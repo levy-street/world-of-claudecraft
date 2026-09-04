@@ -5,7 +5,10 @@
 // through) is icons.ts behavior, not this module's.
 import { describe, expect, it, vi } from 'vitest';
 
-vi.mock('../src/ui/icons', () => ({
+vi.mock('../src/ui/icons', async (importOriginal) => ({
+  // Additive, never bare (the reliquary_window_behavior lesson): the real
+  // module passes through and only iconDataUrl stays stubbed.
+  ...(await importOriginal<typeof import('../src/ui/icons')>()),
   iconDataUrl: (kind: string, id: string) => {
     if (id === 'canvasless_id') throw new Error('2D canvas context is unavailable');
     if (id === 'hostile_url_id') return 'x" onerror="alert(1)';
@@ -120,6 +123,22 @@ describe('knownItemIconHtml (the known arm of the same swallow)', () => {
       '<img class="item-icon q-rare" src="stub:item:copper_ore" alt="" draggable="false">',
     );
     expect(knownItemIconHtml({ id: 'copper_ore' })).toContain('q-common');
+  });
+
+  it('an instance-effective quality overrides the def class; omitted, the def rules', () => {
+    // The phase 13 promoted-copy rim: an instance-aware caller passes the
+    // copy's effective quality and the q-class follows it (legendary orange
+    // on an epic def), while the def-only call shape is byte-identical to the
+    // old markup, so every legacy caller is untouched.
+    expect(knownItemIconHtml({ id: 'copper_ore', quality: 'epic' }, 'legendary')).toBe(
+      '<img class="item-icon q-legendary" src="stub:item:copper_ore" alt="" draggable="false">',
+    );
+    expect(knownItemIconHtml({ id: 'copper_ore', quality: 'epic' })).toContain('q-epic');
+    // The rung guard reaches this arm too: a wire-borne rolled quality can
+    // never inject a second class token.
+    const hostile = knownItemIconHtml({ id: 'copper_ore', quality: 'epic' }, 'x" onerror="a(1)');
+    expect(hostile).not.toContain('onerror');
+    expect(hostile).toContain('class="item-icon q-common"');
   });
 
   it('degrades to the blank pixel on a canvas-less host, never a throw', () => {

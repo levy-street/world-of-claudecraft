@@ -274,10 +274,25 @@ const ONLINE_HISTORY_RANGES: Record<
   '30d': { interval: '30 days', bucket: 'day' },
 };
 
-function cleanOnlineHistoryRange(range: string): OnlineHistoryRange {
+/**
+ * Fold any query-string value onto one of the three ranges. Exported so the
+ * read cache's own copy of this rule (`cacheKeyForRange`,
+ * server/admin_online_history_cache.ts, which cannot import from here; its
+ * header says why) can be asserted to agree with it: the cache must key on the
+ * value THIS function would resolve, or one range's numbers get served under
+ * another range's key.
+ */
+export function cleanOnlineHistoryRange(range: string): OnlineHistoryRange {
   return range === '24h' || range === '7d' || range === '30d' ? range : '30d';
 }
 
+/**
+ * The raw aggregate. NOT the read path a request should take: it is two
+ * date_trunc GROUP BY scans FULL OUTER JOINed over up to 30 days of samples,
+ * and the response is viewer-identical per range, so both dispatch arms go
+ * through readOnlineHistoryCached (server/admin_online_history_cache.ts) and
+ * this stays the cache's refresh.
+ */
 export async function onlineHistory(rangeInput: string): Promise<OnlineHistory> {
   const range = cleanOnlineHistoryRange(rangeInput);
   const config = ONLINE_HISTORY_RANGES[range];

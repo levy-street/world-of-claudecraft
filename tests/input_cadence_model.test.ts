@@ -44,7 +44,7 @@ import { DT, emptyMoveInput, TURN_SPEED } from '../src/sim/types';
 // of real traffic (input frames land in the measured 74 to 106 byte range).
 // ---------------------------------------------------------------------------
 
-type FrameKind = 'input' | 'cast' | 'chat' | 'telemetry' | 'challenge' | 'logout';
+type FrameKind = 'input' | 'cast' | 'chat' | 'telemetry' | 'challenge' | 'rename' | 'logout';
 
 interface SendEvent {
   atMs: number; // receive time; equals send time except in the stall arm
@@ -82,6 +82,9 @@ function chatRaw(line: number): string {
 }
 
 const TELEMETRY_RAW = JSON.stringify({ t: 'cmd', cmd: 'telemetry', apm: 42 });
+// A pet rename: the name-screen lane's tenant (R5), a dialog action at a
+// human cadence of single digits per minute.
+const RENAME_RAW = JSON.stringify({ t: 'cmd', cmd: 'pet_rename', name: 'Rex' });
 const CHALLENGE_RAW = JSON.stringify({
   t: 'cmd',
   cmd: 'challengeResponse',
@@ -198,7 +201,7 @@ function mergeStreams(...streams: SendEvent[][]): SendEvent[] {
 // R6, exempt frames never lane-checked, a kick tearing the session down).
 // ---------------------------------------------------------------------------
 
-type DropCause = MsgDropCause | 'lane_movement' | 'lane_command' | 'lane_chat';
+type DropCause = MsgDropCause | 'lane_movement' | 'lane_command' | 'lane_chat' | 'lane_name_screen';
 
 interface DropRecord {
   atMs: number;
@@ -215,7 +218,7 @@ interface ChainOutcome {
 }
 
 function zeroKindCounts(): Record<FrameKind, number> {
-  return { input: 0, cast: 0, chat: 0, telemetry: 0, challenge: 0, logout: 0 };
+  return { input: 0, cast: 0, chat: 0, telemetry: 0, challenge: 0, rename: 0, logout: 0 };
 }
 
 // Receive-time epoch: an arbitrary real-world second, so the abuse window's
@@ -312,8 +315,16 @@ function buildMix(mix: MixName, hz: number, offsetMs: number): SendEvent[] {
         () => TELEMETRY_RAW,
       );
       const challenge: SendEvent[] = [{ atMs: 13_700, kind: 'challenge', raw: CHALLENGE_RAW }];
+      // Pet renames on the name-screen lane: one per 4 s (an ADMISSION check
+      // at a dialog cadence, not a refill pin; the literal lives in
+      // tests/msg_lanes.test.ts) plus one burst-sized mash of five inside a
+      // second on a full bucket, which pins the burst: a smaller one drops one.
+      const rename = mergeStreams(
+        everyMs(4000, 4000, MATRIX_DURATION_MS - 1, 'rename', () => RENAME_RAW),
+        everyMs(22_000, 10, 22_040, 'rename', () => RENAME_RAW),
+      );
       const logout: SendEvent[] = [{ atMs: MATRIX_DURATION_MS, kind: 'logout', raw: LOGOUT_RAW }];
-      return mergeStreams(input, gcd, mash, chat, telemetry, challenge, logout);
+      return mergeStreams(input, gcd, mash, chat, telemetry, challenge, rename, logout);
     }
   }
 }

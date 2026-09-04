@@ -841,19 +841,50 @@ describe('real catalog integration', () => {
     const view = buildDeedsView(
       makeInput({ deeds: DEEDS, order: DEED_ORDER, category: 'progression' }),
     );
-    // 279 deeds - 4 feats - 9 hidden = 268 visible to a fresh character (the
+    // 287 deeds - 4 feats - 9 hidden = 274 visible to a fresh character. The
+    // farming absorb (masterwrought Phase 11d) carried this branch's 279 to 286
+    // with its seven deeds, none of them feat-flagged or hidden, so both
+    // subtrahends are unchanged and the identity moves with the total alone.
+    // The chain below is the 279 history it extends (the
     // Drakelands brood pair, the four battleground deeds, the Rift coverage
-    // pair, the seven per-craft rare-tier profession deeds, the twelve
-    // remaining starter-zone chronicle pairs, the four Reliquary Curator rank
-    // bridges, the three WARFARE honor ranks, four of the five Phase 18
-    // Reliquary completion-ladder deeds, the walk-in castle visit pair, the
-    // Proving Shore graduation deed, and the five Crucible raid deeds;
-    // col_reliquary_complete is the catalog's one off-prefix feat, so it sits
-    // outside the completion denominator like the three feat_ deeds).
-    expect(view.summary.visibleTotal).toBe(268);
+    // pair, the nine per-craft rare-tier profession deeds (jewelcrafting
+    // joined with the Masterwrought phase 05 base catalog, then its 50-skill
+    // and Grandmaster milestones at the phase 05 QA; inscription and its own
+    // 50-skill and Grandmaster milestone pair joined with the phase 06 base
+    // catalog), the twelve remaining starter-zone chronicle pairs, the four
+    // Reliquary Curator rank bridges, the three WARFARE honor ranks, four of
+    // the five Phase 18 Reliquary completion-ladder deeds, and the release's
+    // walk-in castle visit pair; col_reliquary_complete is the catalog's one
+    // off-prefix feat, so it sits outside the completion denominator like the
+    // three feat_ deeds). Phase 11e appends col_farm_roster, an ordinary
+    // non-feat collection deed, so it joins BOTH counts: 273 to 274 and 277
+    // to 278.
+    // 275 since masterwrought Phase 11i's col_deepest_cast, which is also a
+    // visible non-feat collection deed and so joins both counts again.
+    // 276 since masterwrought Phase 11k's prog_field_to_feast, a visible
+    // non-feat PROGRESSION deed, which joins both counts for the same reason.
+    // 277 since the release/v0.41.0 merge appended prog_ready_for_an_adventure,
+    // the Proving Shore graduation deed: a visible non-feat PROGRESSION deed,
+    // so it joins both counts for the same reason again. The release's own
+    // chain read 274 - 4 - 9 = 261 and 265; the merged identity is
+    // 290 - 4 - 9 = 277 and 281, measured on the merged catalog.
+    // 278 since masterwrought Phase 13 appended prog_legendmaker, the
+    // promotion capstone: another visible non-feat PROGRESSION deed, so it
+    // joins both counts too; 291 - 4 - 9 = 278, and the bucket sum adds the
+    // 4 feat rows back = 282.
+    // 280 since the 2026-08-29 release/v0.41.0 merge brought in the bank
+    // socket ladder pair (Bank Storage phase 06: soc_strongbox_outfitter and
+    // soc_four_bags_deep), both visible non-feat SOCIAL deeds, so they join
+    // both counts; 293 - 4 - 9 = 280, and the bucket sum adds the 4 feat
+    // rows back = 284, recomputed against the merged catalog.
+    // 285 since the release/v0.41.0 merge (2026-08-30) brought in the five
+    // Crucible raid deeds, all visible non-feat DUNGEON deeds (the release's
+    // own identity read 281 - 4 - 9 = 268 and 272), so they join both counts;
+    // 298 - 4 - 9 = 285, and the bucket sum adds the 4 feat rows back = 289.
+    expect(view.summary.visibleTotal).toBe(285);
     // The bucket sum adds the feat-flagged rows back on top (3 on the Feats
     // shelf plus the off-prefix capstone on Collection).
-    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(272);
+    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(289);
   });
 
   it('offers exactly the live catalog border deeds once they are earned', () => {

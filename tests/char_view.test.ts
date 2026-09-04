@@ -83,6 +83,40 @@ describe('char_view: paperdoll data model', () => {
     // every right-column slot is empty when nothing is equipped there
     expect(view.right.every((c) => c.item === null)).toBe(true);
   });
+
+  it('carries each slot its OWN worn payload, PROJECTED to worn identity (phase 13)', () => {
+    // The instance rides the cell so the painter's row can describe the worn
+    // COPY (a promoted legendary's color and chosen name). Slot-keyed, never
+    // smeared: the helmet's payload must not leak onto the mainhand. The cell
+    // holds the wornTooltipInstance PROJECTION, never the raw payload: the
+    // cosmetic fields survive and the bond fields (boundTo, bindOnTrade) are
+    // trimmed, so a future cell reader cannot diverge the offline host from
+    // the eqi-trimmed online mirror.
+    const promoted = {
+      name: 'Dawnbreaker',
+      rolled: { quality: 'legendary' as const },
+      boundTo: 7,
+    };
+    const view = buildPaperdollView(FULL, ITEMS, { helmet: promoted });
+    expect(view.left[0].instance).toEqual({
+      name: 'Dawnbreaker',
+      rolled: { quality: 'legendary' },
+    });
+    expect(view.left[0].instance).not.toBe(promoted); // a projection, not the raw handle
+    expect(view.left[4].instance).toBeNull(); // mainhand: worn, no payload
+    // The def-only negative: no instances argument (a caller with no payloads
+    // in hand) resolves every cell payload-free, byte for byte the old model.
+    const defOnly = buildPaperdollView(FULL, ITEMS);
+    expect(defOnly.left.every((c) => c.instance === null)).toBe(true);
+    expect(defOnly.right.every((c) => c.instance === null)).toBe(true);
+    // An empty slot never carries a payload, even if the record has a stale
+    // entry for it (the item gate runs first).
+    const stale = buildPaperdollView({ chest: 'no_such_item' }, ITEMS, {
+      chest: promoted,
+    });
+    expect(stale.left[3].item).toBeNull();
+    expect(stale.left[3].instance).toBeNull();
+  });
 });
 
 describe('char_view: determinism + ClientWorld-vs-Sim parity', () => {

@@ -11,10 +11,10 @@ describe('Honor and ranked Arena chat feedback', () => {
 
     expect(handler).toContain("const honorMessage = t('hudChrome.warfare.honorGain'");
     // The chat pane carries the single announce (log -> #chat-live).
-    expect(handler).toContain("this.log(honorMessage, '#ffd100')");
+    expect(handler).toContain('this.log(honorMessage, HUD_LOG.NOTICE)');
     // The combat pane is a SILENT visual mirror (appendLog, NOT combatLog), so a screen
     // reader hears the Honor gain once, matching the xp-float precedent / announce contract.
-    expect(handler).toContain("this.appendLog(this.combatLogEl, honorMessage, '#ffd100')");
+    expect(handler).toContain('this.appendLog(this.combatLogEl, honorMessage, HUD_LOG.NOTICE)');
     expect(handler).not.toContain('this.combatLog(honorMessage');
     // Keeps the open character sheet's Honor balance live when an award lands.
     expect(handler).toContain('this.renderCharIfOpen()');

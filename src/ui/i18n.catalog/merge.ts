@@ -159,7 +159,7 @@ const mergePetHud = {
       'Command Emberkin to launch an extra fel projectile at your target. 8 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.',
     abyssalChainTitle: 'Abyssal Chain',
     abyssalChainDesc:
-      'Command Gloomshade to drag a normal enemy more than 8 and up to 20 yards back to itself. Bosses cannot be pulled. 15 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.',
+      'Command Duskmurk to drag a normal enemy more than 8 and up to 20 yards back to itself. Bosses cannot be pulled. 15 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.',
     petTauntTitle: 'Pet Taunt',
     petTauntDesc:
       'Command your pet to engage and Growl when in range. 10 second cooldown. Right-click to auto-cast it whenever it is off cooldown.',
@@ -207,7 +207,7 @@ const mergePetHud = {
       'Ordena a Emberkin lanzar un proyectil vil adicional contra tu objetivo. Reutilización de 8 segundos. Haz clic derecho, mantén pulsado o pulsa Mayús+Intro para alternar el lanzamiento automático.',
     abyssalChainTitle: 'Cadena abisal',
     abyssalChainDesc:
-      'Ordena a Gloomshade arrastrar hacia sí a un enemigo normal situado a más de 8 y hasta 20 metros. No funciona contra jefes. Reutilización de 15 segundos. Haz clic derecho, mantén pulsado o pulsa Mayús+Intro para alternar el lanzamiento automático.',
+      'Ordena a Duskmurk arrastrar hacia sí a un enemigo normal situado a más de 8 y hasta 20 metros. No funciona contra jefes. Reutilización de 15 segundos. Haz clic derecho, mantén pulsado o pulsa Mayús+Intro para alternar el lanzamiento automático.',
     petTauntTitle: 'Provocación de mascota',
     petTauntDesc:
       'Ordena a tu mascota entrar en combate y usar Gruñido al estar en alcance. Reutilización de 10 segundos. Clic derecho para autolanzarlo cuando esté disponible.',
@@ -513,11 +513,16 @@ const mergeStringsEn = {
     ...abilityStrings.en.abilityUi,
     cast: {
       fishing: 'Fishing',
+      // The plant cast (Farming, the growth-engine phase). Same gerund style
+      // as its neighbours; the cast is pure flavor (plantCrop already resolved
+      // the plant), so the label names the activity and nothing more.
+      farming: 'Planting',
       gathering: 'Gathering',
       crafting: 'Crafting',
       disenchanting: 'Disenchanting',
       enchanting_apply: 'Enchanting',
       salvaging: 'Salvaging',
+      sundering: 'Sundering',
       tool_recharge: 'Recharging',
       demonHeal: 'Demon Heal',
       thunzharrStormcall: 'Stormcall',
@@ -552,6 +557,8 @@ const mergeStringsEn = {
       tool: 'Tool',
       potion: 'Potion',
       elixir: 'Elixir',
+      flask: 'Flask',
+      scroll: 'Scroll',
       bag: 'Bag',
       mount: 'Mount',
     },
@@ -565,6 +572,14 @@ const mergeStringsEn = {
       useManaPotion: 'Use: Instantly restores {amount} mana. Usable in combat. 2 min cooldown.',
       clickUseInstant: 'Click to use instantly in combat',
       clickUse: 'Click to use',
+      // The placeable feast's hint (bags_view.ts): the click PLACES the feast
+      // at your feet, it never eats it, so "use" undersold what happens.
+      clickSetOut: 'Click to set out',
+      // The station-placing tools' hint (bags_view.ts), the feast's twin and
+      // the ONE deployable-hint pattern (Masterwrought phase 14): the click
+      // sets the field station up at your feet, the sim line's own verb
+      // ("You set up the {name}."), so "use" undersold this one the same way.
+      clickSetUp: 'Click to set up',
       clickBuyback: 'Click to buy back',
       // Rendered by the item tooltip (hud.ts), the bag sockets (bags_window.ts) AND the
       // World Market's bag-capacity dropdown (market_window.ts), which reuses it so a new
@@ -726,14 +741,12 @@ export const mergeStrings = {
   en: mergeStringsEn,
   es: {
     abilityUi: {
-      ...abilityStrings.es.abilityUi,
       cast: {
         fishing: 'Pesca',
         demonHeal: 'Sanación demoníaca',
         thunzharrStormcall: 'Llamada de la tormenta',
       },
       actionBar: {
-        ...abilityStrings.es.abilityUi.actionBar,
         clearHint: 'Mayús-clic derecho o Mayús-Supr para vaciar',
         itemInBags: 'En bolsas: {count}',
         itemNoneInBags: 'Ninguno en las bolsas',
@@ -899,14 +912,12 @@ export const mergeStrings = {
   es_ES: {} as typeof mergeStringsEn,
   fr_FR: {
     abilityUi: {
-      ...abilityStrings.fr_FR.abilityUi,
       cast: {
         fishing: 'Pêche',
         demonHeal: 'Soin démoniaque',
         thunzharrStormcall: 'Appel de la tempête',
       },
       actionBar: {
-        ...abilityStrings.fr_FR.abilityUi.actionBar,
         clearHint: 'Maj-clic droit ou Maj-Suppr pour vider',
         itemInBags: 'Dans les sacs : {count}',
         itemNoneInBags: 'Aucun dans les sacs',
@@ -1073,14 +1084,12 @@ export const mergeStrings = {
   en_CA: mergeStringsEn,
   it_IT: {
     abilityUi: {
-      ...abilityStrings.it_IT.abilityUi,
       cast: {
         fishing: 'Pesca',
         demonHeal: 'Cura demoniaca',
         thunzharrStormcall: 'Richiamo della tempesta',
       },
       actionBar: {
-        ...abilityStrings.it_IT.abilityUi.actionBar,
         clearHint: 'Maiusc-clic destro o Maiusc-Canc per svuotare',
         itemInBags: 'Nelle borse: {count}',
         itemNoneInBags: 'Nessuno nelle borse',
@@ -1240,14 +1249,12 @@ export const mergeStrings = {
   },
   de_DE: {
     abilityUi: {
-      ...abilityStrings.de_DE.abilityUi,
       cast: {
         fishing: 'Angeln',
         demonHeal: 'Dämonenheilung',
         thunzharrStormcall: 'Sturmruf',
       },
       actionBar: {
-        ...abilityStrings.de_DE.abilityUi.actionBar,
         clearHint: 'Umschalt-Rechtsklick oder Umschalt-Entf zum Leeren',
         itemInBags: 'In Taschen: {count}',
         itemNoneInBags: 'Keine in den Taschen',
@@ -1411,7 +1418,6 @@ export const mergeStrings = {
   },
   zh_CN: {
     abilityUi: {
-      ...abilityStrings.zh_CN.abilityUi,
       cast: {
         fishing: '钓鱼',
         demonHeal: '恶魔治疗',
@@ -1434,7 +1440,6 @@ export const mergeStrings = {
         rift_tide_strike: 'Crushing Depth',
       },
       actionBar: {
-        ...abilityStrings.zh_CN.abilityUi.actionBar,
         clearHint: 'Shift-右键或 Shift-Delete 清除',
         itemInBags: '背包中：{count}',
         itemNoneInBags: '背包中没有',
@@ -1591,7 +1596,6 @@ export const mergeStrings = {
   },
   zh_TW: {
     abilityUi: {
-      ...abilityStrings.zh_TW.abilityUi,
       cast: {
         fishing: '釣魚',
         demonHeal: '惡魔治療',
@@ -1614,7 +1618,6 @@ export const mergeStrings = {
         rift_tide_strike: 'Crushing Depth',
       },
       actionBar: {
-        ...abilityStrings.zh_TW.abilityUi.actionBar,
         clearHint: 'Shift-右鍵或 Shift-Delete 清除',
         itemInBags: '背包中：{count}',
         itemNoneInBags: '背包中沒有',
@@ -1771,7 +1774,6 @@ export const mergeStrings = {
   },
   ko_KR: {
     abilityUi: {
-      ...abilityStrings.ko_KR.abilityUi,
       cast: {
         fishing: '낚시',
         demonHeal: '악마 치유',
@@ -1794,7 +1796,6 @@ export const mergeStrings = {
         rift_tide_strike: 'Crushing Depth',
       },
       actionBar: {
-        ...abilityStrings.ko_KR.abilityUi.actionBar,
         clearHint: 'Shift-우클릭 또는 Shift-Delete로 비우기',
         itemInBags: '가방 보유: {count}',
         itemNoneInBags: '가방에 없음',
@@ -1954,7 +1955,6 @@ export const mergeStrings = {
   },
   ja_JP: {
     abilityUi: {
-      ...abilityStrings.ja_JP.abilityUi,
       cast: {
         fishing: '釣り',
         demonHeal: '悪魔の治癒',
@@ -1977,7 +1977,6 @@ export const mergeStrings = {
         rift_tide_strike: 'Crushing Depth',
       },
       actionBar: {
-        ...abilityStrings.ja_JP.abilityUi.actionBar,
         clearHint: 'Shift-右クリックまたはShift-Deleteで消去',
         itemInBags: 'バッグ内: {count}',
         itemNoneInBags: 'バッグ内になし',
@@ -2140,14 +2139,12 @@ export const mergeStrings = {
   },
   pt_BR: {
     abilityUi: {
-      ...abilityStrings.pt_BR.abilityUi,
       cast: {
         fishing: 'Pesca',
         demonHeal: 'Cura demoníaca',
         thunzharrStormcall: 'Chamado da Tempestade',
       },
       actionBar: {
-        ...abilityStrings.pt_BR.abilityUi.actionBar,
         clearHint: 'Shift-clique direito ou Shift-Delete para limpar',
         itemInBags: 'Nas bolsas: {count}',
         itemNoneInBags: 'Nenhum nas bolsas',
@@ -2312,7 +2309,6 @@ export const mergeStrings = {
   },
   ru_RU: {
     abilityUi: {
-      ...abilityStrings.ru_RU.abilityUi,
       cast: {
         fishing: 'Рыбная ловля',
         demonHeal: 'Исцеление демона',
@@ -2335,7 +2331,6 @@ export const mergeStrings = {
         rift_tide_strike: 'Crushing Depth',
       },
       actionBar: {
-        ...abilityStrings.ru_RU.abilityUi.actionBar,
         clearHint: 'Shift-правый щелчок или Shift-Delete, чтобы очистить',
         itemInBags: 'В сумках: {count}',
         itemNoneInBags: 'В сумках нет',
@@ -2554,7 +2549,7 @@ const mergeEntitiesEn = {
       'Tideguard Sabatons',
       'Valeborn Spellblade',
       "Voss's Sanctified Mace",
-      'Wyrmcult Soulsteps',
+      'Broodsworn Soulsteps',
       'Nightfang Harness',
       'Nightfang Legguards',
       'Nightfang Treads',
@@ -2608,7 +2603,7 @@ const mergeEntitiesEn = {
       'Sister Nhalia',
       'Varkas Boneguard',
       'Emberkin',
-      'Gloomshade',
+      'Duskmurk',
       'Grix the Tunnelking',
       'Brutok Skullsmasher',
       'Captain Verlan',
@@ -4022,13 +4017,13 @@ const mergeExtraEn = {
       name: 'Ondrel Vane',
       title: 'Tidewatcher',
       greeting:
-        'The mere drinks the moonlight, {className}, and gives back the drowned. I have watched that gate for thirty nights — and tonight it is open.',
+        'The mere drinks the moonlight, {className}, and gives back the drowned. I have watched that gate for thirty nights, and tonight it is open.',
     },
   },
   quests: {
     q_drowned_choir: {
       title: 'The Drowned Choir',
-      text: 'The waders do not act alone. Among them walk the Drowned Votaries — the cult that sank with the temple, still in their rotted vestments, still singing the prayer from the shore-rocks. Silence eight of them, and bring me six of the offerings they carry. I would know what they mean to give their goddess.',
+      text: 'The waders do not act alone. Among them walk the Drowned Votaries, the cult that sank with the temple, still in their rotted vestments, still singing the prayer from the shore-rocks. Silence eight of them, and bring me six of the offerings they carry. I would know what they mean to give their goddess.',
       completion:
         "Pearls, knuckle-bones, a child's carved fish... grave-gifts, {playerName}. They are not raising the dead. They are dressing them, the way you dress a body for burial. The temple is a tomb that refuses to close.",
       objectives: {
@@ -4038,37 +4033,37 @@ const mergeExtraEn = {
     },
     q_drowned_moon: {
       title: 'The Drowned Moon',
-      text: "I have read the last of the rubbings, {playerName}, and I understand now what the cult drowned themselves to keep asleep. Ysolei — the Drowned Moon made flesh — coils on the altar at the temple's heart, and the stolen warmth of every life the mere took is pouring into her waking. When the moon stands full she rises, and the water rises with her — the tarn, the wall, the whole mountain under it. Gather the strongest you can find and put her back to sleep. For good, this time.",
+      text: "I have read the last of the rubbings, {playerName}, and I understand now what the cult drowned themselves to keep asleep. Ysolei, the Drowned Moon made flesh, coils on the altar at the temple's heart, and the stolen warmth of every life the mere took is pouring into her waking. When the moon stands full she rises, and the water rises with her: the tarn, the wall, the whole mountain under it. Gather the strongest you can find and put her back to sleep. For good, this time.",
       completion:
-        'The altar is dark, the water is still, and the moon over the tarn is only the moon. You drowned a goddess tonight, {playerName} — and the mountain will never know how close it came. Let the wardens of the shore-rocks rest easy at last.',
+        'The altar is dark, the water is still, and the moon over the tarn is only the moon. You drowned a goddess tonight, {playerName}, and the mountain will never know how close it came. Let the wardens of the shore-rocks rest easy at last.',
       objectives: { 0: { label: 'Ysolei, Avatar of the Drowned Moon, slain' } },
     },
     q_glimmermere_light: {
       title: 'Light on the Water',
-      text: 'Look there, {playerName} — under the surface, a stair of pale stone running down into the dark, and a gate of cold light at the head of it. The old wardens scratched warnings into the shore-rocks before the water took them. Take a rubbing of one for me; I would read what they feared before we go any closer.',
+      text: 'Look there, {playerName}, under the surface, a stair of pale stone running down into the dark, and a gate of cold light at the head of it. The old wardens scratched warnings into the shore-rocks before the water took them. Take a rubbing of one for me; I would read what they feared before we go any closer.',
       completion:
         'A waking-prayer... to something they called the Drowned Moon. And below it, in a steadier hand: "It only sleeps." The water has been listening a long time, {playerName}.',
       objectives: { 0: { label: 'Warding Rubbing taken' } },
     },
     q_palecoil: {
       title: 'Sethrael the Palecoil',
-      text: "One shape in the mere is no drowned man. A serpent the colour of bone glides the deep shelf where the stair begins — Sethrael, the rubbings call it, the Palecoil, the moon's own watch-beast. While it guards that water, no one reaches the gate alive. Go down to the shelf and kill it, {playerName}. Take its heartscale so I know the deed is done.",
+      text: "One shape in the mere is no drowned man. A serpent the colour of bone glides the deep shelf where the stair begins: Sethrael, the rubbings call it, the Palecoil, the moon's own watch-beast. While it guards that water, no one reaches the gate alive. Go down to the shelf and kill it, {playerName}. Take its heartscale so I know the deed is done.",
       completion:
-        'Cold as the bottom of the world, and still it twitches. The shelf is clear, {playerName} — the stair to the gate stands open. I almost wish it did not.',
+        'Cold as the bottom of the world, and still it twitches. The shelf is clear, {playerName}. The stair to the gate stands open. I almost wish it did not.',
       objectives: { 0: { label: "Sethrael's Heartscale" } },
     },
     q_silence_the_choir: {
       title: 'Silence the Choir',
-      text: 'The singing comes from below the gate now, and one voice leads it: Choirmother Selthe, who first taught the cult to drown without dying. While she keeps the prayer, the temple will never sleep — and the mere will never stop giving up its dead. Take companions through the gate and end her. This is no errand for a lone blade, {playerName}.',
+      text: 'The singing comes from below the gate now, and one voice leads it: Choirmother Selthe, who first taught the cult to drown without dying. While she keeps the prayer, the temple will never sleep, and the mere will never stop giving up its dead. Take companions through the gate and end her. This is no errand for a lone blade, {playerName}.',
       completion:
         'The prayer falters... and for the first time in thirty nights, the mere is quiet. But quiet is not the same as ended. Selthe was only the choir. Something below it still listens.',
       objectives: { 0: { label: 'Choirmother Selthe slain' } },
     },
     q_tarn_waders: {
       title: 'What the Tarn Gives Up',
-      text: 'Since the gate opened, things climb out of the mere at dusk — bloated, pale, finned where hands ought to be. Glimmermere Waders, the old rubbings name them. They drag anything living back down with them. Cull ten before they thin my watch to nothing.',
+      text: 'Since the gate opened, things climb out of the mere at dusk: bloated, pale, finned where hands ought to be. Glimmermere Waders, the old rubbings name them. They drag anything living back down with them. Cull ten before they thin my watch to nothing.',
       completion:
-        'Ten back in the water. They feel no cold, {playerName}, and no fear — only the pull of that gate. Whatever sings to them, it sings loud.',
+        'Ten back in the water. They feel no cold, {playerName}, and no fear, only the pull of that gate. Whatever sings to them, it sings loud.',
       objectives: { 0: { label: 'Glimmermere Wader slain' } },
     },
   },
@@ -4076,7 +4071,7 @@ const mergeExtraEn = {
     drowned_temple: {
       name: 'The Drowned Temple',
       enterText:
-        'You step through the moongate — the air turns to cold water and pale light, and the singing closes over your head.',
+        'You step through the moongate: the air turns to cold water and pale light, and the singing closes over your head.',
       leaveText: 'You surface through the moongate into the mountain night.',
     },
   },

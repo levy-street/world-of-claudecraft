@@ -18,13 +18,19 @@
 // Three lifetime totals whose truth already lives in their emitting modules (the
 // bank-ledger FIFO's dropped rows, the two backend-cancel counts) are instead
 // SYNCED from the GameStateSource at scrape time; see their registration below.
+// The offline-writer fence refusals sync the same way but read their emitting
+// module DIRECTLY (server/offline_fence_refusals.ts), like the bank-ledger
+// growth budget and the auth-guard cache stats already do: the counters are
+// process-local and monotonic there, and routing them through
+// GameStateSource would only add a hop GameServer has no part in.
 //
 // CARDINALITY IS BOUNDED BY DESIGN, same contract as server/http/metrics.ts: the
 // only label values are the fixed tick-phase names, the two per-phase stats
 // (p95, max), the two ws directions (in, out), the fixed inbound drop
 // causes (WS_DROP_CAUSES), the fixed guild-bank incident kinds
 // (GUILD_BANK_INCIDENTS), the fixed vault-ledger incident kinds
-// (VAULT_LEDGER_INCIDENTS), and the content-derived economy and fishing
+// (VAULT_LEDGER_INCIDENTS), the fixed offline-writer families
+// (OFFLINE_FENCE_WRITERS), and the content-derived economy and fishing
 // vocabularies (COPPER_FLOW_SOURCES, HARVEST_BANDS, NODE_TIERS, FISHING_BANDS,
 // ROD_FEE_RECIPE_IDS). Nothing per-player and nothing per-guild (account id,
 // character id, guild id, name, ip) is ever a label. The tick-phase series count is fixed at
@@ -36,8 +42,10 @@
 // THE `band` LABEL MEANS TWO DIFFERENT THINGS, and deliberately so: on
 // woc_gather_harvests_total it is the node's ZONE (the R3 re-key), while on
 // the woc_fishing_* family the zone rides its own `zone` label and `band` is
-// the EFFECTIVE fishing rung 0/1/2 (proficiency capped by the rod,
-// effectiveFishingBand in src/sim/professions/fishing.ts). Both vocabularies
+// the EFFECTIVE fishing rung, 0 to 5 (proficiency capped by the rod,
+// effectiveFishingBand in src/sim/professions/fishing.ts; the ladder itself is
+// FISHING_CATCH_BAND_THRESHOLDS in src/sim/professions/fishing_bands.ts, and it
+// read 0/1/2 until masterwrought Phase 11i grew it). Both vocabularies
 // ship together in this metric family's first release, so nothing live
 // depends on either yet; they still must not be renamed apart later, and the
 // label reads against its metric, never across families.
@@ -69,6 +77,7 @@ import {
   ROD_FEE_RECIPE_IDS,
   rodFeeForRecipe,
 } from '../fishing_telemetry';
+import { OFFLINE_FENCE_WRITERS, offlineFenceRefusals } from '../offline_fence_refusals';
 import { wocAuthGuardCacheStats } from '../woc_auth_guard_cache';
 import {
   type GameMetricsCounters,
@@ -89,6 +98,17 @@ import {
 
 /** Live characters online (joined sessions). */
 export const WOC_PLAYERS_ONLINE = 'woc_players_online';
+export const WOC_USERNAME_BANLIST_FILE_LOADED = 'woc_username_banlist_file_loaded';
+export const WOC_CHARACTER_STATE_BYTES_MAX = 'woc_character_state_bytes_max';
+/** The p99 serialized character blob over the most recent saves: the fleet-creep
+ *  read the monotonic max cannot give (server/character_blob_size.ts). */
+export const WOC_CHARACTER_STATE_BYTES_P99 = 'woc_character_state_bytes_p99';
+
+/** Lease-fence refusals by offline character-blob writer family
+ *  (server/offline_fence_refusals.ts). A refusal means a durable effect
+ *  silently did NOT land and nothing in the tree re-triggers it, which is why
+ *  this is a scraped series and not only a log line. */
+export const WOC_OFFLINE_FENCE_REFUSALS_TOTAL = 'woc_offline_fence_refusals_total';
 
 /** Distinct accounts online (a single account may hold several sessions). */
 export const WOC_ACCOUNTS_ONLINE = 'woc_accounts_online';
@@ -227,6 +247,17 @@ export const WOC_BANK_LEDGER_TAIL = 'woc_bank_ledger_tail';
  *  restarts, which the old dropped_rows gauge arm did not. */
 export const WOC_BANK_LEDGER_TAIL_DROPPED_ROWS_TOTAL = 'woc_bank_ledger_tail_dropped_rows_total';
 
+/** Market sold-volume write FIFO occupancy (measure=depth queued entries,
+ *  measure=coalesced lifetime sales folded into an already-queued entry).
+ *  Instantaneous only; the lifetime drop total is the counter below. */
+export const WOC_MARKET_SOLD_VOLUME_TAIL = 'woc_market_sold_volume_tail';
+
+/** Total market sales dropped at the sold-volume write FIFO admission cap (each
+ *  is a lost observation, never a lost sale; the sale itself completed). Alert on
+ *  any increase. A Counter, so rate()/increase() read correctly across restarts. */
+export const WOC_MARKET_SOLD_VOLUME_TAIL_DROPPED_SALES_TOTAL =
+  'woc_market_sold_volume_tail_dropped_sales_total';
+
 /** Marketplace escrow-queue outcomes (the listing entry on the per-character
  *  save FIFO), by kind. */
 export const WOC_ESCROW_QUEUE_TOTAL = 'woc_escrow_queue_total';
@@ -354,6 +385,33 @@ export interface TickPhaseMillis {
  * fixed values. Every method is a cheap live read: it must not block or throw.
  */
 export interface GameStateSource {
+  /**
+   * Whether the configured USERNAME_BANLIST_FILE built the name-screen list
+   * now being served (true with no file configured). A mount that fails
+   * hours after boot leaves the moderation screen serving stale terms with
+   * only a one-shot warn line to say so; this is the scrape-visible twin
+   * (server/auth.ts usernameBanlistStatus, the phase 13 QA hot-path review).
+   * A pure readout as of the LAST name screen or the boot warm: a scrape
+   * never stats or reads the file, so a break on a quiet realm shows at the
+   * next screen, not at the next scrape.
+   */
+  usernameBanlistLoaded(): boolean;
+  /**
+   * Largest serialized character blob (bytes) this process has measured at the
+   * save chokepoint (server/character_blob_size.ts high-water mark). The warn
+   * line only fires 3.2x above the modelled worst case; this gauge makes the
+   * band below it scrape-visible, so a per-player field growing without a
+   * bound shows as a climbing max long before the log says anything.
+   */
+  characterBlobBytesHighWater(): number;
+  /**
+   * The p99 serialized character blob (bytes) over the most recent saves at the
+   * same chokepoint (server/character_blob_size.ts, a count-windowed ring). The
+   * max above flags one outlier; this moves only when the bulk of the realm's
+   * blobs move, which is the shape a per-player field growing without a bound
+   * takes across a fleet. 0 before the first save.
+   */
+  characterBlobBytesP99(): number;
   /** Live characters online. */
   playersOnline(): number;
   /** Distinct accounts online. */
@@ -417,6 +475,10 @@ export interface GameStateSource {
   /** Bank-ledger insert FIFO: live queued ops (depth), the ledger rows those
    *  ops carry, and lifetime rows dropped at either cap. */
   bankLedgerTail(): { depth: number; rows: number; droppedRows: number };
+  /** Market sold-volume write FIFO: live queued entries (depth), lifetime sales
+   *  coalesced into an already-queued entry, and lifetime sales dropped at the
+   *  admission cap (the sale completed; only the observation was lost). */
+  soldVolumeTail(): { depth: number; coalescedSales: number; droppedSales: number };
   generalChatQuotaDbPool(): { total: number; idle: number; waiting: number };
   generalChatQuotaInFlight(): number;
   generalChatQuotaCachedAccounts(): number;
@@ -475,6 +537,59 @@ export function registerGameStateMetrics(
     registers: [registry],
     collect() {
       this.set(source.playersOnline());
+    },
+  });
+
+  new Gauge({
+    name: WOC_USERNAME_BANLIST_FILE_LOADED,
+    help: '1 when the configured USERNAME_BANLIST_FILE built the served name-screen term list (or no file is configured); 0 while a stale or empty list is served in its place. Reflects the state as of the last name screen or the boot warm (a scrape never stats or reads the file).',
+    registers: [registry],
+    collect() {
+      this.set(source.usernameBanlistLoaded() ? 1 : 0);
+    },
+  });
+
+  new Gauge({
+    name: WOC_CHARACTER_STATE_BYTES_MAX,
+    help: 'Largest serialized character blob in bytes measured at the save chokepoint since process start (monotonic high-water mark; the dampened warn line only fires far above the modelled worst case, this gauge watches the band below it).',
+    registers: [registry],
+    collect() {
+      this.set(source.characterBlobBytesHighWater());
+    },
+  });
+
+  new Gauge({
+    name: WOC_CHARACTER_STATE_BYTES_P99,
+    help: 'p99 serialized character blob in bytes over the most recent saves at the save chokepoint (a count-windowed ring, 0 before the first save). The max flags one outlier; this climbs only when the bulk of the realm blobs grow, the fleet-wide creep shape.',
+    registers: [registry],
+    collect() {
+      this.set(source.characterBlobBytesP99());
+    },
+  });
+
+  // The offline-writer lease-fence refusals (the Phase 18 U-SRV-HOT hand-off,
+  // landed in the QA fix round now that server/offline_fence_refusals.ts is in
+  // the tree). Same scrape-time-synced shape as the backend-cancel counters
+  // below: the truth lives in the emitting module and is monotonic per
+  // process, so collect() replays the absolute total via reset() + inc().
+  // NO separate zero-backfill loop, unlike the pushed counters further down:
+  // collect() walks the WHOLE family vocabulary every scrape, so all three
+  // series exist from the first scrape and an operator can tell "no refusals"
+  // from "the series never existed". (Measured, not assumed: an explicit
+  // backfill was written first and removed once the pin proved it changed
+  // nothing.) A refusal is not an error the caller retries: a durable effect
+  // (a rename or reclaim signer sweep, a boosted character's level column)
+  // silently did NOT land and nothing re-triggers it, which is why this is the
+  // series worth alerting on rather than a logged line.
+  new Counter({
+    name: WOC_OFFLINE_FENCE_REFUSALS_TOTAL,
+    help: 'Total offline character-blob writes refused by the load-lease fence, by writer family (rename_sweep, reclaim_sweep, pbe_roster). Each refusal is a durable effect that did not land and that nothing re-triggers; alert on any sustained increase. Counts the FENCE refusal only (the 0-row answer), never a thrown write, which is a different failure with a different operator response.',
+    labelNames: ['writer'],
+    registers: [registry],
+    collect() {
+      this.reset();
+      const refusals = offlineFenceRefusals();
+      for (const writer of OFFLINE_FENCE_WRITERS) this.inc({ writer }, refusals[writer]);
     },
   });
 
@@ -659,6 +774,28 @@ export function registerGameStateMetrics(
     collect() {
       this.reset();
       this.inc(source.bankLedgerTail().droppedRows);
+    },
+  });
+
+  new Gauge({
+    name: WOC_MARKET_SOLD_VOLUME_TAIL,
+    help: 'Per-process market sold-volume write FIFO occupancy by measure: depth is queued write entries against the admission cap, coalesced is the lifetime count of sales folded into an already-queued entry. Instantaneous only; alert on drops via woc_market_sold_volume_tail_dropped_sales_total.',
+    labelNames: ['measure'],
+    registers: [registry],
+    collect() {
+      const tail = source.soldVolumeTail();
+      this.set({ measure: 'depth' }, tail.depth);
+      this.set({ measure: 'coalesced' }, tail.coalescedSales);
+    },
+  });
+
+  new Counter({
+    name: WOC_MARKET_SOLD_VOLUME_TAIL_DROPPED_SALES_TOTAL,
+    help: 'Total market sales dropped at the sold-volume write FIFO admission cap (alert on any increase; each is a lost observation, the sale itself completed).',
+    registers: [registry],
+    collect() {
+      this.reset();
+      this.inc(source.soldVolumeTail().droppedSales);
     },
   });
 

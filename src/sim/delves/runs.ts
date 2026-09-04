@@ -786,7 +786,13 @@ export function ejectToDelveDoor(
   ctx.rebucket(p);
   p.facing = 0;
   p.prevFacing = 0;
-  // The Keeper's Toll survives a delve eject too (see resurrection.ts); all else clears.
+  // The Keeper's Toll survives a delve eject too (see resurrection.ts), and so
+  // does a FLASK aura: this is an EJECT rather than a death, so reusing the
+  // death filter here means the flask deliberately rides through it. That is
+  // the consistent answer (a player ejected from a delve has not died, and
+  // taking their flask would be a harsher outcome than dying), and it is a
+  // deliberate widening of the marker's reach recorded in the phase ledger.
+  // Every other aura clears.
   p.auras = aurasSurvivingDeath(p.auras);
   p.ccDr.clear();
   recalcPlayerStats(p, r.meta.cls, r.meta.equipment, r.meta.talentMods, r.meta.equipmentInstance);
@@ -1303,7 +1309,7 @@ export function tickDelveRaiseDeadChannel(ctx: SimContext, run: DelveRun): void 
     // interrupt-success line emitted from delveInteract on the cracked grave.
     ctx.emit({
       type: 'log',
-      text: "The dead answer Deacon Varric's call!",
+      text: "The dead answer Deacon Vandric's call!",
       color: '#f96',
       entityId: boss.id,
     });

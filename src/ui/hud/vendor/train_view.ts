@@ -82,9 +82,16 @@ export interface TrainViewDeps {
   /** Server-confirmed learns (trainResult ok) the mirrored knownRecipes set
    *  may not carry yet: unioned into the known set so the row flips to Known
    *  the moment the result lands, never a repaint behind the cprof mirror.
-   *  Their fees stay reserved until the mirror carries the grant, because
-   *  the cprof grant and the debited copper ride the same self-frame: an
-   *  unmirrored confirm means an unmirrored debit. Absent means none. */
+   *  Their fees stay reserved until the mirror carries the grant, because on
+   *  the TRAINER path the cprof grant and the debited copper ride the same
+   *  self-frame, so an unmirrored confirm means an unmirrored debit.
+   *  A pattern-item learn (src/sim/professions/pattern_items.ts) joins this
+   *  set too, since TrainLearnTracker.resolve accepts an unsolicited
+   *  trainResult, and it charges no fee at all. Its fee is NOT reserved:
+   *  availableTrainCopper holds copper back only for an id the trainer path
+   *  could have charged (see trainerCharges there), so the one broadcast
+   *  between such a confirm and its cprof no longer blanks every sibling
+   *  row's gold chip. Absent means none. */
   confirmedRecipes?: ReadonlySet<string>;
 }
 
@@ -100,6 +107,14 @@ export interface TrainViewDeps {
  * look). Clamped at 0: online the debited copper can mirror while a flight
  * is still open, and a negative purse would wrongly disable free tier-0
  * rows. Pure and host-agnostic so the view tests pin it directly.
+ *
+ * NEVER RESERVE A FEE THAT CANNOT BE CHARGED. A reserved id only holds copper
+ * back while the TRAINER path could have debited it, which is exactly the ids
+ * `trainerCharges` accepts below. That is what keeps an unsolicited pattern-item
+ * learn (src/sim/professions/pattern_items.ts, which reaches the confirmed
+ * overlay through TrainLearnTracker.resolve and charges nothing) from blanking
+ * every sibling row's gold chip for the one broadcast between its confirm and
+ * its cprof mirror.
  */
 export function availableTrainCopper(
   copper: number,
@@ -112,9 +127,20 @@ export function availableTrainCopper(
   for (const id of reservedRecipes) {
     if (id === excludeRecipeId) continue;
     const recipe = recipeById(id);
-    if (recipe) reserved += trainingFeeFor(recipe);
+    if (recipe && trainerCharges(recipe)) reserved += trainingFeeFor(recipe);
   }
   return Math.max(0, copper - reserved);
+}
+
+/** Whether a learn of `recipe` could have cost the purse its training fee.
+ *  The sim's own answer, restated from the ONE arm that gates it: resolveTrain
+ *  (professions/training.ts) refuses a recipe whose acquisition list omits
+ *  'trainer' as train_not_taught_here, ahead of every charging arm, so no
+ *  other path debits a training fee. A recipe that is BOTH drop- and
+ *  trainer-taught reserves as before: the client cannot tell which path taught
+ *  it, and holding the fee is the arm that fails closed. */
+function trainerCharges(recipe: ProfessionRecipeRecord): boolean {
+  return recipe.acquisition?.includes('trainer') === true;
 }
 
 /** True when a station master with `masterNpcId` exists (the gossip dialog's
@@ -145,9 +171,11 @@ function rowState(
     return 'known';
   }
   // A recipe this master's station serves but that is not trainer-taught
-  // (drop/quest acquisition; none exist today) has no honest row state at a
-  // trainer: it is neither teachable nor tier-locked here, so it is omitted
-  // rather than rendered with a misleading requirement.
+  // (drop/quest acquisition) has no honest row state at a trainer: it is
+  // neither teachable nor tier-locked here, so it is omitted rather than
+  // rendered with a misleading requirement. The drop-taught MECHANISM exists
+  // (pattern items, src/sim/professions/pattern_items.ts), but no shipped
+  // recipe carries a drop or quest source yet.
   if (!recipe.acquisition?.includes('trainer')) return null;
   // The sim's own predicate, not a mirror of it: the row can never drift
   // from what resolveTrain will actually allow.

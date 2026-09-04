@@ -1,0 +1,163 @@
+// Membership pins for the extracted heavy-self policy (server/heavy_self.ts,
+// moved whole from server/game.ts at the v0.38.0 fourteenth absorb). The
+// farming members' BEHAVIORAL coverage lives in
+// tests/farming_command_chain_online.test.ts; these literal pins guard the
+// extraction itself: a member dropped in a merge resolution reds here by name
+// instead of surfacing as a stale self mirror in a live session.
+import { readFileSync } from 'node:fs';
+import { describe, expect, it } from 'vitest';
+import { HEAVY_SELF_CMDS, HEAVY_SELF_EVENTS } from '../../server/heavy_self';
+
+// The FULL member sets as sorted literals (the wire-name doctrine: these are
+// protocol-adjacent names, so each is pinned to a string the production set
+// does not supply). Adding or removing a member is a deliberate policy change
+// that edits this list in the same change; an absorb-resolution that silently
+// drops ANY member reds here by exact diff.
+const EXPECTED_CMDS = [
+  'abandon',
+  'accept',
+  'applyTalents',
+  'bank_buy_slots',
+  'bank_deposit',
+  // The release/v0.41.0 Bank Storage members, relocated into heavy_self.ts at
+  // the sync merge: the two bag-socket moves and the three Materials Vault
+  // item moves all rewrite the carried inventory (the heavy-gated inv key).
+  // vault_buy_upgrade stays absent on the module's own recorded terms.
+  'bank_socket_bag',
+  'bank_unsocket_bag',
+  'bank_withdraw',
+  'buy',
+  'buyback',
+  'change_skin',
+  'change_weapon_skin',
+  'claim_event_skin',
+  'convert_husks',
+  'deleteLoadout',
+  'dev_give',
+  'dev_level',
+  'discard',
+  'equip',
+  'equip_bag',
+  'guild_bank_deposit',
+  'guild_bank_withdraw',
+  'harvestCorpse',
+  'harvest_crop',
+  'interact',
+  'inv_move',
+  'inv_sort',
+  'lock_item',
+  'loot',
+  'mail_delete',
+  'mail_read',
+  'mail_send',
+  'mail_take',
+  'market_buy',
+  'market_cancel',
+  'market_collect',
+  'market_list',
+  'market_list_instance',
+  'mount_toggle',
+  // Masterwrought phase 12: an attempt spends materials and mutates an
+  // instance payload in place, so the inv/einst self mirrors must re-diff.
+  'perfect_item',
+  'pet_feed',
+  'pickup',
+  'place_feast',
+  'plant_crop',
+  'prestige',
+  'respec',
+  'rift_enchant_item',
+  'rift_socket_gem',
+  'rift_upgrade_item',
+  'saveLoadout',
+  'selectTalentRow',
+  'sell',
+  'setSpec',
+  'switchLoadout',
+  'turnin',
+  'unequip_bag',
+  'unequip_item',
+  'unequip_mech_chroma',
+  'use',
+  'vault_deposit',
+  'vault_deposit_all',
+  'vault_withdraw',
+];
+
+const EXPECTED_EVENTS = [
+  'commissionOrderResult',
+  'deedUnlocked',
+  'dismissPet',
+  'enchantResult',
+  'farmPlanted',
+  'farmReady',
+  'learnAbility',
+  'levelup',
+  'loot',
+  'mailArrived',
+  'mailResult',
+  'mechChroma',
+  'questAccepted',
+  'questDone',
+  'questProgress',
+  'questReady',
+  'reliquaryUnlock',
+  'skinEvent',
+  'skinSelect',
+  'summonDemon',
+  'summonPet',
+  'tamePet',
+  'toolEffectResult',
+  'tradeDone',
+  'unbindResult',
+  'vendor',
+  'virtualLevelUp',
+];
+
+describe('heavy-self policy sets', () => {
+  it('HEAVY_SELF_CMDS is exactly the pinned set', () => {
+    expect([...HEAVY_SELF_CMDS].sort()).toEqual(EXPECTED_CMDS);
+  });
+
+  it('HEAVY_SELF_EVENTS is exactly the pinned set', () => {
+    expect([...HEAVY_SELF_EVENTS].sort()).toEqual(EXPECTED_EVENTS);
+  });
+
+  it('carries the farming members and the farming negatives', () => {
+    // Named singly beside the exact-set pins so a farming regression reads as
+    // a farming failure, not a 56-row diff.
+    for (const cmd of ['plant_crop', 'harvest_crop', 'convert_husks']) {
+      expect(HEAVY_SELF_CMDS.has(cmd), cmd).toBe(true);
+    }
+    expect(HEAVY_SELF_EVENTS.has('farmPlanted')).toBe(true);
+    // The ready notice (the ready-notice phase): the sweep flips the plot's
+    // persisted `notified` flag with no inventory change and no command
+    // behind it, so the heavy-gated `fplot` row refreshes off THIS event or
+    // not until the staggered backstop.
+    expect(HEAVY_SELF_EVENTS.has('farmReady')).toBe(true);
+    // farmDenied is deliberately NOT a member (refusals ride their own event
+    // and must not buy a heavy re-serialize); pin the negative arm too.
+    expect(HEAVY_SELF_EVENTS.has('farmDenied')).toBe(false);
+  });
+
+  it('server/game.ts still consumes the extracted sets (the orphan guard)', () => {
+    // The membership pins above stay green on an orphaned module; this arm
+    // fails if the coordinator stops importing the policy. A rename of the
+    // import path or names is a deliberate change that edits this line.
+    //
+    // Phase 18 moved the CMDS consumption behind two predicates: game.ts no
+    // longer reads HEAVY_SELF_CMDS itself, it asks heavySelfMarkOnReceipt /
+    // heavySelfMarkOnAccept which path a command marks on (server/heavy_self.ts,
+    // which is where the set is now read). So the import line alone would leave
+    // the CMDS set orphanable behind a dead import: both CALL SITES are pinned
+    // too, one per path, and tests/heavy_self_arm_marks.test.ts holds the other
+    // end (that the predicates are really answering out of HEAVY_SELF_CMDS).
+    const game = readFileSync(new URL('../../server/game.ts', import.meta.url), 'utf8');
+    expect(game).toContain(
+      "import { HEAVY_SELF_EVENTS, heavySelfMarkOnAccept, heavySelfMarkOnReceipt } from './heavy_self';",
+    );
+    expect(game).toContain('heavySelfMarkOnReceipt(msg.cmd)');
+    expect(game).toContain('heavySelfMarkOnAccept(command)');
+    expect(game).toContain('if (HEAVY_SELF_EVENTS.has(ev.type)) session.selfHeavyDirty = true;');
+  });
+});

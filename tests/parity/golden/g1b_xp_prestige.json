@@ -16,8 +16,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "06cbf5e3",
+      "nextId": 1003,
+      "state": "2567625d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -49,6 +49,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -62,7 +63,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 994,
+          "entityId": 998,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -90,7 +91,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -105,7 +107,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 994
+              "sourceId": 998
             }
           ],
           "blockChance": 0.05,
@@ -119,7 +121,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 994,
+          "id": 998,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -163,9 +165,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 999,
-      "state": "05ff15b5",
-      "events": "7eb0fe07",
+      "nextId": 1003,
+      "state": "97d190f5",
+      "events": "f8844217",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -174,8 +176,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 999,
-      "state": "4324f4b4",
+      "nextId": 1003,
+      "state": "ae40af66",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -185,8 +187,8 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 999,
-      "state": "0756cf85",
+      "nextId": 1003,
+      "state": "d7bb1ac7",
       "events": "741638a5",
       "rng": {
         "draws": 149,
@@ -196,8 +198,8 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 999,
-      "state": "0756cf85",
+      "nextId": 1003,
+      "state": "d7bb1ac7",
       "events": "741638a5",
       "rng": {
         "draws": 149,
@@ -229,6 +231,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -248,7 +251,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 994,
+          "entityId": 998,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -278,7 +281,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -293,7 +297,7 @@
               "name": "Battle Stance",
               "remaining": 3597,
               "school": "physical",
-              "sourceId": 994
+              "sourceId": 998
             }
           ],
           "blockChance": 0.05,
@@ -307,7 +311,7 @@
           "fiveSecondRule": 102,
           "healPower": 5,
           "hp": 100,
-          "id": 994,
+          "id": 998,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -351,9 +355,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 999,
-      "state": "e50e4568",
-      "events": "ed3ac70a",
+      "nextId": 1003,
+      "state": "4d8a53b8",
+      "events": "4747e1f6",
       "rng": {
         "draws": 149,
         "digest": "70ec170d"
@@ -386,6 +390,7 @@
           "counters": {
             "xpGained": 160
           },
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -405,7 +410,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 994,
+          "entityId": 998,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -437,6 +442,7 @@
           "vault": {
             "stock": {}
           },
+          "wyrmfallDaily": {},
           "xp": 160
         }
       ],
@@ -452,7 +458,7 @@
               "name": "Battle Stance",
               "remaining": 3597,
               "school": "physical",
-              "sourceId": 994
+              "sourceId": 998
             }
           ],
           "blockChance": 0.05,
@@ -466,7 +472,7 @@
           "fiveSecondRule": 102,
           "healPower": 5,
           "hp": 100,
-          "id": 994,
+          "id": 998,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -510,9 +516,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 999,
-      "state": "a8518fd3",
-      "events": "9122e81d",
+      "nextId": 1003,
+      "state": "1416bb5d",
+      "events": "5f5ace8d",
       "rng": {
         "draws": 149,
         "digest": "70ec170d"
@@ -546,6 +552,7 @@
             "levelUps": 1,
             "xpGained": 610
           },
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -565,7 +572,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 994,
+          "entityId": 998,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -597,6 +604,7 @@
           "vault": {
             "stock": {}
           },
+          "wyrmfallDaily": {},
           "xp": 210
         }
       ],
@@ -612,7 +620,7 @@
               "name": "Battle Stance",
               "remaining": 3597,
               "school": "physical",
-              "sourceId": 994
+              "sourceId": 998
             }
           ],
           "blockChance": 0.05,
@@ -626,7 +634,7 @@
           "fiveSecondRule": 102,
           "healPower": 5,
           "hp": 138,
-          "id": 994,
+          "id": 998,
           "kind": "player",
           "level": 2,
           "lootFfaTimer": "Infinity",
@@ -670,9 +678,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 999,
-      "state": "ebb71b1f",
-      "events": "44db317f",
+      "nextId": 1003,
+      "state": "0321a8eb",
+      "events": "fdd04957",
       "rng": {
         "draws": 149,
         "digest": "70ec170d"
@@ -706,6 +714,7 @@
             "levelUps": 1,
             "xpGained": 23810
           },
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -725,7 +734,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 994,
+          "entityId": 998,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -757,6 +766,7 @@
           "vault": {
             "stock": {}
           },
+          "wyrmfallDaily": {},
           "xp": 210
         }
       ],
@@ -772,7 +782,7 @@
               "name": "Battle Stance",
               "remaining": 3597,
               "school": "physical",
-              "sourceId": 994
+              "sourceId": 998
             }
           ],
           "blockChance": 0.05,
@@ -786,7 +796,7 @@
           "fiveSecondRule": 102,
           "healPower": 5,
           "hp": 822,
-          "id": 994,
+          "id": 998,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -830,9 +840,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 999,
-      "state": "ae0eba22",
-      "events": "095fca5a",
+      "nextId": 1003,
+      "state": "3c9c9294",
+      "events": "2a93fa2a",
       "rng": {
         "draws": 149,
         "digest": "70ec170d"
@@ -866,6 +876,7 @@
             "levelUps": 1,
             "xpGained": 23810
           },
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -885,7 +896,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 994,
+          "entityId": 998,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -917,7 +928,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -932,7 +944,7 @@
               "name": "Battle Stance",
               "remaining": 3597,
               "school": "physical",
-              "sourceId": 994
+              "sourceId": 998
             }
           ],
           "blockChance": 0.05,
@@ -946,7 +958,7 @@
           "fiveSecondRule": 102,
           "healPower": 5,
           "hp": 822,
-          "id": 994,
+          "id": 998,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -990,8 +1002,8 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 999,
-      "state": "ae0eba22",
+      "nextId": 1003,
+      "state": "3c9c9294",
       "events": "741638a5",
       "rng": {
         "draws": 149,
@@ -1026,6 +1038,7 @@
             "levelUps": 1,
             "xpGained": 23810
           },
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1045,7 +1058,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 994,
+          "entityId": 998,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1077,7 +1090,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -1092,7 +1106,7 @@
               "name": "Battle Stance",
               "remaining": 3597,
               "school": "physical",
-              "sourceId": 994
+              "sourceId": 998
             }
           ],
           "blockChance": 0.05,
@@ -1106,7 +1120,7 @@
           "fiveSecondRule": 102,
           "healPower": 5,
           "hp": 822,
-          "id": 994,
+          "id": 998,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1150,8 +1164,8 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 999,
-      "state": "ae0eba22",
+      "nextId": 1003,
+      "state": "3c9c9294",
       "events": "741638a5",
       "rng": {
         "draws": 149,
@@ -1186,6 +1200,7 @@
             "levelUps": 1,
             "xpGained": 23810
           },
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1205,7 +1220,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 994,
+          "entityId": 998,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1237,7 +1252,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -1252,7 +1268,7 @@
               "name": "Battle Stance",
               "remaining": 3597,
               "school": "physical",
-              "sourceId": 994
+              "sourceId": 998
             }
           ],
           "blockChance": 0.05,
@@ -1266,7 +1282,7 @@
           "fiveSecondRule": 102,
           "healPower": 5,
           "hp": 822,
-          "id": 994,
+          "id": 998,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",

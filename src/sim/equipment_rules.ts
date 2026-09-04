@@ -4,7 +4,9 @@ import {
   type ArmorItemDef,
   type ArmorType,
   type EquipSlot,
+  type InvSlot,
   type ItemDef,
+  type ItemInstancePayload,
   type PlayerClass,
   type WeaponItemDef,
 } from './types';
@@ -82,9 +84,27 @@ export function slotAcceptsItem(item: ItemDef, slot: EquipSlot): boolean {
 
 // Every legendary item is unique-equipped: a character wears at most one copy
 // of a given legendary at a time. Derived from quality rather than a per-item
-// flag so a new legendary can never forget to opt in.
-export function isUniqueEquipped(item: ItemDef): boolean {
-  return item.quality === 'legendary';
+// flag so a new legendary can never forget to opt in. Since 2026-08-27
+// (phase 13) the instance widening is ADD-ONLY and PROMOTION-SCOPED, not a
+// raw effective-quality read (corrected 2026-08-27, same day): a def-level
+// legendary ALWAYS counts (a below-def rolled quality can never remove
+// def-level uniqueness), and a legendary-ROLLED copy counts only when the
+// payload also carries the promotion's own `perfected` stamp (the orange
+// promotion requires a Perfected copy, so every promoted copy has it). Legacy
+// legendary-rolled payloads never do (old masterwork bumps wrote
+// rolled.quality; crafting.ts retired that for new writes but keeps loading
+// them), so a live character legally wearing two legacy legendary-rolled
+// copies is not retroactively captured and benched at login. A def-only
+// caller passes nothing and keeps the def-quality answer unchanged.
+// DECIDED 2026-08-27, display vs equip: a legacy legendary-rolled copy
+// deliberately KEEPS its legendary DISPLAY (tooltipEffectiveQuality in
+// src/ui/item_instance_tooltip.ts renders the copy's honest roll) while THIS
+// rule stays promotion-scoped for migration safety. The two reads
+// disagreeing about a legacy copy is a decision, not drift; do not "fix"
+// either side to match the other.
+export function isUniqueEquipped(item: ItemDef, instance?: ItemInstancePayload): boolean {
+  if (item.quality === 'legendary') return true;
+  return instance?.perfected === true && instance.rolled?.quality === 'legendary';
 }
 
 // The uniqueness KEY. A heroic upgrade variant (content/heroic_variants.ts,
@@ -101,21 +121,189 @@ export function uniqueEquipFamily(item: ItemDef): string {
 // swap displaces, e.g. the offhand a two-hander benches), which therefore
 // cannot conflict with the incoming copy. `lookup` resolves a worn id to its
 // def (the sim passes ITEMS; injected so this leaf stays data-free).
+// `instances` are the worn per-copy payloads and `incomingInstance` the exact
+// copy about to be worn (phase 13, the masterwroughtConflictSlot params'
+// shape): with them the rule counts a promoted legendary-rolled copy on
+// either side; a caller with no instance context omits both and keeps the
+// def-only behavior.
 export function uniqueEquipConflictSlot(
   item: ItemDef,
   equipment: Partial<Record<EquipSlot, string>>,
   lookup: (id: string) => ItemDef | undefined,
   ignoreSlots: readonly EquipSlot[],
+  instances?: Partial<Record<EquipSlot, ItemInstancePayload>>,
+  incomingInstance?: ItemInstancePayload,
 ): EquipSlot | null {
-  if (!isUniqueEquipped(item)) return null;
+  if (!isUniqueEquipped(item, incomingInstance)) return null;
   const family = uniqueEquipFamily(item);
   for (const slot of ALL_EQUIP_SLOTS) {
     if (ignoreSlots.includes(slot)) continue;
     const wornId = equipment[slot];
     if (!wornId) continue;
     const worn = lookup(wornId);
-    if (!worn || !isUniqueEquipped(worn)) continue;
+    if (!worn || !isUniqueEquipped(worn, instances?.[slot])) continue;
     if (uniqueEquipFamily(worn) === family) return slot;
+  }
+  return null;
+}
+
+// THE unit-selection rule for an equip: an explicit `slotIndex` naming a
+// valid cell holding this item id wins (the copy consumeSelectedInventorySlot
+// would lift, the item_copy_ref index-plus-id pin), else the highest-index
+// matching inventory slot (see the comment at the consume site in items.ts
+// equipItem for why the top of the bags is what an id-only equip picks up).
+// Lives in this leaf rather than beside the consume so the client mirror can
+// answer "which copy would this equip take" without importing the command
+// bodies, and so the pre-equip PEEK at a copy and the consume that lifts it
+// can never pick different units: a counted equip family reading a different
+// copy's rolled quality than the one it ends up wearing would be gameable by
+// stack ordering alone (and, before 2026-08-27, WAS: a slotIndex equip
+// consumed the named cell while the peek judged the highest-index one).
+// The invalid-index case (a slotIndex that names no valid cell of this id)
+// falls back to the highest-index unit HERE while
+// consumeSelectedInventorySlot refuses it outright; what keeps peek and
+// consume agreeing anyway is equipItem's early invalid-selection gate
+// (src/sim/items.ts, the selectedInventorySlot null check before the first
+// write), which refuses the whole equip before either is consulted.
+export function equipCandidateIndex(
+  inventory: readonly InvSlot[],
+  itemId: string,
+  slotIndex?: number,
+): number {
+  if (
+    slotIndex !== undefined &&
+    Number.isInteger(slotIndex) &&
+    slotIndex >= 0 &&
+    slotIndex < inventory.length &&
+    inventory[slotIndex].itemId === itemId &&
+    inventory[slotIndex].count >= 1
+  ) {
+    return slotIndex;
+  }
+  // Same count >= 1 rule as the named-cell arm above: a cell that holds none of
+  // the item is not a unit anything can lift, so it must not be the copy the
+  // peek judges either. Without it a stale count-0 cell sitting above a real
+  // copy answered as the unit an id-only equip would take, which is the exact
+  // peek-consume disagreement the header says this function exists to prevent.
+  for (let i = inventory.length - 1; i >= 0; i--) {
+    if (inventory[i].itemId === itemId && inventory[i].count >= 1) return i;
+  }
+  return -1;
+}
+
+// THE effective-quality precedence rule, shared by the worn side and the
+// incoming side below: a copy's own rolled quality wins over its def's when
+// present, the same precedence professions/battlefield_xp.ts reads rarity with.
+// Exported since phase 13: the promotion mints legendary-ROLLED copies, so
+// presentation consumers (the instance tooltip) read the same one rule.
+export function effectiveQuality(
+  def: ItemDef,
+  instance: ItemInstancePayload | undefined,
+): string | undefined {
+  return instance?.rolled?.quality ?? def.quality;
+}
+
+// The effective quality of the copy an equip of `itemId` would consume now:
+// the selected unit's rolled quality when it carries one, else the def's.
+// `slotIndex` is the equip's own selection when the caller named one (a drag
+// from a specific cell); without it the id-only rule answers. This is what
+// masterwroughtConflictSlot wants for `incomingQuality`.
+export function equipCandidateQuality(
+  inventory: readonly InvSlot[],
+  itemId: string,
+  def: ItemDef,
+  slotIndex?: number,
+): string | undefined {
+  return effectiveQuality(def, equipCandidateInstance(inventory, itemId, slotIndex));
+}
+
+// The per-copy payload of the unit an equip of `itemId` would consume now
+// (the same selection equipCandidateIndex makes: the named cell when
+// `slotIndex` validly names one, else the highest-index match), or undefined
+// for no carried copy or a plain one. The unique-equipped rule peeks it
+// (phase 13) the way the Masterwrought sub-cap peeks equipCandidateQuality
+// above. Both peeks must receive the SAME slotIndex the consume will honor:
+// judged-vs-worn CAN differ when the caller threads the selection into the
+// consume but not into the peek (the 2026-08-27 sub-cap bypass), which is
+// why items.ts passes its slotIndex through at every call site.
+export function equipCandidateInstance(
+  inventory: readonly InvSlot[],
+  itemId: string,
+  slotIndex?: number,
+): ItemInstancePayload | undefined {
+  const index = equipCandidateIndex(inventory, itemId, slotIndex);
+  return index < 0 ? undefined : inventory[index].instance;
+}
+
+// How many Masterwrought pieces a character may wear at once, and how many of
+// those may be legendary. A two-hander occupies one equipment slot and so
+// counts once, like every other piece. Retuning either cap is never a quiet
+// one-line edit: the refusal prose in src/ui/sim_i18n.ts spells these numbers
+// out in every locale and the tooltip copy interpolates the equip cap, so a
+// retune must sweep all of that copy with it (the pinned test in
+// tests/masterwrought_cap.test.ts is the reminder).
+export const MASTERWROUGHT_EQUIP_CAP = 2;
+export const MASTERWROUGHT_LEGENDARY_CAP = 1;
+
+export type MasterwroughtConflict = { slot: EquipSlot; reason: 'cap' | 'legendary' };
+
+// The worn slot that would break the Masterwrought counted-family rule if
+// `item` were equipped now, or null when the equip is legal. Two counted caps,
+// reported apart so the refusal can say which one bit: `cap` when the character
+// already wears the maximum number of flagged pieces, `legendary` when the
+// incoming piece is legendary-effective and a legendary-effective flagged piece
+// is already worn. Duplicates of one flagged item are deliberately legal inside
+// the cap, so nothing here compares ids or families.
+//
+// The sub-cap reads INSTANCE-effective quality. Until 2026-08-27 that made
+// the two rules deliberately disagree about one copy (isUniqueEquipped read
+// def quality only, so a legendary-ROLLED copy of an epic def counted here
+// and was NOT unique-equipped). 2026-08-27, phase 13: the orange promotion
+// mints legendary-rolled instances (NOT the first legal ones, as this
+// comment first claimed: legacy masterwork bumps wrote rolled.quality too,
+// crafting.ts says so; corrected 2026-08-27) and the phase file's acceptance
+// requires BOTH rules to count a PROMOTED copy, so isUniqueEquipped is
+// instance-aware for promotion-stamped (`perfected`) copies and the recorded
+// disagreement is retired for those. The sub-cap here keeps the plain
+// effective-quality read: a legacy legendary-rolled payload can only sit on
+// a non-masterwrought def (masterwrought crafts never wrote rolled.quality),
+// which the flag filter below never counts.
+//
+// `ignoreSlots` names the slots this equip empties or overwrites (the target
+// slot itself, plus a slot the swap displaces, e.g. the offhand a two-hander
+// benches), which therefore cannot conflict with the incoming piece. `lookup`
+// resolves a worn id to its def and `instances` the worn per-copy payloads (the
+// sim passes ITEMS and meta.equipmentInstance; injected so this leaf stays
+// data-free). `incomingQuality` is the effective quality of the exact copy
+// about to be worn, which overrides the def's when the carried unit rolled its
+// own. Quality strings are compared strictly: a rolled quality that is not
+// exactly 'legendary' (a typo, a future tier) counts as non-legendary, so the
+// sub-cap fails OPEN on an unrecognized string while the piece count itself is
+// unaffected.
+export function masterwroughtConflictSlot(
+  item: ItemDef,
+  equipment: Partial<Record<EquipSlot, string>>,
+  lookup: (id: string) => ItemDef | undefined,
+  ignoreSlots: readonly EquipSlot[],
+  instances?: Partial<Record<EquipSlot, ItemInstancePayload>>,
+  incomingQuality?: string,
+): MasterwroughtConflict | null {
+  if (!item.masterwrought) return null;
+  const worn: { slot: EquipSlot; legendary: boolean }[] = [];
+  for (const slot of ALL_EQUIP_SLOTS) {
+    if (ignoreSlots.includes(slot)) continue;
+    const wornId = equipment[slot];
+    if (!wornId) continue;
+    const def = lookup(wornId);
+    if (!def?.masterwrought) continue;
+    worn.push({ slot, legendary: effectiveQuality(def, instances?.[slot]) === 'legendary' });
+  }
+  if (worn.length >= MASTERWROUGHT_EQUIP_CAP) return { slot: worn[0].slot, reason: 'cap' };
+  if ((incomingQuality ?? item.quality) === 'legendary') {
+    const legendaryWorn = worn.filter((w) => w.legendary);
+    if (legendaryWorn.length >= MASTERWROUGHT_LEGENDARY_CAP) {
+      return { slot: legendaryWorn[0].slot, reason: 'legendary' };
+    }
   }
   return null;
 }

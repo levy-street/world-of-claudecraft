@@ -64,7 +64,8 @@ export const it_IT: EnTranslations = {
       "dungeon": "Dungeon",
       "difficulty": "Difficoltà",
       "name": "Nome",
-      "spec": "Specializzazione"
+      "spec": "Specializzazione",
+      "bed": "Bed id (optional)"
     },
     "difficulty": {
       "normal": "Normale",
@@ -150,6 +151,10 @@ export const it_IT: EnTranslations = {
       "gather": {
         "label": "Aumenta abilità di raccolta",
         "description": "Aumenta l’abilità in un mestiere di raccolta."
+      },
+      "farmgrow": {
+        "label": "Ripen crops",
+        "description": "Bring your planted crop beds to their ready time, or one bed by id. Nothing else changes: the outcome was rolled when you planted."
       },
       "teleport": {
         "label": "Teletrasporta",
@@ -681,7 +686,7 @@ export const it_IT: EnTranslations = {
         "ice_fang_sword": {
           "name": "Zanna di ghiaccio",
           "look": "Lama curva di ghiaccio glaciale pallido, cristalli di brina frastagliati lungo la spina dorsale, un nucleo ghiacciato di colore ciano brillante nella guardia trasversale di ghiacciolo più piena.",
-          "lore": "Il pezzo forte della serie gelata, il primo che ogni collezionista desidera. Zanna di Ghiaccio fu scolpita, non forgiata, da una zanna del ghiacciaio che corona Thornpeak sopra Highwatch; il nucleo ciano arde di un freddo pari alla luce del Glimmermere. Ricopre di brina persino l'aria che taglia. Le guardie della muraglia giurano che un soldato la portasse la notte in cui le alte nevi respinsero il Culto del Wyrm e \"regalò alla muraglia un altro inverno\"."
+          "lore": "The flagship of the frozen grade, and the piece every collector reaches for first. Ice Fang was carved, not forged, from a fang of the glacier that caps Thornpeak above Highwatch, its cyan core burning cold as the light off the Glimmermere. It rimes the very air it cuts. The wall-guard swear one soldier carried it the night the high snows held the Broodsworn back, and 'bought the wall a winter.'"
         },
         "glaciersplit_axe": {
           "name": "Spaccatura del ghiacciaio",
@@ -709,7 +714,7 @@ export const it_IT: EnTranslations = {
           "lore": "Una punta di ghiaccio glaciale luminoso, che si dice provenga dal profondo laghetto sotto il Sanctum, dove il freddo della montagna ha i denti. La brina fiorisce senza fine dal collare d'argento e non si scioglie mai, né al fuoco né d'estate. I maghi la tengono vicina per il gelo che presta alle loro opere, ma la allontanano nelle notti in cui sembra inclinarsi verso la cripta di Nythraxis e mettersi in ascolto."
         },
         "winterbite": {
-          "name": "Morso invernale",
+          "name": "Wintergnaw",
           "look": "Arco di acciaio argentato e ghiaccio azzurro, nucleo ciano ghiacciato e luminoso nell'impugnatura, freccia di ghiaccio massiccio incoccata e vapore freddo.",
           "lore": "Un arco di acciaio argentato e ghiaccio di Thornpeak, con l'impugnatura illuminata da un freddo nucleo ciano che congela la freccia alla corda. Incocca un dardo di ghiaccio glaciale che si riforma a ogni tiro; sulla muraglia l'arciere non porta una faretra, soltanto il freddo. Highwatch resistette a un assedio sulla Cresta del braccatore grazie a un arco simile: un solo arciere, si dice, e frecce per un intero inverno, sempre già pronte."
         },
@@ -1035,11 +1040,6 @@ export const it_IT: EnTranslations = {
       "clearArmed": "Tocca uno slot per svuotarlo."
     },
     "tutorialGreeting": {
-      "bodyFirst": "Non ti avevo mai visto da queste parti, amico. È tradizione in queste terre che chi inizia la propria avventura visiti la Riva della Prova, un'isola tranquilla al largo dello stretto. Lì puoi affinare le tue abilità e abituarti al mondo prima di affrontarne le sfide. Il traghetto va in entrambe le direzioni, e nessuno penserà male di te in un caso o nell'altro.",
-      "bodyRefresher": "Di nuovo qui con un volto nuovo, eh? Allora sai già come funziona. Ma se desideri un ripasso prima di partire, la Riva della Prova non respinge mai uno studente di ritorno, e il traghetto è pronto quando lo sei tu.",
-      "play": "Inizia il tutorial",
-      "skip": "Salta il tutorial",
-      "declineNote": "Come preferisci, amico. Se mai dovessi cambiare idea, la campana del traghetto accanto alla cassetta della Posta dei Corvi ti farà attraversare fino alla Riva della Prova a qualunque ora, di giorno o di notte. Sarà ancora qui quando i lupi non ci saranno più.",
       "bellHomeNote": "Già di ritorno dalla riva? Quella era la campana del traghetto che hai suonato. La sua gemella è appesa proprio lì, accanto alla cassetta della Posta dei Corvi: suonala quando vuoi e la traversata ti riporterà alla Riva della Prova. Nessun danno in entrambi i casi.",
       "islandArrivalNote": "Benvenuto alla Riva della Prova. Il Guardiano Tam ti aspetta poco più avanti sulla spiaggia: vai a trovarlo.",
       "noteClose": "Capito"
@@ -1388,7 +1388,7 @@ export const it_IT: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, il Rospo Saltombra",
       "name_stormfeather_griffin": "Piumatempesta Toccacielo",
       "name_thunderstrut_gobbler": "Passotuono, il Gran Tacchino",
-      "name_terrorspark_groundshaker": "Terrorscintilla, Scuoteterra",
+      "name_terrorspark_groundshaker": "Dreadspark Groundshaker",
       "name_drakemaw_raptor": "Raptor di Drakemaw",
       "name_mech_bird": "Cluckwork Mech Bird",
       "name_lanternback_troll": "Grumbol the Lanternback",
@@ -1950,7 +1950,7 @@ export const it_IT: EnTranslations = {
         "battleTrance": "Trance di Battaglia",
         "overpowerCharge": "Potenziamento di Mano Rossa",
         "suddenDeath": "Morte Improvvisa",
-        "victoryRush": "Impeto della Vittoria",
+        "victoryRush": "Victor's Surge",
         "enrage": "Carneficina: Infuriato",
         "heatingUp": "Riscaldamento",
         "arcaneCharge": "Cariche Arcane",
@@ -2092,6 +2092,15 @@ export const it_IT: EnTranslations = {
     "itemHeroicLabel": "Eroico",
     "itemSoulbound": "Vincolato all’anima",
     "itemUniqueEquipped": "Unico Equipaggiato",
+    "itemMasterwrought": "Unique-Equipped: Masterwrought ({count})",
+    "masterwrought": {
+      "slotsLabel": "Masterwrought slots:",
+      "slotsValue": "{used} / {cap}",
+      "pieceMark": "Masterwrought",
+      "tooltipWorn": "Occupies a Masterwrought slot ({used} of {cap} in use).",
+      "tooltipLegendaryLimit": "Only {cap} legendary Masterwrought piece can be worn.",
+      "tooltipAtCap": "All {cap} of your Masterwrought slots are in use."
+    },
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2121,6 +2130,18 @@ export const it_IT: EnTranslations = {
       "linkHint": "Shift-clic per collegare questo oggetto in chat."
     },
     "plurals": {
+      "commissionMasterworks": {
+        "one": "{count} masterwork",
+        "few": "{count} masterworks",
+        "many": "{count} masterworks",
+        "other": "{count} masterworks"
+      },
+      "commissionLegendaries": {
+        "one": "{count} legendary",
+        "few": "{count} legendaries",
+        "many": "{count} legendaries",
+        "other": "{count} legendaries"
+      },
       "guildMembers": {
         "one": "sei {rank}, {count} membro",
         "few": "sei {rank}, {count} membri",
@@ -2730,7 +2751,7 @@ export const it_IT: EnTranslations = {
       "sanguine": "Aumenta la velocità di attacco del {hastePct}% e i danni inflitti del {dmgPct}%",
       "battleTrance": "Il tuo prossimo Colpo del Predone o Colpo Mutilante non costa rabbia",
       "revengeFree": "La tua prossima Vendetta non costa rabbia",
-      "victoryRush": "Impeto della Vittoria è pronto",
+      "victoryRush": "Victor's Surge is ready",
       "maxHpPct": "Aumenta la salute massima del {pct}%",
       "enrage": "Danni inflitti aumentati del {damagePct}%, velocità d'attacco del {hastePct}%, e velocità di movimento del {movePct}%",
       "suddenDeath": "La tua prossima Tomba Prematura non costa rabbia e ignora il suo requisito di salute",
@@ -3024,20 +3045,34 @@ export const it_IT: EnTranslations = {
       "riftSockets": "Gemme dello squarcio {used}/{total}",
       "statEnchanted": "+{value} {stat} (Incantato)",
       "enchantedFallback": "Incantato",
-      "partyTradeWindow": "Puoi scambiare questo oggetto con i giocatori che hanno condiviso il suo bottino per i prossimi {time}. Indossarlo pone fine alla finestra di scambio."
+      "partyTradeWindow": "Puoi scambiare questo oggetto con i giocatori che hanno condiviso il suo bottino per i prossimi {time}. Indossarlo pone fine alla finestra di scambio.",
+      "perfectedBadge": "Perfected",
+      "perfectingRank": "Perfecting: rank {rank} of {ranks}"
     },
     "materialHint": {
       "fineGrade": "Grado pregiato. Raccolto da un filone di pieno livello con uno strumento di rango superiore al materiale, e vale come la versione ordinaria ovunque ne venga richiesta una.",
       "cookingCatch": "Ingrediente da cucina. Deve essere cucinato prima di essere mangiato.",
       "usedBy": "Usato da {crafts}.",
-      "arcaneDust": "Reagente dell'incantamento. Si ottiene disincantando equipaggiamento comune e non comune.",
-      "arcaneEssence": "Reagente dell'incantamento. Si ottiene disincantando equipaggiamento raro.",
+      "arcaneDust": "Crafting reagent. Disenchanted from common and uncommon gear.",
+      "arcaneEssence": "Crafting reagent. Disenchanted from rare gear.",
       "arcaneShard": "Reagente dell'incantamento. Si ottiene disincantando equipaggiamento epico e leggendario.",
       "resonantThread": "Reagente dell'incantamento. Si ottiene disincantando armatura di stoffa rara o superiore.",
       "resonantHide": "Reagente dell'incantamento. Si ottiene disincantando armatura di cuoio rara o superiore.",
       "resonantLinks": "Reagente dell'incantamento. Si ottiene disincantando armatura di maglia rara o superiore.",
       "resonantSteel": "Reagente dell'incantamento. Si ottiene disincantando armi da mischia rare o superiori.",
-      "resonantTimber": "Reagente dell'incantamento. Si ottiene disincantando bastoni, bacchette, archi e balestre rari o superiori."
+      "resonantTimber": "Reagente dell'incantamento. Si ottiene disincantando bastoni, bacchette, archi e balestre rari o superiori.",
+      "masterwroughtIntermediate": "Masterwrought crafting component.",
+      "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day.",
+      "growthTonic": "Farming supply. Spent when you plant a crop for a chance of a slightly larger harvest. If the crop withers, the tonic is lost with it.",
+      "deedOfMaking": "Inscription writ. Consumed to raise a Perfected Masterwrought work to legendary and give it a name.",
+      "wyrmfallCore": "Masterwrought crafting catalyst. The raid final boss drops 1 to 3 to each player once per day on each difficulty. Heroic dungeon final bosses each drop 1 to 3 to each player once per day. Your first A or S rank Rift race win of the day grants 1 at A rank or 2 at S rank. The Heroic Quartermaster sells one for Heroic Marks.",
+      "mudfinScale": "Crafting reagent. Mudfin Skulkers drop it about half the time, the deeper marsh fish a little less often, and the named terrors of those waters always.",
+      "crackedWyrmScale": "Crafting reagent. Sanctum Scaleguards drop it about half the time, and nothing else in the world carries one.",
+      "crackedOgreTusk": "Crafting reagent. Brutok Skullsmasher carries one every time he falls, and he is its only source.",
+      "tallowCandle": "Crafting reagent. Deeprock diggers drop it more often than not and Gravecaller cultists now and then, while the named leaders of both always carry one.",
+      "banditBandana": "Crafting reagent. Bandits drop it about half the time, and their named leaders always carry one.",
+      "oldCragmawsPelt": "Crafting reagent. Old Cragmaw yields one every time he falls, and no other beast carries it.",
+      "emberwingCinderscale": "Crafting reagent. Voskar the Emberwing yields one every time he falls, and no other beast carries it."
     },
     "discord": {
       "title": "Discord",
@@ -3353,7 +3388,7 @@ export const it_IT: EnTranslations = {
       "sortAria": "Ordina gli oggetti della banca",
       "searchAria": "Cerca gli oggetti della banca per nome",
       "depositAll": "Deposita tutti i materiali",
-      "depositAllTooltip": "Invia in banca in un solo viaggio ogni reagente di fabbricazione e oggetto di scarto dalle tue borse. Strumenti di raccolta, equipaggiamento indossato, oggetti missione e consumabili non vengono mai toccati.",
+      "depositAllTooltip": "Invia in banca in un solo viaggio ogni materiale di fabbricazione (tutto ciò la cui descrizione dice \"Materiale\" o \"Materiale pregiato\") dalle tue borse. Tutto il resto rimane nelle tue borse, compresi strumenti di raccolta, oggetti missione, consumabili e oggetti grigi.",
       "depositAllDone": "Materiali depositati: {count}.",
       "depositAllFull": "Materiali depositati: {count}. Ora la banca è piena.",
       "depositAllNone": "Banca piena: non è stato depositato nulla.",
@@ -3537,6 +3572,7 @@ export const it_IT: EnTranslations = {
       "logging": "Taglio del legname",
       "herbalism": "Erbalismo",
       "fishing": "Pesca",
+      "farming": "Farming",
       "notReady": "Questo nodo di risorse non e ancora rispawnato per te.",
       "gatherLine": "Raccogli: {name}.",
       "gatherLineQty": "Raccogli: {name} x {qty}.",
@@ -3555,7 +3591,8 @@ export const it_IT: EnTranslations = {
       "tierRequired": {
         "mining": "Richiede un piccone da estrazione di livello {tier}",
         "logging": "Richiede un'ascia da taglio di livello {tier}",
-        "herbalism": "Richiede una falce da erbalismo di livello {tier}"
+        "herbalism": "Richiede una falce da erbalismo di livello {tier}",
+        "farming": "Requires a tier {tier} farming hoe"
       },
       "requiresTool": {
         "mining": "Richiede un piccone da estrazione",
@@ -3566,23 +3603,27 @@ export const it_IT: EnTranslations = {
         "mining": "Hai bisogno di un piccone da estrazione di livello {tier} per raccogliere questo filone.",
         "logging": "Hai bisogno di un'ascia da taglio di livello {tier} per abbattere questo boschetto.",
         "herbalism": "Hai bisogno di una falce da erbalismo di livello {tier} per raccogliere quest'aiuola.",
-        "fishing": "Hai bisogno di una canna da pesca di livello {tier} per pescare in queste acque."
+        "fishing": "Hai bisogno di una canna da pesca di livello {tier} per pescare in queste acque.",
+        "farming": "You need a tier {tier} farming hoe to work this bed."
       },
       "toolRequired": {
         "mining": "Hai bisogno di un piccone da estrazione per raccogliere questo filone.",
         "logging": "Hai bisogno di un'ascia da taglio per abbattere questo boschetto.",
         "herbalism": "Hai bisogno di una falce da erbalismo per raccogliere quest'aiuola.",
-        "fishing": "Hai bisogno di una canna da pesca per lanciare la lenza."
+        "fishing": "Hai bisogno di una canna da pesca per lanciare la lenza.",
+        "farming": "You need a farming hoe to work this bed."
       },
       "noNodeNearby": {
         "mining": "Non c'è nessun filone di minerale a portata.",
         "logging": "Non c'è nessun boschetto di alberi a portata.",
-        "herbalism": "Non c'è nessuna aiuola d'erbe a portata."
+        "herbalism": "Non c'è nessuna aiuola d'erbe a portata.",
+        "farming": "There is no crop bed within reach."
       },
       "wieldUnmet": {
         "mining": "Ti serve Estrazione mineraria {skill} per impugnare il piccone che hai già nelle borse.",
         "logging": "Ti serve Taglio del legname {skill} per impugnare l'ascia che hai già nelle borse.",
-        "herbalism": "Ti serve Erbalismo {skill} per usare la falce che hai già nelle borse."
+        "herbalism": "Ti serve Erbalismo {skill} per usare la falce che hai già nelle borse.",
+        "farming": "You need Farming {skill} to swing the hoe already in your bags."
       },
       "wieldUnmetCorpse": "Ti serve abilità di raccolta {skill} per mettere all'opera il tuo strumento migliore.",
       "toolTierUnmetCorpse": "Hai bisogno di uno strumento da raccolta di livello {tier} per recuperare i materiali migliori.",
@@ -3591,26 +3632,31 @@ export const it_IT: EnTranslations = {
           "mining": "Strumento da estrazione (livello {tier})",
           "logging": "Strumento da taglio (livello {tier})",
           "herbalism": "Strumento da erbalismo (livello {tier})",
-          "fishing": "Canna da pesca (livello {tier})"
+          "fishing": "Canna da pesca (livello {tier})",
+          "farming": "Farming tool (tier {tier})"
         },
         "unlocks": {
           "mining": "Necessario per estrarre dai filoni di minerale fino al livello {tier}.",
           "logging": "Necessaria per abbattere i boschetti di alberi fino al livello {tier}.",
           "herbalism": "Necessaria per raccogliere le aiuole d'erbe fino al livello {tier}.",
-          "fishing": "Necessaria per pescare nelle acque fino al livello {tier}."
+          "fishing": "Necessaria per pescare nelle acque fino al livello {tier}.",
+          "farming": "Required to plant crops up to tier {tier}."
         },
         "use": {
           "mining": "Uso: estrai da un filone di minerale vicino.",
           "logging": "Uso: abbatti un boschetto di alberi vicino.",
-          "herbalism": "Uso: raccogli da un'aiuola d'erbe vicina."
+          "herbalism": "Uso: raccogli da un'aiuola d'erbe vicina.",
+          "farming": "Works from your bags when you plant a crop bed."
         },
         "speed": "Raccoglie più in fretta sui nodi di livello inferiore a {tier}.",
         "rodRequired": "Necessaria per pescare.",
         "rodBite": "I pesci abboccano fino a {seconds} s prima.",
         "rodReel": "Allunga di {seconds} s la finestra per recuperare la lenza.",
-        "rodBand": "Sblocca tabelle di catture più ricche con abilità di Pesca {skill} o superiore."
+        "rodBand": "Sblocca tabelle di catture più ricche con abilità di Pesca {skill} o superiore.",
+        "rodBandCatch": "Unlocks {fish} at fishing skill {skill} and above."
       },
       "downgradeMark": "Borse piene: il ritrovamento e stato conservato senza il marchio del raccoglitore.",
+      "downgradeMarkCrop": "Bags full: the harvest was stored without its grower's mark.",
       "downgradeFind": "Borse piene: un ritrovamento pregiato e scivolato via.",
       "emptyHookNote": "Niente all'amo",
       "stateReady": "Pronto",
@@ -3618,6 +3664,90 @@ export const it_IT: EnTranslations = {
       "stateCooldownTimed": "Si rigenera tra {time}",
       "respawnClock": "{minutes}:{seconds}",
       "fineGradePreview": "Il tuo strumento affina questa resa al grado pregiato."
+    },
+    "farming": {
+      "plantLine": "You plant: {name}.",
+      "harvestLine": "You bring in: {name}.",
+      "harvestLineQty": "You bring in: {name} x{qty}.",
+      "harvestFineLine": "You also bring in: {name}.",
+      "harvestFineLineQty": "You also bring in: {name} x{qty}.",
+      "witheredLine": "The crop withered. You clear the bed: {name}.",
+      "witheredLineQty": "The crop withered. You clear the bed: {name} x{qty}.",
+      "pressTarget": {
+        "feastOverHarvest": "A feast and your crop are both in reach. Interact takes the feast before the bed; step away from the feast to harvest.",
+        "feastOverPlant": "A feast and an empty bed are both in reach. Interact takes the feast before the bed; step away from the feast to plant."
+      },
+      "seedBackLine": "You recover seed: {name}.",
+      "seedBackLineQty": "You recover seed: {name} x{qty}.",
+      "goldenBonusLine": "The golden harvest yields: {name}.",
+      "denied": {
+        "bad_bed": "There is no crop bed there.",
+        "bad_crop": "You cannot plant that here.",
+        "range": "You are too far from that crop bed.",
+        "bed_taken": "You already have a crop growing there.",
+        "skill": "Your Farming skill is too low for that crop.",
+        "no_seed": "You have no seed for that crop.",
+        "not_ready": "That crop is still growing.",
+        "no_plot": "Nothing is planted in that bed.",
+        "no_husks": "You do not have enough withered husks.",
+        "no_compost": "You have no compost.",
+        "no_fee_produce": "You have no produce to pay the watch fee.",
+        "no_tonic": "You have no growth tonic.",
+        "tool": "You have no farming hoe fit for that crop.",
+        "locked": "An item that would pay for that is locked.",
+        "no_farmer": "You must be near a farmer to trade husks for compost.",
+        "no_feast": "You have no feast to set out.",
+        "feast_active": "Your feast is already set out.",
+        "feast_expired": "That feast is gone.",
+        "feast_finished": "That feast has been picked clean.",
+        "feast_eaten": "You have already eaten from that feast."
+      },
+      "feastTitle": "{name}'s Harvest Feast",
+      "stonepotFeastTitle": "{name}'s Stonepot Feast",
+      "warspiceFeastTitle": "{name}'s Warspice Feast",
+      "sageleafFeastTitle": "{name}'s Sageleaf Feast",
+      "feastPlacedLine": "You set out your harvest feast.",
+      "huskTrade": "Trade husks for compost",
+      "huskTradeAria": "Trade husks for compost with {name}",
+      "plantSheet": {
+        "title": "Plant a Crop",
+        "plant": "Plant",
+        "sowAria": "Sow {name}",
+        "empty": "You have no seed you can sow at this bed.",
+        "close": "Close the plant sheet"
+      },
+      "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
+      "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}.",
+      "readyLine": "A crop is ready to harvest.",
+      "readyLineQty": "{count} crops are ready to harvest.",
+      "readyWitheredLine": "A crop withered in its bed.",
+      "readyWitheredLineQty": "{count} crops withered in their beds."
+    },
+    "harvestJournal": {
+      "title": "Harvest Journal",
+      "close": "Close",
+      "listLabel": "Planted crop beds",
+      "growing": "Ready in {time}",
+      "ready": "Ready to harvest",
+      "finishing": "Finishing up",
+      "withered": "Withered",
+      "readyAnnounce": "Ready to harvest: {name}",
+      "remainingDaysHours": "{days}d {hours}h",
+      "remainingHoursMinutes": "{hours}h {minutes}m",
+      "remainingMinutesSeconds": "{minutes}m {seconds}s",
+      "remainingSeconds": "{seconds}s",
+      "bedLine": "{zone}, bed {index}",
+      "bedLineUnknown": "Unknown bed",
+      "careWatch": "Farmer's Watch",
+      "careNone": "No extras",
+      "stageSprout": "Sprout",
+      "stageSeedling": "Seedling",
+      "stageMaturing": "Maturing",
+      "stageRipe": "Ripe",
+      "emptyTitle": "No crops planted",
+      "emptyBody": "Sow a seed in any garden bed and the plot appears here with its timer.",
+      "noviceTitle": "You have not worked a garden bed yet",
+      "noviceBody": "Farming skill grows every time you bring in a crop. Sow a seed in any garden bed to begin."
     },
     "archetypeTitle": {
       "label": "Titolo",
@@ -3649,48 +3779,53 @@ export const it_IT: EnTranslations = {
       "leatherworking": "Lavorazione del Cuoio"
     },
     "enchantName": {
-      "enchant_weapon_might": "Incanta Arma - Potenza",
-      "enchant_weapon_intellect": "Incanta Arma - Potere Magico",
-      "enchant_offhand_stamina": "Incanta Mano Secondaria - Robustezza",
-      "enchant_helmet_fortitude": "Incanta Elmo - Fortezza",
-      "enchant_neck_spirit": "Incanta Collana - Spirito",
-      "enchant_shoulder_agility": "Incanta Spalle - Agilita",
-      "enchant_chest_stamina": "Incanta Petto - Robustezza",
-      "enchant_waist_stamina": "Incanta Cintura - Robustezza",
-      "enchant_legs_stamina": "Incanta Gambe - Robustezza",
-      "enchant_gloves_agility": "Incanta Guanti - Agilita",
-      "enchant_gloves_intellect": "Incanta Guanti - Potere Magico",
-      "enchant_feet_agility": "Incanta Stivali - Agilita",
-      "enchant_ring_spirit": "Incanta Anello - Spirito",
-      "enchant_weapon_agility": "Incanta Arma - Agilita",
-      "enchant_helmet_intellect": "Incanta Elmo - Intelletto",
-      "enchant_helmet_armor": "Incanta Elmo - Rinforzo",
-      "enchant_neck_intellect": "Incanta Collana - Intelletto",
-      "enchant_neck_agility": "Incanta Collana - Agilita",
-      "enchant_shoulder_strength": "Incanta Spalle - Forza",
-      "enchant_shoulder_intellect": "Incanta Spalle - Intelletto",
-      "enchant_chest_spirit": "Incanta Petto - Spirito",
-      "enchant_chest_armor": "Incanta Petto - Rinforzo",
-      "enchant_waist_strength": "Incanta Cintura - Forza",
-      "enchant_waist_agility": "Incanta Cintura - Agilita",
-      "enchant_legs_intellect": "Incanta Gambe - Intelletto",
-      "enchant_gloves_strength": "Incanta Guanti - Forza",
-      "enchant_feet_strength": "Incanta Stivali - Forza",
-      "enchant_feet_stamina": "Incanta Stivali - Robustezza",
-      "enchant_ring_strength": "Incanta Anello - Forza",
-      "enchant_ring_agility": "Incanta Anello - Agilita",
-      "enchant_ring_intellect": "Incanta Anello - Intelletto",
-      "enchant_weapon_greater_might": "Incanta Arma - Potenza Superiore",
-      "enchant_weapon_greater_spellpower": "Incanta Arma - Potere Magico Superiore",
-      "enchant_helmet_greater_fortitude": "Incanta Elmo - Fortezza Superiore",
-      "enchant_chest_greater_stamina": "Incanta Petto - Robustezza Superiore",
-      "enchant_legs_greater_stamina": "Incanta Gambe - Robustezza Superiore",
-      "enchant_gloves_greater_agility": "Incanta Guanti - Agilita Superiore",
-      "enchant_weapon_runed_edge": "Incanta Arma - Filo Runico",
-      "enchant_weapon_runed_focus": "Incanta Arma - Concentrazione Runica",
-      "enchant_chest_runeweave": "Incanta Petto - Tessiturarunica",
-      "enchant_legs_runed_hide": "Incanta Gambe - Pelle Runica",
-      "enchant_helmet_runed_links": "Incanta Elmo - Maglie Runiche"
+      "enchant_weapon_might": "Weapon Etching: Might",
+      "enchant_weapon_intellect": "Weapon Etching: Spellpower",
+      "enchant_offhand_stamina": "Offhand Etching: Stamina",
+      "enchant_helmet_fortitude": "Helmet Etching: Fortitude",
+      "enchant_neck_spirit": "Necklace Etching: Spirit",
+      "enchant_shoulder_agility": "Shoulder Etching: Agility",
+      "enchant_chest_stamina": "Chest Etching: Stamina",
+      "enchant_waist_stamina": "Belt Etching: Stamina",
+      "enchant_legs_stamina": "Leg Etching: Stamina",
+      "enchant_gloves_agility": "Glove Etching: Agility",
+      "enchant_gloves_intellect": "Glove Etching: Spellpower",
+      "enchant_feet_agility": "Boot Etching: Agility",
+      "enchant_ring_spirit": "Ring Etching: Spirit",
+      "enchant_weapon_agility": "Weapon Etching: Agility",
+      "enchant_helmet_intellect": "Helmet Etching: Intellect",
+      "enchant_helmet_armor": "Helmet Etching: Reinforcement",
+      "enchant_neck_intellect": "Necklace Etching: Intellect",
+      "enchant_neck_agility": "Necklace Etching: Agility",
+      "enchant_shoulder_strength": "Shoulder Etching: Strength",
+      "enchant_shoulder_intellect": "Shoulder Etching: Intellect",
+      "enchant_chest_spirit": "Chest Etching: Spirit",
+      "enchant_chest_armor": "Chest Etching: Reinforcement",
+      "enchant_waist_strength": "Belt Etching: Strength",
+      "enchant_waist_agility": "Belt Etching: Agility",
+      "enchant_legs_intellect": "Leg Etching: Intellect",
+      "enchant_gloves_strength": "Glove Etching: Strength",
+      "enchant_feet_strength": "Boot Etching: Strength",
+      "enchant_feet_stamina": "Boot Etching: Stamina",
+      "enchant_ring_strength": "Ring Etching: Strength",
+      "enchant_ring_agility": "Ring Etching: Agility",
+      "enchant_ring_intellect": "Ring Etching: Intellect",
+      "enchant_weapon_greater_might": "Weapon Etching: Greater Might",
+      "enchant_weapon_greater_spellpower": "Weapon Etching: Greater Spellpower",
+      "enchant_helmet_greater_fortitude": "Helmet Etching: Greater Fortitude",
+      "enchant_chest_greater_stamina": "Chest Etching: Greater Stamina",
+      "enchant_legs_greater_stamina": "Leg Etching: Greater Stamina",
+      "enchant_gloves_greater_agility": "Glove Etching: Greater Agility",
+      "enchant_weapon_runed_edge": "Weapon Etching: Runed Edge",
+      "enchant_weapon_runed_focus": "Weapon Etching: Runed Sigil",
+      "enchant_chest_runeweave": "Chest Etching: Runed Weave",
+      "enchant_legs_runed_hide": "Leg Etching: Runed Hide",
+      "enchant_helmet_runed_links": "Helmet Etching: Runed Links",
+      "enchant_weapon_lucent_might": "Weapon Etching: Lucent Might",
+      "enchant_weapon_lucent_spellpower": "Weapon Etching: Lucent Spellpower",
+      "enchant_chest_lucent_stamina": "Chest Etching: Lucent Stamina",
+      "enchant_feet_lucent_agility": "Boot Etching: Lucent Agility",
+      "enchant_lucent_infusion": "Lucent Infusion"
     },
     "professions": {
       "title": "Professioni",
@@ -3721,19 +3856,29 @@ export const it_IT: EnTranslations = {
       "toolEffectName": {
         "gatherersCache": "Scorta del Raccoglitore",
         "artisansEye": "Occhio dell'Artigiano",
-        "quickeningCharm": "Amuleto di Ripresa"
+        "quickeningCharm": "Amuleto di Ripresa",
+        "makersCharm": "Maker's Charm"
       },
       "toolEffectTooltip": {
         "kind": "Amuleto per strumenti",
         "bonus": {
           "gatherersCache": "+1 resa per raccolta mentre è carico.",
           "artisansEye": "Aumenta il grado del raccolto di 1 livello di strumento mentre è carico.",
-          "quickeningCharm": "Riduce il tempo di rigenerazione del nodo che attiva."
+          "quickeningCharm": "Riduce il tempo di rigenerazione del nodo che attiva.",
+          "makersCharm": "+2 yield per harvest while charged, or +1 on a farming tool."
         },
-        "howToSlot": "Inseriscilo su uno strumento da estrazione mineraria, taglio del legname o erbalismo dalla finestra Professioni. Viene consumato quando inserito.",
+        "howToSlot": "Inseriscilo su uno strumento da estrazione mineraria, taglio del legname, erbalismo o agricoltura dalla finestra Professioni. Viene consumato quando inserito.",
         "charges": "Parte con {base} cariche su uno strumento comune (+{bonus} per ogni gradino di rarità).",
         "landOnly": "Non si inserisce sulle canne da pesca.",
         "openProfessions": "Apri Professioni per inserirlo su uno strumento da raccolta."
+      },
+      "mobileStationTooltip": {
+        "kind": "Field station",
+        "use": "Places a party-shared {station} at your feet.",
+        "radius": "You can craft at it from anywhere; party members must be within {radius} yards.",
+        "duration": "Lasts {minutes} minutes.",
+        "notConsumed": "Never consumed.",
+        "replace": "Placing replaces your active field station, including a specialty-placed one."
       },
       "toolEffectSlotButton": "Inserisci {effect}",
       "toolEffectRechargeButton": "Ricarica",
@@ -3860,6 +4005,9 @@ export const it_IT: EnTranslations = {
       "busy": "Sei occupato.",
       "recipeNotLearned": "Non hai ancora imparato quella ricetta.",
       "noBagSpace": "Non hai spazio per l'oggetto realizzato.",
+      "dailyLimit": "You can only craft that once per day.",
+      "dailyLimitRetry": "You can only craft that once per day. Available again in {duration}.",
+      "oncePerDay": "Once per day",
       "skillReqLine": "Richiede {craft} {skill}",
       "difficultyFull": "Guadagno completo di abilità",
       "difficultyReduced": "Guadagno di abilità ridotto",
@@ -3868,8 +4016,16 @@ export const it_IT: EnTranslations = {
       "stationBadge": "Stazione",
       "stationOutOfRangeNamed": "Passa a {station} per crearlo.",
       "learnMoreAtStation": "{master} alla {station} puo insegnarti altre ricette di {craft}.",
+      "apexChip": "Apex",
+      "apexPatternRaid": "Its pattern is a rare raid trophy.",
+      "apexPatternRift": "Its pattern is won on victorious high-rank Rift clears.",
+      "apexPatternVendor": "The Heroic Quartermaster sells its pattern for Heroic Marks.",
+      "apexPatternDrop": "Its pattern is found in the world.",
+      "perfectingLink": "Perfecting",
       "masterworkToast": "Capolavoro! {name}",
       "masterworkZoneLine": "{crafter} ha realizzato un capolavoro {name}!",
+      "legendaryLine": "{item} is reborn as {name}, a legend!",
+      "legendaryZoneLine": "{player} forged {item} into the legend {name}!",
       "tierUpToast": "{craft} è avanzato al livello {tier}!",
       "skillUpToast": "Abilità {skill} aumentata a {level}!",
       "skillUpSubtext": "Abilità aumentata a {level}!",
@@ -3898,6 +4054,7 @@ export const it_IT: EnTranslations = {
       "disenchant": "Disincanta",
       "salvage": "Smantella",
       "applyEnchant": "Applica Incantesimo",
+      "sunder": "Sunder",
       "sell": "Vendi",
       "sellAll": "Vendi tutto ({count})"
     },
@@ -3930,6 +4087,9 @@ export const it_IT: EnTranslations = {
       "salvageConfirmTitle": "Smantella {item}?",
       "salvageConfirmBody": "Questo distrugge {item} e produce materiali artigianali. Questa azione non puo essere annullata.",
       "salvageConfirmBodySpecial": "Questo distrugge una copia speciale di {item} (firmata, capolavoro o incantata) e produce materiali artigianali. Questa azione non puo essere annullata.",
+      "sunderConfirmTitle": "Sunder {item}?",
+      "sunderConfirmBody": "This destroys {item} and yields Sundered Essence. This cannot be undone.",
+      "sunderConfirmBodySpecial": "This destroys a special copy of {item} (signed, masterwork, or enchanted) and yields Sundered Essence. This cannot be undone.",
       "pickerTitle": "Applica Incantesimo",
       "targetTitle": "Scegli un oggetto da incantare",
       "noEnchants": "Nessun incantesimo utilizza questo reagente.",
@@ -3939,13 +4099,16 @@ export const it_IT: EnTranslations = {
       "tier": {
         "base": "Incanti Base",
         "runed": "Incanti Runici",
-        "greater": "Incanti Superiori"
+        "greater": "Incanti Superiori",
+        "lucent": "Lucent Enchants"
       },
       "yieldHeader": "Materiali previsti:",
       "yieldLineExact": "{count} {item}",
       "yieldLineRange": "Da {min} a {max} {item}",
       "alreadyEnchanted": "Quell'oggetto è già incantato.",
       "sameEnchant": "Quell'oggetto ha già quell'incantesimo.",
+      "notPerfected": "Only a Perfected item can bear that enchant.",
+      "enchantSkillTooLow": "Your Enchanting skill is too low for that enchant.",
       "replaceTag": "Sostituisce {enchant}",
       "sameEnchantTag": "Già applicato",
       "plainTag": "Non incantato",
@@ -3956,6 +4119,7 @@ export const it_IT: EnTranslations = {
       "replaceConfirmKeepsSigner": "Marchio del creatore",
       "replaceConfirmKeepsMasterwork": "Bonus capolavoro",
       "replaceConfirmKeepsBond": "Vincolo di commissione",
+      "replaceConfirmKeepsPerfecting": "Perfecting",
       "replaceConfirmCost": "Costo: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Sostituisci"
@@ -3981,6 +4145,9 @@ export const it_IT: EnTranslations = {
       "alreadyKnown": "Conosci già quella ricetta.",
       "outOfRange": "Devi essere alla stazione per allenarti."
     },
+    "pattern": {
+      "teaches": "Use: Teaches you how to craft {item}."
+    },
     "unbind": {
       "title": "Scioglimento: {name}",
       "close": "Chiudi scioglimento",
@@ -3999,7 +4166,49 @@ export const it_IT: EnTranslations = {
       "notBound": "Quell'oggetto non e legato.",
       "cannotAfford": "Non puoi permetterti la tariffa di scioglimento.",
       "outOfRange": "Devi essere a una stazione artigianale per sciogliere.",
-      "noSpace": "Non hai spazio per la copia sciolta."
+      "noSpace": "Non hai spazio per la copia sciolta.",
+      "perfecting": "A piece on the Perfecting track, or already Perfected, stays bound."
+    },
+    "perfecting": {
+      "title": "Perfecting",
+      "close": "Close the Perfecting window",
+      "openButton": "Perfecting",
+      "openButtonAria": "Open the Perfecting window",
+      "empty": "You hold no Masterwrought piece. The apex recipes forge one.",
+      "wornChip": "Worn",
+      "rowRank": "Rank {rank} of {ranks}",
+      "rowPerfected": "Perfected",
+      "rankAnnounce": "{name} reaches Perfecting rank {rank} of {ranks}.",
+      "perfectedAnnounce": "{name} is now Perfected.",
+      "promotedAnnounce": "{name} is forged as {chosen}.",
+      "unknownItem": "Unknown item",
+      "namingSelectionUnconfirmed": "Your bags shifted: the piece being named could not be confirmed. Check the selection before you forge.",
+      "rowPromoted": "Legendary",
+      "attemptCost": "Attempt cost",
+      "promoteCost": "Promotion cost",
+      "matCount": "{have} of {required}",
+      "skillNeed": "Needs {craft} skill {skill}.",
+      "skillMet": "Met.",
+      "skillUnmet": "Not met.",
+      "skillSyncing": "Checking your craft skill.",
+      "bindWarn": "Your first perfecting attempt binds {name} to you.",
+      "bindWarnDetail": "Perfecting never lowers a rank: a failed attempt only spends its materials. A piece with Perfecting progress or a Perfected piece cannot be unbound, and a promotion is permanent.",
+      "bindConfirmText": "Your first attempt binds {name} to you. Attempt anyway?",
+      "bindConfirmAccept": "Bind and Attempt",
+      "bindConfirmCancel": "Cancel",
+      "attempt": "Attempt Perfecting",
+      "promote": "Name and Promote",
+      "perfectedLead": "Perfected. Give it a name to forge a legend.",
+      "promotedLine": "A finished legend: nothing left to perfect.",
+      "equipBlocked": "You could not equip it once promoted. Unequip the conflicting piece first.",
+      "nameTitle": "Name the Legend",
+      "nameLabel": "Inscribe a name for {name}. The name is permanent.",
+      "nameInputAria": "Legendary name",
+      "nameHint": "Two to 32 characters: letters, spaces, apostrophes, and hyphens, starting with a letter.",
+      "nameCount": "{count} of {max}",
+      "nameSubmit": "Forge the Legend",
+      "nameSubmitBusy": "Forging",
+      "nameCancel": "Cancel"
     },
     "commissionBoard": {
       "title": "Ordini di Commissione",
@@ -4025,6 +4234,7 @@ export const it_IT: EnTranslations = {
       "rowFor": "{item} per {requester}",
       "rowTargeted": "{item} per {requester} (per {crafter})",
       "acceptedBy": "Accettato da {name}",
+      "crafterRecordLabel": "Crafter's record:",
       "statusOpen": "Aperto",
       "statusAccepted": "Accettato",
       "statusDelivered": "Consegnato",
@@ -4216,10 +4426,13 @@ export const it_IT: EnTranslations = {
         "masterwork_armorcrafting": "Capolavoro di forgiatura di armature",
         "masterwork_tailoring": "Capolavoro di sartoria",
         "masterwork_leatherworking": "Capolavoro di lavorazione del cuoio",
+        "masterwork_jewelcrafting": "Jewelcrafting Masterwork",
+        "masterwork_inscription": "Inscription Masterwork",
         "masterwork_engineering": "Capolavoro di ingegneria",
         "gather_event_pristine_vein": "Vena incontaminata",
         "gather_event_ancient_heartwood": "Durame antico",
         "gather_event_moonlit_bloom": "Fiore al chiaro di luna",
+        "gather_event_golden_harvest": "Golden Harvest",
         "gather_event_perfect_specimen": "Esemplare perfetto",
         "slain_old_greyjaw": "Ucciso: Vecchio Greyjaw",
         "slain_mogger": "Ucciso: Mogger",
@@ -4606,7 +4819,8 @@ export const it_IT: EnTranslations = {
   "gatherEvent": {
     "pristineVein": "{finder} ha colpito una vena incontaminata!",
     "ancientHeartwood": "{finder} ha abbattuto un antico durame!",
-    "moonlitBloom": "{finder} ha scoperto una fioritura illuminata dalla luna!"
+    "moonlitBloom": "{finder} ha scoperto una fioritura illuminata dalla luna!",
+    "goldenHarvest": "{finder} reaped a golden harvest!"
   },
   "apiError": {
     "validation": {
@@ -4951,7 +5165,7 @@ export const it_IT: EnTranslations = {
         "nightName": "Nightbloom",
         "nightBlurb": "Una terra di mezzanotte stellata dove i fiori illuminano i sentieri e Moonrest veglia senza sosta.",
         "hauntName": "Wraithwood",
-        "hauntBlurb": "Una foresta infestata sotto chiome gigantesche, dove le lanterne di Gallowmere sono l'unica luce onesta sulla strada.",
+        "hauntBlurb": "Una foresta infestata sotto chiome gigantesche, dove le lanterne di Gibbetmere sono l'unica luce onesta sulla strada.",
         "jungleName": "Palmreach",
         "jungleBlurb": "Palme, sabbia bianca e uccelli chiassosi, con la città-spiaggia di Drifthaven che tiene un fuoco acceso sulla riva.",
         "gardenName": "Evergarden",
@@ -5042,6 +5256,7 @@ export const it_IT: EnTranslations = {
       "groupCamera": "Telecamera",
       "talents": "Talenti",
       "professions": "Professioni",
+      "harvestJournal": "Harvest Journal",
       "arena": "Finestra GcG (le arene e i Campi di Thornhollow)",
       "leaderboard": "Classifica",
       "deeds": "Libro delle Imprese",
@@ -5260,6 +5475,7 @@ export const it_IT: EnTranslations = {
       "framePetTitle": "Il tuo famiglio",
       "framePetBody": "Cacciatori, stregoni e chiunque altro abbia un famiglio evocato ottengono per lui un piccolo riquadro accanto al proprio, con nome, livello e salute. Fare clic su quel riquadro seleziona il tuo famiglio, e Ctrl+6 fa lo stesso da tastiera.",
       "framesMoveBody": "Il tuo riquadro, il riquadro del tuo bersaglio e i riquadri del tuo gruppo possono essere tutti spostati. Ognuno porta un piccolo pulsante di spostamento nel proprio angolo: premi Sposta per sbloccarlo, trascina il riquadro dove vuoi, e premi di nuovo Blocca così un clic accidentale non può spostarlo. Se finiscono in un punto che non ti piace, Ripristina posizione dei riquadri nelle opzioni li riporta tutti dove erano all'inizio.",
+      "framesMoveBodyEditFrames": "Your frame, your target frame, and your party frames can all be moved. Each carries a small move button in its corner: unlock it, drag the frame where you want it, and lock it again so a stray click cannot shift it. Edit Frames, at the top of the Frames tab in the Interface options, loosens the rest of the interface at once, those three frames with it: the action bars, the cast bar, the swing bar, the experience bar, the minimap, the button rail, the pet frame, the stance bar, the buff and debuff rows, and the Wishlist Reminder chip, each wearing a name chip while it is loose. If they end up somewhere you regret, Reset to Defaults at the foot of that same Frames tab snaps them all back to where they started.",
       "barsTitle": "Barre, timer e testo di combattimento",
       "barsBody": "La tua barra di lancio appare al centro dello schermo, appena sopra le barre delle azioni, ogni volta che lanci o canalizzi un incantesimo, e riporta il nome dell'incantesimo e il tempo rimanente. Anche il tuo bersaglio ha una propria barra di lancio sul suo riquadro, così puoi vedere cosa sta arrivando e rispondere.\n\nUna sottile barra dell'attacco sta sotto la tua barra di lancio e si riempie tra un colpo d'arma e l'altro, così chi attacca in mischia o a distanza può vedere quando arriverà il prossimo colpo automatico.\n\nLa tua barra dell'esperienza occupa tutta la larghezza sotto le barre delle azioni, suddivisa in segmenti, con un tratto più chiaro che mostra l'esperienza da riposo che hai accumulato.\n\nNuota sott'acqua e in cima allo schermo compare una barra del Fiato blu. Si consuma finché hai la testa sott'acqua, lampeggia di rosso quando si esaurisce e inizi ad annegare, e si riempie di nuovo in fretta non appena riemergi. Barra spaziatrice ti fa nuotare verso l'alto, e il tasto Nuota Verso il Basso, Ctrl di default, ti porta più in profondità.\n\nI danni e le cure salgono fluttuando sopra ciò che hanno colpito come piccoli numeri, così puoi leggere uno scontro senza leggere del testo. La scheda Combattimento nella tua chat conserva il resoconto scritto completo.",
       "aurasTitle": "Potenziamenti e indebolimenti",
@@ -5270,6 +5486,7 @@ export const it_IT: EnTranslations = {
       "minimapBody": "In alto a destra: una minimappa rotonda con il nome della zona sopra e le tue coordinate sotto, cinta da una ghiera che dipinge l'ora del giorno.\n\nIl disco porta più del solo terreno. La tua freccia sta al centro, rivolta nella direzione in cui guardi, con il tuo gruppo intorno a te come puntini colorati per classe e una freccia sul bordo per chiunque se ne sia allontanato. Chi assegna missioni porta sulla minimappa gli stessi simboli che porta nel mondo, e riconoscerai anche i nodi di raccolta e le stazioni di lavorazione, i portali di viaggio, i cadaveri e i contenitori saccheggiabili, qualsiasi ostile che si è interessato a te, gli amici e i compagni di gilda nelle vicinanze, e il tuo stesso corpo mentre corri indietro come spettro.\n\nPiccoli indicatori compaiono su di essa quando hanno qualcosa da dire: una busta mentre ti aspettano lettere non lette, una moneta mentre ricavi di vendita o oggetti restituiti attendono al Mercante, e un pulsante che elenca i tuoi blocchi d'incursione.",
       "mapTitle": "La mappa del mondo e i tuoi tracciatori",
       "mapBody": "M apre la mappa del mondo: il continente disegnato per intero, con sopra la tua freccia, le zone e i loro nomi, i punti di interesse intorno a te, i portali di viaggio e i nodi di raccolta che hai trovato. Anche il tuo gruppo compare sulla mappa. All'interno di un'incursione, la mappa passa a uno schema delle stanze che hai esplorato finora.\n\nLungo il lato destro, sotto la minimappa, una pila di tracciatori tiene sott'occhio i tuoi affari del momento senza che tu debba aprire nulla: le missioni che tieni sotto traccia e i loro obiettivi, il tuo progresso nelle imprese, l'incursione in cui ti trovi, e qualsiasi squarcio a cui stai partecipando. Il tracciatore delle missioni si comprime quando vuoi indietro lo schermo.",
+      "mapBodyZoneFirst": "M opens the world map on the zone you are standing in, with your own arrow on it, the points of interest around you, the quest givers with their marks and the areas your objectives sit in, the crafting stations, mailboxes, noticeboards and garden beds, the dungeon entrances, and every gathering node in the zone, grayed out while it regrows and marked when your tools are not up to it. Your party shows on it too. Right-click the map, or press its World map button, and it pulls back to the continent, every zone drawn with its name, where a click on a zone opens that zone's map. Step into a delve, a dungeon, a rift or a castle keep and the map switches to a floor plan of where you stand; the Thornhollow Fields battleground gets a field map of its own.\n\nDown the right side, under the minimap, a stack of trackers keeps your current business in view without opening anything: your tracked quests and their objectives, your deed progress, your Reliquary pages, the delve you are in, and any rift you are taking part in. The quest tracker collapses when you want the screen back.",
       "chatTitle": "La finestra della chat",
       "chatBody": "In basso a sinistra. Premi Invio per iniziare a scrivere e di nuovo Invio per inviare.\n\nDue schede sono sempre presenti: Chat, il registro combinato di tutto ciò che viene detto intorno a te, e Combattimento, il resoconto scritto del tuo scontro. Il pulsante più ne aggiunge altre, una per canale: Dire, Gridare, Gruppo, Generale, Mondo, LFG, Gilda e Ufficiale, più una scheda Sussurri che raccoglie in un unico posto ogni sussurro che invii e ricevi. Scrivere in una scheda di canale invia a quel canale senza bisogno di ridigitare il comando.\n\nL'intera finestra può essere trascinata altrove e ridimensionata, e ricorda dove l'hai lasciata.",
       "keyWindowsTitle": "Finestre che apri con un tasto",
@@ -5298,8 +5515,10 @@ export const it_IT: EnTranslations = {
       "winMetersBody": "Danni, cure e minaccia per te e per chiunque sia con te, tenuti in segmenti così puoi riguardare lo scontro precedente a quello attuale. I pannelli delle cure e della minaccia possono essere estratti per stare da soli.",
       "winMoreTitle": "E altre ancora",
       "winMoreBody": "La mappa del mondo (M), la finestra del PvP (G), la Coppa della Valle (Y), la classifica (K), il calendario degli eventi (I) e la ruota delle emote (X) funzionano tutte allo stesso modo. La classifica merita un momento alla tua prima visita: tiene una scheda per i giocatori, una per le gilde, una che classifica interi account per Fama dal Libro delle Imprese, e una per le classifiche giornaliere.\n\nFai clic destro su un altro giocatore, sulla sua targhetta o sul suo nome in chat, e Informazioni Giocatore apre una scheda su di lui: l'equipaggiamento che indossa, con i tooltip, e i dettagli pubblici del suo personaggio. È solo uno sguardo, niente di più, e richiede che sia abbastanza vicino da poter essere visto.",
+      "winMoreBodyNoValeCup": "The world map (M), the PvP window (G), the leaderboard (K), and the event calendar (I) all work the same way. The emote wheel (X) is the exception: hold its key and the wheel appears, then let go over an emote to play it. The leaderboard is worth a moment on your first visit: it keeps a tab for players, one for guilds, one that ranks whole accounts by Renown from the Book of Deeds, one for the daily standings, and a Developers tab for the people who build the game, there unless you switch Show Developer Badges off.\n\nTarget another player and right-click the target frame (on touch, double-tap or long-press it), or right-click their name in chat, and Player Info opens a card on them: the gear they are wearing, with tooltips, and the public details of their character. It is a look, nothing more. The gear needs them close enough to see: look a name up from chat while they are far away and you get the public half of the card instead, their portrait, name, level, class, and guild.",
       "worldWindowsTitle": "Finestre che il mondo apre per te",
       "worldWindowsBody": "Alcune finestre non si aprono mai premendo un tasto: si aprono quando parli con la persona giusta o clicchi sulla cosa giusta.\n\nUn mercante apre la finestra del venditore, con la sua merce da comprare e una scheda Riacquisto che custodisce ciò che hai venduto l'ultima volta, nel caso tu l'abbia venduto per sbaglio. Una fila di pulsanti di quantità affianca la merce, così una pila di reagenti si compra con una sola pressione da cinque o dieci alla volta anziché con dieci pressioni, e una quantità personalizzata è lì per quando nessuna delle due si adatta. Un istruttore di classe apre l'elenco di ciò che puoi imparare ora e di ciò che ti aspetta ancora.\n\nUn banchiere apre la tua banca, il forziere di spazi extra che puoi ampliare comprandone altri. Se la tua gilda ha aperto una banca, una seconda scheda lì la mostra: ogni membro può guardarci dentro anche senza il permesso di prelevare qualcosa, così nessuno deve chiedere cosa possiede la gilda, i ranghi decidono chi può depositare, ritirare e spostare il denaro della gilda, e un registro segna ogni movimento.\n\nUna cassetta postale della Posta dei Corvi apre le tue lettere, con ciò che è arrivato in una scheda e un modulo per l'invio in un'altra, allegati compresi. Il Mercato Mondiale presso il Mercante ha una finestra propria: sfoglia e compra in una scheda, metti in vendita le tue merci in un'altra, e ritira ciò che hai venduto in una terza. Scambiare faccia a faccia con un altro giocatore apre una finestra di scambio con un lato per ciascuno.",
+      "worldWindowsBodyStationMaster": "Some windows you never press a key for: they open when you talk to the right person or click the right thing.\n\nA merchant opens the vendor window, with their stock to buy from and a buyback list at the foot of the same panel holding what you last sold, in case you sold it by mistake. A row of quantity buttons sits with the stock, so a stack of reagents is one press at five or ten at a time rather than ten presses, and a custom amount is there when neither suits. Your class abilities need no trainer, they come with your levels; the trainers here are the resident masters of the crafting stations, and Training on one of them opens the recipes they can teach you now, the ones you already know, and the ones still locked behind more skill.\n\nA banker opens your bank, with a Personal tab for the strongbox of extra slots you can buy more of and a Vault tab that stores your crafting materials by kind. If your guild has opened a bank, a Guild tab there shows it: every member can look inside even without permission to take anything out, so nobody has to ask what the guild is holding, ranks decide who may deposit, withdraw, and move the guild's coin, and a log records every movement.\n\nA Ravenpost mailbox opens your letters, with what has arrived on one tab and a form for sending on another, attachments and all. The World Market, at the Merchant in Eastbrook or Auctioneer Voss up in Highwatch, has its own window: browse and buy on one tab, list your own goods on another, and collect what has sold on a third. Trading face to face with another player opens a trade window with a side each.",
       "lootTitle": "Bottino e tiri",
       "lootBody": "Interagisci con un cadavere che hai guadagnato e si apre la finestra del bottino, che elenca cosa è caduto. Fai clic su una riga per prenderlo.\n\nIn un gruppo, un buon drop soggetto alle regole del bottino del gruppo mette invece sullo schermo un prompt di tiro: Bisogno se lo vuoi per te, Brama se lo prenderesti solo per venderlo, o Passa per lasciarlo a qualcun altro. Un piccolo pannello mostra poi chi ha tirato e cosa ha scelto mentre il timer scorre.\n\nLe regole del bottino vivono in una piccola finestra a parte. Il capogruppo può cambiarle lì, e tutti gli altri vedono la stessa finestra in sola lettura, così le regole non sono mai un segreto.\n\nAlcuni cadaveri possono anche essere raccolti per le loro parti. Quando è possibile, una sezione Raccolta compare in fondo alla finestra del bottino con una casella da spuntare per ogni componente che vuoi.",
       "playerCardTitle": "La tua scheda giocatore",
@@ -5308,6 +5527,7 @@ export const it_IT: EnTranslations = {
       "wikiBody": "Questa wiki è a un clic di distanza dentro al gioco. Un pulsante per raggiungerla sta insieme agli altri nella fila in basso a destra, c'è una riga per lei nel menu di gioco di Esc, e su telefono vive nel vassoio Altro. Poiché aprirla ti passa al tuo browser, il pulsante chiede sempre prima una conferma, così un tocco accidentale durante uno scontro non può mai tirartene fuori. Il gioco continua a funzionare dietro di essa.",
       "mobileTitle": "Su telefoni e tablet",
       "mobileBody": "I comandi touch compaiono da soli, e il layout si adatta alle dimensioni del tuo schermo: una disposizione compatta su un telefono piccolo, una standard su un telefono più grande, e una più spaziosa su un tablet.\n\nLe tue abilità stanno in un anello anziché in una fila di numeri: il pulsante Attacca con cinque pulsanti di azione accanto, e un interruttore di pagina che scorre l'anello attraverso il resto delle tue caselle, fino a sette pagine una volta attivate tutte e tre le barre delle azioni. Intorno a essi stanno i pulsanti a cui un giocatore su touch ricorre più spesso: Scambia bersaglio, Usa per ciò che hai davanti, e Salta, più una fila estraibile dei tuoi consumabili che si riempie da sola con quello che porti.\n\nLungo il bordo inferiore trovi Chat, Sociale, Missioni, Impostazioni e Altro. Altro apre un vassoio con il resto delle tue finestre, tra cui il tuo personaggio, il Cercatore di Dungeon, il PvP, la Coppa della Valle, le emote e la wiki. Qui le finestre riempiono lo schermo invece di fluttuarci sopra.\n\nSpostare i tuoi riquadri unità è una cosa da desktop: su touch il layout li posiziona al posto tuo.",
+      "mobileBodyTwoPages": "Touch controls appear on their own, and the layout sizes itself to your screen: a compact arrangement on a small phone, a standard one on a larger phone, and a roomier one on a tablet.\n\nYour abilities sit in a ring rather than a number row: the attack button with four action buttons beside it, and a page toggle that swaps the ring between its {pages} pages, which together reach all {slots} of your ability slots whether or not the extra desktop bars are switched on. The fifth arc position of that ring is your consumables seat: tap it to use what is seated there, or hold it, or swipe it inward, to open a row that fills itself from what you are carrying. Around the ring sit the buttons a touch player reaches for most, swapping target, using what is in front of you, and jumping.\n\nOne Quick Actions control sits at the bottom edge in place of a row of buttons. It opens onto everything else: mount, chat, map, bags, social, quests, character, spellbook, game menu, and a More entry holding the rest of your windows, the Dungeon Finder, PvP, emotes and the wiki among them. Windows fill the screen here rather than floating over it.\n\nMoving your unit frames is a desktop thing: on touch the layout places them for you.",
       "railTitle": "La fila dei pulsanti",
       "railBody": "Giù nell'angolo in basso a destra dello schermo, lontano dalla minimappa, sta una fila di piccoli pulsanti quadrati, uno per finestra, disposti in due colonne corte affiancate. La maggior parte porta stampato il proprio tasto predefinito.\n\nLa prima colonna copre il tuo personaggio, il libro degli incantesimi, i talenti, il registro delle missioni, il Libro delle Imprese, le professioni, la mappa del mondo, le borse e la creazione. La seconda si apre con il Negozio WOC e prosegue con il PvP, il Cercatore di Dungeon, la Coppa della Valle, il Duello di Carte, la classifica, le emote, la musica, amici e gilda, questa wiki e il menu di gioco. Alcuni altri si aggiungono solo quando si applicano."
     },
@@ -5853,13 +6073,13 @@ export const it_IT: EnTranslations = {
       "valeBlurb": "La verde valle di partenza, dove i nuovi eroi si fanno le ossa su lupi e banditi intorno alla città di Eastbrook.",
       "marshBlurb": "Una terra annegata di nebbia e rovine. I mudfin brulicano nelle secche e qualcosa di più antico si agita sotto l'acqua, sorvegliato dalla città-ponte di Fenbridge.",
       "peaksBlurb": "Creste spazzate dal vento e vecchie opere minerarie che salgono verso i pericoli più duri della strada iniziale, tenute dall'avamposto di Highwatch.",
-      "duskBlurb": "Una valle di crepuscolo perenne sotto il grande albero di Eldergleam, dove rovine di cristallo risplendono e l’aria vibra di antica magia.",
+      "duskBlurb": "Una valle di crepuscolo perenne sotto il grande albero di Eldershine, dove rovine di cristallo risplendono e l’aria vibra di antica magia.",
       "emberBlurb": "Lande desolate illuminate dalla tempesta, di cenere e vetro di sangue, dove i draghi volteggiano sopra la caldera e i fuochi dei troll ardono tra le dune, vegliate dalla città-cancello di Wyrmwatch.",
       "frostBlurb": "Un silenzio di neve e pini scuri sotto l’aurora, dove il freddo stesso sembra sveglio e Icemantle mantiene accesi i suoi fuochi.",
       "amberBlurb": "Un autunno eterno di foglie d’oro e rosse che non cadono mai, raccolto attorno alla città illuminata da lanterne di Lanternmere.",
       "fenBlurb": "Una zona umida luminosa e ronzante di gigli e acque lente, attraversata su vecchie passerelle dalla città-ponte di Bridgemere.",
       "nightBlurb": "Un regno di mezzanotte stellata dove i fiori illuminano i sentieri e Moonrest veglia in silenzio sotto un cielo che sogna.",
-      "hauntBlurb": "Una foresta infestata sotto chiome gigantesche, dove le lanterne di Gallowmere sono l’unica luce onesta sulla strada.",
+      "hauntBlurb": "Una foresta infestata sotto chiome gigantesche, dove le lanterne di Gibbetmere sono l’unica luce onesta sulla strada.",
       "galeBlurb": "Scogliere marine e colline ululanti dove il vento non si ferma mai, il Vecchio Faro non si spegne mai, e Wickharbor chiude bene le sue porte.",
       "jungleBlurb": "Un intreccio tropicale di palme, sabbia bianca e uccelli chiassosi, con la città-spiaggia di Drifthaven che tiene un fuoco acceso sulla riva.",
       "gardenBlurb": "Un regno-giardino labirinto di siepi ancora potato da nessun giardiniere che qualcuno abbia mai visto, a cui si accede oltre Hedgewick e le sue corti di fontane.",
@@ -5870,7 +6090,7 @@ export const it_IT: EnTranslations = {
       "peaksGreeting": "Duecento anni ha retto questo muro. Non cederà sotto la mia guardia, ma geme.",
       "peaksGreeter": "Capitano Thessaly, Highwatch",
       "duskGreeting": "Pochi della tua specie si sono fermati sotto questi rami. Cammina con delicatezza, e sii il benvenuto.",
-      "duskGreeter": "Custode Saelwyn, Eldergleam",
+      "duskGreeter": "Custode Saelwyn, Eldershine",
       "emberGreeting": "Vento caldo dalle lande desolate, draghi sopra il Drakemaw, e fuochi di troll tra le dune. Bevi qualcosa prima di avventurarti là fuori.",
       "emberGreeter": "Il guardiano del cancello, Wyrmwatch",
       "frostGreeting": "La neve inghiotte ogni suono oltre le mura. Se le luci iniziano a danzare, abbassa la voce e tieni il fuoco acceso.",
@@ -5882,7 +6102,7 @@ export const it_IT: EnTranslations = {
       "nightGreeting": "Oltre la Porta della Notte, l’aria stessa sogna. Segui la luce dei fiori, e fai attenzione al mondo addormentato che pende nel cielo.",
       "nightGreeter": "La guardiana della veglia, Moonrest",
       "hauntGreeting": "Resta vicino alle lanterne, viandante. E se il bosco chiama il tuo nome da fuori la strada, non rispondere.",
-      "hauntGreeter": "Il lampionaio, Gallowmere",
+      "hauntGreeter": "Il lampionaio, Gibbetmere",
       "galeGreeting": "Il vento non ha mai smesso di soffiare qui, e il Vecchio Faro non si è mai spento. Chiudi la porta della locanda dietro di te.",
       "galeGreeter": "Il guardiano del faro, Wickharbor",
       "jungleGreeting": "Sabbia calda, uccelli chiassosi, e una giungla che divora l’orizzonte. Teniamo un fuoco acceso sulla spiaggia; cerca di tornarci.",
@@ -5891,14 +6111,14 @@ export const it_IT: EnTranslations = {
       "gardenGreeter": "Il guardiano del cancello, Hedgewick",
       "valePlaceNotes": "Eastbrook è la tua prima base. Il Sentiero dei Lupi e il Prato dei Cinghiali sono terreni di caccia tranquilli; il Lago a Specchio è ottima acqua da pesca, anche se i mudfin ne affollano le secche; il Sableweb e lo Scavo di Rame nascondono ragni e scavatori avidi di minerale; un Campo di Banditi e la Cappella Caduta custodiscono lavori più duri; la Collina del Reliquiario scende nel Reliquiario Crollato, la prima esplorazione del reame; Brightwood Glade è una serena radura assolata a nord; e il Campo della Scrofa è il campo murato di palla di cinghiale di Eastbrook, dove la Coppa della Valle si gioca sotto una tregua del raccolto.",
       "marshPlaceNotes": "Fenbridge custodisce l'unica strada asciutta. Le Canne del Predatore e le Secche di Deepfen brulicano di bestie di palude e mudfin; il Roveto della Vedova è fittamente intessuto di ragnatele; la Cappella Annegata e i Tumuli dei Troll custodiscono pericoli più antichi, con La Litania Annegata, l'incursione della palude, che si apre appena a nord dei tumuli; l'Accampamento del Gravecaller è il culto trincerato, e il Bastione Sommerso è il cuore istanziato della palude.",
-      "peaksPlaceNotes": "Highwatch tiene il muro. La Cresta del Cacciatore e le Tane di Deeprock appartengono ai felini di cresta e agli scavatori; le Pendici degli Ogre e l'Accampamento di Guerra di Drogmar ai bruti a pagamento; Stormcrag crepita di elementali, e sotto di esso risplende il Glimmermere, il laghetto la cui riva custodisce il portale di luce pallida che scende al Tempio Annegato; le Tende del Culto del Wyrm e i Campi dei Revenant cingono l'altura del culto, con il Santuario del Gravewyrm alla sua sommità.",
-      "duskPlaceNotes": "Eldergleam si raduna sotto il grande albero. La Grotta di Duskfall e il suo belvedere sono la via d’accesso e il primo sguardo sulla valle; il Boschetto Antico e il Bacino delle Stelle Cadenti custodiscono il quieto sud; la Corte Sommersa custodisce rovine invase dalla vegetazione a est; e il Profondo Splendente e i Bassifondi Cristallini risplendono a nord.",
+      "peaksPlaceNotes": "Highwatch holds the wall. Stalker Ridge and the Deeprock Burrows belong to ridge cats and burrowers; the Ogre Foothills and Drogmar's War-Camp to brutes for hire; Stormcrag crackles with elementals, and below it glows the Glimmermere, the tarn whose shore keeps the gate of pale light down to the Drowned Temple; the Broodsworn Tents and Revenant Fields ring the cult's high ground, with Gravewyrm Sanctum at its peak.",
+      "duskPlaceNotes": "Eldershine si raduna sotto il grande albero. La Grotta di Duskfall e il suo belvedere sono la via d’accesso e il primo sguardo sulla valle; il Boschetto Antico e il Bacino delle Stelle Cadenti custodiscono il quieto sud; la Corte Sommersa custodisce rovine invase dalla vegetazione a est; e il Profondo Splendente e i Bassifondi Cristallini risplendono a nord.",
       "emberPlaceNotes": "Wyrmwatch presidia il cancello. Il Gatewood è l’ultimo verde prima delle lande desolate; le Dune di Cenere si spostano cariche di cenere e di peggio; il Trollmoot è dove i troll delle dune radunano i loro fuochi; i Campi di Vetro di Sangue scintillano di schegge taglienti; e la Caldera di Drakemaw è la corona fumante attorno a cui volteggiano i draghi.",
       "frostPlaceNotes": "Icemantle custodisce l’ultimo focolare caldo. La Linea delle Nevi segna dove i cumuli di neve prendono il sopravvento; il Laghetto del Ghiacciaio è acqua nera e immobile sotto il ghiaccio; la Scalinata dell’Aurora sale sotto le luci danzanti; lo Shiverfen è una palude ghiacciata che non dorme mai del tutto; e le Terrazze Ululanti meritano il loro nome ogni notte.",
       "amberPlaceNotes": "Lanternmere risplende nel cuore del raccolto. Il Goldmelt è il passaggio scivoloso d’ambra che vi conduce; il Frutteto Dorato e la Valletta del Raccolto custodiscono i frutti più dolci e i ladri più audaci; il Grande Stagno riflette le foglie ardenti; il Poggio di Cindermaple si erge più alto e più rosso di tutti; e il Monolito Pendente ricorda qualcosa di più antico dell’autunno.",
       "fenPlaceNotes": "Bridgemere siede a cavallo delle acque lente. La Scalinata di Amberfen scende dalle terre del raccolto; le Lilymoors e le Pozze di Bogshine scintillano di fuochi fatui e libellule; Willowweep lascia ricadere i suoi rami nello stagno; e le Piane Assonnate sono il luogo più quieto di questa terra.",
       "nightPlaceNotes": "Moonrest mantiene la veglia. La Porta della Notte è la via d’accesso alla terra di mezzanotte; il Pozzo della Luna custodisce una luce stellare accanto alla quale puoi restare; Gloamfield fiorisce nel buio; la Veglia Perenne osserva senza mai muoversi; e il Tumulo Insonne è l’unico luogo qui che non sogna mai.",
-      "hauntPlaceNotes": "Gallowmere si raccoglie tra le sue lanterne. La Porta dei Corvi è la tetra porta d’ingresso del bosco; il Boschetto della Vedova è fitto di ragnatele; la Radura degli Impiccati e la Cappella di Mournstone custodiscono i lutti più antichi della foresta; e la Radura del Cacciatore appartiene a qualunque cosa cacci ancora lì.",
+      "hauntPlaceNotes": "Gibbetmere si raccoglie tra le sue lanterne. La Porta dei Corvi è la tetra porta d’ingresso del bosco; il Boschetto della Vedova è fitto di ragnatele; la Radura degli Impiccati e la Cappella di Mournstone custodiscono i lutti più antichi della foresta; e la Radura del Cacciatore appartiene a qualunque cosa cacci ancora lì.",
       "galePlaceNotes": "Wickharbor si piega contro il vento. La Via del Vento è la strada sulla scogliera che vi conduce; le Colline Ululanti si estendono spoglie sotto la tempesta; il Vecchio Faro arde da quando chiunque possa ricordare; lo Strapiombo precipita a picco sull’acqua; i Campi dei Relitti tengono onesta la costa; e il Laghetto Specchio è l’unica cosa immobile in tutto il regno.",
       "junglePlaceNotes": "Drifthaven tiene il suo fuoco sulla spiaggia. La Foce Aggrovigliata è dove il fiume incontra la muraglia verde; la Spiaggia delle Palme corre bianca e calda lungo la risacca; il Groviglio di Smeraldo e il Vinefall inghiottono l’interno; la Laguna di Zaffiro risplende limpida e profonda; e l’Idolo Sommerso veglia da sotto l’acqua.",
       "gardenPlaceNotes": "Hedgewick attende al Cancello del Giardino. Il Viale del Parterre fiorisce in colori ben potati; il Castello di Dawnhold addestra i suoi cavalieri dietro mura nuove; lo Stagno dei Petali fluttua rosa tutto l’anno; il Vecchio Mulino gira sopra le proprie aiuole ad anello; il Grande Labirinto cambia le sue vie per ogni ospite, i suoi archi vegliati da volpi di foglie; la Vedetta del Nord custodisce la strada d’uscita; il Bacino dei Gigli riposa oltre ogni cosa; e la Corte della Fontana scorre ancora limpida nel cuore del giardino.",
@@ -6101,13 +6321,17 @@ export const it_IT: EnTranslations = {
       "ladderBody": "Il gioco classificato traccia la tua posizione nel tempo. Controlla la classifica per vedere dove ti trovi e chi domina la vetta del reame.",
       "rewardsHeading": "Cosa paga il gioco classificato",
       "rewardsBody": "Una vittoria classificata paga Onore, la moneta del giocatore contro giocatore, e una sconfitta non ti costa altro che indice. L'Onore è pensato per premiare incontri autentici: battere di nuovo lo stesso avversario o la stessa squadra nello stesso giorno non paga più nulla, una lunga giornata di vittorie rende un po' meno per ogni vittoria man mano che procede, e una partita che il tuo avversario abbandona muove comunque il tuo indice ma non paga alcun Onore. Quella giornata appartiene solo all'Onore, e si rinnova secondo un proprio ciclo orario, non con il ripristino delle istanze del reame.",
+      "rewardsBodyLossShare": "A ranked win pays Honor, the player versus player currency, and a loss you play to the end still pays a smaller share of it, as does a draw, so rating is the only thing a loss really costs you. Honor is meant to reward real matches: beating the same opponent or the same team again on the same day pays nothing further (nor does losing to them again), a long winning day pays in full for its first stretch of wins and then halves what a win pays, halving it again deeper in and staying there, and a match your opponent forfeits still moves your rating but pays no Honor at all. That day is the realm's own: it rolls over at the realm's nightly reset hour, the same boundary every daily lockout clears on.",
       "honorHeading": "Onore",
       "honorBody": "L'Onore è la moneta che si guadagna combattendo altri giocatori. Lo ottieni nel Colosseo e nei Campi di Thornhollow, viene tenuto separato dalle tue monete e non si mescola mai con esse, e la tua scheda del personaggio mostra quanto ne possiedi. C'è esattamente una cosa su cui spenderlo: l'equipaggiamento da Guerra.",
       "quartermastersBody": "Due quartiermastri tengono gli stessi scaffali, quindi commercia con quello più vicino a te. FURIA, il Quartiermastro d'Onore, si trova nella Valle di Eastbrook, mentre il Guerramaresciallo Draven Kole, Maestro del Negozio della Guerra, tiene banco a Highwatch. Il loro assortimento è il livello Guerra: cinque famiglie di armature, più collane, anelli e armi condivisi tra tutte.",
       "honorFinalNote": "Gli acquisti in Onore sono definitivi. Un acquisto in monete può essere annullato dall'elenco di riacquisto di un venditore, ma un acquisto in Onore non vi compare mai, e l'equipaggiamento da Guerra si vincola all'anima nel momento stesso in cui lo acquisti, quindi non potrà mai essere scambiato, spedito per posta, né rivenduto per nulla. Per questo il negozio ti chiede conferma: leggi bene il pezzo prima di confermarlo.",
+      "honorFinalNoteSoldBack": "Honor purchases are final. The buyback list only ever holds what you sold: a coin purchase can usually be sold back for its sell price and reclaimed from that list if you change your mind again, but Warfare gear is soulbound the moment you buy it, so it can never be traded, mailed, or sold back for anything, and it never reaches that list. The shop asks you to confirm for that reason: read the piece before you press it.",
       "warfareHeading": "Equipaggiamento da Guerra",
       "warfareBody": "Ogni pezzo da Guerra porta un Indice di Attacco GUERRA e un Indice di Difesa GUERRA, e questi due indici non hanno alcun effetto contro i mostri. Si applicano solo quando combatti un altro giocatore, in duello, in arena o sul campo di battaglia, dove l'Attacco aumenta il danno che infliggi e la Difesa riduce il danno che subisci, ciascuno fino al proprio tetto massimo. Ogni famiglia di armature è anche un set, e i suoi bonus di set sono a loro volta indici GUERRA o effetti che funzionano solo contro i giocatori, quindi un kit da onore completo non vale nulla contro un boss di dungeon.",
-      "warfareTradeBody": "Questo è lo scambio voluto. L'equipaggiamento da Guerra è costruito per combattere altri giocatori, non come scorciatoia per saltare i livelli dei dungeon: un pezzo da Guerra non porta mai gli indici di combattimento di un epico da dungeon nello stesso slot, e tutto ciò che offre si spende su altri giocatori. Se vuoi tenere testa in arena, compralo. Se vuoi completare le eroiche più in fretta, guadagnati l'equipaggiamento nei dungeon."
+      "warfareBodyStatsStay": "Every Warfare piece carries Warfare Offense and Warfare Defense Rating, and those two ratings do nothing at all against monsters. They apply only when you fight another player, in a duel, in the arena, or on the battleground, where Offense adds to the damage you deal and Defense cuts the damage you take, each up to its own ceiling. Each armor family is also a set, and its set bonuses are likewise Warfare rating or effects that only work against players, so a full honor kit's set bonuses count for nothing on a dungeon boss. The pieces themselves still carry their ordinary stats, armor, and weapon damage, and those work everywhere; it is the Warfare ratings and the set bonuses that go quiet against a monster.",
+      "warfareTradeBody": "Questo è lo scambio voluto. L'equipaggiamento da Guerra è costruito per combattere altri giocatori, non come scorciatoia per saltare i livelli dei dungeon: un pezzo da Guerra non porta mai gli indici di combattimento di un epico da dungeon nello stesso slot, e tutto ciò che offre si spende su altri giocatori. Se vuoi tenere testa in arena, compralo. Se vuoi completare le eroiche più in fretta, guadagnati l'equipaggiamento nei dungeon.",
+      "warfareTradeBodyRatingSpent": "That is the deliberate trade. Warfare gear is built for fighting players, not as a shortcut past the dungeon tiers: a Warfare piece never carries the combat ratings a dungeon epic in the same slot does, and the Warfare rating and set bonuses it carries instead are spent entirely on other players. If you want to hold your own in the arena, buy it. If you want to clear heroics faster, earn your gear in the dungeons."
     },
     "thornhollowPage": {
       "heading": "Campi di Thornhollow",
@@ -6300,6 +6524,9 @@ export const it_IT: EnTranslations = {
       "soulboundBody": "Alcune ricompense speciali sono vincolate all'anima, legate al tuo personaggio dal momento in cui le ottieni. Un oggetto vincolato all'anima non può essere scambiato, spedito, venduto a un venditore o messo in vendita sul mercato; è tuo e tuo soltanto. Oggi questa protezione custodisce i gettoni premio come i Marchi Eroici, mentre l'equipaggiamento che vinci è tuo da scambiare, vendere o condividere liberamente.",
       "uniqueTitle": "Unico Equipaggiato: un solo leggendario per tipo",
       "uniqueBody": "Gli oggetti leggendari sono Unico Equipaggiato: il tuo personaggio può indossare solo una copia di un dato leggendario alla volta, e la sua versione eroica conta come lo stesso oggetto. Una seconda copia può restare nelle tue borse, in banca o sul mercato, ma cercare di indossarle entrambe insieme viene rifiutato, e la descrizione porta un'etichetta dorata Unico Equipaggiato così puoi vedere la regola prima di pianificare una build basata su due copie.",
+      "masterwroughtTitle": "Masterwrought: the crafted summit",
+      "masterwroughtBody": "The finest crafted gear carries a gold Unique-Equipped: Masterwrought tag on its tooltip. These pieces are the summit of the crafting professions, made by master crafters from rare materials and traded freely on the open market, and they stand beside the treasures of the deepest dungeons. The tag is one shared family rule: a character can wear at most two Masterwrought pieces at once, whichever crafts they come from, so pick the two slots where they serve your build best.",
+      "masterwroughtBodyLegendary": "The finest crafted gear carries a gold Unique-Equipped: Masterwrought tag on its tooltip. These pieces are the summit of the crafting professions, made by master crafters from rare materials and traded freely on the open market, and they stand beside the treasures of the deepest dungeons. The tag is one shared family rule: a character can wear at most two Masterwrought pieces at once, whichever crafts they come from, so pick the two slots where they serve your build best. The rule keeps one further line for the very top of the family: a wearer who has Perfected a Masterwrought piece can promote it into a legendary of their own naming, a chain the Professions page tells in full, and a character can wear at most one legendary Masterwrought piece among the two.",
       "setsTitle": "Le tenute e i loro bonus",
       "setsBody": "Certe armature vengono in famiglie abbinate, più pezzi tagliati per apparire e combattere come uno solo. Indossa abbastanza pezzi di una famiglia insieme e il set si risveglia, concedendo bonus sopra le statistiche proprie di ciascun pezzo, e più pezzi indossi più diventa forte. Alcune di queste famiglie compaiono come bottino ambito mentre sali di livello, e le più grandi vengono dal contenuto di gruppo più duro vicino al livello massimo, quindi inseguire un set completo è un classico obiettivo di fine gioco. Il combattimento fra giocatori ha famiglie abbinate tutte sue, comprate un pezzo alla volta con l'Onore; si risvegliano a conteggi di pezzi diversi da quelli delle famiglie di bottino, e i loro bonus rispondono solo quando il nemico è un altro giocatore.",
       "consumablesTitle": "Consumabili",
@@ -6340,35 +6567,43 @@ export const it_IT: EnTranslations = {
       "archetypeChooseBody": "Non devi andare a cercarlo. Lavora i tuoi mestieri, e una volta che le tue abilita mostrano per la prima volta una chiara inclinazione verso una coppia, la Gilda degli Artigiani se ne accorge e invia una lettera per Corvo che indica il maestro da incontrare e la missione da intraprendere. Arriva una volta per personaggio, e solo se non hai gia giurato fedelta a una coppia.",
       "archetypeSwitchBody": "Una dichiarazione non è nemmeno un ergastolo. Una coppia che non hai mai avuto è semplicemente una nuova missione di sintonizzazione, mentre tornare a una coppia che hai abbandonato ti chiede prima di fare ammenda: cinque compiti la prima volta, e tre in più aggiunti per ogni ritorno che hai già compiuto (prendere una coppia del tutto nuova non alza mai il conteggio). La scelta resta significativa senza mai chiudere per sempre una porta.",
       "whatHeading": "Un mestiere accanto alla spada",
-      "whatBody": "Le professioni sono la vita lavorativa del mondo: quattro mestieri di raccolta che strappano la materia prima direttamente dalla terra, e un anello di dieci mestieri che la trasformano in equipaggiamento, pasti, pozioni e strumenti. Qui tutto alimenta qualcos'altro. Il minerale che estrai diventa una lama, la lama prende un incanto, e l'incanto ha bisogno di polvere ricavata da vecchio equipaggiamento, quindi un raccoglitore, un artigiano e un armeggiatore sono tutti anelli di una sola catena.\n\nNon c'è alcun limite di professioni su cui angustiarsi. Ogni personaggio può far salire sette degli otto mestieri che hanno contenuto oggi e tutte e quattro le professioni di raccolta fianco a fianco (l'Ingegneria è l'unica esclusa: le sue ricette partono tutte sopra il tetto libero, quindi la sua scala attende il giuramento del Bombardiere); l'unica scelta esclusiva è il tuo archetipo, l'identità a cui prima o poi giuri fedeltà, anche se una volta sintonizzato i mestieri che restano dormienti dietro di esso salgono solo sulle loro ricette comuni, e oltre l'abilità 75 non salgono affatto. L'abilità non scende mai, e nulla di ciò che impari ti viene mai tolto.",
+      "whatBody": "Professions are the working life of the world: the gathering trades that pull raw material straight out of the land, and a ring of ten crafts that turn it into gear, meals, potions, and tools. Everything feeds something else here. The ore you mine becomes a blade, the blade takes an enchant, and the enchant needs dust broken out of old gear, so a gatherer, a crafter, and a tinkerer are all links in one chain.\n\nThere is no profession limit to agonize over. Every character can raise nine of the ten crafts and every gathering profession side by side (Engineering is the one holdout: its recipes all start above the free ceiling, so its ladder waits for the Bombardier's oath); the only exclusive choice is your archetype, the identity you eventually swear to, though once you attune the crafts that fall dormant behind it climb only on their common recipes, and past skill 75 not at all. Skill never goes down, and nothing you learn is ever taken away.",
       "ringHeading": "L'anello dei mestieri",
-      "ringBody": "Ogni mestiere con contenuto oggi ha un massimo di 125 di abilita: Forgiatura delle armi, Forgiatura delle armature, Sartoria, Conciatura, Cucina, Alchimia, Ingegneria e Incantamento. Al massimo il mestiere continua a funzionare, i raccolti producono ancora, le fabbricazioni si concludono ancora e i capolavori possono ancora accadere; solo il numero smette di salire. Scegli una scheda qui sotto per le tabelle complete di ricette e i numeri di un mestiere.",
-      "ringWaveNote": "Due mestieri sulla ruota, Gioielleria e Iscrizione, occupano i loro posti ma non hanno ancora ricette. Cio e deliberato piuttosto che una svista: il loro contenuto arriva con le zone future, e i massimi qui sopra salgono allo stesso modo, quindi un mestiere al massimo oggi e un vantaggio su quella espansione, non un traguardo finale.",
+      "ringBody": "Every craft on the ring caps at 125 skill: Weaponcrafting, Armorcrafting, Jewelcrafting, Inscription, Tailoring, Leatherworking, Cooking, Alchemy, Engineering, and Enchanting. At a cap the trade keeps working, harvests still yield, crafts still resolve, and masterworks can still happen; only the number stops climbing. Pick a card below for a craft's full recipe tables and numbers.",
+      "ringWaveNote": "With Inscription taking up its quills, every seat on the wheel now ships real recipes. The ring is complete rather than finished: the caps rise with future zones, so a capped craft today is a head start on that expansion, not a finish line.",
       "capFmt": "Massimo {cap}",
       "comingSoon": "Ancora nessuna ricetta",
       "gatherHubHeading": "Raccolta",
       "gatherHubBody": "Quattro professioni di raccolta alimentano l'anello dal campo: Mineria, Boscaiolia e Erboristeria estraggono minerale, legname e erbe dalla terra con un massimo di 100 di competenza, mentre la Pesca segue il proprio ritmo di lenza e mulinello fino a 200. Ogni pagina qui sotto porta le mappe esatte dei nodi, le scale degli strumenti e le probabilita.",
       "archetypesHeading": "La ruota e i suoi archetipi",
-      "archetypesBody": "I dieci mestieri stanno su una ruota fissa, e la geografia di quella ruota conta. Ogni due vicini formano una coppia con un nome: Fabbro per Forgiatura di Armi e Forgiatura di Armature, Sarto da Campo per Lavorazione del Cuoio e Sartoria, Speziale per Alchimia e Cucina, Bombardiere per Ingegneria e Alchimia, e altre sei lungo l'anello.\n\nSintonizzarsi con una coppia è una missione, non un clic in un menu. Oggi si possono abbracciare quattro coppie (Fabbro, Sarto da Campo, Speziale e Bombardiere), ognuna ancorata a un maestro residente a Eastbrook la cui missione di accettazione espone l'intero patto prima che tu lo accetti. Finché non ti dichiari, ogni mestiere avanza liberamente sulle ricette fino al livello raro compreso (qualsiasi ricetta che chieda abilità 74 o meno), così puoi provare quasi tutto prima di scegliere (la sola Ingegneria non ha ricette così in basso, quindi il suo numero aspetta).\n\nUna volta sintonizzato, i due mestieri della tua coppia diventano i tuoi principali, senza altro limite che il tetto massimo. Il resto della ruota non si spegne: un mestiere opposto ai tuoi principali resta acceso come passatempo che continua a salire fino al livello raro (una missione ripetibile alla fucina del Fabbro Haldren ti permette di cambiare quale), e ogni altro mestiere diventa dormiente. Un mestiere dormiente conserva la sua abilità e le sue ricette comuni, che continuano a insegnargli sulla curva normale finché non diventano grigie a 75; tutto ciò che sta sopra il comune smette di pagare all'istante, e un mestiere dormiente non sforna mai un capolavoro mentre riposa.",
+      "archetypesBody": "I dieci mestieri stanno su una ruota fissa, e la geografia di quella ruota conta. Ogni due vicini formano una coppia con un nome: Fabbro per Forgiatura di Armi e Forgiatura di Armature, Sarto da Campo per Lavorazione del Cuoio e Sartoria, Speziale per Alchimia e Cucina, Bombardiere per Ingegneria e Alchimia, e altre sei lungo l'anello.\n\nSintonizzarsi con una coppia è una missione, non un clic in un menu. Oggi si possono abbracciare quattro coppie (Fabbro, Sarto da Campo, Speziale e Bombardiere), ognuna ancorata a un maestro residente a Eastbrook la cui missione di accettazione espone l'intero patto prima che tu lo accetti. Finché non ti dichiari, ogni mestiere avanza liberamente sulle ricette fino al livello raro compreso (qualsiasi ricetta che chieda abilità 74 o meno), così puoi provare tutto prima di scegliere.\n\nUna volta sintonizzato, i due mestieri della tua coppia diventano i tuoi principali, senza altro limite che il tetto massimo. Il resto della ruota non si spegne: un mestiere opposto ai tuoi principali resta acceso come passatempo che continua a salire fino al livello raro (una missione ripetibile alla fucina del Fabbro Haldren ti permette di cambiare quale), e ogni altro mestiere diventa dormiente. Un mestiere dormiente conserva la sua abilità e le sue ricette comuni, che continuano a insegnargli sulla curva normale finché non diventano grigie a 75; tutto ciò che sta sopra il comune smette di pagare all'istante, e un mestiere dormiente non sforna mai un capolavoro mentre riposa.",
       "pairFmt": "{a} e {b}",
       "curveHeading": "La Curva di Maestria",
-      "curveBody": "Il guadagno di abilita segue una sola regola ovunque, la Curva di Maestria a quattro stati. Ogni {step} punti di abilita e un livello, e ogni ricetta viene valutata in base a dove si trova rispetto alla tua: al tuo livello o superiore concede guadagno pieno, un livello sotto concede meta, due sotto un quarto, e tre o piu sotto nulla.\n\nLa finestra di fabbricazione dipinge questo direttamente nell'elenco delle ricette con i colori classici: arancione per guadagno pieno, giallo per ridotto, verde per un gocciolio, grigio per nessuno. I guadagni sono deterministici, mai un tiro di avanzamento, quindi la stessa fabbricazione allo stesso livello sposta sempre la tua abilita esattamente della stessa quantita, e una ricetta che diventa gialla e il segnale di imparare il gradino successivo.\n\nLa Raccolta segue la stessa curva con lo stesso passo di livello, valutata rispetto al nodo invece che a una ricetta: i nodi facili diventano grigi man mano che li superi, e sono i nodi piu ricchi delle zone successive a completare la scalata. La Pesca mantiene il proprio calendario: un punto intero per cattura al di sotto di 50 di competenza, meta fino a 100, un decimo fino a 150, e una coda lenta fino a 200, con le catture di immondizia che non insegnano nulla da 100 in poi.",
+      "curveBodyRetunedFishing": "Skill gain follows one rule everywhere, the four-state Mastery Curve. Every {step} points of skill is a tier, and each recipe is scored by where it sits against yours: at or above your tier it grants full gain, one tier below grants half, two below a quarter, and three or more below nothing at all.\n\nThe crafting window paints this straight onto the recipe list in the classic colors: orange for full gain, yellow for reduced, green for a trickle, gray for none. Gains are deterministic, never a skill-up roll, so the same craft at the same tier always moves your skill by exactly the same amount, and a recipe turning yellow is your cue to train the next rung.\n\nGathering runs on the same curve with the same tier step, scored against the node instead of a recipe: easy nodes gray out as you pass them, and the richer nodes of the later zones are what finish a climb. Fishing keeps its own schedule: 0.08 of a point per catch below 50 proficiency, 0.05 to 100, 0.04 to 150, and 0.03 to 200, with junk catches teaching nothing from 100 on.",
       "provenanceHeading": "Provenienza",
       "provenanceBody": "Il buon lavoro in questo mondo ricorda il suo artefice: i raccolti e le fabbricazioni rari o superiori arrivano firmati (Raccolto da, Fabbricato da), un capolavoro porta sempre il nome del suo artefice e viene finito un grado di qualita superiore, e un pezzo su commissione si lega al suo destinatario tramite il Vincolo del Fabbricatore. La pagina dell'Economia Artigianale porta le regole complete, dalle firme e dall'accumulo alle commissioni di scioglimento.",
+      "endgameHeading": "The Masterwrought endgame",
+      "endgameBody": "Above every craft's trainer ladder sits one shared summit: the Masterwrought family, the crafted pieces wearing the gold Unique-Equipped: Masterwrought tag the Gear page describes. The chain has the same shape whichever craft climbs it: apex patterns found rather than taught, daily-gated intermediate crafts that pace the work, and three shared materials every ladder drinks from. The finished pieces trade freely like any other crafted work (the Crafting Economy page carries the trading rules), and the two-piece wearing cap keeps them an accent on a build rather than a whole kit, so a crafter who never sets foot in the deepest endgame still sells to the people who live there.",
+      "endgamePatternsBody": "The patterns arrive through three channels, and the recipe tables on every craft page label each row's own: found in the deepest endgame victories, sold by the Heroic Quartermaster for Heroic Marks, or both at once. The split is deliberate. The gear patterns are found and never sold, the consumable patterns sit on the quartermaster's counter from day one, and the farming patterns ride both roads. Patterns are ordinary tradable goods besides, so a find you cannot use is a find you can sell.",
+      "endgameMaterialsBody": "Three shared materials feed the chain. The Wyrmfall Core is the tradable catalyst: each of the deepest endgame's final victories pays a credited character 1 to 3 cores, once per source per day, the highest rift clears pay a fixed count of their own on the same daily clock, and the Heroic Quartermaster sells one for 12 Heroic Marks as the bad-luck backstop; cores trade freely. The Sundered Essence is soulbound, and sundering is its only source: any character can sunder, no profession asked, and the cast breaks a raid-won piece of epic gear of the tier into exactly one essence, the gear itself being the price. The Maker's Ember is soulbound too, and it is the chain's clock: one per week per character, granted on your first eligible endgame completion of the week, and a missed week is never lost, since the embers accrue and pay out on your next completion.",
+      "endgameMaterialsBodyAnyRaid": "Three shared materials feed the chain. The Wyrmfall Core is the tradable catalyst: each of the deepest endgame's final victories pays a credited character 1 to 3 cores, once per source per day, the highest rift clears pay a fixed count of their own on the same daily clock, and the Heroic Quartermaster sells one for 12 Heroic Marks as the bad-luck backstop; cores trade freely. The Sundered Essence is soulbound, and sundering is its only source: any character can sunder, no profession asked, and the cast breaks a raid-won piece of epic gear, from any raid and either difficulty, into exactly one essence, the gear itself being the price. The Maker's Ember is soulbound too, and it is the chain's clock: one per week per character, granted on your first eligible endgame completion of the week, and a missed week is never lost, since the embers accrue and pay out on your next completion.",
+      "perfectingHeading": "Perfecting, and the orange promotion",
+      "perfectingBody": "A finished apex piece is not the end of its story. Its owner, with 125 skill in the craft that made it, can walk the piece up four ranks of Perfecting. Each attempt spends one Maker's Ember, one Sundered Essence, and one Prismglass Setting, and succeeds four times in five; a miss costs the materials and nothing else, the piece is never harmed or set back. The first attempt binds the piece to the one perfecting it, so a copy meant for sale is sold before the work begins. A Perfected piece carries a stat bonus over its base, and Perfected is exactly what the Lucent Infusion waits for: the one enchant the Enchanting page marks Perfected only lands on nothing less.\n\nThe walk can begin one rank in. A masterwork proc on an apex craft cannot finish the piece a tier finer, since apex is already the top of the ladder, so it grants the head start instead: the piece comes off the bench at the first rank of Perfecting, with three ranks left to walk rather than four. It is the same roll and the same odds the Masterworks section on every craft page publishes, spent on a rank instead of a quality.",
+      "promotionBody": "The last step is the orange promotion, and it is the Deed of Making's whole purpose. Bring a Perfected piece and one Deed of Making, an inscriptionist's skill-125 writ, and the copy is promoted into a legendary carrying a name of your own choosing. No roll rides it: the promotion is deterministic, the stats do not change at all, and what changes is the name and the color. The deed is tradable, so the scribe and the wearer need never be the same person, and the family cap keeps its one extra line: a character wears at most one legendary Masterwrought piece among their two.",
       "stationsHeading": "Stazioni e i tre hub",
-      "stationsBody": "Sei stazioni tipizzate servono i sette mestieri legati alla stazione, distribuiti tra i tre hub cittadini. Eastbrook ospita la forgia (Forgiatura delle armi e Forgiatura delle armature la condividono), le cucine, il telaio e l'officina; Fenbridge tiene la conceria, e Highwatch l'apotecario. Ogni stazione ha un maestro residente accanto che addestra ricette, pubblica ordini di lavoro e offre il servizio di scioglimento.\n\nIl raggio operativo e di 20 yard, all'incirca il cortile della stazione stessa, quindi si fabbrica stando all'incudine piuttosto che dall'altra parte della citta. Gioielleria, Iscrizione e Incantamento non hanno stazione: i primi due attendono le loro ricette, e l'Incantamento funziona ovunque per progetto.",
+      "stationsBody": "Six typed stations serve the nine station-bound crafts, spread across the three town hubs. Eastbrook holds the forge (Weaponcrafting, Armorcrafting, and Jewelcrafting all share it), the kitchens, the loom, and the toolworks; Fenbridge keeps the tannery, and Highwatch the apothecary (Alchemy and Inscription share that bench). Each station has a resident master beside it who trains recipes, posts work orders, and offers the unbind service.\n\nThe working radius is 20 yards, roughly the station's own yard, so you craft standing at the anvil rather than from across town. Enchanting alone has no station: it works anywhere by design.",
       "deedsHeading": "Imprese che ricordano il viaggio",
-      "deedsBody": "Il Libro delle Imprese cammina accanto a ogni passo di questo. La tua prima sintonizzazione guadagna Giurato del Mestiere e il tuo primo capolavoro guadagna Mastro Artefice, entrambi indossabili come titoli. Ognuno degli otto mestieri conseguibili segna un'impresa traguardo a 50 di abilita e corona il suo massimo con un titolo di Gran Maestro, mentre la Pesca ottiene Vecchio Sale a 100 di competenza e il titolo di Maestro Pescatore a 200.\n\nCi sono anche pagine piu tranquille: imprese per il tuo primo raccolto e la tua prima fabbricazione, per i ritrovamenti rari che la fortuna porta sul campo, e per aver intrapreso lo smantellamento. Tutto e cosmetico, solo titoli e Rinomanza. Un'impresa non concede mai potere; prova solo che eri li.",
+      "deedsBody": "The Book of Deeds walks beside every step of this. Your first attunement earns Craftsworn and your first masterwork earns Masterwright, both wearable as titles. All ten earnable crafts mark a milestone deed at 50 skill and crown their caps with a Grandmaster title, while Fishing gets Old Salt at 100 proficiency and the Master Angler title at 200.\n\nThere are quieter pages too: deeds for your first harvest and first craft, for the rare finds luck turns up in the field, and for taking up salvage. All of it is cosmetic, titles and Renown only. A deed never grants power; it only proves you were there.",
       "startHeading": "Da dove iniziare",
       "startBody": "Appena arrivato a Eastbrook? Trova il Caposquadra Odell e accetta Un mestiere per ogni mano: ti indicherà i filoni di minerale attorno alla Cava di Rame a nordest della città e ti regalerà i tuoi primi calli. Occhio però alla cava stessa: gli Scavatori di Deeprock accampati sopra di essa stanno qualche livello sopra un nuovo arrivato, quindi lavora prima i filoni periferici e lascia il cuore dell'accampamento a quando avrai salito qualche livello. Da lì in poi, raccogli ogni filone, boschetto di alberi e aiuola d'erbe che incontri mentre fai missioni; la competenza viene naturale ai viaggiatori.\n\nTornato in città, premi T per aprire la finestra di fabbricazione e lavora le ricette comuni che ogni personaggio conosce fin dall'inizio. Fai visita ai maestri alla forgia, alle cucine, al telaio e all'officina per vedere che cosa insegnano, e accetta i loro ordini di lavoro per monete costanti. Quando la lettera della Gilda ti raggiungerà, saprai già quale coppia ti sembra casa.",
       "colStation": "Stazione",
       "colHub": "Hub",
       "colMaster": "Maestro",
       "masterCellFmt": "{name}, {title}",
-      "harvestBodyFamilies": "La raccolta non si ferma ai nodi. Molte bestie uccise possono essere raccolte una volta ciascuna, primo arrivato primo servito, per pelli, zanne, artigli, difese, seta, veleno, panno e carne, direttamente dalla carcassa insieme al bottino ordinario; una pressione apre entrambi. Quando una bestia porta più di un componente lavorabile, la scelta è tua: prendi tutto quello che può dare, oppure concentrati su meno componenti e ottieni una qualità misurabilmente superiore di ciò che scegli di prendere.\n\nUn tiro di raccolto raro o superiore su una famiglia che porta esemplari concede anche un esemplare puro firmato (una Pelle Pura, Seta Pura, Ghiandola di Veleno Pura, Artiglio Puro o Taglio Pregiato) in aggiunta alla resa ordinaria, e registra Un Esemplare Perfetto nel tuo Libro delle Imprese. Qualunque personaggio può raccogliere, senza alcun addestramento richiesto, e qualsiasi strumento di raccolta che possiedi conta verso il bonus avanzato, indipendentemente dal mestiere a cui appartiene.",
+      "harvestBodyFamilies": "La raccolta non si ferma ai nodi. Molte bestie uccise possono essere raccolte una volta ciascuna, primo arrivato primo servito, per pelli, zanne, artigli, difese, corna, branchie, seta, veleno, panno e carne, direttamente dalla carcassa insieme al bottino ordinario; una pressione apre entrambi. Quando una bestia porta più di un componente lavorabile, la scelta è tua: prendi tutto quello che può dare, oppure concentrati su meno componenti e ottieni una qualità misurabilmente superiore di ciò che scegli di prendere.\n\nUn tiro di raccolto raro o superiore su una famiglia che porta esemplari concede anche un esemplare puro firmato (una Pelle Pura, Seta Pura, Ghiandola di Veleno Pura, Artiglio Puro o Taglio Pregiato) in aggiunta alla resa ordinaria, e registra Un Esemplare Perfetto nel tuo Libro delle Imprese. Qualunque personaggio può raccogliere, senza alcun addestramento richiesto, e qualsiasi strumento di raccolta che possiedi conta verso il bonus avanzato, indipendentemente dal mestiere a cui appartiene.",
       "focusBodyTiers": "Ogni città principale tiene un pannello Focus Cittadino per i raccoglitori di passaggio: fermati in città, aprilo da accanto alla minimappa e distribuisci un budget di 10 punti focus tra i tipi di componente che ti interessano. Ogni 5 punti su un componente ne innalza il grado di raccolta di un gradino (due gradini al massimo), e ogni punto aggiunge il 10 percento alla sua resa; i componenti non focalizzati non vengono mai peggiorati.\n\nLa tua ripartizione segue il tuo personaggio ovunque vada e può essere ridiretta a ogni successiva visita in città, al ritmo che scegli. Prendersi il proprio tempo è gratis: la ridirezione richiede 1 minuto per ogni punto che sposti. Pagare un po' la velocizza, 15 secondi per punto più 5 rame e 1 Polvere di Tintinnio per punto, e pagare per intero la rende istantanea per 25 rame e 5 Polveri di Tintinnio per punto. Vengono contati solo i punti che sposti davvero, quindi spostare un solo punto costa poco, e un pannello che apri e chiudi senza modifiche non costa nulla a nessun livello.",
       "toolEffectsHeading": "Effetti da strumento",
-      "toolEffectsBody": "Uno strumento di raccolta ha uno slot al suo interno, ed è il ciondolo di un incantatore ciò che vi si inserisce. Una Riserva del Raccoglitore aggiunge un'unità a ciò che un raccolto produce; un Occhio dell'Artigiano innalza il grado di ciò che estrae. L'Armeggiatore Gizzel, Maestro degli Attrezzi a Eastbrook, insegna entrambi agli incantatori che hanno raggiunto 25 di competenza nel mestiere, ed entrambi si fabbricano alla sua officina degli attrezzi.\\n\\nUn ciondolo appena inserito porta 20 cariche su uno strumento comune e 10 in più per ogni gradino di rarità sopra il comune, quindi lo stesso ciondolo inserito su un piccone epico parte da 50. Una carica viene spesa solo quando il ciondolo ha effettivamente cambiato l'esito, mai su un raccolto che non ha migliorato, e uno slot può essere impostato per chiedere conferma a ogni utilizzo, così il ciondolo aspetta finché non premi Usa una carica. Inserire un ciondolo appena fabbricato rigenera lo slot attorno allo strumento che stai portando in quel momento, quindi si riempie fino a ciò che quello strumento può contenere anziché tornare a un massimo raggiunto in precedenza, e un nuovo inserimento che non cambierebbe nulla viene respinto invece di consumare il ciondolo.\\n\\nEsaurire le cariche non distrugge il ciondolo: il proprietario dello strumento ricarica lo slot, 10 cariche per ogni materiale arcano speso, e il materiale richiesto segue il migliore tra lo strumento che porti con te e il miglior strumento con cui quello slot sia mai stato riempito, Polvere di Tintinnio per uno strumento comune o non comune, Essenza di Tintinnio per uno raro, e un Frammento di Tintinnio per uno epico. Lasciare lo strumento buono in banca non compra una ricarica più economica, solo una più piccola allo stesso prezzo; il modo onesto per scendere a un gradino più economico è inserire un ciondolo appena fabbricato mentre porti lo strumento inferiore, il che rigenera lo slot lì. Se il tetto dello slot sta sopra ciò che il tuo strumento attuale può riempire, la ricarica si ferma dove si ferma quello strumento e ti dice di portare quello migliore. La ricarica costa la metà dei materiali quando sei l'incantatore che ha firmato il ciondolo, e ancora meno se sei specializzato in Incantamento; chiunque altro paga la tariffa piena. Una ricarica è un lancio breve, come il resto della famiglia del mestiere."
+      "toolEffectsBody": "A gathering tool has a slot in it, and a crafted charm is what goes in. A Gatherer's Cache adds a unit to what a harvest yields; an Artisan's Eye raises the grade of what it pulls up; a Maker's Charm adds two units the same way. The first two are enchanting work: Tinker Gizzel, Master of the Toolworks in Eastbrook, teaches them to enchanters who have reached 25 skill in the craft. The Maker's Charm is engineering work instead, a dropped pattern crafted at 100 skill; all three are made at his toolworks.\n\nA freshly slotted charm carries 20 charges on a common tool and 10 more for every rarity rung above common, so the same charm slotted on an epic pick starts at 50. A charge is spent only when the charm actually changed the outcome, never on a harvest it did not improve, and a slot can be set to ask each use, so the charm waits until you say Use a Charge. Slotting a fresh charm re-mints the slot around the tool you are carrying at that moment, so it fills to what that tool can hold rather than back to some earlier high mark, and a re-slot that would change nothing at all is turned away instead of eating the charm.\n\nRunning out of charges does not destroy the charm: the tool's owner refills the slot, 10 charges for each arcane material spent, and which material it asks for follows the better of the tool you are carrying and the best tool that slot has ever been filled by, Chime Dust for a common or uncommon tool, Chime Essence for a rare one, and a Chime Shard for an epic. Leaving the good tool in the bank does not buy a cheaper refill, only a smaller one at the same price; the honest way down to a cheaper rung is to slot a fresh charm while carrying the lesser tool, which re-mints the slot there. If the slot's ceiling sits above what your current tool can fill, the refill stops where that tool stops and tells you to carry the better one. The refill costs half the materials when you are the crafter who signed the charm, and less again if you are specialized in the charm's own craft, Enchanting for a Cache or an Eye, Engineering for a Maker's Charm; anyone else pays the full rate. A refill is a short cast, like the rest of the craft family."
     },
     "profPages": {
       "back": "Torna alle Professioni",
@@ -6383,10 +6618,21 @@ export const it_IT: EnTranslations = {
       "matFmt": "{name} x{count}",
       "outputFmt": "{name} x{count}",
       "comboReq": "Richiede {a} e {b}",
+      "oncePerDay": "Once per day",
+      "effectFood": "Restores {amount} health over {seconds} sec when eaten.",
+      "effectWellFed": "Well Fed when you finish eating: +{value} {stat} for {minutes} min.",
+      "effectWellFedAura": "Grants {aura} for {minutes} min when you finish eating.",
+      "effectFeast": "Sets out a feast others eat from, one serving each: {servings} servings, lasting {minutes} min.",
+      "effectFeastServing": "Each serving restores {amount} health over {seconds} sec.",
+      "effectFeastWellFed": "Well Fed when a serving is finished: +{value} {stat} for {minutes} min.",
       "sourceTrainerFee": "Istruttore, {fee}",
       "sourceTrainerFree": "Istruttore, gratuito",
       "sourceKnown": "Conosciuta dall'inizio",
+      "sourceDrop": "From a found pattern",
+      "sourceVendor": "Sold by the Heroic Quartermaster",
+      "sourceDropAndVendor": "From a found pattern, or the Heroic Quartermaster",
       "gainFmt": "{reduced} / {minimal} / {zero}",
+      "gainNever": "never",
       "colRecipe": "Ricetta",
       "colSkill": "Competenza",
       "colSource": "Fonte",
@@ -6407,27 +6653,29 @@ export const it_IT: EnTranslations = {
         "armorcrafting": "La forgiatura di armature martella la maglia, l'armatura piu pesante che un artigiano possa realizzare, dalle basi in rame rivettato al raro set in scaglie di osmio, con un paio di pezzi con statistiche da incantatore a corredo. I suoi clienti sono le persone che si trovano dove arrivano i colpi.",
         "tailoring": "La sartoria tesse il panno da Intelletto e Spirito in cui vivono gli incantatori, dalle basi in tela grezza al set di tessidorato fino al raro lavoro in tessitura solare, e cuce la Sacca di Seta Filata, una borsa da dieci slot che nessuno rifiuta mai.",
         "leatherworking": "La lavorazione del cuoio lavora pelli e realizza equipaggiamento di Agilita e Resistenza per le classi che schivano invece di bloccare, dalle basi in pelle di Fenbridge al raro set di Guardapaludi, ed e l'unico mestiere profondo addestrato fuori nella palude.",
-        "cooking": "La cucina trasforma il bottino della giornata in pasti da assaporare seduti che curano nell'arco di 18 secondi di riposo, la guarigione piu economica del gioco, dalla Carne Salata fino all'Arrosto Solenne di Marlow. Tutti mangiano, quindi nessun mestiere e piu universalmente gradito in un gruppo.",
-        "alchemy": "L'alchimia trasforma erbe, ghiandole e vetro in boccette che fanno vincere i combattimenti: fiale di cura e mana per il momento in cui le cose vanno storte, ed elisir di resistenza che restano sulla barra dei potenziamenti per tutto un dungeon.",
-        "engineering": "L’Ingegneria costruisce gli strumenti che ogni raccoglitore serio finisce per volere: i picconi, le asce, i falcetti e le canne da pesca di livello 4 e 5 che nessun bancone venderà mai per monete, ognuno dei quali consuma lo strumento del livello inferiore.",
-        "enchanting": "L’Incantamento scompone l’equipaggiamento e ne rimette dentro il potere: riduci i pezzi indesiderati in materiali arcani, poi spendili in un bonus permanente alle statistiche per un pezzo che intendi tenere. Scomporre e incantare non richiedono né stazione né addestratore, e chiunque può cominciare il primo giorno; solo le due ricette di ciondolo chiedono di più, insegnate all’officina degli attrezzi."
+        "cooking": "Cooking turns the day's catch and the season's harvest into sit-down meals that heal over 18 seconds of rest, the cheapest healing in the game, from Salted Jerky through Marlow's Grand Roast to the three apex role dishes, which heal more than any other food and leave a Well Fed buff on whoever finishes the plate. Everyone eats, so no craft is more universally welcome in a group.",
+        "alchemy": "Alchemy turns herbs, glands, and glass into bottles that win fights: healing and mana draughts for the moment things go wrong, stamina elixirs that sit on your buff bar through a whole dungeon, and at the top the flasks, one per role, that stay with you through your own death.",
+        "engineering": "Engineering builds the tools every serious gatherer ends up wanting: the tier 4 and tier 5 picks, axes and sickles, and the three fishing rods that climb from tier 4 to tier 6, none of which any counter will ever sell for coin, each one consuming the tool below it.",
+        "enchanting": "Enchanting takes gear apart and puts the power back in: break unwanted pieces into arcane materials, then spend them on a permanent stat bonus for a piece you mean to keep. Breaking and enchanting need no station and no trainer, and anyone can start on day one; only its three trainer recipes ask more, the two charms and the Lucent Reagent, taught and worked at the toolworks.",
+        "jewelcrafting": "Jewelcrafting is the finer bench of the Eastbrook forge: rings and necklaces in copper, iron, and rare osmium, with a Strength ring, an Intellect ring, and an Agility necklace on every rung. Jewelry has no armor and no class lock, so its customers are simply everyone with fingers and a neck.",
+        "inscription": "Inscription is the writing desk of the Highwatch apothecary: caster tomes for the offhand and stamina scrolls for everyone, milled from the same herbs the draughts beside them use. Its scrolls are the second door into the battle-elixir buffs, so even a fighter who never holds a book has reason to knock."
       },
       "craftProse": {
         "weaponcrafting": {
           "identityHeading": "Il filo che ogni combattente cerca",
-          "identityBody": "Qualcuno in ogni gruppo vuole il lavoro di questo mestiere, perche il solo gradino raro copre tutti e tre gli appetiti: la Lama da Guerra di Osmio per il corpo a corpo con Forza, l'Ascia da Guerra di Glifacciaio per i combattenti con Agilita, e il Bastone da Battaglia di Altopino, un bastone da Intelletto e Spirito per la folla in veste.\n\nNell'anello si trova tra Forgiatura di Armature e Gemmologia. La sua identita viva e il Fabbro, la coppia di Forgiatura di Armi e Forgiatura di Armature, giurata davanti alla Capofabbra Darva alla fucina lavorando tre filoni di minerale con le proprie mani; la coppia del Forgiatore di Lame con Gemmologia e nominata nell'anello, ma non puo ancora essere giurata, poiche la Gemmologia non spedisce ricette fino a una successiva espansione di zona.",
+          "identityBody": "Someone in every group wants this craft's work, because the rare rung alone covers all three appetites: the Osmium Warblade for Strength melee, the Glyphsteel War Axe for Agility fighters, and the Highpine Battle Staff, an Intellect and Spirit stave for the robe crowd.\n\nOn the craft ring it stands between Armorcrafting and Jewelcrafting. Its living identity is the Smith, the Weaponcrafting and Armorcrafting pair, sworn before Forgemistress Darva at the forge by working three ore veins with your own hands; the Bladewright pair with Jewelcrafting is named on the ring too, and though Jewelcrafting now works its own 0-to-50 jewelry ladder at this same forge, the pair still waits for its oath quest before it can be sworn.",
           "materialsHeading": "Cio di cui si nutre la fucina",
-          "materialsBody": "L’estrazione mineraria è la spina dorsale. Il Minerale di rame viene dai filoni di livello 1 della Valle di Eastbrook, il Minerale di ferro dalla Palude di Mirefen, e il Minerale di Thorium dalle Alture di Thornpeak, e ogni gradino della scala sale allo stesso modo. Il taglio del legname conta più di quanto ti aspetteresti: la corteccia di ferro fa l’asta della lancia da cinghiale, il frassino cinereo regge il martellone, e un solo Tronco di Elderwood forma il bastone da battaglia.\n\nIl resto viene dalla caccia e dal bancone. La Pelle ruvida per le impugnature si raccoglie direttamente dalle carcasse di lupi e cinghiali, i frammenti d’osso vengono dai morti inquieti o dallo smantellamento di equipaggiamento comune, e la scala della forgia brucia Flusso di forgiatura, 20 monete di rame al vasetto da Darva in persona. Se la tua estrazione resta indietro, nessun bancone ti salverà sul minerale vero e proprio: il Thorium viene dai filoni di Thornpeak, dai filoni iniziali di ogni zona più giovane tranne il Farshore (i cui filoni scavano ferro), oppure dalla pila di un altro giocatore, per scambio o tramite il Mercato Mondiale. Solo la Barra di Arcanite si compra con le monete, dall’Armeggiatore Gizzel all’officina degli attrezzi o dal Quartiermastro Bree a Highwatch.",
+          "materialsBody": "Mining is the backbone. Copper ore comes off the tier 1 veins of Eastbrook Vale, iron ore from Mirefen Marsh, and osmium ore from Thornpeak Heights, and each rung of the ladder steps up the same way. Logging matters more than you might expect: ironbark hafts the boar spear, ashwood shoulders the maul, and a single highpine log forms the battle staff.\n\nThe rest comes from the hunt and the counter. Rough hide for grips is harvested straight off wolf and boar corpses, bone fragments come off the restless dead or out of salvaged common gear, and the forge ladder burns Smithing Flux, 20 copper a jar from Darva herself. If your own mining lags behind, no counter will save you on the ore itself: osmium comes off the Thornpeak veins, off the starter veins of every younger zone but the Farshore (whose veins dig iron), or out of another player's stack, by trade or the World Market. Only the Glyphsteel Bar is bought for coin, from Tinker Gizzel at the toolworks or Quartermaster Bree in Highwatch.",
           "ladderHeading": "La scala, gradino per gradino",
           "ladderBody": "Una ricetta da campo, la Spada da Armi di Eastbrook, e nota a tutti dall'inizio e si realizza ovunque dai materiali di caccia (un paio di zanne di lupo e frammenti di ossa) piu sei Fondenti per Fabbri dal bancone della fucina. La vera scala e composta da nove ricette di addestratore in tre gradini, tutte vincolate alla fucina: il gradino del rame (ascia barbuta, mazza flangiata, lancia da cinghiale) e gratuito da imparare alla competenza 0, il gradino del ferro (spada lunga, martellone, pugnale) si apre alla competenza 25 per 25 monete d'argento per ricetta, e il gradino dell'osmio (lama da guerra, ascia da guerra, bastone da battaglia) si apre alla competenza 50 per 1 moneta d'oro ciascuno. Darva insegna una ricetta nel momento in cui il tuo livello nel mestiere la raggiunge, quindi ogni gradino si sblocca esattamente quando inizia la sua fascia di competenza.\n\nUna ricetta in piu viaggia con la coppia: i Guantoni di Gravewyrm, un pezzo combinato insegnato dall'addestratore che solo un Fabbro sintonizzato con Forgiatura di Armi e Forgiatura di Armature entrambe alla competenza 25 puo lavorare, e non richiede alcuna stazione.",
           "routeHeading": "Capolavori, e una rotta concreta fino a 125",
-          "routeBody": "Qualsiasi pezzo con una vera riga di statistiche, il che su questa scala significa dal gradino del ferro in su, può uscire dall’incudine come capolavoro, purché la qualità superiore rientri nel tetto del tuo livello; i comuni di rame senza statistiche non lo ottengono mai, perché in loro non c’è nulla da migliorare. Ferro e Thorium contano come materiali di livello 1 per il bonus da capolavoro, Elderwood e Arcanite come livello 2, e una competenza che sta sopra il livello proprio di una ricetta aggiunge il suo punto per livello, quindi tra i tre pezzi di Thorium sono l’ascia da guerra e il bastone da battaglia a portare il vantaggio dei materiali, e un gradino continua a rendere meglio anche dopo che l’hai superato.\n\nCavalca il gradino del rame fino a 25, impara il gradino del ferro il giorno stesso in cui si apre e cavalcalo fino a 50, poi il gradino del Thorium fino a 75. Oltre il 75 non è ancora uscito nulla di più alto, quindi le ricette di Thorium scendono a metà e poi a un quarto del guadagno: metti in preventivo circa 150 lavorazioni in più per raggiungere il limite di 125, e ricorda il limite condiviso di dieci azioni di lavorazione al minuto quando ti siedi a produrre in serie.\n\nFinanzia la scalata strada facendo: l’ordine di lavoro della forgia di Darva ti toglie dalle mani otto Minerali di rame ogni 30 minuti in cambio di qualche moneta e di PE, e i gradini del ferro e del Thorium si vendono onestamente a chi combatte in mischia mentre sale di livello. Il Libro delle Imprese segna Filo e Tempra alla competenza 50 e incorona Grande Maestro Forgiatura di Armi a 125."
+          "routeBody": "Any piece with a real stat line, which on this ladder means the iron rung and up, can come off the anvil as a masterwork so long as the finer quality fits inside your tier ceiling; the statless copper commons never proc, because there is nothing in them to improve. Iron and osmium count as tier 1 materials for the masterwork bonus, highpine and glyphsteel as tier 2, and skill sitting above a recipe's own tier adds its own point per tier, so among the osmium three it is the war axe and the battle staff that carry the material edge, and a rung keeps proccing better after you have outgrown it.\n\nRide the copper rung to 25, train the iron rung the day it opens and ride it to 50, then the osmium rung to 75. Above the osmium three sits an apex rung Darva does not teach: its patterns are found, not bought. For a smith whose majors include Weaponcrafting, which today means the sworn Smith, an apex craft pays full gain right to the 125 cap; below a major's ceiling it teaches nothing at all, so an undeclared or hobby smith works one for the weapon, not the points. Either way the osmium recipes carry the climb, fading to half and then quarter gain: budget roughly 150 more crafts to reach the 125 cap, and each craft takes real cast time, so a long batch is paced by duration rather than a quota.\n\nFund the climb as you go: Darva's forge work order takes eight copper ore off your hands every 30 minutes for a little coin and XP, and the iron and osmium rungs sell honestly to leveling melee. The Book of Deeds marks Edge and Temper at skill 50 and crowns Grandmaster Weaponcrafting at 125."
         },
         "armorcrafting": {
           "identityHeading": "Maglia per la prima linea",
           "identityBody": "La scala della Forgiatura di Armature si legge come la carriera di un soldato: per cominciare la semplice cintura in rame rivettata, i calzari e i guanti di maglia di rame, poi l’usbergo, i gambali e gli spallacci ironlink con le loro prime vere righe di statistiche, e infine il raro elmo, la corazza e i gambali di Scaglie di Thorium, pezzi da Forza e Tempra con valori di armatura al vertice assoluto dell’arte di un artigiano.\n\nHa anche un lato più tranquillo: i Gambali protetti di Eastbrook, un comune da campo con statistiche da incantatore, e il Mantello di Scaglie Fuligginose, una spalla di maglia rara da Intelletto e Spirito alla competenza 75, tengono nella lista dei clienti anche chi porta maglia e pensa agli incantesimi. Sull’anello sta tra Forgiatura di Armi e Ingegneria; la coppia del Fabbro con la Forgiatura di Armi si giura davanti alla Maestra della Forgia Darva, mentre la coppia dell’Artigiano degli Ingranaggi con l’Ingegneria è nominata ma non ha ancora una missione di giuramento.",
           "materialsHeading": "Minerale a sacchi",
-          "materialsBody": "Nessun mestiere divora minerale più in fretta. Il solo usbergo ironlink richiede cinque Minerali di ferro, e ogni pezzo di Scaglie di Thorium vuole tre o quattro Thorium più una Barra di Arcanite, quindi un armaiolo serio scava nella Palude di Mirefen e sulle Alture di Thornpeak, oppure paga qualcuno che lo faccia per lui. Il rame alimenta il primo gradino, dritto dai filoni presso lo Scavo di Rame.\n\nIntorno al metallo vanno le parti morbide: Pelle ruvida raccolta dalle carcasse di lupi e cinghiali, frammenti d’osso dai morti inquieti (o smantellati da equipaggiamento comune), e vasetti di Flusso di forgiatura (20 monete di rame l’uno alla forgia) in quasi ogni ricetta. Nessun bancone vende Thorium: gli impazienti lo comprano da altri giocatori o se lo estraggono da soli, su Thornpeak o dai filoni iniziali di dieci delle undici zone più giovani (solo il Farshore scava ferro).",
+          "materialsBody": "No craft eats ore faster. The ironlink hauberk alone takes five iron ore, and every osmiumscale piece wants three or four osmium plus a glyphsteel bar, so a serious armorcrafter mines Mirefen Marsh and Thornpeak Heights or pays someone who does. Copper feeds the first rung, straight from the veins by the Copper Dig.\n\nAround the metal go the soft parts: rough hide harvested off wolf and boar corpses, bone fragments off the restless dead (or salvaged out of common gear), and Smithing Flux jars (20 copper each at the forge) in nearly every recipe. No counter sells osmium: the impatient buy it off other players or mine it themselves, on Thornpeak or the starter veins of ten of the eleven younger zones (the Farshore alone digs iron).",
           "ladderHeading": "Imparare alla fucina di Darva",
           "ladderBody": "Due comuni da campo, il Gilet di maglia di Eastbrook e i Gambali protetti, sono noti dall’inizio e si realizzano ovunque. La scala dell’addestratore conta nove ricette in tre gradini alla forgia di Eastbrook: il gradino del rame è gratuito alla competenza 0, il gradino ironlink costa 25 monete d’argento a ricetta alla competenza 25, e il gradino delle Scaglie di Thorium costa 1 moneta d’oro ciascuna alla competenza 50, e ogni gradino è insegnabile nel momento in cui il tuo livello lo raggiunge.\n\nOltre la scala stanno due pezzi speciali. L’Elmo Pietrvincolo è una delle due ricette combinate del Fabbro (i Guanti d’arme del Gravewyrm sono il suo fratello sul lato della Forgiatura di Armi), insegnata dall’addestratore, senza stazione, e lavorabile solo da un Fabbro sintonizzato con entrambi i mestieri alla competenza 25. Il Mantello di Scaglie Fuligginose non ha bisogno di alcun maestro: lo conoscono tutti dall’inizio, e nulla ne vincola la lavorazione se non la forgia e i materiali. La competenza 75 indicata riguarda il guadagno, non il permesso: con la Forgiatura di Armature come mestiere principale paga guadagno pieno dal primissimo colpo di martello fino a 99, quindi un Fabbro con Thorium da spendere può appoggiarvisi presto. Sotto il tetto di un mestiere principale la ricetta di livello 3 non insegna nulla, perciò un armaiolo non dichiarato o per passatempo la lavora per il pezzo, non per i punti.",
           "routeHeading": "Capolavori e un percorso pratico fino a 125",
@@ -6435,7 +6683,7 @@ export const it_IT: EnTranslations = {
         },
         "tailoring": {
           "identityHeading": "Panno per gli incantatori, borse per tutti",
-          "identityBody": "La scala sale dalle basi in tela grezza attraverso il set di tessidorato fino al gradino raro: il Vestito del Tessitore di Seta e i pezzi di tessitura solare. Il suo secondo mestiere e universale: la Sacca di Seta Filata e una borsa da dieci slot, e non esiste classe, specializzazione o livello che non voglia piu spazio in borsa.\n\nNell'anello la Sartoria si trova tra Lavorazione del Cuoio e Iscrizione. La sua coppia viva e il Sarto da Campo, Lavorazione del Cuoio e Sartoria insieme, giurata davanti alla Tessitrice Ottilie al telaio di Eastbrook dopo aver abbattuto quattro ragni del bosco di rovi per la loro seta; la coppia del Tessitore d'Inchiostro con Iscrizione e nominata nell'anello ma attende le prime ricette dell'Iscrizione prima di poter essere giurata.",
+          "identityBody": "The ladder climbs from homespun basics through the gildenweave set to the rare rung: the Silkbinder's Raiment and the sunweave pieces. Its second trade is universal: the Silkspun Satchel is a ten-slot bag, and there is no class, spec, or level that does not want more bag space.\n\nOn the ring Tailoring sits between Leatherworking and Inscription. Its living pair is the Outfitter, Leatherworking and Tailoring together, sworn before Weaver Ottilie at the Eastbrook loom after culling four webwood spiders for their silk; the Inkweaver pair with Inscription is named on the ring, and with Inscription's base catalog now inked it waits only on an oath quest of its own.",
           "materialsHeading": "Filo, seta e, si, erbe",
           "materialsBody": "Il telaio funziona con cio che la caccia lascia cadere e con cio che i campi producono. Ritagli di lino e panno grezzo provengono dagli umanoidi uccisi, la seta di ragno si raccoglie dai cadaveri di ragno, e il pezzo centrale del gradino raro, il Vestito del Tessitore di Seta, vuole una Seta Pura, l'esemplare firmato che un fortunato raccolto da cadavere produce.\n\nL'erboristeria alimenta la sartoria piu di qualsiasi altro mestiere di equipaggiamento: la foglialucente rifinisce le pantofole, la fogliadoro colora il set di tessidorato, e il petalo solare tesse l'intero gradino raro, quindi un sarto che raccoglie le proprie erbe risparmia costantemente. Un Rocchetto di Filo costa 12 rami di rame da Ottilie, e il telaio non richiede affatto metallo: persino il pezzo finale del Cappuccio di Tessitura Guardiana e tessuto da erbe premium, Seta Pura, seta di ragno e filo.",
           "ladderHeading": "Imparare al telaio di Ottilie",
@@ -6455,45 +6703,68 @@ export const it_IT: EnTranslations = {
         },
         "cooking": {
           "identityHeading": "La pentola che sfama il gruppo",
-          "identityBody": "Mangia un pasto cucinato e ti cura nell’arco di 18 secondi di riposo, il che tra un ingaggio e l’altro è la guarigione più economica del gioco. La scala va dal Pesce persico del fiume scottato in padella, da 90 di salute, fino al Gran Arrosto di Marlow a 980, una cura da seduti che nulla nel gioco batte.\n\nSull’anello la Cucina sta tra l’Alchimia e la Lavorazione del Cuoio. La sua coppia viva è lo Speziale, Alchimia e Cucina, giurata davanti al Cuoco Marlow alle cucine di Eastbrook dopo aver cacciato quattro cinghiali selvatici per la pentola; la coppia del Cacciatore con la Lavorazione del Cuoio è nominata sull’anello ma non ha ancora una missione di giuramento.",
+          "identityBody": "Eat a cooked meal and it heals you over 18 seconds of rest, which between pulls is the cheapest healing in the game. The ladder runs from a 90-health Pan-Seared River Perch up through Marlow's Grand Roast at 980, and above even the roast sit the three apex role dishes at 1,392, the largest sit-heal in the game and the strongest Well Fed buff a finished plate can leave behind (the farm kitchen's buff dishes fill the rungs below it).\n\nOn the ring Cooking sits between Alchemy and Leatherworking. Its living pair is the Apothecary, Alchemy and Cooking, sworn before Cook Marlow at the Eastbrook kitchens after hunting four wild boars for the pot; the Trapper pair with Leatherworking is named on the ring but has no oath quest yet.",
+          "identityBodyOneMeal": "Eat a cooked meal and it heals you over 18 seconds of rest, which between pulls is the cheapest healing in the game. The ladder runs from a 90-health Pan-Seared River Perch up through Marlow's Grand Roast at 980, and above even the roast sit the three apex role dishes at 1,392, the largest sit-heal in the game and the strongest Well Fed buff a finished plate can leave behind (the farm kitchen's buff dishes fill the rungs below it; the Farming page tells that side of the story). Only one Well Fed effect at a time: a newer meal replaces it.\n\nOn the ring Cooking sits between Alchemy and Leatherworking. Its living pair is the Apothecary, Alchemy and Cooking, sworn before Cook Marlow at the Eastbrook kitchens after hunting four wild boars for the pot; the Trapper pair with Leatherworking is named on the ring but has no oath quest yet.",
           "materialsHeading": "Una dispensa alimentata da canna e coltello",
           "materialsBody": "La Pesca rifornisce gli ingredienti distintivi, zona per zona: trota specchio e persico di fiume dalle acque della Valle di Eastbrook, luccio di palude e anguilla di palude dalla Palude di Mirefen, trota dalle branchie gelide e carpa Slatefin dalle Alture di Thornpeak. I gradini mescolano le zone liberamente (il gradino gratuito vuole già il luccio di palude, quello intermedio le branchie gelide di Thornpeak, e la cena rara richiama dentro la trota specchio della Valle), quindi un cuoco che pesca ovunque lo porti la strada non resta mai a secco.\n\nIl lato del macellaio viene dalle carcasse raccolte: Carne di selvaggina da cinghiali e affini e, con un tiro di raccolto raro o superiore, un Taglio primo firmato, il pezzo forte del gran arrosto. Le erbe insaporiscono i piatti migliori, un Tronco di Frassino Cinereo affumica l’anguilla, e il Sale da cucina costa 8 monete di rame a sacchetto alla bancarella di Marlow.",
           "ladderHeading": "Dalla carne salata all'arrosto solenne",
           "ladderBody": "La Carne Salata e la ricetta da campo: nota dall'inizio, una zampa di ragno, realizzabile ovunque, il cibo da viaggio di ogni avventuriero alle prime armi. La scala dell'addestratore cucina nelle cucine di Eastbrook sul lato est della piazza: il gradino gratuito alla competenza 0 (la trota, lo Spiedino di Caccia del Cacciatore, la Trota delle Paludi alle Erbe), il gradino intermedio alla competenza 25 per 25 monete d'argento per ricetta (Anguilla affumicata in frassino, Stufato di Selvaggina con Fogliadoro, Zuppetta di Frostgill), e il gradino raro alla competenza 50 per 1 moneta d'oro ciascuno (Cena della Carpa Argentata, Piatto del Banchetto del Pescatore, Arrosto Solenne di Marlow).\n\nI piatti in grandi quantita allungano gli ingredienti: l'anguilla affumicata e lo stufato di selvaggina servono due porzioni per lavorazione, e il piatto del banchetto ne serve tre. Marlow insegna ogni gradino nel momento in cui il tuo livello in Cucina lo raggiunge.",
           "routeHeading": "La specializzazione, non i capolavori, e il percorso fino a 125",
-          "routeBody": "La cucina e l'eccezione onesta alla storia dei capolavori: un pasto non ha statistiche da migliorare, quindi i piatti non ne producono mai uno, e nessun cuoco dovrebbe inseguirlo. La maestria del mestiere e la specializzazione a 75: un quinto di ingredienti in meno per ogni ricetta, il che si somma rapidamente sui piatti in grandi quantita, e una cucina da campo mobile cosi che il banchetto possa essere cucinato alla porta del dungeon.\n\nCucina cio che catturi: abbina la scalata a una sessione di pesca e le due competenze si alimentano a vicenda per tutto il percorso. La carne salata e il gradino gratuito ti portano a 25 a un punto per lavorazione, il gradino intermedio a 50, e il gradino raro a 75; oltre il 75 non sono stati ancora aggiunti piatti piu avanzati, quindi i piatti rari scendono a meta e poi a un quarto del guadagno, circa 150 lavorazioni in piu fino al limite. Trattalo come fare scorta, non come una grind: una gilda mangia ogni porzione.\n\nL'ordine di lavoro delle cucine di Marlow compra otto carni di selvaggina ogni 30 minuti in cambio di monete e PE, e il Libro delle Imprese segna Chef Esperto alla competenza 50 lungo il percorso verso il titolo di Grande Maestro Cuoco a 125."
+          "routeBody": "Cooking is the honest exception to the masterwork story: a meal has no stat line to improve, so dishes never proc one, and no cook should chase it. The craft's mastery is specialization at 75: a fifth less of every ingredient, which compounds fast on batch dishes, and a mobile field kitchen so dinner gets cooked at the dungeon door.\n\nCook what you catch: pair the climb with a fishing session and the two skills feed each other all the way up. Jerky and the free rung carry you to 25 at a point per craft, the mid rung to 50, and the rare rung to 75. Above the rare rung sits the apex kitchen, the three role dishes and The Laden Hearth: no trainer teaches them, they come off found patterns. For a cook whose majors include Cooking, which today means the sworn Apothecary, an apex craft pays full gain right to the 125 cap; below a major's ceiling it teaches nothing at all, so an undeclared or hobby cook works one for the plate, not the points. Either way the rare dishes carry the last stretch, fading to half and then quarter gain, roughly 150 more crafts. Treat it as stocking, not grinding: a guild eats every serving.\n\nMarlow's kitchens work order buys eight game meat every 30 minutes for coin and XP, and the Book of Deeds marks Seasoned Chef at skill 50 on the way to the Grandmaster Cooking title at 125."
         },
         "alchemy": {
           "identityHeading": "Boccette che fanno vincere i combattimenti",
-          "identityBody": "Il mestiere si lavora presso l’apotecario di Highwatch, casa dell’alchimista Verane, Maestro dello speziale, che insegna la scala delle ricette, vende Fiale di vetro a 12 monete di rame e paga in monete le erbe attraverso il suo ordine di lavoro.\n\nSull’anello dei mestieri l’Alchimia sta con i mestieri che vivono di prove ed errori, con l’Ingegneria da un lato e la Cucina dall’altro. Questo le dà due identità di coppia: il Bombardiere (Ingegneria e Alchimia, intrapreso davanti all’Armeggiatore Gizzel a Eastbrook) e lo Speziale (Alchimia e Cucina, giurato davanti al Cuoco Marlow). Sintonizzati con una delle due coppie per rendere l’Alchimia un mestiere principale e lasciare che il tuo stesso lavoro firmato ti insegni qualcosa in cambio; la coppia del Bombardiere apre anche il suo intruglio combinato, l’Elisir dell’Orso, mentre la coppia dello Speziale non porta ancora alcuna ricetta combinata. La scala in sé non aspetta mai, però, perché ogni ricetta di Alchimia rientra nel gradino raro sotto cui lavorano i mestieri non dichiarati, quindi l’intera scalata fino al limite è aperta prima di qualsiasi giuramento.",
+          "identityBody": "The craft is worked at the apothecary in Highwatch, home of Alchemist Verane, Master of the Apothecary, who teaches the recipe ladder, sells Glass Vials at 12 copper, and pays coin for herbs through her work order.\n\nOn the craft ring, Alchemy sits with the trial-and-error trades, next to Engineering on one side and Cooking on the other. That gives it two pair identities: the Bombardier (Engineering and Alchemy, taken up before Tinker Gizzel in Eastbrook) and the Apothecary (Alchemy and Cooking, sworn before Cook Marlow). Attune to either pair to make Alchemy a major and let your own signed work teach you back; the Bombardier pair also opens its combination brew, the Elixir of the Bear, while the Apothecary pair ships no combination recipe yet. The 0-to-50 ladder itself never waits, though: every one of those rungs sits inside the rare tier that undeclared crafts work under, so the climb to the cap is open before any oath. Two things sit above that ceiling and pay their skill to a major alone: the Quickening Catalyst, the 75-rung intermediate Verane also teaches, and the found-pattern rungs above the ladder; an undeclared or hobby alchemist brews them for the goods, not the points.",
           "materialsHeading": "Erbe, ghiandole e vetro",
           "materialsBody": "Ogni fiala vuole una Fiala di Vetro piu erbe abbinate al suo gradino: la foglialucente cresce nella Valle di Eastbrook, la fogliadoro nelle Paludi di Mirefen, e il petalo solare sulle Alture di Thornpeak, un'erba per zona, quindi le tue boccette salgono di livello insieme al mondo. L'erboristeria e il mestiere partner naturale, sebbene acquistare dai raccoglitori o dal mercato funzioni altrettanto bene; le zone piu profonde ospitano appezzamenti di livello superiore che richiedono un falcetto migliore, quindi tieni il tuo strumento aggiornato se cogli da solo.\n\nLa linea degli elisir aggiunge un ingrediente da cacciatore: Ghiandole di Veleno raccolte da cadaveri velenosi, e l'elisir di punta richiede una Ghiandola di Veleno Pura, il raro esemplare firmato che un fortunato raccolto da cadavere produce di tanto in tanto. Se non fai la raccolta da solo, questi sono esattamente i materiali che vale la pena chiedere a un amico cacciatore di portare.",
           "ladderHeading": "La scala delle ricette",
-          "ladderBody": "Tutti conoscono la Pozione curativa minore fin dall’inizio e possono mescolarla ovunque, senza bisogno di stazione. La vera scala è fatta di nove ricette insegnate da Verane all’apotecario, tre per gradino: le ricette a competenza 0 sono gratuite, il gradino a competenza 25 costa 25 monete d’argento per ricetta, e il gradino a competenza 50 costa 1 moneta d’oro per ricetta. Ogni gradino è fatto di una fiala curativa, una fiala di mana e un elisir di Tempra, e sale dalle boccette comuni di Fogliaargento (120 salute, 160 mana) attraverso quelle non comuni di Fogliadoro (200 salute, 260 mana) fino a quelle rare di Petalosole (280 salute, 360 mana).\n\nGli elisir salgono allo stesso modo: l’Elisir del Cinghiale concede 6 Tempra per 10 minuti, l’Elisir del Veleno di Fuoco 9 per 15 minuti, e l’Elisir del Serpente 12 per 15 minuti, e il Serpente è il solo a produrre due boccette per lavorazione. Una ricetta in più sta in disparte: l’Elisir dell’Orso, un intruglio combinato che Verane insegna per 25 monete d’argento una volta che la tua Alchimia raggiunge 25, mescolabile ovunque, ma solo da un Bombardiere sintonizzato con Alchimia e Ingegneria entrambe a 25.",
+          "ladderBody": "Everyone knows the Minor Healing Potion from the start and can mix it anywhere, no station needed. The real ladder is taught by Verane at the apothecary, rung by rung: the skill 0 recipes are free, the skill 25 rung costs 25 silver per recipe, and the skill 50 rung costs 1 gold per recipe. Each rung carries a healing draught, a mana draught, and a stamina elixir, stepping from common sheenleaf bottles (120 health, 160 mana) through uncommon goldleaf (200 health, 260 mana) to rare sunpetal (335 health, 425 mana); since the trophy economy the skill 25 rung also teaches a Lesser Healing Potion brewed from tallow, a cheaper bottle a hair weaker than the goldleaf draught.\n\nThe elixirs climb the same way: the Elixir of the Boar grants 6 Stamina for 10 minutes, the Vipersear Elixir 9 for 15 minutes, and the Elixir of the Serpent 12 for 15 minutes, the Serpent alone brewing two bottles per craft. One more recipe sits off to the side: the Elixir of the Bear, a combination brew Verane teaches for 25 silver once your Alchemy reaches 25, mixable anywhere, but only by an attuned Bombardier with both Alchemy and Engineering at 25.\n\nAbove the whole elixir line sits the flask rung, which no trainer teaches and which comes off found patterns instead. A flask grants 13 for 20 minutes, and it opens two axes the elixirs never had: Attack Power and Intellect beside the familiar Stamina, one flask per role. It also keeps its own rules. Only one flask rides at a time whatever its stat, a weaker elixir or scroll of that stat cannot replace it, no dispel, steal, or hand cancel takes it off, and it stays with you through your own death, though it ends when you log out.",
           "routeHeading": "Il percorso di un produttore fino a 125",
-          "routeBody": "Fiale ed elisir non producono mai capolavori; quel risultato appartiene all’equipaggiamento con statistiche. Il tuo nome viaggia lo stesso, però: le fiale rare di Petalosole arrivano firmate con il marchio del creatore, e così ogni boccetta dell’Elisir del Serpente a doppia infornata, quindi in questo mestiere nulla di raro lascia il banco senza firma. Alla competenza 75 ti specializzi, e da quel momento ogni ricetta di Alchimia costa il 20 percento di materiali in meno.\n\nPrendi l’Erbalismo presto e cogli mentre sali di livello: la Fogliaargento è ovunque nella Valle, e una volta arrivato al banco di Verane il gradino gratuito ti porterà pulito fino alla competenza 25 con erbe che avresti raccolto comunque. Impara il gradino 25 nel momento stesso in cui si accende, sposta la raccolta nella palude per la Fogliadoro, e lascia che l’ordine di lavoro di Verane (sei Erbe Fogliadoro per 45 monete di rame, ripetibile ogni 30 minuti) ti restituisca un po’ di monete strada facendo.\n\nDal 50 in poi, prepara fiale di Petalosole e infornate di Serpente con il Petalosole di Thornpeak, con ancora un po’ di verde della Valle e della palude nell’impasto. L’ultimo tratto da 100 a 125 è un gocciolio voluto, quindi prepara ciò che si vende davvero invece di bruciare erbe per il numero, e ricorda che i consumabili sono l’unico bene lavorato che tutti ricomprano per sempre. Il Libro delle Imprese segna Strani Intrugli alla competenza 50 e Grande Maestro Alchimia al limite."
+          "routeBody": "Draughts and elixirs never roll masterworks; that proc belongs to stat-bearing gear. Your name still travels, though: the rare sunpetal draughts arrive signed with a maker's mark, and so does every bottle of the double-batch Elixir of the Serpent, so nothing rare in this craft leaves the bench unsigned. At skill 75 you specialize, and every Alchemy recipe costs 20 percent fewer materials from then on.\n\nTake Herbalism early and pick as you level: sheenleaf is everywhere in the Vale, and once you reach Verane's bench the free rung will carry you cleanly to skill 25 on herbs you would have picked anyway. Learn the 25 rung the moment it turns on, move your picking to the marsh for goldleaf, and let Verane's work order (six Goldleaf Herbs for 45 copper, repeatable every 30 minutes) hand a little coin back as you go.\n\nFrom 50 on, brew sunpetal draughts and Serpent batches out of Thornpeak sunpetal, with a little Vale and marsh greenery still in the mix. Above the Serpent sits the apex bench, the three flasks and, at the very top, the Grand Cauldron, the skill-125 capstone: no trainer teaches them, they come off found patterns, and they pay their skill to a sworn major alone (below a major's ceiling they teach nothing at all). The last stretch from 100 to 125 is a deliberate trickle, so brew what actually sells rather than burning herbs for the number, and remember that consumables are the one crafted good everyone re-buys forever. The Book of Deeds marks Strange Brews at skill 50 and Grandmaster Alchemy at the cap."
         },
         "engineering": {
           "identityHeading": "Il monopolio del fabbricante di attrezzi",
-          "identityBody": "Il mestiere si lavora all’officina degli attrezzi, nell’angolo sud-occidentale della Piazza di Eastbrook, casa dell’Armeggiatore Gizzel, Maestro degli Attrezzi. I livelli da 1 a 3 di ogni linea di strumenti sono normale merce da venditore; i livelli 4 e 5 escono dal banco di un ingegnere, oppure dal bancone d’incursione della Litania Annegata in cambio di Sigilli d’Incursione dietro le sue soglie di completamenti, e mai da alcuna cassa in cambio di monete.\n\nSull’anello sta con i mestieri che vivono di prove ed errori, accanto ad Alchimia e Forgiatura di Armature, il che le dà due identità di coppia: il Bombardiere (Ingegneria e Alchimia, intrapreso davanti a Gizzel in persona) e l’Artigiano degli Ingranaggi (Forgiatura di Armature e Ingegneria, nominato ma non ancora giurabile). Un avvertimento conta qui più che altrove: ogni gradino di ricette dell’Ingegneria sta sopra il tetto del gradino raro sotto cui lavorano i passatempi e gli artigiani non dichiarati, quindi il numero di competenza si muove solo per un artigiano i cui mestieri principali comprendono l’Ingegneria, il che oggi significa il Bombardiere. Chiunque può comunque costruire gli strumenti di terra; un artigiano non sintonizzato semplicemente non impara nulla dal farlo, e le due ricette di canna richiedono per giunta l’insegnamento di Gizzel.",
+          "identityBody": "The craft is worked at the toolworks in the southwest corner of Eastbrook Square, home of Tinker Gizzel, Master of the Toolworks. Tiers 1 through 3 of every tool line are ordinary vendor stock; every rung above that comes off an engineer's bench, or out of the Drowned Litany's delve counter for Delve Marks behind its clears gates, and never out of any till for coin. The land lines stop at tier 5; the rod line climbs one further, to the tier 6 Clockreel.\n\nOn the ring it sits with the trial-and-error trades, next to Alchemy and Armorcrafting, giving it two pair identities: the Bombardier (Engineering and Alchemy, taken up before Gizzel himself) and the Gearwright (Armorcrafting and Engineering, named but not yet swearable). One warning still matters here: every rung of the tool ladder itself sits above the rare-tier ceiling that hobbies and undeclared crafters work under, so ladder work only moves the skill for a crafter whose majors include Engineering, which today means the Bombardier. The bench is no longer closed to everyone else, though: Gizzel now starts anyone at skill 0 with the Cogwheel Blank and the Bronze Hoe, both free of any fee, and teaches the Copperlens Ocular at 25 for the ordinary tier fee, so an unattuned or hobby engineer can raise the skill through its early rungs; a craft left dormant behind another identity still gains only from the two skill-0 lessons. Anyone can still build the land tools; an unattuned crafter just learns nothing from doing those, and two of the three rod recipes ask for Gizzel's teaching besides, the tier 6 rung coming off a schematic instead.",
           "materialsHeading": "Reagenti e strumenti precedenti",
-          "materialsBody": "Ogni ricetta di strumento di terra consuma lo strumento del livello inferiore più un materiale PREGIATO, e quell’abbinamento è l’intera scala di terra: quattro Minerali di ferro pregiati e un Piccone da Miniera di Mithril diventano il Piccone da Miniera di Thorium, poi due Barre di Arcanite, due Minerali di Thorium pregiati e quello stesso piccone diventano il Piccone da Miniera di Arcanite. Le linee dell’ascia e del falcetto ricalcano la forma pregiato-più-strumento-precedente con i Tronchi di Frassino Cinereo e di Elderwood Pregiati e le Erbe Fogliadoro e Petalosole Pregiate, anche se i loro gradini di livello 5 non chiedono Barre di Arcanite: il piccone è l’unica linea che rincara in cima. Le due ricette di canna rompono lo schema di proposito: la Canna con mulinello di tempesta richiede quattro Koi Guizzolucente e una Canna del ruscello d’argento, quella forgiata dalla marea due Koi, otto Carpe Slatefin crude e quella stessa canna di tempesta, così la cima della scala del pescatore si paga sull’acqua invece che a un filone.\n\nUn materiale pregiato non si vende da nessuna parte e non cade da un raccolto ordinario: lo ottieni lavorando uno dei filoni di grado pieno di una zona con uno strumento di rango superiore al materiale stesso, il che in pratica significa lo strumento di un gradino sotto quello che stai cercando di costruire (i filoni più facili che una zona tiene per i viandanti danno il materiale semplice, qualunque cosa tu impugni). È voluto. Sul percorso del mestiere, uno strumento di livello 5 nasce dall’aver davvero impugnato quello di livello 4, non da una gita di acquisti; il bancone dei Sigilli d’Incursione è l’unico modo per aggirarlo. L’unica eccezione è la Barra di Arcanite, raffinata e venduta solo dai venditori, 1 argento e 60 rame a barra dal Quartiermastro Bree a Highwatch o dal bancone di Gizzel, così il solo Piccone da Miniera di Arcanite porta nel proprio costo un pavimento fisso in monete.",
+          "materialsBody": "Every land tool recipe consumes the tool one tier below it plus a FINE material, and that pairing is the whole land ladder: four Fine Iron Ore and a Skysilver Mining Pick become the Osmium Mining Pick, then two Glyphsteel Bars, two Fine Osmium Ore and that osmium pick become the Glyphsteel Mining Pick. The axe and sickle lines mirror the fine-plus-prior-tool shape with Fine Ashwood and Fine Highpine Logs, Fine Goldleaf and Fine Sunpetal Herbs, though their tier 5 rungs ask no Glyphsteel Bars: the pick is the one line that gets dearer at the top. The two rod recipes break the pattern on purpose: the Stormreel takes four Sunglint Koi and a Silverstream rod, the Tidewrought two Koi, eight Raw Slatefin Carp and that Stormreel, so the top of the angler's ladder is paid for on the water rather than at a vein.\n\nA fine material is not sold anywhere and does not drop from an ordinary harvest: you get it by working one of a zone's full-grade veins with a tool ranked above the material itself, which in practice means the tool one rung below the one you are trying to build (the easier veins a zone keeps for travellers yield the plain material whatever you swing). That is deliberate. On the craft route, a tier 5 tool comes from actually swinging the tier 4 one, not from a shopping trip; the Delve Marks counter is the one way around it. The single exception is the Glyphsteel Bar, refined and vendor-only, 1 silver 60 copper a bar from Quartermaster Bree in Highwatch or from Gizzel's own counter, so the Glyphsteel Mining Pick alone carries a fixed coin floor built into its cost.",
+          "materialsBodyThreeRods": "Every land tool recipe consumes the tool one tier below it plus a FINE material, and that pairing is the whole land ladder: four Fine Iron Ore and a Skysilver Mining Pick become the Osmium Mining Pick, then two Glyphsteel Bars, two Fine Osmium Ore and that osmium pick become the Glyphsteel Mining Pick. The axe and sickle lines mirror the fine-plus-prior-tool shape with Fine Ashwood and Fine Highpine Logs, Fine Goldleaf and Fine Sunpetal Herbs, though their tier 5 rungs ask no Glyphsteel Bars: the pick is the one line that gets dearer at the top. The three rod recipes break the pattern on purpose: the Stormreel takes four Sunglint Koi and a Silverstream rod, the Tidewrought two Koi, eight Raw Slatefin Carp and that Stormreel, and the Clockreel two Koi, ten Raw Hollowgill Sturgeon and that Tidewrought, so the top of the angler's ladder is paid for on the water rather than at a vein.\n\nA fine material is not sold anywhere and does not drop from an ordinary harvest: you get it by working one of a zone's full-grade veins with a tool ranked above the material itself, which in practice means the tool one rung below the one you are trying to build (the easier veins a zone keeps for travellers yield the plain material whatever you swing). That is deliberate. On the craft route, a tier 5 tool comes from actually swinging the tier 4 one, not from a shopping trip; the Delve Marks counter is the one way around it. The single exception is the Glyphsteel Bar, refined and vendor-only, 1 silver 60 copper a bar from Quartermaster Bree in Highwatch or from Gizzel's own counter, so the Glyphsteel Mining Pick alone carries a fixed coin floor built into its cost.",
           "ladderHeading": "La scala degli strumenti",
-          "ladderBody": "La scala è di otto ricette, tutte vincolate alla stazione dell’officina degli attrezzi. Le sei ricette di strumenti di terra sono note automaticamente, senza mai una tariffa di addestramento: il piccone, l’ascia e il falcetto di livello 4 alla competenza 75, e le versioni di livello 5 alla competenza 150. Quel secondo numero non è un refuso, e sta sopra l’attuale limite di 125 di proposito: qui i requisiti di competenza non sbarrano mai una lavorazione, danno forma soltanto al guadagno di competenza, quindi puoi costruire uno strumento di livello 5 il giorno stesso in cui hai in mano i suoi reagenti e il suo predecessore di livello 4. Le due canne lavorate sono l’eccezione insegnata: Gizzel insegna la Canna con mulinello di tempesta alla competenza 75 per 4 monete d’oro e la Canna forgiata dalla marea alla competenza 125 per 16 monete d’oro, ciascuna nel momento in cui il tuo livello nel mestiere raggiunge il suo.\n\nOgni strumento finito è di qualità rara o epica ed esce firmato, così il tuo nome gira per le zone appeso alle cinture degli attrezzi di altri giocatori. L’Ingegneria regge anche metà di una ricetta combinata: l’Elisir dell’Orso, preparato da un Bombardiere sintonizzato con Ingegneria e Alchimia entrambe a 25.",
+          "ladderBody": "Every rung of the tool ladder is bound to the toolworks station (the crafted hoes the toolmaker also teaches have their own note on the gathering page, and his two starter lessons are the pair named above). The six land-tool recipes are known automatically, no trainer fee ever: the tier 4 pick, axe, and sickle at skill 75, and the tier 5 versions at skill 125, the cap tier itself. Skill requirements never gate a craft here, they only shape skill gain, so you can build a tier 5 tool the day you hold its reagents and its tier 4 predecessor. Two of the three crafted rods are the taught exception: Gizzel teaches the Stormreel at skill 75 for 4 gold and the Tidewrought at skill 125 for 16 gold, each the moment your tier in the craft reaches its own. The tier 6 Clockreel is the third, and no trainer quotes it a fee at all: its schematic sits on the Heroic Quartermaster's counter and teaches the recipe outright.\n\nEvery finished tool is rare or epic quality and comes out signed, so your name rides the zones on other players' toolbelts. Engineering also holds up half of one combination recipe: the Elixir of the Bear, brewed by an attuned Bombardier with both Engineering and Alchemy at 25.",
           "routeHeading": "Il percorso di un ingegnere fino a 125",
-          "routeBody": "Gli strumenti non hanno statistiche di combattimento, quindi non producono mai capolavori; quel risultato appartiene all'equipaggiamento con statistiche. La specializzazione arriva comunque alla competenza 75: il 20 percento di materiali in meno per lavorazione, e una bottega degli attrezzi da campo temporanea che trasforma qualsiasi gita di raccolta in un laboratorio. La matematica del guadagno qui quasi non diminuisce: le ricette di competenza 75 pagano il pieno guadagno fino a 100 e la meta dopo, e le ricette di competenza 150 pagano il pieno guadagno fino al limite di 125, quindi il vero vincolo e reagenti e monete, mai ricette grigie.\n\nScegli prima la coppia, perche nulla si muove senza di essa: prendi la sintonizzazione del Bombardiere dall'Armeggiatore Gizzel. Poi alimenta la scala: livella Estrazione, Abbattimento o Erboristeria da solo o fai amicizia con i raccoglitori, compra gli strumenti di livello 3 dai venditori, e tratta l'ordine di lavoro di Gizzel (otto Tronchi di corteccia di ferro per 16 rami di rame, ripetibile ogni 30 minuti) come denaro tascabile.\n\nL'Ingegneria e un commercio di prestigio a basso volume, circa un punto di competenza per strumento finito, quindi tratta ogni lavorazione come stock da vendere. La proposta ai tuoi clienti si scrive da sola: ogni livello di strumento sopra il livello di un nodo riduce di 0,4 secondi il lancio di raccolta di 2,5 secondi (fino a un minimo di 1,5 secondi), quindi uno strumento di livello 5 e un miglioramento della velocita su ogni nodo del mondo, e solo tu puoi farne uno. Il Libro delle Imprese segna Ingranaggi e Molle alla competenza 50 e Grande Maestro Ingegnere a 125."
+          "routeBody": "Gli strumenti non hanno statistiche di combattimento, quindi non producono mai capolavori; quel risultato appartiene all'equipaggiamento con statistiche. La specializzazione arriva comunque alla competenza 75: il 20 percento di materiali in meno per lavorazione, e una bottega degli attrezzi da campo temporanea che trasforma qualsiasi gita di raccolta in un laboratorio. La matematica del guadagno qui quasi non diminuisce: le ricette di competenza 75 pagano il pieno guadagno fino a 100 e la meta dopo, e le ricette di competenza 125 pagano il pieno guadagno fino al limite, quindi il vero vincolo e reagenti e monete, mai ricette grigie.\n\nScegli presto la coppia, perche la scala degli attrezzi non si muove senza di essa: prendi la sintonizzazione del Bombardiere dall'Armeggiatore Gizzel. Poi alimenta la scala: livella Estrazione, Abbattimento o Erboristeria da solo o fai amicizia con i raccoglitori, compra gli strumenti di livello 3 dai venditori, e tratta l'ordine di lavoro di Gizzel (otto Tronchi di corteccia di ferro per 16 rami di rame, ripetibile ogni 30 minuti) come denaro tascabile.\n\nL'Ingegneria e un commercio di prestigio a basso volume, circa un punto di competenza per strumento finito, quindi tratta ogni lavorazione come stock da vendere. La proposta ai tuoi clienti si scrive da sola: ogni livello di strumento sopra il livello di un nodo riduce di 0,4 secondi il lancio di raccolta di 2,5 secondi (fino a un minimo di 1,5 secondi), quindi uno strumento di livello 5 e un miglioramento della velocita su ogni nodo del mondo, e solo tu puoi farne uno. Il Libro delle Imprese segna Ingranaggi e Molle alla competenza 50 e Grande Maestro Ingegnere a 125."
         },
         "enchanting": {
           "identityHeading": "Scomponi l'equipaggiamento, recupera il potere",
-          "identityBody": "Ogni incanto è noto dall’inizio, chiunque può disincantare dal primo giorno, e nessuna delle due cose richiede mai una stazione; la competenza si ferma a 125 come in ogni mestiere. L’unico angolo insegnato del mestiere è la sua coppia di ricette di ciondolo: l’Armeggiatore Gizzel insegna la Riserva del Raccoglitore e l’Occhio dell’Artigiano all’officina degli attrezzi, nell’angolo sud-occidentale della Piazza di Eastbrook, per la consueta tariffa di livello una volta che il tuo Incantamento raggiunge 25, e i ciondoli stessi si lavorano alla sua stazione.\n\nSull’anello sta tra Iscrizione e Gemmologia, quindi le sue due identità di coppia sono l’Arcanista (Iscrizione e Incantamento) e il Gemmolegatore (Incantamento e Gemmologia). Nessuna delle due può ancora essere giurata, poiché entrambi i vicini attendono le loro prime ricette, quindi oggi l’Incantamento sale come il mestiere di tutti: libero fino al gradino raro prima di qualsiasi giuramento, e una scelta naturale come passatempo per un Bombardiere o uno Speziale. Gli incantatori tengono anche in moto il mondo della raccolta: i due effetti da strumento inseribili sono opera di un Incantatore, e chi li ha creati ricarica i propri effetti a prezzo scontato, ancora più scontato una volta specializzato.",
+          "identityBody": "Every enchant is known from the start, anyone can disenchant from day one, and neither ever needs a station; the skill caps at 125 like every craft. The one taught corner of the trade is three recipes, all Tinker Gizzel's at the toolworks in the southwest corner of Eastbrook Square, and all worked at that station: the two charms, the Gatherer's Cache and the Artisan's Eye, for the ordinary tier fee once your Enchanting reaches 25, and above them the Lucent Reagent, the apex tier's own material, at 75.\n\nOn the ring it sits between Inscription and Jewelcrafting, so its two pair identities are the Arcanist (Inscription and Enchanting) and the Gembinder (Enchanting and Jewelcrafting). Neither can be sworn yet: both neighbor crafts now work their own ladders (Inscription at the apothecary, Jewelcrafting at the forge), but neither pair has an oath quest yet. So today Enchanting climbs as everyone's craft: free to the rare tier before any oath, and a natural hobby pick for a Bombardier or an Apothecary. Enchanters also keep the gathering world running: the two slottable tool effects are Enchanter work, and an original crafter recharges their own effects at a discount, deeper still once specialized.",
           "levelingHeading": "Come avanza l'incantamento",
-          "levelingBody": "Tre azioni muovono la competenza: disincantare un pezzo, applicare un incanto e realizzare i due ciondoli, che seguono la normale curva di fabbricazione. Ogni successo vale fino a un punto, in proporzione a quanto è impegnativo il lavoro: la rarità del pezzo che scomponi, o il livello di reagente dell’incanto che applichi. I disincanti comuni e gli incanti di sola polvere contano come lavoro comune; i disincanti non comuni e gli incanti a essenza come non comuni; i disincanti rari e ogni incanto Runico o Superiore come rari; i disincanti epici e leggendari stanno ancora più in alto nella tabella, anche se oggi nessuna identità da incantatore va oltre il gradino raro, quindi in pratica pagano quanto il lavoro raro. Una sola onestà governa il banco di scomposizione: un pezzo uscito dal banco di un giocatore (realizzato, firmato o da capolavoro) si sbriciola comunque in materiali ma non insegna nulla, quindi un ciclo di fabbrica-e-scomponi non fa salire nessuno, e le lezioni stanno nell’equipaggiamento trovato nel mondo.\n\nLa consueta dissolvenza della maestria si applica su livelli da 25 punti, quindi il lavoro di grado comune diventa grigio alla competenza 75, quello non comune a 100, e quello di gradino raro esattamente al limite di 125. L’Incantamento ha anche una gentilezza tutta sua: un lavoro sopra il tetto del tuo archetipo viene arrotondato per difetto a quel tetto invece che azzerato, quindi prima di sintonizzarti un disincanto epico conta semplicemente come raro anziché non insegnare nulla. Se l’Incantamento finisce dormiente dietro un’altra identità, scomporre e applicare contano come lavoro comune e la scalata si arena a 75, mentre i due ciondoli, che seguono la curva di fabbricazione al di sopra del tetto comune, non insegnano proprio nulla a un incantatore dormiente; tienilo come passatempo e il lavoro di gradino raro paga ancora, solo più lentamente oltre il 75.",
+          "levelingBody": "Three actions move the skill: disenchanting a piece, applying an enchant, and crafting the two charm recipes, which climb the ordinary crafting curve. The third taught recipe, the Lucent Reagent, is the exception: at skill 75 it sits above the rare ceiling every enchanter works under (Enchanting has no oath pair, so it is never a major), and a recipe above your ceiling teaches nothing, so craft it for the reagent, not the points. Each success is worth up to one point, scaled by how serious the work is: the rarity of the piece you break, or the reagent tier of the enchant you apply. Common disenchants and dust-only enchants score as common work; uncommon disenchants and essence enchants as uncommon; rare disenchants and every Runed or Greater enchant as rare; epic and legendary disenchants, and every Lucent enchant, rank higher still on the table, though no enchanting identity today reaches past the rare rung, so they pay the same as rare work in practice. One honesty rules the breaking bench: a piece that came off a player bench (crafted, signed, or masterworked) still mills into materials but teaches nothing, so a craft-and-break loop levels no one, and the lessons are in world-found gear.\n\nThe familiar mastery fade applies on 25-point tiers, so common-grade work goes gray at skill 75, uncommon work at 100, and rare-tier work exactly at the 125 cap. Enchanting also has one kindness of its own: input above your archetype ceiling is rounded down to that ceiling instead of zeroed, so before you attune, an epic disenchant simply scores as rare rather than teaching nothing. If Enchanting ends up dormant behind another identity, breaking and applying score as common work and the climb stalls at 75, while the two charms, riding the crafting curve above the common ceiling, teach a dormant enchanter nothing at all; keep it as your hobby and rare-tier work still pays, just slower past 75.",
           "marketHeading": "Copie incantate, provenienza e il mercato",
           "marketBody": "Applicare un incanto consuma i reagenti e marchia una copia precisa dell’oggetto. Puntalo su una copia in borsa e ottieni indietro una copia incantata distinta; puntalo su un pezzo che stai già indossando e viene incantato sul posto, esattamente dov’è, senza il balletto di togli e riequipaggia. In entrambi i casi il bonus segue quel pezzo per sempre, attraverso disequipaggiamenti, viaggi in banca e scambi. Un incanto per pezzo: applicare un incanto diverso a una copia incantata chiede conferma, poi sostituisce del tutto il vecchio incanto, distruggendolo senza alcun rimborso dei suoi materiali. Vendita, scarto e disincanto preferiscono sempre prima le copie semplici, così il tuo pezzo finito non viene divorato per sbaglio.\n\nEquipaggiamento da capolavoro e Incantamento vanno d’accordo: un pezzo da capolavoro resta pienamente incantabile, e l’incanto si somma al bonus del capolavoro senza disturbare né quello né la firma del creatore. Sommando ogni fonte, un capolavoro firmato che porta un incanto Superiore è il meglio a cui un pezzo lavorato possa arrivare, e resta comunque sotto il bottino da raid per scelta progettuale.\n\nSul mercato, un pezzo incantato o firmato si mette in vendita come qualsiasi altra cosa: sale come inserzione a copia singola, la descrizione mostra l’incanto e il marchio del creatore, e la Posta del Corvo lo trasporta con la stessa fedeltà. I materiali restano la metà stabile del mestiere: Polvere, Essenza e Frammenti si inseriscono liberamente, l’inserzione non costa nulla, e il Mercante prende il 5 percento solo di una vendita conclusa. Questo fa sì che i due guadagni classici dell’incantatore siano la vendita dei materiali e la vendita del lavoro finito: sul mercato, per corvo, o faccia a faccia in una finestra di scambio."
+        },
+        "jewelcrafting": {
+          "identityHeading": "The finer work of the forge",
+          "identityBody": "The ladder is three rungs of three: a Strength ring, an Intellect ring, and an Agility necklace, first in copper, again in iron, and once more in rare osmium at the top. Jewelry carries no armor and no class lock, and even the copper pieces arrive with real stat lines, because a ring without stats would be nothing at all.\n\nOn the craft ring it sits between Enchanting and Weaponcrafting, giving it two pair identities: the Gembinder (Enchanting and Jewelcrafting) and the Bladewright (Jewelcrafting and Weaponcrafting). Neither has an oath quest yet, so today Jewelcrafting climbs as everyone's craft: the three rungs of the 0-to-50 ladder all sit inside the rare tier that undeclared crafts work under, so the ladder is open before any oath. Two things sit above that ceiling: the Prismglass Setting, the 75-rung intermediate Darva also teaches, and the found-pattern rung above it; since neither pair can be sworn yet, today they teach nothing to anyone, so cut them for the goods, not the points.",
+          "materialsHeading": "Ore, dust, and essence",
+          "materialsBody": "The bench runs on mining and breaking. Copper ore comes off the tier 1 veins of Eastbrook Vale, iron ore from Mirefen Marsh, and osmium ore from Thornpeak Heights, with a jar or two of Smithing Flux, 20 copper each from Forgemistress Darva, in every recipe. The other half of every piece comes off the breaking bench: Chime Dust settles the copper rung and Chime Essence the iron and osmium rungs, so a jewelcrafter is an enchanter's steadiest customer, or simply keeps a disenchanting habit of their own.\n\nThe osmium rung adds one refinement: every rare piece takes two iron ore besides its osmium, worked in as solder for the fine settings. No counter sells the ores or the dust: they come out of the world or off another player, by trade or the World Market; only the flux is bought for coin.",
+          "ladderHeading": "Taught beside the anvil",
+          "ladderBody": "Jewelcrafting has no station of its own: the whole catalog is worked at the Eastbrook forge, the same anvil Weaponcrafting and Armorcrafting share, and Forgemistress Darva teaches it there. The ladder is nine trainer recipes in three rungs: the copper rung (band, loop, torc) is free at skill 0, the iron rung (signet, loop, choker) costs 25 silver a recipe at skill 25, and the osmium rung (band, loop, amulet) costs 1 gold each at skill 50, each rung teachable the moment your tier in the craft reaches its own.\n\nThere are no field recipes and no combination piece yet: every taught rung is forge-bound trainer work, and the found-pattern rung above them is forge-bound too but bought nowhere, so this craft is learned, and practiced, standing where the smiths stand.",
+          "routeHeading": "Masterworks, and a working route to 125",
+          "routeBody": "There is no statless rung here: every piece on the ladder carries a real stat line, so every craft rolls the masterwork chance so long as the finer quality fits inside your tier ceiling, with iron and osmium counting as tier 1 materials for the proc. The copper and iron rungs, uncommon by make, can masterwork into rare for a hobby or undeclared jewelcrafter alike; the osmium three are rare already, so their epic masterworks wait on a ceiling above rare, which no jewelcrafter has until the craft's pairs open.\n\nThe climb is the standard ride: copper to 25, the iron rung the day it opens to 50, then osmium to 75. Above them sits an apex rung no trainer teaches: its patterns are found, not bought. Read that as an item you can make, not a shortcut up the ladder, because the same ceiling named above applies to skill gain as well as to masterworks: an apex pattern sits well over the rare ceiling every jewelcrafter works under today, so crafting one teaches nothing at all until this craft's pairs open and it can be a major. Whichever you hold, the osmium recipes carry the climb, fading to half and then quarter gain: budget roughly 150 more crafts to reach the 125 cap, and fund them honestly, since every class wears jewelry and most travelers level with their ring and neck slots empty.\n\nThe Book of Deeds marks Polished to Brilliance for your first rare-tier piece, Facet and Filigree at 50 skill, and Grandmaster Jewelcrafting at the 125 cap."
+        },
+        "inscription": {
+          "identityHeading": "Ink for the mind, scrolls for the road",
+          "identityBody": "The ladder is three rungs of two: a caster tome for the offhand and a stamina scroll for anyone at all, first in sheenleaf, again in goldleaf, and once more in rare sunpetal at the top. The tomes are held stat sticks for the six mana classes, real Intellect and Spirit from the first rung; the scrolls are consumables with no class lock, so half of every rung sells to the whole realm.\n\nOn the craft ring it sits between Tailoring and Enchanting, giving it two pair identities: the Inkweaver (Tailoring and Inscription) and the Arcanist (Inscription and Enchanting). Neither has an oath quest yet, so today Inscription climbs as everyone's craft: the three rungs of the 0-to-50 ladder all sit inside the rare tier that undeclared crafts work under, so the ladder is open before any oath. Two things sit above that ceiling: the Sablewax Vellum, the 75-rung intermediate Verane also teaches, and the found-pattern rung above it; since neither pair can be sworn yet, today they teach nothing to anyone, so scribe them for the goods, not the points.",
+          "materialsHeading": "Herbs, ink, and a vial to hold it",
+          "materialsBody": "The desk runs on herbalism and the breaking bench. Sheenleaf comes off the tier 1 herb patches of Eastbrook Vale, goldleaf from Mirefen Marsh, and sunpetal from Thornpeak Heights, ground into pigment with a Glass Vial, 12 copper from the apothecary master, in every recipe. The magical half of the ink comes off the breaking bench: Chime Dust settles the sheenleaf rung, Chime Essence the goldleaf and sunpetal rungs, and the sunpetal scroll binds a pinch of dust back in, so a scribe is an enchanter's steady customer, or keeps a disenchanting habit of their own.\n\nThe sunpetal rung refines both of its recipes: the rare grimoire takes two goldleaf besides its sunpetal, worked in to size the illuminations, and the double scroll batch takes a second essence with that pinch of dust, priced even with the Elixir of the Serpent whose buff it mirrors. No counter sells the herbs or the dust: they come out of the world or off another player; only the vial is bought for coin.",
+          "materialsBodyFrostGourd": "The desk runs on herbalism and the breaking bench. Sheenleaf comes off the tier 1 herb patches of Eastbrook Vale, goldleaf from Mirefen Marsh, and sunpetal from Thornpeak Heights, ground into pigment with a Glass Vial, 12 copper from the apothecary master, in every recipe. The magical half of the ink comes off the breaking bench: Chime Dust settles the sheenleaf rung, Chime Essence the goldleaf and sunpetal rungs, and the sunpetal scroll binds a pinch of dust back in, so a scribe is an enchanter's steady customer, or keeps a disenchanting habit of their own.\n\nThe sunpetal rung refines both of its recipes: the rare grimoire takes two goldleaf besides its sunpetal, worked in to size the illuminations, and the double scroll batch takes a second essence with that pinch of dust and a Frost Gourd off the Highwatch terraces, which prices it even with the Elixir of the Serpent whose buff it mirrors. No counter sells the herbs, the dust or the gourd: they come out of the world, a garden bed or off another player; only the vial is bought for coin.",
+          "ladderHeading": "Taught beside the alembics",
+          "ladderBody": "Inscription has no station of its own: the whole catalog is worked at the Highwatch apothecary, the same bench Alchemy brews at, and Alchemist Verane teaches it there. The ladder is six trainer recipes in three rungs: the sheenleaf rung (primer and scroll) is free at skill 0, the goldleaf rung (folio and scroll) costs 25 silver a recipe at skill 25, and the sunpetal rung (grimoire and scroll) costs 1 gold each at skill 50, each rung teachable the moment your tier in the craft reaches its own. The rung-50 scroll comes off the desk two at a time.\n\nThere are no field recipes and no combination piece yet: every taught rung is apothecary-bound trainer work, and the found-pattern rung above them is apothecary-bound too but bought nowhere, so this craft is learned, and practiced, standing where the alchemists stand.",
+          "routeHeading": "Scrolls, elixirs, and a working route to 125",
+          "routeBody": "The scrolls are the craft's signature rule: each rung's scroll grants exactly the buff of its band's stamina elixir (the boar, vipersear, and serpent bands), and the two sources share one slot on the buff bar. Reading a scroll over an elixir replaces it, drinking an elixir over a scroll replaces that, and the newest application always wins, so a scroll is an alternative door into the same buff, never a second stack on top of it.\n\nThe tomes carry real stat lines, so every tome craft rolls the masterwork chance so long as the finer quality fits inside your tier ceiling; the scrolls, statless consumables, never proc. The climb is the standard ride: sheenleaf to 25, the goldleaf rung the day it opens to 50, then sunpetal to 75. Above them sits an apex rung Verane does not teach: its pattern is found, not bought. Read that as a tome you can make, not a shortcut up the ladder: an apex pattern sits well over the rare ceiling every scribe works under today, and a recipe above your ceiling teaches nothing at all, so the skill it grants waits on this craft's pairs opening and Inscription becoming a major. Whichever you hold, the sunpetal recipes carry the climb, fading to half and then quarter gain: budget roughly 150 more crafts to reach the 125 cap, and fund them honestly, since the scrolls sell to every class in the game.\n\nThe Book of Deeds marks Written in Fine Ink for your first rare-tier piece, Quill and Pigment at 50 skill, and Grandmaster Inscription at the 125 cap."
         }
       },
       "howHeading": "Come funziona la fabbricazione",
-      "howBody": "Apri la finestra di fabbricazione (tasto predefinito T) e troverai elencata ogni ricetta che conosci, con ciò che richiede e ciò che hai a portata di mano. Le ricette legate a una stazione ti chiedono di stare entro 20 yard dalla stazione giusta in città, le ricette da campo si fabbricano ovunque, e lo scomporre e l'incantare dell'Incantamento non richiedono alcuna stazione (solo le sue due ricette di amuleto sono lavoro da stazione, all'officina). Non esiste un tiro di fallimento: una lavorazione con i materiali in mano riesce sempre.\n\nDue piccoli attriti mantengono onesta l'economia. Ogni lavorazione riuscita paga una tariffa di 2 monete di rame per punto del budget di statistiche dell'oggetto, e le azioni di tipo artigianale condividono un unico ritmo: al massimo 10 fabbricazioni, disincanti, incanti, smantellamenti o ricariche di strumenti in ogni finestra di 60 secondi. Nessuno dei due disturberà una sessione normale; entrambi impediscono a uno specialista al massimo di inondare il mercato.",
+      "howBody": "Open the crafting window (default key T) and every recipe you know is listed with what it needs and what you have on hand. Station-bound recipes ask you to stand within 20 yards of the right station in town, field recipes craft anywhere, and Enchanting's breaking and enchanting need no station at all (only its three trainer recipes are station work, at the toolworks). There is no failure roll: a craft with the materials in hand always succeeds.\n\nTwo small frictions keep the economy honest. Every successful craft pays a fee of 2 copper per point of the item's stat budget, and every craft-family action takes real cast time (field crafts near two seconds, harder ladder crafts longer, and disenchant, enchant, salvage, and tool recharge each about a second and a half). Materials, the gold fee, stations, and skill ceilings do the rest; nothing scolds you for working too quickly.",
       "recipesHeading": "Ricette",
       "recipesNote": "Ogni ricetta del mestiere: il requisito esatto di abilita e i materiali, dove si impara e per quale compenso, e i tre valori di abilita in cui il guadagno scende a meta, un quarto e nulla.",
       "masteryHeading": "Guadagno di abilita",
@@ -6501,7 +6772,7 @@ export const it_IT: EnTranslations = {
       "masterworkHeading": "Capolavori",
       "masterworkBody": "Ogni lavorazione riuscita è esattamente ciò che la ricetta promette, e a volte un po' di più: un capolavoro conclude lo stesso pezzo un livello di qualità più fine, con le statistiche bonus incorporate al momento della fabbricazione. È solo in aggiunta, mai un peggioramento, e resta sotto la soglia del raid, così l'equipaggiamento fabbricato può essere eccellente senza sostituire un drop da raid.\n\nLa probabilità è pubblicata, non mistica: {base}% di base, più {perTier}% per ogni livello di cui la tua abilità supera la ricetta, più {signed}% quando entra un qualsiasi reagente firmato, più {spec}% una volta che sei specializzato, con i materiali di livello superiore che aggiungono da 1 a 2% in più, il tutto con un tetto a {cap}%. Solo un pezzo con statistiche vere può migliorare, quindi i comuni senza statistiche, gli strumenti e i consumabili non scattano mai; un mestiere dormiente non ne produce mai uno, e un mestiere da passatempo non può fare capolavori oltre il suo limite raro.\n\nIl buon lavoro porta con sé il suo artefice. I risultati rari o superiori sono firmati, ogni copia (Fabbricato da; i materiali raccolti portano Raccolto da), e un capolavoro è sempre firmato qualunque sia la sua qualità. Una firma è provenienza, non un lucchetto: i beni firmati si scambiano, si spediscono e si inseriscono liberamente sul Mercato Mondiale.",
       "trainingHeading": "Addestramento",
-      "trainingBody": "Le ricette da addestratore vengono dai maestri residenti e si imparano presso le loro stazioni. La regola sta in una riga: un maestro insegna una ricetta quando il tuo livello nel mestiere ha raggiunto il livello della ricetta stessa, e nient'altro la vincola, né il tuo livello di personaggio né il tuo archetipo. Le scale dell'equipaggiamento e dei consumabili dispongono i loro gradini ad abilità 0, 25 e 50; le due lezioni sulle canne dell'Ingegneria proseguono la scala a 75 e 125, e le due ricette di amuleto dell'Incantamento stanno sul gradino 25, così un gradino nuovo si apre man mano che i tuoi livelli salgono.\n\nLe tariffe sono una tantum e fisse per gradino: il gradino iniziale è gratuito, il gradino ad abilità 25 costa {tier1} a ricetta, il gradino ad abilità 50 {tier2}, e le lezioni sulle canne sopra di essi portano tariffe proprie, elencate accanto a ogni ricetta nella tabella. Per addestrarti devi trovarti presso la stazione vera del maestro, e una stazione mobile non conta mai. Le ricette comuni da campo e le sei ricette di strumenti da terra fabbricati non richiedono alcun addestramento; ogni personaggio le conosce fin dall'inizio.",
+      "trainingBody": "Trainer recipes come from the resident masters, taught at their stations. The rule is one line: a master teaches a recipe once your tier in the craft has reached the recipe's own tier, and nothing else gates it, not your level, not your archetype. The gear and consumable ladders run their rungs at skill 0, 25, and 50, and every craft adds one 75-rung intermediate above them, taught at its station (Enchanting's is the Lucent Reagent, beside its two charm recipes on the 25 rung); Engineering's two rod lessons continue its ladder at 75 and 125, so a fresh rung opens as your tiers climb.\n\nFees are one-time and flat by rung: the starting rung is free, the skill 25 rung costs {tier1} a recipe, the skill 50 rung {tier2}, and the 75 and 125 rungs above them carry their own fees, listed beside each recipe in the table. You must stand at the master's actual station to train, and a mobile station never counts. The common field recipes and the six crafted land-tool recipes need no training at all; every character knows them from the start.",
       "specializationHeading": "Specializzazione",
       "specializationBody": "All'abilita {at} questo mestiere ti specializza, senza bisogno di missione: le ricette costano il {pct}% di materiali in meno da quel momento, e la specializzazione aggiunge il proprio incremento alla probabilita di capolavoro.\n\nGli specialisti imparano anche a portare l'officina con se: un fabbricatore specializzato puo allestire una stazione mobile sul campo per dieci minuti alla volta, cosi le ricette legate alla stazione possono essere lavorate all'ingresso della miniera invece che di ritorno in citta. I suoi limiti sono deliberati: non conta mai per l'addestramento con un maestro ne per sciogliere un pezzo su commissione, e scade al suo timer sia che tu l'abbia usata sia che no.",
       "ench": {
@@ -6521,12 +6792,15 @@ export const it_IT: EnTranslations = {
         "tier": {
           "base": "Base",
           "runed": "Runico",
-          "greater": "Superiore"
+          "greater": "Superiore",
+          "lucent": "Lucent"
         },
+        "perfectedOnly": "Perfected only",
         "salvageHeading": "Smantellamento",
         "salvageNote": "Lo smantellamento e il cugino per tutti del disincanto: le stesse armi e armature, nessuna competenza richiesta e nessuna guadagnata, che restituisce rottami artigianali semplici in base alla qualita invece di qualcosa di arcano. Chiunque puo farlo, incantatore o no. Quando tieni un pezzo che vale la pena smontare, la scelta e semplice: dal raro in su, il disincanto e nettamente l'affare migliore, mentre al comune i due valori si vendono all'incirca allo stesso prezzo al venditore, quindi smonta verso il materiale di cui hai effettivamente bisogno.",
         "bonusFmt": "+{value} {stat}",
-        "enchantsNoteOffhand": "Gli incanti esistono in tre livelli. Il livello Base funziona a Polvere di Tintinnio (con un po' di Essenza nella fascia alta) e copre lo slot arma, la mano secondaria e ogni slot d'armatura, con abbastanza opzioni di statistica perché ogni build trovi qualcosa per ciascuno slot: gli scudi e le mani secondarie da incantatore tenute in mano hanno un proprio incanto di Tempra, così nessuno slot equipaggiato resta privo di incanto. Il livello Superiore costa un Frammento di Tintinnio più Essenza: bonus più forti sugli slot di maggiore impatto. I Frammenti alimentano inoltre altri due assorbimenti, le due ricette di ciondolo a cinque ciascuna e il gradino più alto delle ricariche degli effetti degli strumenti, quindi mettine da parte qualcuno prima di spendere.\n\nTra i due si collocano i cinque incanti Runici, un consumatore per ogni secondario tipizzato, così nulla di ciò che scomponi è mai un vicolo cieco: Filo Runico (arma, Forza, consuma Acciaio Risonante), Concentrazione Runica (arma, Intelletto, Legname Risonante), Tessiturarunica (petto, Spirito, Filo Risonante), Pelle Runica (gambe, Agilità, Pelle Risonante) e Maglie Runiche (elmo, Tempra, Anelli Risonanti). Ognuno richiede anche due Essenze di Tintinnio; dove uno slot e una statistica hanno sia un incanto base sia uno Superiore, il bonus Runico si colloca tra i due, mentre Tessiturarunica è senz'altro il più forte incanto di Spirito per il petto e Pelle Runica è l'unico incanto di Agilità per le gambe in assoluto. I bonus esatti sono tutti nella tabella qui sotto.",
+        "enchantsNoteOffhand": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected, and no piece can be yet: it is authored ahead of the Perfecting work it waits on.",
+        "enchantsNoteInfusionLive": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected: Perfecting is the wearer's own work, not the enchanter's, and the Professions page tells how a piece earns it.",
         "charmsHeading": "Ciondoli per gli strumenti di un raccoglitore",
         "charmsBody": "L'Incantamento è anche l'origine dei ciondoli di un raccoglitore. L'Armeggiatore Gizzel li insegna entrambi all'officina degli attrezzi di Eastbrook una volta che il tuo Incantamento raggiunge 25: la Riserva del Raccoglitore, che aggiunge un'unità a un raccolto, e l'Occhio dell'Artigiano, che innalza il grado di ciò che viene estratto. Ciascuno viene fabbricato una sola volta, poi inserito in un piccone, un'ascia o un falcetto, dove spende una carica solo sui raccolti che effettivamente migliora.\n\nÈ nella ricarica che il mestiere continua a guadagnare. Le cariche vengono ripristinate da chi possiede lo strumento, non da un incantatore di passaggio, e la ricarica costa la metà dei materiali quando quel proprietario è l'incantatore che ha firmato il ciondolo, ancora meno con una specializzazione in Incantamento. Quindi un ciondolo venduto al banco è una vendita unica, mentre i ciondoli che viaggiano sui tuoi stessi strumenti sono quelli economici da mantenere in funzione. La scala completa di cariche e materiali si trova in qualsiasi pagina delle professioni di raccolta, sotto Effetti da strumento."
       },
@@ -6534,7 +6808,8 @@ export const it_IT: EnTranslations = {
         "mining": "L'Estrazione mineraria strappa il minerale direttamente dalla roccia del mondo: rame nella Valle di Eastbrook, ferro nella Palude di Mirefen e osmio lassù sulle Alture di Thornpeak, con filoni iniziali sparsi per ogni zona più giovane oltre di esse, che alimentano i mestieri della forgia. Aperta a tutti dal livello 1: un piccone da estrazione da 20 monete di rame preso a un bancone di Eastbrook, Fenbridge o Highwatch apre ogni filone iniziale, e i gradini più alti della scala dei picconi si risvegliano man mano che il tuo contatore se li guadagna. Tracciata su un contatore proprio fino a un limite di 100.",
         "logging": "Il Taglio del legname abbatte legname dai boschetti di alberi di tutto il mondo: corteccia di ferro nella Valle di Eastbrook, frassino nella Palude di Mirefen, altopino sulle Alture di Thornpeak e boschetti iniziali in ogni zona più giovane, la materia grezza per manici, bastoni e il banco dell'ingegnere. Aperto a tutti dal livello 1 con un'ascia da taglio nelle borse (20 monete di rame ai banconi di Eastbrook, Fenbridge e Highwatch), tracciato su un contatore proprio fino a un limite di 100.",
         "herbalism": "L'Erbalismo raccoglie ciò che cresce spontaneo: foglialucente nella Valle di Eastbrook, fogliadoro nella Palude di Mirefen, petalo solare sulle Alture di Thornpeak e aiuole iniziali in ogni zona più giovane, la foglia e lo stelo che tengono in ebollizione i mestieri dell'apotecario. Aperto a tutti dal livello 1 con una falce da erbalismo nelle borse (20 monete di rame ai banconi di Eastbrook, Fenbridge e Highwatch), tracciato su un contatore proprio fino a un limite di 100.",
-        "fishing": "La Pesca è la mosca bianca tra i mestieri di raccolta, e il più profondo: un vero minigioco di abboccata e recupero, tabelle delle catture proprie in ciascuna delle tre zone centrali (per ora le acque giovani oltre di esse servono tutte la tabella della Valle) e un limite di competenza di 200, il doppio degli altri. Compra una canna, mettiti di fronte all'acqua aperta e lancia."
+        "fishing": "La Pesca è la mosca bianca tra i mestieri di raccolta, e il più profondo: un vero minigioco di abboccata e recupero, tabelle delle catture proprie in ciascuna delle tre zone centrali (per ora le acque giovani oltre di esse servono tutte la tabella della Valle) e un limite di competenza di 200, il doppio degli altri. Compra una canna, mettiti di fronte all'acqua aperta e lancia.",
+        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked garden beds, growing on their own clock whether you stay or go, and pulled up ripe whenever you come back, because nothing in a bed ever spoils. A farmer stands beside every bed site, from the Eastbrook allotments through Fenbridge and Highwatch to the Evergarden parterre, and Farmer Jessica in Eastbrook is where the trade starts: she sells the garden hoe and the first seeds, and her errand walks a new farmer through a first crop. Each rung of the ladder grows its own crops, two on the lower rungs and four on the upper ones, each with a finer grade for a practiced hand to pull, and engineers craft the hoes for the tougher ground above the starter beds. Tracked on its own counter to a cap of 100."
       },
       "rhythmHeading": "Il ritmo del raccolto",
       "rhythmBody": "Un raccolto è un breve lancio visibile, non una presa istantanea: {base} secondi di base, mai sotto un minimo di {floor} secondi. Portare uno strumento sopra il livello del nodo, e che la tua competenza ti permetta di impugnare, ti accelera di {tool} secondi per ogni livello in più, e ogni fascia di competenza che superi taglia altri {band} secondi; limitarsi a pareggiare il livello del nodo ti fa entrare dalla porta, sono i livelli sopra di esso a renderti veloce.\n\nUna borsa piena rifiuta educatamente il lancio prima che cominci, così nulla va sprecato a metà colpo, e ogni raccolto paga una piccola fetta di PE del personaggio, scalata sul livello del nodo rispetto al tuo come scalano i PE da uccisione: un nodo grigio insignificante non insegna nulla a un personaggio al massimo.",
@@ -6542,7 +6817,7 @@ export const it_IT: EnTranslations = {
       "nodesHeading": "Nodi per zona",
       "nodesNote": "Dove si trovano i nodi, il loro livello, lo strumento necessario e cio che producono. Ogni nodo rispawna per te {respawn} secondi dopo il tuo raccolto, e quel timer e solo tuo: un altro raccoglitore che lavora lo stesso nodo non ritarda mai il tuo, quindi non c'e gara per i nodi e nessuno li presidia. Ogni zona piu avanzata offre un materiale migliore estratto da terreno piu duro.",
       "toolsHeading": "Strumenti",
-      "toolsNote": "Ogni nodo richiede nelle borse lo strumento del suo mestiere, livello 1 compreso: niente piccone, niente minerale; niente canna, niente pesce. La scala dei venditori copre i livelli da 1 a 3 nei tre hub centrali: lo strumento di livello 1 è venduto in tutti e tre, i gradini superiori là dove comincia il terreno che li usa (Fenbridge aggiunge il livello 2, Highwatch il livello 3), e gli insediamenti più giovani oltre di essi non tengono alcuno strumento, quindi equipaggiati prima di viaggiare. Ogni bancone vende liberamente ogni gradino che tiene, e qualsiasi strumento passa per scambio diretto; ogni gradino si inserisce anche sul Mercato e viaggia per posta, tranne i tre strumenti da terra iniziali da 20 monete di rame: quelli si comprano a un bancone o si passano di mano in mano, e non si rivendono, spediscono o inseriscono mai. Ciò che è vincolato è l'uso. Uno strumento da terra sopra il livello 1 funziona solo quando la tua competenza nel suo stesso mestiere se lo è guadagnato, {tier2Prof} per il livello 2, {tier3Prof} per il livello 3, e 85 e 100 per i due gradini fabbricati, e la riga del venditore, il tooltip e la tabella qui sotto indicano tutti il requisito in anticipo. Fino ad allora uno strumento comprato in anticipo aspetta semplicemente nelle tue borse, senza aprire terreno, senza comprare velocità e senza coniare gradi pregiati, poi diventa utilizzabile nell'istante in cui il tuo contatore tocca il suo numero. Le canne da pesca sono l'unica eccezione: nessuna canna porta un requisito d'uso, e il Mercante Wilkes a Eastbrook tiene di proposito le canne di livello 2 e di livello 3 per i pescatori che comprano in anticipo. Uno strumento non occupa mai uno slot di equipaggiamento e non si consuma mai, quindi ognuno è un acquisto una tantum, e per il vincolo conta solo il livello: uno strumento più raro dello stesso livello non apre nulla in più. La rarità però non è solo colore. Fa durare più a lungo un effetto di strumento assegnato a uno slot, e su una canna allarga la finestra di recupero.\n\nUno strumento migliore compra tre cose, non due. Apre terreno di livello superiore, accorcia il lancio e migliora ciò che ne esce: lavora un filone con uno strumento di rango SUPERIORE al materiale della zona stessa e il raccolto ne produce il grado pregiato invece di quello semplice. Il filone dev'essere uno di quelli a grado pieno della zona, quindi i filoni più facili che una zona tiene per i viaggiatori producono comunque il materiale ordinario. I materiali pregiati sono ciò che consumano le ricette degli strumenti fabbricati, e un grado pregiato conta come la sua versione ordinaria ovunque una ricetta o un ordine di lavoro ne richieda una, quindi migliorare non ti lascia mai a piedi: significa solo che il tuo minerale di rame arriva come Minerale di Rame Pregiato.\n\nSopra la scala dei venditori ogni mestiere ha due strumenti fabbricati, livello 4 e livello 5, realizzati all'officina (ogni personaggio conosce le ricette da terra; l'abilità che sale con il lavoro è quella dell'Ingegneria), oppure comprati con i Sigilli d'Incursione al banco della Litania Annegata una volta soddisfatti i suoi requisiti di completamento: la tabella qui sotto riporta il prezzo in Sigilli e i completamenti che ogni gradino richiede. Nessun mercante li vende mai per monete. La Pesca ha la propria coppia, e si imparano dal fabbricante di attrezzi anziché essere note fin dall'inizio. Oggi nessun nodo e nessuna acqua richiedono più del livello 3, quindi i due gradini di punta comprano velocità, grado e una finestra di recupero più clemente invece dell'accesso, e saranno il biglietto d'ingresso quando arriverà terreno di livello superiore.",
+      "toolsNoteFishingPageMarks": "Every node needs its trade's tool in your bags, tier 1 included: no pick, no ore, and no pole, no fish. The vendor ladder covers tiers 1 to 3 across the three heartland hubs: the tier-1 tool is sold at all three, the rungs above it where the ground that uses them begins (Fenbridge adds tier 2, Highwatch tier 3), and the younger settlements beyond them stock no tools at all, so kit up before you travel. Farming buys elsewhere: its tier-1 hoe is stocked by the farmer who keeps the first allotment (she stands at the Eastbrook allotments, not at any tool counter), and no hoe rung above it is sold for coin anywhere. Every counter sells every rung it stocks freely, and any tool passes by direct trade; every rung also lists on the Market and travels by mail except the four 20-copper land starters (the Copper Mining Pick, the Handaxe, the Gathering Sickle and the Garden Hoe): those are bought at a counter or passed hand to hand, and never sold back, mailed, or listed. What is gated is the wielding. A land tool above tier 1 works only once your proficiency in its own trade has earned it, {tier2Prof} for tier 2, {tier3Prof} for tier 3, and 85 for tier 4 and 100 for tier 5, and the vendor row, the tooltip, and the table below all name the requirement up front. Until then a tool bought ahead simply waits in your bags, opening no ground, buying no speed, and minting no fine grades, then wields the moment your counter touches its number. Fishing rods are the one exception: no rod carries a wield requirement, and Trader Wilkes in Eastbrook deliberately stocks the tier 2 and tier 3 rods for anglers buying ahead. A tool never occupies an equip slot and never wears out, so each is a one-time purchase, and only the tier matters to the gate: a rarer tool of the same tier opens nothing extra. Rarity is not only colour, though. It makes a slotted tool effect last longer, and on a rod it widens the reel window.\n\nA better tool buys three things, not two. It opens higher-tier ground, it shortens the cast, and it improves what comes out: work a vein with a tool ranked ABOVE the zone's own material and the harvest yields the fine grade of it instead of the plain one. The vein has to be one of the zone's full-grade ones, so the easier veins a zone keeps for travellers still yield the ordinary material. Fine materials are what the crafted tool recipes consume, and a fine grade counts as its ordinary version anywhere a recipe or a work order asks for one, so upgrading never strands you: it just means your copper ore arrives as Fine Copper Ore.\n\nAbove the vendor ladder the three node trades each have two crafted tools, tier 4 and tier 5, made at the toolworks (every character knows those two recipes; the skill that climbs for the work is Engineering's), or bought with Delve Marks at the Drowned Litany counter once its clears gates are met: the table below carries the Marks price and the clears each rung asks. No merchant ever sells them for coin. Farming's ladder is the long one: every hoe above the 20-copper starter is crafted, tiers 2 through 5, all four taught by the toolmaker rather than known from the start, and the top two rungs are also stocked at that same Marks counter. Fishing has three of its own, and they are learned rather than known from the start too: the toolmaker teaches the tier 4 Stormreel and the tier 5 Tidewrought, and the tier 6 Clockreel is built from a schematic instead; the Stormreel and the Tidewrought are also stocked at that same Marks counter, behind the same clears gates as the node tools of their tier, and the fishing page's tool table carries their Marks prices. Rods are the one ladder whose top rungs buy ACCESS on the water: every one of the three opens a catch band that skill alone can never reach, so a better rod is not comfort. For the three node trades no node today needs more than tier 3, so their tier 4 and tier 5 tools still buy speed and grade rather than access, and they will be the entry ticket when higher-tier ground arrives. Farming sits between the two: planting is what needs the hoe, so a bed of tier N asks a hoe of tier N right up to the fourth and last crop tier, and only the fifth rung opens no new ground.",
       "toolCrafted": "Fabbricato ({craft})",
       "toolCraftedOrMarks": "Fabbricato ({craft}) o {marks} Sigilli d'Incursione dopo tre completamenti della Litania Annegata",
       "toolCraftedOrMarksHeroic": "Fabbricato ({craft}) o {marks} Sigilli d'Incursione dopo un completamento Eroico della Litania Annegata",
@@ -6555,38 +6830,55 @@ export const it_IT: EnTranslations = {
       "yieldsHeading": "Cosa produce un raccolto",
       "yieldsBody": "Ogni raccolta tira una qualita per cio che concede, e la tua competenza e l'unico fattore di quel tiro. Un raccoglitore alle prime armi ottiene sempre materiale comune; ogni punto di abilita sposta il peso costantemente dal comune ai gradi superiori e mai al contrario, finche al massimo di 100 il grado comune scompare del tutto: 60 percento non comune, 30 percento raro, 8 percento epico e 2 percento leggendario, ogni volta.\n\nLa qualita significa anche quantita: un tiro comune da 1 unita, non comune e raro danno 2, epico 3 e leggendario 4. Qualsiasi tiro raro, epico o leggendario arriva come istanza firmata con il timbro Raccolto da te: al massimo sono quattro raccolti su dieci che portano il tuo nome, e le regole di provenienza nella pagina dell'Economia Artigianale spiegano perche i fabbricatori pagano di piu esattamente per quelle pile.",
       "bandsHeading": "Fasce di competenza",
-      "bandsBody": "Le fasce di competenza sono la scala condivisa 0/100/200 che corre sopra il contatore di un mestiere. Per i mestieri di terra la fascia superata a 100 accorcia il lancio di raccolta, e il loro limite fa della fascia 1 il tetto. Le fasce della Pesca non accorciano nulla: selezionano le tabelle delle catture (con una canna all’altezza), solo la Pesca raggiunge la fascia 2, e la scalata stessa è ciò che spinge un pescatore verso acque più profonde, dove vivono sia le tabelle migliori sia le lezioni successive.",
+      "bandsBodySplitLadder": "Proficiency bands are the shared 0/100/200 ladder over a land trade's counter: the band crossed at 100 shaves the gather cast, and the land cap makes band 1 the ceiling. Fishing keeps a ladder of its own, six rungs at 0, 100, 150 and then three more at 200. Its bands shave nothing; they select the catch tables, each with a rod to match. After that third rung the gate moves once more, to the 200 cap, and then stops: from the cap on, the rod alone decides how far the table goes. The climb is what pulls an angler to deeper water, where the better tables and the further lessons both live.",
       "bandFmt": "Fascia {band}: dalla competenza {at}",
       "rareHeading": "Ritrovamenti rari",
       "rareBody": "Ogni raccolta, qualunque sia la tua abilita, ha una probabilita di 1 su {oneIn} di un ritrovamento raro: un filone intatto nel minerale, antico cuore di legno nel legname, un fiore lunare tra le erbe. Il ritrovamento moltiplica il raccolto di quella volta {mult} volte, ogni unita arriva firmata con il tuo nome indipendentemente dalla qualita estratta, e l'intera zona ne viene informata per nome. Ogni tipo iscrive anche il proprio segno del collezionista a zero Rinomanza nel tuo Libro delle Imprese, un segno che esiste solo per provare che e successo a te.",
+      "rareBodyFourFlavors": "Every harvest, whatever your skill, carries a 1 in {oneIn} chance of a rare find: a pristine vein in ore, ancient heartwood in timber, a moonlit bloom among the herbs, a golden harvest from a garden bed. The find multiplies that harvest's yield {mult} times over, every unit arrives signed with your name regardless of the quality rolled, and the whole zone hears about it by name. Each flavor also inscribes its own zero-Renown deed in your Book of Deeds, a collector's mark that exists purely to prove it happened to you.",
       "specimenBody": "Tieni un po' di spazio libero nelle borse quando raccogli: un colpo di fortuna firmato ha bisogno di uno slot tutto suo o di una pila firmata corrispondente in cui atterrare, e se non entra da nessuna parte la resa arriva comunque, ma la firma va perduta. Anche la raccolta dalle carcasse ha il suo ramo da jackpot: circa il {pct}% di ogni componente raccolto esce raro o superiore. Una famiglia che ha un esemplare perfetto da dare (pelle, seta, veleno, carne) mantiene semplice la sua resa ordinaria e conia l'esemplare firmato accanto a essa; ogni altra famiglia firma la resa stessa.",
       "gatherDeedsHeading": "Imprese lungo il cammino",
       "gatherDeeds": {
         "mining": "Il tuo primo nodo di qualsiasi professione guadagna Frutti del Campo, e il massimo di 100 in Mineria iscrive Minerale nel Sangue. Raggiungere 100 in qualsiasi tre tra Mineria, Boscaiolia, Erboristeria e Pesca aggiunge Maestro Raccoglitore a 25 Rinomanza, e il cracking di un filone intatto registra il proprio segno del collezionista. Nessuno di questi conferisce potere: le Imprese sono titoli e Rinomanza, un registro delle strade che hai percorso.",
         "logging": "Il tuo primo nodo di qualsiasi professione guadagna Frutti del Campo, e il massimo di 100 in Boscaiolia iscrive Taglialegna Cuore di Legno. Raggiungere 100 in qualsiasi tre tra Mineria, Boscaiolia, Erboristeria e Pesca aggiunge Maestro Raccoglitore a 25 Rinomanza, e un colpo di antico cuore di legno registra il proprio segno del collezionista. Le Imprese sono solo titoli e Rinomanza, mai potere.",
         "herbalism": "Il tuo primo nodo di qualsiasi professione guadagna Frutti del Campo, e il massimo di 100 in Erboristeria iscrive Maestro del Prato. Raggiungere 100 in qualsiasi tre tra Mineria, Boscaiolia, Erboristeria e Pesca aggiunge Maestro Raccoglitore a 25 Rinomanza, e un fiore lunare in fiore registra il proprio segno del collezionista. Le Imprese sono solo titoli e Rinomanza, mai potere.",
-        "fishing": "Il traguardo dei 100 iscrive Vecchio Sale e quello dei 200 iscrive Maestro Pescatore con il suo titolo, il vertice assoluto dell'arte del pescatore; la Pesca conta anche per Maestro Raccoglitore, guadagnato a 100 in tre qualsiasi dei mestieri di raccolta. Un primo pesce dalle acque di ciascuna di sei zone riempie una pagina propria, le tre zone centrali più il Willowfen, il Galecrest e Farshore oltre di esse, e il Koi del Bagliore Solare registra Barlume di Speranza, così i viaggiatori con una canna nello zaino riempiono il loro libro più in fretta di quanto si aspettino."
+        "fishing": "Il traguardo dei 100 iscrive Vecchio Sale e quello dei 200 iscrive Maestro Pescatore con il suo titolo, il vertice assoluto dell'arte del pescatore; la Pesca conta anche per Maestro Raccoglitore, guadagnato a 100 in tre qualsiasi dei mestieri di raccolta. Un primo pesce dalle acque di ciascuna di sei zone riempie una pagina propria, le tre zone centrali più il Willowfen, il Galecrest e Farshore oltre di esse, e il Koi del Bagliore Solare registra Barlume di Speranza, così i viaggiatori con una canna nello zaino riempiono il loro libro più in fretta di quanto si aspettino.",
+        "farming": "Farming keeps no deeds of its own yet: now that its beds and crops are in the ground, the milestone and cap deeds that mark the other trades arrive in a later patch. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power.",
+        "farmingSown": "Farming keeps its own shelf in the Book of Deeds now. Sow It Begins marks your first planted crop, and four chronicle pages mark a first thriving harvest at each of the bed sites, from Eastbrook Vale to the Evergarden. A golden harvest records its own zero-Renown collector's mark, and proficiency in Farming counts toward Master Gatherer, earned at 100 in any three gathering trades. Every Furrow Filled gathers the whole roster onto one page: grow every crop the four gardens carry and the collection closes. The capstone above it is Harvestmaster, the trade's 100-proficiency title, and with the mountain and parterre seeds now on their farmers' counters it is a climb you can finish today. Deeds are titles and Renown only, never power."
       },
       "fish": {
         "startHeading": "Come iniziare",
-        "startBody": "Una Canna da pesca semplice costa 20 monete di rame dal Pescatore Brandt a Eastbrook (cerca il Vecchio Sale al margine orientale della città, sulla strada per il Lago Specchio); anche l'Armeggiatore Gizzel, il Provveditore Hale a Fenbridge e il Quartiermastro Bree a Highwatch tengono canne in magazzino. Usa la canna rivolto verso acqua abbastanza profonda da contenere pesci, fino a circa 24 yard davanti a te, e il tuo galleggiante volerà fuori.\n\nNon puoi lanciare in combattimento, mentre nuoti o da morto: lanciare dalla riva è la postura prevista. L'acqua però si fa dura come si fa dura la terra: la palude vuole almeno la Canna con mulinello di ferro di livello 2 e le vette la Canna del ruscello d'argento di livello 3, e una lenza lanciata senza la canna che quell'acqua pretende non lascia mai la tua mano. Due canne stanno sopra queste, la Canna della Tempesta e la Canna Forgiamarea: gli ingegneri le fabbricano all'officina con ciò che la lenza tira su, e il banco dell'incursione della Litania Annegata le vende per Sigilli d'Incursione dietro ai suoi requisiti di completamento, ma mai per monete. Nessuna acqua le richiede, quindi comprano un'attesa più breve e una finestra di recupero più ampia invece dell'accesso, il che al gradino più alto significa un'abboccata in tre secondi netti.",
+        "startBodyThreeRods": "A Simple Fishing Pole costs 20 copper from Fisherman Brandt in Eastbrook (look for the Old Salt at the town's east edge, by the road to Mirror Lake); Tinker Gizzel, Provisioner Hale in Fenbridge, and Quartermaster Bree in Highwatch stock poles too. Use the pole while facing water deep enough to hold fish, up to about 24 yards ahead of you, and your bobber sails out.\n\nYou cannot cast while in combat, while swimming, or while dead: casting from shore is the intended posture. Water gets harder as the land does, though: the marsh wants at least the tier 2 Ironreel and the peaks the tier 3 Silverstream, and a line cast without the rod that water takes never leaves your hand. Three rods sit above those, the Stormreel, the Tidewrought and the Clockreel: engineers craft all three at the toolworks out of what a line pulls up, and the Drowned Litany's delve counter sells the first two for Delve Marks behind its clears gates, though never for coin. No water asks for any of them, but they are not comfort alone: each one opens a catch band that skill by itself cannot reach, so once your counter is capped the rod is the only thing left that decides how deep your table goes. They shorten the wait and widen the reel window besides, which at the top rung means a bite in a flat three seconds.",
         "biteHeading": "Abboccata e salpata",
         "biteBody": "Dopo il lancio, l'abboccata arriva in un momento nascosto tra {min} e {max} secondi; il ritardo viene deciso quando la lenza tocca l'acqua, quindi non ci sono due lanci davvero uguali. Quando il galleggiante abbocca hai una finestra di {reel} secondi per premere di nuovo la canna e recuperare: recupera entro quel tempo e la cattura è tua, esita oltre e il pesce se ne va senza lasciarti nulla. Un'intera sessione si ferma a {cap} secondi, quindi anche un lancio tranquillo si risolve in fretta.\n\nLe canne migliori affinano entrambe le estremità del minigioco: ogni livello di canna sopra il primo taglia {rod} secondi dall'attesa più lunga possibile, mai sotto il minimo di tre secondi che la canna di punta già sfiora, e aggiunge {reelRod} secondi alla finestra di recupero, così la Canna con mulinello di ferro porta l'attesa peggiore a 6,5 secondi con una finestra di 3,25 secondi, e la Canna del ruscello d'argento a 5 con una finestra oltre i 4, dato che la sua rarità allarga il recupero un po' più di quanto paghi il livello da solo. Le abboccate più rapide non cambiano mai, qualunque cosa tu impugni, e a una canna basta stare nelle tue borse per contare.",
         "earlyReelNote": "Un avvertimento per le dita impazienti: premi di nuovo la canna prima che qualcosa abbocchi e recuperi una lenza vuota, chiudendo il lancio. Il primo secondo dopo che la lenza si posa è perdonato, quindi una doppia pressione accidentale non ti costa nulla; oltre quello, una pressione anticipata è un lancio sprecato. La pazienza è tutto il gioco: aspetta l'abboccata, poi ferra.",
         "scheduleHeading": "Guadagno di competenza",
-        "scheduleNote": "Il guadagno della Pesca segue un calendario fisso senza dadi: un punto intero per cattura sotto 50 di competenza, mezzo punto sotto 100, un decimo sotto 150 e un lento gocciolio di 0,02 da 150 a 200. Quell'ultimo tratto è deliberatamente un viaggio da migliaia di catture: 200 è una dichiarazione, non una tappa verso qualcos'altro.\n\nL'immondizia smette del tutto di insegnare a {cutoff}: da lì in poi, alghe e stivali sono soltanto alghe e stivali. Anche l'acqua stessa pone un tetto alla lezione: le acque di livello 1 della Valle (e ogni riva giovane oltre le terre centrali) non insegnano nulla oltre 100, quelle della palude si fermano a 150, e solo quelle di Thornpeak istruiscono un pescatore per l'intero tragitto fino a 200. Per il resto ogni cattura portata a riva guadagna al ritmo previsto, quindi quando il contatore si blocca, è il calendario che ti sta dicendo di cercare acque più profonde.",
+        "scheduleNoteRetuned": "Fishing gain follows a fixed schedule with no dice: 0.08 of a point per catch below 50 proficiency, 0.05 below 100, 0.04 below 150, and 0.03 from 150 to 200. The curve is deliberately shallow rather than back-loaded: the whole climb to 200 is about eleven hours of active fishing, and no quarter of it costs more than a third of the total, so the last fifty points are a long stretch rather than the whole journey.\n\nJunk stops teaching entirely at {cutoff}: from there on, weeds and boots are just weeds and boots. The water itself caps the lesson too: the Vale's tier 1 waters (and every young shore beyond the heartland) teach nothing past 100, the marsh's stop at 150, and only Thornpeak's school an angler the whole way to 200. Every landed catch otherwise gains at the scheduled rate, so when the counter stalls, the schedule is telling you to seek deeper water.",
         "colProficiency": "Competenza",
         "colGain": "Guadagno per cattura",
         "belowFmt": "Sotto {below}",
         "tablesHeading": "Tabelle delle catture",
-        "tablesNote": "La tua competenza sceglie una di tre fasce di cattura: fascia 0 fin dall'inizio, fascia 1 a 100, fascia 2 a 200, ognuna delle quali sposta peso dall'immondizia e dagli ami vuoti verso pesci veri, zona per zona. Ogni fascia oltre la prima pretende anche una canna: la fascia 1 vuole la Canna con mulinello di ferro di livello 2, la fascia 2 la Canna del ruscello d'argento di livello 3. La tua fascia effettiva è la minore tra quella che la tua abilità ha guadagnato e quella che la tua canna sostiene, e il limite è silenzioso: con una canna inferiore peschi comunque, solo sulla tabella della fascia più bassa, quindi se le tue catture sembrano ferme mentre la tua abilità sale, controlla prima la canna.\n\nLe acque di ogni zona ospitano la propria coppia di pesci commestibili, che curano di più quanto più profonda è la zona, tutti ingredienti da cucina e ottimo cibo da mangiare seduti anche crudi appena tolti dalla lenza. Il resto della tabella è la tassa del pescatore: alghe, qualche stivale ogni tanto e l'amo vuoto, che non sparisce mai del tutto. Quanto paghi dipende dall'acqua in cui cade il tuo galleggiante, non da dove stai in piedi: un lancio arriva fino a 24 yard, e la canna che l'acqua pretende, la tabella da cui pesca, l'impresa che accredita e fin dove insegna rispondono tutte alla zona a cui quell'acqua appartiene, decisa nell'istante in cui la lenza tocca l'acqua. L'acqua di ogni zona è scritta per una fascia propria, la Valle per la fascia 0, la palude per la fascia 1, le vette per la fascia 2, e pescare una fascia sotto quella trasforma circa un terzo dei tuoi lanci in ami vuoti, due fasce sotto più della metà. La canna ti porta all'acqua; è l'abilità a farla rendere, ed è la scalata a tirare un pescatore sempre più a fondo, perché le fasce migliori non sono solo una paga migliore: oltre la Valle sono le uniche acque che continuano a insegnare. Il {rare} è l'unica riga che risponde alla tua fascia di cattura e a nient'altro: le stesse probabilità in ogni zona, e sei volte più probabile alla fascia 2 che alla fascia 0, quindi la cosa più rara sul molo è proprio quella in cui un Maestro Pescatore è davvero più bravo.",
+        "tablesNoteSixBands": "Your proficiency selects one of six catch bands: band 0 from the start, band 1 at 100, band 2 at 150, and the top three all at 200, each shifting weight out of junk and empty hooks into real fish, zone by zone. Each band above the first also demands a rod, one tier higher every time: band 1 wants the tier 2 Ironreel, band 2 the tier 3 Silverstream, band 3 the tier 4 Stormreel, band 4 the tier 5 Tidewrought, and band 5 the tier 6 Clockreel. Band 2 opens at 150 and the last three all wait for the 200 cap, so the skill gate moves once more and then stops: from the cap on, the rod is the only thing that lifts your table, which is what the crafted rods are for and where the three deep-water catches live. Your effective band is the lower of what your skill has earned and what your rod supports, and the cap is silent: with a lesser rod you still catch, just off the lower band's table, so if your catches feel stuck while your skill climbs, check your rod first.\n\nEach zone's waters hold their own pair of cooking catches, higher-tier fish the deeper the zone, all of them kitchen reagents that must be cooked before they restore anything; from band 3 up, three more join every zone's table at the same weight, so a recipe naming one of those asks the same of an angler wherever they fish. The rest of the table is the angler's tax: weed, the occasional boot, and the empty hook, which never fully disappears. How much you pay depends on the water your bobber lands in, not where you stand: a cast reaches up to 24 yards, and the rod the water demands, the table it draws from, the deed it credits, and how far it teaches all answer to the zone that water belongs to, decided the moment the line lands. Each zone's water is written for a band of its own, the Vale for band 0, the marsh for band 1, the peaks for band 2, and fishing one band under that turns roughly a third of your casts into empty hooks, two bands under it more than half. The rod gets you to the water; the skill is what makes it pay, and the climb is what pulls an angler deeper, because better bands are not just better pay: past the Vale they are the only waters that keep teaching. The {rare} is the one row that answers to your catch band and nothing else: the same odds in every zone, and six times likelier at band 2 than at band 0, so the rarest thing on the dock is the one a Master Angler really is better at.",
         "bandHeading": "Fascia {band}: competenza {at} e superiore, livello canna {rod}",
         "colCatch": "Cattura",
         "colOdds": "Probabilita",
         "pctFmt": "{pct}%",
         "emptyHook": "Nulla abbocca",
         "koiHeading": "Il Koi del Bagliore Solare",
-        "koiBody": "Ogni specchio d'acqua del gioco nasconde lo stesso premio: il Koi del Bagliore Solare, un lampo non comune sulla lenza che vale 75 monete di rame per un venditore e parecchio di più per il tuo orgoglio. Le sue probabilità rispondono alla tua fascia di cattura e a nient'altro, identiche in ogni zona: una riga dell'1 percento nella tabella delle catture alla fascia 0, 3 alla fascia 1 e 6 alla fascia 2, estratta a ogni lancio recuperato, quindi il koi va al pescatore che si è guadagnato le tabelle profonde. Portarne a riva uno registra Barlume di Speranza nel tuo Libro delle Imprese, un segno da collezionista a zero Rinomanza. Quando accade, il registro si assicura che tu lo sappia."
+        "koiBodyBandFlat": "Every body of water in the game hides the same prize: the Sunglint Koi, an uncommon gleam on the line worth 75 copper to a vendor and rather more to your pride. Its odds answer to your catch band and to nothing else, the same in every zone: a 1 percent row of the catch table at band 0, 3 at band 1, and 6 from band 2 upward, drawn on every reeled-in cast, so the koi comes to the angler who earned the deep tables. Landing one records Glimmer of Hope in your Book of Deeds, a zero-Renown collector's mark. When it happens, the log makes sure you know."
+      },
+      "farm": {
+        "rhythmHeading": "The farming rhythm",
+        "rhythmBody": "Planting is the short visible cast: {plant} seconds flat at every rung, because a hoe opens ground rather than buying speed. Pulling a ripe crop is instant. There is no cast to interrupt and no bag check to refuse it, and a bed that has come ready waits as long as you leave it, so a full pack costs a farmer nothing but the walk to empty it.\n\nWhat a harvest pays is produce and farming proficiency. Unlike a vein, it grants no character XP at all, so the beds are a trade to work rather than a way to level.",
+        "gainHeading": "What a harvest teaches",
+        "gainBody": "Gain is deterministic and keyed to your own counter rather than to the crop: {g1} proficiency a harvest below {p1}, {g2} below {p2}, {g3} below {p3}, and {g4} the rest of the way to the cap of {cap}. It is never a skill-up roll, so the climb is exactly as long as the arithmetic makes it.\n\nWhat the crop tier decides is how far a bed can carry you. A tier 1 crop teaches to {c1} and grays there, a tier 2 crop to {c2}, and tier 3 and above to the cap, so moving up the beds is what keeps the counter moving at all.",
+        "yieldsHeading": "What a harvest yields",
+        "yieldsBody": "A bed pays picks rather than a graded pull. Every plot starts with a floor of {floor} lives, and each pick rolls a chance not to spend one: {keep0} percent at a fresh counter and {keepCap} percent at the cap, which works out at roughly three and a half picks at the start and six at the end.\n\nQuality rides those same picks instead of replacing them. Each pick has a {fine0} percent chance at a fresh counter, {fineCap} percent at the cap, of coming up as the crop the bed grew in its fine grade rather than its plain one, so a fine pick upgrades a pick and never adds one. There is no common-to-legendary ladder on a bed: a crop mints its own two grades and nothing else.\n\nTwo things add picks outright, and both land at the plain grade. An alchemist's growth tonic, armed when you plant, pays {tonicPicks} more picks on a {tonicPct} percent chance, and a slotted quantity effect adds {effectCap}, which is the cap farming puts on a Maker's Charm so the tonic keeps a reason to exist. A charged Artisan's Eye works on quality instead, adding {fineBonus} percentage points to every fine roll.",
+        "bedsHeading": "Working the beds",
+        "bedsBody": "The loop is short. Buy seeds and compost from the farmer beside the beds: Jessica in Eastbrook stocks the Vale pair, the Fenbridge farmer the marsh pair, Hollis on the Highwatch terraces the mountain crops, and Verbena the Evergarden parterre. A high-tier harvest also hands back a seed or two of its own, any seed changes hands on the World Market, and the mountain and parterre seeds now turn up in endgame drops and on the Heroic Quartermaster's counter besides, so the farmer beside the beds is the way in rather than the only way. Sow with a hoe in your bags, and tip the odds if you like: compost from the counter and the farmer's watch, paid in produce as you plant, each raise a crop's chance of coming through, an alchemist's growth tonic gives the harvest a shot at a larger yield, and once your skill has climbed a full band past a crop's tier that crop never fails at all. Then walk away. The bed keeps growing while you are logged out, a ripe crop waits as long as you leave it, and the Harvest Journal (Shift+K by default, or the Farming row of your professions window) lists every bed you have planted with its timer.\n\nA crop that fails leaves withered husks in place of produce, and any farmer trades husks for compost, so a bad season buys the next one's insurance. What you bring in feeds more than your own recipes: the produce cooks into the farm dishes at the kitchens, and it now goes into Cook Marlow's own trainer ladder and into the apothecary's elixirs besides, so a farmer has a buyer from the very first rung. And the garden no longer stops at the trainer ladder: the terrace crops season the raid's own role plates and every apex flask, and the Evergarden beds feed the two skill-125 capstone stations, so the last rung of both crafts is bought from a farmer too. Marlow's wheat and rice orders take Vale Wheat and Marsh Rice off your hands for coin on the same clock as every other work order.",
+        "bedsBodyScribeBuyer": "The scribe's desk buys from the beds too: the rung-50 Sunpetal Scroll takes a Frost Gourd off the Highwatch terraces, the same gourd the Elixir of the Serpent takes, which prices the two routes to that buff even.",
+        "tableHeading": "From the beds to the table",
+        "tableBody": "The kitchens are where a season pays forward. Beyond the everyday farm dishes, each crop tier has a richer dish that leaves you Well Fed: finish the meal and a lasting boon stays with you, the kind of edge a group wants eaten before the dungeon door. Crowning the set is the Harvest Feast, a spread a cook sets out in the world itself: everyone at hand takes a serving of their own, one each, and every finished meal pays the same Well Fed boon, so one farmer's season can set the table for a whole party. The top of that ladder, the two richest dishes and the feast itself, leans on the mountain and parterre crops, whose seeds the farmers beside those beds sell. The recipes are another matter: the upper rungs of the farm ladder are no longer taught at any counter, and are found in the endgame or bought with Heroic Marks like every other endgame recipe.\n\nLuck keeps a place at that table too. Every harvest you bring in rolls the same windfall chance the other gathering trades enjoy, and now and then a crop comes up golden: the yield lands far past a normal pull, something extra comes up with it (a seed for finer ground than you are working, or now and then one of those endgame recipes), the whole zone hears the find announced by name, and Golden Harvest is recorded in your Book of Deeds.",
+        "tableBodyOneMeal": "The kitchens are where a season pays forward. Beyond the everyday farm dishes, each crop tier has a richer dish that leaves you Well Fed: finish the meal and a lasting boon stays with you, the kind of edge a group wants eaten before the dungeon door. Only one Well Fed effect at a time: a newer meal replaces it. Crowning the set is the Harvest Feast, a spread a cook sets out in the world itself: everyone at hand takes a serving of their own, one each, and every finished meal pays the same Well Fed boon, so one farmer's season can set the table for a whole party. The top of that ladder, the two richest dishes and the feast itself, leans on the mountain and parterre crops, whose seeds the farmers beside those beds sell. The recipes are another matter: the upper rungs of the farm ladder are no longer taught at any counter, and are found in the endgame or bought with Heroic Marks like every other endgame recipe. The dish ladder itself is Cooking's work: the Cooking page carries every rung.\n\nLuck keeps a place at that table too. Every harvest you bring in rolls the same windfall chance the other gathering trades enjoy, and now and then a crop comes up golden: the yield lands far past a normal pull, something extra comes up with it (a seed for finer ground than you are working, or now and then one of those endgame recipes), the whole zone hears the find announced by name, and Golden Harvest is recorded in your Book of Deeds."
       },
       "econ": {
         "title": "Economia Artigianale",
@@ -6610,7 +6902,7 @@ export const it_IT: EnTranslations = {
         "marketHeading": "Il Mercato Mondiale e la sua commissione",
         "marketBody": "Il Mercato Mondiale e la borsa a livello di reame, gestita dal Mercante a Eastbrook e dal Banditore Voss a Highwatch. L'inserzione e gratuita: non c'e deposito, e un'inserzione invenduta ti ritorna semplicemente. La casa prende la sua commissione solo quando qualcosa si vende davvero: il 5 percento del prezzo di vendita, e il resto ti aspetta da riscuotere.\n\nUn limite importante: il Mercato gestisce solo beni semplici. Una copia firmata, da capolavoro, incantata o vincolata non viene mai inclusa in un'inserzione, quindi i pezzi speciali cambiano mani faccia a faccia in una finestra di scambio, che porta l'identita completa di un oggetto, firma inclusa. Fissa tu stesso il prezzo; il Mercato ti dice solo cosa rende la versione semplice.",
         "workOrdersHeading": "Ordini di lavoro",
-        "workOrdersNote": "Ogni maestro di stazione pubblica un ordine di lavoro fisso: porta una pila del materiale di base del suo mestiere e vieni pagato sul momento, piu un po' di esperienza missione. La paga e deliberatamente il {pct}% di cio che un venditore ti darebbe per la stessa pila, arrotondato per difetto, quindi un ordine di lavoro non e mai il modo piu redditizio per vendere materiali, solo un motivo per passare dalla stazione.\n\nOgni ordine va sul proprio orologio di {minutes} minuti per personaggio: consegnane uno e quel maestro non ha piu nulla per te finche il timer non scade. Trattali come un piccolo bonus sui materiali che raccoglievi comunque, non come un'attivita.",
+        "workOrdersNote": "Ogni maestro di stazione pubblica ordini di lavoro fissi, uno per materiale di base: porta la pila che un ordine chiede e vieni pagato sul momento, piu un po' di esperienza missione. La paga e deliberatamente il {pct}% di cio che un venditore ti darebbe per la stessa pila, arrotondato per difetto, quindi un ordine di lavoro non e mai il modo piu redditizio per vendere materiali, solo un motivo per passare dalla stazione.\n\nOgni ordine va sul proprio orologio di {minutes} minuti per personaggio: consegnane uno e quell'ordine resta chiuso per te finche il timer non scade, mentre gli altri ordini del maestro restano aperti. Trattali come un piccolo bonus sui materiali che raccoglievi comunque, non come un'attivita.",
         "colOrder": "Ordine di lavoro",
         "colMaster": "Maestro",
         "colAsks": "Chiede",
@@ -6618,7 +6910,7 @@ export const it_IT: EnTranslations = {
         "commissionsHeading": "Commissioni e il Vincolo dell'Artigiano",
         "commissionsBody": "Una commissione e una lavorazione fatta per qualcuno. Quando si forgia un'arma, un pezzo d'armatura o un oggetto tenuto fuori mano (una pozione non puo portare un vincolo), l'artigiano puo contrassegnare la lavorazione come commissione: il pezzo finito si comporta normalmente tra le mani del creatore, ma nel momento in cui cambia mani in uno scambio si vincola alla persona che lo ha ricevuto. Questo e il Vincolo dell'Artigiano: il compratore ottiene il suo pezzo, e il pezzo non puo essere ceduto o rivenduto.\n\nI vincoli non sono eterni, solo costosi. Qualsiasi maestro di stazione sciolgliera un pezzo vincolato mentre sei presso la sua stazione (una stazione mobile non offre mai il servizio), per una tariffa fissata dalla qualita dell'oggetto: 25 argento per il non comune, 1 oro per il raro, 4 oro per l'epico, con il leggendario che paga la tariffa dell'epico e un pezzo comune commissionato quella del non comune.\n\nLa tariffa compra una lavagna pulita, non una cura: il pezzo e ancora una commissione, quindi si vincola di nuovo a chiunque lo riceva nel successivo scambio, e tutto il resto, firma, capolavoro e incanti, sopravvive intatto.",
         "provenanceHeading": "Lavoro firmato",
-        "provenanceBody": "Alcuni oggetti portano un nome. Passaci sopra il puntatore e la descrizione dice Raccolto da tal dei tali su un materiale grezzo, oppure Realizzato da tal dei tali su un pezzo finito: lo stesso marchio, formulato secondo il modo in cui l’oggetto è venuto al mondo. Una firma è parte dell’oggetto stesso, viaggia con lui attraverso gli scambi, la banca, la posta, il Mercato Mondiale e persino il riacquisto da un venditore, e non svanisce mai.\n\nLa raccolta firma il suo lavoro migliore in automatico: ogni raccolto che tira raro o superiore arriva firmato, e i ritrovamenti rari firmano l’intera manna quintuplicata. Il tiro fortunato di un raccolto da carcassa firma la sua resa quando la famiglia non ha alcun esemplare da offrire; quando invece ce l’ha, lascia la resa semplice e conia accanto l’esemplare puro firmato. La fabbricazione firma seguendo la stessa linea: ogni copia di un risultato raro o superiore viene coniata firmata, e un capolavoro firma sempre, qualunque sia la sua qualità, così la versione più pregiata di qualsiasi pezzo nomina sempre il suo creatore. L’unica cosa che può costarti una firma è una borsa piena: un’unità firmata ha bisogno di uno spazio tutto suo, o di una pila firmata corrispondente, in cui posarsi.\n\nUna pila di oggetti condivide una sola identità, quindi due copie si uniscono solo quando ogni marchio combacia esattamente: stesso oggetto, stesso firmatario, stesse statistiche da capolavoro, stesso incanto, stesso vincolo. Un tronco firmato non si aggiunge mai a un mucchio semplice, in nessuna delle due direzioni (unirli cancellerebbe il nome di qualcuno), ma carichi identici si uniscono volentieri, così venti minerali firmati dallo stesso raccoglitore stanno in un’unica pila e una manna non ti fa a pezzi le borse.\n\nLe firme ripagano gli artigiani: tenere al banco una qualsiasi copia firmata di un reagente richiesto, chiunque l’abbia firmata, aggiunge 2 punti percentuali alla probabilità di capolavoro, e tenere un reagente firmato dalla tua stessa mano riduce di uno la quantità richiesta di quel reagente (mai sotto uno). Il tuo lavoro firmato di qualità rara o superiore continua persino a insegnarti qualcosa, oggi soltanto attraverso la boccetta: bevi una pozione che hai firmato e un piccolo rivolo di competenza torna al mestiere che l’ha preparata, purché quel mestiere sia uno dei tuoi principali attivi.",
+        "provenanceBody": "Some items carry a name. Hover one and the tooltip says Gathered by so-and-so on a raw material, or Crafted by so-and-so on a finished piece: the same mark, worded for how the item came to be. A signature is part of the item itself, travels with it through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fades.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. The one thing that can cost you a signature is a full bag: a signed unit needs room of its own, or a matching signed stack, to land in.\n\nA stack of items shares one identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. A signed log never joins a plain pile in either direction (merging would erase somebody's name), but identical payloads merge happily, so twenty ore signed by the same gatherer sit in one stack and a windfall does not shred your bags.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
         "collectorsHeading": "Collezionisti, trofei, e il prezzo di una storia",
         "collectorsBody": "I venditori sono ciechi alla provenienza: un oggetto firmato si vende a un PNG esattamente al suo prezzo normale. Il sovrapprezzo di una firma esiste solo tra i giocatori, il che e precisamente cio che lo rende interessante: una pila di minerale fortunato firmata da un celebre raccoglitore, un Taglio Pregiato da un raccolto fortunato, una lama da capolavoro che porta il nome di un artigiano ormai ritirato, valgono tutti cio che la memoria di qualcuno dice che valgano.\n\nIl Libro delle Imprese segue lo stesso istinto: Filone Intatto, Cuore di Legno Antico, Fiore di Luna, Un Esemplare Perfetto, e Barlume di Speranza sono segni da collezionista a zero Fama che esistono solo per provare che un momento e accaduto a te. Conserva l'oggetto che ha guadagnato l'impresa e tieni la ricevuta. Nulla di tutto questo e potere; la provenienza non compra statistiche e non vince battaglie, e il registro cartaceo del gioco dei giorni felici.",
         "castPaceHeading": "Tempo di lancio e pozzo dell'oro",
@@ -6637,13 +6929,31 @@ export const it_IT: EnTranslations = {
         "orderBoardBody": "Non devi cercare un artigiano in chat. Apri la tua finestra di fabbricazione e la bacheca delle commissioni è a un clic di distanza nella sua intestazione. Chiunque può pubblicare un ordine lì: indica la ricetta che vuoi far realizzare, poi lascialo aperto per qualsiasi artigiano che voglia accettarlo, oppure indirizzalo a un artigiano specifico, che sarà allora l'unico a poterlo prendere in carico. Un artigiano che sfoglia la bacheca accetta un ordine, e accettarlo lo impegna, quindi un lavoro è sempre svolto da una sola persona alla volta.\n\nNulla viene trattenuto quando pubblichi: un ordine non riserva né monete né materiali, quindi il prezzo e chi fornisce i reagenti restano tra voi due, concordati nel modo in cui si concorda qualsiasi commissione. Puoi annullare il tuo ordine finché è ancora aperto, e un ordine che nessuno accetta scade da solo dopo un giorno. Una volta che un artigiano ha accettato, è la consegna a chiuderlo.\n\nLa consegna avviene faccia a faccia. L'artigiano realizza il pezzo come commissione, viene da te e te lo consegna, quindi tieni libero uno slot della borsa per riceverlo. Ciò che arriva segue le normali regole della commissione qui sotto, vincolandosi a te tramite il Vincolo dell'Artigiano.",
         "commissionsBoardNote": "Esistono due strade per arrivare a una commissione: un ordine che pubblichi sulla bacheca qui sopra, che porta il lavoro a un artigiano, oppure un artigiano che sceglie semplicemente di realizzare un pezzo per te. Entrambe finiscono nello stesso Vincolo dell'Artigiano."
       },
+      "prov": {
+        "title": "Provisioning: from the field to the raid",
+        "intro": "The gathering lines meet in one kitchen, and the ladder above it ends at a table a whole raid eats from.",
+        "suppliersHeading": "Who feeds the kitchen",
+        "suppliersBody": "Cooking takes from nearly every gathering line, and that is deliberate: a cook who also fishes, farms, or skins is never short of something to work with, and a cook who does none of those can buy the lot on the market.\n\nWhat each line brings is listed below, and it is read straight off the live recipe list rather than written down here, so it is always what the kitchen actually asks for today.",
+        "lineCountFmt": "{count} into cooking bills",
+        "lineCorpse": "Corpse harvesting",
+        "ladderHeading": "The ladder, rung by rung",
+        "ladderBody": "Cooking climbs in the usual brackets, and every rung is listed with what it teaches. The early rungs are single dishes you eat from your bags. Higher up the kitchen starts making things for other people: plates that carry a lasting buff, and above those the feasts, which you do not eat at all but set down on the ground for everyone standing near it.",
+        "rungFmt": "Cooking {skill}",
+        "placeableTag": "(placed, not eaten)",
+        "stationTag": "(field station)",
+        "tableHeading": "The table at the top",
+        "tableBody": "A feast is set down where you stand and anyone nearby takes one serving each. What a serving gives is exactly the dish that feast is built around, so a feast never has power of its own to learn: it is a way of handing a whole group the plate you already know how to cook.\n\nThe top of the ladder is three feasts rather than one, and picking between them is the only choice there is. They cost the same, ask for the same materials, and take the same skill; each simply serves a different one of the three great plates, so a group takes the one that suits what it is about to do. Only one feast of yours can stand at a time, whichever rung it came from, and it keeps for a few minutes before it is cleared away.",
+        "marketHeading": "If you cook none of it",
+        "marketBody": "None of this is a wall for anyone who does not cook. Every material on this page is ordinary tradable goods, so a fisher sells catches, a farmer sells crops, and a raider who does neither buys a feast outright from a cook who made a spare. The kitchen is a place the professions meet, never a toll on the ones who skip it.",
+        "cookingLink": "Cooking"
+      },
       "faq": {
         "title": "Domande Frequenti sulle Professioni",
         "intro": "Risposte rapide alle domande piu frequenti degli artigiani.",
-        "q1": "Perche i miei oggetti firmati non si impilano?",
-        "a1": "Un oggetto firmato e un oggetto istanziato: porta un proprio piccolo registro (il firmatario, qualsiasi qualita tirata, statistiche di capolavoro, un incanto, un vincolo) invece di essere una copia anonima. Due copie si uniscono in una pila solo quando quei registri corrispondono esattamente.\n\nIn pratica: il minerale raro che hai raccolto tu stesso si impila con altro minerale raro che hai raccolto tu stesso, perche entrambi dicono Raccolto da te e nient'altro differisce. Lo stesso materiale firmato da un amico occupa il proprio slot, e una copia semplice non firmata non si unisce mai a una pila firmata. Borse, banca e scambio seguono tutti questa unica regola.",
+        "q1": "Why do my signed items not stack?",
+        "a1": "A signed item is an instanced item: it carries its own little record (the signer, any rolled quality, masterwork stats, an enchant, a bond) instead of being an anonymous copy. Two copies merge into one stack only when those records match exactly.\n\nIn practice: rare ore you gathered yourself stacks with more rare ore you gathered yourself, because both say Gathered by you and nothing else differs. The same material signed by a friend sits in its own slot, and a plain unsigned copy never merges into a signed stack. Bags, bank, trade, mail, and the World Market all follow this one rule.",
         "q2": "Le ricette comuni aumentano la mia competenza all'infinito?",
-        "a2": "No. Ogni ricetta e valutata in base a quanto si trova sotto la tua fascia attuale in quel mestiere, la classica lettura arancione, giallo, verde, grigio: guadagno pieno alla tua fascia o superiore, meta un livello sotto, un quarto due livelli sotto, e nulla tre o piu livelli sotto. Le fasce sono ogni 25 punti di competenza, quindi le ricette gratuite al livello 0 smettono di insegnarti qualcosa a 75 di competenza.\n\nI tetti sono anche piu bassi del classico 300 che potresti aspettarti: ognuno degli otto mestieri guadagnabili ha un tetto a 125, Estrazione mineraria, Taglio del legname ed Erbalismo hanno un tetto a 100, e la Pesca va piu in la con 200. Salire significa passare alle ricette alla tua fascia, non macinare quella piu economica.",
+        "a2": "No. Every recipe is scored by how far it sits below your current bracket in that craft, the classic orange, yellow, green, gray reading: full gain at or above your bracket, half one tier below, a quarter two tiers below, and nothing three or more below. Brackets are every 25 skill, so the free skill 0 recipes stop teaching you anything at 75 skill.\n\nThe caps are also lower than the classic 300 you might expect: each of the ten earnable crafts caps at 125, Mining, Logging, and Herbalism cap at 100, and Fishing runs long at 200. Climbing means moving up to recipes at your own bracket, not grinding the cheapest one.",
         "q3": "Qual e la differenza tra saccheggiare e raccogliere una carcassa?",
         "a3": "Una sola pressione copre entrambi. Tutto cio che una carcassa contiene, monete e drop piu eventuali componenti raccoglibili, si apre nella stessa finestra: il saccheggio segue le normali regole di saccheggio, e la raccolta e il lato delle professioni, che strappa i materiali dalla carcassa stessa.\n\nLa raccolta e chi prima arriva, uso singolo: ogni carcassa puo essere raccolta esattamente una volta, da chiunque la rivendichi per primo, anche online. Il tuo Focus della Citta determina cosa ottieni: mentre sei in un hub cittadino puoi distribuire 10 punti di focus tra i tipi di componenti che ti interessano, e ogni componente focalizzato tira un livello migliore (ogni 5 punti lo fa avanzare di un gradino, al massimo due gradini) e produce di piu (10 percento per punto). I componenti non focalizzati non vengono mai peggiorati.",
         "q4": "Perche il mio Tronco di corteccia di ferro e firmato?",
@@ -6651,18 +6961,20 @@ export const it_IT: EnTranslations = {
         "q5": "Come sciolgo un pezzo commissionato, e quanto costa?",
         "a5": "Vai a qualsiasi stazione di lavorazione con il pezzo nelle borse e paga il maestro. La tariffa segue la qualita dell'oggetto: 25 argento per un pezzo non comune, 1 oro per un raro, 4 oro per un epico; un leggendario paga la tariffa dell'epico, e un pezzo comune commissionato paga quella del non comune. Deve essere una vera stazione: una stazione mobile non offre mai il servizio.\n\nLa tariffa compra una lavagna pulita, non una cura: il pezzo rimane una commissione, quindi si vincola di nuovo a chiunque lo riceva nel successivo scambio. Se piu copie vincolate condividono una pila, una copia viene staccata e svincolata per ogni pagamento.",
         "q6": "Dove imparo le ricette, e quanto costano?",
-        "a6": "Le nove ricette comuni da campo e le sei ricette di strumenti da terra fabbricati sono note a tutti fin dall'inizio, e lo sono anche tre ricette legate a una stazione (il Mantello di Scaglie da Fornace, il Cappuccio di tessuto protettivo e le Fasce di pelle del crepuscolo), che non richiedono alcun addestratore, soltanto la loro stazione. Tutto il resto viene insegnato dai maestri residenti presso le loro stazioni nelle tre città hub: la maggior parte sta a Eastbrook, il conciatore tiene la conceria a Fenbridge e l'alchimista tiene l'apotecario a Highwatch.\n\nLe ricette da addestratore procedono a gradini: abilità 0, 25 e 50 per i mestieri di equipaggiamento e di consumabili, al prezzo di nulla, 25 argento e 1 oro come tariffe una tantum; le due ricette di amuleto dell'Incantamento stanno sul gradino 25, e il fabbricante di attrezzi insegna le due canne da pesca fabbricate a 75 e 125 per 4 e 16 oro. Un maestro insegna una ricetta quando la tua fascia in quel mestiere ha raggiunto la fascia della ricetta stessa, e per imparare devi trovarti presso la sua stazione: una stazione mobile non conta.",
+        "a6ThreeRods": "The nine common field recipes and the six crafted land-tool recipes are known to everyone from the start, and so are three station-bound recipes (the Kilnscale Mantle, the Wardweave Cowl, and the Duskhide Wraps), which need no trainer, only their station. Everything else is taught by the resident masters at their stations across the three hub towns: most stand in Eastbrook, the tanner keeps the tannery in Fenbridge, and the alchemist keeps the apothecary in Highwatch.\n\nTrainer recipes run in rungs: skill 0, 25, and 50 for the gear and consumable crafts, priced free, 25 silver, and 1 gold as one-time fees, and every craft adds one 75-rung intermediate above them at its station (Enchanting's is the Lucent Reagent, beside its two charm recipes on the 25 rung); the toolmaker also teaches two of the three crafted fishing rods, at 75 and 125 for 4 and 16 gold (the apex rung is learned from a schematic instead, so no trainer quotes it a fee). A master teaches a recipe once your bracket in that craft has reached the recipe's own bracket, and you must be standing at their station to learn: a mobile station does not count.",
         "q7": "Perche la mia raccolta e improvvisamente rallentata?",
-        "a7": "Il lancio di raccolta parte da 2,5 secondi e viene limato in due modi: 0,4 secondi per ogni livello di strumento che porti e sai impugnare al di sopra del livello del nodo stesso, e 0,15 secondi quando il contatore del tuo mestiere supera la fascia dei 100, con un minimo di 1,5 secondi. Passa dai nodi di livello 1 ai nodi di livello 3 e il tuo margine svanisce, quindi lo stesso piccone torna a colpire più lentamente. Avere esattamente il livello richiesto non compra velocità; apre soltanto il nodo.\n\nIl guadagno svanisce come per la fabbricazione: un nodo diventa grigio man mano che la tua competenza supera il suo livello (i nodi di livello 1 non insegnano più nulla da competenza 75 in poi), quindi la risposta ai guadagni lenti sono nodi di livello più alto. Questi richiedono nelle borse uno strumento almeno del loro livello (nessun nodo si lavora mai a mani nude, livello 1 compreso), e uno strumento da terra sopra il livello 1 vuole prima anche il suo requisito d'uso, 40/70/85/100 nel proprio mestiere per i livelli da 2 a 5. La Pesca segue una discesa tutta sua: guadagno pieno sotto 50 di competenza, metà sotto 100, un gocciolio di 0,1 sotto 150 e di 0,02 sotto 200, le catture di immondizia non insegnano più nulla da 100 in poi, e l'acqua stessa pone un tetto alla lezione (le acque di livello 1 smettono di insegnare a 100, quelle della palude a 150), quindi un contatore fermo può anche voler dire che hai superato quell'acqua.",
+        "a7RetunedTaper": "The gather cast starts at 2.5 seconds and is shaved down two ways: 0.4 seconds for every tool tier you carry and can wield above the node's own tier, and 0.15 seconds once your trade's counter crosses its 100 band, with a floor of 1.5 seconds. Move from tier 1 nodes up to tier 3 nodes and your surplus vanishes, so the same pick swings slower again. Holding exactly the required tier buys no speed; it only opens the node.\n\nSkill gain fades the same way crafting does: a node grays out as your proficiency climbs past its tier (tier 1 nodes teach nothing from proficiency 75 on), so the answer to slow gains is higher tier nodes. Those need a tool of at least their tier in your bags (no node is ever worked bare-handed, tier 1 included), and a land tool above tier 1 also wants its wield mark first, 40/70/85/100 in its own trade for tiers 2 through 5. Fishing follows its own taper: 0.08 per catch below 50 proficiency, 0.05 below 100, 0.04 below 150 and 0.03 below 200, junk catches teach nothing at all from 100 on, and the water itself caps the lesson (tier 1 waters stop teaching at 100, the marsh at 150), so a stalled counter can also mean you have outgrown the water.",
         "q8": "Posso lavorare lontano dalla citta?",
         "a8": "In parte. Le nove ricette comuni da campo (i capisaldi iniziali di arma, armatura, cibo e pozione) si fabbricano ovunque e in qualsiasi momento, e lo stesso vale per le tre ricette combinate delle coppie giurate. Tutto il resto sopra di esse è legato a un tipo di stazione: forgia, cucine, apotecario, conceria, telaio od officina, e devi trovarti entro 20 yard dalla stazione perché la lavorazione vada a buon fine.\n\nA 75 di abilità in un mestiere ti specializzi, e insieme a uno sconto del 20 percento sui materiali ottieni una stazione mobile: piazzala sul campo e resta in piedi per 10 minuti, servendo le ricette di quel mestiere come se fossi alla stazione vera. La stazione mobile serve solo a fabbricare: imparare le ricette e sciogliere le commissioni richiedono sempre la stazione autentica in città.",
         "q9": "Come faccio a farmi realizzare qualcosa su commissione?",
         "a9": "Pubblicalo sulla bacheca delle commissioni. Apri la finestra di fabbricazione, apri la bacheca dalla sua intestazione, e indica la ricetta che vuoi far realizzare: lascia l'ordine aperto per qualsiasi artigiano che voglia accettarlo, oppure indirizzalo a un artigiano che già conosci. Accettarlo impegna quell'artigiano al lavoro, e un ordine è sempre in mano a una sola persona alla volta.\n\nNessuna moneta e nessun materiale vengono trattenuti quando pubblichi, quindi concordate tra voi il prezzo e chi porta i reagenti, nel modo in cui le commissioni sono sempre state organizzate. Puoi annullare il tuo ordine finché è ancora aperto, e un ordine che nessuno accetta scade dopo un giorno. La consegna avviene di persona: sta' vicino al tuo artigiano con uno slot della borsa libero quando il pezzo è pronto. Arriva vincolato a te tramite il Vincolo dell'Artigiano, che qualsiasi maestro di stazione scioglierà per la tariffa consueta.",
         "q10": "Cos'è un ciondolo, e cosa succede quando si esaurisce?",
-        "a10": "Un ciondolo è un effetto da strumento inseribile: il lavoro di un incantatore che si trova in uno strumento di raccolta e migliora ciò che porta alla luce. Una Riserva del Raccoglitore aggiunge un'unità a un raccolto, un Occhio dell'Artigiano ne innalza il grado, e l'Armeggiatore Gizzel insegna entrambi all'officina degli attrezzi di Eastbrook a 25 di Incantamento. Una carica viene spesa solo quando il ciondolo ha effettivamente cambiato l'esito, quindi un raccolto che non poteva migliorare non ti costa nulla, e uno slot può essere impostato per chiedere conferma a ogni utilizzo, se preferisci decidere carica per carica.\n\nUn ciondolo appena inserito porta 20 cariche su uno strumento comune e 10 in più per ogni gradino di rarità sopra di esso, quindi uno strumento epico parte da 50. Esaurirlo non distrugge il ciondolo: il proprietario dello strumento ricarica lo slot, 10 cariche per ogni materiale arcano, con il materiale che segue il migliore tra lo strumento che porta con sé e il miglior strumento con cui quello slot sia mai stato riempito (Polvere di Tintinnio per uno strumento comune o non comune, Essenza di Tintinnio per uno raro, un Frammento di Tintinnio per uno epico). Mettere in banca lo strumento buono prima di una ricarica non la rende mai più economica, solo più piccola allo stesso prezzo, e inserire un ciondolo appena fabbricato mentre porti lo strumento inferiore è il modo onesto per tornare a un gradino più economico. L'incantatore che ha firmato il ciondolo paga la metà per ricaricare il proprio, e ancora meno con una specializzazione in Incantamento."
+        "a10": "Un ciondolo è un effetto da strumento inseribile: il lavoro di un incantatore che si trova in uno strumento di raccolta e migliora ciò che porta alla luce. Una Riserva del Raccoglitore aggiunge un'unità a un raccolto, un Occhio dell'Artigiano ne innalza il grado, e l'Armeggiatore Gizzel insegna entrambi all'officina degli attrezzi di Eastbrook a 25 di Incantamento. Una carica viene spesa solo quando il ciondolo ha effettivamente cambiato l'esito, quindi un raccolto che non poteva migliorare non ti costa nulla, e uno slot può essere impostato per chiedere conferma a ogni utilizzo, se preferisci decidere carica per carica.\n\nUn ciondolo appena inserito porta 20 cariche su uno strumento comune e 10 in più per ogni gradino di rarità sopra di esso, quindi uno strumento epico parte da 50. Esaurirlo non distrugge il ciondolo: il proprietario dello strumento ricarica lo slot, 10 cariche per ogni materiale arcano, con il materiale che segue il migliore tra lo strumento che porta con sé e il miglior strumento con cui quello slot sia mai stato riempito (Polvere di Tintinnio per uno strumento comune o non comune, Essenza di Tintinnio per uno raro, un Frammento di Tintinnio per uno epico). Mettere in banca lo strumento buono prima di una ricarica non la rende mai più economica, solo più piccola allo stesso prezzo, e inserire un ciondolo appena fabbricato mentre porti lo strumento inferiore è il modo onesto per tornare a un gradino più economico. L'incantatore che ha firmato il ciondolo paga la metà per ricaricare il proprio, e ancora meno con una specializzazione in Incantamento.",
+        "q11": "How do I make an orange item?",
+        "a11Promotion": "Craft or buy an apex Masterwrought piece, then perfect it: with 125 skill in the craft that made it, each attempt spends one Maker's Ember, one Sundered Essence, and one Prismglass Setting, succeeds four times in five, and never harms the piece when it misses. The first attempt binds the piece to you, and four successful ranks make it Perfected. Then spend one Deed of Making, an inscriptionist's skill-125 writ anyone can buy or commission, to promote the Perfected copy into a legendary named whatever you choose. The promotion is deterministic: no roll, stats unchanged, only the name and the color change."
       },
       "findingNodesNote": "Non devi trovarli a occhio. Ogni nodo della zona è disegnato sulla mappa della zona ovunque essa mostri quel terreno, e sulla minimappa mentre lo attraversi, così un giro di raccolta può essere pianificato dalla schermata della mappa prima ancora di partire. Un nodo che i tuoi strumenti non possono ancora lavorare è segnato anziché nascosto: mantiene il suo posto con un segno barrato e attenuato, così puoi vedere il terreno verso cui ti stai allenando. Su desktop, passare il puntatore su un filone, un boschetto o un'aiuola nel mondo lo nomina, ti dice lo strumento che richiede e, una volta che l'hai lavorato, fa il conto alla rovescia al secondo fino alla tua ricomparsa personale. Su schermo touch non c'è nulla su cui passare il puntatore, quindi i segni sulla minimappa raccontano la stessa storia.",
-      "specimenBodyFamilies": "Tieni un po' di spazio libero nelle borse quando raccogli: un colpo di fortuna firmato ha bisogno di uno slot tutto suo o di una pila firmata corrispondente in cui atterrare, e se non entra da nessuna parte la resa arriva comunque, ma la firma va perduta. Anche la raccolta dalle carcasse ha il suo ramo da jackpot: circa il {pct}% di ogni componente raccolto esce raro o superiore. Una famiglia che ha un esemplare perfetto da dare (pelle, seta, veleno, artiglio, carne) mantiene semplice la sua resa ordinaria e conia l'esemplare firmato accanto a essa; le altre tre, zanna, panno e difesa, firmano la resa stessa."
+      "specimenBodyFamilies": "Tieni un po' di spazio libero nelle borse quando raccogli: un colpo di fortuna firmato ha bisogno di uno slot tutto suo o di una pila firmata corrispondente in cui atterrare, e se non entra da nessuna parte la resa arriva comunque, ma la firma va perduta. Anche la raccolta dalle carcasse ha il suo ramo da jackpot: circa il {pct}% di ogni componente raccolto esce raro o superiore. Una famiglia che ha un esemplare perfetto da dare (pelle, seta, veleno, artiglio, carne) mantiene semplice la sua resa ordinaria e conia l'esemplare firmato accanto a essa; le altre cinque, zanna, panno, difesa, corno e branchie, firmano la resa stessa."
     },
     "economy": {
       "intro": "Le monete fanno girare tutto il mondo: comprano il tuo equipaggiamento, le provviste e l'attrezzatura da viaggio, e passano di mano tra i giocatori. Raccogli tutto questo semplicemente giocando, perciò considera questa pagina come una mappa di dove arriva e dove va il tuo denaro.",
@@ -6731,6 +7043,7 @@ export const it_IT: EnTranslations = {
       "lootCommonBody": "I bottini ordinari possono fare il giro del gruppo a turno o andare a chi saccheggia, mentre quelli migliori vengono messi a tiro così tutti hanno una possibilità equa.",
       "lootRollTitle": "Bisogno, Brama o Passa.",
       "lootRollBody": "Quando un oggetto va a tiro, ogni membro idoneo sceglie Bisogno se lo vuole, Brama se lo prenderebbe solo come scorta, o Passa per chiamarsi fuori. Il tiro più alto vince.",
+      "lootRollBodyNeedBeatsGreed": "When an item goes to a roll, each eligible member chooses Need if they want it, Greed if they would only take it spare, or Pass to bow out. Need beats Greed: if anyone rolls Need, the item goes to the highest Need roll and the Greed rolls do not count; otherwise the highest Greed roll wins.",
       "lootMasterTitle": "Saccheggiatore designato.",
       "lootMasterBody": "Il capo può invece occuparsi del bottino migliore, assegnando ogni pezzo al membro che dovrebbe riceverlo. Evita che l'equipaggiamento più ambito finisca a un tiro di dado casuale, come fa un gruppo organizzato quando affronta un dungeon.",
       "friendsHeading": "Amici, ignorati e bloccati",
@@ -6744,8 +7057,10 @@ export const it_IT: EnTranslations = {
       "slashHeading": "Comandi slash utili",
       "slashBody": "Vale la pena memorizzare qualche comando di tutti i giorni: /w Nome invia un sussurro e /r risponde all'ultimo che hai ricevuto, /invite chiede a qualcuno di unirsi al tuo gruppo, /follow ti fa seguire i passi di un amico, /roll tira i dadi sotto gli occhi del gruppo, /who mostra chi è online, e /afk ti segna come assente. Digita /help nel gioco per l'elenco completo.",
       "emotesBody": "Il tuo personaggio può anche esprimersi senza parole: digita un'emote come /wave, /dance, /cheer o /bow, seleziona prima un amico per indirizzargliela, oppure tieni premuto X per aprire la ruota delle emote e ottenere una rapida espressione sopra la testa.",
+      "emotesBodyNamedTarget": "Your character can also speak without words: type an emote like /wave, /dance, /cheer, or /bow, add a name to aim it at someone, as in /wave Aleph, or hold X, the emote wheel's default key, to open the emote wheel for a quick overhead expression. The Emotes button in the rail of window buttons, or under More on touch, opens the same wheel.",
       "calendarHeading": "Il calendario degli eventi",
       "calendarBody": "Premi I per aprire il calendario degli eventi. Segna i giorni del reame attorno a cui vale la pena organizzarsi, l'Appello all'Incursione settimanale, il Giorno di Mercato, lo Scontro d'Arena e la Gara di Pesca, più il Giorno d'Incursione mensile e la Comunione della Porta Lunare, ed è dove le gilde tengono il proprio calendario: il capogilda e gli ufficiali possono fissarvi eventi, e ogni membro li vede sulla stessa pagina. I giorni del reame sono un invito a riunirsi, non un bonus; nulla del tuo personaggio cambia perché un giorno è segnato.",
+      "calendarBodyDoubleHonor": "Press I to open the event calendar. It marks the realm days worth planning around, the weekly Raid Call, Market Day, Arena Clash, Double Honor Weekend, and Fishing Derby, plus the monthly Delve Day and Moongate Communion, and it is where guilds keep their schedule: the guild leader and officers can book events on it, and every member sees them on the same page. The realm days are a prompt to gather rather than a bonus, with one exception: all through the Double Honor Weekend, Thornhollow Fields Honor pays double and a played-out loss pays like a win. Nothing else about your character changes because a day is marked.",
       "readyHeading": "Verifiche di prontezza",
       "readyBody": "Prima di un grande ingaggio, il capogruppo può digitare /ready per interpellare la stanza: tutti gli altri ricevono una richiesta Pronto o Non pronto, e una volta che tutti hanno risposto, o scaduti 30 secondi, l'intero gruppo vede un unico riepilogo dei conteggi. Nessuno viene messo alla gogna; conta il totale, non il colpevole.",
       "markersHeading": "Simboli bersaglio",
@@ -6757,6 +7072,7 @@ export const it_IT: EnTranslations = {
       "realmsScopeBody": "Ciò che fai resta sul mondo che hai scelto: i tuoi personaggi, la tua lista amici, la tua gilda e il Mercato vivono tutti lì, e le classifiche di gilde e giocatori che apri in gioco classificano solo quel mondo, mentre la classifica sul sito web riunisce tutti i mondi insieme. Ogni mondo mantiene anche il proprio ripristino giornaliero dell'incursione, secondo il proprio orario locale.",
       "finderHeading": "Trovare un gruppo",
       "finderBody": "Non devi gridare nel canale Cerca Gruppo per completare una squadra. Apri il Cercatore di Dungeon, scegli la run che vuoi e i ruoli che sei disposto a coprire, e unisciti alla coda da solo o con il gruppo che hai già. Il cercatore aspetta di avere un set completo di ruoli, poi offre il gruppo a tutti contemporaneamente: una finestra chiede a ciascuno di voi di accettare, e il gruppo si forma nel momento in cui l'ultima persona dice sì. Rifiutare un'offerta, o lasciarla scadere, ti mette in un breve tempo di recupero prima che la coda te ne offra un'altra, così la fila continua a muoversi.",
+      "finderBodyLeaderQueues": "You do not have to shout in Looking for Group to fill a run. Open the Dungeon Finder, choose the run you want and the roles you are willing to fill, and join the queue on your own, or have your party leader queue the party you already have (only the leader can put a group in). The finder waits until it has a full set of roles, then offers the group to everyone at once: a popup asks each of you to accept, and the party forms the moment the last person says yes. Turning an offer down, or letting it run out, drops you, and any party you queued with, out of the queue and puts you on a short cooldown before you can join it again; everyone else in the offer keeps their place, unless they did the same or queued with someone who did, so the line keeps moving.",
       "finderBoardBody": "Il Cercatore di Dungeon tiene anche una bacheca di gruppi prefissati. Un capo gruppo pubblica un annuncio con etichette che dicono a cosa serve la run, da una prima visita a una pulizia completa diretta, e tu ti candidi perché il capo gruppo ti approvi. La coda automatica riempie i dungeon e l'incursione di fine gioco, ciascuna a Normale ed Eroico, mentre la bacheca può portare anche la corsa di sintonizzazione in solitaria, che la coda non riempie mai per te; le incursioni e le uscite nel mondo aperto sono tue da organizzare. In entrambi i casi il cercatore costruisce solo il gruppo: raggiungere la porta, impostare la difficoltà e concordare le regole del bottino restano compiti tuoi.",
       "finderMore": "Scopri cosa c'è dentro ogni dungeon",
       "blockBody": "Il blocco è lo strumento più severo, per un giocatore che non ti lascia in pace. Un blocco taglia i suoi inviti, i suoi sussurri e la sua posta oltre alla sua chat, vi rende invisibili a vicenda in /who, e lo rimuove dalla tua lista amici se ci si trovava. Blocca dal menu con il tasto destro sul suo nome oppure con /block, /unblock lo revoca di nuovo, e /blocklist mostra chi ne fa parte.",
@@ -7946,11 +8262,7 @@ export const it_IT: EnTranslations = {
       "detonateLightningRod": "Il Parafulmine colpisce!",
       "detonateStormcallersWrath": "L'Ira del Richiamatempeste erompe!",
       "detonateAbyssalMaw": "Fauci Abissali si chiudono!",
-      "detonateCrushingDepth": "Profondità Schiacciante schiaccia!",
-      "detonatePactSeal": "Il Sigillo del Patto detona!",
-      "detonateBloodRite": "Rito di Sangue cala!",
-      "detonatePitSentence": "La Sentenza della Fossa detona!",
-      "detonateHellfireBrand": "Marchio del Fuoco Infernale detona!"
+      "detonateCrushingDepth": "Profondità Schiacciante schiaccia!"
     },
     "delve": {
       "cannotEnterNow": "Non puoi entrare in un'incursione in questo momento.",
@@ -8293,24 +8605,24 @@ export const it_IT: EnTranslations = {
     "boss": {
       "varric": {
         "bell": {
-          "emote": "Il Diacono Varric afferra la campana sepolta con entrambe le mani!",
-          "log": "Il Diacono Varric inizia a far rintoccare la campana funebre.",
-          "warning": "Allontanati dal Diacono Varric!",
+          "emote": "Il Diacono Vandric afferra la campana sepolta con entrambe le mani!",
+          "log": "Il Diacono Vandric inizia a far rintoccare la campana funebre.",
+          "warning": "Allontanati dal Diacono Vandric!",
           "impact": "Il rintocco della campana spacca il pavimento della camera!",
           "lesson": "Rintocco della Campana: un colpo al suolo ogni dodici secondi. Allontanati prima che cada."
         },
         "raise": {
-          "emote": "Il Diacono Varric richiama i nomi dalle tombe spezzate!",
-          "log": "Il Diacono Varric inizia a evocare i morti.",
+          "emote": "Il Diacono Vandric richiama i nomi dalle tombe spezzate!",
+          "log": "Il Diacono Vandric inizia a evocare i morti.",
           "warning": "Ferma il rito sepolcrale!",
           "object": "La tomba incrinata freme di un respiro rubato.",
           "interrupt_ok": "Il rito sepolcrale vacilla.",
-          "interrupt_fail": "I morti rispondono al richiamo del Diacono Varric!",
+          "interrupt_fail": "I morti rispondono al richiamo del Diacono Vandric!",
           "lesson": "Interrompi la tomba incrinata entro cinque secondi o i morti si leveranno al suo richiamo."
         },
         "pull": "Calpesti la polvere consacrata con propositi immondi. Inginocchiati, e fatti contare.",
         "intro": "Nessun'anima è perduta. Solo smarrita.",
-        "mid60": "Il Diacono Varric legge i nomi dal registro con tremante trionfo.",
+        "mid60": "Il Diacono Vandric legge i nomi dal registro con tremante trionfo.",
         "mid30": "La campana funebre risponde a ogni nome che pronuncia.",
         "defeat": "No... avevo i nomi... li avevo tutti..."
       }
@@ -8938,6 +9250,7 @@ export const it_IT: EnTranslations = {
         "cooldownLockedHerb": "Aiuola d'erbe esaurita, strumento non disponibile",
         "station": "Stazione di artigianato: {name}",
         "service": "Servizio: {name}",
+        "farmPatch": "Garden beds",
         "partyMember": "Membro del gruppo: {name}",
         "deadPartyMember": "Membro del gruppo caduto: {name}",
         "partyMemberGeneric": "Membro del gruppo",
@@ -9372,6 +9685,8 @@ export const it_IT: EnTranslations = {
       "soldJunkMany": "Hai venduto {count} oggetti grigi per {money}.",
       "keptBoundOne": "Conservata {count} copia vincolata.",
       "keptBoundMany": "Conservate {count} copie vincolate.",
+      "keptLockedOne": "Kept {count} locked copy.",
+      "keptLockedMany": "Kept {count} locked copies.",
       "friendOnline": "{name} è entrato online.",
       "friendOffline": "{name} è uscito offline."
     },
@@ -9430,7 +9745,7 @@ export const it_IT: EnTranslations = {
       "felboltTitle": "Dardo di Cenere",
       "felboltDesc": "Ordina a Emberkin di lanciare un dardo di cenere aggiuntivo contro il tuo bersaglio. Tempo di recupero: 8 secondi. Clic destro, tocca e tieni premuto, o premi Maiusc+Invio per attivare/disattivare l'autolancio.",
       "abyssalChainTitle": "Catena Abissale",
-      "abyssalChainDesc": "Ordina a Gloomshade di trascinare a sé un nemico normale a più di 8 e fino a 20 metri di distanza. I boss non possono essere trascinati. Tempo di recupero: 15 secondi. Clic destro, tocca e tieni premuto, o premi Maiusc+Invio per attivare/disattivare l'autolancio.",
+      "abyssalChainDesc": "Ordina a Duskmurk di trascinare a sé un nemico normale a più di 8 e fino a 20 metri di distanza. I boss non possono essere trascinati. Tempo di recupero: 15 secondi. Clic destro, tocca e tieni premuto, o premi Maiusc+Invio per attivare/disattivare l'autolancio.",
       "petTauntTitle": "Provocazione mascotte",
       "petTauntDesc": "Ordina alla tua mascotte di ingaggiare e usare Ringhio quando è a portata. Recupero di 10 secondi.",
       "healDemonDesc": "Spendi mana per canalizzare cure nel tuo demone per 5 secondi.",
@@ -9625,11 +9940,13 @@ export const it_IT: EnTranslations = {
     },
     "cast": {
       "fishing": "Pesca",
+      "farming": "Planting",
       "gathering": "Raccolta",
       "crafting": "Creazione",
       "disenchanting": "Disincantamento",
       "enchanting_apply": "Incantamento",
       "salvaging": "Smantellamento",
+      "sundering": "Sundering",
       "tool_recharge": "Ricarica",
       "demonHeal": "Cura demoniaca",
       "thunzharrStormcall": "Richiamo della tempesta",
@@ -9769,9 +10086,12 @@ export const it_IT: EnTranslations = {
       "material": "Materiale",
       "food": "Cibo",
       "drink": "Bevanda",
+      "recipe": "Schema",
       "tool": "Strumento",
       "potion": "Pozione",
       "elixir": "Elisir",
+      "flask": "Flask",
+      "scroll": "Scroll",
       "bag": "Borsa",
       "mount": "Cavalcatura"
     },
@@ -9798,8 +10118,17 @@ export const it_IT: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "Usa: ripristina {amount} salute in {seconds} s. Devi restare seduto mentre mangi.",
       "useDrink": "Usa: ripristina {amount} mana in {seconds} s. Devi restare seduto mentre bevi.",
-      "useElixir": "Uso: aumenta {stat} di {value} per {minutes} min. Utilizzabile in combattimento.",
-      "useElixirAura": "Uso: concede {aura} per {minutes} min. Utilizzabile in combattimento.",
+      "useElixir": "Use: Increases your {stat} by {value} for {minutes} min. Replaces any other elixir or scroll of the same stat. Usable in combat.",
+      "useElixirAura": "Use: Grants {aura} for {minutes} min. Replaces any other elixir or scroll of its kind. Usable in combat.",
+      "flaskOnlyOne": "Only one flask effect at a time. Drinking another flask replaces this one.",
+      "flaskOutranks": "A weaker elixir or scroll of the same stat cannot replace it.",
+      "flaskUnremovable": "It cannot be dispelled, stolen, or canceled by hand.",
+      "flaskThroughDeath": "The effect remains through death, but ends when you log out; instanced matches begin and end on a clean slate.",
+      "wellFed": "Well Fed: Increases your {stat} by {value} for {minutes} min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.",
+      "wellFedAura": "Well Fed: Grants {aura} for {minutes} min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.",
+      "useFeast": "Use: Sets out a feast others can eat from, one serving each ({servings} servings, lasts {minutes} min).",
+      "useFeastBuff": "Each serving grants {aura}: +{value} {stat} for {minutes} min when you finish the {seconds} sec meal. Only one Well Fed effect at a time: a newer meal replaces it.",
+      "useFeastBuffAura": "Each serving grants {aura} for {minutes} min when you finish the {seconds} sec meal. Only one Well Fed effect at a time: a newer meal replaces it.",
       "questItem": "Oggetto missione",
       "questRelated": "Missione: {quest}",
       "questRules": "Non può essere venduto, depositato in banca o scambiato.",
@@ -9822,6 +10151,8 @@ export const it_IT: EnTranslations = {
       "useManaPotion": "Uso: ripristina istantaneamente {amount} mana. Usabile in combattimento. Recupero 1 min.",
       "clickUseInstant": "Clicca per usare subito in combattimento",
       "clickUse": "Clicca per usare",
+      "clickSetOut": "Click to set out",
+      "clickSetUp": "Click to set up",
       "clickBuyback": "Clicca per ricomprare",
       "bagSlots": "Borsa da {slots} spazi",
       "bagSlotsMaterials": "Borsa per materiali da {slots} spazi"
@@ -9907,6 +10238,7 @@ export const it_IT: EnTranslations = {
       "filterTypeConsumable": "Consumabili",
       "filterTypeMaterial": "Materiali",
       "filterTypeCosmetic": "Cosmetici",
+      "filterTypePattern": "Patterns",
       "filterTypeOther": "Altro",
       "filterArmorType": "Tipo armatura",
       "filterArmorAll": "Tutte le armature",
@@ -10206,7 +10538,7 @@ export const it_IT: EnTranslations = {
       },
       "cold_snap": {
         "name": "Richiamo dell'inverno",
-        "description": "Termina il tempo di recupero di Passo fulmineo, Velo di Gelo e Invisibilità superiore. (Talento del mago)"
+        "description": "Finishes the cooldown on Flitstep, Frostveil, and Greater Invisibility. (Mage talent)"
       },
       "greater_invisibility": {
         "name": "Invisibilità superiore",
@@ -10257,15 +10589,15 @@ export const it_IT: EnTranslations = {
         "description": "Scatena tre dardi ghiacciati per {damage} danni da gelo ciascuno e pianta Gelo invernale sul bersaglio: i suoi prossimi 2 incantesimi compatibili in arrivo lo considerano congelato. Brain Freeze rende Winterlash istantaneo e salta il suo tempo di recupero. (Gelo)"
       },
       "frozen_orb": {
-        "name": "Sfera Congelata",
+        "name": "Frostglobe",
         "description": "Rilascia una sfera di gelo vorticoso che si sposta in avanti per 8 sec, infliggendo a {damage} danni da gelo ogni secondo ai nemici vicini e rallentandoli del 30%. Ogni impulso che colpisce genera un ghiacciolo. (Gelo)"
       },
       "blizzard": {
         "name": "Bufera di Neve",
-        "description": "Scatena una tempesta di ghiaccio sull'area bersaglio per 6 secondi, infliggendo {damage} danni da Gelo al secondo e rallentando i nemici del 40%. Ogni nemico colpito riduce di 0,5 secondi il recupero di Frozen Orb, fino a 3 secondi per lancio. (Gelo)"
+        "description": "Scatena una tempesta di ghiaccio sull'area bersaglio per 6 secondi, infliggendo {damage} danni da Gelo al secondo e rallentando i nemici del 40%. Ogni nemico colpito riduce di 0,5 secondi il recupero di Frostglobe, fino a 3 secondi per lancio. (Gelo)"
       },
       "glacial_spike": {
-        "name": "Spuntone Glaciale",
+        "name": "Rimeneedle",
         "description": "Evoca un'enorme stalattite di ghiaccio, consumando 5 Stalattiti per infliggere {damage} danni da Gelo e congelare il bersaglio sul posto per 4 secondi. (Gelo)"
       },
       "glacial_front": {
@@ -10415,7 +10747,7 @@ export const it_IT: EnTranslations = {
         "description": "Mossa finale che ferisce il bersaglio: sanguina ogni 2 sec, per 6 sec più 2 sec per punto combo (5 punti combo: 16 sec e {damage} danni totali)."
       },
       "vanish": {
-        "name": "Passo di Fumo",
+        "name": "Smokefade",
         "description": "Scompari dalla vista, entrando in Duskveil anche in combattimento. Ti muovi il 50% più lentamente mentre sei nascosto. Dura fino a 10 sec."
       },
       "instant_poison": {
@@ -11021,7 +11353,7 @@ export const it_IT: EnTranslations = {
         "description": "Entri in una furia ribollente, generando 20 punti rabbia. (talento del guerriero)"
       },
       "crusader_strike": {
-        "name": "Assalto del Crociato",
+        "name": "Oathstrike",
         "description": "Colpisce il bersaglio infliggendo danni dell’arma più {damage} danni sacri. (talento da paladino)"
       },
       "chain_heal": {
@@ -11125,7 +11457,7 @@ export const it_IT: EnTranslations = {
         "description": "Diventate un lich per 20 sec, creando 3 Frammenti d'Anima e aumentando del 20% i vostri danni magici e la vostra velocità di lancio. I vostri non morti infliggono il 50% di danni in più e agiscono il 20% più in fretta, e Soul Lance trapassa il proprio bersaglio colpendo fino a 2 nemici vicini per il 50% del suo danno. (Distintivo di Negromanzia)"
       },
       "holy_shock": {
-        "name": "Shock Sacro",
+        "name": "Lightjolt",
         "description": "Colpisce un bersaglio alleato con energia Sacra, curandolo di {damage}. (firma Sacro)"
       },
       "holy_shield": {
@@ -11153,7 +11485,7 @@ export const it_IT: EnTranslations = {
         "description": "Aumenta la probabilità di critico magico del 50% per 15 s. (firma Fuoco)"
       },
       "icy_veins": {
-        "name": "Vene Gelide",
+        "name": "Coldsurge",
         "description": "Aumenta la celerità magica del 30% e impedisce l’interruzione e il contraccolpo dei lanci per 10 s. (firma Gelo)"
       },
       "cold_blood": {
@@ -11229,8 +11561,8 @@ export const it_IT: EnTranslations = {
         "description": "Evoca un Emberkin agli ordini dello stregone. L'Emberkin lancia Dardo di Cenere sui vostri nemici dalla distanza. Evocare un nuovo demone congeda quello attuale. Potete avere un solo demone alla volta."
       },
       "summon_voidwalker": {
-        "name": "Evoca Gloomshade",
-        "description": "Evoca un Gloomshade agli ordini dello stregone. Questo solido demone provoca i nemici e usa Catena Abissale per trascinare a portata i nemici normali lontani. I boss non possono essere trascinati. Evocare un nuovo demone congeda quello attuale. Potete avere un solo demone alla volta."
+        "name": "Evoca Duskmurk",
+        "description": "Evoca un Duskmurk agli ordini dello stregone. Questo solido demone provoca i nemici e usa Catena Abissale per trascinare a portata i nemici normali lontani. I boss non possono essere trascinati. Evocare un nuovo demone congeda quello attuale. Potete avere un solo demone alla volta."
       },
       "summon_succubus": {
         "name": "Evoca Duskborn",
@@ -11329,7 +11661,7 @@ export const it_IT: EnTranslations = {
         "description": "I tuoi attacchi automatici hanno una probabilità di permetterti di lanciare Tomba Prematura su un bersaglio a qualsiasi livello di salute, senza costo di rabbia. (Armi)"
       },
       "storm_bolt": {
-        "name": "Dardo della Tempesta",
+        "name": "Thunderhurl",
         "description": "Scagli la tua arma contro il bersaglio, infliggendo {damage} danni e stordendolo per 3 sec."
       },
       "piercing_howl": {
@@ -11353,7 +11685,7 @@ export const it_IT: EnTranslations = {
         "description": "Intridi la tua arma del sangue dei tuoi nemici: tu e i tuoi alleati in mischia ottenete il 10% di velocità d'attacco e il 10% di danni per 20 sec."
       },
       "victory_rush": {
-        "name": "Impeto della Vittoria",
+        "name": "Victor's Surge",
         "description": "Colpisci per danni dell'arma più {damage} e recuperi il 20% della tua salute massima. Utilizzabile solo entro 20 sec dall'uccisione di un nemico."
       },
       "intimidating_shout": {
@@ -11393,7 +11725,7 @@ export const it_IT: EnTranslations = {
         "description": "Diventi una tempesta d’acciaio vorticante che colpisce tutti i nemici entro 6 m, infliggendo {damage} danni ogni secondo per 4 s."
       },
       "blink": {
-        "name": "Passo Baleno",
+        "name": "Flitstep",
         "description": "Ti teletrasporta di 15 m in avanti e spezza gli effetti di immobilizzazione. (talento del Mago)"
       },
       "bloodlust": {
@@ -11425,7 +11757,7 @@ export const it_IT: EnTranslations = {
         "description": "Golpea a vicini nemici con escarcha e inflige {damage} de daño de Gelo. (talento da mago)"
       },
       "counterspell": {
-        "name": "Spezzaincantesimi",
+        "name": "Spellsever",
         "description": "Interrompe il lancio dell'incantesimo del bersaglio e impedisce di lanciare incantesimi di quella scuola per 6 s."
       },
       "curse_of_exhaustion": {
@@ -11609,7 +11941,7 @@ export const it_IT: EnTranslations = {
         "description": "Aumenta la velocità di movimento del 35%, ma sacrifica il 2% della tua salute massima ogni secondo. Rilancia per annullare. Si disattiva al 20% di salute."
       },
       "spellsteal": {
-        "name": "Rubamagie",
+        "name": "Spellplunder",
         "description": "Ruba un effetto magico benefico da un nemico e lo trasferisce su di te."
       },
       "startle_shot": {
@@ -11895,7 +12227,7 @@ export const it_IT: EnTranslations = {
         "name": "Ritaglio di lino"
       },
       "arcane_dust": {
-        "name": "Polvere Arcana"
+        "name": "Chime Dust"
       },
       "arcane_essence": {
         "name": "Essenza Arcana"
@@ -12057,7 +12389,7 @@ export const it_IT: EnTranslations = {
         "name": "Scheggia del cuore di Kazzix"
       },
       "wyrmcult_orders": {
-        "name": "Ordini del Culto del Wyrm"
+        "name": "Broodsworn Orders"
       },
       "ritual_phylactery": {
         "name": "Filatterio rituale"
@@ -12120,7 +12452,7 @@ export const it_IT: EnTranslations = {
         "name": "Usbergo di scaglie di Gravewyrm"
       },
       "wyrmcult_grand_robe": {
-        "name": "Grande veste del Culto del Wyrm"
+        "name": "Broodsworn Grand Robe"
       },
       "wyrmscale_jerkin": {
         "name": "Giaco di scaglie di wyrm"
@@ -12303,7 +12635,7 @@ export const it_IT: EnTranslations = {
         "name": "Piccone di Ferro"
       },
       "mithril_mining_pick": {
-        "name": "Piccone da Miniera di Mithril"
+        "name": "Skysilver Mining Pick"
       },
       "handaxe": {
         "name": "Accetta"
@@ -12321,13 +12653,13 @@ export const it_IT: EnTranslations = {
         "name": "Falcetto di Bronzo"
       },
       "silverleaf_sickle": {
-        "name": "Falcetto di Fogliaargento"
+        "name": "Sheenleaf Sickle"
       },
       "thorium_mining_pick": {
         "name": "Piccone da Miniera di Thorium"
       },
       "arcanite_mining_pick": {
-        "name": "Piccone da Miniera di Arcanite"
+        "name": "Glyphsteel Mining Pick"
       },
       "ashwood_axe": {
         "name": "Ascia di Frassino"
@@ -12345,7 +12677,7 @@ export const it_IT: EnTranslations = {
         "name": "Minerale di Thorium"
       },
       "arcanite_bar": {
-        "name": "Barra di Arcanite"
+        "name": "Glyphsteel Bar"
       },
       "ashwood_log": {
         "name": "Tronco di Frassino Cinereo"
@@ -12510,7 +12842,7 @@ export const it_IT: EnTranslations = {
         "name": "Tronco di corteccia di ferro"
       },
       "silverleaf_herb": {
-        "name": "Erba Fogliaargento"
+        "name": "Sheenleaf Herb"
       },
       "rough_hide": {
         "name": "Pelle ruvida"
@@ -12576,7 +12908,7 @@ export const it_IT: EnTranslations = {
         "name": "Lama da Guerra di Thorium"
       },
       "arcanite_war_axe": {
-        "name": "Ascia da Guerra di Arcanite"
+        "name": "Glyphsteel War Axe"
       },
       "elderwood_battle_staff": {
         "name": "Bastone da Battaglia di Elderwood"
@@ -12690,10 +13022,10 @@ export const it_IT: EnTranslations = {
         "name": "Il Gran Arrosto di Marlow"
       },
       "silverleaf_healing_draught": {
-        "name": "Pozione curativa di Fogliaargento"
+        "name": "Sheenleaf Healing Draught"
       },
       "silverleaf_mana_draught": {
-        "name": "Pozione di mana di Fogliaargento"
+        "name": "Sheenleaf Mana Draught"
       },
       "elixir_of_the_boar": {
         "name": "Elisir del Cinghiale"
@@ -12789,7 +13121,7 @@ export const it_IT: EnTranslations = {
         "name": "Mantello del Canto dei Frammenti"
       },
       "wyrmcult_spellgrips": {
-        "name": "Guanti da Incantesimo del Culto del Wyrm"
+        "name": "Broodsworn Spellgrips"
       },
       "thornpeak_wildwraps": {
         "name": "Avvolgimani Selvatici di Spinovetta"
@@ -12798,7 +13130,7 @@ export const it_IT: EnTranslations = {
         "name": "Usbergo Votivo della Tempesta"
       },
       "cryptbloom_shoulderguards": {
-        "name": "Guardaspalle di Criptafiore"
+        "name": "Tombpetal Shoulderguards"
       },
       "gravewyrm_thornmaul": {
         "name": "Maglio Spinoso del Wyrm della Tomba"
@@ -12873,7 +13205,7 @@ export const it_IT: EnTranslations = {
         "name": "Tronco di Elderwood Pregiato"
       },
       "fine_silverleaf_herb": {
-        "name": "Erba Fogliaargento Pregiata"
+        "name": "Fine Sheenleaf Herb"
       },
       "fine_goldleaf_herb": {
         "name": "Erba Fogliadoro Pregiata"
@@ -13053,7 +13385,7 @@ export const it_IT: EnTranslations = {
         "name": "Stivali Foderati per il Focolare"
       },
       "frostmane_mantle": {
-        "name": "Mantello della Criniera di Gelo"
+        "name": "Mantle of the Rimemane"
       },
       "ashbone_war_brand": {
         "name": "Tizzone di Guerra Ossocenere"
@@ -13212,7 +13544,7 @@ export const it_IT: EnTranslations = {
         "name": "Occhio dell’Artigiano"
       },
       "reins_terrorspark_groundshaker": {
-        "name": "Chiave d’accensione: Terrorscintilla, Scuoteterra"
+        "name": "Ignition Key: Dreadspark Groundshaker"
       },
       "reins_lanternback_troll": {
         "name": "Giogo del lampionaio: Grumbol"
@@ -13291,6 +13623,483 @@ export const it_IT: EnTranslations = {
       },
       "loombound_reagent_satchel": {
         "name": "Borsa per reagenti Loombound"
+      },
+      "hammered_copper_band": {
+        "name": "Hammered Copper Band"
+      },
+      "polished_copper_loop": {
+        "name": "Polished Copper Loop"
+      },
+      "coiled_copper_torc": {
+        "name": "Coiled Copper Torc"
+      },
+      "riveted_iron_signet": {
+        "name": "Riveted Iron Signet"
+      },
+      "etched_iron_loop": {
+        "name": "Etched Iron Loop"
+      },
+      "iron_link_choker": {
+        "name": "Iron Link Choker"
+      },
+      "weighted_thorium_band": {
+        "name": "Weighted Osmium Band"
+      },
+      "gleaming_thorium_loop": {
+        "name": "Gleaming Osmium Loop"
+      },
+      "burnished_thorium_amulet": {
+        "name": "Burnished Osmium Amulet"
+      },
+      "silverleaf_primer": {
+        "name": "Sheenleaf Primer"
+      },
+      "goldleaf_folio": {
+        "name": "Goldleaf Folio"
+      },
+      "sunpetal_grimoire": {
+        "name": "Sunpetal Grimoire"
+      },
+      "silverleaf_scroll": {
+        "name": "Sheenleaf Scroll"
+      },
+      "goldleaf_scroll": {
+        "name": "Goldleaf Scroll"
+      },
+      "sunpetal_scroll": {
+        "name": "Sunpetal Scroll"
+      },
+      "duskforged_billet": {
+        "name": "Duskforged Billet"
+      },
+      "forgefold_plating": {
+        "name": "Forgefold Plating"
+      },
+      "wyrmhide_cording": {
+        "name": "Wyrmhide Cording"
+      },
+      "sunspun_bolt": {
+        "name": "Sunspun Bolt"
+      },
+      "prismglass_setting": {
+        "name": "Prismglass Setting"
+      },
+      "precision_chassis": {
+        "name": "Precision Chassis"
+      },
+      "quickening_catalyst": {
+        "name": "Quickening Catalyst"
+      },
+      "seasoned_stock": {
+        "name": "Seasoned Stock"
+      },
+      "lucent_reagent": {
+        "name": "Lucent Reagent"
+      },
+      "sablewax_vellum": {
+        "name": "Sablewax Vellum"
+      },
+      "spiritweld_girdle": {
+        "name": "Spiritweld Girdle"
+      },
+      "forgefold_legguards": {
+        "name": "Forgefold Legguards"
+      },
+      "wardspeaker_sabatons": {
+        "name": "Wardspeaker Sabatons"
+      },
+      "briarstep_jerkin": {
+        "name": "Briarstep Jerkin"
+      },
+      "fenbloom_breeches": {
+        "name": "Fenbloom Breeches"
+      },
+      "barksong_handguards": {
+        "name": "Barksong Handguards"
+      },
+      "sunspun_vestments": {
+        "name": "Sunspun Vestments"
+      },
+      "sunspun_leggings": {
+        "name": "Sunspun Leggings"
+      },
+      "sunspun_handwraps": {
+        "name": "Sunspun Handwraps"
+      },
+      "sunspun_haversack": {
+        "name": "Sunspun Haversack"
+      },
+      "duskforged_warblade": {
+        "name": "Duskforged Warblade"
+      },
+      "ridgebreaker": {
+        "name": "Ridgebreaker"
+      },
+      "duskforged_bulwark": {
+        "name": "Duskforged Bulwark"
+      },
+      "wyrmfall_pendant": {
+        "name": "Wyrmfall Pendant"
+      },
+      "warhewn_signet": {
+        "name": "Warhewn Signet"
+      },
+      "prismglass_loop": {
+        "name": "Prismglass Loop"
+      },
+      "gyrelens_array": {
+        "name": "Gyrelens Array"
+      },
+      "voidbound_grimoire": {
+        "name": "Voidbound Grimoire"
+      },
+      "masters_field_forge": {
+        "name": "Master's Field Forge"
+      },
+      "makers_charm": {
+        "name": "Maker's Charm"
+      },
+      "ironhusk_flask": {
+        "name": "Ironhusk Flask"
+      },
+      "warboar_flask": {
+        "name": "Warboar Flask"
+      },
+      "runewater_flask": {
+        "name": "Runewater Flask"
+      },
+      "stonepot_stew": {
+        "name": "Stonepot Stew"
+      },
+      "warspice_skewers": {
+        "name": "Warspice Skewers"
+      },
+      "sageleaf_chowder": {
+        "name": "Sageleaf Chowder"
+      },
+      "grand_cauldron": {
+        "name": "Grand Cauldron"
+      },
+      "laden_hearth": {
+        "name": "The Laden Hearth"
+      },
+      "pattern_spiritweld_girdle": {
+        "name": "Plans: Spiritweld Girdle"
+      },
+      "pattern_forgefold_legguards": {
+        "name": "Plans: Forgefold Legguards"
+      },
+      "pattern_wardspeaker_sabatons": {
+        "name": "Plans: Wardspeaker Sabatons"
+      },
+      "pattern_briarstep_jerkin": {
+        "name": "Pattern: Briarstep Jerkin"
+      },
+      "pattern_fenbloom_breeches": {
+        "name": "Pattern: Fenbloom Breeches"
+      },
+      "pattern_barksong_handguards": {
+        "name": "Pattern: Barksong Handguards"
+      },
+      "pattern_sunspun_vestments": {
+        "name": "Pattern: Sunspun Vestments"
+      },
+      "pattern_sunspun_leggings": {
+        "name": "Pattern: Sunspun Leggings"
+      },
+      "pattern_sunspun_handwraps": {
+        "name": "Pattern: Sunspun Handwraps"
+      },
+      "pattern_sunspun_haversack": {
+        "name": "Pattern: Sunspun Haversack"
+      },
+      "pattern_duskforged_warblade": {
+        "name": "Plans: Duskforged Warblade"
+      },
+      "pattern_ridgebreaker": {
+        "name": "Plans: Ridgebreaker"
+      },
+      "pattern_duskforged_bulwark": {
+        "name": "Plans: Duskforged Bulwark"
+      },
+      "pattern_wyrmfall_pendant": {
+        "name": "Design: Wyrmfall Pendant"
+      },
+      "pattern_warhewn_signet": {
+        "name": "Design: Warhewn Signet"
+      },
+      "pattern_prismglass_loop": {
+        "name": "Design: Prismglass Loop"
+      },
+      "pattern_gyrelens_array": {
+        "name": "Schematic: Gyrelens Array"
+      },
+      "pattern_masters_field_forge": {
+        "name": "Schematic: Master's Field Forge"
+      },
+      "pattern_makers_charm": {
+        "name": "Schematic: Maker's Charm"
+      },
+      "pattern_voidbound_grimoire": {
+        "name": "Technique: Voidbound Grimoire"
+      },
+      "pattern_ironhusk_flask": {
+        "name": "Recipe: Ironhusk Flask"
+      },
+      "pattern_warboar_flask": {
+        "name": "Recipe: Warboar Flask"
+      },
+      "pattern_runewater_flask": {
+        "name": "Recipe: Runewater Flask"
+      },
+      "pattern_stonepot_stew": {
+        "name": "Recipe: Stonepot Stew"
+      },
+      "pattern_warspice_skewers": {
+        "name": "Recipe: Warspice Skewers"
+      },
+      "pattern_sageleaf_chowder": {
+        "name": "Recipe: Sageleaf Chowder"
+      },
+      "pattern_grand_cauldron": {
+        "name": "Recipe: Grand Cauldron"
+      },
+      "pattern_laden_hearth": {
+        "name": "Recipe: The Laden Hearth"
+      },
+      "vale_wheat_seed": {
+        "name": "Vale Wheat Seed"
+      },
+      "vale_wheat": {
+        "name": "Vale Wheat"
+      },
+      "fine_vale_wheat": {
+        "name": "Fine Vale Wheat"
+      },
+      "withered_husks": {
+        "name": "Withered Husks"
+      },
+      "compost": {
+        "name": "Compost"
+      },
+      "growth_tonic": {
+        "name": "Growth Tonic"
+      },
+      "brook_carrot_seed": {
+        "name": "Brook Carrot Seed"
+      },
+      "brook_carrot": {
+        "name": "Brook Carrot"
+      },
+      "fine_brook_carrot": {
+        "name": "Fine Brook Carrot"
+      },
+      "marsh_rice_seed": {
+        "name": "Marsh Rice Seed"
+      },
+      "marsh_rice": {
+        "name": "Marsh Rice"
+      },
+      "fine_marsh_rice": {
+        "name": "Fine Marsh Rice"
+      },
+      "bog_beet_seed": {
+        "name": "Bog Beet Seed"
+      },
+      "bog_beet": {
+        "name": "Bog Beet"
+      },
+      "fine_bog_beet": {
+        "name": "Fine Bog Beet"
+      },
+      "highland_barley_seed": {
+        "name": "Highland Barley Seed"
+      },
+      "highland_barley": {
+        "name": "Highland Barley"
+      },
+      "fine_highland_barley": {
+        "name": "Fine Highland Barley"
+      },
+      "frost_gourd_seed": {
+        "name": "Frost Gourd Seed"
+      },
+      "frost_gourd": {
+        "name": "Frost Gourd"
+      },
+      "fine_frost_gourd": {
+        "name": "Fine Frost Gourd"
+      },
+      "thornpeak_cabbage_seed": {
+        "name": "Thornpeak Cabbage Seed"
+      },
+      "thornpeak_cabbage": {
+        "name": "Thornpeak Cabbage"
+      },
+      "fine_thornpeak_cabbage": {
+        "name": "Fine Thornpeak Cabbage"
+      },
+      "frost_lentils_seed": {
+        "name": "Frost Lentils Seed"
+      },
+      "frost_lentils": {
+        "name": "Frost Lentils"
+      },
+      "fine_frost_lentils": {
+        "name": "Fine Frost Lentils"
+      },
+      "gilded_sunmelon_seed": {
+        "name": "Gilded Sunmelon Seed"
+      },
+      "gilded_sunmelon": {
+        "name": "Gilded Sunmelon"
+      },
+      "fine_gilded_sunmelon": {
+        "name": "Fine Gilded Sunmelon"
+      },
+      "evergarden_greens_seed": {
+        "name": "Evergarden Greens Seed"
+      },
+      "evergarden_greens": {
+        "name": "Evergarden Greens"
+      },
+      "fine_evergarden_greens": {
+        "name": "Fine Evergarden Greens"
+      },
+      "gilded_yam_seed": {
+        "name": "Gilded Yam Seed"
+      },
+      "gilded_yam": {
+        "name": "Gilded Yam"
+      },
+      "fine_gilded_yam": {
+        "name": "Fine Gilded Yam"
+      },
+      "evergarden_pumpkin_seed": {
+        "name": "Evergarden Pumpkin Seed"
+      },
+      "evergarden_pumpkin": {
+        "name": "Evergarden Pumpkin"
+      },
+      "fine_evergarden_pumpkin": {
+        "name": "Fine Evergarden Pumpkin"
+      },
+      "garden_hoe": {
+        "name": "Garden Hoe"
+      },
+      "bronze_hoe": {
+        "name": "Bronze Hoe"
+      },
+      "skysilver_hoe": {
+        "name": "Skysilver Hoe"
+      },
+      "osmium_hoe": {
+        "name": "Osmium Hoe"
+      },
+      "vale_hearth_loaf": {
+        "name": "Vale Hearth Loaf"
+      },
+      "eastbrook_root_pottage": {
+        "name": "Eastbrook Root Pottage"
+      },
+      "fenbridge_rice_bowl": {
+        "name": "Fenbridge Rice Bowl"
+      },
+      "fenbridge_beet_braise": {
+        "name": "Fenbridge Beet Braise"
+      },
+      "highwatch_barley_bannock": {
+        "name": "Highwatch Barley Bannock"
+      },
+      "highwatch_gourd_soup": {
+        "name": "Highwatch Gourd Soup"
+      },
+      "evergarden_sunmelon_tart": {
+        "name": "Evergarden Sunmelon Tart"
+      },
+      "evergarden_harvest_platter": {
+        "name": "Evergarden Harvest Platter"
+      },
+      "eastbrook_glazed_carrots": {
+        "name": "Eastbrook Glazed Carrots"
+      },
+      "fenbridge_rice_pudding": {
+        "name": "Fenbridge Rice Pudding"
+      },
+      "highwatch_barley_porridge": {
+        "name": "Highwatch Barley Porridge"
+      },
+      "evergarden_braised_greens": {
+        "name": "Evergarden Braised Greens"
+      },
+      "harvest_feast": {
+        "name": "Harvest Feast"
+      },
+      "pattern_highwatch_gourd_soup": {
+        "name": "Recipe: Highwatch Gourd Soup"
+      },
+      "pattern_highwatch_barley_porridge": {
+        "name": "Recipe: Highwatch Barley Porridge"
+      },
+      "pattern_evergarden_sunmelon_tart": {
+        "name": "Recipe: Evergarden Sunmelon Tart"
+      },
+      "pattern_evergarden_harvest_platter": {
+        "name": "Recipe: Evergarden Harvest Platter"
+      },
+      "pattern_evergarden_braised_greens": {
+        "name": "Recipe: Evergarden Braised Greens"
+      },
+      "pattern_harvest_feast": {
+        "name": "Recipe: Harvest Feast"
+      },
+      "raw_deepbarb_catfish": {
+        "name": "Raw Deepbarb Catfish"
+      },
+      "raw_hollowgill_sturgeon": {
+        "name": "Raw Hollowgill Sturgeon"
+      },
+      "raw_stillmere_salmon": {
+        "name": "Raw Stillmere Salmon"
+      },
+      "clockreel_fishing_rod": {
+        "name": "Clockreel Fishing Rod"
+      },
+      "peppered_deepbarb_catfish": {
+        "name": "Peppered Deepbarb Catfish"
+      },
+      "roast_hollowgill_sturgeon": {
+        "name": "Roast Hollowgill Sturgeon"
+      },
+      "pattern_peppered_deepbarb_catfish": {
+        "name": "Recipe: Peppered Deepbarb Catfish"
+      },
+      "pattern_roast_hollowgill_sturgeon": {
+        "name": "Recipe: Roast Hollowgill Sturgeon"
+      },
+      "pattern_clockreel_fishing_rod": {
+        "name": "Schematic: Clockreel Fishing Rod"
+      },
+      "evergarden_hoe": {
+        "name": "Evergarden Hoe"
+      },
+      "stonepot_feast": {
+        "name": "Stonepot Feast"
+      },
+      "warspice_feast": {
+        "name": "Warspice Feast"
+      },
+      "sageleaf_feast": {
+        "name": "Sageleaf Feast"
+      },
+      "pattern_stonepot_feast": {
+        "name": "Recipe: Stonepot Feast"
+      },
+      "pattern_warspice_feast": {
+        "name": "Recipe: Warspice Feast"
+      },
+      "pattern_sageleaf_feast": {
+        "name": "Recipe: Sageleaf Feast"
       },
       "ps_briny_lure": {
         "name": "Esca salmastra"
@@ -13910,6 +14719,15 @@ export const it_IT: EnTranslations = {
       "wand_of_quenched_sparks": {
         "name": "Bacchetta delle Scintille Estinte"
       },
+      "cogwheel_blank": {
+        "name": "Cogwheel Blank"
+      },
+      "copperlens_ocular": {
+        "name": "Copperlens Ocular"
+      },
+      "deed_of_making": {
+        "name": "Deed of Making"
+      },
       "conjured_water4": {
         "name": "Acqua sorgiva evocata"
       },
@@ -14055,7 +14873,7 @@ export const it_IT: EnTranslations = {
         "name": "Mazza santificata di Voss"
       },
       "wyrmcult_soulsteps": {
-        "name": "Passi d'anima del Culto del Wyrm"
+        "name": "Broodsworn Soulsteps"
       },
       "wyrmshadow_harness": {
         "name": "Finimenti Nightfang"
@@ -14286,7 +15104,7 @@ export const it_IT: EnTranslations = {
         "name": "Elmo del reliquiario del diacono"
       },
       "varric_shadow_cowl": {
-        "name": "Cappuccio d'ombra di Varric"
+        "name": "Cappuccio d'ombra di Vandric"
       },
       "siltguard_helm": {
         "name": "Elmo della guardia del limo"
@@ -14393,6 +15211,15 @@ export const it_IT: EnTranslations = {
       "heroic_mark": {
         "name": "Marchio Eroico"
       },
+      "wyrmfall_core": {
+        "name": "Wyrmfall Core"
+      },
+      "sundered_essence": {
+        "name": "Sundered Essence"
+      },
+      "makers_ember": {
+        "name": "Maker's Ember"
+      },
       "eastbrook_buckler": {
         "name": "Brocchiero di Eastbrook"
       },
@@ -14463,7 +15290,7 @@ export const it_IT: EnTranslations = {
         "name": "Cordone del gelo osseo"
       },
       "mistforged_pauldrons": {
-        "name": "Spallacci forgiati nella nebbia"
+        "name": "Fogforged Pauldrons"
       },
       "tideguard_faceguard": {
         "name": "Visiera della guardia della marea"
@@ -14792,10 +15619,10 @@ export const it_IT: EnTranslations = {
         "name": "Signore dei frammenti Kazzix"
       },
       "wyrmcult_zealot": {
-        "name": "Zelota del Culto del Wyrm"
+        "name": "Broodsworn Zealot"
       },
       "wyrmcult_necromancer": {
-        "name": "Negromante del Culto del Wyrm"
+        "name": "Broodsworn Necromancer"
       },
       "boneclad_revenant": {
         "name": "Revenant corazzato di ossa"
@@ -14924,7 +15751,7 @@ export const it_IT: EnTranslations = {
         "name": "Effigie Senza Santo"
       },
       "deacon_varric": {
-        "name": "Diacono Varric"
+        "name": "Diacono Vandric"
       },
       "acolyte_tessa": {
         "name": "Accolita Tessa"
@@ -15113,7 +15940,7 @@ export const it_IT: EnTranslations = {
         "name": "Folletto di Palude"
       },
       "frostmane_yeti": {
-        "name": "Yeti dalla Criniera di Gelo"
+        "name": "Rimemane Yeti"
       },
       "terrace_howler": {
         "name": "Ululatore delle Terrazze"
@@ -15161,7 +15988,7 @@ export const it_IT: EnTranslations = {
         "name": "L'Oscurità dello Stagno"
       },
       "harvest_sprite": {
-        "name": "Folletto del Raccolto"
+        "name": "Gleaning Sprite"
       },
       "mere_lurker": {
         "name": "Agguatatore dello Stagno"
@@ -15185,7 +16012,7 @@ export const it_IT: EnTranslations = {
         "name": "Vagabondo del Crepuscolo"
       },
       "nightkin_stargazer": {
-        "name": "Astrologo Nightkin"
+        "name": "Astrologo Gloamkin"
       },
       "barrow_king": {
         "name": "Il Re del Tumulo"
@@ -15344,7 +16171,7 @@ export const it_IT: EnTranslations = {
         "name": "Emberkin"
       },
       "gloomshade": {
-        "name": "Gloomshade"
+        "name": "Duskmurk"
       },
       "grix_the_tunnelking": {
         "name": "Grix il Re dei Cunicoli"
@@ -15625,7 +16452,7 @@ export const it_IT: EnTranslations = {
       },
       "provisioner_fenna": {
         "name": "Fornitrice Fenna",
-        "title": "Fornitrice di Eldergleam",
+        "title": "Fornitrice di Eldershine",
         "greeting": "Pane ancora caldo, acqua ancora dolce. La Valletta provvede, e anch'io."
       },
       "wardsmith_orun": {
@@ -15750,12 +16577,12 @@ export const it_IT: EnTranslations = {
       },
       "sexton_marrow": {
         "name": "Sagrestano Marrow",
-        "title": "Sagrestano di Gallowmere",
+        "title": "Sagrestano di Gibbetmere",
         "greeting": "Qui li seppelliamo in profondità, e suoniamo le campane perché ricordino di restare giù."
       },
       "widow_tansy": {
         "name": "Vedova Tansy",
-        "title": "Fabbricante di Candele di Gallowmere",
+        "title": "Fabbricante di Candele di Gibbetmere",
         "greeting": "Una candela per ogni tomba, e nemmeno una deve spegnersi. Nemmeno una, mi senti?"
       },
       "vicar_creel": {
@@ -15779,7 +16606,7 @@ export const it_IT: EnTranslations = {
         "greeting": "Il mare dona, la sabbia custodisce, e la giungla prende. Resta sulla spiaggia, straniero."
       },
       "hermit_okku": {
-        "name": "Okku",
+        "name": "Okrim",
         "title": "Uomo che Entrò",
         "greeting": "Silenzio ora. I tamburi contano tutto ciò che cammina sotto gli alberi, e ti hanno già contato."
       },
@@ -15883,6 +16710,26 @@ export const it_IT: EnTranslations = {
         "title": "Maestro dello speziale",
         "greeting": "Misura due volte e versa una volta, {className}. Il farmacista non ha pazienza per i reagenti versati."
       },
+      "farmer_jessica": {
+        "name": "Farmer Jessica",
+        "title": "Allotment Keeper",
+        "greeting": "Good soil and fair weather, {playerName}. Buy a seed from me, sow it in one of those beds, and go about your day. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer."
+      },
+      "farmer_teasel": {
+        "name": "Farmer Teasel",
+        "title": "Fen Paddy Farmer",
+        "greeting": "Marsh rice and bog beet seed, {className}, and compost to feed them. The paddies drain slow, so mind where you tread."
+      },
+      "farmer_hollis": {
+        "name": "Farmer Hollis",
+        "title": "Highwatch Terrace Farmer",
+        "greeting": "The terraces give what the mountain allows, {className}. I sell seed and compost, and if a crop of yours comes up withered I will work the husks back into good soil for you."
+      },
+      "farmer_verbena": {
+        "name": "Farmer Verbena",
+        "title": "Parterre Gardener",
+        "greeting": "Mind the edging, {playerName}, these beds are the pride of the parterre. Seed and compost are what I sell, and I will turn any withered husks you carry into more of it."
+      },
       "wayfarer_bryn": {
         "name": "Viandante Bryn",
         "title": "Guida del Porto",
@@ -15942,6 +16789,19 @@ export const it_IT: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Filone di minerale raccolto"
+          }
+        }
+      },
+      "q_farm_intro": {
+        "title": "First Furrow",
+        "text": "Take this hoe and a pinch of vale wheat seed, {playerName}. Sow the seed in one of the beds beside me, then go about your business. Come back whenever you like and bring the crop in; I will be here.",
+        "completion": "There, your first crop in your own hands. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer. Come back for seed whenever the beds call you, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat planted"
+          },
+          "1": {
+            "label": "Vale Wheat harvested"
           }
         }
       },
@@ -16492,7 +17352,7 @@ export const it_IT: EnTranslations = {
       },
       "q_drogmar": {
         "title": "Signore della guerra Drogmar",
-        "text": "Drogmar ha preso la moneta del Wyrmcult e giurato i clan al risveglio della montagna. Quando colpisce il suolo, {playerName}, non restargli vicino. Entra nel campo e uccidilo per Highwatch.",
+        "text": "Drogmar ha preso la moneta del Broodsworn e giurato i clan al risveglio della montagna. Quando colpisce il suolo, {playerName}, non restargli vicino. Entra nel campo e uccidilo per Highwatch.",
         "completion": "Drogmar giace morto nel suo campo. Hai comprato un inverno al mio muro, {playerName}.",
         "objectives": {
           "0": {
@@ -16532,11 +17392,11 @@ export const it_IT: EnTranslations = {
       },
       "q_zealots": {
         "title": "Canti nel vento",
-        "text": "Il vento porta canti dai picchi del sud. Zittisci 12 zeloti, {playerName}; ogni voce fermata compra un'altra notte di sonno.",
+        "text": "When the wind comes off the southern peaks, {playerName}, it carries chanting. The Broodsworn no longer hides: they have raised tents below the Sanctum and they sing to what sleeps beneath it. Silence twelve zealots. Every voice stilled buys the mountain another night of sleep.",
         "completion": "Il vento è più quieto. Ma ciò che mi turba non è il canto, {playerName}: è che qualcosa possa rispondere al canto.",
         "objectives": {
           "0": {
-            "label": "Zelota del Culto del Wyrm ucciso"
+            "label": "Broodsworn Zealot slain"
           }
         }
       },
@@ -16546,7 +17406,7 @@ export const it_IT: EnTranslations = {
         "completion": "Questa scrittura viene dal grimorio di Morthen. La stessa mano ha guidato ogni tomba, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Zelota del Culto del Wyrm ucciso"
+            "label": "Orders from Below"
           }
         }
       },
@@ -16556,7 +17416,7 @@ export const it_IT: EnTranslations = {
         "completion": "Che la Luce ci perdoni. Contengono i morti della Valle e della palude; non stavano costruendo un esercito, {playerName}, raccoglievano una decima.",
         "objectives": {
           "0": {
-            "label": "Negromante del Culto del Wyrm ucciso"
+            "label": "Ritual Phylactery"
           }
         }
       },
@@ -16606,10 +17466,10 @@ export const it_IT: EnTranslations = {
         "completion": "L'inginocchiarsi è finito. Non abbiamo zittito la voce, {playerName}; solo ridotto il suo coro.",
         "objectives": {
           "0": {
-            "label": "Zelota del Culto del Wyrm ucciso"
+            "label": "Threnos the First Voice silenced"
           },
           "1": {
-            "label": "Negromante del Culto del Wyrm ucciso"
+            "label": "Broodsworn Necromancer slain"
           }
         }
       },
@@ -16874,6 +17734,26 @@ export const it_IT: EnTranslations = {
           }
         }
       },
+      "q_prof_workorder_kitchens_wheat": {
+        "title": "Kitchens Wheat Order",
+        "text": "Bread does not bake itself, {playerName}, and my flour bins are scraping bottom. Bring me eight sheaves of vale wheat and I will pay you honest coin for the lot. Grown by your own hand or bought off the market, I do not care, so long as it grinds.",
+        "completion": "Good dry grain, and plenty of it. There is your pay, counted out. When the next crop comes in, you know which door to knock on.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat delivered"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_rice": {
+        "title": "Kitchens Rice Order",
+        "text": "The marsh folk swear by their rice, {playerName}, and I mean to find out why. Fetch me five measures of marsh rice and there is coin waiting for you here. Keep it dry on the road, mind: wet rice is porridge, and I did not order porridge.",
+        "completion": "Plump and dry, every grain. Here is your coin. If the marsh keeps giving, so do I.",
+        "objectives": {
+          "0": {
+            "label": "Marsh Rice delivered"
+          }
+        }
+      },
       "q_prof_workorder_loom": {
         "title": "Ordine di lavoro per il telaio",
         "text": "Il telaio rimane asciutto e le mani inoperose sprecano la luce del giorno, {playerName}. Portami sei gomitoli di seta di ragno e ti pagherò una tariffa equa, contata fino al rame.",
@@ -17082,7 +17962,7 @@ export const it_IT: EnTranslations = {
       },
       "q_hollow_old_marrowshell": {
         "title": "Il Vecchio Guscio dei Bassifondi",
-        "text": "Il primo nome è Vecchio Marrowshell, un granchio grande come un carro che caccia nei bassifondi orientali da prima che Eldergleam avesse un cancello. Vaga, {playerName}, quindi dovrai percorrere la riva finché non incroci le sue tracce. Non andare da solo, e non fidarti della sua immobilità.",
+        "text": "Il primo nome è Vecchio Marrowshell, un granchio grande come un carro che caccia nei bassifondi orientali da prima che Eldershine avesse un cancello. Vaga, {playerName}, quindi dovrai percorrere la riva finché non incroci le sue tracce. Non andare da solo, e non fidarti della sua immobilità.",
         "completion": "I bassifondi sono di nuovo solo acqua. Ho visto quel guscio spezzare cacciatori migliori di me, {playerName}. Non te.",
         "objectives": {
           "0": {
@@ -17224,12 +18104,12 @@ export const it_IT: EnTranslations = {
         }
       },
       "q_fv_frostmane_tyrant": {
-        "title": "Il Tiranno dalla Criniera di Gelo",
-        "text": "Gli ululatori non stavano cacciando quando sono scesi dalle terrazze. Stavano fuggendo. Uno yeti ha rivendicato le alture, la gente di montagna lo chiama la Criniera di Gelo, e nemmeno i branchi vogliono condividere un pendio con lui. Deve finire, {playerName}, prima che l'inverno lo spinga fino alle mie mura. Porta un amico. Portane due.",
-        "completion": "Quando il vento è calato la notte scorsa, tutto il villaggio ha sentito il silenzio dove prima c'era la Criniera di Gelo. La Distesa ti deve un debito che impiegherà anni a ripagare, {playerName}. Indossa questo, e ogni porta a Icemantle ti sarà aperta.",
+        "title": "The Rimemane Tyrant",
+        "text": "The howlers were not hunting when they came down the terraces. They were fleeing. A yeti has claimed the high ground, the mountain folk call it the Rimemane, and even the packs will not share a slope with it. It has to end, {playerName}, before winter drives it down to my walls. Bring a friend. Bring two.",
+        "completion": "When the wind dropped last night the whole village heard the silence where the Rimemane used to be. The Reach owes you a debt it will be years in paying, {playerName}. Wear this, and every door in Icemantle is open to you.",
         "objectives": {
           "0": {
-            "label": "La Criniera di Gelo sconfitta"
+            "label": "The Rimemane slain"
           }
         }
       },
@@ -17382,7 +18262,7 @@ export const it_IT: EnTranslations = {
         "completion": "Quattro secchi di nuovo ai loro ganci e i filari finalmente tranquilli. Hai una mano più pesante coi folletti di quanta ne abbia io, {playerName}, e oggi ne sono felice.",
         "objectives": {
           "0": {
-            "label": "Folletto del Raccolto scacciato"
+            "label": "Gleaning Sprite driven off"
           },
           "1": {
             "label": "Secchio Raccogli-Linfa recuperato"
@@ -17524,7 +18404,7 @@ export const it_IT: EnTranslations = {
       },
       "q_nb_eyes_on_the_vigil": {
         "title": "Occhi sulla Veglia",
-        "text": "Qualcosa rende i vagabondi audaci e le mandrie inquiete, {playerName}, e non riesco a leggerlo nei fiori. Cassian può leggerlo nel cielo. Tiene il suo campo osservatorio vicino alla Veglia Perenne a est di qui, dove i nightkin vagano tra le pietre. Trovalo, e chiedigli cosa dicono le stelle.",
+        "text": "Something has the striders bold and the herds uneasy, {playerName}, and I cannot read it in the flowers. Cassian can read it in the sky. He keeps his observatory camp by the Standing Vigil east of here, where the gloamkin drift among the stones. Find him, and ask what the stars are saying.",
         "completion": "Ti ha mandato Lira? Allora anche i giardini lo sentono. Siediti vicino al cannocchiale un momento, {playerName}. Le stelle sono inquiete da un mese, e ogni mappa che traccio pende a nord verso il tumulo.",
         "objectives": {
           "0": {
@@ -17534,7 +18414,7 @@ export const it_IT: EnTranslations = {
       },
       "q_nb_charts_of_the_stones": {
         "title": "Le Mappe nelle Pietre",
-        "text": "Le pietre della Veglia sono più antiche di Moonrest, più antiche dei nightkin che le curano, e le loro facce sono incise con mappe stellari che ho passato la vita a imparare a leggere. Il cielo si è spostato, {playerName}, e devo sapere di quanto. Leggi le mappe su tre delle pietre e portami i loro rilevamenti.",
+        "text": "The Vigil stones are older than Moonrest, older than the gloamkin who tend them, and their faces are cut with star charts I have spent my life learning to read. The sky has shifted, {playerName}, and I must know how far. Read the charts on three of the stones and bring me their bearings.",
         "completion": "Non resta alcun dubbio. Ogni rilevamento si è spostato verso il Tumulo Insonne, come se il cielo stesso si sporgesse su quel tumulo per osservare. Gli antichi re furono sepolti sotto stelle allineate per una ragione, {playerName}.",
         "objectives": {
           "0": {
@@ -17558,7 +18438,7 @@ export const it_IT: EnTranslations = {
       "q_nb_the_barrow_king": {
         "title": "Il Re del Tumulo si Risveglia",
         "text": "Ogni rilevamento, ogni stella inquieta, ogni tumulo aperto indica una sola cosa: il Re del Tumulo si sta risvegliando sotto il grande tumulo, e questo regno non ha un'alba per trattenerlo. Deve essere messo a riposo prima che ricordi la sua corona, {playerName}. Non andare da solo: porta un amico, e tieni la luce dei fiori alle tue spalle.",
-        "completion": "Le stelle si sono placate per la prima volta in una stagione, {playerName}. I tumuli sono chiusi, i nightkin si sono acquietati presso le loro pietre, e il re dorme di nuovo sottoterra. Indossa questo mantello: Moonrest lo ha tagliato per chiunque la notte finalmente si fidasse.",
+        "completion": "The stars have settled for the first time in a season, {playerName}. The mounds are closed, the gloamkin have gone still at their stones, and the king sleeps below once more. Wear this mantle: Moonrest cut it for whoever the night finally trusted.",
         "objectives": {
           "0": {
             "label": "Il Re del Tumulo messo a riposo"
@@ -17566,9 +18446,9 @@ export const it_IT: EnTranslations = {
         }
       },
       "q_ww_bells_of_gallowmere": {
-        "title": "Le Campane di Gallowmere",
-        "text": "Senti quel rintocco, {playerName}? È Gallowmere, su per la strada nord, che culla i suoi morti nel sonno a suon di campane. Il Sagrestano Marrow tiene il conto di ogni anima sotto la chioma, vivi e sepolti. Vai a farti contare, prima che il bosco ti conti da solo.",
-        "completion": "Cobb ti ha mandato su per la strada tutto intero, vero? Bravo uomo. Ha tenuto accese quelle lanterne del cancello per trent'anni, e il bosco non gli è mai passato oltre nemmeno una volta. Benvenuto a Gallowmere, {playerName}. Fai attenzione alle campane.",
+        "title": "Le Campane di Gibbetmere",
+        "text": "Senti quel rintocco, {playerName}? È Gibbetmere, su per la strada nord, che culla i suoi morti nel sonno a suon di campane. Il Sagrestano Marrow tiene il conto di ogni anima sotto la chioma, vivi e sepolti. Vai a farti contare, prima che il bosco ti conti da solo.",
+        "completion": "Cobb ti ha mandato su per la strada tutto intero, vero? Bravo uomo. Ha tenuto accese quelle lanterne del cancello per trent'anni, e il bosco non gli è mai passato oltre nemmeno una volta. Benvenuto a Gibbetmere, {playerName}. Fai attenzione alle campane.",
         "objectives": {
           "0": {
             "label": "Riferisci al Sagrestano Marrow"
@@ -17597,7 +18477,7 @@ export const it_IT: EnTranslations = {
       },
       "q_ww_candles_at_the_bounds": {
         "title": "Candele ai Confini",
-        "text": "Quattro pietre di confine circondano Gallowmere, {playerName}, una su ogni strada in uscita, e una candela funebre arde su ogni pietra. Finché ardono, i sepolti restano sepolti. La pioggerella le ha spente, tutte e quattro, e sono troppo vecchio per percorrere i confini da solo. Prendi la mia candela e riaccendile, in fretta.",
+        "text": "Quattro pietre di confine circondano Gibbetmere, {playerName}, una su ogni strada in uscita, e una candela funebre arde su ogni pietra. Finché ardono, i sepolti restano sepolti. La pioggerella le ha spente, tutte e quattro, e sono troppo vecchio per percorrere i confini da solo. Prendi la mia candela e riaccendile, in fretta.",
         "completion": "Tutte e quattro ardono? Allora respira, {playerName}. Non lo hai sentito, ma tutto il villaggio sì: le campane hanno suonato più leggere nell'istante in cui l'ultimo stoppino ha preso fuoco.",
         "objectives": {
           "0": {
@@ -17627,7 +18507,7 @@ export const it_IT: EnTranslations = {
       },
       "q_ww_what_the_bark_holds": {
         "title": "Ciò che la Corteccia Custodisce",
-        "text": "Nella Radura degli Impiccati a est di Gallowmere le filatrici appendono ai rami i loro morti avvolti nella seta, e i vaganti dalla corteccia incisa fanno la guardia sotto come pazienti portatori di bara. Quella è la nostra gente lassù, {playerName}. Abbatti cinque vaganti, taglia giù tre dei morti avvolti, e riportali a casa nella terra.",
+        "text": "Nella Radura degli Impiccati a est di Gibbetmere le filatrici appendono ai rami i loro morti avvolti nella seta, e i vaganti dalla corteccia incisa fanno la guardia sotto come pazienti portatori di bara. Quella è la nostra gente lassù, {playerName}. Abbatti cinque vaganti, taglia giù tre dei morti avvolti, e riportali a casa nella terra.",
         "completion": "Tre anime di nuovo sotto terra onesta prima del calar della notte. I vaganti ricresceranno, la corteccia lo fa sempre, ma stanotte la radura pende vuota, ed è abbastanza.",
         "objectives": {
           "0": {
@@ -17641,17 +18521,17 @@ export const it_IT: EnTranslations = {
       "q_ww_walking_mosley_home": {
         "title": "Riportare Mosley a Casa",
         "text": "Il mio becchino Mosley ha preso la strada della cappella tre giorni fa per aprire una fossa nel vecchio cimitero, e lo scavo gli è crollato addosso. Si è scavato una via d'uscita a forza di unghie, lo sciocco è vivo, ma è raggomitolato vicino alle tombe della cappella e non si muove per via delle filatrici sulla strada. Riportalo a casa, {playerName}. Non posso suonare le campane per un uomo vivo.",
-        "completion": "È entrato dal cancello con le sue stesse gambe, giurando che d'ora in poi non scaverà nulla di più profondo di un'aiuola di rape. Sarà di nuovo al cimitero entro domenica, lo sono sempre. Grazie, {playerName}. Gallowmere custodisce la sua gente, questa è tutta la nostra legge.",
+        "completion": "È entrato dal cancello con le sue stesse gambe, giurando che d'ora in poi non scaverà nulla di più profondo di un'aiuola di rape. Sarà di nuovo al cimitero entro domenica, lo sono sempre. Grazie, {playerName}. Gibbetmere custodisce la sua gente, questa è tutta la nostra legge.",
         "objectives": {
           "0": {
-            "label": "Becchino Mosley riportato sano e salvo a Gallowmere"
+            "label": "Becchino Mosley riportato sano e salvo a Gibbetmere"
           }
         }
       },
       "q_ww_horn_of_the_huntsman": {
         "title": "Il Corno del Cacciatore",
         "text": "Ormai avrai sentito il corno, {playerName}, sottile e lontano, il suono per cui tutto il bosco trattiene il respiro. Il Cacciatore Pallido cavalca la sua radura a nord di qui, e ogni tomba che attraversa diventa più superficiale. Un tempo era un uomo, e fu sepolto male, e ho smesso di fingere che la preghiera basterà. Porta un amico, portane due, e disarcionalo.",
-        "completion": "Il corno si è fermato a metà nota. Ogni campana a Gallowmere ha suonato una volta, da sola, e poi il bosco è diventato più silenzioso di quanto lo abbia mai sentito in trent'anni. Hai compiuto il rito che io non potevo, {playerName}. Indossa questo, e cammina sotto la chioma senza paura.",
+        "completion": "Il corno si è fermato a metà nota. Ogni campana a Gibbetmere ha suonato una volta, da sola, e poi il bosco è diventato più silenzioso di quanto lo abbia mai sentito in trent'anni. Hai compiuto il rito che io non potevo, {playerName}. Indossa questo, e cammina sotto la chioma senza paura.",
         "objectives": {
           "0": {
             "label": "Il Cacciatore Pallido disarcionato"
@@ -17700,11 +18580,11 @@ export const it_IT: EnTranslations = {
       },
       "q_pr_the_man_who_went_in": {
         "title": "L'Uomo che Entrò",
-        "text": "I sommozzatori non metteranno piede oltre la linea degli alberi, {playerName}, e non glielo chiederò. Ormai avrai sentito i tamburi: tutti li sentono, entro la seconda notte. Un solo uomo su quest’isola ha mai camminato verso quel suono ed è tornato. Okku. Si accampa sotto i grandi banyan al Vinefall, in fondo alla strada del Groviglio. Trovalo, e chiedigli cosa nasconde il verde.",
+        "text": "I sommozzatori non metteranno piede oltre la linea degli alberi, {playerName}, e non glielo chiederò. Ormai avrai sentito i tamburi: tutti li sentono, entro la seconda notte. Un solo uomo su quest’isola ha mai camminato verso quel suono ed è tornato. Okrim. Si accampa sotto i grandi banyan al Vinefall, in fondo alla strada del Groviglio. Trovalo, e chiedigli cosa nasconde il verde.",
         "completion": "Ti ha mandato Isha? La Madre delle Perle non pronuncia il mio nome da anni. Siediti fuori dalla portata delle liane, {playerName}, e ti dirò ciò che so: i tamburi non sono il pericolo. Sono l’avvertimento.",
         "objectives": {
           "0": {
-            "label": "Trova Okku al Vinefall"
+            "label": "Trova Okrim al Vinefall"
           }
         }
       },
@@ -18289,7 +19169,7 @@ export const it_IT: EnTranslations = {
             "label": "Il Glimmermere"
           },
           "7": {
-            "label": "Tende del Culto del Wyrm"
+            "label": "Broodsworn Tents"
           },
           "8": {
             "label": "Campi dei revenant"
@@ -18301,10 +19181,10 @@ export const it_IT: EnTranslations = {
       },
       "veiled_hollow": {
         "name": "La Valletta Velata",
-        "welcome": "L'aria vibra di antica magia. Cerca la Custode Saelwyn sotto il grande albero di Eldergleam.",
+        "welcome": "L'aria vibra di antica magia. Cerca la Custode Saelwyn sotto il grande albero di Eldershine.",
         "pois": {
           "0": {
-            "label": "Eldergleam"
+            "label": "Eldershine"
           },
           "1": {
             "label": "Grotta di Duskfall"
@@ -18442,7 +19322,7 @@ export const it_IT: EnTranslations = {
             "label": "La Porta della Notte"
           },
           "2": {
-            "label": "Il Pozzo della Luna"
+            "label": "The Moonspring"
           },
           "3": {
             "label": "Gloamfield"
@@ -18457,10 +19337,10 @@ export const it_IT: EnTranslations = {
       },
       "wraithwood": {
         "name": "Wraithwood",
-        "welcome": "La chioma si richiude sulla strada come un coperchio. Resta vicino alle lanterne di Gallowmere, e non rispondere se il bosco chiama il tuo nome.",
+        "welcome": "La chioma si richiude sulla strada come un coperchio. Resta vicino alle lanterne di Gibbetmere, e non rispondere se il bosco chiama il tuo nome.",
         "pois": {
           "0": {
-            "label": "Gallowmere"
+            "label": "Gibbetmere"
           },
           "1": {
             "label": "La Porta dei Corvi"
@@ -18724,6 +19604,11 @@ export const it_IT: EnTranslations = {
         "sender": "Quartiermastro eroico",
         "subject": "I tuoi Marchi eroici",
         "body": "Il tuo gruppo ha superato la prova eroica mentre combattevi nelle retrovie o giacevi a terra. Anche il tuo vincolo è stato registrato, quindi la tua parte di Marchi eroici è arrivata qui invece di andare perduta. Usali bene.\n\n- Quartiermastro eroico"
+      },
+      "wyrmfall_core_reward": {
+        "sender": "The Heroic Quartermaster",
+        "subject": "Your Wyrmfall Cores",
+        "body": "The beast fell while you fought from the back, or from the dirt. Your share of its Wyrmfall Cores flies to you here rather than being lost to the corpse-pickers. Put them to good work at a bench.\n\n- The Heroic Quartermaster"
       },
       "guild_trend_engineering_alchemy": {
         "sender": "La Gilda degli Artigiani",
@@ -19142,6 +20027,7 @@ export const it_IT: EnTranslations = {
     "delveRiteShrineReedInteract": "Santuario delle Canne: premi F per toccarlo",
     "delveRiteShrineSkullInteract": "Santuario del Teschio: premi F per toccarlo",
     "mailboxName": "Cassetta postale",
-    "noticeboardName": "Bacheca degli annunci"
+    "noticeboardName": "Bacheca degli annunci",
+    "farmPatchName": "Garden Beds"
   }
 };

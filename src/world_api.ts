@@ -49,6 +49,8 @@
 //   dungeon_finder.ts   IWorldDungeonFinder  Dungeon Finder queue/proposals/premade board
 //   deeds.ts            IWorldDeeds          earned deeds, lifetime stats, renown, active title,
 //                                            rarity + the account-Renown leaderboard reads
+//   farming.ts          IWorldFarming        the static garden-bed geography + the caller's own
+//                                            plot rows (reads only in the patches-and-plots phase)
 //   reliquary.ts        IWorldReliquary      sparse firstFind / marks / recent + pure completion
 //
 // THREE GATES pin this seam (run before any facet edit; the literal counts are
@@ -76,6 +78,7 @@ import type { IWorldDuelArena } from './world_api/duel_arena';
 import type { IWorldDungeonFinder } from './world_api/dungeon_finder';
 import type { IWorldDungeons } from './world_api/dungeons';
 import type { IWorldEntityRoster } from './world_api/entity_roster';
+import type { IWorldFarming } from './world_api/farming';
 import type { IWorldGuildBank } from './world_api/guild_bank';
 import type { IWorldInteraction } from './world_api/interaction';
 import type { IWorldInventory } from './world_api/inventory';
@@ -130,8 +133,9 @@ export type {
 // the Mirefen road, and the harbor-town plat's basin lobes and grading stamps
 // land where the Sowfield stood. (8 on the pre-merge eastbrook branch.)
 // 10 = Bank Storage adds required BankInfo socket and two-pool capacity fields.
-// Release v0.41.0's auth-world-9 payload lacks them, so mixed binaries must be
-// rejected before the new client can consume the old six-field snapshot.
+// The pre-bank-storage release/v0.41.0 payload (then auth-world-9) lacks them,
+// so mixed binaries must be rejected before the new client can consume the old
+// six-field snapshot.
 // 11 = Materials Vault snapshots require the identity-preserving `special`
 // collection. An epoch-10 client can neither render nor select those rows, and
 // an epoch-10 server would omit them, stranding deposited special materials.
@@ -175,8 +179,15 @@ export type {
 // (12 is deliberately unassigned: 13 through 25 were numbered 11 through 23 on
 // the pre-merge raid branch, which forked before the Bank Storage and Materials
 // Vault bumps above; that branch's 11 through 20 were in turn 9 through 18
-// before the Eastbrook program bumps.)
-export const ONLINE_WORLD_LAYOUT_VERSION = 25 as const;
+// before the Eastbrook program bumps. The Masterwrought branch had also
+// numbered its own bump 12 pre-merge, off the epoch-11 base; the v0.41.0 sync
+// renumbered it 26 below so it sits above every raid epoch.)
+// 26 = Masterwrought and farming ship together: equipped-instance snapshots
+// carry required Perfecting fields (rank progress, the Perfected quality, an
+// orange piece's chosen name) and the self wire carries the `fplot` farm-plot
+// delta. An epoch-25 client can neither render Perfected copies nor a farm,
+// and an epoch-25 server omits both, stranding Perfecting progress and plots.
+export const ONLINE_WORLD_LAYOUT_VERSION = 26 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI
@@ -280,6 +291,12 @@ export type {
   DungeonFinderQueueView,
 } from './world_api/dungeon_finder';
 export type { RaidLockout, RiftFloorView } from './world_api/dungeons';
+export type {
+  FarmPatchDef,
+  FarmPlantKnobs,
+  FarmPlotStatus,
+  FarmPlotView,
+} from './world_api/farming';
 export {
   GUILD_BANK_LOG_LIMIT,
   type GuildBankInfo,
@@ -369,7 +386,8 @@ export interface IWorld
     IWorldActionBar,
     IWorldDeeds,
     IWorldReliquary,
-    IWorldMounts {}
+    IWorldMounts,
+    IWorldFarming {}
 
 // ---------------------------------------------------------------------------
 // Command schema (W0b): the shared wire-token vocabulary.
@@ -599,6 +617,7 @@ export const COMMAND_NAMES = [
   // held piece into generic materials (Sim.disenchantItem/applyEnchant/salvageItem
   // via src/sim/professions/enchanting.ts and salvage.ts).
   'disenchant_item',
+  'extract_essence',
   'apply_enchant',
   'salvage_item',
   // Maker's Bond unbind service (Professions 2.0): clear the
@@ -674,6 +693,29 @@ export const COMMAND_NAMES = [
   // payload, the sim resolves the previous enemy in the same ordered list Tab
   // walks forward. Appended because wire tokens are never reordered.
   'tabPrev',
+  // Farming's growth phase: sow a crop into a garden bed, and pull it back
+  // out (Sim.plantCrop / Sim.harvestCrop via src/sim/professions/farming.ts).
+  // Both carry IDS ONLY (`bed`, and `crop` on the plant): the seed cost, the
+  // pre-rolled growth script, the deadline and the yield are all resolved
+  // sim-side, so there is no item payload on this wire to forge. Appended
+  // because wire tokens are never reordered.
+  'plant_crop',
+  'harvest_crop',
+  // Farming's knobs phase: trade withered husks for compost at the sim's
+  // fixed ratio (Sim.convertHusks via src/sim/professions/farming.ts). NO
+  // PAYLOAD AT ALL: the ratio, the batch count and both item ids are resolved
+  // sim-side from the sender's own bags, so there is nothing on this wire to
+  // forge. Appended because wire tokens are never reordered.
+  'convert_husks',
+  // The shared feast (Sim.placeFeast / Sim.consumeFeast via
+  // src/sim/professions/feast.ts). place_feast carries only an optional bag
+  // slot naming the copy to spend (the feast item id, charges, expiry and the
+  // anti-abuse rule resolve sim-side); consume_feast carries the feast ENTITY
+  // id only, and every outcome (ledger, charges, range, the Well Fed mint) is
+  // server state.
+  // Appended because wire tokens are never reordered.
+  'place_feast',
+  'consume_feast',
   // The Materials Vault: the per-material, gold-upgraded material store beside the
   // personal slot bank (src/sim/materials_vault.ts). Appended at the END because
   // wire tokens are never reordered, so these deliberately do NOT sit beside the
@@ -702,11 +744,11 @@ export const COMMAND_NAMES = [
   'bank_unlock_socket',
   'bank_socket_bag',
   'bank_unsocket_bag',
-  // The tutorial greeting's accept: the ferry ride to the Proving Shore
-  // (IWorldQuests.startTutorial; sim/tutorial/greeting.ts re-validates level,
-  // life, and band server-side). Appended because wire tokens are never
-  // reordered.
-  'tutorial_start',
+  // The Perfecting stage (Masterwrought phase 12, IWorldProfessions.perfectItem):
+  // one attempt on a worn (`slot`) or bagged (`bag`) apex piece; the server
+  // validates the ref shape and the sim resolves every gate and the one roll.
+  // Appended because wire tokens are never reordered.
+  'perfect_item',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -788,7 +830,8 @@ export type WorldFacet =
   | 'IWorldActionBar'
   | 'IWorldDeeds'
   | 'IWorldReliquary'
-  | 'IWorldMounts';
+  | 'IWorldMounts'
+  | 'IWorldFarming';
 
 export const COMMAND_FACETS = {
   // IWorldCombat: ability casts, auto-attack, spirit release.
@@ -818,8 +861,10 @@ export const COMMAND_FACETS = {
   // IWorldInventory: non-fungible Rift gear progression. These mutate the
   // authoritative inventory copy; every cost and payload is validated again
   // in the sim before the item instance is changed. (salvage_item rides the
-  // professions surface and, like the other enchanting-family commands, has
-  // no facet row here.)
+  // professions surface and, like the other enchanting-family commands and
+  // perfect_item, has no facet row here: the IWorldProfessions surface is
+  // row-less by the W6 PARTIAL design, its members pinned by
+  // tests/world_api_parity.test.ts FACET_PROFESSIONS instead.)
   rift_upgrade_item: 'IWorldInventory',
   rift_enchant_item: 'IWorldInventory',
   rift_socket_gem: 'IWorldInventory',
@@ -1038,4 +1083,13 @@ export const COMMAND_FACETS = {
   // IWorldActionBar: the debounced action-bar layout upload. takeActionBarLayoutRestore
   // is a login-time read (no send, untagged).
   save_hotbar_layout: 'IWorldActionBar',
+  // IWorldFarming: the two growth-phase plot mutations (snake_case wire
+  // strings, by design). farmPatches (a static content read served from the
+  // client bundle) and myFarmPlots (the `fplot` self-delta mirror) carry no
+  // wire command and stay untagged.
+  plant_crop: 'IWorldFarming',
+  harvest_crop: 'IWorldFarming',
+  convert_husks: 'IWorldFarming',
+  place_feast: 'IWorldFarming',
+  consume_feast: 'IWorldFarming',
 } as const satisfies Partial<Record<ClientCommand, WorldFacet>>;

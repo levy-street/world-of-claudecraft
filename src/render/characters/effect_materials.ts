@@ -34,7 +34,7 @@ export type GhostStyle = 'spirit' | 'stealth';
 type CharacterEffectStyle = GhostStyle | 'shadowform' | 'moonkin';
 
 const GHOST_OPACITY = 0.34;
-// Stealth (Duskveil/Smokestep) reads as a faded-but-solid silhouette, a touch
+// Stealth (Duskveil/Smokefade) reads as a faded-but-solid silhouette, a touch
 // denser than the spirit run's 0.34 (owner: stealth was "too transparent").
 const STEALTH_OPACITY = 0.45;
 const SHADOWFORM_OPACITY = 0.9;

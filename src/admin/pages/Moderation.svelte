@@ -2,6 +2,8 @@
   import { onMount } from 'svelte';
   import type { ModerationQueueRow } from '../types';
   import { apiGet } from '../api';
+  import { type AdminLoadFailure, classifyAdminLoadFailure } from '../load_failure';
+  import PermissionDenied from '../components/PermissionDenied.svelte';
   import { auth } from '../state/auth.svelte';
   import { t } from '../i18n';
   import { fmtRelative } from '../format';
@@ -13,16 +15,16 @@
   // Moderation tab: the report queue (highest open-report counts first) and the detail
   // for the selected account. Ported from renderModerationQueue + openModerationAccount.
   let rows = $state<ModerationQueueRow[]>([]);
-  let failed = $state(false);
+  let failed = $state<AdminLoadFailure>('none');
   let selectedId = $state<number | null>(null);
 
   async function refreshQueue(): Promise<void> {
     try {
       const data = await apiGet<{ rows: ModerationQueueRow[] }>('/admin/api/moderation/queue');
       rows = data.rows;
-      failed = false;
+      failed = 'none';
     } catch (err) {
-      if (!auth.handleAuthFailure(err)) failed = true;
+      if (!auth.handleAuthFailure(err)) failed = classifyAdminLoadFailure(err);
     }
   }
 
@@ -30,7 +32,9 @@
 </script>
 
 <Panel title={t('moderation.queueTitle')} hint={t('moderation.queueHint')}>
-  {#if failed}
+  {#if failed === 'forbidden'}
+    <PermissionDenied />
+  {:else if failed === 'error'}
     <div class="empty">{t('moderation.loadFailed')}</div>
   {:else if rows.length === 0}
     <div class="empty">{t('moderation.empty')}</div>

@@ -1,0 +1,179 @@
+// Recipe pattern items: the physical drop that teaches one recipe when used
+// from the bags. A pattern is an ordinary tradable item (kind 'recipe',
+// src/sim/types.ts RecipeItemDef) naming the ProfessionRecipeRecord it teaches;
+// using it spends the copy and marks the recipe known, which is what makes a
+// pattern bind on LEARN rather than on pickup: the item is freely tradable and
+// market-listable right up until someone consumes it.
+//
+// Shaped like ./training.ts: a PURE resolver (`resolvePatternLearn`) that
+// decides the outcome with no side effect, plus a thin apply function
+// (`useRecipePatternItem`) that owns the emits and the consume. The split is
+// what lets a Vitest drive every deny arm directly against a synthetic recipe
+// without a live Sim, exactly as resolveTrain is driven today.
+//
+// `src/sim`-pure (see src/sim/CLAUDE.md): no DOM/render/ui/game/net imports and
+// no Sim import (PlayerMeta arrives type-only, the crafting.ts idiom). The whole
+// path draws NO rng and reads no clock: learning is a deterministic yes or no.
+
+import { recipeById } from '../content/recipes';
+import { consumeSelectedInventorySlot, selectedInventorySlot } from '../item_copy_ref';
+import type { PlayerMeta } from '../sim';
+import type { SimContext } from '../sim_context';
+import type { RecipeItemDef } from '../types';
+import { acquireRecipe, isRecipeKnown } from './crafting';
+import { teachTierMet } from './training';
+import type { ProfessionRecipeRecord } from './types';
+
+/** Why a pattern use was refused, or `ok` when the learn may proceed.
+ *  Stable codes, not player-facing prose: the apply function below owns the
+ *  English literals, so the resolver stays language-agnostic and testable.
+ *  Exported with no external consumer ON PURPOSE, the TrainResult idiom
+ *  (./training.ts TrainResult): a pure resolver's result type is part of its
+ *  public seam, so a test or a future caller can name the outcome shape
+ *  without re-deriving it. */
+export type PatternLearnResult =
+  | { ok: true }
+  | { ok: false; reason: 'invalid' | 'already_known' | 'profession' | 'tier' };
+
+/**
+ * Pure validation of one pattern use: no side effect ever (the caller emits,
+ * grants, and consumes on ok). The deny ORDER is load-bearing and mirrors
+ * resolveTrain's discipline in ./training.ts, so a double click resolves
+ * `already_known` before any other arm can fire and never spends a second copy:
+ *
+ * 1. `invalid`: the recipe id does not resolve, OR the recipe's `acquisition`
+ *    list does not include 'drop'. This is a CONTENT-SHAPE guard only, not the
+ *    mint authority: acquireRecipeForRecipe in ./crafting.ts is what actually
+ *    refuses a wrong-source grant. This pre-check exists solely to decide
+ *    SILENT versus EMITTED, because a pattern whose def points at a missing or
+ *    non-droppable recipe is an authoring bug, and a player holding one should
+ *    see the same nothing a malformed item id produces, not a refusal line
+ *    blaming their character.
+ * 2. `already_known` (isRecipeKnown, grandfathered recipes included).
+ * 3. `profession`: the player has never practiced the recipe's craft at all,
+ *    i.e. their flat skill in it is 0 or absent. There is NO profession
+ *    membership concept in this codebase (a character carries a flat skill per
+ *    craft, professions/wheel.ts CraftSkills, and no roster of "professions
+ *    known"), so "you are not that profession" DECOMPOSES to exactly this
+ *    zero-skill read. Deliberate: it is the one condition that separates
+ *    "wrong craft entirely" from "right craft, not skilled enough" below.
+ * 4. `tier`: teachTierMet is unmet. Reused from ./training.ts rather than
+ *    restated, so on the TIER question a pattern and a trainer can never
+ *    disagree about who is allowed to learn a given recipe. They DO diverge
+ *    one arm earlier, deliberately: a trainer teaches a tier-0 recipe to a
+ *    character who has never touched the craft, while a pattern refuses at
+ *    arm 3 until the profession has actually been practiced.
+ * 5. otherwise ok.
+ */
+export function resolvePatternLearn(
+  recipe: ProfessionRecipeRecord | undefined,
+  meta: PlayerMeta,
+): PatternLearnResult {
+  if (!recipe?.acquisition?.includes('drop')) return { ok: false, reason: 'invalid' };
+  if (isRecipeKnown(meta, recipe)) return { ok: false, reason: 'already_known' };
+  if ((meta.craftSkills[recipe.professionId] ?? 0) <= 0) return { ok: false, reason: 'profession' };
+  if (!teachTierMet(recipe, meta.craftSkills)) return { ok: false, reason: 'tier' };
+  return { ok: true };
+}
+
+/**
+ * Use one pattern item: resolve the recipe it teaches, run the pure resolver,
+ * then either refuse (never consuming) or learn and spend exactly one copy.
+ * Called from the `recipe` kind arm of items.ts useItem, which sits BELOW that
+ * function's dead gate, so using a pattern while dead is a silent no-op like
+ * every other kind arm there.
+ */
+export function useRecipePatternItem(
+  ctx: SimContext,
+  itemId: string,
+  def: RecipeItemDef,
+  meta: PlayerMeta,
+  slotIndex?: number,
+): void {
+  // The pinned-selection gate, BEFORE any effect. useItem already refused an
+  // invalid selection, but this function holds the item_copy_ref tri-state
+  // contract for ANY caller: a bad pin refuses outright (silently, the same
+  // texture as useItem's own pre-effect refusal), never falls back into the
+  // newest-first guess, and refusing HERE keeps the learn-and-consume pair
+  // atomic: the learn below never runs, so a bad pin can neither destroy a
+  // wrong victim nor mint a free learn.
+  if (
+    slotIndex !== undefined &&
+    selectedInventorySlot(meta.inventory, itemId, slotIndex) === null
+  ) {
+    return;
+  }
+  const recipe = recipeById(def.teachesRecipeId);
+  const verdict = resolvePatternLearn(recipe, meta);
+  if (!verdict.ok) {
+    // Three plain calls, each on ONE physical line: once biome wraps a call it
+    // also adds a trailing comma, which the S3 drift-guard's closing-paren
+    // anchor on this emit form does not match, and the guard's ternary form
+    // cannot span lines at all. Keep each literal short enough to never wrap,
+    // or the guard goes blind to it.
+    if (verdict.reason === 'already_known') {
+      ctx.error(meta.entityId, 'You already know that recipe.');
+    } else if (verdict.reason === 'profession') {
+      ctx.error(meta.entityId, 'You have not practiced that profession.');
+    } else if (verdict.reason === 'tier') {
+      ctx.error(meta.entityId, 'Your skill is too low to learn that pattern.');
+    } else if (verdict.reason !== 'invalid') {
+      // Exhaustiveness anchor: 'invalid' is the ONE deliberately silent reason
+      // (below), so anything reaching here is a PatternLearnResult reason added
+      // without an arm. `never` makes that a compile error instead of a click
+      // that neither refuses nor learns.
+      const _exhaustive: never = verdict.reason;
+      void _exhaustive;
+    }
+    // 'invalid' falls through silently, the same contract as useItem's own
+    // `if (!def) return;` arm. A refusal NEVER consumes the pattern.
+    return;
+  }
+  const learned = acquireRecipe(ctx, meta.entityId, def.teachesRecipeId, 'drop');
+  // Defense in depth, the unlockMechChromaFromItem idiom: the resolver already
+  // proved every condition this mint re-checks against the same recipe record
+  // and the same live meta, so this arm is UNREACHABLE today and exists for
+  // the day the mint grows a condition the resolver does not know. Return
+  // without consuming rather than eating the copy for nothing; a lost pattern
+  // is unrecoverable, a silent no-op is not.
+  if (!learned.ok) return;
+  // Consume by the id the caller was asked to use, not def.id: useItem's own
+  // ownership gate counted THAT id, so spending anything else could remove a
+  // copy the player was never charged for. When the click named a slot (the
+  // gate at the top of this function re-validated it, and useItem validated
+  // it before dispatching), spend THAT exact copy: the legacy newest-first
+  // walk in ctx.removeItem is lock-blind and could otherwise destroy a
+  // DIFFERENT copy of the same pattern than the one clicked, a player-LOCKED
+  // copy included (the v0.38.0 item lock, issue 3042, makes same-id copies
+  // distinguishable per copy). The id-only arm below stays byte-identical
+  // for callers with no selection, per item_copy_ref.ts's frozen-fallback
+  // doctrine.
+  const taken = consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex);
+  if (taken === undefined) {
+    // No selection named: the legacy id-only walk, byte-identical to the
+    // pre-selection behavior (the hook fires inside ctx.removeItem).
+    ctx.removeItem(itemId, 1, meta.entityId);
+  } else if (taken === null) {
+    // Unreachable: the gate at the top of this function pinned the selection
+    // and nothing between it and this consume touches the bags (the resolver
+    // is pure, acquireRecipe only adds to knownRecipes). Kept as an explicit
+    // arm per the item_copy_ref tri-state contract: a bad selection must
+    // never collapse into the newest-first guess this arm exists to remove.
+    return;
+  } else {
+    // The consumed-slot arm owes the same bookkeeping ctx.removeItem does:
+    // the quest recount plus its meta.wireRev bump, which is what tells the
+    // online host's heavy self block that the bags changed (pinned in
+    // tests/recipe_pattern_items.test.ts).
+    ctx.onInventoryChangedForQuests?.(meta);
+  }
+  // Success feedback, the Sim.trainRecipe shape: the same text-free personal
+  // trainResult the trainer path emits, so the hud's existing handler logs
+  // "You have learned {recipe}." and the train window's row flips to Known
+  // with no client change. Two deliberate choices. It does NOT write
+  // meta.lastTrainResult, which is the train COMMAND's own probe rather than a
+  // record of knowing a recipe. And NO trainResult is emitted on a refusal:
+  // the refusals above are ctx.error-only, because an ok:false event would
+  // double-print through the hud's trainResult deny renderer.
+  ctx.emit({ type: 'trainResult', ok: true, recipeId: def.teachesRecipeId, pid: meta.entityId });
+}

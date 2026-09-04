@@ -336,8 +336,8 @@ describe('rift and delve painted map marker catalog', () => {
       }
     }
     const decodedMasterBytes = MAP_MARKER_ART_IDS.length * 64 * 64 * 4;
-    expect(canvasCount).toBe(248);
-    expect(retainedBytes).toBe(523_712);
+    expect(canvasCount).toBe(252);
+    expect(retainedBytes).toBe(531_408);
     expect(retainedBytes + decodedMasterBytes).toBeLessThan(1024 * 1024);
   });
 

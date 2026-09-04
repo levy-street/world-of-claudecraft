@@ -7,6 +7,7 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { TOOL_EFFECTS } from '../src/sim/content/professions';
 import { ITEMS } from '../src/sim/data';
+import { FARM_EFFECT_BONUS_PICK_CAP } from '../src/sim/professions/farming';
 import { RARITY_DURABILITY_BONUS, slotToolEffectRefused } from '../src/sim/professions/tools';
 import type { ItemDef } from '../src/sim/types';
 import { itemNameColor } from '../src/ui/item_name_color';
@@ -23,7 +24,7 @@ describe('toolEffectTooltipLines: live charms', () => {
     expect(html).toContain('<div class="tt-sub">Tool charm</div>');
     expect(html).toContain('<div class="tt-green">+1 yield per harvest while charged.</div>');
     expect(html).toContain(
-      '<div class="tt-desc">Slot onto a mining, logging, or herbalism tool from the Professions window. Consumed when slotted.</div>',
+      '<div class="tt-desc">Slot onto a mining, logging, herbalism, or farming tool from the Professions window. Consumed when slotted.</div>',
     );
     expect(html).toContain(
       `<div class="tt-desc">Starts with ${TOOL_EFFECTS.gatherers_cache.startingDurability} charges on a common tool (+${RARITY_DURABILITY_BONUS} per rarity rung).</div>`,
@@ -70,6 +71,55 @@ describe('toolEffectTooltipLines: live charms', () => {
     // ever wired for real, this pin drags the landOnly copy along.
     expect(slotToolEffectRefused('fishing', 'gatherers_cache')).toBe(true);
     expect(slotToolEffectRefused('fishing', 'artisans_eye')).toBe(true);
+    // The hoe phase lifted farming's shipless refusal arm: both live effects
+    // now slot on farming for real (professions/farming.ts harvestCrop maps
+    // quantity to bonus picks and quality to a fine-chance bump), so the
+    // admission is pinned in both live-effect rows.
+    expect(slotToolEffectRefused('farming', 'gatherers_cache')).toBe(false);
+    expect(slotToolEffectRefused('farming', 'artisans_eye')).toBe(false);
+    // Springback Charm (id quickening_charm, kind respawnSpeed) stays refused
+    // on EVERY profession via the kind arm, farming included. One arm per
+    // site: farming proves the kind arm survives the lifted shipless arm,
+    // mining proves it fires away from farming entirely.
+    expect(slotToolEffectRefused('farming', 'quickening_charm')).toBe(true);
+    expect(slotToolEffectRefused('mining', 'quickening_charm')).toBe(true);
+    // The Maker's Charm is a quantity effect too, so the SAME admission holds
+    // for it, and it is pinned against the predicate rather than against the
+    // sentence: the howToSlot copy names farming, and this is what makes that
+    // claim true rather than merely written. It was unpinned until 11e, which
+    // is how the charm-on-a-hoe path survived two packets unexamined.
+    expect(slotToolEffectRefused('farming', 'makers_charm')).toBe(false);
+    expect(slotToolEffectRefused('fishing', 'makers_charm')).toBe(true);
+    // The copy and the policy in BOTH directions: every profession the
+    // sentence advertises really admits a live quantity charm, and every one it
+    // omits really refuses. Derived from the sentence, so a reword that adds or
+    // drops a profession without moving the policy reds here.
+    // Scoped to the ADVERTISED sentence, not the whole tooltip: the tooltip
+    // also carries the landOnly line, which names fishing precisely because it
+    // is refused, so a whole-tooltip search would find the word for the
+    // opposite reason and the negative arm would be meaningless.
+    const rendered = toolEffectTooltipLines(ITEMS.makers_charm);
+    const advertised = /<div class="tt-desc">(Slot onto [^<]*)<\/div>/.exec(rendered)?.[1];
+    expect(advertised, 'the how-to-slot sentence must render').toBeTruthy();
+    for (const professionId of ['mining', 'logging', 'herbalism', 'farming'] as const) {
+      expect(advertised, `${professionId} must be advertised`).toContain(professionId);
+      expect(slotToolEffectRefused(professionId, 'makers_charm')).toBe(false);
+    }
+    // ...and the one it omits really is refused, which is what the separate
+    // landOnly line tells the player.
+    expect(advertised).not.toContain('fishing');
+    expect(rendered).toContain('Does not slot on fishing rods.');
+    // The farming gatherTool roster, once the self-clearing empty tripwire of
+    // the shipless era, is now the exact FIVE-rung hoe ladder, in ITEMS
+    // insertion order (which is how Object.values returns them). The apex rung
+    // joined at masterwrought Phase 11j and takes the three tool effects like
+    // every rung below it: rarity is what the epic rung buys on this surface,
+    // through the charge bonus and the refill ceiling.
+    expect(
+      Object.values(ITEMS)
+        .filter((item) => item.use?.type === 'gatherTool' && item.use.professionId === 'farming')
+        .map((item) => item.id),
+    ).toEqual(['garden_hoe', 'bronze_hoe', 'skysilver_hoe', 'osmium_hoe', 'evergarden_hoe']);
   });
 });
 
@@ -130,16 +180,31 @@ describe('toolEffectStandaloneTooltip: professions window card', () => {
     expect(hasToolEffectCard('')).toBe(false);
   });
 
-  it('every shipped charm item is rare, the tripwire for the title-color derivation', () => {
-    // Today the derived color (itemNameColor on the charm def) and the
-    // no-item fallback are byte-identical, both QUALITY_COLOR.rare, so the
-    // color assertion above cannot distinguish derive from hardcode. This
-    // pin is the tripwire: the first non-rare charm fails it, and THAT
-    // change must bring a fixture proving the derivation renders the new
-    // quality.
+  it('every shipped charm item carries its pinned quality (the title-color rung table)', () => {
+    // Until phase 09 every charm was rare, so the derived color
+    // (itemNameColor on the charm def) and the no-item fallback were
+    // byte-identical and the color assertion above could not distinguish
+    // derive from hardcode. The epic Maker's Charm is the distinguishing
+    // fixture the old tripwire demanded (see the next arm); this exact map
+    // remains the tripwire for any FUTURE rung change.
+    const expected: Record<string, string> = {
+      gatherers_cache: 'rare',
+      artisans_eye: 'rare',
+      makers_charm: 'epic',
+    };
     const charms = Object.values(ITEMS).filter((def) => def.use?.type === 'toolEffect');
-    expect(charms.length).toBeGreaterThan(0);
-    for (const def of charms) expect(def.quality, def.id).toBe('rare');
+    expect(charms.map((def) => def.id).sort()).toEqual(Object.keys(expected).sort());
+    for (const def of charms) expect(def.quality, def.id).toBe(expected[def.id]);
+  });
+
+  it('the epic charm title takes the DERIVED epic color, not the rare fallback', () => {
+    // The fixture the old all-rare tripwire demanded: epic differs from the
+    // fallback rung, so a hardcoded QUALITY_COLOR.rare title now fails here.
+    const html = toolEffectStandaloneTooltip('makers_charm');
+    expect(html).toContain(
+      `<div class="tt-title" style="color:${itemNameColor(ITEMS.makers_charm)}">`,
+    );
+    expect(itemNameColor(ITEMS.makers_charm)).not.toBe(itemNameColor(ITEMS.gatherers_cache));
   });
 
   it('covers every live TOOL_EFFECTS catalog entry with its OWN bonus line', () => {
@@ -149,6 +214,14 @@ describe('toolEffectStandaloneTooltip: professions window card', () => {
       gatherers_cache: '+1 yield per harvest',
       artisans_eye: 'Raises the harvest grade',
       quickening_charm: 'Shortens the node respawn timer',
+      // Two numbers, and BOTH are pinned back to their source constant. The
+      // +2 is TOOL_EFFECTS.makers_charm.bonus; the +1 is farming's own
+      // FARM_EFFECT_BONUS_PICK_CAP, which had no pin at all until the Phase
+      // 11e architecture review caught it. The module header claims "the
+      // numbers the English spells out are pinned back", and with only the
+      // catalog half pinned that was half true: re-tuning the cap left every
+      // test green while the copy lied.
+      makers_charm: `+${TOOL_EFFECTS.makers_charm.bonus} yield per harvest while charged, or +${FARM_EFFECT_BONUS_PICK_CAP} on a farming tool.`,
     };
     for (const id of Object.keys(TOOL_EFFECTS)) {
       const html = toolEffectStandaloneTooltip(id);

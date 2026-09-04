@@ -82,6 +82,28 @@ describe('classifyDiff', () => {
     expect(plan.generic).toHaveLength(0);
   });
 
+  it('captures Masterwrought modal teardown and indoor feast placement on desktop and mobile', () => {
+    for (const [path, key] of [
+      ['src/ui/hud/professions/perfecting_window.ts', 'perfecting-dismissal'],
+      ['src/render/farm_patches.ts', 'feast-dungeon-floor'],
+    ]) {
+      const target = classifyDiff([path]).specific.find(
+        (entry: { key: string }) => entry.key === key,
+      );
+      expect(target, path).toBeDefined();
+      expect(target.variants.map((variant: { key: string }) => variant.key)).toEqual([
+        'desktop',
+        'mobile',
+      ]);
+      expect(target.variants[1].mobile).toBe(true);
+      expect(
+        target.variants.every(
+          (variant: { beforeLoad: unknown }) => typeof variant.beforeLoad === 'function',
+        ),
+      ).toBe(true);
+    }
+  });
+
   it('maps a bags change to the inventory window target', () => {
     const plan = classifyDiff(['src/ui/bags.ts']);
     expect(plan.isVisual).toBe(true);
@@ -509,7 +531,7 @@ describe('classifyDiff', () => {
   });
 
   it('stages a complete profession identity for refresh-aware captures', () => {
-    const target = resolveTargets(['src/ui/professions_window.ts']).find(
+    const target = resolveTargets(['src/ui/hud/professions/professions_window.ts']).find(
       (candidate: { key: string }) => candidate.key === 'professions',
     );
     expect(target?.capture.toString()).toContain('knownRecipes: []');
@@ -518,10 +540,10 @@ describe('classifyDiff', () => {
   it('maps the identity card and view modules to the crafting target (phase 22)', () => {
     // A rename or when-list trim would silently stop capturing the identity
     // card framings; pin the routing per module the phase added.
-    const cardPlan = classifyDiff(['src/ui/profession_identity_card.ts']);
+    const cardPlan = classifyDiff(['src/ui/hud/professions/profession_identity_card.ts']);
     expect(cardPlan.isVisual).toBe(true);
     expect(cardPlan.specific.map((t: { key: string }) => t.key)).toContain('crafting');
-    const viewPlan = classifyDiff(['src/ui/profession_identity_view.ts']);
+    const viewPlan = classifyDiff(['src/ui/hud/professions/profession_identity_view.ts']);
     expect(viewPlan.specific.map((t: { key: string }) => t.key)).toContain('crafting');
     const crafting = cardPlan.specific.find(
       (candidate: { key: string }) => candidate.key === 'crafting',
@@ -654,6 +676,76 @@ describe('classifyDiff', () => {
         path,
       ).toContain('reliquary-tracker');
     }
+  });
+
+  // The deed catalog copy case that stood here (#2767, the 'vale-cup-skill-deed-copy'
+  // target) left with the Vale Cup: the release retired that shot target with the
+  // Sowfield, so a deeds.ts copy change no longer has a dedicated Book of Deeds
+  // reshoot to map to.
+
+  it('maps the plant sheet halves and the bed-interact resolver to the bed-press target (phase 9b)', () => {
+    // Both sheet halves share the 'ui/farming_plant_sheet' substring; the
+    // proximity resolver is the third road to the same surface, so a change
+    // to any of the three reshoots the bed press.
+    for (const path of [
+      'src/ui/hud/professions/farming_plant_sheet_view.ts',
+      'src/ui/hud/professions/farming_plant_sheet_window.ts',
+      'src/game/farm_bed_interact.ts',
+    ]) {
+      const plan = classifyDiff([path]);
+      expect(plan.isVisual, path).toBe(true);
+      expect(
+        plan.specific.map((t: { key: string }) => t.key),
+        path,
+      ).toContain('farm-plant-sheet');
+    }
+    const target = resolveTargets(['src/ui/hud/professions/farming_plant_sheet_view.ts']).find(
+      (candidate: { key: string }) => candidate.key === 'farm-plant-sheet',
+    );
+    // Desktop and mobile landscape both, each on the LOW graphics seed (the
+    // standing capture rules).
+    expect(target?.variants.map((v: { key: string }) => v.key)).toEqual(['desktop', 'mobile']);
+    expect(target?.variants.every((v: { beforeLoad?: unknown }) => !!v.beforeLoad)).toBe(true);
+  });
+
+  it('routes the legendary regalia core to the phase 16 regalia target', () => {
+    // The forge-mote drift is computed in legendary_regalia_core.ts and drawn
+    // by the renderer entity loop; a change to the core is a change to the
+    // marquee orange identity and must reshoot it.
+    const plan = classifyDiff(['src/render/legendary_regalia_core.ts']);
+    expect(plan.isVisual).toBe(true);
+    expect(plan.specific.map((t: { key: string }) => t.key)).toContain('p16-legendary-regalia');
+    const target = resolveTargets(['src/render/legendary_regalia_core.ts']).find(
+      (candidate: { key: string }) => candidate.key === 'p16-legendary-regalia',
+    );
+    // Desktop and mobile landscape both. Every variant carries a preset seed,
+    // and deliberately NOT the lowest one: the treatment is gated at the
+    // medium effects tier, so the target seeds preset 2 (the graphics
+    // comparison exception to the standing lowest-preset rule; the rationale
+    // lives on the target and the seedMediumGraphicsPreset helper).
+    expect(target?.variants.map((v: { key: string }) => v.key)).toEqual(['desktop', 'mobile']);
+    // Pin the seed IDENTITY, not just presence (the Phase 16 QA): the
+    // load-bearing property is WHICH seed. A truthy-only check would stay
+    // green if a variant swapped to the lowest-preset seed, and the capture
+    // would silently lose the medium-gated treatment (an empty frame).
+    expect(
+      target?.variants.map((v: { beforeLoad?: { name?: string } }) => v.beforeLoad?.name),
+    ).toEqual(['seedMediumGraphicsPreset', 'seedMediumGraphicsPreset']);
+    // ... and WHAT that helper seeds: the name pin alone would stay green if
+    // the helper's body were edited down to the lowest preset, silently
+    // costing the capture its medium-gated subject.
+    const seedSource = String((target?.variants[0] as { beforeLoad?: unknown })?.beforeLoad);
+    expect(seedSource, 'seedMediumGraphicsPreset must seed preset 2').toContain(
+      'graphicsPreset = 2',
+    );
+    // The mobile arm must keep its Android UA override: the runner's default
+    // iPhone UA lands the iOS memory profile, whose Lambert material tier
+    // never applies the day/night grade, and the evening staging is
+    // load-bearing for the shot (daylight washes the additive motes out).
+    const mobileVariant = target?.variants.find((v: { key: string }) => v.key === 'mobile') as
+      | { userAgent?: string }
+      | undefined;
+    expect(mobileVariant?.userAgent).toContain('Android');
   });
 });
 

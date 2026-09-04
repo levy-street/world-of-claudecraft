@@ -234,7 +234,7 @@ Jede Instanz läuft außerdem auf **Heroisch**: höherstufige Gegner, schärfere
 
 ### Delves
 
-Delves sind ein separater, skalierbarer Kleingruppen-Modus für ein oder zwei Spieler, bei jedem Durchlauf aus zufallsgenerierten Kammern neu aufgebaut und endend an einer verschlossenen Reliquientruhe, die sich über ein Schlossknack-Minispiel statt über einen Beutewurf öffnet. **The Collapsed Reliquary** (ab Stufe 7) endet bei Deacon Varric, und wenn du allein gehst, kämpft die KI-Begleiterin Tessa an deiner Seite. **The Drowned Litany** (ab Stufe 12) folgt der Spur in einen gefluteten Schrein am Rand von Mirefen Marsh. Ein Delve-Board legt die Stufe fest: Heroisch hebt die Gegnerstufen an und fügt für reichere Belohnungen ein zufälliges Affix hinzu.
+Delves sind ein separater, skalierbarer Kleingruppen-Modus für ein oder zwei Spieler, bei jedem Durchlauf aus zufallsgenerierten Kammern neu aufgebaut und endend an einer verschlossenen Reliquientruhe, die sich über ein Schlossknack-Minispiel statt über einen Beutewurf öffnet. **The Collapsed Reliquary** (ab Stufe 7) endet bei Deacon Vandric, und wenn du allein gehst, kämpft die KI-Begleiterin Tessa an deiner Seite. **The Drowned Litany** (ab Stufe 12) folgt der Spur in einen gefluteten Schrein am Rand von Mirefen Marsh. Ein Delve-Board legt die Stufe fest: Heroisch hebt die Gegnerstufen an und fügt für reichere Belohnungen ein zufälliges Affix hinzu.
 
 ### Gewertetes PvP (das Ashen Coliseum)
 

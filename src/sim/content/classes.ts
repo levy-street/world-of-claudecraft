@@ -1717,13 +1717,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       "Loose three icy bolts for $d Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Winterlash instant and skips its cooldown. (Frost)",
   },
-  // Frozen Orb: the roaming Icicle generator (combat/frozen_orb.ts). Instant,
+  // Frostglobe: the roaming Icicle generator (combat/frozen_orb.ts). Instant,
   // 45s cooldown; the orb drifts forward pulsing frost damage + a 30% snare
   // once per second for 8s. Each striking pulse banks one Icicle. Blizzard
   // shortens its cooldown (below).
   frozen_orb: {
     id: 'frozen_orb',
-    name: 'Frozen Orb',
+    name: 'Frostglobe',
     class: 'mage',
     learnLevel: 15,
     specs: ['frost'],
@@ -1763,15 +1763,15 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Release an orb of swirling frost that drifts forward for 8 sec, dealing $d Frost damage each second to nearby enemies and slowing them by 30%. Each striking pulse generates one Icicle. (Frost)',
   },
-  // Glacial Spike: the frost spec's slow, heavy spender. Gated on a FULL Icicles
+  // Rimeneedle: the frost spec's slow, heavy spender. Gated on a FULL Icicles
   // stack (requiresAuraStacks 5), which the cast consumes; it lands a big frost
   // hit and freezes the target with a short root, so the follow-up Ice Lance and
   // spells Brittle Ruin even where the target was not already frozen. The Icicles
-  // build-up lives in combat/frost_mage.ts (fed by Rimelance impacts + Frozen Orb
+  // build-up lives in combat/frost_mage.ts (fed by Rimelance impacts + Frostglobe
   // pulses); the freeze reuses the shared root effect so isRooted counts it.
   glacial_spike: {
     id: 'glacial_spike',
-    name: 'Glacial Spike',
+    name: 'Rimeneedle',
     class: 'mage',
     learnLevel: 16,
     specs: ['frost'],
@@ -1803,7 +1803,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   // Blizzard: the frost AoE workhorse, a ground-aimed channel on the
   // rain_of_fire template plus a snare rider (the position-channel aoeSlow
-  // pulse) and the Frozen Orb refund (frostMageChannelPulse, 0.5s per enemy
+  // pulse) and the Frostglobe refund (frostMageChannelPulse, 0.5s per enemy
   // struck, at most 3s per cast).
   blizzard: {
     id: 'blizzard',
@@ -1819,7 +1819,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetMode: 'position',
     // Owner playtest 2026-07-11: no longer a channel. A 2 sec cast places the
     // storm, which then pulses on its own for 6 sec (a groundAoE with the
-    // snare + Frozen Orb refund riders; delayed skips the on-cast pulse so
+    // snare + Frostglobe refund riders; delayed skips the on-cast pulse so
     // the first wave lands as the storm visibly forms).
     castTime: 2,
     effects: [
@@ -1839,7 +1839,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Conjures an ice storm at the target area: after a 2 sec cast it rages for 6 sec, dealing 12 to 16 Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frozen Orb, up to 3 sec per cast. (Frost)',
+      'Conjures an ice storm at the target area: after a 2 sec cast it rages for 6 sec, dealing 12 to 16 Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frostglobe, up to 3 sec per cast. (Frost)',
   },
   // Frente Glacial: Frost's hold-to-charge cone. The 2.4 sec cast is the
   // authoritative maximum charge clock; releasing earlier selects one of the
@@ -3333,7 +3333,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   vanish: {
     id: 'vanish',
     tooltipOmitEffectLines: true,
-    name: 'Smokestep',
+    name: 'Smokefade',
     class: 'rogue',
     learnLevel: 18,
     cost: 0,
@@ -4738,7 +4738,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Trigger your active weapon enchant. Pyrebrand: deal 54 to 64 Fire damage plus 30% of your Spell Power and gain 2 Thunder. Galeheart: strike with your weapon, advance Warspirit Cadence, and gain 20% attack speed for 6 sec. Stonebound: strike for 75% weapon damage, force the target to attack you for 3 sec, and take 20% less damage for 4 sec. Lifespring: consume Mending Current, heal for 125% of its remaining healing, and reduce the next hit within 8 sec by 50% of the health restored.',
   },
-  // Restoration Shaman signature, granted only by the Spiritmend spec.
+  // Restoration Shaman signature, granted only by the Spiritcall spec.
   chain_heal: {
     id: 'chain_heal',
     name: 'Cascading Mend',
@@ -4762,7 +4762,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Heal a friendly target for $d, then jump to up to 2 allies within 12 yards. Each jump heals for 50% of the previous target. Each ally reached consumes your remaining Mending Current and immediately heals for 125% of the amount consumed. The initial heal increases with Spell Power. (Spiritmend signature)',
+      'Heal a friendly target for $d, then jump to up to 2 allies within 12 yards. Each jump heals for 50% of the previous target. Each ally reached consumes your remaining Mending Current and immediately heals for 125% of the amount consumed. The initial heal increases with Spell Power. (Spiritcall signature)',
   },
   // ---- Spiritmend out-of-combat mass resurrection, the Chronomancy
   // collective_reversal twin. The five-minute cooldown is the real throttle:
@@ -4787,7 +4787,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     projectile: false,
     effects: [{ type: 'massResurrectGroup', hpFrac: 0.3 }],
     description:
-      'Call every fallen member of your group or raid within 40 yards and in your line of sight back to your side with 30% health and mana. Cannot be cast in combat. (Spiritmend)',
+      'Call every fallen member of your group or raid within 40 yards and in your line of sight back to your side with 30% health and mana. Cannot be cast in combat. (Spiritcall)',
   },
   healing_wave: {
     id: 'healing_wave',
@@ -4833,7 +4833,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      "Heal a friendly target for $d. Healing increases with Spell Power. Spiritmend: store 50% of the full heal before overhealing as Mending Current for 12 sec, up to 30% of the target's maximum health.",
+      "Heal a friendly target for $d. Healing increases with Spell Power. Spiritcall: store 50% of the full heal before overhealing as Mending Current for 12 sec, up to 30% of the target's maximum health.",
   },
   tidecall: {
     id: 'tidecall',
@@ -5771,7 +5771,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   summon_voidwalker: {
     id: 'summon_voidwalker',
-    name: 'Summon Gloomshade',
+    name: 'Summon Duskmurk',
     class: 'warlock',
     excludeSpecs: ['affliction', 'demonology'],
     learnLevel: 5,
@@ -5783,7 +5783,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'summonDemon', mobId: 'gloomshade' }],
     description:
-      'Summons a Gloomshade under the command of the Warlock. This sturdy demon taunts enemies and uses Abyssal Chain to drag distant normal enemies back into reach. Bosses cannot be pulled. Summoning a new demon dismisses your current one. You may have one demon at a time.',
+      'Summons a Duskmurk under the command of the Warlock. This sturdy demon taunts enemies and uses Abyssal Chain to drag distant normal enemies back into reach. Bosses cannot be pulled. Summoning a new demon dismisses your current one. You may have one demon at a time.',
   },
   summon_infernal: {
     id: 'summon_infernal',
@@ -6272,7 +6272,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description: 'Heals the target for $d over 12 sec.',
     specNotes: {
       restoration:
-        'Planting a NEW bloom adds 1 Verdance (max 5). At 5 Verdance, Swiftmend becomes Overbloom.',
+        'Planting a NEW bloom adds 1 Verdance (max 5). At 5 Verdance, Fleetmend becomes Overbloom.',
     },
   },
   thorns: {
@@ -7026,13 +7026,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   heroic_leap: {
     id: 'heroic_leap',
-    name: 'Heroic Leap',
+    name: 'Vaulting Charge',
     class: 'warrior',
     learnLevel: 6,
     cost: 0,
     castTime: 0,
     // 30s (was 20s, owner 2026-08-07): the warrior mobility budget in PvP is the
-    // whole point of the level-5 row re-cut above, and Heroic Leap is the other
+    // whole point of the level-5 row re-cut above, and Vaulting Charge is the other
     // half of it. Base kit, so this lands on all three specs.
     cooldown: 30,
     range: 30,
@@ -7064,7 +7064,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // design draft, tune VALUE not SHAPE) ------
   storm_bolt: {
     id: 'storm_bolt',
-    name: 'Storm Bolt',
+    name: 'Thunderhurl',
     class: 'warrior',
     learnLevel: 11,
     cost: 10,
@@ -7132,7 +7132,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   victory_rush: {
     id: 'victory_rush',
-    name: 'Victory Rush',
+    name: "Victor's Surge",
     class: 'warrior',
     learnLevel: 8,
     cost: 0,
@@ -7315,7 +7315,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // Not in CLASSES.*.abilities. Unlocked only via spec grants.
   crusader_strike: {
     id: 'crusader_strike',
-    name: 'Crusader Strike',
+    name: 'Oathstrike',
     class: 'paladin',
     learnLevel: 10,
     cost: 30,
@@ -7351,7 +7351,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   holy_shock: {
     id: 'holy_shock',
-    name: 'Holy Shock',
+    name: 'Lightjolt',
     class: 'paladin',
     learnLevel: 10,
     cost: 55,
@@ -7452,7 +7452,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   wyvern_sting: {
     id: 'wyvern_sting',
-    name: 'Wyvern Sting',
+    name: 'Drakesting',
     class: 'hunter',
     learnLevel: 10,
     cost: 35,
@@ -7526,7 +7526,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   icy_veins: {
     id: 'icy_veins',
     specs: ['frost'],
-    name: 'Icy Veins',
+    name: 'Coldsurge',
     class: 'mage',
     learnLevel: 12,
     cost: 0,
@@ -7746,7 +7746,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   swiftmend: {
     id: 'swiftmend',
-    name: 'Swiftmend',
+    name: 'Fleetmend',
     class: 'druid',
     learnLevel: 10,
     cost: 55,
@@ -7928,7 +7928,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   blink: {
     id: 'blink',
-    name: 'Flickerstep',
+    name: 'Flitstep',
     class: 'mage',
     // Joins the base kit at 5 (see the 'blink' entry in the mage kit list): two
     // level-5 choice-row options modify it, so it must exist by then, not at 10.
@@ -7960,7 +7960,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   counterspell: {
     id: 'counterspell',
-    name: 'Spellbreak',
+    name: 'Spellsever',
     class: 'mage',
     learnLevel: 4,
     cost: 45,
@@ -8049,7 +8049,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   meteor: {
     id: 'meteor',
-    name: 'Meteor',
+    // 'Skystone', not 'Meteor': the def name and the catalog English had
+    // drifted apart since the phase 03 naming sweep scrubbed the display name
+    // (src/ui/i18n.catalog/abilities.ts), and the catalog's is the ratified
+    // one. The ID stays 'meteor' (ids are frozen); only the English display
+    // name moves, which is the sanctioned pure-rename class of parity golden
+    // delta (tests/parity/CLAUDE.md).
+    name: 'Skystone',
     class: 'mage',
     learnLevel: 16,
     specs: ['fire'],
@@ -8191,7 +8197,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Finishes the cooldown on Flickerstep, Frostveil, and Greater Invisibility. (Mage talent)',
+      'Finishes the cooldown on Flitstep, Frostveil, and Greater Invisibility. (Mage talent)',
   },
   mass_barrier: {
     id: 'mass_barrier',
@@ -8700,7 +8706,7 @@ function scaleEffect(
             max: Math.round(eff.max * dmgMult + flat),
           };
     case 'repositionToAim':
-      // Heroic Leap's landing hit is a groundAoE-shaped rider on the
+      // Vaulting Charge's landing hit is a groundAoE-shaped rider on the
       // reposition; scale it the same way a groundAoE pulse scales.
       return eff.landingAoe
         ? {

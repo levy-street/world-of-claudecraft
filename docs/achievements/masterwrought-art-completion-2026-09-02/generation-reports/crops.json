@@ -1,0 +1,1113 @@
+{
+  "batch": "masterwrought-crop-icons-2026-09-02",
+  "generator": "OpenAI built-in image_gen",
+  "generationMode": "one built-in call per distinct asset, with targeted edit calls only for rejected candidates",
+  "contract": "woc-item-icon-v1",
+  "referencePolicy": "Only canonical approved item anchors were used as style references. Generated candidates were used only as edit targets during targeted retries.",
+  "summary": {
+    "requested": 36,
+    "completed": 36,
+    "accepted": 36,
+    "initialGenerationCalls": 36,
+    "targetedRetryCalls": 4,
+    "allMastersSquare": true,
+    "allMastersSrgb": true,
+    "allMastersOpaque": true
+  },
+  "reviewArtifacts": {
+    "familyMontages": "tmp/imagegen/masterwrought-art-2026-09-02/review/crops/*-triplet.png",
+    "actualSize128": "tmp/imagegen/masterwrought-art-2026-09-02/review/crops/all-128.png",
+    "actualSize40": "tmp/imagegen/masterwrought-art-2026-09-02/review/crops/all-40.png",
+    "actualSize28": "tmp/imagegen/masterwrought-art-2026-09-02/review/crops/all-28.png",
+    "actualSize22": "tmp/imagegen/masterwrought-art-2026-09-02/review/crops/all-22.png",
+    "grayscale28": "tmp/imagegen/masterwrought-art-2026-09-02/review/crops/all-28-gray.png",
+    "circularCrop64": "tmp/imagegen/masterwrought-art-2026-09-02/review/crops/all-circle64.png"
+  },
+  "reviewConclusion": "All 36 accepted masters preserve full silhouettes, remain recognizable at 22px and in a 64px circular crop, separate base and Fine identities by construction rather than overlays, and contain no text, pseudo-writing, baked UI frame, watermark, or transparency.",
+  "items": [
+    {
+      "id": "vale_wheat_seed",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Vale Wheat Seed (vale_wheat_seed) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one squat open homespun seed pouch, oat-colored linen with a narrow pastoral-green stitched rim and tied drawcord, visibly filled with long golden wheat kernels; a single small wheat awn tucked into the pouch seam makes the crop unmistakable. The pouch and its contents are one compact tangible inventory subject. No writing or symbol on the pouch.\nComposition: centered complete three-quarter pouch, opening and crop-specific contents readable, about 72 percent subject fill with generous safe padding, crisp silhouette at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal and muted vale-green painted vignette, subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile coarse linen, dry grain, soft leather cord; pastoral gold and leaf green; crisp focal edges and softer peripheral brushwork; warm top-left key light with cool deep bottom-right shadow.\nInput images: Image 1 linen_pouch is a soft-goods, leather, volume, and lighting style reference only. Image 2 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 3 eastbrook_buckler is a value range, top-left light, circular-mass readability, and painted-ground style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact seed-pouch subject; opaque painted background; borderless; no text, letters, numbers, labels, glyphs, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, landscape scene, loose scattered inventory, or cropped silhouette.",
+      "references": [
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "soft-goods volume and lighting style"
+        },
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, top-left light, circular-mass readability, and painted-ground style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-3b31d56a-05d0-41bc-8adf-d7aea09a6b93.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/vale_wheat_seed.png",
+      "sourceSha256": "735202de264b324513d3a54e8492e84d16f69c589f47ca09ff56088e19dc2f51",
+      "sourceBytes": 2167767,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 0,
+      "review": "Accepted. Crop-specific open wheat pouch, no writing, complete padded silhouette, tactile materials, correct directional light, and strong small-size grain cue."
+    },
+    {
+      "id": "vale_wheat",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Vale Wheat (vale_wheat) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one compact hand-harvested sheaf of ripe vale wheat, a readable fan of golden bearded grain heads on full green-gold stems, roughly bound low with plain leaf-green twine. The uneven bend of the stalks and a few folded leaves make it honest field produce rather than a decorative trophy.\nComposition: centered complete three-quarter harvest bundle, fan-shaped heads above a visible binding and stem ends, about 72 percent subject fill with safe padding, unmistakable wheat silhouette at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep umber and muted vale-green painted vignette with subtle dusty atmosphere and grounded contact shadow.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile dry stalks and plump kernels; pastoral gold and leaf green; crisp grain-head focal edges, softer peripheral brushwork; warm top-left key light with cool deep bottom-right shadow.\nInput images: Image 1 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 2 linen_pouch is a natural-fiber texture and warm-wear style reference only. Image 3 eastbrook_buckler is a value range, top-left light, readable mass, and painted-ground style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one bound wheat-sheaf subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical glow, sparkles, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, basket, landscape scene, loose scattered grain, or cropped stalks.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "natural-fiber texture and warm-wear style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, top-left light, readable mass, and painted-ground style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-9378a02a-664d-4519-9239-6bb9bfb094f1.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/vale_wheat.png",
+      "sourceSha256": "921e767787c884352a61da4d2b6ceab57effaf58ff7bc9aca4bb533a9b58e1c0",
+      "sourceBytes": 2398328,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 0,
+      "review": "Accepted. Complete rough fan-shaped wheat sheaf, field-worn construction, readable wheat identity, safe padding, and correct directional light."
+    },
+    {
+      "id": "fine_vale_wheat",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Fine Vale Wheat (fine_vale_wheat) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one pristine selection of exceptionally heavy vale wheat, arranged as a tight upright three-lobed crown of broad amber grain heads with clean unbroken stems, bound at the middle by a braided forest-green cord. Make it physically premium through fuller kernels, flawless form, controlled polish, and deliberate compact arrangement, not through a recolor, badge, glow, or added effect. It must be clearly distinct from the base crop's rough fan-shaped field sheaf.\nComposition: centered complete front-three-quarter premium produce bundle, crownlike top and neatly aligned stem ends visible, about 71 percent subject fill with safe padding, bold silhouette at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal-umber and restrained moss-green painted vignette, subtle atmosphere and grounded contact shadow.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile dry grain with crisp kernel ridges and braided cord; rich honey gold, amber, and forest green; crisp focal edges with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nInput images: Image 1 anglers_feast_platter is a premium food-material separation and small-size readability style reference only. Image 2 linen_pouch is a natural-fiber texture and crafted-detail style reference only. Image 3 eastbrook_buckler is a value range, top-left light, strong silhouette, and painted-ground style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact premium wheat-bundle subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical aura, floating sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, basket, landscape scene, loose scattered grain, or cropped stalks.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "premium food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "natural-fiber texture and crafted-detail style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, top-left light, strong silhouette, and painted-ground style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-785ffa0d-c256-4779-aa8a-3f98e10e26fb.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/fine_vale_wheat.png",
+      "sourceSha256": "80ad4b70400738c76a567a269b8800285e44ee30c75c7870a2551062217d451d",
+      "sourceBytes": 2245416,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 0,
+      "review": "Accepted. Premium heavy-grain crown silhouette is visibly distinct from the base rough field sheaf without relying on recolor or overlay; clean padding and tiny-size read."
+    },
+    {
+      "id": "brook_carrot_seed",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Brook Carrot Seed (brook_carrot_seed) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one plump open seed pouch of warm russet leather and coarse cream linen, its rolled leaf-green cuff framing a visible bed of tiny ridged tan carrot seeds; a single feathery carrot-leaf tuft is securely tucked beneath the tied orange cord as an unmistakable crop cue. The pouch, contents, and attached tuft form one tangible subject. No writing or symbol.\nComposition: centered complete three-quarter pouch with a broad readable opening, about 72 percent subject fill and safe padding, stout triangular bag silhouette readable at 22px and in a 64px circular crop.\nScene and backdrop: opaque full-square deep hearth-umber and muted leaf-green painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile worn leather, coarse linen, dry seed texture, and soft leaf fronds; Brook hearth orange, russet, cream, and leaf green; crisp focal edges with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nInput images: Image 1 linen_pouch is a soft-goods volume, fiber, and lighting style reference only. Image 2 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 3 eastbrook_buckler is a value range, strong silhouette, and painted-ground style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact inventory subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical aura, floating sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, landscape scene, loose scattered inventory, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "soft-goods volume, fiber, and lighting style"
+        },
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, strong silhouette, and painted-ground style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-25010dbc-2a50-45e0-a02e-3f36d1622ae1.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/brook_carrot_seed.png",
+      "sourceSha256": "36c992395ce9ae8174be88bfaea6c4a12c1f1838b5587fec3a00fc09cfb4a35f",
+      "sourceBytes": 2486285,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 0,
+      "review": "Accepted. Wide open crop-specific pouch, ridged seed mass and attached carrot fronds read cleanly; no writing and strong padded bag silhouette."
+    },
+    {
+      "id": "brook_carrot",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Brook Carrot (brook_carrot) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one honest field bunch of three crooked brook carrots joined at their intact leafy crowns, the roots varied in size, dusted with dark loam, and tied once with plain green twine. The compact bunch reads as one harvested produce item, with strong orange tapers and feathery tops.\nComposition: centered complete three-quarter compact bunch on a gentle diagonal, every root tip and leaf crown visible, about 73 percent subject fill with safe padding, unmistakable carrot silhouette at 22px and in a 64px circular crop.\nScene and backdrop: opaque full-square deep warm umber and restrained kitchen-green painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile soil-dusted root skin, fibrous twine, and crisp leafy fronds; Brook hearth orange, earthy brown, and leaf green; crisp focal edges with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nInput images: Image 1 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 2 eastbrook_buckler is a value range, top-left light, strong silhouette, and painted-ground style reference only. Image 3 linen_pouch is a tactile natural-material and brushwork style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact inventory subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical aura, floating sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, landscape scene, loose scattered inventory, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, top-left light, strong silhouette, and painted-ground style"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile natural-material and brushwork style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-6dc15b41-f0f0-4878-9784-be55bc9984ca.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/brook_carrot.png",
+      "sourceSha256": "ee69c8d0e26dce897533f0bacac352f05e162449fdcbc79c568289319c241aab",
+      "sourceBytes": 2302536,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 0,
+      "review": "Accepted. Rustic tied three-root harvest bunch is unmistakably carrot at tiny size and distinct from the pristine single fine carrot."
+    },
+    {
+      "id": "fine_brook_carrot",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Fine Brook Carrot (fine_brook_carrot) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one exceptionally plump, straight brook carrot selected at perfect ripeness, with a clean long taper, delicate pale root whiskers, and a full symmetrical crown of fresh feathered leaves. Make it physically premium through immaculate shape, saturated natural skin, fine growth rings, and pristine foliage, clearly distinct from the base crop's rough three-root field bunch, never through a recolor, badge, glow, or effect.\nComposition: centered complete front-three-quarter single carrot on a confident diagonal, root tip and full leaf crown safely inside the square, about 72 percent subject fill, bold identity at 22px and in a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal-umber and restrained forest-green painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile fresh root skin with fine ridges, tiny soil traces, and layered feathery leaves; rich tangerine, warm amber, and fresh leaf green; crisp focal edges with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nInput images: Image 1 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 2 eastbrook_buckler is a value range, top-left light, strong silhouette, and painted-ground style reference only. Image 3 linen_pouch is a tactile natural-material and brushwork style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact inventory subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical aura, floating sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, landscape scene, loose scattered inventory, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, top-left light, strong silhouette, and painted-ground style"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile natural-material and brushwork style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-bca4b5a9-06ec-4f9a-9d60-fa671525a983.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/fine_brook_carrot.png",
+      "sourceSha256": "d3972d6b61b23e6881e9c253ac3508027e8da3b16337294c839a4a1c13499211",
+      "sourceBytes": 2257982,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 0,
+      "review": "Accepted. Immaculate single carrot has a bold premium silhouette and is structurally distinct from the rough three-root base crop without an overlay."
+    },
+    {
+      "id": "marsh_rice_seed",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Marsh Rice Seed (marsh_rice_seed) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one low open seed pouch made from dark waxed umber cloth, reinforced by a braided marsh-reed rim and tied with a narrow burgundy cord, visibly filled with slender ivory rice grains; one drooping rice panicle is fixed beneath the knot as the crop cue. The weatherproof pouch, contents, and attached panicle form one tangible subject. No writing or symbol.\nComposition: centered complete three-quarter pouch with the ivory contents and reed construction readable, about 71 percent subject fill with safe padding, broad low silhouette at 22px and in a 64px circular crop.\nScene and backdrop: opaque full-square deep wet umber and misty teal painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile waxed cloth, fibrous reed braid, dry polished grain, and damp cord; Marsh ivory, burgundy, wet umber, and restrained misty teal; crisp focal edges with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nInput images: Image 1 linen_pouch is a soft-goods volume, fiber, and lighting style reference only. Image 2 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 3 eastbrook_buckler is a value range, strong silhouette, and painted-ground style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact inventory subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical aura, floating sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, landscape scene, loose scattered inventory, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "soft-goods volume, fiber, and lighting style"
+        },
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, strong silhouette, and painted-ground style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-6105d83a-b8ad-404e-a63f-d4e2e197477c.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/marsh_rice_seed.png",
+      "sourceSha256": "94cf2954e1e156bc288c8fc3c878670b0ffa1b3a476d5576f7f3a5954245517e",
+      "sourceBytes": 2192449,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 0,
+      "review": "Accepted. Weatherproof reed-rimmed pouch, ivory grains, burgundy tie, and attached rice panicles provide a strong crop-specific read with safe padding."
+    },
+    {
+      "id": "marsh_rice",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Marsh Rice (marsh_rice) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one rough field sheaf of mature marsh rice, several drooping ivory grain panicles on long damp green-brown stems, gathered asymmetrically and tied low with a plain burgundy reed band. A little dark peat clings near the cut stem ends, making it working harvest produce rather than ornamental wheat.\nComposition: centered complete three-quarter sheaf with curved grain heads, binding, and stem ends visible, about 72 percent subject fill with safe padding, distinctive drooping rice silhouette at 22px and in a 64px circular crop.\nScene and backdrop: opaque full-square deep wet umber and smoky mist-teal painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile pale grains, damp fibrous stems, woven reed band, and traces of peat; Marsh ivory, reed green, burgundy, wet umber, and misty teal; crisp focal edges with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nInput images: Image 1 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 2 eastbrook_buckler is a value range, top-left light, strong silhouette, and painted-ground style reference only. Image 3 linen_pouch is a tactile natural-material and brushwork style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact inventory subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical aura, floating sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, landscape scene, loose scattered inventory, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, top-left light, strong silhouette, and painted-ground style"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile natural-material and brushwork style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-b00984d2-0955-46a2-8e86-662fd59b7b1f.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/marsh_rice.png",
+      "sourceSha256": "757106bb24d478b31e3e7eefee3754541874b63e18996b36fa3543e2ca794395",
+      "sourceBytes": 2557066,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 0,
+      "review": "Accepted. Damp rough sheaf has long drooping panicles, peat-dark cut stems, and an asymmetric working-harvest silhouette."
+    },
+    {
+      "id": "fine_marsh_rice",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Fine Marsh Rice (fine_marsh_rice) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one pristine selection of marsh rice arranged into a compact arched fan of three exceptionally heavy ivory panicles, their clean stems aligned and secured by a refined burgundy woven band. Make it physically premium through fuller grains, flawless pale husks, balanced fan construction, and clean stem finish, clearly distinct from the base crop's rough asymmetric damp sheaf, never through recolor, badge, glow, or effect.\nComposition: centered complete front-three-quarter premium fan, three bowed grain heads forming a strong arch above the visible band and aligned stems, about 70 percent subject fill with safe padding, bold identity at 22px and in a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal-umber and restrained marsh-teal painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile plump rice grains, satin-dry stems, and fine woven reed cloth; pearl ivory, dark burgundy, muted reed green, and cool misty teal; crisp focal edges with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nInput images: Image 1 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 2 eastbrook_buckler is a value range, top-left light, strong silhouette, and painted-ground style reference only. Image 3 linen_pouch is a tactile natural-material and brushwork style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact inventory subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical aura, floating sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, landscape scene, loose scattered inventory, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, top-left light, strong silhouette, and painted-ground style"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile natural-material and brushwork style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-ae828b89-fde2-4428-9b9a-a65daf6d884d.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/fine_marsh_rice.png",
+      "sourceSha256": "ca1c6f9f0a2a5209e67cadd007ca5ac25c40efbcb6a44429b3cd426e0bcbe7c0",
+      "sourceBytes": 2345297,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 0,
+      "review": "Accepted. Clean ivory three-arc fan with aligned stems and refined burgundy band is structurally and materially premium, distinct from the rough base sheaf without effects."
+    },
+    {
+      "id": "bog_beet_seed",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Bog Beet Seed (bog_beet_seed) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one squat open pouch of peat-brown waxed hide with a folded burgundy cloth collar, filled with knobbly tan beet seed clusters; a single small dark-green beet leaf with a wine-red vein is fastened beneath the cord as the crop cue. The pouch, contents, and attached leaf form one tangible subject. No writing or symbol.\nComposition: centered complete three-quarter pouch with its seed clusters and broad waxed body readable, about 71 percent subject fill with safe padding, low rounded silhouette at 22px and in a 64px circular crop.\nScene and backdrop: opaque full-square deep wet umber and smoky marsh-teal painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile waxed hide, damp cloth, rough clustered seeds, and veined leaf; Marsh burgundy, peat umber, muted bog green, tan, and misty teal; crisp focal edges with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nInput images: Image 1 linen_pouch is a soft-goods volume, fiber, and lighting style reference only. Image 2 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 3 eastbrook_buckler is a value range, strong silhouette, and painted-ground style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact inventory subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical aura, floating sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, landscape scene, loose scattered inventory, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "soft-goods volume, fiber, and lighting style"
+        },
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, strong silhouette, and painted-ground style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-545154fa-5aa1-477b-9caf-615a9ce313b9.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/bog_beet_seed.png",
+      "sourceSha256": "e8e0eece47429921f1c63f23a880f02dfd00b610cf59f626519026d696cb7f94",
+      "sourceBytes": 2310300,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 0,
+      "review": "Accepted. Distinct waxed round pouch with visibly clustered beet seeds and an attached red-veined beet leaf; no writing and clear marsh palette."
+    },
+    {
+      "id": "bog_beet",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Bog Beet (bog_beet) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one rugged bog beet freshly pulled from dark peat, an elongated knobbly burgundy root with a crooked taper, damp soil caught in its grooves, and a loose crown of broad dark-green leaves streaked with red veins. It reads as ordinary working harvest produce, not a jewel.\nComposition: centered complete three-quarter single root on a gentle diagonal, leaf crown and root tip visible with safe padding, about 73 percent subject fill, unmistakable beet silhouette at 22px and in a 64px circular crop.\nScene and backdrop: opaque full-square deep wet umber and restrained bog-teal painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile muddy root skin, damp soil, fibrous rootlets, and broad veined leaves; dark burgundy, beet red, peat brown, bog green, and misty teal; crisp focal edges with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nInput images: Image 1 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 2 eastbrook_buckler is a value range, top-left light, strong silhouette, and painted-ground style reference only. Image 3 linen_pouch is a tactile natural-material and brushwork style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact inventory subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical aura, floating sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, landscape scene, loose scattered inventory, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, top-left light, strong silhouette, and painted-ground style"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile natural-material and brushwork style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-6bcc0094-0235-402d-b171-5d492778a3f1.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/bog_beet.png",
+      "sourceSha256": "d3d65f36738316206dff06104070d2a81d72c7cbd18be96c1a977e2c3f0d1f02",
+      "sourceBytes": 2508307,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 0,
+      "review": "Accepted. Mud-caked elongated beet, fibrous taper, and loose weathered leaves make a strong ordinary harvest silhouette."
+    },
+    {
+      "id": "fine_bog_beet",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Fine Bog Beet (fine_bog_beet) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one immaculate round bog beet selected at perfect ripeness, with a smooth deep-ruby bulb, a clean golden-brown taper, fine pale root whiskers, and a tight symmetrical crown of crisp emerald leaves with precise burgundy veins. Make it physically premium through fullness, unblemished skin, balanced form, and fresh foliage, clearly distinct from the base crop's elongated mud-caked root, never through recolor, badge, glow, or effect.\nComposition: centered complete front-three-quarter single beet, compact round bulb below its tidy leaf crown, about 71 percent subject fill with safe padding, bold identity at 22px and in a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal-umber and restrained marsh-teal painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile satin root skin, tiny natural pores, clean root fibers, and crisp veined leaves; rich ruby, dark burgundy, emerald green, warm root gold, and cool misty teal; crisp focal edges with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nInput images: Image 1 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 2 eastbrook_buckler is a value range, top-left light, strong silhouette, and painted-ground style reference only. Image 3 linen_pouch is a tactile natural-material and brushwork style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact inventory subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical aura, floating sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, landscape scene, loose scattered inventory, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, top-left light, strong silhouette, and painted-ground style"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile natural-material and brushwork style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-d8576de0-eb8d-49d5-a708-62c0b5bd0110.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/fine_bog_beet.png",
+      "sourceSha256": "229f59aa229ea267019a6155be2a1f15b7b4324f819801de45906ac388ad9625",
+      "sourceBytes": 2298426,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 0,
+      "review": "Accepted. Smooth round ruby bulb and disciplined symmetrical leaf crown read as physically pristine and clearly differ from the rough base beet."
+    },
+    {
+      "id": "highland_barley_seed",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Highland Barley Seed (highland_barley_seed) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one sturdy open seed pouch of slate-blue wool and weathered brown leather, its mouth reinforced with a narrow bronze-toned band and filled with pale elongated barley kernels; a single long-awned barley head is tucked securely beneath the frost-blue tie as the crop cue. The pouch, contents, and attached head form one tangible subject. No writing or symbol.\nComposition: centered complete three-quarter pouch with broad opening and whiskered barley cue visible, about 71 percent subject fill with safe padding, rugged trapezoid silhouette at 22px and in a 64px circular crop.\nScene and backdrop: opaque full-square deep slate-charcoal and restrained frost-blue painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile wool weave, worn leather, dry grain, bronze edge, and fine awns; Highwatch bronze, pale grain gold, frost blue, and slate; crisp focal edges with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nInput images: Image 1 linen_pouch is a soft-goods volume, fiber, and lighting style reference only. Image 2 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 3 eastbrook_buckler is a value range, strong silhouette, and painted-ground style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact inventory subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical aura, floating sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, landscape scene, loose scattered inventory, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "soft-goods volume, fiber, and lighting style"
+        },
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, strong silhouette, and painted-ground style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-0673be69-b74c-4589-8b69-6b118c8a96fd.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/highland_barley_seed.png",
+      "sourceSha256": "a78abcd60dfa455598151d66b3611e16f58fc7723d8658f62492056ee748ab05",
+      "sourceBytes": 2388730,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 0,
+      "review": "Accepted. Slate wool and leather pouch, loose barley kernels, long-awned attached head, and cold mountain palette are distinct and text-free."
+    },
+    {
+      "id": "highland_barley",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Highland Barley (highland_barley) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one windswept rough sheaf of highland barley, many slender tawny heads distinguished by very long whisker-like awns, bent in one direction on weathered green-gold stems and bound low with a worn frost-blue cord. The airy bristled profile must not resemble broad-headed vale wheat.\nComposition: centered complete three-quarter sheaf on a mild wind-swept diagonal, bristled heads, binding, and cut stems all visible, about 72 percent subject fill with safe padding, distinctive whiskered silhouette at 22px and in a 64px circular crop.\nScene and backdrop: opaque full-square deep slate and smoky mountain blue painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile dry awns, narrow grain heads, fibrous stems, and worn cord; Highwatch tawny gold, bronze, frost blue, weathered green, and slate; crisp focal edges with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nInput images: Image 1 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 2 eastbrook_buckler is a value range, top-left light, strong silhouette, and painted-ground style reference only. Image 3 linen_pouch is a tactile natural-material and brushwork style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact inventory subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical aura, floating sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, landscape scene, loose scattered inventory, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, top-left light, strong silhouette, and painted-ground style"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile natural-material and brushwork style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-b2da1dac-2497-41dc-af6b-7851fcd43e9e.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/highland_barley.png",
+      "sourceSha256": "c5f8b43ec89db1d5204329e03517059f47701a381d330370e64ad223d5b0ba62",
+      "sourceBytes": 2664570,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 0,
+      "review": "Accepted. The loose windswept long-awn sheaf clearly separates barley from Vale wheat and keeps every tip and stem safely framed."
+    },
+    {
+      "id": "fine_highland_barley",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Fine Highland Barley (fine_highland_barley) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one pristine compact crown of selected highland barley, five tall silver-gold heads with exceptionally long clean awns arranged in a tight upward brush, their straight stems secured by a refined bronze clasp over a frost-blue woven band. Make it physically premium through flawless whiskered heads, precise upright construction, and crisp finish, clearly distinct from the base crop's loose windswept sheaf, never through recolor, badge, glow, or effect.\nComposition: centered complete front-three-quarter premium bundle, narrow upright brush silhouette with clasp and aligned stem ends visible, about 70 percent subject fill with safe padding, bold bristled identity at 22px and in a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal-slate and restrained cold blue painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile fine awns and grain ridges, satin stems, woven band, and controlled bronze highlights; silver gold, aged bronze, frost blue, and dark slate; crisp focal edges with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nInput images: Image 1 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 2 eastbrook_buckler is a value range, top-left light, strong silhouette, and painted-ground style reference only. Image 3 linen_pouch is a tactile natural-material and brushwork style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact inventory subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical aura, floating sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, landscape scene, loose scattered inventory, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, top-left light, strong silhouette, and painted-ground style"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile natural-material and brushwork style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-362b0cff-d1ba-4f0f-8176-b43e57d8d687.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/fine_highland_barley.png",
+      "sourceSha256": "e9d72b75870ccf10d290c020f767d65bf92e7d4669db9f89af927f880e438802",
+      "sourceBytes": 2090478,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 1,
+      "review": "Accepted after one targeted retry. Upright five-head barley crown has a narrow premium silhouette and the unrequested sun emblem was replaced by a plain bronze fastening ring.",
+      "retryPrompts": [
+        "Use case: precise-object-edit\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: revise only Fine Highland Barley (fine_highland_barley) so its binding has no emblem or symbol.\nInput images: Image 1 is the edit target and controls the full subject, composition, palette, and paint treatment. Image 2 eastbrook_buckler is a lighting and painted-ground style check only. Image 3 linen_pouch is a tactile woven-material style check only.\nEdit: replace the ornate sun-shaped medallion on the front binding with a simple plain hammered bronze fastening ring over the existing frost-blue woven band. The bronze must have no icon, sunburst, crest, glyph, rune, inscription, pseudo-writing, or decorative symbol.\nPreserve exactly: the five upright long-awned barley heads, aligned stems, narrow crown silhouette, framing, safe padding, slate-blue backdrop, warm top-left key, cool bottom-right shadow, opaque square background, and premium hand-painted classic dark-fantasy MMORPG inventory style.\nConstraints: change only the fastening detail; one complete centered barley bundle; no text, letters, numbers, label, glyph, rune, pseudo-writing, emblem, UI border, rarity frame, halo, glow, sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, or crop."
+      ],
+      "discardedResults": [
+        "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-5e90301f-b891-40c5-99cb-c0f65bb55b25.png"
+      ],
+      "retryAttempts": [
+        {
+          "prompt": "Use case: precise-object-edit\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: revise only Fine Highland Barley (fine_highland_barley) so its binding has no emblem or symbol.\nInput images: Image 1 is the edit target and controls the full subject, composition, palette, and paint treatment. Image 2 eastbrook_buckler is a lighting and painted-ground style check only. Image 3 linen_pouch is a tactile woven-material style check only.\nEdit: replace the ornate sun-shaped medallion on the front binding with a simple plain hammered bronze fastening ring over the existing frost-blue woven band. The bronze must have no icon, sunburst, crest, glyph, rune, inscription, pseudo-writing, or decorative symbol.\nPreserve exactly: the five upright long-awned barley heads, aligned stems, narrow crown silhouette, framing, safe padding, slate-blue backdrop, warm top-left key, cool bottom-right shadow, opaque square background, and premium hand-painted classic dark-fantasy MMORPG inventory style.\nConstraints: change only the fastening detail; one complete centered barley bundle; no text, letters, numbers, label, glyph, rune, pseudo-writing, emblem, UI border, rarity frame, halo, glow, sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, or crop.",
+          "references": [
+            {
+              "path": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/fine_highland_barley.png",
+              "role": "edit target controlling the full subject, composition, palette, and paint treatment"
+            },
+            {
+              "path": "public/ui/items/eastbrook_buckler.webp",
+              "role": "lighting and painted-ground style check"
+            },
+            {
+              "path": "public/ui/items/linen_pouch.webp",
+              "role": "tactile woven-material style check"
+            }
+          ],
+          "inputCandidateResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-5e90301f-b891-40c5-99cb-c0f65bb55b25.png",
+          "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-362b0cff-d1ba-4f0f-8176-b43e57d8d687.png",
+          "disposition": "accepted"
+        }
+      ]
+    },
+    {
+      "id": "frost_gourd_seed",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Frost Gourd Seed (frost_gourd_seed) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one round open pouch of thick slate-gray felt with a pale frost-blue rolled rim and stout brown leather base, visibly filled with large flat ivory gourd seeds; a single pale curled vine tendril and small blue-green gourd leaf are secured beneath the tie as the crop cue. The pouch, contents, and attached vine form one tangible subject. No writing or symbol.\nComposition: centered complete three-quarter pouch with large flat seeds and curled vine readable, about 71 percent subject fill with safe padding, round sturdy silhouette at 22px and in a 64px circular crop.\nScene and backdrop: opaque full-square deep blue-slate and muted frost haze painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile thick felt, worn leather, smooth flat seeds, waxy leaf, and fibrous tendril; Highwatch frost blue, ivory, weathered bronze-brown, and slate; crisp focal edges with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nInput images: Image 1 linen_pouch is a soft-goods volume, fiber, and lighting style reference only. Image 2 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 3 eastbrook_buckler is a value range, strong silhouette, and painted-ground style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact inventory subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical aura, floating sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, landscape scene, loose scattered inventory, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "soft-goods volume, fiber, and lighting style"
+        },
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, strong silhouette, and painted-ground style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-12363eb3-1884-420d-bc42-1d504144eba6.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/frost_gourd_seed.png",
+      "sourceSha256": "f6d38339aa1ad982a8303ab644a9a30146c72015bab30008bfa1379143b32738",
+      "sourceBytes": 2449794,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 0,
+      "review": "Accepted. Large flat gourd seeds, thick felt pouch, curled tendril, and attached blue-green leaf make the cold-region seed identity immediate."
+    },
+    {
+      "id": "frost_gourd",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Frost Gourd (frost_gourd) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one rugged squat frost gourd, pale blue-gray with irregular deep ribs, a chalky natural bloom, a crooked dark stem, and one curled blue-green vine leaf. Its broad low body is slightly asymmetrical and field-worn, with a cool hardy mountain character rather than literal ice.\nComposition: centered complete three-quarter single gourd, broad low ribbed mass with stem and leaf safely framed, about 73 percent subject fill, unmistakable squash silhouette at 22px and in a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal-slate and restrained frost-blue painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile powdery rind, deep organic ribs, woody stem, and waxy vine leaf; pale blue-gray, muted ivory, slate, cold leaf green, and restrained bronze; crisp focal edges with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nInput images: Image 1 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 2 eastbrook_buckler is a value range, top-left light, strong silhouette, and painted-ground style reference only. Image 3 linen_pouch is a tactile natural-material and brushwork style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact inventory subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical aura, floating sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, landscape scene, loose scattered inventory, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, top-left light, strong silhouette, and painted-ground style"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile natural-material and brushwork style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-241f3edb-7c7e-4424-891a-77bbe18137b9.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/frost_gourd.png",
+      "sourceSha256": "fb6664c34a2d514d75dcb0ce2c762857b2b4b58c65d3001724b4e7fd73e874a0",
+      "sourceBytes": 2349092,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 0,
+      "review": "Accepted. Low broad powdery blue gourd with irregular ribs and crooked stem is safely framed and strongly field-worn."
+    },
+    {
+      "id": "fine_frost_gourd",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Fine Frost Gourd (fine_frost_gourd) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one immaculate pear-shaped frost gourd selected at perfect ripeness, standing taller than the base crop with elegant symmetrical ivory-blue ribs, smooth powdery skin, a clean bronze-brown stem, and a compact dark slate-green leaf collar. Make it physically premium through flawless surface, sculptural tall form, crisp rib geometry, and pristine stem, clearly distinct from the base crop's low crooked field gourd, never through recolor, badge, glow, frost magic, or effect.\nComposition: centered complete front-three-quarter single tall gourd, stem and base safely visible, about 71 percent subject fill with safe padding, bold pear silhouette at 22px and in a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal-slate and cool muted blue painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile satin-powder rind, controlled rib highlights, woody stem, and crisp waxy leaf; pearl ivory, frost blue, dark slate green, aged bronze, and deep charcoal; crisp focal edges with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nInput images: Image 1 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 2 eastbrook_buckler is a value range, top-left light, strong silhouette, and painted-ground style reference only. Image 3 linen_pouch is a tactile natural-material and brushwork style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact inventory subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical aura, floating sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, landscape scene, loose scattered inventory, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, top-left light, strong silhouette, and painted-ground style"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile natural-material and brushwork style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-99dd6e6c-8d00-4b9f-a3e9-07027757cfa3.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/fine_frost_gourd.png",
+      "sourceSha256": "95d65bf82aa05cee13fbd237511da8ae9f3512902db46154a12ffaff733fa55c",
+      "sourceBytes": 2053570,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 0,
+      "review": "Accepted. Tall pear-shaped immaculate gourd is structurally distinct from the squat base crop and reads premium through form and finish, not effects."
+    },
+    {
+      "id": "thornpeak_cabbage_seed",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Thornpeak Cabbage Seed (thornpeak_cabbage_seed) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one angular open seed pouch of rugged slate-blue canvas with a weathered brown leather base and bronze-rimmed mouth, visibly filled with tiny round charcoal-black cabbage seeds; one serrated blue-green cabbage leaf tip is secured under the frost-blue cord as the crop cue. The pouch, contents, and attached leaf form one tangible subject. No writing, seal, or symbol.\nComposition: centered complete three-quarter pouch with dark round seeds sharply separated from the rim, about 71 percent subject fill with safe padding, angular mountain-kit silhouette at 22px and in a 64px circular crop.\nScene and backdrop: opaque full-square deep slate-charcoal and restrained cold blue painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile canvas, worn leather, controlled bronze edge, hard tiny seeds, and waxy serrated leaf; Highwatch slate, frost blue, aged bronze, charcoal, and cold leaf green; crisp focal edges with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nInput images: Image 1 linen_pouch is a soft-goods volume, fiber, and lighting style reference only. Image 2 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 3 eastbrook_buckler is a value range, strong silhouette, and painted-ground style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact inventory subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical aura, floating sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, landscape scene, loose scattered inventory, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "soft-goods volume, fiber, and lighting style"
+        },
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, strong silhouette, and painted-ground style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-058af973-2fd5-4d40-8574-309b992db6d0.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/thornpeak_cabbage_seed.png",
+      "sourceSha256": "b0277175ab35d27b3550100701335319583fbf097ed83dfb514afa8e84fa957e",
+      "sourceBytes": 2408475,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 0,
+      "review": "Accepted. Dark round cabbage seeds, angular slate pouch, frost cord, and serrated leaf cue make the cold mountain family distinct and text-free."
+    },
+    {
+      "id": "thornpeak_cabbage",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Thornpeak Cabbage (thornpeak_cabbage) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one rugged thornpeak cabbage head, a compact core surrounded by loose jagged blue-green outer leaves with thorn-like serrated tips, weathered pale veins, and a few frost-nipped bronze edges. It should look hardy and mountain-grown, slightly uneven and field-worn, not a smooth lettuce or flower.\nComposition: centered complete three-quarter single cabbage, broad spiky leaf mass with every outer tip safely visible, about 72 percent subject fill, unmistakable cabbage silhouette at 22px and in a 64px circular crop.\nScene and backdrop: opaque full-square deep slate and smoky frost-blue painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile thick waxy leaves, raised pale veins, curled weathered edges, and subtle cold moisture; blue green, dark forest green, frost blue, aged bronze, and slate; crisp focal edges with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nInput images: Image 1 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 2 eastbrook_buckler is a value range, top-left light, strong silhouette, and painted-ground style reference only. Image 3 linen_pouch is a tactile natural-material and brushwork style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact inventory subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical aura, floating sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, landscape scene, loose scattered inventory, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, top-left light, strong silhouette, and painted-ground style"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile natural-material and brushwork style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-133a6484-fb0e-4898-ba53-fef440baf0a4.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/thornpeak_cabbage.png",
+      "sourceSha256": "3330f381c184b28be1eb4d0a069b9f1071f56ec0923ca85b286b95554bd1e947",
+      "sourceBytes": 2460634,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 0,
+      "review": "Accepted. Loose thorn-like blue outer leaves and weathered inner head give the ordinary crop a hardy jagged silhouette."
+    },
+    {
+      "id": "fine_thornpeak_cabbage",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Fine Thornpeak Cabbage (fine_thornpeak_cabbage) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one immaculate tight thornpeak cabbage selected at perfect ripeness, a dense round rosette of precisely layered silver-green leaves with crisp pale veins and restrained blue outer tips. Make it physically premium through compact fullness, flawless layered geometry, fresh waxy surfaces, and a clean short stem, clearly distinct from the base crop's loose jagged frost-nipped head, never through recolor, badge, glow, frost magic, or effect.\nComposition: centered complete front-three-quarter single cabbage rosette, dense round silhouette with clean stem base and all leaves safely framed, about 71 percent subject fill, bold identity at 22px and in a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal-slate and muted cold blue painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile fresh waxy leaves, crisp raised veins, smooth folded edges, and controlled natural sheen; silver green, deep emerald, frost blue, ivory veins, and dark slate; crisp focal edges with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nInput images: Image 1 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 2 eastbrook_buckler is a value range, top-left light, strong silhouette, and painted-ground style reference only. Image 3 linen_pouch is a tactile natural-material and brushwork style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact inventory subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical aura, floating sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, landscape scene, loose scattered inventory, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, top-left light, strong silhouette, and painted-ground style"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile natural-material and brushwork style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-4cc2ac40-f4b7-4261-b8e9-f00a02de7a7b.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/fine_thornpeak_cabbage.png",
+      "sourceSha256": "96c235490684d1289ebb15ba23a8be4f399b2c46433150d1d7423b6c7fa6ff02",
+      "sourceBytes": 2330995,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 1,
+      "review": "Accepted after one targeted retry. Dense pristine rosette remains structurally distinct while the sticker-like white perimeter was softened into directional painted light and cool shadow.",
+      "retryPrompts": [
+        "Use case: precise-object-edit\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: revise only the edge lighting on Fine Thornpeak Cabbage (fine_thornpeak_cabbage) so it integrates naturally into the painted vignette.\nInput images: Image 1 is the edit target and controls the cabbage identity, layered geometry, composition, palette, and paint treatment. Image 2 anglers_feast_platter is a food-material and small-size readability style check only. Image 3 eastbrook_buckler is a directional-light and painted-ground style check only.\nEdit: remove the bright white contour that currently traces the outer leaves. Keep a controlled warm top-left highlight, but soften and darken the outer perimeter, especially the right and lower edges, into a cool deep shadow. Preserve natural leaf-edge contrast without any cel-shaded, sticker-like, cutout, or glowing outline.\nPreserve exactly: one pristine dense round silver-green cabbage rosette, precise layered leaves and pale veins, complete centered silhouette, safe padding, dark slate backdrop, opaque square background, and premium hand-painted classic dark-fantasy MMORPG inventory rendering.\nConstraints: change only the perimeter lighting and integration; no text, letters, numbers, glyph, rune, pseudo-writing, emblem, UI border, rarity frame, halo, glow, sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, or crop."
+      ],
+      "discardedResults": [
+        "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-23721b23-2734-47f8-bd02-3cb5dd6f028b.png"
+      ],
+      "retryAttempts": [
+        {
+          "prompt": "Use case: precise-object-edit\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: revise only the edge lighting on Fine Thornpeak Cabbage (fine_thornpeak_cabbage) so it integrates naturally into the painted vignette.\nInput images: Image 1 is the edit target and controls the cabbage identity, layered geometry, composition, palette, and paint treatment. Image 2 anglers_feast_platter is a food-material and small-size readability style check only. Image 3 eastbrook_buckler is a directional-light and painted-ground style check only.\nEdit: remove the bright white contour that currently traces the outer leaves. Keep a controlled warm top-left highlight, but soften and darken the outer perimeter, especially the right and lower edges, into a cool deep shadow. Preserve natural leaf-edge contrast without any cel-shaded, sticker-like, cutout, or glowing outline.\nPreserve exactly: one pristine dense round silver-green cabbage rosette, precise layered leaves and pale veins, complete centered silhouette, safe padding, dark slate backdrop, opaque square background, and premium hand-painted classic dark-fantasy MMORPG inventory rendering.\nConstraints: change only the perimeter lighting and integration; no text, letters, numbers, glyph, rune, pseudo-writing, emblem, UI border, rarity frame, halo, glow, sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, or crop.",
+          "references": [
+            {
+              "path": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/fine_thornpeak_cabbage.png",
+              "role": "edit target controlling cabbage identity, layered geometry, composition, palette, and paint treatment"
+            },
+            {
+              "path": "public/ui/items/anglers_feast_platter.webp",
+              "role": "food-material and small-size readability style check"
+            },
+            {
+              "path": "public/ui/items/eastbrook_buckler.webp",
+              "role": "directional-light and painted-ground style check"
+            }
+          ],
+          "inputCandidateResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-23721b23-2734-47f8-bd02-3cb5dd6f028b.png",
+          "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-4cc2ac40-f4b7-4261-b8e9-f00a02de7a7b.png",
+          "disposition": "accepted"
+        }
+      ]
+    },
+    {
+      "id": "frost_lentils_seed",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Frost Lentils Seed (frost_lentils_seed) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one small open pouch of dark slate wool with a plain hammered-bronze rim and frost-blue braided tie, visibly filled with flat coin-shaped blue-gray lentil seeds speckled ivory; one closed lentil pod and a tiny paired leaf are fastened beneath the cord as the crop cue. The pouch, contents, and attached pod form one tangible subject. No writing, seal, or symbol.\nComposition: centered complete three-quarter pouch with flat speckled seed shapes readable, about 70 percent subject fill with safe padding, compact round silhouette at 22px and in a 64px circular crop.\nScene and backdrop: opaque full-square deep blue-slate and restrained cold haze painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile wool weave, plain bronze rim, flat dry seeds, fibrous pod, and fine paired leaves; Highwatch slate, frost blue, dull bronze, ivory, and muted blue green; crisp focal edges with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nInput images: Image 1 linen_pouch is a soft-goods volume, fiber, and lighting style reference only. Image 2 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 3 eastbrook_buckler is a value range, strong silhouette, and painted-ground style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact inventory subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical aura, floating sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, landscape scene, loose scattered inventory, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "soft-goods volume, fiber, and lighting style"
+        },
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, strong silhouette, and painted-ground style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-e7d8e12d-76c4-4b0d-a361-24194c8bb878.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/frost_lentils_seed.png",
+      "sourceSha256": "b79c021fb3f042eeb368871cd736a0d70b3380be90af07b4f901ba74a46bb082",
+      "sourceBytes": 2427158,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 0,
+      "review": "Accepted. Flat speckled blue lentils are legible inside a text-free wool pouch, with an attached closed pod reinforcing the crop identity."
+    },
+    {
+      "id": "frost_lentils",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Frost Lentils (frost_lentils) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one rough harvested bundle of frost lentil plants, several plump tan-green lentil pods on short branching blue-green stems, gathered tightly and bound at the cut ends with a worn frost-blue cord. The pod shapes must be broad and unmistakable, making this harvested pulse visibly different from the loose seeds in a pouch.\nComposition: centered complete three-quarter pod bundle on a mild diagonal, branching stems, closed pods, binding, and cut ends all visible, about 72 percent subject fill with safe padding, strong pod-cluster silhouette at 22px and in a 64px circular crop.\nScene and backdrop: opaque full-square deep slate-charcoal and smoky frost-blue painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile papery pods, fibrous stems, small matte leaves, and worn cord; cold tan, muted blue green, frost blue, aged bronze, and slate; crisp focal edges with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nInput images: Image 1 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 2 eastbrook_buckler is a value range, top-left light, strong silhouette, and painted-ground style reference only. Image 3 linen_pouch is a tactile natural-material and brushwork style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact inventory subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical aura, floating sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, landscape scene, loose scattered inventory, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, top-left light, strong silhouette, and painted-ground style"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile natural-material and brushwork style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-8c0dfad3-ea72-492b-b6de-7a487578cdd5.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/frost_lentils.png",
+      "sourceSha256": "431004ac949c0c986d0b6661f0d4a3243036a6d7b1b646d0dc534bca483c1fa6",
+      "sourceBytes": 2343045,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 0,
+      "review": "Accepted. Rough branching harvest bundle of papery pods is materially and structurally distinct from the loose seed pouch."
+    },
+    {
+      "id": "fine_frost_lentils",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Fine Frost Lentils (fine_frost_lentils) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one pristine selected frost-lentil sprig arranged as a compact radial fan of seven full silver-blue pods around a clean central stem, secured at the base by a narrow bronze ring and frost-blue cord. Make it physically premium through uniformly plump pods, clean seams, precise fan construction, and fresh paired leaves, clearly distinct from the base crop's rough branching bundle, never through recolor, badge, glow, frost magic, or effect.\nComposition: centered complete front-three-quarter premium pod fan, bold oval pods forming a balanced crown above the bound stem base, about 70 percent subject fill with safe padding, clear pulse silhouette at 22px and in a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal-slate and restrained cold blue painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile satin-papery pods with crisp seams, clean stems, fresh small leaves, woven cord, and plain bronze; silver blue, cool sage, ivory seams, aged bronze, and dark slate; crisp focal edges with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nInput images: Image 1 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 2 eastbrook_buckler is a value range, top-left light, strong silhouette, and painted-ground style reference only. Image 3 linen_pouch is a tactile natural-material and brushwork style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact inventory subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical aura, floating sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, landscape scene, loose scattered inventory, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, top-left light, strong silhouette, and painted-ground style"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile natural-material and brushwork style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-5f247793-697a-45b8-9a5f-0147abf37226.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/fine_frost_lentils.png",
+      "sourceSha256": "e19d79a944b0961d75636e68b36caa278274a79ffd8cf0acc02ea22526226400",
+      "sourceBytes": 2145694,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 0,
+      "review": "Accepted. Balanced radial fan of seven full pale pods and clean tied stems reads as a deliberately selected premium harvest without glow or overlay."
+    },
+    {
+      "id": "gilded_sunmelon_seed",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Gilded Sunmelon Seed (gilded_sunmelon_seed) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one luxurious open seed pouch of deep emerald velvet with a plain warm-gold leather cuff and braided gold-green drawcord, visibly filled with glossy flat cream-and-charcoal melon seeds; one curling emerald vine tendril and small five-lobed leaf are secured beneath the tie as the crop cue. The pouch, contents, and attached vine form one tangible subject. No writing, seal, crest, or symbol.\nComposition: centered complete three-quarter pouch with glossy flat seeds and curled vine readable, about 71 percent subject fill with safe padding, opulent round silhouette at 22px and in a 64px circular crop.\nScene and backdrop: opaque full-square deep emerald-charcoal and muted amber painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile velvet pile, soft leather, polished flat seeds, waxy leaf, and braided cord; Evergarden emerald, warm gold, cream, charcoal, and restrained amber; crisp focal edges with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nInput images: Image 1 linen_pouch is a soft-goods volume, fiber, and lighting style reference only. Image 2 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 3 eastbrook_buckler is a value range, strong silhouette, and painted-ground style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact inventory subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical aura, floating sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, landscape scene, loose scattered inventory, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "soft-goods volume, fiber, and lighting style"
+        },
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, strong silhouette, and painted-ground style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-b297b1c9-09a7-40f4-84ac-a07d9ac5e384.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/gilded_sunmelon_seed.png",
+      "sourceSha256": "3b0c3f720fb2f06f3ba71ffec0ceb5e5f9845a3c5bdcf7ad6e3761318cda7193",
+      "sourceBytes": 2270892,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 0,
+      "review": "Accepted. Velvet emerald pouch, large two-tone melon seeds, and attached vine leaf establish the opulent Evergarden seed family without writing."
+    },
+    {
+      "id": "gilded_sunmelon",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Gilded Sunmelon (gilded_sunmelon) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one rustic oval gilded sunmelon, long and slightly asymmetrical with warm golden-orange skin, broad natural cream stripes following its length, a crooked emerald stem, and one curled vine leaf. Its rind is field-grown with small scuffs and subtle netted texture, clearly a melon rather than a pumpkin or glowing orb.\nComposition: centered complete three-quarter single oval melon on a mild diagonal, stem and leaf safely framed, about 73 percent subject fill, unmistakable melon silhouette at 22px and in a 64px circular crop.\nScene and backdrop: opaque full-square deep emerald-umber and restrained amber haze painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile netted rind, broad natural stripes, woody stem, and waxy vine leaf; Evergarden golden orange, cream, emerald, warm umber, and amber; crisp focal edges with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nInput images: Image 1 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 2 eastbrook_buckler is a value range, top-left light, strong silhouette, and painted-ground style reference only. Image 3 linen_pouch is a tactile natural-material and brushwork style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact inventory subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical aura, floating sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, landscape scene, loose scattered inventory, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, top-left light, strong silhouette, and painted-ground style"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile natural-material and brushwork style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-95906371-e8c7-4a1f-81b6-e0f77de1314d.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/gilded_sunmelon.png",
+      "sourceSha256": "b6e7b47ce0866851a5d0d34b9b949c7a06afe0be9a7d579e6ce50e032020f631",
+      "sourceBytes": 2287151,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 0,
+      "review": "Accepted. Long scuffed striped fruit with slim vine reads as a rustic melon and stays safely distinct from pumpkin silhouettes."
+    },
+    {
+      "id": "fine_gilded_sunmelon",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Fine Gilded Sunmelon (fine_gilded_sunmelon) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one immaculate round gilded sunmelon selected at perfect ripeness, lower and fuller than the base crop with precise scalloped golden segments, delicate ivory seams, a clean dark-emerald crown stem, and a single tightly curled vine. Make it physically premium through flawless rind, balanced sculptural segmentation, rich natural finish, and pristine stem, clearly distinct from the base crop's long scuffed striped melon, never through recolor, badge, glow, sun emblem, or effect.\nComposition: centered complete front-three-quarter single round melon, bold segmented mass with stem and curl safely visible, about 71 percent subject fill with safe padding, clear premium melon silhouette at 22px and in a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal-emerald and restrained warm amber painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile satin rind, clean natural seams, polished woody stem, and crisp waxy vine; rich honey gold, amber, ivory, dark emerald, and deep charcoal; crisp focal edges with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nInput images: Image 1 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 2 eastbrook_buckler is a value range, top-left light, strong silhouette, and painted-ground style reference only. Image 3 linen_pouch is a tactile natural-material and brushwork style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact inventory subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical aura, floating sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, landscape scene, loose scattered inventory, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, top-left light, strong silhouette, and painted-ground style"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile natural-material and brushwork style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-ae811514-93f3-413f-938a-5f1afdb84eb9.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/fine_gilded_sunmelon.png",
+      "sourceSha256": "da4315e5233e29a8773fd02ee8adbe383ad3409e56288a4a8f45b11dfcb816e2",
+      "sourceBytes": 2487937,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 1,
+      "review": "Accepted after one targeted retry. Deep pumpkin lobes were removed; the smooth full golden melon now has delicate cream netting and a slim vine, clearly premium and melon-specific.",
+      "retryPrompts": [
+        "Use case: precise-object-edit\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: revise Fine Gilded Sunmelon (fine_gilded_sunmelon) so it reads unmistakably as a premium melon and cannot be confused with a pumpkin.\nInput images: Image 1 is the edit target and controls the golden fruit, composition, palette, background, and paint treatment. Image 2 anglers_feast_platter is a food-material and small-size readability style check only. Image 3 eastbrook_buckler is a directional-light and painted-ground style check only.\nEdit: remove the pumpkin-like deep lobes and furrows. Give the fruit a smooth, full, slightly flattened round-melon silhouette with only very shallow natural banding and a delicate cream webbed rind texture, like an exceptional honeydew-family melon. Keep a short slender dark-emerald stem and one tight vine curl, but no broad pumpkin stem. Preserve the immaculate premium finish and rich honey-gold color.\nPreserve exactly: one centered complete fruit, safe padding, dark emerald-charcoal vignette, warm top-left key, cool bottom-right shadow, opaque square background, and premium hand-painted classic dark-fantasy MMORPG inventory style.\nConstraints: change only the rind geometry, texture, and stem needed to clarify melon identity; no pumpkin lobes, squash shape, sun emblem, text, letters, numbers, glyph, rune, pseudo-writing, UI border, rarity frame, halo, glow, sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, or crop."
+      ],
+      "discardedResults": [
+        "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-7c56626d-01a4-42f1-8d3b-aed07cd6101c.png"
+      ],
+      "retryAttempts": [
+        {
+          "prompt": "Use case: precise-object-edit\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: revise Fine Gilded Sunmelon (fine_gilded_sunmelon) so it reads unmistakably as a premium melon and cannot be confused with a pumpkin.\nInput images: Image 1 is the edit target and controls the golden fruit, composition, palette, background, and paint treatment. Image 2 anglers_feast_platter is a food-material and small-size readability style check only. Image 3 eastbrook_buckler is a directional-light and painted-ground style check only.\nEdit: remove the pumpkin-like deep lobes and furrows. Give the fruit a smooth, full, slightly flattened round-melon silhouette with only very shallow natural banding and a delicate cream webbed rind texture, like an exceptional honeydew-family melon. Keep a short slender dark-emerald stem and one tight vine curl, but no broad pumpkin stem. Preserve the immaculate premium finish and rich honey-gold color.\nPreserve exactly: one centered complete fruit, safe padding, dark emerald-charcoal vignette, warm top-left key, cool bottom-right shadow, opaque square background, and premium hand-painted classic dark-fantasy MMORPG inventory style.\nConstraints: change only the rind geometry, texture, and stem needed to clarify melon identity; no pumpkin lobes, squash shape, sun emblem, text, letters, numbers, glyph, rune, pseudo-writing, UI border, rarity frame, halo, glow, sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, or crop.",
+          "references": [
+            {
+              "path": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/fine_gilded_sunmelon.png",
+              "role": "edit target controlling golden fruit, composition, palette, background, and paint treatment"
+            },
+            {
+              "path": "public/ui/items/anglers_feast_platter.webp",
+              "role": "food-material and small-size readability style check"
+            },
+            {
+              "path": "public/ui/items/eastbrook_buckler.webp",
+              "role": "directional-light and painted-ground style check"
+            }
+          ],
+          "inputCandidateResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-7c56626d-01a4-42f1-8d3b-aed07cd6101c.png",
+          "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-ae811514-93f3-413f-938a-5f1afdb84eb9.png",
+          "disposition": "accepted"
+        }
+      ]
+    },
+    {
+      "id": "evergarden_greens_seed",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Evergarden Greens Seed (evergarden_greens_seed) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one elegant open seed pouch of emerald damask cloth with a plain petal-pink silk lining and braided gold-green tie, visibly filled with tiny dark oval greens seeds; one tender heart-shaped emerald leaf is fastened beneath the cord as the crop cue. The pouch, contents, and attached leaf form one tangible subject. The fabric has natural weave only, with no writing, pattern, seal, crest, or symbol.\nComposition: centered complete three-quarter pouch with dark seeds separated against the pink-lined mouth, about 71 percent subject fill with safe padding, compact soft silhouette at 22px and in a 64px circular crop.\nScene and backdrop: opaque full-square deep emerald-charcoal and restrained rose-gold haze painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile silk-lined cloth, braided cord, matte oval seeds, and tender veined leaf; Evergarden emerald, warm gold, petal pink, charcoal, and soft amber; crisp focal edges with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nInput images: Image 1 linen_pouch is a soft-goods volume, fiber, and lighting style reference only. Image 2 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 3 eastbrook_buckler is a value range, strong silhouette, and painted-ground style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact inventory subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical aura, floating sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, landscape scene, loose scattered inventory, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "soft-goods volume, fiber, and lighting style"
+        },
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, strong silhouette, and painted-ground style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-be536299-3463-4d98-9250-881f1833bdf8.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/evergarden_greens_seed.png",
+      "sourceSha256": "42f48ed1267bb3a698ec1edd78299618b9c5bf6cfdefe2796b6dead56845bd2f",
+      "sourceBytes": 2611719,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 0,
+      "review": "Accepted. Emerald pouch with petal-pink lining, dark oval seeds, and a heart-shaped leaf provides a distinct opulent seed identity without any pattern or text."
+    },
+    {
+      "id": "evergarden_greens",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Evergarden Greens (evergarden_greens) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one rough kitchen bunch of mixed Evergarden greens, several long wavy emerald leaves with visible pale stems, curled and slightly drooping from harvest, gathered tightly at the stalk ends with plain green twine. The leafy bundle must read as cut cooking greens, not a cabbage head, flower, or herb sprig.\nComposition: centered complete three-quarter upright bunch with varied leafy fan, binding, and cut pale stems all visible, about 72 percent subject fill with safe padding, clear leafy-greens silhouette at 22px and in a 64px circular crop.\nScene and backdrop: opaque full-square deep emerald-umber and muted petal haze painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile broad fresh leaves, pale fibrous stems, curled edges, natural moisture, and simple twine; Evergarden emerald, leaf green, pale stem ivory, warm gold, and restrained petal pink; crisp focal edges with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nInput images: Image 1 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 2 eastbrook_buckler is a value range, top-left light, strong silhouette, and painted-ground style reference only. Image 3 linen_pouch is a tactile natural-material and brushwork style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact inventory subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical aura, floating sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, landscape scene, loose scattered inventory, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, top-left light, strong silhouette, and painted-ground style"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile natural-material and brushwork style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-726e5ee3-19f4-45dc-a5bc-9ae098ca8ca1.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/evergarden_greens.png",
+      "sourceSha256": "7e0d4b871992098fadb82c374b15397863a032fc65ef98bc0bcb190be2aef34e",
+      "sourceBytes": 2155064,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 0,
+      "review": "Accepted. Rough tied fan of curled mixed cooking leaves reads clearly as harvested greens, not cabbage, with safe stems and leaf tips."
+    },
+    {
+      "id": "fine_evergarden_greens",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Fine Evergarden Greens (fine_evergarden_greens) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one immaculate selected bouquet of seven broad Evergarden leaves arranged as a tall balanced fan, each leaf full, unbroken, and crisply veined, with straight pale-gold stems aligned and bound by a refined plain emerald-and-gold cord. Make it physically premium through fresh fullness, precise upright construction, clean stems, and controlled dew, clearly distinct from the base crop's rough mixed drooping bunch, never through recolor, badge, glow, flower petals, or effect. It must not resemble a round cabbage.\nComposition: centered complete front-three-quarter premium leafy fan, upright open silhouette with binding and stem ends visible, about 70 percent subject fill with safe padding, bold leafy identity at 22px and in a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal-emerald and restrained warm amber painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile satin-fresh leaves, crisp veins, clean fibrous stems, and braided cord; rich emerald, fresh green, pale gold, ivory stems, and deep charcoal; crisp focal edges with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nInput images: Image 1 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 2 eastbrook_buckler is a value range, top-left light, strong silhouette, and painted-ground style reference only. Image 3 linen_pouch is a tactile natural-material and brushwork style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact inventory subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical aura, floating sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, landscape scene, loose scattered inventory, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, top-left light, strong silhouette, and painted-ground style"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile natural-material and brushwork style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-f2fc6ba4-dfd1-40b9-a277-ff74c8f337d1.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/fine_evergarden_greens.png",
+      "sourceSha256": "6fc6bc74eeba6a818ec12de73126fa24865a4d7e88069dcac548ef5960baf313",
+      "sourceBytes": 2428390,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 0,
+      "review": "Accepted. Seven broad immaculate leaves form a precise upright fan with aligned pale stems, visibly premium and structurally distinct from the rough base bunch."
+    },
+    {
+      "id": "gilded_yam_seed",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Gilded Yam Seed (gilded_yam_seed) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one low open pouch of rich burgundy leather and emerald cloth with a plain braided gold-green cord, visibly filled with angular pale-brown winged yam seeds; one slender curling vine bearing a single heart-shaped emerald yam leaf is secured beneath the tie as the crop cue. The pouch, contents, and attached vine form one tangible subject. No writing, seal, crest, or symbol.\nComposition: centered complete three-quarter pouch with angular seed shapes and heart-leaf vine readable, about 71 percent subject fill with safe padding, low asymmetric silhouette at 22px and in a 64px circular crop.\nScene and backdrop: opaque full-square deep emerald-umber and restrained petal-amber haze painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile worn leather, woven cloth, papery winged seeds, waxy heart leaf, and braided cord; Evergarden burgundy, emerald, warm gold, pale umber, and amber; crisp focal edges with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nInput images: Image 1 linen_pouch is a soft-goods volume, fiber, and lighting style reference only. Image 2 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 3 eastbrook_buckler is a value range, strong silhouette, and painted-ground style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact inventory subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical aura, floating sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, landscape scene, loose scattered inventory, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "soft-goods volume, fiber, and lighting style"
+        },
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, strong silhouette, and painted-ground style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-a179ceff-0ee7-4e87-8c90-33e6148ecd5b.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/gilded_yam_seed.png",
+      "sourceSha256": "466b89c72a48962aff08e8d5c240c41dab33ec892b2b23bedd11e71aca3824bc",
+      "sourceBytes": 2332180,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 0,
+      "review": "Accepted. Burgundy and emerald open pouch with papery winged yam seeds and heart-leaf vine is crop-specific, opulent, and text-free."
+    },
+    {
+      "id": "gilded_yam",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Gilded Yam (gilded_yam) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one rustic gilded yam freshly dug from rich soil, a long gnarled amber-brown tuber with irregular bends, ringed growth texture, branching rootlets, a short cut vine stem, and one small heart-shaped emerald leaf. It must read as an earthy tuber, not a carrot, loaf, horn, or glowing treasure.\nComposition: centered complete three-quarter single yam on a broad diagonal, every tip, rootlet, and attached leaf safely framed, about 72 percent subject fill, unmistakable knobbly tuber silhouette at 22px and in a 64px circular crop.\nScene and backdrop: opaque full-square deep emerald-umber and muted warm amber painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile rough root skin, dry soil in creases, fibrous rootlets, and waxy leaf; Evergarden amber brown, muted gold, rich soil umber, emerald, and charcoal; crisp focal edges with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nInput images: Image 1 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 2 eastbrook_buckler is a value range, top-left light, strong silhouette, and painted-ground style reference only. Image 3 linen_pouch is a tactile natural-material and brushwork style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact inventory subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical aura, floating sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, landscape scene, loose scattered inventory, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, top-left light, strong silhouette, and painted-ground style"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile natural-material and brushwork style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-f9fe0023-3526-44ea-bf56-28a78020060a.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/gilded_yam.png",
+      "sourceSha256": "d771d02998cbd516086a35511f961b36cdffcb9225b023db0e68619c49dffd9b",
+      "sourceBytes": 2441435,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 0,
+      "review": "Accepted. Long rough earth-caked tuber, branching rootlets, and small heart leaf provide a convincing ordinary yam harvest."
+    },
+    {
+      "id": "fine_gilded_yam",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Fine Gilded Yam (fine_gilded_yam) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one exceptional gilded yam selected at perfect ripeness, shorter and fuller than the base crop with a smooth elegant S-curve, clean spiral growth ridges, warm honey-brown skin, a neatly cut crown, and one compact emerald vine curl. Make it physically premium through substantial form, unbroken skin, deliberate sculptural curve, and clean finish, clearly distinct from the base crop's long branching mud-caked root, never through recolor, badge, gold metal, glow, or effect.\nComposition: centered complete front-three-quarter single full yam on a gentle diagonal, both ends and vine curl safely visible, about 71 percent subject fill with safe padding, bold tuber silhouette at 22px and in a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal-emerald and restrained warm amber painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile satin root skin, crisp natural growth ridges, tiny pores, clean stem, and waxy vine; rich honey brown, warm amber, muted gold, dark emerald, and deep charcoal; crisp focal edges with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nInput images: Image 1 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 2 eastbrook_buckler is a value range, top-left light, strong silhouette, and painted-ground style reference only. Image 3 linen_pouch is a tactile natural-material and brushwork style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact inventory subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical aura, floating sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, landscape scene, loose scattered inventory, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, top-left light, strong silhouette, and painted-ground style"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile natural-material and brushwork style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-c8e85fad-8be8-4d4a-ac11-b8f9e3c0f973.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/fine_gilded_yam.png",
+      "sourceSha256": "25272926d670738397800dabd8dc0d2463f61bd3b784bf349213d36346323bb9",
+      "sourceBytes": 1990014,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 1,
+      "review": "Accepted after one targeted retry. Squash-like lobes and stalk were replaced by a smooth plump tapered sweet-potato silhouette with root eyes and a small vine curl.",
+      "retryPrompts": [
+        "Use case: precise-object-edit\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: revise Fine Gilded Yam (fine_gilded_yam) so it reads unmistakably as a premium yam root and cannot be confused with a gourd or squash.\nInput images: Image 1 is the edit target and controls the warm palette, composition, backdrop, and paint treatment. Image 2 anglers_feast_platter is a food-material and small-size readability style check only. Image 3 linen_pouch is a tactile natural-material style check only.\nEdit: replace the bulbous segmented squash geometry with one plump oblong sweet-potato-like tuber, gently curved and tapered at both ends, with matte honey-russet root skin, fine shallow growth wrinkles, tiny root eyes, and a small clean stem scar instead of a thick woody gourd stalk. Keep one short emerald vine curl emerging naturally from a root eye. It must remain smoother, fuller, and cleaner than the rough base yam but still look like an underground tuber.\nPreserve exactly: one centered complete premium produce object, safe padding, dark emerald-umber vignette, warm top-left key, cool bottom-right shadow, opaque square background, and premium hand-painted classic dark-fantasy MMORPG inventory style.\nConstraints: change only the root geometry, surface, and stem needed to clarify yam identity; no squash lobes, pumpkin ribs, horn shape, carrot shape, metallic gold, text, letters, numbers, glyph, rune, pseudo-writing, UI border, rarity frame, halo, glow, sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, or crop."
+      ],
+      "discardedResults": [
+        "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-71e6f452-6a92-4c08-8351-5a470c95bad9.png"
+      ],
+      "retryAttempts": [
+        {
+          "prompt": "Use case: precise-object-edit\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: revise Fine Gilded Yam (fine_gilded_yam) so it reads unmistakably as a premium yam root and cannot be confused with a gourd or squash.\nInput images: Image 1 is the edit target and controls the warm palette, composition, backdrop, and paint treatment. Image 2 anglers_feast_platter is a food-material and small-size readability style check only. Image 3 linen_pouch is a tactile natural-material style check only.\nEdit: replace the bulbous segmented squash geometry with one plump oblong sweet-potato-like tuber, gently curved and tapered at both ends, with matte honey-russet root skin, fine shallow growth wrinkles, tiny root eyes, and a small clean stem scar instead of a thick woody gourd stalk. Keep one short emerald vine curl emerging naturally from a root eye. It must remain smoother, fuller, and cleaner than the rough base yam but still look like an underground tuber.\nPreserve exactly: one centered complete premium produce object, safe padding, dark emerald-umber vignette, warm top-left key, cool bottom-right shadow, opaque square background, and premium hand-painted classic dark-fantasy MMORPG inventory style.\nConstraints: change only the root geometry, surface, and stem needed to clarify yam identity; no squash lobes, pumpkin ribs, horn shape, carrot shape, metallic gold, text, letters, numbers, glyph, rune, pseudo-writing, UI border, rarity frame, halo, glow, sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, or crop.",
+          "references": [
+            {
+              "path": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/fine_gilded_yam.png",
+              "role": "edit target controlling warm palette, composition, backdrop, and paint treatment"
+            },
+            {
+              "path": "public/ui/items/anglers_feast_platter.webp",
+              "role": "food-material and small-size readability style check"
+            },
+            {
+              "path": "public/ui/items/linen_pouch.webp",
+              "role": "tactile natural-material style check"
+            }
+          ],
+          "inputCandidateResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-71e6f452-6a92-4c08-8351-5a470c95bad9.png",
+          "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-c8e85fad-8be8-4d4a-ac11-b8f9e3c0f973.png",
+          "disposition": "accepted"
+        }
+      ]
+    },
+    {
+      "id": "evergarden_pumpkin_seed",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Evergarden Pumpkin Seed (evergarden_pumpkin_seed) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one sumptuous open seed pouch of deep plum velvet with an emerald rolled cuff and plain braided warm-gold cord, visibly filled with large flat cream pumpkin seeds; one curling vine with a small broad five-lobed pumpkin leaf is secured beneath the tie as the crop cue. The pouch, contents, and attached vine form one tangible subject. No writing, seal, crest, fabric motif, or symbol.\nComposition: centered complete three-quarter pouch with large flat seeds and broad-leaf vine readable, about 71 percent subject fill with safe padding, plush rounded silhouette at 22px and in a 64px circular crop.\nScene and backdrop: opaque full-square deep emerald-charcoal and restrained petal-plum haze painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile velvet pile, soft rolled cloth, smooth flat seeds, braided cord, and waxy vine leaf; Evergarden plum, emerald, warm gold, cream, and dark charcoal; crisp focal edges with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nInput images: Image 1 linen_pouch is a soft-goods volume, fiber, and lighting style reference only. Image 2 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 3 eastbrook_buckler is a value range, strong silhouette, and painted-ground style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact inventory subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical aura, floating sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, landscape scene, loose scattered inventory, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "soft-goods volume, fiber, and lighting style"
+        },
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, strong silhouette, and painted-ground style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-5566b556-3485-44c0-832a-53a9b7a8fd55.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/evergarden_pumpkin_seed.png",
+      "sourceSha256": "3b9d3ab9224fdeaf9fac0e756f473ac7af7c1980a112e3523b53b5193d3a2a64",
+      "sourceBytes": 2079509,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 0,
+      "review": "Accepted. Plum velvet pouch, emerald cuff, large cream seeds, and broad pumpkin leaf make a distinctive Evergarden seed icon with no text or motif."
+    },
+    {
+      "id": "evergarden_pumpkin",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Evergarden Pumpkin (evergarden_pumpkin) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one rustic Evergarden pumpkin, a classic round deep-orange field gourd with strong uneven vertical ribs, a broad gnarled brown stem, one dark-emerald leaf, and a short curling vine. Its matte rind carries small earth scuffs and natural mottling, clearly a pumpkin rather than the smooth netted sunmelon.\nComposition: centered complete three-quarter single round pumpkin, broad ribbed mass with stem, leaf, and vine safely framed, about 73 percent subject fill, unmistakable pumpkin silhouette at 22px and in a 64px circular crop.\nScene and backdrop: opaque full-square deep emerald-umber and muted warm amber painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile matte rind, deep organic ribs, gnarled woody stem, waxy leaf, and traces of rich soil; Evergarden deep orange, burnt amber, dark emerald, warm umber, and charcoal; crisp focal edges with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nInput images: Image 1 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 2 eastbrook_buckler is a value range, top-left light, strong silhouette, and painted-ground style reference only. Image 3 linen_pouch is a tactile natural-material and brushwork style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact inventory subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical aura, floating sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, landscape scene, loose scattered inventory, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, top-left light, strong silhouette, and painted-ground style"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile natural-material and brushwork style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-0261be91-efc8-4298-9d43-7f2c5ccee7db.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/evergarden_pumpkin.png",
+      "sourceSha256": "96b48655c8613f1e4410f1a531cba9bc7d4e7c93fe36c5d58d0e2a6f50563658",
+      "sourceBytes": 2346264,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 0,
+      "review": "Accepted. Classic scuffed round orange field pumpkin, gnarled stem, leaf, and deep irregular ribs read immediately at icon scale."
+    },
+    {
+      "id": "fine_evergarden_pumpkin",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Fine Evergarden Pumpkin (fine_evergarden_pumpkin) in the World of ClaudeCraft woc-item-icon-v1 house style.\nSubject and identity: one immaculate low-wide heirloom Evergarden pumpkin selected at perfect ripeness, with boldly sculpted alternating burnished-orange and deep-emerald ribs, a clean pale-gold stem crown, and one compact curled vine. The color variation must follow the natural rib geometry, not form a symbol. Make it physically premium through substantial flattened form, flawless satin rind, balanced segmentation, and pristine stem, clearly distinct from the base crop's ordinary round scuffed orange pumpkin and from the smooth netted gilded sunmelon, never through badge, glow, or effect.\nComposition: centered complete front-three-quarter single flattened pumpkin, wide lobed silhouette with stem and curl safely visible, about 71 percent subject fill with safe padding, bold heirloom-pumpkin identity at 22px and in a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal-emerald and restrained petal-amber painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle and palette: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile satin rind, deep sculpted ribs, controlled natural color variation, woody stem, and crisp vine; burnished orange, deep emerald, pale gold, warm amber, and dark charcoal; crisp focal edges with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nInput images: Image 1 anglers_feast_platter is a food-material separation and small-size readability style reference only. Image 2 eastbrook_buckler is a value range, top-left light, strong silhouette, and painted-ground style reference only. Image 3 linen_pouch is a tactile natural-material and brushwork style reference only. Do not copy their objects.\nConstraints: square single icon; exactly one compact inventory subject; complete silhouette; opaque painted background; borderless; no text, letters, numbers, label, glyph, rune, pseudo-writing, UI chrome, rarity frame, circular halo, magical aura, floating sparkle overlay, watermark, signature, checkerboard, transparency, split sheet, collage, hand, character, landscape scene, loose scattered inventory, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food-material separation and small-size readability style"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "value range, top-left light, strong silhouette, and painted-ground style"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile natural-material and brushwork style"
+        }
+      ],
+      "builtInResult": "/Users/fernando/.codex/generated_images/01a064ea-7778-7733-8ea9-dc12002ed0a0/exec-51d9b6d3-eaa4-4910-bc64-a9125ef997c7.png",
+      "workspaceMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/crops/fine_evergarden_pumpkin.png",
+      "sourceSha256": "03e52d47008d207692103aa1eccb0dd28b9d56851e1a69fac6eacf3279306d3b",
+      "sourceBytes": 2315307,
+      "dimensions": "1254x1254",
+      "colorspace": "sRGB",
+      "opaque": true,
+      "retries": 0,
+      "review": "Accepted. Low-wide heirloom form and natural alternating emerald and orange ribs are unmistakably premium pumpkin, distinct from both the base crop and smooth netted sunmelon."
+    }
+  ]
+}

@@ -383,8 +383,7 @@ class Sfx {
       const nd = noise.getChannelData(0);
       for (let i = 0; i < noiseLen; i++) nd[i] = Math.random() * 2 - 1;
       this.synthNoise = noise;
-      this.buffers.set('amb_crowd', this.makeCrowdBuffer(ctx, 6, false));
-      this.buffers.set('vcup_crowd_roar', this.makeCrowdBuffer(ctx, 2.6, true));
+      this.buffers.set('amb_crowd', this.makeCrowdBuffer(ctx, 6));
       for (const cue of [
         'aggro',
         'attack',
@@ -400,10 +399,12 @@ class Sfx {
     }
   }
 
-  /** Procedural crowd noise. Bed mode is a seamless 6s murmur loop (filtered
-   *  noise under slow integer-cycle swells, so the wrap point is silent-clean);
-   *  roar mode bakes a crescendo-decay envelope for a goal-roar one-shot. */
-  private makeCrowdBuffer(ctx: AudioContext, seconds: number, roar: boolean): AudioBuffer {
+  /** Procedural crowd noise: a seamless murmur bed (filtered noise under slow
+   *  integer-cycle swells, so the wrap point is silent-clean). The one-shot
+   *  roar mode left with the Vale Cup: its buffer had no player and its
+   *  crowdRoar() entry point had no caller, so the envelope branch went with
+   *  them rather than staying as an unreachable parameter. */
+  private makeCrowdBuffer(ctx: AudioContext, seconds: number): AudioBuffer {
     const sr = ctx.sampleRate;
     const len = Math.floor(seconds * sr);
     const buf = ctx.createBuffer(2, len, sr);
@@ -422,20 +423,14 @@ class Sfx {
           0.22 * Math.sin(2 * Math.PI * 3 * t + phase) +
           0.16 * Math.sin(2 * Math.PI * 7 * t + phase * 1.31);
         const voiceBand = (lpMid - lpDeep) * 0.9;
-        let sample = (lpDeep * 2.2 + voiceBand) * swell;
-        if (roar) {
-          const envelope = t < 0.18 ? t / 0.18 : t < 0.55 ? 1 : 1 - (t - 0.55) / 0.45;
-          sample = (lpDeep * 1.6 + voiceBand * 2.4 + w * 0.06) * envelope * 1.5;
-        }
+        const sample = (lpDeep * 2.2 + voiceBand) * swell;
         data[i] = Math.max(-1, Math.min(1, sample));
       }
-      if (!roar) {
-        const fade = Math.floor(0.25 * sr);
-        for (let i = 0; i < fade; i++) {
-          const amount = i / fade;
-          data[len - fade + i] =
-            data[len - fade + i] * Math.sqrt(1 - amount) + data[i] * Math.sqrt(amount);
-        }
+      const fade = Math.floor(0.25 * sr);
+      for (let i = 0; i < fade; i++) {
+        const amount = i / fade;
+        data[len - fade + i] =
+          data[len - fade + i] * Math.sqrt(1 - amount) + data[i] * Math.sqrt(amount);
       }
     }
     return buf;
@@ -1108,20 +1103,19 @@ class Sfx {
     this.unloop(`mountEngine:${entityId}`, 0.1);
   }
 
-  /** Warm the three engine clips (windup/loop/winddown) for a mountKey ahead
-   *  of the first time they are actually needed. Called from the mountKey
-   *  transition edge in renderer.ts (the same edge that calls
-   *  mountEngineReset), so a fresh mount or a swap has its buffers already
-   *  decoded, or at least in flight, by the time movement first calls
-   *  mountEngine. Without this, a cold first ride can still hit playAt's/
-   *  loop()'s cold paths (dropped one-shot, or a fallback fade-in) if the
-   *  rider starts moving before the fetch+decode finishes; this preload just
-   *  makes that window much smaller in practice. A no-op for a mount with no
-   *  engine take set.*/
+  /** Warm a mount's authored movement clips ahead of first use. Called from
+   *  the summon-cast and mountKey transition edges in renderer.ts, so a fresh
+   *  mount or a swap has its buffers decoded, or at least in flight, before
+   *  movement dispatch. Without this, a cold first ride can still hit
+   *  playAt's/loop()'s cold paths (dropped one-shot, or a fallback fade-in)
+   *  while fetch+decode runs. A no-op for an ordinary mount with no custom
+   *  movement takes. */
   preloadMountEngine(mountKey: string): void {
-    // The idle hum and the mount-aware jump/land takes ride the same warm-up
-    // edge: a mount can ship those without an engine take set (the Mech Bird),
-    // so they preload before the engine-set early return.
+    // The per-stride gait beat, idle hum, and mount-aware jump/land takes ride
+    // the same warm-up edge: a mount can ship them without an engine take set
+    // (the Mech Bird), so they preload before the engine-set early return.
+    const runKey = `mount_run_${mountKey}`;
+    if (runKey in SFX_CLIPS) this.preload(runKey);
     const idleKey = this.idleClipKey(mountKey);
     if (idleKey) this.preload(idleKey);
     for (const kind of ['jump', 'land'] as const) {
@@ -1422,11 +1416,6 @@ class Sfx {
     };
     blast(196, 0, 0.5);
     blast(261.6, 0.42, 0.9);
-  }
-
-  /** The stands erupt: the baked crescendo-decay crowd roar (procedural). */
-  crowdRoar(gain = 0.9): void {
-    this.playUi('vcup_crowd_roar', { gain, cooldown: 0.4 });
   }
 
   // --- Per-ability procedural combat audio (src/render/ability_vfx) --------

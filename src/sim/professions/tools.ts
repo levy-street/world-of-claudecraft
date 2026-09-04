@@ -344,6 +344,24 @@ export function slotEffect(
   };
 }
 
+/** Whether this profession's slot may NEVER mint in prompt mode: the ONE
+ *  policy authority for the pairing, read by the resolver arm below (which
+ *  refuses the mint) AND by the professions window (which suppresses the
+ *  "Ask each use" toggle on the row), so the two surfaces cannot drift. The
+ *  Phase 5 QA found the drift's cost: the window offered farming a checkbox
+ *  whose every resulting mint the resolver refused, so ticking it emptied
+ *  the row's slottable set and erased both the buttons and the toggle
+ *  itself until the window reopened. Farming refuses because harvest_crop
+ *  carries no confirm channel (see the resolver arm's banner); the change
+ *  that lands the channel edits THREE sites together, this predicate, the
+ *  resolver arm, and the Phase 18 LOAD-side twin in normalizeToolEffectSlots
+ *  below. RULED PERMANENT (qr-19-harvest-confirm-channel, 2026-09-01): the
+ *  refusal is the design rather than a stopgap, so this banner is the
+ *  standing guard for anyone who later reverses it. */
+export function promptSlotRefused(professionId: string): boolean {
+  return professionId === 'farming';
+}
+
 /** Stable deny vocabulary for one slot request (the trainResult idiom: ids,
  *  not prose; the client renders localized copy). `invalid_request` covers the
  *  shapes an honest client never sends (unknown profession/effect, a
@@ -376,13 +394,14 @@ export type ResolvedSlotToolEffect =
  * answer to the same gates, so no path can mint what another path refuses (the
  * free-grant incident was exactly a second path with fewer gates).
  *
- * Seven refusals, all before any mutation and all draw-free (the seventh,
+ * Eight refusals, all before any mutation and all draw-free (the eighth,
  * the no_gain re-slot with its R48 directional provenance arm, is documented
  * at its own check below):
  *   - a profession id that is not a gathering profession
  *   - an effect id absent from the live catalog
  *   - a pair the slot POLICY refuses (`slotToolEffectRefused` below: the
- *     Springback Charm everywhere, every effect on fishing)
+ *     Springback Charm everywhere, and every effect on fishing; farming's
+ *     shipless refusal was lifted by its hoe phase)
  *   - any confirm mode outside the union. A malformed value is refused
  *     OUTRIGHT rather than falling back; 'prompt' is accepted since the R40
  *     confirm flow shipped: the harvest command carries the per-use consent
@@ -390,6 +409,9 @@ export type ResolvedSlotToolEffect =
  *     resolution and the grant, and `applyToolEffectUse` gates the fire, so
  *     a 'prompt' slot genuinely asks first and an unconfirmed use costs
  *     nothing.
+ *   - 'prompt' on FARMING specifically: farming's one apply site has no
+ *     confirm channel, so the slot could never fire (the inline comment at
+ *     the check owns the full reasoning).
  *   - no REAL tool carried for that profession. Reads
  *     `bestOwnedGatherToolTierOrNone`, which returns NO_TOOL_OWNED rather than
  *     the bare-hands floor, so carrying nothing is not carrying a tier-1 tool.
@@ -432,6 +454,24 @@ export function resolveSlotToolEffect(
     return { ok: false, reason: 'invalid_request' };
   }
   if (confirmMode !== 'always' && confirmMode !== 'prompt') {
+    return { ok: false, reason: 'invalid_request' };
+  }
+  // FARMING REFUSES 'prompt' AT THE MINT (invalid_request, the same shape as
+  // a policy-refused pair). The R40 confirm flow's consent rides the HARVEST
+  // command (confirmEffectUse), and harvest_crop carries no such channel: at
+  // farming's one apply site (professions/farming.ts harvestCrop) `confirmed`
+  // is hard false, so a farming slot minted in prompt mode could never fire
+  // or spend and the charm would be consumed into a permanently dead slot.
+  // RULED PERMANENT (qr-19-harvest-confirm-channel, 2026-09-01): the refusal
+  // is the design, not a stopgap waiting on the Phase 7/8 farming UI work.
+  // Whether harvest_crop ever grows a confirm channel is a fresh sub-feature
+  // decision, and whoever takes it lifts this refusal in the same change,
+  // together with the predicate above and its LOAD-side twin in
+  // normalizeToolEffectSlots below (masterwrought Phase 18), THREE sites, not
+  // two: no legal mint can write a farming prompt row, so a persisted
+  // one is a hand-edited or rogue-writer row and drops at load like any
+  // policy-refused pair, instead of loading as a permanently dead slot.
+  if (promptSlotRefused(professionId) && confirmMode === 'prompt') {
     return { ok: false, reason: 'invalid_request' };
   }
   const profession = professionId as GatheringProfessionId;
@@ -546,6 +586,12 @@ function charmIndexToConsume(
  */
 export function slotToolEffectRefused(professionId: string, effectId: string): boolean {
   if (professionId === 'fishing') return true;
+  // Farming's shipless refusal arm was lifted by the hoe phase: the four hoe
+  // gatherTool items exist and both live effects have real farming behavior
+  // (professions/farming.ts harvestCrop maps quantity to bonus picks and
+  // quality to a fine-chance bump), so a farming slot fires and spends like
+  // a land one. Springback stays refused on farming by the kind arm below,
+  // like everywhere else.
   return (
     Object.hasOwn(TOOL_EFFECTS, effectId) &&
     TOOL_EFFECTS[effectId as ToolEffectId].kind === 'respawnSpeed'
@@ -594,6 +640,10 @@ export function structuredCloneToolEffectSlots(
  */
 export function normalizeToolEffectSlots(
   saved: Partial<Record<string, ToolEffectSlot>> | undefined,
+  // For the dev-channel drop line only (the farm_load_report posture): the
+  // owner's name when the caller has one, so an operator reading server logs
+  // can tie the dropped row to a character. Never player-visible.
+  ownerName?: string,
 ): Partial<Record<GatheringProfessionId, ToolEffectSlot>> | undefined {
   if (!saved) return undefined;
   let out: Partial<Record<GatheringProfessionId, ToolEffectSlot>> | undefined;
@@ -601,6 +651,22 @@ export function normalizeToolEffectSlots(
     const row = saved[professionId];
     if (!row || !Object.hasOwn(TOOL_EFFECTS, row.effectId)) continue;
     if (slotToolEffectRefused(professionId, row.effectId)) continue;
+    // The mint-side farming+prompt gate's load twin (masterwrought Phase 18;
+    // the resolver arm above owns the full reasoning): resolve the stored
+    // mode through the SAME coercion the surviving row would take (garbled
+    // fail-safes to 'prompt', see the confirmMode note below), then drop a
+    // pair the mint could never have written. Judged on the RESOLVED mode so
+    // a garbled farming row cannot slip through as a dead prompt slot. The
+    // drop is NOT silent: no legal writer produces this row, so an operator
+    // should see it happen (dev-channel English, the farm_load_report line).
+    const confirmMode: ToolEffectConfirmMode =
+      row.confirmMode === 'always' || row.confirmMode == null ? 'always' : 'prompt';
+    if (promptSlotRefused(professionId) && confirmMode === 'prompt') {
+      console.warn(
+        `[load] dropped ${professionId} tool-effect slot ${row.effectId} (stored mode ${String(row.confirmMode)}) for ${ownerName ?? 'an unnamed owner'}: the mint refuses prompt mode on this profession, so no legal writer produced this row`,
+      );
+      continue;
+    }
     // A stored maxDurability that is not a usable positive integer falls back
     // to the catalog's own starting value, because a recharge restores TO this
     // number and a dead one would make the slot permanently useless.
@@ -660,8 +726,9 @@ export function normalizeToolEffectSlots(
       // another charm (the no_gain conjunct is what lets a mode-only
       // re-slot land). Fail-safe stays the right direction: a burned
       // charge is unrecoverable, a charm is a known price, and the mode
-      // chip makes the coerced state visible.
-      confirmMode: row.confirmMode === 'always' || row.confirmMode == null ? 'always' : 'prompt',
+      // chip makes the coerced state visible. Resolved ONCE above the
+      // farming+prompt twin, which judges the same value this row stores.
+      confirmMode,
     };
   }
   return out;

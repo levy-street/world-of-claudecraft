@@ -10,14 +10,17 @@
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { ITEMS } from '../src/sim/data';
+import { itemCopyPin } from '../src/sim/item_copy_ref';
 import { Sim } from '../src/sim/sim';
-import type { EquipSlot } from '../src/sim/types';
+import type { EquipSlot, InvSlot, ItemDef } from '../src/sim/types';
 import {
+  draggedCopySlotIndex,
   dropRequiredLevel,
   isPaperdollDraggable,
   paperdollDropAction,
+  resolveDraggedCopy,
 } from '../src/ui/equip_drop_core';
 import { Hud } from '../src/ui/hud';
 import { resolveDropTargetAt } from '../src/ui/item_drop_hit_test';
@@ -176,6 +179,666 @@ describe('paperdollDropAction unique-equipped mirror', () => {
     const offhandBefore = equipmentOf(sim, pid).offhand;
     sim.equipItemToSlot('kingsbane_last_oath', 'offhand', pid);
     expect(equipmentOf(sim, pid).offhand).toBe(offhandBefore);
+  });
+});
+
+// Masterwrought (the crafted-apex tier) is a COUNTED family rather than the
+// one-copy rule above: two worn pieces across the whole family, at most one of
+// them legendary, and duplicates of one piece are legal inside that budget. The
+// mirror reads the same sim leaf the equip path does, so these cases pin the
+// mapping from the leaf's two refusal reasons onto the drop actions.
+//
+// Synthetic flagged pieces, injected into the live ITEMS table the way
+// unique_equipped.test.ts does. The ids carry their own prefix so they cannot
+// collide with the sim-side suite's fixtures.
+const MW_BAND = 'test_mwdrop_band';
+const MW_TORC = 'test_mwdrop_torc';
+const MW_SIGNET = 'test_mwdrop_signet';
+const PLAIN_RING = 'test_mwdrop_plain_band';
+const MW_GREATSWORD = 'test_mwdrop_greatsword';
+const MW_BULWARK = 'test_mwdrop_bulwark';
+
+beforeAll(() => {
+  ITEMS[MW_BAND] = {
+    id: MW_BAND,
+    name: 'Test Masterwrought Band',
+    kind: 'armor',
+    slot: 'ring',
+    quality: 'epic',
+    masterwrought: true,
+    requiredLevel: 20,
+    stats: { sta: 1 },
+    sellValue: 1,
+  } as ItemDef;
+  ITEMS[MW_TORC] = {
+    id: MW_TORC,
+    name: 'Test Masterwrought Torc',
+    kind: 'armor',
+    slot: 'neck',
+    quality: 'epic',
+    masterwrought: true,
+    requiredLevel: 20,
+    stats: { sta: 1 },
+    sellValue: 1,
+  } as ItemDef;
+  // A legendary of its OWN family: the unique-equipped arm runs first and is
+  // family-scoped, so a distinct id keeps it out of the way of the legendary
+  // sub-cap this fixture exists to exercise.
+  ITEMS[MW_SIGNET] = {
+    id: MW_SIGNET,
+    name: 'Test Masterwrought Signet',
+    kind: 'armor',
+    slot: 'ring',
+    quality: 'legendary',
+    masterwrought: true,
+    requiredLevel: 20,
+    stats: { sta: 2 },
+    sellValue: 1,
+  } as ItemDef;
+  // Same slot and quality as MW_BAND but NOT flagged: the control that proves
+  // the arms key on the flag, not on the fixture shape.
+  ITEMS[PLAIN_RING] = {
+    id: PLAIN_RING,
+    name: 'Test Plain Band',
+    kind: 'armor',
+    slot: 'ring',
+    quality: 'epic',
+    requiredLevel: 20,
+    stats: { sta: 1 },
+    sellValue: 1,
+  } as ItemDef;
+  // A flagged two-hander and the flagged shield it benches: the pair that
+  // exercises the mirror's DISPLACED-slot exemption, which no jewelry drop can.
+  ITEMS[MW_GREATSWORD] = {
+    id: MW_GREATSWORD,
+    name: 'Test Mwdrop Greatsword',
+    kind: 'weapon',
+    slot: 'mainhand',
+    hand: 'twohand',
+    quality: 'epic',
+    masterwrought: true,
+    requiredLevel: 20,
+    weapon: { min: 10, max: 20, speed: 3.0 },
+    requiredClass: ['warrior', 'rogue', 'hunter', 'shaman', 'paladin'],
+    stats: { str: 1 },
+    sellValue: 1,
+  } as ItemDef;
+  ITEMS[MW_BULWARK] = {
+    id: MW_BULWARK,
+    name: 'Test Mwdrop Bulwark',
+    kind: 'armor',
+    slot: 'offhand',
+    shield: true,
+    quality: 'epic',
+    masterwrought: true,
+    requiredLevel: 20,
+    stats: { armor: 40 },
+    sellValue: 1,
+  } as ItemDef;
+});
+
+afterAll(() => {
+  delete ITEMS[MW_BAND];
+  delete ITEMS[MW_TORC];
+  delete ITEMS[MW_SIGNET];
+  delete ITEMS[PLAIN_RING];
+  delete ITEMS[MW_GREATSWORD];
+  delete ITEMS[MW_BULWARK];
+});
+
+describe('paperdollDropAction promoted-copy unique mirror (Masterwrought phase 13)', () => {
+  // The orange promotion stamps rolled.quality = 'legendary' on a PERFECTED
+  // copy of an EPIC def, so the unique-equipped rule is promotion-scoped and
+  // add-only (isUniqueEquipped: def legendary OR perfected + rolled
+  // legendary), read on both sides: the worn payloads (instances) and the
+  // sim's own candidate peek over the mirrored bags (equipCandidateInstance).
+  // RING is epic by def, so every verdict below is instance-driven; the
+  // fixture carries `perfected` because a bare rolled-legendary payload (no
+  // promotion behind it) deliberately does NOT count.
+  const PROMOTED = { perfected: true as const, rolled: { quality: 'legendary' as const } };
+
+  it('the fixture def is epic, so the def-only read alone decides nothing here', () => {
+    expect(RING.quality).toBe('epic');
+  });
+
+  it('refuses a second promoted copy when one is worn on the other finger', () => {
+    expect(
+      paperdollDropAction(
+        RING,
+        'ring2',
+        'warrior',
+        20,
+        null,
+        { ring1: RING.id },
+        { ring1: PROMOTED },
+        [{ itemId: RING.id, count: 1, instance: PROMOTED }],
+      ),
+    ).toBe('blockedUnique');
+  });
+
+  it('a PLAIN incoming copy beside a worn promoted one still equips (only unique blocks unique)', () => {
+    expect(
+      paperdollDropAction(
+        RING,
+        'ring2',
+        'warrior',
+        20,
+        null,
+        { ring1: RING.id },
+        { ring1: PROMOTED },
+        [{ itemId: RING.id, count: 1 }],
+      ),
+    ).toBe('equip');
+  });
+
+  it('a promoted incoming copy beside a worn PLAIN one equips too', () => {
+    expect(
+      paperdollDropAction(RING, 'ring2', 'warrior', 20, null, { ring1: RING.id }, {}, [
+        { itemId: RING.id, count: 1, instance: PROMOTED },
+      ]),
+    ).toBe('equip');
+  });
+
+  it('the candidate peek is the sim selection rule: id-only, the HIGHEST-index unit decides', () => {
+    // A promoted copy sitting UNDER a plain one is not what an id-only equip
+    // would consume, so the feedback must read the plain top copy and allow.
+    expect(
+      paperdollDropAction(
+        RING,
+        'ring2',
+        'warrior',
+        20,
+        null,
+        { ring1: RING.id },
+        { ring1: PROMOTED },
+        [
+          { itemId: RING.id, count: 1, instance: PROMOTED },
+          { itemId: RING.id, count: 1 },
+        ],
+      ),
+    ).toBe('equip');
+  });
+
+  it('a drag NAMING a cell judges exactly that copy, both directions (the slotIndex peek)', () => {
+    // The premise of the highest-index pin above changed: since the sim's
+    // equip honors the drag's own cell selection, the mirror threads the SAME
+    // slotIndex into the peek. Direction one: the named LOWER-index copy is
+    // promoted, so the drop is refused even though the top copy is plain.
+    const bags = [
+      { itemId: RING.id, count: 1, instance: PROMOTED },
+      { itemId: RING.id, count: 1 },
+    ];
+    expect(
+      paperdollDropAction(
+        RING,
+        'ring2',
+        'warrior',
+        20,
+        null,
+        { ring1: RING.id },
+        { ring1: PROMOTED },
+        bags,
+        0,
+      ),
+    ).toBe('blockedUnique');
+    // Direction two: naming the PLAIN copy equips even with a promoted copy
+    // sitting at a higher index (the copy the id-only rule would have read).
+    const bagsPromotedOnTop = [
+      { itemId: RING.id, count: 1 },
+      { itemId: RING.id, count: 1, instance: PROMOTED },
+    ];
+    expect(
+      paperdollDropAction(
+        RING,
+        'ring2',
+        'warrior',
+        20,
+        null,
+        { ring1: RING.id },
+        { ring1: PROMOTED },
+        bagsPromotedOnTop,
+        0,
+      ),
+    ).toBe('equip');
+    // An index that no longer names a matching cell is REFUSED outright,
+    // mirroring the sim's early invalid-selection gate (items.ts equipItem:
+    // "You don't have that item." before the first write); it must never
+    // light green off a fallback unit's payload. The highest-index fallback
+    // survives for an ABSENT slotIndex only (the id-only pin above).
+    expect(
+      paperdollDropAction(
+        RING,
+        'ring2',
+        'warrior',
+        20,
+        null,
+        { ring1: RING.id },
+        { ring1: PROMOTED },
+        bagsPromotedOnTop,
+        7,
+      ),
+    ).toBe('blockedSelection');
+  });
+
+  it('agrees with the sim on the promoted duplicate (the authority check)', () => {
+    const sim = new Sim({ seed: 8, playerClass: 'warrior', noPlayer: true }) as Sim &
+      Record<string, any>;
+    const pid = sim.addPlayer('warrior', 'Promoter');
+    sim.setPlayerLevel(20, pid);
+    sim.addItemInstance(RING.id, structuredClone(PROMOTED), pid);
+    sim.equipItemToSlot(RING.id, 'ring1', pid);
+    sim.addItemInstance(RING.id, structuredClone(PROMOTED), pid);
+    const meta = sim.players.get(pid);
+    if (!meta) throw new Error(`no player ${pid}`);
+    expect(meta.equipmentInstance?.ring1?.rolled?.quality).toBe('legendary');
+    expect(
+      paperdollDropAction(
+        RING,
+        'ring2',
+        'warrior',
+        20,
+        null,
+        equipmentOf(sim, pid),
+        meta.equipmentInstance,
+        meta.inventory,
+      ),
+    ).toBe('blockedUnique');
+    // The authority refuses the same drop with its own unique-equipped line.
+    sim.tick();
+    sim.equipItemToSlot(RING.id, 'ring2', pid);
+    const events = sim.tick();
+    expect(equipmentOf(sim, pid).ring2).toBeUndefined();
+    expect(
+      events.some((e: any) => e.type === 'error' && e.text === 'You can only equip one of those.'),
+    ).toBe(true);
+  });
+});
+
+describe('paperdollDropAction Masterwrought counted-family mirror', () => {
+  it('refuses a third flagged piece once two are already worn', () => {
+    expect(
+      paperdollDropAction(ITEMS[MW_BAND], 'ring2', 'warrior', 20, null, {
+        ring1: MW_BAND,
+        neck: MW_TORC,
+      }),
+    ).toBe('blockedMasterwroughtCap');
+  });
+
+  it('leaves an unflagged piece alone at the same worn count', () => {
+    expect(
+      paperdollDropAction(ITEMS[PLAIN_RING], 'ring2', 'warrior', 20, null, {
+        ring1: MW_BAND,
+        neck: MW_TORC,
+      }),
+    ).toBe('equip');
+  });
+
+  it('exempts the swapped slot, so replacing a worn flagged piece at the cap still equips', () => {
+    // ring1 already holds a flagged band; dropping onto it empties that slot,
+    // leaving one flagged piece (the neck) outside the exemption.
+    expect(
+      paperdollDropAction(ITEMS[MW_BAND], 'ring1', 'warrior', 20, null, {
+        ring1: MW_BAND,
+        neck: MW_TORC,
+      }),
+    ).toBe('equip');
+  });
+
+  it('exempts the DISPLACED slot too: a flagged two-hander over a flagged shield at the cap', () => {
+    // Shield plus band is already the cap, but the two-hander benches the
+    // shield, so the pieces actually worn afterward are band plus two-hander.
+    // The mirror-side twin of the sim's displacement case: this is the drop
+    // that goes red if the mirror's ignore list ever narrows to the target
+    // slot alone.
+    expect(
+      paperdollDropAction(ITEMS[MW_GREATSWORD], 'mainhand', 'warrior', 20, null, {
+        offhand: MW_BULWARK,
+        ring1: MW_BAND,
+      }),
+    ).toBe('equip');
+  });
+
+  it('names the LEGENDARY reason when the worn copy rolled legendary on an epic def', () => {
+    // The worn band's def is epic; only its instance payload makes it
+    // legendary-effective, which is exactly what the instances argument exists
+    // to carry into the mirror.
+    const equipment = { ring1: MW_BAND };
+    expect(paperdollDropAction(ITEMS[MW_SIGNET], 'ring2', 'warrior', 20, null, equipment)).toBe(
+      'equip',
+    );
+    expect(
+      paperdollDropAction(ITEMS[MW_SIGNET], 'ring2', 'warrior', 20, null, equipment, {
+        ring1: { rolled: { quality: 'legendary' } },
+      }),
+    ).toBe('blockedMasterwroughtLegendary');
+  });
+
+  it('lets a plain flagged piece in beside a worn legendary one', () => {
+    expect(
+      paperdollDropAction(
+        ITEMS[MW_BAND],
+        'ring2',
+        'warrior',
+        20,
+        null,
+        { ring1: MW_SIGNET },
+        { ring1: {} },
+      ),
+    ).toBe('equip');
+  });
+
+  it('predicts the consumed copy off the bags, reading the HIGHEST-index unit', () => {
+    // The dragged band's def is epic, so nothing about it is legendary until a
+    // carried unit says so. Which unit is not the player's choice: the sim
+    // consumes the highest-index matching stack, so the mirror must read that
+    // one and no other, whichever stack the drag happened to start from.
+    const worn = { ring1: MW_SIGNET };
+    const legendaryUnit = {
+      itemId: MW_BAND,
+      count: 1,
+      instance: { rolled: { quality: 'legendary' } },
+    };
+    const plainUnit = { itemId: MW_BAND, count: 1 };
+    expect(paperdollDropAction(ITEMS[MW_BAND], 'ring2', 'warrior', 20, null, worn, {}, [])).toBe(
+      'equip',
+    );
+    expect(
+      paperdollDropAction(ITEMS[MW_BAND], 'ring2', 'warrior', 20, null, worn, {}, [
+        plainUnit,
+        legendaryUnit,
+      ]),
+    ).toBe('blockedMasterwroughtLegendary');
+    // The same two units the other way round: the legendary one is no longer
+    // the copy an id-only equip would lift, so the drop is legal again. This is
+    // the assertion that fails if the mirror ever reads "any matching unit".
+    expect(
+      paperdollDropAction(ITEMS[MW_BAND], 'ring2', 'warrior', 20, null, worn, {}, [
+        legendaryUnit,
+        plainUnit,
+      ]),
+    ).toBe('equip');
+    // And a drag NAMING a cell flips both verdicts (the slotIndex peek, the
+    // sub-cap's twin of the unique-mirror direction pair): the named
+    // lower-index legendary copy blocks, the named plain copy equips even with
+    // the legendary one sitting at the higher index.
+    expect(
+      paperdollDropAction(
+        ITEMS[MW_BAND],
+        'ring2',
+        'warrior',
+        20,
+        null,
+        worn,
+        {},
+        [legendaryUnit, plainUnit],
+        0,
+      ),
+    ).toBe('blockedMasterwroughtLegendary');
+    expect(
+      paperdollDropAction(
+        ITEMS[MW_BAND],
+        'ring2',
+        'warrior',
+        20,
+        null,
+        worn,
+        {},
+        [plainUnit, legendaryUnit],
+        0,
+      ),
+    ).toBe('equip');
+  });
+
+  it('agrees with the sim on a refused third piece (the authority check)', () => {
+    const sim = new Sim({ seed: 11, playerClass: 'warrior', noPlayer: true }) as Sim &
+      Record<string, any>;
+    const pid = sim.addPlayer('warrior', 'Smith');
+    sim.setPlayerLevel(20, pid);
+    sim.addItem(MW_BAND, 2, pid);
+    sim.addItem(MW_TORC, 1, pid);
+    sim.equipItemToSlot(MW_BAND, 'ring1', pid);
+    sim.equipItemToSlot(MW_TORC, 'neck', pid);
+    const equipment = equipmentOf(sim, pid);
+    expect(equipment.ring1).toBe(MW_BAND);
+    expect(equipment.neck).toBe(MW_TORC);
+    expect(paperdollDropAction(ITEMS[MW_BAND], 'ring2', 'warrior', 20, null, equipment)).toBe(
+      'blockedMasterwroughtCap',
+    );
+    sim.equipItemToSlot(MW_BAND, 'ring2', pid);
+    expect(equipmentOf(sim, pid).ring2).toBeUndefined();
+    // The refusal itself, not just the absence of an equip: an unrelated
+    // silent no-op in the equip path would leave ring2 empty too.
+    const refusals: string[] = [];
+    for (const ev of sim.tick()) if (ev.type === 'error') refusals.push(ev.text);
+    expect(refusals).toContain('You can only equip two Masterwrought items.');
+  });
+
+  it('agrees with the sim when only the highest-index bag copy is legendary', () => {
+    // The case the mirror could only get right by predicting the consumed unit:
+    // the bags hold two copies of ONE flagged id and only the top one rolled
+    // legendary, so the equip is refused even though the player may well have
+    // dragged the plain copy. Both sides must reach that same verdict.
+    const sim = new Sim({ seed: 12, playerClass: 'warrior', noPlayer: true }) as Sim &
+      Record<string, any>;
+    const pid = sim.addPlayer('warrior', 'Ward');
+    sim.setPlayerLevel(20, pid);
+    sim.addItem(MW_SIGNET, 1, pid);
+    sim.equipItemToSlot(MW_SIGNET, 'ring1', pid);
+    expect(equipmentOf(sim, pid).ring1).toBe(MW_SIGNET);
+    // Pushed rather than added, because addItem would fold both units into one
+    // stack and the point here is two units with different payloads.
+    const meta = sim.players.get(pid)!;
+    meta.inventory.push({ itemId: MW_BAND, count: 1 });
+    meta.inventory.push({
+      itemId: MW_BAND,
+      count: 1,
+      instance: { rolled: { quality: 'legendary' } },
+    });
+    expect(
+      paperdollDropAction(
+        ITEMS[MW_BAND],
+        'ring2',
+        'warrior',
+        20,
+        null,
+        equipmentOf(sim, pid),
+        meta.equipmentInstance,
+        meta.inventory,
+      ),
+    ).toBe('blockedMasterwroughtLegendary');
+    sim.equipItemToSlot(MW_BAND, 'ring2', pid);
+    expect(equipmentOf(sim, pid).ring2).toBeUndefined();
+    const refusals: string[] = [];
+    for (const ev of sim.tick()) if (ev.type === 'error') refusals.push(ev.text);
+    expect(refusals).toContain('You can only equip one legendary Masterwrought item.');
+  });
+
+  it('agrees with the sim when the drag NAMES the plain lower-index copy (the slotIndex arm)', () => {
+    // The named-cell twin of the case above: same bags, but the equip carries
+    // the plain copy's own cell, so BOTH sides let it through, and the worn
+    // payload proves the sim consumed the named unit, not the legendary top.
+    const sim = new Sim({ seed: 13, playerClass: 'warrior', noPlayer: true }) as Sim &
+      Record<string, any>;
+    const pid = sim.addPlayer('warrior', 'Wend');
+    sim.setPlayerLevel(20, pid);
+    sim.addItem(MW_SIGNET, 1, pid);
+    sim.equipItemToSlot(MW_SIGNET, 'ring1', pid);
+    expect(equipmentOf(sim, pid).ring1).toBe(MW_SIGNET);
+    const meta = sim.players.get(pid)!;
+    meta.inventory.push({ itemId: MW_BAND, count: 1 });
+    meta.inventory.push({
+      itemId: MW_BAND,
+      count: 1,
+      instance: { rolled: { quality: 'legendary' } },
+    });
+    const named = meta.inventory.findIndex(
+      (s: { itemId: string; instance?: unknown }) => s.itemId === MW_BAND && !s.instance,
+    );
+    expect(named).toBeGreaterThanOrEqual(0);
+    expect(
+      paperdollDropAction(
+        ITEMS[MW_BAND],
+        'ring2',
+        'warrior',
+        20,
+        null,
+        equipmentOf(sim, pid),
+        meta.equipmentInstance,
+        meta.inventory,
+        named,
+      ),
+    ).toBe('equip');
+    sim.equipItemToSlot(MW_BAND, 'ring2', pid, named);
+    expect(equipmentOf(sim, pid).ring2).toBe(MW_BAND);
+    // The named plain unit is what got worn: no legendary payload rode along.
+    expect(meta.equipmentInstance?.ring2?.rolled?.quality).toBeUndefined();
+  });
+});
+
+describe('char_window masterwrought mirror wiring (source pins)', () => {
+  const stripped = (rel: string): string =>
+    readFileSync(join(__dirname, rel), 'utf8').replace(/^\s*\/\/.*$/gm, '');
+
+  it('all three paperdollDropAction call sites feed the mirror the worn payloads AND the bags', () => {
+    // Dropping either argument silently degrades the mirror to def quality,
+    // the exact false green the consumed-copy prediction exists to prevent,
+    // and nothing else goes red when that happens: the arguments are optional
+    // by design (legacy call shapes), so only a pin can hold the wiring.
+    const src = stripped('../src/ui/char_window.ts');
+    const wired = src.match(/world\.equipment,\s*world\.equipmentInstances,\s*world\.inventory,/g);
+    expect(wired).toHaveLength(3);
+    // And no call site sits outside the wired shape.
+    expect(src.match(/paperdollDropAction\(/g)).toHaveLength(3);
+  });
+
+  it('both refusal reasons map to their own sim-worded toast', () => {
+    const src = stripped('../src/ui/char_window.ts');
+    expect(src).toContain("case 'blockedMasterwroughtCap':");
+    expect(src).toContain("this.deps.showError(tSim('error.masterwroughtCap'));");
+    expect(src).toContain("case 'blockedMasterwroughtLegendary':");
+    expect(src).toContain("this.deps.showError(tSim('error.masterwroughtLegendary'));");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The dragged-copy identity (resolveDraggedCopy / draggedCopySlotIndex). A drag
+// is a WINDOW during which the bags can move underneath it, so the pick-up index
+// stops being an identity the moment a snapshot lands.
+// ---------------------------------------------------------------------------
+describe('resolveDraggedCopy', () => {
+  /** An enchanted copy and its plain duplicate: the pair whose confusion is the
+   *  whole reason a pin exists. */
+  const enchanted = {
+    itemId: 'ring',
+    count: 1,
+    instance: { enchant: { id: 'ench_str' } },
+  } as unknown as InvSlot;
+  const plain = { itemId: 'ring', count: 1 } as unknown as InvSlot;
+  const other = { itemId: 'cloth', count: 4 } as unknown as InvSlot;
+
+  function refFor(inventory: readonly InvSlot[], index: number) {
+    return { index, copyPin: itemCopyPin(inventory[index]) };
+  }
+
+  it('resolves an untouched drag back to its own cell', () => {
+    const inv = [plain, enchanted, other];
+    expect(resolveDraggedCopy(inv, 'ring', refFor(inv, 1))).toEqual({ kind: 'held', index: 1 });
+  });
+
+  it('FOLLOWS the copy when the bags shift underneath the drag', () => {
+    // The cell below the dragged copy emptied mid-drag, so everything above it
+    // moved down one. The pick-up index (1) now names the enchanted copy's
+    // former neighbour; the pin finds the copy at its new index.
+    const before = [plain, enchanted, other];
+    const ref = refFor(before, 1);
+    const after = [enchanted, other];
+    expect(resolveDraggedCopy(after, 'ring', ref)).toEqual({ kind: 'held', index: 0 });
+  });
+
+  it('never redirects to a DIFFERENT copy of the same id (the silent failure)', () => {
+    // THE regression. After the shift, index 1 still holds a `ring`, so an
+    // index-plus-id check accepts it and the drop equips the plain duplicate
+    // instead of the enchanted piece the player dragged.
+    const before = [other, enchanted, plain];
+    const ref = refFor(before, 1);
+    const after = [other, plain, enchanted];
+    expect(after[ref.index].itemId).toBe('ring'); // an id check would be satisfied
+    expect(resolveDraggedCopy(after, 'ring', ref)).toEqual({ kind: 'held', index: 2 });
+  });
+
+  it('refuses when the dragged copy has left the bags', () => {
+    const before = [plain, enchanted];
+    const ref = refFor(before, 1);
+    expect(resolveDraggedCopy([plain], 'ring', ref)).toEqual({ kind: 'gone' });
+    expect(resolveDraggedCopy([], 'ring', ref)).toEqual({ kind: 'gone' });
+  });
+
+  it('treats an emptied cell as holding nothing', () => {
+    const before = [enchanted];
+    const ref = refFor(before, 0);
+    const emptied = [{ ...enchanted, count: 0 } as unknown as InvSlot];
+    expect(resolveDraggedCopy(emptied, 'ring', ref)).toEqual({ kind: 'gone' });
+  });
+
+  it('an UNPINNED drag keeps the pre-existing id-only behavior', () => {
+    // A sorted or filtered grid names no position, so it captures no identity;
+    // every consumer must behave exactly as it did before the pin existed.
+    const inv = [plain, enchanted];
+    expect(resolveDraggedCopy(inv, 'ring', { index: null, copyPin: '' })).toEqual({
+      kind: 'unpinned',
+    });
+    expect(resolveDraggedCopy(inv, 'ring', { index: 1, copyPin: '' })).toEqual({
+      kind: 'unpinned',
+    });
+  });
+
+  it('two indistinguishable copies resolve to either, which is correct', () => {
+    // The pin covers everything that DISTINGUISHES two copies, so a matching
+    // pair is interchangeable by definition. Deterministic: the pick-up index
+    // wins, otherwise the lowest match.
+    const inv = [plain, other, plain];
+    expect(resolveDraggedCopy(inv, 'ring', refFor(inv, 2))).toEqual({ kind: 'held', index: 2 });
+    expect(resolveDraggedCopy([other, plain], 'ring', refFor(inv, 2))).toEqual({
+      kind: 'held',
+      index: 1,
+    });
+  });
+
+  it('does not match a same-pin copy of a DIFFERENT item id', () => {
+    const inv = [plain];
+    expect(resolveDraggedCopy(inv, 'cloth', refFor(inv, 0))).toEqual({ kind: 'gone' });
+  });
+});
+
+describe('draggedCopySlotIndex (what a drop consumer sends)', () => {
+  const enchanted = {
+    itemId: 'ring',
+    count: 1,
+    instance: { enchant: { id: 'ench_str' } },
+  } as unknown as InvSlot;
+  const plain = { itemId: 'ring', count: 1 } as unknown as InvSlot;
+
+  it('names the copy at its CURRENT index', () => {
+    const before = [plain, enchanted];
+    const ref = { index: 1, copyPin: itemCopyPin(before[1]) };
+    expect(draggedCopySlotIndex(before, 'ring', ref)).toBe(1);
+    expect(draggedCopySlotIndex([enchanted], 'ring', ref)).toBe(0);
+  });
+
+  it('answers null (refuse) for a copy that is gone, never a fallback index', () => {
+    const before = [plain, enchanted];
+    const ref = { index: 1, copyPin: itemCopyPin(before[1]) };
+    // A plain `ring` is still held, so an id-only fallback would happily name
+    // it. Refusing is the point: the player dragged the enchanted one.
+    expect(draggedCopySlotIndex([plain], 'ring', ref)).toBeNull();
+  });
+
+  it('answers undefined (id-only fallback) for an unpinned drag with no position', () => {
+    expect(draggedCopySlotIndex([plain], 'ring', { index: null, copyPin: '' })).toBeUndefined();
+  });
+
+  it('answers the raw index for an unpinned drag that had one', () => {
+    expect(draggedCopySlotIndex([plain], 'ring', { index: 0, copyPin: '' })).toBe(0);
   });
 });
 

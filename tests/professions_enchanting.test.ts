@@ -10,6 +10,7 @@ import { characterDerivedStats } from '../src/sim/entity';
 import { canStackInstancePayloads } from '../src/sim/item_instance_merge';
 import { removePreferFungible } from '../src/sim/items';
 import {
+  APEX_TIER_REAGENT,
   consumeEnchantedVictim,
   disenchantItem,
   disenchantYield,
@@ -912,10 +913,10 @@ describe('quality-tiered enchanting gains', () => {
     });
   });
 
-  it('derives an enchant gain tier from its reagent defs (dust 0, essence 1, shard 2)', () => {
+  it('derives an enchant gain tier from its reagent defs (dust 0, essence 1, shard 2, lucent 3)', () => {
     // EnchantDef carries no tier field: the existing tier notion is the
     // arcane reagent ladder, read off the reagent ITEM DEFS' quality (max
-    // over the list). Pin the three material qualities so a def re-tune
+    // over the list). Pin the four material qualities so a def re-tune
     // cannot silently reshuffle every enchant's gain tier.
     expect(ITEMS.arcane_dust.quality).toBe('common');
     expect(ITEMS.arcane_essence.quality).toBe('uncommon');
@@ -923,6 +924,27 @@ describe('quality-tiered enchanting gains', () => {
     expect(enchantGainTier(ENCHANTS.enchant_weapon_might)).toBe(0);
     expect(enchantGainTier(ENCHANTS.enchant_chest_stamina)).toBe(1);
     expect(enchantGainTier(ENCHANTS.enchant_weapon_greater_might)).toBe(2);
+
+    // The apex rung is the one that CANNOT be read off item quality: the
+    // reagent is authored common/white so the junk sweep never vendors it,
+    // which is why enchantGainTier names it explicitly. Pin that premise
+    // (the reagent id as a literal, and the quality that would mis-score it)
+    // before the two arms that only pass while the named arm exists.
+    expect(APEX_TIER_REAGENT).toBe('lucent_reagent');
+    expect(ITEMS.lucent_reagent.quality).toBe('common');
+    // Decisive: delete the named apex arm and this boots enchant, whose whole
+    // bill is lucent plus dust, falls all the way to 0.
+    expect(ENCHANTS.enchant_feet_lucent_agility.reagents.map((r) => r.itemId)).toEqual([
+      'lucent_reagent',
+      'arcane_dust',
+    ]);
+    expect(enchantGainTier(ENCHANTS.enchant_feet_lucent_agility)).toBe(3);
+    // ...and the same deletion drops the shard-carrying apex weapon enchant to
+    // its shard rung, 2, so the apex tier saturates into Greater unnoticed.
+    expect(enchantGainTier(ENCHANTS.enchant_weapon_lucent_might)).toBe(3);
+    // The int twin (phase 10 QA D10-D1, landed at the head of phase 11)
+    // carries the byte-identical bill, so it scores the same apex rung.
+    expect(enchantGainTier(ENCHANTS.enchant_weapon_lucent_spellpower)).toBe(3);
   });
 
   it('a fresh disenchanter still gains the full point from a common piece (orange at capability 0)', () => {
@@ -1208,6 +1230,56 @@ describe('apply enchant to WORN gear (in place)', () => {
     expect(meta.equipmentInstance.mainhand?.enchant).toBe(WORN_ENCHANT);
     // The other hand is untouched: no payload leaked across slots.
     expect(meta.equipmentInstance.offhand).toBeUndefined();
+  });
+
+  it('dual wield, BOTH hands enchanted: the weapon term lands TWICE on the character', () => {
+    // ADDED AT PHASE 15, the R5 weapon-term MULTIPLICITY, and the arm above is
+    // exactly why it was needed: read alone, "the mainhand slot enchants ONLY
+    // the mainhand copy" invites the inference that a weapon enchant applies
+    // once per character. It does not. A one-hand weapon declares
+    // ItemDef.slot 'mainhand' and is legal in the offhand, and the enchant
+    // slot gate compares itemDef.slot to enchant.itemSlot, so both worn
+    // weapons accept every mainhand enchant and recalcPlayerStats reads both
+    // instances in the same loop. The packet's ratified R5 arithmetic counted
+    // this term once, which is why the apex weapon rung was trimmed to half
+    // its ladder step; this pin is what keeps the reason visible.
+    const { sim, pid, meta } = wearing('mainhand', WORN_SWORD, { dust: 20 });
+    sim.addItem(WORN_SWORD, 1, pid);
+    sim.equipItemToSlot(WORN_SWORD, 'offhand', pid);
+    const before = sim.player.stats.str;
+
+    // The FORFEITED line first, the other arm of the same gate (the Phase 15
+    // QA): the offhand hand holding a mainhand-kind weapon REFUSES an
+    // offhand-slot enchant, because the gate compares the ITEM's declared
+    // slot, not the hand it sits in. Probed BEFORE any enchant lands so the
+    // copy is fresh: a broken gate here would APPLY the enchant and red on
+    // ok:true, not merely on a different deny reason (the round-2 mutation
+    // pass proved the after-the-fact probe killed only through the reason
+    // pin, via already_enchanted).
+    const refused = resolveApplyEnchant(
+      sim.ctx,
+      pid,
+      WORN_SWORD,
+      'enchant_offhand_stamina',
+      'offhand',
+    );
+    expect(refused.ok, 'an offhand enchant on a mainhand-kind weapon').toBe(false);
+    expect((refused as { reason?: string }).reason).toBe('wrong_slot');
+    expect(meta.equipmentInstance.offhand?.enchant, 'nothing landed on the fresh copy').toBe(
+      undefined,
+    );
+
+    expect(resolveApplyEnchant(sim.ctx, pid, WORN_SWORD, WORN_ENCHANT, 'mainhand').ok).toBe(true);
+    expect(resolveApplyEnchant(sim.ctx, pid, WORN_SWORD, WORN_ENCHANT, 'offhand').ok).toBe(true);
+    expect(meta.equipmentInstance.mainhand?.enchant).toBe(WORN_ENCHANT);
+    expect(meta.equipmentInstance.offhand?.enchant).toBe(WORN_ENCHANT);
+
+    const bonus = ENCHANTS[WORN_ENCHANT].statBonus.str ?? 0;
+    expect(bonus, 'the fixture enchant really carries strength').toBeGreaterThan(0);
+    expect(
+      sim.player.stats.str - before,
+      'both payloads reach the derived stat book, so the term is 2x',
+    ).toBe(bonus * 2);
   });
 
   it('two rings, identical copies: the ring2 slot enchants ONLY the ring2 copy', () => {

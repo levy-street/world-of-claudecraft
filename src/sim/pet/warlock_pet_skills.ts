@@ -1,6 +1,6 @@
 // Signature Warlock-pet utility kept outside the general pet dispatcher.
 // The data lives on MobTemplate; this module owns the movement-authority and
-// boss-immunity boundary for Gloomshade's anti-kite chain.
+// boss-immunity boundary for Duskmurk's anti-kite chain.
 
 import { isPullEligible } from '../combat/pull_eligibility';
 import { MOBS } from '../data';

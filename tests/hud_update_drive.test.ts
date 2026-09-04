@@ -351,7 +351,7 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
   {
     call: 'this.renderCrafting',
     band: 'slow',
-    gate: "$('#crafting-window').style.display === 'flex' && stationTypesSignature(inRangeStationTypes(sim.stationPlacements, sim.player.pos, sim.activeMobileStationCraft)) !== this.lastCraftingStationSig",
+    gate: "$('#crafting-window').style.display === 'flex' && stationTypesSignature(inRangeStationTypes(sim.stationPlacements, sim.player.pos, sim.activeMobileStationCrafts)) !== this.lastCraftingStationSig",
     surface: 'window',
     guard: { kind: 'callsite' },
     why: 'rebuilds the crafting window when the in-range station-type set changes',
@@ -891,11 +891,11 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the combat swords/ring on the player portrait, through the elided writer',
   },
   {
-    call: 'restEl.classList.toggle',
+    call: 'paintRestIndicator',
     band: 'medium',
     gate: 'rest.resting !== this.lastResting',
     surface: 'chrome',
-    why: 'the resting zZz on the player portrait, behind an edge latch',
+    why: 'the resting zZz on the player portrait, behind an edge latch. Was an inline restEl.classList.toggle until masterwrought D129s review round moved the badges whole DOM half (the on/off class plus BOTH text sinks) into rest_indicator_painter.ts: the title was being corrected on a locale switch while the aria-label was left saying Resting through a whole meal, and one function writing both from one resolved string is what stops them drifting again',
   },
   {
     call: 'this.updateQuestTracker',
@@ -1115,6 +1115,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'closes the gossip dialog when the player walks away from the NPC',
   },
   {
+    call: 'this.farmPressAffordance.paint',
+    band: 'medium',
+    gate: '',
+    surface: 'chrome',
+    why: 'the interact affordance for the ambiguous farming press (a placed feast over a garden bed); the resolver checks the short static bed list first, so the entity walk happens only while standing in a garden, and both writes elide through the shared facet',
+  },
+  {
     call: 'this.arenaWindow.close',
     band: 'frame',
     gate: "inArenaMatch && !this.arenaMatchSeen && $('#arena-window').style.display === 'block'",
@@ -1297,7 +1304,9 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     surface: 'window',
     guard: {
       kind: 'module',
-      module: 'professions_window.ts',
+      // Re-pointed at the ip-14-UI professions migration: the window moved
+      // behind the hud/professions barrel with the rest of the family.
+      module: 'hud/professions/professions_window.ts',
       // The guard compares the freshly built input's signature directly (no
       // local sig binding): render() re-latches lastSig from the one input it
       // painted, so this band never re-acts on a stale one.
@@ -1679,8 +1688,15 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // existing swingTimerBars.update row.
       // window 44 -> 46: the crucible vendor's out-of-range close (the third
       // #vendor-window tenant, on the heroic vendor's exact row shape).
-      // Both deltas apply on the merged tree.
-    ).toEqual({ window: 46, chrome: 84, none: 17 });
+      // chrome 84 -> 85: the farming press affordance (a placed feast in reach
+      // over a garden bed). Chrome, not a window: it paints one #interact-
+      // affordance notice through the shared writer facet, with no window root,
+      // no open check and therefore no invalidation guard to name.
+      // Both chrome deltas apply on the merged tree (the swing-timer bars row
+      // and the farming affordance row are different calls), and the window
+      // delta lands once, so the split below was counted from the merged table
+      // rather than carried over from either side.
+    ).toEqual({ window: 46, chrome: 85, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1766,7 +1782,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         // The professions guard hashes the freshly built input inline (no local
         // sig binding): render() re-latches lastSig from the one input it
         // painted, so the band never re-acts on a stale signature.
-        'professions_window.ts: const input = this.buildInput(); const sig = professionsRefreshSig(input); if (sig === this.lastSig) return;',
+        'hud/professions/professions_window.ts: const input = this.buildInput(); const sig = professionsRefreshSig(input); if (sig === this.lastSig) return;',
         'reliquary_window.ts: const input = this.buildInput(); const sig = this.sigFromInput(input); if (sig === this.lastSig) return;',
         'social_window.ts: if (struct !== this.lastStruct) {',
         // #2519 replaced the joined signature string this used to build every frame with

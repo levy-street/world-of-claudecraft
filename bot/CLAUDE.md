@@ -132,6 +132,18 @@ conditional-type line; a listed kind the bot cannot take reddens the
 non-blank embed author name, title, and description. Fallbacks for optional
 copy use `||`, never `??`: an empty string must degrade to the generic title.
 
+Two farming cards ride this seam since the Masterwrought packet (N10,
+capped at exactly TWO by ruling ip-16-SURFACES b): `golden_harvest` is its
+own kind (the server cards only the finder's own zone-event copy, behind
+the deed-broadcasts opt-out via `emitCraftActivityCard`), and the
+Harvestmaster title deed re-skins the EXISTING `deed` kind through a
+bespoke `else if` on `HARVESTMASTER_DEED_ID` inside `case 'deed'`, the
+`FIRST_KOI_DEED_ID` precedent. A deed wanting a distinctive card takes
+that shape, never a new kind, because the generic deed card already fires
+for it and a second kind would double-announce; the id constants are
+deliberate COPIES pinned against the DEEDS catalog in
+`tests/discord_activity_professions.test.ts`, never imports.
+
 ### Discord posts are English
 Every builder in `logic.ts` writes English literals, deliberately. The repo's
 "every player-visible string is a `t()` key" rule scopes to the GAME surfaces

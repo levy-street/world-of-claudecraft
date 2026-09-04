@@ -12,8 +12,10 @@
 //
 // The table is the WHOLE migrated set under src/sim/, re-derived at every release
 // sync (the v0.40.0 sync added src/sim/broker_custody.ts, a release-owned grant
-// boundary that arrived on the flat arm and was migrated in the merge), with ONE
-// deliberate omission:
+// boundary that arrived on the flat arm and was migrated in the merge; the
+// v0.41.0 sync into feature/masterwrought added that branch's two grant gates,
+// farming.ts harvestCrop and sundering.ts sunderAdmitted, adapted from the flat
+// arm at the merge), with ONE deliberate omission:
 // src/sim/mail/post_office.ts, whose stronger pin (a positive toContain on the exact
 // call shape plus the flat-total not.toContain) already sits beside its behavioral
 // arms in tests/mail.test.ts, 'asks the fit gate with the two-pool SPLIT, never a
@@ -308,6 +310,24 @@ const PINS: PoolWiringPin[] = [
         what: 'the admission arm gate on the fresh-enchant path',
       },
     ],
+    grantsOnly: true,
+  },
+  // The v0.41.0 sync re-derivation (the header's rule): the masterwrought
+  // branch carries two grant gates of its own that were adapted to the
+  // two-pool shape at the merge and join the table here.
+  {
+    path: 'src/sim/professions/farming.ts',
+    sites: [
+      {
+        fn: 'harvestCrop',
+        what: 'the hoisted pools binding both golden-windfall countFit signature gates read',
+      },
+    ],
+    grantsOnly: true,
+  },
+  {
+    path: 'src/sim/professions/sundering.ts',
+    sites: [{ fn: 'sunderAdmitted', what: 'the fitsAll gate on the sundered essence yield' }],
     grantsOnly: true,
   },
 ];

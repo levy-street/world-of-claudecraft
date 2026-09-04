@@ -1,0 +1,103 @@
+// The Proving Shore ferry premise, the parts no other suite pins (11m QA).
+// tests/tutorial_greeting.test.ts ("the ferry bells (the clicked crossing)")
+// already rides BOTH bells through sim.pickUpObject and pins the exact
+// landings and markers, so a gate that broke the ride outright would red
+// there too; what had NO coverage anywhere was the rest of the premise the
+// R22 reachability predicate leans on (tests/harvest_geography.test.ts admits
+// the island's camps because the crossing is ungated and two-way): this file
+// asserts the ZERO-PROGRESS premise explicitly (nothing accepted, nothing
+// done), proves the ride REPEATS (the ferry branch in interaction.ts returns
+// before the pickup path, so the bell is never consumed), and pins combat as
+// the ONLY refusal, message included. Neither file is redundant: delete this
+// one and the gate class comes back untested; delete the greeting's and the
+// landings and markers lose theirs.
+//
+// isOnProvingShore serves as both the bell selector and the landing oracle
+// here on purpose: a broken shore rect cannot pass green, it makes bells()
+// throw (the two bells must land on opposite sides), and the placements are
+// anchored independently in tests/proving_shore_content.test.ts.
+
+import { describe, expect, it } from 'vitest';
+import { isOnProvingShore } from '../src/sim/content/proving_shore';
+import { Sim } from '../src/sim/sim';
+import type { Entity } from '../src/sim/types';
+
+// Any seed works: the bells are authored placements and neither
+// tryRingFerryBell nor displacePlayer draws rng, so 4121 is arbitrary, not
+// hunted; a re-record round should never need to move it.
+function makeSim(seed = 4121): Sim {
+  return new Sim({ seed, playerClass: 'warrior', autoEquip: true });
+}
+
+function bells(sim: Sim): { island: Entity; town: Entity } {
+  const all = [...sim.entities.values()].filter(
+    (e) => e.kind === 'object' && e.objectItemId === 'ps_ferry_bell',
+  );
+  expect(all).toHaveLength(2);
+  const island = all.find((b) => isOnProvingShore(b.pos.x, b.pos.z));
+  const town = all.find((b) => !isOnProvingShore(b.pos.x, b.pos.z));
+  if (!island || !town) throw new Error('expected one ferry bell per shore');
+  return { island, town };
+}
+
+// Deliberately NOT the full teleport idiom (tests/CLAUDE.md: pos, then
+// terrainHeight for y, then prevPos): no tick runs in this file and the
+// shore predicate reads x/z only, so y stays stale on purpose. Copying this
+// shortcut into a suite that ticks would sink the player.
+function standAt(sim: Sim, bell: Entity): Entity {
+  const p = sim.entities.get(sim.playerId);
+  if (!p) throw new Error('no player');
+  p.pos.x = bell.pos.x + 1;
+  p.pos.z = bell.pos.z;
+  p.prevPos = { ...p.pos };
+  return p;
+}
+
+describe('the ferry bells are an ungated two-way crossing', () => {
+  it('either bell sails a character with ZERO rail progress, both directions', () => {
+    const sim = makeSim();
+    const meta = sim.players.get(sim.playerId);
+    if (!meta) throw new Error('no player meta');
+    // The premise character: no Proving Shore quest accepted or done (both
+    // halves of isFirstIslandVisit's read), so a graduation gate of any
+    // shape would refuse this ride.
+    expect(meta.questsDone.size).toBe(0);
+    expect(meta.questLog.size).toBe(0);
+    const { island, town } = bells(sim);
+    const p = standAt(sim, island);
+    sim.pickUpObject(island.id);
+    expect(isOnProvingShore(p.pos.x, p.pos.z), 'island bell lands in town').toBe(false);
+    standAt(sim, town);
+    sim.pickUpObject(town.id);
+    expect(isOnProvingShore(p.pos.x, p.pos.z), 'town bell lands on the island').toBe(true);
+    // Round trip again from the island: the crossing is repeatable, not a
+    // one-shot escort.
+    standAt(sim, island);
+    sim.pickUpObject(island.id);
+    expect(isOnProvingShore(p.pos.x, p.pos.z)).toBe(false);
+  });
+
+  it('combat is the ONLY refusal: an in-combat ring holds position and says so, then sails', () => {
+    const sim = makeSim();
+    const { island } = bells(sim);
+    const p = standAt(sim, island);
+    p.inCombat = true;
+    const before = { ...p.pos };
+    sim.events = [];
+    sim.pickUpObject(island.id);
+    // Not merely "still on the island": the refused ring moves NOTHING, and
+    // it tells the player why (a silent refusal that held position would
+    // read as a dead bell).
+    expect(p.pos).toEqual(before);
+    expect(sim.events).toContainEqual(
+      expect.objectContaining({
+        type: 'error',
+        pid: sim.playerId,
+        text: 'You cannot set sail from here.',
+      }),
+    );
+    p.inCombat = false;
+    sim.pickUpObject(island.id);
+    expect(isOnProvingShore(p.pos.x, p.pos.z), 'the same click sails once combat ends').toBe(false);
+  });
+});

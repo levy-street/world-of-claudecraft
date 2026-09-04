@@ -64,7 +64,8 @@ export const tr_TR: EnTranslations = {
       "dungeon": "Zindan",
       "difficulty": "Zorluk",
       "name": "Ad",
-      "spec": "Uzmanlık"
+      "spec": "Uzmanlık",
+      "bed": "Bed id (optional)"
     },
     "difficulty": {
       "normal": "Normal",
@@ -150,6 +151,10 @@ export const tr_TR: EnTranslations = {
       "gather": {
         "label": "Toplama becerisi ver",
         "description": "Bir toplama mesleğini geliştir."
+      },
+      "farmgrow": {
+        "label": "Ripen crops",
+        "description": "Bring your planted crop beds to their ready time, or one bed by id. Nothing else changes: the outcome was rolled when you planted."
       },
       "teleport": {
         "label": "Işınlan",
@@ -681,7 +686,7 @@ export const tr_TR: EnTranslations = {
         "ice_fang_sword": {
           "name": "Buz Dişi",
           "look": "Soluk buzul buzunun kavisli bıçağı, omurga boyunca sivri uçlu kırağı kristalleri, daha dolgun, buz saçağı çapraz korumasında parlak camgöbeği donmuş bir çekirdek.",
-          "lore": "Dondurulmuş sınıfın amiral gemisi ve her koleksiyoncunun ilk ulaştığı parça. Ice Fang, Highwatch'ın yukarısındaki Thornpeak'i çevreleyen buzulun bir dişinden oyulmuş, dövülmemiş, camgöbeği çekirdeği Glimmermere'in ışığı kadar soğuktu. Kestiği havayı çevreliyor. Duvar muhafızı, yoğun kar yağışının Wyrmkült'ü geride bıraktığı gece onu bir askerin taşıdığına ve 'duvarı bir kış satın aldığına' yemin etti."
+          "lore": "The flagship of the frozen grade, and the piece every collector reaches for first. Ice Fang was carved, not forged, from a fang of the glacier that caps Thornpeak above Highwatch, its cyan core burning cold as the light off the Glimmermere. It rimes the very air it cuts. The wall-guard swear one soldier carried it the night the high snows held the Broodsworn back, and 'bought the wall a winter.'"
         },
         "glaciersplit_axe": {
           "name": "Buzul yarılması",
@@ -709,7 +714,7 @@ export const tr_TR: EnTranslations = {
           "lore": "Dağın soğuğunun dişlerinin olduğu Sanctum'un altındaki derin dağ gölünden kırıldığı söylenen parlak bir buzul buz parçası. Kırağı gümüş tasmasından sonsuzca çiçek açar ve ne ateşle ne de yazla asla erimez. Büyücü'ler, işlerini kolaylaştıracak soğuktan dolayı onu yakın tutuyorlar ve Nythraxis'in mezarına doğru eğildiği ve dinlediği gecelerde de onu uzakta tutuyorlar."
         },
         "winterbite": {
-          "name": "Kış ısırığı",
+          "name": "Wintergnaw",
           "look": "Gümüş rengi çelik ve mavi buz yay, yükselticide parlayan camgöbeği donmuş çekirdek, katı buz ve soğuk buhardan oluşan çentikli bir ok.",
           "lore": "Gümüş rengi çelikten ve Thornpeak buzundan yapılmış bir yay; yükselticisi, okun teline doğru donmasını sağlayan soğuk camgöbeği bir çekirdekle aydınlatılıyor. Her çekişi yeniden şekillendiren katı buzul buzundan oluşan bir şaftı çentikliyor; okçu duvarda ok kılıfı taşımaz, sadece soğuktur. Highwatch, Sinsi Sokulmaer Ridge'i buna benzer biriyle kuşatma altında tuttu: Söylediklerine göre tek bir okçu ve her zaman orada olan bir kışa yetecek kadar ok vardı."
         },
@@ -1035,11 +1040,6 @@ export const tr_TR: EnTranslations = {
       "clearArmed": "Temizlemek için bir yuvaya dokun."
     },
     "tutorialGreeting": {
-      "bodyFirst": "Seni buralarda daha önce görmedim, dostum. Bu topraklarda macerasına yeni başlayanların, boğazın açığındaki sakin bir ada olan Sınav Kıyısı'nı ziyaret etmesi bir gelenektir. Orada, dünyanın zorluklarını göğüslemeden önce becerilerini geliştirip ona alışabilirsin. Feribot iki yöne de çalışır ve ne yaparsan yap kimse seni küçük görmez.",
-      "bodyRefresher": "Yeni bir yüzle yine mi geldin? O zaman bunun nasıl işlediğini biliyorsundur. Yine de yola çıkmadan önce belleğini tazelemek istersen, Sınav Kıyısı geri dönen bir öğrenciyi hiç geri çevirmez ve feribot sen hazır olduğunda hazırdır.",
-      "play": "Eğitime başla",
-      "skip": "Eğitimi atla",
-      "declineNote": "Nasıl istersen, dostum. Fikrini değiştirirsen, Kuzgun Postası kutusunun yanındaki feribot çanı seni gece gündüz istediğin an Sınav Kıyısı'na geçirir. Kurtlar olmadığında da o hâlâ burada olacak.",
       "bellHomeNote": "Kıyıdan bu kadar çabuk mu döndün? Çaldığın o feribot çanıydı. Onun eşi tam şurada, Kuzgun Postası kutusunun yanında asılı: istediğin an çal, geçiş seni yeniden Sınav Kıyısı'na taşır. Hangi yöne gidersen git, bir sakıncası yok.",
       "islandArrivalNote": "Sınav Kıyısı'na hoş geldin. Muhafız Tam kıyı boyunca az ileride seni bekliyor: git ve onunla görüş.",
       "noteClose": "Anladım"
@@ -1388,7 +1388,7 @@ export const tr_TR: EnTranslations = {
       "name_shadowjump_toad": "Gölge Sıçrayan Kurbağa Kama-Kage",
       "name_stormfeather_griffin": "Gökyüzü Erişimli Fırtınatüy",
       "name_thunderstrut_gobbler": "Gürlemeadım, Büyük Hindi",
-      "name_terrorspark_groundshaker": "Dehşetkıvılcım, Yer Sarsan",
+      "name_terrorspark_groundshaker": "Dreadspark Groundshaker",
       "name_drakemaw_raptor": "Ejder Ağzı Raptoru",
       "name_mech_bird": "Cluckwork Mech Bird",
       "name_lanternback_troll": "Grumbol the Lanternback",
@@ -1950,7 +1950,7 @@ export const tr_TR: EnTranslations = {
         "battleTrance": "Savaş Transı",
         "overpowerCharge": "Kızıl El Güçlendirmesi",
         "suddenDeath": "Ani Ölüm",
-        "victoryRush": "Zafer Atılımı",
+        "victoryRush": "Victor's Surge",
         "enrage": "Kargaşa: Öfkeli",
         "heatingUp": "Isınıyor",
         "arcaneCharge": "Gizemli Yükler",
@@ -2092,6 +2092,15 @@ export const tr_TR: EnTranslations = {
     "itemHeroicLabel": "Heroik",
     "itemSoulbound": "Ruha Bağlı",
     "itemUniqueEquipped": "Eşsiz Kuşanım",
+    "itemMasterwrought": "Unique-Equipped: Masterwrought ({count})",
+    "masterwrought": {
+      "slotsLabel": "Masterwrought slots:",
+      "slotsValue": "{used} / {cap}",
+      "pieceMark": "Masterwrought",
+      "tooltipWorn": "Occupies a Masterwrought slot ({used} of {cap} in use).",
+      "tooltipLegendaryLimit": "Only {cap} legendary Masterwrought piece can be worn.",
+      "tooltipAtCap": "All {cap} of your Masterwrought slots are in use."
+    },
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2121,6 +2130,18 @@ export const tr_TR: EnTranslations = {
       "linkHint": "Bu eşyayı sohbete bağlamak için Shift+tıkla."
     },
     "plurals": {
+      "commissionMasterworks": {
+        "one": "{count} masterwork",
+        "few": "{count} masterworks",
+        "many": "{count} masterworks",
+        "other": "{count} masterworks"
+      },
+      "commissionLegendaries": {
+        "one": "{count} legendary",
+        "few": "{count} legendaries",
+        "many": "{count} legendaries",
+        "other": "{count} legendaries"
+      },
       "guildMembers": {
         "one": "rütben {rank}, {count} üye",
         "few": "rütben {rank}, {count} üye",
@@ -2730,7 +2751,7 @@ export const tr_TR: EnTranslations = {
       "sanguine": "Saldırı hızını %{hastePct}, verilen hasarı %{dmgPct} artırır",
       "battleTrance": "Bir sonraki Yağmacı Darbesi veya Sakatlayan Darbe hiç Öfkeye mal olmaz",
       "revengeFree": "Bir sonraki İntikam hiç Öfkeye mal olmaz",
-      "victoryRush": "Zafer Atılımı hazır",
+      "victoryRush": "Victor's Surge is ready",
       "maxHpPct": "Azami canı %{pct} artırır",
       "enrage": "Verilen hasar {damagePct}%, saldırı hızı {hastePct}% ve hareket hızı {movePct}% artar",
       "suddenDeath": "Bir sonraki Erken Mezar'ın hiç Öfkeye mal olmaz ve can şartını yok sayar",
@@ -3024,20 +3045,34 @@ export const tr_TR: EnTranslations = {
       "riftSockets": "Yarık mücevherleri {used}/{total}",
       "statEnchanted": "+{value} {stat} (Büyülü)",
       "enchantedFallback": "Büyülü",
-      "partyTradeWindow": "Bu eşyayı, düşüşünü paylaşan oyunculara önümüzdeki {time} boyunca takas edebilirsin. Kuşanmak takas penceresini sona erdirir."
+      "partyTradeWindow": "Bu eşyayı, düşüşünü paylaşan oyunculara önümüzdeki {time} boyunca takas edebilirsin. Kuşanmak takas penceresini sona erdirir.",
+      "perfectedBadge": "Perfected",
+      "perfectingRank": "Perfecting: rank {rank} of {ranks}"
     },
     "materialHint": {
       "fineGrade": "Kaliteli derece. Malzemenin üstünde kademelenmiş bir aletle tam kademeli bir damardan toplanır ve sıradan sürümün gerektiği her yerde onun yerine sayılır.",
       "cookingCatch": "Pişirme malzemesi. Yemeden önce pişirilmelidir.",
       "usedBy": "{crafts} tarafından kullanılır.",
-      "arcaneDust": "Sıradan ve az bulunur eşyalardan büyü bozularak elde edilen büyü malzemesi.",
-      "arcaneEssence": "Nadir eşyalardan büyü bozularak elde edilen büyü malzemesi.",
+      "arcaneDust": "Crafting reagent. Disenchanted from common and uncommon gear.",
+      "arcaneEssence": "Crafting reagent. Disenchanted from rare gear.",
       "arcaneShard": "Destansı ve efsanevi eşyalardan büyü bozularak elde edilen büyü malzemesi.",
       "resonantThread": "Nadir ve üstü kumaş zırhlardan büyü bozularak elde edilen büyü malzemesi.",
       "resonantHide": "Nadir ve üstü deri zırhlardan büyü bozularak elde edilen büyü malzemesi.",
       "resonantLinks": "Nadir ve üstü zincir zırhlardan büyü bozularak elde edilen büyü malzemesi.",
       "resonantSteel": "Nadir ve üstü yakın dövüş silahlarından büyü bozularak elde edilen büyü malzemesi.",
-      "resonantTimber": "Nadir ve üstü asa, değnek, yay ve arbaletlerden büyü bozularak elde edilen büyü malzemesi."
+      "resonantTimber": "Nadir ve üstü asa, değnek, yay ve arbaletlerden büyü bozularak elde edilen büyü malzemesi.",
+      "masterwroughtIntermediate": "Masterwrought crafting component.",
+      "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day.",
+      "growthTonic": "Farming supply. Spent when you plant a crop for a chance of a slightly larger harvest. If the crop withers, the tonic is lost with it.",
+      "deedOfMaking": "Inscription writ. Consumed to raise a Perfected Masterwrought work to legendary and give it a name.",
+      "wyrmfallCore": "Masterwrought crafting catalyst. The raid final boss drops 1 to 3 to each player once per day on each difficulty. Heroic dungeon final bosses each drop 1 to 3 to each player once per day. Your first A or S rank Rift race win of the day grants 1 at A rank or 2 at S rank. The Heroic Quartermaster sells one for Heroic Marks.",
+      "mudfinScale": "Crafting reagent. Mudfin Skulkers drop it about half the time, the deeper marsh fish a little less often, and the named terrors of those waters always.",
+      "crackedWyrmScale": "Crafting reagent. Sanctum Scaleguards drop it about half the time, and nothing else in the world carries one.",
+      "crackedOgreTusk": "Crafting reagent. Brutok Skullsmasher carries one every time he falls, and he is its only source.",
+      "tallowCandle": "Crafting reagent. Deeprock diggers drop it more often than not and Gravecaller cultists now and then, while the named leaders of both always carry one.",
+      "banditBandana": "Crafting reagent. Bandits drop it about half the time, and their named leaders always carry one.",
+      "oldCragmawsPelt": "Crafting reagent. Old Cragmaw yields one every time he falls, and no other beast carries it.",
+      "emberwingCinderscale": "Crafting reagent. Voskar the Emberwing yields one every time he falls, and no other beast carries it."
     },
     "discord": {
       "title": "Discord",
@@ -3353,7 +3388,7 @@ export const tr_TR: EnTranslations = {
       "sortAria": "Banka eşyalarını sırala",
       "searchAria": "Banka eşyalarını ada göre ara",
       "depositAll": "Tüm malzemeleri yatır",
-      "depositAllTooltip": "Çantalarındaki tüm zanaat malzemelerini ve döküntü eşyaları tek seferde bankaya gönderir. Toplama aletlerine, kuşanılan teçhizata, görev eşyalarına ve sarf malzemelerine asla dokunulmaz.",
+      "depositAllTooltip": "Çantalarındaki tüm zanaat malzemelerini (açıklamasında \"Malzeme\" veya \"Kaliteli Malzeme\" yazan her şeyi) tek seferde bankaya gönderir. Geri kalan her şey çantalarında kalır; toplama aletleri, görev eşyaları, sarf malzemeleri ve gri eşyalar dahil.",
       "depositAllDone": "Yatırılan malzeme: {count}.",
       "depositAllFull": "Yatırılan malzeme: {count}. Banka artık dolu.",
       "depositAllNone": "Banka dolu: hiçbir şey yatırılmadı.",
@@ -3537,6 +3572,7 @@ export const tr_TR: EnTranslations = {
       "logging": "Ağaç kesme",
       "herbalism": "Bitkicilik",
       "fishing": "Balıkçılık",
+      "farming": "Farming",
       "notReady": "Bu kaynak noktası senin için henüz yeniden oluşmadı.",
       "gatherLine": "Topladığınız şey: {name}.",
       "gatherLineQty": "Şunu toplarsınız: {name} x{qty}.",
@@ -3555,7 +3591,8 @@ export const tr_TR: EnTranslations = {
       "tierRequired": {
         "mining": "{tier}. kademe madenci kazması gerektirir",
         "logging": "{tier}. kademe odun kesme baltası gerektirir",
-        "herbalism": "{tier}. kademe bitkicilik orakı gerektirir"
+        "herbalism": "{tier}. kademe bitkicilik orakı gerektirir",
+        "farming": "Requires a tier {tier} farming hoe"
       },
       "requiresTool": {
         "mining": "Madenci kazması gerektirir",
@@ -3566,23 +3603,27 @@ export const tr_TR: EnTranslations = {
         "mining": "Bu damarı işlemek için {tier}. kademe madenci kazmasına ihtiyacınız var.",
         "logging": "Bu korulugu devirmek için {tier}. kademe odun kesme baltasına ihtiyacınız var.",
         "herbalism": "Bu tarlayı toplamak için {tier}. kademe bitkicilik orakına ihtiyacınız var.",
-        "fishing": "Bu sularda balık tutmak için {tier}. kademe olta kamışına ihtiyacınız var."
+        "fishing": "Bu sularda balık tutmak için {tier}. kademe olta kamışına ihtiyacınız var.",
+        "farming": "You need a tier {tier} farming hoe to work this bed."
       },
       "toolRequired": {
         "mining": "Bu cevher damarını kazmak için bir madenci kazmasına ihtiyacınız var.",
         "logging": "Bu ağaç kümesini devirmek için bir oduncu baltasına ihtiyacınız var.",
         "herbalism": "Bu ot öbeğini toplamak için bir otçu orağına ihtiyacınız var.",
-        "fishing": "Balık tutmak için bir olta kamışına ihtiyacınız var."
+        "fishing": "Balık tutmak için bir olta kamışına ihtiyacınız var.",
+        "farming": "You need a farming hoe to work this bed."
       },
       "noNodeNearby": {
         "mining": "Erişebileceğiniz bir cevher damarı yok.",
         "logging": "Erişebileceğiniz bir ağaç kümesi yok.",
-        "herbalism": "Erişebileceğiniz bir ot öbeği yok."
+        "herbalism": "Erişebileceğiniz bir ot öbeği yok.",
+        "farming": "There is no crop bed within reach."
       },
       "wieldUnmet": {
         "mining": "Çantanızdaki kazmayı sallamak için Madencilik {skill} becerisine ihtiyacınız var.",
         "logging": "Çantanızdaki baltayı sallamak için Ağaç kesme {skill} becerisine ihtiyacınız var.",
-        "herbalism": "Çantanızdaki orağı kullanmak için Bitkicilik {skill} becerisine ihtiyacınız var."
+        "herbalism": "Çantanızdaki orağı kullanmak için Bitkicilik {skill} becerisine ihtiyacınız var.",
+        "farming": "You need Farming {skill} to swing the hoe already in your bags."
       },
       "wieldUnmetCorpse": "En iyi aletinizi iş başına koymak için {skill} toplama becerisine ihtiyacınız var.",
       "toolTierUnmetCorpse": "En iyi malzemeleri kurtarmak için {tier}. kademe toplama aracına ihtiyacınız var.",
@@ -3591,26 +3632,31 @@ export const tr_TR: EnTranslations = {
           "mining": "Madencilik aleti (kademe {tier})",
           "logging": "Odun kesimi aleti (kademe {tier})",
           "herbalism": "Otçuluk aleti (kademe {tier})",
-          "fishing": "Olta kamışı (kademe {tier})"
+          "fishing": "Olta kamışı (kademe {tier})",
+          "farming": "Farming tool (tier {tier})"
         },
         "unlocks": {
           "mining": "Kademe {tier} ve altındaki cevher damarlarını kazmak için gereklidir.",
           "logging": "Kademe {tier} ve altındaki ağaç kümelerini devirmek için gereklidir.",
           "herbalism": "Kademe {tier} ve altındaki ot öbeklerini toplamak için gereklidir.",
-          "fishing": "Kademe {tier} ve altındaki sularda balık tutmak için gereklidir."
+          "fishing": "Kademe {tier} ve altındaki sularda balık tutmak için gereklidir.",
+          "farming": "Required to plant crops up to tier {tier}."
         },
         "use": {
           "mining": "Kullanım: Yakındaki bir cevher damarını kazar.",
           "logging": "Kullanım: Yakındaki bir ağaç kümesini devirir.",
-          "herbalism": "Kullanım: Yakındaki bir ot öbeğini toplar."
+          "herbalism": "Kullanım: Yakındaki bir ot öbeğini toplar.",
+          "farming": "Works from your bags when you plant a crop bed."
         },
         "speed": "Kademe {tier} altındaki düğümlerde daha hızlı toplar.",
         "rodRequired": "Balık tutmak için gereklidir.",
         "rodBite": "Balıklar {seconds} sn'ye kadar daha erken oltaya vurur.",
         "rodReel": "Olta çekme süresini {seconds} sn uzatır.",
-        "rodBand": "Balıkçılık becerisi {skill} ve üzerinde daha zengin av listelerinin kilidini açar."
+        "rodBand": "Balıkçılık becerisi {skill} ve üzerinde daha zengin av listelerinin kilidini açar.",
+        "rodBandCatch": "Unlocks {fish} at fishing skill {skill} and above."
       },
       "downgradeMark": "Çantalar dolu: bulgu, toplayıcı işareti olmadan saklandı.",
+      "downgradeMarkCrop": "Bags full: the harvest was stored without its grower's mark.",
       "downgradeFind": "Çantalar dolu: pırıl pırıl bir bulgu kayboldu gitti.",
       "emptyHookNote": "Oltada bir şey yok",
       "stateReady": "Hazır",
@@ -3618,6 +3664,90 @@ export const tr_TR: EnTranslations = {
       "stateCooldownTimed": "{time} içinde yeniden oluşur",
       "respawnClock": "{minutes}:{seconds}",
       "fineGradePreview": "Aletiniz bu verimi kaliteli dereceye yükseltir."
+    },
+    "farming": {
+      "plantLine": "You plant: {name}.",
+      "harvestLine": "You bring in: {name}.",
+      "harvestLineQty": "You bring in: {name} x{qty}.",
+      "harvestFineLine": "You also bring in: {name}.",
+      "harvestFineLineQty": "You also bring in: {name} x{qty}.",
+      "witheredLine": "The crop withered. You clear the bed: {name}.",
+      "witheredLineQty": "The crop withered. You clear the bed: {name} x{qty}.",
+      "pressTarget": {
+        "feastOverHarvest": "A feast and your crop are both in reach. Interact takes the feast before the bed; step away from the feast to harvest.",
+        "feastOverPlant": "A feast and an empty bed are both in reach. Interact takes the feast before the bed; step away from the feast to plant."
+      },
+      "seedBackLine": "You recover seed: {name}.",
+      "seedBackLineQty": "You recover seed: {name} x{qty}.",
+      "goldenBonusLine": "The golden harvest yields: {name}.",
+      "denied": {
+        "bad_bed": "There is no crop bed there.",
+        "bad_crop": "You cannot plant that here.",
+        "range": "You are too far from that crop bed.",
+        "bed_taken": "You already have a crop growing there.",
+        "skill": "Your Farming skill is too low for that crop.",
+        "no_seed": "You have no seed for that crop.",
+        "not_ready": "That crop is still growing.",
+        "no_plot": "Nothing is planted in that bed.",
+        "no_husks": "You do not have enough withered husks.",
+        "no_compost": "You have no compost.",
+        "no_fee_produce": "You have no produce to pay the watch fee.",
+        "no_tonic": "You have no growth tonic.",
+        "tool": "You have no farming hoe fit for that crop.",
+        "locked": "An item that would pay for that is locked.",
+        "no_farmer": "You must be near a farmer to trade husks for compost.",
+        "no_feast": "You have no feast to set out.",
+        "feast_active": "Your feast is already set out.",
+        "feast_expired": "That feast is gone.",
+        "feast_finished": "That feast has been picked clean.",
+        "feast_eaten": "You have already eaten from that feast."
+      },
+      "feastTitle": "{name}'s Harvest Feast",
+      "stonepotFeastTitle": "{name}'s Stonepot Feast",
+      "warspiceFeastTitle": "{name}'s Warspice Feast",
+      "sageleafFeastTitle": "{name}'s Sageleaf Feast",
+      "feastPlacedLine": "You set out your harvest feast.",
+      "huskTrade": "Trade husks for compost",
+      "huskTradeAria": "Trade husks for compost with {name}",
+      "plantSheet": {
+        "title": "Plant a Crop",
+        "plant": "Plant",
+        "sowAria": "Sow {name}",
+        "empty": "You have no seed you can sow at this bed.",
+        "close": "Close the plant sheet"
+      },
+      "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
+      "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}.",
+      "readyLine": "A crop is ready to harvest.",
+      "readyLineQty": "{count} crops are ready to harvest.",
+      "readyWitheredLine": "A crop withered in its bed.",
+      "readyWitheredLineQty": "{count} crops withered in their beds."
+    },
+    "harvestJournal": {
+      "title": "Harvest Journal",
+      "close": "Close",
+      "listLabel": "Planted crop beds",
+      "growing": "Ready in {time}",
+      "ready": "Ready to harvest",
+      "finishing": "Finishing up",
+      "withered": "Withered",
+      "readyAnnounce": "Ready to harvest: {name}",
+      "remainingDaysHours": "{days}d {hours}h",
+      "remainingHoursMinutes": "{hours}h {minutes}m",
+      "remainingMinutesSeconds": "{minutes}m {seconds}s",
+      "remainingSeconds": "{seconds}s",
+      "bedLine": "{zone}, bed {index}",
+      "bedLineUnknown": "Unknown bed",
+      "careWatch": "Farmer's Watch",
+      "careNone": "No extras",
+      "stageSprout": "Sprout",
+      "stageSeedling": "Seedling",
+      "stageMaturing": "Maturing",
+      "stageRipe": "Ripe",
+      "emptyTitle": "No crops planted",
+      "emptyBody": "Sow a seed in any garden bed and the plot appears here with its timer.",
+      "noviceTitle": "You have not worked a garden bed yet",
+      "noviceBody": "Farming skill grows every time you bring in a crop. Sow a seed in any garden bed to begin."
     },
     "archetypeTitle": {
       "label": "Unvan",
@@ -3649,48 +3779,53 @@ export const tr_TR: EnTranslations = {
       "leatherworking": "Deri İşleme"
     },
     "enchantName": {
-      "enchant_weapon_might": "Silah Büyüsü - Güç",
-      "enchant_weapon_intellect": "Silah Büyüsü - Büyü Gücü",
-      "enchant_offhand_stamina": "İkincil El Büyüsü - Dayanıklılık",
-      "enchant_helmet_fortitude": "Miğfer Büyüsü - Metanet",
-      "enchant_neck_spirit": "Kolye Büyüsü - Ruh",
-      "enchant_shoulder_agility": "Omuzluk Büyüsü - Çeviklik",
-      "enchant_chest_stamina": "Göğüs Büyüsü - Dayanıklılık",
-      "enchant_waist_stamina": "Kemer Büyüsü - Dayanıklılık",
-      "enchant_legs_stamina": "Bacak Büyüsü - Dayanıklılık",
-      "enchant_gloves_agility": "Eldiven Büyüsü - Çeviklik",
-      "enchant_gloves_intellect": "Eldiven Büyüsü - Büyü Gücü",
-      "enchant_feet_agility": "Bot Büyüsü - Çeviklik",
-      "enchant_ring_spirit": "Yüzük Büyüsü - Ruh",
-      "enchant_weapon_agility": "Silah Büyüsü - Çeviklik",
-      "enchant_helmet_intellect": "Miğfer Büyüsü - Zeka",
-      "enchant_helmet_armor": "Miğfer Büyüsü - Takviye",
-      "enchant_neck_intellect": "Kolye Büyüsü - Zeka",
-      "enchant_neck_agility": "Kolye Büyüsü - Çeviklik",
-      "enchant_shoulder_strength": "Omuzluk Büyüsü - Güç",
-      "enchant_shoulder_intellect": "Omuzluk Büyüsü - Zeka",
-      "enchant_chest_spirit": "Göğüs Büyüsü - Ruh",
-      "enchant_chest_armor": "Göğüs Büyüsü - Takviye",
-      "enchant_waist_strength": "Kemer Büyüsü - Güç",
-      "enchant_waist_agility": "Kemer Büyüsü - Çeviklik",
-      "enchant_legs_intellect": "Bacak Büyüsü - Zeka",
-      "enchant_gloves_strength": "Eldiven Büyüsü - Güç",
-      "enchant_feet_strength": "Bot Büyüsü - Güç",
-      "enchant_feet_stamina": "Bot Büyüsü - Dayanıklılık",
-      "enchant_ring_strength": "Yüzük Büyüsü - Güç",
-      "enchant_ring_agility": "Yüzük Büyüsü - Çeviklik",
-      "enchant_ring_intellect": "Yüzük Büyüsü - Zeka",
-      "enchant_weapon_greater_might": "Silah Büyüsü - Yüksek Güç",
-      "enchant_weapon_greater_spellpower": "Silah Büyüsü - Yüksek Büyü Gücü",
-      "enchant_helmet_greater_fortitude": "Miğfer Büyüsü - Yüksek Metanet",
-      "enchant_chest_greater_stamina": "Göğüs Büyüsü - Yüksek Dayanıklılık",
-      "enchant_legs_greater_stamina": "Bacak Büyüsü - Yüksek Dayanıklılık",
-      "enchant_gloves_greater_agility": "Eldiven Büyüsü - Yüksek Çeviklik",
-      "enchant_weapon_runed_edge": "Silah Büyüsü - Rünlü Ağız",
-      "enchant_weapon_runed_focus": "Silah Büyüsü - Runlu Odak",
-      "enchant_chest_runeweave": "Göğüs Büyüsü - Rün Dokuma",
-      "enchant_legs_runed_hide": "Bacak Büyüsü - Rünlü Post",
-      "enchant_helmet_runed_links": "Miğfer Büyüsü - Rünlü Halkalar"
+      "enchant_weapon_might": "Weapon Etching: Might",
+      "enchant_weapon_intellect": "Weapon Etching: Spellpower",
+      "enchant_offhand_stamina": "Offhand Etching: Stamina",
+      "enchant_helmet_fortitude": "Helmet Etching: Fortitude",
+      "enchant_neck_spirit": "Necklace Etching: Spirit",
+      "enchant_shoulder_agility": "Shoulder Etching: Agility",
+      "enchant_chest_stamina": "Chest Etching: Stamina",
+      "enchant_waist_stamina": "Belt Etching: Stamina",
+      "enchant_legs_stamina": "Leg Etching: Stamina",
+      "enchant_gloves_agility": "Glove Etching: Agility",
+      "enchant_gloves_intellect": "Glove Etching: Spellpower",
+      "enchant_feet_agility": "Boot Etching: Agility",
+      "enchant_ring_spirit": "Ring Etching: Spirit",
+      "enchant_weapon_agility": "Weapon Etching: Agility",
+      "enchant_helmet_intellect": "Helmet Etching: Intellect",
+      "enchant_helmet_armor": "Helmet Etching: Reinforcement",
+      "enchant_neck_intellect": "Necklace Etching: Intellect",
+      "enchant_neck_agility": "Necklace Etching: Agility",
+      "enchant_shoulder_strength": "Shoulder Etching: Strength",
+      "enchant_shoulder_intellect": "Shoulder Etching: Intellect",
+      "enchant_chest_spirit": "Chest Etching: Spirit",
+      "enchant_chest_armor": "Chest Etching: Reinforcement",
+      "enchant_waist_strength": "Belt Etching: Strength",
+      "enchant_waist_agility": "Belt Etching: Agility",
+      "enchant_legs_intellect": "Leg Etching: Intellect",
+      "enchant_gloves_strength": "Glove Etching: Strength",
+      "enchant_feet_strength": "Boot Etching: Strength",
+      "enchant_feet_stamina": "Boot Etching: Stamina",
+      "enchant_ring_strength": "Ring Etching: Strength",
+      "enchant_ring_agility": "Ring Etching: Agility",
+      "enchant_ring_intellect": "Ring Etching: Intellect",
+      "enchant_weapon_greater_might": "Weapon Etching: Greater Might",
+      "enchant_weapon_greater_spellpower": "Weapon Etching: Greater Spellpower",
+      "enchant_helmet_greater_fortitude": "Helmet Etching: Greater Fortitude",
+      "enchant_chest_greater_stamina": "Chest Etching: Greater Stamina",
+      "enchant_legs_greater_stamina": "Leg Etching: Greater Stamina",
+      "enchant_gloves_greater_agility": "Glove Etching: Greater Agility",
+      "enchant_weapon_runed_edge": "Weapon Etching: Runed Edge",
+      "enchant_weapon_runed_focus": "Weapon Etching: Runed Sigil",
+      "enchant_chest_runeweave": "Chest Etching: Runed Weave",
+      "enchant_legs_runed_hide": "Leg Etching: Runed Hide",
+      "enchant_helmet_runed_links": "Helmet Etching: Runed Links",
+      "enchant_weapon_lucent_might": "Weapon Etching: Lucent Might",
+      "enchant_weapon_lucent_spellpower": "Weapon Etching: Lucent Spellpower",
+      "enchant_chest_lucent_stamina": "Chest Etching: Lucent Stamina",
+      "enchant_feet_lucent_agility": "Boot Etching: Lucent Agility",
+      "enchant_lucent_infusion": "Lucent Infusion"
     },
     "professions": {
       "title": "Meslekler",
@@ -3721,19 +3856,29 @@ export const tr_TR: EnTranslations = {
       "toolEffectName": {
         "gatherersCache": "Toplayıcının Zulası",
         "artisansEye": "Ustanın Gözü",
-        "quickeningCharm": "Yaylanma Tılsımı"
+        "quickeningCharm": "Yaylanma Tılsımı",
+        "makersCharm": "Maker's Charm"
       },
       "toolEffectTooltip": {
         "kind": "Alet tılsımı",
         "bonus": {
           "gatherersCache": "Şarjlıyken hasat başına +1 verim.",
           "artisansEye": "Şarjlıyken hasat derecesini 1 alet kademesi yükseltir.",
-          "quickeningCharm": "Tetiklediği düğüm yeniden oluşma süresini kısaltır."
+          "quickeningCharm": "Tetiklediği düğüm yeniden oluşma süresini kısaltır.",
+          "makersCharm": "+2 yield per harvest while charged, or +1 on a farming tool."
         },
-        "howToSlot": "Meslekler penceresinden bir madencilik, ağaç kesme ya da bitkicilik aletine yuvala. Yuvalandığında tüketilir.",
+        "howToSlot": "Meslekler penceresinden bir madencilik, ağaç kesme, bitkicilik ya da çiftçilik aletine yuvala. Yuvalandığında tüketilir.",
         "charges": "Sıradan bir alette {base} şarjla başlar (her nadirlik kademesinde +{bonus}).",
         "landOnly": "Olta kamışlarına yuvalanmaz.",
         "openProfessions": "Bunu bir toplama aletine yuvalamak için Meslekler'i aç."
+      },
+      "mobileStationTooltip": {
+        "kind": "Field station",
+        "use": "Places a party-shared {station} at your feet.",
+        "radius": "You can craft at it from anywhere; party members must be within {radius} yards.",
+        "duration": "Lasts {minutes} minutes.",
+        "notConsumed": "Never consumed.",
+        "replace": "Placing replaces your active field station, including a specialty-placed one."
       },
       "toolEffectSlotButton": "{effect} Tak",
       "toolEffectRechargeButton": "Şarj Et",
@@ -3860,6 +4005,9 @@ export const tr_TR: EnTranslations = {
       "busy": "Meşgulsün.",
       "recipeNotLearned": "Bu tarifi henüz öğrenmedin.",
       "noBagSpace": "Çantanızda üretilen eşya için yer yok.",
+      "dailyLimit": "You can only craft that once per day.",
+      "dailyLimitRetry": "You can only craft that once per day. Available again in {duration}.",
+      "oncePerDay": "Once per day",
       "skillReqLine": "{craft} {skill} gerektirir",
       "difficultyFull": "Tam beceri kazanımı",
       "difficultyReduced": "Azaltılmış beceri kazanımı",
@@ -3868,8 +4016,16 @@ export const tr_TR: EnTranslations = {
       "stationBadge": "Üretim Tezgâhı",
       "stationOutOfRangeNamed": "Bunu yapmak için {station}'ye gidin.",
       "learnMoreAtStation": "{master}, {station} içinde size daha fazla {craft} tarifi öğretebilir.",
+      "apexChip": "Apex",
+      "apexPatternRaid": "Its pattern is a rare raid trophy.",
+      "apexPatternRift": "Its pattern is won on victorious high-rank Rift clears.",
+      "apexPatternVendor": "The Heroic Quartermaster sells its pattern for Heroic Marks.",
+      "apexPatternDrop": "Its pattern is found in the world.",
+      "perfectingLink": "Perfecting",
       "masterworkToast": "Şaheser! {name}",
       "masterworkZoneLine": "{crafter} bir şaheser {name} yarattı!",
+      "legendaryLine": "{item} is reborn as {name}, a legend!",
+      "legendaryZoneLine": "{player} forged {item} into the legend {name}!",
       "tierUpToast": "{craft}, {tier} seviyesine yükseldi!",
       "skillUpToast": "{skill} becerisi {level} seviyesine yükseldi!",
       "skillUpSubtext": "Beceri {level} seviyesine yükseldi!",
@@ -3898,6 +4054,7 @@ export const tr_TR: EnTranslations = {
       "disenchant": "Büyüyü Boz",
       "salvage": "Kurtar",
       "applyEnchant": "Büyü Uygula",
+      "sunder": "Sunder",
       "sell": "Sat",
       "sellAll": "Tümünü sat ({count})"
     },
@@ -3930,6 +4087,9 @@ export const tr_TR: EnTranslations = {
       "salvageConfirmTitle": "{item} parçalansın mı?",
       "salvageConfirmBody": "{item} yok edilir ve zanaat malzemesi verir. Bu geri alınamaz.",
       "salvageConfirmBodySpecial": "{item}'nin özel bir kopyası (imzalı, şaheser veya büyülü) yok edilir ve zanaat malzemesi verir. Bu geri alınamaz.",
+      "sunderConfirmTitle": "Sunder {item}?",
+      "sunderConfirmBody": "This destroys {item} and yields Sundered Essence. This cannot be undone.",
+      "sunderConfirmBodySpecial": "This destroys a special copy of {item} (signed, masterwork, or enchanted) and yields Sundered Essence. This cannot be undone.",
       "pickerTitle": "Büyü Uygula",
       "targetTitle": "Büyülenecek eşya seçin",
       "noEnchants": "Hiçbir büyü bu malzemeyi kullanmıyor.",
@@ -3939,13 +4099,16 @@ export const tr_TR: EnTranslations = {
       "tier": {
         "base": "Temel Büyüler",
         "runed": "Runlu Büyüler",
-        "greater": "Daha İyi Büyüler"
+        "greater": "Daha İyi Büyüler",
+        "lucent": "Lucent Enchants"
       },
       "yieldHeader": "Beklenen malzemeler:",
       "yieldLineExact": "{count} {item}",
       "yieldLineRange": "{min} ile {max} arası {item}",
       "alreadyEnchanted": "O eşya zaten büyülü.",
       "sameEnchant": "O eşyada zaten bu büyü var.",
+      "notPerfected": "Only a Perfected item can bear that enchant.",
+      "enchantSkillTooLow": "Your Enchanting skill is too low for that enchant.",
       "replaceTag": "{enchant} yerine geçer",
       "sameEnchantTag": "Zaten uygulandı",
       "plainTag": "Büyüsüz",
@@ -3956,6 +4119,7 @@ export const tr_TR: EnTranslations = {
       "replaceConfirmKeepsSigner": "Yapımcı işareti",
       "replaceConfirmKeepsMasterwork": "Ustalık bonusu",
       "replaceConfirmKeepsBond": "Komisyon bağı",
+      "replaceConfirmKeepsPerfecting": "Perfecting",
       "replaceConfirmCost": "Maliyet: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Değiştir"
@@ -3981,6 +4145,9 @@ export const tr_TR: EnTranslations = {
       "alreadyKnown": "Bu tarifi zaten biliyorsunuz.",
       "outOfRange": "Antrenman yapmak için istasyonda olmanız gerekmektedir."
     },
+    "pattern": {
+      "teaches": "Use: Teaches you how to craft {item}."
+    },
     "unbind": {
       "title": "Bağ Çözme: {name}",
       "close": "Bağı çözmeyi kapat",
@@ -3999,7 +4166,49 @@ export const tr_TR: EnTranslations = {
       "notBound": "O eşya bağlı değil.",
       "cannotAfford": "Çözüm ücretini karşılayamazsınız.",
       "outOfRange": "Bağ çözmek için bir zanaat tezgahında olmanız gerekir.",
-      "noSpace": "Çantanızda bağı çözülmüş kopya için yer yok."
+      "noSpace": "Çantanızda bağı çözülmüş kopya için yer yok.",
+      "perfecting": "A piece on the Perfecting track, or already Perfected, stays bound."
+    },
+    "perfecting": {
+      "title": "Perfecting",
+      "close": "Close the Perfecting window",
+      "openButton": "Perfecting",
+      "openButtonAria": "Open the Perfecting window",
+      "empty": "You hold no Masterwrought piece. The apex recipes forge one.",
+      "wornChip": "Worn",
+      "rowRank": "Rank {rank} of {ranks}",
+      "rowPerfected": "Perfected",
+      "rankAnnounce": "{name} reaches Perfecting rank {rank} of {ranks}.",
+      "perfectedAnnounce": "{name} is now Perfected.",
+      "promotedAnnounce": "{name} is forged as {chosen}.",
+      "unknownItem": "Unknown item",
+      "namingSelectionUnconfirmed": "Your bags shifted: the piece being named could not be confirmed. Check the selection before you forge.",
+      "rowPromoted": "Legendary",
+      "attemptCost": "Attempt cost",
+      "promoteCost": "Promotion cost",
+      "matCount": "{have} of {required}",
+      "skillNeed": "Needs {craft} skill {skill}.",
+      "skillMet": "Met.",
+      "skillUnmet": "Not met.",
+      "skillSyncing": "Checking your craft skill.",
+      "bindWarn": "Your first perfecting attempt binds {name} to you.",
+      "bindWarnDetail": "Perfecting never lowers a rank: a failed attempt only spends its materials. A piece with Perfecting progress or a Perfected piece cannot be unbound, and a promotion is permanent.",
+      "bindConfirmText": "Your first attempt binds {name} to you. Attempt anyway?",
+      "bindConfirmAccept": "Bind and Attempt",
+      "bindConfirmCancel": "Cancel",
+      "attempt": "Attempt Perfecting",
+      "promote": "Name and Promote",
+      "perfectedLead": "Perfected. Give it a name to forge a legend.",
+      "promotedLine": "A finished legend: nothing left to perfect.",
+      "equipBlocked": "You could not equip it once promoted. Unequip the conflicting piece first.",
+      "nameTitle": "Name the Legend",
+      "nameLabel": "Inscribe a name for {name}. The name is permanent.",
+      "nameInputAria": "Legendary name",
+      "nameHint": "Two to 32 characters: letters, spaces, apostrophes, and hyphens, starting with a letter.",
+      "nameCount": "{count} of {max}",
+      "nameSubmit": "Forge the Legend",
+      "nameSubmitBusy": "Forging",
+      "nameCancel": "Cancel"
     },
     "commissionBoard": {
       "title": "Komisyon Siparişleri",
@@ -4025,6 +4234,7 @@ export const tr_TR: EnTranslations = {
       "rowFor": "{requester} için {item}",
       "rowTargeted": "{requester} için {item} ({crafter} için)",
       "acceptedBy": "{name} tarafından kabul edildi",
+      "crafterRecordLabel": "Crafter's record:",
       "statusOpen": "Açık",
       "statusAccepted": "Kabul Edildi",
       "statusDelivered": "Teslim Edildi",
@@ -4216,10 +4426,13 @@ export const tr_TR: EnTranslations = {
         "masterwork_armorcrafting": "Zırh Yapımı Şaheseri",
         "masterwork_tailoring": "Terzilik Şaheseri",
         "masterwork_leatherworking": "Deri İşleme Şaheseri",
+        "masterwork_jewelcrafting": "Jewelcrafting Masterwork",
+        "masterwork_inscription": "Inscription Masterwork",
         "masterwork_engineering": "Mühendislik Şaheseri",
         "gather_event_pristine_vein": "El Değmemiş Damar",
         "gather_event_ancient_heartwood": "Kadim Öz Odun",
         "gather_event_moonlit_bloom": "Ay Işığında Açan Çiçek",
+        "gather_event_golden_harvest": "Golden Harvest",
         "gather_event_perfect_specimen": "Kusursuz Örnek",
         "slain_old_greyjaw": "Öldürüldü: İhtiyar Greyjaw",
         "slain_mogger": "Öldürüldü: Mogger",
@@ -4606,7 +4819,8 @@ export const tr_TR: EnTranslations = {
   "gatherEvent": {
     "pristineVein": "{finder} bozulmamış bir damara çarptı!",
     "ancientHeartwood": "{finder} eski bir öz odunu kesti!",
-    "moonlitBloom": "{finder} ay ışığının aydınlattığı bir çiçek keşfetti!"
+    "moonlitBloom": "{finder} ay ışığının aydınlattığı bir çiçek keşfetti!",
+    "goldenHarvest": "{finder} reaped a golden harvest!"
   },
   "apiError": {
     "validation": {
@@ -4951,7 +5165,7 @@ export const tr_TR: EnTranslations = {
         "nightName": "Gece Çiçeği",
         "nightBlurb": "Çiçeklerin patikaları aydınlattığı ve Moonrest'in nöbetini tuttuğu, yıldızlı gece yarısı ülkesi.",
         "hauntName": "Hayalet Ormanı",
-        "hauntBlurb": "Devasa ağaç tepelerinin altında lanetli bir orman; yolda tek dürüst ışık Gallowmere'in fenerleridir.",
+        "hauntBlurb": "Devasa ağaç tepelerinin altında lanetli bir orman; yolda tek dürüst ışık Gibbetmere'in fenerleridir.",
         "jungleName": "Palmiye Kıyısı",
         "jungleBlurb": "Palmiyeler, beyaz kum ve gürültücü kuşlar; sahil kasabası Drifthaven kıyıda bir ateşi yanık tutar.",
         "gardenName": "Sonsuz Bahçe",
@@ -5042,6 +5256,7 @@ export const tr_TR: EnTranslations = {
       "groupCamera": "Kamera",
       "talents": "Yetenekler",
       "professions": "Meslekler",
+      "harvestJournal": "Harvest Journal",
       "arena": "PvP penceresi (arenalar ve Dikenvadi Ovası)",
       "leaderboard": "Lider Tablosu",
       "deeds": "Yiğitlikler Kitabı",
@@ -5260,6 +5475,7 @@ export const tr_TR: EnTranslations = {
       "framePetTitle": "Evcilin",
       "framePetBody": "Avcılar, Karabüyücüler ve dışarıda bir evcili olan herkes, kendi çerçevesinin yanında evcili için adı, seviyesi ve canıyla küçük bir çerçeve alır. O çerçeveye tıklamak evcilini seçer, klavyeden Ctrl+6 de aynısını yapar.",
       "framesMoveBody": "Çerçeven, hedef çerçeven ve grup çerçevelerinin hepsi taşınabilir. Her biri köşesinde küçük bir taşıma düğmesi taşır: kilidini aç, çerçeveyi istediğin yere sürükle ve başıboş bir tıklamanın onu kaydırmaması için tekrar kilitle. Pişman olacağın bir yerde son bulurlarsa, seçeneklerdeki Çerçeve Konumlarını Sıfırla hepsini başladıkları yere geri döndürür.",
+      "framesMoveBodyEditFrames": "Your frame, your target frame, and your party frames can all be moved. Each carries a small move button in its corner: unlock it, drag the frame where you want it, and lock it again so a stray click cannot shift it. Edit Frames, at the top of the Frames tab in the Interface options, loosens the rest of the interface at once, those three frames with it: the action bars, the cast bar, the swing bar, the experience bar, the minimap, the button rail, the pet frame, the stance bar, the buff and debuff rows, and the Wishlist Reminder chip, each wearing a name chip while it is loose. If they end up somewhere you regret, Reset to Defaults at the foot of that same Frames tab snaps them all back to where they started.",
       "barsTitle": "Çubuklar, sayaçlar ve savaş metni",
       "barsBody": "Büyü çubuğun, büyü okuduğunda ya da kanalize ettiğinde eylem çubuklarının hemen üzerinde, ekranın ortasında belirir ve büyünün adını ve kalan süreyi taşır. Hedefin de kendi çerçevesinde kendi büyü çubuğuna sahiptir, böylece neyin geldiğini görüp buna karşılık verebilirsin.\n\nBüyü çubuğunun altında ince bir vuruş çubuğu durur ve silah vuruşların arasında dolar, böylece yakın dövüş ya da menzilli bir saldırgan bir sonraki otomatik vuruşun ne zaman ineceğini görebilir.\n\nTecrübe çubuğun eylem çubuklarının altında tam genişlikte uzanır, dilimlere bölünmüştür ve biriktirdiğin dinlenmiş tecrübeyi gösteren daha açık bir bölüm taşır.\n\nSuyun altında yüzersen ekranın üstünde mavi bir nefes çubuğu belirir. Başın suyun altındayken azalır, tükendiğinde kırmızıya döner ve boğulmaya başlarsın, yüzeye çıktığın anda hızla dolar. Boşluk tuşu seni yukarı yüzdürür, varsayılan olarak Ctrl olan Aşağı Yüz tuşu ise seni derine götürür.\n\nHasar ve iyileştirme, indikleri şeyin üzerinde küçük sayılar olarak yükselir, böylece bir dövüşü metin okumadan takip edebilirsin. Sohbet kutundaki Savaş sekmesi tam yazılı kaydı tutar.",
       "aurasTitle": "Takviyeler ve zayıflatmalar",
@@ -5270,6 +5486,7 @@ export const tr_TR: EnTranslations = {
       "minimapBody": "Sağ üst: üzerinde bölge adı, altında koordinatların bulunan ve günün saatini boyayan bir kadranla çevrili yuvarlak bir mini harita.\n\nDisk, arazi çiziminden fazlasını taşır. Kendi okun merkezde durur ve baktığın yönü gösterir; etrafında grubun sınıf renkli noktalar olarak ve haritanın dışına sarkmış olanlar için bir kenar oku vardır. Görev verenler orada da dünyadakiyle aynı işaretleri taşır ve ayrıca toplama düğümlerini ve zanaat istasyonlarını, seyahat portallarını, yağmalanabilir cesetleri ve kasaları, ilgisini çekmiş herhangi bir düşmanı, yakınlardaki arkadaşlarını ve lonca üyelerini, bir de hayalet olarak geri koşarken kendi bedenini seçebilirsin.\n\nSöyleyecek bir şeyleri olduğunda üzerinde küçük göstergeler belirir: okunmamış mektupların beklerken bir zarf, Tüccar'da satış geliri ya da iade edilen mallar beklerken bir sikke ve akın kilitlerini listeleyen bir düğme.",
       "mapTitle": "Dünya haritası ve takipçilerin",
       "mapBody": "M, dünya haritasını açar: kıtanın tamamı çizilmiş halde, üzerinde kendi okun, bölgeler ve adları, çevrendeki ilgi noktaları, seyahat portalları ve bulduğun toplama düğümleriyle birlikte. Grubun da üzerinde görünür. Bir mağara seferinin içindeyken harita, şimdiye kadar keşfettiğin odaların bir şemasına döner.\n\nSağ tarafta, mini haritanın altında, hiçbir şey açmadan güncel işlerini gözünün önünde tutan bir yığın takipçi bulunur: takip ettiğin görevler ve hedefleri, yiğitlik ilerlemen, içinde bulunduğun mağara seferi ve katıldığın herhangi bir yarık. Görev takipçisi, ekranı geri istediğinde daralır.",
+      "mapBodyZoneFirst": "M opens the world map on the zone you are standing in, with your own arrow on it, the points of interest around you, the quest givers with their marks and the areas your objectives sit in, the crafting stations, mailboxes, noticeboards and garden beds, the dungeon entrances, and every gathering node in the zone, grayed out while it regrows and marked when your tools are not up to it. Your party shows on it too. Right-click the map, or press its World map button, and it pulls back to the continent, every zone drawn with its name, where a click on a zone opens that zone's map. Step into a delve, a dungeon, a rift or a castle keep and the map switches to a floor plan of where you stand; the Thornhollow Fields battleground gets a field map of its own.\n\nDown the right side, under the minimap, a stack of trackers keeps your current business in view without opening anything: your tracked quests and their objectives, your deed progress, your Reliquary pages, the delve you are in, and any rift you are taking part in. The quest tracker collapses when you want the screen back.",
       "chatTitle": "Sohbet kutusu",
       "chatBody": "Sol alt köşe. Yazmaya başlamak için Enter'a, göndermek için tekrar Enter'a bas.\n\nHer zaman iki sekme vardır: çevrende söylenen her şeyin birleşik kaydı olan Sohbet ve dövüşünün yazılı kaydı olan Savaş. Artı düğmesi kanal başına bir tane olmak üzere daha fazlasını ekler: Söyle, Bağır, Grup, Genel, Dünya, LFG, Lonca ve Subay; ayrıca gönderdiğin ve aldığın her fısıltıyı tek bir yerde toplayan bir Fısıltı sekmesi. Bir kanal sekmesinde yazmak, komutu yeniden yazmana gerek kalmadan o kanala gönderir.\n\nKutunun tamamı başka bir yere sürüklenebilir ve yeniden boyutlandırılabilir, bıraktığın yeri hatırlar.",
       "keyWindowsTitle": "Bir tuşla açtığın pencereler",
@@ -5298,8 +5515,10 @@ export const tr_TR: EnTranslations = {
       "winMetersBody": "Senin ve yanındaki herkesin hasarı, iyileştirmesi ve tehdidi, bir önceki dövüşe bile dönüp bakabilmen için dilimler halinde tutulur. İyileştirme ve tehdit panelleri kendi başlarına durmaları için dışarı çekilebilir.",
       "winMoreTitle": "Ve birkaçı daha",
       "winMoreBody": "Dünya haritası (M), PvP penceresi (G), Vadi Kupası (Y), lider tablosu (K), etkinlik takvimi (I) ve ifade çarkı (X) hepsi aynı şekilde çalışır. Lider tablosu ilk ziyaretinde bir an ayırmaya değer: oyuncular için bir sekme, loncalar için bir sekme, tüm hesapları Yiğitlikler Kitabı'ndaki Ün'e göre sıralayan bir sekme ve günlük sıralama için bir sekme tutar.\n\nBaşka bir oyuncuya, isim etiketinde ya da sohbette adının üzerinde sağ tıkla; Oyuncu Bilgisi onun hakkında bir kart açar: ipucu kutularıyla birlikte kuşandığı teçhizat ve karakterinin herkese açık ayrıntıları. Bu yalnızca bir bakıştır, başka bir şey değildir ve görebilmen için onun yeterince yakında olması gerekir.",
+      "winMoreBodyNoValeCup": "The world map (M), the PvP window (G), the leaderboard (K), and the event calendar (I) all work the same way. The emote wheel (X) is the exception: hold its key and the wheel appears, then let go over an emote to play it. The leaderboard is worth a moment on your first visit: it keeps a tab for players, one for guilds, one that ranks whole accounts by Renown from the Book of Deeds, one for the daily standings, and a Developers tab for the people who build the game, there unless you switch Show Developer Badges off.\n\nTarget another player and right-click the target frame (on touch, double-tap or long-press it), or right-click their name in chat, and Player Info opens a card on them: the gear they are wearing, with tooltips, and the public details of their character. It is a look, nothing more. The gear needs them close enough to see: look a name up from chat while they are far away and you get the public half of the card instead, their portrait, name, level, class, and guild.",
       "worldWindowsTitle": "Dünyanın sizin için açtığı pencereler",
       "worldWindowsBody": "Bazı pencereler için hiçbir tuşa basmazsınız: doğru kişiyle konuştuğunuzda ya da doğru şeye tıkladığınızda kendiliğinden açılırlar.\n\nBir tüccar, satın alınabilecek stokla birlikte, yanlışlıkla sattığınız eşyaları tutan bir geri alım sekmesiyle Tüccar penceresini açar. Stokla birlikte bir dizi miktar düğmesi durur, böylece bir yığın malzeme on kez basmak yerine beşer ya da onar basışla alınır; ikisi de uymadığında özel bir miktar seçeneği de vardır. Bir sınıf eğitmeni, şu anda öğrenebilecekleriniz ile önünüzde bekleyenlerin listesini açar.\n\nBir bankacı kasanızı açar: satın alarak genişletebileceğiniz ekstra yuvaların bulunduğu o kasayı. Loncanız bir banka açtıysa oradaki ikinci bir sekme onu gösterir: bir şey çıkarma izni olmasa da her üye içine bakabilir, böylece kimse loncanın ne tuttuğunu sormak zorunda kalmaz; kimin para yatırıp çekebileceğine ve lonca parasını taşıyabileceğine rütbeler karar verir, bir günlük de her hareketi kaydeder.\n\nBir Kuzgun Postası kutusu mektuplarınızı açar: gelenler bir sekmede, ekleriyle birlikte gönderme formu bir başka sekmede. Tüccar'daki Dünya Pazarı'nın kendi penceresi vardır: bir sekmesinde göz atıp satın alırsınız, bir başkasında kendi mallarınızı listelersiniz, üçüncüsünde satılanları toplarsınız. Başka bir oyuncuyla yüz yüze takas yapmak, her biri için bir tarafı olan bir takas penceresi açar.",
+      "worldWindowsBodyStationMaster": "Some windows you never press a key for: they open when you talk to the right person or click the right thing.\n\nA merchant opens the vendor window, with their stock to buy from and a buyback list at the foot of the same panel holding what you last sold, in case you sold it by mistake. A row of quantity buttons sits with the stock, so a stack of reagents is one press at five or ten at a time rather than ten presses, and a custom amount is there when neither suits. Your class abilities need no trainer, they come with your levels; the trainers here are the resident masters of the crafting stations, and Training on one of them opens the recipes they can teach you now, the ones you already know, and the ones still locked behind more skill.\n\nA banker opens your bank, with a Personal tab for the strongbox of extra slots you can buy more of and a Vault tab that stores your crafting materials by kind. If your guild has opened a bank, a Guild tab there shows it: every member can look inside even without permission to take anything out, so nobody has to ask what the guild is holding, ranks decide who may deposit, withdraw, and move the guild's coin, and a log records every movement.\n\nA Ravenpost mailbox opens your letters, with what has arrived on one tab and a form for sending on another, attachments and all. The World Market, at the Merchant in Eastbrook or Auctioneer Voss up in Highwatch, has its own window: browse and buy on one tab, list your own goods on another, and collect what has sold on a third. Trading face to face with another player opens a trade window with a side each.",
       "lootTitle": "Ganimet ve zar atışları",
       "lootBody": "Hakkını kazandığın bir cesetle etkileşime gir, ganimet penceresi açılır ve neyin düştüğünü listeler. Almak için bir satıra tıkla.\n\nBir grupta, grubun ganimet kurallarına göre iyi bir düşüş bunun yerine ekranına bir zar atışı istemi koyar: kendin istiyorsan İhtiyaç, satmak için alacaksan Açgözlülük ya da başkasına bırakmak için Pas. Küçük bir panel, sayaç azalırken kimin zar attığını ve ne seçtiğini gösterir.\n\nGanimet kurallarının kendisi küçük bir pencerede yaşar. Grup lideri onları orada değiştirebilir, geri kalan herkes ise aynı pencereyi salt okunur görür, böylece kurallar asla bir sır olmaz.\n\nBazı cesetler parçaları için de toplanabilir. Bu mümkün olduğunda, ganimet penceresinin altında istediğin her bileşen için işaretlenecek bir kutuyla bir Toplama bölümü belirir.",
       "playerCardTitle": "Oyuncu kartın",
@@ -5308,6 +5527,7 @@ export const tr_TR: EnTranslations = {
       "wikiBody": "Bu wiki oyunun içinden tek bir tıklama uzaklıktadır. Bir düğmesi sağ alt köşedeki raydaki diğerleriyle birlikte durur, Esc oyun menüsünde bir sırası vardır ve telefonda Daha Fazla tepsisinde yaşar. Açmak seni tarayıcına devrettiği için düğme her zaman önce onay ister, böylece bir dövüşteki kazara bir dokunuş seni asla dışarı çıkaramaz. Oyun arkasında çalışmaya devam eder.",
       "mobileTitle": "Telefonda ya da tablette",
       "mobileBody": "Dokunmatik denetimler kendiliğinden belirir ve düzen kendini ekranına göre boyutlandırır: küçük bir telefonda kompakt bir düzen, daha büyük bir telefonda standart bir düzen ve bir tablette daha ferah bir düzen.\n\nYeteneklerin bir sayı sırası yerine bir halkada durur: yanında beş eylem düğmesi olan saldırı düğmesi ve halkayı geri kalan yuvaların arasında değiştiren bir sayfa geçişi, üç eylem çubuğunun tamamını açtığında yedi sayfaya kadar. Etraflarında dokunmatik bir oyuncunun en çok başvurduğu düğmeler durur: hedef değiştirme, önündekini kullanma ve zıplama, ayrıca taşıdıklarından kendiliğinden dolan, dışarı çekilebilen bir sarf malzemesi sırası.\n\nAlt kenar boyunca Sohbet, Sosyal, Görevler, Ayarlar ve Daha Fazla bulunur. Daha Fazla, karakterin, Zindan Bulucu, PvP, Vadi Kupası, ifadeler ve wiki dahil geri kalan pencerelerini tutan bir tepsi açar. Pencereler burada üzerine yüzmek yerine ekranı doldurur.\n\nBirim çerçevelerini taşımak masaüstüne özgü bir şeydir: dokunmatikte düzen onları senin için yerleştirir.",
+      "mobileBodyTwoPages": "Touch controls appear on their own, and the layout sizes itself to your screen: a compact arrangement on a small phone, a standard one on a larger phone, and a roomier one on a tablet.\n\nYour abilities sit in a ring rather than a number row: the attack button with four action buttons beside it, and a page toggle that swaps the ring between its {pages} pages, which together reach all {slots} of your ability slots whether or not the extra desktop bars are switched on. The fifth arc position of that ring is your consumables seat: tap it to use what is seated there, or hold it, or swipe it inward, to open a row that fills itself from what you are carrying. Around the ring sit the buttons a touch player reaches for most, swapping target, using what is in front of you, and jumping.\n\nOne Quick Actions control sits at the bottom edge in place of a row of buttons. It opens onto everything else: mount, chat, map, bags, social, quests, character, spellbook, game menu, and a More entry holding the rest of your windows, the Dungeon Finder, PvP, emotes and the wiki among them. Windows fill the screen here rather than floating over it.\n\nMoving your unit frames is a desktop thing: on touch the layout places them for you.",
       "railTitle": "Düğme rayı",
       "railBody": "Ekranın sağ alt köşesinde, mini haritadan epey uzakta, pencere başına bir tane olmak üzere, yan yana iki kısa sütun halinde düzenlenmiş küçük kare düğmelerden oluşan bir ray durur. Çoğunun üzerinde varsayılan tuşu yazılıdır.\n\nİlk sütun karakterini, büyü kitabını, yeteneklerini, görev günlüğünü, Yiğitlikler Kitabı'nı, mesleklerini, dünya haritanı, çantalarını ve üretimi kapsar. İkincisi WOC Mağazası ile açılır ve PvP, Zindan Bulucu, Vadi Kupası, Kart Düellosu, lider tablosu, ifadeler, müzik, arkadaşlar ve lonca, bu wiki ve oyun menüsüyle devam eder. Yalnızca geçerli olduklarında birkaçı daha onlara katılır."
     },
@@ -5853,13 +6073,13 @@ export const tr_TR: EnTranslations = {
       "valeBlurb": "Yeni kahramanların Eastbrook kasabası çevresinde kurtlar ve haydutlarla dişlerini biledikleri yemyeşil başlangıç vadisi.",
       "marshBlurb": "Sis ve harabelerle dolu, suya gömülmüş bir ülke. Mudfinler sığlıkları sarar ve suyun altında daha eski bir şey kıpırdanır, köprü-kasabası Fenbridge'den izlenir.",
       "peaksBlurb": "Rüzgârın yonttuğu sırtlar ve başlangıç yolunun en çetin tehlikelerine tırmanan eski maden işleri, Highwatch karakolunca tutulur.",
-      "duskBlurb": "Eldergleam'ın büyük ağacının altında kalıcı bir alacakaranlığın hüküm sürdüğü, kristal kalıntıların parıldadığı ve havanın eski bir büyüyle uğuldadığı bir vadi.",
+      "duskBlurb": "Eldershine'ın büyük ağacının altında kalıcı bir alacakaranlığın hüküm sürdüğü, kristal kalıntıların parıldadığı ve havanın eski bir büyüyle uğuldadığı bir vadi.",
       "emberBlurb": "Ejderlerin kaldera üzerinde daireler çizdiği ve trol ateşlerinin kumullar arasında yandığı, kapı kasabası Wyrmwatch'tan gözlenen, fırtınayla aydınlanan kül ve kan camı çorak toprakları.",
       "frostBlurb": "Kutup ışığının altında kar ve karanlık çamların sessizliği, soğuğun kendisinin uyanık hissettiği ve Icemantle'ın ateşlerini yanık tuttuğu bir yer.",
       "amberBlurb": "Hiç dökülmeyen altın ve kızıl yapraklardan oluşan sonsuz bir sonbahar, fenerlerle aydınlatılan Lanternmere kasabasının çevresinde toplanmış.",
       "fenBlurb": "Zambaklarla ve yavaş akan suyla dolu, aydınlık ve uğuldayan bir sulak alan, köprü kasabası Bridgemere'den uzanan eski tahta yollarla geçilir.",
       "nightBlurb": "Çiçeklerin patikaları aydınlattığı ve Moonrest'in düş gören bir gökyüzü altında sessiz bir nöbet tuttuğu, yıldızlı gece yarısı diyarı.",
-      "hauntBlurb": "Devasa ağaç tepelerinin altındaki lanetli bir orman, yolda tek dürüst ışığın Gallowmere'in fenerleri olduğu.",
+      "hauntBlurb": "Devasa ağaç tepelerinin altındaki lanetli bir orman, yolda tek dürüst ışığın Gibbetmere'in fenerleri olduğu.",
       "galeBlurb": "Rüzgarın hiç dinmediği, Eski Fener'in hiç sönmediği ve Wickharbor'un kapılarını sıkıca kapattığı deniz kayalıkları ve uluyan bozkırlar.",
       "jungleBlurb": "Palmiyelerden, beyaz kumdan ve gürültücü kuşlardan oluşan tropikal bir sarmaşık, sahil kasabası Drifthaven'ın kıyıda bir ateş yaktığı.",
       "gardenBlurb": "Kimsenin görmediği bir bahçıvan tarafından hala budanmaya devam eden, Hedgewick ve onun çeşme avlularının ötesinden girilen bir çit labirenti bahçe diyarı.",
@@ -5870,7 +6090,7 @@ export const tr_TR: EnTranslations = {
       "peaksGreeting": "İki yüz yıldır bu sur dayandı. Benim nöbetimde yıkılmayacak, ama inliyor.",
       "peaksGreeter": "Yüzbaşı Thessaly, Highwatch",
       "duskGreeting": "Senin türünden pek azı bu dalların altında durmuştur. Nazikçe yürü ve hoş geldin.",
-      "duskGreeter": "Bekçi Saelwyn, Eldergleam",
+      "duskGreeter": "Bekçi Saelwyn, Eldershine",
       "emberGreeting": "Çorak topraklardan sıcak bir rüzgar, Ejder Ağzı Kalderası üzerinde ejderler ve kumullarda trol ateşleri. Oraya gitmeden önce bir şeyler iç.",
       "emberGreeter": "Kapı muhafızı, Wyrmwatch",
       "frostGreeting": "Duvarın ötesinde kar her sesi yutar. Işıklar dans etmeye başlarsa, sesini alçalt ve ateşini yanık tut.",
@@ -5882,7 +6102,7 @@ export const tr_TR: EnTranslations = {
       "nightGreeting": "Gece Kapısı'nın ardında havanın kendisi rüya görür. Çiçek ışığını takip et ve gökyüzünde asılı duran uykudaki dünyaya dikkat et.",
       "nightGreeter": "Nöbet bekçisi, Moonrest",
       "hauntGreeting": "Fenerlerin yanından ayrılma, gezgin. Ve eğer orman yolun dışından adını seslenirse, cevap verme.",
-      "hauntGreeter": "Fener yakıcısı, Gallowmere",
+      "hauntGreeter": "Fener yakıcısı, Gibbetmere",
       "galeGreeting": "Rüzgar burada bir kez bile durmadı ve Eski Fener bir kez bile sönmedi. Han kapısını arkandan kapat.",
       "galeGreeter": "Fener bekçisi, Wickharbor",
       "jungleGreeting": "Sıcak kum, gürültücü kuşlar ve ufku yutan bir orman. Sahilde bir ateş yakılı tutuyoruz; ona geri dönmeye çalış.",
@@ -5891,14 +6111,14 @@ export const tr_TR: EnTranslations = {
       "gardenGreeter": "Kapı bekçisi, Hedgewick",
       "valePlaceNotes": "Doğudere ilk ana üssünüzdür. Kurt Koşusu ve Yaban Domuzu Çayırı yumuşak av sahalarıdır; Ayna Gölü balık tutulacak güzel sulardır, gerçi sığlıklarında çamuryüzgeçler kaynar; Sableweb ve Bakır Kazısı örümcekleri ve cevhere aç kazıcıları saklar; bir Haydut Kampı ve Yıkık Şapel daha çetin işler barındırır; Emanetlik Tepesi, diyarın ilk mağara seferi olan Çökmüş Emanetlik'e iner; Parlakorman Açıklığı kuzeydeki sakin, güneşli bir korudur; ve Domuz Tarlası, Doğudere'nin surla çevrili domuztopu sahasıdır, orada Vadi Kupası bir hasat ateşkesi altında oynanır.",
       "marshPlaceNotes": "Fenbridge tek kuru yolu korur. Avcı Sazlıkları ve Derinbataklık Sığlıkları bataklık hayvanları ve Mudfinlerle kaynar; Dul Örümcek Çalılığı sımsıkı ağlarla örülüdür; Boğulmuş Şapel ve Trol Höyükleri daha eski tehlikeleri barındırır; bataklığın kendi mağara seferi olan Boğulmuş Litanya ise höyüklerin hemen kuzeyinde açılır; Mezar Çağıran Kampı tarikatın siper kazdığı yerdir ve Batık Kale bataklığın örneklenmiş kalbidir.",
-      "peaksPlaceNotes": "Highwatch suru tutar. Sinsi Sırt ve Deeprock Oyukları sırt kedilerinin ve oyucularındır; Dev Etekleri ve Drogmar Savaş Kampı kiralık zorbalarındır; Fırtınakaya elementallerle çıtırdar ve altında Işıltıgöl ışıldar, kıyısı Boğulmuş Tapınak'a inen solgun ışıktan geçidi barındıran dağ gölü; Solucankült Çadırları ve Hortlak Tarlaları tarikatın yüksek mevzisini kuşatır, zirvesinde Mezarejderi Mabedi yer alır.",
-      "duskPlaceNotes": "Eldergleam, büyük ağacın altında toplanır. Alacakaranlık Mağarası ve seyir tepesi içeri giden yol ve vadinin ilk görünüşüdür; Kadim Koru ve Yıldız Düşümü Çukuru sessiz güneyi korur; Batık Avlu doğuda yabani otlarla kaplı kalıntıları barındırır; Parıldayan Derinlik ve Kristal Sığlıklar ise kuzeyde parıldar.",
+      "peaksPlaceNotes": "Highwatch holds the wall. Stalker Ridge and the Deeprock Burrows belong to ridge cats and burrowers; the Ogre Foothills and Drogmar's War-Camp to brutes for hire; Stormcrag crackles with elementals, and below it glows the Glimmermere, the tarn whose shore keeps the gate of pale light down to the Drowned Temple; the Broodsworn Tents and Revenant Fields ring the cult's high ground, with Gravewyrm Sanctum at its peak.",
+      "duskPlaceNotes": "Eldershine, büyük ağacın altında toplanır. Alacakaranlık Mağarası ve seyir tepesi içeri giden yol ve vadinin ilk görünüşüdür; Kadim Koru ve Yıldız Düşümü Çukuru sessiz güneyi korur; Batık Avlu doğuda yabani otlarla kaplı kalıntıları barındırır; Parıldayan Derinlik ve Kristal Sığlıklar ise kuzeyde parıldar.",
       "emberPlaceNotes": "Wyrmwatch kapıyı tutar. Kapı Ormanı, çorak topraklardan önceki son yeşilliktir; Kül Kumulları kül ve daha kötüsüyle sürüklenir; Trol Meclisi, kum trollerinin ateşlerini topladığı yerdir; Kan Camı Tarlaları jilet gibi keskin parçalarla parıldar; ve Ejder Ağzı Kalderası ejderlerin etrafında döndüğü tüten taçtır.",
       "frostPlaceNotes": "Icemantle son sıcak ocağı korur. Kar Sınırı, kar yığınlarının hakimiyeti ele geçirdiği yeri gösterir; Buzul Gölü, buzun altında kara ve durgun bir sudur; Kutup Işığı Basamakları dans eden ışıkların altında yükselir; Titrek Bataklık asla tam olarak uyumayan donmuş bir bataklıktır; ve Uluyan Taraçalar her gece adını hak eder.",
       "amberPlaceNotes": "Lanternmere, hasadın tam kalbinde parıldar. Altın Eriyiş, kehribar gibi kaygan bir geçittir; Yaldızlı Bahçe ve Hasat Vadisi en tatlı ürünleri ve en cüretkar hırsızları barındırır; Büyük Göl yanan yaprakları yansıtır; Kül Akçaağaç Tepesi en yüksekte durur ve en kızıl renktedir; ve Eğik Dikilitaş sonbahardan daha eski bir şeyi hatırlar.",
       "fenPlaceNotes": "Bridgemere, yavaş akan suyun üzerine kurulmuştur. Kehribar Basamakları hasat ülkesinden aşağı iner; Zambak Bozkırları ve Parıldayan Bataklık Gölcükleri ışık cinleri ve yusufçuklarla parıldar; Willowweep dallarını göle uzatır; ve Uykulu Düzlükler bu topraklarda bulunabilecek en sakin yerdir.",
       "nightPlaceNotes": "Moonrest nöbeti tutar. Gece Kapısı gece yarısı ülkesine giden yoldur; Ay Kuyusu yanında durabileceğin yıldız ışığını barındırır; Gloamfield karanlıkta çiçek açar; Ebedi Nöbet hiç kımıldamadan gözetler; ve Uykusuz Höyük burada asla rüya görmeyen tek yerdir.",
-      "hauntPlaceNotes": "Gallowmere kendi fenerlerinin içine sinmiştir. Karga Kapısı, ormanın kasvetli ön kapısıdır; Dul Çalılığı ağlarla sıkıca örülüdür; Asılı Çayırlık ve Yas Taşı Şapeli ormanın en eski kederlerini barındırır; ve Avcının Açıklığı hala orada avlanan her neyse ona aittir.",
+      "hauntPlaceNotes": "Gibbetmere kendi fenerlerinin içine sinmiştir. Karga Kapısı, ormanın kasvetli ön kapısıdır; Dul Çalılığı ağlarla sıkıca örülüdür; Asılı Çayırlık ve Yas Taşı Şapeli ormanın en eski kederlerini barındırır; ve Avcının Açıklığı hala orada avlanan her neyse ona aittir.",
       "galePlaceNotes": "Wickharbor rüzgara doğru eğilir. Rüzgar Yolu içeri giden kayalık yoldur; Uluyan Bozkırlar fırtına altında ağaçsızca uzanır; Eski Fener herkesin hatırlayabildiği kadar uzun süredir yanmaktadır; Uçurum suya dik iner; Enkaz Tarlaları kıyıyı dürüst tutar; ve Ayna Gölü tüm diyardaki tek durgun şeydir.",
       "junglePlaceNotes": "Drifthaven ateşini sahilde tutar. Sarmaşık Ağzı, nehrin yeşil duvarla buluştuğu yerdir; Palmiye Plajı dalgalar boyunca beyaz ve sıcak uzanır; Zümrüt Sarmaşık ve Sarmaşık Şelalesi iç kısmı yutar; Safir Lagünü berrak ve derin parıldar; ve Batık İdol suyun altından gözetler.",
       "gardenPlaceNotes": "Hedgewick, Bahçe Kapısı'nda bekler. Çiçek Terası Yolu kırpılmış renklerle çiçek açar; Şafak Kalesi yeni duvarların ardında şövalyelerini eğitir; Yaprak Gölcüğü yıl boyunca pembe tonlarda süzülür; Eski Değirmen kendi halka tarhlarını çevirir; Büyük Labirent her konuk için düzenini değiştirir, kemerlerini yapraklı tilkiler gözetler; Kuzey Karakolu çıkış yolunu korur; Zambak Çukuru bunların hepsinin ötesinde dinlenir; ve Çeşme Avlusu hala bahçenin kalbinde berrak akar.",
@@ -6101,13 +6321,17 @@ export const tr_TR: EnTranslations = {
       "ladderBody": "Dereceli oyun, konumunu zaman içinde takip eder. Nerede durduğunu ve diyarın zirvesini kimin tuttuğunu görmek için lider tablosuna bak.",
       "rewardsHeading": "Dereceli oyun ne öder",
       "rewardsBody": "Dereceli bir galibiyet, oyuncuya karşı oyuncu para birimi olan Onur öder, bir mağlubiyet ise sana puandan başka bir şey kaybettirmez. Onur, gerçek maçları ödüllendirmek için tasarlanmıştır: aynı gün aynı rakibi ya da aynı takımı tekrar yenmek artık hiçbir şey ödemez, uzun bir galibiyet günü ilerledikçe galibiyet başına biraz daha az öder, ve rakibinin çekildiği bir maç puanını yine de değiştirir ama hiç Onur ödemez. O gün Onur’un kendi günüdür ve diyarın örnek sıfırlamasıyla değil, kendi saatiyle yenilenir.",
+      "rewardsBodyLossShare": "A ranked win pays Honor, the player versus player currency, and a loss you play to the end still pays a smaller share of it, as does a draw, so rating is the only thing a loss really costs you. Honor is meant to reward real matches: beating the same opponent or the same team again on the same day pays nothing further (nor does losing to them again), a long winning day pays in full for its first stretch of wins and then halves what a win pays, halving it again deeper in and staying there, and a match your opponent forfeits still moves your rating but pays no Honor at all. That day is the realm's own: it rolls over at the realm's nightly reset hour, the same boundary every daily lockout clears on.",
       "honorHeading": "Onur",
       "honorBody": "Onur, diğer oyunculara karşı dövüşmenin para birimidir. Onu Kül Kolezyumu’nda ve Dikenvadi Ovası’nda kazanırsın; parandan ayrı tutulur ve onunla hiç karışmaz, karakter sayfan ne kadar tuttuğunu gösterir. Harcayabileceğin tam olarak tek bir şey vardır: Harp teçhizatı.",
       "quartermastersBody": "İki levazımcı aynı rafları tutar, o yüzden hangisi daha yakınsa onunla alışveriş yap. Onur Malzeme Sorumlusu ÖFKE, Doğudere Vadisi’nde durur; Harp Depolarının Ustası Savaş Mareşali Draven Kole ise tezgahı Yükseknöbet’te tutar. Stoklarında Harp kademesi bulunur: beş zırh ailesi, artı hepsinde ortak kolyeler, yüzükler ve silahlar.",
       "honorFinalNote": "Onur ile yapılan alımlar kesindir. Bir para alımı satıcının Geri Alım listesinden geri alınabilir, ama bir Onur alımı hiçbir zaman oraya düşmez ve Harp teçhizatı satın aldığın an ruha bağlanır; bu yüzden hiçbir şekilde takas edilemez, postalanamaz ya da geri satılamaz. Dükkan bu yüzden onay ister: parçaya basmadan önce oku.",
+      "honorFinalNoteSoldBack": "Honor purchases are final. The buyback list only ever holds what you sold: a coin purchase can usually be sold back for its sell price and reclaimed from that list if you change your mind again, but Warfare gear is soulbound the moment you buy it, so it can never be traded, mailed, or sold back for anything, and it never reaches that list. The shop asks you to confirm for that reason: read the piece before you press it.",
       "warfareHeading": "Harp teçhizatı",
       "warfareBody": "Her Harp parçası Harp Saldırı Puanı ve Harp Savunma Puanı taşır, ve bu iki puan canavarlara karşı hiçbir işe yaramaz. Yalnızca başka bir oyuncuyla dövüştüğünde, bir düelloda, arenada ya da savaş alanında işler; burada Saldırı verdiğin hasara eklenir, Savunma ise aldığın hasarı azaltır, her biri kendi tavanına kadar. Her zırh ailesi aynı zamanda bir takımdır, ve takım bonusları da benzer şekilde Harp puanı ya da yalnızca oyunculara karşı işleyen etkilerdir, bu yüzden tam bir onur kiti bir zindan patronunda hiçbir işe yaramaz.",
-      "warfareTradeBody": "Bu bilinçli bir değiş tokuştur. Harp teçhizatı oyuncularla dövüşmek için yapılmıştır, zindan kademelerini atlamanın bir kestirmesi değildir: bir Harp parçası aynı yuvadaki destansı bir zindan parçasının taşıdığı savaş puanlarını asla taşımaz, ve getirdiği her şey diğer oyunculara harcanır. Arenada kendini tutmak istiyorsan onu satın al. Kahramanca zindanları daha hızlı temizlemek istiyorsan teçhizatını zindanlarda kazan."
+      "warfareBodyStatsStay": "Every Warfare piece carries Warfare Offense and Warfare Defense Rating, and those two ratings do nothing at all against monsters. They apply only when you fight another player, in a duel, in the arena, or on the battleground, where Offense adds to the damage you deal and Defense cuts the damage you take, each up to its own ceiling. Each armor family is also a set, and its set bonuses are likewise Warfare rating or effects that only work against players, so a full honor kit's set bonuses count for nothing on a dungeon boss. The pieces themselves still carry their ordinary stats, armor, and weapon damage, and those work everywhere; it is the Warfare ratings and the set bonuses that go quiet against a monster.",
+      "warfareTradeBody": "Bu bilinçli bir değiş tokuştur. Harp teçhizatı oyuncularla dövüşmek için yapılmıştır, zindan kademelerini atlamanın bir kestirmesi değildir: bir Harp parçası aynı yuvadaki destansı bir zindan parçasının taşıdığı savaş puanlarını asla taşımaz, ve getirdiği her şey diğer oyunculara harcanır. Arenada kendini tutmak istiyorsan onu satın al. Kahramanca zindanları daha hızlı temizlemek istiyorsan teçhizatını zindanlarda kazan.",
+      "warfareTradeBodyRatingSpent": "That is the deliberate trade. Warfare gear is built for fighting players, not as a shortcut past the dungeon tiers: a Warfare piece never carries the combat ratings a dungeon epic in the same slot does, and the Warfare rating and set bonuses it carries instead are spent entirely on other players. If you want to hold your own in the arena, buy it. If you want to clear heroics faster, earn your gear in the dungeons."
     },
     "thornhollowPage": {
       "heading": "Dikenvadi Ovası",
@@ -6300,6 +6524,9 @@ export const tr_TR: EnTranslations = {
       "soulboundBody": "Birkaç özel ödül ruha bağlıdır, onları kazandığınız andan itibaren karakterinize bağlanır. Ruha bağlı bir eşya takas edilemez, postalanamaz, bir satıcıya satılamaz ya da pazara ilan edilemez; yalnızca ve yalnızca sizindir. Bugün bu koruma, Kahramanca Nişanları gibi ödül jetonlarını gözetir; kazandığınız teçhizat ise takas etmek, satmak ya da özgürce paylaşmak üzere sizindir.",
       "uniqueTitle": "Eşsiz Kuşanım: türünden yalnızca bir efsanevi",
       "uniqueBody": "Efsanevi eşyalar eşsiz kuşanımdır: karakterin, belirli bir efsanevi eşyanın aynı anda yalnızca bir kopyasını kuşanabilir ve onun kahramanca sürümü de aynı eşya sayılır. İkinci bir kopya çantalarında, bankada ya da pazarda durabilir, ama ikisini birden kuşanmaya çalışmak reddedilir; eşyanın bilgi kutusunda da altın renkli bir Eşsiz Kuşanım etiketi bulunur, böylece ikisi etrafında bir yapı kurmadan önce kuralı görebilirsin.",
+      "masterwroughtTitle": "Masterwrought: the crafted summit",
+      "masterwroughtBody": "The finest crafted gear carries a gold Unique-Equipped: Masterwrought tag on its tooltip. These pieces are the summit of the crafting professions, made by master crafters from rare materials and traded freely on the open market, and they stand beside the treasures of the deepest dungeons. The tag is one shared family rule: a character can wear at most two Masterwrought pieces at once, whichever crafts they come from, so pick the two slots where they serve your build best.",
+      "masterwroughtBodyLegendary": "The finest crafted gear carries a gold Unique-Equipped: Masterwrought tag on its tooltip. These pieces are the summit of the crafting professions, made by master crafters from rare materials and traded freely on the open market, and they stand beside the treasures of the deepest dungeons. The tag is one shared family rule: a character can wear at most two Masterwrought pieces at once, whichever crafts they come from, so pick the two slots where they serve your build best. The rule keeps one further line for the very top of the family: a wearer who has Perfected a Masterwrought piece can promote it into a legendary of their own naming, a chain the Professions page tells in full, and a character can wear at most one legendary Masterwrought piece among the two.",
       "setsTitle": "Takımlar ve takım bonusları",
       "setsBody": "Bazı zırhlar eşleşen ailelerle gelir; tek bir bütün gibi görünmek ve dövüşmek üzere biçilmiş birkaç parça. Bir ailenin yeterince parçasını aynı anda giy, set uyanır ve her parçanın kendi değerlerinin üstüne bonuslar verir, ne kadar çok parça giyersen o kadar güçlenir. Böyle ailelerden birkaçı sen seviye atlarken imrenilen ganimet olarak ortaya çıkar, en büyükleri ise seviye tavanına yakın en çetin grup içeriğinden gelir, dolayısıyla tam bir setin peşine düşmek klasik bir oyun sonu hedefidir. Diğer oyunculara karşı dövüşün kendi eşleşen aileleri vardır, Onur ile parça parça satın alınır; ganimet ailelerinden farklı parça sayılarında uyanırlar ve bonusları yalnızca düşman başka bir oyuncuyken karşılık verir.",
       "consumablesTitle": "Sarf Malzemeleri",
@@ -6340,35 +6567,43 @@ export const tr_TR: EnTranslations = {
       "archetypeChooseBody": "Bunların hiçbirini aramanıza gerek yok. Zanaatlarınızla uğraşın; becerileriniz belirgin biçimde bir çifte yöneldiğinde Zanaat Loncası bunu fark eder ve görülecek ustayı ile alınacak görevi adlandıran bir Karakargo mektubu gönderir. Mektup karakter başına bir kez gelir ve yalnızca henüz bir çifte bağlanmadıysanız.",
       "archetypeSwitchBody": "Bir beyan ömür boyu hüküm de değildir. Hiç sahip olmadığınız bir çift yalnızca yeni bir uyum görevidir; bırakıp gittiğiniz bir çifte dönmek ise önce barışı tesis etmenizi ister: ilk seferinde beş görev ve daha önce yaptığınız her dönüş için üç görev daha eklenir (yepyeni bir çifti benimsemek bu sayıyı asla artırmaz). Seçim, hiçbir kapıyı temelli kilitlemeden anlamlı kalır.",
       "whatHeading": "Kılıcın yanında bir meslek",
-      "whatBody": "Meslekler dünyanın çalışma hayatıdır: ham malzemeyi doğrudan topraktan söken dört toplama mesleği ve onu teçhizata, yemeğe, iksire ve alete dönüştüren on zanaatlık bir halka. Burada her şey bir başkasını besler. Kazdığınız cevher bir kılıç olur, kılıç bir büyü alır ve o büyü eski teçhizattan bozularak çıkarılan toza ihtiyaç duyar; yani bir toplayıcı, bir üretici ve bir tamirci hep aynı zincirin halkalarıdır.\n\nÜzerinde kara kara düşünülecek bir meslek sınırı yoktur. Her karakter, bugün içeriği olan sekiz zanaattan yedisini ve dört toplama mesleğinin hepsini yan yana yükseltebilir (Mühendislik tek direnendir: tarifleri tamamen serbest tavanın üzerinde başlar, bu yüzden onun merdiveni Bombacı yeminini bekler); tek özel seçim, sonunda üzerine yemin ettiğiniz kimlik olan arketipinizdir; yine de uyumlandığınızda onun ardında uykuya geçen zanaatlar yalnızca sıradan tariflerinde tırmanır, beceri 75'in ötesinde ise hiç tırmanmaz. Beceri asla düşmez ve öğrendiğiniz hiçbir şey elinizden alınmaz.",
+      "whatBody": "Professions are the working life of the world: the gathering trades that pull raw material straight out of the land, and a ring of ten crafts that turn it into gear, meals, potions, and tools. Everything feeds something else here. The ore you mine becomes a blade, the blade takes an enchant, and the enchant needs dust broken out of old gear, so a gatherer, a crafter, and a tinkerer are all links in one chain.\n\nThere is no profession limit to agonize over. Every character can raise nine of the ten crafts and every gathering profession side by side (Engineering is the one holdout: its recipes all start above the free ceiling, so its ladder waits for the Bombardier's oath); the only exclusive choice is your archetype, the identity you eventually swear to, though once you attune the crafts that fall dormant behind it climb only on their common recipes, and past skill 75 not at all. Skill never goes down, and nothing you learn is ever taken away.",
       "ringHeading": "Zanaat halkası",
-      "ringBody": "Bugün içeriği olan her zanaat 125 beceri tavanına ulaşır: Silah Yapımı, Zırh Yapımı, Terzilik, Deri İşleme, Aşçılık, Simya, Mühendislik ve Büyüleme. Bir tavanda meslek çalışmaya devam eder, hasatlar verim sağlamaya devam eder, üretimler çözülmeye devam eder ve şaheserler hala olabilir; yalnızca sayı tırmanmayı durdurur. Bir mesleğin tam tarif tablolarını ve rakamlarını görmek için aşağıdaki bir kartı seç.",
-      "ringWaveNote": "Çarktaki iki zanaat, Mücevher İşleme ve Yazıtçılık, yerlerini tutar ama henüz tarif göndermiyor. Bu bir ihmal değil, kasıtlıdır: içerikleri gelecek bölgelerle birlikte gelir ve yukarıdaki tavanlar aynı şekilde yükselir; bu nedenle bugün tavana ulaşmış bir zanaat o genişlemeye hazırlık değil, bir avantajdır.",
+      "ringBody": "Every craft on the ring caps at 125 skill: Weaponcrafting, Armorcrafting, Jewelcrafting, Inscription, Tailoring, Leatherworking, Cooking, Alchemy, Engineering, and Enchanting. At a cap the trade keeps working, harvests still yield, crafts still resolve, and masterworks can still happen; only the number stops climbing. Pick a card below for a craft's full recipe tables and numbers.",
+      "ringWaveNote": "With Inscription taking up its quills, every seat on the wheel now ships real recipes. The ring is complete rather than finished: the caps rise with future zones, so a capped craft today is a head start on that expansion, not a finish line.",
       "capFmt": "{cap} tavanı",
       "comingSoon": "Henüz tarif yok",
       "gatherHubHeading": "Toplama",
       "gatherHubBody": "Dört toplama mesleği, sahadan halkayı besler: Madencilik, Odun Kesimi ve Otçuluk topraktan cevher, kereste ve ot çıkarır ve 100 yetkinlikte sınırlanır; Balık Tutma ise kendi balık tutma ve çekme ritmiyle 200'e kadar uzanır. Aşağıdaki her sayfa tam düğüm haritalarını, alet merdivenlerini ve oranları taşır.",
       "archetypesHeading": "Çark ve arketipleri",
-      "archetypesBody": "On zanaat sabit bir çark üzerinde oturur ve o çark üzerindeki coğrafya önemlidir. Her iki komşu, adlandırılmış bir çift oluşturur: Silah Yapımı ile Zırh Yapımı için Demirci, Deri İşleme ile Terzilik için Teçhizatçı, Simya ile Aşçılık için Eczacı, Mühendislik ile Simya için Bombacı ve halkanın çevresinde altı tane daha.\n\nBir çifte uyumlanmak bir menü tıklaması değil, bir görevdir. Bugün dört çifte katılınabilir (Demirci, Teçhizatçı, Eczacı ve Bombacı); her biri Doğudere'deki yerleşik bir ustaya bağlıdır ve o ustanın kabul görevi, siz üstlenmeden önce anlaşmanın tamamını baştan açıkça söyler. Siz beyanda bulunana kadar her zanaat, nadir kademeye kadarki tariflerde serbestçe ilerler (beceri 74 ve altını isteyen her tarif), böylece seçim yapmadan önce neredeyse her şeyi deneyebilirsiniz (yalnızca Mühendislik'in o kadar düşük bir tarifi yoktur, bu yüzden onun sayısı bekler).\n\nUyumlandığınız anda çiftinizin iki zanaatı ana dallarınız olur ve tavan dışında hiçbir sınırları kalmaz. Çarkın geri kalanı kararmaz: ana dallarınızın karşısındaki bir zanaat, nadir kademe boyunca tırmanmayı sürdüren bir hobi olarak açık kalır (Demirci Haldren'in ocağındaki tekrarlanabilir bir görev hangisi olduğunu değiştirmenizi sağlar) ve diğer her zanaat uykuya geçer. Uykudaki bir zanaat becerisini ve sıradan tariflerini korur; bu tarifler 75'te grileşene kadar normal eğri üzerinde öğretmeyi sürdürür; sıradanın üzerindeki her şey ise bir anda ödemeyi keser ve uykudaki bir zanaat dinlenirken asla şaheser çıkarmaz.",
+      "archetypesBody": "On zanaat sabit bir çark üzerinde oturur ve o çark üzerindeki coğrafya önemlidir. Her iki komşu, adlandırılmış bir çift oluşturur: Silah Yapımı ile Zırh Yapımı için Demirci, Deri İşleme ile Terzilik için Teçhizatçı, Simya ile Aşçılık için Eczacı, Mühendislik ile Simya için Bombacı ve halkanın çevresinde altı tane daha.\n\nBir çifte uyumlanmak bir menü tıklaması değil, bir görevdir. Bugün dört çifte katılınabilir (Demirci, Teçhizatçı, Eczacı ve Bombacı); her biri Doğudere'deki yerleşik bir ustaya bağlıdır ve o ustanın kabul görevi, siz üstlenmeden önce anlaşmanın tamamını baştan açıkça söyler. Siz beyanda bulunana kadar her zanaat, nadir kademeye kadarki tariflerde serbestçe ilerler (beceri 74 ve altını isteyen her tarif), böylece seçim yapmadan önce her şeyi deneyebilirsiniz.\n\nUyumlandığınız anda çiftinizin iki zanaatı ana dallarınız olur ve tavan dışında hiçbir sınırları kalmaz. Çarkın geri kalanı kararmaz: ana dallarınızın karşısındaki bir zanaat, nadir kademe boyunca tırmanmayı sürdüren bir hobi olarak açık kalır (Demirci Haldren'in ocağındaki tekrarlanabilir bir görev hangisi olduğunu değiştirmenizi sağlar) ve diğer her zanaat uykuya geçer. Uykudaki bir zanaat becerisini ve sıradan tariflerini korur; bu tarifler 75'te grileşene kadar normal eğri üzerinde öğretmeyi sürdürür; sıradanın üzerindeki her şey ise bir anda ödemeyi keser ve uykudaki bir zanaat dinlenirken asla şaheser çıkarmaz.",
       "pairFmt": "{a} ve {b}",
       "curveHeading": "Ustalık Eğrisi",
-      "curveBody": "Beceri kazanımı her yerde tek kurala, dört durumlu Ustalık Eğrisine uyar. Her {step} beceri puanı bir kademedir ve her tarif, tarifin seninkine karşı nerede durduğuna göre puanlanır: kademende veya üzerinde tam kazanım verir, bir kademe altında yarım, iki aşağıda çeyrek ve üç veya daha fazla aşağıda hiç.\n\nZanaat penceresi bunu doğrudan tariflerin listesine klasik renklerde boyar: tam kazanım için turuncu, azaltılmış için sarı, damlama için yeşil, hiçbiri için gri. Kazanımlar belirlenimcidir, asla beceri artışı zarı değildir; bu nedenle aynı kademede aynı tarif becerini her zaman aynı miktarda artırır ve sarıya dönen bir tarif bir sonraki basamağı eğitmen sinyalidir.\n\nToplama aynı eğriyle aynı kademe adımıyla çalışır, tarif yerine düğüme karşı puanlanır: kolay düğümler geçerken griye döner ve sonraki bölgelerin daha zengin düğümleri bir tırmanışı tamamlayandır. Balık Tutma kendi programını tutar: 50 yetkinliğin altında her yakalamada tam bir puan, 100'e kadar yarım, 150'ye kadar onda bir ve 200'e kadar yavaş bir kuyruk; 100'den itibaren çöp yakalamalar hiçbir şey öğretmez.",
+      "curveBodyRetunedFishing": "Skill gain follows one rule everywhere, the four-state Mastery Curve. Every {step} points of skill is a tier, and each recipe is scored by where it sits against yours: at or above your tier it grants full gain, one tier below grants half, two below a quarter, and three or more below nothing at all.\n\nThe crafting window paints this straight onto the recipe list in the classic colors: orange for full gain, yellow for reduced, green for a trickle, gray for none. Gains are deterministic, never a skill-up roll, so the same craft at the same tier always moves your skill by exactly the same amount, and a recipe turning yellow is your cue to train the next rung.\n\nGathering runs on the same curve with the same tier step, scored against the node instead of a recipe: easy nodes gray out as you pass them, and the richer nodes of the later zones are what finish a climb. Fishing keeps its own schedule: 0.08 of a point per catch below 50 proficiency, 0.05 to 100, 0.04 to 150, and 0.03 to 200, with junk catches teaching nothing from 100 on.",
       "provenanceHeading": "İmzalı İşler",
       "provenanceBody": "Bu dünyadaki güzel işler yapıcısını hatırlar: nadir veya daha iyi hasatlar ve üretimler imzalı gelir (Toplayıcı:, Üretici:), bir şaheser her zaman yapıcının adıyla birlikte bir kalite kademesi daha yüksek biter ve sipariş edilmiş bir parça, Yapıcı Bağı aracılığıyla alıcısına bağlanır. Zanaat Ekonomisi sayfası imzalardan ve istiflenmeden bağ çözme ücretlerine kadar tam kuralları taşır.",
+      "endgameHeading": "The Masterwrought endgame",
+      "endgameBody": "Above every craft's trainer ladder sits one shared summit: the Masterwrought family, the crafted pieces wearing the gold Unique-Equipped: Masterwrought tag the Gear page describes. The chain has the same shape whichever craft climbs it: apex patterns found rather than taught, daily-gated intermediate crafts that pace the work, and three shared materials every ladder drinks from. The finished pieces trade freely like any other crafted work (the Crafting Economy page carries the trading rules), and the two-piece wearing cap keeps them an accent on a build rather than a whole kit, so a crafter who never sets foot in the deepest endgame still sells to the people who live there.",
+      "endgamePatternsBody": "The patterns arrive through three channels, and the recipe tables on every craft page label each row's own: found in the deepest endgame victories, sold by the Heroic Quartermaster for Heroic Marks, or both at once. The split is deliberate. The gear patterns are found and never sold, the consumable patterns sit on the quartermaster's counter from day one, and the farming patterns ride both roads. Patterns are ordinary tradable goods besides, so a find you cannot use is a find you can sell.",
+      "endgameMaterialsBody": "Three shared materials feed the chain. The Wyrmfall Core is the tradable catalyst: each of the deepest endgame's final victories pays a credited character 1 to 3 cores, once per source per day, the highest rift clears pay a fixed count of their own on the same daily clock, and the Heroic Quartermaster sells one for 12 Heroic Marks as the bad-luck backstop; cores trade freely. The Sundered Essence is soulbound, and sundering is its only source: any character can sunder, no profession asked, and the cast breaks a raid-won piece of epic gear of the tier into exactly one essence, the gear itself being the price. The Maker's Ember is soulbound too, and it is the chain's clock: one per week per character, granted on your first eligible endgame completion of the week, and a missed week is never lost, since the embers accrue and pay out on your next completion.",
+      "endgameMaterialsBodyAnyRaid": "Three shared materials feed the chain. The Wyrmfall Core is the tradable catalyst: each of the deepest endgame's final victories pays a credited character 1 to 3 cores, once per source per day, the highest rift clears pay a fixed count of their own on the same daily clock, and the Heroic Quartermaster sells one for 12 Heroic Marks as the bad-luck backstop; cores trade freely. The Sundered Essence is soulbound, and sundering is its only source: any character can sunder, no profession asked, and the cast breaks a raid-won piece of epic gear, from any raid and either difficulty, into exactly one essence, the gear itself being the price. The Maker's Ember is soulbound too, and it is the chain's clock: one per week per character, granted on your first eligible endgame completion of the week, and a missed week is never lost, since the embers accrue and pay out on your next completion.",
+      "perfectingHeading": "Perfecting, and the orange promotion",
+      "perfectingBody": "A finished apex piece is not the end of its story. Its owner, with 125 skill in the craft that made it, can walk the piece up four ranks of Perfecting. Each attempt spends one Maker's Ember, one Sundered Essence, and one Prismglass Setting, and succeeds four times in five; a miss costs the materials and nothing else, the piece is never harmed or set back. The first attempt binds the piece to the one perfecting it, so a copy meant for sale is sold before the work begins. A Perfected piece carries a stat bonus over its base, and Perfected is exactly what the Lucent Infusion waits for: the one enchant the Enchanting page marks Perfected only lands on nothing less.\n\nThe walk can begin one rank in. A masterwork proc on an apex craft cannot finish the piece a tier finer, since apex is already the top of the ladder, so it grants the head start instead: the piece comes off the bench at the first rank of Perfecting, with three ranks left to walk rather than four. It is the same roll and the same odds the Masterworks section on every craft page publishes, spent on a rank instead of a quality.",
+      "promotionBody": "The last step is the orange promotion, and it is the Deed of Making's whole purpose. Bring a Perfected piece and one Deed of Making, an inscriptionist's skill-125 writ, and the copy is promoted into a legendary carrying a name of your own choosing. No roll rides it: the promotion is deterministic, the stats do not change at all, and what changes is the name and the color. The deed is tradable, so the scribe and the wearer need never be the same person, and the family cap keeps its one extra line: a character wears at most one legendary Masterwrought piece among their two.",
       "stationsHeading": "İstasyonlar ve üç merkez",
-      "stationsBody": "Altı tipli istasyon, üç kasaba merkezine yayılmış yedi istasyona bağlı zanaata hizmet eder. Doğudere ocağı (Silah Yapımı ve Zırh Yapımı onu paylaşır), mutfakları, dokuma tezgahını ve alet atölyesini barındırır; Fenbridge tabakhaneyi, Highwatch ise eczaneyi tutar. Her istasyonun yanında kendi alanında uzman tarifleri öğreten, iş emirleri yayınlayan ve bağ çözme hizmetini sunan sakin bir usta bulunur.\n\nÇalışma yarıçapı 20 yardadır, kabaca istasyonun kendi alanı; bu yüzden kasabanın karşısından değil, örsün yanında durarak üretim yaparsın. Mücevher İşleme, Yazıtçılık ve Büyüleme'nın istasyonu yoktur: ilk ikisi tariflerini bekler ve Büyüleme tasarım gereği her yerde çalışır.",
+      "stationsBody": "Six typed stations serve the nine station-bound crafts, spread across the three town hubs. Eastbrook holds the forge (Weaponcrafting, Armorcrafting, and Jewelcrafting all share it), the kitchens, the loom, and the toolworks; Fenbridge keeps the tannery, and Highwatch the apothecary (Alchemy and Inscription share that bench). Each station has a resident master beside it who trains recipes, posts work orders, and offers the unbind service.\n\nThe working radius is 20 yards, roughly the station's own yard, so you craft standing at the anvil rather than from across town. Enchanting alone has no station: it works anywhere by design.",
       "deedsHeading": "Yolculuğu hatırlayan yiğitlikler",
-      "deedsBody": "Yiğitlikler Kitabı her adımda yanındadır. İlk bağlanman Zanaat Yeminlisi'ni ve ilk şaheser Şaheser Ustası'nı kazandırır; her ikisi de unvan olarak takılabilir. Sekiz kazanılabilir zanaatın her biri 50 beceri için bir dönüm noktası yiğitliği işaretler ve tavanını Büyük Usta unvanıyla taçlandırır; Balık Tutma ise 100 yetkinlikte Eski Denizci'yi ve 200'de Usta Olta Ustası unvanını alır.\n\nDaha sakin sayfalar da vardır: ilk hasat ve ilk üretim, sahada şansın ortaya çıkardığı nadir bulgular ve hurda işleme için yiğitlikler. Hepsi kozmetiktir, yalnızca unvanlar ve Ün. Bir yiğitlik hiçbir zaman güç vermez; yalnızca orada olduğunu kanıtlar.",
+      "deedsBody": "The Book of Deeds walks beside every step of this. Your first attunement earns Craftsworn and your first masterwork earns Masterwright, both wearable as titles. All ten earnable crafts mark a milestone deed at 50 skill and crown their caps with a Grandmaster title, while Fishing gets Old Salt at 100 proficiency and the Master Angler title at 200.\n\nThere are quieter pages too: deeds for your first harvest and first craft, for the rare finds luck turns up in the field, and for taking up salvage. All of it is cosmetic, titles and Renown only. A deed never grants power; it only proves you were there.",
       "startHeading": "Nereden başlanır",
       "startBody": "Doğudere'ye yoldan yeni mi indiniz? Ustabaşı Odell'i bulun ve Her Ele Bir Zanaat'ı alın: sizi kasabanın kuzeydoğusundaki Bakır Kazısı çevresindeki maden damarlarına yönlendirecek ve ilk nasırlarınızı elinize verecek. Kazının kendisine dikkat edin: üzerine kamp kurmuş Deeprock Kazıcıları yeni gelen birinin birkaç seviye üstündedir, o yüzden önce dış damarları işleyin ve kampın göbeğini biraz seviye atladığınız zamana saklayın. Ondan sonra, görev yaparken geçtiğiniz her damarı, ağaç kümesini ve ot öbeğini hasat edin; yetkinlik gezginlere kendiliğinden gelir.\n\nKasabaya döndüğünüzde, üretim penceresini açmak için T'ye basın ve her karakterin başından beri bildiği sıradan tarifleri işleyin. Demirhanedeki, mutfaklardaki, dokuma tezgahındaki ve alet atölyesindeki ustaları ziyaret edip ne öğrettiklerine bakın, istikrarlı bir sikke için de iş emirlerini alın. Lonca'nın mektubu sizi bulduğunda, hangi çiftin ev gibi geldiğini çoktan biliyor olacaksınız.",
       "colStation": "İstasyon",
       "colHub": "Merkez",
       "colMaster": "Usta",
       "masterCellFmt": "{name}, {title}",
-      "harvestBodyFamilies": "Toplama düğümlerde durmaz. Öldürülen pek çok canavardan birer kez hasat yapılabilir, ilk gelen alır; post, diş, pençe, azı dişi, ipek, zehir, kumaş ve et, cesedin olağan ganimetiyle birlikte doğrudan cesetten elde edilir; tek bir basışla her ikisi de açılır. Bir canavar birden fazla işlenebilir bileşen taşıyorsa seçim sizindir: verebileceği her şeyi alın ya da daha az bileşene odaklanın ve aldığınız şeyin ölçülebilir biçimde daha kaliteli bir derecesini kazanın.\n\nÖrnek taşıyan bir ailede nadir veya daha iyi bir hasat turu, olağan verimin üstüne imzalı mükemmel bir örnek de kazandırır (Bozulmamış Post, Bozulmamış İpek, Bozulmamış Zehir Bezi, Kusursuz Pençe ya da Birinci Kalite Et) ve Yiğitlikler Kitabınıza Mükemmel Örnek kaydeder. Her karakter hasat yapabilir, eğitim gerekmez; sahip olduğunuz herhangi bir toplama aleti, hangi zanaata ait olursa olsun premium kolu sayılır.",
+      "harvestBodyFamilies": "Toplama düğümlerde durmaz. Öldürülen pek çok canavardan birer kez hasat yapılabilir, ilk gelen alır; post, diş, pençe, azı dişi, boynuz, solungaç, ipek, zehir, kumaş ve et, cesedin olağan ganimetiyle birlikte doğrudan cesetten elde edilir; tek bir basışla her ikisi de açılır. Bir canavar birden fazla işlenebilir bileşen taşıyorsa seçim sizindir: verebileceği her şeyi alın ya da daha az bileşene odaklanın ve aldığınız şeyin ölçülebilir biçimde daha kaliteli bir derecesini kazanın.\n\nÖrnek taşıyan bir ailede nadir veya daha iyi bir hasat turu, olağan verimin üstüne imzalı mükemmel bir örnek de kazandırır (Bozulmamış Post, Bozulmamış İpek, Bozulmamış Zehir Bezi, Kusursuz Pençe ya da Birinci Kalite Et) ve Yiğitlikler Kitabınıza Mükemmel Örnek kaydeder. Her karakter hasat yapabilir, eğitim gerekmez; sahip olduğunuz herhangi bir toplama aleti, hangi zanaata ait olursa olsun premium kolu sayılır.",
       "focusBodyTiers": "Her merkez kasaba, uğrayan toplayıcılar için bir Kasaba Odağı paneli tutar: kasabada dur, onu mini haritanın yanından aç ve 10 odak puanından oluşan bir bütçeyi önemsediğin bileşen türlerine yay. Bir bileşendeki her 5 puan, hasat derecesini bir adım yükseltir (en fazla iki adım), ve her puan verimine yüzde 10 ekler; odaklanılmayan bileşenler asla kötüleşmez.\n\nDağılımın karakterini her yere takip eder ve kasabaya sonraki her uğrayışında, kendi seçtiğin bir hızda yeniden yönlendirilebilir. Acele etmemek ücretsizdir: yeniden yönlendirme, taşıdığın her puan için 1 dakika sürer. Biraz ödemek onu hızlandırır, puan başına 15 saniye artı 5 bakır ve 1 Çan Tozu, tam ödeme ise puan başına 25 bakır ve 5 Çan Tozu karşılığında anında yapar. Yalnızca gerçekten taşıdığın puanlar sayılır, bu yüzden tek bir puanı kıpırdatmak ucuzdur, ve değiştirmeden açıp kapattığın bir panel hiçbir kademede hiçbir şeye mal olmaz.",
       "toolEffectsHeading": "Alet etkileri",
-      "toolEffectsBody": "Bir toplama aletinde bir yuva vardır ve içine giren şey bir büyücü tılsımıdır. Toplayıcının Zulası bir hasadın verdiğine bir birim ekler; Zanaatkârın Gözü çıkardığının derecesini yükseltir. Doğudere'deki alet atölyesinin ustası Tamirci Gizzel, zanaatta 25 beceriye ulaşan büyücülere ikisini de öğretir, ve ikisi de onun atölyesinde yapılır.\\n\\nYeni takılmış bir tılsım sıradan bir alette 20 şarj taşır ve sıradanın üzerindeki her nadirlik kademesi için 10 daha fazlasını taşır, bu yüzden destansı bir kazmaya takılan aynı tılsım 50'den başlar. Bir şarj yalnızca tılsım sonucu gerçekten değiştirdiğinde harcanır, iyileştirmediği bir hasatta asla, ve bir yuva her kullanımda sormaya ayarlanabilir, böylece tılsım siz Şarj Kullan diyene kadar bekler. Taze bir tılsım takmak, yuvayı o an taşıdığınız aletin çevresinde yeniden basar, böylece daha önceki bir üst sınıra değil, o aletin tutabileceği kadarına dolar, ve hiçbir şeyi değiştirmeyecek bir yeniden takma, tılsımı yemek yerine geri çevrilir.\\n\\nŞarjların tükenmesi tılsımı yok etmez: aletin sahibi yuvayı, harcanan her arkanik malzeme için 10 şarj olacak şekilde yeniden doldurur, ve hangi malzemeyi istediği, taşıdığınız aletin ve o yuvanın şimdiye kadar doldurduğu en iyi aletin daha iyisini izler; sıradan ya da sıradan dışı bir alet için Çan Tozu, nadir biri için Çan Özü, destansı biri için bir Çan Kırığı. İyi aleti bankada bırakmak daha ucuz bir yeniden dolum satın almaz, yalnızca aynı fiyata daha küçük bir tane satın alır; daha ucuz bir kademeye dürüstçe inmenin yolu, daha zayıf aleti taşırken taze bir tılsım takmaktır, ki bu orada yuvayı yeniden basar. Yuvanın tavanı mevcut aletinizin doldurabileceğinin üzerindeyse, yeniden dolum o aletin durduğu yerde durur ve size daha iyisini taşımanızı söyler. Yeniden dolum, tılsımı imzalayan büyücüyseniz malzemelerin yarısına mal olur, Büyülemede uzmansanız daha da azına; başka herkes tam oranı öder. Bir yeniden dolum, zanaat ailesinin geri kalanı gibi kısa bir büyüdür."
+      "toolEffectsBody": "A gathering tool has a slot in it, and a crafted charm is what goes in. A Gatherer's Cache adds a unit to what a harvest yields; an Artisan's Eye raises the grade of what it pulls up; a Maker's Charm adds two units the same way. The first two are enchanting work: Tinker Gizzel, Master of the Toolworks in Eastbrook, teaches them to enchanters who have reached 25 skill in the craft. The Maker's Charm is engineering work instead, a dropped pattern crafted at 100 skill; all three are made at his toolworks.\n\nA freshly slotted charm carries 20 charges on a common tool and 10 more for every rarity rung above common, so the same charm slotted on an epic pick starts at 50. A charge is spent only when the charm actually changed the outcome, never on a harvest it did not improve, and a slot can be set to ask each use, so the charm waits until you say Use a Charge. Slotting a fresh charm re-mints the slot around the tool you are carrying at that moment, so it fills to what that tool can hold rather than back to some earlier high mark, and a re-slot that would change nothing at all is turned away instead of eating the charm.\n\nRunning out of charges does not destroy the charm: the tool's owner refills the slot, 10 charges for each arcane material spent, and which material it asks for follows the better of the tool you are carrying and the best tool that slot has ever been filled by, Chime Dust for a common or uncommon tool, Chime Essence for a rare one, and a Chime Shard for an epic. Leaving the good tool in the bank does not buy a cheaper refill, only a smaller one at the same price; the honest way down to a cheaper rung is to slot a fresh charm while carrying the lesser tool, which re-mints the slot there. If the slot's ceiling sits above what your current tool can fill, the refill stops where that tool stops and tells you to carry the better one. The refill costs half the materials when you are the crafter who signed the charm, and less again if you are specialized in the charm's own craft, Enchanting for a Cache or an Eye, Engineering for a Maker's Charm; anyone else pays the full rate. A refill is a short cast, like the rest of the craft family."
     },
     "profPages": {
       "back": "Mesleklere Dön",
@@ -6383,10 +6618,21 @@ export const tr_TR: EnTranslations = {
       "matFmt": "{name} x{count}",
       "outputFmt": "{name} x{count}",
       "comboReq": "{a} ve {b} gerektirir",
+      "oncePerDay": "Once per day",
+      "effectFood": "Restores {amount} health over {seconds} sec when eaten.",
+      "effectWellFed": "Well Fed when you finish eating: +{value} {stat} for {minutes} min.",
+      "effectWellFedAura": "Grants {aura} for {minutes} min when you finish eating.",
+      "effectFeast": "Sets out a feast others eat from, one serving each: {servings} servings, lasting {minutes} min.",
+      "effectFeastServing": "Each serving restores {amount} health over {seconds} sec.",
+      "effectFeastWellFed": "Well Fed when a serving is finished: +{value} {stat} for {minutes} min.",
       "sourceTrainerFee": "Eğitmen, {fee}",
       "sourceTrainerFree": "Eğitmen, ücretsiz",
       "sourceKnown": "Başlangıçtan bilinir",
+      "sourceDrop": "From a found pattern",
+      "sourceVendor": "Sold by the Heroic Quartermaster",
+      "sourceDropAndVendor": "From a found pattern, or the Heroic Quartermaster",
       "gainFmt": "{reduced} / {minimal} / {zero}",
+      "gainNever": "never",
       "colRecipe": "Tarif",
       "colSkill": "Beceri",
       "colSource": "Kaynak",
@@ -6407,21 +6653,23 @@ export const tr_TR: EnTranslations = {
         "armorcrafting": "Zırh Yapımı; bir ustanın üretebileceği en ağır zırh olan zinciri perçinli bakır temellerden nadir osmiyum pul setine kadar döver; yanında birkaç büyücü istatistikli parça da üretir. Müşterileri vuruşların indiği yerde duran kişilerdir.",
         "tailoring": "Terzilik; keten temellerden yaldız dokuma setine ve nadir güneş iplikli işlere kadar büyücülerin içinde yaşadığı Zeka ve Ruh kumaşını dokur; ayrıca kimsenin reddetmediği on yuvali bir çanta olan İpek Örümcek Çantası'nı diker.",
         "leatherworking": "Deri İşleme; engellemek yerine sıyrınan sınıflar için Çeviklik ve Dayanıklılık teçhizatı hazırlar: Fenbridge post temellerinden nadir bataklık bekçisi setine kadar; ve bataklıkta öğretilen tek derin zanaat odur.",
-        "cooking": "Yemek Pişirme; günün avını 18 saniyelik dinlenme boyunca iyileştiren, oyundaki en ucuz iyileştirme olan sofra yemeklerine dönüştürür: Tuzlanmış Kurutulmuş Et'ten Marlow'un Büyük Kavurması'na kadar. Herkes yer, bu yüzden hiçbir zanaat bir grupta bu kadar evrensel biçimde karşılanmaz.",
-        "alchemy": "Simya; bitkileri, bezleri ve camı dövüşleri kazandıran şişelere dönüştürür: işlerin ters gittiği anlarda kullanılan iyileştirme ve mana iksirlerini ve tüm zindan boyunca güçlendirme çubuğunuzda kalan stamina eleksirlerini.",
-        "engineering": "Mühendislik, ciddi her toplayıcının er ya da geç istediği aletleri üretir: hiçbir tezgahın para karşılığı satmayacağı kademe 4 ve kademe 5 kazmalar, baltalar, oraklar ve oltalar; her biri kendi altındaki aleti tüketerek.",
-        "enchanting": "Büyüleme teçhizatı parçalarına ayırır ve gücü geri koyar: istemediğiniz parçaları arkanik malzemelere bozun, sonra onları saklamayı düşündüğünüz bir parçaya kalıcı bir istatistik bonusu almak için harcayın. Bozma ve büyüleme ne istasyon ne de eğitmen ister; herkes daha ilk gün başlayabilir. Yalnızca alet atölyesinde öğretilen iki tılsım tarifi daha fazlasını ister."
+        "cooking": "Cooking turns the day's catch and the season's harvest into sit-down meals that heal over 18 seconds of rest, the cheapest healing in the game, from Salted Jerky through Marlow's Grand Roast to the three apex role dishes, which heal more than any other food and leave a Well Fed buff on whoever finishes the plate. Everyone eats, so no craft is more universally welcome in a group.",
+        "alchemy": "Alchemy turns herbs, glands, and glass into bottles that win fights: healing and mana draughts for the moment things go wrong, stamina elixirs that sit on your buff bar through a whole dungeon, and at the top the flasks, one per role, that stay with you through your own death.",
+        "engineering": "Engineering builds the tools every serious gatherer ends up wanting: the tier 4 and tier 5 picks, axes and sickles, and the three fishing rods that climb from tier 4 to tier 6, none of which any counter will ever sell for coin, each one consuming the tool below it.",
+        "enchanting": "Enchanting takes gear apart and puts the power back in: break unwanted pieces into arcane materials, then spend them on a permanent stat bonus for a piece you mean to keep. Breaking and enchanting need no station and no trainer, and anyone can start on day one; only its three trainer recipes ask more, the two charms and the Lucent Reagent, taught and worked at the toolworks.",
+        "jewelcrafting": "Jewelcrafting is the finer bench of the Eastbrook forge: rings and necklaces in copper, iron, and rare osmium, with a Strength ring, an Intellect ring, and an Agility necklace on every rung. Jewelry has no armor and no class lock, so its customers are simply everyone with fingers and a neck.",
+        "inscription": "Inscription is the writing desk of the Highwatch apothecary: caster tomes for the offhand and stamina scrolls for everyone, milled from the same herbs the draughts beside them use. Its scrolls are the second door into the battle-elixir buffs, so even a fighter who never holds a book has reason to knock."
       },
       "craftProse": {
         "weaponcrafting": {
           "identityHeading": "Her savaşçının alışveriş yaptığı keskin kenar",
-          "identityBody": "Her gruptaki biri bu zanaatın işini ister; çünkü yalnızca nadir kademe üç iştahı da karşılar: Güç yakın dövüşçüler için Osmiyum Savaş Kılıcı, Çeviklik savaşçılar için Glifçelik Savaş Baltası ve elbise kalabalığı için Zeka ve Ruh asası Yüksekçam Savaş Asası.\n\nZanaat tekerinde Zırh Yapımı ile Mücevher İşleme arasında durur. Yaşayan kimliği Demirci'dir: Silah Yapımı ve Zırh Yapımı çifti, kendi ellerinizle üç cevher damarını işleyerek Ustabaşı Darva'nın önünde ocakta yemin edilir; Mücevher İşleme ile Bıçakçı Usta çifti de tekerekte adlandırılmış ancak Mücevher İşleme daha sonraki bir bölge genişlemesine kadar tarif göndermediğinden henüz yemin edilemez.",
+          "identityBody": "Someone in every group wants this craft's work, because the rare rung alone covers all three appetites: the Osmium Warblade for Strength melee, the Glyphsteel War Axe for Agility fighters, and the Highpine Battle Staff, an Intellect and Spirit stave for the robe crowd.\n\nOn the craft ring it stands between Armorcrafting and Jewelcrafting. Its living identity is the Smith, the Weaponcrafting and Armorcrafting pair, sworn before Forgemistress Darva at the forge by working three ore veins with your own hands; the Bladewright pair with Jewelcrafting is named on the ring too, and though Jewelcrafting now works its own 0-to-50 jewelry ladder at this same forge, the pair still waits for its oath quest before it can be sworn.",
           "materialsHeading": "Demirhanenin içtiği şeyler",
           "materialsBody": "Bel kemiği Madenciliktir. Bakır cevheri Doğudere Vadisi'nin kademe 1 damarlarından, demir cevheri Mirefen Bataklığı'ndan, osmiyum cevheri ise Dikenzirve Tepeleri'nden gelir ve merdivenin her kademesi aynı şekilde yükselir. Odun Kesimi beklediğinizden daha çok önem taşır: yaban domuzu mızrağının sapını demirkabuk verir, savaş tokmağının omzunu kül ağacı taşır ve savaş asasını tek bir yaşlıağaç kütüğü oluşturur.\n\nGerisi avdan ve tezgahtan gelir. Kabzalar için gereken Kaba Post doğrudan kurt ve yaban domuzu cesetlerinden hasat edilir, Kemik Parçaları huzursuz ölülerden ya da hurdaya ayrılan sıradan teçhizattan çıkar ve ocak merdiveni Demircilik Akısı yakar: bizzat Darva'dan kavanozu 20 bakır. Kendi madenciliğiniz geride kalırsa cevherin kendisinde hiçbir tezgah sizi kurtarmaz: osmiyum ya Dikenzirve damarlarından, ya Uzak Kıyı dışındaki her genç bölgenin başlangıç damarlarından (Uzak Kıyı'nın damarları demir çıkarır), ya da ticaretle veya Dünya Pazarı üzerinden başka bir oyuncunun yığınından gelir. Yalnızca Glifçelik Külçesi para karşılığı alınır: alet atölyesindeki Tamirci Gizzel'den ya da Highwatch'taki Donatım Subayı Bree'den.",
           "ladderHeading": "Merdiven, kademe kademe",
           "ladderBody": "Tek alan tarifi olan Doğudere Savaş Kılıcı başından beri herkese bilinir ve avlanma düşürme malzemeleri (birkaç kurt dişi ve kemik parçası) artı ocak tezgahından alınan altı Demircilik Akı ile her yerde üretilir. Gerçek merdiven, hepsi ocağa bağlı üç kademede dokuz eğitmen tarifinden oluşur: bakır kademe (sakallı balta, flenç topuz, yaban domuzu mızrağı) beceri 0'da ücretsiz öğrenilir; demir kademe (uzun kılıç, savaş tokmağı, hançer) beceri 25'te tarif başına 25 gümüşe açılır; osmiyum kademesi (savaş kılıcı, savaş baltası, savaş asası) beceri 50'de her biri 1 altına açılır. Darva, bir zanaat kademesi kendi kademe bandına ulaşır ulaşmaz bir tarifi öğretir; bu yüzden her kademesi kendi beceri bandı başladığında açılır.\n\nBir tarif daha çiftle birlikte gelir: Mezar Ejderi Eldivenleri, yalnızca hem Silah Yapımı hem de Zırh Yapımı becerisi 25 olan uyumlu bir Demirci'nin yapabileceği, eğitmen tarafından öğretilen bir kombinasyon parçasıdır ve hiç istasyona ihtiyaç duymaz.",
           "routeHeading": "Şaheserler ve 125'e giden çalışan bir rota",
-          "routeBody": "Gerçek bir istatistik satırı olan her parça, ki bu merdivende demir kademesi ve üstü demektir, daha iyi kalite kademe tavanınızın içine sığdığı sürece örsten şaheser olarak çıkabilir; istatistiksiz bakır yaygınları asla tetiklemez, çünkü içlerinde iyileştirilecek hiçbir şey yoktur. Şaheser bonusu için demir ve osmiyum kademe 1, yaşlıağaç ve glifçelik kademe 2 malzeme sayılır; bir tarifin kendi kademesinin üstünde duran beceri de kademe başına kendi puanını ekler. Bu yüzden osmiyum üçlüsü arasında malzeme üstünlüğünü savaş baltası ile savaş asası taşır ve bir kademe, siz onu aştıktan sonra da daha iyi tetiklemeyi sürdürür.\n\nBakır kademesini 25'e kadar sürün, demir kademesini açıldığı gün eğitin ve 50'ye kadar sürün, sonra osmiyum kademesiyle 75'e çıkın. 75'ten sonra henüz daha yükseği gönderilmediğinden osmiyum tarifleri önce yarım, sonra çeyrek kazanıma solar: 125 tavanına ulaşmak için kabaca 150 üretim daha bütçeleyin ve toplu üretime oturduğunuzda dakikada on zanaat eylemlik ortak kısıtlamayı unutmayın.\n\nTırmanışı yol boyunca finanse edin: Darva'nın ocak iş emri her 30 dakikada bir elinizden sekiz bakır cevheri alır, karşılığında biraz para ve tecrübe verir; demir ve osmiyum kademeleri de seviye atlayan yakın dövüşçülere dürüstçe satılır. Yiğitlikler Kitabı beceri 50'de Keskinlik ve Su Verme'yi işaretler, 125'te ise Şaheser Silah Yapımı'nı taçlandırır."
+          "routeBody": "Any piece with a real stat line, which on this ladder means the iron rung and up, can come off the anvil as a masterwork so long as the finer quality fits inside your tier ceiling; the statless copper commons never proc, because there is nothing in them to improve. Iron and osmium count as tier 1 materials for the masterwork bonus, highpine and glyphsteel as tier 2, and skill sitting above a recipe's own tier adds its own point per tier, so among the osmium three it is the war axe and the battle staff that carry the material edge, and a rung keeps proccing better after you have outgrown it.\n\nRide the copper rung to 25, train the iron rung the day it opens and ride it to 50, then the osmium rung to 75. Above the osmium three sits an apex rung Darva does not teach: its patterns are found, not bought. For a smith whose majors include Weaponcrafting, which today means the sworn Smith, an apex craft pays full gain right to the 125 cap; below a major's ceiling it teaches nothing at all, so an undeclared or hobby smith works one for the weapon, not the points. Either way the osmium recipes carry the climb, fading to half and then quarter gain: budget roughly 150 more crafts to reach the 125 cap, and each craft takes real cast time, so a long batch is paced by duration rather than a quota.\n\nFund the climb as you go: Darva's forge work order takes eight copper ore off your hands every 30 minutes for a little coin and XP, and the iron and osmium rungs sell honestly to leveling melee. The Book of Deeds marks Edge and Temper at skill 50 and crowns Grandmaster Weaponcrafting at 125."
         },
         "armorcrafting": {
           "identityHeading": "Ön cephe için zırh",
@@ -6435,7 +6683,7 @@ export const tr_TR: EnTranslations = {
         },
         "tailoring": {
           "identityHeading": "Büyücüler için kumaş, herkes için çanta",
-          "identityBody": "Merdiven, keten temellerden yaldız dokuma setine ve nadir kademeye yükselir: İpek Bağlayıcı Kıyafeti ve güneş iplikli parçalar. İkinci zanaati evrenseldir: İpek Örümcek Çantası on yuvali bir çantadır ve onu istemeyen hiçbir sınıf, spec ya da seviye yoktur.\n\nTekerekte Terzilik, Deri İşleme ile Hat Sanatı arasında durur. Yaşayan çifti Teçhizatçı'dır: Deri İşleme ve Terzilik birlikte, Doğudere tezgahındaki Dokumacı Ottilie'nin önünde dört ağ ağacı örümceği ipekleri için kesilip yemin edilir; Hat Sanatı ile Mürekkep Dokuyucu çifti tekerekte adlandırılmış ama Hat Sanatı'nın ilk tarifleri gelmeden yemin edilemez.",
+          "identityBody": "The ladder climbs from homespun basics through the gildenweave set to the rare rung: the Silkbinder's Raiment and the sunweave pieces. Its second trade is universal: the Silkspun Satchel is a ten-slot bag, and there is no class, spec, or level that does not want more bag space.\n\nOn the ring Tailoring sits between Leatherworking and Inscription. Its living pair is the Outfitter, Leatherworking and Tailoring together, sworn before Weaver Ottilie at the Eastbrook loom after culling four webwood spiders for their silk; the Inkweaver pair with Inscription is named on the ring, and with Inscription's base catalog now inked it waits only on an oath quest of its own.",
           "materialsHeading": "İplik, ipek ve evet bitkiler de",
           "materialsBody": "Tezgah, avın düşürdüğü ve tarlaların büyüttüğü üzerine çalışır. Keten parçaları ve ev dokuma kumaşı insansı öldürmelerden gelir, örümcek ipeği örümcek cesetlerinden hasat edilir ve nadir kademenin merkezkoşası İpek Bağlayıcı Kıyafeti, şanslı bir ceset hasadında ortaya çıkan imzalı örneklem olan Bozulmamış İpeği ister.\n\nBitkicilik, terzilik ile herhangi bir diğer teçhizat zanaatından daha fazla bağlantı kurar: parlakyaprak terlikleri budamak için, altın yaprak yaldız dokuma setini renklendirmek için ve güneşyaprağı ise tüm nadir kademeyi dikmek için kullanılır; bu yüzden kendi bitkilerini toplayan bir terzi düzenli tasarruf eder. İplik makarası Ottilie'den 12 bakıra alınır ve tezgah hiç metal istemez: Koruyucu Dokuma Başlık baş tarifi bile premium bitkilerden, Bozulmamış İpek'ten, örümcek ipeğinden ve iplikten dokunmuştur.",
           "ladderHeading": "Ottilie'nin tezgahında öğrenmek",
@@ -6455,45 +6703,68 @@ export const tr_TR: EnTranslations = {
         },
         "cooking": {
           "identityHeading": "Grubu besleyen kazan",
-          "identityBody": "Pişmiş bir yemek yediğinizde 18 saniyelik dinlenme boyunca sizi iyileştirir; çekişler arasında bu, oyundaki en ucuz iyileştirmedir. Merdiven, 90 can veren Tavada Kızarmış Nehir Levreği'nden 980 canlık Marlow'un Büyük Kavurması'na kadar uzanır; oyunda hiçbir şeyin geçemediği bir oturma iyileştirmesi.\n\nHalkada Aşçılık, Simya ile Deri İşleme arasında durur. Yaşayan çifti Eczacı'dır: Simya ve Aşçılık birlikte, kazan için dört yaban domuzu avlandıktan sonra Doğudere mutfaklarında Aşçı Marlow'un önünde yemin edilir; Deri İşleme ile kurulan Avcı Ustası çifti halkada adlandırılmıştır ama henüz yemin görevi yoktur.",
+          "identityBody": "Eat a cooked meal and it heals you over 18 seconds of rest, which between pulls is the cheapest healing in the game. The ladder runs from a 90-health Pan-Seared River Perch up through Marlow's Grand Roast at 980, and above even the roast sit the three apex role dishes at 1,392, the largest sit-heal in the game and the strongest Well Fed buff a finished plate can leave behind (the farm kitchen's buff dishes fill the rungs below it).\n\nOn the ring Cooking sits between Alchemy and Leatherworking. Its living pair is the Apothecary, Alchemy and Cooking, sworn before Cook Marlow at the Eastbrook kitchens after hunting four wild boars for the pot; the Trapper pair with Leatherworking is named on the ring but has no oath quest yet.",
+          "identityBodyOneMeal": "Eat a cooked meal and it heals you over 18 seconds of rest, which between pulls is the cheapest healing in the game. The ladder runs from a 90-health Pan-Seared River Perch up through Marlow's Grand Roast at 980, and above even the roast sit the three apex role dishes at 1,392, the largest sit-heal in the game and the strongest Well Fed buff a finished plate can leave behind (the farm kitchen's buff dishes fill the rungs below it; the Farming page tells that side of the story). Only one Well Fed effect at a time: a newer meal replaces it.\n\nOn the ring Cooking sits between Alchemy and Leatherworking. Its living pair is the Apothecary, Alchemy and Cooking, sworn before Cook Marlow at the Eastbrook kitchens after hunting four wild boars for the pot; the Trapper pair with Leatherworking is named on the ring but has no oath quest yet.",
           "materialsHeading": "Olta ve bıçakla beslenen bir kiler",
           "materialsBody": "İmza malzemelerini bölge bölge balıkçılık sağlar: Doğudere Vadisi'nin sularından ayna alabalığı ve nehir levreği, Mirefen Bataklığı'ndan bataklık turnabalığı ve bataklık yılanbalığı, Dikenzirve Tepeleri'nden buzsolungaç alabalığı ve slatefin sazanı. Kademeler bölgeleri serbestçe karıştırır (ücretsiz kademe daha şimdiden bataklık turnabalığı ister, orta kademe Dikenzirve'nin buzsolungacını, nadir akşam yemeği ise Vadi'nin ayna alabalığını geri katar); bu yüzden yol nereye giderse orada balık tutan bir aşçının malzemesi hiç tükenmez.\n\nKasap tarafı hasat edilen cesetlerden gelir: yaban domuzlarından ve akrabalarından Av Eti ve nadir ya da daha iyi bir hasat atışında, büyük kavurmanın baş tacı olan imzalı bir Seçme Et. Otlar daha iyi yemekleri terbiyeler, tek bir Kül Ağacı Kütüğü yılanbalığını tütsüler ve Pişirme Tuzu, Marlow'un kendi tezgahında kesesi 8 bakırdır.",
           "ladderHeading": "Kurutulmuş etten büyük kavurmaya",
           "ladderBody": "Tuzlanmış Kurutulmuş Et alan tarifidir: başından beri bilinir, bir örümcek bacağıyla yapılır, her yerde hazırlanabilir; her taze maceracının yol yiyeceğidir. Eğitmen merdiveni meydanın doğu tarafındaki Doğudere mutfaklarında pişirir: beceri 0'da ücretsiz kademe (levrek, Avcı Oyun Şişi, Otlu Bataklık Turna Balığı), beceri 25'te tarif başına 25 gümüşe orta kademe (Meşeağacı Tütsülenmiş Yılanbalığı, Altın Yapraklı Oyun Güveci, Buzdiş Çorbası) ve beceri 50'de her biri 1 altına nadir kademe (Gümüş Sazan Akşam Yemeği, Balıkçının Şölen Tabağı, Marlow'un Büyük Kavurması).\n\nToplu yemekler malzemelerinizi uzatır: tütsülenmiş yılanbalığı ve oyun güveci zanaat başına iki kişiye yetecek, şölen tabağı ise üç kişiye yetecek miktarda servis eder. Marlow, Aşçılıktaki kademeniz tarife ulaşır ulaşmaz her kademeyi öğretir.",
           "routeHeading": "Şaheserler değil uzmanlaşma ve 125'e giden yol",
-          "routeBody": "Aşçılık, şaheser hikayesinin dürüst istisnasıdır: bir yemeğin iyileştirilebilecek istatistik çizgisi yoktur, bu yüzden yemekler hiçbir zaman şaheser üretmez ve hiçbir aşçı bunu peşinde koşmamalıdır. Zanaatın ustalığı 75'te uzmanlaşmaktır: her malzemede beşte bir daha az, bu toplu yemeklerde hızla birleşir; ve zindanın kapısında yemek pişirilmesini sağlayan seyyar bir alan mutfağı.\n\nYakaladığınızı pişirin: tırmanışı bir balık tutma seansıyla eşleştirin ve iki beceri birbirini tüm yol boyunca besler. Kurutulmuş et ve ücretsiz kademe sizi zanaat başına bir puanla 25'e taşır, orta kademe 50'ye ve nadir kademe 75'e; 75 sonrasında henüz daha yüksek bir yemek gönderilmemiştir, bu yüzden nadir yemekler yarıya ve ardından çeyreğe solar, tavan noktasına ulaşmak için yaklaşık 150 daha üretim gerekir. Öğütme değil stok yapma olarak düşünün: bir lonca her porsiyonu yer.\n\nMarlow'un mutfakları iş siparişi, para ve deneyim karşılığında her 30 dakikada bir sekiz av eti satın alır; Yiğitlikler Kitabı beceri 50'de 125'teki Şaheser Aşçılık unvanına giden yolda Deneyimli Şef'i işaretler."
+          "routeBody": "Cooking is the honest exception to the masterwork story: a meal has no stat line to improve, so dishes never proc one, and no cook should chase it. The craft's mastery is specialization at 75: a fifth less of every ingredient, which compounds fast on batch dishes, and a mobile field kitchen so dinner gets cooked at the dungeon door.\n\nCook what you catch: pair the climb with a fishing session and the two skills feed each other all the way up. Jerky and the free rung carry you to 25 at a point per craft, the mid rung to 50, and the rare rung to 75. Above the rare rung sits the apex kitchen, the three role dishes and The Laden Hearth: no trainer teaches them, they come off found patterns. For a cook whose majors include Cooking, which today means the sworn Apothecary, an apex craft pays full gain right to the 125 cap; below a major's ceiling it teaches nothing at all, so an undeclared or hobby cook works one for the plate, not the points. Either way the rare dishes carry the last stretch, fading to half and then quarter gain, roughly 150 more crafts. Treat it as stocking, not grinding: a guild eats every serving.\n\nMarlow's kitchens work order buys eight game meat every 30 minutes for coin and XP, and the Book of Deeds marks Seasoned Chef at skill 50 on the way to the Grandmaster Cooking title at 125."
         },
         "alchemy": {
           "identityHeading": "Dövüşleri kazandıran şişeler",
-          "identityBody": "Bu zanaat Highwatch'taki eczanede işlenir; burası Eczacı Ustası Simyacı Verane'nin evidir. Verane tarif merdivenini öğretir, Cam Flakonları 12 bakıra satar ve iş emri üzerinden bitkilere para öder.\n\nZanaat halkasında Simya, deneme yanılma mesleklerinin arasında durur: bir yanında Mühendislik, öbür yanında Aşçılık. Bu ona iki çift kimliği kazandırır: Bombacı (Mühendislik ve Simya, Doğudere'de Tamirci Gizzel'in önünde benimsenir) ve Eczacı (Simya ve Aşçılık, Aşçı Marlow'un önünde yemin edilir). Simya'yı bir ana dal yapmak ve kendi imzalı işinizin size geri ders vermesini sağlamak için iki çiftten birine uyum sağlayın; Bombacı çifti ayrıca kendi kombinasyon karışımını, Ayı İksiri'ni açar, Eczacı çifti ise henüz hiçbir kombinasyon tarifi göndermez. Yine de merdivenin kendisi hiç beklemez, çünkü her Simya tarifi, beyan edilmemiş zanaatların altında çalıştığı nadir kademenin içinde durur; dolayısıyla tavana giden tırmanışın tamamı herhangi bir yeminden önce açıktır.",
+          "identityBody": "The craft is worked at the apothecary in Highwatch, home of Alchemist Verane, Master of the Apothecary, who teaches the recipe ladder, sells Glass Vials at 12 copper, and pays coin for herbs through her work order.\n\nOn the craft ring, Alchemy sits with the trial-and-error trades, next to Engineering on one side and Cooking on the other. That gives it two pair identities: the Bombardier (Engineering and Alchemy, taken up before Tinker Gizzel in Eastbrook) and the Apothecary (Alchemy and Cooking, sworn before Cook Marlow). Attune to either pair to make Alchemy a major and let your own signed work teach you back; the Bombardier pair also opens its combination brew, the Elixir of the Bear, while the Apothecary pair ships no combination recipe yet. The 0-to-50 ladder itself never waits, though: every one of those rungs sits inside the rare tier that undeclared crafts work under, so the climb to the cap is open before any oath. Two things sit above that ceiling and pay their skill to a major alone: the Quickening Catalyst, the 75-rung intermediate Verane also teaches, and the found-pattern rungs above the ladder; an undeclared or hobby alchemist brews them for the goods, not the points.",
           "materialsHeading": "Bitkiler, bezler ve cam",
           "materialsBody": "Her iksir, kademesiyle eşleşen bitkilerle birlikte bir cam flakon ister: parlakyaprak Doğudere Vadisi'nde, altın yaprak Mirefen Bataklığı'nda, güneşyaprağı ise Dikenzirve Yüksekliklerinde yetişir; her bölgede bir bitki, böylece şişeleriniz dünyayla birlikte yükselir. Bitkicilik doğal ortak beceridir, ancak toplayıcılardan veya pazardan satın almak da işe yarar; derin bölgelerde daha iyi orak gerektiren yüksek kademeli bitkiler bulunduğundan, kendi bitkilerinizi topluyorsanız araçlarınızı güncel tutun.\n\nEleksir serisi bir avcının malzemesini ekler: zehirli cesetlerden toplanan Zehir Bezleri ve en üst eksir, şanslı bir ceset hasatında ortaya çıkan imzalı nadir örneklem olan Bozulmamış Zehir Bezi'ni ister. Kendiniz hasat etmiyorsanız, bir avcı arkadaştan getirmesini istemeye değer malzemeler bunlardır.",
           "ladderHeading": "Tarif merdiveni",
-          "ladderBody": "Zayıf İyileştirme İksiri'ni herkes başından beri bilir ve istasyon gerekmeden her yerde karıştırabilir. Gerçek merdiven, Verane'nin eczanede öğrettiği dokuz tariftir, her kademede üç tane: beceri 0 tarifleri ücretsizdir, beceri 25 kademesi tarif başına 25 gümüş, beceri 50 kademesi ise tarif başına 1 altın tutar. Her kademe bir iyileştirme şerbeti, bir mana şerbeti ve bir dayanıklılık eleksiri içerir; sıradan parlakyaprak şişelerinden (120 can, 160 mana) sıradan dışı altın yaprağa (200 can, 260 mana) ve nadir güneşyaprağına (280 can, 360 mana) doğru adım adım yükselir.\n\nEleksirler de aynı yoldan tırmanır: Domuz İksiri 10 dakika boyunca 6 Dayanıklılık verir, Zehirateşi İksiri 15 dakika boyunca 9, Yılan İksiri ise 15 dakika boyunca 12; üretim başına iki şişe çıkaran tek eleksir de Yılan'dır. Bir tarif daha kenarda durur: Ayı İksiri, Simya'nız 25'e ulaştığında Verane'nin 25 gümüşe öğrettiği bir kombinasyon karışımıdır; her yerde karıştırılabilir, ama yalnızca hem Simya'sı hem Mühendisliği 25 olan uyumlu bir Bombacı tarafından.",
+          "ladderBody": "Everyone knows the Minor Healing Potion from the start and can mix it anywhere, no station needed. The real ladder is taught by Verane at the apothecary, rung by rung: the skill 0 recipes are free, the skill 25 rung costs 25 silver per recipe, and the skill 50 rung costs 1 gold per recipe. Each rung carries a healing draught, a mana draught, and a stamina elixir, stepping from common sheenleaf bottles (120 health, 160 mana) through uncommon goldleaf (200 health, 260 mana) to rare sunpetal (335 health, 425 mana); since the trophy economy the skill 25 rung also teaches a Lesser Healing Potion brewed from tallow, a cheaper bottle a hair weaker than the goldleaf draught.\n\nThe elixirs climb the same way: the Elixir of the Boar grants 6 Stamina for 10 minutes, the Vipersear Elixir 9 for 15 minutes, and the Elixir of the Serpent 12 for 15 minutes, the Serpent alone brewing two bottles per craft. One more recipe sits off to the side: the Elixir of the Bear, a combination brew Verane teaches for 25 silver once your Alchemy reaches 25, mixable anywhere, but only by an attuned Bombardier with both Alchemy and Engineering at 25.\n\nAbove the whole elixir line sits the flask rung, which no trainer teaches and which comes off found patterns instead. A flask grants 13 for 20 minutes, and it opens two axes the elixirs never had: Attack Power and Intellect beside the familiar Stamina, one flask per role. It also keeps its own rules. Only one flask rides at a time whatever its stat, a weaker elixir or scroll of that stat cannot replace it, no dispel, steal, or hand cancel takes it off, and it stays with you through your own death, though it ends when you log out.",
           "routeHeading": "Bir simyacının 125'e giden yolu",
-          "routeBody": "Şerbetler ve eleksirler asla şaheser atmaz; o tetikleme istatistik taşıyan teçhizata aittir. Yine de adınız yol alır: nadir güneşyaprağı şerbetleri usta imzasıyla gelir ve çift şişelik Yılan İksiri'nin her şişesi de öyle; yani bu zanaatta nadir hiçbir şey tezgahtan imzasız çıkmaz. Beceri 75'te uzmanlaşırsınız ve o andan itibaren her Simya tarifi yüzde 20 daha az malzeme ister.\n\nBitkiciliği erken alın ve seviye atlarken toplayın: parlakyaprak Vadi'nin her yerindedir ve Verane'nin tezgahına vardığınızda ücretsiz kademe, zaten toplayacağınız otlarla sizi tertemiz biçimde beceri 25'e taşır. 25 kademesi açılır açılmaz öğrenin, altın yaprak için toplamanızı bataklığa taşıyın ve Verane'nin iş emri (45 bakıra altı Altın Yaprak Otu, her 30 dakikada bir tekrarlanabilir) yol boyunca size biraz para geri versin.\n\n50'den sonra, Dikenzirve güneşyaprağıyla güneşyaprağı şerbetleri ve Yılan partileri karıştırın; karışımda hâlâ biraz Vadi ve bataklık yeşilliği bulunsun. 100'den 125'e uzanan son bölüm kasıtlı olarak damla damla ilerler; bu yüzden sayı uğruna ot yakmak yerine gerçekten satan şeyi karıştırın ve tüketim mallarının, herkesin sonsuza dek yeniden satın aldığı tek üretilmiş mal olduğunu unutmayın. Yiğitlikler Kitabı beceri 50'de Tuhaf Karışımlar'ı, tavanda ise Şaheser Simya'yı işaretler."
+          "routeBody": "Draughts and elixirs never roll masterworks; that proc belongs to stat-bearing gear. Your name still travels, though: the rare sunpetal draughts arrive signed with a maker's mark, and so does every bottle of the double-batch Elixir of the Serpent, so nothing rare in this craft leaves the bench unsigned. At skill 75 you specialize, and every Alchemy recipe costs 20 percent fewer materials from then on.\n\nTake Herbalism early and pick as you level: sheenleaf is everywhere in the Vale, and once you reach Verane's bench the free rung will carry you cleanly to skill 25 on herbs you would have picked anyway. Learn the 25 rung the moment it turns on, move your picking to the marsh for goldleaf, and let Verane's work order (six Goldleaf Herbs for 45 copper, repeatable every 30 minutes) hand a little coin back as you go.\n\nFrom 50 on, brew sunpetal draughts and Serpent batches out of Thornpeak sunpetal, with a little Vale and marsh greenery still in the mix. Above the Serpent sits the apex bench, the three flasks and, at the very top, the Grand Cauldron, the skill-125 capstone: no trainer teaches them, they come off found patterns, and they pay their skill to a sworn major alone (below a major's ceiling they teach nothing at all). The last stretch from 100 to 125 is a deliberate trickle, so brew what actually sells rather than burning herbs for the number, and remember that consumables are the one crafted good everyone re-buys forever. The Book of Deeds marks Strange Brews at skill 50 and Grandmaster Alchemy at the cap."
         },
         "engineering": {
           "identityHeading": "Alet yapımcısının tekeli",
-          "identityBody": "Bu zanaat, Doğudere Meydanı'nın güneybatı köşesindeki alet atölyesinde işlenir; burası Alet İşlerinin Ustası Tamirci Gizzel'in evidir. Her alet serisinin 1 ile 3 arasındaki kademeleri sıradan satıcı stoğudur; kademe 4 ve kademe 5 ise ya bir mühendisin tezgahından çıkar ya da temizleme kapılarının ardındaki Boğulmuş Litanya'nın mağara tezgahından Mağara Nişanı karşılığında alınır, hiçbir kasadan para karşılığı asla çıkmaz.\n\nHalkada deneme yanılma mesleklerinin arasında, Simya ile Zırh Yapımı'nın yanında durur; bu da ona iki çift kimliği kazandırır: Bombacı (Mühendislik ve Simya, bizzat Gizzel'in önünde benimsenir) ve Çarklı Demirci (Zırh Yapımı ve Mühendislik, adlandırılmış ama henüz yemin edilemez). Bir uyarı burada başka her yerden daha çok önem taşır: Mühendisliğin tarif kademelerinin her biri, hobilerin ve beyan etmemiş ustaların altında çalıştığı nadir kademe tavanının üstünde durur; dolayısıyla beceri sayısı yalnızca ana dalları arasında Mühendislik bulunan bir usta için hareket eder, ki bu bugün Bombacı demektir. Kara aletlerini yine de herkes yapabilir; uyum sağlamamış bir usta bunu yapmaktan yalnızca hiçbir şey öğrenmez, üstelik iki olta tarifi ayrıca Gizzel'in öğretmesini ister.",
+          "identityBody": "The craft is worked at the toolworks in the southwest corner of Eastbrook Square, home of Tinker Gizzel, Master of the Toolworks. Tiers 1 through 3 of every tool line are ordinary vendor stock; every rung above that comes off an engineer's bench, or out of the Drowned Litany's delve counter for Delve Marks behind its clears gates, and never out of any till for coin. The land lines stop at tier 5; the rod line climbs one further, to the tier 6 Clockreel.\n\nOn the ring it sits with the trial-and-error trades, next to Alchemy and Armorcrafting, giving it two pair identities: the Bombardier (Engineering and Alchemy, taken up before Gizzel himself) and the Gearwright (Armorcrafting and Engineering, named but not yet swearable). One warning still matters here: every rung of the tool ladder itself sits above the rare-tier ceiling that hobbies and undeclared crafters work under, so ladder work only moves the skill for a crafter whose majors include Engineering, which today means the Bombardier. The bench is no longer closed to everyone else, though: Gizzel now starts anyone at skill 0 with the Cogwheel Blank and the Bronze Hoe, both free of any fee, and teaches the Copperlens Ocular at 25 for the ordinary tier fee, so an unattuned or hobby engineer can raise the skill through its early rungs; a craft left dormant behind another identity still gains only from the two skill-0 lessons. Anyone can still build the land tools; an unattuned crafter just learns nothing from doing those, and two of the three rod recipes ask for Gizzel's teaching besides, the tier 6 rung coming off a schematic instead.",
           "materialsHeading": "Bileşenler ve önceki aletler",
-          "materialsBody": "Her kara aleti tarifi, bir alt kademedeki aleti artı bir KALİTELİ malzemeyi tüketir ve kara merdiveninin tamamı bu eşleşmeden ibarettir: dört Kaliteli Demir Cevheri ile bir Mithril Maden Kazması, Toryum Maden Kazması'na dönüşür; sonra iki Glifçelik Külçesi, iki Kaliteli Toryum Cevheri ve o osmiyum kazması Arkanit Maden Kazması'nı verir. Balta ve orak serileri de kaliteli-artı-önceki-alet biçimini yineler: Kaliteli Kül Ağacı ve Kaliteli Yaşlıağaç Kütükleri, Kaliteli Altın Yaprak ve Kaliteli Güneş Yaprağı Otları; ama onların kademe 5 basamakları hiç Glifçelik Külçesi istemez: tepede pahalılaşan tek seri kazmadır. İki olta tarifi kalıbı bilerek kırar: Fırtına Makaralı Olta dört Günışıltısı Sazan ile bir Gümüş dere oltası ister, Gelgit Dövmeli Olta ise iki Sazan, sekiz Çiğ Slatefin Sazanı ve o Fırtına Makaralı Olta'yı; yani oltacı merdiveninin tepesi bir damarda değil, suyun üstünde ödenir.\n\nKaliteli malzeme hiçbir yerde satılmaz ve sıradan bir hasattan düşmez: onu, bir bölgenin tam dereceli damarlarından birini malzemenin kendisinden üst sıradaki bir aletle işleyerek elde edersiniz; pratikte bu, yapmaya çalıştığınız aletin bir kademe altındaki alet demektir (bir bölgenin yolcular için tuttuğu kolay damarlar, ne sallarsanız sallayın düz malzemeyi verir). Bu kasıtlıdır. Zanaat rotasında kademe 5 bir alet, bir alışveriş gezisinden değil, kademe 4 aleti gerçekten sallamaktan gelir; Mağara Nişanı tezgahı bunun etrafından dolanmanın tek yoludur. Tek istisna, işlenmiş ve yalnızca satıcıdan alınan Glifçelik Külçesi'dir: Highwatch'taki Donatım Subayı Bree'den ya da Gizzel'in kendi tezgahından külçesi 1 gümüş 60 bakır; bu yüzden maliyetine gömülü sabit bir para tabanı taşıyan tek alet Arkanit Maden Kazması'dır.",
+          "materialsBody": "Every land tool recipe consumes the tool one tier below it plus a FINE material, and that pairing is the whole land ladder: four Fine Iron Ore and a Skysilver Mining Pick become the Osmium Mining Pick, then two Glyphsteel Bars, two Fine Osmium Ore and that osmium pick become the Glyphsteel Mining Pick. The axe and sickle lines mirror the fine-plus-prior-tool shape with Fine Ashwood and Fine Highpine Logs, Fine Goldleaf and Fine Sunpetal Herbs, though their tier 5 rungs ask no Glyphsteel Bars: the pick is the one line that gets dearer at the top. The two rod recipes break the pattern on purpose: the Stormreel takes four Sunglint Koi and a Silverstream rod, the Tidewrought two Koi, eight Raw Slatefin Carp and that Stormreel, so the top of the angler's ladder is paid for on the water rather than at a vein.\n\nA fine material is not sold anywhere and does not drop from an ordinary harvest: you get it by working one of a zone's full-grade veins with a tool ranked above the material itself, which in practice means the tool one rung below the one you are trying to build (the easier veins a zone keeps for travellers yield the plain material whatever you swing). That is deliberate. On the craft route, a tier 5 tool comes from actually swinging the tier 4 one, not from a shopping trip; the Delve Marks counter is the one way around it. The single exception is the Glyphsteel Bar, refined and vendor-only, 1 silver 60 copper a bar from Quartermaster Bree in Highwatch or from Gizzel's own counter, so the Glyphsteel Mining Pick alone carries a fixed coin floor built into its cost.",
+          "materialsBodyThreeRods": "Every land tool recipe consumes the tool one tier below it plus a FINE material, and that pairing is the whole land ladder: four Fine Iron Ore and a Skysilver Mining Pick become the Osmium Mining Pick, then two Glyphsteel Bars, two Fine Osmium Ore and that osmium pick become the Glyphsteel Mining Pick. The axe and sickle lines mirror the fine-plus-prior-tool shape with Fine Ashwood and Fine Highpine Logs, Fine Goldleaf and Fine Sunpetal Herbs, though their tier 5 rungs ask no Glyphsteel Bars: the pick is the one line that gets dearer at the top. The three rod recipes break the pattern on purpose: the Stormreel takes four Sunglint Koi and a Silverstream rod, the Tidewrought two Koi, eight Raw Slatefin Carp and that Stormreel, and the Clockreel two Koi, ten Raw Hollowgill Sturgeon and that Tidewrought, so the top of the angler's ladder is paid for on the water rather than at a vein.\n\nA fine material is not sold anywhere and does not drop from an ordinary harvest: you get it by working one of a zone's full-grade veins with a tool ranked above the material itself, which in practice means the tool one rung below the one you are trying to build (the easier veins a zone keeps for travellers yield the plain material whatever you swing). That is deliberate. On the craft route, a tier 5 tool comes from actually swinging the tier 4 one, not from a shopping trip; the Delve Marks counter is the one way around it. The single exception is the Glyphsteel Bar, refined and vendor-only, 1 silver 60 copper a bar from Quartermaster Bree in Highwatch or from Gizzel's own counter, so the Glyphsteel Mining Pick alone carries a fixed coin floor built into its cost.",
           "ladderHeading": "Alet merdiveni",
-          "ladderBody": "Merdiven sekiz tariftir ve hepsi alet atölyesi istasyonuna bağlıdır. Altı kara aleti tarifi kendiliğinden bilinir, hiçbir zaman eğitmen ücreti yoktur: beceri 75'te kademe 4 kazma, balta ve orak; beceri 150'de ise kademe 5 sürümleri. O ikinci sayı yazım hatası değildir ve mevcut 125 tavanının üstünde bilerek durur: burada beceri gereksinimleri bir üretimin önünü asla kesmez, yalnızca beceri kazanımını biçimlendirir; yani kademe 5 bir aleti, bileşenlerini ve kademe 4 selefini elinizde tuttuğunuz gün yapabilirsiniz. Üretilen iki olta öğretilen istisnadır: Gizzel, Fırtına Makaralı Olta'yı beceri 75'te 4 altına, Gelgit Dövmeli Olta'yı ise beceri 125'te 16 altına öğretir; her birini, zanaattaki kademeniz kendi kademesine ulaştığı anda.\n\nBitmiş her alet nadir ya da destansı kalitededir ve imzalı çıkar; yani adınız başka oyuncuların alet kemerlerinde bölge bölge dolaşır. Mühendislik ayrıca bir kombinasyon tarifinin yarısını taşır: hem Mühendisliği hem Simyası 25 olan uyumlu bir Bombacının karıştırdığı Ayı İksiri.",
+          "ladderBody": "Every rung of the tool ladder is bound to the toolworks station (the crafted hoes the toolmaker also teaches have their own note on the gathering page, and his two starter lessons are the pair named above). The six land-tool recipes are known automatically, no trainer fee ever: the tier 4 pick, axe, and sickle at skill 75, and the tier 5 versions at skill 125, the cap tier itself. Skill requirements never gate a craft here, they only shape skill gain, so you can build a tier 5 tool the day you hold its reagents and its tier 4 predecessor. Two of the three crafted rods are the taught exception: Gizzel teaches the Stormreel at skill 75 for 4 gold and the Tidewrought at skill 125 for 16 gold, each the moment your tier in the craft reaches its own. The tier 6 Clockreel is the third, and no trainer quotes it a fee at all: its schematic sits on the Heroic Quartermaster's counter and teaches the recipe outright.\n\nEvery finished tool is rare or epic quality and comes out signed, so your name rides the zones on other players' toolbelts. Engineering also holds up half of one combination recipe: the Elixir of the Bear, brewed by an attuned Bombardier with both Engineering and Alchemy at 25.",
           "routeHeading": "Bir mühendisçinin 125'e giden yolu",
-          "routeBody": "Aletlerin savaş istatistiği yoktur, bu yüzden hiçbir zaman şaheser üretmezler; bu ihtimal istatistik taşıyan teçhizata aittir. Uzmanlaşma yine de beceri 75'te gelir: zanaat başına yüzde yirmi daha az malzeme ve her toplayıcılık gezisini bir atölyeye dönüştüren geçici bir alan atölyesi. Kazanım matematiği burada neredeyse solmaz: beceri 75 tarifleri 100'e kadar tam kazanım sağlar, sonrasında yarısı; beceri 150 tarifleri ise 125 tavanına kadar tam kazanım sağlar; bu yüzden gerçek kısıt, gri tarifler değil, bileşenler ve sikke.\n\nÖnce çiftinizi seçin, çünkü onsuz hiçbir şey hareket etmez: Tamirci Gizzel'den Bombacı uyumunu alın. Ardından merdiveni besleyin: Madencilik, Tomruk Kesimi veya Bitkicilik öğrenin ya da toplayıcılarla arkadaş olun, kademe 3 aletleri satıcılardan alın ve Gizzel'in iş siparişini (30 dakikada bir tekrarlanabilir, sekiz Demir Kabuk Tomruğu için 16 bakır) yürüyüş parası olarak değerlendirin.\n\nMühendislik, her bitmiş alet başına yaklaşık bir beceri puanı olan düşük hacimli bir prestij zanaatidir; bu yüzden her üretimi satış için stok olarak değerlendirin. Müşterilerinize yapacağınız satış konuşması kendi kendine yazar: bir düğümün kendi kademesinin üzerindeki her alet kademesi 2,5 saniyelik toplama yayından 0,4 saniye (1,5 saniyelik tabana kadar) düşürür; dolayısıyla kademe 5 alet dünyada her düğümde bir hız yükseltmesidir ve yalnızca siz yapabilirsiniz. Yiğitlikler Kitabı beceri 50'de Dişliler ve Makaralar'ı; Şaheser Mühendislik'i ise 125'te işaretler."
+          "routeBody": "Aletlerin savaş istatistiği yoktur, bu yüzden hiçbir zaman şaheser üretmezler; bu ihtimal istatistik taşıyan teçhizata aittir. Uzmanlaşma yine de beceri 75'te gelir: zanaat başına yüzde yirmi daha az malzeme ve her toplayıcılık gezisini bir atölyeye dönüştüren geçici bir alan atölyesi. Kazanım matematiği burada neredeyse solmaz: beceri 75 tarifleri 100'e kadar tam kazanım sağlar, sonrasında yarısı; beceri 125 tarifleri ise tavana kadar tam kazanım sağlar; bu yüzden gerçek kısıt, gri tarifler değil, bileşenler ve sikke.\n\nÇiftinizi erken seçin, çünkü alet merdiveni onsuz hareket etmez: Tamirci Gizzel'den Bombacı uyumunu alın. Ardından merdiveni besleyin: Madencilik, Tomruk Kesimi veya Bitkicilik öğrenin ya da toplayıcılarla arkadaş olun, kademe 3 aletleri satıcılardan alın ve Gizzel'in iş siparişini (30 dakikada bir tekrarlanabilir, sekiz Demir Kabuk Tomruğu için 16 bakır) yürüyüş parası olarak değerlendirin.\n\nMühendislik, her bitmiş alet başına yaklaşık bir beceri puanı olan düşük hacimli bir prestij zanaatidir; bu yüzden her üretimi satış için stok olarak değerlendirin. Müşterilerinize yapacağınız satış konuşması kendi kendine yazar: bir düğümün kendi kademesinin üzerindeki her alet kademesi 2,5 saniyelik toplama yayından 0,4 saniye (1,5 saniyelik tabana kadar) düşürür; dolayısıyla kademe 5 alet dünyada her düğümde bir hız yükseltmesidir ve yalnızca siz yapabilirsiniz. Yiğitlikler Kitabı beceri 50'de Dişliler ve Makaralar'ı; Şaheser Mühendislik'i ise 125'te işaretler."
         },
         "enchanting": {
           "identityHeading": "Teçhizatı parçala, gücü geri koy",
-          "identityBody": "Her büyü başından beri bilinir, herkes daha ilk gün büyü bozabilir ve ikisi de asla istasyon istemez; beceri, her zanaat gibi 125'te tavan yapar. Mesleğin öğretilen tek köşesi iki tılsım tarifidir: Tamirci Gizzel, Doğudere Meydanı'nın güneybatı köşesindeki alet atölyesinde Toplayıcının Zulası'nı ve Zanaatkârın Gözü'nü, Büyülemeniz 25'e ulaştığında olağan kademe ücreti karşılığında öğretir; tılsımların kendisi de onun istasyonunda işlenir.\n\nHalkada Hat Sanatı ile Mücevher İşleme arasında durur; dolayısıyla iki çift kimliği Gizemci (Hat Sanatı ve Büyüleme) ile Mücevher Bağlayıcı'dır (Büyüleme ve Mücevher İşleme). İki komşu da ilk tariflerini beklediğinden henüz hiçbirine yemin edilemez; bu yüzden bugün Büyüleme herkesin zanaatı olarak tırmanır: herhangi bir yeminden önce nadir kademeye kadar serbesttir ve bir Bombacı ya da Eczacı için doğal bir hobi seçimidir. Büyüleyiciler toplama dünyasını da ayakta tutar: yuvaya takılabilen iki alet etkisi Büyüleyici işidir ve bir etkinin asıl üreticisi kendi etkilerini indirimli yeniden doldurur, uzmanlaştığında daha da ucuza.",
+          "identityBody": "Every enchant is known from the start, anyone can disenchant from day one, and neither ever needs a station; the skill caps at 125 like every craft. The one taught corner of the trade is three recipes, all Tinker Gizzel's at the toolworks in the southwest corner of Eastbrook Square, and all worked at that station: the two charms, the Gatherer's Cache and the Artisan's Eye, for the ordinary tier fee once your Enchanting reaches 25, and above them the Lucent Reagent, the apex tier's own material, at 75.\n\nOn the ring it sits between Inscription and Jewelcrafting, so its two pair identities are the Arcanist (Inscription and Enchanting) and the Gembinder (Enchanting and Jewelcrafting). Neither can be sworn yet: both neighbor crafts now work their own ladders (Inscription at the apothecary, Jewelcrafting at the forge), but neither pair has an oath quest yet. So today Enchanting climbs as everyone's craft: free to the rare tier before any oath, and a natural hobby pick for a Bombardier or an Apothecary. Enchanters also keep the gathering world running: the two slottable tool effects are Enchanter work, and an original crafter recharges their own effects at a discount, deeper still once specialized.",
           "levelingHeading": "Büyüleme nasıl seviye kazanır",
-          "levelingBody": "Beceriyi üç eylem hareket ettirir: bir parçayı büyü bozumuna sokmak, bir büyü uygulamak ve olağan üretim eğrisini tırmanan iki tılsımı üretmek. Her başarı en fazla bir puan değerindedir ve işin ne kadar ciddi olduğuna göre ölçeklenir: bozduğunuz parçanın nadirliği ya da uyguladığınız büyünün bileşen kademesi. Sıradan bozumlar ve yalnızca toz isteyen büyüler sıradan iş sayılır; sıradan dışı bozumlar ile öz büyüleri sıradan dışı; nadir bozumlar ile her Runlu ya da Daha İyi büyü nadir sayılır; destansı ve efsanevi bozumlar tabloda daha da yüksekte durur, ama bugün hiçbir büyüleme kimliği nadir kademenin ötesine geçmediğinden pratikte nadir iş kadar öderler. Bozma tezgahında tek bir dürüstlük kuralı geçerlidir: bir oyuncu tezgahından çıkmış bir parça (üretilmiş, imzalı ya da şaheser) yine malzemeye öğütülür ama hiçbir şey öğretmez; yani üret-ve-boz döngüsü kimseyi yükseltmez, dersler dünyada bulunan teçhizattadır.\n\nTanıdık ustalık solması 25 puanlık kademelerde işler: sıradan kalitedeki iş beceri 75'te griye döner, sıradan dışı iş 100'de ve nadir kademedeki iş tam olarak 125 tavanında. Büyüleme'nin kendine özgü bir iyiliği de vardır: arketip tavanınızın üstündeki girdi sıfırlanmak yerine o tavana yuvarlanır; yani uyum sağlamadan önce destansı bir bozum hiçbir şey öğretmemek yerine yalnızca nadir iş olarak sayılır. Büyüleme başka bir kimliğin arkasında uykuda kalırsa, bozma ve uygulama sıradan iş sayılır ve tırmanış 75'te durur; sıradan tavanın üstündeki üretim eğrisine binen iki tılsım ise uykuda bir büyüleyiciye hiçbir şey öğretmez. Onu hobiniz olarak tutun, nadir kademedeki iş yine öder, sadece 75'ten sonra daha yavaş.",
+          "levelingBody": "Three actions move the skill: disenchanting a piece, applying an enchant, and crafting the two charm recipes, which climb the ordinary crafting curve. The third taught recipe, the Lucent Reagent, is the exception: at skill 75 it sits above the rare ceiling every enchanter works under (Enchanting has no oath pair, so it is never a major), and a recipe above your ceiling teaches nothing, so craft it for the reagent, not the points. Each success is worth up to one point, scaled by how serious the work is: the rarity of the piece you break, or the reagent tier of the enchant you apply. Common disenchants and dust-only enchants score as common work; uncommon disenchants and essence enchants as uncommon; rare disenchants and every Runed or Greater enchant as rare; epic and legendary disenchants, and every Lucent enchant, rank higher still on the table, though no enchanting identity today reaches past the rare rung, so they pay the same as rare work in practice. One honesty rules the breaking bench: a piece that came off a player bench (crafted, signed, or masterworked) still mills into materials but teaches nothing, so a craft-and-break loop levels no one, and the lessons are in world-found gear.\n\nThe familiar mastery fade applies on 25-point tiers, so common-grade work goes gray at skill 75, uncommon work at 100, and rare-tier work exactly at the 125 cap. Enchanting also has one kindness of its own: input above your archetype ceiling is rounded down to that ceiling instead of zeroed, so before you attune, an epic disenchant simply scores as rare rather than teaching nothing. If Enchanting ends up dormant behind another identity, breaking and applying score as common work and the climb stalls at 75, while the two charms, riding the crafting curve above the common ceiling, teach a dormant enchanter nothing at all; keep it as your hobby and rare-tier work still pays, just slower past 75.",
           "marketHeading": "Büyülenmiş kopyalar, köken ve pazar",
           "marketBody": "Bir büyü uygulamak bileşenleri harcar ve eşyanın belirli bir kopyasını işaretler. Onu çantadaki bir kopyaya yöneltirseniz ayrı bir büyülü kopya alırsınız; zaten üzerinizde taşıdığınız bir parçaya yöneltirseniz parça yerinde, tam durduğu yerde büyülenir, çıkar-tak dansı olmadan. Her iki durumda da bonus o parçayı sonsuza dek izler: kuşanmayı bıraktığınızda, banka yolculuklarında ve ticaretlerde. Parça başına tek büyü: büyülü bir kopyaya farklı bir büyü uygulamak önce onay ister, sonra eski büyüyü tümüyle değiştirir ve malzemelerini geri vermeden yok eder. Satma, atma ve büyü bozumu her zaman önce düz kopyaları seçer; böylece bitmiş parçanız kazara yenip yutulmaz.\n\nŞaheser teçhizat ile büyüleme dosttur: şaheser bir parça tümüyle büyülenebilir kalır ve büyü, şaheser bonusunu ya da usta imzasını bozmadan onun üstüne eklenir. Bütün kaynaklar üst üste konduğunda, Daha İyi bir büyü taşıyan imzalı bir şaheser, üretilmiş bir parçanın ulaşabileceği en iyi haldir ve yine de tasarım gereği akın ganimetinin altında durur.\n\nPazarda, büyülü ya da imzalı bir parça diğer her şey gibi ilan edilir: kendi tek kopyalık ilanı olarak yayınlanır, ipucu kutusu büyüyü ve usta imzasını gösterir ve Kuzgun Postası onu aynı sadakatle taşır. Malzemeler zanaatın istikrarlı yarısı olmayı sürdürür: Toz, Öz ve Kıymıklar serbestçe ilan edilir, ilan vermek hiçbir şeye mal olmaz ve Tüccar yalnızca tamamlanan bir satıştan yüzde 5 alır. Klasik iki büyüleyici gelirini doğuran şey de budur: malzeme satmak ve bitmiş iş satmak; pazar üzerinden, kuzgunla ya da bir ticaret penceresinde yüz yüze."
+        },
+        "jewelcrafting": {
+          "identityHeading": "The finer work of the forge",
+          "identityBody": "The ladder is three rungs of three: a Strength ring, an Intellect ring, and an Agility necklace, first in copper, again in iron, and once more in rare osmium at the top. Jewelry carries no armor and no class lock, and even the copper pieces arrive with real stat lines, because a ring without stats would be nothing at all.\n\nOn the craft ring it sits between Enchanting and Weaponcrafting, giving it two pair identities: the Gembinder (Enchanting and Jewelcrafting) and the Bladewright (Jewelcrafting and Weaponcrafting). Neither has an oath quest yet, so today Jewelcrafting climbs as everyone's craft: the three rungs of the 0-to-50 ladder all sit inside the rare tier that undeclared crafts work under, so the ladder is open before any oath. Two things sit above that ceiling: the Prismglass Setting, the 75-rung intermediate Darva also teaches, and the found-pattern rung above it; since neither pair can be sworn yet, today they teach nothing to anyone, so cut them for the goods, not the points.",
+          "materialsHeading": "Ore, dust, and essence",
+          "materialsBody": "The bench runs on mining and breaking. Copper ore comes off the tier 1 veins of Eastbrook Vale, iron ore from Mirefen Marsh, and osmium ore from Thornpeak Heights, with a jar or two of Smithing Flux, 20 copper each from Forgemistress Darva, in every recipe. The other half of every piece comes off the breaking bench: Chime Dust settles the copper rung and Chime Essence the iron and osmium rungs, so a jewelcrafter is an enchanter's steadiest customer, or simply keeps a disenchanting habit of their own.\n\nThe osmium rung adds one refinement: every rare piece takes two iron ore besides its osmium, worked in as solder for the fine settings. No counter sells the ores or the dust: they come out of the world or off another player, by trade or the World Market; only the flux is bought for coin.",
+          "ladderHeading": "Taught beside the anvil",
+          "ladderBody": "Jewelcrafting has no station of its own: the whole catalog is worked at the Eastbrook forge, the same anvil Weaponcrafting and Armorcrafting share, and Forgemistress Darva teaches it there. The ladder is nine trainer recipes in three rungs: the copper rung (band, loop, torc) is free at skill 0, the iron rung (signet, loop, choker) costs 25 silver a recipe at skill 25, and the osmium rung (band, loop, amulet) costs 1 gold each at skill 50, each rung teachable the moment your tier in the craft reaches its own.\n\nThere are no field recipes and no combination piece yet: every taught rung is forge-bound trainer work, and the found-pattern rung above them is forge-bound too but bought nowhere, so this craft is learned, and practiced, standing where the smiths stand.",
+          "routeHeading": "Masterworks, and a working route to 125",
+          "routeBody": "There is no statless rung here: every piece on the ladder carries a real stat line, so every craft rolls the masterwork chance so long as the finer quality fits inside your tier ceiling, with iron and osmium counting as tier 1 materials for the proc. The copper and iron rungs, uncommon by make, can masterwork into rare for a hobby or undeclared jewelcrafter alike; the osmium three are rare already, so their epic masterworks wait on a ceiling above rare, which no jewelcrafter has until the craft's pairs open.\n\nThe climb is the standard ride: copper to 25, the iron rung the day it opens to 50, then osmium to 75. Above them sits an apex rung no trainer teaches: its patterns are found, not bought. Read that as an item you can make, not a shortcut up the ladder, because the same ceiling named above applies to skill gain as well as to masterworks: an apex pattern sits well over the rare ceiling every jewelcrafter works under today, so crafting one teaches nothing at all until this craft's pairs open and it can be a major. Whichever you hold, the osmium recipes carry the climb, fading to half and then quarter gain: budget roughly 150 more crafts to reach the 125 cap, and fund them honestly, since every class wears jewelry and most travelers level with their ring and neck slots empty.\n\nThe Book of Deeds marks Polished to Brilliance for your first rare-tier piece, Facet and Filigree at 50 skill, and Grandmaster Jewelcrafting at the 125 cap."
+        },
+        "inscription": {
+          "identityHeading": "Ink for the mind, scrolls for the road",
+          "identityBody": "The ladder is three rungs of two: a caster tome for the offhand and a stamina scroll for anyone at all, first in sheenleaf, again in goldleaf, and once more in rare sunpetal at the top. The tomes are held stat sticks for the six mana classes, real Intellect and Spirit from the first rung; the scrolls are consumables with no class lock, so half of every rung sells to the whole realm.\n\nOn the craft ring it sits between Tailoring and Enchanting, giving it two pair identities: the Inkweaver (Tailoring and Inscription) and the Arcanist (Inscription and Enchanting). Neither has an oath quest yet, so today Inscription climbs as everyone's craft: the three rungs of the 0-to-50 ladder all sit inside the rare tier that undeclared crafts work under, so the ladder is open before any oath. Two things sit above that ceiling: the Sablewax Vellum, the 75-rung intermediate Verane also teaches, and the found-pattern rung above it; since neither pair can be sworn yet, today they teach nothing to anyone, so scribe them for the goods, not the points.",
+          "materialsHeading": "Herbs, ink, and a vial to hold it",
+          "materialsBody": "The desk runs on herbalism and the breaking bench. Sheenleaf comes off the tier 1 herb patches of Eastbrook Vale, goldleaf from Mirefen Marsh, and sunpetal from Thornpeak Heights, ground into pigment with a Glass Vial, 12 copper from the apothecary master, in every recipe. The magical half of the ink comes off the breaking bench: Chime Dust settles the sheenleaf rung, Chime Essence the goldleaf and sunpetal rungs, and the sunpetal scroll binds a pinch of dust back in, so a scribe is an enchanter's steady customer, or keeps a disenchanting habit of their own.\n\nThe sunpetal rung refines both of its recipes: the rare grimoire takes two goldleaf besides its sunpetal, worked in to size the illuminations, and the double scroll batch takes a second essence with that pinch of dust, priced even with the Elixir of the Serpent whose buff it mirrors. No counter sells the herbs or the dust: they come out of the world or off another player; only the vial is bought for coin.",
+          "materialsBodyFrostGourd": "The desk runs on herbalism and the breaking bench. Sheenleaf comes off the tier 1 herb patches of Eastbrook Vale, goldleaf from Mirefen Marsh, and sunpetal from Thornpeak Heights, ground into pigment with a Glass Vial, 12 copper from the apothecary master, in every recipe. The magical half of the ink comes off the breaking bench: Chime Dust settles the sheenleaf rung, Chime Essence the goldleaf and sunpetal rungs, and the sunpetal scroll binds a pinch of dust back in, so a scribe is an enchanter's steady customer, or keeps a disenchanting habit of their own.\n\nThe sunpetal rung refines both of its recipes: the rare grimoire takes two goldleaf besides its sunpetal, worked in to size the illuminations, and the double scroll batch takes a second essence with that pinch of dust and a Frost Gourd off the Highwatch terraces, which prices it even with the Elixir of the Serpent whose buff it mirrors. No counter sells the herbs, the dust or the gourd: they come out of the world, a garden bed or off another player; only the vial is bought for coin.",
+          "ladderHeading": "Taught beside the alembics",
+          "ladderBody": "Inscription has no station of its own: the whole catalog is worked at the Highwatch apothecary, the same bench Alchemy brews at, and Alchemist Verane teaches it there. The ladder is six trainer recipes in three rungs: the sheenleaf rung (primer and scroll) is free at skill 0, the goldleaf rung (folio and scroll) costs 25 silver a recipe at skill 25, and the sunpetal rung (grimoire and scroll) costs 1 gold each at skill 50, each rung teachable the moment your tier in the craft reaches its own. The rung-50 scroll comes off the desk two at a time.\n\nThere are no field recipes and no combination piece yet: every taught rung is apothecary-bound trainer work, and the found-pattern rung above them is apothecary-bound too but bought nowhere, so this craft is learned, and practiced, standing where the alchemists stand.",
+          "routeHeading": "Scrolls, elixirs, and a working route to 125",
+          "routeBody": "The scrolls are the craft's signature rule: each rung's scroll grants exactly the buff of its band's stamina elixir (the boar, vipersear, and serpent bands), and the two sources share one slot on the buff bar. Reading a scroll over an elixir replaces it, drinking an elixir over a scroll replaces that, and the newest application always wins, so a scroll is an alternative door into the same buff, never a second stack on top of it.\n\nThe tomes carry real stat lines, so every tome craft rolls the masterwork chance so long as the finer quality fits inside your tier ceiling; the scrolls, statless consumables, never proc. The climb is the standard ride: sheenleaf to 25, the goldleaf rung the day it opens to 50, then sunpetal to 75. Above them sits an apex rung Verane does not teach: its pattern is found, not bought. Read that as a tome you can make, not a shortcut up the ladder: an apex pattern sits well over the rare ceiling every scribe works under today, and a recipe above your ceiling teaches nothing at all, so the skill it grants waits on this craft's pairs opening and Inscription becoming a major. Whichever you hold, the sunpetal recipes carry the climb, fading to half and then quarter gain: budget roughly 150 more crafts to reach the 125 cap, and fund them honestly, since the scrolls sell to every class in the game.\n\nThe Book of Deeds marks Written in Fine Ink for your first rare-tier piece, Quill and Pigment at 50 skill, and Grandmaster Inscription at the 125 cap."
         }
       },
       "howHeading": "Üretim nasıl çalışır",
-      "howBody": "Üretim penceresini açın (varsayılan tuş T); bildiğiniz her tarif, neye ihtiyaç duyduğu ve elinizde ne olduğuyla birlikte listelenir. İstasyona bağlı tarifler kasabada doğru istasyonun 20 yarda yakınında durmanızı ister, alan tarifleri her yerde üretilir ve Büyüleme'nin bozma ile büyüleme işleri hiçbir istasyon istemez (yalnızca iki tılsım tarifi istasyon işidir, alet atölyesinde). Başarısızlık zarı yoktur: malzemesi elde olan bir üretim her zaman başarılı olur.\n\nİki küçük sürtünme ekonomiyi dürüst tutar. Başarılı her üretim, eşyanın istatistik bütçesinin her puanı için 2 bakırlık bir ücret öder ve zanaat türü eylemler tek bir tempoyu paylaşır: her 60 saniyelik pencerede en fazla 10 üretim, büyü bozumu, büyüleme, hurda toplama veya alet yeniden dolumu. İkisi de normal bir oturumu rahatsız etmez; ikisi birden becerisi tavan yapmış bir uzmanın pazarı boğmasını engeller.",
+      "howBody": "Open the crafting window (default key T) and every recipe you know is listed with what it needs and what you have on hand. Station-bound recipes ask you to stand within 20 yards of the right station in town, field recipes craft anywhere, and Enchanting's breaking and enchanting need no station at all (only its three trainer recipes are station work, at the toolworks). There is no failure roll: a craft with the materials in hand always succeeds.\n\nTwo small frictions keep the economy honest. Every successful craft pays a fee of 2 copper per point of the item's stat budget, and every craft-family action takes real cast time (field crafts near two seconds, harder ladder crafts longer, and disenchant, enchant, salvage, and tool recharge each about a second and a half). Materials, the gold fee, stations, and skill ceilings do the rest; nothing scolds you for working too quickly.",
       "recipesHeading": "Tarifler",
       "recipesNote": "Mesleğin her tarifi: tam beceri gereksinimi ve malzemeleri, nerede ve hangi ücretle öğrenildiği ve kazanımın yarıya, çeyreğe ve sıfıra düştüğü üç beceri değeri.",
       "masteryHeading": "Beceri kazanımı",
@@ -6501,7 +6772,7 @@ export const tr_TR: EnTranslations = {
       "masterworkHeading": "Şaheserler",
       "masterworkBody": "Başarılı her üretim tam olarak tarifin vaat ettiği şeydir, bazen de biraz fazlası: bir şaheser, aynı parçayı bir kalite kademesi daha ince bitirir ve bonus istatistikler üretim anında içine işlenir. Yalnızca ekler, asla düşürmez ve akın zemininin altında kalır; böylece üretilmiş teçhizat, bir akın ganimetinin yerini almadan mükemmel olabilir.\n\nŞans yayımlanmıştır, mistik değil: {base}% temel, becerinizin tarifin üzerinde oturduğu her kademe için {perTier}%, imzalı herhangi bir bileşen girdiğinde {signed}%, uzmanlaştığınızda ise {spec}%; daha yüksek kademeli malzemeler 1 ila 2% daha ekler ve hepsi {cap}% ile sınırlıdır. Yalnızca gerçek istatistiği olan bir parça iyileşebilir, dolayısıyla istatistiksiz sıradanlar, aletler ve tüketim maddeleri asla tetiklenmez; uykudaki bir zanaat hiç şaheser üretmez ve bir hobi zanaatı nadir tavanının ötesinde şaheser çıkaramaz.\n\nİyi iş, ustasını taşır. Nadir ve üzeri çıktılar imzalıdır, hem de her kopyası: üzerinde hazırlayanın adı yazar, toplanan malzemeler ise toplayanın adını taşır; bir şaheser ise kalitesi ne olursa olsun her zaman imzalıdır. İmza bir kökendir, bir kilit değil: imzalı mallar serbestçe takas edilir, postalanır ve Dünya Pazarı'nda ilan edilir.",
       "trainingHeading": "Eğitim",
-      "trainingBody": "Eğitmen tarifleri yerleşik ustalardan gelir ve kendi istasyonlarında öğretilir. Kural tek satırdır: bir usta, zanaattaki kademeniz tarifin kendi kademesine ulaştığında o tarifi öğretir ve başka hiçbir şey buna kapı koymaz, ne seviyeniz ne de arketipiniz. Teçhizat ve tüketim merdivenleri basamaklarını beceri 0, 25 ve 50'de işletir; Mühendislik'in iki olta dersi merdiveni 75 ve 125'te sürdürür ve Büyüleme'nin iki tılsım tarifi 25 basamağında oturur, böylece kademeleriniz tırmandıkça yeni bir basamak açılır.\n\nÜcretler tek seferliktir ve basamağa göre sabittir: başlangıç basamağı ücretsizdir, beceri 25 basamağı tarif başına {tier1}, beceri 50 basamağı {tier2} tutar; üzerlerindeki olta dersleri ise tabloda her tarifin yanında listelenen kendi ücretlerini taşır. Eğitim almak için ustanın gerçek istasyonunda durmanız gerekir, mobil istasyon asla sayılmaz. Sıradan alan tarifleri ile altı üretilebilir kara aleti tarifi hiç eğitim gerektirmez; her karakter onları başından beri bilir.",
+      "trainingBody": "Trainer recipes come from the resident masters, taught at their stations. The rule is one line: a master teaches a recipe once your tier in the craft has reached the recipe's own tier, and nothing else gates it, not your level, not your archetype. The gear and consumable ladders run their rungs at skill 0, 25, and 50, and every craft adds one 75-rung intermediate above them, taught at its station (Enchanting's is the Lucent Reagent, beside its two charm recipes on the 25 rung); Engineering's two rod lessons continue its ladder at 75 and 125, so a fresh rung opens as your tiers climb.\n\nFees are one-time and flat by rung: the starting rung is free, the skill 25 rung costs {tier1} a recipe, the skill 50 rung {tier2}, and the 75 and 125 rungs above them carry their own fees, listed beside each recipe in the table. You must stand at the master's actual station to train, and a mobile station never counts. The common field recipes and the six crafted land-tool recipes need no training at all; every character knows them from the start.",
       "specializationHeading": "Uzmanlaşma",
       "specializationBody": "Bu zanaat {at} becerisinde seni uzmanlaştırır, görev gerekmez: tarifler o andan itibaren {pct}% daha az malzeme gerektirir ve uzmanlaşma şaheser şansına kendi artışını ekler.\n\nUzmanlar aynı zamanda atölyeyi yanlarında taşımayı öğrenir: uzmanlaşmış bir üretici bir seferde on dakikalığına sahaya mobil bir istasyon kurabilir; böylece istasyona bağlı tarifler kasabaya dönmek yerine maden ağzında çalışılabilir. Sınırları kasıtlıdır: bir usta yanında eğitim için veya sipariş edilmiş bir parçayı serbest bırakmak için hiçbir zaman geçerli sayılmaz ve zamanlayıcısında kullandığına bakılmaksızın sona erer.",
       "ench": {
@@ -6521,12 +6792,15 @@ export const tr_TR: EnTranslations = {
         "tier": {
           "base": "Temel",
           "runed": "Runlu",
-          "greater": "Daha İyi"
+          "greater": "Daha İyi",
+          "lucent": "Lucent"
         },
+        "perfectedOnly": "Perfected only",
         "salvageHeading": "Hurda toplama",
         "salvageNote": "Hurda toplama, büyü bozumunun herkese açık kuzenidir: aynı silahlar ve zırhlar, beceri gerekmez ve kazanılmaz, bunun yerine arkanik bir şey değil kaliteye göre düz zanaat hurdası döner. Herkes yapabilir, büyücü olup olmak fark etmez. Bozulmaya değer bir parça tuttuğunuzda seçim basittir: nadir ve üzeri için büyü bozumu kesinlikle daha iyi bir anlaşmadır; sıradan kalitede ise ikisinin de satıcıya verdiği değer yaklaşık aynıdır, dolayısıyla gerçekten hangi malzemeye ihtiyacınız varsa onu gözetecek şekilde bozun.",
         "bonusFmt": "+{value} {stat}",
-        "enchantsNoteOffhand": "Büyüler üç kademede gelir. Temel kademe Çan Tozu ile çalışır (üst uçta biraz da Öz ister) ve silah yuvasını, yardımcı eli ve her zırh yuvasını kapsar; istatistik eksenlerinde her yapının her yuva için bir şey bulacağı kadar seçenek vardır: kalkanlar ve tutulan büyücü yardımcı el eşyaları kendilerine ait bir Dayanıklılık büyüsü alır, bu yüzden hiçbir kuşanılmış yuva büyüsüz kalmaz. Daha İyi kademe bir Çan Kırığı artı Öz'e mal olur: en yüksek etkili yuvalarda daha güçlü bonuslar. Kırıklar bunun ötesinde iki rezerv daha besler, beşer taneden iki tılsım tarifi ve alet etkisi yeniden dolumlarının en üst basamağı; bu yüzden harcamadan önce birkaç tane biriktirin.\n\nİkisinin arasında beş Runlu büyü durur, her yazılan ikincil için bir tüketici; böylece öğüttüğünüz hiçbir şey çıkmaz sokak olmaz: Runlu Ağız (silah, Güç, Rezonant Çelik tüketir), Runlu Mühür (silah, Zeka, Rezonant Kereste), Runlu Doku (göğüslük, Ruh, Rezonant İplik), Runlu Post (bacaklar, Çeviklik, Rezonant Deri) ve Runlu Halkalar (miğfer, Dayanıklılık, Rezonant Halkalar). Her biri ayrıca iki Çan Özü ister; bir yuva ile istatistiğin hem temel hem Daha İyi büyüsünün bulunduğu yerde Runlu bonus tam ikisinin arasına düşer, buna karşılık Runlu Doku açık ara en güçlü göğüslük Ruh büyüsüdür ve Runlu Post bacaklar için var olan tek Çeviklik büyüsüdür. Kesin bonusların hepsi aşağıdaki tabloda.",
+        "enchantsNoteOffhand": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected, and no piece can be yet: it is authored ahead of the Perfecting work it waits on.",
+        "enchantsNoteInfusionLive": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected: Perfecting is the wearer's own work, not the enchanter's, and the Professions page tells how a piece earns it.",
         "charmsHeading": "Toplayıcı aletleri için tılsımlar",
         "charmsBody": "Büyüleme aynı zamanda bir toplayıcının tılsımlarının da kaynağıdır. Büyülemeniz 25'e ulaştığında Tamirci Gizzel, Doğudere'deki alet atölyesinde ikisini de öğretir: bir hasada bir birim ekleyen Toplayıcının Zulası'nı ve çıkanın derecesini yükselten Zanaatkârın Gözü'nü. Her biri bir kez üretilir, sonra bir kazmaya, baltaya ya da orağa takılır; orada yalnızca gerçekten iyileştirdiği hasatlarda bir şarj harcar.\n\nZanaatın kazanmaya devam ettiği yer yeniden doldurmadır. Şarjlar, ziyaret eden bir büyücü tarafından değil, aletin sahibi tarafından geri kazandırılır, ve o sahip tılsımı imzalayan büyücüyse yeniden doldurma malzemelerin yarısına mal olur, Büyülemede uzmanlaşmışsa daha da ucuza. Yani tezgahtan satılan bir tılsım tek bir satıştır, kendi aletlerinizde taşıdığınız tılsımlar ise çalıştırmaya devam etmesi ucuz olanlardır. Tam şarj ve malzeme merdiveni, herhangi bir toplama mesleği sayfasında, Alet etkileri başlığı altındadır."
       },
@@ -6534,7 +6808,8 @@ export const tr_TR: EnTranslations = {
         "mining": "Madencilik cevheri doğrudan dünyanın kayasından söker: Doğudere Vadisi'nde bakır, Mirefen Bataklığı'nda demir ve yukarıda Dikenzirve Tepeleri'nde osmiyum; bunların ötesindeki her genç bölgeye de başlangıç damarları serpiştirilmiştir ve hepsi ocak zanaatlarını besler. 1. seviyeden itibaren herkese açıktır: Doğudere, Fenbridge ya da Highwatch tezgahından alınan 20 bakırlık bir madenci kazması her başlangıç damarını açar, kazma merdiveninin üst basamakları ise kendi sayacınız onları hak ettikçe uyanır. 100 tavanına kadar kendi sayacında izlenir.",
         "logging": "Odun Kesimi tüm dünyaya yayılmış ağaç kümelerinden kereste devirir: Doğudere Vadisi'nde demirkabuk, Mirefen Bataklığı'nda kül ağacı, Dikenzirve Tepeleri'nde yüksekçam ve her genç bölgede başlangıç kümeleri; saplar, asalar ve mühendisin tezgahı için ham stok. Çantanızda bir oduncu baltası varsa 1. seviyeden itibaren herkese açıktır (Doğudere, Fenbridge ve Highwatch tezgahlarında 20 bakır) ve 100 tavanına kadar kendi sayacında izlenir.",
         "herbalism": "Bitkicilik yabanda yetişeni toplar: Doğudere Vadisi'nde parlakyaprak, Mirefen Bataklığı'nda altın yaprak, Dikenzirve Tepeleri'nde güneşyaprağı ve her genç bölgede başlangıç öbekleri; eczacılık mesleklerinin kazanını kaynatan yaprak ve sap. Çantanızda bir bitkicilik orağı varsa 1. seviyeden itibaren herkese açıktır (Doğudere, Fenbridge ve Highwatch tezgahlarında 20 bakır) ve 100 tavanına kadar kendi sayacında izlenir.",
-        "fishing": "Balıkçılık, toplama meslekleri arasında kuralın dışında kalanı ve en derinidir: gerçek bir ısır-ve-çek mini oyunu, üç ana bölgenin her birinde kendine ait av tabloları (bunların ötesindeki genç sular şimdilik hep Vadi'nin tablosunu sunar) ve diğerlerinin iki katı olan 200'lük bir yetkinlik tavanı. Bir olta alın, açık suya dönün ve oltayı atın."
+        "fishing": "Balıkçılık, toplama meslekleri arasında kuralın dışında kalanı ve en derinidir: gerçek bir ısır-ve-çek mini oyunu, üç ana bölgenin her birinde kendine ait av tabloları (bunların ötesindeki genç sular şimdilik hep Vadi'nin tablosunu sunar) ve diğerlerinin iki katı olan 200'lük bir yetkinlik tavanı. Bir olta alın, açık suya dönün ve oltayı atın.",
+        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked garden beds, growing on their own clock whether you stay or go, and pulled up ripe whenever you come back, because nothing in a bed ever spoils. A farmer stands beside every bed site, from the Eastbrook allotments through Fenbridge and Highwatch to the Evergarden parterre, and Farmer Jessica in Eastbrook is where the trade starts: she sells the garden hoe and the first seeds, and her errand walks a new farmer through a first crop. Each rung of the ladder grows its own crops, two on the lower rungs and four on the upper ones, each with a finer grade for a practiced hand to pull, and engineers craft the hoes for the tougher ground above the starter beds. Tracked on its own counter to a cap of 100."
       },
       "rhythmHeading": "Toplama ritmi",
       "rhythmBody": "Bir hasat, anında bir kapış değil kısa ve görünür bir toplama yayıdır: temelde {base} saniye, asla {floor} saniyelik tabanın altına inmez. Düğümün kademesinin üzerinde, yetkinliğinizin kullanmanıza izin verdiği bir alet taşımak sizi üstündeki her kademe için {tool} saniye hızlandırır ve geçtiğiniz her yetkinlik bandı {band} saniye daha kırpar; düğümün kademesini yalnızca tutturmak sizi kapıdan içeri sokar, hızlı yapan ise onun üzerindeki kademelerdir.\n\nDolu bir çanta, toplama yayını daha başlamadan kibarca reddeder, böylece darbenin ortasında hiçbir şey ziyan olmaz; ayrıca her hasat küçük bir dilim karakter XP'si öder, tıpkı öldürme XP'sinin ölçeklendiği gibi düğümün seviyesi sizinkine göre ölçeklenir: önemsiz, gri bir düğüm tavana ulaşmış bir karaktere hiçbir şey öğretmez.",
@@ -6542,7 +6817,7 @@ export const tr_TR: EnTranslations = {
       "nodesHeading": "Bölgeye göre düğümler",
       "nodesNote": "Düğümlerin nerede olduğu, kademeleri, hangi aleti gerektirdikleri ve ne verdikleri. Her düğüm, kendi hasatının {respawn} saniye sonra senin için yeniden oluşur; bu zamanlayıcı yalnızca senindir: aynı düğümde çalışan başka bir toplayıcı seni asla geciktirmez, bu yüzden düğüm yarışması ve bekleme yoktur. Merdivende yukarı çıkan her bölge, daha sert araziden daha iyi malzeme çıkarır.",
       "toolsHeading": "Aletler",
-      "toolsNote": "Her düğüm, mesleğinin aletini çantanızda ister, kademe 1 dahil: kazma yoksa cevher de yok, olta yoksa balık da yok. Satıcı merdiveni üç ana kasaba merkezinde kademe 1'den 3'e kadar uzanır: kademe 1 alet üçünde birden satılır, üzerindeki basamaklar ise onları kullanan arazinin başladığı yerde (Fenbridge kademe 2'yi, Highwatch kademe 3'ü ekler); bunların ötesindeki genç yerleşimlerde hiç alet bulunmaz, o yüzden yola çıkmadan önce donanın. Her tezgah, stokladığı her basamağı serbestçe satar ve her alet doğrudan takasla el değiştirebilir; üç adet 20 bakırlık kara başlangıç aleti dışında her basamak Pazar'a da ilan edilir ve postayla yolculuk eder: bu üçü bir tezgahtan alınır ya da elden ele geçer, asla geri satılmaz, postalanmaz veya ilan edilmez. Kapıya konan şey, aleti kullanabilmektir. Kademe 1'in üzerindeki bir kara aleti ancak kendi mesleğindeki yetkinliğiniz onu hak ettiğinde çalışır: kademe 2 için {tier2Prof}, kademe 3 için {tier3Prof} ve iki üretilebilir basamak için 85 ile 100; satıcı satırı, ipucu balonu ve aşağıdaki tablo bu şartı baştan söyler. O ana kadar önden alınmış bir alet çantanızda öylece bekler, hiçbir arazi açmaz, hız satın almaz ve ince kalite basmaz, sonra sayacınız kendi sayısına dokunduğu an kullanılabilir hale gelir. Oltalar tek istisnadır: hiçbir olta kullanım şartı taşımaz ve Doğudere'deki Tüccar Wilkes, önden alışveriş yapan balıkçılar için kademe 2 ve kademe 3 oltalarını bilerek stoklar. Bir alet asla kuşanma yuvası kaplamaz ve asla yıpranmaz, dolayısıyla her biri tek seferlik bir alımdır; kapı için de yalnızca kademe önemlidir: aynı kademenin daha nadir bir aleti fazladan hiçbir şey açmaz. Yine de nadirlik sadece renkten ibaret değildir. Yuvalı bir alet etkisinin daha uzun sürmesini sağlar, oltada ise çekme penceresini genişletir.\n\nDaha iyi bir alet iki değil üç şey satın alır. Daha yüksek kademeli araziyi açar, toplama yayını kısaltır ve çıkanı iyileştirir: bir damarı, bölgenin kendi malzemesinin ÜZERİNDE derecelendirilmiş bir aletle işleyin, hasat sade olan yerine onun ince kalitesini verir. Damarın, bölgenin tam kaliteli damarlarından biri olması gerekir; yani bir bölgenin gezginler için tuttuğu kolay damarlar yine sıradan malzeme verir. Üretilebilir alet tarifleri ince malzemeleri tüketir ve bir tarif ya da iş emri sıradan bir malzeme istediği her yerde ince kalite onun yerine sayılır, dolayısıyla yükseltmek sizi asla açıkta bırakmaz: sadece bakır cevherinizin İnce Bakır Cevheri olarak gelmesi demektir.\n\nSatıcı merdiveninin üzerinde her mesleğin iki üretilebilir aleti vardır, kademe 4 ve kademe 5; bunlar alet atölyesinde yapılır (kara tariflerini her karakter bilir; iş için tırmanan beceri Mühendislik'inkidir) ya da temizleme kapıları karşılandığında Boğulmuş Litanya tezgahından Mağara Nişanı ile alınır: aşağıdaki tablo Nişan fiyatını ve her basamağın istediği temizleme sayısını taşır. Hiçbir tüccar bunları sikke karşılığı satmaz. Balıkçılığın kendi çifti vardır ve bunlar başından bilinmek yerine alet yapımcısından öğrenilir. Bugün hiçbir düğüm ve hiçbir su kademe 3'ten fazlasını istemez, dolayısıyla en üstteki iki basamak erişim yerine hız, kalite ve daha müşfik bir çekme penceresi satın alır; daha yüksek kademeli arazi geldiğinde ise giriş bileti onlar olacak.",
+      "toolsNoteFishingPageMarks": "Every node needs its trade's tool in your bags, tier 1 included: no pick, no ore, and no pole, no fish. The vendor ladder covers tiers 1 to 3 across the three heartland hubs: the tier-1 tool is sold at all three, the rungs above it where the ground that uses them begins (Fenbridge adds tier 2, Highwatch tier 3), and the younger settlements beyond them stock no tools at all, so kit up before you travel. Farming buys elsewhere: its tier-1 hoe is stocked by the farmer who keeps the first allotment (she stands at the Eastbrook allotments, not at any tool counter), and no hoe rung above it is sold for coin anywhere. Every counter sells every rung it stocks freely, and any tool passes by direct trade; every rung also lists on the Market and travels by mail except the four 20-copper land starters (the Copper Mining Pick, the Handaxe, the Gathering Sickle and the Garden Hoe): those are bought at a counter or passed hand to hand, and never sold back, mailed, or listed. What is gated is the wielding. A land tool above tier 1 works only once your proficiency in its own trade has earned it, {tier2Prof} for tier 2, {tier3Prof} for tier 3, and 85 for tier 4 and 100 for tier 5, and the vendor row, the tooltip, and the table below all name the requirement up front. Until then a tool bought ahead simply waits in your bags, opening no ground, buying no speed, and minting no fine grades, then wields the moment your counter touches its number. Fishing rods are the one exception: no rod carries a wield requirement, and Trader Wilkes in Eastbrook deliberately stocks the tier 2 and tier 3 rods for anglers buying ahead. A tool never occupies an equip slot and never wears out, so each is a one-time purchase, and only the tier matters to the gate: a rarer tool of the same tier opens nothing extra. Rarity is not only colour, though. It makes a slotted tool effect last longer, and on a rod it widens the reel window.\n\nA better tool buys three things, not two. It opens higher-tier ground, it shortens the cast, and it improves what comes out: work a vein with a tool ranked ABOVE the zone's own material and the harvest yields the fine grade of it instead of the plain one. The vein has to be one of the zone's full-grade ones, so the easier veins a zone keeps for travellers still yield the ordinary material. Fine materials are what the crafted tool recipes consume, and a fine grade counts as its ordinary version anywhere a recipe or a work order asks for one, so upgrading never strands you: it just means your copper ore arrives as Fine Copper Ore.\n\nAbove the vendor ladder the three node trades each have two crafted tools, tier 4 and tier 5, made at the toolworks (every character knows those two recipes; the skill that climbs for the work is Engineering's), or bought with Delve Marks at the Drowned Litany counter once its clears gates are met: the table below carries the Marks price and the clears each rung asks. No merchant ever sells them for coin. Farming's ladder is the long one: every hoe above the 20-copper starter is crafted, tiers 2 through 5, all four taught by the toolmaker rather than known from the start, and the top two rungs are also stocked at that same Marks counter. Fishing has three of its own, and they are learned rather than known from the start too: the toolmaker teaches the tier 4 Stormreel and the tier 5 Tidewrought, and the tier 6 Clockreel is built from a schematic instead; the Stormreel and the Tidewrought are also stocked at that same Marks counter, behind the same clears gates as the node tools of their tier, and the fishing page's tool table carries their Marks prices. Rods are the one ladder whose top rungs buy ACCESS on the water: every one of the three opens a catch band that skill alone can never reach, so a better rod is not comfort. For the three node trades no node today needs more than tier 3, so their tier 4 and tier 5 tools still buy speed and grade rather than access, and they will be the entry ticket when higher-tier ground arrives. Farming sits between the two: planting is what needs the hoe, so a bed of tier N asks a hoe of tier N right up to the fourth and last crop tier, and only the fifth rung opens no new ground.",
       "toolCrafted": "Üretilmiş ({craft})",
       "toolCraftedOrMarks": "Üretilmiş ({craft}) ya da üç Boğulmuş Litanya temizlemesinden sonra {marks} Mağara Nişanı",
       "toolCraftedOrMarksHeroic": "Üretilmiş ({craft}) ya da bir Kahramanca Boğulmuş Litanya temizlemesinden sonra {marks} Mağara Nişanı",
@@ -6555,38 +6830,55 @@ export const tr_TR: EnTranslations = {
       "yieldsHeading": "Hasat ne verir",
       "yieldsBody": "Her hasat, verdiği şeyin kalitesini çalar ve yetkinliğin tüm hikayesidir bu. Yeni başlayan bir toplayıcı her zaman yaygın malzeme çıkarır; her beceri puanı ağırlığı istikrarlı bir şekilde yaygından daha yüksek kademelere taşır ve asla geri dönmez; 100 tavanında yaygın kademe tamamen ortadan kalkar: her seferinde yüzde 60 nadir dışı, yüzde 30 nadir, yüzde 8 epik ve yüzde 2 efsanevi.\n\nKalite aynı zamanda miktar anlamına da gelir: yaygın çekim 1 birim, nadir dışı ve nadir 2, epik 3 ve efsanevi 4 verir. Nadir, epik veya efsanevi her çekim, tarafından toplandı olarak damgalanmış imzalı bir örnek olarak gelir: tavanda on hasattan dördü adını taşır ve Zanaat Ekonomisi sayfasındaki provenance kuralları, üreticilerin tam olarak bu yığınlar için neden fazladan ödediğini açıklar.",
       "bandsHeading": "Yetkinlik bantları",
-      "bandsBody": "Yetkinlik bantları, bir mesleğin sayacı üzerine serilen ortak 0/100/200 merdivenidir. Kara meslekleri için 100'de geçilen bant toplama yayını kısaltır ve tavanları bant 1'i sınır yapar. Balıkçılığın bantları hiçbir şeyi kısaltmaz: av tablolarını seçerler (eşleşen bir oltayla birlikte), bant 2'ye yalnızca balıkçılık ulaşır ve bir oltacıyı daha derin sulara çeken şey tırmanışın kendisidir; daha iyi tablolar da, sonraki dersler de orada yaşar.",
+      "bandsBodySplitLadder": "Proficiency bands are the shared 0/100/200 ladder over a land trade's counter: the band crossed at 100 shaves the gather cast, and the land cap makes band 1 the ceiling. Fishing keeps a ladder of its own, six rungs at 0, 100, 150 and then three more at 200. Its bands shave nothing; they select the catch tables, each with a rod to match. After that third rung the gate moves once more, to the 200 cap, and then stops: from the cap on, the rod alone decides how far the table goes. The climb is what pulls an angler to deeper water, where the better tables and the further lessons both live.",
       "bandFmt": "Bant {band}: {at} yetkinlikten itibaren",
       "rareHeading": "Nadir bulgular",
       "rareBody": "Her hasat, yetkinliğiniz ne olursa olsun {oneIn} ihtimalinden 1'i nadir bir bulgu şansı taşır: cevherde bozulmamış bir damar, kerestede antik kalp odunu, otlar arasında mehtaplı bir çiçek. Bulgu o hasatın verimini {mult} kat çarpar, her birim kalitesi ne olursa olsun adınızla imzalı olarak gelir ve tüm bölge bunu adıyla duyar. Her çeşit aynı zamanda Yiğitlikler Kitabınızda sıfır Ün'lü kendi koleksiyoncu işaretini yazar; yalnızca sizde gerçekleştiğini kanıtlamak için var olan bir işaret.",
+      "rareBodyFourFlavors": "Every harvest, whatever your skill, carries a 1 in {oneIn} chance of a rare find: a pristine vein in ore, ancient heartwood in timber, a moonlit bloom among the herbs, a golden harvest from a garden bed. The find multiplies that harvest's yield {mult} times over, every unit arrives signed with your name regardless of the quality rolled, and the whole zone hears about it by name. Each flavor also inscribes its own zero-Renown deed in your Book of Deeds, a collector's mark that exists purely to prove it happened to you.",
       "specimenBody": "Toplayıcılık yaparken çantanızda biraz yer boş bırakın: imzalı bir talih vurgunu, inecek kendi yerini ya da eşleşen imzalı bir yığın ister; hiçbiri sığmazsa verim yine gelir ama imza kaybolur. Ceset hasatının da kendi ikramiye kolu vardır: hasat edilen her bileşenin yaklaşık {pct}%'i nadir veya üzeri çıkar. Verecek mükemmel bir numunesi olan bir aile (post, ipek, zehir, et) sıradan verimini sade tutar ve imzalı numuneyi onun yanında basar; diğer her aile verimin kendisini imzalar.",
       "gatherDeedsHeading": "Yolda kazanılan yiğitlikler",
       "gatherDeeds": {
         "mining": "Herhangi bir mesleğin ilk düğümü Toprağın Meyvelerini kazandırır ve Madencilikteki 100 tavanı Kanında Maden'i yazar. Madencilik, Odun Kesimi, Otçuluk ve Balık Tutma'nın herhangi üçünde 100'e ulaşmak 25 Ün'de Usta Toplayıcı'yı ekler; bozulmamış bir damarı kırmak kendi koleksiyoncu işaretini kaydeder. Bunların hiçbiri güç vermez: yiğitlikler unvanlar ve Ün'dür, yürüdüğün yolların bir kaydıdır.",
         "logging": "Herhangi bir mesleğin ilk düğümü Toprağın Meyvelerini kazandırır ve Odun Kesimindeki 100 tavanı Kalp Odunu Yontucusu'nu yazar. Madencilik, Odun Kesimi, Otçuluk ve Balık Tutma'nın herhangi üçünde 100'e ulaşmak 25 Ün'de Usta Toplayıcı'yı ekler; antik bir kalp odunu darbesi kendi koleksiyoncu işaretini kaydeder. Yiğitlikler yalnızca unvanlar ve Ün'dür, asla güç değil.",
         "herbalism": "Herhangi bir mesleğin ilk düğümü Toprağın Meyvelerini kazandırır ve Otçuluktaki 100 tavanı Çayır Ustası'nı yazar. Madencilik, Odun Kesimi, Otçuluk ve Balık Tutma'nın herhangi üçünde 100'e ulaşmak 25 Ün'de Usta Toplayıcı'yı ekler; mehtaplı bir çiçek kendi koleksiyoncu işaretini kaydeder. Yiğitlikler yalnızca unvanlar ve Ün'dür, asla güç değil.",
-        "fishing": "100 kilometre taşı Eski Denizci'yi, 200 ise balıkçılık sanatının en tepesi olan Usta Balıkçı'yı kendi unvanıyla birlikte yazar; Balıkçılık ayrıca herhangi üç toplama mesleğinde 100'e ulaşınca kazanılan Usta Toplayıcı'ya da sayılır. Altı bölgenin sularından yakalanan ilk balık kendi sayfasını doldurur: üç ana bölge ile onların ötesindeki Söğüt Bataklığı, Fırtına Sırtı ve Uzak Kıyı; Günışıltısı Sazan ise Umut Işıltısı'nı kaydeder, bu yüzden çantasında olta taşıyan gezginler kitaplarını umduklarından daha hızlı doldurur."
+        "fishing": "100 kilometre taşı Eski Denizci'yi, 200 ise balıkçılık sanatının en tepesi olan Usta Balıkçı'yı kendi unvanıyla birlikte yazar; Balıkçılık ayrıca herhangi üç toplama mesleğinde 100'e ulaşınca kazanılan Usta Toplayıcı'ya da sayılır. Altı bölgenin sularından yakalanan ilk balık kendi sayfasını doldurur: üç ana bölge ile onların ötesindeki Söğüt Bataklığı, Fırtına Sırtı ve Uzak Kıyı; Günışıltısı Sazan ise Umut Işıltısı'nı kaydeder, bu yüzden çantasında olta taşıyan gezginler kitaplarını umduklarından daha hızlı doldurur.",
+        "farming": "Farming keeps no deeds of its own yet: now that its beds and crops are in the ground, the milestone and cap deeds that mark the other trades arrive in a later patch. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power.",
+        "farmingSown": "Farming keeps its own shelf in the Book of Deeds now. Sow It Begins marks your first planted crop, and four chronicle pages mark a first thriving harvest at each of the bed sites, from Eastbrook Vale to the Evergarden. A golden harvest records its own zero-Renown collector's mark, and proficiency in Farming counts toward Master Gatherer, earned at 100 in any three gathering trades. Every Furrow Filled gathers the whole roster onto one page: grow every crop the four gardens carry and the collection closes. The capstone above it is Harvestmaster, the trade's 100-proficiency title, and with the mountain and parterre seeds now on their farmers' counters it is a climb you can finish today. Deeds are titles and Renown only, never power."
       },
       "fish": {
         "startHeading": "Başlangıç",
-        "startBody": "Basit Olta, Doğudere'deki Balıkçı Brandt'ten 20 bakıra alınır (Eski Denizci'yi kasabanın doğu ucunda, Ayna Gölü'ne giden yolun kenarında arayın); Tamirci Gizzel, Fenbridge'deki Levazımcı Hale ve Highwatch'taki Donatım Subayı Bree de olta bulundurur. Oltayı, balık tutacak kadar derin bir suya dönükken, önünüzde yaklaşık 24 yardaya kadar kullanın; şamandıranız süzülüp gider.\n\nDövüşteyken, yüzerken ya da ölüyken olta atamazsınız: amaçlanan duruş kıyıdan atmaktır. Ne var ki sular da kara gibi sertleşir: bataklık en az kademe 2 Demir Makaralı Olta'yı, zirveler ise kademe 3 Gümüş Dere Oltası'nı ister ve o suyun istediği olta olmadan atılan misina elinizden hiç çıkmaz. Bunların üzerinde iki olta daha durur, Fırtına Makarası ve Gelgit Dövmesi: mühendisler bunları alet atölyesinde, misinanın sudan çıkardıklarıyla üretir; Boğulmuş Litanya'nın sefer tezgahı da temizleme kapılarının ardında Mağara Nişanı karşılığında satar, ama asla sikke karşılığında değil. Hiçbir su bunları istemez, dolayısıyla erişim yerine daha kısa bir bekleyiş ve daha geniş bir çekme penceresi satın alırlar; en üst basamakta bu, tam üç saniyede gelen bir ısırık demektir.",
+        "startBodyThreeRods": "A Simple Fishing Pole costs 20 copper from Fisherman Brandt in Eastbrook (look for the Old Salt at the town's east edge, by the road to Mirror Lake); Tinker Gizzel, Provisioner Hale in Fenbridge, and Quartermaster Bree in Highwatch stock poles too. Use the pole while facing water deep enough to hold fish, up to about 24 yards ahead of you, and your bobber sails out.\n\nYou cannot cast while in combat, while swimming, or while dead: casting from shore is the intended posture. Water gets harder as the land does, though: the marsh wants at least the tier 2 Ironreel and the peaks the tier 3 Silverstream, and a line cast without the rod that water takes never leaves your hand. Three rods sit above those, the Stormreel, the Tidewrought and the Clockreel: engineers craft all three at the toolworks out of what a line pulls up, and the Drowned Litany's delve counter sells the first two for Delve Marks behind its clears gates, though never for coin. No water asks for any of them, but they are not comfort alone: each one opens a catch band that skill by itself cannot reach, so once your counter is capped the rod is the only thing left that decides how deep your table goes. They shorten the wait and widen the reel window besides, which at the top rung means a bite in a flat three seconds.",
         "biteHeading": "Isırma ve çekme",
         "biteBody": "Oltayı attıktan sonra ısırık, {min} ile {max} saniye arasında gizli bir anda gelir; gecikme misina suya değdiğinde belirlenir, bu yüzden hiçbir atış bir diğerine tam olarak benzemez. Şamandıra vurduğunda, oltaya tekrar basıp çekmek için {reel} saniyelik bir pencereniz olur: bu pencerenin içinde çekerseniz av elinizde kalır, geçirirseniz balık gösterecek hiçbir şey bırakmadan kaçar. Bütün bir seans {cap} saniyeyle sınırlıdır, bu yüzden sessiz bir atış bile çabuk sonuçlanır.\n\nDaha iyi oltalar mini oyunun her iki ucunu da keskinleştirir: ilkinin üzerindeki her olta kademesi, en üst oltanın hâlihazırda sıyırdığı üç saniyelik tabanın altına asla inmeden, mümkün olan en uzun bekleyişten {rod} saniye kırpar ve çekme penceresine {reelRod} saniye ekler; böylece Demir Makaralı Olta en kötü bekleyişi 3,25 saniyelik bir pencereyle 6,5 saniyeye, Gümüş Dere Oltası ise 4'ü aşan bir pencereyle 5 saniyeye indirir, nadirliği çekme süresini kademenin tek başına ödediğinin biraz ötesine genişletir. En hızlı ısırıklar elinizde ne olursa olsun hiç değişmez ve bir oltanın sayılması için yalnızca çantanızda olması yeterlidir.",
         "earlyReelNote": "Hevesli parmaklar için bir uyarı: bir şey vurmadan önce oltaya yeniden basarsan boş misina toplarsın ve atış biter. Misina suya değdikten sonraki ilk saniye bağışlanır, dolayısıyla kazara çift basış sana hiçbir şeye mal olmaz; ondan sonrası için erken basmak boşa gitmiş bir atıştır. Sabır oyunun tamamıdır: vuruşu bekle, sonra çek.",
         "scheduleHeading": "Yetkinlik kazanımı",
-        "scheduleNote": "Balıkçılık kazanımı zar atmayan sabit bir çizelgeyi izler: yetkinlik 50'nin altında av başına tam bir puan, 100'ün altında yarım puan, 150'nin altında onda bir ve 150'den 200'e yavaş bir 0,02'lik sızıntı. O son etap kasten binlerce avlık bir yolculuktur: 200 bir beyandır, başka bir şeye giderken uğranan bir durak değil.\n\nDöküntü, {cutoff} değerinde tamamen öğretmeyi bırakır: oradan sonra yosunlar ve çizmeler sadece yosun ve çizmedir. Suyun kendisi de dersi sınırlar: Vadi'nin kademe 1 suları (ve ana bölgelerin ötesindeki her genç kıyı) 100'ün ötesinde hiçbir şey öğretmez, bataklığınkiler 150'de durur ve bir balıkçıyı 200'e kadar yalnızca Dikenzirve'ninkiler okutur. Bunun dışında karaya çıkarılan her av çizelgedeki oranda kazandırır, yani sayaç durduğunda çizelge size daha derin su aramanızı söylüyordur.",
+        "scheduleNoteRetuned": "Fishing gain follows a fixed schedule with no dice: 0.08 of a point per catch below 50 proficiency, 0.05 below 100, 0.04 below 150, and 0.03 from 150 to 200. The curve is deliberately shallow rather than back-loaded: the whole climb to 200 is about eleven hours of active fishing, and no quarter of it costs more than a third of the total, so the last fifty points are a long stretch rather than the whole journey.\n\nJunk stops teaching entirely at {cutoff}: from there on, weeds and boots are just weeds and boots. The water itself caps the lesson too: the Vale's tier 1 waters (and every young shore beyond the heartland) teach nothing past 100, the marsh's stop at 150, and only Thornpeak's school an angler the whole way to 200. Every landed catch otherwise gains at the scheduled rate, so when the counter stalls, the schedule is telling you to seek deeper water.",
         "colProficiency": "Yetkinlik",
         "colGain": "Av başına kazanım",
         "belowFmt": "{below} altında",
         "tablesHeading": "Av tabloları",
-        "tablesNote": "Yetkinliğiniz üç av bandından birini seçer: başından beri bant 0, 100'de bant 1, 200'de bant 2; her biri ağırlığı döküntüden ve boş kancalardan gerçek balığa kaydırır, bölge bölge. İlkinin üzerindeki her bant ayrıca bir olta ister: bant 1 kademe 2 Demir Makaralı Olta'yı, bant 2 kademe 3 Gümüş Dere Oltası'nı. Etkin bandınız, becerinizin kazandırdığı ile oltanızın desteklediğinin küçük olanıdır ve bu sınır sessizdir: daha zayıf bir oltayla yine avlanırsınız, sadece alt bandın tablosundan; bu yüzden beceriniz tırmanırken avlarınız yerinde sayıyorsa önce oltanıza bakın.\n\nHer bölgenin suları kendi yemeklik balık çiftini barındırır; bölge derinleştikçe daha çok iyileştirirler, hepsi aşçılık girdisidir ve misinadan çıktığı ham haliyle oturup yemek için gayet uygundur. Tablonun geri kalanı balıkçının vergisidir: yosun, arada bir çizme ve hiçbir zaman tamamen kaybolmayan boş kanca. Ne kadar ödeyeceğiniz, nerede durduğunuza değil şamandıranızın düştüğü suya bağlıdır: bir atış 24 yardaya kadar uzanır ve suyun istediği olta, çektiği tablo, kazandırdığı yiğitlik ve nereye kadar öğrettiği, misina suya değdiği anda belirlenmek üzere o suyun ait olduğu bölgeye bakar. Her bölgenin suyu kendine ait bir bant için yazılmıştır, Vadi bant 0 için, bataklık bant 1 için, zirveler bant 2 için; bunun bir bant altında balık tutmak atışlarınızın kabaca üçte birini boş kancaya çevirir, iki bant altında yarısından fazlasını. Olta sizi suya götürür; onu kazançlı kılan beceridir ve balıkçıyı derine çeken de bu tırmanıştır, çünkü daha iyi bantlar sadece daha iyi kazanç değildir: Vadi'nin ötesinde öğretmeye devam eden tek sular onlardır. {rare} ise yalnızca av bandınıza yanıt veren, başka hiçbir şeye bakmayan tek satırdır: her bölgede aynı olasılık ve bant 2'de bant 0'a göre altı kat daha muhtemel; yani iskeledeki en nadir şey, bir Usta Balıkçı'nın gerçekten daha iyi olduğu şeydir.",
+        "tablesNoteSixBands": "Your proficiency selects one of six catch bands: band 0 from the start, band 1 at 100, band 2 at 150, and the top three all at 200, each shifting weight out of junk and empty hooks into real fish, zone by zone. Each band above the first also demands a rod, one tier higher every time: band 1 wants the tier 2 Ironreel, band 2 the tier 3 Silverstream, band 3 the tier 4 Stormreel, band 4 the tier 5 Tidewrought, and band 5 the tier 6 Clockreel. Band 2 opens at 150 and the last three all wait for the 200 cap, so the skill gate moves once more and then stops: from the cap on, the rod is the only thing that lifts your table, which is what the crafted rods are for and where the three deep-water catches live. Your effective band is the lower of what your skill has earned and what your rod supports, and the cap is silent: with a lesser rod you still catch, just off the lower band's table, so if your catches feel stuck while your skill climbs, check your rod first.\n\nEach zone's waters hold their own pair of cooking catches, higher-tier fish the deeper the zone, all of them kitchen reagents that must be cooked before they restore anything; from band 3 up, three more join every zone's table at the same weight, so a recipe naming one of those asks the same of an angler wherever they fish. The rest of the table is the angler's tax: weed, the occasional boot, and the empty hook, which never fully disappears. How much you pay depends on the water your bobber lands in, not where you stand: a cast reaches up to 24 yards, and the rod the water demands, the table it draws from, the deed it credits, and how far it teaches all answer to the zone that water belongs to, decided the moment the line lands. Each zone's water is written for a band of its own, the Vale for band 0, the marsh for band 1, the peaks for band 2, and fishing one band under that turns roughly a third of your casts into empty hooks, two bands under it more than half. The rod gets you to the water; the skill is what makes it pay, and the climb is what pulls an angler deeper, because better bands are not just better pay: past the Vale they are the only waters that keep teaching. The {rare} is the one row that answers to your catch band and nothing else: the same odds in every zone, and six times likelier at band 2 than at band 0, so the rarest thing on the dock is the one a Master Angler really is better at.",
         "bandHeading": "Bant {band}: {at} ve üzeri yetkinlik, {rod}. kademe olta",
         "colCatch": "Av",
         "colOdds": "Olasılık",
         "pctFmt": "{pct}%",
         "emptyHook": "Hiçbir şey ısırmıyor",
         "koiHeading": "Günışıltısı Sazan",
-        "koiBody": "Oyundaki her su kütlesi aynı ödülü saklar: Günışıltısı Sazan, misinada sıradan dışı bir parıltı, bir satıcıya 75 bakır, gururunuza ise epeyce fazlası değerinde. Olasılığı yalnızca av bandınıza yanıt verir, başka hiçbir şeye; her bölgede aynıdır: av tablosunda bant 0'da yüzde 1'lik bir satır, bant 1'de 3, bant 2'de 6; ve çekilen her atışta çekiliş yapılır, yani sazan derin tabloları hak etmiş balıkçıya gelir. Bir tane yakalamak Yiğitlikler Kitabınıza Umut Işıltısı'nı yazar, sıfır Ün'lü bir koleksiyoncu işareti. Gerçekleştiğinde kayıt bunu bilmenizi sağlar."
+        "koiBodyBandFlat": "Every body of water in the game hides the same prize: the Sunglint Koi, an uncommon gleam on the line worth 75 copper to a vendor and rather more to your pride. Its odds answer to your catch band and to nothing else, the same in every zone: a 1 percent row of the catch table at band 0, 3 at band 1, and 6 from band 2 upward, drawn on every reeled-in cast, so the koi comes to the angler who earned the deep tables. Landing one records Glimmer of Hope in your Book of Deeds, a zero-Renown collector's mark. When it happens, the log makes sure you know."
+      },
+      "farm": {
+        "rhythmHeading": "The farming rhythm",
+        "rhythmBody": "Planting is the short visible cast: {plant} seconds flat at every rung, because a hoe opens ground rather than buying speed. Pulling a ripe crop is instant. There is no cast to interrupt and no bag check to refuse it, and a bed that has come ready waits as long as you leave it, so a full pack costs a farmer nothing but the walk to empty it.\n\nWhat a harvest pays is produce and farming proficiency. Unlike a vein, it grants no character XP at all, so the beds are a trade to work rather than a way to level.",
+        "gainHeading": "What a harvest teaches",
+        "gainBody": "Gain is deterministic and keyed to your own counter rather than to the crop: {g1} proficiency a harvest below {p1}, {g2} below {p2}, {g3} below {p3}, and {g4} the rest of the way to the cap of {cap}. It is never a skill-up roll, so the climb is exactly as long as the arithmetic makes it.\n\nWhat the crop tier decides is how far a bed can carry you. A tier 1 crop teaches to {c1} and grays there, a tier 2 crop to {c2}, and tier 3 and above to the cap, so moving up the beds is what keeps the counter moving at all.",
+        "yieldsHeading": "What a harvest yields",
+        "yieldsBody": "A bed pays picks rather than a graded pull. Every plot starts with a floor of {floor} lives, and each pick rolls a chance not to spend one: {keep0} percent at a fresh counter and {keepCap} percent at the cap, which works out at roughly three and a half picks at the start and six at the end.\n\nQuality rides those same picks instead of replacing them. Each pick has a {fine0} percent chance at a fresh counter, {fineCap} percent at the cap, of coming up as the crop the bed grew in its fine grade rather than its plain one, so a fine pick upgrades a pick and never adds one. There is no common-to-legendary ladder on a bed: a crop mints its own two grades and nothing else.\n\nTwo things add picks outright, and both land at the plain grade. An alchemist's growth tonic, armed when you plant, pays {tonicPicks} more picks on a {tonicPct} percent chance, and a slotted quantity effect adds {effectCap}, which is the cap farming puts on a Maker's Charm so the tonic keeps a reason to exist. A charged Artisan's Eye works on quality instead, adding {fineBonus} percentage points to every fine roll.",
+        "bedsHeading": "Working the beds",
+        "bedsBody": "The loop is short. Buy seeds and compost from the farmer beside the beds: Jessica in Eastbrook stocks the Vale pair, the Fenbridge farmer the marsh pair, Hollis on the Highwatch terraces the mountain crops, and Verbena the Evergarden parterre. A high-tier harvest also hands back a seed or two of its own, any seed changes hands on the World Market, and the mountain and parterre seeds now turn up in endgame drops and on the Heroic Quartermaster's counter besides, so the farmer beside the beds is the way in rather than the only way. Sow with a hoe in your bags, and tip the odds if you like: compost from the counter and the farmer's watch, paid in produce as you plant, each raise a crop's chance of coming through, an alchemist's growth tonic gives the harvest a shot at a larger yield, and once your skill has climbed a full band past a crop's tier that crop never fails at all. Then walk away. The bed keeps growing while you are logged out, a ripe crop waits as long as you leave it, and the Harvest Journal (Shift+K by default, or the Farming row of your professions window) lists every bed you have planted with its timer.\n\nA crop that fails leaves withered husks in place of produce, and any farmer trades husks for compost, so a bad season buys the next one's insurance. What you bring in feeds more than your own recipes: the produce cooks into the farm dishes at the kitchens, and it now goes into Cook Marlow's own trainer ladder and into the apothecary's elixirs besides, so a farmer has a buyer from the very first rung. And the garden no longer stops at the trainer ladder: the terrace crops season the raid's own role plates and every apex flask, and the Evergarden beds feed the two skill-125 capstone stations, so the last rung of both crafts is bought from a farmer too. Marlow's wheat and rice orders take Vale Wheat and Marsh Rice off your hands for coin on the same clock as every other work order.",
+        "bedsBodyScribeBuyer": "The scribe's desk buys from the beds too: the rung-50 Sunpetal Scroll takes a Frost Gourd off the Highwatch terraces, the same gourd the Elixir of the Serpent takes, which prices the two routes to that buff even.",
+        "tableHeading": "From the beds to the table",
+        "tableBody": "The kitchens are where a season pays forward. Beyond the everyday farm dishes, each crop tier has a richer dish that leaves you Well Fed: finish the meal and a lasting boon stays with you, the kind of edge a group wants eaten before the dungeon door. Crowning the set is the Harvest Feast, a spread a cook sets out in the world itself: everyone at hand takes a serving of their own, one each, and every finished meal pays the same Well Fed boon, so one farmer's season can set the table for a whole party. The top of that ladder, the two richest dishes and the feast itself, leans on the mountain and parterre crops, whose seeds the farmers beside those beds sell. The recipes are another matter: the upper rungs of the farm ladder are no longer taught at any counter, and are found in the endgame or bought with Heroic Marks like every other endgame recipe.\n\nLuck keeps a place at that table too. Every harvest you bring in rolls the same windfall chance the other gathering trades enjoy, and now and then a crop comes up golden: the yield lands far past a normal pull, something extra comes up with it (a seed for finer ground than you are working, or now and then one of those endgame recipes), the whole zone hears the find announced by name, and Golden Harvest is recorded in your Book of Deeds.",
+        "tableBodyOneMeal": "The kitchens are where a season pays forward. Beyond the everyday farm dishes, each crop tier has a richer dish that leaves you Well Fed: finish the meal and a lasting boon stays with you, the kind of edge a group wants eaten before the dungeon door. Only one Well Fed effect at a time: a newer meal replaces it. Crowning the set is the Harvest Feast, a spread a cook sets out in the world itself: everyone at hand takes a serving of their own, one each, and every finished meal pays the same Well Fed boon, so one farmer's season can set the table for a whole party. The top of that ladder, the two richest dishes and the feast itself, leans on the mountain and parterre crops, whose seeds the farmers beside those beds sell. The recipes are another matter: the upper rungs of the farm ladder are no longer taught at any counter, and are found in the endgame or bought with Heroic Marks like every other endgame recipe. The dish ladder itself is Cooking's work: the Cooking page carries every rung.\n\nLuck keeps a place at that table too. Every harvest you bring in rolls the same windfall chance the other gathering trades enjoy, and now and then a crop comes up golden: the yield lands far past a normal pull, something extra comes up with it (a seed for finer ground than you are working, or now and then one of those endgame recipes), the whole zone hears the find announced by name, and Golden Harvest is recorded in your Book of Deeds."
       },
       "econ": {
         "title": "Zanaat Ekonomisi",
@@ -6610,7 +6902,7 @@ export const tr_TR: EnTranslations = {
         "marketHeading": "Dünya Pazarı ve komisyonu",
         "marketBody": "Dünya Pazarı, Doğudere'deki Tüccar ve Highwatch'taki Müzayedeci Voss tarafından yönetilen diyar genelindeki borsadır. İlan ücretsizdir: depozito yoktur ve satılmayan ilan size geri gelir. Ev payını yalnızca bir şey gerçekten satıldığında alır: satış fiyatının yüzde 5'i, gerisi de toplamanızı bekler.\n\nÖnemli bir sınır: Pazar yalnızca düz ürünlere aracılık eder. İmzalı, şaheser, büyülü veya bağlı bir kopya asla bir ilana dahil edilmez, bu nedenle özel parçalar yüz yüze bir ticaret penceresinde el değiştirir; bu pencere imzası dahil bir eşyanın tam kimliğini taşır. Bunları kendiniz fiyatlandırın; Pazar yalnızca düz versiyonun ne getirdiğini söyler.",
         "workOrdersHeading": "İş emirleri",
-        "workOrdersNote": "Her tezgah ustası sürekli bir iş emri verir: zanaatnın temel malzemesinden bir yığın getirin ve hemen ödeme alın, üstüne biraz görev deneyimi de. Ödeme kasıtlı olarak aynı yığın için bir satıcının vereceğinin %{pct}'si, aşağı yuvarlanmış olarak belirlenir; bu nedenle bir iş emri malzemeleri satmanın karlı yolu asla değildir, yalnızca tezgahın yanından geçmek için bir nedendir.\n\nHer emir karakter başına kendi {minutes} dakikalık saatinde çalışır: birini teslim edin ve o usta timer'ı dönene kadar sizin için başka bir şeyi yoktur. Bunları zaten topladığınız malzemelere küçük bir bonus olarak değerlendirin, bir iş olarak değil.",
+        "workOrdersNote": "Her tezgah ustası sürekli iş emirleri verir, her temel malzeme için bir tane: bir emrin istediği yığını getirin ve hemen ödeme alın, üstüne biraz görev deneyimi de. Ödeme kasıtlı olarak aynı yığın için bir satıcının vereceğinin %{pct}'si, aşağı yuvarlanmış olarak belirlenir; bu nedenle bir iş emri malzemeleri satmanın karlı yolu asla değildir, yalnızca tezgahın yanından geçmek için bir nedendir.\n\nHer emir karakter başına kendi {minutes} dakikalık saatinde çalışır: birini teslim edin ve o emir sayaç dönene kadar size kapalı kalır, ustanın diğer emirleri ise açık kalır. Bunları zaten topladığınız malzemelere küçük bir bonus olarak değerlendirin, bir iş olarak değil.",
         "colOrder": "İş emri",
         "colMaster": "Usta",
         "colAsks": "Talep fiyatı",
@@ -6618,7 +6910,7 @@ export const tr_TR: EnTranslations = {
         "commissionsHeading": "Komisyonlar ve Ustanın Bağı",
         "commissionsBody": "Komisyon, başkası için yapılan bir zanaattır. Bir silah, zırh parçası veya elde tutulan yan eşya üretirken (bir iksir bağ taşıyamaz), üretici üretimi komisyon olarak işaretleyebilir: bitmiş parça üreticinin elinde normal davranır, ancak bir ticaret el değiştirdiği anda onu alanın üstüne bağlanır. Bu Ustanın Bağı'dır: alıcı parçasını alır ve parça başkasına aktarılamaz ya da yeniden satılamaz.\n\nBağlar sonsuza kadar sürmez, sadece pahalıdır. Herhangi bir tezgah ustası, istasyonunda dururken bağlı bir parçayı bağdan kurtarır (taşınabilir bir tezgah bu hizmeti hiçbir zaman sunmaz), eşyanın kalitesine göre belirlenen bir ücret karşılığında: 25 gümüş sıradan dışı, 1 altın nadir, 4 altın destansı; bir efsanevi destansı oranını öder, komisyonlu sıradan bir parça ise sıradan dışı oranını öder.\n\nÜcret temiz bir sayfa satın alır, çözüm değil: parça hala bir komisyondur, bu nedenle bir sonraki ticarette kimin alacağına yeniden bağlanır ve imza, şaheser ile büyüler dahil her şey dokunulmadan kalır.",
         "provenanceHeading": "İmzalı işler",
-        "provenanceBody": "Bazı eşyalar bir ad taşır. Üzerine gelin; ipucu kutusu bir hammaddede filanca tarafından toplandı, bitmiş bir parçada ise filanca tarafından hazırlanmıştır der: aynı işaret, eşyanın nasıl var olduğuna göre sözcüklenmiştir. İmza eşyanın kendisinin bir parçasıdır; ticaretlerde, bankada, postada, Dünya Pazarı'nda ve hatta bir satıcıdan geri alımda bile onunla birlikte yol alır ve asla solmaz.\n\nToplama en iyi işini kendiliğinden imzalar: nadir ya da daha iyi atan her hasat imzalı gelir ve nadir bulgular beş katlık beklenmedik kazancının tamamını imzalar. Bir ceset hasadının şanslı atışı, ailenin verecek bir örneği olmadığı yerde verimi imzalar; örneği olduğu yerde ise verimi düz bırakır ve yanına imzalı bozulmamış örneği basar. Üretim de aynı çizgide imzalar: nadir ya da daha iyi bir çıktının her kopyası imzalı basılır ve bir şaheser, kalitesi ne olursa olsun her zaman imzalanır; böylece herhangi bir parçanın en iyi sürümü her zaman ustasının adını taşır. Size bir imzaya mal olabilecek tek şey dolu bir çantadır: imzalı bir birimin ineceği kendi yerine ya da eşleşen imzalı bir yığına ihtiyacı vardır.\n\nBir eşya yığını tek bir kimliği paylaşır; bu yüzden iki kopya ancak her işaret tam olarak eşleştiğinde birleşir: aynı eşya, aynı imzalayan, aynı şaheser istatistikleri, aynı büyü, aynı bağ. İmzalı bir kütük hiçbir yönde düz bir yığına katılmaz (birleşme birinin adını silerdi), ama birebir aynı içerikler seve seve birleşir; böylece aynı toplayıcının imzaladığı yirmi cevher tek bir yığında durur ve beklenmedik bir kazanç çantalarınızı param parça etmez.\n\nİmzalar ustalara geri öder: tezgahta gereken bir bileşenin imzalı herhangi bir kopyasını elde tutmak, kim imzalamış olursa olsun, şaheser şansına 2 yüzde puanı ekler; kendi elinizle imzaladığınız bir bileşeni tutmak ise o bileşenin gereken miktarını bir azaltır (asla birin altına inmez). Kendi imzalı nadir ya da daha iyi işiniz size ders vermeyi bile sürdürür, bugün yalnızca şişe üzerinden: imzaladığınız bir iksiri içtiğinizde, o iksiri karıştıran zanaat etkin ana dallarınızdan biri olduğu sürece küçük bir beceri sızıntısı o zanaata geri akar.",
+        "provenanceBody": "Some items carry a name. Hover one and the tooltip says Gathered by so-and-so on a raw material, or Crafted by so-and-so on a finished piece: the same mark, worded for how the item came to be. A signature is part of the item itself, travels with it through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fades.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. The one thing that can cost you a signature is a full bag: a signed unit needs room of its own, or a matching signed stack, to land in.\n\nA stack of items shares one identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. A signed log never joins a plain pile in either direction (merging would erase somebody's name), but identical payloads merge happily, so twenty ore signed by the same gatherer sit in one stack and a windfall does not shred your bags.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
         "collectorsHeading": "Koleksiyoncular, kupalar ve bir hikayenin bedeli",
         "collectorsBody": "Satıcılar kaynağa kördür: imzalı bir eşya NPC'ye tam fiyatına satılır. İmzanın getirdiği prim yalnızca oyuncular arasında mevcuttur; bu da onu ilginç kılan şeydir: ünlü bir toplayıcı tarafından imzalanmış bir yığın beklenmedik cevher, şanslı bir hasattan gelen Prime Cut, o zamandan beri emekli olmuş bir ustanın adını taşıyan şaheser bir bıçak, bunların hepsi birinin belleğinin değer biçtiği kadar değerlidir.\n\nDeeds Kitabı da aynı içgüdüye yaslanır: Bozulmamış Damar, Kadim Kalp Ağacı, Ay Işığı Çiçeği, Mükemmel Numune ve Umut Işıltısı, tamamen bir anın sizinle gerçekleştiğini kanıtlamak için var olan sıfır Şöhretli koleksiyoncu işaretleridir. Görevi kazandıran eşyayı elinizde tutun, elinizde makbuzu tutarsınız. Bunların hiçbiri güç değildir; köken istatistik satın almaz ve savaş kazanmaz, sadece iyi günlerin oyunun kağıt izi olur.",
         "castPaceHeading": "Okuma süresi ve altın gideri",
@@ -6637,13 +6929,31 @@ export const tr_TR: EnTranslations = {
         "orderBoardBody": "Sohbette bir üretici bulmak zorunda değilsiniz. Üretim penceresini açın, komisyon panosu başlığında tek bir tıkla uzaktadır. Herkes oraya bir sipariş verebilir: yapılmasını istediğiniz tarifi belirtin, sonra ya herhangi bir üreticinin alması için açık bırakın ya da adını verdiğiniz tek bir üreticiyi hedefleyin, ki bu durumda onu yalnızca o alabilir. Panoya bakan bir üretici bir siparişi kabul eder, ve kabul etmek onu bu işe bağlar, bu yüzden bir iş her zaman aynı anda yalnızca bir kişi tarafından yürütülür.\n\nSipariş verdiğinizde hiçbir şey alıkonmaz: bir sipariş ne para ne de malzeme ayırır, bu yüzden fiyat ve malzemeleri kimin sağlayacağı, herhangi bir komisyonun anlaşıldığı şekilde ikinizin arasında kalır. Sipariş hâlâ açıkken kendi siparişinizi iptal edebilirsiniz, ve kimsenin kabul etmediği bir sipariş bir gün sonra kendiliğinden sona erer. Bir üretici kabul ettikten sonra onu kapatan şey teslimattır.\n\nTeslimat yüz yüze gerçekleşir. Üretici parçayı bir komisyon olarak yapar, yanınıza gelir ve onu size verir, bu yüzden onu almak için bir çanta yuvası boş tutun. Gelen parça aşağıdaki olağan komisyon kurallarını izler ve Ustanın Bağı aracılığıyla size bağlanır.",
         "commissionsBoardNote": "Bir komisyona giden iki yol vardır: yukarıdaki panoya verdiğiniz ve işi bir üreticiye getiren bir sipariş, ya da bir üreticinin sizin için bir parça yapmayı kendiliğinden seçmesi. İkisi de aynı bağla sonuçlanır."
       },
+      "prov": {
+        "title": "Provisioning: from the field to the raid",
+        "intro": "The gathering lines meet in one kitchen, and the ladder above it ends at a table a whole raid eats from.",
+        "suppliersHeading": "Who feeds the kitchen",
+        "suppliersBody": "Cooking takes from nearly every gathering line, and that is deliberate: a cook who also fishes, farms, or skins is never short of something to work with, and a cook who does none of those can buy the lot on the market.\n\nWhat each line brings is listed below, and it is read straight off the live recipe list rather than written down here, so it is always what the kitchen actually asks for today.",
+        "lineCountFmt": "{count} into cooking bills",
+        "lineCorpse": "Corpse harvesting",
+        "ladderHeading": "The ladder, rung by rung",
+        "ladderBody": "Cooking climbs in the usual brackets, and every rung is listed with what it teaches. The early rungs are single dishes you eat from your bags. Higher up the kitchen starts making things for other people: plates that carry a lasting buff, and above those the feasts, which you do not eat at all but set down on the ground for everyone standing near it.",
+        "rungFmt": "Cooking {skill}",
+        "placeableTag": "(placed, not eaten)",
+        "stationTag": "(field station)",
+        "tableHeading": "The table at the top",
+        "tableBody": "A feast is set down where you stand and anyone nearby takes one serving each. What a serving gives is exactly the dish that feast is built around, so a feast never has power of its own to learn: it is a way of handing a whole group the plate you already know how to cook.\n\nThe top of the ladder is three feasts rather than one, and picking between them is the only choice there is. They cost the same, ask for the same materials, and take the same skill; each simply serves a different one of the three great plates, so a group takes the one that suits what it is about to do. Only one feast of yours can stand at a time, whichever rung it came from, and it keeps for a few minutes before it is cleared away.",
+        "marketHeading": "If you cook none of it",
+        "marketBody": "None of this is a wall for anyone who does not cook. Every material on this page is ordinary tradable goods, so a fisher sells catches, a farmer sells crops, and a raider who does neither buys a feast outright from a cook who made a spare. The kitchen is a place the professions meet, never a toll on the ones who skip it.",
+        "cookingLink": "Cooking"
+      },
       "faq": {
         "title": "Meslekler SSS",
         "intro": "Ustaların en sık sorduğu sorulara hızlı yanıtlar.",
-        "q1": "İmzalı eşyalarım neden yığın oluşturmuyor?",
-        "a1": "İmzalı eşya, örneklenmiş bir eşyadır: anonim bir kopya olmak yerine kendi küçük kaydını taşır (imzalayan, herhangi bir kalite zar atışı, şaheser istatistikleri, büyü, bağ). İki kopya yalnızca bu kayıtlar tam olarak eşleştiğinde tek yığına birleşir.\n\nPratikte: kendi topladığınız nadir cevher, daha fazla kendi topladığınız nadir cevherle yığın oluşturur, çünkü ikisi de Sizin tarafınızdan toplandı der ve başka hiçbir şey farklılık göstermez. Bir arkadaş tarafından imzalanmış aynı malzeme kendi yuvasında durur ve imzasız düz kopya asla imzalı yığına birleşmez. Çantalar, banka ve ticaret hepsi bu tek kuralı izler.",
+        "q1": "Why do my signed items not stack?",
+        "a1": "A signed item is an instanced item: it carries its own little record (the signer, any rolled quality, masterwork stats, an enchant, a bond) instead of being an anonymous copy. Two copies merge into one stack only when those records match exactly.\n\nIn practice: rare ore you gathered yourself stacks with more rare ore you gathered yourself, because both say Gathered by you and nothing else differs. The same material signed by a friend sits in its own slot, and a plain unsigned copy never merges into a signed stack. Bags, bank, trade, mail, and the World Market all follow this one rule.",
         "q2": "Sıradan tarifler becerimi sonsuza kadar yükseltir mi?",
-        "a2": "Hayır. Her tarif, o zanaat dalındaki mevcut bandınızın altında ne kadar oturduğuna göre puanlanır; klasik turuncu, sarı, yeşil, gri okuması: bandınızda veya üstündeyken tam kazanım, bir kademe altında yarı, iki kademe altında çeyrek ve üç veya daha fazla altında hiçbir şey. Bantlar her 25 beceri düzeyindedir, bu nedenle ücretsiz 0. beceri tarifleri 75. beceriden itibaren artık hiçbir şey öğretmez.\n\nSınırlar, beklediğinizden daha düşüktür: sekiz kazanılabilir zanaat her biri 125'te sınırlanır; Madencilik, Odun Kesimi ve Bitkicilik 100'de sınırlanır; Balık Tutma ise 200'de uzun koşar. Tırmanmak, en ucuz olanı sonsuzca öğütmek değil, kendi bandınızdaki tariflere geçmek demektir.",
+        "a2": "No. Every recipe is scored by how far it sits below your current bracket in that craft, the classic orange, yellow, green, gray reading: full gain at or above your bracket, half one tier below, a quarter two tiers below, and nothing three or more below. Brackets are every 25 skill, so the free skill 0 recipes stop teaching you anything at 75 skill.\n\nThe caps are also lower than the classic 300 you might expect: each of the ten earnable crafts caps at 125, Mining, Logging, and Herbalism cap at 100, and Fishing runs long at 200. Climbing means moving up to recipes at your own bracket, not grinding the cheapest one.",
         "q3": "Bir cesedi yağmalamak ile hasat etmek arasındaki fark nedir?",
         "a3": "Tek bir tuşa basmak her ikisini de kapsar. Bir cesedin tuttuğu her şey, altın ve düşen eşyaların yanı sıra hasat edilebilir bileşenler, aynı pencerede açılır: yağma normal yağma kurallarını izler ve hasat ise meslek tarafı olup malzemeleri cesetten soyar.\n\nHasat önce gelen tekil kullanımlıktır: her ceset tam olarak bir kez hasat edilebilir, çevrimiçi olup olmaksızın ilk kimin talep ettiği tarafından. Kasaba Odağınız ne aldığınızı şekillendirir: bir kasaba merkezinde dururken 10 odak puanını önem verdiğiniz bileşen türlerine dağıtabilirsiniz ve her odaklanmış bileşen daha iyi bir kademe atar (her 5 puan bir adım yükseltir, en fazla iki adım) ve daha fazla verir (puan başına yüzde 10). Odaklanmamış bileşenler asla kötüleştirilmez.",
         "q4": "Demir Ağacı Kütüğüm neden imzalı?",
@@ -6651,18 +6961,20 @@ export const tr_TR: EnTranslations = {
         "q5": "Komisyonlu bir parçayı nasıl bağdan kurtarırım ve maliyeti nedir?",
         "a5": "Parçayı çantanızda taşıyarak herhangi bir zanaat tezgahına gidin ve ustaya ödeme yapın. Ücret eşyanın kalitesini izler: sıradan dışı parça için 25 gümüş, nadir için 1 altın, destansı için 4 altın; efsanevi destansı oranını öder ve komisyonlu sıradan parça sıradan dışı oranını öder. Gerçek bir tezgah olmalıdır: taşınabilir bir tezgah bu hizmeti asla sunmaz.\n\nÜcret temiz bir sayfa satın alır, çözüm değil: parça komisyon olmaya devam eder, bu nedenle bir sonraki ticarette kimin aldığına yeniden bağlanır. Birden fazla bağlı kopya bir yığını paylaşıyorsa, ödeme başına bir kopya soyulup bağdan kurtarılır.",
         "q6": "Tarifleri nereden öğrenirim ve maliyetleri nedir?",
-        "a6": "Dokuz sıradan alan tarifi ile altı üretilebilir kara aleti tarifi herkes tarafından başından beri bilinir; istasyona bağlı üç tarif de öyle (Ocakpul Manto, Koruma Dokumalı Başlık ve Alacakaranlık Postu Sargıları), bunlar eğitmen değil yalnızca kendi istasyonlarını ister. Geri kalan her şey, üç merkez kasabaya dağılmış istasyonlarında yerleşik ustalar tarafından öğretilir: çoğu Doğudere'de durur, tabakçı Fenbridge'de tabakhaneyi tutar, simyacı da Highwatch'ta eczaneyi tutar.\n\nEğitmen tarifleri basamaklar halinde ilerler: teçhizat ve tüketim zanaatları için beceri 0, 25 ve 50; tek seferlik ücretleri sırasıyla ücretsiz, 25 gümüş ve 1 altındır; Büyüleme'nin iki tılsım tarifi 25 basamağında oturur ve alet yapımcısı iki üretilebilir oltayı 75 ve 125'te, 4 ve 16 altına öğretir. Bir usta, o zanaattaki kademeniz tarifin kendi kademe bandına ulaştığı anda tarifi öğretir ve öğrenmek için onun istasyonunda duruyor olmanız gerekir: mobil istasyon sayılmaz.",
+        "a6ThreeRods": "The nine common field recipes and the six crafted land-tool recipes are known to everyone from the start, and so are three station-bound recipes (the Kilnscale Mantle, the Wardweave Cowl, and the Duskhide Wraps), which need no trainer, only their station. Everything else is taught by the resident masters at their stations across the three hub towns: most stand in Eastbrook, the tanner keeps the tannery in Fenbridge, and the alchemist keeps the apothecary in Highwatch.\n\nTrainer recipes run in rungs: skill 0, 25, and 50 for the gear and consumable crafts, priced free, 25 silver, and 1 gold as one-time fees, and every craft adds one 75-rung intermediate above them at its station (Enchanting's is the Lucent Reagent, beside its two charm recipes on the 25 rung); the toolmaker also teaches two of the three crafted fishing rods, at 75 and 125 for 4 and 16 gold (the apex rung is learned from a schematic instead, so no trainer quotes it a fee). A master teaches a recipe once your bracket in that craft has reached the recipe's own bracket, and you must be standing at their station to learn: a mobile station does not count.",
         "q7": "Toplamam neden aniden yavaşladı?",
-        "a7": "Toplama yayı 2,5 saniyeden başlar ve iki şekilde kısalır: taşıdığınız ve kullanabildiğiniz, düğümün kendi kademesinin üzerindeki her alet kademesi için 0,4 saniye ve mesleğinizin sayacı 100 bandını geçtiğinde 0,15 saniye; 1,5 saniyelik bir taban vardır. Kademe 1 düğümlerden kademe 3 düğümlere geçin, fazlanız buharlaşır ve aynı kazma yeniden daha yavaş sallanır. Tam olarak gereken kademeyi elde tutmak hız satın almaz; yalnızca düğümü açar.\n\nBeceri kazanımı, üretimde olduğu gibi solar: yetkinliğiniz bir düğümün kademesini aştıkça o düğüm grileşir (kademe 1 düğümler yetkinlik 75'ten itibaren hiçbir şey öğretmez), dolayısıyla yavaş kazanımın cevabı daha yüksek kademeli düğümlerdir. Bunlar çantanızda en az kendi kademelerinde bir alet ister (hiçbir düğüm çıplak elle işlenmez, kademe 1 dahil) ve kademe 1'in üzerindeki bir kara aleti önce kendi kullanım işaretini de ister: kademe 2'den 5'e kadar kendi mesleğinde 40/70/85/100. Balıkçılık kendi azalma çizelgesini izler: yetkinlik 50'nin altında tam kazanım, 100'ün altında yarım, 150'nin altında 0,1'lik bir sızıntı ve 200'ün altında 0,02; döküntü avlar 100'den itibaren hiçbir şey öğretmez ve suyun kendisi de dersi sınırlar (kademe 1 suları 100'de, bataklık 150'de öğretmeyi bırakır), yani duran bir sayaç, suyu aştığınız anlamına da gelebilir.",
+        "a7RetunedTaper": "The gather cast starts at 2.5 seconds and is shaved down two ways: 0.4 seconds for every tool tier you carry and can wield above the node's own tier, and 0.15 seconds once your trade's counter crosses its 100 band, with a floor of 1.5 seconds. Move from tier 1 nodes up to tier 3 nodes and your surplus vanishes, so the same pick swings slower again. Holding exactly the required tier buys no speed; it only opens the node.\n\nSkill gain fades the same way crafting does: a node grays out as your proficiency climbs past its tier (tier 1 nodes teach nothing from proficiency 75 on), so the answer to slow gains is higher tier nodes. Those need a tool of at least their tier in your bags (no node is ever worked bare-handed, tier 1 included), and a land tool above tier 1 also wants its wield mark first, 40/70/85/100 in its own trade for tiers 2 through 5. Fishing follows its own taper: 0.08 per catch below 50 proficiency, 0.05 below 100, 0.04 below 150 and 0.03 below 200, junk catches teach nothing at all from 100 on, and the water itself caps the lesson (tier 1 waters stop teaching at 100, the marsh at 150), so a stalled counter can also mean you have outgrown the water.",
         "q8": "Kasabadan uzakta zanaat yapabilir miyim?",
         "a8": "Kısmen. Dokuz sıradan alan tarifi (başlangıç silahı, zırhı, yiyeceği ve iksiri gibi temel işler) her yerde, her zaman üretilir; yemin edilmiş çiftlerin üç kombinasyon tarifi de öyle. Bunların üzerindeki her şey bir istasyon türüne bağlıdır: demirhane, mutfaklar, eczane, tabakhane, dokuma tezgahı ya da alet atölyesi; ve üretimin gerçekleşmesi için istasyona 20 yarda mesafede olmanız gerekir.\n\nBir zanaatta beceri 75'te uzmanlaşırsınız ve yüzde 20 malzeme indiriminin yanında bir de mobil istasyon kazanırsınız: sahaya kurun, 10 dakika ayakta kalır ve gerçeğinin başındaymışsınız gibi o zanaatın tariflerine hizmet eder. Mobil istasyon yalnızca üretim içindir: tarif öğrenmek ve sipariş parçalarını bağdan kurtarmak her zaman kasabadaki gerçek istasyonu gerektirir.",
         "q9": "Benim için bir eşyayı nasıl ürettirebilirim?",
         "a9": "Komisyon panosuna verin. Üretim penceresini açın, başlığından panoyu açın ve yapılmasını istediğiniz tarifi belirtin: siparişi herhangi bir üreticinin kabul etmesi için açık bırakın ya da zaten tanıdığınız bir üreticiyi hedefleyin. Kabul etmek o üreticiyi işe bağlar, ve bir sipariş her zaman aynı anda yalnızca bir kişi tarafından tutulur.\n\nSipariş verdiğinizde ne para ne de malzeme tutulur, bu yüzden fiyatı ve malzemeleri kimin getireceğini, komisyonların her zaman anlaşıldığı gibi kendi aranızda kararlaştırın. Sipariş hâlâ açıkken kendi siparişinizi iptal edebilirsiniz, ve kimsenin kabul etmediği bir sipariş bir gün sonra sona erer. Teslimat yüz yüzedir: parça hazır olduğunda üreticinizin yanında boş bir çanta yuvasıyla durun. Parça, herhangi bir istasyon ustasının olağan ücret karşılığında çözebileceği Ustanın Bağı ile size bağlı gelir.",
         "q10": "Bir tılsım nedir ve tükendiğinde ne olur?",
-        "a10": "Bir tılsım, yuvaya takılan bir alet etkisidir: bir toplama aletine yerleşip çıkardığı şeyi iyileştiren bir büyücü işi. Toplayıcının Zulası bir hasada bir birim ekler, Zanaatkârın Gözü derecesini yükseltir, ve Tamirci Gizzel ikisini de Büyülemeniz 25'e ulaştığında Doğudere'deki alet atölyesinde öğretir. Bir şarj yalnızca tılsım sonucu gerçekten değiştirdiğinde harcanır, bu yüzden iyileştiremediği bir hasat size hiçbir şeye mal olmaz, ve şarj şarj karar vermeyi tercih ederseniz bir yuva her kullanımda sormak üzere ayarlanabilir.\\n\\nTaze bir tılsım sıradan bir alette 20 şarjla başlar ve üzerindeki her nadirlik kademesi için 10 daha fazlasını taşır, bu yüzden destansı bir alet 50'den başlar. Tükenmek tılsımı yok etmez: aletin sahibi yuvayı, her arkanik malzeme için 10 şarj olacak şekilde yeniden doldurur; hangi malzemeyi istediği, taşıdığınız aletin ve o yuvanın şimdiye kadar doldurduğu en iyi aletin daha iyisini izler (sıradan ya da sıradan dışı bir alet için Çan Tozu, nadir biri için Çan Özü, destansı biri için bir Çan Kırığı). İyi aleti bir yeniden doldurmadan önce bankaya koymak onu asla daha ucuz yapmaz, yalnızca aynı fiyata daha küçük yapar, ve daha zayıf aleti taşırken taze bir tılsım takmak daha ucuz bir kademeye geri dönmenin yoludur. Tılsımı imzalayan büyücü kendi tılsımını yeniden doldurmak için yarısını öder, Büyülemede uzmanlaşmışsa daha da azını."
+        "a10": "Bir tılsım, yuvaya takılan bir alet etkisidir: bir toplama aletine yerleşip çıkardığı şeyi iyileştiren bir büyücü işi. Toplayıcının Zulası bir hasada bir birim ekler, Zanaatkârın Gözü derecesini yükseltir, ve Tamirci Gizzel ikisini de Büyülemeniz 25'e ulaştığında Doğudere'deki alet atölyesinde öğretir. Bir şarj yalnızca tılsım sonucu gerçekten değiştirdiğinde harcanır, bu yüzden iyileştiremediği bir hasat size hiçbir şeye mal olmaz, ve şarj şarj karar vermeyi tercih ederseniz bir yuva her kullanımda sormak üzere ayarlanabilir.\n\nTaze bir tılsım sıradan bir alette 20 şarjla başlar ve üzerindeki her nadirlik kademesi için 10 daha fazlasını taşır, bu yüzden destansı bir alet 50'den başlar. Tükenmek tılsımı yok etmez: aletin sahibi yuvayı, her arkanik malzeme için 10 şarj olacak şekilde yeniden doldurur; hangi malzemeyi istediği, taşıdığınız aletin ve o yuvanın şimdiye kadar doldurduğu en iyi aletin daha iyisini izler (sıradan ya da sıradan dışı bir alet için Çan Tozu, nadir biri için Çan Özü, destansı biri için bir Çan Kırığı). İyi aleti bir yeniden doldurmadan önce bankaya koymak onu asla daha ucuz yapmaz, yalnızca aynı fiyata daha küçük yapar, ve daha zayıf aleti taşırken taze bir tılsım takmak daha ucuz bir kademeye geri dönmenin yoludur. Tılsımı imzalayan büyücü kendi tılsımını yeniden doldurmak için yarısını öder, Büyülemede uzmanlaşmışsa daha da azını.",
+        "q11": "How do I make an orange item?",
+        "a11Promotion": "Craft or buy an apex Masterwrought piece, then perfect it: with 125 skill in the craft that made it, each attempt spends one Maker's Ember, one Sundered Essence, and one Prismglass Setting, succeeds four times in five, and never harms the piece when it misses. The first attempt binds the piece to you, and four successful ranks make it Perfected. Then spend one Deed of Making, an inscriptionist's skill-125 writ anyone can buy or commission, to promote the Perfected copy into a legendary named whatever you choose. The promotion is deterministic: no roll, stats unchanged, only the name and the color change."
       },
       "findingNodesNote": "Bunları gözle bulmak zorunda değilsiniz. Bölgedeki her düğüm, haritanın o zemini gösterdiği her yerde bölge haritasında çizilidir, ve yanından geçtiğinizde minimapta da görünür, bu yüzden bir toplama turu yola çıkmadan önce harita ekranından planlanabilir. Aletlerinizin henüz işleyemediği bir düğüm gizlenmek yerine işaretlenir: üzeri çizili, soluk bir işaretle yerini korur, böylece hangi zemine doğru geliştiğinizi görebilirsiniz. Masaüstünde, dünyadaki bir damarın, ağaç kümesinin ya da ot öbeğinin üzerine gelmek onu adlandırır, istediği aleti söyler, ve onu işledikten sonra kendi yeniden oluşma sürenizi saniyesine kadar sayar. Dokunmatikte üzerine gelinecek bir şey olmadığından, minimap işaretleri aynı hikayeyi anlatır.",
-      "specimenBodyFamilies": "Toplayıcılık yaparken çantanızda biraz yer boş bırakın: imzalı bir talih vurgunu, inecek kendi yerini ya da eşleşen imzalı bir yığın ister; hiçbiri sığmazsa verim yine gelir ama imza kaybolur. Ceset hasatının da kendi ikramiye kolu vardır: hasat edilen her bileşenin yaklaşık {pct}%'i nadir veya üzeri çıkar. Verecek mükemmel bir numunesi olan bir aile (post, ipek, zehir, pençe, et) sıradan verimini sade tutar ve imzalı numuneyi onun yanında basar; diğer üçü, diş, kumaş ve azı dişi, verimin kendisini imzalar."
+      "specimenBodyFamilies": "Toplayıcılık yaparken çantanızda biraz yer boş bırakın: imzalı bir talih vurgunu, inecek kendi yerini ya da eşleşen imzalı bir yığın ister; hiçbiri sığmazsa verim yine gelir ama imza kaybolur. Ceset hasatının da kendi ikramiye kolu vardır: hasat edilen her bileşenin yaklaşık {pct}%'i nadir veya üzeri çıkar. Verecek mükemmel bir numunesi olan bir aile (post, ipek, zehir, pençe, et) sıradan verimini sade tutar ve imzalı numuneyi onun yanında basar; diğer beşi, diş, kumaş, azı dişi, boynuz ve solungaç, verimin kendisini imzalar."
     },
     "economy": {
       "intro": "Para tüm dünyayı çevirir: teçhizatınızı, erzakınızı ve yolculuk gereçlerinizi alır, oyuncular arasında el değiştirir. Bütün bunları sadece oynayarak öğrenirsiniz, bu yüzden bu sayfayı paranızın nereden gelip nereye gittiğinin bir haritası olarak düşünün.",
@@ -6731,6 +7043,7 @@ export const tr_TR: EnTranslations = {
       "lootCommonBody": "Sıradan ganimetler grupta sırayla dağıtılabilir ya da toplayana gidebilir; daha iyi ganimetler ise herkesin adil bir şansı olsun diye zar atışına konur.",
       "lootRollTitle": "İhtiyaç, Açgözlülük ya da Geç.",
       "lootRollBody": "Bir eşya zar atışına gittiğinde, uygun her üye onu istiyorsa İhtiyaç, yalnızca yedek olarak alırsa Açgözlülük ya da çekilmek için Geç seçer. En yüksek zar kazanır.",
+      "lootRollBodyNeedBeatsGreed": "When an item goes to a roll, each eligible member chooses Need if they want it, Greed if they would only take it spare, or Pass to bow out. Need beats Greed: if anyone rolls Need, the item goes to the highest Need roll and the Greed rolls do not count; otherwise the highest Greed roll wins.",
       "lootMasterTitle": "Ganimet sorumlusu.",
       "lootMasterBody": "Lider, bunun yerine daha iyi ganimetlerin sorumluluğunu üstlenip her birini almasına gereken üyeye verebilir. Bu, örgütlü bir grubun bir zindanı koşturduğu gibi, değerli teçhizatın başıboş bir zar atışına gitmesini önler.",
       "friendsHeading": "Arkadaşlar, yok sayma ve engelleme",
@@ -6744,8 +7057,10 @@ export const tr_TR: EnTranslations = {
       "slashHeading": "Kullanışlı eğik çizgi komutları",
       "slashBody": "Birkaç günlük komutu ezberlemeye değer: /w İsim bir fısıltı gönderir ve /r aldığın sonuncuyu yanıtlar, /invite birini grubuna çağırır, /follow bir arkadaşın peşine takılır, /roll grubun görmesi için zar atar, /who kimin çevrimiçi olduğunu gösterir ve /afk seni uzakta olarak işaretler. Tam liste için oyunda /help yaz.",
       "emotesBody": "Karakterin sözcükler olmadan da konuşabilir: /wave, /dance, /cheer ya da /bow gibi bir ifade yaz, ona yöneltmek için önce bir arkadaşı hedefle ya da baş üstünde hızlı bir ifade için X'e basılı tutup ifade tekerini aç.",
+      "emotesBodyNamedTarget": "Your character can also speak without words: type an emote like /wave, /dance, /cheer, or /bow, add a name to aim it at someone, as in /wave Aleph, or hold X, the emote wheel's default key, to open the emote wheel for a quick overhead expression. The Emotes button in the rail of window buttons, or under More on touch, opens the same wheel.",
       "calendarHeading": "Etkinlik takvimi",
       "calendarBody": "Etkinlik takvimini açmak için I'ya bas. Çevresinde plan yapmaya değer diyar günlerini işaretler: haftalık Akın Çağrısı, Pazar Günü, Arena Kapışması ve Balık Yarışması, ayrıca aylık Mağara Günü ve Ay Kapısı Ayini; ve loncaların takvimlerini tuttukları yer de burasıdır: lonca lideri ve subaylar üzerine etkinlik kaydedebilir ve her üye onları aynı sayfada görür. Diyar günleri bir araya gelmek için bir çağrıdır, bonus değil; bir gün işaretli diye karakterinde hiçbir şey değişmez.",
+      "calendarBodyDoubleHonor": "Press I to open the event calendar. It marks the realm days worth planning around, the weekly Raid Call, Market Day, Arena Clash, Double Honor Weekend, and Fishing Derby, plus the monthly Delve Day and Moongate Communion, and it is where guilds keep their schedule: the guild leader and officers can book events on it, and every member sees them on the same page. The realm days are a prompt to gather rather than a bonus, with one exception: all through the Double Honor Weekend, Thornhollow Fields Honor pays double and a played-out loss pays like a win. Nothing else about your character changes because a day is marked.",
       "readyHeading": "Hazırlık yoklamaları",
       "readyBody": "Büyük bir çekişten önce, grup lideri odayı yoklamak için /ready yazabilir: herkese Hazır ya da Hazır Değil istemi gelir ve herkes yanıtladığında ya da 30 saniye dolduğunda, tüm grup sayıların tek bir özetini görür. Kimse tek tek işaret edilmez; mesele sayıdır, suçlu değil.",
       "markersHeading": "Hedef işaretleri",
@@ -6757,6 +7072,7 @@ export const tr_TR: EnTranslations = {
       "realmsScopeBody": "Yaptıkların, seçtiğin dünyada kalır: karakterlerin, arkadaş listen, loncan ve Pazar hepsi orada yaşar, ve oyun içinde açtığın lonca ve oyuncu tabloları yalnızca o dünyayı sıralar; web sitesindeki tablo ise tüm dünyaları bir araya toplar. Her dünya ayrıca kendi yerel saatinde işleyen kendi günlük akın sıfırlamasını tutar.",
       "finderHeading": "Grup bulmak",
       "finderBody": "Bir koşuyu doldurmak için Grup Arıyor'da bağırman gerekmez. Zindan Bulucu'yu aç, istediğin koşuyu ve doldurmaya razı olduğun rolleri seç, ardından tek başına ya da elindeki grupla sıraya gir. Bulucu, tam bir rol seti toplayana dek bekler, sonra grubu herkese aynı anda sunar: bir açılır pencere her birinizden kabul etmenizi ister ve son kişi evet dediği anda grup kurulur. Bir teklifi reddetmek ya da süresinin dolmasına izin vermek, sıra sana bir başkasını sunmadan önce kısa bir bekleme süresine sokar, böylece sıra akmaya devam eder.",
+      "finderBodyLeaderQueues": "You do not have to shout in Looking for Group to fill a run. Open the Dungeon Finder, choose the run you want and the roles you are willing to fill, and join the queue on your own, or have your party leader queue the party you already have (only the leader can put a group in). The finder waits until it has a full set of roles, then offers the group to everyone at once: a popup asks each of you to accept, and the party forms the moment the last person says yes. Turning an offer down, or letting it run out, drops you, and any party you queued with, out of the queue and puts you on a short cooldown before you can join it again; everyone else in the offer keeps their place, unless they did the same or queued with someone who did, so the line keeps moving.",
       "finderBoardBody": "Bulucu ayrıca hazır grupların bulunduğu bir pano da tutar. Bir lider, koşunun ne için olduğunu söyleyen etiketlerle (ilk koşudan düpedüz tam temizliğe kadar) bir ilan yayımlar, sen de liderin onaylaması için ona başvurursun. Otomatik sıra, normal ve kahramanca olmak üzere zindanları ve son oyun akınını doldururken, pano sıranın senin için asla doldurmadığı yalnız uyum koşusunu da taşıyabilir; mağara seferleri ve açık dünya gezileri kendi ayarlayacağın şeylerdir. Her iki durumda da bulucu yalnızca grubu kurar: kapıya yürümek, zorluğu ayarlamak ve ganimet kurallarında anlaşmak yine sana kalır.",
       "finderMore": "Her zindanın içinde neler olduğunu gör",
       "blockBody": "Engelle, seni rahat bırakmayacak bir oyuncu için daha ağır araçtır. Bir engelleme, sohbetinin yanı sıra davetlerini, fısıltılarını ve postalarını da keser, ikinizi /who içinde birbirinize görünmez yapar ve arkadaş listendeyse oradan da düşürür. Adının üzerindeki sağ tık menüsünden ya da /block ile engelle, /unblock engeli tekrar kaldırır ve /blocklist kimin listede olduğunu gösterir.",
@@ -7946,11 +8262,7 @@ export const tr_TR: EnTranslations = {
       "detonateLightningRod": "Yıldırım Çubuğu çarpıyor!",
       "detonateStormcallersWrath": "Fırtına Çağırıcısının Gazabı patlıyor!",
       "detonateAbyssalMaw": "Uçurum Ağzı kapanıyor!",
-      "detonateCrushingDepth": "Ezici Derinlik eziyor!",
-      "detonatePactSeal": "Antlaşma Mührü patlıyor!",
-      "detonateBloodRite": "Kan Ayini düşüyor!",
-      "detonatePitSentence": "Çukur Fermanı patlıyor!",
-      "detonateHellfireBrand": "Cehennem Ateşi Damgası patlıyor!"
+      "detonateCrushingDepth": "Ezici Derinlik eziyor!"
     },
     "delve": {
       "cannotEnterNow": "Şu anda bir delveye giremezsin.",
@@ -8293,24 +8605,24 @@ export const tr_TR: EnTranslations = {
     "boss": {
       "varric": {
         "bell": {
-          "emote": "Diyakoz Varric gömülü çanı iki eliyle kavrar!",
-          "log": "Diyakoz Varric defin çanını çalmaya başlar.",
-          "warning": "Diyakoz Varric'ten uzaklaş!",
+          "emote": "Diyakoz Vandric gömülü çanı iki eliyle kavrar!",
+          "log": "Diyakoz Vandric defin çanını çalmaya başlar.",
+          "warning": "Diyakoz Vandric'ten uzaklaş!",
           "impact": "Çanın çınlaması mahzenin zeminini çatlatır!",
           "lesson": "Çan Çınlaması: her on iki saniyede bir yere vuruş. Düşmeden önce uzaklaş."
         },
         "raise": {
-          "emote": "Diyakoz Varric kırık mezarlardan isimler çağırır!",
-          "log": "Diyakoz Varric Ölü Diriltme'ye başlar.",
+          "emote": "Diyakoz Vandric kırık mezarlardan isimler çağırır!",
+          "log": "Diyakoz Vandric Ölü Diriltme'ye başlar.",
           "warning": "Mezar ayinini durdur!",
           "object": "Çatlamış mezar çalınmış bir nefesle titrer.",
           "interrupt_ok": "Mezar ayini sekteye uğrar.",
-          "interrupt_fail": "Ölüler Diyakoz Varric'in çağrısına yanıt verir!",
+          "interrupt_fail": "Ölüler Diyakoz Vandric'in çağrısına yanıt verir!",
           "lesson": "Çatlamış mezarı beş saniye içinde kes, yoksa ölüler onun çağrısına kalkar."
         },
         "pull": "Kutsal toprağa kirli niyetlerle ayak basıyorsun. Diz çök ve sayıma katıl.",
         "intro": "Hiçbir ruh kaybolmaz. Yalnızca yanlış yerleştirilir.",
-        "mid60": "Diyakoz Varric defterden isimleri titrek bir zaferle okur.",
+        "mid60": "Diyakoz Vandric defterden isimleri titrek bir zaferle okur.",
         "mid30": "Defin çanı söylediği her isme yanıt verir.",
         "defeat": "Hayır... İsimler bendeydi... Hepsi bendeydi..."
       }
@@ -8938,6 +9250,7 @@ export const tr_TR: EnTranslations = {
         "cooldownLockedHerb": "Toplanmış ot öbeği, alet kullanılamıyor",
         "station": "Zanaat istasyonu: {name}",
         "service": "Hizmet: {name}",
+        "farmPatch": "Garden beds",
         "partyMember": "Grup üyesi: {name}",
         "deadPartyMember": "Ölü grup üyesi: {name}",
         "partyMemberGeneric": "Grup üyesi",
@@ -9372,6 +9685,8 @@ export const tr_TR: EnTranslations = {
       "soldJunkMany": "{count} değersiz eşya {money} karşılığında satıldı.",
       "keptBoundOne": "{count} adet bağlı kopya tutuldu.",
       "keptBoundMany": "{count} adet bağlı kopya tutuldu.",
+      "keptLockedOne": "Kept {count} locked copy.",
+      "keptLockedMany": "Kept {count} locked copies.",
       "friendOnline": "{name} çevrimiçi oldu.",
       "friendOffline": "{name} çevrimdışı oldu."
     },
@@ -9430,7 +9745,7 @@ export const tr_TR: EnTranslations = {
       "felboltTitle": "Kül Oku",
       "felboltDesc": "Emberkin'e hedefine ekstra bir kül oku fırlatmasını emret. 8 saniyelik bekleme süresi. Otomatik büyüyü açıp kapatmak için sağ tıklayın, basılı tutun veya Shift+Enter'a basın.",
       "abyssalChainTitle": "Uçurum Zinciri",
-      "abyssalChainDesc": "Gloomshade'e, 8 yardadan fazla ve 20 yardaya kadar uzaktaki normal bir düşmanı kendine doğru çekmesini emret. Patronlar çekilemez. 15 saniyelik bekleme süresi. Otomatik büyüyü açıp kapatmak için sağ tıklayın, basılı tutun veya Shift+Enter'a basın.",
+      "abyssalChainDesc": "Duskmurk'e, 8 yardadan fazla ve 20 yardaya kadar uzaktaki normal bir düşmanı kendine doğru çekmesini emret. Patronlar çekilemez. 15 saniyelik bekleme süresi. Otomatik büyüyü açıp kapatmak için sağ tıklayın, basılı tutun veya Shift+Enter'a basın.",
       "petTauntTitle": "Evcil Kışkırtması",
       "petTauntDesc": "Evciline saldırıya geçmesini ve menzile girince Hırlamasını emret. 10 saniyelik bekleme süresi.",
       "healDemonDesc": "5 saniye boyunca şeytanına iyileştirme kanalize etmek için mana harca.",
@@ -9625,11 +9940,13 @@ export const tr_TR: EnTranslations = {
     },
     "cast": {
       "fishing": "Balık Tutma",
+      "farming": "Planting",
       "gathering": "Toplama",
       "crafting": "Üretim",
       "disenchanting": "Büyü Bozma",
       "enchanting_apply": "Büyüleme",
       "salvaging": "Parçalama",
+      "sundering": "Sundering",
       "tool_recharge": "Şarj Etme",
       "demonHeal": "Şeytan İyileştirmesi",
       "thunzharrStormcall": "Fırtına Çağrısı",
@@ -9769,9 +10086,12 @@ export const tr_TR: EnTranslations = {
       "material": "Malzeme",
       "food": "Yiyecek",
       "drink": "İçecek",
+      "recipe": "Şema",
       "tool": "Alet",
       "potion": "Şifa İksiri",
       "elixir": "İksir",
+      "flask": "Flask",
+      "scroll": "Scroll",
       "bag": "Çanta",
       "mount": "Binek"
     },
@@ -9798,8 +10118,17 @@ export const tr_TR: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "Kullanım: {seconds} saniyede {amount} can yeniler. Yerken oturur kalmalısın.",
       "useDrink": "Kullanım: {seconds} saniyede {amount} mana yeniler. İçerken oturur kalmalısın.",
-      "useElixir": "Kullanım: {stat} özelliğini {minutes} dakika boyunca {value} artırır. Dövüşte kullanılabilir.",
-      "useElixirAura": "Kullanım: {minutes} dakika boyunca {aura} bahşeder. Dövüşte kullanılabilir.",
+      "useElixir": "Use: Increases your {stat} by {value} for {minutes} min. Replaces any other elixir or scroll of the same stat. Usable in combat.",
+      "useElixirAura": "Use: Grants {aura} for {minutes} min. Replaces any other elixir or scroll of its kind. Usable in combat.",
+      "flaskOnlyOne": "Only one flask effect at a time. Drinking another flask replaces this one.",
+      "flaskOutranks": "A weaker elixir or scroll of the same stat cannot replace it.",
+      "flaskUnremovable": "It cannot be dispelled, stolen, or canceled by hand.",
+      "flaskThroughDeath": "The effect remains through death, but ends when you log out; instanced matches begin and end on a clean slate.",
+      "wellFed": "Well Fed: Increases your {stat} by {value} for {minutes} min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.",
+      "wellFedAura": "Well Fed: Grants {aura} for {minutes} min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.",
+      "useFeast": "Use: Sets out a feast others can eat from, one serving each ({servings} servings, lasts {minutes} min).",
+      "useFeastBuff": "Each serving grants {aura}: +{value} {stat} for {minutes} min when you finish the {seconds} sec meal. Only one Well Fed effect at a time: a newer meal replaces it.",
+      "useFeastBuffAura": "Each serving grants {aura} for {minutes} min when you finish the {seconds} sec meal. Only one Well Fed effect at a time: a newer meal replaces it.",
       "questItem": "Görev Eşyası",
       "questRelated": "Görev: {quest}",
       "questRules": "Satılamaz, bankaya konulamaz veya takas edilemez.",
@@ -9822,6 +10151,8 @@ export const tr_TR: EnTranslations = {
       "useManaPotion": "Kullanım: Anında {amount} mana yeniler. Savaşta kullanılabilir. 1 dk bekleme süresi.",
       "clickUseInstant": "Savaşta anında kullanmak için tıkla",
       "clickUse": "Kullanmak için tıkla",
+      "clickSetOut": "Click to set out",
+      "clickSetUp": "Click to set up",
       "clickBuyback": "Geri satın almak için tıkla",
       "bagSlots": "{slots} Yuvalı Çanta",
       "bagSlotsMaterials": "{slots} Yuvalı Malzeme Çantası"
@@ -9907,6 +10238,7 @@ export const tr_TR: EnTranslations = {
       "filterTypeConsumable": "Sarf Malzemeleri",
       "filterTypeMaterial": "Malzemeler",
       "filterTypeCosmetic": "Kozmetikler",
+      "filterTypePattern": "Patterns",
       "filterTypeOther": "Diğer",
       "filterArmorType": "Zırh türü",
       "filterArmorAll": "Tüm zırhlar",
@@ -10206,7 +10538,7 @@ export const tr_TR: EnTranslations = {
       },
       "cold_snap": {
         "name": "Kışın Çağrısı",
-        "description": "Titrek Adım, Ayaz Örtüsü ve Üstün Görünmezlik yeteneklerinin bekleme süresini bitirir. (büyücü yeteneği)"
+        "description": "Finishes the cooldown on Flitstep, Frostveil, and Greater Invisibility. (Mage talent)"
       },
       "greater_invisibility": {
         "name": "Üstün Görünmezlik",
@@ -10257,15 +10589,15 @@ export const tr_TR: EnTranslations = {
         "description": "Her biri {damage} Frost hasarı veren üç buz mermisi fırlatın ve hedefe Winter's Chill'i uygulayın: sonraki 2 uyumlu büyü hedefi donmuş sayar. Brain Freeze, Winterlash'yi anında yapar ve bekleme süresini atlar. (Don)"
       },
       "frozen_orb": {
-        "name": "Donmuş Küre",
+        "name": "Frostglobe",
         "description": "8 saniye boyunca ileri doğru sürüklenen, dönen bir buz küresi salarak yakındaki düşmanlara her saniye {damage} Frost hasarı verir ve onları %30 yavaşlatır. Her çarpan darbe bir Buz Saçağı üretir. (Don)"
       },
       "blizzard": {
         "name": "Kar Fırtınası",
-        "description": "Hedef alana 6 saniye boyunca buz fırtınası çağırır, her saniye {damage} Don hasarı verir ve düşmanları %40 yavaşlatır. Vurulan her düşman Donmuş Küre'nin süresini 0,5 saniye azaltır (kullanım başına en fazla 3 saniye). (Don)"
+        "description": "Calls an ice storm onto the target area for 6 sec, dealing {damage} Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frostglobe, up to 3 sec per cast. (Frost)"
       },
       "glacial_spike": {
-        "name": "Buzul Dikeni",
+        "name": "Rimeneedle",
         "description": "Devasa bir buz dikeni çağırarak 5 Buz Parçası tüketir, {damage} Don hasarı verir ve hedefi 4 saniye olduğu yere dondurur. (Don)"
       },
       "glacial_front": {
@@ -10415,7 +10747,7 @@ export const tr_TR: EnTranslations = {
         "description": "Hedefi yaralayan bitirici hamle: 6 sn artı kombo puanı başına 2 sn boyunca her 2 sn'de kanar (5 kombo puanı: 16 sn ve toplam {damage} hasar)."
       },
       "vanish": {
-        "name": "Duman Adımı",
+        "name": "Smokefade",
         "description": "Gözden kaybolursun, dövüşte bile Duskveil'e geçersin. Gizliyken %50 daha yavaş hareket edersin. 10 saniyeye kadar sürer."
       },
       "instant_poison": {
@@ -11021,7 +11353,7 @@ export const tr_TR: EnTranslations = {
         "description": "Kaynayan bir gazaba kapılarak 20 öfke üretir. (Savaşçı yeteneği)"
       },
       "crusader_strike": {
-        "name": "Haçlı Darbesi",
+        "name": "Oathstrike",
         "description": "Hedefe silah hasarı artı {damage} Kutsal hasar verir. (Paladin yeteneği)"
       },
       "chain_heal": {
@@ -11125,7 +11457,7 @@ export const tr_TR: EnTranslations = {
         "description": "20 sn boyunca bir lich olursun, 3 Ruh Parçası yaratır ve büyü hasarın ile büyü hızını %20 artırırsın. Ölüsüzlerin %50 daha fazla hasar verir ve %20 daha hızlı davranır, Ruh Mızrağı ise hedefini delip geçerek yakındaki en fazla 2 düşmana hasarının %50'si kadar vurur. (Nekromansi imzası)"
       },
       "holy_shock": {
-        "name": "Kutsal Şok",
+        "name": "Lightjolt",
         "description": "Dost bir hedefi Kutsal enerjiyle sarsar ve onu {damage} kadar iyileştirir. (Kutsal imza)"
       },
       "holy_shield": {
@@ -11153,7 +11485,7 @@ export const tr_TR: EnTranslations = {
         "description": "Büyü kritik şansını %50 artırır, 15 sn sürer. (Ateş imza yeteneği)"
       },
       "icy_veins": {
-        "name": "Buzlu Damarlar",
+        "name": "Coldsurge",
         "description": "Büyü hızını %30 artırır ve 10 sn boyunca büyü kesintisini ve geri itmeyi önler. (Buz imza yeteneği)"
       },
       "cold_blood": {
@@ -11229,8 +11561,8 @@ export const tr_TR: EnTranslations = {
         "description": "Büyücünün emrine bir Emberkin çağırır. Emberkin, düşmanlarına uzaktan Kül Oku savurur. Yeni bir iblis çağırmak mevcut olanı gönderir. Aynı anda tek bir iblisin olabilir."
       },
       "summon_voidwalker": {
-        "name": "Gloomshade Çağırma",
-        "description": "Büyücünün emrine bir Gloomshade çağırır. Bu dayanıklı iblis düşmanlarla alay eder ve uzaktaki sıradan düşmanları menzile geri sürüklemek için Uçurum Zinciri kullanır. Patronlar çekilemez. Yeni bir iblis çağırmak mevcut olanı gönderir. Aynı anda tek bir iblisin olabilir."
+        "name": "Duskmurk Çağırma",
+        "description": "Büyücünün emrine bir Duskmurk çağırır. Bu dayanıklı iblis düşmanlarla alay eder ve uzaktaki sıradan düşmanları menzile geri sürüklemek için Uçurum Zinciri kullanır. Patronlar çekilemez. Yeni bir iblis çağırmak mevcut olanı gönderir. Aynı anda tek bir iblisin olabilir."
       },
       "summon_succubus": {
         "name": "Duskborn Çağırma",
@@ -11329,7 +11661,7 @@ export const tr_TR: EnTranslations = {
         "description": "Otomatik saldırıların, canı ne olursa olsun bir hedefe hiç öfke harcamadan Erken Mezar kullanmana izin verme şansı taşır. (Silahşor)"
       },
       "storm_bolt": {
-        "name": "Fırtına Oku",
+        "name": "Thunderhurl",
         "description": "Silahını hedefe fırlatır, {damage} hasar verir ve onu 3 sn sersemletirsin."
       },
       "piercing_howl": {
@@ -11353,7 +11685,7 @@ export const tr_TR: EnTranslations = {
         "description": "Silahını düşmanlarının kanıyla donatırsın: sen ve yakın dövüşçü müttefiklerin 20 sn boyunca %10 saldırı hızı ve %10 hasar kazanırsınız."
       },
       "victory_rush": {
-        "name": "Zafer Atılımı",
+        "name": "Victor's Surge",
         "description": "Silah hasarı artı {damage} vurur ve azami canının %20'sini iyileştirirsin. Yalnızca bir düşman öldürdükten sonraki 20 sn içinde kullanılabilir."
       },
       "intimidating_shout": {
@@ -11393,7 +11725,7 @@ export const tr_TR: EnTranslations = {
         "description": "Dönen bir çelik fırtınasına dönüşerek 4 sn boyunca 6 metre içindeki tüm düşmanlara her saniye {damage} hasar verirsin."
       },
       "blink": {
-        "name": "Titreşim Adımı",
+        "name": "Flitstep",
         "description": "Seni 15 m ileri ışınlar ve kök salma etkilerini bozar. (Büyücü yeteneği)"
       },
       "bloodlust": {
@@ -11425,7 +11757,7 @@ export const tr_TR: EnTranslations = {
         "description": "Golpea a yakındaki düşmanları con escarcha e inflige {damage} de daño de Buz. (büyücü yeteneği)"
       },
       "counterspell": {
-        "name": "Karşı Büyü",
+        "name": "Spellsever",
         "description": "Hedefin büyü kullanımına karşı koyar ve 6 saniye boyunca o okuldan büyü yapılmasını engeller."
       },
       "curse_of_exhaustion": {
@@ -11609,7 +11941,7 @@ export const tr_TR: EnTranslations = {
         "description": "Hareket hızını %35 artırır, ama her saniye azami canının %2'sini feda eder. İptal etmek için tekrar oku. %20 canda kendiliğinden kapanır."
       },
       "spellsteal": {
-        "name": "Büyü Çalma",
+        "name": "Spellplunder",
         "description": "Bir düşmandan faydalı bir büyü etkisi çalar ve sana aktarır."
       },
       "startle_shot": {
@@ -12057,7 +12389,7 @@ export const tr_TR: EnTranslations = {
         "name": "Kazzix'in Kalp Parçası"
       },
       "wyrmcult_orders": {
-        "name": "Ejdertarikatı Emirleri"
+        "name": "Broodsworn Orders"
       },
       "ritual_phylactery": {
         "name": "Ayin Muskası"
@@ -12120,7 +12452,7 @@ export const tr_TR: EnTranslations = {
         "name": "Mezarejderi Pul Zırhı"
       },
       "wyrmcult_grand_robe": {
-        "name": "Ejdertarikatı Görkemli Cübbesi"
+        "name": "Broodsworn Grand Robe"
       },
       "wyrmscale_jerkin": {
         "name": "Ejderpulu Ceketi"
@@ -12327,7 +12659,7 @@ export const tr_TR: EnTranslations = {
         "name": "Toryum Maden Kazması"
       },
       "arcanite_mining_pick": {
-        "name": "Arkanit Maden Kazması"
+        "name": "Glyphsteel Mining Pick"
       },
       "ashwood_axe": {
         "name": "Dişbudak Baltası"
@@ -12345,7 +12677,7 @@ export const tr_TR: EnTranslations = {
         "name": "Toryum Cevheri"
       },
       "arcanite_bar": {
-        "name": "Arkanit Çubuğu"
+        "name": "Glyphsteel Bar"
       },
       "ashwood_log": {
         "name": "Kül Ağacı Kütüğü"
@@ -12576,7 +12908,7 @@ export const tr_TR: EnTranslations = {
         "name": "Toryum Savaş Kılıcı"
       },
       "arcanite_war_axe": {
-        "name": "Arkanit Savaş Baltası"
+        "name": "Glyphsteel War Axe"
       },
       "elderwood_battle_staff": {
         "name": "Yaşlıağaç Savaş Asası"
@@ -12789,7 +13121,7 @@ export const tr_TR: EnTranslations = {
         "name": "Kırık Şarkı Pelerini"
       },
       "wyrmcult_spellgrips": {
-        "name": "Ejdertarikatı Büyü Eldivenleri"
+        "name": "Broodsworn Spellgrips"
       },
       "thornpeak_wildwraps": {
         "name": "Dikentepe Vahşi Sarmaları"
@@ -12798,7 +13130,7 @@ export const tr_TR: EnTranslations = {
         "name": "Fırtına Adağı Zırh Gömleği"
       },
       "cryptbloom_shoulderguards": {
-        "name": "Mezarçiçeği Omuz Korumaları"
+        "name": "Tombpetal Shoulderguards"
       },
       "gravewyrm_thornmaul": {
         "name": "Mezarejderi Diken Balyozu"
@@ -13053,7 +13385,7 @@ export const tr_TR: EnTranslations = {
         "name": "Ocak Astarlı Botlar"
       },
       "frostmane_mantle": {
-        "name": "Kırağı Yeleli Pelerini"
+        "name": "Mantle of the Rimemane"
       },
       "ashbone_war_brand": {
         "name": "Kültükemik Savaş Markası"
@@ -13212,7 +13544,7 @@ export const tr_TR: EnTranslations = {
         "name": "Zanaatkârın Gözü"
       },
       "reins_terrorspark_groundshaker": {
-        "name": "Kontak Anahtarı: Dehşetkıvılcım, Yer Sarsan"
+        "name": "Ignition Key: Dreadspark Groundshaker"
       },
       "reins_lanternback_troll": {
         "name": "Fenerci Boyunduruğu: Grumbol"
@@ -13291,6 +13623,483 @@ export const tr_TR: EnTranslations = {
       },
       "loombound_reagent_satchel": {
         "name": "Tezgâha Bağlı Reaktif Çantası"
+      },
+      "hammered_copper_band": {
+        "name": "Hammered Copper Band"
+      },
+      "polished_copper_loop": {
+        "name": "Polished Copper Loop"
+      },
+      "coiled_copper_torc": {
+        "name": "Coiled Copper Torc"
+      },
+      "riveted_iron_signet": {
+        "name": "Riveted Iron Signet"
+      },
+      "etched_iron_loop": {
+        "name": "Etched Iron Loop"
+      },
+      "iron_link_choker": {
+        "name": "Iron Link Choker"
+      },
+      "weighted_thorium_band": {
+        "name": "Weighted Osmium Band"
+      },
+      "gleaming_thorium_loop": {
+        "name": "Gleaming Osmium Loop"
+      },
+      "burnished_thorium_amulet": {
+        "name": "Burnished Osmium Amulet"
+      },
+      "silverleaf_primer": {
+        "name": "Sheenleaf Primer"
+      },
+      "goldleaf_folio": {
+        "name": "Goldleaf Folio"
+      },
+      "sunpetal_grimoire": {
+        "name": "Sunpetal Grimoire"
+      },
+      "silverleaf_scroll": {
+        "name": "Sheenleaf Scroll"
+      },
+      "goldleaf_scroll": {
+        "name": "Goldleaf Scroll"
+      },
+      "sunpetal_scroll": {
+        "name": "Sunpetal Scroll"
+      },
+      "duskforged_billet": {
+        "name": "Duskforged Billet"
+      },
+      "forgefold_plating": {
+        "name": "Forgefold Plating"
+      },
+      "wyrmhide_cording": {
+        "name": "Wyrmhide Cording"
+      },
+      "sunspun_bolt": {
+        "name": "Sunspun Bolt"
+      },
+      "prismglass_setting": {
+        "name": "Prismglass Setting"
+      },
+      "precision_chassis": {
+        "name": "Precision Chassis"
+      },
+      "quickening_catalyst": {
+        "name": "Quickening Catalyst"
+      },
+      "seasoned_stock": {
+        "name": "Seasoned Stock"
+      },
+      "lucent_reagent": {
+        "name": "Lucent Reagent"
+      },
+      "sablewax_vellum": {
+        "name": "Sablewax Vellum"
+      },
+      "spiritweld_girdle": {
+        "name": "Spiritweld Girdle"
+      },
+      "forgefold_legguards": {
+        "name": "Forgefold Legguards"
+      },
+      "wardspeaker_sabatons": {
+        "name": "Wardspeaker Sabatons"
+      },
+      "briarstep_jerkin": {
+        "name": "Briarstep Jerkin"
+      },
+      "fenbloom_breeches": {
+        "name": "Fenbloom Breeches"
+      },
+      "barksong_handguards": {
+        "name": "Barksong Handguards"
+      },
+      "sunspun_vestments": {
+        "name": "Sunspun Vestments"
+      },
+      "sunspun_leggings": {
+        "name": "Sunspun Leggings"
+      },
+      "sunspun_handwraps": {
+        "name": "Sunspun Handwraps"
+      },
+      "sunspun_haversack": {
+        "name": "Sunspun Haversack"
+      },
+      "duskforged_warblade": {
+        "name": "Duskforged Warblade"
+      },
+      "ridgebreaker": {
+        "name": "Ridgebreaker"
+      },
+      "duskforged_bulwark": {
+        "name": "Duskforged Bulwark"
+      },
+      "wyrmfall_pendant": {
+        "name": "Wyrmfall Pendant"
+      },
+      "warhewn_signet": {
+        "name": "Warhewn Signet"
+      },
+      "prismglass_loop": {
+        "name": "Prismglass Loop"
+      },
+      "gyrelens_array": {
+        "name": "Gyrelens Array"
+      },
+      "voidbound_grimoire": {
+        "name": "Voidbound Grimoire"
+      },
+      "masters_field_forge": {
+        "name": "Master's Field Forge"
+      },
+      "makers_charm": {
+        "name": "Maker's Charm"
+      },
+      "ironhusk_flask": {
+        "name": "Ironhusk Flask"
+      },
+      "warboar_flask": {
+        "name": "Warboar Flask"
+      },
+      "runewater_flask": {
+        "name": "Runewater Flask"
+      },
+      "stonepot_stew": {
+        "name": "Stonepot Stew"
+      },
+      "warspice_skewers": {
+        "name": "Warspice Skewers"
+      },
+      "sageleaf_chowder": {
+        "name": "Sageleaf Chowder"
+      },
+      "grand_cauldron": {
+        "name": "Grand Cauldron"
+      },
+      "laden_hearth": {
+        "name": "The Laden Hearth"
+      },
+      "pattern_spiritweld_girdle": {
+        "name": "Plans: Spiritweld Girdle"
+      },
+      "pattern_forgefold_legguards": {
+        "name": "Plans: Forgefold Legguards"
+      },
+      "pattern_wardspeaker_sabatons": {
+        "name": "Plans: Wardspeaker Sabatons"
+      },
+      "pattern_briarstep_jerkin": {
+        "name": "Pattern: Briarstep Jerkin"
+      },
+      "pattern_fenbloom_breeches": {
+        "name": "Pattern: Fenbloom Breeches"
+      },
+      "pattern_barksong_handguards": {
+        "name": "Pattern: Barksong Handguards"
+      },
+      "pattern_sunspun_vestments": {
+        "name": "Pattern: Sunspun Vestments"
+      },
+      "pattern_sunspun_leggings": {
+        "name": "Pattern: Sunspun Leggings"
+      },
+      "pattern_sunspun_handwraps": {
+        "name": "Pattern: Sunspun Handwraps"
+      },
+      "pattern_sunspun_haversack": {
+        "name": "Pattern: Sunspun Haversack"
+      },
+      "pattern_duskforged_warblade": {
+        "name": "Plans: Duskforged Warblade"
+      },
+      "pattern_ridgebreaker": {
+        "name": "Plans: Ridgebreaker"
+      },
+      "pattern_duskforged_bulwark": {
+        "name": "Plans: Duskforged Bulwark"
+      },
+      "pattern_wyrmfall_pendant": {
+        "name": "Design: Wyrmfall Pendant"
+      },
+      "pattern_warhewn_signet": {
+        "name": "Design: Warhewn Signet"
+      },
+      "pattern_prismglass_loop": {
+        "name": "Design: Prismglass Loop"
+      },
+      "pattern_gyrelens_array": {
+        "name": "Schematic: Gyrelens Array"
+      },
+      "pattern_masters_field_forge": {
+        "name": "Schematic: Master's Field Forge"
+      },
+      "pattern_makers_charm": {
+        "name": "Schematic: Maker's Charm"
+      },
+      "pattern_voidbound_grimoire": {
+        "name": "Technique: Voidbound Grimoire"
+      },
+      "pattern_ironhusk_flask": {
+        "name": "Recipe: Ironhusk Flask"
+      },
+      "pattern_warboar_flask": {
+        "name": "Recipe: Warboar Flask"
+      },
+      "pattern_runewater_flask": {
+        "name": "Recipe: Runewater Flask"
+      },
+      "pattern_stonepot_stew": {
+        "name": "Recipe: Stonepot Stew"
+      },
+      "pattern_warspice_skewers": {
+        "name": "Recipe: Warspice Skewers"
+      },
+      "pattern_sageleaf_chowder": {
+        "name": "Recipe: Sageleaf Chowder"
+      },
+      "pattern_grand_cauldron": {
+        "name": "Recipe: Grand Cauldron"
+      },
+      "pattern_laden_hearth": {
+        "name": "Recipe: The Laden Hearth"
+      },
+      "vale_wheat_seed": {
+        "name": "Vale Wheat Seed"
+      },
+      "vale_wheat": {
+        "name": "Vale Wheat"
+      },
+      "fine_vale_wheat": {
+        "name": "Fine Vale Wheat"
+      },
+      "withered_husks": {
+        "name": "Withered Husks"
+      },
+      "compost": {
+        "name": "Compost"
+      },
+      "growth_tonic": {
+        "name": "Growth Tonic"
+      },
+      "brook_carrot_seed": {
+        "name": "Brook Carrot Seed"
+      },
+      "brook_carrot": {
+        "name": "Brook Carrot"
+      },
+      "fine_brook_carrot": {
+        "name": "Fine Brook Carrot"
+      },
+      "marsh_rice_seed": {
+        "name": "Marsh Rice Seed"
+      },
+      "marsh_rice": {
+        "name": "Marsh Rice"
+      },
+      "fine_marsh_rice": {
+        "name": "Fine Marsh Rice"
+      },
+      "bog_beet_seed": {
+        "name": "Bog Beet Seed"
+      },
+      "bog_beet": {
+        "name": "Bog Beet"
+      },
+      "fine_bog_beet": {
+        "name": "Fine Bog Beet"
+      },
+      "highland_barley_seed": {
+        "name": "Highland Barley Seed"
+      },
+      "highland_barley": {
+        "name": "Highland Barley"
+      },
+      "fine_highland_barley": {
+        "name": "Fine Highland Barley"
+      },
+      "frost_gourd_seed": {
+        "name": "Frost Gourd Seed"
+      },
+      "frost_gourd": {
+        "name": "Frost Gourd"
+      },
+      "fine_frost_gourd": {
+        "name": "Fine Frost Gourd"
+      },
+      "thornpeak_cabbage_seed": {
+        "name": "Thornpeak Cabbage Seed"
+      },
+      "thornpeak_cabbage": {
+        "name": "Thornpeak Cabbage"
+      },
+      "fine_thornpeak_cabbage": {
+        "name": "Fine Thornpeak Cabbage"
+      },
+      "frost_lentils_seed": {
+        "name": "Frost Lentils Seed"
+      },
+      "frost_lentils": {
+        "name": "Frost Lentils"
+      },
+      "fine_frost_lentils": {
+        "name": "Fine Frost Lentils"
+      },
+      "gilded_sunmelon_seed": {
+        "name": "Gilded Sunmelon Seed"
+      },
+      "gilded_sunmelon": {
+        "name": "Gilded Sunmelon"
+      },
+      "fine_gilded_sunmelon": {
+        "name": "Fine Gilded Sunmelon"
+      },
+      "evergarden_greens_seed": {
+        "name": "Evergarden Greens Seed"
+      },
+      "evergarden_greens": {
+        "name": "Evergarden Greens"
+      },
+      "fine_evergarden_greens": {
+        "name": "Fine Evergarden Greens"
+      },
+      "gilded_yam_seed": {
+        "name": "Gilded Yam Seed"
+      },
+      "gilded_yam": {
+        "name": "Gilded Yam"
+      },
+      "fine_gilded_yam": {
+        "name": "Fine Gilded Yam"
+      },
+      "evergarden_pumpkin_seed": {
+        "name": "Evergarden Pumpkin Seed"
+      },
+      "evergarden_pumpkin": {
+        "name": "Evergarden Pumpkin"
+      },
+      "fine_evergarden_pumpkin": {
+        "name": "Fine Evergarden Pumpkin"
+      },
+      "garden_hoe": {
+        "name": "Garden Hoe"
+      },
+      "bronze_hoe": {
+        "name": "Bronze Hoe"
+      },
+      "skysilver_hoe": {
+        "name": "Skysilver Hoe"
+      },
+      "osmium_hoe": {
+        "name": "Osmium Hoe"
+      },
+      "vale_hearth_loaf": {
+        "name": "Vale Hearth Loaf"
+      },
+      "eastbrook_root_pottage": {
+        "name": "Eastbrook Root Pottage"
+      },
+      "fenbridge_rice_bowl": {
+        "name": "Fenbridge Rice Bowl"
+      },
+      "fenbridge_beet_braise": {
+        "name": "Fenbridge Beet Braise"
+      },
+      "highwatch_barley_bannock": {
+        "name": "Highwatch Barley Bannock"
+      },
+      "highwatch_gourd_soup": {
+        "name": "Highwatch Gourd Soup"
+      },
+      "evergarden_sunmelon_tart": {
+        "name": "Evergarden Sunmelon Tart"
+      },
+      "evergarden_harvest_platter": {
+        "name": "Evergarden Harvest Platter"
+      },
+      "eastbrook_glazed_carrots": {
+        "name": "Eastbrook Glazed Carrots"
+      },
+      "fenbridge_rice_pudding": {
+        "name": "Fenbridge Rice Pudding"
+      },
+      "highwatch_barley_porridge": {
+        "name": "Highwatch Barley Porridge"
+      },
+      "evergarden_braised_greens": {
+        "name": "Evergarden Braised Greens"
+      },
+      "harvest_feast": {
+        "name": "Harvest Feast"
+      },
+      "pattern_highwatch_gourd_soup": {
+        "name": "Recipe: Highwatch Gourd Soup"
+      },
+      "pattern_highwatch_barley_porridge": {
+        "name": "Recipe: Highwatch Barley Porridge"
+      },
+      "pattern_evergarden_sunmelon_tart": {
+        "name": "Recipe: Evergarden Sunmelon Tart"
+      },
+      "pattern_evergarden_harvest_platter": {
+        "name": "Recipe: Evergarden Harvest Platter"
+      },
+      "pattern_evergarden_braised_greens": {
+        "name": "Recipe: Evergarden Braised Greens"
+      },
+      "pattern_harvest_feast": {
+        "name": "Recipe: Harvest Feast"
+      },
+      "raw_deepbarb_catfish": {
+        "name": "Raw Deepbarb Catfish"
+      },
+      "raw_hollowgill_sturgeon": {
+        "name": "Raw Hollowgill Sturgeon"
+      },
+      "raw_stillmere_salmon": {
+        "name": "Raw Stillmere Salmon"
+      },
+      "clockreel_fishing_rod": {
+        "name": "Clockreel Fishing Rod"
+      },
+      "peppered_deepbarb_catfish": {
+        "name": "Peppered Deepbarb Catfish"
+      },
+      "roast_hollowgill_sturgeon": {
+        "name": "Roast Hollowgill Sturgeon"
+      },
+      "pattern_peppered_deepbarb_catfish": {
+        "name": "Recipe: Peppered Deepbarb Catfish"
+      },
+      "pattern_roast_hollowgill_sturgeon": {
+        "name": "Recipe: Roast Hollowgill Sturgeon"
+      },
+      "pattern_clockreel_fishing_rod": {
+        "name": "Schematic: Clockreel Fishing Rod"
+      },
+      "evergarden_hoe": {
+        "name": "Evergarden Hoe"
+      },
+      "stonepot_feast": {
+        "name": "Stonepot Feast"
+      },
+      "warspice_feast": {
+        "name": "Warspice Feast"
+      },
+      "sageleaf_feast": {
+        "name": "Sageleaf Feast"
+      },
+      "pattern_stonepot_feast": {
+        "name": "Recipe: Stonepot Feast"
+      },
+      "pattern_warspice_feast": {
+        "name": "Recipe: Warspice Feast"
+      },
+      "pattern_sageleaf_feast": {
+        "name": "Recipe: Sageleaf Feast"
       },
       "ps_briny_lure": {
         "name": "Tuzlu Yem"
@@ -13910,6 +14719,15 @@ export const tr_TR: EnTranslations = {
       "wand_of_quenched_sparks": {
         "name": "Sönmüş Kıvılcımların Asası"
       },
+      "cogwheel_blank": {
+        "name": "Cogwheel Blank"
+      },
+      "copperlens_ocular": {
+        "name": "Copperlens Ocular"
+      },
+      "deed_of_making": {
+        "name": "Deed of Making"
+      },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"
       },
@@ -14055,7 +14873,7 @@ export const tr_TR: EnTranslations = {
         "name": "Voss'un Kutsanmış Topuzu"
       },
       "wyrmcult_soulsteps": {
-        "name": "Ejdertarikatı Ruhadımları"
+        "name": "Broodsworn Soulsteps"
       },
       "wyrmshadow_harness": {
         "name": "Nightfang Koşumu"
@@ -14286,7 +15104,7 @@ export const tr_TR: EnTranslations = {
         "name": "Diyakoz'un Kutsal Emanet Miğferi"
       },
       "varric_shadow_cowl": {
-        "name": "Varric'in Gölge Başlığı"
+        "name": "Vandric'in Gölge Başlığı"
       },
       "siltguard_helm": {
         "name": "Balçıkmuhafız Miğferi"
@@ -14393,6 +15211,15 @@ export const tr_TR: EnTranslations = {
       "heroic_mark": {
         "name": "Kahramanca Nişan"
       },
+      "wyrmfall_core": {
+        "name": "Wyrmfall Core"
+      },
+      "sundered_essence": {
+        "name": "Sundered Essence"
+      },
+      "makers_ember": {
+        "name": "Maker's Ember"
+      },
       "eastbrook_buckler": {
         "name": "Doğudere Kalkanı"
       },
@@ -14463,7 +15290,7 @@ export const tr_TR: EnTranslations = {
         "name": "Kemikürperti Kuşağı"
       },
       "mistforged_pauldrons": {
-        "name": "Sisdövümü Omuzlukları"
+        "name": "Fogforged Pauldrons"
       },
       "tideguard_faceguard": {
         "name": "Gelgitmuhafızı Yüzlüğü"
@@ -14792,10 +15619,10 @@ export const tr_TR: EnTranslations = {
         "name": "Parçabeyi Kazzix"
       },
       "wyrmcult_zealot": {
-        "name": "Ejder Tarikatı Bağnazı"
+        "name": "Broodsworn Zealot"
       },
       "wyrmcult_necromancer": {
-        "name": "Ejder Tarikatı Nekromcusu"
+        "name": "Broodsworn Necromancer"
       },
       "boneclad_revenant": {
         "name": "Kemikzırhlı Hortlak"
@@ -14924,7 +15751,7 @@ export const tr_TR: EnTranslations = {
         "name": "Azizsiz Heykel"
       },
       "deacon_varric": {
-        "name": "Diyakoz Varric"
+        "name": "Diyakoz Vandric"
       },
       "acolyte_tessa": {
         "name": "Çömez Tessa"
@@ -15113,7 +15940,7 @@ export const tr_TR: EnTranslations = {
         "name": "Bataklık Perisi"
       },
       "frostmane_yeti": {
-        "name": "Kırağı Yeleli Yeti"
+        "name": "Rimemane Yeti"
       },
       "terrace_howler": {
         "name": "Taraça Uluyanı"
@@ -15161,7 +15988,7 @@ export const tr_TR: EnTranslations = {
         "name": "Meredark"
       },
       "harvest_sprite": {
-        "name": "Hasat Perisi"
+        "name": "Gleaning Sprite"
       },
       "mere_lurker": {
         "name": "Göl Pusucusu"
@@ -15185,7 +16012,7 @@ export const tr_TR: EnTranslations = {
         "name": "Alacakaranlık Gezgini"
       },
       "nightkin_stargazer": {
-        "name": "Gece Halkı Yıldız Gözlemcisi"
+        "name": "Gloamkin Stargazer"
       },
       "barrow_king": {
         "name": "Höyük Kralı"
@@ -15344,7 +16171,7 @@ export const tr_TR: EnTranslations = {
         "name": "Emberkin"
       },
       "gloomshade": {
-        "name": "Gloomshade"
+        "name": "Duskmurk"
       },
       "grix_the_tunnelking": {
         "name": "Tünelkral Grix"
@@ -15625,7 +16452,7 @@ export const tr_TR: EnTranslations = {
       },
       "provisioner_fenna": {
         "name": "Erzakçı Fenna",
-        "title": "Eldergleam Erzakçısı",
+        "title": "Eldershine Erzakçısı",
         "greeting": "Ekmek hala sıcak, su hala tatlı. Vadi sağlıyor, ben de öyle."
       },
       "wardsmith_orun": {
@@ -15750,12 +16577,12 @@ export const tr_TR: EnTranslations = {
       },
       "sexton_marrow": {
         "name": "Mezarcı Marrow",
-        "title": "Gallowmere Mezarcısı",
+        "title": "Gibbetmere Mezarcısı",
         "greeting": "Onları burada derin gömüyoruz ve çanları çalıyoruz ki aşağıda kalmaları gerektiğini hatırlasınlar."
       },
       "widow_tansy": {
         "name": "Dul Tansy",
-        "title": "Gallowmere'in Mum Yapımcısı",
+        "title": "Gibbetmere'in Mum Yapımcısı",
         "greeting": "Her mezar için bir mum ve hiçbiri sönmemeli. Hiçbiri, duyuyor musun beni?"
       },
       "vicar_creel": {
@@ -15779,7 +16606,7 @@ export const tr_TR: EnTranslations = {
         "greeting": "Deniz verir, kum saklar, orman ise alır. Kıyıdan ayrılma, yabancı."
       },
       "hermit_okku": {
-        "name": "Okku",
+        "name": "Okrim",
         "title": "İçeri Giren Adam",
         "greeting": "Şimdi sessiz ol. Davullar ağaçların altında yürüyen her şeyi sayar ve seni de zaten saydılar."
       },
@@ -15883,6 +16710,26 @@ export const tr_TR: EnTranslations = {
         "title": "Eczacı Ustası",
         "greeting": "İki kez ölçün ve bir kez dökün, {className}. Eczacının dökülen reaktiflere karşı sabrı yoktur."
       },
+      "farmer_jessica": {
+        "name": "Farmer Jessica",
+        "title": "Allotment Keeper",
+        "greeting": "Good soil and fair weather, {playerName}. Buy a seed from me, sow it in one of those beds, and go about your day. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer."
+      },
+      "farmer_teasel": {
+        "name": "Farmer Teasel",
+        "title": "Fen Paddy Farmer",
+        "greeting": "Marsh rice and bog beet seed, {className}, and compost to feed them. The paddies drain slow, so mind where you tread."
+      },
+      "farmer_hollis": {
+        "name": "Farmer Hollis",
+        "title": "Highwatch Terrace Farmer",
+        "greeting": "The terraces give what the mountain allows, {className}. I sell seed and compost, and if a crop of yours comes up withered I will work the husks back into good soil for you."
+      },
+      "farmer_verbena": {
+        "name": "Farmer Verbena",
+        "title": "Parterre Gardener",
+        "greeting": "Mind the edging, {playerName}, these beds are the pride of the parterre. Seed and compost are what I sell, and I will turn any withered husks you carry into more of it."
+      },
       "wayfarer_bryn": {
         "name": "Yolcu Bryn",
         "title": "Liman Rehberi",
@@ -15942,6 +16789,19 @@ export const tr_TR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Maden damarı işlendi"
+          }
+        }
+      },
+      "q_farm_intro": {
+        "title": "First Furrow",
+        "text": "Take this hoe and a pinch of vale wheat seed, {playerName}. Sow the seed in one of the beds beside me, then go about your business. Come back whenever you like and bring the crop in; I will be here.",
+        "completion": "There, your first crop in your own hands. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer. Come back for seed whenever the beds call you, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat planted"
+          },
+          "1": {
+            "label": "Vale Wheat harvested"
           }
         }
       },
@@ -16492,7 +17352,7 @@ export const tr_TR: EnTranslations = {
       },
       "q_drogmar": {
         "title": "Savaş Ağası Drogmar",
-        "text": "Savaş Ağası Drogmar, Ejdertarikatı'nın altınını aldı ve klanları dağın uyanışına yemin ettirdi. O, duvarıma savurmayı düşündükleri çekiç, ve yere vurduğunda, {playerName}, yanında durma. Yoldaşlarını savaş kampına götür ve onu yok et, Highwatch için.",
+        "text": "Warlord Drogmar took the Broodsworn's coin and swore the clans to the mountain's waking. He is the hammer they mean to swing at my wall, and when he slams the ground, {playerName}, do not be standing near him. Take your companions into the war-camp and end him, for Highwatch.",
         "completion": "Drogmar, kendi kampında ölü. Klanlar yüksek geçitlere dağılacak, duvarıma bir kışlık zaman kazandırdın, {playerName}.",
         "objectives": {
           "0": {
@@ -16532,11 +17392,11 @@ export const tr_TR: EnTranslations = {
       },
       "q_zealots": {
         "title": "Rüzgârdaki İlahiler",
-        "text": "Rüzgâr güney zirvelerinden geldiğinde, {playerName}, ilahi taşır. Ejder Tarikatı artık saklanmıyor, Mabet'in aşağısına çadırlar kurdular ve altında uyuyana şarkı söylüyorlar. On iki yobazı sustur. Susturulan her ses, dağa bir gecelik uyku daha kazandırır.",
+        "text": "When the wind comes off the southern peaks, {playerName}, it carries chanting. The Broodsworn no longer hides: they have raised tents below the Sanctum and they sing to what sleeps beneath it. Silence twelve zealots. Every voice stilled buys the mountain another night of sleep.",
         "completion": "Rüzgâr daha sessiz. Ama beni rahatsız eden ilahi söylemeleri değil, {playerName}, asıl mesele bir şeyin onlara karşılık söylüyor olabileceği.",
         "objectives": {
           "0": {
-            "label": "Öldürülen Ejder Tarikatı Yobazı"
+            "label": "Broodsworn Zealot slain"
           }
         }
       },
@@ -16609,7 +17469,7 @@ export const tr_TR: EnTranslations = {
             "label": "Öldürülen Ejder Tarikatı Yobazı"
           },
           "1": {
-            "label": "Öldürülen Ejder Tarikatı Nekromantı"
+            "label": "Broodsworn Necromancer slain"
           }
         }
       },
@@ -16874,6 +17734,26 @@ export const tr_TR: EnTranslations = {
           }
         }
       },
+      "q_prof_workorder_kitchens_wheat": {
+        "title": "Kitchens Wheat Order",
+        "text": "Bread does not bake itself, {playerName}, and my flour bins are scraping bottom. Bring me eight sheaves of vale wheat and I will pay you honest coin for the lot. Grown by your own hand or bought off the market, I do not care, so long as it grinds.",
+        "completion": "Good dry grain, and plenty of it. There is your pay, counted out. When the next crop comes in, you know which door to knock on.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat delivered"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_rice": {
+        "title": "Kitchens Rice Order",
+        "text": "The marsh folk swear by their rice, {playerName}, and I mean to find out why. Fetch me five measures of marsh rice and there is coin waiting for you here. Keep it dry on the road, mind: wet rice is porridge, and I did not order porridge.",
+        "completion": "Plump and dry, every grain. Here is your coin. If the marsh keeps giving, so do I.",
+        "objectives": {
+          "0": {
+            "label": "Marsh Rice delivered"
+          }
+        }
+      },
       "q_prof_workorder_loom": {
         "title": "Tezgah İş Siparişi",
         "text": "Tezgah kuruyor ve boş eller gün ışığını boşa harcıyor, {playerName}. Bana altı örümcek ipeği yumağı getir, bakırına kadar sayılan adil bir ücret öderim.",
@@ -17082,7 +17962,7 @@ export const tr_TR: EnTranslations = {
       },
       "q_hollow_old_marrowshell": {
         "title": "Sığlıkların Yaşlı Kabuğu",
-        "text": "İlk isim Yaşlı İlikkabuk, Eldergleam'ın bir kapısı olmadan önce doğu sığlıklarında avlanan, bir araba büyüklüğünde bir yengeç. Dolaşır, {playerName}, o yüzden izine rastlayana kadar kıyı boyunca yürümen gerekecek. Yalnız gitme ve durgunluğuna güvenme.",
+        "text": "İlk isim Yaşlı İlikkabuk, Eldershine'ın bir kapısı olmadan önce doğu sığlıklarında avlanan, bir araba büyüklüğünde bir yengeç. Dolaşır, {playerName}, o yüzden izine rastlayana kadar kıyı boyunca yürümen gerekecek. Yalnız gitme ve durgunluğuna güvenme.",
         "completion": "Sığlıklar yeniden sadece su. O kabuğun benden daha iyi avcıları kırdığını gördüm, {playerName}. Seni değil.",
         "objectives": {
           "0": {
@@ -17224,12 +18104,12 @@ export const tr_TR: EnTranslations = {
         }
       },
       "q_fv_frostmane_tyrant": {
-        "title": "Kırağı Yeleli Zorba",
-        "text": "Uluyanlar taraçalardan indiğinde avlanmıyorlardı. Kaçıyorlardı. Bir yeti yüksek toprakları ele geçirdi, dağ halkı ona Kırağı Yeleli diyor, ve sürüler bile onunla bir yamacı paylaşmıyor. Bu bitmeli, {playerName}, kış onu duvarlarıma sürmeden önce. Bir arkadaş getir. İki getir.",
-        "completion": "Dün gece rüzgar dindiğinde, bütün köy Kırağı Yeleli'nin eskiden olduğu yerdeki sessizliği duydu. Diyar sana yıllarca ödeyeceği bir borç içinde, {playerName}. Bunu tak, ve Icemantle'daki her kapı sana açık.",
+        "title": "The Rimemane Tyrant",
+        "text": "The howlers were not hunting when they came down the terraces. They were fleeing. A yeti has claimed the high ground, the mountain folk call it the Rimemane, and even the packs will not share a slope with it. It has to end, {playerName}, before winter drives it down to my walls. Bring a friend. Bring two.",
+        "completion": "When the wind dropped last night the whole village heard the silence where the Rimemane used to be. The Reach owes you a debt it will be years in paying, {playerName}. Wear this, and every door in Icemantle is open to you.",
         "objectives": {
           "0": {
-            "label": "Öldürülen Kırağı Yeleli"
+            "label": "The Rimemane slain"
           }
         }
       },
@@ -17382,7 +18262,7 @@ export const tr_TR: EnTranslations = {
         "completion": "Dört kova kancalarına geri döndü ve sıralar sessizleşti. Perilerle benden daha ağır bir elin var, {playerName}, ve bugün buna sevindim.",
         "objectives": {
           "0": {
-            "label": "Kovulan Hasat Perisi"
+            "label": "Gleaning Sprite driven off"
           },
           "1": {
             "label": "Kurtarılan Reçine Toplama Kovası"
@@ -17524,7 +18404,7 @@ export const tr_TR: EnTranslations = {
       },
       "q_nb_eyes_on_the_vigil": {
         "title": "Nöbetteki Gözler",
-        "text": "Bir şey, gezginleri cesur ve sürüleri huzursuz yapıyor, {playerName}, ve bunu çiçeklerde okuyamıyorum. Cassian bunu gökyüzünde okuyabilir. Gözlem kampını, gece halkının taşlar arasında süzüldüğü, buranın doğusundaki Ebedi Nöbet'in yanında tutuyor. Onu bul, ve yıldızların ne söylediğini sor.",
+        "text": "Something has the striders bold and the herds uneasy, {playerName}, and I cannot read it in the flowers. Cassian can read it in the sky. He keeps his observatory camp by the Standing Vigil east of here, where the gloamkin drift among the stones. Find him, and ask what the stars are saying.",
         "completion": "Lira mı gönderdi seni? Demek bahçeler de hissediyor. Bir an dürbünün yanında otur, {playerName}. Yıldızlar bir aydır huzursuz, ve çizdiğim her harita kuzeye, höyüğe doğru eğiliyor.",
         "objectives": {
           "0": {
@@ -17534,7 +18414,7 @@ export const tr_TR: EnTranslations = {
       },
       "q_nb_charts_of_the_stones": {
         "title": "Taşlardaki Haritalar",
-        "text": "Nöbet taşları Moonrest'ten daha yaşlı, onlara bakan gece halkından daha yaşlı, ve yüzeyleri, hayatımı okumayı öğrenmeye adadığım yıldız haritalarıyla kazınmış. Gökyüzü kaydı, {playerName}, ve ne kadar olduğunu bilmem gerekiyor. Üç taştaki haritaları oku ve bana yönlerini getir.",
+        "text": "The Vigil stones are older than Moonrest, older than the gloamkin who tend them, and their faces are cut with star charts I have spent my life learning to read. The sky has shifted, {playerName}, and I must know how far. Read the charts on three of the stones and bring me their bearings.",
         "completion": "Şüphe kalmadı. Her yön Uykusuz Höyük'e doğru sürünmüş, sanki gökyüzünün kendisi izlemek için o höyüğe eğiliyormuş gibi. Eski krallar bir sebepten hizalanmış yıldızların altına gömülmüştü, {playerName}.",
         "objectives": {
           "0": {
@@ -17558,7 +18438,7 @@ export const tr_TR: EnTranslations = {
       "q_nb_the_barrow_king": {
         "title": "Höyük Kralı Uyanıyor",
         "text": "Her yön, her huzursuz yıldız, her açılmış höyük tek bir şeye işaret ediyor: Höyük Kralı büyük höyüğün altında uyanıyor, ve bu diyarın onu geri tutacak bir şafağı yok. Tacını hatırlamadan önce huzura kavuşturulmalı, {playerName}. Yalnız gitme: bir arkadaş getir ve çiçek ışığını arkanda tut.",
-        "completion": "Yıldızlar bir mevsim içinde ilk kez sakinleşti, {playerName}. Höyükler kapandı, gece halkı taşlarının yanında durgunlaştı, ve kral bir kez daha aşağıda uyuyor. Bu pelerini tak: Moonrest onu, gecenin sonunda güvendiği kişi için kesti.",
+        "completion": "The stars have settled for the first time in a season, {playerName}. The mounds are closed, the gloamkin have gone still at their stones, and the king sleeps below once more. Wear this mantle: Moonrest cut it for whoever the night finally trusted.",
         "objectives": {
           "0": {
             "label": "Huzura Kavuşturulan Höyük Kralı"
@@ -17566,9 +18446,9 @@ export const tr_TR: EnTranslations = {
         }
       },
       "q_ww_bells_of_gallowmere": {
-        "title": "Gallowmere'in Çanları",
-        "text": "O çan seslerini duyuyor musun, {playerName}? Bu, kuzey yolunun yukarısındaki Gallowmere, ölülerini uykuya çalıyor. Mezarcı Marrow, örtünün altındaki her ruhun sayımını tutuyor, yaşayan ve gömülü. Git ve sayıl, orman seni kendi başına saymadan önce.",
-        "completion": "Cobb seni yolun yukarısına sağ salim mi gönderdi? İyi adam. O kapı fenerlerini otuz yıldır yanık tuttu, ve orman onu bir kez bile geçemedi. Gallowmere'e hoş geldin, {playerName}. Çanlara dikkat et.",
+        "title": "Gibbetmere'in Çanları",
+        "text": "O çan seslerini duyuyor musun, {playerName}? Bu, kuzey yolunun yukarısındaki Gibbetmere, ölülerini uykuya çalıyor. Mezarcı Marrow, örtünün altındaki her ruhun sayımını tutuyor, yaşayan ve gömülü. Git ve sayıl, orman seni kendi başına saymadan önce.",
+        "completion": "Cobb seni yolun yukarısına sağ salim mi gönderdi? İyi adam. O kapı fenerlerini otuz yıldır yanık tuttu, ve orman onu bir kez bile geçemedi. Gibbetmere'e hoş geldin, {playerName}. Çanlara dikkat et.",
         "objectives": {
           "0": {
             "label": "Mezarcı Marrow'a Rapor Ver"
@@ -17597,7 +18477,7 @@ export const tr_TR: EnTranslations = {
       },
       "q_ww_candles_at_the_bounds": {
         "title": "Sınırlardaki Mumlar",
-        "text": "Dört sınır taşı Gallowmere'i çevreler, {playerName}, çıkan her yolda bir tane, ve her taşta bir mezar mumu yanar. Onlar yandığı sürece, gömülüler gömülü kalır. Çisenti hepsini söndürdü, dördünü de, ve ben sınırları tek başıma yürüyecek kadar yaşlıyım. Mumumu al ve onları çabucak yeniden yak.",
+        "text": "Dört sınır taşı Gibbetmere'i çevreler, {playerName}, çıkan her yolda bir tane, ve her taşta bir mezar mumu yanar. Onlar yandığı sürece, gömülüler gömülü kalır. Çisenti hepsini söndürdü, dördünü de, ve ben sınırları tek başıma yürüyecek kadar yaşlıyım. Mumumu al ve onları çabucak yeniden yak.",
         "completion": "Dördü de mi yanıyor? O zaman nefes al, {playerName}. Sen duymadın ama bütün köy duydu: son fitil tutuştuğu an çanlar daha rahat çaldı.",
         "objectives": {
           "0": {
@@ -17627,7 +18507,7 @@ export const tr_TR: EnTranslations = {
       },
       "q_ww_what_the_bark_holds": {
         "title": "Kabuğun Sakladığı",
-        "text": "Gallowmere'in doğusundaki Asılı Çayırlık'ta örücüler ipekle sarılmış ölülerini dallara asıyor, ve mezar kütüğü sürüngenleri altında sabırlı tabut taşıyıcılar gibi nöbet tutuyor. Yukarıdakiler bizim halkımız, {playerName}. Beş sürüngeni devir, sarılı ölülerden üçünü indir, ve onları toprağa, eve getir.",
+        "text": "Gibbetmere'in doğusundaki Asılı Çayırlık'ta örücüler ipekle sarılmış ölülerini dallara asıyor, ve mezar kütüğü sürüngenleri altında sabırlı tabut taşıyıcılar gibi nöbet tutuyor. Yukarıdakiler bizim halkımız, {playerName}. Beş sürüngeni devir, sarılı ölülerden üçünü indir, ve onları toprağa, eve getir.",
         "completion": "Gece çökmeden üç ruh dürüst toprağın altına geri döndü. Sürüngenler yeniden büyür, kabuk her zaman büyür, ama bu gece çayır boş asılı duruyor, ve bu yeterli.",
         "objectives": {
           "0": {
@@ -17641,17 +18521,17 @@ export const tr_TR: EnTranslations = {
       "q_ww_walking_mosley_home": {
         "title": "Mosley'i Eve Ulaştırmak",
         "text": "Mezarcım Mosley üç gün önce eski avluda bir mezar açmak için şapel yolunu tuttu, ve kazı üzerine çöktü. Tırnaklarıyla kazıp çıktı, aptal yaşıyor, ama şapel mezarlarının yanında büzülmüş ve yoldaki örücüler yüzünden kımıldamıyor. Onu eve götür, {playerName}. Yaşayan bir adam için çanları çalamam.",
-        "completion": "Kapıdan kendi ayaklarının üzerinde geçti, bundan sonra bir şalgam tarhından daha derin bir şey kazmayacağına yemin ederek. Pazara kadar avluya geri dönecek, hep dönerler. Teşekkür ederim, {playerName}. Gallowmere halkını tutar, bütün yasamız bu.",
+        "completion": "Kapıdan kendi ayaklarının üzerinde geçti, bundan sonra bir şalgam tarhından daha derin bir şey kazmayacağına yemin ederek. Pazara kadar avluya geri dönecek, hep dönerler. Teşekkür ederim, {playerName}. Gibbetmere halkını tutar, bütün yasamız bu.",
         "objectives": {
           "0": {
-            "label": "Mezarcı Mosley Gallowmere'e Güvenle Ulaştırıldı"
+            "label": "Mezarcı Mosley Gibbetmere'e Güvenle Ulaştırıldı"
           }
         }
       },
       "q_ww_horn_of_the_huntsman": {
         "title": "Avcının Borusu",
         "text": "Şimdiye kadar borazanı duymuşsundur, {playerName}, ince ve uzak, bütün ormanın nefesini tuttuğu ses. Solgun Avcı, buranın kuzeyindeki çayırında at sürüyor, ve geçtiği her mezar daha da sığlaşıyor. Bir zamanlar bir insandı, ve yanlış gömüldü, ve duanın bunu çözeceğini düşünmekten vazgeçtim. Bir arkadaş al, iki al, ve onu attan indir.",
-        "completion": "Borazan notanın ortasında durdu. Gallowmere'deki her çan kendiliğinden bir kez çaldı, ve sonra orman otuz yıldır duyduğumdan daha sessizleşti. Benim yapamadığım ayini sen yaptın, {playerName}. Bunu tak ve örtünün altında korkmadan yürü.",
+        "completion": "Borazan notanın ortasında durdu. Gibbetmere'deki her çan kendiliğinden bir kez çaldı, ve sonra orman otuz yıldır duyduğumdan daha sessizleşti. Benim yapamadığım ayini sen yaptın, {playerName}. Bunu tak ve örtünün altında korkmadan yürü.",
         "objectives": {
           "0": {
             "label": "Attan İndirilen Solgun Avcı"
@@ -17700,11 +18580,11 @@ export const tr_TR: EnTranslations = {
       },
       "q_pr_the_man_who_went_in": {
         "title": "İçeri Giren Adam",
-        "text": "Dalgıçlar ağaç sınırının ötesine adım atmayacak, {playerName}, ve onlardan bunu istemeyeceğim. Şimdiye kadar davulları duymuşsundur zaten: herkes ikinci geceye kadar duyar. Bu adada o sese doğru yürüyüp geri dönen tek bir adam oldu. Okku. Sarmaşık yolunun derinliklerindeki Sarmaşık Şelalesi'nde büyük banyan ağaçlarının altında kamp kuruyor. Onu bul ve yeşilliğin ne sakladığını sor.",
+        "text": "Dalgıçlar ağaç sınırının ötesine adım atmayacak, {playerName}, ve onlardan bunu istemeyeceğim. Şimdiye kadar davulları duymuşsundur zaten: herkes ikinci geceye kadar duyar. Bu adada o sese doğru yürüyüp geri dönen tek bir adam oldu. Okrim. Sarmaşık yolunun derinliklerindeki Sarmaşık Şelalesi'nde büyük banyan ağaçlarının altında kamp kuruyor. Onu bul ve yeşilliğin ne sakladığını sor.",
         "completion": "Isha mı gönderdi seni? İnci Ana yıllardır adımı ağzına almadı. Sarmaşıkların erişemeyeceği bir yere otur, {playerName}, ve bildiklerimi anlatayım: davullar tehlike değil. Onlar bir uyarı.",
         "objectives": {
           "0": {
-            "label": "Sarmaşık Şelalesi'nde Okku'yu Bul"
+            "label": "Sarmaşık Şelalesi'nde Okrim'yu Bul"
           }
         }
       },
@@ -18289,7 +19169,7 @@ export const tr_TR: EnTranslations = {
             "label": "Işıltıgöl"
           },
           "7": {
-            "label": "Ejder Tarikatı Çadırları"
+            "label": "Broodsworn Tents"
           },
           "8": {
             "label": "Hortlak Tarlaları"
@@ -18301,10 +19181,10 @@ export const tr_TR: EnTranslations = {
       },
       "veiled_hollow": {
         "name": "Örtülü Vadi",
-        "welcome": "Hava eski bir büyüyle uğulduyor. Eldergleam'ın büyük ağacının altında Bekçi Saelwyn'i ara.",
+        "welcome": "Hava eski bir büyüyle uğulduyor. Eldershine'ın büyük ağacının altında Bekçi Saelwyn'i ara.",
         "pois": {
           "0": {
-            "label": "Eldergleam"
+            "label": "Eldershine"
           },
           "1": {
             "label": "Alacakaranlık Mağarası"
@@ -18442,7 +19322,7 @@ export const tr_TR: EnTranslations = {
             "label": "Gece Kapısı"
           },
           "2": {
-            "label": "Ay Kuyusu"
+            "label": "The Moonspring"
           },
           "3": {
             "label": "Gloamfield"
@@ -18457,10 +19337,10 @@ export const tr_TR: EnTranslations = {
       },
       "wraithwood": {
         "name": "Hayalet Ormanı",
-        "welcome": "Ağaç tepeleri yolun üzerinde bir kapak gibi kapanıyor. Gallowmere'in fenerlerinden ayrılma ve orman adını seslenirse cevap verme.",
+        "welcome": "Ağaç tepeleri yolun üzerinde bir kapak gibi kapanıyor. Gibbetmere'in fenerlerinden ayrılma ve orman adını seslenirse cevap verme.",
         "pois": {
           "0": {
-            "label": "Gallowmere"
+            "label": "Gibbetmere"
           },
           "1": {
             "label": "Karga Kapısı"
@@ -18724,6 +19604,11 @@ export const tr_TR: EnTranslations = {
         "sender": "Kahraman levazım subayı",
         "subject": "Kahramanlık Nişanların",
         "body": "Birliğin kahramanlık sınavını temizlerken sen arka saflarda savaşıyor ya da yerde yatıyordun. Kilidin yine de kaydedildi, bu yüzden Kahramanlık Nişanlarından payın kaybolmak yerine buraya gönderildi. Onları iyi kullan.\n\n- Kahraman levazım subayı"
+      },
+      "wyrmfall_core_reward": {
+        "sender": "The Heroic Quartermaster",
+        "subject": "Your Wyrmfall Cores",
+        "body": "The beast fell while you fought from the back, or from the dirt. Your share of its Wyrmfall Cores flies to you here rather than being lost to the corpse-pickers. Put them to good work at a bench.\n\n- The Heroic Quartermaster"
       },
       "guild_trend_engineering_alchemy": {
         "sender": "Üretim Loncası",
@@ -19142,6 +20027,7 @@ export const tr_TR: EnTranslations = {
     "delveRiteShrineReedInteract": "Saz Sunağı: Dokunmak için F'ye bas",
     "delveRiteShrineSkullInteract": "Kafatası Sunağı: Dokunmak için F'ye bas",
     "mailboxName": "Posta Kutusu",
-    "noticeboardName": "İlan Tahtası"
+    "noticeboardName": "İlan Tahtası",
+    "farmPatchName": "Garden Beds"
   }
 };

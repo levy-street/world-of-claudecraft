@@ -36,10 +36,14 @@ export { isTransferLockedInstance };
 
 /** The public display projection of a payload, for wire surfaces other players
  *  see (market browse rows, letter attachment chips). The allowlist is the eqi
- *  wire's (server/game.ts identityFields): signer, enchant, rolled, and nothing
- *  else, so boundTo / bindOnTrade / charges are excluded BY CONSTRUCTION, as is
- *  any future non-cosmetic field. Deep-copies the mutable rolled maps so a
- *  projection never aliases the live escrowed payload. */
+ *  wire's (server/game.ts identityFields): signer, enchant, rolled, name, and
+ *  nothing else, so boundTo / bindOnTrade / charges are excluded BY
+ *  CONSTRUCTION, as is any future non-cosmetic field. 2026-08-27: `name` (the
+ *  player-chosen legendary name, Masterwrought phase 13) is the FIRST cosmetic
+ *  field to JOIN the allowlist since the rule was written; the eqi cross-pin
+ *  in tests/item_instance_transfer.test.ts holds the two sites in lockstep.
+ *  Deep-copies the mutable rolled maps so a projection never aliases the live
+ *  escrowed payload. */
 export function publicInstanceView(instance: ItemInstancePayload): ItemInstancePayload {
   const pub: ItemInstancePayload = {};
   if (instance.signer !== undefined) pub.signer = instance.signer;
@@ -50,6 +54,7 @@ export function publicInstanceView(instance: ItemInstancePayload): ItemInstanceP
       ...(instance.rolled.stats && { stats: { ...instance.rolled.stats } }),
     };
   }
+  if (instance.name !== undefined) pub.name = instance.name;
   return pub;
 }
 

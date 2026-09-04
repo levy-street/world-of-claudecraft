@@ -71,17 +71,21 @@ describe('interior encounter prewarm spec', () => {
     expect(kickAt).toBeGreaterThan(-1);
     expect(kitAt).toBeGreaterThan(kickAt);
 
-    const mobListStart = renderer.indexOf('const PREWARM_MOB_TEMPLATE_IDS = [');
+    // The zone prewarm constants moved to src/render/zone_prewarm_groups.ts
+    // at the Phase 16 extraction; the encounter-exclusion claim follows them.
+    const prewarmGroups = readSource('../src/render/zone_prewarm_groups.ts');
+    const mobListStart = prewarmGroups.indexOf('const PREWARM_MOB_TEMPLATE_IDS = [');
     expect(mobListStart).toBeGreaterThan(-1);
-    const mobListEnd = renderer.indexOf('] as const;', mobListStart);
+    const mobListEnd = prewarmGroups.indexOf('] as const;', mobListStart);
     expect(mobListEnd).toBeGreaterThan(mobListStart);
-    const mobList = renderer.slice(mobListStart, mobListEnd);
+    const mobList = prewarmGroups.slice(mobListStart, mobListEnd);
     // Positive control: a renamed marker would leave an empty slice that
     // satisfies every not.toContain below without reading a thing.
     expect(mobList).toContain('forest_wolf');
     expect(mobList).not.toContain(NYTHRAXIS_ALDRIC);
     expect(mobList).not.toContain('nythraxis');
     expect(renderer).not.toContain("'entities.nythraxis");
+    expect(prewarmGroups).not.toContain("'entities.nythraxis");
   });
 
   it('lists every catalog skin whose model has a weapon VFX spec', () => {

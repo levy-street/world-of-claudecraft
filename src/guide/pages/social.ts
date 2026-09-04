@@ -27,7 +27,7 @@ const CHANNELS = [
 const LOOT = [
   ['guide.social.lootCoinTitle', 'guide.social.lootCoinBody'],
   ['guide.social.lootCommonTitle', 'guide.social.lootCommonBody'],
-  ['guide.social.lootRollTitle', 'guide.social.lootRollBody'],
+  ['guide.social.lootRollTitle', 'guide.social.lootRollBodyNeedBeatsGreed'],
   ['guide.social.lootMasterTitle', 'guide.social.lootMasterBody'],
 ] as const;
 
@@ -55,7 +55,7 @@ export const social: GuidePage = {
           <h2>${esc(t('guide.social.chatHeading'))}</h2>
           <p>${esc(t('guide.social.chatBody'))}</p>
           <ul class="guide-list">${channels}</ul>
-          <p>${esc(t('guide.social.emotesBody'))}</p>
+          <p>${esc(t('guide.social.emotesBodyNamedTarget'))}</p>
           <p class="guide-section-more"><a href="${esc(hrefFor('reference/interface'))}">${esc(t('guide.social.chatMore'))}</a></p>
         </section>
 
@@ -76,7 +76,7 @@ export const social: GuidePage = {
 
         <section class="guide-block">
           <h2>${esc(t('guide.social.finderHeading'))}</h2>
-          <p>${esc(t('guide.social.finderBody'))}</p>
+          <p>${esc(t('guide.social.finderBodyLeaderQueues'))}</p>
           <p>${esc(t('guide.social.finderBoardBody'))}</p>
           <p class="guide-section-more"><a href="${esc(hrefFor('dungeons'))}">${esc(t('guide.social.finderMore'))}</a></p>
         </section>
@@ -110,7 +110,7 @@ export const social: GuidePage = {
           <p>${esc(t('guide.social.guildBankRulesBody'))}</p>
         </section>
 
-        ${section('guide.social.calendarHeading', p('guide.social.calendarBody'))}
+        ${section('guide.social.calendarHeading', p('guide.social.calendarBodyDoubleHonor'))}
 
         <section class="guide-block">
           <h2>${esc(t('guide.social.etiquetteHeading'))}</h2>

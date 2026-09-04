@@ -11,7 +11,11 @@
 
 import { ITEMS } from '../data';
 import { recalcPlayerStats } from '../entity';
-import { canEquipItemInSlot } from '../equipment_rules';
+import {
+  canEquipItemInSlot,
+  displacedSlotForEquip,
+  MASTERWROUGHT_EQUIP_CAP,
+} from '../equipment_rules';
 import { refreshModsForEquipmentChange } from '../progression/talents';
 import type { SimContext } from '../sim_context';
 import type { EquipSlot, ItemDef } from '../types';
@@ -46,10 +50,11 @@ export function bestEpicGearFor(
   );
   const picks: Partial<Record<EquipSlot, string>> = {};
   const used = new Set<string>();
-  for (const slot of ALL_EQUIP_SLOTS) {
+  const bestFor = (slot: EquipSlot, extra?: (item: ItemDef) => boolean): ItemDef | undefined => {
     let candidates = epics.filter(
       (item) =>
         !used.has(item.id) &&
+        (!extra || extra(item)) &&
         canEquipItemInSlot(cls as Parameters<typeof canEquipItemInSlot>[0], item, slot, spec),
     );
     // A dagger class fantasy (Craven Thrust and the Duskveil openers require
@@ -69,10 +74,92 @@ export function bestEpicGearFor(
       );
       if (oneHanders.length > 0) candidates = oneHanders;
     }
-    if (candidates.length === 0) continue;
     candidates.sort((a, b) => score(b) - score(a) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
-    picks[slot] = candidates[0].id;
-    used.add(candidates[0].id);
+    return candidates[0];
+  };
+  for (const slot of ALL_EQUIP_SLOTS) {
+    const best = bestFor(slot);
+    if (!best) continue;
+    picks[slot] = best.id;
+    used.add(best.id);
+  }
+  // Masterwrought cap arm (phase 08): equipBestInSlotForDev writes equipment
+  // directly and never runs masterwroughtConflictSlot, so without this the
+  // dev outfit could silently exceed the counted-family cap the moment
+  // flagged pieces out-score their references (the pbe_boost twin,
+  // enforceMasterwroughtCap, hit exactly that). Keep the cap-highest scoring
+  // flagged picks and refill each demoted slot under the same slot rules,
+  // with every non-KEPT flagged id excluded (the twin's semantics: a refill
+  // can never re-select a different over-cap flagged item, worn or not).
+  // Like the twin, the legendary sub-cap needs no arm until a
+  // legendary-flagged def ships; unlike the twin this sort carries an
+  // explicit id tie-break (the twin leans on sort stability), both
+  // deterministic.
+  const flagged = (Object.entries(picks) as [EquipSlot, string][]).filter(
+    ([, id]) => ITEMS[id]?.masterwrought,
+  );
+  // The refill exclusion only binds after a demotion (a refill can never
+  // re-select a different over-cap flagged item); with the cap not firing
+  // there is no over-cap set to exclude, so the pair re-run below admits
+  // everything.
+  let allowedRefill: (item: ItemDef) => boolean = () => true;
+  if (flagged.length > MASTERWROUGHT_EQUIP_CAP) {
+    const scored = flagged
+      .map(([slot, id]) => ({ slot, id, s: score(ITEMS[id]) }))
+      .sort((a, b) => b.s - a.s || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+    const kept = new Set(scored.slice(0, MASTERWROUGHT_EQUIP_CAP).map((entry) => entry.id));
+    allowedRefill = (item: ItemDef): boolean => !item.masterwrought || kept.has(item.id);
+    for (const demoted of scored.slice(MASTERWROUGHT_EQUIP_CAP)) {
+      used.delete(demoted.id);
+      const fallback = bestFor(demoted.slot, allowedRefill);
+      if (fallback) {
+        picks[demoted.slot] = fallback.id;
+        used.add(fallback.id);
+      } else {
+        delete picks[demoted.slot];
+      }
+    }
+  }
+  // bestFor is per-slot legality only: neither the INITIAL fill nor a
+  // demotion refill applies the two-hand/offhand exclusion, so a mainhand
+  // two-hander (picked when nothing one-handed exists for the class) can
+  // stand beside an offhand pick, and an offhand refill can land beside a
+  // kept two-hand mainhand. This check therefore runs on EVERY path, not
+  // only when the cap fired: re-validate the pair with the shared
+  // displacement rule and, when it fails, re-run the hand fill in the
+  // initial order (mainhand first, then a partner the mainhand does not
+  // displace) under the refill exclusion; kept flagged hand picks stay
+  // candidates, so the re-run re-selects them.
+  const clsKey = cls as Parameters<typeof canEquipItemInSlot>[0];
+  const lookup = (id: string) => ITEMS[id];
+  const offhandDef = picks.offhand !== undefined ? ITEMS[picks.offhand] : undefined;
+  const pairIllegal =
+    picks.mainhand !== undefined &&
+    offhandDef !== undefined &&
+    displacedSlotForEquip(offhandDef, 'offhand', picks, lookup, clsKey, spec) !== null;
+  if (pairIllegal) {
+    for (const slot of ['mainhand', 'offhand'] as const) {
+      const id = picks[slot];
+      if (id !== undefined) {
+        used.delete(id);
+        delete picks[slot];
+      }
+    }
+    const main = bestFor('mainhand', allowedRefill);
+    if (main) {
+      picks.mainhand = main.id;
+      used.add(main.id);
+    }
+    const off = bestFor(
+      'offhand',
+      (item) =>
+        allowedRefill(item) &&
+        displacedSlotForEquip(item, 'offhand', picks, lookup, clsKey, spec) === null,
+    );
+    if (off) {
+      picks.offhand = off.id;
+      used.add(off.id);
+    }
   }
   return picks;
 }

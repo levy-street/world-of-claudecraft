@@ -951,7 +951,7 @@ export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> =
       // noteSpellHit seam (frostMageOnSpellHit in combat/frost_mage.ts),
       // because the base bank site in frostMageAfterCast cannot see the crit
       // flag. The 5-Icicle cap stays untouched and load-bearing (its three
-      // hardcoded readers keep it), and Frozen Orb pulses stay single-bank
+      // hardcoded readers keep it), and Frostglobe pulses stay single-bank
       // (the set doc's disclosed dead zone). gainIcicle draws no rng, so the
       // stream is byte-identical for everyone. The caster 2pc pushback rider
       // rides the generic global knob.

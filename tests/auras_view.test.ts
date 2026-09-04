@@ -24,6 +24,8 @@ import {
   isShortDurationBuff,
   SHORT_BUFF_PRIORITY_SEC,
 } from '../src/ui/auras_view';
+import { setLanguage } from '../src/ui/i18n';
+import { localizeSimAuraName } from '../src/ui/sim_i18n';
 import { assertAllocationStable } from './util/alloc_probe';
 
 // The "local player" id the isOwn dep compares against (the real host compares
@@ -431,10 +433,10 @@ describe('createAurasView: derivation per mode', () => {
     expect(text(Number.POSITIVE_INFINITY)).toBe(''); // truly permanent: no label
   });
 
-  it('hides the countdown under toggle auras (stealth / forms / stance / Ghost Wolf)', () => {
+  it('hides the countdown under toggle auras (stealth / forms / stance / Shadewolf)', () => {
     const v = createAurasView('all', deps());
     // The sim backs each toggle with a long finite duration (3600s), but a mode
-    // shows no countdown (WoW parity): stealth by kind, Ghost Wolf by id (its
+    // shows no countdown (WoW parity): stealth by kind, Shadewolf by id (its
     // aura rides the generic buff_speed kind that Sprint also uses).
     expect(
       v.tick(entity([aura({ id: 'stealth', kind: 'stealth', remaining: 3600 })])).slots[0]
@@ -845,6 +847,44 @@ describe('auras_view: the carried-flag buff', () => {
     expect(auraCancelNeedsConfirm(CARRIED_FLAG_AURA_ID)).toBe(true);
     expect(auraCancelNeedsConfirm('battle_shout')).toBe(false);
     expect(auraCancelNeedsConfirm('ghost_wolf')).toBe(false);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The well-fed food buff. Every buff food mints the ONE unified 'well_fed'
+// aura id (Masterwrought 11c: last eaten wins across the whole family; an
+// elixir coexists because the ids can never collide). On the buff bar it is
+// an ordinary timed buff: its display name rides the AURA_NAME_KEY matcher
+// exactly like the elixir auras, and it is NOT a toggle, so
+// compactAuraDuration applies and the remaining time shows.
+// ---------------------------------------------------------------------------
+describe('auras_view: the well-fed food buff', () => {
+  const wellFed = (): AuraInput => ({
+    id: 'well_fed',
+    name: 'Well Fed',
+    kind: 'buff_sta',
+    value: 2,
+    remaining: 600,
+    duration: 600,
+  });
+
+  it('resolves its display name through the AURA_NAME_KEY row, like the elixirs', () => {
+    // Non-null proves the matcher ROW exists (a missing row returns null and
+    // the buff bar would fall back to the raw sim string in every locale);
+    // the en identity round-trip proves the row's EN value matches the aura
+    // string the dishes actually mint.
+    setLanguage('en');
+    expect(localizeSimAuraName('Well Fed')).not.toBeNull();
+    expect(localizeSimAuraName('Well Fed')).toBe('Well Fed');
+  });
+
+  it('shows its remaining time: a real timed buff, never a toggle', () => {
+    const slot = createAurasView('buffs', deps()).tick(entity([wellFed()])).slots[0];
+    expect(slot.key).toBe('well_fed');
+    expect(slot.toggle).toBe(false);
+    expect(slot.durationText).toBe('10m'); // compactAuraDuration: 600s reads 10m
+    expect(slot.isDebuff).toBe(false);
+    expect(slot.expiring).toBe(false);
   });
 });
 

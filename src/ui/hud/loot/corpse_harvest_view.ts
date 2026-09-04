@@ -20,11 +20,14 @@ export interface CorpseHarvestRow {
   readonly tag: string;
   readonly checked: boolean;
   /**
-   * #2514: does this family have a harvest item behind it? False for the four
-   * carried-but-unmapped families (claw, tusk, gills, horn), whose rows are
-   * still offered (the corpse really does carry them) but can extract nothing.
-   * Checking one is now a no-op rather than a tier's worth of penalty, and the
-   * painter marks the row so the box is not a silent one.
+   * #2514: does this family have a harvest item behind it? False for a
+   * carried-but-unmapped family, whose row is still offered (the corpse
+   * really does carry it) but can extract nothing: checking it is a no-op
+   * rather than a tier's worth of penalty, and the painter marks the row so
+   * the box is not a silent one. Four shipped families were in that state
+   * when #2514 landed (claw, tusk, gills, horn); #2905 mapped the first two
+   * and Masterwrought Phase 11m the last two, so today the false arm is
+   * driven only by the retagged fixtures of tests/helpers/unmapped_family.ts.
    */
   readonly yieldsItem: boolean;
 }
@@ -36,18 +39,33 @@ export interface CorpseHarvestViewModel {
    * True when THIS selection concentrates: it earns a higher tier than the
    * widest pick available on this corpse would. Measured against that widest
    * pick (the sim's bonus for an empty selection), not against zero, because
-   * after #2514 the widest pick on a mixed corpse already carries a bonus: part
-   * of the corpse's breadth is a family with no item behind it, which is
-   * unreachable content rather than a choice the player declined. So on the
-   * three `gills, hide` murlocs nothing is ever concentrated (checking hide is
-   * the widest pick there is), and on old_greyjaw `['hide']` is while
-   * `['hide','fang']` is not.
+   * since #2514 the widest pick on a MIXED corpse (one carrying a family
+   * with no item behind it) already carries a bonus: part of the corpse's
+   * breadth is unreachable content rather than a choice the player declined.
+   * No shipped corpse is mixed since #2905 (claw, tusk) and Masterwrought
+   * Phase 11m (horn, gills) mapped the last unmapped families, so on shipped
+   * content the empty pick's bonus is 0 and the two baselines coincide; the
+   * distinction stays exercised on the retagged fixtures of
+   * tests/helpers/unmapped_family.ts, where an `['antler','hide']` corpse
+   * concentrates nothing (every legal pick's bonus is 1, the empty pick's
+   * own), exactly the shape the three `gills, hide` murlocs had before 11m
+   * mapped gills. Today `['hide']` on those murlocs is a genuine concentrate
+   * (bonus 1 against the spread's 0), and on old_greyjaw (hide, fang, claw)
+   * every strict subset is: `['hide']` bonus 2, `['hide','fang']` and
+   * `['hide','claw']` bonus 1, the spread 0.
    *
-   * Read off the sim's own bonus, never a checkbox count. A count would call
-   * `['gills','hide']` a full cover and `['hide','claw']` a concentrate, and
-   * the sim disagrees with both. On an all-mapped corpse the two definitions
-   * coincide exactly, which is why the pre-#2514 count survived: it was right
-   * about the eight templates it was ever tested on.
+   * Read off the sim's own bonus, never a checkbox count. On an all-mapped
+   * corpse the two definitions coincide exactly, which is why the pre-#2514
+   * count survived: it was right about the eight templates it was ever
+   * tested on, and since Phase 11m it would be right on every shipped
+   * template again. What retires it is the mixed shape, now fixture-only: on
+   * a retagged `['hide','fang','antler']` corpse a count calls
+   * `['hide','antler']` a two-family pick distinct from `['hide']` and calls
+   * `['hide','fang','antler']` a full cover, and the sim disagrees with
+   * both: the first extracts only hide at bonus 2, byte-identical to
+   * `['hide']`, and the cover still forfeits antler at bonus 1, never 0.
+   * (Before #2905, old_greyjaw's own claw demonstrated the first half on
+   * shipped content.)
    */
   readonly concentrated: boolean;
   /** #2509: the checked set forfeits every yield this corpse could have given. */
@@ -72,18 +90,23 @@ export interface CorpseHarvestViewModel {
  * disabled: the harvest button enables once the corpse is harvestable, since
  * submitting an empty/partial selection is well-defined.
  *
- * The ONE selection that is not: #2509. Four shipped component families
- * (claw, tusk, gills, horn) are tagged on corpses but have no harvest item
- * behind them yet, and the rows for them are rendered like any other, so on a
- * mixed corpse a player could check only those and submit. That pick survives
- * the sim's sanitization (the tags ARE carried), spends the single-use claim,
- * and grants nothing. The command boundary now refuses it
- * (src/sim/interaction.ts harvestCorpse); this is the client mirror of the
- * same predicate, so the dead-end submit is not offered in the first place.
+ * The ONE selection that is not: #2509. A carried-but-unmapped family (a tag
+ * HARVEST_COMPONENT_ITEMS maps to no item) renders its row like any other,
+ * so on a mixed corpse a player could check only such rows and submit. That
+ * pick survives the sim's sanitization (the tags ARE carried), would spend
+ * the single-use claim, and would grant nothing. The command boundary
+ * refuses it (src/sim/interaction.ts harvestCorpse); this is the client
+ * mirror of the same predicate, so the dead-end submit is not offered in the
+ * first place. Four shipped families were in that state when #2509 landed
+ * (claw, tusk, gills, horn); #2905 mapped the first two and Masterwrought
+ * Phase 11m the last two, so no shipped corpse is mixed today and the corpse
+ * suites drive this arm through the retagged fixtures of
+ * tests/helpers/unmapped_family.ts.
  *
  * Mirrored EXACTLY, including where it does not fire: on a corpse whose tags all
- * map to nothing (gills, horn on a retagged fixture; fen_troll was the shipped
- * case until #2905 mapped claw and tusk) NO pick forfeits anything, because no
+ * map to nothing (a fixture retagged with the synthetic antler and fleece
+ * families of tests/helpers/unmapped_family.ts; fen_troll (claw, tusk) was the
+ * shipped case until #2905 mapped both) NO pick forfeits anything, because no
  * pick could have paid out, so `forfeitsEveryYield` stays false there. What
  * disables that corpse is the OTHER term, isHarvestableCorpse (#2513): the sim
  * refuses the command outright, so the button must not submit. The two terms are

@@ -224,3 +224,43 @@ export function eventLeadDayKey(
 ): string {
   return resetDayKey(nowMs + DOUBLE_HONOR_LEAD_MS, zone);
 }
+
+// Whole seconds until the reset that CLOSES the current window (Masterwrought
+// phase 14, the daily-gate refusal countdown): the when-half of resetDayKey,
+// fed to the sim beside it so a daily_limit refusal can tell the player when
+// the gate reopens. Runs in the 20 Hz loop like resetDayKey, so the resolved
+// INSTANT is memoized per (window, zone): within one window it is a constant,
+// and nextRaidResetMs builds several Intl.DateTimeFormat instances per call.
+// Still pure in (instant, zone); ceil'd and floored at 1 so a caller never
+// reads 0 (the sim's "no calendar" sentinel) from a live realm clock.
+const NEXT_RESET_MEMO_MAX = 16;
+const nextResetMemo = new Map<string, number>();
+
+/** Test-only observable for the memo's size bound (the ForTest seam idiom):
+ *  the map is module-private, so without this the clear-on-overflow line has
+ *  no behavioral witness (an unbounded map answers every probe correctly). */
+export function nextResetMemoSizeForTest(): number {
+  return nextResetMemo.size;
+}
+
+export function dailyResetRemainingSec(
+  nowMs: number,
+  zone: string = DEFAULT_RAID_RESET_TIME_ZONE,
+): number {
+  const memoKey = `${resetDayKey(nowMs, zone)}:${zone}`;
+  let resetAt = nextResetMemo.get(memoKey);
+  // Self-expiring on the RESOLVED instant, never the label alone: in a zone
+  // whose local 03:00 is ambiguous on DST fall-back (the EET family,
+  // Pacific/Chatham), resetDayKey flips at the FIRST 03:00 while the reset
+  // resolves to the SECOND, so a label-trusting memo would serve a stale
+  // instant (and the floor's "1 second" lie) for the rest of that window.
+  // Re-resolving once the cached instant passes keeps one recompute per day
+  // and handles a backward wall-clock step across a boundary too (the wave-1
+  // hot-path review, measured over all 418 zones).
+  if (resetAt === undefined || nowMs >= resetAt) {
+    resetAt = nextRaidResetMs(nowMs, zone);
+    if (nextResetMemo.size >= NEXT_RESET_MEMO_MAX) nextResetMemo.clear();
+    nextResetMemo.set(memoKey, resetAt);
+  }
+  return Math.max(1, Math.ceil((resetAt - nowMs) / 1000));
+}

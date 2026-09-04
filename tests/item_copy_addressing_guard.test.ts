@@ -22,6 +22,8 @@
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { perfectingCommand } from '../src/net/perfecting_command';
+import type { PerfectingCopyReads } from '../src/sim/professions/perfecting_copy';
 
 const ONLINE = readFileSync(new URL('../src/net/online.ts', import.meta.url), 'utf8');
 const SERVER = readFileSync(new URL('../server/game.ts', import.meta.url), 'utf8');
@@ -46,6 +48,11 @@ const ADDRESSED_COMMANDS: ReadonlyArray<{
 }> = [
   { cmd: 'salvage_item', field: 'slot' },
   { cmd: 'disenchant_item', field: 'slot', why: 'the original precise surface' },
+  {
+    cmd: 'extract_essence',
+    field: 'slot',
+    why: 'the Masterwrought sunder rides the enchant-family selected-slot discipline and pins the copy mid-cast with itemCopyPin',
+  },
   { cmd: 'discard', field: 'slot' },
   { cmd: 'lock_item', field: 'slot' },
   { cmd: 'sell', field: 'slot' },
@@ -110,27 +117,74 @@ const EXEMPT: ReadonlyArray<{ cmd: string; why: string }> = [
   },
 ];
 
-/** Sender bodies from ClientWorld, keyed by the wire token they send. */
-function senderBodyFor(cmd: string): string {
-  // Every sender routes through the private cmd() helper, so the token literal
-  // appears inside the method that owns it. Take a window around each occurrence
-  // rather than parsing: the assertion only needs to see whether the selection
-  // field rides alongside the token.
+/**
+ * Item commands whose untrusted-input parse lives in a PURE CORE module the
+ * dispatch arm consumes (server/CLAUDE.md module-first), so the inline
+ * Number.isInteger scan above cannot see them. An entry here is NOT an
+ * exemption: the teeth move with the parse. The arm must CALL the named
+ * parser, the parser module must carry the integer check on the named cell
+ * field, and the parsed ref must reach the sim call in the same arm, so a
+ * command in this family keeps the whole addressed contract. (perfect_item
+ * was first classified EXEMPT with a prose pointer at its pins; the QA
+ * test-decisiveness lane flagged that precedent as eroding the guard for
+ * every future parse-core command, hence this table.)
+ */
+const PARSE_CORE_COMMANDS: ReadonlyArray<{
+  cmd: string;
+  parser: string;
+  module: string;
+  cellField: string;
+  senderFields: string[];
+  senderHelper: { symbol: string; module: string };
+}> = [
+  {
+    cmd: 'perfect_item',
+    parser: 'parsePerfectItemRef',
+    module: '../server/perfect_item_ref.ts',
+    cellField: 'bag',
+    // `name` is the phase 13 optional legendary name riding the same frame
+    // (parsed by the sibling parsePerfectItemName in the same module; a bad
+    // name drops the FIELD, never the frame).
+    senderFields: ['slot', 'bag', 'item', 'copy', 'name'],
+    senderHelper: { symbol: 'perfectingCommand', module: './perfecting_command' },
+  },
+];
+
+/** Sender windows from ClientWorld, one per token occurrence, keyed by the
+ *  wire token they send. Every sender routes through the private cmd()
+ *  helper, so the token literal appears inside the method that owns it. Each
+ *  window ENDS at the owning method's closing brace (the next `\n  }` at
+ *  class-body indent), the client half of the server arm's next-case bound
+ *  below: a fixed-length slice bled into the NEIGHBOURING method, and since
+ *  most senders do pass a selection, the field assertion stayed green with
+ *  the sender under test's field deleted (verified by re-running the old
+ *  window over a useItem with its slot field removed: discardItem's `slot`
+ *  landed inside the 220 chars). Returned as SEPARATE windows rather than one
+ *  concatenation: a token sent from TWO methods (equip: equipItem and
+ *  equipItemToSlot) is otherwise only pinned in aggregate, and deleting the
+ *  field from one method stays green on the other's window. */
+function senderWindowsFor(cmd: string): string[] {
   const needle = `cmd: '${cmd}'`;
-  let out = '';
+  const windows: string[] = [];
   let at = ONLINE.indexOf(needle);
   while (at !== -1) {
-    out += ONLINE.slice(at, at + 220);
+    const end = ONLINE.indexOf('\n  }', at);
+    windows.push(end === -1 ? ONLINE.slice(at) : ONLINE.slice(at, end));
     at = ONLINE.indexOf(needle, at + 1);
   }
-  return out;
+  return windows;
 }
 
 describe('every item command can name the copy it acts on', () => {
   it.each(ADDRESSED_COMMANDS)('$cmd carries a $field selection on the wire', ({ cmd, field }) => {
-    const body = senderBodyFor(cmd);
-    expect(body, `no ClientWorld sender found for ${cmd}`).not.toBe('');
-    expect(body, `${cmd} must be able to send a ${field}`).toContain(field);
+    const windows = senderWindowsFor(cmd);
+    expect(windows.length, `no ClientWorld sender found for ${cmd}`).toBeGreaterThan(0);
+    // PER OCCURRENCE, never the concatenation: each window is bounded by its
+    // owning method, so every METHOD that sends this token must carry the
+    // field, and deleting it from one of two sender methods reds here.
+    for (const [i, body] of windows.entries()) {
+      expect(body, `${cmd} occurrence ${i + 1} must be able to send a ${field}`).toContain(field);
+    }
   });
 
   it.each(ADDRESSED_COMMANDS)(
@@ -195,16 +249,90 @@ describe('every item command can name the copy it acts on', () => {
     },
   );
 
-  it('exempts only commands with a written reason, and no command is in both lists', () => {
+  it.each(PARSE_CORE_COMMANDS)(
+    '$cmd names its copy through the $parser parse core, with teeth',
+    ({ cmd, parser, module, cellField, senderFields, senderHelper }) => {
+      // The sender now delegates its complementary worn/bagged shapes to a
+      // pure helper. Follow the actual import, and require EVERY occurrence
+      // to spread its whole result with the live reads, ref and name. The
+      // exact bounded body also rejects overrides after the spread, so a
+      // helper call left beside a dropped/rewritten copy field cannot pass.
+      const windows = senderWindowsFor(cmd);
+      expect(windows.length, `no ClientWorld sender found for ${cmd}`).toBeGreaterThan(0);
+      expect(ONLINE).toContain(`import { ${senderHelper.symbol} } from '${senderHelper.module}';`);
+      for (const body of windows) {
+        expect(body.replace(/\s+/g, ' ').trim()).toBe(
+          `cmd: '${cmd}', ...${senderHelper.symbol}(this, ref, name) });`,
+        );
+      }
+      const senderSource = readFileSync(
+        new URL(`../src/net/${senderHelper.module}.ts`, import.meta.url),
+        'utf8',
+      );
+      for (const f of senderFields) {
+        expect(senderSource, `${cmd} helper must be able to send ${f}`).toContain(f);
+      }
+      const at = SERVER.indexOf(`case '${cmd}':`);
+      expect(at, `no dispatch arm for ${cmd}`).toBeGreaterThan(-1);
+      const rest = SERVER.slice(at + `case '${cmd}':`.length);
+      const nextCase = rest.indexOf("case '");
+      const arm = nextCase === -1 ? rest : rest.slice(0, nextCase);
+      expect(arm, `${cmd} must parse through ${parser} in its OWN arm`).toContain(`${parser}(`);
+      const parserSource = readFileSync(new URL(module, import.meta.url), 'utf8');
+      expect(parserSource, `${parser} must carry the integer check on msg.${cellField}`).toContain(
+        `Number.isInteger(msg.${cellField})`,
+      );
+      const simCall = arm.slice(arm.indexOf('sim.'));
+      expect(simCall, `${cmd} must forward the parsed ref to the sim call`).toMatch(/\bref\b/);
+    },
+  );
+
+  it('the actual Perfecting sender helper emits both copy-addressed shapes and preserves a capture', () => {
+    const itemId = 'wyrmfall_pendant';
+    const reads = {
+      inventory: [
+        { itemId, count: 1, instance: { signer: 'First' } },
+        { itemId, count: 1, instance: { signer: 'Second' } },
+      ],
+      equipment: { neck: itemId },
+      equipmentInstances: { neck: { signer: 'Worn' } },
+    } satisfies PerfectingCopyReads;
+    expect(perfectingCommand(reads, { slot: 'neck' })).toStrictEqual({
+      slot: 'neck',
+      copy: { pin: expect.stringMatching(/^[0-9a-f]{32}$/) },
+      name: undefined,
+    });
+    const bag = perfectingCommand(reads, { bag: 1, itemId }, 'Dawn Star');
+    expect(bag).toStrictEqual({
+      bag: 1,
+      item: itemId,
+      copy: { pin: expect.stringMatching(/^[0-9a-f]{32}$/), anchor: { ordinal: 1, count: 2 } },
+      name: 'Dawn Star',
+    });
+    reads.inventory[1].instance.signer = 'Replacement';
+    expect(perfectingCommand(reads, { bag: 1, itemId }).copy?.pin).not.toBe(bag.copy?.pin);
+    expect(perfectingCommand(reads, { bag: 1, itemId, copy: bag.copy }, 'Dawn Star')).toStrictEqual(
+      bag,
+    );
+  });
+
+  it('exempts only commands with a written reason, and no command is in two lists', () => {
     // Guards the guard. An exemption with no reason, or a command quietly living
-    // in both tables, would let a surface escape while the file still looked
+    // in two tables, would let a surface escape while the file still looked
     // complete.
     for (const row of EXEMPT) {
       expect(row.why.length, `${row.cmd} needs a real reason`).toBeGreaterThan(30);
     }
     const addressed = new Set(ADDRESSED_COMMANDS.map((r) => r.cmd));
+    const parseCore = new Set(PARSE_CORE_COMMANDS.map((r) => r.cmd));
     for (const row of EXEMPT) {
       expect(addressed.has(row.cmd), `${row.cmd} cannot be both addressed and exempt`).toBe(false);
+      expect(parseCore.has(row.cmd), `${row.cmd} cannot be both parse-core and exempt`).toBe(false);
+    }
+    for (const row of PARSE_CORE_COMMANDS) {
+      expect(addressed.has(row.cmd), `${row.cmd} cannot be both addressed and parse-core`).toBe(
+        false,
+      );
     }
   });
 
@@ -224,6 +352,7 @@ describe('every item command can name the copy it acts on', () => {
 
     const classified = new Set([
       ...ADDRESSED_COMMANDS.map((r) => r.cmd),
+      ...PARSE_CORE_COMMANDS.map((r) => r.cmd),
       ...EXEMPT.map((r) => r.cmd),
     ]);
     const unclassified = [...sending].filter((c) => !classified.has(c)).sort();

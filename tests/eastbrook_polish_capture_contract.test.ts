@@ -258,6 +258,135 @@ interface AttributionTargetFixture {
 // instanced-mesh render-list skip): the lockfile is a hashed leaf of the town
 // fingerprint, so the seals follow the swept evidence bytes. No capture was
 // retaken.
+// Re-minted for the merge of the moved release/v0.40.0 tip into
+// feature/masterwrought: both sides re-minted since the common base, so the
+// merged tree mints values matching neither parent. No capture was retaken.
+// Re-minted for the farming absorb (Phase 11d): renderer.ts moved (the
+// farming runtime integration landed on the masterwrought renderer; the other
+// swept inputs, prewarm_policy.ts included, held their sealed bytes), the
+// seals follow the swept evidence bytes. No capture was retaken.
+// Upstream re-minted the same leaf on its own side for the shader-memory-probes
+// renderer instrumentation and VFX teardown extraction, calling both changes
+// behavior-neutral for the accepted visual evidence and retaking no capture.
+// RE-MINTED AGAIN at the Phase 11e QA release sync (release tip fd705304ee,
+// PR #3531): the third consecutive sync where BOTH parents re-minted this seal
+// since their common base, so the merged tree mints a value matching NEITHER
+// parent, and taking either side's literal would pin a tree that never existed.
+// Parent values for the record: ours 9fdb68de, the release 87e05c78. The moved
+// input is the same renderer.ts leaf both sides edited (13546 base, ours 13576,
+// theirs 13548, merged 13578); every other swept input holds its sealed bytes.
+// Minted from the merged WORKING TREE with the repo's own tool
+// (scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs) rather
+// than hand-edited, and committed with exactly the bytes it read. No capture
+// was retaken: the merged renderer delta is upstream's instrumentation plus
+// this branch's farm-visual wiring, neither of which moves the sealed pixels.
+//
+// UPSTREAM'S OWN RE-MINT HISTORY over the same span, kept rather than dropped:
+// for the shader-memory-probes renderer instrumentation and VFX teardown
+// extraction; for the fast-loading-screen-variety merge with release/v0.40.0,
+// where the renderer runtime leaf moved on both sides of THAT merge (its
+// character asset-ready wiring, the release's shader-memory probes); and for
+// its review-fix round (the nearby-view floor in prewarm_policy.ts, the
+// weapon-skin early-out wiring in renderer.ts). No capture retaken in any.
+//
+// RE-MINTED AGAIN at the Phase 11f release sync (release tip 098372138a, PR
+// #3232). The FOURTH consecutive sync to re-mint this seal, but the first
+// where only ONE parent re-minted it: the four seal JSONs on this branch are
+// byte-identical to the merge base, and only the release moved them. The
+// re-mint is owed anyway, because the seal is a fingerprint OF renderer.ts and
+// BOTH parents edited that file, so the merged renderer is a third content
+// (13548 base, ours 13578, theirs 13573, merged 13603) and the release's fresh
+// seal describes a tree that stops existing the moment this merge lands. That
+// is the durable lesson: the trigger is a moved SWEPT INPUT, not a conflicting
+// seal. Parent values for the record: ours 1c3ae800, the release e922918a.
+// Minted from the merged WORKING TREE with the repo's own tool and committed
+// with exactly the bytes it read. No capture was retaken: the merged renderer
+// delta is upstream's loading-screen wiring plus this branch's farm-visual
+// wiring, neither of which moves the sealed pixels.
+//
+// RE-MINTED AGAIN at the Phase 11g QA release sync (release tip 3e49dc11b3,
+// PR #3566's rift long-session perf work; prior synced release parent
+// 098372138a). The FIFTH consecutive sync to re-mint this seal, and the
+// trigger is the one it has always been: a MOVED SWEPT INPUT, never a
+// conflicting seal.
+//
+// TWO COUNTERS RUN THROUGH THIS PACKET AND THEY COUNT DIFFERENT THINGS, said
+// here because a reader using either as evidence will otherwise trip: this one
+// counts SYNCS THAT RE-MINTED THIS SEAL (the entry above is the fourth), while
+// the packet record counts RELEASE SYNCS ATTEMPTED, of which this is the
+// eighth and only the ones that actually merged could re-mint anything. The
+// two agree; they measure different events. BOTH parents edited src/render/renderer.ts since the
+// common base (base 13573, ours 13603, theirs 13584, merged 13614), so the
+// merged renderer is a third content and NEITHER parent's literal describes
+// it. Parent values for the record: composite ours 6b9ee410 / theirs
+// 0ae18f49; metadata sha256 ours fe37c37c / theirs 1cd098ab; second-order
+// performance digest ours d3fc845b / theirs cfd7bd7e. Every other swept input
+// holds its sealed bytes.
+//
+// UPSTREAM'S NEW HALF over this span, kept rather than dropped: the release
+// re-minted for its own rift long-session perf merge with release/v0.40.0,
+// where renderer.ts moved on both sides of THAT merge (its object-view
+// material disposal and build-retry-gate wiring, the release's
+// loading-screen-variety work), and again for that branch's review round. No
+// capture was retaken in either.
+//
+// Minted from the merged WORKING TREE with the repo's own tool
+// (scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs) rather
+// than hand-edited, and committed with exactly the bytes it read. No capture
+// was retaken: the merged renderer delta is upstream's rift collision and
+// view-resource-disposal work plus this branch's farm-visual wiring, neither
+// of which moves the sealed pixels.
+//
+// RE-MINTED AGAIN at the Phase 11h release sync (release tip 50462dda83, PR
+// #3582's entry-admission perf work; prior synced release parent 3e49dc11b3).
+// The SIXTH consecutive sync to re-mint this seal, and the trigger is the one
+// it has always been: a MOVED SWEPT INPUT, never a conflicting seal. BOTH
+// parents edited src/render/renderer.ts since the common base (base 13584,
+// ours 13614, theirs 13541, merged 13571), and the release also moved
+// src/render/prewarm_policy.ts, so the merged tree is a third content and
+// NEITHER parent's literal describes it. Parent values for the record:
+// composite ours 18bcb514 / theirs 9c27fa70; metadata sha256 ours bb2148e4 /
+// theirs af5eef8b; second-order performance digest ours fa94c388 / theirs
+// f06481ca. The merged mint matches neither on any of the three.
+//
+// UPSTREAM'S NEW HALF over this span, kept rather than dropped: the release
+// re-minted after merging release/v0.40.0 into its loading-hitch branch, where
+// renderer.ts combined mandatory entry admission with the rift long-session
+// resource lifecycle changes, and again for that branch's loading review fixes
+// (rebuild reveal gates, the inactive horizon fast path, display-pacing
+// admission and the restored rationale). No capture was retaken in either.
+//
+// Minted from the merged WORKING TREE with the repo's own tool
+// (scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs) rather
+// than hand-edited, and committed with exactly the bytes it read. No capture
+// was retaken: the merged renderer delta is upstream's entry-admission and
+// texture/compile extraction work plus this branch's farm-visual wiring,
+// neither of which moves the sealed pixels.
+// RE-MINTED AT THE PHASE 11k QA RELEASE SYNC (the FOURTEENTH sync,
+// release/v0.40.0 b39b16022e to efb1220e85). BOTH parents re-minted this seal
+// since their common base again, so the merged tree mints a value matching
+// NEITHER parent and taking either side's literal would pin a tree that never
+// existed. Parent values for the record: ours 6c733d41, the release 4ad25d5f.
+// Minted from the merged WORKING TREE with the repo's own tool
+// (scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs), never
+// hand-edited, and committed with exactly the bytes it read. No capture was
+// retaken: the merged renderer delta is this branch's farm-visual wiring plus
+// the release's own renderer work (the far-mesh swap holdout, the stale
+// remote-entity repair, the loading-review admission gates), none of which
+// moves the sealed pixels.
+//
+// UPSTREAM'S OWN RE-MINT HISTORY over this span, kept rather than dropped:
+// the shader-memory-probes instrumentation and VFX teardown extraction, the
+// fast-loading-screen-variety merge, its review-fix round (the nearby-view
+// floor in prewarm_policy.ts, the weapon-skin early-out in renderer.ts), the
+// release/v0.40.0 merge into the loading-hitch branch, the v0.40 batch
+// merge-forward, the loading review fixes (rebuild reveal gates, inactive
+// horizon fast path, display-pacing admission), the sliding-far-mob-freeze fix
+// and the stale remote-entity holdout repair. Every one of them retook no
+// capture and moved only the renderer/prewarm runtime leaves.
+//
+// UPSTREAM'S OWN RE-MINT HISTORY over the release/v0.41.0 span, kept rather
+// than dropped (the block that follows is the release's record verbatim).
 // Re-minted for shader-memory-probes renderer instrumentation and VFX teardown
 // extraction. The renderer leaf moved; no capture was retaken because both
 // changes are behavior-neutral for the accepted visual evidence.
@@ -323,6 +452,28 @@ interface AttributionTargetFixture {
 // Re-minted for the v0.40.0 sync merge into the guild pledge branch (the
 // OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
 // both sides). No capture was retaken.
+//
+// RE-MINTED AT THE MERGE OF release/v0.41.0 (tip ff2837da1f) into
+// feature/masterwrought (base 9a89e3483e). BOTH parents
+// re-minted this seal since their common base again (the release for the
+// Sowfield demolition, the Eastbrook harbor move and its owner rounds, the
+// Proving Shore island and the guild pledge sync; this branch for its farm
+// visual wiring and its own release syncs), and BOTH parents edited
+// src/render/renderer.ts, so the merged tree mints a value matching NEITHER
+// parent. Parent values for the record: ours 0e27f9ad, the release
+// b4f994b0. The release literal stood in as a placeholder while the merge
+// was mid-resolution; the value below is the re-mint (node
+// scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs over
+// the fully resolved tree, with renderer.ts, eastbrook_town.ts and
+// eastbrook_layout.ts as the drifted inputs), committed with exactly the
+// bytes it read. No capture was retaken.
+// Re-minted 2026-08-28 for the Masterwrought phase 14 farm-visuals prewarm guard: the
+// one-line renderer.ts change (prewarmWorldFrame gates the farm sync on the
+// world holding its own player) moved the runtimeRender renderer leaf; the
+// evidence seals were swept by the one-step re-mint. No capture was retaken.
+//
+// UPSTREAM'S OWN RE-MINT HISTORY over the release/v0.41.0 span, kept rather
+// than dropped (the block that follows is the release's record verbatim).
 // Re-minted for the entry-horizon scenery cull (renderer.ts hands the four
 // reveal-gated painters the horizon-capped cull far at both frame sites): the
 // renderer integration leaf moved. No capture was retaken.
@@ -336,6 +487,22 @@ interface AttributionTargetFixture {
 // merged renderer.ts carries the entry-fade arm's scenery cull beside this
 // branch's aim blocked pass-through, so the composite matches neither parent.
 // No capture was retaken.
+//
+// Re-minted at the merge of release/v0.41.0 (tip d3f8bae369 onward) into
+// feature/masterwrought: BOTH parents edited src/render/renderer.ts (the
+// release's entry-horizon cull, compile gate and ground-aim rounds beside
+// this branch's farm-visuals prewarm guard) and the release also moved
+// src/render/eastbrook_town.ts, so the merged tree mints a value matching
+// NEITHER parent. Parent values for the record: ours 01fcf59e, the release
+// fd58a923. The value below is the re-mint over the resolved tree, committed
+// with exactly the bytes it read. No capture was retaken.
+// Re-minted at Phase 16 (2026-08-30): the zone prewarm-group extraction moved
+// the builder family out of renderer.ts and the composite's renderer leaf
+// followed the file. REMINT_COMMAND on the committed tree; no capture retaken.
+//
+// UPSTREAM'S OWN RE-MINT HISTORY over the later release/v0.41.0 span (tip
+// 3e801dc925), kept rather than dropped (the block that follows is the
+// release's record verbatim).
 // Re-minted after the Forgefather strike-route call-site swap in renderer.ts
 // (routeVarkhulForgeHammer replaced the bare forge-hammer dispatch) moved the
 // runtimeRender.renderer leaf. No capture was retaken.
@@ -348,14 +515,57 @@ interface AttributionTargetFixture {
 // Re-minted for the Drakelands entrance merge into the raid branch (PRs 3689
 // plus 3734: both arms had re-minted, the merged renderer and evidence inputs
 // land together). No capture was retaken.
-// Re-minted at the release/v0.42.0 sync of PR #3439: renderer.ts moved for the
-// mount lifecycle seam (mount_lifecycle.ts) and the rickshaw hooks it absorbed.
-// Re-minted for the Cluckwork Mech Bird store mount (PR #3464) on top of the
-// v0.42.0 mount-lifecycle move: the renderer's stride accumulator moved to
-// src/render/stride_audio_core.ts and the mounted audio branch gained the
-// idle-hum poll. No capture was retaken.
+//
+// Re-minted at the merge of release/v0.41.0 (tip 3e801dc925) into
+// feature/masterwrought: BOTH parents edited src/render/renderer.ts again
+// (the release's Ignivar/Varkhul wiring, backface twin staging and the
+// Ignivar mechanic-visual prewarm beside this branch's farmPatchVisuals
+// dispose seam, zone_prewarm extraction and reduced-motion regalia gate), so
+// the merged tree mints a value matching NEITHER parent. Parent values for
+// the record: ours f2e6c8c3, the release 23415789. The literal below is the
+// re-mint (node scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs)
+// run over the fully resolved merged tree on 2026-08-30, after every
+// renderer.ts byte was final, and committed with exactly the bytes it read.
+// No capture was retaken.
+// Re-minted 2026-08-31 for the Phase 18 farm render unit: renderer.ts moved
+// again (the farm compile gate handed at construction, the gate's label
+// parameter, the typed zone-prewarm host weld, the single-sited farm drive,
+// and the shadow arm's body extracted to src/render/shadow_depth_compile.ts).
+// Run over the finished unit, after every renderer.ts byte was final and
+// after biome left the file unchanged. No capture was retaken.
+// The release re-minted this composite again over its v0.42.0 span, without a
+// comment of its own: renderer.ts moved 207 lines there (the validated local
+// locomotion and client movement prediction, the self-pose frame seams pulled
+// into pure modules, the FOV slider fix, and the Bonebound Rickshaw render arm).
+//
+// Parent values for the record: ours 161370d0, the release 89c8a62f.
+// RE-MINTED at the TENTH release sync, the merge of release/v0.42.0 (tip
+// 22e909839f) into feature/masterwrought (base e6b8edb375).
+// BOTH parents moved renderer.ts, so the merged tree is a
+// third content and neither parent's literal described it; the tool was run
+// over the fully resolved tree, LAST, after every renderer.ts byte was final
+// and after biome left the file unchanged. The four polish evidence JSONs were
+// swept by the tool in the same run and are committed with these pins. No
+// capture was retaken; ACCEPTED_POLISH_V2_TOWN_SOURCE_FINGERPRINT is untouched.
+// Re-minted at the next release/v0.42.0 sync (tip 178dfd46db): the release's
+// mount-lifecycle and rickshaw hooks moved renderer.ts against this branch's
+// Masterwrought farm integration. The final renderer sha256 is ed29e747 after
+// the semantic merge audit's mount compile-gate fixes,
+// matching neither ours (8e5722cb) nor the release (72d8b7ce); every other
+// provenance input is byte-identical between the parents. The tool swept the
+// four evidence JSONs over the resolved renderer, with no capture retaken.
+// Re-minted at the Cluckwork Mech Bird release sync (tip 1fdf0f55a3): its
+// stride-audio extraction and mounted idle-hum poll moved renderer.ts against
+// the already merged Masterwrought and mount-lifecycle integrations. The
+// resolved renderer sha256 is 36b780c6, matching neither ours (ed29e747) nor
+// the release (9b4d40e5); every other provenance input remains byte-identical.
+// The four evidence JSONs were swept again, with no capture retaken.
+// Re-minted at Masterwrought closeout after the Mech Bird transition/audio
+// sequencing fix moved renderer.ts to 7c10f934. No capture was retaken.
+// Re-minted during PR closeout after farm compile staging changed renderer.ts.
+// No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '87d8b0efb81ca5d41f5a57f7fd9654739ba16b59f9f8de4cda6a39031b5e8806';
+  'd137e84a98c7eca03d0ea7eadc8d1a3a0665f726d6bd54e6c2b9a3af7995f493';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

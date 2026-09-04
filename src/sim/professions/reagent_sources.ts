@@ -11,7 +11,7 @@
 //   simulation
 // - professions/enchanting.ts, all three apply arms plus the three admission
 //   arms that mirror them
-// - src/ui/crafting_view.ts, the crafting window's own projection, so the
+// - src/ui/hud/professions/crafting_view.ts, the crafting window's own projection, so the
 //   button a player sees agrees with the sim that will judge the click
 //
 // Every one of them must reach the same answer, or a gate approves a spend the

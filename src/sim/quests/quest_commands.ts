@@ -183,6 +183,13 @@ export function finalizeQuestAccept(
   // from alone (bags, bank, market escrow, mailbox), not just the bags: a
   // bags-only read was the unbounded starter-tool mint (bank it, abandon,
   // re-accept, repeat). See quest_item_presence.ts for the full reasoning.
+  // Capacity is deliberately NOT pre-checked here, nor in the giver-talk twin
+  // regrantMissingQuestItems below: a required item the player can no longer
+  // obtain must never be lost to a full bag, so the grant force-adds and the
+  // over-capacity bag is tolerated and visible. The turn-in reward below DOES
+  // gate (countFit + bagsFullError); that asymmetry is the design. See the
+  // ungated-paths list in src/sim/bags.ts (qr-19-qprofintro-overflow-grant,
+  // 2026-09-01).
   for (const itemId of questFallbackGrants(quest, (id) => playerHoldsQuestItem(ctx, meta, id))) {
     ctx.addItem(itemId, 1, meta.entityId);
   }

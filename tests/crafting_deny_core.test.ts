@@ -1,4 +1,4 @@
-// The craft-deny message table (src/ui/crafting_deny_core.ts): every refusal
+// The craft-deny message table (src/ui/hud/professions/crafting_deny_core.ts): every refusal
 // reason a craftResult event can carry maps to exactly the key hud.ts's log
 // arm rendered before the extraction, and the station arm resolves the
 // station type from recipe content. Inputs are plain event fields, identical
@@ -6,7 +6,10 @@
 // union is shared), so one table drives both hosts.
 import { describe, expect, it } from 'vitest';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
-import { type CraftDenyReason, craftDenyMessage } from '../src/ui/crafting_deny_core';
+import {
+  type CraftDenyReason,
+  craftDenyMessage,
+} from '../src/ui/hud/professions/crafting_deny_core';
 
 describe('craftDenyMessage', () => {
   it('maps every non-station reason to its key, unknown and absent to the materials line', () => {
@@ -42,6 +45,11 @@ describe('craftDenyMessage', () => {
       busy: 'hudChrome.crafting.busy',
       station_required: 'hudChrome.crafting.stationRequired',
       no_bag_space: 'hudChrome.crafting.noBagSpace',
+      // The branch's own reason (the quickening catalyst's persisted daily
+      // gate), which reaches this table through the release sync: it gets its
+      // OWN line rather than the generic materials fall-through, because the
+      // player is not short of materials.
+      daily_limit: 'hudChrome.crafting.dailyLimit',
     } satisfies Record<CraftDenyReason, string>;
     for (const [reason, key] of Object.entries(table)) {
       if (reason === 'station_required') continue;
@@ -75,6 +83,24 @@ describe('craftDenyMessage', () => {
     });
     expect(craftDenyMessage('station_required', 'not-a-recipe')).toEqual({
       key: 'hudChrome.crafting.insufficientMaterials',
+    });
+  });
+
+  it('daily_limit with a countdown carries ready-made duration params (phase 14)', () => {
+    // 7200 s spells as the duration_text largest-whole-unit phrase; the core
+    // hands the painter the FINISHED string so hud.ts needs no second
+    // resolver. English default locale in tests: '2 hours'.
+    expect(craftDenyMessage('daily_limit', 'not-a-recipe', 7200)).toEqual({
+      key: 'hudChrome.crafting.dailyLimitRetry',
+      params: { duration: '2 hours' },
+    });
+    // Absent or malformed countdowns keep the plain line with NO params, so
+    // the caller's t() call cannot render a dangling {duration}.
+    expect(craftDenyMessage('daily_limit', 'not-a-recipe')).toEqual({
+      key: 'hudChrome.crafting.dailyLimit',
+    });
+    expect(craftDenyMessage('daily_limit', 'not-a-recipe', 0)).toEqual({
+      key: 'hudChrome.crafting.dailyLimit',
     });
   });
 });

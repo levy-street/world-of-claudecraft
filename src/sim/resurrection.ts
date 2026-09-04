@@ -81,32 +81,88 @@ export function unstuckSicknessDuration(level: number): number {
 // Auras that survive a death / respawn reset: both sicknesses (The Keeper's Toll
 // and Unstuck Sickness), the Cauterize lockout ('cauterize_fatigue',
 // combat/fire_mage.ts), the operator-applied Cheater mark (src/sim/moderation/),
-// and encounter-owned unbreakable control. None may be shed by dying; the
-// encounter script remains responsible for releasing its own control.
-// Every other aura clears. Used at every player death/respawn site so the rule
-// cannot drift.
+// encounter-owned unbreakable control, and FLASK auras (Aura.flask, the alchemy
+// apex consumable): a flask survives DEATH, which is what makes it worth
+// carrying instead of the elixir of the same stat. Death only. Auras are
+// session state and are not persisted, so a flask does NOT survive a deliberate
+// logout, a linkdead grace that runs out (server/linkdead.ts holds a dropped
+// session in-world for its grace window, so an ordinary reconnect inside it
+// KEEPS the flask), or a realm restart; that is a deferred schema decision, not
+// an oversight here. While dead the timer pauses with every other aura
+// (updateAuras early-returns for a dead entity), so a death effectively extends
+// a flask by the time spent dead. None may be shed by dying; the encounter script remains
+// responsible for releasing its own control. Every other aura clears, Well Fed
+// included. Used at every player death/respawn site so the rule cannot drift.
+// RULED (qr-19-flask-dead-timer-pause, 2026-09-01, under qr-19-best-for-project): the pause
+// above is the ratified v1 behavior, not a defect awaiting a fix. The recorded fidelity
+// nuance is that classic flasks kept ticking. Exempting flask auras from this shared guard by
+// loosening the dead early-return would re-enter the whole aura loop for every retained aura
+// and so fork the rng draw order it protects; a flask-only decrement placed OUTSIDE the loop
+// would draw nothing, so the fork is the risk of the obvious implementation rather than a
+// property of every possible one. It would also owe the STABLE (v3) timer wire, which sends a
+// dead wearer's auras as a frozen remaining rather than an absolute expiry: the split is made
+// in server/snapshot_timer_wire.ts, but the dead read itself is the caller's
+// (server/game.ts passes e.dead as `paused`), and the legacy encoder sends a remaining for
+// every aura alive or dead, so it needs no change. tests/snapshots.test.ts pins the
+// freeze-then-resume round trip in 'freezes retained auras while dead, then resumes absolute
+// decay after resurrection'; it pins the paused-to-rem MECHANISM on a plain retained aura
+// rather than a flask specifically, and the flask half rests on aurasSurvivingDeath below. A
+// tick-through build is a sim-systems change of its own, never a content-lane edit.
 //
 // The Cheater mark is here for the same reason the sicknesses are: its aura IS
 // the played-seconds countdown, so a wipe that dropped it would end the sanction
 // early and hand a marked player a one-keypress way out of it.
+//
+// The flask PvP accounting in full, corrected three times at the phase 10 QA
+// (each fix round's review found a route or an attribution the previous cut
+// missed). The clean slate below keeps ONLY the Cheater mark, and it is
+// reached by THREE routes. (1) The DIRECT call, in exactly two places: the
+// clearPrep arm of readyArenaFighter (social/arena.ts), which IS the clean
+// slate, and a Fiesta down (fiestaDownEntity in social/fiesta.ts, which a
+// Protect Yumi down runs too). (2) readyArenaFighter called with clearPrep:
+// true: Thornhollow Fields (social/battleground.ts) at the seat, the countdown
+// end, a leaver, and the match end; the Protect Yumi revive (social/yumi.ts)
+// and the Fiesta revive; and the body of resetForArena. (3) resetForArena, the
+// one-line wrapper around (2), which social/arena.ts runs at its own seat
+// (startArenaMatch, every arena-family format), match end (endArenaMatch, the
+// undefeated), and send-home (returnFromArena, everyone the seat wrote a
+// return record for and who is still present), and which the SimContext seam
+// (ctx.resetForArena) hands to call sites that never spell readyArenaFighter:
+// the Protect Yumi match seat (the Vale Cup's kit-swap seat and match teardown
+// were the other two until the Vale Cup retired with release/v0.41.0).
+// So an instanced match is a parenthesis for a flask: nothing carried in rides
+// through the gates, and nothing quaffed inside comes back out. The one PvP
+// path that KEEPS a flask is a Thornhollow Fields DEATH: handleDeath runs this
+// filter, the graveyard release runs it again, and the wave respawn raises the
+// fighter with clearPrep: false, so a flask quaffed inside a match rides
+// through every death in it (classic-era flasks persisted through battleground
+// deaths, the recorded decision), until the match ends. (An arena death keeps
+// it on the corpse the same way, until the send-home wipe.) Both halves
+// pinned: behavior per mode in tests/arena.test.ts (seat, end, send-home),
+// tests/battleground.test.ts, tests/yumi_match.test.ts and tests/fiesta.test.ts;
+// the three caller sets, literally, in tests/resurrection.test.ts.
 export function aurasSurvivingDeath(auras: readonly Aura[]): Aura[] {
   return auras.filter(
     (a) =>
       SICKNESS_AURA_IDS.has(a.id) ||
       a.kind === 'cauterize_fatigue' ||
       a.id === CHEATER_MARK_AURA_ID ||
-      a.unbreakableControl === true,
+      a.unbreakableControl === true ||
+      a.flask === true,
   );
 }
 
-// Auras that survive a CLEAN-SLATE wipe: only the Cheater mark. Arena entry
-// (social/arena.ts readyArenaFighter) and a Fiesta down (social/fiesta.ts
-// fiestaDownEntity) deliberately strip MORE than a death does, The Keeper's Toll
-// included, so a normalized bout is decided by play and not by what each fighter
-// walked in carrying. A sanction is not something the fighter walked in carrying:
-// it is account state an operator applied, so it survives here exactly as it
-// survives an ordinary death. Returns a NEW array, so the caller's assignment
-// stays a replacement and never mutates the array it read.
+// Auras that survive a CLEAN-SLATE wipe: only the Cheater mark. The clearPrep
+// arm of readyArenaFighter (the arm lives in social/arena.ts; it is reached
+// from every instanced match's seat and end, the Thornhollow Fields gates, and
+// every Fiesta and Yumi revive; see the three routes above) and a Fiesta down
+// (social/fiesta.ts fiestaDownEntity) deliberately strip MORE than a death
+// does, The Keeper's Toll included, so a normalized bout is decided by play
+// and not by what each fighter walked in carrying. A sanction is not something
+// the fighter walked in carrying: it is account state an operator applied, so
+// it survives here exactly as it survives an ordinary death. Returns a NEW
+// array, so the caller's assignment stays a replacement and never mutates the
+// array it read.
 export function aurasSurvivingCleanSlate(auras: readonly Aura[]): Aura[] {
   return auras.filter((a) => a.id === CHEATER_MARK_AURA_ID);
 }

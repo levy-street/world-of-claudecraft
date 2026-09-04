@@ -150,7 +150,9 @@ export const WILLOWFEN_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1,
     color: 0x7aa848,
-    componentTags: ['gills', 'hide'],
+    // A poison toad: the venom gland is the same family the spiders yield.
+    // Phase 11m added the tag as the band-3 open-world venomSac source.
+    componentTags: ['gills', 'venomSac', 'hide'],
   },
   drowsy_croaker: {
     id: 'drowsy_croaker',

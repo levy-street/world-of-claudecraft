@@ -3,8 +3,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import { TIER_SKILL_STEP } from '../src/sim/professions/wheel';
 import { Hud } from '../src/ui/hud';
-import { buildProfessionTutorialModel } from '../src/ui/profession_tutorial_view';
-import { renderProfessionTutorial } from '../src/ui/profession_tutorial_window';
+import { buildProfessionTutorialModel } from '../src/ui/hud/professions/profession_tutorial_view';
+import { renderProfessionTutorial } from '../src/ui/hud/professions/profession_tutorial_window';
 
 // The managed-window close path (Esc dispatcher: closeAll -> topmostOpenWindow ->
 // closeManagedWindow) must route the tutorial modal through

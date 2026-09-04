@@ -271,10 +271,12 @@ describe('Drowned Litany shop stock (data pins)', () => {
       { itemId: 'ashwood_axe', marks: 24, gate: 'clears:3' },
       { itemId: 'goldleaf_sickle', marks: 24, gate: 'clears:3' },
       { itemId: 'stormreel_fishing_rod', marks: 24, gate: 'clears:3' },
+      { itemId: 'osmium_hoe', marks: 24, gate: 'clears:3' },
       { itemId: 'arcanite_mining_pick', marks: 56, gate: 'heroicClear' },
       { itemId: 'elderwood_axe', marks: 56, gate: 'heroicClear' },
       { itemId: 'sunpetal_sickle', marks: 56, gate: 'heroicClear' },
       { itemId: 'tidewrought_fishing_rod', marks: 56, gate: 'heroicClear' },
+      { itemId: 'evergarden_hoe', marks: 56, gate: 'heroicClear' },
     ]);
   });
 
@@ -282,14 +284,50 @@ describe('Drowned Litany shop stock (data pins)', () => {
     // DERIVED from the item table, never a second hand-written list: a ninth
     // crafted tool added to content and forgotten here fails, which is the
     // whole point of the route existing.
+    // FARMING IS NO LONGER EXCLUDED (masterwrought Phase 11j, decision B), and
+    // the exclusion was discharged by RE-DECIDING it rather than by widening
+    // anything to keep this arm green. The old skip said the crafted osmium_hoe
+    // deliberately had no Marks route and that whether the top hoe ever joined
+    // a delve shop was a later decision. That decision is made: leaving farming
+    // out made it the only gathering profession with no non-crafter route at
+    // the tier-4 rung, which masterwrought R18 forbids, so BOTH hoe rungs
+    // joined the counter and the filter below stopped excluding the profession.
+    // Every per-tier arm therefore reads FIVE rather than four.
+    //
+    // THE FISHING EXCLUSION IS UNCHANGED, and this exclusion is
+    // NOT a widening of it (masterwrought Phase 11i). Both shipped crafted rods
+    // keep their Marks rows and both are still swept below; what is excluded is
+    // the ONE tier-6 apex rung 11i minted, by TIER rather than by profession,
+    // so a future crafted tier-4 or tier-5 rod still lands inside this guard.
+    // The reasoning is recorded where the prices are (content/delves/shop.ts):
+    // pricing a tier-6 rung means inventing a Marks number and a gate above
+    // heroicClear, the rung needs no bad-luck backstop because its schematic is
+    // deterministic marks stock and the rod is market-listable, and the two rod
+    // prices below are themselves pending a re-derivation. A later decision,
+    // pinned ABSENT here so it stays visible rather than becoming a hole.
+    const APEX_ROD_TIER = 6;
     const craftedTools = Object.values(ITEMS).filter(
-      (def) => def.use?.type === 'gatherTool' && def.use.tier > 3,
+      (def) => def.use?.type === 'gatherTool' && def.use.tier > 3 && def.use.tier < APEX_ROD_TIER,
     );
-    // At-least, not exactly: a ninth crafted tool added WITH its Marks row is
-    // a legitimate content addition, and an exact pin would red on it with a
+    // The excluded rung is pinned by NAME and by absence, both ways, so neither
+    // the exclusion nor the rung can drift quietly: a second tier-6 tool, or
+    // this one gaining a row, reds here.
+    const apexRungs = Object.values(ITEMS).filter(
+      (def) => def.use?.type === 'gatherTool' && def.use.tier >= APEX_ROD_TIER,
+    );
+    expect(apexRungs.map((d) => d.id)).toEqual(['clockreel_fishing_rod']);
+    expect(
+      DELVE_SHOPS.drowned_litany.some((e) => e.itemId === 'clockreel_fishing_rod'),
+      'the apex rung has no Marks route by decision; see content/delves/shop.ts',
+    ).toBe(false);
+    // At-least, not exactly: an eleventh crafted tool added WITH its Marks row
+    // is a legitimate content addition, and an exact pin would red on it with a
     // misleading message. The per-tool loop below is what actually guards the
     // claim, and the literal stock pin above already fixes today's count.
-    expect(craftedTools.length).toBeGreaterThanOrEqual(8);
+    // RE-DERIVED to 10 at masterwrought Phase 11j: a >= floor left at its old
+    // value silently stops guarding as the set grows, so the floor moves with
+    // the set every time the set does.
+    expect(craftedTools.length).toBeGreaterThanOrEqual(10);
     const rows = new Map(DELVE_SHOPS.drowned_litany.map((e) => [e.itemId, e]));
     for (const tool of craftedTools) {
       const row = rows.get(tool.id);
@@ -301,13 +339,42 @@ describe('Drowned Litany shop stock (data pins)', () => {
         tier === 4 ? [24, 'clears:3'] : [56, 'heroicClear'],
       );
     }
-    // Both arms are populated, so neither branch above is dead.
+    // Both arms are populated, so neither branch above is dead. FIVE and FIVE
+    // since masterwrought Phase 11j seated farming at both rungs: one pick, one
+    // axe, one sickle, one rod and one hoe per rung. A matched pair is also a
+    // more drift-resistant shape than four against five.
     expect(
       craftedTools.filter((t) => t.use?.type === 'gatherTool' && t.use.tier === 4),
-    ).toHaveLength(4);
+    ).toHaveLength(5);
     expect(
       craftedTools.filter((t) => t.use?.type === 'gatherTool' && t.use.tier === 5),
-    ).toHaveLength(4);
+    ).toHaveLength(5);
+    // THE FARMING TRIPWIRE IS DISCHARGED, and replaced by its own positive
+    // pin rather than deleted. It used to assert that NO farming gatherTool had
+    // a Marks row anywhere, carrying a self-clearing message telling whoever
+    // added one to re-decide the skip; 11j added two and re-decided it. What
+    // stands in its place is the claim that is now true and load-bearing: the
+    // farming rungs that belong on the counter are exactly the two crafted top
+    // rungs, and the three below stay off it (the low-rung half is pinned in
+    // tests/professions_hoe_recipes.test.ts, which owns the hoe ladder).
+    const farmingTools = Object.values(ITEMS).filter(
+      (def) => def.use?.type === 'gatherTool' && def.use.professionId === 'farming',
+    );
+    // At the real count rather than a token floor. NOT the same shape as the
+    // craftedTools assertion above, which is deliberately a >= floor because
+    // that set may legitimately grow with a new crafted tool; this roster is
+    // closed content, so an exact pin is right and a hoe leaving it reds here.
+    expect(farmingTools.length, 'the five shipped hoe rungs').toBe(5);
+    const allDelveRows = new Set(
+      Object.values(DELVE_SHOPS)
+        .flat()
+        .map((e) => e.itemId),
+    );
+    const farmingOnCounter = farmingTools
+      .filter((t) => allDelveRows.has(t.id))
+      .map((t) => t.id)
+      .sort();
+    expect(farmingOnCounter).toEqual(['evergarden_hoe', 'osmium_hoe']);
   });
 
   it('every Litany slot costs exactly 2x its Collapsed Reliquary price tier', () => {

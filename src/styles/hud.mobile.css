@@ -3074,6 +3074,21 @@
        a 4px gap. The landscape media block below re-tunes it for that tier's
        0.6 frame scale. */
     --mobile-pet-frame-drop: calc(53px * var(--mobile-chrome-scale, 1) + 4px);
+    /* RULED (qr-19-mobile-pet-frame-combo-overlap, 2026-09-01): the combo-row overlap
+       raised against this constant is UNREACHABLE, so the drop stays as written and takes
+       no class-conditional term. Checked live: the combo row paints only for resourceType
+       'energy' (src/ui/hud.ts, the player-frame pass), which is the rogue
+       (src/sim/content/classes.ts) and the druid's cat form (src/sim/entity.ts, the form
+       resource swap), and neither is a pet class: isPetClass (src/sim/types.ts) is hunter,
+       warlock and mage, and the pet-frame pass paints hidden for the other six classes,
+       always. The roster walk cannot back-door one either, since findOwnPet
+       (src/ui/pet_frame_view.ts) excludes delve companions, guardian_ templates, the pyre
+       guardian and temporary necromancy undead. No player can see the two boxes at once,
+       so paying vertical space, or a conditional in this layer, would be work with no
+       reachable beneficiary. One figure amended in place while here: the estimate above
+       reads about 53px, while the Phase 18 tests unit measured the heraldry-era frame at
+       45.30px painted and 55.06px with the combo row; the constant is deliberately not
+       re-derived off either number, because it is not moving. */
   }
   body.mobile-touch #pet-frame {
     position: fixed;
@@ -4559,9 +4574,11 @@
   body.mobile-touch .crafting-cast-progress-batch {
     font-size: 12px;
   }
-  /* Phase 3 batch: 40px touch floor on qty stepper and Create All. */
+  /* Phase 3 batch: 40px touch floor on qty stepper and Create All; phase 14
+     adds the batch row's Perfecting link to the same floor. */
   body.mobile-touch .crafting-qty-btn,
-  body.mobile-touch .crafting-create-all-btn {
+  body.mobile-touch .crafting-create-all-btn,
+  body.mobile-touch .crafting-perfecting-link {
     min-width: 40px;
     min-height: 40px;
   }
@@ -6410,6 +6427,109 @@
   body.mobile-touch #professions-window .prof-list {
     grid-template-columns: minmax(0, 1fr);
   }
+  /* The Harvest Journal on touch: inset-pinned on all four edges like the
+     professions window above, since its row list is the whole window and a
+     centered 520px card wastes a landscape phone. The .hj-body scroller is
+     the one internal scroll container; the title bar stays pinned chrome and
+     the close button keeps the shared 40px x-btn tap floor. */
+  body.mobile-touch #harvest-journal-window {
+    position: fixed;
+    left: calc(max(10px, env(safe-area-inset-left)) / var(--ui-scale, 1));
+    right: calc(max(10px, env(safe-area-inset-right)) / var(--ui-scale, 1));
+    top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));
+    bottom: calc(max(10px, env(safe-area-inset-bottom)) / var(--ui-scale, 1));
+    width: auto;
+    transform: none;
+    max-width: none;
+    max-height: none;
+    box-sizing: border-box;
+    /* The generic mobile .window rule pads the bottom for the safe area; this
+       window is already inset-pinned on all four edges, so that rule would
+       double count the inset. */
+    padding-bottom: var(--window-pad);
+    overflow: hidden;
+    z-index: 95;
+  }
+  /* Narrow phones stack each row into one column: the right-hand state and
+     care cells keep their full width rather than crushing the crop name. */
+  @media (max-width: 560px) {
+    body.mobile-touch .hj-row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    body.mobile-touch .hj-state,
+    body.mobile-touch .hj-care {
+      grid-column: 1;
+      grid-row: auto;
+      justify-content: flex-start;
+    }
+  }
+  /* The plant sheet on touch: the desktop 440px card clamps to the phone
+     (844x390 landscape stays fully on screen), and the pick / toggle / plant
+     controls carry the 44px touch floor, the class-scoped twin of the
+     coarse-pointer rules (the map-zoom-btn idiom). */
+  body.mobile-touch #plant-sheet-window {
+    /* This window lives inside zoomed #ui. Convert the JS-synced viewport and
+       safe-area values into author-space before the zoom is applied; the
+       symmetric inset still uses twice the larger edge for a centered card. */
+    width: min(
+      440px,
+      calc(
+        (
+          var(--app-vw, 100vw) -
+          2 *
+          max(env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px))
+        ) /
+        var(--ui-scale, 1) -
+        20px
+      )
+    );
+    max-height: calc(
+      (
+        var(--app-vh, 100vh) -
+        2 *
+        max(env(safe-area-inset-top, 0px), env(safe-area-inset-bottom, 0px))
+      ) /
+      var(--ui-scale, 1) -
+      20px
+    );
+  }
+  body.mobile-touch .ps-seed,
+  body.mobile-touch .ps-knob,
+  body.mobile-touch .ps-plant {
+    min-height: 44px;
+  }
+  /* The Perfecting window on touch (Masterwrought phase 14): inset-pinned on
+     all four edges like the harvest journal above, since its candidate list
+     plus detail pane is the whole window and a centered 460px card wastes a
+     landscape phone. .pf-body stays the one internal scroller; the interactive
+     rows carry the 44px touch floor. A re-pinned `left` re-declares
+     `transform` (the mobile transform rule). */
+  body.mobile-touch #perfecting-window {
+    position: fixed;
+    left: calc(max(10px, env(safe-area-inset-left)) / var(--ui-scale, 1));
+    right: calc(max(10px, env(safe-area-inset-right)) / var(--ui-scale, 1));
+    top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));
+    bottom: calc(max(10px, env(safe-area-inset-bottom)) / var(--ui-scale, 1));
+    width: auto;
+    transform: none;
+    max-width: none;
+    max-height: none;
+    box-sizing: border-box;
+    /* The generic mobile .window rule pads the bottom for the safe area; this
+       window is already inset-pinned on all four edges, so that rule would
+       double count the inset. */
+    padding-bottom: var(--window-pad);
+    overflow: hidden;
+    z-index: 95;
+  }
+  body.mobile-touch .pf-cand,
+  body.mobile-touch .pf-action,
+  body.mobile-touch .pf-name-submit,
+  body.mobile-touch .pf-name-cancel,
+  body.mobile-touch .pf-bind-confirm,
+  body.mobile-touch .pf-bind-cancel {
+    min-height: 44px;
+  }
   /* The tool-effect controls' touch floors, the body.mobile-touch twin of the
      @media (pointer: coarse) rules in components.css (the map-zoom-btn idiom):
      the coarse-pointer media rule serves real devices, and this class-scoped
@@ -6953,12 +7073,17 @@
   body.mobile-touch #ctx-menu .ctx-item-effect {
     font-size: 14px;
   }
-  /* The DESTRUCTIVE replace flag scales with them (#2421). The other meta
-     sub-lines keep the base 11px on purpose (a worn tag and a reagent count are
-     reference, read once), but this one is the warning that a tap will destroy
-     an existing enchant, and fine print at arm's length is exactly where that
-     gets missed. Only the danger variant moves, so the informational tags it
-     sits beside stay visibly lighter. */
+  /* The two sub-lines a player has to ACT on scale with them: the DESTRUCTIVE
+     replace flag (#2421) and the GATE line that says why a listed row cannot be
+     tapped (the Enchanting floor, the Perfected requirement). The purely
+     informational tags keep the base 11px on purpose (a worn tag and a reagent
+     count are reference, read once), but a warning that a tap will destroy an
+     existing enchant, and the only answer a player gets to "why is this row
+     dead?", are both exactly the fine print that gets missed at arm's length.
+     One rule, so the pair cannot drift apart. Selector ORDER is load-bearing:
+     tests/ctx_menu_picker_sizing.test.ts finds this block by matching the danger
+     selector immediately before the brace, so that arm stays last. */
+  body.mobile-touch #ctx-menu .ctx-item-meta.ctx-item-gate,
   body.mobile-touch #ctx-menu .ctx-item-meta.ctx-item-danger {
     font-size: 13px;
   }
@@ -6976,11 +7101,12 @@
      app viewport, scaled like the base rule) and a bounded width; the box
      scrolls within it. */
   body.mobile-touch #ctx-menu.ctx-menu-picker {
-    /* 0.72, raised from 0.6: a picker row carries three lines now (name, effect,
-       slot + reagents), so the original fraction showed barely two and a half
-       rows on a landscape phone. Still a genuine fraction of the viewport, well
-       short of the full-height box this cap exists to prevent, and the list
-       still scrolls. */
+    /* 0.72, raised from 0.6: a picker row carries at least three lines (name,
+       effect, slot + reagents), and a GATED one carries a fourth or a fifth (the
+       skill floor, the Perfected requirement), so the original fraction showed
+       barely two and a half rows on a landscape phone. Still a genuine fraction
+       of the viewport, well short of the full-height box this cap exists to
+       prevent, and the list still scrolls. */
     max-height: calc(var(--app-vh, 100vh) / var(--ui-scale, 1) * 0.72);
     min-width: 280px;
     max-width: min(420px, 86vw);

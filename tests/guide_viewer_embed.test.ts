@@ -43,7 +43,7 @@ describe('modelViewerEmbed', () => {
   });
 
   it('emits no poster image when neither a still nor a crest is provided', () => {
-    const html = modelViewerEmbed({ modelKey: 'gloomshade', name: 'Gloomshade' });
+    const html = modelViewerEmbed({ modelKey: 'gloomshade', name: 'Duskmurk' });
     expect(html).not.toContain('class="guide-viewer-poster');
   });
 

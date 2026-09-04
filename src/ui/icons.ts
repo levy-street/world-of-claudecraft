@@ -14,12 +14,12 @@ import { ABILITIES, ITEMS } from '../sim/data';
 import { crestIconUrl } from './crest_icon_art';
 import { currencyImageUrl } from './currency_art';
 import { DEED_IMAGE_IDS } from './deed_image_ids';
+import { professionImageUrl } from './hud/professions/profession_art';
 import { MOB_AURA_IMAGE_IDS } from './mob_aura_icon_art';
 import { PET_ACTION_IMAGE_IDS } from './pet_action_icons';
-import { professionImageUrl } from './profession_art';
 import { ITEM_WEAPON_VARIANTS } from './weapon_variants';
 
-export { PROFESSION_IMAGE_IDS, professionImageUrl } from './profession_art';
+export { PROFESSION_IMAGE_IDS, professionImageUrl } from './hud/professions/profession_art';
 
 export type IconKind = 'ability' | 'item' | 'aura' | 'crest';
 
@@ -3613,6 +3613,19 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   aura_buff_ap_pct: r('fury', 'gold', ['fist', { p: 'sunburst', ...TR }], ['glow']),
   aura_buff_armor: r('steel', 'steel', ['shield']),
   aura_buff_int: r('arcane', 'arcanePink', ['eye']),
+  // The FLASK family: the three FlaskAuraKind stats, each the VESSEL primitive
+  // carrying the same stat motif its shared buff glyph uses, so a flask reads
+  // as "that buff, from the bottle" rather than as an unrelated icon. Keyed off
+  // the aura's flask marker (src/ui/aura_icon_view.ts flaskAuraIconId), which
+  // is why these ids are `flask_<kind>` and not `aura_<something>`: a flask, an
+  // elixir and a scroll of one stat share an aura id, and only the marker tells
+  // them apart. The added glow is what separates them at buff-bar size without
+  // relying on colour alone. Adding a fourth FlaskAuraKind means adding its
+  // recipe here, or the resolver falls back to the shared glyph, which is the
+  // safe direction.
+  flask_buff_sta: r('blood', 'blood', ['potion', { p: 'heart', ...BR }], ['glow']),
+  flask_buff_ap: r('fury', 'gold', ['potion', { p: 'fist', ...BR }], ['glow']),
+  flask_buff_int: r('arcane', 'arcanePink', ['potion', { p: 'eye', ...BR }], ['glow']),
   aura_buff_dodge: r('storm', 'sky', ['shield'], ['motion']),
   aura_buff_speed: r('earth', 'leather', ['boot'], ['motion']),
   aura_buff_haste: r('storm', 'sky', ['lightning']),
@@ -3679,6 +3692,15 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   // red_banner ability's staff-plus-sunburst language) on the objective gold, so
   // it reads as the flag itself and not as another rune.
   bg_carried_flag: r('fury', 'gold', ['staff', { p: 'sunburst', ...TR, pal: 'gold' }], ['motion']),
+  // Well Fed (the Masterwrought phase 10 role foods and, since 11c, every farm
+  // buff dish too, aura id 'well_fed'). Keyed
+  // by AURA id like the Thornhollow runes above, and it has to be: the buff
+  // carries an ordinary stat kind (buff_sta / buff_ap / buff_int, one per role
+  // food), so without a recipe of its own the resolver falls through to
+  // aura_buff_<kind> and Well Fed wears the same glyph as the elixir or flask of
+  // that stat. Three buffs, one picture, on a bar where the player is choosing
+  // between them. A cooked haunch on the food palette says which one it is.
+  well_fed: r('food', 'ember', ['meat'], ['glow']),
   // The operator-applied Cheater mark (src/sim/moderation/), keyed by AURA id like
   // the rune buffs above. Without a row here the resolver fell through to the
   // generic utility fallback, so a SANCTION wore a parchment/gold buff icon in the
@@ -4060,16 +4082,19 @@ function itemFallback(id: string): IconRecipe | null {
       ? r('drink', 'sky', [{ p: 'potion', pal: 'sky' }])
       : r('drink', 'sky', ['waterskin']);
   }
-  if (it.kind === 'potion' || it.kind === 'elixir') {
+  if (it.kind === 'potion' || it.kind === 'elixir' || it.kind === 'flask') {
     // Crafted consumables without curated art (the trained-ladder draughts and
-    // elixirs) render the flask, tinted by function, instead of falling
-    // through to the trinket arm below.
+    // elixirs, plus the phase 10 apex flasks) render the flask, tinted by
+    // function, instead of falling through to the trinket arm below. The
+    // sparkle marks the timed-buff half of the family, so a flask carries it
+    // for the same reason an elixir does.
     const pal: PaletteName = has(name, ['healing'])
       ? 'ember'
       : has(name, ['mana'])
         ? 'sky'
         : 'venom';
-    return r('arcane', pal, [{ p: 'potion', pal }], it.kind === 'elixir' ? ['sparkle'] : fx);
+    const timedBuff = it.kind === 'elixir' || it.kind === 'flask';
+    return r('arcane', pal, [{ p: 'potion', pal }], timedBuff ? ['sparkle'] : fx);
   }
   if (it.kind === 'tool') {
     const prim: PrimitiveName = has(name, ['pole', 'rod', 'staff']) ? 'staff' : 'mace';
@@ -4079,6 +4104,20 @@ function itemFallback(id: string): IconRecipe | null {
     const isCloth = has(name, ['linen', 'silk', 'woven', 'cloth', 'wool']);
     return r(isCloth ? 'cloth' : 'leather', isCloth ? 'cloth' : 'leather', ['sack'], fx);
   }
+  // Recipe patterns (kind 'recipe') are a written page, so they take the same
+  // 'parchment' ground quest items do rather than falling through to the junk
+  // trinket below, which would ink every unlearned pattern the color of vendor
+  // trash. It sits ahead of BOTH arms below: the fall-through keys on 'quest'
+  // alone, and the fish arm matches on the NAME with no kind gate, so a pattern
+  // named "Pattern: Steel Longsword" would draw a fish off the 'eel' substring.
+  // Every arm above is kind-gated and cannot match a 'recipe'.
+  if (it.kind === 'recipe') return r('parchment', 'leather', ['scroll'], fx);
+  // Buff scrolls (kind 'scroll', phase 06) take the same parchment fallback
+  // explicitly: no kind-gated arm above matches them (the flask arm gates on
+  // potion|elixir), so without this row an artless scroll would fall through
+  // to the name-matched trinket cascade. Inert while every shipped scroll
+  // carries committed WebP; this is the artless-id backstop.
+  if (it.kind === 'scroll') return r('parchment', 'leather', ['scroll'], fx);
   // Raw fishing catches left kind food for cooking reagents; keep a fish-like
   // procedural recipe so they never fall through to generic junk trinkets when
   // static WebP is missing. Name tokens cover cooked fish siblings and rares.
@@ -4902,6 +4941,7 @@ export const AURA_FILE_IMAGE_IDS: ReadonlySet<string> = new Set([
   'voidsong_echo',
   'water_jet',
   'water_jet_slow',
+  'well_fed',
   'winters_chill',
   'wlk_forbidden_reflection',
   'wlk_forbidden_reflection_lock',
@@ -5307,31 +5347,10 @@ for (const item of Object.values(ITEMS)) {
 // real, non-weapon item; both sets are served by itemImageUrl and gated on committed art.
 export const UI_ITEM_IMAGE_IDS = new Set<string>(['backpack']);
 
-// Items whose painted art has not been commissioned yet. The derivation above deliberately
-// enters EVERY non-weapon item into ITEM_IMAGE_IDS, which is what keeps the filesystem and
-// provenance gates honest, but an id listed here has no committed .webp behind it yet, so
-// itemImageUrl declines it and iconDataUrl composes the procedural recipe instead of pointing
-// an <img> at a file that 404s. Same shape as the i18n `pending` model: the debt is
-// enumerated rather than silent, and it shrinks as art lands.
-//
-// Empty after the accepted 2026-08-01 painted-art wave, and empty again after the three
-// quest-collect items this branch's dedupe pass added were painted. Keep the mechanism: a
-// future development-only item may still use it temporarily. tests/item_icons.test.ts holds
-// the line from both sides: it rejects stale entries after art lands and unenumerated art
-// debt. Do not add to this list merely to silence that failure; commission the art.
-// Empty again after the hunter quiver art landed in the same branch that enumerated it,
-// and still empty with the Proving Shore pair: the island's castaway crate and ferry
-// bell icons are rendered from their own world models
-// (scripts/render_island_item_icons.mjs), so they ship with committed art like
-// every other item.
-//
-// The Ignivar raid loot table (content/ignivar_loot.ts) currently carries the
-// whole debt: 192 non-weapon items behind the development-only Crucible raid,
-// enumerated here until their painted wave lands (the raid itself ships with a
-// dev-only entrance, so no player-facing surface shows a procedural icon yet).
-// The 10 raid weapons are excluded: weapons never enter this set (guard A2);
-// they ship painted art through WEAPON_IMAGE_IDS like every other weapon.
-export const ITEM_ART_PENDING = new Set<string>(IGNIVAR_ART_PENDING_ITEM_IDS);
+// Explicit development-only item-art debt ledger. The Masterwrought completion wave
+// cleared all 81 feature entries; keep the Crucible-owned spread as the canonical seam for
+// future parked raid art. Tests reject both unenumerated debt and stale entries after art lands.
+export const ITEM_ART_PENDING = new Set<string>([...IGNIVAR_ART_PENDING_ITEM_IDS]);
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */
 export function itemImageUrl(id: string): string | null {
@@ -5348,32 +5367,16 @@ export function itemImageUrl(id: string): string | null {
 const DEED_ICON_DIR = '/ui/deeds';
 const DEED_CREST_PREFIX = 'deed_';
 
-// Exhaustive live-deed art debt ledger, following the ITEM_ART_PENDING model one screen up. The
-// Icons authoring rule in docs/design/deeds.md permits a procedural category fallback while art
-// trails a deed. Every deed of the release base is painted today; this set is the one
-// authoritative ledger of the debt that remains, and a new entry must be commissioned and filed
-// in docs/achievements/icon-brief.md rather than hidden by an unreviewed fallback.
-// tests/deed_icons.test.ts holds the line from both sides: a stale entry once art lands, and
-// unenumerated debt.
+// Exhaustive live-deed art debt ledger. The Masterwrought completion wave clears its
+// eleven crests (including the commissioned Harvestmaster replacement); the remaining rows
+// belong to independent release work and retain their deliberate procedural category fallback.
+// Insertion order mirrors DEED_ORDER because the deed-art gate derives its exact debt in order.
 export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
-  // The walk-in castle visit pair: both are 'exploration', so both fall back to
-  // the deed_cat_exploration crest until their commissioned art lands
-  // (docs/achievements/icon-brief.md).
   'exp_the_last_keep',
   'exp_dawnhold_castle',
-  // The bank socket ladder pair (Bank Storage phase 06): both are 'social', so
-  // both fall back to the deed_cat_social crest until their commissioned art
-  // lands (docs/achievements/icon-brief.md). Neither carries a reward, so the
-  // title-shelf rule that forbids a title deed from riding this ledger does
-  // not apply.
   'soc_strongbox_outfitter',
   'soc_four_bags_deep',
-  // The Proving Shore graduation deed rides the deed_cat_progression crest
-  // until its commissioned art lands (docs/achievements/icon-brief.md).
   'prog_ready_for_an_adventure',
-  // The Crucible of the Last Spring raid deeds: all five are 'dungeon', so
-  // each rides the deed_cat_dungeon crest until its commissioned art lands
-  // (docs/achievements/icon-brief.md).
   'dgn_ignivar',
   'dgn_ignivar_heroic',
   'dgn_varkhul',
@@ -5425,7 +5428,7 @@ function resolveRecipe(kind: IconKind, id: string): IconRecipe {
   if (!recipe) {
     if (import.meta.env?.DEV && !warnedIds.has(id)) {
       warnedIds.add(id);
-      console.warn(`[icons] no recipe or def for ${kind} id "${id}" — using fallback icon`);
+      console.warn(`[icons] no recipe or def for ${kind} id "${id}": using fallback icon`);
     }
     return UNKNOWN_RECIPE;
   }
@@ -5657,6 +5660,15 @@ const PROFESSION_RECIPES: Record<string, IconRecipe> = {
     ['sparkle'],
   ),
   gather_fishing: r('drink', 'sky', [{ p: 'fish' }], ['glow']),
+  // Farming, the fifth gathering skill: a seed sack faded into tilled-earth
+  // ground behind a crisp sprout, the tailoring/enchanting backdrop idiom. Read
+  // deliberately apart from herbalism, whose twin wild leaves sit on a nature
+  // ground: farming is the CULTIVATED skill, so the soil and the sack carry the
+  // silhouette and the foliage is only the payoff on top.
+  gather_farming: r('earth', 'leafGreen', [
+    { p: 'sack', ...BIG, pal: 'earthBrown' },
+    { p: 'leaf' },
+  ]),
 };
 
 /** True when `id` has an explicit profession recipe, as opposed to falling

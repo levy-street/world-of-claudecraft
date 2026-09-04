@@ -72,7 +72,7 @@ describe('shaman ability-specific spellcasts (issue #2889)', () => {
     const block = shamanBlock.slice(abilityStart, abilityEnd);
     const rows = [...block.matchAll(/^\s*([a-z_]+): '([A-Za-z_]+)',$/gm)];
     // 14 real shaman-tagged abilities exist in classes.ts (base kit plus the
-    // Elemental/Restoration spec signatures); this batch maps every one.
+    // Thundercall/Spiritcall spec signatures); this batch maps every one.
     expect(rows.length).toBe(14);
     for (const [, abilityId, clip] of rows) {
       expect(

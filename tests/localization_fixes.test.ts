@@ -5,11 +5,12 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { resolveReportTarget } from '../server/report_target';
 import { DICT as adminDICT, classLabel, setAdminLanguage } from '../src/admin/i18n';
 import { DELVE_MOBS } from '../src/sim/content/delves/mobs';
-import { ABILITIES, ITEMS } from '../src/sim/data';
+import { ABILITIES, DUNGEON_LIST, ITEMS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
 import { auraDisplayNameForHud } from '../src/ui/aura_display_name';
-import { itemDisplayName } from '../src/ui/entity_i18n';
+import { dungeonText } from '../src/ui/entity_display_core';
+import { itemDisplayName, tEntityOptional } from '../src/ui/entity_i18n';
 import { Hud } from '../src/ui/hud';
 import {
   cs_CZ,
@@ -965,10 +966,21 @@ type Cand = { type: 'log' | 'error' | 'loot'; tmpl: string };
 function scanEmitCandidates(simSrc: string, serverSrc: string): Cand[] {
   const cands: Cand[] = [];
   const lit = '(`[^`]*`|\'(?:[^\'\\\\]|\\\\.)*\'|"(?:[^"\\\\]|\\\\.)*")';
-  // A ternary condition up to the `?` (no quotes/braces/commas of its own beyond
-  // the matched literals): catches `text: cond ? 'A' : 'B'` emits the literal-only
-  // patterns below miss.
-  const cond = '[^?,{}\\n]*?';
+  // A ternary condition up to the `?` (no braces/commas of its own beyond
+  // the matched literals, and no `;` or `)`: a condition never crosses a
+  // statement or call boundary, so a one-line `this.err(id, 'A'); y = b ? 'C'
+  // : 'D';` cannot false-harvest C and D as an err ternary): catches
+  // `text: cond ? 'A' : 'B'` emits the literal-only patterns below miss.
+  // Quotes stay admitted on purpose: the live guild-create condition is
+  // `result.error === 'name_taken'` (server/social.ts).
+  const cond = '[^?,{}\\n;)]*?';
+  // The same condition, newline-tolerant, for the WRAPPED emit shapes. Biome puts
+  // a long `text:` value on its own line, which parked the condition of a ternary
+  // emit one line below the `text:` and made the whole emit invisible to `cond`
+  // (nine live sites, dungeons.ts's difficulty-mismatch pair among them). `;` and
+  // `)` still terminate it, so it cannot cross a statement or call boundary; only
+  // the newline rule is relaxed.
+  const condm = '[^?,{};)]*?';
   const unq = (s: string) => s.slice(1, -1);
   // --- src/sim/sim.ts (+ extracted sim modules, which emit via ctx.*) emits ---
   const e1 = new RegExp(`emit\\(\\{[^}]*?type:\\s*'(log|loot)'[^}]*?text:\\s*${lit}`, 'gs');
@@ -977,7 +989,7 @@ function scanEmitCandidates(simSrc: string, serverSrc: string): Cand[] {
   for (const m of simSrc.matchAll(e2)) cands.push({ type: m[2] as Cand['type'], tmpl: unq(m[1]) });
   // Ternary `text:` emits (both branches) — previously a blind spot.
   const e3 = new RegExp(
-    `emit\\(\\{[^}]*?type:\\s*'(log|loot)'[^}]*?text:\\s*${cond}\\?\\s*${lit}\\s*:\\s*${lit}`,
+    `emit\\(\\{[^}]*?type:\\s*'(log|loot)'[^}]*?text:\\s*${condm}\\?\\s*${lit}\\s*:\\s*${lit}`,
     'gs',
   );
   for (const m of simSrc.matchAll(e3)) {
@@ -996,9 +1008,13 @@ function scanEmitCandidates(simSrc: string, serverSrc: string): Cand[] {
   for (const m of simSrc.matchAll(er)) cands.push({ type: 'error', tmpl: unq(m[1]) });
   // Variable-routed sim emits: this/ctx.notice(pid, '<lit>') (emits 'log') and
   // this/ctx.stopFollow(p, '<lit>') (arg2 routes through error) — blind spots.
-  // The first-arg class excludes ),(,newline so a single-arg call (e.g.
-  // `this.stopFollow(p);`) cannot span into the NEXT call's literal.
-  const nr = new RegExp(`(?:this|ctx)\\.(?:notice|stopFollow)\\([^,()\\n]+,\\s*${lit}`, 'g');
+  // The first-arg class excludes parens so a single-arg call (e.g.
+  // `this.stopFollow(p);`) cannot span into the NEXT call's literal. It spans
+  // NEWLINES, matching its `er`/`ert`/`s4`/`s5` siblings: biome wraps a call whose
+  // literal is long, putting the pid on its own line, and the old newline
+  // exclusion made every such notice invisible (ready_check.ts's readout and
+  // dungeon_finder.ts's assembled line both sat outside the guard that way).
+  const nr = new RegExp(`(?:this|ctx)\\.(?:notice|stopFollow)\\([^,()]+,\\s*${lit}`, 'g');
   for (const m of simSrc.matchAll(nr)) cands.push({ type: 'log', tmpl: unq(m[1]) });
   // Ternary args to error/notice/stopFollow (both branches). The first-arg
   // class spans newlines (a biome-wrapped call puts each arg on its own line)
@@ -1038,6 +1054,39 @@ function scanEmitCandidates(simSrc: string, serverSrc: string): Cand[] {
   for (const m of serverSrc.matchAll(s2)) cands.push({ type: 'error', tmpl: unq(m[1]) });
   const s3 = new RegExp(`sendSystemNotice\\([^,]+,\\s*${lit}`, 'g');
   for (const m of serverSrc.matchAll(s3)) cands.push({ type: 'log', tmpl: unq(m[1]) });
+  // server/social.ts routes its player text through three private helpers rather
+  // than inline { type, text } objects: this.err(charId, '<lit>') delivers
+  // { type: 'error' }, this.info(charId, '<lit>') delivers { type: 'log' }, and
+  // notifyGuildOfficers(guildId, '<lit>') fans a { type: 'log' } line out to a
+  // guild's online officers. Its call sites wrap (the id on its own line), so the
+  // first-arg class admits newlines but, like nr above, no parens or commas: a
+  // single-arg call cannot span into the NEXT call's literal.
+  const s4 = new RegExp(`this\\.err\\([^,()]+,\\s*${lit}`, 'g');
+  for (const m of serverSrc.matchAll(s4)) cands.push({ type: 'error', tmpl: unq(m[1]) });
+  const s5 = new RegExp(`(?:this\\.info|notifyGuildOfficers)\\([^,()]+,\\s*${lit}`, 'g');
+  for (const m of serverSrc.matchAll(s5)) cands.push({ type: 'log', tmpl: unq(m[1]) });
+  // Ternary payloads through the same social helpers (both branches), the ert
+  // shape above in server/social.ts clothing: the guild-create name_taken arm
+  // routes `cond ? LIT : LIT` through this.err, and biome wraps the call, so
+  // the condition and each branch sit on their own lines. The `\\s*` before the
+  // `?` and around the `:` admit that layout; the literal-only s4/s5 above
+  // cannot see either branch of a ternary payload.
+  const s4t = new RegExp(`this\\.err\\([^,()]+,\\s*${cond}\\s*\\?\\s*${lit}\\s*:\\s*${lit}`, 'g');
+  for (const m of serverSrc.matchAll(s4t)) {
+    cands.push({ type: 'error', tmpl: unq(m[1]) });
+    cands.push({ type: 'error', tmpl: unq(m[2]) });
+  }
+  // No live this.info/notifyGuildOfficers ternary site today; kept for
+  // symmetry with s4t so the FIRST one added is harvested instead of shipping
+  // English (the synthetic regression arm below exercises this companion).
+  const s5t = new RegExp(
+    `(?:this\\.info|notifyGuildOfficers)\\([^,()]+,\\s*${cond}\\s*\\?\\s*${lit}\\s*:\\s*${lit}`,
+    'g',
+  );
+  for (const m of serverSrc.matchAll(s5t)) {
+    cands.push({ type: 'log', tmpl: unq(m[1]) });
+    cands.push({ type: 'log', tmpl: unq(m[2]) });
+  }
   const seen = new Set<string>();
   return cands.filter((c) => {
     const k = `${c.type} ${c.tmpl}`;
@@ -1110,6 +1159,10 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/progression/xp.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/mob_swing.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/lifecycle.ts'), 'utf8'),
+    // M5 -> src/sim/mob/boss_mechanics.ts (the boss support kit: "calls for aid!",
+    // "becomes enraged!", the desperate-second-wind line, the channels/unleashes
+    // support-pulse lines, "<mechanic> is interrupted!").
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/boss_mechanics.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/pet/pet_commands.ts'), 'utf8'),
     // The arena-shaped-match pet round trip: its one emit is the same
     // "<name> returns to your side." line Revive Pet uses, so it is matched by
@@ -1126,10 +1179,8 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // sim_i18n EXACT map via log.veilEnter/log.veilLeave); scanning the module
     // keeps any FUTURE literal emit added here under the drift guard.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/portals.ts'), 'utf8'),
-    // The tutorial greeting (spawn greeting event + the startTutorial ferry):
-    // the ferry log line and the two gate denials are matched by the sim_i18n
-    // EXACT map (log.provingFerry, error.tutorialFromHere,
-    // error.tutorialOutleveled); scanning keeps future literal emits guarded.
+    // The compulsory tutorial greeting's ferry log is matched by the sim_i18n
+    // EXACT map (log.provingFerry); scanning keeps future literal emits guarded.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/tutorial/greeting.ts'), 'utf8'),
     // The clicked ferry bells (tutorial island): the two crossing lines and
     // the combat denial are matched by the sim_i18n EXACT map
@@ -1382,8 +1433,47 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
   // client-side by localizeServerText; previously the guard read only sim.ts, so
   // a new server emit (chat-filter notices, pet-name, etc.) could ship English to
   // every locale while the gate stayed green. Recognized via the localizeServerText
-  // fallback in recognized() below.
-  const serverSrc = fs.readFileSync(path.resolve(process.cwd(), 'server/game.ts'), 'utf8');
+  // fallback in recognized() below. server/social.ts joined the corpus at the
+  // seventeenth release sync (masterwrought Phase 11m). That file's own emit
+  // idiom is not the inline { type, text } object: almost all of its player
+  // text goes through this.err(charId, '...') (an error), this.info(charId,
+  // '...') (a log line) and notifyGuildOfficers(guildId, '...') (a log line to
+  // a guild's online officers), which the s4/s5 regexes in scanEmitCandidates
+  // harvest; a `cond ? LIT : LIT` payload through the same helpers (the
+  // guild-create name_taken arm) rides their s4t/s5t ternary companions; the
+  // few inline { type: 'log', text } broadcasts ride s1. Every
+  // literal harvested today is a server_i18n matcher row, so with those shapes
+  // scanned the NEXT literal added to that file in its own idiom fails here
+  // instead of shipping English to every locale.
+  // activity_detect.ts joined the corpus with Phase 16's extraction: today it
+  // holds zero player-facing literals (cards and daily-reward observers), but
+  // it drains per-event at the tick tail, exactly where an emit is plausible,
+  // and the corpus is hand-curated, so it rides along from day one.
+  // The remaining masterwrought-branch server modules joined at Phase 17 (the
+  // closing parity review): each holds zero player-facing emits today, but the
+  // corpus is hand-curated and the sim side got whole-directory sweeps, so the
+  // server half now follows the same rule (a new module joins in the change
+  // that adds it). Command handlers (farming_commands, perfect_item_ref,
+  // clear_item_name) and the wire/read extractions ride along so the NEXT
+  // literal added in any of them fails here instead of shipping English.
+  const serverSrc = [
+    'server/game.ts',
+    'server/social.ts',
+    'server/activity_detect.ts',
+    'server/farming_commands.ts',
+    'server/perfect_item_ref.ts',
+    'server/clear_item_name.ts',
+    'server/craft_activity.ts',
+    'server/self_social_wire.ts',
+    'server/sim_calendar_feed.ts',
+    'server/heavy_self.ts',
+    'server/interest_policy.ts',
+    'server/character_blob_size.ts',
+    'server/character_save_statement.ts',
+    'server/admin_market_metrics.ts',
+  ]
+    .map((file) => fs.readFileSync(path.resolve(process.cwd(), file), 'utf8'))
+    .join('\n');
 
   const armRegexes = (body: string): RegExp[] => {
     const out: RegExp[] = [];
@@ -1425,8 +1515,16 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     const tern = expr.match(/\?\s*'([^']*)'\s*:\s*'([^']*)'/);
     if (tern) return tern[1] || tern[2];
     if (/\?[^:]*:/.test(expr)) return '';
+    // server/social.ts's guild-rank lines interpolate RANK_LABEL[rank], and their
+    // server_i18n rows accept only the three real labels, so the probe value is
+    // one of them (the numeric class below would otherwise read `rank` as 5).
+    if (/RANK_LABEL/.test(expr)) return 'Officer';
     if (
-      /rank|level|count|players|roll|prestige|amount|seconds|percent|\bN\b|MAX_|FIRST_|threshold|number|\.length|Math|round|parseInt|\*\s*100|suggested|FEE_GOLD/i.test(
+      // The three ready-check tallies are counts whose names say so in words
+      // rather than in any of the stems below, so they read as a NAME and the
+      // readout's `(\d+)` rule rejected the probe form. Word-anchored, so
+      // `alreadyQueued` and friends are untouched.
+      /rank|level|count|players|roll|prestige|amount|seconds|minutes|percent|\bN\b|MAX_|FIRST_|threshold|number|\.length|Math|round|parseInt|\*\s*100|suggested|FEE_GOLD|\bready\b|\bnotReady\b|\bnoResponse\b/i.test(
         expr,
       )
     )
@@ -1653,8 +1751,8 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
 
 // Regression for the S3 hardening: prove the scanner ENUMERATES each emit form it was
 // hardened to cover, by feeding it synthetic source. If a future refactor drops one of
-// the regexes (s1/s1t/s2/s3/nr/ert/e3), the matching assertion bites - so the drift guard
-// cannot silently lose coverage of a whole emit shape.
+// the regexes (s1/s1t/s2/s3/s4/s4t/s5/s5t/nr/ert/e3), the matching assertion bites - so the drift
+// guard cannot silently lose coverage of a whole emit shape.
 describe('S3 scanner enumerates each hardened emit form (regression)', () => {
   const synthSim = [
     "this.emit({ type: 'log', text: 'SYNTH_SIM_LOG' });", // e1
@@ -1675,15 +1773,45 @@ describe('S3 scanner enumerates each hardened emit form (regression)', () => {
     // terminator must not choke on nullish coalescing).
     "ctx.error(\n  p.id,\n  (p.mana ?? 0) === 0\n    ? 'SYNTH_WRAPPED_NULLISH_A'\n    : 'SYNTH_WRAPPED_NULLISH_B',\n);",
     "return 'Synth returns a sentence here.';", // rr
+    // nr, biome-WRAPPED: a notice whose literal is long puts the pid on its own
+    // line, which the old newline-excluding first-arg class could not cross, so
+    // the whole call was invisible (ready_check.ts's readout, dungeon_finder.ts's
+    // assembled line).
+    'ctx.notice(\n  mPid,\n  `SYNTH_WRAPPED_NOTICE ${ready} ready.`,\n);',
+    // e3, biome-WRAPPED: a long ternary `text:` value moves the CONDITION to the
+    // line below `text:`, which the old newline-excluding cond could not cross,
+    // so both branches were invisible (dungeons.ts's difficulty-mismatch pair).
+    "ctx.emit({\n  type: 'log',\n  text:\n    diff === 'heroic'\n      ? 'SYNTH_WRAPPED_EMIT_TERN_A'\n      : 'SYNTH_WRAPPED_EMIT_TERN_B',\n  pid: r.meta.entityId,\n});",
     // nr anti-bleed: a single-arg stopFollow() must stop its first-arg scan at ')'
-    // (the [^,()\\n]+ class) and NOT span into a following call's literal.
+    // (the [^,()]+ class) and NOT span into a following call's literal.
     "this.stopFollow(p); track(metric, 'BLEED_SENTINEL_should_not_capture');",
+    // e3 anti-bleed: the newline-tolerant condm must still stop at ';' and ')', so
+    // an emit followed by an unrelated wrapped ternary cannot harvest its branches.
+    "ctx.emit({ type: 'log', text: 'SYNTH_EMIT_STOP' });\ny =\n  b\n    ? 'EMIT_TERN_BLEED_A'\n    : 'EMIT_TERN_BLEED_B';",
   ].join('\n');
   const synthServer = [
     "this.send({ type: 'error', text: 'SYNTH_SERVER_INLINE' });", // s1
     "this.send({ type: 'log', text: flag ? 'SYNTH_SRV_TERN_A' : 'SYNTH_SRV_TERN_B' });", // s1t
     "sendChatNotice(session, 'SYNTH_CHATNOTICE');", // s2
     "sendSystemNotice(session, 'SYNTH_SYSNOTICE');", // s3
+    // server/social.ts idiom (s4/s5): the private err/info helpers and the
+    // officer fan-out, one of them wrapped across lines the way biome lays the
+    // real call sites out (the id on its own line, the literal on the next).
+    "this.err(actor.characterId, 'SYNTH_SOCIAL_ERR');", // s4
+    "this.info(\n  actor.characterId,\n  'SYNTH_SOCIAL_INFO_WRAPPED',\n);", // s5 (info, wrapped)
+    'await this.notifyGuildOfficers(guild.id, `SYNTH_SOCIAL_OFFICERS ${x}`);', // s5 (officers)
+    // s4t: the guild-create idiom, a ternary payload through this.err with the
+    // call wrapped the way biome lays the real site out (the id, the condition
+    // and each branch on their own lines). BOTH branches must be harvested.
+    "this.err(\n  actor.characterId,\n  result.error === 'name_taken'\n    ? 'SYNTH_SOCIAL_ERR_TERN_A'\n    : 'SYNTH_SOCIAL_ERR_TERN_B',\n);", // s4t (wrapped ternary)
+    "this.info(charId, ok ? 'SYNTH_SOCIAL_INFO_TERN_A' : 'SYNTH_SOCIAL_INFO_TERN_B');", // s5t
+    // s4 anti-bleed: a single-arg this.err() must stop its first-arg scan at ')'
+    // and NOT span into a following call's literal.
+    "this.err(charId); track(metric, 'SOCIAL_BLEED_SENTINEL_should_not_capture');",
+    // s4t anti-bleed: the cond class must stop at ';' and ')', so a one-line
+    // statement followed by an unrelated ternary is harvested as the plain s4
+    // literal ONLY, never as an err ternary over the neighbor's branches.
+    "this.err(charId, 'SYNTH_SOCIAL_ERR_STOP'); y = b ? 'TERN_BLEED_A' : 'TERN_BLEED_B';",
   ].join('\n');
 
   // [label, expected type, expected tmpl] - every entry must be enumerated.
@@ -1705,11 +1833,31 @@ describe('S3 scanner enumerates each hardened emit form (regression)', () => {
     ['sim wrapped nullish-condition ternary, branch A (ert)', 'error', 'SYNTH_WRAPPED_NULLISH_A'],
     ['sim wrapped nullish-condition ternary, branch B (ert)', 'error', 'SYNTH_WRAPPED_NULLISH_B'],
     ['sim return-sentence (rr)', 'error', 'Synth returns a sentence here.'],
+    ['sim ctx.notice biome-wrapped (nr)', 'log', 'SYNTH_WRAPPED_NOTICE ${ready} ready.'],
+    ['sim wrapped emit ternary, branch A (e3)', 'log', 'SYNTH_WRAPPED_EMIT_TERN_A'],
+    ['sim wrapped emit ternary, branch B (e3)', 'log', 'SYNTH_WRAPPED_EMIT_TERN_B'],
+    [
+      'sim emit beside an unrelated wrapped ternary (the e3 anti-bleed host)',
+      'log',
+      'SYNTH_EMIT_STOP',
+    ],
     ['server inline text (s1)', 'error', 'SYNTH_SERVER_INLINE'],
     ['server ternary text, branch A (s1t)', 'log', 'SYNTH_SRV_TERN_A'],
     ['server ternary text, branch B (s1t)', 'log', 'SYNTH_SRV_TERN_B'],
     ['server sendChatNotice (s2)', 'error', 'SYNTH_CHATNOTICE'],
     ['server sendSystemNotice (s3)', 'log', 'SYNTH_SYSNOTICE'],
+    ['social this.err literal (s4)', 'error', 'SYNTH_SOCIAL_ERR'],
+    ['social this.info literal, wrapped call (s5)', 'log', 'SYNTH_SOCIAL_INFO_WRAPPED'],
+    ['social notifyGuildOfficers template (s5)', 'log', 'SYNTH_SOCIAL_OFFICERS ${x}'],
+    ['social this.err ternary, branch A, wrapped call (s4t)', 'error', 'SYNTH_SOCIAL_ERR_TERN_A'],
+    ['social this.err ternary, branch B, wrapped call (s4t)', 'error', 'SYNTH_SOCIAL_ERR_TERN_B'],
+    ['social this.info ternary, branch A (s5t)', 'log', 'SYNTH_SOCIAL_INFO_TERN_A'],
+    ['social this.info ternary, branch B (s5t)', 'log', 'SYNTH_SOCIAL_INFO_TERN_B'],
+    [
+      'social this.err literal beside an unrelated ternary (the s4t anti-bleed host)',
+      'error',
+      'SYNTH_SOCIAL_ERR_STOP',
+    ],
   ];
 
   it('every hardened emit form is enumerated by scanEmitCandidates()', () => {
@@ -1725,6 +1873,26 @@ describe('S3 scanner enumerates each hardened emit form (regression)', () => {
     // ever stopped excluding ')').
     const bled = cands.some((c) => c.tmpl === 'BLEED_SENTINEL_should_not_capture');
     expect(bled, "nr first-arg class must stop at ')' (no cross-call bleed)").toBe(false);
+    const socialBled = cands.some((c) => c.tmpl === 'SOCIAL_BLEED_SENTINEL_should_not_capture');
+    expect(socialBled, "s4 first-arg class must stop at ')' (no cross-call bleed)").toBe(false);
+    // Negative: the s4t/s5t cond class must NOT cross the statement boundary
+    // after the plain s4 literal and harvest the unrelated ternary's branches
+    // (would regress if cond ever stopped excluding ';' and ')').
+    const ternBled = cands.filter((c) => c.tmpl === 'TERN_BLEED_A' || c.tmpl === 'TERN_BLEED_B');
+    expect(
+      ternBled,
+      "cond class must stop at ';' and ')' (no cross-statement ternary harvest)",
+    ).toEqual([]);
+    // Negative for the newline-tolerant condm: relaxing the newline rule must not
+    // also relax the statement boundary, or an emit would harvest whatever ternary
+    // happens to sit below it.
+    const emitTernBled = cands.filter(
+      (c) => c.tmpl === 'EMIT_TERN_BLEED_A' || c.tmpl === 'EMIT_TERN_BLEED_B',
+    );
+    expect(
+      emitTernBled,
+      "condm must stop at ';' and ')' across newlines (no cross-statement emit-ternary harvest)",
+    ).toEqual([]);
   });
 });
 
@@ -1796,10 +1964,19 @@ describe('S3 meta-guard: quest_commands.ts stays on the simSrc scan list', () =>
 describe('elixir aura names stay wired to the sim aura matcher', () => {
   it('every authored elixir aura resolves through localizeSimAuraName', async () => {
     const { ITEMS } = await import('../src/sim/data');
+    // BOTH authored aura-name fields, not just the elixir one: a role food's
+    // wellFed.aura ('Well Fed') is the same kind of twice-authored string (the
+    // def here, the AURA_NAME_KEY row there) reaching the same buff bar, and it
+    // was outside this walk, so a rename on one side alone would have gone
+    // un-localized for every non-English player with nothing red.
     const auras = Object.values(ITEMS)
-      .map((item) => (item as { elixir?: { aura?: string } }).elixir?.aura)
+      .flatMap((item) => [
+        (item as { elixir?: { aura?: string } }).elixir?.aura,
+        (item as { wellFed?: { aura?: string } }).wellFed?.aura,
+      ])
       .filter((aura): aura is string => typeof aura === 'string');
     expect(auras.length).toBeGreaterThanOrEqual(4);
+    expect(auras, 'the role foods are inside the walk').toContain('Well Fed');
     setLanguage('en');
     for (const aura of auras) {
       // Identity round-trip, not just non-null: the EN DICT value must equal
@@ -1826,10 +2003,158 @@ describe('elixir aura names stay wired to the sim aura matcher', () => {
       setLanguage('en');
     }
   });
+});
 
-  it('the pre-rename aura string keeps a legacy alias for the deploy window', () => {
+// --- Deploy-window aliases for wire-carried renames. A not-yet-restarted
+// server still emits the pre-rename or pre-reword bytes, so the client keeps a
+// legacy match arm until the release carrying the change is fully deployed,
+// then drops it (the Venomfire precedent below is the retired shape).
+describe('deploy-window aliases for wire-carried renames', () => {
+  it('the retired Venomfire Vigor deploy-window alias stays deleted', () => {
+    // The alias row ("drop after v0.29.0 ships") outlived its deploy window by
+    // eleven releases; Phase 18 removed it. An unmapped legacy aura name now
+    // resolves to null (callers fall back to the raw name), and this pin keeps
+    // the dead alias from quietly returning with a future merge.
     setLanguage('en');
-    expect(localizeSimAuraName('Venomfire Vigor')).toBe('Vipersear Vigor');
+    expect(localizeSimAuraName('Venomfire Vigor')).toBeNull();
+  });
+
+  it('the phase 03 wire-carried renames keep legacy aliases for the deploy window', () => {
+    // The Venomfire Vigor precedent (its alias is dropped above, its window
+    // long shipped): a not-yet-restarted server still emits the pre-rename
+    // strings, so the new client must localize them until the release
+    // carrying the rename fully ships. These two ride the masterwrought
+    // branch; drop them once the release it integrates onto (release/v0.42.0
+    // at the time of writing) is fully deployed.
+    setLanguage('en');
+    expect(localizeSimAuraName('Winterbite')).toBe(localizeSimAuraName('Wintergnaw'));
+    const legacyLine = "The dead answer Deacon Varric's call!";
+    const canonicalLine = "The dead answer Deacon Vandric's call!";
+    expect(localizeSimText(legacyLine)).toBe(localizeSimText(canonicalLine));
+    expect(localizeSimText(legacyLine)).not.toBe(legacyLine);
+  });
+
+  it('the arena queue line keeps its three-dot legacy twin beside the ellipsis form', () => {
+    // The same class as the two pins around it: the sim emits the ellipsis
+    // form (src/sim/social/arena.ts) and the exact map in localizeSystemText
+    // carries the three-dot spelling a not-yet-restarted server still sends.
+    // Nothing pinned the legacy row until the D150 review found it, so a
+    // merge could have dropped it in silence.
+    interface SystemTextHarness {
+      localizeSystemText(text: string): string;
+    }
+    const harness = Object.create(Hud.prototype) as unknown as SystemTextHarness;
+    const legacy = 'You join the Ashen Coliseum queue. Stand by for a worthy opponent...';
+    const live = 'You join the Ashen Coliseum queue. Stand by for a worthy opponent…';
+    try {
+      for (const lang of supportedLanguages) {
+        setLanguage(lang);
+        const canonical = harness.localizeSystemText(live);
+        expect(canonical, lang).toBe(t('hud.logs.arenaJoin'));
+        expect(harness.localizeSystemText(legacy), lang).toBe(canonical);
+      }
+    } finally {
+      setLanguage('en');
+    }
+  });
+
+  it('the Drowned Temple enterText reword keeps its deploy-window alias (D150)', () => {
+    // The Drowned Temple's enterText de-dash (masterwrought Phase 18 QA) is
+    // WIRE-CARRIED: src/sim/instances/dungeons.ts emits DungeonDef.enterText as
+    // raw English and Hud.localizeSystemText matches it by exact bytes, so a
+    // server that has not restarted past the reword still sends the pre-reword
+    // sentence. The alias arm in localizeSystemText resolves that legacy
+    // sentence to the same catalog text as the live one; this pin keeps a
+    // future merge from dropping the arm in silence (ruled
+    // qr-19-drowned-temple-entertext-deploy-alias, 2026-09-02). Driven through a
+    // bare Hud prototype (the localizeLootText harness below) because the
+    // method is private and reads no instance state on this path; the S3
+    // parsers above cannot see a template-literal arm, so a source-text pin
+    // would not do. The old separator is spelled as an ESCAPE, never the byte.
+    // Retire this pin together with the arm once the release carrying this
+    // branch's reword (release/v0.42.0 at the time of writing) is fully
+    // deployed.
+    interface SystemTextHarness {
+      localizeSystemText(text: string): string;
+    }
+    const harness = Object.create(Hud.prototype) as unknown as SystemTextHarness;
+    const live = DUNGEON_LIST.find((d) => d.id === 'drowned_temple')?.enterText;
+    expect(live, 'the Drowned Temple ships').toBeDefined();
+    if (!live) throw new Error('the Drowned Temple left DUNGEON_LIST');
+    expect(live).toContain('the air turns to cold water');
+    expect(live).not.toContain('\u2014');
+    const legacy =
+      'You step through the moongate \u2014 the air turns to cold water and pale light, and the singing closes over your head.';
+    // The legacy sentence differs from the live one by the separator alone,
+    // so the alias covers exactly the reword and nothing wider.
+    expect(legacy).not.toBe(live);
+    expect(legacy.replace(' \u2014 ', ': ')).toBe(live);
+    // The English catalog copy must equal the content copy byte for byte: the
+    // content copy is the match key and the catalog copy is what renders, so
+    // a reword that moved only one of them would render the other in silence.
+    setLanguage('en');
+    expect(dungeonText('drowned_temple', 'enterText')).toBe(live);
+    // dungeonText falls back to the content copy when the catalog row is
+    // absent, which would turn the line above into content-equals-content; the
+    // bundle-only read proves the catalog really carries the key (fresh read
+    // of the round-1 fix).
+    expect(
+      tEntityOptional({ kind: 'dungeon', id: 'drowned_temple', field: 'enterText' }),
+      'the English catalog carries the enterText row',
+    ).toBe(live);
+    try {
+      for (const lang of supportedLanguages) {
+        setLanguage(lang);
+        const canonical = harness.localizeSystemText(live);
+        expect(canonical, lang).toBe(dungeonText('drowned_temple', 'enterText'));
+        expect(harness.localizeSystemText(legacy), lang).toBe(canonical);
+        expect(harness.localizeSystemText(legacy), lang).not.toBe(legacy);
+      }
+    } finally {
+      setLanguage('en');
+    }
+  });
+});
+
+// --- Well-fed aura name: the same double-authoring hazard as the elixirs
+// (each buff food's wellFed.aura and the sim_i18n map row), so the same
+// identity round-trip pin. Since the 11c unification the ONE field spans the
+// whole family (four farm dishes plus three apex role plates), all sharing
+// the ONE 'Well Fed' name and the one 'well_fed' aura id (last eaten wins
+// across the family), and the matcher serves the kept aura.wellFed terms. ---
+describe('well-fed aura names stay wired to the sim aura matcher', () => {
+  it('every authored wellFed aura resolves through localizeSimAuraName', async () => {
+    const { ITEMS } = await import('../src/sim/data');
+    const auras = Object.values(ITEMS)
+      .map((item) => (item.kind === 'food' ? item.wellFed?.aura : undefined))
+      .filter((aura): aura is string => typeof aura === 'string');
+    // the union of carriers: one buff dish per crop tier plus three plates
+    expect(auras.length).toBeGreaterThanOrEqual(7);
+    setLanguage('en');
+    for (const aura of auras) {
+      // Identity round-trip, not just non-null: the EN DICT value must equal
+      // the item def's aura string, or the matcher resolves a stale name.
+      expect(localizeSimAuraName(aura), `aura "${aura}" out of sync with AURA_NAME_KEY`).toBe(aura);
+    }
+  });
+
+  it('the Well Fed aura localizes on every non-Latin surface', async () => {
+    const expected: Record<string, string> = {
+      zh_CN: '精神饱满',
+      zh_TW: '精神飽滿',
+      ko_KR: '잘 먹음',
+      ja_JP: '満腹',
+      ru_RU: 'Сытость',
+    };
+    try {
+      for (const [locale, value] of Object.entries(expected)) {
+        await ensureLocaleLoaded(locale as Parameters<typeof ensureLocaleLoaded>[0]);
+        setLanguage(locale as Parameters<typeof setLanguage>[0]);
+        expect(localizeSimAuraName('Well Fed'), locale).toBe(value);
+      }
+    } finally {
+      setLanguage('en');
+    }
   });
 });
 

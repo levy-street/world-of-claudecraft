@@ -1,4 +1,4 @@
-// Okku (hermit_okku) camps at the Vinefall, next to the great banyan he
+// Okrim (hermit_okku) camps at the Vinefall, next to the great banyan he
 // "went in" to. His authored spot used to sit 6.3 yards from the banyan's
 // center: inside the RENDERED trunk (render/jungle_features.ts scales the
 // twisted banyan GLB to t.r * (2.5..3.0), far wider than the r * 1.45 sim
@@ -28,7 +28,7 @@ const SEED = 20061;
 // puts an NPC fully in the open next to one.
 const MIN_TRUNK_CLEARANCE = 12;
 
-// The seeded palm scatter instances a ~9 yard tall trunk at each spot. Okku
+// The seeded palm scatter instances a ~9 yard tall trunk at each spot. Okrim
 // now stands OUTSIDE the guaranteed palm-free annulus (propClear only keeps
 // palms greatTree.r + 6 = 9.2 yards off this banyan), so this clearance is a
 // real constraint on the shipped seed, not a formality.
@@ -39,7 +39,7 @@ const SPAWN_BODY_RADIUS = 0.6;
 
 const okku = PALMREACH_NPCS.hermit_okku;
 
-describe('Okku stands clear of the Vinefall banyan', () => {
+describe('Okrim stands clear of the Vinefall banyan', () => {
   it('is at least 12 yards from every authored great tree center', () => {
     // Arrange
     const trees = PALMREACH_PROPS.greatTrees ?? [];
@@ -55,7 +55,7 @@ describe('Okku stands clear of the Vinefall banyan', () => {
     // Assert
     expect(
       nearest.d,
-      `Okku at (${okku.pos.x}, ${okku.pos.z}) is ${nearest.d.toFixed(2)} yd from the great tree at (${nearest.tree.x}, ${nearest.tree.z})`,
+      `Okrim at (${okku.pos.x}, ${okku.pos.z}) is ${nearest.d.toFixed(2)} yd from the great tree at (${nearest.tree.x}, ${nearest.tree.z})`,
     ).toBeGreaterThanOrEqual(MIN_TRUNK_CLEARANCE);
   });
 

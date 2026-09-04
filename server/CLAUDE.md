@@ -40,7 +40,7 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
 | `db.ts` | `pg` pool, core `SCHEMA` DDL + `ensureSchema`, character/account/token/world-state queries. Owns the timeout ladder (connect < statement default < the `runWithStatementTimeout` heavy allowance < the driver-side `query_timeout` backstop; constants + rationale at the top, relation pinned by `tests/server/tunables.test.ts`): wrap a known-long read in `runWithStatementTimeout`, never lift the session default, and remember `SET LOCAL` cannot lift the driver backstop. Boot DDL runs on a dedicated non-pool `Client` so schema setup is never capped |
 | `account.ts`, `totp.ts` | account self-service routes: password change/forgot/reset, verified email change, data export, TOTP 2FA (`totp.ts` is the pure RFC 6238 core) |
 | `admin_permissions.ts`/`admin_routes.ts`/`staff_db.ts` | fine-grained admin authz: permission vocabulary + role bundles / declarative route-to-permission map (fail-closed, guarded by `tests/admin_routes.test.ts`) / `accounts.admin_roles` SQL + `admin_role_changes` audit |
-| `moderation_commands.ts`/`moderation_service.ts`/`moderation_db.ts` | pure parser for the in-game moderator chat commands (`/kick` `/mute` `/ban` `/suspend` `/spectate` `/jail`, ..., with duration caps) / the moderation service behind a host interface, wired into `GameServer` / writes + unified history |
+| `moderation_commands.ts`/`moderation_service.ts`/`moderation_db.ts` | pure parser for the in-game moderator chat commands (`/kick` `/mute` `/ban` `/suspend` `/spectate` `/jail`, ..., with duration caps) / the moderation service behind a host interface, wired into `GameServer` / writes + unified history. `clear_item_name.ts` is the one content-moderation arm on an item COPY (the Masterwrought legendary name strip: a superadmin-only, audited, offline-only blob write behind an injected deps bag; its write rides `db.ts` `saveOfflineCharacterState`, fenced on the load lease; operator runbook in `DEPLOY.md`) |
 | `chat_filter.ts`/`chat_filter_db.ts` | host-agnostic profanity/slur filter (soft cosmetic + hard server-enforced tiers) / admin word-list SQL |
 | `bot_detector/contract.ts` / `stub.ts` | `BotDetector` seam (`#bot-detector`): the contract interface / the no-op stub used when the private clone is absent |
 | `antibot_config_db.ts` | per-realm JSONB state plus append-only audit history for the bot-detector runtime config (the admin Bot Detector > Configuration panel); validation and live apply happen inside the detector (`BotDetector.applyConfig`) |
@@ -121,8 +121,11 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
   (`commitGrant` through custody's bounded `persistGrantSerialized`: in-slot serialize, a
   wait deadline that parks instead of blocking the sweep), and every write's blob carries
   the session save fixups (`character_save_fixups.ts`: jail/spectate position, stowed pet,
-  the jail flag). Recorded exception: the offline
-  admin/boost writers, which never race a live session. Cross-queue order is the character
+  the jail flag). The offline admin/boost writers (the rename and reclaim signer
+  sweeps, the PBE roster save, the clear-item-name strip) ride the lease-fenced
+  `saveOfflineCharacterState` since masterwrought Phase 18, so no character-blob
+  writer is unfenced: a live lease makes the write touch nothing, logged and
+  counted rather than raced. Cross-queue order is the character
   FIFO first, THEN the market serial writer; never enqueue from inside a market thunk, an
   open transaction, or another job for the same character.
 - Save cadence: autosave every **30 s** (`AUTOSAVE_SECONDS`), on `leave`, and on
@@ -197,8 +200,9 @@ server) verdict every inbound frame; `game.ts` is a thin consumer. The design re
 - **Order and placement are load-bearing.** The pre-parse gate (frame ceiling + byte
   budget, sized against the real client cadence model in `src/net/input_send_cadence.ts`)
   verdicts ABOVE `JSON.parse`, so a flooder buys token math, never parse CPU. The
-  per-class lanes (movement / command / chat) are post-parse at the dispatch switch, so
-  one class can never starve another. Every verdict is allow-or-DROP, never queue or
+  per-class lanes (movement / command / chat / name-screen, the last for the two
+  commands that run the obscenity matcher on player text ahead of any sim gate) are
+  post-parse at the dispatch switch, so one class can never starve another. Every verdict is allow-or-DROP, never queue or
   defer: deferred delivery shifts receive time and poisons the bot detector's timing
   strategies.
 - **Detector placement contract:** movement drops before `observeInput` (a dropped frame

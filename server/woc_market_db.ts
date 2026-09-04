@@ -2720,10 +2720,12 @@ export class PgWocMarketDb implements WocMarketDb {
       // A delivery save should wait out a slow database rather than lose the
       // grant (the saveCharacterState rationale); still bounded by the heavy
       // allowance so a sweep pass cannot hang past the container stop grace.
-      // The LOCK wait is bounded separately and tightly: this is the one
-      // market transaction that takes a characters row lock (the game loop's
-      // autosave contends it), and holding a pooled client for the heavy
-      // allowance while queued on that row would starve the loop's own saves.
+      // The LOCK wait is bounded separately and tightly: since D145
+      // (qr-19-live-nonce-fence-write-loss) every live character save takes a
+      // characters row lock (FOR NO KEY UPDATE) before its fenced UPDATE, so this
+      // delivery save genuinely contends the game loop's autosaves on that row,
+      // and holding a pooled client for the heavy allowance while queued on it
+      // would starve the loop's own saves.
       // A 55P03 here surfaces as the transient-throw arm and retries.
       await client.query(`SET LOCAL statement_timeout = ${DB_HEAVY_STATEMENT_TIMEOUT_MS}`);
       await client.query(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);

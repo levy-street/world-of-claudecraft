@@ -88,7 +88,6 @@ export const table: DeedLocaleTable = {
     desc: 'Zbierz zyle rudy, kepke drewna i grzadke ziol w Nightbloomie.',
   },
   chr_nightbloom_first_cast: {
-    name: 'Kragi na ksiezycowej studni',
     desc: 'Zlow rybe w wodach Nightbloomu.',
   },
   chr_wraithwood_gatherer: {
@@ -187,7 +186,6 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: 'Mistrz Łąk', desc: 'Osiągnij 100 biegłości w Zielarstwie.' },
   prog_master_gatherer: {
     name: 'Mistrz Zbieractwa',
-    desc: 'Osiągnij 100 biegłości w dowolnych trzech spośród Górnictwa, Drwalnictwa, Zielarstwa i Wędkarstwa.',
   },
   prog_first_craft: { name: 'Własnoręczna Robota', desc: 'Ukończ swój pierwszy udany wyrób.' },
   prog_craft_specialist: {
@@ -301,7 +299,6 @@ export const table: DeedLocaleTable = {
     title: 'Żmijobójca',
   },
   dgn_sanctum_speed: {
-    name: 'Sprint przez Sanktuarium',
     desc: 'Pokonaj Korzula Grobowego Żmija w ciągu 15 minut od zajęcia Sanktuarium Grobowego Żmija przez twoją drużynę.',
   },
   dgn_nythraxis_gravebreaker: {
@@ -367,7 +364,7 @@ export const table: DeedLocaleTable = {
   },
   dlv_varric_ringers: {
     name: 'Dzwony milkną',
-    desc: 'Pokonaj Diakona Varrica tak, aby każdy wskrzeszony przez niego Pogrzebowy Dzwonnik poległ przed nim.',
+    desc: 'Pokonaj Diakona Vandrica tak, aby każdy wskrzeszony przez niego Pogrzebowy Dzwonnik poległ przed nim.',
   },
   dlv_nhalia_bells: {
     name: 'Uciszyciel Dzwonów',
@@ -443,7 +440,6 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: 'Kronika Ciernistego Szczytu',
-    desc: 'Doprowadź historię góry do końca: Kult Żmija rozbity, Sanktuarium uciszone, Budzący się Szczyt powalony, a każda z osławionych zgróz turni pokonana.',
     title: 'z Ciernistego Szczytu',
   },
   chr_peaks_sparring: {
@@ -535,7 +531,7 @@ export const table: DeedLocaleTable = {
   },
   col_quartermaster_buyout: {
     name: 'Stały klient',
-    desc: 'Odkryj wszystkie dziesięć przedmiotów z zapasów Kwatermistrza Vexa.',
+    desc: 'Odkryj wszystkie dziesięć części ekwipunku z zapasów Kwatermistrza Vexa.',
   },
   col_glimmerfin: {
     name: 'Promyk nadziei',

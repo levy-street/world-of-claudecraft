@@ -310,6 +310,40 @@ export const EVERGARDEN_NPCS: Record<string, NpcDef> = {
     greeting:
       'Hand me that barrow, would you? These lawns do not walk themselves, whatever the hamlet thinks.',
   },
+  // The farming go-live: the tier-4 farmer of the parterre showcase
+  // (content/farm_patches.ts patch_evergarden), on the approach side of the
+  // beds (south of the z 872 row, the way in from Hedgewick), facing north
+  // across them (facing 0 looks along +z), well clear of The Parterre Walk's
+  // lane and of the hedge_knight camp at the far end of the site. Stock:
+  // compost PLUS all four tier-4 seeds, each at buyValue 64, put there by
+  // GATE 1 (Phase 11e). This header read "compost only ... seed-back and
+  // market goods (D11)" until then, the same revert hazard as the Highwatch
+  // twin. tests/farmer_npc_placement.test.ts pins the seat.
+  farmer_verbena: {
+    id: 'farmer_verbena',
+    name: 'Farmer Verbena',
+    title: 'Parterre Gardener',
+    pos: { x: 348.5, z: 867 },
+    facing: 0,
+    color: 0x7d9b5c,
+    questIds: [],
+    // GATE 1's tier-4 half, the same one edit and the same convention as
+    // farmer_hollis in zone3.ts (Phase 11e). buyValue 64 per seed on the item
+    // def (masterwrought DECISION D): the four-times-sell staple on sellValue
+    // 8, doubled as the bootstrap premium, because a tier-4 harvest expects
+    // only 0.41 seeds back and the counter must not become the cheap
+    // permanent source.
+    vendorItems: [
+      'compost',
+      'gilded_sunmelon_seed',
+      'evergarden_greens_seed',
+      'gilded_yam_seed',
+      'evergarden_pumpkin_seed',
+    ],
+    farmer: true,
+    greeting:
+      'Mind the edging, $N, these beds are the pride of the parterre. Seed and compost are what I sell, and I will turn any withered husks you carry into more of it.',
+  },
 };
 
 export const EVERGARDEN_QUESTS: Record<string, QuestDef> = {

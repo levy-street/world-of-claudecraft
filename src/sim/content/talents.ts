@@ -139,7 +139,7 @@ export interface GlobalModEffect {
   // of maximum mana spent, capped at 10 sec per 30 sec (casting_lifecycle's
   // spendAbilityCost, the Colossal Might pattern on mana).
   manaDefCdrPer10?: number;
-  // Blink While Casting: 1 when picked; Flickerstep slips through the busy
+  // Blink While Casting: 1 when picked; Flitstep slips through the busy
   // guard without touching the cast in progress (casting_lifecycle).
   blinkCast?: number;
   // Damage cast-pushback removed, 0..1 (1 = immune). The talent-seam twin of
@@ -175,7 +175,7 @@ export interface GlobalModEffect {
   paladinPerpetualSun?: number;
   // Rogue v0.29 rows (docs/design/rogue-v029-class-design.md):
   // Kill Chain: combo points granted on a killing blow (refreshes, never banks
-  // past the combo cap) and 1 to refresh Smokestep's cooldown on a kill.
+  // past the combo cap) and 1 to refresh Smokefade's cooldown on a kill.
   onKillCombo?: number;
   onKillVanishReset?: number;
   // Second Shadow: fraction of a 5-combo Dirt Nap's resolved damage repeated

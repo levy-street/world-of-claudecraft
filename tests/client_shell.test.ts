@@ -119,6 +119,13 @@ const hudTs = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8')
   /\r\n/g,
   '\n',
 );
+// The Meta pixel SENDER, extracted whole out of hud.ts at the Masterwrought
+// phase 18 sweep (analytics glue belongs in src/game/, not in a coordinator).
+// The level-5 trigger stayed in the HUD, so the pin below reads both halves.
+const metaPixelTs = readFileSync(
+  new URL('../src/game/meta_pixel.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
 const mobileActionRingTs = readFileSync(
   new URL('../src/ui/hud/action_bar/mobile_action_ring_controller.ts', import.meta.url),
   'utf8',
@@ -129,6 +136,11 @@ const consumableSeatControllerTs = readFileSync(
 ).replace(/\r\n/g, '\n');
 const touchRouterTs = readFileSync(
   new URL('../src/game/touch_router.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
+// The body-class scan hud.ts used to hold inline (Phase 14 extraction).
+const windowOpenStateTs = readFileSync(
+  new URL('../src/ui/window_open_state.ts', import.meta.url),
   'utf8',
 ).replace(/\r\n/g, '\n');
 const playerCardControllerTs = readFileSync(
@@ -1018,12 +1030,31 @@ describe('client HTML shell', () => {
     expect(html).toContain(
       "if (!['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)) {",
     );
-    expect(hudTs).toContain("if (options) fbq('trackCustom', eventName, data ?? {}, options);");
-    expect(hudTs).toContain("else fbq('trackCustom', eventName, data ?? {});");
+    // The sender moved to src/game/meta_pixel.ts, so the two arities are pinned
+    // in their new home. Both halves of the chain are read, not just the one
+    // that moved: the sender alone is inert without a caller, and the HUD's
+    // trigger alone proves nothing about what reaches the pixel.
+    expect(metaPixelTs).toContain(
+      "if (options) fbq('trackCustom', eventName, data ?? {}, options);",
+    );
+    expect(metaPixelTs).toContain("else fbq('trackCustom', eventName, data ?? {});");
+    expect(hudTs).toContain("import { trackMetaPixel } from '../game/meta_pixel';");
     expect(hudTs).toContain('if (ev.level === 5) {');
+    // Whitespace-collapsed: this call sits deep enough that biome re-wraps it
+    // with any nearby edit, and the pin is about the CALL, not the indentation.
+    expect(hudTs.replace(/\s+/g, ' ')).toContain(
+      "trackMetaPixel( 'ReachedLevel5', { level: ev.level },",
+    );
     expect(hudTs).toContain('characterId ? { eventID: `lvl5_$' + '{characterId}` } : undefined');
-    expect(mainTs).toContain("if (options) fbq('trackCustom', eventName, data ?? {}, options);");
-    expect(mainTs).toContain("else fbq('trackCustom', eventName, data ?? {});");
+    // main.ts used to carry a BYTE-IDENTICAL private copy of the sender, and
+    // these two lines pinned that copy's arities. The Phase 18 QA collapsed it
+    // onto src/game/meta_pixel.ts (src/main.ts is a firewall, not a home), so the
+    // arities are pinned ONCE, in metaPixelTs above, and behaviorally in
+    // tests/meta_pixel.test.ts. What main.ts owes now is only that it reaches the
+    // shared sender rather than re-implementing it: while the duplicate stood, its
+    // three events were guarded by nothing behavioral at all.
+    expect(mainTs).toContain("import { trackMetaPixel } from './game/meta_pixel';");
+    expect(mainTs).not.toContain("fbq('trackCustom'");
     expect(mainTs).toContain(
       'registered.accountId ? { eventID: `acct_$' + '{registered.accountId}` } : undefined',
     );
@@ -2295,7 +2326,7 @@ describe('client HTML shell', () => {
     expect(bindButton.indexOf("document.getElementById('mobile-more')?.focus();")).toBeLessThan(
       bindButton.indexOf('cb();'),
     );
-    expect(hudTs).toContain(".filter((win) => win.id !== 'mobile-extra-controls')");
+    expect(windowOpenStateTs).toContain(".filter((win) => win.id !== 'mobile-extra-controls')");
     expect(hudTs).toContain('if (destination) this.focusManager.focusFirst(destination);');
   });
 
@@ -3350,9 +3381,9 @@ describe('client HTML shell', () => {
   });
 
   it('stacks the mobile map below the quest log when both are open', () => {
-    expect(hudTs).toContain("'mobile-map-quest-open'");
-    expect(hudTs).toContain('this.isWindowVisible(mapWindow)');
-    expect(hudTs).toContain('this.isWindowVisible(questLogWindow)');
+    expect(windowOpenStateTs).toContain("'mobile-map-quest-open'");
+    expect(windowOpenStateTs).toContain('isWindowVisible(mapWindow)');
+    expect(windowOpenStateTs).toContain('isWindowVisible(questLogWindow)');
     expect(hudMobileCss).toContain(
       '--mobile-map-quest-stack-top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));',
     );

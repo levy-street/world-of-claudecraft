@@ -1,6 +1,5 @@
 // The spawn greeting (tutorial island): one-shot semantics, the silent latch
-// for established characters, save/load durability (zero-default omission),
-// the firstCharacter account fact, and the startTutorial ferry's gates.
+// for established characters, and save/load durability (zero-default omission).
 
 import { describe, expect, it } from 'vitest';
 import { PROVING_SHORE_ARRIVAL } from '../src/sim/content/proving_shore';
@@ -10,6 +9,17 @@ import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import { maybeEmitTutorialGreeting, updateTutorialGreeting } from '../src/sim/tutorial/greeting';
 import type { SimEvent } from '../src/sim/types';
+
+/** Type-level pin: the SimEvent union declares NO `tutorialGreeting` arm.
+ *  The compulsory greeting is event-only (src/sim/tutorial/greeting.ts),
+ *  leaving no tutorialGreeting dialog arm in src/sim/types.ts and no emitter
+ *  anywhere in src/sim or server. Extract<> collapses to `never` while the arm
+ *  is absent, so this alias reads `true`; re-declaring the arm makes it `false`
+ *  and the assignment in the one-shot case fails tsc. The tuple brackets keep
+ *  the check non-distributive. */
+type NoGreetingArm = [Extract<SimEvent, { type: 'tutorialGreeting' }>] extends [never]
+  ? true
+  : false;
 
 function makeSim(seed = 4120): Sim {
   // The greeting suite exercises the live-world arm, so it opts in like the
@@ -33,7 +43,7 @@ function greetCtx(sim: Sim) {
 
 describe('tutorial greeting one-shot', () => {
   it('forces a fresh mainland character onto the island, exactly once', () => {
-    // The tutorial is compulsory (the playtest ruling): no offer, no skip.
+    // Every fresh character follows the same compulsory arrival path.
     // A fresh character standing anywhere off the island (the offline Sim's
     // town spawn, a legacy save that never played) is ferried straight to
     // the arrival and welcomed by Odo.
@@ -46,8 +56,14 @@ describe('tutorial greeting one-shot', () => {
     expect(events.filter((e) => e.type === 'ferryIslandArrival')).toEqual([
       { type: 'ferryIslandArrival', pid: sim.playerId, firstVisit: true },
     ]);
-    // The old opt-in dialog is gone with the choice itself.
-    expect(events.filter((e) => e.type === 'tutorialGreeting')).toEqual([]);
+    // The Phase 18 dead-union sweep removed the retired dialog SimEvent arm.
+    // The teeth are at tsc:
+    // re-declaring the arm turns NoGreetingArm into `false` and this
+    // assignment stops compiling. The runtime line below needs its cast for
+    // the same reason, and still reds if an emitter ever comes back.
+    const noGreetingArm: NoGreetingArm = true;
+    expect(noGreetingArm).toBe(true);
+    expect(events.some((e) => (e.type as string) === 'tutorialGreeting')).toBe(false);
     expect(p.pos.x).toBeCloseTo(PROVING_SHORE_ARRIVAL.x, 3);
     expect(p.pos.z).toBeCloseTo(PROVING_SHORE_ARRIVAL.z, 3);
     expect(meta.tutorialGreetingSent).toBe(true);
@@ -56,7 +72,7 @@ describe('tutorial greeting one-shot', () => {
     expect(sim.drainEvents().filter((e) => e.type === 'ferryIslandArrival')).toEqual([]);
   });
 
-  it('greets a fresh character ALREADY ashore with the island arrival, not the ferry offer', () => {
+  it('greets a fresh character ALREADY ashore with the island arrival in place', () => {
     // The server rolls newborn rows at PROVING_SHORE_ARRIVAL (auto-entered
     // tutorial), so the first greeting a new player sees is Odo's welcome.
     const sim = makeSim();
@@ -228,7 +244,7 @@ describe('tutorial greeting one-shot', () => {
 
   it('forces a LATER fresh character ashore too: compulsory is per character', () => {
     const sim = makeSim();
-    const pid = sim.addPlayer('mage', 'Secondling', { firstCharacter: false });
+    const pid = sim.addPlayer('mage', 'Secondling');
     const meta = sim.players.get(pid)!;
     sim.drainEvents();
     expect(maybeEmitTutorialGreeting(meta, sim.ctx)).toBe(true);
@@ -241,64 +257,10 @@ describe('tutorial greeting one-shot', () => {
   });
 });
 
-describe('startTutorial (the ferry)', () => {
-  it('teleports a level-1 character to the Proving Shore arrival and marks it', () => {
-    const sim = makeSim();
-    sim.events = [];
-    sim.startTutorial();
-    const e = sim.entities.get(sim.playerId)!;
-    expect(
-      Math.hypot(e.pos.x - PROVING_SHORE_ARRIVAL.x, e.pos.z - PROVING_SHORE_ARRIVAL.z),
-    ).toBeLessThan(1);
-    expect(e.facing).toBe(PROVING_SHORE_ARRIVAL.facing);
-    // The text-free arrival marker Odo's welcome note keys off: a character
-    // who has not started the rail is taught, whatever this device has seen.
-    expect(sim.events).toContainEqual({
-      type: 'ferryIslandArrival',
-      pid: sim.playerId,
-      firstVisit: true,
-    });
-  });
-
-  it('refuses a character above level 1 and leaves them in place', () => {
-    const sim = makeSim();
-    sim.setPlayerLevel(2, sim.playerId);
-    const e = sim.entities.get(sim.playerId)!;
-    const before = { ...e.pos };
-    sim.startTutorial();
-    expect(e.pos.x).toBe(before.x);
-    expect(e.pos.z).toBe(before.z);
-  });
-
-  it('refuses in combat (the flag guards the emit, this gate guards the wire)', () => {
-    const sim = makeSim();
-    const e = sim.entities.get(sim.playerId)!;
-    e.inCombat = true;
-    const before = { ...e.pos };
-    sim.startTutorial();
-    expect(e.pos.x).toBe(before.x);
-    expect(e.pos.z).toBe(before.z);
-  });
-
-  it('refuses from the instance band', () => {
-    const sim = makeSim();
-    const e = sim.entities.get(sim.playerId)!;
-    e.pos.x = 100_500; // inside the instance plane, past DUNGEON_X_THRESHOLD
-    sim.startTutorial();
-    expect(e.pos.x).toBe(100_500);
-  });
-
-  it('refuses while dead', () => {
-    const sim = makeSim();
-    const e = sim.entities.get(sim.playerId)!;
-    e.dead = true;
-    const before = { ...e.pos };
-    sim.startTutorial();
-    expect(e.pos.x).toBe(before.x);
-    expect(e.pos.z).toBe(before.z);
-  });
-});
-
+// Sibling coverage: tests/ferry_bell.test.ts pins the crossing's UNGATED
+// premise (zero-progress character, repeat rides, combat as the only refusal
+// with its message); this block pins the exact landings and markers. Neither
+// is redundant with the other (11m QA).
 describe('the ferry bells (the clicked crossing)', () => {
   function bells(sim: Sim) {
     const found = [...sim.entities.values()].filter(

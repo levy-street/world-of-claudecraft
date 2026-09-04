@@ -44,7 +44,7 @@ import {
   holderTierDisplayName,
 } from './holder_tier';
 import { formatNumber, t } from './i18n';
-import { iconDataUrl, QUALITY_COLOR } from './icons';
+import { iconDataUrl } from './icons';
 import {
   buildInspectRemoteView,
   buildInspectView,
@@ -61,6 +61,7 @@ import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import { qualityGlowShadow } from './quality_glow';
 import { curatorRankNameKey } from './reliquary_view';
 import { svgIcon } from './ui_icons';
+import { wornItemCellParts } from './worn_item_cell_view';
 
 /** The inspected entity fields the painter reads (a structural subset of the
  *  live EntityView / ClientWorld mirror; all already client-side). */
@@ -165,6 +166,11 @@ export class InspectWindow {
     e: InspectEntity,
     now: number,
     selfStanding?: { curatorRank: number; owned: number; total: number } | null,
+    // The viewer's own LIVE worn payloads (IWorld.equipmentInstances), passed
+    // only for self-inspect, same doctrine as selfStanding: the entity mirror
+    // is eqi-shaped ONLINE (no perfected), so without this the self card's
+    // Unique-Equipped tag would diverge between hosts (2026-08-27 ruling).
+    selfEquippedInstances?: Partial<Record<EquipSlot, ItemInstancePayload>>,
   ): void {
     const cls = e.templateId as PlayerClass;
     const el = this.deps.root();
@@ -185,6 +191,7 @@ export class InspectWindow {
         relicsTotal: typeof e.relicsTotal === 'number' ? e.relicsTotal : null,
         selfStanding: selfStanding ?? null,
         equippedItems: e.equippedItems,
+        equippedInstances: selfEquippedInstances ?? e.equippedInstances,
         holderTier: e.holderTier ?? 0,
         holderBalance: e.holderBalance ?? null,
         discordTier: e.discordTier ?? 0,
@@ -243,10 +250,8 @@ export class InspectWindow {
     }
     const leftCol = el.querySelector('#inspect-equip-left');
     const rightCol = el.querySelector('#inspect-equip-right');
-    for (const cell of model.gear.left)
-      leftCol?.appendChild(this.buildSlotRow(cell, e.equippedInstances[cell.slot]));
-    for (const cell of model.gear.right)
-      rightCol?.appendChild(this.buildSlotRow(cell, e.equippedInstances[cell.slot]));
+    for (const cell of model.gear.left) leftCol?.appendChild(this.buildSlotRow(cell));
+    for (const cell of model.gear.right) rightCol?.appendChild(this.buildSlotRow(cell));
     const stage = el.querySelector<HTMLElement>('#inspect-model-preview');
     if (stage) {
       this.deps.mountPreview(stage, {
@@ -298,20 +303,27 @@ export class InspectWindow {
 
   // One read-only equipment row for the inspect window: icon, slot name, and the
   // equipped item (quality-tinted, quality-glow socket) with its tooltip. No
-  // unequip / drag affordances (another player's gear is view-only).
-  private buildSlotRow(cell: PaperdollSlot, instance?: ItemInstancePayload): HTMLElement {
-    const { slot, item } = cell;
+  // unequip / drag affordances (another player's gear is view-only). Like the
+  // character sheet's buildSlotRow, the row describes the worn COPY (the
+  // all-surfaces item-cell rule): the cell's eqi-projected instance drives the
+  // effective quality (row color, icon rim, glow) and a promoted copy's
+  // player-chosen name replaces the def name. The chosen name is
+  // player-authored text, so it is esc'd raw, never through t().
+  private buildSlotRow(cell: PaperdollSlot): HTMLElement {
+    const { slot, item, instance } = cell;
     const row = document.createElement('div');
     row.className = 'equip-slot';
-    const qColor = item ? (QUALITY_COLOR[item.quality ?? 'common'] ?? '') : '';
+    const parts = item ? wornItemCellParts(item, instance) : null;
+    const wornName = parts ? parts.name : null;
+    const qColor = parts ? parts.color : '';
     const icon = item
-      ? this.deps.itemIcon(item)
+      ? this.deps.itemIcon(item, parts?.quality)
       : `<img class="item-icon" src="${iconDataUrl('item', 'slot_empty')}" alt="" draggable="false">`;
-    row.innerHTML = `${icon}<div><div class="slot-name">${esc(this.deps.slotName(slot))}</div><div class="slot-item"${item ? ` style="color:${qColor}"` : ''}>${item ? esc(itemDisplayName(item)) : esc(t('itemUi.equipment.empty'))}</div></div>`;
+    row.innerHTML = `${icon}<div><div class="slot-name">${esc(this.deps.slotName(slot))}</div><div class="slot-item"${item ? ` style="color:${qColor}"` : ''}>${wornName !== null ? esc(wornName) : esc(t('itemUi.equipment.empty'))}</div></div>`;
     if (item) {
       const iconEl = row.querySelector<HTMLImageElement>('.item-icon');
       if (iconEl) iconEl.style.boxShadow = qualityGlowShadow(qColor);
-      this.deps.attachTooltip(row, () => this.deps.itemTooltip(item, instance));
+      this.deps.attachTooltip(row, () => this.deps.itemTooltip(item, instance ?? undefined));
     }
     return row;
   }

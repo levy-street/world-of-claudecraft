@@ -1,3 +1,5 @@
+import type { RecordedRenderEnv, RenderEnvDrift } from './mob_portrait_render_env.mjs';
+
 export interface PortraitFileDigest {
   path?: string;
   entry?: string;
@@ -16,6 +18,9 @@ export interface DriftManifest {
   rendererFingerprint: string;
   portraitCount: number;
   bootstrapReview?: PortraitFileDigest;
+  /** Where the committed bytes were rendered. Optional: manifests minted before
+   *  the field existed carry none, and an absent record concludes nothing. */
+  renderEnv?: RecordedRenderEnv;
   // Required in every manifest this ships against. describeManifestDrift still reads it
   // defensively so a malformed committed file degrades into a diagnosis instead of a throw.
   renderer: {
@@ -40,6 +45,12 @@ export interface ManifestDrift {
   changedTrackedFiles: string[];
   changedRows: ChangedPortraitRow[];
   bookkeepingOnly: boolean;
+  /** How the recorded render environments compare. `known` is false whenever
+   *  either manifest carries no record. */
+  renderEnv: RenderEnvDrift;
+  /** Every changed row is output-only AND the known render environment moved:
+   *  the same art re-baked on a different GPU stack. */
+  environmentOnly: boolean;
 }
 
 export function describeManifestDrift(

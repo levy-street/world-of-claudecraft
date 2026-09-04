@@ -38,7 +38,14 @@ import {
   CORDER_WIRE_INTERVAL_TICKS,
   GameServer,
 } from '../server/game';
-import { broadcast, type FakeClient, fakeWs, joinServer, lastSnap } from './helpers/bare_client';
+import {
+  bareClient,
+  broadcast,
+  type FakeClient,
+  fakeWs,
+  joinServer,
+  lastSnap,
+} from './helpers/bare_client';
 
 // A commission-eligible weapon recipe (the professions_commission_order
 // harness constant): opening an order needs no crafting prerequisites.
@@ -120,6 +127,55 @@ describe('corder wire cadence + rebuild-only-on-change', () => {
     expect(rows[0].requesterName).toBe('Requester');
     expect(rows[0].status).toBe('open');
     expect(spy.mock.calls.length).toBeGreaterThan(0);
+  });
+
+  it("an accept's crafter-record snapshot rides the corder wire and the ClientWorld mirror", () => {
+    // The phase 14 quality signal end to end: the accepter's deed stat
+    // counters land on the accepted row over the REAL wire (the corder
+    // self-delta), and a bare ClientWorld decodes them into the
+    // commissionOrders mirror the board window reads. Open rows carry
+    // neither key, so the pre-signal wire shape is unchanged for them.
+    const { server, fc } = viewerServer();
+    broadcast(server);
+
+    const fc2 = fakeWs();
+    const requester = joinServer(server, fc2, 89, 'Requester');
+    const fc3 = fakeWs();
+    const crafter = joinServer(server, fc3, 90, 'Crafter');
+    const crafterMeta = server.sim.players.get(crafter.pid);
+    if (!crafterMeta) throw new Error('missing crafter meta');
+    crafterMeta.deedStats.counters.masterworksCrafted = 7;
+    crafterMeta.deedStats.counters.legendariesForged = 2;
+
+    server.sim.openCommissionOrder(SWORD_RECIPE, 'open', undefined, requester.pid);
+    let sent = fc.sent.length;
+    duePass(server);
+    // biome-ignore lint/suspicious/noExplicitAny: untyped wire JSON
+    const openRow = (corderSnaps(fc.sent, sent)[0] as any).self.corder[0];
+    expect('crafterMasterworks' in openRow).toBe(false);
+    expect('crafterLegendaries' in openRow).toBe(false);
+
+    const order = server.sim.commissionOrderBoard.find((o) => o.requesterId === requester.pid);
+    if (!order) throw new Error('missing opened order');
+    server.sim.acceptCommissionOrder(order.id, crafter.pid);
+    sent = fc2.sent.length;
+    duePass(server);
+    const snaps = corderSnaps(fc2.sent, sent);
+    expect(snaps).toHaveLength(1);
+    // biome-ignore lint/suspicious/noExplicitAny: untyped wire JSON
+    const acceptedRow = (snaps[0] as any).self.corder[0];
+    expect(acceptedRow.status).toBe('accepted');
+    expect(acceptedRow.crafterMasterworks).toBe(7);
+    expect(acceptedRow.crafterLegendaries).toBe(2);
+
+    // The mirror half: a bare ClientWorld decodes the same snapshot into the
+    // IWorld read the board window consumes.
+    const world = bareClient(requester.pid);
+    // biome-ignore lint/suspicious/noExplicitAny: applySnapshot takes wire JSON
+    (world as any).applySnapshot(snaps[0] as any);
+    const mirrored = world.commissionOrders.find((r) => r.id === order.id);
+    expect(mirrored?.crafterMasterworks).toBe(7);
+    expect(mirrored?.crafterLegendaries).toBe(2);
   });
 
   it("the viewer's own commission command lands on the next snapshot (prompt re-arm)", () => {

@@ -19,6 +19,7 @@ import { ENCHANTS } from '../sim/content/enchants';
 import { isItemLocked } from '../sim/item_lock';
 import { isDisenchantable, isEnchantedInstance } from '../sim/professions/enchanting';
 import { isSalvageable } from '../sim/professions/salvage';
+import { isSunderable } from '../sim/professions/sundering';
 import type { ItemDef, ItemInstancePayload } from '../sim/types';
 import type { TranslationKey } from './i18n.catalog';
 
@@ -35,7 +36,13 @@ export function isEnchantReagentItem(itemId: string): boolean {
   return ENCHANT_REAGENT_IDS.has(itemId);
 }
 
-export type BagItemNewActionId = 'disenchant' | 'salvage' | 'applyEnchant' | 'lock' | 'unlock';
+export type BagItemNewActionId =
+  | 'disenchant'
+  | 'salvage'
+  | 'sunder'
+  | 'applyEnchant'
+  | 'lock'
+  | 'unlock';
 export type BagItemContextActionId = 'default' | 'sellAll' | BagItemNewActionId;
 
 export interface BagItemContextAction {
@@ -49,6 +56,7 @@ export interface BagItemContextAction {
 const NEW_ACTION_LABEL_KEY: Record<BagItemNewActionId, TranslationKey> = {
   disenchant: 'hudChrome.itemMenu.disenchant',
   salvage: 'hudChrome.itemMenu.salvage',
+  sunder: 'hudChrome.itemMenu.sunder',
   applyEnchant: 'hudChrome.itemMenu.applyEnchant',
   lock: 'hudChrome.bags.lockItem',
   unlock: 'hudChrome.bags.unlockItem',
@@ -67,14 +75,14 @@ function defaultActionLabelKey(def: ItemDef): TranslationKey {
 }
 
 /** The eligible new actions for this item, in fixed order (disenchant,
- *  salvage, apply-enchant, then the player item lock toggle last). `instance`
- *  is the specific copy the click resolved (issue 3042): a locked copy never
- *  offers salvage (mirrors the sim's evaluateSalvageAdmission 'locked' deny),
- *  and every item, gear or not, always offers exactly one of lock/unlock, so
- *  the toggle is reachable from any bag cell. Disenchant and apply-enchant
- *  stay available on a locked copy: the lock protects against salvage, craft
- *  consumption, and vendor sale only (the issue's own first-pass scope), not
- *  every profession action. */
+ *  salvage, sunder, apply-enchant, then the player item lock toggle last).
+ *  `instance` is the specific copy the click resolved (issue 3042): a locked
+ *  copy never offers salvage (mirrors the sim's evaluateSalvageAdmission
+ *  'locked' deny), and every item, gear or not, always offers exactly one of
+ *  lock/unlock, so the toggle is reachable from any bag cell. Disenchant,
+ *  sunder, and apply-enchant stay available on a locked copy: the lock
+ *  protects against salvage, craft consumption, and vendor sale only (the
+ *  issue's own first-pass scope), not every profession action. */
 export function bagItemNewActions(
   def: ItemDef,
   itemId: string,
@@ -83,6 +91,7 @@ export function bagItemNewActions(
   const out: BagItemNewActionId[] = [];
   if (isDisenchantable(def)) out.push('disenchant');
   if (isSalvageable(def) && !isItemLocked(instance)) out.push('salvage');
+  if (isSunderable(def)) out.push('sunder');
   if (isEnchantReagentItem(itemId)) out.push('applyEnchant');
   out.push(isItemLocked(instance) ? 'unlock' : 'lock');
   return out;
@@ -118,8 +127,9 @@ export function bagItemContextActions(
  *  when more than one copy is held across the bags (one copy is exactly what
  *  the default row already sells, so the extra row would be redundant).
  *  Deliberately distinct from bagItemContextActions: a vendor never offers the
- *  enchanting-profession rows (mirrors itemMenuAvailable's default-mode-only
- *  gate in bags_window.ts, which already excludes every other special mode). */
+ *  profession rows (disenchant, salvage, sunder, apply enchant) nor the item
+ *  lock toggle (mirrors itemMenuAvailable's default-mode-only gate in
+ *  bags_window.ts, which already excludes every other special mode). */
 export function vendorSellContextActions(heldCount: number): BagItemContextAction[] {
   const rows: BagItemContextAction[] = [{ id: 'default', labelKey: 'hudChrome.itemMenu.sell' }];
   if (heldCount > 1) {
@@ -136,12 +146,20 @@ export interface BagCopy {
 }
 
 /** Whether destroying this specific copy loses something irreplaceable: it was
- *  signed/crafted, is a masterwork proc, or is enchanted (isEnchantedInstance:
- *  the explicit marker or a legacy bare rolled.stats without masterwork). A
- *  plain fungible copy is never special. */
+ *  signed/crafted, is a masterwork proc, is enchanted (isEnchantedInstance:
+ *  the explicit marker or a legacy bare rolled.stats without masterwork), or
+ *  carries Perfecting progress or the Perfected stamp (Masterwrought phase
+ *  12: by contract, not by the signer every live Perfected copy happens to
+ *  carry). A plain fungible copy is never special. */
 export function isSpecialCopy(instance: ItemInstancePayload | undefined): boolean {
   if (!instance) return false;
-  return !!instance.signer || !!instance.rolled?.masterwork || isEnchantedInstance(instance);
+  return (
+    !!instance.signer ||
+    !!instance.rolled?.masterwork ||
+    isEnchantedInstance(instance) ||
+    instance.perfected === true ||
+    instance.perfecting !== undefined
+  );
 }
 
 /** Whether the copy the destructive action WOULD consume is special, so the
@@ -158,16 +176,20 @@ export function isSpecialCopy(instance: ItemInstancePayload | undefined): boolea
  *     highest-index NON-enchanted instanced copy is taken first
  *     (removeEnchantableItem); once every remaining copy is enchanted, the
  *     highest-index enchanted copy is the victim (issue #2340), which is
- *     always special, so that arm always warns. */
+ *     always special, so that arm always warns.
+ *   - sunder (professions/sundering.ts): consumes through the SAME preference
+ *     helper as disenchant (consumePreferredDisenchantVictim), so it shares
+ *     the disenchant arm's skip-enchanted-first order exactly. */
 export function destroyConsumesSpecialCopy(
-  action: 'disenchant' | 'salvage',
+  action: 'disenchant' | 'salvage' | 'sunder',
   copies: readonly BagCopy[],
 ): boolean {
   if (copies.some((copy) => !copy.instance)) return false;
+  const skipsEnchanted = action === 'disenchant' || action === 'sunder';
   for (let i = copies.length - 1; i >= 0; i--) {
     const instance = copies[i].instance;
     if (!instance) continue;
-    if (action === 'disenchant' && isEnchantedInstance(instance)) continue;
+    if (skipsEnchanted && isEnchantedInstance(instance)) continue;
     return isSpecialCopy(instance);
   }
   // Reachable with held copies only on the disenchant arm with every copy

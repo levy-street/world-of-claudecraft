@@ -246,7 +246,10 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.0,
     color: 0x283747,
-    componentTags: ['venomSac', 'hide'],
+    // The one open-world mid-band spider: its web is spider silk, the same
+    // family the Webwood and Canopy spiders yield. Phase 11m added the tag by
+    // name (qr-11m-SPREAD) as the directed band-1 silk source.
+    componentTags: ['venomSac', 'silk', 'hide'],
   },
   spider_egg: {
     id: 'spider_egg',
@@ -268,6 +271,10 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
     loot: [],
     scale: 0.9,
     color: 0xb7a7c9,
+    // A silk-wrapped egg sac of the spider family. Phase 11m added the tag. The
+    // clutch is quest-gated to damage (requiresQuestId above), so it is a
+    // hollow silk floor member: the ledger records its density beside the count.
+    componentTags: ['silk'],
   },
   widow_hatchling: {
     id: 'widow_hatchling',
@@ -321,6 +328,10 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.4,
     color: 0x641e16,
+    // The spider boss that spins the Mirefen's webs (it drops
+    // broodmother_silk_robe). Phase 11m added the tag. A count-1 boss, so a
+    // hollow silk floor member: the ledger records its density beside the count.
+    componentTags: ['silk'],
   },
   drowned_dead: {
     id: 'drowned_dead',
@@ -709,7 +720,7 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
       'q_highwatch_summons',
     ],
     greeting:
-      'The Light keep you above the water, $N. The dead in this fen do not sleep — they wade.',
+      'The Light keep you above the water, $N. The dead in this fen do not sleep: they wade.',
   },
   provisioner_hale: {
     id: 'provisioner_hale',
@@ -752,7 +763,7 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
       'ironreel_fishing_rod',
     ],
     greeting:
-      'Dry boots, dry bread, dry powder — at Fenbridge you get two of the three on a good day.',
+      'Dry boots, dry bread, dry powder: at Fenbridge you get two of the three on a good day.',
   },
   herbalist_yara: {
     id: 'herbalist_yara',
@@ -773,7 +784,7 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
     color: 0x7d6608,
     questIds: ['q_troll_fetishes', 'q_cult_camp', 'q_olen'],
     greeting:
-      'Quiet feet and a short blade keep you breathing out here. Speak quick — I am due back in the reeds.',
+      'Quiet feet and a short blade keep you breathing out here. Speak quick, for I am due back in the reeds.',
   },
   bursar_petra_vell: {
     id: 'bursar_petra_vell',
@@ -817,6 +828,27 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
     vendorItems: ['travelers_knapsack', 'tough_jerky', 'smoked_eel', 'tanning_agent'],
     greeting: 'A hide is only as good as its tanning, $C. The vats are ready when you are.',
   },
+  // The farming go-live: the tier-2 farmer at the Fenbridge raised beds
+  // (content/farm_patches.ts patch_mirefen), on the town side of the beds
+  // facing north across them. His placement row lives in fenbridge_layout.ts
+  // services.npcs like every other Fenbridge NPC (the layout suite pins the
+  // ZONE2_NPCS key list against that table). Stock: the tier-2 seeds and
+  // compost, no tool (the rung-one hoe is Eastbrook's counter and the crafted
+  // hoes are stocked nowhere). tests/farmer_npc_placement.test.ts pins the
+  // seat beside the beds.
+  farmer_teasel: {
+    id: 'farmer_teasel',
+    name: 'Farmer Teasel',
+    title: 'Fen Paddy Farmer',
+    pos: { ...FENBRIDGE_NPC_PLACEMENTS_BY_ID.farmer_teasel.position },
+    facing: FENBRIDGE_NPC_PLACEMENTS_BY_ID.farmer_teasel.facing,
+    color: 0x6b7f3a,
+    questIds: [],
+    vendorItems: ['marsh_rice_seed', 'bog_beet_seed', 'compost'],
+    farmer: true,
+    greeting:
+      'Marsh rice and bog beet seed, $C, and compost to feed them. The paddies drain slow, so mind where you tread.',
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -829,7 +861,7 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
     name: 'Muster at Fenbridge',
     giverNpcId: 'brother_aldric',
     turnInNpcId: 'warden_fenwick',
-    text: "Morthen's writings named a master in the northern marsh — a 'Fogbinder.' Now Warden Fenwick has sounded the muster horn at Fenbridge, and I do not believe in coincidence, $N. Take the causeway north, pull the muster order from the gatepost, and present it to the Warden.",
+    text: "Morthen's writings named a master in the northern marsh, a 'Fogbinder.' Now Warden Fenwick has sounded the muster horn at Fenbridge, and I do not believe in coincidence, $N. Take the causeway north, pull the muster order from the gatepost, and present it to the Warden.",
     completionText:
       "Aldric's seal, is it? Then you'll do. The fen has been swallowing my patrols whole, and I need every blade that floats.",
     objectives: [
@@ -845,7 +877,7 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
     name: 'Teeth of the Fen',
     giverNpcId: 'warden_fenwick',
     turnInNpcId: 'warden_fenwick',
-    text: 'The mire prowlers have learned what a supply mule sounds like, and now they hunt the causeway itself. Last week they dragged a courier into the reeds not fifty paces from this gate. Thin them out, $N — twelve dead prowlers ought to teach the rest fear.',
+    text: 'The mire prowlers have learned what a supply mule sounds like, and now they hunt the causeway itself. Last week they dragged a courier into the reeds not fifty paces from this gate. Thin them out, $N: twelve dead prowlers ought to teach the rest fear.',
     completionText: 'Twelve, and not a bite on you? The causeway breathes easier tonight.',
     objectives: [
       { type: 'kill', targetMobId: 'mire_prowler', count: 12, label: 'Mire Prowler slain' },
@@ -859,7 +891,7 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
     name: 'Pelts for the Causeway',
     giverNpcId: 'provisioner_hale',
     turnInNpcId: 'provisioner_hale',
-    text: 'Every plank of that causeway rests on pilings wrapped in oiled prowler hide — the only thing the rot will not chew through. My stock is gone and the south spans are already sinking. Bring me 8 unspoiled pelts, $N, before we are all wading to Eastbrook.',
+    text: 'Every plank of that causeway rests on pilings wrapped in oiled prowler hide, the only thing the rot will not chew through. My stock is gone and the south spans are already sinking. Bring me 8 unspoiled pelts, $N, before we are all wading to Eastbrook.',
     completionText: 'Good thick pelts, these. The causeway will outlast the both of us now.',
     objectives: [
       { type: 'collect', itemId: 'mire_prowler_pelt', count: 8, label: 'Mire Prowler Pelt' },
@@ -873,7 +905,7 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
     name: 'The Lost Caravan',
     giverNpcId: 'provisioner_hale',
     turnInNpcId: 'provisioner_hale',
-    text: 'A caravan out of Eastbrook went into the mist three days back and never rang the gate bell. The wreck is strewn the whole length of the causeway — crates, casks, the lot, sinking slow. Salvage 5 loads of goods before the marsh finishes the job.',
+    text: 'A caravan out of Eastbrook went into the mist three days back and never rang the gate bell. The wreck is strewn the whole length of the causeway: crates, casks, the lot, sinking slow. Salvage 5 loads of goods before the marsh finishes the job.',
     completionText:
       'Waterlogged, but whole. Poor drivers... the fen keeps what it catches, $N. Remember that.',
     objectives: [
@@ -903,7 +935,7 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
     name: 'The Deepfen Stirs',
     giverNpcId: 'warden_fenwick',
     turnInNpcId: 'warden_fenwick',
-    text: 'The Deepfen mudfins kept to their shallows for twenty years. Now they swarm the east bank like flies on a carcass — and my wardens say they are dragging things up from the lake bed. Whatever has them stirred, I want it stopped. Cull 12 of the snappers.',
+    text: 'The Deepfen mudfins kept to their shallows for twenty years. Now they swarm the east bank like flies on a carcass, and my wardens say they are dragging things up from the lake bed. Whatever has them stirred, I want it stopped. Cull 12 of the snappers.',
     completionText:
       'That will push them back to the mud for a while. But something set them digging, and I mean to learn what.',
     objectives: [
@@ -919,9 +951,9 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
     name: 'Idols of the Deep',
     giverNpcId: 'brother_aldric_fen',
     turnInNpcId: 'brother_aldric_fen',
-    text: "Fenwick's wardens say the fish-men dredge idols from the lake bottom and clutch them like holy relics. If those idols are what I fear, I must see them with my own eyes. Take 5 from the Deepfen snappers — they will not part with them kindly.",
+    text: "Fenwick's wardens say the fish-men dredge idols from the lake bottom and clutch them like holy relics. If those idols are what I fear, I must see them with my own eyes. Take 5 from the Deepfen snappers: they will not part with them kindly.",
     completionText:
-      'Gravecaller work — older than Morthen, older than me. The sect did not begin in Eastbrook, $N. It began here, and the lake has been keeping its secrets.',
+      'Gravecaller work, older than Morthen, older than me. The sect did not begin in Eastbrook, $N. It began here, and the lake has been keeping its secrets.',
     objectives: [
       { type: 'collect', itemId: 'waterlogged_idol', count: 5, label: 'Waterlogged Idol' },
     ],
@@ -979,7 +1011,7 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
     name: 'Silk and Venom',
     giverNpcId: 'herbalist_yara',
     turnInNpcId: 'herbalist_yara',
-    text: 'Widow venom is the only thing that draws fen-rot from a wound — I bled a man of it just this morning. But the thicket west of the road has gone from nuisance to horror; the webs are taking deer whole now. Kill 10 widows and cut me 6 venom sacs, whole and unburst.',
+    text: 'Widow venom is the only thing that draws fen-rot from a wound: I bled a man of it just this morning. But the thicket west of the road has gone from nuisance to horror; the webs are taking deer whole now. Kill 10 widows and cut me 6 venom sacs, whole and unburst.',
     completionText:
       'Whole sacs, every one. You have steadier hands than half the surgeons in the south, $N.',
     objectives: [
@@ -1019,7 +1051,7 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
     name: 'The Drowned Dead',
     giverNpcId: 'brother_aldric_fen',
     turnInNpcId: 'brother_aldric_fen',
-    text: 'Travelers drowned on the causeway are walking out of the lakes, $N — still hung with the weeds they died in. This is no restless haunting. Drowning leaves no marks; it makes obedient corpses. Someone is filling this fen like a tithing box. Return 12 of the Drowned Dead to their rest.',
+    text: 'Travelers drowned on the causeway are walking out of the lakes, $N, still hung with the weeds they died in. This is no restless haunting. Drowning leaves no marks; it makes obedient corpses. Someone is filling this fen like a tithing box. Return 12 of the Drowned Dead to their rest.',
     completionText:
       'Each one you fell is a stolen soul set free. But the one who drowned them is still pouring water.',
     objectives: [
@@ -1035,9 +1067,9 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
     name: 'Censers from the Deep',
     giverNpcId: 'brother_aldric_fen',
     turnInNpcId: 'brother_aldric_fen',
-    text: 'North of the widow lake stands a chapel that drowned with its congregation when the marsh rose. The dead there carry rusted censers — funerary ones, the kind swung at a Gravecaller rite. Gather 4 from the chapel yard and I will read what rite was sung over that water.',
+    text: 'North of the widow lake stands a chapel that drowned with its congregation when the marsh rose. The dead there carry rusted censers, funerary ones, the kind swung at a Gravecaller rite. Gather 4 from the chapel yard and I will read what rite was sung over that water.',
     completionText:
-      "As I feared. These censers burned grave-ash, not incense. Someone consecrated that chapel to the drowning — and the rite is signed 'Voss.'",
+      "As I feared. These censers burned grave-ash, not incense. Someone consecrated that chapel to the drowning, and the rite is signed 'Voss.'",
     objectives: [{ type: 'collect', itemId: 'rusted_censer', count: 4, label: 'Rusted Censer' }],
     xpReward: 1300,
     copperReward: 500,
@@ -1098,9 +1130,9 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
     name: 'Mounds of the Mirefen',
     giverNpcId: 'warden_fenwick',
     turnInNpcId: 'warden_fenwick',
-    text: 'The Mirefen trolls have torn open the old barrow-mounds east of the far lake — burial mounds, $N, older than any kingdom of men. Whatever gold they think is down there, what they are letting OUT is worse. Drive them off the mounds: 12 trolls dead ought to do it.',
+    text: 'The Mirefen trolls have torn open the old barrow-mounds east of the far lake: burial mounds, $N, older than any kingdom of men. Whatever gold they think is down there, what they are letting OUT is worse. Drive them off the mounds: 12 trolls dead ought to do it.',
     completionText:
-      "Trolls don't dig without a reason. Someone told them where to dig — and I'd wager my gate it wears a grey robe.",
+      "Trolls don't dig without a reason. Someone told them where to dig, and I'd wager my gate it wears a grey robe.",
     objectives: [
       { type: 'kill', targetMobId: 'fen_troll', count: 12, label: 'Mirefen Troll slain' },
     ],
@@ -1114,7 +1146,7 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
     name: 'Fetish and Bone',
     giverNpcId: 'scout_maren',
     turnInNpcId: 'scout_maren',
-    text: 'I crawled the troll mounds two nights past. Those fetishes they plant are not troll-craft — the knots are wrong, the bones are man-bones, and every one points at the open barrows like a signpost. Bring me 8 of them and I will prove to Fenwick who is really paying for this dig.',
+    text: 'I crawled the troll mounds two nights past. Those fetishes they plant are not troll-craft: the knots are wrong, the bones are man-bones, and every one points at the open barrows like a signpost. Bring me 8 of them and I will prove to Fenwick who is really paying for this dig.',
     completionText:
       'Same maker as the banners in the cult camp. The trolls are hired shovels, nothing more. Good work, $N.',
     objectives: [
@@ -1134,7 +1166,7 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
     name: 'The Glutton',
     giverNpcId: 'provisioner_hale',
     turnInNpcId: 'provisioner_hale',
-    text: "There's one troll the others won't dig beside — Grubjaw, the Glutton. He ate my last two pack-mules, harness and all, and my insurance man drowned years ago. He prowls the far eastern mounds, $N. Bring me his tusk and I will outfit you proper.",
+    text: "There's one troll the others won't dig beside: Grubjaw, the Glutton. He ate my last two pack-mules, harness and all, and my insurance man drowned years ago. He prowls the far eastern mounds, $N. Bring me his tusk and I will outfit you proper.",
     completionText:
       'That tusk is long as my forearm! The mules are avenged, and Fenbridge owes you a round.',
     objectives: [{ type: 'collect', itemId: 'grubjaw_tusk', count: 1, label: "Grubjaw's Tusk" }],
@@ -1152,7 +1184,7 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
     name: 'Robes in the Reeds',
     giverNpcId: 'scout_maren',
     turnInNpcId: 'scout_maren',
-    text: 'There — north past the third lake, where the mist never lifts. Grey robes, grey banners: Gravecallers, camped in the open like they already own the fen. They have stopped hiding, $N, which means they think they have already won. Prove them wrong. Cut down 12 of their cultists.',
+    text: 'There, north past the third lake, where the mist never lifts. Grey robes, grey banners: Gravecallers, camped in the open like they already own the fen. They have stopped hiding, $N, which means they think they have already won. Prove them wrong. Cut down 12 of their cultists.',
     completionText: 'Twelve robes face-down in the mud. Now they know the fen watches back.',
     objectives: [
       {
@@ -1172,9 +1204,9 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
     name: 'Stopping the Summoning',
     giverNpcId: 'brother_aldric_fen',
     turnInNpcId: 'brother_aldric_fen',
-    text: "Maren's reports name summoners among the cultists — voices that call the drowned up out of the water like hounds to a whistle. Their ciphers will spell out the chain of command. Silence 8 summoners and bring me 4 of their ciphers.",
+    text: "Maren's reports name summoners among the cultists, voices that call the drowned up out of the water like hounds to a whistle. Their ciphers will spell out the chain of command. Silence 8 summoners and bring me 4 of their ciphers.",
     completionText:
-      "Every cipher is countersigned 'Deacon Voss' — and addressed onward to a 'Fogbinder' in the Bastion. Morthen's master, $N. We have found him.",
+      "Every cipher is countersigned 'Deacon Voss', and addressed onward to a 'Fogbinder' in the Bastion. Morthen's master, $N. We have found him.",
     objectives: [
       {
         type: 'kill',
@@ -1194,9 +1226,9 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
     name: 'The Deacon of the Mire',
     giverNpcId: 'warden_fenwick',
     turnInNpcId: 'warden_fenwick',
-    text: 'So a deacon of the Gravecallers stands at the heart of that camp, singing my drowned wardens up out of the lakes to serve him. His hymn ends today. Take the camp road north, $N, and put Deacon Voss in the ground — deep enough that nobody sings HIM back up.',
+    text: 'So a deacon of the Gravecallers stands at the heart of that camp, singing my drowned wardens up out of the lakes to serve him. His hymn ends today. Take the camp road north, $N, and put Deacon Voss in the ground, deep enough that nobody sings HIM back up.',
     completionText:
-      'Voss is dead and the mist over the camp is already thinning. You have broken their voice in the fen — now only the Bastion remains.',
+      'Voss is dead and the mist over the camp is already thinning. You have broken their voice in the fen. Now only the Bastion remains.',
     objectives: [
       { type: 'kill', targetMobId: 'deacon_voss', count: 1, label: 'Deacon Voss slain' },
     ],
@@ -1217,7 +1249,7 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
     name: 'The Sunken Bastion',
     giverNpcId: 'brother_aldric_fen',
     turnInNpcId: 'brother_aldric_fen',
-    text: "The Sunken Bastion — a knight's hold that drowned in the fen a century ago — is where Voss's letters point, and where this Fogbinder sings his drowning hymns. The cult has warded its door with grave-stones. Bring me one of the ward stones, $N, and I will unweave the seal.",
+    text: "The Sunken Bastion, a knight's hold that drowned in the fen a century ago, is where Voss's letters point, and where this Fogbinder sings his drowning hymns. The cult has warded its door with grave-stones. Bring me one of the ward stones, $N, and I will unweave the seal.",
     completionText:
       'The ward parts like rotten rope. The door stands open... and the dark below it is listening.',
     objectives: [
@@ -1234,7 +1266,7 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
     name: "The Knight-Commander's Shame",
     giverNpcId: 'scout_maren',
     turnInNpcId: 'scout_maren',
-    text: 'Knight-Commander Olen held the Bastion when it sank — drowned at his post rather than abandon it. Every warden learns his name with pride. Now the Fogbinder has raised him as a puppet to guard the very door he died defending. That shame ends, $N. Take four companions below and grant Olen the rest he earned.',
+    text: 'Knight-Commander Olen held the Bastion when it sank, drowned at his post rather than abandon it. Every warden learns his name with pride. Now the Fogbinder has raised him as a puppet to guard the very door he died defending. That shame ends, $N. Take four companions below and grant Olen the rest he earned.',
     completionText:
       "Then his watch is finally over. I'll see his name cut into the gate myself. Thank you, $N.",
     objectives: [
@@ -1261,9 +1293,9 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
     name: 'The Fogbinder',
     giverNpcId: 'brother_aldric_fen',
     turnInNpcId: 'brother_aldric_fen',
-    text: "At the bottom of the Bastion waits Vael the Fogbinder — Morthen's master, Voss's master, the voice that has drowned a hundred travelers to raise itself an army. He is far beyond any one hero: take four companions, no fewer. End him, $N, and the fen's dead may finally lie still.",
+    text: "At the bottom of the Bastion waits Vael the Fogbinder, Morthen's master, Voss's master, the voice that has drowned a hundred travelers to raise itself an army. He is far beyond any one hero: take four companions, no fewer. End him, $N, and the fen's dead may finally lie still.",
     completionText:
-      "Vael is dead, and the mist is lifting for the first time in years. But Maren heard his last words, and they freeze my blood: 'The Wyrm stirs beneath the peaks.' The sect serves something older than we ever guessed, $N. Rest while you can — the mountains are next.",
+      "Vael is dead, and the mist is lifting for the first time in years. But Maren heard his last words, and they freeze my blood: 'The Wyrm stirs beneath the peaks.' The sect serves something older than we ever guessed, $N. Rest while you can: the mountains are next.",
     objectives: [
       {
         type: 'kill',
@@ -2058,12 +2090,15 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     requiredClass: ROG,
   },
   // --- vendor food & drink (Provisioner Hale) ---
+  // Vendor food nerf (11n-D-13): crafted 243 tier (goldleaf_game_stew,
+  // fenbridge_rice_bowl, fenbridge_rice_pudding, ashwood_smoked_eel) / 1.10,
+  // bottom tercile, floored; crafted margin +10.5 percent.
   fenbridge_rye: {
     id: 'fenbridge_rye',
     name: 'Fenbridge Rye Loaf',
     kind: 'food',
     quality: 'common',
-    foodHp: 243,
+    foodHp: 220,
     sellValue: 25,
     buyValue: 400,
   },
@@ -2076,12 +2111,15 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     sellValue: 25,
     buyValue: 400,
   },
+  // Vendor food nerf (11n-D-13): crafted 432 tier (frostgill_chowder,
+  // fenbridge_beet_braise) / 1.15, the middle tercile's 15 percent margin,
+  // floored; crafted margin +15.2 percent.
   smoked_eel: {
     id: 'smoked_eel',
     name: 'Smoked Mirefen Eel',
     kind: 'food',
     quality: 'common',
-    foodHp: 432,
+    foodHp: 375,
     sellValue: 60,
     buyValue: 1000,
   },

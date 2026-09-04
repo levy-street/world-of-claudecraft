@@ -50,6 +50,10 @@
 //
 // DELIBERATE SIMPLIFICATIONS, each named with its bias DIRECTION (they do
 // not all point the same way; the per-bullet direction is what a tuner needs)
+// - Daily-gated chains are excluded from the pool outright (the transitive
+//   closure below): biases the hours UP at the margin, since a real player
+//   COULD bank catalyst-day output into skill the model never counts. The
+//   exclusion is the point: the pacing alarm measures the ungated ladder.
 // - Common-rarity yields only: biases the hours UP. Every material row grants
 //   1 unit on a common roll and 2 to 4 on a rarer one, so a real climb needs
 //   fewer casts than this. Assuming the common row is the honest pessimistic
@@ -130,6 +134,10 @@ import {
   resolveCraftForRecipe,
 } from '../src/sim/professions/crafting';
 import { NODE_HARVEST_TABLE, NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
+import {
+  MAKERS_EMBER_ITEM_ID,
+  WYRMFALL_CORE_ITEM_ID,
+} from '../src/sim/professions/masterwrought_materials';
 import { teachTierMet } from '../src/sim/professions/training';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
 import { type CraftSkills, emptyCraftSkills, gainCraftSkill } from '../src/sim/professions/wheel';
@@ -377,7 +385,97 @@ function deriveMastery(pool: ProfessionRecipeRecord[], attunement: Attunement): 
   };
 }
 
-const ARMORCRAFTING_RECIPES = ALL_RECIPES.filter((recipe) => recipe.professionId === CRAFT);
+// Daily-gated chains stay OUT of the mastery pool: the model's tie-break
+// counts GATHERED units only, so a crafted daily-gated reagent (the
+// Quickening Catalyst) costs it nothing while being hard-capped at one per
+// character per reset day. Left in, the Phase 07 forgefold row reads as the
+// cheapest skill-75 rung via a path no leveling player can walk (75
+// catalyst-days for the rung's crafts). The pacing alarm keeps measuring
+// the ungated ladder. The gate is TRANSITIVE (phase 08): an output whose
+// recipe consumes a daily-gated output is itself daily-gated (the apex rows
+// consume the intermediates, which consume the catalyst; one apex piece is
+// 3 catalyst-days), so the closure keeps every rung of the chain out, not
+// just the catalyst's direct consumers.
+const DAILY_GATED_OUTPUT_IDS = new Set(
+  ALL_RECIPES.filter((r) => r.oncePerDay).map((r) => r.resultItemId),
+);
+for (let grew = true; grew; ) {
+  grew = false;
+  for (const r of ALL_RECIPES) {
+    if (DAILY_GATED_OUTPUT_IDS.has(r.resultItemId)) continue;
+    if (r.reagents.some((reagent) => DAILY_GATED_OUTPUT_IDS.has(reagent.itemId))) {
+      DAILY_GATED_OUTPUT_IDS.add(r.resultItemId);
+      grew = true;
+    }
+  }
+}
+const ARMORCRAFTING_RECIPES = ALL_RECIPES.filter(
+  (recipe) =>
+    recipe.professionId === CRAFT &&
+    !recipe.oncePerDay &&
+    !recipe.reagents.some((reagent) => DAILY_GATED_OUTPUT_IDS.has(reagent.itemId)),
+);
+
+describe('the daily-gate exclusion actually excludes (filter liveness)', () => {
+  it('the gated chain is derived non-empty and the forgefold row is out of the pool', () => {
+    // Without these two pins a rename of oncePerDay or a re-key of the
+    // catalyst turns both filter arms into silent no-ops and the gated row
+    // re-enters the pool inside the window's slack (review round).
+    expect(DAILY_GATED_OUTPUT_IDS.has('quickening_catalyst')).toBe(true);
+    expect(ARMORCRAFTING_RECIPES.length).toBeGreaterThan(0);
+    expect(ARMORCRAFTING_RECIPES.map((r) => r.id)).not.toContain('recipe_forgefold_plating');
+  });
+
+  it('the closure reaches the apex rung: second-hop chain members stay out (phase 08)', () => {
+    // The apex rows never touch the catalyst directly; without the closure
+    // they enter the POOL, and the pool feeds the EXPECTATION side of the
+    // climb pin (the top rung would read 100 while the walk still tops at
+    // 75, since drop-taught rows fail the known-recipe gate and can never be
+    // crafted by the model anyway). The failure lives in the expectation,
+    // not the walk; exactly how this arm was born.
+    expect(DAILY_GATED_OUTPUT_IDS.has('forgefold_plating')).toBe(true);
+    expect(DAILY_GATED_OUTPUT_IDS.has('forgefold_legguards')).toBe(true);
+    // The EXACT excluded armorcrafting set, so a third apex row (or a lost
+    // exclusion) reds by name rather than hiding behind two spot negatives.
+    const excluded = ALL_RECIPES.filter(
+      (r) => r.professionId === CRAFT && !ARMORCRAFTING_RECIPES.includes(r) && !r.oncePerDay,
+    )
+      .map((r) => r.id)
+      .sort();
+    expect(excluded).toEqual([
+      'recipe_forgefold_legguards',
+      'recipe_forgefold_plating',
+      'recipe_spiritweld_girdle',
+      'recipe_wardspeaker_sabatons',
+    ]);
+  });
+
+  it('the closure premises hold: unique producers, and no cadence gate it cannot see', () => {
+    // Premise 1: the closure marks an ITEM gated when SOME producing recipe
+    // consumes a gated reagent, which is sound only while resultItemId is
+    // one-to-one across the catalog (a second ungated producer of the same
+    // id would be wrongly excluded).
+    const outputs = ALL_RECIPES.map((r) => r.resultItemId);
+    expect(new Set(outputs).size).toBe(outputs.length);
+    // Premise 2: oncePerDay is the only cadence gate the closure can SEE,
+    // but the packet ships two more it cannot (wyrmfall_core's income is
+    // per character per source per reset day, beside its ungated marks
+    // vendor channel; makers_ember is weekly). Both are consumed only by
+    // rows the closure already excludes; the day an ungated pool recipe
+    // consumes either, this tripwire forces the model to learn the
+    // material-level gates. The ids come from the OWNING module's
+    // constants, never literals: a rename would silently disarm a negative
+    // assertion (the literal-arm trap).
+    for (const recipe of ARMORCRAFTING_RECIPES) {
+      for (const reagent of recipe.reagents) {
+        expect(
+          [WYRMFALL_CORE_ITEM_ID, MAKERS_EMBER_ITEM_ID],
+          `${recipe.id} ${reagent.itemId}`,
+        ).not.toContain(reagent.itemId);
+      }
+    }
+  });
+});
 const ATTUNEMENT = attunedArmorcrafter();
 const RUN = deriveMastery(ARMORCRAFTING_RECIPES, ATTUNEMENT);
 
@@ -647,7 +745,19 @@ describe('armorcrafting mastery derives from the live tables (R13)', () => {
     // ladder (which consumes no thorium at all) cannot reshape silently
     // under the window either.
     expect(RUN.bill.get('thorium_ore')).toBe(450);
+    // 100 again since the 11l QA: the 11l build's trophy row recipe_hobnail_boots
+    // (iron 3 gathered; its bogiron trophy and flux were non-gathered, so free
+    // in this model) had won the rung-25 fewest-gathered tie-break at 75, and
+    // the QA excluded the bogiron nugget and deleted that row, so the previous
+    // pick's 4 iron per craft is back.
     expect(RUN.bill.get('iron_ore')).toBe(100);
+    // The 100 rests on WHICH row won the rung, so the winner is pinned by id
+    // AND exact use count beside it (25, the whole rung-25 allotment), the
+    // shape the 11l build established for its hobnail row: a different pick
+    // that happened to bill 4 iron would keep the literal green while the
+    // comment above named the wrong recipe, and a presence check alone would
+    // pass a row that won only part of the rung. Measured at the 11l QA.
+    expect(RUN.recipeUse.get('recipe_ironlink_spaulders')).toBe(25);
     expect(RUN.bill.get('copper_ore')).toBe(75);
     // Gain curve ON: the whole per-rung craft vector, not just the top rung.
     const craftsPerRung = new Map<number, number>();

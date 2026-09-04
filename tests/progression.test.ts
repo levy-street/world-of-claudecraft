@@ -4,6 +4,7 @@
 // whatever the content modules currently export, so they hold as zones grow.
 import { describe, expect, it } from 'vitest';
 import { CHOICE_ROW_LEVELS, CHOICE_ROWS } from '../src/sim/content/choice_rows';
+import { FARM_CROPS } from '../src/sim/content/farm_crops';
 import {
   ABILITIES,
   ALL_RECIPES,
@@ -40,7 +41,9 @@ const SCRIPTED_COLLECT_ITEMS = new Set(['the_codfather']);
 // materials use: gather-node harvest (NODE_MATERIAL_TABLE grants copper_ore,
 // ironbark_log, goldleaf_herb in their zones) and corpse harvest
 // (HARVEST_COMPONENT_ITEMS maps a component tag to game_meat, spider_silk,
-// rough_hide, etc). Both the obtainability check and its negative control call
+// rough_hide, etc), plus the farm harvest path the produce work orders use
+// (FARM_CROPS: harvestCrop grants a crop's produceItemId, vale_wheat, marsh_rice,
+// etc). Both the obtainability check and its negative control call
 // this one predicate, so the negative control proves the REAL model, not a copy.
 function collectItemAcquirable(itemId: string): boolean {
   const fromLoot = Object.values(MOBS).some((m) => m.loot.some((l) => l.itemId === itemId));
@@ -50,11 +53,14 @@ function collectItemAcquirable(itemId: string): boolean {
     Object.values(byZone).some((row) => row.itemId === itemId),
   );
   const fromHarvest = Object.values(HARVEST_COMPONENT_ITEMS).includes(itemId);
+  const fromFarm = Object.values(FARM_CROPS).some((crop) => crop.produceItemId === itemId);
   // A vendor's stock is an acquisition source too: the tutorial island's
   // buy-a-pick lesson (q_ps_tools_of_the_trade) is deliberately fulfilled at
-  // a vendor stall, teaching the purchase flow itself.
+  // a vendor stall, teaching the purchase flow itself. (Merge note: the
+  // shipped lesson is q_ps_pouch_and_purse collecting linen_pouch, the one
+  // collect objective only the vendor arm satisfies on the merged tree.)
   const fromVendor = Object.values(NPCS).some((n) => n.vendorItems?.includes(itemId) === true);
-  return fromLoot || fromGround || fromScript || fromNode || fromHarvest || fromVendor;
+  return fromLoot || fromGround || fromScript || fromNode || fromHarvest || fromFarm || fromVendor;
 }
 
 describe('content referential integrity', () => {
@@ -124,19 +130,33 @@ describe('content referential integrity', () => {
   });
 
   it('the collect-obtainability model rejects a fabricated unobtainable item (negative control)', () => {
-    // Decisive guard so the widened model (with the gather-node and
-    // corpse-harvest paths for the work-order materials) can never go all-
-    // permissive: an item that lives in NO mob loot table, ground object,
-    // scripted set, gather-node material row, or corpse-harvest component map
-    // must still be classified unacquirable. The four real acquisition paths are
-    // re-proven acquirable here so a later refactor that drops a path reds this.
+    // Decisive guard so the widened model (with the gather-node, corpse-
+    // harvest, and farm-harvest paths for the work-order materials) can never
+    // go all-permissive: an item that lives in NO mob loot table, ground
+    // object, scripted set, gather-node material row, corpse-harvest component
+    // map, or crop produce column must still be classified unacquirable. The
+    // real acquisition paths are re-proven acquirable here so a later refactor
+    // that drops a path reds this. The farm arm's negative side WAS a crop SEED
+    // (vale_wheat_seed: farming content that nothing harvests out of the
+    // ground) while vendor stock sat outside the model; the release/v0.41.0
+    // merge added the vendor arm, and every seed is farmer vendor stock (all
+    // four tiers since Phase 11e, tier 4 also boss loot), so a seed is now
+    // honestly acquirable and that negative retired. Fine produce is NOT a
+    // substitute negative either: harvestCrop grants it on the quality roll,
+    // so the model would only be recording its own blind spot. The fabricated
+    // id stays the negative control, and the vendor arm is re-proven on the
+    // one collect objective that only a stall fulfils today.
     expect(collectItemAcquirable('totally_not_a_real_item_xyz')).toBe(false);
+    expect(collectItemAcquirable('vale_wheat_seed')).toBe(true); // farmer vendor stock
+    expect(collectItemAcquirable('linen_pouch')).toBe(true); // vendor stock only (pouch lesson)
     expect(collectItemAcquirable('copper_ore')).toBe(true); // gather-node material
     expect(collectItemAcquirable('ironbark_log')).toBe(true); // gather-node material
     expect(collectItemAcquirable('goldleaf_herb')).toBe(true); // gather-node material
     expect(collectItemAcquirable('game_meat')).toBe(true); // corpse-harvest component
     expect(collectItemAcquirable('spider_silk')).toBe(true); // corpse-harvest component
     expect(collectItemAcquirable('rough_hide')).toBe(true); // corpse-harvest component
+    expect(collectItemAcquirable('vale_wheat')).toBe(true); // farm-harvest produce
+    expect(collectItemAcquirable('marsh_rice')).toBe(true); // farm-harvest produce
   });
 
   it('QUEST_ORDER covers every quest exactly once', () => {

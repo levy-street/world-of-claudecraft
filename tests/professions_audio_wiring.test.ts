@@ -95,6 +95,8 @@ describe('craft-family cast-start audio wiring (Craft Cast System Phase 6)', () 
     expect(body).toContain('DISENCHANT_CAST_ID');
     expect(body).toContain('ENCHANT_CAST_ID');
     expect(body).toContain('SALVAGE_CAST_ID');
+    // Masterwrought phase 04: the sunder cast joins the family wind-up.
+    expect(body).toContain('SUNDER_CAST_ID');
     expect(body).toContain('TOOL_RECHARGE_CAST_ID');
   });
 });
@@ -123,6 +125,22 @@ describe('craftResult audio wiring', () => {
     // The masterwork call must come strictly after the craftSuccess call, so
     // it layers on top rather than replacing it.
     expect(body.indexOf('audio.craftSuccess(')).toBeLessThan(body.indexOf('audio.masterwork();'));
+  });
+});
+
+describe('legendaryForged audio wiring (Masterwrought phase 14)', () => {
+  // The orange promotion's personal celebration used to reuse ui_achievement
+  // (audibly identical to any deed unlock); the dedicated capstone cue
+  // supersedes it on the personal arm ONLY. The zone arm's view bundle
+  // decides no cue for anyone (playCue: false in
+  // craft_celebration_text_view.ts), so its inert achievement call is not
+  // policed here.
+  it('the personal arm plays the dedicated forged cue, not the deed chime', () => {
+    const start = hud.indexOf("case 'legendaryForged':");
+    expect(start).toBeGreaterThan(-1);
+    const body = hud.slice(start, hud.indexOf('break;', start));
+    expect(body).toContain('if (l.playCue) audio.legendaryForged();');
+    expect(body).not.toContain('audio.achievement()');
   });
 });
 
@@ -224,5 +242,52 @@ describe('enchantResult audio wiring', () => {
     expect(body).toContain("if (toast.sink === 'log') {");
     expect(body).toContain('audio.enchant();');
     expect(body.indexOf('audio.enchant();')).toBeLessThan(body.indexOf('else'));
+  });
+});
+
+describe('sunder completion audio wiring (Masterwrought phase 14)', () => {
+  // The sunder grant is silent + callerLogs (the recorded one silent
+  // craft-family completion), so the cue keys off the personal log line's RAW
+  // English in hud.ts's case 'log' via the pure predicate. Three welds so a
+  // reword in ANY home fails here: the hud call, the predicate's two literal
+  // halves, and the sim emit template they must keep matching.
+  const core = readFileSync(
+    join(__dirname, '../src/ui/hud/professions/profession_event_lines_core.ts'),
+    'utf8',
+  )
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/(^|[^:])\/\/.*$/gm, '$1');
+  const sundering = readFileSync(join(__dirname, '../src/sim/professions/sundering.ts'), 'utf8')
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/(^|[^:])\/\/.*$/gm, '$1');
+
+  it("the case 'log' arm routes the sunder line to audio.sunderComplete()", () => {
+    const start = hud.indexOf("case 'log': {");
+    expect(start).toBeGreaterThan(-1);
+    const end = hud.indexOf("case 'playerDeath'", start);
+    const body = hud.slice(start, end);
+    expect(body).toContain('if (isSunderCompletionLog(ev.text)) audio.sunderComplete();');
+  });
+
+  it('the predicate spells both halves of the emit, and the sim emit still matches them', () => {
+    expect(core).toContain("text.startsWith('You sunder ')");
+    expect(core).toContain("text.endsWith(' into Sundered Essence.')");
+    // The emit template in sundering.ts: interpolated name between the exact
+    // prefix and suffix the predicate tests.
+    expect(sundering).toContain('`You sunder ${def?.name ?? itemId} into Sundered Essence.`');
+  });
+
+  it('the predicate itself accepts the live emit shape and refuses near misses', async () => {
+    const { isSunderCompletionLog } = await import(
+      '../src/ui/hud/professions/profession_event_lines_core'
+    );
+    expect(isSunderCompletionLog('You sunder Gravewyrm Bone Quiver into Sundered Essence.')).toBe(
+      true,
+    );
+    expect(isSunderCompletionLog('You sunder it.')).toBe(false);
+    expect(isSunderCompletionLog('Sundered Essence.')).toBe(false);
+    expect(isSunderCompletionLog('They sunder Gravewyrm Bone Quiver into Sundered Essence.')).toBe(
+      false,
+    );
   });
 });

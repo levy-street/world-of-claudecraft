@@ -1,10 +1,18 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { VISUALS } from '../src/render/characters/manifest';
-import { idleVariantCadenceForTest } from '../src/render/characters/visual';
+import {
+  type BaseState,
+  CharacterVisual,
+  idleVariantCadenceForTest,
+} from '../src/render/characters/visual';
 
 const repoRoot = path.resolve(__dirname, '..');
+const characterVisualSource = readFileSync(
+  new URL('../src/render/characters/visual.ts', import.meta.url),
+  'utf8',
+);
 
 /** Clip name -> duration (seconds), read straight out of a GLB's accessors. */
 function clipDurations(glbRelative: string): Map<string, number> {
@@ -44,6 +52,46 @@ const rigsWithVariants = Object.entries(VISUALS).filter(
   ([, def]) => (def.clips.idleVariants ?? []).length > 0,
 );
 
+interface IdleVariantHarness {
+  idleVariantIn: number;
+  idleBeatIn: number;
+  currentIsOneShot: boolean;
+  currentOneShotIsIdleVariant: boolean;
+  def: {
+    clips: {
+      idleVariants: string[];
+      idleBeat?: { clip: string; everySec: number; jitterSec?: number };
+    };
+  };
+  action(name: string): object | null;
+  playOneShot(name: string, speed: number): void;
+  tickIdleVariant(dt: number, desired: BaseState): void;
+  tickIdleBeat(dt: number, desired: BaseState): void;
+}
+
+function idleVariantHarness(): {
+  visual: IdleVariantHarness;
+  playOneShot: ReturnType<typeof vi.fn>;
+} {
+  const playOneShot = vi.fn();
+  const visual = Object.create(CharacterVisual.prototype) as IdleVariantHarness;
+  Object.assign(visual, {
+    idleVariantIn: -1,
+    idleBeatIn: -1,
+    currentIsOneShot: false,
+    currentOneShotIsIdleVariant: false,
+    def: {
+      clips: {
+        idleVariants: ['Idle_Look', 'Idle_Rear'],
+        idleBeat: { clip: 'Idle_Shake', everySec: 20, jitterSec: 4 },
+      },
+    },
+    action: () => ({}),
+    playOneShot,
+  });
+  return { visual, playOneShot };
+}
+
 describe('idle-breaker clips', () => {
   it('is a feature at least one rig actually uses', () => {
     expect(rigsWithVariants.map(([key]) => key)).toContain('mount_chimeglass_tortoise');
@@ -60,13 +108,63 @@ describe('idle-breaker clips', () => {
     }
   });
 
+  it('pins the Chimeglass fidget pool, signature beat, and airborne handoff clips', () => {
+    expect(VISUALS.mount_chimeglass_tortoise.clips).toMatchObject({
+      idle: 'Idle',
+      idleVariants: ['Idle_Look', 'Idle_Rear', 'Idle_Stamp', 'Idle_Groove'],
+      idleBeat: { clip: 'Idle_Shake', everySec: 20, jitterSec: 4 },
+      jump: 'Jump',
+      land: 'Land',
+    });
+  });
+
+  it('registers every scheduled idle clip in the CharacterVisual action map', () => {
+    const start = characterVisualSource.indexOf('function clipNamesOf(def: VisualDef): string[] {');
+    const end = characterVisualSource.indexOf('\nfunction firstLoadedEmoteClip(', start);
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    const actionMap = characterVisualSource.slice(start, end);
+
+    expect(characterVisualSource).toContain(
+      'for (const name of [...clipNamesOf(prep.def), ...SKIN_ATTACK_CLIP_NAMES]) {',
+    );
+    expect(actionMap).toContain('...(c.idleVariants ?? []),');
+    expect(actionMap).toContain('c.idleBeat?.clip,');
+  });
+
+  it('drives both schedulers from update and hands an interrupted fidget to locomotion', () => {
+    const start = characterVisualSource.indexOf(
+      'update(dt: number, s: AnimState, animate: boolean, reducedMotion = false): void {',
+    );
+    const end = characterVisualSource.indexOf('\n  /**', start + 1);
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    const update = characterVisualSource.slice(start, end);
+
+    const cancelAt = update.indexOf(
+      "this.currentIsOneShot && this.currentOneShotIsIdleVariant && desired !== 'idle'",
+    );
+    const beatAt = update.indexOf('this.tickIdleBeat(dt, desired);');
+    const variantAt = update.indexOf('this.tickIdleVariant(dt, desired);');
+    const gaitAt = update.indexOf('// foot-speed matching on locomotion cycles');
+    expect(cancelAt).toBeGreaterThan(-1);
+    expect(update.slice(cancelAt, beatAt)).toContain('this.currentIsOneShot = false;');
+    expect(update.slice(cancelAt, beatAt)).toContain('this.currentOneShotIsIdleVariant = false;');
+    expect(update.slice(cancelAt, beatAt)).toContain(
+      'this.fadeTo(this.baseAction(), this.baseTransitionFade(desired), false);',
+    );
+    expect(beatAt).toBeGreaterThan(cancelAt);
+    expect(variantAt).toBeGreaterThan(beatAt);
+    expect(gaitAt).toBeGreaterThan(variantAt);
+  });
+
   it('fires a fidget on the authored 5-second beat, clear of the previous one', () => {
     // The fidgets are this rig's character, so the cadence is deliberately
     // tight: a fidget falls due every 5 seconds. The only hard requirement left
     // is that a variant has ENDED before the next one is due, since a fidget is
     // a one-shot and re-firing over a live one would cut it short.
     const { min, jitter } = idleVariantCadenceForTest;
-    expect(jitter).toBeGreaterThanOrEqual(0);
+    expect(jitter).toBe(0);
     expect(min).toBe(5);
     for (const [key, def] of rigsWithVariants) {
       const durations = clipDurations(def.url.replace(/^\//, ''));
@@ -77,6 +175,65 @@ describe('idle-breaker clips', () => {
       expect(min, `${key}: fidget beat ${min}s vs longest clip ${longest}s`).toBeGreaterThan(
         longest,
       );
+    }
+  });
+
+  it('runs the CharacterVisual scheduler on the shipped five-second beat', () => {
+    const random = vi.spyOn(Math, 'random').mockReturnValue(0);
+    try {
+      const { visual, playOneShot } = idleVariantHarness();
+      visual.tickIdleVariant(0, 'idle');
+      expect(visual.idleVariantIn).toBe(5);
+      visual.tickIdleVariant(4.99, 'idle');
+      expect(playOneShot).not.toHaveBeenCalled();
+      visual.tickIdleVariant(0.02, 'idle');
+      expect(playOneShot).toHaveBeenCalledOnce();
+      expect(playOneShot).toHaveBeenCalledWith('Idle_Look', 1);
+      expect(visual.currentOneShotIsIdleVariant).toBe(true);
+
+      visual.tickIdleVariant(0, 'run');
+      expect(visual.idleVariantIn).toBe(-1);
+    } finally {
+      random.mockRestore();
+    }
+  });
+
+  it('holds an overdue fidget behind another one-shot, then fires on the first clear frame', () => {
+    const random = vi.spyOn(Math, 'random').mockReturnValue(0);
+    try {
+      const { visual, playOneShot } = idleVariantHarness();
+      visual.idleVariantIn = 0;
+      visual.currentIsOneShot = true;
+
+      visual.tickIdleVariant(0, 'idle');
+      expect(playOneShot).not.toHaveBeenCalled();
+      expect(visual.idleVariantIn).toBe(0);
+
+      visual.currentIsOneShot = false;
+      visual.tickIdleVariant(0, 'idle');
+      expect(playOneShot).toHaveBeenCalledOnce();
+      expect(playOneShot).toHaveBeenCalledWith('Idle_Look', 1);
+    } finally {
+      random.mockRestore();
+    }
+  });
+
+  it('runs the signature shake on its independent 20-plus-jitter clock', () => {
+    const random = vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    try {
+      const { visual, playOneShot } = idleVariantHarness();
+      visual.tickIdleBeat(0, 'idle');
+      expect(visual.idleBeatIn).toBe(22);
+      visual.tickIdleBeat(21.99, 'idle');
+      expect(playOneShot).not.toHaveBeenCalled();
+      visual.tickIdleBeat(0.02, 'idle');
+      expect(playOneShot).toHaveBeenCalledWith('Idle_Shake', 1);
+      expect(visual.currentOneShotIsIdleVariant).toBe(true);
+
+      visual.tickIdleBeat(0, 'run');
+      expect(visual.idleBeatIn).toBe(-1);
+    } finally {
+      random.mockRestore();
     }
   });
 });

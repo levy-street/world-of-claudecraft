@@ -15,7 +15,7 @@ import { type BagCells, layoutBagCells } from '../sim/inventory_order';
 import { isTransferLockedInstance } from '../sim/item_instance_transfer';
 import type { Quality } from '../sim/loot_master';
 import { isMaterialItemId } from '../sim/material_ids';
-import type { InvSlot, ItemInstancePayload } from '../sim/types';
+import type { InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import {
   applyBagFilter,
   type BagFilterState,
@@ -23,6 +23,7 @@ import {
   bagOrderIsManual,
   type ItemLookup,
 } from './bag_filter';
+import { tooltipEffectiveQuality } from './item_instance_tooltip';
 
 export type { BagCells };
 
@@ -42,6 +43,16 @@ export interface BagItemInfo {
   soulbound?: boolean;
   /** The catalog mount a kind:'mount' reins item owns (see MountItemDef). */
   mount?: string;
+  /** The placeable shared feast payload (ItemDef.feast, Farming Phase 12). */
+  // The shipped payload also carries `templateId` (masterwrought Phase 11k); it
+  // is omitted here because this view routes a placement but never renders the
+  // PLACED ENTITY (the command carries the item id; the template is the placed
+  // object's, which only the world sites read), and a structural
+  // mirror that lists a field it does not read invites the next reader to think
+  // it does. Under-describing is the deliberate half: adding a field to the def
+  // does not red this line, so a field that ever becomes load-bearing HERE must
+  // be added here on purpose.
+  feast?: { charges: number; durationTicks: number; dishItemId: string };
   /** The id is in the Materials Vault's honest material set
    *  (vaultMaterialIds()). Computed by the CALLER (this info shape carries no
    *  id to test); read only by the vaultDeposit mode arm, so every other
@@ -124,6 +135,7 @@ export type BagAction =
   | 'petFeedBlocked'
   | 'discardQuest'
   | 'equipBag'
+  | 'placeFeast'
   | 'use';
 
 /** The tooltip hint sub-line i18n key for a bag item (or '' for no hint). */
@@ -148,6 +160,13 @@ export type BagTooltipHintKey =
   | 'itemUi.tooltip.clickConsume'
   | 'itemUi.tooltip.clickUseInstant'
   | 'itemUi.tooltip.clickUse'
+  // The placeable feast: the click SETS IT OUT at your feet (placeFeast),
+  // it never eats it, so the generic "Click to use" undersold the action.
+  | 'itemUi.tooltip.clickSetOut'
+  // The station-placing tools: the click SETS THE STATION UP at your feet
+  // (placeMobileStation), the feast's twin in the one deployable-hint
+  // pattern, and the same verb the sim's placement line speaks.
+  | 'itemUi.tooltip.clickSetUp'
   // Tool-effect charms are not bag-usable: the sim refuses useItem with the
   // "Open Professions to slot that" line, so the hover must not advertise
   // "Click to use" for a click that only errors.
@@ -242,9 +261,23 @@ export function bagItemAction(
   // not discarded; only inert quest items fall through to the discard prompt.
   if (item.kind === 'quest') return item.use ? 'use' : 'discardQuest';
   if (item.kind === 'bag') return 'equipBag';
+  // A placeable feast (ItemDef.feast, Farming Phase 12) routes to the
+  // dedicated place verb instead of plain useItem, the mount-classification
+  // pattern: this pure core decides off the def, bags_window dispatches
+  // world.placeFeast(). Sits below every window mode above (a vendor click
+  // still sells it) and cannot overlap the quest/bag arms (the feast item is
+  // kind 'junk'); the sim owns every outcome, refusals included.
+  if (item.feast) return 'placeFeast';
   // A collected reins item falls through to 'use' like any other usable item:
   // clicking it summons that mount (sim useItem -> summonMountItem). There is no
   // picker to open any more.
+  // A recipe pattern falls through here too: using it learns the recipe and
+  // consumes the copy (professions/pattern_items.ts). It carries no def-level
+  // `use` payload, so the fall-through is the only rung that reaches it, and
+  // every transfer mode above deliberately treats it as an ordinary tradable
+  // drop (not soulbound, not noMarketList). Patterns never stack, though:
+  // 'recipe' is an UNSTACKED_KIND (src/sim/bags.ts), so each cell here holds
+  // exactly one copy and a click can only ever spend that one.
   return 'use';
 }
 
@@ -498,14 +531,41 @@ export function bagTooltipHintKey(
   )
     return 'itemUi.tooltip.clickEquip';
   if (item.kind === 'food' || item.kind === 'drink') return 'itemUi.tooltip.clickConsume';
-  if (item.kind === 'potion') return 'itemUi.tooltip.clickUseInstant';
+  // Elixirs, flasks, and scrolls consume instantly on a bag click exactly like a
+  // potion (the widened items.ts consumable arm), so the hover previews the click
+  // the same way. Closes the family gap the phase 06 QA judged fix-not-cut: the
+  // click always worked, only the hint stayed silent.
+  if (
+    item.kind === 'potion' ||
+    item.kind === 'elixir' ||
+    item.kind === 'flask' ||
+    item.kind === 'scroll'
+  )
+    return 'itemUi.tooltip.clickUseInstant';
   // Charms (use.type 'toolEffect') slot from the Professions window, not from
   // a bag click. Mirror the sim refusal copy so the hover never promises a
   // use action the click cannot perform.
   if (isToolEffectBagUse(item.use)) {
     return 'hudChrome.professions.toolEffectTooltip.openProfessions';
   }
-  if (item.use) return 'itemUi.tooltip.clickUse';
+  // The placeable feast: the hover previews the click the action ladder
+  // raises (placeFeast), in the feast's own words: the click sets the table
+  // out at your feet, it never eats it, so the generic use hint undersold
+  // the action (the P12 QA deferral this key discharges). Sits ABOVE the
+  // generic use hint because the feast is placed and never eaten. The guard
+  // is deliberately the SAME bare `item.feast` the click ladder's placeFeast
+  // arm uses (this module's own item shape carries feast? on every item), so
+  // the hover can never advertise a click the ladder routes elsewhere.
+  if (item.feast) return 'itemUi.tooltip.clickSetOut';
+  // The station-placing tools (Master's Field Forge and kin): the same
+  // deployable pattern as the feast above, with the family's own verb. The
+  // hover previews the click the ladder's useItem arm performs, in the words
+  // the sim's placement line will confirm ("You set up the {name}.").
+  if (isPlaceStationBagUse(item.use)) return 'itemUi.tooltip.clickSetUp';
+  // Patterns are usable but carry no `use` payload (the kind IS the payload),
+  // so the kind joins this arm to reach the shared use hint; without it the
+  // hover stayed silent about a click that learns a recipe.
+  if (item.kind === 'recipe' || item.use) return 'itemUi.tooltip.clickUse';
   return '';
 }
 
@@ -519,11 +579,31 @@ function isToolEffectBagUse(use: unknown): boolean {
   );
 }
 
-/** The quality key into QUALITY_COLOR for an item ('common' when unspecified).
- *  The painter maps this to a color token; centralizing the default here keeps
- *  the fallback out of the painter as a magic string. */
-export function bagQualityKey(item: { quality?: string }): string {
-  return item.quality ?? 'common';
+/** True when the bag use payload places a mobile crafting station (ItemDef
+ *  use.type 'placeMobileStation'): the structural twin of
+ *  isPlaceMobileStationItem in hud/professions/mobile_station_tooltip.ts,
+ *  which this view cannot import as a guard because its item shape carries
+ *  `use` as unknown. */
+function isPlaceStationBagUse(use: unknown): boolean {
+  return (
+    !!use &&
+    typeof use === 'object' &&
+    Object.hasOwn(use, 'type') &&
+    (use as { type: unknown }).type === 'placeMobileStation'
+  );
+}
+
+/** The quality key into QUALITY_COLOR for an item cell ('common' when
+ *  unspecified). Instance-aware since phase 13 (the all-surfaces item-cell
+ *  rule: a mark describes the ITEM): the copy's rolled quality wins over its
+ *  def's through the tooltip's ONE effective-quality rule, so a promoted
+ *  legendary keeps its rim in the bag, bank, and guild bank grids alike. The
+ *  painter maps this to a color token; centralizing the default here keeps the
+ *  fallback out of the painter as a magic string. */
+export function bagQualityKey(item: { quality?: string }, instance?: ItemInstancePayload): string {
+  // tooltipEffectiveQuality reads only `quality`, so the narrow cell shape the
+  // bank rows pass (a def that may be gone resolves to {}) is safe to hand it.
+  return tooltipEffectiveQuality(item as ItemDef, instance) ?? 'common';
 }
 
 /** The three grid states: the whole bag is empty, the filter matched nothing, or

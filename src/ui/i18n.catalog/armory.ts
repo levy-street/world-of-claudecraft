@@ -82,7 +82,7 @@ export const armorySkinStrings = {
   ice_fang_sword: {
     name: 'Ice Fang',
     look: 'Curved blade of pale glacial ice, jagged rime crystals along the spine, a glowing cyan frozen core in the fuller, icicle crossguard.',
-    lore: "The flagship of the frozen grade, and the piece every collector reaches for first. Ice Fang was carved, not forged, from a fang of the glacier that caps Thornpeak above Highwatch, its cyan core burning cold as the light off the Glimmermere. It rimes the very air it cuts. The wall-guard swear one soldier carried it the night the high snows held the Wyrmcult back, and 'bought the wall a winter.'",
+    lore: "The flagship of the frozen grade, and the piece every collector reaches for first. Ice Fang was carved, not forged, from a fang of the glacier that caps Thornpeak above Highwatch, its cyan core burning cold as the light off the Glimmermere. It rimes the very air it cuts. The wall-guard swear one soldier carried it the night the high snows held the Broodsworn back, and 'bought the wall a winter.'",
   },
   glaciersplit_axe: {
     name: 'Glaciersplit',
@@ -110,7 +110,7 @@ export const armorySkinStrings = {
     lore: "A spike of glowing glacier-ice, said to be broken from the deep tarn below the Sanctum, where the mountain's cold has teeth. Hoarfrost blooms endlessly from its silver collar and never melts, not by fire nor by summer. Mages keep it close for the cold it lends their work, and keep it far on the nights it seems to lean toward Nythraxis's crypt, and listen.",
   },
   winterbite: {
-    name: 'Winterbite',
+    name: 'Wintergnaw',
     look: 'Silvered steel and blue-ice bow, a glowing cyan frozen core in the riser, a nocked arrow of solid ice, cold vapor.',
     lore: "A bow of silvered steel and Thornpeak ice, its riser lit by a cold cyan core that freezes the arrow to the string. It nocks a shaft of solid glacier-ice that reforms each draw; the archer carries no quiver on the wall, only the cold. Highwatch held Stalker Ridge through a siege with one like it: a single bowman, they say, and a winter's worth of arrows that were always already there.",
   },

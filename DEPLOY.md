@@ -248,6 +248,93 @@ For off-box safety, sync the directory to S3 occasionally:
   rollback across a cap change needs a restore-from-backup plan for professions
   counters. Details: "Rollback erases newer fields" in
   `docs/design/professions-tuning-packet.md`.
+- **Farming plot deploy order and rollback (mixed fleet)**: `farmPlots` rides
+  `characters.state`, which is written whole, so a server binary that predates the
+  farming growth-engine release autosaves the blob WITHOUT `farmPlots` and erases
+  every planted crop that process touches. Deploy order: the 11b absorb collapsed
+  the growth-engine and seed-faucet releases into ONE (Farmer Jessica vendors
+  seeds and `q_farm_intro` grants one from first boot), so the window is LIVE
+  from the first mixed-fleet minute of that release: roll it out to EVERY realm
+  process in one deploy pass, never staged across days. Rollback: rolling back
+  past the growth-engine release after plants exist destroys all plot state on
+  the next 30 s autosave sweep, AND erases each character's accumulated Farming
+  skill number (the pre-farming binary's four-trade serializer drops the
+  `farming` key from both `gatheringProficiency` and the legacy dual-written
+  `professions` record); the only recovery is restore-from-backup. The hidden
+  per-plot pre-rolls (`survivalRoll`, `yieldSeed`) live in the same blob; the load
+  side clamps them into their value domains and re-derives absent slots
+  deterministically, so RESTORED bytes always resolve to the same outcome and
+  cannot be replayed for rerolls. A writer with direct blob access can still
+  reroll by editing `plantedAtMs`; that is total compromise already and is
+  bounded by the allowlists and clamps, not by the derivation.
+- **Masterwrought daily-gate rollback (a repeatable faucet, not just lost state)**:
+  three more `characters.state` keys ride the same whole-blob write, and rolling
+  back past the masterwrought material phases erases all three on the first
+  autosave. Unlike the two caveats above, whose damage is lost player value, this
+  one REOPENS GRANTS and keeps reopening them: `wyrmfallDaily.sources` is the
+  per-day per-source Wyrmfall Core gate, `craftDaily.crafted` is the once-per-day
+  craft gate, and `emberWeekAnchor` is the Maker's Ember week anchor whose empty
+  value IS the first-grant arm (`tryGrantMakersEmber` in
+  `src/sim/professions/masterwrought_materials.ts` grants an Ember outright when
+  the anchor is `''`, which is also what `createPlayer` defaults it to). So an
+  erased anchor mints a free Maker's Ember on the next qualifying completion, and
+  an erased daily record reopens that day's core and craft gates, once per
+  affected character per rollback pass rather than once overall. Deploy the
+  masterwrought material release to EVERY realm process in one pass for the same
+  reason the farming bullet gives, and treat a rollback across it as an economy
+  event: it needs a restore-from-backup plan, not just a release note.
+- **Perfecting rollback (a pre-Perfecting binary DESTROYS Perfected bonuses through
+  normal play)**: the per-copy `perfecting`/`perfected` markers themselves survive an
+  older binary (its instance load bound is drop-only, not a whitelist), but that
+  binary's `isEnchantedInstance` reads a Perfected copy's bare `rolled.stats` record
+  as a LEGACY ENCHANT (apex defs never bake a masterwork record, so no Perfected
+  copy can carry the `rolled.masterwork` flag that would exempt it from that old
+  read). One ordinary confirmed replace-enchant on such a copy then
+  takes the legacy wipe arm and replaces `rolled.stats` wholesale with the new
+  enchant's bonus: the R5 Perfected bonus is gone, permanently, because the copy
+  still carries `perfected: true` and refuses re-earning it. The same misread also
+  re-opens the pre-fix Lucent Infusion holding-scan hole while Perfected copies now
+  exist. So a rollback across the Perfecting release is NOT merely lossy: leave it
+  running only with apply-enchant replace disabled, or accept that every Perfected
+  unenchanted copy a player confirms a replace onto loses its bonus until
+  restore-from-backup. Deploy the Perfecting release fleet-wide in one pass like the
+  two bullets above.
+- **Content-id additions are a one-way door (the itemsDiscovered/deeds class)**: any
+  release that adds a content id (an item, a deed, a visited-mark namespace) is
+  rollback-destructive and mixed-fleet-unsafe for persisted state that USES the new
+  id, even when the release's code changes look trivially revertible. The mechanism
+  is the load-side id gate: `restoreDeedStats` (src/sim/deeds.ts) drops any
+  `itemsDiscovered` id its own ITEMS table lacks, and the old binary's next autosave
+  writes the reduced set back, permanently; deed counters behave the same way (the
+  `legendariesForged` erasure in the orange-promotion bullet below is this class). A
+  mixed fleet does it without any rollback: a character landing on an old process
+  loses the new-id state on its next autosave. So treat every content-id addition as
+  a fleet-wide-in-one-pass boundary, and a rollback across one as needing
+  restore-from-backup for the state that referenced the new ids.
+- **Orange-promotion rolling window (cosmetic)**: the promotion release RETIRES the
+  sim's "That item is already Perfected." line (its client matcher row was removed
+  with it), so during a realm-by-realm roll an OLD server still emits that line to
+  a NEW client, which renders it untranslated English. Cosmetic only and confined
+  to the mixed window; fleet-wide-in-one-pass (the Perfecting bullet above) also
+  makes it a non-event. The rollback-then-roll-forward direction is likewise
+  self-healing: a pre-phase binary applies the def-only unique-equipped rule, so
+  under it a player can wear two promoted twins of one item id, and the first
+  login after the roll-forward benches one back to the bags via
+  `benchDuplicateUniqueEquipped` (src/sim/items.ts) with its Unequipped notice,
+  payload intact and nothing lost; fleet-wide-in-one-pass avoids that window
+  entirely too. The promotion's own persisted fields are SAFE across an older
+  binary, unlike the Perfecting bonus above: the stamped `name`, its
+  `rolled.quality` of legendary, and the `perfected` marker all survive a
+  pre-promotion binary's load, save, and even a confirmed replace-enchant (the
+  instance load bound is drop-only and the enchant paths clone the payload
+  through). What an older binary DOES erase is the `legendariesForged` deed
+  counter: it reads only the counter keys it knows and its next autosave writes
+  the rest away, so a roll-back-then-forward restarts every promoter's count at 0
+  (the deed itself keeps its earn row; the character reads 50 Renown lighter on
+  the old binary and recovers it on roll-forward). Under `API_DISPATCH=legacy`
+  the clear-item-name remediation endpoint is unavailable (registry-only, no
+  legacy arm; it 404s rather than serving unauthorized), so a rollback that
+  coincides with a name report waits for the roll-forward.
 - **Mail partition backfill rollback**: the Ravenpost mail persistence migration
   (`server/mail_partition_backfill.ts`, #3561) partitions a realm's legacy
   `mail:<realm>` blob into one row per recipient (`mail:<realm>:r:<key>`) inside
@@ -338,12 +425,30 @@ For off-box safety, sync the directory to S3 occasionally:
     enters any dungeon, delve, or arena after the deploy is teleported to
     coordinates its renderer draws as a black, collider-less void, with the
     exit object invisible, until relog (login is protected: a saved
-    inside-instance position ejects to the door). The release left the
-    fail-closed layout gate at ONLINE_WORLD_LAYOUT_VERSION 3 through both
-    changes, so stale bundles are still admitted at reconnect; bumping it
-    is the one-line mechanical answer if the maintainer resolves the
-    surfaced forced-refresh question toward refusing stale sessions.
-  - NEW client on OLD server (the bounded direction): every gather node the
+    inside-instance position ejects to the door). CORRECTED 2026-09-01
+    (qr-19-stale-client-deploy-window), and SCOPED, which the first
+    correction was not: the two sentences that stood here said the
+    fail-closed layout gate was still at ONLINE_WORLD_LAYOUT_VERSION 3 and
+    that stale bundles were therefore still admitted at reconnect, with a
+    bump as the pending answer. Both are false on this branch: the gate
+    reads 26 and the world socket refuses a mismatched first frame
+    outright. READ THE SCOPE, because it changes the player-comms plan
+    rather than only the prose. WHEN A DEPLOY MOVES THE EPOCH, none of the
+    symptoms above is reachable at all: every stale tab is hard
+    disconnected with an incompatible-version error and must reload, so
+    plan for that instead of for cosmetic glitches. ON AN ORDINARY
+    SAME-EPOCH CONTENT DEPLOY, which is what this section's heading is
+    about, old clients DO stay in world and every skew above is live
+    exactly as described.
+  - NEW client on OLD server (the bounded direction). SAME SCOPING as the
+    bullet above, added 2026-09-01 (qr-19-stale-client-deploy-window) because
+    the correction there left this one reading as though it were unaffected:
+    the epoch gate closes this direction SYMMETRICALLY. A server still on the
+    older layout refuses a new client's `auth-world-26` first frame the same
+    way, so when a deploy moves the epoch none of the skew below is reachable,
+    including the rate-limit tokens the mount and unstuck paths would spend.
+    On a same-epoch content deploy it is all live as written: every gather node
+    the
     release relocated is unusable, because the client shows it where the old
     server does not have it. Among the zones the deployed server HAS, the
     worst cases are Eastbrook tier-1 herbalism and Mirefen's tier-2 band,
@@ -377,77 +482,140 @@ For off-box safety, sync the directory to S3 occasionally:
     masterwork and deed card kinds (and the expansion's vale_cup kind), so
     restart the bot with the server or those cards post as empty embeds
     Discord rejects until it picks up the new build.)
-  Release-specific caveat for the professions tuning deploy: the guards above
-  describe bundles built from this release onward. The bundle DEPLOYED TODAY
-  predates them, and its trade window throws while rendering an offer that
-  stages ANY item id the bundle predates (the packet's fine-grade materials
-  and rods, and equally the expansion's whole tradeable catalog: rift
-  essence and gems, the new-zone gear, none of it soulbound), freezing that
-  trade panel for the stale session until the page reloads. The sibling
-  loot-window throw is unreachable through the PACKET's ids as long as
-  they remain gathering, recipe, vendor, and delve-shop
-  content only, out of every mob and chest loot table, so keep them out
-  until clients have rolled; it is NOT unreachable for the merged release as
-  a whole, because the v0.32.0 expansion put four mount reins into the
-  heroic loot of five encounters the deployed bundle already knows (the
-  Morthen, Vael, Ysolei, and Korzul heroic finales plus the Nythraxis raid),
-  so a solo or free-for-all heroic clear that drops one freezes a stale
-  session's corpse loot window the same way, and the v0.34.0 sync widened
-  the same arm: the release's Heroic Wildheart Basin loot pass (Zulgar) put
-  six more epic ids into heroic boss loot that a stale bundle
-  does not know. The reins odds are the mount drop rates (0.5 and 0.1
-  percent) while the Wildheart ids drop at ordinary heroic rates, the party
-  need/greed path is already guarded at the base, and the frozen id set
-  (reins exceptions plus the Wildheart additions) is pinned by the
-  deploy-window test's snapshot. The v0.36.0 class-overhauls integration
-  admits one more id on the same recorded arm (owner decision 2026-08-08):
-  heroic_duskwhisper, the generated heroic variant of the rogue re-band's
-  Duskwhisper dagger on the Fanglord Beastmaster's heroic table, at an
-  ordinary heroic drop rate; a stale bundle renders it through the
-  unknown-item fallback exactly like the Wildheart six. The v0.41.0 Crucible
-  raid widens the same arm with its Ignivar and Varkhul Heroic-only sigils,
-  shields, and weapons. This content is reachable in production: a raid group
-  can enter through the live Forge-Lift and select Heroic, so a stale client
-  can receive one of those ids. The 2026-08-31 Emberward correction moved
-  varkhul_emberward from Varkhul's Normal table into the Heroic shield group
-  at the same 3 percent rate. That narrows its exposure but does not make the
-  stale-client path unreachable; the frozen snapshot deliberately admits the
-  move alongside the other Crucible append ids. Rift-run loot is a second
-  release-content arm on the same window (the run builders push the rift
-  catalog onto boss corpse lists at runtime, outside every content-table
-  sweep); it requires a stale tab to get inside a rift at all, and whether
-  the old bundle's generic object interaction reaches a rift portal has not
-  been verified
-  either way. Both arms are inputs to the surfaced
-  forced-refresh-at-deploy question. Two more
-  deployed-bundle arms need no loot table at all, because the
-  fine grades are minted by HARVESTING with an outclassing tool: a stale tab
-  that gathers one sees it land in an INVISIBLE bag cell (and bank cell after
-  a deposit) that still consumes capacity, and the profession chat line names
-  the raw id. Cosmetic and self-healing on reload, but they will read as
-  "my ore vanished" in reports, so expect them for as long as stale tabs
-  live. Stale sessions are ended by the pre-deploy restart countdown, but a
-  reconnect rides the same stale page: only a page reload picks up the new
-  bundle.
-  The caveats above were measured against 9d7a1a021, the commit deployed
-  today; the branch has since merged the true v0.32.0 tip (0b427afca, 685
-  commits past the measured base), re-synced repeatedly through
+  Release-specific caveat for the professions tuning deploy, REWRITTEN
+  2026-09-01 under ruling qr-19-stale-client-deploy-window and CORRECTED at its
+  review round. SCOPE FIRST, because the rewrite dropped this and two sentences
+  below then read as contradicting each other: the guards described in the
+  bullets above are in bundles built from this release onward. The bundle that
+  was DEPLOYED when this window was measured (9d7a1a021) predates them and
+  THROWS rather than degrading, which is what the rest of this paragraph is
+  about.
+  What this paragraph used to prescribe was a LOOT-TABLE EXCLUSION: keep new ids
+  out of mob and chest tables until clients have rolled, because a stale bundle
+  handed an id it cannot resolve freezes the panel rendering it. That window is
+  CLOSED, and by a different mechanism than the exclusion:
+  ONLINE_WORLD_LAYOUT_VERSION now reads 26 (src/world_api.ts), and the world
+  socket is FAIL-CLOSED on it. A client whose first frame does not carry
+  `auth-world-26` is refused at the handshake before any world work runs
+  (server/ws_auth.ts): a real stale bundle sends `auth-world-<older>` and is
+  refused with `incompatibleWorldLayout`, while a frame with no recognisable
+  type at all is refused with `authRequired`. Either way it never receives a
+  snapshot, an event, a loot list or a trade offer, so it cannot be handed an
+  unknown id. STATE THE RULE PRECISELY, because it is a property of the
+  surfaces and not of the process: every id-rendering surface in that bundle
+  lives behind the world socket. REST is not epoch-gated, and `/api/characters`
+  really does return item ids to a stale bundle; they are safe only because the
+  character-preview path that consumes them resolves every lookup with optional
+  chaining. A future non-game surface that renders an id from REST would fall
+  outside this rule.
+  The epoch bump arrived for wire-shape reasons, not for this, so the closure is
+  by circumstance rather than by design.
+  VERIFIED rather than asserted, against 9d7a1a021. All 22 `ITEMS[` sites in its
+  `src/ui/hud.ts` are null-safe, and one reachable throw survives there: the
+  trade panel's `itemIcon(item)`, whose `itemIcon(item: ItemDef)` dereferences
+  `item.quality` and `item.id` with no guard. THE FIRST DRAFT OF THIS PARAGRAPH
+  SAID "exactly ONE", scoping the measurement to hud.ts and then generalising it
+  to the bundle; that is corrected here. THE ENUMERATION BELOW IS SCOPED TO
+  WS-FED SURFACES, and says so, because the same generalisation is easy to make
+  twice: three more WS-fed siblings carry the same unguarded shape, and one of
+  them is the very throw the old caveat named:
+  `src/ui/hud/loot/loot_window_controller.ts` passes an unresolved item to
+  `itemIcon` and `itemDisplayName` on its row build and to `itemTooltip` on
+  hover, and `src/ui/disenchant_yield_view.ts` passes one to `itemDisplayName`.
+  All three are WS-fed, so all three are behind the handshake and the retirement
+  stands; the count was wrong, not the conclusion. The identical shape also
+  exists in the quest log, the quest dialog and the bag reagent menu at that
+  commit, and those are deliberately NOT in the count: every one of them takes
+  its id from client-local content (the quest tables, a quest reward record, a
+  recipe's reagents), never from the server, so no unknown id can reach them by
+  any vector and they were never part of this window.
+  `src/ui/market_view.ts` drops unknown listings and `src/ui/mailbox_window.ts`
+  skips them, so those two degrade on their own. So does the vendor path: the
+  junk preview filters through `junkSellableSlot`, whose first term is a
+  definition check, and vendor stock rows come from local content.
+  "Degrades" is not uniform, and the difference matters when reading a report:
+  several of those sites degrade to NOTHING RENDERED rather than to a raw id (a
+  set-piece count reads low, a gear stat source is omitted, the junk sweep skips
+  the stack, pet food is not seen), which is the same silent-omission family as
+  the invisible bag cell below.
+  WHAT STILL HOLDS at a deploy, and needs no loot rule: a tab that harvests a
+  fine grade with an outclassing tool sees it land in an INVISIBLE bag cell (and
+  bank cell after a deposit) that still consumes capacity, and the profession
+  chat line names the raw id. Cosmetic and self-healing on reload, but it reads
+  as "my ore vanished" in reports. NOTE THE COMBINATION THIS NEEDS, because the
+  measured bundle cannot produce it alone: `src/sim/professions/material_grades.ts`
+  does not exist at 9d7a1a021 and no fine-grade id appears in its `src/`, so
+  that bundle mints no fine grade offline and, with the gate, gathers none
+  online. The arm is a NEWER bundle writing an offline save that an older cached
+  bundle then loads.
+  Stale sessions are ended by the pre-deploy restart countdown, but a reconnect
+  rides the same stale page: only a page reload picks up the new bundle.
+  The measurements above were taken against 9d7a1a021, the commit deployed when
+  the window was open; the branch has since merged the true v0.32.0 tip
+  (0b427afca, 685 commits past the measured base), re-synced repeatedly through
   release/v0.33.0 (last at 2ae71a7fbf), and then merged release/v0.34.0
-  (94f5ac63d8, at merge 706bec2d21), which together are what the
-  merged-branch numbers above describe. If the live server moves before
-  this branch deploys, re-run the compatibility diff against the commit
-  actually deployed before trusting any "N new X" claim.
-  The loot-table exclusion is enforced by
-  `tests/stale_client_rollout.test.ts` for the deploy window (delete that
-  pin once clients have rolled). Per-surface analysis for the professions
-  tuning release: the stale-client compatibility phase of
+  (94f5ac63d8, at merge 706bec2d21). If the live server moves before this branch
+  deploys, re-run the compatibility diff against the commit actually deployed
+  before trusting any "N new X" claim.
+  There is no longer a guard file behind this paragraph.
+  `tests/stale_client_rollout.test.ts` and its snapshot froze the
+  HEROIC_BOSS_LOOT id set for the deploy window and were RETIRED in the same
+  change as this rewrite: a guard whose premise is closed is a guard that fails
+  for the wrong reason later. One thing goes with it and is recorded so nobody
+  looks for it: that frozen set was also the only change-detector on the heroic
+  boss loot table, and no surviving suite pins that id SET. Per-surface analysis
+  of the window as it stood: the stale-client compatibility phase of
   `docs/design/professions-tuning-packet-review.md`.
 - **Bank ledger audit**: `node scripts/bank_audit.mjs` (reads `DATABASE_URL` from the
   environment) replays the append-only `bank_ledger` against live character bank state
   and exits non-zero on any discrepancy. Run it after an economy incident or a restore.
 - **Username bans**: set `USERNAME_BANLIST_FILE=/opt/eastbrook/username-banlist.txt`
   to load blocked username terms from a private newline- or comma-separated
-  file. `USERNAME_BANLIST` can also provide a comma-separated inline list.
+  file. `USERNAME_BANLIST` can also provide a comma-separated inline list. The same
+  screen prices every player-chosen legendary item name (the Masterwrought orange
+  promotion), a surface wider than a character name (up to 32 characters with
+  spaces, apostrophes, and hyphens), so seed the file with the slur and hate-group
+  residual the built-in word list does not carry before that feature is live. An
+  edited file takes effect without a restart, at the next name screen at least one
+  second after the edit (nothing polls between screens; the cache is keyed on the
+  file's mtime and size, checked at most once per `USERNAME_BANLIST_STAT_HOLD_MS`,
+  so a permissions-only repair, a bare `chmod`, needs a `touch` too); a missing,
+  unreadable, or over-64-KiB file (about nine thousand terms; a name screen's cost does
+  not grow with the list, only the once-per-edit parse does) warns once and keeps
+  serving the last list it read successfully (fail-open by decision: it never blocks a
+  signup), and the boot log
+  prints one `name banlist:` line saying whether the configured file loaded (the
+  `woc_username_banlist_file_loaded` gauge is its scrape-visible twin, as of the last
+  name screen). Keep the file on LOCAL disk: the server stats it once a second at most
+  and reads it on change, synchronously on the loop that runs the realm, so a hung
+  network mount stalls a name screen for the mount's timeout.
+- **Clearing a stamped legendary name** (`POST
+  /admin/api/moderation/characters/:id/clear-item-name`, permission
+  `moderation.clearItemName`, SUPERADMIN only, API-only: the dashboard has no
+  button for it): the remediation for a reported player-chosen name on a promoted
+  copy. The body names EXACTLY one target plus a required `reason`: `{"slot":
+  "neck"}` for a worn copy, `{"bag": <inventory array index>, "itemId": "<id>"}`
+  for one carried cell, or `{"all": true}` for every named copy the character
+  holds (carried bags, bank, the buyback ring, and both equipment maps). Prefer
+  `all: true` unless the index was read from the blob itself: `bag` is the
+  persisted array index, not the cell the client displays, it reaches the carried
+  bags only, and with two same-id named copies a screenshot's index can strip the
+  other one. The flow is KICK, THEN CLEAR: the endpoint refuses while the
+  character is online on this realm (disconnect them with the in-game `/kick`
+  command or a dashboard suspension first). The offline load, strip, and save
+  run in one locked transaction, so simultaneous removals preserve each other.
+  The lease fence refuses a live session; expired nonces are invalidated under
+  the lock so a stale heartbeat cannot restore the removed name. A racing login
+  either wins first and the endpoint asks for a retry, or waits and loads the
+  corrected state. A player contesting the strip by reconnect-spamming is
+  answered by suspending the account first. The audit row (`clear_item_name`, a
+  sanction badge in the moderation history) lands before the write, so a refused
+  request still records what was asked. The strip removes ONLY the name: the
+  promotion, its stats, signer, and bind stand, and the copy is a permanently
+  nameless legendary (the game offers no re-name). What the strip CANNOT reach:
+  the Discord activity card the promotion published is durable in the community
+  channel and has no in-repo takedown, so a name report also owes a manual Discord
+  message removal.
 - **Chat filter**: the word lists are now **managed live from the admin
   dashboard** (Chat Filter tab), stored in the database and seeded with sensible
   defaults on first boot. Two tiers: *soft* words are masked client-side with
@@ -709,6 +877,16 @@ For off-box safety, sync the directory to S3 occasionally:
   `delete_busy` 503s; `in_flight` stuck at the cap with no delete traffic is a
   leaked sub slot. Client-gone abandonments (a player closing the tab
   mid-wait) count in neither series.
+  `woc_offline_fence_refusals_total` (labeled by writer family over
+  `rename_sweep`, `reclaim_sweep`, `pbe_roster`) is the one to watch after an
+  operator action that writes a character while it is OFFLINE. The lease fence
+  means the write is REFUSED rather than applied when the character has come
+  back online, and a refusal is silent to the operator: the durable effect
+  simply did not land, with nothing in the tree to re-trigger it. A rename
+  sweep is the worst of the three, because the rename itself commits first, so
+  a refusal leaves the character renamed with every crafted copy still signed
+  with the old name. Any sustained `increase()` here means operator work is
+  being dropped; the remedy is to disconnect the character and retry.
 - **Discord bot series (Grafana)**: the bot reports its rate-limit governor
   counters on the presence push it already sends, so `/metrics` carries them with
   no extra scrape target and no bot-side endpoint. Cumulative counters

@@ -7,6 +7,7 @@ import {
 } from '../src/ui/hud/action_bar/action_bar_layout_sync';
 import { attackSlotStorageKey } from '../src/ui/hud/action_bar/hotbar';
 import {
+  ACTION_BAR_LAYOUT_FORMS,
   ACTION_BAR_LAYOUT_MAX_ID_LEN,
   ACTION_BAR_LAYOUT_MAX_SLOTS,
   type ActionBarLayout,
@@ -71,6 +72,22 @@ describe('sanitizeActionBarLayout (untrusted payload bounds)', () => {
     });
     expect(clean).not.toBeNull();
     expect(Object.keys(clean?.forms ?? {})).toEqual(['normal']);
+  });
+
+  it('drops the retired Vale Cup sport form like any other unknown key', () => {
+    // The release retired the Vale Cup, so a sport bar can no longer be
+    // arranged or shown and the token was left in the form list as residue.
+    // Both halves are pinned: the token is GONE from the live list, and a
+    // layout persisted before the retirement still DEGRADES the ignore-unknown
+    // way rather than rejecting the whole payload, which would cost a player
+    // their real bars over a dead form.
+    const clean = sanitizeActionBarLayout({
+      v: 1,
+      forms: { normal: { bar: [] }, sport: { bar: [] } },
+    });
+    expect(clean).not.toBeNull();
+    expect(Object.keys(clean?.forms ?? {})).toEqual(['normal']);
+    expect(ACTION_BAR_LAYOUT_FORMS).toEqual(['normal', 'bear', 'cat', 'cat_stealth', 'stealth']);
   });
 
   it('rejects a payload with an abusive number of form keys', () => {

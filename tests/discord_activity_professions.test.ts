@@ -1,12 +1,15 @@
-// Discord activity feed, professions moments (phase 15): the pure deed
-// feed-worthiness gate (discordFeedDeed) and the two new detectActivity arms,
-// masterwork procs and feed-worthy deed unlocks (titles + the first koi). The
+// Discord activity feed, professions moments (phase 15, extended by N10): the
+// pure deed feed-worthiness gate (discordFeedDeed) and the detectActivity
+// professions arms: masterwork procs, legendary forgings, golden harvests,
+// and feed-worthy deed unlocks (titles + the first koi). The
 // server rig mirrors tests/vale_cup_online.test.ts (GameServer over a mocked
 // db) and drives detectActivity with synthetic events, the
 // tests/game_sessions.test.ts precedent. Each test joins a DISTINCT account:
 // the queue's dedupe keys are account-scoped and its recent-key map is
 // module-global wall-clock state, so a shared account would collapse cards
 // across tests.
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../server/db', () => ({
@@ -34,11 +37,13 @@ vi.mock('../server/db', () => ({
   releaseAllCharacterLeases: vi.fn(async () => {}),
 }));
 
-import { FIRST_KOI_DEED_ID as BOT_FIRST_KOI_DEED_ID } from '../bot/logic';
+import { FIRST_KOI_DEED_ID as BOT_FIRST_KOI_DEED_ID, HARVESTMASTER_DEED_ID } from '../bot/logic';
+import { dailyRewardService } from '../server/daily_rewards';
 import * as db from '../server/db';
 import { discordFeedDeed, FIRST_KOI_DEED_ID } from '../server/deeds_records';
 import { claimDedupeKey, drainActivity, releaseDedupeKey } from '../server/discord_activity';
 import { type ClientSession, GameServer } from '../server/game';
+import { DEEDS } from '../src/sim/content/deeds';
 import type { PlayerClass } from '../src/sim/types';
 
 interface FakeClient {
@@ -137,6 +142,25 @@ describe('discordFeedDeed: the feed-worthiness gate', () => {
     // degrades the first koi to a generic deed card (the ActivityKind class
     // of bug, caught at the constant instead of in production).
     expect(BOT_FIRST_KOI_DEED_ID).toBe(FIRST_KOI_DEED_ID);
+  });
+
+  it('maps the Harvestmaster deed to its name and title (the bespoke card premise)', () => {
+    // Cheap insurance that the title arm keeps feeding the bot's bespoke
+    // Harvestmaster render (bot/logic.ts): a reward retune that stops this
+    // deed feeding degrades the capstone card to nothing, silently.
+    expect(discordFeedDeed(HARVESTMASTER_DEED_ID)).toEqual({
+      deedName: 'Harvestmaster',
+      deedTitle: 'Harvestmaster',
+    });
+  });
+
+  it('names the SAME Harvestmaster deed on both sides of the process boundary', () => {
+    // The bot special-cases the farming-capstone card by this id; unlike the
+    // koi there is no server-side constant to compare (the deed arm re-skins
+    // the one 'deed' payload), so the DEEDS catalog is the other side of this
+    // boundary: the id must exist and still reward the Harvestmaster title.
+    expect(HARVESTMASTER_DEED_ID).toBe('prog_farming_100');
+    expect(DEEDS[HARVESTMASTER_DEED_ID]?.reward).toEqual({ kind: 'title', text: 'Harvestmaster' });
   });
 });
 
@@ -288,6 +312,334 @@ describe('detectActivity: professions arms (GameServer)', () => {
     ]);
     await flushAsync();
     expect(drainActivity()).toHaveLength(0);
+  });
+
+  it('legendaryForged enqueues one legendary card carrying the PLAYER-CHOSEN name', async () => {
+    // Masterwrought phase 13, the masterwork arm's parity sibling
+    // (server/craft_activity.ts): personal event only, opt-out gated, and the
+    // card's itemName is the player-authored legendary name as data.
+    const session = joinServer(server, fakeWs(), 121, 'Forgemaster');
+    (server as any).detectActivity([
+      {
+        type: 'legendaryForged',
+        itemId: 'eastbrook_arming_sword',
+        name: "Vel'tara's Oath",
+        owner: session.pid,
+        pid: session.pid,
+      },
+    ]);
+    // Same consent discipline as masterwork: nothing enqueues synchronously.
+    expect(drainActivity()).toHaveLength(0);
+    await flushAsync();
+    const cards = drainActivity();
+    expect(cards).toHaveLength(1);
+    expect(cards[0]).toMatchObject({
+      kind: 'legendary',
+      accountIds: [121],
+      names: ['Forgemaster'],
+      itemName: "Vel'tara's Oath",
+    });
+  });
+
+  it('the legendary dedupe window is kind-scoped: a masterwork does not eat the promotion card', async () => {
+    // The two arms share the account-scoped dedupe SHAPE but not the key
+    // (`masterwork:<id>` vs `legendary:<id>`), so a proc and a promotion in
+    // one TTL window each card once, while a same-account legendary burst
+    // still collapses to one.
+    const session = joinServer(server, fakeWs(), 122, 'Twice');
+    const legendary = (name: string) => ({
+      type: 'legendaryForged',
+      itemId: 'eastbrook_arming_sword',
+      name,
+      owner: session.pid,
+      pid: session.pid,
+    });
+    (server as any).detectActivity([
+      {
+        type: 'masterwork',
+        recipeId: 'recipe_eastbrook_arming_sword',
+        itemId: 'eastbrook_arming_sword',
+        crafter: session.pid,
+        pid: session.pid,
+      },
+    ]);
+    (server as any).detectActivity([legendary('Dawnbreaker')]);
+    (server as any).detectActivity([legendary('Duskbreaker')]);
+    await flushAsync();
+    const kinds = drainActivity()
+      .map((c) => c.kind)
+      .sort();
+    expect(kinds).toEqual(['legendary', 'masterwork']);
+    // The DB read the synchronous claim exists to bound: one opt-out read per
+    // kind per window, so the same-account legendary burst cost NO third read
+    // (the masterwork sibling's pin, carried onto the legendary arm).
+    expect(optOutReads()).toBe(2);
+  });
+
+  it('a legendaryForged with no session (a bot owner) enqueues nothing', async () => {
+    (server as any).detectActivity([
+      {
+        type: 'legendaryForged',
+        itemId: 'eastbrook_arming_sword',
+        name: 'Ghostwork',
+        owner: 424242,
+        pid: 424242,
+      },
+    ]);
+    await flushAsync();
+    expect(drainActivity()).toHaveLength(0);
+  });
+
+  it('a legendaryForgedZone bystander copy never enqueues a card', async () => {
+    // The masterworkZone rule: only the personal event may card, or every
+    // bystander would card under their own account.
+    const session = joinServer(server, fakeWs(), 123, 'Onlooker');
+    (server as any).detectActivity([
+      {
+        type: 'legendaryForgedZone',
+        ownerPid: 424242,
+        ownerName: 'SomeoneElse',
+        itemId: 'eastbrook_arming_sword',
+        itemName: 'Dawnbreaker',
+        zoneId: 'eastbrook_vale',
+        pid: session.pid,
+      },
+    ]);
+    await flushAsync();
+    expect(drainActivity()).toHaveLength(0);
+  });
+
+  it('a golden harvest finder copy enqueues one card behind the opt-out read', async () => {
+    // N10: the crop flavor of the gather rare event cards through the same
+    // consent contract as masterwork (server/craft_activity.ts, widened by
+    // one kind); the card's itemName is the crop's item name from ITEMS.
+    const session = joinServer(server, fakeWs(), 131, 'Reaper');
+    (server as any).detectActivity([
+      {
+        type: 'gatherRareEvent',
+        pid: session.pid,
+        flavor: 'golden_harvest',
+        finderName: session.name,
+        finderPid: session.pid,
+        zoneId: 'evergarden',
+        nodeType: 'crop',
+        itemId: 'vale_wheat',
+      },
+    ]);
+    // Golden harvests repeat (1 in 90 harvests), so like masterwork the card
+    // waits on the async consent read; nothing may enqueue synchronously.
+    expect(drainActivity()).toHaveLength(0);
+    await flushAsync();
+    const cards = drainActivity();
+    expect(cards).toHaveLength(1);
+    expect(cards[0]).toMatchObject({
+      kind: 'golden_harvest',
+      accountIds: [131],
+      names: ['Reaper'],
+      itemName: 'Vale Wheat',
+    });
+  });
+
+  it('a zone bystander copy never enqueues a golden-harvest card and never reads', async () => {
+    // announceGatherRareEvent fans one pid-scoped copy per player in the
+    // zone; only the FINDER's own copy may card (the masterworkZone rule),
+    // and a bystander copy must not even touch the opt-out read.
+    const finder = joinServer(server, fakeWs(), 132, 'Grower');
+    const bystander = joinServer(server, fakeWs(), 133, 'Watcher');
+    (db.pool.query as ReturnType<typeof vi.fn>).mockClear();
+    (server as any).detectActivity([
+      {
+        type: 'gatherRareEvent',
+        pid: bystander.pid,
+        flavor: 'golden_harvest',
+        finderName: finder.name,
+        finderPid: finder.pid,
+        zoneId: 'evergarden',
+        nodeType: 'crop',
+        itemId: 'vale_wheat',
+      },
+    ]);
+    await flushAsync();
+    expect(drainActivity()).toHaveLength(0);
+    expect(optOutReads()).toBe(0);
+  });
+
+  it('a non-crop rare event never cards (the two-card ruling)', async () => {
+    // pristine_vein / ancient_heartwood / moonlit_bloom deliberately never
+    // reach the feed: the flavor guard, not the event type, is the gate.
+    const session = joinServer(server, fakeWs(), 134, 'Miner');
+    (db.pool.query as ReturnType<typeof vi.fn>).mockClear();
+    (server as any).detectActivity([
+      {
+        type: 'gatherRareEvent',
+        pid: session.pid,
+        flavor: 'pristine_vein',
+        finderName: session.name,
+        finderPid: session.pid,
+        zoneId: 'eastbrook_vale',
+        nodeType: 'ore',
+        itemId: 'copper_ore',
+      },
+    ]);
+    await flushAsync();
+    expect(drainActivity()).toHaveLength(0);
+    expect(optOutReads()).toBe(0);
+  });
+
+  it('a same-account golden burst collapses to one card and ONE read', async () => {
+    // The account-scoped golden_harvest:<id> key is claimed synchronously
+    // BEFORE the opt-out read (the masterwork fix-round P1 contract).
+    const session = joinServer(server, fakeWs(), 135, 'Bumper');
+    const ev = (itemId: string) => ({
+      type: 'gatherRareEvent',
+      pid: session.pid,
+      flavor: 'golden_harvest',
+      finderName: session.name,
+      finderPid: session.pid,
+      zoneId: 'evergarden',
+      nodeType: 'crop',
+      itemId,
+    });
+    (db.pool.query as ReturnType<typeof vi.fn>).mockClear();
+    (server as any).detectActivity([ev('vale_wheat'), ev('vale_wheat')]);
+    await flushAsync();
+    expect(drainActivity()).toHaveLength(1);
+    expect(optOutReads()).toBe(1);
+  });
+
+  it('the deed-broadcasts opt-out suppresses the golden-harvest card', async () => {
+    const session = joinServer(server, fakeWs(), 136, 'Hermit');
+    (db.pool.query as ReturnType<typeof vi.fn>).mockImplementation(async (sql: string) =>
+      typeof sql === 'string' && sql.includes('deed_broadcasts')
+        ? { rows: [{ deed_broadcasts: false }] }
+        : { rows: [] },
+    );
+    (server as any).detectActivity([
+      {
+        type: 'gatherRareEvent',
+        pid: session.pid,
+        flavor: 'golden_harvest',
+        finderName: session.name,
+        finderPid: session.pid,
+        zoneId: 'evergarden',
+        nodeType: 'crop',
+        itemId: 'vale_wheat',
+      },
+    ]);
+    await flushAsync();
+    expect(drainActivity()).toHaveLength(0);
+  });
+
+  it('a golden harvest with no session (a bot finder) enqueues nothing', async () => {
+    (server as any).detectActivity([
+      {
+        type: 'gatherRareEvent',
+        pid: 424242,
+        flavor: 'golden_harvest',
+        finderName: 'Botfarmer',
+        finderPid: 424242,
+        zoneId: 'evergarden',
+        nodeType: 'crop',
+        itemId: 'vale_wheat',
+      },
+    ]);
+    await flushAsync();
+    expect(drainActivity()).toHaveLength(0);
+  });
+
+  it('duelEnd resolves BOTH sessions by name and cards them together', async () => {
+    // The moved duel arm is the only one that rides deps.sessionByName (twice:
+    // winner and loser); driving it through the real detectActivity pins the
+    // game.ts deps-field wiring, not just the extracted module.
+    const winner = joinServer(server, fakeWs(), 141, 'Duelara');
+    const loser = joinServer(server, fakeWs(), 142, 'Duelbert');
+    (server as any).detectActivity([
+      { type: 'duelEnd', winnerName: winner.name, loserName: loser.name },
+    ]);
+    await flushAsync();
+    const cards = drainActivity();
+    expect(cards).toHaveLength(1);
+    expect(cards[0]).toMatchObject({
+      kind: 'duel',
+      accountIds: [141, 142],
+      names: ['Duelara', 'Duelbert'],
+      winnerName: 'Duelara',
+      loserName: 'Duelbert',
+    });
+  });
+
+  it('a won arenaEnd cards the rating delta AND pays the daily-reward observer', async () => {
+    // The arena arm carries the one deps.sendDailyRewardPointsGained wire; the
+    // service call is spied (its own suite owns the scoring), so the observer
+    // effect is the points frame the real sender pushes onto the session ws.
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 143, 'Gladiatra');
+    const arenaSpy = vi.spyOn(dailyRewardService, 'recordArenaResult').mockResolvedValue(7);
+    try {
+      (server as any).detectActivity([
+        {
+          type: 'arenaEnd',
+          format: '2v2',
+          won: true,
+          draw: false,
+          oppName: 'Rivals',
+          ratingBefore: 1500,
+          ratingAfter: 1516,
+          pid: session.pid,
+        },
+      ]);
+      await flushAsync();
+      const cards = drainActivity();
+      expect(cards).toHaveLength(1);
+      expect(cards[0]).toMatchObject({
+        kind: 'arena',
+        accountIds: [143],
+        names: ['Gladiatra'],
+        ratingDelta: 16,
+      });
+      expect(arenaSpy).toHaveBeenCalledWith(143, {
+        won: true,
+        format: '2v2',
+        ratingBefore: 1500,
+        ratingAfter: 1516,
+      });
+      const pointsFrames = fc.sent.filter(
+        (frame) =>
+          (frame as { t?: string; list?: { text?: string }[] }).t === 'events' &&
+          (frame as { list?: { text?: string }[] }).list?.some((e) =>
+            e.text?.includes('daily rewards points gained'),
+          ),
+      );
+      expect(pointsFrames).toHaveLength(1);
+    } finally {
+      arenaSpy.mockRestore();
+    }
+  });
+
+  it('a LOST arenaEnd runs the daily-reward observer but never cards', async () => {
+    // The !ev.won early return sits between the observer and the enqueue; a
+    // dropped return would card every loss.
+    const session = joinServer(server, fakeWs(), 144, 'Runnerup');
+    const arenaSpy = vi.spyOn(dailyRewardService, 'recordArenaResult').mockResolvedValue(0);
+    try {
+      (server as any).detectActivity([
+        {
+          type: 'arenaEnd',
+          format: '2v2',
+          won: false,
+          draw: false,
+          oppName: 'Winners',
+          ratingBefore: 1500,
+          ratingAfter: 1484,
+          pid: session.pid,
+        },
+      ]);
+      await flushAsync();
+      expect(drainActivity()).toHaveLength(0);
+      expect(arenaSpy).toHaveBeenCalledTimes(1);
+    } finally {
+      arenaSpy.mockRestore();
+    }
   });
 
   it('a title-deed unlock enqueues a deed card behind the opt-out read', async () => {
@@ -488,5 +840,38 @@ describe('dedupe key semantics (the pure claim/release layer, R60)', () => {
     // And a population UNDER the cap never evicts: key 200 was claimed after
     // the flood start yet inside the TTL, so it still dedupes.
     expect(claimDedupeKey('r60:ov:200', base + 4300)).toBe(false);
+  });
+});
+
+// The Discord card's safety chain starts at the SIM emit: the bot-side filter
+// (bot/logic.ts sanitizeLegendaryItemName) is defense in depth, and the first
+// link is that both promotion celebration events carry the NORMALIZED name
+// (src/sim/professions/legendary_name.ts), never the raw wire string. The
+// emit lives in src/sim, outside this lane's editable files, so this is a
+// deliberate source-level pin on the two emit sites; if promotePerfectedCopy
+// is refactored, re-point the pin at the new emit sites rather than deleting it.
+describe('the promotion emits pass the normalized name (source pin)', () => {
+  it('legendaryForged and legendaryForgedZone both carry the normalized local', () => {
+    // CODE only: block and line comments stripped first, so a commented-out
+    // normalization gate cannot keep this pin green (the phase 13 QA
+    // test-coverage audit; the source-text-pin trap).
+    const source = readFileSync(
+      join(__dirname, '..', 'src', 'sim', 'professions', 'perfecting.ts'),
+      'utf8',
+    )
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|[^:])\/\/.*$/gm, '$1');
+    // The normalization gate exists and refuses a null shape before any emit.
+    expect(source).toContain('const normalized = normalizeLegendaryName(name);');
+    expect(source).toContain('if (normalized === null) {');
+    // The personal event's name field is the normalized value...
+    expect(source).toMatch(/emit\(\{\s*type: 'legendaryForged',\s*itemId,\s*name: normalized,/);
+    // ...and the zone fan-out's itemName is too.
+    expect(source).toMatch(/itemName: normalized,/);
+    // No emit in the module carries the RAW name field. The negative pin
+    // carries its own positive control so it can never pass vacuously.
+    const rawShape = /name: name,|itemName: name,/;
+    expect("ctx.emit({ type: 'legendaryForged', itemId, name: name, owner })").toMatch(rawShape);
+    expect(source).not.toMatch(rawShape);
   });
 });

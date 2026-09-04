@@ -41,6 +41,7 @@ import { bankBonusSectionHtml } from './bank_bonus_view';
 import { showBuyConfirmPrompt } from './bank_buy_prompt';
 import { type BankScrollOffsets, planBankScrollRestore } from './bank_chrome_layout_core';
 import { filterBankSlots } from './bank_filter';
+import { bankSlotDisplayName } from './bank_item_name_core';
 import { bankMeterAriaLabel, bankMeterTooltipHtml } from './bank_meter_view';
 import { showQuantityPrompt } from './bank_quantity_prompt';
 import { BankRungPurchase } from './bank_rung_purchase_core';
@@ -104,6 +105,7 @@ import { svgIcon } from './ui_icons';
 import { unknownItemIconHtml } from './unknown_item_icon';
 import { hasVaultDepositable, vaultSpecialContentKey } from './vault_view';
 import { VAULT_PANEL_ID, VAULT_TAB_ID, VaultTab } from './vault_window';
+import { wornItemCellParts } from './worn_item_cell_view';
 
 // The unranked quality fallback as a CSS custom property. The shared QUALITY_COLOR
 // map carries the real per-quality hex; this token covers an item with no quality
@@ -370,7 +372,7 @@ export class BankWindow {
     this.guildPane = new GuildBankTab({
       root: () => this.deps.root(),
       world: () => this.deps.world(),
-      itemIcon: (item) => this.deps.itemIcon(item),
+      itemIcon: (item, quality) => this.deps.itemIcon(item, quality),
       moneyHtml: (copper) => this.deps.moneyHtml(copper),
       itemTooltip: (item, instance) => this.deps.itemTooltip(item, instance),
       attachTooltip: (el, html) => this.deps.attachTooltip(el, html),
@@ -1042,7 +1044,10 @@ export class BankWindow {
       slots,
       (id) => knownItemDef(ITEMS, id),
       this.filter,
-      (id) => this.itemNameOf(id),
+      // Search and the name-sort both read the name the CELL shows
+      // (bank_item_name_core), so neither can file a copy under a name the
+      // player cannot see.
+      (slot) => bankSlotDisplayName(knownItemDef(ITEMS, slot.itemId), slot),
     );
     if (visible.length === 0) {
       // A narrowing filter matched nothing: show the no-match line. With NO filter active
@@ -1084,9 +1089,13 @@ export class BankWindow {
       // server resolves it by slotIndex, no def needed; only the def-derived
       // tooltip body is replaced.
       const countLabel = this.fmt(slot.count);
+      // The cell authority (worn_item_cell_view.ts) for a known def: the
+      // chosen name for the accessible name, the copy's effective quality
+      // for the icon rim (the q-<key> class above keeps its string key).
+      const parts = item ? wornItemCellParts(item, slot.instance) : null;
       cell.setAttribute(
         'aria-label',
-        item
+        parts
           ? t(
               locked
                 ? 'hudChrome.bags.itemAriaLocked'
@@ -1094,7 +1103,7 @@ export class BankWindow {
                   ? INSTANCE_GLYPH_ARIA_KEYS[glyphKind]
                   : 'itemUi.bags.itemAria',
               {
-                item: itemDisplayName(item),
+                item: parts.name,
                 count: countLabel,
               },
             )
@@ -1105,7 +1114,7 @@ export class BankWindow {
               { id: slot.itemId, count: countLabel },
             ),
       );
-      cell.innerHTML = `${item ? this.deps.itemIcon(item) : unknownItemIconHtml(slot.itemId)}${instanceMark}${lockSeal}<span class="bank-count">${slot.showCount ? esc(t('itemUi.bags.stackCount', { count: countLabel })) : ''}</span>`;
+      cell.innerHTML = `${item && parts ? this.deps.itemIcon(item, parts.quality) : unknownItemIconHtml(slot.itemId)}${instanceMark}${lockSeal}<span class="bank-count">${slot.showCount ? esc(t('itemUi.bags.stackCount', { count: countLabel })) : ''}</span>`;
       cell.addEventListener('click', (ev) => {
         // On touch, the click that ends a long-press peek inspects the slot (its
         // tooltip is already shown) instead of withdrawing: the release dismisses
@@ -1141,14 +1150,6 @@ export class BankWindow {
       cell.setAttribute('aria-hidden', 'true');
       grid.appendChild(cell);
     }
-  }
-
-  // Localized display name, used for search matching AND the name-sort so both agree
-  // with the visible cell. An unknown id falls back to the raw id: that is the label
-  // its cell renders (the stale-client guard above), so sort and search stay agreed.
-  private itemNameOf(itemId: string): string {
-    const item = knownItemDef(ITEMS, itemId);
-    return item ? itemDisplayName(item) : itemId;
   }
 
   // Repaint ONLY the grid from the live bank + current filter, preserving the search
@@ -1247,9 +1248,13 @@ export class BankWindow {
     // Disabled when the bags hold no material stack; a full bank is still actionable
     // (the click reports it), so it does not disable here.
     //
-    // The clarification (junk moves too, not just tradeskill materials, and
-    // gathering tools never do) is exposed two ways so it reaches touch and keyboard users, not
-    // only a mouse-hover title: a `title` for desktop hover, PLUS a visually-hidden
+    // The clarification (every item whose tooltip reads Material or Fine Material
+    // moves, the honest taxonomy in src/sim/material_taxonomy.ts, and everything
+    // else stays: gathering tools, quest items, consumables and gray items
+    // included; reworded at the Masterwrought 11l QA, which retired the old "junk
+    // moves too" claim) is exposed two ways so it reaches touch and keyboard
+    // users, not only a mouse-hover title: a `title` for desktop hover, PLUS a
+    // visually-hidden
     // aria-describedby span the button always carries. A screen reader announces
     // aria-describedby on both hover and keyboard focus, and reading it needs no
     // pointer at all, so it also covers touch users who tap the button directly.
@@ -1872,7 +1877,11 @@ export class BankWindow {
     // knownItemDef, not a raw ITEMS index: the release's stale-client sweep
     // made every bank item read tolerate an id this client does not know.
     const item = knownItemDef(ITEMS, slot.itemId);
-    const itemName = item ? itemDisplayName(item) : slot.itemId;
+    // Uniformity read: inert today, since the partial-withdraw rung offers
+    // only on !slot.instance (bank_view.ts bankSlotAction), so this always
+    // resolves the def name; kept on the shared cell rule the search and the
+    // name-sort read, so a future instanced rung cannot regress it silently.
+    const itemName = bankSlotDisplayName(item, slot);
     showQuantityPrompt(
       {
         installPromptDialog: (prompt, opener, close) =>

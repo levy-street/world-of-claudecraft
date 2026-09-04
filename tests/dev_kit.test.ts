@@ -13,6 +13,8 @@ import {
   DEV_KIT_LEVEL,
   dungeonLootIds,
   isFreshTwentyItem,
+  QUALITY_TIE_RANK,
+  QUALITY_TIE_SCALE,
 } from '../src/sim/dev_kit';
 import { canDualWield, isShieldItem } from '../src/sim/equipment_rules';
 import { itemFromRaid } from '../src/sim/item_level';
@@ -179,7 +181,8 @@ describe('fresh-20 item pool', () => {
 
 describe('kit construction', () => {
   it('builds a kit for every one of the 27 specs, with no empty armor slot', () => {
-    // neck/ring1/ring2 are deliberately NOT required: see the jewelry-gap test below.
+    // neck/ring1/ring2 are absent from this armor floor on purpose: the jewelry test
+    // below pins them by exact id, which is stricter than a truthiness check here.
     const required = [
       'helmet',
       'shoulder',
@@ -199,29 +202,167 @@ describe('kit construction', () => {
     }
   });
 
-  it('wears the tutorial keepsake as the ONE fresh-20 ring, neck empty', () => {
-    // Revisited when the Proving Shore's Mother of Pearl landed (+1 all
-    // stats, the tutorial quest reward every fresh 20 realistically owns):
-    // it is the single piece of fresh-20 jewelry in the game, worn in ring1
-    // for every class. Every OTHER neck/ring stays Heroic-badge-vendor stock
-    // or source level 22+, so ring2 and neck stay empty. The day more
-    // fresh-20 jewelry lands, this reds and the presets get revisited again.
+  it('fills neck and both rings from the jewelcrafting catalog, per archetype', () => {
+    // These three slots used to come back empty, and this test used to say so: before
+    // the jewelcrafting base catalog every neck and ring in the game was
+    // Heroic-badge-vendor stock or source level 22+, so a genuinely fresh 20 could
+    // wear none of it. The catalog put nine crafted pieces inside the tier and the
+    // slots filled themselves, by the same best-in-slot derivation that already
+    // dresses the kit in crafted armor and weapons. The catalog change itself
+    // touched no picker code; the phase 05 QA later hardened bestBy's tie
+    // handling (epsilon band + identity-first tiebreak) WITHOUT moving any
+    // pick, which this table proves by staying put.
+    //
+    // Revisited again when the Proving Shore's Mother of Pearl landed
+    // (release/v0.41.0: +1 all stats, the tutorial quest reward every fresh
+    // 20 realistically owns). On the release alone it was the single piece
+    // of fresh-20 jewelry in the game, worn in ring1 for every class with
+    // ring2 and neck empty; on this tree it joins the nine crafted pieces,
+    // so the fresh-20 jewelry roster is pinned below and the ring table
+    // admits it where it scores in (the agility camp's ring2 only, see
+    // AGI_RINGS). The day more fresh-20 jewelry lands, the roster pin reds
+    // and the presets get revisited again.
+    //
+    // The ids are pinned as literals rather than recomputed from roleItemScore, so a
+    // retune of the role weights has to be admitted here instead of quietly moving
+    // what every preset wears.
+    const FRESH_TWENTY_JEWELRY = [
+      'burnished_thorium_amulet',
+      'coiled_copper_torc',
+      'etched_iron_loop',
+      'gleaming_thorium_loop',
+      'hammered_copper_band',
+      'iron_link_choker',
+      'mother_of_pearl',
+      'polished_copper_loop',
+      'riveted_iron_signet',
+      'weighted_thorium_band',
+    ];
     const jewelry = Object.values(ITEMS).filter(
       (item) => item.slot === 'neck' || item.slot === 'ring',
     );
     expect(jewelry.length).toBeGreaterThan(0);
     for (const cls of ALL_CLASSES) {
       expect(
-        jewelry.filter((item) => isFreshTwentyItem(cls, item)).map((item) => item.id),
+        jewelry
+          .filter((item) => isFreshTwentyItem(cls, item))
+          .map((item) => item.id)
+          .sort(),
         `${cls} fresh-20 jewelry changed: revisit the kit slots`,
-      ).toEqual(['mother_of_pearl']);
+      ).toEqual(FRESH_TWENTY_JEWELRY);
     }
+    //
+    // Neck is archetype-blind: burnished_thorium_amulet (agi 5, sta 3) outscores
+    // iron_link_choker (agi 3, sta 1) on stamina alone, so even a pure-intellect
+    // caster scoring its agility at zero still takes it.
+    const NECK = 'burnished_thorium_amulet';
+    // Strength roles: the rung-50 str ring, then the rung-25 str ring, an
+    // outright win for ring2 (str 3 at full weight clears the int loop's 3
+    // stamina, and the keepsake's 1/1/1 scores 2.1 against the signet's 3.6).
+    const STR_RINGS = ['weighted_thorium_band', 'riveted_iron_signet'] as const;
+    // Agility roles: the rung-50 str ring, then the tutorial keepsake. Before
+    // Mother of Pearl, ring2 here was a REAL TIE: the rung-25 str ring (str 3
+    // x 0.4 + sta 1 x 0.6) and the rung-50 int ring (sta 3 x 0.6) both score
+    // exactly 1.8 in real arithmetic, and only IEEE754 product rounding ever
+    // separated them (phase 05 QA probe); bestBy judges the tie inside an
+    // epsilon band and resolves it on the role IDENTITY sum first, so the
+    // signet won on the stats the role actually uses. The keepsake now
+    // clears both outright (agi 1 + str 1 x 0.4 + sta 1 x 0.6 = 2.0 against
+    // 1.8), a real score gap, so the tie no longer decides this camp. A pick
+    // that moves here means a weights retune (admit it) or the scorer broke.
+    const AGI_RINGS = ['weighted_thorium_band', 'mother_of_pearl'] as const;
+    // Intellect roles: the rung-50 int ring, then the rung-25 int ring (the
+    // keepsake scores 1.75 caster / 2.1 healer against the loop's 3.4).
+    const CASTER_RINGS = ['gleaming_thorium_loop', 'etched_iron_loop'] as const;
+    const STR_SPECS = [
+      'warrior/arms',
+      'warrior/fury',
+      'warrior/prot',
+      'paladin/protection',
+      'paladin/retribution',
+    ];
+    const AGI_SPECS = [
+      'hunter/beast_mastery',
+      'hunter/marksmanship',
+      'hunter/survival',
+      'rogue/assassination',
+      'rogue/combat',
+      'rogue/subtlety',
+      'shaman/enhancement',
+    ];
+    const CASTER_SPECS = [
+      'paladin/holy',
+      'priest/discipline',
+      'priest/holy',
+      'priest/shadow',
+      'shaman/elemental',
+      'shaman/restoration',
+      'mage/arcane',
+      'mage/fire',
+      'mage/frost',
+      'warlock/affliction',
+      'warlock/demonology',
+      'warlock/destruction',
+      'druid/balance',
+      'druid/restoration',
+    ];
+    // druid/feral takes the str ring and then the rung-50 INT ring, and it is
+    // not a mistake. It is the one TANK_AGI role, and stamina leads outright
+    // there (sta 1.0), so after the str ring it takes the int loop for its 3
+    // stamina rather than the rung-25 str ring or the keepsake: 3.0 against
+    // 1.9 and 2.1, real score gaps, not the epsilon tie above. A tank wearing
+    // an intellect ring looks wrong and is the scorer working as designed.
+    const FERAL_RINGS = ['weighted_thorium_band', 'gleaming_thorium_loop'] as const;
+
+    const expected = new Map<string, readonly [string, string]>();
+    for (const key of STR_SPECS) expected.set(key, STR_RINGS);
+    for (const key of AGI_SPECS) expected.set(key, AGI_RINGS);
+    for (const key of CASTER_SPECS) expected.set(key, CASTER_RINGS);
+    expected.set('druid/feral', FERAL_RINGS);
+    // Cross-check against the role table, so a spec added there without a row here
+    // fails rather than going unpinned.
+    expect(expected.size).toBe(DEV_KIT_ROLE_COUNT);
+
+    for (const { cls, spec } of everySpec()) {
+      const key = `${cls}/${spec}`;
+      const rings = expected.get(key);
+      expect(rings, `${key} is not classified above`).toBeDefined();
+      const kit = buildDevKit(cls, spec);
+      expect(kit?.equip.neck, `${key} neck`).toBe(NECK);
+      expect(kit?.equip.ring1, `${key} ring1`).toBe(rings?.[0]);
+      expect(kit?.equip.ring2, `${key} ring2`).toBe(rings?.[1]);
+    }
+  });
+
+  it('gives every one-hand caster the rare tome as its held offhand', () => {
+    // Before the inscription catalog the only class-legal held offhand in
+    // the fresh-20 pool was valefire_lantern (int 1, spi 1), so no caster
+    // pick was ever pinned and a displacement would have reddened nothing
+    // (the phase 06 coverage audit's gap). The rung-50 tome
+    // (int 5, spi 3, sta 2, budget 10 at ilvl 23) outscores the lantern for
+    // every caster role, so the pick is pinned as a literal the way the
+    // neck/ring table above is: a move here means a weights retune (admit
+    // it) or the tome ladder changed. Scope: CASTER_ALL classes only; a
+    // hunter's held offhand is its quiver (tomes are class-locked away), and
+    // dual-wield specs fill the slot with a second weapon first.
+    const CASTER_TOME = 'sunpetal_grimoire';
+    const casterClasses = new Set(['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid']);
+    let pinned = 0;
     for (const { cls, spec } of everySpec()) {
       const kit = buildDevKit(cls, spec);
-      expect(kit?.equip.ring1, `${cls}/${spec} ring1`).toBe('mother_of_pearl');
-      expect(kit?.equip.ring2, `${cls}/${spec} ring2`).toBeUndefined();
-      expect(kit?.equip.neck, `${cls}/${spec} neck`).toBeUndefined();
+      const off = kit?.equip.offhand;
+      if (!off) continue;
+      if (ITEMS[off]?.kind !== 'held_offhand') continue;
+      if (!casterClasses.has(cls)) continue;
+      expect(off, `${cls}/${spec} held offhand`).toBe(CASTER_TOME);
+      pinned += 1;
     }
+    // Liveness at the REAL count (the vacuity-floor rule): thirteen specs
+    // carry the pick today (mage x3, priest x3, warlock x3, druid x3,
+    // shaman/elemental; paladin contributes zero, holy and protection take
+    // shields and retribution takes nothing). A pool or picker change that
+    // moves ANY of them must be admitted here.
+    expect(pinned).toBe(13);
   });
 
   it('never puts the same ring in both ring slots', () => {
@@ -238,6 +379,40 @@ describe('kit construction', () => {
     // dependence here would silently move the number under test.
     for (const { cls, spec } of everySpec()) {
       expect(buildDevKit(cls, spec)).toEqual(buildDevKit(cls, spec));
+    }
+  });
+
+  it('an in-band tie prefers quality over id (the masterwrought Phase 11o tiebreak)', () => {
+    // The regression this pins: feral weights no int or spi, so the rare
+    // sunpetal_grimoire and the uncommon copperlens_ocular tie on identity
+    // (sta 2 each) inside the epsilon band, and before the quality term the
+    // alphabet handed the kit the strictly weaker uncommon the day its lower
+    // id shipped. The tome must win on quality.
+    expect(buildDevKit('druid', 'feral')?.equip.offhand).toBe('sunpetal_grimoire');
+    // The dominance order's other half: quality never outranks identity (a
+    // caster spec whose weights the tome's int/spi DO count keeps it too,
+    // trivially, and a role-stat edge beats any quality edge by construction;
+    // the integer-stat premise that construction rests on is pinned below).
+    expect(buildDevKit('mage', 'frost')?.equip.offhand).toBe('sunpetal_grimoire');
+  });
+
+  it('the tiebreak scale strictly exceeds the quality ladder top rank (dominance property)', () => {
+    // With integer identity sums (pinned below), scale > max rank is what
+    // makes a 1-point role-stat edge unbeatable by any quality gap.
+    expect(QUALITY_TIE_SCALE).toBeGreaterThan(Math.max(...Object.values(QUALITY_TIE_RANK)));
+  });
+
+  it('every primary stat in ITEMS is an integer (the tiebreak scale premise)', () => {
+    // buildDevKit scales the identity sum above the quality rank ladder; that
+    // dominance argument is sound only while stats are integers (a fractional
+    // stat could shrink an identity edge below a quality gap). Pin the
+    // premise where it is relied on.
+    for (const def of Object.values(ITEMS)) {
+      for (const stat of ['str', 'agi', 'sta', 'int', 'spi'] as const) {
+        const value = def.stats?.[stat];
+        if (value === undefined) continue;
+        expect(Number.isInteger(value), `${def.id}.${stat} = ${value}`).toBe(true);
+      }
     }
   });
 
@@ -353,8 +528,10 @@ describe('/dev kit against a real Sim', () => {
     const sim = kitted('warrior', 'prot');
     const meta = sim.players.get(sim.playerId);
     expect(meta?.bags.filter(Boolean)).toHaveLength(4);
-    // 8 armor/weapon slots minimum. Not 11: neck and both rings stay empty because no
-    // fresh-20 jewelry exists (see the jewelry-gap test above).
+    // 8 armor/weapon slots minimum, kept as a floor rather than an exact count: this
+    // test is about the command dressing the character at all. A prot warrior wears
+    // 12 today (the jewelry test above pins neck and both rings by id, so the three
+    // slots this floor used to exclude are covered there).
     const worn = Object.values(meta?.equipment ?? {}).filter(Boolean);
     expect(worn.length).toBeGreaterThanOrEqual(8);
     for (const slot of ['helmet', 'chest', 'legs', 'mainhand'] as const) {

@@ -282,10 +282,12 @@ describe('v0.36 placeholder-art completion evidence', () => {
     expect(targets.deeds.every((id) => DEED_IMAGE_IDS.has(id))).toBe(true);
     // The campaign's frozen weapon scope predates the class-overhaul
     // integration's four daggers (integration-dagger-icons-2026-08-10 owns
-    // their art) and the ten Crucible raid weapons
-    // (crucible-raid-weapons-2026-08-28), so the live registry minus both
-    // batches is the campaign set.
+    // their art), the Masterwrought phase 09 pair (masterwrought-phase09-art
+    // owns their art, gated by the item-art audit suites), and the ten
+    // Crucible raid weapons (crucible-raid-weapons-2026-08-28), so the live
+    // registry minus those batches is the campaign set.
     const INTEGRATION_WEAPON_IDS = ['boneglass_shiv', 'duskwhisper', 'marrowpoint', 'rimefang'];
+    const MASTERWROUGHT_PHASE09_WEAPON_IDS = ['duskforged_warblade', 'ridgebreaker'];
     const CRUCIBLE_WEAPON_IDS = [
       'anvilguard_blade',
       'cinderfang_kris',
@@ -299,7 +301,11 @@ describe('v0.36 placeholder-art completion evidence', () => {
     ];
     // The Ignivar legendary maul postdates the campaign the same way (its art
     // batch is ignivar-varkhul-drop-renders-2026-08-28).
-    const POST_CAMPAIGN_WEAPON_IDS = [...INTEGRATION_WEAPON_IDS, 'varkhul_forgebreaker'];
+    const POST_CAMPAIGN_WEAPON_IDS = [
+      ...INTEGRATION_WEAPON_IDS,
+      ...MASTERWROUGHT_PHASE09_WEAPON_IDS,
+      'varkhul_forgebreaker',
+    ];
     expect(targets.weaponItems).toEqual(
       sorted(
         Object.keys(ITEM_WEAPON_VARIANTS).filter(
@@ -496,9 +502,11 @@ describe('v0.36 placeholder-art completion evidence', () => {
     expect(credits).toContain('replaces eighteen stale portraits');
 
     const brief = readFileSync(path.join(repoRoot, 'docs/achievements/icon-brief.md'), 'utf8');
-    expect(brief).toContain('every live deed now has committed painted art');
+    expect(brief).toContain('every live deed then had committed painted art');
     expect(brief).toMatch(/The final 30-crested\s*>\s*completion wave/);
     expect(brief).toContain('placeholder-art-completion-2026-08-09/README.md');
     expect(brief).toContain('placeholder-art-completion-2026-08-09/accepted-art.json');
+    expect(brief).toContain('leaving 10 inherited release-base rows');
+    expect(brief).toContain('masterwrought-art-completion-2026-09-02/accepted-art.json');
   });
 });

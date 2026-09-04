@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ABILITIES } from '../src/sim/data';
+import { preparePartyFrameAuras } from '../src/sim/party_frame_info';
+import type { Aura } from '../src/sim/types';
 import {
   DEFAULT_PARTY_FRAME_DISPLAY,
   PARTY_FRAME_RANGE_YD,
@@ -56,7 +58,10 @@ describe('party frame aura relevance', () => {
       false,
     );
     expect(partyFrameAuraIsRelevant({ id: 'temporal_exhaustion', kind: 'sated' })).toBe(false);
-    expect(partyFrameAuraIsRelevant({ id: 'well_fed', kind: 'buff_sta' })).toBe(false);
+    // the live unified food-buff id (Masterwrought 11c): every buff food
+    // mints 'well_fed' (value 5 is the capstone dish's real magnitude, so
+    // the fixture walks the predicate exactly as the live aura does)
+    expect(partyFrameAuraIsRelevant({ id: 'well_fed', kind: 'buff_sta', value: 5 })).toBe(false);
     expect(partyFrameAuraIsRelevant({ id: 'rend', kind: 'dot' })).toBe(true);
     expect(partyFrameAuraIsRelevant({ id: 'wither', kind: 'buff_ap', neg: 1 })).toBe(true);
   });
@@ -587,5 +592,41 @@ describe('party pets in the selector and the signature', () => {
     expect(at(PARTY_FRAME_RANGE_YD + 1), 'past it: badged').toBe(true);
     // The old threshold, which is the middle of the reported dead zone.
     expect(at(60), 'the 60yd case healers complained about now badges').toBe(true);
+  });
+});
+
+// The other half of the Aura.flask wire question (tests/snapshots.test.ts pins
+// the entity-snapshot half): the party-frame payload projects each aura through
+// preparePartyFrameAuras into an explicitly built summary, so the flask marker
+// stops there too and a party row can never badge a member's flask. The
+// projection is a hand-written object literal rather than a spread, which is
+// exactly why it needs a pin: adding one line to it would widen the payload for
+// every member of every party with nothing else red.
+describe('party frame aura summary carries no flask marker', () => {
+  // A flask-MARKED aura of a party-frame-relevant kind. Contrived on purpose:
+  // a real flask buff (buff_sta) is not relevant to a party frame at all, so it
+  // never reaches the projection, and pinning the projection needs an aura that
+  // does. What is under test is the summary's key set, not which auras qualify.
+  const markedRelevantAura: Aura = {
+    id: 'power_word_shield',
+    name: 'Psalm of Warding',
+    kind: 'absorb',
+    remaining: 12,
+    duration: 12,
+    value: 250,
+    sourceId: 7,
+    school: 'holy',
+    flask: true,
+  };
+
+  it('projects a fixed key set, so the marker never reaches a party row', () => {
+    const prepared = preparePartyFrameAuras([markedRelevantAura], 1000);
+    expect(prepared, 'the aura really reached the projection').toHaveLength(1);
+    const summary = prepared[0].summary as unknown as Record<string, unknown>;
+    expect('flask' in summary, 'the marker stopped at the projection').toBe(false);
+    // The WHOLE key set, so any other widening fails here too: id and kind
+    // always ride, remaining always rides, and neg/poolPct are conditional on a
+    // negative value and on Mending Current respectively (neither applies here).
+    expect(Object.keys(summary).sort()).toEqual(['id', 'kind', 'remaining']);
   });
 });

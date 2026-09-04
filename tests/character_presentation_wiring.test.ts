@@ -43,6 +43,36 @@ describe('character presentation sleep wiring', () => {
     expect(offscreenBlock).toContain('this.endStowGesture();');
   });
 
+  it('wires touchdown into a landing one-shot that yields immediately to movement', () => {
+    const start = characterVisual.indexOf(
+      'update(dt: number, s: AnimState, animate: boolean, reducedMotion = false): void {',
+    );
+    const end = characterVisual.indexOf('\n  /**', start + 1);
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    const update = characterVisual.slice(start, end);
+
+    const edgeAt = update.indexOf(
+      'shouldPlayLanding(this.wasAirborne, s.airborne, s.dead, !!this.action(landClip))',
+    );
+    const latchAt = update.indexOf('this.currentOneShotIsLanding = true;', edgeAt);
+    const stateAt = update.indexOf('const desired = this.desiredBase(s);', latchAt);
+    const cancelAt = update.indexOf('MOVING_STATES.has(desired)', stateAt);
+    const handoffAt = update.indexOf(
+      'this.fadeTo(this.baseAction(), this.baseTransitionFade(desired), false);',
+      cancelAt,
+    );
+
+    expect(edgeAt).toBeGreaterThan(-1);
+    expect(update.slice(edgeAt, latchAt)).toContain('this.playOneShot(landClip, 1);');
+    expect(latchAt).toBeGreaterThan(edgeAt);
+    expect(stateAt).toBeGreaterThan(latchAt);
+    expect(cancelAt).toBeGreaterThan(stateAt);
+    expect(update.slice(cancelAt, handoffAt)).toContain('this.currentIsOneShot = false;');
+    expect(update.slice(cancelAt, handoffAt)).toContain('this.currentOneShotIsLanding = false;');
+    expect(handoffAt).toBeGreaterThan(cancelAt);
+  });
+
   it('persists the Recklessness latch across camera re-entry and clears it on aura end', () => {
     expect(renderer).toContain('const nextRecklessSkullsLatch = nextRecklessnessSkullsLatch(');
     expect(renderer).toContain(
@@ -65,6 +95,43 @@ describe('character presentation sleep wiring', () => {
       'this.abilityVfx.syncEntity(e, runCharacterPresentation);',
     );
     expect(renderer.slice(abilityStart)).toContain('if (runCharacterPresentation) {');
+  });
+
+  it('keeps the rider on foot until the mount compile gate presents the rig', () => {
+    const mountStart = renderer.indexOf('// rideable mount under the player');
+    const mountEnd = renderer.indexOf('// distant rigs swap', mountStart);
+    expect(mountStart).toBeGreaterThan(-1);
+    expect(mountEnd).toBeGreaterThan(mountStart);
+    const setup = renderer.slice(mountStart, mountEnd);
+
+    expect(setup).toContain(
+      'const mountPresented = mountShown && !!v.mountVisual && !v.mountCompilePending;',
+    );
+    expect(setup).toContain('v.mountVisual.root.visible = mountPresented;');
+    expect(setup).toContain('v.mountLift = mountPresented && mountSpec ? mountSpec.seat : 0;');
+    expect(setup).toContain(
+      'v.visual.setRidePose(mountPresented && mountSpec ? mountSpec.ride : null);',
+    );
+    expect(setup).toContain('if (!(runCharacterPresentation && mountPresented)) {');
+    expect(setup).toContain(
+      'placeRider(v, v.visual.root, mountPresented ? mountSpec : null, v.mountLift, 0);',
+    );
+
+    const presentationStart = renderer.indexOf(
+      'if (v.mountVisual && mountSpec && mountShown) {',
+      mountEnd,
+    );
+    const presentationEnd = renderer.indexOf('// per-ability windup orb', presentationStart);
+    const presentation = renderer.slice(presentationStart, presentationEnd);
+    expect(presentation).toContain('if (mountPresented) {\n            applyMountJumpAttitude(');
+    expect(presentation).toContain('seatRiderOnBone(');
+    expect(presentation).toContain('if (v.mountGlows) updateMountGlows(v.mountGlows, this.time);');
+  });
+
+  it('reuses one mount host and stows weapons only while a mount is actually presented', () => {
+    expect(renderer).toContain('private readonly mountHost: MountViewHost = {');
+    expect(renderer.match(/syncMountVisual\(v, mountSpec, this\.mountHost\)/g)).toHaveLength(1);
+    expect(renderer).toContain('const stowed = e.weaponStowed || swimming || v.mountLift > 0;');
   });
 });
 

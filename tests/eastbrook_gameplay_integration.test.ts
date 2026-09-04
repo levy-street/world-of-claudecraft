@@ -414,6 +414,7 @@ describe('Eastbrook authored gameplay data integration', () => {
       'cook_marlow',
       'weaver_ottilie',
       'tinker_gizzel',
+      'farmer_jessica',
     ]);
     // Reminted for the paladin-only Dawnbound Tome chain, which hangs q_divine_tome
     // off Brother Aldric. The payload covers everything but pos/facing, so a quest
@@ -448,6 +449,18 @@ describe('Eastbrook authored gameplay data integration', () => {
     // a drift in some OTHER field of some other NPC moves the hash while these
     // stay green, which is the diagnostic the digest alone cannot give.
     //
+    // Re-minted a third time at the farming go-live, when the kitchens
+    // master took on the two produce work orders: exactly one payload moved
+    // and the move is cook_marlow's questIds row (two order ids appended
+    // after q_prof_workorder_kitchens). The row assertion below re-checks
+    // that this is still the row this case owns.
+    expect(ZONE1_NPCS.cook_marlow.questIds).toEqual([
+      'q_prof_attune_apothecary',
+      'q_prof_amends_apothecary',
+      'q_prof_workorder_kitchens',
+      'q_prof_workorder_kitchens_wheat',
+      'q_prof_workorder_kitchens_rice',
+    ]);
     // Re-minted again at the release/v0.41.0 sync, where the Sowfield
     // demolition retired Groundskeeper Bram with the Vale Cup module: his
     // whole record (the one dynamic payload) left the table, and no other def
@@ -484,6 +497,19 @@ describe('Eastbrook authored gameplay data integration', () => {
       'simple_fishing_pole',
       'arcanite_bar',
     ]);
+    // Re-minted a third time for the farming go-live: farmer_jessica joined
+    // ZONE1_NPCS as the seventeenth def (a non-town NPC with an inline pos
+    // outside the wall, like Bram, so the 15 town placements below are
+    // untouched and ZONE1_TOWN_NPC_IDS keeps its length). Her payload is the
+    // only new row; the sixteen prior payloads are byte-identical (zone1.ts
+    // diff-checked). The row assertion that follows owns her stock.
+    expect(ZONE1_NPCS.farmer_jessica.vendorItems).toEqual([
+      'vale_wheat_seed',
+      'brook_carrot_seed',
+      'brook_carrot',
+      'compost',
+      'garden_hoe',
+    ]);
     // Re-minted a fourth time (2026-08-18) for the harbor move (commit
     // d19aa33f76, docs/design/eastbrook-revamp/site-plan.md; the reword
     // itself landed with the wave D waterfront, 88f14c6078): exactly one
@@ -495,8 +521,63 @@ describe('Eastbrook authored gameplay data integration', () => {
     expect(ZONE1_NPCS.apothecary_lin.greeting).toBe(
       'Careful where you step in the northeastern woods, friend.',
     );
+    // Re-minted at the merge of release/v0.41.0 into feature/masterwrought
+    // (base 9a89e3483e, release tip ff2837da1f): the branch's farmer_jessica
+    // row and the two produce work orders on cook_marlow combine with the
+    // release's Bram retirement, Lin's harbor greeting and the Eastbrook
+    // rebuild rounds, so the merged payload hashes to a value matching
+    // NEITHER parent. Parent values for the record: ours
+    // 7f0a09f0bd4c4d83845c57e760b92981af62338feab28ed570ec1390eedfd5e9, the
+    // release 2f6072ad2baa2341ce32484144915a0d6cbc9836d0ed4c9d70112e3dbeb87146.
+    // Measured on the merged working tree (npx vitest run
+    // tests/eastbrook_gameplay_integration.test.ts, with zone1.ts and the
+    // layout both conflict-free) and set to exactly what it reported.
+    //
+    // Re-minted at the 11n vendor floor (qr-11n-WIDE): exactly one payload
+    // moved and the move is smith_haldren's vendorItems row, the four
+    // byte-identical crafted gear rows pulled (eastbrook_arming_sword,
+    // eastbrook_chain_vest, eastbrook_wool_trousers, tanned_leather_jerkin).
+    // Nothing else in any def, and no placement field, changed. The row
+    // assertion below is asserted BEFORE the digest, same as the vendor rows
+    // above, so the one moved field is described where it can actually fail;
+    // tests/vendor_floor.test.ts owns the deeper per-id keeps.
+    expect(ZONE1_NPCS.smith_haldren.vendorItems).toEqual([
+      'eastbrook_greatsword',
+      'bronzework_mace',
+      'vale_carving_knife',
+      'hickory_shortstaff',
+      'eastbrook_buckler',
+      'valespun_robe',
+      'hobnail_boots',
+    ]);
+    // Re-minted at the merge of release/v0.41.0 (tip d3f8bae369 onward) into
+    // feature/masterwrought: the branch's 11n vendor floor pull combines with
+    // the release's Burlap Reagent Pouch rows on trader_wilkes and
+    // weaver_ottilie (bank-storage phase 05), so the merged payload hashes to
+    // a value matching NEITHER parent. Parent values for the record: ours
+    // a9448fdddffaac362da8792a7a013d2a840122c2c12a25adb73779767952e14d, the
+    // release 3943f298cc9eff07d9dc040c8ff68d401da70e4a1ba9c17efc681aebc0fede44.
+    // Measured on the merged working tree (zone1.ts conflict-free) and set to
+    // exactly what it reported.
+    //
+    // Re-minted at the Phase 18 seed-feeding copy pass (commit 58e904a4b6),
+    // which cleared the grandfathered em dashes out of the prose the mediawiki
+    // seed publishes. Exactly two payload fields moved, both greetings, both
+    // rewordings of a dash: The Merchant's market line takes a comma and
+    // Brandt's takes an ellipsis. No other field, no placement field, and no
+    // key order changed (proved by replaying the pre-pass zone1.ts against the
+    // current siblings: the payload reproduces the previous digest above with
+    // only these two strings restored). Both are asserted BEFORE the digest,
+    // same as the vendor and greeting rows above, so each moved field is
+    // described where it can actually fail.
+    expect(ZONE1_NPCS.the_merchant.greeting).toBe(
+      'Welcome to the World Market, $C. Buy from every adventurer in the realm, or set out your own wares and let coin find you.',
+    );
+    expect(ZONE1_NPCS.fisherman_brandt.greeting).toBe(
+      'Blrb-glub... sorry, been listening to those fish-men too long.',
+    );
     expect(createHash('sha256').update(JSON.stringify(stableTownNpcPayload())).digest('hex')).toBe(
-      '3943f298cc9eff07d9dc040c8ff68d401da70e4a1ba9c17efc681aebc0fede44',
+      'ef35b8640f9ed213e86dbac9b04ba7a8ec9cdde6179d3859e833519dcaabb6c2',
     );
     expect(ZONE1_TOWN_NPC_IDS).toHaveLength(15);
     for (const id of ZONE1_TOWN_NPC_IDS) {
@@ -504,6 +585,19 @@ describe('Eastbrook authored gameplay data integration', () => {
       expect(ZONE1_NPCS[id].pos).toEqual(placement.position);
       expect(ZONE1_NPCS[id].facing).toBe(placement.facing);
     }
+    // Groundskeeper Bram's inline placement pin stood here until the release
+    // retired him with the Sowfield and the Vale Cup; Farmer Jessica's is now
+    // the one non-layout Eastbrook placement.
+    // The farmer's inline seat beside the allotments (the go-live), pinned
+    // here as the non-layout Eastbrook placement; the world-side proof (never
+    // nudged, beside the beds, off the road) lives in
+    // tests/farmer_npc_placement.test.ts.
+    expect(ZONE1_NPCS.farmer_jessica).toMatchObject({
+      pos: { x: -15.5, z: -81.5 },
+      facing: -Math.PI / 2,
+      farmer: true,
+    });
+    expect(ZONE1_NPCS.farmer_jessica.dynamic).toBeUndefined();
   });
 
   // Re-pinned 2026-08-18 for the harbor move (commit d19aa33f76,

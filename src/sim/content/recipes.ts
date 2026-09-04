@@ -7,7 +7,10 @@
 // Scope: COMMON_RECIPES all carry skillReq 0 (the free floor: a common-tier
 // recipe is craftable with zero craft skill, gated only by having the
 // materials). The file has since grown past that floor: TOOL_RECIPES
-// (skillReq 75/150, station-bound at the toolworks) and COMBO_RECIPES
+// (skillReq 75/125 since masterwrought Phase 11o retired the fictional 150
+// rung to the reachable cap tier, station-bound at the toolworks; AMENDED
+// 2026-08-31, masterwrought qr-11o-150) and
+// COMBO_RECIPES
 // (skillReq 25, the #1132 dual-craft gate) sit alongside it. There is still
 // no skillReq admission gate anywhere: crafting.ts reads skillReq only for
 // skill-gain scaling, and itemLevelBudget feeds the #1301 gold sink.
@@ -37,7 +40,7 @@
 // COMBO_RECIPES carry `acquisition: ['trainer']`, learned from the resident
 // master at their craft's station (professions/training.ts resolveTrain).
 // COMMON_RECIPES, TOOL_RECIPES, and CASTER_HUB_RECIPES deliberately keep NO
-// acquisition field: state.md locks them grandfathered, known to everyone via
+// acquisition field: they remain grandfathered, known to everyone via
 // the empty-acquisition arm of crafting.ts isRecipeKnown. Existing characters
 // keep the combo recipes too, via the one-time grandfather union
 // (training.ts PRE_TRAINING_RECIPE_IDS / grandfatherKnownRecipes); every
@@ -277,7 +280,7 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
       { itemId: 'fine_thorium_ore', count: 2 },
       { itemId: 'thorium_mining_pick', count: 1 },
     ],
-    skillReq: 150,
+    skillReq: 125,
     itemLevelBudget: 30,
     level: 20,
     stationType: 'toolworks',
@@ -305,7 +308,7 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
       { itemId: 'fine_elderwood_log', count: 2 },
       { itemId: 'ashwood_axe', count: 1 },
     ],
-    skillReq: 150,
+    skillReq: 125,
     itemLevelBudget: 30,
     level: 20,
     stationType: 'toolworks',
@@ -333,7 +336,7 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
       { itemId: 'fine_sunpetal_herb', count: 2 },
       { itemId: 'goldleaf_sickle', count: 1 },
     ],
-    skillReq: 150,
+    skillReq: 125,
     itemLevelBudget: 30,
     level: 20,
     stationType: 'toolworks',
@@ -380,12 +383,55 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
 // teaches them, without a content edit, because the trainer's list derives
 // from the crafts its station serves.
 //
-// SKILL REQUIREMENTS ARE BOTH INSIDE ENGINEERING'S CAP (125), unlike the
-// tier-5 land tools at 75/150. 150 resolves to tier 6 while the cap resolves
-// to tier 5, and a trainer only teaches a recipe whose tier the learner has
-// reached, so a trainer-taught recipe at 150 would be permanently unlearnable
-// rather than merely expensive. The land tools escape that only because they
-// predate training and are grandfathered known.
+// THE CRAFTED FISHING RODS ARE THREE RUNGS SINCE masterwrought Phase 11i, not
+// two: tier 4, tier 5, and the tier-6 apex rung that opens catch band 5. The
+// two paragraphs above describe the shipped pair; the apex rung's own self-gate
+// is the third bullet below.
+//
+// - The APEX rung is hard-gated by its own ladder and by nothing else. It
+//   consumes the tier-5 rod plus the catch BAND 4 pays, and band 4 takes that
+//   same tier-5 rod, so nothing in the bill can be fished by anyone who has not
+//   already climbed to the rung below. That is the identical shape the tier-5
+//   rung uses one step down.
+//
+//   IT DELIBERATELY DOES NOT CONSUME THE BAND-5 CATCH, and this is the one
+//   place on the ladder where the obvious bill is a bug. The Stillmere Salmon
+//   exists only in the band-5 cells; band 5 takes a tier-6 rod; the only tier-6
+//   rod in the game is this recipe's own output. A bill naming the salmon is
+//   therefore a closed circuit that nobody in a realm can ever open, and it
+//   would have stranded the rod, the whole band-5 table, the capstone feast and
+//   the deed along with it. An earlier draft of this header argued the circuit
+//   away as "the first clockreel is crafted from catches its owner cannot have
+//   farmed themselves, and the market carries the rest": that reasoning is
+//   wrong, because a market cannot carry an item no player can produce. The
+//   band-5 catch is a REWARD for owning the rod, never an input to it.
+//
+// SKILL REQUIREMENTS ARE ALL THREE INSIDE ENGINEERING'S CAP (125). The
+// STANDING RULE for every new row: a skillReq above the cap band resolves to
+// a tier no player can reach (150 resolves to tier 6 while the cap resolves
+// to tier 5), and BOTH learning channels run the same gate (teachTierMet in
+// professions/training.ts and the 'tier' deny arm in
+// professions/pattern_items.ts), so a recipe authored above the cap is
+// permanently unlearnable through a trainer AND through a pattern: dead
+// content that no test would red on, because there is no craft-time skillReq
+// admission gate to catch it. 125 is the
+// reachable top rung, which is exactly where APEX_CONSUMABLE_RECIPES already
+// puts its two capstones. RE-VERIFIED IN CODE at masterwrought Phase 11i and
+// handed to Phase 11j, whose apex hoe is settled on the same finding.
+// AMENDED 2026-08-25 (masterwrought Phase 11o, qr-11o-150): the historical
+// half of this lesson used to read "unlike the tier-5 land tools at 75/150",
+// which escaped the trap only by being grandfathered known
+// (PRE_TRAINING_RECIPE_IDS, frozen). Those three rows were re-tiered 150 to
+// 125 by Phase 11o: the printed tier stopped being fiction, no admission
+// behavior changed (they are acquisition-less and known to everyone), the
+// grandfather list is untouched, and the rule above STANDS for new rows.
+//
+// THE APEX RUNG IS DROP-TAUGHT, breaking the ['trainer'] pattern of the two
+// above, and that is R8 rather than convenience: an apex rung reaches players
+// through the pillars, and its schematic is deterministic Heroic Marks stock
+// (content/heroic_vendor.ts). It could not be a band-5 catch instead: the rod
+// gates band 5, so a luck-gated schematic would put the whole top band behind
+// luck, which is the compulsion R18 forbids.
 export const ROD_RECIPES: ProfessionRecipeRecord[] = [
   {
     id: 'recipe_stormreel_fishing_rod',
@@ -417,6 +463,35 @@ export const ROD_RECIPES: ProfessionRecipeRecord[] = [
     level: 20,
     stationType: 'toolworks',
     acquisition: ['trainer'],
+  },
+  {
+    id: 'recipe_clockreel_fishing_rod',
+    professionId: 'engineering',
+    resultItemId: 'clockreel_fishing_rod',
+    resultCount: 1,
+    // Input 480 vs output 375. recipe_tidewrought_fishing_rod above is
+    // untouched by this phase: its def and its bill both diff empty.
+    //
+    // NO STILLMERE SALMON, and its absence is the whole correctness of this
+    // row. The salmon lives ONLY in the band-5 cells, band 5 takes a tier-6
+    // rod, and this recipe's own output is the only tier-6 rod in the game, so
+    // a bill containing it is a closed circuit: no clockreel means no band 5
+    // means no salmon means no clockreel, and the rod, the band, the capstone
+    // feast and the deed attached to the rod would all have been permanently
+    // unreachable on any realm. The sturgeon is the right keystone because it
+    // is band 4's catch and band 4 takes the tier-5 tidewrought this bill
+    // already consumes, which is exactly the self-gate the two rungs above use
+    // (the carp is Thornpeak-only and Thornpeak takes the rung below it).
+    reagents: [
+      { itemId: 'glimmerfin_koi', count: 2 },
+      { itemId: 'raw_hollowgill_sturgeon', count: 10 },
+      { itemId: 'tidewrought_fishing_rod', count: 1 },
+    ],
+    skillReq: 125,
+    itemLevelBudget: 30,
+    level: 20,
+    stationType: 'toolworks',
+    acquisition: ['drop'],
   },
 ];
 
@@ -496,6 +571,12 @@ export const TOOL_EFFECT_RECIPES: ProfessionRecipeRecord[] = [
 // gold-negative (input above output under the recipe_economy rule).
 // skillReq-75 recipes may consume rare-band materials; the plain volume-based
 // shapes were used (the resonant-consumer variant was deliberately not taken).
+// AMENDED 2026-08-25 (masterwrought Phase 11o, qr-11o-WEAR): the three rows
+// shipped level 20, which gated their rare outputs behind character level 20,
+// where the epic shelf obsoletes them on arrival. The two rung-75 rows now
+// carry level 17 (wearable by 18) and the rung-50 wraps carry level 15
+// (wearable by 16, the band its #3520 re-tier already placed it in). Stats
+// are untouched; see the LADDER_RECIPES amendment for the full rule.
 export const CASTER_HUB_RECIPES: ProfessionRecipeRecord[] = [
   {
     id: 'recipe_wardweave_cowl',
@@ -513,7 +594,7 @@ export const CASTER_HUB_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 75,
     itemLevelBudget: 20,
-    level: 20,
+    level: 17,
     stationType: 'loom',
   },
   {
@@ -541,7 +622,7 @@ export const CASTER_HUB_RECIPES: ProfessionRecipeRecord[] = [
     // (mirewarden_jerkin/leggings/treads).
     skillReq: 50,
     itemLevelBudget: 20,
-    level: 20,
+    level: 15,
     stationType: 'tannery',
   },
   {
@@ -561,7 +642,7 @@ export const CASTER_HUB_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 75,
     itemLevelBudget: 20,
-    level: 20,
+    level: 17,
     stationType: 'forge',
   },
 ];
@@ -648,6 +729,23 @@ export const COMBO_RECIPES: ProfessionRecipeRecord[] = [
 // (skillReq 0 -> 10/10, skillReq 25 -> 16/15, skillReq 50 -> 20/20); the outputs'
 // stats and values were budgeted against real comparables and are authored
 // unchanged in profession_items.ts.
+// AMENDED 2026-08-25 (masterwrought Phase 11o, qr-11o-WEAR): the rung-50
+// convention above now splits by output kind. Every EQUIPPABLE rung-50 output
+// carries level 15 (budget field unchanged at 20), so the crafted rares derive
+// requiredLevel 15 and are wearable inside the 14-19 band their stats compete
+// in; consumable rung-50 outputs keep level 20 (their pacing was tuned
+// elsewhere). Stats stay authored at the original budget on purpose: the fix
+// moves WHEN the gear can be worn, never how strong it is, so these pieces
+// deliberately sit above the derived budget of their new item level.
+// tests/crafted_wearability.test.ts pins the windows and the skip list.
+// One DERIVED magnitude rides the level down and is recorded rather than
+// hidden: the masterwork proc's bonus bakes from recipe.level
+// (crafting.ts craftBonusStatsFor), so future masterwork copies of the
+// re-leveled outputs carry a smaller bonus on the slots where the epic-
+// minus-rare delta shrinks at 15 (legs 3 to 1, shoulder and held offhand
+// 3 to 2, gloves 2 to 1; chest, mainhand, helmet, feet, neck and ring are
+// unchanged). Authored def stats moved nowhere; the per-slot deltas are
+// pinned in tests/professions_masterwork.test.ts.
 export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
   // --- weaponcrafting ------------------------------------------------------
   {
@@ -763,7 +861,7 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 50,
     itemLevelBudget: 20,
-    level: 20,
+    level: 15,
     acquisition: ['trainer'],
     stationType: 'forge',
   },
@@ -780,7 +878,7 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 50,
     itemLevelBudget: 20,
-    level: 20,
+    level: 15,
     acquisition: ['trainer'],
     stationType: 'forge',
   },
@@ -797,7 +895,7 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 50,
     itemLevelBudget: 20,
-    level: 20,
+    level: 15,
     acquisition: ['trainer'],
     stationType: 'forge',
   },
@@ -911,7 +1009,7 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 50,
     itemLevelBudget: 20,
-    level: 20,
+    level: 15,
     acquisition: ['trainer'],
     stationType: 'forge',
   },
@@ -928,7 +1026,7 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 50,
     itemLevelBudget: 20,
-    level: 20,
+    level: 15,
     acquisition: ['trainer'],
     stationType: 'forge',
   },
@@ -945,7 +1043,7 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 50,
     itemLevelBudget: 20,
-    level: 20,
+    level: 15,
     acquisition: ['trainer'],
     stationType: 'forge',
   },
@@ -1058,7 +1156,7 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 50,
     itemLevelBudget: 20,
-    level: 20,
+    level: 15,
     acquisition: ['trainer'],
     stationType: 'loom',
   },
@@ -1074,7 +1172,7 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 50,
     itemLevelBudget: 20,
-    level: 20,
+    level: 15,
     acquisition: ['trainer'],
     stationType: 'loom',
   },
@@ -1091,7 +1189,7 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 50,
     itemLevelBudget: 20,
-    level: 20,
+    level: 15,
     acquisition: ['trainer'],
     stationType: 'loom',
   },
@@ -1204,7 +1302,7 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 50,
     itemLevelBudget: 20,
-    level: 20,
+    level: 15,
     acquisition: ['trainer'],
     stationType: 'tannery',
   },
@@ -1220,7 +1318,7 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 50,
     itemLevelBudget: 20,
-    level: 20,
+    level: 15,
     acquisition: ['trainer'],
     stationType: 'tannery',
   },
@@ -1244,7 +1342,7 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 50,
     itemLevelBudget: 20,
-    level: 20,
+    level: 15,
     acquisition: ['trainer'],
     stationType: 'tannery',
   },
@@ -1269,8 +1367,28 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'cooking',
     resultItemId: 'hunters_game_skewer',
     resultCount: 1,
+    // THE PROVISIONING SUPPLY LINE, rung 0 (masterwrought R17/R18). The grain
+    // the skewer is rolled in, ADDED beside the meat and never traded for it:
+    // no meat or salt count moved. vale_wheat rather than the brook_carrot the
+    // plan defaulted to, and the reason is the economy basis rather than taste.
+    // brook_carrot is farming's D9 fee vegetable and the one BASE produce row
+    // that carries a buyValue (16); every FINE twin carries one too, so the
+    // claim is about the base line only. That 16 would make it the most
+    // valuable reagent on this row: the comparison is CONTRIBUTION, not the
+    // per-unit basis, so it is one carrot at 16 against game_meat's two at 4
+    // for 8. The crop becomes the body and breaks the accent rule.
+    // THE COST OF THE SWAP, recorded because it is real: brook_carrot is the one
+    // produce a counter sells, so with it this rung-0 bill stayed buyable, and
+    // with vale_wheat it needs a farm detour or the World Market. R18 is still
+    // satisfied (vale_wheat is a market-listable kind 'junk' material, exactly
+    // as sunpetal_herb is in these same bills), so the requirement never falls
+    // on a profession, but the vendor route is genuinely gone.
+    // vale_wheat at 4 sits under the cap, and a vale_wheat 1
+    // binder is the shipped shape farming's own tier-1 rows already use
+    // (recipe_eastbrook_root_pottage, recipe_eastbrook_glazed_carrots).
     reagents: [
       { itemId: 'game_meat', count: 2 },
+      { itemId: 'vale_wheat', count: 1 },
       { itemId: 'cooking_salt', count: 1 },
     ],
     skillReq: 0,
@@ -1316,8 +1434,17 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'cooking',
     resultItemId: 'goldleaf_game_stew',
     resultCount: 2,
+    // THE PROVISIONING SUPPLY LINE, rung 25, and the flagship row: a stew is
+    // the dish the missing vegetable class was most obviously short of, and it
+    // is the one place grain AND root both belong. The grain that thickens it
+    // and the root that bodies it, both ADDED: the meat stays at 3, the herb at
+    // 1 and the salt at 1. vale_wheat gates at farming 0 and bog_beet at 25,
+    // both at or under this row's skillReq 25, so a cook levelling both skills
+    // together is never blocked.
     reagents: [
       { itemId: 'game_meat', count: 3 },
+      { itemId: 'vale_wheat', count: 2 },
+      { itemId: 'bog_beet', count: 1 },
       { itemId: 'goldleaf_herb', count: 1 },
       { itemId: 'cooking_salt', count: 1 },
     ],
@@ -1332,8 +1459,16 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'cooking',
     resultItemId: 'frostgill_chowder',
     resultCount: 1,
+    // THE PROVISIONING SUPPLY LINE, rung 25: a chowder's root, ADDED beside the
+    // fish and the herb with neither count reduced. ONE carrot, not the two the
+    // plan defaulted to, and the count is derived rather than picked: this row's
+    // largest non-produce count is 2 (trout, herb and salt all sit there), and
+    // a crop at 2 would tie it instead of staying strictly under it. Two would
+    // also tie the summed fish count, and a fish row whose vegetables match its
+    // fish is no longer a fish dish. At 1 the row stays fish-forward 2 to 1.
     reagents: [
       { itemId: 'raw_frostgill_trout', count: 2 },
+      { itemId: 'brook_carrot', count: 1 },
       { itemId: 'silverleaf_herb', count: 2 },
       { itemId: 'cooking_salt', count: 2 },
     ],
@@ -1348,9 +1483,13 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'cooking',
     resultItemId: 'silvered_carp_supper',
     resultCount: 1,
+    // THE PROVISIONING SUPPLY LINE, rung 50: the bed the supper is served on.
+    // The carp stays the headline at 3 and nothing else moved. Fish-forward
+    // holds 4 to 2, and exactly one crop family joins a fish row.
     reagents: [
       { itemId: 'raw_stonescale_carp', count: 3 },
       { itemId: 'raw_mirror_trout', count: 1 },
+      { itemId: 'marsh_rice', count: 2 },
       { itemId: 'goldleaf_herb', count: 1 },
       { itemId: 'cooking_salt', count: 1 },
     ],
@@ -1382,9 +1521,18 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'cooking',
     resultItemId: 'marlows_grand_roast',
     resultCount: 1,
+    // THE PROVISIONING SUPPLY LINE, rung 50, and the row that exercises
+    // masterwrought DECISION B on the cooking side: a roast's grain and gourd,
+    // at TIER 3, which gates at farming 50 and so lands exactly on this row's
+    // skillReq. The tier-3 seed faucet is real and was read from the code
+    // rather than a plan doc: farmer_hollis stocks all four tier-3 seeds at
+    // buyValue 32 (src/sim/content/zone3.ts). Both meats, the herb and the salt
+    // are untouched.
     reagents: [
       { itemId: 'prime_cut', count: 1 },
       { itemId: 'game_meat', count: 4 },
+      { itemId: 'highland_barley', count: 2 },
+      { itemId: 'frost_gourd', count: 2 },
       { itemId: 'sunpetal_herb', count: 1 },
       { itemId: 'cooking_salt', count: 2 },
     ],
@@ -1430,8 +1578,18 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'alchemy',
     resultItemId: 'elixir_of_the_boar',
     resultCount: 1,
+    // THE PROVISIONING SUPPLY LINE, alchemy rung 0. The elixir line is the
+    // hearty stamina line, so a farm base belongs in it, and after this phase
+    // the two professions supply each other: alchemy already brews farming's
+    // growth tonic from wild Sheenleaf (farming D7), and now farming feeds the
+    // elixirs back. The herb count is untouched, which is the whole point of
+    // masterwrought R18: herbalism loses nothing here.
+    // vale_wheat rather than brook_carrot for the same economy-basis reason as
+    // the rung-0 skewer: the carrot's D9 buyValue of 16 would make it worth
+    // more than this row's largest reagent (venom_gland at 12).
     reagents: [
       { itemId: 'venom_gland', count: 2 },
+      { itemId: 'vale_wheat', count: 1 },
       { itemId: 'silverleaf_herb', count: 2 },
       { itemId: 'glass_vial', count: 1 },
     ],
@@ -1477,8 +1635,12 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'alchemy',
     resultItemId: 'venomfire_elixir',
     resultCount: 1,
+    // THE PROVISIONING SUPPLY LINE, alchemy rung 25: the root base, at tier 2,
+    // which gates at farming 25 and lands exactly on this row. The gland count
+    // and the herb count are both untouched.
     reagents: [
       { itemId: 'venom_gland', count: 3 },
+      { itemId: 'bog_beet', count: 2 },
       { itemId: 'goldleaf_herb', count: 1 },
       { itemId: 'glass_vial', count: 1 },
     ],
@@ -1525,9 +1687,15 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'alchemy',
     resultItemId: 'elixir_of_the_serpent',
     resultCount: 2,
+    // THE PROVISIONING SUPPLY LINE, alchemy rung 50, and masterwrought DECISION
+    // B on the alchemy side: TIER 3 produce, gating at farming 50, on the row
+    // that unlocks at alchemy 50. ONE gourd, not the two the plan defaulted to,
+    // because this row's largest non-produce count is venom_gland at 2 and a
+    // crop must stay strictly under it. Neither herb nor gland count moved.
     reagents: [
       { itemId: 'pristine_venom_gland', count: 1 },
       { itemId: 'venom_gland', count: 2 },
+      { itemId: 'frost_gourd', count: 1 },
       { itemId: 'sunpetal_herb', count: 1 },
       { itemId: 'glass_vial', count: 1 },
     ],
@@ -1627,11 +1795,2867 @@ export const BAG_RECIPES: ProfessionRecipeRecord[] = [
   },
 ];
 
+// The jewelcrafting base catalog (Masterwrought phase 05): three rungs at
+// skillReq 0/25/50, three outputs per rung (two rings plus one neck), the
+// crafted jewelry ItemDefs in content/profession_items.ts. A separate list
+// from LADDER_RECIPES on purpose: that array's length and six-craft shape are
+// pinned as the Professions 2.0 ladder, and this catalog carries two shapes of
+// its own (tests/jewelcrafting_catalog.test.ts).
+//
+// - Every record binds `stationType: 'forge'` explicitly: jewelcrafting has no
+//   station of its own and deliberately stays OUT of STATION_TYPE_BY_CRAFT (no
+//   new station type, no new trainer NPC). The binding is the recipe's
+//   teaching home (training.ts trainingStationTypeFor), so Forgemistress Darva
+//   teaches the catalog, the enchanting charm precedent
+//   (TOOL_EFFECT_RECIPES). The foreign-bound literal pin in
+//   tests/professions_crafting_hub.test.ts names all nine ids.
+// - Reagents read the phase's "gems-from-salvage" input class as the
+//   disenchant ladder: arcane_dust on the 0 rung, arcane_essence on the 25 and
+//   50 rungs, and NEVER arcane_shard (phase 04 sized epic disenchant 1:1
+//   against the heroic faucet; shards stay reserved for the apex band). Ores
+//   carry the volume (wrought-metal register, the forge binding), fluxed like
+//   the other forge ladders; the rung-50 fourth line is iron_ore solder,
+//   NEVER fine_thorium_ore: a recipe must never list a base material AND its
+//   fine grade (they share one consumption pool via materialGradeIds, so the
+//   reagent check double-counts a bag; the disjointness invariant in
+//   tests/material_grades.test.ts pins it). The solder keeps the whole input
+//   list mining-plus-disenchant rather than crossing into the
+//   enchant-exclusive resonant secondaries.
+// - Scaffolding follows the cross-craft convention above (skillReq 0 -> 10/10,
+//   25 -> 16/15, 50 -> 20/20; since masterwrought Phase 11o the equippable
+//   rung-50 rows carry level 15, see the LADDER_RECIPES amendment, and all
+//   three rung-50 jewelry rows are equippable); acquisition is ['trainer'] on
+//   every record (the grandfather list is frozen). Every reagent list is
+//   authored gold-negative
+//   under the recipe_economy rule, and every rung keeps at least one
+//   no-buyValue reagent (the ores/dust/essence) so no record joins the
+//   counterfactually-vendor-fed set.
+export const JEWELCRAFTING_RECIPES: ProfessionRecipeRecord[] = [
+  {
+    id: 'recipe_hammered_copper_band',
+    professionId: 'jewelcrafting',
+    resultItemId: 'hammered_copper_band',
+    resultCount: 1,
+    // Input 48 vs output 32.
+    reagents: [
+      { itemId: 'copper_ore', count: 4 },
+      { itemId: 'arcane_dust', count: 2 },
+      { itemId: 'smithing_flux', count: 1 },
+    ],
+    skillReq: 0,
+    itemLevelBudget: 10,
+    level: 10,
+    acquisition: ['trainer'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_polished_copper_loop',
+    professionId: 'jewelcrafting',
+    resultItemId: 'polished_copper_loop',
+    resultCount: 1,
+    // Input 54 vs output 32.
+    reagents: [
+      { itemId: 'copper_ore', count: 4 },
+      { itemId: 'arcane_dust', count: 3 },
+      { itemId: 'smithing_flux', count: 1 },
+    ],
+    skillReq: 0,
+    itemLevelBudget: 10,
+    level: 10,
+    acquisition: ['trainer'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_coiled_copper_torc',
+    professionId: 'jewelcrafting',
+    resultItemId: 'coiled_copper_torc',
+    resultCount: 1,
+    // Input 52 vs output 36.
+    reagents: [
+      { itemId: 'copper_ore', count: 5 },
+      { itemId: 'arcane_dust', count: 2 },
+      { itemId: 'smithing_flux', count: 1 },
+    ],
+    skillReq: 0,
+    itemLevelBudget: 10,
+    level: 10,
+    acquisition: ['trainer'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_riveted_iron_signet',
+    professionId: 'jewelcrafting',
+    resultItemId: 'riveted_iron_signet',
+    resultCount: 1,
+    // Input 70 vs output 46.
+    reagents: [
+      { itemId: 'iron_ore', count: 4 },
+      { itemId: 'arcane_essence', count: 1 },
+      { itemId: 'smithing_flux', count: 1 },
+    ],
+    skillReq: 25,
+    itemLevelBudget: 16,
+    level: 15,
+    acquisition: ['trainer'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_etched_iron_loop',
+    professionId: 'jewelcrafting',
+    resultItemId: 'etched_iron_loop',
+    resultCount: 1,
+    // Input 80 vs output 46.
+    reagents: [
+      { itemId: 'iron_ore', count: 3 },
+      { itemId: 'arcane_essence', count: 2 },
+      { itemId: 'smithing_flux', count: 1 },
+    ],
+    skillReq: 25,
+    itemLevelBudget: 16,
+    level: 15,
+    acquisition: ['trainer'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_iron_link_choker',
+    professionId: 'jewelcrafting',
+    resultItemId: 'iron_link_choker',
+    resultCount: 1,
+    // Input 78 vs output 52.
+    reagents: [
+      { itemId: 'iron_ore', count: 5 },
+      { itemId: 'arcane_essence', count: 1 },
+      { itemId: 'smithing_flux', count: 1 },
+    ],
+    skillReq: 25,
+    itemLevelBudget: 16,
+    level: 15,
+    acquisition: ['trainer'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_weighted_thorium_band',
+    professionId: 'jewelcrafting',
+    resultItemId: 'weighted_thorium_band',
+    resultCount: 1,
+    // Input 332 vs output 280 (buyValue basis: osmium ore 60, flux 20). The
+    // 4th line is iron solder, NOT fine_thorium_ore: a recipe must never list
+    // a base material AND its fine grade (they share one consumption pool via
+    // materialGradeIds, so the reagent check double-counts a bag; the
+    // disjointness invariant in tests/material_grades.test.ts pins it).
+    reagents: [
+      { itemId: 'thorium_ore', count: 4 },
+      { itemId: 'arcane_essence', count: 2 },
+      { itemId: 'smithing_flux', count: 2 },
+      { itemId: 'iron_ore', count: 2 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    level: 15,
+    acquisition: ['trainer'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_gleaming_thorium_loop',
+    professionId: 'jewelcrafting',
+    resultItemId: 'gleaming_thorium_loop',
+    resultCount: 1,
+    // Input 350 vs output 280. Iron solder 4th line, same rule as the band.
+    reagents: [
+      { itemId: 'thorium_ore', count: 4 },
+      { itemId: 'arcane_essence', count: 3 },
+      { itemId: 'smithing_flux', count: 2 },
+      { itemId: 'iron_ore', count: 2 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    level: 15,
+    acquisition: ['trainer'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_burnished_thorium_amulet',
+    professionId: 'jewelcrafting',
+    resultItemId: 'burnished_thorium_amulet',
+    resultCount: 1,
+    // Input 332 vs output 310. Iron solder 4th line, same rule as the band.
+    reagents: [
+      { itemId: 'thorium_ore', count: 4 },
+      { itemId: 'arcane_essence', count: 2 },
+      { itemId: 'smithing_flux', count: 2 },
+      { itemId: 'iron_ore', count: 2 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    level: 15,
+    acquisition: ['trainer'],
+    stationType: 'forge',
+  },
+];
+
+// The inscription base catalog (Masterwrought phase 06): three rungs at
+// skillReq 0/25/50, two outputs per rung (one caster tome plus one buff
+// scroll), the crafted ItemDefs in content/profession_items.ts. A separate
+// list from LADDER_RECIPES for the jewelcrafting reason: that array's length
+// and six-craft shape are pinned as the Professions 2.0 ladder, and this
+// catalog carries shapes of its own (tests/inscription_catalog.test.ts).
+//
+// - Every record binds `stationType: 'apothecary'` explicitly: inscription has
+//   no station of its own and deliberately stays OUT of STATION_TYPE_BY_CRAFT
+//   (no new station type, no new trainer NPC). The binding is the recipe's
+//   teaching home (training.ts trainingStationTypeFor), so Alchemist Verane
+//   teaches the catalog, the enchanting-charm/jewelcrafting precedent. The
+//   foreign-bound literal pin in tests/professions_crafting_hub.test.ts names
+//   all six ids.
+// - Reagents are ink and pigment work: the herb ladder carries the volume
+//   (silverleaf on the 0 rung, goldleaf on 25, sunpetal on 50, the SAME herbs
+//   the apothecary's alchemy draughts mill), arcane_dust on the 0 rung and
+//   arcane_essence on 25/50 are the magical ink, and NEVER arcane_shard
+//   (phase 04 sized epic disenchant 1:1 against the heroic faucet; shards
+//   stay reserved for the apex band). glass_vial is the ink vessel, the
+//   apothecary staple the recipes' own station stocks. The rung-50 fourth
+//   line is goldleaf_herb sizing, NEVER a fine_* grade beside its base: a
+//   recipe must never list a base material AND its fine grade (they share one
+//   consumption pool via materialGradeIds; the disjointness invariant in
+//   tests/material_grades.test.ts pins it).
+// - Scaffolding follows the cross-craft convention above (skillReq 0 -> 10/10,
+//   25 -> 16/15, 50 -> 20/20; since masterwrought Phase 11o the equippable
+//   rung-50 grimoire carries level 15 while the consumable scroll keeps 20,
+//   see the LADDER_RECIPES amendment); acquisition is ['trainer'] on every
+//   record. Every reagent list is authored gold-negative under the recipe_economy
+//   rule, and every rung keeps at least one no-buyValue reagent (the
+//   dust/essence ink lines) so no record joins the counterfactually-
+//   vendor-fed set.
+export const INSCRIPTION_RECIPES: ProfessionRecipeRecord[] = [
+  {
+    id: 'recipe_silverleaf_primer',
+    professionId: 'inscription',
+    resultItemId: 'silverleaf_primer',
+    resultCount: 1,
+    // Input 36 vs output 24.
+    reagents: [
+      { itemId: 'silverleaf_herb', count: 3 },
+      { itemId: 'arcane_dust', count: 2 },
+      { itemId: 'glass_vial', count: 1 },
+    ],
+    skillReq: 0,
+    itemLevelBudget: 10,
+    level: 10,
+    acquisition: ['trainer'],
+    stationType: 'apothecary',
+  },
+  {
+    id: 'recipe_silverleaf_scroll',
+    professionId: 'inscription',
+    resultItemId: 'silverleaf_scroll',
+    resultCount: 1,
+    // Input 26 vs output 10.
+    reagents: [
+      { itemId: 'silverleaf_herb', count: 2 },
+      { itemId: 'arcane_dust', count: 1 },
+      { itemId: 'glass_vial', count: 1 },
+    ],
+    skillReq: 0,
+    itemLevelBudget: 10,
+    level: 10,
+    acquisition: ['trainer'],
+    stationType: 'apothecary',
+  },
+  {
+    id: 'recipe_goldleaf_folio',
+    professionId: 'inscription',
+    resultItemId: 'goldleaf_folio',
+    resultCount: 1,
+    // Input 150 vs output 100.
+    reagents: [
+      { itemId: 'goldleaf_herb', count: 2 },
+      { itemId: 'arcane_essence', count: 1 },
+      { itemId: 'glass_vial', count: 1 },
+    ],
+    skillReq: 25,
+    itemLevelBudget: 16,
+    level: 15,
+    acquisition: ['trainer'],
+    stationType: 'apothecary',
+  },
+  {
+    id: 'recipe_goldleaf_scroll',
+    professionId: 'inscription',
+    resultItemId: 'goldleaf_scroll',
+    resultCount: 1,
+    // Input 90 vs output 15.
+    reagents: [
+      { itemId: 'goldleaf_herb', count: 1 },
+      { itemId: 'arcane_essence', count: 1 },
+      { itemId: 'glass_vial', count: 1 },
+    ],
+    skillReq: 25,
+    itemLevelBudget: 16,
+    level: 15,
+    acquisition: ['trainer'],
+    stationType: 'apothecary',
+  },
+  {
+    id: 'recipe_sunpetal_grimoire',
+    professionId: 'inscription',
+    resultItemId: 'sunpetal_grimoire',
+    resultCount: 1,
+    // Input 488 vs output 280. Goldleaf sizing 4th line, no fine grades.
+    reagents: [
+      { itemId: 'sunpetal_herb', count: 2 },
+      { itemId: 'arcane_essence', count: 2 },
+      { itemId: 'glass_vial', count: 1 },
+      { itemId: 'goldleaf_herb', count: 2 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    level: 15,
+    acquisition: ['trainer'],
+    stationType: 'apothecary',
+  },
+  {
+    id: 'recipe_sunpetal_scroll',
+    professionId: 'inscription',
+    resultItemId: 'sunpetal_scroll',
+    resultCount: 2,
+    // Input 229 vs output 40 (two scrolls, the serpent-elixir batch shape).
+    // Priced at EXACT parity with recipe_elixir_of_the_serpent (229, also x2)
+    // per the Phase 06 QA ruling, RESTORED at masterwrought Phase 19G (ruling
+    // qr-19-scroll-elixir-15c-parity, 2026-09-02): the two routes grant a
+    // byte-identical buff, so neither may undercut the other. Phase 11g put a
+    // frost_gourd on the elixir as its rung-50 produce consumer (214 to 229)
+    // and this scroll stayed at 214, so the same gourd rides here now: the
+    // tier-3 crops are the only family IN USE AS A REAGENT whose unit value
+    // lands 15 exactly (chipped_tusk lands 15 too and no recipe consumes it;
+    // the ink register cannot reach it), and the elixir's own crop is the one
+    // that keeps the twin bills alike.
+    // The parity is PINNED in tests/recipe_economy.test.ts ('the rung-50
+    // scroll and the serpent elixir bill at exact input parity'); the byte
+    // bill is pinned in tests/inscription_catalog.test.ts.
+    // Two claims the ruling once rested on are stated as they are today:
+    // pristine_venom_gland has FOUR crafting sinks (the serpent elixir and
+    // the three apex flasks), and the rung-25 pair does NOT ship parity
+    // (recipe_goldleaf_scroll 90 against recipe_venomfire_elixir 106 since
+    // 11g's bog_beet); the rung-0 pair is 26 against 36 for the same reason.
+    // Both stay recorded, not repaired: the ruling covers rung 50 alone.
+    // The dust 5th line stays inside the craft's ink register (the rung-0
+    // recipes grind dust), an extra tail line the way the grimoire's rung-50
+    // bill carries one (its goldleaf pair).
+    reagents: [
+      { itemId: 'sunpetal_herb', count: 1 },
+      { itemId: 'frost_gourd', count: 1 },
+      { itemId: 'arcane_essence', count: 2 },
+      { itemId: 'glass_vial', count: 1 },
+      { itemId: 'arcane_dust', count: 1 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'apothecary',
+  },
+  // The Deed of Making (Masterwrought phase 13, R3/R13): inscription's FIRST
+  // and only 125 rung, the writ the orange promotion consumes 1:1
+  // (professions/perfecting.ts LEGENDARY_PROMOTION_COST). Trainer-taught, NOT
+  // a drop row like the apex arrays: the promotion's real gates are the
+  // Perfected copy and the deed's bill, so the pattern itself stays a
+  // teachable service any 125 inscriptionist sells. The bill is the consumed-
+  // capstone idiom (the apex feast shape): 3 of the craft's own intermediate,
+  // ONE Wyrmfall Core because the output is spent, plus the craft's gathered
+  // family (the voidbound grimoire's own lines). Input 553 on the sibling
+  // recipes' buyValue basis (buyValue where one exists, else sellValue:
+  // vellum 3x45=135, core 50, sunpetal 2x160=320, essence 2x18=36, vial 12)
+  // vs output 50. NOT oncePerDay: promotion pacing lives in the Perfected
+  // walk, never in a craft gate.
+  {
+    id: 'recipe_deed_of_making',
+    professionId: 'inscription',
+    resultItemId: 'deed_of_making',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'sablewax_vellum', count: 3 },
+      { itemId: 'wyrmfall_core', count: 1 },
+      { itemId: 'sunpetal_herb', count: 2 },
+      { itemId: 'arcane_essence', count: 2 },
+      { itemId: 'glass_vial', count: 1 },
+    ],
+    skillReq: 125,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['trainer'],
+    stationType: 'apothecary',
+  },
+];
+
+// The Masterwrought intermediates rung (Phase 07, R13): one intermediate
+// material per profession at skill 75, using the ten-row mapping and demand
+// model summarized in docs/design/professions.md. The Quickening Catalyst is alchemy's 75
+// rung and the time gate: `oncePerDay` limits it to one successful craft per
+// character per reset day (professions/types.ts), and every other row
+// consumes exactly one Catalyst, so each apex piece (3 intermediates) costs 3
+// catalyst-days, self-funded or market-bought (the Catalyst and all nine
+// intermediates are ordinary tradable items).
+//
+// - A NEW list rather than a LADDER_RECIPES growth: that array's 54-row
+//   six-craft shape is pinned as the Professions 2.0 ladder
+//   (tests/ladder_crafting.test.ts), the jewelcrafting/inscription precedent.
+// - Scaffolding is the shipped 75-band convention (skillReq 75,
+//   itemLevelBudget 20, level 20: the 75-skill TOOL_RECIPES,
+//   recipe_stormreel_fishing_rod; CASTER_HUB_RECIPES was the third exemplar
+//   until masterwrought Phase 11o moved its equippable outputs to level 17,
+//   which does not touch these junk-output rows); acquisition ['trainer'] on
+//   every record (the grandfather list is frozen), tier-3 teaches at the
+//   crafts' own stations. The three station-less crafts bind a foreign
+//   station per record, the recipe's teaching home: jewelcrafting 'forge'
+//   (phase 05), inscription 'apothecary' (phase 06), and enchanting
+//   'toolworks' (the Phase 07 serial decision: the two tool-effect charms
+//   already bind there, and enchanting stays OUT of STATION_TYPE_BY_CRAFT).
+//   The foreign-bound literal pin in tests/professions_crafting_hub.test.ts
+//   names the three new ids.
+// - Reagents are EXISTING gathered mats in each craft's own register plus the
+//   Catalyst; the Catalyst row consumes alchemy-register mats only. Every row
+//   keeps at least one no-buyValue reagent (the Catalyst itself for the nine,
+//   venom glands on the Catalyst row), so no record joins the
+//   counterfactually-vendor-fed set; never a base material beside its fine_
+//   grade (material_grades.ts disjointness); and NEVER arcane_shard (reserved
+//   for the apex band per Phase 04).
+export const INTERMEDIATE_RECIPES: ProfessionRecipeRecord[] = [
+  // The rung itself and the gate. Input 304 (sunpetal 160 + goldleaf 2x60 +
+  // venom glands 2x6 + vial 12) vs output 50.
+  {
+    id: 'recipe_quickening_catalyst',
+    professionId: 'alchemy',
+    resultItemId: 'quickening_catalyst',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'sunpetal_herb', count: 1 },
+      { itemId: 'goldleaf_herb', count: 2 },
+      { itemId: 'venom_gland', count: 2 },
+      { itemId: 'glass_vial', count: 1 },
+    ],
+    skillReq: 75,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'apothecary',
+    oncePerDay: true,
+  },
+  // The nine consumers, each gold-negative on the buyValue-else-sellValue
+  // basis with the Catalyst priced at its 50 sellValue: billet 246 vs 45,
+  // plating 256 vs 45, cording 105 vs 40, bolt 255 vs 45, setting 206 vs 45,
+  // chassis 308 vs 45 (290 until masterwrought Phase 11o ADDED the
+  // cogwheel_blank row at its 18 sellValue basis, qr-11o-ENG's R18
+  // add-never-substitute shape), stock 130 vs 30, reagent 128 vs 40,
+  // vellum 258 vs 45.
+  // (The stock read 98 here from Phase 07 until masterwrought Phase 11g's
+  // DECISION C put marsh_rice 2 plus bog_beet 2 in that bill and left this
+  // number behind. Corrected by Phase 11h's verify pass over the same row,
+  // which re-derives 130 from the merged table; the ROW itself is 11g's and is
+  // untouched here.)
+  {
+    id: 'recipe_duskforged_billet',
+    professionId: 'weaponcrafting',
+    resultItemId: 'duskforged_billet',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'thorium_ore', count: 3 },
+      { itemId: 'iron_ore', count: 2 },
+      { itemId: 'quickening_catalyst', count: 1 },
+    ],
+    skillReq: 75,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_forgefold_plating',
+    professionId: 'armorcrafting',
+    resultItemId: 'forgefold_plating',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'thorium_ore', count: 3 },
+      { itemId: 'iron_ore', count: 2 },
+      { itemId: 'rough_hide', count: 2 },
+      { itemId: 'quickening_catalyst', count: 1 },
+    ],
+    skillReq: 75,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_wyrmhide_cording',
+    professionId: 'leatherworking',
+    resultItemId: 'wyrmhide_cording',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'pristine_hide', count: 1 },
+      { itemId: 'rough_hide', count: 4 },
+      { itemId: 'spider_silk', count: 2 },
+      { itemId: 'quickening_catalyst', count: 1 },
+    ],
+    skillReq: 75,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'tannery',
+  },
+  {
+    id: 'recipe_sunspun_bolt',
+    professionId: 'tailoring',
+    resultItemId: 'sunspun_bolt',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'sunpetal_herb', count: 1 },
+      { itemId: 'spider_silk', count: 4 },
+      { itemId: 'pristine_silk', count: 1 },
+      { itemId: 'quickening_catalyst', count: 1 },
+    ],
+    skillReq: 75,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'loom',
+  },
+  {
+    id: 'recipe_prismglass_setting',
+    professionId: 'jewelcrafting',
+    resultItemId: 'prismglass_setting',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'thorium_ore', count: 2 },
+      { itemId: 'arcane_essence', count: 2 },
+      { itemId: 'quickening_catalyst', count: 1 },
+    ],
+    skillReq: 75,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_precision_chassis',
+    professionId: 'engineering',
+    resultItemId: 'precision_chassis',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'ashwood_log', count: 2 },
+      { itemId: 'thorium_ore', count: 2 },
+      { itemId: 'quickening_catalyst', count: 1 },
+      // ADDED at masterwrought Phase 11o (qr-11o-ENG, R18 add-never-
+      // substitute): the skill-0 on-ramp part gains its real consumer inside
+      // engineering's own chain. Tier-0 material, so the bill's masterwork
+      // materialTierBonus is unchanged (the bonus is the MAX reagent tier and
+      // the Catalyst already holds it at 2; measured delta 0).
+      { itemId: 'cogwheel_blank', count: 1 },
+    ],
+    skillReq: 75,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'toolworks',
+  },
+  {
+    id: 'recipe_seasoned_stock',
+    professionId: 'cooking',
+    resultItemId: 'seasoned_stock',
+    resultCount: 1,
+    // THE CHOKE POINT (masterwrought DECISION C, settled 2026-08-20, authored
+    // HERE because Phase 11g reaches this row first; Phase 11h takes this bill
+    // AS GIVEN and re-derives its own arithmetic from it rather than editing
+    // the row). The result is meat plus vegetables plus salt, which is what a
+    // stock is.
+    //
+    // THE COUNTS ARE DERIVED FROM THE ROW'S OWN SHAPE, not picked: the shipped
+    // bill was prime_cut 1, game_meat 3, cooking_salt 2, quickening_catalyst 1,
+    // so the vegetables enter at the salt's count of 2, one below the meat
+    // count of 3, and the bill still reads meat, then vegetables, then salt.
+    //
+    // THE TIER IS DELIBERATELY 2 AT BOTH, and it is grain AND root rather than
+    // one crop. Everything in the cooking apex flows through this single row
+    // (the three role plates take seasoned_stock 1, recipe_laden_hearth takes
+    // 3, and Phase 11k's apex feasts take it too), so coupling it to two
+    // vendor-seeded, market-fed supply lines spreads the choke point instead of
+    // making the whole apex kitchen ride one paddy. Tier 3 or 4 would put it
+    // behind farming's deliberately slow upper supply, so the choke point would
+    // actually choke.
+    //
+    // masterwrought R17 IS NOT BREACHED HERE, and the distinction is the point:
+    // R17 fences produce out of the GEAR chain, and this is a cooking
+    // intermediate whose output is a food reagent with no equip slot. The
+    // firewall sweep in tests/provisioner_firewall.test.ts reads
+    // INTERMEDIATE_RECIPES, a mixed table holding both gear intermediates and
+    // this one, so that sweep gains a consumable-profession carve-out proved by
+    // the same no-equip-slot test the hoe carve-out already uses.
+    reagents: [
+      { itemId: 'prime_cut', count: 1 },
+      { itemId: 'game_meat', count: 3 },
+      { itemId: 'marsh_rice', count: 2 },
+      { itemId: 'bog_beet', count: 2 },
+      { itemId: 'cooking_salt', count: 2 },
+      { itemId: 'quickening_catalyst', count: 1 },
+    ],
+    skillReq: 75,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_lucent_reagent',
+    professionId: 'enchanting',
+    resultItemId: 'lucent_reagent',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'arcane_essence', count: 3 },
+      { itemId: 'arcane_dust', count: 4 },
+      { itemId: 'quickening_catalyst', count: 1 },
+    ],
+    skillReq: 75,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'toolworks',
+  },
+  {
+    id: 'recipe_sablewax_vellum',
+    professionId: 'inscription',
+    resultItemId: 'sablewax_vellum',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'sunpetal_herb', count: 1 },
+      { itemId: 'arcane_essence', count: 2 },
+      { itemId: 'glass_vial', count: 1 },
+      { itemId: 'quickening_catalyst', count: 1 },
+    ],
+    skillReq: 75,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'apothecary',
+  },
+];
+
+// The Masterwrought apex armor rung (Phase 08, R8/R13): the skill-100 recipes
+// for the three armor crafts, nine ilvl-31 epics plus the tailoring apex bag.
+// Every row consumes exactly 3 of its own profession's intermediate (the
+// recorded phase 07 demand math: one apex piece = 3 catalyst-days) plus
+// 2 Wyrmfall Cores (the raid/heroic tie; the catalyst stays the pacing gate)
+// plus the craft's gathered family. acquisition ['drop'] per R8: apex patterns
+// land as tradable raid/rift drops and heroic-marks vendor rows in phase 11,
+// so these recipes are deliberately unlearnable until then; NOT trainer rows.
+// stationType matches each craft's existing rows so the per-craft wiki station
+// field stays unanimous. itemLevelBudget feeds only the craft gold fee.
+export const APEX_ARMOR_RECIPES: ProfessionRecipeRecord[] = [
+  {
+    id: 'recipe_spiritweld_girdle',
+    professionId: 'armorcrafting',
+    resultItemId: 'spiritweld_girdle',
+    resultCount: 1,
+    // Authored gold-negative: input value exceeds the output sellValue (live
+    // values in items.ts; pinned by tests/recipe_economy.test.ts).
+    reagents: [
+      { itemId: 'forgefold_plating', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'thorium_ore', count: 4 },
+      { itemId: 'iron_ore', count: 2 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_forgefold_legguards',
+    professionId: 'armorcrafting',
+    resultItemId: 'forgefold_legguards',
+    resultCount: 1,
+    // Authored gold-negative: input value exceeds the output sellValue (live
+    // values in items.ts; pinned by tests/recipe_economy.test.ts).
+    reagents: [
+      { itemId: 'forgefold_plating', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'thorium_ore', count: 4 },
+      { itemId: 'iron_ore', count: 2 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_wardspeaker_sabatons',
+    professionId: 'armorcrafting',
+    resultItemId: 'wardspeaker_sabatons',
+    resultCount: 1,
+    // Authored gold-negative: input value exceeds the output sellValue (live
+    // values in items.ts; pinned by tests/recipe_economy.test.ts).
+    reagents: [
+      { itemId: 'forgefold_plating', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'thorium_ore', count: 4 },
+      { itemId: 'iron_ore', count: 2 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_briarstep_jerkin',
+    professionId: 'leatherworking',
+    resultItemId: 'briarstep_jerkin',
+    resultCount: 1,
+    // Authored gold-negative: input value exceeds the output sellValue (live
+    // values in items.ts; pinned by tests/recipe_economy.test.ts).
+    reagents: [
+      { itemId: 'wyrmhide_cording', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'rough_hide', count: 4 },
+      { itemId: 'pristine_hide', count: 1 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'tannery',
+  },
+  {
+    id: 'recipe_fenbloom_breeches',
+    professionId: 'leatherworking',
+    resultItemId: 'fenbloom_breeches',
+    resultCount: 1,
+    // Authored gold-negative: input value exceeds the output sellValue (live
+    // values in items.ts; pinned by tests/recipe_economy.test.ts).
+    reagents: [
+      { itemId: 'wyrmhide_cording', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'rough_hide', count: 4 },
+      { itemId: 'pristine_hide', count: 1 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'tannery',
+  },
+  {
+    id: 'recipe_barksong_handguards',
+    professionId: 'leatherworking',
+    resultItemId: 'barksong_handguards',
+    resultCount: 1,
+    // Authored gold-negative: input value exceeds the output sellValue (live
+    // values in items.ts; pinned by tests/recipe_economy.test.ts).
+    reagents: [
+      { itemId: 'wyrmhide_cording', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'rough_hide', count: 4 },
+      { itemId: 'pristine_hide', count: 1 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'tannery',
+  },
+  {
+    id: 'recipe_sunspun_vestments',
+    professionId: 'tailoring',
+    resultItemId: 'sunspun_vestments',
+    resultCount: 1,
+    // Authored gold-negative: input value exceeds the output sellValue (live
+    // values in items.ts; pinned by tests/recipe_economy.test.ts).
+    reagents: [
+      { itemId: 'sunspun_bolt', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'spider_silk', count: 4 },
+      { itemId: 'pristine_silk', count: 1 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'loom',
+  },
+  {
+    id: 'recipe_sunspun_leggings',
+    professionId: 'tailoring',
+    resultItemId: 'sunspun_leggings',
+    resultCount: 1,
+    // Authored gold-negative: input value exceeds the output sellValue (live
+    // values in items.ts; pinned by tests/recipe_economy.test.ts).
+    reagents: [
+      { itemId: 'sunspun_bolt', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'spider_silk', count: 4 },
+      { itemId: 'pristine_silk', count: 1 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'loom',
+  },
+  {
+    id: 'recipe_sunspun_handwraps',
+    professionId: 'tailoring',
+    resultItemId: 'sunspun_handwraps',
+    resultCount: 1,
+    // Authored gold-negative: input value exceeds the output sellValue (live
+    // values in items.ts; pinned by tests/recipe_economy.test.ts).
+    reagents: [
+      { itemId: 'sunspun_bolt', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'spider_silk', count: 4 },
+      { itemId: 'pristine_silk', count: 1 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'loom',
+  },
+  {
+    id: 'recipe_sunspun_haversack',
+    professionId: 'tailoring',
+    resultItemId: 'sunspun_haversack',
+    resultCount: 1,
+    // Authored gold-negative: input value exceeds the output sellValue (live
+    // values in items.ts; pinned by tests/recipe_economy.test.ts).
+    reagents: [
+      { itemId: 'sunspun_bolt', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'spider_silk', count: 4 },
+      { itemId: 'pristine_silk', count: 1 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'loom',
+  },
+];
+
+// The Masterwrought apex gear rung (Phase 09, R8/R13): the skill-100 recipes
+// for weaponcrafting (1H, 2H, shield), jewelcrafting (neck, two rings),
+// engineering (gadget, field forge, apex charm), and inscription (tome).
+// Reagent bills are uniform per craft, the phase 07 demand math: exactly 3 of
+// the profession's own intermediate (3 catalyst-days) plus 2 Wyrmfall Cores
+// (the raid/heroic tie) plus the craft's gathered family, quantities on the
+// phase 08 idiom. acquisition ['drop'] per R8, same as APEX_ARMOR_RECIPES:
+// apex patterns land as drops and heroic-marks vendor rows in phase 11, so
+// these recipes are deliberately unlearnable until then; NOT trainer rows.
+// stationType matches each craft's existing rows so the per-craft wiki
+// station field stays unanimous; itemLevelBudget feeds only the craft gold
+// fee. The apex charm row also carries the R39 mint-out-costs-recharge
+// inequality: its cheapest (engineering-specialized) mint values 380 copper,
+// above the 275 the worst generic recharge costs; pinned both ways in
+// tests/professions_tool_effect_recharge.test.ts.
+export const APEX_GEAR_RECIPES: ProfessionRecipeRecord[] = [
+  {
+    id: 'recipe_duskforged_warblade',
+    professionId: 'weaponcrafting',
+    resultItemId: 'duskforged_warblade',
+    resultCount: 1,
+    // Input 491 vs output 320.
+    reagents: [
+      { itemId: 'duskforged_billet', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'thorium_ore', count: 4 },
+      { itemId: 'iron_ore', count: 2 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_ridgebreaker',
+    professionId: 'weaponcrafting',
+    resultItemId: 'ridgebreaker',
+    resultCount: 1,
+    // Input 491 vs output 340.
+    reagents: [
+      { itemId: 'duskforged_billet', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'thorium_ore', count: 4 },
+      { itemId: 'iron_ore', count: 2 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_duskforged_bulwark',
+    professionId: 'weaponcrafting',
+    resultItemId: 'duskforged_bulwark',
+    resultCount: 1,
+    // Input 491 vs output 300.
+    reagents: [
+      { itemId: 'duskforged_billet', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'thorium_ore', count: 4 },
+      { itemId: 'iron_ore', count: 2 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_wyrmfall_pendant',
+    professionId: 'jewelcrafting',
+    resultItemId: 'wyrmfall_pendant',
+    resultCount: 1,
+    // Input 511 vs output 320.
+    reagents: [
+      { itemId: 'prismglass_setting', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'thorium_ore', count: 4 },
+      { itemId: 'arcane_essence', count: 2 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_warhewn_signet',
+    professionId: 'jewelcrafting',
+    resultItemId: 'warhewn_signet',
+    resultCount: 1,
+    // Input 511 vs output 300.
+    reagents: [
+      { itemId: 'prismglass_setting', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'thorium_ore', count: 4 },
+      { itemId: 'arcane_essence', count: 2 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_prismglass_loop',
+    professionId: 'jewelcrafting',
+    resultItemId: 'prismglass_loop',
+    resultCount: 1,
+    // Input 511 vs output 300.
+    reagents: [
+      { itemId: 'prismglass_setting', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'thorium_ore', count: 4 },
+      { itemId: 'arcane_essence', count: 2 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_gyrelens_array',
+    professionId: 'engineering',
+    resultItemId: 'gyrelens_array',
+    resultCount: 1,
+    // Input 595 vs output 340.
+    reagents: [
+      { itemId: 'precision_chassis', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'ashwood_log', count: 4 },
+      { itemId: 'thorium_ore', count: 2 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'toolworks',
+  },
+  {
+    id: 'recipe_masters_field_forge',
+    professionId: 'engineering',
+    resultItemId: 'masters_field_forge',
+    resultCount: 1,
+    // Input 595 vs output 380.
+    reagents: [
+      { itemId: 'precision_chassis', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'ashwood_log', count: 4 },
+      { itemId: 'thorium_ore', count: 2 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'toolworks',
+  },
+  {
+    id: 'recipe_makers_charm',
+    professionId: 'engineering',
+    resultItemId: 'makers_charm',
+    resultCount: 1,
+    // Input 595 vs output 150. The R39 bound at the apex rung: a
+    // specialized engineer consumes floor(count x 0.8) of each line
+    // (2 chassis 90 + 1 core 50 + 3 logs 180 + 1 ore 60 = 380), above the
+    // 275 the worst generic recharge (an epic-rung 50-charge fill, 5
+    // shards) costs, so re-crafting can never bypass recharging.
+    reagents: [
+      { itemId: 'precision_chassis', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'ashwood_log', count: 4 },
+      { itemId: 'thorium_ore', count: 2 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'toolworks',
+  },
+  {
+    id: 'recipe_voidbound_grimoire',
+    professionId: 'inscription',
+    resultItemId: 'voidbound_grimoire',
+    resultCount: 1,
+    // Input 603 vs output 340.
+    reagents: [
+      { itemId: 'sablewax_vellum', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'sunpetal_herb', count: 2 },
+      { itemId: 'arcane_essence', count: 2 },
+      { itemId: 'glass_vial', count: 1 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'apothecary',
+  },
+];
+
+// The Masterwrought apex CONSUMABLE rung (Phase 10, R8/R13): the two crafts
+// the apex gear rungs left out, alchemy and cooking, land theirs as
+// consumables rather than gear. Its own array beside APEX_ARMOR_RECIPES and
+// APEX_GEAR_RECIPES because LADDER_RECIPES is pinned at its 54-row six-craft
+// shape and must never grow.
+//
+// The consumable idiom, which is where these rows differ from the gear ones:
+// a batch output (2 flasks, 4 plates) rather than a single piece, and ONE of
+// the craft's own intermediate rather than three, because a consumable is
+// spent and re-bought while a piece of gear is worn forever.
+//
+// THE UNIFORM-BILL RULE, AMENDED BY masterwrought Phase 11h (11h-GATE-A) and
+// scoped exactly, because a rule silently contradicted by the rows under it is
+// worse than a rule changed on purpose:
+//   - THE FOOD FAMILY'S bills differ by EXACTLY ONE CROP ROW and are identical
+//     in every other reagent.
+//   - THE FLASK FAMILY stays BYTE-IDENTICAL.
+// The original rule (uniform within a family, so a role choice is never also an
+// economy choice) is unchanged in substance and that is what the narrow scope
+// protects. The one crop row is worth 30 copper on every plate, so the three
+// bills are cost-identical to the copper and the differentiation is FLAVOR,
+// never price: the tank plate takes the gourd, the physical plate the grain,
+// the caster plate the leaf, all tier 3, all gated at farming 50, so a role
+// choice is not an economy choice OR a skill-gate choice either.
+// The looser amendment ("the food family is exempt") is REFUSED: it would read
+// as open season, and it would not tell Phase 11i what its fish row has to
+// satisfy. That row is legal under this wording precisely because it is the
+// SAME row on all three plates (11i DECISION D), so the crop row differentiates
+// and the fish row unifies. Read the scope, not the family name.
+//
+// PACING: the flask chain is daily-gated TRANSITIVELY. recipe_quickening_
+// catalyst is oncePerDay, so a flask costs a catalyst-day even though no row
+// here carries the flag. The food chain runs through seasoned_stock, which is
+// NOT daily-gated, so cooking's apex output paces on materials alone.
+//
+// THE SKILL-125 CAPSTONE FAMILIES sit at the end, one rung above everything
+// else in the game. Named as FAMILIES rather than counted, per the anchor rule,
+// because a count here rots the moment a rung is added (this sentence said "the
+// two skill-125 CAPSTONE rungs" until masterwrought Phase 11k made it false):
+//   - THE TWO MOBILE STATIONS, alchemy's Grand Cauldron and cooking's Laden
+//     Hearth. Permanent, never consumed, 2 Wyrmfall Cores each.
+//   - THE THREE APEX ROLE FEASTS (Phase 11k), cooking's consumed capstone.
+//     One byte-identical bill, 1 Core each because a feast is spent per raid
+//     night where a station is permanent.
+// 125 is legal (the tidewrought precedent) and there is no craft-time skill
+// admission gate anyway; skillReq shapes teachability, the gold fee, the
+// masterwork proc, and skill gain, so the rung reads as the prestige marker it
+// is. The STATIONS' bills mirror recipe_masters_field_forge: 3 of the craft's
+// intermediate, 2 Wyrmfall Cores, then the craft's gathered family (the
+// hearth's meats plus the shared sunpetal herb that Marlow's roast and the
+// three role dishes already carry, so the mirror is by shape, not by literal
+// item list). The feasts take the same 3-of-the-intermediate idiom.
+//
+// acquisition ['drop'] on every row per R8, same as the other two apex arrays:
+// the patterns land as drops and heroic-marks vendor rows in phase 11, so
+// these are deliberately unlearnable until then; NOT trainer rows. stationType
+// matches each craft's existing rows so the per-craft wiki station field stays
+// unanimous, and itemLevelBudget feeds only the craft gold fee. Every row is
+// authored gold-negative and keeps reagents with no buyValue, so none joins
+// the counterfactually-vendor-fed set (tests/recipe_economy.test.ts).
+export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
+  // The three flasks share one bill: the serpent elixir's own reagent list
+  // one rung up (sunpetal doubled) plus the catalyst that paces it, plus the
+  // tier-3 grain masterwrought Phase 11h adds IDENTICALLY to all three
+  // (11h-GATE-C). Input 424 to 439 vs output 50.
+  //
+  // THE FAMILY STAYS BYTE-IDENTICAL, and that is the amended header's other
+  // half rather than an accident: the flask chain is the DAILY-GATED one
+  // (recipe_quickening_catalyst is oncePerDay, so a flask costs a catalyst-day),
+  // so a bill difference between the three roles here would be a real gate
+  // rather than flavor. The food family can afford to differ because nothing
+  // paces it but materials.
+  //
+  // ADDED, NEVER SUBSTITUTED (masterwrought R18, farming D24): sunpetal_herb
+  // stays at 2 on every one of the three bills and no other reagent moves. The
+  // grain stands BESIDE the herb line; herbalism loses nothing.
+  //
+  // THE COUNT IS ONE, NOT TWO, and this is a DEVIATION from 11h-GATE-C's
+  // literal, forced by the standing accent rule rather than chosen. masterwrought
+  // R17 RULE 2's
+  // count half (tests/provisioning_supply_line.test.ts, accentVerdict) requires
+  // a crop to stay STRICTLY BELOW the row's largest non-produce count, and this
+  // bill's largest is 2 (venom_gland and sunpetal_herb), so a grain at 2 TIES
+  // and reds. Phase 11g hit the identical collision one rung down and resolved
+  // it the same way: recipe_elixir_of_the_serpent's frost_gourd went 2 to 1
+  // because venom_gland sits at 2, and only the count moved. This bill IS that
+  // elixir's bill one rung up. Everything else the ruling states is intact: one
+  // tier-3 grain, identical on all three, beside the herb, replacing none of it.
+  {
+    id: 'recipe_ironhusk_flask',
+    professionId: 'alchemy',
+    resultItemId: 'ironhusk_flask',
+    resultCount: 2,
+    reagents: [
+      { itemId: 'quickening_catalyst', count: 1 },
+      { itemId: 'pristine_venom_gland', count: 1 },
+      { itemId: 'venom_gland', count: 2 },
+      { itemId: 'sunpetal_herb', count: 2 },
+      { itemId: 'highland_barley', count: 1 },
+      { itemId: 'glass_vial', count: 1 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'apothecary',
+  },
+  {
+    id: 'recipe_warboar_flask',
+    professionId: 'alchemy',
+    resultItemId: 'warboar_flask',
+    resultCount: 2,
+    reagents: [
+      { itemId: 'quickening_catalyst', count: 1 },
+      { itemId: 'pristine_venom_gland', count: 1 },
+      { itemId: 'venom_gland', count: 2 },
+      { itemId: 'sunpetal_herb', count: 2 },
+      { itemId: 'highland_barley', count: 1 },
+      { itemId: 'glass_vial', count: 1 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'apothecary',
+  },
+  {
+    id: 'recipe_runewater_flask',
+    professionId: 'alchemy',
+    resultItemId: 'runewater_flask',
+    resultCount: 2,
+    reagents: [
+      { itemId: 'quickening_catalyst', count: 1 },
+      { itemId: 'pristine_venom_gland', count: 1 },
+      { itemId: 'venom_gland', count: 2 },
+      { itemId: 'sunpetal_herb', count: 2 },
+      { itemId: 'highland_barley', count: 1 },
+      { itemId: 'glass_vial', count: 1 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'apothecary',
+  },
+  // The three role foods: Marlow's Grand Roast scaled to the apex batch, with
+  // the seasoned stock that carries the rung, ONE crop row each (masterwrought
+  // Phase 11h, 11h-GATE-A and 11h-GATE-B) and ONE uniform fish row
+  // (masterwrought Phase 11i, DECISION D).
+  //
+  // THE CROP ROW DIFFERENTIATES, THE FISH ROW UNIFIES, and that is the whole
+  // shape of the family now. The same Raw Deepbarb Catfish at the same count
+  // goes into all three plates AND into recipe_laden_hearth below: fixing only
+  // the chowder (the headline defect, a chowder with no fish in it) would have
+  // left an int-role player needing fish while an ap-role player did not, and
+  // that compulsion asymmetry is exactly what R18 exists to prevent.
+  //
+  // THE COUNT IS FOUR, AND IT IS FORCED RATHER THAN CHOSEN. The standing
+  // fish-forward sweep requires fish to STRICTLY OUTNUMBER produce on any row
+  // carrying a raw catch. The three plates carry produce 2, so 3 would clear
+  // them; recipe_laden_hearth carries produce THREE (evergarden_greens 2 plus
+  // fine_evergarden_greens 1), so a uniform row at 3 TIES there and reds. Four
+  // is the lowest legal uniform count across the four rows DECISION D governs.
+  // ADDED, NEVER SUBSTITUTED: 11h's per-plate crop rows are untouched and no
+  // shipped reagent left any bill.
+  //
+  // THIS IS WHERE THREE BILLS STOP BEING BYTE-IDENTICAL. Since Phase 10 the
+  // three role plates were the same recipe with three names, and a player
+  // comparing them in the crafting window saw nothing to compare. The crop is
+  // what a cook reads off the plate now: the gourd for the tank, the grain for
+  // the fighter, the leaf for the caster.
+  //
+  // THE COUNT IS 2 ON ALL THREE AND THE CROPS ARE ALL TIER 3, deliberately and
+  // by derivation rather than taste. Every tier-3 base crop carries sellValue
+  // 15 and no buyValue, so 2 of any of them is worth exactly 30 on the
+  // buyValue-else-sellValue basis the economy suite reads: the COST SPREAD
+  // ACROSS THE THREE PLATES IS ZERO IN COPPER, pinned in
+  // tests/provisioning_supply_line_apex.test.ts. And farmCropSkillThreshold
+  // gates all four tier-3 crops at farming 50, so a role choice is not a
+  // skill-gate choice either. The superseded alternative was the tier-4 halving
+  // branch, which would have spread 30/30/40 and asked farming 75 for one
+  // plate; Phase 11e's roster was composed with a tier-3 LEAF precisely to make
+  // it unnecessary.
+  //
+  // IN COPPER, AND THE SCOPE IS THE HONEST HALF. 11h-GATE-A rules on summed
+  // VALUE and that is what is zero here, but the three crops do NOT share a
+  // growth timer: highland_barley 14,400,000 ms, thornpeak_cabbage 15,000,000,
+  // frost_gourd 16,200,000, because farm_crops.ts gives every crop in a tier its
+  // own duration on purpose. So a cook who grows their own pays 4h, 4h10m or
+  // 4h30m per two, a 12.5 percent wall-clock spread from cheapest to dearest,
+  // while a cook who buys pays the same either way. The spread is recorded and
+  // pinned beside the copper one rather than left for a reader to discover: it
+  // is small, it is invisible to anyone using the market, and the alternative
+  // (three crops sharing one timer) would break the crop ladder's own rule.
+  //
+  // The INPUT side only. foodHp, the Well Fed magnitude and duration (11c's
+  // settled ladder, 6 for 900 seconds on the single well_fed aura id),
+  // sellValue, resultCount, skillReq: none of them moves here, and a reagent
+  // changes what a craft COSTS and never what it produces.
+  {
+    id: 'recipe_stonepot_stew',
+    professionId: 'cooking',
+    resultItemId: 'stonepot_stew',
+    resultCount: 4,
+    // THE TANK PLATE (buff_sta) takes the GOURD: a stew is what a gourd goes
+    // into, and Frost Gourd is the Highwatch terrace crop the roast already
+    // simmers one rung down.
+    reagents: [
+      { itemId: 'seasoned_stock', count: 1 },
+      { itemId: 'prime_cut', count: 2 },
+      { itemId: 'game_meat', count: 4 },
+      { itemId: 'frost_gourd', count: 2 },
+      { itemId: 'sunpetal_herb', count: 2 },
+      { itemId: 'cooking_salt', count: 2 },
+      { itemId: 'raw_deepbarb_catfish', count: 4 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_warspice_skewers',
+    professionId: 'cooking',
+    resultItemId: 'warspice_skewers',
+    resultCount: 4,
+    // THE PHYSICAL PLATE (buff_ap) takes the GRAIN: skewers are served on a
+    // grain, and Highland Barley is the tier's grain.
+    reagents: [
+      { itemId: 'seasoned_stock', count: 1 },
+      { itemId: 'prime_cut', count: 2 },
+      { itemId: 'game_meat', count: 4 },
+      { itemId: 'highland_barley', count: 2 },
+      { itemId: 'sunpetal_herb', count: 2 },
+      { itemId: 'cooking_salt', count: 2 },
+      { itemId: 'raw_deepbarb_catfish', count: 4 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_sageleaf_chowder',
+    professionId: 'cooking',
+    resultItemId: 'sageleaf_chowder',
+    resultCount: 4,
+    // THE CASTER PLATE (buff_int) takes the LEAF, which is the row Phase 11e's
+    // roster composition existed to make available: Thornpeak Cabbage is tier
+    // 3's leaf (frost_lentils is its legume), and a chowder named for a leaf
+    // that carried none read thin.
+    reagents: [
+      { itemId: 'seasoned_stock', count: 1 },
+      { itemId: 'prime_cut', count: 2 },
+      { itemId: 'game_meat', count: 4 },
+      { itemId: 'thornpeak_cabbage', count: 2 },
+      { itemId: 'sunpetal_herb', count: 2 },
+      { itemId: 'cooking_salt', count: 2 },
+      { itemId: 'raw_deepbarb_catfish', count: 4 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'kitchens',
+  },
+  // The skill-125 capstones, and the first bills in the game to consume a
+  // TIER-4 farm crop (masterwrought Phase 11h, 11h-GATE-D). Cauldron input 1010
+  // to 1410 vs output 380; hearth 606 to 1006 vs 380.
+  //
+  // ONE SHOWCASE CROP EACH, SPLIT rather than shared, so the two 125 capstones
+  // do not read off the same line: the melon to alchemy, the greens to cooking
+  // (the greens are farming's own capstone-plate crop, so the COOKING capstone
+  // is the right home for them).
+  //
+  // THE SHIPPED SHOWCASE IDIOM, CARRIED OFF THE MERGED TREE rather than off a
+  // plan doc, which is what 11h-GATE-D itself instructs. Farming's two tier-4
+  // plates each carry TWO showcase pairs: recipe_evergarden_harvest_platter
+  // takes evergarden_greens 3 + fine 1 AND evergarden_pumpkin 2 + fine 1, and
+  // recipe_evergarden_sunmelon_tart takes gilded_sunmelon 3 + fine 1 AND
+  // gilded_yam 2 + fine 1. So the merged tree carries the base-plus-fine idiom
+  // at BOTH 3+1 and 2+1, twice each, and no number here is invented.
+  //
+  // 2 + 1 IS A DEVIATION from 11h-GATE-D's literal 3 + 1, forced by the
+  // standing accent rule rather than chosen. masterwrought R17 RULE 2's
+  // absolute accent cap
+  // (tests/provisioning_supply_line.test.ts, accentVerdict capOk) refuses any
+  // produce entry above 2 on a consumable row farming did not write, so a base
+  // crop at 3 reds on both capstones. 2 + 1 is the same shipped idiom one notch
+  // down and it clears every half of the rule. The fine twin stays at 1, where
+  // the idiom puts it.
+  //
+  // THE FINE TWIN IS THE POINT, not decoration: before this phase
+  // fine_evergarden_greens and fine_gilded_sunmelon were consumed by exactly
+  // one recipe each, both farming's own tier-4 dishes at cooking 100. This
+  // phase gives both their CAPSTONE consumer at skillReq 125, the top of the
+  // CONSUMABLE catalog, which is the shape masterwrought R20 guarantees.
+  // (125 is cooking and alchemy's
+  // ceiling. ALL_RECIPES topped out at 150 at that phase's own runtime, the
+  // apex tool family it recorded as out of scope, census "3 at 125, 3 at
+  // 150"; masterwrought Phase 11o later re-tiered those three to 125, so the
+  // table now tops out at the cap; AMENDED 2026-08-31, masterwrought
+  // qr-11o-150. 2026-08-27, phase 13 / R13: INSCRIPTION
+  // joins the 125 rung with recipe_deed_of_making, its first, a trainer row
+  // in INSCRIPTION_RECIPES rather than a drop.) Neither is a hoe twin (the hoe ladder
+  // takes fine_vale_wheat, fine_marsh_rice and fine_highland_barley),
+  // so nothing is double-booked.
+  {
+    id: 'recipe_grand_cauldron',
+    professionId: 'alchemy',
+    resultItemId: 'grand_cauldron',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'quickening_catalyst', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'gilded_sunmelon', count: 2 },
+      { itemId: 'fine_gilded_sunmelon', count: 1 },
+      { itemId: 'sunpetal_herb', count: 4 },
+      { itemId: 'goldleaf_herb', count: 2 },
+    ],
+    skillReq: 125,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'apothecary',
+  },
+  // THE LONGEST BILL IN THE GAME: eight reagent entries, and FOUR rows hold it,
+  // this one plus the three apex feasts (recipe_sageleaf_feast,
+  // recipe_stonepot_feast, recipe_warspice_feast). Below it the table steps down
+  // cleanly: seven on the three role plates, six on six rows.
+  //
+  // NO HISTORY IS RESTATED HERE, deliberately. This sentence used to carry its
+  // own chain of previous maxima and went stale the moment the record moved,
+  // which is how it came to claim seven and a single holder while the pin beside
+  // it already said otherwise. tests/provisioning_supply_line_apex.test.ts
+  // derives the maximum over ALL_RECIPES, pins all three tiers BY ID, and records
+  // the history in its own messages, so a later phase that ties or beats eight
+  // visits that arm rather than this sentence.
+  //
+  // The eighth row renders by existing, and that is a BEHAVIORAL pin now rather
+  // than an asserted absence: tests/longest_reagent_bill_render.test.ts sweeps
+  // every max-length row through the crafting view core (count and authored
+  // order), all three of renderCraftingWindow's join sites (the inline spans, the
+  // tooltip string, the button's accessible name) and the wiki's craftDetailHtml
+  // counted page-wide. The old wording asserted that nothing in src/ or server/
+  // slices or caps a reagent list, which a source scan cannot actually establish:
+  // it sees neither a cap introduced through a helper, nor a CSS line-clamp, nor
+  // a painter that stops early. The sweep sees all three.
+  //
+  // THE THREE SURFACES THAT ACTUALLY DRAW IT, traced rather than assumed,
+  // because Phase 11g's own record named a fourth that structurally cannot:
+  // the crafting window's reagent line (src/ui/hud/professions/crafting_window.ts, which wraps
+  // inside a card whose pane scrolls), that window's recipe TOOLTIP, and the
+  // wiki materials cell (src/guide/pages/professions_craft.ts, whose
+  // .guide-prof-mat rule wraps between entries). The bag action-menu cost line
+  // is NOT one of them: it reads ENCHANTS[...].reagents and has no craft-recipe
+  // path at all, so no bill length can reach it.
+  {
+    id: 'recipe_laden_hearth',
+    professionId: 'cooking',
+    resultItemId: 'laden_hearth',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'seasoned_stock', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'prime_cut', count: 4 },
+      { itemId: 'game_meat', count: 4 },
+      { itemId: 'evergarden_greens', count: 2 },
+      { itemId: 'fine_evergarden_greens', count: 1 },
+      { itemId: 'sunpetal_herb', count: 2 },
+      { itemId: 'raw_deepbarb_catfish', count: 4 },
+    ],
+    skillReq: 125,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'kitchens',
+  },
+  // ---- The angler's endgame rows (masterwrought Phase 11i) ----------------
+  //
+  // Three drop-taught cooking rows at 75, 100 and 125, each keyed on the catch
+  // one high band introduces. These are what put FISHING into the endgame bill
+  // census ON ITS OWN ACCOUNT rather than through a rod, which is the R20
+  // property the completion pass will pin: before this phase every fishing bill
+  // at skillReq 75 or above was a fishing rod, so the deepest gathering
+  // profession in the game fed only itself.
+  //
+  // NO PRODUCE ON ANY OF THE THREE, so the accent rule (R17 RULE 2) has nothing
+  // to sweep here and "at most one crop family joins a fish row" is satisfied
+  // vacuously. Fish-forward holds by a wide margin on each.
+  {
+    id: 'recipe_peppered_deepbarb_catfish',
+    professionId: 'cooking',
+    resultItemId: 'peppered_deepbarb_catfish',
+    resultCount: 2,
+    // Rung 75, keyed on the band-3 catch. Input 192 vs output 150.
+    reagents: [
+      { itemId: 'raw_deepbarb_catfish', count: 4 },
+      { itemId: 'goldleaf_herb', count: 2 },
+      { itemId: 'cooking_salt', count: 2 },
+    ],
+    skillReq: 75,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['drop'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_roast_hollowgill_sturgeon',
+    professionId: 'cooking',
+    resultItemId: 'roast_hollowgill_sturgeon',
+    resultCount: 2,
+    // Rung 100, keyed on the band-4 catch, with the band-3 catch under it: the
+    // rung below feeding the rung above is the ladder idiom this file already
+    // uses for the rods. Input 436 vs output 300.
+    reagents: [
+      { itemId: 'raw_hollowgill_sturgeon', count: 4 },
+      { itemId: 'raw_deepbarb_catfish', count: 2 },
+      { itemId: 'sunpetal_herb', count: 2 },
+      { itemId: 'cooking_salt', count: 2 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'kitchens',
+  },
+  // ---- THE APEX FEAST TIER (masterwrought Phase 11k) ---------------------
+  //
+  // Three cooking-125 rows, one per combat role, on ONE BYTE-IDENTICAL BILL.
+  // They REPLACE Phase 11i's `recipe_deepwater_feast` under the ruling recorded
+  // at the item defs (content/profession_items.ts): that row was this tier's
+  // stamina rung minted early, against a bill and a name the tier's own rules
+  // refuse, and it was unplaceable besides.
+  //
+  // THE BILL IS UNIFORM AND THAT IS THE ARRAY HEADER'S OWN RULE: a role choice
+  // is never also an economy choice. The role here is carried entirely by
+  // `dishItemId` on the output def, so there is nothing left for a reagent to
+  // differentiate. (11h's amendment lets the three bagged FOOD plates differ by
+  // exactly one crop row; that amendment is scoped to the plates and does not
+  // reach these feast bills, which stay byte-identical to each other.)
+  //
+  // WHY THIS BILL IS THE PACKET'S THESIS IN ONE ROW: all three provisioning
+  // skills and the raid meet in it. FARMING pays the crop, FISHING pays all
+  // three high-band catches, HERBALISM and COOKING pay the seasoning and the
+  // craft's own intermediate, and the Wyrmfall Core comes from outside every
+  // profession. A raider who farms nothing buys the greens on the market
+  // exactly as they buy sunpetal_herb today (masterwrought R18); a cook with no
+  // rift access buys cores.
+  //
+  // THE BILL WAS RE-DERIVED AGAINST THE STANDING ACCENT RULES. An earlier
+  // proposal (both tier-4 FINE twins plus one catch) is illegal three ways on the merged tree
+  // and was written before the rules that refuse it existed:
+  //   - The fish-forward rule (masterwrought R17) wants fish to OUTNUMBER
+  //     produce on any row carrying a raw catch. Two fine twins at 2 each is
+  //     produce 4 against one catch.
+  //   - At most ONE crop family may join a fish row. Two twins is two families.
+  //   - RULE 2's value half wants a crop's contribution AT OR BELOW the row's
+  //     dominant non-produce reagent. A fine twin carries buyValue 320, so a
+  //     single one contributes 320 and would need a 320-plus non-produce
+  //     reagent beside it; only recipe_laden_hearth's sunpetal_herb 2 reaches
+  //     that, and it TIES, which the 11j QA already recorded as resting on the
+  //     open reading of that half. Three more ties is not a thing a content
+  //     phase should spend an open maintainer item on.
+  // So the row takes the BASE crop, one family, at the accent cap. The fine
+  // twins are not orphaned by that: 11h gave each its own station capstone and
+  // 11j gave the greens the apex hoe as an additional consumer.
+  //
+  // EVERY COUNT IS DERIVED, and the precedent taken is named:
+  // - seasoned_stock 3: the CAPSTONE idiom. recipe_laden_hearth and
+  //   recipe_grand_cauldron both take 3 of their craft's own intermediate at
+  //   this rung, where the skill-100 consumables take 1. These sit at 125, so
+  //   they take the capstone idiom. No third number was invented.
+  // - wyrmfall_core 1, and the row records the comparison rather than hiding
+  //   it: the two shipped capstones take 2, and a feast takes 1 because a feast
+  //   is SPENT per raid night while a station is permanent. The Core is the
+  //   deliberate rate limiter and it lives OUTSIDE the farm (masterwrought R9:
+  //   A and S rift first clears, once per character per day, tradable), so no
+  //   farming daily is minted anywhere (masterwrought R19).
+  // - evergarden_greens 1: the tier-4 crop the PARTY feast one rung down
+  //   already asks for, at ONE rather than its 4, because the apex row spends
+  //   the rest of its weight on the catch ladder. One family, and it keeps the
+  //   two feast rungs legibly the same dish.
+  //   ONE RATHER THAN THE CAP OF TWO IS DELIBERATE, and the reason is a
+  //   maintainer item rather than taste: RULE 2's value half has an OPEN
+  //   reading (dominant-by-value, which ships, versus largest-by-count, which
+  //   does not), and tests/provisioning_supply_line.test.ts carries a census of
+  //   exactly what the alternative reading would refuse. At 2 the crop
+  //   contributes 80 against a count-reading reference of 56 (the catfish at
+  //   the row's largest count), so all three rows would have JOINED that census
+  //   and made the open decision cost three more rows to settle. At 1 it
+  //   contributes 40 and clears BOTH readings, so this phase leaves that
+  //   decision exactly as expensive as it found it. A content phase should not
+  //   spend the maintainer's open items.
+  // - THE WHOLE CATCH LADDER, at exactly the counts Phase 11i's retired
+  //   capstone carried: catfish 4, sturgeon 3, salmon 2. That is not
+  //   sentiment, it is masterwrought RULE 3, which forbids REDUCING any fish,
+  //   herb, meat or salt count anywhere: retiring 11i's row without carrying
+  //   its catches would have cut all three lines. Carrying them on all three
+  //   feasts raises each instead. It also keeps 11i's own design statement
+  //   intact, that the whole ladder feeds its own capstone, and the band-5
+  //   salmon is still the keystone: band 5 gates at proficiency 200 AND the
+  //   tier-6 rod, so the master angler remains the sole faucet of the tier and
+  //   now gates three goods instead of one.
+  // - sunpetal_herb 1 and cooking_salt 2: the same RULE 3 arithmetic, and the
+  //   same two seasonings every shipped cooking apex row carries.
+  //
+  // GOLD-NEGATIVE, WITH THE ARITHMETIC PRINTED. Unit value is buyValue when
+  // finite and above zero, else sellValue (the shipped recipe_economy
+  // convention), which is why the herb and the salt cost more here than their
+  // sell prices suggest:
+  //   seasoned_stock           3 x  30 =   90
+  //   wyrmfall_core            1 x  50 =   50
+  //   evergarden_greens        1 x  40 =   40
+  //   sunpetal_herb            1 x 160 =  160
+  //   cooking_salt             2 x   8 =   16
+  //   raw_deepbarb_catfish     4 x  14 =   56
+  //   raw_hollowgill_sturgeon  3 x  18 =   54
+  //   raw_stillmere_salmon     2 x  22 =   44
+  //   INPUT 510 vs output 1 x 300. Gold-negative by 210.
+  // The rows stay OUT of the counterfactually-vendor-fed set for a reason worth
+  // stating, because the herb and the salt alone would not carry it: that set
+  // needs EVERY reagent to carry a positive buyValue, and seasoned_stock, the
+  // core, the greens and all three catches carry none, so no counter could feed
+  // this bill even in principle.
+  //
+  // EIGHT REAGENT ENTRIES, which TIES recipe_laden_hearth rather than beating
+  // it, and the tie is deliberate: the consumed provisioning capstone asks for
+  // as much as the permanent station does. The longest-bill pin in
+  // tests/provisioning_supply_line_apex.test.ts names both rather than one.
+  //
+  // acquisition ['drop'] per masterwrought R8 (the patterns are Heroic Marks
+  // stock at the skill-125 rung); stationType 'kitchens' so the per-craft wiki
+  // station field stays unanimous; resultCount 1 is the shipped feast
+  // precedent; itemLevelBudget feeds only the craft gold fee.
+  {
+    id: 'recipe_stonepot_feast',
+    professionId: 'cooking',
+    resultItemId: 'stonepot_feast',
+    resultCount: 1,
+    // Input 510 vs output 300 (arithmetic in the block header).
+    reagents: [
+      { itemId: 'seasoned_stock', count: 3 },
+      { itemId: 'wyrmfall_core', count: 1 },
+      { itemId: 'evergarden_greens', count: 1 },
+      { itemId: 'sunpetal_herb', count: 1 },
+      { itemId: 'cooking_salt', count: 2 },
+      { itemId: 'raw_deepbarb_catfish', count: 4 },
+      { itemId: 'raw_hollowgill_sturgeon', count: 3 },
+      { itemId: 'raw_stillmere_salmon', count: 2 },
+    ],
+    skillReq: 125,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_warspice_feast',
+    professionId: 'cooking',
+    resultItemId: 'warspice_feast',
+    resultCount: 1,
+    // Input 510 vs output 300. BYTE-IDENTICAL to the row above and the row
+    // below: the role lives on the output def, never in the bill.
+    reagents: [
+      { itemId: 'seasoned_stock', count: 3 },
+      { itemId: 'wyrmfall_core', count: 1 },
+      { itemId: 'evergarden_greens', count: 1 },
+      { itemId: 'sunpetal_herb', count: 1 },
+      { itemId: 'cooking_salt', count: 2 },
+      { itemId: 'raw_deepbarb_catfish', count: 4 },
+      { itemId: 'raw_hollowgill_sturgeon', count: 3 },
+      { itemId: 'raw_stillmere_salmon', count: 2 },
+    ],
+    skillReq: 125,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_sageleaf_feast',
+    professionId: 'cooking',
+    resultItemId: 'sageleaf_feast',
+    resultCount: 1,
+    // Input 510 vs output 300. BYTE-IDENTICAL to the two rows above.
+    reagents: [
+      { itemId: 'seasoned_stock', count: 3 },
+      { itemId: 'wyrmfall_core', count: 1 },
+      { itemId: 'evergarden_greens', count: 1 },
+      { itemId: 'sunpetal_herb', count: 1 },
+      { itemId: 'cooking_salt', count: 2 },
+      { itemId: 'raw_deepbarb_catfish', count: 4 },
+      { itemId: 'raw_hollowgill_sturgeon', count: 3 },
+      { itemId: 'raw_stillmere_salmon', count: 2 },
+    ],
+    skillReq: 125,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'kitchens',
+  },
+];
+
+// The crafted farming hoes, tiers 2 to 5 (the crop-ladder phase's tool half,
+// completed at masterwrought Phase 11j).
+//
+// A SEPARATE LIST FROM TOOL_RECIPES, deliberately, for the same reason
+// ROD_RECIPES above is: TOOL_RECIPES' whole invariant is that every member
+// consumes a FINE gathered GRADE (a MATERIAL_GRADES row) plus the tool one
+// rung down, and farming has no MATERIAL_GRADES rows at all: its fine twins
+// come from the harvest roll (professions/farming.ts resolveFarmHarvest),
+// never from a node grade. Folding these in would weaken that invariant into
+// a disjunction, so the hoe ladder states its own
+// (tests/professions_hoe_recipes.test.ts) and leaves TOOL_RECIPES alone.
+//
+// THE HOE LADDER'S OWN INVARIANT: every member consumes the fine TWIN of a
+// crop ONE TIER BELOW its result plus the hoe one rung down, at the
+// toolworks. The one-tier-below reagent is the closed-circuit resolution the
+// tier-4 pick recorded above: the step-12 hoe gate reads
+// canGatherTier(hoe tier, crop.tier), so a tier-N crop's fine twin cannot be
+// grown without the tier-N hoe already owned; consuming the MATCHING-tier
+// twin would be a circuit with no entry. One tier down, the twin's crop
+// grows under exactly the hoe the recipe already consumes (rung 2 takes
+// fine_vale_wheat, tier 1, grown under the vendor-PRICED garden_hoe,
+// stocked on the tier-1 farmer NPC since the go-live).
+//
+// ACQUISITION COVERAGE, where this ladder diverges from the rods and why:
+// the rod ladder leaves rungs 2 and 3 vendor-priced and crafts 4, 5 and, since
+// masterwrought Phase 11i, 6,
+// but the hoe pricing table locks buyValue OFF rungs 2 to 5, so the vendor
+// arm cannot be mirrored; HOE_RECIPES covers rungs 2, 3, 4 AND 5 instead,
+// making craft the only mint above rung 1 and leaving no acquisition gap
+// WITHIN the ladder (each rung is reachable from a state the rung below
+// grants; the ladder's one entry point is rung 1's vendor stocking on the
+// tier-1 farmer NPC, the go-live counter). Since masterwrought Phase 11j the
+// non-crafter route is the delve Marks counter, which now carries BOTH the
+// tier-4 and tier-5 hoes beside their land and rod siblings
+// (content/delves/shop.ts, decision B).
+//
+// All four are `acquisition: ['trainer']` per the post-freeze authoring
+// default: Tinker Gizzel at the Eastbrook toolworks teaches them with no
+// content edit (the trainer list derives from the station). skillReq
+// 0/50/75/125 resolves to trainer tiers 0/2/3/5, all inside engineering's
+// learnable band, honoring the ROD_RECIPES lesson (a trainer-taught recipe
+// above the cap band is permanently unlearnable). The rung-4 shape
+// (skillReq 75, itemLevelBudget 20, level 20, toolworks) matches every other
+// tier-4 tool recipe in TOOL_RECIPES.
+// AMENDED 2026-08-25 (masterwrought Phase 11o, qr-11o-ENG): recipe_bronze_hoe
+// re-tiered skillReq 25 to 0, so engineering has a learnable row at skill 0
+// (teachTierMet reads tier 0 at skill 0; the old tier-1 rung was unlearnable
+// below skill 25, which left engineering with no on-ramp at all). The bill,
+// the one-tier-below fine-twin invariant, and the ladder's shape are
+// untouched; the teach fee drops to the tier-0 fee (0 copper) by the shipped
+// fee ladder, correct for an on-ramp row. The 0-to-75 climb is completed by
+// ENGINEERING_ONRAMP_RECIPES below (the same ruling's part and gadget).
+//
+// THE APEX RUNG STAYS TRAINER-TAUGHT, and the honest statement of why is that
+// this is a CHOICE BETWEEN TWO LIVE READINGS rather than a rung the rules
+// settle. Recorded plainly because an earlier draft of this comment argued it
+// badly, against a position ROD_RECIPES does not hold.
+//
+// WHAT THE ROD HEADER ACTUALLY SAYS, since that is the precedent in play: its
+// apex is drop-taught under masterwrought R8, on the ground that "an apex rung
+// reaches players through the pillars". That ground is about apex-ness itself
+// and applies to ANY apex rung, this one included. The header's band-5 clause
+// answers a DIFFERENT question, why the schematic is deterministic Marks stock
+// rather than a band-5 catch, so it is not a reason the hoe escapes
+// masterwrought R8. Do not
+// re-derive a distinction there; there is not one.
+//
+// WHAT THIS RUNG MATCHES INSTEAD is the family it completes rather than the
+// family it resembles. It is the fifth member of the shipped tier-5 base-tool
+// family (epic, use.tier 5, sellValue 150), whose fishing member,
+// recipe_tidewrought_fishing_rod at engineering 125, is `['trainer']` at
+// exactly this rung; the clockreel is a TIER-6 rung above that family, at a
+// different price register. HOE_RECIPES' own post-freeze default is trainer
+// too, and masterwrought R18 is satisfied either way by the Marks counter
+// above, so nothing here is gated behind having taken engineering.
+//
+// THE TIER IS LOAD-BEARING: a tier-6 land tool would ship ungated, because
+// WIELD_REQUIREMENT_BY_TIER has no tier-6 row and wieldRequirementForTier
+// fails OPEN at 0, and only fishing is exempt from that gate.
+export const HOE_RECIPES: ProfessionRecipeRecord[] = [
+  {
+    id: 'recipe_bronze_hoe',
+    professionId: 'engineering',
+    resultItemId: 'bronze_hoe',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'fine_vale_wheat', count: 4 },
+      { itemId: 'garden_hoe', count: 1 },
+    ],
+    skillReq: 0,
+    itemLevelBudget: 10,
+    level: 10,
+    stationType: 'toolworks',
+    acquisition: ['trainer'],
+  },
+  {
+    id: 'recipe_skysilver_hoe',
+    professionId: 'engineering',
+    resultItemId: 'skysilver_hoe',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'fine_marsh_rice', count: 4 },
+      { itemId: 'bronze_hoe', count: 1 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 15,
+    level: 15,
+    stationType: 'toolworks',
+    acquisition: ['trainer'],
+  },
+  {
+    id: 'recipe_osmium_hoe',
+    professionId: 'engineering',
+    resultItemId: 'osmium_hoe',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'fine_highland_barley', count: 4 },
+      { itemId: 'skysilver_hoe', count: 1 },
+    ],
+    skillReq: 75,
+    itemLevelBudget: 20,
+    level: 20,
+    stationType: 'toolworks',
+    acquisition: ['trainer'],
+  },
+  {
+    id: 'recipe_evergarden_hoe',
+    professionId: 'engineering',
+    resultItemId: 'evergarden_hoe',
+    resultCount: 1,
+    // THE COUNT IS 2 AND NOT 4, and the derivation is the family's own. Every
+    // tier-4 land tool takes its fine grade at 4 (fine_iron_ore,
+    // fine_ashwood_log, fine_goldleaf_herb) and every tier-5 land tool HALVES
+    // it to 2 (fine_elderwood_log, fine_sunpetal_herb, fine_thorium_ore), so
+    // the hoe ladder's shipped 4 is the TIER-4 convention and an apex hoe at 4
+    // would be the only apex tool in the game that did not halve.
+    //
+    // WHICH TWIN follows the NAME, and be precise about how much of a rule
+    // that is (narrowed at the masterwrought Phase 11j QA, where the earlier
+    // wording claimed it of every tier-5 tool and two of the four falsify it).
+    // It holds for the two land rungs whose bill is a fine grade plus the rung
+    // below: Highpine Axe from Fine Highpine Log, Sunpetal Sickle from Fine
+    // Sunpetal Herb. It does NOT hold for the other two: the Glyphsteel Mining
+    // Pick is named for its Glyphsteel Bar and takes Fine Osmium Ore beside
+    // it, and the Tidewrought Fishing Rod consumes no fine grade at all. So
+    // the naming convention is what PICKS between the four shipped tier-4
+    // twins, all of which satisfy the one-tier-below invariant equally; it is
+    // not what forces the bill's shape. Input 220 (fine greens 2x80 + the
+    // rung-4 hoe at 60) vs output 150: gold-negative like every rung below it.
+    reagents: [
+      { itemId: 'fine_evergarden_greens', count: 2 },
+      { itemId: 'osmium_hoe', count: 1 },
+    ],
+    skillReq: 125,
+    itemLevelBudget: 30,
+    level: 20,
+    stationType: 'toolworks',
+    acquisition: ['trainer'],
+  },
+];
+
+// The engineering on-ramp (masterwrought Phase 11o, qr-11o-ENG). Measured
+// before it: engineering had NOTHING
+// craftable below skillReq 75 except the two mid hoe rungs, its cheapest
+// pre-absorb recipe sat at tier 3, ABOVE the unattuned archetype ceiling of
+// 2 (archetypeCeilingFor), so an unattuned character could never gain a
+// single point of engineering, and an attuned major leveled 0 to 75 almost
+// exclusively on one recipe family. Two rows close the hole beside the
+// re-tiered recipe_bronze_hoe above:
+//
+// - The PART, a skillReq-0 junk-kind component in the mechanical-parts
+//   register (the precision_chassis materials doctrine: kind 'junk', quality
+//   'common', sellValue only, ordinary tradable). It is not a dead starter
+//   trinket: it JOINS the shipped recipe_precision_chassis bill as an ADDED
+//   reagent row (masterwrought R18's add-never-substitute shape), so the
+//   first thing a new engineer makes is a real input of engineering's own
+//   tier-3 chain, and it feeds the gadget below. Its bill keeps a
+//   no-buyValue reagent (copper_ore) so the row never joins the
+//   counterfactually-vendor-fed set. Input 56 (copper 4x4 + flux 2x20 on the
+//   buyValue-else-sellValue basis) vs output 18: gold-negative.
+// - The GADGET, a skillReq-25 uncommon caster offhand on engineering's OWN
+//   held-lens identity (gyrelens_array's int/sta dps-caster line, one
+//   register down; deliberately NOT inscription's int/spi tome identity, so
+//   the two crafts' rung-25 offhands do not collide). Pure stats on the
+//   formula budget at the rung convention (ilvl 16 held line: int 3 + sta 2
+//   = 5), no use field, no ratings (masterwrought R14 forbids procs and new
+//   combat effects, and the gyrelens comment records that no cosmetic-use
+//   family exists to reuse), and no vendor sells ANY held_offhand
+//   (masterwrought R23 clear by census). Input 44 (the cogwheel 18 + copper
+//   2x4 + dust 3x6) vs output 36: gold-negative. The dust row makes
+//   engineering arcane_dust's FOURTH consumer craft (inscription,
+//   enchanting and jewelcrafting held it at three), which moves the dust's
+//   ring-ordered Used-by tooltip line; the affinity pins moved with it.
+//
+// Both are trainer-taught at the toolworks (Tinker Gizzel derives them from
+// the station, no NPC edit) with skillReq 0/25 resolving to tiers 0/1: the
+// part sits inside every ceiling, the gadget inside the unattuned and hobby
+// rare ceiling but above a dormant craft's common one (tier 1 vs 0).
+// The acceptance is pinned by
+// tests/professions_engineering_onramp.test.ts: an unattuned character can
+// gain engineering 0 to 25, and the attuned 0-to-75 climb needs no
+// grandfathered tier-3 tool craft. Ids are new and append-only
+// (tests/shipped_item_ids.test.ts); art parks per ip-16-ICON.
+export const ENGINEERING_ONRAMP_RECIPES: ProfessionRecipeRecord[] = [
+  {
+    id: 'recipe_cogwheel_blank',
+    professionId: 'engineering',
+    resultItemId: 'cogwheel_blank',
+    resultCount: 1,
+    // Input 56 vs output 18 (copper_ore is the no-buyValue reagent).
+    reagents: [
+      { itemId: 'copper_ore', count: 4 },
+      { itemId: 'smithing_flux', count: 2 },
+    ],
+    skillReq: 0,
+    itemLevelBudget: 10,
+    level: 10,
+    stationType: 'toolworks',
+    acquisition: ['trainer'],
+  },
+  {
+    id: 'recipe_copperlens_ocular',
+    professionId: 'engineering',
+    resultItemId: 'copperlens_ocular',
+    resultCount: 1,
+    // Input 44 vs output 36; consumes the rung below (the cogwheel), the
+    // ladder shape every tool family here already uses.
+    reagents: [
+      { itemId: 'cogwheel_blank', count: 1 },
+      { itemId: 'copper_ore', count: 2 },
+      { itemId: 'arcane_dust', count: 3 },
+    ],
+    skillReq: 25,
+    itemLevelBudget: 16,
+    level: 15,
+    stationType: 'toolworks',
+    acquisition: ['trainer'],
+  },
+];
+
+// The farm-economy hook set (Phase 6, reopened by Phase 11): the recipes that
+// turn farm output into something a player wants, so growing a crop is a
+// supply chain rather than a vendor-sell loop. Thirteen cooking rows (the
+// eight plain dishes, the four Phase 11 well-fed buff dishes, and the Phase
+// 12 harvest feast) plus one alchemy row, the growth tonic's craft (D7, the
+// cross-profession trade).
+//
+// A SEPARATE LIST FROM LADDER_RECIPES, deliberately, for the same reason
+// ROD_RECIPES and HOE_RECIPES are separate: LADDER_RECIPES is CLOSED at three
+// rungs x three recipes for each of its six crafts (54 rows, pinned as a
+// literal and as a per-craft shape in tests/recipe_economy.test.ts). Folding
+// four rung-50 dishes into cooking's nine would break that shape outright, so
+// the farm set states its own conformance (tests/farm_recipes.test.ts) and
+// leaves the ladder alone. Both lists join content-side ALL_RECIPES below, so
+// every recipe surface (recipeList, the trainer, the crafting window, the
+// guide) picks these up with no further wiring.
+//
+// SHAPE: taught at whichever station the row's own craft serves (the dishes at
+// the kitchens under cook_marlow, the tonic at the apothecary under
+// alchemist_verane), with no content edit either side, the post-freeze
+// authoring default: a trainer's list derives from the crafts its station
+// serves.
+//
+// TWO CHANNELS, SPLIT BY RUNG, and the split is a RULE rather than a per-row
+// choice (masterwrought Phase 11f, ruling 11f-GATE-B): every row at
+// FARM_DROP_RUNG_FLOOR or above is acquisition ['drop'], taught by a pattern
+// item off the raid, the heroic five-mans, the rift, or the Heroic
+// Quartermaster; every row below it stays ['trainer']. That is what keeps a
+// new farmer's on-ramp intact (the whole rung-0 band, the growth tonic
+// included, is still walk-up-and-learn) while farming's endgame reaches
+// players the way every other endgame recipe in the game does. Derive the
+// split from the rung, never from a row list, or it drifts row by row.
+// Every row follows the ladder's cross-craft scaffolding convention
+// (skillReq 0 -> 10/10, 25 -> 16/15, 50 -> 20/20, 75 -> 20/20,
+// 100 -> 25/25); no farm row reaches 125. The PLAIN dish outputs are
+// plain kind 'food' + foodHp ItemDefs in content/profession_items.ts with no
+// buff machinery; the four Phase 11 buff dishes add exactly the one `wellFed`
+// field (see their block below). The tonic's output is the kind 'junk' item
+// the plant_crop command already consumes as a knob, which is why it gets no
+// use arm here either.
+//
+// THE FINE-TWIN SLOTS ARE THE POINT, not decoration. Farming's fine twins get
+// no downward grade substitution (materialGradeIds walks MATERIAL_GRADES only,
+// and no farm row is a member), so a fine twin gains a consumer ONLY through
+// its own reagent slot. The hoe ladder took three of the eight
+// (fine_vale_wheat, fine_marsh_rice, fine_highland_barley); these dishes take
+// the remaining five, which is the Phase 5 deferral closing.
+//
+// EVERY row carries at least one reagent with NO buyValue, deliberately: a
+// recipe whose reagents ALL carry a copper basis joins the counterfactual
+// vendor-fed arm in tests/recipe_economy.test.ts (a sorted literal pin plus a
+// discounted-input bound), and neither a dish grown from produce nor a tonic
+// brewed from gathered herbs is that shape (Sheenleaf carries no buyValue).
+//
+// VALUES RATIFIED AS SHIPPED, no longer a proposal awaiting sign-off
+// (masterwrought Phase 19, ruling qr-19-dish-curve-point-assignments, under
+// qr-19-best-for-project): the pairs and the bills below are the settled set,
+// and the four the 11e widening moved (bannock, gourd soup, sunmelon tart,
+// harvest platter) were re-derived at the time. Classic-modest, and
+// every foodHp/sellValue pair REUSES a point the shipped food curve already
+// ships (980 is the ceiling, conjured_bread4). Reagent counts are sized so
+// each dish vendors strictly below its input value at the LISTED counts on
+// the recipe-economy unitValue basis (buyValue when one exists, else
+// sellValue); on a raw sellValue basis the beet braise is exactly break-even,
+// which converts produce without minting copper and is the intended shape.
+// Every farm row is craftable now that both farmer counters stock all eight
+// upper-tier seeds. The held bannock remains trainer-taught at rung 50 for
+// 10000, but now teaches a dish a player can actually cook. Every other
+// formerly dormant row is at
+// FARM_DROP_RUNG_FLOOR or above under the channel rule above, so it is not
+// trainer-taught at all and charges no fee, in advance or otherwise. What
+// remains trainer-taught is the rung 0 to 50 on-ramp, free at rung 0 on the
+// settled R8 fee curve's tier-0 point and fee-charging at 25 and 50; pinned in
+// tests/farm_recipes.test.ts. THAT R8 IS THE PROFESSIONS-TUNING ONE (ruling R8
+// in docs/design/professions-tuning-packet-review.md, cited at
+// professions/training.ts's TRAINING_FEE_BY_TIER), NOT masterwrought R8, which
+// is the recipe-channel doctrine. Left bare on purpose: qualifying it as
+// "masterwrought" would attach the wrong packet to a shipped ruling, which is
+// exactly the collision the packet's R-namespace rule exists to prevent.
+
+/** The rung at which a farm recipe stops being trainer homework and becomes a
+ *  drop (masterwrought ruling 11f-GATE-B). Exported so the channel assertions
+ *  derive the split from the rung the way FARM_RECIPES does, instead of
+ *  restating a row list that goes stale the first time a row moves. */
+export const FARM_DROP_RUNG_FLOOR = 75;
+
+export const FARM_RECIPES: ProfessionRecipeRecord[] = [
+  {
+    id: 'recipe_vale_hearth_loaf',
+    professionId: 'cooking',
+    resultItemId: 'vale_hearth_loaf',
+    resultCount: 1,
+    // The starter bake: wheat and salt, the plainest thing a vale kitchen
+    // makes, and the one dish reachable the hour a first plot comes in.
+    // Input 20 vs output 6.
+    reagents: [
+      { itemId: 'vale_wheat', count: 3 },
+      { itemId: 'cooking_salt', count: 1 },
+    ],
+    skillReq: 0,
+    itemLevelBudget: 10,
+    level: 10,
+    acquisition: ['trainer'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_eastbrook_root_pottage',
+    professionId: 'cooking',
+    resultItemId: 'eastbrook_root_pottage',
+    resultCount: 1,
+    // The first fine-twin sink: a thick root pottage whose body comes from
+    // brook_carrot (the vendor-priced starter vegetable that also pays the
+    // farmer's watch fee, D9) and whose sweetness comes from the fine pick,
+    // thickened with a handful of wheat. Input 68 vs output 12.
+    reagents: [
+      { itemId: 'brook_carrot', count: 2 },
+      { itemId: 'fine_brook_carrot', count: 1 },
+      { itemId: 'vale_wheat', count: 1 },
+    ],
+    skillReq: 0,
+    itemLevelBudget: 10,
+    level: 10,
+    acquisition: ['trainer'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_fenbridge_rice_bowl',
+    professionId: 'cooking',
+    resultItemId: 'fenbridge_rice_bowl',
+    resultCount: 1,
+    // Marsh rice steamed plain and salted, the bulk staple of the fen towns.
+    // resultCount stays 1 where the ladder's rung-25 cooking rows sometimes
+    // pay 2: doubling the output here would need inputs above 50 copper to
+    // clear the economy bound, which is a heavier ask than a plain rice bowl
+    // should carry. Input 40 vs output 25.
+    reagents: [
+      { itemId: 'marsh_rice', count: 4 },
+      { itemId: 'cooking_salt', count: 1 },
+    ],
+    skillReq: 25,
+    itemLevelBudget: 16,
+    level: 15,
+    acquisition: ['trainer'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_fenbridge_beet_braise',
+    professionId: 'cooking',
+    resultItemId: 'fenbridge_beet_braise',
+    resultCount: 1,
+    // Beets braised down until they candy, the fine pick going in whole for
+    // the colour. The tier-2 fine-twin slot. Input 88 vs output 40.
+    reagents: [
+      { itemId: 'bog_beet', count: 3 },
+      { itemId: 'fine_bog_beet', count: 1 },
+    ],
+    skillReq: 25,
+    itemLevelBudget: 16,
+    level: 15,
+    acquisition: ['trainer'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_highwatch_barley_bannock',
+    professionId: 'cooking',
+    resultItemId: 'highwatch_barley_bannock',
+    resultCount: 1,
+    // A griddle flatcake off the wall kitchens, salted hard because it is
+    // carried cold on watch, with shredded cabbage worked through the batter.
+    // The base tier-3 grain keeps its own demand at 4 per bannock; Phase 11e
+    // ADDED the cabbage pair alongside it (masterwrought R18: added, never
+    // substituted), so this stopped being the one rung-50 dish with no fine
+    // twin in it. Input 226 vs output 60 (76 before the widening). The figure
+    // is restored here at the 11e QA: the widening deleted this row's Input
+    // line rather than correcting it, leaving the only one of the five dish
+    // blocks with no recorded economy figure.
+    reagents: [
+      { itemId: 'highland_barley', count: 4 },
+      { itemId: 'thornpeak_cabbage', count: 2 },
+      { itemId: 'fine_thornpeak_cabbage', count: 1 },
+      { itemId: 'cooking_salt', count: 2 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_highwatch_gourd_soup',
+    professionId: 'cooking',
+    resultItemId: 'highwatch_gourd_soup',
+    resultCount: 1,
+    // Frost gourd simmered to a soup, the fine pick carrying the sweetness
+    // the base gourds lack. The tier-3 fine-twin slot. Input 323 vs output 75
+    // (173 before the Phase 11e widening added frost_lentils x2 + its fine twin).
+    //
+    // RUNG 75, A DROP (Phase 11f, rulings 11f-GATE-A and 11f-GATE-B). The
+    // tier-3 dishes climb off the flat rung-50 band onto cooking's real
+    // upper ladder, and the channel follows the rung: at or above
+    // FARM_DROP_RUNG_FLOOR this is taught by pattern_highwatch_gourd_soup,
+    // which rides the heroic five-mans and the Heroic Quartermaster. Only
+    // the rung and the channel moved: reagents, resultCount, station and
+    // output power are 11c's and are untouched.
+    reagents: [
+      { itemId: 'frost_gourd', count: 3 },
+      { itemId: 'fine_frost_gourd', count: 1 },
+      { itemId: 'frost_lentils', count: 2 },
+      { itemId: 'fine_frost_lentils', count: 1 },
+      { itemId: 'cooking_salt', count: 1 },
+    ],
+    skillReq: 75,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['drop'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_evergarden_sunmelon_tart',
+    professionId: 'cooking',
+    resultItemId: 'evergarden_sunmelon_tart',
+    resultCount: 1,
+    // The top band, and the wheat line's second life: a melon tart on a
+    // wheat crust, so the tier-1 crop still has a buyer at the tier-4 table.
+    // The tier-4 fine-twin slot. Input 848 vs output 150 (448 before the Phase
+    // 11e widening added gilded_yam x2 + its fine twin).
+    //
+    // RUNG 100, A DROP (Phase 11f, rulings 11f-GATE-A and 11f-GATE-B). The
+    // tier-4 dishes take cooking's top farm rung; nothing farming owns
+    // reaches 125, which is 11k's apex-feast band. Taught by
+    // pattern_evergarden_sunmelon_tart off the rift and the Heroic
+    // Quartermaster. Rung and channel only: 11c owns the power and it did
+    // not move.
+    reagents: [
+      { itemId: 'gilded_sunmelon', count: 3 },
+      { itemId: 'fine_gilded_sunmelon', count: 1 },
+      { itemId: 'gilded_yam', count: 2 },
+      { itemId: 'fine_gilded_yam', count: 1 },
+      { itemId: 'vale_wheat', count: 2 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_evergarden_harvest_platter',
+    professionId: 'cooking',
+    resultItemId: 'evergarden_harvest_platter',
+    resultCount: 1,
+    // The capstone plate, dressed greens off the Evergarden beds. The last
+    // fine-twin slot, closing the Phase 5 deferral. Input 856 vs output 150
+    // (456 before the Phase 11e widening added evergarden_pumpkin x2 + its twin).
+    //
+    // RUNG 100, A DROP (Phase 11f), on the tier-4 band with its sibling
+    // above. Taught by pattern_evergarden_harvest_platter off the rift and
+    // the Heroic Quartermaster.
+    reagents: [
+      { itemId: 'evergarden_greens', count: 3 },
+      { itemId: 'fine_evergarden_greens', count: 1 },
+      { itemId: 'evergarden_pumpkin', count: 2 },
+      { itemId: 'fine_evergarden_pumpkin', count: 1 },
+      { itemId: 'cooking_salt', count: 2 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'kitchens',
+  },
+  // --- Phase 11 buff dishes (well-fed food) --------------------------------
+  // One buff dish per crop tier, so the produce ladder has a well-fed
+  // consumer at every rung. Each takes its tier's produce x4 (one more than
+  // the plain twins), so the buff dish costs strictly more produce than its
+  // plain sibling at the same rung, plus the kitchen staple salt (the tier-1
+  // row adds the pottage-precedent vale_wheat binder, see below). NO fine
+  // twins here: the hoe-reagent-only twin set is RULED
+  // (qr-19-fine-twin-dish-consumers, 2026-09-01, under qr-19-best-for-project)
+  // and ratified as shipped design, for the live set of THREE
+  // (fine_vale_wheat, fine_marsh_rice, fine_highland_barley), so no buff dish
+  // gains a fine twin. SEVEN of the NINE dish twins above stay
+  // single-owner: 11h gave fine_gilded_sunmelon and fine_evergarden_greens a
+  // second owner apiece, the two skill-125 capstones, and the other seven are
+  // untouched. (This read "the five dish twins above stay single-owner", stale
+  // since Phase 11e added the pumpkin pair. The Phase 11h QA first corrected it
+  // to "three of the five" by subtracting from the stale number instead of
+  // counting the live table, which is the exact failure it was correcting; the
+  // fix-round review counted the nine.)
+  // The tier 3/4 pair is live: both farmer counters stock all eight upper
+  // seeds, so both rows are completable today. VALUES ARE PROPOSED AND
+  // FLAGGED FOR THE MAINTAINER, reagent counts and rungs alike. STILL OPEN
+  // DELIBERATELY (noted 2026-09-01): qr-19-dish-curve-point-assignments ratified
+  // the EIGHT PLAIN dishes and retired their two proposal banners, and this pair
+  // is the BUFF-dish tier 3/4 row, which is 11c-D-2 surface and outside that
+  // ruling's scope. It is not an instance the ruling missed.
+  //
+  // The tier-1 row keeps the POTTAGE PRECEDENT: brook_carrot is the D9
+  // vegetable, the one produce row that is vendor-stocked AND priced, so a
+  // carrot dish carries a vale_wheat binder exactly like
+  // recipe_eastbrook_root_pottage above. That keeps the whole-list invariant
+  // intact (every farm recipe holds at least one reagent no counter stocks
+  // and no vendor prices), so no dish, buff or plain, is craftable from
+  // counter stock alone, and no rung-0 cooking skill-up faucet opens from
+  // vendor goods. Opening a second vendor-funded skill-up faucet would require
+  // a separate maintainer decision.
+  {
+    id: 'recipe_eastbrook_glazed_carrots',
+    professionId: 'cooking',
+    resultItemId: 'eastbrook_glazed_carrots',
+    resultCount: 1,
+    // The starter buff dish: the D9 carrot glazed down with salt and bound
+    // with a handful of wheat (the pottage's binder idiom), reachable the
+    // hour a first carrot bed comes in. Input 76 vs output 6.
+    reagents: [
+      { itemId: 'brook_carrot', count: 4 },
+      { itemId: 'vale_wheat', count: 1 },
+      { itemId: 'cooking_salt', count: 1 },
+    ],
+    skillReq: 0,
+    itemLevelBudget: 10,
+    level: 10,
+    acquisition: ['trainer'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_fenbridge_rice_pudding',
+    professionId: 'cooking',
+    resultItemId: 'fenbridge_rice_pudding',
+    resultCount: 1,
+    // The fen tier's buff dish: the same rice and salt as the plain bowl,
+    // slow-cooked into a pudding worth sitting through. Input 40 vs output 25.
+    reagents: [
+      { itemId: 'marsh_rice', count: 4 },
+      { itemId: 'cooking_salt', count: 1 },
+    ],
+    skillReq: 25,
+    itemLevelBudget: 16,
+    level: 15,
+    acquisition: ['trainer'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_highwatch_barley_porridge',
+    professionId: 'cooking',
+    resultItemId: 'highwatch_barley_porridge',
+    resultCount: 1,
+    // The wall kitchens' buff dish. Farmer Hollis stocks highland_barley seed,
+    // so this row is completable today.
+    // Input 68 vs output 60.
+    //
+    // RUNG 75, A DROP (Phase 11f), the tier-3 band with the gourd soup.
+    // Taught by pattern_highwatch_barley_porridge off the heroic five-mans
+    // and the Heroic Quartermaster.
+    reagents: [
+      { itemId: 'highland_barley', count: 4 },
+      { itemId: 'cooking_salt', count: 1 },
+    ],
+    skillReq: 75,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['drop'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_evergarden_braised_greens',
+    professionId: 'cooking',
+    resultItemId: 'evergarden_braised_greens',
+    resultCount: 1,
+    // The capstone buff dish. Farmer Verbena stocks evergarden_greens seed, so
+    // this row is completable today.
+    // Input 168 vs output 150.
+    //
+    // RUNG 100, A DROP (Phase 11f), the tier-4 band. Taught by
+    // pattern_evergarden_braised_greens off the rift and the Heroic
+    // Quartermaster. Note the feast below serves THIS dish, so the two rows
+    // climb together and a feast host still has a plate to serve.
+    reagents: [
+      { itemId: 'evergarden_greens', count: 4 },
+      { itemId: 'cooking_salt', count: 1 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_harvest_feast',
+    professionId: 'cooking',
+    resultItemId: 'harvest_feast',
+    resultCount: 1,
+    // The shared feast (Phase 12, D16): the tier-4 communal showcase, cooked
+    // from BOTH tier-4 produce lines at once so one feast asks a whole
+    // evergarden harvest, not a single bed. Input vs output: unit value =
+    // buyValue when finite and > 0 else sellValue, so greens 40x4 + sunmelon
+    // 40x4 + salt 8x2 = 336 in against an output sellValue of 250:
+    // gold-negative, like every farm row.
+    //
+    // The whole-list invariant holds here too: both produce reagents
+    // (evergarden_greens, gilded_sunmelon) carry no buyValue and no counter
+    // stocks them, so the feast can never be cooked from vendor stock alone
+    // and stays out of the counterfactual vendor-fed set in
+    // tests/recipe_economy.test.ts.
+    //
+    // Both farmer counters stock all eight upper seeds, so this row is
+    // completable today, exactly like the tier 3/4 dishes above it.
+    //
+    // FLAGGED FOR THE MAINTAINER: the reagent counts (4 + 4 + 2) and the
+    // 250 output sellValue are proposed tuning, like every farming constant.
+    //
+    // RUNG 100, A DROP (Phase 11f), and the rung is the ruled one: NOT 125.
+    // At 125 the party feast would collide with 11k's apex feasts and
+    // falsify their "the party-tier rung below" premise, so the feast ladder
+    // is a real two-rung climb instead (this at cooking 100, the raid feasts
+    // at 125), and NO second cooking-125 capstone exception is taken. This is
+    // the farm ladder's pinnacle, so its pattern rides the pinnacle
+    // encounter: pattern_harvest_feast drops from Nythraxis and is also on
+    // the Heroic Quartermaster.
+    reagents: [
+      { itemId: 'evergarden_greens', count: 4 },
+      { itemId: 'gilded_sunmelon', count: 4 },
+      { itemId: 'cooking_salt', count: 2 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'kitchens',
+  },
+  // --- alchemy -------------------------------------------------------------
+  {
+    id: 'recipe_growth_tonic',
+    professionId: 'alchemy',
+    resultItemId: 'growth_tonic',
+    resultCount: 1,
+    // The cross-profession trade (D7): the one knob that speeds a planting is
+    // brewed by an ALCHEMIST out of wild herbs, never grown, so a farmer who
+    // wants faster beds has to buy from (or level) the other craft, and the
+    // herb line gains a buyer outside the potion ladder. Sheenleaf is the
+    // rung-0 herb every shipped alchemy entry starts from; the vial is the
+    // flask each of them decants into. Input 20 vs output 6.
+    //
+    // FLAGGED FOR THE MAINTAINER: the reagent counts (2 herbs, the low end of
+    // the shipped 2-to-4 band, plus the usual single vial) and skillReq 0. The
+    // tonic is a plant-time knob for EVERY farm tier rather than a late luxury,
+    // so it sits on the accessible rung; gating it at 25 or 50 would leave the
+    // early tiers with a knob nobody can brew for them, and it is never
+    // vendor-stocked (see the growth_tonic ItemDef comment), so the trainer
+    // rung is the only faucet there is.
+    // RULED (qr-19-growth-tonic-price-and-skillup-faucet, 2026-09-01, under
+    // qr-19-best-for-project): both flags above are ANSWERED and stand as
+    // shipped. The reagent counts (2 herbs plus the vial) and skillReq 0 do
+    // not move; the cheaper rung-0 skill-up path this bill opens is accepted
+    // as the accessible entry to the alchemy ladder.
+    reagents: [
+      { itemId: 'silverleaf_herb', count: 2 },
+      { itemId: 'glass_vial', count: 1 },
+    ],
+    skillReq: 0,
+    itemLevelBudget: 10,
+    level: 10,
+    acquisition: ['trainer'],
+    stationType: 'apothecary',
+  },
+];
+
+// The trophy economy (Masterwrought phase 11l): the seven orphaned junk mob
+// drops the output doctrine admits become reagents, one consumer recipe per
+// adopted trophy (five promoted poor to common, plus the two already-common
+// rare-elite leather trophies the second review round adopted). The sixth
+// fix round output-excluded the chipped tusk, and the 11l QA excluded the
+// cracked fetish and the bogiron nugget under the same standard (see the
+// exclusion record below), so the weaponcrafting, inscription and
+// armorcrafting rung-25 rows are gone. Outputs are EXISTING uncrafted
+// shipped items (the COMMON_RECIPES precedent: no new item defs), and no
+// shipped recipe's bill was edited. Each row's RUNG (skillReq) follows its
+// trophy's drop level; the LEVEL field is capped at the OUTPUT's live drop
+// source where one exists, and takes the rung scaffolding where none does.
+// THE recipe.level NOTE (every row's level comment cites it): the item level
+// source index (src/sim/item_level.ts buildSourceIndex) treats recipe.level as
+// an acquisition level, so a value above the output's live drop source would
+// re-tier the shipped item past its pinned item level and off its stat
+// budget; craftActionXp(recipe.level, characterLevel) in
+// src/sim/professions/profession_xp.ts reads the same field (a level-20
+// crafter earns 0 character XP on a row at 12 or below, the gray band), and
+// masterworkBonusStats (crafting.ts craftBonusStatsFor) sizes the proc's
+// bonus off it for a stat-bearing output. Every bill contains its trophy
+// (sellValue only, no buyValue), so no row joins the
+// counterfactually-vendor-fed set.
+//
+// The pinned economy doctrine (tests/recipe_economy.test.ts: output strictly
+// between the trophy's sellValue and the LISTED bill) is list-count-only by
+// the shipped test's design. requiredReagentCountFor
+// (src/sim/professions/crafting.ts) composes THREE discounts into one floor
+// per reagent, count-1 first, then the multipliers, floored and never below
+// 1: the self-signed count-1 (#1145, a held copy the crafter signed), the
+// specialization multiplier 0.8 (#1134, materialDiscountPct in
+// src/sim/content/professions.ts PERK_THRESHOLDS), and the Jack of All
+// Trades multiplier 0.9 (#1296, JACK_MATERIAL_DISCOUNT_PCT in crafting.ts).
+// Every row below prints two figures against its output: the
+// specialization-only bill, and the specialization-plus-self-signed FLOOR
+// (a self-signed copy of every reagent, which is what
+// tests/recipe_economy.test.ts minAchievableInputValue computes and pins
+// per row in TROPHY_BILLS, its floor field; the Jack multiplier is in neither
+// figure, since no live quest path attunes a Jack today, and the same test
+// pins that attuneJackOfAllTrades has no production caller). How much of
+// the floor a crafter can actually reach depends on WHICH lines a signature
+// can move: a self-signed copy exists for a node yield rolled at a rare-plus
+// material rarity (gathering.ts isSignableMaterialRarity), for a corpse
+// component whose family has NO pristine specimen (the corpse-harvest arms
+// in interaction.ts sign the component only then; a hide or silk family
+// grants its component PLAIN and signs the specimen in its place), for a
+// rare gather event, and for a rare-plus masterwork craft, so the crafter's
+// own harvests CAN sign thorium_ore, goldleaf_herb, elderwood_log and
+// pristine_hide, while rough_hide and spider_silk (their families carry a
+// specimen), a mob-dropped trophy and a bought vendor staple never sign. The
+// floor is therefore EXACTLY reachable for the cinch (401) and the belt
+// (421), by one self-signed pristine hide; the maul and the potion sit on it
+// at specialization alone (every line already at 1, nothing left for a
+// signature to move); the quiver reaches 231 by a signed thorium ore (its
+// 196 floor also needs a signed wyrm scale, a mob drop); and the floor is a
+// counterfactual only for the oiled boots (51 against a reachable 56: no
+// line on that bill can carry a signature) and the pouch (36 against a
+// reachable 51: the bandana, the scrap, and the thread are a trophy, a mob
+// drop, and a vendor staple). Where the floor sits under the output the row
+// says so, bounded by trophy supply (the crafter's reward, by the doctrine's
+// design). The #1301 gold sink then adds
+// ceil(itemLevelBudget x CRAFT_GOLD_SINK_COPPER_PER_BUDGET) copper per craft
+// on top (crafting.ts resolveCraftForRecipe, 2 copper per budget point: 32
+// for a budget-16 row, 40 for budget 20, 20 for budget 10), so the true
+// floor is the printed floor plus that sink: three of the seven stay
+// gold-positive after it (the quiver 236 vs 360, the maul 262 vs 420, the
+// pouch 56 vs 60), the sink turns three gold-negative (the oiled boots 83 vs
+// 80, the cinch 441 vs 420, the belt 461 vs 440), and the potion was never
+// positive (109 vs 16). At the REACHABLE bill plus the sink, the oiled boots
+// (88 vs 80) and the pouch (71 vs 60) are gold-negative too, so two of the
+// seven pay out in practice: the quiver (271 vs 360) and the maul.
+//
+// FLAGGED FOR MAINTAINER EYES, the two surplus rows. Every figure above is
+// VENDOR-PURCHASE accounting (buyValue-first unit values, the price basis
+// tests/recipe_economy.test.ts uses to bar a vendor-buy-to-vendor-sell
+// loop); a crafter who gathers the signable lines pays their sellValue
+// instead (thorium 15 not 60, elderwood 40 not 160, goldleaf 15 not 60), the
+// GATHERED column the same test pins per row. At specialization alone
+// recipe_fenshadow_maul bills 222 against 420 out, net +158 per craft after
+// the 40-copper sink (102 in and +278 at gathered cost), bounded by one
+// cracked_ogre_tusk per craft from a single named elite
+// (brutok_skullsmasher); the quiver is next at +89 with a self-signed
+// thorium ore (231 vs 360 less the 40 sink; +29 at specialization alone,
+// 291 vs 360) and +164 at gathered cost (156 in), bounded more loosely
+// (cracked_wyrm_scale drops at 0.5 from the sanctum drakonids, dungeon
+// trash rather than one elite). The maul is also dominated by the trainer's
+// OWN rung-25 row on every axis but one (the ironshod comparison at its
+// row). The doctrine is list-count-only, so these are tuning reads, not rule
+// breaches, left to the maintainer.
+//
+// 11l-RUNG EXCLUSION RECORD (one line per id, so the record greps in src).
+// Scope: the 21 junk mob-drop orphans (seven adopted below, twelve excluded
+// here, two holdouts); soggy_boot (fishing only) and the three Brightwood
+// Glade wildlife ids (no source) are not mob drops and carry no line.
+// The initial review predicted old_cragmaws_pelt and emberwing_cinderscale as
+// value exclusions against
+// the CRAFTED ceiling (460, leather 420); the governing doctrine picks UNCRAFTED
+// outputs, whose leather pool answers 420 and 440, which is what admits them
+// (a divergence recorded, not a re-decision).
+//   gleamstag_charm 2500: value-excluded, jewelcrafting (the uncrafted neck
+//     and ring pool is 25 items: 9 honor pieces at sellValue 0 and 16 above
+//     600, of them 14 epic, one legendary (heart_of_the_rift at 50000) and
+//     one rare (abyssal_loop at 5000, rift-exclusive relic content whose
+//     value no honest bill exceeds); nothing in (25, 460]).
+//   deepfen_pearl 600: value-excluded, jewelcrafting (the same pool).
+//   guardian_core 180: ruling-excluded, engineering (180 is under every
+//     ceiling; the lane deliberately stays empty, and its on-ramp is the
+//     qr-11o-ENG block above).
+//   pale_pearl 30: output-excluded, jewelcrafting (no uncrafted neck or ring
+//     in (25, 460]: the same 25-item pool).
+//   ogre_toe_ring 25: output-excluded, jewelcrafting (the same gap).
+//   AMENDED 2026-09-01 (masterwrought Phase 19,
+//     qr-19-jewelcrafting-exclusion-stale): the four jewelcrafting lines above
+//     STAND, on a narrower ground, and their census is corrected here rather
+//     than rewritten. Re-derived at execution, the uncrafted neck and ring
+//     register answers 34 rows, not 25: the same 9 honor pieces at sellValue
+//     0, then 24 rows above 600 (22 epic, one rare, one legendary, 4500 to
+//     50000), and ONE row inside the band these lines call empty,
+//     mother_of_pearl (Proving Shore quest keepsake, uncommon ring,
+//     requiredLevel 1, one point in each of five stats, sellValue 50). It is a
+//     tutorial-island quest reward rather than a jewelcrafting-register
+//     output, and read as one it is dominated by the trainer's own rung-0
+//     rings (riveted_iron_signet str 3 sta 1 and etched_iron_loop int 3 sta 1,
+//     both at 46), so the lane stays empty.
+//     tests/trophy_domination_claims.test.ts pins the live census: re-derive
+//     there, never from this comment.
+//   briny_idol 32: output-excluded, inscription (register: caster held-offhands
+//     and scrolls; the uncrafted scroll pool is empty, and the one uncrafted
+//     caster offhand below the rung ceiling, valefire_lantern, is itself
+//     excluded as an output by the cracked_fetish derivation below, strictly
+//     dominated by the trainer's own folio and primer, so no inscription
+//     trophy can take it; wraithfire_orb is epic at 12000, barred by the
+//     rung-50 rare cap; eastbrook_buckler and moggers_hide_quiver sit in the
+//     band but are a shield and a hunter quiver, outside the register).
+//   frayed_prayer_beads 30: output-excluded, inscription (as briny_idol).
+//   moonpale_scale 26: output-excluded, inscription (as briny_idol).
+//   inert_storm_shard 28: output-excluded, enchanting (arcane_shard is reserved
+//     for the apex band, the resonant secondaries are enchant-exclusive rare
+//     disenchant outputs, wyrmfall_core is rare, arcanite_bar a master-stocked
+//     premium reagent; any rare output would owe a prog_enchanting_rare deed).
+//   chipped_tusk 15: output-excluded, weaponcrafting (the seventh output
+//     exclusion, the sixth fix round, split by archetype; the counts below
+//     were measured 2026-08-24 and no test pins them, so re-derive them when
+//     a weapon lands in the band: of the 25 uncrafted
+//     weapons with sellValue in (15, 460], the 18 physical rows are strictly
+//     dominated by the trainer's OWN rung-25 row recipe_whetted_iron_dirk,
+//     16-24 at 1.8 = 11.1 dps, agi 5 sta 2, no class lock, a 50-copper listed
+//     bill (iron 2 x 8, bone 2 x 7, flux 1 x 20): vale_carving_knife is 3.06
+//     dps, mirejaw_fang_knife 10.0 dps and rogue- and hunter-locked, the
+//     Crossroads caravan set around 4 dps. The 7 caster rows
+//     (apprentice_staff, hickory_shortstaff, drovers_staff,
+//     corpse_candle_focus, fenreed_staff, staff_of_drowned_prayers,
+//     voss_sanctified_mace) have no rung-25 comparand, since weaponcrafting
+//     serves casters only at rung 50, where recipe_elderwood_battle_staff
+//     (rare, int 9 spi 4, 8.33 dps, no class lock) dominates all seven; the
+//     one caster row inside the deleted bill's reach (208) that any chest or
+//     mob drops, corpse_candle_focus (195, int 2 spi 2, 9-15 at 2.0), is
+//     Drowned Litany chest loot with the same reward-loop question the fang
+//     knife carried and no tusk flavor (apprentice_staff, hickory_shortstaff
+//     and drovers_staff sit under 208 too, as a quest reward, a Haldren
+//     vendor row and a house market listing). The rung-50 physical
+//     candidates are dominated by the crafted rares on every axis but one
+//     (briarroot_staff's 10.45 dps edges thorium_warblade's 10.40;
+//     everything else, str 9 sta 4 against str 2 sta 2, rare against
+//     uncommon, one hand against two, is overwhelming); under R21 no
+//     weaponcrafting output is defensible, so the tusk stays poor trash).
+//   cracked_fetish 14: output-excluded, inscription (the eighth output
+//     exclusion, the 11l QA, under the tusk standard: its one in-register
+//     uncrafted output, valefire_lantern (offhand, uncommon, int 1 spi 1,
+//     item level 7, sellValue 160), is strictly dominated by the trainer's
+//     OWN rows at the same rung and below, recipe_goldleaf_folio (rung 25,
+//     int 3 spi 2, a 150 bill) and recipe_silverleaf_primer (rung 0, int 2
+//     spi 1, a 36 bill): same slot, same CASTER_ALL lock, same quality, more
+//     stats, cheaper. The only axis the lantern wins is sellValue, so the row
+//     was a fetish sink whose one use was the vendor loop (+24 per craft at
+//     the floor after the sink). No other uncrafted caster offhand sits in
+//     (14, 178], so inscription's lane goes EMPTY like jewelcrafting's and
+//     the fetish returns to poor trash, untouched on every other axis).
+//   bogiron_nugget 12: output-excluded, armorcrafting (the ninth, the 11l
+//     QA, the same standard: hobnail_boots (mail feet, common, armor 18, no
+//     stats, sellValue 90, a 900 counter price at Smith Haldren) is strictly
+//     dominated by the trainer's OWN rung-0 row recipe_coppermail_sabatons
+//     (mail feet, common, armor 38, a 46 bill); the counter item is itself
+//     dead beside the sabatons, so a 100-copper craft door onto it was a
+//     nugget sink, not a discount route. No other uncrafted mail foot sits
+//     in (12, 100], and stretching a bill to admit bogiron_hauberk (300) was
+//     rejected at the build; armorcrafting keeps no trophy row and the
+//     nugget returns to poor trash).
+//   RECORDED CONSEQUENCE (found by the 11l QA, the maintainer's to heal):
+//     with bandit_bandana, tallow_candle and mudfin_scale promoted, zone 1
+//     (Eastbrook Vale, levels 1 to 7) carries NO poor mob drop, so a
+//     starter-zone character has nothing for the Sell Junk button the guide
+//     teaches until zone 2, and only the band-0 fishing pair (tangled_weed,
+//     soggy_boot) as gray. Not healed here (authoring a drop is content
+//     design); it sits beside the col_junk_drawer margin on the open list.
+//   tangled_weed, soggy_moccasin: holdouts (11l-HOLDOUT).
+export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
+  {
+    id: 'recipe_oiled_boots',
+    professionId: 'leatherworking',
+    resultItemId: 'oiled_boots',
+    resultCount: 1,
+    // Mudfin scales water-proof the leather, the marshstalker rung's own
+    // hide/silk/agent register does the rest. Input 92 vs output 80.
+    // 11l-OUT: trophy 5 < output 80 < input 92; no prior recipe crafts
+    // oiled_boots (recipeForResultItem); uncommon at the 25 rung ceiling.
+    // Discounted bills (requiredReagentCountFor): specialization only, scales
+    // 4 to 3, hide 6 to 4, silk and agent 2 to 1, 56 vs 80; specialization
+    // plus self-signed, scales 4 to 2, hide 6 to 4, silk and agent 1, the
+    // floor 51 vs 80, and since Phase 11m the floor IS reachable: the one
+    // line a signature moves past 56 is the mudfin scale, which a gills
+    // harvest signs at rare or better (gills maps to it with no specimen row,
+    // so the scale itself carries the signature), while the hide and the silk
+    // never sign (their families grant the component plain and sign only the
+    // pristine specimen); before 11m the scale was a mob drop that never
+    // signed and the reachable bill was the 56. Gold-positive at the floor,
+    // but the 32-copper #1301 sink turns the row gold-negative, 83 vs 80,
+    // bounded by trophy supply.
+    // Beside the trainer's OWN rung-0 row recipe_fenbridge_hide_boots (leather
+    // feet, common, armor 26, a 26 bill) this row wins one axis, agility 1,
+    // and is uncommon rather than common, at three and a half times the bill:
+    // the weakest surviving prize, recorded by the 11l QA as a tuning read,
+    // not an exclusion, since it is not strictly dominated.
+    reagents: [
+      { itemId: 'mudfin_scale', count: 4 },
+      { itemId: 'rough_hide', count: 6 },
+      { itemId: 'spider_silk', count: 2 },
+      { itemId: 'tanning_agent', count: 2 },
+    ],
+    skillReq: 25,
+    itemLevelBudget: 16,
+    // Capped at the boots' top live drop source (Morthen, level 10) so the
+    // recipe route cannot re-tier the shipped item (the recipe.level note in
+    // the header).
+    // Profession XP reads the same field: craftActionXp(10, 20) = 0 for a
+    // level-20 crafter (gray band), against 100 for a level-20 row.
+    level: 10,
+    acquisition: ['trainer'],
+    stationType: 'tannery',
+  },
+  {
+    id: 'recipe_gravewyrm_bone_quiver',
+    professionId: 'leatherworking',
+    resultItemId: 'gravewyrm_bone_quiver',
+    resultCount: 1,
+    // Wyrm scales plate the quiver, the duskhide rung-50 register (thorium
+    // studs, pristine hide, the vats) carries the value. Input 411 vs
+    // output 360. 11l-OUT: trophy 35 < output 360 < input 411; no prior
+    // recipe crafts it (recipeForResultItem); rare at the 50 rung ceiling.
+    // Discounted bills (requiredReagentCountFor): specialization only, scales
+    // 3 to 2, hide 2 to 1, thorium 4 to 3, 291 vs 360; specialization plus
+    // self-signed, scales 3 to 1, hide 1, thorium 4 to 2, agent 1, the floor
+    // 196 vs 360; the reachable figure is 231 (a self-signed thorium ore
+    // takes 4 to 2, the hide is 1 either way, and the wyrm scale is a mob
+    // drop that never signs), gold-positive at the floor and after the
+    // 40-copper #1301 sink (236 vs 360; 271 vs 360 at the reachable bill),
+    // bounded by trophy supply.
+    reagents: [
+      { itemId: 'cracked_wyrm_scale', count: 3 },
+      { itemId: 'pristine_hide', count: 2 },
+      { itemId: 'thorium_ore', count: 4 },
+      { itemId: 'tanning_agent', count: 1 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    // Capped at the quiver's live boss source (korzul_the_gravewyrm, level 20
+    // exactly) so the recipe route cannot re-tier the shipped item past its
+    // pinned item level 23 (20 plus the rare bonus 3; the recipe.level note
+    // in the header):
+    // here the rung-50 scaffolding and the cap coincide. Profession XP reads
+    // the same field: craftActionXp(20, 20) = 100 for a level-20 crafter,
+    // the full level-20 figure.
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'tannery',
+  },
+  {
+    id: 'recipe_fenshadow_maul',
+    professionId: 'weaponcrafting',
+    resultItemId: 'fenshadow_maul',
+    resultCount: 1,
+    // Ogre tusks stud the fen maul on a highpine haft (elderwood_log, the
+    // battle staff's rung-50 log precedent). Input 444 vs output 420.
+    // 11l-OUT: trophy 42 < output 420 < input 444; no prior recipe crafts
+    // fenshadow_maul (recipeForResultItem); uncommon, below the 50 ceiling.
+    // Discounted bills: requiredReagentCountFor (src/sim/professions/crafting.ts)
+    // at full specialization alone floors every listed 2 to 1, so the bill
+    // falls to 42 + 160 + 20 = 222 against 420 out; specialization plus
+    // self-signed lands on the same floor, 222 vs 420 (a 1 never drops, so
+    // the floor IS the specialization-only bill), gold-positive at the floor
+    // and after the 40-copper #1301 sink (262 vs 420), bounded by trophy supply
+    // (cracked_ogre_tusk has one source, brutok_skullsmasher, so at the
+    // discounted bill each craft is ONE named-elite kill, two at the listed
+    // bill).
+    // Re-picked from bristleback_maul (R21): that maul is item level 7, so a
+    // rung-50 crafter had no reason to make it.
+    // Beside the trainer's OWN rung-25 row recipe_ironshod_maul (two-hand,
+    // uncommon, 36-51 at 3.3 = 13.18 dps, str 5 sta 3, no class lock, item
+    // level 16, a 104 bill) this maul (12.21 dps, str 3 agi 2 sta 2, druid
+    // only, item level 13) wins one axis, agility 2; recorded by the 11l QA
+    // beside the surplus in the header as the maintainer's read, not an
+    // exclusion.
+    reagents: [
+      { itemId: 'cracked_ogre_tusk', count: 2 },
+      { itemId: 'elderwood_log', count: 2 },
+      { itemId: 'smithing_flux', count: 2 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    // Capped at the maul's live boss source (Deacon Voss, level 12) so the
+    // recipe route cannot re-tier the shipped item past its pinned item level
+    // 13 (the recipe.level note in the header).
+    // Profession XP reads the same field: craftActionXp(12, 20) = 0 for a
+    // level-20 crafter (gray band, 8 below against zeroDiff 8), against 100
+    // for a level-20 row.
+    level: 12,
+    acquisition: ['trainer'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_lesser_healing_potion',
+    professionId: 'alchemy',
+    resultItemId: 'lesser_healing_potion',
+    resultCount: 1,
+    // Tallow renders into the draught's salve base, goldleaf and vial from
+    // the rung's own register. Input 82 vs output 16 (the goldleaf_scroll
+    // precedent ships 90 vs 15). 11l-OUT: trophy 5 < output 16 < input 82; no
+    // prior recipe crafts it (recipeForResultItem); common, below the ceiling.
+    // Re-picked by the 11l QA from healing_potion (then 320 HP, sellValue 32): at
+    // rung 25 that potion out-healed the trainer's OWN rung-25 row
+    // recipe_goldleaf_healing_draught (200 HP for a 140 bill) at 82 and sat
+    // within 15 HP of the rung-50 rare draught (335 HP for 344), on the one
+    // shared potion cooldown, which inverted alchemy's ladder (R21 in
+    // reverse: the shipped rows go dead for anyone holding tallow). The
+    // lesser potion (190 HP) sits UNDER the rung-25 draught and above the
+    // rung-0 pair (110 and 120 HP), so the ladder keeps its order; the
+    // vendor's own 320 HP potion at 170 already undercut the draught's 140
+    // bill PER POINT OF HEALING (0.53 copper an HP against 0.70), a
+    // pre-existing tension that is the maintainer's, not this row's. (11n
+    // vendor floor: that potion is 279 HP since the nerf, 0.61 an HP, so
+    // the tension narrowed but still stands, and the gap to the rung-50
+    // rare draught widened from 15 HP to 56.)
+    // Discounted bills (requiredReagentCountFor): specialization only, candles
+    // 2 to 1, 77 vs 16; specialization plus self-signed lands on the same
+    // floor, 77 vs 16 (the herb and the vial are already 1), still
+    // gold-negative: the one row whose floor stays above its output (109 vs
+    // 16 after the 32-copper #1301 sink). No prize in copper and none in
+    // access either: Provisioner Hale (zone2.ts) and the zone-3 counter sell
+    // the same potion at 85, under the 109 floor-plus-sink, so the row is a
+    // tallow sink held under the doctrine's list-count-only clause whose one
+    // use is the alchemy skill gain a tallow-holder buys with it; recorded by
+    // the 11l QA as a tuning read beside the oiled boots, not an exclusion
+    // (the trainer's own rung-25 draught does not dominate it: 190 HP common
+    // for 82 against 200 HP uncommon for 140).
+    reagents: [
+      { itemId: 'tallow_candle', count: 2 },
+      { itemId: 'goldleaf_herb', count: 1 },
+      { itemId: 'glass_vial', count: 1 },
+    ],
+    skillReq: 25,
+    itemLevelBudget: 16,
+    // The free rung-25 scaffolding: the potion is slotless, so no item level
+    // results whatever this says (isItemLevelEligible), and only
+    // craftActionXp reads it: craftActionXp(15, 20) = 30 for a level-20
+    // crafter (green band), against 100 for a level-20 row.
+    level: 15,
+    acquisition: ['trainer'],
+    stationType: 'apothecary',
+  },
+  {
+    id: 'recipe_linen_pouch',
+    professionId: 'tailoring',
+    resultItemId: 'linen_pouch',
+    resultCount: 1,
+    // Bandit bandanas sewn into the pouch body with the rung-0 scrap and
+    // thread register; the vendor sells it at 250, so crafting is the
+    // discount route. Input 72 vs output 60. 11l-OUT: trophy 6 < output 60 <
+    // input 72; no prior recipe crafts it (recipeForResultItem); common.
+    // Discounted bills (requiredReagentCountFor): specialization only,
+    // bandanas 2 to 1, scrap and thread 4 to 3, 51 vs 60; specialization plus
+    // self-signed, bandanas 1, scrap and thread 4 to 2, the floor 36 vs 60,
+    // a counterfactual only: the bandana, the scrap, and the thread are a
+    // trophy, a mob drop, and a vendor staple, none of which signs, so the
+    // reachable bill is the 51. Gold-positive at the floor and after the
+    // 20-copper #1301 sink (56 vs 60), but gold-negative at the reachable
+    // bill plus the sink (71 vs 60), bounded by trophy supply.
+    reagents: [
+      { itemId: 'bandit_bandana', count: 2 },
+      { itemId: 'linen_scrap', count: 4 },
+      { itemId: 'spool_of_thread', count: 4 },
+    ],
+    skillReq: 0,
+    itemLevelBudget: 10,
+    // The free rung-0 scaffolding: the pouch is a bag, slotless, so no item
+    // level results whatever this says (isItemLevelEligible), and only
+    // craftActionXp reads it: craftActionXp(10, 20) = 0 for a level-20
+    // crafter (gray band), against 100 for a level-20 row.
+    level: 10,
+    acquisition: ['trainer'],
+    stationType: 'loom',
+  },
+  {
+    id: 'recipe_wildgrove_cinch',
+    professionId: 'leatherworking',
+    resultItemId: 'wildgrove_cinch',
+    resultCount: 1,
+    // Old Cragmaw's pelt (the Ridge Stalkers' rare elite) into the Wildgrove
+    // Cinch his own pack drops at 2 percent (ridge_stalker, zone3.ts: the
+    // druid caster line's uncommon leather waist), the duskhide rung-50
+    // register (pristine hide, a thorium stud, the vats) around it: a
+    // deterministic door beside a trash roll from a DIFFERENT kill, the
+    // cragprowl_belt shape (Voskar's scale into the Thornpeak Ogres' 2
+    // percent belt), not the huntcord's. Input 451 vs output 420. 11l-OUT:
+    // trophy 300 < output 420 < input 451; no prior recipe crafts
+    // wildgrove_cinch (recipeForResultItem); uncommon, below the 50 rung
+    // ceiling.
+    // Re-picked from cragwalker_boots (R21, the fourth fix round): that boot
+    // is a rung-50 common with no stats (armor only), dominated inside its
+    // own zone by the rare cragmaw_prowlboots from the very kill that yields
+    // the pelt, so it was a pelt sink, not a crafter's prize.
+    // Deliberately NOT cragmaw_huntcord, Old Cragmaw's own 0.25 chase belt:
+    // the pelt is that same kill's guaranteed drop, so one pelt per craft
+    // would make the chase deterministic (not the quiver precedent, which
+    // pairs three 0.5 trash-drop scales with a 0.05 boss roll), and two
+    // pelts per craft vendor 600 against 340 out, barred by the doctrine.
+    // Discounted bills (requiredReagentCountFor, src/sim/professions/crafting.ts):
+    // specialization only, pristine_hide 3 to 2, 426 vs 420; specialization
+    // plus self-signed, the hide 3 to 1, 300 + 25 + 60 + 16 = 401, the floor
+    // 401 vs 420, and the floor is REACHABLE: one self-signed pristine hide
+    // (a corpse specimen the crafter's own harvest signs) is the whole
+    // discount, the thorium and the agent are 1 either way, and the pelt
+    // never signs. Gold-positive at the floor, but the 40-copper #1301 sink
+    // turns the row gold-negative, 441 vs 420, bounded by trophy supply (the
+    // pelt has one source, Old Cragmaw, so every craft is one rare-elite kill
+    // at any bill).
+    reagents: [
+      { itemId: 'old_cragmaws_pelt', count: 1 },
+      { itemId: 'pristine_hide', count: 3 },
+      { itemId: 'thorium_ore', count: 1 },
+      { itemId: 'tanning_agent', count: 1 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    // Capped at the cinch's live drop source (the Ridge Stalkers, level 13 to
+    // 14) so the recipe route cannot re-tier the shipped item past its pinned
+    // item level 15 (tests/itemization_coverage.test.ts: 14 plus the uncommon
+    // bonus 1; the recipe.level note in the header names its three
+    // consumers). Here: craftActionXp(14, 20) = 19 character XP per craft for
+    // a level-20 crafter (green band, 6 below against zeroDiff 8), against
+    // 100 for a level-20 row; and the cinch HAS a stat profile (int 2, spi
+    // 2), so the masterwork proc can bump it, the shipped behavior for every
+    // stat-bearing output.
+    level: 14,
+    acquisition: ['trainer'],
+    stationType: 'tannery',
+  },
+  {
+    id: 'recipe_cragprowl_belt',
+    professionId: 'leatherworking',
+    resultItemId: 'cragprowl_belt',
+    resultCount: 1,
+    // Voskar's cinderscale plates the belt, the duskhide rung-50 register
+    // (pristine hide, a thorium stud, the vats) carries the rest, so a 2
+    // percent Thornpeak Ogre drop gains a deterministic craft door. Input 471
+    // vs output 440. 11l-OUT: trophy 320 < output 440 < input 471; no prior
+    // recipe crafts cragprowl_belt (recipeForResultItem); uncommon, below the
+    // 50 rung ceiling.
+    // Discounted bills (requiredReagentCountFor, src/sim/professions/crafting.ts):
+    // specialization only, pristine_hide 3 to 2, 446 vs 440; specialization
+    // plus self-signed, the hide 3 to 1, the floor 421 vs 440, REACHABLE by
+    // one self-signed pristine hide exactly as the cinch's is. Gold-positive
+    // at the floor, but the 40-copper #1301 sink turns the row gold-negative,
+    // 461 vs 440, bounded by trophy supply (the listed 471 inverts; the
+    // cinderscale's one source is Voskar, and the bought agent is 16).
+    reagents: [
+      { itemId: 'emberwing_cinderscale', count: 1 },
+      { itemId: 'pristine_hide', count: 3 },
+      { itemId: 'thorium_ore', count: 1 },
+      { itemId: 'tanning_agent', count: 1 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    // Capped at the belt's live drop source (Thornpeak Ogres, level 16) so
+    // the recipe route cannot re-tier the shipped item past its pinned item
+    // level 17 (the recipe.level note in the header).
+    // Profession XP reads the same field: craftActionXp(16, 20) = 42 for a
+    // level-20 crafter (green band, 4 below), against 100 for a level-20 row.
+    level: 16,
+    acquisition: ['trainer'],
+    stationType: 'tannery',
+  },
+];
+
 // Exported (not just used internally by recipeById below) so the IWorld
 // recipeList read surface (Sim.recipeList / ClientWorld.recipeList) can list
 // every recipe, common, tool, and combo alike: see PR #1209 review, a combo
 // recipe omitted from recipeList was unreachable in normal play; the same
 // applies to the tool recipes de-stubbed here (#1135's crafted base tools).
+
 export const ALL_RECIPES: ProfessionRecipeRecord[] = [
   ...COMMON_RECIPES,
   ...TOOL_RECIPES,
@@ -1641,10 +4665,48 @@ export const ALL_RECIPES: ProfessionRecipeRecord[] = [
   ...COMBO_RECIPES,
   ...LADDER_RECIPES,
   ...BAG_RECIPES,
+  ...JEWELCRAFTING_RECIPES,
+  ...INSCRIPTION_RECIPES,
+  ...INTERMEDIATE_RECIPES,
+  ...APEX_ARMOR_RECIPES,
+  ...APEX_GEAR_RECIPES,
+  ...APEX_CONSUMABLE_RECIPES,
+  ...HOE_RECIPES,
+  ...FARM_RECIPES,
+  ...TROPHY_RECIPES,
+  // Appended at the END (masterwrought Phase 11o): no earlier position moves.
+  ...ENGINEERING_ONRAMP_RECIPES,
 ];
 
+// O(1) indexes for the two per-lookup resolvers below (the recipe table grows
+// every content phase, and recipeById sits on crafting hot paths). NOT built
+// once at load: ALL_RECIPES is append-only content at runtime, but test
+// fixtures push and splice synthetic recipes around a suite
+// (tests/recipe_pattern_items.test.ts relies on recipeById seeing them), so
+// the indexes rebuild whenever the table's length changes; a same-length
+// in-place swap is outside the contract (nothing replaces rows). First
+// insertion wins, preserving the linear scans' first-match semantics, and a
+// miss stays undefined.
+let recipeIndexSize = -1;
+let recipeByIdIndex: ReadonlyMap<string, ProfessionRecipeRecord> = new Map();
+let recipeByResultItemIndex: ReadonlyMap<string, ProfessionRecipeRecord> = new Map();
+
+function ensureRecipeIndexes(): void {
+  if (recipeIndexSize === ALL_RECIPES.length) return;
+  const byId = new Map<string, ProfessionRecipeRecord>();
+  const byResultItem = new Map<string, ProfessionRecipeRecord>();
+  for (const recipe of ALL_RECIPES) {
+    if (!byId.has(recipe.id)) byId.set(recipe.id, recipe);
+    if (!byResultItem.has(recipe.resultItemId)) byResultItem.set(recipe.resultItemId, recipe);
+  }
+  recipeIndexSize = ALL_RECIPES.length;
+  recipeByIdIndex = byId;
+  recipeByResultItemIndex = byResultItem;
+}
+
 export function recipeById(recipeId: string): ProfessionRecipeRecord | undefined {
-  return ALL_RECIPES.find((r) => r.id === recipeId);
+  ensureRecipeIndexes();
+  return recipeByIdIndex.get(recipeId);
 }
 
 // The hands-vs-stations field set (Professions 2.0): the recipe ids
@@ -1657,10 +4719,11 @@ export const FIELD_RECIPES: ReadonlySet<string> = new Set(COMMON_RECIPES.map((r)
 // Reverse lookup (#1149, Battlefield Experience): the recipe whose crafting
 // produced a given result item id, so a tracked-event handler holding only an
 // item instance can resolve back to the craft (professionId) that made it.
-// Searches ALL_RECIPES (common, tool, caster hub, combo, and ladder alike),
+// Indexes ALL_RECIPES (common, tool, caster hub, combo, and ladder alike),
 // not just COMMON_RECIPES: a narrower search here silently broke attribution
 // for every recipe outside the common set. First match wins: no two recipes
 // in this table share a resultItemId today.
 export function recipeForResultItem(itemId: string): ProfessionRecipeRecord | undefined {
-  return ALL_RECIPES.find((r) => r.resultItemId === itemId);
+  ensureRecipeIndexes();
+  return recipeByResultItemIndex.get(itemId);
 }

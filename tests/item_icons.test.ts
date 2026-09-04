@@ -5,8 +5,8 @@ import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
 import { validateAcceptedArtManifest } from '../scripts/lib/icon_asset_audit.mjs';
-import { IGNIVAR_LOOT_ITEM_IDS } from '../src/sim/content/ignivar_loot';
 import { ITEMS } from '../src/sim/data';
+import type { ItemDef } from '../src/sim/types';
 import {
   ITEM_ART_PENDING,
   ITEM_IMAGE_IDS,
@@ -50,7 +50,8 @@ function walk(dir: string): string[] {
   return out;
 }
 
-// The 13 equippable bags. Pinned as a literal (guard F walks it for the per-bag license
+// The 14 equippable bags (the release's 13 plus the Masterwrought
+// sunspun_haversack). Pinned as a literal (guard F walks it for the per-bag license
 // override), so a renamed bag or a drifted `kind` fails loudly instead of dropping out of
 // the coverage. Grew from 6 when phase 05 of the bank-storage packet shipped the bag
 // catalog and its materials-only satchels. Seven phase-05 placeholders were replaced by the
@@ -66,6 +67,7 @@ const BAG_IDS = [
   'necromancers_reagent_satchel',
   'resonant_weave_bag',
   'silkspun_satchel',
+  'sunspun_haversack',
   'travelers_knapsack',
   'wayfarers_backpack',
   'wolfhide_satchel',
@@ -278,6 +280,7 @@ type Mapping = {
     name: string;
     sourcePack: string;
     sourceFile?: string;
+    confidence?: string;
     license?: string;
   }[];
   generatedBatches?: {
@@ -309,7 +312,11 @@ function missingPaintedWaveItemIds(): string[] {
 describe('item webp icons', () => {
   it('has image-backed item ids wired (guards the fixture)', () => {
     expect(ITEM_IMAGE_IDS.size).toBeGreaterThan(0);
-    expect(WEAPON_IMAGE_IDS.size).toBe(133);
+    // 123 -> 125 at Masterwrought phase 09: duskforged_warblade + ridgebreaker joined
+    // ITEM_WEAPON_VARIANTS (set from a suite run, not arithmetic); 125 -> 135 at the
+    // release/v0.41.0 merge (2026-08-30), which brought the ten Ignivar raid weapons
+    // (the release's own arm read 133 = 123 + 10). Re-derived on the merged tree.
+    expect(WEAPON_IMAGE_IDS.size).toBe(135);
   });
 
   it('A) every image-backed item and weapon resolves to a committed, decodable .webp', async () => {
@@ -357,11 +364,12 @@ describe('item webp icons', () => {
     for (const id of ITEM_ART_PENDING) {
       expect(itemImageUrl(id), `${id} must not resolve to uncommitted art`).toBeNull();
     }
-    // The Crucible wave is fully painted (crucible-set-icons-2026-08-29), so
-    // the ledger is back to the EMPTY set: no artless item can hide behind an
-    // open wave, and the next commissioned wave re-pins its exact membership
-    // here when it stages.
-    expect([...ITEM_ART_PENDING]).toEqual([]);
+    // The completion wave clears the feature debt. The release-owned Crucible
+    // spread is also empty today, so any future parked id needs an explicit re-pin.
+    expect(
+      [...ITEM_ART_PENDING].sort(),
+      'art debt is enumerated and re-pinned deliberately, never grown quietly',
+    ).toEqual([]);
     // And the inverse: an id with committed art must still win the static url.
     expect(itemImageUrl('linen_pouch')).toBe('/ui/items/linen_pouch.webp');
   });
@@ -447,6 +455,7 @@ describe('item webp icons', () => {
       'necromancers_reagent_satchel',
       'resonant_weave_bag',
       'silkspun_satchel',
+      'sunspun_haversack',
       'travelers_knapsack',
       'wayfarers_backpack',
       'wolfhide_satchel',
@@ -493,9 +502,14 @@ describe('item webp icons', () => {
       expect(batch.styleReference).toBeTruthy();
       expect(batch.commonPrompt).toBeTruthy();
     }
-    // The remaining legacy bag family is project-owned ordinary art. Silkspun Satchel and the
-    // seven replacement paintings belong only to generatedBatches.
-    const generatedBagIds = new Set<string>([...BANK_STORAGE_PAINTED_BAG_IDS, 'silkspun_satchel']);
+    // The remaining legacy bag family is project-owned ordinary art. Silkspun
+    // Satchel, the seven bank-storage replacements, and Masterwrought's
+    // Sunspun Haversack belong only to generatedBatches.
+    const generatedBagIds = new Set<string>([
+      ...BANK_STORAGE_PAINTED_BAG_IDS,
+      'silkspun_satchel',
+      'sunspun_haversack',
+    ]);
     for (const id of [...BAG_IDS.filter((bagId) => !generatedBagIds.has(bagId)), 'backpack']) {
       const entry = m.entries.find((e) => e.itemId === id);
       expect(entry?.license, `${id} must carry its own license override`).toContain(
@@ -531,6 +545,48 @@ describe('item webp icons', () => {
       provenanceRecords: [BANK_STORAGE_PAINTED_BAG_MANIFEST],
     });
     expect(replacementBatch[0].itemIds).toEqual(BANK_STORAGE_PAINTED_BAG_IDS);
+  });
+
+  it('F0) pins the authored mount-icon sources and Mech Bird render batch', () => {
+    const m = mapping();
+    expect(m.entries.find(({ itemId }) => itemId === 'reins_lanternback_troll')).toEqual({
+      itemId: 'reins_lanternback_troll',
+      name: "Lamplighter's Yoke: Grumbol",
+      sourcePack: 'woc_owner_supplied_art',
+      sourceFile: 'troll icon 2.png (owner-supplied painted master, 624x624)',
+      confidence: 'high',
+      license: 'World of ClaudeCraft original art (project-owned, created for this game)',
+    });
+    expect(m.entries.find(({ itemId }) => itemId === 'reins_chimeglass_tortoise')).toEqual({
+      itemId: 'reins_chimeglass_tortoise',
+      name: "Roadwarden's Bellstrap: Tolliver",
+      sourcePack: 'project-authored',
+      sourceFile:
+        'three-quarter head render of the shipped mount model (public/models/mounts/chimeglass_tortoise.glb) by scripts/render_mount_icons.mjs, background keyed and downscaled to the 128px opaque woc-item-icon-v1 shipping format (re-rendered 2026-08-16 with the lens-glow pass)',
+      confidence: 'high',
+      license: 'World of ClaudeCraft original art (project-owned, created for this game)',
+    });
+
+    expect(
+      (m.generatedBatches ?? []).find(
+        ({ batchId }) => batchId === 'mech-bird-mount-icon-2026-08-17',
+      ),
+    ).toEqual({
+      batchId: 'mech-bird-mount-icon-2026-08-17',
+      source:
+        'Project Blender render of the shipped mount model (Cycles) with painted-treatment post (median brushwork pass, warm and cool grade, vignette multiply)',
+      owner: 'World of ClaudeCraft',
+      license: 'World of ClaudeCraft project-generated art, project asset, rights reserved',
+      styleContract: {
+        id: 'woc-item-icon-v1',
+        document: 'docs/design/item-icon-art-style.md',
+      },
+      styleReference:
+        'Generated under item-icon contract woc-item-icon-v1, Mount collectible family row: three-quarter mount bust with tack. Source model is the shipped public/models/mounts/mech_bird.glb posed on its Idle clip head-turn hold, rendered opaque on a dark umber vignette with a top-left warm key.',
+      commonPrompt:
+        'Three-quarter bust portrait of the Cluckwork Mech Bird mount with saddle and grab handle visible, opaque dark atmospheric vignette ground, top-left warm key light, cool deep shadow, painted brushwork finish, no writing, frame, transparency, or crop.',
+      itemIds: ['reins_mech_bird'],
+    });
   });
 
   it('F1) pins the canonical item-art style contract and its approved visual anchors', () => {
@@ -947,5 +1003,60 @@ describe('unknown item ids resolve to the shared fallback recipe (stale-client p
       (item) => !ITEM_WEAPON_VARIANTS[item.id] && itemIconRecipe(item.id) !== unknown,
     );
     expect(derived).toBeTruthy();
+  });
+});
+
+describe('recipe patterns take the parchment page, whatever they are named', () => {
+  // The kind:'recipe' arm in itemFallback must sit ABOVE the fish-name arm,
+  // which carries no kind gate and matches on SUBSTRINGS: 'eel' is inside
+  // "Steel", so a pattern for a steel weapon is the shape that catches a
+  // wrong ordering. Every arm above the recipe one is kind-gated and cannot
+  // claim a pattern, so this is the only ordering the fallback can get wrong.
+  //
+  // The def is synthetic and removed in finally: no shipped item carries kind
+  // 'recipe' yet (phase 11 authors the drops), and the art-coverage sweeps
+  // above would fail on an artless one left in the table.
+  function withPatternDef<T>(name: string, run: (id: string) => T): T {
+    const id = 'test_icon_pattern_probe';
+    ITEMS[id] = {
+      id,
+      name,
+      kind: 'recipe',
+      quality: 'uncommon',
+      sellValue: 25,
+      teachesRecipeId: 'recipe_eastbrook_arming_sword',
+    } as ItemDef;
+    try {
+      return run(id);
+    } finally {
+      delete ITEMS[id];
+    }
+  }
+
+  it('inks a pattern whose name embeds a fish token as parchment, not a fish', () => {
+    const recipe = withPatternDef('Pattern: Steel Longsword', (id) => itemIconRecipe(id));
+    expect(recipe.bg).toBe('parchment');
+    expect(recipe.prims.map((prim) => prim.p)).toEqual(['scroll']);
+  });
+
+  it('is the ordering and not the name: the same name on a NON-recipe kind still draws a fish', () => {
+    // Without this half the pin above would also pass on a fallback that had
+    // simply stopped drawing fish at all, which would be a different bug.
+    // The fish result here is the CURRENT substring behavior being controlled
+    // for, not a requirement: if the fish token list ever narrows to word
+    // boundaries (the real root cause), retire this half rather than defend it.
+    const id = 'test_icon_fishy_junk_probe';
+    ITEMS[id] = {
+      id,
+      name: 'Steel Longsword Offcut',
+      kind: 'junk',
+      quality: 'common',
+      sellValue: 1,
+    } as ItemDef;
+    try {
+      expect(itemIconRecipe(id).prims.map((prim) => prim.p)).toEqual(['fish']);
+    } finally {
+      delete ITEMS[id];
+    }
   });
 });

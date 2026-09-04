@@ -61,6 +61,27 @@ export const HEROIC_MARK_LETTER: LetterDef = {
   delaySeconds: 0,
 };
 
+// Wyrmfall Core reward letter (Masterwrought phase 04): posted to a final-boss
+// participant who entered the run but was absent at the corpse when the cores
+// paid out (awardWyrmfallCores in professions/masterwrought_materials.ts). The
+// core stacks ride as the attachment; the PostOffice fills `items` per kill
+// (the count is rolled per kill), so this base carries none. Body stays
+// count-free so the letterId localizes cleanly. The Quartermaster signs the
+// normal-raid deliveries too: the packet keeps one materials postman rather
+// than minting a difficulty-split sender (recorded in the phase ledger).
+export const WYRMFALL_CORE_LETTER: LetterDef = {
+  letterId: 'wyrmfall_core_reward',
+  senderName: 'The Heroic Quartermaster',
+  subject: 'Your Wyrmfall Cores',
+  body:
+    'The beast fell while you fought from the back, or from the dirt. Your ' +
+    'share of its Wyrmfall Cores flies to you here rather than being lost to ' +
+    'the corpse-pickers. Put them to good work at a bench.\n\n' +
+    '- The Heroic Quartermaster',
+  copper: 0,
+  delaySeconds: 0,
+};
+
 // The one-time mastery reset notice (Professions 2.0): sent by the
 // tick mail phase to every pre-curve character whose load-time normalize just
 // zeroed their craft skills and gathering proficiencies (see
@@ -520,4 +541,37 @@ for (const pairId of Object.keys(MASTER_TIER_LETTERS)) {
   if (!MASTER_TIER_PAIRS.includes(pairId)) {
     throw new Error(`MASTER_TIER_LETTERS has unexpected pair ${pairId}`);
   }
+}
+
+// Every authored letter keyed by letterId, ONE builder for both client
+// registries (src/ui/entity_i18n.ts LETTERS_BY_ID, the localization source
+// knownLetterId answers from, and src/ui/world_entity_i18n.ts, the English
+// key-set source the catalog reads). The two used to hand-seed their own
+// copies of this map, and the Wyrmfall Core letter reached one but not the
+// other, so knownLetterId('wyrmfall_core_reward') read false and the mailbox
+// fell back to the wire-shipped English in every locale while the overlays
+// carried live fills nobody could reach. Building both from here removes the
+// second registry; tests/entity_i18n_guards.test.ts pins the two key sets
+// equal in both directions. A NEW letter still owes its LETTER_IDS ordering
+// row in world_entity_i18n.ts (that guard reds until it lands).
+export function authoredLettersById(): Record<string, LetterDef> {
+  const byId: Record<string, LetterDef> = {
+    [WELCOME_LETTER.letterId]: WELCOME_LETTER,
+    [HEROIC_MARK_LETTER.letterId]: HEROIC_MARK_LETTER,
+    [WYRMFALL_CORE_LETTER.letterId]: WYRMFALL_CORE_LETTER,
+    [MASTERY_RESET_LETTER.letterId]: MASTERY_RESET_LETTER,
+    // The $WOC Exchange's three delivery letters, which reached this builder
+    // through the release sync: they were hand-seeded into entity_i18n's own
+    // copy of this map, the exact second registry this builder exists to
+    // retire.
+    [WOC_MARKET_DELIVERY_LETTER.letterId]: WOC_MARKET_DELIVERY_LETTER,
+    [WOC_MARKET_RETURN_LETTER.letterId]: WOC_MARKET_RETURN_LETTER,
+    [WOC_MARKET_SOLD_LETTER.letterId]: WOC_MARKET_SOLD_LETTER,
+  };
+  for (const letter of Object.values(QUEST_LETTERS)) byId[letter.letterId] = letter;
+  for (const letter of Object.values(GUILD_TREND_LETTERS)) byId[letter.letterId] = letter;
+  for (const byTier of Object.values(MASTER_TIER_LETTERS)) {
+    for (const letter of Object.values(byTier)) byId[letter.letterId] = letter;
+  }
+  return byId;
 }

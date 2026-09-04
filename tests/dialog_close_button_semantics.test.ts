@@ -20,6 +20,11 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 const HUD_SRC = readFileSync(join(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+// The input modal moved whole into its own module at the Masterwrought
+// phase 14 extraction (Hud keeps a thin delegator); its literal is pinned
+// where it now lives (input_controller.ts since the Phase 18 rename that put
+// it under the painter gate's filename sweep).
+const INPUT_DIALOG_SRC = readFileSync(join(process.cwd(), 'src/ui/input_controller.ts'), 'utf8');
 
 interface CloseControl {
   tag: string;
@@ -75,7 +80,7 @@ describe('emote editor + inputDialog title-bar close controls have real button s
     const literal =
       // biome-ignore lint/suspicious/noTemplateCurlyInString: a literal copy of hud.ts's real template-literal source, asserted verbatim below.
       '<div class="panel-title"><span id="confirm-dialog-title">${esc(opts.title)}</span><button type="button" class="x-btn" data-cancel aria-label="${esc(opts.cancelText ?? t(\'game.talents.cancel\'))}">${svgIcon(\'close\')}</button></div>';
-    expect(HUD_SRC).toContain(literal);
+    expect(INPUT_DIALOG_SRC).toContain(literal);
 
     const control = closeControlTag(resolveInterpolations(literal), 'data-cancel');
     expect(control.tag).toBe('button');
@@ -84,7 +89,9 @@ describe('emote editor + inputDialog title-bar close controls have real button s
   });
 
   it('neither title-bar close control regresses to a bare <span> (the original bug shape)', () => {
-    expect(HUD_SRC).not.toMatch(/<span class="x-btn" data-close>/);
-    expect(HUD_SRC).not.toMatch(/<span class="x-btn" data-cancel>/);
+    for (const src of [HUD_SRC, INPUT_DIALOG_SRC]) {
+      expect(src).not.toMatch(/<span class="x-btn" data-close>/);
+      expect(src).not.toMatch(/<span class="x-btn" data-cancel>/);
+    }
   });
 });

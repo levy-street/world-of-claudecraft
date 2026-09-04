@@ -11,7 +11,8 @@
 //                         source samples and the loop wrap is click-free by
 //                         construction.
 //   mount_jump_mech_bird  the launch servo one-shot, as recorded.
-//   mount_land_mech_bird  the landing clank one-shot, as recorded.
+//   mount_land_mech_bird  the landing clank, pitched down and low-passed for
+//                         a heavier downward impact distinct from launch.
 //
 // Outputs land as lossless wavs in public/audio/sfx/; run the conform step
 // afterwards (scripts/sfx_conform.mjs --fix) to loudness-normalize, downmix,
@@ -77,8 +78,20 @@ ff([
   path.join(OUT, 'mount_idle_mech_bird.wav'),
 ]);
 
-// Jump / land one-shots ship as recorded; conform owns loudness and format.
+// The launch ships as recorded. The landing gets a deterministic impact pass:
+// first normalize the source rate, transpose it down without changing its
+// authored duration, then roll off the brittle launch frequencies and tuck the
+// tail. Keeping this treatment in the generator also prevents a duplicated or
+// overly similar delivery from silently producing the jump take twice.
 ff(['-i', src('Mech_Chicken_Jump.wav'), path.join(OUT, 'mount_jump_mech_bird.wav')]);
-ff(['-i', src('Mech_Chicken_Land.wav'), path.join(OUT, 'mount_land_mech_bird.wav')]);
+ff([
+  '-i',
+  src('Mech_Chicken_Land.wav'),
+  '-af',
+  'aresample=44100,asetrate=44100*0.84,aresample=44100,' +
+    'atempo=1.190476190476,lowpass=f=5200,' +
+    'afade=t=in:st=0:d=0.008,afade=t=out:st=0.58:d=0.07',
+  path.join(OUT, 'mount_land_mech_bird.wav'),
+]);
 
 console.log('mech bird sfx masters written to public/audio/sfx/ (run conform + manifest next)');

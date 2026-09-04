@@ -44,11 +44,23 @@ function harness() {
       afterActions += 1;
     },
   });
+  // The Masterwrought copy-anchor work narrowed open()'s third parameter from a
+  // raw index to a BagMenuTarget (index plus the clicked slot reference plus the
+  // not-held refusal), so the fixture names the copy the way the real caller
+  // does. refuseNotHeld throws: the vendor row set must never reach it, and a
+  // silent no-op would hide a regression that started refusing every sale.
+  const target = {
+    index: 0,
+    slot: world.inventory[0],
+    refuseNotHeld: () => {
+      throw new Error('the vendor row set must not refuse a held copy');
+    },
+  };
   const open = (vendorSellCount?: number) =>
     menu.open(
       ITEMS[BREAD],
       BREAD,
-      0,
+      target,
       10,
       10,
       () => {},

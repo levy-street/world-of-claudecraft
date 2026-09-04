@@ -11,9 +11,10 @@
 //     that would actually be consumed is special (signed / masterwork /
 //     enchanted): bag_item_context_menu.ts decides that predicate.
 //   - Apply Enchant opens a two-step picker (also on #ctx-menu): the enchants
-//     that consume the reagent, each with affordability + target slot, then the
-//     eligible targets (the held copies AND the WORN ones, which enchant in
-//     place), then world.applyEnchant. enchant_apply_view.ts models both steps.
+//     that consume the reagent, each with affordability, target slot and the
+//     per-viewer gates it does not clear, then the eligible targets (the held
+//     copies AND the WORN ones, which enchant in place), then
+//     world.applyEnchant. enchant_apply_view.ts models both steps.
 //     An already-enchanted target is a flagged REPLACE row (#2415): it routes
 //     through the same destroy-confirm family before sending, and only that
 //     dialog's OK sends the apply with the explicit confirm flag. That row
@@ -32,7 +33,7 @@
 
 import { ENCHANTS } from '../sim/content/enchants';
 import { ITEMS } from '../sim/data';
-import type { EquipSlot, ItemDef, ItemInstancePayload, ItemSlot } from '../sim/types';
+import type { EquipSlot, InvSlot, ItemDef, ItemInstancePayload, ItemSlot } from '../sim/types';
 import type { IWorld } from '../world_api';
 import {
   type BagItemContextActionId,
@@ -40,9 +41,15 @@ import {
   destroyConsumesSpecialCopy,
   vendorSellContextActions,
 } from './bag_item_context_menu';
-import { disenchantYieldLines } from './disenchant_yield_view';
+import { bagStackIndex } from './bags_view';
+import { itemDisplayName } from './entity_i18n';
+import { esc } from './esc';
+import { craftNameKey } from './hud/professions/craft_name_view';
+import { disenchantYieldLines } from './hud/professions/disenchant_yield_view';
 import {
   type EnchantReplaceTargetInfo,
+  type EnchantTargetRow,
+  type EnchantViewerInput,
   enchantNameKey,
   enchantSectionsForReagent,
   enchantTargets,
@@ -50,11 +57,10 @@ import {
   preservedTraitKey,
   type WornEnchantTargetRow,
   wornEnchantTargets,
-} from './enchant_apply_view';
-import { itemDisplayName } from './entity_i18n';
-import { esc } from './esc';
-import { t } from './i18n';
+} from './hud/professions/enchant_apply_view';
+import { formatNumber, t } from './i18n';
 import { itemNumber, itemStatName } from './item_instance_tooltip';
+import { wornItemCellParts } from './worn_item_cell_view';
 
 /** Modifier class the picker states set on the shared #ctx-menu element: the
  *  Apply Enchant pickers size differently from every other menu in the family
@@ -69,6 +75,19 @@ export const CTX_MENU_PICKER_CLASS = 'ctx-menu-picker';
  *  Styled in hud.css from the picker's existing warning token, with a
  *  forced-colors arm that swaps the tint for a non-color cue. */
 export const CTX_ITEM_DANGER_CLASS = 'ctx-item-danger';
+
+/** Modifier class on a picker meta sub-line that explains why a LISTED row is
+ *  inert (the Enchanting floor, the Perfected requirement). Neither is
+ *  destructive, so neither takes the danger treatment; what they share, and what
+ *  the reference tags beside them (Worn, heroic, reagent counts) do not, is that
+ *  this line is the only answer a player gets to "why can I not tap this?". The
+ *  touch stylesheet sizes it with the danger line for exactly that reason. */
+export const CTX_ITEM_GATE_CLASS = 'ctx-item-gate';
+
+/** The craft id this picker gates on: the same one the sim's insufficient_skill
+ *  arm reads (professions/enchanting.ts, skillInCraft(..., 'enchanting')) and a
+ *  live CRAFT_RING id, so craftNameKey resolves a printable name for it. */
+const ENCHANTING_CRAFT_ID = 'enchanting';
 
 /** The desktop CSS cap for a picker menu (hud.css #ctx-menu.ctx-menu-picker
  *  max-height: min(60vh, 560px)), mirrored so placement can reserve the real
@@ -92,6 +111,23 @@ export interface CtxMenuSeam {
   element(): HTMLElement;
   place(el: HTMLElement, x: number, y: number, reserveRight: number, reserveBottom: number): void;
   bind(onActivate: (act: string) => void): void;
+}
+
+/** WHICH bag copy the menu was opened on. An index alone is not enough: it is
+ *  captured when the menu opens, and the bags can shift under a snapshot before
+ *  a row is clicked, after which it names either nothing or (silently, and
+ *  worse) a different copy of the same id. The slot REFERENCE lets an action
+ *  re-resolve the copy at the moment it runs, the confirmDestroy precedent. */
+export interface BagMenuTarget {
+  /** The clicked stack's index at menu-open time; -1 when the click was already
+   *  stale (bagStackIndex's own miss value, which the sim refuses outright). */
+  index: number;
+  /** The clicked slot object, for the re-resolve. Absent only for a caller that
+   *  cannot name one, which then keeps the raw-index behavior. */
+  slot?: InvSlot;
+  /** Refuse this action with the honest not-held toast. This menu has no error
+   *  surface of its own, so the bags window (which owns one) supplies it. */
+  refuseNotHeld(): void;
 }
 
 export interface BagItemActionMenuDeps {
@@ -121,12 +157,16 @@ export class BagItemActionMenu {
    *  byte-identical to a plain click. `vendorSellCount`, supplied only at an
    *  open vendor for a sellable item (bags_window.ts), is every copy of this
    *  item held across the bags: it swaps in the vendor-only row set (Sell,
-   *  plus Sell all when more than one copy is held) instead of the
-   *  enchanting-profession rows, which a vendor never offers. */
+   *  plus Sell all when more than one copy is held) instead of the profession
+   *  rows and the lock toggle, which a vendor never offers. `target` carries
+   *  the clicked slot REFERENCE, so a row that re-resolves it at action time
+   *  (the lock toggle) is proof against a mid-menu bag shift; the destroy rows
+   *  still forward `target.index` alone and lean on confirmDestroy's own
+   *  same-id guard, which a shift that swaps in an id-mate still passes. */
   open(
     def: ItemDef,
     itemId: string,
-    slotIndex: number,
+    target: BagMenuTarget,
     x: number,
     y: number,
     runDefault: () => void,
@@ -152,19 +192,32 @@ export class BagItemActionMenu {
       if (id === 'default') runDefault();
       else if (id === 'sellAll' && vendorSellCount !== undefined) {
         runSellAll?.();
-      } else if (id === 'disenchant') this.confirmDestroy('disenchant', itemId, slotIndex);
-      else if (id === 'salvage') this.confirmDestroy('salvage', itemId, slotIndex);
+      } else if (id === 'disenchant') this.confirmDestroy('disenchant', itemId, target.index);
+      else if (id === 'salvage') this.confirmDestroy('salvage', itemId, target.index);
+      else if (id === 'sunder') this.confirmDestroy('sunder', itemId, target.index);
       else if (id === 'applyEnchant') this.openEnchantPicker(itemId, x, y);
       // Lock/unlock (issue 3042): a plain in-place toggle, never destructive,
       // so it skips the confirm-dialog family every disenchant/salvage row
       // routes through and applies immediately like the classic default row.
-      else if (id === 'lock') this.setLocked(itemId, slotIndex, true);
-      else if (id === 'unlock') this.setLocked(itemId, slotIndex, false);
+      else if (id === 'lock') this.setLocked(itemId, target, true);
+      else if (id === 'unlock') this.setLocked(itemId, target, false);
     });
   }
 
-  private setLocked(itemId: string, slotIndex: number, locked: boolean): void {
-    this.deps.world().setItemLocked(itemId, locked, { slotIndex });
+  private setLocked(itemId: string, target: BagMenuTarget, locked: boolean): void {
+    // Re-resolve the clicked copy by REFERENCE at action time, the same rule
+    // confirmDestroy's submit applies. The index alone was captured at
+    // menu-open, and this row used to forward it raw: after a mid-menu bag
+    // shift that index either names nothing, or names a live cell holding a
+    // DIFFERENT copy of the same id, in which case the flip silently locked the
+    // wrong copy. Neither failure was visible to the player, because the Sim
+    // delegate drops setItemLocked's result, so the refusal is voiced here.
+    const at = target.slot ? bagStackIndex(this.deps.world().inventory, target.slot) : target.index;
+    if (at < 0) {
+      target.refuseNotHeld();
+      return;
+    }
+    this.deps.world().setItemLocked(itemId, locked, { slotIndex: at });
     this.deps.afterAction();
   }
 
@@ -172,16 +225,22 @@ export class BagItemActionMenu {
   // the stronger warning body when the copy that would actually be consumed is
   // special (signed / masterwork / enchanted). The OK label reuses the menu verb.
   private confirmDestroy(
-    action: 'disenchant' | 'salvage',
+    action: 'disenchant' | 'salvage' | 'sunder',
     itemId: string,
     slotIndex?: number,
   ): void {
     const world = this.deps.world();
     const def = ITEMS[itemId];
-    const name = def ? itemDisplayName(def) : itemId;
     const selected = slotIndex === undefined ? undefined : world.inventory[slotIndex];
+    // A destroy prompt names the COPY it destroys (its chosen name when the
+    // selected cell carries one), never only the def; the cell index was
+    // captured at menu-open and the bags can shift under a snapshot before
+    // the confirm, so the cell must still hold this item id or the prompt
+    // would title a destroy with a DIFFERENT copy's chosen name.
+    const target = selected?.itemId === itemId ? selected : undefined;
+    const name = def ? wornItemCellParts(def, target?.instance).name : itemId;
     const copies =
-      action === 'disenchant' && selected?.itemId === itemId
+      (action === 'disenchant' || action === 'sunder') && selected?.itemId === itemId
         ? [selected]
         : world.inventory.filter((slot) => slot.itemId === itemId);
     const special = destroyConsumesSpecialCopy(action, copies);
@@ -194,13 +253,21 @@ export class BagItemActionMenu {
               : ('hudChrome.enchanting.disenchantConfirmBody' as const),
             ok: 'hudChrome.itemMenu.disenchant' as const,
           }
-        : {
-            title: 'hudChrome.enchanting.salvageConfirmTitle' as const,
-            body: special
-              ? ('hudChrome.enchanting.salvageConfirmBodySpecial' as const)
-              : ('hudChrome.enchanting.salvageConfirmBody' as const),
-            ok: 'hudChrome.itemMenu.salvage' as const,
-          };
+        : action === 'sunder'
+          ? {
+              title: 'hudChrome.enchanting.sunderConfirmTitle' as const,
+              body: special
+                ? ('hudChrome.enchanting.sunderConfirmBodySpecial' as const)
+                : ('hudChrome.enchanting.sunderConfirmBody' as const),
+              ok: 'hudChrome.itemMenu.sunder' as const,
+            }
+          : {
+              title: 'hudChrome.enchanting.salvageConfirmTitle' as const,
+              body: special
+                ? ('hudChrome.enchanting.salvageConfirmBodySpecial' as const)
+                : ('hudChrome.enchanting.salvageConfirmBody' as const),
+              ok: 'hudChrome.itemMenu.salvage' as const,
+            };
     // The disenchant arm also states what the destroy PAYS OUT (the sim's own
     // yield functions, via the pure view core), so an irreversible action is
     // not a blind trade. Salvage keeps its existing body: its generic yield is
@@ -213,25 +280,117 @@ export class BagItemActionMenu {
       t(c.ok),
       t('hud.chat.context.cancel'),
       () => {
+        // The stale-prompt doctrine (the sibling prompts' precedent): the
+        // captured cell can shift between open and OK, so the NAMED copy is
+        // re-resolved by reference identity and destroyed at its live index
+        // (a same-id swap follows the copy the dialog named). A vanished
+        // copy, and a cell that no longer held this id at OPEN, both refuse
+        // via the length-INDEPENDENT token -1 (bagStackIndex's own miss
+        // value, proven on this path by openItemMenuFor): the sim refuses a
+        // negative index unconditionally (src/sim/item_copy_ref.ts), whereas
+        // an index derived from the CLIENT mirror's length could name a real
+        // server slot one snapshot later, and a raw stale index could too.
+        // The refusal surfaces as each verb's own not-held answer (sunder's
+        // "You are not holding that item." line; the disenchant and salvage
+        // results' not_held reason rendered by enchanting_view), offline and
+        // online alike; this menu has no error surface of its own, and an
+        // untargeted fallback could consume an id-mate the dialog never named.
+        const live = this.deps.world();
+        const at = target
+          ? { slotIndex: bagStackIndex(live.inventory, target) }
+          : slotIndex === undefined
+            ? undefined
+            : { slotIndex: -1 };
         if (action === 'disenchant') {
-          if (slotIndex === undefined) world.disenchantItem(itemId);
-          else world.disenchantItem(itemId, { slotIndex });
-        } else if (slotIndex === undefined) world.salvageItem(itemId);
-        else world.salvageItem(itemId, { slotIndex });
+          if (at === undefined) live.disenchantItem(itemId);
+          else live.disenchantItem(itemId, at);
+        } else if (action === 'sunder') {
+          if (at === undefined) live.extractEssence(itemId);
+          else live.extractEssence(itemId, at);
+        } else if (at === undefined) live.salvageItem(itemId);
+        else live.salvageItem(itemId, at);
         this.deps.afterAction();
       },
     );
   }
 
+  /** The viewer projection both picker steps gate on, built once per open from
+   *  IWorld: the atomic crafting mirror plus the worn set the Perfected
+   *  candidate scan reads. `synced` rides along because it is the ONLY thing
+   *  that tells an online client's all-zero STARTUP mirror apart from a real
+   *  skill of 0, and both worlds implement it (Sim always true, ClientWorld
+   *  false until its first cprof delta). Gating on the unsynced mirror painted
+   *  "Requires Enchanting 100" at a master enchanter and emptied both target
+   *  lists; the pure core skips the whole skill dimension for that window
+   *  instead, and the sim still refuses honestly if the shortfall is real. */
+  private enchantViewer(): EnchantViewerInput {
+    const world = this.deps.world();
+    return {
+      synced: world.craftingIdentity.synced,
+      enchantingSkill: world.craftingIdentity.craftSkills.enchanting ?? 0,
+      // The worn set, for the Perfected candidate scan alone: a Perfected copy
+      // on the body must keep the capstone row live, since the target step
+      // lists worn copies beside bagged ones. The same two reads
+      // openTargetPicker makes for the worn family, so one open cannot see two
+      // different bodies: IWorld.equipmentInstances, the SELF `einst` mirror
+      // (whole in both hosts), never the trimmed peer entity mirror.
+      equipment: world.equipment,
+      equippedInstances: world.equipmentInstances,
+    };
+  }
+
+  /** One gate sub-line (skill floor, Perfected requirement): the plain meta
+   *  style plus the gate modifier the touch stylesheet sizes up. */
+  private gateMeta(text: string): string {
+    return `<span class="ctx-item-meta ${CTX_ITEM_GATE_CLASS}">${esc(text)}</span>`;
+  }
+
+  /** WHY a skill-gated row is inert, stated as the FLOOR rather than as the bare
+   *  fact that one exists: the crafting window's own requirement line ("Requires
+   *  Enchanting 100"), the same key and formatter crafting_window.ts and the
+   *  pattern tooltip use, so one sentence names a craft floor everywhere in the
+   *  HUD. EnchantPickRow.skillReq is what makes that possible, and reading it
+   *  here is what gives that field a consumer. The generic sentence stays the
+   *  SIM's refusal toast (enchanting_view.ts), where there is no row to read a
+   *  floor off.
+   *
+   *  It also remains the fallback for the two cases the line cannot be built: a
+   *  row carrying no floor to name (unreachable while skillMet answers off
+   *  skillReq, kept because an inert row explained by NOTHING is the one outcome
+   *  worse than a generic explanation), and a craft with no printable name, the
+   *  guard recipe_pattern_tooltip_view.ts applies so a raw snake_case id can
+   *  never reach a player. */
+  private skillGateText(skillReq: number | undefined): string {
+    const craftKey = craftNameKey(ENCHANTING_CRAFT_ID);
+    if (skillReq === undefined || craftKey === undefined)
+      return t('hudChrome.enchanting.enchantSkillTooLow');
+    return t('hudChrome.crafting.skillReqLine', {
+      craft: t(craftKey),
+      // formatNumber, not the raw number: t() interpolates with String(v), so a
+      // bare floor would never see Intl, unlike every other number this menu
+      // prints. Same options crafting_window.ts passes for the same line.
+      skill: formatNumber(skillReq, { maximumFractionDigits: 0 }),
+    });
+  }
+
   // Step one: the enchants that consume the chosen reagent, grouped into the
-  // three tier sections and slot-sorted inside each (enchant_apply_view.ts owns
+  // four tier sections and slot-sorted inside each (enchant_apply_view.ts owns
   // both decisions). Each row shows the localized enchant name, WHAT THE ENCHANT
   // DOES (its stat bonus, inline: the picker also lives on touch, where there is
   // no hover to reveal it), its target slot, and the per-reagent affordability;
-  // an unaffordable enchant is shown but not selectable (aria-disabled).
+  // an unaffordable enchant is shown but not selectable (aria-disabled), and
+  // each unmet GATE (the Enchanting floor, the Perfected requirement) paints the
+  // same way with its own sub-line saying which one. Every refusal belongs here
+  // rather than on the target list: all three are facts about the ENCHANT, and
+  // answering any of them with "No eligible item to enchant." told the player
+  // the wrong thing about their own bags.
   private openEnchantPicker(reagentItemId: string, x: number, y: number): void {
     const world = this.deps.world();
-    const sections = enchantSectionsForReagent(world.inventory, reagentItemId);
+    const sections = enchantSectionsForReagent(
+      world.inventory,
+      reagentItemId,
+      this.enchantViewer(),
+    );
     const title = esc(t('hudChrome.enchanting.pickerTitle'));
     if (sections.length === 0) {
       this.paint(
@@ -278,9 +437,26 @@ export class BagItemActionMenu {
         const effectHtml = effectsText
           ? `<span class="ctx-item-effect">${esc(effectsText)}</span>`
           : '';
-        const html = `${esc(t(enchantNameKey(pick.enchantId)))}${effectHtml}<span class="ctx-item-meta">${esc(this.deps.slotName(pick.itemSlot as ItemSlot))}: ${reagentsHtml}</span>`;
+        // Each unmet GATE gets its own sub-line, in the plain meta style the
+        // Worn and heroic tags use: a standing fact about the crafter or the
+        // enchant, not a destructive warning, so neither carries the danger
+        // tint. They sit beside the reagent line rather than replacing it,
+        // because a climbing enchanter wants to know the bill as well as the
+        // rung. Both take the gate class, which is what earns them the touch
+        // size bump: on a phone this sub-line is the ONLY explanation of why a
+        // visible row cannot be tapped, so it is not reference fine print.
+        const skillHtml = pick.skillMet ? '' : this.gateMeta(this.skillGateText(pick.skillReq));
+        const perfectedHtml = pick.perfectedMet
+          ? ''
+          : this.gateMeta(t('hudChrome.enchanting.notPerfected'));
+        const html = `${esc(t(enchantNameKey(pick.enchantId)))}${effectHtml}<span class="ctx-item-meta">${esc(this.deps.slotName(pick.itemSlot as ItemSlot))}: ${reagentsHtml}</span>${skillHtml}${perfectedHtml}`;
+        // One routing rule over every dimension: a row is selectable only when
+        // it clears ALL of them, so hover and click agree and no gate can be
+        // answered later, on the target list, with a sentence about the bags.
         rows.push(
-          pick.affordable ? { act: `enchant:${pick.enchantId}`, html } : { html, disabled: true },
+          pick.affordable && pick.skillMet && pick.perfectedMet
+            ? { act: `enchant:${pick.enchantId}`, html }
+            : { html, disabled: true },
         );
       }
     }
@@ -321,10 +497,16 @@ export class BagItemActionMenu {
     enchantId: string,
     replace: EnchantReplaceTargetInfo,
     slot?: EquipSlot,
+    baggedVictim?: ItemInstancePayload,
   ): void {
     const world = this.deps.world();
     const def = ITEMS[itemId];
-    const name = def ? itemDisplayName(def) : itemId;
+    // The victim COPY's chosen name when it has one, on both families: the
+    // worn arm reads its slot's payload, the bagged arm the victim payload
+    // the row resolved (row.copy, the Phase 18 per-copy identity).
+    const name = def
+      ? wornItemCellParts(def, slot ? world.equipmentInstances?.[slot] : baggedVictim).name
+      : itemId;
     const oldText = this.replacedEnchantText(replace);
     const newText = t(enchantNameKey(enchantId));
     const costText = (ENCHANTS[enchantId]?.reagents ?? [])
@@ -378,18 +560,28 @@ export class BagItemActionMenu {
   // never offered).
   private openTargetPicker(enchantId: string, x: number, y: number): void {
     const world = this.deps.world();
-    // The self entity mirror carries equippedInstances in BOTH worlds (offline
-    // Sim and online ClientWorld), the same read the paperdoll tooltip uses.
-    const worn = wornEnchantTargets(
-      world.equipment,
-      world.entities.get(world.playerId)?.equippedInstances ?? {},
-      enchantId,
-    );
+    // The worn family reads IWorld.equipmentInstances, the SELF `einst` mirror:
+    // the whole meta.equipmentInstance payload in BOTH hosts (the server ships
+    // it untrimmed on the self snapshot and ClientWorld mirrors it; the
+    // paperdoll reads the same surface). Switched here at Masterwrought phase
+    // 12 from the self ENTITY mirror, whose online form is the trimmed `eqi`
+    // peer projection (signer/enchant/rolled only) and so could never carry
+    // the Perfected marker the Lucent tier gates on. A player enchants their
+    // own gear, never an inspected peer's, so the picker is a self surface and
+    // the `eqi` trim now concerns inspecting viewers alone (pinned in
+    // tests/snapshots.test.ts). The replace confirm's worn arm moved with it:
+    // it now states the bond it can see (preservedReplaceTraits).
+    //
+    // The viewer projection carries the rest: the Enchanting skill for the
+    // Lucent tier's floor, and the `synced` flag that keeps an online client's
+    // all-zero startup mirror from reading as a real shortfall.
+    const viewer = this.enchantViewer();
+    const worn = wornEnchantTargets(world.equipment, world.equipmentInstances, enchantId, viewer);
     // Worn FIRST, because the bagged family needs it: an enchanted copy on the
     // body leaves a bagged plain copy of the same id just as ambiguous as an
     // enchanted bagged one would (#2421), and both paint into the one list a
     // player reads. enchantTargets owns that decision; this only supplies it.
-    const targets = enchantTargets(world.inventory, enchantId, worn);
+    const targets = enchantTargets(world.inventory, enchantId, worn, viewer);
     const title = esc(t('hudChrome.enchanting.targetTitle'));
     if (targets.length === 0 && worn.length === 0) {
       this.paint(
@@ -402,9 +594,16 @@ export class BagItemActionMenu {
       );
       return;
     }
-    const nameOf = (itemId: string): string => {
+    // EVERY row names the exact COPY its activation lands on (its chosen
+    // legendary name when it has one: Lucent Infusion targets promoted copies
+    // by design, and the chosen name is the discriminator that tells two
+    // byte-identical rows apart). The worn family reads its slot's payload;
+    // the bagged family, still grouped by item id on the wire, reads the
+    // VICTIM cell the core resolved (row.copy, the Phase 18 per-copy
+    // identity), which closed the recorded def-name-only limit.
+    const nameOf = (itemId: string, instance?: ItemInstancePayload): string => {
       const def = ITEMS[itemId];
-      return esc(def ? itemDisplayName(def) : itemId);
+      return esc(def ? wornItemCellParts(def, instance).name : itemId);
     };
     // A row that will DESTROY an enchant must not read like the purely
     // informational Worn tag beside it (#2421), so the replace flag takes the
@@ -454,11 +653,19 @@ export class BagItemActionMenu {
               index: itemNumber(target.slotIndex),
             }),
       )}</span>`;
-    const identityOf = (target: { itemId: string; heroic?: true }): string =>
-      `${nameOf(target.itemId)}${target.heroic ? heroicMeta() : ''}`;
+    const identityOf = (
+      target: { itemId: string; heroic?: true },
+      instance?: ItemInstancePayload,
+    ): string => `${nameOf(target.itemId, instance)}${target.heroic ? heroicMeta() : ''}`;
+    // What each bagged row PAINTED its name from, keyed by the row itself so a
+    // mixed holding's two rows cannot borrow each other's copy. Captured here
+    // rather than re-read when the row is clicked: `copy.slotIndex` is a live
+    // bag cell, so a splice between paint and click would let the confirm name
+    // whatever slid onto that cell instead of the copy the player read.
+    const paintedVictims = new Map<EnchantTargetRow, ItemInstancePayload | undefined>();
     const rows = [
       ...worn.map((target) => {
-        const html = `${identityOf(target)}${wornMeta(target)}${
+        const html = `${identityOf(target, world.equipmentInstances?.[target.slot])}${wornMeta(target)}${
           target.replace ? replaceMeta(target.replace) : ''
         }`;
         return target.replace?.sameEnchant
@@ -466,11 +673,15 @@ export class BagItemActionMenu {
           : { act: `worn:${target.slot}`, html };
       }),
       ...targets.map((target) => {
+        // The victim cell's payload (row.copy.slotIndex, the sim's own choice
+        // for this row's arm), through the same resolver the worn rows use.
+        const victim = world.inventory[target.copy.slotIndex]?.instance;
+        paintedVictims.set(target, victim);
         if (!target.replace) {
-          const html = `${identityOf(target)}${target.mixedHolding ? plainMeta() : ''}`;
+          const html = `${identityOf(target, victim)}${target.mixedHolding ? plainMeta() : ''}`;
           return { act: `target:${target.itemId}`, html };
         }
-        const html = `${identityOf(target)}${replaceMeta(target.replace)}`;
+        const html = `${identityOf(target, victim)}${replaceMeta(target.replace)}`;
         return target.replace.sameEnchant
           ? { html, disabled: true }
           : { act: `replace:${target.itemId}`, html };
@@ -496,7 +707,17 @@ export class BagItemActionMenu {
           const itemId = act.slice('replace:'.length);
           const target = targets.find((row) => row.itemId === itemId && row.replace);
           if (target?.replace) {
-            this.confirmReplace(itemId, enchantId, target.replace);
+            // The confirm names the copy the ROW described (the victim it
+            // painted from), never a fresh read of a cell that may have moved
+            // since; the sim's own pin re-resolves at accept, the #2415 window
+            // this whole picker already carries.
+            this.confirmReplace(
+              itemId,
+              enchantId,
+              target.replace,
+              undefined,
+              paintedVictims.get(target),
+            );
             return;
           }
         } else {

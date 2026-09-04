@@ -170,7 +170,7 @@ describe('Highwatch training dummy', () => {
     expect(d.threat.size).toBe(0);
   });
 
-  it('lets Smokestep escape dummy combat without keeping target pressure', () => {
+  it('lets Smokefade escape dummy combat without keeping target pressure', () => {
     const sim = makeWorld();
     const d = dummyOf(sim);
     const pid = roguePlayerAt(sim, d.pos.x + 1, d.pos.z);
@@ -187,7 +187,7 @@ describe('Highwatch training dummy', () => {
 
     sim.castAbility('vanish', pid);
 
-    expect(rogue.auras.some((a) => a.name === 'Smokestep' && a.kind === 'stealth')).toBe(true);
+    expect(rogue.auras.some((a) => a.name === 'Smokefade' && a.kind === 'stealth')).toBe(true);
     expect(rogue.cooldowns.has('vanish')).toBe(true);
     expect(rogue.inCombat).toBe(false);
     expect(rogue.autoAttack).toBe(false);
@@ -197,7 +197,7 @@ describe('Highwatch training dummy', () => {
 
     sim.tick();
 
-    expect(rogue.auras.some((a) => a.name === 'Smokestep' && a.kind === 'stealth')).toBe(true);
+    expect(rogue.auras.some((a) => a.name === 'Smokefade' && a.kind === 'stealth')).toBe(true);
     expect(rogue.inCombat).toBe(false);
     expect(rogue.autoAttack).toBe(false);
   });

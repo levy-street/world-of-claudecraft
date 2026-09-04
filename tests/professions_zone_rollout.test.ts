@@ -20,10 +20,18 @@ import { describe, expect, it } from 'vitest';
 import { GUIDE_PROF_GATHERING } from '../src/guide/content.generated';
 import { DEEDS } from '../src/sim/content/deeds';
 import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
+import {
+  FARM_CROPS,
+  FARM_MATERIAL_ITEM_IDS,
+  FARM_SUPPLY_ITEM_IDS,
+  FARM_WITHERED_HUSK_ITEM_ID,
+} from '../src/sim/content/farm_crops';
+import { FARM_PATCHES } from '../src/sim/content/farm_patches';
+import { FARM_PATTERN_ITEMS } from '../src/sim/content/farm_patterns';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import { FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
 import { GATHERING_PROFESSIONS, STATIONS } from '../src/sim/content/professions';
-import { ALL_RECIPES } from '../src/sim/content/recipes';
+import { ALL_RECIPES, FARM_RECIPES, HOE_RECIPES } from '../src/sim/content/recipes';
 import { ZONE1_NPCS } from '../src/sim/content/zone1';
 import { ZONE2_NPCS } from '../src/sim/content/zone2';
 import { ZONE3_NPCS } from '../src/sim/content/zone3';
@@ -38,6 +46,7 @@ import {
 import { MATERIAL_GRADES } from '../src/sim/professions/material_grades';
 import { wieldRequirementForTier } from '../src/sim/professions/wield_gate';
 import { Sim } from '../src/sim/sim';
+import { itemNames } from '../src/ui/i18n.catalog/items';
 import { placeAtHarvestSpot } from './helpers/harvest_spot';
 
 /**
@@ -396,6 +405,14 @@ describe('the new-zone checklist: every complete zone arrives mechanically whole
   });
 
   it('the hub stocks the rungs its own nodes use, and the water rod; ladder tops never (hub rule, R20, R23)', () => {
+    // The exclusion-set pins (asserted after the zone loop): the (aa)
+    // farming skip below is held by these, not by its comment alone. The
+    // Phase 5 QA mutation probe widened the skip to mining and the whole
+    // suite stayed green; these two sets are what red that now, in both
+    // directions (a widened skip lands in hubSkipped, a rewritten condition
+    // that drops a node profession from the walk empties hubAsserted).
+    const hubSkipped = new Set<string>();
+    const hubAsserted = new Set<string>();
     for (const zoneId of complete) {
       const zone = zoneOf(zoneId);
       const zoneTier = zoneTierOf(zoneId);
@@ -410,8 +427,21 @@ describe('the new-zone checklist: every complete zone arrives mechanically whole
       }
       // Land side, both directions: every vendor-priced land tier up to the
       // zone tier is on the counter, and nothing above the zone tier is.
+      // FARMING IS EXCLUDED from this scan exactly as fishing is (the
+      // landTools collector above): the hub rule is about the rungs a zone's
+      // own NODES use, and farming has no nodes (D2, fishing-shaped). Its
+      // counters are the FARMER NPCs beside each patch (one per farming hub,
+      // outside the hub circle), and the farming ladder's own go-live arm
+      // below pins their stock positively: the rung-one hoe sits on the
+      // tier-1 farmer alone and no farming item sits on any other counter.
+      // Do not widen this exclusion to the three node professions.
       for (const [itemId, def] of landTools) {
         if (def.use?.type !== 'gatherTool') continue;
+        if (def.use.professionId === 'farming') {
+          hubSkipped.add(def.use.professionId);
+          continue;
+        }
+        hubAsserted.add(def.use.professionId);
         const priced = def.buyValue !== undefined;
         if (priced && def.use.tier <= zoneTier) {
           expect(hubStock.has(itemId), `${zoneId} hub should stock ${itemId}`).toBe(true);
@@ -445,6 +475,10 @@ describe('the new-zone checklist: every complete zone arrives mechanically whole
         }
       }
     }
+    // The (aa) exclusion is EXACTLY farming (fishing never enters landTools),
+    // and every node profession really passed through the stocked-rung walk.
+    expect([...hubSkipped]).toEqual(['farming']);
+    expect([...hubAsserted].sort()).toEqual(['herbalism', 'logging', 'mining']);
   });
 
   it('the ladder top rungs route through content, never a counter (R23)', () => {
@@ -669,6 +703,662 @@ describe('the new-zone checklist: every complete zone arrives mechanically whole
           `${zoneName} missing from a wiki gathering table`,
         ).toBe(true);
       }
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// THE FARMING LADDER: farming is the fifth gathering profession and
+// deliberately fishing-shaped on land: no GatherNodeType, its stock on the
+// farmer NPCs alone, and one authored tier on each FARM_PATCHES row. The
+// patch table is the authority, never GATHER_NODES: farming intentionally
+// disagrees with the ground progression at evergarden, so a node-derived
+// expectation would either reject the designed row or drag farming back onto
+// the wrong axis. These arms pin the patch tiers literally and own the same
+// content-completeness half the new-zone checklist above owns for complete
+// zones.
+// ---------------------------------------------------------------------------
+
+describe('the farming ladder: every farming zone arrives mechanically whole', () => {
+  const farmingTools = Object.entries(ITEMS).filter(
+    ([, def]) => def.use?.type === 'gatherTool' && def.use.professionId === 'farming',
+  );
+  const farmingTiers = [...new Set(FARM_PATCHES.map((patch) => patch.tier))].sort((a, b) => a - b);
+
+  it('pins every farming patch to its literal zone tier and bed count', () => {
+    // The zone/tier pairs are LITERALS: evergarden is farming tier 4 while
+    // the shipped progression still says 1, so no other content table can
+    // stand in for these numbers. The exact object plus the four-row floor
+    // also forbids duplicate or unclassified patch zones.
+    expect(Object.fromEntries(FARM_PATCHES.map((patch) => [patch.zoneId, patch.tier]))).toEqual({
+      eastbrook_vale: 1,
+      mirefen_marsh: 2,
+      thornpeak_heights: 3,
+      evergarden: 4,
+    });
+    // Bed counts are tier-scaled and PERSISTED save-key surface (bed ids), so
+    // they are pinned per zone as literals, never summed.
+    const BEDS_BY_ZONE: Readonly<Record<string, number>> = {
+      eastbrook_vale: 4,
+      mirefen_marsh: 5,
+      thornpeak_heights: 6,
+      evergarden: 8,
+    };
+    for (const patch of FARM_PATCHES) {
+      expect(patch.beds, `${patch.zoneId} bed count`).toHaveLength(BEDS_BY_ZONE[patch.zoneId]);
+      expect(Object.isFrozen(patch), `${patch.id} row must stay frozen`).toBe(true);
+      expect(Object.isFrozen(patch.beds), `${patch.id} beds must stay frozen`).toBe(true);
+      for (const bed of patch.beds) {
+        expect(Object.isFrozen(bed), `${bed.id} row must stay frozen`).toBe(true);
+      }
+    }
+    expect(Object.isFrozen(FARM_PATCHES), 'the shared patch table must stay frozen').toBe(true);
+    expect(FARM_PATCHES).toHaveLength(4);
+    expect(farmingTiers).toEqual([1, 2, 3, 4]);
+  });
+
+  it('each farming tier grows exactly its D11 crops, 2 / 2 / 4 / 4 after 11e', () => {
+    const CROPS_BY_TIER: Readonly<Record<number, readonly string[]>> = {
+      1: ['brook_carrot', 'vale_wheat'],
+      2: ['bog_beet', 'marsh_rice'],
+      3: ['frost_gourd', 'frost_lentils', 'highland_barley', 'thornpeak_cabbage'],
+      4: ['evergarden_greens', 'evergarden_pumpkin', 'gilded_sunmelon', 'gilded_yam'],
+    };
+    for (const tier of farmingTiers) {
+      const ofTier = Object.values(FARM_CROPS)
+        .filter((c) => c.tier === tier)
+        .map((c) => c.id)
+        .sort();
+      expect(ofTier, `tier ${tier} crop set (D11, amended by 11e)`).toEqual([
+        ...CROPS_BY_TIER[tier],
+      ]);
+    }
+    // The four sets are the whole catalog: a thirteenth crop cannot ship
+    // without joining a set above, and a dropped crop cannot hide behind the
+    // sets that remain.
+    expect(Object.keys(FARM_CROPS)).toHaveLength(12);
+  });
+
+  it('every crop family is whole: defs, junk produce, the 2x/4x fine pricing, and name rows', () => {
+    const enNames = itemNames.en.entities.items as Record<string, { name?: string } | undefined>;
+    for (const crop of Object.values(FARM_CROPS)) {
+      const produce = ITEMS[crop.produceItemId];
+      const fine = ITEMS[crop.fineProduceItemId];
+      expect(ITEMS[crop.seedItemId], `${crop.id} seed def`).toBeDefined();
+      expect(produce, `${crop.id} produce def`).toBeDefined();
+      expect(fine, `${crop.id} fine def`).toBeDefined();
+      // kind junk so produce browses under the market's material filter and
+      // sellAllJunk never vendors it (the node materials' convention).
+      expect(produce.kind, `${crop.id} produce kind`).toBe('junk');
+      // The fine twin's whole reward is doubling the sell price, and its
+      // buyValue is the 4x ECONOMY BASIS the recipe_economy counterfactual
+      // reads, never a stock row (the fine-material convention in items.ts).
+      expect(fine.sellValue, `${crop.id} fine sell must be 2x produce sell`).toBe(
+        (produce.sellValue ?? 0) * 2,
+      );
+      expect(fine.buyValue, `${crop.id} fine buy must be the 4x economy basis`).toBe(
+        (fine.sellValue ?? 0) * 4,
+      );
+      // Seed/produce disjointness: an aliased id would let one bag stack
+      // answer both the seed gate and the watch-fee gate (farm_watch_fee.ts).
+      expect(crop.seedItemId, `${crop.id} seed must not alias its produce`).not.toBe(
+        crop.produceItemId,
+      );
+      expect(crop.seedItemId, `${crop.id} seed must not alias its fine twin`).not.toBe(
+        crop.fineProduceItemId,
+      );
+      for (const itemId of [crop.seedItemId, crop.produceItemId, crop.fineProduceItemId]) {
+        expect(enNames[itemId]?.name, `${itemId} needs an English item-name row`).toBeTruthy();
+      }
+    }
+    // The negative control makes the catalog assertion non-vacuous.
+    expect(enNames.no_such_farming_item).toBeUndefined();
+  });
+
+  it('EVERY seed is vendor-priced, upper tiers at the bootstrap premium (both directions)', () => {
+    // GATE 1 INVERTED THIS ARM (Phase 11e), which is why it reads the way it
+    // does. Before 11e the tier 3 and 4 seeds were deliberately UNPRICED, and
+    // the consequence was three trainer-visible recipes nobody could complete
+    // and two parked deeds. Now EVERY seed is vendor-priced, and the direction
+    // that still bites is the D11 dead-row trap: a stocked row with no positive
+    // buyValue renders and then refuses at the counter.
+    const seeds = Object.values(FARM_CROPS).map((c) => ({
+      id: c.seedItemId,
+      tier: c.tier,
+    }));
+    expect(seeds).toHaveLength(12);
+    for (const seed of seeds) {
+      expect(
+        ITEMS[seed.id]?.buyValue ?? 0,
+        `${seed.id} needs a positive buyValue or it is a dead vendor row`,
+      ).toBeGreaterThan(0);
+    }
+    // The price is DERIVED, not invented: sellValue times the shipped
+    // four-times-sell staple, and for the upper tiers times two again, the
+    // masterwrought DECISION D bootstrap premium. Computed from each row's own
+    // sellValue so a re-priced seed moves its buyValue with it.
+    for (const seed of seeds) {
+      const sell = ITEMS[seed.id]?.sellValue ?? 0;
+      expect(sell, `${seed.id} sellValue`).toBeGreaterThan(0);
+      const premium = seed.tier >= 3 ? 2 : 1;
+      expect(ITEMS[seed.id]?.buyValue, `${seed.id} buyValue = ${sell} x 4 x ${premium}`).toBe(
+        sell * 4 * premium,
+      );
+    }
+    // ...and the two upper rungs land on the exact numbers the ruling names, so
+    // a change to the formula above cannot silently re-price the faucet.
+    // ALL EIGHT anchored, not four. Widened at the 11e QA: the formula above is
+    // computed from each row's OWN sellValue, so with only four literals a
+    // COORDINATED drift on the other four (sell 4 -> 8 with buy 32 -> 64) satisfied
+    // every arm in the tree. Nothing pinned seed sellValue anywhere either, so
+    // the tier rungs are pinned here too and the formula now has something
+    // independent to be checked against.
+    expect(ITEMS.highland_barley_seed?.buyValue).toBe(32);
+    expect(ITEMS.frost_gourd_seed?.buyValue).toBe(32);
+    expect(ITEMS.thornpeak_cabbage_seed?.buyValue).toBe(32);
+    expect(ITEMS.frost_lentils_seed?.buyValue).toBe(32);
+    expect(ITEMS.gilded_sunmelon_seed?.buyValue).toBe(64);
+    expect(ITEMS.evergarden_greens_seed?.buyValue).toBe(64);
+    expect(ITEMS.gilded_yam_seed?.buyValue).toBe(64);
+    expect(ITEMS.evergarden_pumpkin_seed?.buyValue).toBe(64);
+    // The sellValue rungs the formula multiplies, pinned per tier so a
+    // coordinated sell-and-buy drift cannot pass.
+    for (const crop of Object.values(FARM_CROPS)) {
+      const expected = crop.tier === 1 ? 1 : crop.tier === 2 ? 2 : crop.tier === 3 ? 4 : 8;
+      expect(ITEMS[crop.seedItemId]?.sellValue, `${crop.seedItemId} sellValue`).toBe(expected);
+    }
+  });
+
+  it('brook_carrot is the one vendor-priced produce (D9), and no other family row leaks pricing', () => {
+    // The D9 fee vegetable: priced so the watch fee is payable from vendor
+    // stock before a first harvest.
+    expect(ITEMS.brook_carrot?.buyValue).toBe(16);
+    // The four stocked seed prices as literals: the day-one entry cost of the
+    // trade and the size of the intro quest's re-grant, so a retune is a
+    // visible edit rather than a positive-only pass.
+    expect(ITEMS.vale_wheat_seed?.buyValue).toBe(4);
+    expect(ITEMS.brook_carrot_seed?.buyValue).toBe(4);
+    expect(ITEMS.marsh_rice_seed?.buyValue).toBe(8);
+    expect(ITEMS.bog_beet_seed?.buyValue).toBe(8);
+    let produceSwept = 0;
+    for (const crop of Object.values(FARM_CROPS)) {
+      if (crop.produceItemId !== 'brook_carrot') {
+        produceSwept += 1;
+        expect(
+          ITEMS[crop.produceItemId]?.buyValue,
+          `${crop.produceItemId} produce must carry no vendor price`,
+        ).toBe(undefined);
+      }
+    }
+    // Eleven produce rows really swept, so the exception loop was not vacuous.
+    expect(produceSwept).toBe(11);
+    // The SEED half of this arm moved to the pricing arm above when GATE 1
+    // stocked the upper tiers (Phase 11e). What survives here is the rule that
+    // did NOT change: PRODUCE is never vendor-stocked, which is what keeps the
+    // "no farm recipe is craftable from vendor stock alone" arm true. The
+    // faucet is seeds, and only seeds.
+    // The D9 exception is scoped to brook_carrot ALONE within its own tier-1
+    // family: vale_wheat is the other tier-1 produce and carries none.
+    expect(
+      Object.values(FARM_CROPS)
+        .filter((c) => c.tier === 1)
+        .map((c) => c.produceItemId)
+        .sort(),
+    ).toEqual(['brook_carrot', 'vale_wheat']);
+    expect(ITEMS.vale_wheat?.buyValue).toBe(undefined);
+  });
+
+  it('exactly one hoe per tier; rung 1 is the only priced rung and the top rung routes through content', () => {
+    // Non-vacuity for the per-tier loop: the ladder really has five members
+    // since masterwrought Phase 11j added the apex rung. The loop below still
+    // walks the patch tiers, which top out at 4, and that mismatch is the
+    // POINT rather than a gap: there is no tier-5 crop zone, so the apex hoe
+    // opens no new crop tier and buys the epic rarity rung on the tool-effect
+    // economy instead. A tier-5 zone arriving later would pull it into the
+    // loop with no edit here.
+    expect(farmingTools).toHaveLength(5);
+    for (const tier of farmingTiers) {
+      const ofTier = farmingTools.filter(
+        ([, def]) => def.use?.type === 'gatherTool' && def.use.tier === tier,
+      );
+      expect(ofTier, `exactly one farming hoe at tier ${tier}`).toHaveLength(1);
+      const [itemId, def] = ofTier[0];
+      if (tier === 1) {
+        expect(def.buyValue ?? 0, `${itemId} is the one vendor-priced rung`).toBeGreaterThan(0);
+      } else {
+        // Rungs 2 to 4 are craft-only (HOE_RECIPES), the top rung included:
+        // the R23 shape, no copper price anywhere above the entry rung.
+        expect(def.buyValue, `${itemId} must never price for copper`).toBe(undefined);
+        expect(
+          HOE_RECIPES.some((recipe) => recipe.resultItemId === itemId),
+          `${itemId} needs its HOE_RECIPES mint`,
+        ).toBe(true);
+      }
+    }
+    // The four qualities as LITERALS (the Phase 5 QA add): rung quality
+    // feeds the charm-charge economy twice, through the R47 use-time ratchet
+    // (startingDurabilityFor prices per rarity rung) and the R30 recharge
+    // rarity resolution, so a silent quality edit re-prices charges with
+    // nothing else red. The step function is deliberate: tiers 1 and 2 are
+    // both common, matching every other land ladder.
+    expect(Object.fromEntries(farmingTools.map(([itemId, def]) => [itemId, def.quality]))).toEqual({
+      garden_hoe: 'common',
+      bronze_hoe: 'common',
+      skysilver_hoe: 'uncommon',
+      osmium_hoe: 'rare',
+      // The apex rung's epic is load-bearing rather than decorative: rarity is
+      // exactly what this rung buys, through startingDurabilityFor's per-rung
+      // charge bonus and ratchetCeilingForUse's refill ceiling.
+      evergarden_hoe: 'epic',
+    });
+  });
+
+  it('every farming material is consumed by a live path: the Phase 6 closure', () => {
+    // THE LOOP IS CLOSED. Two halves of live demand together account for every
+    // farming material, with no deferred-note escape hatch left anywhere.
+    // COMMANDS: plant_crop spends every seed, the watch fee is a produce sink,
+    // convert_husks eats husks, and the plant-time knobs consume the two
+    // supplies. RECIPES: the whole MERGED ALL_RECIPES reagent set, which
+    // subsumes HOE_RECIPES (the three hoe fine twins) and the Phase 6
+    // FARM_RECIPES (the eight dishes' produce plus the five remaining fine
+    // twins). The recipe term is deliberately filtered to NO subset: a
+    // farming material earns its keep through demand wherever the demand
+    // lives, so a future craft outside cooking counts the same.
+    //
+    // The exact-set pin on FARM_MATERIAL_ITEM_IDS in
+    // tests/material_taxonomy.test.ts is still the smuggle guard: it is what
+    // stops a material being quietly dropped from the taxonomy to make this
+    // arm green, so the two suites have to be edited together to fake a pass.
+    const recipeConsumed = new Set<string>(
+      ALL_RECIPES.flatMap((recipe) => recipe.reagents.map((reagent) => reagent.itemId)),
+    );
+    const liveConsumed = new Set<string>([
+      ...Object.values(FARM_CROPS).flatMap((c) => [c.seedItemId, c.produceItemId]),
+      FARM_WITHERED_HUSK_ITEM_ID,
+      ...FARM_SUPPLY_ITEM_IDS,
+      ...recipeConsumed,
+    ]);
+    const unaccounted = FARM_MATERIAL_ITEM_IDS.filter((itemId) => !liveConsumed.has(itemId));
+    expect(unaccounted, 'every farming material needs a live consumer').toEqual([]);
+    // Non-vacuity, both terms: the taxonomy really carries all 39 materials
+    // (27 before Phase 11e, plus that phase's four crop families at three ids
+    // each) and each one is covered, and the RECIPE half alone is non-empty, so
+    // a broken import or an emptied FARM_RECIPES cannot leave the command terms
+    // silently carrying the whole arm.
+    expect(FARM_MATERIAL_ITEM_IDS.length).toBe(39);
+    expect(FARM_MATERIAL_ITEM_IDS.every((itemId) => liveConsumed.has(itemId))).toBe(true);
+    expect(
+      FARM_MATERIAL_ITEM_IDS.filter((itemId) => recipeConsumed.has(itemId)).length,
+      'the recipe-derived term must consume farming materials on its own',
+    ).toBeGreaterThan(0);
+    // THE CLOSURE DIRECTION, as LITERALS: these five fine twins are exactly
+    // the Phase 5 deferral (the ladder took three twins and left five with no
+    // consumer, noted then as "the dishes phase"), and Phase 6 closed it with
+    // one dedicated dish slot each. A literal twin -> recipe map, never a
+    // derivation: the deferral closed against these five NAMED recipes, so a
+    // dish that quietly drops its twin, or a swap of which dish carries which
+    // twin, reds here instead of passing on a count.
+    const CLOSED_PHASE5_DEFERRALS: Readonly<Record<string, string>> = {
+      fine_bog_beet: 'recipe_fenbridge_beet_braise',
+      fine_brook_carrot: 'recipe_eastbrook_root_pottage',
+      fine_evergarden_greens: 'recipe_evergarden_harvest_platter',
+      fine_frost_gourd: 'recipe_highwatch_gourd_soup',
+      fine_gilded_sunmelon: 'recipe_evergarden_sunmelon_tart',
+    };
+    for (const [twin, recipeId] of Object.entries(CLOSED_PHASE5_DEFERRALS)) {
+      const consumers = ALL_RECIPES.filter((recipe) =>
+        recipe.reagents.some((reagent) => reagent.itemId === twin),
+      ).map((recipe) => recipe.id);
+      expect(
+        consumers.length,
+        `${twin} lost its live recipe consumer; the Phase 5 deferral reopened`,
+      ).toBeGreaterThanOrEqual(1);
+      expect(consumers, `${twin} must be consumed by ${recipeId}`).toContain(recipeId);
+      expect(
+        FARM_MATERIAL_ITEM_IDS.includes(twin),
+        `${twin} is mapped here but is not a farming material`,
+      ).toBe(true);
+    }
+    // The OTHER twin family stays disjointly accounted, so neither family is
+    // standing in for the other's coverage: the three hoe twins keep their
+    // HOE_RECIPES consumers (deviation (ad), each crafted rung consuming the
+    // twin one tier below it). These three gained no dish in Phase 6 and were
+    // never part of the deferral.
+    const HOE_TWIN_CONSUMERS: Readonly<Record<string, string>> = {
+      fine_highland_barley: 'recipe_osmium_hoe',
+      fine_marsh_rice: 'recipe_skysilver_hoe',
+      fine_vale_wheat: 'recipe_bronze_hoe',
+    };
+    for (const [twin, recipeId] of Object.entries(HOE_TWIN_CONSUMERS)) {
+      expect(
+        HOE_RECIPES.some(
+          (recipe) =>
+            recipe.id === recipeId && recipe.reagents.some((reagent) => reagent.itemId === twin),
+        ),
+        `${twin} must keep its ${recipeId} hoe-recipe consumer`,
+      ).toBe(true);
+      expect(
+        Object.keys(CLOSED_PHASE5_DEFERRALS).includes(twin),
+        `${twin} is a hoe twin and must never join the dish deferral map`,
+      ).toBe(false);
+    }
+  });
+
+  it('the farmer NPCs stock EXACTLY the go-live counters, and no other counter carries a farming item', () => {
+    // THE GO-LIVE ARM the hub-rule narrowing above leans on, the positive
+    // twin of the dormant arm it replaced. Farming's vendor surface is the
+    // four farmer NPCs beside the four patches and nothing else: the tier-1
+    // and tier-2 seeds where their tier is farmed, the D9 fee vegetable and
+    // the rung-one hoe at the tier-1 farmer alone, and compost at every
+    // farmer (the husk trade's anchor). Literal lists, ORDER INCLUDED: the
+    // vendor grid renders in this order and a re-sorted row is a content
+    // change to be made on purpose.
+    const FARMER_STOCK: Readonly<Record<string, readonly string[]>> = {
+      farmer_jessica: [
+        'vale_wheat_seed',
+        'brook_carrot_seed',
+        'brook_carrot',
+        'compost',
+        'garden_hoe',
+      ],
+      farmer_teasel: ['marsh_rice_seed', 'bog_beet_seed', 'compost'],
+      // GATE 1 (Phase 11e): the upper two counters gained their tier's seeds,
+      // four rows each, in one edit under one convention. Before this the
+      // tier-3 and tier-4 seeds had no faucet anywhere, so a farmer could see
+      // the crops and never plant a first one.
+      farmer_hollis: [
+        'compost',
+        'highland_barley_seed',
+        'frost_gourd_seed',
+        'thornpeak_cabbage_seed',
+        'frost_lentils_seed',
+      ],
+      farmer_verbena: [
+        'compost',
+        'gilded_sunmelon_seed',
+        'evergarden_greens_seed',
+        'gilded_yam_seed',
+        'evergarden_pumpkin_seed',
+      ],
+    };
+    for (const [npcId, stock] of Object.entries(FARMER_STOCK)) {
+      const npc = NPCS[npcId];
+      expect(npc, `${npcId} must exist`).toBeDefined();
+      expect(npc.farmer, `${npcId} carries the farmer flag`).toBe(true);
+      expect(npc.vendorItems, `${npcId} stock`).toEqual(stock);
+      // THE DEAD-ROW TRAP (D11): a stocked row without a positive buyValue
+      // renders in the grid and refuses at purchase, so every stocked row is
+      // asserted priced HERE, per row, beside the stock it is on.
+      for (const itemId of stock) {
+        expect(ITEMS[itemId], `${npcId} stocks unknown item ${itemId}`).toBeDefined();
+        expect(
+          ITEMS[itemId]?.buyValue ?? 0,
+          `${npcId} stocks ${itemId} without a positive buyValue (a dead row)`,
+        ).toBeGreaterThan(0);
+      }
+    }
+    // The flag set IS the stock table: a fifth flagged farmer must join the
+    // literal above (and decide its stock) rather than ship an unpinned row.
+    expect(
+      Object.values(NPCS)
+        .filter((npc) => npc.farmer === true)
+        .map((npc) => npc.id)
+        .sort(),
+    ).toEqual(Object.keys(FARMER_STOCK).sort());
+    // The needle set for the sweeps below: 39 materials plus the FIVE hoes
+    // (four until masterwrought Phase 11j added the apex rung; the material
+    // half did not move, because an apex tool is not a material).
+    const farmingItemIds = new Set<string>([
+      ...FARM_MATERIAL_ITEM_IDS,
+      ...farmingTools.map(([itemId]) => itemId),
+    ]);
+    expect(farmingItemIds.size).toBe(44);
+    // NO OTHER NPC vendors a farming item: the four farmers are the whole
+    // surface, so a seed or a hoe drifting onto a station master's counter
+    // reds here rather than sliding through the narrowed hub sweep above.
+    let vendorRowsSeen = 0;
+    for (const [npcId, npc] of Object.entries(NPCS)) {
+      if (npcId in FARMER_STOCK) continue;
+      for (const itemId of npc.vendorItems ?? []) {
+        vendorRowsSeen += 1;
+        expect(
+          farmingItemIds.has(itemId),
+          `${npcId} vendors farming item ${itemId}; only the farmer NPCs may`,
+        ).toBe(false);
+      }
+    }
+    // The counter-example: the walk really saw the world's other counters.
+    expect(vendorRowsSeen).toBeGreaterThan(0);
+    // The NEVER-STOCKED set, on every purchase surface (NPC counters, the
+    // heroic vendor, the delve shops): tier 3 and 4 seeds (seed-back and
+    // market only, D11), growth_tonic (crafted only), every FARM_RECIPES
+    // output (the dishes and the tonic), and the three crafted hoes (R23,
+    // craft-only). Literal where the doctrine is literal, derived from the
+    // recipe table where it is a table.
+    //
+    // When the D11 ruling lands ANY tier 3/4 seed faucet, vendor-shaped or
+    // not (a quest reward, a loot drop, a profession output), sweep the (bo)
+    // dormancy prose with it: guide.profPages.gatherDeeds.farmingSown and
+    // guide.profPages.farm.tableBody both promise the top tier "with a later
+    // patch", and tests/guide.test.ts pins that disclosure until the faucet
+    // is real. This sweep and tests/deeds_content.test.ts red only on the
+    // purchase surfaces, so a non-purchase faucet reaches the prose ONLY
+    // through this reminder and the D11 phase's own checklist.
+    // OSMIUM_HOE LEFT THIS SET at masterwrought Phase 11j (decision B), and
+    // the apex evergarden_hoe never joined it: both crafted top rungs now have
+    // a delve Marks route, so "never stocked on any purchase surface" has
+    // stopped being true of them. What remains is the claim that survived:
+    // rungs 2 and 3 have no purchase surface at all. The seeds left this set
+    // the same way at 11e and that direction, out rather than in, is the one
+    // that must never reverse silently, so both hoe rungs are pinned as
+    // ACTUALLY stocked further down rather than just dropped from here.
+    const NEVER_STOCKED = new Set<string>([
+      'growth_tonic',
+      'bronze_hoe',
+      'skysilver_hoe',
+      ...FARM_RECIPES.map((recipe) => recipe.resultItemId),
+    ]);
+    // Non-vacuity of the needle set: fourteen recipe outputs plus the THREE
+    // literals above, growth_tonic counted once (it is both). Four until
+    // masterwrought Phase 11j took osmium_hoe out. Re-pinned
+    // 9/16 -> 13/20 by Phase 11 (the four well-fed buff dishes), then
+    // 13/20 -> 14/21 by Phase 12 (the shared feast, never stocked either),
+    // then 14/21 -> 14/17 by Phase 11e, which STOCKED the four upper-tier
+    // seeds this set used to forbid (GATE 1) and added none of its own four:
+    // the seeds left this set rather than joining it, which is the whole
+    // point of the gate and the one direction that must never be reversed
+    // silently. The set now carries only outputs and supplies, and the
+    // arithmetic still holds: 14 outputs + 3 literals - 1 overlap = 16, having
+    // been 17 before 11j took osmium_hoe out.
+    expect(FARM_RECIPES).toHaveLength(14);
+    expect(NEVER_STOCKED.size).toBe(16);
+    // All eight upper-tier seeds are DELIBERATELY absent from the set, asserted
+    // rather than implied by the deletion above. HONEST ABOUT ITS REACH,
+    // corrected at the 11e QA: NEVER_STOCKED is built from a literal a few
+    // lines up in this same test, so this loop checks the FIXTURE, not the
+    // tree, and its old justification ("without this arm a future edit could
+    // put them back and only a distant purchase test would notice") was wrong
+    // on both halves. Re-adding a seed to that literal reds the NEXT loop five
+    // lines down, which sweeps every NPC's real vendorItems against the same
+    // set and where Hollis and Verbena now stock all eight. Kept anyway,
+    // because a named per-seed failure message localises the break instantly
+    // where the sweep only says "some NPC stocks a never-stocked item", but
+    // kept as a readability arm rather than as coverage.
+    for (const seedId of [
+      'highland_barley_seed',
+      'frost_gourd_seed',
+      'gilded_sunmelon_seed',
+      'evergarden_greens_seed',
+      'thornpeak_cabbage_seed',
+      'frost_lentils_seed',
+      'gilded_yam_seed',
+      'evergarden_pumpkin_seed',
+    ]) {
+      expect(NEVER_STOCKED.has(seedId), `${seedId} is GATE 1 stock, not never-stocked`).toBe(false);
+    }
+    for (const [npcId, npc] of Object.entries(NPCS)) {
+      for (const itemId of npc.vendorItems ?? []) {
+        expect(NEVER_STOCKED.has(itemId), `${npcId} stocks never-stocked ${itemId}`).toBe(false);
+      }
+    }
+    // The two NON-NPC purchase counters (the Marks route) are acquisition
+    // surfaces too: a row naming a farming item there opens a faucet the NPC
+    // walk cannot see. NEITHER is farming-free any more: the HEROIC
+    // quartermaster stopped being so at Phase 11f, and the DELVE counters
+    // stopped at masterwrought Phase 11j. Each exception is NAMED and pinned
+    // both ways rather than the sweep being dropped.
+    //
+    // masterwrought Phase 11f's DECISION E put exactly two families on that
+    // counter at the 12-mark ring point: the eight tier-3 and tier-4 SEEDS
+    // (additive reach beside 11e's copper floor, never a replacement for it,
+    // pinned in tests/farm_seed_channels.test.ts) and the six farming
+    // PATTERNS (the D13 valve that makes the luck-gated drop arms legal). The
+    // allowlist below is derived from the crop catalog and the pattern table,
+    // so it cannot quietly widen to a tier-1 seed, a hoe, produce, a fine
+    // twin, or a dish: every one of those still reds here.
+    const MARKS_ALLOWED = new Set<string>([
+      ...Object.values(FARM_CROPS)
+        .filter((crop) => crop.tier >= 3)
+        .map((crop) => crop.seedItemId),
+      ...Object.keys(FARM_PATTERN_ITEMS),
+    ]);
+    expect(MARKS_ALLOWED.size, 'eight upper seeds plus six patterns').toBe(14);
+    expect(HEROIC_VENDOR_STOCK.length).toBeGreaterThan(0);
+    let marksFarmingRows = 0;
+    for (const offer of HEROIC_VENDOR_STOCK) {
+      if (MARKS_ALLOWED.has(offer.itemId)) {
+        marksFarmingRows += 1;
+        continue;
+      }
+      expect(
+        farmingItemIds.has(offer.itemId) || NEVER_STOCKED.has(offer.itemId),
+        `heroic vendor stocks farming item ${offer.itemId}`,
+      ).toBe(false);
+    }
+    // The allowance is not a hole: every allowed row must ACTUALLY be on the
+    // counter, so the exception cannot outlive the channel it was written for.
+    expect(marksFarmingRows, 'the ruled marks rows must really be stocked').toBe(
+      MARKS_ALLOWED.size,
+    );
+    // THE DELVE COUNTERS ARE NO LONGER FARMING-FREE, and the exception is
+    // named the same way the heroic quartermaster's was rather than the sweep
+    // being dropped (masterwrought Phase 11j, decision B). Exactly the two
+    // CRAFTED TOP RUNGS may appear, because masterwrought R18 says nobody must
+    // have TAKEN a profession to get a thing and this counter is the gathering
+    // family's one non-crafter route. The allowance is DERIVED from the hoe
+    // ladder's own tiers, so it cannot quietly widen to a seed, a tier-1 or
+    // tier-2 hoe, produce, a fine twin or a dish: every one of those still
+    // reds here.
+    const DELVE_ALLOWED = new Set(
+      farmingTools
+        .filter(([, def]) => def.use?.type === 'gatherTool' && def.use.tier >= 4)
+        .map(([itemId]) => itemId),
+    );
+    expect(DELVE_ALLOWED, 'the two crafted top rungs').toEqual(
+      new Set(['osmium_hoe', 'evergarden_hoe']),
+    );
+    let delveRowsSeen = 0;
+    const delveFarmingIds = new Set<string>();
+    for (const [delveId, entries] of Object.entries(DELVE_SHOPS)) {
+      for (const entry of entries) {
+        delveRowsSeen += 1;
+        if (DELVE_ALLOWED.has(entry.itemId)) {
+          delveFarmingIds.add(entry.itemId);
+          continue;
+        }
+        expect(
+          farmingItemIds.has(entry.itemId) || NEVER_STOCKED.has(entry.itemId),
+          `${delveId} delve shop stocks farming item ${entry.itemId}`,
+        ).toBe(false);
+      }
+    }
+    // At the real count: the sweep must really have walked both counters.
+    expect(delveRowsSeen, 'every row across both delve shops').toBe(28);
+    // Same shape as the marks allowance above: the exception cannot outlive
+    // the channel it was written for, so every allowed rung must really be on
+    // a counter. IDS rather than ROWS, deliberately: a row count is satisfied
+    // by two rows for ONE hoe with the other missing, which is exactly the
+    // absence this arm exists to catch.
+    expect([...delveFarmingIds].sort(), 'both ruled hoe rungs must really be stocked').toEqual(
+      [...DELVE_ALLOWED].sort(),
+    );
+  });
+
+  it('no farm recipe is craftable from vendor stock alone', () => {
+    // THE COUNTER-FED NEGATIVE the stock arm above implies but does not
+    // cover. Stocking the farmer counters is only half the guarantee: a farm
+    // recipe whose WHOLE reagent list can be bought off a counter would mint
+    // its output (and its cooking skill-ups) with no crop ever grown. So
+    // every FARM_RECIPES row must keep at least one reagent no NPC stocks.
+    // For the plain dishes that reagent is farm produce (brook_carrot is the
+    // one stocked produce, D9, and its pottage keeps vale_wheat and the fine
+    // twin off every counter); for the tonic it is silverleaf_herb,
+    // wild-gathered and priceless by doctrine; for the four Phase 11 buff
+    // dishes it is their tier's unstocked produce, the tier-1 row carrying
+    // the pottage-precedent vale_wheat binder for exactly this reason.
+    //
+    // DELIBERATE and ledgered as deviation (ai): the tonic IS craftable by a
+    // player who gathers the herbs. That is exactly D7's cross-profession
+    // trade, whose faucet is the herb line rather than the farm, so this arm
+    // asserts unstocked-ness, never uncraftability.
+    // The stocked universe is EVERY purchase surface, not just NPC counters:
+    // the heroic vendor and the delve shops sell for Marks with no buyValue
+    // and no vendorItems row, so a farm reagent (or a dish) stocked there
+    // would keep both price-basis arms green while breaking the live-surface
+    // guarantee. Union all three so one future faucet channel cannot hide.
+    const stockedItemIds = new Set<string>();
+    for (const npc of Object.values(NPCS)) {
+      for (const itemId of npc.vendorItems ?? []) stockedItemIds.add(itemId);
+    }
+    for (const offer of HEROIC_VENDOR_STOCK) stockedItemIds.add(offer.itemId);
+    for (const entries of Object.values(DELVE_SHOPS)) {
+      for (const entry of entries) stockedItemIds.add(entry.itemId);
+    }
+    // Same non-vacuity as the arm above: the world really has counters, so an
+    // "unstocked" verdict below is a real absence rather than an empty walk.
+    expect(stockedItemIds.size).toBeGreaterThan(0);
+    // The whole farm set really swept: twelve dishes plus the tonic and the
+    // Phase 12 shared feast (re-pinned 9 -> 13 by Phase 11, the four
+    // well-fed buff dishes, then 13 -> 14 by Phase 12).
+    expect(FARM_RECIPES).toHaveLength(14);
+    for (const recipe of FARM_RECIPES) {
+      expect(recipe.reagents.length, `${recipe.id} needs reagents to sweep`).toBeGreaterThan(0);
+      const unstocked = recipe.reagents
+        .map((reagent) => reagent.itemId)
+        .filter((itemId) => !stockedItemIds.has(itemId));
+      expect(
+        unstocked.length,
+        `${recipe.id} is craftable from vendor stock alone: every reagent sits on a counter`,
+      ).toBeGreaterThan(0);
+      // The stronger PRICE-BASIS arm, pinned here at the source: a row whose
+      // reagents ALL carry a copper buyValue joins the vendor-fed
+      // counterfactual in tests/recipe_economy.test.ts (a sorted literal pin
+      // plus a discounted-input bound), so a farm row drifting into that shape
+      // is both a dormancy break and a cross-suite break.
+      // Every reagent id must resolve BEFORE the priceless filter reads it: a
+      // typo'd id would satisfy `?.buyValue === undefined` vacuously and read
+      // as "priceless" instead of failing.
+      for (const reagent of recipe.reagents) {
+        expect(
+          ITEMS[reagent.itemId],
+          `${recipe.id} reagent ${reagent.itemId} does not resolve in the merged catalog`,
+        ).toBeDefined();
+      }
+      const priceless = recipe.reagents
+        .map((reagent) => reagent.itemId)
+        .filter((itemId) => ITEMS[itemId]?.buyValue === undefined);
+      expect(
+        priceless.length,
+        `${recipe.id} needs at least one reagent with no vendor buy price`,
+      ).toBeGreaterThan(0);
+      // The symmetric OUTPUT arm: no NPC may stock a farm dish or the tonic
+      // either (the farming-item sweep cannot see them: dishes are kind
+      // food, outside FARM_MATERIAL_ITEM_IDS). buyValue undefined already
+      // makes a stock row render-and-refuse, but the honest claim is that no
+      // row exists at all.
+      expect(stockedItemIds.has(recipe.resultItemId), `an NPC stocks ${recipe.resultItemId}`).toBe(
+        false,
+      );
     }
   });
 });

@@ -54,7 +54,7 @@ const SEA_ROCK_URLS = [
   '/models/props/rock_tall_a.glb',
   '/models/props/rock_tall_h.glb',
 ];
-// The great tree of Eldergleam: one hand-placed giant of the twisted elder
+// The great tree of Eldershine: one hand-placed giant of the twisted elder
 // model the realm's forests already use, kept with its own materials (the
 // loader cache is immutable, so the scene is cloned before use).
 const GREAT_TREE_URL = '/models/foliage/twisted_1.glb';
@@ -1078,7 +1078,7 @@ export function buildRealmFlora(seed: number): RealmFloraView {
     }
   }
 
-  // The great tree of Eldergleam, rising over the town square. Position and
+  // The great tree of Eldershine, rising over the town square. Position and
   // trunk radius come from REALM_PROPS.greatTrees: the same record the sim's
   // collision grid consumes, so the visual and the collider never drift.
   const treeSpot = REALM_PROPS.greatTrees?.[0];

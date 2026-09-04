@@ -1,13 +1,13 @@
 // @vitest-environment happy-dom
 
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { DELVES, NPCS, QUESTS, STATIONS } from '../src/sim/data';
 import { CHRONICLER_TEMPLATE_IDS } from '../src/sim/deeds';
 import type { Entity } from '../src/sim/types';
 import { craftNameText } from '../src/ui/char_window';
 import type { FocusTrapHandle } from '../src/ui/focus_manager';
 import { QuestDialogController } from '../src/ui/hud/quest/quest_dialog_controller';
-import { t } from '../src/ui/i18n';
+import { ensureLocaleLoaded, setLanguage, supportedLanguages, t } from '../src/ui/i18n';
 import type { IWorld } from '../src/world_api';
 
 function npc(id: number, templateId: string, x = 0): Entity {
@@ -46,6 +46,7 @@ function harness(
   const acceptQuest = vi.fn();
   const turnInQuest = vi.fn();
   const reportTelemetry = vi.fn();
+  const convertHusks = vi.fn();
   const world = {
     entities,
     cfg: { playerClass: 'warrior' },
@@ -75,6 +76,7 @@ function harness(
     acceptQuest,
     turnInQuest,
     reportTelemetry,
+    convertHusks,
   } as unknown as IWorld;
   const release = vi.fn();
   const focusFirst = vi.fn();
@@ -156,6 +158,7 @@ function harness(
     acceptQuest,
     turnInQuest,
     reportTelemetry,
+    convertHusks,
     release,
     focusFirst,
     trapOpener,
@@ -180,6 +183,10 @@ describe('QuestDialogController', () => {
   beforeEach(() => {
     document.body.innerHTML = '';
   });
+  // The per-locale label-in-name arm switches the module-global language; a
+  // failure mid-loop must not cascade a non-English locale into every later
+  // test in this file.
+  afterEach(() => setLanguage('en'));
 
   it('owns the normal gossip lifecycle and fades the greeting from NPC distance', () => {
     const test = harness();
@@ -610,6 +617,97 @@ describe('QuestDialogController', () => {
     button?.click();
     expect(master.openTrain).toHaveBeenCalledWith(46);
     expect(master.release).toHaveBeenCalledWith(false);
+  });
+
+  it('a farmer NPC offers the husk-trade row and the click sends convertHusks once, then closes', () => {
+    // The farming go-live: every NpcDef carrying the farmer flag renders the
+    // [data-husk-trade] row (the ONE UI affordance for convert_husks). The
+    // fixture entity has NO quests and NO vendor rows, so the row is what
+    // keeps this dialog worth opening at all. The click goes straight to the
+    // live world (IWorldFarming.convertHusks) exactly once, and the dialog
+    // closes like every other non-quest destination (the market-row shape).
+    const farmerId = Object.values(NPCS).find((definition) => definition.farmer)?.id;
+    if (!farmerId) throw new Error('farmer NPC fixture not found');
+    const farmer = harness(npc(48, farmerId));
+    farmer.controller.open(48);
+    expect(farmer.element.style.display).toBe('block');
+    const button = farmer.element.querySelector<HTMLButtonElement>('[data-husk-trade]');
+    expect(button).not.toBeNull();
+    expect(button?.textContent).toContain(t('hudChrome.farming.huskTrade'));
+    expect(button?.getAttribute('aria-label')).toBe(
+      t('hudChrome.farming.huskTradeAria', { name: `npc:${farmerId}` }),
+    );
+    // The English literals once, beside the t() form: a key swap to any other
+    // existing key would keep the t() comparisons green on their own.
+    expect(button?.textContent).toContain('Trade husks for compost');
+    expect(button?.getAttribute('aria-label')).toBe(`Trade husks for compost with npc:${farmerId}`);
+    // WCAG 2.5.3 label-in-name (the Phase 14 a11y batch): the accessible
+    // name CONTAINS the visible label verbatim, so speech-input users can
+    // say what they see. Pinned as the containment PROPERTY, not just the
+    // literal above, so a future reword of either key must keep it.
+    expect(button?.getAttribute('aria-label')).toContain(button?.textContent?.trim() ?? 'MISSING');
+    // No shop row for an empty stock, so the trade row is the only action.
+    expect(farmer.element.querySelector('[data-vendor]')).toBeNull();
+    expect(farmer.convertHusks).not.toHaveBeenCalled();
+    button?.click();
+    expect(farmer.convertHusks).toHaveBeenCalledTimes(1);
+    // The trade opens NO successor window (the sim's own event lines are the
+    // feedback), so the dialog closes WITH focus restore: the bindRoute
+    // family releases with false because it hands the trap opener to a
+    // successor that restores focus on its own close; with no successor that
+    // chain would drop keyboard focus to <body> (Phase 9 QA, the frontend
+    // seam's finding).
+    expect(farmer.release).toHaveBeenCalledWith(true);
+    expect(farmer.release).not.toHaveBeenCalledWith(false);
+    expect(farmer.controller.isOpen).toBe(false);
+  });
+
+  it('label-in-name holds in EVERY locale for the husk pair (WCAG 2.5.3)', async () => {
+    // The Phase 14 a11y batch reworded the aria pair so the accessible name
+    // contains the visible label verbatim in every locale (speech-input
+    // users say what they see in their language). The property is asserted
+    // across the WHOLE supported set: the five filled non-Latin locales
+    // render their fills, the rest English-fall-back BOTH keys together, so
+    // containment must hold everywhere; a future one-sided fill (aria
+    // translated, visible pending, or vice versa) reds here. Rendered
+    // through the real sink in the app's own order (await, then switch).
+    const FILLED = new Set(['ja_JP', 'ko_KR', 'ru_RU', 'zh_CN', 'zh_TW']);
+    for (const locale of supportedLanguages) {
+      if (locale === 'en') continue;
+      await ensureLocaleLoaded(locale);
+      setLanguage(locale);
+      const visible = t('hudChrome.farming.huskTrade');
+      const aria = t('hudChrome.farming.huskTradeAria', { name: 'X' });
+      expect(aria, locale).toContain(visible);
+      // Non-vacuity where a real fill exists: not English-falling-back.
+      if (FILLED.has(locale)) expect(visible, locale).not.toBe('Trade husks for compost');
+    }
+    setLanguage('en');
+  });
+
+  it('a farmer with stock renders the trade row BESIDE the goods row', () => {
+    // The two go-live counters at once: Jessica sells seeds and trades husks
+    // from the same dialog, so neither row may suppress the other.
+    const stocked = npc(49, 'farmer_jessica');
+    stocked.vendorItems = [...(NPCS.farmer_jessica.vendorItems ?? [])];
+    const jessica = harness(stocked);
+    jessica.controller.open(49);
+    expect(jessica.element.querySelector('[data-vendor]')).not.toBeNull();
+    expect(jessica.element.querySelector('[data-husk-trade]')).not.toBeNull();
+  });
+
+  it('a non-farmer NPC renders no husk-trade row', () => {
+    const plainId = Object.values(NPCS).find(
+      (definition) =>
+        !definition.banker &&
+        !definition.farmer &&
+        !(CHRONICLER_TEMPLATE_IDS as readonly string[]).includes(definition.id),
+    )?.id;
+    if (!plainId) throw new Error('non-farmer NPC fixture not found');
+    const plain = harness(npc(50, plainId));
+    plain.controller.open(50);
+    expect(plain.element.querySelector('[data-husk-trade]')).toBeNull();
+    expect(plain.convertHusks).not.toHaveBeenCalled();
   });
 
   it('a non-master NPC renders no Train option', () => {

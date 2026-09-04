@@ -145,6 +145,14 @@ export interface AttachDef {
   rotationY?: number;
   /** Copy grip from a built-in accessory node on the character rig (e.g. Spellbook_open). */
   gripRef?: string;
+  /** A pure swap-slot BASE that never renders anywhere: it exists only so an
+   *  `offhandSlot` can point at it (the game skips the entry whenever the
+   *  offhand is empty or unmapped), so its url and grip are dead data. The
+   *  wiki generator filters these out of GuideModelSpec, which is what keeps
+   *  the class figures from showcasing another class's fixed prop. Never set
+   *  this on an attach that should showcase in the guide (the shield classes'
+   *  offhand bases deliberately stay unflagged). */
+  swapOnly?: boolean;
 }
 
 export interface VisualDef {
@@ -1057,7 +1065,16 @@ const ITEM_OFFHAND_MODELS: Readonly<Record<string, string>> = {
   eastbrook_buckler: 'shield_round',
   highwatch_wallshield: 'shield_square',
   bonewrought_bulwark: 'shield_square',
+  duskforged_bulwark: 'shield_square', // crafted apex tower shield (masterwrought); bulwarks share shield_square
   pearlward_aegis: 'shield_round', // the first caster (int/spi) shield
+  // The inscription tomes: the first held_offhand item models, procedural GLBs
+  // from scripts/assets/inscription_tomes (VAR_BOOK grips). The phase 09 apex
+  // grimoire joined the family at phase 18, and with it left the conscious
+  // no-model pin in tests/held_weapon_models.test.ts.
+  silverleaf_primer: 'tome_silverleaf',
+  goldleaf_folio: 'tome_goldleaf',
+  sunpetal_grimoire: 'tome_sunpetal',
+  voidbound_grimoire: 'tome_voidbound',
   // Crucible raid shields (content/ignivar_loot.ts): tank wall + healer barrier.
   bulwark_of_the_inner_crucible: 'shield_square',
   ember_wardens_barrier: 'shield_round',
@@ -1339,7 +1356,7 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${PLAYERS}/knight.glb`,
     // Every clip knight.glb ships is already wired somewhere in this block
     // (idle/walk/attack/hit/emotes account for the full shipped library, no
-    // spare donor pose), so Heroic Leap (issue #2889 batch, verified against
+    // spare donor pose), so Vaulting Charge (issue #2889 batch, verified against
     // the warrior's real kit in src/sim/content/classes.ts, not assumed) is
     // authored by pose-sample-and-blend (scripts/build_warrior_ability_anims.mjs)
     // instead of pointed at an unused clip.
@@ -1378,7 +1395,7 @@ export const VISUALS: Record<string, VisualDef> = {
         // Jawcrack is a bare-fist interrupt: the synthesized punch
         // (scripts/_add_pummel_punch_anim.mjs), not a weapon swing.
         pummel: 'Punch_A',
-        // Heroic Leap is a position-targeted jump, not a swing: the bespoke
+        // Vaulting Charge is a position-targeted jump, not a swing: the bespoke
         // pose-sample-and-blend clip (coil, airborne, driven two-hand slam on
         // landing). It carries no castFx and resolves no target entity, so it
         // completes through the renderer's generic 'selfCast' cue, which only
@@ -1387,13 +1404,13 @@ export const VISUALS: Record<string, VisualDef> = {
         // painter.ts's non-contact 'selfCast' branch); with no entry it plays
         // nothing at all on the body.
         heroic_leap: 'Warrior_Heroic_Leap',
-        // Victory Rush is a real weapon strike (weaponStrike effect, not a
+        // Victor's Surge is a real weapon strike (weaponStrike effect, not a
         // pure buff), so it lands through the ordinary damage-event attack
         // trigger like every entry above it: a confident decisive swing, the
         // same clip heroic_strike/overpower/hamstring already use.
         victory_rush: '1H_Melee_Attack_Slice_Diagonal',
         // Seething Fury and Recklessness are both a defiant roar of rage: no
-        // castFx, no target, so (like Heroic Leap above) the existing Cheer
+        // castFx, no target, so (like Vaulting Charge above) the existing Cheer
         // gesture only shows up once an attackByAbility entry exists for it.
         berserker_rage: 'Cheer',
         recklessness: 'Cheer',
@@ -1409,7 +1426,7 @@ export const VISUALS: Record<string, VisualDef> = {
         // the Cheer EMOTE and never reaches attackByAbility at all - adding
         // an entry for any of those would be dead code, so this batch leaves
         // them alone). Piercing Howl's own selfCast cue DOES reach the same
-        // gesture path Heroic Leap/berserker_rage/etc use above, and the
+        // gesture path Vaulting Charge/berserker_rage/etc use above, and the
         // painter's shout-emote call right after it is guarded on
         // isMidOneShot, so it does not stomp this gesture.
         piercing_howl: 'Spellcast_Raise',
@@ -1559,7 +1576,7 @@ export const VISUALS: Record<string, VisualDef> = {
         // 'Block' guard, no bake needed (the pattern player_warrior's
         // raised_guard already uses).
         evasion: 'Block',
-        // Cutthroat Tempo, Smokestep, Quickened Blood, and Duskveil are all
+        // Cutthroat Tempo, Smokefade, Quickened Blood, and Duskveil are all
         // self-buff/stealth toggles with no combat swing to author: rogue.
         // glb's own already-baked 'Spellcast_Raise', the pattern player_
         // warrior's sanguine_aura and the hunter batch's aspect toggles both
@@ -1607,8 +1624,18 @@ export const VISUALS: Record<string, VisualDef> = {
     // accessory as a SkinnedMesh, and the allowlist filter (assets.ts) only
     // hides non-skinned nodes, so the hat always renders. Sanctioned look.
     show: [],
-    attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
+    // The offhand slot renders ONLY an equipped, model-mapped offhand item
+    // (the phase 06 inscription tomes are the first): offhandAttachDef skips
+    // the slot entirely when the offhand is empty or unmapped, so the empty
+    // hand look is unchanged. The base url never renders and is already in
+    // the preload set via the warlock's fixed spellbook; swapOnly keeps it
+    // out of the wiki figures too.
+    attach: [
+      { url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/spellbook_open.glb`, bone: 'handslot.l', swapOnly: true },
+    ],
     weaponSlots: [0],
+    offhandSlot: 1,
     // Faint warm lift only, to tell this apart from the mage/warlock models it
     // shares mage.glb with. The whole rig is ONE merged material/atlas (skin,
     // hair, and robe together), so this lerp multiplies the entire body, not
@@ -1632,20 +1659,20 @@ export const VISUALS: Record<string, VisualDef> = {
       // issue #2889): the shaman had zero attackByAbility overrides across
       // its kit, so every spell played the same melee chop/slice. Mapped by
       // school (src/sim/content/classes.ts): Cast_Bolt is the class's
-      // signature nature bolt (its longest cast, 1.5 to 3.0s); Earth/Flame/
-      // Frost Shock are all instant (0s cast) and differ only in damage
+      // signature nature bolt (its longest cast, 1.5 to 3.0s); Earthen/
+      // Cinder/Rime Jolt are all instant (0s cast) and differ only in damage
       // school, so they share Cast_Shock's snappy point-and-release;
-      // Healing Wave and the Restoration signature Chain Heal share
+      // Mending Waters and the Spiritcall signature Chain Heal share
       // Cast_Heal's sustained mending channel instead of a sharp release;
       // Earthquake borrows the two-hand chop's committed downswing energy
       // for Cast_Quake, the same "slam and radiate outward" read the mage's
-      // Cast_Nova makes; Stormstrike (physical) gets its own charged
-      // diagonal slice, Storm_Strike. The weapon imbues (Rockbiter,
-      // Flametongue, Frostbrand) and the short self buffs (Ghost Wolf,
-      // Elemental Mastery) have no swing to author, so they read fine on the
+      // Cast_Nova makes; Ancestral Strike (physical) gets its own charged
+      // diagonal slice, Storm_Strike. The weapon imbues (Stonebound,
+      // Pyrebrand, Rimebound Weapon) and the short self buffs (Shadewolf,
+      // Primal Mastery) have no swing to author, so they read fine on the
       // rig's existing Spellcast_Raise gesture, the same no-bake call the
-      // priest's renew and the warlock's sanguine_aura make; Lightning
-      // Shield reads as a defensive ward instead, so it reuses Block, the
+      // priest's renew and the warlock's sanguine_aura make; Thunder
+      // Ward reads as a defensive ward instead, so it reuses Block, the
       // same call the warrior's raised_guard makes. This covers every
       // ability tagged class: 'shaman' in classes.ts.
       attackByAbility: {
@@ -1739,8 +1766,14 @@ export const VISUALS: Record<string, VisualDef> = {
     // (assets.ts) only hides non-skinned nodes. The hatted silhouette is the
     // sanctioned mage look; listing Mage_Cape is inert but kept as intent.
     show: ['Mage_Cape'],
-    attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
+    // Offhand slot: renders only an equipped model-mapped offhand (the
+    // inscription tomes); empty stays empty. See the priest note.
+    attach: [
+      { url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/spellbook_open.glb`, bone: 'handslot.l', swapOnly: true },
+    ],
     weaponSlots: [0],
+    offhandSlot: 1,
   }),
   player_warlock: swims({
     url: `${PLAYERS}/mage.glb`,
@@ -1838,8 +1871,14 @@ export const VISUALS: Record<string, VisualDef> = {
     // alongside the hit-variety donor.
     animUrls: [`${PLAYERS}/druid_hit_variety_anims.glb`, `${PLAYERS}/druid_ability_anims.glb`],
     // dedicated druid model (own texture, ships a Backpack mesh)
-    attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
+    // Offhand slot: renders only an equipped model-mapped offhand (the
+    // inscription tomes); empty stays empty. See the priest note.
+    attach: [
+      { url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/spellbook_open.glb`, bone: 'handslot.l', swapOnly: true },
+    ],
     weaponSlots: [0],
+    offhandSlot: 1,
   }),
 
   // -- cosmetic body skin (class-agnostic; both the skin preview and a live
@@ -2824,7 +2863,7 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   // Dedicated Destruction summons generated through the creature pipeline.
   // Their authored fel textures stay untinted. The manifest height combines
-  // with each MobTemplate scale to render Emberkin at 1.15 units, Gloomshade
+  // with each MobTemplate scale to render Emberkin at 1.15 units, Duskmurk
   // at 3.0 units, and the Pyre Colossus at 4.25 units.
   mob_emberkin: {
     url: `${CREATURES}/emberkin.glb`,
@@ -3100,7 +3139,7 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.65,
   },
   delve_skel_varric: {
-    // Deacon Varric: boss mage rig with Taunt flourish on pull
+    // Deacon Vandric: boss mage rig with Taunt flourish on pull
     url: `${ENEMIES}/skeleton_mage.glb`,
     animUrls: [`${ENEMIES}/skeleton_mage_hit_variety_anims.glb`],
     height: 2.5,
@@ -3785,7 +3824,7 @@ const NPC_KEYS: Record<string, string> = {
   // The graveyard angel: a robed figure, rendered translucent (ethereal) with a
   // holy shimmer by the renderer (see the spirit_healer branches there).
   spirit_healer: 'npc_villager_robed',
-  // Eldergleam, the Veiled Hollow
+  // Eldershine, the Veiled Hollow
   keeper_saelwyn: 'npc_mage',
   loremother_bryn: 'npc_villager_robed',
   provisioner_fenna: 'npc_villager',

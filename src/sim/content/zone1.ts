@@ -696,7 +696,7 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     questIds: [],
     market: true,
     greeting:
-      'Welcome to the World Market, $C. Buy from every adventurer in the realm — or set out your own wares and let coin find you.',
+      'Welcome to the World Market, $C. Buy from every adventurer in the realm, or set out your own wares and let coin find you.',
   },
   marshal_redbrook: {
     id: 'marshal_redbrook',
@@ -785,18 +785,21 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     facing: EASTBROOK_NPC_PLACEMENTS_BY_ID.smith_haldren.facing,
     color: 0x707b7c,
     questIds: ['q_prof_hobby_switch'],
+    // qr-11n-WIDE pulled the four byte-identical crafted gear rows from this
+    // stock (eastbrook_arming_sword, eastbrook_chain_vest,
+    // eastbrook_wool_trousers, tanned_leather_jerkin): identical id, zero
+    // margin, unlimited restock, R23's purest competitor form. The recipes,
+    // items and prices stay, and the smith keeps his non-crafted staples
+    // below. (The four ids drop nowhere; other zone-1 drops fill the legs
+    // and chest slots.)
     vendorItems: [
-      'eastbrook_arming_sword',
       'eastbrook_greatsword',
       'bronzework_mace',
       'vale_carving_knife',
       'hickory_shortstaff',
       'eastbrook_buckler',
-      'eastbrook_chain_vest',
       'valespun_robe',
-      'tanned_leather_jerkin',
       'hobnail_boots',
-      'eastbrook_wool_trousers',
     ],
     greeting: 'Mind the sparks, $C. Good steel is the difference between a scar and a grave.',
   },
@@ -809,7 +812,7 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     color: 0x2471a3,
     questIds: ['q_murlocs'],
     vendorItems: ['simple_fishing_pole'],
-    greeting: 'Blrb-glub— sorry, been listening to those fish-men too long.',
+    greeting: 'Blrb-glub... sorry, been listening to those fish-men too long.',
   },
   foreman_odell: {
     id: 'foreman_odell',
@@ -887,7 +890,13 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     // Professions 2.0: the Apothecary pair's (alchemy + cooking) anchor
     // master. Attunement, make-amends return, and the repeatable kitchens work
     // order live here.
-    questIds: ['q_prof_attune_apothecary', 'q_prof_amends_apothecary', 'q_prof_workorder_kitchens'],
+    questIds: [
+      'q_prof_attune_apothecary',
+      'q_prof_amends_apothecary',
+      'q_prof_workorder_kitchens',
+      'q_prof_workorder_kitchens_wheat',
+      'q_prof_workorder_kitchens_rice',
+    ],
     vendorItems: [
       'baked_bread',
       'spring_water',
@@ -950,6 +959,36 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     greeting:
       'Springs, sprockets, and sharp edges, $C: the toolworks has whatever your hands lack.',
   },
+  // The farming go-live: the tier-1 farmer, the face of the Eastbrook
+  // allotments (content/farm_patches.ts patch_eastbrook) and the front door
+  // of the profession (q_farm_intro). She stands 6 yd off the patch anchor on
+  // its +x side (the world's WEST, per the compass note above the camps) at
+  // the harbor town's north-east edge: 20 yd from the civic center, 20 yd off
+  // the nearest lane, 48 yd outside the nearest camp disc. She carries an
+  // INLINE pos rather than an eastbrook_layout row: the layout is the town's
+  // placement table and she is not a town NPC. Facing the beds (atan2(dx, dz)
+  // toward the patch anchor: -x from where she stands). Her stock is the D9/D11 opening counter:
+  // tier-1 seeds, the one vendor-priced produce (brook_carrot, the starter
+  // watch fee), compost, and the rung-one hoe; tier 3/4 seeds and the crafted
+  // hoes are stocked NOWHERE (tests/professions_zone_rollout.test.ts). Her
+  // placement (never nudged by findSafePos, beside the beds, off the road,
+  // in her zone) is pinned by tests/farmer_npc_placement.test.ts.
+  farmer_jessica: {
+    id: 'farmer_jessica',
+    name: 'Farmer Jessica',
+    title: 'Allotment Keeper',
+    pos: { x: -15.5, z: -81.5 },
+    facing: -Math.PI / 2,
+    color: 0xa8843a,
+    questIds: ['q_farm_intro'],
+    vendorItems: ['vale_wheat_seed', 'brook_carrot_seed', 'brook_carrot', 'compost', 'garden_hoe'],
+    farmer: true,
+    // The two teaching sentences below are pinned VERBATIM (the go-live
+    // greeting arm): the anti-chore promise, and the pointer to the Harvest
+    // Journal, the one durable surface that shows every planted bed's timer.
+    greeting:
+      'Good soil and fair weather, $N. Buy a seed from me, sow it in one of those beds, and go about your day. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer.',
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -991,6 +1030,60 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     // re-grants it if it is ever lost, exactly like a prerequisite quest item.
     requiredItems: ['copper_mining_pick'],
   },
+  // Farming onboarding (the farming go-live, D20): the profession's front
+  // door, on the q_prof_intro template. Two ACTION objectives on the farm
+  // arm of the objective union (plant one Vale Wheat in the Eastbrook patch,
+  // then harvest it), credited by the plant and harvest commands themselves
+  // (quests/quest_credit.ts): inventory ownership cannot prove a harvest,
+  // since produce also arrives from the market and work-order pouches. No
+  // minLevel and no prerequisite: like q_prof_intro it is a level-1 entry
+  // point at its own NPC. Fallback grants: the rung-one hoe (the step-12
+  // hoe gate refuses a bare-handed plant) and ONE seed, so a day-one
+  // character with zero copper is never dead-ended at the first bed. NOTE
+  // the seed is CONSUMED by planting, and requiredItems re-grants on every
+  // giver talk while the quest is ACTIVE, so this is a small free-seed
+  // faucet: one 4-copper seed per talk, bounded by the beds a player can
+  // hold planted before the first harvest turns the quest ready (the
+  // re-grant runs for active quests only, never once ready or done). The
+  // seed itself is fenced (noVendorSell, noMarketList: no vendor, market,
+  // mail, or guild-bank cash-out), so the faucet feeds beds, not coin;
+  // face-to-face trade is the one exchange pipe that does not read those
+  // flags (a cooperative pair can pass free seeds). That exception is accepted
+  // at go-live.
+  q_farm_intro: {
+    id: 'q_farm_intro',
+    name: 'First Furrow',
+    giverNpcId: 'farmer_jessica',
+    turnInNpcId: 'farmer_jessica',
+    text: 'Take this hoe and a pinch of vale wheat seed, $N. Sow the seed in one of the beds beside me, then go about your business. Come back whenever you like and bring the crop in; I will be here.',
+    // The two teaching sentences are pinned VERBATIM by
+    // tests/farm_intro_quest_content.test.ts (the D20 magic sentence and the
+    // Harvest Journal pointer, the same two Jessica's greeting carries).
+    completionText:
+      'There, your first crop in your own hands. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer. Come back for seed whenever the beds call you, $N.',
+    objectives: [
+      {
+        type: 'farm',
+        action: 'plant',
+        cropId: 'vale_wheat',
+        patchId: 'patch_eastbrook',
+        count: 1,
+        label: 'Vale Wheat planted',
+      },
+      {
+        type: 'farm',
+        action: 'harvest',
+        cropId: 'vale_wheat',
+        patchId: 'patch_eastbrook',
+        count: 1,
+        label: 'Vale Wheat harvested',
+      },
+    ],
+    xpReward: 150,
+    copperReward: 50,
+    itemRewards: {},
+    requiredItems: ['garden_hoe', 'vale_wheat_seed'],
+  },
   q_wolves: {
     id: 'q_wolves',
     name: 'Wolves at the Door',
@@ -1012,7 +1105,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     turnInNpcId: 'marshal_redbrook',
     text: "There is one wolf no trap has held: Old Greyjaw. He has taken three hounds and a stable boy's arm. He prowls the deep woods north of the wolf runs. Bring me his fang.",
     completionText:
-      'So the old devil is dead at last. The stable boy will sleep easier — and so will I.',
+      'So the old devil is dead at last. The stable boy will sleep easier, and so will I.',
     objectives: [
       { type: 'collect', itemId: 'greyjaw_fang', count: 1, label: "Old Greyjaw's Fang" },
     ],
@@ -1058,7 +1151,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'Trouble at the Lake',
     giverNpcId: 'fisherman_brandt',
     turnInNpcId: 'fisherman_brandt',
-    text: 'Twenty years I have fished Mirror Lake, and never lost a net until those gurgling fish-men crawled out of the shallows. Drive the Mudfin back — slay 8 of them. And watch yourself: where there is one mudfin, there are five.',
+    text: 'Twenty years I have fished Mirror Lake, and never lost a net until those gurgling fish-men crawled out of the shallows. Drive the Mudfin back: slay 8 of them. And watch yourself: where there is one mudfin, there are five.',
     completionText: 'Hah! That will teach them to mind their own mudholes.',
     objectives: [
       { type: 'kill', targetMobId: 'mudfin_murloc', count: 8, label: 'Mudfin Skulker slain' },
@@ -1074,7 +1167,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     giverNpcId: 'foreman_odell',
     turnInNpcId: 'foreman_odell',
     text: 'We struck a fine copper vein and then those burrowing vermin came boiling out of the hillside. My crew will not set foot in the dig until it is cleared. Put down 10 Deeprock Diggers.',
-    completionText: 'Ha! Back to work, lads! You have my thanks — and my coin.',
+    completionText: 'Ha! Back to work, lads! You have my thanks, and my coin.',
     objectives: [
       { type: 'kill', targetMobId: 'tunnel_rat', count: 10, label: 'Deeprock Digger slain' },
     ],
@@ -1124,7 +1217,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'Whispers Below',
     giverNpcId: 'brother_aldric',
     turnInNpcId: 'brother_aldric',
-    text: 'You have laid the dead to rest, but they will not stay resting — something calls them back. Search the chapel ruin for any trace of the one doing the calling. If you find a sigil or seal, bring it to me untouched.',
+    text: 'You have laid the dead to rest, but they will not stay resting: something calls them back. Search the chapel ruin for any trace of the one doing the calling. If you find a sigil or seal, bring it to me untouched.',
     completionText:
       'This sigil... it bears the mark of the Gravecallers, a sect I had prayed was extinct. This is worse than I feared, $N.',
     objectives: [
@@ -1140,9 +1233,9 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'The Names of the Dead',
     giverNpcId: 'brother_aldric',
     turnInNpcId: 'brother_aldric',
-    text: 'If the Gravecallers raised our dead, I must know whose graves they robbed. The chapel sexton kept a burial ledger, and the wind has scattered its pages across the chapel yard. Gather 3 of them for me, $N — the dead deserve to be called by their names.',
+    text: 'If the Gravecallers raised our dead, I must know whose graves they robbed. The chapel sexton kept a burial ledger, and the wind has scattered its pages across the chapel yard. Gather 3 of them for me, $N. The dead deserve to be called by their names.',
     completionText:
-      "These poor souls... and look here. Sexton Marrow — the chapel's own living caretaker — his grave the first disturbed. Morthen began with the very man who buried Eastbrook's dead.",
+      "These poor souls... and look here. Sexton Marrow, the chapel's own living caretaker, his grave the first disturbed. Morthen began with the very man who buried Eastbrook's dead.",
     objectives: [
       {
         type: 'collect',
@@ -1163,7 +1256,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     turnInNpcId: 'brother_aldric',
     text: "Every name in that ledger is a soul Morthen means to drag from the earth, and the chapel yard already crawls with those he has called. Return 12 Restless Bones to their graves, $N, before the Gravecaller's whisper swells into a chorus.",
     completionText:
-      'The yard grows quieter — but the calling has not stopped. It rises from below now, $N. From the crypt itself.',
+      'The yard grows quieter, but the calling has not stopped. It rises from below now, $N. From the crypt itself.',
     objectives: [
       { type: 'kill', targetMobId: 'restless_bones', count: 12, label: 'Restless Bones silenced' },
     ],
@@ -1177,7 +1270,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'The Binding Rite',
     giverNpcId: 'brother_aldric',
     turnInNpcId: 'brother_aldric',
-    text: "The crypt beneath the chapel must be unsealed if we are to stop the Gravecaller — but only a binding rite will let the living pass. I need 4 lumps of Blessed Tallow — the mine's burrowers hoard tallow by the crate — and 6 Ghostly Essences from the restless dead.",
+    text: "The crypt beneath the chapel must be unsealed if we are to stop the Gravecaller, but only a binding rite will let the living pass. I need 4 lumps of Blessed Tallow (the mine's burrowers hoard tallow by the crate) and 6 Ghostly Essences from the restless dead.",
     completionText:
       'It is done. The way below stands open... and may the Light forgive me for opening it. Gather your strongest companions before you descend, $N. No one should face the Hollow alone.',
     objectives: [
@@ -1194,9 +1287,9 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'Into the Hollow',
     giverNpcId: 'brother_aldric',
     turnInNpcId: 'brother_aldric',
-    text: "Morthen the Gravecaller waits at the bottom of the Hollow Crypt, ringed by the elite dead he has raised. He is far beyond any one hero — take four companions, no fewer. End him, and the Vale's dead will finally sleep.",
+    text: "Morthen the Gravecaller waits at the bottom of the Hollow Crypt, ringed by the elite dead he has raised. He is far beyond any one hero: take four companions, no fewer. End him, and the Vale's dead will finally sleep.",
     completionText:
-      'The whispering has stopped. You have done what the whole Vale could not, $N — the dead sleep, and Eastbrook owes you everything it has.',
+      'The whispering has stopped. You have done what the whole Vale could not, $N. The dead sleep, and Eastbrook owes you everything it has.',
     objectives: [
       { type: 'kill', targetMobId: 'morthen', count: 1, label: 'Morthen the Gravecaller slain' },
     ],
@@ -1215,9 +1308,9 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: "The Sexton's Bell",
     giverNpcId: 'brother_aldric',
     turnInNpcId: 'brother_aldric',
-    text: "The ledger named him and the crypt holds him: Sexton Marrow, the chapel's caretaker, the first man Morthen raised — guarding his master's door in death as faithfully as he kept the chapel in life. Take four companions into the Hollow Crypt and grant the old sexton the rest he was robbed of, $N.",
+    text: "The ledger named him and the crypt holds him: Sexton Marrow, the chapel's caretaker, the first man Morthen raised, guarding his master's door in death as faithfully as he kept the chapel in life. Take four companions into the Hollow Crypt and grant the old sexton the rest he was robbed of, $N.",
     completionText:
-      'So Marrow is free at last. Ring no bell for him — he heard enough of them in life.',
+      'So Marrow is free at last. Ring no bell for him: he heard enough of them in life.',
     objectives: [
       { type: 'kill', targetMobId: 'sexton_marrow', count: 1, label: 'Sexton Marrow laid to rest' },
     ],
@@ -1236,9 +1329,9 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: "The Gravecaller's Trail",
     giverNpcId: 'brother_aldric',
     turnInNpcId: 'brother_aldric',
-    text: 'Morthen is dead, yet a question gnaws at me: a sect that hid for a century does not spend itself on one village chapel. He kept a grimoire — his rites, his correspondence. If anything of it survives, it lies in the vestry of the ruined chapel above the crypt. Search the ruin and bring me whatever remains of his writings, $N.',
+    text: 'Morthen is dead, yet a question gnaws at me: a sect that hid for a century does not spend itself on one village chapel. He kept a grimoire: his rites, his correspondence. If anything of it survives, it lies in the vestry of the ruined chapel above the crypt. Search the ruin and bring me whatever remains of his writings, $N.',
     completionText:
-      "Morthen wrote to a 'Fogbinder' in the northern fen. The sect is not dead, $N — it has merely been patient.",
+      "Morthen wrote to a 'Fogbinder' in the northern fen. The sect is not dead, $N. It has merely been patient.",
     objectives: [
       { type: 'collect', itemId: 'morthen_grimoire', count: 1, label: "Morthen's Grimoire" },
     ],
@@ -1280,7 +1373,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     giverNpcId: 'marshal_redbrook',
     turnInNpcId: 'marshal_redbrook',
     text: 'A pack of cutthroats has made camp in the northwest hills. They have robbed three wagons this week. Drive them out: slay 10 Vale Bandits.',
-    completionText: 'Ten fewer knives in the dark. Take this — you have earned it.',
+    completionText: 'Ten fewer knives in the dark. Take this: you have earned it.',
     objectives: [
       { type: 'kill', targetMobId: 'vale_bandit', count: 10, label: 'Vale Bandit slain' },
     ],
@@ -1545,6 +1638,49 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     shareable: false,
     repeatCadenceTicks: WORK_ORDER_CADENCE_TICKS,
   },
+  // Farming go-live: the kitchens take the two early-tier crops off a
+  // farmer's hands on the same work-order contract (fungible produce only:
+  // farming's fine twins have no downward grade substitution, so a Fine Vale
+  // Wheat never fills a plain-wheat order). Two rows, one per early tier, so
+  // both the Eastbrook and the Fenbridge beds have a coin sink from day one.
+  q_prof_workorder_kitchens_wheat: {
+    id: 'q_prof_workorder_kitchens_wheat',
+    name: 'Kitchens Wheat Order',
+    giverNpcId: 'cook_marlow',
+    turnInNpcId: 'cook_marlow',
+    text: 'Bread does not bake itself, $N, and my flour bins are scraping bottom. Bring me eight sheaves of vale wheat and I will pay you honest coin for the lot. Grown by your own hand or bought off the market, I do not care, so long as it grinds.',
+    completionText:
+      'Good dry grain, and plenty of it. There is your pay, counted out. When the next crop comes in, you know which door to knock on.',
+    objectives: [
+      { type: 'collect', itemId: 'vale_wheat', count: 8, label: 'Vale Wheat delivered' },
+    ],
+    xpReward: 100,
+    // floor(0.5 * 8 * 4) = 16 (vale_wheat sellValue 4).
+    copperReward: 16,
+    itemRewards: {},
+    repeatable: true,
+    shareable: false,
+    repeatCadenceTicks: WORK_ORDER_CADENCE_TICKS,
+  },
+  q_prof_workorder_kitchens_rice: {
+    id: 'q_prof_workorder_kitchens_rice',
+    name: 'Kitchens Rice Order',
+    giverNpcId: 'cook_marlow',
+    turnInNpcId: 'cook_marlow',
+    text: 'The marsh folk swear by their rice, $N, and I mean to find out why. Fetch me five measures of marsh rice and there is coin waiting for you here. Keep it dry on the road, mind: wet rice is porridge, and I did not order porridge.',
+    completionText:
+      'Plump and dry, every grain. Here is your coin. If the marsh keeps giving, so do I.',
+    objectives: [
+      { type: 'collect', itemId: 'marsh_rice', count: 5, label: 'Marsh Rice delivered' },
+    ],
+    xpReward: 100,
+    // floor(0.5 * 5 * 8) = 20 (marsh_rice sellValue 8).
+    copperReward: 20,
+    itemRewards: {},
+    repeatable: true,
+    shareable: false,
+    repeatCadenceTicks: WORK_ORDER_CADENCE_TICKS,
+  },
   q_prof_workorder_loom: {
     id: 'q_prof_workorder_loom',
     name: 'Loom Work Order',
@@ -1620,6 +1756,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
 
 export const ZONE1_QUEST_ORDER = [
   'q_prof_intro',
+  'q_farm_intro',
   'q_wolves',
   'q_boars',
   'q_spiders',
@@ -1649,6 +1786,8 @@ export const ZONE1_QUEST_ORDER = [
   'q_prof_amends_bombardier',
   'q_prof_workorder_forge',
   'q_prof_workorder_kitchens',
+  'q_prof_workorder_kitchens_wheat',
+  'q_prof_workorder_kitchens_rice',
   'q_prof_workorder_loom',
   'q_prof_workorder_toolworks',
   'q_prof_hobby_switch',

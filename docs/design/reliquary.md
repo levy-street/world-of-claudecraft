@@ -495,12 +495,30 @@ evaluated over the ownership options.
   weapon skins are `store`. The **Rift gear exclusion is permanent**: derived
   tier-mirror pools paid out as one uniform pick are not a route a player can
   aim at a single relic, so they are not listed. The reins ladder IS such a
-  route and is listed.
+  route and is listed. The **recipe-pattern exclusion is likewise permanent**
+  (Phase 11 of the Masterwrought packet): `kind: 'recipe'` pattern items are
+  repeatable, tradable, consumed-on-learn knowledge, not conquerable unique
+  loot, so no pattern takes a page; the derivation-side carve-out and its
+  exactly-matching vacuity guard live in `tests/reliquary_content.test.ts`.
 - **Obtain counts omit at zero, widened.** A movement grant at ANY clear-meter
   value must not stamp a clear count. A market buy at 12 clears must never
   print "first found on clear 12": that is the same fabricated-provenance class
   the zero case refuses. Both the tooltip and the aria line drop together when
   the stamp is absent.
+- **A player-named legendary INSTANCE takes no page and no rung.** The
+  promotion that raises a Perfected copy stamps `rolled.quality: 'legendary'`
+  and a player-chosen name on ONE copy and mints no item def, while Reliquary
+  state is def-keyed and mark-keyed by construction (rules 3 and 5, and
+  `serializeReliquaryState`), so a rung keyed on the named copy sits outside
+  the model rather than merely unbuilt. The Book of Deeds carries the whole
+  cosmetic record with two credits, `col_first_legendary` and
+  `prog_legendmaker`. A bounded instance-CLASS mark is declined on the same
+  ruling: it would say only that a promotion happened, which both deeds already
+  say. Note the ground, which is the def-keyed model and NOT a conquerability
+  claim: an earlier decline of a crafted item rested on conquerability and was
+  right for the wrong reason, since this shelf does catalogue crafted uniques.
+  Masterwrought ruling `qr-19-named-legendary-instance-reliquary-page`
+  (2026-09-01) settled this instance-versus-definition boundary.
 
 ## Migration hazards (one-way contracts)
 
@@ -551,14 +569,26 @@ intentional and pinned by a test.
   rows in those lists; the suite cannot catch an author opting itself out.
 - **Uncatalogued rare-plus items remain** repo-wide, all of them open-world or
   Rift sourced. That is a known backlog, not a drift bug.
-- **Three catalog slots are permanently unfillable today** and keep 100 percent
+- **Two catalog slots are permanently unfillable today** and keep 100 percent
   catalog completion (and therefore the whole-catalog capstone deed)
-  unreachable: the engineering masterwork mark (every engineering recipe
-  produces a slotless, statless tool, so the masterwork proc can never fire)
-  and two mount reins (one with no acquisition path, one dev-grant only). This
-  is why the capstone deed is marked as a feat and kept out of the Book
-  completion pair. See "Open owner calls" for the consequence that is still
-  undecided.
+  unreachable: two mount reins (one with no acquisition path, one dev-grant
+  only). The engineering masterwork mark was the third until masterwrought
+  Phase 11o (2026-08-25): its un-pend condition was met by copperlens_ocular,
+  a stats-bearing non-masterwrought engineering output, so craftIsGearCapable
+  flipped through the live gate rather than through the Phase 12 suppression
+  move the earlier note predicted, and the mark is earnable and hinted. R1
+  masterwork suppression still stands for the APEX def (craftBonusStatsFor in
+  crafting.ts returns null for masterwrought defs; gyrelens_array bakes
+  nothing). AMENDED 2026-08-26 (Masterwrought Phase 12): the effect-gate move
+  landed. A proc on an apex craft now grants a Perfecting head start
+  (perfectingHeadStart in resolveCraftForRecipe, stamping
+  ItemInstancePayload.perfecting) and reports CraftResult.masterwork, so the
+  masterwork mark family credits apex procs too; craftBonusStatsFor itself is
+  byte-unchanged (an apex def still bakes nothing), so the craftIsGearCapable
+  derivation and its pins do not move.
+  The two mount slots are why the capstone deed is marked as a feat and kept
+  out of the Book completion pair. See "Open owner calls" for the consequence
+  that is still undecided.
 - **Re-acquiring an already-discovered mount's reins never runs the completion
   ladder live**, because first-discovery fires once while mount ownership is
   possession-based. A player whose last missing relic is reins they once owned
@@ -578,7 +608,7 @@ intentional and pinned by a test.
   shipping binary, because the join-time retro pass grants every qualifying
   rank deed in the same session that then feeds the reconcile push.
   - **HOLD the registration of the whole-catalog capstone achievement** until
-    the three unfillable slots above land. The deed is unearnable until then,
+    the two unfillable slots above land. The deed is unearnable until then,
     and a registered impossible achievement is player-visible on both
     storefronts as a permanent 0.0 percent unlock rate.
   - Both mirrors default OFF, so nothing is live until they are enabled.

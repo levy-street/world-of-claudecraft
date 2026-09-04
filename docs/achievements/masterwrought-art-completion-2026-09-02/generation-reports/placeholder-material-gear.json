@@ -1,0 +1,1677 @@
+{
+  "schemaVersion": 1,
+  "batchId": "masterwrought-placeholder-material-gear-2026-09-02",
+  "generatedOn": "2026-09-02",
+  "worktree": "/Users/fernando/Documents/wocc-masterwrought",
+  "contractId": "woc-item-icon-v1",
+  "scope": {
+    "requestedCount": 38,
+    "acceptedCount": 38,
+    "retriedCount": 0,
+    "reusedAcceptedCandidateIds": ["wyrmfall_core"],
+    "outputDirectory": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear"
+  },
+  "generationPolicy": {
+    "mode": "built-in image_gen",
+    "oneCallPerIcon": true,
+    "spriteSheetsUsed": false,
+    "currentPlaceholderRole": "identity-only anti-reference",
+    "styleReferencePolicy": "Only canonical approved anchors from docs/design/item-icon-art-style.md were used as style references.",
+    "sourcePreservation": "Every selected original remains at originalGeneratedPath; accepted byte-identical copies are in outputDirectory."
+  },
+  "review": {
+    "masterInspection": "Every generated master was inspected in family montages; Sundered Essence was also inspected at full 1254px source size.",
+    "smallSizeInspection": [
+      "128px color",
+      "22px downsample enlarged with nearest-neighbor for legibility review",
+      "28px grayscale downsample enlarged for value review",
+      "64px circular crop"
+    ],
+    "batchFindings": [
+      "All 38 accepted masters are 1254x1254 sRGB, three-channel, fully opaque PNGs.",
+      "All accepted-master SHA-256 hashes are unique.",
+      "No visible text, pseudo-writing, UI chrome, baked border, watermark, checkerboard, transparency, mannequin, hand-held presentation, or cropped subject was found.",
+      "Copper, iron, and live-name Osmium jewelry progress through distinct silhouettes and workmanship; no thorium identity was rendered.",
+      "Sheenleaf, Goldleaf, and Sunpetal books and scrolls share a deliberate leaf-to-solar family while staying materially and compositionally distinct.",
+      "The Wardspeaker mail, Briar/Fen/Barksong leather, and Sunspun cloth mini-sets share family palettes without duplicate silhouettes.",
+      "Temporary review contact sheets were used for inspection and are not part of this handoff's deliverable scope."
+    ],
+    "retries": "No hard violation required a retry."
+  },
+  "items": [
+    {
+      "id": "barksong_handguards",
+      "liveName": "Barksong Handguards",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Barksong Handguards (item id barksong_handguards) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its paired russet-olive leather gloves with bark-ribbed backs identity, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile garment, leather and material rendering, dark value range, and equipment composition only; do not copy their unrelated objects.\nSubject and identity: one compact natural pair of epic leather handguards: articulated russet-brown gloves with dark-olive cuffs and overlapping bark-textured leather plates protecting each hand back, joined by sturdy green stitching. They belong to the russet-and-olive Briar/Fen/Barksong leather set and must read immediately as hand-slot equipment, not severed hands, gardening gloves, gauntlets of wood, a branch pile, claws, or UI shapes.\nComposition: one centered complete pair of gloves arranged together with palms angled inward and slight three-quarter depth, about 72 percent subject fill, safe padding on every side, fingers, cuffs, and bark-ribbed back plates readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep umber-charcoal with restrained woodland-green atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile worn leather grain, flexible finger joints, dark olive suede, fibrous stitching, and subtle bark-like surface plates; crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; one compact natural pair constituting one equipment item; borderless; no text, letters, numbers, labels, runes, pseudo-writing, generic magical sigils, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hands or arms inside, skin, body, mannequin, environmental scene, living branches, or cropped silhouette. Do not reproduce any unrelated object from the references.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/barksong_handguards.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/cinderweave_raiment.webp",
+          "role": "canonical approved style reference: cloth, garment silhouette, controlled dark values"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/linen_pouch.webp",
+          "role": "canonical approved style reference: soft goods, leather, compact three-quarter volume"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-e16cdbbd-437f-4f84-a7de-1242801a2205.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/barksong_handguards.png",
+      "acceptedMaster": {
+        "sha256": "adbd37767be5afbd3d6ea73c588c543efbf485fc251610914b1ce2c898b5475c",
+        "bytes": 2278650,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation after master, 128px, 22px, 28px grayscale, and 64px circular-crop inspection; identity, complete padding, tactile material, lighting, opacity, and forbidden-mark checks passed."
+    },
+    {
+      "id": "briarstep_jerkin",
+      "liveName": "Briarstep Jerkin",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Briarstep Jerkin (item id briarstep_jerkin) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its sleeveless russet leather torso garment, olive undertone, and thorn-laced front identity, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile garment, leather and material rendering, dark value range, and equipment composition only; do not copy their unrelated objects.\nSubject and identity: one epic sleeveless leather jerkin made from layered russet-brown hide over a dark olive lining, with an angular open collar, fitted waist, bark-textured shoulder caps, and thick crossing laces whose knotted ends resemble natural briar tips without becoming actual branches. It belongs to the russet-and-olive Briar/Fen/Barksong leather set and must read immediately as chest-slot equipment, not a vest worn on a person, corset, wooden armor, plant creature, or UI panel.\nComposition: one centered complete front-facing torso garment with slight three-quarter depth, about 72 percent subject fill, safe padding on every side, collar, shoulders, waist hem, and laced construction readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep umber-charcoal with restrained moss-green atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile worn leather grain, hand-cut edges, dark olive suede, fibrous laces, subtle bark-like tooling, crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; exactly one complete chest garment; borderless; no text, letters, numbers, labels, runes, pseudo-writing, generic magical sigils, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, body, head, skin, hands, mannequin, hanger, environmental scene, living vines, or cropped silhouette. Do not reproduce any unrelated object from the references.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/briarstep_jerkin.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/cinderweave_raiment.webp",
+          "role": "canonical approved style reference: cloth, garment silhouette, controlled dark values"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/linen_pouch.webp",
+          "role": "canonical approved style reference: soft goods, leather, compact three-quarter volume"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-3dc00b44-d7ea-497d-b9b8-835cb8c08b35.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/briarstep_jerkin.png",
+      "acceptedMaster": {
+        "sha256": "816831e68649657036528b81e074a94d4f8216498c713565338970761a75d082",
+        "bytes": 2186522,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation after master, 128px, 22px, 28px grayscale, and 64px circular-crop inspection; identity, complete padding, tactile material, lighting, opacity, and forbidden-mark checks passed."
+    },
+    {
+      "id": "burnished_thorium_amulet",
+      "liveName": "Burnished Osmium Amulet",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Burnished Osmium Amulet (item id burnished_thorium_amulet) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its chain-and-green-pendant identity, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile metal rendering, dark value range, and composition only; do not copy their unrelated objects.\nSubject and identity: one rare agile Osmium neck amulet: a short, neatly arranged fine gunmetal chain supporting one angular kite-shaped burnished Osmium pendant with a polished green gemstone held in plain functional claws. It must read as precision-made high-tier neck jewelry, not a loose chain pile, finger ring, necklace on a body, compass, shield, or UI symbol.\nComposition: one centered complete necklace laid in a compact inverted-teardrop silhouette with slight three-quarter depth, about 72 percent subject fill, safe padding on every side, the chain arc and angular green pendant readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal and moss-black painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile dense Osmium with warm burnished planes, crisp silver-blue edge highlights, finely separated chain links, and a restrained emerald focal glint; crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; exactly one complete piece of jewelry; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, or cropped silhouette. Do not render thorium: the live item material is Osmium. Do not reproduce any unrelated object from the references.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/burnished_thorium_amulet.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/kingsbane_last_oath.webp",
+          "role": "canonical approved style reference: forged-metal rendering, crisp focal edge, safe silhouette padding"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/firebottle.webp",
+          "role": "canonical approved style reference: glass or ceramic vessel, contained glow, readable liquid"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-2c8e1470-34d2-48d2-a744-c807006bcca0.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/burnished_thorium_amulet.png",
+      "acceptedMaster": {
+        "sha256": "77d61bd9abdf9a76532706fb7d46370cd35eefc91cf1ffc458a469f6ceb07f34",
+        "bytes": 1997162,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation after master, 128px, 22px, 28px grayscale, and 64px circular-crop inspection; identity, complete padding, tactile material, lighting, opacity, and forbidden-mark checks passed."
+    },
+    {
+      "id": "coiled_copper_torc",
+      "liveName": "Coiled Copper Torc",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Coiled Copper Torc (item id coiled_copper_torc) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its authored semantic motif and palette, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile material rendering, dark value range, and composition only; do not copy their unrelated objects.\nSubject and identity: one open neck torc built from three tightly coiled copper strands, with a broad horseshoe silhouette and two small teal-green stone terminals at the open ends. It must read as agile neck jewelry, not a finger ring, rope, portal, horseshoe, or UI circle.\nComposition: one centered complete open torc facing forward with slight three-quarter depth, about 72 percent subject fill, safe padding on every side, the open neck shape and paired terminals readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal and moss-brown painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile twisted copper wire with warm wear, dark grooves between coils, and restrained polished green-stone terminals; crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; exactly one tangible object; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, or cropped silhouette. Do not reproduce any unrelated object from the references.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/coiled_copper_torc.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/kingsbane_last_oath.webp",
+          "role": "canonical approved style reference: forged-metal rendering, crisp focal edge, safe silhouette padding"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/firebottle.webp",
+          "role": "canonical approved style reference: glass or ceramic vessel, contained glow, readable liquid"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-ed1828b3-f623-4251-aa8d-3ee17a9fcfb3.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/coiled_copper_torc.png",
+      "acceptedMaster": {
+        "sha256": "46f3baa81f39bfd6b6d3e50070d81da94ed0dca18f792fb2da8f888d7e48e49a",
+        "bytes": 2118657,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation after master, 128px, 22px, 28px grayscale, and 64px circular-crop inspection; identity, complete padding, tactile material, lighting, opacity, and forbidden-mark checks passed."
+    },
+    {
+      "id": "duskforged_billet",
+      "liveName": "Duskforged Billet",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Duskforged Billet (item id duskforged_billet) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its blue-black rectangular ingot with restrained warm forge-veins, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile hard-material rendering, dark value range, and composition only; do not copy their unrelated objects.\nSubject and identity: one masterwork blacksmithing billet, a compact rectangular bar of dense blue-black forged metal with slightly chamfered ends, hammer-planished facets, and two restrained orange-hot seams cooling beneath the surface. It must read as a tangible weapon blank and valuable intermediate, not a finished blade, generic rock, battery, UI bar, or magic rune.\nComposition: one centered complete billet on a strong shallow diagonal in readable three-quarter view, about 72 percent subject fill, safe padding on every side, both ends and the solid ingot thickness readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal and forge-brown painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile planished blue-black metal, broad reflected values, crisp edge wear, and controlled subsurface forge warmth subordinate to the ingot silhouette; crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; exactly one solid metal billet; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, forge scene, environmental scene, finished weapon, or cropped silhouette. Do not reproduce any unrelated object from the references.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/duskforged_billet.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/arcanite_mining_pick.webp",
+          "role": "canonical approved style reference: hard-material rendering and restrained magic"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/kingsbane_last_oath.webp",
+          "role": "canonical approved style reference: forged-metal rendering, crisp focal edge, safe silhouette padding"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-9689367e-8f78-42da-b70a-fa836f58ebc3.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/duskforged_billet.png",
+      "acceptedMaster": {
+        "sha256": "9a3664c8745a69f71c0d3229657dde055fae780e384b94f42afb66ab7330c602",
+        "bytes": 1993898,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation after master, 128px, 22px, 28px grayscale, and 64px circular-crop inspection; identity, complete padding, tactile material, lighting, opacity, and forbidden-mark checks passed."
+    },
+    {
+      "id": "etched_iron_loop",
+      "liveName": "Etched Iron Loop",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Etched Iron Loop (item id etched_iron_loop) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its authored semantic motif and palette, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile metal rendering, dark value range, and composition only; do not copy their unrelated objects.\nSubject and identity: one slender cold-iron finger ring with an uninterrupted circular silhouette, shallow repeating geometric grooves around the band that are decorative tooling rather than writing, and a small cool-blue polished steel bead set low into the crown. It must read as intellect-oriented iron jewelry and remain clearly slimmer and cleaner than Riveted Iron Signet, not a portal, bearing, button, or UI ring.\nComposition: one centered complete slender ring in readable three-quarter view, about 72 percent subject fill, safe padding on every side, the fine grooved band, open center, and cool-blue crown readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep navy-charcoal with restrained umber painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile dark iron polished at the edges, softly etched non-symbolic grooves, subtle oxidation, and a cool blue specular accent; crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; exactly one complete piece of jewelry; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, or cropped silhouette. Do not reproduce any unrelated object from the references. Do not render thorium: the live item material is Osmium wherever that name appears.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/etched_iron_loop.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/kingsbane_last_oath.webp",
+          "role": "canonical approved style reference: forged-metal rendering, crisp focal edge, safe silhouette padding"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/firebottle.webp",
+          "role": "canonical approved style reference: glass or ceramic vessel, contained glow, readable liquid"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-575a578a-6450-4cf2-b987-a64cf364620b.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/etched_iron_loop.png",
+      "acceptedMaster": {
+        "sha256": "8dad88779f29730b4725fd7dd9a7ee8a590038072ae6a6ab4d6e80ec378c5155",
+        "bytes": 1897734,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation after master, 128px, 22px, 28px grayscale, and 64px circular-crop inspection; identity, complete padding, tactile material, lighting, opacity, and forbidden-mark checks passed."
+    },
+    {
+      "id": "fenbloom_breeches",
+      "liveName": "Fenbloom Breeches",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Fenbloom Breeches (item id fenbloom_breeches) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its olive-green leather trousers, russet reinforcement, and small fen-flower accent identity, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile garment, leather and material rendering, dark value range, and equipment composition only; do not copy their unrelated objects.\nSubject and identity: one epic pair of supple dark-olive leather breeches with a broad russet waist yoke, reinforced knees, narrow wrap ties at the calves, and one tiny pale marsh-flower clasp at the hip. They belong to the russet-and-olive Briar/Fen/Barksong leather set and must read immediately as leg-slot equipment, not pants worn on a body, waders, boots, gardening clothes, plant creature, or UI columns.\nComposition: one centered complete pair of breeches facing forward with slight three-quarter depth, about 72 percent subject fill, safe padding on every side, waist, knees, cuffs, and leg separation readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep moss-charcoal and wet umber painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile oiled leather grain, dark olive suede folds, russet wear panels, natural fiber ties, and a restrained pale floral accent; crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; exactly one leg-slot garment; borderless; no text, letters, numbers, labels, runes, pseudo-writing, generic magical sigils, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, body, skin, feet, hands, mannequin, hanger, environmental scene, living plants, or cropped silhouette. The tiny flower clasp is one intentional material ornament. Do not reproduce any unrelated object from the references.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/fenbloom_breeches.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/cinderweave_raiment.webp",
+          "role": "canonical approved style reference: cloth, garment silhouette, controlled dark values"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/linen_pouch.webp",
+          "role": "canonical approved style reference: soft goods, leather, compact three-quarter volume"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-a8bb4490-b1bf-4832-83cc-aeb47388ece3.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/fenbloom_breeches.png",
+      "acceptedMaster": {
+        "sha256": "4658e6bd464b998e298fed609d3e91601850bfdb9cd8228bb46bdbc752f4175e",
+        "bytes": 2152315,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation after master, 128px, 22px, 28px grayscale, and 64px circular-crop inspection; identity, complete padding, tactile material, lighting, opacity, and forbidden-mark checks passed."
+    },
+    {
+      "id": "forgefold_legguards",
+      "liveName": "Forgefold Legguards",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Forgefold Legguards (item id forgefold_legguards) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its paired articulated blue-black metal leg armor with restrained warm fasteners identity, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile metal and cloth rendering, dark value range, and equipment composition only; do not copy their unrelated objects.\nSubject and identity: one integrated pair of epic mail legguards: blue-black overlapping steel thigh plates over dark-teal mail and leather, strong articulated knee cups, narrow greaves, and restrained warm-gold rivets and seam piping. They belong to the black-steel, teal, and gold Wardspeaker mail set and must read immediately as leg-slot equipment, not boots alone, loose scrap, robot legs, pants on a body, or UI columns.\nComposition: one compact natural pair of complete legguards facing forward with slight three-quarter depth, about 72 percent subject fill, safe padding on every side, waist join, thigh plates, knees, and lower guards all readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep navy-charcoal with restrained teal atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile hammered blue-black steel, dark flexible mail, worn leather joins, controlled silver edge highlights, and warm-gold fasteners; crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; one compact natural pair constituting one equipment item; borderless; no text, letters, numbers, labels, runes, pseudo-writing, generic magical sigils, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, body, waist flesh, hands, feet, mannequin, environmental scene, sci-fi robot styling, or cropped silhouette. Do not reproduce any unrelated object from the references.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/forgefold_legguards.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/arcanite_mining_pick.webp",
+          "role": "canonical approved style reference: hard-material rendering and restrained magic"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/cinderweave_raiment.webp",
+          "role": "canonical approved style reference: cloth, garment silhouette, controlled dark values"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-2d50a3fe-1cbb-4949-a5b6-17887caa355b.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/forgefold_legguards.png",
+      "acceptedMaster": {
+        "sha256": "b81d14c2836fd5ed9ce31458e2d3aa4f0ec086def1f09b7915e03095ec9b0615",
+        "bytes": 1965754,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation. The knee-and-shin construction has no feet and remains visibly distinct from the complete-foot silhouette of Wardspeaker Sabatons."
+    },
+    {
+      "id": "forgefold_plating",
+      "liveName": "Forgefold Plating",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Forgefold Plating (item id forgefold_plating) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its layered riveted armor-plate identity, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile metal and cloth rendering, dark value range, and composition only; do not copy their unrelated objects.\nSubject and identity: one joined masterwork mail-plating blank: three overlapping curved blue-black steel lamellae permanently riveted into a single articulated armor panel, with hammered fold lines and a narrow dark-teal backing visible at the edge. It must read as one flexible armor component awaiting tailoring, not three loose plates, a finished breastplate, shield, book, UI stack, or generic scrap.\nComposition: one centered complete joined armor panel in readable three-quarter view, about 72 percent subject fill, safe padding on every side, the overlap, rivets, curved thickness, and articulated construction readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal and cool blue-black painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile hammered steel, controlled silver-blue edge highlights, deep seams, worn rivets, and subtle fabric backing; crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; exactly one permanently joined armor component; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, finished body armor, shield, or cropped silhouette. Do not reproduce any unrelated object from the references.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/forgefold_plating.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/arcanite_mining_pick.webp",
+          "role": "canonical approved style reference: hard-material rendering and restrained magic"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/cinderweave_raiment.webp",
+          "role": "canonical approved style reference: cloth, garment silhouette, controlled dark values"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-7a4fedbe-ebf2-4737-a3ae-386cbb0ddf46.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/forgefold_plating.png",
+      "acceptedMaster": {
+        "sha256": "ab9fe4d39c28a2ab945c738c7cfa4c9432c8924edebc6ee7a41382d98566d966",
+        "bytes": 2072510,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation after master, 128px, 22px, 28px grayscale, and 64px circular-crop inspection; identity, complete padding, tactile material, lighting, opacity, and forbidden-mark checks passed."
+    },
+    {
+      "id": "gleaming_thorium_loop",
+      "liveName": "Gleaming Osmium Loop",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Gleaming Osmium Loop (item id gleaming_thorium_loop) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its bright circular-jewelry motif, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile metal rendering, dark value range, and composition only; do not copy their unrelated objects.\nSubject and identity: one rare intellect-oriented Osmium finger ring: a graceful slender continuous loop in gleaming pale blue-gunmetal, its crown swept into a subtle raised wave holding one small deep-blue sapphire bead. It must read as precise high-tier jewelry and remain visibly lighter and more elegant than Weighted Osmium Band, not a bracelet, bearing, portal, button, or UI circle.\nComposition: one centered complete graceful ring in readable three-quarter view, about 72 percent subject fill, safe padding on every side, the swept crown, open center, and blue stone readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep navy-charcoal and restrained umber painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile dense Osmium with smooth broad reflections, crisp silver-blue edge highlights, faint warm burnish, and a restrained sapphire glint; crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; exactly one complete piece of jewelry; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, or cropped silhouette. Do not render thorium: the live item material is Osmium. Do not reproduce any unrelated object from the references.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/gleaming_thorium_loop.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/kingsbane_last_oath.webp",
+          "role": "canonical approved style reference: forged-metal rendering, crisp focal edge, safe silhouette padding"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/firebottle.webp",
+          "role": "canonical approved style reference: glass or ceramic vessel, contained glow, readable liquid"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-e7a2f9a8-25d8-4f19-aa00-1fdf06e7ce89.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/gleaming_thorium_loop.png",
+      "acceptedMaster": {
+        "sha256": "829efe78cdddb553c0e8e0e39d8794441b48b32976b9c92e46243d9e7d4e8989",
+        "bytes": 1836806,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation after master, 128px, 22px, 28px grayscale, and 64px circular-crop inspection; identity, complete padding, tactile material, lighting, opacity, and forbidden-mark checks passed."
+    },
+    {
+      "id": "goldleaf_folio",
+      "liveName": "Goldleaf Folio",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Goldleaf Folio (item id goldleaf_folio) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its warm-gold closed-book and leaf-emblem identity, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile cloth, leather and metal rendering, dark value range, and composition only; do not copy their unrelated objects.\nSubject and identity: one artisan caster folio, a medium closed book bound in rich umber leather with layered gilded cover plates, goldleaf-shaped reinforced corners, one deliberate simple leaf boss on the cover, thick cream pages, and a sturdy side hinge clasp. It must read as a more refined tier than Sheenleaf Primer and as a held offhand, not a spell glyph, tablet, UI panel, loose manuscript, or generic modern notebook.\nComposition: one centered complete substantial folio in readable three-quarter view with its layered cover and page thickness visible, about 72 percent subject fill, safe padding on every side, crisp hinged silhouette readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep umber and charcoal painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile rich leather grain, layered page edges, controlled gilded highlights, crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; exactly one closed folio; borderless; no text, letters, numbers, labels, runes, pseudo-writing, random markings, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, loose pages, or cropped silhouette. The single leaf boss is an intentional material emblem, not writing. Do not reproduce any unrelated object from the references.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/goldleaf_folio.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/cinderweave_raiment.webp",
+          "role": "canonical approved style reference: cloth, garment silhouette, controlled dark values"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/linen_pouch.webp",
+          "role": "canonical approved style reference: soft goods, leather, compact three-quarter volume"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-92441779-3b01-40d1-aa45-13aca64e95c3.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/goldleaf_folio.png",
+      "acceptedMaster": {
+        "sha256": "ddabf3e29656719747a68c948b48609eec04f036a751fa4053ddf3b3a586a27b",
+        "bytes": 2260284,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation after master, 128px, 22px, 28px grayscale, and 64px circular-crop inspection; identity, complete padding, tactile material, lighting, opacity, and forbidden-mark checks passed."
+    },
+    {
+      "id": "goldleaf_scroll",
+      "liveName": "Goldleaf Scroll",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Goldleaf Scroll (item id goldleaf_scroll) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its rolled golden parchment and round goldleaf-seal identity, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile parchment, leather, cloth and metal rendering, dark value range, and composition only; do not copy their unrelated objects.\nSubject and identity: one refined consumable scroll, a complete blank warm-cream vellum roll with both curled ends visible, secured at the center by one narrow muted-gold ribbon and a round dark-amber wax seal bearing one simple pressed leaf silhouette. It must read as the middle stamina-scroll tier, richer than Sheenleaf Scroll but restrained below Sunpetal Scroll, not a generic paper tube, bandage, diploma, coin, spell glyph, or UI banner.\nComposition: one centered complete horizontal scroll with slight three-quarter depth, about 72 percent subject fill, safe padding on every side, both curled ends, central ribbon, and round leaf seal readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep umber and charcoal painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile fibrous vellum, softly worn curled edges, muted-gold woven ribbon, controlled amber wax highlight, crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; exactly one tied rolled scroll; its visible parchment must be completely blank; borderless; no text, letters, numbers, labels, runes, pseudo-writing, random ink marks, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, quill, loose pages, or cropped silhouette. The single pressed leaf seal is an intentional material emblem, not writing. Do not reproduce any unrelated object from the references.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/goldleaf_scroll.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/linen_pouch.webp",
+          "role": "canonical approved style reference: soft goods, leather, compact three-quarter volume"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/cinderweave_raiment.webp",
+          "role": "canonical approved style reference: cloth, garment silhouette, controlled dark values"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-0ffbe55f-6881-403e-a300-459f52003d33.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/goldleaf_scroll.png",
+      "acceptedMaster": {
+        "sha256": "7d1bb93e564f2af33424617832a4142ab9f36cd86bc7f4f44382329870006043",
+        "bytes": 2013333,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation. Blank vellum and the round Goldleaf seal remain distinct from the Sheenleaf and Sunpetal siblings at 22px."
+    },
+    {
+      "id": "hammered_copper_band",
+      "liveName": "Hammered Copper Band",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Hammered Copper Band (item id hammered_copper_band) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its authored semantic motif and palette, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile material rendering, dark value range, and composition only; do not copy their unrelated objects.\nSubject and identity: one stout red-copper finger ring with a visibly hand-hammered broad band, irregular forged facets, and one small round deep-red cabochon set flush near the crown. It must read as rugged strength-oriented beginner jewelry, not a bracelet, portal, tire, generic coin, or UI circle.\nComposition: one centered complete oversized ring in readable three-quarter view, about 72 percent subject fill, safe padding on every side, open center and hammered crown readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep umber and charcoal painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile warm copper with hammer marks, oxidized recesses, controlled metal highlights, and a restrained garnet glint; crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; exactly one tangible object; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, or cropped silhouette. Do not reproduce any unrelated object from the references.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/hammered_copper_band.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/kingsbane_last_oath.webp",
+          "role": "canonical approved style reference: forged-metal rendering, crisp focal edge, safe silhouette padding"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/firebottle.webp",
+          "role": "canonical approved style reference: glass or ceramic vessel, contained glow, readable liquid"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-c4e1d543-fbb4-4a69-ad18-9f6d46ea0b06.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/hammered_copper_band.png",
+      "acceptedMaster": {
+        "sha256": "237ac1318d9b52063e3379bb3b340f0ab96f926fbc0bce41bd0dd374173441d9",
+        "bytes": 2126263,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation after master, 128px, 22px, 28px grayscale, and 64px circular-crop inspection; identity, complete padding, tactile material, lighting, opacity, and forbidden-mark checks passed."
+    },
+    {
+      "id": "iron_link_choker",
+      "liveName": "Iron Link Choker",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Iron Link Choker (item id iron_link_choker) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its authored semantic motif and palette, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile metal rendering, dark value range, and composition only; do not copy their unrelated objects.\nSubject and identity: one short heavy neck choker assembled from broad oval black-iron chain links, ending in a central angular pendant mount holding one polished green cabochon. It must read as agile neck jewelry, not a loose chain pile, finger ring, necklace on a body, flail, or UI symbol.\nComposition: one centered complete chain choker in readable three-quarter view, about 72 percent subject fill, safe padding on every side, the collar arc, individual heavy links, and central green pendant readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal and moss-black painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile forged iron links with controlled edge wear and a restrained emerald-green focal glint; crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; exactly one complete piece of jewelry; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, or cropped silhouette. Do not reproduce any unrelated object from the references. Do not render thorium: the live item material is Osmium wherever that name appears.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/iron_link_choker.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/kingsbane_last_oath.webp",
+          "role": "canonical approved style reference: forged-metal rendering, crisp focal edge, safe silhouette padding"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/firebottle.webp",
+          "role": "canonical approved style reference: glass or ceramic vessel, contained glow, readable liquid"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-e7315eae-5f11-4048-bd59-3f4f2952e418.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/iron_link_choker.png",
+      "acceptedMaster": {
+        "sha256": "010edeb61d6f080a97c07c6bebd7ec1d7b1c784b32d8d2905398b7532f6d6093",
+        "bytes": 1888587,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation after master, 128px, 22px, 28px grayscale, and 64px circular-crop inspection; identity, complete padding, tactile material, lighting, opacity, and forbidden-mark checks passed."
+    },
+    {
+      "id": "lucent_reagent",
+      "liveName": "Lucent Reagent",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Lucent Reagent (item id lucent_reagent) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its stoppered teal-glass reagent-vial and luminous droplet identity, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile glass and metal rendering, contained magic, dark value range, and composition only; do not copy their unrelated objects.\nSubject and identity: one faceted teal-tinted glass reagent vial with a short dark cork, containing a small measure of pale-violet luminous liquid that separates into three suspended lens-shaped droplets inside the sealed vessel. It must read as a tangible high-tier enchanting reagent, not loose crystals, a potion label, generic magic orb, UI glyph, or laboratory scene.\nComposition: one centered complete stoppered vial in readable three-quarter view, about 72 percent subject fill, safe padding on every side, the faceted glass, cork, liquid line, and internal droplets readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep navy-charcoal and muted teal-violet painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile thick glass with a crisp rim and controlled specular accents, natural cork, optically deep pale-violet reagent glow subordinate to the vessel silhouette, crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; exactly one sealed glass reagent vial; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, extra vessels, loose gems, or cropped silhouette. Do not reproduce any unrelated object from the references.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/lucent_reagent.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/firebottle.webp",
+          "role": "canonical approved style reference: glass or ceramic vessel, contained glow, readable liquid"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/arcanite_mining_pick.webp",
+          "role": "canonical approved style reference: hard-material rendering and restrained magic"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-3a0bc3d6-e2d3-403e-a577-2998ea2e5c49.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/lucent_reagent.png",
+      "acceptedMaster": {
+        "sha256": "3ffca60f1b93fb540447e3cc6fd582f7c9facdc0f212ce3f446daa9273bff2e2",
+        "bytes": 1899094,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation. Pale-violet suspended reagent facets remain fully contained in one teal glass vessel and read cleanly at icon scale."
+    },
+    {
+      "id": "makers_ember",
+      "liveName": "Maker's Ember",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Maker's Ember (item id makers_ember) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its authored semantic motif and palette, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile material rendering, dark value range, and composition only; do not copy their unrelated objects.\nSubject and identity: one rare contained crafting ember: a compact dark forged-metal reliquary shaped like a squat hexagonal brazier, enclosing one bright gold-orange coal through open protective ribs, with a tiny controlled flame tongue. It must read as a portable tangible forge catalyst, not a campfire, torch, logo, spell glyph, lantern, or UI icon.\nComposition: one centered complete compact reliquary in readable three-quarter view, about 72 percent subject fill, safe padding on every side, strong hexagonal silhouette readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal and ember-brown painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile blackened iron with warm edge wear and a contained gold-orange coal glow subordinate to the vessel silhouette; crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; exactly one tangible object; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, or cropped silhouette. Do not reproduce any unrelated object from the references.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/makers_ember.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/firebottle.webp",
+          "role": "canonical approved style reference: glass or ceramic vessel, contained glow, readable liquid"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/arcanite_mining_pick.webp",
+          "role": "canonical approved style reference: hard-material rendering and restrained magic"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-6fb20104-25c7-4b64-8bc7-f4aea5df9365.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/makers_ember.png",
+      "acceptedMaster": {
+        "sha256": "7ffb1e1342dfd8847b7182909267b72cace7577fefee11c45f461c33193bd8f6",
+        "bytes": 2162956,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation after master, 128px, 22px, 28px grayscale, and 64px circular-crop inspection; identity, complete padding, tactile material, lighting, opacity, and forbidden-mark checks passed."
+    },
+    {
+      "id": "polished_copper_loop",
+      "liveName": "Polished Copper Loop",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Polished Copper Loop (item id polished_copper_loop) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its authored semantic motif and palette, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile material rendering, dark value range, and composition only; do not copy their unrelated objects.\nSubject and identity: one slim smoothly polished copper finger ring with an elegant continuous loop and one small cool-blue round cabochon held in a minimal raised setting. It must read as refined intellect-oriented beginner jewelry and remain clearly slimmer and smoother than Hammered Copper Band, not a bracelet, portal, button, or UI circle.\nComposition: one centered complete graceful ring in readable three-quarter view, about 72 percent subject fill, safe padding on every side, open center and blue crown readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep navy-charcoal and warm umber painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile mirror-polished copper with soft warm reflections, fine edge wear, and a restrained sapphire-blue glint; crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; exactly one tangible object; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, or cropped silhouette. Do not reproduce any unrelated object from the references.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/polished_copper_loop.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/kingsbane_last_oath.webp",
+          "role": "canonical approved style reference: forged-metal rendering, crisp focal edge, safe silhouette padding"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/firebottle.webp",
+          "role": "canonical approved style reference: glass or ceramic vessel, contained glow, readable liquid"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-810f8b96-326c-495c-ba74-16ffa93ea68a.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/polished_copper_loop.png",
+      "acceptedMaster": {
+        "sha256": "1c349266f5a29c09aeafe3d2c57b4d82642e3dd8998a5218e2a8e06d43a5a27d",
+        "bytes": 1720377,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation after master, 128px, 22px, 28px grayscale, and 64px circular-crop inspection; identity, complete padding, tactile material, lighting, opacity, and forbidden-mark checks passed."
+    },
+    {
+      "id": "precision_chassis",
+      "liveName": "Precision Chassis",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Precision Chassis (item id precision_chassis) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its compact brass-steel mechanical chassis with visible gears identity, never its flat vector or UI-panel treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile metal rendering, dark value range, and composition only; do not copy their unrelated objects.\nSubject and identity: one unfinished engineering chassis, a compact thick rectangular brass-and-blue-steel mechanism with an open front exposing two intermeshed precision gears, a wound spring barrel, tiny functional rivets, and protective corner rails. It must read as a tangible clockwork component ready to receive a housing, not a control panel, picture frame, book, safe door, circuit board, computer, or UI window.\nComposition: one centered complete chassis in readable three-quarter view, about 72 percent subject fill, safe padding on every side, the box thickness, open mechanism, gears, and corner rails readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal and restrained brass-brown painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile brushed steel, aged brass, oily gear teeth, fine tool wear, broad reflected values, crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; exactly one standalone mechanical chassis; borderless; no text, letters, numbers, labels, runes, pseudo-writing, gauges, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, modern electronics, or cropped silhouette. Do not reproduce any unrelated object from the references.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/precision_chassis.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/arcanite_mining_pick.webp",
+          "role": "canonical approved style reference: hard-material rendering and restrained magic"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/kingsbane_last_oath.webp",
+          "role": "canonical approved style reference: forged-metal rendering, crisp focal edge, safe silhouette padding"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-8cb3835b-07d8-49b8-adfd-b505c9df269c.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/precision_chassis.png",
+      "acceptedMaster": {
+        "sha256": "fe1aaa9982ab7cbafe6cb6ed0f82a2f9b2761a3c6e1a34a4b32e3dea5bc58a98",
+        "bytes": 2078007,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation. Thick chassis depth and exposed gears make it a standalone mechanical part rather than a flat UI panel."
+    },
+    {
+      "id": "prismglass_setting",
+      "liveName": "Prismglass Setting",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Prismglass Setting (item id prismglass_setting) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its circular metal mount and pale faceted-glass center identity, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile glass and metal rendering, dark value range, and composition only; do not copy their unrelated objects.\nSubject and identity: one precision jewelcrafting setting: a compact open round silver-gunmetal mounting with four plain triangular retaining claws around one thick faceted piece of translucent prismglass, catching restrained pale cyan, violet, and warm highlights. It must read as an unfinished high-tier gemstone mount awaiting a final jewel, not an eye, compass, shield, gear, button, portal, or UI dial.\nComposition: one centered complete setting facing forward with slight three-quarter depth, about 72 percent subject fill, safe padding on every side, the metal claws, open mounting, and faceted glass readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep navy-charcoal and muted violet painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile cool metal with crisp edge wear, optically deep prismglass with a clean rim and restrained internal color, crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; exactly one tangible jewelry setting; borderless; no text, letters, numbers, labels, runes, pseudo-writing, cardinal letters, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, eye motif, compass needle, or cropped silhouette. Do not reproduce any unrelated object from the references.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/prismglass_setting.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/firebottle.webp",
+          "role": "canonical approved style reference: glass or ceramic vessel, contained glow, readable liquid"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/arcanite_mining_pick.webp",
+          "role": "canonical approved style reference: hard-material rendering and restrained magic"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-965c8e14-9f44-404f-8360-73f27a5309bd.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/prismglass_setting.png",
+      "acceptedMaster": {
+        "sha256": "c401612caaff1e038e3355634448489c3d744f722fbdfdc68714264c755bbc3b",
+        "bytes": 1878456,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation. Four plain retaining claws and the thick faceted centerpiece remain readable; no compass needle, cardinal lettering, eye motif, or UI dial appeared."
+    },
+    {
+      "id": "quickening_catalyst",
+      "liveName": "Quickening Catalyst",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Quickening Catalyst (item id quickening_catalyst) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its round clear alchemical-vessel and subtle motion identity, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile glass and metal rendering, contained magic, dark value range, and composition only; do not copy their unrelated objects.\nSubject and identity: one volatile alchemical catalyst in a squat spherical clear-glass ampoule with a short corked neck, containing a small measure of colorless liquid and a single pale silver spiral of rapidly circulating vapor. It must read as a tangible once-per-day masterwork reagent whose motion is contained inside the vessel, not a bubble, clock, potion label, generic magic orb, UI spinner, or laboratory scene.\nComposition: one centered complete ampoule in readable three-quarter view, about 72 percent subject fill, safe padding on every side, the glass rim, cork, liquid line, and internal spiral readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal and muted blue-gray painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile thick glass with a crisp rim and controlled specular accents, natural cork, restrained silvery internal motion, crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; exactly one sealed glass ampoule; borderless; no text, letters, numbers, labels, runes, pseudo-writing, arrows, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, extra vessels, or cropped silhouette. Do not reproduce any unrelated object from the references.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/quickening_catalyst.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/firebottle.webp",
+          "role": "canonical approved style reference: glass or ceramic vessel, contained glow, readable liquid"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/arcanite_mining_pick.webp",
+          "role": "canonical approved style reference: hard-material rendering and restrained magic"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-7f5cec24-aee1-47c4-b361-613a010ef045.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/quickening_catalyst.png",
+      "acceptedMaster": {
+        "sha256": "fd180e40614b332bbc1e8b95feaf507e6e7decdad30c8e2e079baf37eeda6843",
+        "bytes": 1899438,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation. The silver spiral is fully contained within one stoppered ampoule; no arrows, clock face, or rune marks appeared."
+    },
+    {
+      "id": "riveted_iron_signet",
+      "liveName": "Riveted Iron Signet",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Riveted Iron Signet (item id riveted_iron_signet) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its authored semantic motif and palette, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile metal rendering, dark value range, and composition only; do not copy their unrelated objects.\nSubject and identity: one stout black-iron signet ring with a squared raised face, four clearly functional corner rivets, and one deep-red garnet inset without any carved symbol. It must read as rugged strength-oriented iron jewelry, distinctly darker and more architectural than the copper rung, not a padlock, bracket, button, or UI ring.\nComposition: one centered complete signet ring in readable three-quarter view, about 72 percent subject fill, safe padding on every side, the square riveted crown and open finger loop readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal and ember-brown painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile hammered black iron with forged seams, controlled cold edge highlights, reddish reflected warmth, and a restrained garnet glint; crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; exactly one complete piece of jewelry; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, or cropped silhouette. Do not reproduce any unrelated object from the references. Do not render thorium: the live item material is Osmium wherever that name appears.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/riveted_iron_signet.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/kingsbane_last_oath.webp",
+          "role": "canonical approved style reference: forged-metal rendering, crisp focal edge, safe silhouette padding"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/firebottle.webp",
+          "role": "canonical approved style reference: glass or ceramic vessel, contained glow, readable liquid"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-3c973f42-7f20-4d67-9389-af425da088b7.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/riveted_iron_signet.png",
+      "acceptedMaster": {
+        "sha256": "4bb9f11cbfa90e5295c7b8f35d91c0152b3727bcdfd3b487f63d4a014cd1abcf",
+        "bytes": 2043337,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation after master, 128px, 22px, 28px grayscale, and 64px circular-crop inspection; identity, complete padding, tactile material, lighting, opacity, and forbidden-mark checks passed."
+    },
+    {
+      "id": "sablewax_vellum",
+      "liveName": "Sablewax Vellum",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Sablewax Vellum (item id sablewax_vellum) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its rolled pale vellum and dark wax-seal identity, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile parchment, leather, cloth and contained-material rendering, dark value range, and composition only; do not copy their unrelated objects.\nSubject and identity: one premium blank sheet of warm cream vellum rolled into a compact document, tied once with narrow charcoal cord and closed by one thick irregular near-black sablewax seal with no impressed symbol. It must read as an unfinished inscription intermediate, heavier and darker than a ready-to-use scroll, not a letter, diploma, spell scroll, candle, bandage, paper tube, or UI banner.\nComposition: one centered complete rolled vellum in readable three-quarter view on a shallow diagonal, about 72 percent subject fill, safe padding on every side, both curled ends, cord, and dark wax seal readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal and restrained umber painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile fibrous vellum, softly worn edges, twisted cord, dense matte sablewax with one warm specular edge, crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; exactly one tied rolled vellum; its visible parchment and seal must be completely blank; borderless; no text, letters, numbers, labels, runes, pseudo-writing, random ink marks, stamped symbol, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, quill, loose pages, or cropped silhouette. Do not reproduce any unrelated object from the references.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/sablewax_vellum.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/linen_pouch.webp",
+          "role": "canonical approved style reference: soft goods, leather, compact three-quarter volume"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/cinderweave_raiment.webp",
+          "role": "canonical approved style reference: cloth, garment silhouette, controlled dark values"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/firebottle.webp",
+          "role": "canonical approved style reference: glass or ceramic vessel, contained glow, readable liquid"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-99a51e52-99b5-4886-b704-491845897f5f.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/sablewax_vellum.png",
+      "acceptedMaster": {
+        "sha256": "880fe5a2428c4b86c2db05f056d96ac9e0793a52e395b0eb841e3ec4b05dd494",
+        "bytes": 1910935,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation. Vellum and sablewax seal are blank, with no generated writing or stamped symbol."
+    },
+    {
+      "id": "seasoned_stock",
+      "liveName": "Seasoned Stock",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Seasoned Stock (item id seasoned_stock) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its compact handled cooking vessel with rich liquid identity, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for appetizing light, tactile ceramic, glass and metal rendering, dark value range, and composition only; do not copy their unrelated objects.\nSubject and identity: one small stout gray ceramic stockpot with two copper loop handles and a slightly open fitted lid, revealing a narrow gleam of rich amber-brown seasoned broth and only two soft wisps of steam. It must read as one prepared culinary intermediate ready for cooking, not a plated meal, tea cup, cauldron station, soup bowl, potion, or kitchen scene.\nComposition: one centered complete stockpot in readable three-quarter view, about 72 percent subject fill, safe padding on every side, both handles, lid, pot volume, and warm broth glimpse readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal and warm kitchen-umber painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile fired ceramic, worn copper handles, controlled appetizing amber liquid highlight, restrained steam, crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; exactly one compact cooking vessel; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, table setting, environmental scene, extra food, utensils, or cropped silhouette. Do not reproduce any unrelated object from the references.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/seasoned_stock.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/anglers_feast_platter.webp",
+          "role": "canonical approved style reference: appetizing grouped material separation and warm light"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/firebottle.webp",
+          "role": "canonical approved style reference: glass or ceramic vessel, contained glow, readable liquid"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-12b9930b-d23c-4d05-9c69-2df9d109b080.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/seasoned_stock.png",
+      "acceptedMaster": {
+        "sha256": "782301a37671c809de1799b9fe25a555b92805b7ebf6320e9c221b3ddec4ff6c",
+        "bytes": 1756767,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation after master, 128px, 22px, 28px grayscale, and 64px circular-crop inspection; identity, complete padding, tactile material, lighting, opacity, and forbidden-mark checks passed."
+    },
+    {
+      "id": "silverleaf_primer",
+      "liveName": "Sheenleaf Primer",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Sheenleaf Primer (item id silverleaf_primer) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its small green closed-book and single leaf-emblem identity, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile cloth, leather and metal rendering, dark value range, and composition only; do not copy their unrelated objects.\nSubject and identity: one beginner caster primer, a compact closed book bound in worn forest-green leather with silver-green leaf-shaped corner plates, one deliberate simple leaf boss on the cover, a pale page block, and a small plain metal clasp. It must read as a practical Sheenleaf teaching tome and held offhand, not a spell glyph, tablet, UI panel, or generic modern notebook.\nComposition: one centered complete book in readable three-quarter view with its cover and page thickness visible, about 72 percent subject fill, safe padding on every side, crisp rectangular silhouette readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal and restrained woodland-green painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile worn leather grain, layered page edges, softly tarnished silver-green metal, crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; exactly one closed book; borderless; no text, letters, numbers, labels, runes, pseudo-writing, random markings, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, loose pages, or cropped silhouette. The single leaf boss is an intentional material emblem, not writing. Do not reproduce any unrelated object from the references.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/silverleaf_primer.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/cinderweave_raiment.webp",
+          "role": "canonical approved style reference: cloth, garment silhouette, controlled dark values"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/linen_pouch.webp",
+          "role": "canonical approved style reference: soft goods, leather, compact three-quarter volume"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-46332107-0f9b-4876-a1da-24044b0eb1f3.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/silverleaf_primer.png",
+      "acceptedMaster": {
+        "sha256": "f6ab20a196f84c564627ed399bd98b7c2d5c79f3a64e4dedb312c017c10ad7a0",
+        "bytes": 2117047,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation after master, 128px, 22px, 28px grayscale, and 64px circular-crop inspection; identity, complete padding, tactile material, lighting, opacity, and forbidden-mark checks passed."
+    },
+    {
+      "id": "silverleaf_scroll",
+      "liveName": "Sheenleaf Scroll",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Sheenleaf Scroll (item id silverleaf_scroll) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its rolled pale parchment and silver-green tie identity, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile parchment, leather, cloth and metal rendering, dark value range, and composition only; do not copy their unrelated objects.\nSubject and identity: one practical consumable scroll, a complete blank pale-vellum roll with both curled ends visible, secured at the center by one narrow silver-green Sheenleaf ribbon and a small plain leaf-shaped wax seal. It must read as the beginner stamina scroll, not a generic paper tube, bandage, diploma, spell glyph, or UI banner.\nComposition: one centered complete horizontal scroll with slight three-quarter depth, about 72 percent subject fill, safe padding on every side, both curled ends, central ribbon, and leaf seal readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal and restrained woodland-green painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile fibrous vellum, softly worn curled edges, satin ribbon, a restrained wax accent, crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; exactly one tied rolled scroll; its visible parchment must be completely blank; borderless; no text, letters, numbers, labels, runes, pseudo-writing, random ink marks, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, quill, loose pages, or cropped silhouette. The single leaf seal is an intentional material emblem, not writing. Do not reproduce any unrelated object from the references.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/silverleaf_scroll.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/linen_pouch.webp",
+          "role": "canonical approved style reference: soft goods, leather, compact three-quarter volume"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/cinderweave_raiment.webp",
+          "role": "canonical approved style reference: cloth, garment silhouette, controlled dark values"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-b7690640-4f29-4256-8ac6-c7233aa264e9.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/silverleaf_scroll.png",
+      "acceptedMaster": {
+        "sha256": "a1ab954f01419b96c8d399b8d8847dbc172cd9ddc66b4fec79b46a4bb5f6ff14",
+        "bytes": 1888429,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation. Blank vellum, curled ends, Sheenleaf tie, and leaf seal remain distinct at 22px."
+    },
+    {
+      "id": "spiritweld_girdle",
+      "liveName": "Spiritweld Girdle",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Spiritweld Girdle (item id spiritweld_girdle) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its broad blue-black plated belt, teal central focus, and restrained gold trim identity, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile metal and cloth rendering, dark value range, and equipment composition only; do not copy their unrelated objects.\nSubject and identity: one epic mail waist girdle made from a broad dark-teal leather belt under overlapping blue-black steel plates, joined by small warm-gold rivets around one heavy rectangular buckle holding a restrained luminous teal round boss. It belongs to the black-steel, teal, and gold Wardspeaker mail set and must read immediately as waist equipment, not a shield, wrestling belt, crown, UI bar, or generic machinery.\nComposition: one centered complete girdle presented as a shallow curved horizontal belt with slight three-quarter depth, about 72 percent subject fill, safe padding on every side, both belt ends, layered plates, and central buckle readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep navy-charcoal with restrained teal atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile worn leather, hammered blue-black steel, controlled silver edge highlights, warm-gold fasteners, and a subordinate teal inner glow; crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; exactly one complete waist girdle; borderless; no text, letters, numbers, labels, runes, pseudo-writing, generic magical sigils, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, body, torso, hand, mannequin, environmental scene, shield silhouette, or cropped belt ends. Do not reproduce any unrelated object from the references.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/spiritweld_girdle.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/arcanite_mining_pick.webp",
+          "role": "canonical approved style reference: hard-material rendering and restrained magic"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/cinderweave_raiment.webp",
+          "role": "canonical approved style reference: cloth, garment silhouette, controlled dark values"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-c41d424e-5a14-412b-9604-86caf76c78df.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/spiritweld_girdle.png",
+      "acceptedMaster": {
+        "sha256": "a5123496ad5635106b96076f07a5a10fb95c844e6b007ebdca3c4f3bc6c62af6",
+        "bytes": 1857916,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation after master, 128px, 22px, 28px grayscale, and 64px circular-crop inspection; identity, complete padding, tactile material, lighting, opacity, and forbidden-mark checks passed."
+    },
+    {
+      "id": "sundered_essence",
+      "liveName": "Sundered Essence",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Sundered Essence (item id sundered_essence) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its indigo-violet fractured-prism identity, never its flat vector treatment. Images 2 through 4 are approved house-style references for lighting, tactile rendering, dark value range, and compact composition only; do not copy their unrelated objects.\nSubject and identity: one tangible rare shard of crystallized torn essence: an elongated indigo-violet mineral prism fractured into two close interlocking halves, held together by a few restrained wisps of inner violet energy. It must read as one valuable crafting essence, not twin crystals, a logo, portal, generic spell glyph, or UI gem.\nComposition: one centered complete hero object in readable three-quarter view, about 72 percent subject fill, safe padding on every side, crisp asymmetric silhouette readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal and midnight-purple painted vignette with subtle atmosphere and grounded shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile faceted mineral with chipped fracture planes, controlled internal violet glow, crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; exactly one compact object; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, creature, hand, mannequin, environmental scene, or cropped silhouette. Do not reproduce any unrelated object from the references.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/sundered_essence.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/firebottle.webp",
+          "role": "canonical approved style reference: glass or ceramic vessel, contained glow, readable liquid"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/arcanite_mining_pick.webp",
+          "role": "canonical approved style reference: hard-material rendering and restrained magic"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-080677fe-f552-4f7d-98e6-f5a78287c9d0.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/sundered_essence.png",
+      "acceptedMaster": {
+        "sha256": "fa18ae0a171b3c9703973fe0adb6a6095a33adcc88d1da50f02dec88fdeeb6c0",
+        "bytes": 2040141,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation. The two fracture faces read as one interlocking crystallized essence with a single torn-energy seam, not two separate loot objects."
+    },
+    {
+      "id": "sunpetal_grimoire",
+      "liveName": "Sunpetal Grimoire",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Sunpetal Grimoire (item id sunpetal_grimoire) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its blue closed-book and golden sunpetal-emblem identity, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile cloth, leather and metal rendering, dark value range, and composition only; do not copy their unrelated objects.\nSubject and identity: one rare caster grimoire, a substantial closed book bound in midnight-blue leather over a thick ivory page block, with luminous ivory-gold corner plates, a reinforced spine, and one raised golden sunpetal flower boss on the cover. It must read as the solar capstone of the inscription tome family and as a held offhand, clearly more ornate than Sheenleaf Primer and Goldleaf Folio, not a spell glyph, tablet, UI panel, loose manuscript, or modern notebook.\nComposition: one centered complete substantial grimoire in readable three-quarter view with its layered cover, spine, and page thickness visible, about 72 percent subject fill, safe padding on every side, crisp book silhouette readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep navy-charcoal with a restrained warm-gold vignette, subtle atmosphere, and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile deep leather grain, layered page edges, controlled ivory-gold metal highlights, restrained solar warmth, crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; exactly one closed grimoire; borderless; no text, letters, numbers, labels, runes, pseudo-writing, random markings, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, loose pages, or cropped silhouette. The single sunpetal boss is an intentional floral material emblem, not writing. Do not reproduce any unrelated object from the references.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/sunpetal_grimoire.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/cinderweave_raiment.webp",
+          "role": "canonical approved style reference: cloth, garment silhouette, controlled dark values"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/linen_pouch.webp",
+          "role": "canonical approved style reference: soft goods, leather, compact three-quarter volume"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-c8b6c798-1ece-4e24-a2c2-7f1fe8fa0a17.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/sunpetal_grimoire.png",
+      "acceptedMaster": {
+        "sha256": "4fcaafec23accb89783bf37cf8ee19b203f7576817a4eb01847494e48b981ecb",
+        "bytes": 2501525,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation after master, 128px, 22px, 28px grayscale, and 64px circular-crop inspection; identity, complete padding, tactile material, lighting, opacity, and forbidden-mark checks passed."
+    },
+    {
+      "id": "sunpetal_scroll",
+      "liveName": "Sunpetal Scroll",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Sunpetal Scroll (item id sunpetal_scroll) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its rolled warm parchment and orange sunpetal-seal identity, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile parchment and cloth rendering, contained glow, dark value range, and composition only; do not copy their unrelated objects.\nSubject and identity: one rare consumable scroll, a complete blank luminous ivory vellum roll with both curled ends visible, secured at the center by one rich saffron-gold ribbon and a small orange-gold wax seal shaped as a simple many-petaled sun flower. It must read as the solar capstone stamina scroll, visibly finer than Sheenleaf Scroll and Goldleaf Scroll, not a generic paper tube, bandage, diploma, spell glyph, fireball, or UI banner.\nComposition: one centered complete horizontal scroll with slight three-quarter depth, about 72 percent subject fill, safe padding on every side, both curled ends, central ribbon, and floral seal readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep navy-charcoal with restrained warm-gold atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile fibrous vellum with a soft ivory sheen, fine saffron ribbon, controlled orange-gold wax highlights and only a faint solar warmth, crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; exactly one tied rolled scroll; its visible parchment must be completely blank; borderless; no text, letters, numbers, labels, runes, pseudo-writing, random ink marks, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, quill, loose pages, or cropped silhouette. The single sunpetal seal is an intentional floral material emblem, not writing. Do not reproduce any unrelated object from the references.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/sunpetal_scroll.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/linen_pouch.webp",
+          "role": "canonical approved style reference: soft goods, leather, compact three-quarter volume"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/cinderweave_raiment.webp",
+          "role": "canonical approved style reference: cloth, garment silhouette, controlled dark values"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/firebottle.webp",
+          "role": "canonical approved style reference: glass or ceramic vessel, contained glow, readable liquid"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-5b3d8bfc-e42e-450d-9239-5677d4311f28.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/sunpetal_scroll.png",
+      "acceptedMaster": {
+        "sha256": "44bd9a0410fa8d8cff885a37c71b48e575a9a30434fcb6bdb0863ba88f4e1c4b",
+        "bytes": 1795973,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation. Blank vellum and the floral Sunpetal seal remain distinct at 22px without becoming a spell glyph."
+    },
+    {
+      "id": "sunspun_bolt",
+      "liveName": "Sunspun Bolt",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Sunspun Bolt (item id sunspun_bolt) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its compact rolled ivory-gold cloth-bolt identity, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile cloth, soft goods and material rendering, dark value range, and composition only; do not copy their unrelated objects.\nSubject and identity: one premium bolt of luminous ivory cloth woven with fine gold warp threads, tightly rolled around a short hidden core with one layered folded edge draped across the front and secured by a narrow plain gold cord. It must read as an expensive tailoring intermediate, not parchment, logs, bread, a scroll, pillow, UI stack, or magical beam.\nComposition: one centered complete fabric bolt in readable three-quarter view, about 72 percent subject fill, safe padding on every side, the rolled cylinder, layered selvage, woven texture, and tied construction readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep navy-charcoal and restrained warm-gold painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile soft cloth folds, visible fine weave, controlled ivory sheen, restrained gold thread highlights, crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; exactly one tied bolt of cloth; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, loose scraps, or cropped silhouette. Do not reproduce any unrelated object from the references.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/sunspun_bolt.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/cinderweave_raiment.webp",
+          "role": "canonical approved style reference: cloth, garment silhouette, controlled dark values"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/linen_pouch.webp",
+          "role": "canonical approved style reference: soft goods, leather, compact three-quarter volume"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-c30dc90f-8fd6-479c-9f39-42230c018792.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/sunspun_bolt.png",
+      "acceptedMaster": {
+        "sha256": "e64d5043ef021d1f02a7d0181c599323f734045a454694bfdeb40d405cc77500",
+        "bytes": 2272810,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation after master, 128px, 22px, 28px grayscale, and 64px circular-crop inspection; identity, complete padding, tactile material, lighting, opacity, and forbidden-mark checks passed."
+    },
+    {
+      "id": "sunspun_handwraps",
+      "liveName": "Sunspun Handwraps",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Sunspun Handwraps (item id sunspun_handwraps) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its paired midnight-blue padded wraps with ivory-gold bands and solar accents identity, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile garment, cloth, soft-goods and material rendering, dark value range, and equipment composition only; do not copy their unrelated objects.\nSubject and identity: one compact natural pair of epic caster handwraps: padded midnight-blue cloth mitts built from overlapping luminous-ivory wrapping bands, with fine gold-thread edging and one small plain golden sunpetal button at each wrist. They belong to the ivory-gold and midnight-blue Sunspun cloth set and must read immediately as hand-slot equipment, not severed hands, boxing gloves, boots, bandage rolls, oven mitts, or UI shapes.\nComposition: one centered complete pair of handwraps arranged together with palms angled inward and slight three-quarter depth, about 72 percent subject fill, safe padding on every side, wrapped fingers, padded backs, and wrist cuffs readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep navy-charcoal with restrained warm-gold atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile soft midnight cloth, fibrous ivory wrapping bands, controlled gold-thread highlights, believable padded folds, crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; one compact natural pair constituting one equipment item; borderless; no text, letters, numbers, labels, runes, pseudo-writing, generic magical sigils, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hands or arms inside, skin, body, mannequin, environmental scene, loose scattered wraps, or cropped silhouette. The sunpetal buttons are intentional floral ornaments. Do not reproduce any unrelated object from the references.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/sunspun_handwraps.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/cinderweave_raiment.webp",
+          "role": "canonical approved style reference: cloth, garment silhouette, controlled dark values"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/linen_pouch.webp",
+          "role": "canonical approved style reference: soft goods, leather, compact three-quarter volume"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-a8a8ace4-7981-4b10-b47e-a2ce8160b0b9.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/sunspun_handwraps.png",
+      "acceptedMaster": {
+        "sha256": "d12a9c2e2c1844c9a9030a339287c517a53758aff92c2cfc2ee83d1c6ce29148",
+        "bytes": 1927222,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation. Visible thumbs, layered wrapping bands, and wrist cuffs preserve the hand-slot read at 22px despite the compact mitten silhouette."
+    },
+    {
+      "id": "sunspun_haversack",
+      "liveName": "Sunspun Haversack",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Sunspun Haversack (item id sunspun_haversack) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its voluminous midnight-blue bag with ivory-gold solar trim identity, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile soft-goods, cloth, leather and material rendering, dark value range, and bag composition only; do not copy their unrelated objects.\nSubject and identity: one epic high-capacity haversack, a plump three-quarter midnight-blue woven-cloth satchel with broad ivory canvas side panels, fine gold-thread piping, a reinforced brown leather base and shoulder strap, a large flap closure, and one simple golden sunpetal clasp centered on the flap. It belongs to the ivory-gold and midnight-blue Sunspun cloth family and must read immediately as a roomy bag, not a coin purse, chest, shield, bedroll, UI pouch, or bag spilling loose items.\nComposition: one centered complete bag in readable three-quarter view, about 72 percent subject fill, safe padding on every side, its volume, flap, gusseted sides, base, strap, and closure readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep navy-charcoal with restrained warm-gold atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile midnight weave, luminous ivory canvas, worn brown leather, controlled gold-thread highlights, believable soft volume and folds, crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; exactly one closed haversack; borderless; no text, letters, numbers, labels, runes, pseudo-writing, generic magical sigils, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, body, hand, mannequin, environmental scene, loose inventory, attached bottle, or cropped silhouette. The single sunpetal clasp is an intentional floral ornament. Do not reproduce any unrelated object from the references.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/sunspun_haversack.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/linen_pouch.webp",
+          "role": "canonical approved style reference: soft goods, leather, compact three-quarter volume"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/cinderweave_raiment.webp",
+          "role": "canonical approved style reference: cloth, garment silhouette, controlled dark values"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-84fb12a3-e431-491b-a2b3-196c8d8a1f70.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/sunspun_haversack.png",
+      "acceptedMaster": {
+        "sha256": "e8918e41a53d5a7ed08149783657cc22090b03fa2f85229ef08bb5d5fdc63d83",
+        "bytes": 2427085,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation after master, 128px, 22px, 28px grayscale, and 64px circular-crop inspection; identity, complete padding, tactile material, lighting, opacity, and forbidden-mark checks passed."
+    },
+    {
+      "id": "sunspun_leggings",
+      "liveName": "Sunspun Leggings",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Sunspun Leggings (item id sunspun_leggings) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its tailored midnight-blue cloth trousers with ivory-gold vertical weave identity, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile garment, cloth, soft-goods and material rendering, dark value range, and equipment composition only; do not copy their unrelated objects.\nSubject and identity: one epic pair of tailored caster leggings in soft midnight-blue cloth, with luminous ivory side panels, narrow gold-thread vertical piping, a wide folded waist sash, reinforced knees, and gently tapered cuffs. They belong to the ivory-gold and midnight-blue Sunspun cloth set and must read immediately as leg-slot equipment, not a skirt, robe, pants worn on a body, striped pajamas, banner, or UI columns.\nComposition: one centered complete pair of cloth leggings facing forward with slight three-quarter depth, about 72 percent subject fill, safe padding on every side, waist, two legs, knee folds, and cuffs readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep navy-charcoal with restrained warm-gold atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile soft midnight cloth, luminous ivory weave, fine controlled gold-thread highlights, believable folds, crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; exactly one leg-slot garment; borderless; no text, letters, numbers, labels, runes, pseudo-writing, generic magical sigils, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, body, skin, feet, hands, mannequin, hanger, environmental scene, or cropped silhouette. Do not reproduce any unrelated object from the references.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/sunspun_leggings.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/cinderweave_raiment.webp",
+          "role": "canonical approved style reference: cloth, garment silhouette, controlled dark values"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/linen_pouch.webp",
+          "role": "canonical approved style reference: soft goods, leather, compact three-quarter volume"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-1aa3a866-c69a-426d-8c0e-a6d1ff89ea2a.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/sunspun_leggings.png",
+      "acceptedMaster": {
+        "sha256": "335a08a8de17efd0122fab77c3219b64ab5ba0252dfc8d376f4f6c94cd13704f",
+        "bytes": 2016514,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation after master, 128px, 22px, 28px grayscale, and 64px circular-crop inspection; identity, complete padding, tactile material, lighting, opacity, and forbidden-mark checks passed."
+    },
+    {
+      "id": "sunspun_vestments",
+      "liveName": "Sunspun Vestments",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Sunspun Vestments (item id sunspun_vestments) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its midnight-blue caster vestment with ivory-gold solar trim identity, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile garment, cloth, soft-goods and material rendering, dark value range, and equipment composition only; do not copy their unrelated objects.\nSubject and identity: one epic caster chest vestment, a complete front-facing midnight-blue sleeved robe bodice woven with broad ivory panels, fine luminous-gold seam piping, a high folded collar, and one simple golden sunpetal clasp at the sternum with short decorative chains. It belongs to the ivory-gold and midnight-blue Sunspun cloth set and must read immediately as chest-slot equipment, not a robe worn on a body, coat, priest costume, UI panel, or glowing spirit.\nComposition: one centered complete torso garment with sleeves and waist hem visible in slight three-quarter depth, about 72 percent subject fill, safe padding on every side, collar, shoulders, sleeves, clasp, and hem readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep navy-charcoal with restrained warm-gold atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile soft midnight cloth, luminous ivory weave, controlled gold-thread highlights, natural folds, crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; exactly one complete chest garment; borderless; no text, letters, numbers, labels, runes, pseudo-writing, generic magical sigils, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, body, head, skin, hands, mannequin, hanger, environmental scene, or cropped silhouette. The single sunpetal clasp is an intentional floral ornament. Do not reproduce any unrelated object from the references.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/sunspun_vestments.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/cinderweave_raiment.webp",
+          "role": "canonical approved style reference: cloth, garment silhouette, controlled dark values"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/linen_pouch.webp",
+          "role": "canonical approved style reference: soft goods, leather, compact three-quarter volume"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-91625564-3199-4fe3-8a5c-218ef5ea174a.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/sunspun_vestments.png",
+      "acceptedMaster": {
+        "sha256": "7c50bf57397d3e387467cf42e260905df2147224d7d87941f07f037c6e42a243",
+        "bytes": 2334455,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation after master, 128px, 22px, 28px grayscale, and 64px circular-crop inspection; identity, complete padding, tactile material, lighting, opacity, and forbidden-mark checks passed."
+    },
+    {
+      "id": "wardspeaker_sabatons",
+      "liveName": "Wardspeaker Sabatons",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Wardspeaker Sabatons (item id wardspeaker_sabatons) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its paired articulated blue-black armored boots with restrained gold trim identity, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile metal and cloth rendering, dark value range, and equipment composition only; do not copy their unrelated objects.\nSubject and identity: one compact natural pair of epic mail sabatons: heavy blue-black segmented steel foot plates and shin guards over dark-teal mail, with reinforced toe caps, practical leather soles, tiny warm-gold rivets, and one restrained teal inset on each ankle. They complete the black-steel, teal, and gold Wardspeaker mail set and must read immediately as foot-slot equipment, not detached robot legs, greaves without feet, gauntlets, or UI columns.\nComposition: one centered complete pair of sabatons facing forward with slight three-quarter depth, about 72 percent subject fill, safe padding on every side, both armored toes, ankles, and upper cuffs readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep navy-charcoal with restrained teal atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile hammered blue-black steel, flexible dark mail, worn leather soles, controlled silver edge highlights, and warm-gold fasteners; crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; one compact natural pair constituting one equipment item; borderless; no text, letters, numbers, labels, runes, pseudo-writing, generic magical sigils, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, legs, body, feet inside, hands, mannequin, environmental scene, sci-fi robot styling, or cropped silhouette. Do not reproduce any unrelated object from the references.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/wardspeaker_sabatons.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/arcanite_mining_pick.webp",
+          "role": "canonical approved style reference: hard-material rendering and restrained magic"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/cinderweave_raiment.webp",
+          "role": "canonical approved style reference: cloth, garment silhouette, controlled dark values"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-4549f839-ed81-459d-95be-d7a277692492.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/wardspeaker_sabatons.png",
+      "acceptedMaster": {
+        "sha256": "b13ce5d5c041bafa622604228500e7701ae958de0e828ec9f2c147cd61bde594",
+        "bytes": 2039343,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation. Complete toe, sole, ankle, and upper-cuff shapes read as boots; teal insets are plain material accents, not runes."
+    },
+    {
+      "id": "weighted_thorium_band",
+      "liveName": "Weighted Osmium Band",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Weighted Osmium Band (item id weighted_thorium_band) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its authored semantic motif and palette, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile metal rendering, dark value range, and composition only; do not copy their unrelated objects.\nSubject and identity: one broad heavy Osmium finger ring in dense blue-black gunmetal, built with an intentionally weighted asymmetric crown and one inset dark-red garnet. It must read as rare strength jewelry: massive, compact, and precision forged, clearly beyond the iron rung, not a bracelet, bearing, tire, portal, or UI ring.\nComposition: one centered complete massive weighted ring in readable three-quarter view, about 72 percent subject fill, safe padding on every side, the thick off-center weighted crown, open center, and inset red stone readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep blue-black charcoal with a restrained forge-brown glow painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile dense Osmium gunmetal with broad reflected values, crisp silver-blue edge highlights, warm burnish, and a restrained garnet glint; crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; exactly one complete piece of jewelry; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, or cropped silhouette. Do not reproduce any unrelated object from the references. Do not render thorium: the live item material is Osmium wherever that name appears.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/weighted_thorium_band.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/kingsbane_last_oath.webp",
+          "role": "canonical approved style reference: forged-metal rendering, crisp focal edge, safe silhouette padding"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/arcanite_mining_pick.webp",
+          "role": "canonical approved style reference: hard-material rendering and restrained magic"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-fe6cee21-cca1-46be-8b2e-ea9d3e4999f1.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/weighted_thorium_band.png",
+      "acceptedMaster": {
+        "sha256": "ec18935c066e9b6da84a8e17ad920bd95e25d799f5423210878e0b095d211a6b",
+        "bytes": 1982333,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation after master, 128px, 22px, 28px grayscale, and 64px circular-crop inspection; identity, complete padding, tactile material, lighting, opacity, and forbidden-mark checks passed."
+    },
+    {
+      "id": "wyrmfall_core",
+      "liveName": "Wyrmfall Core",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: replace the programmatic placeholder with a fresh painted icon for Wyrmfall Core (item id wyrmfall_core) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its cool teal circular-core idea, not its flat vector treatment. Images 2 to 4 are house-style references for lighting, tactile material, value range, and composition only; do not copy their objects.\nSubject and identity: one rare dragon-forged crafting core, a compact round dark steel and stone mechanism with a luminous teal heart, subtle broken scale-like plates, and restrained signs of having been taken from a fallen wyrm. It must read as a tangible valuable crafting catalyst, not a generic orb, eye, compass, button, or UI glyph.\nComposition: one centered complete hero object in readable three-quarter view, about 72 percent subject fill, safe padding on every side, crisp silhouette readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal and blue-black painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile stone and forged metal, controlled teal internal glow, crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; exactly one object; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, creature, hand, mannequin, environmental scene, or cropped silhouette. Do not reproduce any unrelated object from the reference images.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/wyrmfall_core.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/firebottle.webp",
+          "role": "canonical approved style reference: glass or ceramic vessel, contained glow, readable liquid"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/arcanite_mining_pick.webp",
+          "role": "canonical approved style reference: hard-material rendering and restrained magic"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064de-e910-7ee1-9dcf-8aa86ff5a21b/exec-796f88f7-a14a-4f26-b6dc-5b5b57b02855.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/wyrmfall_core.png",
+      "acceptedMaster": {
+        "sha256": "578f72f6f43779c24c7b824251b01a4397ed14e7b5906b6f363bec7bf7761578",
+        "bytes": 2052617,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted parent-session candidate reused as instructed. One compact dragon-forged core with a teal heart; silhouette stays distinct in the 22px and 64px circular checks."
+    },
+    {
+      "id": "wyrmhide_cording",
+      "liveName": "Wyrmhide Cording",
+      "status": "accepted",
+      "generator": "OpenAI built-in image_gen",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Wyrmhide Cording (item id wyrmhide_cording) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder; preserve only its compact coiled tough-cord identity, never its flat vector treatment. Images 2 through 4 are canonical approved house-style references for lighting, tactile leather, cloth and hard-material rendering, dark value range, and composition only; do not copy their unrelated objects.\nSubject and identity: one compact coil of thick three-strand cording braided from olive-brown wyrm-scale leather strips, with scale grain and dark teal edges, its ends neatly tucked under a simple leather keeper. It must read as rare tough leatherworking cord and a single prepared crafting intermediate, not a snake, rope pile, bracelet, nest, cable spool, or UI loop.\nComposition: one centered complete low coil in readable three-quarter view, about 72 percent subject fill, safe padding on every side, the braid, scaled hide texture, and tucked ends readable at 22px and within a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal and restrained moss-umber painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile worn scale-leather grain, fibrous cut edges, subtle oil sheen, deep braided grooves, crisp focal edges and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.\nConstraints: square single icon; exactly one neatly prepared coil of cording; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, creature, environmental scene, loose scattered strands, or cropped silhouette. Do not reproduce any unrelated object from the references.",
+      "orderedReferences": [
+        {
+          "index": 1,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/wyrmhide_cording.webp",
+          "role": "identity-only anti-reference: preserve the authored semantic motif and palette; reject the flat programmatic placeholder treatment"
+        },
+        {
+          "index": 2,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/linen_pouch.webp",
+          "role": "canonical approved style reference: soft goods, leather, compact three-quarter volume"
+        },
+        {
+          "index": 3,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/cinderweave_raiment.webp",
+          "role": "canonical approved style reference: cloth, garment silhouette, controlled dark values"
+        },
+        {
+          "index": 4,
+          "path": "/Users/fernando/Documents/wocc-masterwrought/public/ui/items/eastbrook_buckler.webp",
+          "role": "canonical approved style reference: metal, top-left light, dark value range, compact circular mass"
+        }
+      ],
+      "originalGeneratedPath": "/Users/fernando/.codex/generated_images/01a064eb-1850-7512-bade-7c12e60030f4/exec-c0bab2a1-964c-43e5-9ad4-e2bc5b4cc388.png",
+      "acceptedMasterPath": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear/wyrmhide_cording.png",
+      "acceptedMaster": {
+        "sha256": "77b5e5efd8eb58a98eff7aae8f06fd667cb953f6478f92212f16dfccd33f8bcb",
+        "bytes": 2047960,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "channels": "srgb  3.0",
+        "square": true,
+        "fullyOpaque": true
+      },
+      "retryCount": 0,
+      "reviewNotes": "Accepted original generation after master, 128px, 22px, 28px grayscale, and 64px circular-crop inspection; identity, complete padding, tactile material, lighting, opacity, and forbidden-mark checks passed."
+    }
+  ]
+}

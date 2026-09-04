@@ -1,6 +1,11 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { ClientWorld } from '../src/net/online';
+import { ITEMS } from '../src/sim/data';
+import { itemDisplayName } from '../src/ui/entity_i18n';
+import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
+import { MARKET_ITEM_TYPE_FILTERS } from '../src/ui/market_filters';
+import { MarketWindow } from '../src/ui/market_window';
 
 // The market window painter is a DOM module; driving the live DOM + events is the
 // opt-in browser suite. This is the no-DOM-suite equivalent: it
@@ -9,6 +14,14 @@ import { ClientWorld } from '../src/net/online';
 // the pure core (no duplicated market_filters logic).
 const painter = readFileSync(new URL('../src/ui/market_window.ts', import.meta.url), 'utf8');
 const core = readFileSync(new URL('../src/ui/market_view.ts', import.meta.url), 'utf8');
+// The instance-effective cell pins match CODE only: block and line comments
+// are stripped first, so a commented-out arm cannot satisfy a pin by keeping
+// its text around (the phase 13 QA test-coverage audit; the source-text-pin
+// trap). The raw `painter` above stays for the slice-anchored method reads.
+function codeOnly(source: string): string {
+  return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+}
+const painterCode = codeOnly(painter);
 const componentsCss = readFileSync(
   new URL('../src/styles/components.css', import.meta.url),
   'utf8',
@@ -34,7 +47,30 @@ describe('market_window: no magic values', () => {
     // as CSS custom properties, so the painter holds no color literal. The resolver's
     // own tests pin that every quality maps to a var(--mkt-name-*) token.
     expect(painter).toContain("import { marketNameColor } from './market_name_color';");
-    expect(painter).toContain('const qColor = marketNameColor(item.quality);');
+    // Instance-bearing rows resolve INSTANCE-effective quality ONCE per row
+    // (phase 13, the all-surfaces item-cell rule) and feed BOTH the name
+    // color and the icon rim from it: the browse row reads the listing's
+    // publicInstanceView payload, the staged sell pick and the returned-goods
+    // rows their own copies, so a promoted legendary reads legendary. The
+    // sale ledger's rows carry no payload in their model and stay def-only.
+    expect(painterCode).toContain('const parts = wornItemCellParts(item, l.instance);');
+    expect(painterCode).toContain('const effQuality = parts.quality;');
+    expect(painterCode).toContain('marketNameColor(effQuality)');
+    expect(painterCode).toContain('const staged = wornItemCellParts(item, view.form.instance);');
+    expect(painterCode).toContain('const stagedQuality = staged.quality;');
+    expect(painterCode).toContain('marketNameColor(stagedQuality)');
+    expect(painterCode).toContain('const returned = wornItemCellParts(item, instance);');
+    expect(painterCode).toContain('const returnedQuality = returned.quality;');
+    expect(painterCode).toContain('marketNameColor(returnedQuality)');
+    // The NAME half of each row rides the same authority read (the round-3
+    // test audit: the quality pins alone left the name half revertible), and
+    // ONE read per row (the occurrence bound: a re-introduced second read
+    // per row would pass the shape pins alone).
+    expect(painterCode).toContain('const itemName = parts.name;');
+    expect(painterCode).toContain('esc(staged.name)');
+    expect(painterCode).toContain('esc(returned.name)');
+    expect(painterCode.match(/wornItemCellParts\(/g)).toHaveLength(3);
+    expect(painterCode).toContain('const qColor = marketNameColor(item.quality);');
     const core = readFileSync(new URL('../src/ui/market_name_color.ts', import.meta.url), 'utf8');
     expect(core).toContain('var(--mkt-name-');
     // The CODE must carry no color literal (tokens only); the header comment may
@@ -53,6 +89,34 @@ describe('market_window: no magic values', () => {
   it('uses no em or en dashes (ASCII separators only)', () => {
     expect(painter.includes('—'), 'em dash found').toBe(false);
     expect(painter.includes('–'), 'en dash found').toBe(false);
+  });
+});
+
+describe('market_window: instance-effective icon rims (phase 13 fix round)', () => {
+  it('all three instance-bearing rows drive the icon q-class off the copy', () => {
+    // Browse, the staged sell pick, and the returned-goods rows each hold a
+    // per-copy payload, so their icons paint through knownItemIconHtml with
+    // the SAME effective quality that colors the name: a promoted legendary
+    // shows the orange rim, never its def tier's purple.
+    // Through the injected icon dep with the cell's quality (the widened
+    // PainterHost itemIcon seam, the phase 13 QA), never a direct import that
+    // would bypass the seam.
+    expect(painterCode).toContain('this.deps.itemIcon(item, effQuality)');
+    expect(painterCode).toContain('this.deps.itemIcon(item, stagedQuality)');
+    expect(painterCode).toContain('this.deps.itemIcon(item, returnedQuality)');
+    expect(painterCode).not.toContain('knownItemIconHtml');
+  });
+
+  it('the def-only negative: the sale LEDGER row has no payload and keeps the def icon', () => {
+    // renderCollectSales rows are historical records whose model carries no
+    // instance, so the rim is the def's, stated rather than defaulted.
+    const ledger = painterCode.slice(
+      painterCode.indexOf('private renderCollectSales('),
+      painterCode.indexOf('private fungibleBagCount('),
+    );
+    expect(ledger).toContain('this.deps.itemIcon(item, item.quality)');
+    expect(ledger).not.toContain('this.deps.itemIcon(item)');
+    expect(ledger).not.toContain('knownItemIconHtml(');
   });
 });
 
@@ -82,9 +146,19 @@ describe('market_window: the Collect tab sale ledger', () => {
 
   it('builds the rows in the pure core, leaving the painter no item resolution', () => {
     expect(core).toContain('collectionSales');
-    // The painter consumes MarketCollectSaleRow; it never reaches into ITEMS itself.
+    // The painter consumes MarketCollectSaleRow; it never reaches into ITEMS to
+    // resolve a LEDGER ROW.
     expect(painter).toContain('MarketCollectSaleRow');
-    expect(painter.includes("from '../sim/data'")).toBe(false);
+    // Scoped to the ledger's own render, not the whole file. The painter does
+    // now import ITEMS, for one unrelated seam: it hands the catalog to the
+    // localized-search resolver (effectiveSearch), which is a pure core that
+    // imports no data of its own and must be given it by its composition point.
+    // A blanket file-wide import ban would have to fail that or be deleted, and
+    // neither answers what this pin is actually for, so it reads the region.
+    const at = painterCode.indexOf('renderCollect');
+    expect(at, 'the collect render must exist to be scoped').toBeGreaterThan(-1);
+    const ledger = painterCode.slice(at, painterCode.indexOf('\n  private ', at + 1));
+    expect(ledger, 'the ledger render resolves no item itself').not.toContain('ITEMS');
   });
 });
 
@@ -229,8 +303,13 @@ describe('market_window: mobile pairing (hud.mobile.css)', () => {
     // The paired-geometry rule reserves the 72px band FOR the player frame;
     // without the market-open disqualifier the docked bags flips
     // mobile-fullscreen-window-open and hides own HP/resource while the world
-    // keeps running. The core pins the flag list; this pins the hud wiring.
-    expect(hud).toMatch(
+    // keeps running. The core pins the flag list; this pins the body-class
+    // writer's wiring (window_open_state.ts since the Phase 14 extraction).
+    const windowOpenState = readFileSync(
+      new URL('../src/ui/window_open_state.ts', import.meta.url),
+      'utf8',
+    );
+    expect(windowOpenState).toMatch(
       /isMobileFullscreenWindowOpen\([\s\S]{0,400}?contains\('market-open'\),\s*document\.body\.classList\.contains\('char-bags-paired'\)/,
     );
   });
@@ -395,11 +474,95 @@ describe('market_window: behavior preserved through the core', () => {
   });
 });
 
+describe('market_window: the localized Browse search is resolved at the UI boundary', () => {
+  // The server filters the book on ENGLISH names and ids (src/sim/market_query.ts),
+  // so the client translates the typed text before sending it. These pin the two
+  // properties that keep that from being worse than the empty result it replaces.
+  it('verifies its candidate searches with the SERVER own matcher, not a client copy', () => {
+    // The whole soundness argument is that a substituted search is proven to
+    // select the same set the server will select. That proof is only worth
+    // anything while the predicate doing the proving is the authority's.
+    expect(painterCode).toContain('localizedMarketSearch');
+    expect(painterCode).toContain('marketItemMatches');
+    // Over the WHOLE catalog and with every facet neutral: a narrower universe
+    // would prove set-equality only on a subset, which does not carry to the
+    // book the server actually searches.
+    expect(painterCode).toContain('itemIds: Object.keys(ITEMS)');
+    expect(painterCode).toContain('...defaultMarketQuery(), search');
+  });
+
+  it('re-resolves the sent search when the LANGUAGE moves under an unchanged query', async () => {
+    // The resolution reads localized item names, so one typed string resolves
+    // differently per locale. Keyed on the text alone, the memo kept serving the
+    // PREVIOUS locale's substitution after a switch: not the empty result the
+    // untranslated path gives, a wrong one, which is the single outcome this
+    // feature exists to avoid.
+    //
+    // Driven for real (the private reach-in follows this file's own precedent
+    // two describes down): the resolver touches no DOM, only the catalog and the
+    // locale table.
+    await ensureLocaleLoaded('ja_JP');
+    setLanguage('ja_JP');
+    const jaName = itemDisplayName(ITEMS.worn_sword);
+    setLanguage('en');
+
+    const win = new MarketWindow({} as never) as any;
+    win.searchQuery = jaName;
+    // Under English the Japanese name matches no English name or id, so the
+    // typed text is handed back untouched. That is the memo this arm poisons.
+    const underEnglish = win.effectiveSearch() as string;
+    expect(underEnglish, 'the untranslated path returns the typed text').toBe(jaName);
+
+    setLanguage('ja_JP');
+    const afterSwitch = win.effectiveSearch() as string;
+    // A window that never saw English resolves the same query fresh; the one
+    // that did must agree with it.
+    const fresh = new MarketWindow({} as never) as any;
+    fresh.searchQuery = jaName;
+    const expected = fresh.effectiveSearch() as string;
+    setLanguage('en');
+
+    expect(afterSwitch, 'the switched window must not serve the English memo').toBe(expected);
+    // Non-vacuity: the two locales really do resolve this query differently, so
+    // the equality above is a claim and not a coincidence.
+    expect(expected, 'ja_JP resolves to a verified English search').toBe('worn_sword');
+    expect(expected).not.toBe(underEnglish);
+  });
+});
+
+describe('market_window: filter chip label routing', () => {
+  // marketItemTypeLabel falls through to the 'All types' label for any filter
+  // value without an arm, so deleting a chip's arm (say 'pattern') would render
+  // that chip labeled 'All' with tsc and every predicate suite still green.
+  // This drives the REAL private resolver over the live filter list (the
+  // constructor only stores its deps and the method only calls t(), so no DOM
+  // is involved; the private reach-in follows this file's `as any` precedent)
+  // and requires every member to resolve to its own distinct label: a member
+  // that falls through collides with the 'all' entry and reds this, future
+  // chips included.
+  it('maps every item-type filter to its own distinct label, never the All fall-through', () => {
+    const win = new MarketWindow({} as never);
+    const labels = MARKET_ITEM_TYPE_FILTERS.map(
+      (filter) => (win as any).marketItemTypeLabel(filter) as string,
+    );
+    for (const label of labels) expect(label.length).toBeGreaterThan(0);
+    expect(new Set(labels).size).toBe(MARKET_ITEM_TYPE_FILTERS.length);
+  });
+});
+
 describe('market_window: Browse row cloth/leather/mail cue (#3104)', () => {
   it('resolves the badge from the shared armor-type resolver, not a second classification', () => {
-    expect(painter).toContain(
-      "import { marketArmorBadge, marketArmorPips, marketHeroicStar } from './market_armor_badge';",
-    );
+    // The claim is WHERE the badge helpers come from, not how the import happens
+    // to be formatted: the module grew a fourth member (the pattern mark) and
+    // biome wrapped the line, which a byte-exact single-line pin fails on while
+    // the property it names is untouched. Named imports plus the source module,
+    // so a second local classification still reds it.
+    const at = painterCode.indexOf("from './market_armor_badge'");
+    expect(at, 'the badge helpers must come from the shared module').toBeGreaterThan(-1);
+    const importStmt = painterCode.slice(painterCode.lastIndexOf('import', at), at);
+    for (const named of ['marketArmorBadge', 'marketArmorPips', 'marketHeroicStar']) {
+      expect(importStmt, `${named} comes from market_armor_badge`).toContain(named);
+    }
     expect(painter).toContain('const armorBadge = marketArmorBadge(item);');
   });
 
@@ -428,6 +591,13 @@ describe('market_window: Browse row cloth/leather/mail cue (#3104)', () => {
     const core = readFileSync(new URL('../src/ui/market_armor_badge.ts', import.meta.url), 'utf8');
     expect(core).toContain("from './item_armor_type'");
     expect(core).toContain("from '../sim/equipment_rules'");
+  });
+
+  it('keeps the pattern mark on shared theme tokens', () => {
+    const rule = componentsCss.match(/\.mkt-pattern-mark\s*\{([^}]*)\}/s)?.[1] ?? '';
+    expect(rule).toContain('var(--color-text-light)');
+    expect(rule).toContain('var(--text-outline-color)');
+    expect(rule).not.toMatch(/#[0-9a-f]{3,8}/i);
   });
 
   it('is not color-only: the cue is a countable pip symbol, distinguished by a per-type class, and still carries the word for assistive tech', () => {
@@ -767,6 +937,20 @@ describe('ClientWorld: reconnect re-push of session preferences (#2723 review)',
       expect(sent).toEqual([]);
     } finally {
       (globalThis as any).WebSocket = oldWebSocket;
+    }
+  });
+});
+
+describe('market_window: live locale-aware case folding', () => {
+  it('uses the active Turkish locale tag when resolving the sent search', async () => {
+    await ensureLocaleLoaded('tr_TR');
+    setLanguage('tr_TR');
+    try {
+      const win = new MarketWindow({} as never) as any;
+      win.searchQuery = 'ilik ucu';
+      expect(win.effectiveSearch()).toBe('marrowpoint');
+    } finally {
+      setLanguage('en');
     }
   });
 });

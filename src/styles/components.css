@@ -1394,6 +1394,23 @@
     letter-spacing: 0.09em;
     color: var(--color-text-muted);
   }
+  /* The worn Masterwrought mark (phase 14): a small gold diamond beside the
+     slot name (a CSS-drawn rotated square; the aria-label carries the word).
+     Sized to the slot-name cap height so it reads as part of the label. */
+  .equip-mw-chip {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    transform: rotate(45deg);
+    background: var(--gold-dim);
+    box-shadow: inset 0 0 0 1px var(--gold);
+    vertical-align: baseline;
+  }
+  @media (forced-colors: active) {
+    .equip-mw-chip {
+      border: 1px solid CanvasText;
+    }
+  }
   /* Item names WRAP (never ellipsized) so a full name always reads. */
   .equip-slot .slot-item {
     font-size: 11.5px;
@@ -1809,6 +1826,23 @@
   .cp-none {
     color: #7c7256;
     font-style: italic;
+  }
+  /* The Masterwrought slots readout (phase 14): the char-playtime slim-row
+     shape (muted label, parchment tabular value) seated under the paperdoll
+     whose worn diamonds it counts. */
+  .char-mw-slots {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .char-mw-slots .cp-title {
+    margin-bottom: 0;
+  }
+  .char-mw-slots-value {
+    font-size: 13px;
+    color: var(--color-text-light);
+    font-weight: normal;
+    font-variant-numeric: tabular-nums;
   }
   /* The lifetime "Time Played" line footing the character sheet: the shared
      inset-card treatment laid out as one slim row (label, value, then the
@@ -6027,7 +6061,7 @@
     padding: 10px 12px;
     border: 1px solid var(--color-border-showcase);
     border-radius: 7px;
-    background: rgba(0, 0, 0, 0.24);
+    background: var(--color-card-inset);
   }
   .profession-identity-main {
     flex: 1 1 0;
@@ -6214,6 +6248,15 @@
     display: block;
     margin-top: 2px;
   }
+  /* One reagent entry never breaks between its name and its have/required
+     count (a wrapped count reads as a stray number on the next line): an
+     inline-block with nowrap wraps the reagent LIST between entries instead,
+     mirroring the wiki twin .guide-prof-mat (src/guide/styles.css) so the
+     two surfaces read a bill the same way. */
+  .crafting-reagent {
+    display: inline-block;
+    white-space: nowrap;
+  }
   /* Unsatisfied reagents tint toward the error red; the have/required counts
      in the text are the actual signal (the tint is a redundant hint). */
   .crafting-reagent.unsat {
@@ -6271,6 +6314,38 @@
     font-variant-numeric: tabular-nums;
     color: var(--color-text-muted);
     white-space: nowrap;
+  }
+  /* The apex treatment (Masterwrought phase 14): restrained per DESIGN.md,
+     gold stays structural. The chip rides the duration-chip base rule with a
+     fine gold edge; the socket ring is one inset line; the provenance line
+     and the Perfecting link carry the same information as text. */
+  .crafting-apex-chip {
+    border-color: var(--gold-dim);
+    color: var(--gold);
+  }
+  .crafting-recipe-socket.apex {
+    box-shadow: inset 0 0 0 1px var(--gold-dim);
+    border-radius: 3px;
+  }
+  .crafting-apex-line {
+    color: var(--color-text-muted);
+    font-size: 10px;
+  }
+  .crafting-perfecting-link {
+    margin-left: auto;
+    min-height: 28px;
+    padding: 2px 10px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+    background: none;
+    color: var(--gold-dim);
+    font: inherit;
+    font-size: 11px;
+    cursor: pointer;
+  }
+  .crafting-perfecting-link:hover {
+    border-color: var(--gold);
+    color: var(--gold);
   }
   /* Polite live region: off-screen, announces cast start/complete/cancel. */
   /* In-window craft-cast strip (Craft Cast System Phase 2): the SINGLE
@@ -6544,15 +6619,15 @@
     color: var(--gold);
   }
 
-  /* ---------- profession first-tier tutorial ---------- */
+  /* ---------- tutorial and ferry notes ---------- */
   /* The once-ever explainer modal (profession_tutorial_window.ts), reusing the
      confirm-dialog modal family (.window.panel shell, .cd-body/.cd-actions). A
      bounded, centered modal; body-appended (see the layout.css --window-scale:1
      group), and the JS floors its z-index above the mobile sheet (the
      scoped-popup 96 rule). Sized from existing tokens, no new ones. */
-  /* #tutorial-greeting (the tutorial island spawn greeting,
-     tutorial_greeting_window.ts) shares every rule: the same once-ever modal
-     shape, reusing the same confirm-dialog family chrome. */
+  /* #tutorial-greeting (the live ferry-note dialog,
+     tutorial_greeting_window.ts) shares every rule: the same single-button
+     modal shape, reusing the same confirm-dialog family chrome. */
   #profession-tutorial,
   #tutorial-greeting {
     left: 50%;
@@ -6776,8 +6851,12 @@
       min-height: 40px;
     }
   }
+  /* The column-flex shell the professions windows share (#professions-window
+     below): the painter opens the board with display:flex, so the title,
+     intro, form and sections stack as a column. */
   #commission-board-window {
     width: 460px;
+    flex-direction: column;
   }
   .commission-board-intro {
     display: block;
@@ -6824,7 +6903,10 @@
     border: 1px solid #5a4a2a;
     border-radius: 6px;
     color: #ffe6a8;
-    font-family: Georgia, serif;
+    /* The serif face by its token (the literal Georgia stack predated
+       --font-serif); the warm input hexes above stay with their mail-form
+       siblings until that family gets its own token pass. */
+    font-family: var(--font-serif);
   }
   .commission-field input[type="text"]:focus-visible {
     outline: 2px solid var(--color-border-focus);
@@ -6878,6 +6960,16 @@
     align-items: center;
     gap: 10px;
     flex-wrap: wrap;
+  }
+  /* The crafter's-record quality signal on accepted rows (Masterwrought
+     phase 14): muted label, parchment values, tabular numerals so a list of
+     records ranks at a glance. */
+  .commission-crafter-record .ccr-label {
+    color: var(--color-text-muted);
+  }
+  .commission-crafter-record .ccr-values {
+    color: var(--color-text-light);
+    font-variant-numeric: tabular-nums;
   }
   .commission-order-actions {
     display: flex;
@@ -10368,23 +10460,100 @@
      positions are build-time inline writes; ring strokes carry
      vector-effect="non-scaling-stroke" so these pixel widths survive the
      unit-circle viewBox. Semantic colours come from tokens; the showcase
-     hairline is the shared --color-border-showcase token, and the remaining
-     inset-card cosmetics (rgba card fills, the ring stage haze) are
-     deliberate literals shared with the char-window showcase family. */
+     hairline is the shared --color-border-showcase token and the card fills
+     its --color-card-inset companion (phase 14); the ring stage haze stays a
+     deliberate literal shared with the char-window showcase family, and so
+     does the .prof-track-step.filled inset bevel (the same 0.28 white bevel
+     .prof-bar-fill in this section already spells; both await the DESIGN.md
+     foundation-phase token pass with the recorded wash/scrim literals). */
   #professions-window {
     width: 720px;
     max-height: calc(var(--app-vh, 100vh) * 0.85 / var(--window-scale) - 24px);
     flex-direction: column;
   }
-  #professions-window .panel-title {
+  /* ONE title treatment for the column-flex professions windows (phase 14:
+     four byte-identical copies collapsed; the crafting window keeps its own
+     relative-positioned title because its close button pins differently). */
+  #professions-window .panel-title,
+  #harvest-journal-window .panel-title,
+  #plant-sheet-window .panel-title,
+  #perfecting-window .panel-title {
     flex: none;
     display: flex;
     align-items: center;
     gap: 8px;
   }
-  #professions-window .panel-title > span {
+  #professions-window .panel-title > span,
+  #harvest-journal-window .panel-title > span,
+  #plant-sheet-window .panel-title > span,
+  #perfecting-window .panel-title > span {
     flex: 1 1 auto;
     min-width: 0;
+  }
+  /* ONE empty-state family for the professions windows (phase 14: the
+     harvest journal's shape, the best of the four the family had grown, now
+     the only one): a centered quiet block, optional small-caps title over a
+     muted body line. Whole-window empties carry both; a section or list
+     empty carries the body alone. */
+  .prof-empty {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px;
+    text-align: center;
+  }
+  .prof-empty h3 {
+    margin: 0;
+    font-family: var(--title-font);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    font-variant: small-caps;
+    color: var(--gold);
+  }
+  .prof-empty p {
+    margin: 0;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  /* ONE progress/track family for the professions windows (phase 14,
+     DESIGN.md 10.5): a stepped rank or growth track plus its status text.
+     Consumers: the Perfecting rank track (perfecting_window.ts) and the
+     Harvest Journal's growth stages and countdown (harvest_journal_window.ts).
+     Dark cells on the one-pixel dark keyline (--panel-edge, the panel's own
+     keyline shade), colored fill with a one-pixel top highlight, tabular
+     status text so ticking digits do not jitter their row. */
+  .prof-track {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .prof-track-steps {
+    display: inline-flex;
+    gap: 4px;
+  }
+  .prof-track-step {
+    width: 22px;
+    height: 8px;
+    border: 1px solid var(--panel-edge);
+    border-radius: 4px;
+    background: var(--color-bg-input);
+  }
+  .prof-track-step.filled {
+    background: var(--gold-dim);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  }
+  /* The compact variant for dense rows (the journal's per-row growth
+     stages): same anatomy, smaller cells; two sizes, one primitive. */
+  .prof-track-steps.compact .prof-track-step {
+    width: 12px;
+    height: 6px;
+    border-radius: 3px;
+  }
+  .prof-track-text {
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-light);
   }
   .prof-scroll {
     flex: 1 1 auto;
@@ -10419,7 +10588,7 @@
     padding: 10px 14px 12px;
     border: 1px solid var(--color-border-showcase);
     border-radius: 7px;
-    background: rgba(0, 0, 0, 0.24);
+    background: var(--color-card-inset);
   }
   /* The hero band: the identity card beside the wheel on its stage. */
   .prof-hero {
@@ -10760,6 +10929,536 @@
     font-size: 11px;
     color: var(--color-text-muted);
   }
+  /* ---------- harvest journal ---------- */
+  /* The Harvest Journal: a cold, read-only list of the caller's own planted
+     garden beds over IWorldFarming. One row per plot (crop name, bed location,
+     state, plant-time care), with a 1 Hz countdown that rewrites only the
+     .hj-time text. IDENTICAL ON EVERY GRAPHICS PRESET AND FPS TIER: a crop
+     timer is actionable information, so nothing here is preset- or tier-gated.
+     The rows ride the showcase inset-card idiom the professions sections use;
+     the two state hues are the shared success/error text tokens and never the
+     only signal (each state also says its word). */
+  #harvest-journal-window {
+    width: 520px;
+    max-height: calc(var(--app-vh, 100vh) * 0.8 / var(--window-scale) - 24px);
+    flex-direction: column;
+  }
+  .hj-body {
+    flex: 1 1 auto;
+    min-height: 120px;
+    overflow-y: auto;
+    padding-right: 2px;
+  }
+  .hj-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  /* Two columns: what and where on the left, when and how tended on the
+     right. Both columns wrap rather than truncate, so a long localized crop
+     or zone name stays readable. */
+  .hj-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, auto);
+    gap: 2px 12px;
+    padding: 8px 10px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+    background: var(--color-card-inset);
+  }
+  .hj-crop {
+    grid-column: 1;
+    min-width: 0;
+    font-weight: 600;
+    color: var(--color-text-light);
+  }
+  .hj-bed {
+    grid-column: 1;
+    min-width: 0;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .hj-state {
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-end;
+    gap: 8px;
+    min-width: 0;
+  }
+  /* The growth-stage step track (the shared .prof-track family): the cells
+     are blocks, so they center in the baseline-aligned state row instead of
+     hanging from the text baseline. */
+  .hj-state .prof-track-steps {
+    align-self: center;
+  }
+  /* .hj-time rides the shared .prof-track-text style (the family above);
+     only the settled-state tints live here, and each is never the only
+     signal (the cell also says its word). */
+  .hj-ready .hj-time {
+    color: var(--color-text-success);
+  }
+  .hj-withered .hj-time {
+    color: var(--color-text-error);
+  }
+  .hj-stage {
+    font-size: 11px;
+    font-variant: small-caps;
+    letter-spacing: 0.04em;
+    color: var(--gold-dim);
+  }
+  .hj-care {
+    grid-column: 2;
+    grid-row: 2;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 4px;
+  }
+  .hj-care-chip {
+    padding: 1px 6px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 999px;
+    background: var(--color-bg-input);
+    font-size: 10px;
+    color: var(--color-text-muted);
+  }
+  .hj-care-none {
+    font-size: 10px;
+    color: var(--color-text-muted);
+  }
+  /* The journal's repaint wrapper: the whole title + body re-renders inside
+     it while the status line beside it persists (a live region must never be
+     destroyed and re-inserted). display: contents keeps the title and body
+     laying out as the root's own flex children, exactly as before. */
+  .hj-content {
+    display: contents;
+  }
+  /* The in-dialog ready announcement. The empty role=status node stays in
+     the accessibility tree before its first content mutation; collapsing it
+     with display:none would make that first announcement unreliable. */
+  .hj-live-status {
+    margin: 6px 14px 10px;
+    font-size: 11px;
+    color: var(--gold);
+  }
+  .hj-live-status:empty {
+    margin: 0;
+  }
+
+  /* ---------- plant sheet ---------- */
+  /* The plant sheet (#plant-sheet-window, the bed verbs): the window a press
+     on a free garden bed opens. Seed rows are single-select RADIOS in a
+     radiogroup (aria-checked carries the pick, the Phase 14 a11y batch) and
+     the three care knobs are aria-pressed toggles, all on the 40px touch
+     floor; hue is never the only signal (a short knob also says its reason).
+     Reuses the journal's inset-card idiom and the shared window chrome. */
+  #plant-sheet-window {
+    width: 440px;
+    max-height: calc(var(--app-vh, 100vh) * 0.8 / var(--window-scale) - 24px);
+    flex-direction: column;
+  }
+  .ps-body {
+    flex: 1 1 auto;
+    min-height: 100px;
+    overflow-y: auto;
+    padding-right: 2px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .ps-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .ps-seed {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 40px;
+    padding: 8px 10px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+    /* The input-surface token its sibling .ps-knob already rides (Phase 14
+       style batch): the raw 24%-black scrim read a shade apart from the knobs
+       in the same sheet and drifted from the tokens the theme presets drive. */
+    background: var(--color-bg-input);
+    color: var(--color-text-light);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  /* The seed rows are radios since the Phase 14 a11y batch (single-select),
+     so the picked state rides aria-checked, never aria-pressed. */
+  .ps-seed[aria-checked="true"] {
+    border-color: var(--gold);
+    color: var(--gold);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .ps-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-weight: 600;
+  }
+  .ps-count {
+    font-variant-numeric: tabular-nums;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .ps-locked {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 2px 8px;
+    padding: 8px 10px;
+    border: 1px dashed var(--color-border-showcase);
+    border-radius: 7px;
+    color: var(--color-text-muted);
+  }
+  .ps-locked .ps-name {
+    flex: none;
+  }
+  .ps-reason {
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .ps-knobs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .ps-knob {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 6px 10px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+    background: var(--color-bg-input);
+    color: var(--color-text-muted);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .ps-knob[aria-pressed="true"] {
+    border-color: var(--gold);
+    color: var(--color-text-light);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .ps-knob:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+  .ps-knob-name {
+    font-weight: 600;
+    font-size: 12px;
+  }
+  .ps-knob-leg {
+    font-size: 10px;
+    color: var(--color-text-muted);
+  }
+  .ps-leg-count {
+    font-variant-numeric: tabular-nums;
+    padding-left: 3px;
+  }
+  .ps-knob-short {
+    font-size: 10px;
+    color: var(--color-text-error);
+  }
+  .ps-plant {
+    align-self: flex-end;
+    min-height: 40px;
+    padding: 8px 18px;
+    border: 1px solid var(--gold-dim);
+    border-radius: 7px;
+    background: var(--color-bg-input);
+    color: var(--gold);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  /* ---------- perfecting window ---------- */
+  /* The Perfecting window (#perfecting-window, Masterwrought phase 14): the
+     apex rank track and the orange promotion. Candidate rows are single-select
+     RADIOS in a radiogroup (aria-checked carries the pick, the plant-sheet
+     shape) on the 40px touch floor; every state pairs its tint with text
+     (rank label, warning sentences), never color alone. Column-flex window
+     family; .pf-body is the ONE scroller (the capped-flex rule). */
+  /* The repaint targets .pf-shell so the sibling role=status region is a
+     persistent node (the harvest journal's structural trick); display:
+     contents keeps the column-flex layout reading the shell's children as
+     the window's own. The status line is aria-only here (the rank track and
+     the Perfected lead already SHOW the state; the region announces it), so
+     it is clipped off-screen rather than painted, unlike .hj-live-status
+     whose text is the journal's visible status line. */
+  .pf-shell {
+    display: contents;
+  }
+  .pf-live-status {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  #perfecting-window {
+    width: 460px;
+    max-height: calc(var(--app-vh, 100vh) * 0.8 / var(--window-scale) - 24px);
+    flex-direction: column;
+  }
+  .pf-body {
+    flex: 1 1 auto;
+    min-height: 100px;
+    overflow-y: auto;
+    padding-right: 2px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .pf-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-cand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 40px;
+    padding: 6px 10px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+    background: var(--color-bg-input);
+    color: var(--color-text-light);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .pf-cand[aria-checked="true"] {
+    border-color: var(--gold);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .pf-cand-socket {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+  }
+  .pf-cand-main {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pf-cand-names {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .pf-cand-sub {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 10px;
+    line-height: 1.2;
+    color: var(--color-text-muted);
+  }
+  .pf-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 600;
+  }
+  /* The promoted legend's name tint: the WCAG-lifted legendary quality-name
+     token in tokens.css (--mkt-name-legendary is #ffab5e, NOT the icon
+     palette's QUALITY_COLOR.legendary #ff8000, which fails AA on the panel
+     ground; the token block documents the lift and this window is its
+     second consumer family beside the market name); the adjacent state TEXT
+     stays the signal. */
+  .pf-name.q-legendary,
+  .pf-detail-name.q-legendary {
+    border: none;
+    box-shadow: none;
+    color: var(--mkt-name-legendary);
+  }
+  .pf-chip {
+    flex: none;
+    padding: 1px 6px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+    font-size: 10px;
+    color: var(--color-text-muted);
+  }
+  .pf-cand-state {
+    flex: none;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-muted);
+  }
+  .pf-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+  }
+  .pf-detail-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .pf-detail-names {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .pf-detail-name {
+    font-weight: 600;
+  }
+  .pf-detail-sub {
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  /* The rank track rides the shared .prof-track family (the professions
+     section above): the steps are aria-hidden decoration, .pf-track-label is
+     the accessible text. Only the settled-state fills live here; the keyline
+     stays the family's constant dark one (DESIGN.md 10.5), and each tint is
+     never the only signal (the label says the state's word). */
+  .pf-track[data-state="perfected"] .pf-step.filled {
+    background: var(--gold);
+  }
+  .pf-track[data-state="promoted"] .pf-step.filled {
+    background: var(--mkt-name-legendary);
+  }
+  .pf-track[data-state="promoted"] .pf-track-label {
+    color: var(--mkt-name-legendary);
+  }
+  .pf-lead {
+    margin: 0;
+    font-size: 12px;
+    color: var(--color-text-light);
+  }
+  .pf-warning {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px 10px;
+    border: 1px solid var(--gold-dim);
+    border-radius: 7px;
+    font-size: 12px;
+    color: var(--color-text-light);
+  }
+  .pf-warning .ui-icon {
+    flex: none;
+    color: var(--gold);
+  }
+  .pf-mats-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+  }
+  .pf-mats {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-mat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .pf-mat-count {
+    margin-left: auto;
+    font-variant-numeric: tabular-nums;
+    font-size: 12px;
+  }
+  .pf-mat.short .pf-mat-count {
+    color: var(--color-text-error);
+  }
+  .pf-skill {
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  .pf-skill.unmet .pf-skill-state {
+    color: var(--color-text-error);
+  }
+  .pf-action {
+    align-self: flex-end;
+    min-height: 40px;
+    padding: 8px 18px;
+    border: 1px solid var(--gold-dim);
+    border-radius: 7px;
+    background: var(--color-bg-input);
+    color: var(--gold);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .pf-action:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+  /* The naming prompt (#prompt-stack tenant) and the bind confirm: the shared
+     .prompt panel chrome plus the name form's own rows. The 16px mobile input
+     floor is base.css's coarse-pointer rule; nothing here undercuts it. */
+  .pf-name-label {
+    font-size: 12px;
+    color: var(--color-text-light);
+  }
+  .pf-name-input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .pf-name-count {
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-muted);
+    text-align: right;
+  }
+  .pf-name-hint {
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .pf-name-hint[data-invalid="true"] {
+    color: var(--color-text-error);
+  }
+  .pf-name-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+
   /* ---------- AAA window-frame adoption: master-detail windows (batch 2) ---------- */
   /* The quest log, mailbox, social panel, and spellbook adopt the shared
      window-frame grammar (src/ui/window_frame.ts; spec 6.1 + 8). Each mounts the
@@ -13291,6 +13990,25 @@
     text-shadow:
       0 1px 2px #000,
       0 0 3px #000;
+    pointer-events: none;
+  }
+  /* Pattern mark: the third corner of the same family, BOTTOM-LEFT. The heroic
+     star holds top-left and the armor pips bottom-right, and bottom-left is the
+     corner that cannot collide with either: an armor pattern is not itself
+     armor so it draws no pips, while a pattern CAN be heroic, and both must
+     stay readable at once. Parchment-toned rather than gold, so the two marks
+     never read as one repeated cue; the lozenge glyph is distinguishable from
+     the star in silhouette alone, which is what carries it in grayscale. */
+  .mkt-pattern-mark {
+    position: absolute;
+    left: -3px;
+    bottom: -3px;
+    font-size: 10px;
+    line-height: 1;
+    color: var(--color-text-light);
+    text-shadow:
+      0 1px 2px var(--text-outline-color),
+      0 0 3px var(--text-outline-color);
     pointer-events: none;
   }
   /* Price is the number a shopper is actually comparing, so give it real weight.

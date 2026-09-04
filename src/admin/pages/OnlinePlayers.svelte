@@ -1,14 +1,11 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { apiGet } from '../api';
-  import {
-    readAutoRefreshPreference,
-    writeAutoRefreshPreference,
-  } from '../auto_refresh_preference';
   import AutoRefreshToggle from '../components/AutoRefreshToggle.svelte';
   import OnlineTable from '../components/OnlineTable.svelte';
   import Pager from '../components/Pager.svelte';
   import Panel from '../components/Panel.svelte';
+  import PermissionDenied from '../components/PermissionDenied.svelte';
   import { fmtNumber } from '../format';
   import { adminLanguageTag, classLabel, t, zoneLabel } from '../i18n';
   import {
@@ -16,7 +13,7 @@
     type OnlineSortColumn,
     type OnlineSortDirection,
   } from '../online_players_view';
-  import { auth } from '../state/auth.svelte';
+  import { createAutoRefresh } from '../state/auto_refresh.svelte';
   import { ONLINE_REFRESH_MS } from '../state/poll';
   import type { LivePlayer } from '../types';
 
@@ -25,16 +22,17 @@
   // operator can switch it off (the preference sticks) and refresh by hand.
   const AUTO_REFRESH_STORAGE_KEY = 'claudecraft_admin_online_players_auto_refresh';
 
-  let players = $state<LivePlayer[]>([]);
-  let loaded = $state(false);
-  let failed = $state(false);
+  const surface = createAutoRefresh<{ players: LivePlayer[] }>({
+    storageKey: AUTO_REFRESH_STORAGE_KEY,
+    intervalMs: ONLINE_REFRESH_MS,
+    load: () => apiGet<{ players: LivePlayer[] }>('/admin/api/online'),
+  });
+  let players = $derived(surface.data?.players ?? []);
+  let loaded = $derived(surface.data !== null);
   let search = $state('');
   let sort = $state<OnlineSortColumn>('name');
   let dir = $state<OnlineSortDirection>('asc');
   let page = $state(1);
-  let autoRefresh = $state(true);
-  let mounted = $state(false);
-  let requestId = 0;
 
   let view = $derived(
     buildOnlinePlayersView(players, {
@@ -58,46 +56,13 @@
         }),
   );
 
-  async function refresh(): Promise<void> {
-    const currentRequest = ++requestId;
-    try {
-      const result = await apiGet<{ players: LivePlayer[] }>('/admin/api/online');
-      if (currentRequest !== requestId) return;
-      players = result.players;
-      loaded = true;
-      failed = false;
-    } catch (err) {
-      if (currentRequest !== requestId) return;
-      if (!auth.handleAuthFailure(err)) failed = true;
-    }
-  }
-
   function onSort(column: OnlineSortColumn): void {
     dir = sort === column && dir === 'asc' ? 'desc' : 'asc';
     sort = column;
     page = 1;
   }
 
-  function changeAutoRefresh(enabled: boolean): void {
-    autoRefresh = enabled;
-    writeAutoRefreshPreference(AUTO_REFRESH_STORAGE_KEY, enabled);
-    if (enabled) void refresh();
-  }
-
-  $effect(() => {
-    if (!mounted || !autoRefresh) return;
-    const id = setInterval(() => void refresh(), ONLINE_REFRESH_MS);
-    return () => clearInterval(id);
-  });
-
-  onMount(() => {
-    autoRefresh = readAutoRefreshPreference(AUTO_REFRESH_STORAGE_KEY);
-    mounted = true;
-    void refresh();
-    return () => {
-      requestId += 1;
-    };
-  });
+  onMount(() => surface.start());
 </script>
 
 <Panel>
@@ -115,11 +80,11 @@
     <span class="text-dim">{count}</span>
     <span class="text-dim">{t('onlinePlayers.sortHint')}</span>
     <AutoRefreshToggle
-      checked={autoRefresh}
+      checked={surface.enabled}
       label={t('onlinePlayers.autoRefresh', { minutes: ONLINE_REFRESH_MS / 60_000 })}
-      onChange={changeAutoRefresh}
+      onChange={(enabled) => surface.setEnabled(enabled)}
     />
-    <button type="button" onclick={() => void refresh()}>{t('onlinePlayers.refresh')}</button>
+    <button type="button" onclick={() => surface.refresh()}>{t('onlinePlayers.refresh')}</button>
     <div class="pager">
       <Pager
         total={view.total}
@@ -131,7 +96,9 @@
       />
     </div>
   </div>
-  {#if failed}
+  {#if surface.failure === 'forbidden'}
+    <PermissionDenied />
+  {:else if surface.failure === 'error'}
     <div class="empty">{t('onlinePlayers.loadFailed')}</div>
   {:else if !loaded}
     <div class="empty">{t('onlinePlayers.loading')}</div>

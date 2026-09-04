@@ -1,9 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
   DEFAULT_RAID_RESET_TIME_ZONE,
+  dailyResetRemainingSec,
   eventLeadDayKey,
   isSupportedTimeZone,
   nextRaidResetMs,
+  nextResetMemoSizeForTest,
   nextWeeklyRaidResetMs,
   RAID_RESET_HOUR,
   resetDayKey,
@@ -257,6 +259,125 @@ describe('resolveRaidResetTimeZone', () => {
     expect(resolveRaidResetTimeZone('Bad/Zone')).toBe(DEFAULT_RAID_RESET_TIME_ZONE);
     expect(warn).toHaveBeenCalledTimes(1);
     warn.mockRestore();
+  });
+});
+
+// The when-half of resetDayKey (Masterwrought phase 14): whole seconds until
+// the reset that closes the current window, fed to the sim by
+// server/sim_calendar_feed.ts so the daily craft gate's refusal can answer
+// with a countdown. Pure in (instant, zone) like every sibling here.
+describe('dailyResetRemainingSec', () => {
+  it('is exactly the ceil of the distance to nextRaidResetMs', () => {
+    for (const now of [
+      Date.UTC(2025, 5, 29, 16, 0, 0), // summer (EDT)
+      Date.UTC(2025, 0, 15, 12, 0, 0), // winter (EST)
+      Date.UTC(2025, 11, 31, 23, 59, 0), // year boundary
+    ]) {
+      expect(dailyResetRemainingSec(now)).toBe(Math.ceil((nextRaidResetMs(now) - now) / 1000));
+    }
+  });
+
+  it('expires exactly where resetDayKey flips, and never answers 0', () => {
+    // One second before the summer boundary (2025-06-30 03:00 EDT == 07:00
+    // UTC): one second remains and the key still reads the old window; at
+    // the boundary a full day remains and the key reads the new one. The
+    // floor at 1 keeps a live realm clock from ever feeding the sim its
+    // 0 = "no calendar" sentinel.
+    const boundary = Date.UTC(2025, 5, 30, 7, 0, 0);
+    expect(dailyResetRemainingSec(boundary - 1000)).toBe(1);
+    expect(resetDayKey(boundary - 1000)).toBe('2025-06-29');
+    expect(dailyResetRemainingSec(boundary)).toBe(24 * 3600);
+    expect(resetDayKey(boundary)).toBe('2025-06-30');
+    expect(dailyResetRemainingSec(boundary - 1)).toBeGreaterThanOrEqual(1);
+  });
+
+  it('the per-window memo answers identically across one window (the 20 Hz loop cost bound)', () => {
+    // Two instants inside one window must resolve the SAME closing instant
+    // (the memoized value), so remaining figures differ by exactly the
+    // elapsed seconds.
+    const morning = Date.UTC(2025, 5, 29, 16, 0, 0);
+    const later = morning + 3600 * 1000;
+    expect(dailyResetRemainingSec(morning) - dailyResetRemainingSec(later)).toBe(3600);
+  });
+
+  it('honors the zone parameter like its siblings', () => {
+    const now = Date.UTC(2025, 5, 29, 16, 0, 0);
+    expect(dailyResetRemainingSec(now, 'Europe/Paris')).not.toBe(
+      dailyResetRemainingSec(now, DEFAULT_RAID_RESET_TIME_ZONE),
+    );
+  });
+
+  it('survives the ambiguous DST fall-back hour: the memo expires on the instant, not the label', () => {
+    // EET fall-back 2026-10-25: local 04:00 EEST becomes 03:00 EET, so 03:00
+    // happens twice. resetDayKey flips at the FIRST 03:00 (00:00Z) while the
+    // reset resolves to the SECOND (01:00Z). A label-keyed memo populated at
+    // 00:00Z would keep serving 01:00Z after it passed, pinning the answer at
+    // the 1-second floor for the rest of the window (the wave-1 hot-path
+    // review's measured finding). The memo must re-resolve once the cached
+    // instant passes, in exact agreement with nextRaidResetMs at every probe.
+    const zone = 'Europe/Athens';
+    const firstThree = Date.UTC(2026, 9, 25, 0, 0, 0);
+    const secondThree = Date.UTC(2026, 9, 25, 1, 0, 0);
+    // Populate the memo inside the ambiguous window, then probe past the
+    // resolved reset: the answer must track nextRaidResetMs, never the floor.
+    expect(dailyResetRemainingSec(firstThree, zone)).toBe(
+      Math.ceil((nextRaidResetMs(firstThree, zone) - firstThree) / 1000),
+    );
+    for (const probe of [
+      secondThree - 1000,
+      secondThree,
+      secondThree + 60 * 1000,
+      secondThree + 12 * 3600 * 1000,
+    ]) {
+      expect(dailyResetRemainingSec(probe, zone), new Date(probe).toISOString()).toBe(
+        Math.max(1, Math.ceil((nextRaidResetMs(probe, zone) - probe) / 1000)),
+      );
+    }
+    // Sanity: an hour after the second 03:00 the countdown is a large number
+    // (the next day's reset), not the 1-second lie.
+    expect(dailyResetRemainingSec(secondThree + 3600 * 1000, zone)).toBeGreaterThan(20 * 3600);
+  });
+
+  it('the memo stays bounded across many zones and still answers correctly after the sweep', () => {
+    // NEXT_RESET_MEMO_MAX clears the map at 16 entries; deleting that line
+    // grows it unbounded across (window, zone) keys. Behavioral pin: drive
+    // well past the bound with distinct zones, then re-probe an early zone;
+    // a correct clear-on-overflow re-resolves and agrees with
+    // nextRaidResetMs (an unbounded map would too, so the agreement half is
+    // the correctness control while the count half below is the bound).
+    const now = Date.UTC(2025, 5, 29, 16, 0, 0);
+    const zones = [
+      'America/New_York',
+      'Europe/Paris',
+      'Europe/Athens',
+      'Asia/Tokyo',
+      'Asia/Seoul',
+      'Asia/Shanghai',
+      'Australia/Sydney',
+      'Pacific/Auckland',
+      'Pacific/Chatham',
+      'America/Santiago',
+      'America/Sao_Paulo',
+      'Africa/Cairo',
+      'Asia/Kolkata',
+      'Asia/Dubai',
+      'Europe/London',
+      'Europe/Berlin',
+      'Europe/Madrid',
+      'America/Chicago',
+      'America/Denver',
+      'America/Los_Angeles',
+    ];
+    for (const zone of zones) dailyResetRemainingSec(now, zone);
+    // The bound itself: 20 distinct keys were driven, so an unbounded map
+    // would hold at least 20; the clear-on-overflow keeps it at or under the
+    // 16-entry cap (plus the entries re-added since the last sweep).
+    expect(nextResetMemoSizeForTest()).toBeLessThanOrEqual(16);
+    for (const zone of [zones[0], zones[1]]) {
+      expect(dailyResetRemainingSec(now, zone)).toBe(
+        Math.max(1, Math.ceil((nextRaidResetMs(now, zone) - now) / 1000)),
+      );
+    }
   });
 });
 

@@ -401,7 +401,7 @@ describe('Ascension talent invariants', () => {
     expect(sim.player.paladinDevotion.value).toBe(7);
     sim.ctx.applyAura(sim.player, {
       id: 'avenging_wrath',
-      name: 'Avenging Wrath',
+      name: 'Zealwing',
       kind: 'buff_dmg_done',
       value: 0.2,
       remaining: 5,

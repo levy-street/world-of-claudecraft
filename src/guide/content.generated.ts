@@ -130,7 +130,11 @@ export interface GuideReliquaryPage {
 // row against the live defs. Display names are baked English proper nouns
 // (the GUIDE_DEEDS precedent); ids/slugs localize client-side via t().
 
-export interface GuideProfMaterial { name: string; count: number; }
+/** One reagent line of a recipe or enchant bill. itemId is the LOCALIZED half:
+ *  the craft page resolves the display name through the item-name translation
+ *  key rather than printing name, which is the English source the accuracy
+ *  guards pin the id against and which stays emitted for them. */
+export interface GuideProfMaterial { itemId: string; name: string; count: number; }
 
 export interface GuideProfRecipe {
   id: string;
@@ -138,13 +142,33 @@ export interface GuideProfRecipe {
   skillReq: number;
   tier: number;
   station: string | null;
-  acquisition: 'trainer' | 'known';
+  acquisition: 'trainer' | 'drop' | 'vendor' | 'dropAndVendor' | 'known';
   feeCopper: number;
   materials: GuideProfMaterial[];
   output: { name: string; count: number; quality: string };
   combo: { crafts: string[]; minTier: number } | null;
+  /** Daily craft gate (Masterwrought phase 07): one craft per character per
+   *  reset day. */
+  oncePerDay: boolean;
   /** Mastery Curve boundaries: skill where gain drops to 0.5 / 0.25 / 0. */
   gain: { reducedAt: number; minimalAt: number; zeroAt: number };
+  /** Consumable effect facts from the live output def (absent for a
+   *  non-consumable): the craft page composes them through the
+   *  guide.profPages.effect* templates.
+   *
+   *  A placeable FEAST carries the feast record and takes its food/wellfed
+   *  values from the dish it SERVES, not from itself (it has neither field of
+   *  its own); the page then composes the feast-serving templates instead of
+   *  the eat-it-yourself ones.
+   *
+   *  NOTE for whoever edits this block: it is emitted from inside a template
+   *  literal in scripts/wiki/build_content.mjs, so a backtick here is a
+   *  SyntaxError in the generator itself, not a comment. Name symbols plainly. */
+  effect?: {
+    feast?: { servings: number; minutes: number };
+    food?: { amount: number; seconds: number };
+    wellfed?: { aura: string; kind: string; value: number; minutes: number };
+  };
 }
 
 export interface GuideProfMaster { name: string; title: string; hub: string; }
@@ -165,7 +189,7 @@ export interface GuideProfRingCraft {
   name: string;
   pole: string;
   maxSkill: number;
-  /** False for the wave-one content-empty crafts (zero recipes shipped). */
+  /** False for a wave-one content-empty craft (zero recipes shipped). */
   hasContent: boolean;
 }
 
@@ -240,6 +264,20 @@ export interface GuideProfCurve {
   bands: number[];
   rareEvent: { oneIn: number; yieldMult: number; flavors: { ore: string; wood: string; herb: string } };
   specimenChancePct: number;
+  farm: {
+    plantCastSec: number;
+    lifeFloor: number;
+    keepChancePctAtZero: number;
+    keepChancePctAtCap: number;
+    finePctAtZero: number;
+    finePctAtCap: number;
+    fineEffectBonusPct: number;
+    tonicChancePct: number;
+    tonicBonusPicks: number;
+    effectBonusPickCap: number;
+    gainSchedule: { belowProficiency: number; gain: number }[];
+    teachingCeilingByCropTier: { tier: number; ceiling: number }[];
+  };
 }
 
 export interface GuideProfEnchanting {
@@ -252,9 +290,10 @@ export interface GuideProfEnchanting {
   };
   enchants: {
     id: string;
-    name: string;
     slot: string;
-    tier: 'base' | 'runed' | 'greater';
+    tier: 'base' | 'runed' | 'greater' | 'lucent';
+    skillReq: number;
+    perfectedOnly: boolean;
     reagents: GuideProfMaterial[];
     bonus: { stat: string; value: number }[];
   }[];
@@ -307,6 +346,19 @@ export interface GuideProfStation {
 }
 
 export interface GuideProfStations { radius: number; stations: GuideProfStation[]; }
+
+/** One gathering line's contribution to the kitchen: item ids for the
+ * materials its cooking bills actually ask for. */
+export interface GuideProfProvisioningLine { id: string; materials: string[]; }
+/** One rung of cooking's ladder and the outputs it teaches. */
+export interface GuideProfProvisioningRung {
+  skillReq: number;
+  outputs: { itemId: string; placeable: boolean; station: boolean }[];
+}
+export interface GuideProfProvisioning {
+  lines: GuideProfProvisioningLine[];
+  ladder: GuideProfProvisioningRung[];
+}
 
 export const GUIDE_CLASSES: GuideClassInfo[] = [
   {
@@ -442,7 +494,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "heroic_leap",
-        "name": "Heroic Leap"
+        "name": "Vaulting Charge"
       },
       {
         "id": "cleave",
@@ -674,7 +726,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "hammer_of_wrath",
-        "name": "Hammer of Wrath"
+        "name": "Tolling Hammer"
       },
       {
         "id": "guardian_covenant",
@@ -682,7 +734,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "avenging_wrath",
-        "name": "Avenging Wrath"
+        "name": "Zealwing"
       },
       {
         "id": "sun_gods_verdict",
@@ -1030,7 +1082,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "vanish",
-        "name": "Smokestep"
+        "name": "Smokefade"
       },
       {
         "id": "instant_poison",
@@ -1228,7 +1280,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "restoration",
-        "name": "Spiritmend",
+        "name": "Spiritcall",
         "role": "healer",
         "signature": "chain_heal"
       }
@@ -1401,7 +1453,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "blink",
-        "name": "Flickerstep"
+        "name": "Flitstep"
       }
     ],
     "abilities": [
@@ -1427,7 +1479,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "blink",
-        "name": "Flickerstep"
+        "name": "Flitstep"
       },
       {
         "id": "ice_block",
@@ -1447,7 +1499,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "meteor",
-        "name": "Meteor"
+        "name": "Skystone"
       },
       {
         "id": "combustion",
@@ -1479,7 +1531,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "counterspell",
-        "name": "Spellbreak"
+        "name": "Spellsever"
       },
       {
         "id": "fire_blast",
@@ -1503,7 +1555,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "frozen_orb",
-        "name": "Frozen Orb"
+        "name": "Frostglobe"
       },
       {
         "id": "blizzard",
@@ -1511,11 +1563,11 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "icy_veins",
-        "name": "Icy Veins"
+        "name": "Coldsurge"
       },
       {
         "id": "glacial_spike",
-        "name": "Glacial Spike"
+        "name": "Rimeneedle"
       },
       {
         "id": "glacial_front",
@@ -1693,7 +1745,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "summon_voidwalker",
-        "name": "Summon Gloomshade"
+        "name": "Summon Duskmurk"
       },
       {
         "id": "curse_of_agony",
@@ -2122,7 +2174,7 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "Drogmar's War-Camp",
       "Stormcrag",
       "The Glimmermere",
-      "Wyrmcult Tents",
+      "Broodsworn Tents",
       "Revenant Fields",
       "Gravewyrm Sanctum"
     ],
@@ -2144,9 +2196,9 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "min": 15,
     "max": 20,
     "biome": "dusk",
-    "hub": "Eldergleam",
+    "hub": "Eldershine",
     "pois": [
-      "Eldergleam",
+      "Eldershine",
       "Duskfall Cave",
       "Duskfall Overlook",
       "Elder Grove",
@@ -2155,7 +2207,7 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "Crystalline Shallows",
       "The Gleaming Deep"
     ],
-    "welcome": "The air hums with old magic. Seek Keeper Saelwyn beneath the great tree of Eldergleam.",
+    "welcome": "The air hums with old magic. Seek Keeper Saelwyn beneath the great tree of Eldershine.",
     "families": [
       "beast",
       "burrower",
@@ -2262,7 +2314,7 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "pois": [
       "Moonrest",
       "The Nightgate",
-      "The Moonwell",
+      "The Moonspring",
       "Gloamfield",
       "The Standing Vigil",
       "The Sleepless Barrow"
@@ -2281,16 +2333,16 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "min": 20,
     "max": 20,
     "biome": "haunt",
-    "hub": "Gallowmere",
+    "hub": "Gibbetmere",
     "pois": [
-      "Gallowmere",
+      "Gibbetmere",
       "The Crowgate",
       "Widow's Thicket",
       "The Hanging Glade",
       "The Mournstone Chapel",
       "The Huntsman's Clearing"
     ],
-    "welcome": "The canopy closes over the road like a lid. Keep to the lanterns of Gallowmere, and do not answer if the wood calls your name.",
+    "welcome": "The canopy closes over the road like a lid. Keep to the lanterns of Gibbetmere, and do not answer if the wood calls your name.",
     "families": [
       "spider",
       "elemental"
@@ -2470,7 +2522,7 @@ export const GUIDE_WARLOCK_PETS: GuideWarlockPet[] = [
   },
   {
     "id": "gloomshade",
-    "name": "Gloomshade",
+    "name": "Duskmurk",
     "model": "mob_gloomshade",
     "still": "/guide-stills/mob_gloomshade.webp"
   },
@@ -2932,7 +2984,7 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "still": "/guide-stills/mob_kobold__cfe0ea__s20.webp"
       },
       {
-        "name": "Harvest Sprite",
+        "name": "Gleaning Sprite",
         "min": 18,
         "max": 19,
         "rare": false,
@@ -3036,7 +3088,7 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "still": "/guide-stills/mob_dark_caster__884ea0__s50.webp"
       },
       {
-        "name": "Wyrmcult Zealot",
+        "name": "Broodsworn Zealot",
         "min": 17,
         "max": 19,
         "rare": false,
@@ -3047,7 +3099,7 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "still": "/guide-stills/mob_bandit__6b3a32__s30.webp"
       },
       {
-        "name": "Wyrmcult Necromancer",
+        "name": "Broodsworn Necromancer",
         "min": 18,
         "max": 19,
         "rare": false,
@@ -3303,6 +3355,17 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "still": "/guide-stills/mob_elemental__bfe0e8.webp"
       },
       {
+        "name": "Gloamkin Stargazer",
+        "min": 20,
+        "max": 20,
+        "rare": false,
+        "templateId": "nightkin_stargazer",
+        "model": "mob_nightkin",
+        "tint": "#8fa8e0",
+        "tintStrength": 0.3,
+        "still": "/guide-stills/mob_nightkin__8fa8e0__s30.webp"
+      },
+      {
         "name": "Gravenbark Shambler",
         "min": 20,
         "max": 20,
@@ -3312,17 +3375,6 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "tint": "#4e4a3a",
         "tintStrength": 0.72,
         "still": "/guide-stills/mob_treant__4e4a3a__s72.webp"
-      },
-      {
-        "name": "Nightkin Stargazer",
-        "min": 20,
-        "max": 20,
-        "rare": false,
-        "templateId": "nightkin_stargazer",
-        "model": "mob_nightkin",
-        "tint": "#8fa8e0",
-        "tintStrength": 0.3,
-        "still": "/guide-stills/mob_nightkin__8fa8e0__s30.webp"
       },
       {
         "name": "Wood Wraith",
@@ -3914,7 +3966,7 @@ export const GUIDE_DEEDS: GuideDeed[] = [
   },
   {
     "id": "dgn_sanctum_speed",
-    "name": "Sanctum Sprint",
+    "name": "Sanctum Footrace",
     "category": "dungeon",
     "renown": 25,
     "feat": false,
@@ -5443,7 +5495,7 @@ export const GUIDE_DEEDS: GuideDeed[] = [
   },
   {
     "id": "chr_nightbloom_first_cast",
-    "name": "A Ripple on the Moonwell",
+    "name": "A Ripple on the Moonspring",
     "category": "chronicle",
     "renown": 5,
     "feat": false,
@@ -5620,6 +5672,137 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "feat": false
   },
   {
+    "id": "prog_jewelcrafting_rare",
+    "name": "Polished to Brilliance",
+    "category": "progression",
+    "renown": 10,
+    "feat": false,
+    "crest": "/ui/deeds/prog_jewelcrafting_rare.webp"
+  },
+  {
+    "id": "prog_jewelcrafting_50",
+    "name": "Facet and Filigree",
+    "category": "progression",
+    "renown": 5,
+    "feat": false,
+    "crest": "/ui/deeds/prog_jewelcrafting_50.webp"
+  },
+  {
+    "id": "prog_grandmaster_jewelcrafting",
+    "name": "Grandmaster Jewelcrafting",
+    "category": "progression",
+    "renown": 25,
+    "feat": false,
+    "rewardTitle": "Grandmaster Jewelcrafting",
+    "crest": "/ui/deeds/prog_grandmaster_jewelcrafting.webp"
+  },
+  {
+    "id": "prog_inscription_rare",
+    "name": "Written in Fine Ink",
+    "category": "progression",
+    "renown": 10,
+    "feat": false,
+    "crest": "/ui/deeds/prog_inscription_rare.webp"
+  },
+  {
+    "id": "prog_inscription_50",
+    "name": "Quill and Pigment",
+    "category": "progression",
+    "renown": 5,
+    "feat": false,
+    "crest": "/ui/deeds/prog_inscription_50.webp"
+  },
+  {
+    "id": "prog_grandmaster_inscription",
+    "name": "Grandmaster Inscription",
+    "category": "progression",
+    "renown": 25,
+    "feat": false,
+    "rewardTitle": "Grandmaster Inscription",
+    "crest": "/ui/deeds/prog_grandmaster_inscription.webp"
+  },
+  {
+    "id": "col_deepest_cast",
+    "name": "The Deepest Cast",
+    "category": "collection",
+    "renown": 10,
+    "feat": false,
+    "crest": "/ui/deeds/col_deepest_cast.webp"
+  },
+  {
+    "id": "prog_first_planting",
+    "name": "Sow It Begins",
+    "category": "progression",
+    "renown": 5,
+    "feat": false,
+    "crest": "/ui/deeds/prog_first_planting.webp"
+  },
+  {
+    "id": "chr_vale_first_harvest",
+    "name": "First Fruits of the Vale",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false,
+    "crest": "/ui/deeds/chr_vale_first_harvest.webp"
+  },
+  {
+    "id": "chr_marsh_first_harvest",
+    "name": "Sprouts in the Peat",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false,
+    "crest": "/ui/deeds/chr_marsh_first_harvest.webp"
+  },
+  {
+    "id": "chr_peaks_first_harvest",
+    "name": "A Crop Among the Crags",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false,
+    "crest": "/ui/deeds/chr_peaks_first_harvest.webp"
+  },
+  {
+    "id": "chr_evergarden_first_harvest",
+    "name": "A Plot in Paradise",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false,
+    "crest": "/ui/deeds/chr_evergarden_first_harvest.webp"
+  },
+  {
+    "id": "col_golden_harvest",
+    "name": "Golden Harvest",
+    "category": "collection",
+    "renown": 0,
+    "feat": false,
+    "crest": "/ui/deeds/col_golden_harvest.webp"
+  },
+  {
+    "id": "prog_farming_100",
+    "name": "Harvestmaster",
+    "category": "progression",
+    "renown": 10,
+    "feat": false,
+    "rewardTitle": "Harvestmaster",
+    "crest": "/ui/deeds/prog_farming_100.webp"
+  },
+  {
+    "id": "col_farm_roster",
+    "name": "Every Furrow Filled",
+    "category": "collection",
+    "renown": 5,
+    "feat": false,
+    "crest": "/ui/deeds/col_farm_roster.webp"
+  },
+  {
+    "id": "prog_field_to_feast",
+    "name": "From Field to Feast",
+    "category": "progression",
+    "renown": 5,
+    "feat": false,
+    "crest": "/ui/deeds/prog_field_to_feast.webp"
+  },
+  {
     "id": "soc_strongbox_outfitter",
     "name": "Strongbox Outfitter",
     "category": "social",
@@ -5639,6 +5822,14 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "progression",
     "renown": 5,
     "feat": false
+  },
+  {
+    "id": "prog_legendmaker",
+    "name": "The Legendmaker",
+    "category": "progression",
+    "renown": 50,
+    "feat": false,
+    "crest": "/ui/deeds/prog_legendmaker.webp"
   }
 ];
 
@@ -5763,7 +5954,7 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "item",
-        "name": "Mistforged Pauldrons"
+        "name": "Fogforged Pauldrons"
       },
       {
         "kind": "item",
@@ -5880,7 +6071,7 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "item",
-        "name": "Wyrmcult Grand Robe"
+        "name": "Broodsworn Grand Robe"
       },
       {
         "kind": "item",
@@ -5888,7 +6079,7 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "item",
-        "name": "Wyrmcult Soulsteps"
+        "name": "Broodsworn Soulsteps"
       },
       {
         "kind": "item",
@@ -6213,7 +6404,7 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "item",
-        "name": "Varric's Shadow Cowl"
+        "name": "Vandric's Shadow Cowl"
       }
     ]
   },
@@ -6444,6 +6635,14 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "mark",
+        "name": "Jewelcrafting Masterwork"
+      },
+      {
+        "kind": "mark",
+        "name": "Inscription Masterwork"
+      },
+      {
+        "kind": "mark",
         "name": "Engineering Masterwork"
       }
     ]
@@ -6464,6 +6663,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "mark",
         "name": "Moonlit Bloom"
+      },
+      {
+        "kind": "mark",
+        "name": "Golden Harvest"
       },
       {
         "kind": "mark",
@@ -6519,6 +6722,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Tidewrought Fishing Rod"
+      },
+      {
+        "kind": "item",
+        "name": "Clockreel Fishing Rod"
       }
     ]
   },
@@ -6573,7 +6780,7 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "mount",
-        "name": "Terrorspark Groundshaker"
+        "name": "Dreadspark Groundshaker"
       },
       {
         "kind": "mount",
@@ -6668,7 +6875,7 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "weapon_skin",
-        "name": "Winterbite"
+        "name": "Wintergnaw"
       },
       {
         "kind": "weapon_skin",
@@ -6868,6 +7075,18 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "title",
         "name": "Light of the Sanctum"
+      },
+      {
+        "kind": "title",
+        "name": "Grandmaster Jewelcrafting"
+      },
+      {
+        "kind": "title",
+        "name": "Grandmaster Inscription"
+      },
+      {
+        "kind": "title",
+        "name": "Harvestmaster"
       },
       {
         "kind": "title",
@@ -7461,7 +7680,7 @@ export const GUIDE_PROF_RING: GuideProfRingCraft[] = [
     "name": "Inscription",
     "pole": "Cross-cutting",
     "maxSkill": 125,
-    "hasContent": false
+    "hasContent": true
   },
   {
     "id": "enchanting",
@@ -7475,7 +7694,7 @@ export const GUIDE_PROF_RING: GuideProfRingCraft[] = [
     "name": "Jewelcrafting",
     "pole": "Material",
     "maxSkill": 125,
-    "hasContent": false
+    "hasContent": true
   },
   {
     "id": "weaponcrafting",
@@ -7595,10 +7814,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "fine_iron_ore",
             "name": "Fine Iron Ore",
             "count": 4
           },
           {
+            "itemId": "mithril_mining_pick",
             "name": "Skysilver Mining Pick",
             "count": 1
           }
@@ -7609,6 +7830,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 100,
           "minimalAt": 125,
@@ -7618,21 +7840,24 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
       {
         "id": "recipe_arcanite_mining_pick",
         "name": "Glyphsteel Mining Pick",
-        "skillReq": 150,
-        "tier": 6,
+        "skillReq": 125,
+        "tier": 5,
         "station": "toolworks",
         "acquisition": "known",
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "arcanite_bar",
             "name": "Glyphsteel Bar",
             "count": 2
           },
           {
+            "itemId": "fine_thorium_ore",
             "name": "Fine Osmium Ore",
             "count": 2
           },
           {
+            "itemId": "thorium_mining_pick",
             "name": "Osmium Mining Pick",
             "count": 1
           }
@@ -7643,10 +7868,11 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "epic"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
-          "reducedAt": 175,
-          "minimalAt": 200,
-          "zeroAt": 225
+          "reducedAt": 150,
+          "minimalAt": 175,
+          "zeroAt": 200
         }
       },
       {
@@ -7659,10 +7885,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "fine_ashwood_log",
             "name": "Fine Ashwood Log",
             "count": 4
           },
           {
+            "itemId": "ironbark_axe",
             "name": "Ironbark Axe",
             "count": 1
           }
@@ -7673,6 +7901,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 100,
           "minimalAt": 125,
@@ -7682,17 +7911,19 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
       {
         "id": "recipe_elderwood_axe",
         "name": "Highpine Axe",
-        "skillReq": 150,
-        "tier": 6,
+        "skillReq": 125,
+        "tier": 5,
         "station": "toolworks",
         "acquisition": "known",
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "fine_elderwood_log",
             "name": "Fine Highpine Log",
             "count": 2
           },
           {
+            "itemId": "ashwood_axe",
             "name": "Ashwood Axe",
             "count": 1
           }
@@ -7703,10 +7934,11 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "epic"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
-          "reducedAt": 175,
-          "minimalAt": 200,
-          "zeroAt": 225
+          "reducedAt": 150,
+          "minimalAt": 175,
+          "zeroAt": 200
         }
       },
       {
@@ -7719,10 +7951,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "fine_goldleaf_herb",
             "name": "Fine Goldleaf Herb",
             "count": 4
           },
           {
+            "itemId": "silverleaf_sickle",
             "name": "Sheenleaf Sickle",
             "count": 1
           }
@@ -7733,6 +7967,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 100,
           "minimalAt": 125,
@@ -7742,17 +7977,19 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
       {
         "id": "recipe_sunpetal_sickle",
         "name": "Sunpetal Sickle",
-        "skillReq": 150,
-        "tier": 6,
+        "skillReq": 125,
+        "tier": 5,
         "station": "toolworks",
         "acquisition": "known",
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "fine_sunpetal_herb",
             "name": "Fine Sunpetal Herb",
             "count": 2
           },
           {
+            "itemId": "goldleaf_sickle",
             "name": "Goldleaf Sickle",
             "count": 1
           }
@@ -7763,10 +8000,11 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "epic"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
-          "reducedAt": 175,
-          "minimalAt": 200,
-          "zeroAt": 225
+          "reducedAt": 150,
+          "minimalAt": 175,
+          "zeroAt": 200
         }
       },
       {
@@ -7779,10 +8017,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 40000,
         "materials": [
           {
+            "itemId": "glimmerfin_koi",
             "name": "Sunglint Koi",
             "count": 4
           },
           {
+            "itemId": "silverstream_fishing_rod",
             "name": "Silverstream Fishing Rod",
             "count": 1
           }
@@ -7793,6 +8033,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 100,
           "minimalAt": 125,
@@ -7809,14 +8050,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 160000,
         "materials": [
           {
+            "itemId": "glimmerfin_koi",
             "name": "Sunglint Koi",
             "count": 2
           },
           {
+            "itemId": "raw_stonescale_carp",
             "name": "Raw Slatefin Carp",
             "count": 8
           },
           {
+            "itemId": "stormreel_fishing_rod",
             "name": "Stormreel Fishing Rod",
             "count": 1
           }
@@ -7827,10 +8071,424 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "epic"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 150,
           "minimalAt": 175,
           "zeroAt": 200
+        }
+      },
+      {
+        "id": "recipe_clockreel_fishing_rod",
+        "name": "Clockreel Fishing Rod",
+        "skillReq": 125,
+        "tier": 5,
+        "station": "toolworks",
+        "acquisition": "vendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "glimmerfin_koi",
+            "name": "Sunglint Koi",
+            "count": 2
+          },
+          {
+            "itemId": "raw_hollowgill_sturgeon",
+            "name": "Raw Hollowgill Sturgeon",
+            "count": 10
+          },
+          {
+            "itemId": "tidewrought_fishing_rod",
+            "name": "Tidewrought Fishing Rod",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Clockreel Fishing Rod",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 150,
+          "minimalAt": 175,
+          "zeroAt": 200
+        }
+      },
+      {
+        "id": "recipe_precision_chassis",
+        "name": "Precision Chassis",
+        "skillReq": 75,
+        "tier": 3,
+        "station": "toolworks",
+        "acquisition": "trainer",
+        "feeCopper": 40000,
+        "materials": [
+          {
+            "itemId": "ashwood_log",
+            "name": "Ashwood Log",
+            "count": 2
+          },
+          {
+            "itemId": "thorium_ore",
+            "name": "Osmium Ore",
+            "count": 2
+          },
+          {
+            "itemId": "quickening_catalyst",
+            "name": "Quickening Catalyst",
+            "count": 1
+          },
+          {
+            "itemId": "cogwheel_blank",
+            "name": "Cogwheel Blank",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Precision Chassis",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 100,
+          "minimalAt": 125,
+          "zeroAt": 150
+        }
+      },
+      {
+        "id": "recipe_gyrelens_array",
+        "name": "Gyrelens Array",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "toolworks",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "precision_chassis",
+            "name": "Precision Chassis",
+            "count": 3
+          },
+          {
+            "itemId": "wyrmfall_core",
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "itemId": "ashwood_log",
+            "name": "Ashwood Log",
+            "count": 4
+          },
+          {
+            "itemId": "thorium_ore",
+            "name": "Osmium Ore",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Gyrelens Array",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_masters_field_forge",
+        "name": "Master's Field Forge",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "toolworks",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "precision_chassis",
+            "name": "Precision Chassis",
+            "count": 3
+          },
+          {
+            "itemId": "wyrmfall_core",
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "itemId": "ashwood_log",
+            "name": "Ashwood Log",
+            "count": 4
+          },
+          {
+            "itemId": "thorium_ore",
+            "name": "Osmium Ore",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Master's Field Forge",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_makers_charm",
+        "name": "Maker's Charm",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "toolworks",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "precision_chassis",
+            "name": "Precision Chassis",
+            "count": 3
+          },
+          {
+            "itemId": "wyrmfall_core",
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "itemId": "ashwood_log",
+            "name": "Ashwood Log",
+            "count": 4
+          },
+          {
+            "itemId": "thorium_ore",
+            "name": "Osmium Ore",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Maker's Charm",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_bronze_hoe",
+        "name": "Bronze Hoe",
+        "skillReq": 0,
+        "tier": 0,
+        "station": "toolworks",
+        "acquisition": "trainer",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "fine_vale_wheat",
+            "name": "Fine Vale Wheat",
+            "count": 4
+          },
+          {
+            "itemId": "garden_hoe",
+            "name": "Garden Hoe",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Bronze Hoe",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 25,
+          "minimalAt": 50,
+          "zeroAt": 75
+        }
+      },
+      {
+        "id": "recipe_skysilver_hoe",
+        "name": "Skysilver Hoe",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "toolworks",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "itemId": "fine_marsh_rice",
+            "name": "Fine Marsh Rice",
+            "count": 4
+          },
+          {
+            "itemId": "bronze_hoe",
+            "name": "Bronze Hoe",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Skysilver Hoe",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_osmium_hoe",
+        "name": "Osmium Hoe",
+        "skillReq": 75,
+        "tier": 3,
+        "station": "toolworks",
+        "acquisition": "trainer",
+        "feeCopper": 40000,
+        "materials": [
+          {
+            "itemId": "fine_highland_barley",
+            "name": "Fine Highland Barley",
+            "count": 4
+          },
+          {
+            "itemId": "skysilver_hoe",
+            "name": "Skysilver Hoe",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Osmium Hoe",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 100,
+          "minimalAt": 125,
+          "zeroAt": 150
+        }
+      },
+      {
+        "id": "recipe_evergarden_hoe",
+        "name": "Evergarden Hoe",
+        "skillReq": 125,
+        "tier": 5,
+        "station": "toolworks",
+        "acquisition": "trainer",
+        "feeCopper": 160000,
+        "materials": [
+          {
+            "itemId": "fine_evergarden_greens",
+            "name": "Fine Evergarden Greens",
+            "count": 2
+          },
+          {
+            "itemId": "osmium_hoe",
+            "name": "Osmium Hoe",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Evergarden Hoe",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 150,
+          "minimalAt": 175,
+          "zeroAt": 200
+        }
+      },
+      {
+        "id": "recipe_cogwheel_blank",
+        "name": "Cogwheel Blank",
+        "skillReq": 0,
+        "tier": 0,
+        "station": "toolworks",
+        "acquisition": "trainer",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "copper_ore",
+            "name": "Copper Ore",
+            "count": 4
+          },
+          {
+            "itemId": "smithing_flux",
+            "name": "Smithing Flux",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Cogwheel Blank",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 25,
+          "minimalAt": 50,
+          "zeroAt": 75
+        }
+      },
+      {
+        "id": "recipe_copperlens_ocular",
+        "name": "Copperlens Ocular",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "toolworks",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "itemId": "cogwheel_blank",
+            "name": "Cogwheel Blank",
+            "count": 1
+          },
+          {
+            "itemId": "copper_ore",
+            "name": "Copper Ore",
+            "count": 2
+          },
+          {
+            "itemId": "arcane_dust",
+            "name": "Chime Dust",
+            "count": 3
+          }
+        ],
+        "output": {
+          "name": "Copperlens Ocular",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
         }
       }
     ]
@@ -7863,14 +8521,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "linen_scrap",
             "name": "Linen Scrap",
             "count": 1
           },
           {
+            "itemId": "spider_leg",
             "name": "Twitching Spider Leg",
             "count": 1
           },
           {
+            "itemId": "silverleaf_herb",
             "name": "Sheenleaf Herb",
             "count": 2
           }
@@ -7881,6 +8542,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -7897,18 +8559,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "linen_scrap",
             "name": "Linen Scrap",
             "count": 2
           },
           {
+            "itemId": "spider_leg",
             "name": "Twitching Spider Leg",
             "count": 2
           },
           {
+            "itemId": "venom_gland",
             "name": "Venom Gland",
             "count": 2
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           }
@@ -7925,6 +8591,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           ],
           "minTier": 1
         },
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -7941,10 +8608,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "silverleaf_herb",
             "name": "Sheenleaf Herb",
             "count": 4
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           }
@@ -7955,6 +8624,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -7971,10 +8641,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "silverleaf_herb",
             "name": "Sheenleaf Herb",
             "count": 3
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           }
@@ -7985,6 +8657,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -8001,14 +8674,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "venom_gland",
             "name": "Venom Gland",
             "count": 2
           },
           {
+            "itemId": "vale_wheat",
+            "name": "Vale Wheat",
+            "count": 1
+          },
+          {
+            "itemId": "silverleaf_herb",
             "name": "Sheenleaf Herb",
             "count": 2
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           }
@@ -8019,6 +8700,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -8035,14 +8717,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "goldleaf_herb",
             "name": "Goldleaf Herb",
             "count": 2
           },
           {
+            "itemId": "silverleaf_herb",
             "name": "Sheenleaf Herb",
             "count": 2
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           }
@@ -8053,6 +8738,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -8069,10 +8755,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "goldleaf_herb",
             "name": "Goldleaf Herb",
             "count": 2
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           }
@@ -8083,6 +8771,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -8099,14 +8788,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "venom_gland",
             "name": "Venom Gland",
             "count": 3
           },
           {
+            "itemId": "bog_beet",
+            "name": "Bog Beet",
+            "count": 2
+          },
+          {
+            "itemId": "goldleaf_herb",
             "name": "Goldleaf Herb",
             "count": 1
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           }
@@ -8117,6 +8814,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -8133,14 +8831,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 2
           },
           {
+            "itemId": "silverleaf_herb",
             "name": "Sheenleaf Herb",
             "count": 3
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           }
@@ -8151,6 +8852,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -8167,14 +8869,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 2
           },
           {
+            "itemId": "goldleaf_herb",
             "name": "Goldleaf Herb",
             "count": 1
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           }
@@ -8185,6 +8890,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -8201,18 +8907,27 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "pristine_venom_gland",
             "name": "Pristine Venom Gland",
             "count": 1
           },
           {
+            "itemId": "venom_gland",
             "name": "Venom Gland",
             "count": 2
           },
           {
+            "itemId": "frost_gourd",
+            "name": "Frost Gourd",
+            "count": 1
+          },
+          {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 1
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           }
@@ -8223,10 +8938,337 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
           "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_quickening_catalyst",
+        "name": "Quickening Catalyst",
+        "skillReq": 75,
+        "tier": 3,
+        "station": "apothecary",
+        "acquisition": "trainer",
+        "feeCopper": 40000,
+        "materials": [
+          {
+            "itemId": "sunpetal_herb",
+            "name": "Sunpetal Herb",
+            "count": 1
+          },
+          {
+            "itemId": "goldleaf_herb",
+            "name": "Goldleaf Herb",
+            "count": 2
+          },
+          {
+            "itemId": "venom_gland",
+            "name": "Venom Gland",
+            "count": 2
+          },
+          {
+            "itemId": "glass_vial",
+            "name": "Glass Vial",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Quickening Catalyst",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "oncePerDay": true,
+        "gain": {
+          "reducedAt": 100,
+          "minimalAt": 125,
+          "zeroAt": 150
+        }
+      },
+      {
+        "id": "recipe_ironhusk_flask",
+        "name": "Ironhusk Flask",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "apothecary",
+        "acquisition": "vendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "quickening_catalyst",
+            "name": "Quickening Catalyst",
+            "count": 1
+          },
+          {
+            "itemId": "pristine_venom_gland",
+            "name": "Pristine Venom Gland",
+            "count": 1
+          },
+          {
+            "itemId": "venom_gland",
+            "name": "Venom Gland",
+            "count": 2
+          },
+          {
+            "itemId": "sunpetal_herb",
+            "name": "Sunpetal Herb",
+            "count": 2
+          },
+          {
+            "itemId": "highland_barley",
+            "name": "Highland Barley",
+            "count": 1
+          },
+          {
+            "itemId": "glass_vial",
+            "name": "Glass Vial",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Ironhusk Flask",
+          "count": 2,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_warboar_flask",
+        "name": "Warboar Flask",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "apothecary",
+        "acquisition": "vendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "quickening_catalyst",
+            "name": "Quickening Catalyst",
+            "count": 1
+          },
+          {
+            "itemId": "pristine_venom_gland",
+            "name": "Pristine Venom Gland",
+            "count": 1
+          },
+          {
+            "itemId": "venom_gland",
+            "name": "Venom Gland",
+            "count": 2
+          },
+          {
+            "itemId": "sunpetal_herb",
+            "name": "Sunpetal Herb",
+            "count": 2
+          },
+          {
+            "itemId": "highland_barley",
+            "name": "Highland Barley",
+            "count": 1
+          },
+          {
+            "itemId": "glass_vial",
+            "name": "Glass Vial",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Warboar Flask",
+          "count": 2,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_runewater_flask",
+        "name": "Runewater Flask",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "apothecary",
+        "acquisition": "vendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "quickening_catalyst",
+            "name": "Quickening Catalyst",
+            "count": 1
+          },
+          {
+            "itemId": "pristine_venom_gland",
+            "name": "Pristine Venom Gland",
+            "count": 1
+          },
+          {
+            "itemId": "venom_gland",
+            "name": "Venom Gland",
+            "count": 2
+          },
+          {
+            "itemId": "sunpetal_herb",
+            "name": "Sunpetal Herb",
+            "count": 2
+          },
+          {
+            "itemId": "highland_barley",
+            "name": "Highland Barley",
+            "count": 1
+          },
+          {
+            "itemId": "glass_vial",
+            "name": "Glass Vial",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Runewater Flask",
+          "count": 2,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_grand_cauldron",
+        "name": "Grand Cauldron",
+        "skillReq": 125,
+        "tier": 5,
+        "station": "apothecary",
+        "acquisition": "vendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "quickening_catalyst",
+            "name": "Quickening Catalyst",
+            "count": 3
+          },
+          {
+            "itemId": "wyrmfall_core",
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "itemId": "gilded_sunmelon",
+            "name": "Gilded Sunmelon",
+            "count": 2
+          },
+          {
+            "itemId": "fine_gilded_sunmelon",
+            "name": "Fine Gilded Sunmelon",
+            "count": 1
+          },
+          {
+            "itemId": "sunpetal_herb",
+            "name": "Sunpetal Herb",
+            "count": 4
+          },
+          {
+            "itemId": "goldleaf_herb",
+            "name": "Goldleaf Herb",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Grand Cauldron",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 150,
+          "minimalAt": 175,
+          "zeroAt": 200
+        }
+      },
+      {
+        "id": "recipe_growth_tonic",
+        "name": "Growth Tonic",
+        "skillReq": 0,
+        "tier": 0,
+        "station": "apothecary",
+        "acquisition": "trainer",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "silverleaf_herb",
+            "name": "Sheenleaf Herb",
+            "count": 2
+          },
+          {
+            "itemId": "glass_vial",
+            "name": "Glass Vial",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Growth Tonic",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 25,
+          "minimalAt": 50,
+          "zeroAt": 75
+        }
+      },
+      {
+        "id": "recipe_lesser_healing_potion",
+        "name": "Lesser Healing Potion",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "apothecary",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "itemId": "tallow_candle",
+            "name": "Greasy Tallow Lump",
+            "count": 2
+          },
+          {
+            "itemId": "goldleaf_herb",
+            "name": "Goldleaf Herb",
+            "count": 1
+          },
+          {
+            "itemId": "glass_vial",
+            "name": "Glass Vial",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Lesser Healing Potion",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
         }
       }
     ]
@@ -8259,6 +9301,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "spider_leg",
             "name": "Twitching Spider Leg",
             "count": 1
           }
@@ -8269,10 +9312,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
           "zeroAt": 75
+        },
+        "effect": {
+          "food": {
+            "amount": 61,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8285,10 +9335,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "raw_river_perch",
             "name": "Raw River Perch",
             "count": 2
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 1
           }
@@ -8299,10 +9351,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
           "zeroAt": 75
+        },
+        "effect": {
+          "food": {
+            "amount": 90,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8315,10 +9374,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "game_meat",
             "name": "Game Meat",
             "count": 2
           },
           {
+            "itemId": "vale_wheat",
+            "name": "Vale Wheat",
+            "count": 1
+          },
+          {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 1
           }
@@ -8329,10 +9395,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
           "zeroAt": 75
+        },
+        "effect": {
+          "food": {
+            "amount": 117,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8345,14 +9418,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "raw_marsh_pike",
             "name": "Raw Marsh Pike",
             "count": 2
           },
           {
+            "itemId": "silverleaf_herb",
             "name": "Sheenleaf Herb",
             "count": 1
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 1
           }
@@ -8363,10 +9439,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
           "zeroAt": 75
+        },
+        "effect": {
+          "food": {
+            "amount": 117,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8379,14 +9462,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "raw_bog_eel",
             "name": "Raw Bog Eel",
             "count": 2
           },
           {
+            "itemId": "ashwood_log",
             "name": "Ashwood Log",
             "count": 1
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 1
           }
@@ -8397,10 +9483,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
           "zeroAt": 100
+        },
+        "effect": {
+          "food": {
+            "amount": 243,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8413,14 +9506,27 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "game_meat",
             "name": "Game Meat",
             "count": 3
           },
           {
+            "itemId": "vale_wheat",
+            "name": "Vale Wheat",
+            "count": 2
+          },
+          {
+            "itemId": "bog_beet",
+            "name": "Bog Beet",
+            "count": 1
+          },
+          {
+            "itemId": "goldleaf_herb",
             "name": "Goldleaf Herb",
             "count": 1
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 1
           }
@@ -8431,10 +9537,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
           "zeroAt": 100
+        },
+        "effect": {
+          "food": {
+            "amount": 243,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8447,14 +9560,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "raw_frostgill_trout",
             "name": "Raw Frostgill Trout",
             "count": 2
           },
           {
+            "itemId": "brook_carrot",
+            "name": "Brook Carrot",
+            "count": 1
+          },
+          {
+            "itemId": "silverleaf_herb",
             "name": "Sheenleaf Herb",
             "count": 2
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 2
           }
@@ -8465,10 +9586,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
           "zeroAt": 100
+        },
+        "effect": {
+          "food": {
+            "amount": 432,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8481,18 +9609,27 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "raw_stonescale_carp",
             "name": "Raw Slatefin Carp",
             "count": 3
           },
           {
+            "itemId": "raw_mirror_trout",
             "name": "Raw Mirror Trout",
             "count": 1
           },
           {
+            "itemId": "marsh_rice",
+            "name": "Marsh Rice",
+            "count": 2
+          },
+          {
+            "itemId": "goldleaf_herb",
             "name": "Goldleaf Herb",
             "count": 1
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 1
           }
@@ -8503,10 +9640,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
           "zeroAt": 125
+        },
+        "effect": {
+          "food": {
+            "amount": 552,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8519,18 +9663,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "raw_frostgill_trout",
             "name": "Raw Frostgill Trout",
             "count": 2
           },
           {
+            "itemId": "raw_bog_eel",
             "name": "Raw Bog Eel",
             "count": 2
           },
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 1
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 2
           }
@@ -8541,10 +9689,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
           "zeroAt": 125
+        },
+        "effect": {
+          "food": {
+            "amount": 552,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8557,18 +9712,32 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "prime_cut",
             "name": "Prime Cut",
             "count": 1
           },
           {
+            "itemId": "game_meat",
             "name": "Game Meat",
             "count": 4
           },
           {
+            "itemId": "highland_barley",
+            "name": "Highland Barley",
+            "count": 2
+          },
+          {
+            "itemId": "frost_gourd",
+            "name": "Frost Gourd",
+            "count": 2
+          },
+          {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 1
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 2
           }
@@ -8579,10 +9748,1284 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
           "zeroAt": 125
+        },
+        "effect": {
+          "food": {
+            "amount": 980,
+            "seconds": 18
+          }
+        }
+      },
+      {
+        "id": "recipe_seasoned_stock",
+        "name": "Seasoned Stock",
+        "skillReq": 75,
+        "tier": 3,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 40000,
+        "materials": [
+          {
+            "itemId": "prime_cut",
+            "name": "Prime Cut",
+            "count": 1
+          },
+          {
+            "itemId": "game_meat",
+            "name": "Game Meat",
+            "count": 3
+          },
+          {
+            "itemId": "marsh_rice",
+            "name": "Marsh Rice",
+            "count": 2
+          },
+          {
+            "itemId": "bog_beet",
+            "name": "Bog Beet",
+            "count": 2
+          },
+          {
+            "itemId": "cooking_salt",
+            "name": "Cooking Salt",
+            "count": 2
+          },
+          {
+            "itemId": "quickening_catalyst",
+            "name": "Quickening Catalyst",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Seasoned Stock",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 100,
+          "minimalAt": 125,
+          "zeroAt": 150
+        }
+      },
+      {
+        "id": "recipe_stonepot_stew",
+        "name": "Stonepot Stew",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "kitchens",
+        "acquisition": "vendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "seasoned_stock",
+            "name": "Seasoned Stock",
+            "count": 1
+          },
+          {
+            "itemId": "prime_cut",
+            "name": "Prime Cut",
+            "count": 2
+          },
+          {
+            "itemId": "game_meat",
+            "name": "Game Meat",
+            "count": 4
+          },
+          {
+            "itemId": "frost_gourd",
+            "name": "Frost Gourd",
+            "count": 2
+          },
+          {
+            "itemId": "sunpetal_herb",
+            "name": "Sunpetal Herb",
+            "count": 2
+          },
+          {
+            "itemId": "cooking_salt",
+            "name": "Cooking Salt",
+            "count": 2
+          },
+          {
+            "itemId": "raw_deepbarb_catfish",
+            "name": "Raw Deepbarb Catfish",
+            "count": 4
+          }
+        ],
+        "output": {
+          "name": "Stonepot Stew",
+          "count": 4,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        },
+        "effect": {
+          "food": {
+            "amount": 1392,
+            "seconds": 18
+          },
+          "wellfed": {
+            "aura": "Well Fed",
+            "kind": "buff_sta",
+            "value": 6,
+            "minutes": 15
+          }
+        }
+      },
+      {
+        "id": "recipe_warspice_skewers",
+        "name": "Warspice Skewers",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "kitchens",
+        "acquisition": "vendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "seasoned_stock",
+            "name": "Seasoned Stock",
+            "count": 1
+          },
+          {
+            "itemId": "prime_cut",
+            "name": "Prime Cut",
+            "count": 2
+          },
+          {
+            "itemId": "game_meat",
+            "name": "Game Meat",
+            "count": 4
+          },
+          {
+            "itemId": "highland_barley",
+            "name": "Highland Barley",
+            "count": 2
+          },
+          {
+            "itemId": "sunpetal_herb",
+            "name": "Sunpetal Herb",
+            "count": 2
+          },
+          {
+            "itemId": "cooking_salt",
+            "name": "Cooking Salt",
+            "count": 2
+          },
+          {
+            "itemId": "raw_deepbarb_catfish",
+            "name": "Raw Deepbarb Catfish",
+            "count": 4
+          }
+        ],
+        "output": {
+          "name": "Warspice Skewers",
+          "count": 4,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        },
+        "effect": {
+          "food": {
+            "amount": 1392,
+            "seconds": 18
+          },
+          "wellfed": {
+            "aura": "Well Fed",
+            "kind": "buff_ap",
+            "value": 6,
+            "minutes": 15
+          }
+        }
+      },
+      {
+        "id": "recipe_sageleaf_chowder",
+        "name": "Sageleaf Chowder",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "kitchens",
+        "acquisition": "vendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "seasoned_stock",
+            "name": "Seasoned Stock",
+            "count": 1
+          },
+          {
+            "itemId": "prime_cut",
+            "name": "Prime Cut",
+            "count": 2
+          },
+          {
+            "itemId": "game_meat",
+            "name": "Game Meat",
+            "count": 4
+          },
+          {
+            "itemId": "thornpeak_cabbage",
+            "name": "Thornpeak Cabbage",
+            "count": 2
+          },
+          {
+            "itemId": "sunpetal_herb",
+            "name": "Sunpetal Herb",
+            "count": 2
+          },
+          {
+            "itemId": "cooking_salt",
+            "name": "Cooking Salt",
+            "count": 2
+          },
+          {
+            "itemId": "raw_deepbarb_catfish",
+            "name": "Raw Deepbarb Catfish",
+            "count": 4
+          }
+        ],
+        "output": {
+          "name": "Sageleaf Chowder",
+          "count": 4,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        },
+        "effect": {
+          "food": {
+            "amount": 1392,
+            "seconds": 18
+          },
+          "wellfed": {
+            "aura": "Well Fed",
+            "kind": "buff_int",
+            "value": 6,
+            "minutes": 15
+          }
+        }
+      },
+      {
+        "id": "recipe_laden_hearth",
+        "name": "The Laden Hearth",
+        "skillReq": 125,
+        "tier": 5,
+        "station": "kitchens",
+        "acquisition": "vendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "seasoned_stock",
+            "name": "Seasoned Stock",
+            "count": 3
+          },
+          {
+            "itemId": "wyrmfall_core",
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "itemId": "prime_cut",
+            "name": "Prime Cut",
+            "count": 4
+          },
+          {
+            "itemId": "game_meat",
+            "name": "Game Meat",
+            "count": 4
+          },
+          {
+            "itemId": "evergarden_greens",
+            "name": "Evergarden Greens",
+            "count": 2
+          },
+          {
+            "itemId": "fine_evergarden_greens",
+            "name": "Fine Evergarden Greens",
+            "count": 1
+          },
+          {
+            "itemId": "sunpetal_herb",
+            "name": "Sunpetal Herb",
+            "count": 2
+          },
+          {
+            "itemId": "raw_deepbarb_catfish",
+            "name": "Raw Deepbarb Catfish",
+            "count": 4
+          }
+        ],
+        "output": {
+          "name": "The Laden Hearth",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 150,
+          "minimalAt": 175,
+          "zeroAt": 200
+        }
+      },
+      {
+        "id": "recipe_peppered_deepbarb_catfish",
+        "name": "Peppered Deepbarb Catfish",
+        "skillReq": 75,
+        "tier": 3,
+        "station": "kitchens",
+        "acquisition": "vendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "raw_deepbarb_catfish",
+            "name": "Raw Deepbarb Catfish",
+            "count": 4
+          },
+          {
+            "itemId": "goldleaf_herb",
+            "name": "Goldleaf Herb",
+            "count": 2
+          },
+          {
+            "itemId": "cooking_salt",
+            "name": "Cooking Salt",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Peppered Deepbarb Catfish",
+          "count": 2,
+          "quality": "rare"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 100,
+          "minimalAt": 125,
+          "zeroAt": 150
+        },
+        "effect": {
+          "food": {
+            "amount": 552,
+            "seconds": 18
+          }
+        }
+      },
+      {
+        "id": "recipe_roast_hollowgill_sturgeon",
+        "name": "Roast Hollowgill Sturgeon",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "kitchens",
+        "acquisition": "vendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "raw_hollowgill_sturgeon",
+            "name": "Raw Hollowgill Sturgeon",
+            "count": 4
+          },
+          {
+            "itemId": "raw_deepbarb_catfish",
+            "name": "Raw Deepbarb Catfish",
+            "count": 2
+          },
+          {
+            "itemId": "sunpetal_herb",
+            "name": "Sunpetal Herb",
+            "count": 2
+          },
+          {
+            "itemId": "cooking_salt",
+            "name": "Cooking Salt",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Roast Hollowgill Sturgeon",
+          "count": 2,
+          "quality": "rare"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        },
+        "effect": {
+          "food": {
+            "amount": 980,
+            "seconds": 18
+          }
+        }
+      },
+      {
+        "id": "recipe_stonepot_feast",
+        "name": "Stonepot Feast",
+        "skillReq": 125,
+        "tier": 5,
+        "station": "kitchens",
+        "acquisition": "vendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "seasoned_stock",
+            "name": "Seasoned Stock",
+            "count": 3
+          },
+          {
+            "itemId": "wyrmfall_core",
+            "name": "Wyrmfall Core",
+            "count": 1
+          },
+          {
+            "itemId": "evergarden_greens",
+            "name": "Evergarden Greens",
+            "count": 1
+          },
+          {
+            "itemId": "sunpetal_herb",
+            "name": "Sunpetal Herb",
+            "count": 1
+          },
+          {
+            "itemId": "cooking_salt",
+            "name": "Cooking Salt",
+            "count": 2
+          },
+          {
+            "itemId": "raw_deepbarb_catfish",
+            "name": "Raw Deepbarb Catfish",
+            "count": 4
+          },
+          {
+            "itemId": "raw_hollowgill_sturgeon",
+            "name": "Raw Hollowgill Sturgeon",
+            "count": 3
+          },
+          {
+            "itemId": "raw_stillmere_salmon",
+            "name": "Raw Stillmere Salmon",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Stonepot Feast",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 150,
+          "minimalAt": 175,
+          "zeroAt": 200
+        },
+        "effect": {
+          "feast": {
+            "servings": 10,
+            "minutes": 3
+          },
+          "food": {
+            "amount": 1392,
+            "seconds": 18
+          },
+          "wellfed": {
+            "aura": "Well Fed",
+            "kind": "buff_sta",
+            "value": 6,
+            "minutes": 15
+          }
+        }
+      },
+      {
+        "id": "recipe_warspice_feast",
+        "name": "Warspice Feast",
+        "skillReq": 125,
+        "tier": 5,
+        "station": "kitchens",
+        "acquisition": "vendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "seasoned_stock",
+            "name": "Seasoned Stock",
+            "count": 3
+          },
+          {
+            "itemId": "wyrmfall_core",
+            "name": "Wyrmfall Core",
+            "count": 1
+          },
+          {
+            "itemId": "evergarden_greens",
+            "name": "Evergarden Greens",
+            "count": 1
+          },
+          {
+            "itemId": "sunpetal_herb",
+            "name": "Sunpetal Herb",
+            "count": 1
+          },
+          {
+            "itemId": "cooking_salt",
+            "name": "Cooking Salt",
+            "count": 2
+          },
+          {
+            "itemId": "raw_deepbarb_catfish",
+            "name": "Raw Deepbarb Catfish",
+            "count": 4
+          },
+          {
+            "itemId": "raw_hollowgill_sturgeon",
+            "name": "Raw Hollowgill Sturgeon",
+            "count": 3
+          },
+          {
+            "itemId": "raw_stillmere_salmon",
+            "name": "Raw Stillmere Salmon",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Warspice Feast",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 150,
+          "minimalAt": 175,
+          "zeroAt": 200
+        },
+        "effect": {
+          "feast": {
+            "servings": 10,
+            "minutes": 3
+          },
+          "food": {
+            "amount": 1392,
+            "seconds": 18
+          },
+          "wellfed": {
+            "aura": "Well Fed",
+            "kind": "buff_ap",
+            "value": 6,
+            "minutes": 15
+          }
+        }
+      },
+      {
+        "id": "recipe_sageleaf_feast",
+        "name": "Sageleaf Feast",
+        "skillReq": 125,
+        "tier": 5,
+        "station": "kitchens",
+        "acquisition": "vendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "seasoned_stock",
+            "name": "Seasoned Stock",
+            "count": 3
+          },
+          {
+            "itemId": "wyrmfall_core",
+            "name": "Wyrmfall Core",
+            "count": 1
+          },
+          {
+            "itemId": "evergarden_greens",
+            "name": "Evergarden Greens",
+            "count": 1
+          },
+          {
+            "itemId": "sunpetal_herb",
+            "name": "Sunpetal Herb",
+            "count": 1
+          },
+          {
+            "itemId": "cooking_salt",
+            "name": "Cooking Salt",
+            "count": 2
+          },
+          {
+            "itemId": "raw_deepbarb_catfish",
+            "name": "Raw Deepbarb Catfish",
+            "count": 4
+          },
+          {
+            "itemId": "raw_hollowgill_sturgeon",
+            "name": "Raw Hollowgill Sturgeon",
+            "count": 3
+          },
+          {
+            "itemId": "raw_stillmere_salmon",
+            "name": "Raw Stillmere Salmon",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Sageleaf Feast",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 150,
+          "minimalAt": 175,
+          "zeroAt": 200
+        },
+        "effect": {
+          "feast": {
+            "servings": 10,
+            "minutes": 3
+          },
+          "food": {
+            "amount": 1392,
+            "seconds": 18
+          },
+          "wellfed": {
+            "aura": "Well Fed",
+            "kind": "buff_int",
+            "value": 6,
+            "minutes": 15
+          }
+        }
+      },
+      {
+        "id": "recipe_vale_hearth_loaf",
+        "name": "Vale Hearth Loaf",
+        "skillReq": 0,
+        "tier": 0,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "vale_wheat",
+            "name": "Vale Wheat",
+            "count": 3
+          },
+          {
+            "itemId": "cooking_salt",
+            "name": "Cooking Salt",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Vale Hearth Loaf",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 25,
+          "minimalAt": 50,
+          "zeroAt": 75
+        },
+        "effect": {
+          "food": {
+            "amount": 90,
+            "seconds": 18
+          }
+        }
+      },
+      {
+        "id": "recipe_eastbrook_root_pottage",
+        "name": "Eastbrook Root Pottage",
+        "skillReq": 0,
+        "tier": 0,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "brook_carrot",
+            "name": "Brook Carrot",
+            "count": 2
+          },
+          {
+            "itemId": "fine_brook_carrot",
+            "name": "Fine Brook Carrot",
+            "count": 1
+          },
+          {
+            "itemId": "vale_wheat",
+            "name": "Vale Wheat",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Eastbrook Root Pottage",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 25,
+          "minimalAt": 50,
+          "zeroAt": 75
+        },
+        "effect": {
+          "food": {
+            "amount": 117,
+            "seconds": 18
+          }
+        }
+      },
+      {
+        "id": "recipe_fenbridge_rice_bowl",
+        "name": "Fenbridge Rice Bowl",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "itemId": "marsh_rice",
+            "name": "Marsh Rice",
+            "count": 4
+          },
+          {
+            "itemId": "cooking_salt",
+            "name": "Cooking Salt",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Fenbridge Rice Bowl",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        },
+        "effect": {
+          "food": {
+            "amount": 243,
+            "seconds": 18
+          }
+        }
+      },
+      {
+        "id": "recipe_fenbridge_beet_braise",
+        "name": "Fenbridge Beet Braise",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "itemId": "bog_beet",
+            "name": "Bog Beet",
+            "count": 3
+          },
+          {
+            "itemId": "fine_bog_beet",
+            "name": "Fine Bog Beet",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Fenbridge Beet Braise",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        },
+        "effect": {
+          "food": {
+            "amount": 432,
+            "seconds": 18
+          }
+        }
+      },
+      {
+        "id": "recipe_highwatch_barley_bannock",
+        "name": "Highwatch Barley Bannock",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "itemId": "highland_barley",
+            "name": "Highland Barley",
+            "count": 4
+          },
+          {
+            "itemId": "thornpeak_cabbage",
+            "name": "Thornpeak Cabbage",
+            "count": 2
+          },
+          {
+            "itemId": "fine_thornpeak_cabbage",
+            "name": "Fine Thornpeak Cabbage",
+            "count": 1
+          },
+          {
+            "itemId": "cooking_salt",
+            "name": "Cooking Salt",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Highwatch Barley Bannock",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        },
+        "effect": {
+          "food": {
+            "amount": 552,
+            "seconds": 18
+          }
+        }
+      },
+      {
+        "id": "recipe_highwatch_gourd_soup",
+        "name": "Highwatch Gourd Soup",
+        "skillReq": 75,
+        "tier": 3,
+        "station": "kitchens",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "frost_gourd",
+            "name": "Frost Gourd",
+            "count": 3
+          },
+          {
+            "itemId": "fine_frost_gourd",
+            "name": "Fine Frost Gourd",
+            "count": 1
+          },
+          {
+            "itemId": "frost_lentils",
+            "name": "Frost Lentils",
+            "count": 2
+          },
+          {
+            "itemId": "fine_frost_lentils",
+            "name": "Fine Frost Lentils",
+            "count": 1
+          },
+          {
+            "itemId": "cooking_salt",
+            "name": "Cooking Salt",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Highwatch Gourd Soup",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 100,
+          "minimalAt": 125,
+          "zeroAt": 150
+        },
+        "effect": {
+          "food": {
+            "amount": 552,
+            "seconds": 18
+          }
+        }
+      },
+      {
+        "id": "recipe_evergarden_sunmelon_tart",
+        "name": "Evergarden Sunmelon Tart",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "kitchens",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "gilded_sunmelon",
+            "name": "Gilded Sunmelon",
+            "count": 3
+          },
+          {
+            "itemId": "fine_gilded_sunmelon",
+            "name": "Fine Gilded Sunmelon",
+            "count": 1
+          },
+          {
+            "itemId": "gilded_yam",
+            "name": "Gilded Yam",
+            "count": 2
+          },
+          {
+            "itemId": "fine_gilded_yam",
+            "name": "Fine Gilded Yam",
+            "count": 1
+          },
+          {
+            "itemId": "vale_wheat",
+            "name": "Vale Wheat",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Evergarden Sunmelon Tart",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        },
+        "effect": {
+          "food": {
+            "amount": 980,
+            "seconds": 18
+          }
+        }
+      },
+      {
+        "id": "recipe_evergarden_harvest_platter",
+        "name": "Evergarden Harvest Platter",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "kitchens",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "evergarden_greens",
+            "name": "Evergarden Greens",
+            "count": 3
+          },
+          {
+            "itemId": "fine_evergarden_greens",
+            "name": "Fine Evergarden Greens",
+            "count": 1
+          },
+          {
+            "itemId": "evergarden_pumpkin",
+            "name": "Evergarden Pumpkin",
+            "count": 2
+          },
+          {
+            "itemId": "fine_evergarden_pumpkin",
+            "name": "Fine Evergarden Pumpkin",
+            "count": 1
+          },
+          {
+            "itemId": "cooking_salt",
+            "name": "Cooking Salt",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Evergarden Harvest Platter",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        },
+        "effect": {
+          "food": {
+            "amount": 980,
+            "seconds": 18
+          }
+        }
+      },
+      {
+        "id": "recipe_eastbrook_glazed_carrots",
+        "name": "Eastbrook Glazed Carrots",
+        "skillReq": 0,
+        "tier": 0,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "brook_carrot",
+            "name": "Brook Carrot",
+            "count": 4
+          },
+          {
+            "itemId": "vale_wheat",
+            "name": "Vale Wheat",
+            "count": 1
+          },
+          {
+            "itemId": "cooking_salt",
+            "name": "Cooking Salt",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Eastbrook Glazed Carrots",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 25,
+          "minimalAt": 50,
+          "zeroAt": 75
+        },
+        "effect": {
+          "food": {
+            "amount": 90,
+            "seconds": 18
+          },
+          "wellfed": {
+            "aura": "Well Fed",
+            "kind": "buff_sta",
+            "value": 2,
+            "minutes": 10
+          }
+        }
+      },
+      {
+        "id": "recipe_fenbridge_rice_pudding",
+        "name": "Fenbridge Rice Pudding",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "itemId": "marsh_rice",
+            "name": "Marsh Rice",
+            "count": 4
+          },
+          {
+            "itemId": "cooking_salt",
+            "name": "Cooking Salt",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Fenbridge Rice Pudding",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        },
+        "effect": {
+          "food": {
+            "amount": 243,
+            "seconds": 18
+          },
+          "wellfed": {
+            "aura": "Well Fed",
+            "kind": "buff_sta",
+            "value": 3,
+            "minutes": 10
+          }
+        }
+      },
+      {
+        "id": "recipe_highwatch_barley_porridge",
+        "name": "Highwatch Barley Porridge",
+        "skillReq": 75,
+        "tier": 3,
+        "station": "kitchens",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "highland_barley",
+            "name": "Highland Barley",
+            "count": 4
+          },
+          {
+            "itemId": "cooking_salt",
+            "name": "Cooking Salt",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Highwatch Barley Porridge",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 100,
+          "minimalAt": 125,
+          "zeroAt": 150
+        },
+        "effect": {
+          "food": {
+            "amount": 552,
+            "seconds": 18
+          },
+          "wellfed": {
+            "aura": "Well Fed",
+            "kind": "buff_sta",
+            "value": 4,
+            "minutes": 10
+          }
+        }
+      },
+      {
+        "id": "recipe_evergarden_braised_greens",
+        "name": "Evergarden Braised Greens",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "kitchens",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "evergarden_greens",
+            "name": "Evergarden Greens",
+            "count": 4
+          },
+          {
+            "itemId": "cooking_salt",
+            "name": "Cooking Salt",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Evergarden Braised Greens",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        },
+        "effect": {
+          "food": {
+            "amount": 980,
+            "seconds": 18
+          },
+          "wellfed": {
+            "aura": "Well Fed",
+            "kind": "buff_sta",
+            "value": 5,
+            "minutes": 10
+          }
+        }
+      },
+      {
+        "id": "recipe_harvest_feast",
+        "name": "Harvest Feast",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "kitchens",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "evergarden_greens",
+            "name": "Evergarden Greens",
+            "count": 4
+          },
+          {
+            "itemId": "gilded_sunmelon",
+            "name": "Gilded Sunmelon",
+            "count": 4
+          },
+          {
+            "itemId": "cooking_salt",
+            "name": "Cooking Salt",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Harvest Feast",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        },
+        "effect": {
+          "feast": {
+            "servings": 10,
+            "minutes": 3
+          },
+          "food": {
+            "amount": 980,
+            "seconds": 18
+          },
+          "wellfed": {
+            "aura": "Well Fed",
+            "kind": "buff_sta",
+            "value": 5,
+            "minutes": 10
+          }
         }
       }
     ]
@@ -8615,14 +11058,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 4
           },
           {
+            "itemId": "spider_leg",
             "name": "Twitching Spider Leg",
             "count": 2
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 5
           }
@@ -8633,6 +11079,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -8649,14 +11096,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 5
           },
           {
+            "itemId": "spider_leg",
             "name": "Twitching Spider Leg",
             "count": 2
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 5
           }
@@ -8667,6 +11117,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -8683,18 +11134,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 6
           },
           {
+            "itemId": "pristine_hide",
             "name": "Pristine Hide",
             "count": 3
           },
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 2
           },
           {
+            "itemId": "tanning_agent",
             "name": "Tanning Agent",
             "count": 1
           }
@@ -8705,6 +11160,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -8721,14 +11177,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 3
           },
           {
+            "itemId": "spider_leg",
             "name": "Twitching Spider Leg",
             "count": 2
           },
           {
+            "itemId": "tanning_agent",
             "name": "Tanning Agent",
             "count": 1
           }
@@ -8739,6 +11198,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -8755,10 +11215,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 2
           },
           {
+            "itemId": "tanning_agent",
             "name": "Tanning Agent",
             "count": 1
           }
@@ -8769,6 +11231,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -8785,14 +11248,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 2
           },
           {
+            "itemId": "spider_leg",
             "name": "Twitching Spider Leg",
             "count": 1
           },
           {
+            "itemId": "tanning_agent",
             "name": "Tanning Agent",
             "count": 1
           }
@@ -8803,6 +11269,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -8819,14 +11286,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 4
           },
           {
+            "itemId": "spider_silk",
             "name": "Spider Silk",
             "count": 2
           },
           {
+            "itemId": "tanning_agent",
             "name": "Tanning Agent",
             "count": 1
           }
@@ -8837,6 +11307,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -8853,14 +11324,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 3
           },
           {
+            "itemId": "spider_leg",
             "name": "Twitching Spider Leg",
             "count": 2
           },
           {
+            "itemId": "tanning_agent",
             "name": "Tanning Agent",
             "count": 1
           }
@@ -8871,6 +11345,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -8887,14 +11362,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 3
           },
           {
+            "itemId": "homespun_cloth",
             "name": "Homespun Cloth",
             "count": 2
           },
           {
+            "itemId": "tanning_agent",
             "name": "Tanning Agent",
             "count": 1
           }
@@ -8905,6 +11383,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -8921,18 +11400,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "pristine_hide",
             "name": "Pristine Hide",
             "count": 1
           },
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 4
           },
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 1
           },
           {
+            "itemId": "tanning_agent",
             "name": "Tanning Agent",
             "count": 2
           }
@@ -8943,6 +11426,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -8959,14 +11443,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 5
           },
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 1
           },
           {
+            "itemId": "tanning_agent",
             "name": "Tanning Agent",
             "count": 1
           }
@@ -8977,6 +11464,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -8993,22 +11481,27 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "pristine_claw",
             "name": "Pristine Claw",
             "count": 1
           },
           {
+            "itemId": "sharp_claw",
             "name": "Sharp Claw",
             "count": 2
           },
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 4
           },
           {
+            "itemId": "spider_silk",
             "name": "Spider Silk",
             "count": 2
           },
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 1
           }
@@ -9019,6 +11512,351 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_wyrmhide_cording",
+        "name": "Wyrmhide Cording",
+        "skillReq": 75,
+        "tier": 3,
+        "station": "tannery",
+        "acquisition": "trainer",
+        "feeCopper": 40000,
+        "materials": [
+          {
+            "itemId": "pristine_hide",
+            "name": "Pristine Hide",
+            "count": 1
+          },
+          {
+            "itemId": "rough_hide",
+            "name": "Rough Hide",
+            "count": 4
+          },
+          {
+            "itemId": "spider_silk",
+            "name": "Spider Silk",
+            "count": 2
+          },
+          {
+            "itemId": "quickening_catalyst",
+            "name": "Quickening Catalyst",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Wyrmhide Cording",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 100,
+          "minimalAt": 125,
+          "zeroAt": 150
+        }
+      },
+      {
+        "id": "recipe_briarstep_jerkin",
+        "name": "Briarstep Jerkin",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "tannery",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "wyrmhide_cording",
+            "name": "Wyrmhide Cording",
+            "count": 3
+          },
+          {
+            "itemId": "wyrmfall_core",
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "itemId": "rough_hide",
+            "name": "Rough Hide",
+            "count": 4
+          },
+          {
+            "itemId": "pristine_hide",
+            "name": "Pristine Hide",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Briarstep Jerkin",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_fenbloom_breeches",
+        "name": "Fenbloom Breeches",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "tannery",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "wyrmhide_cording",
+            "name": "Wyrmhide Cording",
+            "count": 3
+          },
+          {
+            "itemId": "wyrmfall_core",
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "itemId": "rough_hide",
+            "name": "Rough Hide",
+            "count": 4
+          },
+          {
+            "itemId": "pristine_hide",
+            "name": "Pristine Hide",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Fenbloom Breeches",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_barksong_handguards",
+        "name": "Barksong Handguards",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "tannery",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "wyrmhide_cording",
+            "name": "Wyrmhide Cording",
+            "count": 3
+          },
+          {
+            "itemId": "wyrmfall_core",
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "itemId": "rough_hide",
+            "name": "Rough Hide",
+            "count": 4
+          },
+          {
+            "itemId": "pristine_hide",
+            "name": "Pristine Hide",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Barksong Handguards",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_oiled_boots",
+        "name": "Oiled Leather Boots",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "tannery",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "itemId": "mudfin_scale",
+            "name": "Slimy Mudfin Scale",
+            "count": 4
+          },
+          {
+            "itemId": "rough_hide",
+            "name": "Rough Hide",
+            "count": 6
+          },
+          {
+            "itemId": "spider_silk",
+            "name": "Spider Silk",
+            "count": 2
+          },
+          {
+            "itemId": "tanning_agent",
+            "name": "Tanning Agent",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Oiled Leather Boots",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        }
+      },
+      {
+        "id": "recipe_gravewyrm_bone_quiver",
+        "name": "Gravewyrm Bone Quiver",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "tannery",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "itemId": "cracked_wyrm_scale",
+            "name": "Cracked Wyrm Scale",
+            "count": 3
+          },
+          {
+            "itemId": "pristine_hide",
+            "name": "Pristine Hide",
+            "count": 2
+          },
+          {
+            "itemId": "thorium_ore",
+            "name": "Osmium Ore",
+            "count": 4
+          },
+          {
+            "itemId": "tanning_agent",
+            "name": "Tanning Agent",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Gravewyrm Bone Quiver",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_wildgrove_cinch",
+        "name": "Wildgrove Cinch",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "tannery",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "itemId": "old_cragmaws_pelt",
+            "name": "Old Cragmaw's Pelt",
+            "count": 1
+          },
+          {
+            "itemId": "pristine_hide",
+            "name": "Pristine Hide",
+            "count": 3
+          },
+          {
+            "itemId": "thorium_ore",
+            "name": "Osmium Ore",
+            "count": 1
+          },
+          {
+            "itemId": "tanning_agent",
+            "name": "Tanning Agent",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Wildgrove Cinch",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_cragprowl_belt",
+        "name": "Cragprowl Belt",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "tannery",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "itemId": "emberwing_cinderscale",
+            "name": "Emberwing Cinderscale",
+            "count": 1
+          },
+          {
+            "itemId": "pristine_hide",
+            "name": "Pristine Hide",
+            "count": 3
+          },
+          {
+            "itemId": "thorium_ore",
+            "name": "Osmium Ore",
+            "count": 1
+          },
+          {
+            "itemId": "tanning_agent",
+            "name": "Tanning Agent",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Cragprowl Belt",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -9055,10 +11893,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "homespun_cloth",
             "name": "Homespun Cloth",
             "count": 3
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 9
           }
@@ -9069,6 +11909,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -9085,18 +11926,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "linen_scrap",
             "name": "Linen Scrap",
             "count": 3
           },
           {
+            "itemId": "spider_leg",
             "name": "Twitching Spider Leg",
             "count": 1
           },
           {
+            "itemId": "homespun_cloth",
             "name": "Homespun Cloth",
             "count": 3
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 5
           }
@@ -9107,6 +11952,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -9123,22 +11969,27 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 2
           },
           {
+            "itemId": "goldleaf_herb",
             "name": "Goldleaf Herb",
             "count": 2
           },
           {
+            "itemId": "pristine_silk",
             "name": "Pristine Silk",
             "count": 2
           },
           {
+            "itemId": "spider_silk",
             "name": "Spider Silk",
             "count": 4
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 2
           }
@@ -9149,6 +12000,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 100,
           "minimalAt": 125,
@@ -9165,14 +12017,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "homespun_cloth",
             "name": "Homespun Cloth",
             "count": 4
           },
           {
+            "itemId": "linen_scrap",
             "name": "Linen Scrap",
             "count": 2
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 1
           }
@@ -9183,6 +12038,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -9199,10 +12055,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "homespun_cloth",
             "name": "Homespun Cloth",
             "count": 3
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 1
           }
@@ -9213,6 +12071,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -9229,14 +12088,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "linen_scrap",
             "name": "Linen Scrap",
             "count": 3
           },
           {
+            "itemId": "silverleaf_herb",
             "name": "Sheenleaf Herb",
             "count": 2
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 1
           }
@@ -9247,6 +12109,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -9263,14 +12126,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "spider_silk",
             "name": "Spider Silk",
             "count": 4
           },
           {
+            "itemId": "goldleaf_herb",
             "name": "Goldleaf Herb",
             "count": 2
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 2
           }
@@ -9281,6 +12147,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -9297,14 +12164,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "homespun_cloth",
             "name": "Homespun Cloth",
             "count": 4
           },
           {
+            "itemId": "goldleaf_herb",
             "name": "Goldleaf Herb",
             "count": 2
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 1
           }
@@ -9315,6 +12185,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -9331,14 +12202,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "spider_silk",
             "name": "Spider Silk",
             "count": 6
           },
           {
+            "itemId": "goldleaf_herb",
             "name": "Goldleaf Herb",
             "count": 2
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 2
           }
@@ -9349,6 +12223,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -9365,18 +12240,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "pristine_silk",
             "name": "Pristine Silk",
             "count": 1
           },
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 2
           },
           {
+            "itemId": "spider_silk",
             "name": "Spider Silk",
             "count": 4
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 2
           }
@@ -9387,6 +12266,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -9403,14 +12283,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 1
           },
           {
+            "itemId": "homespun_cloth",
             "name": "Homespun Cloth",
             "count": 4
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 2
           }
@@ -9421,6 +12304,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -9437,18 +12321,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 1
           },
           {
+            "itemId": "goldleaf_herb",
             "name": "Goldleaf Herb",
             "count": 2
           },
           {
+            "itemId": "spider_silk",
             "name": "Spider Silk",
             "count": 3
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 1
           }
@@ -9459,6 +12347,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -9475,14 +12364,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "spider_silk",
             "name": "Spider Silk",
             "count": 8
           },
           {
+            "itemId": "goldleaf_herb",
             "name": "Goldleaf Herb",
             "count": 3
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 3
           }
@@ -9493,6 +12385,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -9509,18 +12402,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "pristine_silk",
             "name": "Pristine Silk",
             "count": 2
           },
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 3
           },
           {
+            "itemId": "spider_silk",
             "name": "Spider Silk",
             "count": 6
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 3
           }
@@ -9531,6 +12428,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -9547,18 +12445,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "resonant_thread",
             "name": "Resonant Thread",
             "count": 8
           },
           {
+            "itemId": "pristine_silk",
             "name": "Pristine Silk",
             "count": 4
           },
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 4
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 4
           }
@@ -9569,6 +12471,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "epic"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -9585,22 +12488,27 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "resonant_thread",
             "name": "Resonant Thread",
             "count": 12
           },
           {
+            "itemId": "pristine_silk",
             "name": "Pristine Silk",
             "count": 6
           },
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 5
           },
           {
+            "itemId": "homespun_cloth",
             "name": "Homespun Cloth",
             "count": 8
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 6
           }
@@ -9611,10 +12519,666 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "epic"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
           "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_sunspun_bolt",
+        "name": "Sunspun Bolt",
+        "skillReq": 75,
+        "tier": 3,
+        "station": "loom",
+        "acquisition": "trainer",
+        "feeCopper": 40000,
+        "materials": [
+          {
+            "itemId": "sunpetal_herb",
+            "name": "Sunpetal Herb",
+            "count": 1
+          },
+          {
+            "itemId": "spider_silk",
+            "name": "Spider Silk",
+            "count": 4
+          },
+          {
+            "itemId": "pristine_silk",
+            "name": "Pristine Silk",
+            "count": 1
+          },
+          {
+            "itemId": "quickening_catalyst",
+            "name": "Quickening Catalyst",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Sunspun Bolt",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 100,
+          "minimalAt": 125,
+          "zeroAt": 150
+        }
+      },
+      {
+        "id": "recipe_sunspun_vestments",
+        "name": "Sunspun Vestments",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "loom",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "sunspun_bolt",
+            "name": "Sunspun Bolt",
+            "count": 3
+          },
+          {
+            "itemId": "wyrmfall_core",
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "itemId": "spider_silk",
+            "name": "Spider Silk",
+            "count": 4
+          },
+          {
+            "itemId": "pristine_silk",
+            "name": "Pristine Silk",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Sunspun Vestments",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_sunspun_leggings",
+        "name": "Sunspun Leggings",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "loom",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "sunspun_bolt",
+            "name": "Sunspun Bolt",
+            "count": 3
+          },
+          {
+            "itemId": "wyrmfall_core",
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "itemId": "spider_silk",
+            "name": "Spider Silk",
+            "count": 4
+          },
+          {
+            "itemId": "pristine_silk",
+            "name": "Pristine Silk",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Sunspun Leggings",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_sunspun_handwraps",
+        "name": "Sunspun Handwraps",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "loom",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "sunspun_bolt",
+            "name": "Sunspun Bolt",
+            "count": 3
+          },
+          {
+            "itemId": "wyrmfall_core",
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "itemId": "spider_silk",
+            "name": "Spider Silk",
+            "count": 4
+          },
+          {
+            "itemId": "pristine_silk",
+            "name": "Pristine Silk",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Sunspun Handwraps",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_sunspun_haversack",
+        "name": "Sunspun Haversack",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "loom",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "sunspun_bolt",
+            "name": "Sunspun Bolt",
+            "count": 3
+          },
+          {
+            "itemId": "wyrmfall_core",
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "itemId": "spider_silk",
+            "name": "Spider Silk",
+            "count": 4
+          },
+          {
+            "itemId": "pristine_silk",
+            "name": "Pristine Silk",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Sunspun Haversack",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_linen_pouch",
+        "name": "Linen Pouch",
+        "skillReq": 0,
+        "tier": 0,
+        "station": "loom",
+        "acquisition": "trainer",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "bandit_bandana",
+            "name": "Red Bandana",
+            "count": 2
+          },
+          {
+            "itemId": "linen_scrap",
+            "name": "Linen Scrap",
+            "count": 4
+          },
+          {
+            "itemId": "spool_of_thread",
+            "name": "Spool of Thread",
+            "count": 4
+          }
+        ],
+        "output": {
+          "name": "Linen Pouch",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 25,
+          "minimalAt": 50,
+          "zeroAt": 75
+        }
+      }
+    ]
+  },
+  {
+    "id": "inscription",
+    "name": "Inscription",
+    "pole": "Cross-cutting",
+    "maxSkill": 125,
+    "station": "apothecary",
+    "masters": [
+      {
+        "name": "Alchemist Verane",
+        "title": "Master of the Apothecary",
+        "hub": "Highwatch"
+      }
+    ],
+    "specialization": {
+      "at": 75,
+      "materialDiscountPct": 20
+    },
+    "recipes": [
+      {
+        "id": "recipe_silverleaf_primer",
+        "name": "Sheenleaf Primer",
+        "skillReq": 0,
+        "tier": 0,
+        "station": "apothecary",
+        "acquisition": "trainer",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "silverleaf_herb",
+            "name": "Sheenleaf Herb",
+            "count": 3
+          },
+          {
+            "itemId": "arcane_dust",
+            "name": "Chime Dust",
+            "count": 2
+          },
+          {
+            "itemId": "glass_vial",
+            "name": "Glass Vial",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Sheenleaf Primer",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 25,
+          "minimalAt": 50,
+          "zeroAt": 75
+        }
+      },
+      {
+        "id": "recipe_silverleaf_scroll",
+        "name": "Sheenleaf Scroll",
+        "skillReq": 0,
+        "tier": 0,
+        "station": "apothecary",
+        "acquisition": "trainer",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "silverleaf_herb",
+            "name": "Sheenleaf Herb",
+            "count": 2
+          },
+          {
+            "itemId": "arcane_dust",
+            "name": "Chime Dust",
+            "count": 1
+          },
+          {
+            "itemId": "glass_vial",
+            "name": "Glass Vial",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Sheenleaf Scroll",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 25,
+          "minimalAt": 50,
+          "zeroAt": 75
+        }
+      },
+      {
+        "id": "recipe_goldleaf_folio",
+        "name": "Goldleaf Folio",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "apothecary",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "itemId": "goldleaf_herb",
+            "name": "Goldleaf Herb",
+            "count": 2
+          },
+          {
+            "itemId": "arcane_essence",
+            "name": "Chime Essence",
+            "count": 1
+          },
+          {
+            "itemId": "glass_vial",
+            "name": "Glass Vial",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Goldleaf Folio",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        }
+      },
+      {
+        "id": "recipe_goldleaf_scroll",
+        "name": "Goldleaf Scroll",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "apothecary",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "itemId": "goldleaf_herb",
+            "name": "Goldleaf Herb",
+            "count": 1
+          },
+          {
+            "itemId": "arcane_essence",
+            "name": "Chime Essence",
+            "count": 1
+          },
+          {
+            "itemId": "glass_vial",
+            "name": "Glass Vial",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Goldleaf Scroll",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        }
+      },
+      {
+        "id": "recipe_sunpetal_grimoire",
+        "name": "Sunpetal Grimoire",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "apothecary",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "itemId": "sunpetal_herb",
+            "name": "Sunpetal Herb",
+            "count": 2
+          },
+          {
+            "itemId": "arcane_essence",
+            "name": "Chime Essence",
+            "count": 2
+          },
+          {
+            "itemId": "glass_vial",
+            "name": "Glass Vial",
+            "count": 1
+          },
+          {
+            "itemId": "goldleaf_herb",
+            "name": "Goldleaf Herb",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Sunpetal Grimoire",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_sunpetal_scroll",
+        "name": "Sunpetal Scroll",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "apothecary",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "itemId": "sunpetal_herb",
+            "name": "Sunpetal Herb",
+            "count": 1
+          },
+          {
+            "itemId": "frost_gourd",
+            "name": "Frost Gourd",
+            "count": 1
+          },
+          {
+            "itemId": "arcane_essence",
+            "name": "Chime Essence",
+            "count": 2
+          },
+          {
+            "itemId": "glass_vial",
+            "name": "Glass Vial",
+            "count": 1
+          },
+          {
+            "itemId": "arcane_dust",
+            "name": "Chime Dust",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Sunpetal Scroll",
+          "count": 2,
+          "quality": "rare"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_deed_of_making",
+        "name": "Deed of Making",
+        "skillReq": 125,
+        "tier": 5,
+        "station": "apothecary",
+        "acquisition": "trainer",
+        "feeCopper": 160000,
+        "materials": [
+          {
+            "itemId": "sablewax_vellum",
+            "name": "Sablewax Vellum",
+            "count": 3
+          },
+          {
+            "itemId": "wyrmfall_core",
+            "name": "Wyrmfall Core",
+            "count": 1
+          },
+          {
+            "itemId": "sunpetal_herb",
+            "name": "Sunpetal Herb",
+            "count": 2
+          },
+          {
+            "itemId": "arcane_essence",
+            "name": "Chime Essence",
+            "count": 2
+          },
+          {
+            "itemId": "glass_vial",
+            "name": "Glass Vial",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Deed of Making",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 150,
+          "minimalAt": 175,
+          "zeroAt": 200
+        }
+      },
+      {
+        "id": "recipe_sablewax_vellum",
+        "name": "Sablewax Vellum",
+        "skillReq": 75,
+        "tier": 3,
+        "station": "apothecary",
+        "acquisition": "trainer",
+        "feeCopper": 40000,
+        "materials": [
+          {
+            "itemId": "sunpetal_herb",
+            "name": "Sunpetal Herb",
+            "count": 1
+          },
+          {
+            "itemId": "arcane_essence",
+            "name": "Chime Essence",
+            "count": 2
+          },
+          {
+            "itemId": "glass_vial",
+            "name": "Glass Vial",
+            "count": 1
+          },
+          {
+            "itemId": "quickening_catalyst",
+            "name": "Quickening Catalyst",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Sablewax Vellum",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 100,
+          "minimalAt": 125,
+          "zeroAt": 150
+        }
+      },
+      {
+        "id": "recipe_voidbound_grimoire",
+        "name": "Voidbound Grimoire",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "apothecary",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "sablewax_vellum",
+            "name": "Sablewax Vellum",
+            "count": 3
+          },
+          {
+            "itemId": "wyrmfall_core",
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "itemId": "sunpetal_herb",
+            "name": "Sunpetal Herb",
+            "count": 2
+          },
+          {
+            "itemId": "arcane_essence",
+            "name": "Chime Essence",
+            "count": 2
+          },
+          {
+            "itemId": "glass_vial",
+            "name": "Glass Vial",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Voidbound Grimoire",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
         }
       }
     ]
@@ -9641,14 +13205,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "arcane_shard",
             "name": "Chime Shard",
             "count": 5
           },
           {
+            "itemId": "arcane_essence",
             "name": "Chime Essence",
             "count": 4
           },
           {
+            "itemId": "arcane_dust",
             "name": "Chime Dust",
             "count": 6
           }
@@ -9659,6 +13226,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -9675,14 +13243,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "arcane_shard",
             "name": "Chime Shard",
             "count": 5
           },
           {
+            "itemId": "arcane_essence",
             "name": "Chime Essence",
             "count": 4
           },
           {
+            "itemId": "arcane_dust",
             "name": "Chime Dust",
             "count": 6
           }
@@ -9693,10 +13264,593 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
           "zeroAt": 100
+        }
+      },
+      {
+        "id": "recipe_lucent_reagent",
+        "name": "Lucent Reagent",
+        "skillReq": 75,
+        "tier": 3,
+        "station": "toolworks",
+        "acquisition": "trainer",
+        "feeCopper": 40000,
+        "materials": [
+          {
+            "itemId": "arcane_essence",
+            "name": "Chime Essence",
+            "count": 3
+          },
+          {
+            "itemId": "arcane_dust",
+            "name": "Chime Dust",
+            "count": 4
+          },
+          {
+            "itemId": "quickening_catalyst",
+            "name": "Quickening Catalyst",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Lucent Reagent",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 100,
+          "minimalAt": 125,
+          "zeroAt": 150
+        }
+      }
+    ]
+  },
+  {
+    "id": "jewelcrafting",
+    "name": "Jewelcrafting",
+    "pole": "Material",
+    "maxSkill": 125,
+    "station": "forge",
+    "masters": [
+      {
+        "name": "Forgemistress Darva",
+        "title": "Master of the Forge",
+        "hub": "Eastbrook"
+      }
+    ],
+    "specialization": {
+      "at": 75,
+      "materialDiscountPct": 20
+    },
+    "recipes": [
+      {
+        "id": "recipe_hammered_copper_band",
+        "name": "Hammered Copper Band",
+        "skillReq": 0,
+        "tier": 0,
+        "station": "forge",
+        "acquisition": "trainer",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "copper_ore",
+            "name": "Copper Ore",
+            "count": 4
+          },
+          {
+            "itemId": "arcane_dust",
+            "name": "Chime Dust",
+            "count": 2
+          },
+          {
+            "itemId": "smithing_flux",
+            "name": "Smithing Flux",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Hammered Copper Band",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 25,
+          "minimalAt": 50,
+          "zeroAt": 75
+        }
+      },
+      {
+        "id": "recipe_polished_copper_loop",
+        "name": "Polished Copper Loop",
+        "skillReq": 0,
+        "tier": 0,
+        "station": "forge",
+        "acquisition": "trainer",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "copper_ore",
+            "name": "Copper Ore",
+            "count": 4
+          },
+          {
+            "itemId": "arcane_dust",
+            "name": "Chime Dust",
+            "count": 3
+          },
+          {
+            "itemId": "smithing_flux",
+            "name": "Smithing Flux",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Polished Copper Loop",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 25,
+          "minimalAt": 50,
+          "zeroAt": 75
+        }
+      },
+      {
+        "id": "recipe_coiled_copper_torc",
+        "name": "Coiled Copper Torc",
+        "skillReq": 0,
+        "tier": 0,
+        "station": "forge",
+        "acquisition": "trainer",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "copper_ore",
+            "name": "Copper Ore",
+            "count": 5
+          },
+          {
+            "itemId": "arcane_dust",
+            "name": "Chime Dust",
+            "count": 2
+          },
+          {
+            "itemId": "smithing_flux",
+            "name": "Smithing Flux",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Coiled Copper Torc",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 25,
+          "minimalAt": 50,
+          "zeroAt": 75
+        }
+      },
+      {
+        "id": "recipe_riveted_iron_signet",
+        "name": "Riveted Iron Signet",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "forge",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "itemId": "iron_ore",
+            "name": "Iron Ore",
+            "count": 4
+          },
+          {
+            "itemId": "arcane_essence",
+            "name": "Chime Essence",
+            "count": 1
+          },
+          {
+            "itemId": "smithing_flux",
+            "name": "Smithing Flux",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Riveted Iron Signet",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        }
+      },
+      {
+        "id": "recipe_etched_iron_loop",
+        "name": "Etched Iron Loop",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "forge",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "itemId": "iron_ore",
+            "name": "Iron Ore",
+            "count": 3
+          },
+          {
+            "itemId": "arcane_essence",
+            "name": "Chime Essence",
+            "count": 2
+          },
+          {
+            "itemId": "smithing_flux",
+            "name": "Smithing Flux",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Etched Iron Loop",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        }
+      },
+      {
+        "id": "recipe_iron_link_choker",
+        "name": "Iron Link Choker",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "forge",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "itemId": "iron_ore",
+            "name": "Iron Ore",
+            "count": 5
+          },
+          {
+            "itemId": "arcane_essence",
+            "name": "Chime Essence",
+            "count": 1
+          },
+          {
+            "itemId": "smithing_flux",
+            "name": "Smithing Flux",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Iron Link Choker",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        }
+      },
+      {
+        "id": "recipe_weighted_thorium_band",
+        "name": "Weighted Osmium Band",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "forge",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "itemId": "thorium_ore",
+            "name": "Osmium Ore",
+            "count": 4
+          },
+          {
+            "itemId": "arcane_essence",
+            "name": "Chime Essence",
+            "count": 2
+          },
+          {
+            "itemId": "smithing_flux",
+            "name": "Smithing Flux",
+            "count": 2
+          },
+          {
+            "itemId": "iron_ore",
+            "name": "Iron Ore",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Weighted Osmium Band",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_gleaming_thorium_loop",
+        "name": "Gleaming Osmium Loop",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "forge",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "itemId": "thorium_ore",
+            "name": "Osmium Ore",
+            "count": 4
+          },
+          {
+            "itemId": "arcane_essence",
+            "name": "Chime Essence",
+            "count": 3
+          },
+          {
+            "itemId": "smithing_flux",
+            "name": "Smithing Flux",
+            "count": 2
+          },
+          {
+            "itemId": "iron_ore",
+            "name": "Iron Ore",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Gleaming Osmium Loop",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_burnished_thorium_amulet",
+        "name": "Burnished Osmium Amulet",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "forge",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "itemId": "thorium_ore",
+            "name": "Osmium Ore",
+            "count": 4
+          },
+          {
+            "itemId": "arcane_essence",
+            "name": "Chime Essence",
+            "count": 2
+          },
+          {
+            "itemId": "smithing_flux",
+            "name": "Smithing Flux",
+            "count": 2
+          },
+          {
+            "itemId": "iron_ore",
+            "name": "Iron Ore",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Burnished Osmium Amulet",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_prismglass_setting",
+        "name": "Prismglass Setting",
+        "skillReq": 75,
+        "tier": 3,
+        "station": "forge",
+        "acquisition": "trainer",
+        "feeCopper": 40000,
+        "materials": [
+          {
+            "itemId": "thorium_ore",
+            "name": "Osmium Ore",
+            "count": 2
+          },
+          {
+            "itemId": "arcane_essence",
+            "name": "Chime Essence",
+            "count": 2
+          },
+          {
+            "itemId": "quickening_catalyst",
+            "name": "Quickening Catalyst",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Prismglass Setting",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 100,
+          "minimalAt": 125,
+          "zeroAt": 150
+        }
+      },
+      {
+        "id": "recipe_wyrmfall_pendant",
+        "name": "Wyrmfall Pendant",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "forge",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "prismglass_setting",
+            "name": "Prismglass Setting",
+            "count": 3
+          },
+          {
+            "itemId": "wyrmfall_core",
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "itemId": "thorium_ore",
+            "name": "Osmium Ore",
+            "count": 4
+          },
+          {
+            "itemId": "arcane_essence",
+            "name": "Chime Essence",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Wyrmfall Pendant",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_warhewn_signet",
+        "name": "Warhewn Signet",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "forge",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "prismglass_setting",
+            "name": "Prismglass Setting",
+            "count": 3
+          },
+          {
+            "itemId": "wyrmfall_core",
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "itemId": "thorium_ore",
+            "name": "Osmium Ore",
+            "count": 4
+          },
+          {
+            "itemId": "arcane_essence",
+            "name": "Chime Essence",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Warhewn Signet",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_prismglass_loop",
+        "name": "Prismglass Loop",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "forge",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "prismglass_setting",
+            "name": "Prismglass Setting",
+            "count": 3
+          },
+          {
+            "itemId": "wyrmfall_core",
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "itemId": "thorium_ore",
+            "name": "Osmium Ore",
+            "count": 4
+          },
+          {
+            "itemId": "arcane_essence",
+            "name": "Chime Essence",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Prismglass Loop",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
         }
       }
     ]
@@ -9729,14 +13883,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "wolf_fang",
             "name": "Cracked Wolf Fang",
             "count": 2
           },
           {
+            "itemId": "bone_fragments",
             "name": "Bone Fragments",
             "count": 4
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 6
           }
@@ -9747,6 +13904,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -9763,14 +13921,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 6
           },
           {
+            "itemId": "iron_ore",
             "name": "Iron Ore",
             "count": 3
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 2
           }
@@ -9787,6 +13948,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           ],
           "minTier": 1
         },
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -9803,14 +13965,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "copper_ore",
             "name": "Copper Ore",
             "count": 4
           },
           {
+            "itemId": "ironbark_log",
             "name": "Ironbark Log",
             "count": 2
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 1
           }
@@ -9821,6 +13986,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -9837,14 +14003,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "copper_ore",
             "name": "Copper Ore",
             "count": 3
           },
           {
+            "itemId": "bone_fragments",
             "name": "Bone Fragments",
             "count": 2
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 1
           }
@@ -9855,6 +14024,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -9871,18 +14041,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "curved_tusk",
             "name": "Curved Tusk",
             "count": 2
           },
           {
+            "itemId": "ironbark_log",
             "name": "Ironbark Log",
             "count": 3
           },
           {
+            "itemId": "copper_ore",
             "name": "Copper Ore",
             "count": 2
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 1
           }
@@ -9893,6 +14067,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -9909,14 +14084,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "iron_ore",
             "name": "Iron Ore",
             "count": 4
           },
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 1
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 1
           }
@@ -9927,6 +14105,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -9943,14 +14122,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "iron_ore",
             "name": "Iron Ore",
             "count": 3
           },
           {
+            "itemId": "ashwood_log",
             "name": "Ashwood Log",
             "count": 1
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 1
           }
@@ -9961,6 +14143,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -9977,14 +14160,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "iron_ore",
             "name": "Iron Ore",
             "count": 2
           },
           {
+            "itemId": "bone_fragments",
             "name": "Bone Fragments",
             "count": 2
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 1
           }
@@ -9995,6 +14181,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -10011,14 +14198,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 4
           },
           {
+            "itemId": "iron_ore",
             "name": "Iron Ore",
             "count": 2
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 2
           }
@@ -10029,6 +14219,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -10045,18 +14236,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "arcanite_bar",
             "name": "Glyphsteel Bar",
             "count": 1
           },
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 2
           },
           {
+            "itemId": "bone_fragments",
             "name": "Bone Fragments",
             "count": 4
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 1
           }
@@ -10067,6 +14262,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -10083,18 +14279,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "elderwood_log",
             "name": "Highpine Log",
             "count": 1
           },
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 2
           },
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 2
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 1
           }
@@ -10105,6 +14305,212 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_duskforged_billet",
+        "name": "Duskforged Billet",
+        "skillReq": 75,
+        "tier": 3,
+        "station": "forge",
+        "acquisition": "trainer",
+        "feeCopper": 40000,
+        "materials": [
+          {
+            "itemId": "thorium_ore",
+            "name": "Osmium Ore",
+            "count": 3
+          },
+          {
+            "itemId": "iron_ore",
+            "name": "Iron Ore",
+            "count": 2
+          },
+          {
+            "itemId": "quickening_catalyst",
+            "name": "Quickening Catalyst",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Duskforged Billet",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 100,
+          "minimalAt": 125,
+          "zeroAt": 150
+        }
+      },
+      {
+        "id": "recipe_duskforged_warblade",
+        "name": "Duskforged Warblade",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "forge",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "duskforged_billet",
+            "name": "Duskforged Billet",
+            "count": 3
+          },
+          {
+            "itemId": "wyrmfall_core",
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "itemId": "thorium_ore",
+            "name": "Osmium Ore",
+            "count": 4
+          },
+          {
+            "itemId": "iron_ore",
+            "name": "Iron Ore",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Duskforged Warblade",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_ridgebreaker",
+        "name": "Ridgebreaker",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "forge",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "duskforged_billet",
+            "name": "Duskforged Billet",
+            "count": 3
+          },
+          {
+            "itemId": "wyrmfall_core",
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "itemId": "thorium_ore",
+            "name": "Osmium Ore",
+            "count": 4
+          },
+          {
+            "itemId": "iron_ore",
+            "name": "Iron Ore",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Ridgebreaker",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_duskforged_bulwark",
+        "name": "Duskforged Bulwark",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "forge",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "duskforged_billet",
+            "name": "Duskforged Billet",
+            "count": 3
+          },
+          {
+            "itemId": "wyrmfall_core",
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "itemId": "thorium_ore",
+            "name": "Osmium Ore",
+            "count": 4
+          },
+          {
+            "itemId": "iron_ore",
+            "name": "Iron Ore",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Duskforged Bulwark",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_fenshadow_maul",
+        "name": "Fenshadow Maul",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "forge",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "itemId": "cracked_ogre_tusk",
+            "name": "Cracked Ogre Tusk",
+            "count": 2
+          },
+          {
+            "itemId": "elderwood_log",
+            "name": "Highpine Log",
+            "count": 2
+          },
+          {
+            "itemId": "smithing_flux",
+            "name": "Smithing Flux",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Fenshadow Maul",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -10141,10 +14547,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "copper_ore",
             "name": "Copper Ore",
             "count": 4
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 9
           }
@@ -10155,6 +14563,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -10171,14 +14580,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "bone_fragments",
             "name": "Bone Fragments",
             "count": 3
           },
           {
+            "itemId": "copper_ore",
             "name": "Copper Ore",
             "count": 4
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 4
           }
@@ -10189,6 +14601,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -10205,10 +14618,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 7
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 5
           }
@@ -10219,6 +14634,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 100,
           "minimalAt": 125,
@@ -10235,18 +14651,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "arcanite_bar",
             "name": "Glyphsteel Bar",
             "count": 1
           },
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 5
           },
           {
+            "itemId": "wolf_fang",
             "name": "Cracked Wolf Fang",
             "count": 4
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 2
           }
@@ -10263,6 +14683,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           ],
           "minTier": 1
         },
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -10279,14 +14700,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "copper_ore",
             "name": "Copper Ore",
             "count": 4
           },
           {
+            "itemId": "bone_fragments",
             "name": "Bone Fragments",
             "count": 2
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 1
           }
@@ -10297,6 +14721,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -10313,14 +14738,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "copper_ore",
             "name": "Copper Ore",
             "count": 4
           },
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 2
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 1
           }
@@ -10331,6 +14759,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -10347,14 +14776,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "copper_ore",
             "name": "Copper Ore",
             "count": 3
           },
           {
+            "itemId": "bone_fragments",
             "name": "Bone Fragments",
             "count": 2
           },
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 1
           }
@@ -10365,6 +14797,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "common"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 25,
           "minimalAt": 50,
@@ -10381,14 +14814,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "iron_ore",
             "name": "Iron Ore",
             "count": 5
           },
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 2
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 2
           }
@@ -10399,6 +14835,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -10415,14 +14852,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "iron_ore",
             "name": "Iron Ore",
             "count": 4
           },
           {
+            "itemId": "bone_fragments",
             "name": "Bone Fragments",
             "count": 3
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 2
           }
@@ -10433,6 +14873,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -10449,14 +14890,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "iron_ore",
             "name": "Iron Ore",
             "count": 4
           },
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 1
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 1
           }
@@ -10467,6 +14911,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "uncommon"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 50,
           "minimalAt": 75,
@@ -10483,18 +14928,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 3
           },
           {
+            "itemId": "arcanite_bar",
             "name": "Glyphsteel Bar",
             "count": 1
           },
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 2
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 2
           }
@@ -10505,6 +14954,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -10521,18 +14971,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 4
           },
           {
+            "itemId": "arcanite_bar",
             "name": "Glyphsteel Bar",
             "count": 1
           },
           {
+            "itemId": "iron_ore",
             "name": "Iron Ore",
             "count": 4
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 2
           }
@@ -10543,6 +14997,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
@@ -10559,18 +15014,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 3
           },
           {
+            "itemId": "arcanite_bar",
             "name": "Glyphsteel Bar",
             "count": 1
           },
           {
+            "itemId": "bone_fragments",
             "name": "Bone Fragments",
             "count": 4
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 1
           }
@@ -10581,10 +15040,183 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "quality": "rare"
         },
         "combo": null,
+        "oncePerDay": false,
         "gain": {
           "reducedAt": 75,
           "minimalAt": 100,
           "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_forgefold_plating",
+        "name": "Forgefold Plating",
+        "skillReq": 75,
+        "tier": 3,
+        "station": "forge",
+        "acquisition": "trainer",
+        "feeCopper": 40000,
+        "materials": [
+          {
+            "itemId": "thorium_ore",
+            "name": "Osmium Ore",
+            "count": 3
+          },
+          {
+            "itemId": "iron_ore",
+            "name": "Iron Ore",
+            "count": 2
+          },
+          {
+            "itemId": "rough_hide",
+            "name": "Rough Hide",
+            "count": 2
+          },
+          {
+            "itemId": "quickening_catalyst",
+            "name": "Quickening Catalyst",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Forgefold Plating",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 100,
+          "minimalAt": 125,
+          "zeroAt": 150
+        }
+      },
+      {
+        "id": "recipe_spiritweld_girdle",
+        "name": "Spiritweld Girdle",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "forge",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "forgefold_plating",
+            "name": "Forgefold Plating",
+            "count": 3
+          },
+          {
+            "itemId": "wyrmfall_core",
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "itemId": "thorium_ore",
+            "name": "Osmium Ore",
+            "count": 4
+          },
+          {
+            "itemId": "iron_ore",
+            "name": "Iron Ore",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Spiritweld Girdle",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_forgefold_legguards",
+        "name": "Forgefold Legguards",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "forge",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "forgefold_plating",
+            "name": "Forgefold Plating",
+            "count": 3
+          },
+          {
+            "itemId": "wyrmfall_core",
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "itemId": "thorium_ore",
+            "name": "Osmium Ore",
+            "count": 4
+          },
+          {
+            "itemId": "iron_ore",
+            "name": "Iron Ore",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Forgefold Legguards",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_wardspeaker_sabatons",
+        "name": "Wardspeaker Sabatons",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "forge",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "forgefold_plating",
+            "name": "Forgefold Plating",
+            "count": 3
+          },
+          {
+            "itemId": "wyrmfall_core",
+            "name": "Wyrmfall Core",
+            "count": 2
+          },
+          {
+            "itemId": "thorium_ore",
+            "name": "Osmium Ore",
+            "count": 4
+          },
+          {
+            "itemId": "iron_ore",
+            "name": "Iron Ore",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Wardspeaker Sabatons",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
         }
       }
     ]
@@ -11229,6 +15861,9 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
     "bands": [
       0,
       100,
+      150,
+      200,
+      200,
       200
     ],
     "tools": [
@@ -11307,6 +15942,14 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "craftedBy": "engineering",
         "priceMarks": 56,
         "marksHeroicClear": true
+      },
+      {
+        "name": "Clockreel Fishing Rod",
+        "tier": 6,
+        "quality": "epic",
+        "priceCopper": null,
+        "vendors": [],
+        "craftedBy": "engineering"
       }
     ],
     "fishing": {
@@ -11315,23 +15958,23 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
       "rodBiteReductionSec": 1.5,
       "reelWindowSec": 2.5,
       "reelRodBonusSec": 0.75,
-      "sessionCapSec": 15,
+      "sessionCapSec": 16,
       "schedule": [
         {
           "below": 50,
-          "gain": 1
+          "gain": 0.08
         },
         {
           "below": 100,
-          "gain": 0.5
+          "gain": 0.05
         },
         {
           "below": 150,
-          "gain": 0.1
+          "gain": 0.04
         },
         {
           "below": 200,
-          "gain": 0.02
+          "gain": 0.03
         }
       ],
       "junkCutoff": 100,
@@ -11543,7 +16186,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         },
         {
           "band": 2,
-          "minProficiency": 200,
+          "minProficiency": 150,
           "rodTierRequired": 3,
           "zones": [
             {
@@ -11642,9 +16285,470 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
               ]
             }
           ]
+        },
+        {
+          "band": 3,
+          "minProficiency": 200,
+          "rodTierRequired": 4,
+          "zones": [
+            {
+              "zone": "Eastbrook Vale",
+              "rows": [
+                {
+                  "name": "Raw Mirror Trout",
+                  "pct": 50,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw River Perch",
+                  "pct": 34,
+                  "quality": "common"
+                },
+                {
+                  "name": "Tangled Weed",
+                  "pct": 1,
+                  "quality": "poor"
+                },
+                {
+                  "name": "Sunglint Koi",
+                  "pct": 6,
+                  "quality": "uncommon"
+                },
+                {
+                  "name": "Raw Deepbarb Catfish",
+                  "pct": 5,
+                  "quality": "common"
+                },
+                {
+                  "name": null,
+                  "pct": 4,
+                  "quality": null
+                }
+              ]
+            },
+            {
+              "zone": "Mirefen Marsh",
+              "rows": [
+                {
+                  "name": "Raw Marsh Pike",
+                  "pct": 44,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw Bog Eel",
+                  "pct": 34,
+                  "quality": "common"
+                },
+                {
+                  "name": "Soggy Boot",
+                  "pct": 2,
+                  "quality": "poor"
+                },
+                {
+                  "name": "Tangled Weed",
+                  "pct": 3,
+                  "quality": "poor"
+                },
+                {
+                  "name": "Sunglint Koi",
+                  "pct": 6,
+                  "quality": "uncommon"
+                },
+                {
+                  "name": "Raw Deepbarb Catfish",
+                  "pct": 5,
+                  "quality": "common"
+                },
+                {
+                  "name": null,
+                  "pct": 6,
+                  "quality": null
+                }
+              ]
+            },
+            {
+              "zone": "Thornpeak Heights",
+              "rows": [
+                {
+                  "name": "Raw Frostgill Trout",
+                  "pct": 45,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw Slatefin Carp",
+                  "pct": 34,
+                  "quality": "common"
+                },
+                {
+                  "name": "Tangled Weed",
+                  "pct": 2,
+                  "quality": "poor"
+                },
+                {
+                  "name": "Sunglint Koi",
+                  "pct": 6,
+                  "quality": "uncommon"
+                },
+                {
+                  "name": "Raw Deepbarb Catfish",
+                  "pct": 5,
+                  "quality": "common"
+                },
+                {
+                  "name": null,
+                  "pct": 8,
+                  "quality": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "band": 4,
+          "minProficiency": 200,
+          "rodTierRequired": 5,
+          "zones": [
+            {
+              "zone": "Eastbrook Vale",
+              "rows": [
+                {
+                  "name": "Raw Mirror Trout",
+                  "pct": 50,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw River Perch",
+                  "pct": 34,
+                  "quality": "common"
+                },
+                {
+                  "name": "Tangled Weed",
+                  "pct": 1,
+                  "quality": "poor"
+                },
+                {
+                  "name": "Sunglint Koi",
+                  "pct": 6,
+                  "quality": "uncommon"
+                },
+                {
+                  "name": "Raw Deepbarb Catfish",
+                  "pct": 5,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw Hollowgill Sturgeon",
+                  "pct": 2,
+                  "quality": "common"
+                },
+                {
+                  "name": null,
+                  "pct": 2,
+                  "quality": null
+                }
+              ]
+            },
+            {
+              "zone": "Mirefen Marsh",
+              "rows": [
+                {
+                  "name": "Raw Marsh Pike",
+                  "pct": 45,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw Bog Eel",
+                  "pct": 36,
+                  "quality": "common"
+                },
+                {
+                  "name": "Soggy Boot",
+                  "pct": 1,
+                  "quality": "poor"
+                },
+                {
+                  "name": "Tangled Weed",
+                  "pct": 1,
+                  "quality": "poor"
+                },
+                {
+                  "name": "Sunglint Koi",
+                  "pct": 6,
+                  "quality": "uncommon"
+                },
+                {
+                  "name": "Raw Deepbarb Catfish",
+                  "pct": 5,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw Hollowgill Sturgeon",
+                  "pct": 2,
+                  "quality": "common"
+                },
+                {
+                  "name": null,
+                  "pct": 4,
+                  "quality": null
+                }
+              ]
+            },
+            {
+              "zone": "Thornpeak Heights",
+              "rows": [
+                {
+                  "name": "Raw Frostgill Trout",
+                  "pct": 45,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw Slatefin Carp",
+                  "pct": 35,
+                  "quality": "common"
+                },
+                {
+                  "name": "Tangled Weed",
+                  "pct": 1,
+                  "quality": "poor"
+                },
+                {
+                  "name": "Sunglint Koi",
+                  "pct": 6,
+                  "quality": "uncommon"
+                },
+                {
+                  "name": "Raw Deepbarb Catfish",
+                  "pct": 5,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw Hollowgill Sturgeon",
+                  "pct": 2,
+                  "quality": "common"
+                },
+                {
+                  "name": null,
+                  "pct": 6,
+                  "quality": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "band": 5,
+          "minProficiency": 200,
+          "rodTierRequired": 6,
+          "zones": [
+            {
+              "zone": "Eastbrook Vale",
+              "rows": [
+                {
+                  "name": "Raw Mirror Trout",
+                  "pct": 50,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw River Perch",
+                  "pct": 34,
+                  "quality": "common"
+                },
+                {
+                  "name": "Tangled Weed",
+                  "pct": 1,
+                  "quality": "poor"
+                },
+                {
+                  "name": "Sunglint Koi",
+                  "pct": 6,
+                  "quality": "uncommon"
+                },
+                {
+                  "name": "Raw Deepbarb Catfish",
+                  "pct": 5,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw Hollowgill Sturgeon",
+                  "pct": 2,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw Stillmere Salmon",
+                  "pct": 1,
+                  "quality": "common"
+                },
+                {
+                  "name": null,
+                  "pct": 1,
+                  "quality": null
+                }
+              ]
+            },
+            {
+              "zone": "Mirefen Marsh",
+              "rows": [
+                {
+                  "name": "Raw Marsh Pike",
+                  "pct": 46,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw Bog Eel",
+                  "pct": 36,
+                  "quality": "common"
+                },
+                {
+                  "name": "Soggy Boot",
+                  "pct": 1,
+                  "quality": "poor"
+                },
+                {
+                  "name": "Tangled Weed",
+                  "pct": 1,
+                  "quality": "poor"
+                },
+                {
+                  "name": "Sunglint Koi",
+                  "pct": 6,
+                  "quality": "uncommon"
+                },
+                {
+                  "name": "Raw Deepbarb Catfish",
+                  "pct": 5,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw Hollowgill Sturgeon",
+                  "pct": 2,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw Stillmere Salmon",
+                  "pct": 1,
+                  "quality": "common"
+                },
+                {
+                  "name": null,
+                  "pct": 2,
+                  "quality": null
+                }
+              ]
+            },
+            {
+              "zone": "Thornpeak Heights",
+              "rows": [
+                {
+                  "name": "Raw Frostgill Trout",
+                  "pct": 46,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw Slatefin Carp",
+                  "pct": 35,
+                  "quality": "common"
+                },
+                {
+                  "name": "Tangled Weed",
+                  "pct": 1,
+                  "quality": "poor"
+                },
+                {
+                  "name": "Sunglint Koi",
+                  "pct": 6,
+                  "quality": "uncommon"
+                },
+                {
+                  "name": "Raw Deepbarb Catfish",
+                  "pct": 5,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw Hollowgill Sturgeon",
+                  "pct": 2,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw Stillmere Salmon",
+                  "pct": 1,
+                  "quality": "common"
+                },
+                {
+                  "name": null,
+                  "pct": 4,
+                  "quality": null
+                }
+              ]
+            }
+          ]
         }
       ]
     }
+  },
+  {
+    "id": "farming",
+    "name": "Farming",
+    "maxSkill": 100,
+    "bands": [
+      0,
+      100,
+      200
+    ],
+    "tools": [
+      {
+        "name": "Garden Hoe",
+        "tier": 1,
+        "quality": "common",
+        "priceCopper": 20,
+        "vendors": [
+          {
+            "name": "Farmer Jessica",
+            "hub": "Eastbrook"
+          }
+        ]
+      },
+      {
+        "name": "Bronze Hoe",
+        "tier": 2,
+        "quality": "common",
+        "priceCopper": null,
+        "vendors": [],
+        "craftedBy": "engineering",
+        "wieldProficiency": 40
+      },
+      {
+        "name": "Skysilver Hoe",
+        "tier": 3,
+        "quality": "uncommon",
+        "priceCopper": null,
+        "vendors": [],
+        "craftedBy": "engineering",
+        "wieldProficiency": 70
+      },
+      {
+        "name": "Osmium Hoe",
+        "tier": 4,
+        "quality": "rare",
+        "priceCopper": null,
+        "vendors": [],
+        "craftedBy": "engineering",
+        "priceMarks": 24,
+        "marksClears": 3,
+        "wieldProficiency": 85
+      },
+      {
+        "name": "Evergarden Hoe",
+        "tier": 5,
+        "quality": "epic",
+        "priceCopper": null,
+        "vendors": [],
+        "craftedBy": "engineering",
+        "priceMarks": 56,
+        "marksHeroicClear": true,
+        "wieldProficiency": 100
+      }
+    ],
+    "nodes": []
   }
 ];
 
@@ -11677,7 +16781,55 @@ export const GUIDE_PROF_CURVE: GuideProfCurve = {
       "herb": "moonlit_bloom"
     }
   },
-  "specimenChancePct": 16
+  "specimenChancePct": 16,
+  "farm": {
+    "plantCastSec": 2,
+    "lifeFloor": 3,
+    "keepChancePctAtZero": 15,
+    "keepChancePctAtCap": 50,
+    "finePctAtZero": 2,
+    "finePctAtCap": 10,
+    "fineEffectBonusPct": 10,
+    "tonicChancePct": 50,
+    "tonicBonusPicks": 2,
+    "effectBonusPickCap": 1,
+    "gainSchedule": [
+      {
+        "belowProficiency": 25,
+        "gain": 0.25
+      },
+      {
+        "belowProficiency": 50,
+        "gain": 0.125
+      },
+      {
+        "belowProficiency": 75,
+        "gain": 0.0625
+      },
+      {
+        "belowProficiency": 100,
+        "gain": 0.03125
+      }
+    ],
+    "teachingCeilingByCropTier": [
+      {
+        "tier": 1,
+        "ceiling": 50
+      },
+      {
+        "tier": 2,
+        "ceiling": 75
+      },
+      {
+        "tier": 3,
+        "ceiling": 100
+      },
+      {
+        "tier": 4,
+        "ceiling": 100
+      }
+    ]
+  }
 };
 
 export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
@@ -11737,11 +16889,13 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
   "enchants": [
     {
       "id": "enchant_weapon_might",
-      "name": "Enchant Weapon - Might",
       "slot": "mainhand",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 5
         }
@@ -11755,11 +16909,13 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_weapon_intellect",
-      "name": "Enchant Weapon - Spellpower",
       "slot": "mainhand",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 5
         }
@@ -11773,11 +16929,13 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_offhand_stamina",
-      "name": "Enchant Offhand - Stamina",
       "slot": "offhand",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 5
         }
@@ -11791,11 +16949,13 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_helmet_fortitude",
-      "name": "Enchant Helmet - Fortitude",
       "slot": "helmet",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 5
         }
@@ -11809,11 +16969,13 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_neck_spirit",
-      "name": "Enchant Necklace - Spirit",
       "slot": "neck",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 3
         }
@@ -11827,11 +16989,13 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_shoulder_agility",
-      "name": "Enchant Shoulders - Agility",
       "slot": "shoulder",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 5
         }
@@ -11845,15 +17009,18 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_chest_stamina",
-      "name": "Enchant Chest - Stamina",
       "slot": "chest",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 3
         },
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 2
         }
@@ -11867,11 +17034,13 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_waist_stamina",
-      "name": "Enchant Belt - Stamina",
       "slot": "waist",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 5
         }
@@ -11885,15 +17054,18 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_legs_stamina",
-      "name": "Enchant Legs - Stamina",
       "slot": "legs",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 3
         },
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 2
         }
@@ -11907,11 +17079,13 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_gloves_agility",
-      "name": "Enchant Gloves - Agility",
       "slot": "gloves",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 5
         }
@@ -11925,11 +17099,13 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_gloves_intellect",
-      "name": "Enchant Gloves - Spellpower",
       "slot": "gloves",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 5
         }
@@ -11943,11 +17119,13 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_feet_agility",
-      "name": "Enchant Boots - Agility",
       "slot": "feet",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 3
         }
@@ -11961,11 +17139,13 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_ring_spirit",
-      "name": "Enchant Ring - Spirit",
       "slot": "ring",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 3
         }
@@ -11979,11 +17159,13 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_weapon_agility",
-      "name": "Enchant Weapon - Agility",
       "slot": "mainhand",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 5
         }
@@ -11997,15 +17179,18 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_helmet_intellect",
-      "name": "Enchant Helmet - Intellect",
       "slot": "helmet",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 3
         },
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 2
         }
@@ -12019,15 +17204,18 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_helmet_armor",
-      "name": "Enchant Helmet - Reinforcement",
       "slot": "helmet",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 3
         },
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 1
         }
@@ -12041,11 +17229,13 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_neck_intellect",
-      "name": "Enchant Necklace - Intellect",
       "slot": "neck",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 3
         }
@@ -12059,11 +17249,13 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_neck_agility",
-      "name": "Enchant Necklace - Agility",
       "slot": "neck",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 3
         }
@@ -12077,11 +17269,13 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_shoulder_strength",
-      "name": "Enchant Shoulders - Strength",
       "slot": "shoulder",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 5
         }
@@ -12095,11 +17289,13 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_shoulder_intellect",
-      "name": "Enchant Shoulders - Intellect",
       "slot": "shoulder",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 5
         }
@@ -12113,15 +17309,18 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_chest_spirit",
-      "name": "Enchant Chest - Spirit",
       "slot": "chest",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 3
         },
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 2
         }
@@ -12135,15 +17334,18 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_chest_armor",
-      "name": "Enchant Chest - Reinforcement",
       "slot": "chest",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 3
         },
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 2
         }
@@ -12157,11 +17359,13 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_waist_strength",
-      "name": "Enchant Belt - Strength",
       "slot": "waist",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 5
         }
@@ -12175,11 +17379,13 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_waist_agility",
-      "name": "Enchant Belt - Agility",
       "slot": "waist",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 5
         }
@@ -12193,15 +17399,18 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_legs_intellect",
-      "name": "Enchant Legs - Intellect",
       "slot": "legs",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 3
         },
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 2
         }
@@ -12215,11 +17424,13 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_gloves_strength",
-      "name": "Enchant Gloves - Strength",
       "slot": "gloves",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 5
         }
@@ -12233,11 +17444,13 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_feet_strength",
-      "name": "Enchant Boots - Strength",
       "slot": "feet",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 3
         }
@@ -12251,11 +17464,13 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_feet_stamina",
-      "name": "Enchant Boots - Stamina",
       "slot": "feet",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 3
         }
@@ -12269,11 +17484,13 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_ring_strength",
-      "name": "Enchant Ring - Strength",
       "slot": "ring",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 3
         }
@@ -12287,11 +17504,13 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_ring_agility",
-      "name": "Enchant Ring - Agility",
       "slot": "ring",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 3
         }
@@ -12305,11 +17524,13 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_ring_intellect",
-      "name": "Enchant Ring - Intellect",
       "slot": "ring",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 3
         }
@@ -12323,15 +17544,18 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_weapon_greater_might",
-      "name": "Enchant Weapon - Greater Might",
       "slot": "mainhand",
       "tier": "greater",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_shard",
           "name": "Chime Shard",
           "count": 1
         },
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 2
         }
@@ -12345,15 +17569,18 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_weapon_greater_spellpower",
-      "name": "Enchant Weapon - Greater Spellpower",
       "slot": "mainhand",
       "tier": "greater",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_shard",
           "name": "Chime Shard",
           "count": 1
         },
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 2
         }
@@ -12367,15 +17594,18 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_helmet_greater_fortitude",
-      "name": "Enchant Helmet - Greater Fortitude",
       "slot": "helmet",
       "tier": "greater",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_shard",
           "name": "Chime Shard",
           "count": 1
         },
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 2
         }
@@ -12389,15 +17619,18 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_chest_greater_stamina",
-      "name": "Enchant Chest - Greater Stamina",
       "slot": "chest",
       "tier": "greater",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_shard",
           "name": "Chime Shard",
           "count": 1
         },
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 3
         }
@@ -12411,15 +17644,18 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_legs_greater_stamina",
-      "name": "Enchant Legs - Greater Stamina",
       "slot": "legs",
       "tier": "greater",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_shard",
           "name": "Chime Shard",
           "count": 1
         },
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 3
         }
@@ -12433,15 +17669,18 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_gloves_greater_agility",
-      "name": "Enchant Gloves - Greater Agility",
       "slot": "gloves",
       "tier": "greater",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_shard",
           "name": "Chime Shard",
           "count": 1
         },
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 2
         }
@@ -12455,15 +17694,18 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_weapon_runed_edge",
-      "name": "Enchant Weapon - Runed Edge",
       "slot": "mainhand",
       "tier": "runed",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 2
         },
         {
+          "itemId": "resonant_steel",
           "name": "Resonant Steel",
           "count": 1
         }
@@ -12477,15 +17719,18 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_weapon_runed_focus",
-      "name": "Enchant Weapon - Runed Sigil",
       "slot": "mainhand",
       "tier": "runed",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 2
         },
         {
+          "itemId": "resonant_timber",
           "name": "Resonant Timber",
           "count": 1
         }
@@ -12499,15 +17744,18 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_chest_runeweave",
-      "name": "Enchant Chest - Runed Weave",
       "slot": "chest",
       "tier": "runed",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 2
         },
         {
+          "itemId": "resonant_thread",
           "name": "Resonant Thread",
           "count": 1
         }
@@ -12521,15 +17769,18 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_legs_runed_hide",
-      "name": "Enchant Legs - Runed Hide",
       "slot": "legs",
       "tier": "runed",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 2
         },
         {
+          "itemId": "resonant_hide",
           "name": "Resonant Hide",
           "count": 1
         }
@@ -12543,15 +17794,18 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_helmet_runed_links",
-      "name": "Enchant Helmet - Runed Links",
       "slot": "helmet",
       "tier": "runed",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 2
         },
         {
+          "itemId": "resonant_links",
           "name": "Resonant Links",
           "count": 1
         }
@@ -12560,6 +17814,146 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
         {
           "stat": "sta",
           "value": 5
+        }
+      ]
+    },
+    {
+      "id": "enchant_weapon_lucent_might",
+      "slot": "mainhand",
+      "tier": "lucent",
+      "skillReq": 100,
+      "perfectedOnly": false,
+      "reagents": [
+        {
+          "itemId": "lucent_reagent",
+          "name": "Lucent Reagent",
+          "count": 1
+        },
+        {
+          "itemId": "arcane_shard",
+          "name": "Chime Shard",
+          "count": 1
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 2
+        }
+      ],
+      "bonus": [
+        {
+          "stat": "str",
+          "value": 6
+        }
+      ]
+    },
+    {
+      "id": "enchant_weapon_lucent_spellpower",
+      "slot": "mainhand",
+      "tier": "lucent",
+      "skillReq": 100,
+      "perfectedOnly": false,
+      "reagents": [
+        {
+          "itemId": "lucent_reagent",
+          "name": "Lucent Reagent",
+          "count": 1
+        },
+        {
+          "itemId": "arcane_shard",
+          "name": "Chime Shard",
+          "count": 1
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 2
+        }
+      ],
+      "bonus": [
+        {
+          "stat": "int",
+          "value": 6
+        }
+      ]
+    },
+    {
+      "id": "enchant_chest_lucent_stamina",
+      "slot": "chest",
+      "tier": "lucent",
+      "skillReq": 100,
+      "perfectedOnly": false,
+      "reagents": [
+        {
+          "itemId": "lucent_reagent",
+          "name": "Lucent Reagent",
+          "count": 1
+        },
+        {
+          "itemId": "arcane_shard",
+          "name": "Chime Shard",
+          "count": 1
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 3
+        }
+      ],
+      "bonus": [
+        {
+          "stat": "sta",
+          "value": 10
+        }
+      ]
+    },
+    {
+      "id": "enchant_feet_lucent_agility",
+      "slot": "feet",
+      "tier": "lucent",
+      "skillReq": 100,
+      "perfectedOnly": false,
+      "reagents": [
+        {
+          "itemId": "lucent_reagent",
+          "name": "Lucent Reagent",
+          "count": 1
+        },
+        {
+          "itemId": "arcane_dust",
+          "name": "Chime Dust",
+          "count": 4
+        }
+      ],
+      "bonus": [
+        {
+          "stat": "agi",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "id": "enchant_lucent_infusion",
+      "slot": "chest",
+      "tier": "lucent",
+      "skillReq": 125,
+      "perfectedOnly": true,
+      "reagents": [
+        {
+          "itemId": "lucent_reagent",
+          "name": "Lucent Reagent",
+          "count": 3
+        },
+        {
+          "itemId": "arcane_shard",
+          "name": "Chime Shard",
+          "count": 2
+        }
+      ],
+      "bonus": [
+        {
+          "stat": "sta",
+          "value": 13
         }
       ]
     }
@@ -12643,6 +18037,24 @@ export const GUIDE_PROF_ECONOMY: GuideProfEconomy = {
         "material": "Game Meat",
         "count": 8,
         "coinCopper": 16
+      },
+      {
+        "id": "q_prof_workorder_kitchens_wheat",
+        "name": "Kitchens Wheat Order",
+        "master": "Cook Marlow",
+        "hub": "Eastbrook",
+        "material": "Vale Wheat",
+        "count": 8,
+        "coinCopper": 16
+      },
+      {
+        "id": "q_prof_workorder_kitchens_rice",
+        "name": "Kitchens Rice Order",
+        "master": "Cook Marlow",
+        "hub": "Eastbrook",
+        "material": "Marsh Rice",
+        "count": 5,
+        "coinCopper": 20
       },
       {
         "id": "q_prof_workorder_loom",
@@ -12750,21 +18162,288 @@ export const GUIDE_PROF_STATIONS: GuideProfStations = {
   ]
 };
 
+export const GUIDE_PROF_PROVISIONING: GuideProfProvisioning = {
+  "lines": [
+    {
+      "id": "logging",
+      "materials": [
+        "ashwood_log"
+      ]
+    },
+    {
+      "id": "herbalism",
+      "materials": [
+        "goldleaf_herb",
+        "silverleaf_herb",
+        "sunpetal_herb"
+      ]
+    },
+    {
+      "id": "fishing",
+      "materials": [
+        "raw_bog_eel",
+        "raw_deepbarb_catfish",
+        "raw_frostgill_trout",
+        "raw_hollowgill_sturgeon",
+        "raw_marsh_pike",
+        "raw_mirror_trout",
+        "raw_river_perch",
+        "raw_stonescale_carp",
+        "raw_stillmere_salmon"
+      ]
+    },
+    {
+      "id": "farming",
+      "materials": [
+        "bog_beet",
+        "brook_carrot",
+        "evergarden_greens",
+        "evergarden_pumpkin",
+        "fine_bog_beet",
+        "fine_brook_carrot",
+        "fine_evergarden_greens",
+        "fine_evergarden_pumpkin",
+        "fine_frost_gourd",
+        "fine_frost_lentils",
+        "fine_gilded_sunmelon",
+        "fine_gilded_yam",
+        "fine_thornpeak_cabbage",
+        "frost_gourd",
+        "frost_lentils",
+        "gilded_sunmelon",
+        "gilded_yam",
+        "highland_barley",
+        "marsh_rice",
+        "thornpeak_cabbage",
+        "vale_wheat"
+      ]
+    },
+    {
+      "id": "corpseHarvesting",
+      "materials": [
+        "game_meat",
+        "prime_cut"
+      ]
+    }
+  ],
+  "ladder": [
+    {
+      "skillReq": 0,
+      "outputs": [
+        {
+          "itemId": "eastbrook_glazed_carrots",
+          "placeable": false,
+          "station": false
+        },
+        {
+          "itemId": "eastbrook_root_pottage",
+          "placeable": false,
+          "station": false
+        },
+        {
+          "itemId": "herbed_marsh_pike",
+          "placeable": false,
+          "station": false
+        },
+        {
+          "itemId": "hunters_game_skewer",
+          "placeable": false,
+          "station": false
+        },
+        {
+          "itemId": "pan_seared_perch",
+          "placeable": false,
+          "station": false
+        },
+        {
+          "itemId": "tough_jerky",
+          "placeable": false,
+          "station": false
+        },
+        {
+          "itemId": "vale_hearth_loaf",
+          "placeable": false,
+          "station": false
+        }
+      ]
+    },
+    {
+      "skillReq": 25,
+      "outputs": [
+        {
+          "itemId": "ashwood_smoked_eel",
+          "placeable": false,
+          "station": false
+        },
+        {
+          "itemId": "fenbridge_beet_braise",
+          "placeable": false,
+          "station": false
+        },
+        {
+          "itemId": "fenbridge_rice_bowl",
+          "placeable": false,
+          "station": false
+        },
+        {
+          "itemId": "fenbridge_rice_pudding",
+          "placeable": false,
+          "station": false
+        },
+        {
+          "itemId": "frostgill_chowder",
+          "placeable": false,
+          "station": false
+        },
+        {
+          "itemId": "goldleaf_game_stew",
+          "placeable": false,
+          "station": false
+        }
+      ]
+    },
+    {
+      "skillReq": 50,
+      "outputs": [
+        {
+          "itemId": "anglers_feast_platter",
+          "placeable": false,
+          "station": false
+        },
+        {
+          "itemId": "highwatch_barley_bannock",
+          "placeable": false,
+          "station": false
+        },
+        {
+          "itemId": "marlows_grand_roast",
+          "placeable": false,
+          "station": false
+        },
+        {
+          "itemId": "silvered_carp_supper",
+          "placeable": false,
+          "station": false
+        }
+      ]
+    },
+    {
+      "skillReq": 75,
+      "outputs": [
+        {
+          "itemId": "highwatch_barley_porridge",
+          "placeable": false,
+          "station": false
+        },
+        {
+          "itemId": "highwatch_gourd_soup",
+          "placeable": false,
+          "station": false
+        },
+        {
+          "itemId": "peppered_deepbarb_catfish",
+          "placeable": false,
+          "station": false
+        },
+        {
+          "itemId": "seasoned_stock",
+          "placeable": false,
+          "station": false
+        }
+      ]
+    },
+    {
+      "skillReq": 100,
+      "outputs": [
+        {
+          "itemId": "evergarden_braised_greens",
+          "placeable": false,
+          "station": false
+        },
+        {
+          "itemId": "evergarden_harvest_platter",
+          "placeable": false,
+          "station": false
+        },
+        {
+          "itemId": "evergarden_sunmelon_tart",
+          "placeable": false,
+          "station": false
+        },
+        {
+          "itemId": "harvest_feast",
+          "placeable": true,
+          "station": false
+        },
+        {
+          "itemId": "roast_hollowgill_sturgeon",
+          "placeable": false,
+          "station": false
+        },
+        {
+          "itemId": "sageleaf_chowder",
+          "placeable": false,
+          "station": false
+        },
+        {
+          "itemId": "stonepot_stew",
+          "placeable": false,
+          "station": false
+        },
+        {
+          "itemId": "warspice_skewers",
+          "placeable": false,
+          "station": false
+        }
+      ]
+    },
+    {
+      "skillReq": 125,
+      "outputs": [
+        {
+          "itemId": "sageleaf_feast",
+          "placeable": true,
+          "station": false
+        },
+        {
+          "itemId": "stonepot_feast",
+          "placeable": true,
+          "station": false
+        },
+        {
+          "itemId": "laden_hearth",
+          "placeable": false,
+          "station": true
+        },
+        {
+          "itemId": "warspice_feast",
+          "placeable": true,
+          "station": false
+        }
+      ]
+    }
+  ]
+};
+
 export const GUIDE_PROF_PAGES: string[] = [
   "engineering",
   "alchemy",
   "cooking",
   "leatherworking",
   "tailoring",
+  "inscription",
   "enchanting",
+  "jewelcrafting",
   "weaponcrafting",
   "armorcrafting",
   "mining",
   "logging",
   "herbalism",
   "fishing",
+  "farming",
   "economy",
-  "faq"
+  "faq",
+  "provisioning"
 ];
 
 export const GUIDE_MODELS: Record<string, GuideModelSpec> = {

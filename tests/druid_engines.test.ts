@@ -432,7 +432,7 @@ describe('Groveheart engine', () => {
     expect(stacks(player, VERDANCE_ID)).toBe(1);
   });
 
-  it('runs Swiftmend and Overbloom on one shared slot cooldown', () => {
+  it('runs Fleetmend and Overbloom on one shared slot cooldown', () => {
     const { sim, player } = rig('restoration');
     const selfHot = (): Aura => ({
       id: 'rejuvenation',

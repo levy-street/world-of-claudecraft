@@ -127,6 +127,7 @@
         "src/admin/i18n.locales/**",
         "src/admin/i18n.ts",
         "scripts/i18n_*.mjs",
+        "scripts/lib/write_module_dir.mjs",
         "package.json"
       ],
       "outputs": [
@@ -142,6 +143,7 @@
         "src/sim/**",
         "src/render/characters/manifest.ts",
         "src/ui/deed_image_ids.ts",
+        "src/ui/i18n.catalog/**",
         "scripts/wiki/**",
         "package.json"
       ],
@@ -205,6 +207,7 @@
         "editor.html",
         "vite.config.ts",
         "tsconfig.json",
+        "scripts/build_bundle_pregen.mjs",
         "scripts/build_sitemap.mjs",
         "scripts/build_sfx_manifest.mjs",
         "scripts/build_media_manifest.mjs",

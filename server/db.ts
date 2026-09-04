@@ -10,6 +10,7 @@ import { sanitizeRemovedZone1Content } from '../src/sim/removed_zone1_content';
 import type { CharacterState, MailSave, MarketSave } from '../src/sim/sim';
 import type { ArenaFormat, PlayerClass } from '../src/sim/types';
 import type { ActionBarLayout } from '../src/world_api/action_bar';
+import { projectAccountExportState } from './account_export_state';
 import { ACCOUNT_WEALTH_SCHEMA } from './account_wealth_db';
 import { AD_SPEND_SCHEMA } from './ad_spend_db';
 import { bustAdminGuildListReads } from './admin_guilds_read';
@@ -40,7 +41,6 @@ import {
 import {
   attachBankLedgerCommittedPrefixToError,
   type BankLedgerSaveEffects,
-  characterUpdateStatement,
   lockCharacterSaveEffectAccountsOnClient as lockSaveEffectAccounts,
   writeBankLedgerSaveEffectsOnClient,
 } from './bank_ledger_save_effects_db';
@@ -50,6 +50,12 @@ import {
   readLifetimeXpRankForCharacter,
 } from './character_rank_cache';
 import {
+  type CharacterSaveFence,
+  characterUpdateStatement,
+  liveSaveFence,
+  runFencedCharacterUpdate,
+} from './character_save_statement';
+import {
   beginCharacterSaveTx,
   CHARACTER_SAVE_STATEMENT_TIMEOUT_MS,
   CHARACTER_SAVE_TRANSACTION_TIMEOUT_MS,
@@ -57,6 +63,7 @@ import {
 } from './character_save_transaction';
 import { seedChatFilterDefaults } from './chat_filter_db';
 import type { ChatLogRow } from './chat_log';
+import { cleanMetadataText } from './clean_metadata_text';
 import {
   buildCommunityTestCharacters,
   communityTestAccountsEnabled,
@@ -107,7 +114,9 @@ import {
   marketStateKey,
   runMarketBackfill,
 } from './market_backfill';
+import { MARKET_SOLD_VOLUME_SCHEMA } from './market_sold_volume_db';
 import { OAUTH_SCHEMA } from './oauth_db';
+import { runOfflineCharacterSave } from './offline_character_save_db';
 import { PLAY_SESSION_RETENTION_SCHEMA } from './play_session_retention_db';
 import {
   closeOrphanPlayerSessions,
@@ -1405,6 +1414,9 @@ export async function ensureSchema(): Promise<void> {
     // After SCHEMA: every marketplace table FKs accounts(id), and the custody
     // model rides characters + world_state (the escrow combined save).
     await client.query(WOC_MARKET_SCHEMA);
+    // The World Market sold-volume store (qr-19-sold-volume-four-seam-wiring):
+    // realm x day x tracked-item daily aggregates, no FK, additive, idempotent.
+    await client.query(MARKET_SOLD_VOLUME_SCHEMA);
     // Seed chat-filter defaults once (idempotent), under the same advisory lock.
     await seedChatFilterDefaults(client);
     // Partitioned World Market backfill: runs inside this same advisory-lock
@@ -1791,11 +1803,6 @@ export async function setAccountWeaponSkinLoadout(
     [accountId, JSON.stringify(cleanLoadout)],
   );
   return normalizeAccountCosmeticsRow(res.rows[0]);
-}
-
-function cleanMetadataText(value: string | null | undefined, max: number): string | null {
-  const text = typeof value === 'string' ? value.trim() : '';
-  return text ? text.slice(0, max) : null;
 }
 
 export async function createAccount(
@@ -2628,7 +2635,7 @@ export async function exportAccountData(
       name: c.name,
       class: c.class,
       level: c.level,
-      state: c.state,
+      state: projectAccountExportState(c.state),
       realm: c.realm,
       // The authored modular look: per-character personal data the account
       // created, so it belongs in the export beside the state blob.
@@ -2867,9 +2874,7 @@ export async function bankBonusFactsForAccount(accountId: number): Promise<BankB
             AND EXISTS(
               SELECT 1 FROM characters c
               WHERE c.account_id = r.referee_account_id AND c.level >= 10
-            )) AS qualified_referrals,
-       (SELECT count(*)::int FROM characters cc
-          WHERE cc.account_id = $1) AS character_count
+            )) AS qualified_referrals
      FROM accounts a
      WHERE a.id = $1`,
     [accountId],
@@ -2880,7 +2885,6 @@ export async function bankBonusFactsForAccount(accountId: number): Promise<BankB
     discordLinked: !!row?.discord_linked,
     walletLinked: !!row?.wallet_linked,
     qualifiedReferrals: row?.qualified_referrals ?? 0,
-    characterCount: row?.character_count ?? 0,
   };
 }
 
@@ -3286,61 +3290,10 @@ export async function guildNameForCharacter(characterId: number): Promise<string
   return res.rows[0]?.name ?? null;
 }
 
-export async function createCharacterCapped(
-  accountId: number,
-  name: string,
-  cls: PlayerClass,
-  limit = 10,
-  state: CharacterState | null = null,
-  // The authored modular look, already normalized by the route handler.
-  // Null = created without the creator (legacy rig).
-  appearance: Record<string, unknown> | null = null,
-): Promise<CharacterRow | null> {
-  const client = await pool.connect();
-  try {
-    await client.query('BEGIN');
-    const account = await client.query('SELECT id FROM accounts WHERE id = $1 FOR UPDATE', [
-      accountId,
-    ]);
-    if ((account.rowCount ?? 0) === 0) {
-      await client.query('ROLLBACK');
-      return null;
-    }
-    const count = await client.query(
-      'SELECT count(*)::int AS n FROM characters WHERE account_id = $1 AND realm = $2',
-      [accountId, REALM],
-    );
-    if (Number(count.rows[0]?.n ?? 0) >= limit) {
-      await client.query('ROLLBACK');
-      return null;
-    }
-    const res = await client.query(
-      'INSERT INTO characters (account_id, name, class, realm, state, appearance) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, account_id, name, class, level, state, is_gm, force_rename, appearance',
-      [
-        accountId,
-        name,
-        cls,
-        REALM,
-        state ? JSON.stringify(state) : null,
-        appearance ? JSON.stringify(appearance) : null,
-      ],
-    );
-    await recordCharacterCreation(client, accountId, REALM);
-    await client.query('COMMIT');
-    // A created character can become the account's top one, and its class is fixed
-    // here forever (no statement ever updates characters.class). Enqueued inside the
-    // db function rather than at the route so the RouteDef arm, its retained legacy
-    // twin in main.ts, and the PBE boost roster are all covered by one site. After
-    // COMMIT: a rolled-back create must never have enqueued.
-    enqueueLinkChange({ accountId, kinds: ['flex'] }, Date.now());
-    return res.rows[0];
-  } catch (err) {
-    await client.query('ROLLBACK').catch(() => {});
-    throw err;
-  } finally {
-    client.release();
-  }
-}
+// The capped character CREATE moved whole to server/character_create_db.ts
+// at the Phase 18 database review (the character_delete_db.ts sibling's
+// shape); re-exported here so no caller re-points.
+export { createCharacterCapped } from './character_create_db';
 
 // Reclaim a character name abandoned by a deactivated ("invalid") account.
 // Character names are unique per (realm, lower(name)), and deactivation is a
@@ -3505,6 +3458,20 @@ export async function renameCharacter(
   return row;
 }
 
+// Persist a character row. Returns true when the write landed. When a leaseNonce is
+// given the UPDATE is fenced to the current lease holder+nonce in the SAME statement:
+// a displaced session (its lease reclaimed by a same-account takeover, which rotated
+// the nonce) matches no lease row, the UPDATE touches nothing, and this returns false
+// so the caller can refuse to overwrite the live session's state. The fence rides the
+// write statement itself and never a separate pre-check, because a check-then-write
+// pair would race the takeover that steals the lease between the two. The no-nonce path
+// (tests, resumes, meta-less sessions) writes unconditionally and returns true, exactly
+// as before.
+// The statement builder, the fence-shape picker (liveSaveFence, holder passed in
+// to avoid a db.ts cycle) and the fenced executor (runFencedCharacterUpdate,
+// which takes the characters row lock FIRST, qr-19-live-nonce-fence-write-loss)
+// all live in server/character_save_statement.ts; live save paths run through them.
+
 export async function saveCharacterState(
   characterId: number,
   level: number,
@@ -3520,15 +3487,14 @@ export async function saveCharacterState(
     characterId,
     level,
     JSON.stringify(cleanState),
-    PROCESS_LEASE_HOLDER,
-    leaseNonce,
+    liveSaveFence(leaseNonce, PROCESS_LEASE_HOLDER),
   );
   const client = await pool.connect();
   const transaction = await beginSaveTx(client, 'character save', signal);
   let ledgerWrite: BankLedgerBatchWriteResult | undefined;
   try {
     await lockSaveEffectAccounts(transaction, storageEffects, ledger);
-    const res = await transaction.query(stmt.text, stmt.values);
+    const res = await runFencedCharacterUpdate(transaction, characterId, stmt);
     const saved =
       leaseNonce === undefined && storageEffects.length === 0 && !ledger
         ? true
@@ -3552,6 +3518,17 @@ export async function saveCharacterState(
   } finally {
     transaction.release();
   }
+}
+
+// Lease-fenced offline snapshots for the PBE roster fallback.
+// Signer and name mutations use offline_character_mutation_db.ts instead.
+// The snapshot writer and its bounds live in offline_character_save_db.ts.
+export function saveOfflineCharacterState(
+  characterId: number,
+  level: number,
+  state: CharacterState,
+): Promise<boolean> {
+  return runOfflineCharacterSave(runWithStatementTimeout, characterId, level, state);
 }
 
 // Persist a character row AND this realm's World Market + Ravenpost mail
@@ -3612,10 +3589,9 @@ export async function saveCharacterAndMarketState(
       characterId,
       level,
       JSON.stringify(cleanState),
-      PROCESS_LEASE_HOLDER,
-      leaseNonce,
+      liveSaveFence(leaseNonce, PROCESS_LEASE_HOLDER),
     );
-    const charRes = await transaction.query(stmt.text, stmt.values);
+    const charRes = await runFencedCharacterUpdate(transaction, characterId, stmt);
     if (
       (leaseNonce !== undefined || storageEffects.length > 0 || ledger) &&
       (charRes.rowCount ?? 0) === 0
@@ -3716,10 +3692,9 @@ export async function saveCharacterAndGuildBankState(
       characterId,
       level,
       JSON.stringify(cleanState),
-      PROCESS_LEASE_HOLDER,
-      leaseNonce,
+      liveSaveFence(leaseNonce, PROCESS_LEASE_HOLDER),
     );
-    const charRes = await transaction.query(stmt.text, stmt.values);
+    const charRes = await runFencedCharacterUpdate(transaction, characterId, stmt);
     if (
       (leaseNonce !== undefined || storageEffects.length > 0 || ledger) &&
       (charRes.rowCount ?? 0) === 0
@@ -3862,10 +3837,9 @@ export async function saveCharacterStateOnClient(
     characterId,
     level,
     JSON.stringify(cleanState),
-    PROCESS_LEASE_HOLDER,
-    leaseNonce,
+    liveSaveFence(leaseNonce, PROCESS_LEASE_HOLDER),
   );
-  const res = await client.query(stmt.text, stmt.values);
+  const res = await client.query(stmt.text, stmt.values); // D145-excluded (escrow occupancy invariant, race carried): see runFencedCharacterUpdate JSDoc, qr-19-live-nonce-fence-write-loss
   const saved =
     leaseNonce === undefined && storageEffects.length === 0 && !ledger
       ? true

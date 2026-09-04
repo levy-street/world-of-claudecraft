@@ -31,6 +31,32 @@ export interface CachedReadOptions {
   now?: () => number;
 }
 
+/**
+ * Freeze a cache snapshot WHOLE (every nested object and array) and return
+ * it. Object.freeze alone is shallow, so a tenant that froze only its top
+ * level left the rows the serialize-once memo (server/ok_response_memo.ts)
+ * depends on mutable; a consumer poisoning a shared row would then desync the
+ * memoized bytes from the object.
+ *
+ * The recursion terminates on a VISITED set, never on Object.isFrozen: a
+ * frozen-check short-circuit refuses exactly the input this helper exists to
+ * repair (a shallow-frozen wrapper around mutable rows) and returns having
+ * frozen nothing. The visited set also makes a shared child cheap on its second
+ * sighting and tolerates a cycle, which a frozen check only did by accident.
+ */
+export function deepFreezeSnapshot<T>(value: T): T {
+  freezeInto(value, new WeakSet<object>());
+  return value;
+}
+
+function freezeInto(value: unknown, seen: WeakSet<object>): void {
+  if (typeof value !== 'object' || value === null) return;
+  if (seen.has(value)) return;
+  seen.add(value);
+  Object.freeze(value);
+  for (const child of Object.values(value as Record<string, unknown>)) freezeInto(child, seen);
+}
+
 export interface CachedRead<T> {
   /** Serve fresh-within-TTL from cache; otherwise refresh (single-flight). */
   read(): Promise<T>;

@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "69311947",
+      "nextId": 1003,
+      "state": "0a97d957",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -48,6 +48,7 @@
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -60,7 +61,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 994,
+          "entityId": 998,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -88,7 +89,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -105,7 +107,7 @@
           "fiveSecondRule": 99,
           "healPower": 6,
           "hp": 62,
-          "id": 994,
+          "id": 998,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -157,9 +159,9 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 1013,
-      "state": "d4e80d7f",
-      "events": "873d2f22",
+      "nextId": 1017,
+      "state": "65ffb025",
+      "events": "279db8ad",
       "rng": {
         "draws": 3,
         "digest": "8261aa7c"
@@ -168,9 +170,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 1013,
-      "state": "2e875ba1",
-      "events": "632a979f",
+      "nextId": 1017,
+      "state": "fadb428b",
+      "events": "4bbc9573",
       "rng": {
         "draws": 3,
         "digest": "8261aa7c"
@@ -179,8 +181,8 @@
     {
       "tick": 30,
       "time": 1.5,
-      "nextId": 1013,
-      "state": "3928c827",
+      "nextId": 1017,
+      "state": "2975e6dd",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -190,8 +192,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1013,
-      "state": "9456e4f5",
+      "nextId": 1017,
+      "state": "ce4cca27",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -201,8 +203,8 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 1013,
-      "state": "77a778df",
+      "nextId": 1017,
+      "state": "97bec305",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -212,8 +214,8 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1013,
-      "state": "115da251",
+      "nextId": 1017,
+      "state": "9d141d3b",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -223,9 +225,9 @@
     {
       "tick": 69,
       "time": 3.45,
-      "nextId": 1014,
-      "state": "79aebdb1",
-      "events": "c838dda8",
+      "nextId": 1018,
+      "state": "ba044ba3",
+      "events": "097b658c",
       "rng": {
         "draws": 5,
         "digest": "50aeceb5"
@@ -261,6 +263,7 @@
             "kills": 1,
             "xpGained": 898
           },
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
@@ -309,7 +312,7 @@
             "eastbrook_ledger"
           ],
           "delveMarks": 1,
-          "entityId": 994,
+          "entityId": 998,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -340,6 +343,7 @@
           "vault": {
             "stock": {}
           },
+          "wyrmfallDaily": {},
           "xp": 898
         }
       ],
@@ -356,7 +360,7 @@
           "fiveSecondRule": 102.45,
           "healPower": 6,
           "hp": 50000,
-          "id": 994,
+          "id": 998,
           "inCombat": true,
           "kind": "player",
           "level": 7,
@@ -413,7 +417,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 1012,
+          "id": 1016,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -446,8 +450,8 @@
     {
       "tick": 70,
       "time": 3.5,
-      "nextId": 1014,
-      "state": "4c1942eb",
+      "nextId": 1018,
+      "state": "e3670289",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -457,8 +461,8 @@
     {
       "tick": 71,
       "time": 3.55,
-      "nextId": 1014,
-      "state": "937cc7f9",
+      "nextId": 1018,
+      "state": "7e03e47b",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -495,6 +499,7 @@
             "kills": 1,
             "xpGained": 898
           },
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
@@ -543,7 +548,7 @@
             "eastbrook_ledger"
           ],
           "delveMarks": 1,
-          "entityId": 994,
+          "entityId": 998,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -574,6 +579,7 @@
           "vault": {
             "stock": {}
           },
+          "wyrmfallDaily": {},
           "xp": 898
         }
       ],
@@ -590,7 +596,7 @@
           "fiveSecondRule": 102.55,
           "healPower": 6,
           "hp": 50000,
-          "id": 994,
+          "id": 998,
           "inCombat": true,
           "kind": "player",
           "level": 7,
@@ -647,7 +653,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 1012,
+          "id": 1016,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",

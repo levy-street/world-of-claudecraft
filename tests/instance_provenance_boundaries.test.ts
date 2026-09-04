@@ -17,7 +17,8 @@
 //
 // The contract this file pins, for every boundary in the table below:
 //   a copy that goes in carrying { signer, rolled.masterwork + stats, enchant,
-//   craftedRecipeId } comes back out carrying all four.
+//   craftedRecipeId } plus the two Masterwrought Perfecting markers
+//   { perfecting, perfected } comes back out carrying all six.
 //
 // Adding a container boundary (a guild bank, a loadout store, a housing chest)
 // means adding a row here. A row that cannot be expressed is itself the
@@ -40,10 +41,19 @@ const GEAR = 'eastbrook_chain_vest';
 const GEAR_RECIPE = 'recipe_eastbrook_chain_vest';
 const SIGNER = 'Provenance';
 
+// The two Masterwrought Perfecting markers ride the same copy (phase 12):
+// `perfecting` is the mid-track rank, `perfected` the top-rank stamp. A live
+// copy never carries both (the stamp deletes the rank), and that is exactly
+// why this fixture does: one sweep proves each marker survives on its own
+// terms, and the load bound (src/sim/item_instance_load.ts) keeps each by its
+// own per-field rule, never by cross-field consistency. The rank sits
+// mid-track (2 of PERFECTING_RANKS) so it is a value the load bound keeps.
 const FULL_PAYLOAD: ItemInstancePayload = Object.freeze({
   signer: SIGNER,
   rolled: Object.freeze({ masterwork: true, stats: Object.freeze({ sta: 5 }) }),
   enchant: 'enchant_chest_stamina',
+  perfecting: 2,
+  perfected: true,
 }) as ItemInstancePayload;
 
 function payload(): ItemInstancePayload {
@@ -51,6 +61,8 @@ function payload(): ItemInstancePayload {
     signer: FULL_PAYLOAD.signer,
     rolled: { masterwork: true, stats: { ...FULL_PAYLOAD.rolled?.stats } },
     enchant: FULL_PAYLOAD.enchant,
+    perfecting: FULL_PAYLOAD.perfecting,
+    perfected: FULL_PAYLOAD.perfected,
   };
 }
 
@@ -72,7 +84,7 @@ function gearSlot(sim: Sim, pid: number): InvSlot | undefined {
   return inv(sim, pid).find((s) => s.itemId === GEAR);
 }
 
-/** The one assertion every row shares: all four marker channels intact.
+/** The one assertion every row shares: all six marker channels intact.
  *  Asserted per channel rather than with a single toEqual so a failure names
  *  WHICH marker the boundary dropped instead of dumping two objects. */
 function expectFullyMarked(slot: InvSlot | undefined, where: string): void {
@@ -81,6 +93,11 @@ function expectFullyMarked(slot: InvSlot | undefined, where: string): void {
   expect(slot?.instance?.rolled?.masterwork, `${where}: masterwork seal`).toBe(true);
   expect(slot?.instance?.rolled?.stats, `${where}: baked stats`).toEqual({ sta: 5 });
   expect(slot?.instance?.enchant, `${where}: enchant`).toBe('enchant_chest_stamina');
+  // The Perfecting markers (Masterwrought phase 12), each on its own line so
+  // a boundary that rebuilds the payload from a field list names the one it
+  // forgot: the rank is a plain number, the stamp the literal true.
+  expect(slot?.instance?.perfecting, `${where}: perfecting rank`).toBe(2);
+  expect(slot?.instance?.perfected, `${where}: perfected marker`).toBe(true);
   // The craft marker rides EITHER channel: on the slot for a bagged copy, inside
   // the payload while worn (items.ts equipmentPayloadFor bridges it). Both are
   // honoured by the disenchant gate (professions/enchanting.ts
@@ -346,9 +363,17 @@ describe('provenance survives every container boundary', () => {
     const pid = sim.playerId;
     // The pre-enchant shape a masterwork proc mints (professions/crafting.ts):
     // instance payload for the seal, craftedRecipeId on the slot.
+    // Plus both Perfecting markers (Masterwrought phase 12; a contradictory
+    // pair on one fixture, deliberately, so ONE transform proves each rides
+    // the enchanted re-mint independently).
     sim.addItemInstance(
       GEAR,
-      { signer: SIGNER, rolled: { masterwork: true, stats: { sta: 5 } } },
+      {
+        signer: SIGNER,
+        rolled: { masterwork: true, stats: { sta: 5 } },
+        perfecting: 2,
+        perfected: true,
+      },
       pid,
       1,
       { craftedRecipeId: GEAR_RECIPE },
@@ -362,6 +387,8 @@ describe('provenance survives every container boundary', () => {
     expect(after?.instance?.signer, 'signer').toBe(SIGNER);
     expect(after?.instance?.rolled?.masterwork, 'masterwork seal').toBe(true);
     expect(after?.instance?.enchant, 'enchant').toBe('enchant_chest_stamina');
+    expect(after?.instance?.perfecting, 'perfecting rank').toBe(2);
+    expect(after?.instance?.perfected, 'perfected marker').toBe(true);
     expect(after?.craftedRecipeId ?? after?.instance?.craftedRecipeId, 'craftedRecipeId').toBe(
       GEAR_RECIPE,
     );
@@ -418,6 +445,8 @@ describe('provenance survives every container boundary', () => {
       // Everything BUT the signer is untouched by the sweep.
       expect(slot?.instance?.rolled?.masterwork, `${where}: masterwork seal`).toBe(true);
       expect(slot?.instance?.enchant, `${where}: enchant`).toBe('enchant_chest_stamina');
+      expect(slot?.instance?.perfecting, `${where}: perfecting rank`).toBe(2);
+      expect(slot?.instance?.perfected, `${where}: perfected marker`).toBe(true);
     }
     expect(state.inventory?.[0].craftedRecipeId).toBe(GEAR_RECIPE);
     expect(state.vendorBuyback?.[0].craftedRecipeId).toBe(GEAR_RECIPE);

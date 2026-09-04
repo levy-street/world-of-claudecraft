@@ -84,7 +84,7 @@ export interface GuildBankSlotModel {
   known: boolean;
   count: number;
   showCount: boolean; // count > 1 (a lone item hides its "1")
-  qualityKey: string; // item quality ?? 'common' (bagQualityKey semantics)
+  qualityKey: string; // instance-effective quality ?? 'common' (bagQualityKey semantics)
   /** Pipe-refused (unwithdrawable) slot: renders visibly distinct, never hidden. */
   dormant: boolean;
   /** Per-copy payload passthrough for the tooltip's instance lines. Dormant
@@ -231,7 +231,7 @@ export function buildGuildBankView(
       known: item !== undefined,
       count: slot.count,
       showCount: slot.count > 1,
-      qualityKey: bagQualityKey(item ?? {}),
+      qualityKey: bagQualityKey(item ?? {}, slot.instance),
       dormant: guildBankSlotDormant(slot, item),
       instance: slot.instance,
       craftedRecipeId: slot.craftedRecipeId,

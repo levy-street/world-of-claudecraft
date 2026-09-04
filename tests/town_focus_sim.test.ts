@@ -32,6 +32,7 @@ import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { stepTownFocus } from '../src/ui/town_focus_view';
+import { UNMAPPED_FAMILY } from './helpers/unmapped_family';
 
 // #1143: persistent, town-set focus allocation, applied on top of the #1142
 // per-corpse harvest roll. Two properties matter end-to-end:
@@ -157,7 +158,10 @@ describe('an unknown allocation key never reaches the character save (#2511)', (
     const { sim, a } = setup();
     const state = sim.serializeCharacter(a);
     expect(state).not.toBeNull();
-    const junked = { ...state!, townFocus: { hide: 3, eastbrook: 4, gills: 1 } };
+    // `eastbrook` is the fixture's issue key; UNMAPPED_FAMILY is a component
+    // family no HARVEST_COMPONENT_ITEMS row maps (gills played that part
+    // until Phase 11m mapped it, tests/helpers/unmapped_family.ts).
+    const junked = { ...state!, townFocus: { hide: 3, eastbrook: 4, [UNMAPPED_FAMILY]: 1 } };
 
     const reloaded = new Sim({ seed: 21, playerClass: 'warrior', noPlayer: true });
     const b = reloaded.addPlayer('warrior', 'Alpha', { state: junked });
@@ -220,7 +224,9 @@ describe('an unknown allocation key never reaches the character save (#2511)', (
     expect(stepTownFocus({ hide: 2 }, 'eastbrook', 1, FOCUS_POINT_BUDGET)).toEqual({ hide: 2 });
     expect(stepTownFocus({ hide: 2 }, 'constructor', 1, FOCUS_POINT_BUDGET)).toEqual({ hide: 2 });
     expect(stepTownFocus({}, 'not_a_real_tag', 1, FOCUS_POINT_BUDGET)).toEqual({});
-    expect(stepTownFocus({ hide: 2, gills: 3 }, 'gills', -1, FOCUS_POINT_BUDGET)).toEqual({
+    expect(
+      stepTownFocus({ hide: 2, [UNMAPPED_FAMILY]: 3 }, UNMAPPED_FAMILY, -1, FOCUS_POINT_BUDGET),
+    ).toEqual({
       hide: 2,
     });
   });

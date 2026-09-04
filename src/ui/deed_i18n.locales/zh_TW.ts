@@ -128,7 +128,7 @@ export const table: DeedLocaleTable = {
     desc: '在Nightbloom採集一處礦脈、一片木料和一塊草藥地。',
   },
   chr_nightbloom_first_cast: {
-    name: '月井漣漪',
+    name: '月泉漣漪',
     desc: '在Nightbloom水域釣上一條魚。',
   },
   chr_wraithwood_gatherer: {
@@ -186,7 +186,6 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: '百草宗師', desc: '草藥學熟練度達到100。' },
   prog_master_gatherer: {
     name: '採集大師',
-    desc: '採礦、伐木、草藥學與釣魚中，任意三項熟練度達到100。',
   },
   prog_first_craft: { name: '親手打造', desc: '完成你的第一次成功製作。' },
   prog_craft_specialist: { name: '不傳之秘', desc: '任一工藝技能達到75，並解鎖其專精特長。' },
@@ -258,7 +257,7 @@ export const table: DeedLocaleTable = {
     title: '屠龍者',
   },
   dgn_sanctum_speed: {
-    name: '聖所衝刺',
+    name: '聖所競走',
     desc: '在你的隊伍進駐墓龍聖所後的15分鐘內擊敗墓龍科祖爾。',
   },
   dgn_nythraxis_gravebreaker: {
@@ -303,7 +302,7 @@ export const table: DeedLocaleTable = {
   dlv_rite_flawless: { name: '一字不差', desc: '完成溺亡聖物庫儀式，全程沒有一次失誤。' },
   dlv_varric_ringers: {
     name: '鐘聲止息',
-    desc: '擊敗執事瓦瑞克時，他喚起的每一名喪儀鳴鐘者都已被斬殺。',
+    desc: '擊敗執事凡德里克時，他喚起的每一名喪儀鳴鐘者都已被斬殺。',
   },
   dlv_nhalia_bells: {
     name: '止鐘者',
@@ -367,7 +366,7 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: '荊峰編年史全卷',
-    desc: '見證山嶽故事的始末：擊潰龍教、讓聖所歸於沉寂、擊倒覺醒之峰，並剷除峭壁間每一個有名有姓的惡煞。',
+    desc: '見證山嶽故事的始末：擊潰龍誓、讓聖所歸於沉寂、擊倒覺醒之峰，並剷除峭壁間每一個有名有姓的惡煞。',
     title: '荊峰之譽',
   },
   chr_peaks_sparring: { name: '城牆操練', desc: '對高望上方的訓練假人造成總計 1,000 點傷害。' },
@@ -408,7 +407,7 @@ export const table: DeedLocaleTable = {
   },
   col_true_colors: { name: '本色登場', desc: '穿上職業預設以外的任一外觀上場。' },
   col_all_slots: { name: '十一分體面', desc: '同時在全部十一個裝備欄位裝上物品。' },
-  col_quartermaster_buyout: { name: '老主顧', desc: '發現軍需官維克斯所販售的全部十件貨品。' },
+  col_quartermaster_buyout: { name: '老主顧', desc: '發現軍需官維克斯所販售的全部十件裝備。' },
   col_glimmerfin: {
     name: '一線微光',
     desc: '釣起一條日輝錦鯉。',
@@ -727,6 +726,32 @@ export const table: DeedLocaleTable = {
   prog_armorcrafting_rare: {
     name: '鍛造至完美',
     desc: '在護甲鍛造中製作你的第一件稀有品質物品。',
+  },
+  prog_jewelcrafting_rare: {
+    name: '打磨至璀璨',
+    desc: '在珠寶設計中製作你的第一件稀有品質物品。',
+  },
+  prog_jewelcrafting_50: {
+    name: '琢面與花絲',
+    desc: '珠寶設計技能達到50。',
+  },
+  prog_grandmaster_jewelcrafting: {
+    name: '珠寶設計大宗師',
+    desc: '珠寶設計技能達到125，此技藝的頂點。',
+    title: '珠寶設計大宗師',
+  },
+  prog_inscription_rare: {
+    name: '以佳墨寫就',
+    desc: '在銘文學中製作你的第一件稀有品質物品。',
+  },
+  prog_inscription_50: {
+    name: '羽筆與顏料',
+    desc: '銘文學技能達到50。',
+  },
+  prog_grandmaster_inscription: {
+    name: '銘文學大宗師',
+    desc: '銘文學技能達到125，此技藝的頂點。',
+    title: '銘文學大宗師',
   },
   prog_ready_for_an_adventure: {
     name: '整裝待發',

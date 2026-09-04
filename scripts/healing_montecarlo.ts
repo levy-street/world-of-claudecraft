@@ -222,6 +222,13 @@ function statScore(item: ItemDef, spec: Spec): number {
   // Tank: max-EHP pick (stamina first, armor as tiebreak). Reproduces the
   // floors-test reference warrior kit (2861 armor / 2762 hp base); the old
   // armor-heavy weights traded 310 hp away for armor the fights never repaid.
+  // Provenance (qr-19-ref-armor-calibration-constant, 2026-09-01): 2861 is a
+  // PINNED constant, not a live measurement of the catalog. The committed
+  // max-armour kit pins at 4085 (tests/heroic_difficulty_floors.test.ts), and
+  // whether 2861 was ever the raw kit armour or a prot-mastery-folded reading is
+  // UNSETTLED, so it is not re-based here and rides the packet's R5 re-measure.
+  // This pick is stamina-first (max-EHP), a third basis again from the floor
+  // suites' max-armour one.
   return (s.sta ?? 0) * 100 + (s.armor ?? 0) * 0.1 + weapon * 0.01;
 }
 

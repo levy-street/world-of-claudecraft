@@ -234,7 +234,7 @@ Todas las instancias corren también en **Heroico**: enemigos de mayor nivel, me
 
 ### Delves
 
-Los delves son un modo aparte, escalable y de grupo pequeño para uno o dos jugadores, reconstruido a partir de cámaras aleatorias en cada partida y que termina en un cofre relicario cerrado que se abre con un minijuego de ganzúas en lugar de una tirada de botín. **The Collapsed Reliquary** (nivel 7 en adelante) termina en Deacon Varric, con una compañera de IA, Tessa, luchando a tu lado si vas en solitario. **The Drowned Litany** (nivel 12 en adelante) sigue el rastro hasta un santuario inundado en el borde de Mirefen Marsh. Un tablero de delves fija el nivel: el Heroico sube los niveles de los enemigos y agrega un afijo aleatorio para recompensas más ricas.
+Los delves son un modo aparte, escalable y de grupo pequeño para uno o dos jugadores, reconstruido a partir de cámaras aleatorias en cada partida y que termina en un cofre relicario cerrado que se abre con un minijuego de ganzúas en lugar de una tirada de botín. **The Collapsed Reliquary** (nivel 7 en adelante) termina en Deacon Vandric, con una compañera de IA, Tessa, luchando a tu lado si vas en solitario. **The Drowned Litany** (nivel 12 en adelante) sigue el rastro hasta un santuario inundado en el borde de Mirefen Marsh. Un tablero de delves fija el nivel: el Heroico sube los niveles de los enemigos y agrega un afijo aleatorio para recompensas más ricas.
 
 ### PvP clasificatorio (the Ashen Coliseum)
 

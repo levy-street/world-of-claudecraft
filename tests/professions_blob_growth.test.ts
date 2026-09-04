@@ -20,23 +20,62 @@
 // precedent), rather than loosening it ahead of need.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { CHARACTER_BLOB_WARN_BYTES } from '../server/character_blob_size';
+import { BACKPACK_SLOTS, BAG_SOCKETS, bagCapacity } from '../src/sim/bags';
+import {
+  BANK_BAG_SOCKETS,
+  BANK_BASE_SLOTS,
+  BANK_MAX_BONUS_SLOTS,
+  BANK_PURCHASED_SLOTS_MAX,
+  BANK_STORAGE_KEY_MAX_LENGTH,
+} from '../src/sim/bank';
+import { CLASSES } from '../src/sim/content/classes';
+import { DEEDS } from '../src/sim/content/deeds';
+import { FARM_CROPS } from '../src/sim/content/farm_crops';
+import { FARM_BED_IDS } from '../src/sim/content/farm_patches';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import {
   CRAFT_RING,
+  GATHERING_PROFESSION_IDS,
   GATHERING_PROFESSIONS,
   HARVEST_COMPONENT_ITEMS,
 } from '../src/sim/content/professions';
-import { ALL_RECIPES, ITEMS, QUESTS } from '../src/sim/data';
+import { recipeById } from '../src/sim/content/recipes';
+import {
+  RELIQUARY_ITEM_TO_PAGES,
+  RELIQUARY_MARK_IDS,
+  RELIQUARY_PAGES,
+} from '../src/sim/content/reliquary';
+import { defaultBuild, MAX_LOADOUTS, SAVED_LOADOUT_BAR_SLOTS } from '../src/sim/content/talents';
+import { ALL_RECIPES, DELVES, DUNGEONS, ITEMS, QUESTS } from '../src/sim/data';
+import { VISITED_MARK_NAMESPACES } from '../src/sim/deeds';
+import { MASTERWROUGHT_LEGENDARY_CAP } from '../src/sim/equipment_rules';
+import {
+  VAULT_UPGRADE_RUNGS,
+  vaultCapacityPerMaterial,
+  vaultMaterialIds,
+} from '../src/sim/materials_vault';
 import {
   ARCHETYPE_PAIR_TARGETS,
   craftsForPairTarget,
   hobbyCandidatesForPair,
 } from '../src/sim/professions/archetype';
+import { FARM_MAX_GROW_MS } from '../src/sim/professions/farm_persist';
 import { NODE_HARVEST_TABLE } from '../src/sim/professions/gathering';
-import { MAX_CRAFTED_BY_LENGTH } from '../src/sim/professions/tools';
+import { MAX_LEGENDARY_NAME_LENGTH } from '../src/sim/professions/legendary_name';
+import { perfectedBonusStats } from '../src/sim/professions/perfecting';
+import { MAX_CRAFTED_BY_LENGTH, slotToolEffectRefused } from '../src/sim/professions/tools';
 import { MAX_KNOWN_RECIPE_ID_LENGTH, MAX_KNOWN_RECIPE_IDS } from '../src/sim/professions/training';
 import { type CharacterState, type PlayerMeta, Sim } from '../src/sim/sim';
-import { ALL_EQUIP_SLOTS, type InvSlot } from '../src/sim/types';
+import {
+  ALL_EQUIP_SLOTS,
+  DEED_STAT_KEYS,
+  type EquipSlot,
+  type InvSlot,
+  MAX_LEVEL,
+} from '../src/sim/types';
+import { WORLD_BOSSES, worldBossLockoutId } from '../src/sim/world_boss';
+import { stripComments } from './helpers/strip_comments';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // This file never spawns, targets, or asserts on a camp, npc, or ground
@@ -46,8 +85,25 @@ import { EMPTY_TEST_WORLD } from './sim_shared';
 // terrain, props, and playerStart identical to the built-in world (so
 // findSafePos/groundPos still settle every fixture the same way) while
 // skipping the camp/npc/ground-object population that this file never reads.
-const makeSim = (seed = 31) =>
-  new Sim({ seed, playerClass: 'warrior', autoEquip: false, world: EMPTY_TEST_WORLD });
+const makeSim = (seed = 31, nowMs?: number) =>
+  new Sim({
+    seed,
+    playerClass: 'warrior',
+    autoEquip: false,
+    world: EMPTY_TEST_WORLD,
+    ...(nowMs === undefined ? {} : { lockoutNowMs: () => nowMs }),
+  });
+
+// A fixed EPOCH clock for the byte-MEASURE arm (11d DB review, F2): the
+// production anchors are 13-digit epoch milliseconds, and an offline-anchored
+// fixture (plantedAtMs re-anchored to 1) understates every farm row by 16
+// bytes, 368 across the 23 beds, more than the tracking band is wide. The
+// value is 2026-01-01T04:00Z so the craftDaily stamp date and the clock agree
+// whatever the gate consults. Threaded through ceilingSim AND the measure
+// arm's settle sims so no re-anchor fires and the fixed point holds at full
+// anchor width; every other arm keeps the offline clock (they assert caps and
+// complements, not bytes).
+const CEILING_EPOCH_MS = 1_767_240_000_000;
 
 // The professions-owned key list, mirrored from the roundtrip sweep. The
 // scrape test below pins the two lists together so neither can silently
@@ -70,6 +126,8 @@ const PROFESSIONS_BLOB_FIELDS = [
   'questedHobbies',
   'profTierTutorialSent',
   'guildLetterSent',
+  'craftDaily',
+  'farmPlots',
 ] as const;
 
 // Every CharacterState key this serializer writes that is NOT professions
@@ -165,6 +223,10 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   'delveLoreUnlocked',
   'delveDaily',
   'heroicDaily',
+  // Masterwrought phase 04: the material income gates (content-cardinality
+  // bounded, reset per reset day) and the ember week anchor (a fixed date).
+  'wyrmfallDaily',
+  'emberWeekAnchor',
   'mailWelcomed',
   // The tutorial island's one-shot spawn-greeting latch (sim/tutorial/
   // greeting.ts): a boolean with zero-default omission, bounded by nature.
@@ -186,15 +248,192 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
 // v0.33.0 offhand fix retired it, the fixture now instances all twelve
 // live slots (ALL_EQUIP_SLOTS), and the settled ceiling re-measured 8,587
 // bytes. The phase 20 density pass took the node count 120 to 156 and the
-// settled ceiling to a measured 9,451 bytes: the pin HOLDS, but the
-// headroom is now about 277 bytes, under one starter zone of node growth,
-// so the NEXT authored node-count growth of any size re-mints this bound
-// with its measured value (the tests/professions_node_persist.test.ts
-// 2048 -> 4096 -> 8192 precedent) rather than squeezing under it.
-const PROFESSIONS_BYTE_CEILING = 9728;
+// settled ceiling to a measured 9,451 bytes with about 277 bytes of headroom
+// under the then-current 9,728 bound, and recorded that the next authored
+// content growth of any size re-mints the bound with its measured value (the
+// tests/professions_node_persist.test.ts 2048 -> 4096 -> 8192 precedent)
+// rather than squeezing under it. That growth arrived: the Masterwrought
+// phase 05 jewelcrafting base catalog took the recipe count 79 to 88 (nine
+// knownRecipes entries) and the settled ceiling to a measured 9,734 bytes,
+// six over the old bound, so the bound was re-minted at the next round
+// step (10 KiB). The phase 06 inscription base catalog then took the
+// recipe count 88 to 94 (six knownRecipes entries) and the settled
+// ceiling to a measured 9,889 bytes: the 10 KiB bound HELD with about
+// 351 bytes of headroom, so it stayed put. The Masterwrought phase 07
+// intermediates then took the recipe count 94 to 104 (ten knownRecipes
+// entries, about 259 bytes) and added the craftDaily gate stamp (76
+// bytes), settling at a measured 10,224 bytes: sixteen bytes under the
+// 10 KiB bound, which one more authored recipe would cross, so the bound
+// re-mints at the next round step (12 KiB) per the same precedent. The
+// tracking band below becomes TWO-sided at 160 either side of the
+// measurement (the one-sided band let this note rot 335 bytes upward with
+// no red): the band is the re-measure obligation, forcing the next content
+// growth to update this note with its measured value, while the round-step
+// ceiling stays the structural bound. The Masterwrought phase 08 apex armor
+// catalog then took the recipe count 104 to 114 (ten knownRecipes entries),
+// settling at a measured 10,499 bytes: the 12 KiB ceiling holds with about
+// 1,789 bytes of headroom, and the band below re-centers on the new
+// measurement per the same obligation. Phase 09 took the count 114 to 124
+// (ten more ids) and settled at a measured 10,756 bytes. The Masterwrought
+// phase 10 apex consumables then took the recipe count 124 to 132 (the
+// eight APEX_CONSUMABLE_RECIPES rows: three flasks, three role foods, and
+// the two station capstones, about 193 bytes of knownRecipes ids),
+// settling at a measured 10,949 bytes: the 12 KiB ceiling holds with about
+// 1,339 bytes of headroom, and the band re-centers at 160 either side of
+// that measurement. The phase 10 enchants add nothing here: an enchant is
+// not a recipe, and equipmentInstance already carries one enchant id per
+// slot at the fixture's ceiling whatever the catalog holds.
+// The farming absorb (masterwrought Phase 11d) is the next growth, and it is
+// a UNION, not an authored phase: the merged shape carries this branch's
+// craftDaily/wyrmfallDaily/emberWeekAnchor beside farming's farmPlots, and
+// the fixture restores farming's every-bed block whole (the amended 11b
+// count-pin row: a bound re-minted around a plotless fixture would sit near
+// 11 KiB and stay blind to ~4.7 KiB of farmPlots). Predicted from the two
+// parents' chains off the shared 9,451 base: 9,451 + 1,498 (this branch's
+// phase 05..10 delta to 10,949) + 4,767 (farming's fifth-profession key plus
+// 23 full-width beds to 14,218) = 15,716. Measured 16,206: the +490 is 433
+// bytes of the FOURTEEN farming recipe ids (FARM_RECIPES plus growth_tonic)
+// that joined knownRecipes AFTER farming's Phase 5 re-measure and rotted
+// inside its one-sided band (exactly the rot this file's two-sided band
+// exists to stop), plus ~57 bytes attributed to intra-band drift on both
+// parents' last measurements.
+// THAT ~57 IS NOW MEASURED, at Phase 18 (U-MEASURE), the way the 11d QA said
+// it had to be: by re-running each parent's own growth fixture against its own
+// tree. Throwaway worktrees at the three SHAs the 11d ledger names (base
+// e56707a675, ours d5304a78c4, theirs 8cd964d599), plus the phase-20 density
+// tree the two chains were ANCHORED at (5e48d72755) and the 11d merge itself
+// (b987df912a). Measured: phase-20 9,451, base 9,469, ours 10,949, theirs
+// 14,726, merged 16,206. Two things fall out, and neither of them is drift.
+//   - Composed from those MEASURED values against the TRUE merge base, the
+//     two-parent sum is exact: ours + theirs - base = 10,949 + 14,726 - 9,469
+//     = 16,206, the merged measurement, drift ZERO. The residual was never a
+//     property of the blob. It was the cost of quoting two note figures
+//     instead of measuring the two trees.
+//   - The +490 splits into exactly two named terms. Farming's note lagged its
+//     own tree by 508 (14,218 recorded, 14,726 measured), of which 433 is the
+//     fourteen farm recipe ids already on record and the remaining 75 is
+//     questCadence, which no step of farming's chain ever counted: that parent
+//     added two work-order cadence quests, q_prof_workorder_kitchens_rice (30
+//     characters, 37 as `"<id>":600,`) and q_prof_workorder_kitchens_wheat
+//     (31, 38), and 37 + 38 = 75 exactly. Against that, 18 bytes were
+//     DOUBLE-COUNTED: both chains were anchored at the phase-20 tree, whose
+//     townFocus record is 18 bytes narrower than the real merge base's (60 to
+//     78, and that is the whole base-to-base delta), so a term each parent
+//     inherited once entered the prediction twice. 508 - 18 = 490, and
+//     75 - 18 = 57.
+// The lesson is the anchor, not the arithmetic: a two-parent prediction
+// subtracts the MERGE BASE it really has, and reads each parent's TREE rather
+// than the last number that parent's note happened to record.
+// The bound re-mints at 17 KiB, not 16,384: both parents'
+// re-mints left over 1 KiB of headroom (10,224 -> 12 KiB; 14,218 -> 15 KiB)
+// and 16,384 would leave 178 bytes, thinner than the tracking band itself.
+// The band below re-centers at 160 either side of the 16,206 measurement.
+// The 11d DB review then trued the fixture to the production shape and the
+// re-measure landed at 16,704, EXACTLY the predicted 16,206 + 130 (the
+// fourth tool-effect slot: farming became slottable when the hoe phase
+// lifted its refusal arm, F1) + 368 (13-digit epoch anchors on all 23 farm
+// rows via CEILING_EPOCH_MS, F2): the 17 KiB ceiling HOLDS with 704 bytes
+// of headroom at that measurement, 681 after Phase 11e's re-measure to
+// 16,727, and the band re-centers on the new measurement. Two terms
+// stay DELIBERATELY unmeasured and recorded instead: the rift-forged
+// equipmentInstance payload (~354 B per slot on legitimate endgame copies,
+// bounded separately by src/sim/item_instance_load.ts; F3) and craftDaily's
+// structural clamp bound (32 ids x 64 chars, ~2.1 KB, far above the one
+// oncePerDay recipe content funds today; re-mint when the gated set grows,
+// F6). The fixture measures crafted, signed, enchanted, stat-rolled
+// instances: the professions-CRAFT worst case, not the rift endgame's.
+// F3, DECIDED at Masterwrought Phase 12 (the bound-as-policy work): the
+// bound's scope FORMALLY EXCLUDES rift-forged payloads, which belong to
+// their own bound: a rift payload is REBUILT from bounded progression inputs
+// (rift/progression.ts sanitizeRiftGearInstance, about 461 B per legal copy)
+// before the load bound runs, and the src/sim/item_instance_load.ts clamps
+// bound the LEGAL shapes (string, key-count, key-length, and the rolled/
+// charges subtree ceilings). They are NOT a byte bound for a tampered row:
+// an unknown top-level OBJECT key survives whole under the key arms alone,
+// the forward-compatibility surface that file deliberately refuses to
+// size-police (its header records the doctrine). The fixture models the
+// professions-craft worst case, and since Phase 12 that case INCLUDES
+// Perfecting: the two Masterwrought cap slots carry the Perfected stamp, the
+// R2 bind, and the R5 bonus merged into their rolled stats (ceilingSim
+// below). F6, the same phase: a NO-OP, recorded as such. Perfecting mints no
+// recipe and gates no craft per day, so the oncePerDay set did not grow and
+// craftDaily's structural bound stands exactly as F6 left it.
+// Masterwrought phase 13 (the orange promotion) is the "next authored
+// growth" the Phase 12 note predicted, and it re-minted the ceiling exactly
+// as that note recorded: measured 17,351 (prediction 17,263 + 88 = 17,351,
+// drift ZERO; the arithmetic is 24 bytes of `"recipe_deed_of_making",` in
+// knownRecipes, 22 of `,"quality":"legendary"` inside the promoted cap
+// slot's rolled record, and 42 of `,"name":"A..."` at the full 32-char name
+// width), which left 57 bytes under the 17 KiB structural ceiling, thinner
+// than one recipe id; per the standing precedent the ceiling re-mints at the
+// next round step, 18 KiB = 18432, never a squeeze. F6 stays a no-op at
+// phase 13 too: recipe_deed_of_making is deliberately NOT oncePerDay
+// (promotion pacing lives in the Perfected walk), so the craftDaily
+// structural bound still stands exactly as F6 left it.
+// BOTH ARE NOW MEASURED, at Phase 18 (U-MEASURE), and both figures above are
+// SUPERSEDED. They were carried as "deliberately unmeasured" for six phases,
+// which is exactly how a narrative keeps corroborating a number the tree no
+// longer holds.
+//   F3, the rift-forged payload: measured through the rebuild the notes name
+//   (rift/progression.ts sanitizeRiftGearInstance) with boundTo at production
+//   width. The widest LEGAL payload is 422 bytes per slot: tier S (the only
+//   tier with two gem slots), both gems, upgradeLevel at its ceiling of 5, an
+//   enchant at its one legal value, and a sourceEventId at its 128-character
+//   ceiling. A realistic endgame copy, whose event id is a dozen characters,
+//   is 306. Neither figure on record reproduces: the "~354 B per slot"
+//   above and the Phase 12 note's "about 461 B per legal copy" bracket the
+//   measurement without matching it. The SCOPE ruling is untouched: the
+//   payload is rebuilt from bounded progression inputs before the load bound
+//   runs, so it stays outside this bound and belongs to its own.
+//   F6, the craftDaily clamp: the "32 ids x 64 chars, ~2.1 KB" product
+//   measures 2,245 bytes, and it is UNREACHABLE. professions/daily_gate_load.ts
+//   filters saved stamps against ONCE_PER_DAY_RECIPE_IDS, the live content
+//   set, BEFORE the 32-entry slice, so a tampered row cannot carry 32
+//   arbitrary 64-character ids at all: it carries at most
+//   min(32, oncePerDay recipe count) REAL ids. Content holds exactly one
+//   (recipe_quickening_catalyst, unchanged since 11d), so the true ceiling is
+//   76 bytes in-blob, which is also what the fixture measures. F6's standing
+//   instruction survives, but the quantity it tracks is the CONTENT set's byte
+//   cost, never the structural product the membership filter retired.
+const PROFESSIONS_BYTE_CEILING = 18432;
 
-function ceilingSim(): Sim {
-  const sim = makeSim();
+// The TWO Masterwrought cap slots (R6/R16: at most two apex pieces worn)
+// carry the Perfecting worst case on top (Masterwrought phase 12, the
+// bound-as-policy work): the Perfected stamp, the R2 bind (the wearer's
+// own entity id), and the R5 bonus record MERGED into the rolled stats the
+// way perfecting.ts merges it (additively, new keys appended). Derived from
+// the LIVE bake over the two shipped apex defs whose primary profiles add
+// the most keys to the fixture's {str, agi, sta} record (int and spi: the
+// grimoire's int/spi/sta, the vestments' int/spi), so every slot-keyed
+// payload here is one the professions-craft path can really produce. Both
+// ids are pinned: a re-profiled or retired apex def moves the fixture and
+// forces this ceiling re-read rather than silently narrowing it. Module
+// scope so the settle-content pin below derives its slots from the SAME
+// list the fixture stamps, instead of restating them.
+const PERFECTED_CAP_SLOTS: readonly (readonly [EquipSlot, string])[] = [
+  ['chest', 'sunspun_vestments'],
+  ['offhand', 'voidbound_grimoire'],
+];
+
+// Phase 13: EXACTLY ONE of the two Perfected cap slots also carries the
+// orange promotion, the LEGAL worst case (MASTERWROUGHT_LEGENDARY_CAP is 1,
+// so a second promoted worn copy cannot exist): rolled.quality 'legendary'
+// plus the player-chosen name at its full MAX_LEGENDARY_NAME_LENGTH width.
+const PROMOTED_CAP_SLOT: EquipSlot = PERFECTED_CAP_SLOTS[0][0];
+const PROMOTED_CAP_NAME = 'A'.repeat(MAX_LEGENDARY_NAME_LENGTH);
+
+// The R2 bind stamp at PRODUCTION width (Phase 12 QA's boundTo digit-width
+// note, reopened qr-18). A live wearer's entity id is the character's
+// database id, a Postgres 32-bit serial that reaches ten digits, while this
+// offline fixture's own entity id is two: stamping meta.entityId understated
+// the term by 8 bytes per cap slot. The load path carries boundTo verbatim
+// (item_instance_load.ts names no arm for it and nothing re-binds on load,
+// which is also what lets the settle stay a fixed point across sims whose
+// own ids differ), so the ceiling stamps the widest legal wearer id.
+const PRODUCTION_WIDTH_BOUND_TO = 2_147_483_647;
+
+function ceilingSim(nowMs?: number): Sim {
+  const sim = makeSim(31, nowMs);
   const meta = sim.players.get(sim.playerId) as PlayerMeta;
   // Every gathering skill at its own cap (fishing's is higher by design).
   meta.gatheringProficiency = Object.fromEntries(
@@ -230,6 +469,26 @@ function ceilingSim(): Sim {
       craftedBy: longName,
       confirmMode: 'prompt',
     },
+    // Farming became SLOTTABLE when the hoe phase lifted its shipless
+    // refusal arm (slotToolEffectRefused's own header); the merged worst
+    // case is four slots, not three (11d DB review, F1). confirmMode
+    // 'always': farming refuses 'prompt' at the mint, and the two spellings
+    // are byte-equal.
+    farming: {
+      effectId: 'gatherers_cache',
+      durability: 30,
+      maxDurability: 30,
+      craftedBy: longName,
+      confirmMode: 'always',
+    },
+  };
+  // The daily craft gate at content size: every oncePerDay recipe stamped
+  // for a live window (Masterwrought phase 07). Content-scaled like
+  // knownRecipes, and the load clamp filters to live gated ids, so this IS
+  // the field's ceiling.
+  meta.craftDaily = {
+    date: '2026-01-01',
+    crafted: new Set(ALL_RECIPES.filter((r) => r.oncePerDay).map((r) => r.id)),
   };
   // EVERY equip slot carries a crafted, signed, enchanted, stat-rolled
   // instance: the professions-endgame worst case the phase 16 review found
@@ -251,6 +510,42 @@ function ceilingSim(): Sim {
       enchant: 'enchant_weapon_might',
       rolled: { stats: { str: 2, agi: 2, sta: 2 } },
       signer: longName,
+    };
+  }
+  for (const [slot, apexId] of PERFECTED_CAP_SLOTS) {
+    const def = ITEMS[apexId];
+    const recipe = recipeById(`recipe_${apexId}`);
+    if (def?.masterwrought !== true || !recipe) {
+      throw new Error(`apex fixture id ${apexId} is no longer an apex recipe output; re-mint`);
+    }
+    const bonus = perfectedBonusStats(def, recipe);
+    // POSITIVE int/spi required, not mere key presence: the live stamp skips
+    // zero-valued shares, so a zero-bake would make this fixture write a
+    // payload the real path cannot produce (and red the settle-content pins
+    // with a misleading message) rather than failing here by name.
+    if (!bonus || (bonus.int ?? 0) < 1 || (bonus.spi ?? 0) < 1) {
+      throw new Error(
+        `apex fixture id ${apexId} no longer bakes a positive int/spi delta; re-mint`,
+      );
+    }
+    const stats: Record<string, number> = { str: 2, agi: 2, sta: 2 };
+    for (const [stat, value] of Object.entries(bonus)) {
+      // The live merge's own rule (perfecting.ts): zero shares are never
+      // written, so the fixture skips them identically.
+      if (value === undefined || value === 0) continue;
+      stats[stat] = (stats[stat] ?? 0) + value;
+    }
+    meta.equipmentInstance[slot] = {
+      enchant: 'enchant_weapon_might',
+      // The promoted slot carries the phase 13 stamp the live promotion
+      // writes: the quality override inside the SAME rolled record the R5
+      // stats live on, plus the full-width name (stats untouched, the
+      // promotion's own byte-identity rule).
+      rolled: slot === PROMOTED_CAP_SLOT ? { stats, quality: 'legendary' } : { stats },
+      signer: longName,
+      perfected: true,
+      boundTo: PRODUCTION_WIDTH_BOUND_TO,
+      ...(slot === PROMOTED_CAP_SLOT ? { name: PROMOTED_CAP_NAME } : {}),
     };
   }
   // Every repeatable cadence window live (the first mint never set the field,
@@ -287,6 +582,55 @@ function ceilingSim(): Sim {
   meta.tierMailSent.set(firstPair[1], 2);
   meta.profTierTutorialSent = true;
   meta.guildLetterSent = true;
+  // Every garden bed planted at full row width: hidden slots at their widest
+  // JSON forms (a full-precision roll, a 32-bit seed), every knob and the
+  // notice flag true, and the duration EXACTLY at the tamper ceiling so the
+  // load-side clamp is a no-op and the settle stays a fixed point. The
+  // fresh-Sim load runs at time 0, where the growth phase's anchor rule
+  // re-anchors any positive plant time to the floor of 1 and leaves it there
+  // on every later load. Content-scaled like nodeHarvestCooldowns: about 203
+  // bytes per authored bed at the Phase 5 crop-ladder re-measure (the settled
+  // total lives in the ceiling ledger above). Farming's fixture, restored
+  // whole at the absorb per the amended 11b count-pin row: a bound re-minted
+  // around a plotless fixture would sit near 11 KiB and stay permanently
+  // blind to the largest persisted field this absorb adds.
+  if (FARM_BED_IDS.size !== 23) throw new Error('farm bed set changed; re-mint the ceiling');
+  // Full width includes the crop id column: the Phase 5 ladder shipped ids
+  // longer than vale_wheat, so the worst case plants every bed with the
+  // WIDEST id the catalog carries. Derived, with the winner pinned, so a
+  // future longer id moves the fixture and forces this ceiling re-read.
+  const widestCropId = Object.keys(FARM_CROPS).reduce((a, b) => (b.length > a.length ? b : a));
+  if (widestCropId !== 'evergarden_pumpkin')
+    throw new Error('widest crop id changed; re-measure and re-mint the ceiling');
+  const plantAnchorMs = nowMs ?? 1_000;
+  for (const bedId of FARM_BED_IDS) {
+    meta.farmPlots.set(bedId, {
+      cropId: widestCropId,
+      plantedAtMs: plantAnchorMs,
+      readyAtMs: plantAnchorMs + FARM_MAX_GROW_MS,
+      // The widest LEGAL JSON form of a roll is 24 characters, in DECIMAL
+      // notation: JSON.stringify switches to exponential only below 1e-6, so
+      // a value in [1e-6, 1e-5) prints "0.00000" plus up to 17 significant
+      // digits, one character wider than the widest exponential form (23).
+      // And it is MINT-REACHABLE, not hand-edit-only: the production
+      // replacement mint fnv1a(`${bedId}:${plantedAtMs}:survival`) / 2^32
+      // (farm_persist.ts deriveHiddenSlots) lands in that band about one key
+      // in a hundred thousand (verified against the module's own fnv1a with a
+      // real-shaped key, a live bed id plus a 13-digit epoch anchor:
+      // 'bed_eastbrook_1:1756600100591:survival' lands in the 24-character
+      // band). MEASURED since Phase 18 (F4's deliberately-unmeasured
+      // note retired, reopened qr-18): the value below is a shortest-roundtrip
+      // double inside [0, 1), so clampSurvivalRoll passes it through verbatim
+      // and the settle stays a fixed point at the full 24-character width, +5
+      // bytes per bed over the old 19-character form.
+      survivalRoll: 0.0000012345678901234567,
+      yieldSeed: 4_294_967_295,
+      compost: true,
+      watch: true,
+      tonic: true,
+      notified: true,
+    });
+  }
   return sim;
 }
 
@@ -352,6 +696,11 @@ function armNonProfessionsFields(sim: Sim): void {
   sim.setActiveBorder('prog_prestige_10');
   // The Reliquary blob (sparse: absent while empty).
   meta.reliquary.marks.add('gather_event:pristine_vein');
+  // The Masterwrought material gates (zero-default omission: both need real
+  // values or the serializer drops the keys and the survival floor never
+  // sees them).
+  meta.wyrmfallDaily = { date: '2026-08-11', sources: new Set(['rift']) };
+  meta.emberWeekAnchor = '2026-08-11';
   // Entity-side appearance toggles.
   e.weaponStowed = true;
   e.helmHidden = true;
@@ -363,9 +712,14 @@ describe('the professions blob growth bound (phase 16)', () => {
     // this bound); this scrape makes drift impossible in either direction.
     // Anchored at the declaration and closed at the first `] as const`, so
     // surrounding prose cannot leak into the capture.
-    const source = readFileSync(
-      new URL('./professions_blob_roundtrip.test.ts', import.meta.url),
-      'utf8',
+    // Comments stripped first, like every sibling source scrape in this tree
+    // (command_schema defines its own stripper for exactly this reason, and
+    // farm_verb_reachability imports the shared helper). The block is
+    // comment-free today, so this changes nothing now; a `// dropped:
+    // 'farmPlots'` note beside a real removal would otherwise keep the two
+    // field lists looking identical while they diverged (Phase 11d QA).
+    const source = stripComments(
+      readFileSync(new URL('./professions_blob_roundtrip.test.ts', import.meta.url), 'utf8'),
     );
     const anchor = source.indexOf('const PROFESSIONS_BLOB_FIELDS = [');
     expect(anchor).toBeGreaterThan(-1);
@@ -375,15 +729,23 @@ describe('the professions blob growth bound (phase 16)', () => {
   });
 
   it('the settled ceiling honors the byte bound and every entry cap', () => {
-    const sim = ceilingSim();
+    // The fixture promotes exactly ONE cap slot on the strength of the worn
+    // legendary sub-cap being 1; pin that premise, or a widened sub-cap would
+    // silently understate the worst case by one promotion's bytes (the phase
+    // 13 QA test-coverage audit).
+    expect(MASTERWROUGHT_LEGENDARY_CAP).toBe(1);
+    const sim = ceilingSim(CEILING_EPOCH_MS);
     const s1 = sim.serializeCharacter(sim.playerId) as CharacterState;
     // Settle through one real load (normalizers, one-shot transforms), then
     // prove the result is a fixed point so the measurement is of a REAL
-    // steady state, not a pre-normalization inflation.
-    const second = makeSim(32);
+    // steady state, not a pre-normalization inflation. The settle sims carry
+    // the SAME epoch clock, or the anchor rule would fold the 13-digit
+    // production anchors back to the offline floor and the measurement would
+    // understate every farm row (11d DB review, F2).
+    const second = makeSim(32, CEILING_EPOCH_MS);
     const pid2 = second.addPlayer('warrior', 'Ceiling', { state: s1 });
     const s2 = second.serializeCharacter(pid2) as CharacterState;
-    const third = makeSim(33);
+    const third = makeSim(33, CEILING_EPOCH_MS);
     const pid3 = third.addPlayer('warrior', 'CeilingB', { state: s2 });
     const s3 = third.serializeCharacter(pid3) as CharacterState;
     expect(s3).toEqual(s2);
@@ -409,7 +771,24 @@ describe('the professions blob growth bound (phase 16)', () => {
     // the blob linear in CONTENT rather than unbounded per player.
     expect(Object.keys(s2.nodeHarvestCooldowns ?? {})).toHaveLength(GATHER_NODES.length);
     expect(s2.knownRecipes ?? []).toHaveLength(new Set(ALL_RECIPES.map((r) => r.id)).size);
-    expect(Object.keys(s2.toolEffectSlots ?? {})).toHaveLength(3);
+    // Derived from the refusal policy so a profession becoming slottable
+    // moves this pin instead of freezing the understatement; the literal 4
+    // is pinned beside it so the derivation cannot self-vacuate (11d F1).
+    const slottable = GATHERING_PROFESSION_IDS.filter(
+      (id) => !slotToolEffectRefused(id, 'gatherers_cache'),
+    );
+    expect(slottable).toHaveLength(4);
+    expect(Object.keys(s2.toolEffectSlots ?? {})).toHaveLength(slottable.length);
+    // Content-scaled like knownRecipes: at most one stamp per oncePerDay
+    // recipe per day, and the 32-entry load clamp bounds even a tampered row.
+    // The floor throw is the file's re-check-the-fixture idiom: at zero
+    // flagged recipes the cap self-vacuates to toHaveLength(0) and the
+    // presence pin above cannot see an empty crafted array either.
+    const gatedRecipeCount = ALL_RECIPES.filter((r) => r.oncePerDay).length;
+    if (gatedRecipeCount === 0) {
+      throw new Error('no oncePerDay recipe in content; re-check the craftDaily fixture');
+    }
+    expect(s2.craftDaily?.crafted ?? []).toHaveLength(gatedRecipeCount);
     expect(Object.keys(s2.questedHobbies ?? {})).toHaveLength(ARCHETYPE_PAIR_TARGETS.length);
     // EXACT, not an upper bound: the fixture attunes every authored pair, so
     // a cap pin that tolerated fewer would pass on a normalizer that
@@ -431,14 +810,238 @@ describe('the professions blob growth bound (phase 16)', () => {
       Object.values(QUESTS).filter((q) => q.repeatCadenceTicks).length,
     );
     expect(Object.keys(s2.equipmentInstance ?? {})).toHaveLength(ALL_EQUIP_SLOTS.length);
+    // Content-scaled like the node cooldowns: one row per authored bed, so
+    // the field grows with the FARM_PATCHES table, never per player action.
+    expect(Object.keys(s2.farmPlots ?? {})).toHaveLength(FARM_BED_IDS.size);
+    // The two Perfecting cap-slot rows keep their worst case through the
+    // settle: the SHRINK side of the band (the floor sits 380 under the
+    // measurement, so deleting the PERFECTED_CAP_SLOTS fixture loop would
+    // still pass the band; the content pin here is what reds on that loss).
+    for (const [slot] of PERFECTED_CAP_SLOTS) {
+      const inst = s2.equipmentInstance?.[slot];
+      expect(inst?.perfected, `${slot} keeps the Perfected stamp`).toBe(true);
+      expect(typeof inst?.boundTo, `${slot} keeps the R2 bind`).toBe('number');
+      expect(inst?.rolled?.stats?.int, `${slot} keeps the merged int share`).toBeGreaterThanOrEqual(
+        1,
+      );
+      expect(inst?.rolled?.stats?.spi, `${slot} keeps the merged spi share`).toBeGreaterThanOrEqual(
+        1,
+      );
+    }
+    // The phase 13 promotion worst case survives the settle too (the same
+    // shrink-side reasoning: the floor sits 380 under the measurement, so
+    // losing the 88 promotion bytes alone would still pass the band).
+    const promoted = s2.equipmentInstance?.[PROMOTED_CAP_SLOT];
+    expect(promoted?.rolled?.quality, 'the promoted slot keeps its quality').toBe('legendary');
+    expect(promoted?.name, 'the promoted slot keeps its full-width name').toBe(PROMOTED_CAP_NAME);
+    expect(PROMOTED_CAP_NAME).toHaveLength(32);
 
-    // The byte bound itself, on the settled state. The lower bound tracks
-    // the measured settled value (9,451 at the phase 20 re-measure) minus a
-    // small band, so the headroom note above cannot rot silently in either
-    // direction: a measurement drifting more than a couple hundred bytes
-    // reds here and forces the note to be re-read.
+    // The byte bound itself, on the settled state: the two-sided tracking
+    // band around the production-shape measurement (every bed planted
+    // full-width at epoch anchor width beside every masterwrought field and
+    // all four tool-effect slots; the authoritative narrative lives at the
+    // bound's note above). A re-measure obligation, not the structural
+    // ceiling: drift past either edge reds here and forces the note to be
+    // re-read.
+    //
+    // RE-MEASURED at Phase 11e: 16,727 bytes, up from 16,704. The whole delta
+    // is the crop-id column: evergarden_pumpkin is one character wider than
+    // evergarden_greens and the fixture plants it in all 23 beds, so +1 x 23.
+    // The BAND ITSELF DID NOT MOVE, because the widening landed inside it;
+    // recorded here rather than left at the old figure, since a narrative
+    // naming a number the tree no longer holds is what makes a stale bound
+    // look corroborated.
+    //
+    // RE-MEASURED AGAIN at masterwrought Phase 11j: 16,877 bytes, and this
+    // time the BAND MOVED, upper edge 16,864 to 16,888. The delta is EXACTLY
+    // 24 bytes and it was measured rather than inferred: removing
+    // recipe_evergarden_hoe from the corpus and re-running gives 16,853, so
+    // the whole of it is `"recipe_evergarden_hoe",` in the knownRecipes array,
+    // one id plus its quoting and comma. The band had drifted to within 11
+    // bytes of its upper edge across 11f through 11i without anyone re-reading
+    // this note, which is the thing worth recording: a single new recipe id
+    // was enough to cross it, and the failure looks like a growth regression
+    // when it is one row of a content table. The edge moves by the measured
+    // delta and no further. That WIDENS the band (the lower edge is unmoved,
+    // so 320 becomes 344) and deliberately so: what a tracking band preserves
+    // is its HEADROOM above the measurement, 11 bytes before and 11 after, not
+    // its width. Keeping the tripwire hugging the measurement is what stops it
+    // becoming a budget.
+    //
+    // AND AGAIN AT masterwrought Phase 11k: 16,924 bytes, upper edge 16,888 to
+    // 16,935. The delta is +47 and it is measured the same way rather than
+    // inferred: that phase RETIRED one recipe id and minted three, so the
+    // arithmetic is minus `"recipe_deepwater_feast",` (25 bytes) plus
+    // `"recipe_stonepot_feast",` (24), `"recipe_warspice_feast",` (24) and
+    // `"recipe_sageleaf_feast",` (24), which is 72 - 25 = 47 exactly. The
+    // headroom above the measurement is kept at 11 bytes for the third time,
+    // which is the discipline: the edge tracks the measurement, never the other
+    // way round.
+    //
+    // AND AGAIN AT masterwrought Phase 11l: 17,122 bytes, upper edge 16,935 to
+    // 17,133. The delta is +198 and it is the eight trophy consumer recipe ids
+    // in knownRecipes, accounted exactly: the quoted-plus-comma cost of each id
+    // is its length plus 3, and the eight (recipe_valefire_lantern 26,
+    // recipe_oiled_boots 21, recipe_gravewyrm_bone_quiver 31,
+    // recipe_hobnail_boots 23, recipe_vale_carving_knife 28,
+    // recipe_fenshadow_maul 24, recipe_healing_potion 24,
+    // recipe_linen_pouch 21) sum to 198. The phase's review round re-picked
+    // the weaponcrafting rung-50 row from recipe_bristleback_maul (26) to
+    // recipe_fenshadow_maul (24), predicted 17,124 to 17,122 and measured so.
+    // Headroom above the measurement stays 11 bytes, the fourth time running.
+    // Since 11l the FLOOR tracks the measurement too: measurement minus 380,
+    // the headroom the pre-phase band carried below its own measurement
+    // (16,544 under 16,924). The asymmetry IS the discipline: the ceiling
+    // tracks growth tightly (11 bytes, less than one id), while the floor is
+    // a non-vacuity guard held at the pre-phase slack, so it catches a
+    // wholesale shrink (a dropped field, a lost list) rather than one retired
+    // id.
+    //
+    // AND AGAIN AT 11l's second review round: 17,172 bytes, upper edge 17,133
+    // to 17,183, floor 16,742 to 16,792. The delta is +50 and it is the two
+    // leather trophy consumer ids the round adopted, accounted the same way:
+    // recipe_cragmaw_huntcord (23 characters, 26 quoted plus comma) and
+    // recipe_cragprowl_belt (21, 24), predicted 17,122 + 50 = 17,172 and
+    // measured so. Headroom stays 11 above and 380 below, unchanged.
+    //
+    // AND AGAIN AT 11l's third fix round: 17,172 bytes, band unchanged. The
+    // round re-picked the pelt row's id, recipe_cragmaw_huntcord (23
+    // characters, 26 quoted plus comma) out of knownRecipes and
+    // recipe_cragwalker_boots in; the round's brief counted the new id at 22
+    // and predicted 17,171, the measurement said 17,172, and recounting the
+    // id settles it (also 23, 26): the delta is 0. Recorded as the
+    // discipline requires, prediction, observation, and the reconciliation.
+    //
+    // AND AGAIN AT 11l's fourth fix round: 17,171 bytes, upper edge 17,183
+    // to 17,182, floor 16,792 to 16,791. The round re-picked the pelt row's
+    // id once more, recipe_cragwalker_boots (23 characters, 26 quoted plus
+    // comma) out of knownRecipes and recipe_wildgrove_cinch (22, 25) in:
+    // predicted 17,172 - 1 = 17,171 and measured so (a temporary exact pin,
+    // then restored to the band). Headroom stays 11 above and 380 below.
+    //
+    // AND AGAIN AT 11l's fifth fix round: 17,171 bytes, band unchanged. The
+    // round re-picked the weaponcrafting rung-25 row's id,
+    // recipe_vale_carving_knife (25 characters, 28 quoted plus comma) out of
+    // knownRecipes and recipe_mirejaw_fang_knife (also 25, 28) in: predicted
+    // delta 0, 17,171, and measured so (the same temporary exact pin, then
+    // the band restored). The boots' level edit in the same round touches no
+    // persisted byte (recipe.level is content, never state).
+    //
+    // AND AGAIN AT 11l's sixth fix round: 17,143 bytes, upper edge 17,182 to
+    // 17,154, floor 16,791 to 16,763. The round output-excluded the chipped
+    // tusk and DELETED the weaponcrafting rung-25 row outright, so
+    // recipe_mirejaw_fang_knife (25 characters, 28 quoted plus comma) leaves
+    // knownRecipes with nothing in its place: predicted 17,171 - 28 = 17,143
+    // and measured so (the same temporary exact pin, then the band
+    // restored). The first time since the phase began that the measurement
+    // moved DOWN; the band moved with it by the same rule (measurement plus
+    // 11 above, minus 380 below), so the headroom stays 11 and 380.
+    //
+    // AND AGAIN AT the 11l QA: 17,101 bytes, upper edge 17,154 to 17,112,
+    // floor 16,763 to 16,721. The QA excluded the cracked fetish and the
+    // bogiron nugget under the tusk standard, DELETING recipe_valefire_lantern
+    // (23 characters, 26 quoted plus comma) and recipe_hobnail_boots (20, 23)
+    // from knownRecipes, and re-picked the potion row's id from
+    // recipe_healing_potion (21, 24) to recipe_lesser_healing_potion (28, 31):
+    // predicted 17,143 - 26 - 23 + 7 = 17,101 and measured so (the same
+    // temporary exact pin, then the band restored by the same rule).
+    //
+    // AND AGAIN AT masterwrought Phase 11m: 17,120 bytes, upper edge 17,112
+    // to 17,121, floor 16,721 to 16,740. The delta is +19 and it is the
+    // townFocus record, not knownRecipes for once: mapping horn to
+    // curved_tusk and gills to mudfin_scale appends two keys to
+    // HARVEST_COMPONENT_ITEMS and so two rows to the fixture's full-budget
+    // focus allocation, `,"horn":1` (9 bytes) and `,"gills":1` (10 bytes):
+    // predicted 17,101 + 19 = 17,120 and measured so (the same temporary
+    // exact pin, then the band restored). The ten-key townFocus is the same
+    // content-scaled field it always was (one row per mapped family, never
+    // per player action); what moved is the family count.
+    //
+    // THE UPPER EDGE IS NOW MEASUREMENT PLUS ONE, ON PURPOSE. 11l's rule
+    // (measurement plus 11 above) was sized for the knownRecipes growth
+    // class, where one recipe id costs 20-plus bytes and 11 of headroom
+    // catches any single row. It is the wrong window for the townFocus class
+    // this state now moves on: one family row costs 9 or 10 bytes (`,"<tag>":1`
+    // for a four- or five-letter tag), so an edge 11 above the measurement
+    // let an eleventh HARVEST_COMPONENT_ITEMS key land at 17,129 or 17,130 and
+    // pass. The window is exact-plus-one so that a single new family row reds
+    // here, the same day it lands, and the 11m fix round records the plus-11
+    // convention as SUPERSEDED for the townFocus growth class (the minus-380
+    // floor is unchanged; nothing about the downward headroom moved). A red
+    // here after a deliberate family add is the cue to re-measure and re-base
+    // the edge at the new measurement plus one, never to widen it.
+    // Re-based at masterwrought Phase 11o: the two on-ramp recipe ids join
+    // knownRecipes (measured 17171; edge = measurement plus one).
+    //
+    // AND AGAIN AT masterwrought Phase 12 (the Perfecting stage, the
+    // bound-as-policy work): 17,263 bytes, upper edge 17,172 to 17,264, floor
+    // 16,740 to 16,883. The delta is +92 and it is the equipmentInstance
+    // record, not knownRecipes (Perfecting mints no recipe): the two
+    // Masterwrought cap slots now carry the Perfecting worst case, and each
+    // costs exactly 46 bytes on top of its crafted-signed-enchanted row:
+    // `,"perfected":true` (17), `,"boundTo":43` (13; the wearer's own entity
+    // id, two digits in this fixture, the R2 bind stamp) and the R5 bonus
+    // merged into rolled.stats, `,"int":1,"spi":1` (16; the two keys the
+    // {str, agi, sta} record did not already carry, from the live bake over
+    // sunspun_vestments {int 1, spi 1} and voidbound_grimoire {sta 0, int 1,
+    // spi 1}, whose sta 0 changes no byte). Predicted 17,171 + 2 x 46 = 17,263
+    // before the run and measured so (the same temporary exact pin, then the
+    // band restored). The edge stays measurement plus one (the 11m rule) and
+    // the floor measurement minus 380. The 17 KiB structural ceiling HOLDS
+    // with 145 bytes of headroom at this measurement: thinner than any prior
+    // phase's, and the first measurement the professions-CRAFT worst case
+    // has been complete for (F3 above); the next authored growth of any size
+    // is likely to cross it, and per the standing precedent that is a
+    // re-mint at the next round step with its measured value, never a
+    // squeeze.
+    //
+    // AND AGAIN AT masterwrought Phase 13 (the orange promotion): 17,351
+    // bytes, upper edge 17,264 to 17,352, floor 16,883 to 16,971. The delta
+    // is +88, predicted from the merged literals BEFORE the run and measured
+    // EXACTLY (drift zero), in three accounted terms: the deed recipe id in
+    // knownRecipes, `"recipe_deed_of_making",` (21 characters, 24 quoted
+    // plus comma); the promoted cap slot's quality override inside its
+    // rolled record, `,"quality":"legendary"` (22); and the full-width
+    // player name, `,"name":"` plus 32 plus the closing quote (42). Exactly
+    // ONE cap slot carries the promotion (PROMOTED_CAP_SLOT: the legendary
+    // sub-cap is 1, so a second promoted worn copy is not a LEGAL state and
+    // the fixture never writes one). The edge stays measurement plus one
+    // (the 11m rule) and the floor measurement minus 380. The 17 KiB
+    // structural ceiling fell to 57 bytes of headroom at this measurement,
+    // thinner than one recipe id, and re-minted at 18 KiB = 18432 per the
+    // Phase 12 note's own standing precedent (narrative at the bound above).
+    // RE-MEASURED at the merge of release/v0.41.0 (tip e19d832b47): +114,
+    // predicted from the merged literals and measured EXACTLY (drift zero),
+    // in four accounted terms, the release's Bank Storage trainer bag
+    // recipes joining knownRecipes: "recipe_duskweave_bag", (23 characters
+    // quoted plus comma), "recipe_foragers_haversack", (28),
+    // "recipe_resonant_weave_bag", (28), and
+    // "recipe_loombound_reagent_satchel", (35). The edge stays measurement
+    // plus one and the floor measurement minus 380 (the 11m rule).
+    //
+    // AND AGAIN AT Phase 18 (the fixture honesty pass, no content moved):
+    // 17,596 bytes, upper edge 17,466 to 17,597, floor 17,085 to 17,216. The
+    // delta is +131, predicted from the two fixture-width terms BEFORE the
+    // run and measured EXACTLY (drift zero): the R2 bind at production width,
+    // `,"boundTo":2147483647` for `,"boundTo":45` (this fixture player's own
+    // two-digit entity id; +8 per Perfected cap slot, two slots, +16;
+    // PRODUCTION_WIDTH_BOUND_TO above records why), and the survivalRoll
+    // ceiling at its widest legal JSON form, the 24-character DECIMAL
+    // 0.0000012345678901234567 for the 19-character 0.12345678901234566
+    // (+5 across all 23 beds, +115; retiring F4's deliberately-unmeasured
+    // note; the fixture comment records why decimal beats exponential and
+    // that the production mint reaches the width). The audit round corrected
+    // the first cut of this paragraph, which had used the 23-character
+    // exponential form (measured 17,573) and quoted the Phase 12 fixture's
+    // boundTo digits for this fixture's. The edge stays measurement plus one
+    // and the floor measurement minus 380 (the 11m rule); the 18 KiB
+    // structural ceiling holds with 836 bytes of headroom.
     const bytes = professionsBytes(s2);
-    expect(bytes).toBeGreaterThan(9216);
+    expect(bytes).toBeGreaterThan(17216);
+    expect(bytes).toBeLessThan(17597);
+    // Strictly dominated by the band's upper edge while the band holds:
+    // kept as documentation that the structural ceiling also bounds this
+    // state, never the live guard.
     expect(bytes).toBeLessThanOrEqual(PROFESSIONS_BYTE_CEILING);
   });
 
@@ -476,6 +1079,8 @@ describe('the professions blob growth bound (phase 16)', () => {
       'activeTitle',
       'activeBorder',
       'reliquary',
+      'wyrmfallDaily',
+      'emberWeekAnchor',
       'weaponStowed',
       'helmHidden',
     ]) {
@@ -782,5 +1387,454 @@ describe('the professions blob growth bound (phase 16)', () => {
     expect(s2.knownRecipes?.[511]).toBe('recipe_bulk_511');
     expect(s2.knownRecipes).not.toContain('recipe_bulk_512');
     expect(MAX_KNOWN_RECIPE_IDS).toBe(512);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The WHOLE-CHARACTER maximal blob (Masterwrought Phase 18, the U-MEASURE
+// unit). The professions bound above measures one block of the save; the
+// server's size signal (server/character_blob_size.ts, CHARACTER_BLOB_WARN_BYTES)
+// is derived from the whole character, and its derivation had rested on a
+// 38.9 KB figure taken on the v0.36.0 tree plus an ARITHMETIC carry ("roughly
+// 41.4 KB, about 3.2x") that the Phase 11d QA labelled as such and handed
+// forward as bound-policy debt. This block replaces the carry with a
+// measurement through the REAL serializer: the professions ceiling fixture
+// above, every conditional non-professions key armed, and every remaining
+// container at its legal ceiling (content-sized or structurally capped),
+// settled to a fixed point through two real loads exactly like the
+// professions arm.
+//
+// The fixture is the LEGAL worst case, never a tamper shape: every entry
+// count is a live content-table size or a load-side structural cap, each
+// pinned below so a container that quietly shrinks (a dropped field, a load
+// clamp that started truncating) reds by name rather than inside the band.
+//
+// Deliberately UNARMED, recorded rather than modelled (each is class- or
+// host-specific and would make the fixture a different character):
+//   - the persisted pet (hunter beasts and mage elementals persist; this is
+//     the professions fixture's warrior, which has none);
+//   - the loadout gear snapshots (SavedLoadout.gear is opt-in per save);
+//   - the Materials Vault `special` rows (identity-preserving material
+//     stacks share the per-material capacity with `stock`, so they displace
+//     compact rows rather than adding to them);
+//   - the server's post-serialize `jail` stamp (server/game.ts), a few bytes.
+const MAXIMAL_EPOCH_DATE = '2026-01-01';
+const SEVEN_DAYS_MS = 7 * 24 * 3_600_000;
+
+/** Every `markIds` array authored anywhere inside the deed table, flattened. */
+function authoredDeedMarkIds(): string[] {
+  const out = new Set<string>();
+  const walk = (node: unknown): void => {
+    if (Array.isArray(node)) {
+      for (const child of node) walk(child);
+      return;
+    }
+    if (node && typeof node === 'object') {
+      for (const [key, value] of Object.entries(node as Record<string, unknown>)) {
+        if (key === 'markIds' && Array.isArray(value)) {
+          for (const id of value) if (typeof id === 'string') out.add(id);
+        } else walk(value);
+      }
+    }
+  };
+  walk(DEEDS);
+  return [...out];
+}
+
+/** The widest UNRESTRICTED bag in the catalog (a materials-only bag feeds the
+ *  narrower pool). Derived, with the winner pinned by the caller. */
+function widestUnrestrictedBag(): { id: string; slots: number } {
+  let best: { id: string; slots: number } | null = null;
+  for (const def of Object.values(ITEMS)) {
+    if (def.kind !== 'bag' || def.materialsOnly === true) continue;
+    const slots = def.bagSlots ?? 0;
+    if (!best || slots > best.slots) best = { id: def.id, slots };
+  }
+  if (!best) throw new Error('no unrestricted bag in content; re-check the fixture');
+  return best;
+}
+
+function instancedRow(itemId: string, signer: string): InvSlot {
+  return {
+    itemId,
+    count: 1,
+    instance: {
+      enchant: 'enchant_weapon_might',
+      rolled: { stats: { str: 2, agi: 2, sta: 2 } },
+      signer,
+    },
+    craftedRecipeId: 'recipe_eastbrook_arming_sword',
+  };
+}
+
+function maximalCharacterSim(): Sim {
+  const sim = ceilingSim(CEILING_EPOCH_MS);
+  armNonProfessionsFields(sim);
+  const meta = sim.players.get(sim.playerId) as PlayerMeta;
+  const e = sim.entities.get(sim.playerId)!;
+  const longName = 'A'.repeat(MAX_CRAFTED_BY_LENGTH);
+  const instanceItemId = Object.keys(ITEMS)[0];
+
+  // Progression at the cap, every counter wide.
+  sim.setPlayerLevel(MAX_LEVEL);
+  meta.lifetimeXp = 999_999_999;
+  meta.copper = 999_999_999;
+  meta.honor = 999_999;
+  meta.lifetimeHonor = 999_999_999;
+  meta.arenaRating = 3000;
+  meta.arenaWins = 99_999;
+  meta.arenaLosses = 99_999;
+  meta.arena2v2Rating = 3000;
+  meta.arena2v2Wins = 99_999;
+  meta.arena2v2Losses = 99_999;
+  meta.arenaDraws = 9_999;
+  meta.arena2v2Draws = 9_999;
+  meta.bgDraws = 9_999;
+  const classes = Object.keys(CLASSES);
+  const perClass = Object.fromEntries(classes.map((c) => [c, 99]));
+  meta.honorArenaDaily = {
+    date: new Date().toISOString().slice(0, 10),
+    totalWins: 999,
+    winsByOpponent: { ...perClass },
+    lossesByOpponent: { ...perClass },
+    fiestaCompletionsByOpponent: { ...perClass },
+    bgResultsByOpponent: { ...perClass },
+    bgFirstWinClaimed: true,
+  };
+
+  // Quests: every quest completed (membership-only on load, preserved as
+  // history), and every repeatable cadence quest active AGAIN on top (the one
+  // legal way a quest sits in both lists), each row at its full width.
+  for (const id of Object.keys(QUESTS)) meta.questsDone.add(id);
+  for (const q of Object.values(QUESTS)) {
+    if (!q.repeatCadenceTicks) continue;
+    meta.questLog.set(q.id, {
+      questId: q.id,
+      counts: q.objectives.map(() => 0),
+      state: 'active',
+      ...(q.rev === undefined ? {} : { rev: q.rev }),
+    });
+  }
+
+  // Bags: the four sockets carry the widest unrestricted bag and every slot of
+  // the resulting capacity holds a crafted, signed, enchanted, stat-rolled copy
+  // with its recipe marker (the shape the mint sites really write into bags).
+  // 16 slots is the unrestricted ceiling today (the 20- and 24-slot bags are
+  // materials-only satchels feeding the narrower pool; an instanced row is the
+  // wider per-slot payload, so the general bag is the byte-maximal choice).
+  const bag = widestUnrestrictedBag();
+  if (bag.slots !== 16) {
+    throw new Error(`widest unrestricted bag changed (${bag.id} ${bag.slots}); re-measure`);
+  }
+  meta.bags = Array.from({ length: BAG_SOCKETS }, () => bag.id);
+  const carried = bagCapacity(meta.bags);
+  meta.inventory = Array.from({ length: carried }, () => instancedRow(instanceItemId, longName));
+
+  // Bank: the full purchased ladder, the full entitlement bonus, every gold
+  // socket unlocked and filled with the widest bag, every slot instanced, and
+  // the storage-receipt dedupe list at its documented ceiling (one key per
+  // 6-slot rung, each at the key length cap).
+  const bankSlots = BANK_BASE_SLOTS + BANK_PURCHASED_SLOTS_MAX + BANK_MAX_BONUS_SLOTS;
+  const bankRungs = BANK_PURCHASED_SLOTS_MAX / 6;
+  meta.bank = {
+    inventory: Array.from({ length: bankSlots + BANK_BAG_SOCKETS * bag.slots }, () =>
+      instancedRow(instanceItemId, longName),
+    ),
+    purchasedSlots: BANK_PURCHASED_SLOTS_MAX,
+    bonusSlots: BANK_MAX_BONUS_SLOTS,
+    unlockedSockets: BANK_BAG_SOCKETS,
+    socketBags: Array.from({ length: BANK_BAG_SOCKETS }, () => bag.id),
+    appliedStorageKeys: Array.from({ length: bankRungs }, (_, i) =>
+      `${i}`.padEnd(BANK_STORAGE_KEY_MAX_LENGTH, 'k'),
+    ),
+  };
+  // Buyback: the 12-row vendor ring, every row a signed instance.
+  meta.vendorBuyback = Array.from({ length: 12 }, () => instancedRow(instanceItemId, longName));
+  // Materials Vault: the top rung, every material at the per-material ceiling.
+  meta.vault.upgrades = VAULT_UPGRADE_RUNGS;
+  const perMaterial = vaultCapacityPerMaterial(meta.vault);
+  for (const id of vaultMaterialIds()) meta.vault.stock[id] = perMaterial;
+
+  // Every raid and world-boss lockout live (a week out on the fixture clock).
+  for (const id of Object.keys(DUNGEONS)) {
+    meta.raidLockouts.set(id, CEILING_EPOCH_MS + SEVEN_DAYS_MS);
+  }
+  for (const boss of WORLD_BOSSES) {
+    meta.raidLockouts.set(worldBossLockoutId(boss.templateId), CEILING_EPOCH_MS + SEVEN_DAYS_MS);
+  }
+
+  // The Book of Deeds complete: every deed earned, every counter wide, every
+  // item ever discovered (ITEMS is a closed table, so this is the bound), every
+  // authored visit mark, every dungeon cleared on both difficulties.
+  for (const id of Object.keys(DEEDS)) meta.deedsEarned.set(id, '2026-08-08');
+  for (const k of DEED_STAT_KEYS) meta.deedStats.counters[k] = 999_999;
+  for (const id of Object.keys(ITEMS)) meta.deedStats.itemsDiscovered.add(id);
+  for (const mark of authoredDeedMarkIds()) {
+    const ns = mark.slice(0, mark.indexOf(':'));
+    if ((VISITED_MARK_NAMESPACES as readonly string[]).includes(ns))
+      meta.deedStats.visited.add(mark);
+  }
+  for (const id of Object.keys(DUNGEONS)) {
+    meta.deedStats.dungeonClears[id] = 999;
+    meta.deedStats.dungeonClears[`${id}:heroic`] = 999;
+  }
+  // The Reliquary complete: every catalogued relic first-found with a clear
+  // count and an obtain tally, every authored mark, the recent ring full, every
+  // page illuminated.
+  const relicIds = [...RELIQUARY_ITEM_TO_PAGES.keys()];
+  for (const id of relicIds) {
+    meta.reliquary.firstFind[id] = { clears: 999 };
+    meta.reliquary.counts[id] = 999_999;
+  }
+  for (const mark of RELIQUARY_MARK_IDS) meta.reliquary.marks.add(mark);
+  meta.reliquary.recent = relicIds.slice(0, 12);
+  for (const page of RELIQUARY_PAGES) meta.reliquary.illuminatedPages.add(page.id);
+
+  // Delves: every delve cleared and first-cleared today, every companion at a
+  // wide rank, every lore entry unlocked (the order list is module-private in
+  // delves/runs.ts, so its five ids are scraped from the source like the
+  // roundtrip field list above), and the heroic daily marked for every dungeon.
+  meta.delveMarks = 999_999;
+  for (const d of Object.values(DELVES)) {
+    meta.delveClears[d.id] = 999;
+    if (d.autoCompanionId) meta.companionUpgrades[d.autoCompanionId] = 9;
+    meta.delveDaily.firstClearXp.add(d.id);
+  }
+  meta.delveDaily.date = MAXIMAL_EPOCH_DATE;
+  meta.delveDaily.markClears = 999;
+  const runsSrc = stripComments(
+    readFileSync(new URL('../src/sim/delves/runs.ts', import.meta.url), 'utf8'),
+  );
+  const loreAnchor = runsSrc.indexOf('const DELVE_LORE_ORDER = [');
+  if (loreAnchor < 0) throw new Error('DELVE_LORE_ORDER moved; re-check the fixture');
+  const loreBlock = runsSrc.slice(loreAnchor, runsSrc.indexOf('] as const', loreAnchor));
+  for (const m of loreBlock.matchAll(/'([a-z_]+)'/g)) meta.delveLoreUnlocked.add(m[1]);
+  meta.heroicDaily.date = MAXIMAL_EPOCH_DATE;
+  for (const id of Object.keys(DUNGEONS)) meta.heroicDaily.marked.add(id);
+
+  // Talents: a full allocation, and the loadout list at its cap, each loadout
+  // a full allocation with every bar slot filled.
+  meta.talents = defaultBuild(meta.cls, MAX_LEVEL);
+  const firstAbility = meta.known[0]?.def.id;
+  if (!firstAbility) throw new Error('the capped warrior knows no ability; re-check');
+  meta.loadouts = Array.from({ length: MAX_LOADOUTS }, (_, i) => ({
+    name: `Loadout ${i}`.padEnd(24, 'x'),
+    alloc: defaultBuild(meta.cls, MAX_LEVEL),
+    bar: Array.from({ length: SAVED_LOADOUT_BAR_SLOTS }, () => firstAbility),
+  }));
+  meta.activeLoadout = 0;
+  // Every known ability with a cooldown mid-cooldown, plus the potion timer.
+  for (const known of meta.known) {
+    if (known.cooldown > 0) e.cooldowns.set(known.def.id, 30);
+  }
+  e.potionCooldownUntil = sim.time + 60;
+  return sim;
+}
+
+describe('the whole-character maximal blob (Phase 18 U-MEASURE)', () => {
+  it('settles to a fixed point with every container at its legal ceiling, inside the band', () => {
+    const sim = maximalCharacterSim();
+    const s1 = sim.serializeCharacter(sim.playerId) as CharacterState;
+    const second = makeSim(52, CEILING_EPOCH_MS);
+    const pid2 = second.addPlayer('warrior', 'Maximal', { state: s1 });
+    const s2 = second.serializeCharacter(pid2) as CharacterState;
+    const third = makeSim(53, CEILING_EPOCH_MS);
+    const pid3 = third.addPlayer('warrior', 'MaximalB', { state: s2 });
+    const s3 = third.serializeCharacter(pid3) as CharacterState;
+    expect(s3).toEqual(s2);
+    expect(Object.keys(s3).sort()).toEqual(Object.keys(s2).sort());
+
+    // The professions block rides inside at its own ceiling: the same band the
+    // professions arm pins, so the two measurements can never describe
+    // different fixtures.
+    const professions = professionsBytes(s2);
+    expect(professions).toBeGreaterThan(17216);
+    expect(professions).toBeLessThan(17597);
+
+    // Every container really reached its ceiling through the load (the
+    // `field in state` and non-empty pins above are the pattern): a load clamp
+    // that started truncating, or a field the serializer dropped, reds here
+    // by name rather than as a band miss.
+    expect(s2.level).toBe(MAX_LEVEL);
+    expect(s2.questsDone).toHaveLength(Object.keys(QUESTS).length);
+    const cadenceCount = Object.values(QUESTS).filter((q) => q.repeatCadenceTicks).length;
+    expect(s2.questLog).toHaveLength(cadenceCount);
+    expect(cadenceCount).toBeGreaterThanOrEqual(7);
+    expect(s2.bags?.every((id) => id && ITEMS[id]?.bagSlots === 16)).toBe(true);
+    expect(s2.bags).toHaveLength(4);
+    expect(BACKPACK_SLOTS).toBe(16);
+    expect(s2.inventory).toHaveLength(16 + 4 * 16);
+    // Derived from the load-side name rule so a widened crafter alphabet moves
+    // the fixture instead of freezing an understatement, with the literal
+    // pinned beside it so the derivation cannot self-vacuate (the 11d F1
+    // idiom). The signer answers to isLegalCrafterName, NOT to the generic
+    // payload string ceiling, so 16 is the widest signer any legal mint can
+    // stamp, not a fixture choice.
+    expect(MAX_CRAFTED_BY_LENGTH).toBe(16);
+    expect(
+      s2.inventory?.every((row) => row.instance?.signer?.length === MAX_CRAFTED_BY_LENGTH),
+    ).toBe(true);
+    expect(s2.bank?.inventory).toHaveLength(24 + 72 + 16 + 4 * 16);
+    expect(s2.bank?.purchasedSlots).toBe(72);
+    expect(s2.bank?.bonusSlots).toBe(16);
+    expect(s2.bank?.unlockedSockets).toBe(4);
+    expect(s2.bank?.appliedStorageKeys).toHaveLength(12);
+    expect(s2.bank?.appliedStorageKeys?.every((k) => k.length === 200)).toBe(true);
+    expect(s2.vendorBuyback).toHaveLength(12);
+    expect(Object.keys(s2.vault?.stock ?? {})).toHaveLength(vaultMaterialIds().size);
+    expect(vaultMaterialIds().size).toBeGreaterThan(100);
+    expect(s2.vault?.upgrades).toBe(VAULT_UPGRADE_RUNGS);
+    expect(Object.keys(s2.raidLockouts ?? {})).toHaveLength(
+      Object.keys(DUNGEONS).length + WORLD_BOSSES.length,
+    );
+    expect(Object.keys(s2.deeds ?? {})).toHaveLength(Object.keys(DEEDS).length);
+    expect(s2.deedStats?.itemsDiscovered).toHaveLength(Object.keys(ITEMS).length);
+    expect(Object.keys(ITEMS).length).toBeGreaterThan(900);
+    expect(s2.deedStats?.visited?.length ?? 0).toBeGreaterThan(20);
+    expect(Object.keys(s2.deedStats?.dungeonClears ?? {})).toHaveLength(
+      2 * Object.keys(DUNGEONS).length,
+    );
+    expect(Object.keys(s2.reliquary?.firstFind ?? {})).toHaveLength(RELIQUARY_ITEM_TO_PAGES.size);
+    expect(s2.reliquary?.marks).toHaveLength(RELIQUARY_MARK_IDS.size);
+    expect(s2.reliquary?.recent).toHaveLength(12);
+    expect(s2.reliquary?.illuminatedPages).toHaveLength(RELIQUARY_PAGES.length);
+    expect(Object.keys(s2.delveClears ?? {})).toHaveLength(Object.keys(DELVES).length);
+    expect(s2.delveLoreUnlocked).toHaveLength(5);
+    expect(s2.heroicDaily?.marked).toHaveLength(Object.keys(DUNGEONS).length);
+    expect(s2.loadouts).toHaveLength(MAX_LOADOUTS);
+    expect(s2.loadouts?.every((l) => l.bar.length === SAVED_LOADOUT_BAR_SLOTS)).toBe(true);
+    expect(Object.keys(s2.cooldowns?.abilities ?? {}).length).toBeGreaterThan(5);
+    expect(Object.keys(s2.honorArenaDaily?.winsByOpponent ?? {})).toHaveLength(
+      Object.keys(CLASSES).length,
+    );
+
+    // THE MEASUREMENT, in the save path's own unit (UTF-8 bytes, what
+    // characterUpdateStatement measures). Band discipline as the professions
+    // arm: the upper edge is measurement plus one and the floor measurement
+    // minus 380, so any growth reds the day it lands and a wholesale shrink
+    // cannot hide.
+    //
+    // MEASURED at Phase 18 (U-MEASURE): 151,495 bytes against the committed tip
+    // 021d6c32ad, taken in a throwaway worktree at that SHA because the branch's
+    // working tree was carrying other Phase 18 units' in-flight content at the
+    // time and a band anchored on a moving tree is anchored on nothing.
+    //
+    // RE-BASED, same phase, to 151,525 bytes, band 151,145..151,526. The delta
+    // is +30 and it is MEASURED, not inferred: the per-key split before and
+    // after moves in exactly one key, `reliquary` 16,907 to 16,937, and no
+    // other key moves at all. The whole of it is ONE new mark id joining
+    // reliquary.marks, `gather_event:golden_harvest` (27 characters, 30 bytes
+    // as `"<id>",` in the sorted array), which the phase's farm-bed rare-event
+    // unit added to RELIQUARY_MARK_IDS (31 members to 32). Predicted from that
+    // id's own literal BEFORE the confirming run and measured EXACTLY, drift
+    // zero. The professions block did not move (17,596 both sides).
+    // Two corrections to the first cut of this paragraph, both of which a
+    // measurement settles and a guess would not: the zone and temple content
+    // edits in flight beside it move NOTHING here (they re-tune existing rows
+    // rather than add ids), and the item and deed tables did not grow either
+    // (profession_items.ts added a noDiscard flag to an existing item and
+    // deeds.ts only comments), so `deedStats.itemsDiscovered`, `deeds` and
+    // `questsDone` are byte-identical across the re-base. "Some content rows
+    // landed" is the shape of claim this file exists to refuse: the honest
+    // statement names the ONE row and its byte count.
+    //
+    // THE PHASE-CLOSE OBLIGATION, and it is not discharged by this re-base.
+    // This band is measured against a tree whose content is STILL MOVING, so
+    // every figure here is provisional until the phase's last content unit
+    // lands. A red here mid-phase is not a regression and is never widened
+    // away: re-measure, attribute the delta to the rows that caused it the way
+    // the +30 is attributed above, and re-base at measurement minus 380 and
+    // plus one. The band is then re-measured ONCE MORE AT THE PHASE CLOSE,
+    // after the last content unit, and THAT measurement is the one the QA twin
+    // freezes. Carrying this instruction forward is the point: a successor who
+    // finds this arm red and only moves the numbers has done half the work.
+    //
+    // TWO predictions were on record and they disagreed, so both are stated.
+    // The STANDING carry was the Phase 11d arithmetic one, "roughly 41.4 KB"
+    // (38.9 KB taken on the v0.36.0 tree, plus the professions block's growth
+    // since), and it is labelled an arithmetic carry in its own source. The
+    // honest statement of it is that it was never a measurement of THIS
+    // fixture: the 38.9 KB recipe armed level, quests, recipes, nodes, beds,
+    // skills and 140 instanced container slots, and nothing else. It predates
+    // the Book of Deeds (deedStats alone measured 30,145 in that baseline, the
+    // largest single term), the Reliquary, the Materials Vault, the raid
+    // lockouts, the loadout list and the bank purchase ladder, and it counted
+    // 140 instanced slots where the legal ceiling is now 268 (80 carried, 176
+    // bank, 12 buyback). The measurement is 3.66x that carry, and the carry is
+    // superseded, not adjusted.
+    //
+    // The SECOND prediction was derived for this run and written before it:
+    // every large container built straight from the live content tables and
+    // stringified, with no serializer in the loop, summing to 136,196; plus
+    // the professions block's own measured 17,596 (17,595 in-blob: the
+    // subset's two braces go, one separating comma arrives); plus a 2,414
+    // allowance for the scalars and small records, itself the measured
+    // non-professions remainder of the professions ceiling fixture at the
+    // Phase 11d merged tree. PREDICTED 156,205, measured 151,495, drift
+    // -4,710, and every term of it is accounted:
+    //   -2,144  the crafter signature at its real width. The prediction
+    //           stamped 24 characters; the widest signer a legal mint can
+    //           stamp is MAX_CRAFTED_BY_LENGTH = 16, because the load answers
+    //           it to isLegalCrafterName (item_instance_load.ts) rather than
+    //           to the generic payload string ceiling. 8 bytes x 268 rows.
+    //   -3,917  the Reliquary tally is NOT a second top-level record. The
+    //           fixture writes reliquary.counts as its own map; the serializer
+    //           folds each tally into that relic's firstFind entry as a
+    //           `count` field (serializeReliquaryState), so the 285 relic ids
+    //           are paid for once, not twice.
+    //   -1,040  the loadout allocation and bar at their real widths (the
+    //           allocation is a spec plus six talent rows, and a bar entry is
+    //           an ability id like `heroic_strike`, shorter than the
+    //           prediction's guess).
+    //     -116  one digit per vault stock row, 116 materials.
+    //      +12  the widest unrestricted bag id is one character wider than the
+    //           prediction assumed, across `bags` and `bank.socketBags`.
+    //   +2,863  deedStats.visited, which the prediction left empty and the
+    //           fixture arms from the authored deed marks.
+    //     -365  the scalar allowance, which really measures 2,049 here.
+    // The three terms the prediction got EXACTLY right are the ones that are
+    // pure content-table arithmetic with no shape question in them: `deeds`
+    // (10,369), `questsDone` (4,620) and `raidLockouts` (541).
+    const bytes = Buffer.byteLength(JSON.stringify(s2), 'utf8');
+    const reMint =
+      'the whole-character band is a RE-MEASURE obligation, not a budget: ' +
+      'record the measured value in the ledger above with what moved it, then re-base ' +
+      'the floor at measurement minus 380 and the edge at measurement plus one. ' +
+      'Never widen the edge to absorb a difference. THE PHASE IS STILL LANDING ' +
+      'CONTENT: this band is measured against a moving tree, so a red here mid-phase ' +
+      'means re-measure and re-base, and the band is re-measured ONCE MORE at the ' +
+      'phase close after the LAST content unit lands. The close measurement is the ' +
+      'one the QA twin freezes.';
+    // RE-BASED at the Phase 18 QA close, the measurement the twin froze:
+    // 151,584 bytes, up 59 from the 151,525 the sweep measured. The mover was
+    // the tenth release sync (release/v0.42.0), whose content the fixture
+    // walked; no packet unit added a field to the blob in the QA round, and the
+    // shape remained unchanged (the same containers at the same ceilings,
+    // still a fixed point).
+    //
+    // RE-BASED again after the two v0.42.0 mount integrations: 151,656 bytes,
+    // exactly +72. The one moving top-level key is deedStats: its closed-world
+    // itemsDiscovered set gained `reins_mech_bird` (18 serialized bytes),
+    // `reins_lanternback_troll` (26), and `reins_chimeglass_tortoise` (28).
+    // Those three `"<id>",` terms sum to the measured delta; no persisted shape
+    // or legal ceiling moved. Re-measured and re-based per the rule above,
+    // never widened: the floor is measurement minus 380 and the edge is
+    // measurement plus one, so the band remains exactly 381 bytes wide.
+    expect(bytes, reMint).toBeGreaterThan(151275);
+    expect(bytes, reMint).toBeLessThan(151657);
+
+    // WHAT THE MEASUREMENT SAYS ABOUT THE WARN THRESHOLD, now that D122 has
+    // ruled. The OLD 131,072 sat BELOW the measured legal worst case (about
+    // 0.87x), so a maxed character printed the oversized-save line on every
+    // autosave. qr-19-character-blob-warn-threshold (Phase 19) re-minted
+    // CHARACTER_BLOB_WARN_BYTES to 163,840 (160 KiB), the smallest 32-KiB step
+    // above the measured worst case, so the threshold now sits ABOVE it and a
+    // legal maximal character no longer trips it (measured worst case 151,656 <
+    // 163,840 warn). This arm pins that relation and reds BY DESIGN on any future
+    // re-mint that drops the threshold back under the worst case, which is the
+    // contract: the threshold and this measurement are re-read together
+    // (server/character_blob_size.ts). It also reds if content growth ever pushes
+    // the measured worst case above the warn, which is the fleet-creep signal.
+    expect(bytes).toBeLessThan(CHARACTER_BLOB_WARN_BYTES);
   });
 });

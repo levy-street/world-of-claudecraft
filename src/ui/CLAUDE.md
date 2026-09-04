@@ -296,7 +296,13 @@ follow the root `extract-and-test` skill for the move-not-rewrite mechanics. The
   helper is invisible unless the helper is named as a proxy token (`getUiScale` and
   `getComputedStyle` are; a new one would have to be added), and a BARE-named per-frame module
   (`dungeon_finder_proposal_popup.ts`) still escapes it entirely, held only
-  by the module sweep in `tests/architecture.test.ts`.
+  by the module sweep in `tests/architecture.test.ts`. A bare name is the WHOLE of that
+  escape, which is why a modal painter takes an adapter name too: the two bare-named modal
+  modules the Masterwrought phase 14 shipped (`input_dialog.ts`, `legendary_naming_dialog.ts`)
+  sat outside the sweep until 2026-08-31, when they were renamed `input_controller.ts` and
+  `hud/professions/legendary_naming_controller.ts` and joined the cold contract at zero
+  allowances (keeping their `UI_DOM_MODULES` rows, the deliberate double coverage). Name a new
+  dialog `*_controller.ts` from the start.
 - **Neither of the two?** A **painter-side helper**, and it is a LAST RESORT: if the DOM touch can
   live in the painter, it must. A helper is for logic a painter needs that cannot be a pure core
   (it has to touch the DOM) and is not itself a painter. Register it in `UI_PAINTER_HELPERS`
@@ -443,6 +449,9 @@ per-surface behavior lives in `tests/language_fanout_relocalize.test.ts`.
    a matcher RULE in the table matching the emit's ORIGIN (`sim_i18n.ts` for a `src/sim/` emit,
    `server_i18n.ts` for a `server/` emit) in the SAME change. The S3 guard
    (`tests/localization_fixes.test.ts`) fails if a new emit is recognized by neither.
+   Add the English to `baseEnTable` ONLY and never copy it into a locale block of
+   `sim_i18n.ts`: the status registry reads each locale's own blocks, so a copied English
+   row reads `translated` and ships English (`docs/i18n-scaling/translation-workflow.md`).
 3. Run `npm run i18n:scan` / `i18n:build` and commit the regenerated files. The PR is green
    at the PR-tier gate; the release-tier gate (`I18N_RELEASE_TIER=1`) hard-fails on any
    `pending` row.

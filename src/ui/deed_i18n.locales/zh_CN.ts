@@ -128,7 +128,7 @@ export const table: DeedLocaleTable = {
     desc: '在Nightbloom采集一处矿脉、一片木料和一块草药地。',
   },
   chr_nightbloom_first_cast: {
-    name: '月井涟漪',
+    name: '月泉涟漪',
     desc: '在Nightbloom水域钓上一条鱼。',
   },
   chr_wraithwood_gatherer: {
@@ -186,7 +186,6 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: '草甸之主', desc: '草药学熟练度达到100点。' },
   prog_master_gatherer: {
     name: '采集大师',
-    desc: '在采矿、伐木、草药学、钓鱼中，任意三门的熟练度达到100点。',
   },
   prog_first_craft: { name: '亲手所制', desc: '完成你的第一次成功制造。' },
   prog_craft_specialist: {
@@ -300,7 +299,7 @@ export const table: DeedLocaleTable = {
   dlv_rite_flawless: { name: '一字不差', desc: '完成溺亡圣物库仪式，全程没有一处失误。' },
   dlv_varric_ringers: {
     name: '钟声止息',
-    desc: '击败执事瓦里克时，他唤起的每一个丧葬鸣钟者都已先行伏诛。',
+    desc: '击败执事万德里克时，他唤起的每一个丧葬鸣钟者都已先行伏诛。',
   },
   dlv_nhalia_bells: {
     name: '止钟人',
@@ -364,7 +363,7 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: '荆峰编年史·全卷',
-    desc: '见证高山故事的始末：击溃龙教，肃清墓龙圣所，扳倒觉醒之峰，将峭壁间每一个恶名之敌尽数讨灭。',
+    desc: '见证高山故事的始末：击溃龙誓，肃清墓龙圣所，扳倒觉醒之峰，将峭壁间每一个恶名之敌尽数讨灭。',
     title: '荆峰之子',
   },
   chr_peaks_sparring: { name: '城墙操练', desc: '对高望上方的训练假人造成总计 1,000 点伤害。' },
@@ -405,7 +404,7 @@ export const table: DeedLocaleTable = {
   },
   col_true_colors: { name: '真我本色', desc: '穿着你职业默认之外的任意外观登场。' },
   col_all_slots: { name: '十一分讲究', desc: '让全部十一个装备栏位同时都有装备。' },
-  col_quartermaster_buyout: { name: '老主顾', desc: '发现军需官维克斯所售的全部十件货品。' },
+  col_quartermaster_buyout: { name: '老主顾', desc: '发现军需官维克斯所售的全部十件装备。' },
   col_glimmerfin: {
     name: '一线微光',
     desc: '钓起一条日辉锦鲤。',
@@ -712,6 +711,32 @@ export const table: DeedLocaleTable = {
   prog_armorcrafting_rare: {
     name: '锻造至完美',
     desc: '在护甲锻造中制作你的第一件稀有品质物品。',
+  },
+  prog_jewelcrafting_rare: {
+    name: '打磨至璀璨',
+    desc: '在珠宝加工中制作你的第一件稀有品质物品。',
+  },
+  prog_jewelcrafting_50: {
+    name: '琢面与花丝',
+    desc: '珠宝加工技能达到50点。',
+  },
+  prog_grandmaster_jewelcrafting: {
+    name: '珠宝加工宗师',
+    desc: '珠宝加工技能达到125点，登顶此门技艺的至高境界。',
+    title: '珠宝加工宗师',
+  },
+  prog_inscription_rare: {
+    name: '笔精墨妙',
+    desc: '在铭文中制作你的第一件稀有品质物品。',
+  },
+  prog_inscription_50: {
+    name: '羽笔与颜料',
+    desc: '铭文技能达到50点。',
+  },
+  prog_grandmaster_inscription: {
+    name: '铭文宗师',
+    desc: '铭文技能达到125点，登顶此门技艺的至高境界。',
+    title: '铭文宗师',
   },
   prog_ready_for_an_adventure: {
     name: '整装待发',

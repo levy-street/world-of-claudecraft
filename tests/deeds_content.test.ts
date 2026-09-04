@@ -8,9 +8,20 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { POWERUPS } from '../src/sim/content/augments';
 import { DEED_ORDER, DEEDS, DEEDS_ERA } from '../src/sim/content/deeds';
+import { drownedLitanyChestItemsForTier } from '../src/sim/content/delves/drowned_litany_loot';
+import { delveChestItemsForTier } from '../src/sim/content/delves/lockpick_tiers';
 import { DELVE_MOBS } from '../src/sim/content/delves/mobs';
+import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
 import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
-import { FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
+import { FARM_CROP_IDS, FARM_CROPS } from '../src/sim/content/farm_crops';
+import { FARM_PATCHES } from '../src/sim/content/farm_patches';
+import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
+import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
+import {
+  FISHING_RARE_ID,
+  FISHING_TABLES_BY_BAND,
+  RAW_COOKING_CATCH_IDS,
+} from '../src/sim/content/items';
 import { MAGE_PET_MOBS } from '../src/sim/content/mage_pets';
 import { NECROMANCY_MOBS } from '../src/sim/content/necromancy';
 import {
@@ -19,6 +30,12 @@ import {
   GATHERING_PROFESSIONS,
 } from '../src/sim/content/professions';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
+import {
+  RIFT_EPIC_ITEM_IDS,
+  RIFT_GEAR_ITEM_IDS,
+  RIFT_LEGENDARY_ITEM_IDS,
+  RIFT_RARE_ITEM_IDS,
+} from '../src/sim/content/rift/items';
 import { RIFT_MOBS } from '../src/sim/content/rift/mobs';
 import { WARLOCK_PET_MOBS } from '../src/sim/content/warlock_pets';
 import { YUMI_TEMPLATE_ID } from '../src/sim/content/yumi';
@@ -34,17 +51,29 @@ import {
   ZONES,
 } from '../src/sim/data';
 import {
+  FARM_CHRONICLE_ZONES,
   GROUND_PICKUP_PROVING_QUESTS,
   MAX_CREDITABLE_MOB_LEVEL,
   MILESTONE_DEED_TO_LEGACY,
   onFishCaughtForDeeds,
   RARE_SLAIN_TEMPLATES,
+  restoreDeedStats,
+  serializeDeedStats,
   VISITED_MARK_NAMESPACES,
   ZONE_FISH,
 } from '../src/sim/deeds';
+import type { LootTier } from '../src/sim/lockpick';
+import { MARKET_HOUSE_STOCK } from '../src/sim/market';
+import {
+  craftSkillGainMultiplier,
+  enchantingGainMultiplier,
+} from '../src/sim/professions/archetype';
+import { farmingTeachingCeilingFor } from '../src/sim/professions/farming';
+import { APEX_FEAST_CRAFT_MARK, isApexFeastRecipe } from '../src/sim/professions/feast';
 import { RIFT_LEVEL_CAP, RIFT_MAX_MOB_LEVEL } from '../src/sim/rift/rift_gen';
+import type { Rng } from '../src/sim/rng';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
-import { DEED_STAT_KEYS, type DeedCategory, MILESTONES } from '../src/sim/types';
+import { ALL_CLASSES, DEED_STAT_KEYS, type DeedCategory, MILESTONES } from '../src/sim/types';
 
 const ALL = DEED_ORDER.map((id) => DEEDS[id]);
 
@@ -63,33 +92,92 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 281 deeds worth 3340 total Renown', () => {
+  it('ships exactly 298 deeds worth 3525 total Renown', () => {
     // Release base (262 / 3145 after the WARFARE lifetime-honor ladder) plus
     // four Reliquary Curator rank bridges and the five Phase 18 completion
     // ladder deeds (all nine renown 0: catalog prestige never scores the
-    // board), the walk-in castle visit pair (exp_the_last_keep,
-    // exp_dawnhold_castle, renown 5 each), the Proving Shore graduation
-    // deed (prog_ready_for_an_adventure, renown 5), and the five Crucible
-    // raid deeds (four clears at 25 plus the flawless 50: +150).
-    expect(DEED_ORDER.length).toBe(281);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3340);
+    // board), plus the release's walk-in castle visit pair (exp_the_last_keep,
+    // exp_dawnhold_castle, renown 5 each), plus prog_jewelcrafting_rare
+    // (renown 10, the Masterwrought phase 05 jewelcrafting base catalog), plus
+    // the phase 05 QA ruling pair prog_jewelcrafting_50 (renown 5) and
+    // prog_grandmaster_jewelcrafting (renown 25) joining their cross-craft
+    // families, plus the phase 06 inscription base catalog's three
+    // (prog_inscription_rare 10, prog_inscription_50 5,
+    // prog_grandmaster_inscription 25), plus the seven farming celebration
+    // deeds of the absorbed packet (D13: prog_first_planting and the four
+    // first-harvest chronicles at renown 5, col_golden_harvest at 0 per the
+    // luck rule, prog_farming_100 at the profession-100 family value of 10,
+    // so +35 Renown in all), plus Phase 11e's roster deed col_farm_roster
+    // (renown 5, the gathering ladder's first-rung point), which took this to
+    // 288 / 3285, plus Phase 11k's cross-packet deed prog_field_to_feast
+    // (renown 5, no title), which takes it to 289 / 3290.
+    //
+    // PREDICTED THEN OBSERVED, which is the method that tells an append from a
+    // lost row: the preceding phase's ledger recorded 288 / 3285, this phase
+    // adds exactly one deed at exactly renown 5, so 289 / 3290 was written
+    // BEFORE the run and matched it.
+    //
+    // Then the release/v0.41.0 merge. The release's own chain reads 274 / 3160
+    // (its 262 / 3145 base plus the nine zero-Renown Reliquary rows, the
+    // walk-in castle visit pair, and the Proving Shore graduation deed
+    // prog_ready_for_an_adventure at renown 5). The merge adds exactly that
+    // one deed at exactly renown 5 to this branch's 289 / 3290, so
+    // 290 / 3295 was written BEFORE the merged tree was measured and matched
+    // it; both parents' frozen catalog hashes reproduce from the merged
+    // table (see FROZEN_CATALOG_SHA256 below), which is the proof of a pure
+    // append on both sides.
+    //
+    // Then masterwrought Phase 13 appends the promotion capstone
+    // prog_legendmaker at exactly renown 50 (the deliberate-prestige band;
+    // effort-gated, never luck-gated, so positive Renown is legitimate under
+    // rule 2): 290 / 3295 plus one deed at 50 gives 291 / 3345, written
+    // BEFORE the run from the merged literals and matched by it.
+    //
+    // Then the release/v0.41.0 merge (2026-08-29) appends the bank socket
+    // pair (soc_strongbox_outfitter 5 and soc_four_bags_deep 25, Bank Storage
+    // phase 06) and removes none: 291 / 3345 plus two deeds at 30 gives
+    // 293 / 3375, recomputed against the merged catalog rather than either
+    // parent's prose.
+    //
+    // Then the 2026-08-30 release/v0.41.0 sync merge appends the five
+    // Crucible raid deeds (four clears at 25 plus the flawless 50: +150; the
+    // release's own chain reads 281 / 3340, its 276 / 3190 base plus exactly
+    // these five) and removes none: 293 / 3375 plus five deeds at 150 gives
+    // 298 / 3525, written BEFORE the merged tree was measured and matched by
+    // it.
+    //
+    // The NAME carries the numbers too, deliberately: vitest prints it in the
+    // failure header, and a stale name there is the one part of this pin a
+    // reader can act on without seeing the diff. It went stale once already.
+    expect(DEED_ORDER.length).toBe(298);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3525);
   });
 
   it('ships the audited per-category counts', () => {
     const byCategory: Record<string, number> = {};
     for (const d of ALL) byCategory[d.category] = (byCategory[d.category] ?? 0) + 1;
     expect(byCategory).toEqual({
-      // +1 the Proving Shore graduation (prog_ready_for_an_adventure).
-      progression: 58,
+      // +1 jewelcrafting rare-tier milestone (Masterwrought phase 05), then
+      // +2 for the phase 05 QA ruling pair (the 50-skill and Grandmaster
+      // jewelcrafting milestones joining their cross-craft families), then
+      // +3 for the phase 06 inscription trio (rare-tier, 50-skill, and
+      // Grandmaster) landing the same three families at the table tail, then
+      // +2 farming celebrations (prog_first_planting, prog_farming_100), then
+      // +1 Phase 11k's cross-packet prog_field_to_feast, then
+      // +1 the Proving Shore graduation (prog_ready_for_an_adventure) at the
+      // release/v0.41.0 merge (the release's own chain read 58), then
+      // +1 the Phase 13 promotion capstone prog_legendmaker.
+      progression: 68,
       combat: 10,
       // +2 Rift coverage deeds (dgn_rift, dgn_rift_s_rank), +5 Crucible raid
       // deeds (per-boss clear pairs plus the Varkhul flawless task).
       dungeon: 36,
       delve: 13,
-      chronicle: 49,
+      // +4 farming first-harvest chronicles (chr_*_first_harvest).
+      chronicle: 53,
       // +4 Reliquary Curator rank bridges and +5 Phase 18 completion ladder
-      // deeds on top of the release collection set.
-      collection: 37,
+      // deeds on top of the release collection set, +1 col_golden_harvest.
+      collection: 40,
       // Release's Thornhollow battlegrounds plus the WARFARE honor ladder.
       pvp: 35,
       // +2 bank socket ladder deeds (soc_strongbox_outfitter,
@@ -221,19 +309,64 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'col_reliquary_illum_nythraxis_heroic',
       'col_reliquary_illum_thunzharr',
       'col_reliquary_illum_gravewyrm_heroic',
-      // The walk-in castle visit pair: the Last Keep's deed retro-fixes its
-      // shipped-without-deeds gap, Dawnhold's lands with its castle (both
-      // keyed on the enterDungeon markVisited emit).
+      // The release's walk-in castle visit pair sits ahead of the branch's
+      // craft milestones so the eventual release merge stays a pure tail
+      // append: the Last Keep's deed retro-fixes its shipped-without-deeds
+      // gap, Dawnhold's lands with its castle (both keyed on the enterDungeon
+      // markVisited emit). The release's own list reads the same pair here.
       'exp_the_last_keep',
       'exp_dawnhold_castle',
+      // Jewelcrafting joins the per-craft rare-tier family with the
+      // Masterwrought phase 05 base catalog (appended at the tail:
+      // DEED_ORDER is append-only, so it cannot sit beside its siblings),
+      // then the phase 05 QA ruling appends its 50-skill and Grandmaster
+      // milestones behind it.
+      'prog_jewelcrafting_rare',
+      'prog_jewelcrafting_50',
+      'prog_grandmaster_jewelcrafting',
+      // Inscription joins all three families with the Masterwrought phase 06
+      // base catalog, the jewelcrafting shape exactly.
+      'prog_inscription_rare',
+      'prog_inscription_50',
+      'prog_grandmaster_inscription',
+      // The farming celebration deeds (D13): the first-planting proof, the
+      // masterwrought Phase 11i's one deed, ahead of the farming block because
+      // that block stays last and contiguous under the packet's three-tier
+      // ordering. The angler's endgame ships exactly ONE row, deliberately: the
+      // per-profession gathering ladder is complete at 5 / 10 / 25 and no
+      // profession has a rung at 50 or 150.
+      'col_deepest_cast',
+      // four per-hub first-harvest chronicles, the golden-harvest rare find,
+      // and the Farming 100 milestone with the Harvestmaster title.
+      'prog_first_planting',
+      'chr_vale_first_harvest',
+      'chr_marsh_first_harvest',
+      'chr_peaks_first_harvest',
+      'chr_evergarden_first_harvest',
+      'col_golden_harvest',
+      'prog_farming_100',
+      'col_farm_roster',
+      // Phase 11k's cross-packet deed, the branch's tail. Appended at the
+      // literal end under the 11b three-tier ordering rule, which keeps the
+      // farming block contiguous ahead of it.
+      'prog_field_to_feast',
+      // The bank socket ladder pair (Bank Storage phase 06) rides in at the
+      // 2026-08-29 release/v0.41.0 merge behind the branch's rows, keeping
+      // both sides' tails in their own authored order.
       'soc_strongbox_outfitter',
       'soc_four_bags_deep',
-      // The Proving Shore graduation closes the merged tail.
+      // The Proving Shore graduation closed the earlier merged tail (appended
+      // at the previous release/v0.41.0 merge behind the branch's rows).
       'prog_ready_for_an_adventure',
+      // The Phase 13 promotion capstone closed the branch's tail (append-only:
+      // DEED_ORDER cannot seat it beside its progression siblings).
+      'prog_legendmaker',
       // The Crucible of the Last Spring raid block (per-boss clear pairs on
       // the new FINAL_BOSS_DUNGEONS rows plus the Varkhul flawless task, the
       // dgn_nythraxis_deathless shape; docs/prd/ignivar-raid-loot.md
-      // "Obligations closeout").
+      // "Obligations closeout"), seated behind the branch's rows at the
+      // 2026-08-30 release/v0.41.0 sync merge, keeping both sides' tails in
+      // their own authored order.
       'dgn_ignivar',
       'dgn_ignivar_heroic',
       'dgn_varkhul',
@@ -431,12 +564,16 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       amount: 200,
     });
     expect(DEEDS.prog_master_angler.reward).toEqual({ kind: 'title', text: 'Master Angler' });
-    // Per-craft milestones for every craft with a live skill-gain path (the
-    // seven recipe-homed crafts plus enchanting; jewelcrafting and inscription
-    // stay deferred with prog_ringwright): rare-teach tier 50 at renown 5,
-    // the resolved cap 125 at renown 25 with a Grandmaster title. EVERY craft
-    // threshold in the catalog equals a resolved cap or sits below it, and no
-    // deed references the classic 300 scale anywhere.
+    // Per-craft milestones for the crafts whose milestone pair has shipped:
+    // the seven Professions 2.0 recipe-homed crafts plus enchanting,
+    // jewelcrafting since the phase 05 QA ruling authored its pair, and
+    // inscription since the phase 06 base catalog shipped its trio in the
+    // same change (each base catalog gave its craft a live skill-gain path
+    // to the 125 cap, so the hold was authoring, not mechanics). The shipped
+    // pair is rare-teach tier 50 at renown 5, the resolved cap 125 at renown
+    // 25 with a Grandmaster title. EVERY craft threshold in the catalog
+    // equals a resolved cap or sits below it, and no deed references the
+    // classic 300 scale anywhere.
     const earnableCrafts = [
       'engineering',
       'alchemy',
@@ -446,6 +583,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'enchanting',
       'weaponcrafting',
       'armorcrafting',
+      'jewelcrafting',
+      'inscription',
     ];
     for (const craftId of earnableCrafts) {
       const cap = CRAFT_RING.find((c) => c.id === craftId)?.maxSkill;
@@ -467,6 +606,46 @@ describe('audited launch totals (literals: update deliberately with the catalog)
             ? (CRAFT_RING.find((c) => c.id === t.craftId)?.maxSkill ?? 0)
             : Math.max(...CRAFT_RING.map((c) => c.maxSkill));
         expect(t.level, def.id).toBeLessThanOrEqual(cap);
+        // EARNABILITY, derived from the live gain machinery rather than
+        // asserted in prose: a character ONE skill point short of the
+        // threshold must still gain from SOME shipped recipe rung under the
+        // craft's best-available ceiling, attuned with the craft as a MAJOR
+        // (archetypeCeilingFor returns Infinity for a major; the
+        // hobby/unattuned rare ceiling already suffices for every craft
+        // except engineering, whose ladder waits for its oath, exactly as
+        // the guide's whatBody says). The cap-only check above would
+        // greenlight a deed for a craft with no gain path at all (a
+        // hypothetical prog_inscription_50, which the no-recipes arm reds);
+        // this arm also reds a TIER_SKILL_STEP or four-state-curve re-tune
+        // that silently strands a shipped titled deed as
+        // visible-but-unearnable (design rule 3). Enchanting is the one
+        // recipe-less craft: it gains through the disenchant arm's SOFT
+        // ceiling, which degrades input instead of zeroing, checked with
+        // top-tier input for the same one-point-short character.
+        if (t.craftId !== undefined) {
+          const craftId = t.craftId;
+          const oneShort = { [craftId]: t.level - 1 };
+          if (craftId === 'enchanting') {
+            expect(
+              enchantingGainMultiplier(oneShort, null, null, null, 4),
+              `${def.id}: enchanting gain at ${t.level - 1}`,
+            ).toBeGreaterThan(0);
+          } else {
+            const rungs = ALL_RECIPES.filter((r) => r.professionId === craftId).map(
+              (r) => r.skillReq ?? 0,
+            );
+            expect(rungs.length, `${def.id}: ${craftId} ships no recipes`).toBeGreaterThan(0);
+            const gain = Math.max(
+              ...rungs.map((rung) =>
+                craftSkillGainMultiplier(oneShort, craftId, craftId, craftId, null, rung),
+              ),
+            );
+            expect(
+              gain,
+              `${def.id}: no shipped ${craftId} rung grants at skill ${t.level - 1} as a major`,
+            ).toBeGreaterThan(0);
+          }
+        }
       }
       if (t.kind === 'gathering') {
         const cap =
@@ -514,8 +693,10 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // charms (gatherers_cache/artisans_eye, TOOL_EFFECT_RECIPES): consumable
     // recharge implements, not the graded gear/food/potion class this deed
     // rewards, so they are excluded from the derivation the same way the
-    // deed's own comment excludes enchanting; jewelcrafting/inscription stay
-    // deferred with prog_ringwright (no live recipes).
+    // deed's own comment excludes enchanting; jewelcrafting joined the set
+    // with the Masterwrought phase 05 base catalog (its rung-50 rare
+    // jewelry), and inscription with the phase 06 catalog (its rung-50 rare
+    // tome and scroll).
     const rareTierCrafts = [...new Set(ALL_RECIPES.map((r) => r.professionId))]
       .filter((craftId) =>
         ALL_RECIPES.some((r) => {
@@ -532,6 +713,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'armorcrafting',
       'cooking',
       'engineering',
+      'inscription',
+      'jewelcrafting',
       'leatherworking',
       'tailoring',
       'weaponcrafting',
@@ -544,25 +727,50 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       expect(deed.hidden ?? false, deed.id).toBe(false);
       expect(deed.trigger).toEqual({ kind: 'visit', markId: `craft_rare:${craftId}` });
     }
-    // No deed keys off enchanting, jewelcrafting, or inscription: those
-    // crafts stay out of the per-craft rare-tier set.
-    for (const craftId of ['enchanting', 'jewelcrafting', 'inscription']) {
+    // No deed keys off enchanting: that craft stays out of the per-craft
+    // rare-tier set (no item-def output to grade).
+    for (const craftId of ['enchanting']) {
       expect(DEEDS[`prog_${craftId}_rare`], craftId).toBeUndefined();
     }
+    // The jewelcrafting counter-pin flipped positive with the phase 05 base
+    // catalog: the deed exists with the exact family shape and the verified
+    // name (appended at the table tail, DEED_ORDER is append-only).
+    expect(DEEDS.prog_jewelcrafting_rare).toEqual({
+      id: 'prog_jewelcrafting_rare',
+      name: 'Polished to Brilliance',
+      desc: 'Craft your first rare-tier item in Jewelcrafting.',
+      category: 'progression',
+      renown: 10,
+      trigger: { kind: 'visit', markId: 'craft_rare:jewelcrafting' },
+    });
+    // And the inscription counter-pin flipped with the phase 06 catalog, the
+    // same family shape and its own verified name.
+    expect(DEEDS.prog_inscription_rare).toEqual({
+      id: 'prog_inscription_rare',
+      name: 'Written in Fine Ink',
+      desc: 'Craft your first rare-tier item in Inscription.',
+      category: 'progression',
+      renown: 10,
+      trigger: { kind: 'visit', markId: 'craft_rare:inscription' },
+    });
   });
 
-  it('ships exactly 43 titles and 4 borders', () => {
+  it('ships exactly 46 titles and 4 borders', () => {
     const titles = ALL.filter((d) => d.reward?.kind === 'title');
     const borders = ALL.filter((d) => d.reward?.kind === 'border');
     // Reliquary Curator ranks append 3 titles + 1 border, the WARFARE honor
     // ladder 3 more titles, the Phase 18 Reliquary completion ladder 5 more
-    // on top of the release base (31 + 3), and the Crucible raid's flawless
-    // title (dgn_varkhul_flawless) one more.
-    expect(titles.length).toBe(43);
+    // on top of the release base (31 + 3), Grandmaster Jewelcrafting (phase
+    // 05 QA) the ninth per-craft grandmaster, Grandmaster Inscription
+    // (phase 06) the tenth, closing the family across the whole ring,
+    // prog_farming_100's Harvestmaster (the absorbed packet's D13 title
+    // mandate), and the Crucible raid's flawless title (dgn_varkhul_flawless,
+    // the 2026-08-30 release/v0.41.0 sync merge) one more.
+    expect(titles.length).toBe(46);
     expect(borders.length).toBe(4);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(43);
+    expect(new Set(titleTexts).size).toBe(46);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
     expect([...borderSlugs].sort()).toEqual([
       'curators_gilt',
@@ -576,6 +784,14 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     expect(DEEDS_ERA).toBe('first_era');
   });
 });
+
+/** The one recipe with this id, or a loud failure: a silent undefined would
+ *  make a predicate arm below pass by measuring nothing. */
+function recipeById(id: string) {
+  const found = ALL_RECIPES.find((r) => r.id === id);
+  if (!found) throw new Error(`no such recipe: ${id}`);
+  return found;
+}
 
 describe('frozen trigger + renown catalog (design rule 9: never retro-edit a trigger)', () => {
   // A single digest over (id, trigger, renown) for every deed in authored order.
@@ -642,21 +858,109 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // and ONE deliberate shipped-trigger change the hash correctly caught:
   // feat_book_complete's meta list gained the FOUR earnable ladder deeds and
   // deliberately did NOT gain the capstone, which took feat: true (unearnable
-  // while three catalog slots stay owner-pended; a non-feat capstone would
+  // while catalog slots stay owner-pended, three then, two since the
+  // masterwrought Phase 11o un-pend; a non-feat capstone would
   // dead-end The Whole Book; see the reachability pin below). No other
   // trigger or renown changed (verified by reconstructing the pre-phase
   // catalog, which reproduces the previous literal exactly).
-  // Re-baselined at the release/v0.39.0 sync merge, which interleaves the
-  // walk-in castle visit pair (exp_the_last_keep, exp_dawnhold_castle) and
-  // the Proving Shore graduation deed (prog_ready_for_an_adventure, on the
-  // new tutorialGraduations stat) at the tail; no shipped trigger or renown
-  // changed on either side.
-  // Re-baselined for the Crucible of the Last Spring raid deeds (the
-  // obligations closeout, docs/prd/ignivar-raid-loot.md): five appended
-  // deeds, the per-boss clear pairs (dgn_ignivar, dgn_ignivar_heroic,
-  // dgn_varkhul, dgn_varkhul_heroic) and the Varkhul flawless task
-  // (dgn_varkhul_flawless). No shipped trigger or renown changed.
-  const FROZEN_CATALOG_SHA256 = 'bd95099f837871f85329aefff1478adc621cc8e83a386b2535826cf29d730219';
+  // Re-baselined for the Masterwrought phase 05 jewelcrafting base catalog:
+  // one appended deed, prog_jewelcrafting_rare (the per-craft rare-tier
+  // family shape, renown 10). No shipped trigger or renown changed.
+  // Re-baselined again at the phase 05 QA: two appended deeds,
+  // prog_jewelcrafting_50 (renown 5) and prog_grandmaster_jewelcrafting
+  // (renown 25, Grandmaster title), completing the craft's milestone family
+  // per the 2026-08-10 ruling. No shipped trigger or renown changed.
+  // Re-baselined for the Masterwrought phase 06 inscription base catalog:
+  // three appended deeds (prog_inscription_rare 10, prog_inscription_50 5,
+  // prog_grandmaster_inscription 25, Grandmaster title), the jewelcrafting
+  // family shapes exactly. No shipped trigger or renown changed.
+  // Re-baselined for the merge of release/v0.40.0: the release's walk-in
+  // castle visit pair (exp_the_last_keep, exp_dawnhold_castle, renown 5
+  // each) lands AHEAD of the six craft milestones in the merged order, so
+  // the merged canonical string matches neither parent literal. No shipped
+  // trigger or renown changed (both parents reproduce their own priors
+  // exactly; the merged hash is re-minted from the suite output).
+  // Re-baselined for the farming celebration deeds (D13): seven appended
+  // deeds, prog_first_planting, the four chr_*_first_harvest chronicles,
+  // col_golden_harvest, and prog_farming_100 with the Harvestmaster title.
+  // No shipped trigger or renown changed.
+  // Re-baselined for the farming absorb merge (masterwrought Phase 11d):
+  // both parents' appends land in one order (the six craft milestones, then
+  // the seven farming rows) so the merged canonical string matches neither
+  // parent literal; no shipped trigger or renown changed (both parents
+  // reproduce their own priors exactly; the merged hash is re-minted from
+  // the suite output).
+  // Re-baselined at Phase 11e for the appended roster deed col_farm_roster.
+  // An APPEND is the sanctioned reason to move this hash.
+  //
+  // ONE SHIPPED TRIGGER DID GROW, and saying otherwise would mislead the next
+  // person to re-mint this: feat_book_complete's deedIds is a LIVE reference to
+  // BOOK_COMPLETE_REQUIREMENTS, which is populated after the table literal from
+  // every non-feat non-hidden deed, so appending a deed necessarily widens that
+  // capstone's trigger. That is the documented dynamic-meta design rather than
+  // a rule-9 retro-edit; no AUTHORED trigger or renown value was touched.
+  // Re-baselined at masterwrought Phase 11i for the appended col_deepest_cast.
+  // An APPEND is the sanctioned reason to move this hash; no shipped trigger or
+  // renown value was touched, and the row was inserted ahead of the farming
+  // block rather than at the literal tail so that block stays contiguous, which
+  // moves DEED_ORDER's tail positions but no authored trigger.
+  // Re-baselined at masterwrought Phase 11k for the appended prog_field_to_feast,
+  // and re-minted THE AUDITABLE WAY rather than by pasting the new suite output:
+  // the PRE-append row list was reconstructed first (every row minus the new id,
+  // with feat_book_complete's live deedIds filtered back to its prior value) and
+  // it reproduced 2b6e36a4... EXACTLY, which is what distinguishes an append
+  // from an edit. Only then was the digest re-minted with the one appended
+  // tuple. No shipped trigger or renown value was touched.
+  // Re-baselined at the release/v0.41.0 sync merge for the appended Proving
+  // Shore graduation deed (prog_ready_for_an_adventure, on the new
+  // tutorialGraduations stat), which the release had itself re-baselined
+  // (its own literal was 7041f4ae...) behind the walk-in castle visit pair.
+  // Re-minted THE AUDITABLE WAY again: reconstructing the merged canonical
+  // rows minus the tutorial deed (feat_book_complete's live deedIds filtered
+  // back) reproduced this branch's 52569f4b... EXACTLY, and minus this
+  // branch's sixteen appended rows reproduced the release's 7041f4ae...
+  // EXACTLY, so the merged catalog is a pure append on BOTH sides. No
+  // shipped trigger or renown changed on either side.
+  // Re-baselined at masterwrought Phase 13 (2026-08-27) for the appended
+  // promotion capstone prog_legendmaker (renown 50, on the new
+  // legendariesForged stat), and re-minted THE AUDITABLE WAY: the pre-append
+  // row list was reconstructed first (every row minus prog_legendmaker, with
+  // feat_book_complete's live deedIds filtered back to exclude it) and it
+  // reproduced 4533079d... EXACTLY, which is what distinguishes an append
+  // from an edit. Only then was the digest re-minted with the one appended
+  // tuple. No shipped trigger or renown value was touched.
+  // Re-baselined at the 2026-08-29 release/v0.41.0 sync merge for the bank
+  // socket pair (Bank Storage phase 06: soc_strongbox_outfitter and
+  // soc_four_bags_deep, on the new bankSocketsUnlocked meter), which the
+  // release had itself re-baselined (its own literal was 9d39a371...) between
+  // the castle visit pair and the Proving Shore graduation deed; the merged
+  // order seats the pair behind this branch's tail rows, ahead of
+  // prog_ready_for_an_adventure. Re-minted THE AUDITABLE WAY: the merged
+  // canonical rows minus the soc pair (feat_book_complete's live deedIds
+  // filtered back) reproduce this branch's d69e3def... EXACTLY, and minus
+  // this branch's seventeen appended rows reproduce the release's
+  // 9d39a371... EXACTLY, so the merged catalog is a pure append on BOTH
+  // sides. No shipped trigger or renown changed on either side.
+  // The release side's own ledger for the same span: re-baselined at its
+  // release/v0.39.0 sync merge, which interleaves the walk-in castle visit
+  // pair (exp_the_last_keep, exp_dawnhold_castle) and the Proving Shore
+  // graduation deed (prog_ready_for_an_adventure, on the new
+  // tutorialGraduations stat) at the tail; no shipped trigger or renown
+  // changed on either side. Then re-baselined for the Crucible of the Last
+  // Spring raid deeds (the obligations closeout,
+  // docs/prd/ignivar-raid-loot.md): five appended deeds, the per-boss clear
+  // pairs (dgn_ignivar, dgn_ignivar_heroic, dgn_varkhul, dgn_varkhul_heroic)
+  // and the Varkhul flawless task (dgn_varkhul_flawless); its own literal
+  // was bd95099f... No shipped trigger or renown changed.
+  // Re-baselined at the 2026-08-30 release/v0.41.0 sync merge for those five
+  // Crucible raid deeds, seated behind this branch's prog_legendmaker. The
+  // merged canonical rows minus the five raid rows (feat_book_complete's
+  // live deedIds filtered back) reproduce this branch's d1c102c3... EXACTLY
+  // when checked the auditable way, and minus this branch's seventeen
+  // appended rows reproduce the release's bd95099f..., so the merged catalog
+  // is a pure append on BOTH sides. No shipped trigger or renown changed on
+  // either side.
+  const FROZEN_CATALOG_SHA256 = '77b670a2b8eefdfb6768290dbbee7146828636c3b7327d0cb88cb5683c072a4b';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -670,6 +974,66 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
         'allowed but re-baselines this hash. If the change is deliberate, regenerate ' +
         'FROZEN_CATALOG_SHA256 with the one-liner in the comment above and commit it here.',
     ).toBe(FROZEN_CATALOG_SHA256);
+  });
+
+  // The AUDITABLE re-mint, made mechanical (the phase 13 QA test-coverage
+  // audit): the previous digest stays beside the current one together with
+  // the ids appended since, and the pre-append catalog is RECONSTRUCTED (every
+  // row minus the appended ids, with the one dynamic meta's live deedIds
+  // filtered back) and re-digested. Equal means the change since the previous
+  // mint was a pure tail append; a retro-edit of any older row moves this
+  // digest too, which the comment-only proof above could not show. Re-minting:
+  // move FROZEN_CATALOG_SHA256 down into PRE_APPEND_CATALOG_SHA256, list the
+  // new ids in APPENDED_SINCE, then mint the new frozen literal.
+  // At the merge of release/v0.41.0 (tip e19d832b47) the append set was the
+  // release's two bank-socket deeds, and the previous mint was this branch's
+  // own pre-merge frozen literal d69e3def... (which had already absorbed
+  // prog_legendmaker); that proof reproduced it exactly. At the 2026-08-30
+  // release/v0.41.0 sync merge (tip 3e801dc925) the append set is the
+  // release's five Crucible raid deeds, and the previous mint is the
+  // d1c102c3... literal that merge rotated down here; the proof below
+  // reproduces it exactly, so no older row was retro-edited by the merge.
+  const PRE_APPEND_CATALOG_SHA256 =
+    'd1c102c3eebce38a337164d7164d3954108393b9f9b93a5f2d14242c0c403530';
+  const APPENDED_SINCE: readonly string[] = [
+    'dgn_ignivar',
+    'dgn_ignivar_heroic',
+    'dgn_varkhul',
+    'dgn_varkhul_heroic',
+    'dgn_varkhul_flawless',
+  ];
+
+  it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
+    const appended = new Set(APPENDED_SINCE);
+    for (const id of APPENDED_SINCE) {
+      expect(DEED_ORDER.includes(id), `${id} is in the live catalog`).toBe(true);
+    }
+    // The appended rows sit as one contiguous run at a PINNED position: the
+    // 2026-08-29 merge seated the release's soc pair ahead of the shared
+    // graduation tail (the release's own authored order), so that pin was the
+    // exact final four; this merge seats the release's Crucible raid block
+    // behind the branch's prog_legendmaker, so the run IS the tail, pinned
+    // together with the two rows it follows. Still an append into a known
+    // seat, never a scattered insert, and never a retro-edit (the digest
+    // below proves it).
+    expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
+      'prog_ready_for_an_adventure',
+      'prog_legendmaker',
+      ...APPENDED_SINCE,
+    ]);
+    const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
+      const trigger = DEEDS[id].trigger;
+      const priorTrigger =
+        trigger.kind === 'meta'
+          ? { ...trigger, deedIds: trigger.deedIds.filter((dep) => !appended.has(dep)) }
+          : trigger;
+      return [id, priorTrigger, DEEDS[id].renown];
+    });
+    const digest = createHash('sha256').update(JSON.stringify(priorRows), 'utf8').digest('hex');
+    expect(digest, 'the pre-append catalog is byte-identical to the previous mint').toBe(
+      PRE_APPEND_CATALOG_SHA256,
+    );
+    expect(PRE_APPEND_CATALOG_SHA256).not.toBe(FROZEN_CATALOG_SHA256);
   });
 });
 
@@ -850,12 +1214,26 @@ describe('table shape', () => {
     // DEED_ORDER derives from the table keys, so covering DEEDS is inherent;
     // what CAN drift is the authored order itself. Pin the endpoints as
     // literals: prog_first_steps opens the catalog and the newest appended
-    // deed closes the tail, and either moving would signal a reorder
+    // deed closes the tail (the release's Crucible raid block, behind Phase
+    // 13's prog_legendmaker since the 2026-08-30 sync merge), and either
+    // moving would signal a reorder
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
-    // The Crucible raid block closes the tail (appended behind the Proving
-    // Shore graduation deed; the flawless task is its final entry).
+    // The release's walk-in castle visit pair sits after the Phase 18
+    // Reliquary completion ladder, then the Masterwrought phase 05
+    // jewelcrafting milestones and the phase 06 inscription milestones
+    // append behind it, and the absorbed farming celebration block closes
+    // the catalog per the 11b three-tier ordering rule, and the 11-block's own
+    // appends follow it in phase order; Phase 11k's prog_field_to_feast was
+    // the branch's tail until the release/v0.41.0 merge, where the Proving
+    // Shore graduation deed closed the merged tail (appended at the release
+    // merge behind the walk-in castle visit pair and the branch's rows; the
+    // 2026-08-29 sync merge seats the bank socket pair ahead of it), then
+    // Phase 13's promotion capstone prog_legendmaker closed it, and the
+    // 2026-08-30 sync merge seats the release's Crucible raid block behind
+    // that (appended behind the branch's rows; the flawless task is its
+    // final entry).
     expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('dgn_varkhul_flawless');
   });
 
@@ -877,8 +1255,9 @@ describe('table shape', () => {
     // keeps its col_ id and Collection shelf beside its ladder, but carries
     // feat: true because it is a dynamic meta over a growing catalog (the
     // feat_book_complete class) and the flag is what keeps it out of
-    // BOOK_COMPLETE_REQUIREMENTS: three catalog slots are owner-pended today
-    // (masterwork:engineering, both pending reins), so a non-feat capstone
+    // BOOK_COMPLETE_REQUIREMENTS: two catalog slots are owner-pended today
+    // (both pending reins; masterwork:engineering was the third until the
+    // masterwrought Phase 11o un-pend), so a non-feat capstone
     // would dead-end The Whole Book for every player. Growing this set is a
     // deliberate design act; prefer the feat_ prefix for anything new.
     const OFF_PREFIX_FEATS = new Set(['col_reliquary_complete']);
@@ -918,6 +1297,140 @@ describe('table shape', () => {
     for (const def of ALL) {
       expect(def.name.includes('Edda Hartwell'), `${def.id} name`).toBe(false);
       expect(def.desc.includes('Edda Hartwell'), `${def.id} desc`).toBe(false);
+    }
+  });
+});
+
+describe('count-form gathering deeds stay earnable', () => {
+  // An any-N gathering trigger demanding more professions than are actually
+  // gainable would ship an unearnable deed, so this guard caps every one of
+  // them at the gainable count. Farming was the exception for two phases: it
+  // joined GATHERING_PROFESSION_IDS with no gain path at all. The growth phase
+  // gave it one (a harvest queues through queueGatheringGrant like any other
+  // gathering harvest), so all five are gainable and the count is simply the
+  // roster length again. This guard compares COUNT only, never amount; the
+  // amount side of the model is held by the amount-aware farming arm in the
+  // next test, added with prog_farming_100 (the first farming trigger to
+  // carry an amount above the old tier-1 teaching ceiling).
+  const GAINABLE_GATHERING_PROFESSIONS = GATHERING_PROFESSION_IDS.length;
+  it('caps every any-N gathering trigger at the gainable profession count', () => {
+    expect(GATHERING_PROFESSION_IDS.length).toBe(5);
+    let countForm = 0;
+    for (const def of ALL) {
+      const t = def.trigger;
+      if (t.kind !== 'gathering' || t.professionId !== undefined) continue;
+      countForm += 1;
+      expect(
+        t.count ?? 1,
+        `${def.id}: any-N gathering deed demands more professions than are gainable`,
+      ).toBeLessThanOrEqual(GAINABLE_GATHERING_PROFESSIONS);
+    }
+    // The loop must have seen the real count-form deeds (prog_first_gather
+    // and prog_master_gatherer) or this guard is vacuous.
+    expect(countForm).toBeGreaterThanOrEqual(2);
+  });
+
+  it('caps every farming gathering trigger at the ceiling the gain schedule can teach', () => {
+    // The amount-aware arm the count-form caveat above demanded: farming
+    // gains gray at the crop's teaching ceiling (farmingTeachingCeilingFor,
+    // professions/farming.ts), so a farming trigger demanding more than the
+    // best crop tier can teach would ship unearnable forever, invisible to
+    // the count-only guard. The max over live crop tiers 1 to 4 is the
+    // profession cap of 100, exactly what prog_farming_100 demands.
+    const teachable = Math.max(...[1, 2, 3, 4].map((tier) => farmingTeachingCeilingFor(tier)));
+    expect(teachable).toBe(100);
+    let farmingTriggers = 0;
+    for (const def of ALL) {
+      const t = def.trigger;
+      if (t.kind !== 'gathering' || t.professionId !== 'farming') continue;
+      farmingTriggers += 1;
+      expect(
+        t.amount,
+        `${def.id}: farming deed demands more proficiency than any crop can teach`,
+      ).toBeLessThanOrEqual(teachable);
+    }
+    // Non-vacuity: the loop must have seen prog_farming_100.
+    expect(farmingTriggers).toBeGreaterThanOrEqual(1);
+  });
+
+  it('GATE 1 discharged: every tier 3/4 seed is vendor-stocked, so prog_farming_100 is earnable', () => {
+    // THE (bo) HONESTY ARM, SELF-CLEARED at Phase 11e rather than deleted.
+    //
+    // It used to assert the opposite: that NO purchase surface stocked these
+    // seeds, which made tier 3/4 crops unplantable, capped farming gains at the
+    // tier-2 ceiling of 75, and left prog_farming_100 and its Harvestmaster
+    // title unreachable. The deed shipped anyway under the D13 mandate, with
+    // the dormancy waived in docs/design/deeds.md. GATE 1 stocked the faucet,
+    // so the arm reddened exactly as it was built to, and it is INVERTED here
+    // rather than removed: the surfaces it walks are unchanged, the direction
+    // of the claim is not.
+    //
+    // Green now means EARNABLE. That distinction is the point: an arm that had
+    // simply been deleted would leave nothing saying the faucet exists, and an
+    // arm left asserting absence would have to be weakened to pass. Every
+    // assertion below fails if the faucet is removed again.
+    //
+    // DERIVED from the crop catalog, so Phase 11e's four new upper-tier crops
+    // are covered without being listed; a hand literal would let a future
+    // tier-3 crop ship with no faucet and this arm still green.
+    const tier34Seeds = Object.values(FARM_CROPS)
+      .filter((crop) => crop.tier >= 3)
+      .map((crop) => crop.seedItemId);
+    expect(tier34Seeds.length).toBe(8);
+    const stocked = new Set<string>();
+    for (const npc of Object.values(NPCS)) {
+      for (const itemId of npc.vendorItems ?? []) stocked.add(itemId);
+    }
+    for (const offer of HEROIC_VENDOR_STOCK) stocked.add(offer.itemId);
+    for (const entries of Object.values(DELVE_SHOPS)) {
+      for (const entry of entries) stocked.add(entry.itemId);
+    }
+    // Non-vacuity: the walk really saw the world's counters.
+    expect(stocked.size).toBeGreaterThan(0);
+    for (const seedId of tier34Seeds) {
+      expect(ITEMS[seedId], seedId).toBeDefined();
+      expect(stocked.has(seedId), `${seedId} has no faucet: GATE 1 has regressed`).toBe(true);
+      // A stocked row without a positive buyValue renders and then refuses
+      // (D11's dead-row trap), which would leave the deed just as unreachable
+      // while this arm read green on presence alone.
+      expect(ITEMS[seedId]?.buyValue ?? 0, `${seedId} is a dead vendor row`).toBeGreaterThan(0);
+    }
+    // The consequence the arm exists for, stated rather than implied: the
+    // teaching ceiling a farmer can now actually reach is the profession cap,
+    // because tier 3 and 4 crops are plantable, and that is exactly what
+    // prog_farming_100 demands.
+    const reachableCeiling = Math.max(
+      ...Object.values(FARM_CROPS).map((crop) => farmingTeachingCeilingFor(crop.tier)),
+    );
+    // The ceiling reaches the deed's own demand. Stated ONCE (the redundant
+    // toBeGreaterThanOrEqual(100) that sat below the trigger check was removed
+    // at the 11e QA: toBe(100) already implies it), and read against the
+    // trigger's own amount rather than a second literal, so a re-tuned deed
+    // moves both halves together.
+    expect(reachableCeiling).toBe(100);
+    const farming100 = DEEDS.prog_farming_100;
+    expect(farming100.trigger).toEqual({
+      kind: 'gathering',
+      professionId: 'farming',
+      amount: 100,
+    });
+    // NOTE ON WHAT THIS ARM DOES AND DOES NOT PROVE, corrected at the 11e QA:
+    // farmingTeachingCeilingFor reads the schedule's boundary column and knows
+    // nothing about whether anything is STOCKED, so the ceiling alone cannot
+    // show the deed is earnable. The GATE 1 teeth in this test are the stocked
+    // and positive-buyValue arms above; this pair states the other half, that
+    // the ceiling the crops can teach to actually meets the deed's amount.
+    if (farming100.trigger.kind === 'gathering') {
+      expect(reachableCeiling).toBeGreaterThanOrEqual(farming100.trigger.amount);
+    }
+    // ...and the transitively parked capstone unparks with it. Read off the
+    // capstone's LIVE trigger rather than the private list it is built from, so
+    // this cannot drift from what the evaluator actually requires.
+    const capstone = DEEDS.feat_book_complete.trigger;
+    expect(capstone.kind).toBe('meta');
+    if (capstone.kind === 'meta') {
+      expect(capstone.deedIds).toContain('prog_farming_100');
+      expect(capstone.deedIds).toContain('col_farm_roster');
     }
   });
 });
@@ -982,6 +1495,151 @@ describe('trigger references resolve against the real content tables', () => {
       done.add(id);
     };
     for (const id of DEED_ORDER) visit(id);
+  });
+
+  it('the farm_crop namespace SURVIVES a save/load round trip, so the roster deed can refill', () => {
+    // THE MANDATORY TRAP for masterwrought DECISION E, and it is not a
+    // formality: an UNREGISTERED namespace serializes fine and is silently
+    // dropped by restoreDeedStats on load, so a player who logs out mid-roster
+    // would come back with an empty collection and the deed could never
+    // complete. That exact bug has shipped twice here (gather_event, then
+    // masterwork), which is why this is a round trip and not a list check.
+    const marks = [...FARM_CROP_IDS].sort().map((cropId) => `farm_crop:${cropId}`);
+    expect(marks).toHaveLength(12);
+    const stats = restoreDeedStats(undefined);
+    for (const mark of marks) stats.visited.add(mark);
+    const saved = serializeDeedStats(stats);
+    expect(saved, 'the marks must serialize at all').toBeDefined();
+    const restored = restoreDeedStats(saved);
+    for (const mark of marks) {
+      expect(restored.visited.has(mark), `${mark} was dropped on load`).toBe(true);
+    }
+    // The control that makes the arm mean something: a mark in an UNREGISTERED
+    // namespace really is dropped by the same round trip, so the pass above is
+    // the registration working rather than restoreDeedStats keeping everything.
+    const bogus = restoreDeedStats(undefined);
+    bogus.visited.add('farm_crop_typo:vale_wheat');
+    expect(
+      restoreDeedStats(serializeDeedStats(bogus)).visited.has('farm_crop_typo:vale_wheat'),
+    ).toBe(false);
+    // ...and the deed's own trigger really names these marks, so the round trip
+    // above is over the set the evaluator reads.
+    const trigger = DEEDS.col_farm_roster.trigger;
+    expect(trigger.kind).toBe('visits');
+    if (trigger.kind === 'visits') expect([...trigger.markIds].sort()).toEqual(marks);
+  });
+
+  it('every deed desc that names a shipped item names the RIGHT one', () => {
+    // THE GUARD THE BLOCKING BUG ASKED FOR (masterwrought Phase 11k). That
+    // phase's deed shipped reading "Cook an apex Harvest Feast", and no such
+    // item exists: its outputs are the Stonepot, Warspice and Sageleaf Feasts,
+    // while Harvest Feast is a DIFFERENT shipped item, the rare party rung one
+    // below. A reviewer caught it. Nothing in this suite could, because nothing
+    // read a deed desc, and the Book is player-visible English.
+    //
+    // THE RULE IS DELIBERATELY NARROW. A desc is prose and most Title Case in
+    // it is ordinary English, so a loose check would fire on every deed. This
+    // asks only: does the desc contain a phrase that EXACTLY matches a shipped
+    // item NAME? That is precisely the shape the bug had, a real item name
+    // naming the wrong real item, and it is rare enough to enumerate.
+    //
+    // AN ALLOWLIST RATHER THAN A BAN, because naming an item is often right
+    // (col_deepest_cast really is about the Clockreel Fishing Rod). Its value
+    // is that a NEW mention has to be read by a human once: a deed naming an
+    // item is making a promise about content, and this is where it is checked.
+    const itemNames = [...new Set(Object.values(ITEMS).map((def) => def.name))];
+    const mentions: string[] = [];
+    for (const id of DEED_ORDER) {
+      const desc = DEEDS[id].desc;
+      for (const name of itemNames) {
+        const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        if (new RegExp(`\\b${escaped}\\b`).test(desc)) mentions.push(`${id}:${name}`);
+      }
+    }
+    expect(
+      mentions.sort(),
+      'every deed desc naming a shipped item, each reviewed as naming the right one',
+    ).toEqual([
+      'col_deepest_cast:Clockreel Fishing Rod',
+      'col_glimmerfin:Sunglint Koi',
+      'feat_brightwood_relic:Bramblehide Jerkin',
+      "feat_brightwood_relic:Monarch's Crown",
+      'hid_codfather:The Codfather',
+      // Reviewed at masterwrought Phase 13: the promotion capstone's desc
+      // names the Deed of Making, and resolvePerfectingAttempt's promotion branch really does
+      // consume exactly that item (LEGENDARY_PROMOTION_COST names
+      // deed_of_making), so the desc names the RIGHT one.
+      'prog_legendmaker:Deed of Making',
+    ]);
+    // NON-VACUITY: the sweep must actually be able to see a name, or the
+    // expectation above is a list of five things it never looked for.
+    expect(itemNames.length, 'the item name corpus is real').toBeGreaterThan(500);
+    expect(
+      DEED_ORDER.some((id) => /Clockreel Fishing Rod/.test(DEEDS[id].desc)),
+      'and the matcher really does find one by hand',
+    ).toBe(true);
+  });
+
+  it('the apex_feast namespace SURVIVES a save/load round trip, so the deed can refill', () => {
+    // THE SAME MANDATORY TRAP one deed over (masterwrought Phase 11k), and the
+    // reason it is a ROUND TRIP rather than a membership check: an unregistered
+    // namespace serializes fine and is silently dropped by restoreDeedStats, so
+    // a cook who logs out after crafting their first apex feast would come back
+    // with the mark gone and the deed permanently unearnable. This packet has
+    // paid for that three times (gather_event, masterwork, farm_crop).
+    const stats = restoreDeedStats(undefined);
+    stats.visited.add(APEX_FEAST_CRAFT_MARK);
+    const restored = restoreDeedStats(serializeDeedStats(stats));
+    expect(
+      restored.visited.has(APEX_FEAST_CRAFT_MARK),
+      `${APEX_FEAST_CRAFT_MARK} was dropped on load`,
+    ).toBe(true);
+    // The control that makes the arm mean something: a mark in an UNREGISTERED
+    // namespace really is dropped by the same round trip.
+    const bogus = restoreDeedStats(undefined);
+    bogus.visited.add('apex_feast_typo:crafted');
+    expect(restoreDeedStats(serializeDeedStats(bogus)).visited.has('apex_feast_typo:crafted')).toBe(
+      false,
+    );
+    // ...and the deed's own trigger really names THIS mark, so the round trip
+    // above is over the key the evaluator reads.
+    const trigger = DEEDS.prog_field_to_feast.trigger;
+    expect(trigger.kind).toBe('visit');
+    if (trigger.kind === 'visit') expect(trigger.markId).toBe(APEX_FEAST_CRAFT_MARK);
+    // The mark key is a FIXED literal, which is what makes it bounded: an
+    // interpolated key source would write permanent ledger noise nothing reads
+    // back, the hazard craft_rare's own bounding exists for.
+    expect(APEX_FEAST_CRAFT_MARK).toBe('apex_feast:crafted');
+  });
+
+  it('isApexFeastRecipe admits exactly the capstone feast bills, and no others', () => {
+    // The predicate the craft-credit arm gates on, CALLED rather than described,
+    // and pinned by its OUTCOME over every shipped recipe rather than over the
+    // three rows this phase happened to add. A predicate that returned true
+    // unconditionally would still leave a membership spot-check green.
+    const admitted = ALL_RECIPES.filter((r) => isApexFeastRecipe(r))
+      .map((r) => r.id)
+      .sort();
+    expect(admitted).toEqual([
+      'recipe_sageleaf_feast',
+      'recipe_stonepot_feast',
+      'recipe_warspice_feast',
+    ]);
+    // THE TWO DISCRIMINATING CASES, spelled out because the pin above is
+    // satisfied by either half of the rule alone:
+    //  - the PARTY feast carries a feast payload and is refused on the RUNG
+    //    (cooking 100 against cooking's cap of 125), so a rung-blind predicate
+    //    would admit it and the deed would fire on the wrong feast;
+    const partyFeast = recipeById('recipe_harvest_feast');
+    expect(ITEMS[partyFeast.resultItemId], 'the party feast is a real feast def').toBeTruthy();
+    expect(isApexFeastRecipe(partyFeast), 'the PARTY rung is not the apex one').toBe(false);
+    //  - the two mobile STATIONS sit at the same 125 rung and are refused on the
+    //    PAYLOAD, so a payload-blind predicate would admit them.
+    for (const id of ['recipe_laden_hearth', 'recipe_grand_cauldron']) {
+      const station = recipeById(id);
+      expect(station.skillReq, `${id} really is at the capstone rung`).toBe(125);
+      expect(isApexFeastRecipe(station), `${id} is a station, not a feast`).toBe(false);
+    }
   });
 
   it('every visited mark belongs to an authored namespace and resolves to real content', () => {
@@ -1049,13 +1707,38 @@ describe('trigger references resolve against the real content tables', () => {
       } else if (ns === 'dungeon') {
         expect(DUNGEONS[mark.slice(8)], `${deedId}: ${mark}`).toBeDefined();
       } else if (ns === 'gather_event') {
-        // The three node-flavor marks written by announceGatherRareEvent
-        // (professions/gather_events.ts gatherRareEventFlavor) plus the
-        // corpse-harvest perfect_specimen jackpot (interaction.ts).
+        // The four rare-event flavor marks written by announceGatherRareEvent
+        // (professions/gather_events.ts gatherRareEventFlavor; golden_harvest
+        // is the crop-source flavor) plus the corpse-harvest perfect_specimen
+        // jackpot (interaction.ts).
         expect(
-          ['pristine_vein', 'ancient_heartwood', 'moonlit_bloom', 'perfect_specimen'],
+          [
+            'pristine_vein',
+            'ancient_heartwood',
+            'moonlit_bloom',
+            'golden_harvest',
+            'perfect_specimen',
+          ],
           `${deedId}: ${mark}`,
         ).toContain(mark.slice('gather_event:'.length));
+      } else if (ns === 'farm') {
+        // Farming celebration marks: farm:planted (the first-planting proof
+        // written at plant success) or a farm:<zone> first-harvest chronicle
+        // mark for a listed farming hub (src/sim/deeds.ts
+        // onCropHarvestedForDeeds); nothing else may ride the namespace.
+        const rest = mark.slice('farm:'.length);
+        expect(
+          rest === 'planted' || FARM_CHRONICLE_ZONES.includes(rest),
+          `${deedId}: ${mark}`,
+        ).toBe(true);
+      } else if (ns === 'farm_crop') {
+        // Per-crop first-harvest collection marks (masterwrought DECISION E),
+        // written by the same onCropHarvestedForDeeds hook. Resolved against
+        // the live catalog like its siblings: the ids are generated today, so
+        // a stray mark is impossible by construction, but this is what catches
+        // a HAND-AUTHORED one later, which is the only way the namespace could
+        // grow past the catalog it is supposed to mirror.
+        expect(FARM_CROP_IDS.has(mark.slice('farm_crop:'.length)), `${deedId}: ${mark}`).toBe(true);
       } else if (ns === 'craft_rare') {
         // Written by professions/crafting.ts craftItem the first time a
         // player crafts a rare-or-better output in that craft (#2055).
@@ -1162,6 +1845,87 @@ describe('trigger references resolve against the real content tables', () => {
     expect([...Object.keys(ZONE_FISH)].sort()).toEqual([...deedFishZones].sort());
   });
 
+  it('every zone row lists EXACTLY the catches that zone draws (the item dimension)', () => {
+    // THE THIRD DIRECTION, and the one that was missing. The fish-mark guard
+    // above checks rows-are-drawn (a subset claim), and the reverse sweep
+    // checks zone KEYS. Neither reads the item lists in the drawn-to-listed
+    // direction, so a new catch added to the cell tables and forgotten here
+    // reddened nothing: rv-tests deleted all three of masterwrought Phase 11i's
+    // catches from every row and the whole deeds suite stayed green.
+    //
+    // What that costs is not cosmetic. ZONE_FISH is what the first-cast deed
+    // reads to decide a zone is fished out, so a missing row makes the mark
+    // silently unearnable-by-that-catch: a player reeling in the new fish gets
+    // no credit and no error, which is the failure the phase's own SETTLED
+    // ruling ("ZONE_FISH: YES, all three join") was written to avoid.
+    //
+    // EXACT equality, not a subset either way. The set is derived the way the
+    // resolver reads the tables (own cell, else the Vale fallback) and filtered
+    // to the CATCHES: every raw cooking catch plus the rare koi. Grey junk and
+    // the empty-hook null row are deliberately out, which is why this is an
+    // authored contract worth pinning rather than a restatement of the table.
+    const catchIds = new Set<string>([...RAW_COOKING_CATCH_IDS, FISHING_RARE_ID]);
+    // Non-vacuity: the filter must actually keep the junk out, or "exactly the
+    // catches" would quietly mean "everything drawn".
+    expect(catchIds.has('tangled_weed')).toBe(false);
+    expect(catchIds.has('soggy_boot')).toBe(false);
+    expect(catchIds.has(FISHING_RARE_ID)).toBe(true);
+    let zonesChecked = 0;
+    for (const [zoneId, rows] of Object.entries(ZONE_FISH)) {
+      const drawn = new Set<string>();
+      for (const band of FISHING_TABLES_BY_BAND) {
+        for (const entry of band[zoneId] ?? band.eastbrook_vale) {
+          if (entry.itemId && catchIds.has(entry.itemId)) drawn.add(entry.itemId);
+        }
+      }
+      expect([...rows].sort(), `ZONE_FISH.${zoneId} vs the cells that zone draws`).toEqual(
+        [...drawn].sort(),
+      );
+      zonesChecked++;
+    }
+    // The loop ran over a real table, not an empty one.
+    expect(zonesChecked).toBe(Object.keys(ZONE_FISH).length);
+    expect(zonesChecked).toBeGreaterThanOrEqual(12);
+  });
+
+  it('FARM_CHRONICLE_ZONES is real zones and exactly the authored farm-patch zone set', () => {
+    // The ZONE_FISH template, forward direction: every listed chronicle zone
+    // is a shipped zone, and the list matches the zones that actually carry
+    // authored farm patches (FARM_PATCHES) from both directions, so a new
+    // patch zone cannot land without its chronicle row and a chronicle row
+    // cannot name a bedless zone.
+    for (const zoneId of FARM_CHRONICLE_ZONES) {
+      expect(
+        ZONES.some((z) => z.id === zoneId),
+        `${zoneId} names no real zone`,
+      ).toBe(true);
+    }
+    const patchZones = [...new Set(FARM_PATCHES.map((p) => p.zoneId))].sort();
+    expect([...FARM_CHRONICLE_ZONES].sort()).toEqual(patchZones);
+  });
+
+  it('every farm:<zone> deed mark covers FARM_CHRONICLE_ZONES exactly (the reverse sweep)', () => {
+    // The other direction of the farm-guard intersection: a chronicle zone
+    // with no deed consuming its farm:<zone> mark is inert authoring debt,
+    // so the list and the deed catalog must cover each other exactly (the
+    // ZONE_FISH reverse sweep above).
+    const deedFarmZones = new Set<string>();
+    for (const def of ALL) {
+      if (def.trigger.kind === 'visit' && def.trigger.markId.startsWith('farm:')) {
+        const rest = def.trigger.markId.slice(5);
+        if (rest !== 'planted') deedFarmZones.add(rest);
+      }
+      if (def.trigger.kind === 'visits') {
+        for (const mark of def.trigger.markIds) {
+          if (mark.startsWith('farm:') && mark !== 'farm:planted') {
+            deedFarmZones.add(mark.slice(5));
+          }
+        }
+      }
+    }
+    expect([...deedFarmZones].sort()).toEqual([...FARM_CHRONICLE_ZONES].sort());
+  });
+
   it('every static-zone poi carries a stable id, unique within its zone', () => {
     // id is the PERSISTED identity behind every poi visit mark; the deed sweep
     // keys on it, so each static poi MUST declare one and no two pois in a zone
@@ -1253,9 +2017,10 @@ describe('the completionist feat', () => {
   });
 
   it('stays reachable: the unearnable Reliquary capstone is OUT, its earnable ladder is IN', () => {
-    // col_reliquary_complete is unearnable while three catalog slots stay
-    // owner-pended (masterwork:engineering, reins_drakemaw_raptor,
-    // reins_terrorspark_groundshaker); as a Book requirement it would
+    // col_reliquary_complete is unearnable while two catalog slots stay
+    // owner-pended (reins_drakemaw_raptor, reins_terrorspark_groundshaker;
+    // masterwork:engineering left the list at the masterwrought Phase 11o
+    // un-pend); as a Book requirement it would
     // dead-end The Whole Book for every player, the exact failure the
     // retroFallbackGrants stranded-heal doctrine names. The feat flag is the
     // exclusion mechanism; this arm reds the moment anyone drops it. The
@@ -1291,5 +2056,187 @@ describe('the border-reward set (a public Discord feed surface since Phase 18)',
       'prog_prestige_10',
     ]);
     for (const id of borderIds) expect(DEEDS[id].hidden, id).not.toBe(true);
+  });
+});
+
+describe('col_junk_drawer stays completable after the phase 11l trophy promotion', () => {
+  // The meter behind the deed (poorItemsDiscoveredCount, src/sim/deeds.ts)
+  // recounts itemsDiscovered against the LIVE quality === 'poor', so what the
+  // deed can ever reach is the set of poor ids a character can actually
+  // acquire. Walked here over every acquisition source this file already
+  // knows: mob loot (the delve and rift tables are merged into MOBS, and are
+  // walked again by name so a future un-merge cannot hide them), the heroic
+  // boss tables (HEROIC_BOSS_LOOT), the four rift clear and world-drop id
+  // lists (RIFT_*_ITEM_IDS), the two delve chest tables, the Drowned Litany
+  // and the Collapsed Reliquary (every LootTier, every class, both bountiful
+  // arms), vendor stock (NPC rows, the heroic
+  // quartermaster, the delve shops), the World Market's house stock
+  // (MARKET_HOUSE_STOCK), ground pickups, every fishing cell in every band,
+  // quest rewards, and recipe outputs.
+  //
+  // The heroic, rift, delve and MARKET_HOUSE_STOCK arms contribute no poor
+  // id today (78 heroic and rift entries, 355 chest entries (189 Litany and
+  // 166 lockpick, pinned below so the count cannot rot silently) and the 23
+  // house stock rows visited, zero poor), so they are scope insurance rather
+  // than
+  // a pin: a poor id authored onto one of those tables later enters the walk
+  // here instead of stranding the deed unseen.
+  //
+  // CLOSURE: the faucets deliberately NOT walked cannot emit a poor id, so
+  // the scope is complete rather than merely wide. Gathering yields carry no
+  // poor entry: the node, corpse, and farm supplies in
+  // src/sim/professions/gathering_supply.ts are common materials, and its
+  // fishingSupply skips poor by def (the `quality === 'poor'` continue near
+  // line 76) over the same fishing tables walked above. Salvage returns only
+  // the three common materials of SALVAGE_MATERIAL_BY_QUALITY
+  // (src/sim/professions/salvage.ts, near line 53) and refuses a poor INPUT
+  // outright (isSalvageable, near line 73). Mail letters attach only
+  // q_greyjaw's roasted_boar (the one authored `items:` in
+  // src/sim/content/letters.ts) plus the per-kill Heroic Mark and Wyrmfall
+  // Core stacks the PostOffice fills; the Exchange custody letters carry the
+  // player's own parcel back. The heroic variants are merged into ITEMS
+  // before this scan runs (src/sim/data.ts, buildHeroicVariants), so livePoor
+  // below already sees them. The World Market IS a faucet on its house side:
+  // MARKET_HOUSE_STOCK (src/sim/market.ts) is a reseeded house-listing table
+  // that never depletes, so it is walked below; player listings only move
+  // ids a character acquired through one of the routes above. The /dev
+  // vendor (src/sim/content/ptr_dev_vendor.ts) is spawned on demand under
+  // ALLOW_DEV_COMMANDS, never placed in NPCS, and stocks epic gear only
+  // (allEpicGearIds), so it is invisible to the NPCS walk and can emit no
+  // poor id. The rift clear pools (src/sim/rift/loot_pools.ts) derive from
+  // tables the walk already covers: the five-man dungeon mob loot merged
+  // into MOBS, HEROIC_BOSS_LOOT, and RIFT_EPIC_ITEM_IDS. The lockpick chest
+  // table delveChestItemsForTier (granted by src/sim/rift/runs.ts and
+  // src/sim/delves/lockpick_controller.ts; today only the Collapsed
+  // Reliquary presets it) is walked below beside the Litany table: the 11l
+  // QA found it neither walked nor named, gear-only today, so scope
+  // insurance rather than a live defect.
+  const reachable = new Set<string>();
+  const note = (itemId: string | null | undefined): void => {
+    if (itemId && ITEMS[itemId]?.quality === 'poor') reachable.add(itemId);
+  };
+  for (const m of Object.values(MOBS)) for (const l of m.loot ?? []) note(l.itemId);
+  for (const m of Object.values(DELVE_MOBS)) for (const l of m.loot ?? []) note(l.itemId);
+  for (const m of Object.values(RIFT_MOBS)) for (const l of m.loot ?? []) note(l.itemId);
+  for (const entries of Object.values(HEROIC_BOSS_LOOT)) for (const l of entries) note(l.itemId);
+  for (const id of RIFT_GEAR_ITEM_IDS) note(id);
+  for (const id of RIFT_EPIC_ITEM_IDS) note(id);
+  for (const id of RIFT_LEGENDARY_ITEM_IDS) note(id);
+  for (const id of RIFT_RARE_ITEM_IDS) note(id);
+  // The two delve chest tables are functions, not lists: every tier LootTier
+  // admits (the satisfies clause reds the moment the union grows, under tsc,
+  // which the gate runs; a bare vitest run strips types), every class, both
+  // bountiful arms, under a stub rng pinned all-true and then all-false. The
+  // Litany header says exactly two chance draws per call, so the two stubs
+  // between them reach every id it can ever return (not every branch: the
+  // low tier pushes its second uncommon only on a mixed draw, and the medium,
+  // premium and bountiful arms push that id unconditionally, so the id set is
+  // complete while one branch is not visited; the lockpick table draws at
+  // most once per call, so the same two stubs cover it a fortiori).
+  let litanyEntries = 0;
+  let lockpickEntries = 0;
+  const LOOT_TIERS = Object.keys({
+    premium: true,
+    medium: true,
+    low: true,
+  } satisfies Record<LootTier, true>) as LootTier[];
+  for (const tier of LOOT_TIERS) {
+    for (const cls of ALL_CLASSES) {
+      for (const bountiful of [false, true]) {
+        for (const always of [true, false]) {
+          const rng = { chance: () => always } as unknown as Rng;
+          for (const entry of drownedLitanyChestItemsForTier(tier, cls, rng, bountiful)) {
+            litanyEntries += 1;
+            note(entry.itemId);
+          }
+          for (const entry of delveChestItemsForTier(tier, cls, rng, bountiful)) {
+            lockpickEntries += 1;
+            note(entry.itemId);
+          }
+        }
+      }
+    }
+  }
+  for (const npc of Object.values(NPCS)) for (const itemId of npc.vendorItems ?? []) note(itemId);
+  for (const offer of HEROIC_VENDOR_STOCK) note(offer.itemId);
+  for (const entries of Object.values(DELVE_SHOPS)) for (const entry of entries) note(entry.itemId);
+  for (const stock of MARKET_HOUSE_STOCK) note(stock.itemId);
+  for (const g of GROUND_OBJECTS) note(g.itemId);
+  for (const band of FISHING_TABLES_BY_BAND) {
+    for (const rows of Object.values(band)) for (const entry of rows) note(entry.itemId);
+  }
+  for (const quest of Object.values(QUESTS)) {
+    for (const itemId of Object.values(quest.itemRewards ?? {})) note(itemId);
+  }
+  for (const recipe of ALL_RECIPES) note(recipe.resultItemId);
+  const livePoor = new Set(
+    Object.values(ITEMS)
+      .filter((d) => d.quality === 'poor')
+      .map((d) => d.id),
+  );
+  const unreachable = [...livePoor].filter((id) => !reachable.has(id)).sort();
+
+  it('the chest walk visits every entry of both tables (a count that cannot rot silently)', () => {
+    // 3 tiers x 9 classes x 2 bountiful arms x 2 stubs = 108 calls per table:
+    // 189 Litany entries and 166 lockpick entries at the 11l QA, pinned PER
+    // TABLE so a drift in one cannot hide behind a compensating drift in the
+    // other. A table that stopped contributing (a renamed export, a tier the
+    // satisfies clause missed) shrinks its own count before it could hide a
+    // poor id.
+    expect(litanyEntries).toBe(189);
+    expect(lockpickEntries).toBe(166);
+  });
+
+  it('the reachable poor set is exactly the thirteen survivors with an acquisition route', () => {
+    // The chipped tusk is back since the phase's sixth fix round
+    // output-excluded it, and the bogiron nugget and the cracked fetish since
+    // the 11l QA excluded them the same way (poor again; the fen-troll and
+    // drowned-dead loot rows never moved).
+    expect([...reachable].sort()).toEqual([
+      'bogiron_nugget',
+      'briny_idol',
+      'chipped_tusk',
+      'cracked_fetish',
+      'deepfen_pearl',
+      'frayed_prayer_beads',
+      'inert_storm_shard',
+      'moonpale_scale',
+      'ogre_toe_ring',
+      'pale_pearl',
+      'soggy_boot',
+      'soggy_moccasin',
+      'tangled_weed',
+    ]);
+  });
+
+  it('the unreachable poor remainder is exactly the Brightwood Glade wildlife pack', () => {
+    // Authored in src/sim/content/items.ts under the wildlife-pack banner with
+    // no loot, vendor, pickup, fishing, quest, or recipe route anywhere: they
+    // exist in the catalog and count for nothing here.
+    expect(unreachable).toEqual(['amber_hide', 'soft_down', 'stag_antler']);
+  });
+
+  it('the trigger amount fits inside the reachable pool', () => {
+    // Phase 11l promoted five junk drops out of poor (eight until its sixth
+    // fix round output-excluded the chipped tusk, seven until the 11l QA
+    // excluded the bogiron nugget and the cracked fetish), cutting the
+    // reachable pool from 18 to 13 against an amount of 10: a margin of
+    // THREE. The meter recounts live quality, so a character holding promoted
+    // trophies still sees an in-progress counter regress, and four more
+    // promotions would strand the deed outright. Re-tuning the trigger is a maintainer decision
+    // (docs/design/deeds.md, rule 9: no retro-editing a shipped trigger),
+    // left OPEN in the phase ledger rather than edited here. The same doc's
+    // rule 5 (no permanently missable deeds) names retroFallbackGrants
+    // (src/sim/deeds.ts) as the sanctioned heal for exactly this failure
+    // mode: a deed that can silently become permanently impossible for one
+    // character is granted at world join from proof, or outright once no earn
+    // path can ever exist again for that character.
+    // trigger.amount itself is pinned by FROZEN_CATALOG_SHA256 earlier in
+    // this file (the whole-catalog hash), so a silent retune reds there
+    // before this arm ever sees it.
+    const trigger = DEEDS.col_junk_drawer.trigger;
+    if (trigger.kind !== 'meter') throw new Error('col_junk_drawer lost its meter trigger');
+    expect(trigger.meter).toBe('poorItemsDiscoveredCount');
+    expect(trigger.amount).toBeLessThanOrEqual(reachable.size);
   });
 });

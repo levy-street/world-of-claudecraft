@@ -190,27 +190,38 @@ describe('v0.36 release-audit Reliquary deed art', () => {
     }
   });
 
-  it('closes the exhaustive live deed debt ledger at 271 painted deeds', () => {
+  it('keeps the historical audit sealed while the current ledger reaches 288 painted deeds', () => {
     // The audit's own claim is historical: the 271 deeds live at the v0.36
-    // audit are ALL painted. Deeds appended after it (the walk-in castle
-    // visit pair, the Proving Shore graduation, and the Crucible raid block)
-    // ride the DEED_ART_PENDING ledger until their art lands; the audit
-    // holds exactly when the pending set and the artless set are the same
-    // post-audit appends and every other deed is painted.
+    // audit are ALL painted, the six Masterwrought jewelcrafting and
+    // inscription milestone deeds (phases 05 and 06) each shipped their
+    // crest in the change that authored them, and the farming phase
+    // committed the prog_farming_100 crest. The later Masterwrought art wave
+    // paints ten more live rows and records the replacement separately, while
+    // the historical v0.36 evidence remains untouched. Only release-owned
+    // post-audit additions remain on the current pending ledger.
     expect([...DEED_ART_PENDING]).toEqual([
       'exp_the_last_keep',
       'exp_dawnhold_castle',
+      // The release's bank socket ladder pair (Bank Storage phase 06),
+      // appended at the v0.41.0 release-batch sync in DEED_ORDER position.
       'soc_strongbox_outfitter',
       'soc_four_bags_deep',
+      // The release's Proving Shore graduation deed, appended at the
+      // release/v0.41.0 sync behind this branch's tail (DEED_ORDER position).
       'prog_ready_for_an_adventure',
+      // The release's Crucible of the Last Spring raid block (five 'dungeon'
+      // deeds), appended at the v0.41.0 Crucible sync behind this branch's
+      // tail (DEED_ORDER position); each rides the deed_cat_dungeon crest
+      // until its commissioned art lands (docs/achievements/icon-brief.md).
       'dgn_ignivar',
       'dgn_ignivar_heroic',
       'dgn_varkhul',
       'dgn_varkhul_heroic',
       'dgn_varkhul_flawless',
     ]);
-    expect(DEED_ORDER).toHaveLength(281);
-    expect(DEED_IMAGE_IDS.size).toBe(271);
+    // Current arithmetic: 298 live - 10 release-owned pending = 288 painted.
+    expect(DEED_ORDER).toHaveLength(298);
+    expect(DEED_IMAGE_IDS.size).toBe(288);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(
       sorted(DEED_ORDER.filter((id) => !DEED_ART_PENDING.has(id))),

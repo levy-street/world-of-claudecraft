@@ -1,16 +1,27 @@
-// Tool-effect charm tooltip lines: what Gatherer's Cache / Artisan's Eye (and
-// the catalog Springback Charm) do, how a player slots them, and that a slot
-// burns the charm. Pure string-builder composed inside Hud.itemTooltip (the
-// gather_tool_tooltip.ts / material_hint_view.ts pattern): t() + esc here, no
-// DOM, no Hud state, so tests/tool_effect_tooltip.test.ts drives it directly.
+// Tool-effect charm tooltip lines: what Gatherer's Cache, Artisan's Eye and the
+// Maker's Charm do (plus the catalog Springback Charm), how a player slots
+// them, and that a slot burns the charm. Pure string-builder composed inside
+// Hud.itemTooltip (the gather_tool_tooltip.ts / material_hint_view.ts pattern):
+// t() + esc here, no DOM, no Hud state, so tests/tool_effect_tooltip.test.ts
+// drives it directly.
 //
 // Numbers come from the sim catalog and charge ladder, never re-invented copy:
 // TOOL_EFFECTS.startingDurability and RARITY_DURABILITY_BONUS (tools.ts). The
 // bonus prose tracks applyEffectBonus kinds (quantity / quality / respawnSpeed);
-// the "+1" the English spells out as prose is pinned back to TOOL_EFFECTS[*].bonus
+// the numbers the English spells out are pinned back to TOOL_EFFECTS[*].bonus
 // by the test file, so a rebalance forces the copy to move with it.
-// Fishing is never advertised as a slot target: slotToolEffectRefused refuses
-// every effect on fishing until an arm has real fishing behavior.
+//
+// ONE bonus figure is deliberately NOT a single catalog number, and the copy
+// says so rather than rounding it off: farming caps a quantity effect at
+// FARM_EFFECT_BONUS_PICK_CAP, so the Maker's Charm pays its catalog 2 on
+// mining, logging and herbalism and 1 on a hoe (masterwrought DECISION C). The
+// tooltip is read BEFORE the player picks a tool, so it states both.
+//
+// WHICH PROFESSIONS ARE ADVERTISED is a policy answer, never a hand-kept list:
+// slotToolEffectRefused (professions/tools.ts) is the authority, and the test
+// file pins the howToSlot copy against it in both directions. Fishing is absent
+// from the line because that predicate refuses it, not because the sentence was
+// written that way; farming is present because it does not.
 
 import { TOOL_EFFECTS, type ToolEffectId } from '../sim/content/professions';
 import { ITEMS } from '../sim/data';
@@ -21,6 +32,7 @@ import { formatNumber, type TranslationKey, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import { itemNameColor } from './item_name_color';
 import { toolEffectNameKey } from './tool_effect_name';
+import { tooltipLine } from './tooltip_line_core';
 
 /** Effect id -> bonus-description key. Mirrors TOOL_EFFECTS; an id absent here
  *  has no honest bonus line (a retired or unknown id renders no tooltip). */
@@ -28,11 +40,8 @@ const BONUS_KEYS: Record<ToolEffectId, TranslationKey> = {
   gatherers_cache: 'hudChrome.professions.toolEffectTooltip.bonus.gatherersCache',
   artisans_eye: 'hudChrome.professions.toolEffectTooltip.bonus.artisansEye',
   quickening_charm: 'hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm',
+  makers_charm: 'hudChrome.professions.toolEffectTooltip.bonus.makersCharm',
 };
-
-function line(cls: 'tt-sub' | 'tt-desc' | 'tt-green', text: string): string {
-  return `<div class="${cls}">${esc(text)}</div>`;
-}
 
 type ToolEffectUse = Extract<ItemUse, { type: 'toolEffect' }>;
 
@@ -92,17 +101,17 @@ function toolEffectBodyLines(effectId: string): string {
   const baseCharges = formatNumber(def.startingDurability, { maximumFractionDigits: 0 });
   const rarityBonus = formatNumber(RARITY_DURABILITY_BONUS, { maximumFractionDigits: 0 });
   return (
-    line('tt-sub', t('hudChrome.professions.toolEffectTooltip.kind')) +
-    line('tt-green', t(bonusKey)) +
-    line('tt-desc', t('hudChrome.professions.toolEffectTooltip.howToSlot')) +
-    line(
+    tooltipLine('tt-sub', t('hudChrome.professions.toolEffectTooltip.kind')) +
+    tooltipLine('tt-green', t(bonusKey)) +
+    tooltipLine('tt-desc', t('hudChrome.professions.toolEffectTooltip.howToSlot')) +
+    tooltipLine(
       'tt-desc',
       t('hudChrome.professions.toolEffectTooltip.charges', {
         base: baseCharges,
         bonus: rarityBonus,
       }),
     ) +
-    line('tt-sub', t('hudChrome.professions.toolEffectTooltip.landOnly'))
+    tooltipLine('tt-sub', t('hudChrome.professions.toolEffectTooltip.landOnly'))
   );
 }
 

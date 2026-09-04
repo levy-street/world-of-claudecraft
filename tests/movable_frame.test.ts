@@ -158,6 +158,16 @@ class FakeEl {
 const docListeners: Array<[string, Listener]> = [];
 const fakeDocument = {
   body: new FakeEl(),
+  // getUiScale caches, and its per-call cache key is the INLINE `--ui-scale` on
+  // the document element (the one thing main.ts's applySetting ever writes; no
+  // stylesheet declares the property). So the fake has to move BOTH reads off
+  // the one uiScaleStub, or flipping the stub would move the computed value
+  // that this fake alone can move and leave the cache holding.
+  documentElement: {
+    style: {
+      getPropertyValue: (p: string) => (p === '--ui-scale' ? String(uiScaleStub) : ''),
+    },
+  },
   createElement: () => new FakeEl(),
   addEventListener: (type: string, fn: Listener) => {
     docListeners.push([type, fn]);

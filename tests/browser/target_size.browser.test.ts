@@ -8,6 +8,9 @@
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { page } from 'vitest/browser';
+import { PERFECTING_SKILL_REQ, perfectingInfoFrom } from '../../src/sim/professions/perfecting';
+import { PlantSheetWindow } from '../../src/ui/hud/professions/farming_plant_sheet_window';
+import { PerfectingWindow } from '../../src/ui/hud/professions/perfecting_window';
 import { cleanup } from './_harness';
 
 const TOUCH_FLOOR = 40;
@@ -318,6 +321,126 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
     toggle.appendChild(document.createTextNode(' Ask each use'));
     document.body.appendChild(toggle);
     expectAtLeastFloor(toggle, '.prof-effect-mode-toggle');
+  });
+
+  it('plant sheet controls: seed pick, three care knobs, and Plant (real painter)', () => {
+    // The real painter under the real styles, the a11y-suite idiom, so the
+    // measured markup can never drift from what a bed press renders. The
+    // knobs paint DISABLED here (a fresh bag affords none), which is exactly
+    // the state the touch floor must still honor.
+    // CAUTION: the world stub is handed over through `as never`; it must
+    // carry every member the window's buildInput reads (inventory,
+    // myFarmPlots, professionsState) or the miss is a runtime throw in this
+    // suite only.
+    const host = el('div', { id: 'plant-sheet-window', class: 'window panel' });
+    document.body.appendChild(host);
+    const world = {
+      inventory: [
+        { itemId: 'vale_wheat_seed', count: 3 },
+        { itemId: 'garden_hoe', count: 1 },
+      ],
+      myFarmPlots: [],
+      professionsState: { skills: [{ professionId: 'farming', skill: 10, maxSkill: 100 }] },
+      plantCrop: () => {},
+    };
+    const win = new PlantSheetWindow({
+      root: () => host,
+      world: () => world as never,
+      closeOthers: () => {},
+      captureFocus: () => null,
+      restoreFocus: () => {},
+    });
+    win.open('bed_eastbrook_1');
+    for (const sel of [
+      '.ps-seed',
+      '[data-knob="compost"]',
+      '[data-knob="watch"]',
+      '[data-knob="tonic"]',
+      '.ps-plant',
+    ]) {
+      const node = host.querySelector<HTMLElement>(sel);
+      expect(node, `${sel} must render`).not.toBeNull();
+      expectAtLeastFloor(node as HTMLElement, sel);
+    }
+    win.close();
+  });
+
+  it('perfecting window controls: candidate rows, the action button, close (real painter)', () => {
+    // The real painter under the real styles (the plant-sheet idiom). The
+    // window mints its own root, so it is queried by id after open. The stub
+    // is handed over `as never`, same trap as the plant sheet: it must carry
+    // every member buildView reads.
+    const world = {
+      equipment: { mainhand: 'duskforged_warblade' },
+      equipmentInstances: {},
+      // The full attempt bill: with a material missing the action button
+      // renders DISABLED and its click opens nothing, so the bind-prompt
+      // rows below would find no prompt (the first browser run's red).
+      inventory: [
+        { itemId: 'makers_ember', count: 2 },
+        { itemId: 'sundered_essence', count: 1 },
+        { itemId: 'prismglass_setting', count: 3 },
+      ],
+      craftingIdentity: { synced: true },
+      craftSkills: { weaponcrafting: PERFECTING_SKILL_REQ },
+      perfectItem: () => {},
+      perfectingInfo(ref: unknown) {
+        return perfectingInfoFrom({
+          ref,
+          inventory: world.inventory,
+          equipment: world.equipment,
+          equipmentInstances: world.equipmentInstances,
+          craftSkills: world.craftSkills,
+        } as never);
+      },
+    };
+    const win = new PerfectingWindow({
+      itemIcon: () => '',
+      moneyHtml: () => '',
+      itemTooltip: () => '',
+      attachTooltip: () => {},
+      world: () => world as never,
+      closeOthers: () => {},
+      captureFocus: () => null,
+      restoreFocus: () => {},
+    } as never);
+    win.open();
+    const root = document.getElementById('perfecting-window') as HTMLElement;
+    for (const sel of ['.pf-cand', '.pf-action', '[data-close]']) {
+      const node = root.querySelector<HTMLElement>(sel);
+      expect(node, `${sel} must render`).not.toBeNull();
+      expectAtLeastFloor(node as HTMLElement, sel);
+    }
+    // The bind-confirm prompt: BOTH actions carry the floor. The cancel
+    // shipped bare-.btn (~29px) beside a 44px confirm guarding a permanent
+    // bind, which is exactly the mis-tap bias the floor exists to prevent;
+    // unmeasured controls are how it escaped (the QA round's finding).
+    let stack = document.getElementById('prompt-stack');
+    if (!stack) {
+      stack = el('div', { id: 'prompt-stack' });
+      document.body.appendChild(stack);
+    }
+    (root.querySelector('.pf-action') as HTMLElement).click();
+    for (const sel of ['.pf-bind-confirm', '.pf-bind-cancel']) {
+      const node = stack.querySelector<HTMLElement>(sel);
+      expect(node, `${sel} must render in the bind prompt`).not.toBeNull();
+      expectAtLeastFloor(node as HTMLElement, sel);
+    }
+    (stack.querySelector('.pf-bind-cancel') as HTMLElement).click();
+    win.close();
+    // The naming dialog: reopen over a Perfected copy so the action opens it.
+    world.equipmentInstances = { mainhand: { perfected: true, boundTo: 1 } } as never;
+    world.inventory.push({ itemId: 'deed_of_making', count: 1 });
+    win.open();
+    (root.querySelector('.pf-action') as HTMLElement).click();
+    for (const sel of ['.pf-name-submit', '.pf-name-cancel']) {
+      const node = stack.querySelector<HTMLElement>(sel);
+      expect(node, `${sel} must render in the naming dialog`).not.toBeNull();
+      expectAtLeastFloor(node as HTMLElement, sel);
+    }
+    (stack.querySelector('.pf-name-cancel') as HTMLElement).click();
+    win.close();
+    root.remove();
   });
 
   it('the per-use confirm dialog actions (R40 confirmToolEffectUse)', () => {

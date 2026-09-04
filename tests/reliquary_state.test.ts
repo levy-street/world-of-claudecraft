@@ -831,10 +831,11 @@ describe('Reliquary profession marks (Phase 7)', () => {
     // The load this regex still carries is the isCataloguedRelicMark gate
     // on the derived visit write, which no behavioral case can reach while
     // every masterwork-capable craft has an authored mark (only equippable
-    // outputs can proc, and all four gear-capable professions sit in
-    // RELIQUARY_PROFESSION_MARKS.masterworkByCraft; its fifth entry,
+    // outputs can proc, and every gear-capable profession sits in
+    // RELIQUARY_PROFESSION_MARKS.masterworkByCraft; its one non-gear entry,
     // engineering, is the pended tool-only craft that can never proc, see
-    // the gear-capability pin in tests/reliquary_content.test.ts).
+    // the gear-capability pin in tests/reliquary_content.test.ts, which
+    // derives that membership from the live recipes in both directions).
     const craftSrc = fs
       .readFileSync(path.join(__dirname, '../src/sim/professions/crafting.ts'), 'utf8')
       .split('\n')
@@ -3414,9 +3415,10 @@ describe('Reliquary completion ladder deeds (Phase 18)', () => {
    * the slots named in `skip`. The four on-page ladder titles are never
    * granted directly: the sync under test is their only legitimate writer, so
    * the rig earning them by hand would vacuous-green every assertion below.
-   * masterwork:engineering is granted directly like every other mark: its
-   * live write site is pended (13b QA owner ruling), and direct mark grants
-   * are the sanctioned test route to owned === total.
+   * masterwork:engineering is granted directly like every other mark:
+   * direct mark grants are the sanctioned test route to owned === total
+   * (its live write site has been earnable since the masterwrought Phase
+   * 11o un-pend; the direct grant stays the route regardless).
    */
   function grantWholeCharacterCatalog(sim: Sim, skip: ReadonlySet<string> = new Set()): void {
     const { meta } = primary(sim);

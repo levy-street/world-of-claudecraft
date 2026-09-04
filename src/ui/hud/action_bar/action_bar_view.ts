@@ -53,6 +53,7 @@ import { priestActionGlowActive } from '../../../sim/combat/priest/presentation'
 import { mendingCurrentTargetCapped } from '../../../sim/combat/shaman_spiritmend';
 import { flowStateDiscountedCost } from '../../../sim/combat/shaman_talents';
 import { thundercallPayoffGlowActive } from '../../../sim/combat/shaman_thundercall';
+import { countRawInSlots } from '../../../sim/item_lock';
 import { isAscensionEmpoweredAbility } from '../../../sim/paladin_devotion';
 import {
   type AbilityDef,
@@ -114,7 +115,7 @@ export interface ActionBarAbility {
    *  Ice Block); total max = 1 + bonusCharges. undefined = 0. */
   bonusCharges?: number;
   /** Cooldown map key when a cooldown-carrying transform shares the base
-   *  button's clock (Swiftmend/Overbloom); the sweep must read the same key
+   *  button's clock (Fleetmend/Overbloom); the sweep must read the same key
    *  the sim gate checks, or a running shared clock is invisible while the
    *  button is transformed. */
   cooldownId?: string;
@@ -132,7 +133,7 @@ export interface ActionBarAuraInput {
   kind: AuraKind;
   value?: number;
   empowerAbilities?: readonly string[];
-  /** Stacks, for a stack-gated ability (Glacial Spike needs 5 Icicles). */
+  /** Stacks, for a stack-gated ability (Rimeneedle needs 5 Icicles). */
   stacks?: number;
 }
 
@@ -403,21 +404,6 @@ export function actionBarCooldownRemaining(
   return player.cooldowns.get(ability.cooldownId ?? abilityId) ?? 0;
 }
 
-/** How many of `itemId` the player is carrying, summed across stacks. Exported
- *  because the consumables seat needs the same number for its tooltip's in-bags
- *  line, off the same snapshot the bar state is built from. */
-export function inventoryCount(
-  inventory: readonly { itemId: string; count: number }[],
-  itemId: string,
-): number {
-  // A for-loop, not reduce: no per-frame closure allocation on the hot path.
-  let total = 0;
-  for (const slot of inventory) {
-    if (slot.itemId === itemId) total += slot.count;
-  }
-  return total;
-}
-
 /**
  * Build an action-bar view bound to one descriptor. The per-slot state array is
  * preallocated once here; tick() mutates it in place and returns the SAME references
@@ -534,7 +520,7 @@ export function createActionBarView(
         }
 
         if (item !== null) {
-          const count = inventoryCount(world.inventory, item.id);
+          const count = countRawInSlots(world.inventory, item.id);
           // Potions share one global cooldown, so any potion slot paints the same
           // swipe; other items have no cooldown.
           const potionCd = item.kind === 'potion' ? player.potionCdRemaining : 0;
@@ -649,7 +635,7 @@ export function createActionBarView(
           player.auras,
           cheapCostMultiplier === null ? ability.cost : ability.cost * cheapCostMultiplier,
         );
-        // A kill-window ability (Victory Rush): usable only while its enabling
+        // A kill-window ability (Victor's Surge): usable only while its enabling
         // aura is worn, and it glows while the window is open.
         let windowOpen = true;
         let windowGlow = false;

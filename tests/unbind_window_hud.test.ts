@@ -39,40 +39,47 @@ function unbindResultArm(): string {
 }
 
 describe('hud.ts unbindResult event arm (source pins)', () => {
-  it('logs the unbound line on ok and maps the deny reasons to unbind keys', () => {
+  it('logs the unbound line on ok and renders every deny through the one reason map', () => {
+    // Since Masterwrought phase 12 the reason-to-key pairing is the total
+    // UNBIND_DENY_KEY record in src/ui/hud/vendor/unbind_view.ts (pinned
+    // literal-for-literal in tests/professions_commissions_ui.test.ts, where a
+    // key swap or a missing reason fails), so the arm carries NO chain of its
+    // own: exactly one deny render through unbindDenyKey, and none of the
+    // deny key literals inline (a re-inlined chain would fork the pairing).
     const arm = unbindResultArm();
     expect(arm).toContain("t('hudChrome.unbind.unbound'");
+    expect(arm).toContain('t(unbindDenyKey(ev.reason))');
+    expect(arm.match(/unbindDenyKey\(/g)).toHaveLength(1);
     for (const key of [
       'hudChrome.unbind.notEligible',
       'hudChrome.unbind.notBound',
+      'hudChrome.unbind.perfecting',
       'hudChrome.unbind.cannotAfford',
       'hudChrome.unbind.noSpace',
       'hudChrome.unbind.outOfRange',
     ]) {
-      expect(arm, key).toContain(key);
+      expect(arm, `${key} must not be re-inlined beside the map`).not.toContain(key);
     }
-    for (const reason of [
-      'unbind_not_eligible',
-      'unbind_not_bound',
-      'unbind_cannot_afford',
-      'unbind_no_space',
-    ]) {
-      expect(arm, reason).toContain(reason);
-    }
-  });
-
-  it('pairs each deny reason with ITS OWN key (a key swap in the chain must fail here)', () => {
-    // Presence pins alone cannot catch two keys swapped inside the ternary
-    // chain, so pin each reason-to-key pairing. unbind_out_of_range is
-    // deliberately the fallback arm (its literal never appears in hud.ts), so
-    // its pairing is pinned as the else branch of the unbind_no_space arm.
-    const arm = unbindResultArm();
-    expect(arm).toMatch(/'unbind_not_eligible'\s*\?\s*'hudChrome\.unbind\.notEligible'/);
-    expect(arm).toMatch(/'unbind_not_bound'\s*\?\s*'hudChrome\.unbind\.notBound'/);
-    expect(arm).toMatch(/'unbind_cannot_afford'\s*\?\s*'hudChrome\.unbind\.cannotAfford'/);
-    expect(arm).toMatch(
-      /'unbind_no_space'\s*\?\s*'hudChrome\.unbind\.noSpace'\s*:\s*'hudChrome\.unbind\.outOfRange'/,
-    );
+    expect(arm).not.toMatch(/unbind_[a-z_]+'\s*\?/);
+    // Nor a rewrite of the reason ahead of the map (the coverage audit's
+    // surviving shape: `ev.reason = 'unbind_not_bound'` before the one call
+    // would re-route a refusal with no key literal and no chain). Four pins
+    // cover the write spellings: dotted plain and compound assignment on any
+    // receiver (casts and aliases included); the QUOTED 'reason' literal
+    // banned from the arm in every quote form, which covers bracket-keyed
+    // writes, defineProperty('reason', ...) by name, AND the variable-key
+    // spelling minted IN the arm (const k = 'reason'; ev[k] = ...): the
+    // plain spellings all carry the literal in the arm (a key minted
+    // outside the slice or by concatenation would not, and no source pin
+    // of this class closes deliberate evasion; the live arm only ever
+    // reads ev.reason dotted, so the ban costs nothing); a quoted object-literal
+    // binding; and the dynamic write channels (defineProperty / Reflect.set
+    // / Object.assign) banned outright since an Object.assign from a
+    // variable would carry no quoted key for the literal ban to see.
+    expect(arm).not.toMatch(/\.reason\s*(\|\|=|&&=|\?\?=|=[^=])/);
+    expect(arm).not.toMatch(/['"`]reason['"`]/);
+    expect(arm).not.toMatch(/reason\s*:\s*['"]/);
+    expect(arm).not.toMatch(/defineProperty|Reflect\.set|Object\.assign/);
   });
 
   it('derives the item name from static content and formats the fee locally (text-free event)', () => {

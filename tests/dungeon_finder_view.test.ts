@@ -166,8 +166,21 @@ describe('dungeon finder view core', () => {
       ),
     );
     const boss = view.detail?.encounters.find((e) => e.final);
-    expect(boss?.heroicGroups.length).toBe(2);
-    expect(boss?.heroicGroups.every((g) => g.guaranteed)).toBe(true);
+    // THREE groups since masterwrought Phase 11f, and the split is the claim:
+    // the two GEAR groups still partition a full draw apiece (one epic each,
+    // guaranteed), and the appended farming pattern group deliberately does
+    // not (0.08 total, at most one pattern per clear). The preview showing it
+    // is correct rather than a regression: it really is a drop off this boss,
+    // and a browser deciding whether to queue should see it. The old literal
+    // predates the second group, so it is re-cut rather than the guaranteed
+    // check being dropped, which would have hidden a gear group falling below
+    // a full draw.
+    expect(boss?.heroicGroups.length).toBe(3);
+    expect(boss?.heroicGroups.filter((g) => g.guaranteed).length, 'the two gear groups').toBe(2);
+    expect(
+      boss?.heroicGroups.filter((g) => !g.guaranteed).length,
+      'the appended farming group is a bonus draw, never guaranteed',
+    ).toBe(1);
     expect(view.detail?.heroicMarks).toBe(1);
     // The heroic finale preview advertises the raised heroicCopper base the
     // kill actually pays; a non-finale encounter keeps its normal copper.

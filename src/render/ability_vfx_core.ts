@@ -406,7 +406,7 @@ export function planImpact(
 // rig keys off the kind, so both its sources read) and both 'stasis' ids carry
 // a read (ice_block's shell, temporal_hourglass's own visual). The
 // NON-fear incapacitates still wear nothing persistent: Gouge, Sap, Blind,
-// Hibernate, Wyvern Sting, Startle Shot, Dragon's Breath and the staged-cone
+// Hibernate, Drakesting, Startle Shot, Dragon's Breath and the staged-cone
 // daze hold a victim in place and break on the first damage, which is a
 // different read again ("hit me and this ends"), and giving that its own tell
 // stays a separate design call.

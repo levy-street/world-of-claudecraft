@@ -144,6 +144,7 @@ import {
   resetLoadProfile,
   summarizeLoadProfile,
 } from './game/load_profiler';
+import { trackMetaPixel } from './game/meta_pixel';
 import {
   interfaceModeFromSetting,
   isPhoneTouchDevice,
@@ -187,6 +188,7 @@ import {
   Settings,
 } from './game/settings';
 import { sfx } from './game/sfx';
+import { toggleSheatheWithCue } from './game/sheathe_toggle';
 import { initSoftwareRenderNotice } from './game/software_render_notice';
 import {
   decideSpawnCinematic,
@@ -204,6 +206,12 @@ import {
   teleportCameraArrivalKind,
   teleportCameraFacingState,
 } from './game/teleport_camera';
+import {
+  ensureTurnstile,
+  resetTurnstile,
+  TURNSTILE_SITEKEY,
+  turnstileToken,
+} from './game/turnstile_gate';
 import { loadingCurtainFadeMs, resolveUiEffectsProfile } from './game/ui_effects_profile';
 import { feedSimCalendar } from './game/utc_day';
 import { voice } from './game/voice';
@@ -450,7 +458,6 @@ import {
   attachGatherNodeHoverTooltip,
   gatherNodeToolGateFor,
 } from './ui/gather_node_tooltip_controller';
-import { gatherEffectPrompt, gatherToolNoNodeKey } from './ui/gathering_view';
 import { loadHighscoresInto } from './ui/highscore_board';
 import { type ClaudiumHooks, Hud } from './ui/hud';
 import { resolveActionBarVisibility } from './ui/hud/action_bar/action_bar_visibility_core';
@@ -462,6 +469,7 @@ import {
   setReferralProvider,
   setStandingProvider,
 } from './ui/hud/player_card/player_card_share';
+import { gatherEffectPrompt, gatherToolNoNodeKey } from './ui/hud/professions/gathering_view';
 import {
   ensureLocaleLoaded,
   formatNumber,
@@ -680,65 +688,6 @@ function saveHomepageMusicMuted(muted: boolean): void {
   } catch {
     // Private browsing or storage failures should not block the control.
   }
-}
-
-// --- Cloudflare Turnstile (bot gate on the login/register form) ---------------
-// The site key is injected at build time; when it is empty (local/offline dev or
-// a build without the env var) the widget never renders and the token is '', so
-// the server, which also skips verification without its secret, lets requests
-// through unchanged. The api.js <script> is in index.html.
-const TURNSTILE_SITEKEY = String(import.meta.env.VITE_TURNSTILE_SITEKEY ?? '');
-
-interface TurnstileApi {
-  render: (el: string | HTMLElement, opts: { sitekey: string }) => string;
-  getResponse: (widgetId?: string) => string | undefined;
-  reset: (widgetId?: string) => void;
-}
-let turnstileWidgetId: string | undefined;
-
-function turnstileApi(): TurnstileApi | undefined {
-  return (window as unknown as { turnstile?: TurnstileApi }).turnstile;
-}
-
-// Render the widget once, retrying until the async api.js script is ready. Safe to
-// call repeatedly (idempotent) and a no-op when no site key is configured. The
-// Electron desktop shell never renders it: Cloudflare rejects the app:// origin
-// (widget error 110200), and the server bypasses Turnstile for desktop origins
-// (passesTurnstile in server/turnstile.ts), so a widget here could only wedge
-// the form.
-function ensureTurnstile(): void {
-  if (DESKTOP_APP || !TURNSTILE_SITEKEY || turnstileWidgetId !== undefined) return;
-  const ts = turnstileApi();
-  const el = document.getElementById('cf-turnstile-container');
-  if (!ts || !el) {
-    window.setTimeout(ensureTurnstile, 200);
-    return;
-  }
-  turnstileWidgetId = ts.render(el, { sitekey: TURNSTILE_SITEKEY });
-}
-
-// The current single-use token, or '' when verification is not configured / not
-// yet solved. Tokens are consumed server-side, so reset after each attempt.
-function turnstileToken(): string {
-  const ts = turnstileApi();
-  if (!TURNSTILE_SITEKEY || !ts || turnstileWidgetId === undefined) return '';
-  return ts.getResponse(turnstileWidgetId) ?? '';
-}
-
-function resetTurnstile(): void {
-  const ts = turnstileApi();
-  if (ts && turnstileWidgetId !== undefined) ts.reset(turnstileWidgetId);
-}
-
-function trackMetaPixel(
-  eventName: string,
-  data?: Record<string, unknown>,
-  options?: Record<string, unknown>,
-): void {
-  const fbq = (window as Window & { fbq?: (...args: unknown[]) => void }).fbq;
-  if (typeof fbq !== 'function') return;
-  if (options) fbq('trackCustom', eventName, data ?? {}, options);
-  else fbq('trackCustom', eventName, data ?? {});
 }
 
 function trackCommunityLinkClicks(): void {
@@ -1960,17 +1909,17 @@ async function startGame(
           case 'reliquary':
             hud.toggleReliquary();
             break;
-          case 'sheathe': {
-            // Cosmetic sheathe toggle (Z). The world owns the rule (dead-gate,
-            // combat auto-unsheathe); play the cue only when the state moved.
-            const wasStowed = world.player.weaponStowed;
-            world.toggleWeaponStow();
-            if (world.player.weaponStowed !== wasStowed) {
-              if (world.player.weaponStowed) audio.weaponSheathe();
-              else audio.weaponUnsheathe();
-            }
+          case 'harvestJournal':
+            hud.toggleHarvestJournal();
             break;
-          }
+          case 'perfecting':
+            hud.togglePerfecting();
+            break;
+          case 'sheathe':
+            // Cosmetic sheathe toggle (Z): the cue-on-state-change rule lives
+            // in sheathe_toggle.ts, shared with the gamepad dispatch below.
+            toggleSheatheWithCue(world, audio);
+            break;
           case 'chat':
             openChat();
             break;
@@ -2298,6 +2247,12 @@ async function startGame(
       case 'reliquary':
         hud.toggleReliquary();
         break;
+      case 'harvestJournal':
+        hud.toggleHarvestJournal();
+        break;
+      case 'perfecting':
+        hud.togglePerfecting();
+        break;
       case 'crafting':
         // The controller panel has always OFFERED this bind (it lists every
         // edge keybind action); the dispatch dropped it silently.
@@ -2328,17 +2283,10 @@ async function startGame(
       case 'dungeonFinder':
         hud.toggleDungeonFinder();
         break;
-      case 'sheathe': {
-        // The keyboard arm's exact rule: the world owns the gate, the cue
-        // plays only when the state moved.
-        const wasStowed = world.player.weaponStowed;
-        world.toggleWeaponStow();
-        if (world.player.weaponStowed !== wasStowed) {
-          if (world.player.weaponStowed) audio.weaponSheathe();
-          else audio.weaponUnsheathe();
-        }
+      case 'sheathe':
+        // The keyboard arm's exact rule, from the same module.
+        toggleSheatheWithCue(world, audio);
         break;
-      }
       case 'chat':
         openChat();
         break;

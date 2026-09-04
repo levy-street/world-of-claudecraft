@@ -236,6 +236,69 @@ function jobSource(name: string): string {
   return match[0];
 }
 
+/** A `sparse-checkout:` header in ANY YAML block-scalar spelling. The style
+ *  indicator is deliberately open (`|`, `|-`, `|+`, `>`, `>-`, `>+`, and an
+ *  explicit indentation digit): all of them feed actions/checkout the same cone,
+ *  so a drifted sixth copy must not be able to leave this extractor's sight by
+ *  changing chomping style. Matching only `|` is how a divergent block hides. */
+const SPARSE_HEADER_RE = /^sparse-checkout:\s*[|>][-+]?\d?$/;
+
+/** The screenshot exclusion, as its own LINE rather than a substring, so
+ *  surrounding whitespace or a re-indent cannot make a real block invisible. */
+const SCREENSHOT_EXCLUSION_RE = /^\s*!\/docs\/screenshots\/\*\/\s*$/m;
+
+/**
+ * Every `sparse-checkout:` block in `source` that carries the docs/screenshots
+ * exclusion, extracted WHOLE: the header, its indented body, and the
+ * `sparse-checkout-cone-mode:` line that closes it.
+ *
+ * Structural rather than a search for the known literal, which is the whole
+ * point: a copy-pasted block someone then edited must still be FOUND, so that
+ * the caller can compare it and fail. The body ends where the indentation
+ * returns to the header's own level, so the `changes` job's article-free
+ * `sparse-checkout: |` (a two-line scripts cone with no cone-mode key) is
+ * bounded correctly and then filtered out for lacking the exclusion.
+ */
+function screenshotSparseBlocks(source: string): string[] {
+  const lines = source.split('\n');
+  const indentOf = (line: string): number => line.length - line.trimStart().length;
+  const blocks: string[] = [];
+  for (let i = 0; i < lines.length; i++) {
+    if (!SPARSE_HEADER_RE.test(lines[i].trim())) continue;
+    const headerIndent = indentOf(lines[i]);
+    let end = i;
+    for (let j = i + 1; j < lines.length; j++) {
+      const line = lines[j];
+      // THE TERMINATOR: the body ends at the next NON-BLANK line at or above
+      // the header's own indent (the next `with:` key, the cone-mode closer,
+      // or the next job). A blank line is legal INSIDE a YAML block scalar
+      // and must not end the walk: the pre-fix loop broke at the first blank,
+      // so a block split by an internal blank line was truncated above its
+      // exclusion line and left discovery entirely, which is the one
+      // direction this extractor must never fail in (fewer blocks found).
+      // Trailing blanks stay excluded because `end` only advances on a
+      // non-blank body line.
+      if (line.trim() === '') continue;
+      if (indentOf(line) <= headerIndent) break;
+      end = j;
+    }
+    let block = lines.slice(i, end + 1).join('\n');
+    // The closer lookup is blank-immune like the body walk above: a blank
+    // line parked between the body and sparse-checkout-cone-mode: must not
+    // drop the closer from the extracted block (which would read as a
+    // divergent copy missing its cone-mode line, or, worse, hide the
+    // cone-mode value from the equality pin entirely).
+    let closerAt = end + 1;
+    while (closerAt < lines.length && lines[closerAt].trim() === '') closerAt++;
+    const closer = lines[closerAt];
+    if (closer !== undefined && closer.trim().startsWith('sparse-checkout-cone-mode:')) {
+      block += `\n${closer}`;
+    }
+    if (SCREENSHOT_EXCLUSION_RE.test(block)) blocks.push(block);
+  }
+  return blocks;
+}
+
 describe('CI workflow parity', () => {
   it('sparse-checkout on the test jobs covers every referenced screenshot subtree', () => {
     // The five sparse test-job checkouts (pr-gate, both long-sims lanes,
@@ -270,10 +333,12 @@ describe('CI workflow parity', () => {
       '            /docs/screenshots/ignivar-raid-expansion/',
       '            /docs/screenshots/item-art-consistency-2026-08-09/',
       '            /docs/screenshots/market-house-redesign/',
+      '            /docs/screenshots/masterwrought-art-completion-2026-09-02/',
       '            /docs/screenshots/placeholder-art-completion-2026-08-09/',
       '            /docs/screenshots/r35-admin-professions-inspector/',
       '            /docs/screenshots/release-v036-skill-normalization-2026-08-10/',
       '            /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/',
+      '            /docs/screenshots/touch-ui-rework/',
       '            /docs/screenshots/vault-fine-mark/',
       '            /docs/screenshots/wildheart/',
       '            /docs/screenshots/woc-market/',
@@ -296,6 +361,91 @@ describe('CI workflow parity', () => {
       expect(jobSource(job).includes(SPARSE_CONE), job).toBe(false);
     }
     expect(workflow.split(SPARSE_CONE)).toHaveLength(6);
+    // The counts above are both blind in one direction: they say how many
+    // copies of THIS literal exist, and nothing at all about a sixth block that
+    // was copy-pasted and then edited, which reads as zero copies of the
+    // literal in a job the first loop does not name. So extract every
+    // screenshot-excluding sparse block the workflow actually contains, whole,
+    // and require each to BE the literal. That subsumes both counts against a
+    // divergent copy: a drifted block is still extracted here and still fails.
+    const blocks = screenshotSparseBlocks(workflow);
+    expect(blocks, 'every sparse-checkout block carrying the screenshot exclusion').toHaveLength(5);
+    for (const [i, block] of blocks.entries()) {
+      expect(block, `sparse-checkout block ${i + 1} diverged from the one cone`).toBe(SPARSE_CONE);
+    }
+    // The extractor's own control, and it proves the thing that actually
+    // matters: SIXTH-BLOCK DISCOVERY. Append a synthetic sixth job whose cone
+    // diverged (one subtree dropped) and the extractor must find SIX blocks
+    // with exactly one of them unequal, which is precisely the state a
+    // copy-pasted-then-edited block would leave the workflow in. Mutating one
+    // of the existing five would only prove the extractor reads them.
+    //
+    // The dropped subtree is DERIVED from the parsed cone, never a hard-coded
+    // path: a hard-coded one silently stops mutating anything the day that
+    // subtree is renamed or removed, and the control passes over an unmutated
+    // copy forever.
+    const coneSubtreeLines = SPARSE_CONE.split('\n').filter((line) =>
+      /^\s*\/docs\/screenshots\/[A-Za-z0-9._-]+\/$/.test(line),
+    );
+    expect(coneSubtreeLines.length, 'the cone really lists subtrees to drop').toBeGreaterThan(0);
+    const divergentCone = SPARSE_CONE.split('\n')
+      .filter((line) => line !== coneSubtreeLines[coneSubtreeLines.length - 1])
+      .join('\n');
+    expect(divergentCone).not.toBe(SPARSE_CONE);
+    const withSixth = `${workflow}\n  synthetic-drift-job:\n    steps:\n      - uses: actions/checkout@v5\n        with:\n${divergentCone}\n`;
+    const sixBlocks = screenshotSparseBlocks(withSixth);
+    expect(sixBlocks, 'a sixth block must be DISCOVERED, not silently skipped').toHaveLength(6);
+    expect(sixBlocks.filter((block) => block !== SPARSE_CONE)).toHaveLength(1);
+
+    // ...and the same sixth block hiding behind a different block-scalar style
+    // is still discovered, which is what SPARSE_HEADER_RE buys.
+    for (const style of ['|-', '|+', '>', '>-']) {
+      const restyled = divergentCone.replace(/^(\s*sparse-checkout:\s*)\|$/m, `$1${style}`);
+      expect(restyled, `the ${style} rewrite really changed the header`).not.toBe(divergentCone);
+      const styled = `${workflow}\n  synthetic-drift-job:\n    steps:\n      - uses: actions/checkout@v5\n        with:\n${restyled}\n`;
+      expect(screenshotSparseBlocks(styled), `a ${style} block must be found`).toHaveLength(6);
+    }
+
+    // ...and the same sixth block split by an INTERNAL BLANK LINE above its
+    // exclusion line is still discovered whole. Blank lines are legal inside
+    // a YAML block scalar, and the pre-fix extractor broke its body walk at
+    // the first one: this block's truncated fragment lacked the exclusion, so
+    // the divergent sixth cone left discovery entirely and the five-block
+    // count above stayed green over it. The control reds on that extractor
+    // (five blocks found) and holds the fixed walk to the honest direction:
+    // a formatting trick may only ever surface as MORE blocks discovered
+    // (then unequal to the one cone), never fewer.
+    const splitLines = divergentCone.split('\n');
+    const exclusionAt = splitLines.findIndex((line) => SCREENSHOT_EXCLUSION_RE.test(line));
+    expect(exclusionAt, 'the divergent cone still carries the exclusion line').toBeGreaterThan(0);
+    splitLines.splice(exclusionAt, 0, '');
+    const blankSplitCone = splitLines.join('\n');
+    const withBlankSixth = `${workflow}\n  synthetic-drift-job:\n    steps:\n      - uses: actions/checkout@v5\n        with:\n${blankSplitCone}\n`;
+    const blankBlocks = screenshotSparseBlocks(withBlankSixth);
+    expect(blankBlocks, 'a blank-line-split sixth block must be DISCOVERED whole').toHaveLength(6);
+    expect(blankBlocks.filter((block) => block !== SPARSE_CONE)).toHaveLength(1);
+    // The closer half of the same immunity (the Phase 18 fresh-read control):
+    // a blank line parked between the last subtree row and the cone-mode
+    // closer must not drop the closer from the extracted block. The sixth
+    // copy here is the UNMODIFIED cone with that one blank inserted, so the
+    // post-fix extractor reads it EQUAL to SPARSE_CONE (six equal blocks);
+    // the pre-fix lines[end + 1] lookup lost the closer and read it unequal.
+    // The divergent cone cannot carry this control (it is unequal either
+    // way), which is why the body-split control above cannot see the closer.
+    const coneLines = SPARSE_CONE.split('\n');
+    const closerAt = coneLines.findIndex((line) =>
+      line.trim().startsWith('sparse-checkout-cone-mode:'),
+    );
+    expect(closerAt, 'the cone carries its cone-mode closer').toBeGreaterThan(0);
+    coneLines.splice(closerAt, 0, '');
+    const blankBeforeCloser = coneLines.join('\n');
+    const withBlankCloserSixth = `${workflow}\n  synthetic-drift-job:\n    steps:\n      - uses: actions/checkout@v5\n        with:\n${blankBeforeCloser}\n`;
+    const closerBlocks = screenshotSparseBlocks(withBlankCloserSixth);
+    expect(closerBlocks, 'a blank before the closer must not lose the block').toHaveLength(6);
+    expect(
+      closerBlocks.filter((block) => block !== SPARSE_CONE),
+      'a blank before the closer must not drop the closer from the block',
+    ).toHaveLength(0);
     const coneDirs = new Set<string>(
       [...SPARSE_CONE.matchAll(/\/docs\/screenshots\/([A-Za-z0-9._-]+)\//g)].map((m) => m[1]),
     );
@@ -311,8 +461,15 @@ describe('CI workflow parity', () => {
         const match = line.match(/^docs\/screenshots\/([A-Za-z0-9._-]+)\//);
         if (match) indexDirs.add(match[1]);
       }
-      // Vacuity floor near the real count (166 subtrees on 2026-08-14).
-      expect(indexDirs.size).toBeGreaterThanOrEqual(160);
+      // Vacuity floor near the real count (254 subtrees on 2026-08-25, after
+      // the seventeenth release sync brought the tutorial island, guild board
+      // and Double Honor evidence; 249 on 2026-08-24). The
+      // 169 this comment carried was accurate on 2026-08-14; ten days of
+      // committed evidence took it to 235 at efb1220e85, 248 at the 11l stamp
+      // and 249 after the sixteenth release sync, so a floor of 160 had rotted
+      // by ACCUMULATION, not by a miscount: re-measure it at every release
+      // sync (the 11l QA), and keep it within a few subtrees of the count.
+      expect(indexDirs.size).toBeGreaterThanOrEqual(245);
     }
     // The guard's own file is excluded from the corpus: its SPARSE_CONE
     // literal above names every cone subtree, so counting it would satisfy
@@ -739,6 +896,47 @@ describe('CI workflow parity', () => {
     expect(releaseGate).not.toMatch(/^\s{4}env:\n\s{6}I18N_RELEASE_TIER/m);
     expect(releaseChecks).not.toContain('I18N_RELEASE_TIER');
     expect(jobSource('release-i18n')).toContain("\n    env:\n      I18N_RELEASE_TIER: '1'");
+  });
+
+  it('release-gate arms the mediawiki seed release tier at JOB level', () => {
+    // Phase 18 QA, gate-census item 2. The byte-equality arm of
+    // tests/mediawiki_seed_freshness.test.ts is registered with
+    // `it.runIf(MEDIAWIKI_SEED_RELEASE_TIER === '1')`, so deleting the one env
+    // line in ci.yml leaves EVERY test in the repo green while the demand goes
+    // inert and a stale mediawiki/seed/pages.xml ships. Nothing pinned it. This
+    // is the mirror of the release-i18n assertion one block up, which is why
+    // that flag cannot be deleted the same way.
+    const releaseGate = jobSource('release-gate');
+    // Job level (a six-space key under the four-space `env:`), never a step
+    // env: a step-scoped flag would arm one shard and leave the other seven at
+    // PR tier, which is the same silent half-check in a different shape.
+    expect(releaseGate).toMatch(/^ {4}env:$/m);
+    expect(releaseGate).toMatch(/^ {6}MEDIAWIKI_SEED_RELEASE_TIER: '1'$/m);
+    // Release-gate ALONE: it is a release demand, and arming it on a PR job
+    // would drag the regenerated seed diff into every content PR. Counted over
+    // the WHOLE file, not a hand-listed set of siblings: a named list silently
+    // exempts the jobs it forgets (and every job added later), and a step-level
+    // flag in one of those would arm the tier on a PR job unpinned.
+    expect(workflow.split('MEDIAWIKI_SEED_RELEASE_TIER')).toHaveLength(2);
+    for (const other of [
+      'release-version-gate',
+      'changes',
+      'lint',
+      'browser-gate',
+      'pr-gate',
+      'pr-long-sims-a',
+      'pr-long-sims-b',
+      'pr-checks',
+      'release-checks',
+      'release-i18n',
+    ]) {
+      expect(jobSource(other)).not.toContain('MEDIAWIKI_SEED_RELEASE_TIER');
+    }
+    // The flag is not decorative: the suite still gates that arm on this exact
+    // name, so renaming either half without the other reds here.
+    const seedSuite = readFileSync(join(__dirname, 'mediawiki_seed_freshness.test.ts'), 'utf8');
+    expect(seedSuite).toContain("process.env.MEDIAWIKI_SEED_RELEASE_TIER === '1'");
+    expect(seedSuite).toMatch(/it\.runIf\(RELEASE_TIER\)\(/);
   });
 
   it('splits the PR tier into parallel test and checks jobs that cover every step', () => {

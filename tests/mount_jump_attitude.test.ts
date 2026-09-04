@@ -1,6 +1,12 @@
+import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 
-import { mountRiderPivot, stepMountJumpPitch } from '../src/render/mount_jump_attitude';
+import {
+  applyMountJumpAttitude,
+  mountRiderPivot,
+  stepMountJumpPitch,
+} from '../src/render/mount_jump_attitude';
+import { mountVisualSpec } from '../src/render/mount_visuals';
 
 /** Run to steady state so damping is not what the assertions measure. */
 const settle = (airborne: boolean, vy: number, from = 0, frames = 200): number => {
@@ -58,5 +64,35 @@ describe('mount jump attitude', () => {
     const tipped = mountRiderPivot(seatY, seatFwd, 0.3);
     expect(Math.hypot(tipped.y, tipped.z)).toBeCloseTo(Math.hypot(seatY, seatFwd), 9);
     expect(tipped.y).not.toBeCloseTo(seatY, 3);
+  });
+
+  it('clears a moving-seat offset before applying a fixed saddle attitude', () => {
+    const spec = mountVisualSpec('valorsteed');
+    if (!spec || spec.seatBone) throw new Error('valorsteed must use a fixed saddle');
+    const mount = new THREE.Object3D();
+    const rider = new THREE.Object3D();
+    // A direct live swap reuses the rider root after a bone seat has written a
+    // lateral offset and a full lean into it.
+    rider.position.set(0.3, 1.2, -0.4);
+    rider.rotation.set(0.2, 0.4, 0.5);
+
+    applyMountJumpAttitude(
+      { mountJumpPitch: 0, mountLift: spec.seat },
+      mount,
+      rider,
+      spec,
+      0,
+      false,
+      false,
+      0,
+      1 / 60,
+    );
+
+    expect(rider.position.x).toBe(0);
+    expect(rider.position.y).toBeCloseTo(spec.seat, 9);
+    expect(rider.position.z).toBe(spec.seatFwd);
+    expect(rider.rotation.x).toBeCloseTo(0, 12);
+    expect(rider.rotation.y).toBeCloseTo(0, 12);
+    expect(rider.rotation.z).toBeCloseTo(0, 12);
   });
 });

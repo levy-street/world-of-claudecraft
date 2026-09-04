@@ -234,7 +234,7 @@ Elke instance draait ook op **Heroic**: vijanden van een hoger level, scherpere 
 
 ### Delves
 
-Delves zijn een aparte, schaalbare modus voor kleine groepen van één of twee spelers, elke run opnieuw opgebouwd uit gerandomiseerde kamers en eindigend bij een vergrendelde reliekkist die opengaat via een lockpicking-minigame in plaats van een loot roll. **The Collapsed Reliquary** (level 7 en hoger) eindigt bij Deacon Varric, met een AI-metgezel, Tessa, die aan je zij vecht als je alleen gaat. **The Drowned Litany** (level 12 en hoger) volgt het spoor naar een ondergelopen heiligdom aan de rand van Mirefen Marsh. Een delve-bord bepaalt de tier: Heroic verhoogt de vijandlevels en voegt een willekeurige affix toe voor rijkere beloningen.
+Delves zijn een aparte, schaalbare modus voor kleine groepen van één of twee spelers, elke run opnieuw opgebouwd uit gerandomiseerde kamers en eindigend bij een vergrendelde reliekkist die opengaat via een lockpicking-minigame in plaats van een loot roll. **The Collapsed Reliquary** (level 7 en hoger) eindigt bij Deacon Vandric, met een AI-metgezel, Tessa, die aan je zij vecht als je alleen gaat. **The Drowned Litany** (level 12 en hoger) volgt het spoor naar een ondergelopen heiligdom aan de rand van Mirefen Marsh. Een delve-bord bepaalt de tier: Heroic verhoogt de vijandlevels en voegt een willekeurige affix toe voor rijkere beloningen.
 
 ### Ranked PvP (the Ashen Coliseum)
 

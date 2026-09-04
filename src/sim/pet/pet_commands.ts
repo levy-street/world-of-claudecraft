@@ -300,7 +300,14 @@ export function syncPetLevel(ctx: SimContext, owner: Entity): void {
   applyPetOwnerScaling(ctx, pet);
 }
 
-function cleanPetName(raw: string): string | null {
+/** The pet-name SHAPE (trim, collapse inner whitespace, 2 to 16 letters,
+ *  spaces, hyphens, apostrophes, leading letter), the sim's one authority.
+ *  Exported for the online server's content screen (the phase 13 QA hot-path
+ *  review): the obscenity matcher prices THIS normalized value, never the raw
+ *  wire token, which could be a whole 16 KiB frame (three milliseconds per
+ *  screen) and could hide a slur behind a run of whitespace that this very
+ *  normalization collapses away. Pure, draw-free, host-agnostic. */
+export function cleanPetName(raw: string): string | null {
   const name = raw.trim().replace(/\s+/g, ' ');
   return PET_NAME_RE.test(name) ? name : null;
 }
@@ -428,7 +435,7 @@ export function createDemonPet(
   pet.ownerId = owner.id;
   pet.petMode = 'defensive';
   pet.petTauntTimer = 0;
-  // A melee_tank demon (Gloomshade) is built to hold threat, so it comes up with
+  // A melee_tank demon (Duskmurk) is built to hold threat, so it comes up with
   // auto-taunt already on for a solo owner; every other demon keeps the old opt-in
   // default. petCanForceTaunt is the shared taunt-eligibility gate (pet_taunt_gate.ts)
   // so a future tank demon that can't taunt doesn't default on. In a party/raid,
@@ -711,7 +718,7 @@ export function petWaterJet(ctx: SimContext, pid?: number): void {
   startWaterJet(ctx, pet, target, jet);
 }
 
-/** Manual pet-bar cast for a template-authored signature ability. Gloomshade
+/** Manual pet-bar cast for a template-authored signature ability. Duskmurk
  *  pulls with Abyssal Chain; Emberkin launches an extra Felbolt. */
 export function petSpecial(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);

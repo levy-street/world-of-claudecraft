@@ -13,22 +13,28 @@
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { normalizeGraphicsSettingsSnapshot } from '../../src/game/graphics_rebuild_core';
+import { FARM_PATCHES } from '../../src/sim/content/farm_patches';
 import { storageRungSkuForLadderIndex } from '../../src/sim/content/storage_charters';
 import type { TalentAllocation } from '../../src/sim/content/talents';
 import { ITEMS, QUESTS } from '../../src/sim/data';
+import { PERFECTING_SKILL_REQ, perfectingInfoFrom } from '../../src/sim/professions/perfecting';
 import { ALL_CLASSES } from '../../src/sim/types';
 import { ArenaWindow } from '../../src/ui/arena_window';
 import { BagsWindow } from '../../src/ui/bags_window';
 import { BankWindow } from '../../src/ui/bank_window';
 import { CharWindow } from '../../src/ui/char_window';
 import { FOCUSABLE_SELECTOR } from '../../src/ui/focus_manager';
+import { PlantSheetWindow } from '../../src/ui/hud/professions/farming_plant_sheet_window';
+import { HarvestJournalWindow } from '../../src/ui/hud/professions/harvest_journal_window';
+import { PerfectingWindow } from '../../src/ui/hud/professions/perfecting_window';
+import { ProfessionsWindow } from '../../src/ui/hud/professions/professions_window';
 import { QuestLogWindow } from '../../src/ui/hud/quest/questlog_window';
 import { renderVendorWindow } from '../../src/ui/hud/vendor/vendor_window';
 import { t } from '../../src/ui/i18n';
+import { ItemDragState } from '../../src/ui/item_drag_state';
 import { LeaderboardWindow } from '../../src/ui/leaderboard_window';
 import { MarketWindow } from '../../src/ui/market_window';
 import { OptionsWindow } from '../../src/ui/options_window';
-import { ProfessionsWindow } from '../../src/ui/professions_window';
 import { ReliquaryWindow } from '../../src/ui/reliquary_window';
 import { SocialWindow } from '../../src/ui/social_window';
 import { SpellbookWindow } from '../../src/ui/spellbook_window';
@@ -730,6 +736,7 @@ describe('axe: character window', () => {
           });
         },
         captureFocus: () => null,
+        dragState: new ItemDragState(),
       }),
     );
     win.toggle();
@@ -1229,6 +1236,10 @@ describe('axe: professions window tool-effect controls', () => {
         { itemId: 'copper_mining_pick', count: 1 },
         { itemId: 'artisans_eye', count: 1, instance: { signer: 'Testchar' } },
       ],
+      // The viewer's planted beds (IWorld myFarmPlots): the window reads the
+      // count for its simplified-mode Farming-row arm (deviation (be)); none
+      // here, the shape every non-farmer reads.
+      myFarmPlots: [],
       player: { name: 'Testchar' },
     };
     const win = new ProfessionsWindow(
@@ -1257,6 +1268,204 @@ describe('axe: professions window tool-effect controls', () => {
     expect(slot?.textContent?.trim().length ?? 0).toBeGreaterThan(0);
     expect(recharge?.textContent?.trim().length ?? 0).toBeGreaterThan(0);
     await expectClean(root);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The plant sheet (#plant-sheet-window) - the bed-verbs window: the seed pick
+// rows as a NAMED RADIOGROUP (single-select, the Phase 14 a11y batch), the
+// three aria-pressed care knob toggles (one disabled with its reason line),
+// the in-flight aria-busy affordance, and the Plant control, painted through
+// the real window with the real styles.
+// ---------------------------------------------------------------------------
+
+describe('axe: plant sheet window seed picks, knobs, and Plant control', () => {
+  it('pick rows, knob toggles, and the Plant control are clean with real names', async () => {
+    const root = host('plant-sheet-window');
+    // CAUTION: handed over through `as never`, so tsc cannot flag a missing
+    // member; the stub carries EVERY key the window's buildInput reads
+    // (inventory, myFarmPlots, professionsState) or the miss is a RUNTIME
+    // throw in this suite only.
+    const world = {
+      inventory: [
+        { itemId: 'vale_wheat_seed', count: 3 },
+        { itemId: 'garden_hoe', count: 1 },
+        { itemId: 'compost', count: 1 },
+      ],
+      myFarmPlots: [],
+      professionsState: { skills: [{ professionId: 'farming', skill: 10, maxSkill: 100 }] },
+      plantCrop: () => {},
+    };
+    const win = new PlantSheetWindow(
+      stubDeps({
+        root: () => root,
+        world: () => world as never,
+      }),
+    );
+    win.open('bed_eastbrook_1');
+    // The three control families must actually render: a seed pick row with
+    // its sow aria, a knob toggle (the tonic one disabled, saying why), and
+    // the one Plant control.
+    const seed = root.querySelector<HTMLButtonElement>('[data-seed-crop]');
+    const tonic = root.querySelector<HTMLButtonElement>('[data-knob="tonic"]');
+    const plant = root.querySelector<HTMLButtonElement>('[data-plant]');
+    expect(seed).not.toBeNull();
+    expect(seed?.getAttribute('aria-label')?.trim().length ?? 0).toBeGreaterThan(0);
+    expect(tonic?.disabled).toBe(true);
+    expect(plant?.textContent?.trim().length ?? 0).toBeGreaterThan(0);
+    // The Phase 14 radiogroup semantics, judged by axe with the roles LIVE:
+    // the single-select rows are radios in a group named by the dialog title,
+    // and aria-required-children/parent rules run against the real DOM here.
+    const group = root.querySelector<HTMLElement>('[role="radiogroup"]');
+    expect(group).not.toBeNull();
+    expect(seed?.getAttribute('role')).toBe('radio');
+    expect(seed?.getAttribute('aria-checked')).toBe('true');
+    await expectClean(root);
+    // The in-flight affordance: an armed Plant send reports aria-busy on the
+    // dialog and the busy tree still axes clean.
+    plant?.click();
+    expect(root.getAttribute('aria-busy')).toBe('true');
+    await expectClean(root);
+    win.close();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The harvest journal (#harvest-journal-window) - the read-only plot list,
+// with the Phase 14 in-dialog ready announcement: a persistent role=status
+// line that names a crop flipping to ready UNDER the open journal. Axed both
+// quiet and announcing.
+// ---------------------------------------------------------------------------
+
+describe('axe: harvest journal rows and the ready status line', () => {
+  it('renders rows clean, and the live status line announces a ready flip', async () => {
+    const root = host('harvest-journal-window');
+    // CAUTION: `as never` handover, same trap as the plant sheet stub above.
+    const world = {
+      myFarmPlots: [
+        {
+          bedId: 'bed_eastbrook_1',
+          cropId: 'vale_wheat',
+          plantedAtMs: 0,
+          readyAtMs: 600_000,
+          compost: false,
+          watch: false,
+          tonic: false,
+          notified: false,
+          status: 'growing',
+        },
+      ],
+      farmPatches: FARM_PATCHES,
+      professionsState: { skills: [{ professionId: 'farming', skill: 40, maxSkill: 100 }] },
+      farmNowMs: () => 0,
+    };
+    const win = new HarvestJournalWindow(
+      stubDeps({
+        root: () => root,
+        world: () => world as never,
+      }),
+    );
+    win.open();
+    const status = root.querySelector<HTMLElement>('.hj-live-status');
+    expect(status).not.toBeNull();
+    expect(status?.getAttribute('role')).toBe('status');
+    expect(status?.textContent).toBe('');
+    await expectClean(root);
+    // The authority flips the plot under the open journal: the SAME status
+    // node announces the crop, and the announcing tree still axes clean.
+    world.myFarmPlots[0].status = 'ready';
+    win.render();
+    expect(root.querySelector<HTMLElement>('.hj-live-status')).toBe(status);
+    expect(status?.textContent?.length ?? 0).toBeGreaterThan(0);
+    await expectClean(root);
+    win.close();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The Perfecting window (#perfecting-window, Masterwrought phase 14): the
+// third holder of the farming a11y shapes (candidate radiogroup, aria-busy
+// send-once, the persistent role=status region beside the repaint shell) plus
+// the R2 bind warning. The window mints its own root, so no host() here.
+// ---------------------------------------------------------------------------
+
+describe('axe: perfecting window candidates, bind warning, and status region', () => {
+  it('the radiogroup, busy tree, and announcing tree all axe clean with real names', async () => {
+    // CAUTION: `as never` handover, same trap as the plant sheet stub: the
+    // stub must carry every member buildView reads (equipment,
+    // equipmentInstances, inventory, craftingIdentity, perfectingInfo,
+    // perfectItem; craftSkills feeds the stub's own perfectingInfo) or the
+    // miss is a runtime throw here only.
+    const world = {
+      equipment: { mainhand: 'duskforged_warblade' },
+      equipmentInstances: {} as Record<string, unknown>,
+      inventory: [
+        { itemId: 'makers_ember', count: 2 },
+        { itemId: 'sundered_essence', count: 1 },
+        { itemId: 'prismglass_setting', count: 1 },
+      ],
+      craftingIdentity: { synced: true },
+      craftSkills: { weaponcrafting: PERFECTING_SKILL_REQ },
+      perfectItem: () => {},
+      perfectingInfo(ref: unknown) {
+        return perfectingInfoFrom({
+          ref,
+          inventory: world.inventory,
+          equipment: world.equipment,
+          equipmentInstances: world.equipmentInstances,
+          craftSkills: world.craftSkills,
+        } as never);
+      },
+    };
+    const win = new PerfectingWindow({
+      itemIcon: () => '<img class="icon" alt="">',
+      moneyHtml: () => '',
+      itemTooltip: () => '',
+      attachTooltip: () => {},
+      world: () => world as never,
+      closeOthers: () => {},
+      captureFocus: () => null,
+      restoreFocus: () => {},
+    } as never);
+    win.open();
+    const root = document.getElementById('perfecting-window') as HTMLElement;
+    expect(root).not.toBeNull();
+    // The farming shapes, live: single-select radios in a title-named group,
+    // the bind warning present BEFORE any attempt, the status region empty.
+    const group = root.querySelector<HTMLElement>('[role="radiogroup"]');
+    expect(group?.getAttribute('aria-labelledby')).toBe('perfecting-title');
+    const cand = root.querySelector<HTMLButtonElement>('.pf-cand');
+    expect(cand?.getAttribute('role')).toBe('radio');
+    expect(cand?.getAttribute('aria-checked')).toBe('true');
+    expect(root.querySelector('.pf-warning')).not.toBeNull();
+    const live = root.querySelector<HTMLElement>('.pf-live-status');
+    expect(live?.getAttribute('role')).toBe('status');
+    // The structural halves only a browser can judge (the happy-dom unit
+    // suite has no CSS): the shell is display:contents so .pf-body is the
+    // ONE scroller and the root is not (the one-scroller rule).
+    const shell = root.querySelector<HTMLElement>('.pf-shell') as HTMLElement;
+    expect(getComputedStyle(shell).display).toBe('contents');
+    const body = root.querySelector<HTMLElement>('.pf-body') as HTMLElement;
+    expect(getComputedStyle(body).overflowY).toBe('auto');
+    await expectClean(root);
+    // The armed send reports aria-busy on the dialog; the busy tree still
+    // axes clean. (The bind confirm's prompt path needs #prompt-stack, which
+    // this harness does not mount; the busy arm is driven on the bound copy.)
+    world.equipmentInstances = { mainhand: { boundTo: 1, perfecting: 1 } };
+    win.relocalize();
+    (root.querySelector('[data-action]') as HTMLButtonElement).click();
+    expect(root.getAttribute('aria-busy')).toBe('true');
+    await expectClean(root);
+    // A landed rank ANNOUNCES through the SAME node (the journal's two
+    // assertions: identity across the repaint, non-empty content), and the
+    // announcing tree axes clean.
+    world.equipmentInstances = { mainhand: { boundTo: 1, perfecting: 2 } };
+    win.relocalize();
+    expect(root.querySelector('.pf-live-status')).toBe(live);
+    expect(live?.textContent ?? '').not.toBe('');
+    await expectClean(root);
+    win.close();
+    root.remove();
   });
 });
 

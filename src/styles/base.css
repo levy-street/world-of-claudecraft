@@ -538,7 +538,13 @@
   .mkt-btn:focus-visible,
   .mkt-list-btn:focus-visible,
   .profession-skill-list:focus-visible,
-  .prof-effect:focus-visible {
+  .prof-effect:focus-visible,
+  .crafting-perfecting-link:focus-visible,
+  .pf-cand:focus-visible,
+  .pf-action:focus-visible,
+  .ps-seed:focus-visible,
+  .ps-knob:focus-visible,
+  .ps-plant:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
   }

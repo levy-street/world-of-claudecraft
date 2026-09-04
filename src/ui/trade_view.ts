@@ -15,15 +15,18 @@
 //
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
 import { ITEMS } from '../sim/data';
+import { countRawInSlots } from '../sim/item_lock';
 import type { InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import { itemDisplayName } from './entity_i18n';
 import { formatNumber, t } from './i18n';
 import { knownItemDef } from './known_item';
 
 /** Total held count of `itemId` across every bag slot: the trade offer
- *  stepper's ceiling. */
+ *  stepper's ceiling. A thin domain alias over the shared sim walk
+ *  (item_lock.ts countRawInSlots), so the ceiling can never drift from the
+ *  summed total the sim validates the offer against. */
 export function tradeOfferCeiling(inventory: InvSlot[], itemId: string): number {
-  return inventory.filter((s) => s.itemId === itemId).reduce((n, s) => n + s.count, 0);
+  return countRawInSlots(inventory, itemId);
 }
 
 /** One offer row, resolved for rendering. `item` is undefined for an id this

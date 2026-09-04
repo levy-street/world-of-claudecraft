@@ -119,7 +119,7 @@ describe('warlock low-level sustained damage tuning', () => {
     },
   );
 
-  it('keeps Gloomshade clearly below Emberkin damage after the Emberkin tuning pass', () => {
+  it('keeps Duskmurk clearly below Emberkin damage after the Emberkin tuning pass', () => {
     const impDps = rawPetDps('emberkin');
     const voidwalkerDps = rawPetDps('gloomshade');
 

@@ -69,6 +69,53 @@ COSMETIC (may be tiered down on lower presets):
     that differs between two players looking at the same wearer, and it can only dim.
   What is faded is decoration ON a weapon. The wearer, their nameplate, their cast bar, their
   auras, their position and the weapon model itself are untouched at every scale.
+- The legendary-regalia forge motes (`src/render/legendary_regalia_core.ts` plus the
+  `Vfx.legendaryRegalia` pooled emitter): the sparse orange drift rising off a wearer whose
+  worn set includes a legendary-rolled copy. Worn-gear PRESTIGE display, not actionable
+  state: the predicate reads only the eqi wire allowlist (never `perfected`, hp, auras, or
+  target state), so shedding it hides nothing a player acts on (the classification is a
+  recorded maintainer read in the masterwrought Phase 16 ledger). The shed's shape: gated
+  at the medium effects tier by the STATIC preset stamp (`gfxTierAtLeast(GFX.effectsTier)`,
+  never the FPS governor), distance-faded against the fixed `CHARACTER_LOD_RANGE_SQ` anchor
+  exactly like the weapon-VFX fade above, floored above zero, and dimmed only through the
+  pooled cloud's own governor quality floor. Suppressed under the viewer's
+  prefers-reduced-motion setting, the lich-aura precedent (an accessibility choice by the
+  viewer, not a graphics shed).
+- Ambient plant motion in the world: the foliage wind sway on canopies, bushes and grass
+  cards, and the farm crops' idle lean (`src/render/farm_patches.ts`). This is the class
+  boundary for the reduced-motion clause directly above, which is about a CHARACTER-borne
+  identity effect and does not generalize to the scenery. The exempt class is the CONTINUOUS
+  AMBIENT motion itself, the wind sway and the idle lean, and it is narrow in both
+  directions. Neither is gated on `prefers-reduced-motion` and neither ever has been: the
+  foliage sway reads only the STATIC `GFX.windSway` preset knob against the shared `uTime`
+  clock the renderer advances every frame, and the crop lean is a per-plot phase advanced by
+  `dt` and composed onto the bed's seat quaternion, so a crop always stands normal to the
+  ground it grows in. The two share the class, not the clock. Note the binding time before
+  reusing the knob, and note that it is NOT one story across the three wind paths: on the
+  grass cards `GFX.windSway` is read inside `onBeforeCompile` and selects vertex shader
+  SOURCE (`foliage.ts` `applyGrassShader`), while the cache key beside it
+  (`grassCardProgramCacheKey`, `grass_cap_collapse_core.ts`) does not mention the knob, so a
+  varying grass sway is a program-key change owing a prewarm story. On the impostor sprites
+  (`foliage_impostor.ts`) and on the canopies and bushes (`foliage.ts` `addWind`, wherever it
+  installs its hook at all, which today is every leaf material) the injected source is
+  identical either way and the knob only sets the VALUE of `uWindStrength` or `uImpWind`;
+  `addWind` also has an arm that installs NO hook, so on that arm the knob is a program change
+  too. Even on the uniform arms it is not a live flip, which is the half a first draft of this
+  paragraph got wrong in both directions: nothing retains those uniform objects, both are
+  minted inside the compile hook at material-creation time, so a tier- or preference-varying
+  sway means new plumbing or rebuilt materials on every path, never a uniform write. One more
+  reader is easy to miss and is pinned: the renderer reports `windSway` in its quality bucket
+  (`renderer.ts`), which `tests/perf_reporter.test.ts` asserts on. Price the arm you are
+  actually taking. What is NOT exempt, and the two nearest examples
+  are both inside the same subsystems: a camera-driven TRANSITION is a fade, not ambient
+  motion, so `src/render/tree_hide_fade.ts`'s occluder ghost ramp honors the setting
+  (`updateTreeHides` threads it in from `foliage.ts`); and an ability marker drawn in the
+  world is not scenery, so `src/render/umbral_anchor_marker.ts` freezes its uTime to zero,
+  which it can do precisely because it owns a PRIVATE `uTime` uniform rather than the shared
+  clock. Gating the crops alone would make farm beds the one plant in the game that stops,
+  which is a fidelity break rather than an accessibility win. The classification is a
+  recorded maintainer read in the masterwrought Phase 19 ledger, ruling
+  `qr-19-idle-sway-reducedmotion`.
 - Deed Heraldry's decorative bloom (the Book of Deeds rewards worn in-world and on social
   surfaces). Heraldry is IDENTITY: it encodes no health, range, rank, or threat, so its
   forged seal, motif, material, and structural edge may never be hidden. The world seal and
@@ -167,6 +214,21 @@ What each knob does, and why it is gameplay-neutral:
   cap's usual per-frame cost. It touches only that one painter instance; every other low-tier
   knob (FCT, minimap, the debuff bar, the target strip) is unaffected, so this is a player
   PREFERENCE layered on top of the STATIC preset, never a second preset-like governor.
+  **The 2026-09-01 Well Fed cosmetic-shed ratification:** the farming packet's Phase 11 QA left
+  one fairness READ open against this classification. Well Fed runs 600 sec on the farm buff
+  dishes and 900 sec on the apex plates, an order of magnitude past `SHORT_BUFF_PRIORITY_SEC`, so
+  it sits in exactly the long-duration bucket the priority pass above sheds FIRST, on the one
+  preset, taken from the player whose only cue to re-eat is that icon. RULED
+  (`qr-19-aura-visible-cap-low-fairness`, under `qr-19-best-for-project`): the classification is
+  RATIFIED and Well Fed stays sheddable. The icon is upkeep, not an action: the buff runs whether
+  or not it is on screen, the honest plus-N badge names the shed instead of hiding it, and Always
+  Show All Buffs opts a player out of the cap entirely. Exempting it would spend one of the eight
+  low slots permanently and set a precedent every flask and every raid buff could claim, eroding
+  the cap the low preset exists to enforce. The one part of the QA note still simply true was that
+  nothing pinned the contract either way; `tests/professions_graphics_fairness.test.ts` now does,
+  over the real `selectShedSlots`: a 900 sec Well Fed slot sheds, a debuff does not, an
+  `ALWAYS_VISIBLE_AURA_IDS` id does not, exempt slots do not spend the cap budget, and the
+  `'ultra'` override never caps at all.
 - Target frame, hud + `unit_frame_painter.ts`: on low, the target frame BODY (HP / level /
   portrait) refreshes at about 10 Hz; a target SWAP bypasses the throttle
   (`nonSelfRepaintDue`), and the cast bar and the debuffs strip are both painted OUTSIDE the
@@ -352,6 +414,12 @@ measured design decision. Tracked at levy-street/world-of-claudecraft#3525.
   literal-pinned, the shed is strictly every-other-frame (never a removal: the application
   writes only the `shadowMap.autoUpdate`/`needsUpdate` flags), and the wiring scan pins the
   renderer call sites.
+- `tests/legendary_regalia.test.ts`: the legendary-regalia motes. The predicate core is
+  scanned free of preset, tier, profile, and governor inputs and of every actionable token
+  (`perfected` included, the host-forking read), the eqi wire allowlist is scrape-pinned in
+  `server/game.ts`, the distance shed is anchored to the fixed `CHARACTER_LOD_RANGE_SQ` with
+  a floored scale, the pooled emitter is proven light-, material-, and visibility-write-free,
+  and the renderer wiring is pinned cached, players-only, and static-preset-gated.
 - `tests/weapon_vfx_shed.test.ts`: the weapon-skin fade. Neither arm reaches zero and the
   lever's floor is proven to stay clear of the multiplier at which a part would stop drawing,
   so the fade can never be mistaken for a cull; the distance arm is anchored to the fixed

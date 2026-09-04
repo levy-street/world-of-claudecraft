@@ -294,13 +294,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.woc.youDeclined': "Vous avez refusé l'offre.",
   'hudChrome.trade.woc.youWithdrew': 'Vous avez retiré votre offre.',
   'hudChrome.tutorialGreeting.bellHomeNote': "Déjà de retour du rivage ? C'était la cloche du bac que vous avez sonnée. Sa jumelle est accrochée juste là, près de la boîte aux lettres de la Poste aux Corbeaux : sonnez-la à tout moment et la traversée vous ramènera au Rivage de l'Épreuve. Aucun mal, dans un sens comme dans l'autre.",
-  'hudChrome.tutorialGreeting.bodyFirst': "Je ne vous ai jamais vu par ici, l'ami. La tradition, dans ces terres, veut que ceux qui débutent leur aventure se rendent au Rivage de l'Épreuve, une île paisible au large du détroit. Vous pourrez y affiner vos talents et vous habituer au monde avant d'en affronter les défis. Le bac fait la traversée dans les deux sens, et personne ne pensera moins de vous, quel que soit votre choix.",
-  'hudChrome.tutorialGreeting.bodyRefresher': "De retour avec un nouveau visage, à ce que je vois ? Vous savez donc déjà comment ça se passe. Mais si vous souhaitez tout de même vous rafraîchir la mémoire avant de partir, le Rivage de l'Épreuve n'a jamais refusé un élève de retour, et le bac est prêt quand vous l'êtes.",
-  'hudChrome.tutorialGreeting.declineNote': "Comme il vous plaira, l'ami. Si jamais vous changez d'avis, la cloche du bac près de la boîte aux lettres de la Poste aux Corbeaux vous fait traverser jusqu'au Rivage de l'Épreuve à toute heure, jour et nuit. Elle sera toujours là quand les loups n'y seront plus.",
   'hudChrome.tutorialGreeting.islandArrivalNote': "Bienvenue au Rivage de l'Épreuve. Le Gardien Tam vous attend un peu plus haut sur la grève : allez le voir.",
   'hudChrome.tutorialGreeting.noteClose': 'Compris',
-  'hudChrome.tutorialGreeting.play': 'Commencer le tutoriel',
-  'hudChrome.tutorialGreeting.skip': 'Passer le tutoriel',
   'hudChrome.walletBridge.badResponse': 'Votre portefeuille a renvoyé une réponse inexploitable. Réessayez.',
   'hudChrome.walletBridge.cancelled': "La demande au portefeuille a été annulée. Rien n'a été envoyé.",
   'hudChrome.walletBridge.notConnected': 'Connectez et vérifiez un portefeuille, puis réessayez.',
@@ -965,7 +960,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.home.world.galeName': 'La Crête du Vent',
   'guide.home.world.gardenBlurb': "Un royaume-jardin en labyrinthe de haies, encore taillé par nul jardinier vu de quiconque, dont l'entrée passe par Hedgewick et ses cours de fontaines.",
   'guide.home.world.gardenName': 'Le Jardin Éternel',
-  'guide.home.world.hauntBlurb': 'Une forêt hantée sous des canopées géantes, où les lanternes de Gallowmere sont la seule lumière honnête sur la route.',
+  'guide.home.world.hauntBlurb': 'Une forêt hantée sous des canopées géantes, où les lanternes de Gibbetmere sont la seule lumière honnête sur la route.',
   'guide.home.world.hauntName': 'Le Bois des Spectres',
   'guide.home.world.jungleBlurb': 'Palmiers, sable blanc et oiseaux bruyants, avec la ville de plage de Drifthaven qui garde un feu allumé sur la grève.',
   'guide.home.world.jungleName': 'La Baie des Palmes',
@@ -1085,16 +1080,14 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.orderBoardHeading': 'Le tableau des commandes',
   'guide.profPages.ench.charmsBody': "L'Enchantement est aussi la source des breloques d'un récolteur. Bricoleur Gizzel enseigne les deux à l'atelier d'outillage d'Eastbrook dès que votre Enchantement atteint 25 : la Cache du collecteur, qui ajoute une unité à une récolte, et l'Œil de l'artisan, qui améliore la qualité de ce qui en sort. Chacune se fabrique une fois, puis se sertit dans un pic, une hache ou une serpe, où elle ne dépense une charge que sur les récoltes qu'elle améliore réellement.\n\nC'est la recharge qui fait durer le commerce. Les charges sont restaurées par le propriétaire de l'outil, non par un enchanteur de passage, et la recharge coûte moitié moins de matériaux quand ce propriétaire est l'enchanteur qui a signé la breloque, encore moins avec une spécialisation en Enchantement. Une breloque vendue au comptoir n'est donc qu'une vente unique, tandis que les breloques serties sur vos propres outils sont celles qu'il est bon marché de faire tourner. L'échelle complète des charges et des matériaux figure sur la page de n'importe quel métier de récolte, sous Effets d'outil.",
   'guide.profPages.ench.charmsHeading': "Breloques pour les outils d'un récolteur",
-  'guide.profPages.ench.enchantsNoteOffhand': "Les enchantements se déclinent en trois paliers. Le palier de base fonctionne à la Poussière carillon (avec un peu d'Essence en haut de gamme) et couvre l'emplacement d'arme, le hors-main, et tous les emplacements d'armure, avec assez d'axes de caractéristiques pour que chaque profil trouve son bonheur à chaque emplacement : les boucliers et les hors-main tenus par les lanceurs de sorts reçoivent leur propre enchantement d'Endurance, si bien qu'aucun emplacement équipé n'est privé d'enchantement. Le palier Supérieur coûte un Éclat carillon plus de l'Essence : des bonus plus forts sur les emplacements les plus déterminants. Les Éclats alimentent en outre deux autres gouffres, les deux recettes de breloque à cinq Éclats chacune et l'échelon supérieur des recharges d'effet d'outil, alors mettez-en quelques-uns de côté avant de dépenser.\n\nEntre les deux se placent les cinq enchantements Runiques, un consommateur par secondaire typé, si bien que rien de ce que vous broyez n'est jamais une impasse : Tranchant runique (arme, Force, consomme de l'Acier résonnant), Concentration runique (arme, Intellect, Bois résonnant), Rune tissée (torse, Esprit, Fil résonnant), Peau runique (jambières, Agilité, Peau résonnante) et Mailles runiques (casque, Endurance, Mailles résonnantes). Chacun demande en plus deux Essences carillon ; là où un emplacement et une caractéristique disposent à la fois d'un enchantement de base et d'un Supérieur, le bonus Runique se place entre les deux, tandis que Rune tissée est purement et simplement le meilleur enchantement d'Esprit pour le torse et que Peau runique est le seul enchantement d'Agilité pour les jambières. Les bonus exacts figurent tous dans le tableau ci-dessous.",
-  'guide.profPages.faq.a10': "Une breloque est un effet d'outil serti : le travail d'un enchanteur qui se loge dans un outil de récolte et améliore ce qu'il rapporte. Une Cache du collecteur ajoute une unité à une récolte, un Œil de l'artisan en améliore la qualité, et Bricoleur Gizzel enseigne les deux à l'atelier d'outillage d'Eastbrook à 25 en Enchantement. Une charge n'est dépensée que lorsque la breloque a réellement changé le résultat, si bien qu'une récolte qu'elle ne pouvait pas améliorer ne vous coûte rien, et un emplacement peut être réglé pour demander confirmation à chaque utilisation si vous préférez décider charge par charge.\\n\\nUne breloque toute neuve porte 20 charges sur un outil commun et 10 de plus par échelon de rareté au-dessus, si bien qu'un outil épique commence à 50. Les épuiser ne détruit pas la breloque : le propriétaire de l'outil recharge l'emplacement, 10 charges par matériau arcanique, le matériau demandé suivant le meilleur entre l'outil qu'il porte et le meilleur outil qui ait jamais rempli cet emplacement (Poussière carillon pour un outil commun ou inhabituel, Essence carillon pour un outil rare, un Éclat carillon pour un épique). Mettre le bon outil en banque avant une recharge ne la rend jamais moins chère, seulement plus petite au même prix, et sertir une breloque neuve en portant l'outil inférieur est le moyen de redescendre à un échelon moins coûteux. L'enchanteur qui a signé la breloque paie moitié moins pour recharger la sienne, et encore moins avec une spécialisation en Enchantement.",
+  'guide.profPages.faq.a10': "Une breloque est un effet d'outil serti : le travail d'un enchanteur qui se loge dans un outil de récolte et améliore ce qu'il rapporte. Une Cache du collecteur ajoute une unité à une récolte, un Œil de l'artisan en améliore la qualité, et Bricoleur Gizzel enseigne les deux à l'atelier d'outillage d'Eastbrook à 25 en Enchantement. Une charge n'est dépensée que lorsque la breloque a réellement changé le résultat, si bien qu'une récolte qu'elle ne pouvait pas améliorer ne vous coûte rien, et un emplacement peut être réglé pour demander confirmation à chaque utilisation si vous préférez décider charge par charge.\n\nUne breloque toute neuve porte 20 charges sur un outil commun et 10 de plus par échelon de rareté au-dessus, si bien qu'un outil épique commence à 50. Les épuiser ne détruit pas la breloque : le propriétaire de l'outil recharge l'emplacement, 10 charges par matériau arcanique, le matériau demandé suivant le meilleur entre l'outil qu'il porte et le meilleur outil qui ait jamais rempli cet emplacement (Poussière carillon pour un outil commun ou inhabituel, Essence carillon pour un outil rare, un Éclat carillon pour un épique). Mettre le bon outil en banque avant une recharge ne la rend jamais moins chère, seulement plus petite au même prix, et sertir une breloque neuve en portant l'outil inférieur est le moyen de redescendre à un échelon moins coûteux. L'enchanteur qui a signé la breloque paie moitié moins pour recharger la sienne, et encore moins avec une spécialisation en Enchantement.",
   'guide.profPages.faq.a9': "Publiez-la sur le tableau des commandes. Ouvrez la fenêtre d'artisanat, ouvrez le tableau depuis son en-tête, et nommez la recette que vous voulez voir fabriquer : laissez la commande ouverte pour que n'importe quel artisan l'accepte, ou visez un artisan précis que vous connaissez déjà. Accepter engage cet artisan envers le travail, et une commande n'est jamais tenue que par une seule personne à la fois.\n\nAucune pièce et aucun matériau ne sont retenus lors de la publication, alors mettez-vous d'accord entre vous sur le prix et sur qui apporte les réactifs, comme les commandes se sont toujours arrangées. Vous pouvez annuler votre propre commande tant qu'elle reste ouverte, et une commande que personne n'accepte expire au bout d'un jour. La livraison se fait en personne : tenez-vous près de votre artisan avec un emplacement de sac libre quand la pièce est prête. Elle arrive liée à vous par le Lien du Créateur, que n'importe quel maître de station peut défaire contre le tarif habituel.",
   'guide.profPages.faq.q10': "Qu'est-ce qu'une breloque, et que se passe-t-il quand elle est épuisée ?",
   'guide.profPages.faq.q9': 'Comment faire fabriquer quelque chose pour moi ?',
   'guide.profPages.findingNodesNote': "Vous n'avez pas besoin de les repérer à l'œil. Chaque nœud de la zone est dessiné sur la carte de zone partout où elle montre ce terrain, et sur la minicarte à mesure que vous le croisez, si bien qu'une tournée de récolte peut se planifier depuis l'écran de carte avant même de partir. Un nœud que vos outils ne peuvent pas encore travailler est marqué plutôt que caché : il garde sa place avec une marque barrée et estompée, pour que vous voyiez le terrain vers lequel vous progressez. Sur ordinateur, survoler un filon, un bosquet ou une parcelle dans le monde le nomme, indique l'outil qu'il demande et, une fois que vous l'avez travaillé, décompte votre propre réapparition à la seconde près. Sur tactile, il n'y a rien à survoler, donc les repères de la minicarte racontent la même histoire.",
-  'guide.profPages.specimenBodyFamilies': "Gardez un peu de place dans vos sacs quand vous farmez : une aubaine signée a besoin de son propre emplacement ou d'une pile signée identique où se poser, et si rien ne convient, le rendement arrive quand même mais la signature est perdue. Le dépeçage des cadavres a lui aussi son bras de jackpot : environ {pct}% de chaque composant dépecé sort rare ou mieux. Une famille qui a un spécimen parfait à offrir (peau, soie, venin, griffe, viande) garde son rendement ordinaire tel quel et frappe le spécimen signé à côté ; les trois autres, croc, tissu et défense, signent le rendement lui-même.",
+  'guide.profPages.specimenBodyFamilies': "Gardez un peu de place dans vos sacs quand vous farmez : une aubaine signée a besoin de son propre emplacement ou d'une pile signée identique où se poser, et si rien ne convient, le rendement arrive quand même mais la signature est perdue. Le dépeçage des cadavres a lui aussi son bras de jackpot : environ {pct}% de chaque composant dépecé sort rare ou mieux. Une famille qui a un spécimen parfait à offrir (peau, soie, venin, griffe, viande) garde son rendement ordinaire tel quel et frappe le spécimen signé à côté ; les cinq autres, croc, tissu, défense, corne et branchies, signent le rendement lui-même.",
   'guide.professions.focusBodyTiers': "Chaque ville principale propose un panneau de Focalisation de la ville aux récolteurs de passage : restez en ville, ouvrez-le près de la minicarte, et répartissez un budget de 10 points de focalisation entre les types de composants qui vous intéressent. Chaque tranche de 5 points sur un composant fait monter son palier de récolte d'un cran (deux crans au maximum), et chaque point ajoute 10 pour cent à son rendement ; les composants non focalisés ne sont jamais pénalisés.\n\nVotre répartition suit votre personnage partout et peut être réajustée lors de toute visite ultérieure en ville, au rythme que vous choisissez. Prendre votre temps est gratuit : le réajustement dure 1 minute par point déplacé. Payer un peu l'accélère, 15 secondes par point plus 5 cuivres et 1 Poussière carillon par point, et payer en totalité le rend instantané pour 25 cuivres et 5 Poussières carillon par point. Seuls les points réellement déplacés sont comptés, si bien qu'ajuster un seul point coûte peu, et un panneau ouvert puis refermé sans modification ne coûte jamais rien, quelle que soit la vitesse choisie.",
-  'guide.professions.harvestBodyFamilies': "La récolte ne s'arrête pas aux nœuds. De nombreuses bêtes abattues peuvent être dépecées une fois chacune, premier arrivé premier servi, pour des peaux, crocs, griffes, défenses, soie, venin, tissu et viande, directement sur le cadavre en plus de son butin ordinaire ; une seule pression ouvre les deux. Lorsqu'une bête porte plus d'un composant exploitable, le choix vous appartient : prendre tout ce qu'elle peut donner, ou vous concentrer sur moins de composants et obtenir une qualité sensiblement meilleure de ce que vous prenez.\n\nUn jet de récolte rare ou mieux sur une famille porteuse de spécimens accorde également un spécimen parfait signé (une Peau immaculée, une Soie immaculée, une Glande à venin vierge, une Griffe immaculée, ou une Coupe privilégiée) en plus du rendement ordinaire, et consigne Un spécimen parfait dans votre Livre des hauts faits. N'importe quel personnage peut récolter, sans formation requise, et tout outil de récolte que vous possédez compte pour le bonus de prime, quel que soit le métier auquel il appartient.",
-  'guide.professions.toolEffectsBody': "Un outil de récolte possède un emplacement, et c'est là que se loge la breloque d'un enchanteur. Une Cache du collecteur ajoute une unité à ce que rapporte une récolte ; un Œil de l'artisan en améliore la qualité. Bricoleur Gizzel, Maître des Outillages à Eastbrook, enseigne les deux aux enchanteurs ayant atteint 25 de compétence dans le métier, et les deux se fabriquent à son atelier d'outillage.\\n\\nUne breloque fraîchement sertie porte 20 charges sur un outil commun et 10 de plus par échelon de rareté au-dessus du commun, si bien que la même breloque sertie sur un pic épique commence à 50. Une charge n'est dépensée que lorsque la breloque a réellement changé le résultat, jamais sur une récolte qu'elle n'a pas améliorée, et un emplacement peut être réglé pour demander confirmation à chaque utilisation, si bien que la breloque attend que vous disiez Utiliser une charge. Sertir une breloque neuve refrappe l'emplacement autour de l'outil que vous portez à cet instant, si bien qu'il se remplit selon ce que cet outil peut contenir plutôt que de revenir à un ancien maximum, et un resertissage qui ne changerait strictement rien est refusé plutôt que de consommer la breloque.\\n\\nÉpuiser les charges ne détruit pas la breloque : le propriétaire de l'outil recharge l'emplacement, 10 charges pour chaque matériau arcanique dépensé, le matériau demandé suivant le meilleur entre l'outil que vous portez et le meilleur outil qui ait jamais rempli cet emplacement, Poussière carillon pour un outil commun ou inhabituel, Essence carillon pour un rare, et Éclat carillon pour un épique. Laisser le bon outil en banque n'achète pas une recharge moins chère, seulement une plus petite au même prix ; le moyen honnête de redescendre à un échelon moins coûteux est de sertir une breloque neuve en portant l'outil inférieur, ce qui refrappe l'emplacement à ce niveau-là. Si le plafond de l'emplacement dépasse ce que votre outil actuel peut remplir, la recharge s'arrête là où s'arrête cet outil et vous invite à porter le meilleur. La recharge coûte moitié moins de matériaux quand vous êtes l'enchanteur qui a signé la breloque, et encore moins si vous êtes spécialisé en Enchantement ; n'importe qui d'autre paie le tarif plein. Une recharge est une courte incantation, comme le reste de la famille de l'artisanat.",
+  'guide.professions.harvestBodyFamilies': "La récolte ne s'arrête pas aux nœuds. De nombreuses bêtes abattues peuvent être dépecées une fois chacune, premier arrivé premier servi, pour des peaux, crocs, griffes, défenses, cornes, branchies, soie, venin, tissu et viande, directement sur le cadavre en plus de son butin ordinaire ; une seule pression ouvre les deux. Lorsqu'une bête porte plus d'un composant exploitable, le choix vous appartient : prendre tout ce qu'elle peut donner, ou vous concentrer sur moins de composants et obtenir une qualité sensiblement meilleure de ce que vous prenez.\n\nUn jet de récolte rare ou mieux sur une famille porteuse de spécimens accorde également un spécimen parfait signé (une Peau immaculée, une Soie immaculée, une Glande à venin vierge, une Griffe immaculée, ou une Coupe privilégiée) en plus du rendement ordinaire, et consigne Un spécimen parfait dans votre Livre des hauts faits. N'importe quel personnage peut récolter, sans formation requise, et tout outil de récolte que vous possédez compte pour le bonus de prime, quel que soit le métier auquel il appartient.",
   'guide.professions.toolEffectsHeading': "Effets d'outil",
   'guide.progression.capEndgameBody': "Les failles sont la seule chose qui attend le plafond lui-même. Elles se déchirent dans les royaumes selon leur propre calendrier, classées de C à S, et chaque groupe du monde se lance dans la course pour être celui qui nettoie chacune d'elles. Les tableaux de plongée continuent eux aussi de tourner, et leur difficulté la plus corsée mérite un nouveau regard une fois votre équipement à niveau.",
   'guide.progression.journeyBodyCount': "Le monde est une seule terre continue de {zones} zones. Trois d'entre elles forment la route sur laquelle vous montez en niveau, disposées du sud au nord : vous commencez dans la vallée verdoyante, poursuivez à travers le marais et finissez sur les pics froids et élevés. Suivez le fil des quêtes et la contrée vous porte de l'une à l'autre. Une île se trouve au large des côtes de la vallée pour les premiers niveaux, et le reste des royaumes s'ouvre à partir de cette même route, conçu pour les personnages qui ont déjà achevé cette ascension.",
@@ -1855,7 +1848,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.charges':
     'Commence avec {base} charges sur un outil commun (+{bonus} par échelon de rareté).',
   'hudChrome.professions.toolEffectTooltip.howToSlot':
-    "Sertissez-le sur un outil de Minage, de Bûcheronnage ou d'Herboristerie depuis la fenêtre Métiers. Consommé une fois serti.",
+    "Sertissez-le sur un outil de Minage, de Bûcheronnage, d'Herboristerie ou d'Agriculture depuis la fenêtre Métiers. Consommé une fois serti.",
   'hudChrome.professions.toolEffectTooltip.kind': "Breloque d'outil",
   'hudChrome.professions.toolEffectTooltip.landOnly': 'Ne se sertit pas sur les cannes à pêche.',
   'hudChrome.professions.toolEffectTooltip.openProfessions':
@@ -1893,10 +1886,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.saleBuyer': 'Vendu à {buyer}',
   'itemUi.market.saleOlder': 'Plus {count} ventes antérieures, incluses dans le total.',
   'itemUi.tooltip.maxStack': 'Pile maximale : {count}',
-  'itemUi.tooltip.useElixir':
-    'Utiliser : augmente votre {stat} de {value} pendant {minutes} min. Utilisable en combat.',
-  'itemUi.tooltip.useElixirAura':
-    'Utiliser : confère {aura} pendant {minutes} min. Utilisable en combat.',
   'hud.system.deathRecapAbility': 'Vous êtes mort. Tué par {ability}.',
   'hud.system.deathRecapDrowned': 'Vous êtes mort. Vous vous êtes noyé.',
   'hud.system.deathRecapFalling': 'Vous êtes mort. Vous avez fait une chute mortelle.',
@@ -1907,7 +1896,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.noQuestItems': 'Aucun objet de quête dans vos sacs.',
   'hudChrome.bank.cannotDepositNow': 'Ne peut pas être déposé maintenant',
   'hudChrome.bank.depositAllTooltip':
-    "Envoie en un seul geste tous les réactifs d'artisanat et objets de rebut de vos sacs vers la banque. Les outils de récolte, l'équipement porté, les objets de quête et les consommables ne sont jamais touchés.",
+    "Envoie en un seul geste tous les matériaux d'artisanat (tout ce dont l'infobulle indique « Matériau » ou « Matériau fin ») de vos sacs vers la banque. Tout le reste demeure dans vos sacs, y compris les outils de récolte, les objets de quête, les consommables et les objets gris.",
   'hudChrome.bank.guildBuyConfirm':
     'Acheter {count} emplacements de banque de guilde supplémentaires pour {price}, prélevés sur la trésorerie de la guilde ?',
   'hudChrome.bank.guildBuyNote': 'Payé depuis la trésorerie de la guilde',
@@ -2115,20 +2104,12 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "La possession actuelle d'un Seeker Genesis Token est requise.",
   'guide.professions.archetypeSwitchBody':
     "Une déclaration n'est pas non plus une condamnation à perpétuité. Une paire que vous n'avez jamais tenue est simplement une nouvelle quête d'harmonisation, tandis que revenir à une paire que vous avez quittée vous demande d'abord de faire amende honorable : cinq tâches la première fois, et trois de plus ajoutées pour chaque retour que vous avez déjà effectué (prendre une paire toute neuve n'augmente jamais ce compte). Le choix reste lourd de sens sans jamais fermer une porte pour de bon.",
-  'guide.professions.whatBody':
-    "Les métiers sont la vie laborieuse du monde : quatre métiers de récolte qui arrachent la matière première à même la terre, et un anneau de dix métiers d'artisanat qui la transforment en équipement, en repas, en potions et en outils. Ici, tout alimente autre chose. Le minerai que vous extrayez devient une lame, la lame reçoit un enchantement, et l'enchantement réclame de la poussière tirée d'un vieil équipement brisé : un récolteur, un artisan et un bricoleur sont donc tous les maillons d'une même chaîne.\n\nIl n'y a aucune limite de métiers sur laquelle se torturer. Chaque personnage peut monter côte à côte sept des huit métiers d'artisanat qui ont du contenu aujourd'hui et les quatre métiers de récolte (l'Ingénierie est la seule récalcitrante : ses recettes commencent toutes au-dessus du plafond gratuit, son échelle attend donc le serment du Bombardier) ; le seul choix exclusif est votre archétype, l'identité à laquelle vous finirez par prêter serment, même si, une fois harmonisé, les métiers qui tombent dormants derrière lui ne grimpent plus que sur leurs recettes communes, et plus du tout au-delà de 75 de compétence. La compétence ne redescend jamais, et rien de ce que vous apprenez ne vous est jamais retiré.",
   'guide.professions.archetypesBody':
-    "Les dix métiers occupent une roue fixe, et la géographie sur cette roue compte. Chaque paire de voisins forme une paire nommée : Forgeron pour la Fabrication d'armes et la Fabrication d'armures, Équipementier pour le Travail du cuir et la Couture, Apothicaire pour l'Alchimie et la Cuisine, Bombardier pour l'Ingénierie et l'Alchimie, et six autres autour de l'anneau.\n\nS'harmoniser à une paire est une quête, pas un clic dans un menu. Quatre paires peuvent être rejointes aujourd'hui (Forgeron, Équipementier, Apothicaire et Bombardier), chacune ancrée par un maître résident à Eastbrook dont la quête d'acceptation énonce tout le marché d'emblée, avant que vous ne l'acceptiez. Tant que vous ne vous déclarez pas, chaque métier progresse librement sur les recettes jusqu'au palier rare inclus (toute recette réclamant 74 de compétence ou moins), de sorte que vous pouvez presque tout essayer avant de choisir (seule l'Ingénierie n'a aucune recette aussi basse, son nombre attend donc).\n\nUne fois harmonisé, vos deux métiers de paire deviennent vos majeures, sans autre plafond que le plafond global. Le reste de la roue ne s'éteint pas pour autant : un métier opposé à vos majeures reste allumé comme passe-temps et continue de grimper jusqu'au palier rare (une quête répétable à la forge du Forgeron Haldren permet d'échanger lequel), et tous les autres métiers deviennent dormants. Un métier dormant conserve sa compétence et ses recettes communes, qui continuent de l'enseigner sur la courbe normale jusqu'à ce qu'elles passent au gris à 75 ; tout ce qui est au-dessus du commun cesse aussitôt de payer, et un métier dormant ne sort jamais de chef-d'oeuvre pendant son repos.",
+    "Les dix métiers occupent une roue fixe, et la géographie sur cette roue compte. Chaque paire de voisins forme une paire nommée : Forgeron pour la Fabrication d'armes et la Fabrication d'armures, Équipementier pour le Travail du cuir et la Couture, Apothicaire pour l'Alchimie et la Cuisine, Bombardier pour l'Ingénierie et l'Alchimie, et six autres autour de l'anneau.\n\nS'harmoniser à une paire est une quête, pas un clic dans un menu. Quatre paires peuvent être rejointes aujourd'hui (Forgeron, Équipementier, Apothicaire et Bombardier), chacune ancrée par un maître résident à Eastbrook dont la quête d'acceptation énonce tout le marché d'emblée, avant que vous ne l'acceptiez. Tant que vous ne vous déclarez pas, chaque métier progresse librement sur les recettes jusqu'au palier rare inclus (toute recette réclamant 74 de compétence ou moins), de sorte que vous pouvez tout essayer avant de choisir.\n\nUne fois harmonisé, vos deux métiers de paire deviennent vos majeures, sans autre plafond que le plafond global. Le reste de la roue ne s'éteint pas pour autant : un métier opposé à vos majeures reste allumé comme passe-temps et continue de grimper jusqu'au palier rare (une quête répétable à la forge du Forgeron Haldren permet d'échanger lequel), et tous les autres métiers deviennent dormants. Un métier dormant conserve sa compétence et ses recettes communes, qui continuent de l'enseigner sur la courbe normale jusqu'à ce qu'elles passent au gris à 75 ; tout ce qui est au-dessus du commun cesse aussitôt de payer, et un métier dormant ne sort jamais de chef-d'oeuvre pendant son repos.",
   'guide.professions.startBody':
     "Tout juste arrivé à Eastbrook ? Trouvez le Contremaître Odell et prenez Un métier pour chaque main : il vous indiquera les filons de minerai autour de la Mine de cuivre, au nord-est de la ville, et vous offrira vos premières callosités. Méfiez-vous de la mine elle-même : les Terrassiers de Deeprock qui y campent ont quelques niveaux de plus qu'un nouvel arrivant, alors travaillez d'abord les filons périphériques et gardez le cœur du camp pour quand vous aurez pris un peu de niveau. Ensuite, récoltez chaque filon, chaque bosquet de bois et chaque parcelle de plantes que vous croisez en quêtant ; la maîtrise vient naturellement aux voyageurs.\n\nDe retour en ville, appuyez sur T pour ouvrir la fenêtre d'artisanat et travaillez les recettes communes que tout personnage connaît dès le départ. Passez voir les maîtres à la forge, aux cuisines, au métier à tisser et à l'atelier d'outillage pour découvrir ce qu'ils enseignent, et prenez leurs commandes de travail pour des revenus réguliers. Le jour où la lettre de la Guilde vous trouvera, vous saurez déjà quelle paire vous fait l'effet d'un chez-soi.",
-  'guide.profPages.craftIntro.engineering':
-    "L'Ingénierie fabrique les outils que tout récolteur sérieux finit par vouloir : les pics, haches, serpes et cannes à pêche de palier 4 et de palier 5, qu'aucun comptoir ne vendra jamais contre des pièces, chacun consommant l'outil du palier inférieur.",
-  'guide.profPages.craftIntro.enchanting':
-    "L'Enchantement démantèle l'équipement et lui restitue sa puissance : brisez les pièces dont vous ne voulez pas pour en tirer des matériaux arcaniques, puis dépensez-les en un bonus de caractéristique permanent sur une pièce que vous comptez garder. Briser et enchanter ne demandent ni station ni formateur, et n'importe qui peut commencer dès le premier jour ; seules les deux recettes de charme en demandent davantage, enseignées à l'atelier d'outillage.",
   'guide.profPages.craftProse.weaponcrafting.materialsBody':
     "Le Minage est la colonne vertébrale. Le minerai de cuivre vient des filons de palier 1 du Val d'Eastbrook, le minerai de fer du Marais de Mirefen, et le minerai d'osmium des Hauteurs de Thornpeak, et chaque échelon de l'échelle monte de la même façon. Le Bûcheronnage compte plus que vous ne le croiriez : l'écorce de fer emmanche la lance de sanglier, le frêne gris épaule le maul, et un unique rondin de pin des cimes forme le bâton de bataille.\n\nLe reste vient de la chasse et du comptoir. La peau brute des poignées se récolte directement sur les cadavres de loups et de sangliers, les fragments d'os viennent des morts sans repos ou d'équipement commun récupéré, et l'échelle de la forge brûle du Flux de forgeage, 20 cuivres le pot chez Darva elle-même. Si votre propre minage traîne, aucun comptoir ne vous sauvera sur le minerai lui-même : l'osmium vient des filons de Thornpeak, des filons de départ de toutes les zones plus jeunes sauf le Rivage Lointain (dont les filons donnent du fer), ou de la pile d'un autre joueur, par échange ou par le Marché mondial. Seul le Lingot de glypheacier s'achète contre des pièces, chez Bricoleur Gizzel à l'atelier d'outillage ou chez Quartier-maître Bree à Highwatch.",
-  'guide.profPages.craftProse.weaponcrafting.routeBody':
-    "Toute pièce dotée d'une vraie ligne de caractéristiques, ce qui sur cette échelle veut dire l'échelon fer et au-dessus, peut sortir de l'enclume en chef-d'oeuvre tant que la qualité supérieure tient dans le plafond de votre palier ; les pièces communes en cuivre, sans caractéristiques, ne le déclenchent jamais, parce qu'il n'y a rien en elles à améliorer. Le fer et l'osmium comptent comme matériaux de palier 1 pour le bonus de chef-d'oeuvre, le pin des cimes et le glypheacier comme palier 2, et une compétence assise au-dessus du palier propre d'une recette ajoute son propre point par palier, si bien que parmi les trois pièces en osmium ce sont la hache de guerre et le bâton de bataille qui portent l'avantage de matériau, et qu'un échelon continue de mieux se déclencher une fois que vous l'avez dépassé.\n\nMontez l'échelon cuivre jusqu'à 25, formez-vous à l'échelon fer le jour où il s'ouvre et montez-le jusqu'à 50, puis l'échelon osmium jusqu'à 75. Au-delà de 75, rien de plus haut n'est encore livré : les recettes en osmium s'estompent donc à la moitié puis au quart du gain, prévoyez environ 150 fabrications supplémentaires pour atteindre le plafond de 125, et souvenez-vous du régulateur partagé de dix actions d'artisanat par minute quand vous vous installez pour produire en série.\n\nFinancez la montée au fur et à mesure : la commande de travail de la forge de Darva vous prend huit minerais de cuivre toutes les 30 minutes contre un peu de pièces et d'expérience, et les échelons fer et osmium se vendent honnêtement aux combattants de mêlée en pleine montée de niveau. Le Livre des hauts faits marque Tranchant et trempe à la compétence 50 et couronne Grand Maître Fabrication d'armes à 125.",
   'guide.profPages.craftProse.armorcrafting.identityBody':
     "L'échelle de la Fabrication d'armures se lit comme la carrière d'un soldat : la simple ceinture, les solerets et les gantelets en cuivre riveté pour commencer, le haubert, les jambières et les spallières en maille de fer avec leurs premières vraies lignes de caractéristiques, puis les rares heaume, cuirasse et chausses en écailles d'osmium, des pièces de Force et d'Endurance dont les valeurs d'armure se tiennent tout en haut de l'art d'un artisan.\n\nElle a aussi un versant plus discret : les Jambières protégées d'Eastbrook, une pièce de terrain commune aux caractéristiques de lanceur de sorts, et le Manteau Ecaille-de-fourneau, une épaulière en mailles rare d'Intellect et d'Esprit à la compétence 75, gardent les porteurs de mailles tournés vers la magie sur la liste des clients. Sur l'anneau, elle se tient entre la Fabrication d'armes et l'Ingénierie ; la paire du Forgeron avec la Fabrication d'armes se jure devant la Forge-maîtresse Darva, tandis que la paire du Rouagier avec l'Ingénierie est nommée mais n'a pas encore de quête de serment.",
   'guide.profPages.craftProse.armorcrafting.materialsBody':
@@ -2141,34 +2122,12 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Voici la subtilité : la tannerie se dresse à Fenbridge, sur la route du Marais de Mirefen, ce qui fait du Travail du cuir le seul métier profond formé en plein marais. Tanneur Hesk enseigne l'échelle à ses cuves : l'échelon cuir de Fenbridge gratuit à la compétence 0, l'échelon cuir des marais à 25 pièces d'argent la recette à partir de la compétence 25, et l'échelon gardien des marais à 1 pièce d'or chacune à partir de la compétence 50, chaque échelon s'ouvrant dès que votre palier l'atteint.\n\nTrois recettes se passent du formateur : les pièces de terrain communes (le Pourpoint en cuir tanné et le Cuir de druide d'Eastbrook) se fabriquent n'importe où dès le départ, et les Enveloppements de cuir crépusculaire sont connus de tous à la compétence 50, liés à la tannerie. Notez que le serment de l'Équipementier, lui, se prête à Eastbrook auprès d'Ottilie ; seul l'enseignement se passe dans le marais.",
   'guide.profPages.craftProse.leatherworking.routeBody':
     "Toute pièce dotée de vraies caractéristiques tire la chance de chef-d'oeuvre tant que la qualité supérieure tient dans le plafond de votre palier, y compris le Cuir de druide d'Eastbrook et ses caractéristiques, et une Peau immaculée signée dans un Pourpoint de Mirewarden fournit automatiquement le bonus de réactif signé ; l'osmium compte comme matériau de palier 1 pour ce jet. Les pièces communes en cuir, sans caractéristiques, ne peuvent pas le déclencher.\n\nMontez-le de la façon naturelle : récoltez chaque loup et chaque sanglier que vous tuez dès le niveau un, laissez les deux pièces de terrain communes vous porter jusqu'à 25 où que vous soyez, puis formez-vous à l'échelon cuir aux cuves quand les quêtes vous entraînent de toute façon dans le marais. L'échelon cuir des marais vous mène à 50, et les pièces du gardien des marais ainsi que les Enveloppements de cuir crépusculaire portent le palier rare de 50 à 75. Au-delà de 75, ces recettes de palier 2 tombent à un gain de moitié puis d'un quart, soit environ 150 fabrications pour les cinquante derniers points jusqu'au plafond de 125 ; sous le plafond d'une majeure, elles s'alignent tout de même sur le plafond de fabrication de qualité rare plutôt que de tomber à zéro net.\n\nLa tannerie mobile compte plus pour ce métier que pour aucun autre : spécialisez-vous à 75 et une sacoche de peaux devient de l'équipement fini au coin du feu au lieu d'un retour à pied jusqu'à Fenbridge. La commande de travail de la tannerie de Hesk achète huit peaux brutes toutes les 30 minutes, un joli retour sur des peaux que vous ramassiez de toute façon, et le Livre des hauts faits marque Le métier du tanneur à la compétence 50, avec Grand Maître Travail du cuir au plafond.",
-  'guide.profPages.craftProse.cooking.identityBody':
-    "Mangez un plat cuisiné et il vous soigne sur 18 secondes de repos, ce qui, entre deux engagements, est le soin le moins cher du jeu. L'échelle va de la Perche de rivière poêlée à 90 points de vie jusqu'au Grand Rôti de Marlow à 980, un soin assis que rien dans le jeu ne surpasse.\n\nSur l'anneau, la Cuisine se tient entre l'Alchimie et le Travail du cuir. Sa paire vivante est l'Apothicaire, Alchimie et Cuisine, jurée devant Cuisinier Marlow aux cuisines d'Eastbrook après avoir chassé quatre sangliers sauvages pour la marmite ; la paire du Trappeur avec le Travail du cuir est nommée sur l'anneau mais n'a pas encore de quête de serment.",
-  'guide.profPages.craftProse.cooking.materialsBody':
-    "La Pêche fournit les ingrédients signatures, zone par zone : truite miroir et perche de rivière dans les eaux du Val d'Eastbrook, brochet du marais et anguille des tourbières dans le Marais de Mirefen, truite givrée et carpe argentée dans les Hauteurs de Thornpeak. Les échelons mêlent les zones librement (l'échelon gratuit réclame déjà du brochet du marais, l'échelon intermédiaire la truite givrée de Thornpeak, et le souper rare ramène la truite miroir du Val), si bien qu'un cuisinier qui pêche partout où la route le mène n'est jamais à sec.\n\nLe côté boucherie vient des cadavres récoltés : la viande de gibier des sangliers et de leurs semblables, et, sur un jet de récolte rare ou mieux, une Coupe privilégiée signée, la pièce maîtresse du grand rôti. Les herbes assaisonnent les meilleurs plats, une bûche de frêne gris fume l'anguille, et le Sel de cuisine coûte 8 cuivres le sachet à l'étal de Marlow lui-même.",
-  'guide.profPages.craftProse.alchemy.identityBody':
-    "Le métier se pratique à l'apothicaire de Highwatch, chez Alchimiste Vérane, Maître de l'apothicaire, qui enseigne l'échelle de recettes, vend les Fioles en verre à 12 cuivres et paie les herbes en pièces par sa commande de travail.\n\nSur l'anneau des métiers, l'Alchimie se range avec les métiers d'essais et d'erreurs, l'Ingénierie d'un côté et la Cuisine de l'autre. Cela lui donne deux identités de paire : le Bombardier (Ingénierie et Alchimie, pris devant Bricoleur Gizzel à Eastbrook) et l'Apothicaire (Alchimie et Cuisine, juré devant Cuisinier Marlow). Harmonisez-vous à l'une ou l'autre paire pour faire de l'Alchimie une majeure et laisser votre propre travail signé vous enseigner en retour ; la paire du Bombardier ouvre en plus son breuvage combiné, l'Élixir de l'Ours, tandis que la paire de l'Apothicaire ne livre pas encore de recette combinée. L'échelle, elle, n'attend jamais, car toutes les recettes d'Alchimie tiennent dans le palier rare sous lequel travaillent les métiers non déclarés : toute la montée jusqu'au plafond est donc ouverte avant le moindre serment.",
-  'guide.profPages.craftProse.alchemy.ladderBody':
-    "Tout le monde connaît la Potion de soins mineure dès le départ et peut la mélanger n'importe où, sans aucune station. La vraie échelle, ce sont neuf recettes enseignées par Vérane à l'apothicaire, trois par échelon : les recettes de compétence 0 sont gratuites, l'échelon de compétence 25 coûte 25 pièces d'argent par recette, et l'échelon de compétence 50 coûte 1 pièce d'or par recette. Chaque échelon comprend une potion de soins, une potion de mana et un élixir d'endurance, passant des flacons communs de feuilleclat (120 points de vie, 160 de mana) au peu commun de feuille d'or (200 points de vie, 260 de mana) puis au rare pétale de soleil (280 points de vie, 360 de mana).\n\nLes élixirs montent de la même façon : l'Élixir du Sanglier accorde 6 d'Endurance pendant 10 minutes, l'Élixir du Venin de Feu 9 pendant 15 minutes, et l'Élixir du Serpent 12 pendant 15 minutes, le Serpent étant le seul à donner deux flacons par fabrication. Une recette de plus se tient à l'écart : l'Élixir de l'Ours, un breuvage combiné que Vérane enseigne pour 25 pièces d'argent dès que votre Alchimie atteint 25, mélangeable n'importe où, mais seulement par un Bombardier harmonisé ayant l'Alchimie et l'Ingénierie toutes deux à 25.",
-  'guide.profPages.craftProse.alchemy.routeBody':
-    "Les potions et les élixirs ne tirent jamais de chef-d'oeuvre ; ce résultat appartient aux équipements portant des caractéristiques. Votre nom voyage quand même : les potions rares de pétale de soleil arrivent signées de la marque de leur créateur, et chaque flacon du double lot de l'Élixir du Serpent aussi, si bien que rien de rare ne quitte l'établi sans signature dans ce métier. À la compétence 75, vous vous spécialisez, et toute recette d'Alchimie coûte 20 pour cent de matériaux en moins à partir de là.\n\nPrenez l'Herboristerie tôt et cueillez en montant de niveau : la feuilleclat pousse partout dans le Val, et une fois arrivé à l'établi de Vérane, l'échelon gratuit vous portera proprement jusqu'à la compétence 25 avec des herbes que vous auriez cueillies de toute façon. Apprenez l'échelon 25 dès l'instant où il s'allume, déplacez votre cueillette vers le marais pour la feuille d'or, et laissez la commande de travail de Vérane (six Herbes Feuille d'Or pour 45 cuivres, répétable toutes les 30 minutes) vous rendre un peu de monnaie en chemin.\n\nÀ partir de 50, préparez les potions de pétale de soleil et les lots de Serpent avec le pétale de soleil de Thornpeak, en gardant un peu de verdure du Val et du marais dans le mélange. Le dernier tronçon de 100 à 125 est un filet délibéré : préparez donc ce qui se vend vraiment plutôt que de brûler des herbes pour le chiffre, et rappelez-vous que les consommables sont le seul bien fabriqué que tout le monde rachète indéfiniment. Le Livre des hauts faits marque Étranges breuvages à la compétence 50 et Grand Maître Alchimie au plafond.",
-  'guide.profPages.craftProse.engineering.identityBody':
-    "Le métier se pratique à l'atelier d'outillage, dans l'angle sud-ouest de la place d'Eastbrook, chez Bricoleur Gizzel, Maître des Outillages. Les paliers 1 à 3 de chaque ligne d'outils sont du stock de marchand ordinaire ; les paliers 4 et 5 sortent de l'établi d'un ingénieur, ou du comptoir de plongée de La Litanie noyée contre des Marques de plongée derrière ses conditions de réussites, et jamais d'aucune caisse contre des pièces.\n\nSur l'anneau, elle se range avec les métiers d'essais et d'erreurs, à côté de l'Alchimie et de la Fabrication d'armures, ce qui lui donne deux identités de paire : le Bombardier (Ingénierie et Alchimie, pris devant Gizzel lui-même) et le Rouagier (Fabrication d'armures et Ingénierie, nommé mais pas encore jurable). Un avertissement compte ici plus que partout ailleurs : chacun des échelons de recettes de l'Ingénierie se situe au-dessus du plafond de palier rare sous lequel travaillent les passe-temps et les artisans non déclarés, si bien que le chiffre de compétence ne bouge que pour un artisan dont les majeures comprennent l'Ingénierie, ce qui veut dire aujourd'hui le Bombardier. N'importe qui peut tout de même construire les outils de terre ; un artisan non harmonisé n'apprend simplement rien en le faisant, et les deux recettes de canne réclament en plus l'enseignement de Gizzel.",
   'guide.profPages.craftProse.engineering.materialsBody':
     "Chaque recette d'outil de terre consomme l'outil du palier inférieur plus un matériau FIN, et c'est cet appariement qui fait toute l'échelle terrestre : quatre minerais de fer fins et un Pic de mineur en argent-du-ciel donnent le Pic de mineur en osmium, puis deux Lingots de glypheacier, deux minerais d'osmium fins et ce pic en osmium donnent le Pic de mineur en glypheacier. Les lignes de la hache et de la serpe reprennent la forme fin-plus-outil-précédent avec les Bûches de Frêne Gris fines et les Rondins de bois ancien fins, les Herbes Feuille d'Or fines et les Herbes Pétale de Soleil fines, même si leurs échelons de palier 5 ne demandent aucun Lingot de glypheacier : le pic est la seule ligne qui devient plus chère au sommet. Les deux recettes de canne rompent le schéma volontairement : la Canne à moulinet de tempête prend quatre Koi solaires et une Canne du ruisseau d'argent, la Canne ouvragée par la marée deux Koi, huit Carpes argentées crues et cette Canne à moulinet de tempête, si bien que le sommet de l'échelle du pêcheur se paie sur l'eau plutôt qu'à un filon.\n\nUn matériau fin ne se vend nulle part et ne tombe pas d'une récolte ordinaire : on l'obtient en travaillant l'un des filons de plein grade d'une zone avec un outil classé au-dessus du matériau lui-même, ce qui veut dire en pratique l'outil de l'échelon juste en dessous de celui que vous cherchez à construire (les filons plus faciles qu'une zone garde pour les voyageurs rendent le matériau ordinaire quoi que vous balanciez). C'est délibéré. Sur la route de l'artisanat, un outil de palier 5 vient du fait d'avoir réellement manié celui de palier 4, pas d'une virée aux emplettes ; le comptoir des Marques de plongée est le seul contournement. La seule exception est le Lingot de glypheacier, raffiné et vendu par les seuls marchands, 1 pièce d'argent 60 cuivres le lingot chez Quartier-maître Bree à Highwatch ou au comptoir de Gizzel, si bien que le Pic de mineur en glypheacier est le seul à porter un plancher fixe en pièces intégré à son coût.",
-  'guide.profPages.craftProse.engineering.ladderBody':
-    "L'échelle compte huit recettes, toutes liées à la station de l'atelier d'outillage. Les six recettes d'outils de terre sont connues automatiquement, sans jamais le moindre frais de formateur : le pic, la hache et la serpe de palier 4 à la compétence 75, et les versions de palier 5 à la compétence 150. Ce second chiffre n'est pas une coquille, et il dépasse volontairement le plafond actuel de 125 : ici, les exigences de compétence ne conditionnent jamais une fabrication, elles ne font que modeler le gain de compétence, si bien que vous pouvez construire un outil de palier 5 le jour où vous tenez ses réactifs et son prédécesseur de palier 4. Les deux cannes fabriquées sont l'exception enseignée : Gizzel enseigne la Canne à moulinet de tempête à la compétence 75 pour 4 pièces d'or et la Canne ouvragée par la marée à la compétence 125 pour 16 pièces d'or, chacune dès l'instant où votre palier dans le métier atteint le sien.\n\nChaque outil fini est de qualité rare ou épique et sort signé : votre nom parcourt donc les zones sur les ceintures d'outils des autres joueurs. L'Ingénierie tient aussi la moitié d'une recette combinée : l'Élixir de l'Ours, préparé par un Bombardier harmonisé ayant l'Ingénierie et l'Alchimie toutes deux à 25.",
-  'guide.profPages.craftProse.enchanting.identityBody':
-    "Tous les enchantements sont connus dès le départ, n'importe qui peut désenchanter dès le premier jour, et ni l'un ni l'autre n'exige de station ; la compétence plafonne à 125 comme dans tous les métiers. Le seul coin enseigné du métier, c'est sa paire de recettes de charme : Bricoleur Gizzel enseigne la Cache du collecteur et l'Œil de l'artisan à l'atelier d'outillage, dans l'angle sud-ouest de la place d'Eastbrook, contre le tarif ordinaire du palier dès que votre Enchantement atteint 25, et les charmes eux-mêmes se travaillent à sa station.\n\nSur l'anneau, il se tient entre l'Inscription et la Joaillerie : ses deux identités de paire sont donc l'Arcaniste (Inscription et Enchantement) et le Pierrelier (Enchantement et Joaillerie). Aucune ne peut encore être jurée, puisque les deux voisins attendent leurs premières recettes ; aujourd'hui, l'Enchantement grimpe donc comme le métier de tout le monde : libre jusqu'au palier rare avant le moindre serment, et un choix de passe-temps naturel pour un Bombardier ou un Apothicaire. Les enchanteurs font aussi tourner le monde de la récolte : les deux effets d'outil à insérer sont l'ouvrage de l'Enchanteur, et un artisan d'origine recharge ses propres effets à prix réduit, plus réduit encore une fois spécialisé.",
-  'guide.profPages.craftProse.enchanting.levelingBody':
-    "Trois actions font monter la compétence : désenchanter une pièce, appliquer un enchantement, et fabriquer les deux charmes, qui suivent la courbe d'artisanat ordinaire. Chaque réussite vaut jusqu'à un point, pondéré par le sérieux du travail : la rareté de la pièce que vous brisez, ou le palier de réactif de l'enchantement que vous appliquez. Les désenchantements communs et les enchantements à poussière seule comptent comme du travail commun ; les désenchantements peu communs et les enchantements à essence comme du peu commun ; les désenchantements rares et tout enchantement Runique ou Supérieur comme du rare ; les désenchantements épiques et légendaires se classent plus haut encore sur la table, mais aucune identité d'enchanteur ne dépasse aujourd'hui l'échelon rare, si bien qu'en pratique ils rapportent autant que du travail rare. Une seule honnêteté gouverne l'établi de démantèlement : une pièce sortie de l'établi d'un joueur (fabriquée, signée ou chef-d'oeuvre) se réduit toujours en matériaux mais n'enseigne rien, si bien qu'une boucle fabriquer-briser ne fait monter personne, et que les leçons sont dans l'équipement trouvé dans le monde.\n\nL'estompement de maîtrise habituel s'applique par paliers de 25 points : le travail de grade commun passe au gris à la compétence 75, le travail peu commun à 100, et le travail de palier rare exactement au plafond de 125. L'Enchantement a aussi sa propre bonté : un apport au-dessus du plafond de votre archétype est ramené à ce plafond plutôt qu'annulé, si bien qu'avant votre harmonisation, un désenchantement épique compte simplement comme du rare au lieu de ne rien enseigner. Si l'Enchantement finit dormant derrière une autre identité, briser et appliquer comptent comme du travail commun et la montée cale à 75, tandis que les deux charmes, qui suivent la courbe d'artisanat au-dessus du plafond commun, n'enseignent absolument rien à un enchanteur dormant ; gardez-le comme passe-temps et le travail de palier rare paie toujours, simplement plus lentement au-delà de 75.",
   'guide.profPages.craftProse.enchanting.marketBody':
     "Appliquer un enchantement consomme les réactifs et marque un exemplaire précis de l'objet. Visez un exemplaire rangé dans vos sacs et vous récupérez un exemplaire enchanté distinct ; visez une pièce que vous portez déjà et elle est enchantée sur place, là où elle se trouve, sans le ballet du déséquipement et du rééquipement. Dans les deux cas, le bonus suit cette pièce pour toujours, à travers les déséquipements, les passages en banque et les échanges. Un enchantement par pièce : appliquer un enchantement différent à un exemplaire enchanté demande une confirmation, puis remplace purement et simplement l'ancien, en le détruisant sans rembourser ses matériaux. La vente, la mise au rebut et le désenchantement préfèrent tous les exemplaires ordinaires d'abord, pour que votre pièce finie ne soit pas dévorée par accident.\n\nL'équipement chef-d'oeuvre et l'enchantement font bon ménage : une pièce chef-d'oeuvre reste entièrement enchantable, et l'enchantement s'ajoute par-dessus le bonus de chef-d'oeuvre sans le déranger, ni déranger la signature du créateur. En cumulant toutes les sources, un chef-d'oeuvre signé portant un enchantement Supérieur est le mieux qu'une pièce fabriquée puisse atteindre, et il reste par conception en dessous du butin de raid.\n\nSur le marché, une pièce enchantée ou signée s'annonce comme n'importe quoi d'autre : elle part en annonce à exemplaire unique, l'infobulle montre l'enchantement et la marque du créateur, et la Poste aux Corbeaux la transporte tout aussi fidèlement. Les matériaux restent la moitié régulière du métier : la Poussière, l'Essence et les Éclats s'annoncent librement, l'annonce ne coûte rien, et le Marchand ne prend 5 pour cent que sur une vente conclue. D'où les deux revenus classiques de l'enchanteur, vendre des matériaux et vendre du travail fini : sur le marché, par corbeau, ou face à face dans une fenêtre d'échange.",
-  'guide.profPages.howBody':
-    "Ouvrez la fenêtre d'artisanat (touche T par défaut) et toutes les recettes que vous connaissez y sont listées avec ce qu'elles demandent et ce que vous avez sous la main. Les recettes liées à une station vous demandent de vous tenir à moins de 20 mètres de la bonne station en ville, les recettes de terrain se fabriquent n'importe où, et le brisage et l'enchantement de l'Enchantement ne demandent aucune station (seules ses deux recettes de breloque sont un travail de station, à l'atelier d'outillage). Il n'y a aucun jet d'échec : une fabrication dont vous avez les matériaux réussit toujours.\n\nDeux petites frictions gardent l'économie honnête. Chaque fabrication réussie paie un frais de 2 cuivres par point de budget de caractéristiques de l'objet, et les actions de type artisanat partagent un même rythme : au plus 10 fabrications, désenchantements, enchantements, récupérations ou recharges d'outil par fenêtre de 60 secondes. Ni l'une ni l'autre ne gênera une session normale ; toutes deux empêchent un spécialiste au plafond d'inonder le marché.",
   'guide.profPages.masterworkBody':
     "Chaque fabrication réussie donne exactement ce que la recette promet, et parfois un peu plus : un chef-d'oeuvre achève la même pièce un palier de qualité au-dessus, avec les caractéristiques bonus intégrées au moment de la fabrication. C'est uniquement additif, jamais une dégradation, et cela reste sous le plancher de raid : l'équipement fabriqué peut donc être excellent sans remplacer un butin de raid.\n\nLa probabilité est publiée, elle n'a rien de mystique : {base}% de base, plus {perTier}% par palier de compétence au-dessus de la recette, plus {signed}% dès qu'un réactif signé entre dans la fabrication, plus {spec}% une fois que vous êtes spécialisé, les matériaux de palier supérieur ajoutant 1 à 2% de plus, le tout plafonné à {cap}%. Seule une pièce dotée de vraies caractéristiques peut s'améliorer : les objets communs sans caractéristiques, les outils et les consommables ne déclenchent donc jamais ce résultat ; un métier dormant n'en produit aucun, et un métier passe-temps ne peut pas réaliser de chef-d'oeuvre au-delà de son plafond rare.\n\nLe beau travail porte son créateur. Les productions de qualité rare ou supérieure sont signées, chaque exemplaire (Fabriqué par ; les matériaux collectés portent Collecté par), et un chef-d'oeuvre est toujours signé quelle que soit sa qualité. Une signature est une provenance, pas un verrou : les biens signés s'échangent, s'envoient par courrier et s'annoncent librement sur le Marché mondial.",
-  'guide.profPages.trainingBody':
-    "Les recettes de formateur viennent des maîtres résidents, enseignées à leurs stations. La règle tient en une ligne : un maître enseigne une recette dès que votre palier dans le métier a atteint le palier propre à la recette, et rien d'autre ne la verrouille, ni votre niveau, ni votre archétype. Les échelles d'équipement et de consommables placent leurs échelons aux compétences 0, 25 et 50 ; les deux leçons de canne de l'Ingénierie prolongent l'échelle à 75 et 125, et les deux recettes de breloque de l'Enchantement se placent sur l'échelon 25, si bien qu'un nouvel échelon s'ouvre à mesure que vos paliers montent.\n\nLes frais sont uniques et forfaitaires par échelon : l'échelon de départ est gratuit, l'échelon compétence 25 coûte {tier1} par recette, l'échelon compétence 50 {tier2}, et les leçons de canne au-dessus portent leurs propres frais, indiqués à côté de chaque recette dans le tableau. Vous devez vous tenir à la véritable station du maître pour vous former, et une station mobile ne compte jamais. Les recettes de terrain communes et les six recettes d'outils terrestres fabriqués ne demandent aucune formation ; tout personnage les connaît dès le départ.",
   'guide.profPages.ench.enchantsNote':
     "Les enchantements se déclinent en trois paliers. Le palier de base fonctionne à la Poussière carillon (avec un peu d'Essence en haut de gamme) et couvre l'emplacement d'arme ainsi que tous les emplacements d'armure sauf le hors-main, avec assez d'axes de caractéristiques pour que chaque build trouve son bonheur à chaque emplacement. Le palier Supérieur coûte un Éclat carillon plus de l'Essence : des bonus plus forts sur les emplacements les plus déterminants. Les Éclats alimentent en outre deux autres gouffres, les deux recettes de breloque à cinq Éclats chacune et l'échelon supérieur des recharges d'effet d'outil, alors mettez-en quelques-uns de côté avant de dépenser.\n\nEntre les deux se placent les cinq enchantements Runiques, un consommateur par secondaire typé, si bien que rien de ce que vous broyez n'est jamais une impasse : Tranchant runique (arme, Force, consomme de l'Acier résonnant), Concentration runique (arme, Intellect, Bois résonnant), Rune tissée (torse, Esprit, Fil résonnant), Peau runique (jambières, Agilité, Peau résonnante) et Mailles runiques (casque, Endurance, Mailles résonnantes). Chacun demande en plus deux Essences carillon ; là où un emplacement et une caractéristique disposent à la fois d'un enchantement de base et d'un Supérieur, le bonus Runique se place entre les deux, tandis que Rune tissée est purement et simplement le meilleur enchantement d'Esprit pour le torse et que Peau runique est le seul enchantement d'Agilité pour les jambières. Les bonus exacts figurent tous dans le tableau ci-dessous.",
   'guide.profPages.gatherIntro.mining':
@@ -2183,8 +2142,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Une récolte est une courte incantation visible, pas une prise instantanée : {base} secondes de base, jamais en dessous d'un plancher de {floor} seconde. Porter un outil au-dessus du palier du nœud, un outil que votre maîtrise vous permet de manier, vous accélère de {tool} secondes par palier au-dessus, et chaque tranche de maîtrise que vous franchissez retranche encore {band} secondes ; se contenter d'égaler le palier du nœud vous fait entrer, ce sont les paliers au-dessus qui vous rendent rapide.\n\nUn sac plein refuse poliment l'incantation avant même qu'elle ne commence, si bien que rien n'est gâché en plein geste, et chaque récolte verse une petite part d'expérience de personnage, calibrée sur le niveau du nœud face au vôtre comme l'expérience de tuerie : un nœud gris et trivial n'enseigne rien à un personnage au plafond.",
   'guide.profPages.gainBody':
     "Le gain est déterministe, jamais un jet de montée en compétence : un nœud à votre palier de gain ou au-dessus enseigne un point plein par récolte, et chaque tranche de {step} de maîtrise est un palier compté face au nœud. Les nœuds de palier 1 paient plein en dessous de 25, la moitié jusqu'à 49, un quart jusqu'à 74, et plus rien à partir de 75 ; les nœuds de palier 2 paient plein jusqu'à 49 ; les deux nœuds de palier 3 de chaque métier paient plein jusqu'à 74 et la moitié jusqu'au plafond de {cap}.\n\nLa route prévue est simple : apprenez sur les nœuds de départ du Val, passez au marais, et achevez la montée sur les sommets des Hauteurs de Thornpeak. Au plafond, l'apprentissage s'arrête mais pas les rendements : un récolteur au plafond continue de tirer pour toujours les meilleures probabilités que le métier propose.",
-  'guide.profPages.toolsNote':
-    "Chaque nœud exige dans vos sacs l'outil de son métier, palier 1 compris : pas de pic, pas de minerai ; pas de canne, pas de poisson. L'échelle des marchands couvre les paliers 1 à 3 dans les trois camps de base du cœur du royaume : l'outil de palier 1 est vendu dans les trois, les échelons au-dessus là où commence le terrain qui les utilise (Fenbridge ajoute le palier 2, Highwatch le palier 3), et les établissements plus jeunes au-delà ne tiennent aucun outil, alors équipez-vous avant de voyager. Chaque comptoir vend librement chaque échelon qu'il tient, et n'importe quel outil passe par échange direct ; chaque échelon s'annonce aussi sur le Marché et voyage par courrier, sauf les trois outils terrestres de départ à 20 cuivres : ceux-là s'achètent à un comptoir ou se passent de main en main, et ne se revendent jamais, ne s'envoient jamais par courrier et ne s'annoncent jamais. Ce qui est verrouillé, c'est le maniement. Un outil terrestre au-dessus du palier 1 ne fonctionne qu'une fois que votre maîtrise dans son propre métier l'a mérité, {tier2Prof} pour le palier 2, {tier3Prof} pour le palier 3, et 85 et 100 pour les deux échelons fabriqués ; la ligne du marchand, l'infobulle et le tableau ci-dessous annoncent tous l'exigence d'emblée. Jusque-là, un outil acheté en avance attend simplement dans vos sacs, n'ouvrant aucun terrain, n'achetant aucune vitesse et ne frappant aucun grade fin, puis se manie à l'instant où votre compteur touche son nombre. Les cannes à pêche sont la seule exception : aucune canne ne porte d'exigence de maniement, et le Marchand Wilkes à Eastbrook tient délibérément les cannes de palier 2 et de palier 3 pour les pêcheurs qui achètent en avance. Un outil n'occupe jamais d'emplacement d'équipement et ne s'use jamais : chacun est donc un achat unique, et seul le palier compte pour le verrou, une version plus rare du même palier n'ouvre rien de plus. La rareté n'est pourtant pas qu'une couleur. Elle fait durer plus longtemps un effet d'outil serti, et sur une canne elle élargit la fenêtre de remontée.\n\nUn meilleur outil achète trois choses, pas deux. Il ouvre des terrains de palier supérieur, il raccourcit l'incantation, et il améliore ce qui en sort : travaillez un filon avec un outil classé AU-DESSUS du matériau propre à la zone et la récolte en donne le grade fin plutôt que le grade ordinaire. Le filon doit être l'un des filons de plein grade de la zone : les filons plus faciles qu'une zone réserve aux voyageurs donnent donc toujours le matériau ordinaire. Les matériaux fins sont ce que consomment les recettes d'outils fabriqués, et un grade fin compte comme sa version ordinaire partout où une recette ou une commande de travail en réclame une, si bien qu'améliorer votre outillage ne vous laisse jamais en plan : cela signifie simplement que votre minerai de cuivre arrive sous forme de Minerai de cuivre fin.\n\nAu-dessus de l'échelle des marchands, chaque métier dispose de deux outils fabriqués, palier 4 et palier 5, faits à l'atelier d'outillage (tout personnage connaît les recettes terrestres ; la compétence qui grimpe pour ce travail est celle de l'Ingénierie), ou achetés contre des Marques de plongée au comptoir de la Litanie noyée une fois ses seuils de réussites atteints : le tableau ci-dessous porte le prix en Marques et les réussites que chaque échelon réclame. Aucun marchand ne les vend jamais contre des pièces. La Pêche a sa propre paire, et elles s'apprennent auprès du fabricant d'outils au lieu d'être connues dès le départ. Aucun nœud et aucune eau ne demandent plus que le palier 3 aujourd'hui : les deux échelons supérieurs achètent donc de la vitesse, du grade et une fenêtre de remontée plus clémente plutôt qu'un accès, et ils seront le ticket d'entrée quand des terrains de palier supérieur arriveront.",
   'guide.profPages.toolCraftedOrMarks':
     'Fabriqué ({craft}) ou {marks} Marques de plongée après trois réussites de la Litanie noyée',
   'guide.profPages.toolCraftedOrMarksHeroic':
@@ -2192,34 +2149,14 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.priceNone': 'Non vendu contre des pièces',
   'guide.profPages.colWield': 'Utilisable à',
   'guide.profPages.wieldNone': 'Aucune',
-  'guide.profPages.bandsBody':
-    "Les tranches de compétence sont l'échelle partagée 0/100/200 posée au-dessus du compteur d'un métier. Pour les métiers de terre, la tranche franchie à 100 raccourcit le temps d'incantation de récolte, et leur plafond fait de la tranche 1 le sommet. Les tranches de la Pêche ne raccourcissent rien : elles sélectionnent les tables de prises (avec une canne à la hauteur), seule la Pêche atteint la tranche 2, et c'est la montée elle-même qui entraîne un pêcheur vers des eaux plus profondes, là où vivent à la fois les meilleures tables et les leçons qui portent plus loin.",
   'guide.profPages.specimenBody':
     "Gardez un peu de place dans vos sacs quand vous farmez : une aubaine signée a besoin de son propre emplacement ou d'une pile signée identique où se poser, et si rien ne convient, le rendement arrive quand même mais la signature est perdue. Le dépeçage des cadavres a lui aussi son bras de jackpot : environ {pct}% de chaque composant dépecé sort rare ou mieux. Une famille qui a un spécimen parfait à offrir (peau, soie, venin, viande) garde son rendement ordinaire tel quel et frappe le spécimen signé à côté ; toute autre famille signe le rendement lui-même.",
   'guide.profPages.gatherDeeds.fishing':
     "Le jalon des 100 inscrit Vieux Sel et celui des 200 inscrit Grand Pêcheur avec son titre, le sommet même de l'art du pêcheur ; la Pêche compte aussi pour Grand Récolteur, obtenu à 100 dans trois métiers de récolte quelconques. Un premier poisson tiré des eaux de chacune de six zones remplit sa propre page, les trois zones du cœur du royaume plus le Marais des Saules, la Crête du Vent et le Rivage Lointain au-delà, et le Koi solaire consigne Lueur d'espoir : les voyageurs qui gardent une canne dans leur paquetage remplissent donc leur livre plus vite qu'ils ne le croient.",
-  'guide.profPages.fish.startBody':
-    "Une Canne à pêche simple coûte 20 cuivres chez le Pêcheur Brandt à Eastbrook (cherchez le Vieux loup de mer à la lisière est de la ville, au bord de la route du Lac Miroir) ; Bricoleur Gizzel, l'Approvisionneur Hale à Fenbridge et la Quartier-maître Bree à Highwatch en tiennent aussi. Utilisez la canne face à une eau assez profonde pour abriter du poisson, jusqu'à environ 24 mètres devant vous, et votre bouchon part au loin.\n\nVous ne pouvez pas lancer en combat, en train de nager ou mort : lancer depuis la rive est la posture prévue. L'eau se durcit toutefois en même temps que la terre : le marais réclame au moins la Canne à moulinet de fer de palier 2 et les hauteurs la Canne du ruisseau d'argent de palier 3, et une ligne lancée sans la canne que cette eau exige ne quitte jamais votre main. Deux cannes se situent au-dessus, la Canne à moulinet d'orage et la Canne ouvrée par les marées : les ingénieurs les fabriquent à l'atelier d'outillage avec ce qu'une ligne remonte, et le comptoir de plongée de la Litanie noyée les vend contre des Marques de plongée derrière ses seuils de plongées réussies, mais jamais contre des pièces. Aucune eau ne les exige : elles achètent donc une attente plus courte et une fenêtre de remontée plus large plutôt qu'un accès, ce qui, à l'échelon le plus haut, signifie une touche en trois secondes tout rond.",
   'guide.profPages.fish.biteBody':
     "Après le lancer, la touche survient à un instant caché entre {min} et {max} secondes ; le délai est décidé au moment où la ligne se pose, si bien que deux lancers ne se ressemblent jamais tout à fait. Quand le bouchon plonge, vous disposez d'une fenêtre de {reel} secondes pour appuyer de nouveau sur la canne et remonter : remontez dans ce laps et la prise atterrit, hésitez au-delà et le poisson s'échappe sans rien laisser. Une session entière plafonne à {cap} secondes, même un lancer calme se résout donc vite.\n\nLes meilleures cannes affûtent les deux bouts du mini-jeu : chaque palier de canne au-dessus du premier retranche {rod} secondes à l'attente la plus longue possible, jamais en dessous du plancher de trois secondes que la canne la plus haute effleure déjà, et ajoute {reelRod} secondes à la fenêtre de remontée ; ainsi la Canne à moulinet de fer ramène la pire attente à 6,5 secondes avec une fenêtre de 3,25 secondes, et la Canne du ruisseau d'argent à 5 avec une fenêtre au-delà de 4, sa rareté élargissant la remontée un peu plus que ne le paie le palier seul. Les touches les plus rapides ne changent jamais, quoi que vous teniez, et il suffit qu'une canne soit dans vos sacs pour compter.",
-  'guide.profPages.fish.scheduleNote':
-    "Le gain de Pêche suit un barème fixe, sans le moindre dé : un point plein par prise en dessous de 50 de maîtrise, un demi-point en dessous de 100, un dixième en dessous de 150, et un lent filet de 0,02 de 150 à 200. Ce dernier tronçon est un voyage de plusieurs milliers de prises, et c'est voulu : 200 est une déclaration, pas une halte sur la route vers autre chose.\n\nLa camelote cesse totalement d'enseigner à {cutoff} : à partir de là, les herbes et les bottes ne sont plus que des herbes et des bottes. L'eau elle-même plafonne aussi la leçon : les eaux de palier 1 du Val (et chaque jeune rivage au-delà du cœur du royaume) n'enseignent plus rien après 100, celles du marais s'arrêtent à 150, et seules celles de Thornpeak forment un pêcheur jusqu'à 200. Toute prise ramenée rapporte sinon au rythme prévu par le barème : quand le compteur cale, c'est le barème qui vous dit d'aller chercher des eaux plus profondes.",
-  'guide.profPages.fish.tablesNote':
-    "Votre maîtrise choisit l'une des trois tranches de prises : tranche 0 dès le départ, tranche 1 à 100, tranche 2 à 200, chacune déplaçant du poids de la camelote et des hameçons vides vers du vrai poisson, zone par zone. Chaque tranche au-dessus de la première exige aussi une canne : la tranche 1 réclame la Canne à moulinet de fer de palier 2, la tranche 2 la Canne du ruisseau d'argent de palier 3. Votre tranche effective est la plus basse entre ce que votre compétence a mérité et ce que votre canne supporte, et le plafond est silencieux : avec une canne inférieure vous prenez toujours du poisson, simplement sur la table de la tranche inférieure ; si vos prises semblent bloquées alors que votre compétence grimpe, vérifiez d'abord votre canne.\n\nLes eaux de chaque zone abritent leur propre paire de poissons comestibles, qui soignent d'autant plus que la zone est profonde, tous ingrédients de cuisine et parfaitement bonne nourriture à manger assis, crus, sortis de la ligne. Le reste de la table est l'impôt du pêcheur : des herbes, une botte de temps en temps, et l'hameçon vide, qui ne disparaît jamais tout à fait. Ce que vous payez dépend de l'eau où se pose votre bouchon, pas de l'endroit où vous vous tenez : un lancer porte jusqu'à 24 mètres, et la canne que l'eau exige, la table dont elle tire, le haut fait qu'elle crédite et jusqu'où elle enseigne répondent tous à la zone à laquelle cette eau appartient, décidée à l'instant où la ligne se pose. L'eau de chaque zone est écrite pour une tranche qui lui est propre, le Val pour la tranche 0, le marais pour la tranche 1, les hauteurs pour la tranche 2, et pêcher une tranche en dessous transforme environ un tiers de vos lancers en hameçons vides, deux tranches en dessous plus de la moitié. La canne vous mène à l'eau ; c'est la compétence qui la fait payer, et c'est la montée qui entraîne un pêcheur toujours plus profond, car de meilleures tranches ne sont pas seulement mieux payées : au-delà du Val, ce sont les seules eaux qui continuent d'enseigner. Le {rare} est la seule ligne qui ne répond qu'à votre tranche de prises et à rien d'autre : les mêmes probabilités dans chaque zone, et six fois plus probable à la tranche 2 qu'à la tranche 0, si bien que la chose la plus rare du ponton est celle pour laquelle un Grand Pêcheur est vraiment meilleur.",
-  'guide.profPages.fish.koiBody':
-    "Chaque étendue d'eau du jeu cache le même trophée : le Koi solaire, un éclat inhabituel au bout de la ligne, qui vaut 75 cuivres chez un marchand et bien davantage pour votre fierté. Ses probabilités ne répondent qu'à votre tranche de prises et à rien d'autre, les mêmes dans chaque zone : une ligne à 1 pour cent de la table de prises à la tranche 0, 3 à la tranche 1 et 6 à la tranche 2, tirée à chaque lancer remonté, si bien que le koi revient au pêcheur qui a mérité les tables profondes. En attraper un consigne Lueur d'espoir dans votre Livre des hauts faits, une marque de collectionneur sans Renommée. Quand cela arrive, le journal veille à ce que vous le sachiez.",
   'guide.profPages.econ.trainingNote':
     "Un forfait unique par échelon de recette, prélevé une seule fois quand un maître vous l'enseigne ; chaque échelon du tableau ci-dessous est bel et bien en service aujourd'hui, des recettes de départ gratuites jusqu'aux leçons de canne du fabricant d'outils tout en haut.",
-  'guide.profPages.econ.provenanceBody':
-    "Certains objets portent un nom. Survolez-en un et l'infobulle indique Collecté par untel sur un matériau brut, ou Fabriqué par untel sur une pièce finie : la même marque, formulée selon la manière dont l'objet est né. Une signature fait partie de l'objet lui-même, elle voyage avec lui à travers les échanges, la banque, le courrier, le Marché mondial, et même un rachat chez un marchand, et elle ne s'efface jamais.\n\nLa récolte signe automatiquement son meilleur travail : toute récolte qui tire rare ou mieux arrive signée, et les trouvailles rares signent la totalité de leur aubaine au quintuple. Le jet chanceux d'une récolte sur cadavre signe son rendement là où la famille n'a pas de spécimen à donner, et là où elle en a un, garde le rendement ordinaire et frappe le spécimen immaculé signé à côté. L'artisanat signe selon la même ligne : chaque exemplaire d'un résultat rare ou mieux est frappé signé, et un chef-d'oeuvre signe toujours quelle que soit sa qualité, si bien que la plus belle version d'une pièce nomme toujours son créateur. La seule chose qui puisse vous coûter une signature, c'est un sac plein : une unité signée a besoin d'une place à elle, ou d'une pile signée identique, pour se poser.\n\nUne pile d'objets partage une seule identité : deux exemplaires ne fusionnent donc que si chaque marque correspond exactement, même objet, même signataire, mêmes caractéristiques de chef-d'oeuvre, même enchantement, même lien. Une bûche signée ne rejoint jamais un tas ordinaire, ni dans un sens ni dans l'autre (fusionner effacerait le nom de quelqu'un), mais des contenus identiques fusionnent volontiers : vingt minerais signés par le même collecteur tiennent donc dans une seule pile, et une aubaine ne met pas vos sacs en pièces.\n\nLes signatures rendent la pareille aux artisans : détenir à l'établi un exemplaire signé d'un réactif nécessaire, quel qu'en soit le signataire, ajoute 2 points de pourcentage à la chance de chef-d'oeuvre, et détenir un réactif signé de votre propre main réduit d'un la quantité requise de ce réactif (jamais en dessous d'un). Votre propre travail signé de qualité rare ou mieux continue même de vous enseigner, aujourd'hui par le seul flacon : buvez une potion que vous avez signée et un mince filet de compétence revient au métier qui l'a préparée, tant que ce métier fait partie de vos majeures actives.",
-  'guide.profPages.faq.a4':
-    "Vous avez décroché une aubaine. Environ 1 récolte sur 90 déclenche un événement de récolte rare (du bois de cœur ancien sur un arbre, une veine vierge dans le minerai, une floraison au clair de lune parmi les herbes) : il multiplie le rendement par cinq, signe chaque unité à votre nom, et annonce la trouvaille à la zone entière. Un jet de rareté rare ou mieux sur une récolte ordinaire signe lui aussi le rendement.\n\nLes matériaux signés méritent d'être gardés ou vendus cher : détenir à l'établi n'importe quel exemplaire signé d'un réactif requis ajoute 2 points de pourcentage à la chance de chef-d'oeuvre. Rappelez-vous seulement qu'ils ne se pilent qu'avec des exemplaires signés à l'identique, et qu'ils occupent donc leur propre emplacement de sac.",
-  'guide.profPages.faq.a6':
-    "Les neuf recettes de terrain communes et les six recettes d'outils terrestres fabriqués sont connues de tous dès le départ, tout comme trois recettes liées à une station (le Manteau Écaille-de-fourneau, la Capuche de tissage protecteur et les Bandelettes en cuir crépusculaire), qui ne demandent aucun formateur, seulement leur station. Tout le reste est enseigné par les maîtres résidents à leurs stations dans les trois camps de base : la plupart se tiennent à Eastbrook, le tanneur garde la tannerie à Fenbridge, et l'alchimiste garde l'apothicaire à Highwatch.\n\nLes recettes de formateur se répartissent en échelons : compétence 0, 25 et 50 pour les métiers d'équipement et de consommables, au prix de gratuit, 25 pièces d'argent et 1 pièce d'or en forfaits uniques ; les deux recettes de breloque de l'Enchantement se placent sur l'échelon 25, et le fabricant d'outils enseigne les deux cannes à pêche fabriquées à 75 et 125 pour 4 et 16 pièces d'or. Un maître enseigne une recette dès que votre tranche dans ce métier a atteint la tranche propre à la recette, et vous devez vous tenir à sa station pour apprendre : une station mobile ne compte pas.",
-  'guide.profPages.faq.a7':
-    "L'incantation de récolte part de 2,5 secondes et se raccourcit de deux façons : 0,4 seconde par palier d'outil que vous portez et pouvez manier au-dessus du palier propre au nœud, et 0,15 seconde dès que le compteur de votre métier franchit sa tranche 100, avec un plancher de 1,5 seconde. Passez des nœuds de palier 1 aux nœuds de palier 3 et votre excédent s'évapore : le même pic frappe donc de nouveau plus lentement. Détenir exactement le palier requis n'achète aucune vitesse ; cela ne fait qu'ouvrir le nœud.\n\nLe gain de compétence s'estompe exactement comme pour l'artisanat : un nœud passe au gris à mesure que votre maîtrise dépasse son palier (les nœuds de palier 1 n'enseignent plus rien à partir de 75 de maîtrise), la réponse aux gains trop lents est donc des nœuds de palier supérieur. Ceux-ci exigent dans vos sacs un outil au moins de leur palier (aucun nœud ne se travaille jamais à mains nues, palier 1 compris), et un outil terrestre au-dessus du palier 1 réclame d'abord sa marque de maniement, 40/70/85/100 dans son propre métier pour les paliers 2 à 5. La Pêche suit sa propre décrue : gain complet en dessous de 50 de maîtrise, la moitié en dessous de 100, un filet de 0,1 en dessous de 150 et de 0,02 en dessous de 200, les prises de camelote n'enseignent plus rien du tout à partir de 100, et l'eau elle-même plafonne la leçon (les eaux de palier 1 cessent d'enseigner à 100, celles du marais à 150), si bien qu'un compteur bloqué peut aussi vouloir dire que vous avez dépassé cette eau.",
-  'guide.profPages.faq.a8':
-    "En partie. Les neuf recettes de terrain communes (l'arme, l'armure, la nourriture et la potion de base du départ) se fabriquent n'importe où et n'importe quand, tout comme les trois recettes combinées des paires jurées. Tout le reste au-dessus est lié à un type de station : forge, cuisines, apothicaire, tannerie, métier à tisser ou atelier d'outillage, et vous devez vous trouver à moins de 20 mètres de la station pour que la fabrication aboutisse.\n\nÀ 75 de compétence dans un métier, vous vous spécialisez, et avec la réduction de 20 pour cent sur les matériaux vous gagnez une station mobile : posez-la sur le terrain et elle tient 10 minutes, servant les recettes de ce métier comme si vous étiez devant la vraie. La station mobile ne sert qu'à fabriquer : apprendre des recettes et délier des pièces de commande exige toujours la véritable station en ville.",
   'wallet.seekerAppHelp':
     'Continuez avec Seed Vault Wallet. Examinez les demandes de connexion et de vérification dans Seed Vault, puis revenez au jeu.',
   'questUi.tracker.unknownQuest': 'Quête inconnue ({id})',
@@ -2249,7 +2186,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Vous disparaissez pendant 20 s et dissipez 2 effets de dégâts sur la durée. À la fin de l’invisibilité, vous subissez 90% de dégâts en moins pendant 2 s. (Talent de mage)',
   'entities.items.fine_copper_ore.name': 'Minerai de cuivre fin',
   'entities.items.fine_iron_ore.name': 'Minerai de fer fin',
-  'entities.items.fine_thorium_ore.name': 'Minerai de thorium fin',
   'entities.items.fine_ironbark_log.name': "Bûche d'écorce de fer fine",
   'entities.items.fine_ashwood_log.name': 'Bûche de Frêne Gris fine',
   'entities.items.fine_elderwood_log.name': 'Rondin de bois ancien fin',
@@ -2260,8 +2196,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.tidewrought_fishing_rod.name': 'Canne ouvragée par la marée',
   'entities.items.gatherers_cache.name': 'Cache du collecteur',
   'entities.items.artisans_eye.name': "Œil de l'artisan",
-  'entities.items.reins_terrorspark_groundshaker.name':
-    'Clé de contact : Terrétincelle, l’Ébranleur de sol',
   'entities.items.reins_lanternback_troll.name':
     'Joug de l’allumeur de réverbères : Grumbol',
   'hudChrome.auraOverlay.allOff': 'Tout désactiver',
@@ -2297,7 +2231,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.overpowerCharge': 'Renforcement de Main rouge',
   'hudChrome.auraOverlay.procs.revenge': 'Vengeance !',
   'hudChrome.auraOverlay.procs.suddenDeath': 'Mort subite',
-  'hudChrome.auraOverlay.procs.victoryRush': 'Ruée victorieuse',
   'hudChrome.auraOverlay.reposition': 'Configurer les positions',
   'hudChrome.auraOverlay.reset': 'Réinitialiser la position',
   'hudChrome.auraOverlay.screenPosition': 'Position à l’écran',
@@ -2316,7 +2249,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.epic.unlink': 'Délier Epic',
   'hudChrome.mounts.desc_terrorspark_groundshaker':
     'Un engin blindé compact doté de chenilles lourdes, d’un canon de gros calibre et d’une selle conçue pour les pilotes intrépides.',
-  'hudChrome.mounts.name_terrorspark_groundshaker': 'Terrétincelle, l’Ébranleur de sol',
   'hudChrome.targetAuras.all': 'Tous',
   'hudChrome.targetAuras.buffs': 'Améliorations',
   'hudChrome.targetAuras.configureRows': 'Configurer les auras de la cible',
@@ -2334,7 +2266,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetAuras.visibleRows': 'Rangées d’auras préférées : {count}',
   'hudChrome.bags.itemAriaMasterwork': "{item}, quantité {count}, chef-d'oeuvre",
   'hudChrome.archetypePair.tailoring+inscription': 'Tisserand des arcanes',
-  'hudChrome.enchantName.enchant_weapon_runed_focus': 'Enchantement Arme - Concentration runique',
   'hudChrome.professions.ctaRaiseSpecialized':
     "Continuez à augmenter {craft} : encore {points} points jusqu'à Spécialisé, et les coûts en matériaux baissent.",
   'guide.professions.harvestBodyChoice':
@@ -2347,10 +2278,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Vous n'avez rien à rechercher de votre côté. Exercez vos métiers, et dès que vos compétences d'artisanat montrent clairement un penchant vers une paire, la Guilde des artisans le remarque et envoie une lettre par courrier de corbeau nommant le maître à rencontrer et la quête à entreprendre. Elle arrive une seule fois par personnage, et seulement si vous n'avez pas déjà prêté serment à une paire.",
   'guide.professions.whatHeading': "Un métier à côté de l'épée",
   'guide.professions.ringHeading': "L'anneau des métiers",
-  'guide.professions.ringBody':
-    "Chaque métier avec du contenu aujourd'hui plafonne à 125 points de compétence : la Fabrication d'armes, la Fabrication d'armures, la Couture, le Travail du cuir, la Cuisine, l'Alchimie, l'Ingénierie et l'Enchantement. Au plafond, le métier continue de fonctionner, les récoltes rapportent toujours, les fabrications se résolvent toujours, et les chefs-d'oeuvre peuvent toujours se produire ; seul le nombre cesse de grimper. Choisissez une carte ci-dessous pour les tables complètes de recettes et les chiffres d'un métier.",
-  'guide.professions.ringWaveNote':
-    "Deux métiers sur la roue, la Joaillerie et l'Inscription, tiennent leur place mais ne livrent pas encore de recettes. C'est délibéré plutôt qu'un oubli : leur contenu arrive avec les zones futures, et les plafonds actuels augmenteront de la même façon, si bien qu'un métier au plafond aujourd'hui est une avance sur cette extension, pas une ligne d'arrivée.",
   'guide.professions.capFmt': 'Plafond {cap}',
   'guide.professions.comingSoon': 'Pas encore de recettes',
   'guide.professions.gatherHubHeading': 'Récolte',
@@ -2359,17 +2286,11 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.professions.archetypesHeading': 'La roue et ses archétypes',
   'guide.professions.pairFmt': '{a} et {b}',
   'guide.professions.curveHeading': 'La Courbe de maîtrise',
-  'guide.professions.curveBody':
-    "La progression de compétence obéit à une seule règle partout, la Courbe de maîtrise en quatre états. Chaque tranche de {step} points de compétence est un palier, et chaque recette est évaluée par rapport au vôtre : à votre palier ou au-dessus, elle accorde un gain complet ; un palier en dessous, la moitié ; deux paliers en dessous, un quart ; trois paliers ou plus en dessous, rien du tout.\n\nLa fenêtre d'artisanat peint cela directement sur la liste des recettes dans les couleurs classiques : orange pour le gain complet, jaune pour le gain réduit, vert pour un filet, gris pour aucun gain. Les gains sont déterministes, jamais un jet de montée en compétence, donc la même fabrication au même palier déplace toujours votre compétence du même montant exact, et une recette qui passe au jaune est votre signal pour apprendre l'échelon suivant.\n\nLa récolte fonctionne selon la même courbe avec le même pas de palier, évalué par rapport au noeud plutôt qu'à une recette : les noeuds faciles passent au gris quand vous les dépassez, et les noeuds plus riches des zones ultérieures sont ce qui achève une montée. La Pêche garde son propre barème : un point complet par prise en dessous de 50 de maîtrise, la moitié jusqu'à 100, un dixième jusqu'à 150, et un lent filet jusqu'à 200, les prises de rebut n'enseignant plus rien à partir de 100.",
   'guide.professions.provenanceHeading': 'Provenance',
   'guide.professions.provenanceBody':
     "Le beau travail dans ce monde se souvient de son créateur : les récoltes et fabrications de qualité rare ou supérieure arrivent signées (Collecté par, Fabriqué par), un chef-d'oeuvre s'achève un palier de qualité supérieur avec le nom du créateur toujours dessus, et une pièce de commande se lie à son destinataire par le Lien du Créateur. La page de l'Économie d'artisanat contient les règles complètes, des signatures et de l'empilement aux frais de déliaison.",
   'guide.professions.stationsHeading': 'Stations et les trois camps de base',
-  'guide.professions.stationsBody':
-    "Six stations spécialisées servent les sept métiers liés à une station, réparties dans les trois camps de base. Eastbrook abrite la forge (la Fabrication d'armes et la Fabrication d'armures la partagent), les cuisines, le métier à tisser et l'outillage ; Fenbridge dispose de la tannerie, et Highwatch de l'apothicaire. Chaque station possède un maître résident à côté qui enseigne des recettes, publie des bons de travail et propose le service de déliaison.\n\nLe rayon de travail est de 20 mètres, soit à peu près la cour de la station, donc vous fabriquez en vous tenant à l'enclume plutôt que depuis l'autre côté de la ville. La Joaillerie, l'Inscription et l'Enchantement n'ont pas de station : les deux premières attendent leurs recettes, et l'Enchantement fonctionne partout par conception.",
   'guide.professions.deedsHeading': 'Les hauts faits qui gardent la mémoire du chemin',
-  'guide.professions.deedsBody':
-    "Le Livre des hauts faits accompagne chaque étape de tout cela. Votre première harmonisation vous vaut le titre Juré-métier et votre premier chef-d'oeuvre vous vaut Maître-artisan, tous deux portables comme titres. Chacun des huit métiers d'artisanat disponibles marque un haut fait à 50 de compétence et couronne son plafond d'un titre de Grand Maître, tandis que la Pêche obtient Vieux Sel à 100 de maîtrise et le titre Grand Pêcheur à 200.\n\nIl y a aussi des pages plus discrètes : des hauts faits pour votre première récolte et votre première fabrication, pour les trouvailles rares que la chance réserve sur le terrain, et pour vous initier à la récupération. Tout cela est cosmétique, titres et Renommée seulement. Un haut fait n'accorde jamais de puissance ; il prouve seulement que vous étiez là.",
   'guide.professions.startHeading': 'Par où commencer',
   'guide.professions.colStation': 'Station',
   'guide.professions.colHub': 'Camp de base',
@@ -2414,14 +2335,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "La Couture tisse les habits d'Intellect et d'Esprit dans lesquels vivent les lanceurs de sorts en tissu, des simples toiles jusqu'à l'ensemble tissedor et aux rares pièces en soie de soleil, et confectionne la Besace en soie filée, un sac à dix emplacements que personne ne refuse jamais.",
   'guide.profPages.craftIntro.leatherworking':
     "Le Travail du cuir tanne des équipements d'Agilité et d'Endurance pour les classes qui esquivent plutôt que de bloquer, des simples pièces en cuir de Fenbridge jusqu'au rare ensemble du gardien des marais, et c'est le seul métier profond enseigné en plein marais.",
-  'guide.profPages.craftIntro.cooking':
-    "La Cuisine transforme les prises du jour en repas servis à table qui soignent sur 18 secondes de repos, le soin le moins cher du jeu, du Jerky salé jusqu'au Grand Rôti de Marlow. Tout le monde mange, aucun métier n'est donc plus universellement apprécié dans un groupe.",
-  'guide.profPages.craftIntro.alchemy':
-    "L'Alchimie transforme herbes, glandes et fioles en potions qui font pencher les combats : poisons de soins et de mana pour les moments critiques, et élixirs d'endurance qui restent affichés dans votre barre de buffs pendant tout un donjon.",
   'guide.profPages.craftProse.weaponcrafting.identityHeading':
     'Le tranchant que chaque combattant recherche',
-  'guide.profPages.craftProse.weaponcrafting.identityBody':
-    "Quelqu'un dans chaque groupe veut le travail de ce métier, car l'échelon rare seul couvre les trois appétits : la Lame de guerre en osmium pour les combattants de mêlée à Force, la Hache de guerre en glypheacier pour les combattants à Agilité, et le Bâton de bataille en pin des cimes, un bâton à Intellect et Esprit pour la foule en robes.\n\nSur la roue des métiers, il se tient entre la Fabrication d'armures et la Joaillerie. Son identité vivante est le Forgeron, la paire Fabrication d'armes et Fabrication d'armures, jurée devant la Forge-maîtresse Darva à la forge en exploitant trois filons de minerai de ses propres mains ; la paire du Maître-lame avec la Joaillerie est aussi nommée sur la roue, mais elle ne peut pas encore être jurée, car la Joaillerie ne fournit pas de recettes avant une extension de zone ultérieure.",
   'guide.profPages.craftProse.weaponcrafting.materialsHeading': 'Ce que la forge consomme',
   'guide.profPages.craftProse.weaponcrafting.ladderHeading': "L'échelle, échelon par échelon",
   'guide.profPages.craftProse.weaponcrafting.ladderBody':
@@ -2437,8 +2352,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "À partir de l'échelon maille de fer, chaque fabrication bénéficie du jet de chef-d'oeuvre ; les pièces communes en cuivre, réservées à l'armure, ne peuvent pas déclencher ce résultat, car un chef-d'oeuvre améliore les statistiques et elles n'en ont aucune. Le fer compte comme matériau de palier 1 pour le jet et le glypheacier comme palier 2.\n\nLa progression suit le schéma standard à trois échelons : cuivre jusqu'à 25, maille de fer jusqu'à 50, écailles d'osmium jusqu'à 75, en apprenant chaque échelon le jour où il se débloque. Là où la Fabrication d'armures a de la chance, c'est dans la ligne droite après 75 : le Manteau Ecaille-de-fourneau est une recette de palier 3, elle rapporte donc un gain complet jusqu'à 99 et la moitié après, ce qui signifie que les cinquante derniers points demandent environ 75 fabrications au lieu des 150 qu'un métier sans pièce maîtresse requiert. Chaque manteau coûte sept minerais d'osmium et cinq Flux de forgeage ; faites donc des réserves à Thornpeak et au comptoir de la forge avant de vous lancer.\n\nLe bon de travail de Darva achète huit minerais de cuivre toutes les 30 minutes contre des pièces et de l'expérience, un bon débouché pour le minerai de bas palier dont vous n'avez plus besoin. Le Livre des hauts faits marque Marteau et Plaque à la compétence 50, et Grand Maître Fabrication d'armures attend au plafond de 125.",
   'guide.profPages.craftProse.tailoring.identityHeading':
     'Le tissu pour les lanceurs de sorts, les sacs pour tout le monde',
-  'guide.profPages.craftProse.tailoring.identityBody':
-    "L'échelle monte des simples toiles jusqu'à l'ensemble tissedor, puis jusqu'à l'échelon rare : le Vêtement du lieur de soie et les pièces en soie de soleil. Son second métier est universel : la Besace en soie filée est un sac à dix emplacements, et il n'existe aucune classe, spécialisation ou niveau qui ne veuille pas plus d'espace dans les sacs.\n\nSur la roue, la Couture se trouve entre le Travail du cuir et l'Inscription. Sa paire vivante est l'Équipementier, Travail du cuir et Couture ensemble, juré devant la Tisserand Ottilie au métier à tisser d'Eastbrook après avoir abattu quatre araignées des bois pour leur soie ; la paire du Tisserand des encres avec l'Inscription est nommée sur la roue mais attend les premières recettes de l'Inscription avant de pouvoir être jurée.",
   'guide.profPages.craftProse.tailoring.materialsHeading': 'Fil, soie, et oui, des herbes',
   'guide.profPages.craftProse.tailoring.materialsBody':
     "Le métier à tisser fonctionne avec ce que la chasse laisse tomber et ce que les champs font pousser. Les chutes de lin et le tissu de toile viennent des tués humanoïdes, la soie d'araignée est récoltée sur les cadavres d'araignées, et la pièce maîtresse de l'échelon rare, le Vêtement du lieur de soie, requiert une Soie immaculée, le spécimen signé qu'une récolte chanceuse sur un cadavre peut fournir.\n\nL'Herboristerie alimente la Couture plus que tout autre métier d'équipement : la feuilleclat taille les chaussons, la feuille d'or colore l'ensemble tissedor, et le pétale de soleil fil tout l'échelon rare ; un tailleur qui cueille ses propres herbes économise régulièrement. Une Bobine de fil coûte 12 cuivres chez Ottilie, et le métier à tisser ne demande aucun métal : même la pièce maîtresse du Capuchon en tissu gardé est tissée à partir d'herbes de qualité supérieure, de Soie immaculée, de soie d'araignée et de fil.",
@@ -2465,8 +2378,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Le Jerky salé est la recette de terrain : connue dès le départ, une patte d'araignée, préparable n'importe où, la nourriture de voyage de tout aventurier débutant. L'échelle du formateur se cuisine aux cuisines d'Eastbrook, côté est de la place : l'échelon gratuit à la compétence 0 (la perche, la Brochette de gibier du chasseur, le Brochet du marais aux herbes), l'échelon intermédiaire à la compétence 25 pour 25 pièces d'argent par recette (Anguille fumée aux frênes, Ragoût de gibier à la feuille d'or, Chaudrée de truite givrée), et l'échelon rare à la compétence 50 pour 1 pièce d'or chacune (Souper à la carpe argentée, Plateau du festin du pêcheur, Grand Rôti de Marlow).\n\nLes plats en lot allongent vos ingrédients : l'anguille fumée et le ragoût de gibier servent deux portions par fabrication, et le plateau du festin en sert trois. Marlow enseigne chaque échelon dès que votre palier en Cuisine l'atteint.",
   'guide.profPages.craftProse.cooking.routeHeading':
     "La spécialisation plutôt que les chefs-d'oeuvre, et le parcours vers 125",
-  'guide.profPages.craftProse.cooking.routeBody':
-    "La Cuisine est l'exception honnête à l'histoire des chefs-d'oeuvre : un repas n'a pas de ligne de statistiques à améliorer, les plats ne déclenchent donc jamais ce résultat, et aucun cuisinier ne devrait le rechercher. La maîtrise du métier, c'est la spécialisation à 75 : un cinquième de chaque ingrédient en moins, ce qui se cumule rapidement sur les plats en lot, et une cuisine de terrain mobile pour préparer le festin à la porte du donjon.\n\nCuisinez ce que vous pêchez : associez la progression à une session de pêche et les deux compétences se nourrissent mutuellement jusqu'en haut. Le jerky et l'échelon gratuit vous portent à 25 à un point par fabrication, l'échelon intermédiaire jusqu'à 50, et l'échelon rare jusqu'à 75 ; au-delà de 75, aucun plat supérieur n'existe encore, les plats rares s'estompent donc à la moitié puis au quart du gain, environ 150 fabrications supplémentaires jusqu'au plafond. Traitez-le comme du stockage, pas du grinding : une guilde mange chaque portion.\n\nLe bon de travail des cuisines de Marlow achète huit viandes de gibier toutes les 30 minutes contre des pièces et de l'expérience, et le Livre des hauts faits marque Chef aguerri à la compétence 50 sur le chemin vers le titre de Grand Maître Cuisine à 125.",
   'guide.profPages.craftProse.alchemy.identityHeading': 'Des potions qui font gagner les combats',
   'guide.profPages.craftProse.alchemy.materialsHeading': 'Herbes, glandes et fioles',
   'guide.profPages.craftProse.alchemy.materialsBody':
@@ -2478,7 +2389,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftProse.engineering.ladderHeading': "L'échelle d'outils",
   'guide.profPages.craftProse.engineering.routeHeading': "Le parcours d'un ingénieur jusqu'à 125",
   'guide.profPages.craftProse.engineering.routeBody':
-    "Les outils n'ont aucune statistique de combat, ils ne déclenchent donc jamais de jets de chef-d'oeuvre ; ce résultat est réservé aux équipements portant des statistiques. La spécialisation arrive quand même à la compétence 75 : 20 % de matériaux en moins par fabrication, et un outillage de terrain temporaire qui transforme n'importe quel voyage de récolte en atelier. Les mathématiques du gain s'estompent à peine ici : les recettes de compétence 75 rapportent un gain complet jusqu'à 100 et la moitié après, et les recettes de compétence 150 rapportent un gain complet jusqu'au plafond de 125 ; la vraie contrainte est donc les réactifs et les pièces, jamais les recettes grises.\n\nChoisissez votre paire en premier, car rien ne progresse sans elle : prenez l'harmonisation Bombardier auprès de Bricoleur Gizzel. Puis alimentez l'échelle : montez l'Exploitation minière, le Bûcheronnage ou l'Herboristerie vous-même ou liez-vous d'amitié avec des récolteurs, achetez les outils de palier 3 chez les marchands, et traitez le bon de travail de Gizzel (huit Bûches de chêne de fer pour 16 cuivres, répétable toutes les 30 minutes) comme de l'argent de poche.\n\nL'Ingénierie est un métier de prestige à faible volume, environ un point de compétence par outil fini ; traitez donc chaque fabrication comme du stock à vendre. L'argumentaire de vente pour vos clients s'écrit tout seul : chaque palier d'outil au-delà du propre palier d'un nœud réduit de 0,4 seconde le temps d'incantation de récolte de 2,5 secondes (jusqu'à un plancher de 1,5 seconde), un outil de palier 5 est donc une amélioration de vitesse sur chaque nœud du monde, et seul vous pouvez en fabriquer un. Le Livre des hauts faits marque Rouages et Ressorts à la compétence 50 et Grand Maître Ingénierie à 125.",
+    "Les outils n'ont aucune statistique de combat, ils ne déclenchent donc jamais de jets de chef-d'oeuvre ; ce résultat est réservé aux équipements portant des statistiques. La spécialisation arrive quand même à la compétence 75 : 20 % de matériaux en moins par fabrication, et un outillage de terrain temporaire qui transforme n'importe quel voyage de récolte en atelier. Les mathématiques du gain s'estompent à peine ici : les recettes de compétence 75 rapportent un gain complet jusqu'à 100 et la moitié après, et les recettes de compétence 125 rapportent un gain complet jusqu'au plafond ; la vraie contrainte est donc les réactifs et les pièces, jamais les recettes grises.\n\nChoisissez votre paire tôt, car l'échelle des outils ne progresse pas sans elle : prenez l'harmonisation Bombardier auprès de Bricoleur Gizzel. Puis alimentez l'échelle : montez l'Exploitation minière, le Bûcheronnage ou l'Herboristerie vous-même ou liez-vous d'amitié avec des récolteurs, achetez les outils de palier 3 chez les marchands, et traitez le bon de travail de Gizzel (huit Bûches de chêne de fer pour 16 cuivres, répétable toutes les 30 minutes) comme de l'argent de poche.\n\nL'Ingénierie est un métier de prestige à faible volume, environ un point de compétence par outil fini ; traitez donc chaque fabrication comme du stock à vendre. L'argumentaire de vente pour vos clients s'écrit tout seul : chaque palier d'outil au-delà du propre palier d'un nœud réduit de 0,4 seconde le temps d'incantation de récolte de 2,5 secondes (jusqu'à un plancher de 1,5 seconde), un outil de palier 5 est donc une amélioration de vitesse sur chaque nœud du monde, et seul vous pouvez en fabriquer un. Le Livre des hauts faits marque Rouages et Ressorts à la compétence 50 et Grand Maître Ingénierie à 125.",
   'guide.profPages.craftProse.enchanting.identityHeading':
     "L'équipement démantelé, la puissance restituée",
   'guide.profPages.craftProse.enchanting.levelingHeading': "Comment l'Enchantement progresse",
@@ -2580,7 +2491,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Le Marché mondial est l'échange à l'échelle du royaume, tenu par le Marchand à Eastbrook et le Commissaire-priseur Voss à Highwatch. L'annonce est gratuite : il n'y a pas de caution, et une annonce invendue vous revient simplement. La maison ne prend sa commission que lorsque quelque chose se vend effectivement : 5 pour cent du prix de vente, et le reste vous attend pour être récupéré.\n\nUne limite importante : le Marché ne gère que les marchandises ordinaires. Un exemplaire signé, chef-d'oeuvre, enchanté ou lié n'est jamais inclus dans une annonce, si bien que les pièces spéciales changent de mains face à face dans une fenêtre d'échange, qui transporte l'identité complète d'un objet, signature comprise. Fixez ces prix vous-même ; le Marché vous indique seulement ce que la version ordinaire rapporte.",
   'guide.profPages.econ.workOrdersHeading': 'Commandes de travail',
   'guide.profPages.econ.workOrdersNote':
-    "Chaque maître d'atelier affiche une commande de travail permanente : apportez une pile de la matière première de son métier et soyez payé sur-le-champ, plus un peu d'expérience de quête. La rémunération est délibérément à {pct}% de ce qu'un marchand vous donnerait pour la même pile, arrondi à l'inférieur, de sorte qu'une commande de travail n'est jamais le moyen rentable de vendre des matériaux, juste une raison de passer à l'atelier.\n\nChaque commande tourne sur son propre chrono de {minutes} minutes par personnage : remettez-en une et ce maître n'a plus rien pour vous jusqu'à ce que le minuteur recommence. Traitez-les comme un petit bonus sur les matériaux que vous collectiez de toute façon, non comme un commerce.",
+    "Chaque maître d'atelier affiche des commandes de travail permanentes, une par matière première : apportez la pile qu'une commande demande et soyez payé sur-le-champ, plus un peu d'expérience de quête. La rémunération est délibérément à {pct}% de ce qu'un marchand vous donnerait pour la même pile, arrondi à l'inférieur, de sorte qu'une commande de travail n'est jamais le moyen rentable de vendre des matériaux, juste une raison de passer à l'atelier.\n\nChaque commande tourne sur son propre chrono de {minutes} minutes par personnage : remettez-en une et cette commande vous est fermée jusqu'à ce que le minuteur recommence, tandis que les autres commandes du maître restent ouvertes. Traitez-les comme un petit bonus sur les matériaux que vous collectiez de toute façon, non comme un commerce.",
   'guide.profPages.econ.colOrder': 'Commande de travail',
   'guide.profPages.econ.colMaster': 'Maître',
   'guide.profPages.econ.colAsks': 'Demande',
@@ -2597,22 +2508,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "L'économie de l'artisanat repose sur une idée : les joueurs approvisionnent les joueurs. Les collecteurs alimentent les artisans, les artisans alimentent les quêteurs et les pillards, et les démanteleurs alimentent les enchanteurs, les marchands et maîtres d'atelier se tenant en périphérie pour absorber les rebuts et les pièces plutôt que vous concurrencer. Si vous voulez gagner de l'argent avec un métier, votre client est une personne : apprenez ce que les autres joueurs consomment, fixez vos prix face au Marché mondial, et traitez les systèmes de PNJ comme un plancher sous vos prix, non comme le marché lui-même.\n\nL'équipement fabriqué est calibré pour se situer en dessous du plancher de raid : même un chef-d'oeuvre n'est jamais qu'un palier de qualité au-dessus de sa recette, jamais au-delà du légendaire, et son budget de caractéristiques reste sous la tranche de butin de raid. La forge vous prépare pour le contenu le plus difficile ; elle ne le remplace pas. Cela maintient les artisans, les pillards et le marché dans un triangle stable : les butins de raid restent aspirationnels, et les pièces fabriquées restent le meilleur équipement qu'on puisse réellement acheter.",
   'guide.profPages.faq.title': 'FAQ Métiers',
   'guide.profPages.faq.intro': 'Réponses rapides aux questions les plus posées par les artisans.',
-  'guide.profPages.faq.q1': 'Pourquoi mes objets signés ne se pilent-ils pas ?',
-  'guide.profPages.faq.a1':
-    "Un objet signé est un objet instancié : il porte son propre petit registre (le signataire, toute qualité tirée, les caractéristiques de chef-d'oeuvre, un enchantement, un lien) au lieu d'être un exemplaire anonyme. Deux exemplaires ne fusionnent en une pile que lorsque ces registres correspondent exactement.\n\nEn pratique : du minerai rare que vous avez collecté vous-même se pile avec plus de minerai rare que vous avez collecté vous-même, car les deux disent Collecté par vous et rien d'autre ne diffère. Le même matériau signé par un ami occupe son propre emplacement, et un exemplaire ordinaire non signé ne fusionne jamais dans une pile signée. Sacs, banque et échange suivent tous cette règle unique.",
   'guide.profPages.faq.q2': 'Les recettes communes améliorent-elles ma compétence indéfiniment ?',
-  'guide.profPages.faq.a2':
-    "Non. Chaque recette est évaluée selon la distance qui la sépare de votre tranche actuelle dans ce métier, la lecture classique orange, jaune, vert, gris : gain complet à votre tranche ou au-dessus, moitié un palier en dessous, un quart deux paliers en dessous, et rien à trois paliers ou plus en dessous. Les tranches sont tous les 25 points de compétence, donc les recettes gratuites de compétence 0 cessent de vous enseigner quoi que ce soit à 75 de compétence.\n\nLes plafonds sont aussi inférieurs au 300 classique que vous pourriez attendre : chacun des huit métiers praticables plafonne à 125, l'Extraction minière, la Bûcheronnerie et l'Herboristerie plafonnent à 100, et la Pêche monte haut à 200. Progresser signifie passer à des recettes à votre propre tranche, non broyer la moins chère.",
-  'guide.profPages.faq.q3': 'Quelle est la différence entre piller et récolter un cadavre ?',
-  'guide.profPages.faq.a3':
-    "Un seul appui couvre les deux. Tout ce qu'un cadavre contient, pièces et butins plus tout composant récoltable, s'ouvre dans la même fenêtre : le butin suit les règles normales du butin, et la récolte est le côté métiers, en retirant les matériaux du cadavre lui-même.\n\nLa récolte est premier arrivé, usage unique : chaque cadavre ne peut être récolté qu'une seule fois, par celui qui le revendique en premier, en ligne compris. Votre Focus de ville détermine ce que vous obtenez : pendant que vous vous trouvez dans un centre de ville, vous pouvez répartir 10 points de Focus sur les types de composants qui vous intéressent, et chaque composant ciblé obtient un meilleur palier (chaque tranche de 5 points le fait monter d'un cran, au maximum deux crans) et un meilleur rendement (10 pour cent par point). Les composants non ciblés ne sont jamais pénalisés.",
-  'guide.profPages.faq.q4': 'Pourquoi mon Rondin de frêne de fer est-il signé ?',
-  'guide.profPages.faq.q5': 'Comment délier une pièce de commande, et combien cela coûte-t-il ?',
-  'guide.profPages.faq.a5':
-    "Rendez-vous à n'importe quel atelier d'artisanat avec la pièce dans vos sacs et payez le maître. Le tarif suit la qualité de l'objet : 25 argent pour une pièce inhabituelle, 1 or pour une rare, 4 or pour une épique ; un légendaire paie le tarif épique, et une pièce de commande commune paie le tarif inhabituel. Ce doit être un véritable atelier : un atelier mobile n'offre jamais ce service.\n\nCe tarif achète une ardoise vierge, pas un remède : la pièce reste une pièce de commande, donc elle se lie à nouveau à quiconque la reçoit lors du prochain échange. Si plusieurs exemplaires liés partagent une pile, un exemplaire est détaché et délié par paiement.",
-  'guide.profPages.faq.q6': 'Où apprendre les recettes, et combien coûtent-elles ?',
-  'guide.profPages.faq.q7': 'Pourquoi ma récolte a-t-elle soudainement ralenti ?',
-  'guide.profPages.faq.q8': 'Puis-je fabriquer loin de la ville ?',
   'hud.combat.floatingParry': 'Parade',
   'hud.combat.parried': 'Votre {ability} est parée par {target}.',
   'hud.combat.floatingEvade': 'Évasion',
@@ -2659,7 +2555,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Envoie une déferlante d'éther brut à travers l'ennemi pour {damage} points de dégâts. Chaque incantation laisse une Charge d'arcane qui augmente les dégâts et la vitesse d'incantation de votre prochain Aether Surge (5 % plus rapide chacune) mais en relève fortement le coût en mana, cumulant jusqu'à 4 fois ; Traits d'Aether dépense les charges. Chaque incantation peut également armer l'Élan d'Aether, rendant votre prochain Aether Surge gratuit et deux fois plus rapide à lancer.",
   'entities.abilities.arcane_surge.name': "Déferlante d'Aether",
   'entities.abilities.blizzard.description':
-    "Déchaîne une tempête de glace sur la zone ciblée pendant 6 s, infligeant {damage} points de dégâts de Givre par seconde et ralentissant les ennemis de 40 %. Chaque ennemi touché réduit le temps de recharge de Frozen Orb de 0,5 s, jusqu'à 3 s par incantation. (Givre)",
+    "Déchaîne une tempête de glace sur la zone ciblée pendant 6 s, infligeant {damage} points de dégâts de Givre par seconde et ralentissant les ennemis de 40 %. Chaque ennemi touché réduit le temps de recharge de Frostglobe de 0,5 s, jusqu'à 3 s par incantation. (Givre)",
   'entities.abilities.blizzard.name': 'Tempête de neige',
   'entities.abilities.brain_freeze.name': 'Gel cérébral',
   'entities.abilities.dragons_breath.description':
@@ -2672,13 +2568,11 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Vous vous transformez en braise ardente, augmentant votre vitesse de déplacement de {buff} %. Vous ne pouvez pas attaquer ni lancer de sorts sous cette forme. Réactivez pour reprendre votre forme normale.',
   'entities.abilities.fireball_form.name': 'Forme de braise',
   'entities.abilities.flurry.name': "Fouet de l'hiver",
-  'entities.abilities.frozen_orb.name': 'Orbe gelé',
   'entities.abilities.glacial_front.description':
     'Maintenez pour accumuler un front de givre de plus en plus large, puis relâchez-le en cône. Plus la charge est longue, plus la portée et les dégâts augmentent. Tous les ennemis touchés sont ralentis de 50 % pendant 4 s ; une charge maximale les immobilise également pendant 1 s. (Givre)',
   'entities.abilities.glacial_front.name': 'Front glaciaire',
   'entities.abilities.glacial_spike.description':
     'Conjurez un pic de glace massif en consumant 5 glaçons pour infliger {damage} points de dégâts de Givre et geler la cible sur place pendant 4 s. (Givre)',
-  'entities.abilities.glacial_spike.name': 'Pointe glaciale',
   'entities.abilities.ice_lance.description':
     "Lancez un éclat de glace infligeant {damage} points de dégâts de Givre, triplés contre une cible gelée. Dépense Fingers of Frost ou une charge de Morsure de l'hiver pour traiter la cible comme gelée. (Givre)",
   'entities.abilities.ice_lance.name': 'Lance de glace',
@@ -2715,21 +2609,11 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.arcane_essence.name': 'Essence arcaniste',
   'entities.items.arcane_shard.name': 'Éclat arcaniste',
   'entities.items.stalkerhide_jerkin.name': 'Justaucorps en peau de rôdeur',
-  'entities.items.mithril_mining_pick.name': 'Pic de mineur en mithril',
   'entities.items.silverleaf_sickle.name': "Faucille Feuille d'Argent",
-  'entities.items.thorium_mining_pick.name': 'Pic de mineur en thorium',
-  'entities.items.arcanite_mining_pick.name': 'Pic de mineur en arcanite',
   'entities.items.elderwood_axe.name': 'Hache en bois ancien',
-  'entities.items.thorium_ore.name': 'Minerai de thorium',
-  'entities.items.arcanite_bar.name': "Lingot d'arcanite",
   'entities.items.elderwood_log.name': 'Rondin de bois ancien',
   'entities.items.silverleaf_herb.name': "Herbe Feuille d'Argent",
-  'entities.items.thorium_warblade.name': 'Lame de guerre en thorium',
-  'entities.items.arcanite_war_axe.name': 'Hache de guerre en arcanite',
   'entities.items.elderwood_battle_staff.name': 'Bâton de bataille en bois ancien',
-  'entities.items.thoriumscale_greathelm.name': 'Grand heaume en écailles de thorium',
-  'entities.items.thoriumscale_cuirass.name': 'Cuirasse en écailles de thorium',
-  'entities.items.thoriumscale_leggings.name': 'Jambières en écailles de thorium',
   'entities.items.silverthread_slippers.name': "Chaussons en fil d'argent",
   'entities.items.goldweave_robe.name': "Robe tissée d'or",
   'entities.items.goldweave_leggings.name': "Jambières tissées d'or",
@@ -3314,7 +3198,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.seasoned_soldier.name': 'Soldat aguerri',
   'entities.abilities.storm_bolt.description':
     "Lancez votre arme sur la cible, infligeant {damage} et l'étourdissant pendant 3 s.",
-  'entities.abilities.storm_bolt.name': 'Projectile-tempête',
   'entities.abilities.sudden_death.description':
     'Vos attaques automatiques ont une chance de vous permettre de lancer Tombe précoce sur une cible quel que soit son niveau de vie, sans coût de rage. (Armes)',
   'entities.abilities.sudden_death.name': 'Mort subite',
@@ -3323,7 +3206,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sweeping_strikes.name': 'Arc élargi',
   'entities.abilities.victory_rush.description':
     "Frappe infligeant les dégâts de l'arme plus {damage} et vous soignant de 20% de votre vie maximale. Utilisable seulement dans les 20 s suivant la mort d'un ennemi.",
-  'entities.abilities.victory_rush.name': 'Ruée victorieuse',
   'hudChrome.specPanel.complexity': 'Complexité',
   'hudChrome.specPanel.complexityHigh': 'Élevée',
   'hudChrome.specPanel.complexityLow': 'Faible',
@@ -3339,7 +3221,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aspect_of_the_wild.name': 'Apparence du Croc-sauvage',
   'entities.abilities.avenging_wrath.name': 'Colère vengeresse',
   'entities.abilities.berserk.name': 'Brume rouge',
-  'entities.abilities.blink.name': 'Pas scintillant',
   'entities.abilities.bloodlust.name': 'Tambours de guerre',
   'entities.abilities.chain_lightning.name': 'Éclair fourchu',
   'entities.abilities.chaos_bolt.name': 'Trait de ruine',
@@ -3395,7 +3276,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.smoke_screen.name': 'Écran de fumée',
   'entities.abilities.smoke_screen.description':
     'Vous disparaissez dans un nuage de fumée, ce qui augmente vos chances d’esquiver de 30 % pendant 8 s.',
-  'entities.abilities.spellsteal.name': 'Vol de sort',
   'entities.abilities.spellsteal.description':
     'Vole un effet magique bénéfique à un ennemi et vous le transfère.',
   'entities.abilities.startle_shot.name': 'Tir de stupeur',
@@ -3417,7 +3297,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.counter_shot.name': 'Tir muselant',
   'entities.abilities.counterspell.description':
     'Contre l’incantation de la cible et l’empêche de lancer des sorts de cette école de magie pendant 6 s.',
-  'entities.abilities.counterspell.name': 'Brise-sort',
   'entities.abilities.holy_taunt.description':
     'Provoque la cible : votre menace rejoint celle de l’ennemi qu’elle déteste le plus et elle est contrainte de vous attaquer pendant 3 s.',
   'entities.abilities.holy_taunt.name': 'Provocation sacrée',
@@ -3696,8 +3575,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.hoarfrost_vigil_staff.name': 'Veille du givre blanc',
   'hudChrome.wocStore.skins.ice_fang_sword.look':
     'Lame incurvée en glace pâle de glacier, cristaux de givre dentelés sur le dos, cœur gelé cyan lumineux dans la gouttière et garde en stalactites.',
-  'hudChrome.wocStore.skins.ice_fang_sword.lore':
-    'Le fleuron de la collection gelée et la pièce que tout collectionneur convoite en premier. Croc de glace n’a pas été forgé, mais sculpté dans un croc du glacier qui coiffe Thornpeak au-dessus de Highwatch. Son cœur cyan brûle d’un froid aussi vif que la lumière sur le Glimmermere. Il couvre de givre l’air même qu’il fend. Les gardes du rempart jurent qu’un soldat le portait la nuit où les hautes neiges retinrent le Culte du Ver et qu’il « offrit un hiver au rempart ».',
   'hudChrome.wocStore.skins.ice_fang_sword.name': 'Croc de glace',
   'hudChrome.wocStore.skins.lacquered_wand.look':
     'Fine baguette laquée d’un rouge profond, ornée de deux bagues de laiton poli et d’un petit embout arrondi en laiton.',
@@ -3743,7 +3620,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Arc d’acier argenté et de glace bleue, cœur gelé cyan lumineux dans la poignée, flèche de glace massive encochée et vapeur froide.',
   'hudChrome.wocStore.skins.winterbite.lore':
     'Un arc d’acier argenté et de glace de Thornpeak, dont la poignée est éclairée par un cœur cyan glacé qui fige la flèche sur la corde. Il encoche un trait de glace de glacier massive qui se reforme à chaque tension. Sur le rempart, l’archer ne porte aucun carquois, seulement le froid. Highwatch a tenu la Crête du Traqueur durant un siège avec un arc semblable : un unique archer, dit-on, et tout un hiver de flèches qui se trouvaient toujours déjà là.',
-  'hudChrome.wocStore.skins.winterbite.name': 'Morsure de l’hiver',
   'hudChrome.wocStore.storeTab': 'Boutique',
   'hudChrome.wocStore.tabsLabel': 'Sections de la boutique WOC',
   'hudChrome.wocStore.title': 'Boutique WOC',
@@ -3867,7 +3743,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.lunar_tide_greatstaff.name': 'Grand bâton de la Marée lunaire',
   'entities.items.medallion_of_endless_profit.name': 'Médaillon du Profit sans fin',
   'entities.items.mistcallers_fang.name': "Croc de l'Appelant des brumes",
-  'entities.items.mistforged_pauldrons.name': 'Spallières forgées dans la brume',
   'entities.items.morthens_cryptforged_hauberk.name': 'Haubert Cryptforged de Morthen',
   'entities.items.nielas_coldlight_band.name': 'Anneau de Lumière froide de Niela',
   'entities.items.oath_of_the_round_table.name': 'Serment de la Table ronde',
@@ -6381,6 +6256,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.junk': 'Camelote',
   'itemUi.kind.food': 'Nourriture',
   'itemUi.kind.drink': 'Boisson',
+  'itemUi.kind.recipe': 'Patron',
   'itemUi.kind.tool': 'Outil',
   'itemUi.kind.potion': 'Potion',
   'itemUi.kind.elixir': 'Élixir',
@@ -6629,8 +6505,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blazing_barrier.description':
     'Vous enveloppe de flammes et absorbe {damage} points de dégâts pendant 60 s. (Feu)',
   'entities.abilities.cold_snap.name': "Rappel de l'hiver",
-  'entities.abilities.cold_snap.description':
-    'Met fin au temps de recharge de Pas scintillant, Voile de givre et Invisibilité supérieure. (Talent de mage)',
   'entities.abilities.greater_invisibility.name': 'Invisibilité supérieure',
   'entities.abilities.hot_streak.name': 'Bonne série',
   'entities.abilities.hot_streak.description':
@@ -6717,7 +6591,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Frappe la cible avec un venin de plomb, infligeant {damage} dégâts de Nature et réduisant sa vitesse de déplacement de 50% pendant 12 s.',
   'entities.abilities.expose_armor.name': "Brèche d'armure",
   'entities.abilities.rupture.name': 'Hémorragie',
-  'entities.abilities.vanish.name': 'Pas de fumée',
   'entities.abilities.vanish.description':
     "Vous disparaissez et entrez en Duskveil, même en plein combat. Vous vous déplacez 50% plus lentement tant que vous êtes dissimulé. Dure jusqu'à 10 s.",
   'entities.abilities.instant_poison.name': 'Morsure de vipère',
@@ -6934,8 +6807,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Entre dans une fureur bouillonnante et génère 20 points de rage. (talent de guerrier)',
   'entities.abilities.summon_imp.name': 'Invoquer un Emberkin',
   'entities.abilities.summon_imp.description': "Invoque un Emberkin sous les ordres du démoniste. L'Emberkin lance Éclair fel sur vos ennemis à distance. Invoquer un nouveau démon renvoie l'actuel. Vous ne pouvez avoir qu'un démon à la fois.",
-  'entities.abilities.summon_voidwalker.name': 'Invoquer un Gloomshade',
-  'entities.abilities.summon_voidwalker.description': "Invoque un Gloomshade sous les ordres du démoniste. Ce démon robuste raille les ennemis et utilise Chaîne abyssale pour ramener à portée les ennemis normaux éloignés. Les boss ne peuvent pas être tirés. Invoquer un nouveau démon renvoie l'actuel. Vous ne pouvez avoir qu'un démon à la fois.",
+  'entities.abilities.summon_voidwalker.name': 'Invoquer un Duskmurk',
+  'entities.abilities.summon_voidwalker.description': "Invoque un Duskmurk sous les ordres du démoniste. Ce démon robuste raille les ennemis et utilise Chaîne abyssale pour ramener à portée les ennemis normaux éloignés. Les boss ne peuvent pas être tirés. Invoquer un nouveau démon renvoie l'actuel. Vous ne pouvez avoir qu'un démon à la fois.",
   'entities.abilities.summon_succubus.name': 'Invoquer un Duskborn',
   'entities.abilities.summon_succubus.description':
     "Invoque un Duskborn sous le commandement du démoniste. Le Duskborn est un démon fragile qui frappe vite et fort au corps à corps. Invoquer un nouveau démon renvoie celui que vous avez. Vous ne pouvez avoir qu'un démon à la fois.",
@@ -6964,7 +6837,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.name': 'Rafistoler',
   'entities.abilities.revive_pet.description':
     "Rafistole votre familier et lui rend {overTime} points de vie en 12 s, par pulsations toutes les 3 s, s'il est vivant. S'il est mort, le ranime avec 35 % de ses points de vie.",
-  'entities.abilities.holy_shock.name': 'Horion sacré',
   'entities.abilities.holy_shock.description':
     'Frappe une cible alliée avec de l’énergie sacrée et lui rend {damage} points de vie. (signature Sacré)',
   'entities.abilities.holy_shield.name': 'Bouclier sacré',
@@ -6983,7 +6855,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.combustion.name': 'Transe du phénix',
   'entities.abilities.combustion.description':
     'Augmente les chances de coup critique des sorts de 50% pendant 15 s. (signature Feu)',
-  'entities.abilities.icy_veins.name': 'Veines glaciales',
   'entities.abilities.icy_veins.description':
     'Augmente la hâte des sorts de 30% et empêche l’interruption et le recul des incantations pendant 10 s. (signature Givre)',
   'entities.abilities.cold_blood.name': 'Sang froid',
@@ -7009,7 +6880,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.feral_charge.description':
     "Libère une déferlante primordiale. En Forme de loup, augmente la régénération d'énergie de 100% pendant 10 s. En Forme de Bruin, génère instantanément 50 points de rage. (signature Farouche)",
   'entities.abilities.swiftmend.name': 'Prompte guérison',
-  'entities.abilities.crusader_strike.name': 'Frappe du croisé',
   'entities.abilities.crusader_strike.description':
     'Frappe la cible et inflige les dégâts de l’arme plus {damage} points de dégâts du Sacré. (talent de paladin)',
   'entities.abilities.metamorphosis.name': 'Forme de liche',
@@ -7165,7 +7035,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.ogre_war_totem.name': 'Totem de guerre ogre',
   'entities.items.storm_core.name': 'Noyau de tempête',
   'entities.items.kazzix_heartshard.name': 'Éclat de cœur de Kazzix',
-  'entities.items.wyrmcult_orders.name': 'Ordres du Culte du Wyrm',
   'entities.items.ritual_phylactery.name': 'Phylactère rituel',
   'entities.items.gravewyrm_sigil.name': 'Sceau du Gravewyrm',
   'entities.items.blessed_embers.name': 'Braises bénies',
@@ -7186,7 +7055,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.staff_of_velkhar.name': 'Bâton de Velkhar',
   'entities.items.shadowmeld_tunic.name': 'Tunique Nightveil',
   'entities.items.gravewyrm_scale_hauberk.name': "Haubert d'écailles de Gravewyrm",
-  'entities.items.wyrmcult_grand_robe.name': 'Grande robe du Culte du Wyrm',
   'entities.items.wyrmscale_jerkin.name': 'Pourpoint en écailles de wyrm',
   'entities.items.wyrmfang_greatblade.name': 'Grande lame Croc-de-wyrm',
   'entities.items.staff_of_the_gravewyrm.name': 'Bâton du Gravewyrm',
@@ -7252,7 +7120,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.tideguard_sabatons.name': 'Solerets Garde-marée',
   'entities.items.valeborn_spellblade.name': 'Lame-sort née du Val',
   'entities.items.voss_sanctified_mace.name': 'Masse sanctifiée de Voss',
-  'entities.items.wyrmcult_soulsteps.name': "Pas-d'âme du Culte du Wyrm",
   'entities.items.wyrmshadow_harness.name': 'Harnais Nightfang',
   'entities.items.wyrmshadow_legguards.name': 'Garde-jambes Nightfang',
   'entities.items.wyrmshadow_treads.name': 'Bottines Nightfang',
@@ -7315,8 +7182,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.warlord_drogmar.name': 'Seigneur de guerre Drogmar',
   'entities.mobs.stormcrag_elemental.name': 'Élémentaire de Stormcrag',
   'entities.mobs.shardlord_kazzix.name': 'Seigneur des éclats Kazzix',
-  'entities.mobs.wyrmcult_zealot.name': 'Zélote du Culte du Wyrm',
-  'entities.mobs.wyrmcult_necromancer.name': 'Nécromancien du Culte du Wyrm',
   'entities.mobs.boneclad_revenant.name': "Revenant caparaçonné d'os",
   'entities.mobs.crypt_shambler.name': 'Traînard de la crypte',
   'entities.mobs.hollow_acolyte.name': 'Acolyte du Creux',
@@ -7345,7 +7210,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sister_nhalia.name': 'Sœur Nhalia',
   'entities.mobs.varkas_boneguard.name': 'Garde-os de Varkas',
   'entities.mobs.emberkin.name': 'Emberkin',
-  'entities.mobs.gloomshade.name': 'Gloomshade',
+  'entities.mobs.gloomshade.name': 'Duskmurk',
   'entities.mobs.grix_the_tunnelking.name': 'Grix le Roi des tunnels',
   'entities.mobs.pyre_colossus.name': 'Colosse du bûcher',
   'entities.mobs.choirmother_selthe.name': 'Selthe, mère de chœur',
@@ -7744,7 +7609,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_crushers.objectives.0.label': 'Broyeur de Thornpeak tué',
   'entities.quests.q_drogmar.title': 'Seigneur de guerre Drogmar',
   'entities.quests.q_drogmar.text':
-    'Drogmar a pris la monnaie du Wyrmcult et juré les clans au réveil de la montagne. Entrez dans son camp et tuez-le, {playerName}, pour Highwatch.',
+    'Drogmar a pris la monnaie du Broodsworn et juré les clans au réveil de la montagne. Entrez dans son camp et tuez-le, {playerName}, pour Highwatch.',
   'entities.quests.q_drogmar.completion':
     'Drogmar est mort dans son propre camp. Vous avez acheté un hiver à mon mur, {playerName}.',
   'entities.quests.q_drogmar.objectives.0.label': 'Seigneur de guerre Drogmar tué',
@@ -7767,23 +7632,18 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "L'éclat crépite encore! Magnifique. Prenez ces jambières pour la peine.",
   'entities.quests.q_kazzix.objectives.0.label': 'Éclat de cœur de Kazzix',
   'entities.quests.q_zealots.title': 'Chants sur le vent',
-  'entities.quests.q_zealots.text':
-    'Le vent porte des chants depuis les pics du sud. Faites taire 12 zélotes, {playerName}; chaque voix tue achète une nuit de sommeil.',
   'entities.quests.q_zealots.completion':
     "Le vent est plus calme. Ce qui m'inquiète, {playerName}, c'est que quelque chose réponde peut-être.",
-  'entities.quests.q_zealots.objectives.0.label': 'Zélote du Culte du Wyrm tué',
   'entities.quests.q_cult_orders.title': "Ordres d'en bas",
   'entities.quests.q_cult_orders.text':
     "Les zélotes bougent comme des soldats avant un siège, {playerName}. Tuez-en 8 autres et rapportez 4 jeux d'ordres.",
   'entities.quests.q_cult_orders.completion':
     'Cette écriture vient du grimoire de Morthen. La même main a guidé chaque tombe, {playerName}.',
-  'entities.quests.q_cult_orders.objectives.0.label': 'Zélote du Culte du Wyrm tué',
   'entities.quests.q_necromancers.title': "L'anneau des phylactères",
   'entities.quests.q_necromancers.text':
     "Les ordres parlent d'un anneau de phylactères, {playerName}, vases d'âme autour du Sanctuaire. Tuez 8 nécromanciens et rapportez-en 3 intacts.",
   'entities.quests.q_necromancers.completion':
     "Que la Lumière nous pardonne. Ils contiennent les morts du Val et du marais; ce n'était pas une armée qu'ils bâtissaient, {playerName}, c'était une dîme.",
-  'entities.quests.q_necromancers.objectives.0.label': 'Nécromancien du Culte du Wyrm tué',
   'entities.quests.q_revenants.title': 'Les champs des revenants',
   'entities.quests.q_revenants.text':
     "À l'est de la route dort un vieux champ de bataille. Le culte a relevé ses os en armures rouillées. Remettez-en 12 en terre, {playerName}.",
@@ -7813,8 +7673,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Hier, tout le camp s'est agenouillé face au Sanctuaire, {playerName}. Tuez 10 zélotes et 6 nécromanciens avant que cette voix ait assez de mains.",
   'entities.quests.q_voice_below.completion':
     "L'agenouillement a cessé. Nous n'avons pas réduit la voix au silence, {playerName}; seulement son chœur.",
-  'entities.quests.q_voice_below.objectives.0.label': 'Zélote du Culte du Wyrm tué',
-  'entities.quests.q_voice_below.objectives.1.label': 'Nécromancien du Culte du Wyrm tué',
   'entities.quests.q_sanctum_gate.title': 'La porte du Sanctuaire',
   'entities.quests.q_sanctum_gate.text':
     "C'est le dernier seuil, {playerName}. La clef du Sanctuaire fut brisée sous les yeux des morts cuirassés. Rapportez 3 éclats et j'ouvrirai la voie en silence.",
@@ -7914,7 +7772,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.4.label': 'Camp de guerre de Drogmar',
   'entities.zones.thornpeak_heights.pois.5.label': 'Stormcrag',
   'entities.zones.thornpeak_heights.pois.6.label': 'Le Glimmermere',
-  'entities.zones.thornpeak_heights.pois.7.label': 'Tentes du Culte du Wyrm',
   'entities.zones.thornpeak_heights.pois.8.label': 'Champs des revenants',
   'entities.zones.thornpeak_heights.pois.9.label': 'Sanctuaire du Gravewyrm',
   'entities.zones.amberfall.name': "La Chute d'Ambre",
@@ -7983,7 +7840,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Passé la Porte de la Nuit, l'air lui-même rêve. Suivez la lueur des fleurs jusqu'à Moonrest, et prenez garde au monde endormi suspendu dans le ciel.",
   'entities.zones.nightbloom.pois.0.label': 'Moonrest',
   'entities.zones.nightbloom.pois.1.label': 'La Porte de la Nuit',
-  'entities.zones.nightbloom.pois.2.label': 'Le Puits de Lune',
   'entities.zones.nightbloom.pois.3.label': 'Gloamfield',
   'entities.zones.nightbloom.pois.4.label': 'La Vigie immobile',
   'entities.zones.nightbloom.pois.5.label': 'Le Tertre Sans Sommeil',
@@ -7999,8 +7855,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.palmreach.pois.6.label': "L'Idole engloutie",
   'entities.zones.veiled_hollow.name': 'Le Vallon Voilé',
   'entities.zones.veiled_hollow.welcome':
-    "L'air résonne d'une magie ancienne. Cherchez la Gardienne Saelwyn sous le grand arbre d'Eldergleam.",
-  'entities.zones.veiled_hollow.pois.0.label': 'Eldergleam',
+    "L'air résonne d'une magie ancienne. Cherchez la Gardienne Saelwyn sous le grand arbre d'Eldershine.",
+  'entities.zones.veiled_hollow.pois.0.label': 'Eldershine',
   'entities.zones.veiled_hollow.pois.1.label': 'La Grotte du Crépuscule',
   'entities.zones.veiled_hollow.pois.2.label': 'Le Belvédère du Crépuscule',
   'entities.zones.veiled_hollow.pois.3.label': 'Le Bosquet Ancien',
@@ -8019,8 +7875,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.willowfen.pois.5.label': 'Les Étendues Somnolentes',
   'entities.zones.wraithwood.name': 'Le Bois des Spectres',
   'entities.zones.wraithwood.welcome':
-    'La canopée se referme sur la route comme un couvercle. Restez près des lanternes de Gallowmere, et ne répondez pas si la forêt appelle votre nom.',
-  'entities.zones.wraithwood.pois.0.label': 'Gallowmere',
+    'La canopée se referme sur la route comme un couvercle. Restez près des lanternes de Gibbetmere, et ne répondez pas si la forêt appelle votre nom.',
+  'entities.zones.wraithwood.pois.0.label': 'Gibbetmere',
   'entities.zones.wraithwood.pois.1.label': 'La Porte aux Corbeaux',
   'entities.zones.wraithwood.pois.2.label': 'Le Fourré des Veuves',
   'entities.zones.wraithwood.pois.3.label': 'La Clairière Pendue',
@@ -8420,51 +8276,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.emotes.wave': 'Saluer de la main',
   'hudChrome.emoteWheel.edit': 'Modifier',
   'hudChrome.emoteWheel.label': 'Emotes',
-  'hudChrome.enchantName.enchant_chest_armor': 'Enchantement Torse - Renforcement',
-  'hudChrome.enchantName.enchant_chest_greater_stamina':
-    'Enchantement Torse - Endurance supérieure',
-  'hudChrome.enchantName.enchant_chest_runeweave': 'Enchantement Torse - Rune tissée',
-  'hudChrome.enchantName.enchant_chest_spirit': 'Enchantement Torse - Esprit',
-  'hudChrome.enchantName.enchant_chest_stamina': 'Enchantement Torse - Endurance',
-  'hudChrome.enchantName.enchant_feet_agility': 'Enchantement Bottes - Agilité',
-  'hudChrome.enchantName.enchant_feet_stamina': 'Enchantement Bottes - Endurance',
-  'hudChrome.enchantName.enchant_feet_strength': 'Enchantement Bottes - Force',
-  'hudChrome.enchantName.enchant_gloves_agility': 'Enchantement Gants - Agilité',
-  'hudChrome.enchantName.enchant_gloves_greater_agility': 'Enchantement Gants - Agilité supérieure',
-  'hudChrome.enchantName.enchant_gloves_intellect': 'Enchantement Gants - Puissance des sorts',
-  'hudChrome.enchantName.enchant_gloves_strength': 'Enchantement Gants - Force',
-  'hudChrome.enchantName.enchant_helmet_armor': 'Enchantement Casque - Renforcement',
-  'hudChrome.enchantName.enchant_helmet_fortitude': 'Enchantement Casque - Fortitude',
-  'hudChrome.enchantName.enchant_helmet_greater_fortitude':
-    'Enchantement Casque - Fortitude supérieure',
-  'hudChrome.enchantName.enchant_helmet_intellect': 'Enchantement Casque - Intellect',
-  'hudChrome.enchantName.enchant_helmet_runed_links': 'Enchantement Casque - Mailles runiques',
-  'hudChrome.enchantName.enchant_legs_greater_stamina':
-    'Enchantement Jambières - Endurance supérieure',
-  'hudChrome.enchantName.enchant_legs_intellect': 'Enchantement Jambières - Intellect',
-  'hudChrome.enchantName.enchant_legs_runed_hide': 'Enchantement Jambières - Peau runique',
-  'hudChrome.enchantName.enchant_legs_stamina': 'Enchantement Jambières - Endurance',
-  'hudChrome.enchantName.enchant_neck_agility': 'Enchantement Collier - Agilité',
-  'hudChrome.enchantName.enchant_neck_intellect': 'Enchantement Collier - Intellect',
-  'hudChrome.enchantName.enchant_neck_spirit': 'Enchantement Collier - Esprit',
-  'hudChrome.enchantName.enchant_offhand_stamina': 'Enchantement Main gauche - Endurance',
-  'hudChrome.enchantName.enchant_ring_agility': 'Enchantement Anneau - Agilité',
-  'hudChrome.enchantName.enchant_ring_intellect': 'Enchantement Anneau - Intellect',
-  'hudChrome.enchantName.enchant_ring_spirit': 'Enchantement Anneau - Esprit',
-  'hudChrome.enchantName.enchant_ring_strength': 'Enchantement Anneau - Force',
-  'hudChrome.enchantName.enchant_shoulder_agility': 'Enchantement Épaulières - Agilité',
-  'hudChrome.enchantName.enchant_shoulder_intellect': 'Enchantement Épaulières - Intellect',
-  'hudChrome.enchantName.enchant_shoulder_strength': 'Enchantement Épaulières - Force',
-  'hudChrome.enchantName.enchant_waist_agility': 'Enchantement Ceinture - Agilité',
-  'hudChrome.enchantName.enchant_waist_stamina': 'Enchantement Ceinture - Endurance',
-  'hudChrome.enchantName.enchant_waist_strength': 'Enchantement Ceinture - Force',
-  'hudChrome.enchantName.enchant_weapon_agility': 'Enchantement Arme - Agilité',
-  'hudChrome.enchantName.enchant_weapon_greater_might': 'Enchantement Arme - Puissance supérieure',
-  'hudChrome.enchantName.enchant_weapon_greater_spellpower':
-    'Enchantement Arme - Puissance de sorts supérieure',
-  'hudChrome.enchantName.enchant_weapon_intellect': 'Enchantement Arme - Puissance des sorts',
-  'hudChrome.enchantName.enchant_weapon_might': 'Enchantement Arme - Puissance',
-  'hudChrome.enchantName.enchant_weapon_runed_edge': 'Enchantement Arme - Tranchant runique',
   'hudChrome.enchanting.disenchantConfirmBody':
     'Cela détruit {item} et donne des matériaux arcaniques. Cette action est irréversible.',
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
@@ -9693,8 +9504,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.peaksGreeter': 'Capitaine Thessaly, Highwatch',
   'guide.worldPage.peaksGreeting':
     'Deux cents ans que ce mur tient. Il ne cédera pas sous ma garde, mais il gémit.',
-  'guide.worldPage.peaksPlaceNotes':
-    "Highwatch tient le rempart. La Crête du Traqueur et les Terriers de Deeprock appartiennent aux félins des crêtes et aux fouisseurs ; les Contreforts des ogres et le Camp de guerre de Drogmar à des brutes à gages ; Stormcrag crépite d'élémentaires, et en contrebas luit le Glimmermere, le lac de montagne dont la rive garde la porte de lumière pâle menant au Temple noyé ; les Tentes du culte du Ver et les Champs des revenants ceignent les hauteurs du culte, avec le Sanctuaire du Gravewyrm à son sommet.",
   'guide.worldPage.valeGreeter': 'Maréchal Redbrook, Eastbrook',
   'guide.worldPage.valeGreeting': "Gardez votre lame à portée. Le Val n'est plus ce qu'il était.",
   'guide.worldPage.valePlaceNotes':
@@ -9767,7 +9576,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.reliquary_shoulder.name': 'Spallières effritées',
   'entities.items.reliquary_gloves_rog.name': 'Gantelets du gardien des os',
   'entities.items.deacon_reliquary_helm.name': 'Heaume du reliquaire du diacre',
-  'entities.items.varric_shadow_cowl.name': "Cagoule d'ombre de Varric",
+  'entities.items.varric_shadow_cowl.name': "Cagoule d'ombre de Vandric",
   'entities.items.duskwisp_essence.name': 'Essence de feu follet du crépuscule',
   'entities.items.spore_heart.name': 'Coeur de spore',
   'entities.items.gleaming_antler.name': 'Bois de cerf luisant',
@@ -9789,7 +9598,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.nightweave_tunic.name': 'Tunique de tisse-nuit',
   'entities.items.veilcloth_robe.name': 'Robe de toile voilée',
   'entities.mobs.acolyte_tessa.name': 'Acolyte Tessa',
-  'entities.mobs.deacon_varric.name': 'Diacre Varric',
+  'entities.mobs.deacon_varric.name': 'Diacre Vandric',
   'entities.mobs.reliquary_bonewalker.name': 'Marche-os relevé',
   'entities.mobs.reliquary_funeral_ringer.name': 'Sonneur funéraire',
   'entities.mobs.reliquary_gravecall_acolyte.name': "Acolyte de l'appel funèbre",
@@ -9832,26 +9641,26 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'delveUi.board.title': 'Tableau des plongées',
   'delveUi.board.tabDelve': 'Plongée',
   'delveUi.board.tabShop': 'Boutique',
-  'delveUi.boss.varric.bell.emote': 'Le diacre Varric empoigne la cloche enfouie des deux mains !',
+  'delveUi.boss.varric.bell.emote': 'Le diacre Vandric empoigne la cloche enfouie des deux mains !',
   'delveUi.boss.varric.bell.impact': 'Le glas de la cloche fend le sol de la chambre !',
   'delveUi.boss.varric.bell.lesson':
     "Glas funèbre : un choc au sol toutes les douze secondes. Écartez-vous avant qu'il ne frappe.",
-  'delveUi.boss.varric.bell.log': 'Le diacre Varric commence à faire sonner la cloche funéraire.',
-  'delveUi.boss.varric.bell.warning': 'Éloignez-vous du diacre Varric !',
+  'delveUi.boss.varric.bell.log': 'Le diacre Vandric commence à faire sonner la cloche funéraire.',
+  'delveUi.boss.varric.bell.warning': 'Éloignez-vous du diacre Vandric !',
   'delveUi.boss.varric.defeat': "Non... j'avais les noms... je les avais tous...",
   'delveUi.boss.varric.intro': "Aucune âme n'est perdue. Seulement égarée.",
   'delveUi.boss.varric.mid30': "La cloche funéraire répond à chaque nom qu'il prononce.",
   'delveUi.boss.varric.mid60':
-    'Le diacre Varric lit les noms du registre avec un triomphe tremblant.',
+    'Le diacre Vandric lit les noms du registre avec un triomphe tremblant.',
   'delveUi.boss.varric.pull':
     'Tu foules une poussière sacrée avec un dessein impur. Agenouille-toi, et sois compté.',
   'delveUi.boss.varric.raise.emote':
-    'Le diacre Varric appelle des noms depuis les tombes brisées !',
-  'delveUi.boss.varric.raise.interrupt_fail': "Les morts répondent à l'appel du diacre Varric !",
+    'Le diacre Vandric appelle des noms depuis les tombes brisées !',
+  'delveUi.boss.varric.raise.interrupt_fail': "Les morts répondent à l'appel du diacre Vandric !",
   'delveUi.boss.varric.raise.interrupt_ok': 'Le rite funéraire vacille.',
   'delveUi.boss.varric.raise.lesson':
     'Interrompez la tombe fissurée en cinq secondes, sinon les morts se lèveront à son appel.',
-  'delveUi.boss.varric.raise.log': 'Le diacre Varric commence à incanter Réveil des morts.',
+  'delveUi.boss.varric.raise.log': 'Le diacre Vandric commence à incanter Réveil des morts.',
   'delveUi.boss.varric.raise.object': "La tombe fissurée frémit d'un souffle dérobé.",
   'delveUi.boss.varric.raise.warning': 'Arrêtez le rite funéraire !',
   'delveUi.chest.flavor': 'Les morts ont cédé ce dont ils pouvaient se passer.',
@@ -10042,7 +9851,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'sim.rift.detonateAbsoluteZero': 'Zéro absolu se déchaîne !',
   'sim.rift.detonateAbyssalMaw': 'La Gueule abyssale se referme !',
   'sim.rift.detonateArcaneAnnihilation': "L'Anéantissement arcanique se déchaîne !",
-  'sim.rift.detonateBloodRite': "Le Rite du sang s'abat !",
   'sim.rift.detonateBroodmothersMark': 'La Marque de la Mère des couvées explose !',
   'sim.rift.detonateCoreMeltdown': 'La Fusion du noyau explose !',
   'sim.rift.detonateCrushingDepth': 'La Profondeur écrasante écrase !',
@@ -10050,11 +9858,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'sim.rift.detonateEarthshatter': 'Brise-Terre explose !',
   'sim.rift.detonateFinalJudgment': "Le Jugement final s'abat !",
   'sim.rift.detonateGlacialGrave': 'La Tombe glaciale explose !',
-  'sim.rift.detonateHellfireBrand': 'Le Brandon infernal explose !',
   'sim.rift.detonateLightningRod': 'Paratonnerre frappe !',
   'sim.rift.detonateMagmaWell': 'Le Puits de magma jaillit !',
-  'sim.rift.detonatePactSeal': 'Le Sceau du pacte explose !',
-  'sim.rift.detonatePitSentence': 'La Sentence de la fosse explose !',
   'sim.rift.detonateSoulGrave': 'La Tombe des âmes explose !',
   'sim.rift.detonateStormcallersWrath': "La Colère de l'Invocateur des tempêtes se déchaîne !",
   'sim.rift.detonateVenomPool': 'La Mare de venin jaillit !',
@@ -10739,7 +10544,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.emberwing_drake.name': 'Drake Aile-de-braise',
   'entities.mobs.fen_sprite.name': 'Lutin des tourbières',
   'entities.mobs.fisher_bram.name': 'Pêcheur Bram',
-  'entities.mobs.frostmane_yeti.name': 'Yeti Crin-de-givre',
   'entities.mobs.gale_wisp.name': 'Feu follet des bourrasques',
   'entities.mobs.gilded_stag.name': 'Cerf doré',
   'entities.mobs.gleamstag.name': 'Le Cerf luisant',
@@ -10748,7 +10552,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gloam_strider.name': 'Arpenteur du crépuscule',
   'entities.mobs.gravedigger_mosley.name': 'Fossoyeur Mosley',
   'entities.mobs.gravenbark_shambler.name': "Traînard à l'écorce burinée",
-  'entities.mobs.harvest_sprite.name': 'Lutin des moissons',
   'entities.mobs.hedge_gnome.name': 'Gnome des haies',
   'entities.mobs.hedge_knight.name': 'Chevalier de Dawnhold',
   'entities.mobs.ice_wisp.name': 'Feu follet de glace',
@@ -10758,7 +10561,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.moonfleece_grazer.name': 'Brouteur Toison-de-lune',
   'entities.mobs.moor_ram.name': 'Bélier de la lande',
   'entities.mobs.mushroom_pixie.name': 'Farfadet du Peuple luisant',
-  'entities.mobs.nightkin_stargazer.name': 'Astrologue nocturnien',
   'entities.mobs.old_marrowshell.name': 'Vieux Marrowshell',
   'entities.mobs.orchard_treant.name': 'Treant du verger',
   'entities.mobs.pale_huntsman.name': 'Le Chasseur pâle',
@@ -11056,7 +10858,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_af_orchard_call.title': 'Un chariot pour le verger',
   'entities.quests.q_af_sprites_and_spigots.completion':
     "Quatre seaux de retour à leurs crochets, et les rangées redevenues calmes. Vous avez la main plus lourde que moi avec les lutins, {playerName}, et aujourd'hui je m'en réjouis.",
-  'entities.quests.q_af_sprites_and_spigots.objectives.0.label': 'Lutin des moissons chassé',
   'entities.quests.q_af_sprites_and_spigots.objectives.1.label': 'Seau à sève récupéré',
   'entities.quests.q_af_sprites_and_spigots.text':
     "Des lutins des moissons, {playerName}. Ils arrachent mes robinets à sève des troncs pour la douceur qu'ils contiennent, et jettent les seaux dans l'herbe. Chassez huit de ces petits voleurs et rapportez-moi quatre de mes seaux, et les chariots repartiront.",
@@ -11253,11 +11054,11 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Un traîneau de réserves de braises s'est renversé sur la route du lac cette nuit : des marmites de fer qui gardent un feu couvant vivant pendant un mois. Trois d'entre elles gisent encore dans la neige, {playerName}, et le pavillon ne peut se passer de ce qu'elles contiennent. Ramenez le feu à la maison.",
   'entities.quests.q_fv_ember_caches.title': 'Des braises sur la route du lac',
   'entities.quests.q_fv_frostmane_tyrant.completion':
-    "Quand le vent est tombé la nuit dernière, tout le village a entendu le silence là où se tenait autrefois le Frostmane. Le Reach vous doit une dette qu'il mettra des années à payer, {playerName}. Portez ceci, et chaque porte d'Icemantle vous sera ouverte.",
-  'entities.quests.q_fv_frostmane_tyrant.objectives.0.label': 'Le Frostmane abattu',
+    "Quand le vent est tombé la nuit dernière, tout le village a entendu le silence là où se tenait autrefois le Rimemane. Le Reach vous doit une dette qu'il mettra des années à payer, {playerName}. Portez ceci, et chaque porte d'Icemantle vous sera ouverte.",
+  'entities.quests.q_fv_frostmane_tyrant.objectives.0.label': 'Le Rimemane abattu',
   'entities.quests.q_fv_frostmane_tyrant.text':
-    "Les hurleurs ne chassaient pas quand ils sont descendus des terrasses. Ils fuyaient. Un yeti s'est emparé des hauteurs, les gens de la montagne l'appellent le Frostmane, et même les meutes refusent de partager une pente avec lui. Il faut en finir, {playerName}, avant que l'hiver ne le pousse jusqu'à mes murs. Amenez un ami. Amenez-en deux.",
-  'entities.quests.q_fv_frostmane_tyrant.title': 'Le tyran Frostmane',
+    "Les hurleurs ne chassaient pas quand ils sont descendus des terrasses. Ils fuyaient. Un yeti s'est emparé des hauteurs, les gens de la montagne l'appellent le Rimemane, et même les meutes refusent de partager une pente avec lui. Il faut en finir, {playerName}, avant que l'hiver ne le pousse jusqu'à mes murs. Amenez un ami. Amenez-en deux.",
+  'entities.quests.q_fv_frostmane_tyrant.title': 'Le tyran Rimemane',
   'entities.quests.q_fv_howl_above.completion':
     "Huit, et le chœur du crépuscule s'en trouve amenuisé. Mais les hurleurs ne quittent pas les cimes pour rien. Quelque chose là-haut les a fait fuir, et je crains que cela ait un nom.",
   'entities.quests.q_fv_howl_above.objectives.0.label': 'Hurleur des terrasses abattu',
@@ -11393,7 +11194,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Les hauts-fonds ne sont plus que de l'eau à nouveau. J'ai vu cette carapace briser de meilleurs chasseurs que moi, {playerName}. Pas vous.",
   'entities.quests.q_hollow_old_marrowshell.objectives.0.label': 'Vieux Marrowshell abattu',
   'entities.quests.q_hollow_old_marrowshell.text':
-    "Le premier nom est Vieux Marrowshell, un crabe de la taille d'un chariot qui chasse dans les hauts-fonds de l'est depuis avant qu'Eldergleam n'ait de porte. Il erre, {playerName}, alors vous devrez parcourir le rivage jusqu'à croiser sa trace. N'y allez pas seul, et ne vous fiez pas à son immobilité.",
+    "Le premier nom est Vieux Marrowshell, un crabe de la taille d'un chariot qui chasse dans les hauts-fonds de l'est depuis avant qu'Eldershine n'ait de porte. Il erre, {playerName}, alors vous devrez parcourir le rivage jusqu'à croiser sa trace. N'y allez pas seul, et ne vous fiez pas à son immobilité.",
   'entities.quests.q_hollow_old_marrowshell.title': 'La vieille carapace des hauts-fonds',
   'entities.quests.q_hollow_the_huntsman.completion':
     "Fenna vous envoie ? Bien. Alors elle vous fait confiance, et j'ai deux noms à rayer.",
@@ -11412,15 +11213,11 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nb_charts_of_the_stones.completion':
     "Il ne reste plus aucun doute. Chaque relèvement a dérivé vers le Tertre Sans Sommeil, comme si le ciel lui-même se penchait sur ce tertre pour observer. Les vieux rois n'ont pas été enterrés sous des étoiles alignées par hasard, {playerName}.",
   'entities.quests.q_nb_charts_of_the_stones.objectives.0.label': 'Carte stellaire lue',
-  'entities.quests.q_nb_charts_of_the_stones.text':
-    "Les pierres de la Vigie sont plus anciennes que Moonrest, plus anciennes que les nocturniens qui les entretiennent, et leurs faces sont gravées de cartes stellaires que j'ai passé ma vie à apprendre à lire. Le ciel a dérivé, {playerName}, et je dois savoir de combien. Lisez les cartes sur trois des pierres et rapportez-moi leurs relèvements.",
   'entities.quests.q_nb_charts_of_the_stones.title': 'Les cartes dans les pierres',
   'entities.quests.q_nb_eyes_on_the_vigil.completion':
     'Lira vous envoie ? Alors les jardins le ressentent aussi. Asseyez-vous près de la lunette un instant, {playerName}. Les étoiles sont agitées depuis un mois, et chaque carte que je dresse penche vers le nord, vers le tertre.',
   'entities.quests.q_nb_eyes_on_the_vigil.objectives.0.label':
     "Trouver l'Astronome Cassian à la Vigie immobile",
-  'entities.quests.q_nb_eyes_on_the_vigil.text':
-    "Quelque chose rend les arpenteurs audacieux et les troupeaux nerveux, {playerName}, et je ne peux pas le lire dans les fleurs. Cassian, lui, peut le lire dans le ciel. Il tient son camp d'observation près de la Vigie immobile à l'est d'ici, où les nocturniens dérivent parmi les pierres. Trouvez-le, et demandez-lui ce que disent les étoiles.",
   'entities.quests.q_nb_eyes_on_the_vigil.title': 'Des yeux sur la Vigie',
   'entities.quests.q_nb_night_gardens.completion':
     'Encore luminescentes, chaque pétale. Le sanctuaire sentira la nuit pendant une semaine, et Moonrest en dormira plus paisiblement.',
@@ -11448,8 +11245,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nb_striders_in_the_dark.text':
     'Les arpenteurs du crépuscule ont toujours été des chasseurs patients, {playerName}, mais dernièrement ils se glissent jusque dans les parterres de fleurs et prennent des agneaux toison-de-lune sous nos lanternes. Abattez-en dix et rendez leur calme aux landes.',
   'entities.quests.q_nb_striders_in_the_dark.title': 'Des arpenteurs dans le noir',
-  'entities.quests.q_nb_the_barrow_king.completion':
-    "Les étoiles se sont apaisées pour la première fois depuis une saison, {playerName}. Les tertres sont refermés, les nocturniens se sont immobilisés à leurs pierres, et le roi dort de nouveau en dessous. Portez ce manteau : Moonrest l'a taillé pour qui la nuit finirait par accorder sa confiance.",
   'entities.quests.q_nb_the_barrow_king.objectives.0.label': 'Le Roi des tertres mis au repos',
   'entities.quests.q_nb_the_barrow_king.text':
     "Chaque relèvement, chaque étoile agitée, chaque tertre ouvert pointe vers une seule chose : le Roi des tertres s'éveille sous le grand tertre, et ce royaume n'a pas d'aube pour le retenir. Il doit être mis au repos avant qu'il ne se souvienne de sa couronne, {playerName}. N'y allez pas seul : amenez un ami, et gardez la lumière des fleurs dans votre dos.",
@@ -11501,9 +11296,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_pr_the_man_who_went_in.completion':
     "Isha vous envoie ? La Mère-des-perles n'a pas prononcé mon nom depuis des années. Asseyez-vous hors de portée des lianes, {playerName}, et je vous dirai ce que je sais : les tambours ne sont pas le danger. Ils sont l'avertissement.",
   'entities.quests.q_pr_the_man_who_went_in.objectives.0.label':
-    'Trouver Okku à la Chute de Lianes',
+    'Trouver Okrim à la Chute de Lianes',
   'entities.quests.q_pr_the_man_who_went_in.text':
-    "Les plongeurs refusent de dépasser la lisière des arbres, {playerName}, et je ne leur demanderai pas de le faire. Vous avez entendu les tambours à présent : tout le monde les entend, dès la deuxième nuit. Un seul homme sur cette île a jamais marché vers ce son et en est revenu. Okku. Il campe sous les grands banians de la Chute de Lianes, loin sur la route de l'Enchevêtrement. Trouvez-le, et demandez-lui ce que cache la verdure.",
+    "Les plongeurs refusent de dépasser la lisière des arbres, {playerName}, et je ne leur demanderai pas de le faire. Vous avez entendu les tambours à présent : tout le monde les entend, dès la deuxième nuit. Un seul homme sur cette île a jamais marché vers ce son et en est revenu. Okrim. Il campe sous les grands banians de la Chute de Lianes, loin sur la route de l'Enchevêtrement. Trouvez-le, et demandez-lui ce que cache la verdure.",
   'entities.quests.q_pr_the_man_who_went_in.title': "L'homme qui est entré",
   'entities.quests.q_pr_what_the_drums_guard.completion':
     "Mousse, nacre, et sang de sanglier, tassés par des doigts. Quelque chose dans cette ruine maintient encore ses rites, {playerName}, et le Gardien tient tout le reste à l'écart. Il est temps que nous en parlions clairement.",
@@ -11631,20 +11426,20 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Les feux follets scintillants portent des poussières de la vieille lumière stellaire tombée ici quand le Creux fut scellé. Six poussières, et les lampes du sanctuaire brûleront pendant un an. Ne prenez que sur ceux qui s'estompent ; le Creux donne assez sans qu'on ait besoin d'être cupide.",
   'entities.quests.q_wisp_lights.title': 'Lumières des hauts-fonds',
   'entities.quests.q_ww_bells_of_gallowmere.completion':
-    "Cobb vous a envoyé sur la route entier, n'est-ce pas ? Brave homme. Il garde ces lanternes de porte allumées depuis trente ans, et le bois n'est jamais passé devant lui. Bienvenue à Gallowmere, {playerName}. Prenez garde aux cloches.",
+    "Cobb vous a envoyé sur la route entier, n'est-ce pas ? Brave homme. Il garde ces lanternes de porte allumées depuis trente ans, et le bois n'est jamais passé devant lui. Bienvenue à Gibbetmere, {playerName}. Prenez garde aux cloches.",
   'entities.quests.q_ww_bells_of_gallowmere.objectives.0.label':
     'Faire un rapport au Sacristain Marrow',
   'entities.quests.q_ww_bells_of_gallowmere.text':
-    "Vous entendez ce glas, {playerName} ? C'est Gallowmere, sur la route du nord, qui sonne pour endormir ses morts. Le Sacristain Marrow tient le compte de chaque âme sous la canopée, vivante ou enterrée. Allez vous faire compter, avant que le bois ne vous compte lui-même.",
-  'entities.quests.q_ww_bells_of_gallowmere.title': 'Les cloches de Gallowmere',
+    "Vous entendez ce glas, {playerName} ? C'est Gibbetmere, sur la route du nord, qui sonne pour endormir ses morts. Le Sacristain Marrow tient le compte de chaque âme sous la canopée, vivante ou enterrée. Allez vous faire compter, avant que le bois ne vous compte lui-même.",
+  'entities.quests.q_ww_bells_of_gallowmere.title': 'Les cloches de Gibbetmere',
   'entities.quests.q_ww_candles_at_the_bounds.completion':
     "Toutes les quatre allumées ? Alors respirez, {playerName}. Vous ne l'avez pas entendu, mais tout le village si : les cloches ont sonné plus doucement à l'instant où la dernière mèche a pris.",
   'entities.quests.q_ww_candles_at_the_bounds.objectives.0.label': 'Bougie funéraire rallumée',
   'entities.quests.q_ww_candles_at_the_bounds.text':
-    "Quatre pierres limitrophes entourent Gallowmere, {playerName}, une sur chaque route de sortie, et une bougie funéraire brûle sur chaque pierre. Tant qu'elles brûlent, les enterrés restent enterrés. La bruine les a noyées, toutes les quatre, et je suis trop vieux pour parcourir les limites seul. Prenez mon cierge et rallumez-les, vite.",
+    "Quatre pierres limitrophes entourent Gibbetmere, {playerName}, une sur chaque route de sortie, et une bougie funéraire brûle sur chaque pierre. Tant qu'elles brûlent, les enterrés restent enterrés. La bruine les a noyées, toutes les quatre, et je suis trop vieux pour parcourir les limites seul. Prenez mon cierge et rallumez-les, vite.",
   'entities.quests.q_ww_candles_at_the_bounds.title': 'Des bougies aux limites',
   'entities.quests.q_ww_horn_of_the_huntsman.completion':
-    "Le cor s'est arrêté en pleine note. Chaque cloche de Gallowmere a sonné une fois, d'elle-même, puis le bois est devenu plus silencieux que je ne l'ai entendu depuis trente ans. Vous avez accompli le rite que je ne pouvais accomplir, {playerName}. Portez ceci, et marchez sous la canopée sans crainte.",
+    "Le cor s'est arrêté en pleine note. Chaque cloche de Gibbetmere a sonné une fois, d'elle-même, puis le bois est devenu plus silencieux que je ne l'ai entendu depuis trente ans. Vous avez accompli le rite que je ne pouvais accomplir, {playerName}. Portez ceci, et marchez sous la canopée sans crainte.",
   'entities.quests.q_ww_horn_of_the_huntsman.objectives.0.label': 'Le Chasseur pâle désarçonné',
   'entities.quests.q_ww_horn_of_the_huntsman.text':
     "Vous avez entendu le cor à présent, {playerName}, ténu et lointain, le son pour lequel tout le bois retient son souffle. Le Chasseur pâle chevauche sa clairière au nord d'ici, et chaque tombe qu'il traverse devient plus superficielle. C'était un homme autrefois, et il fut mal enterré, et j'ai cessé de prétendre que la prière suffirait. Prenez un ami, prenez-en deux, et désarçonnez-le.",
@@ -11662,9 +11457,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Au sud d'ici, la Chapelle de Mournstone moisit près de son lac noir, et un homme l'entretient encore : le Vicaire Creel, qui a refusé de partir quand le toit s'est effondré. Il connaît les vieux rites mieux que mes cloches, {playerName}, et il n'a pas donné de nouvelles depuis un mois. Suivez la route de la chapelle et assurez-vous qu'il respire encore.",
   'entities.quests.q_ww_the_last_vicar.title': 'Le dernier vicaire',
   'entities.quests.q_ww_walking_mosley_home.completion':
-    "Il a franchi la porte sur ses deux jambes, jurant qu'il ne creusera plus rien de plus profond qu'un carré de navets désormais. Il sera de retour au cimetière dimanche, ils le sont toujours. Merci, {playerName}. Gallowmere garde ses gens, c'est là toute notre loi.",
+    "Il a franchi la porte sur ses deux jambes, jurant qu'il ne creusera plus rien de plus profond qu'un carré de navets désormais. Il sera de retour au cimetière dimanche, ils le sont toujours. Merci, {playerName}. Gibbetmere garde ses gens, c'est là toute notre loi.",
   'entities.quests.q_ww_walking_mosley_home.objectives.0.label':
-    'Fossoyeur Mosley ramené sain et sauf à Gallowmere',
+    'Fossoyeur Mosley ramené sain et sauf à Gibbetmere',
   'entities.quests.q_ww_walking_mosley_home.text':
     "Mon fossoyeur Mosley a pris la route de la chapelle il y a trois jours pour ouvrir une parcelle dans le vieux cimetière, et la fosse s'est effondrée sur lui. Il s'est extirpé en griffant, l'idiot est vivant, mais il est recroquevillé près des tombes de la chapelle et refuse de bouger à cause des fileuses sur la route. Ramenez-le, {playerName}. Je ne peux pas sonner les cloches pour un homme vivant.",
   'entities.quests.q_ww_walking_mosley_home.title': 'Ramener Mosley chez lui',
@@ -11674,7 +11469,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Traînard à l'écorce burinée terrassé",
   'entities.quests.q_ww_what_the_bark_holds.objectives.1.label': 'Restes liés de soie décrochés',
   'entities.quests.q_ww_what_the_bark_holds.text':
-    "Dans la Clairière Pendue à l'est de Gallowmere, les fileuses suspendent leurs morts enveloppés de soie aux branches, et les traînards à l'écorce burinée montent la garde en dessous comme de patients porteurs de cercueil. Ce sont nos gens, là-haut, {playerName}. Brisez cinq traînards, décrochez trois des morts enveloppés, et ramenez-les à la terre.",
+    "Dans la Clairière Pendue à l'est de Gibbetmere, les fileuses suspendent leurs morts enveloppés de soie aux branches, et les traînards à l'écorce burinée montent la garde en dessous comme de patients porteurs de cercueil. Ce sont nos gens, là-haut, {playerName}. Brisez cinq traînards, décrochez trois des morts enveloppés, et ramenez-les à la terre.",
   'entities.quests.q_ww_what_the_bark_holds.title': "Ce que retient l'écorce",
   'entities.quests.q_ww_widows_skeins.completion':
     "Six écheveaux, doux comme un souffle retenu. Les morts reposeront plus paisiblement dedans. Prenez ces bandages, je les ai cousus du dernier lot, et le bois n'y a jamais mordu.",
@@ -11903,12 +11698,12 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.amberPlaceNotes':
     "Lanternmere brille au cœur de la moisson. Le Goldmelt est le col ambré qui mène ici ; le Verger doré et le Creux des Moissons gardent les meilleures cueillettes et les voleurs les plus audacieux ; le Grand Lac reflète les feuilles brûlantes ; les Hauteurs de Cindermaple se dressent, plus hautes et plus rouges que tout ; et le Monolithe penché se souvient de quelque chose de plus vieux que l'automne.",
   'guide.worldPage.duskBlurb':
-    "Une vallée de crépuscule perpétuel sous le grand arbre d'Eldergleam, où des ruines de cristal luisent et où l'air résonne d'une magie ancienne.",
-  'guide.worldPage.duskGreeter': 'La Gardienne Saelwyn, Eldergleam',
+    "Une vallée de crépuscule perpétuel sous le grand arbre d'Eldershine, où des ruines de cristal luisent et où l'air résonne d'une magie ancienne.",
+  'guide.worldPage.duskGreeter': 'La Gardienne Saelwyn, Eldershine',
   'guide.worldPage.duskGreeting':
     'Peu de gens de votre espèce se sont tenus sous ces frondaisons. Marchez avec douceur : on vous accueille ici.',
   'guide.worldPage.duskPlaceNotes':
-    "Eldergleam se rassemble sous le grand arbre. La Grotte du Crépuscule et son belvédère sont le chemin d'entrée et la première vue sur la vallée ; le Bosquet Ancien et le Bassin des Étoiles Filantes gardent le sud paisible ; la Cour Engloutie renferme des ruines envahies de végétation à l'est ; et les Profondeurs Scintillantes et les Hauts-fonds Cristallins luisent à travers le nord.",
+    "Eldershine se rassemble sous le grand arbre. La Grotte du Crépuscule et son belvédère sont le chemin d'entrée et la première vue sur la vallée ; le Bosquet Ancien et le Bassin des Étoiles Filantes gardent le sud paisible ; la Cour Engloutie renferme des ruines envahies de végétation à l'est ; et les Profondeurs Scintillantes et les Hauts-fonds Cristallins luisent à travers le nord.",
   'guide.worldPage.emberBlurb':
     'Des étendues battues par la tempête, de cendre et de verre-de-sang, où des drakes tournoient au-dessus de la caldeira et où des feux trolls brûlent parmi les dunes, veillées depuis la ville-porte de Wyrmwatch.',
   'guide.worldPage.emberGreeter': 'Le gardien de porte, Wyrmwatch',
@@ -11945,12 +11740,12 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.gardenPlaceNotes':
     "Hedgewick attend à la Porte du Jardin. L'Allée du Parterre fleurit en couleurs taillées ; le Château de Dawnhold entraîne ses chevaliers derrière des murs neufs ; le Bassin aux Pétales dérive en rose toute l'année ; le Vieux Moulin retourne son propre lit de fleurs ; le Grand Labyrinthe réarrange ses manières pour chaque visiteur, ses arcades surveillées par des renards feuillus ; le Guet du Nord garde la route de sortie ; le Bassin des Lys repose au-delà de tout cela ; et la Cour des Fontaines coule encore claire au cœur du jardin.",
   'guide.worldPage.hauntBlurb':
-    'Une forêt hantée sous des canopées géantes, où les lanternes de Gallowmere sont la seule lumière honnête sur la route.',
-  'guide.worldPage.hauntGreeter': 'Le lampiste, Gallowmere',
+    'Une forêt hantée sous des canopées géantes, où les lanternes de Gibbetmere sont la seule lumière honnête sur la route.',
+  'guide.worldPage.hauntGreeter': 'Le lampiste, Gibbetmere',
   'guide.worldPage.hauntGreeting':
     'Restez près des lanternes, voyageur. Et si le bois appelle votre nom hors de la route, ne répondez pas.',
   'guide.worldPage.hauntPlaceNotes':
-    'Gallowmere se blottit dans ses lanternes. La Porte aux Corbeaux est la porte funeste du bois ; le Fourré des Veuves est tissé épais de toiles ; la Clairière Pendue et la Chapelle de Mournstone gardent les plus vieux chagrins de la forêt ; et la Clairière du Chasseur appartient à ce qui y chasse encore.',
+    'Gibbetmere se blottit dans ses lanternes. La Porte aux Corbeaux est la porte funeste du bois ; le Fourré des Veuves est tissé épais de toiles ; la Clairière Pendue et la Chapelle de Mournstone gardent les plus vieux chagrins de la forêt ; et la Clairière du Chasseur appartient à ce qui y chasse encore.',
   'guide.worldPage.jungleBlurb':
     "Un enchevêtrement tropical de palmiers, de sable blanc, et d'oiseaux bruyants, où la ville de plage de Drifthaven garde un feu allumé sur la grève.",
   'guide.worldPage.jungleGreeter': 'La capitaine du port, Drifthaven',
@@ -11963,8 +11758,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.nightGreeter': 'La gardienne de la veille, Moonrest',
   'guide.worldPage.nightGreeting':
     "Passé la Porte de la Nuit, l'air lui-même rêve. Suivez la lumière des fleurs, et prenez garde au monde endormi suspendu dans le ciel.",
-  'guide.worldPage.nightPlaceNotes':
-    "Moonrest tient la veille. La Porte de la Nuit est le chemin vers le pays de minuit ; le Puits de Lune retient une lumière stellaire près de laquelle on peut se tenir ; Gloamfield fleurit dans l'obscurité ; la Vigie immobile observe sans jamais bouger ; et le Tertre Sans Sommeil est le seul endroit ici qui ne rêve jamais.",
   'guide.abilityHook.revenge':
     'Frappe les ennemis devant vous et peut devenir gratuite après une esquive ou une parade.',
   'guide.abilityHook.hamstring': 'Entrave les déplacements d’un ennemi pour l’empêcher de fuir.',
@@ -12204,7 +11997,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.battleTrance':
     'Votre prochaine Frappe du pillard ou Frappe mutilante ne coûte aucune rage',
   'hudChrome.auraEffect.revengeFree': 'Votre prochaine Vengeance ne coûte aucune rage',
-  'hudChrome.auraEffect.victoryRush': 'Ruée victorieuse est prête',
   'hudChrome.auraEffect.maxHpPct': 'Augmente les points de vie maximum de {pct}%',
   'hudChrome.statInfo.names.parry': 'Parade',
   'hudChrome.statInfo.names.healPower': 'Puissance de soins',
@@ -12298,7 +12090,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.cragprowl_belt.name': 'Ceinture du rôdeur des rochers',
   'entities.items.cragthorn_greatstaff.name': 'Grand bâton des épines rocheuses',
   'entities.items.cragward_pauldrons.name': 'Épaulières de la garde des rochers',
-  'entities.items.cryptbloom_shoulderguards.name': 'Épaulières Florécrypte',
   'entities.items.dreamroot_boots.name': 'Bottes de racine onirique',
   'entities.items.duskthorn_mantle.name': 'Manteau des épines du crépuscule',
   'entities.items.fenbark_leggings.name': 'Jambières en écorce des marais',
@@ -12338,7 +12129,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.wildgrove_cinch.name': 'Ceinturon du bosquet sauvage',
   'entities.items.wildgrowth_leggings.name': 'Jambières de la végétation sauvage',
   'entities.items.wildsoul_maul.name': "Marteau de l'âme sauvage",
-  'entities.items.wyrmcult_spellgrips.name': 'Gantelets de sorts du culte du wyrm',
   'entities.items.abyssal_loop.name': 'Anneau abyssal',
   'entities.items.abysswrought_band.name': 'Anneau forgé des abysses',
   'entities.items.amberfall_sap_bucket.name': 'Seau à sève',
@@ -12361,7 +12151,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.farshore_salt_moss.name': 'Mousse salée du Farshore',
   'entities.items.fenway_mooring_line.name': 'Amarre tranchée',
   'entities.items.fountain_court_mantle.name': 'Manteau de la Cour des Fontaines',
-  'entities.items.frostmane_mantle.name': 'Manteau des Crins-de-givre',
   'entities.items.galecrest_ram_wool.name': 'Laine de bélier grasse',
   'entities.items.gallowmere_grave_candle.name': 'Bougie funéraire',
   'entities.items.gilded_sap_clot.name': 'Caillot de sève doré',
@@ -12641,7 +12430,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.hearthkeeper_maeve.title': 'Gardienne du Pavillon du Foyer',
   'entities.npcs.hermit_okku.greeting':
     'Silence, maintenant. Les tambours comptent tout ce qui marche sous les arbres, et ils vous ont déjà compté.',
-  'entities.npcs.hermit_okku.name': 'Okku',
+  'entities.npcs.hermit_okku.name': 'Okrim',
   'entities.npcs.hermit_okku.title': "L'Homme qui est entré",
   'entities.npcs.huntsman_deral.greeting':
     'Silence. Le troupeau connaît chaque bruit que fait cette vallée, et moi aussi.',
@@ -12694,7 +12483,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.provisioner_fenna.greeting':
     "Le pain est encore chaud, l'eau encore douce. Le Creux pourvoit, et moi aussi.",
   'entities.npcs.provisioner_fenna.name': 'Ravitailleuse Fenna',
-  'entities.npcs.provisioner_fenna.title': "Ravitailleuse d'Eldergleam",
+  'entities.npcs.provisioner_fenna.title': "Ravitailleuse d'Eldershine",
   'entities.npcs.quartermaster_edda.greeting':
     "Acier et sel, {className}, c'est tout ce qu'il me reste à distribuer. Prenez-les et faites regretter aux brèches de s'être ouvertes à ma portée.",
   'entities.npcs.quartermaster_edda.name': 'Intendante Edda',
@@ -12730,7 +12519,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.sexton_marrow.greeting':
     "Nous les enterrons profondément ici, et nous sonnons les cloches pour qu'ils se souviennent de rester couchés.",
   'entities.npcs.sexton_marrow.name': 'Sacristain Marrow',
-  'entities.npcs.sexton_marrow.title': 'Sacristain de Gallowmere',
+  'entities.npcs.sexton_marrow.title': 'Sacristain de Gibbetmere',
   'entities.npcs.strandwatcher_pell.greeting':
     'Enfin sorti des arbres noirs. Respirez, étranger, le soleil tient ce côté du col.',
   'entities.npcs.strandwatcher_pell.name': 'Guetteur-de-grève Pell',
@@ -12778,7 +12567,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.widow_tansy.greeting':
     "Une bougie pour chaque tombe, et pas une ne doit s'éteindre. Pas une, vous m'entendez ?",
   'entities.npcs.widow_tansy.name': 'Veuve Tansy',
-  'entities.npcs.widow_tansy.title': 'Cirière de Gallowmere',
+  'entities.npcs.widow_tansy.title': 'Cirière de Gibbetmere',
   'gatherEvent.ancientHeartwood': '{finder} a abattu un bois de cœur ancien !',
   'gatherEvent.moonlitBloom': '{finder} a découvert une floraison au clair de lune !',
   'gatherEvent.pristineVein': '{finder} a touché une veine vierge !',
@@ -13052,10 +12841,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.marketIndicator.aria': 'Produit ou objets du Marché mondial en attente',
   'hudChrome.marketIndicator.tip':
     'Le produit de vos ventes ou des objets retournés vous attendent chez le Marchand.',
-  'hudChrome.materialHint.arcaneDust':
-    "Réactif d'enchantement. Obtenu en désenchantant de l'équipement commun et peu commun.",
-  'hudChrome.materialHint.arcaneEssence':
-    "Réactif d'enchantement. Obtenu en désenchantant de l'équipement rare.",
   'hudChrome.materialHint.arcaneShard':
     "Réactif d'enchantement. Obtenu en désenchantant de l'équipement épique et légendaire.",
   'hudChrome.materialHint.resonantHide':
@@ -13613,7 +13398,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.necromancy_skeletal_warrior.name': 'Guerrier squelette',
   'guide.abilityHook.evil_eye': "Désigne l'ennemi dont les actions et les souffrances alimenteront votre Condamnation.",
   'hud.pet.abyssalChain': 'Chaîne abyssale',
-  'hud.pet.abyssalChainDesc': "Ordonne à Gloomshade de tirer vers lui un ennemi normal situé à plus de 8 mètres et jusqu'à 20 mètres. Les boss ne peuvent pas être tirés de cette façon. Recharge de 15 secondes. Clic droit, appui long ou Maj+Entrée pour activer ou désactiver l'attaque automatique.",
+  'hud.pet.abyssalChainDesc': "Ordonne à Duskmurk de tirer vers lui un ennemi normal situé à plus de 8 mètres et jusqu'à 20 mètres. Les boss ne peuvent pas être tirés de cette façon. Recharge de 15 secondes. Clic droit, appui long ou Maj+Entrée pour activer ou désactiver l'attaque automatique.",
   'hud.pet.abyssalChainTitle': 'Chaîne abyssale',
   'hud.pet.autocastOff': "Attaque automatique désactivée. Clic droit, appui long ou Maj+Entrée pour l'activer.",
   'hud.pet.autocastOn': 'Attaque automatique activée. Clic droit, appui long ou Maj+Entrée pour la désactiver.',
@@ -13977,6 +13762,22 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Frappe la cible pour {damage} points de dégâts, l\'étourdissant pendant 4 s. Confère 2 points de combo.',
   'gpuNotice.bodyDiscreteInactive':
     'Le jeu n\'utilise pas le GPU de jeu dédié et fonctionne à la place sur le GPU intégré (économie d\'énergie), ce qui nuira aux performances. Mettez à jour vos pilotes graphiques, puis redémarrez le jeu. Sous Windows, définissez également le jeu sur Performances élevées dans Paramètres, Système, Affichage, Graphiques.',
+  'guide.profPages.faq.q3': 'Quelle est la différence entre piller et récolter un cadavre ?',
+  'guide.profPages.faq.q4': 'Pourquoi mon Rondin de frêne de fer est-il signé ?',
+  'guide.profPages.faq.q5': 'Comment délier une pièce de commande, et combien cela coûte-t-il ?',
+  'guide.profPages.faq.q6': 'Où apprendre les recettes, et combien coûtent-elles ?',
+  'guide.profPages.faq.q7': 'Pourquoi ma récolte a-t-elle soudainement ralenti ?',
+  'guide.profPages.faq.q8': 'Puis-je fabriquer loin de la ville ?',
+  'guide.profPages.faq.a3':
+    "Un seul appui couvre les deux. Tout ce qu'un cadavre contient, pièces et butins plus tout composant récoltable, s'ouvre dans la même fenêtre : le butin suit les règles normales du butin, et la récolte est le côté métiers, en retirant les matériaux du cadavre lui-même.\n\nLa récolte est premier arrivé, usage unique : chaque cadavre ne peut être récolté qu'une seule fois, par celui qui le revendique en premier, en ligne compris. Votre Focus de ville détermine ce que vous obtenez : pendant que vous vous trouvez dans un centre de ville, vous pouvez répartir 10 points de Focus sur les types de composants qui vous intéressent, et chaque composant ciblé obtient un meilleur palier (chaque tranche de 5 points le fait monter d'un cran, au maximum deux crans) et un meilleur rendement (10 pour cent par point). Les composants non ciblés ne sont jamais pénalisés.",
+  'guide.profPages.faq.a4':
+    "Vous avez décroché une aubaine. Environ 1 récolte sur 90 déclenche un événement de récolte rare (du bois de cœur ancien sur un arbre, une veine vierge dans le minerai, une floraison au clair de lune parmi les herbes) : il multiplie le rendement par cinq, signe chaque unité à votre nom, et annonce la trouvaille à la zone entière. Un jet de rareté rare ou mieux sur une récolte ordinaire signe lui aussi le rendement.\n\nLes matériaux signés méritent d'être gardés ou vendus cher : détenir à l'établi n'importe quel exemplaire signé d'un réactif requis ajoute 2 points de pourcentage à la chance de chef-d'oeuvre. Rappelez-vous seulement qu'ils ne se pilent qu'avec des exemplaires signés à l'identique, et qu'ils occupent donc leur propre emplacement de sac.",
+  'guide.profPages.faq.a5':
+    "Rendez-vous à n'importe quel atelier d'artisanat avec la pièce dans vos sacs et payez le maître. Le tarif suit la qualité de l'objet : 25 argent pour une pièce inhabituelle, 1 or pour une rare, 4 or pour une épique ; un légendaire paie le tarif épique, et une pièce de commande commune paie le tarif inhabituel. Ce doit être un véritable atelier : un atelier mobile n'offre jamais ce service.\n\nCe tarif achète une ardoise vierge, pas un remède : la pièce reste une pièce de commande, donc elle se lie à nouveau à quiconque la reçoit lors du prochain échange. Si plusieurs exemplaires liés partagent une pile, un exemplaire est détaché et délié par paiement.",
+  'guide.profPages.faq.a8':
+    "En partie. Les neuf recettes de terrain communes (l'arme, l'armure, la nourriture et la potion de base du départ) se fabriquent n'importe où et n'importe quand, tout comme les trois recettes combinées des paires jurées. Tout le reste au-dessus est lié à un type de station : forge, cuisines, apothicaire, tannerie, métier à tisser ou atelier d'outillage, et vous devez vous trouver à moins de 20 mètres de la station pour que la fabrication aboutisse.\n\nÀ 75 de compétence dans un métier, vous vous spécialisez, et avec la réduction de 20 pour cent sur les matériaux vous gagnez une station mobile : posez-la sur le terrain et elle tient 10 minutes, servant les recettes de ce métier comme si vous étiez devant la vraie. La station mobile ne sert qu'à fabriquer : apprendre des recettes et délier des pièces de commande exige toujours la véritable station en ville.",
+  'guide.profPages.craftProse.cooking.materialsBody':
+    "La Pêche fournit les ingrédients signatures, zone par zone : truite miroir et perche de rivière dans les eaux du Val d'Eastbrook, brochet du marais et anguille des tourbières dans le Marais de Mirefen, truite givrée et carpe argentée dans les Hauteurs de Thornpeak. Les échelons mêlent les zones librement (l'échelon gratuit réclame déjà du brochet du marais, l'échelon intermédiaire la truite givrée de Thornpeak, et le souper rare ramène la truite miroir du Val), si bien qu'un cuisinier qui pêche partout où la route le mène n'est jamais à sec.\n\nLe côté boucherie vient des cadavres récoltés : la viande de gibier des sangliers et de leurs semblables, et, sur un jet de récolte rare ou mieux, une Coupe privilégiée signée, la pièce maîtresse du grand rôti. Les herbes assaisonnent les meilleurs plats, une bûche de frêne gris fume l'anguille, et le Sel de cuisine coûte 8 cuivres le sachet à l'étal de Marlow lui-même.",
   // v0.40 release i18n fill.
   "abilityUi.tooltip.anyTarget": "Cible ennemie ou amie",
   "hudChrome.account.passwordSet": "Mot de passe défini. Vous pouvez désormais vous connecter avec votre nom d'utilisateur et votre mot de passe n'importe où.",

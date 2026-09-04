@@ -8,7 +8,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { ENCHANTS, type EnchantDef } from '../src/sim/content/enchants';
-import { resolveApplyEnchant } from '../src/sim/professions/enchanting';
+import { APEX_TIER_REAGENT, resolveApplyEnchant } from '../src/sim/professions/enchanting';
 import { Sim } from '../src/sim/sim';
 import { xpForLevel } from '../src/sim/types';
 
@@ -16,11 +16,24 @@ type Axis = 'str' | 'agi' | 'sta' | 'int' | 'spi' | 'armor';
 const AXES: readonly Axis[] = ['str', 'agi', 'sta', 'int', 'spi', 'armor'];
 
 // Tier identity is derived from the reagent contract, exactly the doctrine the
-// table's section comments state: Greater is the arcane_shard consumer, Runed
-// consumes a resonant_* typed disenchant secondary, base is everything else.
-const isGreater = (e: EnchantDef) => e.reagents.some((r) => r.itemId === 'arcane_shard');
-const isRuned = (e: EnchantDef) => e.reagents.some((r) => r.itemId.startsWith('resonant_'));
-const isBase = (e: EnchantDef) => !isGreater(e) && !isRuned(e);
+// table's section comments state: Lucent (the apex tier) consumes
+// lucent_reagent, Greater is the arcane_shard consumer, Runed consumes a
+// resonant_* typed disenchant secondary, base is everything else. Apex is
+// tested FIRST and subtracted from the other three, the same top-down
+// precedence src/ui/hud/professions/enchant_apply_view.ts enchantTier and the sim's
+// enchantGainTier use: every Lucent enchant also draws on the tier below it
+// (shard or dust), so an apex-blind predicate would read three of the four as
+// Greater and quietly widen that tier's pinned id list.
+// Read from the sim's own APEX_TIER_REAGENT rather than re-spelling the id:
+// the tier identity here and the gain tier enchantGainTier scores are the
+// same claim about the same reagent, and a rename that reached only one of
+// them would leave this predicate silently matching nothing.
+const isApex = (e: EnchantDef) => e.reagents.some((r) => r.itemId === APEX_TIER_REAGENT);
+const isGreater = (e: EnchantDef) =>
+  !isApex(e) && e.reagents.some((r) => r.itemId === 'arcane_shard');
+const isRuned = (e: EnchantDef) =>
+  !isApex(e) && e.reagents.some((r) => r.itemId.startsWith('resonant_'));
+const isBase = (e: EnchantDef) => !isApex(e) && !isGreater(e) && !isRuned(e);
 
 const axisOf = (e: EnchantDef): Axis => AXES.filter((a) => (e.statBonus[a] ?? 0) > 0)[0];
 
@@ -36,6 +49,31 @@ function bestPerSlotTotal(axis: Axis, include: (e: EnchantDef) => boolean = () =
   }
   let total = 0;
   for (const [slot, v] of bySlot) total += slot === 'ring' ? v * 2 : v;
+  return total;
+}
+
+/** The same best-per-slot stack, but over a LOADOUT rather than the slot list.
+ *  bestPerSlotTotal counts each ItemSlot once (rings twice) and treats the
+ *  offhand as a slot with its own enchant line. A DUAL-WIELDER's offhand holds
+ *  a 'mainhand'-kind item, so it takes a MAINHAND enchant and no offhand one:
+ *  the reachable stack is different in both directions, and it is the one the
+ *  R5 envelope pays for. */
+function loadoutStack(axis: Axis, loadout: 'shieldOrHeld' | 'dualWield'): number {
+  const best = (slot: string): number => bestValue(slot, axis, () => true);
+  const slots = [
+    'mainhand',
+    'chest',
+    'feet',
+    'gloves',
+    'helmet',
+    'legs',
+    'neck',
+    'shoulder',
+    'waist',
+  ];
+  let total = slots.reduce((a, slot) => a + best(slot), 0);
+  total += best('ring') * 2;
+  total += loadout === 'dualWield' ? best('mainhand') : best('offhand');
   return total;
 }
 
@@ -66,20 +104,78 @@ describe('enchant table magnitude invariants', () => {
     // included): str 125, agi 130, sta 113, int 120, spi 93. The enchant
     // layer lands at roughly 15 to 25 percent of that budget per axis, the
     // "finishing bonus" target, instead of the pre-trim 30 to 43 percent.
-    expect(bestPerSlotTotal('int')).toBe(24); // 20 percent of the 120 int budget
-    // 27 = the prior 24 plus offhand's enchant_offhand_stamina (+3, #2825: the
-    // offhand slot had no base enchant at all before that fix); 24 percent of
-    // the 113 sta budget, still inside the finishing-bonus band. The HP pin
-    // below covers the x10 conversion, over its own fixed 5-slot gear list
-    // that does not include offhand, so it is unaffected by this stack.
-    expect(bestPerSlotTotal('sta')).toBe(27);
-    expect(bestPerSlotTotal('agi')).toBe(25); // 19 percent of the 130 agi budget
-    expect(bestPerSlotTotal('str')).toBe(19); // 15 percent of the 125 str budget
+    // These are BEST-per-slot totals over the whole table, so since the
+    // Masterwrought Lucent tier landed (phase 10) four of them describe an
+    // apex enchanter at skill 100 or above, not the ordinary stack: the four
+    // axes the Lucent tier touches each moved by exactly its own slot's step
+    // (str +1 on the weapon since Phase 15 trimmed the rung 7 to 6, int +1 on
+    // the weapon via the Spellpower twin the
+    // phase 10 QA D10-D1 ruling added, agi +1 on the boots, sta +6 on the
+    // chest, which is the Perfected-only Lucent Infusion at 13 over the
+    // Greater 7, a rung NO live item can take until phase 12 mints a
+    // Perfected copy). spi and armor are untouched by the tier and keep
+    // their pre-phase values.
+    // The percentages below still name the level-20 BiS budgets, so the sta
+    // line reads high by design; phase 15 owns the envelope verification.
+    expect(bestPerSlotTotal('int')).toBe(25); // 24 before the Lucent weapon int twin
+    // 27 before the Lucent tier (24 plus offhand's enchant_offhand_stamina,
+    // #2825: the offhand slot had no base enchant at all before that fix).
+    // The HP pin below covers the x10 conversion, over its own fixed 5-slot
+    // gear list that includes neither offhand nor a Lucent enchant, so it is
+    // unaffected by this stack.
+    expect(bestPerSlotTotal('sta')).toBe(33);
+    expect(bestPerSlotTotal('agi')).toBe(26); // 25 before the Lucent boots step
+    expect(bestPerSlotTotal('str')).toBe(20); // 19 before the Lucent weapon step
     // Spirit rides only neck, chest, and the two rings, so its stack sits
     // below the band by construction; accepted and recorded rather than
     // padded with new enchants.
     expect(bestPerSlotTotal('spi')).toBe(12); // 13 percent of the 93 spi budget
     expect(bestPerSlotTotal('armor')).toBe(35); // helmet 15 plus chest 20, the halved reinforcement pair
+  });
+
+  it('the LOADOUT-aware stacks: a dual-wielder reaches a different ceiling', () => {
+    // ADDED AT PHASE 15. The stack above is a per-ItemSlot model: rings count
+    // twice, the mainhand once, and the offhand is treated as a slot with its
+    // own enchant line. A dual-wielder's offhand holds a 'mainhand'-kind item,
+    // so it takes a MAINHAND enchant and never enchant_offhand_stamina, and
+    // the reachable stack moves in BOTH directions: str, agi and int go UP by
+    // one weapon rung, sta goes DOWN by the offhand line it forfeits. The
+    // per-slot model cannot see the loadout that maximises three of the four
+    // axes it exists to bound, which is exactly how the apex weapon rung's
+    // real per-character size went unnoticed until the R5 measurement.
+    // Literals in both columns so a rung retune re-cuts this table beside the
+    // defs, and the same-loadout column is asserted equal to the per-slot
+    // model so the two can never silently disagree about a non-weapon axis.
+    for (const axis of ['str', 'agi', 'sta', 'int'] as const) {
+      expect(loadoutStack(axis, 'shieldOrHeld'), `${axis} shield/held`).toBe(
+        bestPerSlotTotal(axis),
+      );
+    }
+    expect(loadoutStack('str', 'dualWield')).toBe(26);
+    expect(loadoutStack('agi', 'dualWield')).toBe(28);
+    expect(loadoutStack('int', 'dualWield')).toBe(31);
+    expect(loadoutStack('sta', 'dualWield')).toBe(30);
+    // The per-axis dual-wield lead, pinned as LITERALS (the Phase 15 QA,
+    // round 2: a relation comparing loadoutStack's columns to
+    // bestValue(mainhand) - bestValue(offhand) is an algebraic identity of
+    // loadoutStack's own construction and can never red on a content change,
+    // proven by mutation). The leads: a second weapon rung on str and int, a
+    // second boot-adjacent weapon line on agi, and a NEGATIVE sta lead from
+    // trading enchant_offhand_stamina away for the second weapon.
+    const dwLead = (axis: 'str' | 'agi' | 'sta' | 'int'): number =>
+      loadoutStack(axis, 'dualWield') - loadoutStack(axis, 'shieldOrHeld');
+    expect(dwLead('str')).toBe(6);
+    expect(dwLead('agi')).toBe(2);
+    expect(dwLead('int')).toBe(6);
+    expect(dwLead('sta')).toBe(-3);
+    // The sta lead's two DIRECT def welds, bypassing the shared helper: the
+    // forfeited line is exactly enchant_offhand_stamina's own magnitude, and
+    // no mainhand enchant carries stamina to offset it.
+    expect(ENCHANTS.enchant_offhand_stamina.statBonus.sta, 'the forfeited offhand line').toBe(3);
+    expect(
+      bestValue('mainhand', 'sta', () => true),
+      'no mainhand stamina enchant exists',
+    ).toBe(0);
   });
 
   it('every Greater enchant beats the best base option on its slot and axis by at least 3', () => {
@@ -125,6 +221,57 @@ describe('enchant table magnitude invariants', () => {
     // sibling at all. Pin their magnitudes as literals.
     expect(ENCHANTS.enchant_chest_runeweave.statBonus).toEqual({ spi: 5 });
     expect(ENCHANTS.enchant_legs_runed_hide.statBonus).toEqual({ agi: 4 });
+  });
+
+  it('every Lucent enchant stands strictly above every lower tier on its slot and axis', () => {
+    const apex = Object.values(ENCHANTS).filter(isApex);
+    expect(apex.map((e) => e.id).sort()).toEqual([
+      'enchant_chest_lucent_stamina',
+      'enchant_feet_lucent_agility',
+      'enchant_lucent_infusion',
+      'enchant_weapon_lucent_might',
+      'enchant_weapon_lucent_spellpower',
+    ]);
+    for (const a of apex) {
+      const axis = axisOf(a);
+      // The previous top on this slot and axis is the best of the three
+      // non-apex tiers, whichever of them the slot happens to have (the boots
+      // line has only base, the weapon and chest lines have Greater).
+      const below = Math.max(
+        bestValue(a.itemSlot, axis, isBase),
+        bestValue(a.itemSlot, axis, isRuned),
+        bestValue(a.itemSlot, axis, isGreater),
+      );
+      expect(below, `${a.id}: a lower-tier sibling exists`).toBeGreaterThan(0);
+      expect(a.statBonus[axis] ?? 0, `${a.id}: step over the tier below`).toBeGreaterThan(below);
+    }
+  });
+
+  it('gates the Lucent tier: every one skill-gated, exactly one Perfected-only', () => {
+    // The tier's identity is the gate, not just the magnitude: these are the
+    // first enchants in the table that are not free-floor, and the Infusion is
+    // the one def the phase 12 Perfecting stage flips live.
+    for (const a of Object.values(ENCHANTS).filter(isApex)) {
+      expect(a.skillReq, `${a.id}: skill gate`).toBeGreaterThan(0);
+    }
+    expect(
+      Object.values(ENCHANTS)
+        .filter((e) => e.requiresPerfected)
+        .map((e) => e.id),
+    ).toEqual(['enchant_lucent_infusion']);
+    // Every enchant OUTSIDE the apex tier keeps the historical free floor: an
+    // absent skillReq, not a zero one.
+    for (const e of Object.values(ENCHANTS).filter((x) => !isApex(x))) {
+      expect(e.skillReq, `${e.id}: free floor`).toBeUndefined();
+      expect(e.requiresPerfected, `${e.id}: any-copy`).toBeUndefined();
+    }
+    // The two rungs the design settled on: the apex quartet at the skill-100
+    // product rung, the capstone Infusion at the 125 cap.
+    expect(ENCHANTS.enchant_weapon_lucent_might.skillReq).toBe(100);
+    expect(ENCHANTS.enchant_weapon_lucent_spellpower.skillReq).toBe(100);
+    expect(ENCHANTS.enchant_chest_lucent_stamina.skillReq).toBe(100);
+    expect(ENCHANTS.enchant_feet_lucent_agility.skillReq).toBe(100);
+    expect(ENCHANTS.enchant_lucent_infusion.skillReq).toBe(125);
   });
 });
 
@@ -237,6 +384,58 @@ describe('frozen enchant magnitudes (the #2415 replace-exactness premise)', () =
       enchant_chest_runeweave: { spi: 5 },
       enchant_legs_runed_hide: { agi: 4 },
       enchant_helmet_runed_links: { sta: 5 },
+      enchant_weapon_lucent_might: { str: 6 },
+      enchant_weapon_lucent_spellpower: { int: 6 },
+      enchant_chest_lucent_stamina: { sta: 10 },
+      enchant_feet_lucent_agility: { agi: 3 },
+      enchant_lucent_infusion: { sta: 13 },
     });
+  });
+});
+
+describe('the EnchantDef shape stays stat-only (R7)', () => {
+  // R7 locks the enchant table to STAT bonuses: no movement speed, no proc, no
+  // on-use, no cooldown knob. Every OTHER pin in this file reads statBonus, so
+  // all of them stay green over a def that grew a `moveSpeed` or `proc` field
+  // beside it. This is the one assertion that would notice, and it is a
+  // whole-def key sweep rather than a field check because the hazard is a knob
+  // nobody has thought of yet: an unknown key fails by DEFAULT.
+  const ALLOWED_ENCHANT_KEYS = [
+    'id',
+    'name',
+    'itemSlot',
+    'reagents',
+    'statBonus',
+    'skillReq',
+    'requiresPerfected',
+  ] as const;
+
+  it('every row carries only allowlisted keys, and the required ones', () => {
+    const rows = Object.values(ENCHANTS);
+    expect(rows.length, 'the table really loaded').toBeGreaterThanOrEqual(20);
+    for (const enchant of rows) {
+      for (const key of Object.keys(enchant)) {
+        expect(
+          ALLOWED_ENCHANT_KEYS,
+          `${enchant.id} carries "${key}": if this is a new authored field, decide against ` +
+            'R7 (stat-only) before allowlisting it here',
+        ).toContain(key);
+      }
+      // The floor in the other direction, so the sweep cannot pass over a row
+      // that lost its stat line entirely.
+      for (const required of ['id', 'name', 'itemSlot', 'reagents', 'statBonus']) {
+        expect(Object.keys(enchant), `${enchant.id} is missing ${required}`).toContain(required);
+      }
+    }
+  });
+
+  it('the sweep really rejects an unknown knob (positive control)', () => {
+    // Without this, an allowlist that silently matched everything would pass
+    // the arm above forever.
+    const rogue = { ...ENCHANTS.enchant_weapon_might, moveSpeed: 0.1 };
+    const unknown = Object.keys(rogue).filter(
+      (k) => !(ALLOWED_ENCHANT_KEYS as readonly string[]).includes(k),
+    );
+    expect(unknown).toEqual(['moveSpeed']);
   });
 });

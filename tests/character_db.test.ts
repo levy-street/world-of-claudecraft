@@ -1386,7 +1386,6 @@ describe('bankBonusFactsForAccount', () => {
           discord_linked: false,
           wallet_linked: true,
           qualified_referrals: 3,
-          character_count: 2,
         },
       ],
     } as any);
@@ -1420,7 +1419,6 @@ describe('bankBonusFactsForAccount', () => {
       discordLinked: false,
       walletLinked: true,
       qualifiedReferrals: 3,
-      characterCount: 2,
     });
   });
 
@@ -1431,7 +1429,6 @@ describe('bankBonusFactsForAccount', () => {
       discordLinked: false,
       walletLinked: false,
       qualifiedReferrals: 0,
-      characterCount: 0,
     });
   });
 
@@ -1451,7 +1448,6 @@ describe('bankBonusFactsForAccount', () => {
       discordLinked: true,
       walletLinked: false,
       qualifiedReferrals: 0,
-      characterCount: 0,
     });
   });
 });
@@ -1531,6 +1527,62 @@ describe('createCharacterCapped', () => {
     expect(client.query.mock.calls.map((c) => c[0])).toContain('ROLLBACK');
     expect(client.query.mock.calls.map((c) => c[0])).not.toContain('COMMIT');
     expect(client.release).toHaveBeenCalledTimes(1);
+  });
+
+  it('omits the level column entirely when no level is asked for (the schema default)', async () => {
+    // Every caller but the PBE boost creates at level 1 and lets the DDL
+    // default say so; the INSERT must not name the column at all, or the
+    // default would be duplicated in two places to drift apart.
+    const client = clientStub();
+    dbMock.connect.mockResolvedValue(client as any);
+    client.query
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // BEGIN
+      .mockResolvedValueOnce({ rows: [{ id: 7 }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({ rows: [{ n: 0 }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({ rows: [{ id: 51, level: 1 }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // player metric facts
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // COMMIT
+
+    const row = await createCharacterCapped(7, 'Defaulted', 'mage', 10, null, null);
+
+    const insert = client.query.mock.calls[3];
+    expect(String(insert[0])).toContain(
+      'INSERT INTO characters (account_id, name, class, realm, state, appearance) VALUES ($1, $2, $3, $4, $5, $6)',
+    );
+    expect(insert[1]).toHaveLength(6);
+    expect(String(insert[0])).toContain(
+      'RETURNING id, account_id, name, class, level, state, is_gm, force_rename, appearance',
+    );
+    expect(row?.level).toBe(1);
+  });
+
+  it('carries an asked-for level in the SAME insert (the boost roster write amplification)', async () => {
+    // The Phase 18 database review's B3: the PBE boost created the row with
+    // its whole ~38 KB blob and then REWROTE the whole blob a second time
+    // only to set the level column, nine times per boosted registration. The
+    // create takes the level now, so the second write has nothing left to do.
+    const client = clientStub();
+    dbMock.connect.mockResolvedValue(client as any);
+    client.query
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // BEGIN
+      .mockResolvedValueOnce({ rows: [{ id: 7 }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({ rows: [{ n: 0 }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({ rows: [{ id: 52, level: 20 }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // player metric facts
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // COMMIT
+
+    const state = { level: 20 } as any;
+    const row = await createCharacterCapped(7, 'Boosted', 'mage', 10, state, null, 20);
+
+    const insert = client.query.mock.calls[3];
+    expect(String(insert[0])).toContain(
+      'INSERT INTO characters (account_id, name, class, realm, state, appearance, level) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+    );
+    // Parameterized, never interpolated, and the blob rides the same insert.
+    expect(insert[1]).toEqual([7, 'Boosted', 'mage', REALM, JSON.stringify(state), null, 20]);
+    // The RETURNING row reports the level that actually landed, which is what
+    // lets the boost prove its second write is unnecessary rather than assume it.
+    expect(row?.level).toBe(20);
   });
 });
 

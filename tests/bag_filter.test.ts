@@ -37,6 +37,10 @@ const ITEMS: Record<string, ItemDef> = {
   helm: { id: 'helm', name: 'Iron Helm', kind: 'armor', slot: 'helmet', quality: 'rare' },
   potion: { id: 'potion', name: 'Minor Healing Potion', kind: 'potion', quality: 'common' },
   bread: { id: 'bread', name: 'Crusty Bread', kind: 'food', quality: 'common' },
+  // A scroll (Masterwrought phase 06 inscription): a timed stamina buff in the
+  // elixir exclusivity family (src/sim/types.ts), so it files under the
+  // consumable chip beside potions and elixirs.
+  scroll: { id: 'scroll', name: 'Scroll of Stamina', kind: 'scroll', quality: 'common' },
   pelt: { id: 'pelt', name: 'Wolf Pelt', kind: 'junk', quality: 'poor' },
   rod: { id: 'rod', name: 'Fishing Rod', kind: 'tool', quality: 'common' },
   // A REAL catalog id: the material chip is honest-taxonomy set membership
@@ -56,6 +60,18 @@ const ITEMS: Record<string, ItemDef> = {
     kind: 'mount',
     mount: 'valorsteed',
     quality: 'common',
+  },
+  // A recipe pattern: deliberately ALL-ONLY (no chip fits a permanent unlock),
+  // and does not stack (UNSTACKED_KIND in src/sim/bags.ts).
+  pattern: {
+    id: 'pattern',
+    name: 'Pattern: Eastbrook Arming Sword',
+    kind: 'recipe',
+    // A REAL recipe id (recipes.ts), not an item id: nothing here resolves it,
+    // but a fixture carrying an item id in a recipe field is the kind of thing
+    // the next author copies into a place that DOES resolve it.
+    teachesRecipeId: 'recipe_eastbrook_arming_sword',
+    quality: 'rare',
   },
 } as unknown as Record<string, ItemDef>;
 
@@ -94,9 +110,13 @@ describe('applyBagFilter: category filtering', () => {
     expect(ids(out)).toEqual(['relic', 'helm']);
   });
 
-  it('keeps food, drink, potions and elixirs as consumables', () => {
-    const out = applyBagFilter(INV, lookup, { category: 'consumable', sort: 'recent', search: '' });
-    expect(ids(out)).toEqual(['potion', 'bread']);
+  it('keeps food, drink, potions, elixirs and scrolls as consumables', () => {
+    // Scrolls joined the chip with the Masterwrought phase 06 inscription
+    // catalog: a timed buff a player filters for in a fight, mirroring the
+    // KIND_RANK potion/elixir/scroll run (src/sim/inventory_sort.ts).
+    const inv: InvSlot[] = [...INV, { itemId: 'scroll', count: 2 }];
+    const out = applyBagFilter(inv, lookup, { category: 'consumable', sort: 'recent', search: '' });
+    expect(ids(out)).toEqual(['potion', 'bread', 'scroll']);
   });
 
   it('keeps only honest materials: grey junk and tools no longer match the chip', () => {
@@ -353,6 +373,31 @@ describe('BAG_CATEGORIES', () => {
   });
 });
 
+describe('matchesCategory: recipe patterns are ALL-ONLY', () => {
+  it('matches "all" and no other chip, driven off the live BAG_CATEGORIES list', () => {
+    // Driving off BAG_CATEGORIES (not a hand-written list) means a future chip
+    // added to the row cannot silently start claiming patterns without this
+    // test noticing.
+    for (const category of BAG_CATEGORIES) {
+      expect(matchesCategory(ITEMS.pattern, category), category).toBe(category === 'all');
+    }
+  });
+});
+
+describe('matchesCategory: scrolls are consumables (Masterwrought phase 06)', () => {
+  it('matches "all" and the consumable chip only, driven off the live BAG_CATEGORIES list', () => {
+    // Same census discipline as the recipe block above: driving off the live
+    // BAG_CATEGORIES list means a future chip cannot silently start or stop
+    // claiming scrolls. Landing under 'consumable' is also what keeps the
+    // three phase 06 inscription scrolls out of the All-only census below.
+    for (const category of BAG_CATEGORIES) {
+      expect(matchesCategory(ITEMS.scroll, category), category).toBe(
+        category === 'all' || category === 'consumable',
+      );
+    }
+  });
+});
+
 describe('bagFilterIsDefault (shared by the bags grid and the bank window)', () => {
   const state = (over: Partial<BagFilterState> = {}): BagFilterState => ({
     ...DEFAULT_BAG_FILTER,
@@ -446,50 +491,140 @@ describe('chip reachability census: the All-only set, pinned', () => {
   // still no chip, since matchesCategory has no bag arm). This census makes the ruling
   // enforceable: a chip or taxonomy edit that strands MORE items (or quietly
   // rescues one the settlement excluded) reds an exact-set diff naming it.
+  // The nine Masterwrought phase 07 intermediates ride the wyrmfall_core
+  // shape: All-only until their phase 08/09/10 apex consumer lands (each then
+  // derives into the material set and gains the materials chip; move it out
+  // of here in the same change as its ALLOWED_UNCLASSIFIED_JUNK row in
+  // material_taxonomy). The Quickening Catalyst is deliberately absent: its
+  // nine in-phase consumers already classify it as a material.
+  // masterwrought Phase 11f's six farming patterns join the 28 apex ones for
+  // the same reason the apex set is here: a kind 'recipe' teaching item is not
+  // gear, a consumable, or a material, so it matches no chip and reaching it
+  // through All is the settled behavior rather than a gap.
   const ALL_ONLY = [
     'amber_hide',
-    'bandit_bandana',
+    // masterwrought Phase 11l removed the five promoted trophy drops
+    // (bandit_bandana, cracked_ogre_tusk, cracked_wyrm_scale, mudfin_scale,
+    // tallow_candle): the trophy recipes are their consumers, so all five
+    // derive into the material set and gain the materials chip. Its second
+    // review round removed emberwing_cinderscale and old_cragmaws_pelt the
+    // same way: the two leather trophy recipes consume them, so both derive
+    // IN too.
+    // Back since the 11l QA output-excluded it (with the cracked fetish
+    // below): no recipe consumes the bogiron nugget, so it is poor grey
+    // trash outside the material set again, All-only exactly as before the
+    // phase.
     'bogiron_nugget',
     'briny_idol',
     'burlap_reagent_pouch',
+    // Back since the phase's sixth fix round output-excluded it: no recipe
+    // consumes the chipped tusk, so it is poor grey trash outside the
+    // material set again, All-only exactly as before the phase.
     'chipped_tusk',
     'cracked_fetish',
-    'cracked_ogre_tusk',
-    'cracked_wyrm_scale',
     'dawnhold_posy',
+    // Masterwrought Phase 13 (2026-08-27): the promotion writ, rare
+    // kind-junk consumed by the promotion itself (no use/equip/place
+    // predicate claims it), so it reads under All exactly like the other
+    // ruled junk; the Materials chip correctly skips a non-material.
+    'deed_of_making',
     'deepfen_pearl',
     'duskweave_bag',
-    'emberwing_cinderscale',
     'foragers_haversack',
     'frayed_prayer_beads',
     'gleamstag_charm',
     'gravewoven_bag',
     'guardian_core',
+    // The Phase 12 shared feast: a placeable crafted junk-kind item whose
+    // click PLACES (never uses or equips), so no chip predicate claims it;
+    // All-only is the honest home (the tonic settlement's shape).
+    'harvest_feast',
     'inert_storm_shard',
     'last_keep_signet',
     'linen_pouch',
     'loombound_reagent_satchel',
     'mistcallers_duffel',
     'moonpale_scale',
-    'mudfin_scale',
     'necromancers_reagent_satchel',
     'ogre_toe_ring',
-    'old_cragmaws_pelt',
     'pale_pearl',
+    // Masterwrought phase 11: the 28 apex patterns. Kind 'recipe' is
+    // deliberately All-only in the BAG window (the phase 02 chip-count
+    // restraint decision, first to revisit if the chip rail earns another
+    // entry); the World Market gained its own Patterns chip the same phase,
+    // so bag-side All-only is a bag-window call, never lost findability.
+    'pattern_barksong_handguards',
+    'pattern_briarstep_jerkin',
+    // masterwrought Phase 11i's four: three angler recipes and the apex rod's
+    // schematic, All-only on the same kind-'recipe' rule as every pattern here.
+    // Phase 11k retired the capstone feast's pattern with its recipe and added
+    // three of its own, further down in sort order.
+    'pattern_clockreel_fishing_rod',
+    'pattern_duskforged_bulwark',
+    'pattern_duskforged_warblade',
+    'pattern_evergarden_braised_greens',
+    'pattern_evergarden_harvest_platter',
+    'pattern_evergarden_sunmelon_tart',
+    'pattern_fenbloom_breeches',
+    'pattern_forgefold_legguards',
+    'pattern_grand_cauldron',
+    'pattern_gyrelens_array',
+    'pattern_harvest_feast',
+    'pattern_highwatch_barley_porridge',
+    'pattern_highwatch_gourd_soup',
+    'pattern_ironhusk_flask',
+    'pattern_laden_hearth',
+    'pattern_makers_charm',
+    'pattern_masters_field_forge',
+    'pattern_peppered_deepbarb_catfish',
+    'pattern_prismglass_loop',
+    'pattern_ridgebreaker',
+    'pattern_roast_hollowgill_sturgeon',
+    'pattern_runewater_flask',
+    'pattern_sageleaf_chowder',
+    // masterwrought Phase 11k's three apex feast recipes, on the same
+    // kind-'recipe' rule as every other pattern in this list.
+    'pattern_sageleaf_feast',
+    'pattern_spiritweld_girdle',
+    'pattern_stonepot_feast',
+    'pattern_stonepot_stew',
+    'pattern_sunspun_handwraps',
+    'pattern_sunspun_haversack',
+    'pattern_sunspun_leggings',
+    'pattern_sunspun_vestments',
+    'pattern_voidbound_grimoire',
+    'pattern_warboar_flask',
+    'pattern_wardspeaker_sabatons',
+    'pattern_warhewn_signet',
+    'pattern_warspice_feast',
+    'pattern_warspice_skewers',
+    'pattern_wyrmfall_pendant',
     'resonant_weave_bag',
+    // masterwrought Phase 11k's three apex feasts, the same shape as
+    // harvest_feast and All-only for the same reason: a placeable crafted
+    // junk-kind item whose click PLACES rather than uses or equips.
+    'sageleaf_feast',
     'silkspun_satchel',
     'soft_down',
     'soggy_boot',
     'soggy_moccasin',
     'stag_antler',
-    'tallow_candle',
+    'stonepot_feast',
+    // Masterwrought phase 08: the apex bag joins the bag-kind rows;
+    // forgefold_plating, sunspun_bolt, wyrmfall_core, and wyrmhide_cording
+    // left this list with their apex consumers (they now derive into the
+    // material set and gain the materials chip). Phase 10 did the same for
+    // seasoned_stock, whose consumers are the apex role foods and the Laden
+    // Hearth.
+    'sunspun_haversack',
     'tangled_weed',
     'travelers_knapsack',
+    'warspice_feast',
     'wayfarers_backpack',
     'wolfhide_satchel',
   ] as const;
 
-  it('exactly the ruled junk and bag items match no chip', () => {
+  it('exactly the pinned All-only set (ruled junk plus the bag-kind items) matches no chip', () => {
     const allOnly = Object.values(REAL_ITEMS)
       .filter((def) => !BAG_CATEGORIES.some((c) => c !== 'all' && matchesCategory(def, c)))
       .map((d) => d.id)

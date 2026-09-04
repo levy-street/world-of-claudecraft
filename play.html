@@ -508,6 +508,8 @@
     <div id="deeds-window" class="window panel"></div>
     <div id="reliquary-window" class="window panel"></div>
     <div id="professions-window" class="window panel"></div>
+    <div id="harvest-journal-window" class="window panel"></div>
+    <div id="plant-sheet-window" class="window panel"></div>
     <div id="calendar-window" class="window panel"></div>
     <div id="arena-status"></div>
     <div id="options-menu" class="window panel"></div>
@@ -524,9 +526,11 @@
         <button class="micro-btn" id="mm-deeds" data-i18n-title="hudChrome.deeds.title" data-i18n-aria="hudChrome.deeds.title" title="Book of Deeds" aria-label="Book of Deeds" data-icon="book"><span class="keybind">s-z</span></button>
         <button type="button" class="micro-btn" id="mm-reliquary" data-i18n-title="hudChrome.reliquary.title" data-i18n-aria="hudChrome.reliquary.title" title="The Reliquary" aria-label="The Reliquary" data-icon="crown"><span class="keybind">s-x</span></button>
         <button type="button" class="micro-btn" id="mm-professions" data-i18n-title="hudChrome.professions.title" data-i18n-aria="hudChrome.professions.title" title="Professions" aria-label="Professions" data-icon="professions"><span class="keybind">s-p</span></button>
+        <button type="button" class="micro-btn" id="mm-harvest-journal" data-i18n-title="hudChrome.harvestJournal.title" data-i18n-aria="hudChrome.harvestJournal.title" title="Harvest Journal" aria-label="Harvest Journal" data-icon="harvest-journal"><span class="keybind">s-k</span></button>
         <button class="micro-btn" id="mm-map" data-i18n-title="hud.keybinds.actions.map" data-i18n-aria="hud.keybinds.actions.map" title="World Map" aria-label="World Map" data-icon="map"><span class="keybind">m</span></button>
         <button class="micro-btn" id="mm-bag" data-i18n-title="itemUi.bags.title" data-i18n-aria="itemUi.bags.title" title="Bags" aria-label="Bags" data-icon="bags"><span class="keybind">b</span></button>
         <button class="micro-btn" id="mm-crafting" data-i18n-title="hudChrome.crafting.title" data-i18n-aria="hudChrome.crafting.title" title="Crafting" aria-label="Crafting" data-icon="crafting"><span class="keybind">t</span></button>
+        <button type="button" class="micro-btn" id="mm-perfecting" data-i18n-title="hudChrome.perfecting.title" data-i18n-aria="hudChrome.perfecting.title" title="Perfecting" aria-label="Perfecting" data-icon="perfecting"><span class="keybind">s-t</span></button>
       </div>
       <div id="side-buttons-col-b" class="side-buttons-col">
         <button id="daily-rewards-button" type="button" data-i18n-title="hudChrome.wocStore.title" data-i18n-aria="hudChrome.wocStore.title" title="WOC Store" aria-label="WOC Store"></button>
@@ -561,6 +565,12 @@
       <button type="button" class="btn" id="resurrect-corpse-btn" data-i18n="hudChrome.death.resurrectAtCorpse">Resurrect at Corpse</button>
       <button type="button" class="btn" id="resurrect-healer-btn" data-i18n="hudChrome.death.resurrectAtHealer">The Pale Keeper (Keeper's Toll)</button>
     </div>
+    <!-- Interact affordance: a small non-blocking line, hidden until an interact press
+         is ambiguous between two farming targets in reach (a placed feast over a garden
+         bed). role=status so a screen reader hears the ambiguity the sighted line shows;
+         it carries no authored text because every sentence is localized at paint time by
+         src/ui/hud/professions/farm_press_affordance_controller.ts. -->
+    <div id="interact-affordance" role="status" aria-live="polite"></div>
   </div>
 
   <textarea id="chat-input" rows="1" maxlength="255" data-i18n-placeholder="hud.core.chatPlaceholder" placeholder="Say something... (/w name, /r, /p, /gu, /o, /general, /join world|lfg, /afk, /dnd)" autocomplete="off" autocapitalize="sentences" autocorrect="off" spellcheck="false" data-1p-ignore data-lpignore="true" data-bwignore data-form-type="other"></textarea>

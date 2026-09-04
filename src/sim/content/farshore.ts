@@ -193,6 +193,13 @@ export const FARSHORE_MOBS: Record<string, MobTemplate> = {
     loot: [{ copper: 35, chance: 1 }],
     scale: 1.45,
     color: 0x8a2f6a,
+    // Ogre stock like the Thornpeak ogres, so tusked (the game ships
+    // cracked_ogre_tusk). Phase 11m added the tag as the band-1 open-world tusk
+    // source in place of dune_troll, whose fang beside tusk would put two
+    // specimen-less families on one corpse (the capacity pre-gate premise,
+    // tests/corpse_harvest_sim.test.ts). A count-1 elite, so a hollow tusk
+    // floor member: the ledger records its density.
+    componentTags: ['tusk'],
   },
   // Nell's husband (q_fs_bram_come_home), thrown back by the sea at the
   // nets-break and holed up in his wrecked boat past the Landing's point.

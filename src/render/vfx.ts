@@ -15,6 +15,11 @@ import {
   ignivarJudgmentFireRate,
   writeIgnivarJudgmentFireSample,
 } from './ignivar_judgment_fire_core';
+import {
+  LEGENDARY_REGALIA_COLOR,
+  LEGENDARY_REGALIA_GOLD,
+  LEGENDARY_REGALIA_RATE_PER_SEC,
+} from './legendary_regalia_core';
 import { PaladinSpellVfxController, type PaladinSpellVfxSprite } from './paladin_spell_vfx';
 import type { VfxAnchorResolver, VfxOffsetAnchorResolver } from './vfx_anchor';
 import {
@@ -82,6 +87,24 @@ function projectileSchoolColors(
     projectileColorCache.set(key, c);
   }
   return c;
+}
+
+// Legendary-regalia mote colors, the projectileSchoolColors shape: the emitter
+// is continuous (called per frame while any worn slot is legendary-rolled), so
+// its emit path must allocate nothing. spawn() copies components, never
+// retaining the reference, and the pair is keyed on GFX.composer because the
+// hdr() multiplier bakes into the cached values.
+let regaliaColorComposer: boolean | null = null;
+let regaliaColors: { ember: THREE.Color; gold: THREE.Color } | null = null;
+function legendaryRegaliaColors(): { ember: THREE.Color; gold: THREE.Color } {
+  if (regaliaColors === null || regaliaColorComposer !== GFX.composer) {
+    regaliaColorComposer = GFX.composer;
+    regaliaColors = {
+      ember: new THREE.Color(LEGENDARY_REGALIA_COLOR).multiplyScalar(hdr(2.1)),
+      gold: new THREE.Color(LEGENDARY_REGALIA_GOLD).multiplyScalar(hdr(1.6)),
+    };
+  }
+  return regaliaColors;
 }
 
 // ---------------------------------------------------------------------------
@@ -2061,6 +2084,36 @@ export class Vfx {
         0.85 + Math.random() * 0.5,
         -0.2,
         smoke ? SPR.smoke : SPR.magicWisp,
+      );
+    }
+  }
+
+  // Orange (promoted legendary) worn-gear identity: a sparse, constant drift
+  // of molten-gold forge motes rising off a living wearer (continuous, called
+  // per frame while any worn slot is legendary-rolled; the predicate and the
+  // distance shed live in legendary_regalia_core.ts).
+  legendaryRegalia(entityId: number, dt: number): void {
+    const n = this.emitCount(LEGENDARY_REGALIA_RATE_PER_SEC, dt);
+    if (!n) return;
+    const at = this.anchor(entityId, 0.4);
+    if (!at) return;
+    const { ember, gold } = legendaryRegaliaColors();
+    for (let k = 0; k < n; k++) {
+      const a = Math.random() * Math.PI * 2;
+      const r = 0.3 + Math.random() * 0.35;
+      const star = Math.random() < 0.25;
+      this.spawn(
+        at.x + Math.sin(a) * r,
+        at.y + (Math.random() - 0.2) * 0.9,
+        at.z + Math.cos(a) * r,
+        Math.sin(a) * 0.06,
+        0.25 + Math.random() * 0.3,
+        Math.cos(a) * 0.06,
+        star ? gold : ember,
+        star ? 0.2 : 0.15,
+        1.1 + Math.random() * 0.5,
+        -0.15,
+        star ? SPR.star : SPR.sparkBurst,
       );
     }
   }

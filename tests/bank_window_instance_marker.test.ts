@@ -39,7 +39,13 @@ interface HarnessWorld {
   bankBuySlots(): void;
 }
 
+// Every icon the grid asked its dep for, with the quality it asked with: the
+// rim regression class (a 1-ary call swallowing the copy's quality) is only
+// visible to a stub that records its second argument.
+const iconCalls: { id: string; quality: string | undefined }[] = [];
+
 function windowFor(slots: InvSlot[]): HTMLElement {
+  iconCalls.length = 0;
   const world: HarnessWorld = {
     bankInfo: bankInfo(slots),
     inventory: [],
@@ -51,7 +57,10 @@ function windowFor(slots: InvSlot[]): HTMLElement {
   document.body.appendChild(root);
   const noop = (): void => {};
   const deps: BankWindowDeps = {
-    itemIcon: () => '<span class="item-icon"></span>',
+    itemIcon: (item, quality) => {
+      iconCalls.push({ id: item.id, quality });
+      return '<span class="item-icon"></span>';
+    },
     moneyHtml: () => '',
     itemTooltip: () => '',
     attachTooltip: noop,
@@ -75,6 +84,25 @@ function slot(itemId: string, instance?: ItemInstancePayload, count = 1): InvSlo
 }
 
 describe('bank grid instanced-slot marker', () => {
+  it('a promoted copy keeps its chosen name in the aria and asks the icon for its legendary rim', () => {
+    // The all-surfaces rule on the personal bank, both halves: the cell
+    // authority (worn_item_cell_view.ts) hands the grid the chosen name for
+    // the accessible name and the copy's effective quality for the icon dep
+    // (the round-2 frontend finding: the grid's 1-ary call swallowed it).
+    const root = windowFor([
+      slot('worn_sword', { rolled: { quality: 'legendary' }, name: 'Dawn Oath' }),
+      slot('worn_sword'),
+    ]);
+    const cells = root.querySelectorAll('button.bank-item');
+    expect(cells.length).toBe(2);
+    expect(cells[0].getAttribute('aria-label')).toContain('Dawn Oath');
+    expect(cells[0].getAttribute('aria-label')).not.toContain('Pitted Shortsword');
+    expect(cells[1].getAttribute('aria-label')).toBe('Pitted Shortsword, quantity 1');
+    // Exact tuple: worn_sword is a defined 'common', so a 1-ary regression
+    // (undefined) fails the second entry too, not only the first.
+    expect(iconCalls.map((c) => c.quality)).toEqual(['legendary', 'common']);
+  });
+
   it('a masterwork uses the authored seal and announces masterwork', () => {
     const root = windowFor([
       slot('worn_sword', { signer: 'Anna', rolled: { masterwork: true, stats: { sta: 1 } } }),

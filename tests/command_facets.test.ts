@@ -449,3 +449,78 @@ describe('command facet tags (deeds)', () => {
     }
   });
 });
+
+// Farming: append the growth phase's two plot mutations and the knobs phase's
+// husk conversion. The table-consistency invariants in the W6 block above (no
+// orphan tag, no dispatch-only leak) already cover the new entries; this block
+// pins the exact facet per command, keyed on the WIRE strings, and that the
+// two Phase 2 reads stay untagged (farmPatches is served from the client
+// bundle with no round trip at all, and myFarmPlots mirrors the `fplot` self
+// delta). Append-only: never edit a tag.
+const FARMING_TAGS: Readonly<Record<string, string>> = {
+  plant_crop: 'IWorldFarming',
+  harvest_crop: 'IWorldFarming',
+  convert_husks: 'IWorldFarming',
+  // The feast pair, added by the Phase 11d QA parity audit: both were tagged in
+  // COMMAND_FACETS on the farming parent and the absorb carried them in
+  // untagged HERE, so deleting or re-tagging either one stayed green (the
+  // table-consistency arms do not name commands, and command_schema never reads
+  // COMMAND_FACETS). Three of five pinned reads as "farming is covered".
+  place_feast: 'IWorldFarming',
+  consume_feast: 'IWorldFarming',
+};
+
+describe('command facet tags (farming)', () => {
+  const tags = COMMAND_FACETS as Readonly<Record<string, string>>;
+
+  it('tags every farming command with the IWorldFarming facet', () => {
+    for (const [cmd, facet] of Object.entries(FARMING_TAGS)) {
+      expect(tags[cmd], `facet tag for '${cmd}'`).toBe(facet);
+    }
+  });
+
+  it('preserves the snake_case farming wire strings (never normalized to camelCase)', () => {
+    // The five wire strings pinned literally: these are the protocol, and a
+    // rename is a breaking change, not a refactor.
+    expect(Object.keys(FARMING_TAGS).sort()).toEqual([
+      'consume_feast',
+      'convert_husks',
+      'harvest_crop',
+      'place_feast',
+      'plant_crop',
+    ]);
+    expect('plant_crop' in tags).toBe(true);
+    expect('harvest_crop' in tags).toBe(true);
+    expect('convert_husks' in tags).toBe(true);
+    expect('place_feast' in tags).toBe(true);
+    expect('consume_feast' in tags).toBe(true);
+    expect('plantCrop' in tags).toBe(false);
+    expect('harvestCrop' in tags).toBe(false);
+    expect('convertHusks' in tags).toBe(false);
+    expect('placeFeast' in tags).toBe(false);
+    expect('consumeFeast' in tags).toBe(false);
+  });
+
+  it('names EVERY IWorldFarming tag, so a sixth one cannot be added and forgotten', () => {
+    // The reverse direction. Every arm above iterates the local literal FORWARD
+    // into COMMAND_FACETS, which is how three-of-five read as "farming is
+    // covered" in the first place: a tag the table gains and this block does not
+    // is silent. Reading the table back closes that, one step later (Phase 11d
+    // QA pin audit). Scope: this is the file's idiom, not a general fix; 57
+    // tagged commands are named by no *_TAGS table at all.
+    const tagged = Object.entries(tags)
+      .filter(([, facet]) => facet === 'IWorldFarming')
+      .map(([cmd]) => cmd)
+      .sort();
+    expect(tagged).toEqual(Object.keys(FARMING_TAGS).sort());
+  });
+
+  it('does not tag the reads (farmPatches and myFarmPlots, plus the farmNowMs clock base)', () => {
+    // farmPatches is served from the client bundle with no round trip at all,
+    // myFarmPlots mirrors the `fplot` self delta, and farmNowMs is a local
+    // clock read. None of the three sends a command, so none may be tagged.
+    for (const read of ['farmPatches', 'myFarmPlots', 'farmNowMs']) {
+      expect(read in tags, `${read} should be untagged (no wire command)`).toBe(false);
+    }
+  });
+});

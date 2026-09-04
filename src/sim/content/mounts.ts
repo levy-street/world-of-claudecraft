@@ -93,7 +93,7 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     moveSpeedPct: 0.75,
   },
   // Epic tier (80%): the hover-cycle and the gobbler come from Rift S clears.
-  // The Terrorspark Groundshaker, the Lanternback Troll, the Chimeglass
+  // The Dreadspark Groundshaker, the Lanternback Troll, the Chimeglass
   // Tortoise and the Bonebound Rickshaw are developer-only for now and have no
   // player-facing acquisition. The tank and the rickshaw stay LAST in the
   // catalog (the tests pin the rickshaw as the tail, so a new player-facing
@@ -141,7 +141,7 @@ export const MOUNTS: Record<MountKey, MountDef> = {
   },
   terrorspark_groundshaker: {
     key: 'terrorspark_groundshaker',
-    name: 'Terrorspark Groundshaker',
+    name: 'Dreadspark Groundshaker',
     rarity: 'epic',
     moveSpeedPct: 0.8,
   },

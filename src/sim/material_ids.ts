@@ -6,6 +6,7 @@
 
 import { CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS } from './content/crucible_professions';
 import { ENCHANTS } from './content/enchants';
+import { FARM_MATERIAL_ITEM_IDS } from './content/farm_crops';
 import { HARVEST_COMPONENT_ITEMS, HARVEST_COMPONENT_SPECIMENS } from './content/professions';
 import { ALL_RECIPES, ITEMS } from './data';
 import { deriveMaterialItemIds } from './material_derivation';
@@ -19,6 +20,7 @@ export const MATERIAL_ITEM_IDS: ReadonlySet<string> = deriveMaterialItemIds({
   harvestComponentItems: HARVEST_COMPONENT_ITEMS,
   harvestComponentSpecimens: HARVEST_COMPONENT_SPECIMENS,
   salvageMaterialByQuality: SALVAGE_MATERIAL_BY_QUALITY,
+  farmMaterialItemIds: FARM_MATERIAL_ITEM_IDS,
   recipes: ALL_RECIPES,
   enchants: ENCHANTS,
   recipePendingMaterialItemIds: CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS,

@@ -19,7 +19,6 @@ import { ITEMS } from '../../../sim/data';
 import type { InvSlot, ItemDef, ItemInstancePayload } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
 import { userFacingApiError } from '../../api_error_i18n';
-import { bagQualityKey } from '../../bags_view';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { captureFocusKey } from '../../focus_restore';
@@ -57,6 +56,7 @@ import { WOC_LOG_BAD, WOC_LOG_GOOD, WOC_LOG_NOTE } from '../../woc_log_tones';
 import { wocPaymentPendingText } from '../../woc_market_reason_text';
 import type { WocMarketHooks } from '../../woc_market_window';
 import { wocTokensText } from '../../woc_tokens_text';
+import { wornItemCellParts } from '../../worn_item_cell_view';
 import {
   adoptedWocOffer,
   selectStandingWocOffer,
@@ -110,7 +110,7 @@ export interface WocTradeControllerDeps {
   /** Re-read the wallet footer balance after tokens moved on-chain. */
   refreshWocBalance(): void;
   log(text: string, color?: string): void;
-  itemIcon(item: ItemDef): string;
+  itemIcon(item: ItemDef, quality?: ItemDef['quality']): string;
   attachTooltip(el: HTMLElement, html: () => string): void;
   itemTooltip(item: ItemDef, compare?: boolean, instance?: ItemInstancePayload): string;
   renderBags(): void;
@@ -245,8 +245,8 @@ export class WocTradeController {
   private log(text: string, color?: string): void {
     this.deps.log(text, color);
   }
-  private itemIcon(item: ItemDef): string {
-    return this.deps.itemIcon(item);
+  private itemIcon(item: ItemDef, quality?: ItemDef['quality']): string {
+    return this.deps.itemIcon(item, quality);
   }
   private attachTooltip(el: HTMLElement, html: () => string): void {
     this.deps.attachTooltip(el, html);
@@ -1422,10 +1422,20 @@ export class WocTradeController {
         // family: it carries border-color plus an epic and legendary glow and
         // never a text colour, so on a bare span it painted a stray halo and
         // left the name the inherited grey.
-        const qColor = item
-          ? itemNameColor({ kind: item.kind, quality: bagQualityKey(item) })
-          : QUALITY_DEFAULT_COLOR;
-        const inner = `${item ? this.itemIcon(item) : unknownItemIconHtml(s.itemId)}<span style="color:${qColor}">${esc(label)}</span>`;
+        // The staged COPY's own quality (a legacy legendary-rolled copy is
+        // tradable and reads legendary here, the all-surfaces item-cell rule;
+        // a promoted copy is bound and never reaches the table).
+        // One cell-authority read for the color AND the rim (the label keeps
+        // the def name plus count from buildTradeItemRow: a promoted copy is
+        // bound and never reaches the table, so only a persisted named-but-
+        // unbound payload, which the load arm admits but the live shape never
+        // mints, would show the def here beside the chosen name in its tooltip).
+        const parts = item ? wornItemCellParts(item, s.instance) : null;
+        const qColor =
+          item && parts
+            ? itemNameColor({ kind: item.kind, quality: parts.quality ?? 'common' })
+            : QUALITY_DEFAULT_COLOR;
+        const inner = `${item && parts ? this.itemIcon(item, parts.quality) : unknownItemIconHtml(s.itemId)}<span style="color:${qColor}">${esc(label)}</span>`;
         return mine
           ? `<button type="button" class="trade-item mine" data-item="${esc(s.itemId)}">${inner}</button>`
           : `<div class="trade-item">${inner}</div>`;

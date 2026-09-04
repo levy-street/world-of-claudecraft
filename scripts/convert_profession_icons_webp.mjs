@@ -11,7 +11,7 @@
 // CI never re-encodes). The file basename IS the asset id from
 // docs/design/professions-asset-manifest.json (profession, gathering, archetype,
 // or masterwork),
-// and regenerates src/ui/profession_image_ids.ts from the committed WebPs. Re-running with
+// and regenerates src/ui/hud/professions/profession_image_ids.ts from the committed WebPs. Re-running with
 // everything already WebP is a byte-stable no-op.
 //
 // Sibling of scripts/convert_item_icons_webp.mjs; behavior is identical, only the
@@ -25,7 +25,7 @@ import sharp from 'sharp';
 
 const root = process.cwd();
 const professionsDir = path.join(root, 'public/ui/professions');
-const moduleFile = path.join(root, 'src/ui/profession_image_ids.ts');
+const moduleFile = path.join(root, 'src/ui/hud/professions/profession_image_ids.ts');
 
 // The served icon square. Mirrors "iconSize" in public/ui/professions/mapping.json;
 // the HUD upscales it in CSS for the larger slots.

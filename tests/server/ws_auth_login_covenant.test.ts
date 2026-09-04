@@ -146,7 +146,7 @@ function setup() {
     })),
     acquireCharacterLease: vi.fn(async () => true),
     releaseCharacterLease: vi.fn(async () => {}),
-    bankBonusForAccount: vi.fn(async () => ({ bonusSlots: 0, sources: [], characterCount: 1 })),
+    bankBonusForAccount: vi.fn(async () => ({ bonusSlots: 0, sources: [] })),
     isConnectionRefused: vi.fn(() => false),
     bufferHandshakeMessages,
     requestMetadata: vi.fn(() => ({ ip: '1.2.3.4', userAgent: 'ua' })),

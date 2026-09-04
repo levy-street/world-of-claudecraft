@@ -10,6 +10,7 @@
 // the item def) purely as a courtesy: the server re-validates every listing.
 
 import { ITEMS } from '../sim/data';
+import { effectiveQuality } from '../sim/equipment_rules';
 import {
   exchangeCategoryUsesQualityFloor,
   exchangeHardLock,
@@ -367,7 +368,13 @@ function rowsPassing(
     if (category === 'other') return;
     if (category === 'mount' && !categories.mounts) return;
     if (category === 'mech_chroma' && !categories.mechChromas) return;
-    const quality = slot.instance?.rolled?.quality ?? def.quality ?? 'common';
+    // The sim's one precedence rule (the rolled override, else the def's),
+    // never a hand-rolled copy. Deliberately NOT the tooltip's tier-narrowing
+    // wrapper: a legacy unknown-tier rolled quality must keep ranking as
+    // itself here (QUALITY_RANK's own miss answers 0), not collapse to the
+    // def's tier and pass a floor it never passed before (the fresh-reader
+    // finding on the first QA fix).
+    const quality = effectiveQuality(def, slot.instance) ?? 'common';
     if (exchangeCategoryUsesQualityFloor(category) && (QUALITY_RANK[quality] ?? 0) < floor) return;
     rows.push({ index, itemId: slot.itemId, quality, instance: slot.instance });
   });

@@ -26,6 +26,21 @@ Maps/Sets are canonicalized to sorted arrays; floats are quantized to 1e-6
 sentinels so JSON round-trips losslessly. Samples are VALUE COPIES (the sim mutates
 in place; the sampler must snapshot, never retain a live reference).
 
+**Inert keys, and where a ZERO is not inert.** A key whose canonical value is a
+boring default (`null`, `0`, `false`, `''`, `[]`) is DROPPED, which keeps goldens
+small without losing teeth: a field flipping to or from its default makes the key
+appear or disappear, which `toEqual` still flags. The exception is
+`ZERO_BEARING_CONTAINERS` in `trace.ts`: inside a per-copy item payload (`instance`,
+`equipmentInstance`, `rolled`, inherited by the whole subtree) a numeric `0` is
+INFORMATION and stays. That is not a preference. The Perfecting stamp merges its R5
+bonus into `rolled.stats` and SKIPS a share that rounds to zero, so "no share
+written" and "a share written as 0" canonicalized identically and no golden could
+tell them apart: the harness was blind to a real behavior change. Keep the carve-out
+SCOPED when you extend it (Entity and PlayerMeta carry dozens of resting zeros per
+sample, and keeping all of them balloons every golden for no gameplay reason); add a
+key to that list when a new sparse per-copy record grows a field whose zero is a
+real state. Pinned in `harness.test.ts`.
+
 ## Adding a field (the everyday workflow)
 
 Every new `Entity`/`PlayerMeta` field interacts with this harness; decide once, in the
@@ -65,8 +80,9 @@ luck. The draw-order digest is the precise detector.
 ## Coverage
 
 `SCENARIOS` in `scenarios.ts` is the source of truth: scenarios span combat (swings,
-pets, affixes, ground AoE), arena/duel/fiesta, delves + lockpick, dungeons/raids,
-quests, loot rolls, market, bank, trade, chat/social, talents, xp/prestige, casting,
+pets, affixes, ground AoE), arena/duel/fiesta, delves + lockpick, dungeons/raids
+(NORMAL and HEROIC, at both the raid and the five-man tier), quests, loot rolls,
+market, bank, trade, chat/social, talents, xp/prestige, casting, consumable auras,
 and mob lifecycle. Every playable class appears in some scenario; enumerate with
 `grep -o "playerClass: '[a-z]*'\|addPlayer('[a-z]*'" tests/parity/scenarios.ts | sort -u`.
 The coverage shards (`coverage_a..c.test.ts`) assert each scenario's subsystem actually
@@ -112,6 +128,25 @@ confirmed each):
   else that must pin an unresolved roll needs the same trick. Extracting one of these should add a scenario that drives it (the
   precedents: `market_round_trip`, `bank_round_trip`, `dungeon_instances`) or sample
   the collection directly.
+- **The farming SESSION is driven; profession DENY arms are not.** `farming_session`
+  drives real plants and harvests through `plantCrop`/`harvestCrop` (its growth
+  window writes `readyAtMs` down rather than ticking 45 minutes, the draw-free
+  `/dev farmgrow` equivalence) and pins its own draws, the exact sibling of the
+  `professions_fishing_session` exemplar described above. What is still NOT
+  driven is a profession's DENY arms: those denials are draw-free by contract,
+  which is exactly why nothing here would notice one starting to draw, so a
+  change to a gate order still needs its own suite. Farming's live coverage is
+  `tests/professions_farming.test.ts` (the lifecycle plus the draw-count pins);
+  this gate pins the session, not the surface around it. The one exception is
+  `perfecting_walk`, and since masterwrought Phase 18 it is a WHOLE ladder
+  rather than a sample of one: it stages all six Perfecting deny arms (skill,
+  the phase 13 promotion's missing-name refusal on the Perfected copy, missing
+  materials, the unresolvable-ref noItem, not-apex, and the lock-only shortfall
+  on its dedicated line) between bracketing frames, so its coverage arm pins
+  each as draw-free AND state-identical. The promotion's own ladder stays with
+  `tests/orange_promotion.test.ts`. Use that scenario as the template when you
+  bring another profession's deny ladder here: stage the precondition BEFORE
+  the opening frame so the denial itself is the only thing between the two.
 - **Construction-time draws + ambient world mobs.** The `Rng` is born inside the Sim
   ctor, so ctor draws are not in the draw digest; ambient camp mobs are spawned but
   never tracked. A same-draw-count reorder of ctor spawns that changes only

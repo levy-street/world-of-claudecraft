@@ -1,19 +1,30 @@
 import { describe, expect, it } from 'vitest';
+import { bagCapacity, bagPools, countFit } from '../src/sim/bags';
+import { ITEMS, QUESTS } from '../src/sim/data';
 import { questFallbackGrants } from '../src/sim/quest_fallback';
-import { QUESTS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
-import { groundHeight } from '../src/sim/world';
 import type { Entity, QuestDef } from '../src/sim/types';
+import { groundHeight } from '../src/sim/world';
+import { expectDefined } from './helpers/defined';
 
 const BOUND_GUARDIAN = 'q_nythraxis_bound_guardian';
 const KEYSTONE = 'crypt_keystone';
+const REWARD = 'kings_signet';
 const HIGHWATCH_ALDRIC = 'brother_aldric_highwatch';
 
 function quest(extra: Partial<QuestDef>): QuestDef {
   return {
-    id: 'q_test', name: 'Test', giverNpcId: 'g', turnInNpcId: 'g',
-    text: '', completionText: '', objectives: [], xpReward: 0, copperReward: 0,
-    itemRewards: {}, ...extra,
+    id: 'q_test',
+    name: 'Test',
+    giverNpcId: 'g',
+    turnInNpcId: 'g',
+    text: '',
+    completionText: '',
+    objectives: [],
+    xpReward: 0,
+    copperReward: 0,
+    itemRewards: {},
+    ...extra,
   };
 }
 
@@ -33,9 +44,8 @@ describe('questFallbackGrants (pure)', () => {
 
   it('grants only the missing subset and de-duplicates', () => {
     const have = new Set(['b']);
-    const out = questFallbackGrants(
-      quest({ requiredItems: ['a', 'b', 'c', 'a'] }),
-      (id) => have.has(id),
+    const out = questFallbackGrants(quest({ requiredItems: ['a', 'b', 'c', 'a'] }), (id) =>
+      have.has(id),
     );
     expect(out).toEqual(['a', 'c']);
   });
@@ -88,5 +98,73 @@ describe('Sim.acceptQuest quest-item fallback', () => {
     sim.addItem(KEYSTONE, 1, pid);
     sim.acceptQuest(BOUND_GUARDIAN, pid);
     expect(sim.countItem(KEYSTONE, pid)).toBe(1);
+  });
+
+  it('grants the required item past a FULL bag, the ratified capacity bypass', () => {
+    // RULED (qr-19-qprofintro-overflow-grant, 2026-09-01): the requiredItems
+    // fallback grant deliberately skips the capacity pre-check on accept,
+    // because a required item the player can no longer obtain must never be
+    // lost to a full bag. That was doctrine in a comment and nothing measured
+    // it, so a later capacity gate could soft-lock the chain while every suite
+    // stayed green. This arm is the measurement.
+    const { sim, pid } = makeAttunedPlayerAtGiver();
+    const meta = sim.players.get(pid)!;
+    const capacity = bagCapacity(meta.bags);
+    // Fill the REMAINING general slots with distinct junk ids, so nothing can
+    // merge into an existing stack and quietly make room. Counting the free
+    // slots rather than assuming an empty bag keeps this honest if the starter
+    // kit ever changes.
+    const need = capacity - meta.inventory.length;
+    expect(need, 'the fresh player leaves room to fill').toBeGreaterThan(0);
+    const filler = Object.values(ITEMS)
+      .filter((d) => d.kind === 'junk' && d.id !== KEYSTONE)
+      .slice(0, need);
+    expect(filler.length, 'enough distinct junk ids to fill the bags').toBe(need);
+    for (const def of filler) sim.addItem(def.id, 1, pid);
+    expect(meta.inventory.length, 'bags are exactly full before the accept').toBe(capacity);
+
+    sim.acceptQuest(BOUND_GUARDIAN, pid);
+
+    expect(meta.questLog.get(BOUND_GUARDIAN)?.state, 'the accept still succeeds').toBe('active');
+    expect(sim.countItem(KEYSTONE, pid), 'the required item is granted anyway').toBe(1);
+    expect(
+      meta.inventory.length,
+      'and the bag is deliberately left OVER capacity rather than the grant refused',
+    ).toBeGreaterThan(capacity);
+  });
+
+  it('the turn-in reward DOES gate on a full bag, the other half of the asymmetry', () => {
+    // The asymmetry is the design, per qr-19-qprofintro-overflow-grant and the
+    // capacity doctrine header in src/sim/bags.ts: the fallback grant bypasses
+    // capacity, the REWARD does not. This arm drives the REAL turnInQuest, not
+    // a re-implementation of its gate: an earlier draft called countFit
+    // directly and could not have failed if the gate were deleted outright,
+    // which is no pin at all. The Bound Guardian pays kings_signet and has no
+    // collect objective, so the scratch copy frees nothing and a full bag must
+    // genuinely refuse.
+    const { sim, pid } = makeAttunedPlayerAtGiver();
+    const meta = sim.players.get(pid)!;
+    sim.acceptQuest(BOUND_GUARDIAN, pid);
+    const qp = meta.questLog.get(BOUND_GUARDIAN);
+    expect(qp, 'the quest is on the log to turn in').toBeDefined();
+    // Force the objectives complete rather than playing them out: this arm is
+    // about the capacity gate, not about the encounter.
+    if (qp) qp.state = 'ready';
+
+    const capacity = bagCapacity(meta.bags);
+    const need = capacity - meta.inventory.length;
+    expect(need, 'room to fill after the accept').toBeGreaterThan(0);
+    const filler = Object.values(ITEMS)
+      .filter((d) => d.kind === 'junk' && d.id !== KEYSTONE && d.id !== REWARD)
+      .slice(0, need);
+    expect(filler.length, 'enough distinct junk ids to fill the bags').toBe(need);
+    for (const def of filler) sim.addItem(def.id, 1, pid);
+    expect(meta.inventory.length, 'bags are full before the turn-in').toBe(capacity);
+
+    sim.turnInQuest(BOUND_GUARDIAN, pid);
+
+    // The gate refused: the quest is NOT completed and the reward was not paid.
+    expect(meta.questLog.get(BOUND_GUARDIAN)?.state, 'the turn-in is refused').toBe('ready');
+    expect(sim.countItem(REWARD, pid), 'and no reward landed').toBe(0);
   });
 });

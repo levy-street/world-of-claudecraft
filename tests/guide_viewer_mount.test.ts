@@ -70,7 +70,12 @@ vi.mock('../src/guide/content.generated', () => ({
 }));
 // mount.ts only uses t() for the canvas accessible name; stub it so the reset-module test env
 // (no initialized locale) does not throw on the key lookup. We assert on behavior, not the label.
-vi.mock('../src/ui/i18n', () => ({ t: (k: string) => k }));
+// Additive, never bare (the reliquary_window_behavior lesson): only t stays
+// overridden (keys as labels); the rest passes through.
+vi.mock('../src/ui/i18n', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../src/ui/i18n')>()),
+  t: (k: string) => k,
+}));
 
 // ---- fake DOM (only the surface wireModelViewers queries) ----
 class FakeEl {

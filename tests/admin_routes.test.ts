@@ -125,6 +125,15 @@ describe('admin route permission map', () => {
     expect(
       permissionForAdminRoute('POST', '/admin/api/moderation/characters/42/restore-slot'),
     ).toBe('moderation.act');
+    // The legendary-name strip DESTROYS a player-authored name with no undo,
+    // so like the guild bank purge it carries its own superadmin-only
+    // permission: a moderator with moderation.act must not reach it.
+    expect(
+      permissionForAdminRoute('POST', '/admin/api/moderation/characters/42/clear-item-name'),
+    ).toBe('moderation.clearItemName');
+    expect(
+      permissionForAdminRoute('GET', '/admin/api/moderation/characters/42/clear-item-name'),
+    ).toBeNull();
   });
 
   it('serves the guild bank purge ladder arm AFTER the central permission gate', () => {

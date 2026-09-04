@@ -554,7 +554,6 @@ export const es: Record<string, string> = {
   'poi.thornpeak_heights.4': 'Campamento de Guerra de Drogmar',
   'poi.thornpeak_heights.5': 'Risco Tormentoso',
   'poi.thornpeak_heights.6': 'La Laguna Reluciente',
-  'poi.thornpeak_heights.7': 'Tiendas del Culto del Wyrm',
   'poi.thornpeak_heights.8': 'Campos Espectrales',
   'poi.thornpeak_heights.9': 'Santuario del Gravewyrm',
   'location.kind.overworld': 'Mundo abierto',

@@ -31,6 +31,7 @@ import {
   restoreMatchPet,
   snapshotMatchPet,
 } from '../pet/pet_match_return';
+import { removeMatchFeasts } from '../professions/feast_lifecycle';
 import { awardFiestaCompletionHonor, awardRankedArenaResultHonor, honorTeamIdentity } from '../pvp';
 import { aurasSurvivingCleanSlate, SICKNESS_AURA_IDS, UNSTUCK_SICKNESS_ID } from '../resurrection';
 import type { ArenaMatch, ArenaQueueUnit, ArenaReturnPools, PlayerMeta } from '../sim';
@@ -1272,6 +1273,7 @@ export function endArenaMatch(
 // Teleport all fighters back to where they queued, fully cleansed, and
 // release the instance slot.
 export function returnFromArena(ctx: SimContext, match: ArenaMatch): void {
+  removeMatchFeasts(ctx, 'arena', match.id);
   for (const pid of arenaAllPids(match)) ctx.arenaMatches.delete(pid);
   // Slot numbers collide across pools (pit slot 2 vs maze slot 2), so a yumi
   // match MUST free the maze pool, never the pit's; it also drops its cats.

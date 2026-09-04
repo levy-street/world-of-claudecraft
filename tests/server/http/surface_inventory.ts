@@ -1893,6 +1893,19 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     requireOwnedExpected: REQUIRE_OWNED.operator404,
     match: /^\/admin\/api\/moderation\/characters\/(\d+)\/restore-slot$/,
   },
+  // The phase 13 legendary-name strip: registry-only like the cheater-mark
+  // pair (no legacy *Match regex; the RouteDef path template is its one
+  // dispatch source, listed in REGISTRY_ONLY_PARAM_PATHS).
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'POST',
+    path: '/admin/api/moderation/characters/:id/clear-item-name',
+    handler: 'server/admin.ts clearItemNameHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: REQUIRE_OWNED.operator404,
+  },
   {
     dispatcher: DISPATCH.admin,
     method: 'POST',
@@ -1958,6 +1971,20 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     contentType: PROBLEM_JSON,
     authScope: AUTH_SCOPE.admin,
     limiter: 'adminOversightReadRateLimited',
+    requireOwnedExpected: null,
+  },
+  // Live market listing metrics (Masterwrought supply oversight): registry-only
+  // like the clear-item-name route (no legacy ladder arm; the RouteDef path is
+  // the one dispatch source). No limiter: a warm in-memory cached read with
+  // zero DB cost, the overview precedent.
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'GET',
+    path: '/admin/api/market/metrics',
+    handler: 'server/admin.ts marketMetricsHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
     requireOwnedExpected: null,
   },
   {

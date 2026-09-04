@@ -13,9 +13,15 @@ import { craftIdsForMaterialItem } from '../src/sim/material_profession_affinity
 import { MATERIAL_ITEM_IDS } from '../src/sim/material_taxonomy';
 import { baseMaterialFor } from '../src/sim/professions/material_grades';
 import { Hud } from '../src/ui/hud';
+import { MATERIAL_HINT_KEYS } from '../src/ui/hud/professions/material_hint_view';
+import {
+  CRAFT_NAMING_HINT_KEYS,
+  hasSupersedingPurposeHint,
+  materialProfessionHintText,
+} from '../src/ui/hud/professions/material_profession_hint_view';
 import { setLanguage } from '../src/ui/i18n';
 import { itemKindLabel } from '../src/ui/item_kind_label';
-import { materialProfessionHintText } from '../src/ui/material_profession_hint_view';
+import { adoptedTrophyIds } from './helpers/adopted_trophy_ids';
 
 function tooltipHtml(itemId: string): string {
   const h = Object.create(Hud.prototype) as unknown as {
@@ -55,6 +61,54 @@ describe('materialProfessionHintText', () => {
     expect(materialProfessionHintText('venom_gland')).toBe('Used by Alchemy.');
   });
 
+  it('the Frost Gourd reads three crafts in ring order since D171; its fine twin stays cooking-only', () => {
+    // Masterwrought Phase 19G, D171 (qr-19-scroll-elixir-15c-parity): the
+    // rung-50 scroll took the serpent elixir's gourd, the first crop on an
+    // inscription row, so the tooltip's Used-by line gained a third craft.
+    // Pinned as the EXACT rendered string (ring order: alchemy, cooking,
+    // inscription; the en conjunction). The fine twin is farming's own record,
+    // not a material grade, so it inherits nothing and keeps its one consumer.
+    expect(materialProfessionHintText('frost_gourd')).toBe(
+      'Used by Alchemy, Cooking, and Inscription.',
+    );
+    expect(materialProfessionHintText('fine_frost_gourd')).toBe('Used by Cooking.');
+  });
+
+  it('phase 11l trophies read the simple Used by line for their adopted craft', () => {
+    // Every adopted junk trophy, pinned as an EXACT rendered string so the
+    // localized craft name and the sentence template both hold (none carries
+    // a superseding purpose hint, so the line always renders). The key set is
+    // held equal to the shared derivation (tests/helpers/adopted_trophy_ids.ts)
+    // so an adoption or a de-adoption moves this map too; the two
+    // already-common rare-elite leather trophies read the same line as the
+    // promoted five, since adoption is what put a Used-by line on them at all.
+    const USED_BY: Record<string, string> = {
+      bandit_bandana: 'Used by Tailoring.',
+      cracked_ogre_tusk: 'Used by Weaponcrafting.',
+      cracked_wyrm_scale: 'Used by Leatherworking.',
+      emberwing_cinderscale: 'Used by Leatherworking.',
+      mudfin_scale: 'Used by Leatherworking.',
+      old_cragmaws_pelt: 'Used by Leatherworking.',
+      tallow_candle: 'Used by Alchemy.',
+    };
+    expect(Object.keys(USED_BY).sort()).toEqual(adoptedTrophyIds(ITEMS));
+    for (const [id, text] of Object.entries(USED_BY)) {
+      expect(materialProfessionHintText(id), id).toBe(text);
+    }
+    // Poor trash again, outside MATERIAL_ITEM_IDS: the Used-by line is empty
+    // for the chipped tusk (the sixth fix round), the bogiron nugget and the
+    // cracked fetish (the 11l QA), and it never rendered for the holdouts.
+    for (const id of [
+      'chipped_tusk',
+      'bogiron_nugget',
+      'cracked_fetish',
+      'tangled_weed',
+      'soggy_moccasin',
+    ]) {
+      expect(materialProfessionHintText(id), id).toBe('');
+    }
+  });
+
   it('skips pure cooking catches; multi-craft catches keep the line, and both arms are live', () => {
     // Sole-cooking catches share cookingCatchHint; the Used-by line would only
     // repeat "Cooking". Multi-craft catches still get Used-by. Count both arms
@@ -82,8 +136,20 @@ describe('materialProfessionHintText', () => {
   });
 
   it('skips enchanting-only materials that already say Enchanting reagent', () => {
-    expect(materialProfessionHintText('arcane_dust')).toBe('');
+    expect(materialProfessionHintText('arcane_shard')).toBe('');
     expect(materialProfessionHintText('resonant_hide')).toBe('');
+    // The counterpart arm keeps the skip honest: the dust and essence LEFT
+    // the enchanting-only class with the Masterwrought phase 05 jewelcrafting
+    // catalog, and inscription joined as a third consumer at phase 06. The
+    // dust gained engineering as a FOURTH consumer at masterwrought Phase
+    // 11o (the copperlens_ocular bill), so its line names four crafts in
+    // ring order; the essence stays three-craft.
+    expect(materialProfessionHintText('arcane_dust')).toBe(
+      'Used by Engineering, Inscription, Enchanting, and Jewelcrafting.',
+    );
+    expect(materialProfessionHintText('arcane_essence')).toBe(
+      'Used by Inscription, Enchanting, and Jewelcrafting.',
+    );
   });
 
   it('a fineGrade hint never supersedes: single-craft fine grades keep their line', () => {
@@ -94,9 +160,51 @@ describe('materialProfessionHintText', () => {
     expect(materialProfessionHintText('fine_ironbark_log')).toBe('Used by Weaponcrafting.');
   });
 
+  it('CRAFT_NAMING_HINT_KEYS equals the set of hint keys whose English lead names the craft', async () => {
+    // The contract pin beside the allowlist: membership is DERIVED from the
+    // resolved English leads and held equal in BOTH directions, so rewording
+    // a hint's lead (the way arcaneDust/arcaneEssence went craft-neutral)
+    // without moving membership fails HERE instead of silently re-opening
+    // the suppressed-craft-name defect the allowlist shape fixed.
+    const { en } = await import('../src/ui/i18n.resolved.generated/en');
+    const hints = (en as unknown as { hudChrome: { materialHint: Record<string, string> } })
+      .hudChrome.materialHint;
+    const distinctHintKeys = new Set(Object.values(MATERIAL_HINT_KEYS));
+    const craftNaming = [...distinctHintKeys].filter((key) => {
+      const leaf = key.replace('hudChrome.materialHint.', '');
+      const value = hints[leaf];
+      expect(value, `resolved English for ${key}`).toBeTruthy();
+      return value.startsWith('Enchanting reagent.');
+    });
+    expect([...craftNaming].sort()).toEqual([...CRAFT_NAMING_HINT_KEYS].sort());
+    // Anti-vacuity: both classes are populated (six craft-naming leads, and
+    // at least the fineGrade plus the two craft-neutral arcane leads outside).
+    expect(craftNaming.length).toBe(6);
+    expect(distinctHintKeys.size - craftNaming.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it('a craft-free hint lead never supersedes, even for a single-craft consumer set', () => {
+    // Direct-predicate pins for the LATENT single-craft cases live content
+    // cannot reach while dust and essence feed three crafts (inscription
+    // joined at phase 06): if either ever
+    // drops back to an enchanting-only consumer set, its craft-neutral
+    // "Crafting reagent." lead names no craft, so the Used-by line must still
+    // render (the fineGrade doctrine). Under the old exclusion-shaped check
+    // both rows below returned true and blanked the tooltip's craft name.
+    expect(hasSupersedingPurposeHint('arcane_dust', ['enchanting'])).toBe(false);
+    expect(hasSupersedingPurposeHint('arcane_essence', ['enchanting'])).toBe(false);
+    expect(hasSupersedingPurposeHint('fine_copper_ore', ['enchanting'])).toBe(false);
+    // Positive controls prove the supersede arm itself is live: a craft-NAMING
+    // lead ("Enchanting reagent.") with a sole enchanting consumer supersedes,
+    // and the same lead with a second consumer does not.
+    expect(hasSupersedingPurposeHint('arcane_shard', ['enchanting'])).toBe(true);
+    expect(hasSupersedingPurposeHint('resonant_timber', ['enchanting'])).toBe(true);
+    expect(hasSupersedingPurposeHint('arcane_shard', ['enchanting', 'jewelcrafting'])).toBe(false);
+  });
+
   it('fine grades name every craft beside the Fine grade purpose line, in ring order', () => {
     expect(materialProfessionHintText('fine_iron_ore')).toBe(
-      'Used by Engineering, Weaponcrafting, and Armorcrafting.',
+      'Used by Engineering, Jewelcrafting, Weaponcrafting, and Armorcrafting.',
     );
   });
 
@@ -144,7 +252,9 @@ describe('itemTooltip integration for profession material tags', () => {
   it('a fine grade shows hint then Used-by then sell price, in that order', () => {
     const html = tooltipHtml('fine_iron_ore');
     const hintAt = html.indexOf('Fine grade.');
-    const usedByAt = html.indexOf('Used by Engineering, Weaponcrafting, and Armorcrafting.');
+    const usedByAt = html.indexOf(
+      'Used by Engineering, Jewelcrafting, Weaponcrafting, and Armorcrafting.',
+    );
     const sellAt = html.indexOf('Sell price');
     expect(hintAt).toBeGreaterThanOrEqual(0);
     expect(usedByAt).toBeGreaterThan(hintAt);
@@ -158,9 +268,19 @@ describe('itemTooltip integration for profession material tags', () => {
   });
 
   it('an enchanting material keeps its source line without Used by Enchanting', () => {
-    const html = tooltipHtml('arcane_dust');
+    // arcane_shard is the surviving enchanting-ONLY exemplar (the dust and
+    // essence gained a jewelcrafting consumer in the Masterwrought phase 05
+    // catalog, then an inscription consumer at phase 06, and legitimately
+    // show a three-craft Used-by line now).
+    const html = tooltipHtml('arcane_shard');
     expect(html).toContain('Enchanting reagent');
     expect(html).not.toContain('Used by Enchanting');
+    // The dust lead reworded to the craft-neutral form when jewelcrafting
+    // became its second consumer; the appended Used-by line names the crafts.
+    const dustHtml = tooltipHtml('arcane_dust');
+    expect(dustHtml).toContain('Crafting reagent');
+    expect(dustHtml).not.toContain('Enchanting reagent.');
+    expect(dustHtml).toContain('Used by Engineering, Inscription, Enchanting, and Jewelcrafting.');
   });
 
   it('true grey junk still says Junk', () => {

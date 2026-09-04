@@ -18,12 +18,11 @@ import { isTransferLockedInstance } from '../sim/item_instance_transfer';
 import type { InvSlot, ItemInstancePayload } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { markDialogRoot } from './dialog_root';
-import { itemDisplayName, knownLetterId, tEntity } from './entity_i18n';
+import { knownLetterId, tEntity } from './entity_i18n';
 import { esc } from './esc';
 import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
 import { captureFormDraft, restoreFormDraft } from './form_draft';
 import { formatMoney, formatNumber, t } from './i18n';
-import { QUALITY_COLOR } from './icons';
 import {
   buildMailboxView,
   canStageInstancedCopy,
@@ -39,8 +38,8 @@ import {
 } from './mailbox_view';
 import type { PainterHostPresentation } from './painter_host';
 import { svgIcon } from './ui_icons';
+import { wornItemCellParts } from './worn_item_cell_view';
 
-const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)';
 // Copper-per-denomination (mirrors market_view's COPPER_PER_*).
 const COPPER_PER_GOLD = 10_000;
 const COPPER_PER_SILVER = 100;
@@ -475,10 +474,13 @@ export class MailboxWindow {
         const chip = document.createElement('span');
         chip.className = 'mail-attachment-item';
         if (item) {
-          const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? QUALITY_DEFAULT_COLOR;
+          // The chip describes the attached COPY (the all-surfaces item-cell
+          // rule, worn_item_cell_view.ts): a legacy legendary-rolled copy is
+          // mailable and reads legendary here, never its def tier.
+          const cell = wornItemCellParts(item, slot.instance);
           const stack =
             slot.count > 1 ? ` x${formatNumber(slot.count, { maximumFractionDigits: 0 })}` : '';
-          chip.innerHTML = `${this.deps.itemIcon(item)}<span style="color:${qColor}">${esc(itemDisplayName(item))}${esc(stack)}</span>`;
+          chip.innerHTML = `${this.deps.itemIcon(item, cell.quality)}<span style="color:${cell.color}">${esc(cell.name)}${esc(stack)}</span>`;
           this.deps.attachTooltip(chip, () => this.deps.itemTooltip(item, slot.instance));
         } else {
           chip.textContent = slot.itemId;
@@ -765,7 +767,8 @@ export class MailboxWindow {
       // the array order is stable across repaints, so the focus restore lands
       // on the same chip.
       const chipKey = slot.instance ? `${slot.itemId}#i${chipIdx}` : slot.itemId;
-      const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? QUALITY_DEFAULT_COLOR;
+      // The staged COPY's own presentation (the all-surfaces item-cell rule).
+      const cell = wornItemCellParts(item, slot.instance);
       const chip = document.createElement('span');
       chip.className = 'mail-parcel-chip';
       const name = document.createElement('span');
@@ -773,7 +776,7 @@ export class MailboxWindow {
       // Keyboard-focusable so Tab can reach it: attachTooltip's keyboard path
       // is a focusin listener on this exact element.
       name.tabIndex = 0;
-      name.innerHTML = `${this.deps.itemIcon(item)}<span style="color:${qColor}">${esc(itemDisplayName(item))}</span>`;
+      name.innerHTML = `${this.deps.itemIcon(item, cell.quality)}<span style="color:${cell.color}">${esc(cell.name)}</span>`;
       this.deps.attachTooltip(name, () => this.deps.itemTooltip(item, slot.instance));
       chip.appendChild(name);
       const owned = this.ownedCountFor(slot.itemId);
@@ -794,7 +797,9 @@ export class MailboxWindow {
         minus.dataset.focusKey = `${slot.itemId}:minus`;
         minus.setAttribute(
           'aria-label',
-          t('hudChrome.mailbox.parcelQtyDecreaseAria', { item: itemDisplayName(item) }),
+          t('hudChrome.mailbox.parcelQtyDecreaseAria', {
+            item: cell.name,
+          }),
         );
         minus.addEventListener('click', () => this.adjustParcelQty(slot.itemId, -1));
         // Typeable quantity (was a read-only span): validated on change/blur,
@@ -815,7 +820,9 @@ export class MailboxWindow {
         qty.setAttribute('aria-live', 'polite');
         qty.setAttribute(
           'aria-label',
-          t('hudChrome.mailbox.parcelQtyAria', { item: itemDisplayName(item) }),
+          t('hudChrome.mailbox.parcelQtyAria', {
+            item: cell.name,
+          }),
         );
         // The coin-input focus contract: select the value so typing replaces it
         // (clicking into "2" and typing 5 must mean 5, not 25); the once-only
@@ -839,7 +846,9 @@ export class MailboxWindow {
         plus.dataset.focusKey = `${slot.itemId}:plus`;
         plus.setAttribute(
           'aria-label',
-          t('hudChrome.mailbox.parcelQtyIncreaseAria', { item: itemDisplayName(item) }),
+          t('hudChrome.mailbox.parcelQtyIncreaseAria', {
+            item: cell.name,
+          }),
         );
         plus.addEventListener('click', () => this.adjustParcelQty(slot.itemId, 1));
         step.append(minus, qty, plus);
@@ -855,7 +864,9 @@ export class MailboxWindow {
       remove.dataset.focusKey = `${chipKey}:remove`;
       remove.setAttribute(
         'aria-label',
-        t('hudChrome.mailbox.removeParcelAria', { item: itemDisplayName(item) }),
+        t('hudChrome.mailbox.removeParcelAria', {
+          item: cell.name,
+        }),
       );
       remove.addEventListener('click', () => {
         // Reference identity, not item id: with a plain stack AND an instanced

@@ -31,6 +31,10 @@ import {
 import type { LootTier } from '../lockpick';
 import { RIFT_MECHANIC_SPACING_SEC } from '../mob/mechanic_spacing';
 import { retargetMob } from '../mob/targeting';
+import {
+  awardRiftFirstClearMaterials,
+  grantRiftClearEmbers,
+} from '../professions/masterwrought_materials';
 import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import type { SimContext } from '../sim_context';
 import { DT, dist2d, type Entity, type SimEvent, type Vec3 } from '../types';
@@ -1423,6 +1427,10 @@ function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | n
   creditRiftClearDeeds(ctx, inst, participants);
   const claim = claimRiftFirstClear(ctx, inst, participants);
   if (!claim.won) {
+    // Masterwrought (phase 04): losing the race forfeits the first-clear
+    // cores, but an A/S clear still counts as the week's eligible endgame
+    // completion for the Maker's Ember keystone. Draw-free.
+    grantRiftClearEmbers(ctx, riftRankForBaseLevel(inst.baseLevel), participants, inst.eventId);
     completeLosingRun(ctx, inst);
     return true;
   }
@@ -1459,6 +1467,13 @@ function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | n
         inst.upgrade?.rewards.craftingMaterialBias,
       );
     }
+    // Masterwrought (phase 04): A/S first-clear cores (daily-gated per
+    // character, ruling R9) plus the weekly ember check. Deliberately outside
+    // the boss guard: the grant pays the CLEAR, not the corpse, and it draws
+    // no rng, honoring addRiftProgressionLoot's draw-free contract above.
+    // Rank from baseLevel, the creditRiftClearDeeds precedent above, so the
+    // winning and losing ember arms can never disagree on a clear's rank.
+    awardRiftFirstClearMaterials(ctx, riftRankForBaseLevel(inst.baseLevel), participants);
     const portalId = claim.event.portalId ?? inst.portalId;
     // False means the portal's own RIFT_PORTAL_LIFETIME already collapsed it
     // out from under an unusually long clear (the entity is long gone): never

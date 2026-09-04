@@ -28,12 +28,15 @@ import {
   WOC_BANK_LEDGER_GROWTH_LIMIT_REFUSALS_TOTAL,
   WOC_BANK_LEDGER_TAIL,
   WOC_BANK_LEDGER_TAIL_DROPPED_ROWS_TOTAL,
+  WOC_BANK_VAULT_REALM_ROW_BREACHES_TOTAL,
   WOC_BATTLEGROUND_CAPTURES_TOTAL,
   WOC_BATTLEGROUND_DURATION_SECONDS_TOTAL,
   WOC_BATTLEGROUND_MATCHES_TOTAL,
   WOC_CHARACTER_DELETE_BUSY_TOTAL,
   WOC_CHARACTER_DELETE_GATE,
   WOC_CHARACTER_DELETE_VERIFY_TOTAL,
+  WOC_CHARACTER_STATE_BYTES_MAX,
+  WOC_CHARACTER_STATE_BYTES_P99,
   WOC_CHARACTERS_CREATED_TOTAL,
   WOC_CHAT_MESSAGES_TOTAL,
   WOC_COPPER_CREDITED_TOTAL,
@@ -59,6 +62,8 @@ import {
   WOC_GUILD_BANK_INCIDENTS_TOTAL,
   WOC_GUILD_BANK_LOG_CACHE,
   WOC_INPUT_FRAMES_MISSED_TOTAL,
+  WOC_MARKET_SOLD_VOLUME_TAIL,
+  WOC_MARKET_SOLD_VOLUME_TAIL_DROPPED_SALES_TOTAL,
   WOC_PLAYERS_ONLINE,
   WOC_ROD_FEE_COPPER,
   WOC_ROD_FEE_PAYMENTS_TOTAL,
@@ -68,6 +73,7 @@ import {
   WOC_SIM_TICK_PHASE_SECONDS,
   WOC_STORAGE_RECOVERY,
   WOC_TICK_PHASES,
+  WOC_USERNAME_BANLIST_FILE_LOADED,
   WOC_VAULT_LEDGER_INCIDENTS_TOTAL,
   WOC_WS_CONNECTIONS,
   WOC_WS_MESSAGES_DROPPED_TOTAL,
@@ -89,6 +95,9 @@ import {
 /** A GameStateSource returning fixed values; override any field per test. */
 function stubSource(overrides: Partial<GameStateSource> = {}): GameStateSource {
   return {
+    usernameBanlistLoaded: () => true,
+    characterBlobBytesHighWater: () => 17408,
+    characterBlobBytesP99: () => 16544,
     playersOnline: () => 3,
     accountsOnline: () => 2,
     wsConnections: () => 5,
@@ -138,6 +147,7 @@ function stubSource(overrides: Partial<GameStateSource> = {}): GameStateSource {
     dbPool: () => ({ total: 7, idle: 4, waiting: 1 }),
     dbBackendCancels: () => ({ requested: 3, failed: 1 }),
     bankLedgerTail: () => ({ depth: 12, rows: 240, droppedRows: 5 }),
+    soldVolumeTail: () => ({ depth: 3, coalescedSales: 7, droppedSales: 2 }),
     generalChatQuotaDbPool: () => ({ total: 2, idle: 1, waiting: 0 }),
     generalChatQuotaInFlight: () => 0,
     generalChatQuotaCachedAccounts: () => 0,
@@ -222,11 +232,17 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
     expect(WOC_SIM_TICK_HZ).toBe('woc_sim_tick_hz');
     expect(WOC_SAVE_PENDING_KEYS).toBe('woc_character_save_pending_keys');
     expect(WOC_ESCROW_GATE_IN_FLIGHT).toBe('woc_escrow_gate_in_flight');
+    expect(WOC_USERNAME_BANLIST_FILE_LOADED).toBe('woc_username_banlist_file_loaded');
+    expect(WOC_CHARACTER_STATE_BYTES_MAX).toBe('woc_character_state_bytes_max');
+    expect(WOC_CHARACTER_STATE_BYTES_P99).toBe('woc_character_state_bytes_p99');
     expect(WOC_BACKGROUND_DB_GATE).toBe('woc_background_db_gate');
     expect(WOC_STORAGE_RECOVERY).toBe('woc_storage_recovery');
     expect(WOC_BANK_LEDGER_GROWTH_BUDGET).toBe('woc_bank_ledger_growth_budget');
 
     for (const name of [
+      WOC_USERNAME_BANLIST_FILE_LOADED,
+      WOC_CHARACTER_STATE_BYTES_MAX,
+      WOC_CHARACTER_STATE_BYTES_P99,
       WOC_PLAYERS_ONLINE,
       WOC_ACCOUNTS_ONLINE,
       WOC_WS_CONNECTIONS,
@@ -253,6 +269,13 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
     // The realm escrow gate's occupancy (the fix round: an alert rule needs
     // it in /metrics, not only behind the dashboard secret).
     expect(sampleValue(text, /^woc_escrow_gate_in_flight (\d+)$/m)).toBe('2');
+    // The blob high-water gauge (the Phase 17 database review): the stub
+    // returns the professions-block ceiling figure.
+    expect(sampleValue(text, /^woc_character_state_bytes_max (\d+)$/m)).toBe('17408');
+    // The p99 sibling (Phase 18, the farming handoff's P3 row): the stub
+    // returns the professions-block tracking-band floor, distinct from the
+    // max above so a swapped collect() reads wrong here.
+    expect(sampleValue(text, /^woc_character_state_bytes_p99 (\d+)$/m)).toBe('16544');
   });
 
   it('exports the fixed durable ledger limit and last database observation', async () => {
@@ -507,6 +530,30 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
     expect(sampleValue(text, /^woc_bank_ledger_tail_dropped_rows_total (\d+)$/m)).toBe('5');
     // The retired mixed shape stays retired.
     expect(text).not.toMatch(/^woc_bank_ledger_tail\{measure="dropped_rows"\}/m);
+  });
+
+  it('splits the market sold-volume FIFO into an instantaneous gauge and a drop counter', async () => {
+    const registry = new Registry();
+    registerGameStateMetrics(registry, stubSource());
+    const text = await registry.metrics();
+    expect(WOC_MARKET_SOLD_VOLUME_TAIL).toBe('woc_market_sold_volume_tail');
+    expect(WOC_MARKET_SOLD_VOLUME_TAIL_DROPPED_SALES_TOTAL).toBe(
+      'woc_market_sold_volume_tail_dropped_sales_total',
+    );
+    expect(text).toContain(`# TYPE ${WOC_MARKET_SOLD_VOLUME_TAIL} gauge`);
+    expect(text).toContain(`# TYPE ${WOC_MARKET_SOLD_VOLUME_TAIL_DROPPED_SALES_TOTAL} counter`);
+    // The stub returns depth 3 (queued write entries) and coalesced 7 (lifetime
+    // sales folded into an already-queued entry): the instantaneous arms.
+    expect(sampleValue(text, /^woc_market_sold_volume_tail\{measure="depth"\} (\d+)$/m)).toBe('3');
+    expect(sampleValue(text, /^woc_market_sold_volume_tail\{measure="coalesced"\} (\d+)$/m)).toBe(
+      '7',
+    );
+    // The lifetime drop total is its OWN counter (rate()/increase() across a
+    // realm restart), never a measure on the gauge.
+    expect(labelValues(text, 'measure', WOC_MARKET_SOLD_VOLUME_TAIL)).toEqual(
+      new Set(['depth', 'coalesced']),
+    );
+    expect(sampleValue(text, /^woc_market_sold_volume_tail_dropped_sales_total (\d+)$/m)).toBe('2');
   });
 
   it('exports the dedicated-side-pool backend cancels as two counters', async () => {
@@ -866,6 +913,7 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
       'bank_vault',
       'guild_bank',
       'cosmetic',
+      'lane_name_screen',
     ]);
     for (const cause of WS_DROP_CAUSES) {
       expect(
@@ -917,7 +965,22 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
     expect(sampleValue(text, /^woc_input_frames_missed_total (\d+)$/m)).toBe('9');
   });
 
-  it('keeps the cause label bounded to the fixed nine values', async () => {
+  it('reads woc_username_banlist_file_loaded from the source at scrape time, both values', async () => {
+    // The scrape-visible twin of the banlist warn line (the phase 13 QA
+    // hot-path review): a mount that fails hours after boot flips it to 0.
+    const registry = new Registry();
+    let loaded = true;
+    registerGameStateMetrics(registry, stubSource({ usernameBanlistLoaded: () => loaded }));
+    expect(sampleValue(await registry.metrics(), /^woc_username_banlist_file_loaded (\d+)$/m)).toBe(
+      '1',
+    );
+    loaded = false;
+    expect(sampleValue(await registry.metrics(), /^woc_username_banlist_file_loaded (\d+)$/m)).toBe(
+      '0',
+    );
+  });
+
+  it('keeps the cause label bounded to the closed WS_DROP_CAUSES set', async () => {
     const registry = new Registry();
     const counters = registerGameStateMetrics(registry, stubSource());
     counters.wsMessageDropped('rate');
@@ -994,6 +1057,21 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
     expect(labelValues(text, 'kind', WOC_GUILD_BANK_INCIDENTS_TOTAL)).toEqual(
       new Set(GUILD_BANK_INCIDENTS),
     );
+  });
+
+  it('pre-registers the realm row-breach counter at zero and increments unlabeled', async () => {
+    // The one release/v0.41.0 metric family that shipped without a pin (found
+    // at the sync-merge audit): telemetry-only, label-free, alert on rate.
+    const registry = new Registry();
+    const counters = registerGameStateMetrics(registry, stubSource());
+    expect(WOC_BANK_VAULT_REALM_ROW_BREACHES_TOTAL).toBe('woc_bank_vault_realm_row_breaches_total');
+    const zeroed = await registry.metrics();
+    expect(zeroed).toContain(`# TYPE ${WOC_BANK_VAULT_REALM_ROW_BREACHES_TOTAL} counter`);
+    expect(sampleValue(zeroed, /^woc_bank_vault_realm_row_breaches_total (\d+)$/m)).toBe('0');
+    counters.bankVaultRealmRowBreach();
+    counters.bankVaultRealmRowBreach();
+    const text = await registry.metrics();
+    expect(sampleValue(text, /^woc_bank_vault_realm_row_breaches_total (\d+)$/m)).toBe('2');
   });
 
   it('pre-registers every vault ledger incident kind at zero and increments by kind', async () => {
@@ -1156,6 +1234,7 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
       WOC_ROD_FEE_PAYMENTS_TOTAL,
       WOC_GUILD_BANK_INCIDENTS_TOTAL,
       WOC_VAULT_LEDGER_INCIDENTS_TOTAL,
+      WOC_BANK_VAULT_REALM_ROW_BREACHES_TOTAL,
       WOC_ESCROW_QUEUE_TOTAL,
       WOC_BATTLEGROUND_MATCHES_TOTAL,
       WOC_BATTLEGROUND_DURATION_SECONDS_TOTAL,
@@ -1199,6 +1278,7 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
     expect(() => counters.rodFeePaid(ROD_FEE_RECIPE_IDS[0])).not.toThrow();
     expect(() => counters.guildBankIncident('reconcile')).not.toThrow();
     expect(() => counters.vaultLedgerIncident('ledger_write_failed')).not.toThrow();
+    expect(() => counters.bankVaultRealmRowBreach()).not.toThrow();
     // The escrow-queue counter sits on the listing request path: a prom failure
     // there must never turn an observable refusal into a thrown 500.
     expect(() => counters.wocEscrowQueue('started')).not.toThrow();
@@ -1475,11 +1555,15 @@ describe('registerGameStateMetrics: fishing telemetry counters', () => {
     // who never appears in a band must read as a real zero, not as a gap.
     const text = await registry.metrics();
 
-    expect([...FISHING_BANDS]).toEqual(['0', '1', '2']);
+    // SIX since masterwrought Phase 11i grew the catch ladder.
+    expect([...FISHING_BANDS]).toEqual(['0', '1', '2', '3', '4', '5']);
     const combos = HARVEST_BANDS.length * FISHING_BANDS.length;
-    // 15 zones x 3 bands since the Proving Shore tutorial island (was 14 x 3
-    // since the v0.32.0 expansion, 3 x 3 before that).
-    expect(combos).toBe(45);
+    // 14 zones x 6 bands since masterwrought Phase 11i grew the catch ladder
+    // (was 14 x 3 = 42 after the v0.32.0 expansion, and 3 x 3 = 9 before it).
+    // The Proving Shore tutorial island (release/v0.41.0) then adds the 15th
+    // zone (the release read 15 x 3 = 45 on its own), so the merged tree is
+    // 15 zones x 6 bands.
+    expect(combos).toBe(90);
     for (const name of FISHING_COUNTER_NAMES) {
       for (const zone of HARVEST_BANDS) {
         for (const band of FISHING_BANDS) {
@@ -1630,7 +1714,15 @@ describe('registerGameStateMetrics: fishing telemetry counters', () => {
     // A dropped sample must not have moved a real series on the way out: an
     // off-vocabulary BAND with a real zone is the arm most likely to leak.
     for (const name of FISHING_COUNTER_NAMES) {
-      expect(fishingSeries(text, name), name).toHaveLength(45);
+      // 14 zones x 6 bands, doubled from 42 by the ladder growing to six bands
+      // at masterwrought Phase 11i, then 15 x 6 once the Proving Shore
+      // tutorial island (release/v0.41.0) joined ZONES. The zone term is the
+      // whole HARVEST_BANDS vocabulary, not the three zones with a catch table
+      // of their own (every other zone's water fishes too, on the
+      // eastbrook_vale fallback): the exporter pre-seeds the full cross
+      // product so a zone-and-band pair that never fires reads as a real zero
+      // rather than a gap.
+      expect(fishingSeries(text, name), name).toHaveLength(90);
       for (const zone of HARVEST_BANDS) {
         for (const band of FISHING_BANDS) {
           expect(fishingValue(text, name, zone, band), `${name} ${zone} ${band}`).toBe('0');
@@ -1657,7 +1749,8 @@ describe('registerGameStateMetrics: fishing telemetry counters', () => {
 
     const text = await registry.metrics();
     // The zone label is bounded to the SAME zone vocabulary the harvest counter
-    // uses (one zone list, not two), and the band to the three fishing rungs.
+    // uses (one zone list, not two), and the band to the SIX fishing rungs
+    // (three until masterwrought Phase 11i widened the catch ladder).
     const zones = new Set(
       [...text.matchAll(/^woc_fishing_\w+\{zone="([^"]+)",band="[^"]+"\}/gm)].map((m) => m[1]),
     );

@@ -31,6 +31,12 @@ import {
 import { createMob } from '../src/sim/entity';
 import { respawnMob } from '../src/sim/mob/lifecycle';
 import { craftItem } from '../src/sim/professions/crafting';
+import {
+  PERFECTING_ATTEMPT_COST,
+  PERFECTING_RANKS,
+  PERFECTING_SKILL_REQ,
+  resolvePerfectingAttempt,
+} from '../src/sim/professions/perfecting';
 import { stationsOfType } from '../src/sim/professions/stations';
 import { type ArenaMatch, type InstanceSlot, type PlayerMeta, Sim } from '../src/sim/sim';
 import { endArenaMatch } from '../src/sim/social/arena';
@@ -1353,5 +1359,80 @@ describe('rare camp kills feed the Book of Deeds (RARE_SLAIN_TEMPLATES)', () => 
     updateDeeds(sim.ctx);
     expect(meta.deedStats.visited.has('slain:shardlord_kazzix')).toBe(true);
     expect(meta.deedsEarned.has('chr_peaks_rares_ii')).toBe(true);
+  });
+});
+
+// The Phase 13 promotion capstone (prog_legendmaker, stat legendariesForged):
+// the grant site is resolvePerfectingAttempt (professions/perfecting.ts),
+// driven here end to end through a real Sim. The Perfected fixture comes from
+// the REAL producer, the rank track itself: resolvePerfectingAttempt walked
+// PERFECTING_RANKS times under a forced-success roll (the perfecting.test.ts
+// forceRoll technique, restored after the walk), never a hand-stamped payload.
+describe('legendary promotion feeds the Book of Deeds (prog_legendmaker)', () => {
+  const APEX_ID = 'wyrmfall_pendant'; // apex jewelry, no class gate (jewelcrafting)
+  const DEED_ITEM = 'deed_of_making';
+  const NAME = 'Wyrmsorrow';
+
+  // Re-derive the bag ref before every use: consuming a material stack can
+  // shift bag indices, and the ref contract (item_copy_ref.ts) resolves a
+  // stale index to null rather than to whatever cell now holds the index.
+  function apexRef(meta: PlayerMeta): { bag: number; itemId: string } {
+    const bag = meta.inventory.findIndex((s) => s.itemId === APEX_ID);
+    expect(bag, `${APEX_ID} is really in the bags`).toBeGreaterThanOrEqual(0);
+    return { bag, itemId: APEX_ID };
+  }
+
+  // A skill-125 jewelcrafter whose apex copy is walked to Perfected through
+  // the real rank track; every fixture assertion is a premise the promotion
+  // cases below stand on, not the claim under test.
+  function perfectedFixture(): { sim: Sim; meta: PlayerMeta; pid: number } {
+    const sim = makeSim();
+    const meta = addMeta(sim, 'A');
+    const pid = meta.entityId;
+    meta.craftSkills.jewelcrafting = PERFECTING_SKILL_REQ;
+    for (const c of PERFECTING_ATTEMPT_COST) {
+      sim.addItem(c.itemId, c.count * PERFECTING_RANKS, pid);
+    }
+    sim.addItem(APEX_ID, 1, pid);
+    // Forced success (0 < PERFECTING_SUCCESS_CHANCE), restored after the walk
+    // so the promotion under test runs on the untouched stream (deed credit
+    // is draw-order neutral by contract, and the promotion itself never
+    // rolls).
+    (sim.rng as { next: () => number }).next = () => 0;
+    for (let i = 0; i < PERFECTING_RANKS; i++) {
+      resolvePerfectingAttempt(sim.ctx, pid, apexRef(meta));
+    }
+    delete (sim.rng as { next?: () => number }).next;
+    const copy = meta.inventory[apexRef(meta).bag];
+    expect(copy?.instance?.perfected, 'the fixture really is Perfected').toBe(true);
+    sim.drainEvents();
+    return { sim, meta, pid };
+  }
+
+  it('a real promotion bumps legendariesForged and grants after the tick-tail evaluator', () => {
+    const { sim, meta, pid } = perfectedFixture();
+    sim.addItem(DEED_ITEM, 1, pid);
+    resolvePerfectingAttempt(sim.ctx, pid, apexRef(meta), NAME);
+    expect(sim.countItem(DEED_ITEM, pid), 'the Deed of Making is consumed').toBe(0);
+    expect(meta.deedStats.counters.legendariesForged).toBe(1);
+    // The counter site never grants directly: the tick-tail evaluator does.
+    expect(meta.deedsEarned.has('prog_legendmaker')).toBe(false);
+    updateDeeds(sim.ctx);
+    expect(meta.deedsEarned.has('prog_legendmaker')).toBe(true);
+  });
+
+  it('a DENIED promotion (no Deed of Making in the bags) bumps nothing and grants nothing', () => {
+    const { sim, meta, pid } = perfectedFixture();
+    resolvePerfectingAttempt(sim.ctx, pid, apexRef(meta), NAME);
+    expect(meta.deedStats.counters.legendariesForged).toBe(0);
+    updateDeeds(sim.ctx);
+    expect(meta.deedsEarned.has('prog_legendmaker')).toBe(false);
+    // The missing Deed of Making was the ONE gate: the same copy promotes the
+    // moment it arrives, so the deny arm left the fixture intact.
+    sim.addItem(DEED_ITEM, 1, pid);
+    resolvePerfectingAttempt(sim.ctx, pid, apexRef(meta), NAME);
+    expect(meta.deedStats.counters.legendariesForged).toBe(1);
+    updateDeeds(sim.ctx);
+    expect(meta.deedsEarned.has('prog_legendmaker')).toBe(true);
   });
 });

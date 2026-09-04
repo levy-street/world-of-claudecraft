@@ -88,7 +88,6 @@ export const table: DeedLocaleTable = {
     desc: 'Oogst een ertsader, een houtopstand en een kruidenbed in Nightbloom.',
   },
   chr_nightbloom_first_cast: {
-    name: 'Een rimpel op de maanbron',
     desc: 'Vang een vis in de wateren van Nightbloom.',
   },
   chr_wraithwood_gatherer: {
@@ -193,7 +192,6 @@ export const table: DeedLocaleTable = {
   },
   prog_master_gatherer: {
     name: 'Meesterverzamelaar',
-    desc: 'Bereik 100 vaardigheid in drie van de vier verzamelberoepen Mijnbouw, Houthakken, Kruidenkunde en Vissen.',
   },
   prog_first_craft: { name: 'Handwerk', desc: 'Voltooi je eerste geslaagde ambachtswerk.' },
   prog_craft_specialist: {
@@ -304,7 +302,6 @@ export const table: DeedLocaleTable = {
     title: 'Wurmveller',
   },
   dgn_sanctum_speed: {
-    name: 'Heiligdomssprint',
     desc: 'Versla Korzul de Grafwurm binnen 15 minuten nadat je groep het Grafwurm-Heiligdom heeft opgeëist.',
   },
   dgn_nythraxis_gravebreaker: {
@@ -370,7 +367,7 @@ export const table: DeedLocaleTable = {
   },
   dlv_varric_ringers: {
     name: 'De Klokken Verstommen',
-    desc: 'Versla Diaken Varric terwijl elke Doodsklokluider die hij doet verrijzen al gedood is.',
+    desc: 'Versla Diaken Vandric terwijl elke Doodsklokluider die hij doet verrijzen al gedood is.',
   },
   dlv_nhalia_bells: {
     name: 'Klokkenstiller',
@@ -446,7 +443,6 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: 'Kroniek van Doorntop',
-    desc: 'Breng het hele verhaal van de berg tot een einde: de Wurmcultus gebroken, het Heiligdom tot zwijgen gebracht, de Ontwakende Piek geveld en elke naamdragende verschrikking van de rotsen ten val gebracht.',
     title: 'van Doorntop',
   },
   chr_peaks_sparring: {
@@ -547,7 +543,7 @@ export const table: DeedLocaleTable = {
   },
   col_quartermaster_buyout: {
     name: 'Vaste Klant',
-    desc: 'Ontdek alle tien de stukken uit de voorraad van de Heroïsche Kwartiermeester.',
+    desc: 'Ontdek alle tien de uitrustingsstukken uit de voorraad van de Heroïsche Kwartiermeester.',
   },
   col_glimmerfin: {
     name: 'Een Glansje Hoop',

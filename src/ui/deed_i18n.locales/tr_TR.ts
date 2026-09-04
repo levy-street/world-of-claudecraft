@@ -88,7 +88,6 @@ export const table: DeedLocaleTable = {
     desc: 'Nightbloom da bir cevher damari, bir odun alani ve bir ot yatagi hasat et.',
   },
   chr_nightbloom_first_cast: {
-    name: 'Ay Kuyusunda Bir Halka',
     desc: 'Nightbloom sularindan bir balik yakala.',
   },
   chr_wraithwood_gatherer: {
@@ -187,7 +186,6 @@ export const table: DeedLocaleTable = {
   },
   prog_master_gatherer: {
     name: 'Usta Toplayıcı',
-    desc: "Madencilik, Odun Kesimi, Şifalı Otçuluk ve Balık Tutma'nın herhangi üçünde 100 yetkinliğe ulaş.",
   },
   prog_first_craft: { name: 'El Emeği Göz Nuru', desc: 'İlk başarılı üretimini tamamla.' },
   prog_craft_specialist: {
@@ -292,7 +290,6 @@ export const table: DeedLocaleTable = {
     title: 'Ejderdeviren',
   },
   dgn_sanctum_speed: {
-    name: 'Mabet Koşusu',
     desc: "Grubunun Mezarejderi Mabedi'ni almasından itibaren 15 dakika içinde Mezarejderi Korzul'u alt et.",
   },
   dgn_nythraxis_gravebreaker: {
@@ -358,7 +355,7 @@ export const table: DeedLocaleTable = {
   },
   dlv_varric_ringers: {
     name: 'Çanlar Susar',
-    desc: "Diyakoz Varric'i, dirilttiği her Cenaze Çancısı çoktan öldürülmüşken yen.",
+    desc: "Diyakoz Vandric'i, dirilttiği her Cenaze Çancısı çoktan öldürülmüşken yen.",
   },
   dlv_nhalia_bells: {
     name: 'Çan Susturan',
@@ -434,7 +431,6 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: "Dikenzirve'nin Vakayinamesi",
-    desc: "Dağın hikâyesini sonuna dek götür: Ejder Tarikatı'nı çökert, Mabet'i sustur, Uyanan Zirve'yi devir ve kayalıkların adı bilinen her dehşetini yere ser.",
     title: 'Dikenzirveli',
   },
   chr_peaks_sparring: {
@@ -519,7 +515,7 @@ export const table: DeedLocaleTable = {
   },
   col_quartermaster_buyout: {
     name: 'Gedikli Müşteri',
-    desc: "Kahramanca Levazımcısı'nın tezgâhındaki on parçanın tamamını keşfet.",
+    desc: "Kahramanca Levazımcısı'nın tezgâhındaki on teçhizat parçasının tamamını keşfet.",
   },
   col_glimmerfin: {
     name: 'Umut Pırıltısı',

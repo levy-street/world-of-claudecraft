@@ -10,15 +10,9 @@ import {
   ENCHANT_CAST_ID,
   type Entity,
   SALVAGE_CAST_ID,
+  SUNDER_CAST_ID,
   TOOL_RECHARGE_CAST_ID,
 } from '../../src/sim/types';
-
-function playerPair(sim: Sim, pid: number): { meta: PlayerMeta; p: Entity } {
-  const meta = sim.players.get(pid) as PlayerMeta | undefined;
-  const p = (sim as unknown as { entities: Map<number, Entity> }).entities.get(pid);
-  if (!meta || !p) throw new Error('player missing for cast complete');
-  return { meta, p };
-}
 
 export function completeCraftCast(sim: Sim, pid = sim.playerId): void {
   const meta = sim.players.get(pid) as PlayerMeta | undefined;
@@ -59,11 +53,21 @@ export function completeEnchantFamilyCast(sim: Sim, pid = sim.playerId): void {
   if (castId === DISENCHANT_CAST_ID) sim.ctx.completeDisenchantCast(p, meta);
   else if (castId === ENCHANT_CAST_ID) sim.ctx.completeApplyEnchantCast(p, meta);
   else if (castId === SALVAGE_CAST_ID) sim.ctx.completeSalvageCast(p, meta);
+  else if (castId === SUNDER_CAST_ID) sim.ctx.completeSunderCast(p, meta);
   else if (castId === CRAFT_CAST_ID) sim.ctx.completeCraftCast(p, meta);
   else if (castId === TOOL_RECHARGE_CAST_ID) sim.ctx.completeRechargeCast(p, meta);
   else {
     throw new Error(`expected profession cast, got ${castId}`);
   }
+}
+
+/** Start + complete a sunder cast when the command admitted one; denials
+ *  leave no cast, so the complete half is a no-op then. */
+export function runSunder(sim: Sim, itemId: string, pid?: number, slotIndex?: number): void {
+  if (pid !== undefined && slotIndex !== undefined) sim.extractEssence(itemId, pid, slotIndex);
+  else if (pid !== undefined) sim.extractEssence(itemId, pid);
+  else sim.extractEssence(itemId);
+  completeEnchantFamilyCast(sim, pid ?? sim.playerId);
 }
 
 /** Finish a running tool-recharge cast (or no-op if idle). */

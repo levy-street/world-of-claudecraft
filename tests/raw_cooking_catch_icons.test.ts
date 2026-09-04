@@ -14,7 +14,10 @@ describe('raw cooking catch icon recipes', () => {
     // other catch must hit the shared fish fallback (bg drink / pal sky /
     // prim fish). A loose fish|droplet|fang set is too weak: trinket scale
     // maps to droplet and would hide a dead fallback arm.
-    expect(RAW_COOKING_CATCH_IDS.size).toBe(7);
+    // Ten since the three high-band catches joined the catalog. Their shipped
+    // WebPs provide the distinct runtime art, while the compositor keeps one
+    // generic fallback for any missing static asset.
+    expect(RAW_COOKING_CATCH_IDS.size).toBe(10);
     for (const id of RAW_COOKING_CATCH_IDS) {
       expect(ITEMS[id].kind, id).toBe('junk');
       const recipe = itemIconRecipe(id);
@@ -30,8 +33,7 @@ describe('raw cooking catch icon recipes', () => {
   });
 
   it('name-token fish fallthrough does not use junk trinket scroll for catches', () => {
-    // raw_river_perch has no hand-authored ITEM_RECIPES row; it must hit the
-    // fish fallback, not trinketPrimitive.
+    // raw_river_perch must hit the fish fallback, not trinketPrimitive.
     const recipe = itemIconRecipe('raw_river_perch');
     expect(recipe.prims.map((p) => p.p)).toEqual(['fish']);
     expect(recipe.bg).toBe('drink');

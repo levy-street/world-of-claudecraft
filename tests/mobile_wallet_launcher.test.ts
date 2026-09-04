@@ -3,7 +3,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { FocusManager } from '../src/ui/focus_manager';
 
-vi.mock('../src/ui/i18n', () => ({
+// Additive, never bare (the reliquary_window_behavior lesson): only t stays
+// overridden with the fixture strings; the rest passes through.
+vi.mock('../src/ui/i18n', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../src/ui/i18n')>()),
   t: (key: string, params?: { wallet?: string }) => {
     if (key === 'wallet.openAppTitle') return `Continue in ${params?.wallet}`;
     if (key === 'wallet.openAppHelp') return `Open ${params?.wallet} to review this request.`;

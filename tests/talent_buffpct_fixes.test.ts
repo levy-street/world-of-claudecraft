@@ -133,7 +133,7 @@ describe('talent buffPct resolver fixes', () => {
     expect(rune.allyBuffPct).toBe(0.1);
   });
 
-  it('Heroic Leap landingAoe damage scales with the global melee damage modifier', () => {
+  it('Vaulting Charge landingAoe damage scales with the global melee damage modifier', () => {
     const mods = emptyModifiers();
     accumulateTalentEffect(mods, { global: { meleeDmgPct: 0.4 } }, 1);
 

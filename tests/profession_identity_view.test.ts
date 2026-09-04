@@ -6,7 +6,7 @@ import {
   orderSkillsForCard,
   type ProfessionSkillRow,
   uniformSkillChips,
-} from '../src/ui/profession_identity_view';
+} from '../src/ui/hud/professions/profession_identity_view';
 
 const baseIdentity = {
   version: 1 as const,

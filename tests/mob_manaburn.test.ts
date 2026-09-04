@@ -1,13 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { Sim } from '../src/sim/sim';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 
 const SEED = 42;
-const makeSim = (cls: PlayerClass = 'mage') => new Sim({ seed: SEED, playerClass: cls, autoEquip: true });
+const makeSim = (cls: PlayerClass = 'mage') =>
+  new Sim({ seed: SEED, playerClass: cls, autoEquip: true });
 
-// Spawn a Wyrmcult Necromancer next to the player, force its Mana Sear to always
+// Spawn a Broodsworn Necromancer next to the player, force its Mana Sear to always
 // land, and swing until a hit connects (a swing can miss/dodge).
 const setup = (cls: PlayerClass = 'mage') => {
   const sim = makeSim(cls);
@@ -31,7 +32,7 @@ const swingUntilDrain = (sim: Sim, mob: any, target: any, max = 200) => {
 };
 
 describe('mob mana burn (Mana Sear)', () => {
-  it('Wyrmcult Necromancer template carries the manaBurn mechanic', () => {
+  it('Broodsworn Necromancer template carries the manaBurn mechanic', () => {
     expect(MOBS.wyrmcult_necromancer.manaBurn).toBeDefined();
     expect(MOBS.wyrmcult_necromancer.manaBurn!.name).toBe('Mana Sear');
   });
@@ -74,7 +75,11 @@ describe('mob mana burn (Mana Sear)', () => {
     burn.chance = 1;
     const startRes = player.resource;
     try {
-      for (let i = 0; i < 50; i++) { player.maxHp = KEEP_ALIVE; player.hp = KEEP_ALIVE; (sim as any).mobSwing(mob, player); }
+      for (let i = 0; i < 50; i++) {
+        player.maxHp = KEEP_ALIVE;
+        player.hp = KEEP_ALIVE;
+        (sim as any).mobSwing(mob, player);
+      }
     } finally {
       burn.chance = old;
     }
@@ -90,7 +95,11 @@ describe('mob mana burn (Mana Sear)', () => {
     const old = burn.chance;
     burn.chance = 1;
     try {
-      for (let i = 0; i < 50; i++) { player.maxHp = KEEP_ALIVE; player.hp = KEEP_ALIVE; (sim as any).mobSwing(mob, player); }
+      for (let i = 0; i < 50; i++) {
+        player.maxHp = KEEP_ALIVE;
+        player.hp = KEEP_ALIVE;
+        (sim as any).mobSwing(mob, player);
+      }
     } finally {
       burn.chance = old;
     }

@@ -88,7 +88,6 @@ export const table: DeedLocaleTable = {
     desc: 'Host en malmare, en traestand og et urtebed i Nightbloom.',
   },
   chr_nightbloom_first_cast: {
-    name: 'En ring pa manebronden',
     desc: 'Fang en fisk i Nightblooms vande.',
   },
   chr_wraithwood_gatherer: {
@@ -168,7 +167,6 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: 'Engens Mester', desc: 'Nå 100 i færdigheden Urtekundskab.' },
   prog_master_gatherer: {
     name: 'Mestersamler',
-    desc: 'Nå 100 i færdighed i tre af fagene Minedrift, Skovhugst, Urtekundskab og Fiskeri.',
   },
   prog_first_craft: { name: 'Håndlavet', desc: 'Fuldfør din første vellykkede fremstilling.' },
   prog_craft_specialist: {
@@ -279,7 +277,6 @@ export const table: DeedLocaleTable = {
     title: 'Ormefælder',
   },
   dgn_sanctum_speed: {
-    name: 'Helligdomsspurt',
     desc: 'Besejr Korzul Gravormen inden for 15 minutter efter, at din gruppe har gjort krav på Gravormens Helligdom.',
   },
   dgn_nythraxis_gravebreaker: {
@@ -342,7 +339,7 @@ export const table: DeedLocaleTable = {
   },
   dlv_varric_ringers: {
     name: 'Klokkerne Forstummer',
-    desc: 'Fæld hver Ligklokkeringer, Diakon Varric genopvækker, før han selv falder.',
+    desc: 'Fæld hver Ligklokkeringer, Diakon Vandric genopvækker, før han selv falder.',
   },
   dlv_nhalia_bells: {
     name: 'Klokkestiller',
@@ -415,7 +412,6 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: 'Krøniken om Tornetop',
-    desc: 'Følg bjergets fulde fortælling til ende: Ormekulten knust, Helligdommen bragt til tavshed, den Vågnende Tinde styrtet og hver navngiven rædsel i klipperne fældet.',
     title: 'af Tornetop',
   },
   chr_peaks_sparring: {
@@ -492,7 +488,7 @@ export const table: DeedLocaleTable = {
   },
   col_quartermaster_buyout: {
     name: 'Stamkunde',
-    desc: 'Opdag alle ti dele af den Heroiske Kvartermesters lager.',
+    desc: 'Opdag alle ti udstyrsdele fra den Heroiske Kvartermesters lager.',
   },
   col_glimmerfin: {
     name: 'Et Glimt af Håb',

@@ -1,17 +1,27 @@
 import { EventEmitter } from 'node:events';
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  hasBannedTerm,
+  indexBannedTerms,
   MAX_EMAIL_LENGTH,
   normalizeCharName,
   normalizeEmail,
   offensiveName,
   offensiveUsername,
+  setUsernameBanlistStatHoldMsForTest,
+  USERNAME_BANLIST_FILE_MAX_BYTES,
+  USERNAME_BANLIST_STAT_HOLD_MS,
+  usernameBanlistBootLine,
+  usernameBanlistStatCountForTest,
+  usernameBanlistStatHoldMsForTest,
+  usernameBanlistStatus,
   validCharName,
   validEmail,
   validUsername,
+  warmUsernameBanlist,
 } from '../server/auth';
 import {
   consumeDesktopLoginCode,
@@ -74,6 +84,13 @@ function fakeReq(headers: Record<string, string>, remoteAddress: string) {
   return req;
 }
 
+// The banlist tests below edit the file and screen in the same millisecond, so
+// they run with no stat hold; the hold itself is proven by its own case. The
+// LIVE initializer is captured BEFORE the blanket zero, so the production
+// wiring (hold = the constant) stays pinned (the round-3 test audit).
+const liveStatHoldMs = usernameBanlistStatHoldMsForTest();
+setUsernameBanlistStatHoldMsForTest(0);
+
 function withUsernameBanlist(env: { inline?: string; file?: string }, test: () => void): void {
   const prevInline = process.env.USERNAME_BANLIST;
   const prevFile = process.env.USERNAME_BANLIST_FILE;
@@ -93,12 +110,16 @@ function withUsernameBanlist(env: { inline?: string; file?: string }, test: () =
 
 describe('websocket authentication', () => {
   it('pins the strict world-layout auth epoch for symmetric mixed-release rejection', () => {
-    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(25);
+    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(26);
     expect(ONLINE_WORLD_AUTH_TYPE).toBe(`auth-world-${ONLINE_WORLD_LAYOUT_VERSION}`);
-    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-25');
-    // The previous layout-gated server accepts only `auth-world-11`, so the new
-    // client discriminator must remain necessarily unrecognizable to it.
+    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-26');
+    // The release/v0.41.0 server this branch merged accepts only `auth-world-25`
+    // (the Ignivar raid ladder's tip), and the previous layout-gated servers
+    // before it only `auth-world-11` and `auth-world-10`, so the new client
+    // discriminator must remain necessarily unrecognizable to every one of them.
+    expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-25');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-11');
+    expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-10');
   });
 
   it('keeps bearer tokens out of the websocket URL', () => {
@@ -646,7 +667,7 @@ describe('username censorship', () => {
     }
   });
 
-  it('caches file-backed banned terms until banlist env changes', () => {
+  it('re-reads the banlist file when its mtime changes, without an env change or restart', () => {
     const dir = mkdtempSync(join(tmpdir(), 'woc-banlist-'));
     const firstFile = join(dir, 'first.txt');
     const secondFile = join(dir, 'second.txt');
@@ -654,14 +675,40 @@ describe('username censorship', () => {
     writeFileSync(secondFile, 'otherterm\n');
 
     try {
+      // Mint the baseline stamp with utimesSync itself: a filesystem stamp can
+      // carry sub-millisecond precision a Date round-trip truncates, so a
+      // statSync-read original would not restore byte-identical.
+      const baseline = new Date(Date.now() - 5000);
+      utimesSync(firstFile, baseline, baseline);
       withUsernameBanlist({ file: firstFile }, () => {
         expect(offensiveName('fileterm')).toBe(true);
-        writeFileSync(firstFile, 'changedterm\n');
+        // The cache is keyed on the file's (mtime, size) pair, never its
+        // content: a SAME-LENGTH rewrite rolled back to the baseline stamp
+        // still serves the cached terms (the accepted residual; only a
+        // content hash could see it, and that costs the read the cache
+        // elides) ...
+        writeFileSync(firstFile, 'wxyzterm\n');
+        utimesSync(firstFile, baseline, baseline);
         expect(offensiveName('fileterm')).toBe(true);
+        expect(offensiveName('wxyzterm')).toBe(false);
+        // ... while a same-mtime rewrite whose LENGTH moved busts: size rides
+        // the key beside mtimeMs, so a copy landed inside one timestamp
+        // still takes effect without a restart ...
+        writeFileSync(firstFile, 'changedterm\n');
+        utimesSync(firstFile, baseline, baseline);
+        expect(offensiveName('changedterm')).toBe(true);
+        expect(offensiveName('fileterm')).toBe(false);
+        // ... and a moved stamp alone (same length as the write above)
+        // re-reads too, so an edited banlist takes effect with no restart
+        // and no env change.
+        const bumped = new Date(baseline.getTime() + 2000);
+        writeFileSync(firstFile, 'flippedterm\n');
+        utimesSync(firstFile, bumped, bumped);
+        expect(offensiveName('flippedterm')).toBe(true);
         expect(offensiveName('changedterm')).toBe(false);
 
         process.env.USERNAME_BANLIST_FILE = secondFile;
-        expect(offensiveName('fileterm')).toBe(false);
+        expect(offensiveName('flippedterm')).toBe(false);
         expect(offensiveName('otherterm')).toBe(true);
 
         delete process.env.USERNAME_BANLIST_FILE;
@@ -672,7 +719,7 @@ describe('username censorship', () => {
     }
   });
 
-  it('retries file-backed banned terms after a failed read', () => {
+  it('retries file-backed banned terms after a failed read, warning ONCE per failure state', () => {
     const dir = mkdtempSync(join(tmpdir(), 'woc-banlist-missing-'));
     const missingFile = join(dir, 'missing.txt');
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
@@ -681,9 +728,319 @@ describe('username censorship', () => {
       withUsernameBanlist({ file: missingFile }, () => {
         expect(offensiveName('laterterm')).toBe(false);
         expect(warn).toHaveBeenCalledOnce();
+        // The failure is cached under its own key (stale-on-error): the next
+        // calls neither re-stat, re-read, nor re-warn (the phase 13 QA hot-path
+        // finding: the old shape paid all three, synchronously, per name screen).
+        expect(offensiveName('laterterm')).toBe(false);
+        expect(offensiveName('otherterm')).toBe(false);
+        expect(warn).toHaveBeenCalledOnce();
 
+        // The file appearing moves the stamp off the sentinel: one fresh read.
         writeFileSync(missingFile, 'laterterm\n');
         expect(offensiveName('laterterm')).toBe(true);
+        expect(warn).toHaveBeenCalledOnce();
+      });
+    } finally {
+      warn.mockRestore();
+      rmSync(dir, { force: true, recursive: true });
+    }
+  });
+
+  it('keeps enforcing the last good file terms while the file is unreadable (stale-on-error)', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'woc-banlist-stale-'));
+    const file = join(dir, 'banlist.txt');
+    writeFileSync(file, 'goneterm\n');
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+    try {
+      withUsernameBanlist({ file }, () => {
+        expect(offensiveName('goneterm')).toBe(true);
+        expect(warn).not.toHaveBeenCalled();
+        // The mount vanishes: the operator list is NOT dropped (the old shape
+        // fell back to the built-ins alone), one warn marks the transition,
+        // and repeated screens pay nothing more.
+        rmSync(file, { force: true });
+        expect(offensiveName('goneterm')).toBe(true);
+        expect(offensiveName('goneterm')).toBe(true);
+        expect(warn).toHaveBeenCalledOnce();
+        // The file returning with a new list is picked up on the next call.
+        writeFileSync(file, 'backterm\n');
+        expect(offensiveName('backterm')).toBe(true);
+        expect(offensiveName('goneterm')).toBe(false);
+        expect(warn).toHaveBeenCalledOnce();
+      });
+    } finally {
+      warn.mockRestore();
+      rmSync(dir, { force: true, recursive: true });
+    }
+  });
+
+  it('refuses to read a banlist file past the byte ceiling, keeping the last good list', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'woc-banlist-huge-'));
+    const file = join(dir, 'banlist.txt');
+    writeFileSync(file, 'smallterm\n');
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+    try {
+      withUsernameBanlist({ file }, () => {
+        expect(USERNAME_BANLIST_FILE_MAX_BYTES).toBe(65_536);
+        expect(offensiveName('smallterm')).toBe(true);
+        // A regrown or mistaken file exactly ONE byte past the ceiling is the
+        // unreadable class: warned once, never read whole, the last good
+        // list still enforced and its own terms never admitted.
+        writeFileSync(file, `hugeterm\n${'z'.repeat(USERNAME_BANLIST_FILE_MAX_BYTES - 8)}`);
+        expect(offensiveName('hugeterm')).toBe(false);
+        expect(offensiveName('smallterm')).toBe(true);
+        expect(offensiveName('hugeterm')).toBe(false);
+        expect(warn).toHaveBeenCalledOnce();
+        expect(String(warn.mock.calls[0][0])).toContain('ceiling');
+        // Exactly AT the ceiling still reads.
+        writeFileSync(file, `atterm\n${'z'.repeat(USERNAME_BANLIST_FILE_MAX_BYTES - 7)}`);
+        expect(offensiveName('atterm')).toBe(true);
+        expect(warn).toHaveBeenCalledOnce();
+        // The bound is bytes ON DISK: a non-UTF-8 (latin-1) file exactly at
+        // the ceiling decodes with three-byte U+FFFD substitutions past it,
+        // and must still read (a re-encoded-length check refused it).
+        writeFileSync(
+          file,
+          Buffer.concat([
+            Buffer.from('lat1term\n'),
+            Buffer.alloc(USERNAME_BANLIST_FILE_MAX_BYTES - 9, 0xe9),
+          ]),
+        );
+        expect(offensiveName('lat1term')).toBe(true);
+        expect(warn).toHaveBeenCalledOnce();
+      });
+    } finally {
+      warn.mockRestore();
+      rmSync(dir, { force: true, recursive: true });
+    }
+  });
+
+  it('usernameBanlistBootLine spells both arms from the status alone', () => {
+    expect(usernameBanlistBootLine({ file: '/x/ban.txt', loaded: true, fileTerms: 12 })).toBe(
+      '  name banlist: /x/ban.txt loaded (12 file terms)',
+    );
+    expect(usernameBanlistBootLine({ file: '/x/ban.txt', loaded: false, fileTerms: 0 })).toBe(
+      '  name banlist: /x/ban.txt NOT READABLE (its terms are not enforced; the built-in and USERNAME_BANLIST terms still are; see the warn above)',
+    );
+  });
+
+  it('DEPLOY.md states the live file ceiling, the stat hold, and the per-screen cost honestly', () => {
+    // A doc figure with no code pin rots at the next constant move, and a
+    // cost claim with no pin rots at the next algorithm (the round-3 hot-path
+    // read caught "scans every term per name" one round after it stopped).
+    const deploy = readFileSync(join(__dirname, '../DEPLOY.md'), 'utf8');
+    expect(deploy).toContain(`over-${USERNAME_BANLIST_FILE_MAX_BYTES / 1024}-KiB`);
+    expect(deploy).toContain('`USERNAME_BANLIST_STAT_HOLD_MS`');
+    expect(USERNAME_BANLIST_STAT_HOLD_MS).toBe(1000);
+    // The honest cadence claim: the edit lands at the next SCREEN, not on a
+    // poll (nothing polls; the round-4 security read).
+    expect(deploy).toContain('at the next name screen');
+    expect(deploy).not.toContain('within one second');
+    // Whitespace-tolerant: a doc reflow must not red a true claim.
+    expect(deploy).toMatch(/a name screen's cost does\s+not grow with the list/);
+    // The boot-line promise the doc makes is the literal the helper prints.
+    expect(deploy).toContain('`name banlist:`');
+    expect(
+      usernameBanlistBootLine({ file: '/x', loaded: true, fileTerms: 1 }).includes('name banlist:'),
+    ).toBe(true);
+  });
+
+  it('the matcher second pass is skipped exactly when normalization changed only the case', () => {
+    // The round-3 hot-path note: the second obscenity pass exists for
+    // spellings only the confusable fold or the non-letter strip expose; a
+    // spelling that folds to itself is screened once. Decisive both ways
+    // (the round-4 audit): the spaced spelling is caught by the SECOND pass
+    // alone (raw hasMatch false, no banlist term), so deleting the pass or
+    // breaking the skip predicate reds it; the all-caps spelling pins the
+    // matcher case-insensitivity the skip depends on.
+    withUsernameBanlist({}, () => {
+      expect(offensiveName('S h i t l o r d')).toBe(true);
+      expect(offensiveName('SHITLORD')).toBe(true);
+      expect(offensiveName('Hitler')).toBe(true);
+      expect(offensiveName('H1tler')).toBe(true);
+      expect(offensiveName('H i t l e r')).toBe(true);
+      expect(offensiveName('Aurelia')).toBe(false);
+    });
+  });
+
+  it('the read hardening is present in code: isFile, non-blocking open, short-read, monotonic clock', () => {
+    // Arms pinned as comment-stripped source rather than behavior: the
+    // truncating rewrite between fstat and pread and the backward clock step
+    // cannot be deterministically induced, and the writer-less FIFO CAN be
+    // (mkfifo on the POSIX platforms CI runs) but its failure mode without
+    // the flag is a suite HANG, a worse signal than a red assertion, so the
+    // source pin is the deliberate choice (the round-4 and round-5 reads).
+    const auth = readFileSync(join(__dirname, '../server/auth.ts'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|[^:'"`])\/\/.*$/gm, '$1');
+    expect(auth).toContain('if (!stat.isFile())');
+    expect(auth).toContain('if (read !== size)');
+    expect(auth).toContain('fsConstants.O_RDONLY | fsConstants.O_NONBLOCK');
+    expect(auth).toContain('const nowMs = performance.now();');
+  });
+
+  it('hasBannedTerm answers exactly terms.some(includes), by a walk bounded by the longest term', () => {
+    const terms = ['ab', 'xyz', 'hitler', 'q'];
+    const index = indexBannedTerms(terms);
+    // The walk probes only the DISTINCT term lengths, ascending.
+    expect(index.lengths).toEqual([1, 2, 3, 6]);
+    for (const name of ['', 'a', 'ab', 'cab', 'xy', 'wxyzw', 'hitle', 'ahitlerb', 'pq', 'zzzz']) {
+      expect(hasBannedTerm(name, index), name).toBe(terms.some((term) => name.includes(term)));
+    }
+    // The term COUNT does not price a screen: a nine-thousand-term list
+    // answers a miss by the same substring walk (name length x longest term).
+    const many = indexBannedTerms(Array.from({ length: 9000 }, (_, i) => `t${i.toString(36)}z`));
+    // Nine thousand terms span exactly three distinct lengths (one to three
+    // base36 digits), which is what a screen probes: the cost claim itself.
+    expect(many.lengths).toEqual([3, 4, 5]);
+    expect(hasBannedTerm('a'.repeat(32), many)).toBe(false);
+    expect(hasBannedTerm('xxt1zxx', many)).toBe(true);
+    // The one input class where the walk and `includes` would part ways, an
+    // EMPTY term, is dropped at the index so the exported pair holds for any
+    // caller (the round-3 security read); duplicates are absorbed.
+    expect(hasBannedTerm('abc', indexBannedTerms(['']))).toBe(false);
+    expect(indexBannedTerms(['', 'ab', 'ab']).lengths).toEqual([2]);
+    expect(indexBannedTerms(['', 'ab', 'ab']).set.size).toBe(1);
+    // Boundary cases the walk must not miss: a match only at the last
+    // position, a term of exactly the name's length, a term one longer.
+    expect(hasBannedTerm('zzzab', indexBannedTerms(['ab']))).toBe(true);
+    expect(hasBannedTerm('abc', indexBannedTerms(['abc']))).toBe(true);
+    expect(hasBannedTerm('abc', indexBannedTerms(['abcd']))).toBe(false);
+  });
+
+  it('refuses a non-regular file (a device reads as empty) and keeps the last good list', () => {
+    // A FIFO, a device, or a procfs-style file reports size 0 while holding
+    // content; the old whole-file read recorded an EMPTY list as a success
+    // (loaded, 0 file terms). The fd-bounded read refuses anything but a
+    // regular file onto the warn plus last-good arm (the round-3 security read).
+    const dir = mkdtempSync(join(tmpdir(), 'woc-banlist-dev-'));
+    const file = join(dir, 'banlist.txt');
+    writeFileSync(file, 'goodterm\n');
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    try {
+      withUsernameBanlist({ file }, () => {
+        expect(offensiveName('goodterm')).toBe(true);
+      });
+      withUsernameBanlist({ file: '/dev/null' }, () => {
+        expect(warmUsernameBanlist()).toEqual({ file: '/dev/null', loaded: false, fileTerms: 0 });
+        expect(warn).toHaveBeenCalledOnce();
+        // /dev/null exists on the POSIX platforms CI runs; a Windows checkout
+        // reaches the same warn arm through ENOENT instead.
+        expect(String(warn.mock.calls[0][1])).toMatch(/not a regular file|ENOENT/);
+        // The other path's last-good terms are NOT served under this path.
+        expect(offensiveName('goodterm')).toBe(false);
+      });
+    } finally {
+      warn.mockRestore();
+      rmSync(dir, { force: true, recursive: true });
+    }
+  });
+
+  it('ships with the hold WIRED to the constant, not only the constant declared', () => {
+    expect(liveStatHoldMs).toBe(USERNAME_BANLIST_STAT_HOLD_MS);
+  });
+
+  it('the warm runs before the game loop and the gauge reads the real accessor (boot wiring)', () => {
+    // Source-order pins over server/main.ts, comment-stripped: moving the
+    // warm back inside the listen callback (a hung mount would then stall a
+    // TICKING realm's screen instead of the boot) or stubbing the gauge's
+    // source arm would green every behavior suite, so the wiring is pinned.
+    const main = readFileSync(join(__dirname, '../server/main.ts'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|[^:'"`])\/\/.*$/gm, '$1');
+    const warmAt = main.indexOf('const banlist = warmUsernameBanlist();');
+    const startAt = main.indexOf('game.start();');
+    expect(warmAt).toBeGreaterThan(-1);
+    expect(startAt).toBeGreaterThan(-1);
+    expect(warmAt).toBeLessThan(startAt);
+    expect(main).toContain('usernameBanlistLoaded: usernameBanlistFileLoaded,');
+  });
+
+  it('holds the file stat to one per USERNAME_BANLIST_STAT_HOLD_MS, then sees the edit', () => {
+    expect(USERNAME_BANLIST_STAT_HOLD_MS).toBe(1000);
+    const dir = mkdtempSync(join(tmpdir(), 'woc-banlist-hold-'));
+    const file = join(dir, 'banlist.txt');
+    writeFileSync(file, 'firstterm\n');
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    try {
+      setUsernameBanlistStatHoldMsForTest(60_000);
+      withUsernameBanlist({ file }, () => {
+        const statsBefore = usernameBanlistStatCountForTest();
+        expect(offensiveName('firstterm')).toBe(true);
+        // An edit inside the hold is invisible: no stat runs, the stamp is held.
+        writeFileSync(file, 'secondterm\n');
+        const later = new Date(Date.now() + 5000);
+        utimesSync(file, later, later);
+        expect(offensiveName('secondterm')).toBe(false);
+        expect(offensiveName('firstterm')).toBe(true);
+        // The syscall itself was elided, not merely its answer ignored: fifty
+        // screens inside the hold cost exactly the ONE stat that opened it.
+        for (let i = 0; i < 47; i++) offensiveName('firstterm');
+        expect(usernameBanlistStatCountForTest() - statsBefore).toBe(1);
+        // The hold is keyed to the PATH: a re-pointed env stats immediately
+        // (an oversized file at the new path warns ITS ceiling arm, which
+        // only a fresh stat of the new path can price).
+        const other = join(dir, 'banlist-other.txt');
+        writeFileSync(other, `overterm\n${'z'.repeat(USERNAME_BANLIST_FILE_MAX_BYTES)}`);
+        withUsernameBanlist({ file: other }, () => {
+          expect(offensiveName('overterm')).toBe(false);
+          expect(warn).toHaveBeenCalledOnce();
+          expect(String(warn.mock.calls[0][0])).toContain('ceiling');
+        });
+        // Past the hold (dropped to zero here) the stat runs and the edit lands.
+        setUsernameBanlistStatHoldMsForTest(0);
+        expect(offensiveName('secondterm')).toBe(true);
+        expect(offensiveName('firstterm')).toBe(false);
+      });
+    } finally {
+      warn.mockRestore();
+      setUsernameBanlistStatHoldMsForTest(0);
+      rmSync(dir, { force: true, recursive: true });
+    }
+  });
+
+  it('warmUsernameBanlist reports the served file for the boot line: loaded, or not readable', () => {
+    // The boot-time voice (the phase 13 QA hot-path review): an operator whose
+    // configured file cannot be read learns it at listen time, not from one
+    // warn line at the first name screen hours later.
+    const dir = mkdtempSync(join(tmpdir(), 'woc-banlist-warm-'));
+    const file = join(dir, 'banlist.txt');
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    try {
+      withUsernameBanlist({}, () => {
+        expect(warmUsernameBanlist()).toEqual({ file: '', loaded: true, fileTerms: 0 });
+      });
+      withUsernameBanlist({ file }, () => {
+        const missing = warmUsernameBanlist();
+        expect(missing).toEqual({ file, loaded: false, fileTerms: 0 });
+        expect(warn).toHaveBeenCalledOnce();
+      });
+      writeFileSync(file, 'warmterm\nother\n');
+      withUsernameBanlist({ file }, () => {
+        // The file's OWN contribution (two), never the built-in term.
+        expect(warmUsernameBanlist()).toEqual({ file, loaded: true, fileTerms: 2 });
+        // The pure readout answers the same without a stat or a read.
+        expect(usernameBanlistStatus()).toEqual({ file, loaded: true, fileTerms: 2 });
+        expect(offensiveName('warmterm')).toBe(true);
+      });
+      // `loaded` is keyed to the PATH it was read for: a re-pointed env with
+      // no screen since must not inherit the old path's flag.
+      withUsernameBanlist({ file: `${file}.other` }, () => {
+        expect(usernameBanlistStatus()).toEqual({
+          file: `${file}.other`,
+          loaded: false,
+          fileTerms: 0,
+        });
+      });
+      // `loaded` is the CURRENT read's outcome: after the file breaks, the
+      // stale list still serves but the readout says so (an earlier success
+      // on the same path is not "loaded").
+      rmSync(file);
+      withUsernameBanlist({ file }, () => {
+        expect(warmUsernameBanlist()).toEqual({ file, loaded: false, fileTerms: 2 });
+        expect(offensiveName('warmterm')).toBe(true);
       });
     } finally {
       warn.mockRestore();

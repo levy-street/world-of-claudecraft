@@ -11,6 +11,7 @@ import type { PlayerEquipment } from './entity';
 import type { JailState } from './jail';
 import type { SavedMaterialsVaultState } from './materials_vault';
 import type { ArchetypeState } from './professions/archetype';
+import type { PersistedFarmPlot } from './professions/farm_persist';
 import type { ToolEffectSlot } from './professions/tools';
 import type { SavedReliquaryState } from './reliquary';
 import type {
@@ -197,6 +198,15 @@ export interface CharacterState {
   delveLoreUnlocked?: string[];
   delveDaily?: { date: string; firstClearXp: string[]; markClears: number };
   heroicDaily?: { date: string; marked: string[] };
+  // Masterwrought materials (phase 04): both optional so pre-materials saves
+  // load with the fields at their fresh defaults, and both omitted from
+  // serialization while at those defaults so untouched rows stay byte-equal.
+  wyrmfallDaily?: { date: string; sources: string[] };
+  emberWeekAnchor?: string;
+  // Masterwrought phase 07: the oncePerDay craft stamp. Optional and
+  // zero-default-omitted like wyrmfallDaily above, so saves that never
+  // crafted a daily-gated recipe stay byte-equal.
+  craftDaily?: { date: string; crafted: string[] };
   // Ravenpost welcome letter already sent (optional so pre-mail saves load
   // cleanly and receive the announcement letter once on their next login).
   mailWelcomed?: boolean;
@@ -220,6 +230,14 @@ export interface CharacterState {
   // so older saves load cleanly and fire it once when they first qualify).
   // Written only when true (zero-default omission).
   profTierTutorialSent?: boolean;
+  // Per-player farm plots (Farming; JSONB, bed id -> the persisted row shape
+  // in professions/farm_persist.ts). Optional with zero-default omission:
+  // absent for every pre-farming save and whenever no bed is planted, so
+  // unchanged characters stay byte-equal. Loaded through normalizeFarmPlots,
+  // which drops unknown bed/crop ids and clamps deadlines (growth deadlines
+  // are absolute epoch ms, the raidLockouts idiom, not remaining deltas: a
+  // crop keeps growing while its owner is logged out).
+  farmPlots?: Record<string, PersistedFarmPlot>;
   // Spawn greeting already sent (tutorial island; JSONB, optional so older
   // saves load cleanly and latch silently on their next swept tick).
   // Written only when true (zero-default omission).

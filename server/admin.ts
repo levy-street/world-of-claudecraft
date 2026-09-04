@@ -18,15 +18,17 @@ import {
 import {
   accountDetail,
   associationsForIp,
+  type BucketCount,
   characterProfessionsRow,
   clientPerfRaw,
   clientPerfSummary,
+  type DayPoint,
   dailyRewardPointEvents,
   listAccounts,
   listCharacters,
   listModerationActions,
   listSharedIps,
-  onlineHistory,
+  type SessionDayPoint,
 } from './admin_db';
 import {
   type AdminGeneralChatRateLimitDeps,
@@ -50,6 +52,8 @@ import {
 } from './admin_guilds_read';
 import { parseAdminGuildSort } from './admin_guilds_sort';
 import { cleanIpAssociationLookup } from './admin_ip_association';
+import { readAdminMarketMetrics } from './admin_market_metrics';
+import { readOnlineHistoryCached } from './admin_online_history_cache';
 import { readOverviewCounts } from './admin_overview_cache';
 import {
   type AdminPermission,
@@ -98,6 +102,8 @@ import {
   liftCheaterMarkBodySchema,
   rethrowCheaterMarkRefusal,
 } from './cheater_mark_api';
+import { runClearItemName } from './clear_item_name';
+import { clearOfflineItemName } from './clear_item_name_db';
 import { cleanContentModerationReason } from './content_moderation_db';
 import { currentDailyRewardDay } from './daily_rewards';
 import {
@@ -144,6 +150,7 @@ import {
   moderationReportsForAccount,
   muteAccountChat,
   reactivateAccountAudited,
+  recordItemNameClear,
   recordPasswordReset,
   recordProfessionsRestore,
   resetChatStrikesAudited,
@@ -154,8 +161,10 @@ import {
   setDailyRewardsIpBan,
 } from './moderation_db';
 import { readModerationQueue } from './moderation_queue_cache';
+import { createOkResponseMemo, type OkResponseMemoStats } from './ok_response_memo';
 import { providerUsageSnapshot } from './provider_usage';
 import {
+  adminAnalyticsReadRateLimited,
   adminFlagWriteRateLimited,
   adminOversightReadRateLimited,
   authThrottled,
@@ -210,7 +219,9 @@ const ADMIN_LOGIN_MAX_PER_MINUTE = 10;
 const ADMIN_LOGIN_TOO_MANY_FAILED_ATTEMPTS =
   'too many failed attempts, wait a few minutes and try again';
 
-// Economy-oversight endpoints (player search / wealth / flagged workflow).
+// Economy-oversight endpoints (player search / wealth / flagged workflow)
+// plus the analytics dashboard reads (overview / activity / market metrics),
+// which share the same 429 literal on their own bucket.
 // Error literals are reverse-mapped to i18n keys by the admin client
 // (ADMIN_ERROR_KEYS in src/admin/i18n.ts); change one and the mapping in the
 // SAME change.
@@ -617,6 +628,57 @@ function ok(res: http.ServerResponse, data: unknown): void {
 
 function fail(res: http.ServerResponse, status: number, error: string): void {
   json(res, status, { success: false, data: null, error });
+}
+
+// Serialize-once envelope memos for the analytics dashboard reads whose
+// response is a pure function of a TTL-cached snapshot: ONE INSTANCE PER
+// ROUTE (the memo's key space has no notion of response shape, so the metrics
+// identity key and the activity four-part key never share an instance), and
+// each route's instance is shared by BOTH of its dispatch arms, so a cache
+// window costs one stringify however the request arrives. The overview read
+// stays on plain ok(): its response embeds the per-request live adminStats()
+// merge, so memoized bytes could never match what ok() would produce (see
+// overviewHandler).
+const activityOkMemo = createOkResponseMemo();
+const marketMetricsOkMemo = createOkResponseMemo();
+
+export interface AdminAnalyticsMemoStats {
+  activity: OkResponseMemoStats;
+  marketMetrics: OkResponseMemoStats;
+}
+
+/** The two memos' serve/stringify counters for the internal ops readout
+ *  (server/main.ts): stringifies climbing toward serves is a hit-rate
+ *  regression (a cache turning over per request, or a key that stopped being
+ *  stable) that nothing else would make visible. */
+export function adminAnalyticsMemoStats(): AdminAnalyticsMemoStats {
+  return { activity: activityOkMemo.stats(), marketMetrics: marketMetricsOkMemo.stats() };
+}
+
+/**
+ * Serve the activity response (both dispatch arms call this with the four
+ * cache-stable arrays off the shared admin_activity_cache bundle). The
+ * composed wrapper object is fresh per request, so the memo keys on the parts
+ * tuple: stable identities inside a TTL window hit the memoized bytes, and a
+ * torn read across a turnover re-stringifies rather than serving stale bytes.
+ * `days` is deliberately NOT a part: it is the module constant
+ * ACTIVITY_WINDOW_DAYS (every caller passes it and admin_activity_cache's
+ * assertWindow refuses any other value), so it cannot vary across requests.
+ * The memo's key contract (ok_response_memo.ts header) says exactly this; the
+ * non-part field set is pinned in tests/server/admin_analytics_reads.test.ts.
+ */
+function sendActivityOk(
+  res: http.ServerResponse,
+  registrations: DayPoint[],
+  sessions: SessionDayPoint[],
+  classes: BucketCount[],
+  levels: BucketCount[],
+): void {
+  activityOkMemo.send(
+    res,
+    { days: ACTIVITY_WINDOW_DAYS, registrations, sessions, classes, levels },
+    [registrations, sessions, classes, levels],
+  );
 }
 
 async function sendAdminGuildList(
@@ -1524,6 +1586,9 @@ export async function handleAdminApi(
     }
 
     if (path === '/admin/api/overview') {
+      if (!adminAnalyticsReadRateLimited(req, accountId).allowed) {
+        return fail(res, 429, ADMIN_TOO_MANY_REQUESTS);
+      }
       const counts = await readOverviewCounts();
       const serverStats = game.adminStats();
       return ok(res, {
@@ -1565,16 +1630,22 @@ export async function handleAdminApi(
       return ok(res, game.detectionCalibration());
     }
     if (path === '/admin/api/online-history') {
-      return ok(res, await onlineHistory(url.searchParams.get('range') ?? '30d'));
+      if (!adminAnalyticsReadRateLimited(req, accountId).allowed) {
+        return fail(res, 429, ADMIN_TOO_MANY_REQUESTS);
+      }
+      return ok(res, await readOnlineHistoryCached(url.searchParams.get('range') ?? '30d'));
     }
     if (path === '/admin/api/activity') {
+      if (!adminAnalyticsReadRateLimited(req, accountId).allowed) {
+        return fail(res, 429, ADMIN_TOO_MANY_REQUESTS);
+      }
       const [registrations, sessions, classes, levels] = await Promise.all([
         registrationsByDay(ACTIVITY_WINDOW_DAYS),
         sessionsByDay(ACTIVITY_WINDOW_DAYS),
         classDistribution(),
         levelDistribution(),
       ]);
-      return ok(res, { days: ACTIVITY_WINDOW_DAYS, registrations, sessions, classes, levels });
+      return sendActivityOk(res, registrations, sessions, classes, levels);
     }
     if (path === '/admin/api/perf/summary') {
       const hours = Number(url.searchParams.get('hours') ?? '24');
@@ -2056,7 +2127,10 @@ function makeRealAdminDb() {
     recordAdminGuildBankPurge,
     listModerationActions,
     listSharedIps,
-    onlineHistory,
+    // Cache-backed (the range-keyed online-history memo; both dispatch arms read
+    // it): a setAdminDbForTests override still replaces this member outright,
+    // which bypasses the cache and keeps existing fakes exact.
+    onlineHistory: readOnlineHistoryCached,
     // Cache-backed (the shared admin overview memo; both dispatch arms read it):
     // a setAdminDbForTests override still replaces this member outright, which
     // bypasses the cache and keeps existing fakes exact.
@@ -2121,6 +2195,9 @@ function makeRealAdminDb() {
     updatePasswordHash,
     revokeTokensExcept,
     recordPasswordReset,
+    // Audited, atomic offline legendary-name moderation.
+    clearOfflineItemName,
+    recordItemNameClear,
     setDailyRewardsBan,
     setDailyRewardsIpBan,
     // Account flair: the two audited writes plus the read-back the live push sends
@@ -2158,6 +2235,11 @@ function makeRealAdminDb() {
     activeSuspicionFlagCounts,
     adminOversightReadRateLimited,
     adminFlagWriteRateLimited,
+    // Analytics dashboard read metering (overview / activity / market
+    // metrics): its own bucket, deliberately not the oversight pair, so the
+    // landing page's default poll can never starve the moderation Flagged
+    // workflow (see server/ratelimit.ts).
+    adminAnalyticsReadRateLimited,
   };
 }
 
@@ -2262,8 +2344,17 @@ async function loginHandler(ctx: Ctx): Promise<void> {
   });
 }
 
-/** GET /admin/api/overview: headline counts merged with live server stats. */
+/** GET /admin/api/overview: headline counts merged with live server stats.
+ *  Metered on the analytics read bucket like its activity/metrics siblings,
+ *  but EXEMPT from the family's serialize-once memos (activityOkMemo and
+ *  marketMetricsOkMemo): the
+ *  response embeds the per-request live adminStats() merge (online, uptime,
+ *  memory), so memoized bytes could never stay byte-identical with what ok()
+ *  produces. Only the DB counts are cached (admin_overview_cache.ts). */
 async function overviewHandler(ctx: Ctx): Promise<void> {
+  if (!adminDb().adminAnalyticsReadRateLimited(ctx.req, ctxAccountId(ctx)).allowed) {
+    return fail(ctx.res, 429, ADMIN_TOO_MANY_REQUESTS);
+  }
   const rt = useAdminRuntime();
   const counts = await adminDb().overviewCounts();
   const serverStats = rt.adminStats();
@@ -2277,6 +2368,21 @@ async function overviewHandler(ctx: Ctx): Promise<void> {
       peakOnline: Math.max(serverStats.peakOnline, counts.peakOnlineAllTime, serverStats.online),
     },
   });
+}
+
+/** GET /admin/api/market/metrics: live World Market listing aggregates over the
+ *  tracked supply buckets (server/admin_market_metrics.ts). Metered on the
+ *  analytics read bucket: the read itself is a warm in-memory cache with zero
+ *  DB cost, but metering is uniform across the admin read families so no
+ *  route is the unthrottled odd one out (the oversight bucket stays scoped to
+ *  the DB-cost economy-oversight reads). The response IS the cached snapshot,
+ *  so the envelope bytes are memoized per cache turnover on the route's own
+ *  memo (marketMetricsOkMemo, identity-keyed on the snapshot). */
+async function marketMetricsHandler(ctx: Ctx): Promise<void> {
+  if (!adminDb().adminAnalyticsReadRateLimited(ctx.req, ctxAccountId(ctx)).allowed) {
+    return fail(ctx.res, 429, ADMIN_TOO_MANY_REQUESTS);
+  }
+  marketMetricsOkMemo.send(ctx.res, await readAdminMarketMetrics());
 }
 
 /** GET /admin/api/me: the caller's own staff identity (any staff role). */
@@ -2413,20 +2519,30 @@ async function detectionCalibrationHandler(ctx: Ctx): Promise<void> {
   ok(ctx.res, useAdminRuntime().detectionCalibration());
 }
 
-/** GET /admin/api/online-history: bucketed online + site-user history. */
+/** GET /admin/api/online-history: bucketed online + site-user history.
+ *  Metered on the analytics read bucket like its overview/activity/metrics
+ *  siblings (it is fetched from the SAME Promise.all as activity, so leaving it
+ *  off the meter left one uncapped door into the family's heaviest aggregate),
+ *  and served from the range-keyed memo bound into the bundle below. */
 async function onlineHistoryHandler(ctx: Ctx): Promise<void> {
+  if (!adminDb().adminAnalyticsReadRateLimited(ctx.req, ctxAccountId(ctx)).allowed) {
+    return fail(ctx.res, 429, ADMIN_TOO_MANY_REQUESTS);
+  }
   ok(ctx.res, await adminDb().onlineHistory(ctx.url.searchParams.get('range') ?? '30d'));
 }
 
 /** GET /admin/api/activity: registrations + sessions + class/level distributions. */
 async function activityHandler(ctx: Ctx): Promise<void> {
+  if (!adminDb().adminAnalyticsReadRateLimited(ctx.req, ctxAccountId(ctx)).allowed) {
+    return fail(ctx.res, 429, ADMIN_TOO_MANY_REQUESTS);
+  }
   const [registrations, sessions, classes, levels] = await Promise.all([
     adminDb().registrationsByDay(ACTIVITY_WINDOW_DAYS),
     adminDb().sessionsByDay(ACTIVITY_WINDOW_DAYS),
     adminDb().classDistribution(),
     adminDb().levelDistribution(),
   ]);
-  ok(ctx.res, { days: ACTIVITY_WINDOW_DAYS, registrations, sessions, classes, levels });
+  sendActivityOk(ctx.res, registrations, sessions, classes, levels);
 }
 
 /** GET /admin/api/perf/summary: aggregated client-perf percentiles. */
@@ -3199,6 +3315,34 @@ async function restoreSlotHandler(ctx: Ctx): Promise<void> {
   }
 }
 
+/** POST /admin/api/moderation/characters/:id/clear-item-name: strip a stamped
+ *  legendary name (ItemInstancePayload.name) from an OFFLINE character's copy,
+ *  the phase 13 remediation arm. The whole decision (target validation, the
+ *  audit-first ordering, the offline requirement, the blob region walk) is
+ *  server/clear_item_name.ts runClearItemName; this binder wires the real
+ *  runtime + db seams and maps the typed outcome onto the restore family's
+ *  English admin error model. Registry-only (the cheater-mark precedent). */
+async function clearItemNameHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const id = adminTargetId(ctx);
+  const body = await readBody(ctx.req);
+  try {
+    const outcome = await runClearItemName(
+      {
+        characterOnline: (characterId) => rt.adminCharacterOnline(characterId),
+        clearOfflineItemName: (characterId, target) =>
+          adminDb().clearOfflineItemName(characterId, target),
+        recordAudit: (input) => adminDb().recordItemNameClear(input),
+      },
+      { characterId: id, adminAccountId: ctxAccountId(ctx), body },
+    );
+    if (!outcome.ok) return fail(ctx.res, 400, outcome.error);
+    return ok(ctx.res, { ok: true, cleared: outcome.cleared });
+  } catch (err) {
+    return fail(ctx.res, 400, err instanceof Error ? err.message : 'item name clear failed');
+  }
+}
+
 /** GET /admin/api/accounts/:id/daily-rewards-events: bounded point-award ledger. */
 async function dailyRewardPointEventsHandler(ctx: Ctx): Promise<void> {
   const day = await dailyRewardEventDay(ctx.url.searchParams.get('day'));
@@ -3541,6 +3685,15 @@ export const routes: RouteDef[] = [
     meta: ADMIN_META,
     handler: activityHandler,
   },
+  // Registry-only (born after the migration): no legacy ladder arm.
+  {
+    method: 'GET',
+    path: '/admin/api/market/metrics',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: marketMetricsHandler,
+  },
   {
     method: 'GET',
     path: '/admin/api/perf/summary',
@@ -3684,6 +3837,14 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin, requireAdminTarget('character')],
     meta: adminTargetMeta('character'),
     handler: restoreSlotHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/characters/:id/clear-item-name',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('character')],
+    meta: adminTargetMeta('character'),
+    handler: clearItemNameHandler,
   },
   {
     method: 'GET',

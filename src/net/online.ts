@@ -14,7 +14,8 @@ import { bagCapacity } from '../sim/bags';
 import { signChallenge } from '../sim/client_challenge';
 import { allocRiftCollisionToken, clearRiftRegion, setRiftRegion } from '../sim/colliders';
 import { heroicLeapPlacementPreview } from '../sim/combat/heroic_leap';
-import { MOUNT_RACE_COURSE, type MountKey, normalizeMountKey } from '../sim/content/mounts';
+import { FARM_PATCHES } from '../sim/content/farm_patches';
+import { type MountKey, normalizeMountKey } from '../sim/content/mounts';
 import { mechChromaSkinIndex } from '../sim/content/skins';
 import {
   emptyAllocation,
@@ -39,6 +40,7 @@ import {
 } from '../sim/data';
 import { deadTargetSelectable } from '../sim/dead_target';
 import { DEEDS_RECENT_CAP, freshDeedStats } from '../sim/deeds';
+import type { NamedSlotTarget } from '../sim/item_copy_ref';
 import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 import type { Ante, PickAction } from '../sim/lockpick';
 import type { MarketQuery } from '../sim/market_query';
@@ -48,6 +50,7 @@ import { isPrimaryOwnedPetEntity } from '../sim/pet/pet_selection';
 import { getArchetypeTitle, getHobbyCraft } from '../sim/professions/archetype';
 import type { RespecPaymentTier } from '../sim/professions/focus';
 import type { MaterialRarity } from '../sim/professions/gathering';
+import { perfectingInfoFrom } from '../sim/professions/perfecting';
 import { emptyCraftSkills } from '../sim/professions/wheel';
 import {
   catalogRankOwned,
@@ -126,6 +129,9 @@ import {
   type DevLeaderboardPage,
   DUNGEON_ENTRY_FACING_WIRE_VERSION,
   type DuelInfo,
+  type FarmPatchDef,
+  type FarmPlantKnobs,
+  type FarmPlotView,
   type FriendInfo,
   type GuildBankInfo,
   type GuildBankLogEntry,
@@ -170,10 +176,13 @@ import type {
   CommissionOrderView,
   DisenchantResultView,
   MasterworkView,
+  PerfectItemRef,
+  PerfectingInfoView,
   SalvageResultView,
 } from '../world_api/professions';
 import { normalizeAccountCosmetics } from './account_cosmetics_wire';
 import { apiErrorFromBody } from './api_error';
+import { applyAuraWire, type ClientWireAura, snapshotCarriesAuras } from './aura_wire_decode';
 import { computeBackoffDelay } from './backoff';
 import { applyBankSelfWire } from './bank_snapshot_wire';
 import {
@@ -181,6 +190,11 @@ import {
   createCivicServicePlacementsReader,
 } from './civic_service_placements';
 import { applySelfCombatScalars } from './combat_scalar_wire';
+import {
+  decodeCraftingIdentity,
+  decodeMobileStationCrafts,
+  EMPTY_MST_CRAFTS,
+} from './crafting_wire';
 import {
   type DesktopWalletBrowserAction,
   type DesktopWalletStatus,
@@ -199,6 +213,11 @@ import { foldInputAck } from './input_ack';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
 import { inputSignature } from './input_signature';
 import {
+  applyMountRaceEventToMirror,
+  decodeMountRaceView,
+  type MountRaceMirror,
+} from './mount_race_wire';
+import {
   type MovementFrameV2,
   MovementFrameV2Outbox,
   trackPendingInputSequence,
@@ -207,6 +226,7 @@ import {
 import { applyReconSelfWire, ReconWireState } from './movement_reconciliation_wire';
 import { createNativeAttestationProof } from './native_attestation';
 import { createNetPipelineStats, type NetPipelineStats } from './net_pipeline_stats';
+import { perfectingCommand } from './perfecting_command';
 import { optimisticQuestState } from './quest_state_optimistic';
 import { isTransientReconnectRejection, isTransientTimeoutRejection } from './reconnect_policy';
 import { isInputSendBackpressured } from './send_backpressure';
@@ -242,28 +262,6 @@ interface PendingTransientInput {
   jump: boolean;
   turnLeft: boolean;
   turnRight: boolean;
-}
-
-interface ClientWireAura {
-  id: string;
-  name: string;
-  kind: Aura['kind'];
-  rem?: number;
-  exp?: number;
-  dur: number;
-  perm?: 1;
-  value?: number;
-  value2?: number;
-  value3?: number;
-  tickInterval?: number;
-  school?: Aura['school'];
-  stacks?: number;
-  charges?: number;
-  emp?: Aura['empowerAbilities'];
-  src?: number;
-  ub?: 1;
-  und?: 1;
-  bt?: 1;
 }
 
 // ---------------------------------------------------------------------------
@@ -1491,6 +1489,16 @@ function blankEntity(id: number): Entity {
   };
 }
 
+// The two wire fields a per-copy selection's ANCHOR rides on (`ord`/`n`), or
+// nothing at all when the caller named no anchor. Spread into the frame so an
+// unanchored command is byte-identical to what it always sent, which is what
+// keeps the golden traces still and an older server working unchanged; the
+// server re-derives the anchor against its own bags and refuses a mismatch
+// (src/sim/item_copy_anchor.ts).
+function anchorFields(target: NamedSlotTarget): { ord?: number; n?: number } {
+  return target.anchor ? { ord: target.anchor.ordinal, n: target.anchor.count } : {};
+}
+
 export class ClientWorld extends ReconWireState implements IWorld {
   // --- IWorldEntityRoster: roster + player reads, mirrored from snapshots. The
   // `player` getter lives below the ctor (it reads `entities`/`playerId`). `known`
@@ -1699,30 +1707,25 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // Holds only the fog-windowed cells the server discloses.
   lockpickState: LockpickView | null = null;
   // Show-jumping race: updated immediately from mountRace* events and reconciled
-  // from the authoritative self snapshot after reconnects. Internal shape carries
-  // wall-clock anchors (performance.now scale, render-interpolation timing only):
-  // goDeadlineMs for the 3..2..1 countdown and deadlineMs for the timed lap, so
-  // mountRaceView() can count both down; the server stays authoritative (its end
-  // event clears the mirror). clearedMask/cleared mirror the any-order jump progress.
-  private mountRaceMirror: {
-    raceId: string;
-    phase: 'countdown' | 'racing';
-    clearedMask: number;
-    cleared: number;
-    jumpsTotal: number;
-    goDeadlineMs: number;
-    deadlineMs: number;
-    timeLimitTicks: number;
-  } | null = null;
+  // from the authoritative self snapshot after reconnects. The mirror shape and
+  // both decodes live in mount_race_wire.ts (performance.now scale anchors,
+  // render-interpolation timing only; the server stays authoritative).
+  private mountRaceMirror: MountRaceMirror | null = null;
   // Riding lesson liveness, mirrored from mountTrain* events and reconciled from
   // the authoritative self snapshot for legacy mountLessonActive() consumers.
   private mountLessonActiveMirror = false;
   delveMarks = 0;
   companionUpgrades: Record<string, number> = {};
-  // Flat per-craft skill tracking (#1126). NOT yet mirrored over the wire: this
-  // issue lands the sim-side state + persistence only, so online play sees the
-  // all-zero default until the wheel/mass-conservation follow-up wires a self-snap
-  // field the way `dmarks`/`dcomp` do for delveMarks/companionUpgrades above.
+  // Flat per-craft skill tracking (#1126), mirrored over the wire on the atomic
+  // `cprof` (craftingIdentity) delta: applySnapshot REPLACES this map from
+  // cprof.craftSkills and re-points craftingIdentity.craftSkills at the same
+  // object, so the two reads can never disagree. Until the first cprof arrives
+  // the all-zero default stands and craftingIdentity.synced is false. That FLAG,
+  // never this map, is what a viewer-side gate keys on: the enchant picker
+  // (enchant_apply_view.ts) and the pattern tooltip (recipe_pattern_tooltip_view.ts)
+  // both SKIP their skill gates entirely while it is false, because an all-zero
+  // default is not a measurement and refusing on it tells a master crafter their
+  // skill is too low.
   craftSkills: Record<string, number> = emptyCraftSkills();
   craftingIdentity: CraftingIdentityView = {
     version: 1,
@@ -1738,21 +1741,40 @@ export class ClientWorld extends ReconWireState implements IWorld {
     knownRecipes: [],
     cadenceBlockedQuests: [],
   };
-  // Gathering profession proficiency (Mining/Logging/Herbalism, #1119), mirrored
-  // from the `gprof` self-wire delta below (the real read surface; see
-  // professionsState below for crafting/secondary professions).
+  // Gathering profession proficiency (the GATHERING_PROFESSION_IDS roster,
+  // #1119), mirrored from the `gprof` self-wire delta below (the real read
+  // surface; see professionsState below for crafting/secondary professions).
   gatheringProficiency: Record<string, number> = {};
   // Slotted tool effects, one row per gathering profession that has one,
   // mirrored from the `tslot` self-wire delta. Empty for every player who has
   // never slotted an effect, which is the server's own default: the sim leaves
   // the backing PlayerMeta field absent and projects [] for it.
   toolEffectSlots: readonly ToolEffectSlotView[] = [];
+  // Static content read (the recipeList precedent below): the garden-bed
+  // geography ships with the client bundle like every other content table, so
+  // this needs no wire round-trip. See src/world_api/farming.ts.
+  farmPatches: readonly FarmPatchDef[] = FARM_PATCHES;
+  // The viewer's own farm plots, one row per planted bed sorted by bed id,
+  // mirrored from the `fplot` self-wire delta. Empty for every player with no
+  // planted bed, which is the server's own default (the sim projects [] for an
+  // empty plot map). `status` arrives server-computed and is never re-derived
+  // here: the authority owns it, and the hidden pre-rolled outcome slots that
+  // decide a crop's fate never cross the wire at all.
+  myFarmPlots: readonly FarmPlotView[] = [];
+  // The clock base the plot timestamps above were written in. Date.now is
+  // correct here for the riftEventMsRemaining reason: the server computes farm
+  // timestamps through ctx.lockoutNowMs(), which IS real Date.now() on the
+  // live server, the same clock raidLockouts() already subtracts against.
+  // Read fresh per call so a growth stage advances between snapshots.
+  farmNowMs(): number {
+    return Date.now();
+  }
   // Per-delve clears (key `${delveId}:${tierId}`), mirrored from the self-wire so
   // delveShopOffers can resolve the shop lock badge client-side.
   delveClears: Record<string, number> = {};
   delveDaily: DelveDailyInfo = { date: '', firstClearXp: [], markClears: 0 };
-  // Gathering profession proficiency (Mining/Logging/Herbalism), the real
-  // read surface for #1119; mirrored from the `prof` wire delta below.
+  // Gathering profession proficiency (the GATHERING_PROFESSION_IDS roster),
+  // the real read surface for #1119; mirrored from the `prof` wire delta below.
   // Crafting/secondary professions still contribute nothing until later
   // issues (#1120/#1125/#1126/#1140) land.
   professionsState: PlayerProfessionsView = { skills: [] };
@@ -1815,13 +1837,21 @@ export class ClientWorld extends ReconWireState implements IWorld {
   lastDisenchantResult: DisenchantResultView | null = null;
   lastEnchantResult: ApplyEnchantResultView | null = null;
   lastSalvageResult: SalvageResultView | null = null;
-  // The viewer's own active mobile crafting station (Professions 2.0),
-  // mirrored from the server's `mst` self-delta (applySnapshot below). The
-  // server computes the active/expired state against its own tickCount, so
-  // this is always a server-authoritative value: placement is never predicted
-  // locally (net/ optimism rules), the delta lands after the server accepts
-  // the specialization-gated command, and it flips back to null on expiry.
-  activeMobileStationCraft: string | null = null;
+  // The mobile craft ids whose station currently serves the viewer (own
+  // active station at any distance, plus every active partyShared party
+  // station within STATION_RADIUS), mirrored from the server's `mst`
+  // self-delta (applySnapshot below): a comma-joined, server-sorted scalar
+  // this client splits, null on the wire when the set is empty. The server
+  // computes active/expired and party range against its own tickCount and
+  // positions, so this is always a server-authoritative value: membership is
+  // never predicted locally (net/ optimism rules), the delta lands after the
+  // server accepts a placement, re-emits as players cross STATION_RADIUS,
+  // and flips back to empty on expiry.
+  activeMobileStationCrafts: readonly string[] = EMPTY_MST_CRAFTS;
+  // The raw joined `mst` scalar the array above was split from: the split
+  // runs ONLY when this string changes, so steady-state snapshots never
+  // re-allocate the array.
+  private activeMobileStationCraftsRaw: string | null = null;
   // Commission order board (Professions 2.0, issue #1298), mirrored from the
   // server's `corder` self-delta below: the viewer's own projection, small
   // and diffed per tick like professionsState/craftingIdentity above.
@@ -2949,14 +2979,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
     const prevSelfFacing = prevSelf?.facing;
     const prevSelfDead = prevSelf?.dead ?? false;
 
-    const auraRemaining = (aura: ClientWireAura): number => {
-      if (aura.perm === 1) return Number.POSITIVE_INFINITY;
-      if (timerWire.mode !== 'stable' || timerWire.time === null) return Number(aura.rem);
-      const deadlineRemaining = stableDeadlineRemaining(aura.exp, timerWire.time);
-      if (deadlineRemaining !== null) return deadlineRemaining;
-      return typeof aura.rem === 'number' && Number.isFinite(aura.rem) ? aura.rem : 0;
-    };
-
     // `selfDelta` marks the one record that is not a peer broadcast: the
     // viewer's own extended state. Fields the server delta-gates per session
     // (bcastSelf's maybe/maybeRaw channel) are absent when unchanged there,
@@ -3232,89 +3254,14 @@ export class ClientWorld extends ReconWireState implements IWorld {
       // updates the existing Map in place: no per-entity Map churn at 20 Hz
       e.threat.clear();
       if (w.thr) for (const [tid, tv] of w.thr as [number, number][]) e.threat.set(tid, tv);
-      // The wire carries the aura magnitude (and imbue range / tick cadence / school) so buff
-      // and debuff hover tooltips show the real numbers online exactly as offline (aura_effect
-      // reads these). A 0/absent value decodes to 0 (value-less auras and an old server are
-      // unchanged), a missing school falls back to the physical default, and imbue range /
-      // tick cadence stay undefined when not sent. sourceId stays simplified (a separate
-      // pre-existing wire reduction, not read by the tooltip).
-      //
-      // Between snapshots the aura SET is usually unchanged (only `rem` ticks down), so when
-      // the incoming ids line up index-for-index with the existing records, update those
-      // records in place: no array + per-aura object allocation per entity at 20 Hz, and the
-      // preserved object identity matches the offline Sim (one live aura object across ticks).
-      // Any composition change (gain/fade/reorder) falls back to the fresh build below.
-      const shouldApplyAuras =
-        timerWire.mode === 'legacy' ||
-        (timerWire.mode === 'stable' && timerWire.time !== null && w.auras !== undefined);
-      if (shouldApplyAuras) {
-        const wireAuras = (Array.isArray(w.auras) ? w.auras : []) as ClientWireAura[];
-        let sameAuraShape = e.auras.length === wireAuras.length;
-        if (sameAuraShape) {
-          for (let i = 0; i < wireAuras.length; i++) {
-            if (e.auras[i].id !== wireAuras[i].id) {
-              sameAuraShape = false;
-              break;
-            }
-          }
-        }
-        if (sameAuraShape) {
-          for (let i = 0; i < wireAuras.length; i++) {
-            const a = wireAuras[i];
-            const rec = e.auras[i];
-            rec.name = a.name;
-            rec.kind = a.kind;
-            rec.remaining = auraRemaining(a);
-            rec.duration = a.perm === 1 ? Number.POSITIVE_INFINITY : a.dur;
-            rec.permanent = a.perm === 1;
-            rec.value = a.value ?? 0;
-            rec.value2 = a.value2;
-            rec.value3 = a.value3;
-            rec.tickInterval = a.tickInterval;
-            rec.school = a.school ?? 'physical';
-            rec.stacks = a.stacks;
-            // Mirror the charge count for a charge-limited aura (Lightning Shield); the wire
-            // sends it only when defined (server/game.ts), so an ordinary aura or an old server
-            // decodes to undefined and the badge falls back to the stacks path, exactly as before.
-            rec.charges = a.charges;
-            rec.empowerAbilities = a.emp;
-            // The caster's entity id, for the target strip's own-aura prominence
-            // (auras_view ownFirst). An old server omits it; 0 matches no player id.
-            rec.sourceId = a.src ?? 0;
-            rec.unbreakableControl = a.ub === 1 ? true : undefined;
-            // Presence-only mirror of the undispellable marker, so the client's
-            // isPlayerRemovableAura answers exactly as the server's does.
-            rec.undispellable = a.und === 1 ? true : undefined;
-            // Presence-only mirror of the break-threshold armed marker (the
-            // server emits bt = 1 when breakThreshold is defined): the one
-            // client reader is the Lingering Dread victim-band alias, which
-            // gates on breakThreshold !== undefined and never reads the
-            // value (ability_vfx/painter.ts). An old server omits it and the
-            // band stays off, exactly the offline-parity gap this closes.
-            rec.breakThreshold = a.bt === 1 ? 1 : undefined;
-          }
-        } else {
-          e.auras = wireAuras.map((a) => ({
-            id: a.id,
-            name: a.name,
-            kind: a.kind,
-            remaining: auraRemaining(a),
-            duration: a.perm === 1 ? Number.POSITIVE_INFINITY : a.dur,
-            permanent: a.perm === 1,
-            value: a.value ?? 0,
-            value2: a.value2,
-            value3: a.value3,
-            tickInterval: a.tickInterval,
-            sourceId: a.src ?? 0,
-            school: a.school ?? 'physical',
-            stacks: a.stacks,
-            charges: a.charges,
-            empowerAbilities: a.emp,
-            unbreakableControl: a.ub === 1 ? true : undefined,
-            undispellable: a.und === 1 ? true : undefined,
-            breakThreshold: a.bt === 1 ? 1 : undefined,
-          }));
-        }
+      // The aura family decodes in its own sibling (src/net/aura_wire_decode.ts):
+      // the deadline-vs-remaining clock, the in-place fast path that keeps a
+      // steady aura set allocation-free at 20 Hz, and every presence-only
+      // marker's absent-means-cleared handling live there, in ONE place rather
+      // than duplicated across the update and rebuild paths.
+      const wireAuras = (Array.isArray(w.auras) ? w.auras : []) as ClientWireAura[];
+      if (snapshotCarriesAuras(timerWire, w.auras)) {
+        e.auras = applyAuraWire(e.auras, wireAuras, timerWire);
       }
       e.loot = w.lootList ?? null;
       return e;
@@ -3586,7 +3533,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         this.invChanged = true;
       }
       if (s.equip !== undefined) this.equipment = s.equip;
-      if (s.einst !== undefined) this.equipmentInstances = s.einst;
+      if (s.einst !== undefined) this.equipmentInstances = s.einst ?? {};
       // IWorldCosmetics facet (W7) self-decode: cosmetics is delta-guarded (a
       // missing field keeps the prior mirror); normalizeAccountCosmetics rebuilds it.
       if (s.cosmetics !== undefined) {
@@ -3609,26 +3556,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       }
       if (s.mntRtd !== undefined) this.selfRidingTrained = s.mntRtd === true;
       if (s.mntLesson !== undefined) this.mountLessonActiveMirror = s.mntLesson === true;
-      if (s.mntRace !== undefined) {
-        const view = s.mntRace as MountRaceView | null;
-        if (!view) {
-          this.mountRaceMirror = null;
-        } else {
-          const goTicksLeft = Math.max(0, Number(view.goTicksLeft) || 0);
-          const ticksLeft = Math.max(0, Number(view.ticksLeft) || 0);
-          const timeLimitTicks = Math.max(0, Number(view.timeLimitTicks) || 0);
-          this.mountRaceMirror = {
-            raceId: String(view.raceId),
-            phase: view.phase === 'racing' ? 'racing' : 'countdown',
-            clearedMask: Math.max(0, Number(view.clearedMask) || 0),
-            cleared: Math.max(0, Number(view.cleared) || 0),
-            jumpsTotal: Math.max(0, Number(view.jumpsTotal) || 0),
-            goDeadlineMs: now + (goTicksLeft / TICK_RATE) * 1000,
-            deadlineMs: now + (ticksLeft / TICK_RATE) * 1000,
-            timeLimitTicks,
-          };
-        }
-      }
+      if (s.mntRace !== undefined) this.mountRaceMirror = decodeMountRaceView(s.mntRace, now);
       if (s.ddiff === 'normal' || s.ddiff === 'heroic') this.selectedDungeonDifficulty = s.ddiff;
       if (s.qlog !== undefined || s.qdone !== undefined) this.pendingQuestCommands?.clear();
       // IWorldTalents facet (W7) self-decode: tal is delta-guarded (omitted keeps
@@ -3754,9 +3682,17 @@ export class ClientWorld extends ReconWireState implements IWorld {
       if (s.dclears !== undefined) this.delveClears = s.dclears ?? {};
       if (s.delveDaily !== undefined) this.delveDaily = s.delveDaily;
       if (s.tfocus !== undefined) this.townFocus = s.tfocus ?? {};
-      // mst -> activeMobileStationCraft: a nullable scalar, so the delta's
-      // explicit null (station expired or never placed) must overwrite.
-      if (s.mst !== undefined) this.activeMobileStationCraft = (s.mst as string | null) ?? null;
+      // mst -> activeMobileStationCrafts: a comma-joined nullable scalar, so
+      // the delta's explicit null (every station expired, out of range, or
+      // never placed) must overwrite to the empty set. The split array is
+      // cached against the raw string and rebuilt only when it changes.
+      if (s.mst !== undefined) {
+        const rawMst = (s.mst as string | null) ?? null;
+        if (rawMst !== this.activeMobileStationCraftsRaw) {
+          this.activeMobileStationCraftsRaw = rawMst;
+          this.activeMobileStationCrafts = decodeMobileStationCrafts(rawMst);
+        }
+      }
       // Commission order board (issue #1298): server-gated on the board
       // revision at the corder wire cadence (a passive party converges within
       // one cadence window; the viewer's own commands re-arm for the next
@@ -3773,38 +3709,12 @@ export class ClientWorld extends ReconWireState implements IWorld {
       if (s.salv !== undefined) this.lastSalvageResult = s.salv ?? null;
       if (s.gprof !== undefined) this.gatheringProficiency = s.gprof ?? {};
       if (s.tslot !== undefined) this.toolEffectSlots = s.tslot ?? [];
+      if (s.fplot !== undefined) this.myFarmPlots = s.fplot ?? [];
       if (s.prof !== undefined) this.professionsState = s.prof ?? { skills: [] };
       if (s.cprof !== undefined && s.cprof) {
-        const cprof = s.cprof as CraftingIdentityView;
-        this.craftSkills = { ...(cprof.craftSkills ?? {}) };
-        this.craftingIdentity = {
-          version: 1,
-          synced: true,
-          craftSkills: this.craftSkills,
-          activeArchetype: cprof.activeArchetype ?? null,
-          pairedMajor: cprof.pairedMajor ?? null,
-          hobbyCraft: cprof.hobbyCraft ?? null,
-          attunedPairs: [...(cprof.attunedPairs ?? [])],
-          switchCount: cprof.switchCount ?? 0,
-          amendsProgress: cprof.amendsProgress ?? 0,
-          amendsRequired: cprof.amendsRequired ?? 0,
-          // The learned-recipe mirror. The identity is replaced
-          // wholesale on every cprof delta (see the comment above), so a
-          // train_recipe grant goes live the tick the server re-emits cprof
-          // (its JSON diff fires on the sorted array changing). The ?? []
-          // keeps an older server's payload (without the field) loading cleanly.
-          knownRecipes: [...(cprof.knownRecipes ?? [])],
-          // The server-computed work-order cooldown set (against ITS
-          // tickCount). questState() feeds it into computeQuestState so a work
-          // order on cooldown shows unavailable on the client too. The ?? []
-          // keeps an older server's payload (without the field) loading cleanly.
-          cadenceBlockedQuests: [...(cprof.cadenceBlockedQuests ?? [])],
-          // The quested-hobby record, mirrored so the attunement preview can
-          // promise the hobby a return will actually restore. Conditional
-          // spread: absent stays absent (older server payloads, characters
-          // without the feature).
-          ...(cprof.questedHobbies ? { questedHobbies: { ...cprof.questedHobbies } } : {}),
-        };
+        const decoded = decodeCraftingIdentity(s.cprof as CraftingIdentityView);
+        this.craftSkills = decoded.craftSkills;
+        this.craftingIdentity = decoded.identity;
       }
       // camera follows server-side facing changes when not mouselooking
       if (prevSelfFacing !== undefined && this.mouselookFacing === null) {
@@ -4160,12 +4070,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
     this.pendingQuestCommands.delete(questId);
     this.cmd({ cmd: 'abandon', quest: questId });
   }
-  startTutorial(): void {
-    if (!this.canSendCommand()) return;
-    // Command only, never predicted: the server validates and the >30 yd
-    // displacement in the next snapshot drives the client's arrival flow.
-    this.cmd({ cmd: 'tutorial_start' });
-  }
   acceptLinkedQuest(questId: string, fromPid: number): void {
     this.cmd({ cmd: 'qlinkaccept', quest: questId, from: fromPid });
   }
@@ -4227,12 +4131,25 @@ export class ClientWorld extends ReconWireState implements IWorld {
     if (target === undefined) this.cmd({ cmd: 'use', item: itemId });
     else this.cmd({ cmd: 'use', item: itemId, slot: target.slotIndex });
   }
-  discardItem(itemId: string, count?: number, target?: { slotIndex: number }): void {
+  discardItem(itemId: string, count?: number, target?: NamedSlotTarget): void {
     if (target === undefined) this.cmd({ cmd: 'discard', item: itemId, count });
-    else this.cmd({ cmd: 'discard', item: itemId, count, slot: target.slotIndex });
+    else
+      this.cmd({
+        cmd: 'discard',
+        item: itemId,
+        count,
+        slot: target.slotIndex,
+        ...anchorFields(target),
+      });
   }
-  setItemLocked(itemId: string, locked: boolean, target: { slotIndex: number }): void {
-    this.cmd({ cmd: 'lock_item', item: itemId, locked, slot: target.slotIndex });
+  setItemLocked(itemId: string, locked: boolean, target: NamedSlotTarget): void {
+    this.cmd({
+      cmd: 'lock_item',
+      item: itemId,
+      locked,
+      slot: target.slotIndex,
+      ...anchorFields(target),
+    });
   }
   buyItem(npcId: number, itemId: string, opts?: VendorBuyOptions): void {
     // `bulk` and `count` each ride the wire only when non-default (the
@@ -4344,6 +4261,16 @@ export class ClientWorld extends ReconWireState implements IWorld {
       this.cmd({ cmd: 'disenchant_item', item: itemId, slot: target.slotIndex });
     }
   }
+  // The Sundered Essence extraction (Masterwrought phase 04): same command-only
+  // shape as disenchantItem above; feedback is error/log lines plus the
+  // inventory delta, no result event.
+  extractEssence(itemId: string, target?: { slotIndex: number }): void {
+    if (target === undefined) {
+      this.cmd({ cmd: 'extract_essence', item: itemId });
+    } else {
+      this.cmd({ cmd: 'extract_essence', item: itemId, slot: target.slotIndex });
+    }
+  }
   // `slot` rides only when the target is a WORN piece (the in-place arm); a
   // bagged target sends a message byte-identical to the pre-feature form. The
   // server re-validates the token against ALL_EQUIP_SLOTS and the sim re-checks
@@ -4382,6 +4309,25 @@ export class ClientWorld extends ReconWireState implements IWorld {
   unbindItem(itemId: string): void {
     this.cmd({ cmd: 'unbind_item', item: itemId });
   }
+  // Perfecting sends the captured copy and optional name; the server resolves
+  // every gate and roll. Feedback is the sim's lines and self inv/einst re-diff.
+  perfectItem(ref: PerfectItemRef, name?: string): void {
+    this.cmd({ cmd: 'perfect_item', ...perfectingCommand(this, ref, name) });
+  }
+  // The one shared view builder the offline Sim also answers through
+  // (perfectingInfoFrom), fed the self mirrors: the whole `inv` array, the
+  // `equip`/`einst` worn set, and the cprof craft skills. A pure read over
+  // mirrored state, so under snapshot lag it can trail the server by a
+  // snapshot; the server still resolves every attempt authoritatively.
+  perfectingInfo(ref: PerfectItemRef): PerfectingInfoView | null {
+    return perfectingInfoFrom({
+      ref,
+      inventory: this.inventory,
+      equipment: this.equipment,
+      equipmentInstances: this.equipmentInstances,
+      craftSkills: this.craftingIdentity.craftSkills,
+    });
+  }
   // Commission order board (Professions 2.0, issue #1298): command only,
   // never predicted. The server re-validates every field in
   // src/sim/professions/commission_order.ts and answers with the personal
@@ -4404,9 +4350,16 @@ export class ClientWorld extends ReconWireState implements IWorld {
   deliverCommissionOrder(orderId: number): void {
     this.cmd({ cmd: 'deliver_commission_order', order: orderId });
   }
-  sellItem(itemId: string, count?: number, target?: { slotIndex: number }): void {
+  sellItem(itemId: string, count?: number, target?: NamedSlotTarget): void {
     if (target === undefined) this.cmd({ cmd: 'sell', item: itemId, count });
-    else this.cmd({ cmd: 'sell', item: itemId, count, slot: target.slotIndex });
+    else
+      this.cmd({
+        cmd: 'sell',
+        item: itemId,
+        count,
+        slot: target.slotIndex,
+        ...anchorFields(target),
+      });
   }
   sellAllJunk(): void {
     this.cmd({ cmd: 'sell_all_junk' });
@@ -4501,54 +4454,11 @@ export class ClientWorld extends ReconWireState implements IWorld {
       timeLimitTicks: s.timeLimitTicks,
     };
   }
-  // Mirror the authoritative race lifecycle into mountRaceMirror. Gate positions
-  // never ride the wire (the racing line derives from the shared
-  // MOUNT_RACE_COURSE content); the events still flow to the HUD (drainEvents)
-  // for the countdown/banners.
+  // Mirror the authoritative race lifecycle into mountRaceMirror (the fold
+  // itself lives in mount_race_wire.ts); the events still flow to the HUD
+  // (drainEvents) for the countdown/banners.
   private applyMountRaceEvent(ev: SimEvent): void {
-    if (ev.type === 'mountRaceCountdown') {
-      this.mountRaceMirror = {
-        raceId: ev.raceId,
-        phase: 'countdown',
-        clearedMask: 0,
-        cleared: 0,
-        jumpsTotal: MOUNT_RACE_COURSE.jumps.length,
-        goDeadlineMs: performance.now() + (ev.countdownTicks / TICK_RATE) * 1000,
-        deadlineMs: 0,
-        timeLimitTicks: 0,
-      };
-    } else if (ev.type === 'mountRaceStart') {
-      const s = this.mountRaceMirror;
-      const deadlineMs = performance.now() + (ev.timeLimitTicks / TICK_RATE) * 1000;
-      if (s && s.raceId === ev.raceId) {
-        s.phase = 'racing';
-        s.jumpsTotal = ev.jumpsTotal;
-        s.timeLimitTicks = ev.timeLimitTicks;
-        s.deadlineMs = deadlineMs;
-      } else {
-        // A start without a preceding countdown mirror (late join / dropped
-        // event): build the racing mirror straight from the start event.
-        this.mountRaceMirror = {
-          raceId: ev.raceId,
-          phase: 'racing',
-          clearedMask: 0,
-          cleared: 0,
-          jumpsTotal: ev.jumpsTotal,
-          goDeadlineMs: 0,
-          deadlineMs,
-          timeLimitTicks: ev.timeLimitTicks,
-        };
-      }
-    } else if (ev.type === 'mountRaceJump') {
-      const s = this.mountRaceMirror;
-      if (s && s.raceId === ev.raceId) {
-        s.clearedMask = ev.mask;
-        s.cleared = ev.cleared;
-        s.jumpsTotal = ev.jumpsTotal;
-      }
-    } else if (ev.type === 'mountRaceEnd') {
-      if (this.mountRaceMirror?.raceId === ev.raceId) this.mountRaceMirror = null;
-    }
+    this.mountRaceMirror = applyMountRaceEventToMirror(this.mountRaceMirror, ev, performance.now());
   }
   // Mirror riding-lesson liveness for legacy mountLessonActive() consumers.
   private applyMountTrainEvent(ev: SimEvent): void {
@@ -4668,6 +4578,49 @@ export class ClientWorld extends ReconWireState implements IWorld {
     const restore = this.actionBarRestore;
     this.actionBarRestore = undefined; // one-shot: consumed by the HUD at world entry
     return restore;
+  }
+  // --- IWorldFarming: the two plot mutations (snake_case wire, by design).
+  // Command only, NEVER predicted: the server re-validates the bed id, the
+  // crop id, ownership, the skill threshold, the seed in bags, and the
+  // step-12 hoe gate (a wieldable farming hoe covering the crop tier; live
+  // since the crop-ladder phase) inside the
+  // sim, consumes the seed, and pre-rolls the whole hidden
+  // growth script there. Writing an optimistic plot row here would be
+  // guessing at a deadline only the authority can set, and the hidden
+  // survival/yield slots deliberately never reach this client at all, so
+  // there is nothing to predict FROM. Every outcome mirrors back on the
+  // `fplot` self delta plus a text-free id-carrying SimEvent. ---
+  plantCrop(bedId: string, cropId: string, knobs?: FarmPlantKnobs): void {
+    // Knob fields ride the frame ONLY when literally true (the fplot
+    // only-when-true convention): a plain plant's frame stays byte-identical
+    // to the pre-knob protocol, and the server treats an absent field and
+    // false identically (knob not requested).
+    this.cmd({
+      cmd: 'plant_crop',
+      bed: bedId,
+      crop: cropId,
+      ...(knobs?.compost === true ? { compost: true } : {}),
+      ...(knobs?.watch === true ? { watch: true } : {}),
+      ...(knobs?.tonic === true ? { tonic: true } : {}),
+    });
+  }
+  harvestCrop(bedId: string): void {
+    this.cmd({ cmd: 'harvest_crop', bed: bedId });
+  }
+  convertHusks(): void {
+    this.cmd({ cmd: 'convert_husks' });
+  }
+  // The shared feast pair: place (the item id, charges, expiry and anti-abuse
+  // rule all resolve server-side; only WHICH bag copy to spend rides the wire,
+  // and only when the caller named one) and an entity-id-only consume. Never
+  // predicted: the placed feast arrives on the normal entity snapshot and every
+  // refusal answers as a text-free farmDenied SimEvent.
+  placeFeast(target?: { slotIndex: number }): void {
+    if (target === undefined) this.cmd({ cmd: 'place_feast' });
+    else this.cmd({ cmd: 'place_feast', slot: target.slotIndex });
+  }
+  consumeFeast(feastId: number): void {
+    this.cmd({ cmd: 'consume_feast', id: feastId });
   }
   chat(text: string): void {
     this.cmd({ cmd: 'chat', text });

@@ -125,6 +125,43 @@ export const UI_CUES = {
   // no conflict sharing the file with the real applyEnchant/enchantResult
   // action here.
   enchant: 'ui_craft_enchanting',
+  // Masterwrought crafting UX (phase 14): perfectingAttempt is the Perfecting
+  // attempt resolve strike and perfectingSuccess the rank landing (both
+  // consumed by the Perfecting window); legendaryForged is the orange
+  // promotion's own capstone cue, replacing the reused achievement chime at
+  // the hud's legendaryForged arm so the rarest crafting moment stops
+  // sounding like any deed unlock; sunderComplete closes the one silent
+  // craft-family completion (the sunder grant is silent + callerLogs, so no
+  // generic ding ever covered it).
+  perfectingAttempt: 'ui_perfecting_attempt',
+  perfectingSuccess: 'ui_perfecting_success',
+  legendaryForged: 'ui_legendary_forged',
+  sunderComplete: 'ui_sunder_complete',
+  // Farming (the render / juice phase): the plant ACTION and the harvest
+  // RESULT, the same cast/result split the gathering family uses. Both are
+  // procedural placeholders in scripts/sfx/ui_sfx.mjs until real recordings
+  // land.
+  farmPlant: 'ui_farm_plant',
+  farmHarvest: 'ui_farm_harvest',
+  // The withered outcome's own sting (the deferred Phase 8/10 cue, landed at
+  // the Phase 18 sweep). It shared farmHarvest through the interim, which
+  // sounded like the crop came in; it is the same action resolving, so the
+  // cue keeps the harvest's vocabulary and inverts its tail rather than
+  // reaching for an unrelated failure sound.
+  farmWithered: 'ui_farm_withered',
+  // The ready notice (the ready-notice phase): its own cue rather than a
+  // borrowed one, because it is the only farming sound the player did not
+  // just ask for by pressing something, and it must not read as a harvest
+  // that happened without them.
+  farmReady: 'ui_farm_ready',
+  // The golden-harvest sting (the celebrations phase): layers alongside the
+  // shared rare-event achievement cue, never a replacement for it, the same
+  // additive design masterwork and gatherRareTier follow.
+  farmGolden: 'ui_farm_golden',
+  // Setting out the shared feast (Phase 12): the placement's own cue, a
+  // procedural placeholder like its farming siblings until a real recording
+  // lands.
+  farmFeast: 'ui_farm_feast',
 } as const;
 
 type UiCue =
@@ -427,6 +464,71 @@ export class GameAudio {
 
   enchant(): void {
     this.playFeedback(UI_CUES.enchant);
+  }
+
+  // Masterwrought Perfecting (phase 14): the attempt resolve strike and the
+  // rank landing. Result feedback like craftSuccess/masterwork, so both ride
+  // the feedback gate.
+  perfectingAttempt(): void {
+    this.playFeedback(UI_CUES.perfectingAttempt);
+  }
+
+  perfectingSuccess(): void {
+    this.playFeedback(UI_CUES.perfectingSuccess);
+  }
+
+  // The orange moment (Masterwrought phase 13's promotion, cued in phase 14):
+  // the legendary promotion's own capstone cue. Feedback-gated like the other
+  // crafting result celebrations (craftSuccess, masterwork).
+  legendaryForged(): void {
+    this.playFeedback(UI_CUES.legendaryForged);
+  }
+
+  // The sundering completion: the grant is silent + callerLogs, so this cue
+  // is the action's only sound beyond the shared cast wind-up. Feedback-gated
+  // like disenchant/salvage, its enchant-family siblings.
+  sunderComplete(): void {
+    this.playFeedback(UI_CUES.sunderComplete);
+  }
+
+  // Farming plant: the direct-affordance half (you pressed plant and the soil
+  // answers), so it rides the ungated arm like click/bagOpen.
+  farmPlant(): void {
+    this.play(UI_CUES.farmPlant);
+  }
+
+  // Farming harvest: the reward half, feedback-gated like the other result
+  // notifications (loot, gather, craftSuccess).
+  farmHarvest(): void {
+    this.playFeedback(UI_CUES.farmHarvest);
+  }
+
+  // Farming withered outcome: the harvest's unlucky twin, so it takes the
+  // same feedback gate as farmHarvest rather than the ungated affordance arm
+  // the plant press rides.
+  farmWithered(): void {
+    this.playFeedback(UI_CUES.farmWithered);
+  }
+
+  // Farming ready notice: a NOTIFICATION, not an affordance (nothing was
+  // pressed), so it rides the feedback gate like mail and quest chimes and
+  // goes silent for a player who turned interface sounds off.
+  farmReady(): void {
+    this.playFeedback(UI_CUES.farmReady);
+  }
+
+  // Golden-harvest sting: the finder's reward notification, feedback-gated
+  // like the other result cues (masterwork, gatherRareTier) and layered on
+  // top of the shared achievement cue, never a replacement for it.
+  farmGolden(): void {
+    this.playFeedback(UI_CUES.farmGolden);
+  }
+
+  // Setting out the shared feast: the direct-affordance half (you pressed
+  // the verb and the table answers), so it rides the ungated arm exactly
+  // like its farmPlant sibling.
+  farmFeast(): void {
+    this.play(UI_CUES.farmFeast);
   }
 }
 

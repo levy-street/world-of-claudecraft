@@ -2,6 +2,8 @@
   import { onMount } from 'svelte';
   import type { PerfCaptureStatus, PerfPhaseStats } from '../types';
   import { apiGet, apiPost } from '../api';
+  import { type AdminLoadFailure, classifyAdminLoadFailure } from '../load_failure';
+  import PermissionDenied from '../components/PermissionDenied.svelte';
   import { auth } from '../state/auth.svelte';
   import { poll } from '../state/poll';
   import { adminLanguageTag, t } from '../i18n';
@@ -29,7 +31,7 @@
   let status = $state<PerfCaptureStatus | null>(null);
   let durationSeconds = $state<number>(10);
   let starting = $state(false);
-  let failed = $state(false);
+  let failed = $state<AdminLoadFailure>('none');
 
   const msFormatter = new Intl.NumberFormat(adminLanguageTag(), {
     minimumFractionDigits: 2,
@@ -77,9 +79,9 @@
   async function refresh(): Promise<void> {
     try {
       status = await apiGet<PerfCaptureStatus>('/admin/api/perf/tick');
-      failed = false;
+      failed = 'none';
     } catch (err) {
-      if (!auth.handleAuthFailure(err)) failed = true;
+      if (!auth.handleAuthFailure(err)) failed = classifyAdminLoadFailure(err);
     }
   }
 
@@ -124,7 +126,9 @@
     </button>
   </div>
 
-  {#if failed}
+  {#if failed === 'forbidden'}
+    <PermissionDenied />
+  {:else if failed === 'error'}
     <div class="empty">{t('tickPerf.loadFailed')}</div>
   {:else}
     <p class="status" aria-live="polite">

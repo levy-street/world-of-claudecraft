@@ -84,18 +84,29 @@ const JUNK_ROWS: Record<string, string[]> = {
 };
 
 // The band side of the ladder, which lives here rather than in the module: it
-// is the rule the nine catch-table cells were AUTHORED against, and nothing at
-// runtime asks it anything (the engine reads the table it is handed). A zone's
-// required band is the band its required rod unlocks, which is rodTier - 1
-// under the shipped band gate.
+// is the rule the EIGHTEEN catch-table cells were AUTHORED against, and nothing
+// at runtime asks it anything (the engine reads the table it is handed). A
+// zone's required band is the band its required rod unlocks, which is
+// rodTier - 1 under the shipped band gate.
+//
+// THE SURPLUS CLAMP MOVED OFF 2 IN MASTERWROUGHT PHASE 11i, and the clamp is
+// the reason this file's arms are worth extending rather than re-pinning. The
+// three zones' REQUIREMENTS did not move (a zone's required rod is a property
+// of its nodes, not of how many bands exist), but the ladder grew three rungs
+// above them, so Eastbrook now reaches a surplus of FIVE. A clamp left at 2
+// would have squashed bands 3, 4 and 5 onto the band-2 schedule row and made
+// every arm below pass by aliasing rather than by agreement. The shortfall side
+// is untouched at 2 because nothing new sits BELOW a requirement: the deepest
+// shortfall is still Thornpeak at band 0.
+const MAX_BAND = FISHING_TABLES_BY_BAND.length - 1;
 const requiredBandFor = (zoneId: string): number =>
-  Math.min(2, Math.max(0, rodTierRequiredForZone(zoneId) - 1));
+  Math.min(MAX_BAND, Math.max(0, rodTierRequiredForZone(zoneId) - 1));
 /** How many bands short of the zone's requirement a band is, 0 at or above. */
 const shortfallFor = (zoneId: string, band: number): number =>
   Math.min(2, Math.max(0, requiredBandFor(zoneId) - band));
 /** How many bands ABOVE the requirement a band sits, 0 when short or at it. */
 const surplusFor = (zoneId: string, band: number): number =>
-  Math.min(2, Math.max(0, band - requiredBandFor(zoneId)));
+  Math.min(MAX_BAND, Math.max(0, band - requiredBandFor(zoneId)));
 
 function makeSim(seed = 4242): Sim {
   return new Sim({ seed, playerClass: 'warrior', autoEquip: true, world: EMPTY_TEST_WORLD });
@@ -241,18 +252,26 @@ describe('the rod a zone takes', () => {
   });
 
   it('shortfall and surplus are mirrors, clamped, and never both positive', () => {
+    let pairsChecked = 0;
     for (const zoneId of ZONE_IDS) {
-      for (let band = 0; band < 3; band++) {
+      for (let band = 0; band <= MAX_BAND; band++) {
         const short = shortfallFor(zoneId, band);
         const over = surplusFor(zoneId, band);
         expect(Math.min(short, over), `${zoneId} band ${band}`).toBe(0);
         expect(short - over).toBe(requiredBandFor(zoneId) - band);
+        pairsChecked += 1;
       }
     }
-    // Both ends clamp, so a fourth band or a fourth zone cannot index off the
+    // The loop really did widen with the ladder: 3 zones over 6 bands.
+    expect(pairsChecked).toBe(18);
+    // Both ends clamp, so a seventh band or a fourth zone cannot index off the
     // schedule.
     expect(shortfallFor('thornpeak_heights', -5)).toBe(2);
-    expect(surplusFor('eastbrook_vale', 99)).toBe(2);
+    expect(surplusFor('eastbrook_vale', 99)).toBe(MAX_BAND);
+    // And the clamp really is above the live top rather than sitting on it: the
+    // Vale at the top band is a surplus of five, which a stale clamp of 2 would
+    // have silently reported as two.
+    expect(surplusFor('eastbrook_vale', MAX_BAND)).toBe(5);
   });
 });
 
@@ -260,14 +279,22 @@ describe('the catch tables follow the shortfall schedule', () => {
   // The one place the nine cells are checked against the rule that authored
   // them. Editing a weight past the schedule reds here rather than quietly
   // changing what a zone pays.
-  const EMPTY_HOOK_AT_OR_ABOVE = [10, 8, 6]; // by bands ABOVE the requirement
+  // Extended to six rungs in masterwrought Phase 11i. THE SCHEDULE EXTENDS, IT
+  // DOES NOT RESTART: every rung below continues the shipped step rather than
+  // starting a second curve, which is what lets the same three arms rule on all
+  // eighteen cells (src/sim/content/items.ts states the same schedule in prose
+  // beside the tables; this is the executable copy).
+  const EMPTY_HOOK_AT_OR_ABOVE = [10, 8, 6, 4, 2, 1]; // by bands ABOVE the requirement
   const EMPTY_HOOK_SHORT = [0, 35, 55]; // by bands SHORT of it
-  const KOI_BY_BAND = [1, 3, 6];
+  // Flat at 6 from band 2 up: the rare row is already the second-heaviest thing
+  // in a top-band cell, and climbing further would only crowd out the three
+  // catches the new bands exist to pay. Non-decreasing is still satisfied.
+  const KOI_BY_BAND = [1, 3, 6, 6, 6, 6];
 
   it('every empty-hook weight is exactly what the zone distance says it is', () => {
     let checked = 0;
     for (const zoneId of ZONE_IDS) {
-      for (let band = 0; band < 3; band++) {
+      for (let band = 0; band <= MAX_BAND; band++) {
         const short = shortfallFor(zoneId, band);
         const expected =
           short > 0 ? EMPTY_HOOK_SHORT[short] : EMPTY_HOOK_AT_OR_ABOVE[surplusFor(zoneId, band)];
@@ -275,25 +302,27 @@ describe('the catch tables follow the shortfall schedule', () => {
         checked += 1;
       }
     }
-    expect(checked).toBe(9);
-    // Every arm of the schedule is exercised by real content, so none of the
-    // three cases above is dead: Eastbrook supplies all three surplus steps,
-    // Mirefen and Thornpeak supply both shortfalls.
+    expect(checked).toBe(18);
+    // Every arm of the schedule is exercised by real content, so no rung above
+    // is dead: Eastbrook supplies all six surplus steps, Mirefen and Thornpeak
+    // supply both shortfalls. This is the arm that would catch a rung added to
+    // EMPTY_HOOK_AT_OR_ABOVE that no zone ever reaches.
     const shortfalls = new Set<number>();
     const surpluses = new Set<number>();
     for (const zoneId of ZONE_IDS) {
-      for (let band = 0; band < 3; band++) {
+      for (let band = 0; band <= MAX_BAND; band++) {
         const short = shortfallFor(zoneId, band);
         if (short > 0) shortfalls.add(short);
         else surpluses.add(surplusFor(zoneId, band));
       }
     }
     expect([...shortfalls].sort((a, b) => a - b)).toEqual([1, 2]);
-    expect([...surpluses].sort((a, b) => a - b)).toEqual([0, 1, 2]);
+    expect([...surpluses].sort((a, b) => a - b)).toEqual([0, 1, 2, 3, 4, 5]);
+    expect(surpluses.size).toBe(EMPTY_HOOK_AT_OR_ABOVE.length);
   });
 
   it('the rare catch reads SKILL alone: same weight in every zone, rising with the band', () => {
-    for (let band = 0; band < 3; band++) {
+    for (let band = 0; band <= MAX_BAND; band++) {
       for (const zoneId of ZONE_IDS) {
         expect(weightOf(band, zoneId, KOI), `${zoneId} band ${band}`).toBe(KOI_BY_BAND[band]);
       }
@@ -302,6 +331,17 @@ describe('the catch tables follow the shortfall schedule', () => {
     // bands short and still pays the same koi weight as the Vale at band 0.
     expect(weightOf(0, 'thornpeak_heights', KOI)).toBe(weightOf(0, 'eastbrook_vale', KOI));
     expect(KOI_BY_BAND[0]).toBeLessThan(KOI_BY_BAND[2]);
+    // The ladder is non-decreasing across EVERY step (the shipped monotonic
+    // rule), and the top is a deliberate FLAT rather than a curve that ran out
+    // of rungs. Asserting the flat explicitly is what makes a future rung that
+    // quietly resumes climbing a decision someone has to make here.
+    for (let band = 1; band <= MAX_BAND; band++) {
+      expect(KOI_BY_BAND[band], `koi step ${band - 1} to ${band}`).toBeGreaterThanOrEqual(
+        KOI_BY_BAND[band - 1],
+      );
+    }
+    expect(KOI_BY_BAND.slice(2)).toEqual([6, 6, 6, 6]);
+    expect(KOI_BY_BAND).toHaveLength(FISHING_TABLES_BY_BAND.length);
   });
 
   it('junk is pinned per cell, and swells with the shortfall', () => {
@@ -311,26 +351,44 @@ describe('the catch tables follow the shortfall schedule', () => {
     // other assertion in this file still green: the junk dimension of the
     // schedule was the one authored rule not actually enforced.
     const JUNK_TOTALS: Record<string, number[]> = {
-      eastbrook_vale: [12, 8, 4],
-      mirefen_marsh: [25, 13, 9],
-      thornpeak_heights: [28, 15, 6],
+      eastbrook_vale: [12, 8, 4, 1, 1, 1],
+      mirefen_marsh: [25, 13, 9, 5, 2, 2],
+      thornpeak_heights: [28, 15, 6, 2, 1, 1],
     };
     let checked = 0;
     for (const zoneId of ZONE_IDS) {
-      for (let band = 0; band < 3; band++) {
+      for (let band = 0; band <= MAX_BAND; band++) {
         expect(junkTotal(band, zoneId), `${zoneId} band ${band} junk`).toBe(
           JUNK_TOTALS[zoneId][band],
         );
         checked += 1;
       }
     }
-    expect(checked).toBe(9);
+    expect(checked).toBe(18);
+    // And those literals obey a RULE, which is the half a literal table cannot
+    // state: minus 4 per surplus band off the zone's at-requirement total,
+    // FLOORED at one weight per junk row the zone carries so a zone never loses
+    // a flavor row entirely. The floor is what makes the three top-band cells
+    // sit at 1, 2 and 1 rather than at zero or negative, and Mirefen's 2 (it
+    // carries two junk rows) is what proves the floor is per-ROW, not a flat 1.
+    for (const zoneId of ZONE_IDS) {
+      const atRequirement = JUNK_TOTALS[zoneId][requiredBandFor(zoneId)];
+      const floor = JUNK_ROWS[zoneId].length;
+      for (let band = requiredBandFor(zoneId); band <= MAX_BAND; band++) {
+        const surplus = surplusFor(zoneId, band);
+        expect(JUNK_TOTALS[zoneId][band], `${zoneId} band ${band} junk rule`).toBe(
+          Math.max(atRequirement - 4 * surplus, floor),
+        );
+      }
+    }
+    expect(JUNK_TOTALS.mirefen_marsh[MAX_BAND]).toBe(2);
+    expect(JUNK_TOTALS.eastbrook_vale[MAX_BAND]).toBe(1);
     // And the shape those literals encode: a short cell really does pay more
     // junk than the same zone at its own requirement, roughly double or worse.
     let shortCells = 0;
     for (const zoneId of ZONE_IDS) {
       const atRequirement = junkTotal(requiredBandFor(zoneId), zoneId);
-      for (let band = 0; band < 3; band++) {
+      for (let band = 0; band <= MAX_BAND; band++) {
         const short = shortfallFor(zoneId, band);
         if (short === 0) continue;
         const ratio = junkTotal(band, zoneId) / atRequirement;
@@ -352,36 +410,241 @@ describe('the catch tables follow the shortfall schedule', () => {
     // is left, which is how the remainder is split between a zone's two food
     // fish. Pinned as literals so a 50/34 to 49/35 nudge in the Vale reds here
     // rather than passing every other assertion in this file.
-    const FOOD_ROWS: Record<string, number[][]> = {
+    //
+    // PAIRS, NOT BARE WEIGHTS, since masterwrought Phase 11i. The bare-weight
+    // form was written when every cell had exactly two food rows in a fixed
+    // order, so a weight list said everything. The new bands add a third,
+    // fourth and fifth row, and ROW ORDER IS DRAW BEHAVIOR (the roll walks a
+    // running weight total), so a weight-only list stopped covering the cell:
+    // rv-tests swapped the catfish and sturgeon rows inside the Vale's top cell
+    // and every table arm in this file, plus the whole parity suite, stayed
+    // green. Naming each row's id beside its weight closes that, and it closes
+    // the likelier version of the same bug too, a new catch inserted at the
+    // wrong point in an existing cell.
+    const FOOD_ROWS: Record<string, [string, number][][]> = {
       eastbrook_vale: [
-        [46, 31],
-        [49, 32],
-        [50, 34],
+        [
+          ['raw_mirror_trout', 46],
+          ['raw_river_perch', 31],
+        ],
+        [
+          ['raw_mirror_trout', 49],
+          ['raw_river_perch', 32],
+        ],
+        [
+          ['raw_mirror_trout', 50],
+          ['raw_river_perch', 34],
+        ],
+        [
+          ['raw_mirror_trout', 50],
+          ['raw_river_perch', 34],
+          ['raw_deepbarb_catfish', 5],
+        ],
+        [
+          ['raw_mirror_trout', 50],
+          ['raw_river_perch', 34],
+          ['raw_deepbarb_catfish', 5],
+          ['raw_hollowgill_sturgeon', 2],
+        ],
+        [
+          ['raw_mirror_trout', 50],
+          ['raw_river_perch', 34],
+          ['raw_deepbarb_catfish', 5],
+          ['raw_hollowgill_sturgeon', 2],
+          ['raw_stillmere_salmon', 1],
+        ],
       ],
       mirefen_marsh: [
-        [22, 17],
-        [42, 32],
-        [43, 34],
+        [
+          ['raw_marsh_pike', 22],
+          ['raw_bog_eel', 17],
+        ],
+        [
+          ['raw_marsh_pike', 42],
+          ['raw_bog_eel', 32],
+        ],
+        [
+          ['raw_marsh_pike', 43],
+          ['raw_bog_eel', 34],
+        ],
+        [
+          ['raw_marsh_pike', 44],
+          ['raw_bog_eel', 34],
+          ['raw_deepbarb_catfish', 5],
+        ],
+        [
+          ['raw_marsh_pike', 45],
+          ['raw_bog_eel', 36],
+          ['raw_deepbarb_catfish', 5],
+          ['raw_hollowgill_sturgeon', 2],
+        ],
+        [
+          ['raw_marsh_pike', 46],
+          ['raw_bog_eel', 36],
+          ['raw_deepbarb_catfish', 5],
+          ['raw_hollowgill_sturgeon', 2],
+          ['raw_stillmere_salmon', 1],
+        ],
       ],
       thornpeak_heights: [
-        [9, 7],
-        [27, 20],
-        [44, 34],
+        [
+          ['raw_frostgill_trout', 9],
+          ['raw_stonescale_carp', 7],
+        ],
+        [
+          ['raw_frostgill_trout', 27],
+          ['raw_stonescale_carp', 20],
+        ],
+        [
+          ['raw_frostgill_trout', 44],
+          ['raw_stonescale_carp', 34],
+        ],
+        [
+          ['raw_frostgill_trout', 45],
+          ['raw_stonescale_carp', 34],
+          ['raw_deepbarb_catfish', 5],
+        ],
+        [
+          ['raw_frostgill_trout', 45],
+          ['raw_stonescale_carp', 35],
+          ['raw_deepbarb_catfish', 5],
+          ['raw_hollowgill_sturgeon', 2],
+        ],
+        [
+          ['raw_frostgill_trout', 46],
+          ['raw_stonescale_carp', 35],
+          ['raw_deepbarb_catfish', 5],
+          ['raw_hollowgill_sturgeon', 2],
+          ['raw_stillmere_salmon', 1],
+        ],
       ],
     };
     let checked = 0;
     for (const zoneId of ZONE_IDS) {
-      for (let band = 0; band < 3; band++) {
+      for (let band = 0; band <= MAX_BAND; band++) {
         const food = FISHING_TABLES_BY_BAND[band][zoneId]
           .filter(
             (r) => r.itemId !== null && r.itemId !== KOI && !JUNK_ROWS[zoneId].includes(r.itemId),
           )
-          .map((r) => r.weight);
+          .map((r) => [r.itemId as string, r.weight] as [string, number]);
         expect(food, `${zoneId} band ${band} food rows`).toEqual(FOOD_ROWS[zoneId][band]);
         checked += 1;
       }
     }
-    expect(checked).toBe(9);
+    expect(checked).toBe(18);
+    // The rung each new catch enters at, read off the pinned table rather than
+    // restated: the three catches introduce at bands 3, 4 and 5 respectively,
+    // which is the one fact the D9 axis and the rod ladder have to agree on.
+    const firstBandOf = (itemId: string): number =>
+      FOOD_ROWS.eastbrook_vale.findIndex((rows) => rows.some(([id]) => id === itemId));
+    expect(firstBandOf('raw_deepbarb_catfish')).toBe(3);
+    expect(firstBandOf('raw_hollowgill_sturgeon')).toBe(4);
+    expect(firstBandOf('raw_stillmere_salmon')).toBe(5);
+    // THE WHOLE CELL'S ORDER, not just the food subsequence (Phase 11i QA).
+    //
+    // The pairs above are ordered, and that closed the mutation the battery
+    // ran: swapping two FOOD rows reds. What it does not close is the rest of
+    // the row list. A draw walks a RUNNING WEIGHT TOTAL down the cell, so the
+    // position of the koi row, either grey-junk row and the null row is draw
+    // behaviour exactly as much as the fish rows are, and the filter above
+    // deletes all four before comparing. Move the null row to the front of a
+    // cell and every arm in this file still passes.
+    //
+    // So pin the cell's SHAPE as an ordered id list. Weights stay the
+    // schedule's job; this is only about the order the roll walks them in, and
+    // it is READ OFF the shipped table rather than assumed: the first draft of
+    // this arm asserted the koi sits directly above the null row, which is true
+    // of bands 0 to 2 and false from band 3 up, because the new catches are
+    // APPENDED after the koi rather than inserted beside their fish.
+    const cellIds = (zoneId: string, band: number): (string | null)[] =>
+      FISHING_TABLES_BY_BAND[band][zoneId].map((r) => r.itemId);
+    const NEW_CATCHES = ['raw_deepbarb_catfish', 'raw_hollowgill_sturgeon', 'raw_stillmere_salmon'];
+    let ordered = 0;
+    for (const zoneId of ZONE_IDS) {
+      for (let band = 0; band <= MAX_BAND; band++) {
+        const ids = cellIds(zoneId, band);
+        const at = (id: string | null) => ids.indexOf(id);
+        // ONE null row, and it is LAST: the roll's remainder arm depends on it.
+        expect(
+          ids.filter((id) => id === null),
+          `${zoneId} band ${band}: exactly one null row`,
+        ).toHaveLength(1);
+        expect(at(null), `${zoneId} band ${band}: the null row is last`).toBe(ids.length - 1);
+        const junkAt = JUNK_ROWS[zoneId].map((id) => at(id)).filter((i) => i >= 0);
+        // EVERY junk row is present, and IN ITS AUTHORED ORDER. Without the
+        // length floor, Math.min and Math.max over an empty junkAt yield
+        // Infinity and -Infinity, so a cell that lost its junk rows entirely
+        // would satisfy both order assertions below vacuously; without the sort
+        // check, Mirefen's two junk rows could swap with each other silently,
+        // which is a draw change this file otherwise pins nowhere.
+        expect(junkAt, `${zoneId} band ${band}: every junk row present`).toHaveLength(
+          JUNK_ROWS[zoneId].length,
+        );
+        expect(
+          [...junkAt].sort((a, b) => a - b),
+          `${zoneId} band ${band}: junk rows in their authored order`,
+        ).toEqual(junkAt);
+        const shippedFishAt = ids
+          .map((id, i) =>
+            id !== null &&
+            id !== KOI &&
+            !JUNK_ROWS[zoneId].includes(id) &&
+            !NEW_CATCHES.includes(id)
+              ? i
+              : -1,
+          )
+          .filter((i) => i >= 0);
+        // The shipped composition: the zone's own fish, then its junk, then the
+        // koi, then whatever new catches its band has earned, then the null row.
+        expect(
+          Math.max(...shippedFishAt) < Math.min(...junkAt),
+          `${zoneId} band ${band}: the zone's own fish precede its junk`,
+        ).toBe(true);
+        expect(
+          Math.max(...junkAt) < at(KOI),
+          `${zoneId} band ${band}: the junk rows precede the koi`,
+        ).toBe(true);
+        const newAt = NEW_CATCHES.map((id) => at(id)).filter((i) => i >= 0);
+        for (const i of newAt) {
+          expect(i, `${zoneId} band ${band}: a new catch sits after the koi`).toBeGreaterThan(
+            at(KOI),
+          );
+        }
+        // And they are appended in the order their bands opened them, which is
+        // what makes a cell readable as its own history.
+        expect(
+          [...newAt].sort((a, b) => a - b),
+          `${zoneId} band ${band}: new catches in band-introduction order`,
+        ).toEqual(newAt);
+        expect(newAt).toHaveLength(Math.max(0, band - 2));
+        ordered += 1;
+      }
+    }
+    expect(ordered, 'every cell had its row order pinned').toBe(18);
+    // AND EVERY BAND CARRIES THE SAME ZONE KEYS. ZONE_IDS is read off band 0, so
+    // without this a zone table authored only from band 3 up would never be
+    // walked by anything in this file and `ordered` would still read 18: the
+    // count is a product of the two loops, not evidence that the loops covered
+    // the table.
+    for (let band = 0; band <= MAX_BAND; band++) {
+      expect(
+        Object.keys(FISHING_TABLES_BY_BAND[band]).sort(),
+        `band ${band} carries exactly the band-0 zone keys`,
+      ).toEqual([...ZONE_IDS].sort());
+    }
+    // And once a catch enters it never leaves, in any zone: a cell that dropped
+    // a row a lower band paid would be a table going BACKWARDS for the angler
+    // who climbed to it.
+    for (const zoneId of ZONE_IDS) {
+      for (let band = 1; band <= MAX_BAND; band++) {
+        const below = FOOD_ROWS[zoneId][band - 1].map(([id]) => id);
+        const here = FOOD_ROWS[zoneId][band].map(([id]) => id);
+        expect(
+          here.slice(0, below.length),
+          `${zoneId} band ${band} keeps its rows in place`,
+        ).toEqual(below);
+      }
+    }
   });
 
   it('a short cell pays out worse overall than the same zone at its requirement', () => {
@@ -394,13 +657,32 @@ describe('the catch tables follow the shortfall schedule', () => {
     let checked = 0;
     for (const zoneId of ZONE_IDS) {
       const atRequirement = foodShare(requiredBandFor(zoneId), zoneId);
-      for (let band = 0; band < 3; band++) {
+      for (let band = 0; band <= MAX_BAND; band++) {
         if (shortfallFor(zoneId, band) === 0) continue;
         expect(foodShare(band, zoneId), `${zoneId} band ${band}`).toBeLessThan(atRequirement);
         checked += 1;
       }
     }
     expect(checked).toBe(3);
+    // The converse, and the property the three new bands were added FOR: every
+    // band ABOVE a zone's requirement pays at least as much real fish as the
+    // requirement band does, so climbing is never a downgrade. The 11i cells
+    // would satisfy a per-row monotonic rule while still shrinking the total if
+    // the empty hook had not been the row paying for the new catches.
+    let surplusCells = 0;
+    for (const zoneId of ZONE_IDS) {
+      const atRequirement = foodShare(requiredBandFor(zoneId), zoneId);
+      for (let band = requiredBandFor(zoneId) + 1; band <= MAX_BAND; band++) {
+        expect(
+          foodShare(band, zoneId),
+          `${zoneId} band ${band} vs its requirement`,
+        ).toBeGreaterThan(atRequirement);
+        surplusCells += 1;
+      }
+    }
+    // 5 + 4 + 3 surplus cells across the three zones; without this the loop
+    // could skip everything on a clamp regression and still pass.
+    expect(surplusCells).toBe(12);
     // And the worst cell in the world really is bleak: a band-0 angler in
     // Thornpeak lands a fish under a fifth of the time.
     expect(foodShare(0, 'thornpeak_heights')).toBeLessThan(20);
@@ -714,7 +996,11 @@ describe('the session cap always outlasts a legal reel window', () => {
     const capTicks = Math.round(FISHING_SESSION_CAP_SEC / DT);
     // The cap side pinned to a literal: without it BOTH sides of the budget are
     // derived, and a trim to 14.5 s still satisfies every inequality below.
-    expect(capTicks, 'the session cap is 300 ticks').toBe(300);
+    // 320 since masterwrought Phase 11i: the tier-6 epic rung's 140-tick window
+    // on top of the pole's 160-tick worst bite plus the miss tick needs 301,
+    // one more than the old 300-tick cap gave. The derivation is in
+    // professions/fishing.ts beside FISH_REEL_WINDOW_RARITY_BONUS_SEC.
+    expect(capTicks, 'the session cap is 320 ticks').toBe(320);
     // ONE loop, over the rod held at the BITE. The bite delay is drawn against
     // the rod held at the CAST and the window is measured against the rod held
     // at the BITE, and since a better rod only ever SHORTENS the delay, the
@@ -995,12 +1281,12 @@ describe('the rod gate reads the WATER zone at the probe point', () => {
     expect(p.castingAbility).toBeNull();
   });
 
-  it('the cross-boundary GAIN answers to the water zone: 0.1 at proficiency 120', () => {
+  it('the cross-boundary GAIN answers to the water zone: 0.04 at proficiency 120', () => {
     // The discriminating drive the live map cannot stage: no shipped fishable
     // water lies within the 24 yd cast reach of a tier-DIFFERING zone line
     // (the nearest rim is 36 yd out, at the thornpeak/veiled_hollow border),
     // so the gain amount is discriminated here on the authored border lake.
-    // At fishing 120 the mirefen water ahead teaches 0.1 (tier 2 grays at
+    // At fishing 120 the mirefen water ahead teaches 0.04 (tier 2 grays at
     // 150) while the eastbrook ground underfoot teaches 0 (tier 1 grayed at
     // 100), so a gain call reading zoneAt(p.pos) instead of the pinned cast
     // zone zeroes this grant. 100..149 is the whole discriminating window:
@@ -1025,7 +1311,7 @@ describe('the rod gate reads the WATER zone at the probe point', () => {
       const gained = meta.pendingGatherGrants.slice(before);
       if (gained.length > 0) {
         taught++;
-        expect(gained).toEqual([{ professionId: 'fishing', amount: 0.1 }]);
+        expect(gained).toEqual([{ professionId: 'fishing', amount: 0.04 }]);
       }
     }
     expect(taught, 'the drive must land a teaching catch').toBe(1);

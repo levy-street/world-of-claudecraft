@@ -12,7 +12,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { audio } from '../src/game/audio';
 import type { SimEvent } from '../src/sim/types';
 import { type BannerVariant, Hud } from '../src/ui/hud';
-import { professionImageUrl } from '../src/ui/profession_art';
+import { professionImageUrl } from '../src/ui/hud/professions/profession_art';
 import {
   advanceSkillLevelObservation,
   buildSkillLevelCelebrationPlan,
@@ -21,7 +21,7 @@ import {
   SKILL_PLATE_MILESTONE_STEP,
   skillDisplayLevel,
   skillLevelArtId,
-} from '../src/ui/skill_level_toast_view';
+} from '../src/ui/hud/professions/skill_level_toast_view';
 
 describe('skillDisplayLevel', () => {
   it('floors a fractional skill to the player-visible level', () => {
@@ -269,10 +269,11 @@ describe('skillLevelArtId', () => {
   it('maps gathering ids to the profession art registry prefix', () => {
     expect(skillLevelArtId('mining')).toBe('gather_mining');
     expect(skillLevelArtId('fishing')).toBe('gather_fishing');
+    expect(skillLevelArtId('farming')).toBe('gather_farming');
   });
 
   it('resolves to shipped art URLs for every gathering profession', () => {
-    for (const id of ['mining', 'logging', 'herbalism', 'fishing'] as const) {
+    for (const id of ['mining', 'logging', 'herbalism', 'fishing', 'farming'] as const) {
       expect(professionImageUrl(skillLevelArtId(id))).toMatch(
         new RegExp(`/ui/professions/gather_${id}\\.webp$`),
       );

@@ -21,10 +21,17 @@
 // transform command models the post-consumption inventory on a scratch copy
 // (removeStacked/consumeOneScratch below) so consuming the inputs can free
 // the room the output needs. Grant paths a player cannot re-try (winning a
-// need/greed roll, master loot, delve end-of-run rewards, dev gives) skip the
+// need/greed roll, master loot, delve end-of-run rewards, dev gives, and the
+// quest requiredItems fallback grant on accept and on giver re-talk) skip the
 // check on purpose: an over-capacity inventory is tolerated (pre-bag saves may
 // load overflowing too) and simply blocks new pickups until space is freed.
-// Items are never destroyed by capacity.
+// Items are never destroyed by capacity. The fallback grant is the entry that
+// most looks like an omission and is not: it re-mints a required item the
+// player can no longer obtain (quest_fallback.ts), so refusing it on a full
+// bag would soft-lock the chain, the same reason fishing.ts states for the
+// once-ever Codfather catch. Ratified 2026-09-01 as
+// qr-19-qprofintro-overflow-grant; the resulting over-capacity bag is visible,
+// since the bag counter paints used over capacity.
 //
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/
 // Date.now (enforced by tests/architecture.test.ts). This module draws NO rng.
@@ -53,8 +60,9 @@ export const BAG_SOCKETS = 4;
 /** Default stack cap for stackable kinds (consumables, junk, quest drops). */
 const DEFAULT_STACK = 20;
 
-/** Kinds that never stack: each copy occupies its own slot, classic style. */
-const UNSTACKED_KINDS = new Set(['weapon', 'armor', 'held_offhand', 'bag', 'tool']);
+/** Kinds that never stack: each copy occupies its own slot, classic style.
+ *  Recipe patterns join gear here: classic recipe drops are one per slot. */
+const UNSTACKED_KINDS = new Set(['weapon', 'armor', 'held_offhand', 'bag', 'tool', 'recipe']);
 
 /** Max copies of an item per inventory slot. Explicit `stackSize` wins;
  *  gear/bags/tools default to 1, everything else to 20. */
@@ -363,11 +371,15 @@ export function bagsFullError(ctx: SimContext, pid: number): void {
 }
 
 // The bag ladder the pre-bag save migration draws from, ordered by quality
-// tier then size. A FROZEN back-compat subset of the shipped bag items (the
-// phase 05 catalog additions deliberately never join it; the grant ladder is
-// a shipped contract), with each slot count cross-checked against the live
-// content table by tests/bags.test.ts so a content re-tune cannot silently
-// under-grant a pre-bag save.
+// tier then size. A FROZEN back-compat subset of the shipped DROP-SOURCED
+// bag items (the phase 05 catalog additions deliberately never join it; the
+// grant ladder is a shipped contract), with each slot count cross-checked
+// against the live content table by tests/bags.test.ts so a content re-tune
+// cannot silently under-grant a pre-bag save. The crafted apex bag
+// (sunspun_haversack, 16 slots, phase 08) is deliberately absent too, since
+// a save migration must never hand out a top-capacity epic bag for free:
+// the migration ceiling stays at the duffel while the true pooled general
+// ceiling is now 16 + 4 x 16.
 export const MIGRATION_BAGS: { id: string; slots: number; tier: number }[] = [
   { id: 'linen_pouch', slots: 6, tier: 0 }, // common
   { id: 'travelers_knapsack', slots: 8, tier: 0 }, // common
@@ -458,12 +470,15 @@ export function equipBag(
   // park an instance payload or a craftedRecipeId while a bag is worn, so
   // equipping a payload-bearing copy would silently destroy it on the next
   // unequip's plain addStacked grant. Not reachable through shipped content
-  // today: no bag recipe or grant currently carries one. The crafted signer
-  // mint is bag-exempt at the source (crafting.ts mintsSignedCraftOutput
-  // refuses to sign a bag-kind output at ANY rarity, pinned in
-  // tests/bags.test.ts), so the phase 05 tailoring ladder's rare and epic
-  // craftable bags grant plain and fungible, exactly like the recipe-free
-  // rare/epic loot bags always did. Bags are DECLARED payload-free here
+  // today: no bag grant carries one, BY CONSTRUCTION since the phase 10 QA
+  // ruling (2026-08-16) exempted kind 'bag' from the crafting signer mint
+  // (crafting.ts mintsSignerPayload, applied through its def-quality wrapper
+  // mintsSignedCraftOutput, which refuses to sign a bag-kind output at ANY
+  // rarity; pinned in tests/bags.test.ts), so the phase 05 tailoring
+  // ladder's rare and epic craftable bags and the epic craftable
+  // sunspun_haversack all land plain and fungible, exactly like the
+  // recipe-free rare/epic loot bags always did (craftedRecipeId's own kind
+  // check closes the other vector). Bags are DECLARED payload-free here
   // rather than merely assumed: peek the copy that would be consumed BEFORE
   // consuming it (refusing late would have already removed it) and refuse
   // the equip outright the moment one ever does carry a payload, whatever

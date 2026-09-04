@@ -3,8 +3,19 @@ import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
 import * as characters from '../src/render/characters';
-import { prewarmDepthMaterialKey } from '../src/render/prewarm_depth_material';
+import {
+  buildFarmPatchProps,
+  FarmPatchVisuals,
+  FEAST_SHADOW_CAP,
+} from '../src/render/farm_patches';
+import {
+  prewarmDepthMaterialKey,
+  prewarmDepthMaterialsOf,
+} from '../src/render/prewarm_depth_material';
+import { pieceMaterialsOf } from '../src/render/program_variant_settle';
 import { type EntityView, Renderer } from '../src/render/renderer';
+import { FARM_PATCHES } from '../src/sim/content/farm_patches';
+import type { Entity } from '../src/sim/types';
 
 interface CompileGateHarness {
   gateViewOnCompile(
@@ -799,6 +810,117 @@ describe('the shadow arm compiles a depth twin for every mesh, caster or not', (
     expect(compileAsync).not.toHaveBeenCalled();
     expect(renderer.prewarmDepthMaterials.size).toBe(0);
     expect(bare.material).toBeNull();
+  });
+
+  // The farm feast tables (Masterwrought phase 18): a placed feast draws
+  // through src/render/farm_patches.ts, and only the first FEAST_SHADOW_CAP
+  // tables cast (the universal shadow budget), so the ninth table in a packed
+  // hub is exactly the "non-caster at gate time" the arm exists for: the
+  // budget refills as feasts despawn and flips its castShadow on frames later.
+  function feastScene(): { visuals: FarmPatchVisuals; tables: THREE.Group[] } {
+    const scene = new THREE.Scene();
+    const entities = new Map<number, Entity>();
+    for (let i = 0; i < FEAST_SHADOW_CAP + 1; i++) {
+      entities.set(700 + i, {
+        id: 700 + i,
+        kind: 'object',
+        templateId: 'farm_feast',
+        name: 'Mira',
+        pos: { x: 12 + i * 3, y: 0, z: -8 },
+      } as Entity);
+    }
+    const { seats } = buildFarmPatchProps(1234, FARM_PATCHES);
+    // No gate handed in: the attach is bare and synchronous, which is what
+    // lets these cases hold the groups without awaiting a settle.
+    const visuals = new FarmPatchVisuals(scene, seats, { burst() {}, groundPuff() {} });
+    visuals.sync({ myFarmPlots: [], farmNowMs: () => 0, entities, cfg: { seed: 1234 } }, 0.5);
+    const tables = scene.children.filter((c) => c.name.startsWith('farmFeast:')) as THREE.Group[];
+    expect(tables).toHaveLength(FEAST_SHADOW_CAP + 1);
+    return { visuals, tables };
+  }
+  const meshOf = (group: THREE.Group): THREE.Mesh => {
+    const meshes: THREE.Mesh[] = [];
+    group.traverse((o) => {
+      if ((o as THREE.Mesh).isMesh) meshes.push(o as THREE.Mesh);
+    });
+    expect(meshes.length).toBeGreaterThan(0);
+    return meshes[0];
+  };
+
+  it('a beyond-cap non-casting feast table compiles through the SAME depth twin as a casting one, originals restored before the awaited link', async () => {
+    const renderer = shadowHarness();
+    const { tables } = feastScene();
+    const casting = meshOf(tables[0]);
+    const beyondCap = meshOf(tables[FEAST_SHADOW_CAP]);
+    expect(casting.castShadow).toBe(true);
+    expect(beyondCap.castShadow).toBe(false);
+    const seen: THREE.Material[] = [];
+    let resolveLink!: (root: THREE.Object3D) => void;
+    renderer.webgl = {
+      getRenderTarget: () => null,
+      setRenderTarget: () => {},
+      compileAsync: (root: THREE.Object3D) => {
+        root.traverse((o) => {
+          const mesh = o as THREE.Mesh;
+          if (mesh.isMesh) seen.push(mesh.material as THREE.Material);
+        });
+        return new Promise<THREE.Object3D>((resolve) => {
+          resolveLink = resolve;
+        });
+      },
+    };
+    const castingMaterial = casting.material;
+    const beyondCapMaterial = beyondCap.material;
+
+    // The caster first, then the non-caster: the second compile must be a
+    // cache hit on the twin the first one minted.
+    const first = renderer.compileShadowPrograms(tables[0]);
+    expect(seen.every((m) => (m as THREE.MeshDepthMaterial).isMeshDepthMaterial)).toBe(true);
+    expect(casting.material).toBe(castingMaterial);
+    resolveLink(tables[0]);
+    await first;
+    const twinsAfterCaster = renderer.prewarmDepthMaterials.size;
+    seen.length = 0;
+
+    const second = renderer.compileShadowPrograms(tables[FEAST_SHADOW_CAP]);
+    expect(seen.length).toBeGreaterThan(0);
+    expect(seen.every((m) => (m as THREE.MeshDepthMaterial).isMeshDepthMaterial)).toBe(true);
+    // restored BEFORE the awaited link
+    expect(beyondCap.material).toBe(beyondCapMaterial);
+    resolveLink(tables[FEAST_SHADOW_CAP]);
+    await second;
+    expect(renderer.prewarmDepthMaterials.size).toBe(twinsAfterCaster);
+    expect(prewarmDepthMaterialKey(beyondCap.material as THREE.Material, beyondCap)).toBe(
+      prewarmDepthMaterialKey(casting.material as THREE.Material, casting),
+    );
+    expect(prewarmDepthMaterialsOf(renderer.prewarmDepthMaterials, beyondCap)).toEqual(
+      prewarmDepthMaterialsOf(renderer.prewarmDepthMaterials, casting),
+    );
+    expect(prewarmDepthMaterialsOf(renderer.prewarmDepthMaterials, beyondCap)).toHaveLength(1);
+  });
+
+  it('the feast depth twin is in the settle census: pieceMaterialsOf polls the twin beside the table material', async () => {
+    // program_variant_settle.ts pieceMaterialsOf is what the gate's third arm
+    // enumerates; a twin the shadow arm minted must be in it, or its program
+    // links unpolled and pays at the first shadow draw. Both the casting and
+    // the beyond-cap table answer the same twin.
+    const renderer = shadowHarness();
+    renderer.webgl = {
+      getRenderTarget: () => null,
+      setRenderTarget: () => {},
+      compileAsync: () => Promise.resolve(),
+    };
+    const { tables } = feastScene();
+    for (const table of [tables[0], tables[FEAST_SHADOW_CAP]]) {
+      await renderer.compileShadowPrograms(table);
+      const mesh = meshOf(table);
+      const census = pieceMaterialsOf(mesh, renderer.prewarmDepthMaterials);
+      const own = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+      for (const material of own) expect(census).toContain(material);
+      const twins = census.filter((m) => (m as THREE.MeshDepthMaterial).isMeshDepthMaterial);
+      expect(twins).toHaveLength(1);
+      expect(twins[0]).toBe(prewarmDepthMaterialsOf(renderer.prewarmDepthMaterials, mesh)[0]);
+    }
   });
 });
 

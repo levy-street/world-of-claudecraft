@@ -46,7 +46,13 @@ function guildInfo(slots: InvSlot[]): GuildBankInfo {
   };
 }
 
+// Every icon the grid asked its dep for, with the quality it asked with: the
+// rim regression class (a 1-ary call swallowing the copy's quality) is only
+// visible to a stub that records its second argument.
+const iconCalls: { id: string; quality: string | undefined }[] = [];
+
 function harness(slots: InvSlot[]): HTMLElement {
+  iconCalls.length = 0;
   document.body.innerHTML = '<div id="prompt-stack"></div>';
   const root = document.createElement('div');
   root.id = 'bank-window';
@@ -84,7 +90,10 @@ function harness(slots: InvSlot[]): HTMLElement {
   };
   const noop = (): void => {};
   const deps: BankWindowDeps = {
-    itemIcon: () => '<span class="item-icon"></span>',
+    itemIcon: (item, quality) => {
+      iconCalls.push({ id: item.id, quality });
+      return '<span class="item-icon"></span>';
+    },
     moneyHtml: (c: number) => `<span class="money-inline">${c}</span>`,
     itemTooltip: () => '',
     attachTooltip: noop,
@@ -112,6 +121,29 @@ beforeEach(() => {
 });
 
 describe('guild bank grid instanced-slot marker', () => {
+  it('a named legendary-rolled copy announces its chosen name and asks for its rim', () => {
+    // No promoted copy reaches the guild grid today (bound copies are refused
+    // at the anonymous pipe), but the cell describes its copy through the same
+    // authority every grid reads, so the grid cannot drift from the family.
+    const root = harness([
+      {
+        itemId: plainId,
+        count: 1,
+        instance: { rolled: { quality: 'legendary' }, name: 'Dawn Oath' },
+      },
+      { itemId: plainId, count: 1 },
+    ]);
+    const cells = cellsOf(root);
+    expect(cells[0].getAttribute('aria-label')).toContain('Dawn Oath');
+    expect(cells[0].getAttribute('aria-label')).not.toContain(plainName);
+    expect(cells[1].getAttribute('aria-label')).toBe(`${plainName}, quantity 1`);
+    // The plain control reads the def's own tier from the same table the code
+    // reads; it is meaningful because that def has a DEFINED quality, so a
+    // 1-ary regression (undefined) still fails it.
+    expect(ITEMS[plainId].quality).toBeDefined();
+    expect(iconCalls.map((c) => c.quality)).toEqual(['legendary', ITEMS[plainId].quality]);
+  });
+
   it('a masterwork uses the authored seal and announces masterwork', () => {
     const root = harness([
       { itemId: plainId, count: 1, instance: MASTERWORK },

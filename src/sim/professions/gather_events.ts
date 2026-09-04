@@ -9,10 +9,10 @@ import { noteReliquaryMark } from '../reliquary';
 import type { Rng } from '../rng';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import type { GatherNodeDef, GatherNodeType, GatherRareEventFlavor, SimEvent } from '../types';
+import type { GatherRareEventFlavor, GatherRareEventSource, SimEvent } from '../types';
 import type { MasterworkProc } from './masterwork';
 
-// One shared cadence knob: state.md target of roughly 1 per zone per 20
+// One shared cadence knob: target roughly 1 per zone per 20
 // minutes, from 240s node respawn and 18 nodes per zone giving at most
 // ~90 harvests per zone per 20 minutes; tuned per family. The derivation is
 // the TUNED zones' (the R37 'complete' set): the v0.32.0 expansion's starter
@@ -34,23 +34,42 @@ export const GATHER_RARE_EVENT_CHANCE = 1 / 90;
 // regardless of the rolled material rarity.
 export const GATHER_RARE_EVENT_YIELD_MULT = 5;
 
-export function gatherRareEventFlavor(nodeType: GatherNodeType): GatherRareEventFlavor {
-  return nodeType === 'ore'
-    ? 'pristine_vein'
-    : nodeType === 'wood'
-      ? 'ancient_heartwood'
-      : 'moonlit_bloom';
+// Exhaustive on purpose: the record is typed over the whole source union, so a
+// fifth source added to the union fails tsc here instead of silently minting a
+// golden harvest, and the runtime list below is derived from the same record
+// (Masterwrought Phase 19F review round) so a guide pin can walk every source
+// rather than a hand-copied four; the list's consumers are that guide pin and
+// this module's own suite (the sim reads the record through
+// gatherRareEventFlavor). NULL-PROTOTYPE and frozen: the switch this replaced
+// returned undefined for an out-of-union runtime value, which the
+// farming harvest's `!= null` belt relies on; a plain object literal would
+// have answered 'constructor' or 'toString' with a function instead.
+const FLAVOR_BY_SOURCE: Record<GatherRareEventSource, GatherRareEventFlavor> = Object.freeze(
+  Object.assign(Object.create(null) as Record<GatherRareEventSource, GatherRareEventFlavor>, {
+    ore: 'pristine_vein',
+    wood: 'ancient_heartwood',
+    herb: 'moonlit_bloom',
+    crop: 'golden_harvest',
+  } satisfies Record<GatherRareEventSource, GatherRareEventFlavor>),
+);
+export const GATHER_RARE_EVENT_SOURCES: readonly GatherRareEventSource[] = Object.freeze(
+  Object.keys(FLAVOR_BY_SOURCE) as (keyof typeof FLAVOR_BY_SOURCE)[],
+);
+export function gatherRareEventFlavor(source: GatherRareEventSource): GatherRareEventFlavor {
+  return FLAVOR_BY_SOURCE[source];
 }
 
 // Draw #2 of resolveHarvest (after rollMaterialRarity, a pinned determinism
 // contract). Draws EXACTLY ONE rng.next() on EVERY call, hit when the draw is
 // below GATHER_RARE_EVENT_CHANCE: a constant draw count per harvest keeps the
-// sim's rng stream identical across hosts regardless of the outcome.
+// sim's rng stream identical across hosts regardless of the outcome. The
+// farming harvest draw block is the second caller (source 'crop') and uses the
+// SAME shared chance, never a farming copy of the constant.
 export function rollGatherRareEvent(
   rng: Rng,
-  nodeType: GatherNodeType,
+  source: GatherRareEventSource,
 ): GatherRareEventFlavor | null {
-  return rng.next() < GATHER_RARE_EVENT_CHANCE ? gatherRareEventFlavor(nodeType) : null;
+  return rng.next() < GATHER_RARE_EVENT_CHANCE ? gatherRareEventFlavor(source) : null;
 }
 
 // Soft zone broadcast: one pid-scoped copy of the event per player whose
@@ -75,35 +94,62 @@ export function emitToZonePlayers(
   }
 }
 
+// The `source` parameter is structural on purpose: a GatherNodeDef satisfies
+// it as-is (the three node flavors), and the farming harvest passes its bed's
+// zone with type 'crop' (golden_harvest) without farm beds ever becoming
+// gather nodes.
 export function announceGatherRareEvent(
   ctx: SimContext,
   finder: PlayerMeta,
-  node: GatherNodeDef,
+  source: { zoneId: string; type: GatherRareEventSource },
   flavor: GatherRareEventFlavor,
   itemId: string,
 ): void {
-  emitToZonePlayers(ctx, node.zoneId, (recipientPid) => ({
+  emitToZonePlayers(ctx, source.zoneId, (recipientPid) => ({
     type: 'gatherRareEvent',
     pid: recipientPid,
     flavor,
     finderName: finder.name,
     finderPid: finder.entityId,
-    zoneId: node.zoneId,
-    nodeType: node.type,
+    zoneId: source.zoneId,
+    nodeType: source.type,
     itemId,
   }));
-  // Deed-mark hook: each flavor mark feeds its rare-find
-  // deed (col_pristine_vein / col_ancient_heartwood / col_moonlit_bloom).
+  // Deed-mark hook: each flavor mark feeds its rare-find deed
+  // (col_pristine_vein / col_ancient_heartwood / col_moonlit_bloom, and the
+  // farming phase's golden-harvest deed on gather_event:golden_harvest).
   // Reliquary field-note trophies reuse the same stable gather_event:* ids
-  // (catalog allowlist only; noteReliquaryMark no-ops unknown ids).
+  // (catalog allowlist only; noteReliquaryMark no-ops an id the catalog does
+  // not carry). All four flavors have a cell since masterwrought Phase 18,
+  // which added the previously missing golden_harvest mapping.
   const visitMark = `gather_event:${flavor}`;
   ctx.markVisited(finder, visitMark);
   noteReliquaryMark(ctx, finder, visitMark);
 }
 
+/** The ONE zone-celebration prologue every zone-wide celebration producer
+ *  runs (extracted 2026-08-27, rule of three: masterworkZone here,
+ *  attunedZone in attunement_events.ts, legendaryForgedZone in
+ *  perfecting.ts): resolve the celebrant entity, skip instance space
+ *  entirely (x past DUNGEON_X_THRESHOLD: an instanced celebrant keeps only
+ *  its personal event, deliberately), resolve the overworld zone, and fan
+ *  one pid-scoped copy per player in it through emitToZonePlayers above.
+ *  Draws NO rng, so a producer's position in its path cannot fork the
+ *  deterministic draw order. */
+export function announceZoneCelebration(
+  ctx: SimContext,
+  ownerPid: number,
+  build: (recipientPid: number, zoneId: string) => SimEvent,
+): void {
+  const ownerE = ctx.entities.get(ownerPid);
+  if (!ownerE || ownerE.pos.x > DUNGEON_X_THRESHOLD) return;
+  const zoneId = zoneAt(ownerE.pos.x, ownerE.pos.z).id;
+  emitToZonePlayers(ctx, zoneId, (recipientPid) => build(recipientPid, zoneId));
+}
+
 /** The zone-wide masterwork celebration copy. One pid-scoped
  *  masterworkZone event per overworld player in the crafter's zone, the
- *  crafter included, via the shared fanout above. Skipped entirely when the
+ *  crafter included, via the shared prologue above. Skipped entirely when the
  *  crafter is in instance space (instanced masterworks stay a personal toast,
  *  deliberately). Draws NO rng and must run AFTER the personal masterwork
  *  emit in Sim.craftItem, keeping the craft path's pinned single-draw
@@ -114,10 +160,7 @@ export function announceMasterworkZone(
   crafterName: string,
   proc: MasterworkProc,
 ): void {
-  const crafterE = ctx.entities.get(crafterPid);
-  if (!crafterE || crafterE.pos.x > DUNGEON_X_THRESHOLD) return;
-  const zoneId = zoneAt(crafterE.pos.x, crafterE.pos.z).id;
-  emitToZonePlayers(ctx, zoneId, (recipientPid) => ({
+  announceZoneCelebration(ctx, crafterPid, (recipientPid, zoneId) => ({
     type: 'masterworkZone',
     pid: recipientPid,
     crafterPid,

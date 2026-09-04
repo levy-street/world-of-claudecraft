@@ -440,6 +440,7 @@ function mapWorld(): IWorld {
     inventory: [],
     gatheringProficiency: {},
     stationPlacements: [],
+    farmPatches: [],
     civicServicePlacements: [],
     nodeHarvestableByMe: () => true,
   } as unknown as IWorld;
@@ -746,6 +747,7 @@ function labelWorld(): IWorld {
     inventory: [],
     gatheringProficiency: {},
     stationPlacements: [],
+    farmPatches: [],
     civicServicePlacements: [],
     nodeHarvestableByMe: () => true,
   } as unknown as IWorld;
@@ -963,6 +965,21 @@ function stationTypesLabelWorld(types: readonly (typeof TEST_STATION_TYPES)[numb
 
 function stationLabelWorld(): IWorld {
   return stationTypesLabelWorld(['forge']);
+}
+
+function farmPatchLabelWorld(): IWorld {
+  const world = labelWorld() as unknown as { farmPatches: unknown[] };
+  world.farmPatches = [
+    {
+      id: 'patch_painter',
+      zoneId: LABEL_ZONE.id,
+      tier: 1,
+      x: 18,
+      z: LABEL_ZONE_CZ + 22,
+      beds: [],
+    },
+  ];
+  return world as unknown as IWorld;
 }
 
 function serviceWorldContent() {
@@ -1468,6 +1485,153 @@ describe('map_window_painter: painted stable marker sprites', () => {
       style: 'paint:--color-map-outline',
       lineWidth: 1.5,
       commands: ['moveTo', 'lineTo', 'lineTo', 'lineTo', 'closePath'],
+    });
+  });
+
+  it('centers farm-patch art at the station landmark size', () => {
+    const markerArt = fakeMarkerArt(['farm-patch']);
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+
+    const result = new MapWindowPainter(classColor, markerArt.art).paintOverworld(
+      fakeMapContext(trace),
+      farmPatchLabelWorld(),
+      labelPaintOptions(),
+    );
+
+    expect(result.farmPatches).toHaveLength(1);
+    const patch = result.farmPatches[0];
+    expect(markerArt.calls.filter((call) => call.id === 'farm-patch')).toEqual([
+      { id: 'farm-patch', size: 'mapStation' },
+    ]);
+    expect(trace.markerBlits.find((blit) => blit.sprite.markerId === 'farm-patch')).toMatchObject({
+      sprite: { markerId: 'farm-patch', sizeId: 'mapStation' },
+      dx: Math.round(patch.mx - MAP_MARKER_SIZES.mapStation / 2),
+      dy: Math.round(patch.my - MAP_MARKER_SIZES.mapStation / 2),
+      alpha: 1,
+    });
+  });
+
+  it('centers farm-patch art at the compact station landmark size', () => {
+    const markerArt = fakeMarkerArt(['farm-patch']);
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+
+    const result = new MapWindowPainter(classColor, markerArt.art, () => 'compact').paintOverworld(
+      fakeMapContext(trace),
+      farmPatchLabelWorld(),
+      labelPaintOptions(),
+    );
+
+    const patch = result.farmPatches[0];
+    expect(patch).toBeDefined();
+    expect(markerArt.calls.filter((call) => call.id === 'farm-patch')).toEqual([
+      { id: 'farm-patch', size: 'mapStationCompact' },
+    ]);
+    expect(trace.markerBlits.find((blit) => blit.sprite.markerId === 'farm-patch')).toMatchObject({
+      sprite: { markerId: 'farm-patch', sizeId: 'mapStationCompact' },
+      dx: Math.round((patch?.mx ?? 0) - MAP_MARKER_SIZES.mapStationCompact / 2),
+      dy: Math.round((patch?.my ?? 0) - MAP_MARKER_SIZES.mapStationCompact / 2),
+      alpha: 1,
+    });
+  });
+
+  it('falls back to the procedural farm-patch sprout when its art is unavailable', () => {
+    const markerArt = fakeMarkerArt([]);
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+
+    const result = new MapWindowPainter(classColor, markerArt.art).paintOverworld(
+      fakeMapContext(trace),
+      farmPatchLabelWorld(),
+      labelPaintOptions(),
+    );
+
+    expect(result.farmPatches).toHaveLength(1);
+    const patch = result.farmPatches[0];
+    expect(patch.patchId).toBe('patch_painter');
+    expect(markerArt.calls.filter((call) => call.id === 'farm-patch')).toEqual([
+      { id: 'farm-patch', size: 'mapStation' },
+    ]);
+    expect(trace.markerBlits.some((blit) => blit.sprite.markerId === 'farm-patch')).toBe(false);
+    // Two leaves in ONE filled path (two closed triangles), in the STATION
+    // family's token on this surface (the stall fill the station diamond takes
+    // with no sprite; the minimap paints the same pin in its own station
+    // token), never the oak green it once borrowed and never any gather-node
+    // readiness color.
+    const leaves = trace.fills.find(
+      (fill) =>
+        fill.style === 'paint:--color-map-stall' &&
+        fill.commands.join() === 'moveTo,lineTo,lineTo,closePath,moveTo,lineTo,lineTo,closePath',
+    );
+    expect(leaves, 'the farm pin must paint its two-leaf sprout').toBeDefined();
+    // The leaves are keyed off the badge position and the standard radius, and
+    // fan symmetrically to either side of the stem.
+    const radius = 6.5;
+    expect(leaves?.args.slice(0, 6)).toEqual([
+      patch.mx,
+      patch.my - radius * 0.2,
+      patch.mx - radius,
+      patch.my - radius,
+      patch.mx - radius * 0.15,
+      patch.my + radius * 0.25,
+    ]);
+    // The stem is a separate two-point stroke below the crown, outlined like
+    // every other painted landmark.
+    const stem = trace.strokes.find(
+      (stroke) =>
+        stroke.at > (leaves?.at ?? Number.MAX_VALUE) && stroke.commands.join() === 'moveTo,lineTo',
+    );
+    expect(stem).toMatchObject({
+      style: 'paint:--color-map-outline',
+      lineWidth: 1.5,
+      args: [patch.mx, patch.my - radius * 0.2, patch.mx, patch.my + radius],
+    });
+  });
+
+  it('scales the procedural farm-patch fallback with the compact profile', () => {
+    const markerArt = fakeMarkerArt([]);
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+
+    const result = new MapWindowPainter(classColor, markerArt.art, () => 'compact').paintOverworld(
+      fakeMapContext(trace),
+      farmPatchLabelWorld(),
+      labelPaintOptions(),
+    );
+
+    const patch = result.farmPatches[0];
+    expect(patch).toBeDefined();
+    expect(markerArt.calls.filter((call) => call.id === 'farm-patch')).toEqual([
+      { id: 'farm-patch', size: 'mapStationCompact' },
+    ]);
+    expect(trace.markerBlits).toEqual([]);
+    const leaves = trace.fills.find(
+      (fill) =>
+        fill.style === 'paint:--color-map-stall' &&
+        fill.commands.join() === 'moveTo,lineTo,lineTo,closePath,moveTo,lineTo,lineTo,closePath',
+    );
+    const radius = 9;
+    expect(leaves?.args.slice(0, 6)).toEqual([
+      patch?.mx,
+      (patch?.my ?? 0) - radius * 0.2,
+      (patch?.mx ?? 0) - radius,
+      (patch?.my ?? 0) - radius,
+      (patch?.mx ?? 0) - radius * 0.15,
+      (patch?.my ?? 0) + radius * 0.25,
+    ]);
+    const stem = trace.strokes.find(
+      (stroke) =>
+        stroke.at > (leaves?.at ?? Number.MAX_VALUE) && stroke.commands.join() === 'moveTo,lineTo',
+    );
+    expect(stem).toMatchObject({
+      style: 'paint:--color-map-outline',
+      lineWidth: 2,
+      args: [patch?.mx, (patch?.my ?? 0) - radius * 0.2, patch?.mx, (patch?.my ?? 0) + radius],
     });
   });
 

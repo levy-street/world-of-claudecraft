@@ -21,6 +21,7 @@ import {
   indexSpecialRoleIds,
   interactionFailureFallback,
   isSlashCommand,
+  LEGENDARY_CARD_NAME_MAX,
   levelNickSuffix,
   MEMBERS_META_BATCH,
   memberRolesFromPayload,
@@ -31,6 +32,7 @@ import {
   relayRespondUrl,
   requestGuildMembersPayload,
   rosterComplete,
+  sanitizeLegendaryItemName,
   staleFlairedIds,
   stripLevelSuffix,
   tierRoleName,
@@ -623,6 +625,93 @@ describe('significant-activity cards', () => {
     expect(msg.allowed_mentions.users).toEqual(['111']);
   });
 
+  it('legendary card renders the player-chosen name as plain data at masterwork parity', () => {
+    // The name is PLAYER-AUTHORED text (Masterwrought phase 13): it must land
+    // in the embed verbatim as data, with no markdown of our own wrapped
+    // around it, exactly the way the masterwork card treats itemName.
+    const msg = buildActivityMessage({
+      kind: 'legendary',
+      realm: 'Claudemoon',
+      profileUrl: 'https://woc.test/c/Aldric',
+      itemName: "Vel'tara's Oath",
+      participants: [linked('Aldric', '111')],
+    }) as {
+      content: string;
+      allowed_mentions: { users: string[] };
+      embeds: Array<Record<string, any>>;
+    };
+    expect(msg.embeds[0].title).toBe("Vel'tara's Oath");
+    expect(msg.embeds[0].description).toContain("Vel'tara's Oath was forged by");
+    expect(msg.embeds[0].description).toContain('<@111>');
+    // Legendary orange, the qualityColor legendary accent.
+    expect(msg.embeds[0].color).toBe(0xff8000);
+    expect(msg.allowed_mentions.users).toEqual(['111']);
+  });
+
+  // The legendary card's itemName is the ONE player-authored string this feed
+  // interpolates, it crosses two processes as unchecked JSON, and the game's
+  // persisted-load shape for it is wider than the mint alphabet, so the card
+  // carries its own conservative filter (sanitizeLegendaryItemName) rather
+  // than resting on the sim emitting only freshly normalized names.
+  describe('legendary card item-name filter', () => {
+    it('mirrors the mint length cap (src/sim/professions/legendary_name.ts, copy not import)', () => {
+      expect(LEGENDARY_CARD_NAME_MAX).toBe(32);
+    });
+
+    it('passes a mint-shaped name through unchanged', () => {
+      expect(sanitizeLegendaryItemName("Vel'tara's Oath")).toBe("Vel'tara's Oath");
+      expect(sanitizeLegendaryItemName('Dawn-breaker of Eastbrook')).toBe(
+        'Dawn-breaker of Eastbrook',
+      );
+    });
+
+    it('strips everything outside the mint alphabet, collapses, and bounds at the cap', () => {
+      expect(sanitizeLegendaryItemName('@everyone **Doom** `rm -rf`')).toBe('everyone Doom rm -rf');
+      expect(sanitizeLegendaryItemName('<@&123> [link](https://x.test)')).toBe('linkhttpsxtest');
+      expect(sanitizeLegendaryItemName('  Dawn \n\t breaker  ')).toBe('Dawn breaker');
+      const bounded = sanitizeLegendaryItemName(`${'A'.repeat(31)} ${'B'.repeat(40)}`);
+      expect(bounded.length).toBeLessThanOrEqual(LEGENDARY_CARD_NAME_MAX);
+      expect(bounded).toBe('A'.repeat(31));
+      // The cap boundary itself (a golden cannot pin a boundary): exactly the
+      // cap survives whole, one past it loses exactly one character.
+      expect(sanitizeLegendaryItemName('A'.repeat(32))).toBe('A'.repeat(32));
+      expect(sanitizeLegendaryItemName('A'.repeat(33))).toBe('A'.repeat(32));
+      expect(sanitizeLegendaryItemName(undefined)).toBe('');
+    });
+
+    it('enforces the full mint shape: leading non-letters drop, under 2 letters empties', () => {
+      // The mint shape starts with a LETTER (legendary_name.ts); a surviving
+      // "- " head would render as a Discord bullet in the description, so the
+      // filter drops leading hyphens, apostrophes, and spaces outright.
+      expect(sanitizeLegendaryItemName('- Doom')).toBe('Doom');
+      expect(sanitizeLegendaryItemName("'-'Doom")).toBe('Doom');
+      // A result under the mint's 2-character floor degrades to '' (the
+      // caller's || fallback takes over), never a one-letter title.
+      expect(sanitizeLegendaryItemName('X')).toBe('');
+      expect(sanitizeLegendaryItemName("--''  ")).toBe('');
+    });
+
+    it('the legendary CARD routes itemName through the filter, and an emptied name degrades', () => {
+      const cardOf = (itemName: string) =>
+        buildActivityMessage({
+          kind: 'legendary',
+          realm: 'Claudemoon',
+          profileUrl: null,
+          itemName,
+          participants: [linked('Aldric', '111')],
+        }) as { embeds: Array<Record<string, any>> };
+      const hostile = cardOf('**@everyone** _Doom_');
+      expect(hostile.embeds[0].title).toBe('everyone Doom');
+      expect(hostile.embeds[0].description).toContain('everyone Doom was forged by');
+      expect(hostile.embeds[0].description).not.toContain('*');
+      expect(hostile.embeds[0].description).not.toContain('@everyone');
+      // A name the filter empties (nothing in the mint alphabet) falls to the
+      // generic title through the || fallback, never a blank embed.
+      const emptied = cardOf('本物の伝説 123');
+      expect(emptied.embeds[0].title).toBe('A legend');
+    });
+  });
+
   it('deed-title card names the deed and the earned title', () => {
     const msg = buildActivityMessage({
       kind: 'deed',
@@ -654,6 +743,44 @@ describe('significant-activity cards', () => {
     expect(msg.embeds[0].description).toContain('<@111>');
   });
 
+  it('harvestmaster card reads as a farming capstone, not a generic deed', () => {
+    const msg = buildActivityMessage({
+      kind: 'deed',
+      realm: 'Claudemoon',
+      profileUrl: null,
+      deedId: 'prog_farming_100',
+      deedName: 'Harvestmaster',
+      deedTitle: 'Harvestmaster',
+      participants: [linked('Aldric', '111')],
+    }) as { embeds: Array<Record<string, any>> };
+    expect(msg.embeds[0].author.name).toBe(':ear_of_rice: Harvestmaster');
+    expect(msg.embeds[0].title).toBe('Harvestmaster');
+    expect(msg.embeds[0].description).toContain('100 Farming');
+    expect(msg.embeds[0].description).toContain('"Harvestmaster"');
+    expect(msg.embeds[0].description).toContain('<@111>');
+    expect(msg.embeds[0].color).toBe(0xf5c242);
+  });
+
+  it('golden harvest card names the crop and pings the finder', () => {
+    // 'Vale Wheat' is the real produce name (src/sim/content/items.ts, farm
+    // crop vale_wheat); the shared harvest gold 0xf5c242 pairs it with the
+    // Harvestmaster card as one farming family.
+    const msg = buildActivityMessage({
+      kind: 'golden_harvest',
+      realm: 'Claudemoon',
+      profileUrl: null,
+      itemName: 'Vale Wheat',
+      participants: [linked('Aldric', '111')],
+    }) as { embeds: Array<Record<string, any>> };
+    expect(msg.embeds[0].title).toBe('Vale Wheat');
+    expect(msg.embeds[0].description).toContain('golden harvest of Vale Wheat');
+    expect(msg.embeds[0].description).toContain('<@111>');
+    expect(msg.embeds[0].color).toBe(0xf5c242);
+    // The kind-to-author mapping, fully asserted (the Phase 16 QA): a reworded
+    // author line would otherwise pass with only title/description sampled.
+    expect(msg.embeds[0].author?.name).toBe(':ear_of_rice: Golden Harvest');
+  });
+
   // Same empty-embed class, one layer in: an item name the server sends as an
   // EMPTY string (not absent) must fall back to the generic title. `??` keeps
   // the empty string and Discord rejects a blank embed title, so every title
@@ -664,11 +791,24 @@ describe('significant-activity cards', () => {
     const base = { realm: 'Claudemoon', profileUrl: null, participants: [linked('Aldric', '111')] };
     expect(titleOf({ ...base, kind: 'rareloot', itemName: '' })).toBe('A rare item');
     expect(titleOf({ ...base, kind: 'masterwork', itemName: '' })).toBe('A masterwork piece');
+    expect(titleOf({ ...base, kind: 'legendary', itemName: '' })).toBe('A legend');
     expect(titleOf({ ...base, kind: 'deed', deedId: 'col_glimmerfin', deedName: '' })).toBe(
       'A rare catch',
     );
     expect(titleOf({ ...base, kind: 'deed', deedId: 'prog_masterwright', deedName: '' })).toBe(
       'A deed of renown',
+    );
+    expect(titleOf({ ...base, kind: 'golden_harvest', itemName: '' })).toBe('A golden harvest');
+    // The golden-harvest DESCRIPTION carries its own fallback (|| 'crops').
+    expect(
+      (
+        buildActivityMessage({ ...base, kind: 'golden_harvest', itemName: '' }) as {
+          embeds: Array<{ description: string }>;
+        }
+      ).embeds[0].description,
+    ).toContain('golden harvest of crops');
+    expect(titleOf({ ...base, kind: 'deed', deedId: 'prog_farming_100', deedName: '' })).toBe(
+      'Harvestmaster',
     );
   });
 
@@ -698,7 +838,9 @@ describe('significant-activity cards', () => {
     'duel',
     'arena',
     'masterwork',
+    'legendary',
     'deed',
+    'golden_harvest',
   ] as const satisfies readonly ActivityKind[];
   type MissingServerKind = Exclude<ActivityKind, (typeof SERVER_KINDS)[number]>;
   // Deliberately a TYPE-level pin: the initializer is literally null, so the

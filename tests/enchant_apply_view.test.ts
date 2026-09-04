@@ -10,12 +10,16 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { ENCHANTS } from '../src/sim/content/enchants';
+import { ENCHANTS, type EnchantDef } from '../src/sim/content/enchants';
 import { ITEMS } from '../src/sim/data';
-import type { InvSlot, ItemDef, ItemSlot } from '../src/sim/types';
+import { baggedEnchantVictim, replaceVictimIndex } from '../src/sim/professions/enchanting';
+import type { InvSlot, ItemDef, ItemInstancePayload, ItemSlot } from '../src/sim/types';
+import { itemDisplayName } from '../src/ui/entity_i18n';
 import {
   ENCHANT_PRESERVED_TRAITS,
   ENCHANT_TIER_ORDER,
+  type EnchantTargetRow,
+  type EnchantViewerInput,
   enchantNameKey,
   enchantSectionsForReagent,
   enchantsForReagent,
@@ -24,8 +28,7 @@ import {
   preservedReplaceTraits,
   preservedTraitKey,
   wornEnchantTargets,
-} from '../src/ui/enchant_apply_view';
-import { itemDisplayName } from '../src/ui/entity_i18n';
+} from '../src/ui/hud/professions/enchant_apply_view';
 import { hudChromeStrings } from '../src/ui/i18n.catalog/hud_chrome';
 import { translations } from '../src/ui/i18n.resolved.generated';
 import { wornTooltipInstance } from '../src/ui/item_instance_tooltip';
@@ -44,6 +47,27 @@ function itemForSlot(slot: ItemSlot, skip = new Set<string>()): string {
   );
   if (!id) throw new Error(`no item found for slot ${slot}`);
   return id;
+}
+
+/** The bagged rows minus their victim cell (`copy`), for the pins whose subject
+ *  is the row FAMILY (grouping, the replace facts, the #2421 / #2466 flags),
+ *  not WHICH copy the sim would consume: those stay exact over the family
+ *  shape, and the victim cell has its own describe below, so neither pin
+ *  dilutes the other. */
+function familyRows(rows: EnchantTargetRow[]): Array<Omit<EnchantTargetRow, 'copy'>> {
+  return rows.map(({ copy: _copy, ...family }) => family);
+}
+
+/** A SYNCED viewer at `enchantingSkill`: the ordinary case, and the only one
+ *  every pre-existing case here ever meant (offline always, online from the
+ *  first cprof delta on). The UNSYNCED arm is exercised in its own describe
+ *  below, so nothing gets it by accident. `worn` supplies the body for the
+ *  Perfected candidate scan; omitted, the viewer wears nothing. */
+function viewerAt(
+  enchantingSkill: number,
+  worn?: Pick<EnchantViewerInput, 'equipment' | 'equippedInstances'>,
+): EnchantViewerInput {
+  return { synced: true, enchantingSkill, ...worn };
 }
 
 describe('enchant_apply_view: enchantNameKey', () => {
@@ -157,11 +181,24 @@ describe('enchant_apply_view: tier classification', () => {
     expect(enchantTier('enchant_chest_stamina')).toBe('base');
   });
 
+  it('the apex reagent marks the Lucent tier, over the shard it also consumes', () => {
+    expect(enchantTier('enchant_weapon_lucent_might')).toBe('lucent');
+    expect(enchantTier('enchant_lucent_infusion')).toBe('lucent');
+    // The precedence is load-bearing, not incidental: this one carries a shard
+    // as well, so a shard-first rule would file it under Greater.
+    expect(ENCHANTS.enchant_weapon_lucent_might.reagents.map((r) => r.itemId)).toContain(
+      'arcane_shard',
+    );
+    // And the dust-plus-lucent boots enchant still reads apex, not Base.
+    expect(enchantTier('enchant_feet_lucent_agility')).toBe('lucent');
+  });
+
   it('classifies every live enchant, and each tier matches its reagents', () => {
     for (const id of Object.keys(ENCHANTS)) {
       const tier = enchantTier(id);
       const reagentIds = ENCHANTS[id].reagents.map((r) => r.itemId);
-      if (reagentIds.includes('arcane_shard')) expect(tier).toBe('greater');
+      if (reagentIds.includes('lucent_reagent')) expect(tier).toBe('lucent');
+      else if (reagentIds.includes('arcane_shard')) expect(tier).toBe('greater');
       else if (reagentIds.some((r) => r.startsWith('resonant_'))) expect(tier).toBe('runed');
       else expect(tier).toBe('base');
     }
@@ -183,6 +220,7 @@ describe('enchant_apply_view: tier classification', () => {
     const unclassifiable: string[] = [];
     for (const enchant of Object.values(ENCHANTS)) {
       for (const { itemId } of enchant.reagents) {
+        if (itemId === 'lucent_reagent') continue;
         if (itemId === 'arcane_shard') continue;
         if (itemId.startsWith('resonant_')) continue;
         if (KNOWN_BASE_REAGENTS.has(itemId)) continue;
@@ -193,19 +231,21 @@ describe('enchant_apply_view: tier classification', () => {
       unclassifiable,
       'these reagents match no tier rule and would silently classify as Base:\n' +
         `${unclassifiable.join('\n')}\n` +
-        'Add the material to enchantTier (src/ui/enchant_apply_view.ts) and to this list.',
+        'Add the material to enchantTier (src/ui/hud/professions/enchant_apply_view.ts) and to this list.',
     ).toEqual([]);
   });
 
-  it('the two tier-marker reagents are still real, distinct items', () => {
+  it('the tier-marker reagents are still real, distinct items', () => {
     // The rules key on these ids, so a rename in content must not leave the
     // classification pointing at nothing.
     expect(ITEMS.arcane_shard).toBeDefined();
+    expect(ITEMS.lucent_reagent).toBeDefined();
     const resonants = Object.keys(ITEMS).filter((id) => id.startsWith('resonant_'));
     expect(resonants.length).toBeGreaterThan(0);
     // And each tier is actually POPULATED, so a rename that silently emptied a
     // tier (every row falling through to Base) fails here too.
     const tiers = Object.keys(ENCHANTS).map(enchantTier);
+    expect(tiers).toContain('lucent');
     expect(tiers).toContain('greater');
     expect(tiers).toContain('runed');
     expect(tiers).toContain('base');
@@ -213,11 +253,11 @@ describe('enchant_apply_view: tier classification', () => {
 });
 
 describe('enchant_apply_view: enchantSectionsForReagent', () => {
-  it('groups essence enchants into the ladder order, base then runed then greater', () => {
-    // arcane_essence is the one reagent that reaches all three tiers, which is
+  it('groups essence enchants into the ladder order, base then runed then greater then lucent', () => {
+    // arcane_essence is the one reagent that reaches every tier, which is
     // exactly the wall this grouping exists for.
     const sections = enchantSectionsForReagent([], 'arcane_essence');
-    expect(sections.map((s) => s.tier)).toEqual(['base', 'runed', 'greater']);
+    expect(sections.map((s) => s.tier)).toEqual(['base', 'runed', 'greater', 'lucent']);
     for (const section of sections) {
       expect(section.titleKey).toBe(`hudChrome.enchanting.tier.${section.tier}`);
       expect(section.rows.length).toBeGreaterThan(0);
@@ -229,9 +269,12 @@ describe('enchant_apply_view: enchantSectionsForReagent', () => {
     expect(grouped.slice().sort()).toEqual(flat.slice().sort());
   });
 
-  it('omits an empty section: a dust reagent paints only the Base header', () => {
+  it('omits an empty section: a dust reagent paints no Runed or Greater header', () => {
+    // Dust reaches Base and, since the Lucent boots enchant, the apex tier; it
+    // still reaches neither of the two in between, which is what makes this an
+    // omission test rather than a full-ladder one.
     const sections = enchantSectionsForReagent([], 'arcane_dust');
-    expect(sections.map((s) => s.tier)).toEqual(['base']);
+    expect(sections.map((s) => s.tier)).toEqual(['base', 'lucent']);
   });
 
   it('a typed secondary paints only the Runed section', () => {
@@ -296,6 +339,7 @@ describe('enchant_apply_view: enchantSectionsForReagent', () => {
     // Literal English, not a length check: the headers ARE the ladder the
     // player reads, so a reword has to be a deliberate edit here.
     expect(headers).toEqual({
+      lucent: 'Lucent Enchants',
       base: 'Base Enchants',
       runed: 'Runed Enchants',
       greater: 'Greater Enchants',
@@ -317,7 +361,7 @@ describe('enchant_apply_view: enchantTargets', () => {
       { itemId: helmetId, count: 1 }, // wrong slot for a chest enchant
     ];
     const targets = enchantTargets(inventory, 'enchant_chest_stamina');
-    expect(targets).toEqual([{ itemId: chestId, count: 2 }]);
+    expect(familyRows(targets)).toEqual([{ itemId: chestId, count: 2 }]);
   });
 
   it('surfaces an already-enchanted copy as a flagged replace row, and keeps a masterwork copy plain', () => {
@@ -329,7 +373,7 @@ describe('enchant_apply_view: enchantTargets', () => {
     // #2415: the enchanted chest is no longer hidden: it paints as a replace
     // row AFTER the plain family, carrying the doomed enchant's id, and since
     // the picked enchant IS the one it carries, it is a sameEnchant deny row.
-    expect(targets).toEqual([
+    expect(familyRows(targets)).toEqual([
       { itemId: otherChestId, count: 1 },
       {
         itemId: chestId,
@@ -348,7 +392,7 @@ describe('enchant_apply_view: enchantTargets', () => {
       { itemId: chestId, count: 2 }, // plain fungible copies of the SAME id
     ];
     const targets = enchantTargets(inventory, 'enchant_chest_stamina');
-    expect(targets).toEqual([
+    expect(familyRows(targets)).toEqual([
       // The plain family first, counting only the enchantable copies...
       // ...both rows flagged mixedHolding, since this pair is the one case that
       // shares an item display name (#2421, pinned on its own below).
@@ -368,7 +412,7 @@ describe('enchant_apply_view: enchantTargets', () => {
     const inventory: InvSlot[] = [
       { itemId: chestId, count: 1, instance: { enchant: 'enchant_chest_stamina' } },
     ];
-    expect(enchantTargets(inventory, 'enchant_chest_spirit')).toEqual([
+    expect(familyRows(enchantTargets(inventory, 'enchant_chest_spirit'))).toEqual([
       {
         itemId: chestId,
         count: 1,
@@ -381,7 +425,7 @@ describe('enchant_apply_view: enchantTargets', () => {
     const inventory: InvSlot[] = [
       { itemId: chestId, count: 1, instance: { rolled: { stats: { sta: 4 } } } },
     ];
-    expect(enchantTargets(inventory, 'enchant_chest_spirit')).toEqual([
+    expect(familyRows(enchantTargets(inventory, 'enchant_chest_spirit'))).toEqual([
       { itemId: chestId, count: 1, replace: { stats: { sta: 4 }, sameEnchant: false } },
     ]);
   });
@@ -394,7 +438,7 @@ describe('enchant_apply_view: enchantTargets', () => {
     // One row for the id, count = every enchanted copy, described by the
     // highest-index copy: exactly the one the sim's replaceVictimIndex
     // consumes, so what the dialog names is what a confirm destroys.
-    expect(enchantTargets(inventory, 'enchant_chest_spirit')).toEqual([
+    expect(familyRows(enchantTargets(inventory, 'enchant_chest_spirit'))).toEqual([
       {
         itemId: chestId,
         count: 2,
@@ -413,11 +457,136 @@ describe('enchant_apply_view: enchantTargets', () => {
     // The unknown-marker copy ('x' resolves to no ENCHANTS row) is DROPPED,
     // never offered: the sim's replace arm refuses what it cannot subtract,
     // and the picker must not offer what the sim denies.
-    expect(targets).toEqual([{ itemId: chestId, count: 3 }]);
+    expect(familyRows(targets)).toEqual([{ itemId: chestId, count: 3 }]);
   });
 
   it('returns nothing for an unknown enchant id', () => {
     expect(enchantTargets([{ itemId: chestId, count: 1 }], 'not_a_real_enchant')).toEqual([]);
+  });
+});
+
+describe('enchant_apply_view: which bagged copy each row lands on (the Phase 18 victim cell)', () => {
+  // Every bagged row names WHICH copy its activation lands on, as that copy's
+  // bag CELL, resolved through the sim's own walks (baggedEnchantVictim for a
+  // plain row, replaceVictimIndex for a replace row) rather than a private
+  // guess. The cell is live for one frame and carries no re-targeting anchor,
+  // so what these arms pin is the RESOLUTION: which copy the walk lands on,
+  // and that a later call re-resolves it rather than reusing a stale cell.
+  const chestId = itemForSlot('chest');
+  const helmetId = itemForSlot('helmet'); // never a chest row: the filler stack
+  const CHEST_ENCHANT = 'enchant_chest_stamina';
+  const OTHER = 'enchant_chest_spirit';
+  const plainCopy = (inventory: InvSlot[]) =>
+    enchantTargets(inventory, CHEST_ENCHANT).find((row) => row.replace === undefined)?.copy;
+  const replaceCopy = (inventory: InvSlot[]) =>
+    enchantTargets(inventory, CHEST_ENCHANT).find((row) => row.replace !== undefined)?.copy;
+
+  it("a plain row names the sim's own victim: the highest-index plain cell before any instanced copy", () => {
+    const inventory: InvSlot[] = [
+      { itemId: chestId, count: 1, instance: { signer: 'Crafter' } },
+      { itemId: helmetId, count: 3 },
+      { itemId: chestId, count: 2 },
+      { itemId: chestId, count: 1, instance: { rolled: { masterwork: true } } },
+    ];
+    const rows = enchantTargets(inventory, CHEST_ENCHANT);
+    expect(rows).toHaveLength(1);
+    // `count` is UNITS (four copies over three chest cells); the copy is ONE
+    // cell, so neither number can stand in for the other.
+    expect(rows[0].count).toBe(4);
+    expect(rows[0].copy).toEqual({ slotIndex: 2 });
+    // The sim's peek agrees: a plain fungible victim reads undefined there and
+    // the named cell holds no payload.
+    expect(baggedEnchantVictim(inventory, chestId, false)).toBeUndefined();
+    expect(inventory[2].instance).toBeUndefined();
+  });
+
+  it('between two PLAIN cells of one id the victim is the highest-index one (the remover walks from the end)', () => {
+    // The one dimension the peek cannot answer for us: a plain fungible victim
+    // reads as undefined through baggedEnchantVictim (there is no payload to
+    // return), so plainVictimIndex spells that pass itself and has to spell it
+    // in the sim's direction. consumeOneScratch's first pass (src/sim/bags.ts,
+    // removeFungibleItem's walk) runs `for (let i = scratch.length - 1; i >= 0;
+    // i--)`, so the apply spends the LAST plain cell; a forward walk here would
+    // name the first, a copy the apply leaves alone. Two plain cells is the
+    // only fixture where the direction decides anything, which is why the arms
+    // above (one plain cell each, or none) all pass either way.
+    const inventory: InvSlot[] = [
+      { itemId: chestId, count: 1 },
+      { itemId: helmetId, count: 1 },
+      { itemId: chestId, count: 1 },
+    ];
+    expect(plainCopy(inventory)).toEqual({ slotIndex: 2 });
+    expect(baggedEnchantVictim(inventory, chestId, false)).toBeUndefined();
+  });
+
+  it('with no plain cell the victim is the newest unenchanted INSTANCED copy, the very object the sim peeks', () => {
+    const inventory: InvSlot[] = [
+      { itemId: chestId, count: 1, instance: { signer: 'Crafter' } },
+      { itemId: helmetId, count: 3 },
+      { itemId: chestId, count: 1, instance: { rolled: { masterwork: true } } },
+    ];
+    const copy = plainCopy(inventory);
+    expect(copy).toEqual({ slotIndex: 2 });
+    // One selection by construction: the cell the row names holds the payload
+    // baggedEnchantVictim returns by reference.
+    expect(inventory[copy?.slotIndex ?? -1].instance).toBe(
+      baggedEnchantVictim(inventory, chestId, false),
+    );
+  });
+
+  it('a replace row names the pinned victim (replaceVictimIndex), its plain twin its own', () => {
+    const inventory: InvSlot[] = [
+      { itemId: chestId, count: 1, instance: { enchant: OTHER } },
+      { itemId: helmetId, count: 1 },
+      { itemId: chestId, count: 1 },
+      { itemId: chestId, count: 1, instance: { enchant: OTHER } },
+    ];
+    expect(replaceCopy(inventory)).toEqual({
+      slotIndex: replaceVictimIndex(inventory, chestId),
+    });
+    expect(replaceVictimIndex(inventory, chestId)).toBe(3);
+    // The two families of ONE item id resolve apart, each through its own
+    // walk: the replace row's victim is never the plain row's.
+    expect(plainCopy(inventory)).toEqual({ slotIndex: 2 });
+  });
+
+  it('re-resolves after a splice: the cell follows the victim rather than naming its sibling', () => {
+    // The cell is live for one frame, so the row is re-derived per call. Here a
+    // stack BELOW the victim is spliced away: a row that cached its old cell
+    // would name A, the adjacent sibling that slid onto it, while the walk
+    // still lands on B. This is why the picker's consumer captures the victim
+    // payload as it PAINTS instead of re-reading the cell when a row is
+    // clicked (tests/bag_item_action_menu_paint.test.ts pins that arm).
+    const A: ItemInstancePayload = { signer: 'A' };
+    const B: ItemInstancePayload = { signer: 'B' };
+    const inventory: InvSlot[] = [
+      { itemId: helmetId, count: 1 }, // the stack an apply exhausts
+      { itemId: chestId, count: 1, instance: A },
+      { itemId: chestId, count: 1, instance: B },
+    ];
+    expect(plainCopy(inventory)).toEqual({ slotIndex: 2 });
+    expect(inventory[1].instance).toBe(A);
+    inventory.splice(0, 1);
+    expect(plainCopy(inventory)).toEqual({ slotIndex: 1 });
+    expect(inventory[1].instance).toBe(B);
+  });
+
+  it('a Perfected-only enchant lands on the Perfected copy, never the gated-out sibling', () => {
+    const infusion = Object.values(ENCHANTS).find(
+      (enchant) => enchant.requiresPerfected === true && enchant.itemSlot === 'chest',
+    );
+    expect(infusion, 'content carries a Perfected-gated chest enchant').toBeDefined();
+    const enchantId = (infusion as EnchantDef).id;
+    const viewer = viewerAt(infusion?.skillReq ?? 0);
+    const inventory: InvSlot[] = [
+      { itemId: chestId, count: 1, instance: { signer: 'plain' } }, // fails the per-copy gate
+      { itemId: chestId, count: 1, instance: { perfected: true } },
+    ];
+    const rows = enchantTargets(inventory, enchantId, [], viewer);
+    expect(rows).toHaveLength(1);
+    // The row lands on the Perfected cell, not on the signed copy the per-copy
+    // gate refused: the walk sees the GATED family alone.
+    expect(rows[0].copy).toEqual({ slotIndex: 1 });
   });
 });
 
@@ -577,25 +746,52 @@ describe('enchant_apply_view: preservedReplaceTraits (#2421)', () => {
     expect(preservedReplaceTraits({ boundTo: 3, bindOnTrade: true })).toEqual(['bond']);
   });
 
-  it('drops both bind facts on the wire-trimmed (WORN) arm, keeping signature and masterwork', () => {
-    // The public eqi wire carries signer/enchant/rolled ONLY, so an online
-    // client cannot see a worn copy's bond while the offline Sim can. Claiming
-    // it on this arm would make one dialog say different things per host.
+  it('collapses the Perfecting family onto ONE trait, per state and combined (phase 14)', () => {
+    // The bond doctrine one trait over: a Perfected stamp, a live rank walk,
+    // and a copy carrying both print ONE "Perfecting" entry. rank 0 is
+    // spelled as an ABSENT perfecting field (the payload contract), so a
+    // plain copy stays trait-free.
+    expect(preservedReplaceTraits({ perfected: true })).toEqual(['perfecting']);
+    expect(preservedReplaceTraits({ perfecting: 2 })).toEqual(['perfecting']);
+    expect(preservedReplaceTraits({ perfected: true, perfecting: 3 })).toEqual(['perfecting']);
+    expect(preservedReplaceTraits({})).toEqual([]);
+  });
+
+  it('drops both bind facts on the wire-trimmed arm, keeping signature and masterwork', () => {
+    // The public eqi wire carries signer/enchant/rolled ONLY, so a reader of
+    // that mirror cannot see a copy's bond while the offline Sim can. Claiming
+    // it on such an arm would make one dialog say different things per host.
+    // Since Masterwrought phase 12 NO live picker arm passes true (the worn
+    // family reads the whole self einst mirror, the case below), so this pins
+    // the guard itself, kept for any future eqi reader.
     const victim = {
       signer: 'Tester',
       rolled: { masterwork: true },
       boundTo: 9,
       bindOnTrade: true,
+      // Phase 14: the Perfecting family sits BELOW the trim gate with the
+      // bond, because the peer eqi projection carries neither field (the
+      // allowlist pin below), so a trimmed reader must stay silent about it.
+      perfected: true as const,
     };
     expect(preservedReplaceTraits(victim, true)).toEqual(['signer', 'masterwork']);
-    // ...and the bagged arm, reading the full self inv mirror, still states it.
-    expect(preservedReplaceTraits(victim, false)).toEqual(['signer', 'masterwork', 'bond']);
+    // ...and the untrimmed arm, reading a whole self mirror (the `inv` array
+    // for the bags, the `einst` payloads for the body), states it.
+    expect(preservedReplaceTraits(victim, false)).toEqual([
+      'signer',
+      'masterwork',
+      'bond',
+      'perfecting',
+    ]);
   });
 
   // The premise the wireTrimmed arm rests on, pinned against the SERVER so it
-  // cannot rot silently: the moment the eqi allowlist grows a bind field, the
-  // worn arm is free to state the bond and this test says so.
-  it('pins the eqi allowlist the worn trim mirrors', () => {
+  // cannot rot silently. Since Masterwrought phase 12 the picker's worn arm
+  // no longer reads this projection (it reads the self einst mirror), so the
+  // pin now guards the INSPECT-side trim the paperdoll tooltip mirrors
+  // (wornTooltipInstance, cross-pinned below): the moment the eqi allowlist
+  // grows a field, both consumers of the one policy must move together.
+  it('pins the eqi allowlist the inspect-side trim mirrors', () => {
     const wire = readFileSync(fileURLToPath(new URL('../server/game.ts', import.meta.url)), 'utf8');
     const block = wire.match(
       /for \(const \[slot, inst\] of Object\.entries\(e\.equippedInstances\)\)[\s\S]*?\n {4}\}/,
@@ -606,13 +802,15 @@ describe('enchant_apply_view: preservedReplaceTraits (#2421)', () => {
     // not read as coverage either.
     const body = (block?.[0] ?? '').replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
     const projected = [...body.matchAll(/pub\.(\w+) = inst\.\w+/g)].map((m) => m[1]);
-    // Exactly the cosmetic inspect fields, and NOTHING that carries bind state.
-    expect(projected.sort()).toEqual(['enchant', 'rolled', 'signer']);
+    // Exactly the cosmetic inspect fields, and NOTHING that carries bind
+    // state. `name` (the player-chosen legendary name) joined at Masterwrought
+    // phase 13, the first cosmetic widening since the allowlist was written.
+    expect(projected.sort()).toEqual(['enchant', 'name', 'rolled', 'signer']);
     // Syntax-independent backstop: the extractor above only sees dot-notation
     // assignment, so a widening written as pub['boundTo'] = inst.boundTo or an
     // Object.assign spread would slip past it. Pin the FIELD NAMES out of the
     // loop body entirely, which no assignment shape can dodge.
-    for (const field of ['boundTo', 'bindOnTrade', 'charges']) {
+    for (const field of ['boundTo', 'bindOnTrade', 'charges', 'perfecting', 'perfected']) {
       expect(body, `${field} must not ride the public eqi wire`).not.toContain(field);
     }
   });
@@ -622,20 +820,26 @@ describe('enchant_apply_view: preservedReplaceTraits (#2421)', () => {
   // for the identical reason. Both are pinned in their own files, but nothing
   // linked them, so widening the wire would fail only the pin above and leave
   // the tooltip copy to be found later. Cross-pinned here instead: the two
-  // consumers of one policy must agree, mechanically.
-  it('pins wornTooltipInstance to that same allowlist, so both consumers move together', () => {
+  // consumers of one policy must agree, mechanically. ONE recorded exception
+  // since 2026-08-27: the projection keeps `perfected`, a SELF-side fact the
+  // owner's own paperdoll needs for the promotion-scoped Unique-Equipped tag,
+  // while the wire pin above still refuses it on the peer eqi lane. So the
+  // projection is exactly wire-allowlist plus perfected, nothing else.
+  it('pins wornTooltipInstance to the wire allowlist plus the self-only perfected stamp', () => {
     const worn = wornTooltipInstance({
       signer: 'Tester',
       enchant: 'enchant_chest_stamina',
       rolled: { masterwork: true, stats: { sta: 4 } },
+      name: "Vel'tara's Oath",
+      perfected: true,
       boundTo: 7,
       bindOnTrade: true,
       charges: { some_effect: 2 },
     });
     expect(
       Object.keys(worn ?? {}).sort(),
-      'wornTooltipInstance and the eqi wire encode one policy: widen both or neither',
-    ).toEqual(['enchant', 'rolled', 'signer']);
+      'wornTooltipInstance is the eqi allowlist plus perfected: widen both or neither',
+    ).toEqual(['enchant', 'name', 'perfected', 'rolled', 'signer']);
   });
 
   // The exported sweep list claims two things about itself: that it is the
@@ -650,6 +854,7 @@ describe('enchant_apply_view: preservedReplaceTraits (#2421)', () => {
         rolled: { masterwork: true },
         boundTo: 1,
         bindOnTrade: true,
+        perfected: true,
       }),
     ).toEqual([...ENCHANT_PRESERVED_TRAITS]);
   });
@@ -709,7 +914,7 @@ describe('enchant_apply_view: preserved facts on the replace rows (#2421)', () =
       ],
       WEAPON_ENCHANT,
     );
-    expect(targets).toEqual([
+    expect(familyRows(targets)).toEqual([
       {
         itemId: SWORD,
         count: 1,
@@ -768,10 +973,12 @@ describe('enchant_apply_view: preserved facts on the replace rows (#2421)', () =
     expect(targets[0].replace?.preserved).toEqual(['masterwork', 'bond']);
   });
 
-  it('carries traits on a LEGACY victim read off the WORN mirror too', () => {
-    // The uncovered cross of the two arms: no enchant marker AND wire-trimmed.
-    // The signature still survives and is still visible on the eqi wire; the
-    // bond is dropped like every other worn victim.
+  it('carries traits on a LEGACY victim read off the WORN mirror too, the bond included', () => {
+    // The cross of the two arms: no enchant marker AND the worn family. Since
+    // Masterwrought phase 12 the worn family reads IWorld.equipmentInstances,
+    // the whole self einst mirror in both hosts, so the bond is stated here
+    // exactly as on a bagged victim (before the switch this arm read the
+    // trimmed eqi entity mirror and pinned ['signer'] alone).
     const rows = wornEnchantTargets(
       { mainhand: SWORD },
       { mainhand: { signer: 'Tester', rolled: { stats: { agi: 2 } }, boundTo: 4 } },
@@ -781,12 +988,12 @@ describe('enchant_apply_view: preserved facts on the replace rows (#2421)', () =
       {
         itemId: SWORD,
         slot: 'mainhand',
-        replace: { stats: { agi: 2 }, sameEnchant: false, preserved: ['signer'] },
+        replace: { stats: { agi: 2 }, sameEnchant: false, preserved: ['signer', 'bond'] },
       },
     ]);
   });
 
-  it('the WORN row states signature and masterwork but never a bind state', () => {
+  it('the WORN row states signature, masterwork AND the bind state (the self einst mirror)', () => {
     const rows = wornEnchantTargets(
       { mainhand: SWORD },
       {
@@ -799,8 +1006,10 @@ describe('enchant_apply_view: preserved facts on the replace rows (#2421)', () =
       },
       WEAPON_ENCHANT,
     );
-    // The offline Sim holds boundTo here; the online eqi mirror never does.
-    // Both hosts must produce this same row (see preservedReplaceTraits).
+    // Both hosts hold boundTo on this surface (the server ships
+    // meta.equipmentInstance whole under `einst`; the offline Sim reads it
+    // live), so both produce this same row (see preservedReplaceTraits). The
+    // pre-phase-12 pin read the trimmed eqi entity mirror and dropped the bond.
     expect(rows).toEqual([
       {
         itemId: SWORD,
@@ -808,7 +1017,7 @@ describe('enchant_apply_view: preserved facts on the replace rows (#2421)', () =
         replace: {
           enchantId: AGILITY,
           sameEnchant: false,
-          preserved: ['signer', 'masterwork'],
+          preserved: ['signer', 'masterwork', 'bond'],
         },
       },
     ]);
@@ -831,7 +1040,7 @@ describe('enchant_apply_view: mixedHolding (#2421)', () => {
       ],
       'enchant_chest_stamina',
     );
-    expect(targets).toEqual([
+    expect(familyRows(targets)).toEqual([
       { itemId: chestId, count: 2, mixedHolding: true },
       {
         itemId: chestId,
@@ -864,7 +1073,7 @@ describe('enchant_apply_view: mixedHolding (#2421)', () => {
       ],
       'enchant_chest_stamina',
     );
-    expect(targets).toEqual([{ itemId: chestId, count: 2 }]);
+    expect(familyRows(targets)).toEqual([{ itemId: chestId, count: 2 }]);
   });
 
   // The CROSS-FAMILY holding: the enchanted copy is WORN and its plain twin is
@@ -878,9 +1087,9 @@ describe('enchant_apply_view: mixedHolding (#2421)', () => {
       'enchant_chest_stamina',
     );
     expect(worn[0]?.replace, 'the worn copy is the enchanted twin').toBeDefined();
-    expect(enchantTargets([{ itemId: chestId, count: 2 }], 'enchant_chest_stamina', worn)).toEqual([
-      { itemId: chestId, count: 2, mixedHolding: true },
-    ]);
+    expect(
+      familyRows(enchantTargets([{ itemId: chestId, count: 2 }], 'enchant_chest_stamina', worn)),
+    ).toEqual([{ itemId: chestId, count: 2, mixedHolding: true }]);
     // Without the worn rows the same bags read as unambiguous, which is what
     // makes the argument load-bearing rather than incidental.
     expect(
@@ -943,7 +1152,7 @@ describe('enchant_apply_view: mixedHolding (#2421)', () => {
       ],
       'enchant_chest_stamina',
     );
-    expect(targets).toEqual([
+    expect(familyRows(targets)).toEqual([
       { itemId: base, count: 1 },
       { itemId: heroic, count: 1, heroic: true },
     ]);
@@ -1017,7 +1226,7 @@ describe('enchant_apply_view: name discriminators (#2466)', () => {
       ],
       CHEST_ENCHANT,
     );
-    expect(targets).toEqual([
+    expect(familyRows(targets)).toEqual([
       {
         itemId: base,
         count: 1,
@@ -1149,7 +1358,11 @@ describe('enchant_apply_view: name discriminators (#2466)', () => {
         const nameId = def.heroicOf ?? def.id;
         const name = table.entities?.items?.[nameId]?.name;
         expect(name, `${lang} carries a name for ${nameId}`).toBeTruthy();
-        const key = `${name} ${heroic(def) ? 'heroic' : 'plain'}`;
+        // The separator is written as the ESCAPE, never as a raw NUL byte: a
+        // literal NUL in the source makes this whole file binary to grep, so a
+        // reviewer's plain `grep readFileSync` over it reports nothing, which is
+        // exactly how the eqi-allowlist pin above got called missing once.
+        const key = `${name}\u0000${heroic(def) ? 'heroic' : 'plain'}`;
         byKey.set(key, [...(byKey.get(key) ?? []), def.id]);
         byName.set(name as string, [...(byName.get(name as string) ?? []), def.id]);
       }
@@ -1165,5 +1378,505 @@ describe('enchant_apply_view: name discriminators (#2466)', () => {
     // decoration: names ARE shared in live content, and the assertion above
     // passes only because the mark separates the rows that share them.
     expect(sharedNames, 'live content shares display names across ids').toBeGreaterThan(0);
+  });
+});
+
+// The picker half of the Lucent tier's two gates (Masterwrought phase 10). The
+// sim owns the refusals (professions/enchanting.ts insufficient_skill /
+// not_perfected); these pin that the picker never OFFERS what those refuse, on
+// both target families, which is the whole reason the core takes the viewer's
+// skill at all.
+describe('enchant_apply_view: the Lucent tier gates', () => {
+  const WEAPON = itemForSlot('mainhand');
+  const CHEST = itemForSlot('chest');
+  const LUCENT_WEAPON = 'enchant_weapon_lucent_might';
+  const INFUSION = 'enchant_lucent_infusion';
+
+  it('lists no target for a skill-gated enchant below its floor, on either family', () => {
+    const inventory: InvSlot[] = [{ itemId: WEAPON, count: 1 }];
+    const equipment = { mainhand: WEAPON };
+    const floor = ENCHANTS[LUCENT_WEAPON].skillReq as number;
+    // One point short, and the default (a caller that passes no skill at all):
+    // both offer nothing rather than promising an apply the sim denies.
+    expect(enchantTargets(inventory, LUCENT_WEAPON, [], viewerAt(floor - 1))).toEqual([]);
+    expect(enchantTargets(inventory, LUCENT_WEAPON)).toEqual([]);
+    expect(wornEnchantTargets(equipment, {}, LUCENT_WEAPON, viewerAt(floor - 1))).toEqual([]);
+    expect(wornEnchantTargets(equipment, {}, LUCENT_WEAPON)).toEqual([]);
+    // At the floor exactly, both families list the copy.
+    expect(
+      enchantTargets(inventory, LUCENT_WEAPON, [], viewerAt(floor)).map((r) => r.itemId),
+    ).toEqual([WEAPON]);
+    expect(
+      wornEnchantTargets(equipment, {}, LUCENT_WEAPON, viewerAt(floor)).map((r) => r.slot),
+    ).toEqual(['mainhand']);
+  });
+
+  it('LISTS the skill-short enchant, inert: present at floor-1, selectable at the floor', () => {
+    // The picker's step-one row is where a skill shortfall is answered, and it
+    // is answered by LISTING the enchant and marking it not selectable, the
+    // unaffordable-reagents treatment exactly. Dropping the row instead left
+    // the enchant clickable and then painted "No eligible item to enchant." on
+    // step two, which is false: the items were eligible and the skill was not.
+    const floor = ENCHANTS[LUCENT_WEAPON].skillReq as number;
+    const reagent = ENCHANTS[LUCENT_WEAPON].reagents[0].itemId;
+    // Reagents in hand, so `affordable` cannot be what disables the row and the
+    // two gates are told apart.
+    const inventory: InvSlot[] = ENCHANTS[LUCENT_WEAPON].reagents.map((r) => ({
+      itemId: r.itemId,
+      count: r.count + 5,
+    }));
+
+    const short = enchantsForReagent(inventory, reagent, viewerAt(floor - 1)).find(
+      (row) => row.enchantId === LUCENT_WEAPON,
+    );
+    expect(short, 'the row is present one point short, never dropped').toBeDefined();
+    expect(short?.affordable, 'the reagents really are in hand').toBe(true);
+    expect(short?.skillMet).toBe(false);
+    expect(short?.skillReq).toBe(floor);
+
+    const at = enchantsForReagent(inventory, reagent, viewerAt(floor)).find(
+      (row) => row.enchantId === LUCENT_WEAPON,
+    );
+    expect(at?.skillMet, 'at the floor exactly it becomes selectable').toBe(true);
+    expect(at?.skillReq).toBe(floor);
+
+    // The default (a caller that passes no skill) offers less, not more.
+    expect(
+      enchantsForReagent(inventory, reagent).find((row) => row.enchantId === LUCENT_WEAPON)
+        ?.skillMet,
+    ).toBe(false);
+
+    // A free-floor enchant declares no skillReq and is met at skill 0, so the
+    // flag above cannot be a constant this test happens to read as false. The
+    // dust reagent feeds both tiers, which is the point: one call, both answers.
+    const dust = enchantsForReagent(
+      [{ itemId: 'arcane_dust', count: 99 }],
+      'arcane_dust',
+      viewerAt(0),
+    );
+    const freeFloor = dust.filter((row) => row.skillReq === undefined);
+    const gated = dust.filter((row) => row.skillReq !== undefined);
+    expect(freeFloor.length, 'the dust tier really has free-floor enchants').toBeGreaterThan(0);
+    expect(gated.length, 'and at least one gated one, so both arms are exercised').toBeGreaterThan(
+      0,
+    );
+    for (const row of freeFloor) expect(row.skillMet, `${row.enchantId} is free`).toBe(true);
+    for (const row of gated) expect(row.skillMet, `${row.enchantId} is gated`).toBe(false);
+  });
+
+  it('keeps the skill-short row inside its tier SECTION, so the rung stays visible', () => {
+    // The sections are what tell a climbing enchanter the Lucent rung exists.
+    // A dropped row would delete the whole section for a viewer under the
+    // floor, which is the state every enchanter is in before they get there.
+    const floor = ENCHANTS[LUCENT_WEAPON].skillReq as number;
+    const reagent = ENCHANTS[LUCENT_WEAPON].reagents[0].itemId;
+    const inventory: InvSlot[] = [{ itemId: reagent, count: 99 }];
+    const sections = enchantSectionsForReagent(inventory, reagent, viewerAt(floor - 1));
+    const lucent = sections.find((section) => section.tier === 'lucent');
+    expect(lucent, 'the Lucent section survives a short skill').toBeDefined();
+    const row = lucent?.rows.find((r) => r.enchantId === LUCENT_WEAPON);
+    expect(row?.skillMet).toBe(false);
+    // And the same section at the floor holds the same row, now selectable.
+    const met = enchantSectionsForReagent(inventory, reagent, viewerAt(floor))
+      .find((section) => section.tier === 'lucent')
+      ?.rows.find((r) => r.enchantId === LUCENT_WEAPON);
+    expect(met?.skillMet).toBe(true);
+  });
+
+  it('leaves the free-floor enchants alone: a skill-0 viewer still sees every old target', () => {
+    // The gate is scoped to defs that declare a floor, so the pre-Lucent table
+    // behaves exactly as it did before this parameter existed.
+    const inventory: InvSlot[] = [{ itemId: WEAPON, count: 1 }];
+    expect(
+      enchantTargets(inventory, 'enchant_weapon_might', [], viewerAt(0)).map((r) => r.itemId),
+    ).toEqual([WEAPON]);
+    expect(
+      wornEnchantTargets({ mainhand: WEAPON }, {}, 'enchant_weapon_might', viewerAt(0)).map(
+        (r) => r.slot,
+      ),
+    ).toEqual(['mainhand']);
+  });
+
+  it('offers a Perfected-only enchant only on a copy carrying the marker', () => {
+    const cap = ENCHANTS[INFUSION].skillReq as number;
+    // A capped enchanter holding an ordinary copy: still nothing, because the
+    // gate is about the COPY. Today no shipped path mints the marker, so this
+    // is the state every live character is in.
+    expect(enchantTargets([{ itemId: CHEST, count: 1 }], INFUSION, [], viewerAt(cap))).toEqual([]);
+    expect(wornEnchantTargets({ chest: CHEST }, {}, INFUSION, viewerAt(cap))).toEqual([]);
+    // The same copy carrying the phase 12 marker becomes a target on both
+    // families, which is what proves the empty lists above are the GUARD
+    // answering and not the slot match or the skill gate.
+    expect(
+      enchantTargets(
+        [{ itemId: CHEST, count: 1, instance: { perfected: true } }],
+        INFUSION,
+        [],
+        viewerAt(cap),
+      ).map((r) => r.itemId),
+    ).toEqual([CHEST]);
+    expect(
+      wornEnchantTargets(
+        { chest: CHEST },
+        { chest: { perfected: true } },
+        INFUSION,
+        viewerAt(cap),
+      ).map((r) => r.slot),
+    ).toEqual(['chest']);
+  });
+
+  it('refuses every ordinary copy of every requiresPerfected enchant (the phase 10 contract)', () => {
+    const perfectedOnly = Object.values(ENCHANTS).filter((e) => e.requiresPerfected);
+    expect(perfectedOnly.length).toBeGreaterThan(0);
+    for (const enchant of perfectedOnly) {
+      const itemId = itemForSlot(enchant.itemSlot);
+      // Skill deliberately far above any floor: the only thing left refusing is
+      // the Perfected marker.
+      expect(
+        enchantTargets([{ itemId, count: 1 }], enchant.id, [], viewerAt(999)),
+        enchant.id,
+      ).toEqual([]);
+      // A masterwork or signed copy is not a Perfected one either.
+      expect(
+        enchantTargets(
+          [{ itemId, count: 1, instance: { signer: 'Someone', rolled: { masterwork: true } } }],
+          enchant.id,
+          [],
+          viewerAt(999),
+        ),
+        `${enchant.id}: masterwork is not Perfected`,
+      ).toEqual([]);
+    }
+  });
+});
+
+// The UNSYNCED window (CraftingIdentityView.synced): an online client's
+// craftSkills mirror is an all-zero DEFAULT until its first cprof delta lands,
+// not a measurement. Gating on it told a master enchanter their skill was too
+// low on an inert row and emptied both target lists, so the skill dimension is
+// skipped whole for that window and the sim stays the authority. The sibling
+// core recipe_pattern_tooltip_view.ts holds the same contract for the pattern
+// tooltip's gated lines.
+describe('enchant_apply_view: the unsynced viewer skips the skill dimension', () => {
+  const WEAPON = itemForSlot('mainhand');
+  const LUCENT_WEAPON = 'enchant_weapon_lucent_might';
+  const FLOOR = ENCHANTS[LUCENT_WEAPON].skillReq as number;
+  const REAGENT = ENCHANTS[LUCENT_WEAPON].reagents[0].itemId;
+  /** Every reagent in hand, so `affordable` can never be what marks a row. */
+  const STOCKED: InvSlot[] = ENCHANTS[LUCENT_WEAPON].reagents.map((r) => ({
+    itemId: r.itemId,
+    count: r.count + 5,
+  }));
+  const unsynced: EnchantViewerInput = { synced: false, enchantingSkill: 0 };
+
+  it('reads a skill-gated row as MET at skill 0, where a synced viewer reads it short', () => {
+    const rowOf = (viewer: EnchantViewerInput) =>
+      enchantsForReagent(STOCKED, REAGENT, viewer).find((row) => row.enchantId === LUCENT_WEAPON);
+    const before = rowOf(unsynced);
+    expect(before, 'the row is listed either way').toBeDefined();
+    expect(before?.affordable, 'the reagents really are in hand').toBe(true);
+    expect(before?.skillMet).toBe(true);
+    // The floor is still CARRIED (it is a fact about the enchant, not about the
+    // viewer), so the mirror landing needs no second read to paint the line.
+    expect(before?.skillReq).toBe(FLOOR);
+    // The SAME skill, synced: now a real shortfall, and the row goes inert.
+    expect(rowOf(viewerAt(0))?.skillMet).toBe(false);
+    // And a synced viewer at the floor is met, so `skillMet` is not a constant
+    // this pair happens to read twice.
+    expect(rowOf(viewerAt(FLOOR))?.skillMet).toBe(true);
+  });
+
+  it('leaves both target families unfiltered while unsynced, on the same skill of 0', () => {
+    const inventory: InvSlot[] = [{ itemId: WEAPON, count: 1 }];
+    const equipment = { mainhand: WEAPON };
+    expect(enchantTargets(inventory, LUCENT_WEAPON, [], unsynced).map((r) => r.itemId)).toEqual([
+      WEAPON,
+    ]);
+    expect(wornEnchantTargets(equipment, {}, LUCENT_WEAPON, unsynced).map((r) => r.slot)).toEqual([
+      'mainhand',
+    ]);
+    // Synced at the identical skill: both empty. The one field is the whole
+    // difference, which is what makes the pair above a gate and not a default.
+    expect(enchantTargets(inventory, LUCENT_WEAPON, [], viewerAt(0))).toEqual([]);
+    expect(wornEnchantTargets(equipment, {}, LUCENT_WEAPON, viewerAt(0))).toEqual([]);
+  });
+
+  it('widens NOTHING else: reagents and the Perfected marker still refuse', () => {
+    // The skip is scoped to the one dimension that reads a mirror which has not
+    // arrived. Affordability is read from the inventory, which is present from
+    // the first frame, and the Perfected marker is a fact about a COPY.
+    const broke = enchantsForReagent([{ itemId: REAGENT, count: 1 }], REAGENT, unsynced).find(
+      (row) => row.enchantId === LUCENT_WEAPON,
+    );
+    expect(broke?.skillMet, 'the skill dimension is still skipped').toBe(true);
+    expect(broke?.affordable, 'one reagent of three is not affordable').toBe(false);
+    const INFUSION = 'enchant_lucent_infusion';
+    const chest = itemForSlot('chest');
+    const capstone = enchantsForReagent(
+      [
+        { itemId: ENCHANTS[INFUSION].reagents[0].itemId, count: 99 },
+        { itemId: chest, count: 1 },
+      ],
+      ENCHANTS[INFUSION].reagents[0].itemId,
+      unsynced,
+    ).find((row) => row.enchantId === INFUSION);
+    expect(capstone?.perfectedMet, 'an ordinary copy is not a Perfected one').toBe(false);
+    expect(enchantTargets([{ itemId: chest, count: 1 }], INFUSION, [], unsynced)).toEqual([]);
+  });
+});
+
+// The Perfected requirement as a step-ONE row flag (the skill dimension's twin).
+// Without it the capstone stayed selectable and step two answered "No eligible
+// item to enchant.", a sentence about the player's bags for a refusal that is
+// about the enchant: nothing mints the marker before phase 12, so that was the
+// answer EVERY live character got.
+describe('enchant_apply_view: perfectedMet on the step-one row', () => {
+  const INFUSION = 'enchant_lucent_infusion';
+  const CHEST = itemForSlot('chest');
+  const CAP = ENCHANTS[INFUSION].skillReq as number;
+  const REAGENT = ENCHANTS[INFUSION].reagents[0].itemId;
+  /** The whole bill in hand, so affordability cannot be what marks the row. */
+  const BILL: InvSlot[] = ENCHANTS[INFUSION].reagents.map((r) => ({
+    itemId: r.itemId,
+    count: r.count + 5,
+  }));
+  const rowFor = (inventory: InvSlot[], viewer: EnchantViewerInput) =>
+    enchantsForReagent(inventory, REAGENT, viewer).find((row) => row.enchantId === INFUSION);
+
+  it('marks the capstone unmet at the cap with the bill paid and no Perfected copy', () => {
+    // Every OTHER dimension cleared, so this one is the only thing left saying
+    // no, which is exactly the state the false "No eligible item" came from.
+    const row = rowFor([...BILL, { itemId: CHEST, count: 1 }], viewerAt(CAP));
+    expect(row, 'the row is listed, never dropped').toBeDefined();
+    expect(row?.affordable).toBe(true);
+    expect(row?.skillMet).toBe(true);
+    expect(row?.perfectedMet).toBe(false);
+  });
+
+  it('clears it on a Perfected copy in the BAGS', () => {
+    const row = rowFor(
+      [...BILL, { itemId: CHEST, count: 1, instance: { perfected: true } }],
+      viewerAt(CAP),
+    );
+    expect(row?.perfectedMet).toBe(true);
+    // A masterwork or signed copy is not a Perfected one, so the flag is not
+    // simply reading "this copy has a payload".
+    expect(
+      rowFor(
+        [...BILL, { itemId: CHEST, count: 1, instance: { rolled: { masterwork: true } } }],
+        viewerAt(CAP),
+      )?.perfectedMet,
+    ).toBe(false);
+  });
+
+  it('clears it on a WORN Perfected copy too, since the target step lists the body', () => {
+    // A copy on the body is a target row like any bagged one, so a row marked
+    // unmet while the player wears the very item it would land on would be the
+    // same false refusal in the other direction.
+    // Annotated, not inferred: ItemInstancePayload.perfected is the literal
+    // `true`, which a bare const would widen to boolean.
+    const worn: Pick<EnchantViewerInput, 'equipment' | 'equippedInstances'> = {
+      equipment: { chest: CHEST },
+      equippedInstances: { chest: { perfected: true } },
+    };
+    expect(rowFor(BILL, viewerAt(CAP, worn))?.perfectedMet).toBe(true);
+    // The same body wearing an ORDINARY copy stays unmet, so the arm is reading
+    // the marker rather than the presence of a worn item.
+    expect(
+      rowFor(BILL, viewerAt(CAP, { equipment: { chest: CHEST }, equippedInstances: {} }))
+        ?.perfectedMet,
+    ).toBe(false);
+    // And a viewer given no body at all falls back to the bags alone.
+    expect(rowFor(BILL, viewerAt(CAP))?.perfectedMet).toBe(false);
+  });
+
+  it('agrees with step two on an already-enchanted copy: a retired enchant id is no candidate', () => {
+    // The QA review's divergence: the target builders DROP an already-enchanted
+    // copy whose enchant id no longer resolves (replaceInfoFor's defensive arm,
+    // the sim's already_enchanted refusal), so a Perfected copy carrying a
+    // retired enchant must not clear the row either, or the row is actionable
+    // over an EMPTY step two, the exact false answer this flag exists to
+    // remove. The scan now asks the builders themselves; this pins the seam
+    // from both sides with the same viewer.
+    const retired = rowFor(
+      [
+        ...BILL,
+        {
+          itemId: CHEST,
+          count: 1,
+          instance: { perfected: true, enchant: 'enchant_retired_probe' },
+        },
+      ],
+      viewerAt(CAP),
+    );
+    expect(
+      ENCHANTS.enchant_retired_probe,
+      'the probe id really resolves to nothing',
+    ).toBeUndefined();
+    expect(retired?.perfectedMet).toBe(false);
+    expect(
+      enchantTargets(
+        [
+          ...BILL,
+          {
+            itemId: CHEST,
+            count: 1,
+            instance: { perfected: true, enchant: 'enchant_retired_probe' },
+          },
+        ],
+        INFUSION,
+        [],
+        viewerAt(CAP),
+      ),
+    ).toEqual([]);
+    // The positive control on the same shape: a Perfected copy carrying a LIVE
+    // enchant is a replace row in step two, so it clears the flag.
+    const live = ENCHANTS.enchant_chest_lucent_stamina;
+    expect(live, 'the live sibling chest enchant exists').toBeDefined();
+    const inventory: InvSlot[] = [
+      ...BILL,
+      { itemId: CHEST, count: 1, instance: { perfected: true, enchant: live.id } },
+    ];
+    expect(rowFor(inventory, viewerAt(CAP))?.perfectedMet).toBe(true);
+    expect(enchantTargets(inventory, INFUSION, [], viewerAt(CAP)).map((row) => row.itemId)).toEqual(
+      [CHEST],
+    );
+  });
+
+  it('a copy in the shape the Perfecting walk really mints is a plain-row candidate', () => {
+    // The walk stamps `perfected` beside a bare R5 record in rolled.stats with
+    // no masterwork flag: exactly the shape isEnchantedInstance once misread
+    // as a legacy enchant. The picker must list it as a PLAIN row (one
+    // unenchanted copy), never a replace row, and clear the flag.
+    const walked: InvSlot[] = [
+      ...BILL,
+      {
+        itemId: CHEST,
+        count: 1,
+        instance: { signer: 'Crafter', perfected: true, rolled: { stats: { int: 1 } } },
+      },
+    ];
+    expect(rowFor(walked, viewerAt(CAP))?.perfectedMet).toBe(true);
+    expect(familyRows(enchantTargets(walked, INFUSION, [], viewerAt(CAP)))).toEqual([
+      { itemId: CHEST, count: 1 },
+    ]);
+  });
+
+  it('sets ONLY the skill dimension aside: a short applier still reads a Perfected copy as met', () => {
+    // perfectedMet must not fold the skill floor in (each unmet gate paints its
+    // own line), so a Perfected copy clears it at any skill while skillMet
+    // stays false, and an unsynced viewer clears neither more nor less.
+    const inventory: InvSlot[] = [
+      ...BILL,
+      { itemId: CHEST, count: 1, instance: { perfected: true } },
+    ];
+    const short = rowFor(inventory, viewerAt(CAP - 1));
+    expect(short?.skillMet).toBe(false);
+    expect(short?.perfectedMet).toBe(true);
+    const bare = rowFor([...BILL, { itemId: CHEST, count: 1 }], viewerAt(CAP - 1));
+    expect(bare?.skillMet).toBe(false);
+    expect(bare?.perfectedMet).toBe(false);
+  });
+
+  it('models the sim exactly: a Perfected copy the apply would not SPEND is no candidate', () => {
+    // The sim's bagged gate (professions/enchanting.ts holdsPerfectedTarget)
+    // peeks the exact copy an id-only apply would spend (baggedEnchantVictim:
+    // a plain copy before any instanced one, then the newest unenchanted
+    // instanced copy) and refuses not_perfected unless THAT copy carries the
+    // marker. A some()-over-holding would clear this row (a Perfected copy IS
+    // in the bags) while every apply the player then sends is refused; the row
+    // must read unmet exactly when the sim refuses.
+    const disagreeing: InvSlot[] = [
+      ...BILL,
+      { itemId: CHEST, count: 1, instance: { perfected: true } },
+      { itemId: CHEST, count: 1 }, // plain: the first copy the remover spends
+    ];
+    expect(rowFor(disagreeing, viewerAt(CAP))?.perfectedMet).toBe(false);
+    expect(enchantTargets(disagreeing, INFUSION, [], viewerAt(CAP))).toEqual([]);
+    // A plain copy shadows a NEWER Perfected one too: the remover's first pass
+    // takes plain copies whatever their index (the shape a newest-copy peek
+    // got wrong).
+    const shadowed: InvSlot[] = [
+      ...BILL,
+      { itemId: CHEST, count: 1 },
+      { itemId: CHEST, count: 1, instance: { perfected: true } },
+    ];
+    expect(rowFor(shadowed, viewerAt(CAP))?.perfectedMet).toBe(false);
+    expect(enchantTargets(shadowed, INFUSION, [], viewerAt(CAP))).toEqual([]);
+    // With both copies instanced the newest unenchanted one is the victim: the
+    // row clears, and step two lists exactly the ONE copy the gate admits (the
+    // ordinary older copy is no target).
+    const agreeing: InvSlot[] = [
+      ...BILL,
+      { itemId: CHEST, count: 1, instance: { signer: 'Crafter' } },
+      { itemId: CHEST, count: 1, instance: { perfected: true } },
+    ];
+    expect(rowFor(agreeing, viewerAt(CAP))?.perfectedMet).toBe(true);
+    expect(familyRows(enchantTargets(agreeing, INFUSION, [], viewerAt(CAP)))).toEqual([
+      { itemId: CHEST, count: 1 },
+    ]);
+    // An already-enchanted Perfected copy beside an ordinary unenchanted one:
+    // the PLAIN apply would spend the ordinary copy (the remover's second
+    // pass skips the enchanted one), but step two lists the enchanted
+    // Perfected copy as a REPLACE row, and the sim's confirmed replace peeks
+    // exactly that copy (replaceVictimIndex), so the row still clears. Its
+    // plain-apply half alone would refuse: pinned through the sim guard in
+    // tests/lucent_infusion_guard.test.ts.
+    const enchantedShadow: InvSlot[] = [
+      ...BILL,
+      { itemId: CHEST, count: 1, instance: { signer: 'Crafter' } },
+      { itemId: CHEST, count: 1, instance: { perfected: true, enchant: 'enchant_chest_stamina' } },
+    ];
+    expect(rowFor(enchantedShadow, viewerAt(CAP))?.perfectedMet).toBe(true);
+    // Each ROW family is gated on its own arm's victim: [enchanted Perfected
+    // A, enchanted ordinary D newer, unenchanted Perfected B] pins the replace
+    // victim D (replaceVictimIndex, the highest enchanted copy) as NOT
+    // Perfected, so no replace row is offered (the sim's confirmed replace
+    // would refuse not_perfected on D), while the plain victim B still lists.
+    const splitArms: InvSlot[] = [
+      ...BILL,
+      { itemId: CHEST, count: 1, instance: { perfected: true, enchant: 'enchant_chest_stamina' } },
+      {
+        itemId: CHEST,
+        count: 1,
+        instance: { signer: 'Crafter', enchant: 'enchant_chest_stamina' },
+      },
+      { itemId: CHEST, count: 1, instance: { perfected: true } },
+    ];
+    expect(rowFor(splitArms, viewerAt(CAP))?.perfectedMet).toBe(true);
+    expect(familyRows(enchantTargets(splitArms, INFUSION, [], viewerAt(CAP)))).toEqual([
+      { itemId: CHEST, count: 1 },
+    ]);
+    // And with the enchanted Perfected copy alone, the plain victim falls to
+    // that same copy (the remover's third pass), so both arms clear it; the
+    // plain apply then denies already_enchanted, and the replace row is the
+    // actionable path: still true.
+    expect(
+      rowFor([...BILL, enchantedShadow[enchantedShadow.length - 1]], viewerAt(CAP))?.perfectedMet,
+    ).toBe(true);
+    // The rule is the CAPSTONE'S alone: an ordinary chest enchant lists both
+    // copies of the same disagreeing holding.
+    const plain = 'enchant_chest_stamina';
+    expect(familyRows(enchantTargets(disagreeing, plain, [], viewerAt(CAP)))).toEqual([
+      { itemId: CHEST, count: 2 },
+    ]);
+  });
+
+  it('is true on every enchant that requires nothing, so it gates only the capstone', () => {
+    const dust = enchantsForReagent([{ itemId: 'arcane_dust', count: 99 }], 'arcane_dust');
+    const free = dust.filter((row) => ENCHANTS[row.enchantId].requiresPerfected !== true);
+    expect(free.length, 'the dust reagent really lists ungated enchants').toBeGreaterThan(0);
+    for (const row of free) expect(row.perfectedMet, row.enchantId).toBe(true);
+    // Non-vacuity: live content really does carry a requiresPerfected enchant,
+    // and an empty-handed viewer reads it as unmet, so the sweep above is not
+    // passing over a table where the flag can only ever be true.
+    const gated = Object.values(ENCHANTS).filter((enchant) => enchant.requiresPerfected);
+    expect(gated.length).toBeGreaterThan(0);
+    for (const enchant of gated) {
+      const row = enchantsForReagent([], enchant.reagents[0].itemId).find(
+        (candidate) => candidate.enchantId === enchant.id,
+      );
+      expect(row?.perfectedMet, enchant.id).toBe(false);
+    }
   });
 });

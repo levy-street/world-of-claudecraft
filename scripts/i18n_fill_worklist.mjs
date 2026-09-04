@@ -107,12 +107,18 @@ const CHROME_MAIN_PREFIXES = [
   'serverUnavailable.',
   'stats.',
 ];
-// DICT scopes (sim/server/admin) are system / operator UI chrome. The admin
-// dashboard is in scope (operators are users); the cognate backstops there are
-// already `blocked` (not `pending`), so they never reach this tool.
+// DICT scopes (sim/server/admin) are system / operator UI chrome, with one
+// carve-out: the sim scope also carries boss dialogue and lore lines
+// (dialogue.*, lore.*), which are narrative and route to humanRequired like
+// the main scope's prose (Masterwrought Phase 19F: since the registry reads
+// per-locale source presence, sim rows reach this tool). The admin dashboard
+// is in scope (operators are users); the cognate backstops there are already
+// `blocked` (not `pending`), so they never reach this tool.
 const CHROME_DICT_SCOPES = new Set(['sim', 'server', 'admin']);
+const PROSE_SIM_PREFIXES = ['dialogue.', 'lore.'];
 
 function isProse(scope, key) {
+  if (scope === 'sim') return PROSE_SIM_PREFIXES.some((p) => key.startsWith(p));
   if (scope !== 'main') return false;
   return PROSE_MAIN_PREFIXES.some((p) => key.startsWith(p));
 }

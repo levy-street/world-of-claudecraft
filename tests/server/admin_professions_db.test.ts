@@ -44,10 +44,14 @@ describe('recordProfessionsRestore', () => {
         reason: 'lost',
       }),
     ).rejects.toThrow('character not found');
-    // Only the owner lookup ran; no audit row without an owner.
+    // Only the owner lookup ran; no audit row without an owner. Realm-scoped
+    // since the 2026-08-27 micro-review sweep (a cross-realm id must not
+    // write an audit row against another realm's account).
     expect(query).toHaveBeenCalledTimes(1);
-    expect(query.mock.calls[0][0]).toContain('SELECT account_id FROM characters');
-    expect(query.mock.calls[0][1]).toEqual([42]);
+    expect(query.mock.calls[0][0]).toContain(
+      'SELECT account_id FROM characters WHERE id = $1 AND realm = $2',
+    );
+    expect(query.mock.calls[0][1]).toEqual([42, 'Claudemoon']);
   });
 
   it('records the audit row with the action kind and the character-carrying reason', async () => {

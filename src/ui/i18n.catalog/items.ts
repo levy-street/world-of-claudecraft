@@ -2,7 +2,7 @@
 // Part of src/ui/i18n.catalog/; assembled into `en` by ./index.ts.
 // Translations live in src/ui/i18n.locales/<lang>.ts, never here.
 
-import { classAbilityNames, classAbilityNamesEn } from './abilities';
+import { classAbilityNamesEn } from './abilities';
 
 const itemStringsEn = {
   itemUi: {
@@ -54,6 +54,11 @@ const itemStringsEn = {
       material: 'Material',
       food: 'Food',
       drink: 'Drink',
+      // Recipe pattern items (kind 'recipe'): the physical drop that teaches
+      // one crafting recipe when used. "Pattern" rather than "Recipe" so the
+      // OBJECT in the bags reads apart from the KNOWLEDGE it grants, which the
+      // trainer and crafting surfaces already call a recipe.
+      recipe: 'Pattern',
     },
     stats: {
       armor: 'Armor',
@@ -82,8 +87,78 @@ const itemStringsEn = {
       // Battle elixirs (elixir_tooltip_view.ts): the stat line for a mapped
       // buff kind, and the aura-name fallback so an unmapped kind still says
       // what quaffing grants instead of saying nothing.
-      useElixir: 'Use: Increases your {stat} by {value} for {minutes} min. Usable in combat.',
-      useElixirAura: 'Use: Grants {aura} for {minutes} min. Usable in combat.',
+      // The replacement clause is the family's exclusivity rule at the point
+      // of use (tooltip-writing.md item 7): every elixir and scroll of one
+      // stat shares a single buff slot, newest application wins.
+      useElixir:
+        'Use: Increases your {stat} by {value} for {minutes} min. Replaces any other elixir or scroll of the same stat. Usable in combat.',
+      useElixirAura:
+        'Use: Grants {aura} for {minutes} min. Replaces any other elixir or scroll of its kind. Usable in combat.',
+      // Flasks (elixir_tooltip_view.ts) append these three rules under the Use
+      // line they share with elixirs. All three are the mechanic, not flavor:
+      // the use path sheds every other flask aura before applying (one flask at
+      // a time, whatever its stat), it REFUSES an elixir or scroll of THAT
+      // SAME stat while a flask is worn rather than letting the weaker source
+      // overwrite it (the refusal is keyed on the aura family, so a worn flask
+      // never blocks an elixir of a DIFFERENT stat, which is why the line says
+      // so), and aurasSurvivingDeath keeps a flask aura through a death that
+      // clears everything else. The death line names its limits too: auras are
+      // session state, so the buff really does end at logout, and every
+      // instanced match (arena, Thornhollow Fields, Fiesta, Protect Yumi, Vale
+      // Cup) runs the harsher clean slate at its seat and its end
+      // (aurasSurvivingCleanSlate), so a flask neither enters nor leaves one
+      // with the player; a tooltip that promised only the death half would be
+      // read as promising all three.
+      flaskOnlyOne: 'Only one flask effect at a time. Drinking another flask replaces this one.',
+      flaskOutranks: 'A weaker elixir or scroll of the same stat cannot replace it.',
+      // The counter-immunity line (phase 10 QA STK-2 ruling): the mint stamps
+      // undispellable, so no dispel or steal takes a flask and the flag's
+      // standing rule also removes the owner's right-click cancel; the
+      // tooltip states all three because the live mechanic refuses all three.
+      // The Spellgnaw devour affix (devourBeneficialAura, src/sim/mob/mob_swing.ts)
+      // does take a flask and is deliberately NOT listed: ruled
+      // qr-19-flask-tooltip-spellgnaw-exception (Masterwrought Phase 19F), the
+      // classic-idiom rule that consumable tooltips do not enumerate mob-affix
+      // interactions, a recorded exception to tooltip-writing.md's item 7.
+      flaskUnremovable: 'It cannot be dispelled, stolen, or canceled by hand.',
+      flaskThroughDeath:
+        'The effect remains through death, but ends when you log out; instanced matches begin and end on a clean slate.',
+      // Well Fed (wellfed_tooltip_view.ts), the ONE key pair for every buff
+      // food since the 11c unification (farming's useWellfed pair was retired
+      // with its overlay rows; ruling 11c-A4-KEYPAIR). Both clauses are
+      // load-bearing, not padding: "once you finish eating" because standing
+      // up early grants nothing at all, and the one-at-a-time sentence
+      // because the whole food family shares one 'well_fed' aura id, so a
+      // newer meal really does replace the last. Second key is the
+      // unmapped-kind fallback, the useElixirAura pattern; its {aura} rides
+      // the same sim_i18n matcher the buff bar reads, so one row owns the
+      // term in every locale. No 'Use:' prefix on either line: every buff
+      // food also carries foodHp, so the useFood sentence above it already
+      // owns the Use: slot and a second one would double the prefix.
+      wellFed:
+        'Well Fed: Increases your {stat} by {value} for {minutes} min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.',
+      wellFedAura:
+        'Well Fed: Grants {aura} for {minutes} min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.',
+      // The shared feast (feast_tooltip_view.ts): what USING the item does
+      // (places a feast entity others eat from; {servings} and {minutes} come
+      // from the def's own feast record), then what each serving pays,
+      // matching the capstone dish's resolved well-fed form above. {seconds}
+      // is CONSUME_DURATION, the same sit-restore a bagged dish runs, and the
+      // finish-the-meal trigger is load-bearing copy like the wellfed lines
+      // (the buff lands only when the meal COMPLETES). The buff NAME rides
+      // the shared sim_i18n matcher row ({aura}), the (by) rule, so the
+      // tooltip, the dish tooltip, and the buff bar can never disagree per
+      // locale. useFeast keeps the Use: prefix: the feast has no foodHp, so
+      // no useFood sentence owns that slot on its tooltip. Since 11c a
+      // serving mints the one shared 'well_fed' aura exactly as a bagged dish
+      // does, so both serving lines state the one-at-a-time rule too, in the
+      // wellFed pair's own words.
+      useFeast:
+        'Use: Sets out a feast others can eat from, one serving each ({servings} servings, lasts {minutes} min).',
+      useFeastBuff:
+        'Each serving grants {aura}: +{value} {stat} for {minutes} min when you finish the {seconds} sec meal. Only one Well Fed effect at a time: a newer meal replaces it.',
+      useFeastBuffAura:
+        'Each serving grants {aura} for {minutes} min when you finish the {seconds} sec meal. Only one Well Fed effect at a time: a newer meal replaces it.',
       questItem: 'Quest Item',
       // Story tooltip lines (quest_item_tooltip_view.ts): related quest title,
       // keep-rules footer, and orphaned copy when the item is no longer needed
@@ -207,6 +282,7 @@ const itemStringsEn = {
       filterTypeConsumable: 'Consumables',
       filterTypeMaterial: 'Materials',
       filterTypeCosmetic: 'Cosmetics',
+      filterTypePattern: 'Patterns',
       filterTypeOther: 'Other',
       filterArmorType: 'Armor type',
       filterArmorAll: 'All armor',
@@ -2459,6 +2535,201 @@ const ITEM_ENTITY_IDS = [
   'resonant_weave_bag',
   'foragers_haversack',
   'loombound_reagent_satchel',
+  'hammered_copper_band',
+  'polished_copper_loop',
+  'coiled_copper_torc',
+  'riveted_iron_signet',
+  'etched_iron_loop',
+  'iron_link_choker',
+  'weighted_thorium_band',
+  'gleaming_thorium_loop',
+  'burnished_thorium_amulet',
+  'silverleaf_primer',
+  'goldleaf_folio',
+  'sunpetal_grimoire',
+  'silverleaf_scroll',
+  'goldleaf_scroll',
+  'sunpetal_scroll',
+  'duskforged_billet',
+  'forgefold_plating',
+  'wyrmhide_cording',
+  'sunspun_bolt',
+  'prismglass_setting',
+  'precision_chassis',
+  'quickening_catalyst',
+  'seasoned_stock',
+  'lucent_reagent',
+  'sablewax_vellum',
+  'spiritweld_girdle',
+  'forgefold_legguards',
+  'wardspeaker_sabatons',
+  'briarstep_jerkin',
+  'fenbloom_breeches',
+  'barksong_handguards',
+  'sunspun_vestments',
+  'sunspun_leggings',
+  'sunspun_handwraps',
+  'sunspun_haversack',
+  'duskforged_warblade',
+  'ridgebreaker',
+  'duskforged_bulwark',
+  'wyrmfall_pendant',
+  'warhewn_signet',
+  'prismglass_loop',
+  'gyrelens_array',
+  'voidbound_grimoire',
+  'masters_field_forge',
+  'makers_charm',
+  'ironhusk_flask',
+  'warboar_flask',
+  'runewater_flask',
+  'stonepot_stew',
+  'warspice_skewers',
+  'sageleaf_chowder',
+  'grand_cauldron',
+  'laden_hearth',
+  'pattern_spiritweld_girdle',
+  'pattern_forgefold_legguards',
+  'pattern_wardspeaker_sabatons',
+  'pattern_briarstep_jerkin',
+  'pattern_fenbloom_breeches',
+  'pattern_barksong_handguards',
+  'pattern_sunspun_vestments',
+  'pattern_sunspun_leggings',
+  'pattern_sunspun_handwraps',
+  'pattern_sunspun_haversack',
+  'pattern_duskforged_warblade',
+  'pattern_ridgebreaker',
+  'pattern_duskforged_bulwark',
+  'pattern_wyrmfall_pendant',
+  'pattern_warhewn_signet',
+  'pattern_prismglass_loop',
+  'pattern_gyrelens_array',
+  'pattern_masters_field_forge',
+  'pattern_makers_charm',
+  'pattern_voidbound_grimoire',
+  'pattern_ironhusk_flask',
+  'pattern_warboar_flask',
+  'pattern_runewater_flask',
+  'pattern_stonepot_stew',
+  'pattern_warspice_skewers',
+  'pattern_sageleaf_chowder',
+  'pattern_grand_cauldron',
+  'pattern_laden_hearth',
+  'vale_wheat_seed',
+  'vale_wheat',
+  'fine_vale_wheat',
+  'withered_husks',
+  'compost',
+  'growth_tonic',
+  'brook_carrot_seed',
+  'brook_carrot',
+  'fine_brook_carrot',
+  'marsh_rice_seed',
+  'marsh_rice',
+  'fine_marsh_rice',
+  'bog_beet_seed',
+  'bog_beet',
+  'fine_bog_beet',
+  'highland_barley_seed',
+  'highland_barley',
+  'fine_highland_barley',
+  'frost_gourd_seed',
+  'frost_gourd',
+  'fine_frost_gourd',
+  'thornpeak_cabbage_seed',
+  'thornpeak_cabbage',
+  'fine_thornpeak_cabbage',
+  'frost_lentils_seed',
+  'frost_lentils',
+  'fine_frost_lentils',
+  'gilded_sunmelon_seed',
+  'gilded_sunmelon',
+  'fine_gilded_sunmelon',
+  'evergarden_greens_seed',
+  'evergarden_greens',
+  'fine_evergarden_greens',
+  'gilded_yam_seed',
+  'gilded_yam',
+  'fine_gilded_yam',
+  'evergarden_pumpkin_seed',
+  'evergarden_pumpkin',
+  'fine_evergarden_pumpkin',
+  'garden_hoe',
+  'bronze_hoe',
+  'skysilver_hoe',
+  'osmium_hoe',
+  'vale_hearth_loaf',
+  'eastbrook_root_pottage',
+  'fenbridge_rice_bowl',
+  'fenbridge_beet_braise',
+  'highwatch_barley_bannock',
+  'highwatch_gourd_soup',
+  'evergarden_sunmelon_tart',
+  'evergarden_harvest_platter',
+  'eastbrook_glazed_carrots',
+  'fenbridge_rice_pudding',
+  'highwatch_barley_porridge',
+  'evergarden_braised_greens',
+  'harvest_feast',
+  'pattern_highwatch_gourd_soup',
+  'pattern_highwatch_barley_porridge',
+  'pattern_evergarden_sunmelon_tart',
+  'pattern_evergarden_harvest_platter',
+  'pattern_evergarden_braised_greens',
+  'pattern_harvest_feast',
+  // masterwrought Phase 11i, the angler's endgame. Appended at the END under
+  // the append-only contract, after the farming block, so no earlier position
+  // moves: three high-band catches, the apex rod, two dishes, and the three
+  // patterns that teach the drop-taught rows. The capstone feast and its
+  // pattern were here too until Phase 11k retired both ids, which is what took
+  // the patterns from four to three (the TWIN of this comment in src/ui/icons.ts
+  // was corrected at the Phase 11k QA and this one was missed, so both are
+  // named here).
+  'raw_deepbarb_catfish',
+  'raw_hollowgill_sturgeon',
+  'raw_stillmere_salmon',
+  'clockreel_fishing_rod',
+  'peppered_deepbarb_catfish',
+  'roast_hollowgill_sturgeon',
+  'pattern_peppered_deepbarb_catfish',
+  'pattern_roast_hollowgill_sturgeon',
+  'pattern_clockreel_fishing_rod',
+  // masterwrought Phase 11j, the gathering completion pass. Appended at the END
+  // under the same append-only contract as the 11i block above, rather than
+  // beside the four hoe rungs it belongs to by subject: position here is not a
+  // grouping, it is a sequence, and inserting mid-array would contradict the
+  // note directly above it. The English name is on the keyed appended map, so
+  // the reader looking for the hoe family finds it there.
+  'evergarden_hoe',
+  // masterwrought Phase 11k, the apex feast tier. Appended at the END under the
+  // same append-only contract. The two ids this phase RETIRED
+  // (`deepwater_feast` and `pattern_deepwater_feast`) are removed from the 11i
+  // block above rather than left behind: both were minted on this branch and
+  // never shipped in a release, which is the one case content/CLAUDE.md permits
+  // an outright delete (verified against origin/release/v0.40.0: neither id
+  // appears in that tree's items catalog or content tables).
+  //
+  // THE REMOVAL SHIFTED NO INDEX, and that is worth stating precisely because
+  // this list IS positional for its older half and a reader could reasonably
+  // assume the worst. `itemTranslations` only reads names by index when it is
+  // handed a full-length list (`includesAppendedNames`, below); every locale
+  // list including the English one is the LEGACY length, so every id on
+  // APPENDED_ITEM_NAMES resolves BY KEY. Both retired feast ids were appended
+  // ids, so they came out of this array and that keyed map together and no
+  // positional row moved anywhere.
+  // All six new names are wordy in English, so M16 non-Latin fills are owed;
+  // they land in the src/ui/i18n.locales overlays, never in this file.
+  'stonepot_feast',
+  'warspice_feast',
+  'sageleaf_feast',
+  'pattern_stonepot_feast',
+  'pattern_warspice_feast',
+  'pattern_sageleaf_feast',
+  // The Proving Shore's pearl detour (release v0.41.0), appended behind the
+  // masterwrought tail at the release merge under the same append-only
+  // contract; every id here resolves BY KEY, so the relative order of the two
+  // tails carries no positional meaning.
   'ps_briny_lure',
   'ps_lustrous_pearl',
   'mother_of_pearl',
@@ -2667,6 +2938,20 @@ const ITEM_ENTITY_IDS = [
   'forgefire_spire',
   'springtouched_crozier',
   'wand_of_quenched_sparks',
+  // masterwrought Phase 11o, the engineering on-ramp (qr-11o-ENG). Appended
+  // at the END under the append-only contract; both resolve BY KEY. Both
+  // names are wordy English, so M16 non-Latin fills land in the
+  // src/ui/i18n.locales overlays in the same change.
+  'cogwheel_blank',
+  'copperlens_ocular',
+  // masterwrought Phase 13, the orange promotion: the inscription recipe's
+  // consumable that names a Perfected work a legend. Appended at the END
+  // under the append-only contract, behind the prior masterwrought appends;
+  // resolves BY KEY. The name is wordy English, so M16 non-Latin fills land
+  // in the src/ui/i18n.locales overlays in the same change, and the
+  // 'Deed of Making' noun there must match the sim_i18n.ts
+  // error.legendaryDeed rows.
+  'deed_of_making',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2715,7 +3000,7 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   hearth_ember_cache: 'Ember Cache',
   sprung_trap: 'Sprung Fen Trap',
   hearthlined_treads: 'Hearth-Lined Treads',
-  frostmane_mantle: 'Mantle of the Frostmane',
+  frostmane_mantle: 'Mantle of the Rimemane',
   ashbone_war_brand: 'Ashbone War-Brand',
   emberwing_scale: 'Emberwing Scale',
   scorched_supply_crate: 'Scorched Supply Crate',
@@ -2768,7 +3053,7 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   last_keep_signet: 'Signet of the Last Keep',
   gatherers_cache: "Gatherer's Cache",
   artisans_eye: "Artisan's Eye",
-  reins_terrorspark_groundshaker: 'Ignition Key: Terrorspark Groundshaker',
+  reins_terrorspark_groundshaker: 'Ignition Key: Dreadspark Groundshaker',
   reins_lanternback_troll: "Lamplighter's Yoke: Grumbol",
   reins_chimeglass_tortoise: "Roadwarden's Bellstrap: Tolliver",
   reins_rickshaw_mount: 'Bound Reins: Bonebound Rickshaw',
@@ -2813,6 +3098,247 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   resonant_weave_bag: 'Resonantweave Bag',
   foragers_haversack: "Forager's Haversack",
   loombound_reagent_satchel: 'Loombound Reagent Satchel',
+  // Jewelcrafting base catalog (Masterwrought phase 05): the thorium_* ids
+  // display "Osmium" (the Osmium register in content/profession_items.ts).
+  // English-appended like the quivers above until the release fill folds them
+  // into the per-locale arrays.
+  hammered_copper_band: 'Hammered Copper Band',
+  polished_copper_loop: 'Polished Copper Loop',
+  coiled_copper_torc: 'Coiled Copper Torc',
+  riveted_iron_signet: 'Riveted Iron Signet',
+  etched_iron_loop: 'Etched Iron Loop',
+  iron_link_choker: 'Iron Link Choker',
+  weighted_thorium_band: 'Weighted Osmium Band',
+  gleaming_thorium_loop: 'Gleaming Osmium Loop',
+  burnished_thorium_amulet: 'Burnished Osmium Amulet',
+  // Inscription base catalog (Masterwrought phase 06): the silverleaf_* ids
+  // display "Sheenleaf" (the Sheenleaf register in content/items.ts, the
+  // originality-sweep id/display split). English-appended like the quivers
+  // above until the release fill folds them into the per-locale arrays.
+  silverleaf_primer: 'Sheenleaf Primer',
+  goldleaf_folio: 'Goldleaf Folio',
+  sunpetal_grimoire: 'Sunpetal Grimoire',
+  silverleaf_scroll: 'Sheenleaf Scroll',
+  goldleaf_scroll: 'Goldleaf Scroll',
+  sunpetal_scroll: 'Sunpetal Scroll',
+  // Masterwrought intermediates (phase 07): the skill-75 rung, one per craft
+  // (content/profession_items.ts). English-appended like the quivers above
+  // until the release fill folds them into the per-locale arrays.
+  duskforged_billet: 'Duskforged Billet',
+  forgefold_plating: 'Forgefold Plating',
+  wyrmhide_cording: 'Wyrmhide Cording',
+  sunspun_bolt: 'Sunspun Bolt',
+  prismglass_setting: 'Prismglass Setting',
+  precision_chassis: 'Precision Chassis',
+  quickening_catalyst: 'Quickening Catalyst',
+  seasoned_stock: 'Seasoned Stock',
+  lucent_reagent: 'Lucent Reagent',
+  sablewax_vellum: 'Sablewax Vellum',
+  // Masterwrought apex armor (phase 08): the skill-100 rung for the three
+  // armor crafts plus the apex bag (content/profession_items.ts).
+  spiritweld_girdle: 'Spiritweld Girdle',
+  forgefold_legguards: 'Forgefold Legguards',
+  wardspeaker_sabatons: 'Wardspeaker Sabatons',
+  briarstep_jerkin: 'Briarstep Jerkin',
+  fenbloom_breeches: 'Fenbloom Breeches',
+  barksong_handguards: 'Barksong Handguards',
+  sunspun_vestments: 'Sunspun Vestments',
+  sunspun_leggings: 'Sunspun Leggings',
+  sunspun_handwraps: 'Sunspun Handwraps',
+  sunspun_haversack: 'Sunspun Haversack',
+  // Masterwrought apex gear (phase 09): the skill-100 rung for
+  // weaponcrafting, jewelcrafting, engineering, and inscription
+  // (content/items.ts). English-appended like the phase 08 block above until
+  // the release fill folds them into the per-locale arrays.
+  duskforged_warblade: 'Duskforged Warblade',
+  ridgebreaker: 'Ridgebreaker',
+  duskforged_bulwark: 'Duskforged Bulwark',
+  wyrmfall_pendant: 'Wyrmfall Pendant',
+  warhewn_signet: 'Warhewn Signet',
+  prismglass_loop: 'Prismglass Loop',
+  gyrelens_array: 'Gyrelens Array',
+  voidbound_grimoire: 'Voidbound Grimoire',
+  masters_field_forge: "Master's Field Forge",
+  makers_charm: "Maker's Charm",
+  // Masterwrought apex consumables (phase 10): the three alchemy flasks, the
+  // three cooking role foods, and the two skill-125 capstone placements
+  // (content/profession_items.ts and content/items.ts). English-appended like
+  // the phase 09 block above until the release fill folds them into the
+  // per-locale arrays.
+  ironhusk_flask: 'Ironhusk Flask',
+  warboar_flask: 'Warboar Flask',
+  runewater_flask: 'Runewater Flask',
+  stonepot_stew: 'Stonepot Stew',
+  warspice_skewers: 'Warspice Skewers',
+  sageleaf_chowder: 'Sageleaf Chowder',
+  grand_cauldron: 'Grand Cauldron',
+  laden_hearth: 'The Laden Hearth',
+  // Masterwrought apex recipe patterns (phase 11): the kind:'recipe' drops
+  // teaching the 28 apex recipes (content/apex_patterns.ts), classic per-craft
+  // prefixes on the output's English name. English-appended like the phase 10
+  // block above until the release fill folds them into the per-locale arrays.
+  pattern_spiritweld_girdle: 'Plans: Spiritweld Girdle',
+  pattern_forgefold_legguards: 'Plans: Forgefold Legguards',
+  pattern_wardspeaker_sabatons: 'Plans: Wardspeaker Sabatons',
+  pattern_briarstep_jerkin: 'Pattern: Briarstep Jerkin',
+  pattern_fenbloom_breeches: 'Pattern: Fenbloom Breeches',
+  pattern_barksong_handguards: 'Pattern: Barksong Handguards',
+  pattern_sunspun_vestments: 'Pattern: Sunspun Vestments',
+  pattern_sunspun_leggings: 'Pattern: Sunspun Leggings',
+  pattern_sunspun_handwraps: 'Pattern: Sunspun Handwraps',
+  pattern_sunspun_haversack: 'Pattern: Sunspun Haversack',
+  pattern_duskforged_warblade: 'Plans: Duskforged Warblade',
+  pattern_ridgebreaker: 'Plans: Ridgebreaker',
+  pattern_duskforged_bulwark: 'Plans: Duskforged Bulwark',
+  pattern_wyrmfall_pendant: 'Design: Wyrmfall Pendant',
+  pattern_warhewn_signet: 'Design: Warhewn Signet',
+  pattern_prismglass_loop: 'Design: Prismglass Loop',
+  pattern_gyrelens_array: 'Schematic: Gyrelens Array',
+  pattern_masters_field_forge: "Schematic: Master's Field Forge",
+  pattern_makers_charm: "Schematic: Maker's Charm",
+  pattern_voidbound_grimoire: 'Technique: Voidbound Grimoire',
+  pattern_ironhusk_flask: 'Recipe: Ironhusk Flask',
+  pattern_warboar_flask: 'Recipe: Warboar Flask',
+  pattern_runewater_flask: 'Recipe: Runewater Flask',
+  pattern_stonepot_stew: 'Recipe: Stonepot Stew',
+  pattern_warspice_skewers: 'Recipe: Warspice Skewers',
+  pattern_sageleaf_chowder: 'Recipe: Sageleaf Chowder',
+  pattern_grand_cauldron: 'Recipe: Grand Cauldron',
+  pattern_laden_hearth: 'Recipe: The Laden Hearth',
+  // Farming's tier-1 crop line (the growth-engine phase): the seed, its
+  // produce, the fine twin a skill-scaled harvest roll upgrades a pick into,
+  // and the husks a failed crop pays. Same English-appended treatment as the
+  // quivers and the Thornhide family above. These names must stay in step with
+  // the ItemDef `name` fields in src/sim/content/items.ts, which is what the
+  // sim splices into its own English text for the matchers to re-localize.
+  vale_wheat_seed: 'Vale Wheat Seed',
+  vale_wheat: 'Vale Wheat',
+  fine_vale_wheat: 'Fine Vale Wheat',
+  withered_husks: 'Withered Husks',
+  // The knobs phase's two plant-time supplies, same treatment and the same
+  // stay-in-step rule against the ItemDef `name` fields. IP-safe per D17:
+  // plain real words, no coined compost grades borrowed from other games.
+  compost: 'Compost',
+  growth_tonic: 'Growth Tonic',
+  // The crop-ladder phase's seven crop families (seed, produce, fine twin),
+  // same English-appended treatment and the same stay-in-step rule against
+  // the ItemDef `name` fields in src/sim/content/items.ts. IP-safe per D17:
+  // real plant words plus zone-flavored qualifiers, coining nothing from
+  // another game.
+  brook_carrot_seed: 'Brook Carrot Seed',
+  brook_carrot: 'Brook Carrot',
+  fine_brook_carrot: 'Fine Brook Carrot',
+  marsh_rice_seed: 'Marsh Rice Seed',
+  marsh_rice: 'Marsh Rice',
+  fine_marsh_rice: 'Fine Marsh Rice',
+  bog_beet_seed: 'Bog Beet Seed',
+  bog_beet: 'Bog Beet',
+  fine_bog_beet: 'Fine Bog Beet',
+  highland_barley_seed: 'Highland Barley Seed',
+  highland_barley: 'Highland Barley',
+  fine_highland_barley: 'Fine Highland Barley',
+  frost_gourd_seed: 'Frost Gourd Seed',
+  frost_gourd: 'Frost Gourd',
+  fine_frost_gourd: 'Fine Frost Gourd',
+  thornpeak_cabbage_seed: 'Thornpeak Cabbage Seed',
+  thornpeak_cabbage: 'Thornpeak Cabbage',
+  fine_thornpeak_cabbage: 'Fine Thornpeak Cabbage',
+  frost_lentils_seed: 'Frost Lentils Seed',
+  frost_lentils: 'Frost Lentils',
+  fine_frost_lentils: 'Fine Frost Lentils',
+  gilded_sunmelon_seed: 'Gilded Sunmelon Seed',
+  gilded_sunmelon: 'Gilded Sunmelon',
+  fine_gilded_sunmelon: 'Fine Gilded Sunmelon',
+  evergarden_greens_seed: 'Evergarden Greens Seed',
+  evergarden_greens: 'Evergarden Greens',
+  fine_evergarden_greens: 'Fine Evergarden Greens',
+  gilded_yam_seed: 'Gilded Yam Seed',
+  gilded_yam: 'Gilded Yam',
+  fine_gilded_yam: 'Fine Gilded Yam',
+  evergarden_pumpkin_seed: 'Evergarden Pumpkin Seed',
+  evergarden_pumpkin: 'Evergarden Pumpkin',
+  fine_evergarden_pumpkin: 'Fine Evergarden Pumpkin',
+  // The hoe ladder (the crop-ladder phase's tool half), same English-appended
+  // treatment and the same stay-in-step rule against the ItemDef `name`
+  // fields. IP-safe per D17: plain real words at tiers 1 and 2, and the
+  // repo's own shipped Skysilver/Osmium material coinages at tiers 3 and 4
+  // (the mining pick precedent).
+  garden_hoe: 'Garden Hoe',
+  bronze_hoe: 'Bronze Hoe',
+  skysilver_hoe: 'Skysilver Hoe',
+  osmium_hoe: 'Osmium Hoe',
+  // The apex rung (masterwrought Phase 11j). Named for the fine reagent its
+  // rung consumes, which is the tier-5 land convention exactly (Highpine Axe
+  // from fine_elderwood_log, Sunpetal Sickle from fine_sunpetal_herb). It
+  // mints NO new proper noun: Evergarden is already a registered coinage in
+  // this packet, carried at KEEP under the masterwrought R15 bar, and this row
+  // inherits that
+  // verdict the same way Evergarden Pumpkin did.
+  evergarden_hoe: 'Evergarden Hoe',
+  // The economy-hooks phase's eight farm dishes (FARM_RECIPES), listed in
+  // tier order, same English-appended treatment and the same stay-in-step
+  // rule against the ItemDef `name` fields in
+  // src/sim/content/profession_items.ts. IP-safe per D17: real cooking words
+  // (loaf, pottage, braise, bannock, tart, platter) plus this game's own
+  // settlement and zone flavor, coining nothing from another game.
+  vale_hearth_loaf: 'Vale Hearth Loaf',
+  eastbrook_root_pottage: 'Eastbrook Root Pottage',
+  fenbridge_rice_bowl: 'Fenbridge Rice Bowl',
+  fenbridge_beet_braise: 'Fenbridge Beet Braise',
+  highwatch_barley_bannock: 'Highwatch Barley Bannock',
+  highwatch_gourd_soup: 'Highwatch Gourd Soup',
+  evergarden_sunmelon_tart: 'Evergarden Sunmelon Tart',
+  evergarden_harvest_platter: 'Evergarden Harvest Platter',
+  // The well-fed phase's four buff dishes (FARM_RECIPES), one per crop tier,
+  // same treatment and the same stay-in-step rule against the ItemDef `name`
+  // fields in src/sim/content/profession_items.ts. IP-safe per D17: real
+  // cooking words (glazed, pudding, porridge, braised) plus this game's own
+  // settlement flavor.
+  eastbrook_glazed_carrots: 'Eastbrook Glazed Carrots',
+  fenbridge_rice_pudding: 'Fenbridge Rice Pudding',
+  highwatch_barley_porridge: 'Highwatch Barley Porridge',
+  evergarden_braised_greens: 'Evergarden Braised Greens',
+  // The shared feast (Phase 12). IP-safe per D17: two plain cooking words.
+  harvest_feast: 'Harvest Feast',
+  // The six farming patterns (Phase 11f, content/farm_patterns.ts). NO NEW
+  // COINAGE: every name is the registered cooking prefix "Recipe:" plus a dish
+  // name already shipped above, so masterwrought R15 and D17 are satisfied by construction
+  // and the verdict is recorded in docs/design/naming-audit.md.
+  // Several are wordy in English, so M16 non-Latin fills land with them.
+  pattern_highwatch_gourd_soup: 'Recipe: Highwatch Gourd Soup',
+  pattern_highwatch_barley_porridge: 'Recipe: Highwatch Barley Porridge',
+  pattern_evergarden_sunmelon_tart: 'Recipe: Evergarden Sunmelon Tart',
+  pattern_evergarden_harvest_platter: 'Recipe: Evergarden Harvest Platter',
+  pattern_evergarden_braised_greens: 'Recipe: Evergarden Braised Greens',
+  pattern_harvest_feast: 'Recipe: Harvest Feast',
+  // masterwrought Phase 11i (the angler's endgame). Every proper noun here was
+  // web-verified at authoring with an adversarial second pass and recorded in
+  // docs/design/naming-audit.md; the four patterns coin nothing at
+  // all, being a registered per-craft prefix plus a name verified in the same
+  // block. All eleven are wordy in English, so M16 non-Latin fills land with
+  // them.
+  raw_deepbarb_catfish: 'Raw Deepbarb Catfish',
+  raw_hollowgill_sturgeon: 'Raw Hollowgill Sturgeon',
+  raw_stillmere_salmon: 'Raw Stillmere Salmon',
+  clockreel_fishing_rod: 'Clockreel Fishing Rod',
+  peppered_deepbarb_catfish: 'Peppered Deepbarb Catfish',
+  roast_hollowgill_sturgeon: 'Roast Hollowgill Sturgeon',
+  pattern_peppered_deepbarb_catfish: 'Recipe: Peppered Deepbarb Catfish',
+  pattern_roast_hollowgill_sturgeon: 'Recipe: Roast Hollowgill Sturgeon',
+  pattern_clockreel_fishing_rod: 'Schematic: Clockreel Fishing Rod',
+  // masterwrought Phase 11k, the apex feast tier. Each name COMPOUNDS the
+  // shipped apex plate it serves (Stonepot Stew, Warspice Skewers, Sageleaf
+  // Chowder) with the mechanic word, so the role is legible from the placed
+  // entity's title by construction and the phase coins NO new proper noun at
+  // all: all three first words are already registered and web-verified, and
+  // "Feast" is the shipped mechanic word Harvest Feast already uses (the 11c
+  // vocabulary ruling: "feast" names only the real placed-entity mechanic).
+  stonepot_feast: 'Stonepot Feast',
+  warspice_feast: 'Warspice Feast',
+  sageleaf_feast: 'Sageleaf Feast',
+  pattern_stonepot_feast: 'Recipe: Stonepot Feast',
+  pattern_warspice_feast: 'Recipe: Warspice Feast',
+  pattern_sageleaf_feast: 'Recipe: Sageleaf Feast',
   // The Proving Shore's pearl detour (q_ps_mother_of_pearl).
   ps_briny_lure: 'Briny Lure',
   ps_lustrous_pearl: 'Lustrous Pearl',
@@ -3025,6 +3551,12 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   forgefire_spire: 'Forgefire Spire',
   springtouched_crozier: 'Springtouched Crozier',
   wand_of_quenched_sparks: 'Wand of Quenched Sparks',
+  // masterwrought Phase 11o, the engineering on-ramp.
+  cogwheel_blank: 'Cogwheel Blank',
+  copperlens_ocular: 'Copperlens Ocular',
+  // masterwrought Phase 13 (the orange promotion). The noun is shared with
+  // the sim_i18n.ts error.legendaryDeed refusal rows in every locale.
+  deed_of_making: 'Deed of Making',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {
@@ -3191,7 +3723,7 @@ const itemNamesEn = {
       'Ogre War Totem',
       'Storm Core',
       "Kazzix's Heartshard",
-      'Wyrmcult Orders',
+      'Broodsworn Orders',
       'Ritual Phylactery',
       'Gravewyrm Sigil',
       'Blessed Embers',
@@ -3212,7 +3744,7 @@ const itemNamesEn = {
       'Staff of Velkhar',
       'Nightveil Tunic',
       'Gravewyrm Scale Hauberk',
-      'Wyrmcult Grand Robe',
+      'Broodsworn Grand Robe',
       'Wyrmscale Jerkin',
       'Wyrmfang Greatblade',
       'Staff of the Gravewyrm',
@@ -3428,10 +3960,10 @@ const itemNamesEn = {
       'Revenantstep Treads',
       'Shardfang Grips',
       'Shardsong Mantle',
-      'Wyrmcult Spellgrips',
+      'Broodsworn Spellgrips',
       'Thornpeak Wildwraps',
       'Stormvotive Hauberk',
-      'Cryptbloom Shoulderguards',
+      'Tombpetal Shoulderguards',
       'Gravewyrm Thornmaul',
       'Vestments of the Waking Grove',
       "Nightfang's Greatstaff",
@@ -3504,7 +4036,6 @@ export const itemNames = {
       },
     },
     entities: {
-      ...classAbilityNames.es.entities,
       items: itemTranslations([
         'Espada corta desgastada',
         'Bastón nudoso',
@@ -3855,10 +4386,10 @@ export const itemNames = {
         'Revenantstep Treads',
         'Shardfang Grips',
         'Shardsong Mantle',
-        'Wyrmcult Spellgrips',
+        'Broodsworn Spellgrips',
         'Thornpeak Wildwraps',
         'Stormvotive Hauberk',
-        'Cryptbloom Shoulderguards',
+        'Tombpetal Shoulderguards',
         'Gravewyrm Thornmaul',
         'Vestments of the Waking Grove',
         "Nightfang's Greatstaff",
@@ -3929,7 +4460,6 @@ export const itemNames = {
       },
     },
     entities: {
-      ...classAbilityNames.fr_FR.entities,
       items: itemTranslations([
         'Épée courte usée',
         'Bâton noueux',
@@ -4280,10 +4810,10 @@ export const itemNames = {
         'Revenantstep Treads',
         'Shardfang Grips',
         'Shardsong Mantle',
-        'Wyrmcult Spellgrips',
+        'Broodsworn Spellgrips',
         'Thornpeak Wildwraps',
         'Stormvotive Hauberk',
-        'Cryptbloom Shoulderguards',
+        'Tombpetal Shoulderguards',
         'Gravewyrm Thornmaul',
         'Vestments of the Waking Grove',
         "Nightfang's Greatstaff",
@@ -4355,7 +4885,6 @@ export const itemNames = {
       },
     },
     entities: {
-      ...classAbilityNames.it_IT.entities,
       items: itemTranslations([
         'Spada corta logora',
         'Bastone nodoso',
@@ -4706,10 +5235,10 @@ export const itemNames = {
         'Revenantstep Treads',
         'Shardfang Grips',
         'Shardsong Mantle',
-        'Wyrmcult Spellgrips',
+        'Broodsworn Spellgrips',
         'Thornpeak Wildwraps',
         'Stormvotive Hauberk',
-        'Cryptbloom Shoulderguards',
+        'Tombpetal Shoulderguards',
         'Gravewyrm Thornmaul',
         'Vestments of the Waking Grove',
         "Nightfang's Greatstaff",
@@ -4779,7 +5308,6 @@ export const itemNames = {
       },
     },
     entities: {
-      ...classAbilityNames.de_DE.entities,
       items: itemTranslations([
         'Abgenutztes Kurzschwert',
         'Knorriger Stab',
@@ -5130,10 +5658,10 @@ export const itemNames = {
         'Revenantstep Treads',
         'Shardfang Grips',
         'Shardsong Mantle',
-        'Wyrmcult Spellgrips',
+        'Broodsworn Spellgrips',
         'Thornpeak Wildwraps',
         'Stormvotive Hauberk',
-        'Cryptbloom Shoulderguards',
+        'Tombpetal Shoulderguards',
         'Gravewyrm Thornmaul',
         'Vestments of the Waking Grove',
         "Nightfang's Greatstaff",
@@ -5203,7 +5731,6 @@ export const itemNames = {
       },
     },
     entities: {
-      ...classAbilityNames.zh_CN.entities,
       items: itemTranslations([
         '破旧短剑',
         '多节法杖',
@@ -5554,10 +6081,10 @@ export const itemNames = {
         'Revenantstep Treads',
         'Shardfang Grips',
         'Shardsong Mantle',
-        'Wyrmcult Spellgrips',
+        'Broodsworn Spellgrips',
         'Thornpeak Wildwraps',
         'Stormvotive Hauberk',
-        'Cryptbloom Shoulderguards',
+        'Tombpetal Shoulderguards',
         'Gravewyrm Thornmaul',
         'Vestments of the Waking Grove',
         "Nightfang's Greatstaff",
@@ -5627,7 +6154,6 @@ export const itemNames = {
       },
     },
     entities: {
-      ...classAbilityNames.zh_TW.entities,
       items: itemTranslations([
         '破舊短劍',
         '多節法杖',
@@ -5978,10 +6504,10 @@ export const itemNames = {
         'Revenantstep Treads',
         'Shardfang Grips',
         'Shardsong Mantle',
-        'Wyrmcult Spellgrips',
+        'Broodsworn Spellgrips',
         'Thornpeak Wildwraps',
         'Stormvotive Hauberk',
-        'Cryptbloom Shoulderguards',
+        'Tombpetal Shoulderguards',
         'Gravewyrm Thornmaul',
         'Vestments of the Waking Grove',
         "Nightfang's Greatstaff",
@@ -6051,7 +6577,6 @@ export const itemNames = {
       },
     },
     entities: {
-      ...classAbilityNames.ko_KR.entities,
       items: itemTranslations([
         '낡은 쇼트소드',
         '옹이진 지팡이',
@@ -6402,10 +6927,10 @@ export const itemNames = {
         'Revenantstep Treads',
         'Shardfang Grips',
         'Shardsong Mantle',
-        'Wyrmcult Spellgrips',
+        'Broodsworn Spellgrips',
         'Thornpeak Wildwraps',
         'Stormvotive Hauberk',
-        'Cryptbloom Shoulderguards',
+        'Tombpetal Shoulderguards',
         'Gravewyrm Thornmaul',
         'Vestments of the Waking Grove',
         "Nightfang's Greatstaff",
@@ -6475,7 +7000,6 @@ export const itemNames = {
       },
     },
     entities: {
-      ...classAbilityNames.ja_JP.entities,
       items: itemTranslations([
         '擦り切れたショートソード',
         '節くれだった杖',
@@ -6826,10 +7350,10 @@ export const itemNames = {
         'Revenantstep Treads',
         'Shardfang Grips',
         'Shardsong Mantle',
-        'Wyrmcult Spellgrips',
+        'Broodsworn Spellgrips',
         'Thornpeak Wildwraps',
         'Stormvotive Hauberk',
-        'Cryptbloom Shoulderguards',
+        'Tombpetal Shoulderguards',
         'Gravewyrm Thornmaul',
         'Vestments of the Waking Grove',
         "Nightfang's Greatstaff",
@@ -6899,7 +7423,6 @@ export const itemNames = {
       },
     },
     entities: {
-      ...classAbilityNames.pt_BR.entities,
       items: itemTranslations([
         'Espada curta gasta',
         'Cajado nodoso',
@@ -7250,10 +7773,10 @@ export const itemNames = {
         'Revenantstep Treads',
         'Shardfang Grips',
         'Shardsong Mantle',
-        'Wyrmcult Spellgrips',
+        'Broodsworn Spellgrips',
         'Thornpeak Wildwraps',
         'Stormvotive Hauberk',
-        'Cryptbloom Shoulderguards',
+        'Tombpetal Shoulderguards',
         'Gravewyrm Thornmaul',
         'Vestments of the Waking Grove',
         "Nightfang's Greatstaff",
@@ -7323,7 +7846,6 @@ export const itemNames = {
       },
     },
     entities: {
-      ...classAbilityNames.ru_RU.entities,
       items: itemTranslations([
         'Изношенный короткий меч',
         'Сучковатый посох',
@@ -7674,10 +8196,10 @@ export const itemNames = {
         'Revenantstep Treads',
         'Shardfang Grips',
         'Shardsong Mantle',
-        'Wyrmcult Spellgrips',
+        'Broodsworn Spellgrips',
         'Thornpeak Wildwraps',
         'Stormvotive Hauberk',
-        'Cryptbloom Shoulderguards',
+        'Tombpetal Shoulderguards',
         'Gravewyrm Thornmaul',
         'Vestments of the Waking Grove',
         "Nightfang's Greatstaff",

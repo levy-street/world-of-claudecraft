@@ -22,6 +22,7 @@ import {
   isEligibleForJackOfAllTrades,
   JACK_CEILING_TIER,
   normalizeArchetypeState,
+  serializeArchetypeState,
 } from '../src/sim/professions/archetype';
 import {
   meetsComboRequirement,
@@ -69,6 +70,24 @@ const NON_ADJACENT_B = CRAFT_RING[2].id; // cooking
 describe('ArchetypeState.isJackOfAllTrades: state shape and normalization', () => {
   it('a fresh character is not Jack', () => {
     expect(emptyArchetypeState().isJackOfAllTrades).toBe(false);
+  });
+
+  it('serializeArchetypeState emits the Jack flag only while the live flag is true (the serializer link of the closed circuit)', () => {
+    // The persisted blob has ONE writer. A never-attuned character must
+    // serialize NO isJackOfAllTrades key at all (an inverted or dropped guard
+    // would persist a true that the hydrate arm then mints on the next load,
+    // the door tests/recipe_economy.test.ts scans for textually), and a Jack
+    // serializes exactly `isJackOfAllTrades: true`; both round-trip through
+    // normalizeArchetypeState to the flag they started from.
+    const fresh = emptyArchetypeState();
+    expect('isJackOfAllTrades' in serializeArchetypeState(fresh)).toBe(false);
+    expect(normalizeArchetypeState(serializeArchetypeState(fresh)).isJackOfAllTrades).toBe(false);
+    // The live flag written directly (the mint itself is pinned by the
+    // attuneJackOfAllTrades suite below); this arm is about the serializer.
+    const jack = emptyArchetypeState();
+    jack.isJackOfAllTrades = true;
+    expect(serializeArchetypeState(jack).isJackOfAllTrades).toBe(true);
+    expect(normalizeArchetypeState(serializeArchetypeState(jack)).isJackOfAllTrades).toBe(true);
   });
 
   it('normalizeArchetypeState backfills a saved Jack flag when no archetype is set', () => {

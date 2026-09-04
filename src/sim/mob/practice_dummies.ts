@@ -16,6 +16,17 @@ import type { Entity, PlayerClass } from '../types';
 // max-armor kit"), so the healing target is the same body those floors describe
 // rather than a second, competing definition of a geared player.
 //
+// AMENDED 2026-09-01 (qr-19-ref-armor-calibration-constant): "the same body" is
+// now true only of the PROSE, not of the numbers. That ruling ratified REF_ARMOR
+// as a PINNED calibration constant at 2861 rather than a live catalog read,
+// while this dummy derives its vitals live (bestEpicGearFor plus
+// characterDerivedStats above), and the committed max-armour kit pins at 4085
+// (tests/heroic_difficulty_floors.test.ts). So the dummy and the difficulty
+// floors DO describe two different bodies today, and the basis of 2861 is itself
+// unsettled; the sibling hazard is recorded the same way at
+// scripts/healing_montecarlo.ts, whose bench pick is a third basis again. Do not
+// read a dummy parse as landing on the floors' reference tank.
+//
 // GEAR ONLY, no talents: the kit is what a player can be handed, while a
 // spec's passive stamina and armor multipliers are what they bring themselves.
 // Excluding them keeps this number a property of the item tables alone.

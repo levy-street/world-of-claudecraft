@@ -109,6 +109,7 @@ export const SERVER_NEW = {
     'moderation.tooManyFailed':
       'Příliš mnoho neúspěšných pokusů. Počkej pár minut a zkus to znovu.',
     'pet.nameNotAllowed': 'Jméno mazlíčka není povoleno.',
+    'legendary.nameNotAllowed': 'Toto jméno není povoleno.',
     'time.day': '{count} den',
     'time.days': '{count} dní',
     'time.hour': '{count} hodina',
@@ -245,6 +246,7 @@ export const SERVER_NEW = {
     'moderation.suspended': 'Denne konto er suspenderet.',
     'moderation.tooManyFailed': 'For mange mislykkede forsøg. Vent et par minutter og prøv igen.',
     'pet.nameNotAllowed': 'Kæledyrsnavnet er ikke tilladt.',
+    'legendary.nameNotAllowed': 'Det navn er ikke tilladt.',
     'time.day': '{count} dag',
     'time.days': '{count} dage',
     'time.hour': '{count} time',
@@ -386,6 +388,7 @@ export const SERVER_NEW = {
     'moderation.tooManyFailed':
       'Terlalu banyak percobaan gagal. Tunggu beberapa menit lalu coba lagi.',
     'pet.nameNotAllowed': 'Nama peliharaan tidak diperbolehkan.',
+    'legendary.nameNotAllowed': 'Nama itu tidak diperbolehkan.',
     'time.day': '{count} hari',
     'time.days': '{count} hari',
     'time.hour': '{count} jam',
@@ -525,6 +528,7 @@ export const SERVER_NEW = {
     'moderation.tooManyFailed':
       'Te veel mislukte pogingen. Wacht een paar minuten en probeer het opnieuw.',
     'pet.nameNotAllowed': 'Huisdiernaam is niet toegestaan.',
+    'legendary.nameNotAllowed': 'Die naam is niet toegestaan.',
     'time.day': '{count} dag',
     'time.days': '{count} dagen',
     'time.hour': '{count} uur',
@@ -667,6 +671,7 @@ export const SERVER_NEW = {
     'moderation.tooManyFailed':
       'Zbyt wiele nieudanych prób. Odczekaj kilka minut i spróbuj ponownie.',
     'pet.nameNotAllowed': 'Imię zwierzęcia jest niedozwolone.',
+    'legendary.nameNotAllowed': 'To imię jest niedozwolone.',
     'time.day': '{count} dzień',
     'time.days': '{count} dni',
     'time.hour': '{count} godzina',
@@ -806,6 +811,7 @@ export const SERVER_NEW = {
     'moderation.tooManyFailed':
       'För många misslyckade försök. Vänta några minuter och försök igen.',
     'pet.nameNotAllowed': 'Djurnamnet är inte tillåtet.',
+    'legendary.nameNotAllowed': 'Det namnet är inte tillåtet.',
     'time.day': '{count} dag',
     'time.days': '{count} dagar',
     'time.hour': '{count} timme',
@@ -943,6 +949,7 @@ export const SERVER_NEW = {
     'moderation.suspended': 'Bu hesap askıya alındı.',
     'moderation.tooManyFailed': 'Çok fazla başarısız deneme. Birkaç dakika bekleyip tekrar dene.',
     'pet.nameNotAllowed': 'Evcil adına izin verilmiyor.',
+    'legendary.nameNotAllowed': 'Bu ada izin verilmiyor.',
     'time.day': '{count} gün',
     'time.days': '{count} gün',
     'time.hour': '{count} saat',
@@ -1082,6 +1089,7 @@ export const SERVER_NEW = {
     'moderation.suspended': 'Tài khoản này đã bị đình chỉ.',
     'moderation.tooManyFailed': 'Quá nhiều lần thử thất bại. Hãy chờ vài phút rồi thử lại.',
     'pet.nameNotAllowed': 'Tên thú nuôi không được phép.',
+    'legendary.nameNotAllowed': 'Tên đó không được phép.',
     'time.day': '{count} ngày',
     'time.days': '{count} ngày',
     'time.hour': '{count} giờ',

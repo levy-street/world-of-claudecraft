@@ -4,6 +4,8 @@
   import { apiGet } from '../api';
   import { recentAccountIps } from '../account_ips';
   import { accountStatusFor } from '../account_status';
+  import { type AdminLoadFailure, classifyAdminLoadFailure } from '../load_failure';
+  import PermissionDenied from './PermissionDenied.svelte';
   import { auth } from '../state/auth.svelte';
   import { fmtDate, fmtNumber } from '../format';
   import { t } from '../i18n';
@@ -24,7 +26,7 @@
   } = $props();
 
   let detail = $state<AccountDetailData | null>(null);
-  let failed = $state(false);
+  let failed = $state<AdminLoadFailure>('none');
   type AccountTab = 'overview' | 'rewardPoints';
   const ACCOUNT_TABS: AccountTab[] = ['overview', 'rewardPoints'];
   let activeTab = $state<AccountTab>('overview');
@@ -37,14 +39,14 @@
   async function refresh(clear = true): Promise<void> {
     const currentRequest = ++requestId;
     if (clear) detail = null;
-    failed = false;
+    failed = 'none';
     try {
       const result = await apiGet<AccountDetailData>(`/admin/api/accounts/${accountId}`);
       if (currentRequest !== requestId) return;
       detail = result;
     } catch (err) {
       if (currentRequest !== requestId) return;
-      if (!auth.handleAuthFailure(err)) failed = true;
+      if (!auth.handleAuthFailure(err)) failed = classifyAdminLoadFailure(err);
     }
   }
 
@@ -140,7 +142,9 @@
     </header>
 
     <div class="account-modal-body">
-      {#if failed}
+      {#if failed === 'forbidden'}
+        <PermissionDenied />
+      {:else if failed === 'error'}
         <div class="empty">{t('accountModal.loadFailed')}</div>
       {:else if detail === null}
         <div class="empty">{t('accountModal.loading')}</div>

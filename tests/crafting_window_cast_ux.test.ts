@@ -9,14 +9,21 @@
 // #crafting-live region), never a node inside the rebuilt subtree.
 
 import { readFileSync } from 'node:fs';
+import * as path from 'node:path';
 import { resolve } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import type { ItemDef } from '../src/sim/types';
 import { CRAFT_CAST_ID } from '../src/sim/types';
 import { CastBarPainter } from '../src/ui/cast_bar_painter';
-import { buildCraftCastSession, IDLE_CRAFT_CAST_SESSION } from '../src/ui/craft_cast_view';
-import { buildCraftingView, type CraftingView } from '../src/ui/crafting_view';
-import { craftCastStripElements, renderCraftingWindow } from '../src/ui/crafting_window';
+import {
+  buildCraftCastSession,
+  IDLE_CRAFT_CAST_SESSION,
+} from '../src/ui/hud/professions/craft_cast_view';
+import { buildCraftingView, type CraftingView } from '../src/ui/hud/professions/crafting_view';
+import {
+  craftCastStripElements,
+  renderCraftingWindow,
+} from '../src/ui/hud/professions/crafting_window';
 import { makeWriterFacet } from '../src/ui/painter_host';
 
 function item(id: string): ItemDef {
@@ -278,6 +285,55 @@ describe('renderCraftingWindow craft-cast UX', () => {
     expect(d.onCraft).toHaveBeenCalledWith('recipe_test_stew', 4);
   });
 
+  it('a oncePerDay row states the limit and caps every batch affordance at one', () => {
+    // The Phase 07 review pair: maxCraftBatchFit keeps the affordances
+    // honest, and the Once per day label explains the frozen stepper BEFORE
+    // the attempt (chip, and the accessible name; the tooltip line rides
+    // deps.attachTooltip and is pinned by the chip's shared label).
+    const el = document.createElement('div');
+    const gatedView = buildCraftingView(
+      [
+        {
+          id: 'recipe_test_catalyst',
+          professionId: 'cooking',
+          resultItemId: 'test_stew',
+          resultCount: 1,
+          reagents: [{ itemId: 'copper_ore', count: 1 }],
+          skillReq: 0,
+          oncePerDay: true as const,
+        },
+      ],
+      [{ itemId: 'copper_ore', count: 4 }],
+      ITEMS,
+    );
+    const d = deps(1);
+    renderCraftingWindow(el, gatedView, d);
+    const chip = el.querySelector('.crafting-daily-chip');
+    expect(chip?.textContent).toBe('Once per day');
+    // Stylesheet reach (the guide-badge lesson): the daily chip's OWN class
+    // has no rule; every visual rides the co-applied duration-chip class.
+    // Class presence alone is blind to selector reach, so pin the
+    // co-application AND that the styled class has a live rule; splitting
+    // the markup or renaming the styled class reds here instead of shipping
+    // an unstyled chip glued to its neighbors.
+    expect(chip?.classList.contains('crafting-duration-chip')).toBe(true);
+    const componentsCss = readFileSync(
+      path.resolve(process.cwd(), 'src/styles/components.css'),
+      'utf8',
+    ).replace(/\/\*[\s\S]*?\*\//g, '');
+    // Selector-list tolerant: the rule stays live if the class is folded
+    // into a list; [^}]* cannot cross a preceding rule's body once comments
+    // are stripped, so the match stays within one selector region.
+    expect(componentsCss).toMatch(/\.crafting-duration-chip\b[^}]*\{/);
+    const aria = el.querySelector('.crafting-recipe-btn')!.getAttribute('aria-label') ?? '';
+    expect(aria).toContain('Once per day');
+    // Mats fit four crafts; the daily cap holds every affordance at one.
+    const inc = el.querySelector<HTMLButtonElement>('[data-focus-key^="qty-inc:"]');
+    expect(inc!.disabled).toBe(true);
+    el.querySelector<HTMLButtonElement>('.crafting-create-all-btn')!.click();
+    expect(d.onCraft).toHaveBeenCalledWith('recipe_test_catalyst', 1);
+  });
+
   it('disables qty stepper while casting and paints the cold batch label', () => {
     const el = document.createElement('div');
     const session = buildCraftCastSession({
@@ -494,5 +550,39 @@ describe('renderCraftingWindow vault-draw suffix (Phase 04)', () => {
     expect(noteAt, '.crafting-vault-note rule missing from components.css').toBeGreaterThan(-1);
     const noteBody = css.slice(noteAt, css.indexOf('}', noteAt));
     expect(noteBody).toContain('color: var(--color-text-muted)');
+  });
+});
+
+describe('crafting reagent entries never break mid-entry (the wiki twin rule, Phase 18)', () => {
+  // One reagent entry (name plus its have/required count) is an inline-block
+  // with nowrap, so a long name wraps the reagent LIST between entries rather
+  // than splitting an entry across lines; the wiki's recipe cells carry the
+  // same rule (.guide-prof-mat), and the two surfaces read a bill alike.
+  it('.crafting-reagent is inline-block + nowrap in components.css, mirroring .guide-prof-mat', () => {
+    const css = readFileSync(path.resolve(process.cwd(), 'src/styles/components.css'), 'utf8');
+    expect(css).toMatch(
+      /\.crafting-reagent \{[^}]*display: inline-block;[^}]*white-space: nowrap;[^}]*\}/s,
+    );
+    // ONE block, not two: the two frontend units that landed this rule each
+    // wrote their own, and the earlier white-space-only block was entirely
+    // subsumed by this one while carrying a second, competing rationale. A
+    // regex that only proves the surviving block exists stays green with the
+    // dead twin back above it.
+    expect(css.match(/^\s*\.crafting-reagent \{/gm) ?? []).toHaveLength(1);
+    const guide = readFileSync(path.resolve(process.cwd(), 'src/guide/styles.css'), 'utf8');
+    expect(guide).toMatch(
+      /\.guide-prof-mat \{[^}]*display: inline-block;[^}]*white-space: nowrap;/s,
+    );
+    // The unsat tint stays a SEPARATE rule beside it (the count in the text is
+    // the signal; the tint is the redundant hint), so neither rule swallows
+    // the other.
+    expect(css).toMatch(/\.crafting-reagent\.unsat \{[^}]*color: var\(--color-text-error\);/s);
+    // And the window emits the class on every reagent span, so the rule has a
+    // target (a renamed class would leave the CSS green and inert).
+    const src = readFileSync(
+      path.resolve(process.cwd(), 'src/ui/hud/professions/crafting_window.ts'),
+      'utf8',
+    );
+    expect(src).toContain('class="crafting-reagent${');
   });
 });

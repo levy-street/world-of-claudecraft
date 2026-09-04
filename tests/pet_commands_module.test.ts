@@ -74,7 +74,7 @@ function spawnBroodmotherEgg(sim: AnySim, near: AnyEntity): AnyEntity {
 }
 
 describe('pet_commands module (P1b)', () => {
-  it('commands Gloomshade signature skill and exposes its independent autocast toggle', () => {
+  it('commands Duskmurk signature skill and exposes its independent autocast toggle', () => {
     const sim = new Sim({
       seed: 13,
       playerClass: 'warlock',
@@ -177,7 +177,7 @@ describe('pet_commands module (P1b)', () => {
     expect(saved?.autoSkill).toBe(false);
 
     sim.ctx.despawnPet(original);
-    if (!saved) throw new Error('Expected a serialized Gloomshade.');
+    if (!saved) throw new Error('Expected a serialized Duskmurk.');
     restorePet(sim.ctx, owner, saved);
     const restored = petOf(sim.ctx, pid) as AnyEntity;
     expect(restored.petAutoSkill).toBe(false);
@@ -192,7 +192,7 @@ describe('pet_commands module (P1b)', () => {
     const enabledState = serializePet(sim.ctx, pid);
     expect(enabledState?.autoSkill).toBe(true);
     sim.ctx.despawnPet(legacyRestored);
-    if (!enabledState) throw new Error('Expected an enabled Gloomshade state.');
+    if (!enabledState) throw new Error('Expected an enabled Duskmurk state.');
     restorePet(sim.ctx, owner, enabledState);
     expect((petOf(sim.ctx, pid) as AnyEntity).petAutoSkill).toBe(true);
   });

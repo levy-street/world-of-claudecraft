@@ -25,6 +25,7 @@ import {
   resolveDepositSubmit,
   vendorSellIsInstant,
 } from '../src/ui/bags_view';
+import { adoptedTrophyIds } from './helpers/adopted_trophy_ids';
 
 // The bags core decides the mode-dependent click + tooltip (the 6-way branch) and
 // the filtered grid model (empty / no-match / items), reusing bag_filter for the
@@ -48,6 +49,8 @@ const NO_MODE: BagMode = {
 const ITEMS: Record<string, ItemDef> = {
   sword: { kind: 'weapon', name: 'Sword', quality: 'rare' } as ItemDef,
   potion: { kind: 'potion', name: 'Potion', quality: 'common' } as ItemDef,
+  elixir: { kind: 'elixir', name: 'Elixir', quality: 'common' } as ItemDef,
+  scroll: { kind: 'scroll', name: 'Scroll', quality: 'common' } as ItemDef,
   bread: { kind: 'food', name: 'Bread', quality: 'common' } as ItemDef,
   questItem: { kind: 'quest', name: 'Relic', quality: 'epic' } as ItemDef,
   bound: { kind: 'armor', name: 'Bound Plate', quality: 'uncommon', noMarketList: true } as ItemDef,
@@ -75,6 +78,28 @@ const ITEMS: Record<string, ItemDef> = {
     soulbound: true,
     noDiscard: true,
   } as ItemDef,
+  // A recipe pattern: teaches teachesRecipeId when used from the bags, then is
+  // consumed. It carries no def-level `use` payload, so it reaches the click
+  // ladder's final fall-through like a mount reins item does.
+  pattern: {
+    kind: 'recipe',
+    name: 'Pattern: Eastbrook Arming Sword',
+    quality: 'rare',
+    // A REAL recipe id (recipes.ts), not an item id: nothing here resolves it,
+    // but a fixture carrying an item id in a recipe field is the kind of thing
+    // the next author copies into a place that DOES resolve it.
+    teachesRecipeId: 'recipe_eastbrook_arming_sword',
+  } as ItemDef,
+  // The placeable shared feast (Farming Phase 12): the feast FIELD is the
+  // classifier, mirrored by the plain-junk twin below that must stay on the
+  // use ladder.
+  feastItem: {
+    kind: 'junk',
+    name: 'Harvest Feast',
+    quality: 'rare',
+    feast: { charges: 10, durationTicks: 3600, dishItemId: 'evergarden_braised_greens' },
+  } as ItemDef,
+  plainJunk: { kind: 'junk', name: 'Cracked Fang', quality: 'common' } as ItemDef,
   pouch: { kind: 'bag', name: 'Linen Pouch', quality: 'common', bagSlots: 6 } as ItemDef,
   junk: { kind: 'junk', name: 'Vendor Trash', quality: 'poor' } as ItemDef,
 };
@@ -176,6 +201,92 @@ describe('bagItemAction priority order', () => {
     expect(bagItemAction(ITEMS.sword, { ...NO_MODE, petFeed: true })).toBe('petFeedBlocked');
     expect(bagItemAction(ITEMS.questItem, NO_MODE)).toBe('discardQuest');
     expect(bagItemAction(ITEMS.potion, NO_MODE)).toBe('use');
+    // A recipe pattern falls through to the same 'use' rung: using it teaches
+    // the recipe and consumes the copy.
+    expect(bagItemAction(ITEMS.pattern, NO_MODE)).toBe('use');
+  });
+
+  it('stages a recipe pattern in every transfer mode like an ordinary tradable drop', () => {
+    // A pattern carries no transfer restriction of its own (no noMarketList,
+    // no soulbound, no quest kind), and that is a claim about the whole mode
+    // matrix, not only the NO_MODE rung the case above covers. The literals
+    // come first on purpose: a bare compare against the reference item would
+    // stay green if the ladder broke for BOTH of them.
+    const MODES = [
+      'tradeOpen',
+      'mailAttach',
+      'marketSell',
+      'vendorOpen',
+      'guildBankDeposit',
+      'bankDeposit',
+    ] as const;
+    const staged = MODES.map((mode) => bagItemAction(ITEMS.pattern, { ...NO_MODE, [mode]: true }));
+    expect(staged).toEqual([
+      'trade',
+      'mailAttach',
+      'marketSell',
+      'vendorSell',
+      'guildBankDeposit',
+      'bankDeposit',
+    ]);
+    // And identical to the unrestricted reference item, so a def-level gate
+    // added to patterns later cannot land without failing here.
+    expect(staged).toEqual(
+      MODES.map((mode) => bagItemAction(ITEMS.sword, { ...NO_MODE, [mode]: true })),
+    );
+  });
+});
+
+describe('the placeable feast classification (Farming Phase 12)', () => {
+  it('classifies a def carrying the feast field as placeFeast, never plain use', () => {
+    expect(bagItemAction(ITEMS.feastItem, NO_MODE)).toBe('placeFeast');
+  });
+
+  it('the hover previews the click the feast arm raises, in the feast`s own words', () => {
+    // The frontend-seam review's ask plus the P12 QA copy deferral: the feast
+    // needs a hint sub-line (hover-previews-click doctrine), and the click
+    // SETS OUT the table (placeFeast), it never eats it, so the hint is the
+    // dedicated set-out key, never the generic use line.
+    expect(bagTooltipHintKey(ITEMS.feastItem, NO_MODE)).toBe('itemUi.tooltip.clickSetOut');
+    // The real shipped def rides the same key (the fixture cannot detach).
+    expect(bagTooltipHintKey(CATALOG_ITEMS.harvest_feast, NO_MODE)).toBe(
+      'itemUi.tooltip.clickSetOut',
+    );
+  });
+
+  it('keeps a plain junk def (no feast field) on the use ladder', () => {
+    // The twin that keeps the arm honest: without it, classifying EVERY junk
+    // item as placeFeast would pass the positive arm above.
+    expect(bagItemAction(ITEMS.plainJunk, NO_MODE)).toBe('use');
+  });
+
+  it('a station-placing tool hovers the set-up hint, the feast pattern`s twin (phase 14)', () => {
+    // ONE deployable-hint pattern: a placeable's hover speaks its family's
+    // own placement verb (feast "set out", station "set up", the sim
+    // placement line's verb), never the generic use line. Off the real
+    // catalog def so the hint cannot detach from the item the sim places.
+    expect(CATALOG_ITEMS.masters_field_forge).toBeDefined();
+    expect(bagTooltipHintKey(CATALOG_ITEMS.masters_field_forge, NO_MODE)).toBe(
+      'itemUi.tooltip.clickSetUp',
+    );
+    // The junk twin that keeps the arm honest: no use payload, no set-up hint.
+    expect(bagTooltipHintKey(ITEMS.plainJunk, NO_MODE)).not.toBe('itemUi.tooltip.clickSetUp');
+  });
+
+  it('every window mode still outranks the feast arm (a vendor click sells it)', () => {
+    expect(bagItemAction(ITEMS.feastItem, { ...NO_MODE, tradeOpen: true })).toBe('trade');
+    expect(bagItemAction(ITEMS.feastItem, { ...NO_MODE, marketSell: true })).toBe('marketSell');
+    expect(bagItemAction(ITEMS.feastItem, { ...NO_MODE, vendorOpen: true })).toBe('vendorSell');
+    expect(bagItemAction(ITEMS.feastItem, { ...NO_MODE, bankDeposit: true })).toBe('bankDeposit');
+    expect(bagItemAction(ITEMS.feastItem, { ...NO_MODE, petFeed: true })).toBe('petFeedBlocked');
+  });
+
+  it('the REAL shipped harvest_feast def classifies as placeFeast (the wiring is live)', () => {
+    // Off the real catalog, so the classification cannot silently detach from
+    // the item the sim actually places (a renamed field would red here while
+    // every fixture arm above stayed green).
+    expect(CATALOG_ITEMS.harvest_feast).toBeDefined();
+    expect(bagItemAction(CATALOG_ITEMS.harvest_feast, NO_MODE)).toBe('placeFeast');
   });
 });
 
@@ -252,6 +363,51 @@ describe('vendorSellIsInstant (the plain-click vendor sale safety gate)', () => 
     // recipe-minted stack would misread as safe junk despite carrying provenance.
     expect(vendorSellIsInstant(ITEMS.junk, undefined, 'recipe_tangled_weed')).toBe(false);
     expect(vendorSellIsInstant(ITEMS.junk, undefined, undefined)).toBe(true);
+  });
+
+  it('the REAL catalog: an adopted trophy prompts, grey trash still sells on the spot', () => {
+    // Masterwrought phase 11l adopted seven junk mob drops as TROPHY_RECIPES
+    // reagents (five promoted poor -> common, two already common). This
+    // gate reads quality, so a plain vendor click on one routes to the
+    // confirm prompt instead of selling instantly. The adopted list is
+    // DERIVED from the shipped rows by the shared
+    // tests/helpers/adopted_trophy_ids.ts (every junk-kind reagent of a
+    // trophy row that no other recipe also consumes) and held equal to the
+    // literal, so a newly adopted trophy cannot leave this arm silently
+    // under-covering and a re-picked reagent reds the literal. Pinned off
+    // the shipped defs so the gate cannot detach from what the catalog says.
+    // The chipped tusk left the list when the sixth fix round
+    // output-excluded it, and the bogiron nugget and the cracked fetish when
+    // the 11l QA excluded them the same way: poor again, all three sell on
+    // the spot like the holdouts.
+    const adopted = [
+      'bandit_bandana',
+      'cracked_ogre_tusk',
+      'cracked_wyrm_scale',
+      'emberwing_cinderscale',
+      'mudfin_scale',
+      'old_cragmaws_pelt',
+      'tallow_candle',
+    ];
+    // A do-not-shrink marker, not a pin: it compares the literal to itself
+    // and can only red when someone edits the list above. The derived
+    // equality on the next line is the pin.
+    expect(adopted).toHaveLength(7);
+    expect(adoptedTrophyIds(CATALOG_ITEMS)).toEqual(adopted);
+    for (const id of adopted) {
+      expect(CATALOG_ITEMS[id], `${id} is a real item`).toBeDefined();
+      expect(vendorSellIsInstant(CATALOG_ITEMS[id]), `${id} prompts now`).toBe(false);
+    }
+    for (const id of [
+      'tangled_weed',
+      'soggy_moccasin',
+      'chipped_tusk',
+      'bogiron_nugget',
+      'cracked_fetish',
+    ]) {
+      expect(CATALOG_ITEMS[id], `${id} is a real item`).toBeDefined();
+      expect(vendorSellIsInstant(CATALOG_ITEMS[id]), `${id} still sells instantly`).toBe(true);
+    }
   });
 });
 
@@ -666,6 +822,10 @@ describe('bagTooltipHintKey', () => {
     expect(bagTooltipHintKey(ITEMS.sword, NO_MODE)).toBe('itemUi.tooltip.clickEquip');
     expect(bagTooltipHintKey(ITEMS.bread, NO_MODE)).toBe('itemUi.tooltip.clickConsume');
     expect(bagTooltipHintKey(ITEMS.potion, NO_MODE)).toBe('itemUi.tooltip.clickUseInstant');
+    // Elixirs and scrolls consume instantly on click like a potion (the
+    // widened items.ts arm), so the hover previews the same instant use.
+    expect(bagTooltipHintKey(ITEMS.elixir, NO_MODE)).toBe('itemUi.tooltip.clickUseInstant');
+    expect(bagTooltipHintKey(ITEMS.scroll, NO_MODE)).toBe('itemUi.tooltip.clickUseInstant');
     expect(bagTooltipHintKey(ITEMS.rod, NO_MODE)).toBe('itemUi.tooltip.clickUse');
     // Charms refuse bag use (sim: "Open Professions to slot that."); the hint
     // must not advertise click-to-use for a click that only errors.
@@ -673,6 +833,8 @@ describe('bagTooltipHintKey', () => {
       'hudChrome.professions.toolEffectTooltip.openProfessions',
     );
     expect(bagTooltipHintKey({ kind: 'junk' }, NO_MODE)).toBe('');
+    // A recipe pattern hints click-to-use, like the fishing rod above.
+    expect(bagTooltipHintKey(ITEMS.pattern, NO_MODE)).toBe('itemUi.tooltip.clickUse');
   });
 
   it('raw cooking catches are not clickConsume (junk reagents, no food kind)', () => {
@@ -803,6 +965,22 @@ describe('bagQualityKey', () => {
   it('falls back to common when quality is unset', () => {
     expect(bagQualityKey({ quality: 'epic' })).toBe('epic');
     expect(bagQualityKey({})).toBe('common');
+  });
+
+  it('reads instance-effective quality: a promoted copy outranks its def, a plain copy does not', () => {
+    // The all-surfaces item-cell rule (phase 13): the rim describes the COPY.
+    expect(bagQualityKey({ quality: 'epic' }, { rolled: { quality: 'legendary' } })).toBe(
+      'legendary',
+    );
+    // Def-only negatives: no payload, and a payload with no rolled quality,
+    // both keep the def tier.
+    expect(bagQualityKey({ quality: 'epic' }, undefined)).toBe('epic');
+    expect(bagQualityKey({ quality: 'epic' }, { signer: 'Ana' })).toBe('epic');
+    // An unrecognized rolled string narrows back to the def tier (the
+    // tooltipEffectiveQuality hostile-wire doctrine), never leaks into a class.
+    expect(bagQualityKey({ quality: 'epic' }, { rolled: { quality: 'mythic' } } as never)).toBe(
+      'epic',
+    );
   });
 });
 

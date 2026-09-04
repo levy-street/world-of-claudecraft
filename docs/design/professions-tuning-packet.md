@@ -505,16 +505,26 @@ Its own phase because it is the only one that touches persistence and the wire.
   slot, so the window shows one row per profession and never a list per item.
 - **Rarity is a COARSENING of tier, not a second axis.** Every shipped gathering
   tool's rarity follows its tier, and tiers 1 and 2 are both common. For LAND
-  tools that makes the charge bonus a genuine step function. For RODS it is
+  tools that makes the charge bonus a genuine step function. For RODS it WAS
   perfectly collinear (2 common, 3 uncommon, 4 rare, 5 epic), so the reel-window
-  bonus IS a tier bonus wearing rarity's coat. Both modules say so outright
+  bonus was a tier bonus wearing rarity's coat. THE COLLINEARITY BROKE AT
+  masterwrought Phase 11i: the tier-6 clockreel is EPIC, the same rarity as the
+  tier-5 tidewrought, so the two axes genuinely part and the apex rung gains
+  0.75 s of window from its tier and nothing at all from rarity. That is the
+  ruling working rather than a wrinkle in it, since the rule was expressed as
+  rarity precisely so a rung could decline to raise it. Both modules say so outright
   rather than leaving a reader to discover it, and the test that proves the reel
   term is real holds the TIER FIXED, since every shipped rod would also pass a
   tier-only implementation.
-- **The reel-window rung was sized by the session cap, not by feel.** The cap is
+- **The reel-window rung was sized by the session cap, not by feel.** The cap WAS
   300 ticks and the worst legal session was 271, leaving 29. At 0.25 s per
   rarity rung the epic rod's three steps cost 15 ticks, landing the worst
-  session at 286. 0.5 would not have fitted, and a mutation pass confirms the
+  session at 286. THE CAP MOVED TO 16 s (320 ticks) AT masterwrought Phase 11i,
+  and it was forced rather than chosen: the tier-6 epic rod opens a 7.00 s
+  window (2.5 + 0.75 x 5 + 0.25 x 3 = 140 ticks), so the worst legal session
+  became 160 + 140 + 1 = 301 against the old 300, over by exactly the miss
+  arm's one tick. Recorded there as a deviation for the maintainer to ratify or
+  revert. 0.5 would not have fitted, and a mutation pass confirms the
   budget reddens at that value rather than silently letting the cap eat a legal
   reel window. Both former inline copies of the window formula in
   `tests/fishing_zones.test.ts` now call `fishReelWindowSecFor`; the budget one

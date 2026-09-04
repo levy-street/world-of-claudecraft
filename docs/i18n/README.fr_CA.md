@@ -234,7 +234,7 @@ Chaque instance tourne aussi en **Héroïque** : des ennemis de niveau supérieu
 
 ### Delves
 
-Les delves sont un mode séparé et évolutif pour petit groupe d'un ou deux joueurs, reconstruit à partir de chambres aléatoires à chaque partie et se terminant sur un coffre-reliquaire verrouillé qui s'ouvre par un mini-jeu de crochetage plutôt que par un jet de butin. **The Collapsed Reliquary** (niveau 7 et plus) se termine chez Deacon Varric, avec une compagne IA, Tessa, qui combat à vos côtés si vous y allez seul. **The Drowned Litany** (niveau 12 et plus) suit la piste jusqu'à un sanctuaire inondé à la lisière de Mirefen Marsh. Un tableau des delves fixe le palier : Héroïque relève les niveaux des ennemis et ajoute un affixe aléatoire pour de plus riches récompenses.
+Les delves sont un mode séparé et évolutif pour petit groupe d'un ou deux joueurs, reconstruit à partir de chambres aléatoires à chaque partie et se terminant sur un coffre-reliquaire verrouillé qui s'ouvre par un mini-jeu de crochetage plutôt que par un jet de butin. **The Collapsed Reliquary** (niveau 7 et plus) se termine chez Deacon Vandric, avec une compagne IA, Tessa, qui combat à vos côtés si vous y allez seul. **The Drowned Litany** (niveau 12 et plus) suit la piste jusqu'à un sanctuaire inondé à la lisière de Mirefen Marsh. Un tableau des delves fixe le palier : Héroïque relève les niveaux des ennemis et ajoute un affixe aléatoire pour de plus riches récompenses.
 
 ### JcJ classé (the Ashen Coliseum)
 

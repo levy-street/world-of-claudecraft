@@ -64,7 +64,8 @@ export const vi_VN: EnTranslations = {
       "dungeon": "Hầm Ngục",
       "difficulty": "Độ Khó",
       "name": "Tên",
-      "spec": "Chuyên Môn"
+      "spec": "Chuyên Môn",
+      "bed": "Bed id (optional)"
     },
     "difficulty": {
       "normal": "Thường",
@@ -150,6 +151,10 @@ export const vi_VN: EnTranslations = {
       "gather": {
         "label": "Tăng kỹ năng thu thập",
         "description": "Tăng cấp một nghề thu thập."
+      },
+      "farmgrow": {
+        "label": "Ripen crops",
+        "description": "Bring your planted crop beds to their ready time, or one bed by id. Nothing else changes: the outcome was rolled when you planted."
       },
       "teleport": {
         "label": "Dịch chuyển",
@@ -681,7 +686,7 @@ export const vi_VN: EnTranslations = {
         "ice_fang_sword": {
           "name": "Nanh băng",
           "look": "Lưỡi cong làm bằng băng băng nhạt, những tinh thể sương muối lởm chởm dọc theo sống lưng, một lõi đông lạnh màu lục lam phát sáng ở lớp chắn ngang đầy đặn hơn bằng băng.",
-          "lore": "Sản phẩm hàng đầu của loại đông lạnh và là sản phẩm mà mọi nhà sưu tập đều hướng tới đầu tiên. Ice Fang được chạm khắc chứ không phải rèn từ một nhánh sông băng bao phủ Thornpeak phía trên Highwatch, lõi màu lục lam của nó cháy lạnh như ánh sáng của Glimmermere. Nó tạo ra không khí mà nó cắt. Người bảo vệ tường thề rằng một người lính đã mang nó vào đêm tuyết dày đã cản trở Wyrmcult, và 'đã mua được bức tường trong mùa đông'."
+          "lore": "Sản phẩm hàng đầu của loại đông lạnh và là sản phẩm mà mọi nhà sưu tập đều hướng tới đầu tiên. Ice Fang được chạm khắc chứ không phải rèn từ một nhánh sông băng bao phủ Thornpeak phía trên Highwatch, lõi màu lục lam của nó cháy lạnh như ánh sáng của Glimmermere. Nó tạo ra không khí mà nó cắt. Người bảo vệ tường thề rằng một người lính đã mang nó vào đêm tuyết dày đã cản trở Broodsworn, và 'đã mua được bức tường trong mùa đông'."
         },
         "glaciersplit_axe": {
           "name": "Rìu Tách Băng",
@@ -709,7 +714,7 @@ export const vi_VN: EnTranslations = {
           "lore": "Một nhánh băng sông băng phát sáng, được cho là bị vỡ ra từ vùng đất sâu bên dưới Sanctum, nơi cái lạnh của ngọn núi có răng. Sương muối nở không ngừng từ vòng cổ bạc của nó và không bao giờ tan, không phải do lửa hay mùa hè. Pháp Sư giữ nó ở gần vì cái lạnh mà nó mang lại cho công việc của họ, và giữ nó ở xa vào những đêm nó dường như nghiêng về phía hầm mộ của Nythraxis và lắng nghe."
         },
         "winterbite": {
-          "name": "Nanh Đông",
+          "name": "Wintergnaw",
           "look": "Thép bạc và cung băng xanh, lõi đông lạnh màu lục lam phát sáng trong ống đứng, một mũi tên có móc bằng băng rắn, hơi lạnh.",
           "lore": "Một cây cung bằng thép bạc và băng Thornpeak, phần nâng của nó được thắp sáng bởi lõi màu lục lam lạnh lẽo có tác dụng đóng băng mũi tên vào dây. Nó tạo thành một trục băng sông băng rắn chắc cải cách mỗi lần vẽ; người bắn cung không mang theo ống tên trên tường, chỉ mang theo cái lạnh. Highwatch đã giữ Rình Rậper Ridge vượt qua một cuộc bao vây với một người giống như vậy: họ nói, một cung thủ duy nhất và những mũi tên giá trị cho cả một mùa đông luôn ở đó."
         },
@@ -1035,11 +1040,6 @@ export const vi_VN: EnTranslations = {
       "clearArmed": "Chạm vào một ô để xóa nó."
     },
     "tutorialGreeting": {
-      "bodyFirst": "Ta chưa từng thấy bạn quanh đây trước kia, bạn hỡi. Ở vùng đất này có một truyền thống: những ai mới bắt đầu cuộc phiêu lưu sẽ ghé thăm Bờ Biển Thử Thách, một hòn đảo yên tĩnh ngoài eo biển. Ở đó bạn có thể rèn giũa kỹ năng và làm quen với thế giới trước khi đối mặt với những thử thách của nó. Chuyến phà chạy cả hai chiều, và dù bạn chọn thế nào cũng chẳng ai nghĩ kém về bạn.",
-      "bodyRefresher": "Lại quay về với một gương mặt mới à? Vậy thì bạn đã biết cách này rồi. Nhưng nếu bạn muốn ôn lại đôi chút trước khi lên đường, Bờ Biển Thử Thách chẳng bao giờ từ chối một học trò trở lại, và chuyến phà luôn sẵn sàng khi bạn cần.",
-      "play": "Bắt đầu hướng dẫn",
-      "skip": "Bỏ qua hướng dẫn",
-      "declineNote": "Tùy ý bạn, bạn hỡi. Nếu có bao giờ bạn đổi ý, chiếc chuông phà cạnh hòm thư Bưu Quạ sẽ đưa bạn qua Bờ Biển Thử Thách bất kể ngày đêm. Nó vẫn sẽ ở đây, ngay cả khi lũ sói không còn.",
       "bellHomeNote": "Đã quay lại từ bờ biển rồi sao? Đó là tiếng chuông phà bạn vừa rung đấy. Chiếc chuông song sinh của nó treo ngay cạnh hòm thư Bưu Quạ: rung nó bất cứ lúc nào và chuyến phà sẽ đưa bạn trở lại Bờ Biển Thử Thách. Dù chọn cách nào cũng chẳng hại gì.",
       "islandArrivalNote": "Chào mừng đến với Bờ Biển Thử Thách. Vệ Quan Tam đang chờ ngay phía trên bãi biển: hãy đến gặp ông ấy.",
       "noteClose": "Đã hiểu"
@@ -1388,7 +1388,7 @@ export const vi_VN: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, Cóc Nhảy Bóng Tối",
       "name_stormfeather_griffin": "Stormfeather Vươn Trời",
       "name_thunderstrut_gobbler": "Thunderstrut, Gà Tây Vĩ Đại",
-      "name_terrorspark_groundshaker": "Tia Kinh Hoàng, Kẻ Rung Chuyển Mặt Đất",
+      "name_terrorspark_groundshaker": "Dreadspark Groundshaker",
       "name_drakemaw_raptor": "Cuồng Long Drakemaw",
       "name_mech_bird": "Cluckwork Mech Bird",
       "name_lanternback_troll": "Grumbol the Lanternback",
@@ -1950,7 +1950,7 @@ export const vi_VN: EnTranslations = {
         "battleTrance": "Nhập Định Chiến Đấu",
         "overpowerCharge": "Tăng Cường Bàn Tay Đẫm Máu",
         "suddenDeath": "Đột Tử",
-        "victoryRush": "Đà Chiến Thắng",
+        "victoryRush": "Victor's Surge",
         "enrage": "Cuồng Loạn: Phẫn Nộ",
         "heatingUp": "Đang Nóng Lên",
         "arcaneCharge": "Điện Tích Bí Thuật",
@@ -2092,6 +2092,15 @@ export const vi_VN: EnTranslations = {
     "itemHeroicLabel": "Anh Hùng",
     "itemSoulbound": "Ràng Buộc Linh Hồn",
     "itemUniqueEquipped": "Độc Nhất Khi Trang Bị",
+    "itemMasterwrought": "Unique-Equipped: Masterwrought ({count})",
+    "masterwrought": {
+      "slotsLabel": "Masterwrought slots:",
+      "slotsValue": "{used} / {cap}",
+      "pieceMark": "Masterwrought",
+      "tooltipWorn": "Occupies a Masterwrought slot ({used} of {cap} in use).",
+      "tooltipLegendaryLimit": "Only {cap} legendary Masterwrought piece can be worn.",
+      "tooltipAtCap": "All {cap} of your Masterwrought slots are in use."
+    },
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2121,6 +2130,18 @@ export const vi_VN: EnTranslations = {
       "linkHint": "Shift-click để chia sẻ vật phẩm này trong khung chat."
     },
     "plurals": {
+      "commissionMasterworks": {
+        "one": "{count} masterwork",
+        "few": "{count} masterworks",
+        "many": "{count} masterworks",
+        "other": "{count} masterworks"
+      },
+      "commissionLegendaries": {
+        "one": "{count} legendary",
+        "few": "{count} legendaries",
+        "many": "{count} legendaries",
+        "other": "{count} legendaries"
+      },
       "guildMembers": {
         "one": "bạn là {rank}, {count} thành viên",
         "few": "bạn là {rank}, {count} thành viên",
@@ -2730,7 +2751,7 @@ export const vi_VN: EnTranslations = {
       "sanguine": "Tăng tốc độ tấn công thêm {hastePct}% và sát thương gây ra thêm {dmgPct}%",
       "battleTrance": "Đòn Cướp Phá hoặc Đòn Tàn Phế tiếp theo của bạn không tốn nộ khí",
       "revengeFree": "Phục Thù tiếp theo của bạn không tốn nộ khí",
-      "victoryRush": "Đà Chiến Thắng đã sẵn sàng",
+      "victoryRush": "Victor's Surge is ready",
       "maxHpPct": "Tăng máu tối đa thêm {pct}%",
       "enrage": "Sát thương gây ra tăng {damagePct}%, tốc độ đánh tăng {hastePct}%, và tốc độ di chuyển tăng {movePct}%",
       "suddenDeath": "Nấm Mồ Sớm tiếp theo của bạn không tốn Nộ Khí và bỏ qua yêu cầu về lượng máu",
@@ -3024,20 +3045,34 @@ export const vi_VN: EnTranslations = {
       "riftSockets": "Ngọc Rạn Nứt {used}/{total}",
       "statEnchanted": "+{value} {stat} (Đã Pháp Khắc)",
       "enchantedFallback": "Đã Pháp Khắc",
-      "partyTradeWindow": "Bạn có thể giao dịch vật phẩm này cho những người chơi đã cùng nhận nó rơi ra, trong {time} tới. Trang bị nó sẽ kết thúc khoảng thời gian giao dịch này."
+      "partyTradeWindow": "Bạn có thể giao dịch vật phẩm này cho những người chơi đã cùng nhận nó rơi ra, trong {time} tới. Trang bị nó sẽ kết thúc khoảng thời gian giao dịch này.",
+      "perfectedBadge": "Perfected",
+      "perfectingRank": "Perfecting: rank {rank} of {ranks}"
     },
     "materialHint": {
       "fineGrade": "Phẩm cấp hảo hạng. Thu được từ mạch đủ bậc bằng công cụ xếp trên nguyên liệu, và được tính như bản thường ở bất cứ đâu cần đến.",
       "cookingCatch": "Nguyên liệu nấu ăn. Phải nấu chín trước khi ăn.",
       "usedBy": "Được dùng bởi {crafts}.",
-      "arcaneDust": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trang bị phổ thông và khác thường.",
-      "arcaneEssence": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trang bị hiếm.",
+      "arcaneDust": "Crafting reagent. Disenchanted from common and uncommon gear.",
+      "arcaneEssence": "Crafting reagent. Disenchanted from rare gear.",
       "arcaneShard": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trang bị sử thi và huyền thoại.",
       "resonantThread": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc giáp vải hiếm trở lên.",
       "resonantHide": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc giáp da hiếm trở lên.",
       "resonantLinks": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc giáp lưới hiếm trở lên.",
       "resonantSteel": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc vũ khí cận chiến hiếm trở lên.",
-      "resonantTimber": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trượng, đũa phép, cung, và nỏ hiếm trở lên."
+      "resonantTimber": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trượng, đũa phép, cung, và nỏ hiếm trở lên.",
+      "masterwroughtIntermediate": "Masterwrought crafting component.",
+      "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day.",
+      "growthTonic": "Farming supply. Spent when you plant a crop for a chance of a slightly larger harvest. If the crop withers, the tonic is lost with it.",
+      "deedOfMaking": "Inscription writ. Consumed to raise a Perfected Masterwrought work to legendary and give it a name.",
+      "wyrmfallCore": "Masterwrought crafting catalyst. The raid final boss drops 1 to 3 to each player once per day on each difficulty. Heroic dungeon final bosses each drop 1 to 3 to each player once per day. Your first A or S rank Rift race win of the day grants 1 at A rank or 2 at S rank. The Heroic Quartermaster sells one for Heroic Marks.",
+      "mudfinScale": "Crafting reagent. Mudfin Skulkers drop it about half the time, the deeper marsh fish a little less often, and the named terrors of those waters always.",
+      "crackedWyrmScale": "Crafting reagent. Sanctum Scaleguards drop it about half the time, and nothing else in the world carries one.",
+      "crackedOgreTusk": "Crafting reagent. Brutok Skullsmasher carries one every time he falls, and he is its only source.",
+      "tallowCandle": "Crafting reagent. Deeprock diggers drop it more often than not and Gravecaller cultists now and then, while the named leaders of both always carry one.",
+      "banditBandana": "Crafting reagent. Bandits drop it about half the time, and their named leaders always carry one.",
+      "oldCragmawsPelt": "Crafting reagent. Old Cragmaw yields one every time he falls, and no other beast carries it.",
+      "emberwingCinderscale": "Crafting reagent. Voskar the Emberwing yields one every time he falls, and no other beast carries it."
     },
     "discord": {
       "title": "Discord",
@@ -3353,7 +3388,7 @@ export const vi_VN: EnTranslations = {
       "sortAria": "Sắp xếp vật phẩm ngân hàng",
       "searchAria": "Tìm vật phẩm ngân hàng theo tên",
       "depositAll": "Gửi tất cả nguyên liệu",
-      "depositAllTooltip": "Gửi toàn bộ nguyên liệu chế tác và vật phẩm linh tinh từ túi đồ của bạn vào ngân hàng chỉ trong một lần. Dụng cụ thu thập, trang bị đang mặc, vật phẩm nhiệm vụ, và vật phẩm tiêu hao sẽ không bao giờ bị động đến.",
+      "depositAllTooltip": "Gửi toàn bộ nguyên liệu chế tác (mọi vật phẩm có chú giải ghi \"Nguyên Liệu\" hoặc \"Nguyên Liệu Hảo Hạng\") từ túi đồ của bạn vào ngân hàng chỉ trong một lần. Mọi thứ khác vẫn ở trong túi đồ, kể cả dụng cụ thu thập, vật phẩm nhiệm vụ, vật phẩm tiêu hao và vật phẩm màu xám.",
       "depositAllDone": "Nguyên liệu đã gửi: {count}.",
       "depositAllFull": "Nguyên liệu đã gửi: {count}. Ngân hàng hiện đã đầy.",
       "depositAllNone": "Ngân hàng đầy: không gửi được gì.",
@@ -3537,6 +3572,7 @@ export const vi_VN: EnTranslations = {
       "logging": "Đốn gỗ",
       "herbalism": "Thảo dược học",
       "fishing": "Câu Cá",
+      "farming": "Farming",
       "notReady": "Điểm tài nguyên này chưa hồi sinh lại dành cho bạn.",
       "gatherLine": "Bạn tập hợp: {name}.",
       "gatherLineQty": "Bạn tập hợp: {name} x{qty}.",
@@ -3555,7 +3591,8 @@ export const vi_VN: EnTranslations = {
       "tierRequired": {
         "mining": "Yêu cầu cuốc khai khoáng bậc {tier}",
         "logging": "Yêu cầu rìu đốn gỗ bậc {tier}",
-        "herbalism": "Yêu cầu liềm hái thảo dược bậc {tier}"
+        "herbalism": "Yêu cầu liềm hái thảo dược bậc {tier}",
+        "farming": "Requires a tier {tier} farming hoe"
       },
       "requiresTool": {
         "mining": "Cần cuốc khai khoáng",
@@ -3566,23 +3603,27 @@ export const vi_VN: EnTranslations = {
         "mining": "Bạn cần cuốc khai khoáng bậc {tier} để khai thác mạch này.",
         "logging": "Bạn cần rìu đốn gỗ bậc {tier} để đốn bãi này.",
         "herbalism": "Bạn cần liềm hái thảo dược bậc {tier} để thu hoạch bụi này.",
-        "fishing": "Bạn cần cần câu bậc {tier} để câu ở vùng nước này."
+        "fishing": "Bạn cần cần câu bậc {tier} để câu ở vùng nước này.",
+        "farming": "You need a tier {tier} farming hoe to work this bed."
       },
       "toolRequired": {
         "mining": "Bạn cần cuốc khai khoáng để khai thác mạch quặng này.",
         "logging": "Bạn cần rìu đốn gỗ để đốn hạ cụm cây này.",
         "herbalism": "Bạn cần liềm thảo dược để thu hái khóm thảo dược này.",
-        "fishing": "Bạn phải có cần câu mới buông câu được."
+        "fishing": "Bạn phải có cần câu mới buông câu được.",
+        "farming": "You need a farming hoe to work this bed."
       },
       "noNodeNearby": {
         "mining": "Không có mạch quặng nào trong tầm với.",
         "logging": "Không có cụm cây gỗ nào trong tầm với.",
-        "herbalism": "Không có khóm thảo dược nào trong tầm với."
+        "herbalism": "Không có khóm thảo dược nào trong tầm với.",
+        "farming": "There is no crop bed within reach."
       },
       "wieldUnmet": {
         "mining": "Bạn cần Khai mỏ {skill} để vung chiếc cuốc đã có trong túi.",
         "logging": "Bạn cần Đốn gỗ {skill} để vung chiếc rìu đã có trong túi.",
-        "herbalism": "Bạn cần Thảo dược học {skill} để dùng chiếc liềm đã có trong túi."
+        "herbalism": "Bạn cần Thảo dược học {skill} để dùng chiếc liềm đã có trong túi.",
+        "farming": "You need Farming {skill} to swing the hoe already in your bags."
       },
       "wieldUnmetCorpse": "Bạn cần kỹ năng thu thập {skill} để dùng được công cụ tốt nhất của mình.",
       "toolTierUnmetCorpse": "Bạn cần công cụ thu thập bậc {tier} để lấy được nguyên liệu tốt nhất.",
@@ -3591,26 +3632,31 @@ export const vi_VN: EnTranslations = {
           "mining": "Công cụ khai khoáng (bậc {tier})",
           "logging": "Công cụ đốn gỗ (bậc {tier})",
           "herbalism": "Công cụ thảo dược (bậc {tier})",
-          "fishing": "Cần câu (bậc {tier})"
+          "fishing": "Cần câu (bậc {tier})",
+          "farming": "Farming tool (tier {tier})"
         },
         "unlocks": {
           "mining": "Cần thiết để khai thác các mạch quặng đến bậc {tier}.",
           "logging": "Cần thiết để đốn hạ các cụm cây gỗ đến bậc {tier}.",
           "herbalism": "Cần thiết để thu hái các khóm thảo dược đến bậc {tier}.",
-          "fishing": "Cần thiết để câu ở các vùng nước đến bậc {tier}."
+          "fishing": "Cần thiết để câu ở các vùng nước đến bậc {tier}.",
+          "farming": "Required to plant crops up to tier {tier}."
         },
         "use": {
           "mining": "Sử dụng: Khai thác mạch quặng gần đó.",
           "logging": "Sử dụng: Đốn hạ cụm cây gỗ gần đó.",
-          "herbalism": "Sử dụng: Thu hái từ khóm thảo dược gần đó."
+          "herbalism": "Sử dụng: Thu hái từ khóm thảo dược gần đó.",
+          "farming": "Works from your bags when you plant a crop bed."
         },
         "speed": "Thu hoạch nhanh hơn tại các điểm tài nguyên dưới bậc {tier}.",
         "rodRequired": "Cần thiết để câu cá.",
         "rodBite": "Cá cắn câu sớm hơn tới {seconds} giây.",
         "rodReel": "Kéo dài thời gian thu dây thêm {seconds} giây.",
-        "rodBand": "Mở khóa danh sách cá phong phú hơn khi kỹ năng câu cá đạt {skill} trở lên."
+        "rodBand": "Mở khóa danh sách cá phong phú hơn khi kỹ năng câu cá đạt {skill} trở lên.",
+        "rodBandCatch": "Unlocks {fish} at fishing skill {skill} and above."
       },
       "downgradeMark": "Túi đầy: phát hiện được lưu mà không có dấu thợ thu thập.",
+      "downgradeMarkCrop": "Bags full: the harvest was stored without its grower's mark.",
       "downgradeFind": "Túi đầy: một phát hiện tuyệt vời đã trôi qua.",
       "emptyHookNote": "Không có gì dính câu",
       "stateReady": "Sẵn Sàng",
@@ -3618,6 +3664,90 @@ export const vi_VN: EnTranslations = {
       "stateCooldownTimed": "Hồi sinh sau {time}",
       "respawnClock": "{minutes}:{seconds}",
       "fineGradePreview": "Công cụ của bạn nâng sản vật này lên phẩm cấp hảo hạng."
+    },
+    "farming": {
+      "plantLine": "You plant: {name}.",
+      "harvestLine": "You bring in: {name}.",
+      "harvestLineQty": "You bring in: {name} x{qty}.",
+      "harvestFineLine": "You also bring in: {name}.",
+      "harvestFineLineQty": "You also bring in: {name} x{qty}.",
+      "witheredLine": "The crop withered. You clear the bed: {name}.",
+      "witheredLineQty": "The crop withered. You clear the bed: {name} x{qty}.",
+      "pressTarget": {
+        "feastOverHarvest": "A feast and your crop are both in reach. Interact takes the feast before the bed; step away from the feast to harvest.",
+        "feastOverPlant": "A feast and an empty bed are both in reach. Interact takes the feast before the bed; step away from the feast to plant."
+      },
+      "seedBackLine": "You recover seed: {name}.",
+      "seedBackLineQty": "You recover seed: {name} x{qty}.",
+      "goldenBonusLine": "The golden harvest yields: {name}.",
+      "denied": {
+        "bad_bed": "There is no crop bed there.",
+        "bad_crop": "You cannot plant that here.",
+        "range": "You are too far from that crop bed.",
+        "bed_taken": "You already have a crop growing there.",
+        "skill": "Your Farming skill is too low for that crop.",
+        "no_seed": "You have no seed for that crop.",
+        "not_ready": "That crop is still growing.",
+        "no_plot": "Nothing is planted in that bed.",
+        "no_husks": "You do not have enough withered husks.",
+        "no_compost": "You have no compost.",
+        "no_fee_produce": "You have no produce to pay the watch fee.",
+        "no_tonic": "You have no growth tonic.",
+        "tool": "You have no farming hoe fit for that crop.",
+        "locked": "An item that would pay for that is locked.",
+        "no_farmer": "You must be near a farmer to trade husks for compost.",
+        "no_feast": "You have no feast to set out.",
+        "feast_active": "Your feast is already set out.",
+        "feast_expired": "That feast is gone.",
+        "feast_finished": "That feast has been picked clean.",
+        "feast_eaten": "You have already eaten from that feast."
+      },
+      "feastTitle": "{name}'s Harvest Feast",
+      "stonepotFeastTitle": "{name}'s Stonepot Feast",
+      "warspiceFeastTitle": "{name}'s Warspice Feast",
+      "sageleafFeastTitle": "{name}'s Sageleaf Feast",
+      "feastPlacedLine": "You set out your harvest feast.",
+      "huskTrade": "Trade husks for compost",
+      "huskTradeAria": "Trade husks for compost with {name}",
+      "plantSheet": {
+        "title": "Plant a Crop",
+        "plant": "Plant",
+        "sowAria": "Sow {name}",
+        "empty": "You have no seed you can sow at this bed.",
+        "close": "Close the plant sheet"
+      },
+      "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
+      "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}.",
+      "readyLine": "A crop is ready to harvest.",
+      "readyLineQty": "{count} crops are ready to harvest.",
+      "readyWitheredLine": "A crop withered in its bed.",
+      "readyWitheredLineQty": "{count} crops withered in their beds."
+    },
+    "harvestJournal": {
+      "title": "Harvest Journal",
+      "close": "Close",
+      "listLabel": "Planted crop beds",
+      "growing": "Ready in {time}",
+      "ready": "Ready to harvest",
+      "finishing": "Finishing up",
+      "withered": "Withered",
+      "readyAnnounce": "Ready to harvest: {name}",
+      "remainingDaysHours": "{days}d {hours}h",
+      "remainingHoursMinutes": "{hours}h {minutes}m",
+      "remainingMinutesSeconds": "{minutes}m {seconds}s",
+      "remainingSeconds": "{seconds}s",
+      "bedLine": "{zone}, bed {index}",
+      "bedLineUnknown": "Unknown bed",
+      "careWatch": "Farmer's Watch",
+      "careNone": "No extras",
+      "stageSprout": "Sprout",
+      "stageSeedling": "Seedling",
+      "stageMaturing": "Maturing",
+      "stageRipe": "Ripe",
+      "emptyTitle": "No crops planted",
+      "emptyBody": "Sow a seed in any garden bed and the plot appears here with its timer.",
+      "noviceTitle": "You have not worked a garden bed yet",
+      "noviceBody": "Farming skill grows every time you bring in a crop. Sow a seed in any garden bed to begin."
     },
     "archetypeTitle": {
       "label": "Danh hiệu",
@@ -3649,48 +3779,53 @@ export const vi_VN: EnTranslations = {
       "leatherworking": "Thuộc Da"
     },
     "enchantName": {
-      "enchant_weapon_might": "Pháp Khắc Vũ Khí - Dũng Mãnh",
-      "enchant_weapon_intellect": "Pháp Khắc Vũ Khí - Sức Mạnh Phép Thuật",
-      "enchant_offhand_stamina": "Pháp Khắc Tay Phụ - Thể Lực",
-      "enchant_helmet_fortitude": "Pháp Khắc Mũ Giáp - Kiên Cường",
-      "enchant_neck_spirit": "Pháp Khắc Vòng Cổ - Tinh Thần",
-      "enchant_shoulder_agility": "Pháp Khắc Giáp Vai - Nhanh Nhẹn",
-      "enchant_chest_stamina": "Pháp Khắc Giáp Ngực - Thể Lực",
-      "enchant_waist_stamina": "Pháp Khắc Thắt Lưng - Thể Lực",
-      "enchant_legs_stamina": "Pháp Khắc Giáp Chân - Thể Lực",
-      "enchant_gloves_agility": "Pháp Khắc Găng Tay - Nhanh Nhẹn",
-      "enchant_gloves_intellect": "Pháp Khắc Găng Tay - Sức Mạnh Phép Thuật",
-      "enchant_feet_agility": "Pháp Khắc Giày - Nhanh Nhẹn",
-      "enchant_ring_spirit": "Pháp Khắc Nhẫn - Tinh Thần",
-      "enchant_weapon_agility": "Pháp Khắc Vũ Khí - Nhanh Nhẹn",
-      "enchant_helmet_intellect": "Pháp Khắc Mũ Giáp - Trí Tuệ",
-      "enchant_helmet_armor": "Pháp Khắc Mũ Giáp - Gia Cố",
-      "enchant_neck_intellect": "Pháp Khắc Vòng Cổ - Trí Tuệ",
-      "enchant_neck_agility": "Pháp Khắc Vòng Cổ - Nhanh Nhẹn",
-      "enchant_shoulder_strength": "Pháp Khắc Giáp Vai - Sức Mạnh",
-      "enchant_shoulder_intellect": "Pháp Khắc Giáp Vai - Trí Tuệ",
-      "enchant_chest_spirit": "Pháp Khắc Giáp Ngực - Tinh Thần",
-      "enchant_chest_armor": "Pháp Khắc Giáp Ngực - Gia Cố",
-      "enchant_waist_strength": "Pháp Khắc Thắt Lưng - Sức Mạnh",
-      "enchant_waist_agility": "Pháp Khắc Thắt Lưng - Nhanh Nhẹn",
-      "enchant_legs_intellect": "Pháp Khắc Giáp Chân - Trí Tuệ",
-      "enchant_gloves_strength": "Pháp Khắc Găng Tay - Sức Mạnh",
-      "enchant_feet_strength": "Pháp Khắc Giày - Sức Mạnh",
-      "enchant_feet_stamina": "Pháp Khắc Giày - Thể Lực",
-      "enchant_ring_strength": "Pháp Khắc Nhẫn - Sức Mạnh",
-      "enchant_ring_agility": "Pháp Khắc Nhẫn - Nhanh Nhẹn",
-      "enchant_ring_intellect": "Pháp Khắc Nhẫn - Trí Tuệ",
-      "enchant_weapon_greater_might": "Pháp Khắc Vũ Khí - Dũng Mãnh Cao Cấp",
-      "enchant_weapon_greater_spellpower": "Pháp Khắc Vũ Khí - Sức Mạnh Phép Thuật Cao Cấp",
-      "enchant_helmet_greater_fortitude": "Pháp Khắc Mũ Giáp - Kiên Cường Cao Cấp",
-      "enchant_chest_greater_stamina": "Pháp Khắc Giáp Ngực - Thể Lực Cao Cấp",
-      "enchant_legs_greater_stamina": "Pháp Khắc Giáp Chân - Thể Lực Cao Cấp",
-      "enchant_gloves_greater_agility": "Pháp Khắc Găng Tay - Nhanh Nhẹn Cao Cấp",
-      "enchant_weapon_runed_edge": "Pháp Khắc Vũ Khí - Lưỡi Phù Văn",
-      "enchant_weapon_runed_focus": "Pháp Khắc Vũ Khí - Tiêu Điểm Phù Văn",
-      "enchant_chest_runeweave": "Pháp Khắc Giáp Ngực - Dệt Phù Văn",
-      "enchant_legs_runed_hide": "Pháp Khắc Giáp Chân - Da Phù Văn",
-      "enchant_helmet_runed_links": "Pháp Khắc Mũ Giáp - Xích Phù Văn"
+      "enchant_weapon_might": "Weapon Etching: Might",
+      "enchant_weapon_intellect": "Weapon Etching: Spellpower",
+      "enchant_offhand_stamina": "Offhand Etching: Stamina",
+      "enchant_helmet_fortitude": "Helmet Etching: Fortitude",
+      "enchant_neck_spirit": "Necklace Etching: Spirit",
+      "enchant_shoulder_agility": "Shoulder Etching: Agility",
+      "enchant_chest_stamina": "Chest Etching: Stamina",
+      "enchant_waist_stamina": "Belt Etching: Stamina",
+      "enchant_legs_stamina": "Leg Etching: Stamina",
+      "enchant_gloves_agility": "Glove Etching: Agility",
+      "enchant_gloves_intellect": "Glove Etching: Spellpower",
+      "enchant_feet_agility": "Boot Etching: Agility",
+      "enchant_ring_spirit": "Ring Etching: Spirit",
+      "enchant_weapon_agility": "Weapon Etching: Agility",
+      "enchant_helmet_intellect": "Helmet Etching: Intellect",
+      "enchant_helmet_armor": "Helmet Etching: Reinforcement",
+      "enchant_neck_intellect": "Necklace Etching: Intellect",
+      "enchant_neck_agility": "Necklace Etching: Agility",
+      "enchant_shoulder_strength": "Shoulder Etching: Strength",
+      "enchant_shoulder_intellect": "Shoulder Etching: Intellect",
+      "enchant_chest_spirit": "Chest Etching: Spirit",
+      "enchant_chest_armor": "Chest Etching: Reinforcement",
+      "enchant_waist_strength": "Belt Etching: Strength",
+      "enchant_waist_agility": "Belt Etching: Agility",
+      "enchant_legs_intellect": "Leg Etching: Intellect",
+      "enchant_gloves_strength": "Glove Etching: Strength",
+      "enchant_feet_strength": "Boot Etching: Strength",
+      "enchant_feet_stamina": "Boot Etching: Stamina",
+      "enchant_ring_strength": "Ring Etching: Strength",
+      "enchant_ring_agility": "Ring Etching: Agility",
+      "enchant_ring_intellect": "Ring Etching: Intellect",
+      "enchant_weapon_greater_might": "Weapon Etching: Greater Might",
+      "enchant_weapon_greater_spellpower": "Weapon Etching: Greater Spellpower",
+      "enchant_helmet_greater_fortitude": "Helmet Etching: Greater Fortitude",
+      "enchant_chest_greater_stamina": "Chest Etching: Greater Stamina",
+      "enchant_legs_greater_stamina": "Leg Etching: Greater Stamina",
+      "enchant_gloves_greater_agility": "Glove Etching: Greater Agility",
+      "enchant_weapon_runed_edge": "Weapon Etching: Runed Edge",
+      "enchant_weapon_runed_focus": "Weapon Etching: Runed Sigil",
+      "enchant_chest_runeweave": "Chest Etching: Runed Weave",
+      "enchant_legs_runed_hide": "Leg Etching: Runed Hide",
+      "enchant_helmet_runed_links": "Helmet Etching: Runed Links",
+      "enchant_weapon_lucent_might": "Weapon Etching: Lucent Might",
+      "enchant_weapon_lucent_spellpower": "Weapon Etching: Lucent Spellpower",
+      "enchant_chest_lucent_stamina": "Chest Etching: Lucent Stamina",
+      "enchant_feet_lucent_agility": "Boot Etching: Lucent Agility",
+      "enchant_lucent_infusion": "Lucent Infusion"
     },
     "professions": {
       "title": "Nghề nghiệp",
@@ -3721,19 +3856,29 @@ export const vi_VN: EnTranslations = {
       "toolEffectName": {
         "gatherersCache": "Kho Của Thợ Thu Thập",
         "artisansEye": "Mắt Nghệ Nhân",
-        "quickeningCharm": "Bùa Hồi Nhanh"
+        "quickeningCharm": "Bùa Hồi Nhanh",
+        "makersCharm": "Maker's Charm"
       },
       "toolEffectTooltip": {
         "kind": "Bùa Công Cụ",
         "bonus": {
           "gatherersCache": "+1 sản lượng mỗi lần thu hoạch trong khi còn nạp.",
           "artisansEye": "Nâng bậc thu hoạch thêm 1 bậc công cụ trong khi còn nạp.",
-          "quickeningCharm": "Rút ngắn thời gian hồi sinh của điểm tài nguyên mà nó kích hoạt."
+          "quickeningCharm": "Rút ngắn thời gian hồi sinh của điểm tài nguyên mà nó kích hoạt.",
+          "makersCharm": "+2 yield per harvest while charged, or +1 on a farming tool."
         },
-        "howToSlot": "Gắn vào công cụ khai khoáng, đốn gỗ, hoặc thảo dược từ cửa sổ Nghề Nghiệp. Bị tiêu hao khi gắn.",
+        "howToSlot": "Gắn vào công cụ khai khoáng, đốn gỗ, thảo dược, hoặc nông nghiệp từ cửa sổ Nghề Nghiệp. Bị tiêu hao khi gắn.",
         "charges": "Bắt đầu với {base} lượt nạp trên một công cụ phổ thông (+{bonus} mỗi bậc hiếm).",
         "landOnly": "Không thể gắn vào cần câu.",
         "openProfessions": "Mở Nghề Nghiệp để gắn cái này vào một công cụ thu thập."
+      },
+      "mobileStationTooltip": {
+        "kind": "Field station",
+        "use": "Places a party-shared {station} at your feet.",
+        "radius": "You can craft at it from anywhere; party members must be within {radius} yards.",
+        "duration": "Lasts {minutes} minutes.",
+        "notConsumed": "Never consumed.",
+        "replace": "Placing replaces your active field station, including a specialty-placed one."
       },
       "toolEffectSlotButton": "Gắn {effect}",
       "toolEffectRechargeButton": "Nạp Lại",
@@ -3860,6 +4005,9 @@ export const vi_VN: EnTranslations = {
       "busy": "Bạn đang bận.",
       "recipeNotLearned": "Bạn chưa học công thức đó.",
       "noBagSpace": "Túi của bạn không còn chỗ cho vật phẩm vừa chế tạo.",
+      "dailyLimit": "You can only craft that once per day.",
+      "dailyLimitRetry": "You can only craft that once per day. Available again in {duration}.",
+      "oncePerDay": "Once per day",
       "skillReqLine": "Yêu cầu {craft} {skill}",
       "difficultyFull": "Đạt được kỹ năng đầy đủ",
       "difficultyReduced": "Giảm khả năng nhận được kỹ năng",
@@ -3868,8 +4016,16 @@ export const vi_VN: EnTranslations = {
       "stationBadge": "Bàn chế tác",
       "stationOutOfRangeNamed": "Di chuyển đến {station} để chế tạo cái này.",
       "learnMoreAtStation": "{master} tại {station} có thể dạy bạn thêm công thức {craft}.",
+      "apexChip": "Apex",
+      "apexPatternRaid": "Its pattern is a rare raid trophy.",
+      "apexPatternRift": "Its pattern is won on victorious high-rank Rift clears.",
+      "apexPatternVendor": "The Heroic Quartermaster sells its pattern for Heroic Marks.",
+      "apexPatternDrop": "Its pattern is found in the world.",
+      "perfectingLink": "Perfecting",
       "masterworkToast": "Tuyệt tác! {name}",
       "masterworkZoneLine": "{crafter} đã tạo ra một kiệt tác {name}!",
+      "legendaryLine": "{item} is reborn as {name}, a legend!",
+      "legendaryZoneLine": "{player} forged {item} into the legend {name}!",
       "tierUpToast": "{craft} đã thăng cấp lên cấp {tier}!",
       "skillUpToast": "Kỹ năng {skill} tăng lên {level}!",
       "skillUpSubtext": "Kỹ năng tăng lên {level}!",
@@ -3898,6 +4054,7 @@ export const vi_VN: EnTranslations = {
       "disenchant": "Hủy Pháp Khắc",
       "salvage": "Tháo Dỡ",
       "applyEnchant": "Áp Dụng Pháp Khắc",
+      "sunder": "Sunder",
       "sell": "Bán",
       "sellAll": "Bán tất cả ({count})"
     },
@@ -3930,6 +4087,9 @@ export const vi_VN: EnTranslations = {
       "salvageConfirmTitle": "Tháo Dỡ {item}?",
       "salvageConfirmBody": "Thao tác này phá hủy {item} và thu được nguyên liệu chế tác. Không thể hoàn tác.",
       "salvageConfirmBodySpecial": "Thao tác này phá hủy một bản đặc biệt của {item} (có chữ ký, kiệt tác hoặc đã pháp khắc) và thu được nguyên liệu chế tác. Không thể hoàn tác.",
+      "sunderConfirmTitle": "Sunder {item}?",
+      "sunderConfirmBody": "This destroys {item} and yields Sundered Essence. This cannot be undone.",
+      "sunderConfirmBodySpecial": "This destroys a special copy of {item} (signed, masterwork, or enchanted) and yields Sundered Essence. This cannot be undone.",
       "pickerTitle": "Áp Dụng Pháp Khắc",
       "targetTitle": "Chọn vật phẩm để pháp khắc",
       "noEnchants": "Không có phép khắc nào dùng nguyên liệu này.",
@@ -3939,13 +4099,16 @@ export const vi_VN: EnTranslations = {
       "tier": {
         "base": "Pháp Khắc Cơ Bản",
         "runed": "Pháp Khắc Phù Văn",
-        "greater": "Pháp Khắc Cao Cấp"
+        "greater": "Pháp Khắc Cao Cấp",
+        "lucent": "Lucent Enchants"
       },
       "yieldHeader": "Nguyên liệu dự kiến:",
       "yieldLineExact": "{count} {item}",
       "yieldLineRange": "{min} đến {max} {item}",
       "alreadyEnchanted": "Vật phẩm đó đã được pháp khắc rồi.",
       "sameEnchant": "Vật phẩm đó đã có phép khắc đó rồi.",
+      "notPerfected": "Only a Perfected item can bear that enchant.",
+      "enchantSkillTooLow": "Your Enchanting skill is too low for that enchant.",
       "replaceTag": "Thay Thế {enchant}",
       "sameEnchantTag": "Đã Áp Dụng",
       "plainTag": "Chưa pháp khắc",
@@ -3956,6 +4119,7 @@ export const vi_VN: EnTranslations = {
       "replaceConfirmKeepsSigner": "Dấu người chế tạo",
       "replaceConfirmKeepsMasterwork": "Thưởng tuyệt phẩm",
       "replaceConfirmKeepsBond": "Ràng buộc ủy thác",
+      "replaceConfirmKeepsPerfecting": "Perfecting",
       "replaceConfirmCost": "Chi phí: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Thay Thế"
@@ -3981,6 +4145,9 @@ export const vi_VN: EnTranslations = {
       "alreadyKnown": "Bạn đã biết công thức đó rồi.",
       "outOfRange": "Bạn phải ở nhà ga để đào tạo."
     },
+    "pattern": {
+      "teaches": "Use: Teaches you how to craft {item}."
+    },
     "unbind": {
       "title": "Gỡ Ràng Buộc: {name}",
       "close": "Đóng gỡ ràng buộc",
@@ -3999,7 +4166,49 @@ export const vi_VN: EnTranslations = {
       "notBound": "Vật phẩm đó không bị ràng buộc.",
       "cannotAfford": "Bạn không đủ tiền để trả phí gỡ ràng buộc.",
       "outOfRange": "Bạn phải ở tại bàn chế tác để gỡ ràng buộc.",
-      "noSpace": "Túi của bạn không còn chỗ cho bản đã gỡ ràng buộc."
+      "noSpace": "Túi của bạn không còn chỗ cho bản đã gỡ ràng buộc.",
+      "perfecting": "A piece on the Perfecting track, or already Perfected, stays bound."
+    },
+    "perfecting": {
+      "title": "Perfecting",
+      "close": "Close the Perfecting window",
+      "openButton": "Perfecting",
+      "openButtonAria": "Open the Perfecting window",
+      "empty": "You hold no Masterwrought piece. The apex recipes forge one.",
+      "wornChip": "Worn",
+      "rowRank": "Rank {rank} of {ranks}",
+      "rowPerfected": "Perfected",
+      "rankAnnounce": "{name} reaches Perfecting rank {rank} of {ranks}.",
+      "perfectedAnnounce": "{name} is now Perfected.",
+      "promotedAnnounce": "{name} is forged as {chosen}.",
+      "unknownItem": "Unknown item",
+      "namingSelectionUnconfirmed": "Your bags shifted: the piece being named could not be confirmed. Check the selection before you forge.",
+      "rowPromoted": "Legendary",
+      "attemptCost": "Attempt cost",
+      "promoteCost": "Promotion cost",
+      "matCount": "{have} of {required}",
+      "skillNeed": "Needs {craft} skill {skill}.",
+      "skillMet": "Met.",
+      "skillUnmet": "Not met.",
+      "skillSyncing": "Checking your craft skill.",
+      "bindWarn": "Your first perfecting attempt binds {name} to you.",
+      "bindWarnDetail": "Perfecting never lowers a rank: a failed attempt only spends its materials. A piece with Perfecting progress or a Perfected piece cannot be unbound, and a promotion is permanent.",
+      "bindConfirmText": "Your first attempt binds {name} to you. Attempt anyway?",
+      "bindConfirmAccept": "Bind and Attempt",
+      "bindConfirmCancel": "Cancel",
+      "attempt": "Attempt Perfecting",
+      "promote": "Name and Promote",
+      "perfectedLead": "Perfected. Give it a name to forge a legend.",
+      "promotedLine": "A finished legend: nothing left to perfect.",
+      "equipBlocked": "You could not equip it once promoted. Unequip the conflicting piece first.",
+      "nameTitle": "Name the Legend",
+      "nameLabel": "Inscribe a name for {name}. The name is permanent.",
+      "nameInputAria": "Legendary name",
+      "nameHint": "Two to 32 characters: letters, spaces, apostrophes, and hyphens, starting with a letter.",
+      "nameCount": "{count} of {max}",
+      "nameSubmit": "Forge the Legend",
+      "nameSubmitBusy": "Forging",
+      "nameCancel": "Cancel"
     },
     "commissionBoard": {
       "title": "Đơn Ủy Thác",
@@ -4025,6 +4234,7 @@ export const vi_VN: EnTranslations = {
       "rowFor": "{item} cho {requester}",
       "rowTargeted": "{item} cho {requester} (dành cho {crafter})",
       "acceptedBy": "Được {name} chấp nhận",
+      "crafterRecordLabel": "Crafter's record:",
       "statusOpen": "Đang Mở",
       "statusAccepted": "Đã Chấp Nhận",
       "statusDelivered": "Đã Giao",
@@ -4216,10 +4426,13 @@ export const vi_VN: EnTranslations = {
         "masterwork_armorcrafting": "Kiệt tác Rèn Giáp",
         "masterwork_tailoring": "Kiệt tác May Vá",
         "masterwork_leatherworking": "Kiệt tác Thuộc Da",
+        "masterwork_jewelcrafting": "Jewelcrafting Masterwork",
+        "masterwork_inscription": "Inscription Masterwork",
         "masterwork_engineering": "Kiệt tác Cơ Khí",
         "gather_event_pristine_vein": "Mạch Quặng Nguyên Vẹn",
         "gather_event_ancient_heartwood": "Lõi Gỗ Cổ Xưa",
         "gather_event_moonlit_bloom": "Đóa Hoa Dưới Trăng",
+        "gather_event_golden_harvest": "Golden Harvest",
         "gather_event_perfect_specimen": "Mẫu Vật Hoàn Hảo",
         "slain_old_greyjaw": "Đã hạ: Lão Greyjaw",
         "slain_mogger": "Đã hạ: Mogger",
@@ -4606,7 +4819,8 @@ export const vi_VN: EnTranslations = {
   "gatherEvent": {
     "pristineVein": "{finder} đánh vào mạch máu nguyên sơ!",
     "ancientHeartwood": "{finder} đã đốn hạ một tâm gỗ cổ xưa!",
-    "moonlitBloom": "{finder} phát hiện ra hoa nở dưới ánh trăng!"
+    "moonlitBloom": "{finder} phát hiện ra hoa nở dưới ánh trăng!",
+    "goldenHarvest": "{finder} reaped a golden harvest!"
   },
   "apiError": {
     "validation": {
@@ -4951,7 +5165,7 @@ export const vi_VN: EnTranslations = {
         "nightName": "Cánh Đồng Dạ Hoa",
         "nightBlurb": "Một xứ sở của đêm khuya lấp lánh sao trời, nơi hoa lá thắp sáng những lối đi và Moonrest lặng lẽ canh giữ.",
         "hauntName": "Rừng Oan Hồn",
-        "hauntBlurb": "Một khu rừng ma ám dưới những tán cây khổng lồ, nơi những ngọn đèn lồng của Gallowmere là thứ ánh sáng chân thật duy nhất trên con đường.",
+        "hauntBlurb": "Một khu rừng ma ám dưới những tán cây khổng lồ, nơi những ngọn đèn lồng của Gibbetmere là thứ ánh sáng chân thật duy nhất trên con đường.",
         "jungleName": "Vịnh Cọ",
         "jungleBlurb": "Cọ, cát trắng, và tiếng chim ríu rít vang xa, cùng thị trấn ven biển Drifthaven vẫn giữ một ngọn lửa cháy sáng trên bãi cát.",
         "gardenName": "Khu Vườn Vĩnh Cửu",
@@ -5042,6 +5256,7 @@ export const vi_VN: EnTranslations = {
       "groupCamera": "Máy quay",
       "talents": "Thiên Phú",
       "professions": "Nghề Nghiệp",
+      "harvestJournal": "Harvest Journal",
       "arena": "Cửa sổ PvP (các đấu trường và Cánh Đồng Trũng Gai)",
       "leaderboard": "Bảng xếp hạng",
       "deeds": "Sách Kỳ Công",
@@ -5260,6 +5475,7 @@ export const vi_VN: EnTranslations = {
       "framePetTitle": "Thú cưng của bạn",
       "framePetBody": "Thợ Săn, Thuật Sĩ Hắc Ám, và bất kỳ ai khác đang thả thú cưng đều có một khung nhỏ cho nó bên cạnh khung của mình, với tên, cấp, và máu của thú cưng. Bấm vào khung đó sẽ chọn thú cưng của bạn, và Ctrl+6 làm điều tương tự từ bàn phím.",
       "framesMoveBody": "Khung của bạn, khung mục tiêu, và các khung tổ đội đều có thể di chuyển được. Mỗi khung mang một nút di chuyển nhỏ ở góc: mở khóa nó, kéo khung tới vị trí bạn muốn, rồi khóa lại để một cú bấm nhầm không thể làm nó xê dịch. Nếu chúng lỡ nằm ở chỗ bạn không ưng, mục Đặt Lại Vị Trí Các Khung trong phần cài đặt sẽ đưa tất cả về đúng vị trí ban đầu.",
+      "framesMoveBodyEditFrames": "Your frame, your target frame, and your party frames can all be moved. Each carries a small move button in its corner: unlock it, drag the frame where you want it, and lock it again so a stray click cannot shift it. Edit Frames, at the top of the Frames tab in the Interface options, loosens the rest of the interface at once, those three frames with it: the action bars, the cast bar, the swing bar, the experience bar, the minimap, the button rail, the pet frame, the stance bar, the buff and debuff rows, and the Wishlist Reminder chip, each wearing a name chip while it is loose. If they end up somewhere you regret, Reset to Defaults at the foot of that same Frames tab snaps them all back to where they started.",
       "barsTitle": "Các thanh, bộ đếm giờ, và chữ chiến đấu",
       "barsBody": "Thanh niệm chú của bạn xuất hiện giữa màn hình, ngay phía trên thanh kỹ năng, bất cứ khi nào bạn niệm hoặc duy trì một phép, và hiển thị tên phép cùng thời gian còn lại. Mục tiêu của bạn cũng có thanh niệm chú riêng trên khung của nó, để bạn biết điều gì sắp xảy ra và đối phó kịp thời.\n\nMột thanh vung đòn mảnh nằm dưới thanh niệm chú và đầy dần giữa hai lần vung vũ khí, để một người đánh cận chiến hay tầm xa biết khi nào đòn đánh tự động tiếp theo sẽ trúng.\n\nThanh kinh nghiệm của bạn chạy suốt chiều rộng bên dưới thanh kỹ năng, chia thành từng đoạn, với một dải sáng hơn cho biết lượng kinh nghiệm nghỉ ngơi bạn đã tích lũy.\n\nBơi xuống dưới nước và một thanh hơi thở màu xanh sẽ xuất hiện ở đầu màn hình. Nó cạn dần khi đầu bạn còn ở dưới nước, chớp đỏ khi cạn hết và bạn bắt đầu chết đuối, rồi đầy lại nhanh chóng ngay khi bạn nổi lên mặt nước. Phím Nhảy đưa bạn bơi lên, còn phím Bơi Xuống, mặc định là Ctrl, đưa bạn xuống sâu hơn.\n\nSát thương và hồi máu bay lên trên bất cứ thứ gì chúng vừa tác động, dưới dạng những con số nhỏ, để bạn có thể đọc hiểu một trận đánh mà không cần đọc chữ. Tab Chiến Đấu trong khung trò chuyện của bạn giữ lại toàn bộ ghi chép bằng văn bản.",
       "aurasTitle": "Buff và debuff",
@@ -5270,6 +5486,7 @@ export const vi_VN: EnTranslations = {
       "minimapBody": "Góc trên bên phải: một bản đồ nhỏ hình tròn với tên vùng đất phía trên và tọa độ của bạn phía dưới, được viền bởi một vòng quay tô màu theo thời khắc trong ngày.\n\nTấm đĩa này chứa nhiều hơn cả địa hình. Mũi tên của chính bạn nằm ở trung tâm, chỉ theo hướng bạn đang nhìn, với tổ đội quanh bạn hiện thành các chấm màu theo lớp nhân vật và một mũi tên ở rìa cho bất kỳ ai đã đi lạc ra ngoài phạm vi. Người giao nhiệm vụ mang cùng loại dấu hiệu trên đó như ngoài thế giới thật, và bạn cũng sẽ nhận ra các điểm tài nguyên và trạm chế tác, các cổng dịch chuyển, các xác và rương có thể nhặt đồ, bất kỳ kẻ địch nào đã để ý đến bạn, bạn bè và thành viên bang hội ở gần, và cả thi thể của chính bạn trong lúc bạn đang chạy hồn ma quay lại.\n\nCác biểu tượng nhỏ sẽ xuất hiện trên đó khi có điều cần báo: một phong bì khi có thư chưa đọc đang chờ bạn, một đồng xu khi tiền bán hàng hoặc hàng trả lại đang chờ ở chỗ Thương Nhân, và một nút liệt kê các khóa lượt raid của bạn.",
       "mapTitle": "Bản đồ thế giới và các bảng theo dõi của bạn",
       "mapBody": "M mở bản đồ thế giới: toàn bộ lục địa được vẽ ra, với mũi tên của chính bạn trên đó, các vùng đất cùng tên gọi, các điểm quan tâm quanh bạn, các cổng dịch chuyển, và các điểm tài nguyên bạn đã tìm thấy. Tổ đội của bạn cũng hiện trên đó. Bên trong một Hang Sâu, bản đồ chuyển sang một sơ đồ các phòng bạn đã khám phá được cho tới lúc đó.\n\nDọc theo cạnh phải, bên dưới bản đồ nhỏ, một chồng bảng theo dõi giữ những việc bạn đang làm trong tầm mắt mà không cần mở gì cả: các nhiệm vụ bạn đang theo dõi cùng mục tiêu của chúng, tiến độ kỳ công của bạn, Hang Sâu bạn đang ở trong, và bất kỳ Rạn Nứt nào bạn đang tham gia. Bảng theo dõi nhiệm vụ sẽ thu gọn lại khi bạn muốn lấy lại khoảng trống trên màn hình.",
+      "mapBodyZoneFirst": "M opens the world map on the zone you are standing in, with your own arrow on it, the points of interest around you, the quest givers with their marks and the areas your objectives sit in, the crafting stations, mailboxes, noticeboards and garden beds, the dungeon entrances, and every gathering node in the zone, grayed out while it regrows and marked when your tools are not up to it. Your party shows on it too. Right-click the map, or press its World map button, and it pulls back to the continent, every zone drawn with its name, where a click on a zone opens that zone's map. Step into a delve, a dungeon, a rift or a castle keep and the map switches to a floor plan of where you stand; the Thornhollow Fields battleground gets a field map of its own.\n\nDown the right side, under the minimap, a stack of trackers keeps your current business in view without opening anything: your tracked quests and their objectives, your deed progress, your Reliquary pages, the delve you are in, and any rift you are taking part in. The quest tracker collapses when you want the screen back.",
       "chatTitle": "Khung trò chuyện",
       "chatBody": "Góc dưới bên trái. Nhấn Enter để bắt đầu gõ và Enter lần nữa để gửi.\n\nLuôn có hai tab: Trò Chuyện, nhật ký gộp mọi thứ được nói quanh bạn, và Chiến Đấu, ghi chép bằng văn bản của trận đánh. Nút dấu cộng thêm nhiều tab hơn, mỗi tab cho một kênh: Nói, Hét, Tổ Đội, Chung, Thế Giới, Tìm Đội, Bang Hội, và Sĩ Quan, cùng một tab Nhắn Riêng gom mọi tin nhắn riêng bạn gửi và nhận vào một chỗ. Gõ trong một tab kênh sẽ gửi thẳng đến kênh đó mà bạn không cần gõ lại lệnh.\n\nCả khung có thể được kéo sang chỗ khác và đổi kích thước, và nó sẽ nhớ vị trí bạn để lại.",
       "keyWindowsTitle": "Các cửa sổ bạn mở bằng phím",
@@ -5298,8 +5515,10 @@ export const vi_VN: EnTranslations = {
       "winMetersBody": "Sát thương, hồi máu, và mối đe dọa của bạn và mọi người cùng bạn, được lưu theo từng đoạn để bạn có thể xem lại trận đánh áp chót. Các bảng hồi máu và mối đe dọa có thể được kéo ra để đứng riêng.",
       "winMoreTitle": "Và vài cửa sổ khác",
       "winMoreBody": "Bản đồ thế giới (M), cửa sổ PvP (G), Cúp Thung Lũng (Y), bảng xếp hạng (K), lịch sự kiện (I), và vòng biểu cảm (X) đều hoạt động theo cùng một cách. Bảng xếp hạng đáng để bạn dừng lại xem trong lần ghé thăm đầu tiên: nó có một tab cho người chơi, một tab cho bang hội, một tab xếp hạng toàn bộ tài khoản theo Danh Vọng từ Sách Kỳ Công, và một tab cho thứ hạng hằng ngày.\n\nBấm chuột phải vào một người chơi khác, trên bảng tên của họ hoặc trên tên họ trong khung trò chuyện, và Thông Tin Người Chơi sẽ mở một thẻ về họ: trang bị họ đang mặc, kèm chú giải, và các chi tiết công khai của nhân vật họ. Đây chỉ là để xem, không hơn không kém, và cần họ ở đủ gần để nhìn thấy.",
+      "winMoreBodyNoValeCup": "The world map (M), the PvP window (G), the leaderboard (K), and the event calendar (I) all work the same way. The emote wheel (X) is the exception: hold its key and the wheel appears, then let go over an emote to play it. The leaderboard is worth a moment on your first visit: it keeps a tab for players, one for guilds, one that ranks whole accounts by Renown from the Book of Deeds, one for the daily standings, and a Developers tab for the people who build the game, there unless you switch Show Developer Badges off.\n\nTarget another player and right-click the target frame (on touch, double-tap or long-press it), or right-click their name in chat, and Player Info opens a card on them: the gear they are wearing, with tooltips, and the public details of their character. It is a look, nothing more. The gear needs them close enough to see: look a name up from chat while they are far away and you get the public half of the card instead, their portrait, name, level, class, and guild.",
       "worldWindowsTitle": "Những cửa sổ mà thế giới mở ra cho bạn",
       "worldWindowsBody": "Có những cửa sổ bạn không bao giờ phải bấm phím để mở: chúng mở ra khi bạn trò chuyện với đúng người hoặc nhấp vào đúng thứ.\n\nMột thương nhân mở ra cửa hàng, với Xem Hàng để bạn mua và thẻ Mua Lại giữ những gì bạn vừa bán, phòng khi bạn lỡ tay bán nhầm. Một hàng nút số lượng đi kèm với hàng hóa, nên một chồng nguyên liệu chỉ cần một lần nhấn để lấy năm hoặc mười cái một lúc thay vì nhấn mười lần, và có sẵn tùy chọn Tùy Chỉnh khi không mức nào trong hai vừa ý bạn. Một huấn luyện viên lớp mở ra danh sách những gì bạn có thể học ngay bây giờ và những gì vẫn còn chờ ở phía trước.\n\nMột thủ quỹ mở kho két của bạn, chiếc rương sắt với thêm ô chứa mà bạn có thể mua thêm. Nếu bang hội của bạn đã mở một ngân hàng, một thẻ thứ hai ở đó sẽ hiện ra: mọi thành viên đều có thể nhìn vào bên trong dù không có quyền lấy bất cứ thứ gì ra, nên không ai phải hỏi bang hội đang giữ những gì, cấp bậc quyết định ai được gửi, rút, và chuyển tiền của bang hội, và một nhật ký ghi lại mọi lần di chuyển.\n\nMột hòm thư Bưu Quạ mở ra những lá thư của bạn, với những gì đã đến trên một thẻ và một biểu mẫu để gửi thư trên thẻ kia, cả phần đính kèm cũng vậy. Chợ Thế Giới tại chỗ Thương Nhân có cửa sổ riêng của nó: duyệt và mua trên một thẻ, rao bán hàng của chính bạn trên thẻ khác, và thu tiền những gì đã bán được trên thẻ thứ ba. Giao dịch mặt đối mặt với người chơi khác mở ra một cửa sổ giao dịch với mỗi bên một phía.",
+      "worldWindowsBodyStationMaster": "Some windows you never press a key for: they open when you talk to the right person or click the right thing.\n\nA merchant opens the vendor window, with their stock to buy from and a buyback list at the foot of the same panel holding what you last sold, in case you sold it by mistake. A row of quantity buttons sits with the stock, so a stack of reagents is one press at five or ten at a time rather than ten presses, and a custom amount is there when neither suits. Your class abilities need no trainer, they come with your levels; the trainers here are the resident masters of the crafting stations, and Training on one of them opens the recipes they can teach you now, the ones you already know, and the ones still locked behind more skill.\n\nA banker opens your bank, with a Personal tab for the strongbox of extra slots you can buy more of and a Vault tab that stores your crafting materials by kind. If your guild has opened a bank, a Guild tab there shows it: every member can look inside even without permission to take anything out, so nobody has to ask what the guild is holding, ranks decide who may deposit, withdraw, and move the guild's coin, and a log records every movement.\n\nA Ravenpost mailbox opens your letters, with what has arrived on one tab and a form for sending on another, attachments and all. The World Market, at the Merchant in Eastbrook or Auctioneer Voss up in Highwatch, has its own window: browse and buy on one tab, list your own goods on another, and collect what has sold on a third. Trading face to face with another player opens a trade window with a side each.",
       "lootTitle": "Chiến lợi phẩm và tung xúc xắc",
       "lootBody": "Tương tác với một xác bạn xứng đáng nhận và cửa sổ chiến lợi phẩm sẽ mở ra, liệt kê những gì đã rơi ra. Bấm vào một dòng để lấy nó.\n\nTrong một tổ đội, một món rơi tốt theo quy tắc chia chiến lợi phẩm của nhóm sẽ hiện một lời nhắc tung xúc xắc trên màn hình của bạn: Cần Dùng nếu bạn muốn giữ cho mình, Tham Lam nếu bạn định lấy để bán, hoặc Bỏ Qua để nhường cho người khác. Một bảng nhỏ sau đó hiện ai đã tung xúc xắc và họ đã chọn gì trong khi bộ đếm giờ chạy xuống.\n\nBản thân các quy tắc chia chiến lợi phẩm nằm trong một cửa sổ nhỏ riêng. Trưởng nhóm có thể thay đổi chúng ở đó, còn mọi người khác chỉ xem cùng cửa sổ đó ở chế độ chỉ đọc, nên các quy tắc không bao giờ là bí mật.\n\nMột số xác cũng có thể được thu hoạch để lấy các bộ phận của chúng. Khi có thể, một mục Thu Hoạch sẽ xuất hiện ở cuối cửa sổ chiến lợi phẩm với một ô để tích chọn từng thành phần bạn muốn.",
       "playerCardTitle": "Thẻ người chơi của bạn",
@@ -5308,6 +5527,7 @@ export const vi_VN: EnTranslations = {
       "wikiBody": "Wiki này chỉ cách một cú bấm ngay trong trò chơi. Một nút cho nó nằm cùng các nút khác trong dải ở góc dưới bên phải, có một dòng cho nó trong menu trò chơi khi bấm Esc, và trên điện thoại nó nằm trong khay Thêm. Vì việc mở nó sẽ chuyển bạn sang trình duyệt, nút này luôn hỏi xác nhận trước, nên một cú chạm nhầm giữa trận chiến không bao giờ có thể kéo bạn ra khỏi trận đấu. Trò chơi vẫn tiếp tục chạy phía sau nó.",
       "mobileTitle": "Trên điện thoại hoặc máy tính bảng",
       "mobileBody": "Các điều khiển cảm ứng tự xuất hiện, và bố cục tự co giãn theo màn hình của bạn: một sắp xếp gọn nhẹ trên điện thoại nhỏ, một bố cục tiêu chuẩn trên điện thoại lớn hơn, và một bố cục rộng rãi hơn trên máy tính bảng.\n\nKỹ năng của bạn nằm trong một vòng tròn thay vì một hàng số: nút tấn công cùng năm nút hành động bên cạnh, và một nút chuyển trang hoán đổi vòng tròn qua các ô còn lại, tối đa bảy trang khi bạn đã bật cả ba thanh kỹ năng. Quanh chúng là những nút một người chơi cảm ứng dùng nhiều nhất: đổi mục tiêu, dùng thứ trước mặt bạn, và nhảy, cùng một hàng kéo ra chứa đồ tiêu hao tự động lấp đầy từ những gì bạn đang mang theo.\n\nDọc theo cạnh dưới là Trò Chuyện, Xã Hội, Nhiệm Vụ, Cài Đặt, và Thêm. Thêm mở ra một khay chứa các cửa sổ còn lại, gồm nhân vật, Tìm Hầm Ngục, PvP, Cúp Thung Lũng, biểu cảm, và wiki. Ở đây các cửa sổ lấp đầy màn hình thay vì nổi lên trên nó.\n\nDi chuyển khung đơn vị là việc dành cho máy tính để bàn: trên cảm ứng, bố cục tự đặt chúng cho bạn.",
+      "mobileBodyTwoPages": "Touch controls appear on their own, and the layout sizes itself to your screen: a compact arrangement on a small phone, a standard one on a larger phone, and a roomier one on a tablet.\n\nYour abilities sit in a ring rather than a number row: the attack button with four action buttons beside it, and a page toggle that swaps the ring between its {pages} pages, which together reach all {slots} of your ability slots whether or not the extra desktop bars are switched on. The fifth arc position of that ring is your consumables seat: tap it to use what is seated there, or hold it, or swipe it inward, to open a row that fills itself from what you are carrying. Around the ring sit the buttons a touch player reaches for most, swapping target, using what is in front of you, and jumping.\n\nOne Quick Actions control sits at the bottom edge in place of a row of buttons. It opens onto everything else: mount, chat, map, bags, social, quests, character, spellbook, game menu, and a More entry holding the rest of your windows, the Dungeon Finder, PvP, emotes and the wiki among them. Windows fill the screen here rather than floating over it.\n\nMoving your unit frames is a desktop thing: on touch the layout places them for you.",
       "railTitle": "Dải nút bấm",
       "railBody": "Ở góc dưới bên phải màn hình, cách xa bản đồ nhỏ, là một dải nút vuông nhỏ, mỗi nút cho một cửa sổ, xếp thành hai cột ngắn cạnh nhau. Hầu hết được in kèm phím mặc định của chúng.\n\nCột thứ nhất gồm nhân vật, sách phép, tài năng, nhật ký nhiệm vụ, Sách Kỳ Công, nghề nghiệp, bản đồ thế giới, túi đồ, và chế tác. Cột thứ hai mở đầu với Cửa hàng WOC rồi tiếp tục qua PvP, Tìm Hầm Ngục, Cúp Thung Lũng, Đấu Bài, bảng xếp hạng, biểu cảm, âm nhạc, bạn bè và bang hội, wiki này, và menu trò chơi. Vài nút khác chỉ gia nhập khi có thể áp dụng."
     },
@@ -5853,13 +6073,13 @@ export const vi_VN: EnTranslations = {
       "valeBlurb": "Thung lũng khởi đầu xanh tươi, nơi những anh hùng mới rèn luyện bản lĩnh với lũ sói và đám cướp quanh thị trấn Eastbrook.",
       "marshBlurb": "Một xứ sở chìm trong sương mù và phế tích. Bầy mudfin tràn ngập vùng nước nông và một thứ gì đó cổ xưa hơn đang cựa quậy dưới mặt nước, được canh chừng từ thị trấn cầu Fenbridge.",
       "peaksBlurb": "Những sống núi bị gió mài và các khu mỏ cũ leo lên tới những hiểm nguy khắc nghiệt nhất của con đường khởi đầu, do tiền đồn Highwatch trấn giữ.",
-      "duskBlurb": "Một thung lũng chìm trong hoàng hôn vĩnh cửu dưới tán đại thụ Eldergleam, nơi những phế tích pha lê tỏa sáng và không khí ngân vang phép thuật cổ xưa.",
+      "duskBlurb": "Một thung lũng chìm trong hoàng hôn vĩnh cửu dưới tán đại thụ Eldershine, nơi những phế tích pha lê tỏa sáng và không khí ngân vang phép thuật cổ xưa.",
       "emberBlurb": "Vùng đất hoang tàn ngập tro tàn và bloodglass, rực sáng dưới ánh bão chớp giật, nơi bầy rồng lượn vòng trên miệng núi lửa và lửa trại của troll cháy rực giữa những cồn cát, tất cả được canh giữ từ thị trấn cổng Wyrmwatch.",
       "frostBlurb": "Một khoảng lặng phủ tuyết và thông đen dưới ánh cực quang, nơi cái lạnh dường như cũng đang thức tỉnh, còn Icemantle vẫn giữ cho lửa trại không bao giờ tắt.",
       "amberBlurb": "Một mùa thu vĩnh cửu với những chiếc lá vàng đỏ không bao giờ rụng, quần tụ quanh thị trấn Lanternmere rực sáng ánh đèn lồng.",
       "fenBlurb": "Một vùng đất ngập nước tươi sáng, rộn ràng tiếng vo ve, phủ đầy hoa súng và dòng nước chảy chậm, được băng qua bằng những lối ván gỗ cũ kỹ từ thị trấn cầu Bridgemere.",
       "nightBlurb": "Một cõi giới của đêm khuya lấp lánh sao trời, nơi hoa lá thắp sáng những lối đi và Moonrest lặng lẽ canh giữ dưới bầu trời đang say giấc mộng.",
-      "hauntBlurb": "Một khu rừng ma ám dưới những tán cây khổng lồ, nơi những ngọn đèn lồng của Gallowmere là thứ ánh sáng chân thật duy nhất trên con đường.",
+      "hauntBlurb": "Một khu rừng ma ám dưới những tán cây khổng lồ, nơi những ngọn đèn lồng của Gibbetmere là thứ ánh sáng chân thật duy nhất trên con đường.",
       "galeBlurb": "Những vách đá ven biển và cao nguyên lộng gió nơi cơn gió chẳng bao giờ ngơi nghỉ, Hải Đăng Cổ chẳng bao giờ tắt, và Wickharbor thì luôn đóng chặt cửa nẻo.",
       "jungleBlurb": "Một mớ bòng bong nhiệt đới của những rặng cọ, cát trắng và tiếng chim ríu rít vang xa, cùng thị trấn ven biển Drifthaven vẫn giữ ngọn lửa cháy sáng trên bãi cát.",
       "gardenBlurb": "Một cõi giới vườn mê cung hàng rào vẫn được xén tỉa gọn gàng dù chưa ai từng thấy bóng dáng một người làm vườn nào, bước vào qua khỏi Hedgewick và những sân đài phun nước của nó.",
@@ -5870,7 +6090,7 @@ export const vi_VN: EnTranslations = {
       "peaksGreeting": "Hai trăm năm bức tường này đã đứng vững. Nó sẽ không sụp đổ dưới phiên gác của ta, nhưng nó đang rền rĩ.",
       "peaksGreeter": "Đại Úy Thessaly, Highwatch",
       "duskGreeting": "Rất ít người như bạn từng đứng dưới những tán cành này. Hãy bước đi nhẹ nhàng, và xin chào đón bạn đến đây.",
-      "duskGreeter": "Người Giữ Saelwyn, Eldergleam",
+      "duskGreeter": "Người Giữ Saelwyn, Eldershine",
       "emberGreeting": "Gió nóng thổi từ vùng đất hoang, rồng bay lượn trên Drakemaw, và lửa trại của troll cháy giữa những cồn cát. Uống nước trước khi bước ra ngoài đó.",
       "emberGreeter": "Vệ Quan Cổng, Wyrmwatch",
       "frostGreeting": "Tuyết nuốt trọn mọi âm thanh ngoài kia, sau bức tường. Nếu ánh sáng bắt đầu nhảy múa trên trời, hãy giữ giọng thật khẽ và lửa thì đừng để tắt.",
@@ -5882,7 +6102,7 @@ export const vi_VN: EnTranslations = {
       "nightGreeting": "Qua khỏi Nightgate, chính bầu không khí cũng đang chìm trong giấc mộng. Hãy men theo ánh sáng của hoa, và để ý đến thế giới đang say ngủ treo lơ lửng trên bầu trời.",
       "nightGreeter": "Vệ Quan Canh Thức, Moonrest",
       "hauntGreeting": "Hãy bám theo ánh đèn lồng, lữ khách à. Và nếu khu rừng gọi tên bạn từ ngoài con đường, đừng bao giờ đáp lại.",
-      "hauntGreeter": "Người Thắp Đèn, Gallowmere",
+      "hauntGreeter": "Người Thắp Đèn, Gibbetmere",
       "galeGreeting": "Ở đây gió chưa từng một lần ngừng thổi, và Hải Đăng Cổ chưa từng một lần tắt lửa. Nhớ đóng cửa quán trọ lại sau lưng nhé.",
       "galeGreeter": "Người Giữ Hải Đăng, Wickharbor",
       "jungleGreeting": "Cát ấm, tiếng chim ríu rít, và một khu rừng rậm nuốt trọn cả chân trời. Chúng tôi luôn giữ một ngọn lửa cháy trên bãi biển; cố mà quay về với nó nhé.",
@@ -5891,14 +6111,14 @@ export const vi_VN: EnTranslations = {
       "gardenGreeter": "Người Giữ Cổng, Hedgewick",
       "valePlaceNotes": "Eastbrook là căn cứ nhà đầu tiên của bạn. Wolf Run và Boar Meadow là vùng săn bắn hiền hòa; Mirror Lake là vùng nước câu cá lý tưởng, dù lũ cá bùn lúc nhúc nơi vùng nước nông của nó; Sableweb và Copper Dig giấu lũ nhện và đám đào mỏ tham quặng; một Bandit Camp và Fallen Chapel chứa những công việc gai góc hơn; Reliquary Hill dẫn xuống Collapsed Reliquary, delve đầu tiên của vương quốc; Brightwood Glade là một khu rừng thưa ngập nắng, tĩnh lặng ở phía bắc; và Sân Heo Nái là sân bóng heo rừng có tường bao của Eastbrook, nơi Cúp Thung Lũng thi đấu dưới một lệnh hưu chiến mùa gặt.",
       "marshPlaceNotes": "Fenbridge canh giữ con đường khô ráo duy nhất. Prowler Reeds và Deepfen Shallows đầy ắp thú đầm lầy và mudfin; Widow Thicket giăng kín mạng nhện dày đặc; Drowned Chapel và Troll Mounds giữ những hiểm họa cổ xưa hơn, với Kinh Cầu Chết Chìm, delve của riêng đầm lầy, mở ra ngay phía bắc các gò mộ; Gravecaller Encampment là nơi giáo phái đào hầm ẩn náu, và Pháo Đài Chìm là trái tim hầm ngục của đầm lầy.",
-      "peaksPlaceNotes": "Highwatch giữ vững bức tường. Stalker Ridge và Deeprock Burrows thuộc về mèo núi và lũ đào hang; Ogre Foothills và Drogmar's War-Camp thuộc về lũ côn đồ đánh thuê; Stormcrag lách tách tiếng các nguyên tố, và bên dưới nó Hồ Lung Linh phát sáng, hồ nước trên núi mà bờ của nó giữ cánh cổng ánh sáng nhợt nhạt dẫn xuống Ngôi Đền Chết Chìm; Wyrmcult Tents và Revenant Fields bao quanh vùng đất cao của giáo phái, với Thánh Đường Mộ Long ở đỉnh của nó.",
-      "duskPlaceNotes": "Eldergleam quần tụ dưới tán đại thụ. Hang Duskfall cùng đài quan sát của nó là lối vào và cũng là cảnh tượng đầu tiên của thung lũng; Rừng Cổ Thụ và Bồn Địa Starfall giữ lấy miền nam tĩnh lặng; Sân Chìm ôm những phế tích rậm rạp ở phía đông; còn Vực Sâu Lấp Lánh và Bãi Cạn Pha Lê tỏa sáng khắp miền bắc.",
+      "peaksPlaceNotes": "Highwatch giữ vững bức tường. Stalker Ridge và Deeprock Burrows thuộc về mèo núi và lũ đào hang; Ogre Foothills và Drogmar's War-Camp thuộc về lũ côn đồ đánh thuê; Stormcrag lách tách tiếng các nguyên tố, và bên dưới nó Hồ Lung Linh phát sáng, hồ nước trên núi mà bờ của nó giữ cánh cổng ánh sáng nhợt nhạt dẫn xuống Ngôi Đền Chết Chìm; Broodsworn Tents và Revenant Fields bao quanh vùng đất cao của giáo phái, với Thánh Đường Mộ Long ở đỉnh của nó.",
+      "duskPlaceNotes": "Eldershine quần tụ dưới tán đại thụ. Hang Duskfall cùng đài quan sát của nó là lối vào và cũng là cảnh tượng đầu tiên của thung lũng; Rừng Cổ Thụ và Bồn Địa Starfall giữ lấy miền nam tĩnh lặng; Sân Chìm ôm những phế tích rậm rạp ở phía đông; còn Vực Sâu Lấp Lánh và Bãi Cạn Pha Lê tỏa sáng khắp miền bắc.",
       "emberPlaceNotes": "Wyrmwatch trấn giữ cổng vào. Gatewood là mảng xanh cuối cùng trước vùng đất hoang; Cồn Cát Tro Tàn cuộn tro bụi và những thứ còn tệ hơn thế; Trollmoot là nơi lũ troll cồn cát tụ tập quanh lửa trại; Cánh Đồng Bloodglass lấp lánh những mảnh vỡ sắc như dao cạo; còn Miệng Núi Lửa Drakemaw là vương miện bốc khói mà bầy rồng vẫn lượn vòng quanh.",
       "frostPlaceNotes": "Icemantle giữ ngọn lửa ấm cuối cùng. Snowline đánh dấu nơi tuyết trôi bắt đầu chiếm lĩnh; Hồ Băng Hà là vùng nước đen tĩnh lặng dưới lớp băng; Bậc Thang Cực Quang vươn lên dưới ánh sáng nhảy múa; Shiverfen là đầm lầy đóng băng chẳng bao giờ thực sự ngủ yên; còn Bậc Thềm Gào Thét thì đêm nào cũng xứng với cái tên của mình.",
       "amberPlaceNotes": "Lanternmere tỏa sáng giữa lòng mùa gặt. Goldmelt là con đèo phủ hổ phách dẫn vào thị trấn; Vườn Cây Dát Vàng và Thung Lũng Mùa Gặt giữ những vụ mùa ngọt nhất cùng những tên trộm liều lĩnh nhất; Đại Hồ phản chiếu những tán lá rực cháy; Đồi Cindermaple sừng sững cao nhất và đỏ nhất; còn Trụ Đá Nghiêng thì lưu giữ ký ức về một điều gì đó cổ xưa hơn cả mùa thu.",
       "fenPlaceNotes": "Bridgemere nằm vắt ngang dòng nước chảy chậm. Bậc Thang Amberfen đổ xuống từ miền đất mùa gặt; Lilymoors và Vũng Nước Bogshine lấp lánh ma trơi và chuồn chuồn; Willowweep buông cành rủ xuống mặt hồ; còn Vùng Đất Lim Dim là nơi hiền hòa nhất mà vùng đất này có thể có.",
-      "nightPlaceNotes": "Moonrest giữ vững buổi canh thức. Nightgate là lối vào miền đất nửa đêm; Moonwell lưu giữ ánh sao mà bạn có thể đứng cạnh bên; Gloamfield nở hoa trong bóng tối; Đài Canh Thức Bất Động dõi trông mà chẳng bao giờ lay động; còn Gò Mộ Không Ngủ là nơi duy nhất ở đây chẳng bao giờ chìm vào giấc mộng.",
-      "hauntPlaceNotes": "Gallowmere co cụm bên trong vòng đèn lồng của mình. Crowgate là cánh cửa u ám của khu rừng; Bụi Rậm Của Góa Phụ giăng kín tơ nhện dày đặc; Khoảng Rừng Treo và Nhà Nguyện Mournstone giữ lại những nỗi đau cổ xưa nhất của khu rừng; còn Bãi Trống Của Thợ Săn thuộc về bất cứ thứ gì vẫn còn săn đuổi nơi đó.",
+      "nightPlaceNotes": "Moonrest giữ vững buổi canh thức. Nightgate là lối vào miền đất nửa đêm; Moonspring lưu giữ ánh sao mà bạn có thể đứng cạnh bên; Gloamfield nở hoa trong bóng tối; Đài Canh Thức Bất Động dõi trông mà chẳng bao giờ lay động; còn Gò Mộ Không Ngủ là nơi duy nhất ở đây chẳng bao giờ chìm vào giấc mộng.",
+      "hauntPlaceNotes": "Gibbetmere co cụm bên trong vòng đèn lồng của mình. Crowgate là cánh cửa u ám của khu rừng; Bụi Rậm Của Góa Phụ giăng kín tơ nhện dày đặc; Khoảng Rừng Treo và Nhà Nguyện Mournstone giữ lại những nỗi đau cổ xưa nhất của khu rừng; còn Bãi Trống Của Thợ Săn thuộc về bất cứ thứ gì vẫn còn săn đuổi nơi đó.",
       "galePlaceNotes": "Wickharbor nghiêng mình đón gió. Windway là con đường vách đá dẫn vào; Cao Nguyên Gào Thét trải dài trọc lóc dưới cơn cuồng phong; Hải Đăng Cổ đã cháy sáng lâu đến mức không ai còn nhớ nổi từ bao giờ; Shear đổ dốc thẳng đứng xuống mặt nước; Wreckfields giữ cho bờ biển này luôn thành thật; còn Hồ Gương là thứ duy nhất còn tĩnh lặng trong cả cõi này.",
       "junglePlaceNotes": "Drifthaven giữ ngọn lửa của mình trên bãi biển. Tanglemouth là nơi dòng sông gặp bức tường xanh thẳm; Palmstrand chạy dài trắng xóa và ấm áp dọc theo sóng biển; Rừng Rậm Ngọc Lục Bảo và Vinefall nuốt trọn vùng nội địa; Đầm Phá Lam Ngọc tỏa sáng trong vắt và sâu thẳm; còn Tượng Thần Chìm dõi theo từ dưới làn nước.",
       "gardenPlaceNotes": "Hedgewick chờ đợi ngay tại Cổng Vườn. Lối Đi Bồn Hoa nở rộ sắc màu được xén tỉa gọn gàng; Lâu Đài Dawnhold vẫn huấn luyện hiệp sĩ sau những bức tường mới; Ao Cánh Hoa trôi dạt sắc hồng quanh năm; Cối Xay Cũ vẫn tự xoay vòng luống hoa của riêng nó; Đại Mê Cung thay đổi cách cư xử cho từng vị khách, những vòm cổng của nó được canh giữ bởi lũ cáo lá; Trạm Gác Phương Bắc trấn giữ con đường ra; Bồn Hoa Huệ nghỉ ngơi phía sau tất cả; và Sân Đài Phun Nước vẫn chảy trong vắt tại trái tim khu vườn.",
@@ -6101,13 +6321,17 @@ export const vi_VN: EnTranslations = {
       "ladderBody": "Chế độ xếp hạng theo dõi thứ hạng của bạn theo thời gian. Xem bảng xếp hạng để biết bạn đang ở đâu và ai đang đứng đầu vương quốc.",
       "rewardsHeading": "Chế Độ Xếp Hạng Trả Gì",
       "rewardsBody": "Một chiến thắng xếp hạng trả Danh dự, đồng tiền của việc người chơi đấu người chơi, còn một thất bại không tốn của bạn gì ngoài điểm xếp hạng. Danh dự được thiết kế để thưởng cho những trận đấu thực sự: đánh bại cùng một đối thủ hay cùng một đội lần nữa trong cùng một ngày sẽ không trả thêm gì nữa, một ngày thắng dài sẽ trả ít Danh dự hơn một chút cho mỗi trận thắng khi nó kéo dài, và một trận đấu mà đối thủ của bạn bỏ cuộc vẫn thay đổi điểm xếp hạng của bạn nhưng không trả Danh dự nào cả. Ngày đó là ngày riêng của Danh dự, và nó tự làm mới theo đồng hồ riêng chứ không theo giờ đặt lại instance của vương quốc.",
+      "rewardsBodyLossShare": "A ranked win pays Honor, the player versus player currency, and a loss you play to the end still pays a smaller share of it, as does a draw, so rating is the only thing a loss really costs you. Honor is meant to reward real matches: beating the same opponent or the same team again on the same day pays nothing further (nor does losing to them again), a long winning day pays in full for its first stretch of wins and then halves what a win pays, halving it again deeper in and staying there, and a match your opponent forfeits still moves your rating but pays no Honor at all. That day is the realm's own: it rolls over at the realm's nightly reset hour, the same boundary every daily lockout clears on.",
       "honorHeading": "Danh Dự",
       "honorBody": "Danh dự là đồng tiền của việc chiến đấu với người chơi khác. Bạn kiếm được nó tại Đấu Trường Tro Tàn và ngoài Cánh Đồng Trũng Gai, nó được giữ tách biệt với tiền vàng của bạn và không bao giờ trộn lẫn, còn bảng nhân vật của bạn hiển thị bạn đang giữ bao nhiêu. Chỉ có đúng một thứ để tiêu nó vào: trang bị Chiến Tranh.",
       "quartermastersBody": "Hai quân nhu trưởng giữ cùng một loại hàng, nên hãy giao dịch với người nào gần bạn hơn. NỘ KHÍ, Thủ Lĩnh Danh Dự, đứng tại Thung Lũng Đông Khê, còn Chiến Thống Chế Draven Kole, Quân Nhu Trưởng Chiến Tranh, giữ quầy hàng tại Highwatch. Hàng của họ thuộc bậc Chiến Tranh: năm dòng giáp, cùng dây chuyền, nhẫn, và vũ khí dùng chung cho tất cả các dòng đó.",
       "honorFinalNote": "Giao dịch mua bằng Danh dự là vĩnh viễn. Một giao dịch mua bằng tiền vàng có thể hoàn tác từ danh sách mua lại của người bán, nhưng một giao dịch mua bằng Danh dự không bao giờ xuất hiện ở đó, và trang bị Chiến Tranh bị ràng buộc linh hồn ngay khoảnh khắc bạn mua nó, nên nó không bao giờ có thể trao đổi, gửi thư, hay bán lại lấy bất cứ thứ gì. Chính vì lý do đó mà cửa hàng yêu cầu bạn xác nhận: hãy đọc kỹ món đồ trước khi bạn nhấn mua.",
+      "honorFinalNoteSoldBack": "Honor purchases are final. The buyback list only ever holds what you sold: a coin purchase can usually be sold back for its sell price and reclaimed from that list if you change your mind again, but Warfare gear is soulbound the moment you buy it, so it can never be traded, mailed, or sold back for anything, and it never reaches that list. The shop asks you to confirm for that reason: read the piece before you press it.",
       "warfareHeading": "Trang Bị Chiến Tranh",
       "warfareBody": "Mỗi món trang bị Chiến Tranh đều mang Chỉ Số Tấn Công Chiến Tranh và Chỉ Số Phòng Thủ Chiến Tranh, và hai chỉ số này hoàn toàn vô dụng trước quái vật. Chúng chỉ phát huy tác dụng khi bạn chiến đấu với người chơi khác, trong một trận đấu tay đôi, tại đấu trường, hoặc trên chiến trường, nơi Tấn Công cộng thêm vào sát thương bạn gây ra và Phòng Thủ giảm bớt sát thương bạn nhận vào, mỗi chỉ số đều có trần riêng. Mỗi dòng giáp cũng là một bộ trang bị, và các phần thưởng bộ của nó cũng là chỉ số Chiến Tranh hay hiệu ứng chỉ có tác dụng trước người chơi, nên một bộ đồ danh dự đầy đủ chẳng có giá trị gì trước một trùm hầm ngục.",
-      "warfareTradeBody": "Đó là sự đánh đổi có chủ ý. Trang bị Chiến Tranh được tạo ra để chiến đấu với người chơi, không phải để làm đường tắt vượt qua các bậc hầm ngục: một món trang bị Chiến Tranh không bao giờ mang chỉ số chiến đấu như một món sử thi hầm ngục cùng ô trang bị, và mọi thứ nó mang lại chỉ dùng được trước người chơi khác. Nếu bạn muốn trụ vững ở đấu trường, hãy mua nó. Nếu bạn muốn dọn heroic nhanh hơn, hãy kiếm trang bị của mình trong các hầm ngục."
+      "warfareBodyStatsStay": "Every Warfare piece carries Warfare Offense and Warfare Defense Rating, and those two ratings do nothing at all against monsters. They apply only when you fight another player, in a duel, in the arena, or on the battleground, where Offense adds to the damage you deal and Defense cuts the damage you take, each up to its own ceiling. Each armor family is also a set, and its set bonuses are likewise Warfare rating or effects that only work against players, so a full honor kit's set bonuses count for nothing on a dungeon boss. The pieces themselves still carry their ordinary stats, armor, and weapon damage, and those work everywhere; it is the Warfare ratings and the set bonuses that go quiet against a monster.",
+      "warfareTradeBody": "Đó là sự đánh đổi có chủ ý. Trang bị Chiến Tranh được tạo ra để chiến đấu với người chơi, không phải để làm đường tắt vượt qua các bậc hầm ngục: một món trang bị Chiến Tranh không bao giờ mang chỉ số chiến đấu như một món sử thi hầm ngục cùng ô trang bị, và mọi thứ nó mang lại chỉ dùng được trước người chơi khác. Nếu bạn muốn trụ vững ở đấu trường, hãy mua nó. Nếu bạn muốn dọn heroic nhanh hơn, hãy kiếm trang bị của mình trong các hầm ngục.",
+      "warfareTradeBodyRatingSpent": "That is the deliberate trade. Warfare gear is built for fighting players, not as a shortcut past the dungeon tiers: a Warfare piece never carries the combat ratings a dungeon epic in the same slot does, and the Warfare rating and set bonuses it carries instead are spent entirely on other players. If you want to hold your own in the arena, buy it. If you want to clear heroics faster, earn your gear in the dungeons."
     },
     "thornhollowPage": {
       "heading": "Cánh Đồng Trũng Gai",
@@ -6300,6 +6524,9 @@ export const vi_VN: EnTranslations = {
       "soulboundBody": "Một vài phần thưởng đặc biệt là ràng buộc linh hồn, gắn với nhân vật của bạn ngay từ khoảnh khắc bạn giành được chúng. Một vật phẩm ràng buộc linh hồn không thể trao đổi, gửi thư, bán cho người bán, hay niêm yết trên chợ; nó là của bạn và chỉ của riêng bạn. Ngày nay sự bảo vệ ấy canh giữ những token phần thưởng như Dấu Ấn Anh Hùng, trong khi trang bị bạn giành được là của bạn để tùy ý trao đổi, bán, hay san sẻ.",
       "uniqueTitle": "Độc Nhất Khi Trang Bị: mỗi loại huyền thoại một món",
       "uniqueBody": "Vật phẩm huyền thoại là độc nhất khi trang bị: nhân vật của bạn chỉ có thể mặc một bản duy nhất của một huyền thoại nhất định tại một thời điểm, và phiên bản Anh Hùng của nó được tính là cùng một vật phẩm. Một bản thứ hai có thể nằm trong túi đồ, trong ngân hàng, hoặc trên chợ của bạn, nhưng cố mặc cả hai cùng lúc sẽ bị từ chối, và chú thích mang một nhãn Độc Nhất Khi Trang Bị màu vàng để bạn biết luật này trước khi lên kế hoạch xây dựng nhân vật quanh hai món đó.",
+      "masterwroughtTitle": "Masterwrought: the crafted summit",
+      "masterwroughtBody": "The finest crafted gear carries a gold Unique-Equipped: Masterwrought tag on its tooltip. These pieces are the summit of the crafting professions, made by master crafters from rare materials and traded freely on the open market, and they stand beside the treasures of the deepest dungeons. The tag is one shared family rule: a character can wear at most two Masterwrought pieces at once, whichever crafts they come from, so pick the two slots where they serve your build best.",
+      "masterwroughtBodyLegendary": "The finest crafted gear carries a gold Unique-Equipped: Masterwrought tag on its tooltip. These pieces are the summit of the crafting professions, made by master crafters from rare materials and traded freely on the open market, and they stand beside the treasures of the deepest dungeons. The tag is one shared family rule: a character can wear at most two Masterwrought pieces at once, whichever crafts they come from, so pick the two slots where they serve your build best. The rule keeps one further line for the very top of the family: a wearer who has Perfected a Masterwrought piece can promote it into a legendary of their own naming, a chain the Professions page tells in full, and a character can wear at most one legendary Masterwrought piece among the two.",
       "setsTitle": "Bộ trang bị và hiệu ứng bộ",
       "setsBody": "Một số giáp đi theo bộ đồng dạng, vài món được cắt may để trông và chiến đấu như một khối. Hãy mặc đủ số món của một bộ cùng lúc và bộ đó thức dậy, ban lợi ích chồng lên chỉ số riêng của từng món, và bạn mặc càng nhiều món thì nó càng mạnh. Vài bộ như vậy xuất hiện như chiến lợi phẩm được thèm muốn trong lúc bạn lên cấp, còn những bộ lớn nhất đến từ nội dung nhóm khắc nghiệt nhất gần trần cấp, nên săn cho đủ một bộ là mục tiêu cuối trò chơi kinh điển. Việc đánh nhau với người chơi khác có những bộ đồng dạng của riêng nó, mua từng món một bằng Danh dự; chúng thức dậy ở số món khác với các bộ rơi ra từ chiến lợi phẩm, và lợi ích của chúng chỉ đáp lời khi kẻ địch là một người chơi khác.",
       "consumablesTitle": "Vật Phẩm Tiêu Hao",
@@ -6340,35 +6567,43 @@ export const vi_VN: EnTranslations = {
       "archetypeChooseBody": "Bạn không cần phải tự đi tìm kiếm bất kỳ điều nào trong số này. Hãy tiếp tục làm nghề, và một khi kỹ năng thủ công của bạn lần đầu thể hiện xu hướng rõ ràng về một cặp, Hội Thủ Công sẽ chú ý và gửi một bức thư Ravenpost nêu tên bậc thầy cần gặp và nhiệm vụ cần nhận. Thư đến một lần mỗi nhân vật, và chỉ khi bạn chưa thề với một cặp nào.",
       "archetypeSwitchBody": "Một lời tuyên bố cũng không phải bản án chung thân. Một cặp bạn chưa từng theo thì chỉ đơn giản là một nhiệm vụ thụ ngộ mới, còn quay lại một cặp bạn đã rời bỏ thì đòi bạn chuộc lỗi trước: năm nhiệm vụ ở lần đầu, và cộng thêm ba nhiệm vụ cho mỗi lần quay lại mà bạn đã thực hiện trước đó (nhận một cặp hoàn toàn mới không bao giờ làm tăng con số ấy). Lựa chọn vẫn giữ được sức nặng mà không bao giờ khóa hẳn một cánh cửa nào.",
       "whatHeading": "Một nghề bên cạnh thanh kiếm",
-      "whatBody": "Nghề nghiệp là đời sống lao động của thế giới này: bốn nghề thu thập kéo nguyên liệu thô thẳng ra khỏi đất, và một vòng gồm mười nghề thủ công biến chúng thành trang bị, bữa ăn, thuốc, và công cụ. Ở đây mọi thứ đều nuôi một thứ khác. Quặng bạn khai thác trở thành một lưỡi kiếm, lưỡi kiếm nhận một pháp khắc, và pháp khắc lại cần bụi phá ra từ trang bị cũ, nên người thu thập, người chế tác, và người mày mò máy móc đều là những mắt xích trong cùng một sợi dây.\n\nKhông có giới hạn số nghề nào để bạn phải đau đầu. Mỗi nhân vật đều có thể nâng bảy trong tám nghề thủ công có nội dung hôm nay cùng cả bốn nghề thu thập song song với nhau (Cơ Khí là ngoại lệ duy nhất: mọi công thức của nó đều bắt đầu trên cái trần miễn phí, nên cái thang của nó phải chờ lời thề của Chuyên Gia Nổ); lựa chọn độc quyền duy nhất là hình mẫu của bạn, cái danh tính mà rốt cuộc bạn sẽ thề theo, dù một khi đã thụ ngộ thì những nghề rơi vào trạng thái ngủ phía sau nó chỉ còn leo được trên các công thức phổ thông của chúng, và quá kỹ năng 75 thì không leo được nữa. Kỹ năng không bao giờ tụt xuống, và không thứ gì bạn đã học bị lấy đi.",
+      "whatBody": "Professions are the working life of the world: the gathering trades that pull raw material straight out of the land, and a ring of ten crafts that turn it into gear, meals, potions, and tools. Everything feeds something else here. The ore you mine becomes a blade, the blade takes an enchant, and the enchant needs dust broken out of old gear, so a gatherer, a crafter, and a tinkerer are all links in one chain.\n\nThere is no profession limit to agonize over. Every character can raise nine of the ten crafts and every gathering profession side by side (Engineering is the one holdout: its recipes all start above the free ceiling, so its ladder waits for the Bombardier's oath); the only exclusive choice is your archetype, the identity you eventually swear to, though once you attune the crafts that fall dormant behind it climb only on their common recipes, and past skill 75 not at all. Skill never goes down, and nothing you learn is ever taken away.",
       "ringHeading": "Vòng nghề thủ công",
-      "ringBody": "Mọi nghề thủ công có nội dung hôm nay đều có giới hạn 125 kỹ năng: Rèn Vũ Khí, Rèn Giáp, May Vá, Thuộc Da, Nấu Ăn, Giả Kim, Cơ Khí, và Pháp Khắc. Khi đạt giới hạn nghề thủ công vẫn tiếp tục hoạt động, thu hoạch vẫn cho ra sản phẩm, chế tạo vẫn hoàn thành, và kiệt tác vẫn có thể xảy ra; chỉ con số dừng leo. Chọn một mục dưới đây để xem bảng công thức đầy đủ và các con số của nghề thủ công.",
-      "ringWaveNote": "Hai nghề thủ công trên bánh xe, Chế Tác Trang Sức và Khắc Chữ, giữ chỗ nhưng chưa có công thức nào. Đây là có chủ ý chứ không phải sơ sót: nội dung của chúng đến cùng các khu vực trong tương lai, và các giới hạn trên tăng theo cùng cách đó, nên một nghề thủ công đã đạt giới hạn hôm nay là lợi thế cho sự mở rộng đó, không phải đích đến cuối cùng.",
+      "ringBody": "Every craft on the ring caps at 125 skill: Weaponcrafting, Armorcrafting, Jewelcrafting, Inscription, Tailoring, Leatherworking, Cooking, Alchemy, Engineering, and Enchanting. At a cap the trade keeps working, harvests still yield, crafts still resolve, and masterworks can still happen; only the number stops climbing. Pick a card below for a craft's full recipe tables and numbers.",
+      "ringWaveNote": "With Inscription taking up its quills, every seat on the wheel now ships real recipes. The ring is complete rather than finished: the caps rise with future zones, so a capped craft today is a head start on that expansion, not a finish line.",
       "capFmt": "Giới hạn {cap}",
       "comingSoon": "Chưa có công thức",
       "gatherHubHeading": "Thu thập",
       "gatherHubBody": "Bốn nghề thu thập nuôi vòng từ thực địa: Khai Khoáng, Đốn Gỗ, và Thảo Dược Học kéo quặng, gỗ, và thảo dược ra khỏi đất và đạt giới hạn 100 thành thạo, trong khi Câu Cá chạy theo nhịp cắn câu và giật cần riêng của nó tất cả đường đến 200. Mỗi trang dưới đây có bản đồ điểm tài nguyên, thang dụng cụ, và tỉ lệ chính xác.",
       "archetypesHeading": "Bánh xe và các hình mẫu",
-      "archetypesBody": "Mười nghề thủ công nằm trên một bánh xe cố định, và vị trí trên bánh xe ấy có ý nghĩa. Cứ hai nghề kề nhau lại tạo thành một cặp có tên: Thợ Rèn cho Rèn Vũ Khí và Rèn Giáp, Thợ Trang Phục cho Thuộc Da và May Vá, Dược Sĩ cho Giả Kim và Nấu Ăn, Chuyên Gia Nổ cho Cơ Khí và Giả Kim, cùng sáu cặp nữa quanh vòng.\n\nThụ ngộ với một cặp là một nhiệm vụ, không phải một cú nhấn trong menu. Hôm nay có bốn cặp có thể gia nhập (Thợ Rèn, Thợ Trang Phục, Dược Sĩ, và Chuyên Gia Nổ), mỗi cặp neo vào một bậc thầy thường trú ở Eastbrook mà nhiệm vụ tiếp nhận của họ nêu rõ toàn bộ giao kèo ngay từ đầu trước khi bạn nhận. Cho tới lúc bạn tuyên bố, mọi nghề thủ công đều tiến lên thoải mái trên các công thức tới hết bậc hiếm (bất kỳ công thức nào đòi kỹ năng 74 trở xuống), nên bạn có thể thử gần như mọi thứ trước khi chọn (riêng Cơ Khí không có công thức nào thấp đến thế, nên con số của nó phải chờ).\n\nMột khi bạn đã thụ ngộ, hai nghề trong cặp trở thành nghề chuyên ngành của bạn, không có trần nào ngoài chính giới hạn tối đa. Phần còn lại của bánh xe không tắt hẳn: một nghề nằm đối diện các nghề chuyên ngành vẫn sáng như một sở thích và tiếp tục leo qua hết bậc hiếm (một nhiệm vụ lặp lại được tại lò rèn của Thợ Rèn Haldren cho phép bạn đổi xem đó là nghề nào), và mọi nghề khác thì ngủ yên. Một nghề đang ngủ vẫn giữ kỹ năng và các công thức phổ thông của nó, những công thức ấy vẫn dạy nó theo đường cong bình thường cho tới khi chúng chuyển xám ở 75; mọi thứ trên bậc phổ thông ngừng trả điểm ngay lập tức, và một nghề đang ngủ không bao giờ cho ra kiệt tác trong lúc nó nghỉ.",
+      "archetypesBody": "Mười nghề thủ công nằm trên một bánh xe cố định, và vị trí trên bánh xe ấy có ý nghĩa. Cứ hai nghề kề nhau lại tạo thành một cặp có tên: Thợ Rèn cho Rèn Vũ Khí và Rèn Giáp, Thợ Trang Phục cho Thuộc Da và May Vá, Dược Sĩ cho Giả Kim và Nấu Ăn, Chuyên Gia Nổ cho Cơ Khí và Giả Kim, cùng sáu cặp nữa quanh vòng.\n\nThụ ngộ với một cặp là một nhiệm vụ, không phải một cú nhấn trong menu. Hôm nay có bốn cặp có thể gia nhập (Thợ Rèn, Thợ Trang Phục, Dược Sĩ, và Chuyên Gia Nổ), mỗi cặp neo vào một bậc thầy thường trú ở Eastbrook mà nhiệm vụ tiếp nhận của họ nêu rõ toàn bộ giao kèo ngay từ đầu trước khi bạn nhận. Cho tới lúc bạn tuyên bố, mọi nghề thủ công đều tiến lên thoải mái trên các công thức tới hết bậc hiếm (bất kỳ công thức nào đòi kỹ năng 74 trở xuống), nên bạn có thể thử mọi thứ trước khi chọn.\n\nMột khi bạn đã thụ ngộ, hai nghề trong cặp trở thành nghề chuyên ngành của bạn, không có trần nào ngoài chính giới hạn tối đa. Phần còn lại của bánh xe không tắt hẳn: một nghề nằm đối diện các nghề chuyên ngành vẫn sáng như một sở thích và tiếp tục leo qua hết bậc hiếm (một nhiệm vụ lặp lại được tại lò rèn của Thợ Rèn Haldren cho phép bạn đổi xem đó là nghề nào), và mọi nghề khác thì ngủ yên. Một nghề đang ngủ vẫn giữ kỹ năng và các công thức phổ thông của nó, những công thức ấy vẫn dạy nó theo đường cong bình thường cho tới khi chúng chuyển xám ở 75; mọi thứ trên bậc phổ thông ngừng trả điểm ngay lập tức, và một nghề đang ngủ không bao giờ cho ra kiệt tác trong lúc nó nghỉ.",
       "pairFmt": "{a} và {b}",
       "curveHeading": "Đường Cong Tinh Thông",
-      "curveBody": "Tích lũy kỹ năng tuân theo một quy tắc ở khắp nơi, Đường Cong Tinh Thông bốn trạng thái. Mỗi {step} điểm kỹ năng là một bậc, và mỗi công thức được tính theo vị trí của nó so với bậc của bạn: bằng hoặc cao hơn bậc của bạn thì tích lũy đầy đủ, thấp hơn một bậc thì tích lũy một nửa, thấp hơn hai bậc thì một phần tư, và thấp hơn ba bậc trở lên thì không gì cả.\n\nCửa sổ chế tác vẽ thẳng điều này lên danh sách công thức theo màu sắc cổ điển: cam cho tích lũy đầy đủ, vàng cho đã giảm, xanh lá cho rỉ giọt, xám cho không gì. Điểm tích lũy là tất định, không bao giờ là lần may kỹ năng, nên cùng một lần chế tạo ở cùng bậc luôn di chuyển kỹ năng của bạn đúng cùng một lượng, và công thức chuyển sang vàng là tín hiệu để bạn học bậc tiếp theo.\n\nThu thập chạy theo cùng đường cong với cùng bước bậc, được tính theo điểm tài nguyên thay vì công thức: các điểm tài nguyên dễ mờ dần thành xám khi bạn vượt qua chúng, và các điểm tài nguyên phong phú hơn ở các khu vực sau là thứ hoàn thành hành trình leo lên. Câu Cá giữ lịch riêng của nó: một điểm đầy đủ mỗi lần câu được dưới 50 thành thạo, nửa đến 100, một phần mười đến 150, và đuôi chậm đến tận 200, với lần câu được rác không dạy gì từ 100 trở lên.",
+      "curveBodyRetunedFishing": "Skill gain follows one rule everywhere, the four-state Mastery Curve. Every {step} points of skill is a tier, and each recipe is scored by where it sits against yours: at or above your tier it grants full gain, one tier below grants half, two below a quarter, and three or more below nothing at all.\n\nThe crafting window paints this straight onto the recipe list in the classic colors: orange for full gain, yellow for reduced, green for a trickle, gray for none. Gains are deterministic, never a skill-up roll, so the same craft at the same tier always moves your skill by exactly the same amount, and a recipe turning yellow is your cue to train the next rung.\n\nGathering runs on the same curve with the same tier step, scored against the node instead of a recipe: easy nodes gray out as you pass them, and the richer nodes of the later zones are what finish a climb. Fishing keeps its own schedule: 0.08 of a point per catch below 50 proficiency, 0.05 to 100, 0.04 to 150, and 0.03 to 200, with junk catches teaching nothing from 100 on.",
       "provenanceHeading": "Xuất xứ",
       "provenanceBody": "Tác phẩm tinh xảo trong thế giới này nhớ người tạo ra nó: thu hoạch và chế tạo chất lượng Hiếm trở lên đều đến có dấu thợ (Được thu thập bởi, Chế tạo bởi), một kiệt tác hoàn thiện một bậc phẩm chất cao hơn với tên người thợ luôn trên nó, và một món đồ ủy thác gắn kết với người nhận qua Liên Kết Người Thợ. Trang Kinh Tế Chế Tạo có toàn bộ quy tắc, từ chữ ký và xếp chồng đến phí giải trói.",
+      "endgameHeading": "The Masterwrought endgame",
+      "endgameBody": "Above every craft's trainer ladder sits one shared summit: the Masterwrought family, the crafted pieces wearing the gold Unique-Equipped: Masterwrought tag the Gear page describes. The chain has the same shape whichever craft climbs it: apex patterns found rather than taught, daily-gated intermediate crafts that pace the work, and three shared materials every ladder drinks from. The finished pieces trade freely like any other crafted work (the Crafting Economy page carries the trading rules), and the two-piece wearing cap keeps them an accent on a build rather than a whole kit, so a crafter who never sets foot in the deepest endgame still sells to the people who live there.",
+      "endgamePatternsBody": "The patterns arrive through three channels, and the recipe tables on every craft page label each row's own: found in the deepest endgame victories, sold by the Heroic Quartermaster for Heroic Marks, or both at once. The split is deliberate. The gear patterns are found and never sold, the consumable patterns sit on the quartermaster's counter from day one, and the farming patterns ride both roads. Patterns are ordinary tradable goods besides, so a find you cannot use is a find you can sell.",
+      "endgameMaterialsBody": "Three shared materials feed the chain. The Wyrmfall Core is the tradable catalyst: each of the deepest endgame's final victories pays a credited character 1 to 3 cores, once per source per day, the highest rift clears pay a fixed count of their own on the same daily clock, and the Heroic Quartermaster sells one for 12 Heroic Marks as the bad-luck backstop; cores trade freely. The Sundered Essence is soulbound, and sundering is its only source: any character can sunder, no profession asked, and the cast breaks a raid-won piece of epic gear of the tier into exactly one essence, the gear itself being the price. The Maker's Ember is soulbound too, and it is the chain's clock: one per week per character, granted on your first eligible endgame completion of the week, and a missed week is never lost, since the embers accrue and pay out on your next completion.",
+      "endgameMaterialsBodyAnyRaid": "Three shared materials feed the chain. The Wyrmfall Core is the tradable catalyst: each of the deepest endgame's final victories pays a credited character 1 to 3 cores, once per source per day, the highest rift clears pay a fixed count of their own on the same daily clock, and the Heroic Quartermaster sells one for 12 Heroic Marks as the bad-luck backstop; cores trade freely. The Sundered Essence is soulbound, and sundering is its only source: any character can sunder, no profession asked, and the cast breaks a raid-won piece of epic gear, from any raid and either difficulty, into exactly one essence, the gear itself being the price. The Maker's Ember is soulbound too, and it is the chain's clock: one per week per character, granted on your first eligible endgame completion of the week, and a missed week is never lost, since the embers accrue and pay out on your next completion.",
+      "perfectingHeading": "Perfecting, and the orange promotion",
+      "perfectingBody": "A finished apex piece is not the end of its story. Its owner, with 125 skill in the craft that made it, can walk the piece up four ranks of Perfecting. Each attempt spends one Maker's Ember, one Sundered Essence, and one Prismglass Setting, and succeeds four times in five; a miss costs the materials and nothing else, the piece is never harmed or set back. The first attempt binds the piece to the one perfecting it, so a copy meant for sale is sold before the work begins. A Perfected piece carries a stat bonus over its base, and Perfected is exactly what the Lucent Infusion waits for: the one enchant the Enchanting page marks Perfected only lands on nothing less.\n\nThe walk can begin one rank in. A masterwork proc on an apex craft cannot finish the piece a tier finer, since apex is already the top of the ladder, so it grants the head start instead: the piece comes off the bench at the first rank of Perfecting, with three ranks left to walk rather than four. It is the same roll and the same odds the Masterworks section on every craft page publishes, spent on a rank instead of a quality.",
+      "promotionBody": "The last step is the orange promotion, and it is the Deed of Making's whole purpose. Bring a Perfected piece and one Deed of Making, an inscriptionist's skill-125 writ, and the copy is promoted into a legendary carrying a name of your own choosing. No roll rides it: the promotion is deterministic, the stats do not change at all, and what changes is the name and the color. The deed is tradable, so the scribe and the wearer need never be the same person, and the family cap keeps its one extra line: a character wears at most one legendary Masterwrought piece among their two.",
       "stationsHeading": "Các trạm và ba thị trấn trung tâm",
-      "stationsBody": "Sáu trạm theo kiểu phục vụ cho bảy nghề thủ công gắn trạm, rải khắp ba thị trấn trung tâm. Eastbrook có lò rèn (Rèn Vũ Khí và Rèn Giáp dùng chung), bếp, khung cửi, và xưởng dụng cụ; Fenbridge có xưởng thuộc da, và Highwatch có nhà bào chế. Mỗi trạm có một bậc thầy thường trú bên cạnh người học công thức, đăng đơn đặt hàng, và cung cấp dịch vụ giải trói.\n\nBán kính hoạt động là 20 thước, xấp xỉ sân của trạm, nên bạn chế tạo khi đứng tại đe chứ không phải từ bên kia thị trấn. Chế Tác Trang Sức, Khắc Chữ, và Pháp Khắc không có trạm: hai cái đầu còn chờ công thức, và Pháp Khắc hoạt động ở bất kỳ đâu theo thiết kế.",
+      "stationsBody": "Six typed stations serve the nine station-bound crafts, spread across the three town hubs. Eastbrook holds the forge (Weaponcrafting, Armorcrafting, and Jewelcrafting all share it), the kitchens, the loom, and the toolworks; Fenbridge keeps the tannery, and Highwatch the apothecary (Alchemy and Inscription share that bench). Each station has a resident master beside it who trains recipes, posts work orders, and offers the unbind service.\n\nThe working radius is 20 yards, roughly the station's own yard, so you craft standing at the anvil rather than from across town. Enchanting alone has no station: it works anywhere by design.",
       "deedsHeading": "Thành tích ghi nhớ hành trình",
-      "deedsBody": "Sách Kỳ Công đồng hành với từng bước của hành trình này. Lần gắn kết đầu tiên của bạn đạt được thành tích Thề Nguyện Thủ Công và kiệt tác đầu tiên của bạn đạt được thành tích Thợ Đại Tài, cả hai đều có thể đeo như danh hiệu. Mỗi trong tám nghề thủ công có thể kiếm được đánh dấu một thành tích cột mốc ở kỹ năng 50 và đăng quang giới hạn của nó bằng danh hiệu Đại Sư, trong khi Câu Cá nhận được Lão Muối ở 100 thành thạo và danh hiệu Ngư Sư Thành Thạo ở 200.\n\nCó những trang lặng lẽ hơn: thành tích cho lần thu hoạch và chế tạo đầu tiên của bạn, cho những phát hiện hiếm may mắn tìm thấy ở thực địa, và cho việc bắt đầu tháo dỡ. Tất cả là trang trí, danh hiệu và Danh Vọng mà thôi. Thành tích không bao giờ ban sức mạnh; nó chỉ chứng minh bạn đã ở đó.",
+      "deedsBody": "The Book of Deeds walks beside every step of this. Your first attunement earns Craftsworn and your first masterwork earns Masterwright, both wearable as titles. All ten earnable crafts mark a milestone deed at 50 skill and crown their caps with a Grandmaster title, while Fishing gets Old Salt at 100 proficiency and the Master Angler title at 200.\n\nThere are quieter pages too: deeds for your first harvest and first craft, for the rare finds luck turns up in the field, and for taking up salvage. All of it is cosmetic, titles and Renown only. A deed never grants power; it only proves you were there.",
       "startHeading": "Bắt đầu từ đâu",
       "startBody": "Vừa đặt chân tới Eastbrook sau chặng đường dài? Hãy tìm Quản Đốc Odell và nhận Nghề Cho Mọi Đôi Tay: ông sẽ chỉ bạn tới những mạch quặng quanh Mỏ Đồng phía đông bắc thị trấn và trao cho bạn những vết chai tay đầu tiên. Nhưng hãy dè chừng chính khu mỏ ấy: bọn Thợ Đào Deeprock đóng trại trên đó cao hơn một người mới đến vài cấp, nên hãy khai thác các mạch ngoài rìa trước và để dành lõi của khu trại cho lúc bạn đã lên được vài cấp. Từ đó trở đi, hãy thu hoạch mọi mạch quặng, cụm cây gỗ, và khóm thảo dược bạn đi ngang qua khi làm nhiệm vụ; thành thạo đến với lữ khách một cách tự nhiên.\n\nVề lại thị trấn, nhấn T để mở cửa sổ chế tác và làm các công thức phổ thông mà mọi nhân vật đều biết từ đầu. Hãy ghé các bậc thầy ở lò rèn, bếp, khung cửi, và xưởng dụng cụ để xem họ dạy gì, và nhận đơn hàng của họ để có nguồn tiền đều đặn. Đến lúc lá thư của Hội tìm tới bạn, bạn sẽ đã biết cặp nào cho mình cảm giác như nhà.",
       "colStation": "Trạm",
       "colHub": "Thị trấn",
       "colMaster": "Bậc thầy",
       "masterCellFmt": "{name}, {title}",
-      "harvestBodyFamilies": "Thu hoạch không chỉ dừng lại ở các điểm tài nguyên. Nhiều loài thú bị hạ có thể được thu hoạch một lần cho mỗi con, ai đến trước được trước, để lấy da, nanh, móng vuốt, ngà, tơ, nọc độc, vải, và thịt, ngay từ xác cùng với chiến lợi phẩm thông thường của nó; một lần nhấn mở ra cả hai. Khi một con thú mang nhiều hơn một thành phần có thể thu hoạch, lựa chọn là của bạn: lấy hết mọi thứ nó có thể cho, hoặc tập trung vào ít thành phần hơn để lấy được một bậc phẩm chất rõ rệt tinh hơn.\n\nMột lượt tung thu hoạch phẩm chất hiếm trở lên trên một nhóm có mẫu vật hoàn hảo cũng trao thêm một mẫu vật hoàn hảo có dấu thợ (Da nguyên vẹn, Tơ lụa nguyên sơ, Tuyến nọc độc nguyên sơ, Móng Vuốt Nguyên Vẹn, hoặc Cắt Prime) bên trên sản lượng thông thường, và ghi lại Mẫu Vật Hoàn Hảo vào Sách Kỳ Công của bạn. Bất kỳ nhân vật nào cũng có thể thu hoạch, không cần huấn luyện, và bất kỳ công cụ thu hoạch nào bạn sở hữu cũng được tính vào nhánh cao cấp này, bất kể thuộc nghề nào.",
+      "harvestBodyFamilies": "Thu hoạch không chỉ dừng lại ở các điểm tài nguyên. Nhiều loài thú bị hạ có thể được thu hoạch một lần cho mỗi con, ai đến trước được trước, để lấy da, nanh, móng vuốt, ngà, sừng, mang, tơ, nọc độc, vải, và thịt, ngay từ xác cùng với chiến lợi phẩm thông thường của nó; một lần nhấn mở ra cả hai. Khi một con thú mang nhiều hơn một thành phần có thể thu hoạch, lựa chọn là của bạn: lấy hết mọi thứ nó có thể cho, hoặc tập trung vào ít thành phần hơn để lấy được một bậc phẩm chất rõ rệt tinh hơn.\n\nMột lượt tung thu hoạch phẩm chất hiếm trở lên trên một nhóm có mẫu vật hoàn hảo cũng trao thêm một mẫu vật hoàn hảo có dấu thợ (Da nguyên vẹn, Tơ lụa nguyên sơ, Tuyến nọc độc nguyên sơ, Móng Vuốt Nguyên Vẹn, hoặc Cắt Prime) bên trên sản lượng thông thường, và ghi lại Mẫu Vật Hoàn Hảo vào Sách Kỳ Công của bạn. Bất kỳ nhân vật nào cũng có thể thu hoạch, không cần huấn luyện, và bất kỳ công cụ thu hoạch nào bạn sở hữu cũng được tính vào nhánh cao cấp này, bất kể thuộc nghề nào.",
       "focusBodyTiers": "Mỗi thị trấn trung tâm đều có một bảng Trọng Tâm Thị Trấn dành cho những người thu hoạch ghé qua: đứng trong thị trấn, mở nó từ cạnh bản đồ nhỏ, và dồn một ngân sách 10 điểm trọng tâm vào các loại thành phần bạn quan tâm. Mỗi 5 điểm dồn vào một thành phần nâng bậc thu hoạch của nó lên một bước (tối đa hai bước), và mỗi điểm cộng thêm 10 phần trăm sản lượng của nó; thành phần không được dồn trọng tâm không bao giờ bị giảm.\n\nPhân bổ của bạn đi theo nhân vật đến bất cứ đâu và có thể được đặt lại trong bất kỳ lần ghé thị trấn nào sau này, theo tốc độ bạn chọn. Cứ từ từ thì hoàn toàn miễn phí: việc đặt lại chạy trong 1 phút cho mỗi điểm bạn di chuyển. Trả một chút để tăng tốc, 15 giây mỗi điểm cộng 5 đồng và 1 Bụi Thanh Âm mỗi điểm, và trả đủ sẽ làm điều đó tức thì với giá 25 đồng và 5 Bụi Thanh Âm mỗi điểm. Chỉ những điểm bạn thực sự di chuyển mới được tính, nên nhích một điểm duy nhất rất rẻ, và mở rồi đóng bảng mà không thay đổi gì thì không tốn gì ở bất kỳ mức nào.",
       "toolEffectsHeading": "Hiệu Ứng Công Cụ",
-      "toolEffectsBody": "Một công cụ thu hoạch có một ô gắn trong nó, và lá bùa của thợ pháp khắc là thứ được gắn vào. Túi Trữ Của Thợ Thu Thập cộng thêm một đơn vị vào những gì một lần thu hoạch mang lại; Con Mắt Nghệ Nhân nâng bậc của những gì nó lấy lên. Thợ máy Gizzel, Bậc thầy của công cụ tại Đông Khê, dạy cả hai cho những thợ pháp khắc đã đạt 25 kỹ năng trong nghề, và cả hai đều được làm tại xưởng dụng cụ của ông.\\n\\nMột lá bùa vừa được gắn mang 20 lượt nạp trên một công cụ phổ thông và thêm 10 lượt cho mỗi bậc hiếm cao hơn phổ thông, nên cùng lá bùa đó gắn trên một cây cuốc sử thi sẽ bắt đầu ở 50. Một lượt nạp chỉ bị tiêu khi lá bùa thực sự làm thay đổi kết quả, không bao giờ tiêu trên một lần thu hoạch mà nó không cải thiện được, và một ô gắn có thể được đặt để hỏi mỗi lần dùng, khiến lá bùa chờ cho đến khi bạn chọn Dùng Một Lượt. Gắn một lá bùa mới sẽ đúc lại ô gắn theo công cụ bạn đang mang lúc đó, nên nó sẽ đầy đến mức công cụ đó có thể chứa chứ không quay về mốc cao nhất trước đây, và việc gắn lại mà chẳng thay đổi gì cả sẽ bị từ chối thay vì ăn mất lá bùa.\\n\\nHết lượt nạp không phá hủy lá bùa: chủ công cụ nạp lại ô gắn, 10 lượt nạp cho mỗi nguyên liệu pháp khắc tiêu tốn, và loại nguyên liệu nó đòi hỏi theo mức tốt hơn giữa công cụ bạn đang mang và công cụ tốt nhất từng lấp đầy ô đó, Bụi Thanh Âm cho công cụ phổ thông hoặc khác thường, Tinh Chất Thanh Âm cho công cụ hiếm, và Mảnh Thanh Âm cho công cụ sử thi. Để công cụ tốt trong kho két không giúp việc nạp lại rẻ hơn, chỉ khiến nó nhỏ hơn với cùng mức giá; cách trung thực để xuống một bậc rẻ hơn là gắn một lá bùa mới trong khi mang công cụ kém hơn, việc này sẽ đúc lại ô gắn ở đó. Nếu trần của ô gắn nằm cao hơn mức công cụ hiện tại của bạn có thể lấp đầy, việc nạp lại sẽ dừng ở mức công cụ đó cho phép và báo cho bạn biết cần mang công cụ tốt hơn. Việc nạp lại tốn một nửa nguyên liệu khi bạn là thợ pháp khắc đã ký lên lá bùa, và ít hơn nữa nếu bạn có chuyên ngành Pháp Khắc; bất kỳ ai khác đều trả đủ giá. Một lần nạp lại là một lượt thi triển ngắn, giống như phần còn lại trong nhóm công thức chế tác."
+      "toolEffectsBody": "A gathering tool has a slot in it, and a crafted charm is what goes in. A Gatherer's Cache adds a unit to what a harvest yields; an Artisan's Eye raises the grade of what it pulls up; a Maker's Charm adds two units the same way. The first two are enchanting work: Tinker Gizzel, Master of the Toolworks in Eastbrook, teaches them to enchanters who have reached 25 skill in the craft. The Maker's Charm is engineering work instead, a dropped pattern crafted at 100 skill; all three are made at his toolworks.\n\nA freshly slotted charm carries 20 charges on a common tool and 10 more for every rarity rung above common, so the same charm slotted on an epic pick starts at 50. A charge is spent only when the charm actually changed the outcome, never on a harvest it did not improve, and a slot can be set to ask each use, so the charm waits until you say Use a Charge. Slotting a fresh charm re-mints the slot around the tool you are carrying at that moment, so it fills to what that tool can hold rather than back to some earlier high mark, and a re-slot that would change nothing at all is turned away instead of eating the charm.\n\nRunning out of charges does not destroy the charm: the tool's owner refills the slot, 10 charges for each arcane material spent, and which material it asks for follows the better of the tool you are carrying and the best tool that slot has ever been filled by, Chime Dust for a common or uncommon tool, Chime Essence for a rare one, and a Chime Shard for an epic. Leaving the good tool in the bank does not buy a cheaper refill, only a smaller one at the same price; the honest way down to a cheaper rung is to slot a fresh charm while carrying the lesser tool, which re-mints the slot there. If the slot's ceiling sits above what your current tool can fill, the refill stops where that tool stops and tells you to carry the better one. The refill costs half the materials when you are the crafter who signed the charm, and less again if you are specialized in the charm's own craft, Enchanting for a Cache or an Eye, Engineering for a Maker's Charm; anyone else pays the full rate. A refill is a short cast, like the rest of the craft family."
     },
     "profPages": {
       "back": "Quay Lại Nghề Nghiệp",
@@ -6383,10 +6618,21 @@ export const vi_VN: EnTranslations = {
       "matFmt": "{name} x{count}",
       "outputFmt": "{name} x{count}",
       "comboReq": "Cần {a} và {b}",
+      "oncePerDay": "Once per day",
+      "effectFood": "Restores {amount} health over {seconds} sec when eaten.",
+      "effectWellFed": "Well Fed when you finish eating: +{value} {stat} for {minutes} min.",
+      "effectWellFedAura": "Grants {aura} for {minutes} min when you finish eating.",
+      "effectFeast": "Sets out a feast others eat from, one serving each: {servings} servings, lasting {minutes} min.",
+      "effectFeastServing": "Each serving restores {amount} health over {seconds} sec.",
+      "effectFeastWellFed": "Well Fed when a serving is finished: +{value} {stat} for {minutes} min.",
       "sourceTrainerFee": "Huấn Luyện Viên, {fee}",
       "sourceTrainerFree": "Huấn Luyện Viên, miễn phí",
       "sourceKnown": "Biết từ đầu",
+      "sourceDrop": "From a found pattern",
+      "sourceVendor": "Sold by the Heroic Quartermaster",
+      "sourceDropAndVendor": "From a found pattern, or the Heroic Quartermaster",
       "gainFmt": "{reduced} / {minimal} / {zero}",
+      "gainNever": "never",
       "colRecipe": "Công thức",
       "colSkill": "Kỹ năng",
       "colSource": "Nguồn gốc",
@@ -6407,21 +6653,23 @@ export const vi_VN: EnTranslations = {
         "armorcrafting": "Rèn Giáp đập thành giáp xích, loại giáp nặng nhất người thủ công có thể làm, từ giáp đồng đinh tán cơ bản đến bộ giáp vảy osmium hiếm, cùng một cặp mảnh giáp chỉ số phép thuật bên cạnh. Khách hàng của nó là những người đứng ở nơi đòn đánh đổ xuống.",
         "tailoring": "May Vá dệt nên vải Trí Tuệ và Tinh Thần mà các pháp sư sống trong đó, từ đồ homespun cơ bản qua bộ gildenweave đến đồ sunweave hiếm, và may Túi Lụa Silkspun, một túi mười ô mà chẳng ai từ chối.",
         "leatherworking": "Thuộc Da thuộc trang bị Nhanh Nhẹn và Thể Lực cho những lớp né đòn thay vì đỡ đòn, từ đồ da cơ bản Fenbridge đến bộ mirewarden hiếm, và đây là nghề thủ công sâu duy nhất được đào tạo ngoài đầm lầy.",
-        "cooking": "Nấu Ăn biến mẻ câu trong ngày thành những bữa ăn ngồi lại hồi phục máu qua 18 giây nghỉ ngơi, loại hồi phục rẻ nhất trong game, từ Thịt Khô Ướp Muối cho đến Đại Tiệc Grand Roast của Marlow. Ai cũng ăn, nên không nghề nào được hoan nghênh trong nhóm hơn thế.",
-        "alchemy": "Giả Kim biến thảo dược, tuyến, và thủy tinh thành những lọ thuốc giúp bạn thắng trận: thuốc hồi máu và hồi phép khi mọi thứ trở nên tồi tệ, và tinh chất thể lực trụ vững trên thanh bùng cường xuyên suốt cả một dungeon.",
-        "engineering": "Cơ Khí chế tạo những công cụ mà mọi thợ thu thập nghiêm túc rồi cũng thèm muốn: cuốc, rìu, liềm, và cần câu bậc 4 và bậc 5 mà không quầy hàng nào bán lấy tiền vàng, mỗi cái đều ngốn chính công cụ bậc dưới nó.",
-        "enchanting": "Pháp Khắc tháo rời trang bị rồi đưa sức mạnh trở lại: phá những món không cần thành nguyên liệu huyền bí, rồi dùng chúng để gắn một phần thưởng chỉ số vĩnh viễn lên món bạn định giữ. Việc phá đồ và pháp khắc không cần trạm và không cần huấn luyện viên, ai cũng có thể bắt đầu ngay ngày đầu tiên; chỉ hai công thức bùa là đòi hỏi hơn thế, được dạy tại xưởng dụng cụ."
+        "cooking": "Cooking turns the day's catch and the season's harvest into sit-down meals that heal over 18 seconds of rest, the cheapest healing in the game, from Salted Jerky through Marlow's Grand Roast to the three apex role dishes, which heal more than any other food and leave a Well Fed buff on whoever finishes the plate. Everyone eats, so no craft is more universally welcome in a group.",
+        "alchemy": "Alchemy turns herbs, glands, and glass into bottles that win fights: healing and mana draughts for the moment things go wrong, stamina elixirs that sit on your buff bar through a whole dungeon, and at the top the flasks, one per role, that stay with you through your own death.",
+        "engineering": "Engineering builds the tools every serious gatherer ends up wanting: the tier 4 and tier 5 picks, axes and sickles, and the three fishing rods that climb from tier 4 to tier 6, none of which any counter will ever sell for coin, each one consuming the tool below it.",
+        "enchanting": "Enchanting takes gear apart and puts the power back in: break unwanted pieces into arcane materials, then spend them on a permanent stat bonus for a piece you mean to keep. Breaking and enchanting need no station and no trainer, and anyone can start on day one; only its three trainer recipes ask more, the two charms and the Lucent Reagent, taught and worked at the toolworks.",
+        "jewelcrafting": "Jewelcrafting is the finer bench of the Eastbrook forge: rings and necklaces in copper, iron, and rare osmium, with a Strength ring, an Intellect ring, and an Agility necklace on every rung. Jewelry has no armor and no class lock, so its customers are simply everyone with fingers and a neck.",
+        "inscription": "Inscription is the writing desk of the Highwatch apothecary: caster tomes for the offhand and stamina scrolls for everyone, milled from the same herbs the draughts beside them use. Its scrolls are the second door into the battle-elixir buffs, so even a fighter who never holds a book has reason to knock."
       },
       "craftProse": {
         "weaponcrafting": {
           "identityHeading": "Lưỡi dao mà mọi chiến binh đều tìm mua",
-          "identityBody": "Ai đó trong mọi nhóm đều muốn sản phẩm của nghề này, vì bậc hiếm một mình đã bao phủ cả ba sở thích: Osmium Warblade cho cận chiến Sức Mạnh, Glyphsteel War Axe cho chiến binh Nhanh Nhẹn, và Highpine Battle Staff, một cây gậy Trí Tuệ và Tinh Thần cho đám áo choàng.\n\nTrên vòng chế tác nó đứng giữa Rèn Giáp và Chế Tác Đá Quý. Danh tính đang hoạt động của nó là Thợ Rèn, đôi Rèn Vũ Khí và Rèn Giáp, thề trước Thợ Rèn Darva tại lò rèn bằng cách tự tay khai thác ba mạch quặng; đôi Bladewright với Chế Tác Đá Quý cũng được đặt tên trên vòng, nhưng chưa thể thề vì Chế Tác Đá Quý không có công thức cho đến khi mở rộng vùng sau.",
+          "identityBody": "Someone in every group wants this craft's work, because the rare rung alone covers all three appetites: the Osmium Warblade for Strength melee, the Glyphsteel War Axe for Agility fighters, and the Highpine Battle Staff, an Intellect and Spirit stave for the robe crowd.\n\nOn the craft ring it stands between Armorcrafting and Jewelcrafting. Its living identity is the Smith, the Weaponcrafting and Armorcrafting pair, sworn before Forgemistress Darva at the forge by working three ore veins with your own hands; the Bladewright pair with Jewelcrafting is named on the ring too, and though Jewelcrafting now works its own 0-to-50 jewelry ladder at this same forge, the pair still waits for its oath quest before it can be sworn.",
           "materialsHeading": "Những gì lò rèn cần",
           "materialsBody": "Khai Khoáng là xương sống. Quặng đồng lấy từ các mạch bậc 1 của Eastbrook Vale, quặng sắt từ Mirefen Marsh, và quặng osmium từ Thornpeak Heights, và mỗi bậc của thang đều bước lên theo đúng cách đó. Đốn Gỗ quan trọng hơn bạn tưởng: gỗ ironbark làm cán cho ngọn giáo lợn rừng, gỗ ashwood gánh cây chùy lớn, và một khúc gỗ highpine duy nhất tạo nên cây gậy chiến.\n\nPhần còn lại đến từ cuộc săn và quầy hàng. Da thô làm chuôi được thu hoạch thẳng từ xác sói và lợn rừng, mảnh xương đến từ đám xác chết không yên nghỉ hoặc từ trang bị phổ thông đã tháo dỡ, và thang lò rèn thì đốt Smithing Flux, 20 đồng một hũ từ chính tay Darva. Nếu việc khai khoáng của bạn tụt lại phía sau, không quầy hàng nào cứu được bạn ở khoản quặng: osmium đến từ các mạch của Thornpeak, từ các mạch khởi đầu của mọi vùng đất trẻ hơn trừ Farshore (nơi các mạch đào ra sắt), hoặc từ chồng hàng của một người chơi khác, qua giao dịch hay Chợ Thế Giới. Chỉ có Thỏi Glyphsteel là mua bằng tiền vàng, từ Thợ Máy Gizzel ở xưởng dụng cụ hoặc Quân Nhu Trưởng Bree ở Highwatch.",
           "ladderHeading": "Thang công thức, từng bậc một",
           "ladderBody": "Một công thức dã chiến, Kiếm Arming Eastbrook, mọi người đều biết từ đầu và chế tạo bất cứ đâu từ đồ săn bắt (vài nanh sói và mảnh xương) cộng sáu Smithing Flux từ quầy lò rèn. Thang thật sự là chín công thức từ huấn luyện viên theo ba bậc, tất cả gắn với lò rèn: bậc đồng (rìu có râu, chùy có bích, giáo lợn rừng) miễn phí để học ở kỹ năng 0, bậc sắt (kiếm dài, chùy lớn, dao ngắn) mở ở kỹ năng 25 với 25 bạc mỗi công thức, và bậc osmium (warblade, rìu chiến, gậy chiến) mở ở kỹ năng 50 với 1 vàng mỗi cái. Darva dạy công thức ngay khi bậc của bạn trong nghề đạt bậc của nó, nên mỗi bậc mở đúng lúc dải kỹ năng của nó bắt đầu.\n\nMột công thức nữa theo đôi: Găng Tay Gravewyrm, một mảnh kết hợp được dạy bởi huấn luyện viên mà chỉ Thợ Rèn đã thụ ngộ với cả Rèn Vũ Khí và Rèn Giáp ở kỹ năng 25 mới có thể làm, và không cần trạm nào cả.",
           "routeHeading": "Kiệt tác, và lộ trình thực tế tới 125",
-          "routeBody": "Mọi mảnh có dòng chỉ số thực thụ, trên thang này nghĩa là từ bậc sắt trở lên, đều có thể rời khỏi đe dưới dạng kiệt tác, miễn là phẩm chất cao hơn đó vẫn lọt vào trần bậc của bạn; những món phổ thông đồng không chỉ số thì không bao giờ tạo kiệt tác, vì trong chúng chẳng có gì để cải thiện. Sắt và osmium tính là nguyên liệu bậc 1 cho phần thưởng kiệt tác, highpine và glyphsteel tính là bậc 2, và kỹ năng nằm trên bậc riêng của một công thức cộng thêm điểm của nó cho mỗi bậc, nên trong bộ ba osmium thì rìu chiến và gậy chiến mới là hai món mang lợi thế nguyên liệu, và một bậc vẫn tiếp tục tạo kiệt tác tốt hơn sau khi bạn đã vượt qua nó.\n\nHãy cưỡi bậc đồng tới 25, học bậc sắt ngay ngày nó mở và cưỡi nó tới 50, rồi bậc osmium tới 75. Sau 75 chưa có gì cao hơn được phát hành, nên các công thức osmium mờ dần xuống một nửa rồi một phần tư điểm thưởng: hãy dự trù khoảng 150 lần chế tác nữa để đạt giới hạn 125, và nhớ giới hạn dùng chung mười hành động chế tác mỗi phút khi bạn ngồi xuống làm hàng loạt.\n\nHãy tự nuôi hành trình leo lên dọc đường: đơn hàng lò rèn của Darva nhận tám quặng đồng khỏi tay bạn mỗi 30 phút để đổi chút tiền vàng và kinh nghiệm, còn các bậc sắt và osmium thì bán rất sòng phẳng cho đám cận chiến đang lên cấp. Sách Kỳ Công đánh dấu Lưỡi Sắc và Tôi Thép ở kỹ năng 50 và đăng quang Đại Sư Rèn Vũ Khí ở 125."
+          "routeBody": "Any piece with a real stat line, which on this ladder means the iron rung and up, can come off the anvil as a masterwork so long as the finer quality fits inside your tier ceiling; the statless copper commons never proc, because there is nothing in them to improve. Iron and osmium count as tier 1 materials for the masterwork bonus, highpine and glyphsteel as tier 2, and skill sitting above a recipe's own tier adds its own point per tier, so among the osmium three it is the war axe and the battle staff that carry the material edge, and a rung keeps proccing better after you have outgrown it.\n\nRide the copper rung to 25, train the iron rung the day it opens and ride it to 50, then the osmium rung to 75. Above the osmium three sits an apex rung Darva does not teach: its patterns are found, not bought. For a smith whose majors include Weaponcrafting, which today means the sworn Smith, an apex craft pays full gain right to the 125 cap; below a major's ceiling it teaches nothing at all, so an undeclared or hobby smith works one for the weapon, not the points. Either way the osmium recipes carry the climb, fading to half and then quarter gain: budget roughly 150 more crafts to reach the 125 cap, and each craft takes real cast time, so a long batch is paced by duration rather than a quota.\n\nFund the climb as you go: Darva's forge work order takes eight copper ore off your hands every 30 minutes for a little coin and XP, and the iron and osmium rungs sell honestly to leveling melee. The Book of Deeds marks Edge and Temper at skill 50 and crowns Grandmaster Weaponcrafting at 125."
         },
         "armorcrafting": {
           "identityHeading": "Giáp xích cho tuyến đầu",
@@ -6435,7 +6683,7 @@ export const vi_VN: EnTranslations = {
         },
         "tailoring": {
           "identityHeading": "Vải cho pháp sư, túi cho mọi người",
-          "identityBody": "Thang leo từ đồ homespun cơ bản qua bộ gildenweave đến bậc hiếm: Raiment của Silkbinder và các mảnh sunweave. Nghề thứ hai của nó là phổ quát: Túi Lụa Silkspun là túi mười ô, và không có lớp, tộc hay cấp độ nào không muốn thêm không gian túi.\n\nTrên vòng May Vá ngồi giữa Thuộc Da và Khắc Chữ. Đôi đang hoạt động của nó là Thợ Trang Phục, Thuộc Da và May Vá cùng nhau, thề trước Thợ Dệt Ottilie tại khung cửi Eastbrook sau khi tiêu diệt bốn con nhện gỗ lưới để lấy tơ; đôi Thợ Dệt Mực với Khắc Chữ được đặt tên trên vòng nhưng chờ công thức đầu tiên của Khắc Chữ trước khi có thể thề.",
+          "identityBody": "The ladder climbs from homespun basics through the gildenweave set to the rare rung: the Silkbinder's Raiment and the sunweave pieces. Its second trade is universal: the Silkspun Satchel is a ten-slot bag, and there is no class, spec, or level that does not want more bag space.\n\nOn the ring Tailoring sits between Leatherworking and Inscription. Its living pair is the Outfitter, Leatherworking and Tailoring together, sworn before Weaver Ottilie at the Eastbrook loom after culling four webwood spiders for their silk; the Inkweaver pair with Inscription is named on the ring, and with Inscription's base catalog now inked it waits only on an oath quest of its own.",
           "materialsHeading": "Chỉ, tơ, và vâng, thảo dược",
           "materialsBody": "Khung cửi chạy bằng những gì cuộc săn nhỏ giọt và đồng ruộng trồng ra. Mảnh lanh và vải homespun từ những mạng giết người hình người, tơ nhện được thu hoạch từ xác nhện, và trọng tâm của bậc hiếm, Raiment Silkbinder, muốn một Tơ Nguyên Vẹn, mẫu có chữ ký mà mẻ xác may mắn tìm thấy.\n\nThảo Dược nuôi may vá hơn bất kỳ nghề làm trang bị nào khác: sheenleaf viền dép, goldleaf màu bộ gildenweave, và sunpetal xâu toàn bộ bậc hiếm, nên người may vá biết tự hái thảo dược tiết kiệm đều đặn. Một Cuộn Chỉ giá 12 đồng từ Ottilie, và khung cửi không yêu cầu kim loại nào: ngay cả đỉnh điểm Mũ Wardweave cũng được dệt từ thảo dược cao cấp, Tơ Nguyên Vẹn, tơ nhện và chỉ.",
           "ladderHeading": "Học tại khung cửi của Ottilie",
@@ -6455,45 +6703,68 @@ export const vi_VN: EnTranslations = {
         },
         "cooking": {
           "identityHeading": "Nồi nuôi sống cả đội",
-          "identityBody": "Ăn một bữa đã nấu và nó hồi máu cho bạn qua 18 giây nghỉ ngơi, thứ hồi máu rẻ nhất trong game giữa các lần kéo quái. Thang chạy từ Cá Rô Sông Áp Chảo 90 máu cho đến Grand Roast Của Marlow ở mức 980, một lần hồi máu ngồi nghỉ mà không gì trong game vượt qua nổi.\n\nTrên vòng chế tác, Nấu Ăn ngồi giữa Giả Kim và Thuộc Da. Đôi đang sống của nó là Dược Sĩ, Giả Kim và Nấu Ăn, thề trước Đầu Bếp Marlow tại bếp Eastbrook sau khi săn bốn con lợn rừng hoang cho cái nồi; đôi Thợ Bẫy với Thuộc Da được đặt tên trên vòng nhưng chưa có nhiệm vụ thề.",
+          "identityBody": "Eat a cooked meal and it heals you over 18 seconds of rest, which between pulls is the cheapest healing in the game. The ladder runs from a 90-health Pan-Seared River Perch up through Marlow's Grand Roast at 980, and above even the roast sit the three apex role dishes at 1,392, the largest sit-heal in the game and the strongest Well Fed buff a finished plate can leave behind (the farm kitchen's buff dishes fill the rungs below it).\n\nOn the ring Cooking sits between Alchemy and Leatherworking. Its living pair is the Apothecary, Alchemy and Cooking, sworn before Cook Marlow at the Eastbrook kitchens after hunting four wild boars for the pot; the Trapper pair with Leatherworking is named on the ring but has no oath quest yet.",
+          "identityBodyOneMeal": "Eat a cooked meal and it heals you over 18 seconds of rest, which between pulls is the cheapest healing in the game. The ladder runs from a 90-health Pan-Seared River Perch up through Marlow's Grand Roast at 980, and above even the roast sit the three apex role dishes at 1,392, the largest sit-heal in the game and the strongest Well Fed buff a finished plate can leave behind (the farm kitchen's buff dishes fill the rungs below it; the Farming page tells that side of the story). Only one Well Fed effect at a time: a newer meal replaces it.\n\nOn the ring Cooking sits between Alchemy and Leatherworking. Its living pair is the Apothecary, Alchemy and Cooking, sworn before Cook Marlow at the Eastbrook kitchens after hunting four wild boars for the pot; the Trapper pair with Leatherworking is named on the ring but has no oath quest yet.",
           "materialsHeading": "Kho thực phẩm được nuôi bằng cần câu và dao",
           "materialsBody": "Câu Cá cung cấp những nguyên liệu đặc trưng, theo từng vùng: cá hồi gương và cá rô sông từ vùng nước của Eastbrook Vale, cá chó đầm lầy và lươn đầm lầy từ Mirefen Marsh, cá hồi mang băng và cá chép vây đá phiến từ Thornpeak Heights. Các bậc pha trộn các vùng thoải mái (bậc miễn phí đã đòi cá chó đầm lầy, bậc giữa đòi cá mang băng của Thornpeak, và bữa tối hiếm lại gấp cá hồi gương của Vale vào), nên một đầu bếp chịu câu ở bất cứ đâu con đường dẫn tới thì không bao giờ cạn nguyên liệu.\n\nPhần của người mổ thịt đến từ những cái xác đã thu hoạch: thịt thú từ lợn rừng và họ hàng của chúng, và, khi lần tung thu hoạch ra hiếm trở lên, một Miếng Thịt Hảo Hạng có dấu thợ, trọng tâm của món quay thịnh soạn. Thảo dược nêm nếm cho những món ngon hơn, một khúc gỗ tần bì tro dùng để xông khói con lươn, và Muối Nấu Ăn giá 8 đồng một túi từ chính sạp hàng của Marlow.",
           "ladderHeading": "Từ thịt khô đến bữa tiệc lớn",
           "ladderBody": "Thịt Khô Ướp Muối là công thức dã chiến: biết từ đầu, một chân nhện, có thể chế tạo bất cứ đâu, thức ăn đường dài của mọi phiêu lưu mới. Thang huấn luyện viên nấu tại bếp Eastbrook ở phía đông quảng trường: bậc miễn phí ở kỹ năng 0 (cá perch, Xiên Thịt Thú Săn Của Thợ Săn, Cá Marsh Pike Ướp Thảo Mộc), bậc giữa ở kỹ năng 25 với 25 bạc mỗi công thức (Lươn Xông Khói Ashwood, Hầm Thịt Thú Lá Vàng, Chowder Cá Lạnh), và bậc hiếm ở kỹ năng 50 với 1 vàng mỗi cái (Bữa Tối Cá Chép Bạc, Đĩa Tiệc Của Thợ Câu, Grand Roast Của Marlow).\n\nMón ăn theo mẻ giúp kéo dài nguyên liệu: lươn xông khói và hầm thịt thú phục vụ hai người mỗi lần chế tác, và đĩa tiệc phục vụ ba người. Marlow dạy mỗi bậc ngay khi bậc Nấu Ăn của bạn đến đó.",
           "routeHeading": "Chuyên hóa, không phải kiệt tác, và con đường lên 125",
-          "routeBody": "Nấu Ăn là ngoại lệ thành thật với câu chuyện kiệt tác: bữa ăn không có dòng chỉ số để cải thiện, nên món ăn không bao giờ tạo kiệt tác, và không đầu bếp nào nên theo đuổi điều đó. Sự thành thạo của nghề là chuyên hóa ở 75: ít hơn một phần năm nguyên liệu mỗi lần chế tác, cộng dồn nhanh trên các món theo mẻ, và bếp dã chiến di động để bữa tiệc được nấu ngay ở cổng dungeon.\n\nNấu những gì bạn câu được: kết hợp việc leo thang với buổi câu cá và hai kỹ năng nuôi dưỡng lẫn nhau suốt chặng đường. Thịt khô và bậc miễn phí dẫn bạn đến 25 một điểm mỗi lần chế tác, bậc giữa đến 50, và bậc hiếm đến 75; sau 75 chưa có món nào cao hơn, nên các món hiếm mờ dần thành nửa rồi một phần tư điểm thưởng, khoảng 150 lần chế tác nữa đến giới hạn. Hãy xem đó là việc dự trữ, không phải mài, vì một bang sẽ ăn hết mọi suất.\n\nĐơn hàng bếp của Marlow mua tám thịt thú mỗi 30 phút lấy tiền và kinh nghiệm, và Sách Kỳ Công đánh dấu Đầu Bếp Có Kinh Nghiệm ở kỹ năng 50 trên đường đến danh hiệu Đại Sư Nấu Ăn ở 125."
+          "routeBody": "Cooking is the honest exception to the masterwork story: a meal has no stat line to improve, so dishes never proc one, and no cook should chase it. The craft's mastery is specialization at 75: a fifth less of every ingredient, which compounds fast on batch dishes, and a mobile field kitchen so dinner gets cooked at the dungeon door.\n\nCook what you catch: pair the climb with a fishing session and the two skills feed each other all the way up. Jerky and the free rung carry you to 25 at a point per craft, the mid rung to 50, and the rare rung to 75. Above the rare rung sits the apex kitchen, the three role dishes and The Laden Hearth: no trainer teaches them, they come off found patterns. For a cook whose majors include Cooking, which today means the sworn Apothecary, an apex craft pays full gain right to the 125 cap; below a major's ceiling it teaches nothing at all, so an undeclared or hobby cook works one for the plate, not the points. Either way the rare dishes carry the last stretch, fading to half and then quarter gain, roughly 150 more crafts. Treat it as stocking, not grinding: a guild eats every serving.\n\nMarlow's kitchens work order buys eight game meat every 30 minutes for coin and XP, and the Book of Deeds marks Seasoned Chef at skill 50 on the way to the Grandmaster Cooking title at 125."
         },
         "alchemy": {
           "identityHeading": "Những lọ thuốc giúp bạn thắng trận",
-          "identityBody": "Nghề này được làm tại nhà bào chế ở Highwatch, nơi ở của Nhà giả kim Verane, Bậc thầy của nhà bào chế, người dạy thang công thức, bán Lọ Thủy Tinh giá 12 đồng, và trả tiền vàng cho thảo dược qua đơn hàng của bà.\n\nTrên vòng chế tác, Giả Kim đứng cùng nhóm nghề thử-và-sai, cạnh Cơ Khí ở một bên và Nấu Ăn ở bên kia. Điều đó cho nó hai danh tính đôi: Chuyên Gia Nổ (Cơ Khí và Giả Kim, nhận trước Thợ Máy Gizzel ở Eastbrook) và Dược Sĩ (Giả Kim và Nấu Ăn, thề trước Đầu Bếp Marlow). Hãy thụ ngộ với một trong hai đôi để biến Giả Kim thành nghề chuyên ngành và để chính tác phẩm có dấu thợ của bạn dạy lại bạn; đôi Chuyên Gia Nổ còn mở ra mẻ pha chế kết hợp của nó, Linh Dược Của Gấu, trong khi đôi Dược Sĩ hiện chưa có công thức kết hợp nào. Dù vậy bản thân thang công thức không bao giờ phải chờ, vì mọi công thức Giả Kim đều nằm trong bậc hiếm mà các nghề chưa khai báo vẫn làm việc dưới đó, nên toàn bộ hành trình leo lên giới hạn đều mở ra trước bất kỳ lời thề nào.",
+          "identityBody": "The craft is worked at the apothecary in Highwatch, home of Alchemist Verane, Master of the Apothecary, who teaches the recipe ladder, sells Glass Vials at 12 copper, and pays coin for herbs through her work order.\n\nOn the craft ring, Alchemy sits with the trial-and-error trades, next to Engineering on one side and Cooking on the other. That gives it two pair identities: the Bombardier (Engineering and Alchemy, taken up before Tinker Gizzel in Eastbrook) and the Apothecary (Alchemy and Cooking, sworn before Cook Marlow). Attune to either pair to make Alchemy a major and let your own signed work teach you back; the Bombardier pair also opens its combination brew, the Elixir of the Bear, while the Apothecary pair ships no combination recipe yet. The 0-to-50 ladder itself never waits, though: every one of those rungs sits inside the rare tier that undeclared crafts work under, so the climb to the cap is open before any oath. Two things sit above that ceiling and pay their skill to a major alone: the Quickening Catalyst, the 75-rung intermediate Verane also teaches, and the found-pattern rungs above the ladder; an undeclared or hobby alchemist brews them for the goods, not the points.",
           "materialsHeading": "Thảo dược, tuyến, và thủy tinh",
           "materialsBody": "Mỗi thuốc muốn một Lọ Thủy Tinh cộng thảo dược tương ứng bậc của nó: sheenleaf mọc ở Eastbrook Vale, goldleaf ở Mirefen Marsh, và sunpetal ở Thornpeak Heights, một loại thảo dược mỗi vùng, nên những lọ thuốc của bạn leo cùng thế giới với bạn. Thảo Dược là kỹ năng bạn đồng hành tự nhiên, dù mua từ người thu thập hoặc chợ cũng được; các vùng sâu hơn có những bụi cây bậc cao hơn đòi liềm tốt hơn, vì vậy hãy giữ công cụ cập nhật nếu bạn tự hái.\n\nDòng tinh chất thêm nguyên liệu của người săn: Tuyến Nọc Độc thu hoạch từ xác thú có nọc, và tinh chất cao nhất cần một Tuyến Nọc Độc Nguyên Vẹn, mẫu hiếm có dấu mà một mẻ xác may mắn tìm thấy. Nếu bạn không tự thu hoạch, đó chính xác là những thứ đáng nhờ một người bạn thợ săn mang về.",
           "ladderHeading": "Thang công thức",
-          "ladderBody": "Ai cũng biết Bình Trị Thương Cấp Thấp ngay từ đầu và có thể pha nó ở bất cứ đâu, không cần trạm. Thang thật sự là chín công thức do Verane dạy tại nhà bào chế, ba cái mỗi bậc: các công thức kỹ năng 0 miễn phí, bậc kỹ năng 25 tốn 25 bạc mỗi công thức, và bậc kỹ năng 50 tốn 1 vàng mỗi công thức. Mỗi bậc gồm một thuốc hồi máu, một thuốc hồi phép, và một tinh chất thể lực, bước từ những lọ sheenleaf phổ thông (120 máu, 160 phép) qua goldleaf khác thường (200 máu, 260 phép) đến sunpetal hiếm (280 máu, 360 phép).\n\nCác tinh chất leo lên theo đúng cách đó: Thuốc Tiên Của Heo Rừng cho 6 Thể Lực trong 10 phút, Tinh Chất Vipersear cho 9 trong 15 phút, và Thuốc Tiên Của Con Rắn cho 12 trong 15 phút, riêng Con Rắn pha ra hai lọ mỗi lần chế tác. Còn một công thức nữa nằm bên lề: Linh Dược Của Gấu, một mẻ pha chế kết hợp mà Verane dạy với giá 25 bạc khi Giả Kim của bạn đạt 25, pha được ở bất cứ đâu, nhưng chỉ dành cho một Chuyên Gia Nổ đã thụ ngộ với cả Giả Kim và Cơ Khí ở mức 25.",
+          "ladderBody": "Everyone knows the Minor Healing Potion from the start and can mix it anywhere, no station needed. The real ladder is taught by Verane at the apothecary, rung by rung: the skill 0 recipes are free, the skill 25 rung costs 25 silver per recipe, and the skill 50 rung costs 1 gold per recipe. Each rung carries a healing draught, a mana draught, and a stamina elixir, stepping from common sheenleaf bottles (120 health, 160 mana) through uncommon goldleaf (200 health, 260 mana) to rare sunpetal (335 health, 425 mana); since the trophy economy the skill 25 rung also teaches a Lesser Healing Potion brewed from tallow, a cheaper bottle a hair weaker than the goldleaf draught.\n\nThe elixirs climb the same way: the Elixir of the Boar grants 6 Stamina for 10 minutes, the Vipersear Elixir 9 for 15 minutes, and the Elixir of the Serpent 12 for 15 minutes, the Serpent alone brewing two bottles per craft. One more recipe sits off to the side: the Elixir of the Bear, a combination brew Verane teaches for 25 silver once your Alchemy reaches 25, mixable anywhere, but only by an attuned Bombardier with both Alchemy and Engineering at 25.\n\nAbove the whole elixir line sits the flask rung, which no trainer teaches and which comes off found patterns instead. A flask grants 13 for 20 minutes, and it opens two axes the elixirs never had: Attack Power and Intellect beside the familiar Stamina, one flask per role. It also keeps its own rules. Only one flask rides at a time whatever its stat, a weaker elixir or scroll of that stat cannot replace it, no dispel, steal, or hand cancel takes it off, and it stays with you through your own death, though it ends when you log out.",
           "routeHeading": "Con đường của nhà pha chế lên 125",
-          "routeBody": "Thuốc và tinh chất không bao giờ tung ra kiệt tác; cơ chế đó thuộc về trang bị mang chỉ số. Dù vậy tên bạn vẫn đi xa: những thuốc sunpetal hiếm đến tay người ta đã mang sẵn dấu thợ, và mỗi lọ Thuốc Tiên Của Con Rắn mẻ đôi cũng vậy, nên không món hiếm nào của nghề này rời bàn mà không có chữ ký. Ở kỹ năng 75 bạn chuyên hóa, và từ đó trở đi mọi công thức Giả Kim tốn ít hơn 20 phần trăm nguyên liệu.\n\nHãy học Thảo Dược Học sớm và hái khi lên cấp: sheenleaf mọc khắp Vale, và một khi bạn đến được bàn của Verane thì bậc miễn phí sẽ đưa bạn gọn gàng tới kỹ năng 25 bằng đúng đám thảo dược bạn vốn dĩ đã hái. Hãy học bậc 25 ngay khoảnh khắc nó mở, chuyển việc hái sang đầm lầy để lấy goldleaf, và để đơn hàng của Verane (sáu Thảo Dược Lá Vàng lấy 45 đồng, lặp lại mỗi 30 phút) trả lại chút tiền vàng dọc đường.\n\nTừ 50 trở đi, hãy pha thuốc sunpetal và các mẻ Con Rắn bằng sunpetal của Thornpeak, vẫn pha thêm chút cây cỏ của Vale và của đầm lầy. Đoạn cuối từ 100 đến 125 là một dòng nhỏ giọt có chủ ý, nên hãy pha thứ thực sự bán được thay vì đốt thảo dược chỉ để lấy con số, và nhớ rằng đồ tiêu hao là mặt hàng chế tác duy nhất mà ai cũng mua đi mua lại mãi mãi. Sách Kỳ Công đánh dấu Những Mẻ Thuốc Lạ ở kỹ năng 50 và Đại Sư Giả Kim ở giới hạn."
+          "routeBody": "Draughts and elixirs never roll masterworks; that proc belongs to stat-bearing gear. Your name still travels, though: the rare sunpetal draughts arrive signed with a maker's mark, and so does every bottle of the double-batch Elixir of the Serpent, so nothing rare in this craft leaves the bench unsigned. At skill 75 you specialize, and every Alchemy recipe costs 20 percent fewer materials from then on.\n\nTake Herbalism early and pick as you level: sheenleaf is everywhere in the Vale, and once you reach Verane's bench the free rung will carry you cleanly to skill 25 on herbs you would have picked anyway. Learn the 25 rung the moment it turns on, move your picking to the marsh for goldleaf, and let Verane's work order (six Goldleaf Herbs for 45 copper, repeatable every 30 minutes) hand a little coin back as you go.\n\nFrom 50 on, brew sunpetal draughts and Serpent batches out of Thornpeak sunpetal, with a little Vale and marsh greenery still in the mix. Above the Serpent sits the apex bench, the three flasks and, at the very top, the Grand Cauldron, the skill-125 capstone: no trainer teaches them, they come off found patterns, and they pay their skill to a sworn major alone (below a major's ceiling they teach nothing at all). The last stretch from 100 to 125 is a deliberate trickle, so brew what actually sells rather than burning herbs for the number, and remember that consumables are the one crafted good everyone re-buys forever. The Book of Deeds marks Strange Brews at skill 50 and Grandmaster Alchemy at the cap."
         },
         "engineering": {
           "identityHeading": "Độc quyền của người chế tạo công cụ",
-          "identityBody": "Nghề này được làm tại xưởng dụng cụ ở góc tây nam Quảng Trường Eastbrook, nơi ở của Thợ Máy Gizzel, Bậc thầy của xưởng dụng cụ. Bậc 1 đến bậc 3 của mọi dòng công cụ là hàng thường của người bán; bậc 4 và bậc 5 chỉ ra lò từ bàn của một kỹ sư, hoặc từ quầy hang sâu của Kinh Cầu Chết Chìm đổi bằng Huy Hiệu Hang Sâu sau các cổng chặn theo số lần phá đảo, và không bao giờ ra khỏi bất kỳ ngăn kéo tiền nào để đổi lấy tiền vàng.\n\nTrên vòng chế tác nó đứng cùng nhóm nghề thử-và-sai, cạnh Giả Kim và Rèn Giáp, cho nó hai danh tính đôi: Chuyên Gia Nổ (Cơ Khí và Giả Kim, nhận trước chính Gizzel) và Thợ Cơ Khí (Rèn Giáp và Cơ Khí, đã được đặt tên nhưng chưa thề được). Có một lời cảnh báo ở đây quan trọng hơn bất cứ nơi nào khác: mọi bậc công thức của Cơ Khí đều nằm trên cái trần bậc hiếm mà những người coi nghề là sở thích và những thợ chưa khai báo phải làm việc dưới đó, nên con số kỹ năng chỉ nhích lên với người thợ có Cơ Khí trong số các nghề chuyên ngành của mình, mà hôm nay nghĩa là Chuyên Gia Nổ. Ai cũng vẫn dựng được các công cụ trên cạn; chỉ là một người thợ chưa thụ ngộ thì chẳng học được gì từ việc đó, và hai công thức cần câu còn đòi phải có Gizzel dạy nữa.",
+          "identityBody": "The craft is worked at the toolworks in the southwest corner of Eastbrook Square, home of Tinker Gizzel, Master of the Toolworks. Tiers 1 through 3 of every tool line are ordinary vendor stock; every rung above that comes off an engineer's bench, or out of the Drowned Litany's delve counter for Delve Marks behind its clears gates, and never out of any till for coin. The land lines stop at tier 5; the rod line climbs one further, to the tier 6 Clockreel.\n\nOn the ring it sits with the trial-and-error trades, next to Alchemy and Armorcrafting, giving it two pair identities: the Bombardier (Engineering and Alchemy, taken up before Gizzel himself) and the Gearwright (Armorcrafting and Engineering, named but not yet swearable). One warning still matters here: every rung of the tool ladder itself sits above the rare-tier ceiling that hobbies and undeclared crafters work under, so ladder work only moves the skill for a crafter whose majors include Engineering, which today means the Bombardier. The bench is no longer closed to everyone else, though: Gizzel now starts anyone at skill 0 with the Cogwheel Blank and the Bronze Hoe, both free of any fee, and teaches the Copperlens Ocular at 25 for the ordinary tier fee, so an unattuned or hobby engineer can raise the skill through its early rungs; a craft left dormant behind another identity still gains only from the two skill-0 lessons. Anyone can still build the land tools; an unattuned crafter just learns nothing from doing those, and two of the three rod recipes ask for Gizzel's teaching besides, the tier 6 rung coming off a schematic instead.",
           "materialsHeading": "Nguyên liệu và công cụ tiền thân",
           "materialsBody": "Mọi công thức công cụ trên cạn đều ngốn công cụ thấp hơn nó một bậc cộng với một nguyên liệu THƯỢNG HẠNG, và chính cặp đôi đó là toàn bộ thang trên cạn: bốn Quặng sắt Thượng Hạng và một Cuốc Khai Khoáng Skysilver thành Cuốc Khai Khoáng Osmium, rồi hai Thỏi Glyphsteel, hai Quặng Thorium Thượng Hạng và chính cái cuốc osmium đó thành Cuốc Khai Khoáng Glyphsteel. Dòng rìu và dòng liềm phản chiếu đúng hình dạng thượng-hạng-cộng-công-cụ-bậc-trước với Khúc Gỗ Tần Bì Tro Thượng Hạng và Khúc Gỗ Cổ Thụ Thượng Hạng, Thảo Dược Lá Vàng Thượng Hạng và Thảo Dược Cánh Mặt Trời Thượng Hạng, dù các bậc 5 của chúng không đòi Thỏi Glyphsteel nào: cuốc là dòng duy nhất đắt đỏ hơn ở trên đỉnh. Hai công thức cần câu cố ý phá vỡ khuôn mẫu: Cần câu guồng bão lấy bốn Cá Koi Ánh Nắng và một cần câu suối bạc, còn Cần câu triều luyện lấy hai con Koi, tám Cá Chép Vây Đá Phiến Sống và chính cái Cần câu guồng bão đó, nên đỉnh thang của người câu cá được trả trên mặt nước chứ không phải ở một mạch quặng.\n\nMột nguyên liệu thượng hạng không được bán ở đâu cả và cũng không rơi ra từ một lần thu hoạch thông thường: bạn có được nó bằng cách làm việc trên một trong những mạch đủ phẩm cấp của một vùng bằng công cụ xếp hạng cao hơn chính nguyên liệu đó, trên thực tế nghĩa là công cụ thấp hơn một bậc so với cái bạn đang định dựng (những mạch dễ hơn mà một vùng giữ lại cho khách qua đường chỉ cho ra nguyên liệu thường dù bạn vung cái gì đi nữa). Đó là chủ ý. Trên lộ trình chế tác, một công cụ bậc 5 đến từ việc thực sự vung cái bậc 4, không phải từ một chuyến đi mua sắm; quầy Huy Hiệu Hang Sâu là con đường vòng duy nhất. Ngoại lệ duy nhất là Thỏi Glyphsteel, đã tinh luyện và chỉ bán ở chỗ người bán, 1 bạc 60 đồng một thỏi từ Quân Nhu Trưởng Bree ở Highwatch hoặc từ chính quầy của Gizzel, nên riêng Cuốc Khai Khoáng Glyphsteel mang một sàn tiền vàng cố định gắn sẵn trong chi phí của nó.",
+          "materialsBodyThreeRods": "Every land tool recipe consumes the tool one tier below it plus a FINE material, and that pairing is the whole land ladder: four Fine Iron Ore and a Skysilver Mining Pick become the Osmium Mining Pick, then two Glyphsteel Bars, two Fine Osmium Ore and that osmium pick become the Glyphsteel Mining Pick. The axe and sickle lines mirror the fine-plus-prior-tool shape with Fine Ashwood and Fine Highpine Logs, Fine Goldleaf and Fine Sunpetal Herbs, though their tier 5 rungs ask no Glyphsteel Bars: the pick is the one line that gets dearer at the top. The three rod recipes break the pattern on purpose: the Stormreel takes four Sunglint Koi and a Silverstream rod, the Tidewrought two Koi, eight Raw Slatefin Carp and that Stormreel, and the Clockreel two Koi, ten Raw Hollowgill Sturgeon and that Tidewrought, so the top of the angler's ladder is paid for on the water rather than at a vein.\n\nA fine material is not sold anywhere and does not drop from an ordinary harvest: you get it by working one of a zone's full-grade veins with a tool ranked above the material itself, which in practice means the tool one rung below the one you are trying to build (the easier veins a zone keeps for travellers yield the plain material whatever you swing). That is deliberate. On the craft route, a tier 5 tool comes from actually swinging the tier 4 one, not from a shopping trip; the Delve Marks counter is the one way around it. The single exception is the Glyphsteel Bar, refined and vendor-only, 1 silver 60 copper a bar from Quartermaster Bree in Highwatch or from Gizzel's own counter, so the Glyphsteel Mining Pick alone carries a fixed coin floor built into its cost.",
           "ladderHeading": "Thang công cụ",
-          "ladderBody": "Thang gồm tám công thức, tất cả đều gắn với trạm xưởng dụng cụ. Sáu công thức công cụ trên cạn được biết tự động, không bao giờ mất phí huấn luyện viên: cuốc, rìu, và liềm bậc 4 ở kỹ năng 75, và các phiên bản bậc 5 ở kỹ năng 150. Con số thứ hai đó không phải lỗi đánh máy, và nó nằm trên giới hạn 125 hiện tại một cách có chủ ý: ở đây yêu cầu kỹ năng không bao giờ chặn việc chế tác, chúng chỉ định hình điểm kỹ năng nhận được, nên bạn có thể dựng một công cụ bậc 5 ngay ngày bạn cầm trong tay nguyên liệu của nó và công cụ bậc 4 tiền nhiệm. Hai cần câu chế tạo là ngoại lệ cần người dạy: Gizzel dạy Cần câu guồng bão ở kỹ năng 75 với giá 4 vàng và Cần câu triều luyện ở kỹ năng 125 với giá 16 vàng, mỗi cái ngay khoảnh khắc bậc của bạn trong nghề chạm tới bậc của nó.\n\nMọi công cụ hoàn thiện đều mang phẩm chất hiếm hoặc sử thi và ra lò có dấu thợ, nên tên bạn rong ruổi khắp các vùng đất trên thắt lưng đồ nghề của những người chơi khác. Cơ Khí cũng nắm một nửa của một công thức kết hợp: Linh Dược Của Gấu, do một Chuyên Gia Nổ đã thụ ngộ với cả Cơ Khí và Giả Kim ở mức 25 pha chế.",
+          "ladderBody": "Every rung of the tool ladder is bound to the toolworks station (the crafted hoes the toolmaker also teaches have their own note on the gathering page, and his two starter lessons are the pair named above). The six land-tool recipes are known automatically, no trainer fee ever: the tier 4 pick, axe, and sickle at skill 75, and the tier 5 versions at skill 125, the cap tier itself. Skill requirements never gate a craft here, they only shape skill gain, so you can build a tier 5 tool the day you hold its reagents and its tier 4 predecessor. Two of the three crafted rods are the taught exception: Gizzel teaches the Stormreel at skill 75 for 4 gold and the Tidewrought at skill 125 for 16 gold, each the moment your tier in the craft reaches its own. The tier 6 Clockreel is the third, and no trainer quotes it a fee at all: its schematic sits on the Heroic Quartermaster's counter and teaches the recipe outright.\n\nEvery finished tool is rare or epic quality and comes out signed, so your name rides the zones on other players' toolbelts. Engineering also holds up half of one combination recipe: the Elixir of the Bear, brewed by an attuned Bombardier with both Engineering and Alchemy at 25.",
           "routeHeading": "Con đường của kỹ sư lên 125",
-          "routeBody": "Công cụ không có chỉ số chiến đấu, nên chúng không tạo kiệt tác; cơ chế đó thuộc về trang bị mang chỉ số. Chuyên hóa vẫn đến ở kỹ năng 75: ít hơn 20 phần trăm nguyên liệu mỗi lần chế tác, và xưởng công cụ dã chiến tạm thời biến bất kỳ chuyến thu thập nào thành xưởng làm việc. Toán điểm thưởng hầu như không mờ ở đây: công thức kỹ năng 75 cho điểm đầy đủ đến 100 và nửa sau, và công thức kỹ năng 150 cho điểm đầy đủ suốt đến giới hạn 125, nên ràng buộc thực sự là nguyên liệu và tiền, không bao giờ là công thức bị mờ.\n\nHãy chọn đôi trước, vì không có gì tiến triển nếu không có nó: lấy thụ ngộ Chuyên Gia Nổ từ Thợ Máy Gizzel. Sau đó nuôi thang: lên cấp Khai Khoáng, Đốn Gỗ, hoặc Thảo Dược bản thân hoặc kết bạn với người thu thập, mua công cụ bậc 3 từ người bán, và xem đơn hàng của Gizzel (tám Khúc Gỗ Ironbark lấy 16 đồng, lặp lại mỗi 30 phút) là tiền đi lại.\n\nCơ Khí là nghề uy tín ít khối lượng, khoảng một điểm kỹ năng mỗi công cụ hoàn thành, nên hãy xem mỗi lần chế tác là hàng để bán. Lời chào hàng cho khách hàng tự viết ra: mỗi bậc công cụ trên bậc của điểm tài nguyên rút ngắn 0,4 giây khỏi thời gian niệm thu thập 2,5 giây (xuống sàn 1,5 giây), nên công cụ bậc 5 là nâng cấp tốc độ trên mọi điểm tài nguyên trong thế giới, và chỉ bạn mới có thể làm ra. Sách Kỳ Công đánh dấu Bánh Răng và Lò Xo ở kỹ năng 50 và Đại Sư Cơ Khí ở 125."
+          "routeBody": "Công cụ không có chỉ số chiến đấu, nên chúng không tạo kiệt tác; cơ chế đó thuộc về trang bị mang chỉ số. Chuyên hóa vẫn đến ở kỹ năng 75: ít hơn 20 phần trăm nguyên liệu mỗi lần chế tác, và xưởng công cụ dã chiến tạm thời biến bất kỳ chuyến thu thập nào thành xưởng làm việc. Toán điểm thưởng hầu như không mờ ở đây: công thức kỹ năng 75 cho điểm đầy đủ đến 100 và nửa sau, và công thức kỹ năng 125 cho điểm đầy đủ suốt đến giới hạn, nên ràng buộc thực sự là nguyên liệu và tiền, không bao giờ là công thức bị mờ.\n\nHãy chọn đôi sớm, vì thang công cụ không tiến triển nếu không có nó: lấy thụ ngộ Chuyên Gia Nổ từ Thợ Máy Gizzel. Sau đó nuôi thang: lên cấp Khai Khoáng, Đốn Gỗ, hoặc Thảo Dược bản thân hoặc kết bạn với người thu thập, mua công cụ bậc 3 từ người bán, và xem đơn hàng của Gizzel (tám Khúc Gỗ Ironbark lấy 16 đồng, lặp lại mỗi 30 phút) là tiền đi lại.\n\nCơ Khí là nghề uy tín ít khối lượng, khoảng một điểm kỹ năng mỗi công cụ hoàn thành, nên hãy xem mỗi lần chế tác là hàng để bán. Lời chào hàng cho khách hàng tự viết ra: mỗi bậc công cụ trên bậc của điểm tài nguyên rút ngắn 0,4 giây khỏi thời gian niệm thu thập 2,5 giây (xuống sàn 1,5 giây), nên công cụ bậc 5 là nâng cấp tốc độ trên mọi điểm tài nguyên trong thế giới, và chỉ bạn mới có thể làm ra. Sách Kỳ Công đánh dấu Bánh Răng và Lò Xo ở kỹ năng 50 và Đại Sư Cơ Khí ở 125."
         },
         "enchanting": {
           "identityHeading": "Tháo rời trang bị, đưa sức mạnh trở lại",
-          "identityBody": "Mọi pháp khắc đều được biết từ đầu, ai cũng có thể hủy pháp khắc ngay ngày đầu tiên, và cả hai việc đó đều không bao giờ cần trạm; kỹ năng đạt giới hạn 125 như mọi nghề. Góc duy nhất của nghề cần người dạy là cặp công thức bùa của nó: Thợ Máy Gizzel dạy Túi Trữ Của Thợ Thu Thập và Con Mắt Nghệ Nhân tại xưởng dụng cụ ở góc tây nam Quảng Trường Eastbrook, với mức phí bậc thông thường khi Pháp Khắc của bạn đạt 25, và bản thân hai lá bùa được làm tại trạm của ông.\n\nTrên vòng chế tác nó nằm giữa Khắc Chữ và Chế Tác Đá Quý, nên hai danh tính đôi của nó là Pháp Sư Học Thuật (Khắc Chữ và Pháp Khắc) và Thợ Đá Quý (Pháp Khắc và Chế Tác Đá Quý). Chưa đôi nào thề được, vì cả hai người hàng xóm còn đang chờ công thức đầu tiên của mình, nên hôm nay Pháp Khắc leo lên như nghề của tất cả mọi người: tự do tới bậc hiếm trước bất kỳ lời thề nào, và là lựa chọn sở thích tự nhiên cho một Chuyên Gia Nổ hay một Dược Sĩ. Thợ pháp khắc cũng là người giữ cho thế giới thu thập vận hành: hai hiệu ứng công cụ có thể gắn vào ô đều là tác phẩm của thợ pháp khắc, và người thợ gốc nạp lại hiệu ứng của chính mình với giá rẻ hơn, còn rẻ hơn nữa khi đã chuyên hóa.",
+          "identityBody": "Every enchant is known from the start, anyone can disenchant from day one, and neither ever needs a station; the skill caps at 125 like every craft. The one taught corner of the trade is three recipes, all Tinker Gizzel's at the toolworks in the southwest corner of Eastbrook Square, and all worked at that station: the two charms, the Gatherer's Cache and the Artisan's Eye, for the ordinary tier fee once your Enchanting reaches 25, and above them the Lucent Reagent, the apex tier's own material, at 75.\n\nOn the ring it sits between Inscription and Jewelcrafting, so its two pair identities are the Arcanist (Inscription and Enchanting) and the Gembinder (Enchanting and Jewelcrafting). Neither can be sworn yet: both neighbor crafts now work their own ladders (Inscription at the apothecary, Jewelcrafting at the forge), but neither pair has an oath quest yet. So today Enchanting climbs as everyone's craft: free to the rare tier before any oath, and a natural hobby pick for a Bombardier or an Apothecary. Enchanters also keep the gathering world running: the two slottable tool effects are Enchanter work, and an original crafter recharges their own effects at a discount, deeper still once specialized.",
           "levelingHeading": "Cách pháp khắc lên cấp",
-          "levelingBody": "Ba hành động làm kỹ năng nhích lên: hủy pháp khắc một món đồ, gắn một pháp khắc, và chế tạo hai lá bùa, vốn leo theo đường cong chế tác thông thường. Mỗi lần thành công đáng giá tối đa một điểm, được chia tỷ lệ theo mức độ nghiêm túc của công việc: độ hiếm của món bạn phá, hoặc bậc nguyên liệu của pháp khắc bạn gắn. Hủy pháp khắc đồ phổ thông và những pháp khắc chỉ dùng bụi tính là công việc phổ thông; hủy đồ khác thường và pháp khắc dùng tinh chất tính là khác thường; hủy đồ hiếm và mọi pháp khắc Phù văn hay Cao cấp tính là hiếm; hủy đồ sử thi và huyền thoại còn xếp cao hơn nữa trên bảng, dù hôm nay chưa danh tính pháp khắc nào vươn quá bậc hiếm, nên trên thực tế chúng trả bằng công việc hiếm. Một sự trung thực chi phối bàn phá đồ: một món ra lò từ bàn của người chơi (được chế tác, có dấu thợ, hoặc kiệt tác) vẫn nghiền ra nguyên liệu nhưng không dạy gì cả, nên vòng lặp chế-rồi-phá chẳng lên cấp cho ai, và bài học nằm ở trang bị nhặt được trong thế giới.\n\nKiểu mờ dần theo tinh thông quen thuộc áp dụng trên các bậc 25 điểm, nên công việc hạng phổ thông chuyển xám ở kỹ năng 75, công việc khác thường ở 100, và công việc bậc hiếm đúng ngay giới hạn 125. Pháp Khắc còn có một sự tử tế riêng: đầu vào cao hơn trần hình mẫu của bạn được làm tròn xuống thành chính cái trần đó thay vì bị đưa về không, nên trước khi thụ ngộ, một lần hủy pháp khắc đồ sử thi chỉ đơn giản tính như công việc hiếm chứ không phải không dạy gì. Nếu Pháp Khắc rốt cuộc rơi vào trạng thái không hoạt động sau lưng một danh tính khác, việc phá đồ và gắn pháp khắc tính là công việc phổ thông và hành trình leo lên khựng lại ở 75, còn hai lá bùa, vốn cưỡi đường cong chế tác nằm trên trần phổ thông, thì chẳng dạy gì cho một thợ pháp khắc có nghề đang không hoạt động; hãy giữ nó làm sở thích và công việc bậc hiếm vẫn trả điểm, chỉ là chậm hơn sau mốc 75.",
+          "levelingBody": "Three actions move the skill: disenchanting a piece, applying an enchant, and crafting the two charm recipes, which climb the ordinary crafting curve. The third taught recipe, the Lucent Reagent, is the exception: at skill 75 it sits above the rare ceiling every enchanter works under (Enchanting has no oath pair, so it is never a major), and a recipe above your ceiling teaches nothing, so craft it for the reagent, not the points. Each success is worth up to one point, scaled by how serious the work is: the rarity of the piece you break, or the reagent tier of the enchant you apply. Common disenchants and dust-only enchants score as common work; uncommon disenchants and essence enchants as uncommon; rare disenchants and every Runed or Greater enchant as rare; epic and legendary disenchants, and every Lucent enchant, rank higher still on the table, though no enchanting identity today reaches past the rare rung, so they pay the same as rare work in practice. One honesty rules the breaking bench: a piece that came off a player bench (crafted, signed, or masterworked) still mills into materials but teaches nothing, so a craft-and-break loop levels no one, and the lessons are in world-found gear.\n\nThe familiar mastery fade applies on 25-point tiers, so common-grade work goes gray at skill 75, uncommon work at 100, and rare-tier work exactly at the 125 cap. Enchanting also has one kindness of its own: input above your archetype ceiling is rounded down to that ceiling instead of zeroed, so before you attune, an epic disenchant simply scores as rare rather than teaching nothing. If Enchanting ends up dormant behind another identity, breaking and applying score as common work and the climb stalls at 75, while the two charms, riding the crafting curve above the common ceiling, teach a dormant enchanter nothing at all; keep it as your hobby and rare-tier work still pays, just slower past 75.",
           "marketHeading": "Bản sao pháp khắc, nguồn gốc, và thị trường",
           "marketBody": "Gắn một pháp khắc sẽ tiêu nguyên liệu và đánh dấu đúng một bản cụ thể của vật phẩm. Nhắm vào một bản nằm trong túi thì bạn nhận lại một bản đã pháp khắc riêng biệt; nhắm vào món bạn đang mặc trên người thì nó được pháp khắc ngay tại chỗ, đúng nơi nó đang nằm, không cần màn tháo ra rồi mặc lại. Dù cách nào, phần thưởng cũng theo món đó mãi mãi, qua những lần tháo trang bị, những chuyến gửi ngân hàng, và những lần giao dịch. Mỗi món một pháp khắc: gắn một pháp khắc khác lên một bản đã có pháp khắc sẽ hỏi xác nhận, rồi thay thế hẳn pháp khắc cũ, hủy nó mà không hoàn lại chút nguyên liệu nào. Việc bán, vứt bỏ, và hủy pháp khắc đều ưu tiên các bản thường trước, nên món đồ hoàn thiện của bạn không bị nuốt mất do sơ ý.\n\nTrang bị kiệt tác và pháp khắc là bạn của nhau: một món kiệt tác vẫn pháp khắc được trọn vẹn, và pháp khắc cộng thêm lên trên phần thưởng kiệt tác mà không đụng chạm gì tới nó hay tới chữ ký của người thợ. Cộng dồn mọi nguồn, một món kiệt tác có dấu thợ mang pháp khắc Cao cấp là mức tốt nhất mà một món đồ chế tác đạt tới, và nó vẫn nằm dưới đồ rơi raid theo đúng thiết kế.\n\nTrên chợ, một món đã pháp khắc hoặc có dấu thợ được rao bán như mọi thứ khác: nó lên sàn thành một rao bán một-bản của riêng mình, phần chú giải hiện pháp khắc và dấu thợ, và Ravenpost chuyển nó đi cũng trung thành y như vậy. Nguyên liệu vẫn là nửa ổn định của nghề: Bụi, Tinh Chất, và Mảnh được rao bán thoải mái, việc rao bán không tốn gì, và Thương Nhân chỉ lấy 5 phần trăm của một giao dịch đã hoàn thành. Điều đó tạo ra hai nguồn thu kinh điển của thợ pháp khắc là bán nguyên liệu, và bán thành phẩm: qua chợ, qua Ravenpost, hoặc mặt đối mặt trong cửa sổ giao dịch."
+        },
+        "jewelcrafting": {
+          "identityHeading": "The finer work of the forge",
+          "identityBody": "The ladder is three rungs of three: a Strength ring, an Intellect ring, and an Agility necklace, first in copper, again in iron, and once more in rare osmium at the top. Jewelry carries no armor and no class lock, and even the copper pieces arrive with real stat lines, because a ring without stats would be nothing at all.\n\nOn the craft ring it sits between Enchanting and Weaponcrafting, giving it two pair identities: the Gembinder (Enchanting and Jewelcrafting) and the Bladewright (Jewelcrafting and Weaponcrafting). Neither has an oath quest yet, so today Jewelcrafting climbs as everyone's craft: the three rungs of the 0-to-50 ladder all sit inside the rare tier that undeclared crafts work under, so the ladder is open before any oath. Two things sit above that ceiling: the Prismglass Setting, the 75-rung intermediate Darva also teaches, and the found-pattern rung above it; since neither pair can be sworn yet, today they teach nothing to anyone, so cut them for the goods, not the points.",
+          "materialsHeading": "Ore, dust, and essence",
+          "materialsBody": "The bench runs on mining and breaking. Copper ore comes off the tier 1 veins of Eastbrook Vale, iron ore from Mirefen Marsh, and osmium ore from Thornpeak Heights, with a jar or two of Smithing Flux, 20 copper each from Forgemistress Darva, in every recipe. The other half of every piece comes off the breaking bench: Chime Dust settles the copper rung and Chime Essence the iron and osmium rungs, so a jewelcrafter is an enchanter's steadiest customer, or simply keeps a disenchanting habit of their own.\n\nThe osmium rung adds one refinement: every rare piece takes two iron ore besides its osmium, worked in as solder for the fine settings. No counter sells the ores or the dust: they come out of the world or off another player, by trade or the World Market; only the flux is bought for coin.",
+          "ladderHeading": "Taught beside the anvil",
+          "ladderBody": "Jewelcrafting has no station of its own: the whole catalog is worked at the Eastbrook forge, the same anvil Weaponcrafting and Armorcrafting share, and Forgemistress Darva teaches it there. The ladder is nine trainer recipes in three rungs: the copper rung (band, loop, torc) is free at skill 0, the iron rung (signet, loop, choker) costs 25 silver a recipe at skill 25, and the osmium rung (band, loop, amulet) costs 1 gold each at skill 50, each rung teachable the moment your tier in the craft reaches its own.\n\nThere are no field recipes and no combination piece yet: every taught rung is forge-bound trainer work, and the found-pattern rung above them is forge-bound too but bought nowhere, so this craft is learned, and practiced, standing where the smiths stand.",
+          "routeHeading": "Masterworks, and a working route to 125",
+          "routeBody": "There is no statless rung here: every piece on the ladder carries a real stat line, so every craft rolls the masterwork chance so long as the finer quality fits inside your tier ceiling, with iron and osmium counting as tier 1 materials for the proc. The copper and iron rungs, uncommon by make, can masterwork into rare for a hobby or undeclared jewelcrafter alike; the osmium three are rare already, so their epic masterworks wait on a ceiling above rare, which no jewelcrafter has until the craft's pairs open.\n\nThe climb is the standard ride: copper to 25, the iron rung the day it opens to 50, then osmium to 75. Above them sits an apex rung no trainer teaches: its patterns are found, not bought. Read that as an item you can make, not a shortcut up the ladder, because the same ceiling named above applies to skill gain as well as to masterworks: an apex pattern sits well over the rare ceiling every jewelcrafter works under today, so crafting one teaches nothing at all until this craft's pairs open and it can be a major. Whichever you hold, the osmium recipes carry the climb, fading to half and then quarter gain: budget roughly 150 more crafts to reach the 125 cap, and fund them honestly, since every class wears jewelry and most travelers level with their ring and neck slots empty.\n\nThe Book of Deeds marks Polished to Brilliance for your first rare-tier piece, Facet and Filigree at 50 skill, and Grandmaster Jewelcrafting at the 125 cap."
+        },
+        "inscription": {
+          "identityHeading": "Ink for the mind, scrolls for the road",
+          "identityBody": "The ladder is three rungs of two: a caster tome for the offhand and a stamina scroll for anyone at all, first in sheenleaf, again in goldleaf, and once more in rare sunpetal at the top. The tomes are held stat sticks for the six mana classes, real Intellect and Spirit from the first rung; the scrolls are consumables with no class lock, so half of every rung sells to the whole realm.\n\nOn the craft ring it sits between Tailoring and Enchanting, giving it two pair identities: the Inkweaver (Tailoring and Inscription) and the Arcanist (Inscription and Enchanting). Neither has an oath quest yet, so today Inscription climbs as everyone's craft: the three rungs of the 0-to-50 ladder all sit inside the rare tier that undeclared crafts work under, so the ladder is open before any oath. Two things sit above that ceiling: the Sablewax Vellum, the 75-rung intermediate Verane also teaches, and the found-pattern rung above it; since neither pair can be sworn yet, today they teach nothing to anyone, so scribe them for the goods, not the points.",
+          "materialsHeading": "Herbs, ink, and a vial to hold it",
+          "materialsBody": "The desk runs on herbalism and the breaking bench. Sheenleaf comes off the tier 1 herb patches of Eastbrook Vale, goldleaf from Mirefen Marsh, and sunpetal from Thornpeak Heights, ground into pigment with a Glass Vial, 12 copper from the apothecary master, in every recipe. The magical half of the ink comes off the breaking bench: Chime Dust settles the sheenleaf rung, Chime Essence the goldleaf and sunpetal rungs, and the sunpetal scroll binds a pinch of dust back in, so a scribe is an enchanter's steady customer, or keeps a disenchanting habit of their own.\n\nThe sunpetal rung refines both of its recipes: the rare grimoire takes two goldleaf besides its sunpetal, worked in to size the illuminations, and the double scroll batch takes a second essence with that pinch of dust, priced even with the Elixir of the Serpent whose buff it mirrors. No counter sells the herbs or the dust: they come out of the world or off another player; only the vial is bought for coin.",
+          "materialsBodyFrostGourd": "The desk runs on herbalism and the breaking bench. Sheenleaf comes off the tier 1 herb patches of Eastbrook Vale, goldleaf from Mirefen Marsh, and sunpetal from Thornpeak Heights, ground into pigment with a Glass Vial, 12 copper from the apothecary master, in every recipe. The magical half of the ink comes off the breaking bench: Chime Dust settles the sheenleaf rung, Chime Essence the goldleaf and sunpetal rungs, and the sunpetal scroll binds a pinch of dust back in, so a scribe is an enchanter's steady customer, or keeps a disenchanting habit of their own.\n\nThe sunpetal rung refines both of its recipes: the rare grimoire takes two goldleaf besides its sunpetal, worked in to size the illuminations, and the double scroll batch takes a second essence with that pinch of dust and a Frost Gourd off the Highwatch terraces, which prices it even with the Elixir of the Serpent whose buff it mirrors. No counter sells the herbs, the dust or the gourd: they come out of the world, a garden bed or off another player; only the vial is bought for coin.",
+          "ladderHeading": "Taught beside the alembics",
+          "ladderBody": "Inscription has no station of its own: the whole catalog is worked at the Highwatch apothecary, the same bench Alchemy brews at, and Alchemist Verane teaches it there. The ladder is six trainer recipes in three rungs: the sheenleaf rung (primer and scroll) is free at skill 0, the goldleaf rung (folio and scroll) costs 25 silver a recipe at skill 25, and the sunpetal rung (grimoire and scroll) costs 1 gold each at skill 50, each rung teachable the moment your tier in the craft reaches its own. The rung-50 scroll comes off the desk two at a time.\n\nThere are no field recipes and no combination piece yet: every taught rung is apothecary-bound trainer work, and the found-pattern rung above them is apothecary-bound too but bought nowhere, so this craft is learned, and practiced, standing where the alchemists stand.",
+          "routeHeading": "Scrolls, elixirs, and a working route to 125",
+          "routeBody": "The scrolls are the craft's signature rule: each rung's scroll grants exactly the buff of its band's stamina elixir (the boar, vipersear, and serpent bands), and the two sources share one slot on the buff bar. Reading a scroll over an elixir replaces it, drinking an elixir over a scroll replaces that, and the newest application always wins, so a scroll is an alternative door into the same buff, never a second stack on top of it.\n\nThe tomes carry real stat lines, so every tome craft rolls the masterwork chance so long as the finer quality fits inside your tier ceiling; the scrolls, statless consumables, never proc. The climb is the standard ride: sheenleaf to 25, the goldleaf rung the day it opens to 50, then sunpetal to 75. Above them sits an apex rung Verane does not teach: its pattern is found, not bought. Read that as a tome you can make, not a shortcut up the ladder: an apex pattern sits well over the rare ceiling every scribe works under today, and a recipe above your ceiling teaches nothing at all, so the skill it grants waits on this craft's pairs opening and Inscription becoming a major. Whichever you hold, the sunpetal recipes carry the climb, fading to half and then quarter gain: budget roughly 150 more crafts to reach the 125 cap, and fund them honestly, since the scrolls sell to every class in the game.\n\nThe Book of Deeds marks Written in Fine Ink for your first rare-tier piece, Quill and Pigment at 50 skill, and Grandmaster Inscription at the 125 cap."
         }
       },
       "howHeading": "Cách chế tác hoạt động",
-      "howBody": "Mở cửa sổ chế tác (phím mặc định T) và mọi công thức bạn biết đều được liệt kê kèm những gì nó cần và những gì bạn đang có trong tay. Công thức gắn trạm đòi bạn đứng trong vòng 20 thước quanh đúng trạm trong thị trấn, công thức dã chiến chế tạo được ở bất kỳ đâu, còn việc phá đồ và pháp khắc của Pháp Khắc thì chẳng cần trạm nào cả (chỉ hai công thức bùa của nó là việc phải làm tại trạm, ở xưởng dụng cụ). Không có lần tung thất bại nào: một lần chế tác đủ nguyên liệu trong tay luôn thành công.\n\nHai điểm ma sát nhỏ giữ cho nền kinh tế trung thực. Mỗi lần chế tác thành công trả một khoản phí 2 đồng cho mỗi điểm ngân sách chỉ số của vật phẩm, và các hành động thuộc loại chế tác dùng chung một nhịp: nhiều nhất 10 lần chế tác, hủy pháp khắc, pháp khắc, tháo dỡ, hoặc nạp lại công cụ trong mỗi khung 60 giây. Không cái nào làm phiền một buổi chơi bình thường; cả hai đều chặn một chuyên gia đã đạt trần khỏi việc làm ngập thị trường.",
+      "howBody": "Open the crafting window (default key T) and every recipe you know is listed with what it needs and what you have on hand. Station-bound recipes ask you to stand within 20 yards of the right station in town, field recipes craft anywhere, and Enchanting's breaking and enchanting need no station at all (only its three trainer recipes are station work, at the toolworks). There is no failure roll: a craft with the materials in hand always succeeds.\n\nTwo small frictions keep the economy honest. Every successful craft pays a fee of 2 copper per point of the item's stat budget, and every craft-family action takes real cast time (field crafts near two seconds, harder ladder crafts longer, and disenchant, enchant, salvage, and tool recharge each about a second and a half). Materials, the gold fee, stations, and skill ceilings do the rest; nothing scolds you for working too quickly.",
       "recipesHeading": "Công thức",
       "recipesNote": "Mọi công thức của nghề thủ công: yêu cầu kỹ năng và nguyên liệu chính xác của nó, nơi học được và phí là bao nhiêu, và ba giá trị kỹ năng mà tại đó tích lũy của nó mờ dần thành một nửa, một phần tư, và không gì.",
       "masteryHeading": "Tích lũy kỹ năng",
@@ -6501,7 +6772,7 @@ export const vi_VN: EnTranslations = {
       "masterworkHeading": "Kiệt tác",
       "masterworkBody": "Mỗi lần chế tác thành công đều đúng như công thức hứa hẹn, và đôi khi còn hơn thế một chút: một kiệt tác hoàn thiện cùng món đồ ấy ở phẩm chất cao hơn một bậc, với các chỉ số thưởng đã được nung sẵn vào ngay lúc chế tác. Nó chỉ cộng thêm, không bao giờ hạ cấp, và nó vẫn nằm dưới ngưỡng raid, nên trang bị chế tác có thể xuất sắc mà không thay thế đồ rơi từ raid.\n\nTỉ lệ được công bố chứ không huyền bí: {base}% cơ bản, cộng {perTier}% cho mỗi bậc mà kỹ năng của bạn cao hơn công thức, cộng {signed}% khi có bất kỳ nguyên liệu có dấu thợ nào được đưa vào, cộng {spec}% một khi bạn đã chuyên ngành hóa, với nguyên liệu bậc cao hơn thêm 1 đến 2% nữa, tất cả chặn trần ở {cap}%. Chỉ món đồ có chỉ số thật mới cải thiện được, nên đồ phổ thông không chỉ số, công cụ, và đồ tiêu hao không bao giờ kích hoạt; một nghề đang ngủ không bao giờ làm ra kiệt tác, và một nghề sở thích không thể tạo kiệt tác vượt quá trần hiếm của nó.\n\nTác phẩm tinh xảo mang theo người làm ra nó. Sản phẩm hiếm trở lên đều có dấu thợ, mọi bản đều thế (Chế tạo bởi; nguyên liệu thu hoạch mang dấu Được thu thập bởi), còn một kiệt tác thì luôn có dấu thợ dù phẩm chất của nó là gì. Chữ ký là xuất xứ chứ không phải khóa: hàng có dấu thợ vẫn giao dịch, gửi thư, và rao bán trên Chợ Thế Giới thoải mái.",
       "trainingHeading": "Học nghề",
-      "trainingBody": "Công thức từ huấn luyện viên đến từ các bậc thầy thường trú, được dạy tại trạm của họ. Quy tắc chỉ gói trong một dòng: một bậc thầy dạy công thức ngay khi bậc của bạn trong nghề đó đạt tới bậc của chính công thức, và không gì khác chặn cổng nó, không phải cấp độ của bạn, cũng không phải hình mẫu của bạn. Thang trang bị và thang đồ tiêu hao chạy các nấc của mình ở kỹ năng 0, 25, và 50; hai bài học cần câu của Cơ Khí nối dài cái thang ở 75 và 125, còn hai công thức bùa của Pháp Khắc nằm ở nấc 25, nên một nấc mới lại mở ra khi các bậc của bạn leo lên.\n\nPhí chỉ thu một lần và cố định theo nấc: nấc khởi đầu miễn phí, nấc kỹ năng 25 tốn {tier1} một công thức, nấc kỹ năng 50 tốn {tier2}, và các bài học cần câu ở trên chúng mang phí riêng, được ghi bên cạnh từng công thức trong bảng. Bạn phải đứng tại trạm thật của bậc thầy mới học được, và trạm di động không bao giờ được tính. Các công thức dã chiến phổ thông và sáu công thức công cụ trên cạn chế tạo được thì chẳng cần học gì cả; mọi nhân vật đều biết chúng từ đầu.",
+      "trainingBody": "Trainer recipes come from the resident masters, taught at their stations. The rule is one line: a master teaches a recipe once your tier in the craft has reached the recipe's own tier, and nothing else gates it, not your level, not your archetype. The gear and consumable ladders run their rungs at skill 0, 25, and 50, and every craft adds one 75-rung intermediate above them, taught at its station (Enchanting's is the Lucent Reagent, beside its two charm recipes on the 25 rung); Engineering's two rod lessons continue its ladder at 75 and 125, so a fresh rung opens as your tiers climb.\n\nFees are one-time and flat by rung: the starting rung is free, the skill 25 rung costs {tier1} a recipe, the skill 50 rung {tier2}, and the 75 and 125 rungs above them carry their own fees, listed beside each recipe in the table. You must stand at the master's actual station to train, and a mobile station never counts. The common field recipes and the six crafted land-tool recipes need no training at all; every character knows them from the start.",
       "specializationHeading": "Chuyên ngành",
       "specializationBody": "Ở kỹ năng {at} nghề thủ công này chuyên ngành hóa bạn, không cần nhiệm vụ: từ đó trở đi công thức tốn ít hơn {pct}% nguyên liệu, và chuyên ngành hóa thêm vào tỉ lệ kiệt tác của nó.\n\nCác chuyên gia cũng học cách mang xưởng theo mình: một thợ chế tạo đã chuyên ngành có thể thiết lập trạm di động ở thực địa trong mười phút mỗi lần, nên công thức gắn trạm có thể được thực hiện ngay cửa mỏ thay vì quay về thị trấn. Các giới hạn của nó là có chủ ý: nó không bao giờ tính cho việc học với bậc thầy hay để giải trói một món đồ ủy thác, và nó hết hạn theo bộ đếm thời gian dù bạn có dùng nó hay không.",
       "ench": {
@@ -6521,12 +6792,15 @@ export const vi_VN: EnTranslations = {
         "tier": {
           "base": "Cơ bản",
           "runed": "Phù văn",
-          "greater": "Cao cấp"
+          "greater": "Cao cấp",
+          "lucent": "Lucent"
         },
+        "perfectedOnly": "Perfected only",
         "salvageHeading": "Tháo dỡ",
         "salvageNote": "Tháo dỡ là người anh em bình dân của hủy pháp khắc: cùng vũ khí và giáp đó, không cần kỹ năng và không nhận kỹ năng, trả về phế liệu chế tác thông thường theo phẩm chất thay vì bất cứ thứ gì huyền bí. Ai cũng làm được, có pháp khắc hay không. Khi bạn cầm trên tay một món đáng phá, lựa chọn rất đơn giản: từ hiếm trở lên, hủy pháp khắc luôn là lựa chọn tốt hơn, còn ở phổ thông thì hai sản lượng bán cho NPC xấp xỉ nhau, nên hãy chọn theo loại nguyên liệu bạn thực sự cần.",
         "bonusFmt": "+{value} {stat}",
-        "enchantsNoteOffhand": "Pháp khắc có ba bậc. Bậc cơ bản chạy bằng Bụi Thanh Âm (thêm chút Tinh Chất ở đầu cao) và bao phủ ô vũ khí, tay phụ, và mọi ô giáp, với đủ lựa chọn trục chỉ số để mọi lối chơi đều tìm được thứ gì đó cho từng ô: khiên và các vật cầm tay phụ của các lớp phép thuật có riêng một pháp khắc Thể Lực, nên không ô trang bị nào bị bỏ trống không thể pháp khắc. Bậc Cao Cấp tốn một Mảnh Thanh Âm cộng Tinh Chất: phần thưởng mạnh hơn trên những ô có tác động cao nhất. Mảnh còn nuôi thêm hai nơi tiêu tốn khác: hai công thức bùa với năm mảnh mỗi loại, và bậc nạp lại cao nhất của hiệu ứng công cụ, nên hãy tích trữ vài cái trước khi tiêu.\n\nNằm giữa các bậc đó là năm pháp khắc Phù Văn, mỗi cái tiêu thụ một loại nguyên liệu phụ riêng, nên không gì bạn nghiền ra từng đi vào ngõ cụt: Lưỡi Phù Văn (vũ khí, Sức Mạnh, tiêu Thép Cộng Hưởng), Tiêu Điểm Phù Văn (vũ khí, Trí Tuệ, Gỗ Cộng Hưởng), Dệt Phù Văn (giáp ngực, Tinh Thần, Sợi Cộng Hưởng), Da Phù Văn (giáp chân, Nhanh Nhẹn, Da Cộng Hưởng), và Xích Phù Văn (mũ giáp, Thể Lực, Xích Cộng Hưởng). Mỗi loại còn cần thêm hai Tinh Chất Thanh Âm; ở những ô và chỉ số vừa có pháp khắc cơ bản vừa có pháp khắc Cao Cấp, phần thưởng Phù Văn nằm ở giữa hai mức đó, trong khi Dệt Phù Văn là pháp khắc Tinh Thần giáp ngực mạnh nhất tuyệt đối và Da Phù Văn là pháp khắc Nhanh Nhẹn giáp chân duy nhất tồn tại. Các con số thưởng chính xác đều nằm trong bảng bên dưới.",
+        "enchantsNoteOffhand": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected, and no piece can be yet: it is authored ahead of the Perfecting work it waits on.",
+        "enchantsNoteInfusionLive": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected: Perfecting is the wearer's own work, not the enchanter's, and the Professions page tells how a piece earns it.",
         "charmsHeading": "Bùa cho công cụ của người thu hoạch",
         "charmsBody": "Pháp Khắc cũng là nơi những lá bùa của người thu hoạch ra đời. Thợ máy Gizzel dạy cả hai tại xưởng dụng cụ ở Đông Khê một khi Pháp Khắc của bạn đạt 25: Túi Trữ Của Thợ Thu Thập, thứ cộng thêm một đơn vị vào một lần thu hoạch, và Con Mắt Nghệ Nhân, thứ nâng bậc của những gì thu được. Mỗi loại được chế tạo một lần, rồi gắn vào một cây cuốc, rìu, hoặc liềm, nơi nó chỉ tiêu một lượt nạp trên những lần thu hoạch mà nó thực sự cải thiện được.\n\nViệc nạp lại là nơi nghề này tiếp tục kiếm tiền. Lượt nạp được khôi phục bởi bất kỳ ai sở hữu công cụ, không phải bởi một thợ pháp khắc ghé qua, và việc nạp lại tốn một nửa nguyên liệu khi chủ công cụ đó chính là thợ pháp khắc đã ký lên lá bùa, ít hơn nữa nếu có chuyên ngành Pháp Khắc. Vậy nên một lá bùa bán qua quầy là một lần bán duy nhất, trong khi những lá bùa gắn trên chính công cụ của bạn là những lá bùa rẻ để tiếp tục vận hành. Toàn bộ thang lượt nạp và nguyên liệu có trên bất kỳ trang nghề thu hoạch nào, dưới mục Hiệu Ứng Công Cụ."
       },
@@ -6534,7 +6808,8 @@ export const vi_VN: EnTranslations = {
         "mining": "Khai Khoáng moi quặng thẳng ra khỏi đá của thế giới: đồng ở Thung Lũng Đông Khê, sắt ở Đầm Lầy Bùn Sâu, và osmium trên Cao Nguyên Đỉnh Gai, cùng những mạch quặng khởi đầu rải khắp mọi khu vực non trẻ hơn ở xa hơn, nuôi các nghề lò rèn. Mở cho tất cả mọi người từ cấp 1: một cây cuốc khai khoáng giá 20 đồng từ quầy Eastbrook, Fenbridge, hoặc Highwatch mở được mọi mạch quặng khởi đầu, còn những nấc cao hơn của thang cuốc sẽ thức dậy khi chính bộ đếm của bạn kiếm được chúng. Được theo dõi trên bộ đếm riêng của nó tới giới hạn 100.",
         "logging": "Đốn Gỗ hạ cây lấy gỗ từ những cụm cây khắp cả thế giới: vỏ sắt ở Thung Lũng Đông Khê, tần bì tro ở Đầm Lầy Bùn Sâu, gỗ cổ thụ ở Cao Nguyên Đỉnh Gai, và các cụm cây khởi đầu ở mọi khu vực non trẻ hơn, nguồn gỗ thô cho cán vũ khí, trượng, và bàn làm việc của kỹ sư. Mở cho tất cả mọi người từ cấp 1 chỉ cần có một cây rìu đốn gỗ trong túi (20 đồng tại các quầy Eastbrook, Fenbridge, và Highwatch), được theo dõi trên bộ đếm riêng của nó tới giới hạn 100.",
         "herbalism": "Thảo Dược Học thu hái những gì mọc hoang: lá bạc ở Thung Lũng Đông Khê, lá vàng ở Đầm Lầy Bùn Sâu, cánh mặt trời ở Cao Nguyên Đỉnh Gai, và các khóm khởi đầu ở mọi khu vực non trẻ hơn, thứ lá và thân giữ cho các nghề bào chế luôn có gì để nấu. Mở cho tất cả mọi người từ cấp 1 chỉ cần có một cây liềm thảo dược trong túi (20 đồng tại các quầy Eastbrook, Fenbridge, và Highwatch), được theo dõi trên bộ đếm riêng của nó tới giới hạn 100.",
-        "fishing": "Câu Cá là kẻ khác biệt giữa các nghề thu thập, và cũng là nghề sâu nhất: một trò nhỏ cắn mồi và giật cần thực thụ, có bảng cá riêng ở mỗi khu vực trong ba vùng lõi (những vùng nước non trẻ xa hơn hiện đều dùng bảng của Thung Lũng), và giới hạn thành thạo 200, gấp đôi các nghề khác. Hãy mua một cần câu, quay mặt ra vùng nước rộng, và buông câu."
+        "fishing": "Câu Cá là kẻ khác biệt giữa các nghề thu thập, và cũng là nghề sâu nhất: một trò nhỏ cắn mồi và giật cần thực thụ, có bảng cá riêng ở mỗi khu vực trong ba vùng lõi (những vùng nước non trẻ xa hơn hiện đều dùng bảng của Thung Lũng), và giới hạn thành thạo 200, gấp đôi các nghề khác. Hãy mua một cần câu, quay mặt ra vùng nước rộng, và buông câu.",
+        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked garden beds, growing on their own clock whether you stay or go, and pulled up ripe whenever you come back, because nothing in a bed ever spoils. A farmer stands beside every bed site, from the Eastbrook allotments through Fenbridge and Highwatch to the Evergarden parterre, and Farmer Jessica in Eastbrook is where the trade starts: she sells the garden hoe and the first seeds, and her errand walks a new farmer through a first crop. Each rung of the ladder grows its own crops, two on the lower rungs and four on the upper ones, each with a finer grade for a practiced hand to pull, and engineers craft the hoes for the tougher ground above the starter beds. Tracked on its own counter to a cap of 100."
       },
       "rhythmHeading": "Nhịp thu hoạch",
       "rhythmBody": "Một lần thu hoạch là một thao tác niệm ngắn nhìn thấy được, không phải cú chộp tức thì: {base} giây cơ bản, không bao giờ xuống dưới cái sàn {floor} giây. Mang theo một công cụ trên bậc của điểm tài nguyên, loại mà thành thạo của bạn cho phép sử dụng, sẽ làm bạn nhanh thêm {tool} giây cho mỗi bậc cao hơn nó, và mỗi dải thành thạo bạn vượt qua lại gọt thêm {band} giây nữa; chỉ khớp đúng bậc của điểm tài nguyên thì mới lọt được vào cửa, chính những bậc cao hơn nó mới làm bạn nhanh.\n\nMột chiếc túi đầy sẽ lịch sự từ chối thao tác trước khi nó bắt đầu, nên không có gì bị phí giữa chừng, và mỗi lần thu hoạch đều trả một lát kinh nghiệm nhân vật nho nhỏ, co giãn theo cấp của điểm tài nguyên đối chiếu với cấp của chính bạn, giống hệt cách kinh nghiệm giết quái co giãn: một điểm tài nguyên xám tầm thường chẳng dạy được gì cho một nhân vật đã đạt trần.",
@@ -6542,7 +6817,7 @@ export const vi_VN: EnTranslations = {
       "nodesHeading": "Điểm tài nguyên theo khu vực",
       "nodesNote": "Vị trí các điểm tài nguyên, bậc của chúng, công cụ cần thiết, và những gì chúng mang lại. Mỗi điểm tài nguyên hồi sinh cho bạn {respawn} giây sau khi bạn tự thu hoạch, và bộ đếm đó là của riêng bạn: người thu thập khác làm việc cùng điểm tài nguyên đó không bao giờ làm chậm bộ đếm của bạn, nên không có tranh giành điểm tài nguyên và không cần canh gác. Mỗi khu vực lên cao hơn mang lại nguyên liệu tốt hơn từ mặt đất khó hơn.",
       "toolsHeading": "Công cụ",
-      "toolsNote": "Mọi điểm tài nguyên đều cần công cụ của nghề tương ứng nằm trong túi bạn, kể cả bậc 1: không cuốc thì không quặng, không cần câu thì không cá. Thang người bán trải từ bậc 1 đến bậc 3 khắp ba thị trấn trung tâm của vùng lõi: công cụ bậc 1 bán ở cả ba nơi, những nấc trên nó bán ở nơi vùng đất dùng đến chúng bắt đầu (Fenbridge thêm bậc 2, Highwatch bậc 3), còn các khu định cư non trẻ xa hơn không bán công cụ nào cả, nên hãy sắm sửa đầy đủ trước khi lên đường. Mỗi quầy đều bán thoải mái mọi nấc mà nó có, và bất kỳ công cụ nào cũng chuyển tay được qua giao dịch trực tiếp; mọi nấc cũng rao được trên Chợ và gửi được qua thư, trừ ba công cụ trên cạn khởi đầu giá 20 đồng: những cái đó mua tại quầy hoặc trao tay nhau, và không bao giờ bán lại, gửi thư, hay rao bán được. Thứ bị chặn cổng là quyền sử dụng. Một công cụ trên cạn cao hơn bậc 1 chỉ hoạt động khi thành thạo của bạn trong chính nghề của nó đã kiếm được nó, {tier2Prof} cho bậc 2, {tier3Prof} cho bậc 3, và 85 với 100 cho hai nấc chế tạo được, và dòng người bán, chú giải, cùng bảng dưới đây đều nêu rõ yêu cầu ngay từ đầu. Trước lúc đó, một công cụ mua sẵn chỉ nằm chờ trong túi, không mở được vùng đất nào, không mua được tốc độ, và không đúc ra phẩm cấp hảo hạng nào, rồi sẽ dùng được đúng khoảnh khắc bộ đếm của bạn chạm tới con số của nó. Cần câu là ngoại lệ duy nhất: không cần câu nào mang yêu cầu sử dụng, và Lái Buôn Wilkes ở Eastbrook cố ý bán sẵn cần câu bậc 2 và bậc 3 cho những người câu muốn mua trước. Một công cụ không bao giờ chiếm ô trang bị và không bao giờ mòn hỏng, nên mỗi cái là một lần mua duy nhất, và với cổng chặn thì chỉ bậc mới quan trọng: một công cụ hiếm hơn cùng bậc chẳng mở thêm được gì. Nhưng độ hiếm không chỉ là màu sắc. Nó khiến hiệu ứng công cụ đã gắn kéo dài hơn, và trên một cần câu thì nó nới rộng cửa sổ giật.\n\nMột công cụ tốt hơn mua được ba thứ, không phải hai. Nó mở vùng đất bậc cao hơn, nó rút ngắn thao tác niệm, và nó cải thiện thứ lấy ra được: khai thác một mạch quặng bằng công cụ xếp hạng TRÊN nguyên liệu của chính khu vực đó thì lần thu hoạch sẽ cho ra phẩm cấp hảo hạng của nguyên liệu ấy thay vì loại thường. Mạch quặng phải là một trong những mạch phẩm cấp đầy đủ của khu vực, nên các mạch dễ hơn mà một khu vực giữ lại cho lữ khách vẫn chỉ cho nguyên liệu thường. Nguyên liệu hảo hạng chính là thứ mà các công thức công cụ chế tạo tiêu thụ, và một phẩm cấp hảo hạng được tính như bản thường của nó ở bất cứ đâu mà một công thức hay một đơn hàng đòi bản thường, nên việc nâng cấp không bao giờ khiến bạn mắc kẹt: nó chỉ có nghĩa là quặng đồng của bạn về tay dưới dạng Quặng Đồng Hảo Hạng.\n\nTrên thang người bán, mỗi nghề còn có hai công cụ chế tạo được, bậc 4 và bậc 5, làm tại xưởng dụng cụ (mọi nhân vật đều biết các công thức trên cạn; kỹ năng phải leo lên vì công việc đó là kỹ năng của Cơ Khí), hoặc mua bằng Huy Hiệu Hang Sâu tại quầy Kinh Cầu Chết Chìm một khi đã đạt các cổng lượt hoàn thành của nó: bảng dưới đây ghi giá Huy Hiệu và số lượt hoàn thành mà mỗi nấc đòi hỏi. Không thương nhân nào bán chúng lấy tiền vàng cả. Câu Cá có cặp riêng của mình, và chúng được học từ người chế tạo công cụ chứ không phải biết từ đầu. Hôm nay không điểm tài nguyên nào và không vùng nước nào cần quá bậc 3, nên hai nấc trên cùng mua tốc độ, phẩm cấp, và một cửa sổ giật rộng rãi hơn chứ không mua quyền vào, và chúng sẽ là tấm vé vào cửa khi vùng đất bậc cao hơn xuất hiện.",
+      "toolsNoteFishingPageMarks": "Every node needs its trade's tool in your bags, tier 1 included: no pick, no ore, and no pole, no fish. The vendor ladder covers tiers 1 to 3 across the three heartland hubs: the tier-1 tool is sold at all three, the rungs above it where the ground that uses them begins (Fenbridge adds tier 2, Highwatch tier 3), and the younger settlements beyond them stock no tools at all, so kit up before you travel. Farming buys elsewhere: its tier-1 hoe is stocked by the farmer who keeps the first allotment (she stands at the Eastbrook allotments, not at any tool counter), and no hoe rung above it is sold for coin anywhere. Every counter sells every rung it stocks freely, and any tool passes by direct trade; every rung also lists on the Market and travels by mail except the four 20-copper land starters (the Copper Mining Pick, the Handaxe, the Gathering Sickle and the Garden Hoe): those are bought at a counter or passed hand to hand, and never sold back, mailed, or listed. What is gated is the wielding. A land tool above tier 1 works only once your proficiency in its own trade has earned it, {tier2Prof} for tier 2, {tier3Prof} for tier 3, and 85 for tier 4 and 100 for tier 5, and the vendor row, the tooltip, and the table below all name the requirement up front. Until then a tool bought ahead simply waits in your bags, opening no ground, buying no speed, and minting no fine grades, then wields the moment your counter touches its number. Fishing rods are the one exception: no rod carries a wield requirement, and Trader Wilkes in Eastbrook deliberately stocks the tier 2 and tier 3 rods for anglers buying ahead. A tool never occupies an equip slot and never wears out, so each is a one-time purchase, and only the tier matters to the gate: a rarer tool of the same tier opens nothing extra. Rarity is not only colour, though. It makes a slotted tool effect last longer, and on a rod it widens the reel window.\n\nA better tool buys three things, not two. It opens higher-tier ground, it shortens the cast, and it improves what comes out: work a vein with a tool ranked ABOVE the zone's own material and the harvest yields the fine grade of it instead of the plain one. The vein has to be one of the zone's full-grade ones, so the easier veins a zone keeps for travellers still yield the ordinary material. Fine materials are what the crafted tool recipes consume, and a fine grade counts as its ordinary version anywhere a recipe or a work order asks for one, so upgrading never strands you: it just means your copper ore arrives as Fine Copper Ore.\n\nAbove the vendor ladder the three node trades each have two crafted tools, tier 4 and tier 5, made at the toolworks (every character knows those two recipes; the skill that climbs for the work is Engineering's), or bought with Delve Marks at the Drowned Litany counter once its clears gates are met: the table below carries the Marks price and the clears each rung asks. No merchant ever sells them for coin. Farming's ladder is the long one: every hoe above the 20-copper starter is crafted, tiers 2 through 5, all four taught by the toolmaker rather than known from the start, and the top two rungs are also stocked at that same Marks counter. Fishing has three of its own, and they are learned rather than known from the start too: the toolmaker teaches the tier 4 Stormreel and the tier 5 Tidewrought, and the tier 6 Clockreel is built from a schematic instead; the Stormreel and the Tidewrought are also stocked at that same Marks counter, behind the same clears gates as the node tools of their tier, and the fishing page's tool table carries their Marks prices. Rods are the one ladder whose top rungs buy ACCESS on the water: every one of the three opens a catch band that skill alone can never reach, so a better rod is not comfort. For the three node trades no node today needs more than tier 3, so their tier 4 and tier 5 tools still buy speed and grade rather than access, and they will be the entry ticket when higher-tier ground arrives. Farming sits between the two: planting is what needs the hoe, so a bed of tier N asks a hoe of tier N right up to the fourth and last crop tier, and only the fifth rung opens no new ground.",
       "toolCrafted": "Chế tạo ({craft})",
       "toolCraftedOrMarks": "Chế tạo ({craft}) hoặc {marks} Huy Hiệu Hang Sâu sau ba lượt hoàn thành Kinh Cầu Chết Chìm",
       "toolCraftedOrMarksHeroic": "Chế tạo ({craft}) hoặc {marks} Huy Hiệu Hang Sâu sau một lượt hoàn thành Kinh Cầu Chết Chìm Anh Hùng",
@@ -6555,38 +6830,55 @@ export const vi_VN: EnTranslations = {
       "yieldsHeading": "Một lần thu hoạch mang lại gì",
       "yieldsBody": "Mỗi lần thu hoạch sẽ tung một phẩm chất cho những gì nó mang lại, và thành thạo của bạn là toàn bộ câu chuyện của lần tung đó. Một người mới thu thập hoàn toàn luôn khai thác được nguyên liệu thông thường; mỗi điểm kỹ năng dịch chuyển tỉ trọng đều đặn ra khỏi thông thường vào các bậc cao hơn và không bao giờ ngược lại, cho đến khi ở giới hạn 100 bậc thông thường biến mất hoàn toàn: 60 phần trăm không phổ biến, 30 phần trăm hiếm, 8 phần trăm sử thi, và 2 phần trăm huyền thoại, mỗi lần.\n\nPhẩm chất cũng là số lượng: lần tung thông thường cho 1 đơn vị, không phổ biến và hiếm cho 2, sử thi 3, và huyền thoại 4. Bất kỳ sản phẩm hiếm, sử thi, hoặc huyền thoại nào đều đến như một bản được đóng dấu Được thu thập bởi bạn: ở giới hạn đó là bốn trong mười lần thu hoạch mang tên bạn, và các quy tắc xuất xứ trên trang Kinh Tế Chế Tạo giải thích lý do tại sao các thợ thủ công trả thêm cho chính xác những chồng đó.",
       "bandsHeading": "Các dải thành thạo",
-      "bandsBody": "Các dải thành thạo là thang 0/100/200 dùng chung nằm trên bộ đếm của một nghề. Với các nghề trên cạn, dải vượt qua ở mốc 100 rút ngắn thời gian niệm thu thập, và giới hạn của chúng khiến dải 1 trở thành trần cao nhất. Các dải của Câu Cá không rút ngắn gì cả: chúng chọn bảng loại cá câu được (với một cần câu tương xứng), chỉ Câu Cá mới chạm tới dải 2, và chính hành trình leo lên là thứ kéo người câu ra vùng nước sâu hơn, nơi những bảng cá tốt hơn và những bài học xa hơn cùng ngự trị.",
+      "bandsBodySplitLadder": "Proficiency bands are the shared 0/100/200 ladder over a land trade's counter: the band crossed at 100 shaves the gather cast, and the land cap makes band 1 the ceiling. Fishing keeps a ladder of its own, six rungs at 0, 100, 150 and then three more at 200. Its bands shave nothing; they select the catch tables, each with a rod to match. After that third rung the gate moves once more, to the 200 cap, and then stops: from the cap on, the rod alone decides how far the table goes. The climb is what pulls an angler to deeper water, where the better tables and the further lessons both live.",
       "bandFmt": "Dải {band}: từ {at} điểm thành thạo",
       "rareHeading": "Phát hiện hiếm",
       "rareBody": "Mỗi lần thu hoạch, dù kỹ năng của bạn như thế nào, đều mang tỉ lệ 1 trên {oneIn} để tìm thấy một phát hiện hiếm: một mạch quặng nguyên sơ trong quặng, gỗ cốt lõi cổ xưa trong gỗ, một bông hoa nở dưới ánh trăng trong thảo dược. Phát hiện này nhân sản lượng thu hoạch đó lên {mult} lần, mọi đơn vị đều đến có dấu thợ của bạn dù phẩm chất được tung nào, và cả khu vực đều nghe tin qua tên bạn. Mỗi loại cũng khắc ghi dấu ấn sưu tập không Danh Vọng của riêng nó vào Sách Kỳ Công của bạn, một dấu ấn sưu tập tồn tại thuần túy để chứng minh điều đó đã xảy ra với bạn.",
+      "rareBodyFourFlavors": "Every harvest, whatever your skill, carries a 1 in {oneIn} chance of a rare find: a pristine vein in ore, ancient heartwood in timber, a moonlit bloom among the herbs, a golden harvest from a garden bed. The find multiplies that harvest's yield {mult} times over, every unit arrives signed with your name regardless of the quality rolled, and the whole zone hears about it by name. Each flavor also inscribes its own zero-Renown deed in your Book of Deeds, a collector's mark that exists purely to prove it happened to you.",
       "specimenBody": "Hãy chừa sẵn chút chỗ trống trong túi khi bạn đi cày: một vụ hời có dấu thợ cần một ô riêng hoặc một chồng có dấu thợ khớp hệt để rơi vào, và nếu không có chỗ nào vừa thì sản lượng vẫn đến nhưng chữ ký thì mất. Việc thu hoạch xác cũng có nhánh trúng độc đắc riêng: khoảng {pct}% mỗi thành phần thu hoạch được sẽ ra hiếm trở lên. Một họ sinh vật có mẫu vật hoàn hảo để cho (da, tơ, nọc độc, thịt) giữ sản lượng thường của nó trơn trụi và đúc thêm mẫu vật có dấu thợ bên cạnh; mọi họ khác thì đóng dấu lên chính sản lượng.",
       "gatherDeedsHeading": "Thành tích trên đường đi",
       "gatherDeeds": {
         "mining": "Lần đầu tiên bạn thu hoạch điểm tài nguyên của bất kỳ nghề nào sẽ đạt được thành tích Hoa Quả Của Đồng Ruộng, và giới hạn 100 trong Khai Khoáng khắc ghi danh hiệu Quặng Trong Máu. Đạt 100 trong bất kỳ ba trong số Khai Khoáng, Đốn Gỗ, Thảo Dược Học, và Câu Cá thêm danh hiệu Thợ Thu Thập Thành Thạo với 25 Danh Vọng, và việc khai phá một mạch quặng nguyên sơ sẽ ghi lại dấu ấn sưu tập riêng của nó. Không có gì trong số này ban sức mạnh: thành tích là danh hiệu và Danh Vọng, bằng chứng về những con đường bạn đã đi qua.",
         "logging": "Lần đầu tiên bạn thu hoạch điểm tài nguyên của bất kỳ nghề nào sẽ đạt được thành tích Hoa Quả Của Đồng Ruộng, và giới hạn 100 trong Đốn Gỗ khắc ghi danh hiệu Thợ Chặt Cốt Lõi. Đạt 100 trong bất kỳ ba trong số Khai Khoáng, Đốn Gỗ, Thảo Dược Học, và Câu Cá thêm danh hiệu Thợ Thu Thập Thành Thạo với 25 Danh Vọng, và một khúc gỗ cốt lõi cổ xưa sẽ ghi lại dấu ấn sưu tập riêng của nó. Thành tích chỉ là danh hiệu và Danh Vọng, không bao giờ là sức mạnh.",
         "herbalism": "Lần đầu tiên bạn thu hoạch điểm tài nguyên của bất kỳ nghề nào sẽ đạt được thành tích Hoa Quả Của Đồng Ruộng, và giới hạn 100 trong Thảo Dược Học khắc ghi danh hiệu Người Thành Thạo Đồng Nội. Đạt 100 trong bất kỳ ba trong số Khai Khoáng, Đốn Gỗ, Thảo Dược Học, và Câu Cá thêm danh hiệu Thợ Thu Thập Thành Thạo với 25 Danh Vọng, và một bông hoa nở dưới ánh trăng sẽ ghi lại dấu ấn sưu tập riêng của nó. Thành tích chỉ là danh hiệu và Danh Vọng, không bao giờ là sức mạnh.",
-        "fishing": "Cột mốc 100 khắc ghi Lão Muối và 200 khắc ghi Ngư Sư Thành Thạo cùng danh hiệu của nó, đỉnh cao nhất của nghệ thuật câu cá; Câu Cá cũng tính cho Thợ Thu Thập Thành Thạo, kiếm được khi đạt 100 ở bất kỳ ba nghề thu thập nào. Con cá đầu tiên từ vùng nước của mỗi khu vực trong sáu khu vực lấp đầy một trang riêng, ba vùng lõi cùng Đầm Liễu, Đỉnh Gió Lộng, và Bờ Biển Xa Xôi ở xa hơn, còn Cá Koi Ánh Nắng thì ghi Tia Hy Vọng, nên những lữ khách mang theo cần câu trong hành trang lấp đầy sách của mình nhanh hơn họ tưởng."
+        "fishing": "Cột mốc 100 khắc ghi Lão Muối và 200 khắc ghi Ngư Sư Thành Thạo cùng danh hiệu của nó, đỉnh cao nhất của nghệ thuật câu cá; Câu Cá cũng tính cho Thợ Thu Thập Thành Thạo, kiếm được khi đạt 100 ở bất kỳ ba nghề thu thập nào. Con cá đầu tiên từ vùng nước của mỗi khu vực trong sáu khu vực lấp đầy một trang riêng, ba vùng lõi cùng Đầm Liễu, Đỉnh Gió Lộng, và Bờ Biển Xa Xôi ở xa hơn, còn Cá Koi Ánh Nắng thì ghi Tia Hy Vọng, nên những lữ khách mang theo cần câu trong hành trang lấp đầy sách của mình nhanh hơn họ tưởng.",
+        "farming": "Farming keeps no deeds of its own yet: now that its beds and crops are in the ground, the milestone and cap deeds that mark the other trades arrive in a later patch. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power.",
+        "farmingSown": "Farming keeps its own shelf in the Book of Deeds now. Sow It Begins marks your first planted crop, and four chronicle pages mark a first thriving harvest at each of the bed sites, from Eastbrook Vale to the Evergarden. A golden harvest records its own zero-Renown collector's mark, and proficiency in Farming counts toward Master Gatherer, earned at 100 in any three gathering trades. Every Furrow Filled gathers the whole roster onto one page: grow every crop the four gardens carry and the collection closes. The capstone above it is Harvestmaster, the trade's 100-proficiency title, and with the mountain and parterre seeds now on their farmers' counters it is a climb you can finish today. Deeds are titles and Renown only, never power."
       },
       "fish": {
         "startHeading": "Bắt đầu",
-        "startBody": "Một Cần Câu Đơn Giản tốn 20 đồng từ Ngư Dân Brandt ở Eastbrook (hãy tìm Lão Thủy Thủ ở rìa phía đông thị trấn, cạnh con đường ra Hồ Gương); Thợ Máy Gizzel, Người Tiếp Tế Hale ở Fenbridge, và Quân Nhu Trưởng Bree ở Highwatch cũng có bán cần câu. Dùng cần trong khi quay mặt ra vùng nước đủ sâu để có cá, xa tới khoảng 24 thước trước mặt bạn, và cái phao sẽ bay ra.\n\nBạn không thể buông câu khi đang giao chiến, khi đang bơi, hay khi đã chết: đứng trên bờ mà câu mới là tư thế được tính. Nhưng nước cũng khó lên theo đất: đầm lầy đòi ít nhất Guồng Sắt bậc 2 còn vùng đỉnh núi đòi Suối Bạc bậc 3, và một dây câu buông ra mà thiếu cần câu vùng nước ấy đòi thì chẳng bao giờ rời khỏi tay bạn. Trên hai cần đó còn hai cần nữa, Guồng Bão và Triều Đúc: kỹ sư chế tạo chúng ở xưởng dụng cụ từ chính những gì dây câu kéo lên, và quầy hang sâu của Kinh Cầu Chết Chìm bán chúng lấy Huy Hiệu Hang Sâu sau các cổng lượt hoàn thành của nó, dù không bao giờ lấy tiền vàng. Không vùng nước nào đòi chúng, nên chúng mua khoảng chờ ngắn hơn và cửa sổ giật rộng hơn thay vì mua quyền vào, mà ở nấc trên cùng thì điều đó có nghĩa là cá cắn đúng ba giây chẵn.",
+        "startBodyThreeRods": "A Simple Fishing Pole costs 20 copper from Fisherman Brandt in Eastbrook (look for the Old Salt at the town's east edge, by the road to Mirror Lake); Tinker Gizzel, Provisioner Hale in Fenbridge, and Quartermaster Bree in Highwatch stock poles too. Use the pole while facing water deep enough to hold fish, up to about 24 yards ahead of you, and your bobber sails out.\n\nYou cannot cast while in combat, while swimming, or while dead: casting from shore is the intended posture. Water gets harder as the land does, though: the marsh wants at least the tier 2 Ironreel and the peaks the tier 3 Silverstream, and a line cast without the rod that water takes never leaves your hand. Three rods sit above those, the Stormreel, the Tidewrought and the Clockreel: engineers craft all three at the toolworks out of what a line pulls up, and the Drowned Litany's delve counter sells the first two for Delve Marks behind its clears gates, though never for coin. No water asks for any of them, but they are not comfort alone: each one opens a catch band that skill by itself cannot reach, so once your counter is capped the rod is the only thing left that decides how deep your table goes. They shorten the wait and widen the reel window besides, which at the top rung means a bite in a flat three seconds.",
         "biteHeading": "Cắn mồi và giật cá",
         "biteBody": "Sau khi buông câu, cá cắn vào một thời điểm giấu kín nằm giữa {min} và {max} giây; độ trễ được quyết định ngay lúc dây chạm nước, nên không lần buông câu nào giống hệt lần nào. Khi phao rung, bạn có cửa sổ {reel} giây để bấm cần lần nữa mà giật lên: giật trong khoảng đó thì cá về tay, chần chừ quá thì cá thoát mất và bạn chẳng có gì để khoe. Trọn một lượt câu chặn trần ở {cap} giây, nên ngay cả một lần buông câu lặng lẽ cũng kết thúc nhanh.\n\nCần câu tốt hơn mài sắc cả hai đầu của trò nhỏ này: mỗi bậc cần câu trên bậc đầu tiên cắt bớt {rod} giây khỏi khoảng chờ dài nhất có thể, không bao giờ xuống dưới cái sàn ba giây mà cần câu đỉnh đã chạm tới, và cộng {reelRod} giây vào cửa sổ giật, nên Guồng Sắt kéo khoảng chờ tệ nhất xuống 6,5 giây với cửa sổ 3,25 giây, còn Suối Bạc xuống 5 với cửa sổ hơn 4, độ hiếm của nó nới cửa sổ giật rộng thêm chút ít ngoài phần mà riêng bậc đã trả. Những cú cắn nhanh nhất không bao giờ đổi dù bạn cầm gì, và một cần câu chỉ cần nằm trong túi là đã được tính.",
         "earlyReelNote": "Một lời nhắc cho những ngón tay nôn nóng: nhấn cần lần nữa trước khi có gì cắn câu thì bạn kéo lên một sợi dây trống không, và cú quăng kết thúc. Giây đầu tiên sau khi dây đáp xuống được tha thứ, nên một cú nhấn đúp vô ý chẳng tốn của bạn gì; quá mốc đó, nhấn sớm là một cú quăng phí hoài. Kiên nhẫn là toàn bộ trò chơi: chờ cá cắn, rồi giật.",
         "scheduleHeading": "Tích lũy thành thạo",
-        "scheduleNote": "Tích lũy câu cá theo một lịch cố định, không có xúc xắc: một điểm đầy đủ mỗi lần câu được khi dưới 50 thành thạo, nửa điểm dưới 100, một phần mười dưới 150, và rỉ giọt chậm 0,02 từ 150 đến 200. Đoạn cuối ấy là hành trình hàng nghìn lần câu, và đó là chủ ý: 200 là một lời tuyên bố, không phải trạm dừng trên đường tới thứ gì khác.\n\nCá rác ngừng dạy hoàn toàn ở {cutoff}: từ đó trở đi, rong rêu và giày ống chỉ là rong rêu và giày ống. Bản thân vùng nước cũng chặn trần bài học: vùng nước bậc 1 của Thung Lũng (và mọi bờ nước non trẻ ngoài ba vùng lõi) không dạy gì quá 100, vùng nước của đầm lầy dừng ở 150, và chỉ có vùng nước Đỉnh Gai mới dạy một người câu suốt chặng đường tới 200. Ngoài ra mọi con cá kéo được lên đều tích lũy theo đúng nhịp của lịch, nên khi bộ đếm đứng yên, cái lịch đang bảo bạn đi tìm vùng nước sâu hơn.",
+        "scheduleNoteRetuned": "Fishing gain follows a fixed schedule with no dice: 0.08 of a point per catch below 50 proficiency, 0.05 below 100, 0.04 below 150, and 0.03 from 150 to 200. The curve is deliberately shallow rather than back-loaded: the whole climb to 200 is about eleven hours of active fishing, and no quarter of it costs more than a third of the total, so the last fifty points are a long stretch rather than the whole journey.\n\nJunk stops teaching entirely at {cutoff}: from there on, weeds and boots are just weeds and boots. The water itself caps the lesson too: the Vale's tier 1 waters (and every young shore beyond the heartland) teach nothing past 100, the marsh's stop at 150, and only Thornpeak's school an angler the whole way to 200. Every landed catch otherwise gains at the scheduled rate, so when the counter stalls, the schedule is telling you to seek deeper water.",
         "colProficiency": "Thành thạo",
         "colGain": "Điểm nhận mỗi lần câu",
         "belowFmt": "Dưới {below}",
         "tablesHeading": "Bảng loại cá câu được",
-        "tablesNote": "Thành thạo của bạn chọn ra một trong ba ngưỡng câu: ngưỡng 0 từ đầu, ngưỡng 1 ở 100, ngưỡng 2 ở 200, mỗi ngưỡng lại dịch tỉ trọng ra khỏi cá rác và lưỡi câu trống để đổ vào cá thật, theo từng khu vực. Mỗi ngưỡng trên ngưỡng đầu tiên còn đòi một cần câu: ngưỡng 1 cần Guồng Sắt bậc 2, ngưỡng 2 cần Suối Bạc bậc 3. Ngưỡng thực tế của bạn là cái thấp hơn giữa cái mà kỹ năng đã kiếm được và cái mà cần câu chống đỡ nổi, và giới hạn ấy im lặng: với cần câu kém hơn bạn vẫn câu được, chỉ là câu theo bảng của ngưỡng thấp hơn, nên nếu thấy mẻ cá đứng yên trong khi kỹ năng vẫn leo, hãy kiểm tra cần câu trước tiên.\n\nVùng nước của mỗi khu vực giữ riêng một cặp cá ăn được, khu vực càng sâu thì hồi càng nhiều, tất cả đều là nguyên liệu nấu ăn và cũng là món ngồi ăn tại chỗ rất tốt ngay khi còn sống vừa gỡ khỏi dây. Phần còn lại của bảng là thuế của người câu: rong rêu, thi thoảng một chiếc giày ống, và cái lưỡi câu trống, thứ không bao giờ biến mất hẳn. Bạn trả bao nhiêu là tùy vùng nước mà phao rơi xuống, chứ không phải chỗ bạn đứng: một lần buông câu vươn xa tới 24 thước, và cần câu mà vùng nước ấy đòi, cái bảng nó rút ra, thành tích nó ghi công, cùng việc nó dạy được tới đâu, tất cả đều đáp lại khu vực mà vùng nước đó thuộc về, quyết định ngay khoảnh khắc dây chạm nước. Nước của mỗi khu vực được viết cho một ngưỡng riêng, Thung Lũng cho ngưỡng 0, đầm lầy cho ngưỡng 1, vùng đỉnh núi cho ngưỡng 2, và câu ở thấp hơn một ngưỡng sẽ biến chừng một phần ba số lần buông câu của bạn thành lưỡi câu trống, thấp hơn hai ngưỡng thì hơn một nửa. Cần câu đưa bạn tới vùng nước; kỹ năng mới là thứ làm nó sinh lợi, và chính hành trình leo lên kéo người câu đi sâu hơn, bởi ngưỡng tốt hơn không chỉ là tiền công tốt hơn: quá Thung Lũng thì đó là những vùng nước duy nhất còn dạy. {rare} là dòng duy nhất chỉ đáp lại ngưỡng câu của bạn chứ không gì khác: xác suất giống nhau ở mọi khu vực, và ở ngưỡng 2 dễ gặp gấp sáu lần so với ngưỡng 0, nên thứ hiếm nhất trên bến câu chính là thứ mà một Ngư Sư Thành Thạo thực sự giỏi hơn thật.",
+        "tablesNoteSixBands": "Your proficiency selects one of six catch bands: band 0 from the start, band 1 at 100, band 2 at 150, and the top three all at 200, each shifting weight out of junk and empty hooks into real fish, zone by zone. Each band above the first also demands a rod, one tier higher every time: band 1 wants the tier 2 Ironreel, band 2 the tier 3 Silverstream, band 3 the tier 4 Stormreel, band 4 the tier 5 Tidewrought, and band 5 the tier 6 Clockreel. Band 2 opens at 150 and the last three all wait for the 200 cap, so the skill gate moves once more and then stops: from the cap on, the rod is the only thing that lifts your table, which is what the crafted rods are for and where the three deep-water catches live. Your effective band is the lower of what your skill has earned and what your rod supports, and the cap is silent: with a lesser rod you still catch, just off the lower band's table, so if your catches feel stuck while your skill climbs, check your rod first.\n\nEach zone's waters hold their own pair of cooking catches, higher-tier fish the deeper the zone, all of them kitchen reagents that must be cooked before they restore anything; from band 3 up, three more join every zone's table at the same weight, so a recipe naming one of those asks the same of an angler wherever they fish. The rest of the table is the angler's tax: weed, the occasional boot, and the empty hook, which never fully disappears. How much you pay depends on the water your bobber lands in, not where you stand: a cast reaches up to 24 yards, and the rod the water demands, the table it draws from, the deed it credits, and how far it teaches all answer to the zone that water belongs to, decided the moment the line lands. Each zone's water is written for a band of its own, the Vale for band 0, the marsh for band 1, the peaks for band 2, and fishing one band under that turns roughly a third of your casts into empty hooks, two bands under it more than half. The rod gets you to the water; the skill is what makes it pay, and the climb is what pulls an angler deeper, because better bands are not just better pay: past the Vale they are the only waters that keep teaching. The {rare} is the one row that answers to your catch band and nothing else: the same odds in every zone, and six times likelier at band 2 than at band 0, so the rarest thing on the dock is the one a Master Angler really is better at.",
         "bandHeading": "Ngưỡng {band}: thành thạo {at} trở lên, cần câu bậc {rod}",
         "colCatch": "Cá câu được",
         "colOdds": "Xác suất",
         "pctFmt": "{pct}%",
         "emptyHook": "Không có gì cắn mồi",
         "koiHeading": "Cá Koi Ánh Nắng",
-        "koiBody": "Mọi vùng nước trong trò chơi đều giấu cùng một phần thưởng: Cá Koi Ánh Nắng, một tia lấp lánh khác thường trên dây câu đáng 75 đồng với người bán và đáng hơn thế nhiều với lòng tự hào của bạn. Xác suất của nó chỉ đáp lại ngưỡng câu của bạn chứ không gì khác, giống nhau ở mọi khu vực: một dòng 1 phần trăm của bảng cá ở ngưỡng 0, 3 ở ngưỡng 1, và 6 ở ngưỡng 2, được tung mỗi lần giật cần thành công, nên con koi tìm đến người câu đã kiếm được những bảng sâu. Bắt được một con sẽ ghi Tia Hy Vọng vào Sách Kỳ Công của bạn, một dấu ấn sưu tập không Danh Vọng. Khi điều đó xảy ra, nhật ký sẽ đảm bảo bạn biết."
+        "koiBodyBandFlat": "Every body of water in the game hides the same prize: the Sunglint Koi, an uncommon gleam on the line worth 75 copper to a vendor and rather more to your pride. Its odds answer to your catch band and to nothing else, the same in every zone: a 1 percent row of the catch table at band 0, 3 at band 1, and 6 from band 2 upward, drawn on every reeled-in cast, so the koi comes to the angler who earned the deep tables. Landing one records Glimmer of Hope in your Book of Deeds, a zero-Renown collector's mark. When it happens, the log makes sure you know."
+      },
+      "farm": {
+        "rhythmHeading": "The farming rhythm",
+        "rhythmBody": "Planting is the short visible cast: {plant} seconds flat at every rung, because a hoe opens ground rather than buying speed. Pulling a ripe crop is instant. There is no cast to interrupt and no bag check to refuse it, and a bed that has come ready waits as long as you leave it, so a full pack costs a farmer nothing but the walk to empty it.\n\nWhat a harvest pays is produce and farming proficiency. Unlike a vein, it grants no character XP at all, so the beds are a trade to work rather than a way to level.",
+        "gainHeading": "What a harvest teaches",
+        "gainBody": "Gain is deterministic and keyed to your own counter rather than to the crop: {g1} proficiency a harvest below {p1}, {g2} below {p2}, {g3} below {p3}, and {g4} the rest of the way to the cap of {cap}. It is never a skill-up roll, so the climb is exactly as long as the arithmetic makes it.\n\nWhat the crop tier decides is how far a bed can carry you. A tier 1 crop teaches to {c1} and grays there, a tier 2 crop to {c2}, and tier 3 and above to the cap, so moving up the beds is what keeps the counter moving at all.",
+        "yieldsHeading": "What a harvest yields",
+        "yieldsBody": "A bed pays picks rather than a graded pull. Every plot starts with a floor of {floor} lives, and each pick rolls a chance not to spend one: {keep0} percent at a fresh counter and {keepCap} percent at the cap, which works out at roughly three and a half picks at the start and six at the end.\n\nQuality rides those same picks instead of replacing them. Each pick has a {fine0} percent chance at a fresh counter, {fineCap} percent at the cap, of coming up as the crop the bed grew in its fine grade rather than its plain one, so a fine pick upgrades a pick and never adds one. There is no common-to-legendary ladder on a bed: a crop mints its own two grades and nothing else.\n\nTwo things add picks outright, and both land at the plain grade. An alchemist's growth tonic, armed when you plant, pays {tonicPicks} more picks on a {tonicPct} percent chance, and a slotted quantity effect adds {effectCap}, which is the cap farming puts on a Maker's Charm so the tonic keeps a reason to exist. A charged Artisan's Eye works on quality instead, adding {fineBonus} percentage points to every fine roll.",
+        "bedsHeading": "Working the beds",
+        "bedsBody": "The loop is short. Buy seeds and compost from the farmer beside the beds: Jessica in Eastbrook stocks the Vale pair, the Fenbridge farmer the marsh pair, Hollis on the Highwatch terraces the mountain crops, and Verbena the Evergarden parterre. A high-tier harvest also hands back a seed or two of its own, any seed changes hands on the World Market, and the mountain and parterre seeds now turn up in endgame drops and on the Heroic Quartermaster's counter besides, so the farmer beside the beds is the way in rather than the only way. Sow with a hoe in your bags, and tip the odds if you like: compost from the counter and the farmer's watch, paid in produce as you plant, each raise a crop's chance of coming through, an alchemist's growth tonic gives the harvest a shot at a larger yield, and once your skill has climbed a full band past a crop's tier that crop never fails at all. Then walk away. The bed keeps growing while you are logged out, a ripe crop waits as long as you leave it, and the Harvest Journal (Shift+K by default, or the Farming row of your professions window) lists every bed you have planted with its timer.\n\nA crop that fails leaves withered husks in place of produce, and any farmer trades husks for compost, so a bad season buys the next one's insurance. What you bring in feeds more than your own recipes: the produce cooks into the farm dishes at the kitchens, and it now goes into Cook Marlow's own trainer ladder and into the apothecary's elixirs besides, so a farmer has a buyer from the very first rung. And the garden no longer stops at the trainer ladder: the terrace crops season the raid's own role plates and every apex flask, and the Evergarden beds feed the two skill-125 capstone stations, so the last rung of both crafts is bought from a farmer too. Marlow's wheat and rice orders take Vale Wheat and Marsh Rice off your hands for coin on the same clock as every other work order.",
+        "bedsBodyScribeBuyer": "The scribe's desk buys from the beds too: the rung-50 Sunpetal Scroll takes a Frost Gourd off the Highwatch terraces, the same gourd the Elixir of the Serpent takes, which prices the two routes to that buff even.",
+        "tableHeading": "From the beds to the table",
+        "tableBody": "The kitchens are where a season pays forward. Beyond the everyday farm dishes, each crop tier has a richer dish that leaves you Well Fed: finish the meal and a lasting boon stays with you, the kind of edge a group wants eaten before the dungeon door. Crowning the set is the Harvest Feast, a spread a cook sets out in the world itself: everyone at hand takes a serving of their own, one each, and every finished meal pays the same Well Fed boon, so one farmer's season can set the table for a whole party. The top of that ladder, the two richest dishes and the feast itself, leans on the mountain and parterre crops, whose seeds the farmers beside those beds sell. The recipes are another matter: the upper rungs of the farm ladder are no longer taught at any counter, and are found in the endgame or bought with Heroic Marks like every other endgame recipe.\n\nLuck keeps a place at that table too. Every harvest you bring in rolls the same windfall chance the other gathering trades enjoy, and now and then a crop comes up golden: the yield lands far past a normal pull, something extra comes up with it (a seed for finer ground than you are working, or now and then one of those endgame recipes), the whole zone hears the find announced by name, and Golden Harvest is recorded in your Book of Deeds.",
+        "tableBodyOneMeal": "The kitchens are where a season pays forward. Beyond the everyday farm dishes, each crop tier has a richer dish that leaves you Well Fed: finish the meal and a lasting boon stays with you, the kind of edge a group wants eaten before the dungeon door. Only one Well Fed effect at a time: a newer meal replaces it. Crowning the set is the Harvest Feast, a spread a cook sets out in the world itself: everyone at hand takes a serving of their own, one each, and every finished meal pays the same Well Fed boon, so one farmer's season can set the table for a whole party. The top of that ladder, the two richest dishes and the feast itself, leans on the mountain and parterre crops, whose seeds the farmers beside those beds sell. The recipes are another matter: the upper rungs of the farm ladder are no longer taught at any counter, and are found in the endgame or bought with Heroic Marks like every other endgame recipe. The dish ladder itself is Cooking's work: the Cooking page carries every rung.\n\nLuck keeps a place at that table too. Every harvest you bring in rolls the same windfall chance the other gathering trades enjoy, and now and then a crop comes up golden: the yield lands far past a normal pull, something extra comes up with it (a seed for finer ground than you are working, or now and then one of those endgame recipes), the whole zone hears the find announced by name, and Golden Harvest is recorded in your Book of Deeds."
       },
       "econ": {
         "title": "Kinh Tế Chế Tác",
@@ -6610,7 +6902,7 @@ export const vi_VN: EnTranslations = {
         "marketHeading": "Chợ Thế Giới và hoa hồng của nó",
         "marketBody": "Chợ Thế Giới là sàn giao dịch toàn vương quốc, do Thương Nhân ở Đông Khê và Đấu Giá Voss ở Highwatch quản lý. Đăng rao miễn phí: không có tiền đặt cọc, và một rao bán không ai mua sẽ đơn giản trở về tay bạn. Nhà cái chỉ lấy hoa hồng khi thứ gì đó thực sự được bán: 5 phần trăm giá bán, phần còn lại chờ bạn đến thu.\n\nMột giới hạn quan trọng: Chợ chỉ môi giới hàng hóa thông thường. Một bản có dấu thợ, kiệt tác, pháp khắc, hoặc đã ràng buộc không bao giờ được đưa vào rao bán, nên những món đặc biệt đổi tay trực tiếp qua cửa sổ giao dịch, vốn mang đầy đủ danh tính của vật phẩm, gồm cả dấu thợ. Tự định giá những thứ đó; Chợ chỉ cho bạn biết bản thông thường được mua bao nhiêu.",
         "workOrdersHeading": "Đơn hàng",
-        "workOrdersNote": "Mỗi chủ bàn đăng một đơn hàng thường trực: mang đến một đống nguyên liệu chủ lực của nghề họ và nhận tiền ngay tại chỗ, cộng thêm ít kinh nghiệm nhiệm vụ. Mức trả cố tình là {pct}% so với những gì người bán NPC sẽ trả cho cùng đống nguyên liệu đó, làm tròn xuống, nên đơn hàng không bao giờ là cách có lời để bán nguyên liệu, chỉ là lý do để ghé qua bàn.\n\nMỗi đơn chạy theo đồng hồ riêng {minutes} phút mỗi nhân vật: nộp một cái và vị chủ bàn đó không có gì thêm cho bạn cho đến khi hết giờ. Hãy coi chúng là phần thưởng nhỏ cho nguyên liệu bạn đang thu hoạch dù sao, không phải là một công việc kinh doanh.",
+        "workOrdersNote": "Mỗi chủ bàn đăng các đơn hàng thường trực, mỗi nguyên liệu chủ lực một đơn: mang đến đúng đống nguyên liệu mà đơn yêu cầu và nhận tiền ngay tại chỗ, cộng thêm ít kinh nghiệm nhiệm vụ. Mức trả cố tình là {pct}% so với những gì người bán NPC sẽ trả cho cùng đống nguyên liệu đó, làm tròn xuống, nên đơn hàng không bao giờ là cách có lời để bán nguyên liệu, chỉ là lý do để ghé qua bàn.\n\nMỗi đơn chạy theo đồng hồ riêng {minutes} phút mỗi nhân vật: nộp một cái và đơn đó đóng lại với bạn cho đến khi hết giờ, còn các đơn khác của chủ bàn vẫn mở. Hãy coi chúng là phần thưởng nhỏ cho nguyên liệu bạn đang thu hoạch dù sao, không phải là một công việc kinh doanh.",
         "colOrder": "Đơn hàng",
         "colMaster": "Bậc thầy",
         "colAsks": "Yêu cầu cho",
@@ -6618,7 +6910,7 @@ export const vi_VN: EnTranslations = {
         "commissionsHeading": "Ủy thác và Giao Kèo Thợ Thủ Công",
         "commissionsBody": "Ủy thác là đồ chế tác cho người khác. Khi chế tác vũ khí, trang phục giáp, hoặc vật phẩm cầm tay phụ (một bình thuốc không thể mang giao kèo), thợ thủ công có thể đánh dấu món đồ là ủy thác: món đồ hoàn thiện hoạt động bình thường trong tay người làm, nhưng ngay khoảnh khắc nó đổi tay trong giao dịch, nó ràng buộc với người nhận. Đó là Giao Kèo Thợ Thủ Công: người mua nhận được món đồ, và món đồ không thể chuyển tiếp hay bán lại.\n\nGiao kèo không phải mãi mãi, chỉ là tốn kém. Bất kỳ chủ bàn nào cũng có thể tháo giao kèo cho một món đồ đã ràng buộc khi bạn đứng tại bàn của họ (bàn di động không bao giờ cung cấp dịch vụ này), với phí theo phẩm chất vật phẩm: 25 bạc cho khác thường, 1 vàng cho hiếm, 4 vàng cho sử thi, huyền thoại trả theo giá sử thi và một đồ phổ thông ủy thác trả theo giá khác thường.\n\nPhí mua lấy tờ giấy trắng, không phải thuốc chữa: món đồ vẫn là ủy thác, nên nó ràng buộc lại với bất kỳ ai nhận nó trong lần giao dịch tiếp theo, và mọi thứ khác về nó, dấu thợ, kiệt tác, và pháp khắc, đều còn nguyên vẹn.",
         "provenanceHeading": "Đồ có dấu thợ",
-        "provenanceBody": "Một số vật phẩm mang theo một cái tên. Di chuột lên nó và phần chú giải sẽ ghi Được thu thập bởi ai đó trên một nguyên liệu thô, hoặc Chế tạo bởi ai đó trên một món hoàn thiện: cùng một dấu, chỉ diễn đạt theo cách món đồ ấy ra đời. Chữ ký là một phần của chính vật phẩm, đi theo nó qua các lần giao dịch, qua ngân hàng, qua thư từ, qua Chợ Thế Giới, và cả qua một lần người bán mua lại, và không bao giờ phai.\n\nThu thập tự động ký lên tác phẩm tốt nhất của nó: bất kỳ lần thu hoạch nào tung ra hiếm trở lên đều đến kèm dấu thợ, và những phát hiện hiếm thì ký lên toàn bộ khoản trời cho gấp năm lần của chúng. Lần tung may mắn của một lần thu hoạch xác sẽ ký lên sản lượng ở những họ sinh vật không có mẫu vật để cho, còn ở nơi có, nó giữ sản lượng ở dạng thường và đúc thêm mẫu vật nguyên vẹn có dấu thợ bên cạnh. Chế tác cũng ký theo cùng lối: mọi bản của một sản phẩm hiếm trở lên đều được đúc kèm dấu thợ, và một kiệt tác thì luôn được ký dù phẩm chất của nó là gì, nên phiên bản đẹp nhất của bất kỳ món nào cũng luôn nêu tên người làm ra nó. Thứ duy nhất có thể khiến bạn mất một chữ ký là một cái túi đầy: một đơn vị có dấu thợ cần chỗ riêng của nó, hoặc một chồng có dấu thợ khớp hoàn toàn, để rơi vào.\n\nMột chồng vật phẩm dùng chung một danh tính, nên hai bản chỉ gộp lại khi mọi dấu đều khớp chính xác: cùng vật phẩm, cùng người ký, cùng chỉ số kiệt tác, cùng pháp khắc, cùng giao kèo. Một khúc gỗ có dấu thợ không bao giờ nhập vào một đống hàng thường theo chiều nào cả (gộp lại sẽ xóa mất tên của ai đó), nhưng những kiện hàng giống hệt nhau thì gộp rất vui vẻ, nên hai mươi quặng do cùng một người thu thập ký nằm chung một chồng và một khoản trời cho không xé nát túi của bạn.\n\nChữ ký trả công lại cho người thợ: cầm bất kỳ bản có dấu thợ nào của một nguyên liệu cần dùng tại bàn chế tác, dù ai ký đi nữa, cũng cộng thêm 2 điểm phần trăm cơ hội kiệt tác, và cầm một nguyên liệu do chính tay bạn ký sẽ cắt bớt một đơn vị khỏi số lượng nguyên liệu đó (không bao giờ xuống dưới một). Tác phẩm hiếm trở lên có dấu thợ của chính bạn thậm chí còn tiếp tục dạy lại bạn, hôm nay chỉ qua duy nhất cái lọ: hãy uống một bình thuốc do bạn ký và một dòng kỹ năng nhỏ chảy ngược về nghề đã pha ra nó, miễn là nghề đó là một trong các nghề chuyên ngành đang hoạt động của bạn.",
+        "provenanceBody": "Some items carry a name. Hover one and the tooltip says Gathered by so-and-so on a raw material, or Crafted by so-and-so on a finished piece: the same mark, worded for how the item came to be. A signature is part of the item itself, travels with it through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fades.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. The one thing that can cost you a signature is a full bag: a signed unit needs room of its own, or a matching signed stack, to land in.\n\nA stack of items shares one identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. A signed log never joins a plain pile in either direction (merging would erase somebody's name), but identical payloads merge happily, so twenty ore signed by the same gatherer sit in one stack and a windfall does not shred your bags.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
         "collectorsHeading": "Người sưu tầm, chiến tích, và giá của một câu chuyện",
         "collectorsBody": "Người bán NPC không quan tâm xuất xứ: một vật phẩm có dấu thợ bán cho NPC vẫn đúng giá thông thường. Phần giá trị tăng thêm của dấu thợ chỉ tồn tại giữa các người chơi, và đó chính xác là điều làm nó thú vị: một đống quặng may mắn được ký bởi một thợ thu hoạch nổi tiếng, một Miếng Ngon từ vụ thu hoạch may mắn, một lưỡi kiệt tác ghi tên thợ rèn đã nghỉ hưu từ lâu, tất cả đều có giá là bao nhiêu ký ức của ai đó nói lên.\n\nSách Kỳ Công cũng dựa vào cùng cảm giác đó: Mạch Nguyên Sơ, Lõi Cây Cổ Đại, Bông Trăng, Mẫu Vật Hoàn Hảo, và Tia Hy Vọng là những dấu ấn sưu tầm không có Danh Vọng tồn tại thuần túy để chứng minh một khoảnh khắc đã xảy ra với bạn. Giữ lại vật phẩm đã kiếm được kỳ công và bạn nắm giữ biên lai. Tất cả những thứ này không phải sức mạnh; xuất xứ không mua được chỉ số và không thắng được trận chiến, đó là dấu vết giấy tờ của những ngày tốt lành trong trò chơi.",
         "castPaceHeading": "Thời gian thi triển và kênh tiêu vàng",
@@ -6637,13 +6929,31 @@ export const vi_VN: EnTranslations = {
         "orderBoardBody": "Bạn không cần phải tìm thợ chế tác qua khung chat. Mở cửa sổ chế tác của bạn và bảng đơn ủy thác chỉ cách một cú nhấp trong phần đầu của nó. Ai cũng có thể đăng một đơn ở đó: đặt tên công thức bạn muốn được làm ra, rồi hoặc để nó mở cho bất kỳ thợ chế tác nào nhận, hoặc nhắm nó vào một thợ chế tác cụ thể, người khi đó là người duy nhất có thể nhận đơn. Một thợ chế tác đang xem bảng chấp nhận một đơn, và việc chấp nhận ràng buộc họ với nó, nên một công việc chỉ bao giờ được một người làm tại một thời điểm.\n\nKhông có gì bị giữ lại khi bạn đăng đơn: một đơn không giữ trước tiền vàng hay nguyên liệu nào cả, nên giá cả và ai cung cấp nguyên liệu vẫn là chuyện giữa hai bạn với nhau, thỏa thuận theo cách mọi đơn ủy thác vẫn luôn được thỏa thuận. Bạn có thể hủy đơn của chính mình khi nó vẫn còn mở, và một đơn không ai nhận sẽ tự hết hạn sau một ngày. Một khi một thợ chế tác đã chấp nhận, việc giao hàng là thứ khép lại nó.\n\nViệc giao hàng diễn ra mặt đối mặt. Thợ chế tác làm ra món đồ dưới dạng ủy thác, đến chỗ bạn, và trao nó tận tay, nên hãy chừa sẵn một ô túi trống để nhận nó. Món đồ đến tay bạn sẽ theo các quy tắc ủy thác thông thường bên dưới, ràng buộc với bạn qua Giao Kèo Thợ Thủ Công.",
         "commissionsBoardNote": "Có hai cách để bắt đầu một đơn ủy thác: một đơn bạn đăng lên bảng phía trên, mang công việc đến với một thợ chế tác, hoặc một thợ chế tác đơn giản là chọn làm một món đồ cho bạn. Cả hai đều kết thúc bằng cùng một giao kèo."
       },
+      "prov": {
+        "title": "Provisioning: from the field to the raid",
+        "intro": "The gathering lines meet in one kitchen, and the ladder above it ends at a table a whole raid eats from.",
+        "suppliersHeading": "Who feeds the kitchen",
+        "suppliersBody": "Cooking takes from nearly every gathering line, and that is deliberate: a cook who also fishes, farms, or skins is never short of something to work with, and a cook who does none of those can buy the lot on the market.\n\nWhat each line brings is listed below, and it is read straight off the live recipe list rather than written down here, so it is always what the kitchen actually asks for today.",
+        "lineCountFmt": "{count} into cooking bills",
+        "lineCorpse": "Corpse harvesting",
+        "ladderHeading": "The ladder, rung by rung",
+        "ladderBody": "Cooking climbs in the usual brackets, and every rung is listed with what it teaches. The early rungs are single dishes you eat from your bags. Higher up the kitchen starts making things for other people: plates that carry a lasting buff, and above those the feasts, which you do not eat at all but set down on the ground for everyone standing near it.",
+        "rungFmt": "Cooking {skill}",
+        "placeableTag": "(placed, not eaten)",
+        "stationTag": "(field station)",
+        "tableHeading": "The table at the top",
+        "tableBody": "A feast is set down where you stand and anyone nearby takes one serving each. What a serving gives is exactly the dish that feast is built around, so a feast never has power of its own to learn: it is a way of handing a whole group the plate you already know how to cook.\n\nThe top of the ladder is three feasts rather than one, and picking between them is the only choice there is. They cost the same, ask for the same materials, and take the same skill; each simply serves a different one of the three great plates, so a group takes the one that suits what it is about to do. Only one feast of yours can stand at a time, whichever rung it came from, and it keeps for a few minutes before it is cleared away.",
+        "marketHeading": "If you cook none of it",
+        "marketBody": "None of this is a wall for anyone who does not cook. Every material on this page is ordinary tradable goods, so a fisher sells catches, a farmer sells crops, and a raider who does neither buys a feast outright from a cook who made a spare. The kitchen is a place the professions meet, never a toll on the ones who skip it.",
+        "cookingLink": "Cooking"
+      },
       "faq": {
         "title": "Câu Hỏi Thường Gặp Về Nghề Nghiệp",
         "intro": "Giải đáp nhanh những câu hỏi thợ chế tác hay hỏi nhất.",
-        "q1": "Tại sao đồ có dấu thợ của tôi không xếp chồng?",
-        "a1": "Một vật phẩm có dấu thợ là một vật phẩm duy nhất: nó mang theo bản ghi riêng của mình (người ký, bất kỳ phẩm chất đã lăn, chỉ số kiệt tác, pháp khắc, giao kèo) thay vì là một bản sao vô danh. Hai bản chỉ gộp vào một ngăn xếp khi những bản ghi đó khớp chính xác.\n\nTrên thực tế: quặng hiếm bạn tự thu hoạch xếp chồng với quặng hiếm bạn tự thu hoạch thêm, vì cả hai đều ghi Thu hoạch bởi bạn và không có gì khác nhau. Cùng nguyên liệu đó do một người bạn ký nằm trong ô riêng, và một bản thường không có dấu không bao giờ gộp vào ngăn xếp có dấu. Túi, ngân hàng, và giao dịch đều theo một quy tắc này.",
+        "q1": "Why do my signed items not stack?",
+        "a1": "A signed item is an instanced item: it carries its own little record (the signer, any rolled quality, masterwork stats, an enchant, a bond) instead of being an anonymous copy. Two copies merge into one stack only when those records match exactly.\n\nIn practice: rare ore you gathered yourself stacks with more rare ore you gathered yourself, because both say Gathered by you and nothing else differs. The same material signed by a friend sits in its own slot, and a plain unsigned copy never merges into a signed stack. Bags, bank, trade, mail, and the World Market all follow this one rule.",
         "q2": "Các công thức phổ thông có tăng kỹ năng mãi mãi không?",
-        "a2": "Không. Mỗi công thức được tính điểm theo khoảng cách giữa nó và ngưỡng hiện tại của bạn trong nghề đó, cách đọc cam, vàng, xanh lá, xám thông thường: điểm đầy đủ ở ngưỡng của bạn trở lên, nửa điểm một bậc dưới, một phần tư hai bậc dưới, và không có gì từ ba bậc trở xuống. Ngưỡng cứ 25 điểm kỹ năng một lần, nên các công thức miễn phí từ kỹ năng 0 ngừng dạy bạn bất cứ điều gì ở kỹ năng 75.\n\nGiới hạn cũng thấp hơn mức 300 thông thường bạn có thể mong đợi: mỗi trong tám nghề chế tác có thể kiếm được giới hạn ở 125, Khai Mỏ, Đốn Gỗ, và Thảo Dược Học giới hạn ở 100, và Câu Cá chạy dài ở 200. Leo thang có nghĩa là chuyển lên các công thức ở ngưỡng của chính bạn, không phải cày nghiền công thức rẻ nhất.",
+        "a2": "No. Every recipe is scored by how far it sits below your current bracket in that craft, the classic orange, yellow, green, gray reading: full gain at or above your bracket, half one tier below, a quarter two tiers below, and nothing three or more below. Brackets are every 25 skill, so the free skill 0 recipes stop teaching you anything at 75 skill.\n\nThe caps are also lower than the classic 300 you might expect: each of the ten earnable crafts caps at 125, Mining, Logging, and Herbalism cap at 100, and Fishing runs long at 200. Climbing means moving up to recipes at your own bracket, not grinding the cheapest one.",
         "q3": "Khác biệt giữa nhặt loot và thu hoạch xác là gì?",
         "a3": "Một lần nhấn bao gồm cả hai. Mọi thứ xác mang theo, tiền vàng và đồ rơi cùng với các thành phần có thể thu hoạch, mở ra trong cùng một cửa sổ: loot theo các quy tắc loot thông thường, và thu hoạch là phía nghề nghiệp, tước nguyên liệu từ chính cái xác.\n\nThu hoạch là người đến trước, dùng một lần: mỗi xác chỉ có thể được thu hoạch đúng một lần, bởi người đầu tiên đến nhận, có mặt trực tuyến hay không. Trọng Tâm Thị Trấn của bạn quyết định những gì bạn nhận được: khi đứng trong trung tâm thị trấn, bạn có thể phân bổ 10 điểm trọng tâm cho các loại thành phần bạn quan tâm, và mỗi thành phần được trọng tâm nhận được bậc tốt hơn (cứ 5 điểm tăng một bậc, tối đa hai bậc) và nhiều hơn (10 phần trăm mỗi điểm). Các thành phần không được trọng tâm không bao giờ bị làm tệ đi.",
         "q4": "Tại sao Khúc Gỗ Vỏ Sắt của tôi có dấu thợ?",
@@ -6651,18 +6961,20 @@ export const vi_VN: EnTranslations = {
         "q5": "Làm thế nào để tháo giao kèo đồ ủy thác, và tốn bao nhiêu?",
         "a5": "Đến bất kỳ bàn chế tác nào với món đồ trong túi và trả tiền cho chủ bàn. Phí theo phẩm chất vật phẩm: 25 bạc cho đồ khác thường, 1 vàng cho đồ hiếm, 4 vàng cho đồ sử thi; huyền thoại trả theo giá sử thi, và đồ phổ thông ủy thác trả theo giá khác thường. Phải là bàn thật: bàn di động không bao giờ cung cấp dịch vụ này.\n\nPhí mua lấy tờ giấy trắng, không phải thuốc chữa: món đồ vẫn là ủy thác, nên nó ràng buộc lại với bất kỳ ai nhận nó trong lần giao dịch tiếp theo. Nếu nhiều bản đã ràng buộc chia sẻ một ngăn xếp, một bản được bóc ra và tháo giao kèo mỗi lần trả phí.",
         "q6": "Học công thức ở đâu, và tốn bao nhiêu?",
-        "a6": "Chín công thức dã chiến phổ thông và sáu công thức công cụ trên cạn chế tạo được thì ai cũng biết từ đầu, và ba công thức gắn trạm cũng vậy (Áo Choàng Vai Vảy Lò, Mũ Trùm Dệt Hộ Mệnh, và Băng Cuốn Da Hoàng Hôn), chúng không cần huấn luyện viên, chỉ cần đúng trạm của mình. Mọi thứ khác đều do các bậc thầy thường trú dạy tại trạm của họ khắp ba thị trấn trung tâm: phần lớn đứng ở Eastbrook, thợ thuộc da giữ xưởng thuộc da ở Fenbridge, và nhà giả kim giữ nhà bào chế ở Highwatch.\n\nCông thức từ huấn luyện viên chạy theo nấc: kỹ năng 0, 25, và 50 cho các nghề trang bị và đồ tiêu hao, giá lần lượt là miễn phí, 25 bạc, và 1 vàng dưới dạng phí một lần; hai công thức bùa của Pháp Khắc nằm ở nấc 25, còn người chế tạo công cụ dạy hai cần câu chế tạo được ở 75 và 125 với giá 4 và 16 vàng. Một bậc thầy dạy công thức ngay khi dải của bạn trong nghề đó đạt tới dải của chính công thức, và bạn phải đứng tại trạm của họ mới học được: trạm di động không tính.",
+        "a6ThreeRods": "The nine common field recipes and the six crafted land-tool recipes are known to everyone from the start, and so are three station-bound recipes (the Kilnscale Mantle, the Wardweave Cowl, and the Duskhide Wraps), which need no trainer, only their station. Everything else is taught by the resident masters at their stations across the three hub towns: most stand in Eastbrook, the tanner keeps the tannery in Fenbridge, and the alchemist keeps the apothecary in Highwatch.\n\nTrainer recipes run in rungs: skill 0, 25, and 50 for the gear and consumable crafts, priced free, 25 silver, and 1 gold as one-time fees, and every craft adds one 75-rung intermediate above them at its station (Enchanting's is the Lucent Reagent, beside its two charm recipes on the 25 rung); the toolmaker also teaches two of the three crafted fishing rods, at 75 and 125 for 4 and 16 gold (the apex rung is learned from a schematic instead, so no trainer quotes it a fee). A master teaches a recipe once your bracket in that craft has reached the recipe's own bracket, and you must be standing at their station to learn: a mobile station does not count.",
         "q7": "Tại sao việc thu hoạch của tôi đột nhiên chậm lại?",
-        "a7": "Thao tác niệm thu thập bắt đầu ở 2,5 giây và được gọt xuống theo hai cách: 0,4 giây cho mỗi bậc công cụ bạn mang theo và đủ sức sử dụng cao hơn bậc của chính điểm tài nguyên, và 0,15 giây một khi bộ đếm của nghề đó vượt qua dải 100 của nó, với sàn là 1,5 giây. Chuyển từ điểm tài nguyên bậc 1 lên điểm tài nguyên bậc 3 thì phần dôi ra của bạn biến mất, nên cùng cây cuốc ấy lại vung chậm đi. Cầm đúng bậc yêu cầu không mua được tốc độ; nó chỉ mở điểm tài nguyên mà thôi.\n\nTích lũy kỹ năng mờ dần y như bên chế tác: một điểm tài nguyên chuyển xám khi thành thạo của bạn leo vượt bậc của nó (điểm tài nguyên bậc 1 không dạy gì nữa từ thành thạo 75 trở đi), nên câu trả lời cho việc tích lũy chậm là những điểm tài nguyên bậc cao hơn. Những điểm đó cần một công cụ ít nhất bằng bậc của chúng nằm trong túi bạn (không điểm tài nguyên nào làm được bằng tay không, kể cả bậc 1), và một công cụ trên cạn cao hơn bậc 1 còn đòi mốc sử dụng của nó trước, 40/70/85/100 trong chính nghề của nó cho các bậc 2 đến 5. Câu Cá theo đường thoải riêng: tích lũy đầy đủ dưới 50 thành thạo, một nửa dưới 100, rỉ giọt 0,1 dưới 150 và 0,02 dưới 200, cá rác không dạy gì cả từ 100 trở lên, và bản thân vùng nước cũng chặn trần bài học (vùng nước bậc 1 ngừng dạy ở 100, đầm lầy ở 150), nên một bộ đếm đứng yên cũng có thể có nghĩa là bạn đã lớn hơn vùng nước ấy.",
+        "a7RetunedTaper": "The gather cast starts at 2.5 seconds and is shaved down two ways: 0.4 seconds for every tool tier you carry and can wield above the node's own tier, and 0.15 seconds once your trade's counter crosses its 100 band, with a floor of 1.5 seconds. Move from tier 1 nodes up to tier 3 nodes and your surplus vanishes, so the same pick swings slower again. Holding exactly the required tier buys no speed; it only opens the node.\n\nSkill gain fades the same way crafting does: a node grays out as your proficiency climbs past its tier (tier 1 nodes teach nothing from proficiency 75 on), so the answer to slow gains is higher tier nodes. Those need a tool of at least their tier in your bags (no node is ever worked bare-handed, tier 1 included), and a land tool above tier 1 also wants its wield mark first, 40/70/85/100 in its own trade for tiers 2 through 5. Fishing follows its own taper: 0.08 per catch below 50 proficiency, 0.05 below 100, 0.04 below 150 and 0.03 below 200, junk catches teach nothing at all from 100 on, and the water itself caps the lesson (tier 1 waters stop teaching at 100, the marsh at 150), so a stalled counter can also mean you have outgrown the water.",
         "q8": "Tôi có thể chế tác khi không ở trong thị trấn không?",
         "a8": "Một phần thôi. Chín công thức dã chiến phổ thông (vũ khí, giáp, thức ăn, và thuốc chủ lực dành cho người mới) chế tạo được ở bất kỳ đâu, bất kỳ lúc nào, và ba công thức kết hợp của các cặp đã thề cũng vậy. Mọi thứ khác nằm trên chúng đều gắn với một loại trạm: lò rèn, bếp, nhà bào chế, xưởng thuộc da, khung cửi, hoặc xưởng dụng cụ, và bạn phải ở trong vòng 20 thước quanh trạm thì lần chế tác mới thành.\n\nỞ kỹ năng 75 trong một nghề bạn sẽ chuyên ngành hóa, và cùng với mức giảm 20 phần trăm nguyên liệu bạn nhận được một trạm di động: đặt nó ngoài thực địa và nó đứng vững 10 phút, phục vụ các công thức của nghề đó y như bạn đang ở trạm thật. Trạm di động chỉ dùng để chế tác: việc học công thức và tháo giao kèo đồ ủy thác luôn cần trạm thật trong thị trấn.",
         "q9": "Làm sao để nhờ ai đó chế tác đồ cho tôi?",
         "a9": "Hãy đăng lên bảng đơn ủy thác. Mở cửa sổ chế tác, mở bảng từ phần đầu của nó, và đặt tên công thức bạn muốn được làm ra: để đơn mở cho bất kỳ thợ chế tác nào chấp nhận, hoặc nhắm nó vào một thợ chế tác bạn đã quen biết. Việc chấp nhận ràng buộc thợ chế tác đó với công việc, và một đơn chỉ bao giờ do một người giữ tại một thời điểm.\n\nKhông có tiền vàng hay nguyên liệu nào bị giữ trước khi bạn đăng đơn, nên hãy tự thỏa thuận giá cả và ai mang nguyên liệu tới, theo đúng cách mọi đơn ủy thác vẫn luôn được sắp xếp. Bạn có thể hủy đơn của chính mình khi nó vẫn còn mở, và một đơn không ai nhận sẽ hết hạn sau một ngày. Việc giao hàng diễn ra trực tiếp: đứng gần thợ chế tác của bạn với một ô túi trống khi món đồ đã sẵn sàng. Nó sẽ đến tay bạn với ràng buộc qua Giao Kèo Thợ Thủ Công, thứ mà bất kỳ chủ bàn nào cũng có thể tháo bỏ với mức phí thông thường.",
         "q10": "Lá bùa là gì, và điều gì xảy ra khi nó hết lượt nạp?",
-        "a10": "Một lá bùa là một hiệu ứng công cụ được gắn vào: tác phẩm của thợ pháp khắc nằm trong một công cụ thu hoạch và cải thiện những gì nó lấy lên. Túi Trữ Của Thợ Thu Thập cộng thêm một đơn vị vào một lần thu hoạch, Con Mắt Nghệ Nhân nâng bậc của nó, và Thợ máy Gizzel dạy cả hai tại xưởng dụng cụ ở Đông Khê khi đạt 25 Pháp Khắc. Một lượt nạp chỉ bị tiêu khi lá bùa thực sự làm thay đổi kết quả, nên một lần thu hoạch mà nó không thể cải thiện sẽ không tốn gì của bạn, và một ô gắn có thể được đặt để hỏi mỗi lần dùng nếu bạn muốn tự quyết định từng lượt nạp.\\n\\nMột lá bùa mới tinh mang 20 lượt nạp trên một công cụ phổ thông và thêm 10 lượt cho mỗi bậc hiếm cao hơn, nên một công cụ sử thi bắt đầu ở 50. Hết lượt nạp không phá hủy lá bùa: chủ công cụ nạp lại ô gắn, 10 lượt nạp cho mỗi nguyên liệu pháp khắc, với loại nguyên liệu theo mức tốt hơn giữa công cụ họ đang mang và công cụ tốt nhất từng được dùng để lấp đầy ô đó (Bụi Thanh Âm cho công cụ phổ thông hoặc khác thường, Tinh Chất Thanh Âm cho công cụ hiếm, một Mảnh Thanh Âm cho công cụ sử thi). Cất công cụ tốt vào kho két trước khi nạp lại không bao giờ làm nó rẻ hơn, chỉ làm nó nhỏ hơn với cùng mức giá, và gắn một lá bùa mới trong khi mang công cụ kém hơn là cách để quay về một bậc rẻ hơn. Thợ pháp khắc đã ký lên lá bùa trả một nửa để nạp lại cho chính lá bùa của mình, và ít hơn nữa nếu có chuyên ngành Pháp Khắc."
+        "a10": "Một lá bùa là một hiệu ứng công cụ được gắn vào: tác phẩm của thợ pháp khắc nằm trong một công cụ thu hoạch và cải thiện những gì nó lấy lên. Túi Trữ Của Thợ Thu Thập cộng thêm một đơn vị vào một lần thu hoạch, Con Mắt Nghệ Nhân nâng bậc của nó, và Thợ máy Gizzel dạy cả hai tại xưởng dụng cụ ở Đông Khê khi đạt 25 Pháp Khắc. Một lượt nạp chỉ bị tiêu khi lá bùa thực sự làm thay đổi kết quả, nên một lần thu hoạch mà nó không thể cải thiện sẽ không tốn gì của bạn, và một ô gắn có thể được đặt để hỏi mỗi lần dùng nếu bạn muốn tự quyết định từng lượt nạp.\n\nMột lá bùa mới tinh mang 20 lượt nạp trên một công cụ phổ thông và thêm 10 lượt cho mỗi bậc hiếm cao hơn, nên một công cụ sử thi bắt đầu ở 50. Hết lượt nạp không phá hủy lá bùa: chủ công cụ nạp lại ô gắn, 10 lượt nạp cho mỗi nguyên liệu pháp khắc, với loại nguyên liệu theo mức tốt hơn giữa công cụ họ đang mang và công cụ tốt nhất từng được dùng để lấp đầy ô đó (Bụi Thanh Âm cho công cụ phổ thông hoặc khác thường, Tinh Chất Thanh Âm cho công cụ hiếm, một Mảnh Thanh Âm cho công cụ sử thi). Cất công cụ tốt vào kho két trước khi nạp lại không bao giờ làm nó rẻ hơn, chỉ làm nó nhỏ hơn với cùng mức giá, và gắn một lá bùa mới trong khi mang công cụ kém hơn là cách để quay về một bậc rẻ hơn. Thợ pháp khắc đã ký lên lá bùa trả một nửa để nạp lại cho chính lá bùa của mình, và ít hơn nữa nếu có chuyên ngành Pháp Khắc.",
+        "q11": "How do I make an orange item?",
+        "a11Promotion": "Craft or buy an apex Masterwrought piece, then perfect it: with 125 skill in the craft that made it, each attempt spends one Maker's Ember, one Sundered Essence, and one Prismglass Setting, succeeds four times in five, and never harms the piece when it misses. The first attempt binds the piece to you, and four successful ranks make it Perfected. Then spend one Deed of Making, an inscriptionist's skill-125 writ anyone can buy or commission, to promote the Perfected copy into a legendary named whatever you choose. The promotion is deterministic: no roll, stats unchanged, only the name and the color change."
       },
       "findingNodesNote": "Bạn không cần phải tự mắt tìm những thứ này. Mọi điểm tài nguyên trong vùng đều được vẽ trên bản đồ vùng ở bất cứ nơi nào bản đồ hiển thị mặt đất đó, và trên bản đồ nhỏ khi bạn đi ngang qua nó, nên một vòng cày nông sản có thể được lên kế hoạch ngay từ màn hình bản đồ trước khi bạn xuất phát. Một điểm tài nguyên mà công cụ của bạn chưa thể khai thác được đánh dấu chứ không bị ẩn đi: nó vẫn giữ vị trí của mình với một dấu gạch mờ, để bạn có thể thấy mảnh đất mình đang luyện tới. Trên máy tính, rê chuột qua một mạch, bãi, hoặc bụi ngoài thế giới sẽ gọi tên nó, cho bạn biết công cụ nó cần, và, một khi bạn đã khai thác nó, đếm ngược thời gian hồi sinh của riêng bạn chính xác đến từng giây. Trên cảm ứng thì không có gì để rê chuột qua, nên các dấu trên bản đồ nhỏ kể lại đúng câu chuyện đó.",
-      "specimenBodyFamilies": "Hãy chừa sẵn một chút chỗ trống trong túi khi bạn cày cuốc: một mẻ trúng lớn có dấu thợ cần một ô trống riêng hoặc một chồng có dấu thợ trùng khớp để rơi vào, và nếu không có chỗ nào vừa thì sản lượng vẫn về tay bạn nhưng dấu thợ sẽ mất. Thu hoạch xác cũng có nhánh trúng lớn của riêng nó: khoảng {pct}% mỗi thành phần thu hoạch được sẽ ra phẩm chất hiếm trở lên. Một nhóm có mẫu vật hoàn hảo để trao (da, tơ, nọc độc, móng vuốt, thịt) giữ nguyên sản lượng thường của nó và đúc thêm mẫu vật có dấu thợ bên cạnh; ba nhóm còn lại, nanh, vải, và ngà, đóng dấu ngay lên chính sản lượng đó."
+      "specimenBodyFamilies": "Hãy chừa sẵn một chút chỗ trống trong túi khi bạn cày cuốc: một mẻ trúng lớn có dấu thợ cần một ô trống riêng hoặc một chồng có dấu thợ trùng khớp để rơi vào, và nếu không có chỗ nào vừa thì sản lượng vẫn về tay bạn nhưng dấu thợ sẽ mất. Thu hoạch xác cũng có nhánh trúng lớn của riêng nó: khoảng {pct}% mỗi thành phần thu hoạch được sẽ ra phẩm chất hiếm trở lên. Một nhóm có mẫu vật hoàn hảo để trao (da, tơ, nọc độc, móng vuốt, thịt) giữ nguyên sản lượng thường của nó và đúc thêm mẫu vật có dấu thợ bên cạnh; năm nhóm còn lại, nanh, vải, ngà, sừng, và mang, đóng dấu ngay lên chính sản lượng đó."
     },
     "economy": {
       "intro": "Tiền bạc bôi trơn cả thế giới: nó mua trang bị, vật phẩm tiếp tế và đồ đi đường của bạn, và đổi tay giữa những người chơi. Bạn nhặt được tất cả những thứ này chỉ bằng cách chơi, nên hãy xem trang này như một bản đồ về nơi tiền của bạn đến từ đâu và đi về đâu.",
@@ -6731,6 +7043,7 @@ export const vi_VN: EnTranslations = {
       "lootCommonBody": "Những món rơi ra thông thường có thể luân phiên quanh tổ đội hoặc về tay người nhặt, trong khi những món tốt hơn được đưa ra tung xúc xắc để mọi người có cơ hội công bằng.",
       "lootRollTitle": "Cần, Tham, hoặc Bỏ Qua.",
       "lootRollBody": "Khi một vật phẩm được đưa ra tung xúc xắc, mỗi thành viên đủ điều kiện chọn Cần nếu họ muốn nó, Tham nếu họ chỉ lấy khi dư, hoặc Bỏ Qua để rút lui. Người tung cao nhất thắng.",
+      "lootRollBodyNeedBeatsGreed": "When an item goes to a roll, each eligible member chooses Need if they want it, Greed if they would only take it spare, or Pass to bow out. Need beats Greed: if anyone rolls Need, the item goes to the highest Need roll and the Greed rolls do not count; otherwise the highest Greed roll wins.",
       "lootMasterTitle": "Quản lý chiến lợi phẩm.",
       "lootMasterBody": "Thay vào đó, đội trưởng có thể đứng ra nắm những món rơi tốt hơn, trao mỗi món cho thành viên xứng đáng nhận nó. Cách này giữ cho trang bị quý không rơi vào một lần tung xúc xắc may rủi, đúng kiểu một nhóm có tổ chức chạy hầm ngục.",
       "friendsHeading": "Bạn bè, phớt lờ và chặn",
@@ -6744,8 +7057,10 @@ export const vi_VN: EnTranslations = {
       "slashHeading": "Những lệnh gạch chéo tiện dụng",
       "slashBody": "Một vài lệnh thường ngày đáng để ghi nhớ: /w Tên gửi một lời thì thầm và /r đáp lại lời cuối cùng bạn nhận được, /invite mời ai đó vào tổ đội, /follow bước theo sau một người bạn, /roll tung xúc xắc cho cả nhóm cùng thấy, /who cho biết ai đang trực tuyến, và /afk đánh dấu bạn đang vắng mặt. Gõ /help trong trò chơi để xem danh sách đầy đủ.",
       "emotesBody": "Nhân vật của bạn cũng có thể nói mà không cần lời: gõ một biểu cảm như /wave, /dance, /cheer, hay /bow, nhắm vào một người bạn trước để hướng nó tới họ, hoặc giữ X để mở vòng biểu cảm cho một biểu lộ nhanh trên đầu.",
+      "emotesBodyNamedTarget": "Your character can also speak without words: type an emote like /wave, /dance, /cheer, or /bow, add a name to aim it at someone, as in /wave Aleph, or hold X, the emote wheel's default key, to open the emote wheel for a quick overhead expression. The Emotes button in the rail of window buttons, or under More on touch, opens the same wheel.",
       "calendarHeading": "Lịch sự kiện",
       "calendarBody": "Nhấn I để mở lịch sự kiện. Nó đánh dấu những ngày của máy chủ đáng để sắp xếp quanh đó, Lời Gọi Đột Kích hằng tuần, Ngày Chợ, Trận Đấu Đấu Trường và Hội Thi Câu Cá, cùng Ngày Hang Sâu hằng tháng và Lễ Hiệp Thông Nguyệt Môn, và đó cũng là nơi các bang hội giữ lịch của mình: hội trưởng và sĩ quan có thể ghi sự kiện lên đó, và mọi thành viên đều thấy chúng trên cùng một trang. Những ngày của máy chủ là lời mời tụ họp, không phải phần thưởng; chẳng có gì ở nhân vật bạn đổi khác chỉ vì một ngày được đánh dấu.",
+      "calendarBodyDoubleHonor": "Press I to open the event calendar. It marks the realm days worth planning around, the weekly Raid Call, Market Day, Arena Clash, Double Honor Weekend, and Fishing Derby, plus the monthly Delve Day and Moongate Communion, and it is where guilds keep their schedule: the guild leader and officers can book events on it, and every member sees them on the same page. The realm days are a prompt to gather rather than a bonus, with one exception: all through the Double Honor Weekend, Thornhollow Fields Honor pays double and a played-out loss pays like a win. Nothing else about your character changes because a day is marked.",
       "readyHeading": "Kiểm tra sẵn sàng",
       "readyBody": "Trước một cú kéo lớn, trưởng nhóm có thể gõ /ready để hỏi ý cả phòng: mọi người còn lại nhận một lời nhắc Sẵn Sàng hoặc Chưa Sẵn Sàng, và một khi tất cả đã trả lời, hoặc hết 30 giây, cả nhóm thấy một bản tóm tắt duy nhất về số lượng. Không ai bị nêu tên; điều quan trọng là con số, không phải kẻ có lỗi.",
       "markersHeading": "Dấu mục tiêu",
@@ -6757,6 +7072,7 @@ export const vi_VN: EnTranslations = {
       "realmsScopeBody": "Những gì bạn làm chỉ tồn tại trên thế giới bạn đã chọn: nhân vật, danh sách bạn bè, bang hội, và Chợ Thế Giới của bạn đều nằm ở đó, và các bảng xếp hạng bang hội cũng như người chơi bạn mở trong trò chơi chỉ xếp hạng riêng thế giới đó, trong khi bảng xếp hạng trên trang web gộp chung mọi thế giới lại. Mỗi thế giới cũng giữ thời điểm đặt lại đột kích hằng ngày của riêng mình, theo giờ địa phương của chính nó.",
       "finderHeading": "Tìm nhóm",
       "finderBody": "Bạn không cần phải hét lên trong kênh Tìm Đội để lấp đầy một lượt chạy. Hãy mở Tìm Hầm Ngục, chọn lượt chạy bạn muốn và những vai trò bạn sẵn lòng đảm nhận, rồi vào hàng chờ một mình hoặc cùng tổ đội bạn đã có sẵn. Hệ thống tìm nhóm chờ cho đến khi đủ bộ vai trò, rồi đề xuất nhóm cho tất cả mọi người cùng lúc: một cửa sổ bật lên yêu cầu từng người chấp nhận, và tổ đội hình thành ngay khoảnh khắc người cuối cùng đồng ý. Từ chối một đề xuất, hoặc để nó hết hạn, sẽ đặt bạn vào một khoảng hồi ngắn trước khi hàng chờ đề xuất cho bạn một nhóm khác, để hàng luôn tiếp tục di chuyển.",
+      "finderBodyLeaderQueues": "You do not have to shout in Looking for Group to fill a run. Open the Dungeon Finder, choose the run you want and the roles you are willing to fill, and join the queue on your own, or have your party leader queue the party you already have (only the leader can put a group in). The finder waits until it has a full set of roles, then offers the group to everyone at once: a popup asks each of you to accept, and the party forms the moment the last person says yes. Turning an offer down, or letting it run out, drops you, and any party you queued with, out of the queue and puts you on a short cooldown before you can join it again; everyone else in the offer keeps their place, unless they did the same or queued with someone who did, so the line keeps moving.",
       "finderBoardBody": "Tìm Hầm Ngục còn có một bảng dành cho các Nhóm Thành Lập Sẵn. Một trưởng nhóm đăng một thông báo kèm nhãn cho biết lượt chạy này để làm gì, từ lần ghé thăm đầu tiên đến dọn sạch thẳng tiến, và bạn đăng ký vào đó để trưởng nhóm chấp nhận. Hàng chờ tự động ghép các hầm ngục và đột kích cuối game, mỗi loại ở cả độ Thường và Anh Hùng, trong khi bảng thông báo còn có thể mang lượt chạy điều chỉnh đơn độc, thứ mà hàng chờ không bao giờ tự ghép cho bạn; hang sâu và các chuyến đi ngoài thế giới mở là việc bạn tự sắp xếp. Dù theo cách nào thì Tìm Hầm Ngục cũng chỉ dựng nên nhóm: đi đến cửa, đặt độ khó, và thống nhất luật chia chiến lợi phẩm vẫn là việc của bạn.",
       "finderMore": "Xem những gì có bên trong mỗi hầm ngục",
       "blockBody": "Chặn là công cụ nặng đô hơn, dành cho một người chơi không chịu để bạn yên. Chặn ai đó sẽ cắt đứt lời mời, tin nhắn thì thầm, và cả thư của họ cũng như trò chuyện của họ, khiến hai bạn vô hình với nhau trong /who, và loại họ khỏi danh sách bạn bè của bạn nếu họ có trong đó. Chặn từ menu chuột phải trên tên của họ hoặc bằng lệnh /block, /unblock sẽ gỡ bỏ lệnh chặn, và /blocklist hiện danh sách những ai đang bị chặn.",
@@ -7946,11 +8262,7 @@ export const vi_VN: EnTranslations = {
       "detonateLightningRod": "Cột Thu Lôi giáng xuống!",
       "detonateStormcallersWrath": "Thịnh Nộ Của Kẻ Gọi Bão bùng nổ!",
       "detonateAbyssalMaw": "Hàm Vực Thẳm khép lại!",
-      "detonateCrushingDepth": "Nghiền Nát Vực Sâu nghiền nát!",
-      "detonatePactSeal": "Ấn Khế Ước phát nổ!",
-      "detonateBloodRite": "Nghi Lễ Máu sập xuống!",
-      "detonatePitSentence": "Án Phạt Vực Ngục phát nổ!",
-      "detonateHellfireBrand": "Ấn Hỏa Ngục phát nổ!"
+      "detonateCrushingDepth": "Nghiền Nát Vực Sâu nghiền nát!"
     },
     "delve": {
       "cannotEnterNow": "Bạn không thể vào hầm thám hiểm lúc này.",
@@ -8293,24 +8605,24 @@ export const vi_VN: EnTranslations = {
     "boss": {
       "varric": {
         "bell": {
-          "emote": "Phó Tế Varric nắm chặt chiếc chuông bị chôn bằng cả hai tay!",
-          "log": "Phó Tế Varric bắt đầu rung chiếc chuông tang lễ.",
-          "warning": "Tránh xa Phó Tế Varric!",
+          "emote": "Phó Tế Vandric nắm chặt chiếc chuông bị chôn bằng cả hai tay!",
+          "log": "Phó Tế Vandric bắt đầu rung chiếc chuông tang lễ.",
+          "warning": "Tránh xa Phó Tế Vandric!",
           "impact": "Tiếng chuông ngân vang làm nứt toác nền căn phòng!",
           "lesson": "Chuông Ngân: một cú giáng đất mỗi mười hai giây. Hãy tránh xa trước khi nó giáng xuống."
         },
         "raise": {
-          "emote": "Phó Tế Varric gọi tên từ những nấm mồ vỡ nát!",
-          "log": "Phó Tế Varric bắt đầu Triệu Hồi Tử Thi.",
+          "emote": "Phó Tế Vandric gọi tên từ những nấm mồ vỡ nát!",
+          "log": "Phó Tế Vandric bắt đầu Triệu Hồi Tử Thi.",
           "warning": "Chặn đứng nghi lễ gọi hồn!",
           "object": "Nấm mồ nứt nẻ rùng mình với hơi thở bị đánh cắp.",
           "interrupt_ok": "Nghi lễ gọi hồn bị gián đoạn.",
-          "interrupt_fail": "Kẻ chết đáp lại lời gọi của Phó Tế Varric!",
+          "interrupt_fail": "Kẻ chết đáp lại lời gọi của Phó Tế Vandric!",
           "lesson": "Hãy gián đoạn nấm mồ nứt nẻ trong vòng năm giây, nếu không kẻ chết sẽ trỗi dậy theo lời gọi của hắn."
         },
         "pull": "Ngươi giẫm lên cát bụi thánh thiêng với mục đích ô uế. Quỳ xuống, và để được điểm danh.",
         "intro": "Không linh hồn nào mất đi. Chỉ là bị đặt nhầm chỗ.",
-        "mid60": "Phó Tế Varric đọc tên từ cuốn sổ với niềm đắc thắng run rẩy.",
+        "mid60": "Phó Tế Vandric đọc tên từ cuốn sổ với niềm đắc thắng run rẩy.",
         "mid30": "Chiếc chuông tang lễ đáp lại mỗi cái tên hắn xướng lên.",
         "defeat": "Không... ta đã có những cái tên... ta đã có tất cả..."
       }
@@ -8938,6 +9250,7 @@ export const vi_VN: EnTranslations = {
         "cooldownLockedHerb": "Khóm thảo dược đã hái, dụng cụ chưa mở khóa",
         "station": "Trạm chế tác: {name}",
         "service": "Dịch vụ: {name}",
+        "farmPatch": "Garden beds",
         "partyMember": "Thành viên tổ đội: {name}",
         "deadPartyMember": "Thành viên tổ đội đã chết: {name}",
         "partyMemberGeneric": "Thành viên tổ đội",
@@ -9372,6 +9685,8 @@ export const vi_VN: EnTranslations = {
       "soldJunkMany": "Đã bán {count} vật phẩm rác được {money}.",
       "keptBoundOne": "Đã giữ {count} bản sao ràng buộc.",
       "keptBoundMany": "Đã giữ {count} bản sao ràng buộc.",
+      "keptLockedOne": "Kept {count} locked copy.",
+      "keptLockedMany": "Kept {count} locked copies.",
       "friendOnline": "{name} đã trực tuyến.",
       "friendOffline": "{name} đã ngoại tuyến."
     },
@@ -9430,7 +9745,7 @@ export const vi_VN: EnTranslations = {
       "felboltTitle": "Tiễn Tro",
       "felboltDesc": "Ra lệnh cho Emberkin phóng thêm một Tiễn Tro vào mục tiêu của bạn. Thời gian hồi chiêu 8 giây. Nhấp chuột phải, chạm giữ, hoặc nhấn Shift+Enter để bật/tắt tự động thi triển.",
       "abyssalChainTitle": "Xích Vực Sâu",
-      "abyssalChainDesc": "Ra lệnh cho Gloomshade kéo một kẻ địch thường ở cách hơn 8 và tối đa 20 thước về phía mình. Không thể kéo trùm. Thời gian hồi chiêu 15 giây. Nhấp chuột phải, chạm giữ, hoặc nhấn Shift+Enter để bật/tắt tự động thi triển.",
+      "abyssalChainDesc": "Ra lệnh cho Duskmurk kéo một kẻ địch thường ở cách hơn 8 và tối đa 20 thước về phía mình. Không thể kéo trùm. Thời gian hồi chiêu 15 giây. Nhấp chuột phải, chạm giữ, hoặc nhấn Shift+Enter để bật/tắt tự động thi triển.",
       "petTauntTitle": "Thú Khiêu Khích",
       "petTauntDesc": "Ra lệnh cho thú lao vào và Gầm Gừ khi trong tầm. Hồi chiêu 10 giây.",
       "healDemonDesc": "Tiêu hao mana để truyền trị liệu cho quỷ của bạn trong 5 giây.",
@@ -9625,11 +9940,13 @@ export const vi_VN: EnTranslations = {
     },
     "cast": {
       "fishing": "Câu Cá",
+      "farming": "Planting",
       "gathering": "Thu Thập",
       "crafting": "Chế Tác",
       "disenchanting": "Hủy Pháp Khắc",
       "enchanting_apply": "Pháp Khắc",
       "salvaging": "Tháo Dỡ",
+      "sundering": "Sundering",
       "tool_recharge": "Nạp Lại",
       "demonHeal": "Quỷ Trị Liệu",
       "thunzharrStormcall": "Tiếng Gọi Bão",
@@ -9769,9 +10086,12 @@ export const vi_VN: EnTranslations = {
       "material": "Nguyên Liệu",
       "food": "Thức Ăn",
       "drink": "Đồ Uống",
+      "recipe": "Mẫu",
       "tool": "Dụng Cụ",
       "potion": "Thuốc",
       "elixir": "Tiên Dược",
+      "flask": "Flask",
+      "scroll": "Scroll",
       "bag": "Túi",
       "mount": "Thú Cưỡi"
     },
@@ -9798,8 +10118,17 @@ export const vi_VN: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "Dùng: Hồi {amount} sinh lực trong {seconds} giây. Phải ngồi yên khi ăn.",
       "useDrink": "Dùng: Hồi {amount} mana trong {seconds} giây. Phải ngồi yên khi uống.",
-      "useElixir": "Dùng: Tăng {stat} của bạn thêm {value} trong {minutes} phút. Dùng được trong chiến đấu.",
-      "useElixirAura": "Dùng: Ban {aura} trong {minutes} phút. Dùng được trong chiến đấu.",
+      "useElixir": "Use: Increases your {stat} by {value} for {minutes} min. Replaces any other elixir or scroll of the same stat. Usable in combat.",
+      "useElixirAura": "Use: Grants {aura} for {minutes} min. Replaces any other elixir or scroll of its kind. Usable in combat.",
+      "flaskOnlyOne": "Only one flask effect at a time. Drinking another flask replaces this one.",
+      "flaskOutranks": "A weaker elixir or scroll of the same stat cannot replace it.",
+      "flaskUnremovable": "It cannot be dispelled, stolen, or canceled by hand.",
+      "flaskThroughDeath": "The effect remains through death, but ends when you log out; instanced matches begin and end on a clean slate.",
+      "wellFed": "Well Fed: Increases your {stat} by {value} for {minutes} min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.",
+      "wellFedAura": "Well Fed: Grants {aura} for {minutes} min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.",
+      "useFeast": "Use: Sets out a feast others can eat from, one serving each ({servings} servings, lasts {minutes} min).",
+      "useFeastBuff": "Each serving grants {aura}: +{value} {stat} for {minutes} min when you finish the {seconds} sec meal. Only one Well Fed effect at a time: a newer meal replaces it.",
+      "useFeastBuffAura": "Each serving grants {aura} for {minutes} min when you finish the {seconds} sec meal. Only one Well Fed effect at a time: a newer meal replaces it.",
       "questItem": "Vật Phẩm Nhiệm Vụ",
       "questRelated": "Nhiệm vụ: {quest}",
       "questRules": "Không thể bán, gửi ngân hàng, hoặc trao đổi.",
@@ -9822,6 +10151,8 @@ export const vi_VN: EnTranslations = {
       "useManaPotion": "Dùng: Hồi tức thời {amount} mana. Dùng được trong chiến đấu. Hồi chiêu 1 phút.",
       "clickUseInstant": "Nhấp để dùng tức thời trong chiến đấu",
       "clickUse": "Nhấp để sử dụng",
+      "clickSetOut": "Click to set out",
+      "clickSetUp": "Click to set up",
       "clickBuyback": "Nhấp để mua lại",
       "bagSlots": "Túi {slots} Ô",
       "bagSlotsMaterials": "Túi Nguyên Liệu {slots} Ô"
@@ -9907,6 +10238,7 @@ export const vi_VN: EnTranslations = {
       "filterTypeConsumable": "Đồ Tiêu Hao",
       "filterTypeMaterial": "Nguyên Liệu",
       "filterTypeCosmetic": "Đồ Trang Trí",
+      "filterTypePattern": "Patterns",
       "filterTypeOther": "Khác",
       "filterArmorType": "Loại giáp",
       "filterArmorAll": "Tất cả giáp",
@@ -10206,7 +10538,7 @@ export const vi_VN: EnTranslations = {
       },
       "cold_snap": {
         "name": "Tiếng Gọi Mùa Đông",
-        "description": "Hoàn tất thời gian hồi của Bước Chớp, Màn Sương Giá và Tàng Hình Cao Cấp. (tài năng pháp sư)"
+        "description": "Finishes the cooldown on Flitstep, Frostveil, and Greater Invisibility. (Mage talent)"
       },
       "greater_invisibility": {
         "name": "Tàng Hình Cao Cấp",
@@ -10257,15 +10589,15 @@ export const vi_VN: EnTranslations = {
         "description": "Phóng ba luồng băng giá, mỗi luồng gây {damage} sát thương băng giá, và đặt Winter's Chill lên mục tiêu: 2 phép thuật tương thích tiếp theo sẽ coi mục tiêu đó như bị đóng băng. Brain Freeze khiến Winterlash được thi triển ngay lập tức và bỏ qua thời gian hồi chiêu. (Sương giá)"
       },
       "frozen_orb": {
-        "name": "Quả Cầu Băng Giá",
+        "name": "Frostglobe",
         "description": "Phóng ra một quả cầu băng xoáy bay về phía trước trong 8 giây, gây sát thương {damage} Băng mỗi giây cho kẻ địch ở gần và làm chậm chúng đi 30%. Mỗi xung đập tạo ra một Băng. (Sương giá)"
       },
       "blizzard": {
         "name": "Bão Tuyết",
-        "description": "Triệu gọi bão tuyết xuống khu vực mục tiêu trong 6 giây, gây {damage} sát thương Băng mỗi giây và làm chậm kẻ thù 40%. Mỗi kẻ thù bị đánh trúng rút ngắn 0,5 giây của Frozen Orb, tối đa 3 giây mỗi lần thi triển. (Băng)"
+        "description": "Triệu gọi bão tuyết xuống khu vực mục tiêu trong 6 giây, gây {damage} sát thương Băng mỗi giây và làm chậm kẻ thù 40%. Mỗi kẻ thù bị đánh trúng rút ngắn 0,5 giây của Frostglobe, tối đa 3 giây mỗi lần thi triển. (Băng)"
       },
       "glacial_spike": {
-        "name": "Chông Băng Hà",
+        "name": "Rimeneedle",
         "description": "Triệu hồi một gai băng khổng lồ, tiêu hao 5 Băng Nhọn để gây {damage} sát thương Băng và đóng băng mục tiêu tại chỗ trong 4 giây. (Băng)"
       },
       "glacial_front": {
@@ -10415,7 +10747,7 @@ export const vi_VN: EnTranslations = {
         "description": "Chiêu kết liễu gây thương tích cho mục tiêu: nó chảy máu mỗi 2 giây, trong 6 giây cộng thêm 2 giây mỗi điểm liên hoàn (5 điểm liên hoàn: 16 giây và tổng {damage} sát thương)."
       },
       "vanish": {
-        "name": "Bước Khói",
+        "name": "Smokefade",
         "description": "Biến mất khỏi tầm nhìn, đi vào Duskveil ngay cả trong chiến đấu. Bạn di chuyển chậm hơn 50% khi ẩn nấp. Kéo dài tối đa 10 giây."
       },
       "instant_poison": {
@@ -11021,7 +11353,7 @@ export const vi_VN: EnTranslations = {
         "description": "Bước vào cơn thịnh nộ sục sôi, tạo 20 nộ khí. (Tài năng Chiến Binh)"
       },
       "crusader_strike": {
-        "name": "Đòn Thập Tự",
+        "name": "Oathstrike",
         "description": "Đánh mục tiêu bằng sát thương vũ khí cộng {damage} sát thương Thánh. (tài năng Paladin)"
       },
       "chain_heal": {
@@ -11125,7 +11457,7 @@ export const vi_VN: EnTranslations = {
         "description": "Hóa thành một lich trong 20 giây, tạo ra 3 Mảnh Linh Hồn và tăng 20% sát thương phép cùng tốc độ niệm chú của bạn. Đám bất tử của bạn gây thêm 50% sát thương và hành động nhanh hơn 20%, còn Thương Linh Hồn xuyên qua mục tiêu để đánh trúng tối đa 2 kẻ địch gần đó với 50% sát thương của nó. (Đặc trưng Thuật Chiêu Hồn)"
       },
       "holy_shock": {
-        "name": "Sốc Thánh",
+        "name": "Lightjolt",
         "description": "Gây sốc một mục tiêu đồng minh bằng năng lượng Thánh, hồi cho họ {damage}. (dấu ấn Thánh)"
       },
       "holy_shield": {
@@ -11153,7 +11485,7 @@ export const vi_VN: EnTranslations = {
         "description": "Tăng tỉ lệ chí mạng phép 50% trong 15 giây. (kỹ năng đặc trưng Fire)"
       },
       "icy_veins": {
-        "name": "Huyết Mạch Băng Giá",
+        "name": "Coldsurge",
         "description": "Tăng tốc độ phép 30% và ngăn gián đoạn cùng đẩy lùi thi triển trong 10 giây. (kỹ năng đặc trưng Frost)"
       },
       "cold_blood": {
@@ -11229,8 +11561,8 @@ export const vi_VN: EnTranslations = {
         "description": "Triệu hồi một Emberkin dưới lệnh của thuật sĩ. Emberkin niệm Tiễn Tro vào kẻ địch của bạn từ xa. Triệu hồi một quỷ mới sẽ giải tán con hiện tại. Bạn chỉ có thể có một quỷ tại một thời điểm."
       },
       "summon_voidwalker": {
-        "name": "Triệu Hồi Gloomshade",
-        "description": "Triệu hồi một Gloomshade dưới lệnh của thuật sĩ. Con quỷ dai sức này khiêu khích kẻ địch và dùng Xích Vực Sâu để kéo những kẻ địch thường ở xa trở lại tầm với. Trùm thì không thể kéo được. Triệu hồi một quỷ mới sẽ giải tán con hiện tại. Bạn chỉ có thể có một quỷ tại một thời điểm."
+        "name": "Triệu Hồi Duskmurk",
+        "description": "Triệu hồi một Duskmurk dưới lệnh của thuật sĩ. Con quỷ dai sức này khiêu khích kẻ địch và dùng Xích Vực Sâu để kéo những kẻ địch thường ở xa trở lại tầm với. Trùm thì không thể kéo được. Triệu hồi một quỷ mới sẽ giải tán con hiện tại. Bạn chỉ có thể có một quỷ tại một thời điểm."
       },
       "summon_succubus": {
         "name": "Triệu Hồi Duskborn",
@@ -11329,7 +11661,7 @@ export const vi_VN: EnTranslations = {
         "description": "Các đòn đánh thường của bạn có cơ hội cho phép bạn tung Nấm Mồ Sớm lên mục tiêu ở bất kỳ mức máu nào mà không tốn nộ khí. (nhánh Vũ Khí)"
       },
       "storm_bolt": {
-        "name": "Cú Ném Bão Tố",
+        "name": "Thunderhurl",
         "description": "Ném vũ khí của bạn vào mục tiêu gây {damage} sát thương, làm choáng nó trong 3 giây."
       },
       "piercing_howl": {
@@ -11353,7 +11685,7 @@ export const vi_VN: EnTranslations = {
         "description": "Tẩm máu quân thù lên vũ khí của bạn: bạn và các đồng minh cận chiến nhận thêm 10% tốc độ tấn công và 10% sát thương trong 20 giây."
       },
       "victory_rush": {
-        "name": "Đà Chiến Thắng",
+        "name": "Victor's Surge",
         "description": "Giáng đòn gây sát thương vũ khí cộng thêm {damage} và hồi 20% máu tối đa của bạn. Chỉ dùng được trong vòng 20 giây sau khi hạ gục một kẻ địch."
       },
       "intimidating_shout": {
@@ -11393,7 +11725,7 @@ export const vi_VN: EnTranslations = {
         "description": "Hóa thành một cơn bão thép cuồng xoáy, đánh trúng mọi kẻ địch trong phạm vi 6 mét với {damage} sát thương mỗi giây trong 4 giây."
       },
       "blink": {
-        "name": "Bước Chớp",
+        "name": "Flitstep",
         "description": "Dịch chuyển bạn 15 m về phía trước và phá hiệu ứng trói chân. (thiên phú Pháp sư)"
       },
       "bloodlust": {
@@ -11425,7 +11757,7 @@ export const vi_VN: EnTranslations = {
         "description": "Golpea a gần đó kẻ địch con escarcha e inflige {damage} de daño de Băng. (thiên phú pháp sư)"
       },
       "counterspell": {
-        "name": "Phản Phép",
+        "name": "Spellsever",
         "description": "Chống lại phép mục tiêu đang niệm và ngăn mục tiêu thi triển phép thuộc hệ đó trong 6 giây."
       },
       "curse_of_exhaustion": {
@@ -11609,7 +11941,7 @@ export const vi_VN: EnTranslations = {
         "description": "Tăng 35% tốc độ di chuyển, nhưng hy sinh 2% máu tối đa của bạn mỗi giây. Thi triển lại để hủy. Tự động tắt khi máu ở mức 20%."
       },
       "spellsteal": {
-        "name": "Đánh Cắp Phép",
+        "name": "Spellplunder",
         "description": "Đánh cắp một hiệu ứng phép thuật có lợi từ kẻ địch và chuyển nó sang bạn."
       },
       "startle_shot": {
@@ -12057,7 +12389,7 @@ export const vi_VN: EnTranslations = {
         "name": "Mảnh Tim Của Kazzix"
       },
       "wyrmcult_orders": {
-        "name": "Mệnh Lệnh Long Giáo"
+        "name": "Broodsworn Orders"
       },
       "ritual_phylactery": {
         "name": "Bùa Hộ Mệnh Nghi Lễ"
@@ -12120,7 +12452,7 @@ export const vi_VN: EnTranslations = {
         "name": "Áo Giáp Vảy Mộ Long"
       },
       "wyrmcult_grand_robe": {
-        "name": "Đại Áo Choàng Long Giáo"
+        "name": "Broodsworn Grand Robe"
       },
       "wyrmscale_jerkin": {
         "name": "Áo Da Long Vảy"
@@ -12327,7 +12659,7 @@ export const vi_VN: EnTranslations = {
         "name": "Cuốc Khai Khoáng Thorium"
       },
       "arcanite_mining_pick": {
-        "name": "Cuốc Khai Khoáng Arcanite"
+        "name": "Glyphsteel Mining Pick"
       },
       "ashwood_axe": {
         "name": "Rìu Gỗ Tần Bì"
@@ -12345,7 +12677,7 @@ export const vi_VN: EnTranslations = {
         "name": "Quặng Thorium"
       },
       "arcanite_bar": {
-        "name": "Thỏi Arcanite"
+        "name": "Glyphsteel Bar"
       },
       "ashwood_log": {
         "name": "Khúc Gỗ Tần Bì Tro"
@@ -12576,7 +12908,7 @@ export const vi_VN: EnTranslations = {
         "name": "Chiến Đao Thorium"
       },
       "arcanite_war_axe": {
-        "name": "Chiến Rìu Arcanite"
+        "name": "Glyphsteel War Axe"
       },
       "elderwood_battle_staff": {
         "name": "Chiến Trượng Gỗ Cổ Thụ"
@@ -12789,7 +13121,7 @@ export const vi_VN: EnTranslations = {
         "name": "Áo Choàng Vai Khúc Ca Mảnh"
       },
       "wyrmcult_spellgrips": {
-        "name": "Găng Pháp Thuật Tà Long"
+        "name": "Broodsworn Spellgrips"
       },
       "thornpeak_wildwraps": {
         "name": "Quấn Hoang Dã Đỉnh Gai"
@@ -12798,7 +13130,7 @@ export const vi_VN: EnTranslations = {
         "name": "Áo Giáp Lưới Tế Bão"
       },
       "cryptbloom_shoulderguards": {
-        "name": "Giáp Vai Hoa Hầm Mộ"
+        "name": "Tombpetal Shoulderguards"
       },
       "gravewyrm_thornmaul": {
         "name": "Búa Gai Mộ Long"
@@ -13053,7 +13385,7 @@ export const vi_VN: EnTranslations = {
         "name": "Giày Lót Lò Sưởi"
       },
       "frostmane_mantle": {
-        "name": "Áo Choàng Của Bờm Băng Giá"
+        "name": "Mantle of the Rimemane"
       },
       "ashbone_war_brand": {
         "name": "Chiến Đao Xương Tro"
@@ -13212,7 +13544,7 @@ export const vi_VN: EnTranslations = {
         "name": "Con Mắt Nghệ Nhân"
       },
       "reins_terrorspark_groundshaker": {
-        "name": "Chìa Khóa Khởi Động: Tia Kinh Hoàng, Kẻ Rung Chuyển Mặt Đất"
+        "name": "Ignition Key: Dreadspark Groundshaker"
       },
       "reins_lanternback_troll": {
         "name": "Ách của Người Thắp Đèn: Grumbol"
@@ -13291,6 +13623,483 @@ export const vi_VN: EnTranslations = {
       },
       "loombound_reagent_satchel": {
         "name": "Túi Thuốc Thử Gắn Với Khung Dệt"
+      },
+      "hammered_copper_band": {
+        "name": "Hammered Copper Band"
+      },
+      "polished_copper_loop": {
+        "name": "Polished Copper Loop"
+      },
+      "coiled_copper_torc": {
+        "name": "Coiled Copper Torc"
+      },
+      "riveted_iron_signet": {
+        "name": "Riveted Iron Signet"
+      },
+      "etched_iron_loop": {
+        "name": "Etched Iron Loop"
+      },
+      "iron_link_choker": {
+        "name": "Iron Link Choker"
+      },
+      "weighted_thorium_band": {
+        "name": "Weighted Osmium Band"
+      },
+      "gleaming_thorium_loop": {
+        "name": "Gleaming Osmium Loop"
+      },
+      "burnished_thorium_amulet": {
+        "name": "Burnished Osmium Amulet"
+      },
+      "silverleaf_primer": {
+        "name": "Sheenleaf Primer"
+      },
+      "goldleaf_folio": {
+        "name": "Goldleaf Folio"
+      },
+      "sunpetal_grimoire": {
+        "name": "Sunpetal Grimoire"
+      },
+      "silverleaf_scroll": {
+        "name": "Sheenleaf Scroll"
+      },
+      "goldleaf_scroll": {
+        "name": "Goldleaf Scroll"
+      },
+      "sunpetal_scroll": {
+        "name": "Sunpetal Scroll"
+      },
+      "duskforged_billet": {
+        "name": "Duskforged Billet"
+      },
+      "forgefold_plating": {
+        "name": "Forgefold Plating"
+      },
+      "wyrmhide_cording": {
+        "name": "Wyrmhide Cording"
+      },
+      "sunspun_bolt": {
+        "name": "Sunspun Bolt"
+      },
+      "prismglass_setting": {
+        "name": "Prismglass Setting"
+      },
+      "precision_chassis": {
+        "name": "Precision Chassis"
+      },
+      "quickening_catalyst": {
+        "name": "Quickening Catalyst"
+      },
+      "seasoned_stock": {
+        "name": "Seasoned Stock"
+      },
+      "lucent_reagent": {
+        "name": "Lucent Reagent"
+      },
+      "sablewax_vellum": {
+        "name": "Sablewax Vellum"
+      },
+      "spiritweld_girdle": {
+        "name": "Spiritweld Girdle"
+      },
+      "forgefold_legguards": {
+        "name": "Forgefold Legguards"
+      },
+      "wardspeaker_sabatons": {
+        "name": "Wardspeaker Sabatons"
+      },
+      "briarstep_jerkin": {
+        "name": "Briarstep Jerkin"
+      },
+      "fenbloom_breeches": {
+        "name": "Fenbloom Breeches"
+      },
+      "barksong_handguards": {
+        "name": "Barksong Handguards"
+      },
+      "sunspun_vestments": {
+        "name": "Sunspun Vestments"
+      },
+      "sunspun_leggings": {
+        "name": "Sunspun Leggings"
+      },
+      "sunspun_handwraps": {
+        "name": "Sunspun Handwraps"
+      },
+      "sunspun_haversack": {
+        "name": "Sunspun Haversack"
+      },
+      "duskforged_warblade": {
+        "name": "Duskforged Warblade"
+      },
+      "ridgebreaker": {
+        "name": "Ridgebreaker"
+      },
+      "duskforged_bulwark": {
+        "name": "Duskforged Bulwark"
+      },
+      "wyrmfall_pendant": {
+        "name": "Wyrmfall Pendant"
+      },
+      "warhewn_signet": {
+        "name": "Warhewn Signet"
+      },
+      "prismglass_loop": {
+        "name": "Prismglass Loop"
+      },
+      "gyrelens_array": {
+        "name": "Gyrelens Array"
+      },
+      "voidbound_grimoire": {
+        "name": "Voidbound Grimoire"
+      },
+      "masters_field_forge": {
+        "name": "Master's Field Forge"
+      },
+      "makers_charm": {
+        "name": "Maker's Charm"
+      },
+      "ironhusk_flask": {
+        "name": "Ironhusk Flask"
+      },
+      "warboar_flask": {
+        "name": "Warboar Flask"
+      },
+      "runewater_flask": {
+        "name": "Runewater Flask"
+      },
+      "stonepot_stew": {
+        "name": "Stonepot Stew"
+      },
+      "warspice_skewers": {
+        "name": "Warspice Skewers"
+      },
+      "sageleaf_chowder": {
+        "name": "Sageleaf Chowder"
+      },
+      "grand_cauldron": {
+        "name": "Grand Cauldron"
+      },
+      "laden_hearth": {
+        "name": "The Laden Hearth"
+      },
+      "pattern_spiritweld_girdle": {
+        "name": "Plans: Spiritweld Girdle"
+      },
+      "pattern_forgefold_legguards": {
+        "name": "Plans: Forgefold Legguards"
+      },
+      "pattern_wardspeaker_sabatons": {
+        "name": "Plans: Wardspeaker Sabatons"
+      },
+      "pattern_briarstep_jerkin": {
+        "name": "Pattern: Briarstep Jerkin"
+      },
+      "pattern_fenbloom_breeches": {
+        "name": "Pattern: Fenbloom Breeches"
+      },
+      "pattern_barksong_handguards": {
+        "name": "Pattern: Barksong Handguards"
+      },
+      "pattern_sunspun_vestments": {
+        "name": "Pattern: Sunspun Vestments"
+      },
+      "pattern_sunspun_leggings": {
+        "name": "Pattern: Sunspun Leggings"
+      },
+      "pattern_sunspun_handwraps": {
+        "name": "Pattern: Sunspun Handwraps"
+      },
+      "pattern_sunspun_haversack": {
+        "name": "Pattern: Sunspun Haversack"
+      },
+      "pattern_duskforged_warblade": {
+        "name": "Plans: Duskforged Warblade"
+      },
+      "pattern_ridgebreaker": {
+        "name": "Plans: Ridgebreaker"
+      },
+      "pattern_duskforged_bulwark": {
+        "name": "Plans: Duskforged Bulwark"
+      },
+      "pattern_wyrmfall_pendant": {
+        "name": "Design: Wyrmfall Pendant"
+      },
+      "pattern_warhewn_signet": {
+        "name": "Design: Warhewn Signet"
+      },
+      "pattern_prismglass_loop": {
+        "name": "Design: Prismglass Loop"
+      },
+      "pattern_gyrelens_array": {
+        "name": "Schematic: Gyrelens Array"
+      },
+      "pattern_masters_field_forge": {
+        "name": "Schematic: Master's Field Forge"
+      },
+      "pattern_makers_charm": {
+        "name": "Schematic: Maker's Charm"
+      },
+      "pattern_voidbound_grimoire": {
+        "name": "Technique: Voidbound Grimoire"
+      },
+      "pattern_ironhusk_flask": {
+        "name": "Recipe: Ironhusk Flask"
+      },
+      "pattern_warboar_flask": {
+        "name": "Recipe: Warboar Flask"
+      },
+      "pattern_runewater_flask": {
+        "name": "Recipe: Runewater Flask"
+      },
+      "pattern_stonepot_stew": {
+        "name": "Recipe: Stonepot Stew"
+      },
+      "pattern_warspice_skewers": {
+        "name": "Recipe: Warspice Skewers"
+      },
+      "pattern_sageleaf_chowder": {
+        "name": "Recipe: Sageleaf Chowder"
+      },
+      "pattern_grand_cauldron": {
+        "name": "Recipe: Grand Cauldron"
+      },
+      "pattern_laden_hearth": {
+        "name": "Recipe: The Laden Hearth"
+      },
+      "vale_wheat_seed": {
+        "name": "Vale Wheat Seed"
+      },
+      "vale_wheat": {
+        "name": "Vale Wheat"
+      },
+      "fine_vale_wheat": {
+        "name": "Fine Vale Wheat"
+      },
+      "withered_husks": {
+        "name": "Withered Husks"
+      },
+      "compost": {
+        "name": "Compost"
+      },
+      "growth_tonic": {
+        "name": "Growth Tonic"
+      },
+      "brook_carrot_seed": {
+        "name": "Brook Carrot Seed"
+      },
+      "brook_carrot": {
+        "name": "Brook Carrot"
+      },
+      "fine_brook_carrot": {
+        "name": "Fine Brook Carrot"
+      },
+      "marsh_rice_seed": {
+        "name": "Marsh Rice Seed"
+      },
+      "marsh_rice": {
+        "name": "Marsh Rice"
+      },
+      "fine_marsh_rice": {
+        "name": "Fine Marsh Rice"
+      },
+      "bog_beet_seed": {
+        "name": "Bog Beet Seed"
+      },
+      "bog_beet": {
+        "name": "Bog Beet"
+      },
+      "fine_bog_beet": {
+        "name": "Fine Bog Beet"
+      },
+      "highland_barley_seed": {
+        "name": "Highland Barley Seed"
+      },
+      "highland_barley": {
+        "name": "Highland Barley"
+      },
+      "fine_highland_barley": {
+        "name": "Fine Highland Barley"
+      },
+      "frost_gourd_seed": {
+        "name": "Frost Gourd Seed"
+      },
+      "frost_gourd": {
+        "name": "Frost Gourd"
+      },
+      "fine_frost_gourd": {
+        "name": "Fine Frost Gourd"
+      },
+      "thornpeak_cabbage_seed": {
+        "name": "Thornpeak Cabbage Seed"
+      },
+      "thornpeak_cabbage": {
+        "name": "Thornpeak Cabbage"
+      },
+      "fine_thornpeak_cabbage": {
+        "name": "Fine Thornpeak Cabbage"
+      },
+      "frost_lentils_seed": {
+        "name": "Frost Lentils Seed"
+      },
+      "frost_lentils": {
+        "name": "Frost Lentils"
+      },
+      "fine_frost_lentils": {
+        "name": "Fine Frost Lentils"
+      },
+      "gilded_sunmelon_seed": {
+        "name": "Gilded Sunmelon Seed"
+      },
+      "gilded_sunmelon": {
+        "name": "Gilded Sunmelon"
+      },
+      "fine_gilded_sunmelon": {
+        "name": "Fine Gilded Sunmelon"
+      },
+      "evergarden_greens_seed": {
+        "name": "Evergarden Greens Seed"
+      },
+      "evergarden_greens": {
+        "name": "Evergarden Greens"
+      },
+      "fine_evergarden_greens": {
+        "name": "Fine Evergarden Greens"
+      },
+      "gilded_yam_seed": {
+        "name": "Gilded Yam Seed"
+      },
+      "gilded_yam": {
+        "name": "Gilded Yam"
+      },
+      "fine_gilded_yam": {
+        "name": "Fine Gilded Yam"
+      },
+      "evergarden_pumpkin_seed": {
+        "name": "Evergarden Pumpkin Seed"
+      },
+      "evergarden_pumpkin": {
+        "name": "Evergarden Pumpkin"
+      },
+      "fine_evergarden_pumpkin": {
+        "name": "Fine Evergarden Pumpkin"
+      },
+      "garden_hoe": {
+        "name": "Garden Hoe"
+      },
+      "bronze_hoe": {
+        "name": "Bronze Hoe"
+      },
+      "skysilver_hoe": {
+        "name": "Skysilver Hoe"
+      },
+      "osmium_hoe": {
+        "name": "Osmium Hoe"
+      },
+      "vale_hearth_loaf": {
+        "name": "Vale Hearth Loaf"
+      },
+      "eastbrook_root_pottage": {
+        "name": "Eastbrook Root Pottage"
+      },
+      "fenbridge_rice_bowl": {
+        "name": "Fenbridge Rice Bowl"
+      },
+      "fenbridge_beet_braise": {
+        "name": "Fenbridge Beet Braise"
+      },
+      "highwatch_barley_bannock": {
+        "name": "Highwatch Barley Bannock"
+      },
+      "highwatch_gourd_soup": {
+        "name": "Highwatch Gourd Soup"
+      },
+      "evergarden_sunmelon_tart": {
+        "name": "Evergarden Sunmelon Tart"
+      },
+      "evergarden_harvest_platter": {
+        "name": "Evergarden Harvest Platter"
+      },
+      "eastbrook_glazed_carrots": {
+        "name": "Eastbrook Glazed Carrots"
+      },
+      "fenbridge_rice_pudding": {
+        "name": "Fenbridge Rice Pudding"
+      },
+      "highwatch_barley_porridge": {
+        "name": "Highwatch Barley Porridge"
+      },
+      "evergarden_braised_greens": {
+        "name": "Evergarden Braised Greens"
+      },
+      "harvest_feast": {
+        "name": "Harvest Feast"
+      },
+      "pattern_highwatch_gourd_soup": {
+        "name": "Recipe: Highwatch Gourd Soup"
+      },
+      "pattern_highwatch_barley_porridge": {
+        "name": "Recipe: Highwatch Barley Porridge"
+      },
+      "pattern_evergarden_sunmelon_tart": {
+        "name": "Recipe: Evergarden Sunmelon Tart"
+      },
+      "pattern_evergarden_harvest_platter": {
+        "name": "Recipe: Evergarden Harvest Platter"
+      },
+      "pattern_evergarden_braised_greens": {
+        "name": "Recipe: Evergarden Braised Greens"
+      },
+      "pattern_harvest_feast": {
+        "name": "Recipe: Harvest Feast"
+      },
+      "raw_deepbarb_catfish": {
+        "name": "Raw Deepbarb Catfish"
+      },
+      "raw_hollowgill_sturgeon": {
+        "name": "Raw Hollowgill Sturgeon"
+      },
+      "raw_stillmere_salmon": {
+        "name": "Raw Stillmere Salmon"
+      },
+      "clockreel_fishing_rod": {
+        "name": "Clockreel Fishing Rod"
+      },
+      "peppered_deepbarb_catfish": {
+        "name": "Peppered Deepbarb Catfish"
+      },
+      "roast_hollowgill_sturgeon": {
+        "name": "Roast Hollowgill Sturgeon"
+      },
+      "pattern_peppered_deepbarb_catfish": {
+        "name": "Recipe: Peppered Deepbarb Catfish"
+      },
+      "pattern_roast_hollowgill_sturgeon": {
+        "name": "Recipe: Roast Hollowgill Sturgeon"
+      },
+      "pattern_clockreel_fishing_rod": {
+        "name": "Schematic: Clockreel Fishing Rod"
+      },
+      "evergarden_hoe": {
+        "name": "Evergarden Hoe"
+      },
+      "stonepot_feast": {
+        "name": "Stonepot Feast"
+      },
+      "warspice_feast": {
+        "name": "Warspice Feast"
+      },
+      "sageleaf_feast": {
+        "name": "Sageleaf Feast"
+      },
+      "pattern_stonepot_feast": {
+        "name": "Recipe: Stonepot Feast"
+      },
+      "pattern_warspice_feast": {
+        "name": "Recipe: Warspice Feast"
+      },
+      "pattern_sageleaf_feast": {
+        "name": "Recipe: Sageleaf Feast"
       },
       "ps_briny_lure": {
         "name": "Mồi Câu Mặn"
@@ -13910,6 +14719,15 @@ export const vi_VN: EnTranslations = {
       "wand_of_quenched_sparks": {
         "name": "Đũa Tia Lửa Đã Dập Tắt"
       },
+      "cogwheel_blank": {
+        "name": "Cogwheel Blank"
+      },
+      "copperlens_ocular": {
+        "name": "Copperlens Ocular"
+      },
+      "deed_of_making": {
+        "name": "Deed of Making"
+      },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"
       },
@@ -14055,7 +14873,7 @@ export const vi_VN: EnTranslations = {
         "name": "Chùy Thánh Hóa của Voss"
       },
       "wyrmcult_soulsteps": {
-        "name": "Bước Hồn Long Giáo"
+        "name": "Broodsworn Soulsteps"
       },
       "wyrmshadow_harness": {
         "name": "Đai Giáp Nightfang"
@@ -14286,7 +15104,7 @@ export const vi_VN: EnTranslations = {
         "name": "Mũ Thánh Tích Của Phó Tế"
       },
       "varric_shadow_cowl": {
-        "name": "Mũ Trùm Bóng Tối của Varric"
+        "name": "Mũ Trùm Bóng Tối của Vandric"
       },
       "siltguard_helm": {
         "name": "Mũ Giáp Hộ Bùn"
@@ -14393,6 +15211,15 @@ export const vi_VN: EnTranslations = {
       "heroic_mark": {
         "name": "Dấu Ấn Anh Hùng"
       },
+      "wyrmfall_core": {
+        "name": "Wyrmfall Core"
+      },
+      "sundered_essence": {
+        "name": "Sundered Essence"
+      },
+      "makers_ember": {
+        "name": "Maker's Ember"
+      },
       "eastbrook_buckler": {
         "name": "Khiên Nhỏ Đông Khê"
       },
@@ -14463,7 +15290,7 @@ export const vi_VN: EnTranslations = {
         "name": "Dây Lưng Hàn Cốt"
       },
       "mistforged_pauldrons": {
-        "name": "Giáp Vai Rèn Sương"
+        "name": "Fogforged Pauldrons"
       },
       "tideguard_faceguard": {
         "name": "Mũ Che Mặt Vệ Triều"
@@ -14792,10 +15619,10 @@ export const vi_VN: EnTranslations = {
         "name": "Lãnh Chúa Mảnh Vỡ Kazzix"
       },
       "wyrmcult_zealot": {
-        "name": "Cuồng Tín Long Giáo"
+        "name": "Broodsworn Zealot"
       },
       "wyrmcult_necromancer": {
-        "name": "Tử Linh Sư Long Giáo"
+        "name": "Broodsworn Necromancer"
       },
       "boneclad_revenant": {
         "name": "Vong Hồn Bọc Xương"
@@ -14924,7 +15751,7 @@ export const vi_VN: EnTranslations = {
         "name": "Hình Nộm Vô Thánh"
       },
       "deacon_varric": {
-        "name": "Chấp Sự Varric"
+        "name": "Chấp Sự Vandric"
       },
       "acolyte_tessa": {
         "name": "Tế Đồ Tessa"
@@ -15113,7 +15940,7 @@ export const vi_VN: EnTranslations = {
         "name": "Tinh Linh Đầm Lầy"
       },
       "frostmane_yeti": {
-        "name": "Người Tuyết Bờm Băng Giá"
+        "name": "Rimemane Yeti"
       },
       "terrace_howler": {
         "name": "Kẻ Gào Thét Bậc Thang"
@@ -15161,7 +15988,7 @@ export const vi_VN: EnTranslations = {
         "name": "Meredark"
       },
       "harvest_sprite": {
-        "name": "Tinh Linh Mùa Gặt"
+        "name": "Gleaning Sprite"
       },
       "mere_lurker": {
         "name": "Kẻ Rình Đầm Hồ"
@@ -15185,7 +16012,7 @@ export const vi_VN: EnTranslations = {
         "name": "Kẻ Rảo Bước Chạng Vạng"
       },
       "nightkin_stargazer": {
-        "name": "Kẻ Ngắm Sao Tộc Đêm"
+        "name": "Gloamkin Stargazer"
       },
       "barrow_king": {
         "name": "Vua Gò Mộ"
@@ -15344,7 +16171,7 @@ export const vi_VN: EnTranslations = {
         "name": "Emberkin"
       },
       "gloomshade": {
-        "name": "Gloomshade"
+        "name": "Duskmurk"
       },
       "grix_the_tunnelking": {
         "name": "Grix Vua Đường Hầm"
@@ -15625,7 +16452,7 @@ export const vi_VN: EnTranslations = {
       },
       "provisioner_fenna": {
         "name": "Người Tiếp Tế Fenna",
-        "title": "Người Tiếp Tế Của Eldergleam",
+        "title": "Người Tiếp Tế Của Eldershine",
         "greeting": "Bánh mì vẫn còn ấm, nước vẫn còn ngọt lành. Hollow ban tặng, và ta cũng vậy."
       },
       "wardsmith_orun": {
@@ -15750,12 +16577,12 @@ export const vi_VN: EnTranslations = {
       },
       "sexton_marrow": {
         "name": "Người Giữ Mộ Marrow",
-        "title": "Người Giữ Mộ Của Gallowmere",
+        "title": "Người Giữ Mộ Của Gibbetmere",
         "greeting": "Chúng tôi chôn họ thật sâu ở đây, và rung chuông để họ nhớ mà nằm yên."
       },
       "widow_tansy": {
         "name": "Quả Phụ Tansy",
-        "title": "Thợ Làm Nến Của Gallowmere",
+        "title": "Thợ Làm Nến Của Gibbetmere",
         "greeting": "Một ngọn nến cho mỗi nấm mộ, và không được để ngọn nào tắt. Không một ngọn nào, ngươi nghe rõ chưa?"
       },
       "vicar_creel": {
@@ -15779,7 +16606,7 @@ export const vi_VN: EnTranslations = {
         "greeting": "Biển cả cho đi, cát giữ lại, và rừng rậm lấy đi. Hãy ở lại trên bờ cát, kẻ lạ mặt."
       },
       "hermit_okku": {
-        "name": "Okku",
+        "name": "Okrim",
         "title": "Người Đã Bước Vào Trong",
         "greeting": "Im lặng nào. Tiếng trống đếm mọi thứ bước đi dưới tán cây, và chúng đã đếm được ngươi rồi."
       },
@@ -15883,6 +16710,26 @@ export const vi_VN: EnTranslations = {
         "title": "Bậc thầy của nhà bào chế thuốc",
         "greeting": "Đo hai lần và đổ một lần, {className}. Người bào chế thuốc không có kiên nhẫn với thuốc thử bị đổ."
       },
+      "farmer_jessica": {
+        "name": "Farmer Jessica",
+        "title": "Allotment Keeper",
+        "greeting": "Good soil and fair weather, {playerName}. Buy a seed from me, sow it in one of those beds, and go about your day. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer."
+      },
+      "farmer_teasel": {
+        "name": "Farmer Teasel",
+        "title": "Fen Paddy Farmer",
+        "greeting": "Marsh rice and bog beet seed, {className}, and compost to feed them. The paddies drain slow, so mind where you tread."
+      },
+      "farmer_hollis": {
+        "name": "Farmer Hollis",
+        "title": "Highwatch Terrace Farmer",
+        "greeting": "The terraces give what the mountain allows, {className}. I sell seed and compost, and if a crop of yours comes up withered I will work the husks back into good soil for you."
+      },
+      "farmer_verbena": {
+        "name": "Farmer Verbena",
+        "title": "Parterre Gardener",
+        "greeting": "Mind the edging, {playerName}, these beds are the pride of the parterre. Seed and compost are what I sell, and I will turn any withered husks you carry into more of it."
+      },
       "wayfarer_bryn": {
         "name": "Lữ Khách Bryn",
         "title": "Người Dẫn Đường Bến Cảng",
@@ -15942,6 +16789,19 @@ export const vi_VN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Mỏ quặng đã khai thác"
+          }
+        }
+      },
+      "q_farm_intro": {
+        "title": "First Furrow",
+        "text": "Take this hoe and a pinch of vale wheat seed, {playerName}. Sow the seed in one of the beds beside me, then go about your business. Come back whenever you like and bring the crop in; I will be here.",
+        "completion": "There, your first crop in your own hands. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer. Come back for seed whenever the beds call you, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat planted"
+          },
+          "1": {
+            "label": "Vale Wheat harvested"
           }
         }
       },
@@ -16492,7 +17352,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_drogmar": {
         "title": "Lãnh Chúa Chiến Tranh Drogmar",
-        "text": "Lãnh Chúa Chiến Tranh Drogmar đã nhận vàng của Long Giáo và thề đưa các bộ tộc theo sự thức tỉnh của ngọn núi. Hắn là cây búa mà chúng định vung vào bức tường của ta - và khi hắn giáng xuống mặt đất, {playerName}, chớ đứng gần hắn. Hãy đưa đồng đội vào trại chiến và kết liễu hắn, vì Highwatch.",
+        "text": "Warlord Drogmar took the Broodsworn's coin and swore the clans to the mountain's waking. He is the hammer they mean to swing at my wall, and when he slams the ground, {playerName}, do not be standing near him. Take your companions into the war-camp and end him, for Highwatch.",
         "completion": "Drogmar, chết ngay trong trại của hắn. Các bộ tộc sẽ tản về những con đèo cao - ngươi đã mua cho bức tường của ta thêm một mùa đông, {playerName}.",
         "objectives": {
           "0": {
@@ -16532,11 +17392,11 @@ export const vi_VN: EnTranslations = {
       },
       "q_zealots": {
         "title": "Khúc Tụng Trong Gió",
-        "text": "Khi gió thổi xuống từ những đỉnh núi phía nam, {playerName}, nó mang theo tiếng tụng niệm. Giáo Phái Cuồng Long không còn ẩn nấp nữa, chúng đã dựng lều bên dưới Thánh Đường và hát cho thứ ngủ vùi bên dưới nó. Bịt miệng mười hai tín đồ. Mỗi giọng nói bị làm im lặng mua cho ngọn núi thêm một đêm ngủ yên.",
+        "text": "When the wind comes off the southern peaks, {playerName}, it carries chanting. The Broodsworn no longer hides: they have raised tents below the Sanctum and they sing to what sleeps beneath it. Silence twelve zealots. Every voice stilled buys the mountain another night of sleep.",
         "completion": "Gió đã lặng hơn. Nhưng điều khiến ta lo lắng không phải là tiếng tụng niệm, {playerName}, mà là có thứ gì đó có thể đang tụng niệm đáp lại.",
         "objectives": {
           "0": {
-            "label": "Tín Đồ Cuồng Long đã hạ"
+            "label": "Broodsworn Zealot slain"
           }
         }
       },
@@ -16609,7 +17469,7 @@ export const vi_VN: EnTranslations = {
             "label": "Tín Đồ Cuồng Long đã hạ"
           },
           "1": {
-            "label": "Tử Linh Sư Cuồng Long đã hạ"
+            "label": "Broodsworn Necromancer slain"
           }
         }
       },
@@ -16874,6 +17734,26 @@ export const vi_VN: EnTranslations = {
           }
         }
       },
+      "q_prof_workorder_kitchens_wheat": {
+        "title": "Kitchens Wheat Order",
+        "text": "Bread does not bake itself, {playerName}, and my flour bins are scraping bottom. Bring me eight sheaves of vale wheat and I will pay you honest coin for the lot. Grown by your own hand or bought off the market, I do not care, so long as it grinds.",
+        "completion": "Good dry grain, and plenty of it. There is your pay, counted out. When the next crop comes in, you know which door to knock on.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat delivered"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_rice": {
+        "title": "Kitchens Rice Order",
+        "text": "The marsh folk swear by their rice, {playerName}, and I mean to find out why. Fetch me five measures of marsh rice and there is coin waiting for you here. Keep it dry on the road, mind: wet rice is porridge, and I did not order porridge.",
+        "completion": "Plump and dry, every grain. Here is your coin. If the marsh keeps giving, so do I.",
+        "objectives": {
+          "0": {
+            "label": "Marsh Rice delivered"
+          }
+        }
+      },
       "q_prof_workorder_loom": {
         "title": "Đơn Hàng Khung Cửi",
         "text": "Khung cửi chạy cạn và đôi tay nhàn rỗi lãng phí ánh sáng ban ngày, {playerName}. Hãy mang cho tôi sáu cuộn tơ nhện và tôi sẽ trả cho bạn mức giá công bằng, đếm đến từng đồng.",
@@ -17082,7 +17962,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_hollow_old_marrowshell": {
         "title": "Chiếc Mai Cũ Của Bãi Cạn",
-        "text": "Cái tên đầu tiên là Lão Vỏ Tủy, một con cua to bằng cả chiếc xe đã săn mồi ở bãi cạn phía đông từ trước khi Eldergleam có cổng. Nó lang thang khắp nơi, {playerName}, nên bạn sẽ phải đi dọc bờ biển cho đến khi bắt gặp dấu vết của nó. Đừng đi một mình, và đừng tin vào sự bất động của nó.",
+        "text": "Cái tên đầu tiên là Lão Vỏ Tủy, một con cua to bằng cả chiếc xe đã săn mồi ở bãi cạn phía đông từ trước khi Eldershine có cổng. Nó lang thang khắp nơi, {playerName}, nên bạn sẽ phải đi dọc bờ biển cho đến khi bắt gặp dấu vết của nó. Đừng đi một mình, và đừng tin vào sự bất động của nó.",
         "completion": "Bãi cạn giờ lại chỉ còn là nước. Ta đã chứng kiến cái mai đó đánh bại những thợ săn giỏi hơn ta, {playerName}. Nhưng không phải bạn.",
         "objectives": {
           "0": {
@@ -17224,12 +18104,12 @@ export const vi_VN: EnTranslations = {
         }
       },
       "q_fv_frostmane_tyrant": {
-        "title": "Bạo Chúa Bờm Băng Giá",
-        "text": "Những kẻ gào thét không phải đang săn mồi khi chúng xuống khỏi bậc thềm. Chúng đang chạy trốn. Một con người tuyết đã chiếm lấy vùng đất cao, dân miền núi gọi nó là Bờm Băng Giá, và ngay cả các bầy sói cũng không chịu chia sẻ một sườn núi với nó. Việc này phải chấm dứt, {playerName}, trước khi mùa đông đẩy nó xuống tận tường thành của ta. Rủ theo một người bạn. Rủ theo hai người.",
-        "completion": "Khi gió lặng đêm qua, cả ngôi làng đã nghe thấy sự im lặng nơi Bờm Băng Giá từng ở. Vùng Đất này nợ bạn một món nợ sẽ mất nhiều năm để trả, {playerName}. Hãy khoác lên thứ này, và mọi cánh cửa ở Icemantle sẽ rộng mở với bạn.",
+        "title": "The Rimemane Tyrant",
+        "text": "The howlers were not hunting when they came down the terraces. They were fleeing. A yeti has claimed the high ground, the mountain folk call it the Rimemane, and even the packs will not share a slope with it. It has to end, {playerName}, before winter drives it down to my walls. Bring a friend. Bring two.",
+        "completion": "When the wind dropped last night the whole village heard the silence where the Rimemane used to be. The Reach owes you a debt it will be years in paying, {playerName}. Wear this, and every door in Icemantle is open to you.",
         "objectives": {
           "0": {
-            "label": "Bờm Băng Giá bị tiêu diệt"
+            "label": "The Rimemane slain"
           }
         }
       },
@@ -17382,7 +18262,7 @@ export const vi_VN: EnTranslations = {
         "completion": "Bốn chiếc xô đã về lại trên móc treo và những hàng cây đã yên tĩnh trở lại. Bạn ra tay mạnh mẽ với đám tinh linh hơn ta nhiều, {playerName}, và hôm nay ta mừng vì điều đó.",
         "objectives": {
           "0": {
-            "label": "Tinh Linh Mùa Gặt bị đuổi đi"
+            "label": "Gleaning Sprite driven off"
           },
           "1": {
             "label": "Xô Hứng Nhựa được tìm lại"
@@ -17524,7 +18404,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_nb_eyes_on_the_vigil": {
         "title": "Mắt Nhìn Về Canh Thức Vĩnh Cửu",
-        "text": "Có thứ gì đó khiến những kẻ rảo bước trở nên táo bạo và đàn hươu bất an, {playerName}, và ta không thể đọc được điều đó từ những bông hoa. Cassian có thể đọc được từ bầu trời. Ông ấy giữ trại quan sát của mình gần Canh Thức Vĩnh Cửu phía đông nơi này, nơi tộc đêm lang thang giữa những phiến đá. Tìm ông ấy, và hỏi xem các vì sao đang nói gì.",
+        "text": "Something has the striders bold and the herds uneasy, {playerName}, and I cannot read it in the flowers. Cassian can read it in the sky. He keeps his observatory camp by the Standing Vigil east of here, where the gloamkin drift among the stones. Find him, and ask what the stars are saying.",
         "completion": "Lira cử bạn đến? Vậy là cả những khu vườn cũng cảm nhận được điều đó. Ngồi cạnh ống kính một lát đi, {playerName}. Các vì sao đã bất an suốt một tháng, và mỗi bản đồ ta vẽ đều nghiêng về phía bắc, hướng đến gò mộ.",
         "objectives": {
           "0": {
@@ -17534,7 +18414,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_nb_charts_of_the_stones": {
         "title": "Bản Đồ Trong Những Phiến Đá",
-        "text": "Những phiến đá Canh Thức còn cổ xưa hơn cả Moonrest, cổ xưa hơn cả tộc đêm chăm sóc chúng, và bề mặt của chúng được khắc những bản đồ sao mà ta đã dành cả đời để học cách đọc. Bầu trời đã dịch chuyển, {playerName}, và ta phải biết đã dịch chuyển bao xa. Đọc bản đồ trên ba phiến đá và mang về cho ta phương vị của chúng.",
+        "text": "The Vigil stones are older than Moonrest, older than the gloamkin who tend them, and their faces are cut with star charts I have spent my life learning to read. The sky has shifted, {playerName}, and I must know how far. Read the charts on three of the stones and bring me their bearings.",
         "completion": "Không còn nghi ngờ gì nữa. Mọi phương vị đều đã dịch chuyển dần về phía Gò Mộ Không Ngủ, như thể chính bầu trời đang cúi xuống gò đất đó để quan sát. Các vị vua xưa được chôn cất dưới những vì sao thẳng hàng không phải vô cớ, {playerName}.",
         "objectives": {
           "0": {
@@ -17558,7 +18438,7 @@ export const vi_VN: EnTranslations = {
       "q_nb_the_barrow_king": {
         "title": "Vua Gò Mộ Thức Tỉnh",
         "text": "Mọi phương vị, mọi vì sao bất an, mọi gò mộ đang mở ra đều chỉ về một điều: Vua Gò Mộ đang thức tỉnh dưới gò đất lớn, và vương quốc này không có bình minh để ngăn nó lại. Nó phải được cho an nghỉ trước khi nó nhớ lại vương miện của mình, {playerName}. Đừng đi một mình: rủ theo một người bạn, và giữ ánh sáng hoa sau lưng bạn.",
-        "completion": "Các vì sao đã lắng xuống lần đầu tiên trong cả mùa, {playerName}. Các gò mộ đã đóng lại, tộc đêm đã trở nên tĩnh lặng bên những phiến đá của họ, và vị vua lại ngủ yên bên dưới. Hãy khoác lên tấm áo choàng này: Moonrest đã cắt nó cho bất cứ ai màn đêm cuối cùng cũng tin tưởng.",
+        "completion": "The stars have settled for the first time in a season, {playerName}. The mounds are closed, the gloamkin have gone still at their stones, and the king sleeps below once more. Wear this mantle: Moonrest cut it for whoever the night finally trusted.",
         "objectives": {
           "0": {
             "label": "Vua Gò Mộ được cho an nghỉ"
@@ -17566,9 +18446,9 @@ export const vi_VN: EnTranslations = {
         }
       },
       "q_ww_bells_of_gallowmere": {
-        "title": "Những Chiếc Chuông Của Gallowmere",
-        "text": "Nghe tiếng chuông đó không, {playerName}? Đó là Gallowmere, trên con đường phía bắc, đang rung chuông ru người chết của nó vào giấc ngủ. Người Giữ Mộ Marrow giữ số đếm của mọi linh hồn dưới tán rừng, cả người sống lẫn người đã chôn cất. Đi đến và được đếm, trước khi khu rừng tự đếm bạn.",
-        "completion": "Cobb đã đưa bạn lên con đường này nguyên vẹn à? Người tốt đấy. Ông ấy đã giữ những chiếc đèn lồng cổng đó cháy sáng suốt ba mươi năm, và khu rừng chưa từng một lần vượt qua được ông ấy. Chào mừng đến Gallowmere, {playerName}. Chú ý đến những chiếc chuông.",
+        "title": "Những Chiếc Chuông Của Gibbetmere",
+        "text": "Nghe tiếng chuông đó không, {playerName}? Đó là Gibbetmere, trên con đường phía bắc, đang rung chuông ru người chết của nó vào giấc ngủ. Người Giữ Mộ Marrow giữ số đếm của mọi linh hồn dưới tán rừng, cả người sống lẫn người đã chôn cất. Đi đến và được đếm, trước khi khu rừng tự đếm bạn.",
+        "completion": "Cobb đã đưa bạn lên con đường này nguyên vẹn à? Người tốt đấy. Ông ấy đã giữ những chiếc đèn lồng cổng đó cháy sáng suốt ba mươi năm, và khu rừng chưa từng một lần vượt qua được ông ấy. Chào mừng đến Gibbetmere, {playerName}. Chú ý đến những chiếc chuông.",
         "objectives": {
           "0": {
             "label": "Báo cáo với Người Giữ Mộ Marrow"
@@ -17597,7 +18477,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_ww_candles_at_the_bounds": {
         "title": "Nến Ở Ranh Giới",
-        "text": "Bốn phiến đá ranh giới bao quanh Gallowmere, {playerName}, một trên mỗi con đường ra vào, và một ngọn nến mộ cháy trên mỗi phiến đá. Khi chúng còn cháy, người đã chôn vẫn ở yên dưới mộ. Mưa phùn đã làm tắt chúng, cả bốn ngọn, và ta đã quá già để tự mình đi vòng quanh ranh giới. Cầm lấy cây nến của ta và thắp lại chúng, thật nhanh.",
+        "text": "Bốn phiến đá ranh giới bao quanh Gibbetmere, {playerName}, một trên mỗi con đường ra vào, và một ngọn nến mộ cháy trên mỗi phiến đá. Khi chúng còn cháy, người đã chôn vẫn ở yên dưới mộ. Mưa phùn đã làm tắt chúng, cả bốn ngọn, và ta đã quá già để tự mình đi vòng quanh ranh giới. Cầm lấy cây nến của ta và thắp lại chúng, thật nhanh.",
         "completion": "Cả bốn ngọn đều cháy sao? Vậy thì hãy thở phào đi, {playerName}. Bạn không nghe thấy, nhưng cả ngôi làng đã nghe: những chiếc chuông rung nhẹ nhõm hơn ngay khoảnh khắc sợi bấc cuối cùng bắt lửa.",
         "objectives": {
           "0": {
@@ -17627,7 +18507,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_ww_what_the_bark_holds": {
         "title": "Điều Mà Vỏ Cây Nắm Giữ",
-        "text": "Trong Trảng Rừng Treo Cổ phía đông Gallowmere, lũ nhả tơ treo người chết được bọc tơ của chúng từ những cành cây, và những kẻ lê bước vỏ cây khắc đứng canh gác bên dưới như những người khiêng quan tài kiên nhẫn. Đó là người dân của chúng ta ở trên đó, {playerName}. Đập tan năm kẻ lê bước, hạ xuống ba xác chết bị bọc, và đưa họ về với đất.",
+        "text": "Trong Trảng Rừng Treo Cổ phía đông Gibbetmere, lũ nhả tơ treo người chết được bọc tơ của chúng từ những cành cây, và những kẻ lê bước vỏ cây khắc đứng canh gác bên dưới như những người khiêng quan tài kiên nhẫn. Đó là người dân của chúng ta ở trên đó, {playerName}. Đập tan năm kẻ lê bước, hạ xuống ba xác chết bị bọc, và đưa họ về với đất.",
         "completion": "Ba linh hồn trở lại dưới lòng đất chân chính trước khi màn đêm buông xuống. Những kẻ lê bước sẽ mọc lại, vỏ cây luôn như vậy, nhưng đêm nay trảng rừng treo trống không, và như thế là đủ.",
         "objectives": {
           "0": {
@@ -17641,17 +18521,17 @@ export const vi_VN: EnTranslations = {
       "q_ww_walking_mosley_home": {
         "title": "Đưa Mosley Về Nhà",
         "text": "Người đào mộ của ta, Mosley, đã đi trên con đường nhà nguyện ba ngày trước để mở một huyệt mộ trong khu đất cũ, và hố đào đã sập xuống trên người ông ấy. Ông ấy đã cào bới thoát ra, kẻ ngốc đó vẫn còn sống, nhưng ông ấy đang co ro cạnh những ngôi mộ nhà nguyện và không dám di chuyển vì lũ nhả tơ trên đường. Đưa ông ấy về nhà, {playerName}. Ta không thể rung chuông cho một người còn sống.",
-        "completion": "Ông ấy đã bước qua cổng bằng chính đôi chân mình, thề rằng từ giờ sẽ không đào gì sâu hơn một luống củ cải. Ông ấy sẽ trở lại khu đất đó trước ngày Chủ Nhật, họ luôn như vậy. Cảm ơn bạn, {playerName}. Gallowmere giữ gìn người dân của mình, đó là toàn bộ luật lệ của chúng ta.",
+        "completion": "Ông ấy đã bước qua cổng bằng chính đôi chân mình, thề rằng từ giờ sẽ không đào gì sâu hơn một luống củ cải. Ông ấy sẽ trở lại khu đất đó trước ngày Chủ Nhật, họ luôn như vậy. Cảm ơn bạn, {playerName}. Gibbetmere giữ gìn người dân của mình, đó là toàn bộ luật lệ của chúng ta.",
         "objectives": {
           "0": {
-            "label": "Người Đào Mộ Mosley được đưa an toàn trở lại Gallowmere"
+            "label": "Người Đào Mộ Mosley được đưa an toàn trở lại Gibbetmere"
           }
         }
       },
       "q_ww_horn_of_the_huntsman": {
         "title": "Chiếc Tù Và Của Thợ Săn",
         "text": "Chắc giờ bạn đã nghe thấy tiếng tù và, {playerName}, mỏng manh và xa xăm, âm thanh khiến cả khu rừng nín thở. Thợ Săn Nhợt Nhạt cưỡi ngựa qua khoảng trống của hắn phía bắc nơi này, và mỗi ngôi mộ hắn đi qua đều trở nên nông hơn. Hắn từng là một con người, và hắn đã bị chôn cất sai cách, và ta đã thôi giả vờ rằng lời cầu nguyện có thể giải quyết được điều đó. Rủ theo một người bạn, rủ theo hai người, và hất hắn khỏi lưng ngựa.",
-        "completion": "Tiếng tù và ngừng bặt giữa chừng. Mỗi chiếc chuông ở Gallowmere đã rung một lần, tự nó rung lên, rồi khu rừng trở nên yên tĩnh hơn bất cứ lúc nào ta từng nghe trong ba mươi năm qua. Bạn đã thực hiện nghi lễ mà ta không thể, {playerName}. Khoác lên thứ này, và bước đi dưới tán rừng mà không sợ hãi.",
+        "completion": "Tiếng tù và ngừng bặt giữa chừng. Mỗi chiếc chuông ở Gibbetmere đã rung một lần, tự nó rung lên, rồi khu rừng trở nên yên tĩnh hơn bất cứ lúc nào ta từng nghe trong ba mươi năm qua. Bạn đã thực hiện nghi lễ mà ta không thể, {playerName}. Khoác lên thứ này, và bước đi dưới tán rừng mà không sợ hãi.",
         "objectives": {
           "0": {
             "label": "Thợ Săn Nhợt Nhạt bị hất khỏi lưng ngựa"
@@ -17700,11 +18580,11 @@ export const vi_VN: EnTranslations = {
       },
       "q_pr_the_man_who_went_in": {
         "title": "Người Đã Bước Vào Trong",
-        "text": "Những người thợ lặn sẽ không bước qua ranh giới cây cối, {playerName}, và tôi sẽ không yêu cầu họ làm vậy. Chắc bạn đã nghe tiếng trống rồi: ai cũng nghe thấy, vào đêm thứ hai. Chỉ có một người trên hòn đảo này từng bước về phía âm thanh đó và trở lại. Okku. Ông ấy cắm trại dưới những cây đa lớn tại Vinefall, sâu trên con đường Tangle. Tìm ông ấy, và hỏi ông ấy xem màu xanh đó đang giấu điều gì.",
+        "text": "Những người thợ lặn sẽ không bước qua ranh giới cây cối, {playerName}, và tôi sẽ không yêu cầu họ làm vậy. Chắc bạn đã nghe tiếng trống rồi: ai cũng nghe thấy, vào đêm thứ hai. Chỉ có một người trên hòn đảo này từng bước về phía âm thanh đó và trở lại. Okrim. Ông ấy cắm trại dưới những cây đa lớn tại Vinefall, sâu trên con đường Tangle. Tìm ông ấy, và hỏi ông ấy xem màu xanh đó đang giấu điều gì.",
         "completion": "Isha cử bạn đến? Ngọc Mẫu đã không nhắc đến tên tôi suốt nhiều năm rồi. Ngồi ngoài tầm với của dây leo đi, {playerName}, và tôi sẽ kể cho bạn nghe những gì tôi biết: tiếng trống không phải là mối nguy hiểm. Chúng là lời cảnh báo.",
         "objectives": {
           "0": {
-            "label": "Tìm Okku tại Vinefall"
+            "label": "Tìm Okrim tại Vinefall"
           }
         }
       },
@@ -18289,7 +19169,7 @@ export const vi_VN: EnTranslations = {
             "label": "Hồ Lung Linh"
           },
           "7": {
-            "label": "Lều Giáo Phái Cuồng Long"
+            "label": "Broodsworn Tents"
           },
           "8": {
             "label": "Cánh Đồng Vong Linh"
@@ -18301,10 +19181,10 @@ export const vi_VN: EnTranslations = {
       },
       "veiled_hollow": {
         "name": "Thung Lũng Sương Phủ",
-        "welcome": "Không khí nơi đây vang vọng phép thuật cổ xưa. Hãy tìm đến Người Canh Giữ Saelwyn dưới gốc đại thụ của Eldergleam.",
+        "welcome": "Không khí nơi đây vang vọng phép thuật cổ xưa. Hãy tìm đến Người Canh Giữ Saelwyn dưới gốc đại thụ của Eldershine.",
         "pois": {
           "0": {
-            "label": "Eldergleam"
+            "label": "Eldershine"
           },
           "1": {
             "label": "Hang Động Duskfall"
@@ -18442,7 +19322,7 @@ export const vi_VN: EnTranslations = {
             "label": "Nightgate"
           },
           "2": {
-            "label": "Moonwell"
+            "label": "Moonspring"
           },
           "3": {
             "label": "Gloamfield"
@@ -18457,10 +19337,10 @@ export const vi_VN: EnTranslations = {
       },
       "wraithwood": {
         "name": "Rừng Oan Hồn",
-        "welcome": "Tán lá khép lại trên con đường như một chiếc nắp đậy. Hãy bám theo ánh đèn lồng của Gallowmere, và đừng đáp lời nếu khu rừng gọi tên bạn.",
+        "welcome": "Tán lá khép lại trên con đường như một chiếc nắp đậy. Hãy bám theo ánh đèn lồng của Gibbetmere, và đừng đáp lời nếu khu rừng gọi tên bạn.",
         "pois": {
           "0": {
-            "label": "Gallowmere"
+            "label": "Gibbetmere"
           },
           "1": {
             "label": "Crowgate"
@@ -18725,6 +19605,11 @@ export const vi_VN: EnTranslations = {
         "subject": "Dấu Ấn Anh Hùng của bạn",
         "body": "Đội của bạn đã vượt qua thử thách Anh Hùng khi bạn chiến đấu ở hậu tuyến hoặc đã ngã xuống. Khóa lượt của bạn vẫn được ghi nhận, vì vậy phần Dấu Ấn Anh Hùng của bạn được gửi đến đây thay vì thất lạc. Hãy sử dụng chúng thật tốt.\n\n- Quân nhu Anh Hùng"
       },
+      "wyrmfall_core_reward": {
+        "sender": "The Heroic Quartermaster",
+        "subject": "Your Wyrmfall Cores",
+        "body": "The beast fell while you fought from the back, or from the dirt. Your share of its Wyrmfall Cores flies to you here rather than being lost to the corpse-pickers. Put them to good work at a bench.\n\n- The Heroic Quartermaster"
+      },
       "guild_trend_engineering_alchemy": {
         "sender": "Hội chế tạo",
         "subject": "Công việc của bạn trong Kỹ thuật và Giả kim thuật",
@@ -18979,7 +19864,7 @@ export const vi_VN: EnTranslations = {
       },
       "grovespring": {
         "name": "Phục Trang Suối Rừng",
-        "bonus2": "Swiftmend ưu tiên tiêu thụ Wildbloom hoặc Second Bloom của bạn trước và hồi thêm 25% máu. Sát thương phải chịu không còn làm chậm việc thi triển phép.",
+        "bonus2": "Hồi Phục Nhanh ưu tiên tiêu thụ Wildbloom hoặc Second Bloom của bạn trước và hồi thêm 25% máu. Sát thương phải chịu không còn làm chậm việc thi triển phép.",
         "bonus4": "Overbloom thu hoạch 75% các hiệu ứng còn lại của bạn và tích trữ 1 Verdance sau đó."
       },
       "hexthread": {
@@ -19142,6 +20027,7 @@ export const vi_VN: EnTranslations = {
     "delveRiteShrineReedInteract": "Miếu Lau Sậy: Nhấn F để chạm vào",
     "delveRiteShrineSkullInteract": "Miếu Đầu Lâu: Nhấn F để chạm vào",
     "mailboxName": "Hòm Thư",
-    "noticeboardName": "Bảng Thông Báo"
+    "noticeboardName": "Bảng Thông Báo",
+    "farmPatchName": "Garden Beds"
   }
 };

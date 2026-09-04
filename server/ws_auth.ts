@@ -146,13 +146,10 @@ export interface WsAuthDeps {
   // Recomputes the account's bank bonus slots from live facts (email/Discord/wallet/
   // referrals) so a fresh join stamps the current entitlement into the character state.
   // Called on the FRESH-JOIN arm only, never on a resume (no mid-session recompute); a
-  // rejection fails the handshake exactly like a getCharacter failure. characterCount
-  // (the tutorial greeting's firstCharacter fact; the row being joined is already
-  // counted, so first means <= 1) rides the same single round trip rather than a
-  // second serial await on every handshake.
+  // rejection fails the handshake exactly like a getCharacter failure.
   bankBonusForAccount: (
     accountId: number,
-  ) => Promise<{ bonusSlots: number; sources: BankBonusSource[]; characterCount: number }>;
+  ) => Promise<{ bonusSlots: number; sources: BankBonusSource[] }>;
 }
 
 export interface WsAuthHandlers {
@@ -462,11 +459,6 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
             // Computed BEFORE the lease acquire so the lease-held window stays tight; a bare
             // await means a DB error fails the handshake exactly like a getCharacter failure.
             const bankBonus = await bankBonusForAccount(accountId);
-            // The tutorial greeting's account fact: this join's character is
-            // the account's first when the account-wide count is at most 1
-            // (the row being joined is already counted). Fresh-join arm only,
-            // like bankBonus, whose single query carries the count.
-            const firstCharacter = bankBonus.characterCount <= 1;
             leaseNonce = randomUUID();
             const leased = await acquireCharacterLease(character.id, accountId, leaseNonce);
             if (!leased) {
@@ -520,7 +512,6 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
                 ...joinMeta,
                 leaseNonce,
                 bankBonus,
-                firstCharacter,
                 mutedUntil: moderation.mutedUntil,
                 reason: moderation.reason,
                 chatStrikes: moderation.strikes,

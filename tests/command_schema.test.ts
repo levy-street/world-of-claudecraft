@@ -71,12 +71,77 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // auto-merged identical numbers before while the real total was higher; the
 // merged tree carries BOTH sides' pairs. Only the suite says what they really
 // are, and the numbers below were set from a run, not from this narrative.
-// The New Eastbrook program then retires the Vale Cup minigame, removing its
-// six vcup_* send + dispatch pairs (docs/design/eastbrook-revamp/master-plan.md);
-// the Proving Shore tutorial adds its one start_tutorial pair back on top, and
-// the v0.40.0 sync merge brings the release side's one new pair with it.
-const EXPECTED_SEND_COUNT = 207;
-const EXPECTED_DISPATCH_COUNT = 220;
+// Masterwrought phase 04 adds the extract_essence command (client-sent, so
+// both counts move together); this merge composed it with deed_set_border,
+// the exact silent-off-by-one the NOTE above warns about (both sides read
+// 196/209 pre-merge, the merged tree carries both pairs). The v0.37.0 sync
+// then repeated the same composition with the release's tabPrev pair: both
+// sides read 197/210 pre-merge, and the merged tree carries both. The
+// v0.38.0 sync repeated it a THIRD time with the release's lock_item pair
+// (the issue #3042 player item lock; the IWorld member is setItemLocked but
+// the wire token both surfaces carry is lock_item): both sides read 198/211
+// pre-merge, and the merged tree carries both extract_essence and lock_item.
+// The final v0.38.0 sync repeated it a FOURTH time with the release's market
+// price-reference pair (marketSellPriceCheck on IWorld): both sides read
+// 199/212 pre-merge, the constants auto-merged as identical, and the merged
+// tree carries both pairs; the numbers below were re-set from a suite run.
+// The farming absorb (masterwrought Phase 11d) composes a FIFTH time, at
+// scale: farming's five client-sent pairs (plant_crop, harvest_crop,
+// convert_husks from the growth phases, then the shared-feast place_feast +
+// consume_feast) land beside extract_essence, so the merged universe is
+// ours' 200/213 plus farming's five on each axis.
+
+// The Phase 11k QA release sync composes a SIXTH time, and the trap held:
+// both sides' constants differ, so this one CONFLICTED rather than
+// auto-merging, and the numbers below were re-set from a suite run on the
+// merged tree, never by adding the two sides' deltas on paper. They compose
+// exactly: base 199/212, ours +6 (extract_essence plus farming's five),
+// theirs +1 (the release's own pair), merged 206/219.
+// The release side (v0.41.0): the New Eastbrook program then retires the
+// Vale Cup minigame, removing its six vcup_* send + dispatch pairs
+// (docs/design/eastbrook-revamp/master-plan.md); the Proving Shore tutorial
+// added its now-retired ferry command pair on top, and the v0.40.0 sync merge
+// brings the release side's one new pair with it, so the release read
+// 199/212 on its own.
+// The v0.41.0 sync composes a SEVENTH time, and again CONFLICTED: off the
+// shared base 200/213, ours +6 (extract_essence plus farming's five), theirs
+// -1 (six vcup_* pairs out, one now-retired ferry pair in), merged 205/218. The
+// numbers below were re-set from a suite run on the merged tree, never by
+// adding the two sides' deltas on paper.
+// Masterwrought phase 12 (the Perfecting stage) adds the perfect_item command
+// (client-sent, so both counts move together): 206/219, dispatch-only
+// unchanged at 13. PREDICTED by the phase's contract before the token landed,
+// then set from a suite run.
+// Masterwrought phase 13 (the orange promotion) adds NO command: the optional
+// legendary name rides the existing perfect_item frame as a new FIELD
+// (parsePerfectItemName in server/perfect_item_ref.ts), so all three counts
+// stay 206/219/13. Stated so the next sync does not misread the phase as a
+// missing pair.
+// The release side (v0.41.0 final): the Bank Storage branch adds the Materials
+// Vault quartet (vault_deposit, vault_withdraw, vault_buy_upgrade,
+// vault_deposit_all) plus the bag-socket trio (bank_unlock_socket,
+// bank_socket_bag, bank_unsocket_bag), seven send + dispatch pairs, so the
+// release also read 206/219 on its own.
+// The final v0.41.0 sync composes an EIGHTH time, and the trap fired in its
+// original form: both sides read 206/219 pre-merge, identical constants git
+// would have auto-merged while the real totals are higher. Off the shared base
+// 199/212, ours +7 (extract_essence, perfect_item, plus farming's five),
+// theirs +7 (the vault quartet plus the bag-socket trio), merged 213/226,
+// dispatch-only unchanged at 13. The numbers below were re-derived by
+// replaying this suite's own scans over the three-way union of both sides'
+// sources, never by trusting either side's constant.
+// The release side (v0.41.0, the Crucible raid loot landing): the raid's
+// Quartermaster sigil-redemption vendor adds its one crucible_buy send +
+// dispatch pair, so the release read 207/220 on its own (its own narrative
+// still spoke of the Vale Cup retirement and the now-retired ferry pair).
+// The 2026-08-30 v0.41.0 sync composes a NINTH time and CONFLICTED (ours
+// 213/226 against the release's 207/220): the merged tree carries both arms,
+// ours' seven plus the release's one new pair, so the send and dispatch
+// counts each move by one over the eighth composition; dispatch-only stays
+// 13. Set from a suite run on the merged tree, never by arithmetic in the
+// diff.
+const EXPECTED_SEND_COUNT = 213;
+const EXPECTED_DISPATCH_COUNT = 226;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch

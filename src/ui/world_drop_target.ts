@@ -11,6 +11,7 @@
 // Thin DOM consumer: the accept/refuse decision is the pure bagDestroyAction
 // (bags_view.ts), the same one the tooltip hint reads.
 
+import type { DraggedCopyRef } from './equip_drop_core';
 import type { ItemDragState } from './item_drag_state';
 
 export interface WorldDropTargetDeps {
@@ -22,8 +23,13 @@ export interface WorldDropTargetDeps {
    *  'discard' opens the prompt, 'discardBlocked' refuses with feedback, 'none'
    *  means the drop is inert, e.g. a vendor/trade window owns the item). */
   destroyAction(itemId: string): 'discard' | 'discardBlocked' | 'none';
-  /** Open the destroy prompt for the dropped stack (confirm + quantity). */
-  promptDestroy(itemId: string, count: number): void;
+  /** Open the destroy prompt for the dropped stack (confirm + quantity).
+   *  `ref` carries WHICH copy was picked up (its pick-up index plus its copy
+   *  pin), not merely where it sat: the bags can shift during a drag, so the
+   *  prompt re-resolves the pin against the live bags and names, targets, and
+   *  destroys the copy the player actually dragged. Null when nothing was in
+   *  flight to identify. */
+  promptDestroy(itemId: string, count: number, ref: DraggedCopyRef | null): void;
   /** Refusal toast for a protected (noDiscard) item. */
   showBlocked(): void;
 }
@@ -53,7 +59,7 @@ export function installWorldDropTarget(deps: WorldDropTargetDeps): void {
       deps.showBlocked();
       return;
     }
-    deps.promptDestroy(drag.itemId, drag.count);
+    deps.promptDestroy(drag.itemId, drag.count, { index: drag.index, copyPin: drag.copyPin });
   });
 }
 
@@ -64,6 +70,7 @@ export function dropOnWorld(
   deps: Pick<WorldDropTargetDeps, 'destroyAction' | 'promptDestroy' | 'showBlocked'>,
   itemId: string,
   count: number,
+  ref: DraggedCopyRef | null,
 ): void {
   const action = deps.destroyAction(itemId);
   if (action === 'none') return;
@@ -71,5 +78,5 @@ export function dropOnWorld(
     deps.showBlocked();
     return;
   }
-  deps.promptDestroy(itemId, count);
+  deps.promptDestroy(itemId, count, ref);
 }

@@ -42,7 +42,6 @@
 // takes no req/res and is the one authority; the client never decides ownership.
 
 import type * as http from 'node:http';
-import { rekeyInstanceSigner } from '../src/sim/character_rename';
 import { resolveActiveWeaponSkin } from '../src/sim/content/weapon_skin_rules';
 import { DEEDS_RECENT_CAP } from '../src/sim/deeds';
 import type { CharacterState } from '../src/sim/sim';
@@ -58,6 +57,7 @@ import {
   characterDeleteRequestSignal,
 } from './character_delete_http';
 import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
+import { rekeyOfflineCharacterSigner } from './character_signer_db';
 import {
   accountAndScopeForToken,
   type CharacterRow,
@@ -73,7 +73,6 @@ import {
   moderationStatusForAccount,
   reclaimDeactivatedName,
   renameCharacter,
-  saveCharacterState,
   scopeAllowsMutation,
 } from './db';
 import { recentDeedsForCharacter } from './deeds_db';
@@ -91,6 +90,7 @@ import {
 import { requireOwned } from './http/middleware/require_owned';
 import type { Ctx, Middleware, RouteDef } from './http/types';
 import { isUniqueViolation, json, moderationErrorBody } from './http_util';
+import { countOfflineFenceRefusal } from './offline_fence_refusals';
 import { REALM } from './realm';
 
 // ---------------------------------------------------------------------------
@@ -255,7 +255,7 @@ const REAL_CHARACTERS_DB = {
   consumeAppearanceReroll,
   reclaimDeactivatedName,
   renameCharacter,
-  saveCharacterState,
+  rekeyOfflineCharacterSigner,
   deleteCharacter,
   lifetimeXpStanding,
   guildNameForCharacter,
@@ -429,10 +429,14 @@ export function buildCharacterList(
  * discount, Battlefield Experience attribution, and the eqi inspect wire all
  * compare signer to a live display name). Every rekey matches the holder's
  * STORED casing (reclaimed.freedName), never the requester's typed casing: the
- * db lookup is case-insensitive and the book matches are exact. The no-nonce
- * blob save is safe for the same reason renameHandler's is: a deactivated
- * account cannot hold a live session, so no lease fence is in play. Like the
- * DB reclaim itself, this runs BEFORE the create retry; a crash between the
+ * db lookup is case-insensitive and the book matches are exact. The blob
+ * mutation loads current state under the shared offline character lock,
+ * then applies the lease-fenced save. It never writes the reclaim's earlier
+ * captured blob over an intervening moderation edit. A deactivated account
+ * cannot hold a live session, so the fence should always admit, and a 0-row refusal (a lease
+ * this process cannot see) logs and moves on instead of writing over a live
+ * session. Like the DB reclaim itself, this runs BEFORE the create retry; a
+ * crash between the
  * committed reclaim and these rekeys leaves the orphan archived with its
  * world state still name-keyed (the same class of unrecoverable window the
  * delete purge documents below; nothing re-triggers the rekey).
@@ -454,22 +458,32 @@ export async function rekeyReclaimedCharacterWorldState(
   if (rt.rekeyMailOwner(reclaimed.id, reclaimed.freedName, reclaimed.archivedName)) {
     await rt.saveMail();
   }
-  if (
-    reclaimed.state &&
-    rekeyInstanceSigner(reclaimed.state, reclaimed.freedName, reclaimed.archivedName)
-  ) {
-    // Swallow-and-log like the market and mail save wrappers above: this is
-    // the helper's one await that can reject, and a throw here would skip
-    // the caller's create retry and 500 a reclaim that already committed.
-    // The cost of swallowing is bounded and accepted: a failed blob save
-    // leaves the orphan's signers on the freed name with nothing to
-    // re-trigger the sweep, the same unrecoverable-window class the purge
-    // and crash comments record.
-    try {
-      await charactersDb.saveCharacterState(reclaimed.id, reclaimed.level, reclaimed.state);
-    } catch (err) {
-      console.error('failed to save the reclaimed holder signer sweep:', err);
+  // Swallow-and-log like the market and mail save wrappers above: this is
+  // the helper's one await that can reject, and a throw here would skip
+  // the caller's create retry and 500 a reclaim that already committed.
+  // The cost of swallowing is bounded and accepted: a failed blob save
+  // leaves the orphan's signers on the freed name with nothing to
+  // re-trigger the sweep, the same unrecoverable-window class the purge
+  // and crash comments record.
+  try {
+    const landed = await charactersDb.rekeyOfflineCharacterSigner(
+      reclaimed.id,
+      reclaimed.freedName,
+      reclaimed.archivedName,
+    );
+    if (!landed) {
+      // The 0-row answer has two causes, and the line names both: a live
+      // lease, or a row that vanished between the reclaim and this write.
+      // Naming only the lease sends an operator hunting a session that is
+      // not there (the Phase 18 database review).
+      countOfflineFenceRefusal('reclaim_sweep');
+      console.error(
+        'reclaimed holder signer sweep refused by the load lease fence (a live lease stands, or the row is gone); the orphan keeps its old signers:',
+        reclaimed.id,
+      );
     }
+  } catch (err) {
+    console.error('failed to save the reclaimed holder signer sweep:', err);
   }
 }
 
@@ -481,25 +495,51 @@ export async function rekeyReclaimedCharacterWorldState(
  * vendor buyback, and equipped, under both `equipmentInstance` spellings), so
  * the #1145 self-signed crafting discount, Battlefield Experience attribution,
  * and the eqi inspect wire all follow the new name. A live entity/meta needs no
- * sweep: the caller's isCharacterOnline/online-session guard runs first, so
- * there is never a live one at rename time. Foreign-held copies signed with the
- * old name live in other characters' blobs or parcels and stay out of scope.
+ * sweep: the caller's isCharacterOnline/online-session guard runs first (the
+ * fast-path courtesy), and the mutation loads the latest blob under the
+ * shared offline lock before applying the lease-fenced save: a login
+ * mid-handshake or a session on a peer process holds a lease the guard cannot
+ * see, the fenced UPDATE touches nothing, and the sweep logs and moves on
+ * (the rename already committed; the blob keeps its old signers, the same
+ * unrecoverable-window class the reclaim sweep records). Foreign-held copies
+ * signed with the old name live in other characters' blobs or parcels and
+ * stay out of scope.
  *
  * Exported so BOTH rename dispatch arms share one behavior: this module's
  * renameHandler below and the retained legacy ladder arm in main.ts (the
  * API_DISPATCH=legacy rollback path), the purge/reclaim precedent above. Call
  * it only with the RETURNING row from a successful rename: a rename that
- * matched no row must never sweep a character's live blob.
+ * matched no row must never sweep a character's live blob. The level/state
+ * arguments remain for legacy dispatch compatibility but are deliberately
+ * ignored; only the freshly locked row may be read or saved.
  */
 export async function rekeyRenamedCharacterOwnSigner(
   characterId: number,
-  level: number,
-  state: CharacterState | null,
+  _level: number,
+  _state: CharacterState | null,
   oldName: string,
   newName: string,
 ): Promise<void> {
-  if (state && rekeyInstanceSigner(state, oldName, newName)) {
-    await charactersDb.saveCharacterState(characterId, level, state);
+  // Swallow-and-log exactly like the reclaim sweep above, for the same
+  // reason: both callers await this AFTER the rename committed and after
+  // the market and mail rekeys landed, with no guard of their own, so a
+  // thrown save used to surface as a 500 on a rename that had in fact
+  // happened, and the client's retry then 403s on the cleared force_rename
+  // flag. The cost of swallowing is the same bounded one the reclaim sweep
+  // records: the blob keeps its old signers with nothing to re-trigger the
+  // sweep.
+  try {
+    const landed = await charactersDb.rekeyOfflineCharacterSigner(characterId, oldName, newName);
+    if (!landed) {
+      // Both causes of the 0-row answer, named (see the reclaim sweep).
+      countOfflineFenceRefusal('rename_sweep');
+      console.error(
+        'renamed character signer sweep refused by the load lease fence (a live lease stands, or the row is gone); the blob keeps its old signers:',
+        characterId,
+      );
+    }
+  } catch (err) {
+    console.error('failed to save the renamed character signer sweep:', err);
   }
 }
 
@@ -829,9 +869,9 @@ async function renameHandler(ctx: Ctx): Promise<void> {
     if (rt.rekeyMailOwner(character.id, character.name, c.name)) {
       await rt.saveMail();
     }
-    // renameCharacter's RETURNING row carries the current blob, and the
-    // no-nonce save is safe for the same offline reason the market/mail
-    // rekeys above are: isCharacterOnline already guarantees no live session.
+    // renameCharacter's RETURNING row carries the current blob; the sweep's
+    // save is the lease-fenced offline writer, so isCharacterOnline above is
+    // the fast path and the fence is the guarantee (see the helper).
     await rekeyRenamedCharacterOwnSigner(c.id, c.level, c.state, character.name, c.name);
     json(ctx.res, 200, {
       id: c.id,

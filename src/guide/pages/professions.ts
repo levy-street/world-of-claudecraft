@@ -3,8 +3,9 @@
 // route entry, with the craft pages (professions_craft.ts), the gathering
 // pages (professions_gathering.ts), and the economy/FAQ pages
 // (professions_economy.ts / professions_faq.ts) selected by the first param.
-// The overview renders the full ten-craft ring (honest about the two
-// wave-one content-empty crafts), the four gathering professions, the ten
+// The overview renders the full ten-craft ring (every seat ships content
+// since the Masterwrought phase 06 inscription catalog), every gathering
+// profession the sim ships, the ten
 // pair-named archetypes, and the shared numbers, all from GUIDE_PROF_*
 // generated data. TRANSPARENCY POLICY: professions
 // pages publish EXACT numbers; guards in tests/guide.test.ts.
@@ -23,6 +24,7 @@ import { craftById, craftDetailHtml, craftLabel, stationLabel } from './professi
 import { economyDetailHtml } from './professions_economy';
 import { faqDetailHtml } from './professions_faq';
 import { gatheringById, gatheringDetailHtml, gatheringLabel } from './professions_gathering';
+import { provisioningDetailHtml } from './professions_provisioning';
 import type { GuidePage, PageContext } from './types';
 import { lead, paras, related } from './ui';
 
@@ -35,21 +37,32 @@ function notFoundInline(): string {
 }
 
 // ------------------------------------------------------------------ overview
-function ringSection(): string {
-  const cards = GUIDE_PROF_RING.map((c) => {
-    const cap = t('guide.professions.capFmt', { cap: formatNumber(c.maxSkill) });
-    if (!c.hasContent) {
-      return `<div class="guide-prof-card guide-prof-card-empty">
+/** The ring's card list, exported so a test can drive the content-empty card
+ *  branch with a synthetic row: since the phase 06 inscription catalog every
+ *  LIVE ring seat has content, so the empty card is unreachable from the
+ *  generated data and would otherwise be untestable retained behavior (it
+ *  stays because a future recipe-less craft seat renders through it). */
+export function ringCards(ring: readonly (typeof GUIDE_PROF_RING)[number][]): string {
+  return ring
+    .map((c) => {
+      const cap = t('guide.professions.capFmt', { cap: formatNumber(c.maxSkill) });
+      if (!c.hasContent) {
+        return `<div class="guide-prof-card guide-prof-card-empty">
           <span class="guide-prof-card-name">${esc(craftLabel(c.id))}</span>
           <span class="guide-prof-card-cap">${esc(cap)}</span>
           <span class="guide-prof-card-soon">${esc(t('guide.professions.comingSoon'))}</span>
         </div>`;
-    }
-    return `<a class="guide-prof-card" href="${esc(hrefFor(`professions/${c.id}`))}">
+      }
+      return `<a class="guide-prof-card" href="${esc(hrefFor(`professions/${c.id}`))}">
         <span class="guide-prof-card-name">${esc(craftLabel(c.id))}</span>
         <span class="guide-prof-card-cap">${esc(cap)}</span>
       </a>`;
-  }).join('');
+    })
+    .join('');
+}
+
+function ringSection(): string {
+  const cards = ringCards(GUIDE_PROF_RING);
   return `<section class="guide-block" id="prof-ring">
       <h2>${esc(t('guide.professions.ringHeading'))}</h2>
       ${paras('guide.professions.ringBody')}
@@ -133,7 +146,7 @@ function overviewHtml(): string {
       </section>
       <section class="guide-block" id="prof-curve">
         <h2>${esc(t('guide.professions.curveHeading'))}</h2>
-        ${paras('guide.professions.curveBody', { step: formatNumber(GUIDE_PROF_CURVE.tierStep) })}
+        ${paras('guide.professions.curveBodyRetunedFishing', { step: formatNumber(GUIDE_PROF_CURVE.tierStep) })}
       </section>
       <section class="guide-block" id="prof-pace">
         <h2>${esc(t('guide.professions.craftMasteryTitle'))}</h2>
@@ -142,6 +155,17 @@ function overviewHtml(): string {
       <section class="guide-block" id="prof-provenance">
         <h2>${esc(t('guide.professions.provenanceHeading'))}</h2>
         ${paras('guide.professions.provenanceBody')}
+      </section>
+      <section class="guide-block" id="prof-endgame">
+        <h2>${esc(t('guide.professions.endgameHeading'))}</h2>
+        ${paras('guide.professions.endgameBody')}
+        ${paras('guide.professions.endgamePatternsBody')}
+        ${paras('guide.professions.endgameMaterialsBodyAnyRaid')}
+      </section>
+      <section class="guide-block" id="prof-perfecting">
+        <h2>${esc(t('guide.professions.perfectingHeading'))}</h2>
+        ${paras('guide.professions.perfectingBody')}
+        ${paras('guide.professions.promotionBody')}
       </section>
       ${stationsSection()}
       <section class="guide-block" id="prof-deeds">
@@ -153,6 +177,7 @@ function overviewHtml(): string {
         ${paras('guide.professions.startBody')}
       </section>
       ${related([
+        { href: hrefFor('professions/provisioning'), key: 'guide.profPages.prov.title' },
         { href: hrefFor('professions/economy'), key: 'guide.profPages.econ.title' },
         { href: hrefFor('professions/faq'), key: 'guide.profPages.faq.title' },
         { href: hrefFor('gear'), key: 'guide.nav.gear' },
@@ -171,6 +196,7 @@ export const professions: GuidePage = {
     if (gatheringById(id)) return gatheringLabel(id);
     if (id === 'economy') return t('guide.profPages.econ.title');
     if (id === 'faq') return t('guide.profPages.faq.title');
+    if (id === 'provisioning') return t('guide.profPages.prov.title');
     return t('guide.nav.professions');
   },
   render(ctx: PageContext) {
@@ -182,6 +208,7 @@ export const professions: GuidePage = {
     if (gathering) return gatheringDetailHtml(gathering);
     if (id === 'economy') return economyDetailHtml();
     if (id === 'faq') return faqDetailHtml();
+    if (id === 'provisioning') return provisioningDetailHtml();
     return notFoundInline();
   },
 };

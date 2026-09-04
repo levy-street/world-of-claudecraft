@@ -6,6 +6,7 @@ import * as items from '../src/sim/items';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import { type Entity, type ItemDef, POTION_COOLDOWN, type SimEvent } from '../src/sim/types';
+import { adoptedTrophyIds } from './helpers/adopted_trophy_ids';
 
 // Direct tests for the extracted inventory/vendor module (W2). They call the module
 // functions with the real SimContext the Sim built in its ctor (the same seam the thin
@@ -949,21 +950,24 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     const { pid, meta } = vendorPlayer(sim);
     const ctx = ctxOf(sim);
     meta.copper = 0;
-    // wolf_fang is a crafting reagent now (quality common, never
-    // swept), so this sweep uses mudfin_scale as its gray fodder.
-    sim.addItem('mudfin_scale', 2, pid); // poor, sellValue 5 -> 10
-    sim.addItem('bandit_bandana', 1, pid); // poor, sellValue 6
+    // mudfin_scale and bandit_bandana are crafting reagents now (quality
+    // common, never swept), so this sweep uses soggy_moccasin and
+    // tangled_weed as its gray fodder.
+    sim.addItem('soggy_moccasin', 2, pid); // poor, sellValue 9 -> 18
+    sim.addItem('tangled_weed', 1, pid); // poor, sellValue 1
     sim.addItem('wolf_fang', 1, pid); // reagent (common, white) -> kept
     sim.addItem('apprentice_staff', 1, pid); // not poor -> kept
     sim.drainEvents();
 
     items.sellAllJunk(ctx, pid);
-    expect(sim.countItem('mudfin_scale', pid)).toBe(0);
-    expect(sim.countItem('bandit_bandana', pid)).toBe(0);
+    expect(sim.countItem('soggy_moccasin', pid)).toBe(0);
+    expect(sim.countItem('tangled_weed', pid)).toBe(0);
     expect(sim.countItem('wolf_fang', pid)).toBe(1);
     expect(sim.countItem('apprentice_staff', pid)).toBe(1);
-    expect(meta.copper).toBe(2 * 5 + 6); // 16
-    expect(meta.vendorBuyback.some((s) => s.itemId === 'mudfin_scale' && s.count === 2)).toBe(true);
+    expect(meta.copper).toBe(2 * 9 + 1); // 19
+    expect(meta.vendorBuyback.some((s) => s.itemId === 'soggy_moccasin' && s.count === 2)).toBe(
+      true,
+    );
     const summary = sim
       .drainEvents()
       .filter((e) => e.type === 'loot' && /^Sold \d+ junk item/.test((e as { text: string }).text));
@@ -974,7 +978,7 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     // The predicate is shared by sellAllJunk and the vendor preview in
     // hud.ts renderVendor; per-arm decisiveness here plus the source pin
     // below keep the two surfaces from ever drifting apart again.
-    const gray: ItemDef = ITEMS.mudfin_scale;
+    const gray: ItemDef = ITEMS.soggy_moccasin;
     const slot = { count: 1 };
     expect(items.junkSellableSlot(gray, slot)).toBe(true);
     expect(items.junkSellableSlot(undefined, slot)).toBe(false);
@@ -997,6 +1001,52 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
       'utf8',
     );
     expect(vendorView).toContain('junkSellableSlot(items[slot.itemId], slot)');
+  });
+
+  it('phase 11l trophy promotion holds at the sweep: promoted reagents never sell, holdouts do', () => {
+    // The seven trophy drops adopted as common TROPHY_RECIPES reagents (five
+    // promoted from poor, two already common: the cinderscale and the pelt)
+    // must be invisible to the junk sweep, exactly like wolf_fang; the two
+    // still-poor holdouts prove the sweep predicate itself stayed live.
+    // The adopted list is DERIVED from the shipped rows by the shared
+    // tests/helpers/adopted_trophy_ids.ts (every junk-kind reagent of a
+    // trophy row that no other recipe also consumes) and held equal to the
+    // literal: a de-adopted trophy (its row dropped or re-picked off it)
+    // reds here too, which the two already-common ids could never do on
+    // their own, since their sweep verdict is the same before and after
+    // adoption. The derived set ALSO reds if a non-trophy recipe starts
+    // consuming an adopted trophy (the helper's header names the fix: widen
+    // the derivation, never de-adopt). The chipped tusk left the list when
+    // the sixth fix round output-excluded it, and the bogiron nugget and the
+    // cracked fetish when the 11l QA excluded them the same way, so all three
+    // sell at the sweep again, beside the holdouts.
+    const slot = { count: 1 };
+    const adopted = [
+      'bandit_bandana',
+      'cracked_ogre_tusk',
+      'cracked_wyrm_scale',
+      'emberwing_cinderscale',
+      'mudfin_scale',
+      'old_cragmaws_pelt',
+      'tallow_candle',
+    ] as const;
+    // A do-not-shrink marker, not a pin: it compares the literal to itself
+    // and can only red when someone edits the list above. The derived
+    // equality on the next line is the pin.
+    expect(adopted).toHaveLength(7);
+    expect(adoptedTrophyIds(ITEMS)).toEqual([...adopted]);
+    for (const id of adopted) {
+      expect(items.junkSellableSlot(ITEMS[id], slot), id).toBe(false);
+    }
+    for (const id of [
+      'tangled_weed',
+      'soggy_moccasin',
+      'chipped_tusk',
+      'bogiron_nugget',
+      'cracked_fetish',
+    ] as const) {
+      expect(items.junkSellableSlot(ITEMS[id], slot), id).toBe(true);
+    }
   });
 
   it('buyBackItem repurchases via the silent add, spends copper, and clears the buyback slot', () => {
@@ -1030,7 +1080,7 @@ describe('items module determinism', () => {
       sim.addItem('wolf_fang', 3, pid);
       items.discardItem(ctx, 'wolf_fang', 1, pid);
       items.sellItem(ctx, 'wolf_fang', 1, pid);
-      sim.addItem('bandit_bandana', 1, pid);
+      sim.addItem('soggy_moccasin', 1, pid);
       items.sellAllJunk(ctx, pid);
       items.buyBackItem(ctx, 'wolf_fang', undefined, pid);
       return {

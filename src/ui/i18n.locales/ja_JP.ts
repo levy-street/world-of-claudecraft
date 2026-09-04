@@ -158,6 +158,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.legend': 'レジェンド',
   'hudChrome.discord.roleTag.shill': 'サポーター',
   'guide.profPages.gainFmt': '{reduced} / {minimal} / {zero}',
+  'guide.profPages.gainNever': 'なし',
   'guide.profPages.colWield': '使用熟練度',
   'guide.profPages.wieldNone': '制限なし',
   'guide.profPages.fish.pctFmt': '{pct}%',
@@ -253,7 +254,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.seasoned_soldier.name': '歴戦の兵',
   'entities.abilities.storm_bolt.description':
     '武器を対象に投げつけて{damage}のダメージを与え、3秒間スタンさせます。',
-  'entities.abilities.storm_bolt.name': '嵐の一投',
+  'entities.abilities.storm_bolt.name': '雷の一投',
   'entities.abilities.sudden_death.description':
     '通常攻撃に、体力に関係なく早すぎる墓を怒りコストなしで使用できるようになる確率があります。（武器）',
   'entities.abilities.sudden_death.name': '突然死',
@@ -262,7 +263,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sweeping_strikes.name': '広がる弧',
   'entities.abilities.victory_rush.description':
     '武器ダメージに{damage}を加えたダメージを与え、最大体力の20%を回復します。敵を倒してから20秒以内にのみ使用できます。',
-  'entities.abilities.victory_rush.name': '勝利の追撃',
+  'entities.abilities.victory_rush.name': '勝者の奔流',
   'hudChrome.specPanel.complexity': '複雑さ',
   'hudChrome.specPanel.complexityHigh': '高',
   'hudChrome.specPanel.complexityLow': '低',
@@ -447,7 +448,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.ice_fang_sword.look':
     '淡い氷河氷の湾曲刀、峰に並ぶ鋸歯状の霧氷結晶、樋で輝く青緑の凍結核、氷柱の鍔。',
   'hudChrome.wocStore.skins.ice_fang_sword.lore':
-    '凍結等級の象徴であり、収集家がまず手を伸ばす逸品。Ice Fangは鍛えられたのではなく、Highwatchの上にそびえるThornpeakの氷河の牙から削り出された。青緑の核はGlimmermereの反射光のように冷たく燃え、斬った空気そのものを霧氷で覆う。大雪がWyrmcultを退けた夜、兵士がこれを携え「城壁に一冬を買った」と衛兵たちは誓う。',
+    '凍結等級の象徴であり、収集家がまず手を伸ばす逸品。Ice Fangは鍛えられたのではなく、Highwatchの上にそびえるThornpeakの氷河の牙から削り出された。青緑の核はGlimmermereの反射光のように冷たく燃え、斬った空気そのものを霧氷で覆う。大雪がBroodswornを退けた夜、兵士がこれを携え「城壁に一冬を買った」と衛兵たちは誓う。',
   'hudChrome.wocStore.skins.glaciersplit_axe.name': 'グレイシャースプリット',
   'hudChrome.wocStore.skins.glaciersplit_axe.look':
     '半透明の青い氷河氷の斧頭、青緑に輝くひび割れた内部、逆立つ霜の結晶、冷気を引く柄。',
@@ -473,7 +474,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '輝く青緑の氷河氷の一本角、銀の口金から咲く白霜、かすかな冷たい霧。',
   'hudChrome.wocStore.skins.everwinter_wand.lore':
     '山の寒さが牙を持つSanctumの下の深い山湖から折り取られたという、輝く氷河氷の角。銀の口金から白霜が絶えず咲き、火にも夏にも溶けない。魔術師は術に貸す冷気ゆえ近くに置き、Nythraxisの地下墓所へ傾いて耳を澄ますような夜には、遠ざけておく。',
-  'hudChrome.wocStore.skins.winterbite.name': 'ウィンターバイト',
+  'hudChrome.wocStore.skins.winterbite.name': 'ウィンターグナウ',
   'hudChrome.wocStore.skins.winterbite.look':
     '銀鋼と青氷の弓、ライザーで輝く青緑の凍結核、つがえられた固い氷の矢、冷たい霧。',
   'hudChrome.wocStore.skins.winterbite.lore':
@@ -893,6 +894,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.core.mapMarkerLabels.cooldownLockedHerb': '枯渇した薬草、道具未解放',
   'hud.core.mapMarkerLabels.station': '製作設備：{name}',
   'hud.core.mapMarkerLabels.service': '施設：{name}',
+  'hud.core.mapMarkerLabels.farmPatch': '菜園',
   'hud.core.mapMarkerLabels.partyMember': 'パーティメンバー：{name}',
   'hud.core.mapMarkerLabels.deadPartyMember': '死亡したパーティメンバー：{name}',
   'hud.core.mapMarkerLabels.partyMemberGeneric': 'パーティメンバー',
@@ -2609,6 +2611,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.logs.soldJunkMany': '不要品{count}個を{money}で売却しました。',
   'hud.logs.keptBoundOne': 'バインド品{count}個は売らずに残しました。',
   'hud.logs.keptBoundMany': 'バインド品{count}個は売らずに残しました。',
+  'hud.logs.keptLockedOne': 'ロック中の{count}個は売らずに残しました。',
+  'hud.logs.keptLockedMany': 'ロック中の{count}個は売らずに残しました。',
   'hud.logs.friendOnline': '{name}がオンラインになりました。',
   'hud.logs.friendOffline': '{name}がオフラインになりました。',
   'hud.markers.names.star': '星',
@@ -2791,6 +2795,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.forms.bear': '熊',
   'abilityUi.forms.cat': '狼',
   'abilityUi.cast.fishing': '釣り',
+  'abilityUi.cast.farming': '種まき',
   'abilityUi.cast.gathering': '採集',
   'abilityUi.cast.thunzharrStormcall': '嵐の呼び声',
   'abilityUi.cast.demonHeal': '悪魔の治癒',
@@ -2919,9 +2924,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.material': '素材',
   'itemUi.kind.food': '食べ物',
   'itemUi.kind.drink': '飲み物',
+  'itemUi.kind.recipe': '図案',
   'itemUi.kind.tool': '道具',
   'itemUi.kind.potion': 'ポーション',
   'itemUi.kind.elixir': 'エリクサー',
+  'itemUi.kind.scroll': '巻物',
+  'itemUi.kind.flask': 'フラスコ',
   'itemUi.kind.mount': 'マウント',
   'itemUi.stats.armor': '防御力',
   'itemUi.stats.str': '筋力',
@@ -2967,11 +2975,27 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.useManaPotion':
     '使用: 即座にマナを{amount}回復します。戦闘中に使用可能。クールダウン1分。',
   'itemUi.tooltip.useElixir':
-    '使用: {stat}が{value}上昇し、{minutes}分間持続します。戦闘中に使用可能。',
+    '使用: {stat}が{value}上昇し、{minutes}分間持続します。同じ能力値の他のエリクサーや巻物の効果を上書きします。戦闘中に使用可能。',
   'itemUi.tooltip.useElixirAura':
-    '使用: {aura}の効果を得て、{minutes}分間持続します。戦闘中に使用可能。',
+    '使用: {aura}の効果を得て、{minutes}分間持続します。同種の他のエリクサーや巻物の効果を上書きします。戦闘中に使用可能。',
+  'itemUi.tooltip.flaskOnlyOne': 'フラスコの効果は同時に1つだけです。別のフラスコを飲むとこの効果を置き換えます。',
+  'itemUi.tooltip.flaskOutranks': '同じ能力値のより弱いエリクサーや巻物では上書きできません。',
+  'itemUi.tooltip.flaskUnremovable': 'この効果は解呪や強奪では取り除けず、手動で取り消すこともできません。',
+  'itemUi.tooltip.flaskThroughDeath': 'この効果は死亡しても残りますが、ログアウトすると失われます。インスタンスマッチは開始時も終了時も白紙の状態になります。',
+  'itemUi.tooltip.wellFed':
+    '満腹：食べ終えると{stat}が {value} 上昇し、{minutes} 分間持続します。満腹の効果は同時に一つだけで、新しい食事が古いものを置き換えます。',
+  'itemUi.tooltip.wellFedAura':
+    '満腹：食べ終えると{aura}を得て、{minutes} 分間持続します。満腹の効果は同時に一つだけで、新しい食事が古いものを置き換えます。',
+  'itemUi.tooltip.useFeast':
+    '使用: 他のプレイヤーも食べられる宴を広げる。1人1食まで（{servings}人前、{minutes}分間持続）。',
+  'itemUi.tooltip.useFeastBuff':
+    '1人前につき、{seconds}秒の食事を終えると{aura}の効果を得て、{stat}が{value}上昇し、{minutes}分間持続します。満腹の効果は同時に一つだけで、新しい食事が古いものを置き換えます。',
+  'itemUi.tooltip.useFeastBuffAura':
+    '1人前につき、{seconds}秒の食事を終えると{aura}の効果を得て、{minutes}分間持続します。満腹の効果は同時に一つだけで、新しい食事が古いものを置き換えます。',
   'itemUi.tooltip.clickUseInstant': 'クリックして戦闘中に即使用',
   'itemUi.tooltip.clickUse': 'クリックして使用',
+  'itemUi.tooltip.clickSetOut': 'クリックして設置',
+  'itemUi.tooltip.clickSetUp': 'クリックして設営',
   'itemUi.tooltip.clickBuyback': 'クリックして買い戻す',
   'itemUi.bags.title': 'バッグ',
   'itemUi.bags.close': 'バッグを閉じる',
@@ -3044,6 +3068,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterTypeConsumable': '消耗品',
   'itemUi.market.filterTypeMaterial': '素材',
   'itemUi.market.filterTypeCosmetic': '外見',
+  'itemUi.market.filterTypePattern': '図案',
   'itemUi.market.filterTypeOther': 'その他',
   'itemUi.market.filterArmorType': '防具の種類',
   'itemUi.market.filterArmorAll': 'すべての防具',
@@ -3555,7 +3580,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.name': '応急処置',
   'entities.abilities.revive_pet.description':
     'ペットを応急処置する。生存している場合は12秒間、3秒ごとに回復し、合計{overTime}の体力を回復する。死亡している場合は体力35%で蘇生する。',
-  'entities.abilities.holy_shock.name': 'ホーリーショック',
+  'entities.abilities.holy_shock.name': 'ライトジョルト',
   'entities.abilities.holy_shock.description':
     '聖なる力で味方を衝撃し、体力を{damage}回復します。（ホーリー特性のシグネチャ）',
   'entities.abilities.holy_shield.name': 'ホーリーシールド',
@@ -3573,7 +3598,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.combustion.name': '不死鳥のトランス',
   'entities.abilities.combustion.description':
     '15秒間、呪文クリティカル率が50%上がります。（ファイア特性のシグネチャ）',
-  'entities.abilities.icy_veins.name': 'アイシーヴェインズ',
+  'entities.abilities.icy_veins.name': 'コールドサージ',
   'entities.abilities.icy_veins.description':
     '10秒間、呪文ヘイストが30%上がり、詠唱の中断と遅延を防ぎます。（フロスト特性のシグネチャ）',
   'entities.abilities.cold_blood.name': 'コールドブラッド',
@@ -3773,7 +3798,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.ogre_war_totem.name': 'オーガ戦のトーテム',
   'entities.items.storm_core.name': '嵐の核',
   'entities.items.kazzix_heartshard.name': 'カジックスの心臓片',
-  'entities.items.wyrmcult_orders.name': 'ワーム教団の命令書',
+  'entities.items.wyrmcult_orders.name': '竜誓団の命令書',
   'entities.items.ritual_phylactery.name': '儀式の経箱',
   'entities.items.gravewyrm_sigil.name': '墓ワームの印章',
   'entities.items.blessed_embers.name': '祝福された残り火',
@@ -3794,7 +3819,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.staff_of_velkhar.name': 'ヴェルカーの杖',
   'entities.items.shadowmeld_tunic.name': '夜帳のチュニック',
   'entities.items.gravewyrm_scale_hauberk.name': '墓ワーム鱗のホーバーク',
-  'entities.items.wyrmcult_grand_robe.name': 'ワーム教団の大ローブ',
+  'entities.items.wyrmcult_grand_robe.name': '竜誓団の大ローブ',
   'entities.items.wyrmscale_jerkin.name': 'ワーム鱗のジャーキン',
   'entities.items.wyrmfang_greatblade.name': 'ワーム牙の大剣',
   'entities.items.staff_of_the_gravewyrm.name': '墓ワームの杖',
@@ -3861,7 +3886,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.tideguard_sabatons.name': '潮守りのサバトン',
   'entities.items.valeborn_spellblade.name': '谷生まれの呪文刃',
   'entities.items.voss_sanctified_mace.name': 'ヴォスの聖別メイス',
-  'entities.items.wyrmcult_soulsteps.name': 'ワーム教団の魂歩き',
+  'entities.items.wyrmcult_soulsteps.name': '竜誓団の魂歩き',
   'entities.items.wyrmshadow_harness.name': 'ナイトファングのハーネス',
   'entities.items.wyrmshadow_legguards.name': 'ナイトファングのレッグガード',
   'entities.items.wyrmshadow_treads.name': 'ナイトファングの足具',
@@ -3937,8 +3962,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.warlord_drogmar.name': '将軍ドログマー',
   'entities.mobs.stormcrag_elemental.name': 'ストームクラッグの精霊',
   'entities.mobs.shardlord_kazzix.name': '破片卿カジックス',
-  'entities.mobs.wyrmcult_zealot.name': 'ワーム教団の狂信者',
-  'entities.mobs.wyrmcult_necromancer.name': 'ワーム教団の死霊術師',
+  'entities.mobs.wyrmcult_zealot.name': '竜誓団の狂信者',
+  'entities.mobs.wyrmcult_necromancer.name': '竜誓団の死霊術師',
   'entities.mobs.boneclad_revenant.name': '骨まといの亡霊',
   'entities.mobs.crypt_shambler.name': '墓所のよろめき手',
   'entities.mobs.hollow_acolyte.name': '虚ろの侍祭',
@@ -3967,7 +3992,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sister_nhalia.name': 'シスター・ナリア',
   'entities.mobs.varkas_boneguard.name': 'ヴァーカスの骨衛兵',
   'entities.mobs.emberkin.name': 'エンバーキン',
-  'entities.mobs.gloomshade.name': 'グルームシェイド',
+  'entities.mobs.gloomshade.name': 'ダスクマーク',
   'entities.mobs.grix_the_tunnelking.name': 'トンネルキングのグリックス',
   'entities.mobs.pyre_colossus.name': 'パイアコロッサス',
   'entities.mobs.choirmother_selthe.name': '聖歌母セルセ',
@@ -4119,6 +4144,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_intro.completion':
     'どうだ？ 鉱石を採り、手にはまめができた。旅の途中でも採掘、伐採、薬草採集を続けるんだ。町へ戻ったら、市場そばのタウンフォーカス掲示板と近くの製作台も忘れるな。望むなら、どの仕事にもまっとうな稼ぎが待っている。',
   'entities.quests.q_prof_intro.objectives.0.label': '鉱脈を採掘',
+  'entities.quests.q_farm_intro.title': '最初の畝',
+  'entities.quests.q_farm_intro.text':
+    'この鍬と渓谷小麦の種をひとつまみ持っていきなさい、{playerName}。私のそばの畑のどれかに種を蒔いて、あとは自分の用事を済ませておいで。いつでも好きな時に戻って作物を収穫すればいい。私はここにいるから。',
+  'entities.quests.q_farm_intro.completion':
+    'ほら、初めての作物が自分の手の中に。留守の間も育ち続けるし、腐ることはない。収穫日誌（Shift+K、または専門技能ウィンドウの農耕の行）に、植えた畑と残り時間がすべて載っている。畑に呼ばれたら、いつでも種を買いにおいで、{playerName}。',
+  'entities.quests.q_farm_intro.objectives.0.label': '渓谷小麦を植えた',
+  'entities.quests.q_farm_intro.objectives.1.label': '渓谷小麦を収穫した',
   'entities.quests.q_wolves.title': '戸口の狼',
   'entities.quests.q_wolves.text':
     '森の狼が北の道で旅人に牙をむけています、{playerName}。8頭を討ち、イーストブルックに息をつかせてください。',
@@ -4420,7 +4452,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_crushers.objectives.0.label': 'ソーンピークの粉砕者を討伐',
   'entities.quests.q_drogmar.title': '将軍ドログマー',
   'entities.quests.q_drogmar.text':
-    'ドログマーはワーム教団の金を取り、山の目覚めへ氏族を誓わせました。{playerName}、彼が地を打つときは近くに立たないように。戦営に入り、ハイウォッチのために討ってください。',
+    'ドログマーは竜誓団の金を取り、山の目覚めへ氏族を誓わせました。{playerName}、彼が地を打つときは近くに立たないように。戦営に入り、ハイウォッチのために討ってください。',
   'entities.quests.q_drogmar.completion':
     'ドログマーは自分の野営地で死にました。あなたは壁に冬を一つ買ってくれました、{playerName}。',
   'entities.quests.q_drogmar.objectives.0.label': '将軍ドログマーを討伐',
@@ -4446,7 +4478,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '南の峰からの風が詠唱を運びます。信徒を12人沈黙させてください、{playerName}。声が止まるほど山は眠れます。',
   'entities.quests.q_zealots.completion':
     '風は静かです。{playerName}、怖いのは詠唱ではなく、何かが返しているかもしれないことです。',
-  'entities.quests.q_zealots.objectives.0.label': 'ワーム教団の狂信者を討伐',
+  'entities.quests.q_zealots.objectives.0.label': '竜誓団の狂信者を討伐',
   'entities.quests.q_cult_orders.title': '下からの命令',
   'entities.quests.q_cult_orders.text':
     '信徒は攻城前の兵のように動いています。{playerName}、8人を倒し、書かれた命令を4組持ってきてください。',
@@ -4489,7 +4521,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_voice_below.completion':
     '跪きは止まりました。声を黙らせたのではなく、合唱を薄くしただけです、{playerName}。',
   'entities.quests.q_voice_below.objectives.0.label': 'ワーム教団の狂信者を討伐',
-  'entities.quests.q_voice_below.objectives.1.label': 'ワーム教団の死霊術師を討伐',
+  'entities.quests.q_voice_below.objectives.1.label': '竜誓団の死霊術師を討伐',
   'entities.quests.q_sanctum_gate.title': '聖所の門',
   'entities.quests.q_sanctum_gate.text':
     '{playerName}、最後の敷居です。教団は聖所の要石を砕き、広場に散らしました。3片を持ち帰れば、静かに開けます。',
@@ -4595,13 +4627,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.4.label': 'ドログマーの戦営',
   'entities.zones.thornpeak_heights.pois.5.label': 'ストームクラッグ',
   'entities.zones.thornpeak_heights.pois.6.label': 'グリマーミア',
-  'entities.zones.thornpeak_heights.pois.7.label': 'ワーム教団の天幕',
+  'entities.zones.thornpeak_heights.pois.7.label': '竜誓団の天幕',
   'entities.zones.thornpeak_heights.pois.8.label': '亡霊の野',
   'entities.zones.thornpeak_heights.pois.9.label': '墓ワームの聖所',
   'entities.zones.veiled_hollow.name': 'ヴェールの幽谷',
   'entities.zones.veiled_hollow.welcome':
-    '大気は古の魔力に満ちて震えている。エルダーグリームの大樹の下で、守り手セルウィンを訪ねよ。',
-  'entities.zones.veiled_hollow.pois.0.label': 'エルダーグリーム',
+    '大気は古の魔力に満ちて震えている。エルダーシャインの大樹の下で、守り手セルウィンを訪ねよ。',
+  'entities.zones.veiled_hollow.pois.0.label': 'エルダーシャイン',
   'entities.zones.veiled_hollow.pois.1.label': 'ダスクフォール洞窟',
   'entities.zones.veiled_hollow.pois.2.label': 'ダスクフォールの見晴らし台',
   'entities.zones.veiled_hollow.pois.3.label': '長老樹の森',
@@ -4663,7 +4695,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.ice_wisp.name': 'アイスウィスプ',
   'entities.mobs.rime_elemental.name': '霧氷の精霊',
   'entities.mobs.fen_sprite.name': 'フェンスプライト',
-  'entities.mobs.frostmane_yeti.name': 'フロストメイン・イエティ',
+  'entities.mobs.frostmane_yeti.name': 'ライムメイン・イエティ',
   'entities.mobs.emberwing_drake.name': 'エンバーウィング・ドレイク',
   'entities.mobs.ashbone_raider.name': 'アッシュボーンの略奪者',
   'entities.mobs.ashbone_warcaller.name': 'アッシュボーンの戦呼び',
@@ -4671,7 +4703,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gilded_stag.name': '黄金の牡鹿',
   'entities.mobs.gloam_fox.name': 'グロームフォックス',
   'entities.mobs.orchard_treant.name': '果樹園のトレント',
-  'entities.mobs.harvest_sprite.name': 'ハーベストスプライト',
+  'entities.mobs.harvest_sprite.name': '落ち穂のスプライト',
   'entities.mobs.mere_lurker.name': '湖の潜み手',
   'entities.mobs.bogtoad.name': 'ボグトード',
   'entities.mobs.drowsy_croaker.name': 'まどろみのクローカー',
@@ -4682,18 +4714,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '夜門の先では、大気までもが夢を見ている。花明かりをたどってムーンレストへ。空に浮かぶ眠れる世界もお見逃しなく。',
   'entities.zones.nightbloom.pois.0.label': 'ムーンレスト',
   'entities.zones.nightbloom.pois.1.label': '夜の門',
-  'entities.zones.nightbloom.pois.2.label': '月の井戸',
+  'entities.zones.nightbloom.pois.2.label': '月の泉',
   'entities.zones.nightbloom.pois.3.label': '宵闇の花野',
   'entities.zones.nightbloom.pois.4.label': '見張りの石環',
   'entities.zones.nightbloom.pois.5.label': '不眠の塚',
   'entities.mobs.moonfleece_grazer.name': 'ムーンフリース',
   'entities.mobs.gloam_strider.name': 'グロームストライダー',
-  'entities.mobs.nightkin_stargazer.name': 'ナイトキンの星読み',
+  'entities.mobs.nightkin_stargazer.name': '宵闇の星読み',
   'entities.mobs.barrow_king.name': '塚の王',
   'entities.zones.wraithwood.name': 'レイスウッド',
   'entities.zones.wraithwood.welcome':
-    '梢が棺の蓋のように道の上で閉じていく。ガロウミアの灯りから離れるな。森が名前を呼んでも、決して答えるな。',
-  'entities.zones.wraithwood.pois.0.label': 'ガロウミア',
+    '梢が棺の蓋のように道の上で閉じていく。ギベットミアの灯りから離れるな。森が名前を呼んでも、決して答えるな。',
+  'entities.zones.wraithwood.pois.0.label': 'ギベットミア',
   'entities.zones.wraithwood.pois.1.label': '鴉の門',
   'entities.zones.wraithwood.pois.2.label': '寡婦の茨',
   'entities.zones.wraithwood.pois.3.label': '吊るしの林間地',
@@ -4812,7 +4844,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.loremother_bryn.greeting':
     'この谷の光はどれも何かを覚えている、{playerName}。共に耳を澄ませておくれ。',
   'entities.npcs.provisioner_fenna.name': '補給係フェンナ',
-  'entities.npcs.provisioner_fenna.title': 'エルダーグリームの補給係',
+  'entities.npcs.provisioner_fenna.title': 'エルダーシャインの補給係',
   'entities.npcs.provisioner_fenna.greeting':
     'パンはまだ温かく、水はまだ甘い。幽谷は与えてくれる。わたしもね。',
   'entities.npcs.wardsmith_orun.name': 'ワードスミス・オルン',
@@ -4962,6 +4994,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.kings_signet.name': '王の印章指輪',
   'entities.items.event_skin_token.name': '謎めいた装いの宝箱',
   'entities.items.heroic_mark.name': '英雄の証',
+  'entities.items.wyrmfall_core.name': '竜墜の核',
+  'entities.items.sundered_essence.name': '断たれし精髄',
+  'entities.items.makers_ember.name': '匠の残り火',
   'hudChrome.raidLockout.heroicName': 'ヒロイック:{name}',
   'hudChrome.raidLockout.heroicLocked': 'ヒロイックの{name}にロックされています。',
   'hudChrome.riftTracker.title': 'リフト',
@@ -4988,7 +5023,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.cryptplate_helm.name': 'クリプトプレートヘルム',
   'entities.items.shadowpulse_slippers.name': 'シャドウパルスのスリッパ',
   'entities.items.bonechill_cord.name': 'ボーンチルの帯',
-  'entities.items.mistforged_pauldrons.name': 'ミストフォージの肩当て',
+  'entities.items.mistforged_pauldrons.name': 'フォグフォージの肩当て',
   'entities.items.tideguard_faceguard.name': 'タイドガードのフェイスガード',
   'entities.items.sunken_court_mantle.name': '沈んだ宮廷のマント',
   'entities.items.lunar_choir_leggings.name': 'ルナクワイアのレギンス',
@@ -5107,7 +5142,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ハーベストスプライトよ、{playerName}。あの小さな盗人たちは、中の甘みほしさに樹液栓を幹からこじり取って、バケツを草むらに放り投げていくの。八匹追い払って、バケツを四つ取り戻してきて。そうすれば荷車はまた走り出せるわ。',
   'entities.quests.q_af_sprites_and_spigots.completion':
     'バケツ四つが掛け釘に戻って、並木も静かになった。あなたはわたしよりスプライトへの手が重いようだけれど、{playerName}、今日ばかりはそれがありがたいわ。',
-  'entities.quests.q_af_sprites_and_spigots.objectives.0.label': 'ハーベストスプライトを追い払った',
+  'entities.quests.q_af_sprites_and_spigots.objectives.0.label': '落ち穂のスプライトを追い払った',
   'entities.quests.q_af_sprites_and_spigots.objectives.1.label': '樹液採りのバケツを回収した',
   'entities.quests.q_af_the_meredark.title': 'ミアダーク',
   'entities.quests.q_af_the_meredark.text':
@@ -5288,12 +5323,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_ember_caches.completion':
     'どれもまだ温かい。この宿に、冬まるごとの慈悲を買ってくれたね、{playerName}。',
   'entities.quests.q_fv_ember_caches.objectives.0.label': '熾火の壺を回収した',
-  'entities.quests.q_fv_frostmane_tyrant.title': 'フロストメインの暴君',
+  'entities.quests.q_fv_frostmane_tyrant.title': 'ライムメインの暴君',
   'entities.quests.q_fv_frostmane_tyrant.text':
-    'ハウラーどもが段丘を下ってきたのは、狩りのためではなかった。逃げていたのだ。イエティが高地を我が物にした。山の民はフロストメインと呼ぶ。群れでさえ、あれと斜面を分かち合おうとはせん。終わらせねばならんのだ、{playerName}、冬があれをわたしの壁まで追い下ろす前に。友を連れて行け。ふたり連れて行け。',
+    'ハウラーどもが段丘を下ってきたのは、狩りのためではなかった。逃げていたのだ。イエティが高地を我が物にした。山の民はライムメインと呼ぶ。群れでさえ、あれと斜面を分かち合おうとはせん。終わらせねばならんのだ、{playerName}、冬があれをわたしの壁まで追い下ろす前に。友を連れて行け。ふたり連れて行け。',
   'entities.quests.q_fv_frostmane_tyrant.completion':
-    '昨夜、風がやんだとき、フロストメインがいたはずの場所の静けさを、村じゅうが聞いた。この果ての地は、返すのに何年もかかる借りをお前に負ったのだ、{playerName}。これをまとえ。アイスマントルの扉という扉が、お前に開かれる。',
-  'entities.quests.q_fv_frostmane_tyrant.objectives.0.label': 'フロストメインを倒した',
+    '昨夜、風がやんだとき、ライムメインがいたはずの場所の静けさを、村じゅうが聞いた。この果ての地は、返すのに何年もかかる借りをお前に負ったのだ、{playerName}。これをまとえ。アイスマントルの扉という扉が、お前に開かれる。',
+  'entities.quests.q_fv_frostmane_tyrant.objectives.0.label': 'ライムメインを倒した',
   'entities.quests.q_fv_howl_above.title': '段丘の咆哮',
   'entities.quests.q_fv_howl_above.text':
     '夕暮れに聞こえるだろう、{playerName}。咆哮のテラスから響く、スノードリフトの群れのものではない遠吠えが。もっと大きな喉だ。テラスハウラーどもが、祖母がこの持ち場を守っていた時代以来はじめて峰から下りてきた。狼どもをわたしの道へ押し出したのは奴らなのだ。八体狩って、押し返せ。',
@@ -5413,7 +5448,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_hollow_first_of_the_herd.objectives.0.label': 'アウレルホーンに安らぎを与えた',
   'entities.quests.q_hollow_old_marrowshell.title': '浅瀬の古い甲羅',
   'entities.quests.q_hollow_old_marrowshell.text':
-    'ひとつめの名はオールド・マロウシェル。エルダーグリームに門ができるより前から東の浅瀬で狩りをしてきた、荷車ほどもある蟹だ。奴は歩き回る、{playerName}。だから、その足跡に行き当たるまで岸辺を歩くしかない。ひとりで行くな。そして、奴の静けさを信じるな。',
+    'ひとつめの名はオールド・マロウシェル。エルダーシャインに門ができるより前から東の浅瀬で狩りをしてきた、荷車ほどもある蟹だ。奴は歩き回る、{playerName}。だから、その足跡に行き当たるまで岸辺を歩くしかない。ひとりで行くな。そして、奴の静けさを信じるな。',
   'entities.quests.q_hollow_old_marrowshell.completion':
     '浅瀬はまた、ただの水になった。あの甲羅がわたしより腕のいい狩人たちを砕くのを、わたしはずっと見てきたのだ、{playerName}。お前は砕かれなかった。',
   'entities.quests.q_hollow_old_marrowshell.objectives.0.label': 'オールド・マロウシェルを倒した',
@@ -5425,13 +5460,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_hollow_the_huntsman.objectives.0.label': '狩人デラルを見つけた',
   'entities.quests.q_nb_charts_of_the_stones.title': '石に刻まれた星図',
   'entities.quests.q_nb_charts_of_the_stones.text':
-    '石環の石はムーンレストより古く、石を守るナイトキンよりも古い。その面には星図が刻まれていて、わたしはそれを読むことに生涯を費やしてきた。空がずれたのだ、{playerName}。どこまでずれたのかを知らねばならん。三つの石の星図を読んで、その方位を持ち帰ってくれ。',
+    '石環の石はムーンレストより古く、石を守る宵闇の民よりも古い。その面には星図が刻まれていて、わたしはそれを読むことに生涯を費やしてきた。空がずれたのだ、{playerName}。どこまでずれたのかを知らねばならん。三つの石の星図を読んで、その方位を持ち帰ってくれ。',
   'entities.quests.q_nb_charts_of_the_stones.completion':
     'もう疑いは残っていない。どの方位も不眠の塚のほうへ這っている。まるで空そのものが、あの塚を覗き込もうと身を乗り出しているかのようだ。古き王たちが揃えられた星の下に葬られたのには、理由があるのだよ、{playerName}。',
   'entities.quests.q_nb_charts_of_the_stones.objectives.0.label': '星図を読んだ',
   'entities.quests.q_nb_eyes_on_the_vigil.title': '石環を見つめる目',
   'entities.quests.q_nb_eyes_on_the_vigil.text':
-    '何かがストライダーたちを大胆にさせ、群れを落ち着かなくさせている、{playerName}。それを、わたしは花からは読み取れない。カシアンなら空から読める。彼はここから東、ナイトキンが石々の間を漂う見張りの石環のそばに、観測の野営を構えているの。彼を見つけて、星が何を語っているのか尋ねてきて。',
+    '何かがストライダーたちを大胆にさせ、群れを落ち着かなくさせている、{playerName}。それを、わたしは花からは読み取れない。カシアンなら空から読める。彼はここから東、宵闇の民が石々の間を漂う見張りの石環のそばに、観測の野営を構えているの。彼を見つけて、星が何を語っているのか尋ねてきて。',
   'entities.quests.q_nb_eyes_on_the_vigil.completion':
     'リラの遣いか？なら、庭々もそれを感じているのだな。しばし、遠眼鏡のそばに座りたまえ、{playerName}。星々はこのひと月ずっと落ち着かず、わたしの引く星図はどれも、北の塚のほうへ傾いていくのだ。',
   'entities.quests.q_nb_eyes_on_the_vigil.objectives.0.label':
@@ -5466,7 +5501,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nb_the_barrow_king.text':
     'すべての方位、すべての落ち着かない星、すべての開いた塚が、ひとつのことを指している。塚の王が大塚の下で目覚めつつあり、この国には彼を押しとどめる夜明けがない。彼が己の王冠を思い出す前に、眠りへ帰さねばならんのだ、{playerName}。ひとりで行くな。友を連れ、花明かりを背にして戦え。',
   'entities.quests.q_nb_the_barrow_king.completion':
-    'ひと季節ぶりに、星々がはじめて静まった、{playerName}。塚は閉じ、ナイトキンは石のそばで動きを止め、王は再び下で眠っている。このマントをまとうといい。夜がついに信を置いた者のために、ムーンレストが裁ったものだ。',
+    'ひと季節ぶりに、星々がはじめて静まった、{playerName}。塚は閉じ、宵闇の民は石のそばで動きを止め、王は再び下で眠っている。このマントをまとうといい。夜がついに信を置いた者のために、ムーンレストが裁ったものだ。',
   'entities.quests.q_nb_the_barrow_king.objectives.0.label': '塚の王を眠りに帰した',
   'entities.quests.q_nb_wool_by_moonlight.title': '月明かりの羊毛',
   'entities.quests.q_nb_wool_by_moonlight.text':
@@ -5513,10 +5548,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '航海士スリをドリフトヘイヴンまで送り届けた',
   'entities.quests.q_pr_the_man_who_went_in.title': '奥へ入った男',
   'entities.quests.q_pr_the_man_who_went_in.text':
-    '潜り手たちは木々の際から先へは踏み込まない、{playerName}。わたしも頼みはしない。太鼓はもう聞いただろう。二晩目までには、誰もが聞く。あの音へ向かって歩き、戻ってきた者はこの島にひとりしかいない。オックだ。彼は絡みの道を深く上った蔓垂の森の、大きな榕樹の下に野営している。彼を見つけて、緑が何を隠しているのか尋ねておいで。',
+    '潜り手たちは木々の際から先へは踏み込まない、{playerName}。わたしも頼みはしない。太鼓はもう聞いただろう。二晩目までには、誰もが聞く。あの音へ向かって歩き、戻ってきた者はこの島にひとりしかいない。オクリムだ。彼は絡みの道を深く上った蔓垂の森の、大きな榕樹の下に野営している。彼を見つけて、緑が何を隠しているのか尋ねておいで。',
   'entities.quests.q_pr_the_man_who_went_in.completion':
     'イーシャの遣いだと？パールマザーがわたしの名を口にするのは何年ぶりか。蔓の届かないところへお座り、{playerName}。知っていることを話そう。太鼓は危険ではない。太鼓は、警告なのだ。',
-  'entities.quests.q_pr_the_man_who_went_in.objectives.0.label': '蔓垂の森でオックを見つけた',
+  'entities.quests.q_pr_the_man_who_went_in.objectives.0.label': '蔓垂の森でオクリムを見つけた',
   'entities.quests.q_pr_what_the_drums_guard.title': '太鼓が守るもの',
   'entities.quests.q_pr_what_the_drums_guard.text':
     '生きた人間に許される限りのところまで、沈んだ神像に近づいてみた。見えたものはふたつ。ウィーバーどもが神像への道を糸の帳で覆っていたこと。そして、道沿いの古い供物鉢が、再び満たされていたことだ。それも新しく、だ、{playerName}。道からウィーバーを八体払い、供物を三つ持ってきてくれ。死んだ神に今も餌をやる手が誰のものか、知っておきたい。',
@@ -5580,15 +5615,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_wf_witch_of_willowweep.completion':
     'アルデンがわざわざ、いびきのことを訊きに人を寄越したのかい？なら橋の民もようやく耳を傾け始めたんだね。湿気を避けてお座り、{playerName}。あの音には名前があり、喉がある。そしてわたしは、あれを静める手伝いをしてくれる馬鹿者を、ずっと待っていたのさ。',
   'entities.quests.q_wf_witch_of_willowweep.objectives.0.label': 'マザー・セッジを見つけた',
-  'entities.quests.q_ww_bells_of_gallowmere.title': 'ガロウミアの鐘',
+  'entities.quests.q_ww_bells_of_gallowmere.title': 'ギベットミアの鐘',
   'entities.quests.q_ww_bells_of_gallowmere.text':
-    'あの鐘の音が聞こえるか、{playerName}？あれがガロウミアだ。北の道の先で、死者たちを眠りへと撞き送っている。堂守マロウが、この梢の下のすべての魂を数えている。生きている者も、葬られた者もな。行って、数えられてこい。森のほうがお前を数えてしまう前に。',
+    'あの鐘の音が聞こえるか、{playerName}？あれがギベットミアだ。北の道の先で、死者たちを眠りへと撞き送っている。堂守マロウが、この梢の下のすべての魂を数えている。生きている者も、葬られた者もな。行って、数えられてこい。森のほうがお前を数えてしまう前に。',
   'entities.quests.q_ww_bells_of_gallowmere.completion':
-    'コッブはお前を無事に道へ送り出したか。良い男だ。三十年あの門のランタンを灯し続けて、森は一度も彼を出し抜けなかった。ようこそガロウミアへ、{playerName}。鐘には気をつけてな。',
+    'コッブはお前を無事に道へ送り出したか。良い男だ。三十年あの門のランタンを灯し続けて、森は一度も彼を出し抜けなかった。ようこそギベットミアへ、{playerName}。鐘には気をつけてな。',
   'entities.quests.q_ww_bells_of_gallowmere.objectives.0.label': '堂守マロウに報告した',
   'entities.quests.q_ww_candles_at_the_bounds.title': '境界の蝋燭',
   'entities.quests.q_ww_candles_at_the_bounds.text':
-    'ガロウミアの周りには四つの境界石が立っている、{playerName}。外へ出る道の一本ごとにひとつ、そしてどの石の上でも墓前の蝋燭が燃えている。あれが燃えている限り、葬られた者は葬られたままでいる。その四つすべてが、霧雨に消されてしまった。わたしはもう、ひとりで境界を歩ける歳ではない。わたしの付け木を持って、急ぎ、灯し直してきてくれ。',
+    'ギベットミアの周りには四つの境界石が立っている、{playerName}。外へ出る道の一本ごとにひとつ、そしてどの石の上でも墓前の蝋燭が燃えている。あれが燃えている限り、葬られた者は葬られたままでいる。その四つすべてが、霧雨に消されてしまった。わたしはもう、ひとりで境界を歩ける歳ではない。わたしの付け木を持って、急ぎ、灯し直してきてくれ。',
   'entities.quests.q_ww_candles_at_the_bounds.completion':
     '四つとも燃えているか？なら息をつけ、{playerName}。お前には聞こえなかったろうが、村じゅうが聞いたのだ。最後の灯芯に火が入った瞬間、鐘の鳴りが軽くなったのを。',
   'entities.quests.q_ww_candles_at_the_bounds.objectives.0.label': '墓前の蝋燭を灯し直した',
@@ -5596,7 +5631,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ww_horn_of_the_huntsman.text':
     'もう角笛は聞いただろう、{playerName}。細く、遠く、森全体が息を潜めるあの音だ。蒼白の狩人はここから北の広場で馬を駆っており、彼が通り過ぎるたび、墓は浅くなっていく。彼もかつては人だった。そして、誤ったやり方で葬られた。祈りで済むふりは、もう終わりにする。友をひとり、ふたり連れて、彼を馬から引きずり下ろせ。',
   'entities.quests.q_ww_horn_of_the_huntsman.completion':
-    '角笛が、音の途中で止まった。ガロウミアの鐘という鐘がひとりでに一度鳴り、それから森は、この三十年で聞いたことのないほど静かになった。わたしにできなかった儀式を、お前が果たしたのだ、{playerName}。これをまとい、梢の下を恐れず歩くがいい。',
+    '角笛が、音の途中で止まった。ギベットミアの鐘という鐘がひとりでに一度鳴り、それから森は、この三十年で聞いたことのないほど静かになった。わたしにできなかった儀式を、お前が果たしたのだ、{playerName}。これをまとい、梢の下を恐れず歩くがいい。',
   'entities.quests.q_ww_horn_of_the_huntsman.objectives.0.label': '蒼白の狩人を馬から落とした',
   'entities.quests.q_ww_silk_in_the_eaves.title': '軒先の絹糸',
   'entities.quests.q_ww_silk_in_the_eaves.text':
@@ -5614,12 +5649,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ww_walking_mosley_home.text':
     'うちの墓掘りモズリーが三日前、古い墓地に墓穴を開けに礼拝堂の道を行ったのだが、掘った穴が上から崩れてきた。自力で這い出した。馬鹿者は生きている。だが礼拝堂の墓のそばでうずくまったきり、道のスピナーが怖くて動けんのだ。家まで歩かせてやってくれ、{playerName}。生きている男のために鐘を鳴らすわけにはいかんのでな。',
   'entities.quests.q_ww_walking_mosley_home.completion':
-    '自分の両足で門をくぐってきたよ。これからはカブの床より深い穴は掘らないと誓いながらな。日曜までには墓地へ戻っているさ、ああいう手合いはいつもそうだ。ありがとう、{playerName}。ガロウミアは己の民を手放さない。それがわたしたちの掟のすべてだ。',
+    '自分の両足で門をくぐってきたよ。これからはカブの床より深い穴は掘らないと誓いながらな。日曜までには墓地へ戻っているさ、ああいう手合いはいつもそうだ。ありがとう、{playerName}。ギベットミアは己の民を手放さない。それがわたしたちの掟のすべてだ。',
   'entities.quests.q_ww_walking_mosley_home.objectives.0.label':
-    '墓掘りモズリーをガロウミアまで送り届けた',
+    '墓掘りモズリーをギベットミアまで送り届けた',
   'entities.quests.q_ww_what_the_bark_holds.title': '樹皮が抱えるもの',
   'entities.quests.q_ww_what_the_bark_holds.text':
-    'ガロウミアの東の吊るしの林間地では、スピナーどもが絹に包んだ死者を枝から吊るし、その下ではグレイヴンバークどもが、辛抱強い棺担ぎのように見張りに立っている。あの上にあるのは、わたしたちの民なのだ、{playerName}。グレイヴンバークを五体砕き、包まれた死者を三体切り下ろして、土へ帰してやってくれ。',
+    'ギベットミアの東の吊るしの林間地では、スピナーどもが絹に包んだ死者を枝から吊るし、その下ではグレイヴンバークどもが、辛抱強い棺担ぎのように見張りに立っている。あの上にあるのは、わたしたちの民なのだ、{playerName}。グレイヴンバークを五体砕き、包まれた死者を三体切り下ろして、土へ帰してやってくれ。',
   'entities.quests.q_ww_what_the_bark_holds.completion':
     '日暮れ前に、三つの魂がまっとうな土の下へ戻った。グレイヴンバークどもはまた生えてくるだろう。樹皮とはそういうものだ。だが今夜、あの林間地には何も吊るされていない。それで十分だ。',
   'entities.quests.q_ww_what_the_bark_holds.objectives.0.label': 'グレイヴンバークを打ち倒した',
@@ -5683,6 +5718,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.raw_marsh_pike.name': '生の沼カワカマス',
   'entities.items.raw_river_perch.name': '生の川スズキ',
   'entities.items.raw_stonescale_carp.name': '生の石鰭コイ',
+  'entities.items.raw_deepbarb_catfish.name': '生の深棘ナマズ',
+  'entities.items.raw_hollowgill_sturgeon.name': '生の空エラチョウザメ',
+  'entities.items.raw_stillmere_salmon.name': '生の静湖サケ',
+  'entities.items.clockreel_fishing_rod.name': '歯車リールの釣り竿',
+  'entities.items.peppered_deepbarb_catfish.name': '深棘ナマズの胡椒焼き',
+  'entities.items.roast_hollowgill_sturgeon.name': '空エラチョウザメのロースト',
+  'entities.items.pattern_peppered_deepbarb_catfish.name': 'レシピ：深棘ナマズの胡椒焼き',
+  'entities.items.pattern_roast_hollowgill_sturgeon.name': 'レシピ：空エラチョウザメのロースト',
+  'entities.items.pattern_clockreel_fishing_rod.name': '設計図：歯車リールの釣り竿',
   'entities.items.soggy_boot.name': 'ずぶ濡れのブーツ',
   'entities.items.elixir_of_the_bear.name': '熊のエリクサー',
   'entities.items.healing_potion.name': '回復のポーション',
@@ -6514,6 +6558,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.controls.leaderboard': 'リーダーボード',
   'guide.controls.deeds': '功績の書',
   'guide.controls.reliquary': '聖遺物庫',
+  'guide.controls.harvestJournal': '収穫日誌',
   'guide.controls.sheathe': '武器を納刀/抜刀',
   'guide.controls.crafting': '製作',
   'guide.controls.mount': '騎乗 / 降車',
@@ -7149,6 +7194,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.gear.soulboundBody':
     '価値ある品の多くは魂縛、つまり入手した瞬間からあなたのキャラクターに縛られています。魂縛のアイテムは取引にも郵送にも出せず、商人に売ることも、マーケットに出品することもできません。それはもうあなたの物語の一部であり、ほかの誰かが代わりに持ち運ぶことはできないのです。',
   'guide.gear.uniqueTitle': '装備ユニーク：同じレジェンダリーは1つだけ',
+  'guide.gear.masterwroughtTitle': '名匠鍛造：クラフトの頂点',
+  'guide.gear.masterwroughtBodyLegendary':
+    '最高級のクラフト装備のツールチップには、金色の「装備ユニーク：名匠鍛造」タグが付きます。これらは生産職の頂点であり、希少な素材から名匠の手で作られ、他のクラフト品と同じく市場で自由に取引でき、最深部のダンジョンの財宝と肩を並べます。タグが示すのはひとつの共通ルール：キャラクターが同時に装備できる名匠鍛造の品は、どのクラフト由来かを問わず最大2つまで。ビルドに最も役立つ2つの部位を選びましょう。この決まりには、一族の頂のための一行が加わります：名匠鍛造の品を完全化した持ち主は、自ら名を付けた伝説の品へと昇格させられます（その道のりは生産職のページが語ります）。そして装備できる2つのうち、伝説の名匠鍛造の品は最大1つまでです。',
+  'guide.gear.masterwroughtBody': '最高級のクラフト装備のツールチップには、金色の「装備ユニーク：名匠鍛造」タグが付きます。これらは生産職の頂点であり、希少な素材から名匠の手で作られ、他のクラフト品と同じく市場で自由に取引でき、最深部のダンジョンの財宝と肩を並べます。タグが示すのはひとつの共通ルール：キャラクターが同時に装備できる名匠鍛造の品は、どのクラフト由来かを問わず最大2つまで。ビルドに最も役立つ2つの部位を選びましょう。',
   'guide.gear.uniqueBody':
     'レジェンダリーアイテムは装備ユニークです。キャラクターは同じレジェンダリーを同時に1つしか装備できず、そのヒロイック版も同じアイテムとして扱われます。2つ目はバッグや銀行、マーケットに置けますが、両方を同時に装備しようとすると拒否されます。ツールチップには金色の「装備ユニーク」タグが表示されるので、2つ持ちのビルドを計画する前にこのルールを確認できます。',
   'guide.gear.soulboundTitle': '魂縛：あなただけのもの',
@@ -7375,17 +7424,17 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.peaksGreeting':
     'この壁は二百年立ち続けてきた。私が守る限り崩れはしないが、軋んでいる。',
   'guide.worldPage.peaksPlaceNotes':
-    'ハイウォッチは壁を守っています。ストーカー尾根とディープロックの巣穴は尾根猫と穴掘りのもの、オーガの丘陵とドログマーの戦営は雇われの荒くれ者のもの。ストームクラグはエレメンタルで弾け、その下にはグリマーミアが輝きます。その岸辺には、溺れし神殿へと下る蒼白い光の門があります。ワームカルトのテントとレヴェナントの野原がカルトの高所を囲み、その頂には墓ワームの聖所があります。',
+    'ハイウォッチは壁を守っています。ストーカー尾根とディープロックの巣穴は尾根猫と穴掘りのもの、オーガの丘陵とドログマーの戦営は雇われの荒くれ者のもの。ストームクラグはエレメンタルで弾け、その下にはグリマーミアが輝きます。その岸辺には、溺れし神殿へと下る蒼白い光の門があります。竜誓団のテントとレヴェナントの野原がカルトの高所を囲み、その頂には墓ワームの聖所があります。',
   'guide.worldPage.duskGreeting':
     'そなたの同族でこの枝の下に立った者は少ない。静かに歩み、歓迎を受けるがよい。',
-  'guide.worldPage.duskGreeter': '守り手セルウィン、エルダーグリーム',
+  'guide.worldPage.duskGreeter': '守り手セルウィン、エルダーシャイン',
   'guide.worldPage.duskPlaceNotes':
-    'エルダーグリームは大樹の下に集う。ダスクフォール洞窟とその見晴らし台が入り口であり、谷を初めて望む場所でもある。長老樹の森と星降りの盆地は静かな南を守り、沈んだ宮廷は東で草に覆われた遺跡を抱え、輝きの深みと水晶の浅瀬は北で淡く光る。',
+    'エルダーシャインは大樹の下に集う。ダスクフォール洞窟とその見晴らし台が入り口であり、谷を初めて望む場所でもある。長老樹の森と星降りの盆地は静かな南を守り、沈んだ宮廷は東で草に覆われた遺跡を抱え、輝きの深みと水晶の浅瀬は北で淡く光る。',
   'guide.family.demon.name': 'デーモン',
   'guide.family.demon.desc':
     '裂け目の彼方から来た侵略者たち。その身は炎と悪意のかたまりです。一体がいるところ、次元の裂け目は決して遠くありません。',
   'guide.worldPage.duskBlurb':
-    'エルダーグリームの大樹の下に広がる、永遠の黄昏に沈む谷。水晶の遺跡が輝き、大気は古の魔力に満ちて震えています。',
+    'エルダーシャインの大樹の下に広がる、永遠の黄昏に沈む谷。水晶の遺跡が輝き、大気は古の魔力に満ちて震えています。',
   'guide.worldPage.emberBlurb':
     '嵐の光に照らされた灰と血硝子の荒れ地。カルデラの上空をドレイクが旋回し、砂丘のあいだにはトロルの篝火が燃えています。門の町ワームウォッチから見張られています。',
   'guide.worldPage.frostBlurb':
@@ -7397,7 +7446,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.nightBlurb':
     '星降る真夜中のレルム。花々が小道を照らし、ムーンレストは夢見る空の下で静かな見張りを続けています。',
   'guide.worldPage.hauntBlurb':
-    '巨大な樹冠に覆われた呪われた森。街道でまともな光といえば、ギャロウミアのランタンだけです。',
+    '巨大な樹冠に覆われた呪われた森。街道でまともな光といえば、ギベットミアのランタンだけです。',
   'guide.worldPage.galeBlurb':
     '風のやむことのない海崖と咆哮の丘陵。古き烽火台の火は決して消えず、ウィックハーバーは扉を固く閉ざしています。',
   'guide.worldPage.jungleBlurb':
@@ -7421,7 +7470,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.nightGreeter': '不寝番の守り手、ムーンレスト',
   'guide.worldPage.hauntGreeting':
     'ランタンのそばを離れるな、旅人よ。それから、道の外から森がお前の名を呼んでも、決して答えるな。',
-  'guide.worldPage.hauntGreeter': '点灯夫、ギャロウミア',
+  'guide.worldPage.hauntGreeter': '点灯夫、ギベットミア',
   'guide.worldPage.galeGreeting':
     'ここでは風は一度たりともやんだことがなく、古き烽火台の火は一度たりとも消えたことがない。宿の扉はしっかり閉めてくれ。',
   'guide.worldPage.galeGreeter': '烽火の番人、ウィックハーバー',
@@ -7442,7 +7491,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.nightPlaceNotes':
     'ムーンレストは見張りを続けています。ナイトゲートは真夜中の国への入り口。月の泉にはそばに立てるほど近くに星明かりが湛えられ、宵闇の野は暗がりの中で花開きます。不動の見張りは微動だにせず見つめ続け、眠らずの塚はこの地でただ一つ、決して夢を見ない場所です。',
   'guide.worldPage.hauntPlaceNotes':
-    'ギャロウミアはランタンの内側に身を寄せ合っています。鴉の門は森の陰気な玄関口。寡婦蜘蛛の茂みは蜘蛛の糸が厚く張られています。首吊りの林間と嘆き石の礼拝堂は森の最も古い悲しみを抱え、狩人の空き地は、今もそこで狩りを続ける何者かのものです。',
+    'ギベットミアはランタンの内側に身を寄せ合っています。鴉の門は森の陰気な玄関口。寡婦蜘蛛の茂みは蜘蛛の糸が厚く張られています。首吊りの林間と嘆き石の礼拝堂は森の最も古い悲しみを抱え、狩人の空き地は、今もそこで狩りを続ける何者かのものです。',
   'guide.worldPage.galePlaceNotes':
     'ウィックハーバーは風に身を傾けています。風の道は崖沿いの入り口の道。咆哮の丘陵は強風の下、木一本なくうねっています。古き烽火台は誰も知らぬ昔から燃え続け、断ち崖は水面まで垂直に落ち込み、難破船の野はこの海岸の油断ならなさを物語ります。そして鏡の山湖は、このレルムでただ一つ静止しているものです。',
   'guide.worldPage.junglePlaceNotes':
@@ -7469,7 +7518,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.reliquary_shoulder.name': '崩れた肩当て',
   'entities.items.reliquary_gloves_rog.name': '骨守りの手甲',
   'entities.items.deacon_reliquary_helm.name': '助祭の聖遺物庫の兜',
-  'entities.items.varric_shadow_cowl.name': 'ヴァリックの影のフード',
+  'entities.items.varric_shadow_cowl.name': 'ヴァンドリックの影のフード',
   'entities.items.duskwisp_essence.name': 'ダスクウィスプの精髄',
   'entities.items.spore_heart.name': '胞子の心臓',
   'entities.items.gleaming_antler.name': '輝く鹿角',
@@ -7491,7 +7540,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.nightweave_tunic.name': '夜織りのチュニック',
   'entities.items.veilcloth_robe.name': 'ヴェール布のローブ',
   'entities.mobs.acolyte_tessa.name': '侍祭テッサ',
-  'entities.mobs.deacon_varric.name': '助祭ヴァリック',
+  'entities.mobs.deacon_varric.name': '助祭ヴァンドリック',
   'entities.mobs.reliquary_bonewalker.name': '蘇りし骨歩き',
   'entities.mobs.reliquary_funeral_ringer.name': '葬儀の鐘鳴らし',
   'entities.mobs.reliquary_gravecall_acolyte.name': '墓呼びの侍祭',
@@ -7526,22 +7575,22 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'delveUi.board.tier.heroic': 'ヒロイック',
   'delveUi.board.tier.normal': 'ノーマル',
   'delveUi.board.title': 'デルヴボード',
-  'delveUi.boss.varric.bell.emote': '助祭ヴァリックが埋もれた鐘を両手で握りしめる!',
+  'delveUi.boss.varric.bell.emote': '助祭ヴァンドリックが埋もれた鐘を両手で握りしめる!',
   'delveUi.boss.varric.bell.impact': '鐘の音が広間の床を砕く!',
   'delveUi.boss.varric.bell.lesson': '鐘の弔鐘。12秒ごとに地面を叩きつける。着弾する前に離れろ。',
-  'delveUi.boss.varric.bell.log': '助祭ヴァリックが埋葬の鐘を鳴らし始める。',
-  'delveUi.boss.varric.bell.warning': '助祭ヴァリックから離れろ!',
+  'delveUi.boss.varric.bell.log': '助祭ヴァンドリックが埋葬の鐘を鳴らし始める。',
+  'delveUi.boss.varric.bell.warning': '助祭ヴァンドリックから離れろ!',
   'delveUi.boss.varric.defeat': 'そんな……名簿は揃っていたのに……すべて揃っていたのに……',
   'delveUi.boss.varric.intro': '失われた魂などない。ただ置き忘れられただけだ。',
   'delveUi.boss.varric.mid30': '埋葬の鐘が、彼が口にするすべての名に応える。',
-  'delveUi.boss.varric.mid60': '助祭ヴァリックは震える勝ち誇りとともに台帳から名を読み上げる。',
+  'delveUi.boss.varric.mid60': '助祭ヴァンドリックは震える勝ち誇りとともに台帳から名を読み上げる。',
   'delveUi.boss.varric.pull': '汚れた目的で聖なる塵を踏むか。跪き、名を数えられよ。',
-  'delveUi.boss.varric.raise.emote': '助祭ヴァリックが砕けた墓から名を呼ぶ!',
-  'delveUi.boss.varric.raise.interrupt_fail': '死者が助祭ヴァリックの呼び声に応える!',
+  'delveUi.boss.varric.raise.emote': '助祭ヴァンドリックが砕けた墓から名を呼ぶ!',
+  'delveUi.boss.varric.raise.interrupt_fail': '死者が助祭ヴァンドリックの呼び声に応える!',
   'delveUi.boss.varric.raise.interrupt_ok': '墓の儀式が乱れる。',
   'delveUi.boss.varric.raise.lesson':
     '5秒以内に砕けた墓を妨害しなければ、死者が彼の呼び声に応えて立ち上がる。',
-  'delveUi.boss.varric.raise.log': '助祭ヴァリックが死者蘇生を唱え始める。',
+  'delveUi.boss.varric.raise.log': '助祭ヴァンドリックが死者蘇生を唱え始める。',
   'delveUi.boss.varric.raise.object': '砕けた墓が奪われた息吹で震える。',
   'delveUi.boss.varric.raise.warning': '墓の儀式を止めろ!',
   'delveUi.chest.flavor': '死者たちが、譲れるものを差し出した。',
@@ -8235,6 +8284,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wyrmshadow.bonus6': '攻撃速度と詠唱速度が4%、命中が3%上昇します。武器のクリティカルヒットで「裂けた傷」を与え、対象に2秒ごとに4ダメージの出血を12秒間与えます。最大3回まで累積します。',
   'hudChrome.itemSoulbound': '魂縛',
   'hudChrome.itemUniqueEquipped': '装備ユニーク',
+  'hudChrome.itemMasterwrought': '装備ユニーク：名匠鍛造（{count}）',
+  'hudChrome.masterwrought.slotsLabel': '名匠鍛造スロット：',
+  'hudChrome.masterwrought.pieceMark': '名匠鍛造',
+  'hudChrome.masterwrought.tooltipWorn': '名匠鍛造スロットを1つ使用（{used}/{cap}使用中）。',
+  'hudChrome.masterwrought.tooltipAtCap': 'あなたの名匠鍛造スロット{cap}枠はすべて使用中です。',
+  'hudChrome.masterwrought.tooltipLegendaryLimit':
+    '伝説の名匠鍛造の品は{cap}つまでしか装備できません。',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemProc.onMeleeHit': '命中時に確率（{chance}%）：{effect}',
   'hudChrome.itemProc.onSpellDamage': 'ダメージ呪文で確率（{chance}%）：{effect}',
@@ -8382,6 +8438,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.insufficientMaterials': '材料が不足しています。',
   'hudChrome.crafting.reagentLocked': 'その素材はロックされています。',
   'hudChrome.crafting.unknownRecipe': 'そのレシピは存在しません。',
+  'hudChrome.crafting.dailyLimit': 'それは1日に1回しか製作できません。',
+  'hudChrome.crafting.dailyLimitRetry':
+    'それは1日に1回しか製作できません。{duration}後に再び製作できます。',
   'hudChrome.crafting.comboRequires': '調律条件：{craftA} + {craftB}、ティア {tier}。',
   'hudChrome.crafting.comboMet': '準備完了。',
   'hudChrome.crafting.comboSyncing': 'サーバーの調律状態を確認しています。',
@@ -9266,6 +9325,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.takeParcelsFirst': '手紙を捨てる前に小包を取り出してください。',
   'worldContent.mailboxName': 'メールボックス',
   'worldContent.noticeboardName': '掲示板',
+  'worldContent.farmPatchName': '菜園',
   'entities.letters.ravenpost_welcome.sender': 'レイヴンポスト',
   'entities.letters.ravenpost_welcome.subject': 'ワタリガラスはあなたのために飛ぶ',
   'entities.letters.ravenpost_welcome.body':
@@ -9286,6 +9346,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.letters.heroic_marks_reward.subject': 'あなたの英雄の印',
   'entities.letters.heroic_marks_reward.body':
     'あなたが後方で、あるいは倒れて戦っている間に、あなたの部隊が英雄級の試練を突破しました。ロックアウトは同じように科されたので、あなたの分の英雄の印は失われることなく、ここへ飛んできました。大切に使ってください。\n\n- 英雄級補給官',
+  'entities.letters.wyrmfall_core_reward.sender': '英雄級補給官',
+  'entities.letters.wyrmfall_core_reward.subject': 'あなたの竜墜の核',
+  'entities.letters.wyrmfall_core_reward.body':
+    'あなたが後方で、あるいは倒れて戦っている間に、あの巨獣は討ち取られました。あなたの分の竜墜の核は、漁り屋の手に渡ることなく、ここへ飛んできました。作業台で役立ててください。\n\n- 英雄級補給官',
   'entities.letters.guild_trend_engineering_alchemy.sender': '製作ギルド',
   'entities.letters.guild_trend_engineering_alchemy.subject': '工作と錬金術の腕前について',
   'entities.letters.guild_trend_engineering_alchemy.body':
@@ -9724,6 +9788,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.logging': '伐採',
   'hudChrome.gathering.herbalism': '薬草学',
   'hudChrome.gathering.fishing': '釣り',
+  'hudChrome.gathering.farming': '農耕',
   'hudChrome.gathering.notReady': 'この資源ノードはまだあなたのために再生していません。',
   'hudChrome.gathering.gatherLine': '{name}を採集した。',
   'hudChrome.gathering.gatherLineQty': '{name}を{qty}個採集した。',
@@ -9740,6 +9805,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.tierRequired.mining': 'ティア{tier}の採掘ピッケルが必要',
   'hudChrome.gathering.tierRequired.logging': 'ティア{tier}の伐採斧が必要',
   'hudChrome.gathering.tierRequired.herbalism': 'ティア{tier}の薬草鎌が必要',
+  'hudChrome.gathering.tierRequired.farming': 'ティア{tier}の農耕鍬が必要',
   'hudChrome.gathering.toolTierUnmet.mining':
     'この鉱脈を採掘するにはティア{tier}の採掘ピッケルが必要です。',
   'hudChrome.gathering.toolTierUnmet.logging':
@@ -9747,6 +9813,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTierUnmet.herbalism':
     'この群生地を採取するにはティア{tier}の薬草鎌が必要です。',
   'hudChrome.gathering.toolTierUnmet.fishing': 'この水域で釣るにはティア{tier}の釣り竿が必要です。',
+  'hudChrome.gathering.toolTierUnmet.farming':
+    'この作物畑を耕すにはティア{tier}の農耕鍬が必要です。',
   'hudChrome.gathering.toolTierUnmetCorpse':
     '最高の素材を回収するにはティア{tier}の採集道具が必要です。',
   'hudChrome.gathering.wieldUnmet.mining':
@@ -9754,6 +9822,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.wieldUnmet.logging': 'バッグにある伐採斧を振るうには伐採{skill}が必要です。',
   'hudChrome.gathering.wieldUnmet.herbalism':
     'バッグにある薬草鎌を扱うには薬草学{skill}が必要です。',
+  'hudChrome.gathering.wieldUnmet.farming': 'バッグにある農耕鍬を振るうには農耕{skill}が必要です。',
   'hudChrome.gathering.wieldUnmetCorpse': '最高の道具を使いこなすには採集スキル{skill}が必要です。',
   'hudChrome.gathering.requiresTool.mining': '採掘ピッケルが必要',
   'hudChrome.gathering.requiresTool.logging': '伐採斧が必要',
@@ -9762,21 +9831,27 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolRequired.logging': 'この立木を伐り倒すには伐採斧が必要です。',
   'hudChrome.gathering.toolRequired.herbalism': 'この群生地を採取するには薬草鎌が必要です。',
   'hudChrome.gathering.toolRequired.fishing': '釣り糸を垂らすには釣り竿が必要です。',
+  'hudChrome.gathering.toolRequired.farming': 'この作物畑を耕すには農耕鍬が必要です。',
   'hudChrome.gathering.noNodeNearby.mining': '手の届く範囲に鉱脈がありません。',
   'hudChrome.gathering.noNodeNearby.logging': '手の届く範囲に立木がありません。',
   'hudChrome.gathering.noNodeNearby.herbalism': '手の届く範囲に薬草の群生地がありません。',
+  'hudChrome.gathering.noNodeNearby.farming': '手の届く範囲に作物畑がありません。',
   'hudChrome.gathering.toolTooltip.kind.mining': '採掘道具（ティア{tier}）',
   'hudChrome.gathering.toolTooltip.kind.logging': '伐採道具（ティア{tier}）',
   'hudChrome.gathering.toolTooltip.kind.herbalism': '薬草道具（ティア{tier}）',
   'hudChrome.gathering.toolTooltip.kind.fishing': '釣り竿（ティア{tier}）',
+  'hudChrome.gathering.toolTooltip.kind.farming': '農耕道具（ティア{tier}）',
   'hudChrome.gathering.toolTooltip.unlocks.mining': 'ティア{tier}までの鉱脈の採掘に必要です。',
   'hudChrome.gathering.toolTooltip.unlocks.logging': 'ティア{tier}までの立木の伐採に必要です。',
   'hudChrome.gathering.toolTooltip.unlocks.herbalism':
     'ティア{tier}までの薬草の群生地の採取に必要です。',
   'hudChrome.gathering.toolTooltip.unlocks.fishing': 'ティア{tier}までの水域での釣りに必要です。',
+  'hudChrome.gathering.toolTooltip.unlocks.farming': 'ティア{tier}までの作物の植え付けに必要です。',
   'hudChrome.gathering.toolTooltip.use.mining': '使用：近くの鉱脈を採掘する。',
   'hudChrome.gathering.toolTooltip.use.logging': '使用：近くの立木を伐り倒す。',
   'hudChrome.gathering.toolTooltip.use.herbalism': '使用：近くの薬草の群生地から採取する。',
+  'hudChrome.gathering.toolTooltip.use.farming':
+    'バッグに入れておけば、作物畑に植え付ける際に使われます。',
   'hudChrome.gathering.toolTooltip.speed': 'ティア{tier}未満のノードでの採集が速くなります。',
   'hudChrome.gathering.toolTooltip.rodRequired': '釣りに必要です。',
   'hudChrome.gathering.toolTooltip.rodBite':
@@ -9784,20 +9859,159 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.rodReel': 'リールの猶予時間が{seconds}秒延びます。',
   'hudChrome.gathering.toolTooltip.rodBand':
     '釣りスキル{skill}以上でより豊かな釣果が解放されます。',
+  'hudChrome.gathering.toolTooltip.rodBandCatch':
+    '釣りスキル{skill}以上で「{fish}」が解放されます。',
   'hudChrome.gathering.downgradeMark': 'バッグが満杯です：収穫は採集者の印なしで収納されました。',
+  'hudChrome.gathering.downgradeMarkCrop': 'バッグが満杯です：収穫物は栽培者の銘なしで収納されました。',
   'hudChrome.gathering.downgradeFind': 'バッグが満杯です：極上の獲物を逃してしまいました。',
   'hudChrome.gathering.emptyHookNote': '針には何もなし',
   'hudChrome.gathering.stateReady': '採集可能',
   'hudChrome.gathering.stateCooldown': '再生中',
   'hudChrome.gathering.stateCooldownTimed': '{time}後に再生',
   'hudChrome.gathering.fineGradePreview': 'あなたの道具なら、ここの採取物は上質な等級になります。',
+  'hudChrome.farming.plantLine': '{name}を植えた。',
+  'hudChrome.farming.harvestLine': '{name}を収穫した。',
+  'hudChrome.farming.harvestLineQty': '{name} x{qty}を収穫した。',
+  'hudChrome.farming.harvestFineLine': 'さらに{name}も収穫した。',
+  'hudChrome.farming.harvestFineLineQty': 'さらに{name} x{qty}も収穫した。',
+  'hudChrome.farming.witheredLine': '作物が枯れた。畑を片づけた：{name}。',
+  'hudChrome.farming.witheredLineQty': '作物が枯れた。畑を片づけた：{name} x{qty}。',
+  'hudChrome.farming.pressTarget.feastOverHarvest':
+    '宴と自分の作物が両方とも範囲内にある。インタラクトは畑より先に宴を取る。収穫するには宴から離れよう。',
+  'hudChrome.farming.pressTarget.feastOverPlant':
+    '宴と空の畑が両方とも範囲内にある。インタラクトは畑より先に宴を取る。植えるには宴から離れよう。',
+  'hudChrome.farming.seedBackLine': '種を回収した：{name}。',
+  'hudChrome.farming.goldenBonusLine': '黄金の収穫がもたらした：{name}。',
+  'hudChrome.farming.seedBackLineQty': '種を回収した：{name} x{qty}。',
+  'hudChrome.farming.denied.bad_bed': 'そこに作物畑はありません。',
+  'hudChrome.farming.denied.bad_crop': 'それはここには植えられません。',
+  'hudChrome.farming.denied.range': 'その作物畑から離れすぎています。',
+  'hudChrome.farming.denied.no_farmer': '籾殻を堆肥と交換するには農夫のそばにいなければなりません。',
+  'hudChrome.farming.huskTrade': '籾殻を堆肥と交換する',
+  'hudChrome.farming.huskTradeAria': '{name}と籾殻を堆肥と交換する',
+  'hudChrome.farming.plantSheet.title': '作物を植える',
+  'hudChrome.farming.plantSheet.plant': '植える',
+  'hudChrome.farming.plantSheet.sowAria': '{name}を蒔く',
+  'hudChrome.farming.plantSheet.empty': 'この畑に蒔ける種を持っていません。',
+  'hudChrome.farming.plantSheet.close': '植え付けシートを閉じる',
+  'hudChrome.farming.denied.bed_taken': 'そこにはすでに作物が育っています。',
+  'hudChrome.farming.denied.skill': 'その作物を育てるには農耕スキルが足りません。',
+  'hudChrome.farming.denied.no_seed': 'その作物の種を持っていません。',
+  'hudChrome.farming.denied.not_ready': 'その作物はまだ育っています。',
+  'hudChrome.farming.denied.no_plot': 'その畑には何も植えられていません。',
+  'hudChrome.farming.denied.no_husks': '枯れた殻が足りません。',
+  'hudChrome.farming.denied.no_compost': '堆肥がありません。',
+  'hudChrome.farming.denied.no_fee_produce': '見張り料を払う作物がありません。',
+  'hudChrome.farming.denied.no_tonic': '成長トニックがありません。',
+  'hudChrome.farming.denied.tool': 'その作物に合う農耕鍬を持っていません。',
+  'hudChrome.farming.denied.locked': 'その支払いに使えるアイテムがロックされています。',
+  'hudChrome.farming.denied.no_feast': '広げられる宴の料理を持っていません。',
+  'hudChrome.farming.denied.feast_active': 'あなたの宴はすでに広げられています。',
+  'hudChrome.farming.denied.feast_expired': 'その宴はもうありません。',
+  'hudChrome.farming.denied.feast_finished': 'その宴は食べ尽くされました。',
+  'hudChrome.farming.denied.feast_eaten': 'その宴からはすでに食べました。',
+  'hudChrome.farming.feastTitle': '{name}の収穫の宴',
+  'hudChrome.farming.stonepotFeastTitle': '{name}の石鍋の宴',
+  'hudChrome.farming.warspiceFeastTitle': '{name}の戦香の宴',
+  'hudChrome.farming.sageleafFeastTitle': '{name}の賢葉の宴',
+  'hudChrome.farming.feastPlacedLine': '収穫の宴を広げた。',
+  'hudChrome.farming.husksConvertedLine': '{husksName} x{husks}を{name}と交換した。',
+  'hudChrome.farming.husksConvertedLineQty': '{husksName} x{husks}を{name} x{qty}と交換した。',
+  'hudChrome.farming.readyLine': '作物が1区画、収穫できるようになった。',
+  'hudChrome.farming.readyLineQty': '作物が{count}区画、収穫できるようになった。',
+  'hudChrome.farming.readyWitheredLine': '作物が1区画、畑で枯れた。',
+  'hudChrome.farming.readyWitheredLineQty': '作物が{count}区画、畑で枯れた。',
+  'hudChrome.harvestJournal.title': '収穫日誌',
+  'hudChrome.harvestJournal.close': '閉じる',
+  'hudChrome.harvestJournal.listLabel': '作付け済みの作物畑',
+  'hudChrome.harvestJournal.growing': 'あと{time}で収穫可能',
+  'hudChrome.harvestJournal.ready': '収穫可能',
+  'hudChrome.harvestJournal.readyAnnounce': '収穫可能: {name}',
+  'hudChrome.harvestJournal.finishing': 'まもなく完了',
+  'hudChrome.harvestJournal.withered': '枯れた',
+  'hudChrome.harvestJournal.remainingDaysHours': '{days}日{hours}時間',
+  'hudChrome.harvestJournal.remainingHoursMinutes': '{hours}時間{minutes}分',
+  'hudChrome.harvestJournal.remainingMinutesSeconds': '{minutes}分{seconds}秒',
+  'hudChrome.harvestJournal.remainingSeconds': '{seconds}秒',
+  'hudChrome.harvestJournal.bedLine': '{zone}、作物畑{index}',
+  'hudChrome.harvestJournal.bedLineUnknown': '不明な作物畑',
+  'hudChrome.harvestJournal.careWatch': '農夫の見回り',
+  'hudChrome.harvestJournal.careNone': '追加の手入れなし',
+  'hudChrome.harvestJournal.stageSprout': '芽',
+  'hudChrome.harvestJournal.stageSeedling': '苗',
+  'hudChrome.harvestJournal.stageMaturing': '生育中',
+  'hudChrome.harvestJournal.stageRipe': '熟した',
+  'hudChrome.harvestJournal.emptyTitle': '作物がありません',
+  'hudChrome.harvestJournal.emptyBody':
+    'どの作物畑でも種をまけば、その畑が残り時間とともにここに並びます。',
+  'hudChrome.harvestJournal.noviceTitle': 'まだ作物畑を耕したことがありません',
+  'hudChrome.harvestJournal.noviceBody':
+    '作物を収穫するたびに農耕スキルが上がります。どの作物畑でもよいので、種をまいて始めましょう。',
   'gatherEvent.pristineVein': '{finder}が純粋な鉱脈を掘り当てた！',
   'gatherEvent.ancientHeartwood': '{finder}が太古の心木を切り倒した！',
   'gatherEvent.moonlitBloom': '{finder}が月光の花を発見した！',
+  'gatherEvent.goldenHarvest': '{finder}が黄金の実りを刈り取った！',
   'entities.items.copper_ore.name': '銅鉱石',
   'entities.items.iron_ore.name': '鉄鉱石',
   'entities.items.ironbark_log.name': 'アイアンバークの丸太',
   'entities.items.silverleaf_herb.name': '艶葉草',
+  'entities.items.vale_wheat_seed.name': '渓谷小麦の種',
+  'entities.items.vale_wheat.name': '渓谷小麦',
+  'entities.items.fine_vale_wheat.name': '上質な渓谷小麦',
+  'entities.items.withered_husks.name': '枯れた籾殻',
+  'entities.items.compost.name': '堆肥',
+  'entities.items.growth_tonic.name': '成長トニック',
+  'entities.items.brook_carrot_seed.name': '小川ニンジンの種',
+  'entities.items.brook_carrot.name': '小川ニンジン',
+  'entities.items.fine_brook_carrot.name': '上質な小川ニンジン',
+  'entities.items.marsh_rice_seed.name': '湿原米の種',
+  'entities.items.marsh_rice.name': '湿原米',
+  'entities.items.fine_marsh_rice.name': '上質な湿原米',
+  'entities.items.bog_beet_seed.name': '沼地ビートの種',
+  'entities.items.bog_beet.name': '沼地ビート',
+  'entities.items.fine_bog_beet.name': '上質な沼地ビート',
+  'entities.items.highland_barley_seed.name': '高地大麦の種',
+  'entities.items.highland_barley.name': '高地大麦',
+  'entities.items.fine_highland_barley.name': '上質な高地大麦',
+  'entities.items.frost_gourd_seed.name': '霜瓜の種',
+  'entities.items.frost_gourd.name': '霜瓜',
+  'entities.items.fine_frost_gourd.name': '上質な霜瓜',
+  'entities.items.gilded_sunmelon_seed.name': '黄金の太陽メロンの種',
+  'entities.items.gilded_sunmelon.name': '黄金の太陽メロン',
+  'entities.items.fine_gilded_sunmelon.name': '上質な黄金の太陽メロン',
+  'entities.items.evergarden_greens_seed.name': 'エバーガーデン青菜の種',
+  'entities.items.evergarden_greens.name': 'エバーガーデン青菜',
+  'entities.items.fine_evergarden_greens.name': '上質なエバーガーデン青菜',
+  'entities.items.thornpeak_cabbage_seed.name': 'ソーンピークキャベツの種',
+  'entities.items.thornpeak_cabbage.name': 'ソーンピークキャベツ',
+  'entities.items.fine_thornpeak_cabbage.name': '上質なソーンピークキャベツ',
+  'entities.items.frost_lentils_seed.name': '霜レンズ豆の種',
+  'entities.items.frost_lentils.name': '霜レンズ豆',
+  'entities.items.fine_frost_lentils.name': '上質な霜レンズ豆',
+  'entities.items.gilded_yam_seed.name': '黄金のヤムイモの種',
+  'entities.items.gilded_yam.name': '黄金のヤムイモ',
+  'entities.items.fine_gilded_yam.name': '上質な黄金のヤムイモ',
+  'entities.items.evergarden_pumpkin_seed.name': 'エバーガーデンカボチャの種',
+  'entities.items.evergarden_pumpkin.name': 'エバーガーデンカボチャ',
+  'entities.items.fine_evergarden_pumpkin.name': '上質なエバーガーデンカボチャ',
+  'entities.items.garden_hoe.name': '菜園の鍬',
+  'entities.items.bronze_hoe.name': '青銅の鍬',
+  'entities.items.skysilver_hoe.name': 'スカイシルバーの鍬',
+  'entities.items.osmium_hoe.name': 'オスミウムの鍬',
+  'entities.items.evergarden_hoe.name': 'エバーガーデンの鍬',
+  'entities.items.vale_hearth_loaf.name': '渓谷の炉焼きパン',
+  'entities.items.eastbrook_root_pottage.name': 'イーストブルックの根菜ポタージュ',
+  'entities.items.fenbridge_rice_bowl.name': 'フェンブリッジの炊き込みご飯',
+  'entities.items.fenbridge_beet_braise.name': 'フェンブリッジのビート煮込み',
+  'entities.items.highwatch_barley_bannock.name': 'ハイウォッチの大麦平焼きパン',
+  'entities.items.highwatch_gourd_soup.name': 'ハイウォッチの霜瓜スープ',
+  'entities.items.evergarden_sunmelon_tart.name': 'エバーガーデンの太陽メロンタルト',
+  'entities.items.evergarden_harvest_platter.name': 'エバーガーデンの収穫プレート',
+  'entities.items.eastbrook_glazed_carrots.name': 'イーストブルックの人参グラッセ',
+  'entities.items.fenbridge_rice_pudding.name': 'フェンブリッジのライスプディング',
+  'entities.items.highwatch_barley_porridge.name': 'ハイウォッチの大麦粥',
+  'entities.items.evergarden_braised_greens.name': 'エバーガーデンの青菜煮込み',
+  'entities.items.harvest_feast.name': '収穫の宴',
   'hudChrome.archetypeTitle.label': '称号',
   'hudChrome.archetypeTitle.none': 'なし',
   'hudChrome.archetypeTitle.hobbyLabel': '趣味',
@@ -10013,6 +10227,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.thornhide_leggings.name': 'ソーンハイドの脚当て',
   'entities.items.thornhide_gloves.name': 'ソーンハイドの手甲',
   'entities.items.thornhide_boots.name': 'ソーンハイドの足袋',
+  'entities.items.hammered_copper_band.name': '鎚打ちの銅指輪',
+  'entities.items.polished_copper_loop.name': '磨かれた銅の輪',
+  'entities.items.coiled_copper_torc.name': '渦巻き銅の首輪',
+  'entities.items.riveted_iron_signet.name': '鋲留めの鉄印章',
+  'entities.items.etched_iron_loop.name': '彫刻された鉄の輪',
+  'entities.items.iron_link_choker.name': '鉄鎖のチョーカー',
+  'entities.items.weighted_thorium_band.name': '重厚なオスミウム指輪',
+  'entities.items.gleaming_thorium_loop.name': '輝くオスミウムの輪',
+  'entities.items.burnished_thorium_amulet.name': '磨き上げたオスミウムのアミュレット',
   'entities.items.final_oath_medallion.name': '最後の誓いのメダリオン',
   'entities.items.razorwind_torque.name': '刃風の首輪',
   'entities.items.cinder_sigil_pendant.name': '熾火印のペンダント',
@@ -10104,7 +10327,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.searchAria': '名前で銀行のアイテムを検索',
   'hudChrome.bank.depositAll': 'すべての素材を預ける',
   'hudChrome.bank.depositAllTooltip':
-    'カバン内の製作素材とがらくたをまとめて銀行に預けます。採集用道具、装備中の防具、クエストアイテム、消耗品は対象外です。',
+    'カバン内の製作素材（ツールチップに「素材」または「上質な素材」と表示されるすべてのアイテム）をまとめて銀行に預けます。採集用道具、クエストアイテム、消耗品、灰色アイテムを含め、それ以外はすべてカバンに残ります。',
   'hudChrome.bank.depositAllDone': '素材を預けました：{count}。',
   'hudChrome.bank.depositAllFull': '素材を預けました：{count}。銀行がいっぱいになりました。',
   'hudChrome.bank.depositAllNone': '銀行がいっぱいです：何も預けられませんでした。',
@@ -10217,10 +10440,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'sim.rift.detonateStormcallersWrath': '嵐の使者の怒りが爆発する！',
   'sim.rift.detonateAbyssalMaw': '深淵の顎が閉じる！',
   'sim.rift.detonateCrushingDepth': '粉砕の深淵が押しつぶす！',
-  'sim.rift.detonatePactSeal': '契約の封印が炸裂する！',
-  'sim.rift.detonateBloodRite': '血の儀式が落ちる！',
-  'sim.rift.detonatePitSentence': '奈落の判決が炸裂する！',
-  'sim.rift.detonateHellfireBrand': '地獄の焼き印が炸裂する！',
   'entities.items.rift_essence.name': 'リフトエッセンス',
   'entities.items.rift_gem_crimson.name': '深紅のリフト宝石',
   'entities.items.rift_gem_azure.name': '紺碧のリフト宝石',
@@ -10514,7 +10733,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_chimeglass_tortoise':
     '塩平原の陸亀。隊商三代を歩き通した。彼を引き取った鋳掛屋たちは嵐硝子を削って眼鏡を作り、喉元に青銅の鈴を吊るした。道は姿を見るより先に、その音を聞く。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '大七面鳥サンダーストラット',
-  'hudChrome.mounts.name_terrorspark_groundshaker': '地揺らしのテラースパーク',
+  'hudChrome.mounts.name_terrorspark_groundshaker': '地揺らしのドレッドスパーク',
   'hudChrome.mounts.name_rickshaw_mount': '骨縛りの人力車',
   'hudChrome.mounts.desc_valorsteed': '頑健で足取り確かな駿馬。移動速度を高める。',
   'hudChrome.mounts.desc_grag_bear': '頑健で足取り確かな熊。移動速度を高める。',
@@ -10561,7 +10780,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.pummel.description': '対象の呪文詠唱を中断し、4秒間その系統の呪文を封じる。',
   'entities.abilities.kick.name': 'ブーツ',
   'entities.abilities.kick.description': '対象の呪文詠唱を中断し、4秒間その系統の呪文を封じる。',
-  'entities.abilities.counterspell.name': 'スペルブレイク',
+  'entities.abilities.counterspell.name': '呪文断ち',
   'entities.abilities.counterspell.description':
     '対象の呪文を打ち消し、6秒間その系統の呪文を封じる。',
   'entities.abilities.counter_shot.name': '沈黙の一射',
@@ -10734,7 +10953,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '対象地点へ矢の一斉射撃を放ち、8ヤード以内の敵に{damage}の物理ダメージを与える。（ハンターのタレント）',
   'entities.abilities.prayer_of_healing.description': '30ヤード以内の味方を{damage}回復します。回復量は呪文威力とともに上がります。（聖なる）',
   'entities.abilities.preparation.description':
-    'スプリント、回避、バニッシュのクールダウンを完了させる。（ローグのタレント）',
+    'スプリント、回避、煙隠れのクールダウンを完了させる。（ローグのタレント）',
   'entities.abilities.presence_of_mind.description':
     '次の詠唱時間のある呪文を即時詠唱にする。効果時間 60 秒。（メイジタレント）',
   'entities.abilities.psychic_scream.description': '8ヤード以内の敵を最大4秒間おののかせます。ダメージで効果が解けることがあります。',
@@ -10779,13 +10998,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flurry.name': 'ウィンターラッシュ',
   'entities.abilities.flurry.description':
     '3発の氷弾を放ち、それぞれ{damage}の氷ダメージを与え、対象にウィンターズ・チルを付与します。次に命中する対応呪文2回は対象を凍結状態として扱います。ブレインフリーズ発動時は即時発動となり、クールダウンを無視します。（氷）',
-  'entities.abilities.frozen_orb.name': 'フローズンオーブ',
+  'entities.abilities.frozen_orb.name': 'フロストグローブ',
   'entities.abilities.frozen_orb.description':
     '渦巻く氷球を放ち、8秒間前方へ漂わせます。周囲の敵に毎秒{damage}の氷ダメージを与え、移動速度を30%低下させます。敵に命中したパルスごとに氷柱を1つ生成します。（氷）',
   'entities.abilities.blizzard.name': 'ブリザード',
   'entities.abilities.blizzard.description':
-    '対象地点に6秒間吹雪を呼び、毎秒{damage}の氷ダメージを与えて敵の移動速度を40%低下させます。敵1体に命中するたび、フローズンオーブのクールダウンを0.5秒、1回の発動につき最大3秒短縮します。（氷）',
-  'entities.abilities.glacial_spike.name': 'グレイシャルスパイク',
+    '対象地点に6秒間吹雪を呼び、毎秒{damage}の氷ダメージを与えて敵の移動速度を40%低下させます。敵1体に命中するたび、フロストグローブのクールダウンを0.5秒、1回の発動につき最大3秒短縮します。（氷）',
+  'entities.abilities.glacial_spike.name': 'リムニードル',
   'entities.abilities.glacial_spike.description':
     '巨大な氷の槍を作り、アイシクルを5個消費して{damage}の氷ダメージを与え、対象を4秒間その場で凍結させます。（氷）',
   'entities.abilities.glacial_front.name': '氷河の前線',
@@ -10828,7 +11047,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '自身を炎で包み、{damage}ダメージを吸収します。60秒間持続します。（火）',
   'entities.abilities.cold_snap.name': '冬の呼び戻し',
   'entities.abilities.cold_snap.description':
-    'フリッカーステップ、フロストヴェール、グレーターインビジビリティのクールダウンを完了させます。（メイジタレント）',
+    '瞬き歩み、フロストヴェール、グレーターインビジビリティのクールダウンを完了させます。（メイジタレント）',
   'entities.abilities.greater_invisibility.name': 'グレーターインビジビリティ',
   'entities.abilities.greater_invisibility.description':
     '20 秒間姿を消し、継続ダメージ効果を 2 つ取り除く。透明化が終了すると、2 秒間、受けるダメージが 90% 減少する。（メイジのタレント）',
@@ -10968,7 +11187,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.battleTrance':
     '次のレイヴァーストライクまたは重傷の一撃の怒りコストが0になる',
   'hudChrome.auraEffect.revengeFree': '次の意趣返しの怒りコストが0になる',
-  'hudChrome.auraEffect.victoryRush': '勝利の追撃が使用可能',
+  'hudChrome.auraEffect.victoryRush': '勝者の奔流が使用可能',
   'hudChrome.auraEffect.maxHpPct': '最大体力を{pct}%上昇させる',
   'hud.combat.floatingParry': '受け流し',
   'hud.combat.parried': '{target}は{ability}を受け流しました。',
@@ -11029,6 +11248,21 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.cook_marlow.title': '厨房の主',
   'entities.npcs.cook_marlow.greeting':
     '私の厨房から生煮えのまま出ていくものはない、{className}。座って食べて、それからまた行きな。',
+  'entities.npcs.farmer_jessica.name': '農婦ジェシカ',
+  'entities.npcs.farmer_jessica.title': '菜園の管理人',
+  'entities.npcs.farmer_jessica.greeting':
+    '良い土と良い天気を、{playerName}。私から種を買って、そこの畑のどれかに蒔いたら、あとは好きに過ごしなさい。留守の間も育ち続けるし、腐ることはない。収穫日誌（Shift+K、または専門技能ウィンドウの農耕の行）に、植えた畑と残り時間がすべて載っている。',
+  'entities.npcs.farmer_teasel.name': '農夫ティーゼル',
+  'entities.npcs.farmer_teasel.title': '湿地の水田農夫',
+  'entities.npcs.farmer_teasel.greeting': '湿原米と沼地ビートの種、それに肥やしの堆肥だ、{className}。水田は水はけが悪い、足元に気をつけな。',
+  'entities.npcs.farmer_hollis.name': '農夫ホリス',
+  'entities.npcs.farmer_hollis.title': 'ハイウォッチの段々畑農夫',
+  'entities.npcs.farmer_hollis.greeting':
+    '段々畑は山が許すぶんだけ実る、{className}。種と堆肥を売っているし、あんたの作物が枯れて上がってきたら、その籾殻を良い土に戻してやろう。',
+  'entities.npcs.farmer_verbena.name': '農婦ヴァーベナ',
+  'entities.npcs.farmer_verbena.title': 'パルテールの庭師',
+  'entities.npcs.farmer_verbena.greeting':
+    '縁取りに気をつけて、{playerName}、この畑はパルテールの誇りなんだから。売っているのは種と堆肥、それと持ってきた枯れた籾殻はどれも堆肥に変えてあげる。',
   'entities.npcs.weaver_ottilie.name': '織り手オッティリー',
   'entities.npcs.weaver_ottilie.title': '機織り場の主',
   'entities.npcs.weaver_ottilie.greeting':
@@ -11085,7 +11319,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.hearthkeeper_maeve.title': '炉火の宿の主',
   'entities.npcs.hearthkeeper_maeve.greeting':
     '寒いところから、さあお入り。わたしが息をしている限り、この宿の火は消えないよ。',
-  'entities.npcs.hermit_okku.name': 'オック',
+  'entities.npcs.hermit_okku.name': 'オクリム',
   'entities.npcs.hermit_okku.title': '奥へ入った男',
   'entities.npcs.hermit_okku.greeting':
     '静かに。太鼓は木々の下を歩くものをすべて数えている。おまえのことも、もう数え終えている。',
@@ -11150,7 +11384,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.scout_yerrin.greeting':
     '身を低くしろ。硝子の上では音が妙に運ばれる。それに、下の門には耳がある。',
   'entities.npcs.sexton_marrow.name': '堂守マロウ',
-  'entities.npcs.sexton_marrow.title': 'ガロウミアの堂守',
+  'entities.npcs.sexton_marrow.title': 'ギベットミアの堂守',
   'entities.npcs.sexton_marrow.greeting':
     'ここでは死者を深くに葬る。そして鐘を鳴らすのだ。土の下にとどまることを、彼らが忘れぬようにな。',
   'entities.npcs.strandwatcher_pell.name': '浜守ペル',
@@ -11189,7 +11423,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.wickmother_sorrel.greeting':
     'お入り、お座り、火にかけた甘い酒があるよ。ただし鉄物からは手を離さないこと。近ごろのノームは手癖が悪いからね。',
   'entities.npcs.widow_tansy.name': '寡婦タンジー',
-  'entities.npcs.widow_tansy.title': 'ガロウミアの蝋燭師',
+  'entities.npcs.widow_tansy.title': 'ギベットミアの蝋燭師',
   'entities.npcs.widow_tansy.greeting':
     '墓のひとつひとつに蝋燭をひとつ。ひとつたりとも消してはいけない。ひとつたりともだよ、聞いているのかい？',
   'hudChrome.training.title': '訓練：{name}',
@@ -11211,6 +11445,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.training.notTaughtHere': 'そのレシピはここでは教えていません。',
   'hudChrome.training.alreadyKnown': 'そのレシピはすでに習得しています。',
   'hudChrome.training.outOfRange': '訓練するには作業台のそばにいる必要があります。',
+  'hudChrome.pattern.teaches': '使用: {item}の作成法を習得します。',
   'entities.items.rough_hide.name': '粗い獣皮',
   'entities.items.spider_silk.name': '蜘蛛の糸',
   'entities.items.venom_gland.name': '毒腺',
@@ -11286,6 +11521,90 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.sunpetal_healing_draught.name': 'サンペタルの治癒薬',
   'entities.items.sunpetal_mana_draught.name': 'サンペタルのマナ薬',
   'entities.items.elixir_of_the_serpent.name': '蛇のエリクサー',
+  'entities.items.silverleaf_primer.name': '艶葉の入門書',
+  'entities.items.goldleaf_folio.name': 'ゴールドリーフの書冊',
+  'entities.items.sunpetal_grimoire.name': 'サンペタルの魔導書',
+  'entities.items.silverleaf_scroll.name': '艶葉の巻物',
+  'entities.items.goldleaf_scroll.name': 'ゴールドリーフの巻物',
+  'entities.items.sunpetal_scroll.name': 'サンペタルの巻物',
+  'entities.items.duskforged_billet.name': '黄昏鍛えの鋼片',
+  'entities.items.forgefold_plating.name': '折り鍛えの装甲板',
+  'entities.items.wyrmhide_cording.name': '竜革の編み紐',
+  'entities.items.sunspun_bolt.name': '陽紡ぎの反物',
+  'entities.items.prismglass_setting.name': 'プリズムガラスの石座',
+  'entities.items.precision_chassis.name': '精密シャーシ',
+  'entities.items.quickening_catalyst.name': '賦活の触媒',
+  'entities.items.seasoned_stock.name': '調味だし汁',
+  'entities.items.lucent_reagent.name': '光輝の試薬',
+  'entities.items.sablewax_vellum.name': '黒蝋のベラム紙',
+  'entities.items.spiritweld_girdle.name': 'スピリットウェルドの帯',
+  'entities.items.forgefold_legguards.name': '折り鍛えのレッグガード',
+  'entities.items.wardspeaker_sabatons.name': 'ワードスピーカーのサバトン',
+  'entities.items.briarstep_jerkin.name': 'ブライアステップのジャーキン',
+  'entities.items.fenbloom_breeches.name': 'フェンブルームのズボン',
+  'entities.items.barksong_handguards.name': 'バークソングのハンドガード',
+  'entities.items.sunspun_vestments.name': '陽紡ぎの祭服',
+  'entities.items.sunspun_leggings.name': '陽紡ぎのレギンス',
+  'entities.items.sunspun_handwraps.name': '陽紡ぎの手巻き',
+  'entities.items.sunspun_haversack.name': '陽紡ぎの背負い袋',
+  'entities.items.duskforged_warblade.name': '黄昏鍛えの戦刃',
+  'entities.items.ridgebreaker.name': '尾根砕き',
+  'entities.items.duskforged_bulwark.name': '黄昏鍛えの大盾',
+  'entities.items.wyrmfall_pendant.name': '竜墜のペンダント',
+  'entities.items.warhewn_signet.name': '戦削りの印章',
+  'entities.items.prismglass_loop.name': 'プリズムガラスの輪',
+  'entities.items.gyrelens_array.name': '渦鏡アレイ',
+  'entities.items.voidbound_grimoire.name': '虚無縛りの魔導書',
+  'entities.items.masters_field_forge.name': '匠の野営炉',
+  'entities.items.makers_charm.name': '匠のお守り',
+  'entities.items.ironhusk_flask.name': '鉄殻のフラスコ',
+  'entities.items.warboar_flask.name': '戦猪のフラスコ',
+  'entities.items.runewater_flask.name': '呪水のフラスコ',
+  'entities.items.stonepot_stew.name': '石鍋のシチュー',
+  'entities.items.warspice_skewers.name': '戦香の串焼き',
+  'entities.items.sageleaf_chowder.name': '賢葉のチャウダー',
+  'entities.items.grand_cauldron.name': '大釜',
+  'entities.items.laden_hearth.name': '豊穣の炉',
+  'entities.items.pattern_spiritweld_girdle.name': '設計図：スピリットウェルドの帯',
+  'entities.items.pattern_forgefold_legguards.name': '設計図：折り鍛えのレッグガード',
+  'entities.items.pattern_wardspeaker_sabatons.name': '設計図：ワードスピーカーのサバトン',
+  'entities.items.pattern_briarstep_jerkin.name': '型紙：ブライアステップのジャーキン',
+  'entities.items.pattern_fenbloom_breeches.name': '型紙：フェンブルームのズボン',
+  'entities.items.pattern_barksong_handguards.name': '型紙：バークソングのハンドガード',
+  'entities.items.pattern_sunspun_vestments.name': '型紙：陽紡ぎの祭服',
+  'entities.items.pattern_sunspun_leggings.name': '型紙：陽紡ぎのレギンス',
+  'entities.items.pattern_sunspun_handwraps.name': '型紙：陽紡ぎの手巻き',
+  'entities.items.pattern_sunspun_haversack.name': '型紙：陽紡ぎの背負い袋',
+  'entities.items.pattern_duskforged_warblade.name': '設計図：黄昏鍛えの戦刃',
+  'entities.items.pattern_ridgebreaker.name': '設計図：尾根砕き',
+  'entities.items.pattern_duskforged_bulwark.name': '設計図：黄昏鍛えの大盾',
+  'entities.items.pattern_wyrmfall_pendant.name': '意匠図：竜墜のペンダント',
+  'entities.items.pattern_warhewn_signet.name': '意匠図：戦削りの印章',
+  'entities.items.pattern_prismglass_loop.name': '意匠図：プリズムガラスの輪',
+  'entities.items.pattern_gyrelens_array.name': '図面：渦鏡アレイ',
+  'entities.items.pattern_masters_field_forge.name': '図面：匠の野営炉',
+  'entities.items.pattern_makers_charm.name': '図面：匠のお守り',
+  'entities.items.pattern_voidbound_grimoire.name': '技法：虚無縛りの魔導書',
+  'entities.items.pattern_ironhusk_flask.name': 'レシピ：鉄殻のフラスコ',
+  'entities.items.pattern_warboar_flask.name': 'レシピ：戦猪のフラスコ',
+  'entities.items.pattern_runewater_flask.name': 'レシピ：呪水のフラスコ',
+  'entities.items.pattern_stonepot_stew.name': 'レシピ：石鍋のシチュー',
+  'entities.items.pattern_warspice_skewers.name': 'レシピ：戦香の串焼き',
+  'entities.items.pattern_sageleaf_chowder.name': 'レシピ：賢葉のチャウダー',
+  'entities.items.stonepot_feast.name': '石鍋の宴',
+  'entities.items.warspice_feast.name': '戦香の宴',
+  'entities.items.sageleaf_feast.name': '賢葉の宴',
+  'entities.items.pattern_stonepot_feast.name': 'レシピ：石鍋の宴',
+  'entities.items.pattern_warspice_feast.name': 'レシピ：戦香の宴',
+  'entities.items.pattern_sageleaf_feast.name': 'レシピ：賢葉の宴',
+  'entities.items.pattern_grand_cauldron.name': 'レシピ：大釜',
+  'entities.items.pattern_laden_hearth.name': 'レシピ：豊穣の炉',
+  'entities.items.pattern_highwatch_gourd_soup.name': 'レシピ：ハイウォッチの霜瓜スープ',
+  'entities.items.pattern_highwatch_barley_porridge.name': 'レシピ：ハイウォッチの大麦粥',
+  'entities.items.pattern_evergarden_sunmelon_tart.name': 'レシピ：エバーガーデンの太陽メロンタルト',
+  'entities.items.pattern_evergarden_harvest_platter.name': 'レシピ：エバーガーデンの収穫プレート',
+  'entities.items.pattern_evergarden_braised_greens.name': 'レシピ：エバーガーデンの青菜煮込み',
+  'entities.items.pattern_harvest_feast.name': 'レシピ：収穫の宴',
   'entities.mobs.wildheart_stalker.name': '蔦爪の追跡者',
   'entities.mobs.wildheart_ravager.name': '血鬣の略奪者',
   'entities.mobs.wildheart_hexcaller.name': '陽骨の呪術師',
@@ -11311,7 +11630,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.the_last_keep.name': '最後の砦',
   'entities.items.last_keep_signet.name': '最後の砦の印章',
   'entities.dungeons.the_last_keep.enterText': '最後の砦の冷たく静まり返った広間へ足を踏み入れた。',
-  'entities.items.reins_terrorspark_groundshaker.name': 'テラースパークの始動キー',
+  'entities.items.reins_terrorspark_groundshaker.name': 'ドレッドスパークの始動キー',
   'entities.items.reins_lanternback_troll.name':
     '点灯人の軛：グルンボル',
   'entities.items.reins_chimeglass_tortoise.name':
@@ -11346,7 +11665,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.farshore_salt_moss.name': '遠つ岸の塩苔',
   'entities.items.fenway_mooring_line.name': '切られた舫い綱',
   'entities.items.fountain_court_mantle.name': '噴水の中庭のマント',
-  'entities.items.frostmane_mantle.name': 'フロストメインのマント',
+  'entities.items.frostmane_mantle.name': 'ライムメインのマント',
   'entities.items.galecrest_ram_wool.name': '脂じみた雄羊の羊毛',
   'entities.items.gallowmere_grave_candle.name': '墓前の蝋燭',
   'entities.items.gilded_sap_clot.name': '金色の樹液の塊',
@@ -11409,7 +11728,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.revenantstep_treads.name': '亡魂歩きの靴',
   'entities.items.shardfang_grips.name': '欠片牙の篭手',
   'entities.items.shardsong_mantle.name': '欠片歌のマント',
-  'entities.items.wyrmcult_spellgrips.name': '竜教団の呪文篭手',
+  'entities.items.wyrmcult_spellgrips.name': '竜誓団の呪文篭手',
   'entities.items.thornpeak_wildwraps.name': 'ソーンピークの野生手甲',
   'entities.items.stormvotive_hauberk.name': '嵐誓願の鎖帷子',
   'entities.items.cryptbloom_shoulderguards.name': '墓花の肩当て',
@@ -11427,22 +11746,30 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.wildgrowth_leggings.name': '野生の成長のレギンス',
   'entities.items.wildsoul_maul.name': '野生魂の大槌',
   'hudChrome.professions.skillValue': '{skill} / {max}',
-  'guide.profPages.toolsNote':
-    'どの採集ポイントにも、その専門の道具をバッグに入れておく必要があります。ティア1も例外ではありません。つるはしがなければ鉱石は採れず、釣り竿がなければ魚も釣れません。商人のはしごはティア1から3までを扱い、各拠点は自分の土地で使うティアだけを置いています。そのためティア1の道具はどの地域拠点でも売られていますが、その上の段は、それを必要とする鉱脈のある場所で売られます。その段を買うには、商人はその専門の熟練度も求めます。ティア2には {tier2Prof}、ティア3には {tier3Prof} が必要で、商品欄にその条件が示されます。道具はバッグに入っていればよく、装備枠も耐久度もありません。ですから購入は一度きりで、すでに持っている道具はそのまま使えます。条件に関わるのはティアだけです。同じティアでレアリティが高い道具でも、開けるものが増えるわけではありません。ただしレアリティは色だけのものではありません。差し込んだ道具効果の持ちが長くなり、釣り竿ならリールの猶予も広がります。\n\n良い道具が買うものは二つではなく三つです。より高いティアの土地を開き、採集時間を縮め、採れるものを良くします。その地域の素材より上のティアの道具で鉱脈を掘ると、通常の素材ではなく上質級が手に入ります。対象はその地域の完全品級の鉱脈に限られるため、旅人向けに残された易しい鉱脈からは通常の素材が出ます。上質素材は道具のレシピが消費するものであり、レシピや依頼が通常版を求めるところではどこでも上質級がその代わりになります。ですから強化して行き詰まることはありません。銅鉱石が上質な銅鉱石として手に入るようになるだけです。\n\n商人のはしごの上には、各専門にティア4とティア5の製作道具が二つあります。技師が道具工房で作るか、溺れた連祷のカウンターで探索の印を使って購入します。硬貨でこれらを売る商人はいません。釣りには専用の一対があり、最初から知っているのではなく道具職人から習います。今のところティア3を超えて必要とする採集ポイントも水域もないため、最上位の二段が買うのは入場条件ではなく、速さと品級と優しいリールの猶予です。より高いティアの土地が現れたとき、それらが入場券になります。',
   'hudChrome.professions.toolEffectName.quickeningCharm': '早戻りの護符',
   'hudChrome.professions.toolEffectName.artisansEye': '職人の眼',
   'hudChrome.professions.toolEffectName.gatherersCache': '採集者の貯蔵袋',
+  'hudChrome.professions.toolEffectName.makersCharm': '匠のお守り',
   'hudChrome.professions.toolEffectTooltip.kind': '道具用の護符',
   'hudChrome.professions.toolEffectTooltip.bonus.gatherersCache': '充填中は採集ごとに産出+1。',
+  'hudChrome.professions.toolEffectTooltip.bonus.makersCharm': '充填中は採集ごとに産出+2、農具では+1。',
   'hudChrome.professions.toolEffectTooltip.bonus.artisansEye':
     '充填中は収穫の品質がツール1段階ぶん上がる。',
   'hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm':
     '発動した資源ノードの再生タイマーを短縮する。',
   'hudChrome.professions.toolEffectTooltip.howToSlot':
-    '専門技能ウィンドウから採掘・伐採・薬草学のツールに装着する。装着すると消費される。',
+    '専門技能ウィンドウから採掘・伐採・薬草学・農耕のツールに装着する。装着すると消費される。',
   'hudChrome.professions.toolEffectTooltip.charges':
     'コモン品質のツールでは{base}回の充填から始まる（レア度が1段階上がるごとに+{bonus}回）。',
   'hudChrome.professions.toolEffectTooltip.landOnly': '釣り竿には装着できない。',
+  'hudChrome.professions.mobileStationTooltip.kind': '野営の製作拠点',
+  'hudChrome.professions.mobileStationTooltip.use': '足元にパーティ共有の{station}を設置する。',
+  'hudChrome.professions.mobileStationTooltip.radius':
+    '自分はどこからでもそこで製作できる。パーティメンバーは{radius}ヤード以内にいる必要がある。',
+  'hudChrome.professions.mobileStationTooltip.duration': '{minutes}分間持続する。',
+  'hudChrome.professions.mobileStationTooltip.notConsumed': '使用しても消費されない。',
+  'hudChrome.professions.mobileStationTooltip.replace':
+    '設置すると稼働中の野営拠点(専門特化で設置したものを含む)が置き換わる。',
   'hudChrome.professions.toolEffectTooltip.openProfessions':
     '専門技能ウィンドウを開き、採集ツールに装着しよう。',
   'hudChrome.professions.toolEffectSlotButton': '{effect}を装着',
@@ -11565,10 +11892,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.markFind.masterwork_armorcrafting': '防具製作の傑作',
   'hudChrome.reliquary.markFind.masterwork_tailoring': '裁縫の傑作',
   'hudChrome.reliquary.markFind.masterwork_leatherworking': '皮革細工の傑作',
+  'hudChrome.reliquary.markFind.masterwork_jewelcrafting': '宝石細工の傑作',
+  'hudChrome.reliquary.markFind.masterwork_inscription': '銘文の傑作',
   'hudChrome.reliquary.markFind.masterwork_engineering': '工学の傑作',
   'hudChrome.reliquary.markFind.gather_event_pristine_vein': '無垢の鉱脈',
   'hudChrome.reliquary.markFind.gather_event_ancient_heartwood': '古代の心材',
   'hudChrome.reliquary.markFind.gather_event_moonlit_bloom': '月明かりの花',
+  'hudChrome.reliquary.markFind.gather_event_golden_harvest': '黄金の実り',
   'hudChrome.reliquary.markFind.gather_event_perfect_specimen': '完璧な標本',
   'hudChrome.reliquary.markFind.slain_old_greyjaw': '討伐: 老グレイジョー',
   'hudChrome.reliquary.markFind.slain_mogger': '討伐: モガー',
@@ -11656,52 +11986,58 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.errors.tradeBound': 'そのアイテムはバインドされているため取引できません。',
   'hud.errors.tradeWindowIneligible': 'それは同じドロップを分かち合ったプレイヤーにしか取引できません。',
   'hud.errors.marketListBound': 'そのアイテムはバインドされているため出品できません。',
-  'hudChrome.enchantName.enchant_weapon_might': '武器エンチャント - 剛力',
-  'hudChrome.enchantName.enchant_weapon_intellect': '武器エンチャント - 呪文威力',
-  'hudChrome.enchantName.enchant_offhand_stamina': 'オフハンドエンチャント - スタミナ',
-  'hudChrome.enchantName.enchant_helmet_fortitude': '頭エンチャント - 堅牢',
-  'hudChrome.enchantName.enchant_neck_spirit': '首エンチャント - 精神力',
-  'hudChrome.enchantName.enchant_shoulder_agility': '肩エンチャント - 敏捷性',
-  'hudChrome.enchantName.enchant_chest_stamina': '胸エンチャント - スタミナ',
-  'hudChrome.enchantName.enchant_waist_stamina': '腰エンチャント - スタミナ',
-  'hudChrome.enchantName.enchant_legs_stamina': '脚エンチャント - スタミナ',
-  'hudChrome.enchantName.enchant_gloves_agility': '手エンチャント - 敏捷性',
-  'hudChrome.enchantName.enchant_gloves_intellect': '手エンチャント - 呪文威力',
-  'hudChrome.enchantName.enchant_feet_agility': '足エンチャント - 敏捷性',
-  'hudChrome.enchantName.enchant_ring_spirit': '指エンチャント - 精神力',
-  'hudChrome.enchantName.enchant_weapon_agility': '武器エンチャント - 敏捷性',
-  'hudChrome.enchantName.enchant_helmet_intellect': '頭エンチャント - 知力',
-  'hudChrome.enchantName.enchant_helmet_armor': '頭エンチャント - 強化',
-  'hudChrome.enchantName.enchant_neck_intellect': '首エンチャント - 知力',
-  'hudChrome.enchantName.enchant_neck_agility': '首エンチャント - 敏捷性',
-  'hudChrome.enchantName.enchant_shoulder_strength': '肩エンチャント - 筋力',
-  'hudChrome.enchantName.enchant_shoulder_intellect': '肩エンチャント - 知力',
-  'hudChrome.enchantName.enchant_chest_spirit': '胸エンチャント - 精神力',
-  'hudChrome.enchantName.enchant_chest_armor': '胸エンチャント - 強化',
-  'hudChrome.enchantName.enchant_waist_strength': '腰エンチャント - 筋力',
-  'hudChrome.enchantName.enchant_waist_agility': '腰エンチャント - 敏捷性',
-  'hudChrome.enchantName.enchant_legs_intellect': '脚エンチャント - 知力',
-  'hudChrome.enchantName.enchant_gloves_strength': '手エンチャント - 筋力',
-  'hudChrome.enchantName.enchant_feet_strength': '足エンチャント - 筋力',
-  'hudChrome.enchantName.enchant_feet_stamina': '足エンチャント - スタミナ',
-  'hudChrome.enchantName.enchant_ring_strength': '指エンチャント - 筋力',
-  'hudChrome.enchantName.enchant_ring_agility': '指エンチャント - 敏捷性',
-  'hudChrome.enchantName.enchant_ring_intellect': '指エンチャント - 知力',
-  'hudChrome.enchantName.enchant_weapon_greater_might': '武器エンチャント - 上級剛力',
-  'hudChrome.enchantName.enchant_weapon_greater_spellpower': '武器エンチャント - 上級呪文威力',
-  'hudChrome.enchantName.enchant_helmet_greater_fortitude': '頭エンチャント - 上級堅牢',
-  'hudChrome.enchantName.enchant_chest_greater_stamina': '胸エンチャント - 上級スタミナ',
-  'hudChrome.enchantName.enchant_legs_greater_stamina': '脚エンチャント - 上級スタミナ',
-  'hudChrome.enchantName.enchant_gloves_greater_agility': '手エンチャント - 上級敏捷性',
-  'hudChrome.enchantName.enchant_weapon_runed_edge': '武器エンチャント - ルーンの刃',
-  'hudChrome.enchantName.enchant_weapon_runed_focus': '武器エンチャント - ルーンの印章',
-  'hudChrome.enchantName.enchant_chest_runeweave': '胸エンチャント - ルーン織り',
-  'hudChrome.enchantName.enchant_legs_runed_hide': '脚エンチャント - ルーンの獣皮',
-  'hudChrome.enchantName.enchant_helmet_runed_links': '頭エンチャント - ルーンの鎖',
+  'hudChrome.enchantName.enchant_weapon_might': '武器銘刻：剛力',
+  'hudChrome.enchantName.enchant_weapon_intellect': '武器銘刻：呪文威力',
+  'hudChrome.enchantName.enchant_offhand_stamina': 'オフハンド銘刻：スタミナ',
+  'hudChrome.enchantName.enchant_helmet_fortitude': '頭銘刻：堅牢',
+  'hudChrome.enchantName.enchant_neck_spirit': '首銘刻：精神力',
+  'hudChrome.enchantName.enchant_shoulder_agility': '肩銘刻：敏捷性',
+  'hudChrome.enchantName.enchant_chest_stamina': '胸銘刻：スタミナ',
+  'hudChrome.enchantName.enchant_waist_stamina': '腰銘刻：スタミナ',
+  'hudChrome.enchantName.enchant_legs_stamina': '脚銘刻：スタミナ',
+  'hudChrome.enchantName.enchant_gloves_agility': '手銘刻：敏捷性',
+  'hudChrome.enchantName.enchant_gloves_intellect': '手銘刻：呪文威力',
+  'hudChrome.enchantName.enchant_feet_agility': '足銘刻：敏捷性',
+  'hudChrome.enchantName.enchant_ring_spirit': '指銘刻：精神力',
+  'hudChrome.enchantName.enchant_weapon_agility': '武器銘刻：敏捷性',
+  'hudChrome.enchantName.enchant_helmet_intellect': '頭銘刻：知力',
+  'hudChrome.enchantName.enchant_helmet_armor': '頭銘刻：強化',
+  'hudChrome.enchantName.enchant_neck_intellect': '首銘刻：知力',
+  'hudChrome.enchantName.enchant_neck_agility': '首銘刻：敏捷性',
+  'hudChrome.enchantName.enchant_shoulder_strength': '肩銘刻：筋力',
+  'hudChrome.enchantName.enchant_shoulder_intellect': '肩銘刻：知力',
+  'hudChrome.enchantName.enchant_chest_spirit': '胸銘刻：精神力',
+  'hudChrome.enchantName.enchant_chest_armor': '胸銘刻：強化',
+  'hudChrome.enchantName.enchant_waist_strength': '腰銘刻：筋力',
+  'hudChrome.enchantName.enchant_waist_agility': '腰銘刻：敏捷性',
+  'hudChrome.enchantName.enchant_legs_intellect': '脚銘刻：知力',
+  'hudChrome.enchantName.enchant_gloves_strength': '手銘刻：筋力',
+  'hudChrome.enchantName.enchant_feet_strength': '足銘刻：筋力',
+  'hudChrome.enchantName.enchant_feet_stamina': '足銘刻：スタミナ',
+  'hudChrome.enchantName.enchant_ring_strength': '指銘刻：筋力',
+  'hudChrome.enchantName.enchant_ring_agility': '指銘刻：敏捷性',
+  'hudChrome.enchantName.enchant_ring_intellect': '指銘刻：知力',
+  'hudChrome.enchantName.enchant_weapon_greater_might': '武器銘刻：上級剛力',
+  'hudChrome.enchantName.enchant_weapon_greater_spellpower': '武器銘刻：上級呪文威力',
+  'hudChrome.enchantName.enchant_helmet_greater_fortitude': '頭銘刻：上級堅牢',
+  'hudChrome.enchantName.enchant_chest_greater_stamina': '胸銘刻：上級スタミナ',
+  'hudChrome.enchantName.enchant_legs_greater_stamina': '脚銘刻：上級スタミナ',
+  'hudChrome.enchantName.enchant_gloves_greater_agility': '手銘刻：上級敏捷性',
+  'hudChrome.enchantName.enchant_weapon_runed_edge': '武器銘刻：ルーンの刃',
+  'hudChrome.enchantName.enchant_weapon_runed_focus': '武器銘刻：ルーンの印章',
+  'hudChrome.enchantName.enchant_chest_runeweave': '胸銘刻：ルーン織り',
+  'hudChrome.enchantName.enchant_legs_runed_hide': '脚銘刻：ルーンの獣皮',
+  'hudChrome.enchantName.enchant_helmet_runed_links': '頭銘刻：ルーンの鎖',
+  'hudChrome.enchantName.enchant_weapon_lucent_might': '武器銘刻：光輝の剛力',
+  'hudChrome.enchantName.enchant_weapon_lucent_spellpower': '武器銘刻：光輝の呪文威力',
+  'hudChrome.enchantName.enchant_chest_lucent_stamina': '胸銘刻：光輝のスタミナ',
+  'hudChrome.enchantName.enchant_feet_lucent_agility': '足銘刻：光輝の敏捷性',
+  'hudChrome.enchantName.enchant_lucent_infusion': '光輝の注入',
   'hudChrome.itemMenu.equip': '装備する',
   'hudChrome.itemMenu.use': '使用する',
   'hudChrome.itemMenu.disenchant': '魔力分解',
   'hudChrome.itemMenu.salvage': '解体',
+  'hudChrome.itemMenu.sunder': '断つ',
   'hudChrome.itemMenu.applyEnchant': 'エンチャントを付与',
   'hudChrome.enchanting.disenchantedLine': '{item}を魔力分解した。',
   'hudChrome.enchanting.disenchantedYield': '{item}を魔力分解して{material}にした。',
@@ -11733,6 +12069,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '{item}を破壊し、製作素材を得ます。この操作は元に戻せません。',
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     '特別な{item}（銘入り、傑作、またはエンチャント済み）を破壊し、製作素材を得ます。この操作は元に戻せません。',
+  'hudChrome.enchanting.sunderConfirmTitle': '{item}を断ちますか？',
+  'hudChrome.enchanting.sunderConfirmBody':
+    '{item}を破壊し、断たれし精髄を得ます。この操作は元に戻せません。',
+  'hudChrome.enchanting.sunderConfirmBodySpecial':
+    '特別な{item}（銘入り、傑作、またはエンチャント済み）を破壊し、断たれし精髄を得ます。この操作は元に戻せません。',
   'hudChrome.enchanting.pickerTitle': 'エンチャントを付与',
   'hudChrome.enchanting.targetTitle': 'エンチャントするアイテムを選択',
   'hudChrome.enchanting.noEnchants': 'この素材を使うエンチャントはありません。',
@@ -11798,6 +12139,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_workorder_kitchens.completion':
     'よし、これで食料庫は満杯だ。これがお前の報酬だ。また袋が重くなったら戻ってこい。',
   'entities.quests.q_prof_workorder_kitchens.objectives.0.label': '野獣の肉を納品',
+  'entities.quests.q_prof_workorder_kitchens_wheat.title': '厨房の小麦受注',
+  'entities.quests.q_prof_workorder_kitchens_wheat.text':
+    'パンは勝手に焼けてくれやしない、{playerName}。うちの粉櫃は底が見えてきた。渓谷小麦を八束持ってきてくれれば、まとめて正当な貨幣を払う。自分の手で育てたものでも市場で買ったものでも構わん、挽けるなら文句はない。',
+  'entities.quests.q_prof_workorder_kitchens_wheat.completion':
+    'よく乾いた粒だ、量もたっぷりある。これがお前の報酬だ、きっちり数えてある。次の収穫が上がったら、どの戸を叩けばいいか分かってるな。',
+  'entities.quests.q_prof_workorder_kitchens_wheat.objectives.0.label': '渓谷小麦を納品',
+  'entities.quests.q_prof_workorder_kitchens_rice.title': '厨房の米受注',
+  'entities.quests.q_prof_workorder_kitchens_rice.text':
+    '湿地の連中は自分たちの米を自慢してやまない、{playerName}。その理由を確かめてやるつもりだ。湿原米を五升持ってきてくれれば、ここに貨幣を用意しておく。道中は濡らすなよ。濡れた米は粥だ、俺は粥を頼んだ覚えはない。',
+  'entities.quests.q_prof_workorder_kitchens_rice.completion':
+    'ふっくらして乾いている、どの粒もな。これがお前の貨幣だ。湿地が実らせ続ける限り、俺も払い続ける。',
+  'entities.quests.q_prof_workorder_kitchens_rice.objectives.0.label': '湿原米を納品',
   'entities.quests.q_prof_workorder_loom.title': '織機の受注',
   'entities.quests.q_prof_workorder_loom.text':
     '織機が空回りし、遊ぶ手は日の光を無駄にします、{playerName}。蜘蛛の糸を六かせ持ってきなさい。公正な相場で、銅貨一枚まで数えてお支払いします。',
@@ -11927,6 +12280,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.cannotAfford': 'バインド解除の手数料を支払えません。',
   'hudChrome.unbind.outOfRange': 'バインド解除するには作業台のそばにいる必要があります。',
   'hudChrome.unbind.noSpace': 'バッグにバインド解除したアイテムを入れる空きがありません。',
+  'hudChrome.unbind.perfecting': '完全化の途中、または完全化済みのアイテムはバインドされたままです。',
   // Commission order board (issue #1298, M16 non-Latin fills added with the keys).
   'hudChrome.commissionBoard.title': '依頼ボード',
   'hudChrome.commissionBoard.close': '依頼ボードを閉じる',
@@ -11952,6 +12306,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.commissionBoard.rowFor': '{item}（依頼者：{requester}）',
   'hudChrome.commissionBoard.rowTargeted': '{item}（依頼者：{requester} / 指名：{crafter}）',
   'hudChrome.commissionBoard.acceptedBy': '{name}が引き受け済み',
+  'hudChrome.commissionBoard.crafterRecordLabel': '職人の実績：',
+  'hudChrome.plurals.commissionMasterworks.one': '傑作{count}点',
+  'hudChrome.plurals.commissionMasterworks.few': '傑作{count}点',
+  'hudChrome.plurals.commissionMasterworks.many': '傑作{count}点',
+  'hudChrome.plurals.commissionMasterworks.other': '傑作{count}点',
+  'hudChrome.plurals.commissionLegendaries.one': '伝説の品{count}点',
+  'hudChrome.plurals.commissionLegendaries.few': '伝説の品{count}点',
+  'hudChrome.plurals.commissionLegendaries.many': '伝説の品{count}点',
+  'hudChrome.plurals.commissionLegendaries.other': '伝説の品{count}点',
   'hudChrome.commissionBoard.statusOpen': '募集中',
   'hudChrome.commissionBoard.statusAccepted': '引き受け済み',
   'hudChrome.commissionBoard.statusDelivered': '納品済み',
@@ -11986,27 +12349,25 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   // /wiki/professions detail pages (M16 non-Latin fills, added with the keys).
   'guide.professions.ringHeading': '製作の輪',
   'guide.professions.ringBody':
-    '十の製作職がひとつの輪に並び、それぞれが独自のスキルを記録します。カードを開くと完全なレシピ表と数値を確認できます。',
+    '輪の上のどの製作職もスキル上限は125です。武器鍛冶、防具鍛冶、宝石細工、銘文、裁縫、皮革加工、料理、錬金術、工作、エンチャント。上限に達しても商いは続きます。採集は実り、製作は仕上がり、傑作も起こり得ます。登らなくなるのは数字だけです。下のカードを開くと、その職の完全なレシピ表と数値を確認できます。',
   'guide.professions.ringWaveNote':
-    '宝石細工と銘文は現在も輪の上にありますが、レシピはまだありません。その内容は今後のゾーン拡張とともに追加されます。',
+    '銘文が羽根ペンを執った今、輪の上のすべての席が本物のレシピを備えました。輪は揃いましたが、終わったわけではありません。上限は今後のゾーンとともに上がっていくので、今日の上限到達はその拡張への先行であって、ゴールではありません。',
   'guide.professions.capFmt': '上限{cap}',
   'guide.professions.comingSoon': 'レシピ未実装',
   'guide.professions.gatherHubHeading': '採集',
   'guide.professions.gatherHubBody':
-    '四つの採集職が製作に素材を供給します。採掘・伐採・薬草学の上限は100、釣りは200です。',
+    '採集職が製作に素材を供給します。採掘・伐採・薬草学の上限は100、農耕は手入れした畑で種から作物を育て上限は同じく100、釣りは200です。',
   'guide.professions.archetypesHeading': '十の生き方',
   'guide.professions.archetypesBody':
     '隣り合う二つの職に調律すると対の称号を得ます。二つの主専攻は上限まで伸ばせ、反対側の一つは趣味としてレア段階まで残り、その他の職はコモン段階に留まります。',
   'guide.professions.pairFmt': '{a}と{b}',
   'guide.professions.curveHeading': '熟達カーブ',
-  'guide.professions.curveBody':
-    'スキル{step}ポイントごとに1段階。自分の段階以上のレシピは全量の成長を与え、レシピが下に離れるにつれ半分、四分の一と減り、やがて止まります。',
   'guide.professions.provenanceHeading': '来歴',
   'guide.professions.provenanceBody':
     'レア以上の作品には作り手の名が刻まれ、傑作は品質が1段階上がり、受注品は受け取った相手にバインドされます（作り手の絆）。',
   'guide.professions.stationsHeading': '作業場と師匠',
   'guide.professions.stationsBody':
-    '三つの町の拠点に六つの種類別作業場があり、常駐の師匠がレシピを教え、作業依頼を出しています。',
+    '六つの種類別作業場が、作業場に縛られる九つの製作職を支え、三つの町の拠点に分かれて立っています。Eastbrookには鍛冶場（武器鍛冶、防具鍛冶、宝石細工が共有します）、厨房、織機、工作場があり、Fenbridgeにはなめし場が、Highwatchには薬房（錬金術と銘文がその調合台を共有します）があります。どの作業場のそばにも常駐の師匠がいて、レシピを教え、作業依頼を出し、バインド解除の窓口も務めます。\n\n作業できる半径は20ヤード、おおよそ作業場の敷地の内側です。町の反対側からではなく、金床のそばに立って作るということです。エンチャントだけは作業場を持たず、意図してどこでも働けます。',
   'guide.professions.colStation': '作業場',
   'guide.professions.colHub': '拠点',
   'guide.professions.colMaster': '師匠',
@@ -12023,9 +12384,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.matFmt': '{name}×{count}',
   'guide.profPages.outputFmt': '{name}×{count}',
   'guide.profPages.comboReq': '{a}と{b}が必要',
+  'guide.profPages.effectFood': '食べると{seconds}秒かけて体力を{amount}回復する。',
+  'guide.profPages.effectWellFed': '食べ終えると満腹: {stat}+{value}({minutes}分)。',
+  'guide.profPages.effectWellFedAura': '食べ終えると{minutes}分間{aura}を得る。',
+  'guide.profPages.effectFeast': '他の人が食べられる宴を並べる。1人1杯: 計{servings}杯、{minutes}分間持続。',
+  'guide.profPages.effectFeastServing': '1杯につき{seconds}秒かけて体力を{amount}回復する。',
+  'guide.profPages.effectFeastWellFed': '1杯を食べ終えると満腹: {stat}+{value}({minutes}分)。',
   'guide.profPages.sourceTrainerFee': '訓練師、{fee}',
   'guide.profPages.sourceTrainerFree': '訓練師、無料',
   'guide.profPages.sourceKnown': '最初から習得済み',
+  'guide.profPages.sourceDrop': '見つけた図案から習得',
+  'guide.profPages.sourceVendor': '英雄補給係が販売',
+  'guide.profPages.sourceDropAndVendor': '見つけた図案から習得、または英雄補給係が販売',
   'guide.profPages.colRecipe': 'レシピ',
   'guide.profPages.colSkill': 'スキル',
   'guide.profPages.colSource': '入手先',
@@ -12050,11 +12420,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftIntro.leatherworking':
     '皮革加工はフェンブリッジのなめし場で軽快な革装備をなめし、獣皮の基本からレアのマイアウォーデンまで作ります。',
   'guide.profPages.craftIntro.cooking':
-    '料理はイーストブルックの厨房で魚や獲物や薬草を腰を据えて食べる料理に変え、最高はレアの祝宴料理に届きます。',
+    '料理はイーストブルックの厨房で魚や獲物や薬草を腰を据えて食べる料理に変え、頂点は三種の役割別料理です。どの食べ物より大きく回復し、皿を食べ終えた者に満腹の効果を残します。',
   'guide.profPages.craftIntro.alchemy':
-    '錬金術はハイウォッチの薬房で治癒とマナの薬、そしてスタミナの霊薬を調合します。',
-  'guide.profPages.craftIntro.engineering':
-    '工作はイーストブルックの工作場でティア4と5の採集道具を作り、どれも一段下の道具を材料として消費します。',
+    '錬金術はハイウォッチの薬房で治癒とマナの薬、スタミナの霊薬、そして頂点には役割ごとのフラスコを調合します。フラスコは自分の死をも越えて残ります。',
   'guide.profPages.craftIntro.enchanting':
     'エンチャントは不要な装備を秘術素材へ分解し、それを永続的な装備エンチャントに注ぎ込みます。作業場は不要です。',
   'guide.profPages.howHeading': '製作の流れ',
@@ -12071,7 +12439,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '製作成功のたびに{base}%の傑作率があり、レシピより1段高いごとに{perTier}%、署名入り素材の使用で{signed}%、特化で{spec}%が加算され、上限は{cap}%です。',
   'guide.profPages.trainingHeading': '訓練',
   'guide.profPages.trainingBody':
-    'この職での段階がレシピ自身の段階に達すると師匠が教えてくれます。段階0のレシピは無料、段階1は{tier1}、段階2は{tier2}です。',
+    'トレーナーのレシピは、その土地に住まう師匠たちが自分の作業場で教えます。規則は一行です。この職でのあなたの段階がレシピ自身の段階に達すると師匠がそれを教えてくれ、他に条件はありません。レベルもアーキタイプも関係しません。装備と消耗品の梯子はスキル0、25、50に段を置き、どの職もその上に、それぞれの作業場で教わる75の中間段をひとつ加えます（エンチャントのそれは光輝の試薬で、25の段にある二つの護符レシピと並びます）。工作の二つの竿の教程は75と125で梯子を先へ延ばすので、段階が上がるごとに新しい段が開きます。\n\n料金は一度きりで、段ごとに一律です。最初の段は無料、スキル25の段はレシピごとに{tier1}、スキル50の段は{tier2}、その上の75と125の段はそれぞれ固有の料金を持ち、表の各レシピの隣に記されています。修行には師匠の実際の作業場に立っている必要があり、移動式の作業場は数に入りません。共通の野外レシピと、製作で作る六つの陸の道具のレシピは修行が一切不要で、どのキャラクターも最初から知っています。',
   'guide.profPages.specializationHeading': '特化',
   'guide.profPages.specializationBody':
     'スキルが{at}に達するとこの職に特化し、レシピの素材コストが{pct}%減ります。',
@@ -12094,6 +12462,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.ench.tier.base': '基本',
   'guide.profPages.ench.tier.runed': 'ルーン',
   'guide.profPages.ench.tier.greater': '上級',
+  'guide.profPages.ench.tier.lucent': '光輝',
   'guide.profPages.ench.salvageHeading': 'サルベージ',
   'guide.profPages.ench.salvageNote':
     '誰でも武器や防具を品質に応じた普通の素材へ回収できます。エンチャントのスキルは不要です。',
@@ -12106,6 +12475,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '薬草学は三つのゾーンで薬草を摘み、調合系の職に素材を供給します。艶葉草はイーストブルック渓谷、金葉草はマイアフェン湿地、陽花草はソーンピーク高地に育ちます。レベル1から誰でも始められ、バッグに薬草鎌（どのゾーンの拠点でも銅貨20枚）があれば摘み取れます。専用のカウンターで記録され、上限は100です。',
   'guide.profPages.gatherIntro.fishing':
     '釣りはアタリとリールの呼吸で各ゾーンの開けた水辺から獲物を釣り上げます。上限は200です。',
+  'guide.profPages.gatherIntro.farming':
+    '農耕は奪うのではなく世話をして育てる唯一の採集職です。手入れした畑に種をまけば、留守の間も作物は自分の時計で育ち、いつ戻っても実りを引き抜けます。畑にあるものは決して腐らないからです。Eastbrookの割当地からFenbridge、Highwatchを経てEvergardenの花壇まで、どの畑のそばにも農夫が立ち、EastbrookのFarmer Jessicaがこの職の入口です。彼女はGarden Hoeと最初の種を売り、その使いは新米農夫に最初の作物の育て方を教えてくれます。はしごの段ごとに固有の作物が実り、下の段は二種、上の段は四種で、腕が上がれば上質な等級も採れ、最初の畑より手強い土地の鍬はエンジニアが作ります。熟練度は専用のカウンターで上限100まで数えられます。',
   'guide.profPages.rhythmHeading': '採集のリズム',
   'guide.profPages.rhythmBody':
     '採集は目に見える詠唱です。基本{base}秒、最短{floor}秒で、道具がノードより1ティア高いごとに{tool}秒、熟練度バンドごとに{band}秒短くなります。',
@@ -12124,11 +12495,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.priceNone': '非売品',
   'guide.profPages.toolTierReq': 'ティア{tier}の道具',
   'guide.profPages.bandsHeading': '熟練度バンド',
-  'guide.profPages.bandsBody': '熟練度バンドは採集の詠唱を速め、釣りでは釣果表も左右します。',
   'guide.profPages.bandFmt': 'バンド{band}：熟練度{at}から',
   'guide.profPages.rareHeading': '珍しい発見',
   'guide.profPages.rareBody':
     '採集のたびに{oneIn}分の1の確率で珍しい発見が起こり、収穫が{mult}倍になり、必ず署名され、ゾーン全体に告知されます。',
+  'guide.profPages.rareBodyFourFlavors':
+    '採集のたびに、熟練の高さを問わず{oneIn}分の1の確率で珍しい発見が起こります。鉱石なら純粋な鉱脈、材木なら太古の心木、薬草の茂みなら月光の花、畑の畝からなら黄金の収穫です。発見が起きるとその回の収穫は{mult}倍になり、引き当てた品質にかかわらず一つ残らずあなたの名前で署名され、ゾーン全体があなたの名とともにその報せを耳にします。さらに四つの発見はそれぞれ専用の名声ゼロの功績を功績の書に刻みます。それがあなたの身に起きたと証明するためだけに存在する収集印です。',
   'guide.profPages.specimenBody':
     '死体の採集では署名入りの完璧な標本が見つかることもあります。死体採集の約{pct}%はレア以上を引き当てます。',
   'guide.profPages.fish.biteHeading': 'アタリとリール',
@@ -12136,14 +12508,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'キャストから{min}から{max}秒でアタリが来ます（良い竿は待ちを最大{rod}秒縮めます）。リールの猶予は{reel}秒に竿がティア1つ上がるごとに{reelRod}秒加わり、1回のセッションは最長{cap}秒です。',
   'guide.profPages.fish.earlyReelNote': 'せっかちな指へひとつ注意を。何かが食いつく前にもう一度竿を押すと、空の糸を巻き上げてその一投は終わります。糸が落ちてからの最初の一秒は大目に見られるので、うっかり二度押しても損はありません。それを過ぎたら、早すぎる一押しは無駄にした一投です。辛抱こそがこの遊びのすべてです。当たりを待ち、それから合わせてください。',
   'guide.profPages.fish.scheduleHeading': '熟練度成長',
-  'guide.profPages.fish.scheduleNote':
-    '釣りの成長は熟練度ごとの固定スケジュールに従い、{cutoff}からはガラクタを釣っても何も学べません。',
   'guide.profPages.fish.colProficiency': '熟練度',
   'guide.profPages.fish.colGain': '1匹あたりの成長',
   'guide.profPages.fish.belowFmt': '{below}未満',
   'guide.profPages.fish.tablesHeading': '釣果表',
-  'guide.profPages.fish.tablesNote':
-    '各バンドのゾーン別の正確な釣果確率です。どの行でも{rare}が珍しい獲物です。',
   'guide.profPages.fish.bandHeading': 'バンド{band}：熟練度{at}以上、竿ティア{rod}',
   'guide.profPages.fish.colCatch': '釣果',
   'guide.profPages.fish.colOdds': '確率',
@@ -12168,7 +12536,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.free': '無料',
   'guide.profPages.econ.workOrdersHeading': '作業依頼',
   'guide.profPages.econ.workOrdersNote':
-    '各師匠は自分の定番素材の束を店売り価格の{pct}%で買い取り、{minutes}分ごとに繰り返せます。',
+    '各師匠は定番素材ごとに受注を出しており、求められた束を店売り価格の{pct}%で買い取ります。受注ごとに{minutes}分の時計が別々に回り、納品した受注だけが閉じ、同じ師匠の他の受注は開いたままです。',
   'guide.profPages.econ.colOrder': '作業依頼',
   'guide.profPages.econ.colMaster': '師匠',
   'guide.profPages.econ.colAsks': '要求',
@@ -12183,40 +12551,53 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.doctrineBody':
     '製作装備の強さは常にレイドの下限を下回り、上記の費用は品物を商店の循環ではなくプレイヤー間の取引へと押し出します。',
   'guide.profPages.faq.title': '生産職FAQ',
+  'guide.profPages.prov.title':
+    '糧食の道：畑からレイドへ',
+  'guide.profPages.prov.intro':
+    '採集の各系統はひとつの厨房で交わり、その上に伸びる梯子の先には、レイド全員が囲む食卓がある。',
+  'guide.profPages.prov.suppliersHeading':
+    '厨房を支えるのは誰か',
+  'guide.profPages.prov.suppliersBody':
+    '料理はほぼすべての採集系統から材料を取る。これは意図されたものだ。釣りや農耕、皮剥ぎも手がける料理人が扱う材料に事欠くことはなく、そのいずれもしない料理人でも市場で一式そろえられる。\n\n各系統が何をもたらすかは下に並べてある。ここに書き写したものではなく、現在のレシピ表から直接読み取っているので、いつでも今日の厨房が実際に求めているものが並ぶ。',
+  'guide.profPages.prov.lineCountFmt':
+    '料理レシピへ{count}種',
+  'guide.profPages.prov.lineCorpse':
+    '死体からの採取',
+  'guide.profPages.prov.ladderHeading':
+    '梯子を一段ずつ',
+  'guide.profPages.prov.ladderBody':
+    '料理はいつもの区切りで上っていき、どの段にもそこで習得できるものが並ぶ。序盤の段は、鞄から自分で食べる一人分の料理だ。上に進むと、厨房は他人のために作りはじめる。持続する強化を宿した皿、そしてその上の宴。宴は自分で食べるものではなく、地面に据えて、近くにいる全員が取り分けるものだ。',
+  'guide.profPages.prov.rungFmt':
+    '料理 {skill}',
+  'guide.profPages.prov.placeableTag':
+    '（食べずに据える）',
+  'guide.profPages.prov.stationTag': '（野営の製作拠点）',
+  'guide.profPages.prov.tableHeading':
+    '頂にある食卓',
+  'guide.profPages.prov.tableBody':
+    '宴は立っている場所に据えられ、近くにいる者が一人一杯ずつ取る。一杯が与えるのは、その宴が中心に据えている料理そのものだ。だから宴が独自の力を持つことはない。すでに作れる皿を、まとめて一団に手渡す方法にすぎない。\n\n梯子の頂は一つではなく三つの宴で、その中から選ぶことだけが唯一の選択だ。費用も、求める材料も、必要な技能も同じ。違うのは三つの大皿のどれを供するかだけで、集団はこれから挑むものに合うものを選ぶ。どの段のものであれ、自分の宴は一度にひとつしか据えられず、片づけられるまで数分は保つ。',
+  'guide.profPages.prov.marketHeading':
+    '自分では一切作らないなら',
+  'guide.profPages.prov.marketBody':
+    '料理をしない者にとって、ここに壁はない。このページに載る素材はすべて取引できる普通の品だ。釣り人は釣果を売り、農夫は作物を売り、そのどちらもしないレイドの者は、余分に作った料理人から宴をそのまま買えばいい。厨房は生産技能が交わる場所であって、素通りする者への関所ではない。',
+  'guide.profPages.prov.cookingLink':
+    '料理',
   'guide.profPages.faq.intro': '作り手からよく聞かれる質問への短い答えです。',
-  'guide.profPages.faq.q1': '生産職はいくつ覚えられますか？',
+  'guide.profPages.faq.q1': 'なぜ署名入りのアイテムはスタックしないのですか？',
   'guide.profPages.faq.a1':
-    'どのキャラクターも八つの修得可能な製作職と四つの採集職をすべて伸ばせます。唯一の選択は生き方だけです。',
-  'guide.profPages.faq.q2': 'レシピはどこで覚えますか？',
+    '署名入りのアイテムは、それ自体がひとつの個体として存在するアイテムです。名もない複製ではなく、そのアイテム自身の小さな記録（署名者、引き当てた品質、傑作の能力値、エンチャント、絆）を携えています。二つの品が一つのスタックにまとまるのは、その記録が完全に一致するときだけです。\n\n実際にはこうなります。自分で採集したレアの鉱石は、同じく自分で採集したレアの鉱石とスタックします。どちらも「採集者：あなた」で、ほかに違いがないからです。友人の署名が入った同じ素材は自分だけのスロットに収まり、署名のない無地の品が署名入りのスタックにまとまることは決してありません。バッグ、銀行、取引、手紙、ワールドマーケットのすべてが、この一つのルールに従います。',
+  'guide.profPages.faq.q2': 'コモンのレシピはいつまでもスキルを上げてくれますか？',
   'guide.profPages.faq.a2':
-    '訓練師のレシピは各作業場の常駐の師匠から学び、九つの共通フィールドレシピと道具レシピは全員が最初から知っています。',
-  'guide.profPages.faq.q3': '採集に道具は必要ですか？',
-  'guide.profPages.faq.a3':
-    'ティア1のノードは素手で採れます。ティア2や3のノードには、そのティア以上の対応する道具が必要です。',
-  'guide.profPages.faq.q4': 'なぜスキルが上がらなくなったのですか？',
-  'guide.profPages.faq.a4':
-    'レシピが自分より下に離れるにつれ、熟達カーブは成長を半分、四分の一、ゼロへと減らし、各職は上限で止まります。',
-  'guide.profPages.faq.q5': '傑作とは何ですか？',
-  'guide.profPages.faq.a5':
-    'どの製作にも品質が1段階高く仕上がる小さな確率（3%から上限15%）があり、レイドの下限を超えることはありません。',
-  'guide.profPages.faq.q6': '「作り手：」とは何の意味ですか？',
-  'guide.profPages.faq.a6':
-    '九つの共通の野外レシピと道具のレシピは、最初から誰もが習得しています。作業場に縛られる三つのレシピ（窯鱗のマント、ワードウィーヴのフード、ダスクハイドの手甲）も同様で、師匠は不要ですが、その作業場は必要です。それ以外はすべて、三つの拠点の町にある各作業場の師匠が教えます。多くはイーストブルックにおり、なめし職人はフェンブリッジのなめし場に、錬金術師はハイウォッチの薬房にいます。\n\nトレーナーのレシピはスキル0、25、50の段階に分かれ、一度きりの料金として無料、銀25、金1で習えます。エンチャントの魔除けレシピ2つは25の段にあり、工作場の親方はスキル75と125で釣り竿2種を教え、それぞれ金4枚と16枚です。師匠はその職のあなたの段階がレシピ自身の段階に達すると教えてくれ、習得には師匠の作業場に立っている必要があります。移動式の作業場は数に入りません。',
-  'guide.profPages.faq.q7': '作り手の絆とは何ですか？',
-  'guide.profPages.faq.a7':
-    '受注品は取引で受け取った相手にバインドされ、どの作業場の師匠でも段階料金で解除できます。',
-  'guide.profPages.faq.q8': '生き方は変えられますか？',
-  'guide.profPages.faq.a8':
-    '一度も持ったことのない組み合わせは新しい調律クエストひとつで済み、かつて持っていた組み合わせに戻るには、代償が増えていく償いの用事が必要です。',
+    'いいえ。どのレシピも、その職での現在の自分の段階からどれだけ下にあるかで採点されます。読み方は古典どおりのオレンジ、黄色、緑、灰色です。自分の段階以上なら全量、1段下は半分、2段下は四分の一、3段以上下は成長なし。段階はスキル25ごとなので、無料のスキル0レシピはスキル75で何も教えなくなります。\n\n上限も、古典の300を思い浮かべていると低めです。修得できる十の製作職はいずれも125で、採掘、伐採、薬草学は100、釣りだけは200まで続きます。登るとは自分の段階のレシピへ乗り換えていくことで、一番安いレシピを回し続けることではありません。',
   // Professions 2.0 wiki arm, final prose sections (M16 non-Latin
   // fills for the NEW keys; item, NPC, and deed names stay English, the baked
   // proper-noun precedent).
   'guide.professions.whatHeading': '剣のかたわらの生業',
   'guide.professions.whatBody':
-    '専門技能はこの世界の暮らしそのものです。四つの採集職が大地から素材を引き出し、十の製作職がそれを装備や食事、薬、道具に変えます。すべてが連鎖します。掘った鉱石は剣になり、剣はエンチャントを受け、そのエンチャントは古い装備を砕いた粉を必要とします。職業数の制限はありません。今内容のある八つの製作職と四つの採集職をすべて並行して伸ばせます。唯一の排他的な選択は、いずれ誓う生き方だけです。ただし、いったん誓いを立てると、その陰で休眠に入った製作職は伸びが止まります。スキルは決して下がらず、学んだことが失われることもありません。',
+    '専門技能はこの世界の暮らしそのものです。採集職が大地から素材を引き出し、十の製作職がそれを装備や食事、薬、道具に変えます。すべてが連鎖します。掘った鉱石は剣になり、剣はエンチャントを受け、そのエンチャントは古い装備を砕いた粉を必要とするので、採集者も職人もからくり師も、みなひとつの鎖の輪です。\n\n職業数の制限に悩む必要はありません。どのキャラクターも十の製作職のうち九つと、採集職のすべてを並行して伸ばせます（工作だけは例外で、レシピが全て自由上限より上から始まるため、その梯子は爆破師の誓いを待ちます）。唯一の排他的な選択は、いずれ誓う生き方だけです。ただし、いったん調律すると、その陰で休眠に入った製作職はコモンのレシピでしか伸びず、スキル75から先はまったく伸びません。スキルは決して下がらず、学んだことが失われることもありません。',
   'guide.professions.deedsHeading': '旅路を刻む功績',
   'guide.professions.deedsBody':
-    '功績の書が歩みに寄り添います。初めての調律で技巧に誓いし者、初めての傑作でMasterwrightを獲得し、どちらも称号として身につけられます。八つの製作職はそれぞれスキル50で節目の功績、上限125でGrandmaster称号を戴き、釣りは熟練100でOld Salt、200でMaster Angler称号を得ます。初めての採集や製作、野外の幸運な発見、サルベージにも静かなページがあります。すべて装飾のみ。称号と名声だけで、功績が力を与えることはありません。',
+    '功績の書が歩みに寄り添います。初めての調律で技巧に誓いし者、初めての傑作でMasterwrightを獲得し、どちらも称号として身につけられます。修得できる十の製作職はいずれもスキル50で節目の功績を刻み、上限でGrandmaster称号を戴き、釣りは熟練100でOld Salt、200でMaster Angler称号を得ます。\n\n静かなページもあります。初めての採集と初めての製作、野外で運が巡らせてくれる珍しい発見、そしてサルベージを始めたことにも功績があります。すべて装飾のみ。称号と名声だけで、功績が力を与えることはありません。あなたがそこにいた証になるだけです。',
   'guide.professions.startHeading': 'どこから始めるか',
   'guide.professions.startBody':
     'イーストブルックに着いたばかりなら、監督官オデルを訪ね、「剣以外にも稼ぎはある」を受けましょう。町の北東、銅鉱山周辺の鉱脈へ案内してくれ、最初のまめを授けてくれます。鉱山そのものには要注意です。そこに陣取るディープロックの掘削者たちは駆け出しより数段強いので、まずは外縁の鉱脈から手をつけ、野営地の中心は少しレベルを上げてから狙いましょう。以後は旅の途中で見かける鉱脈や木立、薬草をすべて採ること。習熟は旅を重ねる者に自然と身につきます。\n\n町ではTキーで製作ウィンドウを開き、誰もが最初から知っている初期レシピをこなしましょう。鍛冶場、厨房、織機、工作場の師匠たちを訪ねて何を教えてくれるか確かめ、作業依頼を受けて堅実に稼ぎましょう。ギルドの手紙が届く頃には、どの対が我が家か分かっているはずです。',
@@ -12225,19 +12606,41 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '採集のたびに品質が抽選され、その確率は熟練度がすべてです。始めたばかりの採集者は常にコモン品ですが、熟練が上がるほど高い等級へ重みが移り、決して後退しません。上限100ではコモンが完全に消え、60%が良質、30%がレア、8%がエピック、2%が伝説になります。品質は量でもあります。コモンは1個、良質とレアは2個、エピックは3個、伝説は4個。レア以上の収穫はあなたの署名入り（Gathered by）で届き、上限では十回に四回、名前が刻まれます。',
   'guide.profPages.gatherDeedsHeading': '道すがらの功績',
   'guide.profPages.gatherDeeds.mining':
-    'どの採集職でも最初の採取でFruits of the Fieldを、採掘100でOre in the Bloodを刻みます。採掘、伐採、薬草学、釣りのうち三つで100に達するとMaster Gatherer（名声25）。pristine veinを掘り当てれば専用の収集印も。功績は称号と名声のみで、力は与えません。',
+    'どの採集職でも最初の採取でFruits of the Fieldを、採掘100でOre in the Bloodを刻みます。採集職のうち三つで100に達するとMaster Gatherer（名声25）。pristine veinを掘り当てれば専用の収集印も。功績は称号と名声のみで、力は与えません。',
   'guide.profPages.gatherDeeds.logging':
-    'どの採集職でも最初の採取でFruits of the Fieldを、伐採100でHeartwood Hewerを刻みます。四採集職のうち三つで100に達するとMaster Gatherer（名声25）。ancient heartwoodを切り出せば専用の収集印も。功績は称号と名声のみで、力は与えません。',
+    'どの採集職でも最初の採取でFruits of the Fieldを、伐採100でHeartwood Hewerを刻みます。採集職のうち三つで100に達するとMaster Gatherer（名声25）。ancient heartwoodを切り出せば専用の収集印も。功績は称号と名声のみで、力は与えません。',
   'guide.profPages.gatherDeeds.herbalism':
-    'どの採集職でも最初の採取でFruits of the Fieldを、薬草学100でMaster of the Meadowを刻みます。四採集職のうち三つで100に達するとMaster Gatherer（名声25）。moonlit bloomを摘めば専用の収集印も。功績は称号と名声のみで、力は与えません。',
+    'どの採集職でも最初の採取でFruits of the Fieldを、薬草学100でMaster of the Meadowを刻みます。採集職のうち三つで100に達するとMaster Gatherer（名声25）。moonlit bloomを摘めば専用の収集印も。功績は称号と名声のみで、力は与えません。',
   'guide.profPages.gatherDeeds.fishing':
     '熟練100でOld Saltを、200でMaster Anglerとその称号を刻みます。釣り人の頂点です。釣りもMaster Gatherer（三職100）に数えられます。各地方の水域で最初の一匹を釣ればそれぞれのページが埋まり、日映えの錦鯉を釣ればGlimmer of Hopeが記されます。杖を荷物に忍ばせる旅人は、思いのほか早く功績の書を満たします。',
+  'guide.profPages.gatherDeeds.farming':
+    '農耕には専用の功績がまだありません。畑と作物が根付いた今、他の職を彩る到達と上限の功績は今後の更新で加わります。熟練はすでにMaster Gatherer（いずれか三職で100）に数えられるため、農夫もそのページを皆と同じように埋められます。功績は称号と名声だけを与え、力を与えることはありません。',
+  'guide.profPages.gatherDeeds.farmingSown':
+    '農耕は今、功績の書に自分の棚を持っています。Sow It Beginsは最初に植えた作物を記し、四つの年代記のページが、Eastbrook ValeからEvergardenまで、それぞれの畑の地での最初の実った収穫を記します。黄金の収穫は名声ゼロの収集印を自ら記し、農耕の熟練もMaster Gatherer（いずれか三職で100）に数えられます。Every Furrow Filledは名簿すべてを一つのページにまとめます。四つの庭が育てる作物をすべて育てれば、その収集は完結します。その上の到達点はHarvestmaster、この職の熟練100の称号で、山と花壇の種が今では農夫の店に並んでいるので、今日から登りきれる道のりです。功績は称号と名声のみで、力は与えません。',
+  'guide.profPages.farm.tableHeading': '畑から食卓へ',
+  'guide.profPages.farm.tableBodyOneMeal':
+    '厨房は、一季の実りが報いに変わる場所です。日々の農家料理に加えて、作物の各段にはより豪華な一皿があり、食べれば満腹が残ります。食事を終えると長持ちする恵みが身に残り、ダンジョンの扉の前でパーティーが先に済ませておきたい一手です。満腹の効果は同時に一つだけで、新しい食事が古いものを置き換えます。締めくくりはHarvest Feast。料理人が世界そのものに広げるごちそうで、居合わせた皆が一人前ずつ、一人一度だけ取り分け、食べ終えた食事はどれも同じ満腹の恵みを支払います。一人の農夫の一季が、パーティー全員の食卓を整えるのです。その梯子の頂、最も豪華な二皿とごちそうそのものは山と花壇の作物に頼り、その種は畑のそばの農夫の店に並んでいます。レシピのほうは別の話です。農耕の梯子の上の段はもうどの店でも教わらず、他の終盤レシピと同じように、終盤コンテンツで見つけるか、ヒーローの記章で買うことになります。皿の梯子そのものは料理の仕事です：その段のすべては料理のページが載せています。\n\nその食卓には運の席もあります。持ち帰るどの収穫も、他の採集職と同じ思わぬ実りの機会を転がし、時おり作物が黄金に実ります。実りは並の収穫をはるかに超え、おまけがもう一つ付いてきて（今耕している土地より上の段の種、あるいはたまにあの終盤レシピの一つ）、地方全体がその発見をあなたの名とともに耳にし、Golden Harvestが功績の書に記されます。',
+  'guide.profPages.farm.tableBody':
+    '厨房は、一季の実りが報いに変わる場所です。日々の農家料理に加えて、作物の各段にはより豪華な一皿があり、食べれば満腹が残ります。食事を終えると長持ちする恵みが身に残り、ダンジョンの扉の前でパーティーが先に済ませておきたい一手です。締めくくりはHarvest Feast。料理人が世界そのものに広げるごちそうで、居合わせた皆が一人前ずつ、一人一度だけ取り分け、食べ終えた食事はどれも同じ満腹の恵みを支払います。一人の農夫の一季が、パーティー全員の食卓を整えるのです。その梯子の頂、最も豪華な二皿とごちそうそのものは山と花壇の作物に頼り、その種は畑のそばの農夫の店に並んでいます。レシピのほうは別の話です。農耕の梯子の上の段はもうどの店でも教わらず、他の終盤レシピと同じように、終盤コンテンツで見つけるか、ヒーローの記章で買うことになります。\n\nその食卓には運の席もあります。持ち帰るどの収穫も、他の採集職と同じ思わぬ実りの機会を転がし、時おり作物が黄金に実ります。実りは並の収穫をはるかに超え、おまけがもう一つ付いてきて（今耕している土地より上の段の種、あるいはたまにあの終盤レシピの一つ）、地方全体がその発見をあなたの名とともに耳にし、Golden Harvestが功績の書に記されます。',
+  'guide.profPages.farm.rhythmHeading':
+    '農耕のリズム',
+  'guide.profPages.farm.rhythmBody':
+    '目に見える詠唱があるのは植え付けだけです。どの段でも一律{plant}秒。鍬は速さを買う道具ではなく、耕せる土地を開く道具だからです。熟した作物を引き抜くのは一瞬で、中断される詠唱もなければ、バッグがいっぱいだからと断られることもありません。実った畑はいつまでも待っていてくれるので、荷物が満杯でも農夫が払う代償は、空けに戻る道のりだけです。\n\n収穫が支払うのは農作物と農耕の熟練度です。鉱脈と違い、キャラクターの経験値はまったく入りません。畑はレベルを上げる手段ではなく、腰を据えて働く職なのです。',
+  'guide.profPages.farm.gainHeading':
+    '収穫が教えること',
+  'guide.profPages.farm.gainBody':
+    '熟練度の伸びは決定的で、作物ではなく自分のカウンターで決まります。熟練度{p1}未満なら収穫ごとに{g1}、{p2}未満なら{g2}、{p3}未満なら{g3}、そこから上限{cap}までは{g4}です。スキルアップの抽選は一切ないので、登りの長さは計算どおりぴったりです。\n\n作物のティアが決めるのは、その畑がどこまで連れて行ってくれるかです。ティア1の作物は{c1}まで教えてそこで灰色になり、ティア2の作物は{c2}まで、ティア3以上は上限まで教えてくれます。カウンターを動かし続けるには、上の畑へ移ることが欠かせません。',
+  'guide.profPages.farm.yieldsHeading':
+    '収穫の実り',
+  'guide.profPages.farm.yieldsBody':
+    '畑が支払うのは、等級の付いた一回の採取ではなく、摘み取りの回数です。どの畑も最低{floor}回分の余力から始まり、一回摘むごとに、その余力を減らさずに済むかどうかを判定します。確率は、始めたばかりのカウンターで{keep0}%、上限で{keepCap}%。ならすと、始めのころで約三回半、終わりのころで約六回の摘み取りになります。\n\n品質は摘み取りを置き換えるのではなく、その同じ摘み取りに乗ります。一回ごとに、始めたばかりのカウンターで{fine0}%、上限で{fineCap}%の確率で、その畑で育てた作物が並の等級ではなく上質な等級で出ます。つまり上質な一回は摘み取りを格上げするだけで、回数を増やすことは決してありません。畑にはコモンから伝説までの梯子はありません。作物が生み出すのは自分の二つの等級だけです。\n\n摘み取りの回数そのものを増やすものは二つあり、どちらも並の等級で加わります。植えるときに仕込んだ錬金術師の成長トニックは、{tonicPct}%の確率で摘み取りを{tonicPicks}回ぶん多く支払い、スロットに装着した数量の道具効果は{effectCap}回を加えます。これは農耕が「匠のお守り」に定めた上限で、成長トニックが存在する理由を残すためのものです。充填の残った「職人の眼」は数ではなく品質に効き、上質判定のたびに{fineBonus}パーセントポイントを上乗せします。',
+  'guide.profPages.farm.bedsHeading': '畑の手入れ',
+  'guide.profPages.farm.bedsBody':
+    '手順は短いものです。畑のそばの農夫から種と堆肥を買います。EastbrookのJessicaは渓谷の二種、Fenbridgeの農夫は湿地の二種、HighwatchのテラスのHollisは山の作物、VerbenaはEvergardenの花壇の作物を置いています。高い段の収穫も自前の種を一つ二つ返してくれますし、どの種もWorld Marketで取引され、山と花壇の種は今では終盤コンテンツからも落ち、ヒーロー補給官の店にも並ぶので、畑のそばの農夫は唯一の入り口ではなく最初の入り口です。鍬を袋に入れて種をまき、望むなら勝ちの目を上げましょう。店の堆肥と、まくときに農作物で払う農夫の見回りはどちらも作物が無事に育つ確率を上げ、錬金術師の成長トニックは収穫が増える見込みを与え、熟練が作物の段より丸一帯上がれば、その作物はもう決して枯れません。あとは立ち去るだけです。ログアウト中も畑は育ち続け、熟した作物はいつまでも待っていて、収穫日誌（Shift+K、または専門技能ウィンドウの農耕の行）が植えた畑すべてをタイマーつきで一覧にします。\n\n枯れた作物は農作物の代わりに枯れた籾殻を残し、どの農夫でも籾殻を堆肥に換えてくれるので、悪い季節は次の季節の保険を買います。持ち帰ったものは厨房を支えます。農作物は厨房で料理になり、Cook Marlowの小麦と米の受注はVale WheatとMarsh Riceを、他のどの受注とも同じ時計で買い取ってくれます。',
+  'guide.profPages.farm.bedsBodyScribeBuyer':
+    '銘文師の机も畑から買い付けます：スキル50の段のサンペタルの巻物はHighwatchのテラスから来る霜瓜をひとつ取り、それは蛇のエリクサーが取るのと同じ瓜ですから、そのバフへ通じる二つの道は同じ費えに揃えられています。',
   'guide.profPages.fish.startHeading': 'はじめかた',
-  'guide.profPages.fish.startBody':
-    'Simple Fishing PoleはEastbrookのFisherman Brandtが20銅で売っています（町の東端でMirror Lakeを睨む老練の釣り師です）。Tinker Gizzel、FenbridgeのProvisioner Hale、HighwatchのQuartermaster Breeにも在庫があります。前方約24ヤード以内の十分に深い水面に向かって竿を使えば、浮きが飛んでいきます。戦闘中、泳いでいる間、死亡中は投げられません。岸から釣るのが本来の姿で、どの地方の釣れる水域でも構いません。',
   'guide.profPages.fish.koiHeading': '日映えの錦鯉',
-  'guide.profPages.fish.koiBody':
-    '世界中のあらゆる水域に同じ大物が潜んでいます。日映えの錦鯉、良質のきらめく錦鯉で、商人に売れば75銅、誇りとしてはそれ以上の価値があります。確率は釣り上げごとに一律3%（Thornpeakの冷たい水では4%）でスキルに左右されず、桟橋の新人もMaster Anglerも同じ土俵です。釣り上げれば功績の書にGlimmer of Hope（名声ゼロの収集印）が記されます。',
   'guide.profPages.econ.sellsHeading': '何が売れるか、なぜか',
   'guide.profPages.econ.sellsBody':
     '最も堅実な商売は消耗品です。使えばなくなり、また買われるからです。薬、料理、エンチャントはすべて消えもの。剣を一度買った戦士も回復薬は永遠に買い続けます。傑作は高級品市場です。注文生産はできないため、望まれた一品には本物の上乗せがつき、刻まれた署名は歩く看板になります。素材が第三の柱です。分解で得る秘術素材、砕き手からエンチャンターへ直接流れるResonant副産物、そして傑作を狙う職人が割高でも買う署名入り採集素材です。',
@@ -12249,7 +12652,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '商人は来歴を見ません。署名入りでもNPCへの売値は無印と同額です。署名の上乗せはプレイヤーの間にだけ存在し、だからこそ面白いのです。名の知れた採集者が署名した幸運の鉱石、Prime Cutの一切れ、引退した職人の名を刻む傑作の剣。値段は誰かの記憶が決めます。功績の書も同じ心を汲みます。Pristine Vein、Ancient Heartwood、Moonlit Bloom、A Perfect Specimen、Glimmer of Hopeはいずれも名声ゼロの収集印で、その瞬間があなたに起きた証のためだけにあります。これらは力ではありません。来歴は能力値を買わず、戦いにも勝ちません。良き日々の控えです。',
   'guide.profPages.craftProse.weaponcrafting.identityHeading': '誰もが買い求める刃',
   'guide.profPages.craftProse.weaponcrafting.identityBody':
-    'レア段だけで三つの欲求を満たします。力の近接向けOsmium Warblade、敏捷の戦士向けGlyphsteel War Axe、そして知力と精神の杖Highpine Battle Staff。製作の環では防具鍛冶と宝石細工の間に座り、鍛冶師（武器鍛冶と防具鍛冶）はForgemistress Darvaの前で鉱脈を三つ自らの手で掘って誓えます。宝石細工との対Bladewrightは、宝石細工のレシピが将来の地方で届くまで誓えません。',
+    'レア段だけで三つの欲求を満たします。力の近接向けOsmium Warblade、敏捷の戦士向けGlyphsteel War Axe、そして知力と精神の杖Highpine Battle Staff。製作の環では防具鍛冶と宝石細工の間に座り、鍛冶師（武器鍛冶と防具鍛冶）はForgemistress Darvaの前で鉱脈を三つ自らの手で掘って誓えます。宝石細工との対Bladewrightも輪に名を連ねており、宝石細工は今や同じ鍛冶場で0から50の装身具の梯子を打っていますが、この対は誓いのクエストが来るまで誓えません。',
   'guide.profPages.craftProse.weaponcrafting.materialsHeading': '炉が飲み込むもの',
   'guide.profPages.craftProse.weaponcrafting.materialsBody':
     '採掘が背骨です。銅鉱石はEastbrook Vale、鉄鉱石はMirefen Marsh、オスミウムはThornpeak Heightsから。伐採も想像以上に重要で、ironbarkが猪槍の柄になり、ashwoodが槌を支え、highpineの丸太一本が杖になります。残りは狩りと売店から。粗皮は狼や猪の亡骸から剥ぎ、骨片は日々の狩りで出ます。梯子のレシピはSmithing Flux（Darvaで20銅）を焚きます。採掘が追いつかなければ、Darvaがオスミウム鉱石を、Tinker Gizzelが工作場でグリフ鋼の延べ棒を、割高で売ってくれます。',
@@ -12258,7 +12661,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '野外レシピのEastbrook Arming Swordは全員が最初から知っていて、どこでも作れます。本当の梯子は鍛冶場限定の三段九レシピ。銅段はスキル0で無料、鉄段はスキル25で各25銀、オスミウム段はスキル50で各1金。あなたの段が届いた瞬間にDarvaが教えてくれます。対に乗るレシピがもう一つ、Gravewyrm Gauntlets。武器鍛冶と防具鍛冶が共に25の調律済み鍛冶師だけが作れる合作の品で、作業場すら要りません。',
   'guide.profPages.craftProse.weaponcrafting.routeHeading': '傑作と、125への道のり',
   'guide.profPages.craftProse.weaponcrafting.routeBody':
-    '能力値を持つ品（鉄段以上）だけが傑作になり得ます。無能力値の銅段コモン品は決して発動しません。鉄は素材段階1（+1%）、highpineとグリフ鋼は段階2（+2%）です。道のりは銅段で25、鉄段で50、オスミウム段で75。以降は上位レシピが未実装のため半減から四分の一へ薄れ、上限125まではおよそ150回。毎分10回の共有スロットルも忘れずに。Darvaの作業依頼は30分ごとに銅鉱石8個を引き取ります。功績の書はスキル50でEdge and Temper、125でGrandmaster Weaponcraftingを刻みます。',
+    '本物の能力値を持つ品、この梯子で言えば鉄段から上は、一段上の品質が自分の段の天井に収まる限り、金床から傑作として出てくることがあります。能力値のない銅段のコモン品は決して発動しません。伸ばすものが何もないからです。傑作ボーナスの計算では鉄とオスミウムが素材段階1、highpineとグリフ鋼が段階2として数えられ、さらにレシピ自身の段より上のスキルが1段ごとに1点を足します。ですからオスミウムの三品では戦斧とバトルスタッフが素材の分だけ有利で、ひとつの段は自分がそれを追い越したあとも良く発動し続けます。\n\n銅段に乗って25まで、鉄段は開いた日に習ってそのまま50まで、続いてオスミウム段で75まで。オスミウムの三品の上には、Darvaが教えない頂点の段があります。その製法書は買うものではなく拾うものです。武器鍛冶を主専攻に含む者、今日で言えば誓いを立てた鍛冶師なら、頂点の一品は上限125まで満額の成長を払います。主専攻の天井より下では何も教えないので、未宣誓や趣味の鍛冶師はポイントではなく武器のために打ちます。いずれにせよ登りを担うのはオスミウムのレシピで、半減から四分の一へ薄れます。上限125まではおよそ150回を見込みましょう。製作の一回ごとに実際の詠唱時間がかかるため、長い連続作業を測るのは個数ではなく時間です。\n\n登りは進みながら賄いましょう。Darvaの鍛冶場の作業依頼は30分ごとに銅鉱石8個を引き取り、わずかなコインと経験値をくれますし、鉄段とオスミウム段はレベリング中の近接職に正直に売れます。功績の書はスキル50でEdge and Temperを刻み、125でGrandmaster Weaponcraftingを戴冠させます。',
   'guide.profPages.craftProse.armorcrafting.identityHeading': '前線のメイル',
   'guide.profPages.craftProse.armorcrafting.identityBody':
     '梯子は兵士の経歴のようです。鋲打ちの銅装備で始まり、ironlink段で初めて本物の能力値がつき、レアのosmiumscale兜、胸当て、脚甲は職人が打てる最大の防御力を誇る力とスタミナの装備です。静かな一面もあります。野外コモンのEastbrook Warded Leggingsとスキル75の窯鱗のマント（知力と精神のメイル肩）が、呪文使いのメイル職を顧客に留めます。環では武器鍛冶と工作の間。鍛冶師の対はDarvaの前で誓え、工作との対歯車師には誓いのクエストがまだありません。',
@@ -12273,7 +12676,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ironlink段以上はすべて傑作の抽選があります。防御力しかない銅段コモンは発動しません。鉄は素材段階1、グリフ鋼は段階2。道は定番の三段、銅で25、ironlinkで50、osmiumscaleで75。75以降の幸運は窯鱗のマントです。第3段レシピなので99まで全速、以降半減。最後の50ポイントが150回ではなくおよそ75回で済みます。1着にオスミウム7個とSmithing Flux 5個、Thornpeakと鍛冶場カウンターで買いだめを。Darvaの依頼は30分ごとに銅鉱石8個。スキル50でHammer and Plate、125でGrandmaster Armorcraftingです。',
   'guide.profPages.craftProse.tailoring.identityHeading': '術者の布、皆の鞄',
   'guide.profPages.craftProse.tailoring.identityBody':
-    "梯子はhomespunの基本から鍍金織り一式を経てレア段のSilkbinder's Raimentとsunweaveへ。第二の商売は万人向けです。Silkspun Satchelは10枠の鞄で、鞄を嫌う職業もレベルもありません。環では皮革加工と銘文の間。生きた対は装具師（皮革加工と裁縫）で、Eastbrookの織機のWeaver Ottilieの前で、webwood蜘蛛を四匹狩って絹を捧げて誓います。銘文との対墨織師は銘文最初のレシピ待ちです。",
+    "梯子はhomespunの基本から鍍金織り一式を経てレア段のSilkbinder's Raimentとsunweaveへ。第二の商売は万人向けです。Silkspun Satchelは10枠の鞄で、鞄を嫌う職業もレベルもありません。環では皮革加工と銘文の間。生きた対は装具師（皮革加工と裁縫）で、Eastbrookの織機のWeaver Ottilieの前で、webwood蜘蛛を四匹狩って絹を捧げて誓います。銘文との対墨織師も輪に名を連ねており、銘文の基本カタログに墨が入った今、残るは専用の誓いのクエストだけです。",
   'guide.profPages.craftProse.tailoring.materialsHeading': '糸と絹、それに薬草',
   'guide.profPages.craftProse.tailoring.materialsBody':
     "織機は狩りの戦利品と野の恵みで回ります。リネンの端切れと手織り布は人型の敵から、蜘蛛の糸は蜘蛛の亡骸から。レア段の目玉Silkbinder's RaimentにはPristine Silk（亡骸採集の署名入り標本）が要ります。薬草学はどの装備職よりも裁縫を養います。艶葉草が履物を飾り、goldleafが鍍金織りを染め、sunpetalがレア段全体を縫い上げます。Spool of ThreadはOttilieで12銅。織機は金属を一切求めず、Wardweave Cowlの上級品でさえpremium herbs、Pristine Silk、蜘蛛の糸、糸で織られます。",
@@ -12296,58 +12699,85 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftProse.leatherworking.routeBody':
     "能力値を持つ品はどれも、より上位の品質があなたの段階の上限に収まっている限り傑作の抽選判定があり、能力値付きのイーストブルックのドルイドの皮も含まれます。泥沼の番人のジャーキンに収めた極上の獣皮は署名素材ボーナスを自動で満たし、オスミウムは素材段階1としてこの判定に数えられます。能力値を持たない硬革コモンは決して発動しません。\n\n自然に育てましょう。レベル1から狼と猪を残らず剥ぎ、硬革段はその場で25まで、クエストで沼に入るついでに修行を。沼追跡者で50、そして泥沼の番人一式とダスクハイドの手甲がレア段階を50から75まで運びます。75を過ぎるとこの第2段のレシピ群は半減、その後4分の1まで薄れ、最後の50ポイントにおよそ150回。主専攻でない場合でも、この段はレア品質の製作上限と同じ扱いのままで、完全にゼロにはなりません。\n\n75の特化で得る移動なめし場はこの職で最も輝きます。焚き火のそばで革袋が装備に変わり、フェンブリッジへの往復が消えます。ヘスクの依頼は30分ごとに粗皮8枚。スキル50でTanner's Trade、上限でGrandmaster Leatherworkingです。",
   'guide.profPages.craftProse.cooking.identityHeading': '一行を養う鍋',
+  'guide.profPages.craftProse.cooking.identityBodyOneMeal':
+    "料理を食べると18秒の休憩で回復します。戦闘の合間には最安の回復です。梯子は回復90のPan-Seared River Perchから、Marlow's Grand Roast（980）を経て、その上に立つ三種の頂点料理（1392）まで届きます。ゲーム中で最大の座り回復であり、皿を食べ終えると得られる満腹の効果としては最強のものです（農場台所の強化料理がその下の段を埋めます。その側の物語は農耕のページが語ります）。満腹の効果は同時に一つだけで、新しい食事が古いものを置き換えます。環では錬金術と皮革加工の間。生きた対は薬師（錬金術と料理）で、Eastbrook厨房のCook Marlowの前で猪を四頭狩って誓います。皮革加工との対Trapperには誓いのクエストがまだありません。",
   'guide.profPages.craftProse.cooking.identityBody':
-    "料理を食べると18秒の休憩で回復します。戦闘の合間には最安の回復です。梯子は回復90のPan-Seared River Perchから、現存最大の座り回復であるMarlow's Grand Roast（980）まで。環では錬金術と皮革加工の間。生きた対は薬師（錬金術と料理）で、Eastbrook厨房のCook Marlowの前で猪を四頭狩って誓います。皮革加工との対Trapperには誓いのクエストがまだありません。",
+    "料理を食べると18秒の休憩で回復します。戦闘の合間には最安の回復です。梯子は回復90のPan-Seared River Perchから、Marlow's Grand Roast（980）を経て、その上に立つ三種の頂点料理（1392）まで届きます。ゲーム中で最大の座り回復であり、皿を食べ終えると得られる満腹の効果としては最強のものです（農場台所の強化料理がその下の段を埋めます）。環では錬金術と皮革加工の間。生きた対は薬師（錬金術と料理）で、Eastbrook厨房のCook Marlowの前で猪を四頭狩って誓います。皮革加工との対Trapperには誓いのクエストがまだありません。",
   'guide.profPages.craftProse.cooking.materialsHeading': '竿と包丁が満たす食料庫',
-  'guide.profPages.craftProse.cooking.materialsBody':
-    '看板食材は釣りが地方ごとに供給します。Eastbrook Valeの鏡鱒と川鱸、Mirefen Marshの沼カワカマスと泥鰻、Thornpeak Heightsの霜鰓鱒と板鰭鯉。梯子の各段はその段の魚を調理するので、釣る料理人は品切れ知らずです。肉屋の側は亡骸採集から。猪などの獣肉、そしてレア以上の採集判定で署名入りのPrime Cut、大ローストの主役が出ます。薬草が上位の皿に香りを添え、ashwoodの丸太一本が鰻を燻し、Cooking SaltはMarlowの店で一袋8銅です。',
   'guide.profPages.craftProse.cooking.ladderHeading': '干し肉から大ローストへ',
   'guide.profPages.craftProse.cooking.ladderBody':
     "Salted Jerkyが野外レシピです。最初から誰でも、蜘蛛の脚1本で、どこでも作れる駆け出しの携行食。訓練の梯子は広場東側のEastbrook厨房で、無料段はスキル0（川鱸、Hunter's Game Skewer、Herbed Marsh Pike）、中段はスキル25で各25銀（Ashwood Smoked Eel、Goldleaf Game Stew、Frostgill Chowder）、レア段はスキル50で各1金（Silvered Carp Supper、Angler's Feast Platter、Marlow's Grand Roast）。まとめ料理は食材を伸ばします。燻製鰻と煮込みは1回で2皿、宴会盛りは3皿です。",
   'guide.profPages.craftProse.cooking.routeHeading': '傑作ではなく特化、そして125への道',
   'guide.profPages.craftProse.cooking.routeBody':
-    '料理は傑作物語の正直な例外です。皿に伸ばす能力値がないので傑作は決して発動せず、追う必要もありません。この職の極みは75の特化です。全食材が2割引きになり（まとめ料理では加速度的に効きます）、移動式の野外厨房でダンジョンの扉の前で宴が炊けます。釣った物を料理し、二つの技能を互いに養いましょう。干し肉と無料段で25、中段で50、レア段で75。以降は上位の皿が未実装のため半減から四分の一へ薄れ、上限まではおよそ150回。作り置きと考えれば無駄がなく、ギルドは全皿を平らげます。Marlowの依頼は30分ごとに獣肉8個。スキル50でSeasoned Chef、125でGrandmaster Cooking称号です。',
+    '料理は傑作物語の正直な例外です。皿に伸ばす能力値がないので傑作は決して発動せず、追う必要もありません。この職の極みは75の特化です。全食材が2割引きになり（まとめ料理では加速度的に効きます）、移動式の野外厨房でダンジョンの扉の前で宴が炊けます。\n\n釣った物を料理しましょう。登りを釣りの一時と組み合わせれば、二つの技能は最後まで互いを養います。干し肉と無料段が1回1ポイントで25まで、中段が50まで、レア段が75まで運びます。レア段の上には頂点の厨房、三種の役割別料理と豊穣の炉があります。誰も教えず、拾った製法書から覚えるものです。料理を主専攻に含む料理人、今日で言えば誓いを立てた薬師なら、頂点の一品は上限125まで満額の成長を払います。主専攻の天井より下では何も教えないので、未宣誓や趣味の料理人はポイントではなく皿のために作ります。いずれにせよ最後の道のりはレアの皿が担い、半減から四分の一へ薄れ、およそ150回。作り置きと考えれば無駄がなく、ギルドは全皿を平らげます。\n\nMarlowの厨房の作業依頼は30分ごとに獣肉8個をコインと経験値で買い取り、功績の書はスキル50でSeasoned Chefを、そして125のGrandmaster Cooking称号への道のりを刻みます。',
   'guide.profPages.craftProse.alchemy.identityHeading': '戦いを制する小瓶',
   'guide.profPages.craftProse.alchemy.identityBody':
-    'この職はHighwatchの薬房で営みます。主はAlchemist Verane。レシピの梯子を教え、Glass Vialを12銅で売り、作業依頼で薬草に金を払います。錬金術は試行錯誤の職たちと並び、片側に工作、もう片側に料理。ゆえに対は二つ、爆破師（工作と錬金術、EastbrookのTinker Gizzelの前で）と薬師（錬金術と料理、Cook Marlowの前で）です。どちらかに調律すれば錬金術は主専攻となり上限まで開きます。それまでは未宣誓の職と同じくレア段階まで働きます。',
+    'この職はHighwatchの薬房で営みます。主はAlchemist Verane。レシピの梯子を教え、Glass Vialを12銅で売り、作業依頼で薬草に金を払います。\n\n製作の環では、錬金術は試行錯誤の職たちと並び、片側に工作、もう片側に料理。ゆえに対は二つ、爆破師（工作と錬金術、EastbrookのTinker Gizzelの前で）と薬師（錬金術と料理、Cook Marlowの前で）です。どちらかの対に調律すれば錬金術は主専攻となり、自分の署名入りの品が自分に教え返してくれます。爆破師の対はその合作の醸造、熊のエリクサーも開きますが、薬師の対にはまだ合作レシピがありません。ただし0から50の梯子そのものは待ちません。その段はどれも未宣誓の職が働くレア段階の内側に座るので、誓いの前から上限への登りが開いています。その天井より上に座り、主専攻にだけスキルを払うものが二つあります。Veraneがあわせて教えるスキル75の中間段、賦活の触媒と、梯子の上にある拾った製法書の段です。未宣誓や趣味の錬金術師は、ポイントではなく品のためにそれらを醸します。',
   'guide.profPages.craftProse.alchemy.materialsHeading': '薬草と毒腺とガラス',
   'guide.profPages.craftProse.alchemy.materialsBody':
     'どの薬もGlass Vialひとつと段に応じた薬草を求めます。艶葉草はEastbrook Vale、goldleafはMirefen Marsh、sunpetalはThornpeak Heightsに育ち、一地方に一種、薬瓶は世界と共に登っていきます。薬草学は生まれつきの相棒ですが、採集者や市場から買っても構いません。深い地方の上位の草むらは良い鎌を求めるので、自分で摘むなら道具を新しく。強壮剤の系統には狩人の素材が加わります。毒持ちの亡骸から採るVenom Gland、頂点の強壮剤にはPristine Venom Gland（署名入りのレア標本）です。',
   'guide.profPages.craftProse.alchemy.ladderHeading': 'レシピの梯子',
   'guide.profPages.craftProse.alchemy.ladderBody':
-    'Minor Healing Potionは全員が最初から知り、どこでも混ぜられます。本当の梯子はVeraneが薬房で教える九つのレシピ、各段三つずつ。スキル0の段は無料、25の段は各25銀、50の段は各1金です。各段は回復薬、マナ薬、スタミナ強壮剤の三点で、コモンの艶葉草瓶（回復120、マナ160）から良質のgoldleaf（200と260）、レアのsunpetal（280と360）へ。強壮剤も同じく登ります。Elixir of the Boarはスタミナ6を10分、Vipersear Elixirは9を15分、Elixir of the Serpentは12を15分で一度に2本。脇にもう一つ、合作のElixir of the Bear。錬金25でVeraneが25銀で教え、どこでも混ぜられますが、両スキル25の調律済み爆破師だけが作れます。',
+    'Minor Healing Potionは全員が最初から知り、どこでも混ぜられます。本当の梯子はVeraneが薬房で段ごとに教えるレシピです。スキル0の段は無料、25の段は各25銀、50の段は各1金です。各段は回復薬、マナ薬、スタミナ強壮剤で、コモンの艶葉草瓶（回復120、マナ160）から良質のgoldleaf（200と260）、レアのsunpetal（335と425）へ。トロフィー経済以降、25の段では獣脂から作るLesser Healing Potionも教わります。goldleafの薬より安く、効き目はわずかに劣ります。強壮剤も同じく登ります。Elixir of the Boarはスタミナ6を10分、Vipersear Elixirは9を15分、Elixir of the Serpentは12を15分で一度に2本。脇にもう一つ、合作のElixir of the Bear。錬金25でVeraneが25銀で教え、どこでも混ぜられますが、両スキル25の調律済み爆破師だけが作れます。\n\n強壮剤の系統すべての上にはフラスコの段があり、これは誰も教えず、拾った製法書から覚えます。フラスコは13を20分与え、これまでの強壮剤にはなかった二つの軸、攻撃力と知力を、おなじみのスタミナと並べて開きます。役割ごとに一種です。独自の規則もあります。ステータスを問わず同時に効くフラスコはひとつだけ、その能力値のより弱い強壮剤や巻物では置き換えられず、解呪や強奪、手動での取り消しでも取り除けず、自分の死を越えて残りますが、ログアウトすると失われます。',
   'guide.profPages.craftProse.alchemy.routeHeading': '調合師の125への道',
   'guide.profPages.craftProse.alchemy.routeBody':
-    '薬は決して傑作になりません。あれは能力値を持つ装備のものです。それでも名前は旅をします。レアのsunpetal薬は一本ずつ醸され署名入りで届き、2本組のElixir of the Serpentは無印のままです。スキル75で特化し、以後すべての錬金レシピの素材が2割引き。薬草学を早めに取り、レベリングしながら摘みましょう。艶葉草は谷中にあり、Veraneの調合台に着けば、無料段はどのみち摘んだ薬草で25まで綺麗に運んでくれます。25の段は開いた瞬間に習い、摘み場を沼のgoldleafへ移し、Veraneの依頼（Goldleaf Herb6本で45銅、30分ごと）で小銭を回収。50からはThornpeakの薬草でsunpetal薬とSerpentを醸します。100から125は意図された細流なので、数字のために薬草を燃やさず、売れる物を醸すこと。スキル50でStrange Brews、上限でGrandmaster Alchemyです。',
+    '薬もエリクサーも決して傑作にはなりません。あれは能力値を持つ装備のものです。それでも名前は旅をします。レアのsunpetal薬は作り手の銘を刻んで届き、2本組の蛇のエリクサーもまた一本ごとに署名入りなので、この職のレアな品が無印のまま作業台を出ることはありません。スキル75で特化し、以後すべての錬金レシピの素材が2割引きになります。\n\n薬草学を早めに取り、レベリングしながら摘みましょう。艶葉草は谷中にあり、Veraneの調合台に着けば、無料段はどのみち摘んだ薬草で25まで綺麗に運んでくれます。25の段は開いた瞬間に習い、摘み場を沼のgoldleafへ移し、Veraneの作業依頼（Goldleaf Herb6本で45銅、30分ごとに繰り返せます）で小銭を回収しましょう。\n\n50からはThornpeakのsunpetalでsunpetal薬と蛇のエリクサーの一括醸造を、谷と沼の緑も少し混ぜながら仕込みます。蛇のエリクサーの上には頂点の調合台、三種のフラスコと、その頂に立つスキル125の締めくくり、大釜があります。誰も教えず、拾った製法書から覚えるもので、スキルを払うのは誓いを立てた主専攻にだけです（主専攻の天井より下では何も教えません）。100から125は意図された細流なので、数字のために薬草を燃やさず、売れる物を醸すこと。そして消耗品こそ、皆が永遠に買い直す唯一の製作品だと覚えておきましょう。功績の書はスキル50でStrange Brews、上限でGrandmaster Alchemyを刻みます。',
   'guide.profPages.craftProse.engineering.identityHeading': '道具職人の独占',
-  'guide.profPages.craftProse.engineering.identityBody':
-    'この職はEastbrook広場南東角の工作場で営みます。主はTinker Gizzel。どの道具系統も段階1から3は普通の店売り品ですが、段階4と5はエンジニアの手からしか生まれません。環では錬金術と防具鍛冶の間で、対は爆破師（工作と錬金術）と歯車師（防具鍛冶と工作、誓いのクエストはまだありません）。ここで何より大事な警告をひとつ。工作の両レシピ段は、趣味や未宣誓の職が働くレア段階の天井より上にあるため、スキルが動くのは工作を主専攻に持つ者、今日で言えば爆破師だけです。道具は誰でも作れます。未調律の職人は、作っても何も学ばないだけです。',
   'guide.profPages.craftProse.engineering.materialsHeading': '素材と前段の道具',
   'guide.profPages.craftProse.engineering.materialsBody':
     'どの道具レシピも一段下の道具と上位素材を飲み込みます。オスミウム鉱石4個とスカイシルバーの採掘ピックがOsmium Mining Pickになり、グリフ鋼の延べ棒2本とそのオスミウムのつるはしがGlyphsteel Mining Pickになります。斧と鎌の系統もAshwoodと高嶺松の丸太、GoldleafとSunpetalの薬草で同じ形をなぞります。急ぎならGizzelが工作場で六種の上位素材をすべて置いていますが、鉱石も丸太も薬草もMirefen MarshとThornpeak Heightsで採れ、利益は自前の採集にあります。唯一の例外は店売りのみのグリフ鋼の延べ棒で、グリフ鋼級の道具には固定の金額が底値として組み込まれます。',
+  'guide.profPages.craftProse.engineering.materialsBodyThreeRods':
+    '陸の道具レシピはどれも、一段下の道具と上質な素材を一種飲み込みます。この組み合わせが陸の梯子のすべてです。上質な鉄鉱石4個とスカイシルバーの採掘ピックがオスミウムの採掘ピックになり、続いてグリフ鋼の延べ棒2本、上質なオスミウム鉱石2個とそのオスミウムのピックがグリフ鋼の採掘ピックになります。斧と鎌の系統も、上質なアッシュウッドの丸太と上質な高嶺松の丸太、上質なゴールドリーフ草と上質なサンペタル草で、上質な素材に前段の道具を添える同じ形をなぞりますが、そのティア5の段はグリフ鋼の延べ棒を求めません。頂点で値が張るのはピックの系統だけです。三つの釣り竿レシピは、あえてこの型を破ります。嵐リールの釣り竿は日映えの錦鯉4匹と銀流の釣り竿を、潮鍛えの釣り竿は錦鯉2匹、生の石鰭コイ8匹とその嵐リールを、歯車リールの釣り竿は錦鯉2匹、生の空エラチョウザメ10匹とその潮鍛えを取ります。釣り人の梯子の頂点は、鉱脈ではなく水の上で支払うわけです。\n\n上質な素材はどこにも売っておらず、ふつうの採集で落ちることもありません。手に入れるには、そのゾーンの完全品級の鉱脈を、素材そのものより上のランクの道具で採る必要があります。実際には、これから作ろうとしている道具の一段下の道具ということです（ゾーンが旅人向けに残している易しい鉱脈は、何を振っても並の素材しか出しません）。これは意図したものです。製作ルートでは、ティア5の道具はティア4の道具を実際に振ることで生まれるのであって、買い物で済むものではありません。唯一の抜け道はデルヴの刻印のカウンターです。ただ一つの例外がグリフ鋼の延べ棒で、精錬済みの店売り限定品、1本1銀60銅でハイウォッチの需品係ブリーか、ギッゼル本人の店先から買えます。そのため、グリフ鋼の採掘ピックだけが、原価に固定の硬貨の底値を抱えています。',
   'guide.profPages.craftProse.engineering.ladderHeading': '道具の梯子',
-  'guide.profPages.craftProse.engineering.ladderBody':
-    '梯子全体でレシピは六つだけ。すべて工作場限定で自動習得、修行費は一切なし。スキル75で段階4のつるはし、斧、鎌、スキル150で段階5です。150は誤植ではなく、現在の上限125より上に据えた意図的な数字です。ここではスキル要件が製作を止めることはなく、成長の形を決めるだけなので、素材と前段の道具が揃った日に段階5の道具を作れます。完成品はすべてレアかエピックで、出荷時から署名入り。工作は合作レシピの半分も担ぎます。Elixir of the Bear、両スキル25の調律済み爆破師の醸す一本です。',
   'guide.profPages.craftProse.engineering.routeHeading': 'エンジニアの125への道',
   'guide.profPages.craftProse.engineering.routeBody':
-    '道具に戦闘能力値はないため傑作は決して発動しません。特化は例によってスキル75で、素材2割引きに加え、どんな採集行も作業場に変える臨時の野外工作場を得ます。成長はほとんど薄れません。スキル75のレシピは100まで全速で以降半減、スキル150のレシピは上限125まで全速。本当の制約は素材と資金であって、灰色のレシピではありません。まず対を決めること。Tinker Gizzelから爆破師の調律を。あとは梯子に食わせるだけです。採掘、伐採、薬草学を自分で上げるか採集者と親しくなり、段階3の道具は店で揃え、Gizzelの依頼（Ironbark Log8本で16銅、30分ごと）は小遣いに。売り文句はひとりでに書けます。節点より上の道具段階ひとつごとに2.5秒の採集詠唱から0.4秒を削る（下限1.5秒）。スキル50でCogs and Sprockets、125でGrandmaster Engineeringです。',
+    '道具に戦闘能力値はないため傑作は決して発動しません。特化は例によってスキル75で、素材2割引きに加え、どんな採集行も作業場に変える臨時の野外工作場を得ます。成長はほとんど薄れません。スキル75のレシピは100まで全速で以降半減、スキル125のレシピは上限まで全速。本当の制約は素材と資金であって、灰色のレシピではありません。対は早めに決めること。道具の梯子はそれなしには動きません。Tinker Gizzelから爆破師の調律を。あとは梯子に食わせるだけです。採掘、伐採、薬草学を自分で上げるか採集者と親しくなり、段階3の道具は店で揃え、Gizzelの依頼（Ironbark Log8本で16銅、30分ごと）は小遣いに。売り文句はひとりでに書けます。節点より上の道具段階ひとつごとに2.5秒の採集詠唱から0.4秒を削る（下限1.5秒）。スキル50でCogs and Sprockets、125でGrandmaster Engineeringです。',
   'guide.profPages.craftProse.enchanting.identityHeading': '装備を解き、力を戻す',
   'guide.profPages.craftProse.enchanting.identityBody':
-    '作業場も師匠も買うべきレシピ表もありません。すべてのエンチャントは最初から知られ、分解は誰でも初日からでき、スキルは他の職と同じく125が上限です。環では銘文と宝石細工の間に座り、対はArcanist（銘文とエンチャント）とGembinder（エンチャントと宝石細工）ですが、両隣ともレシピが届くまで誓えません。つまり今日のエンチャントは皆の手仕事です。誓い以前は自由にレア段階まで登り、爆破師や薬師の趣味枠としても自然な選択です。エンチャンターは採集の世界も支えています。装着できる三種の道具効果はすべてエンチャンターの作で、原作者は自作の充填を割引で行え、特化すればさらに深くなります。',
+    'すべてのエンチャントは最初から知られ、分解は誰でも初日からでき、どちらも作業場を一切要しません。スキルは他の職と同じく125が上限です。この商いで唯一教わる一角が三つのレシピで、いずれもEastbrook広場南西角の工作場にいるTinker Gizzelのもの、そしていずれもその作業場で作ります。二つの護符「採集者の貯蔵袋」と「職人の眼」は、エンチャントが25に達したら通常の段階料金で習えます。その上に並ぶのが、頂点段階そのものの素材である光輝の試薬、スキル75です。\n\n環では銘文と宝石細工の間に座り、対は秘術師（銘文とエンチャント）と宝石付与師（エンチャントと宝石細工）です。どちらもまだ誓えません。隣り合う二つの職はどちらも自分の梯子を働かせるようになりましたが（銘文は薬房で、宝石細工は鍛冶場で）、どちらの対にも誓いのクエストがまだないのです。つまり今日のエンチャントは皆の手仕事です。誓い以前は自由にレア段階まで登り、爆破師や薬師の趣味枠としても自然な選択です。エンチャンターは採集の世界も支えています。装着できる二種の道具効果はエンチャンターの作で、原作者は自作の充填を割引で行え、特化すればさらに深くなります。',
   'guide.profPages.craftProse.enchanting.levelingHeading': 'エンチャントの上げ方',
   'guide.profPages.craftProse.enchanting.levelingBody':
-    'スキルを動かす行動は二つ、分解とエンチャント付与です。成功ごとに最大1ポイント、仕事の重さで換算されます。コモンの分解と粉だけのエンチャントはコモンの仕事、良質の分解とエッセンスのエンチャントは良質、レアの分解とRunedやGreaterのエンチャントはレア、エピックと伝説の分解はさらに上です。お馴染みの熟達の薄れが25ポイント刻みで効き、コモンの仕事はスキル75で、良質は100で、レアの仕事はちょうど上限の125で灰色になります。エンチャントだけの情けもひとつ。天井を超える入力はゼロではなく天井へ丸められるため、誓う前でもエピックの分解はレアとして数えられ、無駄になりません。エンチャントが休眠に落ちればすべてコモン扱いで登りは75で止まり、趣味に据えればレアの仕事はまだ実り、75以降が遅くなるだけです。',
+    'スキルを動かす行動は三つ、分解、エンチャントの付与、そして二つの護符レシピの製作で、護符は通常の製作の成長曲線を登ります。教わる三つ目のレシピ、光輝の試薬だけは例外です。これはスキル75に座り、どのエンチャンターも働くレアの天井より上にあります（エンチャントには誓いの対がないため、決して主専攻にはなりません）。自分の天井より上のレシピは何も教えないので、これはポイントではなく試薬のために作りましょう。成功ごとに最大1ポイント、仕事の重さで換算されます。砕く品のレア度か、付与するエンチャントの素材段階です。コモンの分解と粉だけのエンチャントはコモンの仕事、良質の分解とエッセンスのエンチャントは良質、レアの分解とRunedやGreaterのエンチャントはレア、エピックと伝説の分解、そしてすべての光輝のエンチャントは表のさらに上に座りますが、今日エンチャントを含む生き方はどれもレアの段より上に届かないため、実際にはレアの仕事と同じだけしか払われません。砕く台にはひとつの正直さがあります。プレイヤーの作業台から出た品（製作品、署名入り、傑作）も素材には挽けますが、何も教えません。作っては砕く輪では誰も伸びず、学びは世界で拾った装備の中にあります。\n\nお馴染みの熟達の薄れが25ポイント刻みで効き、コモン級の仕事はスキル75で、良質の仕事は100で、レア段の仕事はちょうど上限の125で灰色になります。エンチャントだけの情けもひとつ。自分のアーキタイプの天井を超える入力はゼロにされず、その天井へ切り下げられるため、調律する前でもエピックの分解は何も教えないのではなく、レアとして数えられます。エンチャントが別の生き方の陰で休眠に落ちれば、分解も付与もコモンの仕事として数えられ、登りは75で止まります。二つの護符はコモンの天井より上の製作曲線に乗るため、休眠のエンチャンターには何も教えません。趣味に据えておけばレアの段の仕事はまだ実り、75から先が遅くなるだけです。',
   'guide.profPages.craftProse.enchanting.marketHeading': '付与済みの品と来歴と市場',
   'guide.profPages.craftProse.enchanting.marketBody':
     '付与は素材を消費し、特定の一品に印を付けます。鞄の中の品に使えば別個の付与済みの品が返り、装備中の品に使えばその場で付与され、外して着け直す必要はありません。どちらでも効果は永遠にその品に付き従います。一品にひとつ。付与済みの品に別の付与を使うと確認のうえ古い付与をそのまま置き換え、古い付与は素材の返却なしに破棄されます。売却、破棄、分解はどれも無印の品を先に選ぶので、完成品がうっかり食われることはありません。同一の付与品同士は重ねられます。傑作とエンチャントは友人です。傑作は問題なく付与でき、効果は傑作ボーナスにも署名にも触れず上乗せされます。全部を積んだ署名入り傑作のGreater付与が工芸品の頂点で、それでも設計上レイド戦利品の下に座ります。付与済みや署名入りの品も世界市場に出せます。一品ずつの単品出品となり、ツールチップには付与と作り手の銘が表示され、ワタリガラス便でも同じように送れます。素材は今も商いの堅実な半分です。粉、エッセンス、シャードは自由に出品でき、出品無料、手数料は成立時の5%だけです。',
+  'guide.profPages.craftIntro.jewelcrafting':
+    '宝石細工はEastbrookの鍛冶場にあるもう一つの、より繊細な作業台です。銅、鉄、レアなオスミウムの指輪と首飾りを扱い、どの段にも力の指輪、知力の指輪、敏捷の首飾りが並びます。装身具には防具値も職業制限もないので、客は指と首を持つ全員です。',
+  'guide.profPages.craftProse.jewelcrafting.identityHeading': '鍛冶場の細工仕事',
+  'guide.profPages.craftProse.jewelcrafting.identityBody':
+    '梯子は三段、各段三品。力の指輪、知力の指輪、敏捷の首飾りを、まず銅で、次に鉄で、最後にレアなオスミウムで作ります。装身具には防具値も職業制限もなく、銅の品ですら本物のステータスを備えています。ステータスのない指輪は何者でもないからです。\n\n製作の環ではエンチャントと武器鍛冶の間に座り、対の生き方は二つ、宝石付与師（エンチャントと宝石細工）と刃鍛冶（宝石細工と武器鍛冶）。どちらもまだ誓いのクエストがないため、今日の宝石細工は皆の手仕事です。0から50の梯子の三段はどれも未宣誓の職が働けるレア段の内側にあり、誓いの前から梯子が開いています。その天井より上には二つあります。Darvaがあわせて教えるスキル75の中間段、プリズムガラスの石座と、そのさらに上の拾った製法書の段です。どちらの対もまだ誓えないため、今日この二つは誰にも何も教えません。ポイントではなく品のために切り出しましょう。',
+  'guide.profPages.craftProse.jewelcrafting.materialsHeading': '鉱石と粉塵と精髄',
+  'guide.profPages.craftProse.jewelcrafting.materialsBody':
+    'この作業台は採掘と分解で回ります。銅鉱石はEastbrook Valeの1層鉱脈から、鉄鉱石はMirefen Marshから、オスミウム鉱石はThornpeak Heightsから来て、どのレシピにも鍛冶の融剤が一、二個入ります（Darvaで20銅）。もう半分は分解台から来ます。銅段は鈴音の粉塵を、鉄段とオスミウム段は鈴音の精髄を求めるので、宝石細工師はエンチャンターの一番の得意客になるか、自分で分解の習慣を持つことになります。\n\nオスミウム段にはもう一つの仕上げがあります。レアの各品はオスミウムに加えて鉄鉱石を二つ、細工の台座のはんだとして使います。鉱石も粉塵も店では買えません。世界から採るか、取引や世界市場で他のプレイヤーから手に入れるかで、コインで買えるのは融剤だけです。',
+  'guide.profPages.craftProse.jewelcrafting.ladderHeading': '金床のそばで学ぶ',
+  'guide.profPages.craftProse.jewelcrafting.ladderBody':
+    '宝石細工には自前の作業場がありません。カタログ全部がEastbrookの鍛冶場、武器鍛冶と防具鍛冶が共有するあの金床で作られ、Forgemistress Darvaがそこで教えます。梯子は三段九つのトレーナーレシピです。銅段（指輪、輪、首輪）はスキル0で無料、鉄段（印章、輪、チョーカー）はスキル25で各25銀、オスミウム段（指輪、輪、アミュレット）はスキル50で各1金。あなたの段がレシピの段に届いた瞬間に教われます。\n\n野外レシピも合作の品もまだありません。教わる段はすべて鍛冶場限定のトレーナー仕事で、その上の拾った製法書の段も同じく鍛冶場限定ですが、どこでも売られていません。ですからこの職は、鍛冶師たちの立つ場所で学び、そこで鍛えます。',
+  'guide.profPages.craftProse.jewelcrafting.routeHeading': '傑作と、125への道のり',
+  'guide.profPages.craftProse.jewelcrafting.routeBody':
+    'この梯子にステータスなしの段はありません。全品が本物のステータスを備えるので、仕上がりの品質があなたの段の上限に収まる限り、毎回の製作が傑作判定を振り、鉄とオスミウムはどちらもティア1素材として加算されます。銅段と鉄段は、趣味の職人でも未宣誓の職人でもレアの傑作に化けます。オスミウムの三品はもとよりレアなので、そのエピック傑作はレアより上の上限を待ちますが、宝石細工の対が開くまでその上限は誰も持ちません。\n\n登りは標準の道です。銅で25、鉄段は開いた日に乗って50、そしてオスミウムで75へ。その上には誰も教えない頂点の段があり、製法書は拾うもので、それを持つ宝石細工師は上限まで満額で伸ばせます。製法書が出るまではオスミウムのレシピが残りを担い、半分、そして四分の一へと減っていきます。125の上限までおよそ150個を見込んでください。どの職業も装身具を着け、大半の旅人は指輪と首の枠を空けたまま育つので、作った分は堂々と売れます。\n\n功績の書は最初のレア品でPolished to Brillianceを、スキル50でFacet and Filigreeを、そして125の上限でGrandmaster Jewelcraftingを記します。',
+  'guide.profPages.craftIntro.inscription':
+    '銘文はHighwatchの薬房にある書き物机です。副手に持つ術者の書物と、誰にでも効くスタミナの巻物を、隣に並ぶ薬と同じ薬草を挽いて仕立てます。巻物は戦闘エリクサーのバフへ通じる第二の扉なので、書物を一度も手にしない戦士にも、扉を叩く理由があります。',
+  'guide.profPages.craftProse.inscription.identityHeading': '知性の墨、旅路の巻物',
+  'guide.profPages.craftProse.inscription.identityBody':
+    '梯子は二品三段。副手に持つ術者の書物と、誰でも使えるスタミナの巻物を、まず艶葉で、次にゴールドリーフで、最後にレアなサンペタルで仕立てます。書物は、マナを使う六つの職業が手に握るステータスの塊で、最初の段から本物の知力と精神を備えます。巻物は職業制限のない消耗品なので、どの段も半分はレルム全体に売れます。\n\n製作の環では裁縫とエンチャントの間に座り、対の生き方は二つ、墨織師（裁縫と銘文）と秘術師（銘文とエンチャント）。どちらもまだ誓いのクエストがないため、今日の銘文は皆の手仕事です。0から50の梯子の三段はどれも未宣誓の職が働けるレア段の内側にあり、誓いの前から梯子が開いています。その天井より上には二つあります。Veraneがあわせて教えるスキル75の中間段、黒蝋のベラム紙と、そのさらに上の拾った製法書の段です。どちらの対もまだ誓えないため、今日この二つは誰にも何も教えません。ポイントではなく品のために書き上げましょう。',
+  'guide.profPages.craftProse.inscription.materialsHeading': '薬草と墨、それを容れる小瓶',
+  'guide.profPages.craftProse.inscription.materialsBody':
+    'この机は薬草学と分解台で回ります。艶葉草はEastbrook Valeの1層薬草地から、ゴールドリーフ草はMirefen Marshから、サンペタル草はThornpeak Heightsから来て、どのレシピでもガラスの小瓶（薬房の主から12銅）とともに顔料へ挽かれます。墨の魔力の半分は分解台から来ます。艶葉の段は鈴音の粉塵を、ゴールドリーフとサンペタルの段は鈴音の精髄を求め、サンペタルの巻物はひとつまみの粉塵を墨に戻すので、銘文師はエンチャンターの堅実な得意客になるか、自分で分解の習慣を持つことになります。\n\nサンペタルの段は二つのレシピをともに仕上げます。レアの魔導書はサンペタルに加えてゴールドリーフ草を二つ、彩飾の下地として使い、二枚一組の巻物は精髄をもう一つと先のひとつまみの粉塵を取り、その効果を映す蛇のエリクサーと同じ費えに揃えられています。薬草も粉塵も店では買えません。世界から採るか、他のプレイヤーから手に入れるかで、コインで買えるのは小瓶だけです。',
+  'guide.profPages.craftProse.inscription.materialsBodyFrostGourd':
+    'この机は薬草学と分解台で回ります。艶葉草はEastbrook Valeの1層薬草地から、ゴールドリーフ草はMirefen Marshから、サンペタル草はThornpeak Heightsから来て、どのレシピでもガラスの小瓶（薬房の主から12銅）とともに顔料へ挽かれます。墨の魔力の半分は分解台から来ます。艶葉の段は鈴音の粉塵を、ゴールドリーフとサンペタルの段は鈴音の精髄を求め、サンペタルの巻物はひとつまみの粉塵を墨に戻すので、銘文師はエンチャンターの堅実な得意客になるか、自分で分解の習慣を持つことになります。\n\nサンペタルの段は二つのレシピをともに仕上げます。レアの魔導書はサンペタルに加えてゴールドリーフ草を二つ、彩飾の下地として使い、二枚一組の巻物は精髄をもう一つと先のひとつまみの粉塵、それにHighwatchのテラスから来る霜瓜ひとつを取り、この霜瓜が加わることで、その効果を映す蛇のエリクサーと同じ費えに揃えられています。薬草も粉塵も霜瓜も店では買えません。世界から採るか、畑から収穫するか、他のプレイヤーから手に入れるかで、コインで買えるのは小瓶だけです。',
+  'guide.profPages.craftProse.inscription.ladderHeading': '蒸留器のそばで学ぶ',
+  'guide.profPages.craftProse.inscription.ladderBody':
+    '銘文には自前の作業場がありません。カタログ全部がHighwatchの薬房、錬金術が醸すあの調合台で仕立てられ、Alchemist Veraneがそこで教えます。梯子は三段六つのトレーナーレシピです。艶葉の段（入門書と巻物）はスキル0で無料、ゴールドリーフの段（書冊と巻物）はスキル25で各25銀、サンペタルの段（魔導書と巻物）はスキル50で各1金。あなたの段がレシピの段に届いた瞬間に教われます。スキル50の段の巻物は、一度の製作で2本仕上がります。\n\n野外レシピも合作の品もまだありません。教わる段はすべて薬房限定のトレーナー仕事で、その上の拾った製法書の段も同じく薬房限定ですが、どこでも売られていません。ですからこの職は、錬金術師たちの立つ場所で学び、そこで鍛えます。',
+  'guide.profPages.craftProse.inscription.routeHeading': '巻物とエリクサーと、125への道のり',
+  'guide.profPages.craftProse.inscription.routeBody':
+    '巻物こそこの職の看板ルールです。各段の巻物は、対応する段のスタミナのエリクサー（猪のエリクサー、蝮灼のエリクサー、蛇のエリクサー）とまったく同じバフを与え、二つの供給源はバフバーのひとつの枠を分け合います。エリクサーの上から巻物を読めば置き換わり、巻物の上からエリクサーを飲めばそちらが置き換わり、常に新しいほうが勝ちます。つまり巻物は同じバフへ通じるもう一つの扉であって、上に重なる二本目ではありません。\n\n書物は本物のステータスを備えるので、仕上がりの品質があなたの段の上限に収まる限り、書物の製作は毎回傑作判定を振ります。ステータスのない消耗品である巻物は決して発動しません。登りは標準の道です。艶葉で25、ゴールドリーフの段は開いた日に乗って50、そしてサンペタルで75へ。その上にはVeraneが教えない頂点の段があり、製法書は拾うもので、それを持つ写字師は上限まで満額で伸ばせます。製法書が出るまではサンペタルのレシピが残りを担い、半分、そして四分の一へと減っていきます。125の上限までおよそ150個を見込み、堂々と稼ぎながら登りましょう。巻物はゲーム中のどの職業にも売れるのですから。\n\n功績の書は最初のレア品でWritten in Fine Inkを、スキル50でQuill and Pigmentを、そして125の上限でGrandmaster Inscriptionを記します。',
   'hudChrome.corpseHarvest.components.meat': '肉',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat}（エンチャント）',
   'hudChrome.materialHint.cookingCatch': '料理材料。食べる前に調理が必要です。',
   'hudChrome.materialHint.fineGrade':
     '上質な等級。素材より上位の道具で満位の採取地から採ったもので、通常版が求められる場所ではそのまま代用できます。',
-  'hudChrome.materialHint.arcaneDust':
-    'エンチャントの材料。一般と良質の装備を魔力分解して得られる。',
-  'hudChrome.materialHint.arcaneEssence': 'エンチャントの材料。レアの装備を魔力分解して得られる。',
+  'hudChrome.materialHint.arcaneDust': '生産の材料。一般と良質の装備を魔力分解して得られる。',
+  'hudChrome.materialHint.arcaneEssence': '生産の材料。レアの装備を魔力分解して得られる。',
   'hudChrome.materialHint.arcaneShard':
     'エンチャントの材料。エピックと伝説の装備を魔力分解して得られる。',
   'hudChrome.materialHint.resonantThread':
@@ -12360,14 +12790,38 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'エンチャントの材料。レア以上の近接武器を魔力分解して得られる。',
   'hudChrome.materialHint.resonantTimber':
     'エンチャントの材料。レア以上の杖、ワンド、弓、クロスボウを魔力分解して得られる。',
+  'hudChrome.materialHint.masterwroughtIntermediate': '名匠鍛造の製作部材。',
+  'hudChrome.materialHint.quickeningCatalyst': '製作用の触媒。錬金術師は1日に1個しか作れません。',
+  'hudChrome.materialHint.growthTonic':
+    '農業用品。作付け時に消費され、収穫がやや増えることがある。作物が枯れるとトニックも失われる。',
+  'hudChrome.materialHint.wyrmfallCore':
+    '名匠鍛造の製作触媒。レイドの最終ボスは難易度ごとに1日1回、各プレイヤーに1から3個をドロップする。ヒロイックダンジョンの最終ボスはそれぞれ1日1回、各プレイヤーに1から3個をドロップする。その日最初のAまたはSランクのリフトレース勝利で、Aランクなら1個、Sランクなら2個を獲得できる。英雄補給係が英雄の証と引き換えに販売している。',
+  'hudChrome.materialHint.mudfinScale':
+    '生産の材料。泥ひれの潜伏者は約半数の確率で落とし、沼の深みの魚はやや低く、その水域の名を持つ強敵は必ず持っている。',
+  'hudChrome.materialHint.crackedWyrmScale':
+    '生産の材料。サンクタム・スケイルガードが約半数の確率で落とし、ほかのどこからも手に入らない。',
+  'hudChrome.materialHint.crackedOgreTusk':
+    '生産の材料。頭蓋砕きブルトークが倒れるたびに必ず一つ残し、入手先は彼だけ。',
+  'hudChrome.materialHint.tallowCandle':
+    '生産の材料。ディープロックの掘削者は半数を超える確率で落とし、グレイブコーラーの信徒はときおり落とす。どちらも名を持つ長は必ず持っている。',
+  'hudChrome.materialHint.banditBandana':
+    '生産の材料。山賊が約半数の確率で落とし、名を持つ頭目は必ず持っている。',
+  'hudChrome.materialHint.oldCragmawsPelt':
+    '生産の材料。老いたるクラッグモウが倒れるたびに必ず一枚残し、ほかの獣は落とさない。',
+  'hudChrome.materialHint.emberwingCinderscale':
+    '生産の材料。燃え翼のヴォスカルが倒れるたびに必ず一枚残し、ほかの獣は落とさない。',
   'hudChrome.enchanting.tier.base': '基本エンチャント',
   'hudChrome.enchanting.tier.runed': 'ルーンエンチャント',
   'hudChrome.enchanting.tier.greater': '上級エンチャント',
+  'hudChrome.enchanting.tier.lucent': '光輝エンチャント',
   'hudChrome.enchanting.yieldHeader': '獲得予定の材料:',
   'hudChrome.enchanting.yieldLineExact': '{item} {count}個',
   'hudChrome.enchanting.yieldLineRange': '{item} {min}から{max}個',
   'hudChrome.enchanting.alreadyEnchanted': 'そのアイテムにはすでにエンチャントが付与されています。',
   'hudChrome.enchanting.sameEnchant': 'そのアイテムにはすでに同じエンチャントが付与されています。',
+  'hudChrome.enchanting.notPerfected': 'そのエンチャントは完全化されたアイテムにしか宿りません。',
+  'hudChrome.enchanting.enchantSkillTooLow':
+    'そのエンチャントを扱うにはエンチャントの技能が足りません。',
   'hudChrome.enchanting.replaceTag': '{enchant}を置き換え',
   'hudChrome.enchanting.sameEnchantTag': '付与済み',
   'hudChrome.enchanting.plainTag': 'エンチャントなし',
@@ -12379,6 +12833,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceConfirmKeepsSigner': '製作者の刻印',
   'hudChrome.enchanting.replaceConfirmKeepsMasterwork': '傑作ボーナス',
   'hudChrome.enchanting.replaceConfirmKeepsBond': '受注品のバインド',
+  'hudChrome.enchanting.replaceConfirmKeepsPerfecting': '完全化',
   'hudChrome.enchanting.replaceConfirmCost': '費用: {cost}',
   'hudChrome.enchanting.replaceConfirmCostItem': '{name} {count}個',
   'hudChrome.enchanting.replaceConfirmAccept': '置き換える',
@@ -12390,6 +12845,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemTooltip.enchantedFallback': 'エンチャント済み',
   'hudChrome.itemTooltip.partyTradeWindow':
     'このアイテムはあと{time}の間、同じドロップを分かち合ったプレイヤーと取引できます。装備すると取引期間は終了します。',
+  'hudChrome.itemTooltip.perfectedBadge': '完全化済み',
+  'hudChrome.itemTooltip.perfectingRank': '完全化：ランク{rank}／{ranks}',
   'devCommand.actions.kit.description':
     '指定したスペック向けのSanctum以前レベル20プリセットを装備します (バッグを先に)。装備品のみです。',
   'devCommand.actions.kit.label': '新規20キットを装備',
@@ -12461,7 +12918,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.battleTrance': 'バトルトランス',
   'hudChrome.auraOverlay.procs.overpowerCharge': 'レッドハンドエンパワー',
   'hudChrome.auraOverlay.procs.suddenDeath': 'サドンデス',
-  'hudChrome.auraOverlay.procs.victoryRush': 'ビクトリーラッシュ',
+  'hudChrome.auraOverlay.procs.victoryRush': '勝者の奔流',
   'hudChrome.auraOverlay.procs.enrage': 'メイヘム: エンレイジ',
   'hudChrome.auraOverlay.procs.heatingUp': 'ヒーティングアップ',
   'hudChrome.auraOverlay.procs.arcaneCharge': 'アーケインチャージ',
@@ -12473,6 +12930,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.disenchanting': '分解',
   'abilityUi.cast.enchanting_apply': '付魔',
   'abilityUi.cast.salvaging': '解体',
+  'abilityUi.cast.sundering': '断ち',
   'abilityUi.cast.tool_recharge': '充填',
   'hudChrome.crafting.crafting': '製作中',
   'hudChrome.crafting.create': '作成',
@@ -13403,7 +13861,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.home.world.galeName': 'ゲイルクレスト',
   'guide.home.world.gardenBlurb': '誰ひとり姿を見たことのない庭師が、今も刈り込みを続ける生け垣の迷路の領域。ヘッジウィックと噴水の中庭を抜けた先にある。',
   'guide.home.world.gardenName': 'エバーガーデン',
-  'guide.home.world.hauntBlurb': '巨大な梢の下に横たわる、呪われた森。ガロウミアの灯りだけが、この道で信じられる唯一の光だ。',
+  'guide.home.world.hauntBlurb': '巨大な梢の下に横たわる、呪われた森。ギベットミアの灯りだけが、この道で信じられる唯一の光だ。',
   'guide.home.world.hauntName': 'レイスウッド',
   'guide.home.world.jungleBlurb': '椰子と白い砂、そして騒がしい鳥たち。浜辺の町ドリフトヘイヴンが、砂州に火を絶やさず待っている。',
   'guide.home.world.jungleName': 'パームリーチ',
@@ -13512,16 +13970,36 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.orderBoardHeading': '依頼ボード',
   'guide.profPages.ench.charmsBody': '採集者の護符が生まれるのも、このエンチャントです。エンチャントが25に届くと、イーストブルックの工房でからくり師ギッゼルが両方を教えてくれます。採取の産出を1つ増やす「採集者の貯蔵袋」と、上がってくるものの等級を上げる「職人の眼」です。どちらも一度作ってから、つるはし、斧、鎌に装着し、実際に成果を良くした採取のときにだけ充填を消費します。\n\nこの職が稼ぎ続けるのは再充填です。充填を戻せるのは道具の持ち主であって、訪ねてきたエンチャンターではありません。そしてその持ち主が護符に署名したエンチャンター本人なら再充填の素材は半分で済み、エンチャントの特化があればさらに少なくなります。ですからカウンター越しに売った護符は一度きりの商いですが、自分の道具に乗せた護符は安く回し続けられます。充填と素材の梯子の全体は、どの採集職のページでも「道具効果」の項にあります。',
   'guide.profPages.ench.charmsHeading': '採集者の道具に付ける護符',
-  'guide.profPages.ench.enchantsNoteOffhand': 'エンチャントは三段階あります。基礎段階は鈴音の粉塵（高位は精髄も少量使用）を消費し、武器スロット、副手、そしてすべての防具スロットをカバーします。各ビルドがすべてのスロットに合った選択肢を見つけられるだけの能力値の軸が揃っており、盾と術者が持つ副手には専用のスタミナエンチャントがあるので、装備スロットにエンチャントの死角はありません。上位段階はGreaterと呼ばれ、鈴音のかけら1個と精髄を消費します。より影響の大きいスロットに強力なボーナスを付与します。かけらの使い道はほかに二つ、二種の護符レシピが各5個と、道具効果の再充填の最上段です。使う前に少し蓄えておきましょう。\n\nその間に五つのルーンエンチャントが挟まります。種別副産物を一個ずつ使う構成で、砕いた素材が無駄になりません。ルーンの刃（武器、筋力、共鳴の鋼）、ルーンの印章（武器、知力、共鳴の木材）、ルーン織り（胸、精神、共鳴の糸）、ルーンの革（脚、敏捷、共鳴の革）、ルーンの鎖（兜、スタミナ、共鳴の鎖）の五種。いずれも鈴音の精髄2個を必要とします。同じスロットと能力値に基礎とGreaterの両方がある場合、ルーンのボーナスはその中間に収まります。その一方でルーン織りは胸の精神エンチャントとして端的に最強であり、ルーンの革は脚の敏捷エンチャントとして唯一の存在です。詳細なボーナスは下の表を参照してください。',
-  'guide.profPages.faq.a10': '護符とは、スロットに装着する道具効果のことです。エンチャンターの手仕事で、採集道具に収まり、その道具が持ち帰るものを良くします。「採集者の貯蔵袋」は採取の産出を1つ増やし、「職人の眼」はその等級を上げます。どちらもエンチャント25で、イーストブルックの工房のからくり師ギッゼルが教えてくれます。充填が減るのは護符が実際に結果を変えたときだけなので、良くしようのなかった採取では何も減りません。充填ごとに自分で決めたければ、スロットを使うたびに確認する設定にもできます。\\n\\n装着したての護符は、コモンの道具で20回の充填を備え、レア度が1段上がるごとに10回ずつ増えるので、エピックの道具なら50回から始まります。使い切っても護符は壊れません。道具の持ち主がスロットを再充填します。秘術素材1個につき10回分で、求められる素材は、その人が持ち歩いている道具と、そのスロットがこれまでに満たされた最上の道具の、より良いほうに従います（コモンかアンコモンの道具なら鈴音の粉塵、レアなら鈴音の精髄、エピックなら鈴音のかけら）。再充填の前に良い道具を銀行へ預けても安くはならず、同じ値段で少なくなるだけです。安い段へ戻る道は、劣る道具を持った状態で新しい護符を装着することです。護符に署名したエンチャンターは自分の護符を半額で再充填でき、エンチャントの特化があればさらに少なくなります。',
+  'guide.profPages.ench.enchantsNoteInfusionLive':
+    'エンチャントは四段階あります。基礎段階は鈴音の粉塵（高位は精髄も少量使用）を消費し、武器スロット、副手、そしてすべての防具スロットをカバーします。各ビルドがすべてのスロットに合った選択肢を見つけられるだけの能力値の軸が揃っており、盾と術者が持つ副手には専用のスタミナエンチャントがあるので、装備スロットにエンチャントの死角はありません。上位段階はGreaterと呼ばれ、鈴音のかけら1個と精髄を消費します。より影響の大きいスロットに強力なボーナスを付与します。かけらの使い道はほかに三つ、二種の護符レシピが各5個、道具効果の再充填の最上段、そして光輝段階です。光輝段階では武器と胸のエンチャントが1個ずつ、注入が2個を求めます。使う前に少し蓄えておきましょう。\n\nその間に五つのルーンエンチャントが挟まります。種別副産物を一個ずつ使う構成で、砕いた素材が無駄になりません。ルーンの刃（武器、筋力、共鳴の鋼）、ルーンの印章（武器、知力、共鳴の木材）、ルーン織り（胸、精神、共鳴の糸）、ルーンの革（脚、敏捷、共鳴の革）、ルーンの鎖（兜、スタミナ、共鳴の鎖）の五種。いずれも鈴音の精髄2個を必要とします。同じスロットと能力値に基礎とGreaterの両方がある場合、ルーンのボーナスはその中間に収まります。その一方でルーン織りは胸の精神エンチャントとして端的に最強であり、ルーンの革は脚の敏捷エンチャントとして唯一の存在です。詳細なボーナスは下の表を参照してください。\n\nそのすべての上に立つのが光輝段階、この職の頂点の仕事であり、技能そのものを問う唯一のエンチャントです。四種にはエンチャント100、注入には125が必要で、下の表の「スキル」の欄に示されています。いずれも光輝の試薬を必要とし、武器（剛力と呪文威力の二種）、胸、足という各スロットの階段をもう一段だけ上げます。その最後の一つ、光輝の注入は、完全化された品にしか宿りません。完全化はエンチャンターではなく持ち主自身の仕事であり、品がそこへ至る道は生産職のページが語ります。',
+  'guide.profPages.ench.enchantsNoteOffhand':
+    'エンチャントは四段階あります。基礎段階は鈴音の粉塵（高位は精髄も少量使用）を消費し、武器スロット、副手、そしてすべての防具スロットをカバーします。各ビルドがすべてのスロットに合った選択肢を見つけられるだけの能力値の軸が揃っており、盾と術者が持つ副手には専用のスタミナエンチャントがあるので、装備スロットにエンチャントの死角はありません。上位段階はGreaterと呼ばれ、鈴音のかけら1個と精髄を消費します。より影響の大きいスロットに強力なボーナスを付与します。かけらの使い道はほかに三つ、二種の護符レシピが各5個、道具効果の再充填の最上段、そして光輝段階です。光輝段階では武器と胸のエンチャントが1個ずつ、注入が2個を求めます。使う前に少し蓄えておきましょう。\n\nその間に五つのルーンエンチャントが挟まります。種別副産物を一個ずつ使う構成で、砕いた素材が無駄になりません。ルーンの刃（武器、筋力、共鳴の鋼）、ルーンの印章（武器、知力、共鳴の木材）、ルーン織り（胸、精神、共鳴の糸）、ルーンの革（脚、敏捷、共鳴の革）、ルーンの鎖（兜、スタミナ、共鳴の鎖）の五種。いずれも鈴音の精髄2個を必要とします。同じスロットと能力値に基礎とGreaterの両方がある場合、ルーンのボーナスはその中間に収まります。その一方でルーン織りは胸の精神エンチャントとして端的に最強であり、ルーンの革は脚の敏捷エンチャントとして唯一の存在です。詳細なボーナスは下の表を参照してください。\n\nそのすべての上に立つのが光輝段階、この職の頂点の仕事であり、技能そのものを問う唯一のエンチャントです。四種にはエンチャント100、注入には125が必要で、下の表の「スキル」の欄に示されています。いずれも光輝の試薬を必要とし、武器（剛力と呪文威力の二種）、胸、足という各スロットの階段をもう一段だけ上げます。その最後の一つ、光輝の注入は、完全化された品にしか宿りません。そして今はまだ完全化できる品がありません。これは、待っている完全化の仕事に先んじて記されたものなのです。',
+  'guide.profPages.faq.a10': '護符とは、スロットに装着する道具効果のことです。エンチャンターの手仕事で、採集道具に収まり、その道具が持ち帰るものを良くします。「採集者の貯蔵袋」は採取の産出を1つ増やし、「職人の眼」はその等級を上げます。どちらもエンチャント25で、イーストブルックの工房のからくり師ギッゼルが教えてくれます。充填が減るのは護符が実際に結果を変えたときだけなので、良くしようのなかった採取では何も減りません。充填ごとに自分で決めたければ、スロットを使うたびに確認する設定にもできます。\n\n装着したての護符は、コモンの道具で20回の充填を備え、レア度が1段上がるごとに10回ずつ増えるので、エピックの道具なら50回から始まります。使い切っても護符は壊れません。道具の持ち主がスロットを再充填します。秘術素材1個につき10回分で、求められる素材は、その人が持ち歩いている道具と、そのスロットがこれまでに満たされた最上の道具の、より良いほうに従います（コモンかアンコモンの道具なら鈴音の粉塵、レアなら鈴音の精髄、エピックなら鈴音のかけら）。再充填の前に良い道具を銀行へ預けても安くはならず、同じ値段で少なくなるだけです。安い段へ戻る道は、劣る道具を持った状態で新しい護符を装着することです。護符に署名したエンチャンターは自分の護符を半額で再充填でき、エンチャントの特化があればさらに少なくなります。',
   'guide.profPages.faq.a9': '依頼ボードに出しましょう。製作ウィンドウを開き、そのヘッダーからボードを開いて、作ってほしいレシピを指定します。どの職人でも承諾できる公開の依頼にするか、すでに知っている職人ひとりに宛てるかを選べます。承諾はその職人をその仕事に縛るので、一つの依頼を抱えるのは常に一人だけです。\n\n出すときにお金も素材も預かられないので、値段と誰が材料を持ち寄るかは、受注が昔からそうであるように当人どうしで取り決めてください。まだ公開中の自分の依頼は取り消せますし、誰にも引き受けられなかった依頼は一日で期限切れになります。受け渡しは対面です。品ができあがったら、バッグを一つ空けて職人のそばに立ちましょう。届いた品は作り手の絆であなたにバインドされますが、どの作業場の師匠でも通常の料金で解いてくれます。',
+  'guide.profPages.faq.q11': 'オレンジのアイテムはどうすれば作れますか？',
+  'guide.profPages.faq.a11Promotion':
+    'まず頂点の名匠鍛造の品を作るか買い、次にそれを完全化します：その品を作ったクラフトの技能125があれば、挑戦一回ごとに匠の残り火1個、断たれし精髄1個、プリズムガラスの石座1個を費やし、五回に四回成功し、外れても品は決して傷つきません。最初の挑戦で品はあなたにバインドされ、四回の成功で完全化に至ります。その後、創造の証書1枚（銘文職の技能125の証文で、誰でも買うか依頼できます）を費やして、完全化された品を好きな名の付いた伝説の品へ昇格させます。昇格は確定です：賽の目はなく、能力値は変わらず、変わるのは名前と色だけです。',
   'guide.profPages.faq.q10': '護符とは何ですか。使い切るとどうなりますか？',
   'guide.profPages.faq.q9': '誰かに何かを作ってもらうにはどうすればいいですか？',
   'guide.profPages.findingNodesNote': '目で探し回る必要はありません。ゾーンの中のノードは、地図がその土地を映しているならすべてゾーンマップに描かれ、そばを通ればミニマップにも現れるので、採集の周回路は出発前に地図の画面で組み立てられます。まだ道具が届かないノードは、隠されるのではなく印が付きます。取り消し線の入った暗い印としてその場所を保つので、これから目指す土地を見て取れます。デスクトップでは、ワールドの鉱脈、立木、群生地にカーソルを合わせると名前と必要な道具が分かり、一度採取したあとは自分の再生時間を秒単位で数えてくれます。タッチではカーソルを合わせられないので、ミニマップの印が同じことを教えてくれます。',
-  'guide.profPages.specimenBodyFamilies': '採集に出るときは、バッグに少し空きを残しておきましょう。署名入りの掘り出し物は、自分のための空きか、署名の一致するスタックがないと収まりません。何も収まらなければ産出そのものは届きますが、署名は失われます。死体の採集にも独自の大当たりがあり、採取した素材のおよそ{pct}%がレア以上を引き当てます。完璧な標本を差し出す系統（毛皮、絹糸、毒、爪、肉）は、通常の産出を無印のまま残し、その脇に署名入りの標本を打ち出します。残る三つ、牙、布、大牙は、産出そのものに署名が入ります。',
+  'guide.profPages.specimenBodyFamilies': '採集に出るときは、バッグに少し空きを残しておきましょう。署名入りの掘り出し物は、自分のための空きか、署名の一致するスタックがないと収まりません。何も収まらなければ産出そのものは届きますが、署名は失われます。死体の採集にも独自の大当たりがあり、採取した素材のおよそ{pct}%がレア以上を引き当てます。完璧な標本を差し出す系統（毛皮、絹糸、毒、爪、肉）は、通常の産出を無印のまま残し、その脇に署名入りの標本を打ち出します。残る五つ、牙、布、大牙、角、えらは、産出そのものに署名が入ります。',
   'guide.professions.focusBodyTiers': 'どの拠点の町にも、訪れる採り手のための「町のフォーカス」パネルがある。町の中に立ってミニマップの脇から開き、10ポイントのフォーカスの持ち分を、気にかける素材の種類へ振り分けよう。素材にフォーカスを5ポイント置くごとに採取ティアが1段階上がり（上がるのは最大2段階まで）、1ポイントごとに産出が10パーセント増える。フォーカスしていない素材が悪くなることは決してない。\n\n割り振りはどこを歩いてもキャラクターに付いてまわり、後の町での滞在中なら、好きな速さでいつでも狙いを変えられる。時間をかけるなら無料で、動かした1ポイントにつき1分かかる。少し払えば速まり、1ポイントにつき15秒、費用は1ポイントごとに5銅と鈴音の粉塵1個。全額払えば即座に終わり、1ポイントごとに25銅と鈴音の粉塵5個だ。数えられるのは実際に動かしたポイントだけなので、1ポイントだけ動かすなら安く済むし、開いて何も変えずに閉じたパネルは、どの段階でも一切かからない。',
-  'guide.professions.harvestBodyFamilies': '採集はノードで終わらない。倒した獣の多くは、通常の戦利品と並んで、死体から直接素材を採取できる：毛皮、牙、爪、大牙、絹糸、毒、布、そして肉。各死体は早い者勝ちで一度だけ採取でき、ひと押しで戦利品と採取の両方が開く。加工できる素材をふたつ以上持つ獣なら、選択はあなたのものだ：その獣が差し出せるすべてを取るか、より少ない素材に集中して、実際に取る分だけはっきりと上のグレードで受け取るか。\n\n標本を宿す系統の獣でレア以上の採取を引き当てると、通常の産出に加えて署名入りの完璧な標本（極上の獣皮、極上の蜘蛛の糸、極上の毒腺、極上の爪、極上の肉のいずれか）も手に入り、功績の書に「申し分なき標本」が刻まれる。採取はどのキャラクターにもでき、訓練も要らない。手持ちの採集道具はどの職のものであれ、このレア以上の判定を後押しする。',
-  'guide.professions.toolEffectsBody': '採集道具にはスロットがひとつあり、そこへ収まるのがエンチャンターの護符です。「採集者の貯蔵袋」は採取の産出を1つ増やし、「職人の眼」は採れるものの等級を1段上げます。イーストブルックの工房の主、からくり師ギッゼルが、エンチャントのスキルが25に届いたエンチャンターに両方を教えてくれます。どちらも彼の工房で作ります。\\n\\n装着したての護符は、コモンの道具なら20回の充填を備え、レア度が1段上がるごとに10回ずつ増えるので、同じ護符をエピックのつるはしに装着すれば50回から始まります。充填が減るのは護符が実際に結果を変えたときだけで、改善しなかった採取では決して減りません。スロットは使うたびに確認する設定にもできるので、あなたが「充填を使う」と言うまで護符は待ってくれます。新しい護符を装着すると、そのとき持っている道具に合わせてスロットが鋳直されるため、以前の最高記録ではなく、その道具が保てる回数まで満たされます。まったく何も変わらない装着し直しは、護符を食べてしまう前に断られます。\\n\\n充填を使い切っても護符が壊れることはありません。道具の持ち主がスロットを再充填します。秘術素材1個につき10回分で、求められる素材は、持ち歩いている道具と、そのスロットがこれまでに満たされた最上の道具の、より良いほうに従います。コモンかアンコモンの道具なら鈴音の粉塵、レアなら鈴音の精髄、エピックなら鈴音のかけらです。良い道具を銀行に置いてきても、安い再充填が買えるわけではなく、同じ値段で少ない充填になるだけです。安い段へ下りる正直な道は、劣る道具を持った状態で新しい護符を装着し、そこでスロットを鋳直すことです。スロットの上限が今の道具で満たせる量を超えている場合、再充填はその道具の限界で止まり、より良いほうを持ってくるように告げます。護符に署名したエンチャンター本人なら再充填の素材は半分で済み、エンチャントに特化していればさらに少なくなります。それ以外の人は全額です。再充填はこの職のほかの作業と同じく、短い詠唱です。',
+  'guide.professions.endgameHeading': '名匠鍛造の終盤',
+  'guide.professions.endgameBody':
+    'どのクラフトの訓練師の梯子の上にも、同じ一つの頂が待っています：名匠鍛造の一族、つまりギアとアイテムのページが述べる、金色の「装備ユニーク：名匠鍛造」タグをまとうクラフト装備です。どのクラフトが登っても鎖の形は同じです：頂点の図案は教わるものではなく見つけるもの、一日一回に区切られた中間クラフトが仕事の歩みを刻み、三つの共有素材があらゆる梯子を潤します。仕上がった品は他のクラフト品と同じく自由に取引でき（取引の決まりは製作経済のページが載せています）、装備2つまでの上限があるため、ビルドの主役一式ではなく引き立て役にとどまります。だからこそ、最深部の終盤に足を踏み入れない職人でも、そこに住む人々へ品物を売れるのです。',
+  'guide.professions.endgamePatternsBody':
+    '図案は三つの経路でやって来ます。そしてどのクラフトページのレシピ表も、行ごとに自分の経路を記しています：最深部の終盤の勝利で見つかるか、英雄補給係がヒーローの記章と引き換えに売るか、その両方かです。この割り振りは意図されたものです。装備の図案は見つけるだけで決して売られず、消耗品の図案は初日から補給係の台に並び、農耕の図案は両方の道を行きます。図案そのものも普通に取引できる品なので、自分に使えない発見は、売れる発見でもあります。',
+  'guide.professions.endgameMaterialsBody':
+    '三つの共有素材が鎖全体を養います。竜墜の核は取引できる触媒です：最深部の終盤の最終勝利は、討伐が認められたキャラクターへ核を1個から3個支払い、供給源ごとに一日一回です。最高位のリフト踏破も同じ日次の時計で決まった数を支払い、英雄補給係は不運の保険としてヒーローの記章12個で1個を売ります。核は自由に取引できます。断たれし精髄は魂縛で、断つことだけが入手源です：どのキャラクターでも職業を問わず断つことができ、その詠唱はレイドで入手したこの層のエピック1個を断ち、ちょうど1個の精髄にします。代価はそのエピックそのものです。匠の残り火も魂縛で、鎖の時計です：キャラクターごとに週1個、その週最初の資格ある終盤クリアで授けられます。逃した週が失われることはなく、残り火は積み立てられ、次のクリアでまとめて支払われます。',
+  'guide.professions.endgameMaterialsBodyAnyRaid':
+    '三つの共有素材が鎖全体を養います。竜墜の核は取引できる触媒です：最深部の終盤の最終勝利は、討伐が認められたキャラクターへ核を1個から3個支払い、供給源ごとに一日一回です。最高位のリフト踏破も同じ日次の時計で決まった数を支払い、英雄補給係は不運の保険としてヒーローの記章12個で1個を売ります。核は自由に取引できます。断たれし精髄は魂縛で、断つことだけが入手源です：どのキャラクターでも職業を問わず断つことができ、その詠唱はレイドで入手したエピック装備1個を、どのレイドで得たものでもノーマルでもヒロイックでも問わず断ち、ちょうど1個の精髄にします。代価はそのエピックそのものです。匠の残り火も魂縛で、鎖の時計です：キャラクターごとに週1個、その週最初の資格ある終盤クリアで授けられます。逃した週が失われることはなく、残り火は積み立てられ、次のクリアでまとめて支払われます。',
+  'guide.professions.perfectingHeading': '完全化とオレンジへの昇格',
+  'guide.professions.perfectingBody':
+    '仕上がった頂点装備の物語は、そこで終わりではありません。持ち主は、その品を作ったクラフトの技能125があれば、装備を完全化の4つのランクへ歩ませられます。挑戦一回ごとに匠の残り火1個、断たれし精髄1個、プリズムガラスの石座1個を費やし、五回に四回成功します。外れても失うのは素材だけで、品が傷ついたり後戻りしたりすることはありません。最初の挑戦で品は完全化する本人にバインドされるので、売るつもりの品は仕事を始める前に売っておきましょう。完全化された品は元の性能に加えて能力値ボーナスを帯び、そして完全化こそ光輝の注入が待っているものです：エンチャントのページで「完全化品のみ」と記されたただ一つのエンチャントは、それ未満には決して宿りません。',
+  'guide.professions.promotionBody':
+    '最後の一歩がオレンジへの昇格で、創造の証書の使い道はこれがすべてです。完全化された品と創造の証書1枚（銘文職の技能125の証文）を用意すれば、その品は自分で名を付けた伝説の品へと昇格します。ここに賽の目はありません：昇格は確定で、能力値はいっさい変わらず、変わるのは名前と色です。証書そのものは取引できるので、書き手と使い手が同じ人である必要はありません。そして一族の上限に加わった一行はここでも生きています：装備できる2つのうち、伝説の名匠鍛造の品は最大1つまでです。',
+  'guide.professions.harvestBodyFamilies': '採集はノードで終わらない。倒した獣の多くは、通常の戦利品と並んで、死体から直接素材を採取できる：毛皮、牙、爪、大牙、角、えら、絹糸、毒、布、そして肉。各死体は早い者勝ちで一度だけ採取でき、ひと押しで戦利品と採取の両方が開く。加工できる素材をふたつ以上持つ獣なら、選択はあなたのものだ：その獣が差し出せるすべてを取るか、より少ない素材に集中して、実際に取る分だけはっきりと上のグレードで受け取るか。\n\n標本を宿す系統の獣でレア以上の採取を引き当てると、通常の産出に加えて署名入りの完璧な標本（極上の獣皮、極上の蜘蛛の糸、極上の毒腺、極上の爪、極上の肉のいずれか）も手に入り、功績の書に「申し分なき標本」が刻まれる。採取はどのキャラクターにもでき、訓練も要らない。手持ちの採集道具はどの職のものであれ、このレア以上の判定を後押しする。',
+  'guide.professions.toolEffectsBody': '採集道具にはスロットがひとつあり、そこへ収まるのが製作された護符です。「採集者の貯蔵袋」は採取の産出を1つ増やし、「職人の眼」は採れるものの等級を1段上げます。「匠のお守り」は同じ仕組みで産出を2つ増やします。前の二つはエンチャントの仕事で、イーストブルックの工房の主、からくり師ギッゼルが、エンチャントのスキルが25に届いたエンチャンターに教えてくれます。「匠のお守り」のほうは工作の仕事で、ドロップで手に入る設計図をスキル100で作ります。三つとも彼の工房で作ります。\n\n装着したての護符は、コモンの道具なら20回の充填を備え、レア度が1段上がるごとに10回ずつ増えるので、同じ護符をエピックのつるはしに装着すれば50回から始まります。充填が減るのは護符が実際に結果を変えたときだけで、改善しなかった採取では決して減りません。スロットは使うたびに確認する設定にもできるので、あなたが「充填を使う」と言うまで護符は待ってくれます。新しい護符を装着すると、そのとき持っている道具に合わせてスロットが鋳直されるため、以前の最高記録ではなく、その道具が保てる回数まで満たされます。まったく何も変わらない装着し直しは、護符を食べてしまう前に断られます。\n\n充填を使い切っても護符が壊れることはありません。道具の持ち主がスロットを再充填します。秘術素材1個につき10回分で、求められる素材は、持ち歩いている道具と、そのスロットがこれまでに満たされた最上の道具の、より良いほうに従います。コモンかアンコモンの道具なら鈴音の粉塵、レアなら鈴音の精髄、エピックなら鈴音のかけらです。良い道具を銀行に置いてきても、安い再充填が買えるわけではなく、同じ値段で少ない充填になるだけです。安い段へ下りる正直な道は、劣る道具を持った状態で新しい護符を装着し、そこでスロットを鋳直すことです。スロットの上限が今の道具で満たせる量を超えている場合、再充填はその道具の限界で止まり、より良いほうを持ってくるように告げます。護符に署名した製作者本人なら再充填の素材は半分で済み、その護符自身の職（「採集者の貯蔵袋」と「職人の眼」ならエンチャント、「匠のお守り」なら工作）に特化していればさらに少なくなります。それ以外の人は全額です。再充填はこの職のほかの作業と同じく、短い詠唱です。',
   'guide.professions.toolEffectsHeading': '道具効果',
   'guide.progression.ridingBody': '登りの果てに待っているもののひとつが騎乗です。レベル{level}になれば、厩舎長がかなりの金貨と引き換えにこの技を教えてくれ、訓練コースでの稽古が最初の手綱をもたらします。マウントは力を何ひとつ与えませんが、世界を小さくしてくれます。北への長い徒歩のあとでは、それもまた立派なご褒美です。',
   'guide.progression.ridingTitle': '騎乗を習う',
@@ -13660,7 +14138,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.errors.notEnoughDevotion': '献身が足りない！',
   'hud.pet.abyssalChain': '深淵の鎖',
   'hud.pet.abyssalChainDesc':
-    'グルームシェイドに、8ヤードより遠く20ヤードまでの通常の敵を自分の元へ引き寄せるよう命令します。ボスは引き寄せられません。クールダウン15秒。右クリック、タッチ長押し、またはShift+Enterで自動発動を切り替えます。',
+    'ダスクマークに、8ヤードより遠く20ヤードまでの通常の敵を自分の元へ引き寄せるよう命令します。ボスは引き寄せられません。クールダウン15秒。右クリック、タッチ長押し、またはShift+Enterで自動発動を切り替えます。',
   'hud.pet.abyssalChainTitle': '深淵の鎖',
   'hud.pet.autocastOff':
     '自動発動オフ。右クリック、タッチ長押し、またはShift+Enterでオンにします。',
@@ -13969,19 +14447,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.report.status.critical': '重大',
   'hudChrome.perf.diagnostics.report.status.needsAttention': '要確認',
   // The Proving Shore (tutorial island) + the spawn greeting dialog.
-  'hudChrome.tutorialGreeting.bodyFirst':
-    '見かけない顔だね、旅の人。この土地では、冒険を始める者が修練の浜を訪れるのが習わしだ。海峡の先にある静かな島だよ。あそこなら世界の試練に挑む前に腕を磨き、この土地に慣れることができる。渡し船は行きも帰りも出ているし、行っても行かなくても誰も君を軽んじたりはしないよ。',
-  'hudChrome.tutorialGreeting.bodyRefresher':
-    '新しい顔でまた来たのかい？なら勝手は分かっているね。それでも旅立つ前におさらいがしたければ、修練の浜は出戻りの生徒を追い返したりしない。渡し船はいつでも出せるよ。',
-  'hudChrome.tutorialGreeting.play': 'チュートリアルを受ける',
-  'hudChrome.tutorialGreeting.declineNote':
-    'お好きにどうぞ、旅の人。気が変わったら、レイヴンポストの郵便柱のそばの渡しの鐘がいつでも修練の浜へ運んでくれる。昼でも夜でもね。狼は待ってくれないが、あの鐘は待っていてくれるよ。',
   'hudChrome.tutorialGreeting.bellHomeNote':
     'もう浜から戻ったのかい？さっき鳴らしたのが渡しの鐘だよ。その双子がすぐそこ、レイヴンポストの郵便柱のそばに掛かっている。いつでも鳴らせば、渡しが修練の浜へ運び直してくれる。間違って鳴らしたのなら、それはそれで構わないさ。',
   'hudChrome.tutorialGreeting.islandArrivalNote':
     '渡ってきたばかりかい？ようこそ修練の浜へ。ウォーデン・タムが目の前の浜でガントレットを預かっている。名前が見えるところまで歩み寄って、Fを押すか、左クリックすれば、そのレーンが体の動かし方を全部教えてくれる。発つ支度ができたら、私の桟橋のそばに立つ鐘を鳴らしなさい。渡しがイーストブルックの家まで運んでくれる。',
   'hudChrome.tutorialGreeting.noteClose': 'わかった',
-  'hudChrome.tutorialGreeting.skip': 'チュートリアルを飛ばす',
   'hudChrome.bootcamp.title': '最初の一歩',
   'hudChrome.bootcamp.talkTitle': 'ウォーデン・タムと話す',
   'hudChrome.bootcamp.talkBody':
@@ -14396,6 +14866,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.ignivar_inner_crucible.name': '内部るつぼ',
   'entities.dungeons.ignivar_inner_crucible.enterText': '開かれた門はるつぼのさらなる深部へ続いている。',
   'entities.dungeons.ignivar_inner_crucible.leaveText': 'るつぼの静まり返った深部を後にする。',
+  'guide.profPages.ench.perfectedOnly': '完全化品のみ',
   'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
   'hudChrome.mobile.barEditorAria': 'アクションバーの配置を編集',
   'hudChrome.barEditor.title': 'アクションバーの編集',
@@ -14412,6 +14883,52 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.barEditor.clearAria': 'スロットをクリア',
   'hudChrome.barEditor.clearArmed': 'スロットをタップするとクリアします。',
   'hudChrome.spellbook.assignAria': '{name}を配置するスロットを選択',
+  'guide.professions.curveBodyRetunedFishing':
+    'スキルの成長はどこでも同じ一つの規則、四段階の熟達カーブに従います。スキル{step}ポイントごとに1段階。自分の段階以上のレシピは全量の成長を与え、レシピが下に離れるにつれ半分、四分の一と減り、やがて止まります。\n\n製作ウィンドウはこれをレシピ一覧にそのまま古典どおりの色で描きます。全量はオレンジ、減った成長は黄色、わずかな成長は緑、成長なしは灰色です。成長は決定的で、スキルアップの抽選はありません。ですから同じ段階の同じ製作は、いつも寸分たがわず同じだけスキルを動かします。レシピが黄色に変わったら、次の段を習いに行く合図です。\n\n採集も同じカーブと同じ段階幅で動き、レシピの代わりにノードと比べられます。易しいノードは通り過ぎるうちに灰色になり、登りを締めくくるのは後のゾーンの豊かなノードです。釣りだけは専用のスケジュールを持ちます。熟練度50未満は1匹あたり0.08、100までは0.05、150までは0.04、200までは0.03で、100からはガラクタを釣っても何も学べません。',
+  'guide.profPages.toolsNoteFishingPageMarks':
+    'どの採集ポイントにも、その専門の道具をバッグに入れておく必要があります。ティア1も例外ではありません。つるはしがなければ鉱石は採れず、釣り竿がなければ魚も釣れません。商人のはしごは中核の三つの拠点でティア1から3までを扱い、ティア1の道具はその三つすべてで売られていますが、その上の段は、それを使う土地が始まる場所で売られます（Fenbridgeがティア2を、Highwatchがティア3を加えます）。その先の若い集落は道具をまったく置いていないので、旅立つ前に買い揃えてください。農耕だけは買う場所が違います。ティア1の鍬を置いているのは最初の割当地を守る農夫で、彼女が立っているのはEastbrookの割当地であって、どの道具カウンターでもありません。そしてその上の鍬の段は、どこでも硬貨では売られていません。どのカウンターも、置いている段は制限なく売ってくれますし、道具はどれも直接取引で渡せます。どの段も市場に出品でき郵送もできますが、20銅の陸の入門道具四つ（Copper Mining Pick、Handaxe、Gathering Sickle、Garden Hoe）だけは例外です。これらはカウンターで買うか手渡しで受け取るしかなく、売り戻すことも、郵送することも、出品することもできません。制限がかかるのは、扱えるかどうかです。ティア1より上の陸の道具は、その専門の熟練度が届いてはじめて働きます。ティア2には {tier2Prof}、ティア3には {tier3Prof}、ティア4には85、ティア5には100が必要で、商品欄も、ツールチップも、下の表も、その条件を最初から示します。それまでは、先回りして買った道具はバッグでただ待つだけで、土地を開くことも、速さを買うことも、上質級を生むこともありません。そして熟練度がその数字に触れた瞬間から扱えるようになります。釣り竿だけは例外です。どの竿にも使用条件はなく、EastbrookのTrader Wilkesは先回りして買う釣り人のために、ティア2とティア3の竿をあえて置いています。道具は装備枠を占めることも、すり減ることもありません。ですから購入は一度きりです。条件に関わるのはティアだけで、同じティアでレアリティが高い道具でも、開けるものが増えるわけではありません。ただしレアリティは色だけのものではありません。差し込んだ道具効果の持ちが長くなり、釣り竿ならリールの猶予も広がります。\n\n良い道具が買うものは二つではなく三つです。より高いティアの土地を開き、採集時間を縮め、採れるものを良くします。その地域固有の素材より上のティアの道具で鉱脈を掘ると、通常の素材ではなく上質級が手に入ります。対象はその地域の完全品級の鉱脈に限られるため、旅人向けに残された易しい鉱脈からは通常の素材が出ます。上質素材は製作道具のレシピが消費するものであり、レシピや作業依頼が通常版を求めるところではどこでも上質級がその代わりになります。ですから強化して行き詰まることはありません。銅鉱石がFine Copper Oreとして手に入るようになるだけです。\n\n商人のはしごの上には、採集ポイントを持つ三つの専門それぞれにティア4とティア5の製作道具が二つあります。道具工房で作るか（その二つのレシピは誰もが最初から知っていて、その作業で伸びるスキルは工作のものです）、溺れし連祷のカウンターで、その攻略条件を満たしたうえでデルヴの刻印を使って購入します。印の値段と各段が求める攻略回数は下の表にあります。硬貨でこれらを売る商人はいません。農耕のはしごは長いほうです。20銅の入門鍬より上の鍬はティア2から5まですべて製作品で、四つとも最初から知っているのではなく道具職人が教えるもので、上の二段は同じデルヴの刻印のカウンターにも置かれています。釣りには専用の三本があり、こちらも最初から知っているのではなく習うものです。道具職人が教えるのはティア4のStormreelとティア5のTidewroughtで、ティア6のClockreelは代わりに設計図から組み上げます。StormreelとTidewroughtは同じデルヴの刻印のカウンターにも置かれていて、求められる攻略条件は同じティアの採集ポイント用道具と変わらず、釣りのページの道具表にはその印の値段が載っています。竿は、上位の段が水の上で入場条件を買う唯一のはしごです。三本のいずれもが、熟練度だけでは決して届かない釣果バンドを開きますから、より良い竿は快適さのためのものではありません。採集ポイントを持つ三つの専門では、今のところティア3を超えて必要とする採集ポイントはないため、ティア4とティア5の道具が買うのは入場条件ではなく速さと品級のままで、より高いティアの土地が現れたとき、それらが入場券になります。農耕はその両者の中間にあります。鍬を必要とするのは植え付けなので、ティアNの畑はティアNの鍬を求め、それは四番目にして最後の作物ティアまで続きます。新しい土地を開かないのは第五の段だけです。',
+  'guide.profPages.bandsBodySplitLadder':
+    '熟練度バンドは、陸の専門のカウンターに重なる共通の0/100/200のはしごです。100で越えるバンドは採集の詠唱を速め、陸の上限があるためバンド1が天井になります。釣りは自分だけのはしごを持ち、0、100、150、そして200に三段が重なる六段です。釣りのバンドは詠唱を速めません。釣果表を選び、それぞれに見合う竿を求めます。三段目より先で熟練度の門はもう一度だけ、200の上限まで動いてから止まります。上限より先は、釣果表がどこまで伸びるかを竿だけが決めます。この登りこそが釣り人を深い水へ引き寄せます。より良い釣果表も、その先の学びも、そこにあるからです。',
+  'guide.profPages.fish.startBodyThreeRods':
+    'Simple Fishing PoleはEastbrookのFisherman Brandtが20銅で売っています（町の東端でMirror Lakeを睨む老練の釣り師です）。Tinker Gizzel、FenbridgeのProvisioner Hale、HighwatchのQuartermaster Breeにも在庫があります。前方約24ヤード以内の十分に深い水面に向かって竿を使えば、浮きが飛んでいきます。\n\n戦闘中、泳いでいる間、死亡中は投げられません。岸から釣るのが本来の姿です。ただし水は土地と同じように難しくなります。湿地は少なくともティア2のIronreelを、峰はティア3のSilverstreamを求め、その水が求める竿を持たずに投げた糸は、手から離れることさえありません。その上に三本の竿があります。Stormreel、Tidewrought、Clockreelです。技師は糸が引き上げたものから三本とも道具工房で作り、溺れし連祷のデルヴのカウンターは攻略条件を満たせば最初の二本をデルヴの刻印で売ります。硬貨で売ることは決してありません。どの水もこれらを求めませんが、快適さだけのものではありません。一本ごとに、熟練度だけでは届かない釣果バンドが開くので、カウンターが上限に達したあとは、釣果表がどこまで深くなるかを決めるのは竿だけです。加えて待ちを縮めリールの猶予も広げ、最上位の段ではきっかり3秒でアタリが来ます。',
+  'guide.profPages.fish.scheduleNoteRetuned':
+    '釣りの成長は熟練度ごとの固定スケジュールに従い、賽の目はありません。熟練度50未満は1匹あたり0.08、100未満は0.05、150未満は0.04、150から200までは0.03です。このカーブは終盤に重みを寄せず、意図して緩やかにしてあります。200までの登り全体で実釣およそ11時間、そのどの四分の一も全体の三分の一を超えることはありません。ですから最後の50ポイントは長い区間ではあっても、旅のすべてではありません。\n\n{cutoff}からは、ガラクタを釣っても何も学べません。そこから先、藻も長靴もただの藻と長靴です。水そのものも学びに上限を課します。渓谷のティア1の水域（と、中核の外にある若い岸辺すべて）は100より先を教えず、湿地の水域は150で止まり、200までずっと釣り人を育てるのはThornpeakの水だけです。それ以外の釣り上げはすべてスケジュールどおりに成長するので、カウンターが止まったときは、より深い水を探せとスケジュールが告げているのです。',
+  'guide.profPages.fish.tablesNoteSixBands':
+    '熟練度は六つの釣果バンドから一つを選びます。バンド0は最初から、バンド1は100、バンド2は150、そして上の三つはいずれも200からで、ゾーンごとに、ガラクタとアタリなしから本物の魚へと重みを移していきます。最初のバンドより上はどれも竿を求め、しかも一段ずつ高くなります。バンド1はティア2のIronreel、バンド2はティア3のSilverstream、バンド3はティア4のStormreel、バンド4はティア5のTidewrought、バンド5はティア6のClockreelです。バンド2は150で開き、最後の三つはそろって200の上限を待ちます。つまり熟練度の門はもう一度だけ動いて、そこで止まります。上限から先で釣果表を押し上げるのは竿だけであり、製作の竿はそのためにあり、三種の深い水の獲物もそこにいます。実際のバンドは、熟練度が勝ち取った高さと竿が支える高さの低いほうです。この頭打ちは何も告げません。竿が足りなくても釣れはしますが、下のバンドの釣果表から釣れるだけです。スキルは伸びているのに釣果が変わらないと感じたら、まず竿を確かめてください。\n\nどのゾーンの水域にも、そのゾーンだけの料理用の獲物が二種あります。深いゾーンほど高いティアの魚で、いずれも厨房の素材であり、調理しなければ何も回復しません。バンド3から上では、さらに三種が同じ重みでどのゾーンの釣果表にも加わるので、その三種を指定するレシピは、どこで釣る釣り人にも同じことを求めます。表の残りは釣り人の税です。藻と、ときおりの長靴と、決してなくならないアタリなし。どれだけ払うかは、立っている場所ではなく浮きが落ちた水で決まります。キャストは最大24ヤード届き、その水が求める竿も、引いてくる釣果表も、記録される功績も、どこまで教えてくれるかも、すべて糸が落ちた瞬間にその水が属するゾーンで決まります。どのゾーンの水も自分のバンドに合わせて書かれていて、渓谷はバンド0、湿地はバンド1、峰はバンド2です。そこから1バンド下で釣ると、およそ三投に一投がアタリなしになり、2バンド下では半分を超えます。竿は水まで連れて行ってくれますが、実りをもたらすのは熟練度です。そしてこの登りが釣り人をより深くへ引き寄せます。良いバンドはただ実入りが良いだけではなく、渓谷から先は、学びを与え続けてくれる唯一の水だからです。{rare}だけは、釣果バンドだけに応え、ほかの何にも左右されない一行です。どのゾーンでも同じ確率で、バンド2ではバンド0の六倍になります。ですから桟橋で最も珍しいものこそ、Master Anglerが本当に得意なものなのです。',
+  'guide.profPages.fish.koiBodyBandFlat':
+    '世界中のあらゆる水域に同じ大物が潜んでいます。日映えの錦鯉、良質のきらめく錦鯉で、商人に売れば75銅、誇りとしてはそれ以上の価値があります。確率は釣果バンドだけに応え、ほかの何にも左右されず、どのゾーンでも同じです。釣果表の一行としてバンド0で1%、バンド1で3%、バンド2から上は6%で、巻き上げた一投ごとに抽選されます。ですからこの錦鯉は、深い釣果表を勝ち取った釣り人のもとへ来ます。釣り上げれば功績の書にGlimmer of Hope（名声ゼロの収集印）が記されます。そのときは、ログが必ず知らせてくれます。',
+  'guide.profPages.faq.a6ThreeRods':
+    '九つの共通の野外レシピと、製作で作る六つの陸の道具のレシピは、最初から誰もが習得しています。作業場に縛られる三つの上級レシピ（窯鱗のマント、ワードウィーヴのフード、ダスクハイドの手甲）も同様で、師匠は不要ですが、その作業場は必要です。それ以外はすべて、三つの拠点の町にある各作業場の師匠が教えます。多くはイーストブルックにおり、なめし職人はフェンブリッジのなめし場に、錬金術師はハイウォッチの薬房にいます。\n\nトレーナーのレシピは段に分かれます。装備と消耗品の職はスキル0、25、50で、一度きりの料金として無料、銀25、金1です。さらにどの職も、その作業場で教わる75の中間段をひとつその上に加えます（エンチャントのそれは光輝の試薬で、25の段にある二つの護符レシピと並びます）。道具職人はそのほかに、製作の釣り竿三本のうち二本を75と125で、金4と金16で教えます（最上段はその代わりに設計図から習得するため、料金を提示する師匠はいません）。師匠はその職のあなたの段階がレシピ自身の段階に達すると教えてくれ、習得には師匠の作業場に立っている必要があります。移動式の作業場は数に入りません。',
+  'guide.profPages.faq.a7RetunedTaper':
+    '採取のキャストは2.5秒から始まり、二通りに短縮されます。ひとつは、採取地点自身の階級を超えて所持し、かつ扱える道具の階級ひとつにつき0.4秒、もうひとつは、その職のカウンターが100の帯を越えた時点で0.15秒で、下限は1.5秒です。階級1の採取地点から階級3の採取地点へ移れば余剰は消えるため、同じつるはしがまた遅く振られます。必要な階級をちょうど満たしているだけでは速さは得られず、その採取地点が開くだけです。\n\nスキルの上昇は製作と同じように衰えます。熟練度がその階級を越えて上がるにつれて採取地点は灰色になり（階級1の採取地点は熟練度75以降は何も教えません）、上がりが鈍いときの答えはより高い階級の採取地点です。それらには少なくともその階級の道具を鞄に入れておく必要があり（階級1を含め、素手で掘れる採取地点はひとつもありません）、階級1を超える陸の道具はさらに、先にその扱いの基準値を求めます。階級2から5まで、その職で40/70/85/100です。釣りは独自の逓減に従います。熟練度50未満では一匹につき0.08、100未満では0.05、150未満では0.04、200未満では0.03で、がらくたは100以降まったく何も教えず、水場そのものが学びの上限を定めます（階級1の水場は100で、湿地は150で教えるのをやめます）。ですから、カウンターが止まったときは、その水場を卒業してしまったという意味でもあり得ます。',
+  'guide.profPages.faq.q3':
+    '死体のルートと採取は何が違うのですか？',
+  'guide.profPages.faq.q4':
+    '自分のIronbark Logに署名が入っているのはなぜですか？',
+  'guide.profPages.faq.q5':
+    '受注品のバインドはどう解除して、いくらかかりますか？',
+  'guide.profPages.faq.q6':
+    'レシピはどこで習えて、いくらかかりますか？',
+  'guide.profPages.faq.q7':
+    '採集が急に遅くなったのはなぜですか？',
+  'guide.profPages.faq.q8':
+    '町を離れても製作できますか？',
+  'guide.profPages.faq.a3':
+    'ひと押しで両方まかなえます。死体が抱えているものは、コインとドロップ品も、採取できる素材も、すべて同じウィンドウに開きます。戦利品は通常の戦利品の規則どおりに配られ、採取のほうが生産職の側で、死体そのものから素材を剥ぎ取ります。\n\n採取は早い者勝ちの一度きりです。各死体を採取できるのはちょうど一度、最初に手をかけた者だけで、オンラインでも同じです。何が採れるかを形づくるのが「町のフォーカス」です。拠点の町の中に立っていれば、10ポイントのフォーカスの持ち分を、気にかける素材の種類へ振り分けられます。フォーカスした素材は良い採取ティアを引きやすくなり（フォーカス5ポイントごとに1段階、上がるのは最大2段階まで）、産出も増えます（1ポイントにつき10%）。フォーカスしていない素材が悪くなることは決してありません。',
+  'guide.profPages.faq.a4':
+    '幸運を引き当てたのです。およそ90回の採取に1回、珍しい発見が起こります（木ならancient heartwood、鉱脈ならpristine vein、薬草ならmoonlit bloom）。収穫は5倍になり、一つ残らずあなたの名前で署名され、その発見はゾーン全体に告知されます。普通の採取でも、レア以上の品質を引き当てれば収穫に署名が入ります。\n\n署名入りの素材は、手元に置くか高く売る値打ちがあります。必要な素材の署名入りの品をひとつでも持って製作に臨めば、それだけで傑作率が2ポイント上がるからです。ただしスタックできるのは署名が完全に一致する品どうしだけなので、自分だけのバッグ枠に収まることは忘れないでください。',
+  'guide.profPages.faq.a5':
+    'その品をバッグに入れたまま、どこかの作業場まで歩いて、師匠に料金を払ってください。料金はその品の品質で決まります。アンコモンの品なら銀25、レアなら金1、エピックなら金4。伝説はエピックと同じ額を、受注で作られたコモンの品はアンコモンと同じ額を払います。本物の作業場でなければなりません。移動式の作業場がこの仕事を引き受けることは決してありません。\n\n料金で買えるのは仕切り直しであって、治療ではありません。その品は受注品のままなので、次の取引で受け取った相手にまたバインドされます。バインドされた品が何個か同じスタックに入っている場合は、支払い一回につき1個だけが剥がされてバインド解除されます。',
+  'guide.profPages.faq.a8':
+    '一部はできます。九つの共通の野外レシピ（入門の武器、防具、食べ物、薬の定番）はいつでもどこでも作れますし、誓いの対の三つの組み合わせレシピも同じです。それより上のレシピはすべて作業場の種類に縛られます。鍛冶場、厨房、薬房、なめし場、織機、工作場のいずれかで、製作を通すにはその作業場から20ヤード以内にいる必要があります。\n\nその職のスキル75で特化すると、素材コスト20%減とあわせて移動式の作業場を得ます。野に据えれば10分間そこに立ち、その職のレシピを本物の作業場にいるのと同じように扱えます。移動式の作業場は製作のためだけのものです。レシピの習得と受注品のバインド解除には、いつでも町の本物の作業場が要ります。',
+  'guide.profPages.craftProse.cooking.materialsBody':
+    '看板食材は釣りが地方ごとに供給します。Eastbrook Valeの鏡鱒と川鱸、Mirefen Marshの沼カワカマスと泥鰻、Thornpeak Heightsの霜鰓鱒と板鰭鯉。梯子の各段はその段の魚を調理するので、釣る料理人は品切れ知らずです。肉屋の側は亡骸採集から。猪などの獣肉、そしてレア以上の採集判定で署名入りのPrime Cut、大ローストの主役が出ます。薬草が上位の皿に香りを添え、ashwoodの丸太一本が鰻を燻し、Cooking SaltはMarlowの店で一袋8銅です。',
+  'guide.profPages.craftIntro.engineering':
+    '工作は、本気の採集者がいずれ欲しくなる道具を作ります。ティア4と5のつるはし、斧、鎌、そしてティア4からティア6まで登る三本の釣り竿。どれもどこかのカウンターがコインで売ることは決してなく、どれも一段下の道具を材料として消費します。',
+  'guide.profPages.craftProse.engineering.identityBody':
+    'この職はEastbrook広場南西角の工作場で営みます。主はTinker Gizzel。どの道具系統も段階1から3は普通の店売り品ですが、そこから上の段はすべてエンジニアの作業台から生まれるか、踏破数の関門の先にある溺れし連祷のデルヴのカウンターでデルヴの刻印と引き換えに手に入るかで、コインでどこかのレジを通ることは決してありません。陸の系統は段階5で止まり、竿の系統はもう一段、段階6の歯車リールの釣り竿まで登ります。\n\n環では錬金術と防具鍛冶の間で、対は爆破師（工作と錬金術）と歯車師（防具鍛冶と工作、誓いのクエストはまだありません）。今も大事な警告をひとつ。道具の梯子そのものの段はどれも、趣味や未宣誓の職が働くレア段階の天井より上にあるため、梯子の仕事でスキルが動くのは工作を主専攻に持つ者、今日で言えば爆破師だけです。もっとも作業台は、もう他の皆に閉ざされてはいません。Gizzelはスキル0で歯車のブランクと青銅の鍬をどちらも無償で教え、25では通常の段階料金で銅レンズの単眼鏡を教えるので、未調律や趣味の工作師でも序盤の段からスキルを上げられます。別の生き方の陰で休眠している職は、今もスキル0の二つの教えからだけ伸びます。陸の道具は誰でも作れます。未調律の職人は、それらを作っても何も学ばないだけです。加えて三本の竿のうち二本はGizzelの教えを要し、段階6の一段はその代わりに設計図から覚えます。',
+  'guide.profPages.craftProse.engineering.ladderBody':
+    '道具の梯子はどの段も工作場の作業台に紐づきます（道具職人が別に教える製作の鍬については採集のページを参照。入門の二つの教えは上で述べた対のことです）。陸の道具のレシピ六つは自動習得で、修行費は一切なし。スキル75で段階4のつるはし、斧、鎌、スキル125、つまり上限の段そのもので段階5です。ここではスキル要件が製作を止めることはなく、成長の形を決めるだけなので、素材と前段の道具が揃った日に段階5の道具を作れます。製作する釣り竿三本のうち二本は、教わる例外です。Gizzelが嵐リールの釣り竿をスキル75で4金、潮鍛えの釣り竿をスキル125で16金で教え、どちらもこの職での自分の段がその段に届いた瞬間に習えます。三本目の段階6の歯車リールの釣り竿には、修行費を提示する師匠がそもそもいません。その設計図は英雄補給係のカウンターに並び、レシピをそのまま授けます。\n\n完成品はすべてレアかエピックで、出荷時から署名入り。工作は合作レシピの半分も担ぎます。Elixir of the Bear、両スキル25の調律済み爆破師の醸す一本です。',
   'hudChrome.meters.threatFrozen': '{name}への最終脅威',
   'hudChrome.account.setPasswordTitle': 'パスワードを設定',
   'hudChrome.account.setPasswordHint':
@@ -14638,5 +15155,92 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.forgefire_spire.name': 'フォージファイアのスパイア',
   'entities.items.springtouched_crozier.name': '泉触れの司教杖',
   'entities.items.wand_of_quenched_sparks.name': '消えた火花のワンド',
+  // masterwrought Phase 11o, the engineering on-ramp (M16 fills).
+  'entities.items.cogwheel_blank.name': '歯車のブランク',
+  'entities.items.copperlens_ocular.name': '銅レンズの単眼鏡',
+  // masterwrought Phase 13, the orange promotion (M16 fills). The Deed of
+  // Making noun matches the sim_i18n.ts error.legendaryDeed row.
+  'entities.items.deed_of_making.name': '創造の証書',
+  'hudChrome.materialHint.deedOfMaking':
+    '銘刻の証書。消費すると、完全化された名匠鍛造の作品を伝説へと昇格させ、名前を与えます。',
+  'hudChrome.crafting.legendaryLine': '{item}は{name}として生まれ変わり、伝説となりました！',
+  'hudChrome.crafting.legendaryZoneLine': '{player}が{item}を鍛え上げ、伝説{name}を生み出しました！',
+  // Masterwrought Phase 14: the Perfecting window + the crafting window's
+  // apex surfacing (M16 fills). Terms follow the shipped sim_i18n rows:
+  // Perfecting 完全化, Masterwrought 名匠鍛造, Rift 裂け目.
+  'hudChrome.crafting.apexChip': '頂点',
+  'hudChrome.crafting.apexPatternRaid': 'その設計図はレイドの希少な戦利品です。',
+  'hudChrome.crafting.apexPatternRift': 'その設計図は高ランクの裂け目を制覇すると手に入ります。',
+  'hudChrome.crafting.apexPatternVendor': 'その設計図は英雄補給係が英雄の証と引き換えに販売しています。',
+  'hudChrome.crafting.apexPatternDrop': 'その設計図は世界のどこかで見つかります。',
+  'hudChrome.crafting.perfectingLink': '完全化',
+  'hudChrome.perfecting.title': '完全化',
+  'hudChrome.perfecting.close': '完全化ウィンドウを閉じる',
+  'hudChrome.perfecting.openButton': '完全化',
+  'hudChrome.perfecting.openButtonAria': '完全化ウィンドウを開く',
+  'hudChrome.perfecting.empty': '完全化できる名匠鍛造アイテムを持っていません。頂点レシピで作り出せます。',
+  'hudChrome.perfecting.wornChip': '装備中',
+  'hudChrome.perfecting.rowRank': 'ランク{rank}/{ranks}',
+  'hudChrome.perfecting.rowPerfected': '完全化済み',
+  'hudChrome.perfecting.rankAnnounce': '{name}が完全化ランク{rank}/{ranks}に到達しました。',
+  'hudChrome.perfecting.perfectedAnnounce': '{name}は完全化されました。',
+  'hudChrome.perfecting.promotedAnnounce': '{name}は{chosen}として鍛え上げられました。',
+  'hudChrome.perfecting.unknownItem': '不明なアイテム',
+  'hudChrome.perfecting.namingSelectionUnconfirmed':
+    'バッグの中身が変わりました：命名中の品を確認できません。鍛える前に選択を確認してください。',
+  'hudChrome.perfecting.rowPromoted': '伝説',
+  'hudChrome.perfecting.attemptCost': '挑戦コスト',
+  'hudChrome.perfecting.promoteCost': '昇格コスト',
+  'hudChrome.perfecting.matCount': '{have}/{required}',
+  'hudChrome.perfecting.skillNeed': '{craft}スキル{skill}が必要です。',
+  'hudChrome.perfecting.skillMet': '条件を満たしています。',
+  'hudChrome.perfecting.skillUnmet': '不足しています。',
+  'hudChrome.perfecting.skillSyncing': '製作スキルを確認しています。',
+  'hudChrome.perfecting.bindWarn': '最初の完全化の挑戦で、{name}はあなたに束縛されます。',
+  'hudChrome.perfecting.bindWarnDetail':
+    '完全化でランクが下がることはありません。失敗しても素材を消費するだけです。完全化の進行がある、または完全化済みのアイテムは束縛を解除できず、昇格も取り消せません。',
+  'hudChrome.perfecting.bindConfirmText': '最初の挑戦で{name}はあなたに束縛されます。挑戦しますか？',
+  'hudChrome.perfecting.bindConfirmAccept': '束縛して挑戦',
+  'hudChrome.perfecting.bindConfirmCancel': 'キャンセル',
+  'hudChrome.perfecting.attempt': '完全化に挑戦',
+  'hudChrome.perfecting.promote': '命名して昇格',
+  'hudChrome.perfecting.perfectedLead': '完全化されました。名を与え、伝説を鍛え上げましょう。',
+  'hudChrome.perfecting.promotedLine': '完成した伝説：これ以上完全化するものはありません。',
+  'hudChrome.perfecting.equipBlocked': '昇格すると装備できなくなります。先に競合する装備を外してください。',
+  'hudChrome.perfecting.nameTitle': '伝説に名を',
+  'hudChrome.perfecting.nameLabel': '{name}に刻む名前を入力してください。名前は永久に残ります。',
+  'hudChrome.perfecting.nameInputAria': '伝説の名前',
+  'hudChrome.perfecting.nameHint':
+    '2から32文字：英字、スペース、アポストロフィ、ハイフンが使えます。先頭は英字にしてください。',
+  'hudChrome.perfecting.nameCount': '{count}/{max}',
+  'hudChrome.perfecting.nameSubmit': '伝説を鍛える',
+  'hudChrome.perfecting.nameSubmitBusy': '鍛造中',
+  'hudChrome.perfecting.nameCancel': 'キャンセル',
   'crucibleShop.balanceEntry': '{name} x{count}',
+  'guide.arenaPage.honorFinalNoteSoldBack':
+    '名誉での購入は取り消せません。商人の買い戻し一覧に並ぶのは、自分が売った品だけです。コインでの買い物なら、たいていは売却価格で売り戻せますし、また気が変わればその一覧から取り戻せますが、ウォーフェア装備は買った瞬間に魂縛されるため、取引にも郵送にも売り戻しにも二度と回せません。その一覧にウォーフェア装備が並ぶことは、決してありません。商店がわざわざ確認を求めるのはそのためです。押す前に、その一点をよく読みましょう。',
+  'guide.arenaPage.rewardsBodyLossShare':
+    'ランクマッチに勝てば、プレイヤー対プレイヤーの通貨である名誉が支払われ、最後まで戦い抜いた負け試合にもそれより少ない額の名誉が支払われます。引き分けも同様です。ですから、負けて本当に失うものはレーティングだけです。名誉は本物の試合に報いるためのものです。同じ日に同じ相手や同じチームをもう一度倒しても追加の支払いはなく（もう一度負けても同じです）、勝ち続けた長い一日でも最初の何勝かまでは満額が支払われ、その後は一勝あたりが半分になり、さらに勝ち進むともう一度半分になってそこで下げ止まり、相手が棄権した試合はレーティングこそ動きますが名誉はまったく支払われません。この「一日」はワールド自身の一日で、ワールドの夜間リセット時刻に切り替わります。日次のロックアウトがすべて解けるのと同じ境目です。',
+  'guide.arenaPage.warfareBodyStatsStay':
+    'ウォーフェアの品はどれもウォーフェア攻撃レーティングとウォーフェア防御レーティングを備えていますが、この二つはモンスター相手にはまったく働きません。効くのは他のプレイヤーと戦うときだけ、決闘、アリーナ、戦場においてのみで、攻撃は与えるダメージを上乗せし、防御は受けるダメージを削り、それぞれに固有の上限があります。各防具系統はセットでもあり、そのセットボーナスもまた、ウォーフェアのレーティングか、プレイヤーにしか働かない効果です。ですから名誉で揃えた一式のセットボーナスは、ダンジョンのボスの前では何の足しにもなりません。品そのものは、通常のステータス、防御力、武器ダメージを変わらず備えており、それらはどこでも働きます。モンスター相手に黙り込むのは、ウォーフェアのレーティングとセットボーナスのほうなのです。',
+  'guide.arenaPage.warfareTradeBodyRatingSpent':
+    'それは意図された取り引きです。ウォーフェア装備はプレイヤーと戦うために作られたものであって、ダンジョンの段階を飛び越える近道ではありません。ウォーフェアの品が、同じ部位のダンジョン産エピックほどの戦闘レーティングを備えることは決してなく、その代わりに備えているウォーフェアのレーティングとセットボーナスは、すべて他のプレイヤーに向けて費やされます。アリーナで渡り合いたいなら買いましょう。ヒロイックをより速く駆け抜けたいなら、装備はダンジョンで勝ち取りましょう。',
+  'guide.social.calendarBodyDoubleHonor':
+    'Iを押すとイベントカレンダーが開きます。予定を立てる価値のあるワールドの日々、毎週のレイド招集、市の日、アリーナ激突、名誉2倍ウィークエンド、フィッシングダービー、それに毎月のデルヴの日と月門の集いを記します。ギルドが予定を管理するのもここです。ギルドマスターとオフィサーがイベントを書き込め、全メンバーが同じページでそれを見られます。ワールドの日々は恩恵ではなく集うための呼びかけですが、一つだけ例外があります。名誉2倍ウィークエンドの間はずっと、ソーンホロウ平原の名誉が2倍支払われ、最後まで戦えば敗北でも勝利と同額が支払われます。それ以外は、日が記されているからといって、キャラクターに何かが変わることはありません。',
+  'guide.social.emotesBodyNamedTarget':
+    'キャラクターは言葉を使わずに気持ちを伝えることもできます。/wave、/dance、/cheer、/bow といったエモートを打ち込みましょう。名前を添えれば誰かに向けて行えます。たとえば「/wave Aleph」です。あるいは、エモートホイールの既定キーであるXキーを長押しするとエモートホイールが開き、頭上に手早く感情を表せます。ウィンドウボタンの列にある「エモート」ボタン（タッチ操作では「その他」の中にあります）からも、同じホイールが開きます。',
+  'guide.social.finderBodyLeaderQueues':
+    '挑戦の人数を埋めるのに、パーティ募集で声を張り上げる必要はありません。ダンジョンファインダーを開き、行きたい挑戦と引き受けられるロールを選んで、一人でキューに並ぶか、すでに組んでいるパーティならパーティリーダーにキューへ入れてもらいましょう（グループを入れられるのはリーダーだけです）。ファインダーはロールが一式そろうまで待ち、そろったところで全員に同時にグループを提示します。ポップアップが一人ひとりに承諾を求め、最後の一人が承諾した瞬間にパーティが成立します。提示を断ったり、時間切れにしたりすると、自分は（一緒に並んだパーティがあればそれも含めて）キューから外れ、再び並べるまで短いクールダウンが入ります。提示を受けた他の人は、自分が同じことをしたか、一緒に並んだ人が同じことをしたのでない限り席を保つので、列は滞りなく流れていきます。',
+  'guide.social.lootRollBodyNeedBeatsGreed':
+    'アイテムがロールにかけられると、対象となる各メンバーは、欲しければ「必要」、余りなら受け取る程度なら「強欲」、辞退するなら「パス」を選びます。「必要」は「強欲」に優先します。誰か一人でも「必要」を選べば、アイテムは「必要」の中で最も高い出目の人に渡り、「強欲」の出目は数えません。「必要」が誰もいなければ、「強欲」の中で最も高い出目が勝ちます。',
+  'guide.interfacePage.framesMoveBodyEditFrames':
+    '自分のフレーム、ターゲットフレーム、パーティフレームは、いずれも移動できます。どれも隅に小さな移動ボタンを備えているので、固定を外し、好きな位置へドラッグし、もう一度固定すれば、うっかりクリックしてもずれません。オプションの「インターフェース」にある「フレーム」タブの先頭の「フレーム編集」を使うと、インターフェースの残りの部分もいっせいに動かせるようになり、この3つのフレームもそれに含まれます。アクションバー、キャストバー、スイングバー、経験値バー、ミニマップ、ボタンレール、ペットフレーム、スタンスバー、バフとデバフの列、そして「ウィッシュリストの通知」のチップが対象で、動かせる間はそれぞれに名前のチップが付きます。置き場所を悔やむことになったら、同じ「フレーム」タブの末尾にある「初期設定に戻す」で、すべて元の場所へ戻せます。',
+  'guide.interfacePage.mapBodyZoneFirst':
+    'Mを押すと、今立っているゾーンのワールドマップが開きます。自分の矢印、周囲の名所、印を掲げたクエストの依頼人と目標のあるエリア、作業場、メールボックス、掲示板、菜園、ダンジョン入口、そしてそのゾーンにあるすべての採集ノードが載り、ノードは再生を待つ間は灰色になり、手持ちの道具では採れないものには印が付きます。パーティの位置も表示されます。マップを右クリックするか「ワールドマップ」ボタンを押すと大陸全体まで引き、すべてのゾーンが名前とともに描かれ、ゾーンをクリックするとそのゾーンのマップが開きます。デルヴ、ダンジョン、リフト、城砦に足を踏み入れると、マップは今いる場所の見取り図に切り替わり、ソーンホロウ平原の戦場には専用の戦場マップがあります。\n\n画面の右側、ミニマップの下には、何も開かなくても今の用事が見えるようにトラッカーが積み重なります。追跡中のクエストとその目標、功績の進み具合、聖遺物庫のページ、潜っているデルヴ、そして参加中のリフトです。クエストトラッカーは、画面を広く使いたいときに折りたためます。',
+  'guide.interfacePage.mobileBodyTwoPages':
+    'タッチ操作は自動的に現れ、配置は画面の大きさに合わせて整えられます。小さなスマートフォンではコンパクトに、大きなスマートフォンでは標準に、タブレットではゆったりと並びます。\n\nアビリティは数字列ではなく輪の形に並びます。攻撃ボタンとその脇の4つのアクションボタン、そして輪を{pages}つのページの間で切り替えるページトグルです。ページを合わせると{slots}個あるアビリティスロットのすべてに届き、デスクトップ用の追加バーを有効にしているかどうかは関係ありません。輪の5番目の弧の位置は消耗品の席です。タップすればそこに据えた品を使い、長押しするか内側へスワイプすれば、持ち物から自動で埋まる列が開きます。その周りには、タッチで遊ぶ人がいちばんよく使うボタン、ターゲットの切り替え、目の前のものへの対話、ジャンプが並びます。\n\n画面の下辺には、ボタンの列の代わりに「クイック操作」のコントロールが一つ置かれています。ここからそれ以外のすべてが開きます。騎乗、チャット、マップ、バッグ、ソーシャル、クエスト、キャラクター、スペルブック、ゲームメニュー、そして残りのウィンドウを収めた「その他」で、ダンジョンファインダー、PvP、エモート、ウィキもそこに入っています。ここではウィンドウは浮かぶのではなく、画面いっぱいに開きます。\n\nユニットフレームの移動はデスクトップだけのものです。タッチでは、配置はゲームの側が決めてくれます。',
+  'guide.interfacePage.winMoreBodyNoValeCup':
+    'ワールドマップ（M）、PvPウィンドウ（G）、ランキング（K）、イベントカレンダー（I）も、すべて同じように使えます。エモートホイール（X）だけは例外で、キーを押し続けるとホイールが現れ、エモートの上でキーを離すとそのエモートが再生されます。ランキングは初めて開くときに少し眺めてみる価値があります。プレイヤーのタブ、ギルドのタブ、功績の書の名声でアカウント全体を順位付けするタブ、デイリーの順位のタブ、そしてゲームを作っている人々のための「開発者」タブがあり、開発者タブは「開発者バッジを表示」をオフにしない限り表示されます。\n\nほかのプレイヤーをターゲットしてターゲットフレームを右クリックするか（タッチではダブルタップか長押し）、チャットでその名前を右クリックすると、「プレイヤー情報」がその人物のカードを開きます。身につけている装備がツールチップ付きで並び、キャラクターの公開情報も載ります。見るだけで、それ以上のことはできません。装備を見るには相手が見える距離にいる必要があります。遠く離れた相手の名前をチャットから調べると、代わりにカードの公開されている半分、ポートレート、名前、レベル、クラス、ギルドが表示されます。',
+  'guide.interfacePage.worldWindowsBodyStationMaster':
+    'キーを押して開くことのないウィンドウもあります。しかるべき相手に話しかけたり、しかるべきものをクリックしたりすると開くのです。\n\n商人は店のウィンドウを開き、買える在庫と、同じパネルの末尾に直前に売ったものを預かる買い戻しの一覧が並びます。うっかり売ってしまったときのためです。在庫の脇には数量ボタンの列があるので、素材の束も10回押す代わりに5個か10個ずつ一押しで買え、どちらも合わないときにはカスタムの数量が使えます。クラスのアビリティに訓練士は要らず、レベルとともに手に入ります。ここでいう訓練士とは作業場に常駐する師匠たちのことで、その一人の「訓練」を選ぶと、今教えてもらえるレシピ、すでに覚えているレシピ、そしてまだ熟練が足りずに開いていないレシピが並びます。\n\n銀行員はあなたの銀行を開きます。スロットを買い足していける追加の金庫としての「個人」タブと、製作素材を種類ごとに収める「保管庫」タブがあります。ギルドが銀行を開いていれば、そこの「ギルド」タブに現れます。取り出す権限がないメンバーでも中を覗けるので、ギルドが何を抱えているのかを誰かに尋ねる必要はありません。誰が預け、引き出し、ギルドの資金を動かせるかはランクが決め、あらゆる出し入れが記録に残ります。\n\nレイヴンポストのメールボックスは手紙を開き、届いたものが一方のタブに、送る用紙がもう一方のタブに並び、添付品も扱えます。イーストブルックの商人か、山上のハイウォッチにいる競売人ヴォスのところにある世界市場は専用のウィンドウを持ち、閲覧して買うタブ、自分の品を出品するタブ、売れた分を受け取るタブの3つに分かれています。ほかのプレイヤーと面と向かって取引すれば、双方に一面ずつある取引ウィンドウが開きます。',
 };

@@ -9,7 +9,7 @@ import {
 
 const DEFAULT_OUTPUT = 'tmp/imagegen/item-art-consistency/final-audit';
 const DEFAULT_VERDICT =
-  'docs/achievements/item-art-consistency-2026-08-09/final-item-art-audit-verdict.json';
+  'docs/achievements/masterwrought-art-completion-2026-09-02/final-item-art-audit-verdict.json';
 
 function usage() {
   return `Usage: node scripts/item_art_audit.mjs [options]
@@ -59,8 +59,13 @@ function parseArguments(arguments_) {
 async function loadItems(repoRoot) {
   const build = await esbuild.build({
     stdin: {
+      // ITEM_ART_PENDING is the one art-pending ledger: it spreads its
+      // content-side source list (IGNIVAR_ART_PENDING_ITEM_IDS in
+      // src/sim/content/ignivar_loot.ts) on top of the enumerated debt, so the
+      // audit reads the union through the UI seam and never a partial list.
       contents:
-        "export { ITEMS } from './src/sim/data.ts'; export { IGNIVAR_ART_PENDING_ITEM_IDS } from './src/sim/content/ignivar_loot.ts';",
+        "export { ITEMS } from './src/sim/data.ts';\n" +
+        "export { ITEM_ART_PENDING } from './src/ui/icons.ts';",
       resolveDir: repoRoot,
       sourcefile: 'item-art-audit-entry.ts',
       loader: 'ts',
@@ -74,7 +79,7 @@ async function loadItems(repoRoot) {
   const bundled = build.outputFiles[0].text;
   const dataUrl = `data:text/javascript;base64,${Buffer.from(bundled).toString('base64')}`;
   const module_ = await import(dataUrl);
-  return { items: module_.ITEMS, artPendingIds: module_.IGNIVAR_ART_PENDING_ITEM_IDS };
+  return { items: module_.ITEMS, pendingArtIds: module_.ITEM_ART_PENDING };
 }
 
 const arguments_ = parseArguments(process.argv.slice(2));
@@ -85,7 +90,7 @@ if (arguments_.help) {
 
 const repoRoot = process.cwd();
 await readFile(path.join(repoRoot, 'package.json'));
-const { items, artPendingIds } = await loadItems(repoRoot);
+const { items, pendingArtIds } = await loadItems(repoRoot);
 const mapping = JSON.parse(
   await readFile(path.join(repoRoot, 'public/ui/items/mapping.json'), 'utf8'),
 );
@@ -95,29 +100,27 @@ const build = await buildItemArtAudit({
   outputDirectory: arguments_.outputDirectory,
   renderOutputs: !arguments_.verifyOnly,
   items,
-  artPendingIds,
   mapping,
+  pendingArtIds: [...pendingArtIds].sort(),
   expected: {
-    // 829 + the crucible-raid-weapons-2026-08-28 batch (9 painted weapons)
-    // + the ignivar-varkhul-drop-renders-2026-08-28 batch (2 rendered
-    // legendaries) + the crucible-set-icons-2026-08-29 wave (all 192
-    // non-weapon Crucible pieces; the art-pending ledger is now empty).
-    // + the OSSBrain v0.41 batch's own painted piece, carried through the
-    // base merge alongside the release-side Crucible waves.
-    // + the two developer mount reins icons (Lanternback Troll, Chimeglass
-    // Tortoise) that joined at the release/v0.42.0 sync of PR #3439.
-    // + the Cluckwork Mech Bird store mount reins icon (PR #3464); liveItemCount
-    // moves with it.
-    catalogCount: 1044,
-    // 844 + the 201 Crucible raid loot definitions (192 of them art-pending)
-    // + the base's 2 Varkhul legendary definitions, + the release sync's 7
-    // bank-storage painted bags, + the two developer mount reins.
-    liveItemCount: 1059,
+    // Masterwrought's completion wave adds 81 newly painted identities and
+    // replaces 84 interim project-owned placeholders. The replacements do
+    // not grow the catalog; the new identities take the shipping census from
+    // 1,128 to 1,209 after the three v0.42 mount reins join the reviewed base.
+    catalogCount: 1209,
+    // The art-subject universe is every live definition minus the explicit
+    // pending-art ledger. This wave clears that ledger, so all 1,224 live
+    // definitions are painted (16 Heroic weapons intentionally alias base
+    // paintings; the implicit backpack is the one non-definition catalog id).
+    liveItemCount: 1224,
+    pendingArtCount: 0,
     generatedHeroicDefinitions: 64,
     heroicDefinitionsWithOwnWebp: 48,
     heroicWeaponArtAliases: 16,
-    sheetPageCount: 27,
-    groupCount: 22,
+    // The 81 additions land inside the existing 25 kind groups without
+    // crossing another 80-record page boundary: 30 pages, eight modes each.
+    sheetPageCount: 30,
+    groupCount: 25,
   },
 });
 assertItemArtAuditPass(build);

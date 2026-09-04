@@ -5,19 +5,19 @@
 // and text-free: the sim emits ids plus names only, the client renders the
 // localized lines.
 //
-// This mirrors professions/gather_events.ts announceMasterworkZone exactly,
-// including its instance-space exclusion and its reuse of the shared
-// emitToZonePlayers fanout, so the two celebrations route to online clients the
-// same way (the generic pid-scoped SimEvent path in server/game.ts routeEvents:
-// each per-recipient copy carries pid = the recipient and is delivered to that
-// session, no per-type server wiring).
+// This rides the SAME shared prologue as professions/gather_events.ts
+// announceMasterworkZone (announceZoneCelebration: the entity lookup, the
+// instance-space exclusion, the emitToZonePlayers fanout), so the
+// celebrations route to online clients the same way (the generic pid-scoped
+// SimEvent path in server/game.ts routeEvents: each per-recipient copy
+// carries pid = the recipient and is delivered to that session, no per-type
+// server wiring).
 //
 // This module is `src/sim`-pure (see src/sim/CLAUDE.md): no DOM/render/ui/game/net
 // imports, no Math.random/Date.now, host-agnostic.
 
-import { DUNGEON_X_THRESHOLD, zoneAt } from '../data';
 import type { SimContext } from '../sim_context';
-import { emitToZonePlayers } from './gather_events';
+import { announceZoneCelebration } from './gather_events';
 
 /** Announce a successful pair attunement for `pid`. Emits the personal `attuned`
  *  event unconditionally, then the zone-wide `attunedZone` broadcast (one copy
@@ -37,10 +37,10 @@ export function announceAttunement(ctx: SimContext, pid: number, pairId: string)
   if (!meta) return;
   ctx.emit({ type: 'attuned', pid, pairId });
   ctx.bumpDeedStat(meta, 'attunementsCompleted', 1);
-  const celebrantE = ctx.entities.get(pid);
-  if (!celebrantE || celebrantE.pos.x > DUNGEON_X_THRESHOLD) return;
-  const zoneId = zoneAt(celebrantE.pos.x, celebrantE.pos.z).id;
-  emitToZonePlayers(ctx, zoneId, (recipientPid) => ({
+  // The shared celebration prologue (gather_events.ts) owns the entity
+  // lookup, the instance-space skip, and the zone fanout; the bump above
+  // stays BEFORE it so an instanced celebrant still counts.
+  announceZoneCelebration(ctx, pid, (recipientPid, zoneId) => ({
     type: 'attunedZone',
     pid: recipientPid,
     celebrantPid: pid,

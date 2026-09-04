@@ -268,6 +268,29 @@ export const ADMIN_ERROR_KEYS: Record<string, string> = {
   'character went offline before the restore landed': 'error.restoreWentOffline',
   'item restore failed': 'error.restoreItemFailed',
   'slot restore failed': 'error.restoreSlotFailed',
+  // The phase 13 legendary-name strip's catch fallback (clearItemNameHandler).
+  'item name clear failed': 'error.itemNameClearFailed',
+  // The strip's typed outcome proses (server/clear_item_name.ts runClearItemName
+  // plus the lease-fenced save's refusal): surfaced through a VARIABLE, so the
+  // fail() scan above cannot see them; the reverse-map pin in
+  // tests/admin/professions_restore.test.ts holds every one to a key here.
+  'name exactly one target: a worn slot, a bag cell, or all: true':
+    'error.clearItemNameTargetForms',
+  'unknown equipment slot': 'error.clearItemNameUnknownSlot',
+  'all must be the literal true': 'error.clearItemNameAllLiteral',
+  'a bag target needs both the cell index and its item id': 'error.clearItemNameBagPair',
+  'bag must be a non-negative whole number': 'error.clearItemNameBagIndex',
+  'character is online on this realm; disconnect them first': 'error.clearItemNameOnline',
+  'no named copy matched that target': 'error.clearItemNameNoMatch',
+  'character came online before the strip landed; kick them and retry':
+    'error.clearItemNameCameOnline',
+  'character holds a live session lease; kick them (or wait out the lease) and retry':
+    'error.clearItemNameLeased',
+  // The LIVE arm's own race (Masterwrought phase 18 QA): the session left between
+  // the online check and the in-memory strip. It reads the opposite way round from
+  // clearItemNameCameOnline above, which is the offline arm losing its race to a
+  // session arriving, so the two cannot share a key.
+  'character went offline before the strip landed; retry': 'error.clearItemNameWentOffline',
   // Named-constant, multi-line, and `err.message ?? literal` fallback prose the
   // widened phase 15 scan guard surfaced (it now flattens the source, resolves
   // single-identifier arguments through server/admin.ts's own constants, and
@@ -298,8 +321,19 @@ export const ADMIN_ERROR_KEYS: Record<string, string> = {
   'a note is required': 'error.flagNoteRequired',
 };
 export function localizeAdminError(message: string): string {
-  const key = ADMIN_ERROR_KEYS[message.trim().toLowerCase()];
-  if (!key) return message;
+  const normalized = message.trim().toLowerCase();
+  const key = ADMIN_ERROR_KEYS[normalized];
+  if (!key) {
+    // The server owns this clamp; read its bounds instead of copying them.
+    const bagRange = /^bag must be a whole number from (\d+) to (\d+)$/.exec(normalized);
+    if (bagRange) {
+      return t('error.clearItemNameBagRange', {
+        min: fmtNumber(Number(bagRange[1])),
+        max: fmtNumber(Number(bagRange[2])),
+      });
+    }
+    return message;
+  }
   // The quota-bound proses carry locale-grouped numbers. Formatting lives in
   // src/admin/format.ts (the admin's one sanctioned Intl home, mirroring the
   // game's src/ui/i18n.ts formatNumber), so the bounds are formatted there and

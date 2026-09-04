@@ -84,6 +84,7 @@ function makeCtx() {
     primaryId: -1,
     tradeInvites: new Map(),
     duelInvites: new Map(),
+    feasts: new Map(),
     nextId: 1,
     get grid() {
       return grid;
@@ -154,6 +155,7 @@ function makeCtx() {
     utcDay: '',
     resetDay: '',
     eventLeadDay: '',
+    dailyResetRemainingSec: 0,
     pendingMobRespawns: [],
     partyInvites: new Map(),
     readyChecks: new Map(),
@@ -224,6 +226,7 @@ function makeCtx() {
     onMobKilledForQuests: vi.fn(),
     onRecipeCraftedForQuests: vi.fn(),
     onNodeGatheredForQuests: vi.fn(),
+    onCropFarmedForQuests: vi.fn(),
     onInventoryChangedForQuests: vi.fn(),
     checkQuestReady: vi.fn(),
     countItem: vi.fn(() => 0),
@@ -248,6 +251,7 @@ function makeCtx() {
     dungeonDifficulty: vi.fn(() => 'normal' as const),
     setDungeonDifficulty: vi.fn(),
     awardHeroicMarks: vi.fn(),
+    awardWyrmfallCores: vi.fn(),
     addEntity: vi.fn(),
     dropEntity: vi.fn(),
     rebucket: vi.fn(),
@@ -374,6 +378,7 @@ function makeCtx() {
     completeDisenchantCast: vi.fn(),
     completeApplyEnchantCast: vi.fn(),
     completeSalvageCast: vi.fn(),
+    completeSunderCast: vi.fn(),
     completeRechargeCast: vi.fn(),
     applyDemonHealTick: vi.fn(),
     awardCombo: vi.fn(),
@@ -408,6 +413,7 @@ function makeCtx() {
     // Ravenpost mail: the quest turn-in letter hook.
     queueQuestLetter: vi.fn(),
     mailHeroicMarks: vi.fn(),
+    mailWyrmfallCores: vi.fn(),
     mailAuthoredLetter: vi.fn(),
     mailboxHoldsItem: vi.fn(() => false),
     applySetProcs: vi.fn(),

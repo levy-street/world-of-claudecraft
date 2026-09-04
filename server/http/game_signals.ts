@@ -18,7 +18,7 @@
 //
 // CARDINALITY IS BOUNDED BY DESIGN, same contract as server/http/metrics.ts: the
 // only label values here are the ws-message direction (a fixed two), the
-// inbound drop cause (the fixed nine-value WS_DROP_CAUSES set), the guild-bank
+// inbound drop cause (the closed WS_DROP_CAUSES set), the guild-bank
 // incident kind (the fixed nine-value GUILD_BANK_INCIDENTS set), the vault-ledger
 // incident kind (the fixed VAULT_LEDGER_INCIDENTS set), the copper-flow
 // source, the harvest band and node tier (the fixed sets in
@@ -57,7 +57,7 @@ export const GENERAL_CHAT_QUOTA_DB_OUTCOMES = [
 export type GeneralChatQuotaDbOutcome = (typeof GENERAL_CHAT_QUOTA_DB_OUTCOMES)[number];
 
 /**
- * The fixed nine causes an inbound ws frame can be dropped for: the two
+ * The closed set of causes an inbound ws frame can be dropped for: the two
  * pre-parse gate causes (server/msg_rate_limit.ts), the three post-parse
  * lanes (server/msg_lanes.ts), the list-read guard on the ignore/block
  * readouts (server/list_read_guard.ts), the personal-bank/materials-vault
@@ -78,9 +78,10 @@ export const WS_DROP_CAUSES = [
   'bank_vault',
   'guild_bank',
   'cosmetic',
+  'lane_name_screen',
 ] as const;
 
-/** One of the fixed nine inbound drop causes. */
+/** One of the fixed inbound drop causes (the closed set above). */
 export type WsDropCause = (typeof WS_DROP_CAUSES)[number];
 
 /**

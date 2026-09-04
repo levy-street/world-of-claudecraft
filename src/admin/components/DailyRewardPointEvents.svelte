@@ -7,6 +7,8 @@
   } from '../daily_reward_event_log';
   import { fmtDate, fmtNumber } from '../format';
   import { t } from '../i18n';
+  import { type AdminLoadFailure, classifyAdminLoadFailure } from '../load_failure';
+  import PermissionDenied from './PermissionDenied.svelte';
   import { auth } from '../state/auth.svelte';
   import type { DailyRewardPointEventLog } from '../types';
 
@@ -16,13 +18,13 @@
   let currentRewardDay = $state('');
   let data = $state<DailyRewardPointEventLog | null>(null);
   let loading = $state(false);
-  let failed = $state(false);
+  let failed = $state<AdminLoadFailure>('none');
   let requestId = 0;
 
   async function refresh(): Promise<void> {
     const currentRequest = ++requestId;
     loading = true;
-    failed = false;
+    failed = 'none';
     try {
       const params = new URLSearchParams({ limit: '100' });
       if (day) params.set('day', day);
@@ -35,7 +37,7 @@
       if (!day) day = result.day;
     } catch (err) {
       if (currentRequest !== requestId) return;
-      if (!auth.handleAuthFailure(err)) failed = true;
+      if (!auth.handleAuthFailure(err)) failed = classifyAdminLoadFailure(err);
     } finally {
       if (currentRequest === requestId) loading = false;
     }
@@ -74,7 +76,9 @@
 
   {#if loading && data === null}
     <div class="empty">{t('accountRewards.loading')}</div>
-  {:else if failed}
+  {:else if failed === 'forbidden'}
+    <PermissionDenied />
+  {:else if failed === 'error'}
     <div class="empty">{t('accountRewards.loadFailed')}</div>
   {:else if data && data.rows.length === 0}
     <div class="empty">{t('accountRewards.empty')}</div>

@@ -12,20 +12,30 @@
 // max-armor kit (full heroic plate + shield, prot mastery), 2861 armor, in
 // Defensive Stance (takes 10% less). Heroic mobs attack at the level-22 pin,
 // so the armor step passes ~44.2% and the stance cut leaves ~39.8%.
+// Provenance (qr-19-ref-armor-calibration-constant, 2026-09-01): 2861 is a
+// PINNED constant, not a live measurement of the catalog. The committed
+// max-armour kit pins at 4085, in THIS file's own re-pin arm below (search
+// 'the live max-armor kit'), and whether 2861 was ever the raw kit armour or a
+// prot-mastery-folded reading is UNSETTLED, so it is not re-based here and rides
+// the packet's R5 re-measure. On the 4085 kit those two figures read about 35.7%
+// and about 32.1%, derived in the arm named REF_ARMOR provenance below.
 
 import { describe, expect, it } from 'vitest';
 import {
   HEROIC_DUNGEON_TUNING,
   NORMAL_DUNGEON_TUNING,
 } from '../src/sim/content/dungeon_difficulty';
-import { DUNGEONS, MOBS } from '../src/sim/data';
-import { createMob } from '../src/sim/entity';
+import { DUNGEONS, ITEMS, MOBS } from '../src/sim/data';
+import type { PlayerEquipment } from '../src/sim/entity';
+import { characterDerivedStats, createMob } from '../src/sim/entity';
+import { canEquipItemInSlot } from '../src/sim/equipment_rules';
 import {
   type HeroicSpawnRole,
   mobTemplateForDungeonDifficulty,
 } from '../src/sim/instances/difficulty';
-import type { DungeonDifficulty } from '../src/sim/types';
-import { armorReduction } from '../src/sim/types';
+import { requiredLevelFor } from '../src/sim/item_level_req';
+import type { DungeonDifficulty, ItemDef } from '../src/sim/types';
+import { ALL_EQUIP_SLOTS, armorReduction } from '../src/sim/types';
 
 const REF_ARMOR = 2861;
 const DEFENSIVE_STANCE_TAKEN = 0.9;
@@ -229,5 +239,156 @@ describe('heroic tuning data contract', () => {
         expect(MOBS[mobId], `${tuning.id}: ${mobId}`).toBeTruthy();
       }
     }
+  });
+});
+
+describe('the reference warrior is a CALIBRATION CONSTANT, and the catalog must not out-run it', () => {
+  // ADDED AT PHASE 15. REF_ARMOR is a hardcoded literal in four floors suites
+  // and is quoted as fact in two shipped sim comments, but nothing derives it
+  // from the catalog, so the whole floors model is structurally blind to GEAR
+  // drift: any new armour piece that becomes a max-mitigation pick moves real
+  // tank intake with zero test signal. That is not hypothetical here. The
+  // packet's apex shield shipped at armor 732 / blockValue 32 against the
+  // heroic raid shield's frozen 680 / 30, which made a CRAFTED item the best
+  // mitigation piece in the game and took the reference tank's physical
+  // damage down about 1.0 percent, unmeasured and unpinned, on exactly the
+  // axis R5's protected asset is priced in.
+  //
+  // Raising REF_ARMOR is not the fix: it would move every floor. The claim
+  // pinned instead is the one that actually protects the model, and it is a
+  // pure equality rather than a tolerance: REMOVING the packet's flagged defs
+  // must leave the max-mitigation kit unchanged. A crafted piece may sit
+  // beside the raid line; it may never take it.
+  const maxArmorKit = (includeFlagged: boolean): PlayerEquipment => {
+    const eq: Record<string, string> = {};
+    for (const slot of ALL_EQUIP_SLOTS) {
+      let best: ItemDef | null = null;
+      let bestArmor = -1;
+      for (const def of Object.values(ITEMS)) {
+        if (!includeFlagged && def.masterwrought === true) continue;
+        if (!canEquipItemInSlot('warrior', def, slot, 'prot')) continue;
+        if ((requiredLevelFor(def) ?? 0) > 20) continue;
+        const armor = (def.stats as { armor?: number } | undefined)?.armor ?? 0;
+        // Deterministic tie-break by id so the pick cannot drift with table order.
+        if (armor > bestArmor || (armor === bestArmor && best !== null && def.id < best.id)) {
+          bestArmor = armor;
+          best = def;
+        }
+      }
+      if (best) eq[slot] = best.id;
+    }
+    return eq as PlayerEquipment;
+  };
+
+  it('the max-mitigation prot kit is UNCHANGED by the packet, slot for slot', () => {
+    const withFlagged = maxArmorKit(true);
+    const withoutFlagged = maxArmorKit(false);
+    // Non-vacuity: the picker really filled the paperdoll, and the flagged
+    // family really exists to be excluded.
+    expect(Object.keys(withFlagged).length, 'the picker filled every slot').toBe(
+      ALL_EQUIP_SLOTS.length,
+    );
+    expect(
+      Object.values(ITEMS).filter((d) => d.masterwrought === true).length,
+      'the flagged family is really there to exclude',
+    ).toBe(17);
+    expect(withFlagged, 'a flagged def won a max-mitigation slot').toEqual(withoutFlagged);
+    const a = characterDerivedStats('warrior', 20, withFlagged);
+    const b = characterDerivedStats('warrior', 20, withoutFlagged);
+    expect(a.stats.armor).toBe(b.stats.armor);
+    expect(a.maxHp).toBe(b.maxHp);
+    // THE RULE ITSELF, stated rather than left to the tie-break. The equality
+    // above holds today partly by accident: after the shield tune the
+    // prot-legal offhand pool is a three-way armour TIE at 680, and the id
+    // tie-break happens to hand both arms an unflagged def. Rename the crafted
+    // shield to sort earlier and the equality would red with no power change;
+    // add a future apex piece that TIES with a late-sorting id and it would
+    // stay green while a crafted piece matched the raid line. So the armour
+    // comparison is made directly, per slot: a crafted piece may sit beside
+    // the raid line, it may never take it.
+    for (const slot of ALL_EQUIP_SLOTS) {
+      let bestFlagged = 0;
+      let bestUnflagged = 0;
+      for (const def of Object.values(ITEMS)) {
+        if (!canEquipItemInSlot('warrior', def, slot, 'prot')) continue;
+        if ((requiredLevelFor(def) ?? 0) > 20) continue;
+        const armor = (def.stats as { armor?: number } | undefined)?.armor ?? 0;
+        if (def.masterwrought === true) bestFlagged = Math.max(bestFlagged, armor);
+        else bestUnflagged = Math.max(bestUnflagged, armor);
+      }
+      expect(
+        bestFlagged,
+        `${slot}: a flagged def out-armours every pre-packet piece a prot warrior can wear`,
+      ).toBeLessThanOrEqual(bestUnflagged);
+    }
+    // Non-vacuity for that sweep: the offhand really is a slot where a flagged
+    // def competes, and it really does reach the raid shield's own number.
+    const shieldArmor = (ITEMS.duskforged_bulwark.stats as { armor?: number }).armor;
+    expect(shieldArmor, 'the apex shield ties the raid shield').toBe(
+      (ITEMS.heroic_bonewrought_bulwark.stats as { armor?: number }).armor,
+    );
+    // The derived values as literals, so a catalog move on EITHER side reds
+    // here with a named cause instead of moving both together silently. These
+    // are the raw kit numbers, without the prot mastery the header's
+    // derivation folds in; REF_ARMOR above stays the pinned calibration
+    // constant it has always been and is deliberately not asserted equal to
+    // this, because it is not a live property of the catalog.
+    // Re-pinned 2969 -> 4085 at the merge of release/v0.41.0 (tip 3e801dc925,
+    // 2026-08-30): the named cause is the release's Crucible raid plate (the
+    // Phase B set pieces and the Varkhul legendaries), which a prot warrior
+    // can wear and which out-armours the pre-raid kit slot for slot; no
+    // flagged def moved (the sweep above still holds). The calibration gap
+    // between REF_ARMOR (2861) and the live kit therefore widened from about a
+    // hundred points to over a thousand: a maintainer decision on the
+    // constant (the packet's Phase 19 table), never a re-tune here.
+    expect(a.stats.armor, 'the live max-armor kit').toBe(4085);
+    // The pool moved DOWN with the same cause (1672 -> 1582): the max-ARMOR
+    // picks are not the max-stamina picks, and the Crucible plate that wins
+    // each slot on armour carries less stamina than the pre-raid kit it
+    // displaces. Same re-pin, same date, same named cause.
+    expect(a.maxHp, 'and its pool').toBe(1582);
+  });
+
+  it('REF_ARMOR provenance: the readings the comments quote are derived, not hand-carried', () => {
+    // RULED (qr-19-ref-armor-calibration-constant, 2026-09-01): the constant
+    // stays pinned at 2861 and the widened gap is recorded as the model's
+    // stated conservatism. That ruling put derived percentages into comments
+    // across this suite, its three siblings, dungeon_difficulty.ts and
+    // rift/ranks.ts, and NOTHING asserted them.
+    //
+    // The LIVE kit armour is derived here, never hand-carried: an earlier
+    // draft of this arm hardcoded 4085 five times, which would have kept
+    // computing on a stale number after the next catalog move while every
+    // comment it defends went false. That is the exact failure this arm
+    // exists to prevent, so it reads the same picker the sibling arm uses.
+    const liveKitArmor = characterDerivedStats('warrior', 20, maxArmorKit(true)).stats.armor;
+    const passes = (armor: number, level: number): number => 1 - armorReduction(armor, level);
+    // Defensive Stance takes 10 percent off on top. MIRRORED, not read: the
+    // factor is a bare literal in src/sim/combat/damage.ts with no exported
+    // constant, so if stance mitigation ever moves, this line and the fifteen
+    // comments move together and neither is the other's guard.
+    const STANCE = 0.9;
+
+    // The constant is NOT a live catalog read, which is the whole ruling.
+    expect(REF_ARMOR, 'the pinned calibration constant').toBe(2861);
+    expect(liveKitArmor, 'and the live kit it no longer describes').toBeGreaterThan(REF_ARMOR);
+
+    // The armour step at the level-22 heroic pin, both kits.
+    expect(passes(REF_ARMOR, 22) * 100, 'armour pass at the constant').toBeCloseTo(44.24, 1);
+    expect(passes(liveKitArmor, 22) * 100, 'armour pass on the live kit').toBeCloseTo(35.72, 1);
+    // Which is where the ~39.8 the comments quote comes from, and what it
+    // would read on the live kit.
+    expect(passes(REF_ARMOR, 22) * STANCE * 100, 'with stance, the constant').toBeCloseTo(39.8, 1);
+    expect(passes(liveKitArmor, 22) * STANCE * 100, 'with stance, live kit').toBeCloseTo(32.1, 1);
+    // The S-rank level-23 pair the rift suite's comment quotes.
+    expect(passes(liveKitArmor, 23) * 100, 'live kit at level 23').toBeCloseTo(36.57, 1);
+    expect(passes(liveKitArmor, 23) * STANCE * 100, 'with stance at level 23').toBeCloseTo(32.9, 1);
+    // And the headline the ruling rests on: post-armour melee falls about 19
+    // percent on the live kit, so holding a floor would want about 24 percent
+    // more mob melee. This is what makes a re-base a difficulty change rather
+    // than a calibration tidy.
+    const ratio = passes(liveKitArmor, 22) / passes(REF_ARMOR, 22);
+    expect((1 - ratio) * 100, 'post-armour melee falls').toBeCloseTo(19.3, 1);
+    expect((1 / ratio - 1) * 100, 'and holding the floor would need').toBeCloseTo(23.9, 1);
   });
 });

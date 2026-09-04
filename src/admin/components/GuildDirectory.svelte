@@ -2,6 +2,8 @@
   import { onMount } from 'svelte';
   import type { GuildSummary, Paginated } from '../types';
   import { ApiError, apiGet } from '../api';
+  import { type AdminLoadFailure, classifyAdminLoadFailure } from '../load_failure';
+  import PermissionDenied from './PermissionDenied.svelte';
   import { auth } from '../state/auth.svelte';
   import { SEARCH_DEBOUNCE_MS } from '../state/poll';
   import { fmtDate, fmtNumber } from '../format';
@@ -14,7 +16,7 @@
   const GUILD_LIST_BUSY_RETRY_MS = 500;
 
   let guilds = $state<Paginated<GuildSummary> | null>(null);
-  let failed = $state(false);
+  let failed = $state<AdminLoadFailure>('none');
   let search = $state('');
   let page = $state(1);
   let sort = $state<GuildSort>('name');
@@ -39,11 +41,11 @@
       const next = await apiGet<Paginated<GuildSummary>>(`/admin/api/guilds?${params}`);
       if (disposed || epoch !== requestEpoch) return;
       guilds = next;
-      failed = false;
+      failed = 'none';
     } catch (err) {
       if (disposed || epoch !== requestEpoch || auth.handleAuthFailure(err)) return;
       if (err instanceof ApiError && err.status === 503 && busyRetryAttempt === 0) {
-        failed = false;
+        failed = 'none';
         clearBusyRetry();
         busyRetryTimer = setTimeout(() => {
           busyRetryTimer = null;
@@ -51,7 +53,7 @@
         }, GUILD_LIST_BUSY_RETRY_MS);
         return;
       }
-      failed = true;
+      failed = classifyAdminLoadFailure(err);
     } finally {
       if (!disposed && epoch === requestEpoch) loading = false;
     }
@@ -120,7 +122,9 @@
     {/if}
   </div>
 
-  {#if failed}
+  {#if failed === 'forbidden'}
+    <PermissionDenied />
+  {:else if failed === 'error'}
     <div class="empty">{t('guilds.loadFailed')}</div>
   {:else if guilds && guilds.rows.length === 0}
     <div class="empty">{t('guilds.empty')}</div>

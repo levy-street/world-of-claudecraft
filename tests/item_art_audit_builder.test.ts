@@ -17,7 +17,6 @@ import {
   renderItemArtAuditPreview,
   updateItemArtAuditVerdict,
 } from '../scripts/lib/item_art_audit.mjs';
-import { ITEMS } from '../src/sim/data';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const temporaryRoots: string[] = [];
@@ -737,6 +736,80 @@ describe('item-art audit builder', () => {
     ).toThrow('Resolved audit item is absent from the current catalog: absent_blade');
   });
 
+  it('exempts declared pending-art ids from the missing-art sweep, policed in both directions', async () => {
+    // The farming branch ships procedural icons as declared debt
+    // (ITEM_ART_PENDING); the audit honors exactly that declaration and
+    // nothing else. Three arms: the undeclared def still reds, a phantom
+    // declaration reds, and a declared id that GAINS art reds until it is
+    // struck from the pending set (the self-clearing direction).
+    const root = mkdtempSync(path.join(tmpdir(), 'woc-item-art-pending-'));
+    temporaryRoots.push(root);
+    const itemDirectory = 'public/ui/items';
+    const outputDirectory = 'tmp/item-art-audit';
+    mkdirSync(path.join(root, itemDirectory), { recursive: true });
+    const red = await sharp({
+      create: { width: 128, height: 128, channels: 3, background: { r: 150, g: 24, b: 35 } },
+    })
+      .webp({ quality: 82 })
+      .toBuffer();
+    writeFileSync(path.join(root, itemDirectory, 'alpha_blade.webp'), red);
+    const items = {
+      alpha_blade: { name: 'Alpha Blade', kind: 'weapon', quality: 'common' },
+      gamma_root: { name: 'Gamma Root', kind: 'junk', quality: 'common' },
+    };
+    const mapping = { entries: [{ itemId: 'alpha_blade' }], generatedBatches: [] };
+    const base = {
+      repoRoot: root,
+      itemDirectory,
+      outputDirectory,
+      renderOutputs: false,
+      items,
+      mapping,
+    };
+    await expect(buildItemArtAudit(base)).rejects.toThrow(
+      'Live item definitions without dedicated art: gamma_root',
+    );
+    const build = await buildItemArtAudit({ ...base, pendingArtIds: ['gamma_root'] });
+    // liveItemCount is the ART-SUBJECT universe: two live defs minus the one
+    // declared debt id.
+    expect(build.catalog.liveItemCount).toBe(1);
+    expect(build.catalog.catalogCount).toBe(1);
+    // The debt term is its own expected literal: an audit run that pins BOTH
+    // halves reds when the pending set grows even though liveItemCount is
+    // structurally blind to a def that joins the catalog and the debt at
+    // once. Conforms arm, then the violates arm one off in each direction.
+    await buildItemArtAudit({
+      ...base,
+      pendingArtIds: ['gamma_root'],
+      expected: { pendingArtCount: 1 },
+    });
+    await expect(
+      buildItemArtAudit({
+        ...base,
+        pendingArtIds: ['gamma_root'],
+        expected: { pendingArtCount: 0 },
+      }),
+    ).rejects.toThrow('Unexpected pending procedural-art debt count');
+    await expect(
+      buildItemArtAudit({
+        ...base,
+        pendingArtIds: ['gamma_root'],
+        expected: { pendingArtCount: 2 },
+      }),
+    ).rejects.toThrow('Unexpected pending procedural-art debt count');
+    await expect(buildItemArtAudit({ ...base, pendingArtIds: ['ghost_id'] })).rejects.toThrow(
+      'pending-art id ghost_id is not a live item definition',
+    );
+    await expect(
+      buildItemArtAudit({ ...base, pendingArtIds: ['alpha_blade', 'gamma_root'] }),
+    ).rejects.toThrow('pending-art id alpha_blade has shipping art');
+  });
+
+  // Declared 60s allowance: this arm execs the real CLI twice (help plus a
+  // full --verify-only, which esbuild-bundles the sim and sharp-decodes 907
+  // committed files, itself budgeted 30s), and under full-suite worker
+  // contention the pair runs past the 20s repo default (21.4s observed at the
+  // farming Phase 6 QA gate) while taking ~7s in isolation.
   it('exposes the fresh-checkout rebuild and explicit verdict-refresh CLI', () => {
     const help = execFileSync(process.execPath, ['scripts/item_art_audit.mjs', '--help'], {
       cwd: repoRoot,
@@ -746,10 +819,12 @@ describe('item-art audit builder', () => {
     expect(help).toContain('--verify-only');
     expect(help).toContain('--refresh-verdict');
     expect(help).toContain('tmp/imagegen/item-art-consistency/final-audit');
+    expect(help).toContain(
+      'docs/achievements/masterwrought-art-completion-2026-09-02/final-item-art-audit-verdict.json',
+    );
 
-    // The current digest includes the Passing Stone addition and the seven reviewed painted bag
-    // replacements. `verdict: null` is the point: verify-only validates the live catalog without
-    // rewriting the committed visual verdict.
+    // `verdict: null` is the point: verify-only validates the live catalog
+    // without rewriting the committed visual verdict.
     const verified = JSON.parse(
       execFileSync(process.execPath, ['scripts/item_art_audit.mjs', '--verify-only'], {
         cwd: repoRoot,
@@ -759,22 +834,22 @@ describe('item-art audit builder', () => {
     ) as Record<string, unknown>;
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      catalogSha256: 'e3eb0b0083df930521d024db4503d3799d647061ae9048c8bcacdb029ca6697e',
-      catalogBytes: 569296,
-      rendererFingerprint: 'd80ff4868f979e1717e106c889b7d6505841caf8d4cf887776ecb60848b1b2b7',
-      catalogCount: 1044,
-      liveItemCount: 1059,
+      catalogSha256: 'febda89453efdcf50432cf3cab6ba638435b301eea6c429e9e0046b8a829e25e',
+      catalogBytes: 657748,
+      rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
+      catalogCount: 1209,
+      liveItemCount: 1224,
       generatedHeroicDefinitions: 64,
       heroicDefinitionsWithOwnWebp: 48,
       heroicWeaponArtAliases: 16,
-      groupCount: 22,
-      sheetPageCount: 27,
-      sheetCount: 216,
-      sheetModeCounts: Object.fromEntries(ITEM_ART_AUDIT_MODES.map((mode) => [mode, 27])),
+      groupCount: 25,
+      sheetPageCount: 30,
+      sheetCount: 240,
+      sheetModeCounts: Object.fromEntries(ITEM_ART_AUDIT_MODES.map((mode) => [mode, 30])),
       sheetSetSha256: null,
-      shippingCatalogSha256: '017938ae50f70349630c15ffe2466b2f8ad4acf4ecf32022fddb0c27c8d7285d',
+      shippingCatalogSha256: 'bdec0afdcd3349a34b74bca9b0e01aee5b3ab2b3a82568bd9019fe0b0bb0b38c',
       machineChecksPassed: true,
       verdict: null,
     });
-  });
+  }, 60_000);
 });

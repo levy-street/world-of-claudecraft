@@ -1,15 +1,25 @@
 import { describe, expect, it } from 'vitest';
 import { STATION_TYPE_BY_CRAFT } from '../src/sim/content/professions';
 import {
+  APEX_ARMOR_RECIPES,
+  APEX_CONSUMABLE_RECIPES,
+  APEX_GEAR_RECIPES,
   BAG_RECIPES,
   CASTER_HUB_RECIPES,
   COMBO_RECIPES,
   COMMON_RECIPES,
+  ENGINEERING_ONRAMP_RECIPES,
+  FARM_RECIPES,
+  HOE_RECIPES,
+  INSCRIPTION_RECIPES,
+  INTERMEDIATE_RECIPES,
+  JEWELCRAFTING_RECIPES,
   LADDER_RECIPES,
   ROD_RECIPES,
   recipeById,
   TOOL_EFFECT_RECIPES,
   TOOL_RECIPES,
+  TROPHY_RECIPES,
 } from '../src/sim/content/recipes';
 import { STATIONS } from '../src/sim/data';
 import {
@@ -425,14 +435,29 @@ describe('craftItem command (#1127)', () => {
 
   it('the IWorld recipeList read surface exposes every recipe, common, tool, and combo alike (#1132 review)', () => {
     const sim = makeSim();
+    // Every authored recipe list, spelled out: a new list that joins
+    // ALL_RECIPES but not this enumeration would be unreachable through
+    // recipeList, which is the exact defect #1132 found. FARM_RECIPES (the
+    // Phase 6 farm-economy hook set) joined here with the dishes;
+    // TROPHY_RECIPES (Masterwrought phase 11l) with the trophy consumers.
     const allIds = [
       ...COMMON_RECIPES,
       ...TOOL_RECIPES,
       ...ROD_RECIPES,
+      ...HOE_RECIPES,
       ...TOOL_EFFECT_RECIPES,
       ...CASTER_HUB_RECIPES,
       ...COMBO_RECIPES,
       ...LADDER_RECIPES,
+      ...JEWELCRAFTING_RECIPES,
+      ...INSCRIPTION_RECIPES,
+      ...INTERMEDIATE_RECIPES,
+      ...APEX_ARMOR_RECIPES,
+      ...APEX_GEAR_RECIPES,
+      ...APEX_CONSUMABLE_RECIPES,
+      ...FARM_RECIPES,
+      ...TROPHY_RECIPES,
+      ...ENGINEERING_ONRAMP_RECIPES,
       ...BAG_RECIPES,
     ]
       .map((r) => r.id)
@@ -441,10 +466,24 @@ describe('craftItem command (#1127)', () => {
       COMMON_RECIPES.length +
         TOOL_RECIPES.length +
         ROD_RECIPES.length +
+        HOE_RECIPES.length +
         TOOL_EFFECT_RECIPES.length +
         CASTER_HUB_RECIPES.length +
         COMBO_RECIPES.length +
         LADDER_RECIPES.length +
+        JEWELCRAFTING_RECIPES.length +
+        INSCRIPTION_RECIPES.length +
+        INTERMEDIATE_RECIPES.length +
+        APEX_ARMOR_RECIPES.length +
+        APEX_GEAR_RECIPES.length +
+        APEX_CONSUMABLE_RECIPES.length +
+        FARM_RECIPES.length +
+        // Sibling literal: expect(TROPHY_RECIPES).toHaveLength(7) in
+        // tests/recipe_economy.test.ts.
+        TROPHY_RECIPES.length +
+        // Sibling literal: the two-row on-ramp pin in
+        // tests/recipe_economy.test.ts (masterwrought Phase 11o).
+        ENGINEERING_ONRAMP_RECIPES.length +
         BAG_RECIPES.length,
     );
     expect(sim.recipeList.map((r) => r.id).sort()).toEqual(allIds);
@@ -1072,6 +1111,10 @@ describe('rare-quality signing composes with multi-copy outputs (#1149 regressio
     placeAtStationFor(sim, pid, recipe.id);
     grantItem(sim, 'pristine_venom_gland', 1, pid);
     grantItem(sim, 'venom_gland', 2, pid);
+    // The provisioning supply line (Phase 11g) put a tier-3 farm base on this
+    // bill. A hand-granted reagent list does not self-heal, so the grant moves
+    // with the recipe or the craft refuses on a missing reagent.
+    grantItem(sim, 'frost_gourd', 1, pid);
     grantItem(sim, 'sunpetal_herb', 1, pid);
     grantItem(sim, 'glass_vial', 1, pid);
 

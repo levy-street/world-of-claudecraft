@@ -1,10 +1,11 @@
 // The load-side shape bound for a persisted per-instance item payload
-// (`ItemInstancePayload`, types.ts). ONE sanitizer, six call sites: the
+// (`ItemInstancePayload`, types.ts). ONE sanitizer, seven call sites: the
 // equipment map, the carried bags and the vendor buyback rows (all in
-// Sim.addPlayer), the bank inventory (bank.ts sanitizeBankState), and the
-// two persisted escrow books (item_instance_transfer.ts sanitizeEscrowSlot
-// for mail attachments and market collections, plus market.ts's listing
-// arm). Phase 16's first cut clamped only `signer`, and only on two of the
+// Sim.addPlayer), the bank inventory (bank.ts sanitizeBankState), the guild
+// bank store (guild_bank.ts sanitizeGuildBankState), and the two persisted
+// escrow books (item_instance_transfer.ts sanitizeEscrowSlot for mail
+// attachments and market collections, plus market.ts's listing arm).
+// Phase 16's first cut clamped only `signer`, and only on two of the
 // character containers, so a signed copy loaded through the bank or the
 // buyback list kept an unbounded name, and every OTHER payload string
 // stayed unbounded everywhere. A
@@ -35,6 +36,7 @@
 // inside a character load.
 
 import { isLoadablePartyTradeMarker } from './loot/bop_trade_window';
+import { PERFECTING_RANKS } from './professions/perfecting';
 import { isLegalCrafterName } from './professions/tools';
 import { MAX_KNOWN_RECIPE_ID_LENGTH } from './professions/training';
 import type { ItemInstancePayload } from './types';
@@ -54,6 +56,16 @@ export const MAX_INSTANCE_STRING_LENGTH = 64;
  * than one written by a newer binary.
  */
 export const MAX_INSTANCE_PAYLOAD_KEYS = 24;
+
+/**
+ * The load ceiling for the player-chosen legendary `name` (phase 13). The
+ * signer doctrine: a byte bound DELIBERATELY looser than the live shape
+ * (legendary_name.ts holds a fresh promotion to 32 letters/spaces/
+ * apostrophes/hyphens), so a persisted name outlives a later widening of the
+ * live alphabet or length; what drops is only what NO writer of either shape
+ * could store (non-strings, empties, non-printable-ASCII, or past this).
+ */
+export const MAX_LEGENDARY_NAME_LOAD_LENGTH = 48;
 
 /** The sub-objects whose own keys are scanned one level down. All are
  *  deep-copied by `cloneItemInstancePayload`, which is what makes it safe to
@@ -153,6 +165,9 @@ export function warnDroppedInstanceKeys(owner: string, dropped: readonly string[
  *    count arm alone would let one megabyte-long key through);
  *  - `signer`: kept only when it is a name a legal mint could have stamped
  *    (`isLegalCrafterName`), else dropped;
+ *  - `name`: the legendary name (phase 13), kept only as a non-empty
+ *    printable-ASCII string within MAX_LEGENDARY_NAME_LOAD_LENGTH (the
+ *    deliberately-looser-than-live signer doctrine, see the constant);
  *  - `partyTrade`: judged ATOMICALLY, the one exception to key-at-a-time
  *    dropping. The bind-on-pickup window is one snapshot (untilMs plus the
  *    eligibility data the trade gate reads together), so a marker whose
@@ -231,6 +246,23 @@ export function sanitizeItemInstancePayloadOnLoad(payload: unknown): SanitizedIt
       }
       continue;
     }
+    if (key === 'perfecting') {
+      // The Perfecting mid-track rank (professions/perfecting.ts): kept only
+      // as an integer in [1, PERFECTING_RANKS - 1]. Absent is rank 0 and rank
+      // PERFECTING_RANKS is the `perfected` stamp, so no legal writer ever
+      // stores anything else; a dropped rank only costs progress a corrupt
+      // row could never legally have carried (drop-only doctrine).
+      if (
+        typeof value !== 'number' ||
+        !Number.isInteger(value) ||
+        value < 1 ||
+        value > PERFECTING_RANKS - 1
+      ) {
+        delete record[key];
+        dropped.push(key);
+      }
+      continue;
+    }
     if (key === 'partyTrade') {
       // The atomic marker arm (see the contract above): shape-refused or
       // oversized, the whole window drops in one move. Before the generic
@@ -240,6 +272,41 @@ export function sanitizeItemInstancePayloadOnLoad(payload: unknown): SanitizedIt
         !isLoadablePartyTradeMarker(value, MAX_INSTANCE_STRING_LENGTH) ||
         savedJsonLength(value) > MAX_INSTANCE_SUBTREE_JSON_LENGTH
       ) {
+        delete record[key];
+        dropped.push(key);
+      }
+      continue;
+    }
+    if (key === 'perfected') {
+      // Kept only as the literal `true`, the one value any legal writer mints
+      // (types.ts declares `perfected?: true`); anything else drops alone.
+      if (value !== true) {
+        delete record[key];
+        dropped.push(key);
+      }
+      continue;
+    }
+    if (key === 'name') {
+      // The player-chosen legendary name (phase 13; legendary_name.ts owns
+      // the LIVE shape). Held to the deliberately looser load bound above:
+      // a non-empty printable-ASCII string (char codes 32..126, the
+      // isLegalCrafterName alphabet) within its own byte ceiling; anything
+      // else drops alone, the same drop-only doctrine as every arm here.
+      let legal =
+        typeof value === 'string' &&
+        value.length >= 1 &&
+        value.length <= MAX_LEGENDARY_NAME_LOAD_LENGTH;
+      if (legal) {
+        const text = value as string;
+        for (let i = 0; i < text.length; i++) {
+          const code = text.charCodeAt(i);
+          if (code < 32 || code > 126) {
+            legal = false;
+            break;
+          }
+        }
+      }
+      if (!legal) {
         delete record[key];
         dropped.push(key);
       }

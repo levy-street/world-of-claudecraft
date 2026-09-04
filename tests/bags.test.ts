@@ -21,7 +21,7 @@ import {
   migrationBagsFor,
   stackSizeOf,
 } from '../src/sim/bags';
-import { ALL_RECIPES, ITEMS } from '../src/sim/data';
+import { ALL_RECIPES, ITEMS, STATIONS } from '../src/sim/data';
 import { removePreferFungible } from '../src/sim/items';
 import { materialItemIds } from '../src/sim/material_ids';
 // material_taxonomy.ts derives EAGERLY and is therefore banned INSIDE src/sim
@@ -29,11 +29,19 @@ import { materialItemIds } from '../src/sim/material_ids';
 // to hold the sim-side lazy set and the UI-side eager set to one taxonomy.
 import { MATERIAL_ITEM_IDS } from '../src/sim/material_taxonomy';
 import { isCommissionEligibleKind } from '../src/sim/professions/commission';
-import { mintsSignedCraftOutput } from '../src/sim/professions/crafting';
+import {
+  acquireRecipe,
+  mintsSignedCraftOutput,
+  mintsSignerPayload,
+  resolveCraftForRecipe,
+} from '../src/sim/professions/crafting';
 import { isEnchantedInstance } from '../src/sim/professions/enchanting';
 import { isSignableMaterialRarity } from '../src/sim/professions/gathering';
+import { stationsOfType } from '../src/sim/professions/stations';
+import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
 import { Sim } from '../src/sim/sim';
 import type { InvSlot } from '../src/sim/types';
+import { terrainHeight } from '../src/sim/world';
 
 const makeSim = (cls = 'warrior', seed = 42) =>
   new Sim({ seed, playerClass: cls as never, autoEquip: false });
@@ -377,16 +385,40 @@ describe('bags are declared payload-free (#2837)', () => {
   // nowhere to park an instance payload or a craftedRecipeId while a bag is
   // worn. craftedRecipeId is already impossible for a bag (crafting.ts
   // isCraftedDisenchantTrackedOutput and the commission opt-in are both
-  // weapon/armor/held_offhand-only, checked below), and the signer mint is
-  // bag-exempt at the source: mintsSignedCraftOutput (crafting.ts) refuses
-  // to sign a bag-kind output at ANY rarity, so the phase 05 tailoring
-  // ladder's rare/epic craftable bags grant plain and fungible (loot-only
-  // bags always did: gravewoven_bag and mistcallers_duffel, both recipe-free
-  // dungeon drops granted plain). This pins the mint-side half of the
-  // equip-time guard (bags.ts equipBag, which still refuses a
-  // payload-carrying copy as defense in depth): the day the exemption is
-  // dropped or bypassed, this fails at test time instead of the first
-  // player equip refusing a freshly crafted bag.
+  // weapon/armor/held_offhand-only, checked below). The instance.signer
+  // vector is closed at the MINT: mintsSignerPayload (crafting.ts) exempts
+  // kind 'bag' from the #1149 signer arm, so a crafted bag lands as a plain
+  // fungible grant however rare its def (the two rare/epic loot bags,
+  // gravewoven_bag and mistcallers_duffel, are recipe-free drops granted
+  // plain and were never in scope).
+  // OUTCOME (2026-08-16, Masterwrought phase 10 QA ruling 1, "accept the
+  // phase design and re-pin"): the previous pin here, "no craftable
+  // bag-kind item def is authored at a signable material rarity", went red
+  // by design when the epic craftable sunspun_haversack shipped; the ruling
+  // accepted the bag and re-scoped this block to the behavior the equip
+  // path actually needs: no CRAFTED bag copy carries a payload, and the
+  // freshly crafted copy equips.
+  it('the signer mint exempts bags and only bags (mintsSignerPayload)', () => {
+    const bag = ITEMS.sunspun_haversack;
+    const armor = ITEMS.sunspun_vestments;
+    expect(bag?.kind).toBe('bag');
+    expect(armor?.kind).toBe('armor');
+    expect(mintsSignerPayload(bag, 'epic')).toBe(false);
+    expect(mintsSignerPayload(bag, 'rare')).toBe(false);
+    expect(mintsSignerPayload(bag, 'legendary')).toBe(false);
+    expect(mintsSignerPayload(bag, 'common')).toBe(false);
+    expect(mintsSignerPayload(armor, 'epic')).toBe(true);
+    expect(mintsSignerPayload(armor, 'rare')).toBe(true);
+    expect(mintsSignerPayload(armor, 'common')).toBe(false);
+  });
+
+  // The def-level twin of the same exemption: mintsSignedCraftOutput
+  // (crafting.ts) refuses to sign a bag-kind output at ANY rarity, so the
+  // phase 05 tailoring ladder's rare/epic craftable bags grant plain and
+  // fungible. This pins the mint-side half of the equip-time guard (bags.ts
+  // equipBag, which still refuses a payload-carrying copy as defense in
+  // depth): the day the exemption is dropped or bypassed, this fails at test
+  // time instead of the first player equip refusing a freshly crafted bag.
   it('a craftable bag never mints a signed crafted copy, at any authored rarity', () => {
     const bagRecipes = ALL_RECIPES.filter((r) => ITEMS[r.resultItemId]?.kind === 'bag');
     expect(bagRecipes.length, 'sanity: there is a bag recipe to check').toBeGreaterThan(0);
@@ -411,6 +443,86 @@ describe('bags are declared payload-free (#2837)', () => {
     const rareNonBag = Object.values(ITEMS).find((d) => d.kind !== 'bag' && d.quality === 'rare');
     expect(rareNonBag, 'sanity: a rare non-bag def exists').toBeTruthy();
     expect(mintsSignedCraftOutput(rareNonBag)).toBe(true);
+  });
+
+  it('no crafted bag copy carries a payload, and the crafted copy equips (#2837 re-scope)', () => {
+    const bagRecipes = ALL_RECIPES.filter((r) => ITEMS[r.resultItemId]?.kind === 'bag');
+    expect(bagRecipes.length, 'sanity: there is a bag recipe to check').toBeGreaterThan(0);
+    for (const recipe of bagRecipes) {
+      const sim = makeSim();
+      const pid = sim.playerId;
+      const m = meta(sim);
+      // Headroom only: nothing on this path charges today (acquireRecipe is
+      // free, the #1301 craft gold sink floors at 0 rather than denying), so
+      // this is insurance against a future priced arm, not an exercised fee.
+      m.copper += 1_000_000;
+      // Learn through the recipe's OWN acquisition channel (the trainer-taught
+      // silkspun_satchel and the drop-taught sunspun_haversack both walk this
+      // sweep); a channel-free recipe is grandfathered known and skips it.
+      const source = recipe.acquisition?.[0];
+      if (source) {
+        const learned = acquireRecipe((sim as never as { ctx: never }).ctx, pid, recipe.id, source);
+        expect(learned.ok, `${recipe.id}: learnable through its ${source} channel`).toBe(true);
+      }
+      for (const reagent of recipe.reagents) {
+        sim.addItem(reagent.itemId, reagent.count, pid);
+      }
+      if (recipe.stationType) {
+        const station = stationsOfType(STATIONS, recipe.stationType)[0];
+        expect(station, `${recipe.id}: a ${recipe.stationType} station exists`).toBeDefined();
+        const p = sim.entities.get(pid);
+        if (!p || !station) throw new Error('player or station missing');
+        p.pos.x = station.pos.x;
+        p.pos.z = station.pos.z;
+        p.pos.y = terrainHeight(station.pos.x, station.pos.z, sim.cfg.seed);
+        p.prevPos = { ...p.pos };
+      }
+      const result = resolveCraftForRecipe((sim as never as { ctx: never }).ctx, pid, recipe);
+      expect(result.ok, `${recipe.id}: the real recipe crafts (${result.reason ?? 'ok'})`).toBe(
+        true,
+      );
+      const slotIndex = sim.inventory.findIndex((s) => s.itemId === recipe.resultItemId);
+      expect(slotIndex, `${recipe.id}: the crafted copy landed`).toBeGreaterThanOrEqual(0);
+      const slot = sim.inventory[slotIndex];
+      expect(slot.instance, `${recipe.id}: no instance payload on the crafted bag`).toBe(undefined);
+      expect(slot.craftedRecipeId, `${recipe.id}: no craftedRecipeId on the crafted bag`).toBe(
+        undefined,
+      );
+      sim.drainEvents();
+      sim.equipBag(recipe.resultItemId, undefined, { slotIndex });
+      const ev = sim.drainEvents();
+      expect(
+        ev.some((e) => e.type === 'error'),
+        `${recipe.id}: the crafted copy equips without a refusal`,
+      ).toBe(false);
+      expect(sim.bags.includes(recipe.resultItemId), `${recipe.id}: worn after equip`).toBe(true);
+    }
+  });
+
+  it('the exemption is the bag kind, not a dead signer arm: a non-bag epic output still signs', () => {
+    // Positive control for the re-scope: an epic NON-bag output through the
+    // same resolver still mints the #1149 signer payload, so the plain bag
+    // above is the exemption firing, not a broken signer arm. ironhusk_flask
+    // is epic with no stats, so the masterwork branch cannot preempt the
+    // signer branch on any rng outcome.
+    const sim = makeSim();
+    const pid = sim.playerId;
+    sim.addItem('iron_ore', 1, pid);
+    const recipe: ProfessionRecipeRecord = {
+      id: 'recipe_test_signer_control',
+      professionId: 'alchemy',
+      resultItemId: 'ironhusk_flask',
+      resultCount: 1,
+      reagents: [{ itemId: 'iron_ore', count: 1 }],
+      skillReq: 0,
+      itemLevelBudget: 9,
+      level: 9,
+    };
+    const result = resolveCraftForRecipe((sim as never as { ctx: never }).ctx, pid, recipe);
+    expect(result.ok).toBe(true);
+    const slot = sim.inventory.find((s) => s.itemId === 'ironhusk_flask');
+    const name = (sim.players.get(pid) as { name?: string } | undefined)?.name;
+    expect(slot?.instance?.signer, 'the epic non-bag output is signed').toBe(name);
   });
 
   it('bags are never a commission-eligible kind', () => {
@@ -1000,14 +1112,21 @@ describe('two-pool capacity through the real gates and the real taxonomy', () =>
     expect(inv.every((s) => s.count === (s.itemId === MATERIAL ? 20 : 1))).toBe(true);
   });
 
-  it('the sim-side lazy material set IS the UI-side eager set, and both are the ruled 56', () => {
+  it('the sim-side lazy material set IS the UI-side eager set, and both are the merged 117', () => {
     // Equality alone proves nothing (both delegate to the one derivation in
     // material_derivation.ts), so it is pinned alongside the literal count
     // tests/material_taxonomy.test.ts pins by exact-set equality, plus known
     // members and known NON-members on each side.
+    // Recomputed at every release merge, never picked from a side. At the
+    // release/v0.41.0 merge the release's ruled 55 plus the packet's
+    // masterwrought reagents and the farming absorb's 39 yields composed to a
+    // measured 116 on the merged catalog. release/v0.42.0 then ruled one more
+    // material in on its own side, the Crucible's lastflame_core, and the two
+    // sides' additions are disjoint, so the merged catalog measures 117 (both
+    // parents' own derivations, one union; no rule changed).
     const lazy = materialItemIds();
-    expect(lazy.size).toBe(56);
-    expect(MATERIAL_ITEM_IDS.size).toBe(56);
+    expect(lazy.size).toBe(117);
+    expect(MATERIAL_ITEM_IDS.size).toBe(117);
     expect(lazy.size).toBe(MATERIAL_ITEM_IDS.size);
     for (const id of lazy) expect(MATERIAL_ITEM_IDS.has(id), id).toBe(true);
     for (const id of MATERIAL_ITEM_IDS) expect(lazy.has(id), id).toBe(true);

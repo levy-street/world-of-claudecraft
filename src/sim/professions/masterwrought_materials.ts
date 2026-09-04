@@ -1,0 +1,330 @@
+// Masterwrought shared chase materials (Masterwrought phase 04): the faucets
+// and gates for Wyrmfall Core and Maker's Ember. The item defs live in
+// content/items.ts; the Sundered Essence extraction is its own sibling module
+// (professions/sundering.ts). Consumers arrive with the apex recipe phases;
+// until then this module is the complete income side of the system.
+//
+// Faucet map (rulings R4 / R9; see docs/design/professions.md):
+// - Wyrmfall Core: 1 to 3 per credited final-boss kill in the raid (either
+//   difficulty) and the heroic five-mans, per participant, once per character
+//   per source per reset day; rift A and S rank FIRST clears grant a
+//   deterministic count once per character per day (rifts have no lockout;
+//   the daily gate IS the cap); the Heroic Quartermaster sells one for
+//   Heroic Marks (content/heroic_vendor.ts).
+// - Maker's Ember: one per week per character, BANKABLE (missed weeks
+//   accrue), granted on the first eligible endgame completion of the week
+//   (raid boss, heroic final boss, or rift A/S clear).
+//
+// Determinism: the only randomness is ONE ctx.rng.int draw per credited
+// eligible boss kill, and the call site (combat/damage.ts handleDeath) sits
+// AFTER ctx.rollLoot returns, so the draw appends to the tick's sequence and
+// never reorders loot rolls. The rift arm is deliberately draw-free, matching
+// addRiftProgressionLoot's documented no-draw contract.
+//
+// Daily and weekly boundaries: everything keys on ctx.resetDay (the
+// realm-local reset window; '' = no calendar known, nothing rolls over, the
+// same contract as every other daily). The weekly boundary is DERIVED from
+// resetDay by pure calendar math (the most recent weekly reset day on or
+// before it), not from a second clock: the realm keeps exactly one reset
+// boundary, per the phase 03 QA amendment. Two consequences worth naming:
+// a host that never sets resetDay (the headless RL env, replays) sees a
+// ONE-SHOT faucet (each source pays once per save, the delve-daily degrade)
+// and never grants an ember; and a DEV-portal rift clear (no world event, so
+// no race claim) grants neither cores nor embers on either arm, on purpose:
+// dev portals are not a material faucet.
+
+import { HEROIC_DUNGEON_TUNING } from '../content/dungeon_difficulty';
+import { claimedInstanceForMob, instanceLockoutMetas } from '../instances/dungeons';
+import type { InstanceSlot, PlayerMeta } from '../sim';
+import type { SimContext } from '../sim_context';
+import type { Entity, RiftTier } from '../types';
+import { NYTHRAXIS_BOSS_ID } from '../types';
+
+export const WYRMFALL_CORE_ITEM_ID = 'wyrmfall_core';
+export const SUNDERED_ESSENCE_ITEM_ID = 'sundered_essence';
+export const MAKERS_EMBER_ITEM_ID = 'makers_ember';
+
+// One rng draw per credited eligible final-boss kill; every participant of
+// that kill shares the rolled count.
+export const WYRMFALL_BOSS_MIN = 1;
+export const WYRMFALL_BOSS_MAX = 3;
+
+// Rift first-clear grants are deterministic (draw-free by design): the S rank
+// pays the risk premium. Typed against the real rank union so a typo or a
+// future rank token is a compile error, never a silent zero payout.
+export const WYRMFALL_RIFT_COUNT: Readonly<Partial<Record<RiftTier, number>>> = { A: 1, S: 2 };
+
+// Ember eligibility for rift clears, stated on its own: R4 (the keystone's
+// pillars) and R9 (the core faucet) are independent rulings, so the ember set
+// is not derived from the core count table even though the two agree today.
+export const EMBER_ELIGIBLE_RIFT_TIERS: ReadonlySet<RiftTier> = new Set(['A', 'S']);
+
+// The daily-gate source token for the rift arm; instance arms use
+// `${dungeonId}:${difficulty}` so the normal and heroic raid stay distinct
+// sources, mirroring the difficulty-scoped raid lockout.
+export const WYRMFALL_RIFT_SOURCE = 'rift';
+
+// Every final-boss template the boss faucet can ever pay on: the heroic
+// tuning table's finalBossIds (which include the raid arena's) plus the raid
+// boss for its normal-difficulty arm. Derived once from data-as-code.
+// Exported for the disjointness pin in tests/masterwrought_materials.test.ts:
+// the death hub calls awardWyrmfallCores ABOVE nothing but BELOW every loot
+// roll, and the "no kill reaches both a wyrmfall draw and a world-boss roll"
+// invariant rests on no worldBoss template ever entering this set.
+export const FINAL_BOSS_TEMPLATE_IDS: ReadonlySet<string> = new Set([
+  ...Object.values(HEROIC_DUNGEON_TUNING).map((t) => t.finalBossId),
+  NYTHRAXIS_BOSS_ID,
+]);
+
+// The civil weekday the ember week rolls on: Tuesday, the classic weekly
+// reset day. Sunday = 0 to match the (days + 4) % 7 epoch arithmetic below.
+export const EMBER_WEEK_RESET_DOW = 2;
+
+// The most embers ONE completion pays out (one full stack): R4's accrual
+// stays uncapped in TOTAL, but a multi-year backlog lands a stack at a time
+// (the anchor only advances by the granted weeks, so the remainder keeps
+// accruing and pays on the next completion), instead of one addItem pushing
+// the bags arbitrarily far past capacity (migration review).
+export const EMBER_ACCRUAL_GRANT_CAP = 20;
+
+// --- Pure calendar math (no Date, no clock, no Intl) -----------------------
+// Howard Hinnant's days_from_civil: days since 1970-01-01 for a civil date.
+// Pure integer arithmetic so the sim never touches the host Date machinery.
+function daysFromCivil(y: number, m: number, d: number): number {
+  const yy = m <= 2 ? y - 1 : y;
+  const era = Math.floor((yy >= 0 ? yy : yy - 399) / 400);
+  const yoe = yy - era * 400;
+  const doy = Math.floor((153 * (m + (m > 2 ? -3 : 9)) + 2) / 5) + d - 1;
+  const doe = yoe * 365 + Math.floor(yoe / 4) - Math.floor(yoe / 100) + doy;
+  return era * 146097 + doe - 719468;
+}
+
+// The inverse (civil_from_days), used to render the week-anchor date string.
+function civilFromDays(z: number): { y: number; m: number; d: number } {
+  const zz = z + 719468;
+  const era = Math.floor((zz >= 0 ? zz : zz - 146096) / 146097);
+  const doe = zz - era * 146097;
+  const yoe = Math.floor(
+    (doe - Math.floor(doe / 1460) + Math.floor(doe / 36524) - Math.floor(doe / 146096)) / 365,
+  );
+  const y = yoe + era * 400;
+  const doy = doe - (365 * yoe + Math.floor(yoe / 4) - Math.floor(yoe / 100));
+  const mp = Math.floor((5 * doy + 2) / 153);
+  const d = doy - Math.floor((153 * mp + 2) / 5) + 1;
+  const m = mp + (mp < 10 ? 3 : -9);
+  return { y: m <= 2 ? y + 1 : y, m, d };
+}
+
+const RESET_DAY_RE = /^(\d{4})-(\d{2})-(\d{2})$/;
+
+function resetDayToDayNumber(resetDay: string): number | null {
+  const m = RESET_DAY_RE.exec(resetDay);
+  if (!m) return null;
+  return daysFromCivil(Number(m[1]), Number(m[2]), Number(m[3]));
+}
+
+function pad2(n: number): string {
+  return n < 10 ? `0${n}` : `${n}`;
+}
+
+// Render a day number back to the RESET_DAY_RE shape, or '' when the year
+// cannot round-trip that shape (below 0 or above 9999). Without the year pad
+// and the range bail, normalizing an out-of-range-but-well-formed anchor
+// ('0003-01-01') would itself mint an UNPARSEABLE value ('2-12-31') that
+// stalls the weekly grant until the next load re-normalizes it to ''; with
+// them, normalization is single-pass: every output either parses or is ''.
+function renderWeekAnchor(dayNum: number): string {
+  const { y, m, d } = civilFromDays(dayNum);
+  if (y < 0 || y > 9999) return '';
+  return `${String(y).padStart(4, '0')}-${pad2(m)}-${pad2(d)}`;
+}
+
+/** The ember week a reset-day window belongs to, as the `YYYY-MM-DD` of the
+ *  most recent weekly reset day (Tuesday) on or before it. '' in, '' out:
+ *  no calendar known means no weekly boundary, the shared daily contract. */
+export function emberWeekAnchorOf(resetDay: string): string {
+  const dayNum = resetDayToDayNumber(resetDay);
+  if (dayNum === null) return '';
+  // 1970-01-01 was a Thursday; with Sunday = 0 that epoch day is dow 4.
+  const dow = (((dayNum + 4) % 7) + 7) % 7;
+  const back = (dow - EMBER_WEEK_RESET_DOW + 7) % 7;
+  return renderWeekAnchor(dayNum - back);
+}
+
+/** Whole weeks from one week-anchor string to another (negative when `to`
+ *  precedes `from`, 0 for the same week or unparseable input). */
+export function emberWeeksBetween(from: string, to: string): number {
+  const a = resetDayToDayNumber(from);
+  const b = resetDayToDayNumber(to);
+  if (a === null || b === null) return 0;
+  return Math.floor((b - a) / 7);
+}
+
+/** An anchor advanced by `weeks` whole weeks ('' for unparseable input), for
+ *  the capped accrual payout: the stored anchor moves exactly as far as the
+ *  grant paid, so an over-cap backlog stays banked. */
+export function emberWeekAnchorPlusWeeks(anchor: string, weeks: number): string {
+  const dayNum = resetDayToDayNumber(anchor);
+  if (dayNum === null) return '';
+  return renderWeekAnchor(dayNum + weeks * 7);
+}
+
+// --- The daily gate ---------------------------------------------------------
+
+/** Roll the wyrmfall daily window forward when the realm's reset day has
+ *  moved (the delveDaily idiom): '' = unknown calendar, nothing rolls. */
+export function refreshWyrmfallDaily(ctx: SimContext, meta: PlayerMeta): void {
+  const today = ctx.resetDay;
+  if (today && meta.wyrmfallDaily.date !== today) {
+    meta.wyrmfallDaily = { date: today, sources: new Set() };
+  }
+}
+
+// --- Maker's Ember ----------------------------------------------------------
+
+/** The weekly keystone grant, run at every eligible endgame completion for a
+ *  present participant. First-ever completion starts the accrual at one ember
+ *  (no realm-age windfall); after that every elapsed week since the last
+ *  granted week banks one more (R4: missed weeks accrue, uncapped). A stored
+ *  anchor AHEAD of the current week (a rolled-back realm clock) grants
+ *  nothing and self-heals when the calendar catches up. */
+export function tryGrantMakersEmber(ctx: SimContext, meta: PlayerMeta): void {
+  const anchor = emberWeekAnchorOf(ctx.resetDay);
+  if (anchor === '') return;
+  if (meta.emberWeekAnchor === '') {
+    meta.emberWeekAnchor = anchor;
+    ctx.addItem(MAKERS_EMBER_ITEM_ID, 1, meta.entityId);
+    return;
+  }
+  const weeks = emberWeeksBetween(meta.emberWeekAnchor, anchor);
+  if (weeks <= 0) return;
+  // One completion pays at most a stack; the anchor advances only as far as
+  // the grant paid, so an over-cap backlog keeps accruing (R4: uncapped in
+  // total, bounded per payout so one addItem never floods the bags).
+  const granted = Math.min(weeks, EMBER_ACCRUAL_GRANT_CAP);
+  meta.emberWeekAnchor =
+    granted === weeks ? anchor : emberWeekAnchorPlusWeeks(meta.emberWeekAnchor, granted);
+  ctx.addItem(MAKERS_EMBER_ITEM_ID, granted, meta.entityId);
+}
+
+// --- The boss faucet --------------------------------------------------------
+
+/** Wyrmfall Cores for a final-boss kill, called from the death hub
+ *  (combat/damage.ts) right after awardHeroicMarks with the same death-time
+ *  participation snapshot. Eligible kills: the final boss of a HEROIC
+ *  instance (the five-mans and the heroic raid, the awardHeroicMarks set) and
+ *  the raid boss at normal difficulty (which pays no marks but is an endgame
+ *  pillar for materials, ruling R4). Delivery mirrors the marks split:
+ *  present at the corpse takes cores to bags, a participant who entered this
+ *  run but is absent has them posted, roster membership alone is not income.
+ *  The income gate is the per-character per-source reset-day window, NOT the
+ *  lockout: the normal raid's kill-time lockout also strikes door-campers,
+ *  and reusing it here would let one raid's gate shape leak into another's.
+ *  Present participants also tick the weekly ember check: an eligible
+ *  completion counts toward the keystone even when the core gate already
+ *  closed today. */
+export function awardWyrmfallCores(
+  ctx: SimContext,
+  mob: Entity,
+  recipients: PlayerMeta[],
+  // The death hub's pre-resolved claim (instances/dungeons.ts
+  // claimedInstanceForMob, the Phase 18 scan dedupe): null means the hub
+  // scanned and found none; undefined (a foreign caller) means resolve here.
+  claimed?: InstanceSlot | null,
+): void {
+  // Template precheck before any instance resolution: this runs on EVERY mob
+  // death (the death hub calls unconditionally). Only a final-boss template
+  // can ever qualify, so open-world trash exits here first, exactly as it
+  // did when this arm owned its own scan.
+  if (!FINAL_BOSS_TEMPLATE_IDS.has(mob.templateId)) return;
+  const inst = claimed === undefined ? claimedInstanceForMob(ctx, mob.id) : claimed;
+  if (!inst) return;
+  const tuning = HEROIC_DUNGEON_TUNING[inst.dungeonId];
+  const heroicFinal =
+    inst.difficulty === 'heroic' && tuning !== undefined && mob.templateId === tuning.finalBossId;
+  const normalRaidFinal = inst.difficulty !== 'heroic' && mob.templateId === NYTHRAXIS_BOSS_ID;
+  if (!heroicFinal && !normalRaidFinal) return;
+  // An uncredited death (empty participation snapshot) pays nobody, the
+  // awardHeroicMarks rule, and draws nothing.
+  if (recipients.length === 0) return;
+  const count = ctx.rng.int(WYRMFALL_BOSS_MIN, WYRMFALL_BOSS_MAX);
+  const sourceKey = `${inst.dungeonId}:${inst.difficulty}`;
+  const presentIds = new Set(recipients.map((meta) => meta.entityId));
+  const deliveryMetas = new Map<number, PlayerMeta>();
+  for (const meta of instanceLockoutMetas(ctx, inst)) deliveryMetas.set(meta.entityId, meta);
+  // A tap holder who left both party and instance before the kill remains in
+  // the death snapshot and keeps their share (the marks precedent).
+  for (const meta of recipients) deliveryMetas.set(meta.entityId, meta);
+  for (const meta of deliveryMetas.values()) {
+    const present = presentIds.has(meta.entityId);
+    if (!present && !inst.enteredBy.has(meta.entityId)) continue;
+    refreshWyrmfallDaily(ctx, meta);
+    if (!meta.wyrmfallDaily.sources.has(sourceKey)) {
+      meta.wyrmfallDaily.sources.add(sourceKey);
+      if (present) ctx.addItem(WYRMFALL_CORE_ITEM_ID, count, meta.entityId);
+      else ctx.mailWyrmfallCores(meta.entityId, count);
+    }
+    // The ember rides completion, not the core gate; absent participants
+    // catch up through the bankable accrual on their next completion.
+    if (present) tryGrantMakersEmber(ctx, meta);
+  }
+}
+
+// --- The rift faucet --------------------------------------------------------
+
+/** Materials for a WINNING rift first clear (called from completeRiftClear
+ *  inside the claim.event arm): A and S rank grant the deterministic core
+ *  count once per character per reset day across ALL rifts (ruling R9; the
+ *  daily gate is the cap because rifts have no lockout), and every A/S
+ *  participant ticks the weekly ember check. Draw-free on purpose. */
+export function awardRiftFirstClearMaterials(
+  ctx: SimContext,
+  tier: RiftTier,
+  participants: readonly number[],
+): void {
+  // The core payout and the ember check gate INDEPENDENTLY (R9 vs R4): the
+  // ember consults EMBER_ELIGIBLE_RIFT_TIERS, never the core count table, so
+  // a tier added to one set alone behaves the same on the winning and losing
+  // arms instead of inverting the incentive (winners unpaid, losers paid).
+  const riftCount = WYRMFALL_RIFT_COUNT[tier] ?? 0;
+  const emberEligible = EMBER_ELIGIBLE_RIFT_TIERS.has(tier);
+  if (riftCount === 0 && !emberEligible) return;
+  for (const pid of participants) {
+    const meta = ctx.players.get(pid);
+    // A departing character (leave snapshot already captured) earns nothing
+    // here: a post-snapshot grant would be discarded on reconnect anyway, and
+    // the boss-faucet rosters are pre-filtered the same way.
+    if (!meta || meta.leaving) continue;
+    if (riftCount > 0) {
+      refreshWyrmfallDaily(ctx, meta);
+      if (!meta.wyrmfallDaily.sources.has(WYRMFALL_RIFT_SOURCE)) {
+        meta.wyrmfallDaily.sources.add(WYRMFALL_RIFT_SOURCE);
+        ctx.addItem(WYRMFALL_CORE_ITEM_ID, riftCount, meta.entityId);
+      }
+    }
+    if (emberEligible) tryGrantMakersEmber(ctx, meta);
+  }
+}
+
+/** The ember check alone, for an A/S rift clear that LOST the race
+ *  (completeLosingRun's callers): losing the race forfeits the first-clear
+ *  extras (the cores), but the run still cleared an endgame pillar, and the
+ *  weekly keystone is mercy, not a race prize (ruling R4). */
+export function grantRiftClearEmbers(
+  ctx: SimContext,
+  tier: RiftTier,
+  participants: readonly number[],
+  eventId: string | null,
+): void {
+  // A run outside the race (a dev portal) is not a material faucet on EITHER
+  // arm. The winning arm holds this via claim.event; this local guard keeps
+  // the losing arm's half of the module-header guarantee true even if
+  // claimRiftFirstClear's dev-portal return shape ever changes.
+  if (eventId === null) return;
+  if (!EMBER_ELIGIBLE_RIFT_TIERS.has(tier)) return;
+  for (const pid of participants) {
+    const meta = ctx.players.get(pid);
+    if (!meta || meta.leaving) continue;
+    tryGrantMakersEmber(ctx, meta);
+  }
+}

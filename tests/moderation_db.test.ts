@@ -52,12 +52,14 @@ import {
   RECENT_REGISTRATIONS_TIMEOUT_MS,
   reactivateAccountAudited,
   recordInGameAction,
+  recordItemNameClear,
   resetChatStrikesAudited,
   setDailyRewardsBan,
   setDailyRewardsIpBan,
   setOnAccountModerated,
   setOnModerationQueueChanged,
 } from '../server/moderation_db';
+import { REALM } from '../server/realm';
 import { flagRegistrationBurst } from '../server/suspicion_flags';
 
 const { query, boundedQuery, runWithStatementTimeout, connect } = db;
@@ -932,6 +934,14 @@ describe('moderation report helpers', () => {
     });
 
     expect(result).toEqual({ accountId: 2 });
+    // The gating account lookup is realm-scoped (the phase 13 micro-review
+    // sweep), pinned as SQL text plus the literal realm like its two siblings,
+    // so the qual cannot be dropped again with a green suite: a foreign
+    // realm's character id must resolve to no account here.
+    expect(query.mock.calls[0][0]).toContain(
+      'SELECT account_id FROM characters WHERE id = $1 AND realm = $2',
+    );
+    expect(query.mock.calls[0][1]).toEqual([20, 'Claudemoon']);
     // The whole transaction must run on one pinned client, not arbitrary pooled
     // connections, otherwise BEGIN/…/COMMIT are not actually atomic.
     expect(connect).toHaveBeenCalledTimes(1);
@@ -1402,5 +1412,56 @@ describe('prunePlayerReportsBatch (the retention-sweep primitive)', () => {
   it('a driver null rowCount reads as zero deleted, not a crash or NaN', async () => {
     query.mockResolvedValueOnce(queryResult([], null as unknown as number));
     await expect(prunePlayerReportsBatch(180, 1000)).resolves.toBe(0);
+  });
+});
+
+describe('recordItemNameClear (the legendary-name strip audit row)', () => {
+  it('realm-scopes the account lookup, matching getCharacterById', async () => {
+    query
+      .mockResolvedValueOnce(queryResult([{ account_id: 9 }]))
+      .mockResolvedValueOnce(queryResult([]));
+    await expect(
+      recordItemNameClear({
+        characterId: 5,
+        adminAccountId: 7,
+        detail: 'all copies',
+        reason: 'reported slur',
+      }),
+    ).resolves.toEqual({ accountId: 9 });
+    const [lookupSql, lookupParams] = query.mock.calls[0];
+    expect(lookupSql).toContain('SELECT account_id FROM characters WHERE id = $1 AND realm = $2');
+    // The realm as a LITERAL (the admin_professions_db sibling's shape): the
+    // imported constant on both sides would move together.
+    expect(lookupParams).toEqual([5, 'Claudemoon']);
+    expect(REALM).toBe('Claudemoon');
+    const [insertSql, insertParams] = query.mock.calls[1];
+    expect(insertSql).toContain('INSERT INTO account_moderation_actions');
+    expect(insertParams?.[0]).toBe(9);
+    expect(insertParams?.[2]).toBe('clear_item_name');
+    expect(insertParams?.[3]).toBe(
+      '[requested clear_item_name all copies for character 5] reported slur',
+    );
+  });
+
+  it('a cross-realm character id resolves no account and writes NO audit row', async () => {
+    // Without the realm qual this realm process would happily stamp its audit
+    // row against another realm's account for the same numeric id.
+    query.mockResolvedValueOnce(queryResult([]));
+    await expect(
+      recordItemNameClear({
+        characterId: 5,
+        adminAccountId: 7,
+        detail: 'all copies',
+        reason: 'reported slur',
+      }),
+    ).rejects.toThrow('character not found');
+    expect(query).toHaveBeenCalledTimes(1);
+  });
+
+  it('refuses a missing reason before any query', async () => {
+    await expect(
+      recordItemNameClear({ characterId: 5, adminAccountId: 7, detail: 'all copies', reason: '' }),
+    ).rejects.toThrow('moderation reason is required');
+    expect(query).not.toHaveBeenCalled();
   });
 });

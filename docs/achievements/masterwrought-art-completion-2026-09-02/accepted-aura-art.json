@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "masterwrought-art-completion-2026-09-02",
+    "acceptedDate": "2026-09-02",
+    "rasterGenerator": "OpenAI built-in image generation",
+    "owner": "World of ClaudeCraft",
+    "license": "World of ClaudeCraft project-generated art, project asset, rights reserved"
+  },
+  "scope": {
+    "exactRuntimeAuras": 1,
+    "runtimeIdentity": "well_fed"
+  },
+  "generationContract": {
+    "builtInImagegenCalls": 1,
+    "acceptedFirstOutputs": 1,
+    "rejectedOutputs": 0,
+    "shipping": {
+      "width": 128,
+      "height": 128,
+      "format": "webp",
+      "maximumBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "assets": [
+    {
+      "auraId": "well_fed",
+      "sourceProvenance": "docs/achievements/masterwrought-art-completion-2026-09-02/generation-reports/root-special.json",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064de-e910-7ee1-9dcf-8aa86ff5a21b/exec-d0edeac7-f28e-4fb9-b830-64e9ed2d343a.png",
+      "sourceFile": "tmp/imagegen/masterwrought-art-2026-09-02/auras/well_fed.png",
+      "sourceBytes": 2141126,
+      "sourceSha256": "482467fc60c686656a138f262ea7eadf1fbc15c509a49383e4546f1ba5d767a3",
+      "acceptedSha256": "574bc0be1b4c524e2d49395a7e102b135ea8f78792a2b0cd667aa26dc223b602",
+      "acceptedBytes": 3468,
+      "references": [
+        {
+          "path": "public/ui/items/harvest_feast.webp",
+          "role": "Rustic farm-harvest palette, compact grouping, and hand-painted material separation."
+        },
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "Feast abundance and tiny-size food readability."
+        },
+        {
+          "path": "public/ui/auras/sated.webp",
+          "role": "Existing aura-family contrast, restrained edge light, and compact 128px presentation."
+        }
+      ],
+      "prompt": "Use case: production status-effect icon. Asset type: opaque square classic fantasy MMORPG aura icon. Primary request: paint the shared Well Fed buff identity (well_fed) for World of ClaudeCraft. Reference roles: Image 1 is authoritative only for the rustic farm-harvest food palette, compact grouping, and hand-painted material separation. Image 2 is authoritative only for feast abundance and tiny-size food readability. Image 3 is authoritative only for the existing aura family's deep high-contrast vignette, restrained magical edge light, and compact 128px presentation. Do not copy any reference object exactly. Subject: one cohesive, abundant but simple hearth meal: a shallow dark stoneware bowl/platter holding a golden roast portion, one small bread wedge, and a few bright green garden vegetables, with three broad curls of warm nourishing steam rising as one unified silhouette. The food must read as sustaining fullness and vitality, not a specific recipe, poison, empty dish, or restaurant spread. Composition: centered three-quarter overhead hero object, complete silhouette, about 72 percent fill, thick clear food masses and steam readable at 22px, safe margins, strong circular-crop read. Opaque full-square deep umber-charcoal painted vignette with subtle hearth warmth and contact shadow. Style: premium hand-painted classic dark-fantasy MMORPG status art; crisp food and steam focal edges, tactile roast, bread, greens, stoneware; warm top-left amber key, cool deep lower-right shadow; restrained healthful green-gold highlights. No broad neon aura or flat vector look. Constraints: one unified meal only; no person, hand, table scene, cutlery, loose ingredient pile, text, letters, numbers, labels, runes, pseudo-writing, UI border, rarity frame, circular frame, watermark, signature, checkerboard, transparency, split sheet, collage, crop, skull, potion, or empty bowl.",
+      "review": "Accepted at source, 128px, and 22px. The bowl, roast, bread, greens, and three warm steam curls remain legible as a sustaining meal; no text, frame, transparency, or recipe-specific identity appears."
+    }
+  ]
+}

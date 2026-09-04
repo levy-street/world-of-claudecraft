@@ -118,6 +118,18 @@ function fakeEl(tag: string): FakeEl {
 const fakeDoc = { createElement: (tag: string) => fakeEl(tag) } as unknown as Document;
 
 type Call = { m: keyof PainterHostWriters; el: unknown; args: unknown[] };
+/**
+ * A RECORDING STUB, and stating its blind spot plainly because it cost real frames.
+ * It records every call and elides NOTHING: it has no cache, so it cannot tell an
+ * elided write from a performed one, and no amount of thoroughness here could have
+ * caught the single-slot collision this painter shipped (setDisplay + setText on the
+ * stacks badge, one cache entry per element, so both writes bypassed elision on
+ * EVERY frame for EVERY stacking aura). What this file proves is WHICH writer is
+ * called with what. What actually elides is proved over the REAL makeWriterFacet:
+ * the mechanism in tests/painter_host.test.ts, this painter across steady frames in
+ * tests/painter_slot_collision.test.ts, and the tree-wide shape in
+ * tests/painter_single_slot_collision_guard.test.ts.
+ */
 function recordingFacet() {
   const calls: Call[] = [];
   const writers: PainterHostWriters = {
@@ -348,8 +360,16 @@ describe('AurasPainter: keyed pool over the elided writers', () => {
     // duration + stacks via setText.
     expect(has('setText', (c) => c.args[0] === '5s')).toBe(true);
     expect(has('setText', (c) => c.args[0] === '3')).toBe(true);
-    // stacks badge shown via setDisplay('').
-    expect(has('setDisplay', (c) => c.args[0] === '')).toBe(true);
+    // The stacks badge is shown via setStyleProp('display', ''), NOT setDisplay:
+    // it is the one node here carrying its text AND its visibility, and the four
+    // single-slot writers share one cache entry per element, so routing both
+    // through them would defeat elision on every frame for every stacking aura.
+    // The DOM write is identical; only the cache slot differs. The mechanism is
+    // pinned in tests/painter_host.test.ts, the elision in
+    // tests/painter_slot_collision.test.ts over the REAL facet (this recording
+    // stub has no cache, so it cannot see the difference), and the whole tree in
+    // tests/painter_single_slot_collision_guard.test.ts.
+    expect(has('setStyleProp', (c) => c.args[0] === 'display' && c.args[1] === '')).toBe(true);
   });
 
   it('clears the expiring blink through the elided writer when an aura is refreshed', () => {
@@ -361,9 +381,14 @@ describe('AurasPainter: keyed pool over the elided writers', () => {
     ).toBe(true);
   });
 
-  it('hides the stacks badge (setDisplay none) when the aura does not stack', () => {
+  it('hides the stacks badge (setStyleProp display:none) when the aura does not stack', () => {
     painter.paint(state([slot({ key: 'a', stacksText: '' })]));
-    expect(calls.some((c) => c.m === 'setDisplay' && c.args[0] === 'none')).toBe(true);
+    expect(
+      calls.some((c) => c.m === 'setStyleProp' && c.args[0] === 'display' && c.args[1] === 'none'),
+    ).toBe(true);
+    // And never through setDisplay, which would share the badge's cache entry
+    // with its text and defeat elision on both.
+    expect(calls.some((c) => c.m === 'setDisplay')).toBe(false);
   });
 });
 
@@ -598,10 +623,22 @@ describe('AurasPainter: static-preset visible-count cap', () => {
 
 // ---------------------------------------------------------------------------
 // The overflow badge: makes the low-tier buff cap's shed count HONEST instead of silent.
-// A painter built with an `overflowEl` reveals it (setDisplay('')) and writes the shed
-// count's label/tooltip through deps ONLY when this frame actually sheds a buff; a
-// painter built without one (the debuff bar, the target strip) never touches an element
-// at all, so nothing here can regress their existing coverage above.
+// A painter built with an `overflowEl` reveals it (setStyleProp('display', 'flex'): the
+// badge's stylesheet default is display:none, so revealing it needs a real value, unlike
+// the stacks badge's revert-to-'') and writes the shed count's label/tooltip through deps
+// ONLY when this frame actually sheds a buff; a painter built without one (the debuff bar,
+// the target strip) never touches an element at all, so nothing here can regress their
+// existing coverage above.
+//
+// WHY setStyleProp AND NOT setDisplay. The badge carries its text AND its visibility on
+// ONE node, and the four single-slot writers (setText / setDisplay / setTransform /
+// setWidth) share one (kind, value) cache entry per element, so routing both through them
+// makes BOTH writes bypass elision on every frame the buff bar paints. Visibility
+// therefore takes its own multi-slot entry, keyed (element, 'display'); the DOM write is
+// byte-identical, only the cache slot differs. Same fix, same reason, as the stacks badge
+// above. The rule is stated in painter_host.ts and scanned tree-wide by
+// tests/painter_single_slot_collision_guard.test.ts, which is why the pins below name the
+// WRITER and not only the value.
 // ---------------------------------------------------------------------------
 
 describe('AurasPainter: the low-tier overflow badge', () => {
@@ -668,7 +705,7 @@ describe('AurasPainter: the low-tier overflow badge', () => {
     const under = tierPainterWithOverflow('low');
     under.paint(manyBuffs(AURA_VISIBLE_CAP_LOW - 2));
     const el = overflowEl();
-    expect(calls).toContainEqual({ m: 'setDisplay', el, args: ['none'] });
+    expect(calls).toContainEqual({ m: 'setStyleProp', el, args: ['display', 'none'] });
     expect(calls).toContainEqual({ m: 'setText', el, args: [''] });
     expect(calls).toContainEqual({ m: 'setAttr', el, args: ['title', ''] });
     expect(labelCalls).toEqual([]);
@@ -677,7 +714,11 @@ describe('AurasPainter: the low-tier overflow badge', () => {
     container = fakeEl('div'); // fresh container: a 2nd painter would else mint a 2nd badge
     const ultra = tierPainterWithOverflow('ultra');
     ultra.paint(manyBuffs(AURA_VISIBLE_CAP_LOW + 20));
-    expect(calls).toContainEqual({ m: 'setDisplay', el: overflowEl(), args: ['none'] });
+    expect(calls).toContainEqual({
+      m: 'setStyleProp',
+      el: overflowEl(),
+      args: ['display', 'none'],
+    });
     expect(labelCalls).toEqual([]);
   });
 
@@ -687,11 +728,29 @@ describe('AurasPainter: the low-tier overflow badge', () => {
     painter.paint(manyBuffs(over));
     const shed = over - AURA_VISIBLE_CAP_LOW;
     const el = overflowEl();
-    expect(calls).toContainEqual({ m: 'setDisplay', el, args: ['flex'] });
+    expect(calls).toContainEqual({ m: 'setStyleProp', el, args: ['display', 'flex'] });
     expect(calls).toContainEqual({ m: 'setText', el, args: [`+${shed}`] });
     expect(calls).toContainEqual({ m: 'setAttr', el, args: ['title', `${shed} hidden`] });
     expect(labelCalls).toEqual([shed]);
     expect(tooltipCalls).toEqual([shed]);
+  });
+
+  it('gives the badge visibility its OWN cache slot, never a second single-slot writer', () => {
+    // Stronger than "the badge said flex": the badge's TEXT and its VISIBILITY live on one
+    // node, and the four single-slot writers share a single (kind, value) entry per
+    // element, so a visibility write through any of them would defeat elision on the text
+    // too, every frame the buff bar paints (the collision the stacks badge shipped with;
+    // painter_host.ts, tests/painter_single_slot_collision_guard.test.ts). setText is
+    // therefore the only single-slot kind allowed to name this element, shown and hidden.
+    const painter = tierPainterWithOverflow('low');
+    painter.paint(manyBuffs(AURA_VISIBLE_CAP_LOW + 5)); // shown
+    painter.paint(manyBuffs(AURA_VISIBLE_CAP_LOW - 1)); // and hidden again
+    const el = overflowEl();
+    const singleSlot: Call['m'][] = ['setText', 'setDisplay', 'setTransform', 'setWidth'];
+    expect(calls.filter((c) => c.el === el && singleSlot.includes(c.m)).map((c) => c.m)).toEqual([
+      'setText',
+      'setText',
+    ]);
   });
 
   it('FAIRNESS: shed counts only the dropped BUFFS, never a debuff that rendered past the cap', () => {
@@ -714,13 +773,13 @@ describe('AurasPainter: the low-tier overflow badge', () => {
     calls.length = 0;
     painter.paint(manyBuffs(AURA_VISIBLE_CAP_LOW - 1));
     const el = overflowEl();
-    expect(calls).toContainEqual({ m: 'setDisplay', el, args: ['none'] });
+    expect(calls).toContainEqual({ m: 'setStyleProp', el, args: ['display', 'none'] });
     expect(calls).toContainEqual({ m: 'setText', el, args: [''] });
   });
 
   it('a repeat identical frame re-derives the SAME value (the real elision lives in the injected writer facet, not here)', () => {
     // AurasPainter always calls the writer facet every frame (exactly like every other
-    // write in this painter: setText/setDisplay/setAttr elision is the FACET's job,
+    // write in this painter: setText/setStyleProp/setAttr elision is the FACET's job,
     // proven separately in tests/painter_host.test.ts). What this painter owns is
     // recomputing the SAME output for the SAME state, so a real elided facet would see
     // no-op writes on a steady state.
@@ -806,7 +865,7 @@ describe('AurasPainter: a wire-faithful buff_* stat-sap survives the low cap (vi
 
 // ---------------------------------------------------------------------------
 // MODE auras print no seconds-remaining line in the tooltip either. The sim backs
-// a form / stance / stealth / Ghost Wolf / the carried flag with a long finite
+// a form / stance / stealth / Shadewolf / the carried flag with a long finite
 // duration (3600s, or a whole match) purely so nothing can expire it; surfacing
 // that number is the same lie the suppressed countdown label already avoids, and
 // on the carried flag it reads as "the flag leaves me in 12 minutes".
@@ -842,7 +901,7 @@ describe('AurasPainter: a toggle aura suppresses the tooltip countdown', () => {
           remaining: 720,
           toggle: true,
         }),
-        slot({ key: 'ghost_wolf', name: 'Ghost Wolf', remaining: 3600, toggle: true }),
+        slot({ key: 'ghost_wolf', name: 'Shadewolf', remaining: 3600, toggle: true }),
         slot({ key: 'bg_sprint_rune', name: 'Sprint', remaining: 15, toggle: false }),
       ]),
     );
@@ -851,7 +910,7 @@ describe('AurasPainter: a toggle aura suppresses the tooltip countdown', () => {
     expect(html[0]).toBe('Carrying the Flag');
     expect(html[0]).not.toMatch(/remaining/);
     expect(html[0]).not.toMatch(/720/);
-    expect(html[1]).toBe('Ghost Wolf');
+    expect(html[1]).toBe('Shadewolf');
     expect(html[1]).not.toMatch(/3600/);
     // ...while a genuinely timed buff still shows its countdown.
     expect(html[2]).toBe('Sprint|15s remaining');

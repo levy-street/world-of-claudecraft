@@ -22,7 +22,7 @@ import {
   craftingReagentSig,
   craftLearnHints,
   type RecipeDefLike,
-} from '../src/ui/crafting_view';
+} from '../src/ui/hud/professions/crafting_view';
 
 function item(id: string): ItemDef {
   return {
@@ -60,6 +60,24 @@ describe('buildCraftingView', () => {
     );
     expect(view.recipes[0].craftable).toBe(true);
     expect(view.recipes[0].reagents[0]).toMatchObject({ required: 2, have: 3, satisfied: true });
+  });
+
+  it('mirrors the static oncePerDay marker onto the row and omits it otherwise', () => {
+    // The batch affordances read this field to cap their preview at one
+    // (craft_cast_view.ts maxCraftBatchFit); a row without the marker must
+    // not carry the key at all, matching the sparse recipe record shape.
+    const inventory: InvSlot[] = [{ itemId: 'bone_fragments', count: 6 }];
+    const gated = {
+      ...recipe('recipe_d', [{ itemId: 'bone_fragments', count: 2 }]),
+      oncePerDay: true as const,
+    };
+    const view = buildCraftingView(
+      [gated, recipe('recipe_e', [{ itemId: 'bone_fragments', count: 2 }])],
+      inventory,
+      table(item('bone_fragments'), item('recipe_d_result'), item('recipe_e_result')),
+    );
+    expect(view.recipes[0].oncePerDay).toBe(true);
+    expect('oncePerDay' in view.recipes[1]).toBe(false);
   });
 
   it('marks a recipe not craftable when any single reagent is short', () => {
@@ -820,16 +838,34 @@ describe('craftLearnHints (discoverability)', () => {
     expect(craftLearnHints(known, STATIONS).has('weaponcrafting')).toBe(false);
   });
 
-  it('never hints a craft with no physical station, and stays safe for unknown crafts', () => {
-    const hints = craftLearnHints([], []);
-    // Every hinted craft resolves to the station type it was paired with.
+  it('a station-less craft hints through its foreign-bound teaching home, and unknowns stay safe', () => {
+    // With no stations at all nothing is hinted: there is no master to point at.
+    expect(craftLearnHints([], []).size).toBe(0);
+    const hints = craftLearnHints([], STATIONS);
+    // Every hinted craft with a station of its own hints AT that station.
+    // Exactly three station-less crafts hint through a foreign-bound teaching
+    // home (trainingStationTypeFor): enchanting via the toolworks charms,
+    // jewelcrafting via its forge-bound catalog, and inscription via its
+    // apothecary-bound catalog (phase 06). Any new station-less hinted
+    // craft must be added here deliberately.
     for (const [craft, hint] of hints) {
-      expect(stationTypeForCraft(craft)).toBe(hint.stationType);
+      const own = stationTypeForCraft(craft);
+      if (own) expect(own, craft).toBe(hint.stationType);
+      else expect(['enchanting', 'jewelcrafting', 'inscription'], craft).toContain(craft);
       expect(hint.masterNpcId).toBeTruthy();
     }
-    // jewelcrafting has no station master, so it is never hinted even unlearned;
-    // a bogus craft id is simply absent (no crash, no entry).
-    expect(hints.has('jewelcrafting')).toBe(false);
+    expect(hints.get('jewelcrafting')).toEqual({
+      stationType: 'forge',
+      masterNpcId: 'forgemistress_darva',
+    });
+    // Phase 06: the inscription base catalog binds to the apothecary (explicit
+    // foreign stationType, the jewelcrafting-at-the-forge precedent), so
+    // inscription now hints at the apothecary master. A bogus craft id stays
+    // simply absent (no crash, no entry).
+    expect(hints.get('inscription')).toEqual({
+      stationType: 'apothecary',
+      masterNpcId: 'alchemist_verane',
+    });
     expect(hints.has('not-a-craft')).toBe(false);
   });
 });

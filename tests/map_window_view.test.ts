@@ -10,6 +10,7 @@
 // getComputedStyle and are covered by the no-magic-values source guard instead.
 
 import { describe, expect, it } from 'vitest';
+import { FARM_PATCHES } from '../src/sim/content/farm_patches';
 import {
   BUILTIN_WORLD,
   CAMPS,
@@ -36,7 +37,7 @@ import {
   type ZonePropsDef,
 } from '../src/sim/types';
 import type { Decoration } from '../src/sim/world';
-import { isNodeToolLockedFor } from '../src/ui/gathering_view';
+import { isNodeToolLockedFor } from '../src/ui/hud/professions/gathering_view';
 import { STABLE_MAP_NAVIGATION_LANDMARKS } from '../src/ui/map_navigation_landmarks_core';
 import {
   buildOverworldMapModel,
@@ -49,7 +50,6 @@ import {
   MAP_NAVIGATION_HIT_RADIUS,
   MAP_NPC_GLYPH_HIT_RADIUS,
   MAP_SERVICE_HIT_RADIUS,
-  MAP_STATION_HIT_RADIUS,
   MAP_STATION_NPC_SEPARATION,
   MAP_TOUCH_POINT_HIT_RADIUS_CSS_PX,
   type MapPointMarkerHit,
@@ -62,7 +62,6 @@ import {
   questAreaObjectivesAt,
   questAreaObjectivesAtInto,
   serviceMarkerAt,
-  stationMarkerAt,
 } from '../src/ui/map_window_view';
 import type { IWorld } from '../src/world_api';
 
@@ -160,6 +159,7 @@ function makeOverworldWorld(
     nodeHarvestableByMe: () => true,
     stationPlacements: STATIONS,
     civicServicePlacements: [],
+    farmPatches: FARM_PATCHES,
   } as unknown as IWorld;
 }
 
@@ -1709,16 +1709,18 @@ describe('zone-map touch point-marker resolution', () => {
     ready: true,
     locked: false,
   };
+  const farm = { mx: 6, my: 0, patchId: 'patch', zoneId: ZONE.id };
 
   it('uses a physical 20px radius and resolves overlapping targets globally by distance', () => {
     expect(MAP_TOUCH_POINT_HIT_RADIUS_CSS_PX).toBe(20);
     expect(
-      mapPointMarkerHits([npc], [navigation], [service], [station], [gather], 0, 0, 20),
+      mapPointMarkerHits([npc], [navigation], [service], [station], [gather], [farm], 0, 0, 20),
     ).toEqual([
       { kind: 'gather', marker: gather, distance2: 0 },
       { kind: 'navigation', marker: navigation, distance2: 4 },
       { kind: 'service', marker: service, distance2: 9 },
       { kind: 'station', marker: station, distance2: 16 },
+      { kind: 'farm', marker: farm, distance2: 36 },
       { kind: 'npc', marker: npc, distance2: 64 },
     ]);
   });
@@ -1730,6 +1732,7 @@ describe('zone-map touch point-marker resolution', () => {
     const tiedStation = { ...station, mx: 5 };
     const tiedService = { ...service, mx: 5 };
     const tiedGather = { ...gather, mx: 5 };
+    const tiedFarm = { ...farm, mx: 5 };
 
     const firstCount = mapPointMarkerHitsInto(
       [tiedNpc],
@@ -1737,18 +1740,20 @@ describe('zone-map touch point-marker resolution', () => {
       [tiedService],
       [tiedStation],
       [tiedGather],
+      [tiedFarm],
       0,
       0,
       5,
       output,
     );
-    expect(firstCount).toBe(5);
+    expect(firstCount).toBe(6);
     expect(output.map((hit) => hit.kind)).toEqual([
       'npc',
       'navigation',
       'station',
       'service',
       'gather',
+      'farm',
     ]);
     const slots = new Set(output);
 
@@ -1758,24 +1763,26 @@ describe('zone-map touch point-marker resolution', () => {
       [{ ...service, mx: 2 }],
       [{ ...station, mx: 1 }],
       [{ ...gather, mx: 0 }],
+      [{ ...farm, mx: 3 }],
       0,
       0,
       5,
       output,
     );
-    expect(secondCount).toBe(5);
+    expect(secondCount).toBe(6);
     expect(new Set(output)).toEqual(slots);
     expect(output.map((hit) => [hit.kind, hit.distance2])).toEqual([
       ['gather', 0],
       ['station', 1],
       ['service', 4],
       ['navigation', 9],
+      ['farm', 9],
       ['npc', 16],
     ]);
 
-    const missCount = mapPointMarkerHitsInto([], [], [], [], [], 0, 0, 5, output);
+    const missCount = mapPointMarkerHitsInto([], [], [], [], [], [], 0, 0, 5, output);
     expect(missCount).toBe(0);
-    expect(output).toHaveLength(5);
+    expect(output).toHaveLength(6);
     expect(new Set(output)).toEqual(slots);
   });
 
@@ -1785,6 +1792,7 @@ describe('zone-map touch point-marker resolution', () => {
     const tiedStation = { ...station, mx: 5 };
     const tiedService = { ...service, mx: 5 };
     const tiedGather = { ...gather, mx: 5 };
+    const tiedFarm = { ...farm, mx: 5 };
     expect(
       mapPointMarkerHits(
         [tiedNpc],
@@ -1792,12 +1800,13 @@ describe('zone-map touch point-marker resolution', () => {
         [tiedService],
         [tiedStation],
         [tiedGather],
+        [tiedFarm],
         0,
         0,
         5,
       ).map((hit) => hit.kind),
-    ).toEqual(['npc', 'navigation', 'station', 'service', 'gather']);
-    expect(mapPointMarkerHits([tiedNpc], [], [], [], [], 0, 0, 4.9)).toEqual([]);
+    ).toEqual(['npc', 'navigation', 'station', 'service', 'gather', 'farm']);
+    expect(mapPointMarkerHits([tiedNpc], [], [], [], [], [], 0, 0, 4.9)).toEqual([]);
   });
 
   it('keeps a forgiving hover target across the full navigation painting', () => {
@@ -1806,6 +1815,7 @@ describe('zone-map touch point-marker resolution', () => {
       mapPointMarkerHits(
         [],
         [navigation],
+        [],
         [],
         [],
         [],
@@ -1869,22 +1879,6 @@ describe('zone-map crafting stations', () => {
     expect(model.stations[0]).toMatchObject({ stationId: 'custom_forge', type: 'forge' });
   });
 
-  it('hit-tests the nearest painted station and misses outside its touch radius', () => {
-    const model = buildOverworldMapModel(input(makeOverworldWorld('sim'), 1));
-    const marker = model.stations[0];
-    expect(marker).toBeDefined();
-    if (!marker) return;
-    expect(stationMarkerAt(model.stations, marker.mx, marker.my)).toBe(marker);
-    // Under the nudge cap the town's stations cluster at their true spots,
-    // so probe from a point past the hit radius of EVERY station: straight
-    // up from the topmost badge, where the vertical gap alone exceeds it.
-    const topMy = Math.min(...model.stations.map((candidate) => candidate.my));
-    expect(
-      stationMarkerAt(model.stations, marker.mx, topMy - MAP_STATION_HIT_RADIUS - 0.5),
-    ).toBeNull();
-    expect(stationMarkerAt([], marker.mx, marker.my)).toBeNull();
-  });
-
   it('pushes a station badge clear of an overlapping quest glyph only within the world-yard cap', () => {
     const world = makeOverworldWorld('sim') as unknown as {
       questState: () => 'available';
@@ -1921,6 +1915,187 @@ describe('zone-map crafting stations', () => {
         ...zoomed.npcs.map((npc) => Math.hypot(station.mx - npc.mx, station.my - npc.my)),
       );
       expect(nearest).toBeGreaterThanOrEqual(MAP_STATION_NPC_SEPARATION - 1e-6);
+    }
+  });
+});
+
+describe('zone-map farm patches', () => {
+  const EASTBROOK_PATCH = FARM_PATCHES.find((patch) => patch.id === 'patch_eastbrook');
+
+  it('projects the committed zone patch anchor identically on both hosts', () => {
+    expect(EASTBROOK_PATCH).toBeDefined();
+    if (!EASTBROOK_PATCH) return;
+    const sim = buildOverworldMapModel(input(makeOverworldWorld('sim'), 1));
+    const client = buildOverworldMapModel(input(makeOverworldWorld('client'), 1));
+    expect(sim.farmPatches).toEqual(client.farmPatches);
+    expect(sim.farmPatches).toHaveLength(1);
+    expect(sim.farmPatches[0]).toMatchObject({
+      patchId: 'patch_eastbrook',
+      zoneId: ZONE.id,
+    });
+    expect(Number.isFinite(sim.farmPatches[0].mx)).toBe(true);
+    expect(Number.isFinite(sim.farmPatches[0].my)).toBe(true);
+  });
+
+  it('caps the farm-patch badge inside the world-yard nudge bound like other landmarks', () => {
+    // The release/v0.41.0 merge landed the patch loop WITHOUT the cap the
+    // release had threaded through every other placeLandmarkBadge call, so
+    // the one badge that marks a place a player walks back to every day was
+    // the one badge still free to drift up to MAP_LANDMARK_PLACEMENT_STEPS
+    // pixels (about 30 yards at the full-zone frame). Decisive fixture: a
+    // mailbox badge is placed first, exactly on the patch's projection, so the
+    // farm badge MUST collide. Under the cap (6.2 px here: 4 yd over the 360 yd
+    // span at 560 px, which stepLimit rounds to 6) no candidate inside the cap
+    // clears the 24 px separation, so the badge stays at its
+    // authored projection; without the cap the search walks to the first
+    // clear ring, 24 px out, three times the bound. The real Eastbrook patch
+    // is not displaced at zoom 1, which is why the fixture is synthetic.
+    const world = makeOverworldWorld('sim') as unknown as {
+      questState: () => 'unavailable';
+      stationPlacements: unknown[];
+      farmPatches: Array<{
+        id: string;
+        zoneId: string;
+        tier: number;
+        x: number;
+        z: number;
+        beds: readonly { id: string; x: number; z: number }[];
+      }>;
+    };
+    world.questState = () => 'unavailable';
+    world.stationPlacements = [];
+    const site = { x: 24, z: ZONE_CZ + 24 };
+    world.farmPatches = [
+      { id: 'crowded_patch', zoneId: ZONE.id, tier: 1, x: site.x, z: site.z, beds: [] },
+    ];
+    const services: WorldServicesDef = { mailboxes: [{ x: site.x, z: site.z }] };
+    const model = buildOverworldMapModel(
+      input(world as unknown as IWorld, 1, NO_DECOR, PROPS, services),
+    );
+    expect(model.services).toHaveLength(1);
+    expect(model.farmPatches).toHaveLength(1);
+    const mx = ((ZONE_CX + FULL_SPAN / 2 - site.x) / FULL_SPAN) * CANVAS;
+    const my = ((ZONE_CZ + FULL_SPAN / 2 - site.z) / FULL_SPAN) * CANVAS;
+    // The blocker really sits on the projection (the collision is real).
+    expect(Math.hypot(model.services[0].mx - mx, model.services[0].my - my)).toBeLessThan(1e-6);
+    // The cap itself is a literal pin, not only an input to the arithmetic
+    // below: every other bound in this file derives from the same constant
+    // the production code reads, so widening the cap (4 to 12 keeps 12 yd
+    // under the 24 px separation at this frame) would move both sides
+    // together and leave every arm green (11m QA).
+    expect(MAP_LANDMARK_MAX_NUDGE_YD).toBe(4);
+    const maxNudgePx = MAP_LANDMARK_MAX_NUDGE_YD * (CANVAS / FULL_SPAN) + 1e-6;
+    expect(maxNudgePx).toBeLessThan(MAP_LANDMARK_SEPARATION);
+    const drift = Math.hypot(model.farmPatches[0].mx - mx, model.farmPatches[0].my - my);
+    expect(drift).toBeLessThanOrEqual(maxNudgePx);
+  });
+
+  it('reads the active IWorld patch list and filters foreign-zone sites', () => {
+    const world = makeOverworldWorld('sim') as unknown as {
+      farmPatches: Array<{
+        id: string;
+        zoneId: string;
+        tier: number;
+        x: number;
+        z: number;
+        beds: readonly { id: string; x: number; z: number }[];
+      }>;
+    };
+    world.farmPatches = [
+      { id: 'custom_patch', zoneId: ZONE.id, tier: 1, x: 24, z: ZONE_CZ + 24, beds: [] },
+      { id: 'foreign_patch', zoneId: ZONES[1].id, tier: 2, x: 24, z: ZONE_CZ + 24, beds: [] },
+    ];
+    const model = buildOverworldMapModel(input(world as unknown as IWorld, 1));
+    expect(model.farmPatches).toHaveLength(1);
+    expect(model.farmPatches[0]).toMatchObject({ patchId: 'custom_patch', zoneId: ZONE.id });
+  });
+
+  it('draws nothing in a zone whose content authors no patch', () => {
+    const world = makeOverworldWorld('sim') as unknown as { farmPatches: unknown[] };
+    world.farmPatches = [];
+    expect(buildOverworldMapModel(input(world as unknown as IWorld, 1)).farmPatches).toEqual([]);
+  });
+
+  it('joins the shared landmark layer, so a patch badge clears every quest glyph', () => {
+    const world = makeOverworldWorld('sim') as unknown as {
+      questState: () => 'available';
+      farmPatches: unknown[];
+    };
+    world.questState = () => 'available';
+    // Park the patch anchor exactly on the quest giver so the allocator has to
+    // displace it; the authored Eastbrook site is nowhere near one.
+    world.farmPatches = [
+      { id: 'patch_on_giver', zoneId: ZONE.id, tier: 1, x: 10, z: ZONE_CZ, beds: [] },
+    ];
+    const model = buildOverworldMapModel(input(world as unknown as IWorld, 1));
+    expect(model.farmPatches).toHaveLength(1);
+    expect(model.npcs.length).toBeGreaterThan(0);
+    const patch = model.farmPatches[0];
+    for (const npc of model.npcs) {
+      expect(Math.hypot(patch.mx - npc.mx, patch.my - npc.my)).toBeGreaterThanOrEqual(
+        MAP_STATION_NPC_SEPARATION - 1e-6,
+      );
+    }
+  });
+
+  it('enters the landmark layer itself, so a second patch clears the first', () => {
+    const world = makeOverworldWorld('sim') as unknown as { farmPatches: unknown[] };
+    // Two sites on the SAME world position: the first keeps its projection and
+    // the second must be displaced, which is only possible if an accepted patch
+    // badge joins the shared landmark list. Since the release/v0.41.0 merge the
+    // farm badge takes the world-yard nudge cap like every landmark, so the
+    // de-overlap is asserted where the cap allows it: the zoom-4 town frame,
+    // where the cap converts to more pixels than the separation needs (the
+    // same two-half shape as the station cap arm above). At the full-zone
+    // frame the second badge holds its authored spot inside the cap instead of
+    // walking yards away.
+    const site = { x: 40, z: ZONE_CZ + 40 };
+    world.farmPatches = [
+      { id: 'patch_first', zoneId: ZONE.id, tier: 1, x: site.x, z: site.z, beds: [] },
+      { id: 'patch_second', zoneId: ZONE.id, tier: 2, x: site.x, z: site.z, beds: [] },
+    ];
+    const zoomed = buildOverworldMapModel({
+      ...input(world as unknown as IWorld, 4),
+      center: { x: site.x, z: site.z },
+    });
+    expect(zoomed.farmPatches.map((patch) => patch.patchId)).toEqual([
+      'patch_first',
+      'patch_second',
+    ]);
+    const [first, second] = zoomed.farmPatches;
+    expect(Math.hypot(first.mx - second.mx, first.my - second.my)).toBeGreaterThanOrEqual(
+      MAP_STATION_NPC_SEPARATION - 1e-6,
+    );
+    const fullZone = buildOverworldMapModel(input(world as unknown as IWorld, 1));
+    const maxNudgePx = MAP_LANDMARK_MAX_NUDGE_YD * (CANVAS / FULL_SPAN) + 1e-6;
+    const [firstFull, secondFull] = fullZone.farmPatches;
+    expect(
+      Math.hypot(firstFull.mx - secondFull.mx, firstFull.my - secondFull.my),
+    ).toBeLessThanOrEqual(maxNudgePx);
+  });
+
+  it('clears the stations placed before it on the same landmark layer', () => {
+    const world = makeOverworldWorld('sim') as unknown as { farmPatches: unknown[] };
+    // Same world position as the Eastbrook forge (STATIONS[0]). Asserted at the
+    // zoom-4 town frame for the reason the arm above records: under the
+    // world-yard cap the full-zone frame holds badges at their true spots.
+    const forge = STATIONS.find((station) => station.id === 'station_eastbrook_forge');
+    expect(forge).toBeDefined();
+    if (!forge) return;
+    world.farmPatches = [
+      { id: 'patch_on_forge', zoneId: ZONE.id, tier: 1, x: forge.pos.x, z: forge.pos.z, beds: [] },
+    ];
+    const model = buildOverworldMapModel({
+      ...input(world as unknown as IWorld, 4),
+      center: { x: forge.pos.x, z: forge.pos.z },
+    });
+    const patch = model.farmPatches[0];
+    expect(patch).toBeDefined();
+    expect(model.stations.length).toBeGreaterThan(0);
+    for (const station of model.stations) {
+      expect(Math.hypot(patch.mx - station.mx, patch.my - station.my)).toBeGreaterThanOrEqual(
+        MAP_STATION_NPC_SEPARATION - 1e-6,
+      );
     }
   });
 });

@@ -549,7 +549,6 @@ export const pt_BR: Record<string, string> = {
   'poi.thornpeak_heights.4': 'Acampamento de Guerra de Drogmar',
   'poi.thornpeak_heights.5': 'Penhasco da Tempestade',
   'poi.thornpeak_heights.6': 'O Lago Cintilante',
-  'poi.thornpeak_heights.7': 'Tendas do Culto do Wyrm',
   'poi.thornpeak_heights.8': 'Campos dos Espectros',
   'poi.thornpeak_heights.9': 'Santuário do Gravewyrm',
   'location.kind.overworld': 'Mundo aberto',

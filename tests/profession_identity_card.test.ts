@@ -4,18 +4,33 @@ import { readFileSync } from 'node:fs';
 import * as path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { CRAFT_RING } from '../src/sim/content/professions';
-import { renderCraftingWindow } from '../src/ui/crafting_window';
+import { renderCraftingWindow } from '../src/ui/hud/professions/crafting_window';
+import { renderProfessionIdentityCard } from '../src/ui/hud/professions/profession_identity_card';
+import { buildProfessionIdentityView } from '../src/ui/hud/professions/profession_identity_view';
 import { QUALITY_COLOR } from '../src/ui/icons';
-import { renderProfessionIdentityCard } from '../src/ui/profession_identity_card';
-import { buildProfessionIdentityView } from '../src/ui/profession_identity_view';
 
-const painter = readFileSync(
-  path.resolve(process.cwd(), 'src/ui/profession_identity_card.ts'),
-  'utf8',
+/** Comment-stripped TS source: a pinned token inside a comment must never
+ *  satisfy a pin about live code (review round; hoisted for EVERY source
+ *  read in this file at the phase 07 QA fix round). The block pass is
+ *  anchored to whole lines (the docblock shape this tree uses), so a block
+ *  opener inside a line comment can never open a false block that swallows
+ *  real code to the next real closer (the trap-catalog ordering hazard);
+ *  the line pass keeps protocol tokens like :// intact. */
+const codeOnly = (source: string): string =>
+  source.replace(/^[ \t]*\/\*[\s\S]*?\*\/[ \t]*$/gm, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+
+/** Comment-stripped CSS: wrapping a rule in a block comment leaves its text
+ *  byte-identical under toContain, so stylesheet pins read live rules only. */
+const cssOnly = (source: string): string => source.replace(/\/\*[\s\S]*?\*\//g, '');
+
+const painter = codeOnly(
+  readFileSync(
+    path.resolve(process.cwd(), 'src/ui/hud/professions/profession_identity_card.ts'),
+    'utf8',
+  ),
 );
-const craftingWindow = readFileSync(
-  path.resolve(process.cwd(), 'src/ui/crafting_window.ts'),
-  'utf8',
+const craftingWindow = codeOnly(
+  readFileSync(path.resolve(process.cwd(), 'src/ui/hud/professions/crafting_window.ts'), 'utf8'),
 );
 
 describe('profession identity card painter contract', () => {
@@ -526,13 +541,11 @@ describe('identity card type floor and numeral pins (phase 22, source pins)', ()
   // The stylesheet is the authority the painter defers to (the no-magic
   // contract above), so the DESIGN.md floors pin against the CSS source the
   // way tests/mobile_window_layout.test.ts pins the vendor 40px floor.
-  const components = readFileSync(
-    path.resolve(process.cwd(), 'src/styles/components.css'),
-    'utf8',
+  const components = cssOnly(
+    readFileSync(path.resolve(process.cwd(), 'src/styles/components.css'), 'utf8'),
   ).replace(/\r\n/g, '\n');
-  const mobileCss = readFileSync(
-    path.resolve(process.cwd(), 'src/styles/hud.mobile.css'),
-    'utf8',
+  const mobileCss = cssOnly(
+    readFileSync(path.resolve(process.cwd(), 'src/styles/hud.mobile.css'), 'utf8'),
   ).replace(/\r\n/g, '\n');
 
   it('the row family the card reuses carries the 13px name line and the tabular-nums value', () => {
@@ -589,7 +602,7 @@ describe('identity card type floor and numeral pins (phase 22, source pins)', ()
   });
 
   it('the focusable capped list carries the shared focus-visible ring', () => {
-    const base = readFileSync(path.resolve(process.cwd(), 'src/styles/base.css'), 'utf8');
+    const base = cssOnly(readFileSync(path.resolve(process.cwd(), 'src/styles/base.css'), 'utf8'));
     expect(base).toMatch(/\.profession-skill-list:focus-visible[^{]*\{[^}]*outline: 2px solid/s);
   });
 
@@ -801,9 +814,8 @@ describe('crafting window pins', () => {
       },
       { difficulty: 'none' as const, token: '--color-craft-none', label: 'No skill gain' },
     ];
-    const componentsCss = readFileSync(
-      path.resolve(process.cwd(), 'src/styles/components.css'),
-      'utf8',
+    const componentsCss = cssOnly(
+      readFileSync(path.resolve(process.cwd(), 'src/styles/components.css'), 'utf8'),
     );
     for (const { difficulty, token, label } of rows) {
       const parent = document.createElement('div');
@@ -986,7 +998,9 @@ describe('crafting difficulty token lockstep (retuned to tokens)', () => {
     // (legendary/uncommon/poor), reduced must reference the house gold BY
     // NAME (var(--gold), the masterwork seal idiom), and --gold itself stays
     // the shipped #ffd100. A retheme that moves any side alone reds here.
-    const tokens = readFileSync(path.resolve(process.cwd(), 'src/styles/tokens.css'), 'utf8');
+    const tokens = cssOnly(
+      readFileSync(path.resolve(process.cwd(), 'src/styles/tokens.css'), 'utf8'),
+    );
     expect(tokens).toContain(`--color-craft-full: ${QUALITY_COLOR.legendary};`);
     expect(tokens).toContain('--color-craft-reduced: var(--gold);');
     expect(tokens).toContain(`--color-craft-minimal: ${QUALITY_COLOR.uncommon};`);
@@ -998,7 +1012,10 @@ describe('crafting difficulty token lockstep (retuned to tokens)', () => {
 });
 
 describe('crafting window station-range repaint liveness (source pins)', () => {
-  const hud = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+  // Comment-stripped like every other source read here: a commented-out
+  // guard must red these pins, never satisfy them (the phase 07 QA
+  // partial-application catch).
+  const hud = codeOnly(readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8'));
 
   it('the slow band repaints an OPEN window only when the live in-range set changes', () => {
     // Walking into/out of a station's range (or the own mobile station
@@ -1007,13 +1024,13 @@ describe('crafting window station-range repaint liveness (source pins)', () => {
     // compares the live set's signature against the last painted one.
     expect(hud).toContain("$('#crafting-window').style.display === 'flex' &&");
     expect(hud).toMatch(
-      /stationTypesSignature\(\s*inRangeStationTypes\(\s*sim\.stationPlacements,\s*sim\.player\.pos,\s*sim\.activeMobileStationCraft,?\s*\),\s*\) !==\s*this\.lastCraftingStationSig/,
+      /stationTypesSignature\(\s*inRangeStationTypes\(\s*sim\.stationPlacements,\s*sim\.player\.pos,\s*sim\.activeMobileStationCrafts,?\s*\),\s*\) !==\s*this\.lastCraftingStationSig/,
     );
   });
 
   it('renderCrafting records the painted signature and feeds the same set to the view', () => {
     expect(hud).toMatch(
-      /const inRangeStations = inRangeStationTypes\(\s*this\.sim\.stationPlacements,\s*this\.sim\.player\.pos,\s*this\.sim\.activeMobileStationCraft,\s*\);/,
+      /const inRangeStations = inRangeStationTypes\(\s*this\.sim\.stationPlacements,\s*this\.sim\.player\.pos,\s*this\.sim\.activeMobileStationCrafts,\s*\);/,
     );
     expect(hud).toContain('this.lastCraftingStationSig = stationTypesSignature(inRangeStations);');
   });
@@ -1034,29 +1051,74 @@ describe('crafting window station-range repaint liveness (source pins)', () => {
 });
 
 describe('craftResult deny toast names the station (source pins)', () => {
-  // The reason-to-key mapping moved out of hud.ts into the
-  // src/ui/crafting_deny_core.ts pure core (whose own suite pins the table
-  // behaviorally and exhaustively); these pins follow the code they pin.
-  const hud = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
-  const core = readFileSync(path.resolve(process.cwd(), 'src/ui/crafting_deny_core.ts'), 'utf8');
+  // Comment-stripped through the shared helper: a pinned token inside a
+  // comment must never satisfy a pin about live code (review round).
+  const hud = codeOnly(readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8'));
 
-  it('station_required resolves the type from recipe content (no station field rides the event)', () => {
-    expect(core).toMatch(
-      /reason === 'station_required' \? recipeById\(recipeId\)\?\.stationType : undefined/,
+  it("the denial routes through the deny core with the event's own recipe id", () => {
+    // The reason-to-key mapping moved into a pure core at the Phase 07 review
+    // round; every arm (the no_bag_space pairing and the daily_limit rung
+    // included) is table-pinned in tests/craft_denial_line_view.test.ts.
+    // RE-POINTED at the 2026-08-24 release sync's QA: hud calls the release's
+    // crafting_deny_core, which resolves the recipe itself and delegates the
+    // decision to that table, so there is one authority AND no module without
+    // a production consumer. The station type still comes from RECIPE CONTENT
+    // (no station field rides the event), so the core can name the station in
+    // both worlds identically.
+    expect(hud).toMatch(/craftDenyMessage\(ev\.reason, ev\.recipeId, ev\.retryAfterSeconds\)/);
+    expect(hud, 'and hud no longer resolves the station itself').not.toMatch(/craftDenialLine\(/);
+  });
+
+  it('the toast renders the CORE-selected key, station params riding the resolved type', () => {
+    // The render half: the line must come from t(denial.key), never a
+    // hardcoded key beside the core (which would leave the core's mapping
+    // dead data), with the station name interpolated only when the core
+    // resolved a type.
+    expect(hud).toMatch(/t\(\s*denial\.key,/);
+    expect(hud).toContain('station: stationNameText(denial.stationType)');
+    // Spelling-tolerant negative: either quote style, and whitespace after
+    // t(, so a reintroduction cannot slip past on formatting alone.
+    expect(hud).not.toMatch(/t\(\s*['"]hudChrome\.crafting\.stationRequired['"]/);
+  });
+
+  // RE-POINTED AT THE SEAM (the Phase 11k QA release sync). The release
+  // extracted the same table as src/ui/hud/professions/crafting_deny_core.ts and pinned its
+  // TERNARY CHAIN by source text; the merge collapsed the twin cores to one
+  // authority (the exhaustive Record in craft_denial_line_view.ts, which
+  // crafting_deny_core now delegates to), so the chain those pins named no
+  // longer exists. The behaviour they protected keeps its pins: the station
+  // resolution below, the exhaustive table in tests/craft_denial_line_view.test.ts,
+  // and the release's own behavioural suite tests/crafting_deny_core.test.ts,
+  // which still drives craftDenyMessage end to end through the delegate.
+  const denyCore = codeOnly(
+    readFileSync(
+      path.resolve(process.cwd(), 'src/ui/hud/professions/crafting_deny_core.ts'),
+      'utf8',
+    ),
+  );
+  const denyTable = codeOnly(
+    readFileSync(
+      path.resolve(process.cwd(), 'src/ui/hud/professions/craft_denial_line_view.ts'),
+      'utf8',
+    ),
+  );
+
+  it('the release core resolves the station from recipe content and delegates the key', () => {
+    // No station field rides the event: the type comes from static recipe
+    // content, identical in both worlds. The third argument (phase 14) is the
+    // daily-gate refusal countdown off the event, threaded through so the
+    // dailyLimitRetry upgrade stays a table decision, never a hud branch.
+    expect(denyCore).toMatch(
+      /craftDenialLine\(reason, recipeById\(recipeId\)\?\.stationType, retryAfterSeconds\)/,
     );
   });
 
-  it('a resolved type renders the NAMED toast via stationRequired + stationNameText', () => {
-    expect(hud).toContain("t('hudChrome.crafting.stationRequired', {");
-    expect(hud).toContain('station: stationNameText(deny.stationType),');
-  });
-
-  it('no_bag_space pairs with the noBagSpace toast, insufficientMaterials as the chain tail', () => {
-    // The reason chain reads no_bag_space ? noBagSpace : insufficientMaterials,
-    // so pin the pairing (a key swap in the ternary tail must fail here) rather
-    // than a bare presence check that two swapped keys could still satisfy.
-    expect(core).toMatch(
-      /reason === 'no_bag_space'\s*\?\s*'hudChrome\.crafting\.noBagSpace'\s*:\s*'hudChrome\.crafting\.insufficientMaterials'/,
+  it('no_bag_space keeps its own toast, insufficient_materials stays the fall-through', () => {
+    // The pairing the release pinned on its ternary tail, held on the Record
+    // that replaced it: a key swap between these two rows reds here.
+    expect(denyTable).toMatch(/no_bag_space: 'hudChrome\.crafting\.noBagSpace',/);
+    expect(denyTable).toMatch(
+      /insufficient_materials: 'hudChrome\.crafting\.insufficientMaterials',/,
     );
   });
 });

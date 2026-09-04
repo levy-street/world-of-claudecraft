@@ -7,6 +7,7 @@
 // drive window.__game directly: sim.addItem, hud.toggleBags/toggleMap, sim.player.pos).
 
 import { dismissEntryOverlays } from './enter_offline_game.mjs';
+import { masterwroughtReviewTargets } from './lib/pr_shot_masterwrought.mjs';
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -537,6 +538,33 @@ export async function seedLowGraphicsPreset(page) {
   );
 }
 
+/** Dismiss the tutorial-island greeting dialog if it has spawned: standalone
+ *  pages enter at The Proving Shore, where Ferryman Odo's greeting pops a few
+ *  beats after entry and would overlap (or swallow the clicks of) any staged
+ *  window shot. Click its own confirm so the dismissal is the real path. */
+async function dismissTutorialGreeting(page) {
+  await page.evaluate(() => {
+    for (const id of ['tutorial-greeting', 'profession-tutorial']) {
+      const popup = document.getElementById(id);
+      popup?.querySelector('button')?.click();
+      popup?.remove();
+    }
+  });
+  await wait(200);
+}
+
+/** Deliberate MEDIUM leg for treatments hidden below the medium effects tier
+ *  (renderer gates like gfxTierAtLeast(GFX.effectsTier, 'medium')). Preset 2 is
+ *  the LOWEST numeric preset whose tier passes such a gate (gfx.ts
+ *  tierFromHints maps 2 to 'medium', and an explicit stored preset is honored
+ *  even on software GL), so this stays as close to the standing lowest-preset
+ *  rule as the subject allows. */
+async function seedMediumGraphicsPreset(page) {
+  await page.evaluateOnNewDocument(
+    `try { const s = JSON.parse(localStorage.getItem('woc_settings') ?? '{}') || {}; s.graphicsPreset = 2; s.graphicsDefaultApplied = true; localStorage.setItem('woc_settings', JSON.stringify(s)); } catch {}`,
+  );
+}
+
 /** Deliberate HIGH comparison leg for identity-versus-bloom evidence. */
 async function seedHighGraphicsPreset(page) {
   await page.evaluateOnNewDocument(
@@ -724,7 +752,7 @@ const fakePadSeed = async (page) => {
 
 // Pin the page's clock to a LOCAL Saturday noon before the app boots, so the
 // weekly Double Honor surfaces render their active state through the real code
-// path (currentResetDay reads the local clock; src/sim/pvp/honor_event.ts turns
+// path (feedSimCalendar reads the local clock; src/sim/pvp/honor_event.ts turns
 // Saturday reset days into the event). A Date subclass shim rather than a sim
 // poke: main.ts re-supplies resetDay every frame, so a staged write would be
 // overwritten one frame later. String form for the usual tsx keepNames reason.
@@ -767,6 +795,10 @@ const fakePadAxesSeed = async (page) => {
 };
 
 export const TARGETS = [
+  ...masterwroughtReviewTargets({
+    beforeLoad: lowGraphicsSeed,
+    dismissOverlays: dismissEntryOverlays,
+  }),
   {
     key: 'ravenrift',
     label:
@@ -1020,7 +1052,7 @@ export const TARGETS = [
   {
     key: 'skill-milestone-plate',
     label: 'Banner: gathering skill milestone plate (#2934)',
-    when: ['ui/skill_level_toast_view'],
+    when: ['ui/hud/professions/skill_level_toast_view'],
     // Drives the REAL observation path: the handleEvents tail baselines the
     // live meta proficiency on one drain, then a later mutation crosses 25 (a
     // milestone, safely below the 100/200 deed bands so no deed plate
@@ -2986,7 +3018,7 @@ export const TARGETS = [
       'material_profession_hint_view',
       'material_profession_affinity',
       'craft_name_view',
-      'ui/material_hint',
+      'ui/hud/professions/material_hint',
     ],
     // Classic AND Parchment presets: the line's craft tint is a theme-emitted
     // token repaired per preset (src/ui/theme.ts --color-material-use), and the light
@@ -3057,7 +3089,7 @@ export const TARGETS = [
   {
     key: 'elixir-use-tooltip',
     label: 'Elixir of the Boar tooltip with its Use line',
-    when: ['ui/elixir_tooltip_view'],
+    when: ['ui/hud/professions/elixir_tooltip_view'],
     // Desktop only, the material-usedby-tooltip rationale: the synthetic
     // hover path does not raise #tooltip on the touch layout, and the
     // tooltip content is byte-identical on mobile.
@@ -3324,7 +3356,7 @@ export const TARGETS = [
   {
     key: 'profession-grant-lines',
     label: 'Chat log: one line per profession grant (#2430)',
-    when: ['ui/grant_line_view', 'ui/enchanting_view', 'sim/professions'],
+    when: ['ui/grant_line_view', 'ui/hud/professions/enchanting_view', 'sim/professions'],
     // Runs four profession actions back to back through the REAL sim commands
     // (craft, salvage, disenchant, apply enchant) and clips the chat log, so
     // the before/after pair shows the same four actions producing eight grant
@@ -3746,12 +3778,12 @@ export const TARGETS = [
     key: 'crafting',
     label: 'Crafting window',
     when: [
-      'ui/crafting_view',
-      'ui/crafting_window',
+      'ui/hud/professions/crafting_view',
+      'ui/hud/professions/crafting_window',
       'sim/content/recipes',
       'sim/professions',
-      'ui/profession_identity_card',
-      'ui/profession_identity_view',
+      'ui/hud/professions/profession_identity_card',
+      'ui/hud/professions/profession_identity_view',
     ],
     // Desktop and mobile variants: the legibility rows (skill line,
     // difficulty label, station badge, combo reason) are actionable info and
@@ -4098,8 +4130,8 @@ export const TARGETS = [
     key: 'commission-board',
     label: 'Commission order board (issue #1298)',
     when: [
-      'ui/commission_order_view',
-      'ui/commission_order_window',
+      'ui/hud/professions/commission_order_view',
+      'ui/hud/professions/commission_order_window',
       'sim/professions/commission_order',
     ],
     // Stages one order per section: an open request the viewer posted
@@ -4185,7 +4217,11 @@ export const TARGETS = [
   {
     key: 'gather-node-hover-tooltip',
     label: 'World hover: gather-node requirement and wield lines (#2343, R22)',
-    when: ['ui/gather_node_tooltip_controller', 'ui/gathering_view', 'professions/gathering'],
+    when: [
+      'ui/gather_node_tooltip_controller',
+      'ui/hud/professions/gathering_view',
+      'professions/gathering',
+    ],
     // Teleport onto the starter ore vein and sweep the REAL mouse over it: the
     // hover tooltip only paints through the live pointermove raycast, so the
     // sweep proves the actual path. Toolless shows the red requires-a-pick
@@ -6517,7 +6553,7 @@ export const TARGETS = [
   {
     key: 'worn-enchant-tooltip',
     label: 'Paperdoll tooltip after enchanting the WORN piece in place',
-    when: ['professions/enchanting', 'ui/enchant_apply_view'],
+    when: ['professions/enchanting', 'ui/hud/professions/enchant_apply_view'],
     // Equip a plain sword, apply an enchant to it IN PLACE (the worn arm), then
     // hover its paperdoll row: the enchanted marker and the green bonus stat line
     // read off equippedInstances without the piece ever leaving the slot. Full
@@ -8037,7 +8073,13 @@ export const TARGETS = [
   {
     key: 'professions',
     label: 'Professions wheel window',
-    when: ['src/ui/professions_view.ts', 'src/ui/professions_window.ts'],
+    // content/professions: registering or retuning a profession in the content
+    // table changes what this window renders (the farming Phase 1 lesson).
+    when: [
+      'src/ui/hud/professions/professions_view.ts',
+      'src/ui/hud/professions/professions_window.ts',
+      'content/professions',
+    ],
     variants: [
       { key: 'desktop-full', charClass: 'warrior', charName: 'Forgeheart' },
       { key: 'desktop-simplified', charClass: 'mage', charName: 'Newhand', simplified: true },
@@ -8048,6 +8090,13 @@ export const TARGETS = [
         key: 'desktop-gathering',
         charClass: 'warrior',
         charName: 'Forgeheart',
+        scrollSel: '.prof-gathering',
+      },
+      {
+        key: 'mobile-gathering',
+        charClass: 'warrior',
+        charName: 'Anvilmar',
+        mobile: true,
         scrollSel: '.prof-gathering',
       },
     ],
@@ -8108,6 +8157,9 @@ export const TARGETS = [
               { professionId: 'logging', skill: 45, maxSkill: 100 },
               { professionId: 'herbalism', skill: 100, maxSkill: 100 },
               { professionId: 'fishing', skill: 68, maxSkill: 200 },
+              // Farming is registered but ungainable until its growth phase
+              // ships, so the honest staged value is the only live one: 0.
+              { professionId: 'farming', skill: 0, maxSkill: 100 },
             ],
           };
           // professionsState is a data read on BOTH world shapes (a getter on
@@ -8312,7 +8364,7 @@ export const TARGETS = [
       'ui/hud/vendor/vendor_window',
       // The shared profession-name table renders INTO the requirement line, so
       // a change there changes this frame.
-      'ui/gathering_profession_name',
+      'ui/hud/professions/gathering_profession_name',
     ],
     // Quartermaster Bree is the only counter carrying all three rungs of a
     // ladder at once (Highwatch has tier-1 through tier-3 ground), so one frame
@@ -9045,8 +9097,8 @@ export const TARGETS = [
     when: [
       'ui/hud/quest/quest_dialog_controller',
       'sim/quests/profession_quest_effects',
-      'ui/profession_tutorial_window',
-      'ui/profession_identity_view.ts',
+      'ui/hud/professions/profession_tutorial_window',
+      'ui/hud/professions/profession_identity_view.ts',
     ],
     // The legibility rule: the full pre-commit picture (majors, hobby,
     // dormancy, and the escalating make-amends return cost) must be visible in
@@ -10212,11 +10264,23 @@ export const TARGETS = [
         return { clip: '#ui' };
       }
       if (variant?.picker || variant?.targets) {
-        // Click the Apply Enchant row (the staged reagent's only action).
-        await page.evaluate(() => {
-          const rows = [...document.querySelectorAll('#ctx-menu .ctx-item')];
-          rows[rows.length - 1]?.click();
+        // Click the Apply Enchant row by its act token: the reagent's menu is no
+        // longer a single-action list (the per-copy Lock Item row sits LAST since
+        // #3042), so the old last-row click shot the lock instead of the picker.
+        const drilled = await page.evaluate(() => {
+          const row =
+            document.querySelector('#ctx-menu .ctx-item[data-act="applyEnchant"]') ??
+            [...document.querySelectorAll('#ctx-menu .ctx-item')].find((r) =>
+              (r.textContent ?? '').includes('Apply Enchant'),
+            );
+          if (!row) return false;
+          row.click();
+          return true;
         });
+        // A missed drill must FAIL, not shoot the still-open action menu
+        // labelled as the picker (both share #ctx-menu, so pollForSize alone
+        // cannot tell them apart).
+        if (!drilled) throw new Error('no Apply Enchant row on the reagent menu');
         await wait(500);
         if (!(await pollForSize(page, '#ctx-menu'))) throw new Error('enchant picker did not open');
         if (variant?.targets) {
@@ -11162,6 +11226,396 @@ export const TARGETS = [
     },
   },
   {
+    key: 'farm-patches',
+    label: 'Farming hub garden beds with per-viewer growth stages (Eastbrook patch)',
+    when: ['render/farm_patches', 'assets/farm_props', 'content/farm_patches'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await page.waitForFunction(
+        () => {
+          const loading = document.querySelector('#loading-screen');
+          const ui = document.querySelector('#ui');
+          return (
+            document.body.classList.contains('game-active') &&
+            !!ui &&
+            getComputedStyle(ui).display !== 'none' &&
+            !!loading &&
+            !loading.classList.contains('visible')
+          );
+        },
+        { timeout: 90000, polling: 200 },
+      );
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      const staged = await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const player = sim?.player;
+        if (!sim || !player?.pos) return { ok: false, reason: 'offline world is unavailable' };
+        // Stand in the middle of the Eastbrook patch (beds at x -24/-19, z
+        // -84/-79 since release/v0.41.0 moved the patch onto the town's own
+        // ground, src/sim/content/farm_patches.ts; walkable by the no-collider
+        // ruling) so beds frame the player whichever way the camera faces, and
+        // every bed sits 3.54 yd away, inside plantCrop's INTERACT_RANGE (a
+        // stand point out of range plants nothing: the sim refuses silently
+        // with a farmDenied range event).
+        player.pos.x = -21.5;
+        player.pos.z = -81.5;
+        sim.addItem?.('garden_hoe', 1);
+        sim.addItem?.('vale_wheat_seed', 4);
+        sim.addItem?.('brook_carrot_seed', 4);
+        // The patch sits in Forest Wolf territory and a hit interrupts the
+        // plant cast, so shove every nearby hostile far away before staging.
+        const ents = sim.entities?.values?.();
+        if (ents) {
+          for (const e of ents) {
+            if (!e?.hostile || !e.pos) continue;
+            const dx = e.pos.x - player.pos.x;
+            const dz = e.pos.z - player.pos.z;
+            if (dx * dx + dz * dz < 60 * 60) {
+              e.pos.x += 500;
+              e.pos.z += 500;
+            }
+          }
+        }
+        return { ok: true };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      // Plant the four beds ONE AT A TIME: plantCrop starts a real cast, so a
+      // second plant while the first is casting refuses with "You are busy".
+      // Poll for the plot row to exist (cast complete) before the next plant,
+      // and retry a bed whose cast got interrupted. On the base build the
+      // plots still plant sim-side but no bed or crop renders, which is the
+      // honest BEFORE at identical framing.
+      const PLANTS = [
+        ['bed_eastbrook_1', 'vale_wheat'],
+        ['bed_eastbrook_2', 'brook_carrot'],
+        ['bed_eastbrook_3', 'vale_wheat'],
+        ['bed_eastbrook_4', 'brook_carrot'],
+      ];
+      for (const [bedId, cropId] of PLANTS) {
+        let planted = false;
+        for (let attempt = 0; attempt < 4 && !planted; attempt++) {
+          await page.evaluate(
+            (bed, crop) => window.__game?.sim?.plantCrop?.(bed, crop),
+            bedId,
+            cropId,
+          );
+          for (let i = 0; i < 10; i++) {
+            planted = await page.evaluate((bed) => {
+              const sim = window.__game?.sim;
+              return !!sim?.players?.get?.(sim?.playerId)?.farmPlots?.get?.(bed);
+            }, bedId);
+            if (planted) break;
+            await wait(400);
+          }
+        }
+      }
+      // Spread the timers so one frame shows the whole ladder: sprout,
+      // seedling, maturing, ready. Direct PlotState edits are the offline
+      // shot idiom (the skill-toast target mutates player meta the same
+      // way); the adapter re-reads on its uniform cadence.
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const plots = sim?.players?.get?.(sim?.playerId)?.farmPlots;
+        const now = sim?.farmNowMs?.();
+        if (!plots?.get || typeof now !== 'number') return;
+        const shape = (bedId, elapsedMs, totalMs) => {
+          const p = plots.get(bedId);
+          if (!p) return;
+          p.plantedAtMs = now - elapsedMs;
+          p.readyAtMs = p.plantedAtMs + totalMs;
+        };
+        shape('bed_eastbrook_1', 5_000, 100_000);
+        shape('bed_eastbrook_2', 40_000, 100_000);
+        shape('bed_eastbrook_3', 75_000, 100_000);
+        shape('bed_eastbrook_4', 200_000, 100_000);
+      });
+      // Give the adapter's 0.5s read cadence and the deferred farm GLBs time
+      // to land; keep dismissing overlays right up to the shot.
+      for (let i = 0; i < 12; i++) {
+        await page.evaluate(() => {
+          document.querySelector('.camera-prompt-confirm')?.click();
+          document.querySelector('.tut-skip')?.click();
+          document.querySelector('.gpu-notice-dismiss')?.click();
+        });
+        await wait(500);
+      }
+      return { clip: '#ui' };
+    },
+  },
+  {
+    key: 'farm-feast',
+    label: 'Placed harvest feast beside the Eastbrook garden beds (the shared feast)',
+    when: ['sim/professions/feast', 'game/feast_interact', 'ui/hud/professions/feast_tooltip_view'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      // The beds give the shot its farming context; the staging helper owns
+      // the game-active wait, the framing stand point, and the hostile shove.
+      await stageEastbrookBeds(page);
+      // Grant and place the feast, then take the placer's own bite so the
+      // shot shows the sit-and-eat beside the spread. Optional-chained on
+      // purpose: on the BASE build neither verb exists, so the staging
+      // degrades to the plain beds at identical framing, the honest BEFORE
+      // (the Phase 8 base-shot precedent).
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        sim?.addItem?.('harvest_feast', 1);
+        sim?.placeFeast?.();
+      });
+      await wait(600);
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const feastId = sim?.feasts ? [...sim.feasts.keys()][0] : undefined;
+        if (feastId !== undefined) sim?.consumeFeast?.(feastId);
+      });
+      // Give the adapter's 0.5s read cadence and the deferred feast GLB time
+      // to land; keep dismissing overlays right up to the shot.
+      for (let i = 0; i < 12; i++) {
+        await page.evaluate(() => {
+          document.querySelector('.camera-prompt-confirm')?.click();
+          document.querySelector('.tut-skip')?.click();
+          document.querySelector('.gpu-notice-dismiss')?.click();
+        });
+        await wait(500);
+      }
+      return { clip: '#ui' };
+    },
+  },
+  {
+    key: 'harvest-journal',
+    label: 'Harvest Journal window with staged growth ladder (Eastbrook beds)',
+    when: ['ui/hud/professions/harvest_journal'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page, shot) {
+      await stageEastbrookBeds(page);
+      // Open through the real toggle the keybind dispatches to; the window's
+      // own 1 Hz countdown driver needs a beat to stamp the time cells.
+      await page.evaluate(() => window.__game?.hud?.toggleHarvestJournal?.());
+      const open = await pollForSize(page, '#harvest-journal-window');
+      if (!open) return { skip: 'the harvest journal never opened' };
+      await wait(1600);
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+      });
+      // Mobile clips the whole HUD so the shot also proves safe-area placement
+      // and shows the minimap farm-patch pin beside the open window.
+      return { clip: shot?.mobile ? '#ui' : '#harvest-journal-window' };
+    },
+  },
+  {
+    key: 'farm-map-pins',
+    label: 'World map farm-patch pins from the Eastbrook garden beds',
+    when: [
+      'ui/map_window_view',
+      'ui/map_window_painter',
+      'ui/minimap_markers',
+      'ui/minimap_painter',
+    ],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await stageEastbrookBeds(page);
+      await page.evaluate(() => window.__game?.hud?.toggleMap?.());
+      const open = await pollForSize(page, '#map-window');
+      if (!open) return { skip: 'the map window never opened' };
+      await wait(600);
+      return { clip: '#map-window' };
+    },
+  },
+  {
+    key: 'farmer-jessica',
+    label: 'Farmer Jessica beside the Eastbrook garden beds (the farming go-live face)',
+    when: ['professions/farmer_npcs', 'content/zone1'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await stageFarmerJessica(page);
+      // Let the deferred farm GLBs and the NPC mesh land; keep dismissing
+      // overlays right up to the shot.
+      for (let i = 0; i < 10; i++) {
+        await page.evaluate(() => {
+          document.querySelector('.camera-prompt-confirm')?.click();
+          document.querySelector('.tut-skip')?.click();
+          document.querySelector('.gpu-notice-dismiss')?.click();
+        });
+        await wait(500);
+      }
+      return { clip: '#ui' };
+    },
+  },
+  {
+    key: 'farm-intro-quest-dialog',
+    label:
+      'Farmer Jessica gossip menu and the First Furrow quest detail (magic sentence, journal pointer)',
+    when: ['professions/farmer_npcs', 'hud/quest/gossip_menu', 'hud/quest/quest_dialog_controller'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await stageFarmerJessica(page);
+      const setup = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        const jess = [...sim.entities.values()].find((e) => e.templateId === 'farmer_jessica');
+        if (!jess) return { ok: false, reason: 'no farmer_jessica entity (base build?)' };
+        const el = document.querySelector('#quest-dialog');
+        if (el) el.style.display = 'none';
+        game.hud.openQuestDialog(jess.id);
+        return { ok: true };
+      });
+      if (!setup.ok) throw new Error(`farm-intro-quest-dialog setup failed: ${setup.reason}`);
+      const open = await pollForSize(page, '#quest-dialog');
+      if (!open) throw new Error('quest dialog did not open');
+      await wait(300);
+      // The gossip menu itself (quest row, Browse Goods, Trade husks for
+      // compost) is the first frame's claim; then the quest detail with the
+      // intro text is the second. One target, two shots would need two
+      // variants per viewport, so this shot holds the DETAIL view (the text
+      // is the design promise) with the menu already proven by the row test.
+      await page.evaluate(() => {
+        document.querySelector('#quest-dialog [data-quest="q_farm_intro"]')?.click();
+      });
+      await wait(400);
+      // The detail view is the narrative block plus the objectives sub-list;
+      // the accept button is a plain <button> the controller appends after it.
+      const detail = await page.evaluate(() => {
+        const dialog = document.querySelector('#quest-dialog');
+        return (
+          Boolean(dialog?.querySelector('.qd-obj')) &&
+          Boolean(dialog?.querySelector('button:not(.qd-list-item):not(.x-btn)'))
+        );
+      });
+      if (!detail) throw new Error('the First Furrow detail did not render');
+      return { clip: '#quest-dialog' };
+    },
+  },
+  {
+    key: 'farmer-gossip-menu',
+    label: 'Farmer Jessica gossip menu: quest, Browse Goods, Trade husks for compost',
+    when: ['professions/farmer_npcs', 'hud/quest/gossip_menu', 'hud/quest/quest_dialog_controller'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await stageFarmerJessica(page);
+      const setup = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        const jess = [...sim.entities.values()].find((e) => e.templateId === 'farmer_jessica');
+        if (!jess) return { ok: false, reason: 'no farmer_jessica entity (base build?)' };
+        const el = document.querySelector('#quest-dialog');
+        if (el) el.style.display = 'none';
+        game.hud.openQuestDialog(jess.id);
+        return { ok: true };
+      });
+      if (!setup.ok) throw new Error(`farmer-gossip-menu setup failed: ${setup.reason}`);
+      const open = await pollForSize(page, '#quest-dialog');
+      if (!open) throw new Error('quest dialog did not open');
+      await wait(400);
+      const rows = await page.evaluate(() => ({
+        quest: Boolean(document.querySelector('#quest-dialog [data-quest="q_farm_intro"]')),
+        goods: Boolean(document.querySelector('#quest-dialog [data-vendor]')),
+        husks: Boolean(document.querySelector('#quest-dialog [data-husk-trade]')),
+      }));
+      if (!rows.quest || !rows.goods || !rows.husks) {
+        throw new Error(`gossip rows missing: ${JSON.stringify(rows)}`);
+      }
+      return { clip: '#quest-dialog' };
+    },
+  },
+  {
+    key: 'farmer-vendor-grid',
+    label: 'Farmer Jessica vendor grid: tier-1 seeds, brook carrot, compost, garden hoe',
+    when: ['professions/farmer_npcs', 'content/zone1'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await stageFarmerJessica(page);
+      const setup = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        const jess = [...sim.entities.values()].find((e) => e.templateId === 'farmer_jessica');
+        if (!jess) return { ok: false, reason: 'no farmer_jessica entity (base build?)' };
+        sim.copper = 5000;
+        const el = document.querySelector('#vendor-window');
+        if (el) el.style.display = 'none';
+        game.hud.openVendor(jess.id);
+        return { ok: true };
+      });
+      if (!setup.ok) throw new Error(`farmer-vendor-grid setup failed: ${setup.reason}`);
+      const open = await pollForSize(page, '#vendor-window');
+      if (!open) throw new Error('vendor window did not open');
+      await wait(400);
+      // Count the GOODS grid's item rows only: the window also lists the
+      // buyback grid, and every stackable good carries a bulk-buy row under
+      // it (.vendor-item-bulk), so Jessica's five goods paint as nine rows.
+      const rows = await page.evaluate(
+        () =>
+          document.querySelectorAll(
+            '#vendor-window .vendor-goods-grid[data-grid="goods"] .vendor-item:not(.vendor-item-bulk)',
+          ).length,
+      );
+      if (rows !== 5) throw new Error(`expected 5 goods rows, saw ${rows}`);
+      return { clip: '#vendor-window' };
+    },
+  },
+  {
+    // The Phase 9b plant surface: standing on a FREE Eastbrook bed with the
+    // tier-1 farming kit in the bags, the real interact gesture (KeyF on
+    // desktop, the mobile-interact button on touch) opens the plant sheet
+    // with the seed rows and the three knob toggles. The press goes through
+    // the real input funnel, never hud.openPlantSheet directly, so the shot
+    // proves the binding is live end to end.
+    key: 'farm-plant-sheet',
+    label: 'The plant sheet opened from a free garden bed by the interact press (Phase 9b)',
+    when: ['ui/hud/professions/farming_plant_sheet', 'game/farm_bed_interact'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page, shot) {
+      await stagePlantSheetBed(page);
+      await page.evaluate(() => {
+        const el = document.activeElement;
+        if (el && el !== document.body) el.blur?.();
+      });
+      const touch = await page.evaluate(() => document.body.classList.contains('mobile-touch'));
+      if (shot?.mobile && touch) {
+        await page.evaluate(() => document.getElementById('mobile-interact')?.click());
+      } else {
+        await page.keyboard.press('KeyF');
+      }
+      const open = await pollForSize(page, '#plant-sheet-window');
+      if (!open) return { skip: 'the plant sheet never opened from the bed press' };
+      await wait(400);
+      // Mobile clips the whole HUD so the shot also proves the sheet fits the
+      // 844x390 landscape viewport beside the touch cluster.
+      return { clip: shot?.mobile ? '#ui' : '#plant-sheet-window' };
+    },
+  },
+  {
     // Auto-unshift (src/sim/combat/form_auto_unshift.ts). The change is a
     // behavior, so the evidence is a MOMENT, not a window: the same press, one
     // second in. Before the change the druid is still wearing the beast and the
@@ -11484,6 +11938,211 @@ export const TARGETS = [
     },
   },
   {
+    key: 'masterwrought-phase10-consumables',
+    label: 'Masterwrought phase 10: flask and role-food tooltips, and the Lucent picker gates',
+    when: [
+      'content/profession_items',
+      'hud/action_bar/consumable_bar_view',
+      'ui/hud/professions/elixir_tooltip_view',
+      'ui/hud/professions/enchant_apply_view',
+      // The painter that mints the gate sub-lines and the row routing. NOT the
+      // mobile stylesheet: a whole-sheet path in a specific target would turn a
+      // hud.mobile.css-only diff from the generic desktop+mobile HUD frames into
+      // these few states (tests/pr_shot_targets.test.ts pins that a mobile CSS
+      // change shoots the generic mobile HUD), which is a narrowing.
+      'ui/bag_item_action_menu',
+    ],
+    // Four states of the phase 10 consumables and enchant surface, each brought
+    // up through the REAL bound events (pointer hover on a bag row, contextmenu
+    // or tap on the reagent's row), never a hand-built
+    // string: the flask tooltip (the shared Use line plus its three rules, the
+    // ranked clean-slate clause included), the role-food tooltip (the Well Fed
+    // line with its one-effect rule), the enchant picker at Enchanting 99 (every
+    // Lucent row inert with its floor line, "Requires Enchanting 100" and 125),
+    // and the same picker at 125 (the three apex rows actionable, the Infusion
+    // inert behind its "Only a Perfected item" line, the honest replacement of
+    // the "No eligible item" answer).
+    //
+    // THE MOBILE TRAY VARIANT IS RETIRED (Phase 11i QA, at the release/v0.40.0
+    // sync). It drove #mobile-consumables-toggle and asserted the
+    // mobile-consumables-open body class, and the touch UI rework replaced that
+    // chip with the ring's 5th-arc consumables SEAT
+    // (hud/action_bar/consumable_seat_controller.ts, #mobile-consumable-seat and
+    // #mobile-consumable-strip, opened by a hold or a leftward swipe rather than
+    // a tap). The old arm did not degrade, it THREW on every capture. It is
+    // removed rather than repointed because driving the new row means driving a
+    // gesture controller, and the release already committed its own before and
+    // after captures of that control under docs/screenshots/touch-ui-rework/.
+    // The six-kind ORDER this variant existed to show is pinned in
+    // tests/consumable_bar_view.test.ts, which is where it belongs.
+    // Tooltips are desktop only, the
+    // elixir-use-tooltip rationale (the synthetic hover does not raise #tooltip
+    // on the touch layout); the picker states shoot both layouts because the
+    // gate lines are the only explanation of an untappable row on touch.
+    // Every variant seeds the LOWEST graphics preset before the document loads
+    // (the standing capture rule): under SwiftShader an unseeded boot resolves
+    // to the low tier in effect, but the seed makes the rule explicit rather
+    // than incidental.
+    variants: [
+      {
+        key: 'flask-tooltip',
+        tooltip: 'ironhusk_flask',
+        itemName: 'Ironhusk Flask',
+        beforeLoad: lowGraphicsSeed,
+      },
+      {
+        key: 'food-tooltip',
+        tooltip: 'stonepot_stew',
+        itemName: 'Stonepot Stew',
+        beforeLoad: lowGraphicsSeed,
+      },
+      { key: 'picker-skill-gated', picker: true, skill: 99, beforeLoad: lowGraphicsSeed },
+      {
+        key: 'picker-skill-gated-mobile',
+        picker: true,
+        skill: 99,
+        mobile: true,
+        beforeLoad: lowGraphicsSeed,
+      },
+      { key: 'picker-perfected', picker: true, skill: 125, beforeLoad: lowGraphicsSeed },
+      {
+        key: 'picker-perfected-mobile',
+        picker: true,
+        skill: 125,
+        mobile: true,
+        beforeLoad: lowGraphicsSeed,
+      },
+    ],
+    async capture(page, variant) {
+      await page.waitForFunction(() => window.__game?.sim?.player, { timeout: 90000 });
+      await dismissEntryOverlays(page);
+      const staged = await page.evaluate(
+        (tooltipId, wantsPicker, skill) => {
+          const game = window.__game;
+          const sim = game?.sim;
+          if (!game || !sim?.player) return { ok: false, reason: 'offline world unavailable' };
+          if (tooltipId) {
+            // ONE copy of the reported item, so the bag-cell lookup by display
+            // name below is unambiguous.
+            sim.addItem(tooltipId, 1);
+            return { ok: true };
+          }
+          if (wantsPicker) {
+            // The whole Lucent bill at once so affordability never masks the
+            // gate under test: weapon and chest take lucent 1 + shard 1 +
+            // essence 2/3, boots lucent 1 + dust 4, the Infusion lucent 3 +
+            // shard 2. The applier's flat Enchanting skill is written on the
+            // primary meta, the same map craftingIdentity derives from live.
+            sim.addItem('lucent_reagent', 6);
+            sim.addItem('arcane_shard', 4);
+            sim.addItem('arcane_essence', 6);
+            sim.addItem('arcane_dust', 8);
+            const meta = sim.players.get(sim.playerId);
+            if (!meta?.craftSkills) return { ok: false, reason: 'no primary meta craftSkills' };
+            meta.craftSkills.enchanting = skill;
+            return { ok: true };
+          }
+          return { ok: false, reason: 'unknown variant' };
+        },
+        variant?.tooltip ?? null,
+        Boolean(variant?.picker),
+        variant?.skill ?? 0,
+      );
+      if (!staged.ok) throw new Error(staged.reason);
+      // Writing the skill trips the once-ever first-tier tutorial modal
+      // (profTierTutorial) a tick or two later; wait for it and dismiss it
+      // through its own OK button so the picker is not shot behind a modal.
+      // Polled rather than a fixed wait: the tick that raises it lands at a
+      // different delay per boot, and a too-early click misses it.
+      const dismissTierTutorial = async () => {
+        if (await pollForSize(page, '#profession-tutorial', 8, 250)) {
+          await page.evaluate(() => {
+            document.querySelector('#profession-tutorial .cd-ok')?.click();
+          });
+          await wait(300);
+        }
+      };
+      if (variant?.picker) await dismissTierTutorial();
+      // Bags for the tooltip hover and the reagent's action menu.
+      await page.evaluate(() => {
+        const el = document.querySelector('#bags');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.toggleBags?.();
+      });
+      if (!(await pollForSize(page, '#bags'))) throw new Error('bags window did not open');
+      if (variant?.tooltip) {
+        const hovered = await page.evaluate((itemName) => {
+          const rows = [...document.querySelectorAll('#bags .bag-item:not(.empty)')];
+          const el = rows.find((r) => (r.getAttribute('aria-label') ?? '').includes(itemName));
+          if (!el) return false;
+          const r = el.getBoundingClientRect();
+          for (const type of [
+            'pointerenter',
+            'pointerover',
+            'mouseenter',
+            'mouseover',
+            'pointermove',
+            'mousemove',
+          ]) {
+            el.dispatchEvent(
+              new MouseEvent(type, {
+                bubbles: true,
+                clientX: r.left + r.width / 2,
+                clientY: r.top + r.height / 2,
+              }),
+            );
+          }
+          return true;
+        }, variant.itemName);
+        if (!hovered) throw new Error(`no bag row for ${variant.itemName}`);
+        await wait(600);
+        return { clip: '#ui' };
+      }
+      // Open the reagent's action menu through the real handler (contextmenu on
+      // desktop, a tap on the mobile-touch layout), then its Apply Enchant row.
+      const opened = await page.evaluate(() => {
+        const rows = [...document.querySelectorAll('#bags .bag-item:not(.empty)')];
+        const el = rows.find((r) =>
+          (r.getAttribute('aria-label') ?? '').includes('Lucent Reagent'),
+        );
+        if (!el) return false;
+        const r = el.getBoundingClientRect();
+        el.dispatchEvent(
+          new MouseEvent(
+            document.body.classList.contains('mobile-touch') ? 'click' : 'contextmenu',
+            {
+              bubbles: true,
+              cancelable: true,
+              clientX: r.x + r.width / 2,
+              clientY: r.y + r.height / 2,
+            },
+          ),
+        );
+        return true;
+      });
+      if (!opened) throw new Error('no Lucent Reagent bag row to open the action menu on');
+      if (!(await pollForSize(page, '#ctx-menu'))) throw new Error('action menu did not open');
+      // By act token, never by position: the reagent's menu is Use / Apply
+      // Enchant / Lock Item, and the lock row is last (#3042).
+      const drilled = await page.evaluate(() => {
+        const row = document.querySelector('#ctx-menu .ctx-item[data-act="applyEnchant"]');
+        if (!row) return false;
+        row.click();
+        return true;
+      });
+      if (!drilled) throw new Error('no Apply Enchant row on the Lucent Reagent menu');
+      await wait(500);
+      if (!(await pollForSize(page, '#ctx-menu'))) throw new Error('enchant picker did not open');
+      // A late modal must not sit over the picker; the picker itself stays
+      // open (the modal is not a click on the menu's outside).
+      await page.evaluate(() => {
+        document.querySelector('#profession-tutorial .cd-ok')?.click();
+      });
+      await wait(300);
+      return { clip: '#ui' };
+    },
+  },
+  {
     key: 'practice-row',
     label: 'The Highwatch practice row seen from the approach',
     when: ['practice_dummies'],
@@ -11669,6 +12328,356 @@ export const TARGETS = [
     },
   },
   {
+    // Masterwrought phase 14: the character sheet's cap visibility over a
+    // worn at-cap pair (warblade + bulwark, both masterwrought): the
+    // "Masterwrought slots: 2 / 2" row, the per-slot marks, and the worn
+    // tooltip line all read from the same masterwrought_cap_view readout.
+    key: 'masterwrought-cap',
+    label: 'The character sheet at the Masterwrought equip cap (phase 14)',
+    when: ['ui/masterwrought_cap_view'],
+    variants: [{ key: 'desktop', beforeLoad: seedLowGraphicsPreset }],
+    async capture(page) {
+      await dismissTutorialGreeting(page);
+      await page.evaluate(() => {
+        const g = window.__game;
+        g?.sim?.setPlayerLevel?.(30);
+        g?.sim?.addItem?.('duskforged_warblade', 1);
+        g?.sim?.addItem?.('duskforged_bulwark', 1);
+        g?.sim?.equipItem?.('duskforged_warblade');
+        g?.sim?.equipItem?.('duskforged_bulwark');
+        g?.hud?.toggleChar?.();
+      });
+      const open = await pollForSize(page, '#char-window');
+      if (!open) return { skip: 'the character window never opened' };
+      await wait(400);
+      return { clip: '#char-window' };
+    },
+  },
+  {
+    // Masterwrought phase 14: the Perfecting window over a bagged apex piece
+    // with the attempt bill in reach, so the shot carries the candidate
+    // radiogroup, the shared prof-track rank track, the materials rows, and
+    // the R2 bind warning in one frame. Opened through the Hud entry the
+    // crafting title-bar button routes to. On a base checkout the optional
+    // chains degrade to a skip (the window does not exist there; the honest
+    // BEFORE is the crafting window's own shot).
+    key: 'perfecting-window',
+    label: 'The Perfecting window: candidates, rank track, bill, bind warning (phase 14)',
+    when: ['ui/hud/professions/perfecting_view', 'ui/hud/professions/perfecting_window'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page, shot) {
+      await dismissTutorialGreeting(page);
+      await page.evaluate(() => {
+        const g = window.__game;
+        const meta = g?.sim?.players?.get?.(g?.sim?.primaryId);
+        if (meta?.craftSkills) meta.craftSkills.weaponcrafting = 125;
+        g?.sim?.addItem?.('duskforged_warblade', 1);
+        g?.sim?.addItem?.('makers_ember', 1);
+        g?.sim?.addItem?.('sundered_essence', 1);
+        g?.sim?.addItem?.('prismglass_setting', 1);
+        g?.hud?.openPerfecting?.();
+      });
+      const open = await pollForSize(page, '#perfecting-window');
+      if (!open) return { skip: 'the perfecting window never opened (base checkout?)' };
+      // The staged skill crossing a tier pops the first-tier profession
+      // tutorial AFTER the entry flow's dismissal already ran; clear it
+      // before the shot (the naming target's precedent).
+      await wait(400);
+      await dismissTutorialGreeting(page);
+      // Mobile clips the whole HUD so the shot also proves the window fits
+      // the 844x390 landscape viewport beside the touch cluster.
+      return { clip: shot?.mobile ? '#ui' : '#perfecting-window' };
+    },
+  },
+  {
+    // The legendary naming dialog over a Perfected, promotion-ready bagged
+    // copy: the 32-char cap, the live count, the shape hint, and the
+    // debounce-armed submit, with a draft typed so the count reads real.
+    key: 'perfecting-naming',
+    label: 'The legendary naming dialog (phase 14)',
+    when: ['ui/hud/professions/legendary_naming_controller'],
+    variants: [{ key: 'desktop', beforeLoad: seedLowGraphicsPreset }],
+    async capture(page) {
+      await dismissTutorialGreeting(page);
+      await page.evaluate(() => {
+        const g = window.__game;
+        const meta = g?.sim?.players?.get?.(g?.sim?.primaryId);
+        if (meta?.craftSkills) meta.craftSkills.weaponcrafting = 125;
+        g?.sim?.addItemInstance?.('duskforged_warblade', { perfected: true, boundTo: 1 });
+        g?.sim?.addItem?.('deed_of_making', 1);
+        g?.hud?.openPerfecting?.();
+      });
+      if (!(await pollForSize(page, '#perfecting-window'))) {
+        return { skip: 'the perfecting window never opened (base checkout?)' };
+      }
+      // The staged skill crossing a tier can pop the first-tier profession
+      // tutorial over the window; clear it before driving the action button.
+      await dismissTutorialGreeting(page);
+      await page.evaluate(() => {
+        document.querySelector('#perfecting-window [data-action]')?.click();
+      });
+      if (!(await pollForSize(page, '.pf-name-prompt'))) {
+        return { skip: 'the naming dialog never opened (no promote affordance?)' };
+      }
+      await page.type('.pf-name-input', 'Oathkeeper');
+      await wait(300);
+      return { clip: '#prompt-stack' };
+    },
+  },
+  {
+    // The kind-fair consumable tray (phase 14): a potion-and-elixir-heavy bag
+    // seats the flask instead of starving it (the recorded residual this
+    // phase fixed). Mobile only: the six-seat strip is the touch HUD's quick
+    // tray, revealed from the consumable ring seat in tap mode.
+    key: 'consumable-tray',
+    label: 'The quick tray seating every present consumable kind (phase 14)',
+    when: ['ui/hud/action_bar/consumable_bar_view'],
+    variants: [{ key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset }],
+    async capture(page) {
+      await dismissTutorialGreeting(page);
+      await page.evaluate(() => {
+        const g = window.__game;
+        for (const id of [
+          'minor_healing_potion',
+          'lesser_healing_potion',
+          'minor_mana_potion',
+          'lesser_mana_potion',
+          'elixir_of_the_bear',
+          'elixir_of_the_boar',
+          'husk_flask',
+        ]) {
+          g?.sim?.addItem?.(id, 1);
+        }
+      });
+      await wait(400);
+      // The strip reveals on the HOLD gesture (the shared strip layer's
+      // reveal timer); keep the touch held through the shot so the row stays
+      // open, exactly as a player mid-gesture sees it.
+      await holdOpen(page, '#mobile-consumable-seat');
+      const expanded = await page.evaluate(
+        () =>
+          document.getElementById('mobile-consumable-seat')?.getAttribute('aria-expanded') ===
+          'true',
+      );
+      if (!expanded) return { skip: 'the consumable strip never revealed from the seat hold' };
+      await wait(300);
+      return { clip: '#ui' };
+    },
+  },
+  {
+    // Masterwrought phase 16: the orange legendary regalia identity, the
+    // world-space forge-mote drift over a wearer whose worn slot carries a
+    // legendary-rolled payload (the renderer entity loop over
+    // legendary_regalia_core.ts). PRESET NOTE: the treatment is hidden below
+    // the medium effects tier by design (gfxTierAtLeast(GFX.effectsTier,
+    // 'medium')), so the standing lowest-preset rule yields to the
+    // graphics-comparison exception here: both variants seed preset 2 via
+    // seedMediumGraphicsPreset, the lowest numeric preset that passes the
+    // gate (see that helper's header for the mapping).
+    key: 'p16-legendary-regalia',
+    label: 'Legendary regalia forge-mote drift on a worn legendary-rolled piece (phase 16)',
+    when: ['legendary_regalia_core'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedMediumGraphicsPreset },
+      {
+        key: 'mobile',
+        mobile: true,
+        beforeLoad: seedMediumGraphicsPreset,
+        // The runner's default iPhone UA lands gfx.ts's iOS memory profile,
+        // which pins Lambert materials at EVERY preset, and the Lambert
+        // outdoor branch never applies the day/night grade (updateAmbience),
+        // so the evening staging cannot darken the frame there and full
+        // daylight washes the additive motes out (verified: the override
+        // reached the renderer, sunDir moved, the frame stayed noon). An
+        // Android phone profile keeps standard materials at the medium
+        // preset and shows the graded evening the way a real Android phone
+        // does; iOS-profile devices genuinely never see the grade.
+        userAgent:
+          'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36',
+      },
+    ],
+    async capture(page, variant) {
+      await dismissTutorialGreeting(page);
+      // Stage through the real item path: a legendary-rolled instance lands in
+      // the bags and is equipped to its own slot, so the equip arm consumes the
+      // bagged instance into PlayerMeta.equipmentInstance and recalcPlayerStats
+      // mirrors it onto entity.equippedInstances, the exact read the renderer
+      // predicate keys on. Never a hand-poked entity field.
+      const staged = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!game || !sim || !player) return { ok: false, reason: 'offline world unavailable' };
+        sim.addItemInstance('quilted_trousers', { rolled: { quality: 'legendary' } });
+        sim.equipItemToSlot('quilted_trousers', 'legs');
+        // The entry camp is thick with ambient fireflies and torch glow that
+        // read exactly like sparse orange motes; relocate to the flat clear
+        // stretch the weapon-vfx-shed target probed (open ground, clean dark
+        // backdrop; a seaward nudge was tried and puts a fully opaque tree
+        // right behind the wearer, worse than the faint high occluder ghost
+        // this spot carries), and drop the entry self-target so the target
+        // frame and overhead highlight stay out of the closeup.
+        player.pos.x = 100;
+        player.pos.z = -80;
+        if (player.prevPos) {
+          player.prevPos.x = player.pos.x;
+          player.prevPos.y = player.pos.y;
+          player.prevPos.z = player.pos.z;
+        }
+        sim.rebucket?.(player);
+        player.targetId = null;
+        // Camera aim happens AFTER the arrival settles (below): the arrival
+        // director re-seats the orbit, so a yaw set here does not survive the
+        // curtain. Only re-home nearby mobs now so nothing aggros through the
+        // frame (the weapon-vfx-shed idiom).
+        for (const e of sim.entities.values()) {
+          if (e.kind !== 'mob' || e.id === player.id) continue;
+          const dx = e.pos.x - player.pos.x;
+          const dz = e.pos.z - player.pos.z;
+          if (dx * dx + dz * dz > 90 * 90) continue;
+          e.pos.x += 400;
+          if (e.prevPos) {
+            e.prevPos.x = e.pos.x;
+            e.prevPos.y = e.pos.y;
+            e.prevPos.z = e.pos.z;
+          }
+          if (e.spawnPos) e.spawnPos = { ...e.pos };
+          if (e.leashAnchor) e.leashAnchor = { ...e.pos };
+          sim.rebucket?.(e);
+        }
+        player.hp = player.maxHp;
+        return { ok: true };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      // The relocation is a teleport-class arrival: it raises the loading
+      // curtain while the destination streams and its programs link. Give the
+      // curtain a beat to RAISE first (a check that runs before it mounts
+      // passes vacuously), then hold until it is down or the shot is a
+      // loading screen.
+      await wait(1200);
+      await page.waitForFunction(
+        () => {
+          const loading = document.querySelector('#loading-screen');
+          return !loading || !loading.classList.contains('visible');
+        },
+        { timeout: 180000, polling: 300 },
+      );
+      // The worn mirror must carry the legendary roll before anything can emit.
+      await page.waitForFunction(
+        () => window.__game?.sim?.player?.equippedInstances?.legs?.rolled?.quality === 'legendary',
+        { timeout: 10000, polling: 200 },
+      );
+      // And the renderer must have recomputed its per-view flag off the new
+      // equippedInstances identity: that flag turning true is the proof the
+      // predicate path ran, not just the sim state.
+      await page.waitForFunction(
+        () =>
+          window.__game?.renderer?.views?.get?.(window.__game?.sim?.playerId)?.legendaryRegalia ===
+          true,
+        { timeout: 15000, polling: 250 },
+      );
+      // The zone change re-pops the tutorial quest banner (Seek the Marshal)
+      // over the top of the frame, and the software-GL notice can outlast the
+      // pre-goto suppression; clear both through their own controls before
+      // the shot, then let sparks accumulate: at 1.8 motes a second with a
+      // 1.1s to 1.6s life, a few are airborne in any shutter once the
+      // emitter has run a while.
+      await page.evaluate(() => {
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+        // Now that the arrival director is done re-seating the orbit: pull
+        // the chase camera in so the sparse drift reads at PR-screenshot
+        // size, aim it at the sea (probed: every landward yaw here backs the
+        // frame with trees and their own fireflies, which read exactly like
+        // motes), and face the wearer at the camera so the worn piece and
+        // the drift share the frame.
+        const game = window.__game;
+        const player = game?.sim?.player;
+        if (game && player) {
+          game.input.camDist = 5;
+          game.input.camYaw = Math.PI;
+          player.facing = 0;
+        }
+      });
+      // Evening light through the same render-only override the /daynight dev
+      // command drives. The command itself is a main.ts closure over the
+      // desktop chat composer's keydown, and the mobile HUD routes chat entry
+      // through its own controls, so a synthetic composer Enter never lands
+      // there; call the underlying module directly instead. Vite dev serves
+      // the live module registry, so this import IS the instance the renderer
+      // reads currentDayNightPhase() from every frame (the reliquary targets'
+      // idiom). 0.8 is the 'evening' preset in main.ts DAY_NIGHT_PRESETS.
+      const evening = await page.evaluate(async () => {
+        const clock = await import('/src/render/day_night_clock.ts');
+        clock.setDayNightPhaseOverride(0.8);
+        // The direct call skips the command's dial refresh; nudge the minimap
+        // dial the same way so the chrome agrees with the sky.
+        window.__game?.hud?.refreshDayNightDial?.();
+        return clock.currentDayNightPhase();
+      });
+      // The override is load-bearing for this shot (in daylight the additive
+      // embers disappear against the dune): a direct call does not log, so
+      // verify through the clock's own state rather than a chatlog line.
+      if (Math.abs(evening - 0.8) > 1e-9) {
+        throw new Error(`evening staging did not land (day/night phase ${evening})`);
+      }
+      // The light transition eases over several seconds (the classic-theme
+      // target waits 8s for the same command); the spark accumulation rides
+      // the same window.
+      await wait(8000);
+      // Ferryman Odo's greeting can pop mid-wait (it arrives a few beats
+      // after entry, later than the entry helper's dismissal), and the
+      // software-GL notice re-raises itself after slow frames; clear both
+      // again so neither covers the frame.
+      await dismissTutorialGreeting(page);
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+      });
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      // Companion close crop around the wearer so the motes read at review
+      // size (the weapon-vfx-shed idiom); the runner's own shot keeps the full
+      // frame for context.
+      const spot = await page.evaluate(() => {
+        const r = window.__game?.renderer;
+        const v = r?.views?.get?.(window.__game?.sim?.playerId);
+        if (!r || !v) return null;
+        const p = v.group.position.clone();
+        // Center the crop on the torso: the drift anchors at the hips and
+        // spreads most of a body height upward.
+        p.y += (v.height ?? 1.8) * 0.55;
+        p.project(r.camera);
+        return {
+          x: (p.x * 0.5 + 0.5) * window.innerWidth,
+          y: (-p.y * 0.5 + 0.5) * window.innerHeight,
+          w: window.innerWidth,
+          h: window.innerHeight,
+        };
+      });
+      if (spot) {
+        const box = { w: 560, h: 520 };
+        const width = Math.min(box.w, spot.w);
+        const height = Math.min(box.h, spot.h);
+        const x = Math.max(0, Math.min(spot.w - width, spot.x - width / 2));
+        // Keep the crop above the self unit frame at the bottom of the HUD:
+        // the closeup is about the world-space motes, not the chrome.
+        const yMax = Math.max(0, spot.h - height - 190);
+        const y = Math.max(0, Math.min(yMax, spot.y - height / 2));
+        await page.screenshot({
+          // biome-ignore lint/suspicious/noUndeclaredEnvVars: Screenshot-only CLI input is not a Turbo task dependency.
+          path: `${process.env.SHOTS_DIR ?? 'pr-shots'}/p16-legendary-regalia-${variant?.key ?? 'desktop'}-closeup.png`,
+          clip: { x, y, width, height },
+        });
+      }
+      return {};
+    },
+  },
+  {
     key: 'ground-aim-placement',
     when: [
       'action_bar/ground_aim',
@@ -11773,6 +12782,211 @@ export const TARGETS = [
     },
   },
 ];
+
+// Shared staging for the farming Phase 8 shots: stand in the Eastbrook patch,
+// plant the four beds one cast at a time, and spread the timers into a
+// growth ladder (the farm-patches target above documents every step's why).
+// Stand the player in front of Farmer Jessica (the farming go-live face) so
+// she fills the camera's forward view beside the Eastbrook garden beds. On a
+// base build without her the player still stands at her authored spot, which
+// is the honest BEFORE at identical framing (empty ground beside the beds).
+async function stageFarmerJessica(page) {
+  await page.waitForFunction(
+    () => {
+      const loading = document.querySelector('#loading-screen');
+      const ui = document.querySelector('#ui');
+      return (
+        document.body.classList.contains('game-active') &&
+        !!ui &&
+        getComputedStyle(ui).display !== 'none' &&
+        !!loading &&
+        !loading.classList.contains('visible')
+      );
+    },
+    { timeout: 90000, polling: 200 },
+  );
+  await page.evaluate(
+    () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+  );
+  const staged = await page.evaluate(() => {
+    const game = window.__game;
+    const sim = game?.sim;
+    const player = sim?.player;
+    if (!game || !sim || !player?.pos) return { ok: false, reason: 'offline world is unavailable' };
+    const jess = [...sim.entities.values()].find((e) => e.templateId === 'farmer_jessica');
+    const spot = jess ? { x: jess.pos.x, z: jess.pos.z } : { x: -15.5, z: -81.5 };
+    // Camera-forward is (sin yaw, cos yaw): stand 4.5 yd behind the spot along
+    // that bearing so Jessica sits squarely ahead of the player.
+    const yaw = game.input.camYaw;
+    player.pos.x = spot.x - Math.sin(yaw) * 4.5;
+    player.pos.z = spot.z - Math.cos(yaw) * 4.5;
+    player.prevPos = { ...player.pos };
+    // The patch sits at the town's edge, outside every camp disc, but shove
+    // any hostile that wandered near away so nothing interrupts or walks
+    // into the frame.
+    for (const e of sim.entities.values()) {
+      if (!e?.hostile || !e.pos) continue;
+      const dx = e.pos.x - spot.x;
+      const dz = e.pos.z - spot.z;
+      if (dx * dx + dz * dz < 60 * 60) {
+        e.pos.x += 500;
+        e.pos.z += 500;
+      }
+    }
+    return { ok: true, jessica: Boolean(jess) };
+  });
+  if (!staged.ok) throw new Error(staged.reason);
+  for (let i = 0; i < 6; i++) {
+    await page.evaluate(() => {
+      document.querySelector('.camera-prompt-confirm')?.click();
+      document.querySelector('.tut-skip')?.click();
+      document.querySelector('.gpu-notice-dismiss')?.click();
+      document.querySelector('#gpu-notice')?.remove();
+    });
+    await wait(400);
+  }
+  return staged;
+}
+
+async function stageEastbrookBeds(page) {
+  await page.waitForFunction(
+    () => {
+      const loading = document.querySelector('#loading-screen');
+      const ui = document.querySelector('#ui');
+      return (
+        document.body.classList.contains('game-active') &&
+        !!ui &&
+        getComputedStyle(ui).display !== 'none' &&
+        !!loading &&
+        !loading.classList.contains('visible')
+      );
+    },
+    { timeout: 90000, polling: 200 },
+  );
+  const staged = await page.evaluate(() => {
+    const sim = window.__game?.sim;
+    const player = sim?.player;
+    if (!sim || !player?.pos) return { ok: false, reason: 'offline world is unavailable' };
+    // The patch centre (beds at x -24/-19, z -84/-79): inside plantCrop's
+    // INTERACT_RANGE of all four beds, see the farm-patches target above.
+    player.pos.x = -21.5;
+    player.pos.z = -81.5;
+    sim.addItem?.('garden_hoe', 1);
+    sim.addItem?.('vale_wheat_seed', 4);
+    sim.addItem?.('brook_carrot_seed', 4);
+    const ents = sim.entities?.values?.();
+    if (ents) {
+      for (const e of ents) {
+        if (!e?.hostile || !e.pos) continue;
+        const dx = e.pos.x - player.pos.x;
+        const dz = e.pos.z - player.pos.z;
+        if (dx * dx + dz * dz < 60 * 60) {
+          e.pos.x += 500;
+          e.pos.z += 500;
+        }
+      }
+    }
+    return { ok: true };
+  });
+  if (!staged.ok) throw new Error(staged.reason);
+  const PLANTS = [
+    ['bed_eastbrook_1', 'vale_wheat'],
+    ['bed_eastbrook_2', 'brook_carrot'],
+    ['bed_eastbrook_3', 'vale_wheat'],
+    ['bed_eastbrook_4', 'brook_carrot'],
+  ];
+  for (const [bedId, cropId] of PLANTS) {
+    let planted = false;
+    for (let attempt = 0; attempt < 4 && !planted; attempt++) {
+      await page.evaluate((bed, crop) => window.__game?.sim?.plantCrop?.(bed, crop), bedId, cropId);
+      for (let i = 0; i < 10; i++) {
+        planted = await page.evaluate((bed) => {
+          const sim = window.__game?.sim;
+          return !!sim?.players?.get?.(sim?.playerId)?.farmPlots?.get?.(bed);
+        }, bedId);
+        if (planted) break;
+        await wait(400);
+      }
+    }
+  }
+  await page.evaluate(() => {
+    const sim = window.__game?.sim;
+    const plots = sim?.players?.get?.(sim?.playerId)?.farmPlots;
+    const now = sim?.farmNowMs?.();
+    if (!plots?.get || typeof now !== 'number') return;
+    const shape = (bedId, elapsedMs, totalMs) => {
+      const p = plots.get(bedId);
+      if (!p) return;
+      p.plantedAtMs = now - elapsedMs;
+      p.readyAtMs = p.plantedAtMs + totalMs;
+    };
+    shape('bed_eastbrook_1', 5_000, 100_000);
+    shape('bed_eastbrook_2', 40_000, 100_000);
+    shape('bed_eastbrook_3', 75_000, 100_000);
+    shape('bed_eastbrook_4', 200_000, 100_000);
+  });
+  for (let i = 0; i < 6; i++) {
+    await page.evaluate(() => {
+      document.querySelector('.camera-prompt-confirm')?.click();
+      document.querySelector('.tut-skip')?.click();
+      document.querySelector('.gpu-notice-dismiss')?.click();
+    });
+    await wait(500);
+  }
+}
+
+// Stand the player ON bed_eastbrook_1 (-24, -84) with the tier-1 farming kit in
+// the bags and NOTHING planted, so the interact press resolves the free bed
+// and opens the plant sheet (the farm-plant-sheet target above). Compost rides
+// along so one knob paints affordable beside the two that honestly cannot pay.
+async function stagePlantSheetBed(page) {
+  await page.waitForFunction(
+    () => {
+      const loading = document.querySelector('#loading-screen');
+      const ui = document.querySelector('#ui');
+      return (
+        document.body.classList.contains('game-active') &&
+        !!ui &&
+        getComputedStyle(ui).display !== 'none' &&
+        !!loading &&
+        !loading.classList.contains('visible')
+      );
+    },
+    { timeout: 90000, polling: 200 },
+  );
+  const staged = await page.evaluate(() => {
+    const sim = window.__game?.sim;
+    const player = sim?.player;
+    if (!sim || !player?.pos) return { ok: false, reason: 'offline world is unavailable' };
+    player.pos.x = -24;
+    player.pos.z = -84;
+    player.prevPos = { ...player.pos };
+    sim.addItem?.('garden_hoe', 1);
+    sim.addItem?.('vale_wheat_seed', 3);
+    sim.addItem?.('compost', 1);
+    for (const e of sim.entities.values()) {
+      if (!e?.hostile || !e.pos) continue;
+      const dx = e.pos.x - player.pos.x;
+      const dz = e.pos.z - player.pos.z;
+      if (dx * dx + dz * dz < 60 * 60) {
+        e.pos.x += 500;
+        e.pos.z += 500;
+      }
+    }
+    return { ok: true };
+  });
+  if (!staged.ok) throw new Error(staged.reason);
+  for (let i = 0; i < 6; i++) {
+    await page.evaluate(() => {
+      document.querySelector('.camera-prompt-confirm')?.click();
+      document.querySelector('.tut-skip')?.click();
+      document.querySelector('.gpu-notice-dismiss')?.click();
+      document.querySelector('#gpu-notice')?.remove();
+    });
+    await wait(400);
+  }
+  return staged;
+}
 
 // Grant one staged stack (a plain count, or a specific ItemInstancePayload) and
 // open the bags window on it. Shared by the tooltip targets above, which each

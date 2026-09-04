@@ -106,10 +106,9 @@ export interface SpatialAudioSink {
    *  (dismount, death while mounted, audio-gate exit, interest culled,
    *  disconnect). */
   mountEngineReset(entityId: number): void;
-  /** Warm a mount's audio takes (engine windup/loop/winddown, idle hum, and
-   *  mount jump/land overrides) ahead of first use, e.g. on the mountKey
-   *  transition that also calls mountEngineReset. A no-op for a mount with
-   *  none of them. */
+  /** Warm a mount's authored run/idle/jump/land and engine take set ahead of
+   *  first movement. The renderer calls this on summon-cast and mountKey
+   *  transitions. A no-op for a mount with no custom movement clips. */
   preloadMountEngine(mountKey: string): void;
   /** Continuous movement loop for a mount that HAS one (a wheeled cart rolls;
    *  it has no stride to hang a one-shot on). Called every frame per mounted

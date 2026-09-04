@@ -18,11 +18,11 @@ import { ARCHETYPE_PAIR_TARGETS } from '../src/sim/professions/archetype';
 import { archetypeTitleText } from '../src/ui/char_window';
 import { tEntity } from '../src/ui/entity_i18n';
 import { Hud } from '../src/ui/hud';
-import { t } from '../src/ui/i18n';
 import {
   attunementMasterForPair,
   type ProfessionEventInput,
-} from '../src/ui/profession_event_lines_core';
+} from '../src/ui/hud/professions/profession_event_lines_core';
+import { t } from '../src/ui/i18n';
 import type { CraftingIdentityView } from '../src/world_api/professions';
 
 // jsdom ships no matchMedia; the handler reads only `.matches` to derive the

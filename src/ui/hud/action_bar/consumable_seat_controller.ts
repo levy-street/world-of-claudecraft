@@ -20,6 +20,7 @@
 // returns null and the seat silently stays unbuilt, exactly like the ring.
 
 import { audio } from '../../../game/audio';
+import { countRawInSlots } from '../../../sim/item_lock';
 import type { ItemDef } from '../../../sim/types';
 import { formatAbilityNumber } from '../../ability_description';
 import { abilityDisplayName } from '../../ability_display_name';
@@ -34,7 +35,6 @@ import {
   type ActionBarState,
   type ActionBarWorldInput,
   createActionBarView,
-  inventoryCount,
 } from './action_bar_view';
 import { CONSUMABLE_BAR_SLOTS, consumableBarItems } from './consumable_bar_view';
 import { ConsumableStripGesture } from './consumable_strip_gesture_controller';
@@ -199,7 +199,7 @@ export function buildMobileConsumableSeat(
     deps.attachTooltip(btn, () => {
       const item = itemAt(deps, ids, i);
       if (!item) return `<div class="tt-sub">${esc(t('abilityUi.actionBar.emptySlot'))}</div>`;
-      return deps.itemTooltip(item) + itemInBagsLine(inventoryCount(inventory, item.id));
+      return deps.itemTooltip(item) + itemInBagsLine(countRawInSlots(inventory, item.id));
     });
   });
 

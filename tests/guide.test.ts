@@ -1,14 +1,18 @@
 import { execFileSync } from 'node:child_process';
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { RETIRED_KEYS } from '../scripts/i18n_retired_keys.mjs';
 import { assertFamiliesKnown } from '../scripts/wiki/family_guard.mjs';
+import { patternChannelSets, recipeAcquisitionChannel } from '../scripts/wiki/vendor_channel.mjs';
 // The English the /c/ public sheet resolves a mark id to. Imported here so the
 // generator's own hand table cannot drift away from what the sheet says.
 import { RELIQUARY_MARK_ENGLISH } from '../server/character_sheet';
-import { BIND_ACTIONS } from '../src/game/keybinds';
+import { nextRaidResetMs, resetDayKey } from '../server/raid_reset';
+import { BIND_ACTIONS, keyLabel } from '../src/game/keybinds';
 import {
   GUIDE_CLASSES,
   GUIDE_DEEDS,
@@ -25,6 +29,7 @@ import {
   GUIDE_PROF_GATHERING,
   GUIDE_PROF_MASTERWORK,
   GUIDE_PROF_PAGES,
+  GUIDE_PROF_PROVISIONING,
   GUIDE_PROF_RING,
   GUIDE_PROF_STATIONS,
   GUIDE_RELIQUARY,
@@ -32,10 +37,15 @@ import {
   GUIDE_ZONES,
 } from '../src/guide/content.generated';
 import { pageFor } from '../src/guide/pages';
+import { arena } from '../src/guide/pages/arena';
 import { controls as controlsPage } from '../src/guide/pages/controls';
 import { catalogSections, deeds as deedsPage } from '../src/guide/pages/deeds';
 import { dungeons as dungeonsPage } from '../src/guide/pages/dungeons';
-import { professions as professionsPage } from '../src/guide/pages/professions';
+import { interfacePage } from '../src/guide/pages/interface';
+import { professions as professionsPage, ringCards } from '../src/guide/pages/professions';
+import { craftDetailHtml, effectLines, itemNameKey } from '../src/guide/pages/professions_craft';
+import { FAQ_ANSWER_KEYS, PROF_FAQ_COUNT } from '../src/guide/pages/professions_faq';
+import { gatheringDetailHtml } from '../src/guide/pages/professions_gathering';
 import { reliquaryCatalogSections, reliquary as reliquaryPage } from '../src/guide/pages/reliquary';
 import { world as worldPage } from '../src/guide/pages/world';
 import {
@@ -51,8 +61,13 @@ import { buildIndex, rank } from '../src/guide/search';
 import { DEEDS } from '../src/sim/content/deeds';
 import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
 import { ENCHANTS } from '../src/sim/content/enchants';
+import { FARM_CROPS } from '../src/sim/content/farm_crops';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
+import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
+import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
+import { ITEM_SETS } from '../src/sim/content/item_sets';
 import { FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
+import { MOUNTS } from '../src/sim/content/mounts';
 import {
   CRAFT_GOLD_SINK_COPPER_PER_BUDGET,
   CRAFT_RING,
@@ -62,7 +77,15 @@ import {
   STATION_TYPE_BY_CRAFT,
   STATIONS,
 } from '../src/sim/content/professions';
-import { ALL_RECIPES } from '../src/sim/content/recipes';
+import { WARFARE_ITEMS } from '../src/sim/content/pvp_honor';
+import {
+  ALL_RECIPES,
+  COMBO_RECIPES,
+  FARM_RECIPES,
+  HOE_RECIPES,
+  LADDER_RECIPES,
+  ROD_RECIPES,
+} from '../src/sim/content/recipes';
 import { RELIQUARY_PAGES } from '../src/sim/content/reliquary';
 import {
   TIER2_TOOL_GATE_PROFICIENCY,
@@ -70,6 +93,10 @@ import {
 } from '../src/sim/content/vendor_row_gates';
 import { ABILITIES, CAMPS, DUNGEONS, ITEMS, MOBS, NPCS, QUESTS, ZONES } from '../src/sim/data';
 import { FINAL_BOSS_DUNGEONS, FLAWLESS_TASKS } from '../src/sim/deeds';
+import { createMob } from '../src/sim/entity';
+import { MASTERWROUGHT_EQUIP_CAP, MASTERWROUGHT_LEGENDARY_CAP } from '../src/sim/equipment_rules';
+import { itemLevel, primaryStatSum } from '../src/sim/item_level';
+import { awardSharedLootItem, submitLootRoll } from '../src/sim/loot/loot_roll';
 import { MARKET_CUT, MARKET_LISTING_DEPOSIT_COPPER } from '../src/sim/market';
 import {
   WORK_ORDER_CADENCE_TICKS,
@@ -81,10 +108,27 @@ import {
   TIMBER_WEAPON_TYPES,
 } from '../src/sim/professions/disenchant_reagents';
 import { DISENCHANT_MATERIAL_BY_QUALITY } from '../src/sim/professions/enchanting';
+import {
+  FARM_EFFECT_BONUS_PICK_CAP,
+  FARM_FINE_CHANCE_BASE,
+  FARM_FINE_CHANCE_EFFECT_BONUS,
+  FARM_FINE_CHANCE_SKILL_SCALE,
+  FARM_HARVEST_LIFE_FLOOR,
+  FARM_KEEP_CHANCE_BASE,
+  FARM_KEEP_CHANCE_SKILL_SCALE,
+  FARM_PLANT_CAST_SEC,
+  FARM_TONIC_BONUS_CHANCE,
+  FARM_TONIC_BONUS_PICKS,
+  FARMING_GAIN_SCHEDULE,
+  farmingTeachingCeilingFor,
+} from '../src/sim/professions/farming';
 import { FISHING_GAIN_SCHEDULE } from '../src/sim/professions/fishing';
+import { FISHING_CATCH_BAND_THRESHOLDS } from '../src/sim/professions/fishing_bands';
 import {
   GATHER_RARE_EVENT_CHANCE,
+  GATHER_RARE_EVENT_SOURCES,
   GATHER_RARE_EVENT_YIELD_MULT,
+  gatherRareEventFlavor,
 } from '../src/sim/professions/gather_events';
 import {
   GATHER_CAST_BAND_REDUCTION_SEC,
@@ -93,6 +137,7 @@ import {
   GATHER_CAST_TOOL_TIER_REDUCTION_SEC,
   GATHER_GAIN_TIER_STEP,
 } from '../src/sim/professions/gathering';
+import { gatheringSupplyByFamily } from '../src/sim/professions/gathering_supply';
 import {
   MASTERWORK_BASE_CHANCE,
   MASTERWORK_CHANCE_CAP,
@@ -100,6 +145,12 @@ import {
   MASTERWORK_SIGNED_CHANCE,
   MASTERWORK_SPECIALIZATION_CHANCE,
 } from '../src/sim/professions/masterwork';
+import {
+  WYRMFALL_BOSS_MAX,
+  WYRMFALL_BOSS_MIN,
+  WYRMFALL_CORE_ITEM_ID,
+} from '../src/sim/professions/masterwrought_materials';
+import { PERFECTING_SUCCESS_CHANCE } from '../src/sim/professions/perfecting';
 import { SALVAGE_MATERIAL_BY_QUALITY } from '../src/sim/professions/salvage';
 import { TRAINING_FEE_BY_TIER, trainingFeeFor } from '../src/sim/professions/training';
 import {
@@ -112,10 +163,53 @@ import {
   TIER5_TOOL_WIELD_PROFICIENCY,
   WIELD_REQUIREMENT_BY_TIER,
 } from '../src/sim/professions/wield_gate';
-import type { DeedDef } from '../src/sim/types';
+import {
+  ARENA_DAILY_TAPER_FLOOR_START,
+  ARENA_DAILY_TAPER_START,
+  ARENA_LOSS_HONOR_SHARE,
+  awardRankedArenaResultHonor,
+  RANKED_ARENA_LOSS_HONOR,
+  RANKED_ARENA_WIN_HONOR,
+} from '../src/sim/pvp/honor';
+import { DOUBLE_HONOR_MULTIPLIER, DOUBLE_HONOR_WEEKDAYS } from '../src/sim/pvp/honor_event';
+import { FARM_RIFT_DROP_ITEM_IDS, RIFT_PATTERN_ITEM_IDS } from '../src/sim/rift/progression';
+import { Sim } from '../src/sim/sim';
+import {
+  FINDER_DECLINE_COOLDOWN_SECONDS,
+  FINDER_PROPOSAL_SECONDS,
+} from '../src/sim/social/dungeon_finder';
+import { CONSUME_DURATION, type DeedDef, DT } from '../src/sim/types';
+import { SYSTEM_EVENTS } from '../src/ui/calendar_view';
 import { DEED_IMAGE_IDS } from '../src/ui/deed_image_ids';
-import { ensureLocaleLoaded, type SupportedLanguage, setLanguage, t } from '../src/ui/i18n';
+import { entityTranslationKey } from '../src/ui/entity_i18n';
+import { esc } from '../src/ui/esc';
+import {
+  MOBILE_ACTION_BUTTONS,
+  MOBILE_ACTION_PAGE_COUNT,
+  MOBILE_ACTION_SOURCE_SLOT_COUNT,
+  mobileActionSourceSlotCount,
+  mobilePageCount,
+} from '../src/ui/hud/action_bar/mobile_action_page_view';
+import { WELLFED_STAT_KEYS } from '../src/ui/hud/professions/wellfed_stat_keys';
+import { VENDOR_MULTIPLES } from '../src/ui/hud/vendor/vendor_view';
+import {
+  ensureLocaleLoaded,
+  formatNumber,
+  type SupportedLanguage,
+  setLanguage,
+  supportedLanguages,
+  t,
+} from '../src/ui/i18n';
 import { guideStrings } from '../src/ui/i18n.catalog/guide';
+import { itemStrings } from '../src/ui/i18n.catalog/items';
+import { HUD_FRAME_SPECS } from '../src/ui/interface_unlock_core';
+import type {
+  MapGatherNodeMarker,
+  MapWindowMode,
+  OverworldMapModel,
+} from '../src/ui/map_window_view';
+import { recipeInputValue } from './helpers/reagent_unit_value';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 const publicPath = (url: string): string => resolve(repoRoot, 'public', url.replace(/^\//, ''));
@@ -362,16 +456,45 @@ describe('Guide generated class content', () => {
   });
 
   it('matches the sim (regenerating leaves the committed file unchanged)', () => {
-    execFileSync('node', ['scripts/wiki/build_content.mjs'], {
-      cwd: new URL('..', import.meta.url),
-    });
-    // No diff means the committed content is derived from the current sim data.
-    expect(() =>
-      execFileSync('git', ['diff', '--exit-code', '--', 'src/guide/content.generated.ts'], {
+    // The generator emits into a TEMP file (`--out`) and this arm compares
+    // bytes, so running the suite never writes into the tree: the old
+    // regenerate-in-place form dirtied src/guide/content.generated.ts on every
+    // stale run and three agents had to restore it by hand (Phase 11d record).
+    // Arm two keeps the on-disk file welded to the index without regenerating
+    // first; the two arms together are exactly the old (regenerated == index)
+    // coverage, minus the write.
+    const tmp = mkdtempSync(join(tmpdir(), 'wocc-guide-content-'));
+    try {
+      const out = join(tmp, 'content.generated.ts');
+      execFileSync('node', ['scripts/wiki/build_content.mjs', '--out', out], {
         cwd: new URL('..', import.meta.url),
-        encoding: 'utf8',
-      }),
-    ).not.toThrow();
+      });
+      const generated = readFileSync(out, 'utf8');
+      const committed = readFileSync(
+        new URL('../src/guide/content.generated.ts', import.meta.url),
+        'utf8',
+      );
+      if (generated !== committed) {
+        const gen = generated.split('\n');
+        const com = committed.split('\n');
+        let line = 0;
+        while (line < gen.length && line < com.length && gen[line] === com[line]) line += 1;
+        expect.fail(
+          'src/guide/content.generated.ts is stale (run `npm run wiki:content` and commit the ' +
+            `result); first difference at line ${line + 1}:\n  committed: ${JSON.stringify(com[line] ?? '<end of file>')}\n  regenerated: ${JSON.stringify(gen[line] ?? '<end of file>')}`,
+        );
+      }
+      // No diff means the on-disk file is the committed one, so the byte
+      // comparison above was against the index, not a stray local edit.
+      expect(() =>
+        execFileSync('git', ['diff', '--exit-code', '--', 'src/guide/content.generated.ts'], {
+          cwd: new URL('..', import.meta.url),
+          encoding: 'utf8',
+        }),
+      ).not.toThrow();
+    } finally {
+      rmSync(tmp, { recursive: true, force: true });
+    }
   });
 });
 
@@ -970,6 +1093,25 @@ describe('Guide Reliquary spoiler-safe catalog', () => {
     expect(nonSlain.some((id) => id.startsWith('gather_event:'))).toBe(true);
   });
 
+  it('every generated mount name equals the live MOUNTS source name', () => {
+    let checked = 0;
+    for (const guidePage of GUIDE_RELIQUARY) {
+      const live = RELIQUARY_PAGES.find((page) => page.id === guidePage.id);
+      expect(live, `live page for ${guidePage.id}`).toBeDefined();
+      if (!live) continue;
+      expect(guidePage.relics.length, `${guidePage.id} relic count`).toBe(live.relics.length);
+      for (let i = 0; i < live.relics.length; i++) {
+        const relic = live.relics[i];
+        if (relic.kind !== 'mount') continue;
+        const expected = (MOUNTS as Record<string, { name: string }>)[relic.mountId]?.name;
+        expect(expected, `${relic.mountId} has a live mount definition`).toBeDefined();
+        expect(guidePage.relics[i]?.name, `${guidePage.id}:${relic.mountId}`).toBe(expected);
+        checked += 1;
+      }
+    }
+    expect(checked).toBe(Object.keys(MOUNTS).length);
+  });
+
   it('pins the reliquary route wiring to literals', () => {
     const route = GUIDE_ROUTES.find((r) => r.id === 'reliquary');
     expect(route?.sub).toBe('reliquary');
@@ -1500,6 +1642,47 @@ describe('Guide controls reference completeness', () => {
     expect(html).toContain('<kbd>Shift+Tab</kbd></td><td>Cycle target backward');
   });
 
+  // Third wave, found by the farming Phase 8 QA: the Harvest Journal shipped a
+  // defaulted window bind (Shift+K) with no controls row, exactly the drift
+  // class the two waves above were written against. Same per-bind contract.
+  it('documents the Harvest Journal bind and keeps it in step with the game default', () => {
+    setLanguage('en');
+    const html = controlsPage.render({
+      params: [],
+      sub: 'reference/controls',
+      titleKey: 'guide.nav.controls',
+    });
+    expect(html).toContain('<kbd>Shift+K</kbd></td><td>Harvest Journal</td>');
+    expect(BIND_ACTIONS.find((a) => a.id === 'harvestJournal')?.defaults).toEqual(['Shift+KeyK']);
+  });
+
+  // The COMPLETENESS pin the three waves above were missing: every Interface
+  // window bind's default keycap must appear in the controls reference, so
+  // the next shipped bind reds here instead of drifting silently. Both halves
+  // read the live tables (BIND_ACTIONS through the same keyLabel the options
+  // panel prints, the page through its rendered <kbd> cells). A page-wide
+  // keycap SET is enough here because tests/keybinds.test.ts pins that no two
+  // shipped defaults share a code (the one sanctioned KeyA pair aside), so a
+  // new Interface bind cannot borrow another action's keycap to pass: its
+  // keycap is on the page only if a row was written for it.
+  it('lists every Interface bind default on the controls page', () => {
+    setLanguage('en');
+    const html = controlsPage.render({
+      params: [],
+      sub: 'reference/controls',
+      titleKey: 'guide.nav.controls',
+    });
+    const kbds = new Set([...html.matchAll(/<kbd>([^<]+)<\/kbd>/g)].map((m) => m[1]));
+    const missing = BIND_ACTIONS.filter(
+      (a) => a.category === 'Interface' && !a.defaults.some((code) => kbds.has(keyLabel(code))),
+    ).map((a) => a.id);
+    expect(missing).toEqual([]);
+    // Anti-vacuous: the scrape really read keycaps, and the two shifted rows
+    // this pin was written for are among them.
+    expect(kbds.has('Shift+P')).toBe(true);
+    expect(kbds.has('Shift+K')).toBe(true);
+  });
+
   it('keeps the second-wave binds in step with the game defaults', () => {
     const defaults = new Map(BIND_ACTIONS.map((a) => [a.id, a.defaults]));
     expect(defaults.get('dive')).toEqual(['ControlLeft']);
@@ -1557,7 +1740,7 @@ describe('Guide model stills', () => {
     }
   });
 
-  it('ships a visible 320px WebP for the dedicated Gloomshade still', async () => {
+  it('ships a visible 320px WebP for the dedicated Duskmurk still', async () => {
     const gloomshade = GUIDE_WARLOCK_PETS.find((pet) => pet.id === 'gloomshade');
     expect(gloomshade?.model).toBe('mob_gloomshade');
     expect(gloomshade?.still).toBe('/guide-stills/mob_gloomshade.webp');
@@ -1642,12 +1825,14 @@ describe('Guide professions generated content accuracy', () => {
     'cooking',
     'leatherworking',
     'tailoring',
+    'inscription',
     'enchanting',
+    'jewelcrafting',
     'weaponcrafting',
     'armorcrafting',
   ];
 
-  it('covers the full ring, honest about the two wave-one content-empty crafts', () => {
+  it('covers the full ring, every seat content-bearing since the phase 06 catalog', () => {
     expect(GUIDE_PROF_RING.map((c) => c.id)).toEqual(CRAFT_RING.map((c) => c.id));
     for (const c of GUIDE_PROF_RING) {
       const def = CRAFT_RING.find((r) => r.id === c.id);
@@ -1656,11 +1841,56 @@ describe('Guide professions generated content accuracy', () => {
       expect(c.maxSkill).toBe(def?.maxSkill);
       expect(c.maxSkill).toBe(125); // every wave-one craft caps at 125
     }
-    expect(GUIDE_PROF_RING.filter((c) => !c.hasContent).map((c) => c.id)).toEqual([
-      'inscription',
-      'jewelcrafting',
-    ]);
+    // Empty since the Masterwrought phase 06 inscription catalog: the pin
+    // stays so a future content-empty seat is declared here, never silent.
+    expect(GUIDE_PROF_RING.filter((c) => !c.hasContent).map((c) => c.id)).toEqual([]);
     expect(GUIDE_PROF_CRAFTS.map((c) => c.id)).toEqual(EARNABLE_CRAFT_IDS);
+  });
+
+  it('derives every hasContent flag independently from the live sim tables', () => {
+    // With every live seat content-bearing, the empty-list pin above would
+    // ALSO pass if the generator's craftHasContent were broken to answer
+    // true unconditionally; recomputing the predicate here from the same
+    // inputs (ALL_RECIPES, plus enchanting's action arm) reds that world.
+    for (const c of GUIDE_PROF_RING) {
+      const derived =
+        c.id === 'enchanting'
+          ? Object.keys(ENCHANTS).length > 0
+          : ALL_RECIPES.some((r) => r.professionId === c.id);
+      expect(c.hasContent, `${c.id} hasContent`).toBe(derived);
+    }
+    // Liveness for the recompute itself: a craft id outside the ring derives
+    // false through the same expression.
+    expect(ALL_RECIPES.some((r) => r.professionId === 'no_such_craft')).toBe(false);
+  });
+
+  it('still renders the content-empty ring card for a synthetic recipe-less seat', () => {
+    // Unreachable from live data since phase 06 (every seat has content), so
+    // the branch is driven directly: the empty card carries the coming-soon
+    // copy and NO link, and the sibling content card links with no such copy.
+    const emptyCard = ringCards([
+      {
+        id: 'inscription',
+        name: 'Inscription',
+        pole: 'Cross-cutting',
+        maxSkill: 125,
+        hasContent: false,
+      },
+    ]);
+    expect(emptyCard).toContain('guide-prof-card-empty');
+    expect(emptyCard).toContain(t('guide.professions.comingSoon'));
+    expect(emptyCard).not.toContain('href=');
+    const contentCard = ringCards([
+      {
+        id: 'inscription',
+        name: 'Inscription',
+        pole: 'Cross-cutting',
+        maxSkill: 125,
+        hasContent: true,
+      },
+    ]);
+    expect(contentCard).toContain('href=');
+    expect(contentCard).not.toContain(t('guide.professions.comingSoon'));
   });
 
   it('emits only allowlisted fields on every craft and recipe row (the GUIDE_DEEDS pattern)', () => {
@@ -1685,7 +1915,12 @@ describe('Guide professions generated content accuracy', () => {
       'materials',
       'output',
       'combo',
+      'oncePerDay',
       'gain',
+      // The consumable effect facts (C10): the foodHp restore and well-fed
+      // boon values the craft page's effect sub-lines compose. Shape-pinned
+      // in its own accuracy arm below.
+      'effect',
     ]);
     for (const c of GUIDE_PROF_CRAFTS) {
       for (const k of Object.keys(c)) {
@@ -1697,7 +1932,8 @@ describe('Guide professions generated content accuracy', () => {
             true,
           );
         }
-        for (const m of r.materials) expect(Object.keys(m).sort()).toEqual(['count', 'name']);
+        for (const m of r.materials)
+          expect(Object.keys(m).sort()).toEqual(['count', 'itemId', 'name']);
         expect(Object.keys(r.output).sort()).toEqual(['count', 'name', 'quality']);
         if (r.combo) expect(Object.keys(r.combo).sort()).toEqual(['crafts', 'minTier']);
         expect(Object.keys(r.gain).sort()).toEqual(['minimalAt', 'reducedAt', 'zeroAt']);
@@ -1706,6 +1942,23 @@ describe('Guide professions generated content accuracy', () => {
   });
 
   it('maps every recipe row back to the sim def with matching numbers', () => {
+    // The channel sets come from the SHARED derivation the generator itself
+    // calls (scripts/wiki/vendor_channel.mjs), not from a second copy of the
+    // expression re-typed here. This guard used to re-derive an identical Set
+    // inline under a comment promising it derived it "exactly as the generator
+    // derives it", which is a promise nothing enforced: a generator that moved
+    // would have kept a green mirror. Sharing the derivation cannot turn this
+    // into a self-comparison, because the per-arm literal exemplars below
+    // ("pins the spot literals...") anchor every one of the five values on a
+    // named recipe id, and tests/wiki_vendor_channel.test.ts drives the module
+    // itself off synthetic tables.
+    const patternChannels = patternChannelSets({
+      mobs: MOBS,
+      heroicBossLoot: HEROIC_BOSS_LOOT,
+      riftPatternItemIds: RIFT_PATTERN_ITEM_IDS,
+      farmRiftDropItemIds: FARM_RIFT_DROP_ITEM_IDS,
+      heroicVendorStock: HEROIC_VENDOR_STOCK,
+    });
     for (const c of GUIDE_PROF_CRAFTS) {
       const simIds = ALL_RECIPES.filter((r) => r.professionId === c.id)
         .map((r) => r.id)
@@ -1718,10 +1971,26 @@ describe('Guide professions generated content accuracy', () => {
         expect(row.skillReq).toBe(def.skillReq);
         expect(row.tier).toBe(tierForSkill(def.skillReq));
         expect(row.station).toBe(def.stationType ?? null);
-        expect(row.acquisition).toBe(def.acquisition?.includes('trainer') ? 'trainer' : 'known');
+        // The channel split IS the generator's (phase 11, masterwrought R8,
+        // widened at phase 11f, shared at phase 18): a drop-acquisition recipe
+        // whose teaching pattern is stocked on the Heroic Quartermaster AND
+        // carried by a live drop table renders as BOTH; one or the other alone
+        // renders as that one. Both sides are derived from the tables
+        // themselves, so a channel added anywhere reaches this pin by existing
+        // rather than by being listed.
+        expect(row.acquisition).toBe(recipeAcquisitionChannel(def, patternChannels));
         expect(row.feeCopper).toBe(def.acquisition?.includes('trainer') ? trainingFeeFor(def) : 0);
+        // The bill carries the reagent ID as well as the English name (the
+        // page localizes through the id and never renders `name`), so the
+        // accuracy guard binds BOTH: the id is the live def's own, and the
+        // English beside it is that id's own live name. An id/name pair that
+        // came apart would render one reagent and pin another.
         expect(row.materials).toEqual(
-          def.reagents.map((g) => ({ name: ITEMS[g.itemId].name, count: g.count })),
+          def.reagents.map((g) => ({
+            itemId: g.itemId,
+            name: ITEMS[g.itemId].name,
+            count: g.count,
+          })),
         );
         expect(row.output.name).toBe(ITEMS[def.resultItemId].name);
         expect(row.output.count).toBe(def.resultCount);
@@ -1746,6 +2015,345 @@ describe('Guide professions generated content accuracy', () => {
     }
   });
 
+  it('mirrors every consumable effect row against the live item def (C10)', () => {
+    // The dish effect prose is composed from these VALUES, so the accuracy
+    // guard binds them to the sim source both ways: every foodHp/wellfed
+    // output carries the row with the def's own numbers, and a row never
+    // appears on a non-consumable. Non-vacuity: the four buff dishes and at
+    // least a dozen foodHp dishes exist, counted below.
+    //
+    // A PLACEABLE FEAST resolves through its own def's dishItemId
+    // (harvest-feast-wiki-effect-cell): a feast carries no foodHp and no
+    // wellFed, so the values belong to the dish each serving IS, and reading
+    // the output def alone is exactly the bug that left every feast row with
+    // an empty effect cell. The hop is re-walked here off the LIVE defs rather
+    // than taken from the generator, so the guard still binds both ways, and
+    // the feast's own two facts are pinned against the same record.
+    let foodRows = 0;
+    let wellfedRows = 0;
+    let feastRows = 0;
+    for (const c of GUIDE_PROF_CRAFTS) {
+      for (const row of c.recipes) {
+        const def = ALL_RECIPES.find((r) => r.id === row.id);
+        if (!def) continue;
+        const output = ITEMS[def.resultItemId];
+        const feastRecord = 'feast' in output ? output.feast : undefined;
+        if (feastRecord) {
+          feastRows++;
+          // A feast def really must carry neither field itself, or the served
+          // hop below would be picking one of two live sources at random.
+          expect(output.foodHp, `${row.id} feast def must carry no foodHp`).toBeUndefined();
+          expect(output.kind, `${row.id} feast def must not be kind food`).not.toBe('food');
+          expect(row.effect?.feast, `${row.id} feast facts missing`).toEqual({
+            servings: feastRecord.charges,
+            minutes: (feastRecord.durationTicks * DT) / 60,
+          });
+        } else {
+          expect(row.effect?.feast, `${row.id} phantom feast facts`).toBeUndefined();
+        }
+        const item = feastRecord ? ITEMS[feastRecord.dishItemId] : output;
+        expect(item, `${row.id} serves an unknown dish`).toBeDefined();
+        const itemWellfed = item.kind === 'food' ? item.wellFed : undefined;
+        if (item.foodHp) {
+          foodRows++;
+          expect(row.effect?.food, `${row.id} foodHp row missing`).toEqual({
+            amount: item.foodHp,
+            seconds: CONSUME_DURATION,
+          });
+        } else {
+          expect(row.effect?.food, `${row.id} phantom food effect`).toBeUndefined();
+        }
+        if (itemWellfed) {
+          wellfedRows++;
+          expect(row.effect?.wellfed, `${row.id} wellfed row missing`).toEqual({
+            aura: itemWellfed.aura,
+            kind: itemWellfed.kind,
+            value: itemWellfed.value,
+            minutes: itemWellfed.duration / 60,
+          });
+          // The LIVE_OFF_SWEEP exemption for effectWellFedAura rests on this
+          // precondition: every SHIPPED wellfed kind is mapped, so the
+          // aura-name fallback stays a degradation path and never renders.
+          // The first dish with an unmapped kind reds here instead of
+          // silently selecting the fallback prose on the wiki.
+          expect(
+            Object.keys(WELLFED_STAT_KEYS),
+            `${row.id} ships an unmapped wellfed kind`,
+          ).toContain(itemWellfed.kind);
+        } else {
+          expect(row.effect?.wellfed, `${row.id} phantom wellfed effect`).toBeUndefined();
+        }
+        if (!item.foodHp && !itemWellfed && !feastRecord) {
+          expect(row.effect, `${row.id} effect on a non-consumable`).toBeUndefined();
+        }
+      }
+    }
+    expect(foodRows).toBeGreaterThanOrEqual(12);
+    // The whole unified well-fed family since 11c: the four farm dishes plus
+    // the three apex role plates, PLUS the four placeable feasts, which now
+    // reach the same count through their served dishes (harvest_feast serves
+    // evergarden_braised_greens; the three apex feasts serve the three role
+    // plates). The number moving from 7 to 11 IS the fix: before the hop, four
+    // craftable outputs with a real well-fed payload published nothing at all.
+    expect(wellfedRows).toBe(11);
+    // Every shipped feast, not "at least one": the hop is per-def, so a fifth
+    // feast that skipped it would sit silently under a floor.
+    expect(feastRows).toBe(4);
+  });
+
+  it('the unmapped-kind fallback line renders (never a silent effect cell)', () => {
+    // Synthetic row: no shipped dish carries an unmapped kind (asserted
+    // above), so the fallback branch is driven directly. Its aura value is
+    // the def's baked English proper noun, the page's GUIDE_DEEDS policy.
+    const row = {
+      effect: { wellfed: { aura: 'Test Boon', kind: 'buff_spellpower', value: 3, minutes: 10 } },
+    } as unknown as Parameters<typeof effectLines>[0];
+    const html = effectLines(row);
+    expect(html).toContain('guide-prof-effect');
+    expect(html).toContain('Test Boon');
+    expect(html).toContain('10');
+  });
+
+  it('the cooking and alchemy materials prose names the farm as a supplier (Phase 11g)', () => {
+    // THE ONLY GUARD OVER THIS HAND-AUTHORED PROSE, added by Phase 11g because
+    // that phase is what made the old text false. content.generated.ts is
+    // regenerated and diffed, but it cannot see a guide.* string at all, so
+    // without an arm here the cooking page could go back to describing a
+    // two-supplier pantry with the whole gate green. Same shape and same
+    // reasoning as the farming anchors further down this file.
+    setLanguage('en');
+    const cooking = GUIDE_PROF_CRAFTS.find((c) => c.id === 'cooking');
+    const alchemy = GUIDE_PROF_CRAFTS.find((c) => c.id === 'alchemy');
+    expect(cooking, 'the cooking craft record').toBeDefined();
+    expect(alchemy, 'the alchemy craft record').toBeDefined();
+    const cookHtml = craftDetailHtml(cooking as (typeof GUIDE_PROF_CRAFTS)[number]);
+    const alcHtml = craftDetailHtml(alchemy as (typeof GUIDE_PROF_CRAFTS)[number]);
+
+    // EVERY ANCHOR EXISTS ONLY IN THE CORRECTED PROSE. Anchoring on a clause
+    // the old text also carried is the exact trap the 11e QA blocked on and
+    // the 11f QA hit again: the correction reverts and the guard stays green.
+    // All of them are apostrophe-free, since the rendered page escapes to
+    // &#39; and a possessive anchor would never match this HTML.
+    expect(cookHtml).toContain('The third supplier is the garden bed');
+    expect(cookHtml).toContain('never held up by the pantry');
+    expect(alcHtml).toContain('The elixir line also takes a farm base');
+    expect(alcHtml).toContain('loses nothing to the change');
+    // THE APEX HALF (masterwrought Phase 11h). Both bodies enumerated the
+    // garden's buyers and both enumerations stopped at rung 50, so both went
+    // stale the moment produce reached 100 and 125. Same anchor rule as above:
+    // every clause exists ONLY in the corrected prose and is apostrophe-free,
+    // since the page escapes to &#39;.
+    expect(cookHtml).toContain('The garden reaches the top of the kitchen too');
+    // THE SUPERLATIVE IS TIED TO THE LIVE TABLE (Phase 11h QA), not just
+    // anchored as a phrase. An anchor proves the sentence is PRESENT and says
+    // nothing about whether it is TRUE, so an eighth-reagent bill would red the
+    // derived maximum in tests/provisioning_supply_line_apex.test.ts, the author
+    // would fix that arm, and this page would go on calling the hearth the
+    // longest bill in the game with every suite green. Deriving it here means
+    // the prose and the table cannot part company.
+    const longestBill = Math.max(...ALL_RECIPES.map((r) => r.reagents.length));
+    const longestRows = ALL_RECIPES.filter((r) => r.reagents.length === longestBill).map(
+      (r) => r.id,
+    );
+    // masterwrought Phase 11k TIED the record and the page said otherwise, which
+    // is exactly the drift this derivation was written to catch: the prose read
+    // "the longest bill in the game" of the hearth alone while three apex
+    // feasts joined it at eight entries. Corrected in the ENGLISH catalog and
+    // pinned BOTH WAYS, so a revert of either half reds: the live set is the
+    // four rows, the page no longer claims a sole holder, and it names the tie.
+    expect(longestRows.sort(), 'the rows that actually hold the record').toEqual([
+      'recipe_laden_hearth',
+      'recipe_sageleaf_feast',
+      'recipe_stonepot_feast',
+      'recipe_warspice_feast',
+    ]);
+    expect(cookHtml).toContain('one of the longest bills in the game');
+    expect(
+      cookHtml,
+      'the retired sole-holder claim must be ABSENT, not merely outnumbered',
+    ).not.toContain('the longest bill in the game.');
+    expect(cookHtml).toContain('Three apex feasts share the top rung with the hearth');
+    expect(alcHtml).toContain('The bench above the ladder asks for the garden too');
+    expect(alcHtml).toContain('stand beside the herbs rather than in place of them');
+    // The negative half for the claim 11h retires: the cooking page said the
+    // crops sit in the TRAINER dishes, which was the whole story until this
+    // phase and is now half of one. Without this, a reverted apex paragraph
+    // would leave the page telling a player the garden stops at the trainer
+    // ladder while the bills say otherwise, and every anchor above would pass.
+    // ANCHORED ON A PHRASE UNIQUE TO THE NEW PARAGRAPH. The obvious anchor,
+    // 'the three apex role dishes', also occurs in craftProse.cooking.identityBody,
+    // which this phase never touched, so it would have stayed green through a
+    // full revert of the apex paragraph. Measured, not assumed.
+    expect(cookHtml).toContain('tells the three apex role dishes apart');
+    expect(alcHtml).toContain('the Grand Cauldron at the very top');
+    // THE GATE CLAUSE, pinned BOTH WAYS (Phase 11h QA, fix-round review). The
+    // page shipped "all three ask Farming 50 and nothing more", which the plant
+    // path refuses: it also wants a tier-3 hoe, and that hoe wields at Farming
+    // 70, so a farmer at 50 who read this page was denied with reason 'tool'.
+    // The correction was made with no pin at all, which is the same shape as the
+    // qr-11G-BEDS hole one arm below: the surviving anchors sit in OTHER
+    // sentences of the same paragraph, so a revert of just this clause would
+    // have left every suite green. The positive half names the new clause; the
+    // negative half is what stops a "supplement rather than replace" edit from
+    // re-adding the false floor beside the true one.
+    expect(cookHtml).toContain('growing your own means a Skysilver Hoe');
+    expect(cookHtml, 'the retired Farming-50 floor must be gone, not supplemented').not.toContain(
+      'ask Farming 50 and nothing more',
+    );
+    // The headings enumerated the suppliers too, so they went stale with the
+    // bodies and are pinned with them.
+    expect(cookHtml).toContain('A pantry fed by rod, knife, and furrow');
+    expect(alcHtml).toContain('Herbs, glands, glass, and the garden');
+    // The negative half: the two-supplier headings must be gone, not merely
+    // supplemented. Without this a reverted heading would sit beside a
+    // corrected body and both positive anchors above would still pass.
+    expect(cookHtml).not.toContain('A pantry fed by rod and knife');
+    expect(alcHtml).not.toContain('Herbs, glands, and glass');
+    // And the craft blurb, which opened on the catch alone.
+    expect(t('guide.profPages.craftIntro.cooking')).toContain(
+      "the day's catch and the season's harvest",
+    );
+    // ...and the RENDERED half of it (qr-11G-INTRO, Phase 11g QA). The five
+    // anchors above read the rendered HTML; this one alone read t(), so the one
+    // string on this page whose render or escaping could regress was the one not
+    // covered against it. craftDetailHtml puts it in the lead paragraph through
+    // esc(), so the apostrophes arrive as &#39; and the anchor is written that
+    // way rather than avoided.
+    expect(cookHtml, 'the craft blurb renders, not just resolves').toContain(
+      'the day&#39;s catch and the season&#39;s harvest',
+    );
+
+    // THE QUANTITY CLAIMS, DERIVED FROM THE LIVE BILLS rather than pinned as
+    // literals, and this arm exists because a mutation proved the anchors above
+    // cannot see a miscount. The prose shipped "a Frost Gourd" against a bill of
+    // two; every anchor stayed green, because they all test WHICH clause is
+    // present and none tests whether its number is true.
+    //
+    // The prose uses the article quantitatively throughout ("a Brook Carrot" is
+    // exactly 1), so the count and the word are pinned together: change the bill
+    // without changing the sentence and this reds, which is the only way the
+    // page cannot quietly start lying about a number a player can count.
+    const countWord: Record<number, string> = { 1: 'a', 2: 'two', 3: 'three', 4: 'four' };
+    const reagentCount = (recipeId: string, itemId: string): number => {
+      const recipe = ALL_RECIPES.find((r) => r.id === recipeId);
+      expect(recipe, `${recipeId} must exist`).toBeDefined();
+      const entry = recipe?.reagents.find((g) => g.itemId === itemId);
+      expect(entry, `${recipeId} must consume ${itemId}`).toBeDefined();
+      return entry?.count ?? 0;
+    };
+    const body = t('guide.profPages.craftProse.cooking.materialsBody');
+    const gourds = reagentCount('recipe_marlows_grand_roast', 'frost_gourd');
+    const barley = reagentCount('recipe_marlows_grand_roast', 'highland_barley');
+    const carrots = reagentCount('recipe_frostgill_chowder', 'brook_carrot');
+    expect(gourds, 'the roast gourd count must have a word for it').toBeLessThanOrEqual(4);
+    // THE ROAST ANCHORS CARRY THEIR OWN TAILS TOO (masterwrought Phase 11h).
+    // They were unique phrases when Phase 11g wrote them; 11h's apex paragraph
+    // introduced a second occurrence of both into the same body, which silently
+    // weakened them: rewording the roast clause to 'three Highland Barley' while
+    // the bill still shipped 2 would have stayed green off the apex sentence.
+    // The tail restores what 11g's arm actually had.
+    expect(body, `the roast takes ${gourds} frost gourd(s)`).toContain(
+      `${countWord[gourds]} Frost Gourd${gourds === 1 ? '' : 's'} off the Highwatch terraces`,
+    );
+    expect(body, `the roast takes ${barley} highland barley`).toContain(
+      `${countWord[barley]} Highland Barley and`,
+    );
+    expect(body, `the chowder takes ${carrots} brook carrot(s)`).toContain(
+      `${countWord[carrots]} Brook Carrot${carrots === 1 ? '' : 's'}`,
+    );
+
+    // THE ALCHEMY BODY CARRIES THE SAME HAZARD and was left without the guard
+    // (qr-11G-ALCPROSE, Phase 11g QA). It writes "a Frost Gourd in the Elixir of
+    // the Serpent", the article used quantitatively exactly as the cooking body
+    // uses it, against a bill of one. That is the identical shape as the defect
+    // this arm was built for: the cooking page shipped "a Frost Gourd" against a
+    // bill of TWO and every clause anchor stayed green, because an anchor tests
+    // WHICH clause is present and never whether its number is true. Nothing above
+    // reads the alchemy body's counts, so a later phase re-tiering the serpent's
+    // gourd would leave the page quietly lying about a number a player can count.
+    const alcBody = t('guide.profPages.craftProse.alchemy.materialsBody');
+    const serpentGourds = reagentCount('recipe_elixir_of_the_serpent', 'frost_gourd');
+    expect(serpentGourds, 'the serpent gourd count must have a word for it').toBeLessThanOrEqual(4);
+    expect(alcBody, `the serpent takes ${serpentGourds} frost gourd(s)`).toContain(
+      `${countWord[serpentGourds]} Frost Gourd${serpentGourds === 1 ? '' : 's'}`,
+    );
+    // The two unquantified alchemy crops are named without a number on purpose,
+    // so pin the NAMES rather than a count: a re-tier that dropped either crop
+    // off its bill would leave the sentence claiming a supplier it lost.
+    expect(reagentCount('recipe_elixir_of_the_boar', 'vale_wheat')).toBeGreaterThan(0);
+    expect(reagentCount('recipe_venomfire_elixir', 'bog_beet')).toBeGreaterThan(0);
+    expect(alcBody).toContain('Vale Wheat in the Elixir of the Boar');
+    expect(alcBody).toContain('Bog Beet in the Vipersear');
+
+    // The same bound the gourd arm carries, stated for the other two cooking
+    // counts as well: countWord only spells 1 to 4, and an unbounded count would
+    // fail on an undefined lookup rather than on the claim under test.
+    expect(barley, 'the roast barley count must have a word for it').toBeLessThanOrEqual(4);
+    expect(carrots, 'the chowder carrot count must have a word for it').toBeLessThanOrEqual(4);
+
+    // THE APEX QUANTITY CLAIMS (masterwrought Phase 11h), derived exactly like
+    // the leveling ones above and for the same recorded reason: an anchor tests
+    // WHICH clause is present and never whether its number is true, and this
+    // page has already shipped one miscount that every anchor passed. Both new
+    // paragraphs use the article and the number word quantitatively, so every
+    // count they state is pinned to the live bill.
+    // EACH ANCHOR CARRIES ITS CLAUSE TAIL, and that is not decoration: the bare
+    // phrases 'two Frost Gourds' and 'two Highland Barley' each occur TWICE in
+    // this one body, because the pre-existing Marlow's Grand Roast sentence
+    // already uses both. Without the tail, changing the PROSE alone ('three
+    // Frost Gourds into the Stonepot Stew') left the arm green off the roast's
+    // occurrence, which is exactly the miscount class this arm exists for.
+    const apexCounts: Array<[string, string, string, string]> = [
+      ['recipe_stonepot_stew', 'frost_gourd', 'Frost Gourd', 's into the Stonepot Stew'],
+      [
+        'recipe_warspice_skewers',
+        'highland_barley',
+        'Highland Barley',
+        ' onto the Warspice Skewers',
+      ],
+      [
+        'recipe_sageleaf_chowder',
+        'thornpeak_cabbage',
+        'Thornpeak Cabbage',
+        ' into the Sageleaf Chowder',
+      ],
+      [
+        'recipe_laden_hearth',
+        'evergarden_greens',
+        'Evergarden Greens',
+        ' and a Fine Evergarden Greens',
+      ],
+    ];
+    for (const [recipeId, itemId, label, tail] of apexCounts) {
+      const n = reagentCount(recipeId, itemId);
+      expect(n, `${recipeId} ${itemId} count must have a word for it`).toBeLessThanOrEqual(4);
+      expect(body, `${recipeId} takes ${n} ${itemId}`).toContain(`${countWord[n]} ${label}${tail}`);
+    }
+    // The cooking page also names the hearth's FINE twin without a number, so
+    // pin the name against the live bill: a re-tier that dropped it would leave
+    // the sentence claiming an ingredient the recipe lost.
+    expect(reagentCount('recipe_laden_hearth', 'fine_evergarden_greens')).toBe(1);
+    expect(body).toContain('a Fine Evergarden Greens');
+    // The alchemy body's apex counts, same rule. The barley is stated once for
+    // all three flasks, so the pin is that all three really agree.
+    const flaskBarley = [
+      'recipe_ironhusk_flask',
+      'recipe_warboar_flask',
+      'recipe_runewater_flask',
+    ].map((id) => reagentCount(id, 'highland_barley'));
+    expect(new Set(flaskBarley).size, 'the three flasks must agree, as the sentence says').toBe(1);
+    expect(alcBody, `each flask steeps ${flaskBarley[0]} highland barley`).toContain(
+      `steep ${countWord[flaskBarley[0]]} Highland Barley`,
+    );
+    const melons = reagentCount('recipe_grand_cauldron', 'gilded_sunmelon');
+    expect(melons, 'the cauldron melon count must have a word for it').toBeLessThanOrEqual(4);
+    expect(alcBody, `the cauldron takes ${melons} gilded sunmelon`).toContain(
+      `${countWord[melons]} Gilded Sunmelon`,
+    );
+    expect(reagentCount('recipe_grand_cauldron', 'fine_gilded_sunmelon')).toBe(1);
+    expect(alcBody).toContain('a Fine Gilded Sunmelon');
+  });
+
   it('pins the spot literals a consistently-wrong regeneration would keep wrong', () => {
     // The rare-tier warblade: trainer-taught at the forge, 1 gold to learn,
     // gain fading at 75 / 100 / 125 (tier 2 recipe, TIER_SKILL_STEP 25).
@@ -1764,6 +2372,34 @@ describe('Guide professions generated content accuracy', () => {
     expect(pick?.acquisition).toBe('known');
     expect(pick?.feeCopper).toBe(0);
     expect(pick?.gain).toEqual({ reducedAt: 100, minimalAt: 125, zeroAt: 150 });
+    // A drop-taught apex row (Masterwrought phase 08, R8): the third
+    // acquisition arm, never 'known' (the row must not claim a pattern-drop
+    // recipe is known from the start), no trainer fee.
+    const ac = GUIDE_PROF_CRAFTS.find((c) => c.id === 'armorcrafting');
+    const apexLegs = ac?.recipes.find((r) => r.id === 'recipe_forgefold_legguards');
+    expect(apexLegs?.acquisition).toBe('drop');
+    expect(apexLegs?.feeCopper).toBe(0);
+    expect(apexLegs?.skillReq).toBe(100);
+    // A vendor-channel apex row (phase 11, R8's deterministic pillar): the
+    // fourth acquisition arm, distinct from the found-pattern channel even
+    // though the sim-side acquisition stays ['drop'] for the learn flow.
+    const alc = GUIDE_PROF_CRAFTS.find((c) => c.id === 'alchemy');
+    const apexFlask = alc?.recipes.find((r) => r.id === 'recipe_ironhusk_flask');
+    expect(apexFlask?.acquisition).toBe('vendor');
+    expect(apexFlask?.feeCopper).toBe(0);
+    // The BOTH-channels arm (phase 11f), the fifth and last value, pinned on a
+    // named row rather than derived. This exemplar is what keeps the shared
+    // channel derivation (scripts/wiki/vendor_channel.mjs, imported by the
+    // generator AND by the mirror above) from becoming a self-comparison:
+    // every farming pattern drops off Nythraxis AND sells on the marks
+    // counter, so a module mutated to collapse the both case into either
+    // single label reds HERE, on a literal, with nothing derived to agree with
+    // it. Named ids on both halves so a table edit that retires one channel
+    // reds rather than silently re-classifying the row.
+    const cook = GUIDE_PROF_CRAFTS.find((c) => c.id === 'cooking');
+    const feast = cook?.recipes.find((r) => r.id === 'recipe_harvest_feast');
+    expect(feast?.acquisition).toBe('dropAndVendor');
+    expect(feast?.feeCopper).toBe(0);
     // Specialization: skill 75, 20 percent material discount, from content.
     for (const c of GUIDE_PROF_CRAFTS) {
       expect(c.specialization.at).toBe(PERK_THRESHOLDS[c.id].specializedSkillThreshold);
@@ -1773,11 +2409,35 @@ describe('Guide professions generated content accuracy', () => {
       );
       expect(c.specialization.materialDiscountPct).toBe(20);
     }
+    // The jewelcrafting card derives its station from its unanimous forge-bound
+    // recipes (the craft is absent from STATION_TYPE_BY_CRAFT by decision), so
+    // the page names the forge and its master instead of "No station needed".
+    const jc = GUIDE_PROF_CRAFTS.find((c) => c.id === 'jewelcrafting');
+    expect(jc?.station).toBe('forge');
+    expect(jc?.masters.map((m) => m.name)).toContain('Forgemistress Darva');
+    // Enchanting keeps the null card by design: its recipe list is a sideline
+    // (two toolworks charms) while enchanting itself needs no station.
+    const ench = GUIDE_PROF_CRAFTS.find((c) => c.id === 'enchanting');
+    expect(ench?.station).toBeNull();
+    expect(ench?.masters).toEqual([]);
   });
 
   it('grounds each craft station and its resident masters in the sim tables', () => {
+    // A craft card's station is its own STATION_TYPE_BY_CRAFT entry, or (for a
+    // craft absent from that table, except enchanting) the unanimous
+    // stationType across its recipes: the generator's stationTypeForCraftCard
+    // rule, re-derived here from the same sim tables.
+    const expectedStation = (id: string): string | null => {
+      const own = STATION_TYPE_BY_CRAFT[id];
+      if (own) return own;
+      if (id === 'enchanting') return null;
+      const recipes = ALL_RECIPES.filter((r) => r.professionId === id);
+      const first = recipes[0]?.stationType ?? null;
+      if (!first) return null;
+      return recipes.every((r) => (r.stationType ?? null) === first) ? first : null;
+    };
     for (const c of GUIDE_PROF_CRAFTS) {
-      expect(c.station).toBe(STATION_TYPE_BY_CRAFT[c.id] ?? null);
+      expect(c.station).toBe(expectedStation(c.id));
       const simMasters = STATIONS.filter((s) => s.type === c.station);
       expect(c.masters.length).toBe(c.station ? simMasters.length : 0);
       for (const m of c.masters) {
@@ -1816,22 +2476,390 @@ describe('Guide professions generated content accuracy', () => {
 });
 
 describe('Guide professions gathering accuracy', () => {
-  it('covers the four gathering professions with grounded caps and bands', () => {
+  it('covers every gathering profession with grounded caps and bands', () => {
+    // Literal list, not a mirror of GATHERING_PROFESSION_IDS: comparing the
+    // generated ids against the same array the generator iterates cannot see a
+    // trade that never reached the wiki. The mirror below still ties order.
+    expect(GUIDE_PROF_GATHERING.map((g) => g.id)).toEqual([
+      'mining',
+      'logging',
+      'herbalism',
+      'fishing',
+      'farming',
+    ]);
     expect(GUIDE_PROF_GATHERING.map((g) => g.id)).toEqual([...GATHERING_PROFESSION_IDS]);
     for (const g of GUIDE_PROF_GATHERING) {
       expect(g.maxSkill).toBe(
         GATHERING_PROFESSIONS[g.id as keyof typeof GATHERING_PROFESSIONS].maxSkill,
       );
-      expect(g.bands).toEqual([0, 100, 200]);
+      // FISHING publishes its OWN six-rung catch-band ladder since
+      // masterwrought Phase 11i; the four land professions still publish the
+      // shared three-rung one. Split here rather than relaxed to a length
+      // check, so the wiki cannot start publishing the wrong ladder for either
+      // side without reddening.
+      expect(g.bands, `${g.id} bands`).toEqual(
+        g.id === 'fishing' ? [0, 100, 150, 200, 200, 200] : [0, 100, 200],
+      );
     }
+    // Non-vacuity for the split: both arms are exercised, so neither branch is
+    // dead and a generator that published one ladder for everyone reds.
+    expect(GUIDE_PROF_GATHERING.filter((g) => g.bands.length === 6)).toHaveLength(1);
+    expect(GUIDE_PROF_GATHERING.filter((g) => g.bands.length === 3)).toHaveLength(4);
     expect(GUIDE_PROF_GATHERING.find((g) => g.id === 'mining')?.maxSkill).toBe(100);
     expect(GUIDE_PROF_GATHERING.find((g) => g.id === 'fishing')?.maxSkill).toBe(200);
+    expect(GUIDE_PROF_GATHERING.find((g) => g.id === 'farming')?.maxSkill).toBe(100);
+  });
+
+  // Both hub bodies used to spell the trade count into the prose ("four
+  // gathering trades"), which made the wiki quietly lie the moment a fifth
+  // trade was registered. They are count-free now, and the hub sentence names
+  // every trade the sim ships, so a sixth one cannot land without an edit here.
+  it('describes the gathering trades count-free and names every one of them', () => {
+    setLanguage('en');
+    const bodies = [
+      ['guide.professions.whatBody', t('guide.professions.whatBody')],
+      ['guide.professions.gatherHubBody', t('guide.professions.gatherHubBody')],
+    ] as const;
+    for (const [key, value] of bodies) {
+      expect(value.length, key).toBeGreaterThan(0);
+      expect(value, `${key} spells a gathering-trade count`).not.toMatch(/\b(four|five|[45])\b/i);
+    }
+    const gatherHubBody = t('guide.professions.gatherHubBody');
+    for (const id of GATHERING_PROFESSION_IDS) {
+      const name = GATHERING_PROFESSIONS[id].name;
+      expect(gatherHubBody, `gatherHubBody never names ${name}`).toContain(name);
+    }
+    // Literal, so the loop above cannot pass vacuously on an empty id list.
+    expect(gatherHubBody).toContain('Farming');
+  });
+
+  // The farming page once rendered "respawns for you 0 seconds" (the `?? 0`
+  // fallback over an empty nodes array) and the full vendor-ladder prose over
+  // an empty tools table: invented content on a public page that three data
+  // pins and a full gate never saw, because data pins are not page pins. This
+  // drives the REAL page render on both sides of the length guard. The Phase
+  // 5 hoe ladder flipped farming's tools side: the section is DEMANDED now,
+  // while the nodes side stays guarded off forever (farming has no
+  // GATHER_NODES by design, fishing-shaped on land), and a synthetic toolless
+  // record keeps the guard's absent side exercised.
+  it("the farming page states farming's own rhythm, gain and yield model, never the node trades'", () => {
+    // The wiki completeness audit (2026-09-03). The page used to render
+    // guide.profPages.rhythmBody, gainBody and yieldsBody, which describe the
+    // NODE model: a gather cast, the node gain curve scored against a node's
+    // tier, and the common-to-legendary material ladder with its unit counts
+    // and signed instances. Farming uses none of the three, so eight of that
+    // lane's findings were rated changes-the-page against this one reuse. The
+    // three shared keys are untouched and still render on mining, logging and
+    // herbalism, where they are true; farming renders its own. Every number
+    // below is DERIVED from src/sim/professions/farming.ts, so a retune moves
+    // the page and this pin together instead of rotting the prose.
+    setLanguage('en');
+    const farming = GUIDE_PROF_GATHERING.find((g) => g.id === 'farming');
+    expect(farming).toBeDefined();
+    const html = gatheringDetailHtml(farming as (typeof GUIDE_PROF_GATHERING)[number]);
+    const mining = GUIDE_PROF_GATHERING.find((g) => g.id === 'mining');
+    expect(mining).toBeDefined();
+    const miningHtml = gatheringDetailHtml(mining as (typeof GUIDE_PROF_GATHERING)[number]);
+
+    // NEGATIVE, the whole point: not one clause of the node model reaches the
+    // farming page, while every one of them still reaches a node page.
+    const nodeOnly = [
+      'A harvest is a short visible cast',
+      'every harvest pays a small slice of character XP',
+      'a node at or above your gain tier teaches a full point per harvest',
+      'the common grade disappears entirely',
+      'a common roll yields 1 unit',
+      'signed instance stamped Gathered by you',
+    ];
+    for (const clause of nodeOnly) {
+      expect(html, `the farming page must not carry the node clause "${clause}"`).not.toContain(
+        clause,
+      );
+      expect(miningHtml, `a node page must still carry "${clause}"`).toContain(clause);
+    }
+
+    // The rhythm: planting is the live cast constant, harvesting is instant,
+    // and nothing is refused for bag room (harvestCrop guards on dead, bed,
+    // range, plot and readiness only).
+    expect(html).toContain(`${formatNumber(FARM_PLANT_CAST_SEC)} seconds flat at every rung`);
+    expect(html).toContain('Pulling a ripe crop is instant');
+    expect(html).toContain('no bag check to refuse it');
+    expect(html).toContain('it grants no character XP at all');
+
+    // The gain model: the four schedule rows and the two teaching ceilings a
+    // crop tier sets, every figure read from the live schedule.
+    const [r1, r2, r3, r4] = FARMING_GAIN_SCHEDULE;
+    expect(html).toContain(
+      `${formatNumber(r1.gain)} proficiency a harvest below ${formatNumber(r1.belowProficiency)}`,
+    );
+    expect(html).toContain(`${formatNumber(r2.gain)} below ${formatNumber(r2.belowProficiency)}`);
+    expect(html).toContain(`${formatNumber(r3.gain)} below ${formatNumber(r3.belowProficiency)}`);
+    expect(html).toContain(`${formatNumber(r4.gain)} the rest of the way`);
+    expect(html).toContain('never a skill-up roll');
+    expect(html).toContain(
+      `A tier 1 crop teaches to ${formatNumber(farmingTeachingCeilingFor(1))}`,
+    );
+    expect(html).toContain(`a tier 2 crop to ${formatNumber(farmingTeachingCeilingFor(2))}`);
+    // Tier 3 and 4 both teach to the cap, which is why the prose groups them.
+    expect(farmingTeachingCeilingFor(3)).toBe(farmingTeachingCeilingFor(4));
+    expect(farmingTeachingCeilingFor(3)).toBe((farming as { maxSkill: number }).maxSkill);
+
+    // The yield model: lives, the keep chance at both ends, the fine twin as
+    // an UPGRADE, and the two things that add picks at the plain grade.
+    const pct = (n: number) => formatNumber(Math.round(n * 100));
+    expect(html).toContain(`a floor of ${formatNumber(FARM_HARVEST_LIFE_FLOOR)} lives`);
+    expect(html).toContain(`${pct(FARM_KEEP_CHANCE_BASE)} percent at a fresh counter`);
+    expect(html).toContain(
+      `${pct(FARM_KEEP_CHANCE_BASE + FARM_KEEP_CHANCE_SKILL_SCALE)} percent at the cap`,
+    );
+    expect(html).toContain(`${pct(FARM_FINE_CHANCE_BASE)} percent chance at a fresh counter`);
+    expect(html).toContain(
+      `${pct(FARM_FINE_CHANCE_BASE + FARM_FINE_CHANCE_SKILL_SCALE)} percent at the cap`,
+    );
+    expect(html).toContain('a fine pick upgrades a pick and never adds one');
+    expect(html).toContain('There is no common-to-legendary ladder on a bed');
+    expect(html).toContain(
+      `pays ${formatNumber(FARM_TONIC_BONUS_PICKS)} more picks on a ${pct(FARM_TONIC_BONUS_CHANCE)} percent chance`,
+    );
+    expect(html).toContain(
+      `a slotted quantity effect adds ${formatNumber(FARM_EFFECT_BONUS_PICK_CAP)}`,
+    );
+    expect(html).toContain(
+      `adding ${pct(FARM_FINE_CHANCE_EFFECT_BONUS)} percentage points to every fine roll`,
+    );
+    // The charm cap is farming's own, and it is what makes the sentence true:
+    // if it ever equalled the catalog bonus the clause would be a lie.
+    expect(FARM_EFFECT_BONUS_PICK_CAP).toBeLessThan(FARM_TONIC_BONUS_PICKS);
+  });
+
+  it('renders farming with its tool ladder, no node prose, and length-guards empty tables', () => {
+    setLanguage('en');
+    const farming = GUIDE_PROF_GATHERING.find((g) => g.id === 'farming');
+    expect(farming).toBeDefined();
+    const html = gatheringDetailHtml(farming as (typeof GUIDE_PROF_GATHERING)[number]);
+    expect(html, 'the shipped hoe ladder must render its tools section').toContain(
+      'id="prof-tools"',
+    );
+    expect(html).toContain('Garden Hoe');
+    expect(html, 'nodes prose must not render for a nodeless trade').not.toContain(
+      'id="prof-nodes"',
+    );
+    expect(html).toContain('id="prof-rhythm"');
+    // The go-live planting-loop section: farming only, and it names the
+    // front door and the timer surface a reader needs (both literals, so a
+    // reword that drops either fails here rather than on the public page).
+    expect(html, 'the farming page must carry its planting-loop section').toContain(
+      'id="prof-farm-beds"',
+    );
+    // The Phase 13 beds-to-table section (the well-fed dishes, the shared
+    // feast, the golden harvest): farming-only, like the beds section above.
+    expect(html, 'the farming page must carry its beds-to-table section').toContain(
+      'id="prof-farm-table"',
+    );
+    // The deeds ternary's farming branch renders the live farmingSown prose,
+    // never the retired no-deeds-yet leaf.
+    expect(html).toContain('its own shelf in the Book of Deeds');
+    expect(html).not.toContain('keeps no deeds of its own yet');
+    // THE (bo) DORMANCY DISCLOSURE, INVERTED at Phase 11e rather than deleted.
+    // It used to require BOTH farming prose sections to carry the later-patch
+    // idiom, because the tier 3/4 seed faucet was absent and advertising that
+    // content as live would have been a lie no purchase-surface sweep could
+    // see. GATE 1 shipped the faucet, so the disclosure became the lie, and
+    // this pin now guards the other direction: neither section may still tell
+    // a player the upper fields are a later patch.
+    //
+    // Kept as an assertion rather than dropped, for the same reason the deed
+    // honesty arm was inverted rather than removed: deleting it would leave
+    // nothing saying the prose has to track the faucet, and this is the ONLY
+    // guard over hand-authored guide.* prose (tests regenerate and diff
+    // content.generated.ts, which cannot see these strings at all).
+    expect(
+      html.split('comes within reach with a later patch').length - 1,
+      'the faucet shipped: no farming section may still disclose dormancy',
+    ).toBe(0);
+    // ...and the positive half, ONE ANCHOR PER SECTION. The retired pin
+    // counted the idiom .toBe(2), which implicitly required BOTH sections to
+    // still carry prose; a single anchor would have let the table section be
+    // gutted with both assertions still green, so the inversion keeps the
+    // per-section coverage its predecessor had rather than only its intent.
+    // farmingSown:
+    expect(html).toContain('Every Furrow Filled');
+    // farm.tableBody. Re-anchored at Phase 11f, which reworded this sentence.
+    // The surviving clause is kept as the section's presence anchor...
+    expect(html).toContain('leans on the mountain and parterre crops');
+    // ...but it CANNOT be the disclosure anchor, and that is the 11e QA lesson
+    // restated: it appears verbatim in the pre-11f text too, so the whole
+    // correction could revert with this guard green. The anchors below are
+    // clauses that exist ONLY in the corrected prose, one per fact 11f moved:
+    // the recipes left the trainer, and they are bought with Marks instead.
+    expect(html).toContain('no longer taught at any counter');
+    expect(html).toContain('bought with Heroic Marks');
+    // The same rule for farm.bedsBody's 11f half. Its 11e anchors below are
+    // tied to the farmers; these two are tied to the channels 11f ADDED, which
+    // nothing else on the page would keep honest if the sentence reverted.
+    // Apostrophe-free on purpose: the rendered page escapes it to &#39;, so a
+    // possessive anchor would never match the HTML this reads.
+    expect(html).toContain('turn up in endgame drops');
+    expect(html).toContain('and on the Heroic Quartermaster');
+    // farm.bedsBodyScribeBuyer (Masterwrought Phase 19G, D171): the sibling
+    // paragraph that names the scribe as a produce buyer, rendered AFTER
+    // bedsBody. Its own clause, apostrophe-free, so deleting the paras() call
+    // in professions_gathering.ts reds here (the key arm reads t(), not HTML),
+    // and its position is pinned after a bedsBody clause, so a re-order reds.
+    const scribeAt = html.indexOf(
+      'takes a Frost Gourd off the Highwatch terraces, the same gourd the',
+    );
+    expect(scribeAt, 'the scribe paragraph renders').toBeGreaterThan(-1);
+    expect(scribeAt, 'the scribe paragraph renders after bedsBody').toBeGreaterThan(
+      html.indexOf('and on the Heroic Quartermaster'),
+    );
+    // ...and inside the beds section: before the table section's own anchor
+    // (the round-three read: a lower bound alone lets it drift to a later
+    // section of the same page).
+    // The anchor also sits on the RETIRED farm.tableBody row of the catalog; the
+    // page renders only the live tableBodyOneMeal, so indexOf binds the live
+    // one (the close-out read).
+    expect(scribeAt, 'the scribe paragraph renders before the table section').toBeLessThan(
+      html.indexOf('leans on the mountain and parterre crops'),
+    );
+    // farm.bedsBody. THE SECTION THAT ACTUALLY WENT STALE, and until the 11e QA
+    // the only section with no anchor tying it to the faucet: its two anchors
+    // were Jessica alone, who has stocked the Vale pair since the growth engine
+    // shipped, so the sentence GATE 1 rewrote (the one that used to say no
+    // counter sells the Highwatch or Evergarden seeds) could have reverted with
+    // this guard fully green. Anchored on both upper farmers now, by LIVE name.
+    expect(html).toContain('Farmer Jessica');
+    // Tied to the live NPC name so a rename cannot leave the page lying.
+    expect(html).toContain(NPCS.farmer_jessica.name);
+    // The prose names these two by bare first name (Jessica alone gets the
+    // "Farmer" form), so tie the bare name to the live NPC name rather than
+    // matching the full string: a rename that moves the word still reds.
+    for (const [npcId, spoken] of [
+      ['farmer_hollis', 'Hollis'],
+      ['farmer_verbena', 'Verbena'],
+    ] as const) {
+      expect(NPCS[npcId].name, `${npcId} name must contain the word the prose uses`).toContain(
+        spoken,
+      );
+      expect(html).toContain(spoken);
+    }
+    // ...and the prose is tied to the MECHANIC, not just to the names: both
+    // counters must really stock the seeds the sentence sends a player to. This
+    // is the half a name check cannot give, and the half that was missing.
+    for (const npcId of ['farmer_hollis', 'farmer_verbena'] as const) {
+      const stocked = NPCS[npcId].vendorItems ?? [];
+      const seeds = stocked.filter((id) => id.endsWith('_seed'));
+      expect(seeds.length, `${npcId} must stock the seeds bedsBody promises`).toBe(4);
+    }
+    expect(html).toContain('Harvest Journal');
+    expect(html).toContain('withered husks');
+    // farm.bedsBody's Phase 11g half, anchored on the ONE fact 11g moved: the
+    // produce now has buyers outside farming's own recipes. Same rule as the
+    // two 11f anchors above and for the same reason: the surviving clauses of
+    // this sentence all appear verbatim in the pre-11g text, so anchoring on
+    // any of them would let the correction revert with this guard green.
+    // Apostrophe-free, since the rendered page escapes it to &#39;.
+    expect(html).toContain('a buyer from the very first rung');
+    expect(html).toContain('into the apothecary');
+    // AND THE PHASE 11h HALF (added at the 11h QA). The sentence above was
+    // still true after 11h and that is exactly why it needed a companion: it
+    // enumerates where a farmer's season goes and it stopped at the trainer
+    // ladder and the elixir line, both rung-50 surfaces, while 11h routed
+    // produce into three cooking-100 plates, three alchemy-100 flasks and both
+    // skill-125 capstones. A page that stops at rung 50 tells a farmer their
+    // buyers stop there. Anchored on a clause unique to the new sentence, for
+    // the reason the 11g anchor above records.
+    expect(html).toContain('the last rung of both crafts is bought from a farmer too');
+    expect(html).toContain('the Evergarden beds feed the two skill-125 capstone stations');
+    // THE NEGATIVE HALF, which the two 11g anchors above lacked (qr-11G-BEDS,
+    // Phase 11g QA). A full revert reds on them, but a "supplement rather than
+    // replace" edit that re-adds the pre-11g clause beside the new one keeps
+    // them green while the page tells a player both that produce only cooks
+    // into dishes and that it feeds two trainer ladders. The cooking and
+    // alchemy headings already carry their stale forms pinned ABSENT for
+    // exactly this reason; this is the same treatment for the farm page.
+    expect(html, 'the pre-11g clause must be gone, not merely supplemented').not.toContain(
+      'the produce cooks into dishes at the kitchens',
+    );
+    // The guard itself stays honest on its absent side: a toolless record
+    // still renders neither section, never prose over an empty table.
+    const toolless = {
+      ...(farming as (typeof GUIDE_PROF_GATHERING)[number]),
+      tools: [],
+      nodes: [],
+    };
+    const bareHtml = gatheringDetailHtml(toolless);
+    expect(bareHtml, 'tools prose must not render for a toolless trade').not.toContain(
+      'id="prof-tools"',
+    );
+    expect(bareHtml, 'nodes prose must not render for a nodeless trade').not.toContain(
+      'id="prof-nodes"',
+    );
+    const mining = GUIDE_PROF_GATHERING.find((g) => g.id === 'mining');
+    const miningHtml = gatheringDetailHtml(mining as (typeof GUIDE_PROF_GATHERING)[number]);
+    expect(miningHtml, 'the guard is length-based: a full trade keeps tools').toContain(
+      'id="prof-tools"',
+    );
+    expect(miningHtml, 'the guard is length-based: a full trade keeps nodes').toContain(
+      'id="prof-nodes"',
+    );
+    expect(miningHtml, 'the planting loop is farming-only prose').not.toContain(
+      'id="prof-farm-beds"',
+    );
+    expect(miningHtml, 'the beds-to-table section is farming-only prose').not.toContain(
+      'id="prof-farm-table"',
+    );
+    // The deeds ternary's other branch: a non-farming trade still renders its
+    // own gatherDeeds leaf.
+    expect(miningHtml).toContain('Ore in the Blood');
+    // The dormancy disclosure is farming-only prose: its phrase leaking into
+    // another trade's page would mean the shared builder grew a wrong branch.
+    expect(miningHtml).not.toContain('comes within reach with a later patch');
+  });
+
+  // Master Gatherer's trigger counts every registered trade (src/sim/deeds.ts
+  // filters GATHERING_PROFESSION_IDS), so prose that enumerates the roster goes
+  // stale the moment a trade joins. It went stale twice, on fishing and again
+  // on farming, so the enumerating form is banned outright rather than patched
+  // a third time. tests/deeds_content.test.ts owns the trigger itself; this
+  // pins the player-visible strings that describe it.
+  it('never enumerates the Master Gatherer roster in the deed prose', () => {
+    setLanguage('en');
+    for (const id of GATHERING_PROFESSION_IDS) {
+      const body = t(`guide.profPages.gatherDeeds.${id}` as never);
+      expect(body.length, id).toBeGreaterThan(0);
+      expect(body, `gatherDeeds.${id} enumerates the gathering roster`).not.toMatch(
+        /any three of/i,
+      );
+    }
+    expect(DEEDS.prog_master_gatherer.desc).toBe(
+      'Reach 100 proficiency in any three gathering trades.',
+    );
   });
 
   it('aggregates every world node into its zone row (tool tier = node tier)', () => {
     const typeFor: Record<string, string> = { mining: 'ore', logging: 'wood', herbalism: 'herb' };
     for (const g of GUIDE_PROF_GATHERING) {
       if (g.id === 'fishing') continue;
+      if (g.id === 'farming') {
+        // Farming has no GATHER_NODES rows by design (fishing-shaped on land:
+        // beds are patch content, never nodes), so the node aggregation stays
+        // EMPTY on purpose and no respawn number ever publishes. The tool
+        // ladder is the aggregation's real farming output since the Phase 5
+        // hoes: the five rungs since masterwrought Phase 11j, rung 1 the only
+        // priced one (seated on the tier-1 farmer NPC since the go-live; the
+        // row-by-row mirror below owns the rest of the fields).
+        expect(g.nodes).toEqual([]);
+        expect((g.tools ?? []).map((tool) => [tool.name, tool.tier, tool.priceCopper])).toEqual([
+          ['Garden Hoe', 1, 20],
+          ['Bronze Hoe', 2, null],
+          ['Skysilver Hoe', 3, null],
+          ['Osmium Hoe', 4, null],
+          ['Evergarden Hoe', 5, null],
+        ]);
+        expect(g.respawnSeconds).toBeUndefined();
+        continue;
+      }
       const simNodes = GATHER_NODES.filter((n) => n.type === typeFor[g.id]);
       const total = (g.nodes ?? []).reduce((sum, row) => sum + row.count, 0);
       expect(total, `${g.id} node count drifted`).toBe(simNodes.length);
@@ -1877,6 +2905,10 @@ describe('Guide professions gathering accuracy', () => {
       expect(rows[0].quality).toBe(def.quality ?? 'common');
       expect(rows[0].priceCopper).toBe(def.buyValue ?? null);
       if (def.buyValue != null) {
+        // Every vendor-priced tool has a counter, the farming garden hoe
+        // included since the go-live seated it on the tier-1 farmer (the
+        // priced-but-unstocked narrowing this branch used to carry is gone;
+        // tests/professions_zone_rollout.test.ts pins the farmer stock).
         const stocked = Object.values(NPCS).some((n) => n.vendorItems?.includes(itemId));
         expect(stocked, `vendor tool "${itemId}" is stocked by no NPC`).toBe(true);
         expect(rows[0].vendors.length).toBeGreaterThan(0);
@@ -1927,8 +2959,10 @@ describe('Guide professions gathering accuracy', () => {
       }
     }
     // The rod ladder: simple pole tier 1, Ironreel t2 at 60c, Silverstream t3
-    // at 150c, all bought; Stormreel t4 and Tidewrought t5 crafted, so they
-    // carry no price at all.
+    // at 150c, all bought; Stormreel t4, Tidewrought t5 and the Clockreel t6
+    // crafted, so they carry no price at all. SIX rungs since masterwrought
+    // Phase 11i, and the apex rung is the only tier-6 gathering tool in the
+    // game.
     const fishing = GUIDE_PROF_GATHERING.find((g) => g.id === 'fishing');
     expect(fishing?.tools.map((tool) => [tool.name, tool.tier, tool.priceCopper])).toEqual([
       ['Simple Fishing Pole', 1, 20],
@@ -1936,6 +2970,7 @@ describe('Guide professions gathering accuracy', () => {
       ['Silverstream Fishing Rod', 3, 150],
       ['Stormreel Fishing Rod', 4, null],
       ['Tidewrought Fishing Rod', 5, null],
+      ['Clockreel Fishing Rod', 6, null],
     ]);
     // Every rung says where it comes from, and the two routes are exclusive:
     // a bought rod names a counter, a crafted one names the craft that makes
@@ -1975,7 +3010,127 @@ describe('Guide professions gathering accuracy', () => {
         ).toBe(true);
       }
     }
-    expect([bought, crafted]).toEqual([3, 2]);
+    // Three bought rungs, THREE crafted since masterwrought Phase 11i.
+    expect([bought, crafted]).toEqual([3, 3]);
+  });
+
+  it('the shared tools note is TRUE of farming, not only of the node trades', () => {
+    // THE ONLY GUARD OVER THIS HAND-AUTHORED PROSE, added at the masterwrought
+    // Phase 11j QA. professions_gathering.ts renders toolsNoteFishingPageMarks
+    // (re-keyed from toolsNoteThreeRods at Phase 19F, D161, once more at its
+    // review round for a false starter count, and a third time for a
+    // cross-page 'table below' phrase) above
+    // the tool table on EVERY gathering page, farming included, and the note
+    // described the node trades as if they were all of them. On the farming
+    // page it sat directly above a table showing five hoe rungs while saying
+    // each land trade has two crafted tools; it said every character knows the
+    // land recipes, where all four hoe rungs are acquisition ['trainer']; and
+    // it said the land trades' crafted tools buy no access, where planting a
+    // tier-N bed needs a tier-N hoe. content.generated.ts is regenerated and
+    // diffed, but a diff of the table cannot see the paragraph beside it.
+    //
+    // ANCHORED ON CLAUSES THAT EXIST ONLY IN THE CORRECTED TEXT, the rule the
+    // Phase 11g arm above records: an anchor the old wording also carried lets
+    // a revert stay green. Anchors are read off t(), not the rendered page, so
+    // the possessive in the sixth clause below is safe; the page escapes it to
+    // &#39; and the older anchors stay apostrophe-free by habit.
+    setLanguage('en');
+    const en = t('guide.profPages.toolsNoteFishingPageMarks', {
+      tier2Prof: String(TIER2_TOOL_GATE_PROFICIENCY),
+      tier3Prof: String(TIER3_TOOL_GATE_PROFICIENCY),
+    });
+    expect(en).toContain('the three node trades each have two crafted tools');
+    expect(en).toContain(
+      'ladder is the long one: every hoe above the 20-copper starter is crafted',
+    );
+    expect(en).toContain('all four taught by the toolmaker rather than known from the start');
+    expect(en).toContain('a bed of tier N asks a hoe of tier N');
+    // The FOURTH clause, and the one a farmer would have acted on: the vendor
+    // ladder paragraph promised tiers 1 to 3 across the three heartland hubs,
+    // where farming's only priced rung sits on a farmer NPC at the allotments.
+    expect(en).toContain('its tier-1 hoe is stocked by the farmer who keeps the first allotment');
+    expect(en).toContain('no hoe rung above it is sold for coin anywhere');
+    // SINGULAR, and pinned as such: exactly ONE NPC anywhere sells garden_hoe,
+    // and the correction to this paragraph first said "the farmers at the
+    // allotments", which would have been a smaller falsehood inside a fix for a
+    // larger one. The other three farmers stock seeds and compost only.
+    const hoeSellers = Object.values(NPCS)
+      .filter((npc) => npc.vendorItems?.includes('garden_hoe'))
+      .map((npc) => npc.id);
+    expect(hoeSellers, 'exactly one NPC sells the tier-1 hoe').toHaveLength(1);
+    // And no OTHER hoe rung is on any NPC counter at all, which is the second
+    // half of the sentence.
+    const anyHoeSeller = Object.values(NPCS).flatMap((npc) =>
+      (npc.vendorItems ?? []).filter((id) => id.endsWith('_hoe') && id !== 'garden_hoe'),
+    );
+    expect(anyHoeSeller, 'no hoe rung above the first is vendor-sold').toEqual([]);
+    // THE FIFTH CLAUSE (19F review round): the note counts the 20-copper land
+    // starters that never sell back, mail or list. Derived from ITEMS, never a
+    // literal: the fenced set is every gatherTool carrying BOTH noVendorSell
+    // and noMarketList (the quest-granted tier-1 kit, the Garden Hoe included
+    // since the farming go-live), and the note must count them and name each.
+    // The 11i note said 'three' for a year of fills; a pin on the count alone
+    // would have passed a note naming the wrong three.
+    // LAND tools only (the sentence says so, and a fenced fishing rod would
+    // otherwise make this pin demand a false sentence), and the price the
+    // sentence states is derived from the set, never held as a literal.
+    const fenced = Object.values(ITEMS).filter(
+      (i) =>
+        i.use?.type === 'gatherTool' &&
+        i.use.professionId !== 'fishing' &&
+        i.noVendorSell &&
+        i.noMarketList,
+    );
+    expect(fenced.length, 'the fenced starter kit').toBeGreaterThanOrEqual(4);
+    // Positive control on the land qualifier: no fenced FISHING tool exists
+    // today, so the day one is added the prose is revisited on purpose rather
+    // than the derived count moving on its own.
+    const fencedAny = Object.values(ITEMS).filter(
+      (i) => i.use?.type === 'gatherTool' && i.noVendorSell && i.noMarketList,
+    );
+    expect(fencedAny.length, 'no fenced fishing tool today').toBe(fenced.length);
+    const prices = new Set(fenced.map((i) => i.buyValue));
+    expect(prices.size, 'one starter price').toBe(1);
+    const [price] = prices;
+    const COUNT_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven'];
+    expect(COUNT_WORDS[fenced.length], 'a count word for the fenced set').toBeDefined();
+    expect(en).toContain(`except the ${COUNT_WORDS[fenced.length]} ${price}-copper land starters`);
+    // THE SIXTH CLAUSE (the round-two fresh read): the note renders on every
+    // gathering page, so a 'below' that only the fishing page can honour is a
+    // false sentence on four of the five; the rods' Marks prices live on the
+    // fishing page's own table and the note must say so.
+    expect(en).toContain("the fishing page's tool table carries their Marks prices");
+    expect(en, 'no cross-page below').not.toContain('fishing table below');
+    for (const tool of fenced) expect(en, `names ${tool.id}`).toContain(tool.name);
+    // The retired claims, each pinned ABSENT so a revert reds rather than
+    // quietly restoring a false page.
+    expect(en, 'the node-trade count must not be claimed of every land trade').not.toContain(
+      'each land trade has two crafted tools',
+    );
+    expect(en, 'the hoes are trainer-taught, never known').not.toContain(
+      'every character knows the land recipes',
+    );
+    expect(en, 'farming is not covered by the node-tier ceiling').not.toContain(
+      'For the land trades no node today needs more than tier 3',
+    );
+
+    // AND TIED TO THE LIVE TABLES, so the sentences are true rather than
+    // merely present. Every hoe rung above the entry one is trainer-taught,
+    // the ladder really runs 2 through 5, and the top crop tier really is the
+    // one the tier-4 hoe reaches.
+    expect(HOE_RECIPES.map((r) => r.acquisition?.join(','))).toEqual([
+      'trainer',
+      'trainer',
+      'trainer',
+      'trainer',
+    ]);
+    expect(
+      HOE_RECIPES.map((r) => {
+        const use = ITEMS[r.resultItemId].use;
+        return use?.type === 'gatherTool' ? use.tier : 0;
+      }),
+    ).toEqual([2, 3, 4, 5]);
+    expect(Math.max(...Object.values(FARM_CROPS).map((c) => c.tier))).toBe(4);
   });
 
   it('publishes the tool-gate thresholds through placeholders in EVERY locale', () => {
@@ -1985,7 +3140,7 @@ describe('Guide professions gathering accuracy', () => {
     // frozen numbers, and nothing else would notice, because the value would
     // still be present and translated.
     setLanguage('en');
-    const en = t('guide.profPages.toolsNote', {
+    const en = t('guide.profPages.toolsNoteFishingPageMarks', {
       tier2Prof: String(TIER2_TOOL_GATE_PROFICIENCY),
       tier3Prof: String(TIER3_TOOL_GATE_PROFICIENCY),
     });
@@ -1997,8 +3152,13 @@ describe('Guide professions gathering accuracy', () => {
     // crafted-rung clause to the frozen wield table: a retune fails here
     // instead of rotting in the prose, and the clause scope keeps an
     // unrelated 100 elsewhere in the note from ever satisfying this.
+    // PER TIER RATHER THAN "for the two crafted rungs", re-worded at the
+    // masterwrought Phase 11j QA: farming has FOUR crafted rungs, so the old
+    // phrasing named the wrong set on the page that shows a five-rung hoe
+    // ladder. The derivation from the frozen wield table is unchanged, which
+    // is the half that matters here.
     expect(en).toContain(
-      `${TIER4_TOOL_WIELD_PROFICIENCY} and ${TIER5_TOOL_WIELD_PROFICIENCY} for the two crafted rungs`,
+      `${TIER4_TOOL_WIELD_PROFICIENCY} for tier 4 and ${TIER5_TOOL_WIELD_PROFICIENCY} for tier 5`,
     );
     // The Marks-route cells name their gates as English words, so tie the
     // wording to the live gate IN THE SAME BREATH: if the delve counter's
@@ -2030,11 +3190,22 @@ describe('Guide professions gathering accuracy', () => {
     // loader map, and the pending slice.
     const INFRA = new Set(['index.ts', 'loaders.ts', 'pending.ts']);
     const locales = readdirSync(dir).filter((f) => f.endsWith('.ts') && !INFRA.has(f));
-    expect(locales.length).toBeGreaterThan(15);
+    // Every shipped locale plus the pseudo-locale: a bundle missing from the
+    // sweep is a locale this pin silently stopped guarding.
+    expect(locales.length).toBeGreaterThanOrEqual(supportedLanguages.length + 1);
+    expect(supportedLanguages.length, 'the shipped locale count').toBe(22);
     for (const file of locales) {
       const source = readFileSync(`${dir}/${file}`, 'utf8');
-      const at = source.indexOf('toolsNote');
-      expect(at, `${file} carries toolsNote`).toBeGreaterThan(-1);
+      // The exact key, and exactly one toolsNote row per slice (19F review
+      // round): a first-substring hit was the looseness that forced two
+      // delete-outright re-keys, since a retired predecessor sorts first and
+      // carries both tokens; a second row on the stem now reds here instead
+      // of being the row this pin silently reads.
+      expect(source.match(/toolsNote/g)?.length, `${file} carries exactly one toolsNote row`).toBe(
+        1,
+      );
+      const at = source.indexOf('"toolsNoteFishingPageMarks"');
+      expect(at, `${file} carries toolsNoteFishingPageMarks`).toBeGreaterThan(-1);
       // Bounded by the value's own line, not a magic width: a window wider
       // than the longest translation reaches into following keys, and the
       // direction of that looseness is a FALSE PASS.
@@ -2066,7 +3237,7 @@ describe('Guide professions gathering accuracy', () => {
     expect(f.rodBiteReductionSec).toBe(1.5);
     expect(f.reelWindowSec).toBe(2.5);
     expect(f.reelRodBonusSec).toBe(0.75);
-    expect(f.sessionCapSec).toBe(15);
+    expect(f.sessionCapSec).toBe(16);
     // The biteBody prose quotes DERIVED figures (worst wait and reel window
     // per rod tier) as English literals; derive them here from the published
     // constants so a rhythm retune reds the prose too, not just the numbers
@@ -2086,11 +3257,17 @@ describe('Guide professions gathering accuracy', () => {
     expect(f.schedule).toEqual(
       FISHING_GAIN_SCHEDULE.map((row) => ({ below: row.belowProficiency, gain: row.gain })),
     );
+    // The four VALUES were re-derived at masterwrought Phase 11i (DECISION F)
+    // from a measured casts-to-200 model; the four BOUNDARIES are frozen,
+    // because fishingTeachingCeilingFor derives the water teaching ceilings
+    // from them. The derivation itself is pinned in
+    // tests/professions_fishing.test.ts; this arm only holds the wiki to
+    // whatever the sim ships.
     expect(f.schedule).toEqual([
-      { below: 50, gain: 1 },
-      { below: 100, gain: 0.5 },
-      { below: 150, gain: 0.1 },
-      { below: 200, gain: 0.02 },
+      { below: 50, gain: 0.08 },
+      { below: 100, gain: 0.05 },
+      { below: 150, gain: 0.04 },
+      { below: 200, gain: 0.03 },
     ]);
     expect(f.junkCutoff).toBe(100);
     expect(f.rareCatch).toBe('Sunglint Koi');
@@ -2101,7 +3278,11 @@ describe('Guide professions gathering accuracy', () => {
     for (const [band, byZone] of FISHING_TABLES_BY_BAND.entries()) {
       const pub = f.bandTables[band];
       expect(pub.rodTierRequired).toBe(band + 1);
-      expect(pub.minProficiency).toBe([0, 100, 200][band]);
+      // FISHING's own ladder, not the shared one: they were the same array
+      // until masterwrought Phase 11i split them, and the generator read the
+      // shared one until that phase, which would have published 200 for a band
+      // gated at 150 and `undefined` for every band above 2.
+      expect(pub.minProficiency).toBe([0, 100, 150, 200, 200, 200][band]);
       for (const [zoneId, rows] of Object.entries(byZone)) {
         const zoneName = ZONES.find((z) => z.id === zoneId)?.name ?? zoneId;
         const pubZone = pub.zones.find((z) => z.zone === zoneName);
@@ -2116,17 +3297,24 @@ describe('Guide professions gathering accuracy', () => {
         expect(pubZone?.rows.reduce((sum, r) => sum + r.pct, 0)).toBe(100);
       }
     }
-    // The koi odds are the one row that reads skill and nothing else: the same
-    // 1 / 3 / 6 percent in every zone, rising with the band.
+    // The koi odds read skill and nothing else: the same percentage in every
+    // zone at a given band, rising to its cap and then holding there. The cap
+    // is a deliberate flat, not the top of a ladder that ran out: THREE rod
+    // rungs consume koi since masterwrought Phase 11i (content/recipes.ts, the
+    // stormreel, tidewrought and clockreel bills), so the demand does not stop
+    // at tier 5, and the row is held flat because it is already the second
+    // heaviest thing in a top-band cell and climbing further would only crowd
+    // out the catches the new bands exist to pay.
     let koiRowsChecked = 0;
     for (const [band, published] of f.bandTables.entries()) {
       for (const zone of published.zones) {
         const koi = zone.rows.find((r) => r.name === 'Sunglint Koi');
-        expect(koi?.pct, `${zone.zone} band ${band}`).toBe([1, 3, 6][band]);
+        expect(koi?.pct, `${zone.zone} band ${band}`).toBe([1, 3, 6, 6, 6, 6][band]);
         koiRowsChecked += 1;
       }
     }
-    expect(koiRowsChecked).toBe(9);
+    // Eighteen since masterwrought Phase 11i: six bands times three zones.
+    expect(koiRowsChecked).toBe(18);
   });
 
   it('publishes the exact shared curve, cast, and rare-event numbers', () => {
@@ -2192,6 +3380,39 @@ describe('Guide professions gathering accuracy', () => {
       expect(guideStrings.profPages.gatherDeeds[trade]).toContain(chronSentence);
     }
   });
+
+  it('the rare-finds note names every gather windfall flavor and its zero-Renown deed', () => {
+    // Masterwrought Phase 19F, D169 (qr-19-rarebody-reword-landmine): the shared
+    // note re-keyed to name farming's golden harvest beside the three node
+    // flavors. Derived from the sim, never a list: gatherRareEventFlavor is
+    // exhaustive over the source union (a fifth source reds tsc there), and
+    // each flavor's collector's mark is the col_<flavor> deed its announce
+    // writes. The deed sweep runs the other way too, so a fifth flavor with a
+    // deed and no sentence reds here rather than shipping a note one short.
+    setLanguage('en');
+    const en = t('guide.profPages.rareBodyFourFlavors', { oneIn: '90', mult: '5' });
+    // GATHER_RARE_EVENT_SOURCES is derived from the flavor record typed over the
+    // source union, so a fifth source reaches this loop the day it compiles.
+    expect(GATHER_RARE_EVENT_SOURCES.length).toBeGreaterThanOrEqual(4);
+    const flavors = GATHER_RARE_EVENT_SOURCES.map((s) => gatherRareEventFlavor(s));
+    expect(new Set(flavors).size).toBe(flavors.length);
+    for (const flavor of flavors) {
+      expect(en, `names the ${flavor} windfall`).toContain(flavor.replace('_', ' '));
+      const deed = DEEDS[`col_${flavor}`];
+      expect(deed, `col_${flavor} exists`).toBeDefined();
+      expect(deed.renown, `${flavor} deed is cosmetic-only`).toBe(0);
+      expect(deed.trigger).toEqual({ kind: 'visit', markId: `gather_event:${flavor}` });
+    }
+    expect(en).toContain('zero-Renown deed');
+    const gatherMarks = Object.values(DEEDS).flatMap((d) =>
+      d.trigger.kind === 'visit' &&
+      d.trigger.markId.startsWith('gather_event:') &&
+      d.trigger.markId !== 'gather_event:perfect_specimen'
+        ? [d.trigger.markId.slice('gather_event:'.length)]
+        : [],
+    );
+    expect(gatherMarks.sort()).toEqual([...flavors].sort());
+  });
 });
 
 describe('Guide professions enchanting and economy accuracy', () => {
@@ -2200,17 +3421,28 @@ describe('Guide professions enchanting and economy accuracy', () => {
     expect(e.enchants.map((row) => row.id).sort()).toEqual(Object.keys(ENCHANTS).sort());
     for (const row of e.enchants) {
       const def = ENCHANTS[row.id];
-      expect(row.name).toBe(def.name);
+      expect(row).not.toHaveProperty('name');
       expect(row.slot).toBe(def.itemSlot);
+      // Id AND English name, the same pairing the recipe bills carry: the
+      // enchant table rides the craft page's one materials cell, which
+      // localizes through the id.
       expect(row.reagents).toEqual(
-        def.reagents.map((g) => ({ name: ITEMS[g.itemId].name, count: g.count })),
+        def.reagents.map((g) => ({
+          itemId: g.itemId,
+          name: ITEMS[g.itemId].name,
+          count: g.count,
+        })),
       );
       expect(row.bonus).toEqual(
         Object.entries(def.statBonus).map(([stat, value]) => ({ stat, value })),
       );
-      // Tier is structural: shard = Greater, typed secondary = Runed.
+      // Tier is structural, top down: lucent_reagent = Lucent (the apex tier,
+      // whose enchants also carry a shard or dust from the tier below, so the
+      // apex test has to come first), shard = Greater, typed secondary = Runed.
+      const hasLucent = def.reagents.some((g) => g.itemId === 'lucent_reagent');
       const hasShard = def.reagents.some((g) => g.itemId === 'arcane_shard');
-      expect(row.tier === 'greater').toBe(hasShard);
+      expect(row.tier === 'lucent').toBe(hasLucent);
+      expect(row.tier === 'greater').toBe(!hasLucent && hasShard);
     }
     // The five Runed consumer enchants (the only typed-secondary sink).
     expect(
@@ -2226,6 +3458,20 @@ describe('Guide professions enchanting and economy accuracy', () => {
       'enchant_weapon_runed_focus',
     ]);
     expect(e.enchants.filter((row) => row.tier === 'greater')).toHaveLength(6);
+    // The five Lucent (apex) enchants: the phase 10 quartet plus the weapon
+    // int twin the phase 10 QA D10-D1 ruling added at the head of phase 11.
+    expect(
+      e.enchants
+        .filter((row) => row.tier === 'lucent')
+        .map((row) => row.id)
+        .sort(),
+    ).toEqual([
+      'enchant_chest_lucent_stamina',
+      'enchant_feet_lucent_agility',
+      'enchant_lucent_infusion',
+      'enchant_weapon_lucent_might',
+      'enchant_weapon_lucent_spellpower',
+    ]);
   });
 
   it('mirrors the disenchant, typed-secondary, and salvage yield maps', () => {
@@ -2259,6 +3505,20 @@ describe('Guide professions enchanting and economy accuracy', () => {
         material: ITEMS[m].name,
       })),
     );
+  });
+
+  it('renders enchant names in the reader locale instead of baked English', async () => {
+    await ensureLocaleLoaded('ja_JP');
+    try {
+      setLanguage('ja_JP');
+      const enchanting = GUIDE_PROF_CRAFTS.find((craft) => craft.id === 'enchanting');
+      if (!enchanting) throw new Error('missing generated enchanting guide data');
+      const html = craftDetailHtml(enchanting);
+      expect(html).toContain('武器銘刻：ルーンの刃');
+      expect(html).not.toContain('Weapon Etching: Runed Edge');
+    } finally {
+      setLanguage('en');
+    }
   });
 
   it('publishes the exact fees, masterwork odds, and market cut', () => {
@@ -2344,7 +3604,278 @@ describe('Guide professions pages and routes', () => {
       ...GUIDE_PROF_GATHERING.map((g) => g.id),
       'economy',
       'faq',
+      // masterwrought Phase 11k's provisioning story, the third FIXED page:
+      // a narrative across professions rather than one profession's reference,
+      // which is why it sits with these two rather than deriving from a craft.
+      'provisioning',
     ]);
+  });
+
+  it('names recipe and enchant materials in the READER locale, never baked English', async () => {
+    // wiki-craft-table-baked-english. The materials cell used to interpolate
+    // the generator's baked English `name` straight into guide.profPages.matFmt,
+    // so a Spanish reader got "Osmium Ore x4" on the wiki and "Mineral de
+    // Osmio" in the game for the same reagent. The generator now emits the item
+    // ID beside the English source and the page localizes through it.
+    //
+    // FIRST: the key the page builds must be the one the game's own entity
+    // resolver builds. The guide cannot import that resolver (src/ui/entity_i18n
+    // pulls ITEMS/MOBS/NPCS/QUESTS/ZONES out of src/sim/data, which the public
+    // wiki bundle deliberately does not carry), so the equality is pinned here,
+    // over EVERY material id the generator emits rather than a sample.
+    let materialIds = 0;
+    const sweep = (bill: readonly { itemId: string }[]): void => {
+      for (const m of bill) {
+        materialIds++;
+        expect(itemNameKey(m.itemId)).toBe(
+          entityTranslationKey({ kind: 'item', id: m.itemId, field: 'name' }),
+        );
+        // itemDisplayName resolves a heroic variant through its base item's
+        // key because the variant has none of its own. The page has no such
+        // hop, so a heroic reagent would resolve to a key that does not exist
+        // and t() would throw. Nothing ships one; pinned so nothing starts to.
+        expect(ITEMS[m.itemId]?.heroicOf, `${m.itemId} is a heroic variant`).toBeUndefined();
+      }
+    };
+    for (const c of GUIDE_PROF_CRAFTS) for (const r of c.recipes) sweep(r.materials);
+    for (const row of GUIDE_PROF_ENCHANTING.enchants) sweep(row.reagents);
+    expect(materialIds, 'material ids swept').toBeGreaterThan(100);
+    // The sweep above cannot reach the SANITIZER half of the builder: every
+    // shipped material id is already word-characters-only, so deleting the
+    // .replace() entirely leaves all 111 ids sweeping green (measured). The
+    // two builders are pinned on synthetic ids carrying each class of
+    // character the segment rule rewrites, so the halves cannot drift before
+    // the day a non-word id ships rather than after it.
+    for (const synthetic of ['a-b', 'a.b', "hunter's", 'a b', 'a/b', 'ok_id9']) {
+      expect(itemNameKey(synthetic), `sanitizer parity for ${synthetic}`).toBe(
+        entityTranslationKey({ kind: 'item', id: synthetic, field: 'name' }),
+      );
+    }
+
+    // SECOND: the render, both ways round. English is unchanged.
+    setLanguage('en');
+    const wc = GUIDE_PROF_CRAFTS.find((c) => c.id === 'weaponcrafting');
+    const ore = wc?.recipes
+      .find((r) => r.id === 'recipe_thorium_warblade')
+      ?.materials.find((m) => m.itemId === 'thorium_ore');
+    expect(ore?.name, 'the generated bill still carries the English source name').toBe(
+      'Osmium Ore',
+    );
+    expect(professionsPage.render(ctx(['weaponcrafting']))).toContain('Osmium Ore');
+
+    await ensureLocaleLoaded('es');
+    try {
+      setLanguage('es');
+      // Premise guard, and the reason the locale is NAMED rather than looped:
+      // es really translates this ore, while de_DE and fr_FR still carry the
+      // English fill for it, so those two would pass the arm below while
+      // rendering English and prove nothing.
+      const esOre = t(itemNameKey('thorium_ore'));
+      expect(esOre, 'es must actually translate the ore for this arm to bite').not.toBe(
+        'Osmium Ore',
+      );
+      const cells = [
+        ...professionsPage
+          .render(ctx(['weaponcrafting']))
+          .matchAll(/<span class="guide-prof-mat">([^<]*)<\/span>/g),
+      ].map((m) => m[1]);
+      expect(cells.length, 'the es page renders material cells at all').toBeGreaterThan(0);
+      expect(cells.some((cell) => cell.includes(esOre))).toBe(true);
+      expect(
+        cells.some((cell) => cell.includes('Osmium Ore')),
+        'no material cell may still read the baked English name',
+      ).toBe(false);
+    } finally {
+      setLanguage('en');
+    }
+  });
+
+  it('renders a feast row through the SERVING templates, never the eat-it-yourself ones', () => {
+    // harvest-feast-wiki-effect-cell, the RENDER half (the data half is pinned
+    // by the C10 mirror above). The values are the served dish's, but the
+    // wording may not be: the player sets a feast out and does not eat it, and
+    // the restore and the boon reach whoever takes a serving. So both the
+    // positive and the NEGATIVE are asserted, because the dish templates would
+    // render perfectly happily off the same numbers and read as a plausible
+    // cell while telling the reader the wrong thing about who eats.
+    setLanguage('en');
+    const cook = GUIDE_PROF_CRAFTS.find((c) => c.id === 'cooking');
+    const feastRow = cook?.recipes.find((r) => r.id === 'recipe_harvest_feast');
+    expect(feastRow?.effect?.feast, 'the feast row carries its placement facts').toEqual({
+      servings: 10,
+      minutes: 3,
+    });
+    // WELLFED_STAT_KEYS is a PARTIAL map (kinds outside it take each
+    // consumer's aura-name fallback), so the stamina row is asserted present
+    // rather than assumed: unmapping it must red here, not degrade the
+    // comparison to a fallback string that would then match a fallback render.
+    const staKey = WELLFED_STAT_KEYS.buff_sta;
+    expect(staKey, 'the stamina well-fed kind must stay mapped').toBeDefined();
+    if (!staKey) return;
+    const html = effectLines(feastRow as (typeof GUIDE_PROF_CRAFTS)[number]['recipes'][number]);
+    expect(html).toContain(t('guide.profPages.effectFeast', { servings: '10', minutes: '3' }));
+    expect(html).toContain(
+      t('guide.profPages.effectFeastServing', { amount: '980', seconds: '18' }),
+    );
+    expect(html).toContain(
+      t('guide.profPages.effectFeastWellFed', {
+        stat: t(staKey),
+        value: '5',
+        minutes: '10',
+      }),
+    );
+    expect(html, 'a feast must not tell the reader they eat it').not.toContain(
+      t('guide.profPages.effectFood', { amount: '980', seconds: '18' }),
+    );
+    expect(html).not.toContain(
+      t('guide.profPages.effectWellFed', {
+        stat: t(staKey),
+        value: '5',
+        minutes: '10',
+      }),
+    );
+    // The cell really reaches the page, and a BAGGED dish on the same page
+    // still uses the eat-it templates (the branch has to be per-row, not
+    // per-page).
+    const page = professionsPage.render(ctx(['cooking']));
+    expect(page, 'the feast effect cell renders on the cooking page').toContain(html);
+    const dish = cook?.recipes.find((r) => r.id === 'recipe_evergarden_braised_greens');
+    const dishHtml = effectLines(dish as (typeof GUIDE_PROF_CRAFTS)[number]['recipes'][number]);
+    expect(dishHtml).toContain(t('guide.profPages.effectFood', { amount: '980', seconds: '18' }));
+    expect(dishHtml).not.toContain(
+      t('guide.profPages.effectFeastServing', { amount: '980', seconds: '18' }),
+    );
+  });
+
+  it('never prints a craft gain boundary a player cannot reach', () => {
+    // wiki-craft-gain-clamp, settled as a REWORD and not the clamp the finding
+    // asked for. The DATA half of that ruling is asserted first, on purpose:
+    // clamping the emitted numbers to the cap replaces an unreachable number
+    // with a FALSE claim about a reachable one (a tier-3 recipe clamped to
+    // "gain fades to nothing at 125" still pays a quarter at 125), and it reds
+    // both the decisive curve arm and the literal row above. So the generator
+    // keeps emitting the raw curve arithmetic and the PAGE stops printing a
+    // skill nobody can have.
+    setLanguage('en');
+    const cook = GUIDE_PROF_CRAFTS.find((c) => c.id === 'cooking');
+    expect(cook?.maxSkill, 'the enforced craft cap the boundaries are read against').toBe(125);
+    const apex = cook?.recipes.find((r) => r.id === 'recipe_stonepot_feast');
+    expect(apex?.skillReq, 'a recipe sitting AT the cap, whose gain never fades').toBe(125);
+    expect(apex?.gain, 'the emitted boundaries stay the raw curve arithmetic, unclamped').toEqual({
+      reducedAt: 150,
+      minimalAt: 175,
+      zeroAt: 200,
+    });
+    // Scale, so this is not one odd row: the exact published counts.
+    const rows = GUIDE_PROF_CRAFTS.flatMap((c) =>
+      c.recipes.map((r) => ({ cap: c.maxSkill, gain: r.gain })),
+    );
+    expect(rows.length, 'published recipe rows').toBe(170);
+    expect(
+      rows.filter((r) => r.gain.zeroAt > r.cap).length,
+      'rows carrying at least one unreachable boundary',
+    ).toBe(63);
+
+    const never = t('guide.profPages.gainNever');
+    const cell = (reduced: string, minimal: string, zero: string): string =>
+      t('guide.profPages.gainFmt', { reduced, minimal, zero });
+    // All three shapes that exist above the cap, each on the cooking page
+    // (which carries all six shapes the catalog produces).
+    const page = professionsPage.render(ctx(['cooking']));
+    expect(page, 'a tier-5 row fades nowhere at all').toContain(cell(never, never, never));
+    expect(page, 'a tier-4 row halves at the cap and stops').toContain(cell('125', never, never));
+    expect(page, 'a tier-3 row reaches the quarter and stops').toContain(cell('100', '125', never));
+    // And the numbers those three used to print are GONE. Without this half
+    // the arms above would pass on a page that printed both.
+    expect(page).not.toContain(cell('150', '175', '200'));
+    expect(page).not.toContain(cell('125', '150', '175'));
+    expect(page).not.toContain(cell('100', '125', '150'));
+    // A fully reachable ladder row still prints all three numbers: the reword
+    // must not swallow the boundaries a player really does cross.
+    expect(professionsPage.render(ctx(['weaponcrafting']))).toContain(cell('75', '100', '125'));
+  });
+
+  it('carries the Masterwrought endgame prose: the caps, the perfecting odds, the promotion', () => {
+    // The hand-authored endgame prose has no freshness gate (the guard-gap
+    // lesson at the farming anchors above), so each fact the phase shipped
+    // gets its own rendered anchor. All anchors are apostrophe-free on
+    // purpose: the rendered page escapes ' to &#39;.
+    setLanguage('en');
+    const hub = professionsPage.render(ctx([]));
+    expect(hub, 'the hub renders the endgame section').toContain('id="prof-endgame"');
+    expect(hub, 'the hub renders the perfecting section').toContain('id="prof-perfecting"');
+    // The materials, exact numbers per the transparency policy. The literal
+    // facts are CHAINED to the live constants (the pin-the-contract-beside-
+    // the-blob shape) so a retune reds HERE by intent, not only in the sim's
+    // own suites, and the wiki cannot go silently stale (the Phase 15 flask
+    // lesson).
+    // Derived from the live wyrmfall boss faucet: a drop-range retune reds here.
+    expect(hub).toContain(`${WYRMFALL_BOSS_MIN} to ${WYRMFALL_BOSS_MAX} cores`);
+    // Derived from the heroic vendor's live core row: a price retune reds here.
+    const coreMarks = HEROIC_VENDOR_STOCK.find((r) => r.itemId === WYRMFALL_CORE_ITEM_ID)?.marks;
+    expect(coreMarks, 'the wyrmfall core row left the heroic vendor').toBeDefined();
+    expect(hub).toContain(`${coreMarks} Heroic Marks`);
+    expect(hub).toContain('exactly one essence');
+    expect(hub).toContain('one per week per character');
+    // The perfecting odds and fail-forward rule.
+    // 'four times in five' IS 0.8: the constant pins beside the prose so a
+    // perfecting retune reds this line, not only tests/perfecting.test.ts.
+    expect(PERFECTING_SUCCESS_CHANCE).toBe(0.8);
+    expect(hub).toContain('succeeds four times in five');
+    expect(hub).toContain('one Sundered Essence, and one Prismglass Setting');
+    expect(hub).toContain('never harmed or set back');
+    // The promotion: deterministic, one deed, name and color only.
+    expect(hub).toContain('one Deed of Making');
+    expect(hub).toContain('the promotion is deterministic');
+    expect(hub).toContain('what changes is the name and the color');
+    // The gear page's cap sentence moved to masterwroughtBodyLegendary: both
+    // caps spelled (the words themselves are derived from the constants in
+    // tests/masterwrought_cap.test.ts; these are the rendered-page halves).
+    // The cap constants pin beside the rendered words so a cap retune reds
+    // this anchor too, not only the derived catalog pins.
+    expect(MASTERWROUGHT_EQUIP_CAP).toBe(2);
+    expect(MASTERWROUGHT_LEGENDARY_CAP).toBe(1);
+    const gearHtml =
+      pageFor('gear')?.render({ params: [], sub: 'gear', titleKey: 'guide.nav.gear' } as never) ??
+      '';
+    expect(gearHtml).toContain('at most two Masterwrought pieces at once');
+    expect(gearHtml).toContain('at most one legendary Masterwrought piece among the two');
+    // The enchanting page's Infusion tail is corrected: Perfecting is live,
+    // so the authored-ahead disclosure must be gone and the pointer present.
+    const ench = professionsPage.render(ctx(['enchanting']));
+    expect(ench).toContain('and the Professions page tells how a piece earns it');
+    expect(ench).not.toContain('no piece can be yet');
+    // The eleventh FAQ row renders.
+    const faq = professionsPage.render(ctx(['faq']));
+    expect(faq).toContain('How do I make an orange item?');
+  });
+
+  it('states the one-meal Well Fed rule on both sides of the kitchen', () => {
+    // The canonical sentence (byte-identical in both catalog bodies, matching
+    // the itemUi wellFed pair) plus each page cross-referencing the other.
+    setLanguage('en');
+    const ONE_MEAL = 'Only one Well Fed effect at a time: a newer meal replaces it.';
+    const cookingHtml = professionsPage.render(ctx(['cooking']));
+    expect(cookingHtml).toContain(ONE_MEAL);
+    expect(cookingHtml).toContain('the Farming page tells that side of the story');
+    const farmingHtml = professionsPage.render(ctx(['farming']));
+    expect(farmingHtml).toContain(ONE_MEAL);
+    expect(farmingHtml).toContain('the Cooking page carries every rung');
+    // The farming-only related row links the cooking page it defers to.
+    expect(farmingHtml).toContain(hrefFor('professions/cooking'));
+    // The TOOLTIP side of the coherence claim: the same sentence must sit in
+    // every itemUi wellFed row, so a tooltip reword (the write-game-tooltips
+    // flow edits exactly that file) reds this pin instead of silently breaking
+    // the guide-to-tooltip agreement the arm is named for.
+    const tooltip = itemStrings.en.itemUi.tooltip;
+    for (const row of [
+      tooltip.wellFed,
+      tooltip.wellFedAura,
+      tooltip.useFeastBuff,
+      tooltip.useFeastBuffAura,
+    ]) {
+      expect(row).toContain(ONE_MEAL);
+    }
   });
 
   it('renders every detail page with exactly one h1 and real generated tables', () => {
@@ -2429,9 +3960,97 @@ describe('Guide professions pages and routes', () => {
     expect((weapon.match(/class="guide-prof-recipe/g) ?? []).length).toBe(
       GUIDE_PROF_CRAFTS.find((c) => c.id === 'weaponcrafting')?.recipes.length,
     );
+    // The MATERIAL entries carry the same two-sided contract as the tools table
+    // above, and for a sharper reason (qr-11G-MATCELL, Phase 11g QA):
+    // materialsCell joins its spans with NO separator at all, so the cell reads
+    // glued unless the stylesheet separates them. That is the defect the
+    // .guide-prof-combo comment in src/guide/styles.css records having shipped
+    // once already, and this sheet sits outside every src/styles CSS guard, so
+    // this is its only pin. Both sides asserted: the markup emits the scoped
+    // class, and the sheet declares the adjacent-sibling separation.
+    expect(weapon, 'recipe rows carry the scoped material class').toContain('guide-prof-mat');
+    expect(guideCss, 'the joined material entries must be separated by the stylesheet').toMatch(
+      /span\.guide-prof-mat\s*\+\s*span\.guide-prof-mat\s*\{[^}]*margin-inline-start:/,
+    );
+    // The RENDERED source cell for a drop-taught apex row (phase 08): the
+    // data-level mirror pins 'drop' in the corpus, but only a render pin can
+    // see sourceCell routing the value to the wrong string (the old two-arm
+    // mapping shipped "Known from the start" for every drop row and stayed
+    // green). Row-scoped so a page that renders the string elsewhere cannot
+    // satisfy it; the trainer arm keeps its own row as the contrast.
+    const armor = professionsPage.render(ctx(['armorcrafting']));
+    const armorRowFor = (name: string): string =>
+      armor.match(
+        new RegExp(`<tr[^>]*>(?:(?!</tr>)[\\s\\S])*${name}(?:(?!</tr>)[\\s\\S])*</tr>`),
+      )?.[0] ?? '';
+    expect(armorRowFor('Forgefold Legguards'), 'apex row renders the drop source string').toContain(
+      t('guide.profPages.sourceDrop'),
+    );
+    expect(armorRowFor('Forgefold Legguards')).not.toContain(t('guide.profPages.sourceKnown'));
+    // ...and it is really the DROP-ONLY string, not the both-channel one. The
+    // toContain above cannot tell them apart on its own: sourceDrop is a proper
+    // PREFIX of sourceDropAndVendor, so a generator that labelled every drop row
+    // as both would satisfy it. This is the arm that says which.
+    expect(
+      armorRowFor('Forgefold Legguards'),
+      'a drop-only row must not claim the marks counter too',
+    ).not.toContain(t('guide.profPages.sourceDropAndVendor'));
+    // The RENDERED source cell for the VENDOR channel (phase 11): the eight
+    // APEX_CONSUMABLE patterns are sold by the Heroic Quartermaster, so the
+    // generator maps their drop-acquisition rows to 'vendor' and sourceCell
+    // must route them to the vendor string, never the drop or known arms (a
+    // mapping that fell through to 'drop' would stay green under the
+    // data-level corpus pin alone). Same row-scoped idiom as the armor pin;
+    // the armor drop pin above stays as the drop channel's own contrast.
+    const alch = professionsPage.render(ctx(['alchemy']));
+    const alchRowFor = (name: string): string =>
+      alch.match(
+        new RegExp(`<tr[^>]*>(?:(?!</tr>)[\\s\\S])*${name}(?:(?!</tr>)[\\s\\S])*</tr>`),
+      )?.[0] ?? '';
+    expect(
+      alchRowFor('Ironhusk Flask'),
+      'vendor-sold pattern row renders the quartermaster source string',
+    ).toContain(t('guide.profPages.sourceVendor'));
+    expect(alchRowFor('Ironhusk Flask')).not.toContain(t('guide.profPages.sourceDrop'));
+    expect(alchRowFor('Ironhusk Flask')).not.toContain(t('guide.profPages.sourceKnown'));
+    // The RENDERED source cell for BOTH channels at once (phase 11f), the
+    // third case and the one with a real player cost: every farming pattern
+    // is in a drop table AND on the marks counter, and until this phase the
+    // generator's vendor arm won outright, so the wiki would have told a
+    // reader "Sold by the Heroic Quartermaster" about a recipe that also
+    // drops off the raid and they would never have looked in the raid. The
+    // row must name both, and must not fall back to either single string.
+    const cooking = professionsPage.render(ctx(['cooking']));
+    const cookingRowFor = (name: string): string =>
+      cooking.match(
+        new RegExp(`<tr[^>]*>(?:(?!</tr>)[\\s\\S])*${name}(?:(?!</tr>)[\\s\\S])*</tr>`),
+      )?.[0] ?? '';
+    const feastRow = cookingRowFor('Harvest Feast');
+    expect(feastRow, 'the both-channel row must render at all').not.toBe('');
+    expect(feastRow, 'a pattern that drops AND sells names both channels').toContain(
+      t('guide.profPages.sourceDropAndVendor'),
+    );
+    expect(feastRow).not.toContain(t('guide.profPages.sourceKnown'));
+    expect(feastRow).not.toContain(t('guide.profPages.sourceTrainerFree'));
+    // And the three source strings really are distinct, so the arm above
+    // cannot be satisfied by a string that merely contains another.
+    expect(
+      new Set([
+        t('guide.profPages.sourceDrop'),
+        t('guide.profPages.sourceVendor'),
+        t('guide.profPages.sourceDropAndVendor'),
+      ]).size,
+    ).toBe(3);
+    // A held trainer row on the SAME page is the contrast: the cooking page
+    // renders both channels, so a sourceCell that collapsed every farm row to
+    // one string would fail here rather than looking consistent.
+    const bannockRow = cookingRowFor('Highwatch Barley Bannock');
+    expect(bannockRow, 'the on-ramp row must render').not.toBe('');
+    expect(bannockRow).not.toContain(t('guide.profPages.sourceDropAndVendor'));
+    expect(bannockRow).not.toContain(t('guide.profPages.sourceDrop'));
     // The enchanting route rides the craft module with its own sections.
     const ench = professionsPage.render(ctx(['enchanting']));
-    expect(ench).toContain('Enchant Weapon - Runed Edge');
+    expect(ench).toContain('Weapon Etching: Runed Edge');
     expect(ench).toContain('Chime Shard');
     expect(ench).toContain('id="prof-disenchant"');
     // The fishing page renders all three band tables and the koi.
@@ -2445,6 +4064,355 @@ describe('Guide professions pages and routes', () => {
     expect(professionsPage.render(ctx(['nonsense']))).toContain('guide-notfound');
   });
 
+  // Row extraction shared by the two arms below: the whole <tr> a named output
+  // appears in, so an assertion cannot be satisfied by the same string
+  // appearing in a different row or in the page prose.
+  //
+  // The needle goes through esc() FIRST and is regex-escaped SECOND, in that
+  // order. The page escapes every interpolated name, so a name carrying an
+  // apostrophe ("Hunter's Game Skewer") is `&#39;` in the HTML and a raw match
+  // silently returns '' for it: an empty row string then satisfies every
+  // `not.toContain` arm and the row drops out of the sweep unnoticed. That is
+  // how a page-wide walk quietly becomes a partial one.
+  const rowFor = (html: string, name: string): string => {
+    const needle = esc(name).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return (
+      html.match(
+        new RegExp(`<tr[^>]*>(?:(?!</tr>)[\\s\\S])*${needle}(?:(?!</tr>)[\\s\\S])*</tr>`),
+      )?.[0] ?? ''
+    );
+  };
+
+  it('renders a placeable feast in feast wording, not the served dish (harvest-feast)', () => {
+    setLanguage('en');
+    // harvest-feast-wiki-effect-cell. A feast is kind 'junk' with no foodHp and
+    // no wellFed of its own, so the craft row used to publish NO effect at all
+    // for the one output on the page whose whole point is what it gives a
+    // raid. It now follows feast.dishItemId to the plate each serving IS.
+    //
+    // Two things have to be true and only one of them is about numbers:
+    // the VALUES must be the served dish's, and the WORDING must be the
+    // feast-serving templates rather than the dish's own eat-it ones, because
+    // the player sets a feast out for others. The negative arm is what pins
+    // the second: effectFood ("...when eaten") and effectFeastServing ("Each
+    // serving restores...") are different strings, neither a prefix of the
+    // other, so a branch that fell through to the dish's key reds here.
+    const cooking = professionsPage.render(ctx(['cooking']));
+    const feastRow = rowFor(cooking, 'Harvest Feast');
+    expect(feastRow, 'the feast row must render at all').not.toBe('');
+    const feastDef = ITEMS.harvest_feast;
+    const feastRecord = 'feast' in feastDef ? feastDef.feast : undefined;
+    expect(feastRecord, 'harvest_feast must still carry a feast payload').toBeDefined();
+    if (!feastRecord) return;
+    const dish = ITEMS[feastRecord.dishItemId];
+    const dishWellfed = dish.kind === 'food' ? dish.wellFed : undefined;
+    expect(dish.foodHp, 'the served dish must still restore health').toBeGreaterThan(0);
+    expect(dishWellfed, 'the served dish must still mint Well Fed').toBeDefined();
+    if (!dishWellfed) return;
+    // Partial map (see the sibling arm): assert the mapping rather than assume
+    // it, so an unmapped kind reds instead of quietly comparing two fallbacks.
+    const dishStatKey = WELLFED_STAT_KEYS[dishWellfed.kind];
+    expect(dishStatKey, `the served dish's ${dishWellfed.kind} must be mapped`).toBeDefined();
+    if (!dishStatKey) return;
+    // Placement, from the feast's OWN record.
+    expect(feastRow, 'the placement line').toContain(
+      t('guide.profPages.effectFeast', {
+        servings: String(feastRecord.charges),
+        minutes: String((feastRecord.durationTicks * DT) / 60),
+      }),
+    );
+    // The serving's restore, from the DISH's record, in serving wording.
+    expect(feastRow, 'the serving restore line').toContain(
+      t('guide.profPages.effectFeastServing', {
+        amount: String(dish.foodHp),
+        seconds: String(CONSUME_DURATION),
+      }),
+    );
+    // The serving's boon, from the DISH's record, in serving wording.
+    expect(feastRow, 'the serving well-fed line').toContain(
+      t('guide.profPages.effectFeastWellFed', {
+        stat: t(dishStatKey),
+        value: String(dishWellfed.value),
+        minutes: String(dishWellfed.duration / 60),
+      }),
+    );
+    // The template-choice negative, kept here too because it is row-scoped:
+    // the sibling arm asserts it on the effectLines() output, which cannot see
+    // a page that put the right cell on the wrong row.
+    expect(feastRow, 'a feast must not claim the reader eats it').not.toContain(
+      t('guide.profPages.effectFood', {
+        amount: String(dish.foodHp),
+        seconds: String(CONSUME_DURATION),
+      }),
+    );
+  });
+
+  it('applies the out-of-reach gain rule ROW by row, not somewhere on the page', () => {
+    setLanguage('en');
+    // The row-scoped half of wiki-craft-gain-clamp. The arm above
+    // ("never prints a craft gain boundary a player cannot reach") owns the
+    // ruling, the counts, and the three page-level shapes; it asserts on the
+    // whole page, so a cell rendered against the WRONG recipe satisfies it.
+    // This walks every row of the page instead and demands that row's own
+    // boundaries, which is what makes the reword a rule rather than three
+    // lucky strings. It is also the arm that reds if the cap the rule reads
+    // stops being the craft's own (a hard-coded 125 would survive above and
+    // die here the day one craft's maxSkill moves).
+    const cooking = GUIDE_PROF_CRAFTS.find((c) => c.id === 'cooking');
+    expect(cooking, 'the cooking craft').toBeDefined();
+    if (!cooking) return;
+    const html = professionsPage.render(ctx(['cooking']));
+    const never = t('guide.profPages.gainNever');
+    const cell = (reduced: string, minimal: string, zero: string): string =>
+      t('guide.profPages.gainFmt', { reduced, minimal, zero });
+    let neverRows = 0;
+    for (const r of cooking.recipes) {
+      const bound = (at: number): string => (at > cooking.maxSkill ? never : String(at));
+      const row = rowFor(html, r.name);
+      expect(row, `${r.id} must render a row at all`).not.toBe('');
+      expect(row, `${r.id} gain cell`).toContain(
+        cell(bound(r.gain.reducedAt), bound(r.gain.minimalAt), bound(r.gain.zeroAt)),
+      );
+      if ([r.gain.reducedAt, r.gain.minimalAt, r.gain.zeroAt].some((v) => v > cooking.maxSkill)) {
+        neverRows++;
+      } else {
+        // A fully reachable row must not carry the word at all, so a renderer
+        // that appended it everywhere cannot pass the sweep.
+        expect(row, `${r.id} is reachable throughout and must say so plainly`).not.toContain(never);
+      }
+    }
+    // Non-vacuity in both directions: the rule really splits this page.
+    expect(neverRows, 'rows with an out-of-reach boundary').toBeGreaterThan(0);
+    expect(neverRows, 'and not every row, or the cell would be saying nothing').toBeLessThan(
+      cooking.recipes.length,
+    );
+  });
+
+  it('localizes provisioning item names and lets semantic lists wrap', async () => {
+    await ensureLocaleLoaded('es');
+    try {
+      setLanguage('es');
+      const gameMeat = t(itemNameKey('game_meat'));
+      const smokedEel = t(itemNameKey('ashwood_smoked_eel'));
+      expect(gameMeat, 'Spanish premise for a supplied material').toBe('Carne de caza');
+      expect(smokedEel, 'Spanish premise for a cooking output').toBe('Anguila ahumada de fresno');
+
+      const html = professionsPage.render(ctx(['provisioning']));
+      expect(html, 'the supplier list uses the localized item name').toContain(
+        `<li>${esc(gameMeat)}</li>`,
+      );
+      expect(html, 'the cooking ladder uses the localized output name').toContain(
+        `<li>${esc(smokedEel)}</li>`,
+      );
+      expect(html).not.toContain('<li>Game Meat</li>');
+      expect(html).not.toContain('<li>Ashwood Smoked Eel</li>');
+      expect(html, 'provisioning lists do not inherit recipe-entry nowrap').not.toContain(
+        '<ul class="guide-prof-mat">',
+      );
+    } finally {
+      setLanguage('en');
+    }
+
+    const guideCss = readFileSync(resolve(process.cwd(), 'src/guide/styles.css'), 'utf8');
+    expect(guideCss).toMatch(
+      /span\.guide-prof-mat \{[^}]*display: inline-block;[^}]*white-space: nowrap;/s,
+    );
+    expect(guideCss, 'nowrap must not apply to lists sharing the class name').not.toMatch(
+      /(?:^|\n)\.guide-prof-mat \{[^}]*white-space: nowrap;/s,
+    );
+  });
+
+  it('the provisioning page tells the story from real generated data', () => {
+    setLanguage('en');
+    const html = professionsPage.render(ctx(['provisioning']));
+    expect((html.match(/<h1>/g) ?? []).length).toBe(1);
+    const itemDef = (itemId: string) => {
+      const def = ITEMS[itemId];
+      if (!def) throw new Error(`unknown provisioning item ${itemId}`);
+      return def;
+    };
+
+    // THE THREE LINES THE PAGE EXISTS TO JOIN, each with a REAL contribution
+    // rendered beside it. An empty story section would satisfy a heading check
+    // and say nothing, which is why every arm below names a material the live
+    // bills actually ask for rather than only the section label.
+    const lineOf = (id: string) => {
+      const line = GUIDE_PROF_PROVISIONING.lines.find((l) => l.id === id);
+      if (!line) throw new Error(`the ${id} line vanished from the generated data`);
+      expect(line.materials.length, `${id} contributes nothing to cooking`).toBeGreaterThan(0);
+      return line;
+    };
+    // THE WHOLE SET, not a hand-picked subset: `logging` feeds cooking too (one
+    // ashwood log smokes the eel) and an earlier version of this arm looped
+    // four ids and left it unexercised, so a generator change that dropped the
+    // logging line entirely was invisible here. The id list is pinned as a
+    // literal so a line LEAVING the page reds, which a loop over the live
+    // lines could never do.
+    expect(
+      GUIDE_PROF_PROVISIONING.lines.map((l) => l.id).sort(),
+      'exactly the lines that feed the kitchen, and mining does not',
+    ).toEqual(['corpseHarvesting', 'farming', 'fishing', 'herbalism', 'logging']);
+    // AND THE PROSE CLAIM THOSE FIVE HAVE TO CARRY (masterwrought Phase 11k QA).
+    // The section opened by telling a player cooking takes from MORE gathering
+    // lines than any other craft, which the tables refuse: engineering takes
+    // from five too (farming, fishing, herbalism, logging, mining), so it is a
+    // tie and not a lead. Corrected to "nearly every gathering line", which is
+    // measured here rather than trusted: five of the six supplying families,
+    // the missing one named above.
+    expect(
+      gatheringSupplyByFamily().size,
+      'six supplying families in all, so five of them is nearly every one',
+    ).toBe(6);
+    expect(
+      t('guide.profPages.prov.suppliersBody'),
+      'the section must not claim a lead it does not hold',
+    ).not.toContain('than any other craft');
+    // AND THE POSITIVE HALF, this file's own idiom one correction over (the
+    // longest-bill pin pins the live clause present and the retired one
+    // absent): without it a reword to "more gathering lines than any other
+    // PROFESSION" sails through the negative.
+    expect(
+      t('guide.profPages.prov.suppliersBody'),
+      'and it must still make the claim the tables support',
+    ).toContain('nearly every gathering line');
+    for (const id of ['farming', 'fishing', 'herbalism', 'corpseHarvesting', 'logging']) {
+      const line = lineOf(id);
+      for (const itemId of line.materials) {
+        const name = itemDef(itemId).name;
+        expect(html, `${id} line missing ${name}`).toContain(name);
+      }
+    }
+    // PER-LINE SIZES at the real counts rather than a shared floor of one: a
+    // line shrinking from nine materials to one satisfies `length > 0` and
+    // renders a page that quietly stopped saying what it says.
+    const sizeOf = (id: string) => lineOf(id).materials.length;
+    expect(
+      [sizeOf('logging'), sizeOf('herbalism'), sizeOf('fishing'), sizeOf('corpseHarvesting')],
+      'the per-line contributions, at their real sizes',
+    ).toEqual([1, 3, 9, 2]);
+    expect(sizeOf('farming'), 'farming is the widest supplier, at its real size').toBe(21);
+    // And one literal anchor per line, so each is named somewhere by a human
+    // and not only reached through the generated list above.
+    expect(html, 'the band-5 catch the apex tier keys on').toContain('Raw Stillmere Salmon');
+    expect(html, 'the crop the feast ladder takes').toContain('Evergarden Greens');
+    expect(html, 'the corpse-harvest meat').toContain('Game Meat');
+    expect(html, 'the herb every apex cooking row seasons with').toContain('Sunpetal Herb');
+    expect(html, 'the one log the kitchen smokes with').toContain('Ashwood Log');
+
+    // THE LADDER, from a levelling rung to the capstone, with the placeable
+    // marker on the feasts, because a ladder that did not say which outputs are
+    // set on the ground rather than eaten reads wrong at the top.
+    const rungs = GUIDE_PROF_PROVISIONING.ladder.map((r) => r.skillReq);
+    expect(rungs, 'the rungs climb').toEqual([...rungs].sort((a, b) => a - b));
+    expect(rungs.length, 'and the ladder is its real height').toBe(6);
+    expect(rungs, 'it starts at the free rung').toContain(0);
+    expect(rungs, 'the capstone rung is on the page').toContain(125);
+    for (const rung of GUIDE_PROF_PROVISIONING.ladder) {
+      for (const output of rung.outputs) itemDef(output.itemId);
+    }
+    expect(html).toContain('Stonepot Feast');
+    expect(html).toContain('Warspice Feast');
+    expect(html).toContain('Sageleaf Feast');
+    expect(html).toContain(t('guide.profPages.prov.placeableTag'));
+    const placeables = GUIDE_PROF_PROVISIONING.ladder
+      .flatMap((r) => r.outputs)
+      .filter((o) => o.placeable)
+      .map((o) => itemDef(o.itemId).name)
+      .sort();
+    expect(placeables, 'exactly the four feasts are marked placeable').toEqual([
+      'Harvest Feast',
+      'Sageleaf Feast',
+      'Stonepot Feast',
+      'Warspice Feast',
+    ]);
+    // AND THE OTHER OUTPUT NOBODY EATS (masterwrought Phase 11k QA). The
+    // placeable flag is a FEAST flag, so with it alone The Laden Hearth
+    // rendered untagged between three tagged feasts on its OWN rung and told a
+    // reader it was a dish. The station flag reads the def's own use record;
+    // the two sets are disjoint, which is what stops a future feast from
+    // wearing both tags.
+    const stations = GUIDE_PROF_PROVISIONING.ladder
+      .flatMap((r) => r.outputs)
+      .filter((o) => o.station)
+      .map((o) => itemDef(o.itemId).name)
+      .sort();
+    expect(stations, 'the cooking mobile station is marked as one').toEqual(['The Laden Hearth']);
+    expect(
+      GUIDE_PROF_PROVISIONING.ladder
+        .flatMap((r) => r.outputs)
+        .filter((o) => o.placeable && o.station),
+      'no output is both a feast and a station',
+    ).toEqual([]);
+    // THE LITERAL, not t() on both sides (the fix round's own reviewer): a
+    // resolved key compared against itself moves together, so it can only see
+    // the tag's total absence, never the tag rendering the wrong words. It is
+    // also what would have caught the first version of this tag, which composed
+    // ASCII brackets around a shipped noun that ja and zh spell full-width.
+    expect(html, 'and the station tag renders its own words').toContain('(field station)');
+    expect(t('guide.profPages.prov.stationTag'), 'the tag owns its brackets').toBe(
+      '(field station)',
+    );
+    // The rung they share, so a reader meets both tags in one list: the claim
+    // is about what sits BESIDE the feasts, not merely that a tag exists.
+    const topRung = GUIDE_PROF_PROVISIONING.ladder.find((r) => r.skillReq === 125);
+    expect(
+      topRung?.outputs.map((o) => itemDef(o.itemId).name).sort(),
+      'the 125 rung holds both kinds',
+    ).toEqual(['Sageleaf Feast', 'Stonepot Feast', 'The Laden Hearth', 'Warspice Feast']);
+
+    // THE PROSE'S OWN CLAIM, PINNED (the packet's recurring defect is a page
+    // sentence nothing checks): the market section tells a reader that every
+    // material here is ordinary tradable goods, so a raider who cooks none of
+    // it can buy the lot. That is only true while no listed material is
+    // soulbound or barred from the market, and it is checked here rather than
+    // trusted, over the ids the page actually renders.
+    const listed = GUIDE_PROF_PROVISIONING.lines.flatMap((l) => l.materials);
+    // AT THE REAL COUNT, not a token floor. This used to read `> 10` against a
+    // real population of 36, which the farming line alone satisfies: every
+    // other line could have emptied and this sweep would still have run over a
+    // valid-looking list. (It briefly also compared `listed.length` to a reduce
+    // over the same lines, which is an identity of flatMap and could not fail;
+    // the literal is the whole guard.)
+    expect(listed.length, 'every listed material is swept, at the real count').toBe(36);
+    for (const itemId of listed) {
+      const def = itemDef(itemId);
+      expect(def.soulbound, `${def.name} is soulbound, so the market claim is false`).toBeFalsy();
+      expect(
+        def.noMarketList,
+        `${def.name} cannot be listed, so the market claim is false`,
+      ).toBeFalsy();
+    }
+
+    // SPOILER-SAFE, and READ WHAT THIS DOES AND DOES NOT CLAIM. The four
+    // negatives below are structurally unreachable today: the page renders
+    // cooking material names, cooking output names and fixed prose, so no boss
+    // or instance name can appear whatever the generator does. They are a
+    // TRIPWIRE against a future widening of this page (a "where do I get it"
+    // column, a drop-source cell), not a live guard, and pretending otherwise
+    // is the decorative-pin trap this packet keeps finding.
+    //
+    // The POSITIVE CONTROL is what makes them worth keeping: it proves the
+    // matcher would see such a token if the page ever grew one, so a green
+    // sweep means absence rather than a broken check.
+    const FORBIDDEN = ['Nythraxis', 'Drowned Litany', 'Collapsed Reliquary', 'Heroic'];
+    for (const forbidden of FORBIDDEN) {
+      expect(html, `the provisioning page must not name ${forbidden}`).not.toContain(forbidden);
+      // THE POSITIVE CONTROL DRIVES THE SAME MATCHER on the same shape of
+      // input. An earlier version of this asserted
+      // `\`${html}<!-- x -->\`.includes(x)` and was worthless twice over: it
+      // interpolated the needle into the haystack in the same expression, so it
+      // was true for every possible string including the empty one, and it
+      // exercised String.prototype.includes rather than the `toContain` matcher
+      // it claimed to control. Writing a fake control inside the fix that
+      // retires decorative pins is the purest version of this packet's own
+      // lesson, so it is recorded here rather than quietly replaced.
+      expect(
+        `${html}<!-- ${forbidden} -->`,
+        `the toContain matcher can actually see ${forbidden}`,
+      ).toContain(forbidden);
+    }
+  });
+
   it('rewrites the overview into the hub: ring cards, links, and honesty about empty crafts', () => {
     setLanguage('en');
     const html = professionsPage.render(ctx([]));
@@ -2454,10 +4422,12 @@ describe('Guide professions pages and routes', () => {
         `href="${hrefFor(`professions/${id}`)}"`,
       );
     }
-    // The two content-empty crafts appear but do NOT link anywhere.
-    expect(html).not.toContain(`href="${hrefFor('professions/jewelcrafting')}"`);
-    expect(html).not.toContain(`href="${hrefFor('professions/inscription')}"`);
-    expect(html).toContain(t('guide.professions.comingSoon'));
+    // Every ring craft links since the Masterwrought phase 06 inscription
+    // catalog (jewelcrafting joined at phase 05, inscription at 06), so the
+    // "coming soon" card copy renders nowhere on the overview.
+    expect(html).toContain(`href="${hrefFor('professions/jewelcrafting')}"`);
+    expect(html).toContain(`href="${hrefFor('professions/inscription')}"`);
+    expect(html).not.toContain(t('guide.professions.comingSoon'));
     // All ten archetype pair titles render.
     for (const a of GUIDE_PROF_ARCHETYPES) {
       expect(html).toContain(t(`hudChrome.archetypePair.${a.pairId}` as never));
@@ -2520,10 +4490,223 @@ describe('Guide professions pages and routes', () => {
     for (const g of GUIDE_PROF_GATHERING) {
       expect(t(`guide.profPages.gatherIntro.${g.id}` as never).length).toBeGreaterThan(0);
     }
-    for (let n = 1; n <= 8; n += 1) {
+    // The QUESTIONS are still index-keyed, so they walk by index. The ANSWERS
+    // are not: the Phase 11i QA gave the renderer a named roster so a stale
+    // answer could be RETIRED AND RE-KEYED, which an index-built key can never
+    // be. Walking FAQ_ANSWER_KEYS rather than rebuilding `faq.a${n}` is what
+    // keeps this arm asserting what the page actually renders: a re-key now
+    // moves the test with the page instead of leaving it asserting a dead key.
+    for (let n = 1; n <= PROF_FAQ_COUNT; n += 1) {
       expect(t(`guide.profPages.faq.q${n}` as never).length).toBeGreaterThan(0);
-      expect(t(`guide.profPages.faq.a${n}` as never).length).toBeGreaterThan(0);
     }
+    // The LITERAL first: FAQ_ANSWER_KEYS against PROF_FAQ_COUNT alone is two
+    // exports of one module agreeing with each other, so dropping an answer and
+    // decrementing the count would pass. The count is what the page renders.
+    expect(PROF_FAQ_COUNT, 'the professions FAQ has eleven rows').toBe(11);
+    expect(FAQ_ANSWER_KEYS).toHaveLength(PROF_FAQ_COUNT);
+    for (const key of FAQ_ANSWER_KEYS) {
+      expect(t(key as never).length, key).toBeGreaterThan(0);
+    }
+    // THE PROSE ACCURACY PIN (Phase 11i QA). tests/guide.test.ts checks that the
+    // GENERATED content is fresh and that every key RESOLVES; it has never
+    // checked that a sentence is TRUE. That gap is this packet's most expensive
+    // one: Phase 11i shipped six prose keys stating a catch ladder, a rod count
+    // and a gain schedule the same commit had just replaced, the review round
+    // found five of them by reading, and the QA found three more the same way.
+    // Regenerating a table does not touch the paragraph beside it, so no
+    // freshness gate can ever see it.
+    //
+    // ASSERTED PER KEY, NEVER AGAINST A JOIN, and the first draft of this arm is
+    // why that is spelled out. It concatenated seven keys and ran toContain
+    // against the concatenation, so a value present in ANY one key satisfied the
+    // pin for ALL seven. Three of the seven carry all four gain values
+    // independently, so any one of them could have gone fully stale invisibly:
+    // the join could not see a PARTIAL correction, which is the exact failure
+    // the arm exists for.
+    const prose = (key: string, vals?: Record<string, string>) => t(key as never, vals as never);
+
+    // Each key that quotes the gain schedule states EVERY value in it. Named
+    // one at a time so a stale sibling cannot hide behind a corrected one.
+    const gainKeys = [
+      ['guide.professions.curveBodyRetunedFishing', { step: '25' }],
+      ['guide.profPages.fish.scheduleNoteRetuned', { cutoff: '100' }],
+      ['guide.profPages.faq.a7RetunedTaper', undefined],
+    ] as const;
+    for (const [key, vals] of gainKeys) {
+      const text = prose(key, vals as never);
+      for (const row of FISHING_GAIN_SCHEDULE) {
+        expect(text, `${key} must publish the shipped gain ${row.gain}`).toContain(
+          String(row.gain),
+        );
+      }
+    }
+
+    // The ladder's shape, on the key that states it.
+    expect(FISHING_CATCH_BAND_THRESHOLDS).toHaveLength(6);
+    const tables = prose('guide.profPages.fish.tablesNoteSixBands', { rare: 'Sunglint Koi' });
+    expect(tables, 'the catch-table page must say SIX bands').toContain('six catch bands');
+    expect(tables, 'and band 2 must carry its shipped threshold').toContain(
+      `band 2 at ${FISHING_CATCH_BAND_THRESHOLDS[2]}`,
+    );
+
+    // THE LADDER SAYS THE GATE MOVES ONE MORE TIME. There are FOUR distinct
+    // thresholds in a six-rung ladder, so "past the third rung the skill gate
+    // stops moving" is false: the third rung is 150 and the gate moves once
+    // more, to the 200 cap. Pinned arithmetically rather than by phrase, so a
+    // reword cannot dodge it and a genuine ladder change moves it.
+    const distinctThresholds = [...new Set(FISHING_CATCH_BAND_THRESHOLDS)];
+    expect(distinctThresholds).toEqual([0, 100, 150, 200]);
+    const bands = prose('guide.profPages.bandsBodySplitLadder');
+    for (const at of distinctThresholds) {
+      expect(bands, `the bands paragraph must name the threshold ${at}`).toContain(String(at));
+    }
+    expect(bands, 'the bands paragraph must not claim the gate stops before the cap').not.toContain(
+      'past the third rung the skill gate stops moving',
+    );
+
+    // The rod ladder: the shipped count of CRAFTED rods, on the two keys that
+    // make a claim about it.
+    expect(ROD_RECIPES).toHaveLength(3);
+    // The engineering materials prose (re-keyed at the Phase 19F D085 review
+    // round after it said 'two' for a year): the count word and each rod's bill
+    // derive from ROD_RECIPES and ITEMS, never from a literal, so a fourth rod
+    // or a re-priced bill reds here instead of rotting in the prose.
+    const COUNT_WORDS = [
+      'zero',
+      'one',
+      'two',
+      'three',
+      'four',
+      'five',
+      'six',
+      'seven',
+      'eight',
+      'nine',
+      'ten',
+    ];
+    const rods = prose('guide.profPages.craftProse.engineering.materialsBodyThreeRods');
+    expect(COUNT_WORDS[ROD_RECIPES.length], 'a count word exists for the rod count').toBeDefined();
+    expect(rods).toContain(`The ${COUNT_WORDS[ROD_RECIPES.length]} rod recipes`);
+    // PER CLAUSE, not whole-value (the D085 frontend-seam review): the bills
+    // share the koi, so a whole-value search let a count swapped between two
+    // rods pass on the sibling clause. Each rod's clause runs from its own
+    // stem to the next rod's stem (or the sentence's end), and its reagents
+    // must sit inside that window.
+    const stems = ROD_RECIPES.map((r) => ITEMS[r.resultItemId].name.split(' ')[0]);
+    // ANCHORED at the rod sentence and exactly-once (the round-four coverage
+    // audit): an earlier mention of a rod's stem elsewhere in the prose would
+    // otherwise pull that rod's window back and swallow the sibling bills.
+    const sentenceStart = rods.indexOf('rod recipes');
+    expect(sentenceStart, 'the rod sentence exists').toBeGreaterThan(-1);
+    const wordAt = (text: string, word: string) => new RegExp(`\\b${word}\\b`).test(text);
+    const fishNames = ROD_RECIPES.flatMap((r) =>
+      r.reagents
+        .map((x) => ITEMS[x.itemId])
+        .filter((it) => it.use?.type !== 'gatherTool')
+        .map((it) => it.name),
+    );
+    for (const [i, recipe] of ROD_RECIPES.entries()) {
+      const stem = stems[i];
+      expect(rods.split(`the ${stem} `).length - 1, `'the ${stem} ' occurs once`).toBe(1);
+      const start = rods.indexOf(`the ${stem} `, sentenceStart);
+      expect(start, `names the ${stem} in the rod sentence`).toBeGreaterThan(-1);
+      const nextStem = stems[i + 1];
+      const stop = nextStem ? rods.indexOf(`the ${nextStem} `, start) : rods.indexOf('.', start);
+      expect(stop, `the ${stem} clause ends`).toBeGreaterThan(start);
+      const clause = rods.slice(start, stop);
+      const own = new Set(recipe.reagents.map((x) => ITEMS[x.itemId].name));
+      for (const reagent of recipe.reagents) {
+        const name = ITEMS[reagent.itemId].name;
+        // A rod reagent is 'a Silverstream rod' / 'that Stormreel': its stem
+        // must sit in this clause as a whole word (a bill re-based on another
+        // rod reds); the fish carry their count word and full name (the koi is
+        // shortened to 'Koi' after its first mention, so the short form is
+        // accepted too).
+        if (ITEMS[reagent.itemId].use?.type === 'gatherTool') {
+          const priorStem = name.split(' ')[0];
+          expect(
+            wordAt(clause, priorStem),
+            `the ${stem} clause names its prior rod ${priorStem}`,
+          ).toBe(true);
+          continue;
+        }
+        const word = COUNT_WORDS[reagent.count];
+        expect(word, `a count word exists for ${reagent.count}`).toBeDefined();
+        const short = name.endsWith(' Koi') ? 'Koi' : name;
+        expect(
+          clause.includes(`${word} ${name}`) || clause.includes(`${word} ${short}`),
+          `the ${stem} clause states ${word} ${name}`,
+        ).toBe(true);
+      }
+      // And nothing that is NOT in the bill: another rod's stem (its own prior
+      // rod aside) or a fish the bill does not take. The audit showed a clause
+      // could gain a false reagent and stay green.
+      const rodStems = new Set([
+        ...stems,
+        ...ROD_RECIPES.flatMap((r) =>
+          r.reagents
+            .map((x) => ITEMS[x.itemId])
+            .filter((it) => it.use?.type === 'gatherTool')
+            .map((it) => it.name.split(' ')[0]),
+        ),
+      ]);
+      const priorStems = new Set(
+        recipe.reagents
+          .map((x) => ITEMS[x.itemId])
+          .filter((it) => it.use?.type === 'gatherTool')
+          .map((it) => it.name.split(' ')[0]),
+      );
+      for (const other of rodStems) {
+        if (other === stem || priorStems.has(other)) continue;
+        expect(wordAt(clause, other), `the ${stem} clause names no ${other}`).toBe(false);
+      }
+      for (const fish of fishNames) {
+        if (own.has(fish)) continue;
+        expect(clause, `the ${stem} clause takes no ${fish}`).not.toContain(fish);
+        const shortFish = fish.split(' ').pop() ?? fish;
+        if (![...own].some((o) => o.endsWith(` ${shortFish}`)))
+          expect(wordAt(clause, shortFish), `the ${stem} clause takes no ${shortFish}`).toBe(false);
+      }
+    }
+    expect(
+      prose('guide.profPages.fish.startBodyThreeRods'),
+      'the fishing page must say THREE rods sit above the vendor ladder',
+    ).toContain('Three rods sit above those');
+    // POSITIVELY, not by absence. The first draft forbade the phrase "rather
+    // than access, and they will be the entry ticket", which the corrected page
+    // still says TRUTHFULLY about the LAND trades, whose tier 4 and 5 tools
+    // really do open no ground. The assertion fired on a true sentence, which is
+    // what absence pins do: they cannot tell which subject a phrase is about.
+    const tools = prose('guide.profPages.toolsNoteFishingPageMarks', {
+      tier2Prof: '40',
+      tier3Prof: '70',
+    });
+    expect(tools, 'the tools page must say fishing has THREE crafted rods').toContain(
+      'Fishing has three of its own',
+    );
+    expect(tools, 'and that a fishing rod opens a band skill alone cannot reach').toContain(
+      'opens a catch band that skill alone can never reach',
+    );
+
+    // THE KOI ROW, derived from the table rather than from the prose. It was
+    // re-keyed in this same round for an accuracy defect and had no accuracy
+    // coverage until now, which is the shape of the whole problem: the key that
+    // was JUST corrected is the one most likely to be corrected wrong.
+    const koiWeightAt = (band: number) =>
+      FISHING_TABLES_BY_BAND[band].eastbrook_vale.find((r) => r.itemId === 'glimmerfin_koi')
+        ?.weight ?? 0;
+    const koi = prose('guide.profPages.fish.koiBodyBandFlat');
+    expect(koi, 'the koi page states its band-0 odds').toContain(`a ${koiWeightAt(0)} percent row`);
+    expect(koi, 'and its band-1 odds').toContain(`${koiWeightAt(1)} at band 1`);
+    expect(koi, 'and that it is FLAT from band 2 up').toContain(
+      `${koiWeightAt(2)} from band 2 upward`,
+    );
+    // The flatness is the claim, so it is checked against the table and not
+    // taken from the sentence: every band from 2 up carries the same weight.
+    for (let b = 3; b < FISHING_TABLES_BY_BAND.length; b++) {
+      expect(koiWeightAt(b), `the koi is flat at band ${b}`).toBe(koiWeightAt(2));
+    }
+
     // Format keys stay translator-controlled, pinned as literals.
     expect(t('guide.profPages.matFmt' as never, { name: 'Copper Ore', count: '4' })).toBe(
       'Copper Ore x4',
@@ -2532,4 +4715,2112 @@ describe('Guide professions pages and routes', () => {
       t('guide.profPages.gainFmt' as never, { reduced: '75', minimal: '100', zero: '125' }),
     ).toBe('75 / 100 / 125');
   });
+
+  it('the inscription materials prose states the live scroll bill and its parity with the serpent elixir (D171)', () => {
+    // Masterwrought Phase 19G, D171 (qr-19-scroll-elixir-15c-parity). The
+    // predecessor key told players the double scroll batch is 'priced even
+    // with the Elixir of the Serpent', false by 15 copper from Phase 11g until
+    // the scroll took the elixir's gourd, and no arm read it: the farming
+    // dormancy arm above is the only guard over hand-authored guide.* prose.
+    // PER CLAUSE, derived from the live bills through the same unit-value rule
+    // tests/recipe_economy.test.ts prices with, so a re-tune that moves either
+    // bill, a count word, or the parity itself reds here rather than rotting
+    // in the prose. The successor differs from the predecessor in exactly the
+    // two clauses the repair made true; that narrowness is pinned too.
+    setLanguage('en');
+    const key = 'guide.profPages.craftProse.inscription.materialsBodyFrostGourd';
+    const body = t(key);
+    const recipe = (id: string) => {
+      const r = ALL_RECIPES.find((x) => x.id === id);
+      expect(r, `${id} exists`).toBeDefined();
+      return r as NonNullable<typeof r>;
+    };
+    const count = (r: ReturnType<typeof recipe>, id: string) =>
+      r.reagents.find((g) => g.itemId === id)?.count ?? 0;
+    // The shipped unit-value rule, imported rather than restated (the QA read
+    // found a second copy of it here; tests/helpers/reagent_unit_value.ts is
+    // the one home, shared with tests/recipe_economy.test.ts).
+    const bill = recipeInputValue;
+    const scroll = recipe('recipe_sunpetal_scroll');
+    const elixir = recipe('recipe_elixir_of_the_serpent');
+    const grimoire = recipe('recipe_sunpetal_grimoire');
+    const goldleafScroll = recipe('recipe_goldleaf_scroll');
+    // The scroll clause runs from its head to the end of its sentence, so a
+    // count that belongs to the grimoire clause cannot satisfy it; the
+    // terminator is asserted before the slice so a missing one cannot
+    // silently truncate the window (the frontend-seam review).
+    const head = body.indexOf('the double scroll batch');
+    expect(head, 'the scroll clause exists').toBeGreaterThan(-1);
+    const end = body.indexOf('. ', head);
+    expect(end, 'the scroll sentence ends').toBeGreaterThan(head);
+    const clause = body.slice(head, end);
+    const once = (text: string, needle: string) => text.split(needle).length - 1;
+    // 'a second essence': exactly one more essence than the rung-25 scroll,
+    // and exactly two in absolute terms (the relation alone stays true at
+    // three against two, where 'second' would be false).
+    expect(count(scroll, 'arcane_essence')).toBe(count(goldleafScroll, 'arcane_essence') + 1);
+    expect(count(scroll, 'arcane_essence')).toBe(2);
+    expect(clause).toContain('takes a second essence');
+    // Paragraph one's '12 copper' vial is the shipped buyValue.
+    expect(body).toContain(`a ${ITEMS.glass_vial.name}, ${ITEMS.glass_vial.buyValue} copper`);
+    // 'that pinch of dust': exactly one, bound back in from paragraph one.
+    expect(count(scroll, 'arcane_dust')).toBe(1);
+    expect(clause).toContain('with that pinch of dust');
+    expect(body).toContain('the sunpetal scroll binds a pinch of dust back in');
+    // 'a Frost Gourd off the Highwatch terraces': exactly one, by the shipped
+    // name, a tier-3 crop (the Highwatch beds), the cooking prose's phrase,
+    // and named exactly once in the clause.
+    expect(count(scroll, 'frost_gourd')).toBe(1);
+    expect(FARM_CROPS.frost_gourd.tier).toBe(3);
+    expect(once(clause, `and a ${ITEMS.frost_gourd.name} off the Highwatch terraces`)).toBe(1);
+    // Exactly once by the shipped name: a second singular mention fails this
+    // count; a plural ('Frost Gourds') still contains the name once and is
+    // caught by the exact phrase pin above ('and a Frost Gourd off'), so the
+    // two pins cover the two cases between them and no hardcoded plural is
+    // needed beside them.
+    expect(once(clause, ITEMS.frost_gourd.name)).toBe(1);
+    // The parity clause is TRUE on the live bills, and names the elixir by its
+    // shipped name; the two bills are equal through the shipped rule.
+    expect(bill(scroll), 'the scroll bill').toBe(bill(elixir));
+    expect(clause).toContain(`which prices it even with the ${ITEMS.elixir_of_the_serpent.name}`);
+    // The grimoire clause: two goldleaf besides its sunpetal. The prose states
+    // no sunpetal count ('besides its sunpetal'), so only presence is pinned
+    // here; the exact bill lives in tests/inscription_catalog.test.ts.
+    expect(count(grimoire, 'goldleaf_herb')).toBe(2);
+    expect(count(grimoire, 'sunpetal_herb')).toBeGreaterThan(0);
+    expect(body).toContain('the rare grimoire takes two goldleaf besides its sunpetal');
+    // The closing sentence: no counter stocks the herbs, the dust or the
+    // gourd, and the vial is bought. Derived from the live vendor rosters.
+    const stocked = new Set(Object.values(NPCS).flatMap((n) => n.vendorItems ?? []));
+    for (const id of [
+      'silverleaf_herb',
+      'goldleaf_herb',
+      'sunpetal_herb',
+      'arcane_dust',
+      'frost_gourd',
+    ]) {
+      expect(stocked.has(id), `${id} is sold by no counter`).toBe(false);
+    }
+    expect(stocked.has('glass_vial'), 'the vial is bought for coin').toBe(true);
+    expect(ITEMS.glass_vial.buyValue).toBe(12);
+    expect(body).toContain('No counter sells the herbs, the dust or the gourd');
+    expect(body).toContain('a garden bed');
+    expect(body).toContain('only the vial is bought for coin');
+    // NARROWNESS, exact: the successor keeps the predecessor's first paragraph
+    // byte for byte, and its second paragraph differs from the predecessor's
+    // in exactly the two clauses the repair made true (undo those two edits
+    // and the predecessor's paragraph comes back byte for byte), and the
+    // predecessor is retired rather than reworded in place.
+    const predecessor = guideStrings.profPages.craftProse.inscription.materialsBody;
+    expect(predecessor, 'the predecessor stays in the catalog, retired').toBeDefined();
+    // Exactly two paragraphs, so a third one cannot ride past the transform
+    // (the round-two coverage read's blocking mutant).
+    expect(body.split(/\n\s*\n/), 'the successor is two paragraphs').toHaveLength(2);
+    expect(predecessor.split(/\n\s*\n/), 'the predecessor is two paragraphs').toHaveLength(2);
+    const [succOne, succTwo] = body.split(/\n\s*\n/);
+    const [predOne, predTwo] = predecessor.split(/\n\s*\n/);
+    expect(succOne).toBe(predOne);
+    expect(
+      succTwo
+        .replace(
+          ` and a ${ITEMS.frost_gourd.name} off the Highwatch terraces, which prices it even`,
+          ', priced even',
+        )
+        .replace(
+          'the herbs, the dust or the gourd: they come out of the world, a garden bed or off another player',
+          'the herbs or the dust: they come out of the world or off another player',
+        ),
+    ).toBe(predTwo);
+    expect(body).not.toBe(predecessor);
+    expect(RETIRED_KEYS).toContain('guide.profPages.craftProse.inscription.materialsBody');
+  });
+
+  it('the inscription materials fills name the gourd, the serpent elixir and the parity in their own locale', async () => {
+    // Masterwrought Phase 19G, D171: the successor's five non-Latin fills are
+    // machine-authored and flagged for the maintainer's read, and a stale
+    // count or a lost clause in a fill is the defect class the re-key exists
+    // to fix. PER CLAUSE (the 19F lesson, and the D171 frontend-seam review):
+    // each fill is cut at its own grimoire clause and scroll clause, and EVERY
+    // count in paragraph two is derived from the live bills and looked up in
+    // the locale's numeral table, bound to its noun in the locale's own word
+    // order: the grimoire's goldleaf, the scroll's extra essence over the
+    // rung-25 scroll, its pinch of dust and its gourd. A re-tune that moves a
+    // count reds here (no numeral form for the new count) instead of leaving
+    // a fill telling players the old number. Each clause is closed to the
+    // other clause's items; the shipped elixir name (stems for Russian, which
+    // declines it) appears in the scroll clause exactly once and nowhere else;
+    // the closing sentence lists the gourd among the never sold and the
+    // garden bed among the sources; paragraph one is byte for byte the
+    // predecessor's (the narrowness of the re-key). The fifteen Latin locales
+    // render English until the Phase 20 fill and are not walked.
+    const filled = ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const;
+    type Filled = (typeof filled)[number];
+    // The reagent stems each locale's fill uses (welded below to the shipped
+    // entities.items.<id>.name of that locale, so the table cannot drift).
+    type Item = 'goldleaf_herb' | 'arcane_essence' | 'arcane_dust' | 'frost_gourd';
+    const NEEDLES: Record<
+      Filled,
+      {
+        grimoireHead: string;
+        head: string;
+        stems: Record<Item, string>;
+        // Count forms per item, keyed by the LIVE count: the noun bound to its
+        // numeral (or its count-of-one idiom) in this locale's word order.
+        forms: Record<Item, Record<number, string>>;
+        terrace: string;
+        elixir: string[];
+        parity: string;
+        neverSold: string;
+        garden: string;
+        // The locale's numeral tokens per count, so a count form is welded to
+        // its NUMBER as well as to its noun (a form whose numeral disagrees
+        // with the count it is keyed by reds); forms that count by idiom (a
+        // pinch, a bare singular) are listed in idioms instead.
+        numerals: Record<number, string[]>;
+        idioms: string[];
+        // SHAPE ANCHORS, re-cut at the Phase 20 re-read rather than defended:
+        // gourdMentions is how many times the gourd stem appears in the scroll
+        // clause of this fill's reviewed shape (the bound form, plus one
+        // anaphoric mention where the locale attributes the parity to 'this
+        // gourd'); closingEnd is the fill's last words (the vial-only clause);
+        // undo is the exact per-locale narrowness transform: each pair maps a
+        // successor-only run of paragraph two back to the predecessor's text,
+        // applied once each, and the result must equal the predecessor's
+        // paragraph two byte for byte, so anything inserted ANYWHERE in the
+        // paragraph reds (the round-one coverage read's blocking finding: the
+        // text before the grimoire head and the closing region were free).
+        gourdMentions: number;
+        closingEnd: string;
+        undo: ReadonlyArray<readonly [string, string]>;
+      }
+    > = {
+      ja_JP: {
+        grimoireHead: 'レアの魔導書',
+        head: '二枚一組の巻物',
+        stems: {
+          goldleaf_herb: 'ゴールドリーフ草',
+          arcane_essence: '精髄',
+          arcane_dust: '粉塵',
+          frost_gourd: '霜瓜',
+        },
+        forms: {
+          goldleaf_herb: { 2: 'ゴールドリーフ草を二つ' },
+          arcane_essence: { 1: '精髄をもう一つ' },
+          arcane_dust: { 1: 'ひとつまみの粉塵' },
+          frost_gourd: { 1: '霜瓜ひとつ' },
+        },
+        terrace: 'Highwatchのテラス',
+        elixir: ['蛇のエリクサー'],
+        parity: '同じ費えに揃え',
+        neverSold: '霜瓜も店では買えません',
+        garden: '畑から収穫',
+        numerals: { 1: ['ひとつ', '一つ', 'もう一つ'], 2: ['二つ', 'ふたつ'] },
+        idioms: ['ひとつまみの粉塵'],
+        gourdMentions: 2,
+        closingEnd: 'コインで買えるのは小瓶だけです。',
+        undo: [
+          ['、それにHighwatchのテラスから来る霜瓜ひとつを取り、この霜瓜が加わることで', 'を取り'],
+          ['霜瓜も', ''],
+          ['畑から収穫するか、', ''],
+        ],
+      },
+      ko_KR: {
+        grimoireHead: '희귀 마법서',
+        head: '두 장짜리 두루마리 묶음',
+        stems: {
+          goldleaf_herb: '금빛잎',
+          arcane_essence: '정수',
+          arcane_dust: '가루',
+          frost_gourd: '서리 박',
+        },
+        forms: {
+          goldleaf_herb: { 2: '금빛잎 두 장' },
+          arcane_essence: { 1: '정수 하나를 더' },
+          arcane_dust: { 1: '가루 한 줌' },
+          frost_gourd: { 1: '서리 박 하나' },
+        },
+        terrace: 'Highwatch 단구',
+        elixir: ['뱀의 비약'],
+        parity: '값을 나란히',
+        neverSold: '박도 상점에서는 팔지 않는다',
+        garden: '밭에서 거두',
+        numerals: { 1: ['하나', '한 '], 2: ['두 ', '둘'] },
+        idioms: [],
+        gourdMentions: 1,
+        closingEnd: '돈으로 사는 것은 유리병뿐이다.',
+        undo: [
+          [
+            '과 Highwatch 단구에서 나는 서리 박 하나를 함께 섞는데, 그 박 하나가 같은 축복을 비추는 뱀의 비약과 값을 나란히 맞춰 준',
+            '을 섞어, 같은 축복을 비추는 뱀의 비약과 값을 나란히 맞춘',
+          ],
+          ['박도 ', ''],
+          ['밭에서 거두거나 ', ''],
+        ],
+      },
+      ru_RU: {
+        grimoireHead: 'редкому гримуару',
+        head: 'двойная связка свитков',
+        stems: {
+          goldleaf_herb: 'золотолист',
+          arcane_essence: 'эссенци',
+          arcane_dust: 'пыл',
+          frost_gourd: 'тыкв',
+        },
+        forms: {
+          goldleaf_herb: { 2: 'два золотолиста' },
+          arcane_essence: { 1: 'вторую эссенцию' },
+          arcane_dust: { 1: 'щепотью пыли' },
+          frost_gourd: { 1: 'Морозную тыкву' },
+        },
+        terrace: 'террас Highwatch',
+        elixir: ['Эликсиром змея', 'Эликсир', 'зме'],
+        parity: 'вровень',
+        neverSold: 'ни тыкву не продает',
+        garden: 'с грядки',
+        numerals: { 1: ['втор', 'одн'], 2: ['два', 'две'] },
+        idioms: ['щепотью пыли', 'Морозную тыкву'],
+        gourdMentions: 2,
+        closingEnd: 'за монету покупается только флакон.',
+        undo: [
+          ['Морозную тыкву с террас Highwatch, и как раз за счет тыквы ', ''],
+          [
+            ', ни тыкву не продает ни один прилавок: они приходят из мира, с грядки',
+            ' не продает ни один прилавок: они приходят из мира',
+          ],
+        ],
+      },
+      zh_CN: {
+        grimoireHead: '那部精良魔典',
+        head: '双份的卷轴',
+        stems: {
+          goldleaf_herb: '金叶',
+          arcane_essence: '精华',
+          arcane_dust: '尘',
+          frost_gourd: '霜瓜',
+        },
+        forms: {
+          goldleaf_herb: { 2: '两株金叶' },
+          arcane_essence: { 1: '多取一份精华' },
+          arcane_dust: { 1: '那撮尘' },
+          frost_gourd: { 1: '一个出自Highwatch梯田的霜瓜' },
+        },
+        terrace: 'Highwatch梯田',
+        elixir: ['巨蛇药剂'],
+        parity: '持平',
+        neverSold: '尘与霜瓜都无处花钱购买',
+        garden: '田畦',
+        numerals: { 1: ['一个', '一份'], 2: ['两', '二'] },
+        idioms: ['那撮尘'],
+        gourdMentions: 1,
+        closingEnd: '只有瓶子用钱能买。',
+        undo: [
+          ['再加一个出自Highwatch梯田的霜瓜，如此一来，造价便', '造价'],
+          [
+            '、尘与霜瓜都无处花钱购买：它们来自世界本身，来自田畦',
+            '与尘都无处花钱购买：它们来自世界本身',
+          ],
+        ],
+      },
+      zh_TW: {
+        grimoireHead: '精良魔典',
+        head: '雙份的卷軸',
+        stems: {
+          goldleaf_herb: '金葉',
+          arcane_essence: '精華',
+          arcane_dust: '塵',
+          frost_gourd: '霜瓜',
+        },
+        forms: {
+          goldleaf_herb: { 2: '兩株金葉' },
+          arcane_essence: { 1: '多取一份精華' },
+          arcane_dust: { 1: '那撮塵' },
+          frost_gourd: { 1: '一顆來自Highwatch梯田的霜瓜' },
+        },
+        terrace: 'Highwatch梯田',
+        elixir: ['巨蛇藥劑'],
+        parity: '持平',
+        neverSold: '塵與霜瓜都無處花錢購買',
+        garden: '田畦',
+        numerals: { 1: ['一顆', '一份'], 2: ['兩', '二'] },
+        idioms: ['那撮塵'],
+        gourdMentions: 1,
+        closingEnd: '只有瓶子用錢能買。',
+        undo: [
+          ['再添一顆來自Highwatch梯田的霜瓜，正是這顆瓜讓卷軸的造價與其', '造價與它'],
+          [
+            '、塵與霜瓜都無處花錢購買：它們來自世界本身、一方田畦',
+            '與塵都無處花錢購買：它們來自世界本身',
+          ],
+        ],
+      },
+    };
+    const key = 'guide.profPages.craftProse.inscription.materialsBodyFrostGourd';
+    const predecessorKey = 'guide.profPages.craftProse.inscription.materialsBody';
+    // The LIVE counts every form is looked up by. The essence is stated as
+    // the extra over the rung-25 scroll ('a second essence'), so its count is
+    // that difference; the others are the bill's own counts.
+    const recipe = (id: string) => {
+      const r = ALL_RECIPES.find((x) => x.id === id);
+      expect(r, `${id} exists`).toBeDefined();
+      return r as NonNullable<typeof r>;
+    };
+    const count = (r: ReturnType<typeof recipe>, id: string) =>
+      r.reagents.find((g) => g.itemId === id)?.count ?? 0;
+    const scroll = recipe('recipe_sunpetal_scroll');
+    const grimoire = recipe('recipe_sunpetal_grimoire');
+    const goldleafScroll = recipe('recipe_goldleaf_scroll');
+    const LIVE: Record<Item, { count: number; clause: 'grimoire' | 'scroll' }> = {
+      goldleaf_herb: { count: count(grimoire, 'goldleaf_herb'), clause: 'grimoire' },
+      arcane_essence: {
+        count: count(scroll, 'arcane_essence') - count(goldleafScroll, 'arcane_essence'),
+        clause: 'scroll',
+      },
+      arcane_dust: { count: count(scroll, 'arcane_dust'), clause: 'scroll' },
+      frost_gourd: { count: count(scroll, 'frost_gourd'), clause: 'scroll' },
+    };
+    const fold = (v: string) => v.toLowerCase().replace(/ё/g, 'е');
+    const once = (text: string, needle: string) => text.split(needle).length - 1;
+    try {
+      for (const lang of filled) {
+        await ensureLocaleLoaded(lang);
+        setLanguage(lang);
+        const body = t(key);
+        const n = NEEDLES[lang];
+        expect(body, `${lang} carries a fill`).not.toBe(
+          guideStrings.profPages.craftProse.inscription.materialsBodyFrostGourd,
+        );
+        // Narrowness, EXACT: paragraph one is the predecessor's byte for byte,
+        // and paragraph two is the predecessor's once this locale's undo pairs
+        // are applied (each successor-only run present exactly once, mapped
+        // back to the predecessor's text), so a false count at the head of the
+        // paragraph or a sentence slipped into the closing reds here (the
+        // round-one coverage read's two green mutants).
+        expect(body.split(/\n\s*\n/), `${lang} successor is two paragraphs`).toHaveLength(2);
+        const [succOne, succTwo] = body.split(/\n\s*\n/);
+        const [predOne, predTwo] = (t(predecessorKey as never) as string).split(/\n\s*\n/);
+        expect(succOne, `${lang} keeps the predecessor's first paragraph`).toBe(predOne);
+        let undone = succTwo;
+        for (const [from, to] of n.undo) {
+          expect(once(undone, from), `${lang} carries the successor-only run once: ${from}`).toBe(
+            1,
+          );
+          undone = undone.replace(from, to);
+        }
+        expect(undone, `${lang} paragraph two is the predecessor's plus the two repairs`).toBe(
+          predTwo,
+        );
+        // The essence count the 'a second essence' idiom rests on, absolute as
+        // well as relative (the forms are keyed by the difference, so a
+        // three-over-two re-tune would keep the key at one; this reds it).
+        expect(count(scroll, 'arcane_essence'), `${lang} essence absolute`).toBe(2);
+        // The stems are welded to the SHIPPED names of this locale (folded,
+        // since Russian declines and the fills inflect), and every count form
+        // carries its item's stem, so the table cannot drift from the catalog.
+        for (const item of Object.keys(n.stems) as Item[]) {
+          const shipped = fold(t(`entities.items.${item}.name` as never));
+          expect(shipped, `${lang} shipped ${item} name carries ${n.stems[item]}`).toContain(
+            fold(n.stems[item]),
+          );
+          for (const [key, form] of Object.entries(n.forms[item])) {
+            expect(fold(form), `${lang} ${item} form carries its stem`).toContain(
+              fold(n.stems[item]),
+            );
+            // ...and its NUMBER: the form keyed by count N carries one of the
+            // locale's tokens for N, unless it counts by idiom (a pinch, a bare
+            // singular), listed as such (the round-one frontend read).
+            if (n.idioms.includes(form)) continue;
+            const tokens = n.numerals[Number(key)];
+            expect(tokens, `${lang} has numeral tokens for ${key}`).toBeDefined();
+            expect(
+              (tokens ?? []).some((tok) => form.includes(tok)),
+              `${lang} ${item} form '${form}' carries a numeral for ${key}`,
+            ).toBe(true);
+          }
+        }
+        // The weld tables cannot be silenced (the round-two coverage read): an
+        // idiom must be one of this locale's COUNT-OF-ONE forms, every numeral
+        // token is non-empty, and no token for one count occurs inside a form
+        // keyed to another count (so '二' cannot pass '十二', 'два' cannot pass
+        // 'двенадцать').
+        const allForms = (Object.keys(n.forms) as Item[]).flatMap((item) =>
+          Object.entries(n.forms[item]).map(([k, f]) => [Number(k), f] as const),
+        );
+        for (const idiom of n.idioms) {
+          expect(
+            allForms.some(([k, f]) => k === 1 && f === idiom),
+            `${lang} idiom '${idiom}' is a count-of-one form of this locale`,
+          ).toBe(true);
+        }
+        for (const [countKey, tokens] of Object.entries(n.numerals)) {
+          for (const tok of tokens) {
+            expect(
+              tok.length,
+              `${lang} numeral token for ${countKey} is non-empty`,
+            ).toBeGreaterThan(0);
+            for (const [k, f] of allForms) {
+              if (k === Number(countKey)) continue;
+              expect(
+                f,
+                `${lang} token '${tok}' (count ${countKey}) is not inside '${f}' (count ${k})`,
+              ).not.toContain(tok);
+            }
+          }
+        }
+        // The first elixir needle is the form the clause must carry; every
+        // needle after it is a stem of the SHIPPED name (Russian declines the
+        // head noun), and the sole needle of the other locales is the shipped
+        // name itself.
+        const elixirName = t('entities.items.elixir_of_the_serpent.name' as never);
+        for (const stem of n.elixir.slice(1))
+          expect(elixirName, `${lang} elixir stem ${stem} is of the shipped name`).toContain(stem);
+        if (n.elixir.length === 1) expect(n.elixir[0]).toBe(elixirName);
+        // The two clauses of paragraph two: the grimoire clause runs from its
+        // head to the scroll head, the scroll clause from there to the
+        // never-sold sentence; both heads and the tail asserted before slicing.
+        const grimoireAt = body.indexOf(n.grimoireHead);
+        expect(grimoireAt, `${lang} names the rare grimoire`).toBeGreaterThan(-1);
+        const head = body.indexOf(n.head, grimoireAt);
+        expect(head, `${lang} names the double scroll batch after the grimoire`).toBeGreaterThan(
+          grimoireAt,
+        );
+        const tail = body.indexOf(n.neverSold, head);
+        expect(tail, `${lang} closes with the never-sold sentence`).toBeGreaterThan(head);
+        const clauses = {
+          grimoire: body.slice(grimoireAt, head),
+          scroll: body.slice(head, tail),
+        };
+        // EVERY count, derived: the form for the live count exists, sits in
+        // its own clause exactly once, and the item is named nowhere in the
+        // other clause (closed to foreign items).
+        for (const item of Object.keys(LIVE) as Item[]) {
+          const { count: live, clause } = LIVE[item];
+          const form = n.forms[item][live];
+          expect(form, `${lang} has a form for ${item} at count ${live}`).toBeDefined();
+          expect(
+            once(clauses[clause], form as string),
+            `${lang} ${clause} clause binds ${item}`,
+          ).toBe(1);
+          const other = clause === 'grimoire' ? clauses.scroll : clauses.grimoire;
+          expect(
+            fold(other),
+            `${lang} ${clause === 'grimoire' ? 'scroll' : 'grimoire'} clause does not name ${item}`,
+          ).not.toContain(fold(n.stems[item]));
+        }
+        const clause = clauses.scroll;
+        // The gourd's stem appears in the scroll clause exactly as many times
+        // as this fill's reviewed shape carries it (the bound form once, plus
+        // the anaphoric 'this gourd' some locales use to attribute the
+        // parity); an unbound extra mention is a second gourd to a reader and
+        // reds here (the coverage audit's M5). Off the Highwatch terraces, and
+        // the fine twin is never named.
+        expect(
+          once(fold(clause), fold(n.stems.frost_gourd)),
+          `${lang} names the gourd ${n.gourdMentions} time(s) in the scroll clause`,
+        ).toBe(n.gourdMentions);
+        expect(clause, `${lang} names the terraces`).toContain(n.terrace);
+        // The fine twin's shipped name contains the base name in every locale
+        // (welded here), so a fill naming the twin would carry a longer token
+        // than the base and this negative can see it; a locale whose twin
+        // name were a substring of the base would red the weld first.
+        expect(
+          fold(t('entities.items.fine_frost_gourd.name' as never)),
+          `${lang} fine twin name contains the base name`,
+        ).toContain(fold(t('entities.items.frost_gourd.name' as never)));
+        expect(body, `${lang} does not name the fine twin`).not.toContain(
+          t('entities.items.fine_frost_gourd.name' as never),
+        );
+        // The parity with the shipped elixir, in this clause exactly once and
+        // nowhere else in the body.
+        for (const form of n.elixir)
+          expect(clause, `${lang} names the serpent elixir (${form})`).toContain(form);
+        expect(once(body, n.elixir[0]), `${lang} names the elixir once`).toBe(1);
+        expect(clause, `${lang} states the parity`).toContain(n.parity);
+        // The closing sentence: the gourd among the never sold, the garden bed
+        // among the sources.
+        const closing = body.slice(tail);
+        expect(closing, `${lang} sources the garden bed`).toContain(n.garden);
+        // The fill ends where the reviewed shape ends: nothing appended after
+        // the vial-only clause.
+        expect(body.trimEnd().endsWith(n.closingEnd), `${lang} ends on the vial-only clause`).toBe(
+          true,
+        );
+        expect(once(body, n.closingEnd), `${lang} carries the vial-only clause once`).toBe(1);
+      }
+    } finally {
+      setLanguage('en');
+    }
+  });
+
+  it('the farm beds prose names the scribe as a produce buyer, and every craft that buys produce is accounted for (D171)', () => {
+    // The D171 frontend-seam review: farm.bedsBody names two crafts that buy
+    // produce (cooking through the kitchens and Marlow's ladder, alchemy
+    // through the elixirs) and the parity repair made the scribe a buyer the
+    // page never named. The shipped bedsBody and its reviewed fills stay
+    // untouched (the page's own convention for later shipments); a sibling
+    // paragraph names the scribe and NO ordinal, because the hoe ladder
+    // (engineering) takes fine produce as a tool reagent and a count would
+    // have been contestable (the round-one reads). DERIVED here two ways: the
+    // crafts whose consumable rows consume produce include inscription, and
+    // the crafts that consume ANY produce (base or fine, tool rows included)
+    // are exactly those plus engineering, whose every such row is a gathering
+    // tool: the carve-out is pinned positively so a gear or tool row taking a
+    // crop under some other craft reds instead of being silently exempt.
+    setLanguage('en');
+    const body = t('guide.profPages.farm.bedsBodyScribeBuyer');
+    const produceIds = new Set(
+      Object.values(FARM_CROPS).flatMap((c) => [c.produceItemId, c.fineProduceItemId]),
+    );
+    const farmOwn = new Set(FARM_RECIPES.map((r) => r.id));
+    const anyBuyerRows = ALL_RECIPES.filter(
+      (r) => !farmOwn.has(r.id) && r.reagents.some((g) => produceIds.has(g.itemId)),
+    );
+    const consumableBuyers = new Set(
+      anyBuyerRows
+        .filter(
+          (r) =>
+            ITEMS[r.resultItemId]?.slot === undefined &&
+            ITEMS[r.resultItemId]?.use?.type !== 'gatherTool',
+        )
+        .map((r) => r.professionId),
+    );
+    expect([...consumableBuyers].sort()).toEqual(['alchemy', 'cooking', 'inscription']);
+    const anyBuyers = new Set(anyBuyerRows.map((r) => r.professionId));
+    expect([...anyBuyers].sort()).toEqual(['alchemy', 'cooking', 'engineering', 'inscription']);
+    for (const r of anyBuyerRows.filter((x) => x.professionId === 'engineering')) {
+      expect(ITEMS[r.resultItemId]?.use?.type, `${r.id} is the hoe ladder`).toBe('gatherTool');
+    }
+    // The sentence: the scribe, no ordinal, the live bill's facts. The WHOLE
+    // English is pinned as a literal (the round-two coverage read: a sentence
+    // with no narrowness pin takes any false clause), so any reword of this
+    // branch-new key comes back here first; the derived checks below then say
+    // which fact a legitimate reword must keep true.
+    expect(body).toBe(
+      "The scribe's desk buys from the beds too: the rung-50 Sunpetal Scroll takes a Frost Gourd off the Highwatch terraces, the same gourd the Elixir of the Serpent takes, which prices the two routes to that buff even.",
+    );
+    expect(body).toContain("The scribe's desk buys from the beds too");
+    expect(body).not.toMatch(/\b(third|fourth|three|four)\b/i);
+    const scroll = ALL_RECIPES.find((r) => r.id === 'recipe_sunpetal_scroll');
+    const elixir = ALL_RECIPES.find((r) => r.id === 'recipe_elixir_of_the_serpent');
+    expect(scroll).toBeDefined();
+    expect(elixir).toBeDefined();
+    if (!scroll || !elixir) return;
+    expect(scroll.professionId).toBe('inscription');
+    expect(body).toContain(`rung-${scroll.skillReq} ${ITEMS[scroll.resultItemId].name}`);
+    const gourdOf = (r: typeof scroll) => r.reagents.find((g) => g.itemId === 'frost_gourd')?.count;
+    expect(gourdOf(scroll)).toBe(1);
+    expect(gourdOf(elixir)).toBe(1);
+    // 'off the Highwatch terraces' is the page's idiom for the tier-3 crops
+    // (bedsBody says 'Hollis on the Highwatch terraces the mountain crops'):
+    // derived here rather than trusted, the gourd is a tier-3 crop and the
+    // Highwatch farmer stocks its seed. The seed's OTHER faucets (endgame
+    // drops, the Heroic Quartermaster) do not move where the gourd is grown.
+    expect(FARM_CROPS.frost_gourd.tier).toBe(3);
+    expect(NPCS.farmer_hollis?.vendorItems ?? [], 'Hollis stocks the gourd seed').toContain(
+      'frost_gourd_seed',
+    );
+    const once = (text: string, needle: string) => text.split(needle).length - 1;
+    expect(once(body, `takes a ${ITEMS.frost_gourd.name} off the Highwatch terraces`)).toBe(1);
+    expect(once(body, ITEMS.frost_gourd.name)).toBe(1);
+    expect(once(body, `the same gourd the ${ITEMS.elixir_of_the_serpent.name} takes`)).toBe(1);
+    // 'priced even' is true on the live bills through the shipped rule.
+    expect(recipeInputValue(scroll)).toBe(recipeInputValue(elixir));
+    expect(body).toContain('prices the two routes to that buff even');
+    // The two routes really are one buff (the exclusivity family), both
+    // payloads present.
+    expect(ITEMS[scroll.resultItemId].elixir).toBeDefined();
+    expect(ITEMS[scroll.resultItemId].elixir).toStrictEqual(ITEMS[elixir.resultItemId].elixir);
+  });
+
+  it('the farm beds fills name the scribe, the scroll, one gourd, the elixir and the parity in their own locale', async () => {
+    // The five non-Latin fills of farm.bedsBodyScribeBuyer, machine-authored
+    // and flagged for the maintainer's read, pinned the way the inscription
+    // fills are: the shipped names welded through entities.items.<id>.name,
+    // the gourd in the locale's count-of-one form exactly once, the rung
+    // derived from the live skillReq, the terraces, the parity word, and NO
+    // ordinal (the ordinal the first draft carried had no antecedent for these
+    // readers, whose bedsBody fills name the kitchens only).
+    const filled = ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const;
+    type Filled = (typeof filled)[number];
+    const NEEDLES: Record<
+      Filled,
+      {
+        scribe: string;
+        scroll: string;
+        rung: (n: number) => string;
+        gourdOne: string;
+        gourdStem: string;
+        terrace: string;
+        elixir: string;
+        parity: string;
+        ordinal: RegExp;
+        // SHAPE ANCHORS, re-cut at the Phase 20 re-read rather than defended:
+        // expected is the whole verified fill (a one-sentence key has no
+        // predecessor to transform against, so the sentence itself is the
+        // narrowness pin: any change comes back here first, and the derived
+        // checks say which fact a legitimate reword must keep); gourdMentions
+        // is how many times the gourd stem appears in this fill's reviewed
+        // shape (ru_RU repeats it anaphorically, 'ту самую тыкву').
+        expected: string;
+        gourdMentions: number;
+      }
+    > = {
+      ja_JP: {
+        scribe: '銘文師',
+        scroll: 'サンペタルの巻物',
+        rung: (n) => `スキル${n}の段`,
+        gourdOne: '霜瓜をひとつ',
+        gourdStem: '霜瓜',
+        terrace: 'Highwatchのテラス',
+        elixir: '蛇のエリクサー',
+        parity: '同じ費えに揃え',
+        ordinal: /三つ目|三番目|第三|四つ目|三つめ|3つ目|三番手/,
+        expected:
+          '銘文師の机も畑から買い付けます：スキル50の段のサンペタルの巻物はHighwatchのテラスから来る霜瓜をひとつ取り、それは蛇のエリクサーが取るのと同じ瓜ですから、そのバフへ通じる二つの道は同じ費えに揃えられています。',
+        gourdMentions: 1,
+      },
+      ko_KR: {
+        scribe: '필경대',
+        scroll: '태양꽃잎 두루마리',
+        rung: (n) => `${n} 단`,
+        gourdOne: '서리 박 하나',
+        gourdStem: '서리 박',
+        terrace: 'Highwatch 단구',
+        elixir: '뱀의 비약',
+        parity: '값을 나란히',
+        ordinal: /세 번째|셋째|네 번째|세 가지|세 기술|3번째|세 개의/,
+        expected:
+          '필경대도 밭에서 사 가니, 필경사의 50 단 태양꽃잎 두루마리는 Highwatch 단구에서 나는 서리 박 하나를 쓰는데, 뱀의 비약이 쓰는 바로 그 박이라 그 강화 효과로 가는 두 길의 값을 나란히 맞춰 준다.',
+        gourdMentions: 1,
+      },
+      ru_RU: {
+        scribe: 'начертател',
+        scroll: 'Свиток солнцелепеста',
+        rung: (n) => `ступени ${n}`,
+        gourdOne: 'Морозную тыкву',
+        gourdStem: 'тыкв',
+        terrace: 'террас Highwatch',
+        elixir: 'Эликсир змея',
+        parity: 'вровень',
+        ordinal: /трет|четверт|три ремесл|троих/i,
+        expected:
+          'С грядок покупает и стол начертателя: Свиток солнцелепеста, что начертатель пишет на ступени 50, берет Морозную тыкву с террас Highwatch, ту самую тыкву, что берет и Эликсир змея, и потому обе дороги к этому усилению выходят по цене вровень.',
+        gourdMentions: 2,
+      },
+      zh_CN: {
+        scribe: '铭文师',
+        scroll: '阳瓣卷轴',
+        rung: (n) => `${n}档`,
+        gourdOne: '一个出自Highwatch梯田的霜瓜',
+        gourdStem: '霜瓜',
+        terrace: 'Highwatch梯田',
+        elixir: '巨蛇药剂',
+        parity: '持平',
+        ordinal: /第三|三门|三种|第四|三样|三个|三项|三大/,
+        expected:
+          '铭文师的书案也向田畦采买：50档的阳瓣卷轴要用一个出自Highwatch梯田的霜瓜，正是巨蛇药剂所用的同一种瓜，如此一来，通往那份增益的两条路便造价持平。',
+        gourdMentions: 1,
+      },
+      zh_TW: {
+        scribe: '銘文師',
+        scroll: '陽瓣卷軸',
+        rung: (n) => `${n}檔`,
+        gourdOne: '一顆來自Highwatch梯田的霜瓜',
+        gourdStem: '霜瓜',
+        terrace: 'Highwatch梯田',
+        elixir: '巨蛇藥劑',
+        parity: '持平',
+        ordinal: /第三|三門|三種|第四|三樣|三個|三項|三大/,
+        expected:
+          '銘文師的書案也向田畦採買：50檔的陽瓣卷軸要取一顆來自Highwatch梯田的霜瓜，正是巨蛇藥劑也要用的同一顆瓜，於是通往那個增益的兩條路造價持平。',
+        gourdMentions: 1,
+      },
+    };
+    const key = 'guide.profPages.farm.bedsBodyScribeBuyer';
+    const scroll = ALL_RECIPES.find((r) => r.id === 'recipe_sunpetal_scroll');
+    expect(scroll).toBeDefined();
+    if (!scroll) return;
+    expect(scroll.reagents.find((g) => g.itemId === 'frost_gourd')?.count).toBe(1);
+    const once = (text: string, needle: string) => text.split(needle).length - 1;
+    const fold = (v: string) => v.toLowerCase().replace(/ё/g, 'е');
+    try {
+      for (const lang of filled) {
+        await ensureLocaleLoaded(lang);
+        setLanguage(lang);
+        const body = t(key);
+        const n = NEEDLES[lang];
+        expect(body, `${lang} carries a fill`).not.toBe(
+          guideStrings.profPages.farm.bedsBodyScribeBuyer,
+        );
+        // The whole fill, byte for byte (the round-two reads: a one-sentence
+        // key with no predecessor has no transform, so the sentence itself is
+        // its narrowness pin; nothing can be added at its head or its tail).
+        expect(body, `${lang} is the verified fill`).toBe(n.expected);
+        // One sentence, one paragraph.
+        expect(body, `${lang} is one paragraph`).not.toContain('\n');
+        // The shipped names weld the table: the scroll needle IS the shipped
+        // name, the gourd form and stem are of the shipped gourd name (stems
+        // for Russian, which declines), the elixir needle is the shipped name.
+        const scrollName = t('entities.items.sunpetal_scroll.name' as never);
+        const gourdName = fold(t('entities.items.frost_gourd.name' as never));
+        const elixirName = t('entities.items.elixir_of_the_serpent.name' as never);
+        expect(n.scroll, `${lang} scroll needle is the shipped name`).toBe(scrollName);
+        expect(gourdName, `${lang} shipped gourd name carries the stem`).toContain(
+          fold(n.gourdStem),
+        );
+        expect(fold(n.gourdOne), `${lang} gourd form carries the stem`).toContain(
+          fold(n.gourdStem),
+        );
+        expect(n.elixir, `${lang} elixir needle is the shipped name`).toBe(elixirName);
+        // The facts, each exactly once where a count is at stake.
+        expect(body, `${lang} names the scribe`).toContain(n.scribe);
+        expect(body, `${lang} names the scroll`).toContain(n.scroll);
+        expect(body, `${lang} states the live rung`).toContain(n.rung(scroll.skillReq));
+        expect(once(body, n.gourdOne), `${lang} binds one gourd`).toBe(1);
+        expect(once(fold(body), fold(n.gourdStem)), `${lang} names the gourd stem`).toBe(
+          n.gourdMentions,
+        );
+        expect(body, `${lang} names the terraces`).toContain(n.terrace);
+        expect(once(body, n.elixir), `${lang} names the elixir once`).toBe(1);
+        expect(body, `${lang} states the parity`).toContain(n.parity);
+        expect(body, `${lang} carries no ordinal`).not.toMatch(n.ordinal);
+        // The fine twin's shipped name contains the base name in every locale
+        // (welded here), so a fill naming the twin would carry a longer token
+        // than the base and this negative can see it; a locale whose twin
+        // name were a substring of the base would red the weld first.
+        expect(
+          fold(t('entities.items.fine_frost_gourd.name' as never)),
+          `${lang} fine twin name contains the base name`,
+        ).toContain(fold(t('entities.items.frost_gourd.name' as never)));
+        expect(body, `${lang} does not name the fine twin`).not.toContain(
+          t('entities.items.fine_frost_gourd.name' as never),
+        );
+      }
+    } finally {
+      setLanguage('en');
+    }
+  });
+
+  it('the engineering materials fills name every rod and fish in their own locale', async () => {
+    // The D085 frontend-seam review: the successor's five non-Latin fills were
+    // pinned by nothing, and a stale count in a fill is the defect class the
+    // re-key exists to fix. PER CLAUSE (the coverage audits and fresh reads):
+    // each filled locale's prose is cut at that locale's shipped rod names, in
+    // ROD_RECIPES order, and each rod's clause must carry its own fish (by that
+    // locale's shipped item name) with the count BOUND to the fish in the
+    // locale's own order, its prior rod, and nothing that is not in the bill.
+    // The fifteen Latin locales render English until the Phase 20 fill and are
+    // deliberately not walked here.
+    const filled = ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const;
+    type Filled = (typeof filled)[number];
+    // The numeral each locale's fill uses for a fish count, with its counter
+    // (匹, 마리, 条/條); Russian and Chinese spell the number out.
+    const NUMERAL: Record<Filled, Record<number, string[]>> = {
+      ja_JP: { 2: ['2匹'], 4: ['4匹'], 8: ['8匹'], 10: ['10匹'] },
+      ko_KR: { 2: ['2마리'], 4: ['4마리'], 8: ['8마리'], 10: ['10마리'] },
+      zh_CN: { 2: ['两条', '二条'], 4: ['四条'], 8: ['八条'], 10: ['十条'] },
+      zh_TW: { 2: ['兩條', '二條'], 4: ['四條'], 8: ['八條'], 10: ['十條'] },
+      ru_RU: { 2: ['два', 'две'], 4: ['четыре'], 8: ['восемь'], 10: ['десять'] },
+    };
+    // Russian declines every name inside the prose, so its needles are explicit
+    // per-item stems for the REAGENTS (the heads are matched by the full
+    // shipped name), each proved by deleting the name in turn.
+    const RU_STEMS: Record<string, string[]> = {
+      glimmerfin_koi: ['кои'],
+      raw_stonescale_carp: ['сланцеплавников', 'карп'],
+      raw_hollowgill_sturgeon: ['полужаберн', 'осетр'],
+      silverstream_fishing_rod: ['серебрян'],
+      stormreel_fishing_rod: ['штормов'],
+      tidewrought_fishing_rod: ['приливн'],
+      // Never a reagent, so never a needle: it only feeds the foreign-rod
+      // exclusion below.
+      clockreel_fishing_rod: ['часов'],
+    };
+    const fold = (v: string) => v.toLowerCase().replace(/ё/g, 'е');
+    // The forms a fish may take in a clause: the full shipped name, and for the
+    // koi the short form the fills use after its first mention (錦鯉, 코이,
+    // 锦鲤 / 錦鯉), or the Russian stems.
+    const fishForms = (lang: Filled, id: string, localName: string): string[] => {
+      if (lang === 'ru_RU') return RU_STEMS[id] ?? [];
+      if (id !== 'glimmerfin_koi') return [localName];
+      const short =
+        lang === 'ja_JP'
+          ? (localName.split('の').pop() ?? localName)
+          : lang === 'ko_KR'
+            ? (localName.split(' ').pop() ?? localName)
+            : localName.slice(-2);
+      return [localName, short];
+    };
+    // The count is BOUND to its fish: numeral then name in zh and ru, name then
+    // numeral in ja and ko (a within-clause swap of two counts reds).
+    // Russian stems match at a word start only (JS \b is ASCII-only, so the
+    // boundary is spelled out): 'кои' cannot ride 'покои', 'карп' cannot ride
+    // 'Прикарпатье'. A numeral is bounded on the right as well, so 'два' cannot
+    // ride 'двадцать'; a stem is not, since the prose declines it.
+    const ruAt = (stem: string) => `(?:^|[^а-яё])${stem}`;
+    const ruWord = (word: string) => `${ruAt(word)}(?![а-яё])`;
+    const hasRu = (clause: string, stem: string) => new RegExp(ruAt(stem)).test(clause);
+    const bound = (lang: Filled, clause: string, numeral: string, form: string) => {
+      const n = fold(numeral);
+      if (lang === 'zh_CN' || lang === 'zh_TW') return clause.includes(`${n}${form}`);
+      if (lang === 'ja_JP') return clause.includes(`${form}${n}`);
+      if (lang === 'ko_KR') return clause.includes(`${form} ${n}`);
+      // Russian: the stem within forty characters after ANY occurrence of the
+      // numeral word, at a word start on both sides.
+      return new RegExp(`${ruWord(n)}[\\s\\S]{0,40}${ruAt(form)}`).test(clause);
+    };
+    const priorStemOf = (lang: Filled, id: string, localName: string) =>
+      lang === 'ru_RU'
+        ? (RU_STEMS[id] ?? [''])[0]
+        : lang === 'ja_JP'
+          ? localName.split('の')[0]
+          : lang === 'ko_KR'
+            ? localName.split(' ')[0]
+            : localName;
+    try {
+      for (const lang of filled) {
+        await ensureLocaleLoaded(lang);
+        setLanguage(lang);
+        const body = fold(t('guide.profPages.craftProse.engineering.materialsBodyThreeRods'));
+        expect(body, `${lang} carries a fill`).not.toBe(
+          fold(guideStrings.profPages.craftProse.engineering.materialsBodyThreeRods),
+        );
+        const name = (id: string) => fold(t(`entities.items.${id}.name` as never));
+        // Clause heads: each rod's full shipped name, found forward in recipe
+        // order and then refined to the LAST occurrence before the next head,
+        // so a stray earlier mention of a rod cannot widen its window (a prior
+        // rod is only ever an earlier rod, so it sits after the next head).
+        const heads: number[] = [];
+        let cursor = 0;
+        for (const recipe of ROD_RECIPES) {
+          const head = name(recipe.resultItemId);
+          const at = body.indexOf(head, cursor);
+          expect(
+            at,
+            `${lang} names ${recipe.resultItemId} (${head}) as a clause head`,
+          ).toBeGreaterThan(-1);
+          heads.push(at);
+          cursor = at + head.length;
+        }
+        for (let i = heads.length - 2; i >= 0; i--) {
+          const head = name(ROD_RECIPES[i].resultItemId);
+          heads[i] = body.lastIndexOf(head, heads[i + 1] - 1);
+        }
+        const paraEnd = body.indexOf('\n\n', heads[heads.length - 1]);
+        const allFish = ROD_RECIPES.flatMap((r) =>
+          r.reagents.map((x) => x.itemId).filter((id) => ITEMS[id].use?.type !== 'gatherTool'),
+        );
+        const allRods = [
+          ...ROD_RECIPES.map((r) => r.resultItemId),
+          ...ROD_RECIPES.flatMap((r) =>
+            r.reagents.map((x) => x.itemId).filter((id) => ITEMS[id].use?.type === 'gatherTool'),
+          ),
+        ];
+        for (const [i, recipe] of ROD_RECIPES.entries()) {
+          const stop = i + 1 < heads.length ? heads[i + 1] : paraEnd === -1 ? body.length : paraEnd;
+          expect(stop, `${lang} ${recipe.resultItemId} clause ends`).toBeGreaterThan(heads[i]);
+          const clause = body.slice(heads[i], stop);
+          const own = new Set(recipe.reagents.map((x) => x.itemId));
+          for (const reagent of recipe.reagents) {
+            const id = reagent.itemId;
+            const localName = name(id);
+            if (ITEMS[id].use?.type === 'gatherTool') {
+              const stem = priorStemOf(lang, id, localName);
+              expect(stem.length, `${lang} prior-rod stem for ${id}`).toBeGreaterThan(0);
+              expect(
+                clause,
+                `${lang} ${recipe.resultItemId} clause names its prior rod ${localName}`,
+              ).toContain(stem);
+              continue;
+            }
+            const forms = fishForms(lang, id, localName);
+            expect(forms.length, `${lang} forms for ${id}`).toBeGreaterThan(0);
+            // Russian: EVERY stem of the name, each at a word start (a species
+            // word dropped from the fill reds); the others: the full name or
+            // the koi's short form.
+            if (lang === 'ru_RU')
+              for (const form of forms)
+                expect(
+                  hasRu(clause, form),
+                  `${lang} ${recipe.resultItemId} clause names ${id} (${localName}) [${form}]`,
+                ).toBe(true);
+            else
+              expect(
+                forms.some((f) => clause.includes(f)),
+                `${lang} ${recipe.resultItemId} clause names ${id} (${localName})`,
+              ).toBe(true);
+            const numerals = NUMERAL[lang][reagent.count];
+            expect(numerals, `${lang} numeral for ${reagent.count}`).toBeDefined();
+            // Bound: in Russian every stem must follow the numeral; elsewhere
+            // the full name or the koi's short form.
+            expect(
+              numerals.some((numeral) =>
+                lang === 'ru_RU'
+                  ? forms.every((form) => bound(lang, clause, numeral, form))
+                  : forms.some((form) => bound(lang, clause, numeral, form)),
+              ),
+              `${lang} ${recipe.resultItemId} clause binds ${reagent.count} to ${id}`,
+            ).toBe(true);
+          }
+          // Nothing that is not in the bill: a fish the bill does not take, or
+          // a rod that is neither this one nor its prior.
+          for (const id of allFish) {
+            if (own.has(id)) continue;
+            const forms = fishForms(lang, id, name(id));
+            // The koi's short form is shared by every koi bill and is exempt
+            // explicitly (the second CJK form); every Russian stem and every
+            // full name is forbidden.
+            const forbidden =
+              lang === 'ru_RU' || id !== 'glimmerfin_koi' ? forms : forms.slice(0, 1);
+            for (const form of forbidden)
+              expect(
+                lang === 'ru_RU' ? hasRu(clause, form) : clause.includes(form),
+                `${lang} ${recipe.resultItemId} clause takes no ${id} (${form})`,
+              ).toBe(false);
+          }
+          for (const id of allRods) {
+            if (id === recipe.resultItemId || own.has(id)) continue;
+            const stem = priorStemOf(lang, id, name(id));
+            expect(
+              lang === 'ru_RU' ? hasRu(clause, stem) : clause.includes(stem),
+              `${lang} ${recipe.resultItemId} clause names no ${id}`,
+            ).toBe(false);
+          }
+        }
+      }
+    } finally {
+      setLanguage('en');
+    }
+  });
+});
+
+describe('the craft ladder prose keeps its counts derived or count-free (Masterwrought 11l QA)', () => {
+  // The alchemy ladder body shipped "nine recipes ... three at each rung" and
+  // a "280 health, 360 mana" sunpetal against a live 335/425, and stayed green
+  // because no arm read it (the freshness gate cannot see a guide.* string).
+  // The 11l QA reworded it count-free with the tallow potion named; these arms
+  // are the regression pins the reword lacked, every number derived from the
+  // item table and every count claim held to the recipe table.
+  const potion = (id: string): { potionHp?: number; potionMana?: number } =>
+    ITEMS[id] as unknown as { potionHp?: number; potionMana?: number };
+
+  it('the alchemy ladder body spells no rung count and carries the live draught numbers', () => {
+    const body = t('guide.profPages.craftProse.alchemy.ladderBody');
+    expect(body).not.toMatch(/\b(nine|three at each rung)\b/i);
+    for (const [hp, mana] of [
+      ['silverleaf_healing_draught', 'silverleaf_mana_draught'],
+      ['goldleaf_healing_draught', 'goldleaf_mana_draught'],
+      ['sunpetal_healing_draught', 'sunpetal_mana_draught'],
+    ] as const) {
+      const heal = potion(hp).potionHp;
+      const mp = potion(mana).potionMana;
+      expect(heal, hp).toBeDefined();
+      expect(mp, mana).toBeDefined();
+      expect(body).toContain(`(${heal} health, ${mp} mana)`);
+    }
+    // The tallow row the trophy economy put on the skill 25 rung, named by
+    // the output's live name and rung.
+    const tallowRow = ALL_RECIPES.find((r) => r.id === 'recipe_lesser_healing_potion');
+    expect(tallowRow, 'the tallow row is live').toBeDefined();
+    expect(tallowRow?.skillReq).toBe(25);
+    const output = ITEMS[tallowRow?.resultItemId ?? ''];
+    expect(output, 'the tallow row outputs a live item').toBeDefined();
+    expect(body).toContain(output.name);
+    // "a hair weaker than the goldleaf draught": derived, not asserted.
+    expect(body).toContain('a hair weaker than the goldleaf draught');
+    const lesserHp = potion(tallowRow?.resultItemId ?? '').potionHp ?? 0;
+    const goldleafHp = potion('goldleaf_healing_draught').potionHp ?? 0;
+    expect(lesserHp).toBeGreaterThan(0);
+    expect(lesserHp).toBeLessThan(goldleafHp);
+    expect(body).toContain('skill 25 rung');
+  });
+
+  it('the alchemy ladder body carries the live ELIXIR and FLASK magnitudes', () => {
+    // ADDED AT PHASE 15, because the arm above pins the draughts and the rung
+    // counts but nothing read the two magnitude sentences below them. The R5
+    // envelope tune moved the flask band 15 to 13 and this prose kept saying
+    // 15, in English and in all five non-Latin overlays, so the public wiki
+    // told players a number the tooltip contradicted and nothing went red.
+    // Every figure is derived from the item table, never restated.
+    const body = t('guide.profPages.craftProse.alchemy.ladderBody');
+    const elixir = (id: string): { value?: number; duration?: number } =>
+      (ITEMS[id] as unknown as { elixir?: { value?: number; duration?: number } }).elixir ?? {};
+
+    // The three elixir rungs, each "<value> [Stamina] for <minutes> minutes".
+    // The first names the stat and the other two lean on it, which is why the
+    // needle allows the word rather than pinning three separate sentences.
+    // venomfire_elixir is the Vipersear Elixir's id: the display name and the
+    // id diverge here, which is exactly why the arm reads the def rather than
+    // trusting the prose's own words.
+    for (const id of ['elixir_of_the_boar', 'venomfire_elixir', 'elixir_of_the_serpent'] as const) {
+      const e = elixir(id);
+      expect(e.value, `${id} value`).toBeGreaterThan(0);
+      expect(e.duration, `${id} duration`).toBeGreaterThan(0);
+      expect(body, id).toMatch(
+        new RegExp(`\\b${e.value}(?: Stamina)? for ${(e.duration ?? 0) / 60} minutes\\b`),
+      );
+    }
+
+    // The flask rung. All three role flasks share one band, so the sentence is
+    // magnitude-only and the arm holds all three to it.
+    const flask = elixir('ironhusk_flask');
+    expect(flask.value, 'the flask band').toBe(13);
+    expect(flask.duration, 'the flask duration').toBe(1200);
+    for (const id of ['ironhusk_flask', 'warboar_flask', 'runewater_flask'] as const) {
+      expect(elixir(id).value, `${id} shares the band`).toBe(flask.value);
+    }
+    expect(body).toContain(
+      `A flask grants ${flask.value} for ${(flask.duration ?? 0) / 60} minutes`,
+    );
+  });
+
+  it('the engineering ladder body spells no ladder count (the hoes and the chassis grew it)', () => {
+    const body = t('guide.profPages.craftProse.engineering.ladderBody');
+    // Any spelled or numeric "<count> recipes" is the retired claim; the
+    // positive control proves the matcher sees one when it is present, so
+    // the negative below is not a dead alternate.
+    const RECIPE_COUNT_RE =
+      /\b(\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty) recipes\b/i;
+    expect('The ladder is seventeen recipes bound to the toolworks').toMatch(RECIPE_COUNT_RE);
+    expect('The ladder is 17 recipes').toMatch(RECIPE_COUNT_RE);
+    expect(body).not.toMatch(RECIPE_COUNT_RE);
+    expect(body).toContain('toolworks');
+    // The one count the body still spells on its own line, the six land-tool
+    // recipes known automatically, is held to the auto-known engineering rows
+    // (no acquisition channel at all: the grandfathered pre-training set).
+    expect(body).toContain('The six land-tool recipes are known automatically');
+    const autoKnown = ALL_RECIPES.filter(
+      (r) => r.professionId === 'engineering' && (r.acquisition ?? []).length === 0,
+    );
+    expect(autoKnown).toHaveLength(6);
+    // The two count claims the body still makes are held to the rod table:
+    // three crafted rods, two of them trainer-taught (the third is drop-taught).
+    expect(body).toContain('Two of the three crafted rods are the taught exception');
+    expect(ROD_RECIPES).toHaveLength(3);
+    expect(ROD_RECIPES.filter((r) => (r.acquisition ?? []).includes('trainer'))).toHaveLength(2);
+    // The count the sentence retired is the one that keeps moving: the
+    // engineering rows are well past the nine the old sentence claimed.
+    expect(ALL_RECIPES.filter((r) => r.professionId === 'engineering').length).toBeGreaterThan(9);
+  });
+
+  it('the armorcrafting and jewelcrafting ladder counts are held to the live ladders', () => {
+    // These two sentences still spell "nine ... in three rungs"; that is true
+    // of the wearable ladder (LADDER_RECIPES, three per rung) and of the
+    // jewelcrafting trainer rows below the intermediate rung, so the claim is
+    // pinned to those tables rather than reworded: the day either table
+    // moves, this reds and the sentence is reworded count-free with its
+    // overlays swept in the same change.
+    // Both arms filter ALL_RECIPES (every list), not LADDER_RECIPES: the
+    // vector that staled alchemy's sentence was a trainer row landing on an
+    // existing rung from a DIFFERENT list (a TROPHY_RECIPES row at 25), which
+    // a ladder-scoped filter cannot see. The per-rung distribution is pinned,
+    // not only the rung set, since each sentence names three items per rung.
+    const perRung = (rows: readonly { skillReq: number }[]): Record<number, number> => {
+      const counts: Record<number, number> = {};
+      for (const r of rows) counts[r.skillReq] = (counts[r.skillReq] ?? 0) + 1;
+      return counts;
+    };
+    const trainerBelowIntermediate = (craft: string) =>
+      ALL_RECIPES.filter(
+        (r) =>
+          r.professionId === craft &&
+          (r.acquisition ?? []).includes('trainer') &&
+          r.skillReq <= 50 &&
+          !COMBO_RECIPES.some((c) => c.id === r.id),
+      );
+    const armor = t('guide.profPages.craftProse.armorcrafting.ladderBody');
+    expect(armor).toContain('nine recipes in three rungs');
+    // The Boundstone Helm is the one trainer-taught armorcrafting row in the
+    // band that is NOT a ladder rung (a Smith combination recipe the sentence
+    // names separately), so it is excluded by its combo membership, pinned.
+    expect(COMBO_RECIPES.map((c) => c.id)).toContain('recipe_ironbound_warplate_helm');
+    const armorTrainer = trainerBelowIntermediate('armorcrafting');
+    expect(armorTrainer).toHaveLength(9);
+    expect(perRung(armorTrainer)).toEqual({ 0: 3, 25: 3, 50: 3 });
+    expect(armorTrainer.map((r) => r.id).sort()).toEqual(
+      LADDER_RECIPES.filter((r) => r.professionId === 'armorcrafting')
+        .map((r) => r.id)
+        .sort(),
+    );
+    const jewel = t('guide.profPages.craftProse.jewelcrafting.ladderBody');
+    expect(jewel).toContain('nine trainer recipes in three rungs');
+    const jewelTrainer = trainerBelowIntermediate('jewelcrafting');
+    expect(jewelTrainer).toHaveLength(9);
+    expect(perRung(jewelTrainer)).toEqual({ 0: 3, 25: 3, 50: 3 });
+  });
+});
+
+describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
+  // One pin per corrected key: every number and enumerated name derived from the live
+  // table, the corrected clause asserted against it, the old false clause asserted ABSENT,
+  // and for a re-key the predecessor's English asserted gone from the surface. Appended per
+  // lane by the Phase 20 inserter; the fills' shape anchors live in
+  // tests/guide_wiki_audit_fills.test.ts.
+  it('guide.arenaPage.honorFinalNoteSoldBack: the buyback list holds sales, never purchases (the wiki completeness audit)', () => {
+    // Phase 20 (2026-09-03). The predecessor honorFinalNote said a coin purchase
+    // 'can be undone from a vendor's buyback list'. The list holds what you SOLD:
+    // recordVendorBuyback (src/sim/items.ts) is reached from sellItem and
+    // sellAllJunk alone, and buyItem debits copper or Honor and records nothing.
+    // The successor says so; every other clause is the predecessor's byte for
+    // byte. The live vendor arm is the sibling pin below.
+    setLanguage('en');
+    const html = arena.render({ params: [], sub: 'arena', titleKey: 'guide.nav.arena' });
+    const body = t('guide.arenaPage.honorFinalNoteSoldBack');
+    const predecessor = guideStrings.arenaPage.honorFinalNote;
+    expect(html).toContain(esc(body));
+    // NEGATIVE: the false clause and the predecessor's English are off the page.
+    expect(html).not.toContain('can be undone from a vendor');
+    expect(html).not.toContain(esc(predecessor));
+    expect(RETIRED_KEYS).toContain('guide.arenaPage.honorFinalNote');
+    // Narrowness: the opening sentence, the soulbound clause and the closing
+    // sentence are the predecessor's.
+    const soulbound =
+      'Warfare gear is soulbound the moment you buy it, so it can never be traded, mailed, or sold back for anything';
+    const closing =
+      'The shop asks you to confirm for that reason: read the piece before you press it.';
+    for (const text of [body, predecessor]) {
+      expect(text.startsWith('Honor purchases are final. ')).toBe(true);
+      expect(text).toContain(soulbound);
+      expect(text.endsWith(closing)).toBe(true);
+    }
+    expect(body).toContain('The buyback list only ever holds what you sold');
+    expect(body).toContain('a coin purchase can usually be sold back for its sell price');
+    expect(body).toContain('reclaimed from that list if you change your mind again');
+    expect(body).toContain('and it never reaches that list');
+    // The Warfare tier, from the vendor rosters: every Honor-priced row is a
+    // Warfare row, soulbound with no sell value, so the sell gate refuses it.
+    const stocked = new Set(Object.values(NPCS).flatMap((n) => n.vendorItems ?? []));
+    const honorRows = [...stocked].filter((id) => (ITEMS[id].priceHonor ?? 0) > 0);
+    expect(honorRows.length).toBeGreaterThan(0);
+    for (const id of honorRows) {
+      expect(id in WARFARE_ITEMS, id).toBe(true);
+      expect(ITEMS[id].soulbound, id).toBe(true);
+      expect(ITEMS[id].sellValue, id).toBe(0);
+    }
+    // 'usually': the coin-priced rows no vendor buys back (the noVendorSell
+    // starter tools and the like) are the minority; the rest sell for sellValue.
+    const coinRows = [...stocked].filter((id) => (ITEMS[id].buyValue ?? 0) > 0);
+    const sellable = coinRows.filter(
+      (id) => !ITEMS[id].noVendorSell && !ITEMS[id].soulbound && ITEMS[id].kind !== 'quest',
+    );
+    expect(sellable.length).toBeGreaterThan(coinRows.length - sellable.length);
+  });
+
+  it('guide.arenaPage.honorFinalNoteSoldBack: the live vendor writes a buyback row on a sale, never on a purchase (the wiki completeness audit)', () => {
+    // The same Sim drive tests/items.test.ts uses, at Trader Wilkes: a purchase
+    // leaves the buyback list empty, a sale pays sellValue and writes the row,
+    // buying it back charges that same sellValue, and a Warfare piece is refused
+    // at the counter (soulbound), so it never reaches the list.
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Audit');
+    const world = sim as unknown as {
+      entities: Map<number, { id: number; templateId?: string; pos: { x: number; z: number } }>;
+      players: Map<
+        number,
+        { copper: number; inventory: unknown[]; vendorBuyback: { itemId: string; count: number }[] }
+      >;
+      rebucket(e: unknown): void;
+    };
+    const wilkes = [...world.entities.values()].find((e) => e.templateId === 'trader_wilkes');
+    const me = world.entities.get(pid);
+    const meta = world.players.get(pid);
+    expect(wilkes).toBeDefined();
+    expect(me).toBeDefined();
+    expect(meta).toBeDefined();
+    if (!wilkes || !me || !meta) return;
+    me.pos.x = wilkes.pos.x + 2;
+    me.pos.z = wilkes.pos.z;
+    world.rebucket(me);
+    meta.inventory.length = 0;
+    meta.copper = 10_000;
+    sim.buyItem(wilkes.id, 'baked_bread', undefined, pid);
+    const bought = sim.countItem('baked_bread', pid);
+    expect(bought).toBeGreaterThan(0);
+    expect(meta.vendorBuyback).toEqual([]);
+    const afterBuy = meta.copper;
+    sim.sellItem('baked_bread', bought, pid);
+    expect(meta.copper).toBe(afterBuy + ITEMS.baked_bread.sellValue * bought);
+    expect(meta.vendorBuyback.map((s) => s.itemId)).toEqual(['baked_bread']);
+    sim.buyBackItem('baked_bread', 0, undefined, pid);
+    expect(sim.countItem('baked_bread', pid)).toBe(1);
+    expect(meta.copper).toBe(afterBuy + ITEMS.baked_bread.sellValue * (bought - 1));
+    const warfareId = Object.keys(WARFARE_ITEMS)[0];
+    sim.addItem(warfareId, 1, pid);
+    sim.drainEvents();
+    sim.sellItem(warfareId, 1, pid);
+    const errors = sim.drainEvents().flatMap((e) => (e.type === 'error' ? [e.text] : []));
+    expect(errors).toContain('That item is not for sale.');
+    expect(sim.countItem(warfareId, pid)).toBe(1);
+    expect(meta.vendorBuyback.some((s) => s.itemId === warfareId)).toBe(false);
+  });
+
+  it('guide.arenaPage.rewardsBodyLossShare: a played-out loss and a draw pay a smaller share (the wiki completeness audit)', () => {
+    // Phase 20 (2026-09-03). The predecessor rewardsBody said a loss 'costs you
+    // nothing but rating'. awardRankedArenaResultHonor (src/sim/pvp/honor.ts)
+    // pays RANKED_ARENA_LOSS_HONOR, a derived ARENA_LOSS_HONOR_SHARE of the win,
+    // for a played-out loss AND a draw; the caller in src/sim/social/arena.ts
+    // endArenaMatch skips it on a forfeit, which the kept clause still says.
+    // Every figure is derived, none restated, and the live module is driven.
+    setLanguage('en');
+    const html = arena.render({ params: [], sub: 'arena', titleKey: 'guide.nav.arena' });
+    const body = t('guide.arenaPage.rewardsBodyLossShare');
+    const predecessor = guideStrings.arenaPage.rewardsBody;
+    expect(html).toContain(esc(body));
+    // NEGATIVE: the false clauses and the predecessor's English are off the page.
+    expect(html).not.toContain('a loss costs you nothing but rating');
+    expect(html).not.toContain(esc("That day is Honor's own"));
+    expect(html).not.toContain(esc(predecessor));
+    expect(RETIRED_KEYS).toContain('guide.arenaPage.rewardsBody');
+    // Narrowness: the kept clauses are the predecessor's.
+    for (const kept of [
+      'A ranked win pays Honor, the player versus player currency, and ',
+      'Honor is meant to reward real matches: beating the same opponent or the same team again on the same day pays nothing further',
+      'and a match your opponent forfeits still moves your rating but pays no Honor at all.',
+    ]) {
+      expect(body).toContain(kept);
+      expect(predecessor).toContain(kept);
+    }
+    // The share: a real, smaller, non-zero share of the win in every bracket.
+    const formats = Object.keys(RANKED_ARENA_WIN_HONOR) as (keyof typeof RANKED_ARENA_WIN_HONOR)[];
+    expect(formats.length).toBeGreaterThan(0);
+    expect(ARENA_LOSS_HONOR_SHARE).toBeGreaterThan(0);
+    expect(ARENA_LOSS_HONOR_SHARE).toBeLessThan(1);
+    for (const format of formats) {
+      expect(RANKED_ARENA_LOSS_HONOR[format], format).toBe(
+        Math.round(RANKED_ARENA_WIN_HONOR[format] * ARENA_LOSS_HONOR_SHARE),
+      );
+      expect(RANKED_ARENA_LOSS_HONOR[format], format).toBeGreaterThan(0);
+      expect(RANKED_ARENA_LOSS_HONOR[format], format).toBeLessThan(RANKED_ARENA_WIN_HONOR[format]);
+    }
+    expect(body).toContain(
+      'a loss you play to the end still pays a smaller share of it, as does a draw, so rating is the only thing a loss really costs you',
+    );
+    // The live module: the first loss to a team pays the share, losing to them
+    // again pays nothing, the first win over them still pays in full (the two
+    // counters are separate), beating them again pays nothing, a draw pays the
+    // loss share.
+    type Award = typeof awardRankedArenaResultHonor;
+    const day = (resetDay: string) =>
+      ({ resetDay, emit: () => {} }) as unknown as Parameters<Award>[0];
+    const fresh = () =>
+      ({ entityId: 1, honor: 0, lifetimeHonor: 0 }) as unknown as Parameters<Award>[1];
+    const [format] = formats;
+    const meta = fresh();
+    const today = day('2026-09-03');
+    expect(awardRankedArenaResultHonor(today, meta, format, 'them', 'loss')).toBe(
+      RANKED_ARENA_LOSS_HONOR[format],
+    );
+    expect(awardRankedArenaResultHonor(today, meta, format, 'them', 'loss')).toBe(0);
+    expect(awardRankedArenaResultHonor(today, meta, format, 'them', 'win')).toBe(
+      RANKED_ARENA_WIN_HONOR[format],
+    );
+    expect(awardRankedArenaResultHonor(today, meta, format, 'them', 'win')).toBe(0);
+    expect(awardRankedArenaResultHonor(today, fresh(), format, 'them', 'draw')).toBe(
+      RANKED_ARENA_LOSS_HONOR[format],
+    );
+    expect(body).toContain('(nor does losing to them again)');
+    // The taper: the predecessor's 'a little less per win' read as a trim, but
+    // arenaDailyMultiplier (src/sim/pvp/honor.ts) halves the award from
+    // ARENA_DAILY_TAPER_START wins, halves it again from
+    // ARENA_DAILY_TAPER_FLOOR_START, and holds there. Driven through the live
+    // module with a NEW opposing team every match, so the repeat curve never
+    // fires and only the daily taper moves the payout.
+    expect(body).toContain(
+      'a long winning day pays in full for its first stretch of wins and then halves what a win pays, halving it again deeper in and staying there',
+    );
+    expect(predecessor).toContain('a long winning day pays a little less per win as it goes on');
+    expect(ARENA_DAILY_TAPER_FLOOR_START).toBeGreaterThan(ARENA_DAILY_TAPER_START);
+    const taperMeta = fresh();
+    const paidWin = (index: number) =>
+      awardRankedArenaResultHonor(today, taperMeta, format, `team-${index}`, 'win');
+    const full = RANKED_ARENA_WIN_HONOR[format];
+    for (let i = 0; i < ARENA_DAILY_TAPER_START; i++) {
+      expect(paidWin(i), `win ${i + 1}`).toBe(full);
+    }
+    const halved = paidWin(ARENA_DAILY_TAPER_START);
+    expect(halved).toBe(Math.floor(full / 2));
+    for (let i = ARENA_DAILY_TAPER_START + 1; i < ARENA_DAILY_TAPER_FLOOR_START; i++) {
+      expect(paidWin(i), `win ${i + 1}`).toBe(halved);
+    }
+    const floored = paidWin(ARENA_DAILY_TAPER_FLOOR_START);
+    expect(floored).toBe(Math.floor(halved / 2));
+    // And it stays there: the next win pays the same again, never nothing.
+    expect(paidWin(ARENA_DAILY_TAPER_FLOOR_START + 1)).toBe(floored);
+    expect(floored).toBeGreaterThan(0);
+  });
+
+  it("guide.arenaPage.rewardsBodyLossShare: Honor's day is the realm's nightly reset, the daily lockout boundary (the wiki completeness audit)", () => {
+    // The predecessor said the day 'rolls over on its own clock rather than
+    // with the realm's instance reset'. dailyWindow (src/sim/pvp/honor.ts) rolls
+    // when ctx.resetDay changes; the server feeds that key from resetDayKey
+    // (server/sim_calendar_feed.ts) and hands the daily lockouts nextRaidResetMs
+    // (server/sim_boot_config.ts raidResetMs, read by finalBossLockedUntil in
+    // src/sim/instances/dungeons.ts). Both come from server/raid_reset.ts, and
+    // the key flips at exactly the instant the lockouts expire on.
+    setLanguage('en');
+    const body = t('guide.arenaPage.rewardsBodyLossShare');
+    expect(body).toContain(
+      "That day is the realm's own: it rolls over at the realm's nightly reset hour, the same boundary every daily lockout clears on.",
+    );
+    type Award = typeof awardRankedArenaResultHonor;
+    const day = (resetDay: string) =>
+      ({ resetDay, emit: () => {} }) as unknown as Parameters<Award>[0];
+    const meta = { entityId: 1, honor: 0, lifetimeHonor: 0 } as unknown as Parameters<Award>[1];
+    const [format] = Object.keys(RANKED_ARENA_WIN_HONOR) as (keyof typeof RANKED_ARENA_WIN_HONOR)[];
+    const noon = Date.UTC(2026, 8, 3, 12, 0, 0);
+    const reset = nextRaidResetMs(noon);
+    const before = resetDayKey(reset - 60_000);
+    const after = resetDayKey(reset);
+    expect(before).toBe(resetDayKey(noon));
+    expect(after).not.toBe(before);
+    // The same team pays in full again only once the host's key has moved to
+    // the window the lockout reset opens.
+    expect(awardRankedArenaResultHonor(day(before), meta, format, 'them', 'win')).toBe(
+      RANKED_ARENA_WIN_HONOR[format],
+    );
+    expect(awardRankedArenaResultHonor(day(before), meta, format, 'them', 'win')).toBe(0);
+    expect(awardRankedArenaResultHonor(day(after), meta, format, 'them', 'win')).toBe(
+      RANKED_ARENA_WIN_HONOR[format],
+    );
+  });
+
+  it('guide.arenaPage.warfareBodyStatsStay: the set bonuses are PvP-only, the pieces keep ordinary stats (the wiki completeness audit)', () => {
+    // Phase 20 (2026-09-03). The predecessor warfareBody closed 'so a full honor
+    // kit is worth nothing on a dungeon boss'. Every WARFARE row
+    // (src/sim/content/pvp_honor.ts) carries a positive primary-stat sum and its
+    // slot's armor or weapon baseline, which work anywhere; what is PvP-only is
+    // the pair of ratings (src/sim/pvp/power.ts) and the set bonuses, whose
+    // effects are Warfare rating, a hostile-player crowd-control reduction
+    // (src/sim/stun_dr.ts) or a pvpOnly proc (src/sim/combat/set_procs.ts).
+    setLanguage('en');
+    const html = arena.render({ params: [], sub: 'arena', titleKey: 'guide.nav.arena' });
+    const body = t('guide.arenaPage.warfareBodyStatsStay');
+    const predecessor = guideStrings.arenaPage.warfareBody;
+    expect(html).toContain(esc(body));
+    expect(html).not.toContain('is worth nothing on a dungeon boss');
+    expect(html).not.toContain(esc(predecessor));
+    expect(RETIRED_KEYS).toContain('guide.arenaPage.warfareBody');
+    // Narrowness: everything up to the corrected clause is the predecessor's.
+    const cut = 'effects that only work against players, so a full honor kit';
+    expect(body.indexOf(cut)).toBeGreaterThan(0);
+    expect(body.slice(0, body.indexOf(cut) + cut.length)).toBe(
+      predecessor.slice(0, predecessor.indexOf(cut) + cut.length),
+    );
+    expect(body).toContain("so a full honor kit's set bonuses count for nothing on a dungeon boss");
+    expect(body).toContain('still carry their ordinary stats, armor, and weapon damage');
+    // The rows: both ratings and a positive ordinary stat sum on every one;
+    // armor rows and weapon rows both exist in the kit.
+    const rows = Object.values(WARFARE_ITEMS);
+    expect(rows.length).toBeGreaterThan(0);
+    for (const item of rows) {
+      expect(item.pvpOffenseRating ?? 0, item.id).toBeGreaterThan(0);
+      expect(item.pvpDefenseRating ?? 0, item.id).toBeGreaterThan(0);
+      expect(primaryStatSum(item), item.id).toBeGreaterThan(0);
+    }
+    expect(rows.filter((i) => (i.stats?.armor ?? 0) > 0).length).toBeGreaterThan(0);
+    expect(rows.filter((i) => i.weapon !== undefined).length).toBeGreaterThan(0);
+    // The sets the rows name: every tier's effect is Warfare rating, the
+    // hostile-player control reduction, or a pvpOnly proc.
+    const setIds = new Set(rows.flatMap((i) => (i.set ? [i.set] : [])));
+    expect(setIds.size).toBeGreaterThan(0);
+    for (const setId of setIds) {
+      const set = ITEM_SETS[setId];
+      expect(set, setId).toBeDefined();
+      for (const tier of set.bonuses) {
+        const { proc, ...rest } = tier.effect;
+        if (proc) expect(proc.pvpOnly, `${setId} ${tier.pieces}pc proc`).toBe(true);
+        for (const [key, value] of Object.entries(rest)) {
+          if (value === undefined) continue;
+          expect(
+            ['pvpOffenseRating', 'pvpDefenseRating', 'ccDurationReduction'],
+            `${setId} ${tier.pieces}pc ${key}`,
+          ).toContain(key);
+        }
+      }
+    }
+  });
+
+  it('guide.arenaPage.warfareTradeBodyRatingSpent: only the Warfare rating and set bonuses are spent on players (the wiki completeness audit)', () => {
+    // Phase 20 (2026-09-03). The predecessor warfareTradeBody said 'everything it
+    // does bring is spent on other players'; every WARFARE row carries a positive
+    // primary-stat sum (src/sim/content/pvp_honor.ts), so the successor scopes
+    // the clause to the Warfare rating and set bonuses. The kept half, 'never
+    // carries the combat ratings a dungeon epic in the same slot does', is held
+    // to the tables: no WARFARE row carries crit, hit or haste rating, and every
+    // slotted PvE epic at the same item level carries at least one.
+    setLanguage('en');
+    const html = arena.render({ params: [], sub: 'arena', titleKey: 'guide.nav.arena' });
+    const body = t('guide.arenaPage.warfareTradeBodyRatingSpent');
+    const predecessor = guideStrings.arenaPage.warfareTradeBody;
+    expect(html).toContain(esc(body));
+    expect(html).not.toContain('everything it does bring is spent on other players');
+    expect(html).not.toContain(esc(predecessor));
+    expect(RETIRED_KEYS).toContain('guide.arenaPage.warfareTradeBody');
+    // Narrowness: the successor differs from the predecessor in exactly one clause.
+    const oldClause = 'and everything it does bring is spent on other players';
+    const newClause =
+      'and the Warfare rating and set bonuses it carries instead are spent entirely on other players';
+    expect(predecessor).toContain(oldClause);
+    expect(body).toBe(predecessor.replace(oldClause, newClause));
+    const rows = Object.values(WARFARE_ITEMS);
+    expect(rows.length).toBeGreaterThan(0);
+    const tier = itemLevel(rows[0]);
+    expect(tier).toBeDefined();
+    for (const item of rows) {
+      expect(itemLevel(item), item.id).toBe(tier);
+      expect(item.critRating ?? 0, item.id).toBe(0);
+      expect(item.hitRating ?? 0, item.id).toBe(0);
+      expect(item.hasteRating ?? 0, item.id).toBe(0);
+      expect(primaryStatSum(item), item.id).toBeGreaterThan(0);
+    }
+    const pveEpics = Object.values(ITEMS).filter(
+      (i) =>
+        i.quality === 'epic' &&
+        i.slot !== undefined &&
+        !(i.id in WARFARE_ITEMS) &&
+        itemLevel(i) === tier,
+    );
+    expect(pveEpics.length).toBeGreaterThan(0);
+    for (const i of pveEpics) {
+      expect((i.critRating ?? 0) + (i.hitRating ?? 0) + (i.hasteRating ?? 0), i.id).toBeGreaterThan(
+        0,
+      );
+    }
+  });
+
+  it('guide.social.calendarBodyDoubleHonor names every realm day and the one weekend that pays (wiki completeness audit)', () => {
+    // Phase 20, the wiki completeness audit (2026-09-03). The predecessor
+    // guide.social.calendarBody listed six realm days where SYSTEM_EVENTS ships
+    // seven ids, and its 'not a bonus' close is false on the Double Honor
+    // Weekend (src/sim/pvp/honor_event.ts doubles Thornhollow Fields honor on
+    // the weekdays the calendar marks). Every name is read from SYSTEM_EVENTS
+    // in table order through the calendar window's own title keys.
+    setLanguage('en');
+    const html =
+      pageFor('social')?.render({ params: [], sub: 'social', titleKey: 'guide.nav.social' }) ?? '';
+    const body = t('guide.social.calendarBodyDoubleHonor' as never);
+    expect(html).toContain(esc(body));
+    const camel = (id: string) => id.replace(/_([a-z])/g, (_m, c: string) => c.toUpperCase());
+    const title = (id: string) => t(`hudChrome.calendar.events.${camel(id)}.title` as never);
+    const ids = [...new Set(SYSTEM_EVENTS.map((e) => e.id))];
+    const kindOf = (id: string) => SYSTEM_EVENTS.find((e) => e.id === id)?.rule.kind;
+    const weekly = ids.filter((id) => kindOf(id) === 'weekly').map(title);
+    const monthly = ids.filter((id) => kindOf(id) === 'monthly').map(title);
+    expect(body).toContain(
+      `the weekly ${weekly.slice(0, -1).join(', ')}, and ${weekly[weekly.length - 1]}`,
+    );
+    expect(body).toContain(`the monthly ${monthly.join(' and ')}`);
+    let cursor = -1;
+    for (const id of ids) {
+      const at = body.indexOf(title(id));
+      expect(at, `${id} is named, in SYSTEM_EVENTS order`).toBeGreaterThan(cursor);
+      cursor = at;
+    }
+    // The exception: the marked weekdays are the sim's window, 'double' is the
+    // multiplier in words, and the in-game calendar note makes the same claims.
+    const marked = SYSTEM_EVENTS.filter((e) => e.id === 'double_honor').map((e) =>
+      e.rule.kind === 'weekly' ? e.rule.weekday : -1,
+    );
+    expect([...marked].sort()).toEqual([...DOUBLE_HONOR_WEEKDAYS].sort());
+    expect(DOUBLE_HONOR_MULTIPLIER).toBe(2);
+    const field = t('hudChrome.bg.title' as never);
+    const exception = `all through the ${title('double_honor')}, ${field} Honor pays double and a played-out loss pays like a win`;
+    expect(body).toContain(`with one exception: ${exception}.`);
+    const note = t('hudChrome.calendar.events.doubleHonor.note' as never);
+    expect(note).toContain(`${field} Honor pays double`);
+    expect(note).toContain('a played-out loss pays like a win');
+    expect(body).toContain('Nothing else about your character changes because a day is marked.');
+    // Narrowness: the opening and the guild clause are the predecessor's bytes.
+    const predecessor = guideStrings.social.calendarBody;
+    expect(body.slice(0, body.indexOf('the weekly'))).toBe(
+      predecessor.slice(0, predecessor.indexOf('the weekly')),
+    );
+    const guildClause = predecessor.slice(
+      predecessor.indexOf(', and it is where guilds'),
+      predecessor.indexOf(' The realm days'),
+    );
+    expect(guildClause.length).toBeGreaterThan(40);
+    expect(body).toContain(guildClause);
+    expect(html).not.toContain('Arena Clash, and Fishing Derby');
+    expect(html).not.toContain(
+      'a prompt to gather, not a bonus; nothing about your character changes',
+    );
+    expect(html).not.toContain(esc(predecessor));
+    expect(RETIRED_KEYS).toContain('guide.social.calendarBody');
+  });
+
+  it('guide.social.emotesBodyNamedTarget aims an emote by a typed name and calls the wheel key a default (wiki completeness audit)', () => {
+    // Phase 20, the wiki completeness audit (2026-09-03). The predecessor
+    // guide.social.emotesBody said 'target a friend first to aim it at them';
+    // the emote arm of src/sim/social/chat.ts aims by the typed name and never
+    // reads the actor's target, and KeyX is only the emoteWheel row's default
+    // in the rebindable BIND_ACTIONS registry. Driven through the real router.
+    setLanguage('en');
+    const html =
+      pageFor('social')?.render({ params: [], sub: 'social', titleKey: 'guide.nav.social' }) ?? '';
+    const body = t('guide.social.emotesBodyNamedTarget' as never);
+    expect(html).toContain(esc(body));
+    type Ev = ReturnType<Sim['tick']>[number];
+    const cfg = {
+      seed: 42,
+      playerClass: 'warrior' as const,
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    };
+    const sim = new Sim(cfg);
+    const aleph = sim.addPlayer('warrior', 'Aleph');
+    sim.addPlayer('mage', 'Bet');
+    sim.tick();
+    const emoteLine = (line: string): string | undefined => {
+      sim.chat(line, aleph);
+      const ev = sim
+        .tick()
+        .find(
+          (e): e is Extract<Ev, { type: 'chat' }> =>
+            e.type === 'chat' && e.pid === aleph && e.channel === 'emote',
+        );
+      return ev?.text;
+    };
+    for (const cmd of ['/wave', '/dance', '/cheer', '/bow']) {
+      expect(body, `${cmd} is listed`).toContain(cmd);
+      expect(emoteLine(cmd), `${cmd} is a live emote`).toBeDefined();
+    }
+    // The predecessor's false clause, driven: with Bet SELECTED, an untargeted
+    // /wave still names nobody, because the emote arm reads the typed name alone.
+    // Without the selection the negative arm passes whatever the router reads.
+    const bet = [...sim.players.keys()].find((p) => p !== aleph) as number;
+    sim.targetEntity(bet, aleph);
+    sim.tick();
+    expect(emoteLine('/wave')).not.toContain('Bet');
+    expect(emoteLine('/wave Bet')).toContain('Bet');
+    expect(body).toContain('add a name to aim it at someone, as in /wave Aleph');
+    const wheel = BIND_ACTIONS.find((a) => a.id === 'emoteWheel');
+    expect(wheel?.kind).toBe('held');
+    const key = keyLabel(wheel?.defaults[0] ?? null);
+    expect(key).not.toBe('');
+    expect(body).toContain(
+      `or hold ${key}, the emote wheel's default key, to open the emote wheel`,
+    );
+    const label = t('hudChrome.emoteWheel.label' as never);
+    const more = t('hud.core.mobileMore' as never);
+    expect(body).toContain(
+      `The ${label} button in the rail of window buttons, or under ${more} on touch, opens the same wheel.`,
+    );
+    // Narrowness: the opening clause is the predecessor's bytes.
+    const predecessor = guideStrings.social.emotesBody;
+    expect(body.startsWith(predecessor.slice(0, predecessor.indexOf('target a friend')))).toBe(
+      true,
+    );
+    expect(html).not.toContain('target a friend first to aim it at them');
+    expect(html).not.toContain(esc(predecessor));
+    expect(RETIRED_KEYS).toContain('guide.social.emotesBody');
+  });
+
+  it('guide.social.finderBodyLeaderQueues states who queues a party and what a decline costs (wiki completeness audit)', () => {
+    // Phase 20, the wiki completeness audit (2026-09-03). The predecessor
+    // guide.social.finderBody let any member queue 'with the party you already
+    // have' (dungeonFinderQueueJoin refuses everyone but the leader) and had a
+    // decline wait 'before the queue offers you another' (failProposal drops every unit
+    // holding an offender and never re-queues it, so a premade mate who accepted loses their
+    // place alongside the offender, while the units with no offender return with their
+    // original joinedAt; both arms pinned in tests/dungeon_finder.test.ts). The gate is
+    // driven live.
+    setLanguage('en');
+    const html =
+      pageFor('social')?.render({ params: [], sub: 'social', titleKey: 'guide.nav.social' }) ?? '';
+    const body = t('guide.social.finderBodyLeaderQueues' as never);
+    expect(html).toContain(esc(body));
+    type Ev = ReturnType<Sim['tick']>[number];
+    const cfg = {
+      seed: 42,
+      playerClass: 'warrior' as const,
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    };
+    const sim = new Sim(cfg);
+    const lead = sim.addPlayer('warrior', 'Lead');
+    const mate = sim.addPlayer('priest', 'Mate');
+    sim.partyInvite(mate, lead);
+    sim.partyAccept(mate);
+    sim.tick();
+    // An empty selection: the leader guard fires before the selection is read.
+    sim.dungeonFinderQueueJoin([], mate);
+    const errors = sim
+      .tick()
+      .filter((e): e is Extract<Ev, { type: 'error' }> => e.type === 'error' && e.pid === mate)
+      .map((e) => e.text);
+    expect(errors).toContain('Only the party leader may use the Dungeon Finder.');
+    expect(t('hudChrome.finder.leaderNote' as never)).toBe(
+      'Only your party leader can queue the group.',
+    );
+    expect(body).toContain(
+      'join the queue on your own, or have your party leader queue the party you already have (only the leader can put a group in).',
+    );
+    expect(FINDER_DECLINE_COOLDOWN_SECONDS).toBeGreaterThan(0);
+    expect(body).toContain(
+      'drops you, and any party you queued with, out of the queue and puts you on a short cooldown before you can join it again; everyone else in the offer keeps their place, unless they did the same or queued with someone who did, so the line keeps moving.',
+    );
+    expect(body).not.toContain(String(FINDER_DECLINE_COOLDOWN_SECONDS));
+    expect(body).not.toContain(String(FINDER_PROPOSAL_SECONDS));
+    // Narrowness: the opening and the offer sentence are the predecessor's bytes.
+    const predecessor = guideStrings.social.finderBody;
+    expect(
+      body.startsWith(predecessor.slice(0, predecessor.indexOf('join the queue on your own'))),
+    ).toBe(true);
+    const offer = predecessor.slice(
+      predecessor.indexOf('The finder waits'),
+      predecessor.indexOf('Turning an offer'),
+    );
+    expect(offer.length).toBeGreaterThan(40);
+    expect(body).toContain(offer);
+    expect(html).not.toContain('or with the party you already have.');
+    expect(html).not.toContain('puts you on a short cooldown before the queue offers you another');
+    expect(html).not.toContain(esc(predecessor));
+    expect(RETIRED_KEYS).toContain('guide.social.finderBody');
+  });
+
+  it('guide.social.lootRollBodyNeedBeatsGreed states that Need beats Greed before any number counts (wiki completeness audit)', () => {
+    // Phase 20, the wiki completeness audit (2026-09-03). The predecessor
+    // guide.social.lootRollBody closed on 'The highest roll wins.', which is not
+    // the rule: resolveLootRoll contends the Need rolls alone whenever there is
+    // one. The three choice names are the loot prompt's own labels.
+    setLanguage('en');
+    const html =
+      pageFor('social')?.render({ params: [], sub: 'social', titleKey: 'guide.nav.social' }) ?? '';
+    const body = t('guide.social.lootRollBodyNeedBeatsGreed' as never);
+    expect(html).toContain(esc(body));
+    const need = t('itemUi.lootRoll.need' as never);
+    const greed = t('itemUi.lootRoll.greed' as never);
+    const pass = t('itemUi.lootRoll.pass' as never);
+    expect(body).toContain(
+      `chooses ${need} if they want it, ${greed} if they would only take it spare, or ${pass} to bow out.`,
+    );
+    expect(body).toContain(
+      `${need} beats ${greed}: if anyone rolls ${need}, the item goes to the highest ${need} roll and the ${greed} rolls do not count; otherwise the highest ${greed} roll wins.`,
+    );
+    // Narrowness: the choices sentence is the predecessor's bytes, and its
+    // false closing sentence renders nowhere on the page.
+    const predecessor = guideStrings.social.lootRollBody;
+    expect(
+      body.startsWith(predecessor.slice(0, predecessor.indexOf(' The highest roll wins.'))),
+    ).toBe(true);
+    expect(html).not.toContain('to bow out. The highest roll wins.');
+    expect(html).not.toContain(esc(predecessor));
+    expect(RETIRED_KEYS).toContain('guide.social.lootRollBody');
+  });
+
+  it('guide.social.lootRollBodyNeedBeatsGreed is the live rule: a forced Greed 100 loses to a Need 1 (wiki completeness audit)', () => {
+    // The clause 'the Greed rolls do not count', driven through the real roll
+    // with both d100s forced: the greeder draws 100, the needer 1, and the
+    // needer holds the item while no Greed roll is even revealed.
+    setLanguage('en');
+    type Ev = ReturnType<Sim['tick']>[number];
+    const cfg = {
+      seed: 42,
+      playerClass: 'warrior' as const,
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    };
+    const sim = new Sim(cfg);
+    const needer = sim.addPlayer('warrior', 'Aaa');
+    const greeder = sim.addPlayer('mage', 'Bbb');
+    sim.partyInvite(greeder, needer);
+    sim.partyAccept(greeder);
+    const itemId = 'greyjaw_hide_boots';
+    expect(['poor', 'common']).not.toContain(ITEMS[itemId].quality);
+    const mob = createMob(sim.nextId++, MOBS.forest_wolf, 2, { x: 0, y: 0, z: 0 });
+    mob.dead = true;
+    mob.lootable = true;
+    mob.tappedById = needer;
+    mob.lootRecipientIds = [needer, greeder];
+    mob.loot = { copper: 0, items: [{ itemId, count: 1 }] };
+    sim.entities.set(mob.id, mob);
+    const looter = sim.ctx.players.get(needer);
+    expect(looter).toBeDefined();
+    awardSharedLootItem(sim.ctx, itemId, mob, looter as NonNullable<typeof looter>);
+    const opened = sim.events.find(
+      (e): e is Extract<Ev, { type: 'lootRoll' }> => e.type === 'lootRoll',
+    );
+    expect(opened).toBeDefined();
+    const rollId = (opened as Extract<Ev, { type: 'lootRoll' }>).rollId;
+    const realInt = sim.ctx.rng.int.bind(sim.ctx.rng);
+    let d100 = 0;
+    const spy = vi
+      .spyOn(sim.ctx.rng, 'int')
+      .mockImplementation((min: number, max: number) =>
+        min === 1 && max === 100 ? (d100++ === 0 ? 100 : 1) : realInt(min, max),
+      );
+    submitLootRoll(sim.ctx, rollId, 'greed', greeder);
+    submitLootRoll(sim.ctx, rollId, 'need', needer);
+    spy.mockRestore();
+    expect(d100).toBe(2);
+    expect(sim.countItem(itemId, needer)).toBe(1);
+    expect(sim.countItem(itemId, greeder)).toBe(0);
+    const need = t('itemUi.lootRoll.need' as never);
+    const greed = t('itemUi.lootRoll.greed' as never);
+    const lines = sim.events
+      .filter((e): e is Extract<Ev, { type: 'loot' }> => e.type === 'loot')
+      .map((e) => e.text);
+    expect(lines.some((l) => l.startsWith(`${need} Roll - 1 `))).toBe(true);
+    expect(lines.some((l) => l.startsWith(`${greed} Roll`))).toBe(false);
+  });
+
+  it('the interface page names Edit Frames and the Frames tab Reset to Defaults for every movable frame (wiki completeness audit)', () => {
+    // The wiki completeness audit (2026-09-03). guide.interfacePage.framesMoveBody
+    // said only the three unit frames move and sent players to a 'Reset Frame
+    // Positions' options row that was retired (options_window.ts keeps the
+    // retirement note where the row stood). Live: Edit Frames at the top of the
+    // Frames tab of the Interface options loosens every HUD_FRAME_SPECS row and
+    // the three unit frames with them, and the tab's Reset to Defaults footer
+    // restores them (Hud.resetUnitFrames). Every control is named by its live
+    // label and every frame family is derived from the live table.
+    setLanguage('en');
+    const html = interfacePage.render({
+      params: [],
+      sub: 'reference/interface',
+      titleKey: 'guide.nav.interface',
+    });
+    const framesTab = t('hudChrome.interfaceTabs.frames');
+    expect(html).toContain(
+      `${t('hudChrome.interfaceUnlock.label')}, at the top of the ${framesTab} tab in the ${t('hud.options.interface')} options`,
+    );
+    expect(html).toContain(
+      `${t('hud.options.resetToDefaults')} at the foot of that same ${framesTab} tab snaps them all back`,
+    );
+    // Every frame the toggle governs has a phrase, and every phrase renders: a
+    // new HUD_FRAME_SPECS row with no phrase here reds.
+    const phraseFor: Record<string, string> = {
+      actionBar1: 'the action bars',
+      actionBar2: 'the action bars',
+      actionBar3: 'the action bars',
+      actionBarGroup: 'the action bars',
+      castBar: 'the cast bar',
+      swingBar: 'the swing bar',
+      steamWishlist: `the ${t('hudChrome.interfaceUnlock.frameNames.steamWishlist')} chip`,
+      menu: 'the button rail',
+      minimap: 'the minimap',
+      petFrame: 'the pet frame',
+      stanceBar: 'the stance bar',
+      xpBar: 'the experience bar',
+      buffBar: 'the buff and debuff rows',
+      debuffBar: 'the buff and debuff rows',
+    };
+    expect(Object.keys(phraseFor).sort()).toEqual(HUD_FRAME_SPECS.map((s) => s.id).sort());
+    for (const spec of HUD_FRAME_SPECS) {
+      expect(html, `the prose names ${spec.id}`).toContain(phraseFor[spec.id] as string);
+    }
+    // The unchanged clauses: the three unit frames and their corner button.
+    expect(html).toContain('Your frame, your target frame, and your party frames can all be moved');
+    expect(html).toContain('small move button in its corner');
+    // NEGATIVE: the retired row is gone from the page, and so is the predecessor.
+    expect(html).not.toContain('Reset Frame Positions');
+    expect(html).not.toContain(esc(guideStrings.interfacePage.framesMoveBody));
+    expect(RETIRED_KEYS).toContain('guide.interfacePage.framesMoveBody');
+  });
+
+  it('the interface page opens the world map on the zone and names every marker layer, map mode and tracker (wiki completeness audit)', () => {
+    // The wiki completeness audit (2026-09-03). guide.interfacePage.mapBody
+    // said M opens on 'the continent drawn out' (Hud.toggleMap always opens
+    // the per-zone level; the continent is the level behind a right-click or
+    // the level-toggle button), that the map shows 'the gathering nodes you
+    // have found' (buildOverworldMapModel walks every GATHER_NODES row of the
+    // zone with no discovery gate; a marker's only per-player facets are ready
+    // and locked), that only a delve switches the map (MapWindowMode has five
+    // modes and the castle keeps paint a plan of their own), and it skipped
+    // the always-on Reliquary tracker. The layers, modes, marker facets and
+    // trackers below are all derived from the live types and markup.
+    setLanguage('en');
+    const html = interfacePage.render({
+      params: [],
+      sub: 'reference/interface',
+      titleKey: 'guide.nav.interface',
+    });
+    expect(html).toContain('M opens the world map on the zone you are standing in');
+    expect(html).toContain(
+      `Right-click the map, or press its ${t('hudChrome.continentMap.toWorld')} button, and it pulls back to the continent`,
+    );
+    // Every layer of the overworld draw model is spoken for (null: a layer the
+    // prose leaves unnamed on purpose); a new OverworldMapModel field reds tsc.
+    // Three of the nulls are LAYERS THE MAP REALLY DRAWS and the prose still does
+    // not name: castles (the curtain plans), navigation (route badges and nearby
+    // live rift entrances) and allies (friends and guildmates). They are a
+    // recorded follow-up, not an oversight: naming them moves the English and its
+    // five fills, which the release fill has not run over yet. The rest are
+    // structural fields (view, cursor, region, zoneId, detail) or a layer another
+    // sentence covers (ping, rift).
+    const layerPhrase: Record<keyof OverworldMapModel, string | null> = {
+      view: null,
+      cursor: null,
+      region: null,
+      zoneId: null,
+      detail: null,
+      ping: null,
+      rift: null,
+      castles: null,
+      navigation: null,
+      allies: null,
+      player: 'with your own arrow on it',
+      pois: 'the points of interest around you',
+      npcs: 'the quest givers with their marks',
+      questAreas: 'the areas your objectives sit in',
+      stations: 'the crafting stations',
+      services: 'mailboxes, noticeboards',
+      farmPatches: 'garden beds',
+      portals: 'the dungeon entrances',
+      gatherNodes: 'every gathering node in the zone',
+      party: 'Your party shows on it too',
+    };
+    for (const [layer, phrase] of Object.entries(layerPhrase)) {
+      if (phrase !== null) expect(html, `the prose names the ${layer} layer`).toContain(phrase);
+    }
+    // The two per-player facets of a node marker are the two states the prose
+    // describes; there is no discovery facet to describe.
+    const facetPhrase: Record<
+      Exclude<keyof MapGatherNodeMarker, 'mx' | 'my' | 'nodeId' | 'type'>,
+      string
+    > = {
+      ready: 'grayed out while it regrows',
+      locked: 'marked when your tools are not up to it',
+    };
+    for (const phrase of Object.values(facetPhrase)) expect(html).toContain(phrase);
+    expect(GATHER_NODES.length).toBeGreaterThan(0);
+    // Every non-overworld map mode is named; MapWindowMode is exhaustive here.
+    const modeWords: Record<MapWindowMode, string | null> = {
+      overworld: null,
+      delve: 'a delve',
+      dungeon: 'a dungeon',
+      rift: 'a rift',
+      battleground: `the ${t('hudChrome.bg.title')} battleground gets a field map of its own`,
+    };
+    for (const [mode, words] of Object.entries(modeWords)) {
+      if (words !== null) expect(html, `the prose names the ${mode} map`).toContain(words);
+    }
+    expect(html).toContain(
+      'Step into a delve, a dungeon, a rift or a castle keep and the map switches to a floor plan of where you stand',
+    );
+    // The tracker stack, read from the live markup: every child of
+    // #right-tracker-stack has a phrase, so a sixth tracker reds here.
+    const indexHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+    const stack = /id="right-tracker-stack">([\s\S]*?)\n\s*<\/div>\n/.exec(indexHtml);
+    expect(stack).not.toBeNull();
+    const trackerIds = [...(stack as RegExpExecArray)[1].matchAll(/id="([a-z-]+)"/g)].map(
+      (m) => m[1] ?? '',
+    );
+    const trackerPhrase: Record<string, string> = {
+      'quest-tracker': 'your tracked quests and their objectives',
+      'deed-tracker': 'your deed progress',
+      'reliquary-tracker': 'your Reliquary pages',
+      'delve-tracker': 'the delve you are in',
+      'rift-tracker': 'any rift you are taking part in',
+    };
+    expect([...trackerIds].sort()).toEqual(Object.keys(trackerPhrase).sort());
+    for (const id of trackerIds) {
+      expect(html, `the prose names ${id}`).toContain(trackerPhrase[id] as string);
+    }
+    // NEGATIVE: the false clauses and the predecessor are gone from the page.
+    for (const stale of [
+      'the continent drawn out',
+      'the gathering nodes you have found',
+      'Inside a delve the map switches to a schematic of the rooms you have explored so far',
+    ]) {
+      expect(html, `stale clause "${stale}"`).not.toContain(stale);
+    }
+    expect(html).not.toContain(esc(guideStrings.interfacePage.mapBody.split('\n\n')[0]));
+    expect(RETIRED_KEYS).toContain('guide.interfacePage.mapBody');
+  });
+
+  it('the interface page gives the touch ring its live page count and drops the Vale Cup from the More tray (wiki completeness audit)', () => {
+    // The wiki completeness audit (2026-09-03). guide.interfacePage.mobileBody
+    // promised 'up to seven pages once you have all three action bars
+    // switched on': the ring has MOBILE_ACTION_PAGE_COUNT pages over
+    // MOBILE_ACTION_SOURCE_SLOT_COUNT slots, and mobileActionSourceSlotCount
+    // ignores the desktop rows' visibility by design. It also listed the Vale
+    // Cup in the More tray, which #mobile-extra-grid does not hold. The
+    // successor interpolates both numbers from the live pure core, so a retune
+    // moves the page instead of rotting it.
+    setLanguage('en');
+    const html = interfacePage.render({
+      params: [],
+      sub: 'reference/interface',
+      titleKey: 'guide.nav.interface',
+    });
+    const start = html.indexOf(esc(t('guide.interfacePage.mobileTitle')));
+    expect(start).toBeGreaterThan(-1);
+    const mobile = html.slice(start);
+    const pages = formatNumber(MOBILE_ACTION_PAGE_COUNT);
+    const slots = formatNumber(MOBILE_ACTION_SOURCE_SLOT_COUNT);
+    expect(mobile).toContain(
+      `swaps the ring between its ${pages} pages, which together reach all ${slots} of your ability slots whether or not the extra desktop bars are switched on`,
+    );
+    expect(MOBILE_ACTION_PAGE_COUNT).toBe(mobilePageCount(MOBILE_ACTION_SOURCE_SLOT_COUNT));
+    expect(mobileActionSourceSlotCount()).toBe(MOBILE_ACTION_SOURCE_SLOT_COUNT);
+    expect(mobileActionSourceSlotCount({ bar2: false, bar3: false } as never)).toBe(
+      MOBILE_ACTION_SOURCE_SLOT_COUNT,
+    );
+    // The unchanged 'four action buttons' clause stays bound to its constant.
+    expect(MOBILE_ACTION_BUTTONS).toBe(4);
+    expect(mobile).toContain('the attack button with four action buttons beside it');
+    // The More tray, read from the live markup: no Vale Cup button, and every
+    // window the prose names has one.
+    const indexHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+    const grid = /<div id="mobile-extra-grid">([\s\S]*?)\n\s*<\/div>\n/.exec(indexHtml);
+    expect(grid).not.toBeNull();
+    const trayIds = [...(grid as RegExpExecArray)[1].matchAll(/ id="(mobile-[a-z-]+)"/g)].map(
+      (m) => m[1] ?? '',
+    );
+    expect(trayIds.length).toBeGreaterThan(0);
+    expect(trayIds.some((id) => /vale|cup/.test(id))).toBe(false);
+    for (const id of ['mobile-dfinder', 'mobile-arena', 'mobile-emote', 'mobile-wiki']) {
+      expect(trayIds, `${id} sits in the More tray`).toContain(id);
+    }
+    expect(mobile).toContain(
+      `the rest of your windows, the ${t('hudChrome.finder.title')}, ${t('hudChrome.pvp.mobileLabel')}, emotes and the wiki among them`,
+    );
+    // NEGATIVE: the false clauses and the predecessor are gone from the section.
+    for (const stale of [
+      'seven pages',
+      'once you have all three action bars switched on',
+      'the Vale Cup',
+    ]) {
+      expect(mobile, `stale clause "${stale}"`).not.toContain(stale);
+    }
+    expect(mobile).not.toContain(esc(guideStrings.interfacePage.mobileBody.split('\n\n')[1]));
+    expect(RETIRED_KEYS).toContain('guide.interfacePage.mobileBody');
+  });
+
+  it('the interface page keys its extra windows to live binds, opens Player Info from the target frame and names the Developers tab (wiki completeness audit)', () => {
+    // The wiki completeness audit (2026-09-03). guide.interfacePage.winMoreBody
+    // listed 'the Vale Cup (Y)' (no bind defaults to KeyY and no Vale Cup
+    // window exists), put the held emote wheel among the toggled windows,
+    // said a right-click on a nameplate opens Player Info (interactions.ts:
+    // a world right-click only targets; the unit menu lives on the target
+    // frame, with the touch double-tap and long press), said the card needs
+    // proximity (Hud.openPlayerInfo falls back to the public sheet out of
+    // view), and skipped the Developers tab. Keys, tabs and labels below are
+    // read from BIND_ACTIONS and the live catalog.
+    setLanguage('en');
+    const html = interfacePage.render({
+      params: [],
+      sub: 'reference/interface',
+      titleKey: 'guide.nav.interface',
+    });
+    const start = html.indexOf(esc(t('guide.interfacePage.winMoreTitle')));
+    expect(start).toBeGreaterThan(-1);
+    const beat = html.slice(start, html.indexOf('</div>', start));
+    const bind = (id: string) => {
+      const action = BIND_ACTIONS.find((b) => b.id === id);
+      expect(action, `${id} is a bind`).toBeDefined();
+      return action as NonNullable<typeof action>;
+    };
+    const key = (id: string) => keyLabel(bind(id).defaults[0] ?? null);
+    // The four toggled windows carry their live default key and are edge binds.
+    const windows = [
+      ['The world map', 'map'],
+      ['the PvP window', 'arena'],
+      ['the leaderboard', 'leaderboard'],
+      ['the event calendar', 'calendar'],
+    ] as const;
+    for (const [words, id] of windows) {
+      expect(bind(id).kind).toBe('edge');
+      expect(beat).toContain(`${words} (${key(id)})`);
+    }
+    // The emote wheel is the one held bind of the set, and the prose says so.
+    expect(bind('emoteWheel').kind).toBe('held');
+    expect(beat).toContain(`The emote wheel (${key('emoteWheel')}) is the exception: hold its key`);
+    // No bind defaults to Y and no Vale Cup bind exists: the dead entry is gone.
+    expect(BIND_ACTIONS.some((b) => b.defaults.includes('KeyY'))).toBe(false);
+    expect(BIND_ACTIONS.some((b) => /vale/i.test(b.id) || /vale cup/i.test(b.label))).toBe(false);
+    expect(beat).not.toContain('Vale Cup');
+    expect(beat).not.toContain('(Y)');
+    // The leaderboard's fifth tab and the setting that hides it, by live label.
+    expect(beat).toContain(`a ${t('hudChrome.leaderboard.tabDevs')} tab`);
+    expect(beat).toContain(`unless you switch ${t('hudChrome.options.showDevBadges')} off`);
+    // Player Info: the target frame or the chat name, and the out-of-view half.
+    expect(beat).toContain(
+      'right-click the target frame (on touch, double-tap or long-press it), or right-click their name in chat',
+    );
+    expect(beat).toContain('The gear needs them close enough to see');
+    expect(beat).toContain('their portrait, name, level, class, and guild');
+    // NEGATIVE: the false clauses and the predecessor are gone from the beat.
+    for (const stale of [
+      'on their nameplate',
+      'and it needs them to be close enough to see',
+      'and the emote wheel (X) all work the same way',
+    ]) {
+      expect(beat, `stale clause "${stale}"`).not.toContain(stale);
+    }
+    expect(beat).not.toContain(esc(guideStrings.interfacePage.winMoreBody));
+    expect(RETIRED_KEYS).toContain('guide.interfacePage.winMoreBody');
+  });
+
+  it('the interface page names the station masters, the three bank tabs, the buyback list and both market keepers (wiki completeness audit)', () => {
+    // The wiki completeness audit (2026-09-03). guide.interfacePage.worldWindowsBody
+    // promised a class trainer (none exists: abilities arrive by level through
+    // refreshKnownAbilities, and the gossip Training route is gated on a
+    // station master), a 'buyback tab' (renderVendorWindow appends a buyback
+    // SECTION at the foot of one panel), a guild bank as 'a second tab' (the
+    // strip is Personal, Vault, Guild), and one market keeper where two NPCs
+    // carry the market flag. Masters, tabs, multiples and keepers below are
+    // derived from the live tables.
+    setLanguage('en');
+    const html = interfacePage.render({
+      params: [],
+      sub: 'reference/interface',
+      titleKey: 'guide.nav.interface',
+    });
+    const start = html.indexOf(esc(t('guide.interfacePage.worldWindowsTitle')));
+    expect(start).toBeGreaterThan(-1);
+    const sect = html.slice(start, html.indexOf('</section>', start));
+    // Training belongs to the station masters, every one of them a real NPC.
+    expect(STATIONS.length).toBeGreaterThan(0);
+    for (const station of STATIONS) {
+      expect(
+        Object.values(NPCS).some((n) => n.id === station.masterNpcId),
+        `${station.masterNpcId} exists`,
+      ).toBe(true);
+    }
+    expect(sect).toContain(
+      `the resident masters of the crafting stations, and ${t('hudChrome.training.dialogOption')} on one of them opens the recipes they can teach you now, the ones you already know, and the ones still locked behind more skill`,
+    );
+    expect(sect).not.toContain('class trainer');
+    // The bank: three tabs by their live labels, in the strip's own order.
+    let cursor = 0;
+    for (const tabKey of ['personalTab', 'vaultTab', 'guildTab'] as const) {
+      const label = `${t(`hudChrome.bank.${tabKey}` as never)} tab`;
+      const at = sect.indexOf(label, cursor);
+      expect(at, `${label} is named in order`).toBeGreaterThan(-1);
+      cursor = at + label.length;
+    }
+    expect(sect).not.toContain('a second tab there shows it');
+    // The vendor: one panel with the buyback list at its foot; the quantity
+    // multiples of the unchanged clause are the live ones.
+    expect(sect).toContain(
+      'a buyback list at the foot of the same panel holding what you last sold',
+    );
+    expect(sect).not.toContain('buyback tab');
+    expect(VENDOR_MULTIPLES).toContain(5);
+    expect(VENDOR_MULTIPLES).toContain(10);
+    expect(VENDOR_MULTIPLES).toContain('custom');
+    expect(sect).toContain('one press at five or ten at a time');
+    // The World Market: every NPC flagged market is named with its town, the
+    // hub of the zone whose bounds hold it.
+    const keepers = Object.values(NPCS).filter((n) => n.market === true);
+    expect(keepers.length).toBeGreaterThan(1);
+    for (const keeper of keepers) {
+      expect(sect.toLowerCase(), `${keeper.id} is named`).toContain(keeper.name.toLowerCase());
+      const zone = ZONES.find(
+        (z) =>
+          keeper.pos.z >= z.zMin &&
+          keeper.pos.z <= z.zMax &&
+          (z.xMin === undefined || keeper.pos.x >= z.xMin) &&
+          (z.xMax === undefined || keeper.pos.x <= z.xMax),
+      );
+      expect(zone, `${keeper.id} sits in a zone`).toBeDefined();
+      expect(sect).toContain((zone as NonNullable<typeof zone>).hub.name);
+    }
+    expect(sect).not.toContain('The World Market at the Merchant has its own window');
+    expect(sect).not.toContain(esc(guideStrings.interfacePage.worldWindowsBody.split('\n\n')[1]));
+    expect(RETIRED_KEYS).toContain('guide.interfacePage.worldWindowsBody');
+  });
+
+  // END wiki completeness corrections (the inserter appends above this line)
 });

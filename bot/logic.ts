@@ -567,8 +567,8 @@ export function buildRelayMessage(item: RelayItem, gameUrl: string): Record<stri
   return payload;
 }
 
-// ── Significant-activity feed (level 20 / rare drop / duel / arena / Vale Cup /
-// masterwork / deed) ──────────────────────────────────────────────────────────
+// ── Significant-activity feed (level 20 / rare drop / duel / arena /
+// masterwork / legendary / deed / golden harvest) ─────────────────────────────
 export interface ActivityParticipant {
   name: string;
   discordUserId: string | null;
@@ -576,11 +576,23 @@ export interface ActivityParticipant {
 }
 
 export interface ActivityItem {
-  kind: 'levelup' | 'rareloot' | 'duel' | 'arena' | 'masterwork' | 'deed';
+  kind:
+    | 'levelup'
+    | 'rareloot'
+    | 'duel'
+    | 'arena'
+    | 'masterwork'
+    | 'legendary'
+    | 'deed'
+    | 'golden_harvest';
   realm: string;
   profileUrl: string | null;
   level?: number;
-  itemName?: string; // rareloot; masterwork; the first-koi deed's catch
+  // rareloot; masterwork; the first-koi deed's catch; for 'golden_harvest'
+  // the crop's item name from the server's ITEMS table. For 'legendary' this
+  // is the PLAYER-CHOSEN legendary name: render it as plain embed text (data,
+  // never our own markdown), exactly the way the masterwork card treats it.
+  itemName?: string;
   quality?: string;
   winnerName?: string;
   loserName?: string;
@@ -596,9 +608,47 @@ export interface ActivityItem {
 // catch rather than a deed record.
 export const FIRST_KOI_DEED_ID = 'col_glimmerfin';
 
+// The Harvestmaster deed (prog_farming_100, the farming capstone title): the
+// one deed whose card reads as a farming triumph rather than a deed record
+// (the FIRST_KOI shape; the id is a copy, pinned against the DEEDS catalog in
+// tests/discord_activity_professions.test.ts, never an import).
+export const HARVESTMASTER_DEED_ID = 'prog_farming_100';
+
 // Per-quality embed accent for a rare drop (epic purple, legendary orange).
 function qualityColor(quality: string | undefined): number {
   return quality === 'legendary' ? 0xff8000 : 0xa335ee;
+}
+
+/** Character cap on a legendary card's item name, mirroring the game's mint
+ *  shape (src/sim/professions/legendary_name.ts MAX_LEGENDARY_NAME_LENGTH; a
+ *  copy pinned in tests/discord_bot.test.ts, not an import, so logic.ts stays
+ *  free of src/ imports). */
+export const LEGENDARY_CARD_NAME_MAX = 32;
+
+/**
+ * Bot-side defense for the one PLAYER-AUTHORED string this feed interpolates:
+ * the legendary card's item name crosses two processes as unchecked JSON, and
+ * the game's persisted-load shape for it is deliberately wider than the mint
+ * alphabet (the signer doctrine), so nothing upstream structurally guarantees
+ * what arrives here. Hold it to the full MINT shape before it touches an
+ * embed (legendary_name.ts: starts with a letter, then [A-Za-z' -], at least
+ * 2 characters): strip everything outside the alphabet, collapse whitespace
+ * runs, trim, drop any leading non-letters (a surviving "- " head would
+ * render as a Discord bullet), require length >= 2, and bound at
+ * LEGENDARY_CARD_NAME_MAX. A name emptied or left under the floor degrades
+ * to the generic title through the caller's `||` fallback.
+ */
+export function sanitizeLegendaryItemName(raw: string | undefined): string {
+  if (!raw) return '';
+  const cleaned = raw
+    .replace(/[^A-Za-z' -]/g, '')
+    .replace(/^[^A-Za-z]+/, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (cleaned.length < 2) return '';
+  return cleaned.length > LEGENDARY_CARD_NAME_MAX
+    ? cleaned.slice(0, LEGENDARY_CARD_NAME_MAX).trimEnd()
+    : cleaned;
 }
 
 // Resolve a character name to its Discord mention (when linked) or plain name.
@@ -675,6 +725,33 @@ export function buildActivityMessage(item: ActivityItem): Record<string, unknown
         `${mentionFor(subjectName, item.participants)} on ${item.realm}!`;
       color = 0xd9a334;
       break;
+    case 'legendary': {
+      // The orange promotion (Masterwrought phase 13). itemName is the
+      // PLAYER-CHOSEN legendary name: held to the mint alphabet by
+      // sanitizeLegendaryItemName above, then interpolated as plain text at
+      // masterwork parity (no markdown of our own around it), with the ||
+      // fallback so an empty or emptied name degrades to the generic title.
+      const legendName = sanitizeLegendaryItemName(item.itemName);
+      author = ':fire: Legend Forged';
+      title = legendName || 'A legend';
+      description =
+        `${legendName || 'A legend'} was forged by ` +
+        `${mentionFor(subjectName, item.participants)} on ${item.realm}!`;
+      color = 0xff8000;
+      break;
+    }
+    case 'golden_harvest':
+      // The farming zone celebration: a five-fold crop windfall. itemName is
+      // the crop's item name from the server's ITEMS table; || so an empty
+      // name degrades to the generic title (never ??, Discord rejects a blank
+      // title).
+      author = ':ear_of_rice: Golden Harvest';
+      title = item.itemName || 'A golden harvest';
+      description =
+        `${mentionFor(subjectName, item.participants)} reaped a golden harvest ` +
+        `of ${item.itemName || 'crops'} on ${item.realm}!`;
+      color = 0xf5c242;
+      break;
     case 'deed':
       if (item.deedId === FIRST_KOI_DEED_ID) {
         // The first-koi moment reads as a catch, not a deed record.
@@ -684,6 +761,14 @@ export function buildActivityMessage(item: ActivityItem): Record<string, unknown
           `${mentionFor(subjectName, item.participants)} landed their ` +
           `first ${item.itemName || 'rare catch'} on ${item.realm}!`;
         color = 0x3fa7d6;
+      } else if (item.deedId === HARVESTMASTER_DEED_ID) {
+        // The farming capstone reads as a harvest triumph, not a deed record.
+        author = ':ear_of_rice: Harvestmaster';
+        title = item.deedName || 'Harvestmaster';
+        description =
+          `${mentionFor(subjectName, item.participants)} reached 100 Farming and ` +
+          `earned the title "${item.deedTitle || 'Harvestmaster'}" on ${item.realm}!`;
+        color = 0xf5c242;
       } else {
         author = ':scroll: Deed Complete';
         title = item.deedName || 'A deed of renown';

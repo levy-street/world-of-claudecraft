@@ -309,8 +309,10 @@ export {
   resolveDelveShopOffers,
 } from './content/delves';
 
+import { APEX_PATTERN_ITEMS } from './content/apex_patterns';
 import { CRUCIBLE_PROFESSION_ITEMS } from './content/crucible_professions';
 import { DELVE_ITEMS } from './content/delves/items';
+import { FARM_PATTERN_ITEMS } from './content/farm_patterns';
 import { HEROIC_ITEMS, RETIRED_HEROIC_ITEMS } from './content/heroic_loot';
 import { buildHeroicVariants } from './content/heroic_variants';
 import { HEROIC_VENDOR_ITEMS } from './content/heroic_vendor';
@@ -356,6 +358,8 @@ export { STATIONS };
 export const ITEMS: Record<string, ItemDef> = mergeItems(
   BASE_ITEMS,
   PROFESSION_ITEMS,
+  APEX_PATTERN_ITEMS,
+  FARM_PATTERN_ITEMS,
   ZONE2_ITEMS,
   ZONE3_ITEMS,
   TEMPLE_ITEMS,

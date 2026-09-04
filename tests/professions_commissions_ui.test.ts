@@ -12,9 +12,9 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import type { InvSlot } from '../src/sim/types';
-import { buildCraftingView } from '../src/ui/crafting_view';
-import { renderCraftingWindow } from '../src/ui/crafting_window';
-import { buildUnbindView } from '../src/ui/hud/vendor/unbind_view';
+import { buildCraftingView } from '../src/ui/hud/professions/crafting_view';
+import { renderCraftingWindow } from '../src/ui/hud/professions/crafting_window';
+import { buildUnbindView, UNBIND_DENY_KEY, unbindDenyKey } from '../src/ui/hud/vendor/unbind_view';
 import { renderUnbindWindow } from '../src/ui/hud/vendor/unbind_window';
 
 const SWORD_RECIPE = 'recipe_eastbrook_arming_sword';
@@ -186,6 +186,42 @@ describe('buildUnbindView (the service rows mirror the resolver)', () => {
       feeCopper: 2500,
       affordable: true,
     });
+  });
+
+  it('omits Perfecting-bound copies (mid-track and Perfected), the resolver refuses them', () => {
+    // Masterwrought phase 12: a bound apex copy on the Perfecting track is
+    // not a Maker's Bond row; listing it would offer an unbind the sim denies
+    // unbind_perfecting. The ordinary bound copy beside it still lists, and
+    // its count excludes the Perfecting-bound ones.
+    const inventory: InvSlot[] = [
+      { itemId: SWORD, count: 1, instance: { boundTo: 5, perfecting: 1 } },
+      { itemId: SWORD, count: 1, instance: { boundTo: 5, perfected: true } },
+      boundSword,
+    ];
+    const view = buildUnbindView({ inventory, copper: 50000, items: ITEMS });
+    expect(view.rows).toHaveLength(1);
+    expect(view.rows[0]).toMatchObject({ itemId: SWORD, boundCount: 1 });
+    expect(view.rows[0].instance).toEqual({ bindOnTrade: true, boundTo: 5 });
+    // Perfecting-bound copies ALONE list nothing.
+    expect(
+      buildUnbindView({ inventory: inventory.slice(0, 2), copper: 50000, items: ITEMS }).rows,
+    ).toEqual([]);
+  });
+
+  it('pairs every deny reason with ITS OWN key, the perfecting refusal included', () => {
+    // The total Record is what the hud's unbindResult arm renders through; a
+    // reason the sim can emit with no row here is a type error, and a key swap
+    // fails on the literal pairing.
+    expect(UNBIND_DENY_KEY).toEqual({
+      unbind_not_eligible: 'hudChrome.unbind.notEligible',
+      unbind_not_bound: 'hudChrome.unbind.notBound',
+      unbind_perfecting: 'hudChrome.unbind.perfecting',
+      unbind_out_of_range: 'hudChrome.unbind.outOfRange',
+      unbind_no_space: 'hudChrome.unbind.noSpace',
+      unbind_cannot_afford: 'hudChrome.unbind.cannotAfford',
+    });
+    expect(unbindDenyKey('unbind_perfecting')).toBe('hudChrome.unbind.perfecting');
+    expect(new Set(Object.values(UNBIND_DENY_KEY)).size, 'no two reasons share a key').toBe(6);
   });
 
   it('aggregates bound copies across slots per item id and prices affordability off copper', () => {

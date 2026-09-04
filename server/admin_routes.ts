@@ -28,6 +28,9 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
   { method: 'GET', pattern: '/admin/api/online', permission: 'accounts.read' },
   { method: 'GET', pattern: '/admin/api/online-history', permission: 'analytics.read' },
   { method: 'GET', pattern: '/admin/api/activity', permission: 'analytics.read' },
+  // Live market listing aggregates: realm-wide, zero per-account data, so it
+  // rides analytics.read like the other dashboards.
+  { method: 'GET', pattern: '/admin/api/market/metrics', permission: 'analytics.read' },
   { method: 'GET', pattern: '/admin/api/perf/summary', permission: 'analytics.read' },
   { method: 'GET', pattern: '/admin/api/perf/raw', permission: 'analytics.read' },
   // Server tick-loop profiling capture: ops-sensitive, admin/superadmin only.
@@ -50,6 +53,14 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
     method: 'POST',
     pattern: /^\/admin\/api\/moderation\/characters\/(\d+)\/restore-slot$/,
     permission: 'moderation.act',
+  },
+  // The phase 13 legendary-name strip: it DESTROYS a player-authored name
+  // with no in-game undo, so like the guild bank purge below it carries its
+  // OWN superadmin-only permission, never moderation.act.
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/moderation\/characters\/(\d+)\/clear-item-name$/,
+    permission: 'moderation.clearItemName',
   },
   { method: 'GET', pattern: '/admin/api/guilds', permission: 'accounts.read' },
   { method: 'GET', pattern: /^\/admin\/api\/guilds\/(\d+)$/, permission: 'accounts.read' },

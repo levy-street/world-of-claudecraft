@@ -232,6 +232,34 @@ describe('findFocusKey', () => {
     expect(findFocusKey(root, hostile)).toBe(btn);
     expect(findFocusKey(root, `${hostile}:missing`)).toBeNull();
   });
+
+  it('is the ONLY read that survives the key the raw selector dies on', () => {
+    // What the interpolating spelling actually does, driven side by side with
+    // the helper over the same key and the same root, so the two are not
+    // compared by argument. A key holding one double quote closes the
+    // selector's own string early and querySelector raises a SyntaxError,
+    // which in a painter escapes from the middle of the repaint that captured
+    // the key. A key holding CSS syntax is the quieter half: it parses, so
+    // nothing throws, and it selects the WRONG node (here: some other member
+    // of the flat namespace), which is how a repaint hands focus to a control
+    // the player was not standing on.
+    const quoted = 'seed:a"b';
+    const { root, btn } = windowWithKeyedButton(quoted);
+    const decoy = document.createElement('button');
+    decoy.dataset.focusKey = 'seed:vale_wheat';
+    root.appendChild(decoy);
+
+    expect(() => root.querySelector(`[data-focus-key="${quoted}"]`)).toThrow();
+    expect(findFocusKey(root, quoted)).toBe(btn);
+
+    const cssy = 'seed:x"], [data-focus-key="seed:vale_wheat';
+    const { root: root2, btn: btn2 } = windowWithKeyedButton(cssy);
+    const decoy2 = document.createElement('button');
+    decoy2.dataset.focusKey = 'seed:vale_wheat';
+    root2.appendChild(decoy2);
+    expect(root2.querySelector(`[data-focus-key="${cssy}"]`)).toBe(decoy2);
+    expect(findFocusKey(root2, cssy)).toBe(btn2);
+  });
 });
 
 describe('restoreFirstEnabled', () => {
@@ -513,6 +541,122 @@ describe('the data-focus-key namespace has exactly one reader', () => {
     expect(
       offenders,
       `these src/ui modules use the shared data-focus-key namespace without importing ./focus_restore, so they hand-roll the containment check that keeps one window's repaint from stealing focus from another (#2528):\n${offenders.join('\n')}`,
+    ).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The READ-BACK half of the same namespace rule.
+//
+// Importing the helper settles how a key is CAPTURED; it says nothing about how
+// the key is resolved again in the rebuilt tree. Splicing it into
+// `[data-focus-key="${key}"]` is the way that goes wrong, and both of its
+// failure modes are shipped-quality bugs rather than style: a key holding a
+// double quote makes querySelector THROW out of the middle of the repaint, and
+// a key holding CSS syntax silently selects a DIFFERENT member of the flat
+// namespace (both driven over a real DOM in the findFocusKey block above).
+// Keys are not literals: they carry crop and item ids, and the market's carry
+// server-supplied listing ids.
+//
+// The list below is a RATCHET, not an acquittal: it is the set of read-back
+// sites that still splice, so a NEW one fails while an existing one is migrated
+// on its own schedule. It is deliberately checked in ONE direction (unlisted
+// offenders fail; a listed file that gets fixed simply stops matching), because
+// a two-way pin here would make every migration a same-change edit of this file
+// from whatever window owns it.
+// ---------------------------------------------------------------------------
+
+/** The SELECTOR spelling, in every form it can take. The leading bracket plus
+ *  the `=` are what separate it from the ordinary markup emission
+ *  (`data-focus-key="${esc(id)}"`, and its `${FOCUS_KEY_ATTR}="..."` twin in
+ *  the emit-only chrome modules), which every keyed window does and which is
+ *  correct, and from the literal namespace selector `[${FOCUS_KEY_ATTR}]` that
+ *  findFocusKey itself uses. The attribute alternation and the optional quote
+ *  matter: the cheapest way to defeat a matcher pinned to one spelling is to
+ *  write the same bug through the exported constant, or with single quotes,
+ *  and all three spellings fail identically at runtime. */
+const FOCUS_KEY_SELECTOR_SPLICE = /\[(?:data-focus-key|\$\{FOCUS_KEY_ATTR\})=["']?\$\{/;
+
+describe('a focus key is never spliced into a CSS selector', () => {
+  const KNOWN_SPLICE_SITES: Record<string, string> = {
+    'hud/action_bar/bar_editor/bar_editor_window.ts': 'slot and page keys minted in-module',
+    'hud/professions/perfecting_window.ts': 'candidate rows keyed by copy identity',
+    'options_window.ts': 'setting ids minted in-module',
+    'trade_woc_arm_painter.ts': 'quote and backslash escaped before the splice, not CSS-escaped',
+    'woc_market_window.ts': 'quote and backslash escaped before the splice, not CSS-escaped',
+  };
+  const uiFiles = tsFilesUnder(path.join(repoRoot, 'src/ui')).map((f) => ({
+    ...f,
+    code: stripComments(readFileSync(f.full, 'utf8')),
+  }));
+  const splicers = uiFiles
+    .filter((f) => FOCUS_KEY_SELECTOR_SPLICE.test(f.code))
+    .map((f) => f.file)
+    .sort();
+
+  it('the matcher really catches a splice, and passes the correct spellings', () => {
+    // Anti-vacuity over SYNTHETIC source, so this holds whatever any other
+    // module in the tree is mid-migration to. Both correct spellings are
+    // exercised as negatives: the markup emission (no leading bracket) and the
+    // literal namespace selector findFocusKey itself uses.
+    expect(
+      // biome-ignore lint/suspicious/noTemplateCurlyInString: the synthetic source under test IS a template expression
+      FOCUS_KEY_SELECTOR_SPLICE.test('root.querySelector(`[data-focus-key="${focusKey}"]`)'),
+    ).toBe(true);
+    expect(
+      // biome-ignore lint/suspicious/noTemplateCurlyInString: the synthetic source under test IS a template expression
+      FOCUS_KEY_SELECTOR_SPLICE.test('`<button data-focus-key="${esc(id)}">`'),
+    ).toBe(false);
+    expect(
+      // biome-ignore lint/suspicious/noTemplateCurlyInString: the synthetic source under test IS a template expression
+      FOCUS_KEY_SELECTOR_SPLICE.test('root.querySelectorAll(`[${FOCUS_KEY_ATTR}]`)'),
+    ).toBe(false);
+    // The two spellings a matcher pinned to the double-quoted literal would
+    // wave through, both of which throw on the same keys: the bug written
+    // through the exported constant, and the single-quoted selector.
+    expect(
+      // biome-ignore lint/suspicious/noTemplateCurlyInString: the synthetic source under test IS a template expression
+      FOCUS_KEY_SELECTOR_SPLICE.test('root.querySelector(`[${FOCUS_KEY_ATTR}="${focusKey}"]`)'),
+    ).toBe(true);
+    expect(
+      // biome-ignore lint/suspicious/noTemplateCurlyInString: the synthetic source under test IS a template expression
+      FOCUS_KEY_SELECTOR_SPLICE.test("root.querySelector(`[data-focus-key='${focusKey}']`)"),
+    ).toBe(true);
+    // And the emit-only chrome modules keep spelling the ATTRIBUTE through the
+    // same constant, which is correct and must stay a negative.
+    expect(
+      // biome-ignore lint/suspicious/noTemplateCurlyInString: the synthetic source under test IS a template expression
+      FOCUS_KEY_SELECTOR_SPLICE.test('`<button ${FOCUS_KEY_ATTR}="wm-sort">`'),
+    ).toBe(false);
+  });
+
+  it('the two farming windows resolve their key by dataset equality', () => {
+    // Named rather than counted: these two rebuilt their whole subtree and
+    // spliced the captured key straight back into a selector, and the plant
+    // sheet's own keys are `seed:<cropId>` / `knob:<knobId>`, content ids
+    // spliced verbatim. A throw there escapes paint(), so the harvest journal
+    // (whose signature latch sits BELOW the restore) would then re-enter and
+    // re-throw on every 1 Hz countdown tick for as long as the window is open.
+    for (const file of [
+      'hud/professions/harvest_journal_window.ts',
+      'hud/professions/farming_plant_sheet_window.ts',
+    ]) {
+      const source = uiFiles.find((f) => f.file === file);
+      expect(source, `${file} left src/ui`).toBeDefined();
+      expect(source?.code, `${file} splices its focus key into a selector again`).not.toMatch(
+        FOCUS_KEY_SELECTOR_SPLICE,
+      );
+      expect(source?.code, `${file} no longer resolves through findFocusKey`).toContain(
+        'findFocusKey(root, focusKey)',
+      );
+    }
+  });
+
+  it('no NEW module splices a focus key into a selector', () => {
+    const offenders = splicers.filter((file) => !(file in KNOWN_SPLICE_SITES));
+    expect(
+      offenders,
+      `these src/ui modules interpolate a focus key into a CSS attribute selector. Keys carry content and server ids, so one holding a quote throws SyntaxError out of the repaint and one holding CSS syntax selects the wrong control. Resolve with findFocusKey(root, key) from ./focus_restore instead (vault_window.ts and bank_window.ts are the shipped callers):\n${offenders.join('\n')}`,
     ).toEqual([]);
   });
 });

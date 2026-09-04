@@ -452,6 +452,13 @@ function shippedOfferUnits(
   toPid: number,
   inventory: InvSlot[] | null,
   nowMsFor: () => number,
+  // Fired once per staged INSTANCED unit whose pinned match found no
+  // payload-equal copy in `inventory` (the unit then takes the generic
+  // fallback below). tradeConfirm's substitution close runs this walk over
+  // scratch bags and refuses the swap on any fire, so the copy identity a
+  // refusal rests on is the removal's own match and never a second
+  // description of it.
+  onPinMiss?: (slot: InvSlot) => void,
 ): PendingGrant[] {
   const grants: PendingGrant[] = [];
   // The copy-choice fix: when an instanced CHARM copy must ship, the
@@ -505,6 +512,14 @@ function shippedOfferUnits(
           units.push(matched);
           continue;
         }
+        // A staged INSTANCED copy with no payload-equal twin in the bags is
+        // the substitution class (the copy was Perfected, renamed, enchanted,
+        // or left the bags after the counterparty accepted): report it so
+        // tradeConfirm's close can refuse before anything moves. Plain lines
+        // keep the fallback below unreported: their staged shape is
+        // id-plus-marker with no payload to mutate, and a decoupled inventory
+        // hub can legitimately stage a plain remainder the array cannot cover.
+        if (s.instance !== undefined) onPinMiss?.(s);
         // The marker guarantee ends at the pinned match above: this generic
         // fallback is marker-blind (plain-first, then any eligible instanced
         // copy), so a staged copy that LEFT the bags can ship a
@@ -631,6 +646,43 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
     for (const tPid of [session.a, session.b])
       ctx.error(tPid, 'Trade failed: items or money no longer available.');
     closeTrade(ctx, session);
+    return;
+  }
+  // The substitution close (the mid-trade payload-mutator class): offerCovered
+  // proves per-id TOTALS, not that the staged COPIES still exist as staged. A
+  // copy whose payload changed under the open window (a Perfecting stamp, a
+  // rename, an enchant) between the counterparty's accept and this confirm
+  // would fall through the removal's generic fallback and ship a twin the
+  // other side never agreed to. So every staged instanced copy is re-pinned
+  // here by the removal's OWN walk (shippedOfferUnits over scratch bags, the
+  // same run the capacity model below makes; a walk cannot drift from
+  // itself), and any miss refuses the swap. The window stays OPEN with both
+  // accepts cleared rather than closing: the offer on the table is stale, the
+  // fix is to re-stage it, and a re-stage is a tradeSetOffer, which already
+  // clears the accepts. Plain lines are not re-pinned (see onPinMiss).
+  const stagedCopiesStand = (giver: PlayerMeta, gives: InvSlot[], toPid: number): boolean => {
+    let missed = false;
+    shippedOfferUnits(
+      ctx,
+      gives,
+      giver.entityId,
+      toPid,
+      giver.inventory.map((s) => ({ ...s })),
+      nowMsFor,
+      () => {
+        missed = true;
+      },
+    );
+    return !missed;
+  };
+  if (
+    !stagedCopiesStand(metaA, session.offerA.items, session.b) ||
+    !stagedCopiesStand(metaB, session.offerB.items, session.a)
+  ) {
+    session.acceptedA = false;
+    session.acceptedB = false;
+    for (const tPid of [session.a, session.b])
+      ctx.error(tPid, 'Trade failed: items or money no longer available.');
     return;
   }
   // capacity gate: each side must fit what they RECEIVE after what they GIVE

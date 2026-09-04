@@ -88,7 +88,6 @@ export const table: DeedLocaleTable = {
     desc: 'Colha um veio de minerio, um bosque de madeira e um canteiro de ervas em Nightbloom.',
   },
   chr_nightbloom_first_cast: {
-    name: 'Uma ondulacao no poco lunar',
     desc: 'Pesque um peixe nas aguas de Nightbloom.',
   },
   chr_wraithwood_gatherer: {
@@ -190,7 +189,6 @@ export const table: DeedLocaleTable = {
   },
   prog_master_gatherer: {
     name: 'Mestre Coletor',
-    desc: 'Alcance 100 de proficiência em quaisquer tres dentre Mineracao, Lenharia, Herborismo e Pesca.',
   },
   prog_first_craft: { name: 'Feito à Mão', desc: 'Conclua sua primeira criação bem-sucedida.' },
   prog_craft_specialist: {
@@ -304,7 +302,6 @@ export const table: DeedLocaleTable = {
     title: 'Mata-Wyrm',
   },
   dgn_sanctum_speed: {
-    name: 'Corrida no Santuário',
     desc: 'Derrote Korzul o Gravewyrm em até 15 minutos após seu grupo reivindicar o Santuário do Gravewyrm.',
   },
   dgn_nythraxis_gravebreaker: {
@@ -370,7 +367,7 @@ export const table: DeedLocaleTable = {
   },
   dlv_varric_ringers: {
     name: 'Os Sinos Emudecem',
-    desc: 'Derrote o Diácono Varric com todos os Sineiros Fúnebres que ele ergue já abatidos.',
+    desc: 'Derrote o Diácono Vandric com todos os Sineiros Fúnebres que ele ergue já abatidos.',
   },
   dlv_nhalia_bells: {
     name: 'Aquieta-Sinos',
@@ -449,7 +446,6 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: 'Crônica de Thornpeak',
-    desc: 'Acompanhe a história da montanha até o fim: o Culto do Wyrm desfeito, o Santuário silenciado, o Pico Desperto derrubado e cada terror nomeado dos penhascos abatido.',
     title: 'de Thornpeak',
   },
   chr_peaks_sparring: {
@@ -544,7 +540,7 @@ export const table: DeedLocaleTable = {
   },
   col_quartermaster_buyout: {
     name: 'Cliente Preferencial',
-    desc: 'Descubra todas as dez peças do estoque heroico do Intendente Vex.',
+    desc: 'Descubra todas as dez peças de equipamento do estoque heroico do Intendente Vex.',
   },
   col_glimmerfin: {
     name: 'Lampejo de Esperança',

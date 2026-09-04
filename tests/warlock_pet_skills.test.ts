@@ -136,7 +136,7 @@ describe('Warlock pet signature skills', () => {
     },
   );
 
-  it('has Gloomshade pull a distant normal enemy with its own readable cooldown', () => {
+  it('has Duskmurk pull a distant normal enemy with its own readable cooldown', () => {
     const { sim, pet, target } = rig();
     const before = dist2d(pet.pos, target.pos);
 

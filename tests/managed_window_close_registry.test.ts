@@ -40,10 +40,12 @@ const playHtml = readFileSync(`${root}play.html`, 'utf8');
  * its own row here.
  */
 const CODE_BUILT: Record<string, string> = {
-  'confirm-dialog': 'src/ui/hud.ts (confirmDialog + inputDialog share the one id)',
-  'profession-tutorial': 'src/ui/profession_tutorial_window.ts',
+  'confirm-dialog':
+    'src/ui/hud.ts (confirmDialog) + src/ui/input_controller.ts (the extracted input modal); the two share the one id',
+  'profession-tutorial': 'src/ui/hud/professions/profession_tutorial_window.ts',
   'tutorial-greeting': 'src/ui/tutorial_greeting_window.ts',
   'dev-command-window': 'src/ui/dev_command_window.ts',
+  'perfecting-window': 'src/ui/hud/professions/perfecting_window.ts',
 };
 
 /**
@@ -65,6 +67,14 @@ const CLOSED_BEFORE_THE_SCAN: Record<string, string> = {
  * hide, and they own no trap, no timer, and no state the next open does not re-seed. This is
  * the "recorded as not needing one" half of the contract, and each entry is a claim its
  * author checked, not a leftover.
+ *
+ * ONE row now, not two. `report-window` left this list under
+ * qr-19-report-window-focus-trap-carveout (masterwrought Phase 19B, D111): it gained a real
+ * focus trap through the shared makeWindowFocus bridge plus an exported close(), so it has a
+ * `case` arm like every other trap-owning window. Its own parenthetical residue, that the
+ * in-flight submit closure captures the persistent panel, went with it: both async arms are
+ * per-open-epoch guarded now (tests/report_window.test.ts), which is what a managed close
+ * made worth fixing, since it makes reopening the likelier path.
  */
 const NO_MANAGED_TEARDOWN: Record<string, string> = {
   'map-window':
@@ -72,12 +82,6 @@ const NO_MANAGED_TEARDOWN: Record<string, string> = {
     'adds the same syncAnyWindowOpenState. No trap, no timer: updateMapWindow is driven by ' +
     "Hud.update()'s mediumHud band behind a display === 'block' gate, so the hide stops it, " +
     'and the mapPing / mapZoneOverride the toggle clears are re-seeded by the next open.',
-  'report-window':
-    "Its X and Cancel buttons are literally `el.style.display = 'none'` and nothing else, so " +
-    'the default arm is a strict superset of its own close path. No trap, no timer, and the ' +
-    'reason dropdown lives on a node the next open replaces. (Its in-flight submit closure ' +
-    'captures the PANEL, which persists, so a stale resolve can still touch a reopened ' +
-    'window: pre-existing on every close path alike, and no business of this arm.)',
 };
 
 /**
@@ -151,11 +155,21 @@ function readPanelIds(html: string): string[] {
   return ids;
 }
 
-// The two populations on the day this was written. They are equal by coincidence, not by
-// construction (37 cases = 34 markup panels with a case + 3 code-built; 37 markup ids = those
-// 34 + the 3 without one), so they get two names and must be bumped independently.
-const CASE_COUNT = 39; // +1: the tutorial island's #tutorial-greeting (code-built)
-const MARKUP_COUNT = 38;
+// The two populations are related but not equal, and they must be bumped independently: the
+// case list counts markup panels that have a case PLUS the code-built ones (five today, see
+// CODE_BUILT), while the markup list counts every `.window.panel` id in either shell,
+// including the ones deliberately excused below.
+// BOTH were RE-MEASURED against the live tree at the Masterwrought Phase 19B close, and BOTH
+// had drifted SEVEN under, which is exactly the room a departing case or a departing panel
+// needs to leave unnoticed. Cases: the CONSTANT read 40 while the live switch already carried
+// 47, and 48 once D111 added the report window's arm. Markup ids: the constant read 38 while
+// each shell, and the union, carried 45. (The constant-versus-live distinction is the whole
+// point and an earlier draft of this comment lost it, writing a stale-constant figure as if it
+// were the measured tip.) The markup half was caught only because a coverage audit re-ran readPanelIds
+// itself rather than trusting the constant, which is the lesson: re-measure a floor when you
+// touch its sibling, or you repair one and leave the identical hole open two lines away.
+const CASE_COUNT = 48;
+const MARKUP_COUNT = 45;
 
 const closeSwitch = readCloseManagedWindowSwitch(hudTs);
 const caseIds = closeSwitch.cases;
@@ -333,12 +347,17 @@ describe('closeManagedWindow case registry', () => {
     // EXACT, not a floor: a floor cannot notice a new module joining.
     expect(sites).toEqual({
       'ui/dev_command_window.ts': 1,
-      // Two build sites, one element id: the two-choice greeting and its
-      // single-button note variant (decline follow-up, bell homecoming) both
-      // mint #tutorial-greeting, and one closeTutorialGreeting covers both.
-      'ui/tutorial_greeting_window.ts': 2,
-      'ui/hud.ts': 2, // confirmDialog + inputDialog share the one #confirm-dialog id
-      'ui/profession_tutorial_window.ts': 1,
+      // The live ferry-note renderer mints the managed #tutorial-greeting shell.
+      'ui/tutorial_greeting_window.ts': 1,
+      'ui/hud.ts': 1, // confirmDialog's half of the shared #confirm-dialog id
+      // The extracted input modal (Masterwrought phase 14): the other half of
+      // the shared #confirm-dialog id, moved whole out of Hud.inputDialog.
+      // Named *_controller since the Phase 18 sweep so the painter gate's
+      // filename sweep covers it (tests/hud_perf_budget.test.ts).
+      'ui/input_controller.ts': 1,
+      'ui/hud/professions/profession_tutorial_window.ts': 1,
+      // The Perfecting window mints its own root (no markup entry).
+      'ui/hud/professions/perfecting_window.ts': 1,
     });
     for (const id of Object.keys(CODE_BUILT)) expect(caseIds).toContain(id);
   });
@@ -375,11 +394,25 @@ describe('closeManagedWindow case registry', () => {
     ]);
   });
 
-  it('keeps the `default:` arm the bare hide the no-teardown rows assume', () => {
-    // Both NO_MANAGED_TEARDOWN rows are justified by "the default arm is a strict superset
+  it('routes #report-window through the module close, not a bare hide (D111)', () => {
+    // The arm that retired this window's NO_MANAGED_TEARDOWN row
+    // (qr-19-report-window-focus-trap-carveout). Over the parsed statements, so a comment
+    // quoting the call cannot satisfy it. closeReportWindow() is what releases the shared
+    // focus trap and returns focus to the opener; the tooltip hide is carried over from the
+    // default arm this window used to fall to, so the managed close stays a strict superset
+    // of the behavior it replaced. Behavioral proof: tests/report_window.test.ts.
+    expect(closeSwitch.bodies['report-window']).toEqual([
+      'closeReportWindow();',
+      'this.hideTooltip();',
+      'break;',
+    ]);
+  });
+
+  it('keeps the `default:` arm the bare hide the no-teardown row assumes', () => {
+    // The one NO_MANAGED_TEARDOWN row is justified by "the default arm is a strict superset
     // of that window's own close path". Nothing else in the repo pins what the default arm
     // DOES, so swapping it for an el.remove(), or dropping the tooltip hide, would falsify
-    // both excuses with every other assertion here still green.
+    // that excuse with every other assertion here still green.
     expect(closeSwitch.fallback).toEqual([
       "el.style.display = 'none';",
       'this.hideTooltip();',

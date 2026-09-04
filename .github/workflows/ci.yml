@@ -642,10 +642,12 @@ jobs:
             /docs/screenshots/ignivar-raid-expansion/
             /docs/screenshots/item-art-consistency-2026-08-09/
             /docs/screenshots/market-house-redesign/
+            /docs/screenshots/masterwrought-art-completion-2026-09-02/
             /docs/screenshots/placeholder-art-completion-2026-08-09/
             /docs/screenshots/r35-admin-professions-inspector/
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/
             /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/
+            /docs/screenshots/touch-ui-rework/
             /docs/screenshots/vault-fine-mark/
             /docs/screenshots/wildheart/
             /docs/screenshots/woc-market/
@@ -861,10 +863,12 @@ jobs:
             /docs/screenshots/ignivar-raid-expansion/
             /docs/screenshots/item-art-consistency-2026-08-09/
             /docs/screenshots/market-house-redesign/
+            /docs/screenshots/masterwrought-art-completion-2026-09-02/
             /docs/screenshots/placeholder-art-completion-2026-08-09/
             /docs/screenshots/r35-admin-professions-inspector/
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/
             /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/
+            /docs/screenshots/touch-ui-rework/
             /docs/screenshots/vault-fine-mark/
             /docs/screenshots/wildheart/
             /docs/screenshots/woc-market/
@@ -962,10 +966,12 @@ jobs:
             /docs/screenshots/ignivar-raid-expansion/
             /docs/screenshots/item-art-consistency-2026-08-09/
             /docs/screenshots/market-house-redesign/
+            /docs/screenshots/masterwrought-art-completion-2026-09-02/
             /docs/screenshots/placeholder-art-completion-2026-08-09/
             /docs/screenshots/r35-admin-professions-inspector/
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/
             /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/
+            /docs/screenshots/touch-ui-rework/
             /docs/screenshots/vault-fine-mark/
             /docs/screenshots/wildheart/
             /docs/screenshots/woc-market/
@@ -1206,6 +1212,13 @@ jobs:
     env:
       TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/wocc_ci
       WOCC_EXPECT_PG: '1'
+      # The mediawiki seed's release tier (masterwrought Phase 18): the seed is a
+      # first-boot deploy artifact that trails content BY DESIGN through a cycle,
+      # so the PR tier only guards its envelope and its dash-freedom, and the
+      # byte-equality demand rides here, where a stale artifact is a real defect.
+      # Its own flag, never I18N_RELEASE_TIER: tests/release_i18n_tier_coverage.test.ts
+      # pins that flag's suite set three ways and would red on contact.
+      MEDIAWIKI_SEED_RELEASE_TIER: '1'
 
     # No I18N_RELEASE_TIER here BY DESIGN (D8 revised, issue #2820). This job runs
     # the suite at PR tier so a red shard always means a real regression. The
@@ -1246,10 +1259,12 @@ jobs:
             /docs/screenshots/ignivar-raid-expansion/
             /docs/screenshots/item-art-consistency-2026-08-09/
             /docs/screenshots/market-house-redesign/
+            /docs/screenshots/masterwrought-art-completion-2026-09-02/
             /docs/screenshots/placeholder-art-completion-2026-08-09/
             /docs/screenshots/r35-admin-professions-inspector/
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/
             /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/
+            /docs/screenshots/touch-ui-rework/
             /docs/screenshots/vault-fine-mark/
             /docs/screenshots/wildheart/
             /docs/screenshots/woc-market/
@@ -1345,10 +1360,12 @@ jobs:
             /docs/screenshots/ignivar-raid-expansion/
             /docs/screenshots/item-art-consistency-2026-08-09/
             /docs/screenshots/market-house-redesign/
+            /docs/screenshots/masterwrought-art-completion-2026-09-02/
             /docs/screenshots/placeholder-art-completion-2026-08-09/
             /docs/screenshots/r35-admin-professions-inspector/
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/
             /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/
+            /docs/screenshots/touch-ui-rework/
             /docs/screenshots/vault-fine-mark/
             /docs/screenshots/wildheart/
             /docs/screenshots/woc-market/

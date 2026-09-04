@@ -26,12 +26,13 @@ import { canGatherTier } from '../sim/professions/tools';
 import { minWieldRequirementToWork } from '../sim/professions/wield_gate';
 import type { GatherNodeDef, GatherNodeType } from '../sim/types';
 import type { IWorld } from '../world_api';
+import { clockSeconds } from './clock_seconds_core';
 import { esc } from './esc';
 import {
   buildGatherNodeTooltip,
   type GatherNodeTooltipModel,
   viewerUsableToolTier,
-} from './gathering_view';
+} from './hud/professions/gathering_view';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { getUiScale } from './ui_scale';
 
@@ -113,16 +114,17 @@ export function gatherNodeTooltipHtml(model: GatherNodeTooltipModel): string {
   return html;
 }
 
-/** m:ss through the shared clock token pattern (the finder/vale-cup idiom):
- *  minutes unpadded via formatNumber, seconds pre-padded. Ceils so a live
- *  timer never reads 0:00 while the node still refuses. */
+/** m:ss through the shared clock token pattern (the finder idiom): minutes
+ *  unpadded via formatNumber, seconds through the one clockSeconds formatter
+ *  (the same Intl pad every HUD clock takes). Ceils so a live timer never
+ *  reads 0:00 while the node still refuses. */
 function respawnClock(totalSeconds: number): string {
   const whole = Math.max(1, Math.ceil(totalSeconds));
   const minutes = Math.floor(whole / 60);
   const seconds = whole % 60;
   return t('hudChrome.gathering.respawnClock', {
     minutes: formatNumber(minutes, { maximumFractionDigits: 0, useGrouping: false }),
-    seconds: String(seconds).padStart(2, '0'),
+    seconds: clockSeconds(seconds, true),
   });
 }
 

@@ -171,6 +171,7 @@ export function sweptLanding(ctx: SimContext, entity: Entity, aim: Vec3): Vec3 {
   );
 }
 
+/** Instant relocation through the same collision/terrain sweep as Vaulting Charge. */
 export function relocateSwept(ctx: SimContext, entity: Entity, aim: Vec3): void {
   const landing = sweptLanding(ctx, entity, aim);
   entity.pos = landing;

@@ -511,6 +511,34 @@ describe('the World Market: the Merchant', () => {
       expect(info.collectionSalesOmitted).toBe(0);
     });
 
+    it("stamps the sold copy's CHOSEN name, and nothing for a plain copy", () => {
+      // The listing row is spliced away the line after the ledger write, so
+      // the sale is the last moment anything knows what the copy was called.
+      // Without the stamp a seller with two listings of one id reads two
+      // identical Collect rows.
+      const { sim, seller, buyer } = world();
+      const named = { name: 'Dawn Oath' } as never;
+      sim.addItemInstance('wolf_fang', named, seller, 1, { silent: true });
+      sim.marketListInstance('wolf_fang', 1000, named, seller);
+      sim.marketBuy(
+        listingBy(
+          sim,
+          (l) => l.sellerKey === marketSellerKey(seller) && l.itemId === 'wolf_fang',
+          'named wolf_fang listing',
+        ).id,
+        buyer,
+      );
+      expect(marketInfo(sim, seller).collectionSales[0]).toMatchObject({
+        itemId: 'wolf_fang',
+        itemName: 'Dawn Oath',
+      });
+
+      // A PLAIN copy stamps nothing, so the field costs the common case zero
+      // bytes in the blob and on the wire.
+      const plain = sellOne(sim, seller, buyer, 'bone_fragments', 1, 500);
+      expect(plain.collectionSales[1].itemName).toBeUndefined();
+    });
+
     it('lists one row per sale, oldest first, and the rows sum to the proceeds', () => {
       const { sim, seller, buyer } = world();
 
@@ -641,6 +669,33 @@ describe('the World Market: the Merchant', () => {
         { itemId: 'wolf_fang', count: 2, price: 1000, proceeds: 950, buyerName: 'Buyer' },
       ]);
       expect(reloaded?.sales.omitted).toBe(0);
+    });
+
+    it("the sold copy's chosen name survives the round-trip too", () => {
+      // The arm above sells a PLAIN copy, so it could never see the name: the
+      // load path rebuilt each row from itemId/count/price/proceeds/buyerName
+      // and silently dropped itemName, which is exactly the logout the stamp
+      // exists to survive.
+      const { sim, seller, buyer } = world();
+      const named = { name: 'Dawn Oath' } as never;
+      sim.addItemInstance('wolf_fang', named, seller, 1, { silent: true });
+      sim.marketListInstance('wolf_fang', 1000, named, seller);
+      sim.marketBuy(
+        listingBy(
+          sim,
+          (l) => l.sellerKey === marketSellerKey(seller) && l.itemId === 'wolf_fang',
+          'named wolf_fang listing',
+        ).id,
+        buyer,
+      );
+      expect(marketInfo(sim, seller).collectionSales[0].itemName).toBe('Dawn Oath');
+
+      const sim2 = makeWorld();
+      sim2.loadMarket(sim.serializeMarket());
+      const reloaded = (
+        sim2.market as unknown as { marketCollections: Map<string, MarketCollection> }
+      ).marketCollections.get(marketSellerKey(seller));
+      expect(reloaded?.sales.entries[0].itemName).toBe('Dawn Oath');
     });
 
     it('writes no sales key for a collection holding only returns (old blobs unchanged)', () => {

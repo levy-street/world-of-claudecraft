@@ -5,7 +5,13 @@
 // zero on denial, proc occurrences reproducible by seed).
 import { describe, expect, it } from 'vitest';
 import { PERK_THRESHOLDS, STATIONS } from '../src/sim/content/professions';
-import { ALL_RECIPES, recipeById } from '../src/sim/content/recipes';
+import {
+  ALL_RECIPES,
+  APEX_ARMOR_RECIPES,
+  APEX_GEAR_RECIPES,
+  INTERMEDIATE_RECIPES,
+  recipeById,
+} from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import { PRIMARY_STATS, primaryStatBudget } from '../src/sim/item_budget';
 import {
@@ -34,6 +40,7 @@ import {
   materialTierBonusForReagents,
   materialTierForItem,
 } from '../src/sim/professions/material_tier';
+import { PERFECTING_HEADSTART_RANK } from '../src/sim/professions/perfecting';
 import { type StationType, stationsOfType } from '../src/sim/professions/stations';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
 import type { Rng } from '../src/sim/rng';
@@ -363,18 +370,28 @@ describe('masterwork stays strictly below the raid-loot band (acceptance bound)'
 
   it('pins the concrete numbers for a hub rare-def recipe and a common-band recipe (drift tripwires)', () => {
     // Even if no content change ever crosses the bound, these two literal rows
-    // trip on any budget/tuning drift. wardweave_cowl: rare helmet, band 20,
-    // def sum 11 plus the baked epic-minus-rare delta 2 at level 20, against
-    // raid floor primaryStatBudget(20 + 6 + 3, 'epic', 'helmet') = 17
-    // (margin 4). eastbrook_ritual_vestments: uncommon chest, band 9, def sum
+    // trip on any budget/tuning drift. wardweave_cowl: rare helmet, band 17
+    // since the masterwrought Phase 11o re-level (20 before it), def sum 11
+    // plus the baked epic-minus-rare delta 2 at level 17, against raid floor
+    // primaryStatBudget(17 + 6 + 3, 'epic', 'helmet') = 15 (margin 2).
+    // eastbrook_ritual_vestments: uncommon chest, band 9, def sum
     // 3 plus delta 2, against primaryStatBudget(9 + 3 + 3, 'rare', 'chest')
     // = 8 (margin 3).
     const cowl = boundRow(recipeById('recipe_wardweave_cowl')!, 1);
     expect(cowl.total).toBe(13);
-    expect(cowl.floor).toBe(17);
+    expect(cowl.floor).toBe(15);
     const vestments = boundRow(recipeById('recipe_eastbrook_ritual_vestments')!, 1);
     expect(vestments.total).toBe(5);
     expect(vestments.floor).toBe(8);
+    // A NON-helmet 11o mover, because the helmet is the one slot whose baked
+    // epic-minus-rare delta is invariant across the re-level (2 at 20 and at
+    // 15). Legs shrink hardest: thoriumscale_leggings, def sum 12, delta 1
+    // at level 15 (3 at the pre-11o level 20; the derived masterwork resize
+    // the LADDER_RECIPES amendment records), total 13 against
+    // primaryStatBudget(15 + 6 + 3, 'epic', 'legs') = 15.
+    const leggings = boundRow(recipeById('recipe_thoriumscale_leggings')!, 1);
+    expect(leggings.total).toBe(13);
+    expect(leggings.floor).toBe(15);
   });
 
   it('the bound has teeth: a hypothetical 2-tier bump would break it for current recipes', () => {
@@ -718,6 +735,20 @@ describe('material-tier masterwork feed (material_tier.ts)', () => {
       sunpetal_herb: 2,
       fine_sunpetal_herb: 2,
       arcanite_bar: 2,
+      // Masterwrought intermediates (phase 08, the phase 07 ledger
+      // obligation): refined crafted reagents on the arcanite precedent,
+      // tier 2 as the deliberate ceiling (no new tier, masterwork.ts
+      // constants are locked). Ungraded, so no fine_ siblings.
+      duskforged_billet: 2,
+      forgefold_plating: 2,
+      wyrmhide_cording: 2,
+      sunspun_bolt: 2,
+      prismglass_setting: 2,
+      precision_chassis: 2,
+      quickening_catalyst: 2,
+      seasoned_stock: 2,
+      lucent_reagent: 2,
+      sablewax_vellum: 2,
     });
     // An id absent from the table is tier 0: the baseline mob drops, the
     // eastbrook_vale starter yields, and non-material inputs alike.
@@ -762,6 +793,46 @@ describe('material-tier masterwork feed (material_tier.ts)', () => {
     expect(materialTierBonusForReagents(recipeById('recipe_goldleaf_sickle')!.reagents)).toBe(0.01);
     expect(materialTierBonusForReagents(recipeById('recipe_elderwood_axe')!.reagents)).toBe(0.02);
     expect(materialTierBonusForReagents(recipeById('recipe_sunpetal_sickle')!.reagents)).toBe(0.02);
+  });
+
+  it('the phase 08 tier rows: every apex bill and every intermediate recipe feeds 0.02', () => {
+    // The apex bills max at tier 2 through their own profession's
+    // intermediate reagent; sweep the whole family (phase 08 armor AND the
+    // phase 09 gear, the masterwrought_budget economy-arm spread) so a
+    // dropped tier row on any of the twenty reds here rather than shipping
+    // a quiet 0.01.
+    for (const recipe of [...APEX_ARMOR_RECIPES, ...APEX_GEAR_RECIPES]) {
+      expect(materialTierBonusForReagents(recipe.reagents), recipe.id).toBe(0.02);
+    }
+    // The catalyst tier row is a deliberate, RECORDED side effect: the nine
+    // phase 07 intermediate recipes consume a Quickening Catalyst, so their
+    // proc-chance INPUTS moved with it (seven really moved: 0.01 to 0.02 for
+    // billet/plating/setting/chassis, 0 to 0.02 for cording/stock/reagent;
+    // bolt and vellum already sat at 0.02 via sunpetal_herb). Pinned so the
+    // move is a fact a retune must confront, not an accident. The companion
+    // arm below is why it ships no behavior.
+    for (const recipe of INTERMEDIATE_RECIPES) {
+      expect(materialTierBonusForReagents(recipe.reagents), recipe.id).toBe(0.02);
+    }
+  });
+
+  it('the moved intermediate inputs are EFFECT-DEAD: slotless junk never bakes a bonus', () => {
+    // Every intermediate output is slotless junk, so masterworkBonusStats
+    // returns null and the crafting.ts effect gate never fires regardless of
+    // the raised chance input above. This is the pin that makes the
+    // material_tier.ts rationale comment true rather than asserted.
+    for (const recipe of INTERMEDIATE_RECIPES) {
+      const def = ITEMS[recipe.resultItemId];
+      expect(
+        masterworkBonusStats({
+          level: recipe.level,
+          quality: def.quality,
+          slot: def.slot,
+          stats: def.stats,
+        }),
+        recipe.id,
+      ).toBeNull();
+    }
   });
 
   it('a tier-0-only reagent list resolves to exactly 0 (the golden-safety arm)', () => {
@@ -878,5 +949,75 @@ describe('material-tier masterwork feed (material_tier.ts)', () => {
     expect(baseline.result.ok).toBe(true);
     expect(baseline.result.masterwork).toBeUndefined();
     expect(baseline.draws).toBe(1);
+  });
+});
+
+describe('R1: the masterwork proc on an APEX craft grants a head start, never a quality bump', () => {
+  // The ruling, as built since phase 12: on a masterwrought output the
+  // craft-time proc grants a Perfecting head start INSTEAD OF a quality bump
+  // (the epic to legendary stat cliff is exactly what fork B exists to
+  // avoid). The roll is FORCED to 0 (below every reachable chance) so the
+  // head-start arm is the only thing standing between the proc and the bump,
+  // and the control arm proves the forcing genuinely forces.
+  const craftForced = (recipeId: string, activeArchetype: string | null) => {
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    const meta = (sim as any).players.get(pid);
+    // An Infinity archetype ceiling for the apex arm, so the ceiling gate
+    // cannot be the reason the bump stays off (that would make this arm
+    // pass vacuously for a pre-attunement crafter).
+    if (activeArchetype) meta.archetype.activeArchetype = activeArchetype;
+    const recipe = recipeById(recipeId)!;
+    if (recipe.stationType) {
+      const station = stationsOfType(STATIONS, recipe.stationType as StationType)[0];
+      const e = (sim as any).entities.get(pid);
+      e.pos.x = station.pos.x;
+      e.pos.z = station.pos.z;
+      e.prevPos = { ...e.pos };
+    }
+    meta.knownRecipes?.add(recipe.id);
+    for (const g of recipe.reagents) sim.addItem(g.itemId, g.count, pid);
+    // Force the single output-side proc draw: 0 is below every reachable
+    // chance (base 0.03 at minimum), so absent the R1 guard the masterwork
+    // effect WOULD fire on this craft. The replacement also COUNTS calls,
+    // so the one-draw-per-successful-craft contract stays pinned on the
+    // apex path (the suppression must gate the EFFECT, never the draw).
+    const rng: Rng = (sim as any).ctx.rng;
+    let draws = 0;
+    (rng as any).next = () => {
+      draws += 1;
+      return 0;
+    };
+    runCraft(sim, recipe.id, false, pid);
+    return { meta, result: { ...(sim as any).lastCraftResult }, draws: () => draws };
+  };
+
+  it('a forced proc on a masterwrought output mints the head start, never a bump', () => {
+    const apex = craftForced('recipe_spiritweld_girdle', 'armorcrafting');
+    expect(apex.result.ok).toBe(true);
+    // The proc EFFECT applied (R1's replacement effect), so the result says
+    // masterwork:true and the deed/announce arms downstream fire; what the
+    // apex path never mints is the quality bump's rolled record.
+    expect(apex.result.masterwork).toBe(true);
+    expect(apex.draws(), 'exactly one draw on the apex craft').toBe(1);
+    const slot = apex.meta.inventory.find(
+      (s: { itemId: string }) => s.itemId === 'spiritweld_girdle',
+    );
+    expect(slot, 'the apex piece was granted').toBeTruthy();
+    // Epic def quality still signs the instance (#1149); the head start rides
+    // the Perfecting track field at the literal rank 1
+    // (PERFECTING_HEADSTART_RANK), with NO rolled record baked.
+    expect(slot.instance?.signer).toBeTruthy();
+    expect(slot.instance?.perfecting).toBe(1);
+    expect(slot.instance?.perfecting).toBe(PERFECTING_HEADSTART_RANK);
+    expect(slot.instance?.perfected).toBeUndefined();
+    expect(slot.instance?.rolled).toBeUndefined();
+  });
+
+  it('the control: the same forced roll still procs a non-apex craft', () => {
+    const control = craftForced('recipe_eastbrook_ritual_vestments', null);
+    expect(control.result.ok).toBe(true);
+    expect(control.result.masterwork).toBe(true);
+    expect(control.draws(), 'exactly one draw on the proccing control').toBe(1);
   });
 });

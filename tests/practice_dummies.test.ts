@@ -209,6 +209,22 @@ describe('the Highwatch practice row', () => {
     expect(d.maxHp).toBe(vitals.maxHp);
     expect(d.stats.armor).toBe(vitals.armor);
     expect(d.hp).toBe(playerDummyRestHp(vitals.maxHp));
+    // THE DERIVED BODY AS LITERALS, added at Phase 15. Every assertion above
+    // compares the entity to playerDummyVitals(), which is the same function
+    // the entity was built from: both sides move together, so a catalog change
+    // that moves this SHIPPED body (it is applied at every world construction,
+    // production included) passes silently. The vitals derive from
+    // bestEpicGearFor, so any new epic entering a slot moves them. Pinned here
+    // so the move reds with a named cause and a reviewer decides whether the
+    // reference player body should have changed.
+    // Re-pinned at the eighth v0.41.0 sync (2026-08-30), the named cause the
+    // comment above demands: the release's Crucible raid catalog re-geared
+    // bestEpicGearFor (every slot's raw-stat winner is now a raid piece), so
+    // the SHIPPED friendly dummy's body moved with the live catalog. The
+    // maintainer's Phase 19 rows 12 and 13 (apex versus the Crucible tier)
+    // may re-gear it again; re-pin with that ruling's commit if so.
+    expect(vitals.maxHp, 'the derived reference-player pool').toBe(1232);
+    expect(vitals.armor, 'and its armor').toBe(3265);
     // A player-sized pool, not the practice targets near-immortal one: heals
     // have to read as a real fraction of the bar.
     expect(d.maxHp).toBeGreaterThan(1000);
@@ -279,7 +295,13 @@ describe('playerDummyShedHp', () => {
   const rest = playerDummyRestHp(maxHp);
 
   it('rests at the resting fraction of the pool', () => {
-    expect(rest).toBe(Math.round(maxHp * PLAYER_DUMMY_REST_HP_FRACTION));
+    // Literal pins, not rest === round(maxHp * FRACTION): that form re-derives
+    // the expectation from the same constant the function reads, so no edit to
+    // the fraction could ever red it (the constant-self-comparison trap). The
+    // 0.35 is the shipped design value (practice_dummies.ts documents why);
+    // moving it is a deliberate retune that updates both literals here.
+    expect(PLAYER_DUMMY_REST_HP_FRACTION).toBe(0.35);
+    expect(rest).toBe(1400);
     expect(rest).toBeLessThan(maxHp);
   });
 

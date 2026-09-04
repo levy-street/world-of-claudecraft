@@ -269,9 +269,17 @@ describe('saves measures the deferred write, not the enqueue', () => {
     expect(GAME_TS).toContain('const sample = this.tickProfiler.currentSample();');
     expect(TICK_PROFILER_TS).toContain("target.addToSample(sample, 'saves', ms);");
     expect(TICK_PROFILER_TS).toContain("target.addToSample(sample, 'total', ms);");
-    expect(GAME_TS).toContain('void this.saveMarket(sample);');
-    expect(GAME_TS).toContain('void this.saveMail(sample);');
-    expect(GAME_TS).toContain('void this.saveRifts(sample);');
+    // The Phase 18 QA fix round extracted the flush body into
+    // server/periodic_save_flush.ts, so the three calls are now thunks handed to
+    // runPeriodicSaveFlush rather than bare statements. What this arm cares about
+    // is unchanged and is still the whole point: each writer is reached from the
+    // saves phase AND is handed the profiler sample, so its time lands in the
+    // phase's own budget instead of going unattributed. The sibling suite
+    // tests/server/periodic_save_flush.test.ts pins the same property plus
+    // exactly-once, which the old bare-statement form could not.
+    expect(GAME_TS).toContain('saveMarket: () => this.saveMarket(sample),');
+    expect(GAME_TS).toContain('saveMail: () => this.saveMail(sample),');
+    expect(GAME_TS).toContain('saveRifts: () => this.saveRifts(sample),');
     expect(GAME_TS).toContain('createSerialWriter(this.onSaveMs)');
     expect(GAME_TS).not.toMatch(/createSerialWriter\(\s*\)/);
   });

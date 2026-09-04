@@ -188,6 +188,14 @@ as the score and tie-break on that row. Cross-surface agreement is pinned by
    `ACH_<UPPER_SNAKE>` mapping in `server/steam/achievement_map.ts` (hard
    cap 100 registered names; API names are stable forever).
 
+A deed whose reward is a TITLE carries a same-change twin: its `DeedDef` in
+`src/sim/content/deeds.ts` AND a slot on the `horizons_titles` page in
+`src/sim/content/reliquary.ts`. The coupling is pinned bidirectionally by
+`tests/reliquary_content.test.ts` (the page must list exactly the live
+non-hidden title rewards, with `col_reliquary_complete` as the one pinned
+exclusion), so a title deed without its Reliquary slot reds the pin rather
+than shipping unlisted.
+
 Every new piece of conquerable content (a dungeon, delve, raid, world boss,
 zone, or rare) authors its deeds in the SAME change that adds the content;
 the root `CLAUDE.md` content rule points here.
@@ -206,15 +214,75 @@ authors deeds like any other.
   seven server-assisted `feat_*` world/realm firsts): the v1 evaluator is
   strictly per-character and `server/deeds_records.ts` is observer-only; an
   account-level grant lane must exist first.
-- **`prog_ringwright`**: jewelcrafting and inscription have zero recipes
-  today (their depth arrives with the post-level-20 zone expansion, per
-  `docs/design/professions.md`), so the ten-craft ring cannot complete and
-  the deed would be visible yet unearnable. Their per-craft milestone and
-  Grandmaster deeds stay deferred with it. Enchanting is no longer a
-  blocker: it is player-wired (disenchant, apply-enchant, salvage) and its
-  deeds shipped.
+- **`prog_ringwright`**: every ring craft now has a live gain path (the
+  Masterwrought phase 06 inscription catalog closed the last gap, and its
+  milestone and Grandmaster deeds shipped with it), so the old
+  engine-surface blocker is gone. The deed stays deferred on a DIFFERENT
+  ground: no design for it is recorded anywhere (no trigger shape, no
+  threshold, no name text, no renown), and its reserved companions
+  `prog_three_paths` and `prog_ninefold` are equally unspecced, so shipping
+  it means inventing design numbers. It waits on a maintainer ruling
+  (queued at the phase 06 QA), not on content. Jewelcrafting is no longer a
+  blocker and no longer deferred at all: its base catalog shipped the
+  rare-tier milestone `prog_jewelcrafting_rare`, and the phase 05 QA ruling
+  (2026-08-10) authored its skill-50 and Grandmaster pair, completing the
+  craft's milestone family. The 125 cap is reachable on the base catalog
+  alone for an unattuned character, and post-attunement when jewelcrafting
+  is the pair or the hobby, the same reachability shape as every shipped
+  craft pair (the switchHobby quest keeps it open to everyone); earnability
+  is pinned by derivation in `tests/deeds_content.test.ts`. Enchanting is
+  not a blocker either: it is player-wired (disenchant, apply-enchant,
+  salvage) and its deeds shipped.
 - **`pvp_vcup_bet_flex`**: cut; no betting-adjacent deeds ship, even at 0
   Renown.
+
+### Farming capstone earnability
+
+- **`prog_farming_100` (the Harvestmaster title)** is earnable. Farmer Hollis
+  stocks the four tier-3 seeds and Farmer Verbena stocks the four tier-4 seeds,
+  each with a positive `buyValue`, so farming teaches through the profession cap
+  of 100. `feat_book_complete` therefore remains earnable too. The derivation in
+  `tests/deeds_content.test.ts` fails if either high-tier seed faucet disappears.
+
+### A recorded rule-2 exception (Masterwrought Phase 11e, `col_farm_roster`)
+
+- **`col_farm_roster` ("Every Furrow Filled") carries Renown 5 with a DERIVED
+  requirement set.** Its `markIds` are generated from `FARM_CROP_IDS`, so it is
+  the catalog's first `visits` deed whose requirements grow with content, and
+  rule 2 above says ZERO Renown for exactly that shape. The exception is
+  deliberate and was ruled explicitly (masterwrought DECISION E), so the ruling
+  stands; it is recorded HERE, beside the rule, because this file is what an
+  author reads before authoring the next one.
+- **Why it does not violate rule 2's stated reason.** That reason is that the
+  account score must never be able to decrease on a content patch, and it
+  cannot here: `deedsEarned` is sticky and `character_deeds` is insert-only, so
+  a player who has closed the roster keeps the 5 when a thirteenth crop ships.
+  What widens is an UNFINISHED collection, which has scored nothing yet.
+- **The one-line change that would resolve it the other way** is dropping the
+  row's `renown` to 0. Do not take it without re-opening DECISION E.
+- **For the next author:** a growing-requirement deed is still the wrong default.
+  Take this exception only where the earn is sticky and the score cannot fall.
+
+### A recorded rule-2 reading (Masterwrought Phase 13, `prog_legendmaker`)
+
+- **`prog_legendmaker` ("The Legendmaker") carries Renown 50 on a feeder whose
+  ATTEMPTS roll.** The deed counts orange promotions, and a promotion needs a
+  Perfected copy, which is reached through a four-rank fail-forward track at 0.8
+  per attempt: a failed attempt spends materials and never loses a rank, so the
+  OUTCOME is certain under effort and only the attempt count varies (expected
+  five attempts for four ranks). The promotion itself draws nothing. Rule 2's
+  "luck-dependent" set is the one whose outcome hinges on a roll with an
+  unbounded expected time (`col_first_rare`, `col_golden_harvest`,
+  `hid_roll_hundred`); this is luck-PACED, not luck-gated, the same reading that
+  scores `prog_masterwright` (a rolled proc) at 25.
+- **The honest weak clause:** rule 2 also says the luck-free guarantee covers the
+  board's completion-time tie-break, and this deed's earn DATE varies with the
+  rolls in week-sized units (the ember faucet is weekly), larger than a
+  masterwork proc's minutes. Recorded here so the next rolled-feeder deed is
+  judged against the same distinction rather than re-deriving it.
+- **The storefront decision** for this deed follows the Masterwrought family:
+  none of its deeds has a Steam or Epic achievement row, so its absence from
+  `achievement_map.ts` is deliberate, not an omission against step 7 above.
 
 The reviewed design blocks for all of these live in the deed catalog's
 authoring history; a deferred deed stays out of `DEED_ORDER` and off Steam

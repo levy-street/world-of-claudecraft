@@ -2,6 +2,8 @@
   import { onMount } from 'svelte';
   import type { ChatFilterData, ChatModeratedAccount } from '../types';
   import { apiGet, apiPost } from '../api';
+  import { type AdminLoadFailure, classifyAdminLoadFailure } from '../load_failure';
+  import PermissionDenied from '../components/PermissionDenied.svelte';
   import { auth } from '../state/auth.svelte';
   import { localizeAdminError, t } from '../i18n';
   import { fmtDate, fmtDuration } from '../format';
@@ -14,7 +16,7 @@
   // Chat filter tab: escalation config, the soft/hard word tiers, and the list of
   // chat-moderated accounts. Ported from renderChatFilter + wireChatFilterEvents.
   let data = $state<ChatFilterData | null>(null);
-  let failed = $state(false);
+  let failed = $state<AdminLoadFailure>('none');
   let warnings = $state(0);
   let ladder = $state('');
   let selectedLift = $state<ChatModeratedAccount | null>(null);
@@ -27,9 +29,9 @@
       data = await apiGet<ChatFilterData>('/admin/api/chat-filter');
       warnings = data.config.warningsBeforeMute;
       ladder = data.config.muteLadderSeconds.join(', ');
-      failed = false;
+      failed = 'none';
     } catch (err) {
-      if (!auth.handleAuthFailure(err)) failed = true;
+      if (!auth.handleAuthFailure(err)) failed = classifyAdminLoadFailure(err);
     }
   }
 
@@ -95,7 +97,9 @@
   onMount(() => { void refresh(); });
 </script>
 
-{#if failed}
+{#if failed === 'forbidden'}
+  <Panel title={t('nav.chatFilter')}><PermissionDenied /></Panel>
+{:else if failed === 'error'}
   <Panel title={t('nav.chatFilter')}><div class="empty">{t('chatFilter.loadFailed')}</div></Panel>
 {:else if data}
   <Panel title={t('chatFilter.escalationTitle')}>

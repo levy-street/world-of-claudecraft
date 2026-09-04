@@ -10,14 +10,53 @@
 // entities helpers live in run_scenarios.ts.
 
 import { describe, expect, it } from 'vitest';
-import { MOBS } from '../../src/sim/data';
+import {
+  HEROIC_DUNGEON_TUNING,
+  HEROIC_MARK_ITEM_ID,
+  NYTHRAXIS_HEROIC_COPPER,
+} from '../../src/sim/content/dungeon_difficulty';
+import { HEROIC_BOSS_LOOT } from '../../src/sim/content/heroic_loot';
+import { heroicVariantId } from '../../src/sim/content/heroic_variants';
+import { ITEMS, MOBS } from '../../src/sim/data';
+import { countRawInSlots, countUnlockedInSlots } from '../../src/sim/item_lock';
 import { RIFT_IMPAIRED_FUSE_CAP } from '../../src/sim/mob/rift_escape_window';
+import {
+  FARM_GOLDEN_BONUS_PATTERN_IDS,
+  FARM_SEED_BACK_TWO_CHANCE,
+  farmGoldenBonusSeedTier,
+  farmingHarvestGainAt,
+  farmSeedIdsOfTier,
+  resolveFarmHarvest,
+} from '../../src/sim/professions/farming';
+import { PERFECTING_ATTEMPT_COST, PERFECTING_RANKS } from '../../src/sim/professions/perfecting';
+import { riftNormalClearPool } from '../../src/sim/rift/loot_pools';
+import {
+  RIFT_COIN_BONUS_A,
+  RIFT_COIN_BONUS_B,
+  RIFT_COIN_BONUS_C,
+  RIFT_COIN_BONUS_S,
+  RIFT_PATTERN_ITEM_IDS,
+} from '../../src/sim/rift/progression';
 import { RIFT_S_ZONE_TEMPO } from '../../src/sim/rift/ranks';
 import { record } from './record';
 import { type Ev, entities, run } from './run_scenarios';
-import { SCENARIOS } from './scenarios';
+import {
+  FARM_GOLDEN_PADDING_CYCLES,
+  FARM_GOLDEN_WIN_YIELD_SEED,
+  FARM_TONIC_WINNER_YIELD_SEED,
+  HEROIC_FIVE_MAN_BOSS_ID,
+  HEROIC_FIVE_MAN_DUNGEON_ID,
+  PERFECTING_WALK_ATTEMPT_CAP,
+  SCENARIOS,
+} from './scenarios';
 
-describe('coverage: each scenario fires its subsystem', () => {
+// Explicit suite timeout, the run_scenarios.ts gate precedent: every case here
+// re-records its scenario (nythraxis_full_pull alone records a full raid
+// pull), and the heavy recordings brush the global 20s budget under
+// parallel-worker contention while green standalone (the same pathology the
+// gate's 90s per-test timeouts were minted for). Assertions are unchanged; a
+// genuine hang still fails, with room to finish under suite load.
+describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () => {
   it('mob_lifecycle: frenzy + death-throes arm/detonate + wild respawn (despawn adds) + dungeon stays dead', () => {
     const rec = run('mob_lifecycle');
     const n = rec.notes as Record<string, any>;
@@ -299,6 +338,77 @@ describe('coverage: each scenario fires its subsystem', () => {
     const tankMeta = [...sim.players.values()].find((m: any) => m.name === 'NyxTank') as any;
     expect(tankMeta.raidLockouts.has('nythraxis_boss_arena')).toBe(true);
     expect(chats.some((e) => e.text === 'Malric...')).toBe(true);
+    // The sibling-distinguishing arm (the rift ladder's fourth-arm idiom): this
+    // scenario's claim is NORMAL, which is precisely why it cannot cover a
+    // heroic loot stream and why nythraxis_heroic_claim below exists. If a
+    // future edit ever makes this pull heroic, BOTH scenarios would cover the
+    // same arm and the heroic one would silently stop being the only witness.
+    expect(
+      sim.instances.some(
+        (i: any) => i.partyKey !== null && i.mobIds.includes(n.bossId) && i.difficulty === 'heroic',
+      ),
+    ).toBe(false);
+  }, 90_000);
+
+  it('nythraxis_heroic_claim: the heroic loot arm (variant swap + heroic-only weapon + raised money base + marks)', () => {
+    const rec = run('nythraxis_heroic_claim');
+    const sim = rec.sim as any;
+    const n = rec.notes as Record<string, any>;
+    const boss = sim.entities.get(n.bossId);
+    expect(boss.dead).toBe(true);
+    // The claim really is heroic: the exact predicate rollLoot resolves.
+    expect(
+      sim.instances.some(
+        (i: any) => i.partyKey !== null && i.mobIds.includes(n.bossId) && i.difficulty === 'heroic',
+      ),
+    ).toBe(true);
+
+    const items: string[] = (boss.loot?.items ?? []).map((s: any) => s.itemId);
+    expect(items.length).toBeGreaterThan(0);
+
+    // EXACTLY ONE heroic-only weapon: the nythraxis_heroic_weapon group sums to
+    // 1.0, so a heroic kill always sheds one and a normal kill never can. The
+    // id set is DERIVED from the shipped table, never listed here, so a table
+    // re-cut moves this arm instead of leaving it green over a stale trio.
+    const heroicOnlyWeaponIds = HEROIC_BOSS_LOOT.nythraxis_scourge_of_thornpeak
+      .filter((e) => e.rollGroup !== undefined)
+      .map((e) => e.itemId as string);
+    expect(heroicOnlyWeaponIds.length).toBeGreaterThan(0);
+    expect(items.filter((id) => heroicOnlyWeaponIds.includes(id)).length).toBe(1);
+
+    // heroicItem() fired on the base table: every drop that HAS a raid-tier
+    // heroic variant came out as that variant. Asserted as a whole-list
+    // property rather than "at least one", so a swap that stopped firing for a
+    // single slot reds. The eligibility test is heroicVariantId's own index
+    // lookup, the exact question heroicItem asks, NOT a kind filter: a table
+    // that later sheds a plain junk or recipe row (the Phase 11f farming seeds
+    // and patterns are both) has no variant to swap to and must not be read as
+    // a swap that failed.
+    const missedSwap = items.filter(
+      (id) => !heroicOnlyWeaponIds.includes(id) && ITEMS[heroicVariantId(id)] !== undefined,
+    );
+    expect(
+      missedSwap,
+      `every drop with a heroic variant must BE that variant: ${missedSwap}`,
+    ).toEqual([]);
+    expect(items.filter((id) => id.startsWith('heroic_')).length).toBeGreaterThan(0);
+
+    // The heroicCopper substitution, and the reason the seed was hunted: the
+    // normal base rolls at most ceil(150000 * 1.4) = 210 000, so a roll above
+    // that could only have come off NYTHRAXIS_HEROIC_COPPER. The upper bound is
+    // pinned too, so a base re-tune cannot widen this arm into always-true.
+    expect(boss.loot.copper).toBeGreaterThan(Math.ceil(150_000 * 1.4));
+    expect(boss.loot.copper).toBeLessThanOrEqual(Math.ceil(NYTHRAXIS_HEROIC_COPPER * 1.4));
+
+    // awardHeroicMarks paid the whole raid, which only a heroic claim reaches.
+    const tuning = HEROIC_DUNGEON_TUNING.nythraxis_boss_arena;
+    const raid = [...sim.players.values()] as any[];
+    expect(raid.length).toBe(5);
+    for (const meta of raid) {
+      expect(sim.countItem(HEROIC_MARK_ITEM_ID, meta.entityId), `${meta.name} heroic marks`).toBe(
+        tuning.marksPerParticipant,
+      );
+    }
   }, 90_000);
 
   it('warrior_row_capstones: intervene, thresholded fear, victory rush heal, bladestorm ticks', () => {
@@ -365,7 +475,23 @@ describe('coverage: each scenario fires its subsystem', () => {
       itemId: 'eastbrook_ritual_vestments',
       crafter: pid,
     });
-    expect(trace.draws).toBe(3);
+
+    // The phase 07 daily-gate arm (step 4b): the catalyst success stamps
+    // craftDaily with real content and draws once like every success; the
+    // daily_limit re-attempt returns BEFORE any draw and leaves the stamp
+    // unmutated, so the scenario's total stays at exactly four draws (three
+    // pre-existing crafts + the catalyst; the two denials contribute zero).
+    expect(
+      crafts.some(
+        (e) => e.ok === true && e.itemId === 'quickening_catalyst' && e.masterwork === undefined,
+      ),
+    ).toBe(true);
+    expect(crafts.some((e) => e.ok === false && e.reason === 'daily_limit')).toBe(true);
+    expect(meta.craftDaily).toEqual({
+      date: '2099-06-25',
+      crafted: new Set(['recipe_quickening_catalyst']),
+    });
+    expect(trace.draws).toBe(4);
   });
 
   it('professions_gather: two draws per harvest, zero-draw denial, zone materials, and the hunted rare event fires', () => {
@@ -600,6 +726,445 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(slot.durability).toBe(29);
   });
 
+  it('farming_session: plants draw two each, every harvest a golden roll and its bonus, the tier-3 one the seed-back too', () => {
+    const { trace, rec } = record(SCENARIOS.find((s) => s.name === 'farming_session')!);
+    const ev = rec.allEvents as Ev[];
+    const pid = (rec.sim as any).playerId as number;
+    const meta = (rec.sim as any).players.get(pid);
+
+    // All five plants landed, in drive order, and each started the flavor
+    // cast. The second one is the load-bearing half of the busy gate (it only
+    // lands because the drive waits out the first cast); the third is the
+    // knobbed plant on the freed bed; the fourth is the tier-3 barley at the
+    // Thornpeak patch; the fifth is the Phase 8 ready-notice beat back on the
+    // freed northern bed.
+    expect(ev.filter((e) => e.type === 'farmPlanted').map((e) => e.bedId)).toEqual([
+      'bed_eastbrook_1',
+      'bed_eastbrook_2',
+      'bed_eastbrook_1',
+      'bed_thornpeak_1',
+      'bed_eastbrook_1',
+      // The Phase 11 (bw) extension: the padding cycles on the southern bed,
+      // the golden-WIN plant on the northern bed, one more padding cycle,
+      // then the paying-band barley at Thornpeak (see the drive's probe
+      // comment for why the padding walks the stream). The count is composed
+      // from the scenario's own constant, which Phase 11f re-probed from 28 to
+      // 36 when the golden bonus draw lengthened a cycle.
+      ...Array.from({ length: FARM_GOLDEN_PADDING_CYCLES }, () => 'bed_eastbrook_2'),
+      'bed_eastbrook_1',
+      'bed_eastbrook_2',
+      'bed_thornpeak_1',
+    ]);
+    // One flavor cast per plant, composed from the beats rather than a bare
+    // literal: the five scripted plants, one per padding cycle, the golden-win
+    // plant, the final padding cycle, and the paying barley.
+    const PLANTS = 5 + FARM_GOLDEN_PADDING_CYCLES + 1 + 1 + 1;
+    expect(
+      ev.filter((e) => e.type === 'castStart' && e.ability === 'farming'),
+      'every plant started the FARMING_CAST_ID flavor cast',
+    ).toHaveLength(PLANTS);
+    expect(PLANTS, 'the session plants 44 crops').toBe(44);
+
+    // THE READY NOTICE (Phase 8): the fifth plant is left standing across two
+    // 1 Hz boundaries, so the sweep fires EXACTLY once for it: a second event
+    // here means the notified flip stopped silencing the sweep, and zero
+    // means the sweep stopped observing ready plots at all. Counts only, no
+    // withered field on an all-survived notice.
+    expect(ev.filter((e) => e.type === 'farmReady')).toEqual([
+      { type: 'farmReady', pid, ready: 1 },
+    ]);
+
+    // THE DRAW LEDGER, the point of this scenario. rng.draws is cumulative
+    // from drive start: two draws per plant (the contiguous survival + yield
+    // seed pre-roll), EXACTLY one golden-harvest roll at EVERY harvest
+    // (both outcomes, the celebrations phase), plus the seed-back roll at
+    // the tier-3 harvest (so harvested-t3 sits at planted-t3 + 2, the
+    // contiguous pair), and NOTHING anywhere else. Growth windows and the
+    // husk trade sit at the count of the beat before them; the two tier-1
+    // opening harvests land together in the harvested frame at +2 (one
+    // golden roll each, survived and withered alike).
+    const drawsAt = (label: string): number => {
+      const frame = trace.frames.find((f) => f.label === label);
+      expect(frame, `missing the ${label} checkpoint frame`).toBeTruthy();
+      return frame?.rng.draws ?? -1;
+    };
+    // The ledger is spelled as ARITHMETIC over the contract's own terms rather
+    // than as bare cumulative literals, and it was re-derived that way at
+    // masterwrought Phase 11f, which added the golden BONUS roll and so moved
+    // every harvest by one. A wall of recomputed numbers would have been
+    // "adopt whatever the run printed"; written as sums, each line states the
+    // MODEL and the total falls out, so a wrong count names which beat is
+    // wrong instead of only that the file drifted.
+    const PLANT = 2; // the contiguous survival + yield-seed pre-roll
+    const HARVEST_LOW = 2; // tier 1/2: the golden roll, then the golden bonus
+    const HARVEST_HIGH = 3; // tier 3/4: the seed-back roll, then those two
+    const PAD_CYCLE = PLANT + HARVEST_LOW; // one tier-1 padding plant + harvest
+    expect(drawsAt('planted-first')).toBe(PLANT);
+    expect(drawsAt('planted')).toBe(2 * PLANT);
+    expect(drawsAt('grown')).toBe(2 * PLANT); // growth windows draw nothing
+    expect(drawsAt('harvested')).toBe(2 * PLANT + 2 * HARVEST_LOW);
+    expect(drawsAt('planted-knobbed')).toBe(3 * PLANT + 2 * HARVEST_LOW);
+    expect(drawsAt('harvested-toniced')).toBe(3 * PLANT + 3 * HARVEST_LOW);
+    expect(drawsAt('husks-converted')).toBe(3 * PLANT + 3 * HARVEST_LOW); // the trade draws nothing
+    expect(drawsAt('planted-t3')).toBe(4 * PLANT + 3 * HARVEST_LOW);
+    expect(drawsAt('harvested-t3')).toBe(4 * PLANT + 3 * HARVEST_LOW + HARVEST_HIGH);
+    // The Phase 8 ready-notice beat: its plant pre-rolls its pair, then
+    // NOTHING draws through the sweep that emits the notice or the sampled
+    // notified flag, and the closing tier-1 harvest spends exactly its own two.
+    expect(drawsAt('ready-noticed')).toBe(5 * PLANT + 3 * HARVEST_LOW + HARVEST_HIGH);
+    expect(drawsAt('harvested-noticed')).toBe(5 * PLANT + 4 * HARVEST_LOW + HARVEST_HIGH);
+    // The Phase 11 (bw) extension: the padding cycles plus the win plant put the
+    // golden-WIN harvest's rolls next, then the final padding cycle plus the
+    // barley plant put the paying seed-back triple last. The padding arithmetic
+    // is the probe comment in the drive; these sums are what pin it.
+    const AFTER_NOTICED = 5 * PLANT + 4 * HARVEST_LOW + HARVEST_HIGH;
+    const PLANTED_GOLDEN = AFTER_NOTICED + FARM_GOLDEN_PADDING_CYCLES * PAD_CYCLE + PLANT;
+    expect(drawsAt('planted-golden')).toBe(PLANTED_GOLDEN);
+    expect(drawsAt('harvested-golden-win')).toBe(PLANTED_GOLDEN + HARVEST_LOW);
+    const PLANTED_T3_PAYING = PLANTED_GOLDEN + HARVEST_LOW + PAD_CYCLE + PLANT;
+    expect(drawsAt('planted-t3-paying')).toBe(PLANTED_T3_PAYING);
+    const TOTAL = PLANTED_T3_PAYING + HARVEST_HIGH;
+    expect(drawsAt('harvested-t3-paying')).toBe(TOTAL);
+    // THE PHASE 12 BEAT-P FRAMES: the dish's tick-phase mint and the whole
+    // feast loop (place, bite, mint, expire) draw NOTHING, so the ledger closes
+    // with every appended frame flat.
+    expect(drawsAt('wellfed-eating')).toBe(TOTAL);
+    expect(drawsAt('wellfed-dish-minted')).toBe(TOTAL);
+    expect(drawsAt('feast-placed')).toBe(TOTAL);
+    expect(drawsAt('feast-bitten')).toBe(TOTAL);
+    expect(drawsAt('feast-wellfed-minted')).toBe(TOTAL);
+    expect(drawsAt('feast-expired')).toBe(TOTAL);
+    expect(trace.draws).toBe(TOTAL);
+    // The composed total, stated ONCE as a literal beside the arithmetic:
+    // without it a term that halved while another doubled would keep every sum
+    // above self-consistent and the whole ledger would slide together.
+    expect(TOTAL, 'the whole session costs 178 draws').toBe(178);
+
+    // The knobbed plant really stored all three paid flags (farmPlanted is
+    // knob-free on the wire, so the drive stashes the stored plot's flags).
+    expect(rec.notes.knobbedFlags).toEqual({ compost: true, watch: true, tonic: true });
+
+    // The first survived plot paid produce expanded from its stored yield
+    // seed: the guaranteed three-pick floor, with no pick upgrading at
+    // proficiency 0 (the fine chance there is 0.02), so BOTH fine fields stay
+    // absent and the common harvest keeps the pre-field wire shape. No
+    // seedBackCount either: tier 1 never rolls (the omit-zero doctrine).
+    const harvested = ev.filter((e) => e.type === 'farmHarvested');
+    expect(harvested).toHaveLength(6);
+    // The Phase 8 closing harvest: skill sits at 75-and-change by now, and its
+    // yieldSeed mints at a stream position the upstream rolls decide, so the
+    // expansion's exact count is the recorded truth of the re-recorded golden,
+    // a literal for the drawsAt reason above. It moved 3 -> 4 at Phase 11f
+    // because the golden BONUS draw re-seated every later mint by one per
+    // harvest; the SHAPE is what the arm is really about and did not move: no
+    // fine fields and no seed-back on a tier-1 crop, and no goldenBonusItemId
+    // because this harvest's own golden roll loses, so nothing multiplied.
+    expect(harvested[3]).toEqual({
+      type: 'farmHarvested',
+      pid,
+      bedId: 'bed_eastbrook_1',
+      cropId: 'vale_wheat',
+      itemId: 'vale_wheat',
+      count: 4,
+    });
+    expect('fineItemId' in harvested[3]).toBe(false);
+    expect('seedBackCount' in harvested[3]).toBe(false);
+    expect(harvested[0].bedId).toBe('bed_eastbrook_1');
+    expect(harvested[0].itemId).toBe('vale_wheat');
+    expect(harvested[0].count).toBe(3);
+    expect('fineItemId' in harvested[0]).toBe(false);
+    expect('fineCount' in harvested[0]).toBe(false);
+    expect('seedBackCount' in harvested[0]).toBe(false);
+
+    // The plot forced to fail paid husks INSTEAD of produce, and said so with
+    // its own event rather than a quiet empty harvest. Tier 1: no seed-back
+    // field on the withered arm either.
+    const withered = ev.filter((e) => e.type === 'farmWithered');
+    // One from the original forced-fail beat, then one per padding cycle plus
+    // the final one before the barley beat (all on the southern bed at the
+    // written skill-0 window, each paying the same two-husk batch, none
+    // carrying a seed-back field). Composed from the padding constant, so the
+    // Phase 11f re-probe moved this by construction rather than by hand.
+    const WITHERED = 1 + FARM_GOLDEN_PADDING_CYCLES + 1;
+    expect(withered).toHaveLength(WITHERED);
+    expect(WITHERED, 'the session withers 38 plots').toBe(38);
+    expect(withered[0].bedId).toBe('bed_eastbrook_2');
+    expect(withered[0].count).toBe(2);
+    expect('seedBackCount' in withered[0]).toBe(false);
+    for (const w of withered.slice(1)) {
+      expect(w.bedId).toBe('bed_eastbrook_2');
+      expect(w.count).toBe(2);
+      expect('seedBackCount' in w).toBe(false);
+    }
+
+    // The toniced harvest, on the probed WINNING yieldSeed the drive wrote
+    // (the M8 lesson: at a losing seed both expansions coincide and this
+    // beat proves nothing). The in-arm non-vacuity guard is the first
+    // assertion: the toniced expansion of that seed really exceeds the
+    // unarmed one at the harvest-time skill of 1 (the first harvest's +1
+    // gain had drained by then).
+    const toniced = resolveFarmHarvest(FARM_TONIC_WINNER_YIELD_SEED, 1, true);
+    const unarmed = resolveFarmHarvest(FARM_TONIC_WINNER_YIELD_SEED, 1, false);
+    expect(toniced.count).toBeGreaterThan(unarmed.count);
+    expect(toniced.fine).toBe(0); // the probe chose a fine-free winner
+    expect(harvested[1].bedId).toBe('bed_eastbrook_1');
+    expect(harvested[1].itemId).toBe('vale_wheat');
+    expect(harvested[1].count).toBe(toniced.count);
+    expect('fineItemId' in harvested[1]).toBe(false);
+    expect('seedBackCount' in harvested[1]).toBe(false);
+
+    // The husk trade: the withered beat paid exactly 2 husks, one batch, so
+    // one call converts them into exactly one compost.
+    const convertedEv = ev.filter((e) => e.type === 'farmHusksConverted');
+    expect(convertedEv).toHaveLength(1);
+    expect(convertedEv[0].husks).toBe(2);
+    expect(convertedEv[0].compost).toBe(1);
+
+    // The tier-3 harvest. The band is pinned as a LITERAL, the drawsAt style
+    // above: it is the recorded truth of the re-recorded farming_session
+    // golden and moves only with a deliberate re-record, never silently. Its
+    // history is the point: the celebrations phase's golden rolls re-seated
+    // the seed-back roll from the old draw 9 (0.297173, the one-seed band) to
+    // draw 12 (0.981881, the zero band), and masterwrought Phase 11f's golden
+    // BONUS draw re-seated it again, off the zero band and onto the TWO-seed
+    // band. Both are expected ledger shifts from an appended draw, not band
+    // retunes: FARM_SEED_BACK_TWO_CHANCE is untouched, which the arm below
+    // states directly rather than leaving to the reader. The bag consistency
+    // arm stays: the event's count must equal the highland_barley_seed bag
+    // delta (the drive granted 1 seed and the plant spent it, so the final bag
+    // IS the seed-back), and the base/fine grants must match their bags the
+    // same way.
+    const countOf = (itemId: string): number =>
+      meta.inventory
+        .filter((s: any) => s.itemId === itemId)
+        .reduce((n: number, s: any) => n + (s.count ?? 1), 0);
+    const barleyEv = harvested[2];
+    expect(barleyEv.bedId).toBe('bed_thornpeak_1');
+    expect(barleyEv.cropId).toBe('highland_barley');
+    const seedBack = (barleyEv.seedBackCount as number | undefined) ?? 0;
+    expect(seedBack).toBe(2);
+    // Present, because it is positive: the omit-zero doctrine says the field
+    // appears exactly when the roll paid, and this stream position now lands
+    // in the two-seed band.
+    expect('seedBackCount' in barleyEv).toBe(true);
+    // The band constants themselves are UNTOUCHED by the phase, stated here so
+    // "the shift is a re-seat, not a retune" is asserted rather than asserted
+    // in a comment. Their own literal pin lives in
+    // tests/professions_farming.test.ts.
+    expect(FARM_SEED_BACK_TWO_CHANCE[3]).toBe(0.08);
+
+    // THE PHASE 11 (bw) BEATS, in the same drawsAt-literal style: the golden
+    // WIN and the PAYING seed-back band are the recorded truth of the
+    // re-recorded golden and move only with a deliberate re-record.
+    const goldenEv = harvested[4];
+    const barleyPayingEv = harvested[5];
+    // The WIN: the five-fold applies to BOTH grades of the probed
+    // both-grades yield seed (the in-arm non-vacuity guard first, the M8
+    // rule: the unfolded expansion really is nonzero in base AND fine, so
+    // the x5 below cannot be five times zero on either grade).
+    const goldenExpansion = resolveFarmHarvest(FARM_GOLDEN_WIN_YIELD_SEED, 75);
+    expect(goldenExpansion.count).toBeGreaterThan(0);
+    expect(goldenExpansion.fine).toBeGreaterThan(0);
+    expect(goldenEv).toEqual({
+      type: 'farmHarvested',
+      pid,
+      bedId: 'bed_eastbrook_1',
+      cropId: 'vale_wheat',
+      itemId: 'vale_wheat',
+      count: goldenExpansion.count * 5,
+      fineItemId: 'fine_vale_wheat',
+      fineCount: goldenExpansion.fine * 5,
+      // THE GOLDEN BONUS (masterwrought Phase 11f), the one beat in the whole
+      // parity suite that reaches it. The literal is the recorded truth of the
+      // re-recorded golden, in the drawsAt style; the PROPERTY beside it is
+      // what the arm is really about and does not depend on the seed.
+      goldenBonusItemId: 'bog_beet_seed',
+    });
+    // The upward drift, asserted rather than left to the literal: a golden
+    // harvest of a TIER-1 crop pays a seed of tier 2, or (far more rarely) a
+    // farming pattern. Both sides derived from content, so a new tier-2 crop
+    // or a seventh pattern widens the claim by existing.
+    const bonusId = goldenEv.goldenBonusItemId as string;
+    const driftSeeds = farmSeedIdsOfTier(farmGoldenBonusSeedTier(1));
+    expect(driftSeeds, 'the tier-1 drift target must have seeds').not.toHaveLength(0);
+    expect(
+      driftSeeds.includes(bonusId) || FARM_GOLDEN_BONUS_PATTERN_IDS.includes(bonusId),
+      `${bonusId} is neither a tier-2 seed nor a farming pattern`,
+    ).toBe(true);
+    // And it is REALLY in the bags, not merely announced.
+    const bonusHeld = meta.inventory
+      .filter((slot: any) => slot.itemId === bonusId)
+      .reduce((n: number, slot: any) => n + (slot.count ?? 1), 0);
+    expect(bonusHeld, `${bonusId} must be granted, not just named`).toBe(1);
+    // The announce fanout: exactly ONE gatherRareEvent (one player in zone),
+    // the crop source naming the base grant, and the finder's visit mark
+    // written while the reliquary field-note stays the ledgered no-op.
+    const rare = ev.filter((e) => e.type === 'gatherRareEvent');
+    expect(rare).toHaveLength(1);
+    expect(rare[0]).toEqual({
+      type: 'gatherRareEvent',
+      pid,
+      flavor: 'golden_harvest',
+      finderName: 'Adventurer',
+      finderPid: pid,
+      zoneId: 'eastbrook_vale',
+      nodeType: 'crop',
+      itemId: 'vale_wheat',
+    });
+    expect(meta.deedStats.visited.has('gather_event:golden_harvest')).toBe(true);
+    // The Reliquary field note pages too since masterwrought Phase 18 (the
+    // ledgered cell deferral retired), so this arm flipped with the content.
+    expect(meta.reliquary.marks.has('gather_event:golden_harvest')).toBe(true);
+    // THE PAYING BAND: seedBackCount PRESENT at exactly one (the one-seed
+    // band, 0.08 <= 0.155753 < 0.4), the upgrade from the zero-band beat
+    // above whose grant proof degraded to 0 === 0.
+    expect(barleyPayingEv.bedId).toBe('bed_thornpeak_1');
+    expect(barleyPayingEv.cropId).toBe('highland_barley');
+    expect(barleyPayingEv.seedBackCount).toBe(1);
+
+    // Bag consistency across BOTH tier-3 beats: the zero-band beat left no
+    // seed and the paying beat's one seed-back is the only barley seed the
+    // player holds (each beat's granted seed was consumed by its own plant).
+    expect(countOf('highland_barley_seed')).toBe(seedBack + 1);
+    expect(countOf(barleyEv.itemId)).toBe(
+      (barleyEv.count as number) + (barleyPayingEv.count as number),
+    );
+    if (barleyEv.fineItemId !== undefined || barleyPayingEv.fineItemId !== undefined) {
+      const fineTotal =
+        ((barleyEv.fineCount as number | undefined) ?? 0) +
+        ((barleyPayingEv.fineCount as number | undefined) ?? 0);
+      expect(countOf('fine_highland_barley')).toBe(fineTotal);
+    }
+
+    // ONE LINE PER FARM GRANT (#2430), pinned where it is actually
+    // observable. Every farm payout goes through the shared inventory hub,
+    // whose "You receive: X" loot event must ride with { silent: true,
+    // callerLogs: true } so the client's own farming line is the only one a
+    // player sees. The drive's scaffolding grants keep the plain hub line,
+    // which is the inverse arm proving the flags come from the farming grant
+    // path and not from every loot event in the world. The partition is
+    // exhaustive and EXACT: no event may carry half the pair, the unflagged
+    // side is pinned to the eight scaffolding grants in drive order, and the
+    // flagged side is counted by arithmetic over the farm events themselves
+    // (one hub grant per base payout, per present fine pair, per present
+    // seedBackCount, per husk trade).
+    const loot = ev.filter((e) => e.type === 'loot');
+    const flagged = loot.filter((l) => l.silent === true && l.callerLogs === true);
+    const unflagged = loot.filter((l) => l.silent === undefined && l.callerLogs === undefined);
+    expect(flagged.length + unflagged.length, 'no loot event may carry half the flag pair').toBe(
+      loot.length,
+    );
+    const receiveLine = (itemId: string, count = 1): string =>
+      `You receive: ${(ITEMS as any)[itemId].name}${count > 1 ? ' x' + count : ''}.`;
+    expect(unflagged.map((l) => l.text)).toEqual([
+      receiveLine('vale_wheat_seed', 2),
+      receiveLine('garden_hoe'),
+      receiveLine('vale_wheat_seed'),
+      receiveLine('compost'),
+      receiveLine('growth_tonic'),
+      receiveLine('vale_wheat', 2),
+      receiveLine('skysilver_hoe'),
+      receiveLine('highland_barley_seed'),
+      receiveLine('vale_wheat_seed'), // the Phase 8 ready-notice beat's seed
+      // The Phase 11 (bw) extension's scaffolding, in drive order: one seed
+      // per padding cycle, the golden-win beat's seed, the final padding
+      // cycle's seed, then the paying tier-3 beat's barley seed. Composed from
+      // the padding constant, so the Phase 11f re-probe moved it by
+      // construction.
+      ...Array.from({ length: FARM_GOLDEN_PADDING_CYCLES + 2 }, () =>
+        receiveLine('vale_wheat_seed'),
+      ),
+      receiveLine('highland_barley_seed'),
+      // The Phase 12 beat-P scaffolding, in drive order: the dish the
+      // tick-phase mint eats, then the feast item the place verb spends.
+      receiveLine('evergarden_braised_greens'),
+      receiveLine('harvest_feast'),
+    ]);
+    const expectedFlagged =
+      harvested.reduce(
+        (n, e) =>
+          n +
+          1 +
+          (e.fineItemId !== undefined ? 1 : 0) +
+          (e.seedBackCount !== undefined ? 1 : 0) +
+          // The Phase 11f golden bonus is its own hub grant, and it carries
+          // the same flag pair: the farmHarvested line owns its feedback too.
+          (e.goldenBonusItemId !== undefined ? 1 : 0),
+        0,
+      ) +
+      withered.reduce((n, e) => n + 1 + (e.seedBackCount !== undefined ? 1 : 0), 0) +
+      convertedEv.length;
+    expect(flagged).toHaveLength(expectedFlagged);
+
+    // The bags agree with every beat: the fee spent 2 of the 5 produce held
+    // (3 banked + 2 scaffolding) before the toniced harvest re-paid, the
+    // Phase 8 closing harvest banked its own expansion on top (harvested[3]
+    // above, pinned there rather than restated here), the
+    // husk batch became the compost back in the bag (1 granted - 1 paid + 1
+    // converted), the tonic was consumed, and every seed pouch is empty
+    // except the seed-back. Both eastbrook beds and the thornpeak bed are
+    // free again (one visit takes the plot out on either outcome).
+    // The Phase 11 terms: the golden win banks its five-fold base grade on
+    // top (signed instances count like any stack member here), the fine
+    // grade is the win's alone, and the padding withers re-fill the husk
+    // pouch AFTER the convert beat (two per cycle, never converted again).
+    // Derived from the EVENTS rather than restating their literals: the arm's
+    // claim is that the two surfaces agree, and the first and closing harvest
+    // counts are already pinned above, so repeating them here would only make
+    // this line move whenever the stream re-seats a yield mint.
+    expect(countOf('vale_wheat')).toBe(
+      (harvested[0].count as number) +
+        toniced.count +
+        (harvested[3].count as number) +
+        goldenExpansion.count * 5,
+    );
+    expect(countOf('fine_vale_wheat')).toBe(goldenExpansion.fine * 5);
+    expect(countOf('withered_husks')).toBe(
+      withered.slice(1).reduce((n, w) => n + (w.count as number), 0),
+    );
+    expect(countOf('vale_wheat_seed')).toBe(0);
+    expect(countOf('compost')).toBe(1);
+    expect(countOf('growth_tonic')).toBe(0);
+
+    // THE PHASE 12 BEAT P, event and state truth. Exactly one
+    // farmFeastPlaced (the placer's own confirmation; everyone else learns
+    // by seeing the entity), and the post-drive world holds NO feast: the
+    // draw-free expiry write plus ONE 1 Hz updateFarming sweep dropped the
+    // entity and the FeastState together.
+    const placedEv = ev.filter((e) => e.type === 'farmFeastPlaced');
+    expect(placedEv).toHaveLength(1);
+    expect(placedEv[0].pid).toBe(pid);
+    const simAny = rec.sim as any;
+    expect(simAny.feasts.size).toBe(0);
+    expect(simAny.entities.get(placedEv[0].feastId)).toBeUndefined();
+    // The bite refreshed the dish mint (last-eaten-wins on the ONE unified
+    // 'well_fed' id, Masterwrought 11c): the drive ends Well Fed at the
+    // tier-4 dish's ladder value 5, and both beat-P items left the bags
+    // (the dish eaten, the feast spent at placement).
+    const wellfedAura = (simAny.player.auras as any[]).find((a) => a.id === 'well_fed');
+    expect(wellfedAura?.value).toBe(5);
+    expect(countOf('evergarden_braised_greens')).toBe(0);
+    expect(countOf('harvest_feast')).toBe(0);
+    expect(meta.farmPlots.size).toBe(0);
+
+    // The gathering-grant drain across the whole session: the first harvest
+    // and the toniced one both grant at low proficiency and are drained before
+    // the drive's proficiency write of 75, then the barley harvest's tier-3
+    // gain at 75 (tier 3 teaches past 75) lands on the tail ticks. The
+    // Phase 11 extension leaves the SAME final value by a different route:
+    // its padding withers at the written skill-0 window queue nothing, the
+    // win harvest at the written 75 grays on a tier-1 crop, and only the
+    // paying barley harvest adds its gain on top of the final restore of 75.
+    //
+    // STRICT equality, and the gain is READ rather than restated. Both halves
+    // are deliberate: reading it means a future re-tune moves this arm with the
+    // schedule instead of reddening it, and strict equality is now available at
+    // all because every gain is exactly representable (masterwrought 11e), so a
+    // toBeCloseTo here would tolerate the very accumulation drift the re-tune
+    // removed.
+    expect(meta.gatheringProficiency.farming).toBe(75 + farmingHarvestGainAt(75, 3));
+  });
+
   it('bank_round_trip: both banker-counter stores actually move (the re-mint guard)', () => {
     // The golden is what UPDATE_PARITY regenerates wholesale, so a silently
     // broken recipe (a moved banker failing the proximity gate, every vault op
@@ -813,6 +1378,125 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(deaths.length).toBeGreaterThanOrEqual(2);
   });
 
+  it('rift_clear_rewards: the winning A clear really pays the corpse ladder, pattern draw included', () => {
+    const rec = run('rift_clear_rewards');
+    const inst = rec.sim.riftInstances.find((i) => i.partyKey !== null);
+    expect(inst, 'the rift instance disappeared before the clear').toBeTruthy();
+    // completeRiftClear ran through the real sweep: won, rewarded, egress open.
+    expect(inst?.outcome).toBe('won');
+    expect(inst?.rewarded).toBe(true);
+    expect(inst?.exitId).not.toBeNull();
+    const boss = rec.sim.entities.get(rec.notes.bossId as number);
+    expect(boss, 'the tracked boss corpse disappeared before the payout').toBeTruthy();
+    const items = (boss?.loot?.items ?? []).map((entry) => entry.itemId);
+    // Draw 2 (the guaranteed heroic epic) plus draw 6 (the pattern) both landed:
+    // the seed is chosen so the 8% pattern roll SUCCEEDS in-window, so the golden
+    // pins the rng.int pick over the sorted RIFT_PATTERN_ITEM_IDS too, and this
+    // proves the recorded window really contains the whole payout, not a truncated
+    // run that never reached completeRiftClear.
+    const patterns = items.filter((id) =>
+      (RIFT_PATTERN_ITEM_IDS as readonly string[]).includes(id),
+    );
+    expect(patterns.length).toBe(1);
+    expect(items.length).toBeGreaterThanOrEqual(2);
+    expect(boss?.lootable).toBe(true);
+    // The A-rank clear-time coin bonus landed on top of the static boss coin.
+    expect(boss?.loot?.copper ?? 0).toBeGreaterThanOrEqual(RIFT_COIN_BONUS_A);
+  });
+
+  // The three sibling ranks (masterwrought Phase 11f). addRiftClearGearLoot's
+  // ladder is rank-gated, so one rank exercises only its own arms: before these
+  // three, draws 0, 1, 3 and 4 ran in no golden at all. Phase 11f appends a new
+  // draw after draw 6 on the same winning path, so the ladder is pinned at every
+  // rank FIRST and the append lands in a stream these goldens cover.
+  //
+  // Each arm asserts what its rank's arm REACHES, not merely that a clear paid:
+  // an assertion that passes at every rank would not tell the four apart, which
+  // is the whole point of recording them separately.
+  it('rift_clear_rewards_c: the C arm pays draw 0 and RETURNS before every other draw', () => {
+    const rec = run('rift_clear_rewards_c');
+    const inst = rec.sim.riftInstances.find((i) => i.partyKey !== null);
+    expect(inst?.outcome).toBe('won');
+    expect(inst?.rewarded).toBe(true);
+    const boss = rec.sim.entities.get(rec.notes.bossId as number);
+    const items = (boss?.loot?.items ?? []).map((entry) => entry.itemId);
+    // Draw 0 landed: exactly one guaranteed pick from the normal-clear pool.
+    const normalPool = new Set(riftNormalClearPool());
+    expect(items.filter((id) => normalPool.has(id)).length).toBe(1);
+    // The EARLY RETURN is the pin: no pattern (draw 6) and no mount (draw 5)
+    // can appear at C, whatever the seed, because the arm exits after draw 0.
+    // This is the decisive half; a C run that shed either would mean the
+    // early-out stopped exiting.
+    expect(items.filter((id) => (RIFT_PATTERN_ITEM_IDS as readonly string[]).includes(id))).toEqual(
+      [],
+    );
+    expect(items.filter((id) => id.startsWith('reins_'))).toEqual([]);
+    expect(items.length).toBe(1);
+    expect(boss?.loot?.copper ?? 0).toBeGreaterThanOrEqual(RIFT_COIN_BONUS_C);
+    expect(boss?.lootable).toBe(true);
+  });
+
+  it('rift_clear_rewards_b: the B arm pays draws 1, 5 and 6, and the pattern lands in-window', () => {
+    const rec = run('rift_clear_rewards_b');
+    const inst = rec.sim.riftInstances.find((i) => i.partyKey !== null);
+    expect(inst?.outcome).toBe('won');
+    const boss = rec.sim.entities.get(rec.notes.bossId as number);
+    const items = (boss?.loot?.items ?? []).map((entry) => entry.itemId);
+    // Draw 1: RIFT_EPIC_CHANCE_B is 1.0, so B always sheds its heroic epic.
+    // Draw 6: the seed was hunted so the 8% roll SUCCEEDS, which is what makes
+    // this golden pin the rng.int pick over the sorted id list rather than a miss.
+    const patterns = items.filter((id) =>
+      (RIFT_PATTERN_ITEM_IDS as readonly string[]).includes(id),
+    );
+    expect(patterns.length).toBe(1);
+    expect(items.length).toBeGreaterThanOrEqual(2);
+    // B is NOT S: no legendary roll (draws 3 and 4) is reachable on this arm.
+    expect(items.filter((id) => id.startsWith('reins_')).length).toBeLessThanOrEqual(1);
+    expect(boss?.loot?.copper ?? 0).toBeGreaterThanOrEqual(RIFT_COIN_BONUS_B);
+    expect(boss?.lootable).toBe(true);
+  });
+
+  it('rift_clear_rewards_s: the S arm reaches the legendary rolls and the pattern draw', () => {
+    const rec = run('rift_clear_rewards_s');
+    const inst = rec.sim.riftInstances.find((i) => i.partyKey !== null);
+    expect(inst?.outcome).toBe('won');
+    const boss = rec.sim.entities.get(rec.notes.bossId as number);
+    const items = (boss?.loot?.items ?? []).map((entry) => entry.itemId);
+    const patterns = items.filter((id) =>
+      (RIFT_PATTERN_ITEM_IDS as readonly string[]).includes(id),
+    );
+    expect(patterns.length).toBe(1);
+    // The S coin bonus is the arm's own discriminator: it is the only rank
+    // paying RIFT_COIN_BONUS_S, so this fails if the scenario silently drifted
+    // to another rank (a baseLevel typo would otherwise still look like a clear).
+    expect(boss?.loot?.copper ?? 0).toBeGreaterThanOrEqual(RIFT_COIN_BONUS_S);
+    expect(items.length).toBeGreaterThanOrEqual(2);
+    expect(boss?.lootable).toBe(true);
+  });
+
+  // The four rows tile the ladder between them rather than repeating one arm:
+  // stated as a test so a future edit that points two scenarios at the same
+  // baseLevel (the cheapest way to silently lose a rank) reds here.
+  it('the four rift reward scenarios cover four DISTINCT ranks', () => {
+    const names = [
+      'rift_clear_rewards_c',
+      'rift_clear_rewards_b',
+      'rift_clear_rewards',
+      'rift_clear_rewards_s',
+    ];
+    const bonuses = new Set<number>();
+    for (const name of names) {
+      const rec = run(name);
+      const boss = rec.sim.entities.get(rec.notes.bossId as number);
+      bonuses.add(boss?.loot?.copper ?? 0);
+    }
+    // C and B share a coin bonus literal (both 10 000c), so the copper alone
+    // cannot separate all four; the C arm's item shape above is what tells
+    // those two apart. Three distinct totals is the honest claim here.
+    expect(bonuses.size).toBeGreaterThanOrEqual(3);
+    expect(SCENARIOS.filter((s) => s.name.startsWith('rift_clear_rewards')).length).toBe(4);
+  });
+
   it('supported_elevation_line_of_sight: heals across the stall jump and denies airborne cover sight', () => {
     const rec = run('supported_elevation_line_of_sight');
     const events = rec.allEvents as Ev[];
@@ -840,6 +1524,191 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(lineOfSightErrors).toHaveLength(1);
   });
 
+  it('perfecting_walk: denials draw nothing, every resolved attempt draws once, the bagged apex stamps Perfected and the worn one binds in place', () => {
+    const { trace, rec } = record(SCENARIOS.find((s) => s.name === 'perfecting_walk')!);
+    const ev = rec.allEvents as Ev[];
+    const pid = rec.notes.pid as number;
+    const meta = (rec.sim as any).players.get(pid);
+    const errors = ev
+      .filter((e) => e.type === 'error' && e.pid === pid)
+      .map((e) => e.text as string);
+    const logs = ev.filter((e) => e.type === 'log' && e.pid === pid).map((e) => e.text as string);
+
+    // The SIX deny arms the drive stages, each answered by its DEDICATED
+    // line and nothing else on the error channel, in drive order. The
+    // post-stamp denial changed lines at phase 13: a nameless perfect_item on
+    // a Perfected copy now routes to the promotion ladder, whose first
+    // answer here is the missing-name refusal (the perfectAlready line is
+    // retired from the sim). The last three joined at masterwrought Phase 18,
+    // which moved the ladder's remaining arms onto this scenario; the
+    // lock-only line is the one that matters most here, because a regression
+    // that dropped its split would answer the GENUINE shortfall line instead
+    // and this equality is what says which one landed.
+    expect(errors).toEqual([
+      'Perfecting that requires 125 skill in the craft that made it.',
+      'That work needs a name to become a legend.',
+      'You lack the materials to perfect that item.',
+      "You don't have that item.",
+      'Only Masterwrought items can be perfected.',
+      'A material needed for perfecting is locked.',
+    ]);
+
+    // One bind per piece (the R2 stamp fires on the FIRST resolved attempt
+    // only), one done line (the neck alone can complete), and the neck's
+    // advances are the whole rank track in order; the ring's advances (zero
+    // to two) are whatever it rolled.
+    const binds = logs.filter((t) => /^Perfecting begins: .+ is now bound to you\.$/.test(t));
+    expect(binds).toEqual([
+      'Perfecting begins: Wyrmfall Pendant is now bound to you.',
+      'Perfecting begins: Warhewn Signet is now bound to you.',
+    ]);
+    expect(logs.filter((t) => /^.+ is now Perfected!$/.test(t))).toEqual([
+      'Wyrmfall Pendant is now Perfected!',
+    ]);
+    // The rank track is spelled from the module's constant on BOTH sides (the
+    // emit interpolates the same import), so pin the constant here too or the
+    // arm would follow a retuned rank count without noticing.
+    expect(PERFECTING_RANKS).toBe(4);
+    const advances = logs.filter((t) => /^Perfecting: .+ advances to rank \d+ of \d+\.$/.test(t));
+    expect(advances.filter((t) => t.startsWith('Perfecting: Wyrmfall Pendant'))).toEqual(
+      Array.from(
+        { length: PERFECTING_RANKS },
+        (_, i) => `Perfecting: Wyrmfall Pendant advances to rank ${i + 1} of ${PERFECTING_RANKS}.`,
+      ),
+    );
+    const fails = logs.filter(
+      (t) => t === 'The perfecting attempt fails; the materials are spent.',
+    );
+    // The fail-forward arm must really have fired on the pinned seed (a walk
+    // with no failure at all has about a one-in-four chance): otherwise the
+    // coverage string above would sit in the golden asserting an arm the
+    // recording never reached (the professions_craft "proc missed for the
+    // pinned seed" doctrine).
+    expect(fails.length, 'the fail-forward arm fired on the pinned seed').toBeGreaterThan(0);
+
+    // THE DRAW LEDGER, the point of this scenario: cumulative from drive
+    // start, spelled as arithmetic over the contract's own terms. Zero at the
+    // staged frame and the skill denial (nothing before them draws either:
+    // the level jump and the grants are draw-free), one per resolved attempt
+    // across the bagged walk, unchanged across the post-stamp denial, exactly
+    // two more for the worn attempts, unchanged across the ember strip and
+    // the materials denial, and NOTHING else.
+    const frameAt = (label: string) => {
+      const frame = trace.frames.find((f) => f.label === label);
+      if (!frame) throw new Error(`missing the ${label} checkpoint frame`);
+      return frame;
+    };
+    const drawsAt = (label: string): number => frameAt(label).rng.draws;
+    const stateAt = (label: string): string => frameAt(label).state;
+    const baggedAttempts = rec.notes.baggedAttempts as number;
+    // (The drive's own loop bound already caps this from above; the completed
+    // stamp below is what proves the walk finished inside it.)
+    expect(baggedAttempts).toBeGreaterThanOrEqual(PERFECTING_RANKS);
+    const WORN_ATTEMPTS = 2;
+    expect(drawsAt('perfect-staged')).toBe(0);
+    expect(drawsAt('perfect-denied-skill')).toBe(0);
+    expect(drawsAt('perfect-bagged-walked')).toBe(baggedAttempts);
+    expect(drawsAt('perfect-denied-perfected')).toBe(baggedAttempts);
+    expect(drawsAt('perfect-worn-attempted')).toBe(baggedAttempts + WORN_ATTEMPTS);
+    expect(drawsAt('perfect-embers-stripped')).toBe(baggedAttempts + WORN_ATTEMPTS);
+    expect(drawsAt('perfect-denied-materials')).toBe(baggedAttempts + WORN_ATTEMPTS);
+    // The three Phase 18 arms draw nothing either, so the ledger is flat from
+    // the materials denial to the end of the drive.
+    expect(drawsAt('perfect-staged-noitem')).toBe(baggedAttempts + WORN_ATTEMPTS);
+    expect(drawsAt('perfect-denied-noitem')).toBe(baggedAttempts + WORN_ATTEMPTS);
+    expect(drawsAt('perfect-denied-notapex')).toBe(baggedAttempts + WORN_ATTEMPTS);
+    expect(drawsAt('perfect-materials-locked')).toBe(baggedAttempts + WORN_ATTEMPTS);
+    expect(drawsAt('perfect-denied-locked')).toBe(baggedAttempts + WORN_ATTEMPTS);
+    expect(trace.draws).toBe(baggedAttempts + WORN_ATTEMPTS);
+    // ...and every draw is accounted for by exactly one notice: an advance or
+    // a fail, never both, never neither.
+    expect(advances.length + fails.length).toBe(trace.draws);
+
+    // Every staged denial is a NO-OP on the sampled state, not merely
+    // draw-free: the frame after each denial digests byte-identical to the
+    // frame before it (bags, payloads, skills, equipment all unmoved), so a
+    // denial that spent a material or touched the copy reds here even though
+    // the end-of-run totals below would still reconcile. (wireRev is a
+    // sampler exclusion, so a spurious wire bump on a deny arm is the one
+    // mutation this pin cannot see.)
+    expect(stateAt('perfect-denied-skill')).toBe(stateAt('perfect-staged'));
+    expect(stateAt('perfect-denied-perfected')).toBe(stateAt('perfect-bagged-walked'));
+    expect(stateAt('perfect-denied-materials')).toBe(stateAt('perfect-embers-stripped'));
+    // The Phase 18 arms take the same bracket. The not-apex arm is bracketed
+    // by the noItem denial's own frame rather than a staged one, which is
+    // sound precisely because that denial is itself proven a no-op on the
+    // line above: two consecutive no-ops leave one unmoved digest across all
+    // three frames, so a not-apex arm that consumed a material still reds.
+    expect(stateAt('perfect-denied-noitem')).toBe(stateAt('perfect-staged-noitem'));
+    expect(stateAt('perfect-denied-notapex')).toBe(stateAt('perfect-denied-noitem'));
+    expect(stateAt('perfect-denied-locked')).toBe(stateAt('perfect-materials-locked'));
+    // The lock-only arm's PREMISE, so it cannot go vacuous by decaying into
+    // the genuine shortfall it is supposed to be distinguished from: the
+    // locking really happened (cells were locked), and the raw counts still
+    // meet the whole bill at the moment of the denial.
+    expect(rec.notes.lockedCells as number).toBeGreaterThanOrEqual(PERFECTING_ATTEMPT_COST.length);
+    for (const c of PERFECTING_ATTEMPT_COST) {
+      expect(countRawInSlots(meta.inventory, c.itemId), `raw ${c.itemId}`).toBeGreaterThanOrEqual(
+        c.count,
+      );
+      expect(countUnlockedInSlots(meta.inventory, c.itemId), `unlocked ${c.itemId}`).toBeLessThan(
+        c.count,
+      );
+    }
+
+    // The bagged copy at rest: bound to the perfecter, the track field gone,
+    // the stamp on, the R5 delta merged (an int 8 / sta 6 neck with a +1
+    // delta: largest-remainder puts the point on int).
+    const neck = meta.inventory.find((s: any) => s.itemId === 'wyrmfall_pendant');
+    expect(neck?.instance).toEqual({
+      boundTo: meta.entityId,
+      perfected: true,
+      rolled: { stats: { int: 1 } },
+    });
+    // The worn copy: seated on ring1 by the resolver, bound by its first
+    // attempt, mid-track (two attempts can never stamp), never stat-baked.
+    expect(meta.equipment.ring1).toBe('warhewn_signet');
+    const ring = meta.equipmentInstance.ring1;
+    expect(ring?.boundTo).toBe(meta.entityId);
+    expect(ring?.perfected).toBeUndefined();
+    expect(ring?.rolled).toBeUndefined();
+    const ringAdvances = advances.filter((t) => t.startsWith('Perfecting: Warhewn Signet')).length;
+    expect(ringAdvances).toBeLessThanOrEqual(WORN_ATTEMPTS);
+    expect(ring?.perfecting).toBe(ringAdvances === 0 ? undefined : ringAdvances);
+
+    // The bill: one of EACH material per resolved attempt, and no denial ever
+    // spent one. The ember (the pacing lever) is billed from the count the
+    // drive stashed just before stripping the stack to stage the last denial;
+    // the other two are read off the live bags.
+    // Billed PER COST-TABLE ENTRY (c.count, not an assumed 1), so a retuned
+    // per-attempt count reds here for the right reason, and a NEW material
+    // joining the table fails loudly until the readings map names it.
+    const haveById: Record<string, number> = {
+      sundered_essence: (rec.sim as any).countItem('sundered_essence', pid),
+      prismglass_setting: (rec.sim as any).countItem('prismglass_setting', pid),
+      makers_ember: rec.notes.emberBeforeStrip as number,
+    };
+    const remainingAttempts = PERFECTING_WALK_ATTEMPT_CAP + WORN_ATTEMPTS - trace.draws;
+    expect(Object.keys(haveById).sort()).toEqual(
+      PERFECTING_ATTEMPT_COST.map((c) => c.itemId).sort(),
+    );
+    for (const c of PERFECTING_ATTEMPT_COST) {
+      expect(haveById[c.itemId], c.itemId).toBe(c.count * remainingAttempts);
+    }
+
+    // The stamp reaches the GOLDEN, not just the live sim: the final frame's
+    // player sample carries the perfected copy and the bound worn copy
+    // (inventory and equipmentInstance are sampled, never excluded), so a
+    // sampler exclusion or a payload-shape change would move the golden
+    // rather than hide behind it.
+    const final = trace.frames[trace.frames.length - 1];
+    expect(final.label).toBe('final');
+    const sampled = (final.players as any[])[0];
+    const sampledNeck = sampled.inventory.find((s: any) => s.itemId === 'wyrmfall_pendant');
+    expect(sampledNeck?.instance?.perfected).toBe(true);
+    expect(sampledNeck?.instance?.perfecting).toBeUndefined();
+    expect(sampled.equipmentInstance?.ring1?.boundTo).toBe(meta.entityId);
+  });
   it('ignivar_raid_tuning: pins live Heroic rays, final Brands, and wipe cooldown recovery', () => {
     const rec = run('ignivar_raid_tuning');
     const notes = rec.notes as Record<string, unknown>;
@@ -870,5 +1739,122 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(notes.visitorCooldownRetained).toBe(true);
     expect(notes.raiderCooldownReset).toBe(true);
     expect(notes.encounterReset).toBe(true);
+  });
+
+  it('heroic_five_man_clear: one shared heroic claim, the variant swap and appended draws, marks and the lockout to every participant', () => {
+    const rec = run('heroic_five_man_clear');
+    const sim = rec.sim as any;
+    const partyPids = rec.notes.partyPids as number[];
+    const boss = sim.entities.get(rec.notes.bossId as number);
+
+    // ONE claim, shared: all five walked the door and joined the same
+    // instance, which is the premise the marks arm below is measured against
+    // (a party left outside would record a one-player payout).
+    expect(partyPids).toHaveLength(5);
+    expect(rec.notes.instanceMembers).toEqual([...partyPids].sort((a, b) => a - b));
+    const heroicClaims = sim.instances.filter(
+      (i: any) => i.dungeonId === HEROIC_FIVE_MAN_DUNGEON_ID && i.difficulty === 'heroic',
+    );
+    expect(heroicClaims).toHaveLength(1);
+
+    // The kill really resolved and really rolled loot.
+    expect(boss.dead).toBe(true);
+    const droppedIds = ((boss.loot?.items ?? []) as any[]).map((s) => s.itemId);
+    expect(droppedIds.length).toBeGreaterThan(0);
+
+    // ARM 1, the heroicItem swap: at least one drop came back as its heroic_
+    // copy of a BASE-table id, which is the arm the raid claim cannot reach
+    // (its variants read the raid tier instead). The base id is asserted too,
+    // so the swap is proven against the table rather than against a prefix.
+    const baseTableIds = new Set(
+      ((MOBS[HEROIC_FIVE_MAN_BOSS_ID].loot ?? []) as any[])
+        .map((e) => e.itemId)
+        .filter((id): id is string => typeof id === 'string'),
+    );
+    const swapped = droppedIds.filter(
+      (id) => id.startsWith('heroic_') && baseTableIds.has(id.slice('heroic_'.length)),
+    );
+    expect(swapped.length, `no variant swap in ${droppedIds.join(',')}`).toBeGreaterThan(0);
+    for (const id of swapped) {
+      expect(ITEMS[id]?.heroicOf, id).toBe(id.slice('heroic_'.length));
+    }
+
+    // ARM 2, the APPENDED heroic-only table: at least one drop came from
+    // HEROIC_BOSS_LOOT rather than the base walk, which is the stream position
+    // a base-table tail append shifts.
+    const heroicOnlyIds = new Set(
+      (HEROIC_BOSS_LOOT[HEROIC_FIVE_MAN_BOSS_ID] ?? []).map((e) => e.itemId),
+    );
+    expect(
+      droppedIds.filter((id) => heroicOnlyIds.has(id)).length,
+      `no appended heroic drop in ${droppedIds.join(',')}`,
+    ).toBeGreaterThan(0);
+
+    // ARM 3, awardHeroicMarks on a FIVE-MAN: the tuning's marksPerParticipant
+    // to EVERY participant (the raid pays 3, so the number itself says which
+    // table answered), plus the per-difficulty daily lockout and NOT the plain
+    // normal key.
+    const tuning = HEROIC_DUNGEON_TUNING[HEROIC_FIVE_MAN_DUNGEON_ID];
+    expect(tuning.marksPerParticipant).toBe(1);
+    for (const pid of partyPids) {
+      expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid), `marks pid ${pid}`).toBe(
+        tuning.marksPerParticipant,
+      );
+      const lockouts = sim.players.get(pid).raidLockouts;
+      expect(lockouts.has(`${HEROIC_FIVE_MAN_DUNGEON_ID}:heroic`), `lock pid ${pid}`).toBe(true);
+      expect(lockouts.has(HEROIC_FIVE_MAN_DUNGEON_ID), `plain key pid ${pid}`).toBe(false);
+    }
+    // Marks are paid into the bags, never onto the corpse.
+    expect(droppedIds).not.toContain(HEROIC_MARK_ITEM_ID);
+  });
+
+  it('flask_consumables: one flask ever rides, upward replaces, downward refuses, and the whole path draws nothing', () => {
+    const { trace, rec } = record(SCENARIOS.find((s) => s.name === 'flask_consumables')!);
+    const sim = rec.sim as any;
+    const pid = rec.notes.pid as number;
+    const p = sim.entities.get(pid);
+    const ev = rec.allEvents as Ev[];
+
+    // The whole use path is draw-free, which is worth a golden on its own: a
+    // consumable that STARTS drawing shifts every later draw in its host.
+    expect(trace.draws).toBe(0);
+
+    const frameAt = (label: string) => {
+      const frame = trace.frames.find((f) => f.label === label);
+      if (!frame) throw new Error(`missing the ${label} checkpoint frame`);
+      return frame;
+    };
+    const stateAt = (label: string): string => frameAt(label).state;
+
+    // BEAT 3, the downward refusal, is the one that can regress silently, so
+    // it is pinned as a state NO-OP between its bracketing frames (bags and
+    // auras alike unmoved) and by its own refusal line.
+    expect(stateAt('flask-downgrade-refused')).toBe(stateAt('flask-upgraded'));
+    const errors = ev.filter((e) => e.type === 'error' && e.pid === pid).map((e) => e.text);
+    expect(errors).toEqual(['A more powerful effect is already active.']);
+    // The refused unit was NOT consumed. Two went in and beat 1 spent one, so
+    // one remains: a refusal that quietly drank would leave zero. (The digest
+    // equality above is the decisive half, since the bags are sampled; this
+    // spells the arithmetic so the count is readable on its own.)
+    expect(sim.countItem('elixir_of_the_serpent', pid)).toBe(1);
+
+    // BEATS 1, 2 and 4 really moved the aura set, so the no-op above is a
+    // refusal rather than a path that does nothing at all. Each of the three
+    // quaffs that landed spent exactly one unit.
+    expect(stateAt('flask-elixir-up')).not.toBe(stateAt('flasks-staged'));
+    expect(stateAt('flask-upgraded')).not.toBe(stateAt('flask-elixir-up'));
+    expect(stateAt('flask-family-swapped')).not.toBe(stateAt('flask-downgrade-refused'));
+    expect(sim.countItem('ironhusk_flask', pid)).toBe(1);
+    expect(sim.countItem('warboar_flask', pid)).toBe(1);
+
+    // THE ONE-FLASK RULE at rest: exactly one flask-MARKED aura rides, and it
+    // is the last family quaffed. Keyed on the marker, never the aura id or
+    // the item kind, which is what the sim keys on.
+    const flaskAuras = (p.auras as any[]).filter((a) => a.flask === true);
+    expect(flaskAuras).toHaveLength(1);
+    expect(flaskAuras[0].kind).toBe('buff_ap');
+    // ...and the stamina family it replaced is gone entirely, so the strip
+    // shed the aura rather than leaving a stale second one behind.
+    expect((p.auras as any[]).filter((a) => a.kind === 'buff_sta')).toEqual([]);
   });
 });

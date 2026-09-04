@@ -482,6 +482,14 @@ export const EASTBROOK_TOWN_MOTION_CAPTURE = Object.freeze({
 const MAILBOX_ASSET_URL = '/models/props/mailbox_pillar.glb';
 const NOTICEBOARD_ASSET_URL = '/models/props/eastbrook_noticeboard.glb';
 export const EASTBROOK_POLISH_BASELINE_REVISION = '3ab740db453bd8b5858a52c304edc811c9d520ca';
+// DELIBERATE EXCLUSION (recorded by the Phase 16 QA, 2026-08-30): the zone
+// prewarm-group builders extracted out of renderer.ts into
+// src/render/zone_prewarm_groups.ts are NOT a leaf here. The polish evidence's
+// claims are about the town's meshes, shaders, layout and view policy, none of
+// which the prewarm grouping decides; the rendererIntegration leaf still
+// covers the renderer's own call sites. Add the module as a leaf at the next
+// legitimate re-mint only if a future capture's claims come to depend on
+// prewarm behavior.
 export const EASTBROOK_POLISH_PROVENANCE_INPUTS = Object.freeze({
   townAssetSourceFingerprint: 'scripts/assets/eastbrook_town/source_fingerprint.mjs',
   authoritativeLayout: 'src/sim/eastbrook_layout.ts',

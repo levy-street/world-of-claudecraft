@@ -23,6 +23,9 @@ import { createHttpMetrics, HTTP_REQUESTS_TOTAL } from '../../../server/http/met
 
 function stubSource(): GameStateSource {
   return {
+    usernameBanlistLoaded: () => true,
+    characterBlobBytesHighWater: () => 0,
+    characterBlobBytesP99: () => 0,
     playersOnline: () => 0,
     accountsOnline: () => 0,
     wsConnections: () => 0,
@@ -72,6 +75,7 @@ function stubSource(): GameStateSource {
     dbPool: () => ({ total: 0, idle: 0, waiting: 0 }),
     dbBackendCancels: () => ({ requested: 0, failed: 0 }),
     bankLedgerTail: () => ({ depth: 0, rows: 0, droppedRows: 0 }),
+    soldVolumeTail: () => ({ depth: 0, coalescedSales: 0, droppedSales: 0 }),
     generalChatQuotaDbPool: () => ({ total: 0, idle: 0, waiting: 0 }),
     generalChatQuotaInFlight: () => 0,
     generalChatQuotaCachedAccounts: () => 0,

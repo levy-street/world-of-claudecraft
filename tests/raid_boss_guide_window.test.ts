@@ -10,7 +10,10 @@ import {
   raidBossGuideContextFallback,
 } from '../src/ui/raid_boss_guide_window';
 
-vi.mock('../src/ui/icons', () => ({
+vi.mock('../src/ui/icons', async (importOriginal) => ({
+  // Additive, never bare (the reliquary_window_behavior lesson): the real
+  // module passes through and only iconDataUrl stays stubbed.
+  ...(await importOriginal<typeof import('../src/ui/icons')>()),
   iconDataUrl: (_kind: string, id: string) => `mock:${id}`,
 }));
 

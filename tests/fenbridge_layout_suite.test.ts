@@ -647,8 +647,29 @@ describe('Fenbridge content projection and preservation', () => {
     expect(Object.keys(ZONE2_NPCS)).toEqual(FENBRIDGE_LAYOUT.services.npcs.map((npc) => npc.id));
     // Re-pinned for q_rite_of_redemption joining brother_aldric_fen's quest
     // list (the only NPC-payload delta vs the prior pin; zone2.ts diff-checked).
+    // Re-pinned again for the farming go-live: farmer_teasel joined ZONE2_NPCS
+    // (and this layout's services.npcs) as the ninth Fenbridge NPC; the eight
+    // prior payloads are byte-identical (zone2.ts diff-checked).
+    // Re-pinned at the Phase 18 seed-feeding copy pass (commit 58e904a4b6),
+    // which cleared the grandfathered em dashes out of the prose the mediawiki
+    // seed publishes. Exactly three payload fields moved, all greetings, all
+    // rewordings of a dash into a colon or a conjunction. No other field, no
+    // placement field, and no key order changed (proved by replaying the
+    // pre-pass zone2.ts against the current siblings: the payload reproduces
+    // the previous digest with only these three strings restored). The three
+    // are asserted BEFORE the digest so each moved field is described where it
+    // can actually fail, rather than only inside the hash.
+    expect(ZONE2_NPCS.brother_aldric_fen.greeting).toBe(
+      'The Light keep you above the water, $N. The dead in this fen do not sleep: they wade.',
+    );
+    expect(ZONE2_NPCS.provisioner_hale.greeting).toBe(
+      'Dry boots, dry bread, dry powder: at Fenbridge you get two of the three on a good day.',
+    );
+    expect(ZONE2_NPCS.scout_maren.greeting).toBe(
+      'Quiet feet and a short blade keep you breathing out here. Speak quick, for I am due back in the reeds.',
+    );
     expect(createHash('sha256').update(JSON.stringify(stableNpcPayload())).digest('hex')).toBe(
-      '7ba7c8ae4db5470fd76b7410698f113322e77df9fdad03415320a8988cccac0d',
+      '27011def4d1208cee33aaee8a80283204e5b639ff95294e8b11f51ae10dbfc24',
     );
     for (const placement of FENBRIDGE_LAYOUT.services.npcs) {
       expect(FENBRIDGE_NPC_PLACEMENTS_BY_ID[placement.id]).toBe(placement);

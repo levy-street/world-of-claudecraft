@@ -633,17 +633,38 @@ describe('missing painted deed and Heroic weapon integration', () => {
       'pvp_card_duel_first_win',
     ]);
     // Later releases appended more deeds after this historical wave. The
-    // release art audit painted those additions, so the wave's own claim is
-    // unchanged: every deed that existed when it landed is painted. The only
-    // artless ids are the post-audit appends (the walk-in castle visit pair,
-    // the Proving Shore graduation, and the Crucible raid block), riding the
-    // category-crest fallback the Icons authoring rule in
-    // docs/design/deeds.md sanctions until their 512px sources are
-    // commissioned (flagged in docs/achievements/icon-brief.md). Read from
-    // DEED_ART_PENDING, the one enumeration of that debt (src/ui/icons.ts),
-    // so this file cannot end up naming a different pending set than the
-    // other two art suites. Exhaustive: another artless deed still reds here.
-    expect(DEED_ORDER).toHaveLength(281);
+    // release art audit painted those additions, and the six Masterwrought
+    // jewelcrafting and inscription milestone deeds (phases 05 and 06) each
+    // shipped their crest in the change that added them. The only artless ids
+    // are the release's walk-in castle visit pair, its bank socket pair (Bank
+    // Storage phase 06), and the six farming
+    // celebration deeds appended after the audit, riding the category-crest
+    // fallback the Icons authoring rule in docs/design/deeds.md sanctions
+    // until their 512px sources are commissioned (flagged in
+    // docs/achievements/icon-brief.md). Read from DEED_ART_PENDING, the one
+    // enumeration of that debt (src/ui/icons.ts), so this file cannot end up
+    // naming a different pending set than the other two art suites.
+    // Exhaustive: an unenumerated artless deed still reds here.
+    // 286 at the farming absorb (Phase 11d): the base 273 plus the six
+    // Masterwrought milestone deeds plus farming's seven (six pending
+    // celebration deeds and the painted prog_farming_100 crest). 287 at Phase
+    // 11e, whose roster deed joins the PENDING side: that phase ships no crest
+    // under the packet's declared art park for 11e to 11k. 288 at Phase 11i,
+    // whose one deed (col_deepest_cast) joins the same pending side for the
+    // same reason, and 289 at Phase 11k, whose prog_field_to_feast does too.
+    // 290 at the release/v0.41.0 sync: the release's Proving Shore graduation
+    // deed (prog_ready_for_an_adventure, 273 to 274 on its own arm) joins the
+    // same pending side, riding the deed_cat_progression crest until its
+    // commissioned art lands. 291 at masterwrought Phase 13, whose promotion
+    // capstone (prog_legendmaker) joins the same pending side on the same
+    // crest: no title, so the Reliquary title-shelf rule does not force a
+    // committed crest. 293 at the v0.41.0 release-batch sync: the release's
+    // bank socket pair (Bank Storage phase 06, 274 to 276 on its own arm)
+    // joins the same pending side.
+    // 298 at the release/v0.41.0 merge (2026-08-30): the release's five
+    // Crucible raid deeds (276 to 281 on its own arm) join the same pending
+    // side on the deed_cat_dungeon crest.
+    expect(DEED_ORDER).toHaveLength(298);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
     const provenance = readFileSync(

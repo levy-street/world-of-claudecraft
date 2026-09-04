@@ -7,7 +7,7 @@ import { VISUALS } from '../src/render/characters/manifest';
 import { resolvePosition } from '../src/sim/colliders';
 import { DEEDS } from '../src/sim/content/deeds';
 import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
-import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
+import { FARM_HEROIC_PATTERN_GROUP, HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { heroicVariantId } from '../src/sim/content/heroic_variants';
 import {
   WILDHEART_DUNGEON_DEFS,
@@ -441,8 +441,14 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
     const entries = HEROIC_BOSS_LOOT.wildheart_high_priest;
     expect(entries).toBeDefined();
     // Gear rides exclusive roll groups; the mounts are group-less independent
-    // rolls appended after them (the house split, tests/dungeons.test.ts).
-    const gear = entries.filter((e) => e.rollGroup !== undefined);
+    // rolls appended after them (the house split, tests/dungeons.test.ts), and
+    // since masterwrought Phase 11f a farming pattern group is appended last.
+    // GEAR is what this arm is about, so the farm group is excluded by NAME
+    // rather than the group check being loosened: a stray third GEAR group
+    // still fails the membership assertion below.
+    const gear = entries.filter(
+      (e) => e.rollGroup !== undefined && e.rollGroup !== FARM_HEROIC_PATTERN_GROUP,
+    );
     const groupSum = (group: string) =>
       gear.filter((e) => e.rollGroup === group).reduce((a, e) => a + e.chance, 0);
     expect(groupSum('wildheart_heroic')).toBeCloseTo(1.0, 9);
@@ -456,6 +462,11 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
     // five-man uses: per-item rates stay at the house 0.33-0.34 (a dup-path
     // re-listing pushed re-listed chests to 0.56-0.66 per kill, above any
     // other heroic item in the game).
+    // WHOLE-TABLE uniqueness, farm rows INCLUDED: the two arms above exclude
+    // the farm group because they are about gear rates, but "no id is listed
+    // twice on this table" is true of every row and excluding any of them only
+    // narrows what the arm can catch. The farm ids are distinct here, so the
+    // unfiltered form is both correct today and stricter.
     const ids = entries.map((e) => e.itemId);
     expect(new Set(ids).size).toBe(ids.length);
     // Per-item literals, not only group sums: 0.9/0.05/0.05 also sums to 1.0
@@ -571,10 +582,15 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
   it('pays exactly two DISTINCT heroic epics per heroic Zulgar kill', () => {
     // GEAR ids only: the two mount entries are group-less 0.1% lotteries that
     // no realistic seed set hits, so counting them here would make the
-    // reachability assertion below unsatisfiable.
+    // reachability assertion below unsatisfiable. Since masterwrought Phase
+    // 11f the same is true of the appended farming pattern group (0.04 each),
+    // so it is excluded by NAME for exactly the same reason rather than the
+    // rollGroup test being loosened.
     const heroicIds = new Set(
       HEROIC_BOSS_LOOT.wildheart_high_priest.flatMap((e) =>
-        e.itemId && e.rollGroup !== undefined ? [e.itemId] : [],
+        e.itemId && e.rollGroup !== undefined && e.rollGroup !== FARM_HEROIC_PATTERN_GROUP
+          ? [e.itemId]
+          : [],
       ),
     );
     const seen = new Set<string>();

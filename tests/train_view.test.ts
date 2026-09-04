@@ -7,8 +7,10 @@
 // same plain fields either way; sim-only junk must be ignored).
 import { describe, expect, it } from 'vitest';
 import { STATIONS } from '../src/sim/content/professions';
-import { COMBO_RECIPES } from '../src/sim/content/recipes';
+import { COMBO_RECIPES, recipeById, TROPHY_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
+import { trainingFeeFor } from '../src/sim/professions/training';
+import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
 import {
   availableTrainCopper,
   buildTrainView,
@@ -16,6 +18,11 @@ import {
   isStationMasterNpc,
   type TrainViewDeps,
 } from '../src/ui/hud/vendor/train_view';
+
+/** A drop-taught armorcrafting recipe: a PATTERN item teaches it, a trainer
+ *  never can (resolveTrain refuses it as train_not_taught_here), and it homes
+ *  to the forge, so it rides the same window as the trainer rows below. */
+const PATTERN_ONLY_RECIPE = 'recipe_spiritweld_girdle';
 
 // Base deps: nothing learned, no skill, comfortable purse.
 function deps(over: Partial<TrainViewDeps> & Record<string, unknown> = {}): TrainViewDeps {
@@ -70,12 +77,25 @@ describe('buildTrainView', () => {
     expect(view.rows).toEqual([]);
   });
 
-  it('the forge master lists BOTH forge crafts (weaponcrafting + armorcrafting), sorted', () => {
+  it('the forge master lists ALL THREE forge crafts, sorted', () => {
+    // Two of them are the forge's OWN crafts (STATION_TYPE_BY_CRAFT maps
+    // weaponcrafting and armorcrafting to 'forge'). Jewelcrafting has no
+    // station named after it and joins the same window per RECIPE, through the
+    // stationType: 'forge' every record in its base catalog carries:
+    // trainingStationTypeFor prefers a recipe's own stationType over its
+    // craft's default station, so Forgemistress Darva teaches it by
+    // derivation rather than by a new station type. Kept exact so a craft
+    // that silently stops resolving to the forge, or a fourth that starts,
+    // reds here.
     for (const [shape, junk] of SHAPES) {
       const view = buildTrainView('forgemistress_darva', deps(junk));
       expect(view.stationType, shape).toBe('forge');
       const crafts = new Set(view.rows.map((row) => row.professionId));
-      expect([...crafts].sort(), shape).toEqual(['armorcrafting', 'weaponcrafting']);
+      expect([...crafts].sort(), shape).toEqual([
+        'armorcrafting',
+        'jewelcrafting',
+        'weaponcrafting',
+      ]);
       // Sort: craft, then skillReq, then id.
       const keys = view.rows.map((row) => [row.professionId, row.skillReq, row.recipeId] as const);
       const sorted = [...keys].sort((a, b) => {
@@ -128,39 +148,105 @@ describe('buildTrainView', () => {
     // Skill 0 everywhere: every trainer recipe above the free floor locks (the
     // skillReq-0 ladder rungs stay teachable at tier 0), and each
     // locked row names its craft and the flat threshold tier * TIER_SKILL_STEP.
-    // forgemistress_darva serves both forge crafts, so her locked ladder is the
-    // two combo recipes plus the tier-1 (skillReq 25) and tier-2 (skillReq 50)
-    // weaponcrafting/armorcrafting rungs.
+    // forgemistress_darva serves all three forge crafts, so her locked ladder is
+    // the two combo recipes, the tier-1 (skillReq 25) and tier-2 (skillReq 50)
+    // weaponcrafting/armorcrafting rungs, and the six gated jewelcrafting base
+    // recipes (three at skillReq 25, three at 50). Jewelcrafting reaches this
+    // window through its recipes' own stationType: 'forge', not through a
+    // station of its own. Its three skillReq-0 copper rungs are deliberately
+    // absent: like every other free-floor rung they stay teachable at tier 0.
+    // The three skillReq-75 Masterwrought intermediates lock here too, and so
+    // does the one Masterwrought phase 11l forge trophy row (TROPHY_RECIPES:
+    // recipe_fenshadow_maul at skillReq 50; the sixth fix round
+    // output-excluded the chipped tusk and the 11l QA the bogiron nugget, so
+    // the weaponcrafting and armorcrafting rung-25 rows are gone), 23 rows
+    // to 24.
     const view = buildTrainView('forgemistress_darva', deps());
     const locked = view.rows.filter((row) => row.state === 'locked');
     expect(locked.map((row) => row.recipeId).sort()).toEqual([
       'recipe_arcanite_war_axe',
+      'recipe_burnished_thorium_amulet',
+      'recipe_duskforged_billet',
       'recipe_elderwood_battle_staff',
+      'recipe_etched_iron_loop',
+      'recipe_fenshadow_maul',
+      'recipe_forgefold_plating',
       'recipe_forgeguard_bulwark_gauntlets',
+      'recipe_gleaming_thorium_loop',
+      'recipe_iron_link_choker',
       'recipe_ironbound_warplate_helm',
       'recipe_ironedge_longsword',
       'recipe_ironlink_hauberk',
       'recipe_ironlink_legguards',
       'recipe_ironlink_spaulders',
       'recipe_ironshod_maul',
+      'recipe_prismglass_setting',
+      'recipe_riveted_iron_signet',
       'recipe_thorium_warblade',
       'recipe_thoriumscale_cuirass',
       'recipe_thoriumscale_greathelm',
       'recipe_thoriumscale_leggings',
+      'recipe_weighted_thorium_band',
       'recipe_whetted_iron_dirk',
     ]);
     // LITERAL requirement values per rung (never the production formula: an
     // expectation composed of tierForSkill * TIER_SKILL_STEP moves in
     // lockstep with the code and can never red on a wrong requirement).
-    const REQUIRED_SKILL_BY_RUNG: Record<number, number> = { 25: 25, 50: 50 };
+    const REQUIRED_SKILL_BY_RUNG: Record<number, number> = { 25: 25, 50: 50, 75: 75 };
     for (const row of locked) {
       const skill = REQUIRED_SKILL_BY_RUNG[row.skillReq];
       expect(skill, `${row.recipeId} rung ${row.skillReq}`).toBeDefined();
       expect(row.requirement).toEqual({ craft: row.professionId, skill });
     }
+    // The phase 07 forge rows get their craft half pinned LITERALLY too:
+    // the loop above compares each row against its own professionId, so it
+    // can never red on a mis-attributed craft (review round).
+    const CRAFT_BY_PHASE07_ROW: Record<string, string> = {
+      recipe_duskforged_billet: 'weaponcrafting',
+      recipe_forgefold_plating: 'armorcrafting',
+      recipe_prismglass_setting: 'jewelcrafting',
+    };
+    for (const [recipeId, craft] of Object.entries(CRAFT_BY_PHASE07_ROW)) {
+      const row = locked.find((entry) => entry.recipeId === recipeId);
+      expect(row?.requirement, recipeId).toEqual({ craft, skill: 75 });
+    }
     // Known rows never carry a requirement.
     for (const row of view.rows.filter((entry) => entry.state === 'known')) {
       expect(row.requirement, row.recipeId).toBeUndefined();
+    }
+  });
+
+  it('the tannery master lists every leatherworking trophy row, locked at its rung', () => {
+    // PRESENCE-based, unlike the forge arm's exact locked ladder: the
+    // tannery's whole list is not pinned here, only that each Masterwrought
+    // phase 11l leatherworking trophy row (TROPHY_RECIPES) reaches Tanner
+    // Hesk's window at skill 0 as a locked row naming its craft and rung.
+    // The rung per row is a LITERAL, never recipe.skillReq echoed back.
+    // 'locked' is hard-coded because no leather trophy row is skillReq 0
+    // today; a future skillReq-0 row reds the key-set equality below first.
+    const tannery = STATIONS.find((station) => station.type === 'tannery');
+    expect(tannery?.masterNpcId).toBe('tanner_hesk');
+    const leatherTrophyRows = TROPHY_RECIPES.filter((r) => r.professionId === 'leatherworking');
+    const RUNG_BY_ROW: Record<string, number> = {
+      recipe_oiled_boots: 25,
+      recipe_gravewyrm_bone_quiver: 50,
+      recipe_wildgrove_cinch: 50,
+      recipe_cragprowl_belt: 50,
+    };
+    expect(leatherTrophyRows.map((r) => r.id).sort()).toEqual(Object.keys(RUNG_BY_ROW).sort());
+    for (const [shape, junk] of SHAPES) {
+      const view = buildTrainView('tanner_hesk', deps(junk));
+      expect(view.stationType, shape).toBe('tannery');
+      const byId = new Map(view.rows.map((row) => [row.recipeId, row]));
+      for (const recipe of leatherTrophyRows) {
+        const row = byId.get(recipe.id);
+        expect(row, `${shape} ${recipe.id} present`).toBeDefined();
+        expect(row?.state, `${shape} ${recipe.id}`).toBe('locked');
+        expect(row?.requirement, `${shape} ${recipe.id}`).toEqual({
+          craft: 'leatherworking',
+          skill: RUNG_BY_ROW[recipe.id],
+        });
+      }
     }
   });
 
@@ -310,13 +396,104 @@ describe('buildTrainView', () => {
     ).toBe(true);
   });
 
-  it('the apothecary master lists the alchemy ladder with its combo teachable at tier 1', () => {
+  it('a fee-free pattern-item confirm reserves nothing (the unsolicited-learn over-reserve)', () => {
+    // TrainLearnTracker.resolve accepts an UNSOLICITED trainResult, so a
+    // pattern item (src/sim/professions/pattern_items.ts) read at a trainer
+    // joins the confirmed overlay exactly like a Learn click. It charges no
+    // fee at all: resolveTrain refuses a recipe with no 'trainer' acquisition
+    // before any charging arm, so the trainer path can never have debited the
+    // purse for one. Reserving its tier fee anyway (160 gold here) blanked the
+    // gold chip on every sibling row for the one broadcast until the cprof
+    // mirror landed.
+    const pattern = recipeById(PATTERN_ONLY_RECIPE);
+    expect(pattern?.acquisition, PATTERN_ONLY_RECIPE).toEqual(['drop']);
+    // Non-vacuity: the fee this must NOT reserve genuinely exceeds the purse,
+    // so a reserve of it would be visible on every arm below.
+    expect(trainingFeeFor(pattern as ProfessionRecipeRecord)).toBeGreaterThan(2500);
+    const view = buildTrainView(
+      'forgemistress_darva',
+      deps({
+        craftSkills: { armorcrafting: 25 },
+        copper: 2500,
+        confirmedRecipes: new Set([PATTERN_ONLY_RECIPE]),
+      }),
+    );
+    expect(view.rows.find((row) => row.recipeId === 'recipe_ironlink_legguards')?.affordable).toBe(
+      true,
+    );
+    expect(view.rows.find((row) => row.recipeId === 'recipe_ironlink_hauberk')?.affordable).toBe(
+      true,
+    );
+  });
+
+  it('a trainer learn confirmed alongside it still reserves ITS fee', () => {
+    // The narrowing must not become a blanket opt-out: a real trainer confirm
+    // riding the same overlay keeps reserving, so the sibling still disables.
+    const view = buildTrainView(
+      'forgemistress_darva',
+      deps({
+        craftSkills: { armorcrafting: 25 },
+        copper: 2500,
+        confirmedRecipes: new Set([PATTERN_ONLY_RECIPE, 'recipe_ironlink_hauberk']),
+      }),
+    );
+    expect(view.rows.find((row) => row.recipeId === 'recipe_ironlink_legguards')?.affordable).toBe(
+      false,
+    );
+  });
+
+  it('availableTrainCopper itself skips an un-chargeable id', () => {
+    // The rule lives in the pure reserve derivation, so it holds for any
+    // caller, not only through buildTrainView's own reserve construction.
+    expect(availableTrainCopper(2500, new Set([PATTERN_ONLY_RECIPE]))).toBe(2500);
+    expect(availableTrainCopper(2500, new Set(['recipe_ironlink_hauberk']))).toBe(0);
+    // And the row under pricing is still excluded from its own reserve.
+    expect(
+      availableTrainCopper(
+        2500,
+        new Set([PATTERN_ONLY_RECIPE, 'recipe_ironlink_hauberk']),
+        'recipe_ironlink_hauberk',
+      ),
+    ).toBe(2500);
+  });
+
+  it('the apothecary master lists BOTH apothecary crafts, with the alchemy combo teachable at tier 1', () => {
+    // Alchemy is the apothecary's OWN craft (STATION_TYPE_BY_CRAFT maps it
+    // there). Inscription has no station named after it and joins the same
+    // window per RECIPE, through the stationType: 'apothecary' every record in
+    // its base catalog carries (the jewelcrafting-at-the-forge precedent):
+    // trainingStationTypeFor prefers a recipe's own stationType over its
+    // craft's default station, so Alchemist Verane teaches it by derivation
+    // rather than by a new station type. Kept exact so a craft that silently
+    // stops resolving to the apothecary, or a third that starts, reds here.
     const view = buildTrainView('alchemist_verane', deps({ craftSkills: { alchemy: 25 } }));
     expect(view.stationType).toBe('apothecary');
     const combo = view.rows.find((row) => row.recipeId === 'recipe_volatile_flux_elixir');
     expect(combo?.state).toBe('teachable');
-    // Every row belongs to the station's craft.
-    for (const row of view.rows) expect(row.professionId, row.recipeId).toBe('alchemy');
+    const crafts = new Set(view.rows.map((row) => row.professionId));
+    expect([...crafts].sort()).toEqual(['alchemy', 'inscription']);
+    // Liveness for the per-recipe binding: all six inscription base recipes
+    // must be PRESENT in this window (not merely allowed), so a record that
+    // silently drops its stationType vanishes loudly instead of quietly.
+    const ids = new Set(view.rows.map((row) => row.recipeId));
+    for (const id of [
+      'recipe_silverleaf_primer',
+      'recipe_silverleaf_scroll',
+      'recipe_goldleaf_folio',
+      'recipe_goldleaf_scroll',
+      'recipe_sunpetal_grimoire',
+      'recipe_sunpetal_scroll',
+    ]) {
+      expect(ids.has(id), id).toBe(true);
+    }
+    // Sort: craft, then skillReq, then id (the same rule the forge arm pins).
+    const keys = view.rows.map((row) => [row.professionId, row.skillReq, row.recipeId] as const);
+    const sorted = [...keys].sort((a, b) => {
+      if (a[0] !== b[0]) return a[0] < b[0] ? -1 : 1;
+      if (a[1] !== b[1]) return a[1] - b[1];
+      return a[2] < b[2] ? -1 : 1;
+    });
+    expect(keys).toEqual(sorted);
   });
 
   it('a pending flight marks ONLY its teachable row (issue #2342)', () => {

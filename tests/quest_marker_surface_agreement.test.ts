@@ -66,6 +66,7 @@ function minimapWorld(): IWorld {
     playerId: 1,
     inventory: [],
     stationPlacements: [],
+    farmPatches: [],
     nodeHarvestableByMe: () => false,
     questState,
     questsDone,

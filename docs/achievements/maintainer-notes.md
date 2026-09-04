@@ -51,7 +51,16 @@ directory lives in git history before 2026-07-11.
 
 See also the deferred section in `docs/design/deeds.md`.
 
-- `prog_ringwright`: jewelcrafting and inscription have zero recipes.
+- `prog_ringwright`: the engine-surface blocker is GONE (the Masterwrought
+  phase 06 inscription catalog gave the last craft its gain path and
+  shipped `prog_inscription_rare` / `prog_inscription_50` /
+  `prog_grandmaster_inscription`), but the ring deed itself has no recorded
+  design: no trigger shape, threshold, name, or renown anywhere, and its
+  reserved companions `prog_three_paths` / `prog_ninefold` are equally
+  unspecced. Deferred awaiting a maintainer design ruling (queued at the
+  phase 06 QA). Jewelcrafting and inscription are both fully off this
+  list: each base catalog shipped its rare-tier milestone and its
+  skill-50 / Grandmaster pair.
 - `soc_first_salvage` and `soc_salvage_50`: salvage has no player-facing
   wiring on any host; the salvagesPerformed counter ships with the
   transcription; ACH_FIRST_SALVAGE is held unregistered.

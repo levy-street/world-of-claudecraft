@@ -16,7 +16,7 @@
 //
 // WRITE ROUTING: every per-frame DOM write goes through
 // the writer facet (setStyleProp for the icon, toggleClass for the debuff class,
-// setText for the duration + stacks, setDisplay for the stacks badge visibility); no
+// setText for the duration + stacks, setStyleProp for both badges' visibility); no
 // raw style / textContent / className / setAttribute. The only DOM construction (the
 // node + its children) happens once per pooled node in createNode(); the icon data-URL
 // is resolved only when an aura's icon key changes (the expensive part).
@@ -74,6 +74,11 @@ const DUP_KEY_SEP = '#';
 // appended the badge only when stacks > 1).
 const STACKS_SHOWN = '';
 const STACKS_HIDDEN = 'none';
+// Visibility for BOTH badges below rides setStyleProp rather than setDisplay, because
+// each of those nodes also carries its own text: two single-slot writers on one element
+// share a cache entry and defeat elision for both (painter_host.ts, and the scan in
+// tests/painter_single_slot_collision_guard.test.ts). See the writes at the paint sites.
+const DISPLAY_PROP = 'display';
 // The overflow badge class + display pair. Unlike the stacks badge (default shown,
 // `''` reverts to it), the overflow badge's CSS default is display:none (it is absent far
 // more often than present), so revealing it needs an explicit value, not a revert.
@@ -277,7 +282,15 @@ export class AurasPainter {
       this.writers.toggleClass(rec.el, EXPIRING_CLASS, s.expiring);
       this.writers.setText(rec.dur, s.durationText);
       const hasStacks = s.stacksText !== '';
-      this.writers.setDisplay(rec.stacks, hasStacks ? STACKS_SHOWN : STACKS_HIDDEN);
+      // The badge node needs TWO INDEPENDENT FACETS, its text and its visibility, and
+      // the single-slot cache holds ONE (kind, value) entry per element. Routing both
+      // through single-slot writers flips that entry on every call, so BOTH bypass
+      // elision forever: every frame, for every stacking aura, which in combat is most
+      // of them. Visibility therefore takes a slot of its own, keyed (element,
+      // 'display'); the DOM write is the same inline display it always was. TWO
+      // SEPARATE NODES would have worked equally well, and a second cache slot is
+      // simply cheaper than a second node.
+      this.writers.setStyleProp(rec.stacks, DISPLAY_PROP, hasStacks ? STACKS_SHOWN : STACKS_HIDDEN);
       if (hasStacks) this.writers.setText(rec.stacks, s.stacksText);
       this.ordered.push(rec);
     }
@@ -302,7 +315,14 @@ export class AurasPainter {
     // with no overflowEl (the debuff bar, the target strip) skips this entirely.
     if (this.overflowEl) {
       const show = shed > 0;
-      this.writers.setDisplay(this.overflowEl, show ? OVERFLOW_SHOWN : OVERFLOW_HIDDEN);
+      // Display through setStyleProp, not setDisplay: this node also takes setText just
+      // below, and two single-slot writers on one element flip the shared cache entry so
+      // BOTH stop eliding (the stacks badge above, same fix, same reason).
+      this.writers.setStyleProp(
+        this.overflowEl,
+        DISPLAY_PROP,
+        show ? OVERFLOW_SHOWN : OVERFLOW_HIDDEN,
+      );
       this.writers.setText(this.overflowEl, show ? this.overflowText.label(shed) : '');
       this.writers.setAttr(
         this.overflowEl,

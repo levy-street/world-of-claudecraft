@@ -44,6 +44,7 @@ import { isPersistentEngineAura } from '../persistent_aura';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
+import { applyWellFedOnMealComplete } from '../wellfed';
 import { tickAfflictionAura, tickMaledictGaze } from './affliction';
 import { isStunned } from './cc';
 import { regenerateRuinOutOfCombat, tickPyreGuardian } from './destruction';
@@ -179,7 +180,23 @@ export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void 
       });
     }
     c.remaining -= 2;
-    if (c.remaining <= 0) p[slot] = null;
+    if (c.remaining <= 0) {
+      // The meal FINISHED, which is the only moment a Well Fed buff is owed
+      // (classic: interrupted eating grants nothing, and every early exit
+      // clears the slot without reaching here). The mint itself lives in
+      // src/sim/wellfed.ts (one aura id, one mint site); it draws no rng.
+      // Clear THEN grant: the payload is held in a local and the consuming slot
+      // is nulled before the aura lands, so the meal is already over from every
+      // reader's point of view when applyAura runs. The reverse order works
+      // today only because nothing on the apply path consults isConsuming; this
+      // one stays correct if anything ever does (a buff that refuses to land on
+      // an eating character, a cancel-on-consume rule).
+      // Only the food arm of Consuming can carry a payload (FoodConsuming,
+      // src/sim/types.ts); the narrowing is the type's, not a runtime guard.
+      const wellFed = c.kind === 'food' ? c.wellFed : undefined;
+      p[slot] = null;
+      applyWellFedOnMealComplete(ctx, p, wellFed);
+    }
   }
 }
 

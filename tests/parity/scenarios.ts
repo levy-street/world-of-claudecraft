@@ -5,7 +5,7 @@
 //  - multiple classes:        warrior / mage / rogue / hunter / warlock / paladin
 //  - meleeSwing weaponStrike:  heroic_strike (warrior), sinister_strike (rogue)
 //  - auto-attack + mobSwing:   solo_warrior (mob swings back)
-//  - frost proc draw order:    frost_proc_orb (Frozen Orb pulses + one proc-producing frostbolt)
+//  - frost proc draw order:    frost_proc_orb (Frostglobe pulses + one proc-producing frostbolt)
 //  - frenzy + on-hit affix:    affix_mob (old_greyjaw frenzyOnHit + ridge_stalker bleed)
 //  - mob-swing affix cascade:  mob_swing_affixes (stun/venom/silence/rampage + friendly-pet short-circuit, M3)
 //  - pets:                     hunter_pet (updateRangedPetAttack), warlock_pet (mobSwing pet arm + applyTaunt)
@@ -22,6 +22,7 @@
 // in a way the sim itself does not already expose.
 
 import { supportHeightAt } from '../../src/sim/colliders';
+import { CORPSE_DURATION } from '../../src/sim/combat/damage';
 import {
   arenaOrigin,
   DELVES,
@@ -30,6 +31,7 @@ import {
   MOBS,
   PROPS,
   QUESTS,
+  STATIONS,
 } from '../../src/sim/data';
 import { EASTBROOK_LAYOUT } from '../../src/sim/eastbrook_layout';
 import {
@@ -49,8 +51,21 @@ import { solveLockActions } from '../../src/sim/lockpick';
 import type { PendingLootRoll } from '../../src/sim/loot/loot_roll';
 import { RIFT_MECHANIC_SPACING_SEC } from '../../src/sim/mob/mechanic_spacing';
 import { PLAYER_BODY_RADIUS } from '../../src/sim/pathfind';
+import type { PlotState } from '../../src/sim/professions/farm_projection';
+import {
+  convertHusks,
+  FARM_PLANT_CAST_SEC,
+  harvestCrop,
+  plantCrop,
+} from '../../src/sim/professions/farming';
 import { startFishing } from '../../src/sim/professions/fishing';
 import { gatherCastDurationSec, gatherNodeById } from '../../src/sim/professions/gathering';
+import {
+  PERFECTING_ATTEMPT_COST,
+  PERFECTING_SKILL_REQ,
+} from '../../src/sim/professions/perfecting';
+import { stationsOfType } from '../../src/sim/professions/stations';
+import { riftRankForBaseLevel } from '../../src/sim/rift/ranks';
 import { type ArenaMatch, type PlayerMeta, Sim } from '../../src/sim/sim';
 import { ARENA_MIN_LEVEL } from '../../src/sim/social/arena';
 import { addThreat } from '../../src/sim/threat';
@@ -278,7 +293,7 @@ function soloMage(): Scenario {
   };
 }
 
-// Committed-Frost draw coverage: Frozen Orb reaches its pulse damage and Icicle
+// Committed-Frost draw coverage: Frostglobe reaches its pulse damage and Icicle
 // path, then the seed-pinned Rimelance impact grants both random procs. The
 // shared-rng digest therefore catches either proc draw moving or disappearing.
 function frostProcOrb(): Scenario {
@@ -286,7 +301,7 @@ function frostProcOrb(): Scenario {
     name: 'frost_proc_orb',
     coverage: [
       'class:mage (committed frost)',
-      'Frozen Orb pulse damage + Icicle generation',
+      'Frostglobe pulse damage + Icicle generation',
       'Fingers of Frost proc draw from frostbolt',
       'Brain Freeze proc draw from frostbolt',
     ],
@@ -664,7 +679,7 @@ function petAi(): Scenario {
       imp.aggroTargetId = impTarget.id;
       rec.track(impTarget.id);
 
-      // Gloomshade (melee tank): NO pre-set target, so petPickTarget runs the
+      // Duskmurk (melee tank): NO pre-set target, so petPickTarget runs the
       // aggressive auto-pull to acquire a beefed wolf in range, then the melee arm
       // closes, auto-taunts the mob, and swings via mobSwing.
       const tank = spawnMob(sim, 'gloomshade', 12, p.pos.x - 2, p.pos.y, p.pos.z);
@@ -2389,7 +2404,7 @@ function talentsProgression(): Scenario {
 // sites in global stream order: Double Charge's spend + sequential recharge
 // bookkeeping (abilityCharges via casting_lifecycle / updateTimers),
 // Intimidating Shout's aoeFear flee-heading draws with Lingering Dread's break
-// threshold armed, Victory Rush's on-kill window aura + selfHealPctMax heal,
+// threshold armed, Victor's Surge's on-kill window aura + selfHealPctMax heal,
 // and Bladestorm's self-centered channel (per-tick position pulse + damage
 // draws). Restored from the pre-revert payload (f274835b1^): pickRowTalent(row
 // index) became selectTalentRow(row LEVEL), and the payload's
@@ -2497,7 +2512,7 @@ function warriorRowCapstones(): Scenario {
       }
       rec.snapshot('feared');
       rec.tick(8);
-      // Victory Rush: a lethal blow opens the window; the strike on a fresh
+      // Victor's Surge: a lethal blow opens the window; the strike on a fresh
       // dummy heals 20% of max health and consumes it.
       const prey = spawnMob(sim, 'forest_wolf', 2, p.pos.x + 2, p.pos.y, p.pos.z);
       rec.track(prey.id);
@@ -3221,6 +3236,12 @@ function nythraxisFullPull(): Scenario {
     build: () => new Sim({ seed: 1031, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
       const sim = rec.sim;
+      // A live realm calendar (the delve_progression precedent): with resetDay
+      // set, the boss kill stamps the wyrmfall daily gate AND grants the
+      // weekly Maker's Ember, so the golden pins the ember week anchor and
+      // the material grants cross-host, not just the draw position.
+      sim.resetDay = '2099-06-25';
+      sim.utcDay = '2099-06-25';
       const tankPid = sim.addPlayer('warrior', 'NyxTank') as number;
       sim.setPlayerLevel(MAX_LEVEL, tankPid);
       // Exercise the winning tank identity explicitly. A level-cap raid tank
@@ -3383,6 +3404,110 @@ function nythraxisFullPull(): Scenario {
       step(1); // updateMob dead-branch -> onBossDeath schedules the death dialogue
       rec.snapshot('death');
       step(20 * 3); // drain the delayed death-dialogue yells
+    },
+  };
+}
+
+// The HEROIC claim on the same raid boss, and it exists to close the sibling
+// residual the 'nythraxis_patterns' block in content/dungeons.ts records in
+// prose: loot/loot_roll.ts walks the base table first and THEN rolls the
+// HEROIC_BOSS_LOOT entries in the SAME call, so every heroic-only draw sits one
+// position later for each rollGroup appended at the base tail. The scenario
+// above enters with NO difficulty (a normal kill), so no golden covered a
+// heroic claim at all, and masterwrought Phase 11f appends exactly such a tail
+// group. The heroic stream is therefore recorded FIRST, as the phase's own
+// commit, the same discipline the rift rank ladder took below.
+//
+// DELIBERATELY LEAN, and not a second full pull: the residual is about the LOOT
+// stream, the encounter script is already pinned frame by frame above, and the
+// full pull is the suite's heaviest recording. The boss dies to one lethal hit
+// at the pull, which is what the heroic arm of tests/dungeons.test.ts does.
+//
+// SEED 4504 WAS MEASURED, NOT PICKED, against two conditions at once, and it is
+// the FIRST seed from 4500 satisfying both (the hunt drove this very scenario
+// body and swapped only the Sim seed):
+//   1. COPPER ABOVE THE NORMAL CEILING. A normal kill rolls
+//      rng.int(90000, 210000) off the 150 000 base and a heroic one
+//      rng.int(120000, 280000) off NYTHRAXIS_HEROIC_COPPER, and the two bands
+//      OVERLAP, so only a roll above 210 000 proves the heroicCopper
+//      substitution actually fired rather than merely being consistent with it.
+//      This seed rolls 248 208.
+//   2. THE EXISTING BASE TAIL GROUP WINNING. 'nythraxis_patterns' is the LAST
+//      group in the base walk, so a seed where it sheds a pattern pins the
+//      outcome of the draw immediately BEFORE the position Phase 11f appends
+//      into. This seed sheds pattern_wyrmfall_pendant.
+// Measured over seeds 4500 to 4513: 8 of 14 cleared the copper condition (the
+// band above 210 000 is 70 000 of the 160 001 wide heroic range, so 8 is where
+// it should land), 5 of 14 shed a pattern (the group's total is 0.40), and 4
+// cleared both.
+function nythraxisHeroicClaim(): Scenario {
+  return {
+    name: 'nythraxis_heroic_claim',
+    coverage: [
+      'rollLoot HEROIC arm on the raid boss: the base-table walk, then the appended HEROIC_BOSS_LOOT draws in the SAME call (the nythraxis_heroic_weapon rollGroup, then the four ungrouped mount chances in array order), which is the stream position a base-table tail append shifts',
+      'heroicItem(): the base set-piece and legendary drops swapped IN PLACE for their raid-tier heroic variants (content/heroic_variants.ts), a swap only a heroic claim reaches',
+      'LootEntry.heroicCopper: the raised finale money base substituted on the SAME single int draw (NYTHRAXIS_HEROIC_COPPER), a value swap and never an extra draw',
+      'awardHeroicMarks on a heroic raid kill (instances/dungeons) plus the raid lockout, neither of which a normal claim grants',
+      'class:warrior',
+    ],
+    sampleEvery: 10,
+    build: () => new Sim({ seed: 4504, playerClass: 'warrior', noPlayer: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim;
+      const tankPid = sim.addPlayer('warrior', 'HeroicTank') as number;
+      sim.setPlayerLevel(MAX_LEVEL, tankPid);
+      sim.setSpec('prot', tankPid);
+      (sim.players.get(tankPid) as PlayerMeta).questsDone.add('q_nythraxis_bound_guardian');
+      for (let i = 0; i < 4; i++) {
+        const pid = sim.addPlayer('mage', `HeroicDps${i}`) as number;
+        sim.setPlayerLevel(MAX_LEVEL, pid);
+        sim.partyInvite(pid, tankPid);
+        sim.partyAccept(pid);
+      }
+      sim.convertPartyToRaid(tankPid); // the raid gate wants five
+      // The ONE line that separates this scenario from its sibling above: the
+      // claim is heroic, so rollLoot's instances.find(difficulty === 'heroic')
+      // resolves and both heroic arms run.
+      sim.setDungeonDifficulty('heroic', tankPid);
+      sim.enterDungeon('nythraxis_boss_arena', tankPid);
+      const tank = sim.entities.get(tankPid) as AnyEntity;
+      const boss = [...sim.entities.values()].find(
+        (e: AnyEntity) => e.kind === 'mob' && e.templateId === NYTHRAXIS_BOSS_ID && !e.dead,
+      ) as AnyEntity;
+      rec.track(boss.id);
+      rec.notes.bossId = boss.id;
+      rec.notes.tankPid = tankPid;
+
+      // Stage the whole raid inside PARTY_XP_RANGE of the boss. NOT cosmetic:
+      // handleDeath builds its participation snapshot from the party members
+      // within that range, and awardHeroicMarks pays exactly that snapshot, so
+      // a raid left at the door would record a one-player mark payout and stop
+      // being a representative heroic clear. Y is pinned to the arena floor the
+      // way the full pull's floorTeleport does (the shared teleport helper
+      // snaps to OVERWORLD terrain, which floats an instanced player into
+      // lethal falling damage).
+      const stage = (e: AnyEntity, x: number, z: number) => {
+        e.pos.x = x;
+        e.pos.z = z;
+        e.pos.y = boss.pos.y;
+        e.prevPos = { ...e.pos };
+        e.fallStartY = boss.pos.y;
+        e.vy = 0;
+        e.onGround = true;
+        sim.rebucket(e);
+      };
+      stage(tank, boss.pos.x, boss.pos.z - 6);
+      const dps = [...sim.players.values()]
+        .filter((m) => m.entityId !== tankPid)
+        .map((m) => sim.entities.get(m.entityId) as AnyEntity);
+      for (let i = 0; i < dps.length; i++) {
+        stage(dps[i], boss.pos.x - 3 + i * 2, boss.pos.z - 12);
+      }
+      rec.snapshot('claimed');
+
+      sim.dealDamage(tank, boss, boss.hp + 1000, false, 'physical', null, 'hit', true);
+      rec.tick(1); // updateMob dead-branch -> handleDeath -> rollLoot + the marks award
+      rec.snapshot('death');
     },
   };
 }
@@ -4395,7 +4520,9 @@ function inventoryVendor(): Scenario {
       rec.snapshot('sold');
 
       // 7) bulk-sell the remaining gray (sellAllJunk: one summary line + per-stack buyback).
-      sim.addItem('bandit_bandana', 1, buyer);
+      // bandit_bandana was the fodder here until phase 11l promoted it to a
+      // common trophy reagent; soggy_moccasin keeps the junk-sold beat live.
+      sim.addItem('soggy_moccasin', 1, buyer);
       sim.sellAllJunk(buyer);
       rec.snapshot('sold-junk');
 
@@ -4816,6 +4943,8 @@ function professionsCraft(seed = 5): Scenario {
       'masterwork effect: signed instance rolled.masterwork + baked tier-delta stats, masterwork SimEvent, PlayerMeta.lastMasterwork',
       'lastCraftResult mirror fields (quality + masterwork?) on a proc',
       'post-proc plain craft: the draw stream continues (one draw per successful craft)',
+      'daily gate (recipe_quickening_catalyst, oncePerDay): the success stamps craftDaily and draws once',
+      'daily_limit denial: returns before any draw (zero draws), stamp unchanged',
     ],
     build: () => new Sim({ seed, playerClass: 'warrior', autoEquip: false }),
     drive(rec: Recorder) {
@@ -4871,6 +5000,35 @@ function professionsCraft(seed = 5): Scenario {
       runCraft(sim, 'recipe_minor_healing_potion', false, pid);
       rec.snapshot('craft-plain-2');
 
+      // Step 4b: the phase 07 daily gate rides the draw digest (the QA
+      // audit's coverage gap: every golden sampled craftDaily at its inert
+      // default, so the gate's refusal path never touched the draw-order
+      // detector). With the realm calendar live and the crafter standing at
+      // an apothecary, the oncePerDay catalyst succeeds once (one
+      // masterwork-proc draw, like every success; the junk-kind def gates
+      // the effect off) and stamps craftDaily with real content; the
+      // re-attempt refuses daily_limit BEFORE any draw, so the stream gains
+      // exactly one draw across both calls and a draw slipped into the
+      // refusal path reds the digest here.
+      sim.resetDay = '2099-06-25';
+      meta.craftSkills.alchemy = 75;
+      meta.knownRecipes.add('recipe_quickening_catalyst');
+      {
+        const apothecary = requireValue(
+          stationsOfType(STATIONS, 'apothecary')[0],
+          'apothecary station',
+        );
+        teleport(sim, requireEntity(sim, pid, 'crafter'), apothecary.pos.x, apothecary.pos.z);
+      }
+      sim.addItem('sunpetal_herb', 1, pid);
+      sim.addItem('goldleaf_herb', 2, pid);
+      sim.addItem('venom_gland', 2, pid);
+      sim.addItem('glass_vial', 1, pid);
+      runCraft(sim, 'recipe_quickening_catalyst', false, pid);
+      rec.snapshot('craft-daily-stamped');
+      runCraft(sim, 'recipe_quickening_catalyst', false, pid);
+      rec.snapshot('craft-daily-denied');
+
       // Step 5: the ARMED craft-cast frame (Craft Cast System). Start a real
       // batch through Sim.craftItem (the three-arg count form the offline HUD
       // uses) and snapshot WITHOUT ticking: the sampler pins the live session
@@ -4878,8 +5036,9 @@ function professionsCraft(seed = 5): Scenario {
       // craftCastRecipeId capture, and the batch counters at 2 of 2) instead
       // of only the at-rest zeros. Deliberately no ticks: this scenario's
       // coverage pin is draw-PRECISE (each craft draws exactly once, the
-      // denial zero), and a cast start draws nothing, so the stream stays at
-      // three draws and the armed cast simply never completes in-scenario.
+      // denials zero), and a cast start draws nothing, so the stream stays at
+      // four draws (step 4b's catalyst included) and the armed cast simply
+      // never completes in-scenario.
       sim.addItem('linen_scrap', 2, pid);
       sim.addItem('spider_leg', 2, pid);
       sim.addItem('silverleaf_herb', 4, pid);
@@ -5654,6 +5813,406 @@ function professionsToolEffectSlot(seed = 1): Scenario {
   };
 }
 
+// The farming SESSION end to end through the real command bodies: two plants
+// (two rng draws each, pre-rolled contiguously), a growth window that draws
+// NOTHING, and both harvest payouts (a survived plot's produce plus its queued
+// proficiency grant, and a withered plot's husks). Farming's whole determinism
+// contract is that randomness happens only at the two player-action moments,
+// so a scenario that plants and harvests for real is the only thing that can
+// pin it: a draw added at the growth deadline, in the tick sweep, or on a deny
+// path moves this golden's draw digest and nothing else in the suite would.
+//
+// TIME IS WRITTEN, NOT TICKED, and that is the sanctioned route rather than a
+// shortcut: vale_wheat takes 45 minutes, which is 54,000 ticks, and no golden
+// can carry that. Setting readyAtMs down to the sim's current lockout clock is
+// exactly what the /dev farmgrow cheat does, and the reason it is safe
+// here is the reason it is safe there: it writes state and draws nothing, so
+// the draw digest stays honest about the window it is standing in for.
+//
+// BOTH survival rolls are overwritten too, one each way. The pre-rolled values
+// are already pinned (they are the plant's own two draws, in the digest), and
+// forcing the stored outcomes is what makes each harvest beat unambiguous:
+// without it, one 15% roll at proficiency 0 decides whether the produce path
+// or the husk path runs, and a future re-tune of the survival ramp could flip
+// a beat while the scenario still looked green.
+// The Phase 4 QA M8 lesson: never assume a seed wins. Probed against the real
+// modules: mulberry32((4 ^ 0x9e3779b9) >>> 0)() = 0.217326 < 0.5
+// (FARM_TONIC_BONUS_CHANCE), so yieldSeed 4 WINS the tonic roll, and its
+// skill-1 expansion is fine-free (resolveFarmHarvest(4, 1) = { count: 3,
+// fine: 0 }, toniced count 5), so the toniced beat below adds exactly one
+// produce grant and no fine line. Exported for the coverage suite's in-arm
+// non-vacuity guard (tests/parity/coverage_c.test.ts).
+export const FARM_TONIC_WINNER_YIELD_SEED = 4;
+
+// The Phase 11 (bw) golden-WIN beat's yield seed, probed the same way at the
+// beat's live skill of exactly 75 (the extension writes it back just before
+// the plant, the beat-10 idiom): resolveFarmHarvest(7, 75) = { count: 3,
+// fine: 1 }, so BOTH grades are nonzero and the five-fold golden multiplier
+// reaches base and fine on one seed (at a single-grade seed the fine half of
+// the win would prove nothing, the M8 lesson again). Exported for the
+// coverage suite's in-arm non-vacuity guard (tests/parity/coverage_c.test.ts).
+export const FARM_GOLDEN_WIN_YIELD_SEED = 7;
+
+/** How many real plant-plus-withered-harvest cycles walk the shared stream to
+ *  the probed golden winner. RE-PROBED at masterwrought Phase 11f, 28 -> 36,
+ *  because the golden BONUS draw made a harvest cost one more and so a padding
+ *  cycle four draws instead of three: the old count landed the golden beat on a
+ *  LOSING roll, which would have quietly retired this scenario's whole golden
+ *  arm and left the new bonus draw covered by no golden at all.
+ *
+ *  Named rather than inlined so the next appended draw re-probes ONE constant,
+ *  and so the coverage ledger can compose against the same number instead of
+ *  restating it. The probe method is the same one the comment inside the drive
+ *  describes: re-align a fresh Rng on the observed drive stream, then solve for
+ *  the padding count whose golden beat lands under GATHER_RARE_EVENT_CHANCE.
+ *  36 is the ONLY count in 0 to 40 that does. */
+export const FARM_GOLDEN_PADDING_CYCLES = 36;
+
+function professionsFarmingSession(seed = 1): Scenario {
+  // The two northern beds of the Eastbrook allotments (content/farm_patches.ts
+  // bed_eastbrook_1 at 16,30 and bed_eastbrook_2 at 21,30). Beds sit on a 5
+  // yard pitch, which is INTERACT_RANGE, so the midpoint below is 2.5yd from
+  // each and one stand point reaches both: no teleport between the plants, and
+  // none between the harvests. The Phase 5 extension (deviation (z)) then
+  // moves to the Thornpeak patch (content/farm_patches.ts bed_thornpeak_1 at
+  // -23,685) for the tier-3 seed-back beat.
+  const BED_READY = 'bed_eastbrook_1';
+  const BED_WITHERED = 'bed_eastbrook_2';
+  const BED_T3 = 'bed_thornpeak_1';
+  const CROP = 'vale_wheat';
+  return {
+    name: 'farming_session',
+    coverage: [
+      'class:warrior (farmer)',
+      'plantCrop gate order passed: alive, range, bed free, crop known, skill, seed in bags',
+      'plant pre-roll: exactly two contiguous rng draws per plant (survival, yield seed)',
+      'plant consumes the seed and starts the flavor cast (FARMING_CAST_ID)',
+      'busy gate: the second plant waits out the first plant cast',
+      'growth window: readyAtMs reached with ZERO rng draws and zero events',
+      'harvestCrop survived path: TWO draws at tier 1 (the golden roll, a recorded loss, then the golden BONUS roll, spent and unread), produce granted from the stored yield seed',
+      'harvestCrop withered path: TWO draws at tier 1 (the golden roll and the golden bonus roll, both spent and ignored), withered husks paid instead of produce',
+      'both harvests free their bed (farmPlots empty at the end)',
+      'gathering grant drain: the queued farming proficiency lands on the next tick',
+      'knobbed plant (compost + watch + tonic): payments consumed, still exactly two draws',
+      'toniced harvest on a probed WINNING yieldSeed: two draws (the golden roll and its bonus; the tonic itself stays draw-free seed expansion), bonus picks at base grade',
+      'convertHusks: the withered payout batch trades into compost, zero draws',
+      'tier-3 harvest (highland_barley at Thornpeak): EXACTLY three contiguous draws, the seed-back roll, then the golden roll, then the golden bonus roll',
+      'ready-notice sweep (Phase 8): a plot left ready across the 1 Hz boundary emits ONE farmReady, zero draws',
+      'notified flag: the noticed plot samples notified true in fplot before its closing harvest',
+      'padding cycles (Phase 11, re-probed at 11f): real plant-plus-withered-harvest cycles walk the shared stream to the probed positions, exactly four draws each, no produce, no gains, no notices',
+      'golden-WIN harvest (Phase 11, (bw), re-probed at 11f): the tier-1 golden roll WINS at the searched position; the five-fold signed grants at both grades, the crop-source announce fanout, and the gather_event:golden_harvest mark reach the golden digest',
+      'golden BONUS payout (Phase 11f): the win READS its bonus roll and grants exactly one extra item, an upward-drift tier-2 seed off a tier-1 crop, named on farmHarvested as goldenBonusItemId; this is the only beat in the suite that reaches the bonus arm',
+      'tier-3 seed-back PAYING band (Phase 11, (bw), re-seated again at 11f): the Thornpeak harvest lands in a paying band and really grants highland_barley_seed, upgrading the Phase 10 zero-band grant proof',
+      'wellfed tick-phase mint (Phase 12, beat P; unified in 11c): a REAL consume completion through ticks (addItem + useItem + the full 18s sit-restore) mints the one well_fed aura at the updateRegen completion arm, zero draws',
+      'shared feast loop (Phase 12): placeFeast spends the bag item and spawns the farm_feast entity on the normal roster; the placer bites the own feast (a charge spent at START) and rides the same completion to a last-eaten-wins refresh of the buff, zero draws',
+      'feast expiry despawn (Phase 12): the draw-free expiresAtTick write plus the 1 Hz updateFarming sweep drop the entity and the FeastState together (the one despawn site)',
+    ],
+    build: () => new Sim({ seed, playerClass: 'warrior', autoEquip: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim;
+      const pid = sim.playerId as number;
+      const meta = sim.players.get(pid) as PlayerMeta;
+      const p = sim.player as AnyEntity;
+
+      // No mob interference: a landed hit cancels the plant cast mid-drive,
+      // which would move the second plant's gate result (the
+      // professionsFishingSession / professionsGather despawn idiom).
+      for (const e of (sim.entities as Map<number, AnyEntity>).values()) {
+        if (e.kind !== 'mob') continue;
+        e.dead = true;
+        e.hp = 0;
+        e.aiState = 'dead';
+        e.respawnTimer = 9999;
+        e.corpseTimer = 9999;
+        e.inCombat = false;
+      }
+
+      // One seed per bed. addItem draws no rng, so the grant is
+      // digest-invisible beyond the sampled inventory contents.
+      sim.addItem('vale_wheat_seed', 2, pid);
+      // The step-12 hoe gate: plantCrop now refuses without a wieldable hoe.
+      sim.addItem('garden_hoe', 1, pid);
+      // Midway between bed_eastbrook_1 (-24, -84) and bed_eastbrook_2 (-19, -84),
+      // both in reach. The patch moved from the north lane (beds at z 30) to the
+      // rebuilt town's north-east edge at the release/v0.41.0 merge, when the
+      // second wolf run landed on the old site.
+      teleport(sim, p, -21.5, -84);
+
+      // Plant one: the first two draws of the session.
+      plantCrop(sim.ctx, p, meta, BED_READY, CROP);
+      rec.snapshot('planted-first');
+      // Ride out the flavor cast. plantCrop's busy gate refuses a second plant
+      // while one runs, so this window is what makes the second plant land
+      // rather than emitting a busy error.
+      rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+      // Plant two: two more draws, and the plot map stays in sorted bed order.
+      plantCrop(sim.ctx, p, meta, BED_WITHERED, CROP);
+      rec.snapshot('planted');
+      rec.tick(20);
+
+      // The /dev farmgrow equivalence: state written, nothing drawn.
+      const now = sim.ctx.lockoutNowMs();
+      const readyPlot = meta.farmPlots.get(BED_READY) as PlotState;
+      const witheredPlot = meta.farmPlots.get(BED_WITHERED) as PlotState;
+      readyPlot.readyAtMs = now;
+      witheredPlot.readyAtMs = now;
+      // The survival test is `survivalRoll < chance`, and chance at
+      // proficiency 0 on a tier-1 crop is the at-gate 0.85, so these two
+      // literals sit either side of it and pin one plot to each outcome.
+      readyPlot.survivalRoll = 0.01;
+      witheredPlot.survivalRoll = 0.99;
+      rec.snapshot('grown');
+
+      // Both harvests, back to back from the one stand point: the survived
+      // plot pays produce and queues proficiency, the withered plot pays
+      // husks and queues nothing. Each draws exactly once (the golden roll,
+      // both outcomes; both land losses on this stream).
+      harvestCrop(sim.ctx, p, meta, BED_READY);
+      harvestCrop(sim.ctx, p, meta, BED_WITHERED);
+      rec.snapshot('harvested');
+      // drainGatheringGrants runs EARLIER in the tick than any command, so the
+      // grant queued above lands on the next tick; this tail is what puts the
+      // raised proficiency into the final sample.
+      rec.tick(8);
+
+      // ---- The Phase 5 extension (deviation (z)): every beat below is
+      // appended AFTER the original drive, so the earlier labels and their
+      // ledger values stay byte-identical. ----
+
+      // KNOBBED PLANT: all three knobs on the freed northern bed. The
+      // supplies are scaffolding grants (draw-free, ordinary hub lines): a
+      // fresh seed (both starters are in the ground above), one compost, one
+      // tonic, and 2 vale_wheat produce for the tier-1 watch fee, paid
+      // beside the 3 produce the first harvest banked.
+      sim.addItem('vale_wheat_seed', 1, pid);
+      sim.addItem('compost', 1, pid);
+      sim.addItem('growth_tonic', 1, pid);
+      sim.addItem('vale_wheat', 2, pid);
+      // Ride out the SECOND plant's flavor cast remainder (0.6 sec of its 2
+      // sec still runs here), or the knobbed plant would deny busy.
+      rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+      plantCrop(sim.ctx, p, meta, BED_READY, CROP, { compost: true, watch: true, tonic: true });
+      const knobbed = meta.farmPlots.get(BED_READY) as PlotState;
+      // The stored knob flags, stashed for the coverage suite: farmPlanted is
+      // knob-free on the wire (the fplot projection carries the flags), so
+      // the notes are where a test can see what the payments bought.
+      rec.notes.knobbedFlags = {
+        compost: knobbed.compost,
+        watch: knobbed.watch,
+        tonic: knobbed.tonic,
+      };
+      rec.snapshot('planted-knobbed');
+
+      // TONICED HARVEST ON A WINNING SEED: force ready + survived exactly as
+      // the beats above, then OVERWRITE the minted yieldSeed with the probed
+      // tonic WINNER (see FARM_TONIC_WINNER_YIELD_SEED above): at a losing
+      // seed the toniced and plain expansions coincide and the beat proves
+      // nothing (the M8 lesson). One draw, the golden roll (a loss on this
+      // stream): the tonic is seed expansion, and vale_wheat is tier 1, so
+      // no seed-back roll.
+      knobbed.readyAtMs = sim.ctx.lockoutNowMs();
+      knobbed.survivalRoll = 0.01;
+      knobbed.yieldSeed = FARM_TONIC_WINNER_YIELD_SEED;
+      harvestCrop(sim.ctx, p, meta, BED_READY);
+      rec.snapshot('harvested-toniced');
+
+      // HUSK CONVERSION: the withered beat above paid exactly 2 husks, one
+      // batch, so this trades them into exactly one compost. Zero draws.
+      convertHusks(sim.ctx, p, meta);
+      rec.snapshot('husks-converted');
+
+      // TIER-3 SEED-BACK at the Thornpeak patch. Ride out the knobbed
+      // plant's own flavor cast first (its 2 sec are untouched here), which
+      // also drains the toniced harvest's queued gain BEFORE the proficiency
+      // write below, so the write is the last word.
+      rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+      teleport(sim, p, -23, 685); // bed_thornpeak_1 (content/farm_patches.ts)
+      meta.gatheringProficiency.farming = 75;
+      sim.addItem('skysilver_hoe', 1, pid);
+      sim.addItem('highland_barley_seed', 1, pid);
+      // Two draws (the plant pre-roll)...
+      plantCrop(sim.ctx, p, meta, BED_T3, 'highland_barley');
+      rec.snapshot('planted-t3');
+      const barley = meta.farmPlots.get(BED_T3) as PlotState;
+      barley.readyAtMs = sim.ctx.lockoutNowMs();
+      barley.survivalRoll = 0.01;
+      // ...and EXACTLY two more, the seed-back roll then the golden roll:
+      // whatever bands the shared stream yields here are the recorded truth
+      // (the coverage suite asserts the ledger arithmetic and that the
+      // event's seedBackCount matches the highland_barley_seed bag delta,
+      // never a band literal).
+      harvestCrop(sim.ctx, p, meta, BED_T3);
+      rec.snapshot('harvested-t3');
+      // Drain the barley harvest's queued 0.02 gain into the final sample.
+      rec.tick(8);
+
+      // ---- The Phase 8 extension: the READY-NOTICE SWEEP, appended after
+      // every earlier beat so their labels and draw ledger stay
+      // byte-identical. Every beat above harvests a ripened plot in the same
+      // drive step, so the 1 Hz sweep never observes one; this beat is the
+      // scenario's only farmReady, and the emission itself is the pinned
+      // fact: a draw or a repeat here moves the event digest and nothing
+      // else in the suite would see it. ----
+      sim.addItem('vale_wheat_seed', 1, pid);
+      teleport(sim, p, -21.5, -84); // back to the freed Eastbrook bed (the pair's midpoint)
+      // Ride out the t3 plant's flavor cast remainder (its harvest landed
+      // mid-cast and tick(8) covers only 0.4 sec), or this plant denies busy.
+      rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+      // Two draws (the plant pre-roll), the extension's only randomness.
+      plantCrop(sim.ctx, p, meta, BED_READY, CROP);
+      rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+      // The /dev farmgrow equivalence again: ripen in place, survived arm.
+      const noticed = meta.farmPlots.get(BED_READY) as PlotState;
+      noticed.readyAtMs = sim.ctx.lockoutNowMs();
+      noticed.survivalRoll = 0.01;
+      // DO NOT harvest yet: 21 ticks cross at least one % 20 boundary, so
+      // the sweep sees a ready, unnotified plot and emits exactly one
+      // farmReady { ready: 1 } with ZERO draws; the following 20 ticks cross
+      // another boundary and prove the flip silenced it.
+      rec.tick(21);
+      rec.tick(20);
+      rec.snapshot('ready-noticed'); // fplot samples notified: true here
+      // Close the bed out so the scenario still ends with every bed free.
+      harvestCrop(sim.ctx, p, meta, BED_READY);
+      rec.snapshot('harvested-noticed');
+      rec.tick(8);
+
+      // ---- The Phase 11 extension (deviation (bw) discharged): the
+      // golden-WIN beat and the paying-band tier-3 seed-back beat, appended
+      // AFTER every earlier beat so their labels and draw ledger stay
+      // byte-identical. Both beats are POSITION-SEARCHED against this stream
+      // (the GOLDEN_WIN_SEED probe idiom from tests/professions_farming
+      // .test.ts, transplanted to the scenario): the shared rng is
+      // mulberry32, so every appended roll is a pure function of how many
+      // draws precede it. Probed by sampling sim.rng right after the beat
+      // above. RE-PROBED at masterwrought Phase 11f (see
+      // FARM_GOLDEN_PADDING_CYCLES): the golden bonus draw made each cycle
+      // cost FOUR draws instead of three, so the old 28 landed the golden
+      // beat on a loser. At 36 cycles the golden beat's own roll is the
+      // winner at stream index 167 (0.004931 < 1/90). The
+      // padding below is REAL play only (this scenario's charter: the real
+      // command bodies, never bare rng draws): each cycle is a real plant
+      // (two draws) plus a real WITHERED harvest (two draws, both spent and
+      // ignored per the contract above), advancing the stream by exactly
+      // four while minting no CROP produce, no skill gains, no golden win,
+      // and no farmReady (the plot is planted, ripened, and harvested inside
+      // one drive step, so the 1 Hz sweep never observes it). The wither
+      // payout's two husks per cycle ARE minted and expected: coverage_c
+      // pins every padding farmWithered event and the husk pouch total,
+      // composed against FARM_GOLDEN_PADDING_CYCLES rather than a literal.
+      // Withering NEEDS
+      // low skill: crops die only at low proficiency (the keep chance
+      // saturates at 1 by 75, where a stored 0.99 roll SURVIVES), so the
+      // padding rides the beat-10 proficiency-write idiom, dropping to the
+      // at-gate 0.85 window for the cycles and restoring 75 for the real
+      // beats. The writes are draw-free state, exactly like readyAtMs. ----
+      meta.gatheringProficiency.farming = 0;
+      for (let cycle = 0; cycle < FARM_GOLDEN_PADDING_CYCLES; cycle++) {
+        sim.addItem('vale_wheat_seed', 1, pid);
+        // Clear the previous plant's flavor-cast busy gate (draw-free).
+        rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+        plantCrop(sim.ctx, p, meta, BED_WITHERED, CROP);
+        const pad = meta.farmPlots.get(BED_WITHERED) as PlotState;
+        pad.readyAtMs = sim.ctx.lockoutNowMs();
+        pad.survivalRoll = 0.99;
+        harvestCrop(sim.ctx, p, meta, BED_WITHERED);
+      }
+
+      // THE GOLDEN-WIN BEAT: the plant spends stream indexes 165 and 166, so
+      // the harvest's golden roll is the probed winner at index 167 and its
+      // BONUS roll rides at 168 (Phase 11f). The
+      // stored yieldSeed is OVERWRITTEN with the probed BOTH-GRADES winner
+      // at the live skill (FARM_GOLDEN_WIN_YIELD_SEED above, the
+      // FARM_TONIC_WINNER_YIELD_SEED idiom), so the five-fold applies to a
+      // nonzero base AND fine grade: the signed grants, the crop-source
+      // announce fanout, and the gather_event:golden_harvest mark all reach
+      // a golden digest for the first time.
+      meta.gatheringProficiency.farming = 75; // the probed expansion's skill
+      sim.addItem('vale_wheat_seed', 1, pid);
+      rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+      plantCrop(sim.ctx, p, meta, BED_READY, CROP);
+      rec.snapshot('planted-golden');
+      const goldenPlot = meta.farmPlots.get(BED_READY) as PlotState;
+      goldenPlot.readyAtMs = sim.ctx.lockoutNowMs();
+      goldenPlot.survivalRoll = 0.01;
+      goldenPlot.yieldSeed = FARM_GOLDEN_WIN_YIELD_SEED;
+      harvestCrop(sim.ctx, p, meta, BED_READY);
+      rec.snapshot('harvested-golden-win');
+      rec.tick(8);
+
+      // THE PAYING-BAND TIER-3 SEED-BACK BEAT: one more padding cycle walks
+      // the stream so the Thornpeak barley harvest's seed-back roll lands in a
+      // PAYING band and really grants a highland_barley_seed, which is what
+      // upgrades the scenario-level grant proof from 0 === 0 to a real grant.
+      // The exact band is the recorded truth of the golden and moves with any
+      // appended draw; coverage_c states which one it landed in. Its golden
+      // roll is a recorded loss, so no bonus rides this beat.
+      meta.gatheringProficiency.farming = 0; // the padding wither window again
+      sim.addItem('vale_wheat_seed', 1, pid);
+      rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+      plantCrop(sim.ctx, p, meta, BED_WITHERED, CROP);
+      const padFinal = meta.farmPlots.get(BED_WITHERED) as PlotState;
+      padFinal.readyAtMs = sim.ctx.lockoutNowMs();
+      padFinal.survivalRoll = 0.99;
+      harvestCrop(sim.ctx, p, meta, BED_WITHERED);
+      meta.gatheringProficiency.farming = 75; // restore for the tier-3 beat
+      teleport(sim, p, -23, 685); // bed_thornpeak_1 (content/farm_patches.ts)
+      sim.addItem('highland_barley_seed', 1, pid);
+      rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+      plantCrop(sim.ctx, p, meta, BED_T3, 'highland_barley');
+      rec.snapshot('planted-t3-paying');
+      const barleyPaying = meta.farmPlots.get(BED_T3) as PlotState;
+      barleyPaying.readyAtMs = sim.ctx.lockoutNowMs();
+      barleyPaying.survivalRoll = 0.01;
+      harvestCrop(sim.ctx, p, meta, BED_T3);
+      rec.snapshot('harvested-t3-paying');
+      // Drain the paying harvest's queued 0.02 gain into the final sample.
+      rec.tick(8);
+
+      // ---- The Phase 12 extension (beat P, the (bw) residual discharged):
+      // the wellfed TICK-PHASE mint, ridden for real. The mint is the one
+      // genuinely new tick-phase path of the well-fed phase (updateRegen
+      // completion, not a command), so the beat rides a REAL consume
+      // completion through ticks: addItem, useItem, the full 18s
+      // sit-restore, then the sampled buff. Zero draws on every step (the
+      // eat is a pure slot write and the ride is mob-dead quiet), so every
+      // prior frame and the whole 110-draw ledger stay byte-identical: a
+      // pure append. ----
+      // Wait out the tier-3 beat's still-running plant flavor cast first
+      // (the drive's own busy-gate idiom): useItem refuses during a
+      // non-spell cast, and rec.tick(8) above is shorter than the cast.
+      rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+      sim.addItem('evergarden_braised_greens', 1, pid);
+      sim.useItem('evergarden_braised_greens', pid);
+      rec.snapshot('wellfed-eating');
+      rec.tick(400); // past the 18s sit-restore (360 ticks) with regen-tick slack
+      rec.snapshot('wellfed-dish-minted');
+
+      // ---- The shared feast loop (Phase 12): place, bite, mint, expire.
+      // placeFeast spends the bag item and spawns the farm_feast entity on
+      // the normal roster; the placer bites the own feast (a charge spent
+      // at bite START, the ledger marked) and rides the SAME completion to
+      // a last-eaten-wins REFRESH of the buff minted above (the (by)
+      // namespace rule, sampled in the digest). Expiry rides the readyAtMs
+      // idiom: a draw-free expiresAtTick write plus the 1 Hz updateFarming
+      // sweep drops the entity and the FeastState together (the one
+      // despawn site). Zero draws end to end. ----
+      sim.addItem('harvest_feast', 1, pid);
+      sim.placeFeast(pid);
+      rec.snapshot('feast-placed');
+      const feastId = [...sim.feasts.keys()][0] as number;
+      sim.consumeFeast(feastId, pid);
+      rec.snapshot('feast-bitten');
+      rec.tick(400); // the bite's own 18s sit-restore, same slack as above
+      rec.snapshot('feast-wellfed-minted');
+      const feast = sim.feasts.get(feastId);
+      if (feast) feast.expiresAtTick = sim.ctx.tickCount;
+      rec.tick(21); // across the next 1 Hz boundary: the sweep despawns
+      rec.snapshot('feast-expired');
+    },
+  };
+}
+
 // The two-pool bag capacity mechanic (phase 05) across the bank counter. Every
 // OTHER scenario in this suite runs with empty bag sockets, and with no
 // materials-only bag socketed the two-pool arithmetic collapses to exactly the
@@ -5954,6 +6513,20 @@ function riftBossFloor(): Scenario {
 // passive idle rolls from the historical shared stream to deterministic per-mob
 // lanes. Track one mob on each side of the boundary so the golden records both
 // the intended state divergence and the resulting shared RNG digest.
+// ID-FRAGILE BY CONSTRUCTION, and it costs a review round every time nobody
+// remembers: this scenario's facing / pos.x / pos.z / wanderTimer leaves are a
+// pure function of the mob's ABSOLUTE entity id, because the culling path routes
+// passive rolls through the private id-seeded lane (src/sim/mob/idle_rng.ts seeds
+// on mob.id). So ANY change that adds a world-init entity ahead of these mobs (a
+// merged packet, a release sync adding an NPC) shifts the id and moves four
+// physics-looking leaves at once, which reads exactly like a determinism drift.
+// The scenario also draws ZERO shared rng, so the draw digest cannot arbitrate.
+// The recipe that settles it in two minutes, used at the Phase 11d farming
+// absorb: build this scenario on the new tree, reassign the near mob's id back to
+// its old value before driving, re-drive the same tick count, and compare the four
+// leaves against the OLD golden. If they reproduce to 1e-6, the movement is the
+// id shift and nothing else. (At 11d, forcing 972 back to 968 reproduced base's
+// leaves exactly.) A real drift will not reproduce under that substitution.
 function idleMobDistanceCulling(): Scenario {
   const seed = 20061;
   return {
@@ -6125,6 +6698,127 @@ function catFormAutoSwing(): Scenario {
   };
 }
 
+// Rift winning-clear payout: a dev-style rift run at an A-rank baseLevel driven
+// through the REAL completion flow until the 1 Hz updateRiftInstances sweep
+// claims the clear and addRiftClearGearLoot rolls the whole corpse ladder.
+// rift_boss_floor cannot reach this: its hand-placed boss dies on floor 0, and
+// the completion sweep only claims an instance whose CURRENT generated floor
+// isBoss, so completeRiftClear (and every payout draw behind it) stayed outside
+// the gate until this scenario (the phase 11 pattern draw landed with no golden
+// moving, which is the blindness this closes). Each non-boss floor is cleared
+// the fixture way (hand-killed trash, hand-solved puzzle), then the descent is
+// walked through the real trigger; the boss floor kill lets the tick pre-pass
+// stamp the death and the sweep pay the clear. Dev entry (no portal) wins the
+// claim by design, so the payout runs without race scaffolding. Seed 4332 is
+// chosen so the 8% pattern roll (draw 6) SUCCEEDS in-window: the golden pins
+// not only every chance() position but the rng.int pick over the sorted
+// RIFT_PATTERN_ITEM_IDS (pattern_forgefold_legguards on this seed). The boss is
+// tracked, so the corpse loot (guaranteed heroic epic + the pattern + the
+// A-rank coin bonus) is in the state digest, not just the draw digest.
+//
+// PARAMETERISED BY RANK at masterwrought Phase 11f, which CLOSES the residual
+// the A-rank coverage line above used to record. The draw ladder is rank-gated
+// (progression.ts numbers it 0 to 6), so one rank exercises only its own arms
+// and three quarters of the ladder sat outside every golden. Phase 11f appends
+// a NEW draw after draw 6 on the same winning B/A/S path, and appending into a
+// stream no golden covers is exactly how a draw-order change ships unseen, so
+// all four ranks are recorded FIRST, as this phase's first commit.
+//
+// baseLevel picks the rank through the shipped inverse map
+// (RIFT_RANK_BASE_LEVEL: C 20, B 22, A 25, S 28), so the ranks here are derived
+// from content rather than restated. The A row keeps the original scenario NAME
+// and its original SEED, so its committed golden does not move for the rename.
+// Each rank carries its OWN seed because the pattern draw is a 0.08 chance and
+// a golden that pins the rng.int pick position is worth far more than one that
+// records a miss: the B and S seeds were hunted for an in-window pattern hit
+// (about 1 in 12 seeds). C needs no hunt because its arm RETURNS after draw 0
+// and never reaches the pattern roll at all.
+function riftClearRewards(baseLevel = 25, seed = 4332): Scenario {
+  const rank = riftRankForBaseLevel(baseLevel);
+  // Per-rank coverage: what each rank's arm actually reaches in the numbered
+  // ladder, so a reader can see the four rows tile it between them.
+  const ladder: Record<string, string> = {
+    C: 'addRiftClearGearLoot on the C-RANK path: draw 0 only (the normal-pool rng.int pick plus RIFT_COIN_BONUS_C), then the arm RETURNS, so no epic, no mount and no pattern draw is reached; this is the pin that the C early-out really exits',
+    B: 'addRiftClearGearLoot on the B-RANK path: draws 1, 5 and 6 in order (the RIFT_EPIC_CHANCE_B chance() call kept so the draw survives, the green mount tier, and the pattern roll, which SUCCEEDS on this seed so the rng.int pick position is pinned)',
+    A: 'addRiftClearGearLoot on the A-RANK path: draws 2, 5, and 6 in order (the phase 11 pattern draw succeeds on this seed, pinning the pick position); the C/B/S-only arms are covered by the sibling rift_clear_rewards_c/_b/_s scenarios',
+    S: 'addRiftClearGearLoot on the S-RANK path: draws 2, 3, 4 (one INDEPENDENT roll per id in RIFT_LEGENDARY_ITEM_IDS, in array order), 5 (the epic mount tier) and 6 in order, the widest arm of the ladder and the only one reaching the legendary rolls',
+  };
+  return {
+    name: rank === 'A' ? 'rift_clear_rewards' : `rift_clear_rewards_${rank.toLowerCase()}`,
+    coverage: [
+      'completeRiftClear winning payout reached through the real 1 Hz updateRiftInstances sweep',
+      ladder[rank],
+      'openDescent + the walk-in descent trigger + spawnRiftFloor across all three floors',
+      'openExit + rank coin bonus on the winning corpse (dev-entry claim, no race)',
+    ],
+    build: () => new Sim({ seed, playerClass: 'warrior', autoEquip: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim;
+      sim.setPlayerLevel(20);
+      const p = sim.player as AnyEntity;
+      beef(p);
+      p.gm = true; // survive floor hazards while the run is walked, auras still apply
+      // Dev entry. First arg is the RIFT SEED (floor count derives 3..6 from
+      // it via riftFloorCount; seed 3 yields 3 floors), second the baseLevel
+      // (25 = A rank): changing the 3 changes the generated rift, not a
+      // floor-count knob.
+      sim.enterRift(3, baseLevel, sim.playerId);
+      const inst = requireValue(
+        sim.riftInstances.find((i) => i.partyKey !== null),
+        'rift_clear_rewards instance',
+      );
+      rec.snapshot('entered');
+      while (inst.floorIndex < inst.floorCount - 1) {
+        // Clear the floor the fixture way (the rift_boss_floor idiom): trash
+        // hand-killed, puzzle hand-solved, so the 1 Hz sweep opens the descent.
+        for (const id of inst.mobIds) {
+          if (id === inst.bossId) continue;
+          const e = sim.entities.get(id);
+          if (e) {
+            e.hp = 0;
+            e.dead = true;
+          }
+        }
+        inst.litPylons = new Set(inst.pylonIds);
+        inst.puzzleSolved = true;
+        rec.tick(20); // guarantees exactly one 1 Hz sweep: openDescent runs
+        const desc = requireEntity(
+          sim,
+          requireValue(inst.descentId, 'rift descent id'),
+          'rift descent object',
+        );
+        teleport(sim, p, desc.pos.x, desc.pos.z);
+        rec.tick(1); // updateRiftTriggers walks the descent: next floor spawns
+        rec.snapshot(`descended-to-${inst.floorIndex}`);
+      }
+      // Boss floor: track the boss so the payout lands in the state digest,
+      // then kill everything at once. The tick pre-pass stamps bossDiedAtTick,
+      // and the next 1 Hz sweep runs completeRiftClear -> addRiftClearGearLoot
+      // (the full draw ladder) -> openExit.
+      const boss = requireEntity(sim, requireValue(inst.bossId, 'rift boss id'), 'rift floor boss');
+      rec.track(boss.id);
+      rec.notes.bossId = boss.id;
+      for (const id of inst.mobIds) {
+        const e = sim.entities.get(id);
+        if (e) {
+          e.hp = 0;
+          e.dead = true;
+          // The corpse window a REAL death stamps (combat/damage.ts). The
+          // fixture kill has to stamp it too since the 2026-08-24 release:
+          // updateMob now expires a DECAYED corpse's interactions
+          // (expireDecayedCorpseInteractions over respawn_policy's
+          // corpseHasDecayed), and a hand-killed body left at corpseTimer 0
+          // reads as already decayed, so the payout's own corpse would go
+          // unlootable inside the sweep window below.
+          e.corpseTimer = CORPSE_DURATION;
+        }
+      }
+      rec.tick(25); // covers the stamp tick plus one full sweep window
+      rec.snapshot('clear-paid');
+    },
+  };
+}
+
 // The entity-aware open-world LOS policy must use real supported feet while
 // continuing to reject an airborne source whose lifted ray clears ordinary
 // cover. Both arms run in the shipping world seed so the positive arm uses the
@@ -6233,6 +6927,378 @@ function supportedElevationLineOfSight(): Scenario {
 
       rec.notes.healerId = healerId;
       rec.notes.allyId = allyId;
+    },
+  };
+}
+
+// The Perfecting stage (Masterwrought phase 12): the apex rank walk through
+// the REAL Sim.perfectItemAs delegate (src/sim/professions/perfecting.ts
+// resolvePerfectingAttempt) in BOTH target shapes the ref discriminates: a
+// BAGGED apex neck walked all the way to the Perfected stamp, and a WORN apex
+// ring attempted twice in place. Exists because perfecting.ts is a NEW draw
+// site on the shared stream (its header's contract: EXACTLY one ctx.rng draw
+// per resolved attempt, ZERO on every deny arm) and nothing else in the suite
+// reaches it (no parity scenario crafts an apex recipe either, so the
+// craft-time head start is pinned only in tests/perfecting.test.ts).
+//
+// Written rng-INDEPENDENT: the bagged loop keeps attempting until the piece
+// stamps Perfected, bounded well past the expected five attempts (four
+// successes at 0.8), so whatever success/failure sequence the seed yields the
+// walk completes and every resolved attempt costs exactly one draw. The
+// coverage arm reads the ledger as arithmetic over the notices (draws equal
+// advances plus fails) rather than a band literal; the pinned seed's actual
+// sequence is what the golden records. Each staged denial is bracketed by a
+// frame on either side, so the arm can pin it as a NO-OP on every sampled
+// field (identical state digests), not merely as draw-free. Deliberately NO
+// ticks (the professions_craft idiom): a resolved attempt is instant, so
+// every draw in this trace is a perfecting draw and the ledger reads straight
+// off the labelled frames.
+const PERFECTING_BAGGED_APEX = 'wyrmfall_pendant'; // apex neck, jewelcrafting, no class gate
+const PERFECTING_WORN_APEX = 'warhewn_signet'; // apex ring, jewelcrafting, no class gate
+// The bagged walk's attempt bound. At four successes needed with a 0.8
+// chance, twelve attempts fail to complete the walk about six times in a
+// hundred thousand seeds; the recorded seed completes inside it (the coverage
+// arm pins the stamp), and the bound is what keeps the drive rng-independent.
+export const PERFECTING_WALK_ATTEMPT_CAP = 12;
+// Materials for the cap plus the two worn attempts, so no resolved attempt
+// can ever deny for want of a stack mid-walk; the materials denial at the end
+// is staged by removing the ember stack outright.
+const PERFECTING_WALK_STACK = PERFECTING_WALK_ATTEMPT_CAP + 2;
+function perfectingWalk(seed = 1): Scenario {
+  return {
+    name: 'perfecting_walk',
+    coverage: [
+      'class:warrior (perfecter, level 20 for the derived apex equip gate; setPlayerLevel draws nothing)',
+      'skill denial (jewelcrafting one under PERFECTING_SKILL_REQ): the dedicated skill line, ZERO draws, nothing consumed',
+      'bagged walk (wyrmfall_pendant via { bag }): the first resolved attempt binds the copy (the R2 boundTo stamp + the bind notice); EVERY resolved attempt draws exactly once and spends one of each material',
+      'fail-forward: a failed attempt emits the fail notice and leaves the rank untouched; the track advances only on an advance notice',
+      'the Perfected stamp: perfecting deleted, perfected true, the R5 delta merged into rolled.stats (int 1 on the neck; a zero share is never written), the done notice',
+      'post-stamp denial: a NAMELESS perfect_item on the Perfected copy routes to the phase 13 promotion ladder and refuses with the missing-name line, ZERO draws, nothing consumed',
+      'worn attempts (warhewn_signet equipped through equipItem, via { slot }): two resolved attempts mutate the equipmentInstance copy in place, the bind notice, exactly two draws',
+      'materials denial (the ember stack removed): the missing-materials line, ZERO draws',
+      'noItem denial (a bag ref past the end of the bags): the unresolvable-ref line, ZERO draws',
+      'not-apex denial (a held prismglass_setting): the not-masterwrought line above the material gate, ZERO draws',
+      'lock-only shortfall (every material cell locked, raw counts intact): the DEDICATED locked line, not the missing-materials one, ZERO draws',
+    ],
+    build: () => new Sim({ seed, playerClass: 'warrior', autoEquip: false }),
+    drive(rec: Recorder) {
+      const sim = rec.sim;
+      const pid = sim.playerId as number;
+      const meta = sim.players.get(pid) as PlayerMeta;
+      rec.notes.pid = pid;
+
+      // Level 20 first: the apex equip gate is the DERIVED level-20
+      // requirement (item_level_req.ts), and setPlayerLevel draws nothing, so
+      // the ledger below starts from zero foreign draws. The grants are
+      // ordinary draw-free hub lines.
+      sim.setPlayerLevel(20, pid);
+      sim.addItem(PERFECTING_BAGGED_APEX, 1, pid);
+      sim.addItem(PERFECTING_WORN_APEX, 1, pid);
+      for (const c of PERFECTING_ATTEMPT_COST) {
+        sim.addItem(c.itemId, c.count * PERFECTING_WALK_STACK, pid);
+      }
+      // The bag ref names a CELL plus the item id seen there (item_copy_ref
+      // discipline). Cells DO shift when a stack empties (removeUnlockedFromSlots
+      // splices it out), but this drive's material stacks sit ABOVE the apex
+      // cell and never empty inside the walk, so the index stays good; had it
+      // shifted, the id pin would deny noItem rather than target another piece.
+      const bagRef = {
+        bag: meta.inventory.findIndex((s) => s.itemId === PERFECTING_BAGGED_APEX),
+        itemId: PERFECTING_BAGGED_APEX,
+      };
+      if (bagRef.bag < 0) throw new Error('the bagged apex piece did not land in the bags');
+
+      // Step 1: DENIAL, one skill point short. The ladder answers before the
+      // material gates and before any draw; the staged frame right before it
+      // is the denial's no-op baseline.
+      meta.craftSkills.jewelcrafting = PERFECTING_SKILL_REQ - 1;
+      rec.snapshot('perfect-staged');
+      sim.perfectItemAs(pid, bagRef);
+      rec.snapshot('perfect-denied-skill');
+
+      // Step 2: the BAGGED walk to Perfected. Each resolved attempt is one
+      // draw; the loop reads the stamp off the live copy so the drive never
+      // assumes an outcome sequence.
+      meta.craftSkills.jewelcrafting = PERFECTING_SKILL_REQ;
+      let baggedAttempts = 0;
+      while (
+        baggedAttempts < PERFECTING_WALK_ATTEMPT_CAP &&
+        meta.inventory[bagRef.bag]?.instance?.perfected !== true
+      ) {
+        sim.perfectItemAs(pid, bagRef);
+        baggedAttempts++;
+      }
+      rec.notes.baggedAttempts = baggedAttempts;
+      rec.snapshot('perfect-bagged-walked');
+
+      // Step 3: the post-stamp DENIAL, zero draws, nothing consumed.
+      sim.perfectItemAs(pid, bagRef);
+      rec.snapshot('perfect-denied-perfected');
+
+      // Step 4: the WORN shape. The ring equips through the ordinary resolver
+      // (first free ring socket, ring1) and two attempts mutate the
+      // equipmentInstance copy in place: two draws, whatever they roll (four
+      // successes are needed, so the ring can never stamp here).
+      sim.equipItem(PERFECTING_WORN_APEX, pid);
+      sim.perfectItemAs(pid, { slot: 'ring1' });
+      sim.perfectItemAs(pid, { slot: 'ring1' });
+      rec.snapshot('perfect-worn-attempted');
+
+      // Step 5: the materials DENIAL. Removing the whole ember stack (a
+      // draw-free hub line) makes the next worn attempt a genuine shortfall;
+      // the pre-strip count is stashed so the coverage arm can bill the ember
+      // like the other two materials, and the stripped frame is the denial's
+      // no-op baseline.
+      rec.notes.emberBeforeStrip = sim.countItem('makers_ember', pid);
+      sim.removeItem('makers_ember', sim.countItem('makers_ember', pid), pid);
+      rec.snapshot('perfect-embers-stripped');
+      sim.perfectItemAs(pid, { slot: 'ring1' });
+      rec.snapshot('perfect-denied-materials');
+
+      // Steps 6 to 8 (masterwrought Phase 18): the three deny arms the walk
+      // used to leave to tests/perfecting.test.ts, staged the same bracketed
+      // way as the three above so the gate pins each as draw-free AND
+      // state-identical rather than merely draw-free. They are APPENDED, so
+      // every frame recorded before this point is untouched by the addition.
+      //
+      // Step 6: the noItem denial. Presence-only ownership makes an
+      // UNRESOLVABLE ref the only noItem arm, so the ref names a bag cell
+      // past the end of the bags: baggedSlotAt answers nothing, the line
+      // emits, and the ladder never reaches a draw.
+      rec.snapshot('perfect-staged-noitem');
+      sim.perfectItemAs(pid, {
+        bag: meta.inventory.length + 5,
+        itemId: PERFECTING_BAGGED_APEX,
+      });
+      rec.snapshot('perfect-denied-noitem');
+
+      // Step 7: the NOT-APEX denial, one rung below noItem. The ref resolves
+      // to a real held item that is simply not masterwrought (a Prismglass
+      // Setting, still in the bags from the walk's own bill), so the arm
+      // proves the def gate rather than the ref gate: same zero draws, and
+      // the material stacks are untouched because this rung answers well
+      // above the material gate.
+      const settingCell = meta.inventory.findIndex((s) => s.itemId === 'prismglass_setting');
+      if (settingCell < 0) throw new Error('the walk left no prismglass setting to deny on');
+      rec.notes.notApexCell = settingCell;
+      sim.perfectItemAs(pid, { bag: settingCell, itemId: 'prismglass_setting' });
+      rec.snapshot('perfect-denied-notapex');
+
+      // Step 8: the LOCK-ONLY shortfall, which has its own line precisely
+      // because it is NOT a genuine shortfall. Put one ember back so the RAW
+      // counts meet the whole bill again (a draw-free hub line), then lock
+      // EVERY cell holding a material id through the real command entry: raw
+      // counts pass, unlocked counts do not, so the ladder takes the
+      // dedicated locked line instead of the missing-materials one it took
+      // at step 5. Locking is staged BEFORE the bracket so the denial itself
+      // is the only thing between the two frames.
+      sim.addItem('makers_ember', 1, pid);
+      const materialIds = new Set(PERFECTING_ATTEMPT_COST.map((c) => c.itemId));
+      let lockedCells = 0;
+      for (let i = 0; i < meta.inventory.length; i++) {
+        const slot = meta.inventory[i];
+        if (!slot.itemId || !materialIds.has(slot.itemId)) continue;
+        sim.setItemLocked(slot.itemId, true, pid, i);
+        lockedCells++;
+      }
+      rec.notes.lockedCells = lockedCells;
+      rec.snapshot('perfect-materials-locked');
+      sim.perfectItemAs(pid, { slot: 'ring1' });
+      rec.snapshot('perfect-denied-locked');
+    },
+  };
+}
+// gravewyrm_sanctum is the five-man that reaches EVERY heroic arm at once, and
+// it was picked by measuring the live tables rather than by name:
+// HEROIC_DUNGEON_TUNING names korzul_the_gravewyrm its finalBossId at
+// marksPerParticipant 1, HEROIC_BOSS_LOOT carries a korzul table (the two
+// heroic-only gear groups plus the farm patterns), and korzul's BASE table is
+// the only five-man one with heroic variants to swap (16 of them; hollow_crypt,
+// the obvious first pick, has ZERO, so a scenario there would have claimed the
+// heroicItem arm while never reaching it). Named here rather than inline so a
+// re-pick is one edit.
+export const HEROIC_FIVE_MAN_DUNGEON_ID = 'gravewyrm_sanctum';
+export const HEROIC_FIVE_MAN_BOSS_ID = 'korzul_the_gravewyrm';
+// A HEROIC FIVE-MAN clear, closing a coverage boundary the phase 09 ledger
+// recorded honestly and never filled: the gate pins a heroic RAID claim
+// (nythraxis_heroic_claim above) and a heroic DELVE (drowned_litany), but
+// nothing walked a heroic five-man, whose reward arms are a different set. Two
+// things are only true here: HEROIC_DUNGEON_TUNING pays marksPerParticipant to
+// EVERY participant of a five-man final boss (the raid pays on its own table),
+// and the heroic loot swap on a five-man reads HEROIC_VARIANT_SOURCE_LEVEL,
+// where the raid's reads the raid tier. hollow_crypt is the model five-man:
+// the tuning names morthen its final boss, and HEROIC_BOSS_LOOT carries a
+// morthen table, so one kill drives all three heroic arms at once (the
+// appended heroic loot draws, the heroicItem variant swap, and
+// awardHeroicMarks with its per-difficulty daily lockout).
+//
+// DELIBERATELY LEAN, the nythraxis_heroic_claim discipline: the trash pull is
+// not the residual and the boss dies to one lethal hit, which is what the
+// heroic arms of tests/dungeons.test.ts do. Every member walks the door
+// (enterDungeon per member, the shared instanceKeyFor join) because the marks
+// arm pays the PARTICIPATION snapshot: a party left at the door would record a
+// one-player payout and stop being a representative clear.
+//
+// SEED 4520 WAS MEASURED, NOT PICKED, against both heroic loot arms at once,
+// and it is the first seed from 4520 satisfying both (the hunt drove this very
+// scenario body and swapped only the Sim seed):
+//   1. THE VARIANT SWAP FIRING. A base drop must actually come back as its
+//      heroic_ copy, or the coverage line would claim an arm the recording
+//      never reached (the professions_craft "proc missed for the pinned seed"
+//      doctrine). This seed swaps heroic_wildgrowth_leggings.
+//   2. AN APPENDED HEROIC-TABLE DROP. At least one item from
+//      HEROIC_BOSS_LOOT[korzul] must land, which is what pins the stream
+//      position a base-table tail append would shift. This seed sheds
+//      sanctum_prowlers_grips and gravewyrm_claws.
+// Measured over seeds 4520 to 4559: 32 of 40 swap a variant, 40 of 40 shed an
+// appended drop (the korzul_heroic group's chances sum to 1.0, so it always
+// pays), and 32 clear both.
+function heroicFiveManClear(): Scenario {
+  return {
+    name: 'heroic_five_man_clear',
+    coverage: [
+      'a heroic FIVE-MAN claim: setDungeonDifficulty heroic + enterDungeon per member sharing one instance (instanceKeyFor), the five-man counterpart of the raid claim above',
+      'rollLoot HEROIC arm on a five-man final boss: the base-table walk, then the appended HEROIC_BOSS_LOOT draws in the SAME call',
+      'heroicItem(): base drops swapped IN PLACE for their heroic variants at the FIVE-MAN tier (HEROIC_VARIANT_SOURCE_LEVEL), the arm the raid claim cannot reach',
+      'awardHeroicMarks on a five-man heroic kill: marksPerParticipant to every participant, plus the hollow_crypt:heroic daily lockout',
+      'class:warrior',
+    ],
+    sampleEvery: 10,
+    build: () => new Sim({ seed: 4520, playerClass: 'warrior', noPlayer: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim;
+      const tankPid = sim.addPlayer('warrior', 'HeroicFiveTank') as number;
+      sim.setPlayerLevel(MAX_LEVEL, tankPid);
+      sim.setSpec('prot', tankPid);
+      const partyPids: number[] = [tankPid];
+      for (let i = 0; i < 4; i++) {
+        const pid = sim.addPlayer('mage', `HeroicFiveDps${i}`) as number;
+        sim.setPlayerLevel(MAX_LEVEL, pid);
+        sim.partyInvite(pid, tankPid);
+        sim.partyAccept(pid);
+        partyPids.push(pid);
+      }
+      // The one line that makes this a heroic run. Set on the LEADER, whose
+      // selection the claim reads; every member then walks the same door and
+      // joins the one claim rather than each minting their own.
+      sim.setDungeonDifficulty('heroic', tankPid);
+      for (const pid of partyPids) sim.enterDungeon(HEROIC_FIVE_MAN_DUNGEON_ID, pid);
+      const inst = requireValue(
+        sim.instances.find(
+          (i) => i.dungeonId === HEROIC_FIVE_MAN_DUNGEON_ID && i.difficulty === 'heroic',
+        ),
+        'parity scenario heroic five-man instance',
+      );
+      rec.notes.instanceMembers = [...inst.enteredBy].sort((a, b) => a - b);
+      const boss = requireValue(
+        [...sim.entities.values()].find(
+          (e: AnyEntity) => e.kind === 'mob' && e.templateId === HEROIC_FIVE_MAN_BOSS_ID && !e.dead,
+        ),
+        'parity scenario heroic five-man boss',
+      ) as AnyEntity;
+      rec.track(boss.id);
+      rec.notes.bossId = boss.id;
+      rec.notes.tankPid = tankPid;
+      rec.notes.partyPids = partyPids;
+
+      // Stage the whole party inside PARTY_XP_RANGE of the boss, the raid
+      // claim's reasoning exactly: handleDeath builds its participation
+      // snapshot from the party members within that range, and the marks arm
+      // pays that snapshot. Y is pinned to the boss's own floor because the
+      // shared teleport helper snaps to OVERWORLD terrain, which drops an
+      // instanced player into lethal falling damage.
+      const stage = (e: AnyEntity, x: number, z: number) => {
+        e.pos.x = x;
+        e.pos.z = z;
+        e.pos.y = boss.pos.y;
+        e.prevPos = { ...e.pos };
+        e.fallStartY = boss.pos.y;
+        e.vy = 0;
+        e.onGround = true;
+        sim.rebucket(e);
+      };
+      const tank = sim.entities.get(tankPid) as AnyEntity;
+      stage(tank, boss.pos.x, boss.pos.z - 6);
+      const dps = partyPids
+        .filter((pid) => pid !== tankPid)
+        .map((pid) => sim.entities.get(pid) as AnyEntity);
+      for (let i = 0; i < dps.length; i++) {
+        stage(dps[i], boss.pos.x - 3 + i * 2, boss.pos.z - 12);
+      }
+      rec.snapshot('claimed');
+
+      sim.dealDamage(tank, boss, boss.hp + 1000, false, 'physical', null, 'hit', true);
+      rec.tick(1); // updateMob dead-branch -> handleDeath -> rollLoot + the marks award
+      rec.snapshot('death');
+    },
+  };
+}
+
+// The FLASK aura path, golden-covered across hosts. Phase 04 considered a flask
+// parity golden and DECLINED it on the maintenance cost every future release
+// sync pays for a moved golden; Phase 18 reopened that, because the ordering
+// rules the flask family carries are exactly what a golden is for. Each of the
+// three keys on the Aura.flask MARKER rather than the item kind or the aura id
+// (src/sim/items.ts), so an extraction can reorder the strip loop, the
+// same-family replace and the downward refusal against each other while every
+// scalar in tests/flask_consumables.test.ts still matches.
+//
+// The four beats drive the real useItem entry point and take NO ticks (the
+// perfecting_walk idiom): a flask applies on the spot, so every frame here is
+// a quaff's own result and the trace reads straight off the labelled frames.
+// The scenario draws no rng at all, which is itself the point of recording it:
+// a use path that STARTS drawing shows up in the draw digest immediately.
+const FLASK_SAME_FAMILY_WEAKER_ID = 'elixir_of_the_serpent'; // buff_sta 12/900
+const FLASK_ID = 'ironhusk_flask'; // buff_sta 13/1200, the same family, stronger
+const FLASK_OTHER_FAMILY_ID = 'warboar_flask'; // buff_ap, a different family
+const FLASK_SCENARIO_IDS = [FLASK_SAME_FAMILY_WEAKER_ID, FLASK_ID, FLASK_OTHER_FAMILY_ID] as const;
+function flaskConsumables(): Scenario {
+  return {
+    name: 'flask_consumables',
+    coverage: [
+      'useItem on the elixir rung: the same-family aura applies (the quaff beat, and the thing the flask then replaces)',
+      'UPWARD replace: the flask replaces the weaker same-family source in place, never stacking a second aura',
+      'DOWNWARD refusal: the weaker source is refused while the flask is up, consuming nothing (a state no-op between bracketing frames)',
+      'the ONE-FLASK strip: a flask of a DIFFERENT family sheds the standing flask, so exactly one flask-marked aura ever rides',
+      'class:warrior',
+    ],
+    build: () => new Sim({ seed: 4522, playerClass: 'warrior', autoEquip: false }),
+    drive(rec: Recorder) {
+      const sim = rec.sim;
+      const pid = sim.playerId as number;
+      rec.notes.pid = pid;
+      // Max level so nothing is refused for level, and the grants are ordinary
+      // draw-free hub lines. TWO of each so the refusal beat is provable: a
+      // refused quaff leaves its stack at two, where a silent consume would
+      // leave one.
+      sim.setPlayerLevel(MAX_LEVEL, pid);
+      for (const itemId of FLASK_SCENARIO_IDS) sim.addItem(itemId, 2, pid);
+      rec.notes.flaskIds = [...FLASK_SCENARIO_IDS];
+      rec.snapshot('flasks-staged');
+
+      // Beat 1: the QUAFF. The weaker same-family source goes up first, so the
+      // replace beat below has something to replace.
+      sim.useItem(FLASK_SAME_FAMILY_WEAKER_ID, pid);
+      rec.snapshot('flask-elixir-up');
+
+      // Beat 2: the UPWARD replace, in place: one aura of the family before,
+      // one after, and it is the flask.
+      sim.useItem(FLASK_ID, pid);
+      rec.snapshot('flask-upgraded');
+
+      // Beat 3: the DOWNWARD refusal. The weaker source is quaffed while the
+      // flask is up: neither the aura nor the stack may move, which the
+      // bracketing frames pin as a state no-op the way the perfecting walk
+      // pins its denials.
+      sim.useItem(FLASK_SAME_FAMILY_WEAKER_ID, pid);
+      rec.snapshot('flask-downgrade-refused');
+
+      // Beat 4: the ONE-FLASK strip. A flask of a DIFFERENT family sheds the
+      // standing one outright, so the flask-marked count stays at one
+      // whichever family is up: the rule that is NOT ordinary elixir
+      // behavior, and the one a reordered strip loop would break.
+      sim.useItem(FLASK_OTHER_FAMILY_ID, pid);
+      rec.snapshot('flask-family-swapped');
     },
   };
 }
@@ -6513,10 +7579,26 @@ export const SCENARIOS: Scenario[] = [
   professionsFishingSession(),
   professionsToolEffectSlot(),
   idleMobDistanceCulling(),
+  professionsFarmingSession(),
   riftBossFloor(),
   grixRespawnWindow(),
   catFormAutoSwing(),
-
+  riftClearRewards(),
+  // The three sibling ranks (masterwrought Phase 11f, closing the residual the
+  // A row used to record). Seeds: C keeps 4332 because its arm returns after
+  // draw 0 and has no chance() to land in-window; B 4353 and S 4333 were HUNTED
+  // for an in-window pattern hit on draw 6, so all three of the ranks that
+  // reach that draw pin the rng.int pick position rather than recording a miss.
+  // The hunt measured 3 B hits and 4 S hits in 40 consecutive seeds, which is
+  // the 0.08 rate showing up where it should.
+  riftClearRewards(20, 4332),
+  riftClearRewards(22, 4353),
+  riftClearRewards(28, 4333),
+  // The heroic claim on the raid boss (masterwrought Phase 11f, closing the
+  // sibling residual the base table's own append comment records). Appended
+  // last, so it lands in the final shard automatically like every other
+  // addition; SHARD_BOUNDS ends at SCENARIOS.length and needs no edit.
+  nythraxisHeroicClaim(),
   // Appended, not filed beside bankRoundTrip: run_scenarios.ts tiles the gate
   // into contiguous slices whose last bound is SCENARIOS.length, so a scenario
   // added at the END lands in the final shard without moving any other
@@ -6527,6 +7609,15 @@ export const SCENARIOS: Scenario[] = [
   // The release's own append, kept at the END for the same tiling rule; both
   // arms of the v0.40.0 sync appended, so both land in the final shard.
   supportedElevationLineOfSight(),
+  // The Perfecting stage (masterwrought Phase 12). Appended last, so it lands
+  // in the final shard automatically; SHARD_BOUNDS needs no edit.
+  perfectingWalk(),
   ignivarRaidTuning(),
   varkhulRaidTuning(),
+  // masterwrought Phase 18, both appended for the same tiling rule the
+  // comments above state: SHARD_BOUNDS ends at SCENARIOS.length, so an
+  // addition at the END lands in the final shard and moves no other scenario
+  // between shards.
+  heroicFiveManClear(),
+  flaskConsumables(),
 ];

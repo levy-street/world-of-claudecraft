@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "06cbf5e3",
+      "nextId": 1003,
+      "state": "2567625d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -48,6 +48,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -61,7 +62,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 994,
+          "entityId": 998,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -89,7 +90,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -104,7 +106,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 994
+              "sourceId": 998
             }
           ],
           "blockChance": 0.05,
@@ -118,7 +120,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 994,
+          "id": 998,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -162,9 +164,9 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 1001,
-      "state": "080ad2b2",
-      "events": "ad1badc4",
+      "nextId": 1005,
+      "state": "b8ecaa00",
+      "events": "036b869c",
       "rng": {
         "draws": 4,
         "digest": "0d8664bb"
@@ -173,8 +175,8 @@
     {
       "tick": 4,
       "time": 0.2,
-      "nextId": 1001,
-      "state": "da363e29",
+      "nextId": 1005,
+      "state": "d1bcbd15",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -184,8 +186,8 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 1001,
-      "state": "e09f8335",
+      "nextId": 1005,
+      "state": "8664e0e1",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -217,6 +219,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -244,7 +247,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 994,
+          "entityId": 998,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -274,7 +277,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -289,7 +293,7 @@
               "name": "Battle Stance",
               "remaining": 3599.75,
               "school": "physical",
-              "sourceId": 994
+              "sourceId": 998
             }
           ],
           "blockChance": 0.05,
@@ -303,7 +307,7 @@
           "fiveSecondRule": 99.25,
           "healPower": 5,
           "hp": 50000,
-          "id": 994,
+          "id": 998,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -347,8 +351,8 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 1001,
-      "state": "2d92a346",
+      "nextId": 1005,
+      "state": "9296a118",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -380,6 +384,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -407,7 +412,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 994,
+          "entityId": 998,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -437,7 +442,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -462,7 +468,7 @@
           "ghost": true,
           "healPower": 5,
           "hp": 442,
-          "id": 994,
+          "id": 998,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -506,9 +512,9 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 1001,
-      "state": "b83fe6de",
-      "events": "d2523cce",
+      "nextId": 1005,
+      "state": "ba424554",
+      "events": "17fb21da",
       "rng": {
         "draws": 4,
         "digest": "0d8664bb"
@@ -539,6 +545,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -566,7 +573,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 994,
+          "entityId": 998,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -596,7 +603,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -611,7 +619,7 @@
               "name": "Resurrection Sickness",
               "remaining": 60,
               "school": "shadow",
-              "sourceId": 994,
+              "sourceId": 998,
               "undispellable": true,
               "value": -0.75
             }
@@ -627,7 +635,7 @@
           "fiveSecondRule": 99.25,
           "healPower": 2,
           "hp": 44,
-          "id": 994,
+          "id": 998,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -671,9 +679,9 @@
     {
       "tick": 6,
       "time": 0.3,
-      "nextId": 1001,
-      "state": "1d6c673b",
-      "events": "1e8fc761",
+      "nextId": 1005,
+      "state": "d77ada4f",
+      "events": "8aecc649",
       "rng": {
         "draws": 4,
         "digest": "0d8664bb"
@@ -682,8 +690,8 @@
     {
       "tick": 7,
       "time": 0.35,
-      "nextId": 1001,
-      "state": "e1dedf68",
+      "nextId": 1005,
+      "state": "c29e91c6",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -715,6 +723,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -742,7 +751,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 994,
+          "entityId": 998,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -772,7 +781,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -787,7 +797,7 @@
               "name": "Resurrection Sickness",
               "remaining": 59.9,
               "school": "shadow",
-              "sourceId": 994,
+              "sourceId": 998,
               "undispellable": true,
               "value": -0.75
             },
@@ -798,7 +808,7 @@
               "name": "Battle Stance",
               "remaining": 3599.9,
               "school": "physical",
-              "sourceId": 994
+              "sourceId": 998
             }
           ],
           "blockChance": 0.05,
@@ -812,7 +822,7 @@
           "fiveSecondRule": 99.35,
           "healPower": 2,
           "hp": 44,
-          "id": 994,
+          "id": 998,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",

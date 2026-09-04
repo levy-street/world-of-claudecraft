@@ -11,7 +11,7 @@
 // The S3 guard in tests/localization_fixes.test.ts parses src/sim/sim.ts, enumerates
 // every player-facing emit site, and fails if any is no longer recognized by a client
 // matcher — so a new unhandled sim string cannot ship silently.
-import { ABILITIES, DELVES, ITEMS, MOBS, ZONES } from '../sim/data';
+import { ABILITIES, CLASSES, DELVES, ITEMS, MOBS, ZONES } from '../sim/data';
 import { DELVE_MODULE_NAMES } from '../sim/sim';
 import type { EntityKind, PlayerClass } from '../sim/types';
 import { tEntity } from './entity_i18n';
@@ -188,11 +188,73 @@ const baseEnTable = {
   // Unique-equipped refusal: a second worn copy of the same legendary item
   // (src/sim/items.ts equipItem, rule in src/sim/equipment_rules.ts).
   'error.uniqueEquipped': 'You can only equip one of those.',
+  // Masterwrought counted-family refusals: the crafted-apex tier is worn at most
+  // two pieces at a time, and at most ONE of those two may be legendary
+  // (src/sim/items.ts equipItem, rule in src/sim/equipment_rules.ts
+  // masterwroughtConflictSlot). Placeholder-free, so both register in the EXACT
+  // matcher automatically.
+  'error.masterwroughtCap': 'You can only equip two Masterwrought items.',
+  'error.masterwroughtLegendary': 'You can only equip one legendary Masterwrought item.',
+  // The Sundered Essence extraction's lines (Masterwrought phase 04,
+  // src/sim/professions/sundering.ts). Three placeholder-free EXACT refusal
+  // rows; the completion line carries {item} and registers through its RULES
+  // regex beside log.quaff's. The fourth refusal ('You are busy.') has NO row
+  // here on purpose: hud.localizeErrorText's own EXACT map already localizes
+  // that literal (hud.errors.busy) and returns before localizeSimText runs,
+  // so a row here would be unreachable dead weight.
+  'error.sunderTarget': 'Only raid-won epics can be sundered.',
+  'error.sunderHeld': 'You are not holding that item.',
+  'error.sunderMoved': 'The item moved; sundering canceled.',
+  'log.sunderResult': 'You sunder {item} into Sundered Essence.',
+  // The Perfecting stage's lines (Masterwrought phase 12,
+  // src/sim/professions/perfecting.ts). Five placeholder-free EXACT refusal
+  // rows (the deny ladder's own arms; its unresolvable-ref arm reuses
+  // error.noItem below) plus the EXACT fail notice; the bind, advance, and
+  // done notices carry {item} (the def's English name, reverse-mapped via
+  // locItem like log.sunderResult) and register through their RULES regexes,
+  // placed AHEAD of the pet-mode `{name} is now {mode}.` catch-all because the
+  // bind line would otherwise match it. The advance line's {n}/{total} are
+  // plain numeric captures; the terminal advance emits n equal to total and is
+  // followed by the separate done line.
+  'error.perfectNotApex': 'Only Masterwrought items can be perfected.',
+  'error.perfectSkill': 'Perfecting that requires 125 skill in the craft that made it.',
+  'error.perfectMaterialLocked': 'A material needed for perfecting is locked.',
+  'error.perfectMaterials': 'You lack the materials to perfect that item.',
+  'log.perfectBind': 'Perfecting begins: {item} is now bound to you.',
+  'log.perfectAdvance': 'Perfecting: {item} advances to rank {n} of {total}.',
+  'log.perfectFail': 'The perfecting attempt fails; the materials are spent.',
+  'log.perfectDone': '{item} is now Perfected!',
+  // The orange promotion's deny ladder (Masterwrought phase 13,
+  // src/sim/professions/perfecting.ts: resolvePerfectingAttempt's internal
+  // promotion arm stamps the copy via promotePerfectedCopy). Four
+  // placeholder-free EXACT refusal rows; there is deliberately NO success
+  // text line (the legendaryForged / legendaryForgedZone events drive the
+  // client copy instead). This block RETIRED error.perfectAlready ('That item
+  // is already Perfected.'): the promotion made an already-Perfected copy a
+  // valid target, so the sim no longer emits it anywhere, and a dead matcher
+  // row would ship 21 locale strings free to drift. legendaryAlready is its
+  // successor at the ladder's top. The 'Deed of Making' noun must match the
+  // items catalog row (i18n.catalog/items.ts APPENDED_ITEM_NAMES) and its
+  // non-Latin overlay fills.
+  'error.legendaryAlready': 'That work is already legendary.',
+  'error.legendaryName': 'That work needs a name to become a legend.',
+  'error.legendaryNameShape': 'That name cannot be inscribed on the work.',
+  'error.legendaryDeed': 'You need a Deed of Making to make that work a legend.',
   // Refusal when an aimed equip slot (a paperdoll drop target) does not accept the
   // dragged piece, e.g. a helm dropped on a ring finger (src/sim/items.ts equipItem).
   'error.wrongEquipSlot': 'That does not go in that slot.',
   'error.faceWater': 'You need to face fishable water.',
+  // The /cast self-readout while the planting cast runs (castingReadout in
+  // src/sim/social/chat_readouts.ts, routed through ctx.error like every other
+  // readout). Registered here rather than parked in the v0.7 English backstop
+  // that still carries its fishing and gathering neighbours: a new string gets
+  // a real row. It carries no countdown BY DESIGN (plantCrop already resolved
+  // the whole plant, so the seconds left decide nothing), which is also why it
+  // has no placeholders and belongs in this exact-match table rather than in
+  // RULES.
+  'error.castingPlanting': 'You are planting.',
   'error.potionNotReady': 'That potion is not ready yet.',
+  'error.strongerEffectActive': 'A more powerful effect is already active.',
   // Tide-pool summon refusals (src/sim/interactions/crab_summon.ts
   // REASON_MESSAGE). Placeholder-free, so they register in the EXACT matcher
   // automatically.
@@ -269,6 +331,13 @@ const baseEnTable = {
   // pair or hobby selection fails validation on quest accept or again at turn-in.
   'error.professionChoiceUnavailable': 'That profession choice is not available.',
   'error.professionChoiceExpired': 'That profession choice is no longer available.',
+  // Recipe pattern refusals (src/sim/professions/pattern_items.ts): using a
+  // kind:'recipe' drop teaches its recipe, and these are the three ways that
+  // use is denied. Placeholder-free, so all three register in the EXACT
+  // matcher automatically.
+  'error.patternKnown': 'You already know that recipe.',
+  'error.patternProfession': 'You have not practiced that profession.',
+  'error.patternSkill': 'Your skill is too low to learn that pattern.',
   'error.townFocusNotInTown': 'You must be in town to set your focus.',
   'error.townFocusOverBudget': 'That allocation exceeds your focus point budget.',
   'error.townFocusInvalid': 'Invalid focus allocation.',
@@ -439,6 +508,16 @@ const baseEnTable = {
   'log.sitEat': 'You sit down to eat.',
   'log.sitDrink': 'You sit down to drink.',
   'log.quaff': 'You quaff {item}.',
+  'log.read': 'You read {item}.',
+  'log.placeStation': 'You set up {item}.',
+  // The name-aware article arm (Masterwrought phase 14): the placement line
+  // glues "the" onto a station name only when the name does not already begin
+  // with an article (mobile_station.ts), so "The Laden Hearth" keeps the bare
+  // form above while "Master's Field Forge" reads naturally. Only English
+  // distinguishes the two arms; every other locale mirrors its placeStation
+  // value (articles inflect by gender there, and the localized item name
+  // carries whatever article it wants, exactly as the bare form always did).
+  'log.placeStationThe': 'You set up the {item}.',
   'log.boutDecided': 'The bout is decided. Returning to the world…',
   'log.partyLeaves': '{name} leaves the party.',
   'log.partyLeft': '{name} has left the party.',
@@ -499,6 +578,16 @@ const baseEnTable = {
   'aura.elixirBoar': 'Might of the Boar',
   'aura.elixirVenomfire': 'Vipersear Vigor',
   'aura.elixirSerpent': 'Might of the Serpent',
+  // Masterwrought phase 10 consumable auras: the three apex flask buffs
+  // (content/profession_items.ts) and the shared Well Fed a finished buff
+  // meal leaves (farm dish or apex role plate alike since Masterwrought 11c).
+  // Same channel as the elixir names above, since both ride the
+  // same aura-name matcher; 'aura.fed' is a PET key with a different English
+  // string and is not this one.
+  'aura.flaskIronhusk': 'Ironhusk Vigor',
+  'aura.flaskWarboar': 'Warboar Might',
+  'aura.flaskRunewater': 'Runewater Clarity',
+  'aura.wellFed': 'Well Fed',
   // Shared Bloodlust / Temporal Acceleration exhaustion debuff (combat/haste_burst.ts).
   'aura.temporalExhaustion': 'Temporal Exhaustion',
   // Cauterize's 5 min lockout debuff (combat/fire_mage.ts); survives death.
@@ -656,7 +745,7 @@ const baseEnTable = {
   'aura.concussiveBlow': 'Concussive Blow',
   'aura.disarmingSmash': 'Disarming Smash',
   'aura.staticCharge': 'Static Charge',
-  'aura.frostbite': 'Winterbite',
+  'aura.frostbite': 'Wintergnaw',
   'aura.maddeningWhisper': 'Maddening Whisper',
   'aura.wyrmwardSigil': 'Wyrmward Sigil',
   'aura.soulSiphon': 'Soul Siphon',
@@ -668,6 +757,78 @@ const baseEnTable = {
   'aura.webSnare': 'Web Snare',
   'aura.feedingFrenzy': 'Feeding Frenzy',
   'aura.demoralized': 'Demoralized',
+  // --- Rift mob and boss mechanic names (src/sim/content/rift/mobs.ts).
+  // Every row here is a name the rift content authors and the sim splices into a
+  // player surface in ENGLISH: an `aura` event name (the buff/debuff bar and the
+  // gain/fade log, via auraDisplayNameForHud), the {mechanic} of the
+  // "{mob} unleashes {mechanic}!" bark (locBossMechanic), or a dealDamage source
+  // label (abilityDisplayNameFromSource). The whole rift kit shipped with no
+  // matcher row between them, so all 52 rendered raw English in the 20
+  // non-English locales; only the four names rift REUSES from older content
+  // (Thunderclap, Howling Gale, Seismic Stomp, Soulrot) resolved. Phase 19F
+  // filled the five non-Latin blocks (qr-19-rift-mechanic-names-translate-or-not);
+  // the 15 Latin locales ride the Phase 20 fill.
+  // `aura.rift*` = the name lands as an aura, `mechanic.rift*` = it only ever
+  // labels damage or a bark, matching the existing split above.
+  // tests/sim_i18n_rift_mechanics.test.ts derives the set from RIFT_MOBS rather
+  // than listing it, so a newly authored rift mechanic reds until it has a row
+  // here AND in AURA_NAME_KEY. lifeleech.name and the deathZone*.name pair are
+  // deliberately NOT here: see that test's exemption table for why.
+  // Trash affixes (on-hit auras and splash labels; src/sim/mob/mob_swing.ts).
+  'aura.riftRimebite': 'Rimebite',
+  'aura.riftRime': 'Rime',
+  'aura.riftCinders': 'Cinders',
+  'aura.riftSmoulder': 'Smoulder',
+  'aura.riftVenom': 'Venom',
+  'aura.riftWeb': 'Web',
+  'aura.riftSerration': 'Serration',
+  'mechanic.riftSweepingArc': 'Sweeping Arc',
+  'aura.riftManaBurn': 'Mana Burn',
+  'aura.riftVoidRot': 'Void Rot',
+  'aura.riftDread': 'Dread',
+  'mechanic.riftTailSweep': 'Tail Sweep',
+  'aura.riftCorrode': 'Corrode',
+  'aura.riftCrush': 'Crush',
+  'mechanic.riftPitsteelSweep': 'Pitsteel Sweep',
+  'aura.riftSearingBrand': 'Searing Brand',
+  'aura.riftPactRot': 'Pact Rot',
+  // Rift boss headline mechanics (the rank-gated runners in
+  // src/sim/mob/locomotion.ts plus the on-hit affixes above).
+  'mechanic.riftGlacialBurst': 'Glacial Burst',
+  'aura.riftGlacialCarapace': 'Glacial Carapace',
+  'mechanic.riftWhiteout': 'Whiteout',
+  'mechanic.riftPyroclasm': 'Pyroclasm',
+  'mechanic.riftCinderWave': 'Cinder Wave',
+  'aura.riftMagmaCrash': 'Magma Crash',
+  'aura.riftDeadlyVenom': 'Deadly Venom',
+  'aura.riftClingingSilk': 'Clinging Silk',
+  'mechanic.riftVenomSpray': 'Venom Spray',
+  'mechanic.riftVenomDeluge': 'Venom Deluge',
+  'aura.riftNecroticBlight': 'Necrotic Blight',
+  'mechanic.riftMarrowHarvest': 'Marrow Harvest',
+  'mechanic.riftBoneStorm': 'Bone Storm',
+  'aura.riftRisingFrenzy': 'Rising Frenzy',
+  'aura.riftWarlordsBellow': "Warlord's Bellow",
+  'mechanic.riftEarthbreaker': 'Earthbreaker',
+  'mechanic.riftArcaneDetonation': 'Arcane Detonation',
+  'aura.riftArcaneFrailty': 'Arcane Frailty',
+  'aura.riftManaShield': 'Mana Shield',
+  'aura.riftTemporalDrag': 'Temporal Drag',
+  'mechanic.riftArcaneVolley': 'Arcane Volley',
+  'mechanic.riftChainLightning': 'Chain Lightning',
+  'mechanic.riftThunderSlam': 'Thunder Slam',
+  'mechanic.riftThunderhead': 'Thunderhead',
+  'aura.riftGalecrash': 'Galecrash',
+  'aura.riftStaticField': 'Static Field',
+  'aura.riftTerrifyingScreech': 'Terrifying Screech',
+  'mechanic.riftRiptide': 'Riptide',
+  'aura.riftUndertow': 'Undertow',
+  'mechanic.riftPactFlame': 'Pact Flame',
+  'mechanic.riftBloodSigil': 'Blood Sigil',
+  'mechanic.riftRainOfBrimstone': 'Rain of Brimstone',
+  'aura.riftHoofOfRuin': 'Hoof of Ruin',
+  'mechanic.riftWingBuffet': 'Wing Buffet',
+  'mechanic.riftPitfireRing': 'Pitfire Ring',
   'aura.resurrectionSickness': "The Keeper's Toll",
   'aura.unstuckSickness': 'Unstuck Sickness',
   'aura.hotPursuit': 'Hot Pursuit',
@@ -767,15 +928,14 @@ const baseEnTable = {
   'log.veilLeave': 'The veil closes behind you, and the mountain air bites again.',
   'log.ferryEnter': 'The ferry bell rings once, and the Farshore rises out of the spray.',
   'log.ferryLeave': 'The bell answers from the vale, and the mainland takes you back.',
-  // The Proving Shore (tutorial island): the greeting's ferry ride, the two
-  // clicked ferry bells, the startTutorial gate denials
-  // (sim/tutorial/greeting.ts + interactions/ferry_bell.ts), and the
+  // The Proving Shore (tutorial island): the compulsory greeting's ferry ride,
+  // the two clicked ferry bells (sim/tutorial/greeting.ts +
+  // interactions/ferry_bell.ts), and the
   // quest-gated vendor row denial (items.ts vendorQuestGates).
   'log.provingFerry': 'The ferry sets you down on the Proving Shore.',
   'log.provingEnter': 'The ferry bell tolls, and the Proving Shore rises to meet you.',
   'log.provingLeave': 'The crossing takes hold, and Eastbrook Vale spreads out before you.',
   'error.tutorialFromHere': 'You cannot set sail from here.',
-  'error.tutorialOutleveled': 'The Proving Shore has nothing left to teach you.',
   'log.passingStoneKneel': 'You close your hand on the Passing Stone, and the shore lets you go.',
   'error.passingStoneCold': 'The stone is cold. Instructor Maren has not asked this of you.',
   'log.longWalkCorpse': 'You are whole again, and you found your own way back.',
@@ -933,7 +1093,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.provingEnter': 'The ferry bell tolls, and the Proving Shore rises to meet you.',
     'log.provingLeave': 'The crossing takes hold, and Eastbrook Vale spreads out before you.',
     'error.tutorialFromHere': 'You cannot set sail from here.',
-    'error.tutorialOutleveled': 'The Proving Shore has nothing left to teach you.',
     'log.passingStoneKneel': 'You close your hand on the Passing Stone, and the shore lets you go.',
     'error.passingStoneCold': 'The stone is cold. Instructor Maren has not asked this of you.',
     'log.longWalkCorpse': 'You are whole again, and you found your own way back.',
@@ -963,6 +1122,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.cannotEquip': 'You cannot equip that.',
     'error.faceWater': 'You need to face fishable water.',
     'error.potionNotReady': 'That potion is not ready yet.',
+    'error.strongerEffectActive': 'A more powerful effect is already active.',
     'error.fullHealth': 'You are already at full health.',
     'error.nothingRestore': 'Nothing to restore.',
     'error.nothingToConsume': 'Nothing to consume.',
@@ -1026,6 +1186,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.sitEat': 'You sit down to eat.',
     'log.sitDrink': 'You sit down to drink.',
     'log.quaff': 'You quaff {item}.',
+    'log.read': 'You read {item}.',
+    'log.placeStation': 'You set up {item}.',
+    'log.placeStationThe': 'You set up the {item}.',
     'log.boutDecided': 'The bout is decided. Returning to the world…',
     'log.partyLeaves': '{name} leaves the party.',
     'log.partyLeft': '{name} has left the party.',
@@ -1071,6 +1234,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirBoar': 'Might of the Boar',
     'aura.elixirVenomfire': 'Vipersear Vigor',
     'aura.elixirSerpent': 'Might of the Serpent',
+    'aura.flaskIronhusk': 'Ironhusk Vigor',
+    'aura.flaskWarboar': 'Warboar Might',
+    'aura.flaskRunewater': 'Runewater Clarity',
+    'aura.wellFed': 'Well Fed',
     'mechanic.warStomp': 'Shuddering Stomp',
     'mechanic.boneCarapace': 'Bone Carapace',
     'mechanic.bansheesWail': 'Keening Wail',
@@ -1108,7 +1275,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.concussiveBlow': 'Concussive Blow',
     'aura.disarmingSmash': 'Disarming Smash',
     'aura.staticCharge': 'Static Charge',
-    'aura.frostbite': 'Winterbite',
+    'aura.frostbite': 'Wintergnaw',
     'aura.maddeningWhisper': 'Maddening Whisper',
     'aura.wyrmwardSigil': 'Wyrmward Sigil',
     'aura.soulSiphon': 'Soul Siphon',
@@ -1129,7 +1296,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.passingStoneKneel':
       'Cierras la mano sobre la Piedra de Paso, y la orilla te deja marchar.',
     'error.tutorialFromHere': 'No puedes zarpar desde aquí.',
-    'error.tutorialOutleveled': 'La Costa de la Prueba ya no tiene nada que enseñarte.',
     'error.passingStoneCold': 'La piedra está fría. La Instructora Maren no te ha pedido esto.',
     'error.vendorQuestGated': 'Ese objeto no está a la venta para ti todavía.',
     'error.arenaMinLevel': 'Debes ser nivel {level} para entrar en cola de arena.',
@@ -1375,7 +1541,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.concussiveBlow': 'Golpe aturdidor',
     'aura.disarmingSmash': 'Mazazo desarmante',
     'aura.staticCharge': 'Carga estática',
-    'aura.frostbite': 'Congelación',
+    'aura.frostbite': 'Dentellada invernal',
     'aura.maddeningWhisper': 'Susurro enloquecedor',
     'aura.wyrmwardSigil': 'Sello antidracónico',
     'aura.soulSiphon': 'Sifón de almas',
@@ -1415,6 +1581,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.cannotEquip': 'No puedes equipar eso.',
     'error.faceWater': 'Debes mirar hacia agua donde se pueda pescar.',
     'error.potionNotReady': 'Esa poción aún no está lista.',
+    'error.strongerEffectActive': 'Ya tienes activo un efecto más poderoso.',
     'error.fullHealth': 'Ya tienes la salud al máximo.',
     'error.nothingRestore': 'No hay nada que restaurar.',
     'error.nothingToConsume': 'No hay nada que consumir.',
@@ -1477,6 +1644,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.sitEat': 'Te sientas a comer.',
     'log.sitDrink': 'Te sientas a beber.',
     'log.quaff': 'Bebes {item}.',
+    'log.read': 'Lees {item}.',
+    'log.placeStation': 'Montas {item}.',
+    'log.placeStationThe': 'Montas {item}.',
     'log.boutDecided': 'El combate está decidido. Regresando al mundo…',
     'log.partyLeaves': '{name} abandona el grupo.',
     'log.partyLeft': '{name} ha abandonado el grupo.',
@@ -1494,6 +1664,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirBoar': 'Poder del Jabalí',
     'aura.elixirVenomfire': 'Vigor de Ardor Viperino',
     'aura.elixirSerpent': 'Poder de la Serpiente',
+    'aura.flaskIronhusk': 'Vigor de Coraza Férrea',
+    'aura.flaskWarboar': 'Poder del Jabalí de Guerra',
+    'aura.flaskRunewater': 'Claridad de Agua Rúnica',
+    'aura.wellFed': 'Bien Alimentado',
     'error.bankQuestItem': 'No puedes guardar objetos de misión en el banco.',
     'error.bankFull': 'Tu banco está lleno.',
     'error.bankOnlyMaterialsSpace': 'En el espacio que queda en tu banco solo caben materiales.',
@@ -1589,6 +1763,28 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'Carámbanos',
     'aura.perfectMoment': 'Momento perfecto',
     'error.uniqueEquipped': 'Solo puedes equiparte uno de esos.',
+    'error.masterwroughtCap': 'Solo puedes equiparte dos objetos maestroforjados.',
+    'error.masterwroughtLegendary': 'Solo puedes equiparte un objeto maestroforjado legendario.',
+    'error.sunderTarget': 'Solo los épicos de banda se pueden romper.',
+    'error.sunderHeld': 'No llevas ese objeto.',
+    'error.sunderMoved': 'El objeto se movió; rotura cancelada.',
+    'log.sunderResult': 'Rompes {item} y obtienes Esencia Escindida.',
+    'error.perfectNotApex': 'Solo los objetos maestroforjados se pueden perfeccionar.',
+    'error.perfectSkill': 'Perfeccionarlo requiere 125 de habilidad en el oficio que lo creó.',
+    'error.perfectMaterialLocked': 'Un material necesario para perfeccionar está bloqueado.',
+    'error.perfectMaterials': 'Te faltan los materiales para perfeccionar ese objeto.',
+    'log.perfectBind': 'Comienza el perfeccionamiento: {item} ahora está ligado a ti.',
+    'log.perfectAdvance': 'Perfeccionamiento: {item} avanza al rango {n} de {total}.',
+    'log.perfectFail': 'El intento de perfeccionamiento falla; los materiales se consumen.',
+    'log.perfectDone': '¡{item} ahora está perfeccionado!',
+    'error.legendaryAlready': 'Esa obra ya es legendaria.',
+    'error.legendaryName': 'Esa obra necesita un nombre para convertirse en leyenda.',
+    'error.legendaryNameShape': 'Ese nombre no se puede inscribir en la obra.',
+    'error.legendaryDeed':
+      'Necesitas una Escritura de Creación para convertir esa obra en leyenda.',
+    'error.patternKnown': 'Ya conoces esa receta.',
+    'error.patternProfession': 'No has practicado esa profesión.',
+    'error.patternSkill': 'Tu habilidad es demasiado baja para aprender ese patrón.',
     'error.townFocusCannotAfford': 'No puedes pagar ese reajuste de enfoque.',
     'log.townFocusRespecComplete': 'Tu reajuste de enfoque se ha completado.',
     'error.townFocusRespecCancelled':
@@ -1598,8 +1794,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.ignivarForgeGateSealed': 'La puerta de la forja está sellada para ti.',
     'error.liveRaidClaimUnsafe':
       'Esta reclamación de banda activa no se puede reemplazar de forma segura.',
-    'error.vaultOnlyMaterials':
-      'En la Bóveda de materiales solo se pueden almacenar materiales.',
+    'error.vaultOnlyMaterials': 'En la Bóveda de materiales solo se pueden almacenar materiales.',
     'error.vaultLocked': 'No has desbloqueado la Bóveda de materiales.',
     'error.vaultMaterialFull': 'Tu bóveda no puede almacenar más de ese material.',
     'error.vaultMaxUpgrades': 'Tu bóveda no se puede mejorar más.',
@@ -1613,7 +1808,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.passingStoneKneel':
       'Cierras la mano sobre la Piedra de Paso, y la orilla te deja marchar.',
     'error.tutorialFromHere': 'No puedes zarpar desde aquí.',
-    'error.tutorialOutleveled': 'La Costa de la Prueba ya no tiene nada que enseñarte.',
     'error.passingStoneCold': 'La piedra está fría. La Instructora Maren no te ha pedido esto.',
     'error.vendorQuestGated': 'Ese objeto no está a la venta para ti todavía.',
     'error.arenaMinLevel': 'Debes ser nivel {level} para entrar en cola de arena.',
@@ -1856,7 +2050,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.concussiveBlow': 'Golpe aturdidor',
     'aura.disarmingSmash': 'Mazazo desarmante',
     'aura.staticCharge': 'Carga estática',
-    'aura.frostbite': 'Congelación',
+    'aura.frostbite': 'Dentellada invernal',
     'aura.maddeningWhisper': 'Susurro enloquecedor',
     'aura.wyrmwardSigil': 'Sello antidracónico',
     'aura.soulSiphon': 'Sifón de almas',
@@ -1896,6 +2090,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.cannotEquip': 'No puedes equipar eso.',
     'error.faceWater': 'Debes mirar hacia aguas con peces.',
     'error.potionNotReady': 'Esa poción aún no está lista.',
+    'error.strongerEffectActive': 'Ya tienes activo un efecto más poderoso.',
     'error.fullHealth': 'Ya tienes la salud al máximo.',
     'error.nothingRestore': 'No hay nada que restaurar.',
     'error.nothingToConsume': 'No hay nada que consumir.',
@@ -1958,6 +2153,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.sitEat': 'Te sientas a comer.',
     'log.sitDrink': 'Te sientas a beber.',
     'log.quaff': 'Bebes {item}.',
+    'log.read': 'Lees {item}.',
+    'log.placeStation': 'Montas {item}.',
+    'log.placeStationThe': 'Montas {item}.',
     'log.boutDecided': 'El combate está decidido. Regresando al mundo…',
     'log.partyLeaves': '{name} abandona el grupo.',
     'log.partyLeft': '{name} ha abandonado el grupo.',
@@ -1975,6 +2173,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirBoar': 'Poder del Jabalí',
     'aura.elixirVenomfire': 'Vigor de Ardor Viperino',
     'aura.elixirSerpent': 'Poder de la Serpiente',
+    'aura.flaskIronhusk': 'Vigor de Coraza Férrea',
+    'aura.flaskWarboar': 'Poder del Jabalí de Guerra',
+    'aura.flaskRunewater': 'Claridad de Agua Rúnica',
+    'aura.wellFed': 'Bien Alimentado',
     'error.bankQuestItem': 'No puedes guardar objetos de misión en el banco.',
     'error.bankFull': 'Tu banco está lleno.',
     'error.bankOnlyMaterialsSpace': 'En el espacio que queda en tu banco solo caben materiales.',
@@ -2073,13 +2275,40 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'Carámbanos',
     'aura.perfectMoment': 'Momento perfecto',
     'error.uniqueEquipped': 'Solo puedes llevar equipado uno de esos.',
+    'error.masterwroughtCap': 'Solo puedes llevar equipados dos objetos maestroforjados.',
+    'error.masterwroughtLegendary':
+      'Solo puedes llevar equipado un objeto maestroforjado legendario.',
+    'error.sunderTarget': 'Solo los épicos de banda pueden romperse.',
+    'error.sunderHeld': 'No llevas ese objeto encima.',
+    'error.sunderMoved': 'El objeto se ha movido; rotura cancelada.',
+    'log.sunderResult': 'Rompes {item} y obtienes Esencia Escindida.',
+    'error.perfectNotApex': 'Solo los objetos maestroforjados pueden perfeccionarse.',
+    'error.perfectSkill': 'Perfeccionarlo requiere 125 de habilidad en el oficio que lo creó.',
+    'error.perfectMaterialLocked': 'Un material necesario para perfeccionar está bloqueado.',
+    'error.perfectMaterials': 'Te faltan los materiales para perfeccionar ese objeto.',
+    'log.perfectBind': 'Comienza el perfeccionamiento: {item} queda ligado a ti.',
+    'log.perfectAdvance': 'Perfeccionamiento: {item} avanza al rango {n} de {total}.',
+    'log.perfectFail':
+      'El intento de perfeccionamiento ha fallado; los materiales se han consumido.',
+    'log.perfectDone': '¡{item} ha alcanzado la perfección!',
+    'error.legendaryAlready': 'Esa obra ya es legendaria.',
+    'error.legendaryName': 'Esa obra necesita un nombre para convertirse en leyenda.',
+    'error.legendaryNameShape': 'Ese nombre no puede inscribirse en la obra.',
+    'error.legendaryDeed':
+      'Necesitas una Escritura de Creación para convertir esa obra en leyenda.',
+    'error.patternKnown': 'Ya conoces esa receta.',
+    'error.patternProfession': 'No has practicado esa profesión.',
+    'error.patternSkill': 'Tu nivel de habilidad es demasiado bajo para aprender ese patrón.',
     'error.townFocusCannotAfford': 'No puedes costear ese reajuste de enfoque.',
     'log.townFocusRespecComplete': 'Tu reajuste de enfoque ha terminado.',
 
-    'error.townFocusRespecCancelled': 'No podías permitirte la reespecialización de enfoque pendiente, así que se canceló.',
-    'error.ignivarRaidInCombat': 'Tu banda sigue en combate. Podrás entrar cuando termine la lucha.',
+    'error.townFocusRespecCancelled':
+      'No podías permitirte la reespecialización de enfoque pendiente, así que se canceló.',
+    'error.ignivarRaidInCombat':
+      'Tu banda sigue en combate. Podrás entrar cuando termine la lucha.',
     'error.ignivarForgeGateSealed': 'La puerta de la forja está sellada para ti.',
-    'error.liveRaidClaimUnsafe': 'Esta reclamación de banda activa no se puede reemplazar de forma segura.',
+    'error.liveRaidClaimUnsafe':
+      'Esta reclamación de banda activa no se puede reemplazar de forma segura.',
     'error.vaultOnlyMaterials': 'En la Bóveda de materiales solo se pueden almacenar materiales.',
     'error.vaultLocked': 'No has desbloqueado la Bóveda de materiales.',
     'error.vaultMaterialFull': 'Tu bóveda no puede almacenar más de ese material.',
@@ -2094,7 +2323,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.passingStoneKneel':
       'Vous refermez la main sur la Pierre de trépas, et le rivage vous laisse partir.',
     'error.tutorialFromHere': 'Vous ne pouvez pas prendre le large depuis ici.',
-    'error.tutorialOutleveled': "Le Rivage de l'Épreuve n'a plus rien à vous apprendre.",
     'error.passingStoneCold':
       "La pierre est froide. L'Instructrice Maren ne vous a pas demandé cela.",
     'error.vendorQuestGated': 'Cet objet ne vous est pas encore proposé à la vente.',
@@ -2346,7 +2574,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.concussiveBlow': 'Coup commotionnant',
     'aura.disarmingSmash': 'Fracas désarmant',
     'aura.staticCharge': 'Charge statique',
-    'aura.frostbite': 'Engelure',
+    'aura.frostbite': "Morsure d'hiver",
     'aura.maddeningWhisper': 'Murmure démentiel',
     'aura.wyrmwardSigil': 'Sceau anti-wyrm',
     'aura.soulSiphon': "Siphon d'âme",
@@ -2386,6 +2614,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.cannotEquip': 'Vous ne pouvez pas équiper cela.',
     'error.faceWater': "Vous devez faire face à de l'eau poissonneuse.",
     'error.potionNotReady': "Cette potion n'est pas encore prête.",
+    'error.strongerEffectActive': 'Un effet plus puissant est déjà actif.',
     'error.fullHealth': 'Vous êtes déjà à pleine santé.',
     'error.nothingRestore': 'Rien à restaurer.',
     'error.nothingToConsume': 'Rien à consommer.',
@@ -2449,6 +2678,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.sitEat': 'Vous vous asseyez pour manger.',
     'log.sitDrink': 'Vous vous asseyez pour boire.',
     'log.quaff': 'Vous buvez {item}.',
+    'log.read': 'Vous lisez {item}.',
+    'log.placeStation': 'Vous installez {item}.',
+    'log.placeStationThe': 'Vous installez {item}.',
     'log.boutDecided': 'Le combat est terminé. Retour dans le monde…',
     'log.partyLeaves': '{name} quitte le groupe.',
     'log.partyLeft': '{name} a quitté le groupe.',
@@ -2466,6 +2698,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirBoar': 'Puissance du Sanglier',
     'aura.elixirVenomfire': 'Vigueur de Brûlure Vipérine',
     'aura.elixirSerpent': 'Puissance du Serpent',
+    'aura.flaskIronhusk': 'Vigueur de Carapace de Fer',
+    'aura.flaskWarboar': 'Puissance du Sanglier de Guerre',
+    'aura.flaskRunewater': "Clarté de l'Eau Runique",
+    'aura.wellFed': 'Bien Nourri',
     'error.bankQuestItem': "Vous ne pouvez pas déposer d'objets de quête à la banque.",
     'error.bankFull': 'Votre banque est pleine.',
     'error.bankOnlyMaterialsSpace':
@@ -2565,14 +2801,42 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'Stalactites de glace',
     'aura.perfectMoment': 'Moment parfait',
     'error.uniqueEquipped': 'Vous ne pouvez en équiper qu’un seul de ce type.',
+    'error.masterwroughtCap': 'Vous ne pouvez équiper que deux objets forgés de maître.',
+    'error.masterwroughtLegendary':
+      'Vous ne pouvez équiper qu’un seul objet légendaire forgé de maître.',
+    'error.sunderTarget': 'Seuls les objets épiques de raid peuvent être brisés.',
+    'error.sunderHeld': 'Vous ne portez pas cet objet.',
+    'error.sunderMoved': 'L’objet a bougé, brisage annulé.',
+    'log.sunderResult': 'Vous brisez {item} en Essence fendue.',
+    'error.perfectNotApex': 'Seuls les objets forgés de maître peuvent être perfectionnés.',
+    'error.perfectSkill':
+      'Perfectionner cet objet requiert 125 de compétence dans le métier qui l’a fabriqué.',
+    'error.perfectMaterialLocked': 'Un matériau nécessaire au perfectionnement est verrouillé.',
+    'error.perfectMaterials': 'Il vous manque les matériaux pour perfectionner cet objet.',
+    'log.perfectBind': 'Le perfectionnement commence : {item} vous est désormais lié.',
+    'log.perfectAdvance': 'Perfectionnement : {item} passe au rang {n} sur {total}.',
+    'log.perfectFail': 'La tentative de perfectionnement échoue ; les matériaux sont dépensés.',
+    'log.perfectDone': '{item} est désormais perfectionné !',
+    'error.legendaryAlready': 'Cette œuvre est déjà légendaire.',
+    'error.legendaryName': "Cette œuvre a besoin d'un nom pour devenir une légende.",
+    'error.legendaryNameShape': "Ce nom ne peut pas être inscrit sur l'œuvre.",
+    'error.legendaryDeed':
+      'Il vous faut un Acte de Façonnage pour faire de cette œuvre une légende.',
+    'error.patternKnown': 'Vous connaissez déjà cette recette.',
+    'error.patternProfession': "Vous n'avez pas pratiqué cette profession.",
+    'error.patternSkill': 'Votre compétence est trop faible pour apprendre ce patron.',
     'error.townFocusCannotAfford': "Vous n'avez pas les moyens de cette respécialisation de focus.",
     'log.townFocusRespecComplete': 'Votre respécialisation de focus est terminée.',
 
-    'error.townFocusRespecCancelled': 'Vous n’aviez pas les moyens de payer votre réattribution de spécialisation de focus en attente ; elle a donc été annulée.',
-    'error.ignivarRaidInCombat': 'Votre raid est toujours en combat. Vous pourrez entrer une fois le combat terminé.',
+    'error.townFocusRespecCancelled':
+      'Vous n’aviez pas les moyens de payer votre réattribution de spécialisation de focus en attente ; elle a donc été annulée.',
+    'error.ignivarRaidInCombat':
+      'Votre raid est toujours en combat. Vous pourrez entrer une fois le combat terminé.',
     'error.ignivarForgeGateSealed': 'La porte de la forge vous est scellée.',
-    'error.liveRaidClaimUnsafe': 'Cette revendication de raid en direct ne peut pas être remplacée en toute sécurité.',
-    'error.vaultOnlyMaterials': 'Seuls les matériaux peuvent être stockés dans le Coffre des matériaux.',
+    'error.liveRaidClaimUnsafe':
+      'Cette revendication de raid en direct ne peut pas être remplacée en toute sécurité.',
+    'error.vaultOnlyMaterials':
+      'Seuls les matériaux peuvent être stockés dans le Coffre des matériaux.',
     'error.vaultLocked': 'Vous n’avez pas déverrouillé le Coffre des matériaux.',
     'error.vaultMaterialFull': 'Votre coffre ne peut plus contenir de ce matériau.',
     'error.vaultMaxUpgrades': 'Votre coffre ne peut pas être amélioré davantage.',
@@ -2586,7 +2850,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.passingStoneKneel':
       'Vous refermez la main sur la Pierre de trépas, et le rivage vous laisse partir.',
     'error.tutorialFromHere': 'Vous ne pouvez pas prendre le large depuis ici.',
-    'error.tutorialOutleveled': "Le Rivage de l'Épreuve n'a plus rien à vous apprendre.",
     'error.passingStoneCold':
       "La pierre est froide. L'Instructrice Maren ne vous a pas demandé cela.",
     'error.vendorQuestGated': 'Cet objet ne vous est pas encore proposé à la vente.',
@@ -2837,7 +3100,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.concussiveBlow': 'Coup commotionnant',
     'aura.disarmingSmash': 'Fracas désarmant',
     'aura.staticCharge': 'Charge statique',
-    'aura.frostbite': 'Engelure',
+    'aura.frostbite': "Morsure d'hiver",
     'aura.maddeningWhisper': 'Murmure démentiel',
     'aura.wyrmwardSigil': 'Sceau anti-wyrm',
     'aura.soulSiphon': "Siphon d'âme",
@@ -2877,6 +3140,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.cannotEquip': 'Vous ne pouvez pas équiper cela.',
     'error.faceWater': 'Vous devez faire face à une eau poissonneuse.',
     'error.potionNotReady': "Cette potion n'est pas encore prête.",
+    'error.strongerEffectActive': 'Un effet plus puissant est déjà actif.',
     'error.fullHealth': 'Vous êtes déjà en pleine santé.',
     'error.nothingRestore': 'Rien à restaurer.',
     'error.nothingToConsume': 'Rien à consommer.',
@@ -2941,6 +3205,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.sitEat': 'Vous vous asseyez pour manger.',
     'log.sitDrink': 'Vous vous asseyez pour boire.',
     'log.quaff': 'Vous buvez {item}.',
+    'log.read': 'Vous lisez {item}.',
+    'log.placeStation': 'Vous installez {item}.',
+    'log.placeStationThe': 'Vous installez {item}.',
     'log.boutDecided': 'Le combat est terminé. Retour dans le monde…',
     'log.partyLeaves': '{name} quitte le groupe.',
     'log.partyLeft': '{name} a quitté le groupe.',
@@ -2958,6 +3225,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirBoar': 'Puissance du Sanglier',
     'aura.elixirVenomfire': 'Vigueur de Brûlure Vipérine',
     'aura.elixirSerpent': 'Puissance du Serpent',
+    'aura.flaskIronhusk': 'Vigueur de Carapace de Fer',
+    'aura.flaskWarboar': 'Puissance du Sanglier de Guerre',
+    'aura.flaskRunewater': "Clarté de l'Eau Runique",
+    'aura.wellFed': 'Bien Nourri',
     'error.bankQuestItem': "Vous ne pouvez pas déposer d'objets de quête à la banque.",
     'error.bankFull': 'Votre banque est pleine.',
     'error.bankOnlyMaterialsSpace':
@@ -3057,15 +3328,43 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'Stalactites de glace',
     'aura.perfectMoment': 'Moment parfait',
     'error.uniqueEquipped': 'Vous ne pouvez porter qu’un seul objet de ce type.',
+    'error.masterwroughtCap': 'Vous ne pouvez porter que deux objets forgés de maître.',
+    'error.masterwroughtLegendary':
+      'Vous ne pouvez porter qu’un seul objet légendaire forgé de maître.',
+    'error.sunderTarget': 'Seuls les épiques de raid peuvent être brisés.',
+    'error.sunderHeld': 'Vous ne portez pas cet objet.',
+    'error.sunderMoved': 'L’objet a bougé, brisage annulé.',
+    'log.sunderResult': 'Vous brisez {item} en Essence fendue.',
+    'error.perfectNotApex': 'Seuls les objets forgés de maître peuvent être perfectionnés.',
+    'error.perfectSkill':
+      'Perfectionner cet objet exige 125 de compétence dans le métier qui l’a fabriqué.',
+    'error.perfectMaterialLocked': 'Un matériau requis pour le perfectionnement est verrouillé.',
+    'error.perfectMaterials': 'Il vous manque les matériaux pour perfectionner cet objet.',
+    'log.perfectBind': 'Le perfectionnement débute : {item} vous est maintenant lié.',
+    'log.perfectAdvance': 'Perfectionnement : {item} passe au rang {n} de {total}.',
+    'log.perfectFail': 'La tentative de perfectionnement échoue ; les matériaux sont dépensés.',
+    'log.perfectDone': '{item} est maintenant perfectionné !',
+    'error.legendaryAlready': 'Cette œuvre est déjà légendaire.',
+    'error.legendaryName': "Cette œuvre a besoin d'un nom pour devenir une légende.",
+    'error.legendaryNameShape': "Ce nom ne peut pas être inscrit sur l'œuvre.",
+    'error.legendaryDeed':
+      "Vous avez besoin d'un Acte de Façonnage pour faire de cette œuvre une légende.",
+    'error.patternKnown': 'Vous connaissez déjà cette recette.',
+    'error.patternProfession': "Vous n'avez pas pratiqué cette profession.",
+    'error.patternSkill': 'Votre compétence est trop faible pour apprendre ce patron.',
     'error.townFocusCannotAfford':
       'Vous n’avez pas assez de moyens pour cette respécialisation de focus.',
     'log.townFocusRespecComplete': 'Votre respécialisation de focus est complétée.',
 
-    'error.townFocusRespecCancelled': 'Vous n’aviez pas les moyens de payer votre réattribution de spécialisation de focus en attente ; elle a donc été annulée.',
-    'error.ignivarRaidInCombat': 'Votre raid est toujours en combat. Vous pourrez entrer une fois le combat terminé.',
+    'error.townFocusRespecCancelled':
+      'Vous n’aviez pas les moyens de payer votre réattribution de spécialisation de focus en attente ; elle a donc été annulée.',
+    'error.ignivarRaidInCombat':
+      'Votre raid est toujours en combat. Vous pourrez entrer une fois le combat terminé.',
     'error.ignivarForgeGateSealed': 'La porte de la forge vous est scellée.',
-    'error.liveRaidClaimUnsafe': 'Cette revendication de raid en direct ne peut pas être remplacée en toute sécurité.',
-    'error.vaultOnlyMaterials': 'Seuls les matériaux peuvent être stockés dans le Coffre des matériaux.',
+    'error.liveRaidClaimUnsafe':
+      'Cette revendication de raid en direct ne peut pas être remplacée en toute sécurité.',
+    'error.vaultOnlyMaterials':
+      'Seuls les matériaux peuvent être stockés dans le Coffre des matériaux.',
     'error.vaultLocked': 'Vous n’avez pas déverrouillé le Coffre des matériaux.',
     'error.vaultMaterialFull': 'Votre coffre ne peut plus contenir de ce matériau.',
     'error.vaultMaxUpgrades': 'Votre coffre ne peut pas être amélioré davantage.',
@@ -3085,7 +3384,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.provingEnter': 'The ferry bell tolls, and the Proving Shore rises to meet you.',
     'log.provingLeave': 'The crossing takes hold, and Eastbrook Vale spreads out before you.',
     'error.tutorialFromHere': 'You cannot set sail from here.',
-    'error.tutorialOutleveled': 'The Proving Shore has nothing left to teach you.',
     'log.passingStoneKneel': 'You close your hand on the Passing Stone, and the shore lets you go.',
     'error.passingStoneCold': 'The stone is cold. Instructor Maren has not asked this of you.',
     'log.longWalkCorpse': 'You are whole again, and you found your own way back.',
@@ -3158,7 +3456,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.concussiveBlow': 'Concussive Blow',
     'aura.disarmingSmash': 'Disarming Smash',
     'aura.staticCharge': 'Static Charge',
-    'aura.frostbite': 'Winterbite',
+    'aura.frostbite': 'Wintergnaw',
     'aura.maddeningWhisper': 'Maddening Whisper',
     'aura.wyrmwardSigil': 'Wyrmward Sigil',
     'aura.soulSiphon': 'Soul Siphon',
@@ -3196,6 +3494,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.cannotEquip': 'You cannot equip that.',
     'error.faceWater': 'You need to face fishable water.',
     'error.potionNotReady': 'That potion is not ready yet.',
+    'error.strongerEffectActive': 'A more powerful effect is already active.',
     'error.fullHealth': 'You are already at full health.',
     'error.nothingRestore': 'Nothing to restore.',
     'error.nothingToConsume': 'Nothing to consume.',
@@ -3257,6 +3556,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.sitEat': 'You sit down to eat.',
     'log.sitDrink': 'You sit down to drink.',
     'log.quaff': 'You quaff {item}.',
+    'log.read': 'You read {item}.',
+    'log.placeStation': 'You set up {item}.',
+    'log.placeStationThe': 'You set up the {item}.',
     'log.boutDecided': 'The bout is decided. Returning to the world…',
     'log.partyLeaves': '{name} leaves the party.',
     'log.partyLeft': '{name} has left the party.',
@@ -3274,12 +3576,15 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirBoar': 'Might of the Boar',
     'aura.elixirVenomfire': 'Vipersear Vigor',
     'aura.elixirSerpent': 'Might of the Serpent',
+    'aura.flaskIronhusk': 'Ironhusk Vigor',
+    'aura.flaskWarboar': 'Warboar Might',
+    'aura.flaskRunewater': 'Runewater Clarity',
+    'aura.wellFed': 'Well Fed',
   },
   it_IT: {
     'log.passingStoneKneel':
       'Chiudi la mano sulla Pietra del trapasso, e la riva ti lascia andare.',
     'error.tutorialFromHere': 'Non puoi salpare da qui.',
-    'error.tutorialOutleveled': 'La Riva della Prova non ha più nulla da insegnarti.',
     'error.passingStoneCold': "La pietra è fredda. L'Istruttrice Maren non te lo ha chiesto.",
     'error.vendorQuestGated': "Quell'oggetto non è ancora in vendita per te.",
     'error.arenaMinLevel': "Devi essere di livello {level} per metterti in coda per l'arena.",
@@ -3524,7 +3829,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.concussiveBlow': 'Colpo Stordente',
     'aura.disarmingSmash': 'Fendente Disarmante',
     'aura.staticCharge': 'Carica Statica',
-    'aura.frostbite': 'Congelamento',
+    'aura.frostbite': 'Morso invernale',
     'aura.maddeningWhisper': 'Sussurro Folle',
     'aura.wyrmwardSigil': 'Sigillo Antidragone',
     'aura.soulSiphon': "Risucchio dell'Anima",
@@ -3564,6 +3869,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.cannotEquip': 'Non puoi equipaggiare quello.',
     'error.faceWater': 'Devi essere rivolto verso acque pescose.',
     'error.potionNotReady': 'Quella pozione non è ancora pronta.',
+    'error.strongerEffectActive': 'Un effetto più potente è già attivo.',
     'error.fullHealth': 'Sei già al massimo della salute.',
     'error.nothingRestore': 'Niente da ripristinare.',
     'error.nothingToConsume': 'Niente da consumare.',
@@ -3626,6 +3932,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.sitEat': 'Ti siedi a mangiare.',
     'log.sitDrink': 'Ti siedi a bere.',
     'log.quaff': 'Tracanni {item}.',
+    'log.read': 'Leggi {item}.',
+    'log.placeStation': 'Monti {item}.',
+    'log.placeStationThe': 'Monti {item}.',
     'log.boutDecided': 'Lo scontro è deciso. Ritorno al mondo…',
     'log.partyLeaves': '{name} abbandona il gruppo.',
     'log.partyLeft': '{name} ha abbandonato il gruppo.',
@@ -3643,6 +3952,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirBoar': 'Potenza del Cinghiale',
     'aura.elixirVenomfire': 'Vigore di Vampa Viperina',
     'aura.elixirSerpent': 'Potenza del Serpente',
+    'aura.flaskIronhusk': 'Vigore di Scorza Ferrea',
+    'aura.flaskWarboar': 'Potenza del Cinghiale da Guerra',
+    'aura.flaskRunewater': 'Chiarezza di Acqua Runica',
+    'aura.wellFed': 'Ben Nutrito',
     'error.bankQuestItem': 'Non puoi depositare oggetti missione in banca.',
     'error.bankFull': 'La tua banca è piena.',
     'error.bankOnlyMaterialsSpace':
@@ -3742,13 +4055,38 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'Ghiaccioli',
     'aura.perfectMoment': 'Momento Perfetto',
     'error.uniqueEquipped': 'Puoi equipaggiarne solo uno di quel tipo.',
+    'error.masterwroughtCap': 'Puoi equipaggiare solo due oggetti maestroforgiati.',
+    'error.masterwroughtLegendary':
+      'Puoi equipaggiare solo un oggetto maestroforgiato leggendario.',
+    'error.sunderTarget': 'Solo gli epici da incursione possono essere infranti.',
+    'error.sunderHeld': 'Non hai quell’oggetto con te.',
+    'error.sunderMoved': 'L’oggetto si è spostato; frantumazione annullata.',
+    'log.sunderResult': 'Infrangi {item} in Essenza Infranta.',
+    'error.perfectNotApex': 'Solo gli oggetti maestroforgiati possono essere perfezionati.',
+    'error.perfectSkill': 'Perfezionarlo richiede 125 di abilità nel mestiere che lo ha creato.',
+    'error.perfectMaterialLocked': 'Un materiale necessario al perfezionamento è bloccato.',
+    'error.perfectMaterials': 'Ti mancano i materiali per perfezionare quell’oggetto.',
+    'log.perfectBind': 'Il perfezionamento ha inizio: {item} è ora vincolato a te.',
+    'log.perfectAdvance': 'Perfezionamento: {item} avanza al grado {n} di {total}.',
+    'log.perfectFail': 'Il tentativo di perfezionamento fallisce; i materiali sono consumati.',
+    'log.perfectDone': '{item} è ora perfezionato!',
+    'error.legendaryAlready': 'Quell’opera è già leggendaria.',
+    'error.legendaryName': 'Quell’opera ha bisogno di un nome per diventare leggenda.',
+    'error.legendaryNameShape': 'Quel nome non può essere inciso sull’opera.',
+    'error.legendaryDeed': 'Ti serve un Atto di Creazione per rendere quell’opera una leggenda.',
+    'error.patternKnown': 'Conosci già quella ricetta.',
+    'error.patternProfession': 'Non hai praticato quella professione.',
+    'error.patternSkill': 'La tua abilità è troppo bassa per imparare quello schema.',
     'error.townFocusCannotAfford': 'Non puoi permetterti quella rispecializzazione del focus.',
     'log.townFocusRespecComplete': 'La tua rispecializzazione del focus è completata.',
 
-    'error.townFocusRespecCancelled': 'Non potevi permetterti la riassegnazione della specializzazione di focus in sospeso, quindi è stata annullata.',
-    'error.ignivarRaidInCombat': 'La tua incursione è ancora in combattimento. Potrai entrare quando lo scontro sarà terminato.',
+    'error.townFocusRespecCancelled':
+      'Non potevi permetterti la riassegnazione della specializzazione di focus in sospeso, quindi è stata annullata.',
+    'error.ignivarRaidInCombat':
+      'La tua incursione è ancora in combattimento. Potrai entrare quando lo scontro sarà terminato.',
     'error.ignivarForgeGateSealed': 'Il cancello della forgia ti è precluso.',
-    'error.liveRaidClaimUnsafe': 'Questa rivendicazione dell’incursione in corso non può essere sostituita in sicurezza.',
+    'error.liveRaidClaimUnsafe':
+      'Questa rivendicazione dell’incursione in corso non può essere sostituita in sicurezza.',
     'error.vaultOnlyMaterials': 'Nel Deposito dei materiali si possono conservare solo materiali.',
     'error.vaultLocked': 'Non hai sbloccato il Deposito dei materiali.',
     'error.vaultMaterialFull': 'Il tuo deposito non può contenere altro di quel materiale.',
@@ -3763,7 +4101,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.passingStoneKneel':
       'Du schließt deine Hand um den Übergangsstein, und die Küste lässt dich ziehen.',
     'error.tutorialFromHere': 'Von hier aus kannst du nicht in See stechen.',
-    'error.tutorialOutleveled': 'Die Bewährungsküste hat dir nichts mehr beizubringen.',
     'error.passingStoneCold':
       'Der Stein ist kalt. Ausbilderin Maren hat dies nicht von dir verlangt.',
     'error.vendorQuestGated': 'Diesen Gegenstand kannst du noch nicht kaufen.',
@@ -4010,7 +4347,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.concussiveBlow': 'Erschütternder Schlag',
     'aura.disarmingSmash': 'Entwaffnender Hieb',
     'aura.staticCharge': 'Statische Ladung',
-    'aura.frostbite': 'Frostbiss',
+    'aura.frostbite': 'Winternagen',
     'aura.maddeningWhisper': 'Wahnsinniges Flüstern',
     'aura.wyrmwardSigil': 'Wyrmwacht-Siegel',
     'aura.soulSiphon': 'Seelenentzug',
@@ -4050,6 +4387,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.cannotEquip': 'Das könnt Ihr nicht ausrüsten.',
     'error.faceWater': 'Ihr müsst zu fischbarem Wasser blicken.',
     'error.potionNotReady': 'Dieser Trank ist noch nicht bereit.',
+    'error.strongerEffectActive': 'Eine stärkere Wirkung ist bereits aktiv.',
     'error.fullHealth': 'Ihr habt bereits volle Gesundheit.',
     'error.nothingRestore': 'Nichts wiederherzustellen.',
     'error.nothingToConsume': 'Nichts zu verbrauchen.',
@@ -4114,6 +4452,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.sitEat': 'Ihr setzt Euch zum Essen.',
     'log.sitDrink': 'Ihr setzt Euch zum Trinken.',
     'log.quaff': 'Ihr trinkt {item}.',
+    'log.read': 'Ihr lest {item}.',
+    'log.placeStation': 'Ihr stellt {item} auf.',
+    'log.placeStationThe': 'Ihr stellt {item} auf.',
     'log.boutDecided': 'Der Kampf ist entschieden. Rückkehr in die Welt…',
     'log.partyLeaves': '{name} verlässt die Gruppe.',
     'log.partyLeft': '{name} hat die Gruppe verlassen.',
@@ -4131,6 +4472,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirBoar': 'Macht des Ebers',
     'aura.elixirVenomfire': 'Viperbrand-Vitalität',
     'aura.elixirSerpent': 'Macht der Schlange',
+    'aura.flaskIronhusk': 'Eisenschale-Vitalität',
+    'aura.flaskWarboar': 'Macht des Kriegsebers',
+    'aura.flaskRunewater': 'Runenwasser-Klarheit',
+    'aura.wellFed': 'Gut Genährt',
     'error.bankQuestItem': 'Ihr könnt keine Questgegenstände in der Bank lagern.',
     'error.bankFull': 'Eure Bank ist voll.',
     'error.bankOnlyMaterialsSpace': 'In Eurer Bank ist nur noch Platz für Materialien.',
@@ -4229,13 +4574,40 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'Eiszapfen',
     'aura.perfectMoment': 'Perfekter Moment',
     'error.uniqueEquipped': 'Du kannst davon nur eins ausrüsten.',
+    'error.masterwroughtCap': 'Du kannst nur zwei meistergeschmiedete Gegenstände ausrüsten.',
+    'error.masterwroughtLegendary':
+      'Du kannst nur einen legendären meistergeschmiedeten Gegenstand ausrüsten.',
+    'error.sunderTarget': 'Nur epische Schlachtzugsbeute kann zerschlagen werden.',
+    'error.sunderHeld': 'Du trägst diesen Gegenstand nicht.',
+    'error.sunderMoved': 'Der Gegenstand wurde verschoben; Zerschlagen abgebrochen.',
+    'log.sunderResult': 'Du zerschlägst {item} zu Geborstener Essenz.',
+    'error.perfectNotApex': 'Nur meistergeschmiedete Gegenstände können vollendet werden.',
+    'error.perfectSkill':
+      'Die Vollendung erfordert 125 Fertigkeit in dem Handwerk, das ihn geschaffen hat.',
+    'error.perfectMaterialLocked': 'Ein für die Vollendung benötigtes Material ist gesperrt.',
+    'error.perfectMaterials': 'Dir fehlen die Materialien, um diesen Gegenstand zu vollenden.',
+    'log.perfectBind': 'Die Vollendung beginnt: {item} ist nun an dich gebunden.',
+    'log.perfectAdvance': 'Vollendung: {item} steigt auf Rang {n} von {total}.',
+    'log.perfectFail': 'Der Vollendungsversuch schlägt fehl; die Materialien sind verbraucht.',
+    'log.perfectDone': '{item} ist nun vollendet!',
+    'error.legendaryAlready': 'Dieses Werk ist bereits legendär.',
+    'error.legendaryName': 'Dieses Werk braucht einen Namen, um zur Legende zu werden.',
+    'error.legendaryNameShape': 'Dieser Name kann dem Werk nicht eingeschrieben werden.',
+    'error.legendaryDeed':
+      'Du brauchst eine Urkunde der Erschaffung, um dieses Werk zur Legende zu machen.',
+    'error.patternKnown': 'Das Rezept kennen Sie bereits.',
+    'error.patternProfession': 'Du hast diesen Beruf nicht ausgeübt.',
+    'error.patternSkill': 'Deine Fertigkeit ist zu gering, um dieses Muster zu erlernen.',
     'error.townFocusCannotAfford': 'Du kannst dir diese Fokus-Neuverteilung nicht leisten.',
     'log.townFocusRespecComplete': 'Deine Fokus-Neuverteilung ist abgeschlossen.',
 
-    'error.townFocusRespecCancelled': 'Du konntest dir deine ausstehende Fokus-Neuspezialisierung nicht leisten, daher wurde sie abgebrochen.',
-    'error.ignivarRaidInCombat': 'Dein Schlachtzug befindet sich noch im Kampf. Du kannst eintreten, sobald der Kampf vorbei ist.',
+    'error.townFocusRespecCancelled':
+      'Du konntest dir deine ausstehende Fokus-Neuspezialisierung nicht leisten, daher wurde sie abgebrochen.',
+    'error.ignivarRaidInCombat':
+      'Dein Schlachtzug befindet sich noch im Kampf. Du kannst eintreten, sobald der Kampf vorbei ist.',
     'error.ignivarForgeGateSealed': 'Das Tor zur Schmiede ist für dich versiegelt.',
-    'error.liveRaidClaimUnsafe': 'Diese laufende Schlachtzugsbeanspruchung kann nicht sicher ersetzt werden.',
+    'error.liveRaidClaimUnsafe':
+      'Diese laufende Schlachtzugsbeanspruchung kann nicht sicher ersetzt werden.',
     'error.vaultOnlyMaterials': 'Im Materiallager können nur Materialien gelagert werden.',
     'error.vaultLocked': 'Du hast das Materiallager noch nicht freigeschaltet.',
     'error.vaultMaterialFull': 'Dein Lager kann von diesem Material nichts mehr aufnehmen.',
@@ -4249,7 +4621,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   zh_CN: {
     'log.passingStoneKneel': '你的手合拢在往生石上，海滨这才放你离去。',
     'error.tutorialFromHere': '你无法从这里扬帆起航。',
-    'error.tutorialOutleveled': '试炼之滨已经没有什么能再教你的了。',
     'error.passingStoneCold': '石头是凉的。教官玛伦并未要求你这么做。',
     'error.vendorQuestGated': '这件物品暂时还不卖给你。',
     'error.arenaMinLevel': '你必须达到等级 {level} 才能加入竞技场队列。',
@@ -4535,7 +4906,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.concussiveBlow': '震荡打击',
     'aura.disarmingSmash': '缴械猛击',
     'aura.staticCharge': '静电充能',
-    'aura.frostbite': '冻伤',
+    'aura.frostbite': '寒冬之啮',
     'aura.maddeningWhisper': '疯狂低语',
     'aura.wyrmwardSigil': '御龙印记',
     'aura.soulSiphon': '灵魂虹吸',
@@ -4591,6 +4962,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.cannotEquip': '你无法装备它。',
     'error.faceWater': '你需要面向可垂钓的水域。',
     'error.potionNotReady': '那瓶药水尚未冷却完毕。',
+    'error.strongerEffectActive': '你已受到更强效果的影响。',
     'error.fullHealth': '你的生命值已满。',
     'error.nothingRestore': '没有可恢复的东西。',
     'error.nothingToConsume': '没有可吞噬的效果。',
@@ -4652,6 +5024,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.sitEat': '你坐下来进食。',
     'log.sitDrink': '你坐下来饮水。',
     'log.quaff': '你饮下了{item}。',
+    'log.read': '你阅读了{item}。',
+    'log.placeStation': '你架设了{item}。',
+    'log.placeStationThe': '你架设了{item}。',
     'log.boutDecided': '对决已分出胜负。正在返回世界……',
     'log.partyLeaves': '{name}离开了队伍。',
     'log.partyLeft': '{name}已离开队伍。',
@@ -4668,6 +5043,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirBoar': '野猪之力',
     'aura.elixirVenomfire': '蝰灼之力',
     'aura.elixirSerpent': '巨蛇之力',
+    'aura.flaskIronhusk': '铁壳活力',
+    'aura.flaskWarboar': '战猪之力',
+    'aura.flaskRunewater': '符水清明',
+    'aura.wellFed': '精神饱满',
     'error.townFocusNotInTown': '你必须在城镇中才能设置专注。',
     'error.townFocusOverBudget': '该分配超出了你的专注点上限。',
     'error.townFocusInvalid': '无效的专注分配。',
@@ -4694,6 +5073,27 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': '冰锥',
     'aura.perfectMoment': '完美时刻',
     'error.uniqueEquipped': '你只能装备一个此类物品。',
+    'error.masterwroughtCap': '你最多只能装备两件大师锻造物品。',
+    'error.masterwroughtLegendary': '你只能装备一件传说品质的大师锻造物品。',
+    'error.sunderTarget': '只有团队副本的史诗物品才能裂断。',
+    'error.sunderHeld': '你没有携带该物品。',
+    'error.sunderMoved': '物品已移动，裂断已取消。',
+    'log.sunderResult': '你将{item}裂断为断裂精华。',
+    'error.perfectNotApex': '只有大师锻造物品才能进行完美化。',
+    'error.perfectSkill': '完美化需要在制作该物品的工艺上达到125点技能。',
+    'error.perfectMaterialLocked': '完美化所需的一种材料已被锁定。',
+    'error.perfectMaterials': '你缺少将该物品完美化所需的材料。',
+    'log.perfectBind': '完美化开始：{item}现已与你绑定。',
+    'log.perfectAdvance': '完美化：{item}提升至第{n}阶，共{total}阶。',
+    'log.perfectFail': '完美化尝试失败，材料已被消耗。',
+    'log.perfectDone': '{item}已臻至完美！',
+    'error.legendaryAlready': '该作品已是传说。',
+    'error.legendaryName': '该作品需要一个名字才能成为传说。',
+    'error.legendaryNameShape': '该名字无法铭刻在作品上。',
+    'error.legendaryDeed': '你需要一份造物契据才能让该作品成为传说。',
+    'error.patternKnown': '你已经学会了该配方。',
+    'error.patternProfession': '你尚未修习该专业。',
+    'error.patternSkill': '你的技能不足以学习该图样。',
     'error.townFocusCannotAfford': '你负担不起这次专注重置。',
     'log.townFocusRespecComplete': '你的专注重置已完成。',
 
@@ -4710,11 +5110,65 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.vaultUpgraded': '你升级了材料库。',
     'error.alreadyEating': '你已经在进食了。',
     'error.alreadyDrinking': '你已经在饮水了。',
+    // Rift mechanic names (Masterwrought Phase 19F, ruling
+    // qr-19-rift-mechanic-names-translate-or-not: translated everywhere,
+    // the shipped precedent of the rift cast ids).
+    'aura.riftRimebite': '白霜之噬',
+    'aura.riftRime': '白霜',
+    'aura.riftCinders': '余烬',
+    'aura.riftSmoulder': '阴燃',
+    'aura.riftVenom': '毒液',
+    'aura.riftWeb': '蛛网',
+    'aura.riftSerration': '锯齿撕裂',
+    'mechanic.riftSweepingArc': '横扫弧斩',
+    'aura.riftManaBurn': '法力燃烧',
+    'aura.riftVoidRot': '虚空腐蚀',
+    'aura.riftDread': '恐惧',
+    'mechanic.riftTailSweep': '尾部横扫',
+    'aura.riftCorrode': '侵蚀',
+    'aura.riftCrush': '碾压',
+    'mechanic.riftPitsteelSweep': '渊钢横扫',
+    'aura.riftSearingBrand': '灼热烙印',
+    'aura.riftPactRot': '契约腐蚀',
+    'mechanic.riftGlacialBurst': '冰川迸发',
+    'aura.riftGlacialCarapace': '冰川甲壳',
+    'mechanic.riftWhiteout': '白茫风雪',
+    'mechanic.riftPyroclasm': '炽炎爆裂',
+    'mechanic.riftCinderWave': '余烬浪潮',
+    'aura.riftMagmaCrash': '岩浆重击',
+    'aura.riftDeadlyVenom': '致命毒液',
+    'aura.riftClingingSilk': '缠身蛛丝',
+    'mechanic.riftVenomSpray': '毒液喷洒',
+    'mechanic.riftVenomDeluge': '毒液洪流',
+    'aura.riftNecroticBlight': '死灵枯萎',
+    'mechanic.riftMarrowHarvest': '骨髓收割',
+    'mechanic.riftBoneStorm': '白骨风暴',
+    'aura.riftRisingFrenzy': '狂乱高涨',
+    'aura.riftWarlordsBellow': '督军怒吼',
+    'mechanic.riftEarthbreaker': '裂地重击',
+    'mechanic.riftArcaneDetonation': '奥术引爆',
+    'aura.riftArcaneFrailty': '奥术脆弱',
+    'aura.riftManaShield': '法力护盾',
+    'aura.riftTemporalDrag': '时光滞缓',
+    'mechanic.riftArcaneVolley': '奥术乱射',
+    'mechanic.riftChainLightning': '连环闪电',
+    'mechanic.riftThunderSlam': '雷霆猛击',
+    'mechanic.riftThunderhead': '雷暴云',
+    'aura.riftGalecrash': '狂风碎击',
+    'aura.riftStaticField': '静电力场',
+    'aura.riftTerrifyingScreech': '骇人尖啸',
+    'mechanic.riftRiptide': '激流',
+    'aura.riftUndertow': '暗涌',
+    'mechanic.riftPactFlame': '契约之焰',
+    'mechanic.riftBloodSigil': '鲜血印记',
+    'mechanic.riftRainOfBrimstone': '硫火之雨',
+    'aura.riftHoofOfRuin': '毁灭之蹄',
+    'mechanic.riftWingBuffet': '翅膀扇击',
+    'mechanic.riftPitfireRing': '渊火之环',
   },
   zh_TW: {
     'log.passingStoneKneel': '你的手握住了往生石，海濱終於放你離去。',
     'error.tutorialFromHere': '你無法從這裡揚帆出海。',
-    'error.tutorialOutleveled': '試煉之濱已經沒有什麼能再教你的了。',
     'error.passingStoneCold': '石頭是冷的。教官瑪倫並未要求你這麼做。',
     'error.vendorQuestGated': '這件物品目前還不能賣給你。',
     'error.arenaMinLevel': '你必須達到等級 {level} 才能加入競技場佇列。',
@@ -5000,7 +5454,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.concussiveBlow': '震盪打擊',
     'aura.disarmingSmash': '繳械重擊',
     'aura.staticCharge': '靜電充能',
-    'aura.frostbite': '凍傷',
+    'aura.frostbite': '寒冬之嚙',
     'aura.maddeningWhisper': '瘋狂低語',
     'aura.wyrmwardSigil': '禦龍印記',
     'aura.soulSiphon': '靈魂虹吸',
@@ -5056,6 +5510,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.cannotEquip': '你無法裝備那件物品。',
     'error.faceWater': '你必須面向可釣魚的水域。',
     'error.potionNotReady': '那瓶藥水尚未準備好。',
+    'error.strongerEffectActive': '你已受到更強效果的影響。',
     'error.fullHealth': '你的生命值已滿。',
     'error.nothingRestore': '沒有可恢復的東西。',
     'error.nothingToConsume': '沒有可吞噬的效果。',
@@ -5117,6 +5572,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.sitEat': '你坐下來進食。',
     'log.sitDrink': '你坐下來飲水。',
     'log.quaff': '你喝下了 {item}。',
+    'log.read': '你閱讀了 {item}。',
+    'log.placeStation': '你架設了 {item}。',
+    'log.placeStationThe': '你架設了 {item}。',
     'log.boutDecided': '勝負已分。正在返回這個世界…',
     'log.partyLeaves': '{name} 離開了隊伍。',
     'log.partyLeft': '{name} 已離開隊伍。',
@@ -5133,6 +5591,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirBoar': '野豬之力',
     'aura.elixirVenomfire': '蝰灼之力',
     'aura.elixirSerpent': '巨蛇之力',
+    'aura.flaskIronhusk': '鐵殼活力',
+    'aura.flaskWarboar': '戰豬之力',
+    'aura.flaskRunewater': '符水清明',
+    'aura.wellFed': '精神飽滿',
     'error.townFocusNotInTown': '你必須在城鎮中才能設定專注。',
     'error.townFocusOverBudget': '此分配超出了你的專注點數上限。',
     'error.townFocusInvalid': '無效的專注分配。',
@@ -5159,6 +5621,27 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': '冰錐',
     'aura.perfectMoment': '完美時刻',
     'error.uniqueEquipped': '你只能裝備一個此類物品。',
+    'error.masterwroughtCap': '你最多只能裝備兩件大師鍛造物品。',
+    'error.masterwroughtLegendary': '你只能裝備一件傳說品質的大師鍛造物品。',
+    'error.sunderTarget': '只有團隊副本的史詩物品才能裂斷。',
+    'error.sunderHeld': '你沒有攜帶該物品。',
+    'error.sunderMoved': '物品已移動，裂斷已取消。',
+    'log.sunderResult': '你將{item}裂斷為斷裂精華。',
+    'error.perfectNotApex': '只有大師鍛造物品才能進行完美化。',
+    'error.perfectSkill': '完美化需要在製作該物品的工藝上達到125點技能。',
+    'error.perfectMaterialLocked': '完美化所需的一種材料已被鎖定。',
+    'error.perfectMaterials': '你缺少將該物品完美化所需的材料。',
+    'log.perfectBind': '完美化開始：{item}現已與你綁定。',
+    'log.perfectAdvance': '完美化：{item}提升至第{n}階，共{total}階。',
+    'log.perfectFail': '完美化嘗試失敗，材料已被消耗。',
+    'log.perfectDone': '{item}已臻至完美！',
+    'error.legendaryAlready': '該作品已是傳說。',
+    'error.legendaryName': '該作品需要一個名字才能成為傳說。',
+    'error.legendaryNameShape': '該名字無法銘刻在作品上。',
+    'error.legendaryDeed': '你需要一份造物契據才能讓該作品成為傳說。',
+    'error.patternKnown': '你已經學會了該配方。',
+    'error.patternProfession': '你尚未修習該專業。',
+    'error.patternSkill': '你的技能不足以學習該圖樣。',
     'error.townFocusCannotAfford': '你負擔不起這次專注重置。',
     'log.townFocusRespecComplete': '你的專注重置已完成。',
 
@@ -5175,11 +5658,65 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.vaultUpgraded': '你升級了材料庫。',
     'error.alreadyEating': '你已經在進食了。',
     'error.alreadyDrinking': '你已經在飲水了。',
+    // Rift mechanic names (Masterwrought Phase 19F, ruling
+    // qr-19-rift-mechanic-names-translate-or-not: translated everywhere,
+    // the shipped precedent of the rift cast ids).
+    'aura.riftRimebite': '白霜之嚙',
+    'aura.riftRime': '白霜',
+    'aura.riftCinders': '餘燼',
+    'aura.riftSmoulder': '悶燒',
+    'aura.riftVenom': '劇毒',
+    'aura.riftWeb': '蛛網',
+    'aura.riftSerration': '鋸齒撕裂',
+    'mechanic.riftSweepingArc': '橫掃弧斬',
+    'aura.riftManaBurn': '法力燃燒',
+    'aura.riftVoidRot': '虛空腐蝕',
+    'aura.riftDread': '恐懼',
+    'mechanic.riftTailSweep': '甩尾橫掃',
+    'aura.riftCorrode': '侵蝕',
+    'aura.riftCrush': '粉碎',
+    'mechanic.riftPitsteelSweep': '淵鋼橫掃',
+    'aura.riftSearingBrand': '灼熱烙印',
+    'aura.riftPactRot': '契約腐蝕',
+    'mechanic.riftGlacialBurst': '冰川爆發',
+    'aura.riftGlacialCarapace': '冰川甲殼',
+    'mechanic.riftWhiteout': '白茫風雪',
+    'mechanic.riftPyroclasm': '火焰爆裂',
+    'mechanic.riftCinderWave': '餘燼浪潮',
+    'aura.riftMagmaCrash': '岩漿崩擊',
+    'aura.riftDeadlyVenom': '致命劇毒',
+    'aura.riftClingingSilk': '纏身蛛絲',
+    'mechanic.riftVenomSpray': '毒液噴濺',
+    'mechanic.riftVenomDeluge': '毒液洪流',
+    'aura.riftNecroticBlight': '死靈枯疫',
+    'mechanic.riftMarrowHarvest': '骨髓收割',
+    'mechanic.riftBoneStorm': '骸骨風暴',
+    'aura.riftRisingFrenzy': '狂亂高漲',
+    'aura.riftWarlordsBellow': '督軍怒吼',
+    'mechanic.riftEarthbreaker': '裂地重擊',
+    'mechanic.riftArcaneDetonation': '奧術引爆',
+    'aura.riftArcaneFrailty': '奧術孱弱',
+    'aura.riftManaShield': '法力護盾',
+    'aura.riftTemporalDrag': '時光遲滯',
+    'mechanic.riftArcaneVolley': '奧術齊射',
+    'mechanic.riftChainLightning': '連環閃電',
+    'mechanic.riftThunderSlam': '雷霆猛擊',
+    'mechanic.riftThunderhead': '雷雲壓頂',
+    'aura.riftGalecrash': '狂風墜擊',
+    'aura.riftStaticField': '靜電力場',
+    'aura.riftTerrifyingScreech': '駭人尖嘯',
+    'mechanic.riftRiptide': '激流',
+    'aura.riftUndertow': '暗流',
+    'mechanic.riftPactFlame': '契約之焰',
+    'mechanic.riftBloodSigil': '鮮血印記',
+    'mechanic.riftRainOfBrimstone': '硫火之雨',
+    'aura.riftHoofOfRuin': '毀滅之蹄',
+    'mechanic.riftWingBuffet': '振翅衝擊',
+    'mechanic.riftPitfireRing': '淵火之環',
   },
   ko_KR: {
     'log.passingStoneKneel': '안식의 돌을 손에 쥐자, 해안이 당신을 놓아줍니다.',
     'error.tutorialFromHere': '여기서는 출항할 수 없습니다.',
-    'error.tutorialOutleveled': '수련의 해안은 더 이상 당신에게 가르칠 것이 없습니다.',
     'error.passingStoneCold': '돌이 차갑습니다. 교관 마렌은 당신에게 이것을 요구하지 않았습니다.',
     'error.vendorQuestGated': '그 아이템은 아직 당신에게 판매되지 않습니다.',
     'error.arenaMinLevel': '투기장 대기열에 참가하려면 레벨 {level} 이상이어야 합니다.',
@@ -5473,7 +6010,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.concussiveBlow': '진탕의 일격',
     'aura.disarmingSmash': '무장 해제 강타',
     'aura.staticCharge': '정전기 충전',
-    'aura.frostbite': '동상',
+    'aura.frostbite': '윈터그나우',
     'aura.maddeningWhisper': '광기의 속삭임',
     'aura.wyrmwardSigil': '용막이 인장',
     'aura.soulSiphon': '영혼 흡수',
@@ -5529,6 +6066,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.cannotEquip': '그것을 착용할 수 없습니다.',
     'error.faceWater': '낚시할 수 있는 물을 바라봐야 합니다.',
     'error.potionNotReady': '그 물약은 아직 사용할 수 없습니다.',
+    'error.strongerEffectActive': '이미 더 강력한 효과가 적용되어 있습니다.',
     'error.fullHealth': '이미 생명력이 가득 찼습니다.',
     'error.nothingRestore': '회복할 것이 없습니다.',
     'error.nothingToConsume': '소모할 효과가 없습니다.',
@@ -5590,6 +6128,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.sitEat': '앉아서 음식을 먹습니다.',
     'log.sitDrink': '앉아서 음료를 마십니다.',
     'log.quaff': '{item}을(를) 들이켭니다.',
+    'log.read': '{item}을(를) 읽습니다.',
+    'log.placeStation': '{item}을(를) 설치합니다.',
+    'log.placeStationThe': '{item}을(를) 설치합니다.',
     'log.boutDecided': '승부가 결정되었습니다. 세계로 돌아갑니다…',
     'log.partyLeaves': '{name}님이 파티를 떠납니다.',
     'log.partyLeft': '{name}님이 파티를 떠났습니다.',
@@ -5607,6 +6148,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirBoar': '멧돼지의 힘',
     'aura.elixirVenomfire': '살무사 작열의 활력',
     'aura.elixirSerpent': '뱀의 힘',
+    'aura.flaskIronhusk': '무쇠껍질의 활력',
+    'aura.flaskWarboar': '전투 멧돼지의 힘',
+    'aura.flaskRunewater': '룬물의 명료함',
+    'aura.wellFed': '잘 먹음',
     'error.townFocusNotInTown': '집중을 설정하려면 마을에 있어야 합니다.',
     'error.townFocusOverBudget': '해당 배분이 집중 포인트 한도를 초과합니다.',
     'error.townFocusInvalid': '잘못된 집중 배분입니다.',
@@ -5635,11 +6180,34 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': '고드름',
     'aura.perfectMoment': '완벽한 순간',
     'error.uniqueEquipped': '그런 것은 하나만 장착할 수 있습니다.',
+    'error.masterwroughtCap': '명장 제작 아이템은 두 개까지만 장착할 수 있습니다.',
+    'error.masterwroughtLegendary': '전설 등급 명장 제작 아이템은 하나만 장착할 수 있습니다.',
+    'error.sunderTarget': '공격대에서 얻은 서사 아이템만 가를 수 있습니다.',
+    'error.sunderHeld': '해당 아이템을 소지하고 있지 않습니다.',
+    'error.sunderMoved': '아이템이 이동하여 가르기가 취소되었습니다.',
+    'log.sunderResult': '{item}을(를) 갈라 갈라진 정수를 얻었습니다.',
+    'error.perfectNotApex': '명장 제작 아이템만 완전하게 만들 수 있습니다.',
+    'error.perfectSkill':
+      '완전하게 만들려면 해당 아이템을 만든 기술의 숙련도가 125 이상이어야 합니다.',
+    'error.perfectMaterialLocked': '완전화에 필요한 재료가 잠겨 있습니다.',
+    'error.perfectMaterials': '해당 아이템을 완전하게 만들 재료가 부족합니다.',
+    'log.perfectBind': '완전화 시작: {item}이(가) 이제 당신에게 귀속되었습니다.',
+    'log.perfectAdvance': '완전화: {item}이(가) {total}단계 중 {n}단계로 올라갔습니다.',
+    'log.perfectFail': '완전화 시도에 실패하여 재료가 소모되었습니다.',
+    'log.perfectDone': '{item}이(가) 이제 완전해졌습니다!',
+    'error.legendaryAlready': '해당 작품은 이미 전설입니다.',
+    'error.legendaryName': '해당 작품이 전설이 되려면 이름이 필요합니다.',
+    'error.legendaryNameShape': '해당 이름은 작품에 새길 수 없습니다.',
+    'error.legendaryDeed': '해당 작품을 전설로 만들려면 창조의 증서가 필요합니다.',
+    'error.patternKnown': '이미 알고 있는 제조법입니다.',
+    'error.patternProfession': '해당 전문 기술을 수련한 적이 없습니다.',
+    'error.patternSkill': '숙련도가 낮아 그 도안을 배울 수 없습니다.',
     'error.townFocusCannotAfford': '해당 집중 재설정 비용을 감당할 수 없습니다.',
     'log.townFocusRespecComplete': '집중 재설정이 완료되었습니다.',
 
     'error.townFocusRespecCancelled': '대기 중인 특성 초기화 비용을 감당할 수 없어 취소되었습니다.',
-    'error.ignivarRaidInCombat': '공격대가 아직 전투 중입니다. 전투가 끝난 뒤에 입장할 수 있습니다.',
+    'error.ignivarRaidInCombat':
+      '공격대가 아직 전투 중입니다. 전투가 끝난 뒤에 입장할 수 있습니다.',
     'error.ignivarForgeGateSealed': '당신에게는 대장간 문이 봉인되어 있습니다.',
     'error.liveRaidClaimUnsafe': '현재 진행 중인 공격대 점유를 안전하게 교체할 수 없습니다.',
     'error.vaultOnlyMaterials': '재료 보관함에는 재료만 보관할 수 있습니다.',
@@ -5651,11 +6219,65 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.vaultUpgraded': '재료 보관함을 업그레이드했습니다.',
     'error.alreadyEating': '이미 식사 중입니다.',
     'error.alreadyDrinking': '이미 음료를 마시는 중입니다.',
+    // Rift mechanic names (Masterwrought Phase 19F, ruling
+    // qr-19-rift-mechanic-names-translate-or-not: translated everywhere,
+    // the shipped precedent of the rift cast ids).
+    'aura.riftRimebite': '서리 이빨',
+    'aura.riftRime': '상고대',
+    'aura.riftCinders': '잉걸불',
+    'aura.riftSmoulder': '타들어감',
+    'aura.riftVenom': '맹독',
+    'aura.riftWeb': '거미줄',
+    'aura.riftSerration': '톱니 상처',
+    'mechanic.riftSweepingArc': '휩쓰는 호',
+    'aura.riftManaBurn': '마나 연소',
+    'aura.riftVoidRot': '공허 부패',
+    'aura.riftDread': '공포',
+    'mechanic.riftTailSweep': '꼬리 휘두르기',
+    'aura.riftCorrode': '부식',
+    'aura.riftCrush': '분쇄',
+    'mechanic.riftPitsteelSweep': '지옥강철 휩쓸기',
+    'aura.riftSearingBrand': '작열의 낙인',
+    'aura.riftPactRot': '계약 부패',
+    'mechanic.riftGlacialBurst': '빙하 폭발',
+    'aura.riftGlacialCarapace': '빙하 갑각',
+    'mechanic.riftWhiteout': '백색 폭풍',
+    'mechanic.riftPyroclasm': '화쇄류',
+    'mechanic.riftCinderWave': '잉걸불 파도',
+    'aura.riftMagmaCrash': '마그마 강타',
+    'aura.riftDeadlyVenom': '치명적 맹독',
+    'aura.riftClingingSilk': '휘감는 거미줄',
+    'mechanic.riftVenomSpray': '독액 분사',
+    'mechanic.riftVenomDeluge': '독액 폭우',
+    'aura.riftNecroticBlight': '괴사의 역병',
+    'mechanic.riftMarrowHarvest': '골수 수확',
+    'mechanic.riftBoneStorm': '뼈 폭풍',
+    'aura.riftRisingFrenzy': '치솟는 광란',
+    'aura.riftWarlordsBellow': '전쟁군주의 포효',
+    'mechanic.riftEarthbreaker': '대지 파괴',
+    'mechanic.riftArcaneDetonation': '비전 기폭',
+    'aura.riftArcaneFrailty': '비전 쇠약',
+    'aura.riftManaShield': '마나 보호막',
+    'aura.riftTemporalDrag': '시간 지연',
+    'mechanic.riftArcaneVolley': '비전 일제 사격',
+    'mechanic.riftChainLightning': '사슬 번개',
+    'mechanic.riftThunderSlam': '천둥 강타',
+    'mechanic.riftThunderhead': '뇌운',
+    'aura.riftGalecrash': '강풍 격돌',
+    'aura.riftStaticField': '정전기장',
+    'aura.riftTerrifyingScreech': '공포의 비명',
+    'mechanic.riftRiptide': '역조',
+    'aura.riftUndertow': '심해 역류',
+    'mechanic.riftPactFlame': '계약의 불꽃',
+    'mechanic.riftBloodSigil': '피의 인장',
+    'mechanic.riftRainOfBrimstone': '유황의 비',
+    'aura.riftHoofOfRuin': '파멸의 발굽',
+    'mechanic.riftWingBuffet': '날개 타격',
+    'mechanic.riftPitfireRing': '지옥불 고리',
   },
   ja_JP: {
     'log.passingStoneKneel': 'たましいの石を握りしめると、渚がその手を解き放つ。',
     'error.tutorialFromHere': 'ここから出航することはできません。',
-    'error.tutorialOutleveled': '修練の浜には、もう教えることは何も残っていません。',
     'error.passingStoneCold': 'その石は冷たいままです。教官マレンはまだそれを求めていません。',
     'error.vendorQuestGated': 'そのアイテムはまだあなたには売り物ではありません。',
     'error.arenaMinLevel': 'アリーナのキューに参加するにはレベル{level}が必要です。',
@@ -5957,7 +6579,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.concussiveBlow': '脳震盪の一撃',
     'aura.disarmingSmash': '武装解除の強打',
     'aura.staticCharge': '帯電',
-    'aura.frostbite': '凍傷',
+    'aura.frostbite': 'ウィンターグナウ',
     'aura.maddeningWhisper': '狂気の囁き',
     'aura.wyrmwardSigil': '竜避けの印',
     'aura.soulSiphon': '魂吸収',
@@ -6015,6 +6637,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.cannotEquip': 'それは装備できません。',
     'error.faceWater': '釣りができる水面に向く必要があります。',
     'error.potionNotReady': 'そのポーションはまだ使用できません。',
+    'error.strongerEffectActive': 'すでにより強力な効果が有効です。',
     'error.fullHealth': 'すでに体力は全快です。',
     'error.nothingRestore': '回復するものがありません。',
     'error.nothingToConsume': '消費できる効果がありません。',
@@ -6077,6 +6700,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.sitEat': '座って食事を始めました。',
     'log.sitDrink': '座って水分補給を始めました。',
     'log.quaff': '{item}を飲み干しました。',
+    'log.read': '{item}を読みました。',
+    'log.placeStation': '{item}を設置しました。',
+    'log.placeStationThe': '{item}を設置しました。',
     'log.boutDecided': '勝負が決しました。ワールドへ戻ります…',
     'log.partyLeaves': '{name}がパーティーを離れます。',
     'log.partyLeft': '{name}がパーティーを離れました。',
@@ -6094,6 +6720,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirBoar': '猪の力',
     'aura.elixirVenomfire': '蝮灼の活力',
     'aura.elixirSerpent': '蛇の力',
+    'aura.flaskIronhusk': '鉄殻の活力',
+    'aura.flaskWarboar': '戦猪の力',
+    'aura.flaskRunewater': '呪水の明晰',
+    'aura.wellFed': '満腹',
     'error.townFocusNotInTown': 'フォーカスを設定するには町にいる必要があります。',
     'error.townFocusOverBudget': 'その割り振りはフォーカスポイントの上限を超えています。',
     'error.townFocusInvalid': '無効なフォーカスの割り振りです。',
@@ -6122,10 +6752,32 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': '氷柱',
     'aura.perfectMoment': '完璧な瞬間',
     'error.uniqueEquipped': 'その種類は1つだけ装備できます。',
+    'error.masterwroughtCap': '名匠鍛造アイテムは2つまでしか装備できません。',
+    'error.masterwroughtLegendary': '伝説の名匠鍛造アイテムは1つだけ装備できます。',
+    'error.sunderTarget': 'レイドで入手したエピックだけを断つことができます。',
+    'error.sunderHeld': 'そのアイテムを所持していません。',
+    'error.sunderMoved': 'アイテムが移動したため、断ちは中止されました。',
+    'log.sunderResult': '{item}を断ち、断たれし精髄を得ました。',
+    'error.perfectNotApex': '名匠鍛造アイテムだけを完全化することができます。',
+    'error.perfectSkill': '完全化するには、そのアイテムを作った製作スキルが125必要です。',
+    'error.perfectMaterialLocked': '完全化に必要な素材がロックされています。',
+    'error.perfectMaterials': 'そのアイテムを完全化するための素材が足りません。',
+    'log.perfectBind': '完全化開始：{item}はあなたに束縛されました。',
+    'log.perfectAdvance': '完全化：{item}が{total}段階中の第{n}段階に進みました。',
+    'log.perfectFail': '完全化の試みは失敗し、素材は消費されました。',
+    'log.perfectDone': '{item}は完全化されました！',
+    'error.legendaryAlready': 'その作品はすでに伝説となっています。',
+    'error.legendaryName': 'その作品が伝説となるには名前が必要です。',
+    'error.legendaryNameShape': 'その名前は作品に刻むことができません。',
+    'error.legendaryDeed': 'その作品を伝説にするには創造の証書が必要です。',
+    'error.patternKnown': 'そのレシピはすでに習得しています。',
+    'error.patternProfession': 'その職業を修めていません。',
+    'error.patternSkill': '技能が足りないため、その図案を習得できません。',
     'error.townFocusCannotAfford': 'そのフォーカス再設定を支払えません。',
     'log.townFocusRespecComplete': 'フォーカス再設定が完了しました。',
 
-    'error.townFocusRespecCancelled': '保留中のフォーカス振り直し費用を支払えないため、キャンセルされました。',
+    'error.townFocusRespecCancelled':
+      '保留中のフォーカス振り直し費用を支払えないため、キャンセルされました。',
     'error.ignivarRaidInCombat': 'あなたのレイドはまだ戦闘中です。戦闘が終わるまで入場できません。',
     'error.ignivarForgeGateSealed': 'あなたに対して鍛冶場の門は封印されています。',
     'error.liveRaidClaimUnsafe': '現在進行中のレイドの権利を安全に置き換えられません。',
@@ -6138,12 +6790,66 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.vaultUpgraded': '素材保管庫をアップグレードしました。',
     'error.alreadyEating': 'すでに食事中です。',
     'error.alreadyDrinking': 'すでに飲み物を飲んでいます。',
+    // Rift mechanic names (Masterwrought Phase 19F, ruling
+    // qr-19-rift-mechanic-names-translate-or-not: translated everywhere,
+    // the shipped precedent of the rift cast ids).
+    'aura.riftRimebite': '霜噛み',
+    'aura.riftRime': '樹氷',
+    'aura.riftCinders': '燃え殻',
+    'aura.riftSmoulder': '燻り',
+    'aura.riftVenom': '猛毒',
+    'aura.riftWeb': '蜘蛛の巣',
+    'aura.riftSerration': '裂傷',
+    'mechanic.riftSweepingArc': '薙ぎ払いの弧',
+    'aura.riftManaBurn': '魔力燃焼',
+    'aura.riftVoidRot': '虚空腐れ',
+    'aura.riftDread': '戦慄',
+    'mechanic.riftTailSweep': '尾の薙ぎ払い',
+    'aura.riftCorrode': '腐食',
+    'aura.riftCrush': '圧砕',
+    'mechanic.riftPitsteelSweep': '奈落鋼の薙ぎ払い',
+    'aura.riftSearingBrand': '灼熱の烙印',
+    'aura.riftPactRot': '契約腐れ',
+    'mechanic.riftGlacialBurst': '氷河の炸裂',
+    'aura.riftGlacialCarapace': '氷河の甲殻',
+    'mechanic.riftWhiteout': 'ホワイトアウト',
+    'mechanic.riftPyroclasm': '火砕流',
+    'mechanic.riftCinderWave': '燃え殻の波',
+    'aura.riftMagmaCrash': 'マグマの激突',
+    'aura.riftDeadlyVenom': '致死の猛毒',
+    'aura.riftClingingSilk': '絡みつく糸',
+    'mechanic.riftVenomSpray': '毒の噴霧',
+    'mechanic.riftVenomDeluge': '毒の大洪水',
+    'aura.riftNecroticBlight': '壊死の疫病',
+    'mechanic.riftMarrowHarvest': '骨髄の刈り取り',
+    'mechanic.riftBoneStorm': '骨の嵐',
+    'aura.riftRisingFrenzy': '高まる狂乱',
+    'aura.riftWarlordsBellow': '軍将の咆哮',
+    'mechanic.riftEarthbreaker': '大地割り',
+    'mechanic.riftArcaneDetonation': '秘術の爆裂',
+    'aura.riftArcaneFrailty': '秘術の脆弱',
+    'aura.riftManaShield': '魔力の盾',
+    'aura.riftTemporalDrag': '時の停滞',
+    'mechanic.riftArcaneVolley': '秘術の斉射',
+    'mechanic.riftChainLightning': '連鎖雷撃',
+    'mechanic.riftThunderSlam': '雷の強打',
+    'mechanic.riftThunderhead': '雷雲',
+    'aura.riftGalecrash': '烈風の激突',
+    'aura.riftStaticField': '静電場',
+    'aura.riftTerrifyingScreech': '恐怖の絶叫',
+    'mechanic.riftRiptide': '離岸流',
+    'aura.riftUndertow': '引き波',
+    'mechanic.riftPactFlame': '契約の炎',
+    'mechanic.riftBloodSigil': '血の刻印',
+    'mechanic.riftRainOfBrimstone': '硫黄の雨',
+    'aura.riftHoofOfRuin': '破滅の蹄',
+    'mechanic.riftWingBuffet': '翼の打撃',
+    'mechanic.riftPitfireRing': '奈落の火輪',
   },
   pt_BR: {
     'log.passingStoneKneel':
       'Você fecha a mão sobre a Pedra de Passagem, e a praia deixa você partir.',
     'error.tutorialFromHere': 'Você não pode zarpar daqui.',
-    'error.tutorialOutleveled': 'A Costa da Provação não tem mais nada a te ensinar.',
     'error.passingStoneCold': 'A pedra está fria. A Instrutora Maren não pediu isso de você.',
     'error.vendorQuestGated': 'Esse item ainda não está à venda para você.',
     'error.arenaMinLevel': 'Você precisa ser nível {level} para entrar na fila da arena.',
@@ -6384,7 +7090,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.concussiveBlow': 'Golpe Concussivo',
     'aura.disarmingSmash': 'Pancada Desarmante',
     'aura.staticCharge': 'Carga Estática',
-    'aura.frostbite': 'Mordida Gélida',
+    'aura.frostbite': 'Roedura Invernal',
     'aura.maddeningWhisper': 'Sussurro Enlouquecedor',
     'aura.wyrmwardSigil': 'Sigilo Anti-Wyrm',
     'aura.soulSiphon': 'Sifão de Alma',
@@ -6424,6 +7130,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.cannotEquip': 'Você não pode equipar isso.',
     'error.faceWater': 'Você precisa estar de frente para água com peixes.',
     'error.potionNotReady': 'Essa poção ainda não está pronta.',
+    'error.strongerEffectActive': 'Um efeito mais poderoso já está ativo.',
     'error.fullHealth': 'Você já está com a vida cheia.',
     'error.nothingRestore': 'Nada a restaurar.',
     'error.nothingToConsume': 'Não há nada para consumir.',
@@ -6486,6 +7193,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.sitEat': 'Você se senta para comer.',
     'log.sitDrink': 'Você se senta para beber.',
     'log.quaff': 'Você bebe {item}.',
+    'log.read': 'Você lê {item}.',
+    'log.placeStation': 'Você monta {item}.',
+    'log.placeStationThe': 'Você monta {item}.',
     'log.boutDecided': 'O duelo foi decidido. Retornando ao mundo…',
     'log.partyLeaves': '{name} sai do grupo.',
     'log.partyLeft': '{name} saiu do grupo.',
@@ -6503,6 +7213,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirBoar': 'Força do Javali',
     'aura.elixirVenomfire': 'Vigor de Ardor Viperino',
     'aura.elixirSerpent': 'Força da Serpente',
+    'aura.flaskIronhusk': 'Vigor de Casca Férrea',
+    'aura.flaskWarboar': 'Força do Javali de Guerra',
+    'aura.flaskRunewater': 'Clareza da Água Rúnica',
+    'aura.wellFed': 'Bem Alimentado',
     'error.bankQuestItem': 'Você não pode guardar itens de missão no banco.',
     'error.bankFull': 'Seu banco está cheio.',
     'error.bankOnlyMaterialsSpace': 'No espaço restante do seu banco só cabem materiais.',
@@ -6601,13 +7315,38 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'Pingentes de Gelo',
     'aura.perfectMoment': 'Momento Perfeito',
     'error.uniqueEquipped': 'Você só pode equipar um desses.',
+    'error.masterwroughtCap': 'Você só pode equipar dois itens forjados por mestre.',
+    'error.masterwroughtLegendary': 'Você só pode equipar um item lendário forjado por mestre.',
+    'error.sunderTarget': 'Somente épicos de raide podem ser rompidos.',
+    'error.sunderHeld': 'Você não está com esse item.',
+    'error.sunderMoved': 'O item foi movido; rompimento cancelado.',
+    'log.sunderResult': 'Você rompe {item} em Essência Rompida.',
+    'error.perfectNotApex': 'Somente itens forjados por mestre podem ser aperfeiçoados.',
+    'error.perfectSkill': 'Aperfeiçoá-lo exige 125 de habilidade no ofício que o criou.',
+    'error.perfectMaterialLocked': 'Um material necessário ao aperfeiçoamento está bloqueado.',
+    'error.perfectMaterials': 'Você não tem os materiais para aperfeiçoar esse item.',
+    'log.perfectBind': 'O aperfeiçoamento começa: {item} agora está vinculado a você.',
+    'log.perfectAdvance': 'Aperfeiçoamento: {item} avança para o grau {n} de {total}.',
+    'log.perfectFail': 'A tentativa de aperfeiçoamento falha; os materiais são gastos.',
+    'log.perfectDone': '{item} agora está aperfeiçoado!',
+    'error.legendaryAlready': 'Essa obra já é lendária.',
+    'error.legendaryName': 'Essa obra precisa de um nome para se tornar uma lenda.',
+    'error.legendaryNameShape': 'Esse nome não pode ser inscrito na obra.',
+    'error.legendaryDeed':
+      'Você precisa de uma Escritura da Criação para tornar essa obra uma lenda.',
+    'error.patternKnown': 'Você já conhece essa receita.',
+    'error.patternProfession': 'Você não praticou essa profissão.',
+    'error.patternSkill': 'Sua habilidade é baixa demais para aprender esse molde.',
     'error.townFocusCannotAfford': 'Você não pode pagar essa redefinição de foco.',
     'log.townFocusRespecComplete': 'Sua redefinição de foco foi concluída.',
 
-    'error.townFocusRespecCancelled': 'Você não pôde pagar pela redefinição de foco pendente, então ela foi cancelada.',
-    'error.ignivarRaidInCombat': 'Seu raide ainda está em combate. Você poderá entrar quando a luta terminar.',
+    'error.townFocusRespecCancelled':
+      'Você não pôde pagar pela redefinição de foco pendente, então ela foi cancelada.',
+    'error.ignivarRaidInCombat':
+      'Seu raide ainda está em combate. Você poderá entrar quando a luta terminar.',
     'error.ignivarForgeGateSealed': 'O portão da forja está selado para você.',
-    'error.liveRaidClaimUnsafe': 'Esta reivindicação de raide ao vivo não pode ser substituída com segurança.',
+    'error.liveRaidClaimUnsafe':
+      'Esta reivindicação de raide ao vivo não pode ser substituída com segurança.',
     'error.vaultOnlyMaterials': 'Somente materiais podem ser armazenados no Cofre de Materiais.',
     'error.vaultLocked': 'Você ainda não desbloqueou o Cofre de Materiais.',
     'error.vaultMaterialFull': 'Seu cofre não pode armazenar mais desse material.',
@@ -6621,7 +7360,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   ru_RU: {
     'log.passingStoneKneel': 'Вы сжимаете в ладони Камень Ухода, и берег отпускает вас.',
     'error.tutorialFromHere': 'Вы не можете отплыть отсюда.',
-    'error.tutorialOutleveled': 'Берегу Испытаний больше нечему вас научить.',
     'error.passingStoneCold': 'Камень холоден. Наставница Марен не просила вас об этом.',
     'error.vendorQuestGated': 'Этот предмет пока не продаётся вам.',
     'error.arenaMinLevel': 'Чтобы встать в очередь на арену, нужен {level} уровень.',
@@ -6923,7 +7661,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.concussiveBlow': 'Оглушающий удар',
     'aura.disarmingSmash': 'Обезоруживающий удар',
     'aura.staticCharge': 'Статический заряд',
-    'aura.frostbite': 'Обморожение',
+    'aura.frostbite': 'Зимогрыз',
     'aura.maddeningWhisper': 'Сводящий с ума шёпот',
     'aura.wyrmwardSigil': 'Драконья печать',
     'aura.soulSiphon': 'Похищение души',
@@ -6982,6 +7720,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.cannotEquip': 'Вы не можете это экипировать.',
     'error.faceWater': 'Повернитесь лицом к воде, пригодной для рыбалки.',
     'error.potionNotReady': 'Это зелье ещё не готово к использованию.',
+    'error.strongerEffectActive': 'Уже действует более сильный эффект.',
     'error.fullHealth': 'У вас и так полное здоровье.',
     'error.nothingRestore': 'Восстанавливать нечего.',
     'error.nothingToConsume': 'Поглощать нечего.',
@@ -7043,6 +7782,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.sitEat': 'Вы садитесь, чтобы поесть.',
     'log.sitDrink': 'Вы садитесь, чтобы попить.',
     'log.quaff': 'Вы выпиваете {item}.',
+    'log.read': 'Вы читаете {item}.',
+    'log.placeStation': 'Вы устанавливаете {item}.',
+    'log.placeStationThe': 'Вы устанавливаете {item}.',
     'log.boutDecided': 'Поединок завершён. Возвращение в мир…',
     'log.partyLeaves': '{name} покидает группу.',
     'log.partyLeft': '{name} покинул(а) группу.',
@@ -7060,6 +7802,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirBoar': 'Мощь Вепря',
     'aura.elixirVenomfire': 'Мощь Гадючьего Жара',
     'aura.elixirSerpent': 'Мощь Змея',
+    'aura.flaskIronhusk': 'Сила Железной Скорлупы',
+    'aura.flaskWarboar': 'Мощь Боевого Вепря',
+    'aura.flaskRunewater': 'Ясность Рунной Воды',
+    'aura.wellFed': 'Сытость',
     'error.townFocusNotInTown': 'Чтобы задать фокус, нужно находиться в городе.',
     'error.townFocusOverBudget': 'Такое распределение превышает ваш запас очков фокуса.',
     'error.townFocusInvalid': 'Недопустимое распределение фокуса.',
@@ -7088,11 +7834,38 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'Сосульки',
     'aura.perfectMoment': 'Идеальный миг',
     'error.uniqueEquipped': 'Можно экипировать только один такой предмет.',
+    'error.masterwroughtCap': 'Можно экипировать только два предмета «Ковка мастера».',
+    'error.masterwroughtLegendary':
+      'Можно экипировать только один легендарный предмет «Ковка мастера».',
+    'error.sunderTarget': 'Расколоть можно только эпические предметы из рейда.',
+    'error.sunderHeld': 'У вас нет этого предмета.',
+    'error.sunderMoved': 'Предмет переместился, раскалывание отменено.',
+    'log.sunderResult': 'Вы раскалываете {item} и получаете Расколотую эссенцию.',
+    'error.perfectNotApex': 'Довести до совершенства можно только предметы «Ковка мастера».',
+    'error.perfectSkill':
+      'Чтобы довести его до совершенства, нужен навык 125 в ремесле, которым он создан.',
+    'error.perfectMaterialLocked':
+      'Один из материалов, необходимых для совершенствования, заблокирован.',
+    'error.perfectMaterials':
+      'Вам не хватает материалов, чтобы довести этот предмет до совершенства.',
+    'log.perfectBind': 'Совершенствование начато: предмет {item} теперь привязан к вам.',
+    'log.perfectAdvance': 'Совершенствование: {item} переходит на ранг {n} из {total}.',
+    'log.perfectFail': 'Попытка совершенствования не удалась; материалы потрачены.',
+    'log.perfectDone': 'Предмет {item} доведён до совершенства!',
+    'error.legendaryAlready': 'Это творение уже легендарно.',
+    'error.legendaryName': 'Этому творению нужно имя, чтобы стать легендой.',
+    'error.legendaryNameShape': 'Это имя нельзя начертать на творении.',
+    'error.legendaryDeed': 'Чтобы сделать это творение легендой, нужна Грамота созидания.',
+    'error.patternKnown': 'Вы уже знаете этот рецепт.',
+    'error.patternProfession': 'Вы не занимались этой профессией.',
+    'error.patternSkill': 'Ваш навык слишком низок, чтобы изучить эту схему.',
     'error.townFocusCannotAfford': 'Вам не хватает средств на эту смену фокуса.',
     'log.townFocusRespecComplete': 'Смена фокуса завершена.',
 
-    'error.townFocusRespecCancelled': 'Вы не смогли оплатить ожидающую смену специализации фокуса, поэтому она была отменена.',
-    'error.ignivarRaidInCombat': 'Ваш рейд всё ещё в бою. Вы сможете войти, когда сражение закончится.',
+    'error.townFocusRespecCancelled':
+      'Вы не смогли оплатить ожидающую смену специализации фокуса, поэтому она была отменена.',
+    'error.ignivarRaidInCombat':
+      'Ваш рейд всё ещё в бою. Вы сможете войти, когда сражение закончится.',
     'error.ignivarForgeGateSealed': 'Вам закрыт доступ к воротам кузницы.',
     'error.liveRaidClaimUnsafe': 'Эту активную заявку на рейд нельзя безопасно заменить.',
     'error.vaultOnlyMaterials': 'В хранилище материалов можно хранить только материалы.',
@@ -7104,18 +7877,75 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.vaultUpgraded': 'Вы улучшили хранилище материалов.',
     'error.alreadyEating': 'Вы уже едите.',
     'error.alreadyDrinking': 'Вы уже пьёте.',
+    // Rift mechanic names (Masterwrought Phase 19F, ruling
+    // qr-19-rift-mechanic-names-translate-or-not: translated everywhere,
+    // the shipped precedent of the rift cast ids).
+    'aura.riftRimebite': 'Укус изморози',
+    'aura.riftRime': 'Изморозь',
+    'aura.riftCinders': 'Пепел',
+    'aura.riftSmoulder': 'Тление',
+    'aura.riftVenom': 'Яд',
+    'aura.riftWeb': 'Паутина',
+    'aura.riftSerration': 'Зазубренная рана',
+    'mechanic.riftSweepingArc': 'Широкий взмах',
+    'aura.riftManaBurn': 'Сжигание маны',
+    'aura.riftVoidRot': 'Гниль пустоты',
+    'aura.riftDread': 'Ужас',
+    'mechanic.riftTailSweep': 'Удар хвостом',
+    'aura.riftCorrode': 'Коррозия',
+    'aura.riftCrush': 'Сокрушение',
+    'mechanic.riftPitsteelSweep': 'Взмах адской стали',
+    'aura.riftSearingBrand': 'Жгучее клеймо',
+    'aura.riftPactRot': 'Гниль договора',
+    'mechanic.riftGlacialBurst': 'Ледяной взрыв',
+    'aura.riftGlacialCarapace': 'Ледяной панцирь',
+    'mechanic.riftWhiteout': 'Белая мгла',
+    'mechanic.riftPyroclasm': 'Пирокластический взрыв',
+    'mechanic.riftCinderWave': 'Пепельная волна',
+    'aura.riftMagmaCrash': 'Удар магмы',
+    'aura.riftDeadlyVenom': 'Смертельный яд',
+    'aura.riftClingingSilk': 'Липкий шёлк',
+    'mechanic.riftVenomSpray': 'Брызги яда',
+    'mechanic.riftVenomDeluge': 'Ядовитый ливень',
+    'aura.riftNecroticBlight': 'Некротическая зараза',
+    'mechanic.riftMarrowHarvest': 'Жатва костного мозга',
+    'mechanic.riftBoneStorm': 'Костяная буря',
+    'aura.riftRisingFrenzy': 'Нарастающая ярость',
+    'aura.riftWarlordsBellow': 'Рёв полководца',
+    'mechanic.riftEarthbreaker': 'Раскол земли',
+    'mechanic.riftArcaneDetonation': 'Тайная детонация',
+    'aura.riftArcaneFrailty': 'Тайная уязвимость',
+    'aura.riftManaShield': 'Щит маны',
+    'aura.riftTemporalDrag': 'Замедление времени',
+    'mechanic.riftArcaneVolley': 'Тайный залп',
+    'mechanic.riftChainLightning': 'Цепь молний',
+    'mechanic.riftThunderSlam': 'Громовой таран',
+    'mechanic.riftThunderhead': 'Грозовая туча',
+    'aura.riftGalecrash': 'Удар шквала',
+    'aura.riftStaticField': 'Статическое поле',
+    'aura.riftTerrifyingScreech': 'Ужасающий визг',
+    'mechanic.riftRiptide': 'Отбойная волна',
+    'aura.riftUndertow': 'Донное течение',
+    'mechanic.riftPactFlame': 'Пламя договора',
+    'mechanic.riftBloodSigil': 'Кровавая печать',
+    'mechanic.riftRainOfBrimstone': 'Серный ливень',
+    'aura.riftHoofOfRuin': 'Копыто погибели',
+    'mechanic.riftWingBuffet': 'Удар крыльями',
+    'mechanic.riftPitfireRing': 'Кольцо адского огня',
   },
   ...BASE_NEW,
   cs_CZ: {
     'log.passingStoneKneel': 'Sevřeš dlaň kolem Kamene přechodu a pobřeží tě pouští.',
     'error.tutorialFromHere': 'Odsud nemůžeš vyplout.',
-    'error.tutorialOutleveled': 'Zkušební pobřeží tě už nemá co naučit.',
     'error.passingStoneCold': 'Kámen je studený. Instruktorka Maren tě o tohle nepožádala.',
     'error.vendorQuestGated': 'Tento předmět ti zatím není na prodej.',
     'error.arenaMinLevel': 'Musíš být na úrovni {level}, abys se mohl(a) zařadit do fronty arény.',
     'error.arenaMinLevelMember':
       '{name} musí být alespoň na úrovni {level}, aby se mohl(a) zařadit do fronty arény.',
     'log.arenaQueueAutoLeave1v1': 'Opouštíš frontu Popelavého kolosea.',
+    'log.read': 'Čteš {item}.',
+    'log.placeStation': 'Stavíš {item}.',
+    'log.placeStationThe': 'Stavíš {item}.',
     'error.guildBankNoGuild': 'Pro použití cechovní banky musíš být v cechu.',
     'error.guildBankRank': 'Cechovní banku smí používat pouze důstojníci.',
     'error.guildBankFull': 'Cechovní banka je plná.',
@@ -7260,19 +8090,35 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Chlad zimy',
     'aura.icicles': 'Rampouchy',
     'aura.perfectMoment': 'Dokonalý okamžik',
+    'error.perfectNotApex': 'Zdokonalit lze jen mistrovsky kované předměty.',
+    'error.perfectSkill': 'Zdokonalení vyžaduje dovednost 125 v řemesle, které předmět vytvořilo.',
+    'error.perfectMaterialLocked': 'Materiál potřebný ke zdokonalení je zamčený.',
+    'error.perfectMaterials': 'Nemáte materiály potřebné ke zdokonalení tohoto předmětu.',
+    'log.perfectBind': 'Zdokonalování začíná: předmět {item} je nyní vázán na vás.',
+    'log.perfectAdvance': 'Zdokonalování: {item} postupuje na stupeň {n} z {total}.',
+    'log.perfectFail': 'Pokus o zdokonalení selhal; materiály byly spotřebovány.',
+    'log.perfectDone': 'Předmět {item} je nyní zdokonalený!',
+    'error.legendaryAlready': 'Toto dílo už je legendární.',
+    'error.legendaryName': 'Toto dílo potřebuje jméno, aby se stalo legendou.',
+    'error.legendaryNameShape': 'Toto jméno nelze do díla vepsat.',
+    'error.legendaryDeed': 'Abyste z tohoto díla udělali legendu, potřebujete Listinu stvoření.',
 
-    'error.townFocusRespecCancelled': 'Nemáš dost prostředků na čekající změnu zaměření, takže byla zrušena.',
+    'error.townFocusRespecCancelled':
+      'Nemáš dost prostředků na čekající změnu zaměření, takže byla zrušena.',
     'error.ignivarRaidInCombat': 'Tvůj raid je stále v boji. Vstoupit můžeš, až boj skončí.',
     'error.ignivarForgeGateSealed': 'Brána kovárny je pro tebe zapečetěná.',
     'error.liveRaidClaimUnsafe': 'Tento nárok na probíhající raid nelze bezpečně nahradit.',
-    'error.bankStackIndivisible': 'Tento stoh nelze rozdělit tak, aby se vešel do volného místa v bance.',
-    'error.bagsStackIndivisible': 'Tento stoh nelze rozdělit tak, aby se vešel do volného místa v brašnách.',
+    'error.bankStackIndivisible':
+      'Tento stoh nelze rozdělit tak, aby se vešel do volného místa v bance.',
+    'error.bagsStackIndivisible':
+      'Tento stoh nelze rozdělit tak, aby se vešel do volného místa v brašnách.',
     'error.vaultOnlyMaterials': 'Do Trezoru materiálů lze ukládat pouze materiály.',
     'error.vaultLocked': 'Trezor materiálů sis ještě neodemkl.',
     'error.vaultMaterialFull': 'Do trezoru se už žádný další materiál nevejde.',
     'error.vaultMaxUpgrades': 'Trezor už nelze dále vylepšit.',
     'error.vaultCannotAfford': 'Na toto vylepšení trezoru nemáš dost prostředků.',
-    'error.guildBankStackIndivisible': 'Tento stoh nelze rozdělit tak, aby se vešel do volného místa v cechovní bance.',
+    'error.guildBankStackIndivisible':
+      'Tento stoh nelze rozdělit tak, aby se vešel do volného místa v cechovní bance.',
     'log.vaultUnlocked': 'Odemkl sis Trezor materiálů.',
     'log.vaultUpgraded': 'Vylepšil sis Trezor materiálů.',
     'error.alreadyEating': 'Už jíš.',
@@ -7281,7 +8127,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   nl_NL: {
     'log.passingStoneKneel': 'Je sluit je hand om de Doorgangssteen, en het strand laat je gaan.',
     'error.tutorialFromHere': 'Je kunt hier niet uitvaren.',
-    'error.tutorialOutleveled': 'De Beproevingskust heeft je niets meer te leren.',
     'error.passingStoneCold': 'De steen is koud. Instructeur Maren heeft je dit niet gevraagd.',
     'error.vendorQuestGated': 'Dat voorwerp is nog niet te koop voor jou.',
     'error.arenaMinLevel':
@@ -7289,6 +8134,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.arenaMinLevelMember':
       '{name} moet minstens niveau {level} zijn om zich aan te sluiten bij de wachtrij voor de arena.',
     'log.arenaQueueAutoLeave1v1': 'Je verlaat de wachtrij van het Ashen Coliseum.',
+    'log.read': 'Je leest {item}.',
+    'log.placeStation': 'Je zet {item} op.',
+    'log.placeStationThe': 'Je zet {item} op.',
     'error.guildBankNoGuild': 'Je moet in een gilde zitten om de gildebank te gebruiken.',
     'error.guildBankRank': 'Alleen gildeofficieren mogen de gildebank gebruiken.',
     'error.guildBankFull': 'De gildebank is vol.',
@@ -7434,19 +8282,38 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Winterkilte',
     'aura.icicles': 'IJspegels',
     'aura.perfectMoment': 'Volmaakt Ogenblik',
+    'error.perfectNotApex': 'Alleen meestergesmede voorwerpen kunnen worden vervolmaakt.',
+    'error.perfectSkill':
+      'Dat vervolmaken vereist 125 vaardigheid in het ambacht waarmee het is gemaakt.',
+    'error.perfectMaterialLocked': 'Een materiaal dat nodig is om te vervolmaken is vergrendeld.',
+    'error.perfectMaterials': 'Je mist de materialen om dat voorwerp te vervolmaken.',
+    'log.perfectBind': 'Het vervolmaken begint: {item} is nu aan je gebonden.',
+    'log.perfectAdvance': 'Vervolmaken: {item} stijgt naar rang {n} van {total}.',
+    'log.perfectFail': 'De vervolmakingspoging mislukt; de materialen zijn verbruikt.',
+    'log.perfectDone': '{item} is nu vervolmaakt!',
+    'error.legendaryAlready': 'Dat werkstuk is al legendarisch.',
+    'error.legendaryName': 'Dat werkstuk heeft een naam nodig om een legende te worden.',
+    'error.legendaryNameShape': 'Die naam kan niet in het werkstuk worden gegraveerd.',
+    'error.legendaryDeed':
+      'Je hebt een Scheppingsakte nodig om van dat werkstuk een legende te maken.',
 
-    'error.townFocusRespecCancelled': 'Je kon de geplande focus-herverdeling niet betalen, dus deze is geannuleerd.',
-    'error.ignivarRaidInCombat': 'Je raid is nog in gevecht. Je kunt binnenkomen zodra het gevecht voorbij is.',
+    'error.townFocusRespecCancelled':
+      'Je kon de geplande focus-herverdeling niet betalen, dus deze is geannuleerd.',
+    'error.ignivarRaidInCombat':
+      'Je raid is nog in gevecht. Je kunt binnenkomen zodra het gevecht voorbij is.',
     'error.ignivarForgeGateSealed': 'De poort van de smidse is voor jou verzegeld.',
     'error.liveRaidClaimUnsafe': 'Deze claim voor een live raid kan niet veilig worden vervangen.',
-    'error.bankStackIndivisible': 'Deze stapel kan niet worden gesplitst om in de resterende ruimte van je bank te passen.',
-    'error.bagsStackIndivisible': 'Deze stapel kan niet worden gesplitst om in de resterende ruimte van je tassen te passen.',
+    'error.bankStackIndivisible':
+      'Deze stapel kan niet worden gesplitst om in de resterende ruimte van je bank te passen.',
+    'error.bagsStackIndivisible':
+      'Deze stapel kan niet worden gesplitst om in de resterende ruimte van je tassen te passen.',
     'error.vaultOnlyMaterials': 'Alleen materialen kunnen in de Materialenkluis worden opgeslagen.',
     'error.vaultLocked': 'Je hebt de Materialenkluis nog niet ontgrendeld.',
     'error.vaultMaterialFull': 'Er past geen extra exemplaar van dat materiaal meer in je kluis.',
     'error.vaultMaxUpgrades': 'Je kluis kan niet verder worden verbeterd.',
     'error.vaultCannotAfford': 'Je kunt die kluisverbetering niet betalen.',
-    'error.guildBankStackIndivisible': 'Deze stapel kan niet worden gesplitst om in de resterende ruimte van de gildebank te passen.',
+    'error.guildBankStackIndivisible':
+      'Deze stapel kan niet worden gesplitst om in de resterende ruimte van de gildebank te passen.',
     'log.vaultUnlocked': 'Je ontgrendelt de Materialenkluis.',
     'log.vaultUpgraded': 'Je verbetert de Materialenkluis.',
     'error.alreadyEating': 'Je bent al aan het eten.',
@@ -7455,13 +8322,15 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   pl_PL: {
     'log.passingStoneKneel': 'Zaciskasz dłoń na Kamieniu Przejścia, a wybrzeże pozwala ci odejść.',
     'error.tutorialFromHere': 'Nie możesz stąd podnieść żagli.',
-    'error.tutorialOutleveled': 'Wybrzeże Prób nie ma cię już czego nauczyć.',
     'error.passingStoneCold': 'Kamień jest zimny. Instruktorka Maren nie prosiła cię o to.',
     'error.vendorQuestGated': 'Ten przedmiot nie jest jeszcze dla ciebie na sprzedaż.',
     'error.arenaMinLevel': 'Musisz mieć poziom {level}, aby dołączyć do kolejki na arenę.',
     'error.arenaMinLevelMember':
       '{name} musi mieć co najmniej poziom {level}, aby dołączyć do kolejki na arenę.',
     'log.arenaQueueAutoLeave1v1': 'Opuszczasz kolejkę do Popielnego Koloseum.',
+    'log.read': 'Odczytujesz {item}.',
+    'log.placeStation': 'Rozstawiasz {item}.',
+    'log.placeStationThe': 'Rozstawiasz {item}.',
     'error.guildBankNoGuild': 'Musisz należeć do gildii, aby korzystać z banku gildii.',
     'error.guildBankRank': 'Tylko oficerowie gildii mogą korzystać z banku gildii.',
     'error.guildBankFull': 'Bank gildii jest pełny.',
@@ -7609,19 +8478,36 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Chłód zimy',
     'aura.icicles': 'Sople lodu',
     'aura.perfectMoment': 'Idealna chwila',
+    'error.perfectNotApex': 'Udoskonalić można tylko mistrzowsko kute przedmioty.',
+    'error.perfectSkill': 'Udoskonalenie wymaga 125 umiejętności w rzemiośle, które go stworzyło.',
+    'error.perfectMaterialLocked': 'Materiał potrzebny do udoskonalenia jest zablokowany.',
+    'error.perfectMaterials': 'Brakuje ci materiałów, by udoskonalić ten przedmiot.',
+    'log.perfectBind': 'Udoskonalanie rozpoczęte: przedmiot {item} jest teraz z tobą związany.',
+    'log.perfectAdvance': 'Udoskonalanie: {item} awansuje na stopień {n} z {total}.',
+    'log.perfectFail': 'Próba udoskonalenia nie powiodła się; materiały zostały zużyte.',
+    'log.perfectDone': 'Przedmiot {item} jest teraz udoskonalony!',
+    'error.legendaryAlready': 'To dzieło jest już legendarne.',
+    'error.legendaryName': 'To dzieło potrzebuje imienia, by stać się legendą.',
+    'error.legendaryNameShape': 'Tego imienia nie można wyryć na dziele.',
+    'error.legendaryDeed': 'Potrzebujesz Aktu stworzenia, by uczynić to dzieło legendą.',
 
-    'error.townFocusRespecCancelled': 'Nie było Cię stać na oczekującą zmianę specjalizacji skupienia, więc ją anulowano.',
-    'error.ignivarRaidInCombat': 'Twój rajd wciąż jest w walce. Możesz wejść, gdy walka się zakończy.',
+    'error.townFocusRespecCancelled':
+      'Nie było Cię stać na oczekującą zmianę specjalizacji skupienia, więc ją anulowano.',
+    'error.ignivarRaidInCombat':
+      'Twój rajd wciąż jest w walce. Możesz wejść, gdy walka się zakończy.',
     'error.ignivarForgeGateSealed': 'Brama kuźni jest dla Ciebie zamknięta.',
     'error.liveRaidClaimUnsafe': 'Tego aktywnego zgłoszenia rajdu nie można bezpiecznie zastąpić.',
-    'error.bankStackIndivisible': 'Nie można podzielić tego stosu, aby zmieścić go w wolnym miejscu w banku.',
-    'error.bagsStackIndivisible': 'Nie można podzielić tego stosu, aby zmieścić go w wolnym miejscu w torbach.',
+    'error.bankStackIndivisible':
+      'Nie można podzielić tego stosu, aby zmieścić go w wolnym miejscu w banku.',
+    'error.bagsStackIndivisible':
+      'Nie można podzielić tego stosu, aby zmieścić go w wolnym miejscu w torbach.',
     'error.vaultOnlyMaterials': 'W Skarbcu Materiałów można przechowywać wyłącznie materiały.',
     'error.vaultLocked': 'Nie odblokowano jeszcze Skarbca Materiałów.',
     'error.vaultMaterialFull': 'W Skarbcu nie ma już miejsca na ten materiał.',
     'error.vaultMaxUpgrades': 'Skarbca nie można już bardziej ulepszyć.',
     'error.vaultCannotAfford': 'Nie stać Cię na to ulepszenie Skarbca.',
-    'error.guildBankStackIndivisible': 'Nie można podzielić tego stosu, aby zmieścić go w wolnym miejscu w banku gildii.',
+    'error.guildBankStackIndivisible':
+      'Nie można podzielić tego stosu, aby zmieścić go w wolnym miejscu w banku gildii.',
     'log.vaultUnlocked': 'Odblokowujesz Skarbiec Materiałów.',
     'log.vaultUpgraded': 'Ulepszasz Skarbiec Materiałów.',
     'error.alreadyEating': 'Już jesz.',
@@ -7631,13 +8517,14 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.passingStoneKneel':
       'Kamu menggenggam Batu Pelepasan itu, dan pesisir ini melepaskanmu pergi.',
     'error.tutorialFromHere': 'Kamu tidak bisa berlayar dari sini.',
-    'error.tutorialOutleveled':
-      'Pesisir Pembuktian tidak punya apa pun lagi untuk diajarkan padamu.',
     'error.passingStoneCold': 'Batu itu dingin. Instruktur Maren belum memintamu melakukan ini.',
     'error.vendorQuestGated': 'Barang itu belum dijual untukmu.',
     'error.arenaMinLevel': 'Kamu harus level {level} untuk mengantre ke arena.',
     'error.arenaMinLevelMember': '{name} harus setidaknya level {level} untuk mengantre ke arena.',
     'log.arenaQueueAutoLeave1v1': 'Kamu meninggalkan antrean Koloseum Abu.',
+    'log.read': 'Kamu membaca {item}.',
+    'log.placeStation': 'Kamu memasang {item}.',
+    'log.placeStationThe': 'Kamu memasang {item}.',
     'error.guildBankNoGuild': 'Kamu harus berada dalam sebuah guild untuk menggunakan bank guild.',
     'error.guildBankRank': 'Hanya perwira guild yang boleh menggunakan bank guild.',
     'error.guildBankFull': 'Bank guild penuh.',
@@ -7783,19 +8670,37 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Hawa Musim Dingin',
     'aura.icicles': 'Kerucut Es',
     'aura.perfectMoment': 'Momen Sempurna',
+    'error.perfectNotApex': 'Hanya benda Tempaan Empu yang dapat disempurnakan.',
+    'error.perfectSkill':
+      'Menyempurnakannya memerlukan keahlian 125 dalam kerajinan yang membuatnya.',
+    'error.perfectMaterialLocked': 'Sebuah bahan yang diperlukan untuk penyempurnaan terkunci.',
+    'error.perfectMaterials': 'Anda kekurangan bahan untuk menyempurnakan benda itu.',
+    'log.perfectBind': 'Penyempurnaan dimulai: {item} kini terikat pada Anda.',
+    'log.perfectAdvance': 'Penyempurnaan: {item} naik ke tingkat {n} dari {total}.',
+    'log.perfectFail': 'Upaya penyempurnaan gagal; bahan-bahannya habis terpakai.',
+    'log.perfectDone': '{item} kini telah disempurnakan!',
+    'error.legendaryAlready': 'Karya itu sudah legendaris.',
+    'error.legendaryName': 'Karya itu membutuhkan nama untuk menjadi legenda.',
+    'error.legendaryNameShape': 'Nama itu tidak dapat diukir pada karya tersebut.',
+    'error.legendaryDeed': 'Anda memerlukan Akta Penciptaan untuk menjadikan karya itu legenda.',
 
-    'error.townFocusRespecCancelled': 'Kamu tidak mampu membayar perubahan spesialisasi fokus yang tertunda, jadi perubahan itu dibatalkan.',
-    'error.ignivarRaidInCombat': 'Raid kamu masih dalam pertempuran. Kamu dapat masuk setelah pertarungan berhenti.',
+    'error.townFocusRespecCancelled':
+      'Kamu tidak mampu membayar perubahan spesialisasi fokus yang tertunda, jadi perubahan itu dibatalkan.',
+    'error.ignivarRaidInCombat':
+      'Raid kamu masih dalam pertempuran. Kamu dapat masuk setelah pertarungan berhenti.',
     'error.ignivarForgeGateSealed': 'Gerbang tempa itu tertutup bagimu.',
     'error.liveRaidClaimUnsafe': 'Klaim raid aktif ini tidak dapat digantikan dengan aman.',
-    'error.bankStackIndivisible': 'Tumpukan itu tidak dapat dipecah agar muat di ruang yang tersisa dalam bankmu.',
-    'error.bagsStackIndivisible': 'Tumpukan itu tidak dapat dipecah agar muat di ruang yang tersisa dalam tasmu.',
+    'error.bankStackIndivisible':
+      'Tumpukan itu tidak dapat dipecah agar muat di ruang yang tersisa dalam bankmu.',
+    'error.bagsStackIndivisible':
+      'Tumpukan itu tidak dapat dipecah agar muat di ruang yang tersisa dalam tasmu.',
     'error.vaultOnlyMaterials': 'Hanya material yang dapat disimpan di Vault Material.',
     'error.vaultLocked': 'Kamu belum membuka Vault Material.',
     'error.vaultMaterialFull': 'Vault-mu tidak dapat menampung material itu lagi.',
     'error.vaultMaxUpgrades': 'Vault-mu tidak dapat ditingkatkan lagi.',
     'error.vaultCannotAfford': 'Kamu tidak mampu membayar peningkatan vault itu.',
-    'error.guildBankStackIndivisible': 'Tumpukan itu tidak dapat dipecah agar muat di ruang yang tersisa dalam bank guild.',
+    'error.guildBankStackIndivisible':
+      'Tumpukan itu tidak dapat dipecah agar muat di ruang yang tersisa dalam bank guild.',
     'log.vaultUnlocked': 'Kamu membuka Vault Material.',
     'log.vaultUpgraded': 'Kamu meningkatkan Vault Material.',
     'error.alreadyEating': 'Kamu sedang makan.',
@@ -7805,13 +8710,15 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.passingStoneKneel':
       "Elini Geçiş Taşı'nın üzerine kapatırsın, ve kıyı seni serbest bırakır.",
     'error.tutorialFromHere': 'Buradan yelken açamazsın.',
-    'error.tutorialOutleveled': "Sınav Kıyısı'nın sana öğretecek bir şeyi kalmadı.",
     'error.passingStoneCold': 'Taş soğuk. Eğitmen Maren senden bunu istemedi.',
     'error.vendorQuestGated': 'O eşya henüz sana satılık değil.',
     'error.arenaMinLevel': 'Arena sırasına girmek için {level}. seviyeye ulaşmalısın.',
     'error.arenaMinLevelMember':
       '{name} arena sırasına girmek için en az {level}. seviyede olmalı.',
     'log.arenaQueueAutoLeave1v1': 'Kül Koliseumu sırasından ayrıldın.',
+    'log.read': '{item} okuyorsun.',
+    'log.placeStation': '{item} kuruyorsun.',
+    'log.placeStationThe': '{item} kuruyorsun.',
     'error.guildBankNoGuild': 'Lonca bankasını kullanmak için bir loncada olmalısın.',
     'error.guildBankRank': 'Lonca bankasını yalnızca subaylar kullanabilir.',
     'error.guildBankFull': 'Lonca bankası dolu.',
@@ -7957,8 +8864,21 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Kış Soğuğu',
     'aura.icicles': 'Buz Sarkıtları',
     'aura.perfectMoment': 'Mükemmel An',
+    'error.perfectNotApex': 'Yalnızca Usta İşi eşyalar mükemmelleştirilebilir.',
+    'error.perfectSkill': 'Bunu mükemmelleştirmek için onu yapan zanaatta 125 beceri gerekir.',
+    'error.perfectMaterialLocked': 'Mükemmelleştirme için gereken bir malzeme kilitli.',
+    'error.perfectMaterials': 'O eşyayı mükemmelleştirecek malzemelerin yok.',
+    'log.perfectBind': 'Mükemmelleştirme başladı: {item} artık sana bağlı.',
+    'log.perfectAdvance': 'Mükemmelleştirme: {item} {total} kademeden {n}. kademeye yükseldi.',
+    'log.perfectFail': 'Mükemmelleştirme denemesi başarısız oldu; malzemeler harcandı.',
+    'log.perfectDone': '{item} artık mükemmelleştirildi!',
+    'error.legendaryAlready': 'O eser zaten efsanevi.',
+    'error.legendaryName': 'O eserin efsane olabilmesi için bir isme ihtiyacı var.',
+    'error.legendaryNameShape': 'O isim esere yazılamaz.',
+    'error.legendaryDeed': 'O eseri efsaneye dönüştürmek için bir Yaratım Senedi gerekir.',
 
-    'error.townFocusRespecCancelled': 'Bekleyen odak uzmanlık değişikliğinin ücretini karşılayamadığın için iptal edildi.',
+    'error.townFocusRespecCancelled':
+      'Bekleyen odak uzmanlık değişikliğinin ücretini karşılayamadığın için iptal edildi.',
     'error.ignivarRaidInCombat': 'Raid’in hâlâ savaşta. Savaş sona erince girebilirsin.',
     'error.ignivarForgeGateSealed': 'Demirhane kapısı sana kapalı.',
     'error.liveRaidClaimUnsafe': 'Bu canlı raid talebi güvenle değiştirilemez.',
@@ -7969,7 +8889,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.vaultMaterialFull': 'Kasanda bu malzemeden daha fazla yer yok.',
     'error.vaultMaxUpgrades': 'Kasan daha fazla yükseltilemez.',
     'error.vaultCannotAfford': 'Bu kasa yükseltmesinin ücretini karşılayamazsın.',
-    'error.guildBankStackIndivisible': 'Bu yığın, lonca bankasında kalan alana sığması için bölünemez.',
+    'error.guildBankStackIndivisible':
+      'Bu yığın, lonca bankasında kalan alana sığması için bölünemez.',
     'log.vaultUnlocked': 'Malzeme Kasası’nın kilidini açtın.',
     'log.vaultUpgraded': 'Malzeme Kasası’nı yükselttin.',
     'error.alreadyEating': 'Zaten yemek yiyorsun.',
@@ -7978,12 +8899,14 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   sv_SE: {
     'log.passingStoneKneel': 'Du sluter handen om Övergångsstenen, och stranden släpper dig.',
     'error.tutorialFromHere': 'Du kan inte sätta segel härifrån.',
-    'error.tutorialOutleveled': 'Prövostranden har inget mer att lära dig.',
     'error.passingStoneCold': 'Stenen är kall. Instruktör Maren har inte bett dig om detta.',
     'error.vendorQuestGated': 'Det föremålet är inte till salu för dig ännu.',
     'error.arenaMinLevel': 'Du måste vara nivå {level} för att köa till arenan.',
     'error.arenaMinLevelMember': '{name} måste vara minst nivå {level} för att köa till arenan.',
     'log.arenaQueueAutoLeave1v1': 'Du lämnar kön till Askgrå kolosseum.',
+    'log.read': 'Du läser {item}.',
+    'log.placeStation': 'Du sätter upp {item}.',
+    'log.placeStationThe': 'Du sätter upp {item}.',
     'error.guildBankNoGuild': 'Du måste vara med i ett gille för att använda gillesbanken.',
     'error.guildBankRank': 'Endast gillesofficerare får använda gillesbanken.',
     'error.guildBankFull': 'Gillesbanken är full.',
@@ -8129,19 +9052,37 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Vinterns köld',
     'aura.icicles': 'Istappar',
     'aura.perfectMoment': 'Perfekt ögonblick',
+    'error.perfectNotApex': 'Endast mästersmidda föremål kan fulländas.',
+    'error.perfectSkill': 'Att fullända det kräver 125 i färdighet i det hantverk som skapade det.',
+    'error.perfectMaterialLocked': 'Ett material som krävs för fulländningen är låst.',
+    'error.perfectMaterials': 'Du saknar materialen för att fullända det föremålet.',
+    'log.perfectBind': 'Fulländningen börjar: {item} är nu bundet till dig.',
+    'log.perfectAdvance': 'Fulländning: {item} stiger till rang {n} av {total}.',
+    'log.perfectFail': 'Fulländningsförsöket misslyckas; materialen är förbrukade.',
+    'log.perfectDone': '{item} är nu fulländat!',
+    'error.legendaryAlready': 'Det verket är redan legendariskt.',
+    'error.legendaryName': 'Det verket behöver ett namn för att bli en legend.',
+    'error.legendaryNameShape': 'Det namnet kan inte ristas in i verket.',
+    'error.legendaryDeed': 'Du behöver en Skapelseurkund för att göra det verket till en legend.',
 
-    'error.townFocusRespecCancelled': 'Du hade inte råd med den pågående ändringen av fokusinriktning, så den avbröts.',
-    'error.ignivarRaidInCombat': 'Ditt raid är fortfarande i strid. Du kan gå in när striden är över.',
+    'error.townFocusRespecCancelled':
+      'Du hade inte råd med den pågående ändringen av fokusinriktning, så den avbröts.',
+    'error.ignivarRaidInCombat':
+      'Ditt raid är fortfarande i strid. Du kan gå in när striden är över.',
     'error.ignivarForgeGateSealed': 'Smidesporten är stängd för dig.',
-    'error.liveRaidClaimUnsafe': 'Det här aktiva raidanspråket kan inte ersättas på ett säkert sätt.',
-    'error.bankStackIndivisible': 'Den högen kan inte delas för att få plats i det återstående utrymmet i banken.',
-    'error.bagsStackIndivisible': 'Den högen kan inte delas för att få plats i det återstående utrymmet i dina väskor.',
+    'error.liveRaidClaimUnsafe':
+      'Det här aktiva raidanspråket kan inte ersättas på ett säkert sätt.',
+    'error.bankStackIndivisible':
+      'Den högen kan inte delas för att få plats i det återstående utrymmet i banken.',
+    'error.bagsStackIndivisible':
+      'Den högen kan inte delas för att få plats i det återstående utrymmet i dina väskor.',
     'error.vaultOnlyMaterials': 'Endast material kan förvaras i materialförrådet.',
     'error.vaultLocked': 'Du har inte låst upp materialförrådet.',
     'error.vaultMaterialFull': 'Ditt förråd rymmer inte mer av det materialet.',
     'error.vaultMaxUpgrades': 'Ditt förråd kan inte uppgraderas mer.',
     'error.vaultCannotAfford': 'Du har inte råd med den uppgraderingen av förrådet.',
-    'error.guildBankStackIndivisible': 'Den högen kan inte delas för att få plats i det återstående utrymmet i guildbanken.',
+    'error.guildBankStackIndivisible':
+      'Den högen kan inte delas för att få plats i det återstående utrymmet i guildbanken.',
     'log.vaultUnlocked': 'Du låser upp materialförrådet.',
     'log.vaultUpgraded': 'Du uppgraderar materialförrådet.',
     'error.alreadyEating': 'Du äter redan.',
@@ -8150,13 +9091,15 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   vi_VN: {
     'log.passingStoneKneel': 'Bạn siết chặt tay quanh Đá Từ Trần, và bờ biển để bạn ra đi.',
     'error.tutorialFromHere': 'Bạn không thể ra khơi từ đây.',
-    'error.tutorialOutleveled': 'Bờ Biển Thử Thách không còn gì để dạy bạn nữa.',
     'error.passingStoneCold': 'Viên đá lạnh ngắt. Giáo Quan Maren chưa yêu cầu bạn làm điều này.',
     'error.vendorQuestGated': 'Vật phẩm đó chưa được bán cho bạn.',
     'error.arenaMinLevel': 'Bạn phải đạt cấp {level} để xếp hàng vào đấu trường.',
     'error.arenaMinLevelMember':
       '{name} phải đạt tối thiểu cấp {level} để xếp hàng vào đấu trường.',
     'log.arenaQueueAutoLeave1v1': 'Bạn rời hàng chờ Đấu Trường Tro Tàn.',
+    'log.read': 'Bạn đọc {item}.',
+    'log.placeStation': 'Bạn dựng {item}.',
+    'log.placeStationThe': 'Bạn dựng {item}.',
     'error.guildBankNoGuild': 'Bạn phải ở trong một bang hội để sử dụng ngân hàng bang hội.',
     'error.guildBankRank': 'Chỉ sĩ quan bang hội mới có thể sử dụng ngân hàng bang hội.',
     'error.guildBankFull': 'Ngân hàng bang hội đã đầy.',
@@ -8300,19 +9243,37 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Giá Lạnh Mùa Đông',
     'aura.icicles': 'Nhũ Băng',
     'aura.perfectMoment': 'Khoảnh Khắc Hoàn Hảo',
+    'error.perfectNotApex': 'Chỉ có thể hoàn thiện các món Rèn Bởi Danh Sư.',
+    'error.perfectSkill': 'Hoàn thiện món này cần 125 kỹ năng trong nghề đã chế tạo ra nó.',
+    'error.perfectMaterialLocked': 'Một nguyên liệu cần cho việc hoàn thiện đang bị khóa.',
+    'error.perfectMaterials': 'Bạn thiếu nguyên liệu để hoàn thiện vật phẩm đó.',
+    'log.perfectBind': 'Bắt đầu hoàn thiện: {item} giờ đã ràng buộc với bạn.',
+    'log.perfectAdvance': 'Hoàn thiện: {item} tiến lên bậc {n} trên {total}.',
+    'log.perfectFail': 'Lần thử hoàn thiện thất bại; nguyên liệu đã bị tiêu hao.',
+    'log.perfectDone': '{item} giờ đã được Hoàn Thiện!',
+    'error.legendaryAlready': 'Tác phẩm đó đã là huyền thoại.',
+    'error.legendaryName': 'Tác phẩm đó cần một cái tên để trở thành huyền thoại.',
+    'error.legendaryNameShape': 'Cái tên đó không thể khắc lên tác phẩm.',
+    'error.legendaryDeed': 'Bạn cần một Chứng thư Tạo tác để biến tác phẩm đó thành huyền thoại.',
 
-    'error.townFocusRespecCancelled': 'Bạn không đủ tiền để đặt lại chuyên môn đang chờ, nên thao tác đã bị hủy.',
-    'error.ignivarRaidInCombat': 'Đội raid của bạn vẫn đang giao chiến. Bạn có thể vào khi trận chiến kết thúc.',
+    'error.townFocusRespecCancelled':
+      'Bạn không đủ tiền để đặt lại chuyên môn đang chờ, nên thao tác đã bị hủy.',
+    'error.ignivarRaidInCombat':
+      'Đội raid của bạn vẫn đang giao chiến. Bạn có thể vào khi trận chiến kết thúc.',
     'error.ignivarForgeGateSealed': 'Cổng lò rèn không mở cho bạn.',
-    'error.liveRaidClaimUnsafe': 'Không thể thay thế yêu cầu nhận phần thưởng raid đang diễn ra này một cách an toàn.',
-    'error.bankStackIndivisible': 'Không thể tách chồng vật phẩm đó để vừa với chỗ trống còn lại trong ngân hàng.',
-    'error.bagsStackIndivisible': 'Không thể tách chồng vật phẩm đó để vừa với chỗ trống còn lại trong túi.',
+    'error.liveRaidClaimUnsafe':
+      'Không thể thay thế yêu cầu nhận phần thưởng raid đang diễn ra này một cách an toàn.',
+    'error.bankStackIndivisible':
+      'Không thể tách chồng vật phẩm đó để vừa với chỗ trống còn lại trong ngân hàng.',
+    'error.bagsStackIndivisible':
+      'Không thể tách chồng vật phẩm đó để vừa với chỗ trống còn lại trong túi.',
     'error.vaultOnlyMaterials': 'Chỉ vật liệu mới có thể được cất trong Kho Vật liệu.',
     'error.vaultLocked': 'Bạn chưa mở khóa Kho Vật liệu.',
     'error.vaultMaterialFull': 'Kho của bạn không thể chứa thêm vật liệu đó.',
     'error.vaultMaxUpgrades': 'Kho của bạn không thể nâng cấp thêm nữa.',
     'error.vaultCannotAfford': 'Bạn không đủ tiền cho lần nâng cấp kho đó.',
-    'error.guildBankStackIndivisible': 'Không thể tách chồng vật phẩm đó để vừa với chỗ trống còn lại trong ngân hàng hội.',
+    'error.guildBankStackIndivisible':
+      'Không thể tách chồng vật phẩm đó để vừa với chỗ trống còn lại trong ngân hàng hội.',
     'log.vaultUnlocked': 'Bạn đã mở khóa Kho Vật liệu.',
     'log.vaultUpgraded': 'Bạn đã nâng cấp Kho Vật liệu.',
     'error.alreadyEating': 'Bạn đang ăn.',
@@ -8321,13 +9282,15 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   da_DK: {
     'log.passingStoneKneel': 'Du lukker hånden om Hvilestenen, og kysten lader dig gå.',
     'error.tutorialFromHere': 'Du kan ikke sætte sejl herfra.',
-    'error.tutorialOutleveled': 'Prøvestranden har intet tilbage at lære dig.',
     'error.passingStoneCold': 'Stenen er kold. Instruktør Maren har ikke bedt dig om dette.',
     'error.vendorQuestGated': 'Den genstand er endnu ikke til salg for dig.',
     'error.arenaMinLevel': 'Du skal være niveau {level} for at stille dig i kø til arenaen.',
     'error.arenaMinLevelMember':
       '{name} skal være mindst niveau {level} for at stille sig i kø til arenaen.',
     'log.arenaQueueAutoLeave1v1': 'Du forlader køen til Det Askegrå Kolosseum.',
+    'log.read': 'Du læser {item}.',
+    'log.placeStation': 'Du stiller {item} op.',
+    'log.placeStationThe': 'Du stiller {item} op.',
     'error.guildBankNoGuild': 'Du skal være i et laug for at bruge laugsbanken.',
     'error.guildBankRank': 'Kun laugsofficerer må bruge laugsbanken.',
     'error.guildBankFull': 'Laugsbanken er fuld.',
@@ -8473,19 +9436,36 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Vinterens Kulde',
     'aura.icicles': 'Istapper',
     'aura.perfectMoment': 'Perfekt Øjeblik',
+    'error.perfectNotApex': 'Kun mestersmedede genstande kan fuldendes.',
+    'error.perfectSkill': 'At fuldende den kræver 125 i færdighed i det håndværk, der skabte den.',
+    'error.perfectMaterialLocked': 'Et materiale, der kræves til fuldendelsen, er låst.',
+    'error.perfectMaterials': 'Du mangler materialerne til at fuldende den genstand.',
+    'log.perfectBind': 'Fuldendelsen begynder: {item} er nu bundet til dig.',
+    'log.perfectAdvance': 'Fuldendelse: {item} stiger til rang {n} af {total}.',
+    'log.perfectFail': 'Fuldendelsesforsøget mislykkes; materialerne er brugt.',
+    'log.perfectDone': '{item} er nu fuldendt!',
+    'error.legendaryAlready': 'Det værk er allerede legendarisk.',
+    'error.legendaryName': 'Det værk har brug for et navn for at blive en legende.',
+    'error.legendaryNameShape': 'Det navn kan ikke indgraveres i værket.',
+    'error.legendaryDeed': 'Du skal bruge et Skabelsesskøde for at gøre det værk til en legende.',
 
-    'error.townFocusRespecCancelled': 'Du havde ikke råd til at nulstille dit fokus, så det blev annulleret.',
+    'error.townFocusRespecCancelled':
+      'Du havde ikke råd til at nulstille dit fokus, så det blev annulleret.',
     'error.ignivarRaidInCombat': 'Dit raid er stadig i kamp. Du kan gå ind, når kampen er slut.',
     'error.ignivarForgeGateSealed': 'Smedjens port er lukket for dig.',
-    'error.liveRaidClaimUnsafe': 'Dette krav på belønningen fra det igangværende raid kan ikke erstattes sikkert.',
-    'error.bankStackIndivisible': 'Stakken kan ikke opdeles, så den passer til den resterende plads i din bank.',
-    'error.bagsStackIndivisible': 'Stakken kan ikke opdeles, så den passer til den resterende plads i dine tasker.',
+    'error.liveRaidClaimUnsafe':
+      'Dette krav på belønningen fra det igangværende raid kan ikke erstattes sikkert.',
+    'error.bankStackIndivisible':
+      'Stakken kan ikke opdeles, så den passer til den resterende plads i din bank.',
+    'error.bagsStackIndivisible':
+      'Stakken kan ikke opdeles, så den passer til den resterende plads i dine tasker.',
     'error.vaultOnlyMaterials': 'Kun materialer kan opbevares i Materialelageret.',
     'error.vaultLocked': 'Du har ikke låst Materialelageret op.',
     'error.vaultMaterialFull': 'Dit lager kan ikke rumme mere af dette materiale.',
     'error.vaultMaxUpgrades': 'Dit lager kan ikke opgraderes yderligere.',
     'error.vaultCannotAfford': 'Du har ikke råd til den lageropgradering.',
-    'error.guildBankStackIndivisible': 'Stakken kan ikke opdeles, så den passer til den resterende plads i laugsbanken.',
+    'error.guildBankStackIndivisible':
+      'Stakken kan ikke opdeles, så den passer til den resterende plads i laugsbanken.',
     'log.vaultUnlocked': 'Du låser Materialelageret op.',
     'log.vaultUpgraded': 'Du opgraderer Materialelageret.',
     'error.alreadyEating': 'Du spiser allerede.',
@@ -9308,36 +10288,31 @@ const IGNIVAR_DICT: Partial<Record<SupportedLanguage, Partial<Record<BaseSimMess
         'As portas da forja permanecem seladas enquanto a batalha continua.',
     },
     cs_CZ: {
-      'error.ignivarExitSealedInCombat':
-        'Dveře kovárny zůstávají pevně zavřené, dokud zuří bitva.',
+      'error.ignivarExitSealedInCombat': 'Dveře kovárny zůstávají pevně zavřené, dokud zuří bitva.',
     },
     nl_NL: {
       'error.ignivarExitSealedInCombat':
         'De deuren van de smidse blijven gesloten zolang de strijd woedt.',
     },
     pl_PL: {
-      'error.ignivarExitSealedInCombat':
-        'Drzwi kuźni pozostają zamknięte, dopóki trwa walka.',
+      'error.ignivarExitSealedInCombat': 'Drzwi kuźni pozostają zamknięte, dopóki trwa walka.',
     },
     id_ID: {
       'error.ignivarExitSealedInCombat':
         'Pintu-pintu bengkel tempa tetap tertutup rapat selama pertempuran berlangsung.',
     },
     tr_TR: {
-      'error.ignivarExitSealedInCombat':
-        'Demirhane kapıları savaş sürdükçe sıkıca kapalı kalır.',
+      'error.ignivarExitSealedInCombat': 'Demirhane kapıları savaş sürdükçe sıkıca kapalı kalır.',
     },
     sv_SE: {
-      'error.ignivarExitSealedInCombat':
-        'Smedjans portar förblir stängda så länge striden pågår.',
+      'error.ignivarExitSealedInCombat': 'Smedjans portar förblir stängda så länge striden pågår.',
     },
     vi_VN: {
       'error.ignivarExitSealedInCombat':
         'Cửa lò rèn vẫn đóng chặt chừng nào trận chiến còn tiếp diễn.',
     },
     da_DK: {
-      'error.ignivarExitSealedInCombat':
-        'Smedjens porte forbliver lukkede, så længe slaget raser.',
+      'error.ignivarExitSealedInCombat': 'Smedjens porte forbliver lukkede, så længe slaget raser.',
     },
   };
 
@@ -9354,6 +10329,36 @@ export const DICT: Record<SupportedLanguage, Record<SimMessageKey, string>> = Ob
     },
   ]),
 ) as Record<SupportedLanguage, Record<SimMessageKey, string>>;
+
+/** The keys a locale's OWN sources carry, before the English spread above fills
+ *  the rest: the union of its BASE_DICT, PET_DICT, RAID_BOSS_DIALOGUE_DICT and
+ *  IGNIVAR_DICT blocks plus the one-row arena literal. The status registry
+ *  (scripts/i18n_scan.mjs) reads this instead of the assembled DICT, because
+ *  DICT is dense by construction (baseEnTable is spread under every locale) and
+ *  so could never report a sim-scope key as pending; a key absent here is an
+ *  untranslated row the release fill must carry (Masterwrought Phase 19F,
+ *  ruling qr-19-sim-scope-pending-is-unreachable). The runtime never calls
+ *  this; tSim keeps reading the dense DICT. */
+export function simDictProvidedKeys(lang: SupportedLanguage): ReadonlySet<string> {
+  const provided = new Set<string>();
+  const tables: ReadonlyArray<Readonly<Record<string, string>> | undefined> = [
+    BASE_DICT[lang],
+    PET_DICT[lang],
+    RAID_BOSS_DIALOGUE_DICT[lang],
+    IGNIVAR_DICT[lang],
+  ];
+  for (const table of tables) {
+    if (!table) continue;
+    for (const [key, value] of Object.entries(table)) {
+      if (typeof value === 'string' && value.trim().length > 0) provided.add(key);
+    }
+  }
+  const arena = ARENA_QUEUE_AUTO_LEAVE_1V1[lang];
+  if (typeof arena === 'string' && arena.trim().length > 0) {
+    provided.add('log.arenaQueueAutoLeave1v1');
+  }
+  return provided;
+}
 
 function interpolate(template: string, params?: InterpolationValues): string {
   if (!params) return template;
@@ -9374,19 +10379,96 @@ export function tSim(
 }
 
 // Reverse maps: the sim splices English item/mob names into its text; localize them.
-const itemNameToId = new Map<string, string>();
-for (const [id, it] of Object.entries(ITEMS)) itemNameToId.set(it.name, it.heroicOf ?? id);
-const mobNameToId = new Map<string, string>();
-for (const [id, m] of Object.entries(MOBS)) mobNameToId.set(m.name, id);
-const abilityNameToId = new Map<string, string>();
-for (const [id, a] of Object.entries(ABILITIES)) abilityNameToId.set(a.name, id);
+//
+// An English display name is NOT a key. Two content records can carry the same
+// one, and the bare `map.set(name, id)` loop these maps used to be handed such a
+// name to whichever record the merged catalog happened to spread LAST, silently
+// and with nothing red. Three ability lines shipped mistranslated that way, each
+// losing to a record no player can reach: 'Aether Surge' resolved to the retired
+// arcane_power instead of the mage kit's arcane_surge, 'Patch Up' to the unkitted
+// mend_pet instead of the hunter kit's revive_pet, and 'Sacred Goad' to the hidden
+// holy_taunt instead of sacred_challenge. A German player learning Aether Surge
+// read "Arkane Macht".
+//
+// buildNameReverseMap resolves a collision on purpose instead: a `prefer`
+// predicate picks the reachable record, any remaining tie breaks on the sorted id
+// so the winner never depends on catalog spread order, and every colliding name is
+// RECORDED in NAME_COLLISIONS. tests/sim_i18n_name_collisions.test.ts holds that
+// record against the real per-locale renderings, so a name whose records translate
+// differently cannot quietly join the list.
+type NameCollisionKind = 'item' | 'mob' | 'ability' | 'zone' | 'delve' | 'delveModule';
+
+export type NameCollision = {
+  kind: NameCollisionKind;
+  name: string;
+  /** Every distinct id carrying this English name, sorted. */
+  ids: readonly string[];
+  /** The id the map resolves the name to. */
+  resolved: string;
+};
+
+const nameCollisions: NameCollision[] = [];
+
+function buildNameReverseMap(
+  kind: NameCollisionKind,
+  entries: readonly (readonly [id: string, name: string])[],
+  prefer?: (id: string) => boolean,
+): Map<string, string> {
+  const byName = new Map<string, string[]>();
+  for (const [id, name] of entries) {
+    const bucket = byName.get(name);
+    if (bucket) bucket.push(id);
+    else byName.set(name, [id]);
+  }
+  const out = new Map<string, string>();
+  for (const [name, ids] of byName) {
+    const unique = [...new Set(ids)].sort();
+    // Two records already pointing at ONE id is not a collision: it is the base
+    // and Heroic copies of an item collapsing through heroicOf, which is what
+    // that field is for.
+    if (unique.length === 1) {
+      out.set(name, unique[0]);
+      continue;
+    }
+    const preferred = prefer ? unique.filter(prefer) : [];
+    out.set(name, preferred.length === 1 ? preferred[0] : unique[0]);
+    nameCollisions.push({ kind, name, ids: unique, resolved: out.get(name) as string });
+  }
+  return out;
+}
+
+// Reachable = a player can have it: in some class kit, and not force-hidden the
+// way the retired paladin ids are. This is the only signal that separates the
+// three colliding ability pairs, and in all three the reachable id is the loser
+// under spread order.
+const KIT_ABILITY_IDS = new Set(Object.values(CLASSES).flatMap((c) => c.abilities));
+const isReachableAbility = (id: string): boolean =>
+  KIT_ABILITY_IDS.has(id) && !ABILITIES[id]?.hiddenFromPlayer;
+
+const itemNameToId = buildNameReverseMap(
+  'item',
+  Object.entries(ITEMS).map(([id, it]) => [it.heroicOf ?? id, it.name] as const),
+);
+const mobNameToId = buildNameReverseMap(
+  'mob',
+  Object.entries(MOBS).map(([id, m]) => [id, m.name] as const),
+);
+const abilityNameToId = buildNameReverseMap(
+  'ability',
+  Object.entries(ABILITIES).map(([id, a]) => [id, a.name] as const),
+  isReachableAbility,
+);
 abilityNameToId.set('Veil Mark', 'veilbound_mark');
-const delveNameToId = new Map<string, string>();
-for (const [id, d] of Object.entries(DELVES)) delveNameToId.set(d.name, id);
+const delveNameToId = buildNameReverseMap(
+  'delve',
+  Object.entries(DELVES).map(([id, d]) => [id, d.name] as const),
+);
 // Module display names are also the delveUi.moduleName.* source values; reverse
 // them so the sim's English module-name splices localize like the run tracker.
-const delveModuleNameToId = new Map<string, string>();
-for (const [id, name] of Object.entries(DELVE_MODULE_NAMES)) delveModuleNameToId.set(name, id);
+const delveModuleNameToId = buildNameReverseMap(
+  'delveModule',
+  Object.entries(DELVE_MODULE_NAMES).map(([id, name]) => [id, name] as const),
+);
 
 function locItem(name: string): string {
   const id = itemNameToId.get(name);
@@ -9400,8 +10482,15 @@ function locAbility(name: string): string {
   const id = abilityNameToId.get(name);
   return id ? tEntity({ kind: 'ability', id, field: 'name' }) : name;
 }
-const zoneNameToId = new Map<string, string>();
-for (const z of ZONES) zoneNameToId.set(z.name, z.id);
+const zoneNameToId = buildNameReverseMap(
+  'zone',
+  ZONES.map((z) => [z.id, z.name] as const),
+);
+
+// Every English display name two or more content records share, with the id each
+// one resolves to. Exported for the guard, never for rendering.
+export const NAME_COLLISIONS: readonly NameCollision[] = nameCollisions;
+
 function locZone(name: string): string {
   const id = zoneNameToId.get(name);
   return id ? tEntity({ kind: 'zone', id, field: 'name' }) : name;
@@ -9522,10 +10611,16 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   // buff_sta aura display name each crafted elixir pushes on use.
   'Might of the Boar': 'aura.elixirBoar',
   'Vipersear Vigor': 'aura.elixirVenomfire',
-  // Legacy alias for mixed-fleet deploy windows: a not-yet-restarted server
-  // still emits the pre-rename aura string. Drop after v0.29.0 ships.
-  'Venomfire Vigor': 'aura.elixirVenomfire',
   'Might of the Serpent': 'aura.elixirSerpent',
+  // Masterwrought phase 10: the three apex flask auras and the Well Fed a
+  // finished buff meal leaves, farm dish or role plate since 11c
+  // (content/profession_items.ts). Same reverse
+  // channel as the elixir names above, which is also what keeps the flask
+  // tooltip's unmapped-kind fallback line localized.
+  'Ironhusk Vigor': 'aura.flaskIronhusk',
+  'Warboar Might': 'aura.flaskWarboar',
+  'Runewater Clarity': 'aura.flaskRunewater',
+  'Well Fed': 'aura.wellFed',
   Summoned: 'aura.summoned',
   Fed: 'aura.fed',
   'Caustic Spores': 'aura.causticSpores',
@@ -9592,6 +10687,13 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Concussive Blow': 'aura.concussiveBlow',
   'Disarming Smash': 'aura.disarmingSmash',
   'Static Charge': 'aura.staticCharge',
+  Wintergnaw: 'aura.frostbite',
+  // Legacy alias for mixed-fleet deploy windows: a not-yet-restarted server
+  // still emits the pre-rename aura string. The rename ships with the
+  // masterwrought branch; drop once the release it integrates onto
+  // (release/v0.42.0 at the time of writing) is fully deployed. Named as a
+  // version, not as "a future release", because the Venomfire alias this came
+  // from said "drop after v0.29.0" and outlived its window by eleven releases.
   Winterbite: 'aura.frostbite',
   'Maddening Whisper': 'aura.maddeningWhisper',
   'Wyrmward Sigil': 'aura.wyrmwardSigil',
@@ -9695,6 +10797,65 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Unyielding Pact': 'aura.unyieldingPact',
   'Grimoire of Carnage': 'aura.grimoireOfCarnage',
   'Curse Mastery': 'aura.curseMastery',
+  // Rift mob and boss mechanic names (src/sim/content/rift/mobs.ts). Keep every
+  // English key here BYTE-IDENTICAL to the authored `name` in the content record:
+  // this map is keyed by the raw English the sim splices in, so one drifted
+  // character silently falls back to raw English with nothing red. The four rift
+  // names that reuse older content (Thunderclap, Howling Gale, Seismic Stomp,
+  // Soulrot) are already registered above and deliberately not repeated.
+  // Derivation and the exemptions live in tests/sim_i18n_rift_mechanics.test.ts.
+  Rimebite: 'aura.riftRimebite',
+  Rime: 'aura.riftRime',
+  Cinders: 'aura.riftCinders',
+  Smoulder: 'aura.riftSmoulder',
+  Venom: 'aura.riftVenom',
+  Web: 'aura.riftWeb',
+  Serration: 'aura.riftSerration',
+  'Sweeping Arc': 'mechanic.riftSweepingArc',
+  'Mana Burn': 'aura.riftManaBurn',
+  'Void Rot': 'aura.riftVoidRot',
+  Dread: 'aura.riftDread',
+  'Tail Sweep': 'mechanic.riftTailSweep',
+  Corrode: 'aura.riftCorrode',
+  Crush: 'aura.riftCrush',
+  'Pitsteel Sweep': 'mechanic.riftPitsteelSweep',
+  'Searing Brand': 'aura.riftSearingBrand',
+  'Pact Rot': 'aura.riftPactRot',
+  'Glacial Burst': 'mechanic.riftGlacialBurst',
+  'Glacial Carapace': 'aura.riftGlacialCarapace',
+  Whiteout: 'mechanic.riftWhiteout',
+  Pyroclasm: 'mechanic.riftPyroclasm',
+  'Cinder Wave': 'mechanic.riftCinderWave',
+  'Magma Crash': 'aura.riftMagmaCrash',
+  'Deadly Venom': 'aura.riftDeadlyVenom',
+  'Clinging Silk': 'aura.riftClingingSilk',
+  'Venom Spray': 'mechanic.riftVenomSpray',
+  'Venom Deluge': 'mechanic.riftVenomDeluge',
+  'Necrotic Blight': 'aura.riftNecroticBlight',
+  'Marrow Harvest': 'mechanic.riftMarrowHarvest',
+  'Bone Storm': 'mechanic.riftBoneStorm',
+  'Rising Frenzy': 'aura.riftRisingFrenzy',
+  "Warlord's Bellow": 'aura.riftWarlordsBellow',
+  Earthbreaker: 'mechanic.riftEarthbreaker',
+  'Arcane Detonation': 'mechanic.riftArcaneDetonation',
+  'Arcane Frailty': 'aura.riftArcaneFrailty',
+  'Mana Shield': 'aura.riftManaShield',
+  'Temporal Drag': 'aura.riftTemporalDrag',
+  'Arcane Volley': 'mechanic.riftArcaneVolley',
+  'Chain Lightning': 'mechanic.riftChainLightning',
+  'Thunder Slam': 'mechanic.riftThunderSlam',
+  Thunderhead: 'mechanic.riftThunderhead',
+  Galecrash: 'aura.riftGalecrash',
+  'Static Field': 'aura.riftStaticField',
+  'Terrifying Screech': 'aura.riftTerrifyingScreech',
+  Riptide: 'mechanic.riftRiptide',
+  Undertow: 'aura.riftUndertow',
+  'Pact Flame': 'mechanic.riftPactFlame',
+  'Blood Sigil': 'mechanic.riftBloodSigil',
+  'Rain of Brimstone': 'mechanic.riftRainOfBrimstone',
+  'Hoof of Ruin': 'aura.riftHoofOfRuin',
+  'Wing Buffet': 'mechanic.riftWingBuffet',
+  'Pitfire Ring': 'mechanic.riftPitfireRing',
 };
 
 const WARLOCK_ABILITY_AURA_IDS: Readonly<Record<string, string>> = {
@@ -12152,6 +13313,25 @@ const RULES: Rule[] = [
     re: /^(.+) is now your loyal companion\.$/,
     build: (m) => tSim('log.tamedPet', { name: locMob(m[1]) }),
   },
+  // The Perfecting stage (src/sim/professions/perfecting.ts): the three
+  // {item} notices, {item} reverse-mapped via locItem (the log.sunderResult
+  // pattern). They sit HERE, ahead of the pet-mode `{name} is now {mode}.`
+  // catch-all directly below, because the bind line ends in "is now bound to
+  // you." and that two-capture rule would swallow it. The advance rule's rank
+  // captures are plain digits; the done rule's "!" tail keeps it clear of the
+  // period-anchored catch-all either way.
+  {
+    re: /^Perfecting begins: (.+) is now bound to you\.$/,
+    build: (m) => tSim('log.perfectBind', { item: locItem(m[1]) }),
+  },
+  {
+    re: /^Perfecting: (.+) advances to rank (\d+) of (\d+)\.$/,
+    build: (m) => tSim('log.perfectAdvance', { item: locItem(m[1]), n: m[2], total: m[3] }),
+  },
+  {
+    re: /^(.+) is now Perfected!$/,
+    build: (m) => tSim('log.perfectDone', { item: locItem(m[1]) }),
+  },
   {
     re: /^(.+) is now (.+)\.$/,
     build: (m) => tSim('log.petMode', { name: locMob(m[1]), mode: locPetMode(m[2]) }),
@@ -12209,6 +13389,22 @@ const RULES: Rule[] = [
     build: (m) => tSim('log.bankBagUnsocketed', { item: locItem(m[1]) }),
   },
   { re: /^You quaff (.+)\.$/, build: (m) => tSim('log.quaff', { item: locItem(m[1]) }) },
+  { re: /^You read (.+)\.$/, build: (m) => tSim('log.read', { item: locItem(m[1]) }) },
+  // The articled arm must run FIRST: the general rule below would otherwise
+  // capture "the <name>", which no item name resolves (the doubled-article
+  // characterization tests/mobile_station_party.test.ts used to record).
+  {
+    re: /^You set up the (.+)\.$/,
+    build: (m) => tSim('log.placeStationThe', { item: locItem(m[1]) }),
+  },
+  {
+    re: /^You set up (.+)\.$/,
+    build: (m) => tSim('log.placeStation', { item: locItem(m[1]) }),
+  },
+  {
+    re: /^You sunder (.+) into Sundered Essence\.$/,
+    build: (m) => tSim('log.sunderResult', { item: locItem(m[1]) }),
+  },
   {
     re: /^(Need|Greed) Roll - (\d+) for (.+) by (.+)$/,
     build: (m) =>
@@ -12684,22 +13880,6 @@ const RULES: Rule[] = [
     re: /^Crushing Depth crushes!$/,
     build: () => t('sim.rift.detonateCrushingDepth'),
   },
-  {
-    re: /^Pact Seal detonates!$/,
-    build: () => t('sim.rift.detonatePactSeal'),
-  },
-  {
-    re: /^Blood Rite falls!$/,
-    build: () => t('sim.rift.detonateBloodRite'),
-  },
-  {
-    re: /^Pit Sentence detonates!$/,
-    build: () => t('sim.rift.detonatePitSentence'),
-  },
-  {
-    re: /^Hellfire Brand detonates!$/,
-    build: () => t('sim.rift.detonateHellfireBrand'),
-  },
   { re: /^You cannot enter a delve right now\.$/, build: () => t('sim.delve.cannotEnterNow') },
   { re: /^Leave the dungeon first\.$/, build: () => t('sim.delve.leaveDungeonFirst') },
   { re: /^Leave the arena first\.$/, build: () => t('sim.delve.leaveArenaFirst') },
@@ -12717,6 +13897,14 @@ const RULES: Rule[] = [
   },
   { re: /^The grave rite falters\.$/, build: () => t('sim.delve.graveFalters') },
   {
+    re: /^The dead answer Deacon Vandric's call!$/,
+    build: () => t('delveUi.boss.varric.raise.interrupt_fail'),
+  },
+  {
+    // Legacy alias for mixed-fleet deploy windows: a not-yet-restarted server
+    // still emits the pre-rename line. The rename ships with the masterwrought
+    // branch; drop once the release it integrates onto (release/v0.42.0 at the
+    // time of writing) is fully deployed (same horizon as the Winterbite alias).
     re: /^The dead answer Deacon Varric's call!$/,
     build: () => t('delveUi.boss.varric.raise.interrupt_fail'),
   },
@@ -13147,6 +14335,9 @@ export function localizeAuthoredYellSpeakerName(
   if (templateId && (speakerKind === 'mob' || speakerKind === 'npc')) {
     return tEntity({ kind: speakerKind, id: templateId, field: 'name' });
   }
-  const mob = Object.values(MOBS).find((entry) => entry.name === name);
-  return mob ? tEntity({ kind: 'mob', id: mob.id, field: 'name' }) : name;
+  // Through the shared reverse map, not a fresh `find`: a bare find is FIRST-write
+  // wins where the map is last-write wins, so on a colliding mob name the yell
+  // speaker and the combat log used to disagree with each other.
+  const id = mobNameToId.get(name);
+  return id ? tEntity({ kind: 'mob', id, field: 'name' }) : name;
 }

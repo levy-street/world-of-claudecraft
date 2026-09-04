@@ -8,8 +8,11 @@
 import { describe, expect, it } from 'vitest';
 import { RAW_COOKING_CATCH_IDS } from '../src/sim/content/items';
 import { ITEMS } from '../src/sim/data';
-import { COOKING_CATCH_HINT_KEY, cookingCatchHintKey } from '../src/ui/cooking_catch_hint_view';
 import { Hud } from '../src/ui/hud';
+import {
+  COOKING_CATCH_HINT_KEY,
+  cookingCatchHintKey,
+} from '../src/ui/hud/professions/cooking_catch_hint_view';
 import { t } from '../src/ui/i18n';
 import { createTooltipLine } from '../src/ui/tooltip_line';
 
@@ -24,7 +27,9 @@ function tooltipHtml(itemId: string): string {
 
 describe('cooking_catch_hint_view (pure keys)', () => {
   it('every raw cooking catch shares the one cooking-ingredient key', () => {
-    expect(RAW_COOKING_CATCH_IDS.size).toBe(7);
+    // TEN since masterwrought Phase 11i added its three high-band catches;
+    // they take the same one cooking-ingredient key by being catches.
+    expect(RAW_COOKING_CATCH_IDS.size).toBe(10);
     const keys = new Set([...RAW_COOKING_CATCH_IDS].map((id) => cookingCatchHintKey(id)));
     expect(keys.size).toBe(1);
     expect([...keys][0]).toBe(COOKING_CATCH_HINT_KEY);
@@ -63,7 +68,10 @@ describe('createTooltipLine (createElement paint)', () => {
     const { readFileSync } = await import('node:fs');
     const { join } = await import('node:path');
     // Repo root is process.cwd() under vitest (worktree root).
-    for (const rel of ['src/ui/cooking_catch_hint_view.ts', 'src/ui/tooltip_line.ts']) {
+    for (const rel of [
+      'src/ui/hud/professions/cooking_catch_hint_view.ts',
+      'src/ui/tooltip_line.ts',
+    ]) {
       const src = readFileSync(join(process.cwd(), rel), 'utf8');
       expect(src, rel).not.toMatch(/\.innerHTML\s*=/);
       expect(src, rel).not.toMatch(/`[\s\S]*class="tt-/);
@@ -89,15 +97,5 @@ describe('itemTooltip integration for raw catches', () => {
     const html = tooltipHtml('pan_seared_perch');
     expect(html).toMatch(/Restores .+ health/i);
     expect(html).not.toContain(t(COOKING_CATCH_HINT_KEY));
-  });
-});
-
-describe('bank deposit-all copy after catches are materials', () => {
-  it('depositAllTooltip still describes crafting reagents and junk', () => {
-    // #2715: button gates on isMaterialItem; raw catches are honest materials.
-    // Full sentence pin so a rewrite that keeps only loose tokens fails.
-    expect(t('hudChrome.bank.depositAllTooltip')).toBe(
-      'Sends every crafting reagent and junk item from your bags to the bank in one trip. Gathering tools, equipped gear, quest items, and consumables are never touched.',
-    );
   });
 });

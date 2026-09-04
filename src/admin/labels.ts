@@ -74,6 +74,7 @@ export const MODERATION_ACTION_LABEL_KEYS: Record<string, string> = {
   // badge variant (the set_ai / note reasoning).
   restore_item: 'moderationHistory.actionRestoreItem',
   restore_slot: 'moderationHistory.actionRestoreSlot',
+  clear_item_name: 'moderationHistory.actionClearItemName',
   cheater_mark: 'moderationHistory.actionCheaterMark',
   cheater_mark_lift: 'moderationHistory.actionCheaterMarkLift',
   // Realm-scoped rather than account-scoped: written by the guild backoffice into
@@ -84,7 +85,16 @@ export const MODERATION_ACTION_LABEL_KEYS: Record<string, string> = {
   guild_bank_purge: 'moderationHistory.actionGuildBankPurge',
 };
 
-const BAD_ACTIONS = new Set(['ban', 'block', 'daily_rewards_ban', 'daily_rewards_ip_ban']);
+// clear_item_name is the SUPERADMIN-only destruction of a player-authored
+// legendary name with no undo (the guildbank.purge doctrine at its permission
+// row), so it reads as a sanction in the audit trail, never a neutral note.
+const BAD_ACTIONS = new Set([
+  'ban',
+  'block',
+  'daily_rewards_ban',
+  'daily_rewards_ip_ban',
+  'clear_item_name',
+]);
 const WARN_ACTIONS = new Set([
   'suspend',
   'chat_mute',

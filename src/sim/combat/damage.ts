@@ -30,7 +30,11 @@ import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
 import { emitIgnivarRaidNarrativeOnDeath } from '../ignivar_raid_lore';
-import { lockNormalDungeonResetOnBossKill, spawnBossExitPortal } from '../instances/dungeons';
+import {
+  claimedInstanceForMob,
+  lockNormalDungeonResetOnBossKill,
+  spawnBossExitPortal,
+} from '../instances/dungeons';
 import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
 import { grantAbilityDevotion } from '../paladin_devotion';
 import { snapshotPetOnOwnerDeath } from '../pet/pet_owner_revive';
@@ -1611,9 +1615,9 @@ export function handleDeath(
           : null;
     const meta = creditId !== null ? ctx.players.get(creditId) : null;
     const creditEntity = creditId !== null ? ctx.entities.get(creditId) : null;
-    const rewardInstance = ctx.instances.find(
-      (inst) => inst.partyKey !== null && inst.mobIds.includes(e.id),
-    );
+    // Resolve the owning claim once for corpse participation and both reward
+    // awarders below; the slot remains stable throughout this death path.
+    const claimedInst = claimedInstanceForMob(ctx, e.id);
     let heroicRewardRecipients: PlayerMeta[] = [];
     if (meta && creditEntity && !meta.leaving) {
       const tmpl = MOBS[e.templateId];
@@ -1638,7 +1642,7 @@ export function handleDeath(
           const matchingInstanceCorpse =
             mE?.ghost &&
             mE.corpsePos &&
-            (!rewardInstance || mE.corpseInstanceId === rewardInstance.exitId)
+            (!claimedInst || mE.corpseInstanceId === claimedInst.exitId)
               ? mE.corpsePos
               : null;
           const participationPos = matchingInstanceCorpse ?? mE?.pos;
@@ -1673,7 +1677,7 @@ export function handleDeath(
           });
         }
         // Kill Chain (rogue row, docs/design/rogue-v029-class-design.md):
-        // killing blows refresh Smokestep and refill combo points. Refreshes,
+        // killing blows refresh Smokefade and refill combo points. Refreshes,
         // never banks past the combo cap; draws no rng.
         if (killMods.onKillCombo > 0) {
           creditEntity.comboPoints = Math.min(
@@ -1717,7 +1721,7 @@ export function handleDeath(
       ) {
         ctx.applyAura(creditEntity, {
           id: 'victory_rush',
-          name: 'Victory Rush',
+          name: "Victor's Surge",
           kind: 'victory_rush',
           value: 0,
           remaining: VICTORY_RUSH_WINDOW,
@@ -1756,7 +1760,7 @@ export function handleDeath(
     // even without player credit so the owning group cannot dodge the lockout;
     // only the participation snapshot above receives marks.
     lockNormalDungeonResetOnBossKill(ctx, e);
-    ctx.awardHeroicMarks(e, heroicRewardRecipients);
+    ctx.awardHeroicMarks(e, heroicRewardRecipients, claimedInst);
     // A bossExitPortal dungeon opens its far-end exit the moment the final
     // boss falls (both difficulties; no-op everywhere else).
     spawnBossExitPortal(ctx, e);
@@ -1771,6 +1775,15 @@ export function handleDeath(
       // World-boss deeds ride the same never-pruned contributor roster.
       deedsMod.onWorldBossKilledForDeeds(ctx, e, worldBossContribs);
     }
+    // Masterwrought materials (phase 04): Wyrmfall Cores and the weekly ember
+    // check for the same participation snapshot. Deliberately BELOW every loot
+    // roll on this path (rollLoot above, rollWorldBossLoot for a world boss),
+    // so its single count draw always appends to the tick's rng sequence and
+    // can never reorder a loot roll, whatever kind of kill this is. Draw-order
+    // neutral to move here from above the world-boss block: an instance kill
+    // has no worldBossContribs and a world boss is never hosted in an instance
+    // slot, so no kill reaches both a wyrmfall draw and a world-boss roll.
+    ctx.awardWyrmfallCores(e, heroicRewardRecipients, claimedInst);
   }
 }
 

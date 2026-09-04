@@ -7,6 +7,7 @@ import type { AdminPermission } from '../permissions';
 // presentation.
 export type AdminPage =
   | 'overview'
+  | 'market-metrics'
   | 'usage'
   | 'tick-perf'
   | 'accounts'
@@ -44,7 +45,12 @@ export const NAV_SECTIONS: readonly AdminNavSection[] = [
   {
     id: 'dashboard',
     defaultPage: 'overview',
-    items: [{ id: 'overview', labelKey: 'nav.overview', permission: 'analytics.read' }],
+    items: [
+      { id: 'overview', labelKey: 'nav.overview', permission: 'analytics.read' },
+      // Live World Market listing metrics: realm-wide aggregates, so it rides
+      // analytics.read like the overview (matches the endpoint permission).
+      { id: 'market-metrics', labelKey: 'nav.marketMetrics', permission: 'analytics.read' },
+    ],
   },
   {
     id: 'operations',

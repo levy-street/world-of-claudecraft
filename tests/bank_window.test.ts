@@ -7,7 +7,12 @@
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { MATERIAL_ITEM_IDS } from '../src/sim/material_taxonomy';
+import { MATERIAL_GRADES } from '../src/sim/professions/material_grades';
 import { CHROME_GUARDED_PANELS } from '../src/ui/chrome_focus_wiring';
+import { ensureLocaleLoaded, getLanguage, setLanguage, t } from '../src/ui/i18n';
+import { SUPPORTED_LANGUAGES } from '../src/ui/i18n.resolved.generated/loaders';
+import { itemKindLabel } from '../src/ui/item_kind_label';
 
 const painter = readFileSync(new URL('../src/ui/bank_window.ts', import.meta.url), 'utf8');
 const promptDialog = readFileSync(new URL('../src/ui/prompt_dialog.ts', import.meta.url), 'utf8');
@@ -169,6 +174,16 @@ describe('bank_window: modal prompt a11y contract', () => {
     const promptBody = stripped.slice(stripped.indexOf('private showWithdrawQuantityPrompt('));
     expect(promptBody.slice(0, 400)).toContain('knownItemDef(ITEMS, slot.itemId)');
     expect(promptBody.slice(0, 400)).not.toContain('? ITEMS[slot.itemId]');
+    // The title reads the cell authority, and reads it through the SHARED core
+    // the bank's search and name-sort read (bank_item_name_core), not through a
+    // second open-coded copy of that core's body. Pinning the duplicated text
+    // was itself holding the duplication in place, so the pin moved to the call
+    // (inert today: the partial rung offers only on !slot.instance; pinned so
+    // an instanced rung cannot regress it silently, the round-4 audit).
+    expect(promptBody.slice(0, 600)).toContain('bankSlotDisplayName(item, slot)');
+    // The regression this actually guards: falling back to the def name, which
+    // is what the title showed before a copy could carry its own.
+    expect(promptBody.slice(0, 600)).not.toContain('itemDisplayName(item)');
   });
 
   it('re-validates the live slot at quantity-prompt submit (stale-index guard)', () => {
@@ -447,6 +462,61 @@ describe('bank_window: search / sort / deposit-all', () => {
   it('gives the deposit-all button a tooltip clarifying which items it moves (issue #2132)', () => {
     expect(painter).toContain("const depositTooltip = t('hudChrome.bank.depositAllTooltip')");
     expect(painter).toContain('deposit.title = depositTooltip');
+  });
+
+  it('the deposit-all tooltip says what the sweep does: every Material moves, everything else stays', () => {
+    // The full-sentence pin (#2715; moved here from the cooking-catch suite
+    // at the Masterwrought 11l QA, beside the render pins above). The sweep
+    // is set membership on isMaterialItem (src/ui/bank_view.ts), which is
+    // exactly the set whose tooltip kind line reads Material
+    // (src/ui/item_kind_label.ts): seeds, husks, compost and the growth tonic
+    // included, gray junk and every non-poor keepsake excluded, so the copy
+    // names the kind line rather than "reagents" and refuses to enumerate what
+    // stays. A rewrite that keeps only loose tokens fails here; the 18
+    // overlays were re-filled in the same change (the reword-staleness class).
+    expect(t('hudChrome.bank.depositAllTooltip')).toBe(
+      'Sends every crafting material (anything whose tooltip reads Material or Fine Material) from your bags to the bank in one trip. Everything else stays in your bags, gathering tools, quest items, consumables, and gray items included.',
+    );
+    // The parenthetical names BOTH kind lines the swept set renders: the nine
+    // fine grades are in MATERIAL_ITEM_IDS (so the sweep moves them) and their
+    // line reads Fine Material, not Material, which the first reword missed
+    // (in pt_BR the two labels share no word, so a player could not read
+    // through). Pinned against the live set and the live label for EVERY
+    // fine grade, not one exemplar: fine_iron_ore is also a recipe reagent
+    // (the tier-4 pick), so it enters the set through the recipes loop even
+    // with the grade rule deleted, and three grades no recipe consumes
+    // (fine_copper_ore, fine_ironbark_log, fine_silverleaf_herb) are what
+    // make the grade rule itself visible here.
+    const grades = Object.values(MATERIAL_GRADES);
+    expect(grades).toHaveLength(9);
+    for (const row of grades) {
+      expect(MATERIAL_ITEM_IDS.has(row.fineItemId), row.fineItemId).toBe(true);
+      expect(itemKindLabel('junk', row.fineItemId), row.fineItemId).toBe('Fine Material');
+    }
+    expect(itemKindLabel('junk', 'iron_ore')).toBe('Material');
+  });
+
+  it('every locale carries both of its own kind labels inside the deposit-all tooltip', async () => {
+    // The English parenthetical quotes the two kind lines a swept item can
+    // render; each locale's fill must quote ITS OWN itemUi.kind.material and
+    // itemUi.kind.fineMaterial, or the player is told to look for a word that
+    // never appears on the tooltip (the pt_BR miss the 11l QA closed, where
+    // the two labels share no word). The reword-staleness class has no hash
+    // gate; this containment is locale-agnostic and would have caught it. A
+    // locale still pending on the key resolves to English and passes on the
+    // English labels, which is the same containment.
+    const before = getLanguage();
+    try {
+      for (const lang of SUPPORTED_LANGUAGES) {
+        await ensureLocaleLoaded(lang);
+        setLanguage(lang);
+        const tooltip = t('hudChrome.bank.depositAllTooltip');
+        expect(tooltip, `${lang} material`).toContain(t('itemUi.kind.material'));
+        expect(tooltip, `${lang} fine material`).toContain(t('itemUi.kind.fineMaterial'));
+      }
+    } finally {
+      setLanguage(before);
+    }
   });
 
   it('exposes the deposit-all clarification beyond hover-only title (PR #2715 review)', () => {
@@ -862,7 +932,9 @@ describe('bank_window: unknown-id slots stay visible (stale-client guard, R34)',
     // The grid loop used to drop the row entirely (`if (!item) continue`),
     // which is how a counted bank slot turned invisible.
     expect(code).not.toContain('if (!item) continue');
-    expect(code).toContain('item ? this.deps.itemIcon(item) : unknownItemIconHtml(slot.itemId)');
+    expect(code).toContain(
+      'item && parts ? this.deps.itemIcon(item, parts.quality) : unknownItemIconHtml(slot.itemId)',
+    );
     // Plain unknown cells use unknownItemAria; instanced unknown cells (a
     // masterwork / signed copy whose def this client predates) use the shared
     // UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS so the per-copy flag still announces.

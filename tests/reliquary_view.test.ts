@@ -2874,9 +2874,10 @@ describe('reliquarySourceLineText', () => {
     }
     // Premise: the sweep really visited authored content, so a catalog that
     // stopped hinting anything could not pass this vacuously. Exact regime:
-    // 260 resolved lines measured today (down one when masterwork:engineering
-    // was pended, QA ruling 2026-08-07); update deliberately with authoring.
-    expect(checked).toBeGreaterThanOrEqual(260);
+    // 261 resolved lines measured at the masterwrought Phase 11o un-pend
+    // (260 while masterwork:engineering sat pended, QA ruling 2026-08-07;
+    // the hint resolves one line again); update deliberately with authoring.
+    expect(checked).toBeGreaterThanOrEqual(261);
   });
 
   it('reliquarySourceLines drops the stale plan and keeps the live ones around it', () => {

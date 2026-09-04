@@ -468,10 +468,36 @@ describe('every professions grant site is accounted for (#2430)', () => {
   const EXPECTED_GRANT_SITES: Record<string, number> = {
     'commission.ts': 1,
     'commission_order.ts': 1,
-    'crafting.ts': 6,
+    // 6 -> 9 at Masterwrought phase 12: the perfecting head-start mint arm
+    // (resolveCraftForRecipe) grants through the same silent + callerLogs
+    // discipline as the masterwork arm it sits beside: the head-started
+    // instance, its commissioned remainder copies, and the plain remainder.
+    'crafting.ts': 9,
     'enchanting.ts': 4,
+    // Farming's eight grants: base produce, its fine twin, the withered-husk
+    // payout on each of the two failure arms (a lost survival roll and the
+    // defensive retired-crop fallback), the knobs phase's compost grant in
+    // convertHusks, the crop-ladder phase's tier 3/4 seed-back grant (ONE
+    // call site above the survived/withered branch, deliberately shared by
+    // both outcomes, so it counts once), and the celebrations phase's two
+    // golden-harvest sites in harvestCrop's grantGolden closure (the signed
+    // addItemInstance for what fits, the plain addItem overflow remainder;
+    // one closure serves both grades, so the pair counts once), and
+    // masterwrought Phase 11f's golden BONUS grant (one extra item on a golden
+    // win: a next-tier seed or a farming pattern). All nine carry both flags,
+    // because farmHarvested / farmWithered / farmHusksConverted own the whole
+    // player feedback; the bonus is named on farmHarvested as
+    // goldenBonusItemId, the seedBackCount idiom, so it has a line of its own
+    // in the client without a second hub grant line.
+    'farming.ts': 9,
     'fishing.ts': 2,
     'gathering.ts': 2,
+    // Masterwrought phase 04: the two core delivery arms (heroic/raid kill
+    // and rift first clear) and the two ember accrual arms, all documented
+    // NO_RESULT_EVENT_GRANTS; plus the sundering essence grant, whose sunder
+    // line owns the feedback (silent + callerLogs).
+    'masterwrought_materials.ts': 4,
+    'sundering.ts': 1,
     'salvage.ts': 2,
     'interaction.ts:harvestCorpse': 6,
   };
@@ -493,6 +519,17 @@ describe('every professions grant site is accounted for (#2430)', () => {
     // completed trade (trade.ts's grantOffer, outside this directory, stays
     // loud for the identical reason).
     'order.requesterId',
+    // masterwrought_materials.ts (phase 04): the Wyrmfall Core and Maker's
+    // Ember participation awards follow the heroic-marks precedent (which
+    // lives in instances/dungeons.ts, outside this sweep): no result event
+    // exists, so the hub's "You receive:" line and the loot ding ARE the
+    // player's whole notification that a kill or completion paid out. One
+    // marker per delivery arm (boss kill, rift first clear, ember first
+    // grant, ember accrual), each pinned to its own call.
+    'WYRMFALL_CORE_ITEM_ID, count',
+    'WYRMFALL_CORE_ITEM_ID, riftCount',
+    'MAKERS_EMBER_ITEM_ID, 1',
+    'MAKERS_EMBER_ITEM_ID, granted',
   ];
 
   // Source with comments removed (`://` protocol slashes preserved), the repo's

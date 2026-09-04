@@ -11,16 +11,21 @@ import {
 } from '../src/sim/content/professions';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
-import { NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
+import { isSignableMaterialRarity, NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
+import { masterworkBonusStats } from '../src/sim/professions/masterwork';
+import { LEGENDARY_PROMOTION_COST } from '../src/sim/professions/perfecting';
 import {
   instanceBadgeLines,
   instanceBindingLines,
   instanceBonusStatLines,
   instanceMakersMarkLine,
   instancePartyTradeLine,
+  instanceTitleHtml,
+  isGatheredProvenance,
   isGatheredProvenanceKind,
   itemNumber,
   itemStatName,
+  tooltipEffectiveQuality,
   wornTooltipInstance,
 } from '../src/ui/item_instance_tooltip';
 import { svgIcon } from '../src/ui/ui_icons';
@@ -59,6 +64,41 @@ describe('item_instance_tooltip', () => {
     expect(instanceBadgeLines({ signer: 'Bob' })).toBe('');
     expect(instanceBonusStatLines({ signer: 'Bob' })).toBe('');
     expect(instanceMakersMarkLine({ signer: 'Bob' })).toContain('Crafted by Bob');
+  });
+
+  // The phase 14 Perfecting badges: data-driven off the payload alone, so
+  // every trim stays the authority over which surface shows what (the peer
+  // eqi mirror never carries either field; the browse display trim drops
+  // `perfecting`, so a head-started listing stays blind there).
+  it('a Perfected copy states it in one gold line; the seal stacks beside it', () => {
+    const perfected = instanceBadgeLines({ perfected: true });
+    expect(perfected).toContain('Perfected');
+    expect(perfected).toContain('color:var(--gold)');
+    expect((perfected.match(/<div/g) ?? []).length).toBe(1);
+    const withSeal = instanceBadgeLines({
+      perfected: true,
+      rolled: { masterwork: true, stats: { str: 2 } },
+    });
+    expect(withSeal).toContain('Masterwork');
+    expect(withSeal).toContain('Perfected');
+    expect((withSeal.match(/<div/g) ?? []).length).toBe(2);
+  });
+
+  it('a head-started copy (rank walk in progress) states its rank; Perfected suppresses it', () => {
+    const rank2 = instanceBadgeLines({ perfecting: 2 });
+    expect(rank2).toContain('Perfecting: rank 2 of 4');
+    // A Perfected copy never shows a stale rank line beside its stamp (the
+    // payload contract deletes `perfecting` at the stamp, and the renderer
+    // holds the rule even against a payload that kept both).
+    const both = instanceBadgeLines({ perfected: true, perfecting: 3 });
+    expect(both).toContain('Perfected');
+    expect(both).not.toContain('Perfecting:');
+  });
+
+  it('an out-of-contract perfecting value renders no rank line at all', () => {
+    for (const bad of [0, -1, 4, 99, 1.5, Number.NaN]) {
+      expect(instanceBadgeLines({ perfecting: bad as number }), String(bad)).toBe('');
+    }
   });
 
   it('baked bonus stats each render one tt-instance-bonus line', () => {
@@ -208,18 +248,35 @@ describe('item_instance_tooltip', () => {
   it('a gathered-kind signed copy reads Gathered by, a crafted-kind keeps Crafted by', () => {
     // Both arms of the kind split, against real defs from each family.
     expect(ITEMS.copper_ore.kind).toBe('junk');
-    const gathered = instanceMakersMarkLine({ signer: 'Anna' }, ITEMS.copper_ore.kind);
+    const gathered = instanceMakersMarkLine({ signer: 'Anna' }, ITEMS.copper_ore);
     expect(gathered).toContain('Gathered by Anna');
     expect(gathered).not.toContain('Crafted by');
     expect(gathered).not.toContain('makers-mark');
     expect(ITEMS.ironedge_longsword.kind).toBe('weapon');
-    const crafted = instanceMakersMarkLine({ signer: 'Anna' }, ITEMS.ironedge_longsword.kind);
+    const crafted = instanceMakersMarkLine({ signer: 'Anna' }, ITEMS.ironedge_longsword);
     expect(crafted).toContain('Crafted by Anna');
     expect(crafted).not.toContain('Gathered by');
     expect(crafted).toContain('tt-makers-mark-icon');
     expect(crafted).toContain('aria-hidden="true"');
-    // No kind at all (a caller without the def) stays the crafted wording.
+    // No def at all (a caller without one) stays the crafted wording.
     expect(instanceMakersMarkLine({ signer: 'Anna' })).toContain('Crafted by Anna');
+    // THE CRAFTED-PLACEABLE CARVE-OUT (masterwrought Phase 11k), and it is a
+    // live-defect pin rather than a new-content one: a crafted Harvest Feast is
+    // kind 'junk' AND quality 'rare', so mintsSignerPayload really does stamp
+    // it, and before this carve-out the kind-only read called a cook's own
+    // feast "Gathered by". Both rungs are asserted, so a revert reds on the
+    // shipped item and not only on this phase's.
+    for (const id of ['harvest_feast', 'stonepot_feast']) {
+      const feast = instanceMakersMarkLine({ signer: 'Anna' }, ITEMS[id]);
+      expect(ITEMS[id].kind, `${id} really is the junk kind this carve-out is about`).toBe('junk');
+      expect(feast, id).toContain('Crafted by Anna');
+      expect(feast, id).not.toContain('Gathered by');
+    }
+    // And the carve-out is NARROW: an ordinary junk material still reads
+    // gathered, so it did not simply retire the other wording.
+    expect(instanceMakersMarkLine({ signer: 'Anna' }, ITEMS.copper_ore)).toContain(
+      'Gathered by Anna',
+    );
   });
 
   it("uses the exact project-owned maker's-mark stroke as a decorative currentColor glyph", () => {
@@ -277,17 +334,22 @@ describe('instanceBindingLines (commission lines)', () => {
   });
 });
 
-// The worn-slot projection: the paperdoll renders exactly the
-// public eqi allowlist (signer/enchant/rolled) in BOTH hosts, so the offline
-// full payload can never show the bond lines on worn gear that the online
-// eqi-trimmed mirror lacks. char_window.ts is pinned to route through it.
+// The worn-slot projection: the paperdoll renders the public eqi allowlist
+// (signer/enchant/rolled/name) in BOTH hosts, so the offline full payload can
+// never show the bond lines on worn gear that the online eqi-trimmed mirror
+// lacks, PLUS the one deliberate self-side addition (2026-08-27): `perfected`,
+// which never rides the peer eqi wire but which the owner's own paperdoll
+// needs for the promotion-scoped Unique-Equipped tag. char_window.ts is pinned
+// to route through it.
 describe('wornTooltipInstance (the eqi-mirror worn projection)', () => {
-  it('keeps exactly signer/enchant/rolled and drops the bond and charges fields', () => {
+  it('keeps exactly signer/enchant/rolled/name/perfected and drops the bond and charges fields', () => {
     expect(
       wornTooltipInstance({
         signer: 'Aldric',
         enchant: 'ench_x',
         rolled: { masterwork: true, stats: { str: 2 } },
+        name: "Vel'tara's Oath",
+        perfected: true,
         bindOnTrade: true,
         boundTo: 7,
         charges: { fireball: 2 },
@@ -296,6 +358,8 @@ describe('wornTooltipInstance (the eqi-mirror worn projection)', () => {
       signer: 'Aldric',
       enchant: 'ench_x',
       rolled: { masterwork: true, stats: { str: 2 } },
+      name: "Vel'tara's Oath",
+      perfected: true,
     });
     expect(wornTooltipInstance(undefined)).toBeUndefined();
     // A bond-only payload projects to an EMPTY worn payload: no line renders.
@@ -307,12 +371,66 @@ describe('wornTooltipInstance (the eqi-mirror worn projection)', () => {
   it('char_window routes the paperdoll tooltip through the projection (source pin)', () => {
     const charWindow = readFileSync(new URL('../src/ui/char_window.ts', import.meta.url), 'utf8');
     expect(charWindow).toContain('wornTooltipInstance(');
-    // The raw equippedInstances read feeds ONLY the projection, never the
+    // The raw IWorld.equipmentInstances read (the owner's FULL worn map on
+    // both hosts, the phase 13 QA) feeds ONLY the projection, never the
     // tooltip directly.
-    const site = charWindow.indexOf('equippedInstances?.[slot]');
+    const site = charWindow.indexOf('world.equipmentInstances?.[slot]');
     expect(site).toBeGreaterThan(-1);
     const before = charWindow.slice(Math.max(0, site - 220), site);
     expect(before).toContain('wornTooltipInstance(');
+  });
+});
+
+describe('tooltipEffectiveQuality and instanceTitleHtml (Masterwrought phase 13)', () => {
+  const def = {
+    id: 'test_apex_ring',
+    name: 'Test Apex Ring',
+    kind: 'armor',
+    slot: 'ring',
+    quality: 'epic',
+  } as import('../src/sim/types').ItemDef;
+
+  it('effective quality: the rolled override wins, unknown strings fall back to the def', () => {
+    expect(tooltipEffectiveQuality(def, undefined)).toBe('epic');
+    expect(tooltipEffectiveQuality(def, { rolled: { quality: 'legendary' } })).toBe('legendary');
+    // A hostile or future-tier wire string never reaches the label lookup:
+    // the def's own quality answers instead of a throw.
+    expect(tooltipEffectiveQuality(def, { rolled: { quality: 'mythic' } })).toBe('epic');
+    expect(tooltipEffectiveQuality(def, { rolled: { quality: 'hasOwnProperty' } })).toBe('epic');
+  });
+
+  it('an unnamed copy keeps the one-line title, colored by EFFECTIVE quality', () => {
+    const plain = instanceTitleHtml(def, undefined, 'Test Apex Ring');
+    expect(plain).toBe('<div class="tt-title" style="color:#a335ee">Test Apex Ring</div>');
+    // A promoted-but-unnamed shape (defensive: the sim always names on
+    // promotion) still recolors to legendary orange.
+    const promotedUnnamed = instanceTitleHtml(
+      def,
+      { rolled: { quality: 'legendary' } },
+      'Test Apex Ring',
+    );
+    expect(promotedUnnamed).toContain('#ff8000');
+    expect(promotedUnnamed).not.toContain('tt-sub');
+  });
+
+  it('a named copy titles the card with the ESCAPED chosen name and keeps the def name below', () => {
+    const html = instanceTitleHtml(
+      def,
+      { rolled: { quality: 'legendary' }, name: '<b>Oath</b> of "Vel\'tara"' },
+      'Test Apex Ring',
+    );
+    // Player-authored text renders escaped, raw, never through t().
+    expect(html).toContain('&lt;b&gt;Oath&lt;/b&gt;');
+    expect(html).not.toContain('<b>Oath</b>');
+    // Legendary orange title plus the identity line below it.
+    expect(html).toContain('style="color:#ff8000"');
+    expect(html).toContain('<div class="tt-sub">Test Apex Ring</div>');
+  });
+
+  it('quest purpose still outranks quality in the title color', () => {
+    const questDef = { ...def, kind: 'quest' } as import('../src/sim/types').ItemDef;
+    const html = instanceTitleHtml(questDef, { rolled: { quality: 'legendary' } }, 'Sealed Writ');
+    expect(html).toContain('var(--color-quest)');
   });
 });
 
@@ -342,15 +460,183 @@ describe('isGatheredProvenanceKind partition over the live content', () => {
     }
   });
 
-  it('every crafted recipe output resolves to a crafted-kind def', () => {
+  it('every crafted output the #1149 signing rule can stamp is a crafted-kind def', () => {
+    // Narrowed at Masterwrought phase 07, then re-aimed at the REAL axis by
+    // the scoped re-review: a crafted copy gains a signer through the
+    // def-QUALITY rule (isSignableMaterialRarity: rare and up,
+    // professions/crafting.ts) or the masterwork proc arm (needs a slot),
+    // NEVER through commission, which mints bindOnTrade only. So the guard
+    // pins quality: every crafted output at signable rarity must read as
+    // crafted-kind, and every crafted junk-kind output must sit BELOW
+    // signable rarity, or the "Gathered by" mislabel goes live the day a
+    // retune bumps an intermediate to rare.
+    // ONE DEF IS A SANCTIONED JUNK KIND rather than a sanctioned exception, and
+    // the distinction is the point (the farming absorb, RULE 3b: the two
+    // suites' rules COMPOSE). Farming deviation (ak): the growth tonic is a
+    // crafted output whose def is DELIBERATELY kind 'junk' (plant_crop consumes
+    // it as the plant-time knob; there is no use arm and Sell Junk must vendor
+    // it). It needs NO skip here: common quality sits below the signing floor
+    // so the sweep below never admits it, the masterwork arm needs slot+stats
+    // the def lacks, and if a retune ever lifted its quality the craftedJunk
+    // loop further down would red on it first. A skip list carrying it was
+    // therefore a branch that could not fire, which is where the next defect
+    // hides, so it is retired rather than re-worded (masterwrought Phase 11k
+    // QA).
+    //
+    // THE FEASTS WERE EXCEPTIONS HERE AND THEY SHOULD NEVER HAVE BEEN
+    // (masterwrought Phase 11k). Their entry claimed the never-signable proof
+    // "rests on the masterwork arm alone", which examined one of the TWO
+    // signing channels: mintsSignerPayload stamps any signable-rarity non-bag
+    // output, and harvest_feast is rare, so a cook's own feast really was
+    // signed and really did render "Gathered by". The fix is in the source
+    // rather than on this list: isGatheredProvenance carves out any def
+    // carrying a `feast` payload, because a feast is only ever crafted or
+    // traded for. So the sweep below reads the DEF-level predicate and the
+    // feasts are ordinary members of it, at every rung.
+    const PLACEABLE_FEASTS = [
+      'harvest_feast',
+      'stonepot_feast',
+      'warspice_feast',
+      'sageleaf_feast',
+    ];
     expect(ALL_RECIPES.length).toBeGreaterThan(0);
     for (const recipe of ALL_RECIPES) {
+      expect(ITEMS[recipe.resultItemId], recipe.id).toBeDefined();
+    }
+    // 'poor' is definitionally below signable (MaterialRarity excludes it),
+    // so it short-circuits before the typed predicate.
+    const signableQuality = (q: (typeof ITEMS)[string]['quality']): boolean =>
+      q !== undefined && q !== 'poor' && isSignableMaterialRarity(q);
+    const signable = ALL_RECIPES.filter((recipe) =>
+      signableQuality(ITEMS[recipe.resultItemId].quality),
+    );
+    expect(signable.length).toBeGreaterThan(0);
+    for (const recipe of signable) {
       const def = ITEMS[recipe.resultItemId];
       expect(def, recipe.resultItemId).toBeDefined();
-      expect(isGatheredProvenanceKind(def.kind), `${recipe.resultItemId} (${def.kind})`).toBe(
-        false,
-      );
+      // NO SKIP LIST: the sweep runs over every signable-rarity crafted output
+      // with no carve-out at all, which is what the feast fix made possible
+      // (the carve-out lives in the SOURCE predicate now, keyed on the feast
+      // payload, rather than on a list here).
+      expect(isGatheredProvenance(def), `${recipe.resultItemId} (${def.kind})`).toBe(false);
     }
+    const craftedJunk = ALL_RECIPES.filter((r) => ITEMS[r.resultItemId].kind === 'junk');
+    expect(craftedJunk.map((r) => r.resultItemId).sort()).toEqual(
+      [
+        'duskforged_billet',
+        'forgefold_plating',
+        'wyrmhide_cording',
+        'sunspun_bolt',
+        'prismglass_setting',
+        'precision_chassis',
+        'quickening_catalyst',
+        'seasoned_stock',
+        'lucent_reagent',
+        'sablewax_vellum',
+        'growth_tonic',
+        'harvest_feast',
+        // masterwrought Phase 11k's three apex role feasts, replacing 11i's
+        // retired capstone feast on the same placeable-junk footing.
+        'stonepot_feast',
+        'warspice_feast',
+        'sageleaf_feast',
+        // masterwrought Phase 11o's on-ramp part: an ordinary crafted junk
+        // component on the intermediates' footing (common, below the signing
+        // floor, same as duskforged_billet and its siblings).
+        'cogwheel_blank',
+        // masterwrought Phase 13's promotion writ: junk-kind at RARE on the
+        // tradable-writ arm, so it sits ABOVE the signing floor like the
+        // feasts and carries its own carve-out (isPromotionBillItem, derived
+        // from perfecting.ts LEGENDARY_PROMOTION_COST).
+        'deed_of_making',
+      ].sort(),
+    );
+    for (const recipe of craftedJunk) {
+      const def = ITEMS[recipe.resultItemId];
+      // The FEASTS are the junk-kind outputs allowed above the signing floor
+      // (harvest_feast rare, the three apex rungs epic). They ARE signed, which
+      // is the correction masterwrought Phase 11k made: the provenance carve-out
+      // in item_instance_tooltip.ts is what keeps a signed feast reading
+      // "Crafted by", so the exception is about the wording rule and never
+      // about signability. The masterwork arm is still asserted below the loop,
+      // because a slot or stats gain would open a SECOND signing channel and
+      // change what the def is. Every other crafted junk output must stay below
+      // the floor.
+      // The Deed of Making joins the feasts on the above-floor side (rare on
+      // the tradable-writ arm, masterwrought Phase 13): a scribed copy IS
+      // signed, and its promotion-bill carve-out is what keeps the signed
+      // writ reading "Crafted by" (asserted with the feasts below). Every
+      // other crafted junk output must stay below the floor.
+      if (
+        !PLACEABLE_FEASTS.includes(recipe.resultItemId) &&
+        recipe.resultItemId !== 'deed_of_making'
+      ) {
+        expect(
+          signableQuality(def.quality),
+          `${recipe.resultItemId} must stay below signable rarity while kind junk`,
+        ).toBe(false);
+      }
+      // The OTHER signing channel (the predicate header names both): the
+      // masterwork proc arm signs independently of rarity, gated solely on
+      // masterworkBonusStats answering non-null, which needs a slot AND
+      // stats. Pin the slot-less/stat-less premise against live content so
+      // giving one of these a slot cannot mint a signer while every
+      // rarity assert above stays green (the phase 07 QA pin-audit catch).
+      expect(
+        masterworkBonusStats({
+          level: recipe.level,
+          quality: def.quality,
+          slot: def.slot,
+          stats: def.stats,
+        }),
+        `${recipe.resultItemId} must stay outside the masterwork signing arm`,
+      ).toBeNull();
+    }
+    // The feast exceptions' rarity arm, stated honestly (both rarities ARE
+    // signable), so a slot or stats gain on either def reds the masterwork
+    // assert above first and forces the exception to be re-decided.
+    for (const id of PLACEABLE_FEASTS) {
+      const feastDef = ITEMS[id];
+      expect(feastDef, `${id}: the feast exception names a live item`).toBeDefined();
+      expect(feastDef.kind, `${id}: the feast exception exists only for the junk kind`).toBe(
+        'junk',
+      );
+      expect(isSignableMaterialRarity(feastDef.quality as never), id).toBe(true);
+      // The `feast` payload is what makes each one a PLACEABLE rather than an
+      // ordinary junk output, which is the whole basis of the exception. Read
+      // through a narrowing rather than off ItemDef: `feast` is kind-scoped
+      // (types.ts puts it on the junk-side def, never on BaseItemDef), which is
+      // itself part of why these two are junk.
+      expect(
+        'feast' in feastDef && feastDef.feast !== undefined,
+        `${id} must actually be a placeable feast`,
+      ).toBe(true);
+    }
+    // Both rungs are represented, so the loop is not one item wearing two names.
+    expect(new Set(PLACEABLE_FEASTS.map((id) => ITEMS[id].quality))).toEqual(
+      new Set(['rare', 'epic']),
+    );
+    // AND THE WORDING RULE ITSELF, at the def level, for every rung: a signed
+    // feast is CRAFTED provenance. Without this the carve-out could be deleted
+    // and only the composed-html arm far above would notice.
+    for (const id of PLACEABLE_FEASTS) {
+      expect(isGatheredProvenanceKind(ITEMS[id].kind), `${id} kind alone still reads junk`).toBe(
+        true,
+      );
+      expect(isGatheredProvenance(ITEMS[id]), `${id} def-level provenance is CRAFTED`).toBe(false);
+    }
+    // The promotion writ's own wording rule (masterwrought Phase 13): the
+    // carve-out is DERIVED from the promotion bill, so pin the derivation
+    // (the bill really names the id) beside the def-level verdict.
+    expect(
+      LEGENDARY_PROMOTION_COST.some((c) => c.itemId === 'deed_of_making'),
+      'the promotion bill must name the writ the carve-out derives from',
+    ).toBe(true);
+    expect(isGatheredProvenanceKind(ITEMS.deed_of_making.kind)).toBe(true);
+    expect(
+      isGatheredProvenance(ITEMS.deed_of_making),
+      'a signed Deed of Making reads Crafted by, never Gathered by',
+    ).toBe(false);
   });
 });
 
@@ -367,7 +653,7 @@ describe('hud.itemTooltip composition order (source pins)', () => {
   const bonus = hud.indexOf('instanceBonusStatLines(instance)');
   // The mark line takes the def's kind too: the gathered-vs-crafted
   // wording split resolves from item.kind at the one composition site.
-  const mark = hud.indexOf('instanceMakersMarkLine(instance, item.kind)');
+  const mark = hud.indexOf('instanceMakersMarkLine(instance, item)');
   const soulbound = hud.indexOf("t('hudChrome.itemSoulbound')");
   const setBlock = hud.indexOf('this.itemSetBlock(item)');
 

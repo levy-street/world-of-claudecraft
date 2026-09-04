@@ -15,7 +15,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 998,
+      "nextId": 1002,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -29,9 +29,9 @@
     {
       "tick": 25,
       "time": 1.25,
-      "nextId": 1002,
-      "state": "beaeaf02",
-      "events": "0eccbde3",
+      "nextId": 1006,
+      "state": "3d5b649b",
+      "events": "ce2853e3",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -40,9 +40,9 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 1002,
-      "state": "b788f0ff",
-      "events": "09d1db15",
+      "nextId": 1006,
+      "state": "dac39b5e",
+      "events": "7204afb5",
       "rng": {
         "draws": 66,
         "digest": "383a5306"
@@ -51,9 +51,9 @@
     {
       "tick": 75,
       "time": 3.75,
-      "nextId": 1002,
-      "state": "dd4f1973",
-      "events": "556cc9b7",
+      "nextId": 1006,
+      "state": "ef04ff7c",
+      "events": "49f52411",
       "rng": {
         "draws": 247,
         "digest": "6b3f31b5"
@@ -62,9 +62,9 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 1002,
-      "state": "fd466ffe",
-      "events": "033a46fd",
+      "nextId": 1006,
+      "state": "fd463563",
+      "events": "4b1392d1",
       "rng": {
         "draws": 485,
         "digest": "b0986e30"
@@ -73,9 +73,9 @@
     {
       "tick": 125,
       "time": 6.25,
-      "nextId": 1002,
-      "state": "5535e481",
-      "events": "19e44103",
+      "nextId": 1006,
+      "state": "d5213822",
+      "events": "99654d99",
       "rng": {
         "draws": 755,
         "digest": "c2a9f447"
@@ -84,8 +84,8 @@
     {
       "tick": 150,
       "time": 7.5,
-      "nextId": 1002,
-      "state": "d124dfee",
+      "nextId": 1006,
+      "state": "8a755bf9",
       "events": "741638a5",
       "rng": {
         "draws": 1040,
@@ -95,9 +95,9 @@
     {
       "tick": 163,
       "time": 8.15,
-      "nextId": 1002,
-      "state": "dd2fa0ab",
-      "events": "6ca92b72",
+      "nextId": 1006,
+      "state": "975b218c",
+      "events": "cfaad162",
       "rng": {
         "draws": 1175,
         "digest": "a357421c"
@@ -129,6 +129,7 @@
           "counters": {
             "kills": 1
           },
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
@@ -144,7 +145,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 998,
+          "entityId": 1002,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -188,7 +189,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -213,6 +215,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -226,7 +229,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 999,
+          "entityId": 1003,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -271,7 +274,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -298,6 +302,7 @@
           "counters": {
             "deaths": 1
           },
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -310,7 +315,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1000,
+          "entityId": 1004,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -355,7 +360,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -380,6 +386,7 @@
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -392,7 +399,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1001,
+          "entityId": 1005,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -433,7 +440,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -448,7 +456,7 @@
               "name": "Battle Stance",
               "remaining": 3591.9,
               "school": "physical",
-              "sourceId": 998
+              "sourceId": 1002
             }
           ],
           "blockChance": 0.05,
@@ -461,7 +469,7 @@
           "fiveSecondRule": 107.15,
           "healPower": 5,
           "hp": 822,
-          "id": 998,
+          "id": 1002,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -510,7 +518,7 @@
           "fiveSecondRule": 107.15,
           "healPower": 41,
           "hp": 418,
-          "id": 999,
+          "id": 1003,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -561,7 +569,7 @@
           "fiveSecondRule": 107.15,
           "healPower": 6,
           "hp": 510,
-          "id": 1000,
+          "id": 1004,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -619,7 +627,7 @@
           "fiveSecondRule": 107.15,
           "healPower": 16,
           "hp": 783,
-          "id": 1001,
+          "id": 1005,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",

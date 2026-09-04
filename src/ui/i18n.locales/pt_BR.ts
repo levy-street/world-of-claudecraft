@@ -294,13 +294,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.woc.youDeclined': 'Você recusou a oferta.',
   'hudChrome.trade.woc.youWithdrew': 'Você retirou sua oferta.',
   'hudChrome.tutorialGreeting.bellHomeNote': 'De volta da costa tão cedo? Foi o sino da balsa que você tocou. O gêmeo dele está pendurado bem ali, perto da caixa de correio do Correio dos Corvos: toque-o quando quiser, e a travessia vai te levar de volta à Costa da Provação. Não há problema nenhum de qualquer jeito.',
-  'hudChrome.tutorialGreeting.bodyFirst': 'Nunca te vi por aqui antes, amigo. É tradição nestas terras que quem está começando sua aventura visite a Costa da Provação, uma ilha tranquila além do estreito. Lá você pode aprimorar suas habilidades e se acostumar com o mundo antes de enfrentar seus desafios. A balsa faz o trajeto nos dois sentidos, e ninguém vai pensar mal de você de qualquer jeito.',
-  'hudChrome.tutorialGreeting.bodyRefresher': 'De volta com um rosto novo, é? Então você já sabe como isso funciona. Ainda assim, se quiser relembrar antes de partir, a Costa da Provação nunca recusa um aluno de volta, e a balsa está pronta quando você estiver.',
-  'hudChrome.tutorialGreeting.declineNote': 'Como preferir, amigo. Se um dia mudar de ideia, o sino da balsa perto da caixa de correio do Correio dos Corvos te leva até a Costa da Provação a qualquer hora, de dia ou de noite. Ela vai continuar aqui quando os lobos não estiverem.',
   'hudChrome.tutorialGreeting.islandArrivalNote': 'Bem-vindo à Costa da Provação. O Guardião Tam está esperando logo ali na praia: vá falar com ele.',
   'hudChrome.tutorialGreeting.noteClose': 'Entendido',
-  'hudChrome.tutorialGreeting.play': 'Fazer o tutorial',
-  'hudChrome.tutorialGreeting.skip': 'Pular o tutorial',
   'hudChrome.walletBridge.badResponse': 'Sua carteira retornou uma resposta inutilizável. Tente novamente.',
   'hudChrome.walletBridge.cancelled': 'A solicitação da carteira foi cancelada. Nada foi enviado.',
   'hudChrome.walletBridge.notConnected': 'Conecte e verifique uma carteira, depois tente novamente.',
@@ -965,7 +960,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.home.world.galeName': 'Galecrest',
   'guide.home.world.gardenBlurb': 'Um reino labirinto de sebes ainda aparado por nenhum jardineiro que alguém já tenha visto, ao qual se entra passando por Hedgewick e seus pátios de fontes.',
   'guide.home.world.gardenName': 'Evergarden',
-  'guide.home.world.hauntBlurb': 'Uma floresta assombrada sob copas gigantescas, onde as lanternas de Gallowmere são a única luz honesta na estrada.',
+  'guide.home.world.hauntBlurb': 'Uma floresta assombrada sob copas gigantescas, onde as lanternas de Gibbetmere são a única luz honesta na estrada.',
   'guide.home.world.hauntName': 'Wraithwood',
   'guide.home.world.jungleBlurb': 'Palmeiras, areia branca e pássaros barulhentos, com a cidade-praia de Drifthaven mantendo uma fogueira acesa na orla.',
   'guide.home.world.jungleName': 'Palmreach',
@@ -1083,16 +1078,14 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.orderBoardHeading': 'O quadro de encomendas',
   'guide.profPages.ench.charmsBody': 'O Encantamento também é de onde vêm os amuletos de um coletor. O Engenhoqueiro Gizzel ensina os dois na oficina de ferramentas de Eastbrook assim que seu Encantamento chega a 25: o Alforje do Coletor, que acrescenta uma unidade a uma colheita, e o Olhar do Artesão, que eleva o grau do que sai. Cada um é criado uma única vez, depois encaixado em uma picareta, um machado ou uma foice, onde gasta uma carga só nas colheitas que ele de fato melhora.\n\nA recarga é onde o ofício continua rendendo. As cargas são restauradas por quem quer que seja dono da ferramenta, não por um encantador visitante, e a recarga custa metade dos materiais quando esse dono é o encantador que assinou o amuleto, e menos ainda com uma especialização em Encantamento. Então um amuleto vendido no balcão é uma venda única, enquanto os amuletos que andam nas suas próprias ferramentas são os baratos de manter funcionando. A escada completa de cargas e materiais está em qualquer página de profissão de coleta, na seção Efeitos de ferramenta.',
   'guide.profPages.ench.charmsHeading': 'Amuletos para as ferramentas de um coletor',
-  'guide.profPages.ench.enchantsNoteOffhand': 'Os encantamentos vêm em três níveis. O nível base funciona com Pó de Toque (com um pouco de Essência na ponta mais alta) e cobre o encaixe de arma, a mão secundária e todos os encaixes de armadura, com opções de eixo de atributo suficientes para que toda construção encontre algo para cada encaixe: escudos e mãos secundárias de conjurador levam seu próprio encantamento de Vigor, então nenhum encaixe equipado fica sem opção de encantamento. O nível Superior custa um Fragmento de Toque mais Essência: bônus mais fortes nos encaixes de maior impacto. Os Fragmentos ainda alimentam outros dois sumidouros, as duas receitas de amuleto a cinco cada e o degrau mais alto das recargas de efeito de ferramenta, então guarde alguns antes de gastar.\n\nEntre eles ficam os cinco encantamentos Rúnicos, um consumidor para cada secundário tipado, de modo que nada do que você desfaz vira beco sem saída: Fio Runado (arma, Força, consome Aço Ressonante), Sigilo Runado (arma, Intelecto, consome Madeira Ressonante), Trama de Runas (torso, Espírito, consome Fio Ressonante), Couro Runado (pernas, Agilidade, consome Couro Ressonante) e Elos Runados (elmo, Vigor, consome Elos Ressonantes). Cada um também leva duas Essências de Toque; onde um encaixe e um atributo têm tanto um encantamento base quanto um Superior, o bônus Runado cai entre os dois, enquanto a Trama de Runas é o encantamento de Espírito de torso mais forte que existe e o Couro Runado é o único encantamento de Agilidade para pernas que existe. Os bônus exatos estão todos na tabela abaixo.',
-  'guide.profPages.faq.a10': 'Um amuleto é um efeito de ferramenta encaixado: o trabalho de um encantador que fica em uma ferramenta de coleta e melhora o que ela traz. Um Alforje do Coletor acrescenta uma unidade a uma colheita, um Olhar do Artesão eleva o grau dela, e o Engenhoqueiro Gizzel ensina os dois na oficina de ferramentas de Eastbrook aos 25 de Encantamento. Uma carga só é gasta quando o amuleto realmente muda o resultado, então uma colheita que ele não conseguiria melhorar não custa nada, e um encaixe pode ser configurado para perguntar a cada uso, caso você prefira decidir carga por carga.\\n\\nUm amuleto novo carrega 20 cargas em uma ferramenta comum e mais 10 para cada degrau de raridade acima dela, então uma ferramenta épica começa com 50. Ficar sem cargas não destrói o amuleto: o dono da ferramenta recarrega o encaixe, 10 cargas por material arcano, com o material seguindo o melhor entre a ferramenta que ele está carregando e a melhor ferramenta que aquele encaixe já usou (Pó de Toque para uma ferramenta comum ou incomum, Essência de Toque para uma rara, um Fragmento de Toque para uma épica). Guardar a ferramenta boa no banco antes de uma recarga nunca deixa mais barato, só menor pelo mesmo preço, e encaixar um amuleto novo enquanto carrega a ferramenta inferior é o jeito honesto de descer para um degrau mais barato. O encantador que assinou o amuleto paga metade para recarregar o próprio, e menos ainda com uma especialização em Encantamento.',
+  'guide.profPages.faq.a10': 'Um amuleto é um efeito de ferramenta encaixado: o trabalho de um encantador que fica em uma ferramenta de coleta e melhora o que ela traz. Um Alforje do Coletor acrescenta uma unidade a uma colheita, um Olhar do Artesão eleva o grau dela, e o Engenhoqueiro Gizzel ensina os dois na oficina de ferramentas de Eastbrook aos 25 de Encantamento. Uma carga só é gasta quando o amuleto realmente muda o resultado, então uma colheita que ele não conseguiria melhorar não custa nada, e um encaixe pode ser configurado para perguntar a cada uso, caso você prefira decidir carga por carga.\n\nUm amuleto novo carrega 20 cargas em uma ferramenta comum e mais 10 para cada degrau de raridade acima dela, então uma ferramenta épica começa com 50. Ficar sem cargas não destrói o amuleto: o dono da ferramenta recarrega o encaixe, 10 cargas por material arcano, com o material seguindo o melhor entre a ferramenta que ele está carregando e a melhor ferramenta que aquele encaixe já usou (Pó de Toque para uma ferramenta comum ou incomum, Essência de Toque para uma rara, um Fragmento de Toque para uma épica). Guardar a ferramenta boa no banco antes de uma recarga nunca deixa mais barato, só menor pelo mesmo preço, e encaixar um amuleto novo enquanto carrega a ferramenta inferior é o jeito honesto de descer para um degrau mais barato. O encantador que assinou o amuleto paga metade para recarregar o próprio, e menos ainda com uma especialização em Encantamento.',
   'guide.profPages.faq.a9': 'Publique no quadro de encomendas. Abra a janela de criação, abra o quadro pelo cabeçalho dela, e nomeie a receita que você quer feita: deixe o pedido aberto para qualquer artesão aceitar, ou direcione-o a um artesão que você já conhece. Aceitar compromete aquele artesão com o trabalho, e um pedido é sempre mantido por apenas uma pessoa por vez.\n\nNenhuma moeda e nenhum material ficam retidos quando você publica, então combine o preço e quem traz os reagentes entre vocês, do jeito que encomendas sempre foram combinadas. Você pode cancelar seu próprio pedido enquanto ele ainda estiver aberto, e um pedido que ninguém aceita expira depois de um dia. A entrega é pessoal: fique perto do seu artesão com um espaço de bolsa livre quando a peça estiver pronta. Ela chega vinculada a você pelo Vínculo do Artesão, que qualquer mestre de posto pode desvincular pela taxa habitual.',
   'guide.profPages.faq.q10': 'O que é um amuleto, e o que acontece quando ele acaba?',
   'guide.profPages.faq.q9': 'Como eu consigo que criem algo para mim?',
   'guide.profPages.findingNodesNote': 'Você não precisa encontrá-los a olho nu. Cada nó da zona é desenhado no mapa da zona onde quer que o mapa mostre aquele terreno, e no minimapa conforme você passa por ele, então uma rota de coleta pode ser planejada pela tela do mapa antes de você sair. Um nó que suas ferramentas ainda não conseguem trabalhar aparece marcado em vez de escondido: ele mantém o lugar com uma marca riscada e esmaecida, para que você veja o terreno rumo ao qual está treinando. No desktop, passar o cursor sobre um veio, um arvoredo ou um canteiro no mundo o nomeia, diz qual ferramenta ele exige e, depois que você o trabalhou, conta sua própria regeneração até o segundo. No toque não há nada para passar o cursor, então as marcas do minimapa contam a mesma história.',
-  'guide.profPages.specimenBodyFamilies': 'Guarde um pouco de espaço livre nas bolsas quando for farmar: um golpe de sorte assinado precisa de um espaço só dele ou de uma pilha assinada compatível para cair, e se nada couber o rendimento ainda chega, mas a assinatura se perde. A colheita de cadáveres também tem seu próprio braço de sorte grande: cerca de {pct}% de cada componente colhido sai raro ou melhor. Uma família que tem um espécime perfeito a oferecer (couro, seda, veneno, garra, carne) mantém seu rendimento comum simples e cunha o espécime assinado ao lado dele; as outras três, presa, pano e presa, assinam o próprio rendimento.',
+  'guide.profPages.specimenBodyFamilies': 'Guarde um pouco de espaço livre nas bolsas quando for farmar: um golpe de sorte assinado precisa de um espaço só dele ou de uma pilha assinada compatível para cair, e se nada couber o rendimento ainda chega, mas a assinatura se perde. A colheita de cadáveres também tem seu próprio braço de sorte grande: cerca de {pct}% de cada componente colhido sai raro ou melhor. Uma família que tem um espécime perfeito a oferecer (couro, seda, veneno, garra, carne) mantém seu rendimento comum simples e cunha o espécime assinado ao lado dele; as outras cinco, presa, pano, presa, chifre e guelras, assinam o próprio rendimento.',
   'guide.professions.focusBodyTiers': 'Toda cidade principal mantém um painel de Foco da Cidade para os coletores de passagem: fique na cidade, abra-o ao lado do minimapa e distribua um orçamento de 10 pontos de foco entre os tipos de componente que lhe interessam. A cada 5 pontos em um componente, o grau de colheita dele sobe um degrau (no máximo dois degraus), e cada ponto acrescenta 10 por cento ao seu rendimento; componentes sem foco nunca pioram.\n\nSua distribuição acompanha seu personagem para onde ele for e pode ser redirecionada em qualquer visita posterior à cidade, no ritmo que você escolher. Ir com calma não custa nada: o redirecionamento leva 1 minuto por ponto movido. Pagar um pouco acelera o processo, 15 segundos por ponto mais 5 cobre e 1 Pó de Toque por ponto, e pagar o valor total o torna instantâneo por 25 cobre e 5 Pó de Toque por ponto. Só os pontos que você realmente move são contados, então ajustar um único ponto é barato, e abrir e fechar o painel sem mudar nada não custa nada em nenhum nível.',
-  'guide.professions.harvestBodyFamilies': 'A coleta não para nos nós. Muitas feras abatidas podem ser colhidas uma vez cada, por ordem de chegada, por couros, presas, garras, presas, seda, veneno, pano e carne, direto do cadáver junto com o saque comum; um único toque abre os dois. Quando uma fera carrega mais de um componente aproveitável, a escolha é sua: pegue tudo o que ela puder dar, ou concentre-se em menos componentes e leve um grau visivelmente mais fino do que você escolher levar.\n\nUm resultado de colheita raro ou melhor em uma família com espécime também concede um espécime perfeito assinado (um Couro Imaculado, uma Seda imaculada, uma Glândula de veneno imaculada, uma Garra Imaculada ou um Corte Principal) além do rendimento comum, e registra Um Espécime Perfeito no seu Livro dos Feitos. Qualquer personagem pode colher, sem necessidade de treinamento, e qualquer ferramenta de coleta que você possua conta para o braço premium, seja qual for o ofício ao qual ela pertença.',
-  'guide.professions.toolEffectsBody': 'Uma ferramenta de coleta tem um encaixe nela, e o amuleto de um encantador é o que entra nele. Um Alforje do Coletor acrescenta uma unidade ao que uma colheita rende; um Olhar do Artesão eleva o grau do que ela traz à tona. O Engenhoqueiro Gizzel, Mestre das Ferramentas em Eastbrook, ensina os dois a encantadores que alcançaram 25 de habilidade no ofício, e ambos são feitos na oficina dele.\\n\\nUm amuleto recém-encaixado carrega 20 cargas em uma ferramenta comum e mais 10 para cada degrau de raridade acima do comum, então o mesmo amuleto encaixado em uma picareta épica começa com 50. Uma carga só é gasta quando o amuleto realmente muda o resultado, nunca em uma colheita que ele não melhorou, e um encaixe pode ser configurado para perguntar a cada uso, então o amuleto espera até você dizer Usar uma carga. Encaixar um amuleto novo recunha o encaixe em torno da ferramenta que você está carregando naquele momento, então ele se enche até o que aquela ferramenta suporta em vez de voltar a algum pico anterior, e um reencaixe que não mudaria nada é recusado em vez de consumir o amuleto.\\n\\nFicar sem cargas não destrói o amuleto: o dono da ferramenta recarrega o encaixe, 10 cargas para cada material arcano gasto, e qual material ele pede segue o melhor entre a ferramenta que você está carregando e a melhor ferramenta que aquele encaixe já usou, Pó de Toque para uma ferramenta comum ou incomum, Essência de Toque para uma rara, e um Fragmento de Toque para uma épica. Deixar a ferramenta boa no banco não compra uma recarga mais barata, só uma menor pelo mesmo preço; o jeito honesto de descer para um degrau mais barato é encaixar um amuleto novo enquanto carrega a ferramenta inferior, o que recunha o encaixe ali. Se o teto do encaixe estiver acima do que sua ferramenta atual pode preencher, a recarga para onde aquela ferramenta para e diz para você carregar a melhor. A recarga custa metade dos materiais quando você é o encantador que assinou o amuleto, e menos ainda se você for especializado em Encantamento; qualquer outra pessoa paga o valor cheio. Uma recarga é uma conjuração curta, como o resto da família do ofício.',
+  'guide.professions.harvestBodyFamilies': 'A coleta não para nos nós. Muitas feras abatidas podem ser colhidas uma vez cada, por ordem de chegada, por couros, presas, garras, presas, chifres, guelras, seda, veneno, pano e carne, direto do cadáver junto com o saque comum; um único toque abre os dois. Quando uma fera carrega mais de um componente aproveitável, a escolha é sua: pegue tudo o que ela puder dar, ou concentre-se em menos componentes e leve um grau visivelmente mais fino do que você escolher levar.\n\nUm resultado de colheita raro ou melhor em uma família com espécime também concede um espécime perfeito assinado (um Couro Imaculado, uma Seda imaculada, uma Glândula de veneno imaculada, uma Garra Imaculada ou um Corte Principal) além do rendimento comum, e registra Um Espécime Perfeito no seu Livro dos Feitos. Qualquer personagem pode colher, sem necessidade de treinamento, e qualquer ferramenta de coleta que você possua conta para o braço premium, seja qual for o ofício ao qual ela pertença.',
   'guide.professions.toolEffectsHeading': 'Efeitos de ferramenta',
   'guide.progression.capEndgameBody': 'As fendas são a única coisa que espera até o próprio limite de nível. Elas se abrem nos reinos na própria agenda, classificadas de C a S, e todos os grupos do mundo correm para ser quem fecha cada uma delas. Os quadros de incursão também continuam por aí, e a dificuldade mais alta deles vale outro olhar assim que seu equipamento tiver evoluído.',
   'guide.progression.journeyBodyCount': 'O mundo é uma terra contínua de {zones} zonas. Três delas são a estrada em que você sobe de nível, dispostas de sul a norte: você começa no vale verdejante, avança pelo pântano e termina nos cumes altos e gélidos. Siga a trilha de missões e a terra carrega você de uma para a próxima. Uma ilha fica ao largo da costa do vale para os primeiros níveis, e o restante dos reinos se abre a partir dessa mesma estrada, construído para personagens que já fizeram a subida.',
@@ -1849,7 +1842,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.charges':
     'Começa com {base} cargas em uma ferramenta comum (+{bonus} por degrau de raridade).',
   'hudChrome.professions.toolEffectTooltip.howToSlot':
-    'Encaixe em uma ferramenta de mineração, lenharia ou herborismo pela janela de Profissões. Consumido ao ser encaixado.',
+    'Encaixe em uma ferramenta de mineração, lenharia, herborismo ou agricultura pela janela de Profissões. Consumido ao ser encaixado.',
   'hudChrome.professions.toolEffectTooltip.kind': 'Amuleto de ferramenta',
   'hudChrome.professions.toolEffectTooltip.landOnly': 'Não se encaixa em varas de pesca.',
   'hudChrome.professions.toolEffectTooltip.openProfessions':
@@ -1887,10 +1880,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.saleBuyer': 'Vendido para {buyer}',
   'itemUi.market.saleOlder': 'Mais {count} vendas anteriores, incluídas no total.',
   'itemUi.tooltip.maxStack': 'Pilha máxima: {count}',
-  'itemUi.tooltip.useElixir':
-    'Uso: aumenta seu {stat} em {value} por {minutes} min. Pode ser usado em combate.',
-  'itemUi.tooltip.useElixirAura':
-    'Uso: concede {aura} por {minutes} min. Pode ser usado em combate.',
   'hud.system.deathRecapAbility': 'Você morreu. Morto por {ability}.',
   'hud.system.deathRecapDrowned': 'Você morreu. Você se afogou.',
   'hud.system.deathRecapFalling': 'Você morreu. Você caiu e morreu.',
@@ -1901,7 +1890,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.noQuestItems': 'Nenhum item de missão em suas bolsas.',
   'hudChrome.bank.cannotDepositNow': 'Não pode ser depositado agora',
   'hudChrome.bank.depositAllTooltip':
-    'Envia todos os reagentes de criação e itens cinza das suas bolsas para o banco em uma única viagem. Ferramentas de coleta, itens equipados, itens de missão e consumíveis nunca são tocados.',
+    'Envia todas as matérias-primas de criação (tudo cuja descrição diz "Matéria-prima" ou "Material Fino") das suas bolsas para o banco em uma única viagem. Todo o resto fica nas suas bolsas, inclusive ferramentas de coleta, itens de missão, consumíveis e itens cinza.',
   'hudChrome.bank.guildBuyConfirm':
     'Comprar {count} espaços adicionais do banco da guilda por {price} da tesouraria da guilda?',
   'hudChrome.bank.guildBuyNote': 'Pago pela tesouraria da guilda',
@@ -2099,20 +2088,12 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'É necessário possuir atualmente o Seeker Genesis Token.',
   'guide.professions.archetypeSwitchBody':
     'Uma declaração também não é sentença perpétua. Um par que você nunca teve é simplesmente uma nova missão de sintonização, enquanto voltar a um par do qual você se afastou pede que você faça reparações antes: cinco tarefas na primeira vez, e mais três somadas a cada retorno que você já tenha feito (assumir um par inédito nunca aumenta a conta). A escolha continua significativa sem jamais trancar uma porta para sempre.',
-  'guide.professions.whatBody':
-    'As profissões são a vida de trabalho do mundo: quatro ofícios de coleta que arrancam matéria-prima direto da terra, e um anel de dez ofícios que a transformam em equipamento, refeições, poções e ferramentas. Aqui tudo alimenta outra coisa. O minério que você extrai vira uma lâmina, a lâmina recebe um encantamento, e o encantamento precisa de pó desfeito de equipamento velho, então um coletor, um artesão e um engenhoqueiro são todos elos de uma mesma corrente.\n\nNão há limite de profissões para agonizar. Todo personagem pode subir sete dos oito ofícios que têm conteúdo hoje e as quatro profissões de coleta lado a lado (a Engenharia é a única resistente: todas as receitas dela começam acima do teto livre, então a escada dela aguarda o juramento do Bombardeiro); a única escolha exclusiva é o seu arquétipo, a identidade a que você acaba jurando, embora, uma vez sintonizado, os ofícios que ficam inativos atrás dela subam apenas pelas suas receitas comuns, e acima da habilidade 75 não subam de jeito nenhum. A habilidade nunca cai, e nada do que você aprende é jamais tirado de você.',
   'guide.professions.archetypesBody':
-    'Os dez ofícios ficam em uma roda fixa, e a geografia dessa roda importa. Cada dois vizinhos formam um par com nome próprio: Ferreiro para Forja de Armas e Forja de Armaduras, Equipador para Couraria e Alfaiataria, Apotecário para Alquimia e Culinária, Bombardeiro para Engenharia e Alquimia, e mais seis ao redor do anel.\n\nSintonizar-se com um par é uma missão, não um clique de menu. Quatro pares podem ser assumidos hoje (Ferreiro, Equipador, Apotecário e Bombardeiro), cada um ancorado por um mestre residente em Eastbrook cuja missão de aceitação declara todo o acordo de antemão, antes de você aceitá-la. Até você se declarar, todo ofício avança livremente em receitas até o nível raro (qualquer receita que peça habilidade 74 ou menos), então você pode experimentar quase tudo antes de escolher (só a Engenharia não tem nenhuma receita tão baixa, então o número dela espera).\n\nUma vez sintonizado, os dois ofícios do seu par viram os seus principais, sem nenhum teto aquém do limite. O resto da roda não apaga: um ofício oposto aos seus principais continua aceso como passatempo e segue subindo até o nível raro (uma missão repetível na forja do Ferreiro Haldren permite trocar qual deles é), e todo ofício restante fica inativo. Um ofício inativo mantém a sua habilidade e as suas receitas comuns, que continuam a ensiná-lo pela curva normal até ficarem cinzas em 75; tudo acima do comum para de pagar de imediato, e um ofício inativo nunca produz uma obra-prima enquanto descansa.',
+    'Os dez ofícios ficam em uma roda fixa, e a geografia dessa roda importa. Cada dois vizinhos formam um par com nome próprio: Ferreiro para Forja de Armas e Forja de Armaduras, Equipador para Couraria e Alfaiataria, Apotecário para Alquimia e Culinária, Bombardeiro para Engenharia e Alquimia, e mais seis ao redor do anel.\n\nSintonizar-se com um par é uma missão, não um clique de menu. Quatro pares podem ser assumidos hoje (Ferreiro, Equipador, Apotecário e Bombardeiro), cada um ancorado por um mestre residente em Eastbrook cuja missão de aceitação declara todo o acordo de antemão, antes de você aceitá-la. Até você se declarar, todo ofício avança livremente em receitas até o nível raro (qualquer receita que peça habilidade 74 ou menos), então você pode experimentar tudo antes de escolher.\n\nUma vez sintonizado, os dois ofícios do seu par viram os seus principais, sem nenhum teto aquém do limite. O resto da roda não apaga: um ofício oposto aos seus principais continua aceso como passatempo e segue subindo até o nível raro (uma missão repetível na forja do Ferreiro Haldren permite trocar qual deles é), e todo ofício restante fica inativo. Um ofício inativo mantém a sua habilidade e as suas receitas comuns, que continuam a ensiná-lo pela curva normal até ficarem cinzas em 75; tudo acima do comum para de pagar de imediato, e um ofício inativo nunca produz uma obra-prima enquanto descansa.',
   'guide.professions.startBody':
     'Recém-chegado de estrada em Eastbrook? Procure o Capataz Odell e aceite Um ofício para cada mão: ele vai apontar você para os veios de minério ao redor da Escavação de Cobre, a nordeste da cidade, e te entregar os seus primeiros calos. Cuidado com a escavação em si: os Escavadores de Deeprock acampados nela estão alguns níveis acima de um recém-chegado, então trabalhe primeiro os veios das bordas e deixe o coração do acampamento para quando você tiver subido um pouco de nível. Dali em diante, colha cada veio, arvoredo e canteiro de ervas por que passar enquanto faz missões; a proficiência vem naturalmente para quem viaja.\n\nDe volta à cidade, aperte T para abrir a janela de criação e trabalhe as receitas comuns que qualquer personagem conhece desde o início. Visite os mestres na forja, nas cozinhas, no tear e na oficina de ferramentas para ver o que eles ensinam, e aceite as encomendas de trabalho deles para uma renda constante. Quando a carta da Guilda te encontrar, você já vai saber qual par parece ser a sua casa.',
-  'guide.profPages.craftIntro.engineering':
-    'A Engenharia constrói as ferramentas que todo coletor sério acaba querendo: as picaretas, machados, foices e varas de pesca de nível 4 e nível 5 que nenhum balcão jamais venderá por moedas, cada uma consumindo a ferramenta abaixo dela.',
-  'guide.profPages.craftIntro.enchanting':
-    'O Encantamento desmonta o equipamento e devolve o poder a ele: desfaça as peças indesejadas em materiais arcanos e gaste-os em um bônus permanente de atributo para uma peça que você pretende guardar. Desfazer e encantar não pedem bancada nem treinador, e qualquer um pode começar no primeiro dia; só as duas receitas de amuleto exigem mais, ensinadas na oficina de ferramentas.',
   'guide.profPages.craftProse.weaponcrafting.materialsBody':
     'A Mineração é a espinha dorsal. O minério de cobre sai dos veios de nível 1 do Vale de Eastbrook, o minério de ferro do Pântano de Mirefen e o minério de ósmio das Alturas de Thornpeak, e cada degrau da escada sobe do mesmo jeito. A Lenharia importa mais do que você imagina: a casca de ferro dá o cabo da lança de javali, o freixo cinza sustenta o malho, e uma única tora de pinheiro alto forma o cajado de batalha.\n\nO resto vem da caçada e do balcão. A pele áspera para os punhos é colhida direto de cadáveres de lobos e javalis, os fragmentos de osso saem dos mortos inquietos ou de equipamento comum salvado, e a escada da forja queima Flux de Ferreiro, 20 cobre o pote com a própria Darva. Se a sua mineração ficar para trás, nenhum balcão o salvará quanto ao minério em si: o ósmio sai dos veios de Thornpeak, dos veios iniciais de toda zona mais nova exceto a Farshore (cujos veios extraem ferro), ou da pilha de outro jogador, por negociação ou pelo Mercado Mundial. Só a Barra de Glifaço se compra por moedas, com o Engenhoqueiro Gizzel na oficina de ferramentas ou com a Intendente Bree em Highwatch.',
-  'guide.profPages.craftProse.weaponcrafting.routeBody':
-    'Qualquer peça com uma linha de atributo de verdade, o que nesta escada significa do degrau de ferro para cima, pode sair da bigorna como obra-prima, desde que a qualidade superior caiba dentro do teto do seu nível; os campos comuns de cobre sem atributos nunca geram proc, porque não há nada neles para melhorar. Ferro e ósmio contam como materiais de nível 1 para o bônus de obra-prima, pinheiro alto e glifaço como nível 2, e a habilidade acima do nível da própria receita acrescenta seu próprio ponto por nível, então, entre os três de ósmio, são o machado de guerra e o cajado de batalha que carregam a vantagem de material, e um degrau continua gerando proc melhor depois que você já o superou.\n\nCavalgue o degrau de cobre até 25, treine o degrau de ferro no dia em que ele abrir e siga nele até 50, depois o degrau de ósmio até 75. Passado o 75 nada mais alto existe ainda, então as receitas de ósmio desvanecem para metade e depois um quarto do ganho: reserve aproximadamente 150 criações a mais para alcançar o limite de 125, e lembre do limitador compartilhado de dez ações de criação por minuto quando sentar para produzir em lote.\n\nFinancie a escalada pelo caminho: a ordem de serviço da forja de Darva tira oito minérios de cobre das suas mãos a cada 30 minutos por umas moedas e EXP, e os degraus de ferro e ósmio vendem honestamente para o corpo a corpo em nivelamento. O Livro dos Feitos marca Fio e Têmpera na habilidade 50 e coroa o Grão-Mestre em Forja de Armas no 125.',
   'guide.profPages.craftProse.armorcrafting.identityBody':
     'A escada da Forja de Armaduras se lê como a carreira de um soldado: o simples cinturão de cobre rebitado, os escarpes e as manoplas para começar, a cota, as grevas e as espaldeiras de elos de ferro com suas primeiras linhas de atributo de verdade, e o raro grande elmo, a couraça e as perneiras de escama de ósmio, peças de Força e Vigor com números de armadura no ponto mais alto da arte de um artesão.\n\nEla tem um lado mais discreto também: as Calças Protegidas de Eastbrook, um campo comum com atributos de conjurador, e o Manto de Escamas de Forno, uma ombreira de malha rara de Intelecto e Espírito na habilidade 75, mantêm os usuários de malha de vocação mágica na lista de clientes. Na roda ela fica entre Forja de Armas e Engenharia; o par Ferreiro com Forja de Armas é jurado diante da Forjadora Darva, enquanto o par Mestre das Engrenagens com Engenharia existe na roda mas ainda não tem missão de juramento.',
   'guide.profPages.craftProse.armorcrafting.materialsBody':
@@ -2125,34 +2106,12 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Aqui está a peculiaridade: o curtume fica em Fenbridge, na estrada do Pântano de Mirefen, o que faz da Couraria o único ofício profundo treinado lá no pântano. O Curtidor Hesk ensina a escada junto aos seus tanques: o degrau de couro de Fenbridge, gratuito na habilidade 0, o degrau do espreitador do pântano a 25 prata por receita a partir da habilidade 25, e o degrau do guardião do brejo a 1 ouro cada a partir da habilidade 50, cada degrau abrindo conforme seu nível o alcança.\n\nTrês receitas pulam o treinador: os campos comuns (o Gibão de couro curtido e o Couro do Druida de Eastbrook) são criados em qualquer lugar desde o início, e as Faixas de Couro do Crepúsculo são conhecidas por todos na habilidade 50, presas ao curtume. Note que o juramento de Equipador em si é feito de volta em Eastbrook, com Ottilie; só o ensino acontece no pântano.',
   'guide.profPages.craftProse.leatherworking.routeBody':
     'Qualquer peça com atributos de verdade rola a chance de obra-prima, desde que a qualidade superior caiba dentro do teto do seu nível, incluído o Couro do Druida de Eastbrook com atributos, e um Couro Imaculado assinado em um Gibão do Guardião do Brejo já garante o bônus de reagente assinado automaticamente; o ósmio conta como material de nível 1 para o proc. Os couros comuns sem atributos não podem gerar proc.\n\nSuba pelo caminho natural: colha cada lobo e cada javali que você abater desde o nível um, deixe os dois campos comuns o levarem até 25 onde quer que você esteja, e então treine o degrau de couro junto aos tanques quando as missões o puxarem para o pântano de qualquer jeito. O espreitador do pântano o leva a 50, e as peças do guardião do brejo e as Faixas de Couro do Crepúsculo levam o nível raro de 50 a 75. Passado o 75, essas receitas de nível 2 caem para metade e depois um quarto do ganho, cerca de 150 criações para os cinquenta pontos finais até o limite de 125; abaixo do teto de um ofício principal, elas ainda igualam o teto de criação de qualidade rara em vez de zerar de vez.\n\nO curtume móvel importa mais para este ofício do que para qualquer outro: especialize-se aos 75 e um alforje de peles vira equipamento acabado na fogueira em vez de uma caminhada de volta a Fenbridge. A ordem de serviço do curtume de Hesk compra oito peles ásperas a cada 30 minutos, um retorno bonito sobre couros que você estava recolhendo de qualquer forma, e o Livro dos Feitos marca O Ofício do Curtidor na habilidade 50, com Grão-Mestre em Couraria no limite.',
-  'guide.profPages.craftProse.cooking.identityBody':
-    'Coma uma refeição preparada e ela cura você ao longo de 18 segundos de descanso, o que entre uma puxada e outra é a cura mais barata do jogo. A escada vai da Perca do rio grelhada na frigideira, com 90 de vida, até o Grande Assado de Marlow, com 980, uma cura sentada que nada no jogo supera.\n\nNa roda, a Culinária fica entre Alquimia e Couraria. Seu par ativo é o Apotecário, Alquimia e Culinária, jurado diante do Cozinheiro Marlow nas cozinhas de Eastbrook depois de caçar quatro javalis selvagens para a panela; o par Caçador com Couraria existe na roda mas ainda não tem missão de juramento.',
-  'guide.profPages.craftProse.cooking.materialsBody':
-    'A Pesca abastece os ingredientes marcantes, zona por zona: truta-espelho e perca de rio das águas do Vale de Eastbrook, lúcio de pântano e enguia de brejo do Pântano de Mirefen, truta de guelras gélidas e carpa de barbatana de ardósia das Alturas de Thornpeak. Os degraus misturam as zonas à vontade (o degrau gratuito já pede lúcio de pântano, o degrau do meio a guelra gélida de Thornpeak, e a ceia rara traz de volta a truta-espelho do Vale), então um cozinheiro que pesca onde quer que a estrada vá nunca fica sem.\n\nO lado do açougue vem dos cadáveres colhidos: carne de caça de javalis e seus parentes e, numa rolagem de colheita rara ou melhor, um Corte Principal assinado, a peça central do grande assado. Ervas temperam os pratos melhores, uma tora de freixo cinza defuma a enguia, e o Sal de cozinha sai a 8 cobre o saquinho na própria banca de Marlow.',
-  'guide.profPages.craftProse.alchemy.identityBody':
-    'O ofício é trabalhado no boticário de Highwatch, casa da Alquimista Verane, Mestre do Boticário, que ensina a escada de receitas, vende Frascos de Vidro a 12 cobre e paga moedas por ervas através da sua ordem de serviço.\n\nNo anel de ofícios, a Alquimia fica com os ofícios de tentativa e erro, ao lado da Engenharia de um lado e da Culinária do outro. Isso lhe dá duas identidades de par: o Bombardeiro (Engenharia e Alquimia, assumido diante do Engenhoqueiro Gizzel em Eastbrook) e o Apotecário (Alquimia e Culinária, jurado diante do Cozinheiro Marlow). Sintonize-se com qualquer um dos pares para tornar a Alquimia um ofício principal e deixar que seu próprio trabalho assinado lhe ensine de volta; o par Bombardeiro também abre sua beberagem combinada, o Elixir do Urso, enquanto o par Apotecário ainda não traz receita combinada nenhuma. A escada em si nunca espera, porém, porque toda receita de Alquimia fica dentro do nível raro sob o qual os ofícios não declarados trabalham, então toda a escalada até o limite está aberta antes de qualquer juramento.',
-  'guide.profPages.craftProse.alchemy.ladderBody':
-    'Todo mundo conhece a Poção menor de cura desde o início e pode misturá-la em qualquer lugar, sem bancada nenhuma. A escada de verdade são nove receitas ensinadas por Verane no boticário, três em cada degrau: as receitas de habilidade 0 são gratuitas, o degrau de habilidade 25 custa 25 prata por receita, e o degrau de habilidade 50 custa 1 ouro por receita. Cada degrau traz uma poção de cura, uma poção de mana e um elixir de vigor, subindo das garrafas comuns de folha reluzente (120 de vida, 160 de mana) pelas incomuns de folha dourada (200 de vida, 260 de mana) até as raras de pétala solar (280 de vida, 360 de mana).\n\nOs elixires sobem do mesmo jeito: o Elixir do Javali concede 6 de Vigor por 10 minutos, o Elixir de Venofogo 9 por 15 minutos, e o Elixir da Serpente 12 por 15 minutos, sendo a Serpente o único a render duas garrafas por criação. Mais uma receita fica à parte: o Elixir do Urso, uma beberagem combinada que Verane ensina por 25 prata assim que sua Alquimia chega a 25, misturável em qualquer lugar, mas só por um Bombardeiro sintonizado com Alquimia e Engenharia ambas em 25.',
-  'guide.profPages.craftProse.alchemy.routeBody':
-    'Poções e elixires nunca geram obras-primas; esse proc pertence ao equipamento com atributos. Seu nome viaja mesmo assim: as poções raras de pétala solar chegam assinadas com a marca do criador, e cada garrafa do Elixir da Serpente de lote duplo também, então nada de raro neste ofício sai da bancada sem assinatura. Na habilidade 75 você se especializa, e toda receita de Alquimia passa a custar 20 por cento menos materiais dali em diante.\n\nPegue Herborismo cedo e colha enquanto sobe de nível: folha reluzente está por toda parte no Vale, e assim que você chegar à bancada de Verane o degrau gratuito o levará limpo até a habilidade 25 com ervas que você teria colhido de qualquer jeito. Aprenda o degrau 25 no instante em que ele abrir, leve sua colheita para o pântano atrás de folha dourada, e deixe a ordem de serviço de Verane (seis Ervas Folha Dourada por 45 cobre, repetível a cada 30 minutos) devolver umas moedas pelo caminho.\n\nDo 50 em diante, prepare poções de pétala solar e lotes de Serpente com pétala solar de Thornpeak, ainda com um pouco de verde do Vale e do pântano na mistura. O último trecho, de 100 a 125, é um gotejar deliberado, então prepare o que de fato vende em vez de queimar ervas pelo número, e lembre que os consumíveis são o único bem criado que todo mundo recompra para sempre. O Livro dos Feitos marca Beberagens Estranhas na habilidade 50 e Grão-Mestre em Alquimia no limite.',
-  'guide.profPages.craftProse.engineering.identityBody':
-    'O ofício é trabalhado na oficina de ferramentas, no canto sudoeste da praça de Eastbrook, casa do Engenhoqueiro Gizzel, Mestre das Ferramentas. Os níveis 1 a 3 de toda linha de ferramentas são estoque comum de vendedor; os níveis 4 e 5 saem da bancada de um engenheiro, ou do balcão de incursão da Ladainha Afogada por Selos de Incursão atrás de suas exigências de conclusão, e nunca de caixa nenhum por moedas.\n\nNa roda ela fica com os ofícios de tentativa e erro, ao lado de Alquimia e Forja de Armaduras, o que lhe dá duas identidades de par: o Bombardeiro (Engenharia e Alquimia, assumido diante do próprio Gizzel) e o Mestre das Engrenagens (Forja de Armaduras e Engenharia, nomeado mas ainda não jurável). Um aviso importa mais aqui do que em qualquer outro lugar: cada um dos degraus de receita da Engenharia fica acima do teto de nível raro sob o qual passatempos e artesãos não declarados trabalham, então o número da habilidade só se move para um artesão cujos ofícios principais incluam Engenharia, o que hoje significa o Bombardeiro. Qualquer um ainda pode construir as ferramentas de terra; um artesão não sintonizado apenas não aprende nada ao fazê-lo, e as duas receitas de vara pedem, além disso, o ensino de Gizzel.',
   'guide.profPages.craftProse.engineering.materialsBody':
     'Toda receita de ferramenta de terra consome a ferramenta um nível abaixo dela mais um material FINO, e esse par é a escada de terra inteira: quatro Minérios de Ferro Finos e uma Picareta de Prata-Celeste viram a Picareta de Ósmio, depois duas Barras de Glifaço, dois Minérios de Ósmio Finos e aquela picareta de ósmio viram a Picareta de Glifaço. As linhas do machado e da foice espelham o formato de fino mais ferramenta anterior com Toras de Freixo Cinza e de Pinheiro Alto Finas, Ervas Folha Dourada e Pétala Solar Finas, embora seus degraus de nível 5 não peçam Barras de Glifaço: a picareta é a única linha que fica mais cara no topo. As duas receitas de vara quebram o padrão de propósito: a Vara com molinete de tempestade pede quatro Koi do Brilho Solar e uma Vara do riacho prateado, e a Vara forjada pela maré, dois Koi, oito Carpas Cruas de Barbatana de Ardósia e aquela Vara com molinete de tempestade, então o topo da escada do pescador é pago na água em vez de num veio.\n\nUm material fino não é vendido em lugar nenhum e não cai de uma colheita comum: você o consegue trabalhando um dos veios de grau pleno de uma zona com uma ferramenta de patente acima do próprio material, o que na prática significa a ferramenta um degrau abaixo daquela que você está tentando construir (os veios mais fáceis que uma zona guarda para os viajantes rendem o material simples, seja lá o que você empunhe). Isso é deliberado. No caminho do ofício, uma ferramenta de nível 5 vem de realmente empunhar a de nível 4, não de uma ida às compras; o balcão de Selos de Incursão é o único atalho. A única exceção é a Barra de Glifaço, refinada e só de vendedor, 1 prata e 60 cobre a barra com a Intendente Bree em Highwatch ou no próprio balcão de Gizzel, então só a Picareta de Glifaço carrega um piso fixo de moedas embutido no seu custo.',
-  'guide.profPages.craftProse.engineering.ladderBody':
-    'A escada são oito receitas, todas vinculadas à bancada da oficina de ferramentas. As seis receitas de ferramentas de terra são conhecidas automaticamente, sem taxa de treinador jamais: a picareta, o machado e a foice de nível 4 na habilidade 75, e as versões de nível 5 na habilidade 150. Esse segundo número não é erro de digitação, e fica acima do limite atual de 125 de propósito: aqui os requisitos de habilidade nunca barram uma criação, eles só moldam o ganho de habilidade, então você pode construir uma ferramenta de nível 5 no dia em que tiver seus reagentes e sua antecessora de nível 4. As duas varas criadas são a exceção ensinada: Gizzel ensina a Vara com molinete de tempestade na habilidade 75 por 4 ouro e a Vara forjada pela maré na habilidade 125 por 16 ouro, cada uma no instante em que seu nível no ofício alcança o dela.\n\nToda ferramenta acabada é de qualidade rara ou épica e sai assinada, então seu nome corre as zonas nos cintos de ferramenta de outros jogadores. A Engenharia também sustenta metade de uma receita combinada: o Elixir do Urso, preparado por um Bombardeiro sintonizado com Engenharia e Alquimia ambas em 25.',
-  'guide.profPages.craftProse.enchanting.identityBody':
-    'Todo encantamento é conhecido desde o início, qualquer um pode desencantar desde o primeiro dia, e nenhum dos dois jamais precisa de bancada; a habilidade tem limite de 125 como todo ofício. O único canto ensinado do ofício é seu par de receitas de amuleto: o Engenhoqueiro Gizzel ensina o Alforje do Coletor e o Olhar do Artesão na oficina de ferramentas, no canto sudoeste da praça de Eastbrook, pela taxa comum do nível assim que seu Encantamento chega a 25, e os próprios amuletos são trabalhados na bancada dele.\n\nNa roda ele fica entre Escrivania e Joalheria, então suas duas identidades de par são o Arcanista (Escrivania e Encantamento) e o Lapidador de Gemas (Encantamento e Joalheria). Nenhum dos dois pode ser jurado ainda, pois os dois vizinhos aguardam suas primeiras receitas, então hoje o Encantamento sobe como o ofício de todo mundo: livre até o nível raro antes de qualquer juramento, e uma escolha natural de passatempo para um Bombardeiro ou um Apotecário. Os encantadores também mantêm o mundo da coleta girando: os dois efeitos de ferramenta encaixáveis são obra de Encantador, e o criador original recarrega os próprios efeitos com desconto, ainda maior depois de especializado.',
-  'guide.profPages.craftProse.enchanting.levelingBody':
-    'Três ações movem a habilidade: desencantar uma peça, aplicar um encantamento e criar os dois amuletos, que sobem pela curva de criação comum. Cada sucesso vale até um ponto, escalado por quão séria é a obra: a raridade da peça que você desfaz, ou o nível de reagente do encantamento que você aplica. Desencantamentos comuns e encantamentos só de pó contam como trabalho comum; desencantamentos incomuns e encantamentos de essência como incomum; desencantamentos raros e todo encantamento Rúnico ou Superior como raro; desencantamentos épicos e lendários figuram ainda mais alto na tabela, embora nenhuma identidade de encantamento chegue hoje além do degrau raro, então na prática eles pagam o mesmo que o trabalho raro. Uma honestidade rege a bancada de desmonte: uma peça que saiu da bancada de um jogador (criada, assinada ou obra-prima) ainda se desfaz em materiais, mas não ensina nada, então um ciclo de criar e desfazer não sobe o nível de ninguém, e as lições estão no equipamento achado no mundo.\n\nO conhecido desvanecer da maestria se aplica em níveis de 25 pontos, então o trabalho de grau comum fica cinza na habilidade 75, o incomum aos 100, e o de nível raro exatamente no limite de 125. O Encantamento ainda tem uma gentileza própria: a entrada acima do teto do seu arquétipo é arredondada para baixo até esse teto em vez de ser zerada, então, antes de você se sintonizar, um desencantamento épico simplesmente conta como raro em vez de não ensinar nada. Se o Encantamento acabar adormecido atrás de outra identidade, desfazer e aplicar contam como trabalho comum e a escalada empaca aos 75, enquanto os dois amuletos, correndo pela curva de criação acima do teto comum, não ensinam absolutamente nada a um encantador adormecido; mantenha-o como seu passatempo e o trabalho de nível raro ainda paga, só que mais devagar depois dos 75.',
   'guide.profPages.craftProse.enchanting.marketBody':
     'Aplicar um encantamento gasta os reagentes e marca uma cópia específica do item. Aponte-o para uma cópia nas bolsas e você recebe de volta uma cópia encantada distinta; aponte-o para uma peça que você já está usando e ela é encantada no lugar, exatamente onde está, sem aquela dança de desequipar e reequipar. De um jeito ou de outro o bônus acompanha aquela peça para sempre, por desequipamentos, idas ao banco e negociações. Um encantamento por peça: aplicar um encantamento diferente a uma cópia encantada pede confirmação e então substitui o antigo por completo, destruindo-o sem devolver seus materiais. Vender, descartar e desencantar preferem sempre as cópias simples primeiro, para que sua peça acabada não seja devorada por acidente.\n\nEquipamento obra-prima e encantamento são amigos: uma peça obra-prima continua totalmente encantável, e o encantamento soma por cima do bônus de obra-prima sem perturbá-lo nem à assinatura do criador. Somando todas as fontes, uma obra-prima assinada carregando um encantamento Superior é o melhor que uma peça criada alcança, e ainda assim fica abaixo do saque de raide por design.\n\nNo mercado, uma peça encantada ou assinada é listada como qualquer outra: sobe como sua própria listagem de cópia única, a dica de item mostra o encantamento e a marca do criador, e o Correio dos Corvos a leva com a mesma fidelidade. Os materiais seguem sendo a metade estável do ofício: Pó, Essência e Fragmentos são listados livremente, listar não custa nada, e o Mercador fica com 5 por cento apenas de uma venda concluída. Isso faz das duas rendas clássicas do encantador vender materiais e vender trabalho acabado: pelo mercado, por corvo ou cara a cara em uma janela de negociação.',
-  'guide.profPages.howBody':
-    'Abra a janela de criação (tecla padrão T) e toda receita que você conhece aparece listada com o que ela exige e o que você tem à mão. As receitas vinculadas a bancada pedem que você esteja a menos de 20 jardas da bancada certa na cidade, as receitas de campo podem ser criadas em qualquer lugar, e desfazer e encantar do Encantamento não precisam de bancada alguma (só as suas duas receitas de amuleto são trabalho de bancada, na oficina de ferramentas). Não existe rolagem de falha: uma criação com os materiais em mãos sempre dá certo.\n\nDuas pequenas fricções mantêm a economia honesta. Toda criação bem-sucedida paga uma taxa de 2 cobre por ponto do orçamento de atributos do item, e as ações do tipo criação dividem um mesmo ritmo: no máximo 10 criações, desencantamentos, encantamentos, salvamentos ou recargas de ferramenta a cada janela de 60 segundos. Nenhuma das duas vai atrapalhar uma sessão normal; ambas impedem que um especialista no limite inunde o mercado.',
   'guide.profPages.masterworkBody':
     'Toda criação bem-sucedida é exatamente o que a receita promete, e às vezes um pouco mais: uma obra-prima termina a mesma peça um nível de qualidade acima, com os atributos de bônus já embutidos no momento da criação. Ela só soma, nunca rebaixa, e permanece abaixo do patamar de raide, então o equipamento criado pode ser excelente sem substituir um drop de raide.\n\nA chance é publicada, não mística: {base}% de base, mais {perTier}% por nível que a sua habilidade estiver acima da receita, mais {signed}% quando entra qualquer reagente assinado, mais {spec}% depois que você está especializado, com materiais de nível mais alto somando de 1 a 2% a mais, tudo limitado a {cap}%. Só uma peça com atributos de verdade pode melhorar, então comuns sem atributos, ferramentas e consumíveis nunca geram o proc; um ofício inativo nunca produz uma, e um ofício de passatempo não pode fazer obra-prima acima do seu teto raro.\n\nUm trabalho fino carrega quem o fez. Os resultados raros ou melhores saem assinados, cada cópia (Feito por; materiais coletados levam Coletado por), e uma obra-prima é sempre assinada, qualquer que seja a sua qualidade. Uma assinatura é proveniência, não uma tranca: bens assinados são negociados, enviados pelo correio e listados no Mercado Mundial livremente.',
-  'guide.profPages.trainingBody':
-    'As receitas de treinador vêm dos mestres residentes, ensinadas nas bancadas deles. A regra cabe em uma linha: um mestre ensina uma receita assim que o seu nível no ofício alcança o nível da própria receita, e nada mais a restringe, nem o seu nível de personagem, nem o seu arquétipo. As escadas de equipamento e de consumíveis correm seus degraus em habilidade 0, 25 e 50; as duas lições de vara da Engenharia continuam a escada em 75 e 125, e as duas receitas de amuleto do Encantamento ficam no degrau 25, então um degrau novo se abre conforme os seus níveis sobem.\n\nAs taxas são únicas e fixas por degrau: o degrau inicial é gratuito, o degrau de habilidade 25 custa {tier1} por receita, o degrau de habilidade 50 custa {tier2}, e as lições de vara acima deles carregam as suas próprias taxas, listadas ao lado de cada receita na tabela. Você precisa estar na bancada real do mestre para treinar, e uma bancada móvel nunca conta. As receitas comuns de campo e as seis receitas de ferramentas de terra criadas não pedem treinamento nenhum; todo personagem as conhece desde o início.',
   'guide.profPages.ench.enchantsNote':
     'Os encantamentos vêm em três níveis. O nível base funciona com Pó de Toque (com um pouco de Essência na ponta mais alta) e cobre o encaixe de arma mais todos os encaixes de armadura, exceto a mão secundária, com opções de eixo de atributo suficientes para que toda construção encontre algo para cada encaixe. O nível Superior custa um Fragmento de Toque mais Essência: bônus mais fortes nos encaixes de maior impacto. Os Fragmentos ainda alimentam outros dois sumidouros, as duas receitas de amuleto a cinco cada e o degrau mais alto das recargas de efeito de ferramenta, então guarde alguns antes de gastar.\n\nEntre eles ficam os cinco encantamentos Rúnicos, um consumidor para cada secundário tipado, de modo que nada do que você desfaz vira beco sem saída: Fio Runado (arma, Força, consome Aço Ressonante), Sigilo Runado (arma, Intelecto, Madeira Ressonante), Trama de Runas (torso, Espírito, Fio Ressonante), Couro Runado (pernas, Agilidade, Couro Ressonante) e Elos Runados (elmo, Vigor, Elos Ressonantes). Cada um leva também duas Essências de Toque; onde um encaixe e um atributo têm tanto um encantamento base quanto um Superior, o bônus Runado cai entre os dois, enquanto a Trama de Runas é disparado o encantamento de Espírito de torso mais forte e o Couro Runado é o único encantamento de Agilidade para pernas que existe. Os bônus exatos estão todos na tabela abaixo.',
   'guide.profPages.gatherIntro.mining':
@@ -2167,8 +2126,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Uma coleta é um lançamento curto e visível, não um agarrão instantâneo: {base} segundos de base, nunca abaixo de um piso de {floor} segundos. Carregar uma ferramenta acima do nível do nó, uma que a sua proficiência permita manejar, te acelera em {tool} segundos por nível acima dele, e cada faixa de proficiência que você cruza corta mais {band} segundos; apenas igualar o nível do nó só abre a porta, são os níveis acima dele que deixam você rápido.\n\nUma bolsa cheia recusa educadamente o lançamento antes que ele comece, então nada se perde no meio do golpe, e toda coleta paga uma pequena fatia de EXP de personagem, escalada pelo nível do nó contra o seu do mesmo jeito que a EXP de abate escala: um nó cinza trivial não ensina nada a um personagem no limite.',
   'guide.profPages.gainBody':
     'O ganho é determinístico, nunca uma rolagem de aumento de habilidade: um nó no seu nível de ganho ou acima ensina um ponto inteiro por coleta, e cada {step} de proficiência é um nível contado contra o nó. Nós de nível 1 pagam integralmente abaixo de 25, metade até 49, um quarto até 74, e nada a partir de 75; nós de nível 2 pagam integralmente até 49; os dois nós de nível 3 de cada ofício pagam integralmente até 74 e metade direto até o limite de {cap}.\n\nO caminho pretendido é simples: aprenda nos nós iniciais do Vale, siga para o pântano e termine a escalada no terreno alto das Alturas de Thornpeak. No limite o aprendizado para, mas os rendimentos não: um coletor no limite continua rolando para sempre as melhores probabilidades que o ofício oferece.',
-  'guide.profPages.toolsNote':
-    'Todo nó exige nas suas bolsas a ferramenta do ofício dele, nível 1 incluído: sem picareta, sem minério; sem vara, sem peixe. A escada de vendedores cobre os níveis 1 a 3 nos três centros das terras centrais: a ferramenta de nível 1 é vendida nos três, os degraus acima dela onde começa o terreno que os usa (Fenbridge acrescenta o nível 2, Highwatch o nível 3), e os assentamentos mais jovens além deles não têm ferramenta alguma em estoque, então equipe-se antes de viajar. Cada balcão vende livremente todo degrau que mantém em estoque, e qualquer ferramenta passa por negociação direta; todo degrau também entra no Mercado e viaja pelo correio, exceto as três ferramentas de terra iniciais de 20 cobre: essas são compradas em um balcão ou passadas de mão em mão, e nunca revendidas, enviadas pelo correio ou listadas. O que é restrito é o manejo. Uma ferramenta de terra acima do nível 1 só funciona depois que a sua proficiência no próprio ofício dela a conquistou, {tier2Prof} para o nível 2, {tier3Prof} para o nível 3, e 85 e 100 para os dois degraus criados, e a linha do vendedor, a dica de ferramenta e a tabela abaixo nomeiam o requisito de antemão. Até lá, uma ferramenta comprada adiantada simplesmente espera nas suas bolsas, sem abrir terreno, sem comprar velocidade e sem cunhar graus finos, e passa a ser manejada no instante em que o seu contador toca o número dela. As varas de pesca são a única exceção: nenhuma vara carrega requisito de manejo, e o Comerciante Wilkes em Eastbrook mantém de propósito as varas de nível 2 e de nível 3 em estoque para pescadores que compram adiantado. Uma ferramenta nunca ocupa um encaixe de equipamento e nunca se desgasta, então cada uma é uma compra única, e só o nível importa para a restrição: uma ferramenta mais rara do mesmo nível não abre nada a mais. A raridade não é só cor, porém. Ela faz um efeito encaixado na ferramenta durar mais tempo, e em uma vara ela alarga a janela de recolha.\n\nUma ferramenta melhor compra três coisas, não duas. Ela abre terreno de nível mais alto, encurta o lançamento e melhora o que sai: trabalhe um veio com uma ferramenta classificada ACIMA do material da própria zona e a coleta rende o grau fino dele em vez do simples. O veio precisa ser um dos de grau pleno da zona, então os veios mais fáceis que uma zona guarda para viajantes continuam rendendo o material comum. Os materiais finos são o que as receitas de ferramenta criada consomem, e um grau fino conta como a sua versão comum em qualquer lugar onde uma receita ou uma encomenda de trabalho peça uma, então melhorar de ferramenta nunca te deixa na mão: significa apenas que o seu minério de cobre chega como Minério de Cobre Fino.\n\nAcima da escada de vendedores, cada ofício tem duas ferramentas criadas, nível 4 e nível 5, feitas na oficina de ferramentas (todo personagem conhece as receitas de terra; a habilidade que sobe com o trabalho é a de Engenharia), ou compradas com Selos de Incursão no balcão da Ladainha Afogada depois que seus requisitos de conclusão são cumpridos: a tabela abaixo traz o preço em Selos e as conclusões que cada degrau pede. Nenhum mercador jamais as vende por moedas. A Pesca tem o seu próprio par, e essas são aprendidas com o fabricante de ferramentas em vez de conhecidas desde o início. Nenhum nó e nenhuma água hoje exigem mais do que o nível 3, então os dois degraus do topo compram velocidade, grau e uma janela de recolha mais generosa em vez de acesso, e serão o ingresso de entrada quando chegar terreno de nível mais alto.',
   'guide.profPages.toolCraftedOrMarks':
     'Criada ({craft}) ou {marks} Selos de Incursão após três conclusões da Ladainha Afogada',
   'guide.profPages.toolCraftedOrMarksHeroic':
@@ -2176,34 +2133,14 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.priceNone': 'Não vendido por moedas',
   'guide.profPages.colWield': 'Uso a partir de',
   'guide.profPages.wieldNone': 'Qualquer',
-  'guide.profPages.bandsBody':
-    'As faixas de proficiência são a escada compartilhada de 0/100/200 sobre o contador de um ofício. Para os ofícios de terra, a faixa cruzada aos 100 reduz o tempo de coleta, e o limite deles faz da faixa 1 o teto. As faixas da Pesca não reduzem nada: elas selecionam as tabelas de captura (com uma vara à altura), só a Pesca alcança a faixa 2, e a própria escalada é o que puxa o pescador para águas mais fundas, onde vivem tanto as melhores tabelas quanto as lições seguintes.',
   'guide.profPages.specimenBody':
     'Guarde um pouco de espaço livre nas bolsas quando for farmar: um golpe de sorte assinado precisa de um encaixe só dele ou de uma pilha assinada compatível para cair, e se nada couber o rendimento ainda chega, mas a assinatura se perde. A colheita de cadáveres também tem o seu próprio braço de sorte grande: cerca de {pct}% de cada componente colhido sai raro ou melhor. Uma família que tem um espécime perfeito a oferecer (couro, seda, veneno, carne) mantém o seu rendimento comum simples e cunha o espécime assinado ao lado dele; toda outra família assina o próprio rendimento.',
   'guide.profPages.gatherDeeds.fishing':
     'O marco de 100 inscreve Sal Velho e o de 200 inscreve Pescador Mestre com seu título, o ponto mais alto da arte do pescador; a Pesca também conta para Mestre Coletor, conquistado com 100 em quaisquer três ofícios de coleta. Um primeiro peixe das águas de cada uma de seis zonas preenche a sua própria página, as três zonas centrais mais Willowfen, Galecrest e Farshore além delas, e o Koi do Brilho Solar registra Lampejo de Esperança, então viajantes com uma vara na mochila enchem o seu livro mais rápido do que esperam.',
-  'guide.profPages.fish.startBody':
-    'Uma Vara de Pesca Simples custa 20 cobre com o Pescador Brandt em Eastbrook (procure o Sal Velho na borda leste da cidade, junto à estrada para o Lago Espelho); o Engenhoqueiro Gizzel, o Fornecedor Hale em Fenbridge e a Intendente Bree em Highwatch também mantêm varas em estoque. Use a vara de frente para uma água funda o bastante para abrigar peixes, até cerca de 24 jardas à sua frente, e a sua boia voa para longe.\n\nVocê não pode lançar em combate, nadando ou morto: lançar da margem é a postura pretendida. A água, porém, fica mais dura conforme a terra fica: o pântano quer pelo menos a Vara com Molinete de Ferro de nível 2 e os picos a Vara do Riacho Prateado de nível 3, e uma linha lançada sem a vara que aquela água exige nunca sai da sua mão. Duas varas ficam acima dessas, a Vara com Molinete de Tempestade e a Vara Forjada pela Maré: engenheiros as criam na oficina de ferramentas com aquilo que a linha traz da água, e o balcão de incursão da Ladainha Afogada as vende por Selos de Incursão atrás de seus requisitos de conclusão, embora nunca por moedas. Nenhuma água as pede, então elas compram uma espera mais curta e uma janela de recolha mais larga em vez de acesso, o que no degrau mais alto significa uma fisgada em exatos três segundos.',
   'guide.profPages.fish.biteBody':
     'Depois do lançamento, a fisgada vem em um instante oculto entre {min} e {max} segundos; o atraso é decidido quando a linha toca a água, então dois lançamentos nunca são exatamente iguais. Quando a boia afunda, você tem uma janela de {reel} segundos para apertar a vara de novo e recolher: recolha dentro dela e a captura é sua, hesite além dela e o peixe escapa sem deixar nada. Uma sessão inteira termina em no máximo {cap} segundos, então até um lançamento tranquilo se resolve rápido.\n\nVaras melhores afiam as duas pontas do minijogo: cada nível de vara acima do primeiro corta {rod} segundos da espera máxima possível, nunca abaixo do piso de três segundos que a vara do topo já roça, e acrescenta {reelRod} segundos à janela de recolha, então a Vara com Molinete de Ferro puxa a pior espera para 6,5 segundos com uma janela de 3,25 segundos, e a Vara do Riacho Prateado para 5 com uma janela acima de 4, sua raridade alargando a recolha um pouco além do que o nível sozinho paga. As fisgadas mais rápidas nunca mudam, seja qual for a vara que você segure, e basta a vara estar nas suas bolsas para contar.',
-  'guide.profPages.fish.scheduleNote':
-    'O ganho de Pesca segue uma tabela fixa, sem dados: um ponto inteiro por captura abaixo de 50 de proficiência, meio ponto abaixo de 100, um décimo abaixo de 150, e um fio lento de 0,02 de 150 a 200. Esse último trecho é uma jornada de milhares de capturas de propósito: 200 é uma declaração, não uma parada no caminho para outra coisa.\n\nA tralha para de ensinar por completo em {cutoff}: dali em diante, ervas daninhas e botas são apenas ervas daninhas e botas. A própria água também limita a lição: as águas de nível 1 do Vale (e toda margem jovem além das terras centrais) não ensinam nada acima de 100, as do pântano param em 150, e só as de Thornpeak instruem um pescador por todo o caminho até 200. Fora isso, toda captura fisgada rende no ritmo previsto, então quando o contador empaca, é a tabela dizendo a você para procurar águas mais profundas.',
-  'guide.profPages.fish.tablesNote':
-    'Sua proficiência seleciona uma de três faixas de captura: faixa 0 desde o início, faixa 1 em 100, faixa 2 em 200, cada uma deslocando peso da tralha e dos anzóis vazios para peixes de verdade, zona por zona. Cada faixa acima da primeira também exige uma vara: a faixa 1 quer a Vara com Molinete de Ferro de nível 2, a faixa 2 a Vara do Riacho Prateado de nível 3. Sua faixa efetiva é a menor entre a que a sua habilidade conquistou e a que a sua vara sustenta, e o limite é silencioso: com uma vara inferior você ainda pesca, só que pela tabela da faixa mais baixa, então se as suas capturas parecem estagnadas enquanto a sua habilidade sobe, confira a vara primeiro.\n\nAs águas de cada zona guardam o seu próprio par de peixes comestíveis, que curam mais quanto mais profunda for a zona, todos eles ingredientes de culinária e comida de sentar e comer perfeitamente boa crua, direto da linha. O resto da tabela é o imposto do pescador: erva daninha, uma bota de vez em quando e o anzol vazio, que nunca desaparece de todo. Quanto você paga depende da água em que a sua boia cai, não de onde você está de pé: um lançamento alcança até 24 jardas, e a vara que a água exige, a tabela de onde ela sorteia, o feito que ela credita e até onde ela ensina respondem todos à zona a que aquela água pertence, decidido no instante em que a linha toca a superfície. A água de cada zona foi escrita para uma faixa própria, o Vale para a faixa 0, o pântano para a faixa 1, os picos para a faixa 2, e pescar uma faixa abaixo disso transforma cerca de um terço dos seus lançamentos em anzóis vazios, duas faixas abaixo, mais da metade. A vara te leva até a água; a habilidade é o que faz a água pagar, e a escalada é o que puxa um pescador para mais fundo, porque faixas melhores não são só pagamento melhor: passado o Vale, elas são as únicas águas que continuam ensinando. O {rare} é a única linha que responde à sua faixa de captura e a mais nada: as mesmas probabilidades em todas as zonas, e seis vezes mais provável na faixa 2 do que na faixa 0, então a coisa mais rara do cais é justamente aquela em que um Pescador Mestre é de fato melhor.',
-  'guide.profPages.fish.koiBody':
-    "Todo corpo d'água do jogo esconde o mesmo prêmio: o Koi do Brilho Solar, um lampejo incomum na linha que vale 75 cobre para um vendedor e bem mais para o seu orgulho. Suas probabilidades respondem à sua faixa de captura e a mais nada, iguais em todas as zonas: uma linha de 1 por cento da tabela de captura na faixa 0, 3 na faixa 1 e 6 na faixa 2, sorteada em todo lançamento recolhido, então o koi vem para o pescador que conquistou as tabelas profundas. Fisgar um registra Lampejo de Esperança no seu Livro dos Feitos, uma marca de colecionador de Renome zero. Quando acontecer, o registro faz questão de te avisar.",
   'guide.profPages.econ.trainingNote':
     'Uma taxa fixa por degrau de receita, cobrada uma única vez quando um mestre a ensina; todo degrau da tabela abaixo está em uso de verdade hoje, das receitas iniciais gratuitas até as lições de vara do fabricante de ferramentas no topo.',
-  'guide.profPages.econ.provenanceBody':
-    'Alguns itens carregam um nome. Passe o cursor sobre um e a dica de item diz Coletado por fulano num material bruto, ou Feito por fulano numa peça acabada: a mesma marca, redigida conforme o item veio a existir. Uma assinatura é parte do próprio item, viaja com ele por negociações, pelo banco, pelo correio, pelo Mercado Mundial e até por uma recompra de vendedor, e nunca desaparece.\n\nA coleta assina seu melhor trabalho automaticamente: toda extração que rola raro ou melhor chega assinada, e os achados raros assinam todo o seu rendimento quíntuplo. A rolagem de sorte de uma colheita de cadáver assina o rendimento quando a família não tem espécime a oferecer, e quando tem, mantém o rendimento simples e cunha o espécime perfeito assinado ao lado dele. A criação assina pela mesma linha: toda cópia de um resultado raro ou melhor é cunhada assinada, e uma obra-prima sempre assina, qualquer que seja sua qualidade, então a versão mais fina de qualquer peça sempre nomeia seu criador. A única coisa que pode lhe custar uma assinatura é uma bolsa cheia: uma unidade assinada precisa de espaço próprio, ou de uma pilha assinada compatível, para pousar.\n\nUma pilha de itens compartilha uma identidade, então duas cópias só se fundem quando cada marca coincide exatamente: mesmo item, mesmo signatário, mesmos atributos de obra-prima, mesmo encantamento, mesmo vínculo. Uma tora assinada nunca se junta a um monte simples em nenhuma das direções (fundi-los apagaria o nome de alguém), mas cargas idênticas se fundem sem problema, então vinte minérios assinados pelo mesmo coletor ficam em uma pilha só e um achado farto não estraçalha suas bolsas.\n\nAs assinaturas recompensam os artesãos: ter na bancada qualquer cópia assinada de um reagente necessário, seja quem for que a assinou, acrescenta 2 pontos percentuais de chance de obra-prima, e ter um reagente assinado pela sua própria mão corta em um a quantidade exigida daquele reagente (nunca abaixo de um). Seu próprio trabalho assinado de qualidade rara ou melhor ainda continua lhe ensinando, hoje só através do frasco: beba uma poção que você assinou e um pequeno fio de habilidade volta para o ofício que a preparou, contanto que esse ofício seja um dos seus principais ativos.',
-  'guide.profPages.faq.a4':
-    'Você teve um golpe de sorte. Aproximadamente 1 coleta em 90 dispara um evento de coleta raro (cerne antigo em uma árvore, uma veia imaculada no minério, uma flor ao luar entre as ervas): ele multiplica o rendimento por cinco, assina cada unidade com o seu nome e anuncia o achado para a zona inteira. Uma rolagem de raridade rara ou melhor em uma coleta comum também assina o rendimento.\n\nMateriais assinados valem a pena guardar ou vender caro: ter na bancada qualquer cópia assinada de um reagente exigido soma 2 pontos percentuais à chance de obra-prima. Só lembre que eles se empilham apenas com cópias assinadas de forma idêntica, então ficam em um encaixe de bolsa só deles.',
-  'guide.profPages.faq.a6':
-    'As nove receitas comuns de campo e as seis receitas de ferramentas de terra criadas são conhecidas por todos desde o início, e o mesmo vale para três receitas vinculadas a bancada (o Manto de Escamas de Forno, o Capuz de Trama Protetora e as Faixas de Couro do Crepúsculo), que não pedem treinador algum, apenas sua bancada. O restante é ensinado pelos mestres residentes em suas bancadas nas três cidades-centro: a maioria fica em Eastbrook, o curtidor mantém o curtume em Fenbridge, e o alquimista mantém o boticário em Highwatch.\n\nAs receitas de treinador correm em degraus: habilidade 0, 25 e 50 para os ofícios de equipamento e de consumíveis, com preços de graça, 25 prata e 1 ouro como taxas únicas; as duas receitas de amuleto do Encantamento ficam no degrau 25, e o fabricante de ferramentas ensina as duas varas de pesca criadas em 75 e 125 por 4 e 16 ouro. Um mestre ensina uma receita assim que a sua faixa naquele ofício alcança a faixa da própria receita, e você precisa estar de pé na bancada dele para aprender: uma bancada móvel não conta.',
-  'guide.profPages.faq.a7':
-    'O lançamento de coleta começa em 2,5 segundos e é encurtado de duas formas: 0,4 segundos para cada nível de ferramenta que você carrega e consegue manejar acima do nível do próprio nó, e 0,15 segundos assim que o contador do seu ofício cruza a faixa de 100, com um piso de 1,5 segundos. Passe dos nós de nível 1 para os nós de nível 3 e a sua vantagem desaparece, então a mesma picareta volta a golpear mais devagar. Carregar exatamente o nível exigido não compra velocidade nenhuma; ele apenas abre o nó.\n\nO ganho de habilidade desvanece do mesmo jeito que na criação: um nó fica cinza conforme a sua proficiência sobe acima do nível dele (nós de nível 1 não ensinam nada a partir de 75 de proficiência), então a resposta para ganhos lentos são nós de nível mais alto. Esses exigem nas suas bolsas uma ferramenta de pelo menos o nível deles (nenhum nó jamais é trabalhado com as mãos nuas, nível 1 incluído), e uma ferramenta de terra acima do nível 1 ainda pede antes a sua marca de manejo, 40/70/85/100 no próprio ofício dela para os níveis 2 a 5. A Pesca segue a sua própria queda: ganho total abaixo de 50 de proficiência, metade abaixo de 100, um fio de 0,1 abaixo de 150 e 0,02 abaixo de 200, capturas de tralha não ensinam mais nada a partir de 100, e a própria água limita a lição (as águas de nível 1 param de ensinar em 100, as do pântano em 150), então um contador parado também pode significar que você superou aquela água.',
-  'guide.profPages.faq.a8':
-    'Em parte. As nove receitas comuns de campo (os básicos iniciais de arma, armadura, comida e poção) podem ser criadas em qualquer lugar, a qualquer hora, e o mesmo vale para as três receitas combinadas dos pares jurados. Tudo o mais acima delas está preso a um tipo de bancada: forja, cozinhas, boticário, curtume, tear ou oficina de ferramentas, e você precisa estar a menos de 20 jardas da bancada para a criação se concretizar.\n\nCom 75 de habilidade em um ofício você se especializa e, junto com um desconto de 20 por cento em materiais, ganha uma bancada móvel: monte-a no campo e ela fica de pé por 10 minutos, atendendo as receitas daquele ofício como se você estivesse na bancada de verdade. A bancada móvel serve só para criar: aprender receitas e desvincular encomendas sempre exigem a bancada verdadeira na cidade.',
   'wallet.seekerAppHelp':
     'Continue com a Seed Vault Wallet. Revise as solicitações de conexão e de verificação no Seed Vault e depois retorne ao jogo.',
   'questUi.tracker.unknownQuest': 'Missão desconhecida ({id})',
@@ -2234,7 +2171,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Desaparece por 20 s e remove 2 efeitos de dano ao longo do tempo. Quando a invisibilidade termina, você sofre 90% menos dano por 2 s. (Talento de mago)',
   'entities.items.fine_copper_ore.name': 'Minério de Cobre Fino',
   'entities.items.fine_iron_ore.name': 'Minério de Ferro Fino',
-  'entities.items.fine_thorium_ore.name': 'Minério de Tório Fino',
   'entities.items.fine_ironbark_log.name': 'Tora de Casca de Ferro Fina',
   'entities.items.fine_ashwood_log.name': 'Tora de Freixo Cinza Fina',
   'entities.items.fine_elderwood_log.name': 'Tora de Madeira Antiga Fina',
@@ -2245,8 +2181,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.tidewrought_fishing_rod.name': 'Vara forjada pela maré',
   'entities.items.gatherers_cache.name': 'Alforje do Coletor',
   'entities.items.artisans_eye.name': 'Olhar do Artesão',
-  'entities.items.reins_terrorspark_groundshaker.name':
-    'Chave de ignição: Faíscaterror, Abala-Terra',
   'entities.items.reins_lanternback_troll.name':
     'Canga do acendedor de lampiões: Grumbol',
   'hudChrome.auraOverlay.allOff': 'Desativar tudo',
@@ -2282,7 +2216,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.overpowerCharge': 'Fortalecimento de Mão Vermelha',
   'hudChrome.auraOverlay.procs.revenge': 'Vingança!',
   'hudChrome.auraOverlay.procs.suddenDeath': 'Morte Súbita',
-  'hudChrome.auraOverlay.procs.victoryRush': 'Ímpeto da Vitória',
   'hudChrome.auraOverlay.reposition': 'Configurar posições',
   'hudChrome.auraOverlay.reset': 'Redefinir Posição',
   'hudChrome.auraOverlay.screenPosition': 'Posição na tela',
@@ -2301,7 +2234,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.epic.unlink': 'Desvincular Epic',
   'hudChrome.mounts.desc_terrorspark_groundshaker':
     'Uma máquina blindada compacta com esteiras pesadas, um canhão de grande calibre e uma sela feita para pilotos destemidos.',
-  'hudChrome.mounts.name_terrorspark_groundshaker': 'Faíscaterror, Abala-Terra',
   'hudChrome.targetAuras.all': 'Todos',
   'hudChrome.targetAuras.buffs': 'Benefícios',
   'hudChrome.targetAuras.configureRows': 'Configurar as auras do alvo',
@@ -2319,7 +2251,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetAuras.visibleRows': 'Linhas de auras preferidas: {count}',
   'hudChrome.bags.itemAriaMasterwork': '{item}, quantidade {count}, obra-prima',
   'hudChrome.archetypePair.tailoring+inscription': 'Tecelão de Magias',
-  'hudChrome.enchantName.enchant_weapon_runed_focus': 'Encantar Arma - Sigilo Runado',
   'hudChrome.professions.ctaRaiseSpecialized':
     'Continue aumentando {craft}: {points} pontos a mais para Especializado, e os custos de material caem.',
   'guide.professions.harvestBodyChoice':
@@ -2332,10 +2263,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Você não precisa ir atrás de nada disso. Trabalhe seus ofícios, e assim que suas habilidades de artesanato mostrarem uma clara inclinação para um par, a Guilda de Artesanato percebe e envia uma carta por Corvo-Mensageiro nomeando o mestre a procurar e a missão a aceitar. Ela chega uma vez por personagem, e apenas se você ainda não tiver jurado a um par.',
   'guide.professions.whatHeading': 'Um ofício ao lado da espada',
   'guide.professions.ringHeading': 'O anel de ofícios',
-  'guide.professions.ringBody':
-    'Todo ofício com conteúdo hoje tem limite de 125 de habilidade: Fabricação de Armas, Fabricação de Armaduras, Alfaiataria, Couraria, Culinária, Alquimia, Engenharia e Encantamento. No limite, o ofício continua funcionando, as coletas ainda rendem, as criações ainda se resolvem e as obras-primas ainda podem acontecer; apenas o número para de subir. Escolha uma carta abaixo para as tabelas completas de receitas e números de um ofício.',
-  'guide.professions.ringWaveNote':
-    'Dois ofícios na roda, Joalheria e Inscrição, mantêm seus assentos mas ainda não têm receitas. É deliberado, não uma omissão: seu conteúdo chega com zonas futuras, e os limites acima sobem da mesma forma, então um ofício no limite hoje é uma vantagem para aquela expansão, não uma linha de chegada.',
   'guide.professions.capFmt': 'Limite {cap}',
   'guide.professions.comingSoon': 'Sem receitas ainda',
   'guide.professions.gatherHubHeading': 'Coleta',
@@ -2344,17 +2271,11 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.professions.archetypesHeading': 'A roda e seus arquétipos',
   'guide.professions.pairFmt': '{a} e {b}',
   'guide.professions.curveHeading': 'A Curva de Maestria',
-  'guide.professions.curveBody':
-    'O ganho de habilidade segue uma regra em todo lugar, a Curva de Maestria de quatro estados. Cada {step} pontos de habilidade é um nível, e cada receita é avaliada em relação ao seu: no seu nível ou acima concede ganho total, um nível abaixo concede metade, dois abaixo um quarto, e três ou mais abaixo nada.\n\nA janela de criação pinta isso diretamente na lista de receitas nas cores clássicas: laranja para ganho total, amarelo para reduzido, verde para um fio, cinza para nenhum. Os ganhos são determinísticos, nunca uma rolagem de aumento de habilidade, então o mesmo ofício no mesmo nível sempre move sua habilidade exatamente a mesma quantidade, e uma receita virando amarelo é seu sinal para treinar o próximo degrau.\n\nA coleta funciona pela mesma curva com o mesmo passo de nível, avaliada contra o nó em vez de uma receita: nós fáceis ficam cinza conforme você os supera, e os nós mais ricos das zonas posteriores são o que termina uma escalada. A Pesca mantém sua própria tabela: um ponto inteiro por captura abaixo de 50 de proficiência, metade até 100, um décimo até 150, e uma cauda lenta até 200, com capturas de tralha sem ensinar nada a partir de 100.',
   'guide.professions.provenanceHeading': 'Proveniência',
   'guide.professions.provenanceBody':
     'Um trabalho fino neste mundo lembra seu criador: coletas e criações raras ou melhores chegam assinadas (Coletado por, Feito por), uma obra-prima termina um nível de qualidade acima com o nome do criador sempre nela, e uma peça por encomenda se vincula ao destinatário pelo Vínculo do Criador. A página de Economia de Criação traz as regras completas, de assinaturas e acúmulo até taxas de desvinculação.',
   'guide.professions.stationsHeading': 'Bancadas e os três centros',
-  'guide.professions.stationsBody':
-    'Seis tipos de bancada atendem os sete ofícios vinculados a bancada, distribuídos pelos três centros urbanos. Eastbrook tem a forja (Fabricação de Armas e Fabricação de Armaduras compartilham), as cozinhas, o tear e a oficina de ferramentas; Fenbridge mantém o curtume, e Highwatch o boticário. Cada bancada tem um mestre residente ao lado que treina receitas, publica pedidos de trabalho e oferece o serviço de desvinculação.\n\nO raio de trabalho é de 20 jardas, aproximadamente o próprio pátio da bancada, então você cria de pé na bigorna, não do outro lado da cidade. Joalheria, Inscrição e Encantamento não têm bancada: os dois primeiros aguardam suas receitas, e Encantamento funciona em qualquer lugar por design.',
   'guide.professions.deedsHeading': 'Feitos que lembram a jornada',
-  'guide.professions.deedsBody':
-    'O Livro dos Feitos caminha ao lado de cada passo disso. Sua primeira sintonização conquista Jurado do Ofício e sua primeira obra-prima conquista Mestre Artesão, ambos usáveis como títulos. Cada um dos oito ofícios que podem ser conquistados marca um feito de marco nos 50 de habilidade e coroa seu limite com um título de Grão-Mestre, enquanto a Pesca recebe Sal Velho aos 100 de proficiência e o título de Pescador Mestre aos 200.\n\nHá páginas mais discretas também: feitos para sua primeira coleta e primeira criação, pelos achados raros que a sorte traz no campo, e por começar a desmontar. Tudo é cosmético, apenas títulos e Renome. Um feito nunca concede poder; ele apenas prova que você esteve lá.',
   'guide.professions.startHeading': 'Por onde começar',
   'guide.professions.colStation': 'Bancada',
   'guide.professions.colHub': 'Centro',
@@ -2399,13 +2320,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'A Alfaiataria tece as roupas de Intelecto e Espírito em que os conjuradores vivem, das básicas de linho caseiro até o conjunto de ouro entretecido e o raro trabalho de seda solar, e costura a Bolsa de seda, uma bolsa de dez espaços que ninguém jamais recusa.',
   'guide.profPages.craftIntro.leatherworking':
     'A Couraria curtimenta equipamentos de Agilidade e Vigor para as classes que esquivam em vez de bloquearem, das básicas de couro de Fenbridge ao raro conjunto do guardião do brejo, e é o único ofício profundo treinado lá no pântano.',
-  'guide.profPages.craftIntro.cooking':
-    'A Culinária transforma a pescaria do dia em refeições que curam ao longo de 18 segundos de descanso, a cura mais barata do jogo, do Carne Seca Salgada até o Grande Assado de Marlow. Todo mundo come, então nenhum ofício é mais universalmente bem-vindo em um grupo.',
-  'guide.profPages.craftIntro.alchemy':
-    'A Alquimia transforma ervas, glândulas e vidro em garrafas que viram batalhas: poções de cura e mana para quando as coisas dão errado, e elixires de vigor que permanecem na sua barra de bônus por uma masmorra inteira.',
   'guide.profPages.craftProse.weaponcrafting.identityHeading': 'O fio que todo combatente procura',
-  'guide.profPages.craftProse.weaponcrafting.identityBody':
-    'Alguém em todo grupo quer o trabalho deste ofício, pois somente o degrau raro cobre os três gostos: a Lâmina de Guerra de Ósmio para corpo a corpo de Força, o Machado de Guerra de Glifaço para combatentes de Agilidade e o Cajado de Batalha de Pinheiro Alto, um cajado de Intelecto e Espírito para a turma dos mantos.\n\nNa roda de ofícios fica entre Forja de Armaduras e Joalheria. Sua identidade ativa é o Ferreiro, o par de Forja de Armas e Forja de Armaduras, jurado diante da Mestra da Forja Darva na forja ao trabalhar três veios de minério com suas próprias mãos; o par Mestre das Lâminas com Joalheria também existe na roda, mas ainda não pode ser jurado, pois a Joalheria não terá receitas até uma expansão de zona futura.',
   'guide.profPages.craftProse.weaponcrafting.materialsHeading': 'O que a forja consome',
   'guide.profPages.craftProse.weaponcrafting.ladderHeading': 'A escada, degrau por degrau',
   'guide.profPages.craftProse.weaponcrafting.ladderBody':
@@ -2421,8 +2336,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Do degrau de elos de ferro para cima, toda criação tem chance de gerar obra-prima; os campos comuns de cobre exclusivos de armadura não podem gerar, pois uma obra-prima melhora atributos e eles não têm nenhum. O ferro conta como material de nível 1 para o proc e o glifaço como nível 2.\n\nA escalada é a clássica de três degraus: cobre até 25, elos de ferro até 50, escama de ósmio até 75, treinando cada degrau no dia em que abre. Onde a Forja de Armaduras tem sorte é no trecho após o 75: o Manto de Escamas de Forno é uma receita de nível 3, então paga ganho total até 99 e metade depois, o que significa que os últimos cinquenta pontos levam cerca de 75 criações em vez das 150 que um ofício sem obra máxima precisaria. Cada manto custa sete minérios de ósmio e cinco Flux de Ferreiro, então estoque em Thornpeak e no balcão da forja antes de começar.\n\nA ordem de serviço de Darva compra oito minérios de cobre a cada 30 minutos por moedas e EXP, um bom destino para o minério de baixo nível que você supera. O Livro de Feitos marca Martelo e Placa na habilidade 50, e Grão-Mestre em Forja de Armaduras espera no limite de 125.',
   'guide.profPages.craftProse.tailoring.identityHeading':
     'Tecido para os conjuradores, bolsas para todos',
-  'guide.profPages.craftProse.tailoring.identityBody':
-    'A escada sobe dos básicos de linho caseiro pelo conjunto de ouro entretecido até o degrau raro: a Vestimenta do Silkbinder e as peças de seda solar. Seu segundo ofício é universal: a Bolsa de seda tem dez espaços, e não há classe, especialização ou nível que não queira mais espaço de bolsa.\n\nNa roda a Alfaiataria fica entre Couraria e Escrivania. Seu par ativo é o Equipador, Couraria e Alfaiataria juntos, jurado diante da Tecelã Ottilie no tear de Eastbrook depois de abater quatro aranhas de seda webwood pelo fio; o par Tecelão de Tintas com Escrivania existe na roda mas aguarda as primeiras receitas da Escrivania antes de poder ser jurado.',
   'guide.profPages.craftProse.tailoring.materialsHeading': 'Linha, seda e, sim, ervas',
   'guide.profPages.craftProse.tailoring.materialsBody':
     'O tear roda com o que a caçada derruba e o que os campos produzem. Retalhos de linho e linho caseiro vêm de abates de humanoides, seda de aranha é colhida de cadáveres de aranhas, e o item central do degrau raro, a Vestimenta do Silkbinder, quer uma Seda Imaculada, o espécime assinado que uma colheita com sorte pode entregar.\n\nHerbalismo alimenta a alfaiataria mais do que qualquer outro ofício de equipamento: folha reluzente apara as pantufas, folha dourada colore o conjunto de ouro entretecido e pétala solar costura todo o degrau raro, então um alfaiate que colhe suas próprias ervas economiza constantemente. Um Novelo de Linha custa 12 cobre de Ottilie, e o tear não exige metal algum: até a obra máxima Capuz de Trama Protetora é tecida a partir de ervas premium, Seda Imaculada, seda de aranha e linha.',
@@ -2447,8 +2360,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Carne Seca Salgada é a receita de campo: conhecida desde o início, uma perna de aranha, preparável em qualquer lugar, o alimento de trilha de todo aventureiro recente. A escada do treinador cozinha nas cozinhas de Eastbrook no lado leste da praça: o degrau gratuito na habilidade 0 (o peixe, o Espeto de Caça do Caçador, o Pique do Pântano Temperado com Ervas), o degrau do meio na habilidade 25 por 25 prata por receita (Enguia Defumada de Freixo, Ensopado de Caça com Folha Dourada, Chowder Geladinha), e o degrau raro na habilidade 50 por 1 ouro cada (Jantar de Carpa Prateada, Prato de Festa do Pescador, Grande Assado de Marlow).\n\nOs pratos em lote esticam seus ingredientes: a enguia defumada e o ensopado servem dois por criação, e o prato de festa serve três. Marlow ensina cada degrau assim que seu nível em Culinária o alcança.',
   'guide.profPages.craftProse.cooking.routeHeading':
     'Especialização, não obras-primas, e o caminho até o 125',
-  'guide.profPages.craftProse.cooking.routeBody':
-    'A Culinária é a exceção honesta à história das obras-primas: uma refeição não tem linha de atributo para melhorar, então os pratos nunca geram uma, e nenhum cozinheiro deve perseguir isso. A maestria do ofício está na especialização aos 75: um quinto a menos de cada ingrediente, que se acumula rapidamente nos pratos em lote, e uma cozinha de campo móvel para que o banquete seja preparado na porta da masmorra.\n\nCozinhe o que você pesca: pareie a escalada com uma sessão de pesca e as duas habilidades se alimentam mutuamente até o topo. Carne seca e o degrau gratuito te levam até 25 a um ponto por criação, o degrau do meio até 50, e o degrau raro até 75; após o 75 nenhum prato mais alto existe ainda, então os pratos raros desvanecem para metade e depois um quarto do ganho, aproximadamente 150 criações a mais até o limite. Trate como estoque, não como grinding: uma guilda come cada porção.\n\nA ordem de serviço das cozinhas de Marlow compra oito carnes de caça a cada 30 minutos por moedas e EXP, e o Livro de Feitos marca Cozinheiro Experiente na habilidade 50 no caminho para o título de Grão-Mestre em Culinária no 125.',
   'guide.profPages.craftProse.alchemy.identityHeading': 'Garrafas que viram batalhas',
   'guide.profPages.craftProse.alchemy.materialsHeading': 'Ervas, glândulas e vidro',
   'guide.profPages.craftProse.alchemy.materialsBody':
@@ -2461,7 +2372,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftProse.engineering.ladderHeading': 'A escada de ferramentas',
   'guide.profPages.craftProse.engineering.routeHeading': 'O caminho de um engenheiro até o 125',
   'guide.profPages.craftProse.engineering.routeBody':
-    'Ferramentas não têm atributos de combate, então nunca geram obras-primas; esse proc pertence a equipamentos com atributos. A especialização ainda chega na habilidade 75: 20% menos materiais por criação, e uma oficina de campo temporária que transforma qualquer viagem de coleta em uma oficina. O cálculo de ganho mal desvanece aqui: as receitas de habilidade 75 pagam ganho total até 100 e metade depois, e as de habilidade 150 pagam ganho total até o limite de 125, então a restrição real são reagentes e moedas, nunca receitas cinzas.\n\nEscolha seu par primeiro, pois nada avança sem ele: pegue a sintonização de Bombardeiro com o Inventor Gizzel. Depois alimente a escada: suba Mineração, Lenharia ou Herbalismo você mesmo ou faça amizade com coletores, compre as ferramentas de nível 3 dos vendedores, e trate a ordem de serviço de Gizzel (oito Toros de Casca de Ferro por 16 cobre, repetível a cada 30 minutos) como dinheiro de bolso.\n\nEngenharia é um ofício de prestígio de baixo volume, aproximadamente um ponto de habilidade por ferramenta finalizada, então trate cada criação como estoque para venda. O argumento para seus clientes se escreve sozinho: cada nível de ferramenta acima do nível de um nó reduz 0,4 segundos do tempo de coleta de 2,5 segundos (até um mínimo de 1,5 segundos), então uma ferramenta de nível 5 é uma melhoria de velocidade em todo nó do mundo, e só você pode fazer uma. O Livro de Feitos marca Engrenagens e Molas na habilidade 50 e Grão-Mestre em Engenharia no 125.',
+    'Ferramentas não têm atributos de combate, então nunca geram obras-primas; esse proc pertence a equipamentos com atributos. A especialização ainda chega na habilidade 75: 20% menos materiais por criação, e uma oficina de campo temporária que transforma qualquer viagem de coleta em uma oficina. O cálculo de ganho mal desvanece aqui: as receitas de habilidade 75 pagam ganho total até 100 e metade depois, e as de habilidade 125 pagam ganho total até o limite, então a restrição real são reagentes e moedas, nunca receitas cinzas.\n\nEscolha seu par cedo, pois a escada de ferramentas não avança sem ele: pegue a sintonização de Bombardeiro com o Inventor Gizzel. Depois alimente a escada: suba Mineração, Lenharia ou Herbalismo você mesmo ou faça amizade com coletores, compre as ferramentas de nível 3 dos vendedores, e trate a ordem de serviço de Gizzel (oito Toros de Casca de Ferro por 16 cobre, repetível a cada 30 minutos) como dinheiro de bolso.\n\nEngenharia é um ofício de prestígio de baixo volume, aproximadamente um ponto de habilidade por ferramenta finalizada, então trate cada criação como estoque para venda. O argumento para seus clientes se escreve sozinho: cada nível de ferramenta acima do nível de um nó reduz 0,4 segundos do tempo de coleta de 2,5 segundos (até um mínimo de 1,5 segundos), então uma ferramenta de nível 5 é uma melhoria de velocidade em todo nó do mundo, e só você pode fazer uma. O Livro de Feitos marca Engrenagens e Molas na habilidade 50 e Grão-Mestre em Engenharia no 125.',
   'guide.profPages.craftProse.enchanting.identityHeading': 'Equipamento desmontado, poder de volta',
   'guide.profPages.craftProse.enchanting.levelingHeading': 'Como o encantamento sobe de nível',
   'guide.profPages.craftProse.enchanting.marketHeading':
@@ -2561,7 +2472,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'O Mercado Mundial é a bolsa de todo o reino, mantida pelo Mercador em Eastbrook e pelo Leiloeiro Voss em Highwatch. A listagem é gratuita: não há depósito, e uma listagem não vendida simplesmente retorna para você. A casa só cobra sua comissão quando algo de fato é vendido: 5 por cento do preço de venda, e o restante fica esperando por você coletar.\n\nUm limite importante: o Mercado negocia apenas bens comuns. Uma cópia assinada, obra-prima, encantada ou vinculada nunca entra em uma listagem, então as peças especiais trocam de mãos face a face em uma janela de negociação, que carrega a identidade completa do item, assinatura inclusa. Precifique essas você mesmo; o Mercado só te diz o que a versão comum alcança.',
   'guide.profPages.econ.workOrdersHeading': 'Encomendas de trabalho',
   'guide.profPages.econ.workOrdersNote':
-    'Cada mestre de posto publica uma encomenda de trabalho fixa: traga uma pilha do material básico do ofício dele e seja pago na hora, mais um pouco de experiência de missão. O pagamento é deliberadamente {pct}% do que um vendedor lhe daria pela mesma pilha, arredondado para baixo, então uma encomenda de trabalho nunca é a forma lucrativa de vender materiais, apenas um motivo para passar pelo posto.\n\nCada encomenda roda em seu próprio relógio de {minutes} minutos por personagem: entregue uma e aquele mestre não tem mais nada para você até o cronômetro girar. Trate-as como um bônus pequeno sobre materiais que você já estaria coletando, não como um negócio.',
+    'Cada mestre de posto publica encomendas de trabalho fixas, uma por material básico: traga a pilha que uma encomenda pede e seja pago na hora, mais um pouco de experiência de missão. O pagamento é deliberadamente {pct}% do que um vendedor lhe daria pela mesma pilha, arredondado para baixo, então uma encomenda de trabalho nunca é a forma lucrativa de vender materiais, apenas um motivo para passar pelo posto.\n\nCada encomenda roda em seu próprio relógio de {minutes} minutos por personagem: entregue uma e essa encomenda fica fechada para você até o cronômetro girar, enquanto as outras encomendas do mestre continuam abertas. Trate-as como um bônus pequeno sobre materiais que você já estaria coletando, não como um negócio.',
   'guide.profPages.econ.colOrder': 'Encomenda de trabalho',
   'guide.profPages.econ.colMaster': 'Mestre',
   'guide.profPages.econ.colAsks': 'Solicita',
@@ -2579,22 +2490,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.title': 'Perguntas Frequentes sobre Profissões',
   'guide.profPages.faq.intro':
     'Respostas rápidas para as perguntas que os artesãos fazem com mais frequência.',
-  'guide.profPages.faq.q1': 'Por que meus itens assinados não se empilham?',
-  'guide.profPages.faq.a1':
-    'Um item assinado é um item instanciado: ele carrega seu próprio pequeno registro (o signatário, qualquer qualidade rolada, atributos de obra-prima, um encantamento, um vínculo) em vez de ser uma cópia anônima. Duas cópias só se fundem em uma pilha quando esses registros coincidem exatamente.\n\nNa prática: o minério raro que você mesmo coletou se empilha com mais minério raro que você mesmo coletou, pois ambos dizem Coletado por você e nada mais difere. O mesmo material assinado por um amigo fica em seu próprio encaixe, e uma cópia comum não assinada nunca se funde em uma pilha assinada. Bolsas, banco e negociações seguem esta mesma regra.',
   'guide.profPages.faq.q2': 'As receitas comuns aumentam minha perícia para sempre?',
-  'guide.profPages.faq.a2':
-    'Não. Cada receita é avaliada por quão abaixo ela fica do seu nível atual naquele ofício, a clássica leitura laranja, amarelo, verde e cinza: ganho total no seu nível ou acima, metade um nível abaixo, um quarto dois níveis abaixo, e nada três ou mais abaixo. Os níveis são a cada 25 de perícia, então as receitas gratuitas de perícia 0 param de ensinar na perícia 75.\n\nOs limites também são menores que os clássicos 300 que você pode esperar: cada um dos oito ofícios ganháveis tem limite em 125, Mineração, Lenharia e Herborismo têm limite em 100, e a Pesca vai mais longe, com 200. Subir significa avançar para receitas do seu próprio nível, não farmar a mais barata.',
-  'guide.profPages.faq.q3': 'Qual é a diferença entre saquear e colher um cadáver?',
-  'guide.profPages.faq.a3':
-    'Um clique cobre os dois. Tudo que um cadáver contém, moedas e drops mais quaisquer componentes coletáveis, abre na mesma janela: o saque segue as regras normais de saque, e a colheita é o lado das profissões, extraindo materiais do próprio cadáver.\n\nA colheita é por ordem de chegada e de uso único: cada cadáver pode ser colhido exatamente uma vez, por quem o reivindicar primeiro, inclusive online. O Foco do Vilarejo molda o que você obtém: enquanto estiver em um centro de vilarejo, você pode distribuir 10 pontos de foco pelos tipos de componente que lhe interessam, e cada componente focado rola um nível melhor (a cada 5 pontos sobe um degrau, no máximo dois degraus) e rende mais (10 por cento por ponto). Componentes sem foco nunca são piorados.',
-  'guide.profPages.faq.q4': 'Por que meu Tronco de Ironbark está assinado?',
-  'guide.profPages.faq.q5': 'Como desvincular uma peça encomendada e quanto custa?',
-  'guide.profPages.faq.a5':
-    'Vá a qualquer posto de criação com a peça nas bolsas e pague o mestre. A taxa segue a qualidade do item: 25 pratas para uma peça incomum, 1 ouro para uma rara, 4 ouros para uma épica; uma lendária paga a taxa épica, e uma peça comum encomendada paga a taxa de incomum. Deve ser um posto real: uma estação móvel nunca oferece o serviço.\n\nA taxa compra uma lousa limpa, não uma cura: a peça continua sendo uma encomenda, então ela se vincula novamente a quem a receber na próxima negociação. Se várias cópias vinculadas compartilharem uma pilha, uma cópia é separada e desvinculada por pagamento.',
-  'guide.profPages.faq.q6': 'Onde aprender receitas e quanto custam?',
-  'guide.profPages.faq.q7': 'Por que minha coleta ficou de repente mais lenta?',
-  'guide.profPages.faq.q8': 'Posso criar longe da cidade?',
   'hud.combat.floatingParry': 'Aparou',
   'hud.combat.parried': 'Seu {ability} foi aparado por {target}.',
   'hud.combat.floatingEvade': 'Evadiu',
@@ -2640,8 +2536,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_surge.description':
     'Canaliza uma rajada de éter bruto pelo inimigo, causando {damage} de dano. Cada lançamento deixa uma Carga Arcana que aumenta o dano e a velocidade de lançamento da próxima Onda de Éter (5% mais rápida a cada carga), mas eleva consideravelmente seu custo de mana, acumulando até 4; Dardos Etéreos gasta as cargas. Cada lançamento também pode armar a Investida Etérea, tornando a próxima Onda de Éter gratuita e duas vezes mais rápida.',
   'entities.abilities.arcane_surge.name': 'Onda de Éter',
-  'entities.abilities.blizzard.description':
-    'Invoca uma tempestade de gelo sobre a área alvo por 6 s, causando {damage} de dano de Gelo por segundo e desacelerando os inimigos em 40%. Cada inimigo atingido reduz em 0,5 s o tempo restante do Orbe Congelado, até no máximo 3 s por lançamento. (Gelo)',
   'entities.abilities.blizzard.name': 'Nevasca',
   'entities.abilities.brain_freeze.name': 'Congelamento Mental',
   'entities.abilities.dragons_breath.description':
@@ -2654,13 +2548,11 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Transforma-se em uma brasa viva, aumentando a velocidade de movimento em {buff}%. Você não pode atacar nem lançar magias enquanto transformado. Lance novamente para retornar à sua forma normal.',
   'entities.abilities.fireball_form.name': 'Forma de Brasa',
   'entities.abilities.flurry.name': 'Açoite Invernal',
-  'entities.abilities.frozen_orb.name': 'Orbe Congelado',
   'entities.abilities.glacial_front.description':
     'Mantenha pressionado para acumular uma frente de gelo cada vez mais ampla, depois solte em cone. Cargas mais longas alcançam mais longe e causam mais dano. Todos os inimigos atingidos são desacelerados em 50% por 4 s; a carga máxima também os prende por 1 s. (Gelo)',
   'entities.abilities.glacial_front.name': 'Frente Glacial',
   'entities.abilities.glacial_spike.description':
     'Conjura um enorme pico de gelo, consumindo 5 Icicles para causar {damage} de dano de Gelo e congelar o alvo no lugar por 4 s. (Gelo)',
-  'entities.abilities.glacial_spike.name': 'Estaca Glacial',
   'entities.abilities.ice_lance.description':
     'Arremessa um fragmento de gelo causando {damage} de dano de Gelo, triplicado contra alvos congelados. Gasta Fingers of Frost ou uma carga de Frio de Inverno para tratar o alvo como congelado. (Gelo)',
   'entities.abilities.ice_lance.name': 'Lança de Gelo',
@@ -2699,19 +2591,10 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.stalkerhide_jerkin.name': 'Gibão de Couro do Espreitador',
   'entities.items.mithril_mining_pick.name': 'Picareta de Mithril',
   'entities.items.silverleaf_sickle.name': 'Foice de Folha de Prata',
-  'entities.items.thorium_mining_pick.name': 'Picareta de Tório',
-  'entities.items.arcanite_mining_pick.name': 'Picareta de Arcanita',
   'entities.items.elderwood_axe.name': 'Machado de Madeira Antiga',
-  'entities.items.thorium_ore.name': 'Minério de Tório',
-  'entities.items.arcanite_bar.name': 'Barra de Arcanita',
   'entities.items.elderwood_log.name': 'Tora de Madeira Antiga',
   'entities.items.silverleaf_herb.name': 'Erva Folha de Prata',
-  'entities.items.thorium_warblade.name': 'Lâmina de Guerra de Tório',
-  'entities.items.arcanite_war_axe.name': 'Machado de Guerra de Arcanita',
   'entities.items.elderwood_battle_staff.name': 'Cajado de Batalha de Madeira Antiga',
-  'entities.items.thoriumscale_greathelm.name': 'Grande Elmo de Escama de Tório',
-  'entities.items.thoriumscale_cuirass.name': 'Couraça de Escama de Tório',
-  'entities.items.thoriumscale_leggings.name': 'Perneiras de Escama de Tório',
   'entities.items.silverthread_slippers.name': 'Pantufas de Linha Pálida',
   'entities.items.goldweave_robe.name': 'Veste de Ouro Tecido',
   'entities.items.goldweave_leggings.name': 'Perneiras de Ouro Tecido',
@@ -3230,7 +3113,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.seasoned_soldier.name': 'Soldado Veterano',
   'entities.abilities.storm_bolt.description':
     'Arremessa sua arma no alvo, causando {damage} de dano e atordoando-o por 3 s.',
-  'entities.abilities.storm_bolt.name': 'Míssil da Tempestade',
   'entities.abilities.sudden_death.description':
     'Seus ataques automáticos têm uma chance de permitir lançar Cova Prematura em um alvo com qualquer quantidade de vida, sem custo de raiva. (Armas)',
   'entities.abilities.sudden_death.name': 'Morte Súbita',
@@ -3239,7 +3121,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sweeping_strikes.name': 'Arco Crescente',
   'entities.abilities.victory_rush.description':
     'Golpeia com dano da arma mais {damage} e cura 20% da sua vida máxima. Só pode ser usado até 20 s depois de matar um inimigo.',
-  'entities.abilities.victory_rush.name': 'Ímpeto da Vitória',
   'hudChrome.specPanel.complexity': 'Complexidade',
   'hudChrome.specPanel.complexityHigh': 'Alta',
   'hudChrome.specPanel.complexityLow': 'Baixa',
@@ -3255,7 +3136,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aspect_of_the_wild.name': 'Aspecto Presa Selvagem',
   'entities.abilities.avenging_wrath.name': 'Ira Vingadora',
   'entities.abilities.berserk.name': 'Névoa Rubra',
-  'entities.abilities.blink.name': 'Passo Cintilante',
   'entities.abilities.bloodlust.name': 'Tambores de Guerra',
   'entities.abilities.chain_lightning.name': 'Relâmpago Bifurcado',
   'entities.abilities.chaos_bolt.name': 'Seta da Ruína',
@@ -3311,7 +3191,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.smoke_screen.name': 'Cortina de Fumaça',
   'entities.abilities.smoke_screen.description':
     'Você desaparece numa nuvem de fumaça, aumentando em 30% sua chance de esquiva por 8 s.',
-  'entities.abilities.spellsteal.name': 'Roubar Feitiço',
   'entities.abilities.spellsteal.description':
     'Rouba um efeito mágico benéfico de um inimigo e o transfere para você.',
   'entities.abilities.startle_shot.name': 'Tiro de Sobressalto',
@@ -3402,7 +3281,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.lunar_tide_greatstaff.name': 'Grande Cajado da Maré Lunar',
   'entities.items.medallion_of_endless_profit.name': 'Medalhão do Lucro Infinito',
   'entities.items.mistcallers_fang.name': 'Presa do Invocador da Névoa',
-  'entities.items.mistforged_pauldrons.name': 'Ombreiras Forjadas na Névoa',
   'entities.items.morthens_cryptforged_hauberk.name': 'Cota de Malha Forjada na Cripta de Morthen',
   'entities.items.nielas_coldlight_band.name': 'Anel da Luz Fria de Niela',
   'entities.items.oath_of_the_round_table.name': 'Juramento da Távola Redonda',
@@ -5846,6 +5724,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.junk': 'Sucata',
   'itemUi.kind.food': 'Comida',
   'itemUi.kind.drink': 'Bebida',
+  'itemUi.kind.recipe': 'Molde',
   'itemUi.kind.tool': 'Ferramenta',
   'itemUi.kind.potion': 'Poção',
   'itemUi.kind.elixir': 'Elixir',
@@ -6092,8 +5971,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blazing_barrier.description':
     'Envolve você em chamas, absorvendo {damage} de dano por 60 s. (Fogo)',
   'entities.abilities.cold_snap.name': 'Chamado do Inverno',
-  'entities.abilities.cold_snap.description':
-    'Encerra o tempo de recarga de Passo Cintilante, Véu de Gelo e Invisibilidade Maior. (Talento de mago)',
   'entities.abilities.greater_invisibility.name': 'Invisibilidade Maior',
   'entities.abilities.hot_streak.name': 'Embalo Ardente',
   'entities.abilities.hot_streak.description':
@@ -6179,7 +6056,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Atinge o alvo com um veneno plúmbeo, causando {damage} de dano de Natureza e reduzindo sua velocidade de movimento em 50% por 12 s.',
   'entities.abilities.expose_armor.name': 'Brecha na Armadura',
   'entities.abilities.rupture.name': 'Hemorragia',
-  'entities.abilities.vanish.name': 'Passo de Fumaça',
   'entities.abilities.vanish.description':
     'Some de vista, entrando em Duskveil mesmo em combate. Você se move 50% mais devagar enquanto escondido. Dura até 10 s.',
   'entities.abilities.instant_poison.name': 'Mordida da Víbora',
@@ -6394,8 +6270,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Entra em uma fúria fervente, gerando 20 de raiva. (talento de guerreiro)',
   'entities.abilities.summon_imp.name': 'Invocar Emberkin',
   'entities.abilities.summon_imp.description': 'Convoca um Emberkin sob o comando do bruxo. O Emberkin lança Descarga Vil em vossos inimigos à distância. Convocar um novo demônio dispensa o atual. Podeis ter apenas um demônio de cada vez.',
-  'entities.abilities.summon_voidwalker.name': 'Invocar Gloomshade',
-  'entities.abilities.summon_voidwalker.description': 'Convoca um Gloomshade sob o comando do bruxo. Este demônio resistente provoca os inimigos e usa Corrente Abissal para arrastar de volta ao alcance os inimigos normais distantes. Chefes não podem ser puxados. Convocar um novo demônio dispensa o atual. Podeis ter apenas um demônio de cada vez.',
+  'entities.abilities.summon_voidwalker.name': 'Invocar Duskmurk',
+  'entities.abilities.summon_voidwalker.description': 'Convoca um Duskmurk sob o comando do bruxo. Este demônio resistente provoca os inimigos e usa Corrente Abissal para arrastar de volta ao alcance os inimigos normais distantes. Chefes não podem ser puxados. Convocar um novo demônio dispensa o atual. Podeis ter apenas um demônio de cada vez.',
   'entities.abilities.summon_succubus.name': 'Invocar Duskborn',
   'entities.abilities.summon_succubus.description':
     'Invoca uma Duskborn sob o comando do bruxo. A Duskborn é um demônio frágil que ataca rapidamente e golpeia com força no corpo a corpo. Invocar um novo demônio dispensa o atual. Você só pode ter um demônio por vez.',
@@ -6424,7 +6300,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.name': 'Remendar',
   'entities.abilities.revive_pet.description':
     'Remenda seu mascote, restaurando {overTime} de vida ao longo de 12 s em pulsos a cada 3 s se ele estiver vivo. Se estiver morto, revive-o com 35% da vida.',
-  'entities.abilities.holy_shock.name': 'Choque Sagrado',
   'entities.abilities.holy_shock.description':
     'Choca um alvo aliado com energia Sagrada, curando-o em {damage}. (assinatura Sagrado)',
   'entities.abilities.holy_shield.name': 'Escudo Sagrado',
@@ -6443,7 +6318,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.combustion.name': 'Transe da Fênix',
   'entities.abilities.combustion.description':
     'Aumenta a chance de acerto crítico de feitiços em 50% por 15 s. (assinatura Fogo)',
-  'entities.abilities.icy_veins.name': 'Veias Gélidas',
   'entities.abilities.icy_veins.description':
     'Aumenta a aceleração de feitiços em 30% e impede interrupção e recuo de conjuração por 10 s. (assinatura Gelo)',
   'entities.abilities.cold_blood.name': 'Sangue Frio',
@@ -6469,7 +6343,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.feral_charge.description':
     'Libera um surto primevo. Na Forma de Lobo, a regeneração de energia aumenta em 100% por 10 s. Na Forma de Bruin, gera instantaneamente 50 de raiva. (assinatura Feral)',
   'entities.abilities.swiftmend.name': 'Recuperação Rápida',
-  'entities.abilities.crusader_strike.name': 'Golpe do Cruzado',
   'entities.abilities.crusader_strike.description':
     'Golpeia o alvo com dano da arma mais {damage} de dano Sagrado. (talento de paladino)',
   'entities.abilities.metamorphosis.name': 'Forma de Lich',
@@ -6625,7 +6498,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.ogre_war_totem.name': 'Totem de guerra ogro',
   'entities.items.storm_core.name': 'Núcleo da tempestade',
   'entities.items.kazzix_heartshard.name': 'Estilhaço do coração de Kazzix',
-  'entities.items.wyrmcult_orders.name': 'Ordens do Culto do Wyrm',
   'entities.items.ritual_phylactery.name': 'Filactério ritual',
   'entities.items.gravewyrm_sigil.name': 'Sigilo do Gravewyrm',
   'entities.items.blessed_embers.name': 'Brasas abençoadas',
@@ -6646,7 +6518,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.staff_of_velkhar.name': 'Cajado de Velkhar',
   'entities.items.shadowmeld_tunic.name': 'Túnica Véu Noturno',
   'entities.items.gravewyrm_scale_hauberk.name': 'Cota de escamas do Gravewyrm',
-  'entities.items.wyrmcult_grand_robe.name': 'Grande veste do Culto do Wyrm',
   'entities.items.wyrmscale_jerkin.name': 'Gibão de escamas de wyrm',
   'entities.items.wyrmfang_greatblade.name': 'Grande lâmina Presa de Wyrm',
   'entities.items.staff_of_the_gravewyrm.name': 'Cajado do Gravewyrm',
@@ -6712,7 +6583,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.tideguard_sabatons.name': 'Escarpes Guardamaré',
   'entities.items.valeborn_spellblade.name': 'Lâmina mágica Nascivale',
   'entities.items.voss_sanctified_mace.name': 'Maça santificada de Voss',
-  'entities.items.wyrmcult_soulsteps.name': 'Passos de alma do Culto do Wyrm',
   'entities.items.wyrmshadow_harness.name': 'Arnês Nightfang',
   'entities.items.wyrmshadow_legguards.name': 'Guarda-pernas Nightfang',
   'entities.items.wyrmshadow_treads.name': 'Pisantes Nightfang',
@@ -6775,8 +6645,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.warlord_drogmar.name': 'Senhor da guerra Drogmar',
   'entities.mobs.stormcrag_elemental.name': 'Elemental de Stormcrag',
   'entities.mobs.shardlord_kazzix.name': 'Senhor dos fragmentos Kazzix',
-  'entities.mobs.wyrmcult_zealot.name': 'Zelote do Culto do Wyrm',
-  'entities.mobs.wyrmcult_necromancer.name': 'Necromante do Culto do Wyrm',
   'entities.mobs.boneclad_revenant.name': 'Revenante encouraçado de ossos',
   'entities.mobs.crypt_shambler.name': 'Cambaleante da cripta',
   'entities.mobs.hollow_acolyte.name': 'Acólito do Vazio',
@@ -6805,7 +6673,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sister_nhalia.name': 'Irmã Nhalia',
   'entities.mobs.varkas_boneguard.name': 'Guardião dos ossos de Varkas',
   'entities.mobs.emberkin.name': 'Emberkin',
-  'entities.mobs.gloomshade.name': 'Gloomshade',
+  'entities.mobs.gloomshade.name': 'Duskmurk',
   'entities.mobs.grix_the_tunnelking.name': 'Grix o Rei dos Túneis',
   'entities.mobs.pyre_colossus.name': 'Pyre Colossus',
   'entities.mobs.choirmother_selthe.name': 'Mãe-do-Coro Selthe',
@@ -7199,7 +7067,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_crushers.objectives.0.label': 'Esmagador ogro abatido',
   'entities.quests.q_drogmar.title': 'Senhor da guerra Drogmar',
   'entities.quests.q_drogmar.text':
-    'Drogmar tomou a moeda do Wyrmcult e jurou os clãs ao despertar da montanha. Entre no acampamento e mate-o, {playerName}, por Highwatch.',
+    'Drogmar tomou a moeda do Broodsworn e jurou os clãs ao despertar da montanha. Entre no acampamento e mate-o, {playerName}, por Highwatch.',
   'entities.quests.q_drogmar.completion':
     'Drogmar jaz morto no próprio campo. Você comprou um inverno para minha muralha, {playerName}.',
   'entities.quests.q_drogmar.objectives.0.label': 'Senhor da guerra Drogmar abatido',
@@ -7222,23 +7090,18 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'O fragmento ainda estala! Magnífico. Pegue estas perneiras.',
   'entities.quests.q_kazzix.objectives.0.label': 'Fragmento do coração de Kazzix',
   'entities.quests.q_zealots.title': 'Cânticos no vento',
-  'entities.quests.q_zealots.text':
-    'O vento traz cânticos dos picos do sul. Silencie 12 zelotes, {playerName}; cada voz calada compra outra noite de sono.',
   'entities.quests.q_zealots.completion':
     'O vento está mais quieto. O que me preocupa não é o cântico, {playerName}, é que algo talvez responda.',
-  'entities.quests.q_zealots.objectives.0.label': 'Zelote do Culto do Wyrm abatido',
   'entities.quests.q_cult_orders.title': 'Ordens de baixo',
   'entities.quests.q_cult_orders.text':
     'Os zelotes se movem como soldados antes de um cerco. Cultistas que se organizam são cultistas recebendo ordens, {playerName}. Mate mais 8 e traga 4 conjuntos de ordens.',
   'entities.quests.q_cult_orders.completion':
     'Esta letra veio do grimório de Morthen. A mesma mão guiou cada túmulo, {playerName}.',
-  'entities.quests.q_cult_orders.objectives.0.label': 'Zelote do Culto do Wyrm abatido',
   'entities.quests.q_necromancers.title': 'O anel de filactérios',
   'entities.quests.q_necromancers.text':
     'As ordens falam de um anel de filactérios, vasos de alma, {playerName}, ao redor do Santuário. Mate 8 necromantes e traga 3 intactos.',
   'entities.quests.q_necromancers.completion':
     'Que a Luz nos perdoe. Eles guardam os mortos do Vale e do pântano; nunca estavam erguendo um exército, {playerName}. Eram um dízimo.',
-  'entities.quests.q_necromancers.objectives.0.label': 'Necromante do Culto do Wyrm abatido',
   'entities.quests.q_revenants.title': 'Campos de revenantes',
   'entities.quests.q_revenants.text':
     'A leste da estrada há um velho campo de batalha. O culto ergueu seus ossos em placas enferrujadas. Ponha 12 de volta no chão, {playerName}.',
@@ -7269,8 +7132,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Ontem o campo inteiro se ajoelhou para o Santuário, {playerName}. Mate 10 zelotes e 6 necromantes antes que essa voz tenha mãos suficientes.',
   'entities.quests.q_voice_below.completion':
     'Os joelhos se ergueram. Não silenciamos a voz, {playerName}; só afinamos seu coro.',
-  'entities.quests.q_voice_below.objectives.0.label': 'Zelote do Culto do Wyrm abatido',
-  'entities.quests.q_voice_below.objectives.1.label': 'Necromante do Culto do Wyrm abatido',
   'entities.quests.q_sanctum_gate.title': 'O portão do Santuário',
   'entities.quests.q_sanctum_gate.text':
     'Este é o último limiar, {playerName}. A chave do Santuário foi quebrada sob os olhos dos mortos encouraçados de ossos. Traga 3 fragmentos e abrirei a passagem em silêncio.',
@@ -7369,7 +7230,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.4.label': 'Acampamento de guerra de Drogmar',
   'entities.zones.thornpeak_heights.pois.5.label': 'Stormcrag',
   'entities.zones.thornpeak_heights.pois.6.label': 'O Glimmermere',
-  'entities.zones.thornpeak_heights.pois.7.label': 'Tendas do Culto do Wyrm',
   'entities.zones.thornpeak_heights.pois.8.label': 'Campos de revenantes',
   'entities.zones.thornpeak_heights.pois.9.label': 'Santuário do Gravewyrm',
   'entities.dungeons.hollow_crypt.name': 'A Cripta Vazia',
@@ -8951,8 +8811,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.peaksGreeter': 'Capitã Thessaly, Highwatch',
   'guide.worldPage.peaksGreeting':
     'Duzentos anos esta muralha resistiu. Ela não cairá sob minha vigilância, mas range.',
-  'guide.worldPage.peaksPlaceNotes':
-    'Highwatch defende a muralha. A Cumeeira do Espreitador e as Tocas de Deeprock pertencem a felinos da serra e escavadores; os Sopés dos Ogros e o Acampamento de Guerra de Drogmar a brutamontes de aluguel; Stormcrag crepita de elementais, e abaixo dele reluz o Glimmermere, o lago cuja margem guarda o portão de luz pálida que desce até o Templo Afogado; as Tendas do Culto do Verme e os Campos dos Revenantes cercam o terreno alto do culto, com o Santuário do Gravewyrm no seu topo.',
   'guide.worldPage.valeGreeter': 'Marechal Redbrook, Eastbrook',
   'guide.worldPage.valeGreeting': 'Mantenha sua lâmina por perto. O Vale não é mais o que era.',
   'guide.worldPage.valePlaceNotes':
@@ -9079,7 +8937,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.nightbloom.name': 'Nightbloom',
   'entities.zones.nightbloom.pois.0.label': 'Moonrest',
   'entities.zones.nightbloom.pois.1.label': 'O Portão da Noite',
-  'entities.zones.nightbloom.pois.2.label': 'O Poço da Lua',
   'entities.zones.nightbloom.pois.3.label': 'Gloamfield',
   'entities.zones.nightbloom.pois.4.label': 'A Vigília Permanente',
   'entities.zones.nightbloom.pois.5.label': 'O Túmulo Insone',
@@ -9096,7 +8953,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.palmreach.welcome':
     'Areia quente, pássaros barulhentos, e uma selva que devora o horizonte. Drifthaven mantém uma fogueira acesa na praia para você.',
   'entities.zones.veiled_hollow.name': 'O Vale Velado',
-  'entities.zones.veiled_hollow.pois.0.label': 'Eldergleam',
+  'entities.zones.veiled_hollow.pois.0.label': 'Eldershine',
   'entities.zones.veiled_hollow.pois.1.label': 'Caverna de Duskfall',
   'entities.zones.veiled_hollow.pois.2.label': 'Mirante de Duskfall',
   'entities.zones.veiled_hollow.pois.3.label': 'O Bosque Antigo',
@@ -9105,7 +8962,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.veiled_hollow.pois.6.label': 'Baixios Cristalinos',
   'entities.zones.veiled_hollow.pois.7.label': 'As Profundezas Reluzentes',
   'entities.zones.veiled_hollow.welcome':
-    'O ar vibra com magia antiga. Procure a Guardiã Saelwyn sob a grande árvore de Eldergleam.',
+    'O ar vibra com magia antiga. Procure a Guardiã Saelwyn sob a grande árvore de Eldershine.',
   'entities.zones.willowfen.name': 'Willowfen',
   'entities.zones.willowfen.pois.0.label': 'Bridgemere',
   'entities.zones.willowfen.pois.1.label': 'A Escadaria de Amberfen',
@@ -9116,14 +8973,14 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.willowfen.welcome':
     'O pântano zumbe com libélulas e abelhas. Atravesse a ponte até Bridgemere e descanse os pés um pouco.',
   'entities.zones.wraithwood.name': 'Wraithwood',
-  'entities.zones.wraithwood.pois.0.label': 'Gallowmere',
+  'entities.zones.wraithwood.pois.0.label': 'Gibbetmere',
   'entities.zones.wraithwood.pois.1.label': 'O Portão dos Corvos',
   'entities.zones.wraithwood.pois.2.label': 'A Moita da Viúva',
   'entities.zones.wraithwood.pois.3.label': 'A Clareira dos Enforcados',
   'entities.zones.wraithwood.pois.4.label': 'A Capela de Mournstone',
   'entities.zones.wraithwood.pois.5.label': 'A Clareira do Caçador',
   'entities.zones.wraithwood.welcome':
-    'A copa das árvores se fecha sobre a estrada como uma tampa. Fique perto das lanternas de Gallowmere, e não responda se o bosque chamar o seu nome.',
+    'A copa das árvores se fecha sobre a estrada como uma tampa. Fique perto das lanternas de Gibbetmere, e não responda se o bosque chamar o seu nome.',
   'entities.items.reliquary_plate_chest.name': 'Cota da Guarda do Relicário',
   'entities.items.reliquary_leather_chest.name': 'Gibão do Guardião da Poeira',
   'entities.items.reliquary_cloth_chest.name': 'Sudário do Relicário',
@@ -9132,7 +8989,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.reliquary_shoulder.name': 'Ombreiras esfareladas',
   'entities.items.reliquary_gloves_rog.name': 'Manoplas do Guardião dos Ossos',
   'entities.items.deacon_reliquary_helm.name': 'Elmo do Relicário do Diácono',
-  'entities.items.varric_shadow_cowl.name': 'Capuz sombrio de Varric',
+  'entities.items.varric_shadow_cowl.name': 'Capuz sombrio de Vandric',
   'entities.items.duskwisp_essence.name': 'Essência de fogo-fátuo do crepúsculo',
   'entities.items.spore_heart.name': 'Coração de esporo',
   'entities.items.gleaming_antler.name': 'Galhada reluzente',
@@ -9154,7 +9011,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.nightweave_tunic.name': 'Túnica de trama noturna',
   'entities.items.veilcloth_robe.name': 'Manto de pano velado',
   'entities.mobs.acolyte_tessa.name': 'Acólita Tessa',
-  'entities.mobs.deacon_varric.name': 'Diácono Varric',
+  'entities.mobs.deacon_varric.name': 'Diácono Vandric',
   'entities.mobs.reliquary_bonewalker.name': 'Caminhante de Ossos Erguido',
   'entities.mobs.reliquary_funeral_ringer.name': 'Sineiro Fúnebre',
   'entities.mobs.reliquary_gravecall_acolyte.name': 'Acólito do Chamado Sepulcral',
@@ -9197,24 +9054,24 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'delveUi.board.title': 'Quadro de Incursões',
   'delveUi.board.tabDelve': 'Incursão',
   'delveUi.board.tabShop': 'Loja',
-  'delveUi.boss.varric.bell.emote': 'O Diácono Varric agarra o sino enterrado com as duas mãos!',
+  'delveUi.boss.varric.bell.emote': 'O Diácono Vandric agarra o sino enterrado com as duas mãos!',
   'delveUi.boss.varric.bell.impact': 'O badalar do sino racha o chão da câmara!',
   'delveUi.boss.varric.bell.lesson':
     'Badalada do Sino: um impacto no solo a cada doze segundos. Afaste-se antes que atinja.',
-  'delveUi.boss.varric.bell.log': 'O Diácono Varric começa a tocar o sino fúnebre.',
-  'delveUi.boss.varric.bell.warning': 'Afaste-se do Diácono Varric!',
+  'delveUi.boss.varric.bell.log': 'O Diácono Vandric começa a tocar o sino fúnebre.',
+  'delveUi.boss.varric.bell.warning': 'Afaste-se do Diácono Vandric!',
   'delveUi.boss.varric.defeat': 'Não... eu tinha os nomes... eu tinha todos eles...',
   'delveUi.boss.varric.intro': 'Nenhuma alma se perde. Apenas se extravia.',
   'delveUi.boss.varric.mid30': 'O sino fúnebre responde a cada nome que ele pronuncia.',
-  'delveUi.boss.varric.mid60': 'O Diácono Varric lê nomes do registro com um triunfo trêmulo.',
+  'delveUi.boss.varric.mid60': 'O Diácono Vandric lê nomes do registro com um triunfo trêmulo.',
   'delveUi.boss.varric.pull':
     'Você pisa em pó sagrado com propósito impuro. Ajoelhe-se e seja contado.',
-  'delveUi.boss.varric.raise.emote': 'O Diácono Varric chama nomes dos túmulos quebrados!',
-  'delveUi.boss.varric.raise.interrupt_fail': 'Os mortos atendem ao chamado do Diácono Varric!',
+  'delveUi.boss.varric.raise.emote': 'O Diácono Vandric chama nomes dos túmulos quebrados!',
+  'delveUi.boss.varric.raise.interrupt_fail': 'Os mortos atendem ao chamado do Diácono Vandric!',
   'delveUi.boss.varric.raise.interrupt_ok': 'O rito sepulcral vacila.',
   'delveUi.boss.varric.raise.lesson':
     'Interrompa o túmulo rachado em cinco segundos ou os mortos se erguerão ao chamado dele.',
-  'delveUi.boss.varric.raise.log': 'O Diácono Varric começa a Erguer os Mortos.',
+  'delveUi.boss.varric.raise.log': 'O Diácono Vandric começa a Erguer os Mortos.',
   'delveUi.boss.varric.raise.object': 'O túmulo rachado estremece com um fôlego roubado.',
   'delveUi.boss.varric.raise.warning': 'Detenha o rito sepulcral!',
   'delveUi.chest.flavor': 'Os mortos entregaram o que podiam dispensar.',
@@ -9404,7 +9261,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'sim.rift.detonateAbsoluteZero': 'Zero Absoluto explode!',
   'sim.rift.detonateAbyssalMaw': 'Fauces Abissais se fecham!',
   'sim.rift.detonateArcaneAnnihilation': 'Aniquilação Arcana explode!',
-  'sim.rift.detonateBloodRite': 'Rito de Sangue cai!',
   'sim.rift.detonateBroodmothersMark': 'A Marca da Mãe da Ninhada detona!',
   'sim.rift.detonateCoreMeltdown': 'Fusão do Núcleo detona!',
   'sim.rift.detonateCrushingDepth': 'Profundeza Esmagadora esmaga!',
@@ -9412,11 +9268,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'sim.rift.detonateEarthshatter': 'Rompe-Terra detona!',
   'sim.rift.detonateFinalJudgment': 'Julgamento Final atinge!',
   'sim.rift.detonateGlacialGrave': 'Sepultura Glacial detona!',
-  'sim.rift.detonateHellfireBrand': 'Marca do Fogo Infernal detona!',
   'sim.rift.detonateLightningRod': 'O Para-raios atinge!',
   'sim.rift.detonateMagmaWell': 'O Poço de Magma explode!',
-  'sim.rift.detonatePactSeal': 'O Selo do Pacto detona!',
-  'sim.rift.detonatePitSentence': 'A Sentença do Fosso detona!',
   'sim.rift.detonateSoulGrave': 'A Sepultura da Alma detona!',
   'sim.rift.detonateStormcallersWrath': 'A Fúria do Invocador de Tempestades explode!',
   'sim.rift.detonateVenomPool': 'A Poça de Veneno explode!',
@@ -10035,7 +9888,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.emberwing_drake.name': 'Dragão Asa de Brasa',
   'entities.mobs.fen_sprite.name': 'Duende do Pântano',
   'entities.mobs.fisher_bram.name': 'Pescador Bram',
-  'entities.mobs.frostmane_yeti.name': 'Yeti de Crina de Gelo',
   'entities.mobs.gale_wisp.name': 'Fogo-Fátuo da Rajada',
   'entities.mobs.gilded_stag.name': 'Cervo Dourado',
   'entities.mobs.gleamstag.name': 'O Cervo Reluzente',
@@ -10044,7 +9896,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gloam_strider.name': 'Andarilho do Crepúsculo',
   'entities.mobs.gravedigger_mosley.name': 'Coveiro Mosley',
   'entities.mobs.gravenbark_shambler.name': 'Errante de Casca Gravada',
-  'entities.mobs.harvest_sprite.name': 'Duende da Colheita',
   'entities.mobs.hedge_gnome.name': 'Gnomo das Sebes',
   'entities.mobs.hedge_knight.name': 'Cavaleiro de Dawnhold',
   'entities.mobs.ice_wisp.name': 'Fogo-Fátuo de Gelo',
@@ -10054,7 +9905,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.moonfleece_grazer.name': 'Pastador de Velo Lunar',
   'entities.mobs.moor_ram.name': 'Carneiro da Charneca',
   'entities.mobs.mushroom_pixie.name': 'Fada Gleamfolk',
-  'entities.mobs.nightkin_stargazer.name': 'Astrólogo Nightkin',
+  'entities.mobs.nightkin_stargazer.name': 'Astrólogo Gloamkin',
   'entities.mobs.old_marrowshell.name': 'Velho Marrowshell',
   'entities.mobs.orchard_treant.name': 'Treant do Pomar',
   'entities.mobs.pale_huntsman.name': 'O Caçador Pálido',
@@ -10352,7 +10203,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_af_sprites_and_spigots.title': 'Duendes e Torneiras',
   'entities.quests.q_af_sprites_and_spigots.text':
     'Duendes da colheita, {playerName}. Eles arrancam minhas torneiras de seiva dos troncos por causa da doçura interior e jogam os baldes na grama. Afugente oito desses pequenos ladrões e traga de volta quatro dos meus baldes, e as carroças voltarão a rodar.',
-  'entities.quests.q_af_sprites_and_spigots.objectives.0.label': 'Duende da Colheita afugentado',
   'entities.quests.q_af_sprites_and_spigots.objectives.1.label':
     'Balde de Coleta de Seiva recuperado',
   'entities.quests.q_af_sprites_and_spigots.completion':
@@ -10547,12 +10397,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_ember_caches.objectives.0.label': 'Reserva de Brasas recuperada',
   'entities.quests.q_fv_ember_caches.completion':
     'Ainda quentes, todas elas. Você deu ao refúgio um inverno inteiro de misericórdia, {playerName}.',
-  'entities.quests.q_fv_frostmane_tyrant.title': 'O Tirano de Crina de Gelo',
-  'entities.quests.q_fv_frostmane_tyrant.text':
-    'Os uivadores não estavam caçando quando desceram dos terraços. Estavam fugindo. Um yeti reivindicou as alturas, a gente da montanha o chama de Crina de Gelo, e nem as matilhas querem dividir uma encosta com ele. Precisa acabar, {playerName}, antes que o inverno o empurre até minhas muralhas. Leve um amigo. Leve dois.',
-  'entities.quests.q_fv_frostmane_tyrant.objectives.0.label': 'A Crina de Gelo derrotada',
-  'entities.quests.q_fv_frostmane_tyrant.completion':
-    'Quando o vento caiu ontem à noite, toda a aldeia ouviu o silêncio onde antes estava a Crina de Gelo. Os Confins te devem uma dívida que levará anos para pagar, {playerName}. Use isto, e toda porta em Icemantle estará aberta para você.',
   'entities.quests.q_fv_howl_above.title': 'O Uivo nos Terraços',
   'entities.quests.q_fv_howl_above.text':
     'Você ouve ao entardecer, {playerName}: um uivo vindo dos Terraços Uivantes que não é das matilhas dos montes de neve. Gargantas maiores. Os uivadores dos terraços desceram dos picos pela primeira vez desde que minha avó ocupava este posto, e foram eles que empurraram os lobos para minha estrada. Abata oito e empurre-os de volta.',
@@ -10685,7 +10529,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Assim o Primeiro cai pela mão do último a chegar. O rebanho já está mais calmo, você sente? Você fez um favor ao Vale hoje, mesmo que não pareça um.',
   'entities.quests.q_hollow_old_marrowshell.title': 'A Velha Concha dos Baixios',
   'entities.quests.q_hollow_old_marrowshell.text':
-    'O primeiro nome é Velho Marrowshell, um caranguejo do tamanho de uma carroça que caça nos baixios orientais desde antes de Eldergleam ter um portão. Ele vagueia, {playerName}, então você terá que percorrer a costa até cruzar seu rastro. Não vá sozinho, e não confie em sua imobilidade.',
+    'O primeiro nome é Velho Marrowshell, um caranguejo do tamanho de uma carroça que caça nos baixios orientais desde antes de Eldershine ter um portão. Ele vagueia, {playerName}, então você terá que percorrer a costa até cruzar seu rastro. Não vá sozinho, e não confie em sua imobilidade.',
   'entities.quests.q_hollow_old_marrowshell.objectives.0.label': 'Velho Marrowshell abatido',
   'entities.quests.q_hollow_old_marrowshell.completion':
     'Os baixios voltaram a ser só água. Já vi aquela concha quebrar caçadores melhores que eu, {playerName}. Não você.',
@@ -10704,14 +10548,10 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_monument_tour.completion':
     'Um mirante, um pátio, e um canto esquecido... e todos os três versos da canção de selamento, juntos pela primeira vez desde que foi cantada. Você fez uma velha leitora muito feliz.',
   'entities.quests.q_nb_charts_of_the_stones.title': 'Os Mapas nas Pedras',
-  'entities.quests.q_nb_charts_of_the_stones.text':
-    'As pedras da Vigília são mais antigas que Moonrest, mais antigas que os nightkin que cuidam delas, e suas faces são gravadas com mapas estelares que passei a vida aprendendo a ler. O céu mudou, {playerName}, e preciso saber quanto. Leia os mapas em três das pedras e traga-me suas coordenadas.',
   'entities.quests.q_nb_charts_of_the_stones.objectives.0.label': 'Mapa estelar lido',
   'entities.quests.q_nb_charts_of_the_stones.completion':
     'Não resta dúvida alguma. Toda coordenada se deslocou em direção ao Túmulo Insone, como se o próprio céu se debruçasse sobre aquele monte para observar. Os antigos reis foram enterrados sob estrelas alinhadas por um motivo, {playerName}.',
   'entities.quests.q_nb_eyes_on_the_vigil.title': 'Olhos na Vigília',
-  'entities.quests.q_nb_eyes_on_the_vigil.text':
-    'Algo deixa os andarilhos ousados e os rebanhos inquietos, {playerName}, e não consigo ler isso nas flores. Cassian consegue ler no céu. Ele mantém seu acampamento observatório perto da Vigília Permanente a leste daqui, onde os nightkin vagam entre as pedras. Encontre-o, e pergunte o que as estrelas estão dizendo.',
   'entities.quests.q_nb_eyes_on_the_vigil.objectives.0.label':
     'Encontre o Astrônomo Cassian na Vigília Permanente',
   'entities.quests.q_nb_eyes_on_the_vigil.completion':
@@ -10745,8 +10585,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nb_the_barrow_king.text':
     'Toda coordenada, toda estrela inquieta, todo monte aberto aponta para uma coisa: o Rei do Túmulo está despertando sob o grande monte, e este reino não tem amanhecer para detê-lo. Ele precisa ser posto em descanso antes que se lembre de sua coroa, {playerName}. Não vá sozinho: leve um amigo, e mantenha a luz das flores atrás de você.',
   'entities.quests.q_nb_the_barrow_king.objectives.0.label': 'O Rei do Túmulo posto em descanso',
-  'entities.quests.q_nb_the_barrow_king.completion':
-    'As estrelas se acalmaram pela primeira vez em uma estação, {playerName}. Os montes estão fechados, os nightkin se aquietaram junto às suas pedras, e o rei dorme novamente lá embaixo. Use este manto: Moonrest o cortou para quem a noite finalmente confiasse.',
   'entities.quests.q_nb_wool_by_moonlight.title': 'Lã ao Luar',
   'entities.quests.q_nb_wool_by_moonlight.text':
     'Nada aquece como o velo lunar, {playerName}, e nada se fia tão fino. Os pastadores carregam sua lã prateada solta em tufos enquanto vagam pelas colinas. Traga-me seis bons tufos dos rebanhos e vou tecer para você algo que valha a caminhada.',
@@ -10793,8 +10631,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Suli está perto da fogueira, ainda jurando que teria conseguido nadar até lá. Você trouxe de volta a única leitora de mapas desta costa, {playerName}. Estes vêm do baú marítimo dela, com sua bênção.',
   'entities.quests.q_pr_the_man_who_went_in.title': 'O Homem que Entrou',
   'entities.quests.q_pr_the_man_who_went_in.text':
-    'Os mergulhadores não vão pisar além da linha das árvores, {playerName}, e eu não vou pedir isso a eles. A esta altura você já ouviu os tambores: todos ouvem, até a segunda noite. Um único homem nesta ilha já caminhou em direção àquele som e voltou. Okku. Ele acampa sob os grandes banianos no Vinefall, no fundo da estrada do Emaranhado. Encontre-o, e pergunte a ele o que o verde esconde.',
-  'entities.quests.q_pr_the_man_who_went_in.objectives.0.label': 'Encontre Okku no Vinefall',
+    'Os mergulhadores não vão pisar além da linha das árvores, {playerName}, e eu não vou pedir isso a eles. A esta altura você já ouviu os tambores: todos ouvem, até a segunda noite. Um único homem nesta ilha já caminhou em direção àquele som e voltou. Okrim. Ele acampa sob os grandes banianos no Vinefall, no fundo da estrada do Emaranhado. Encontre-o, e pergunte a ele o que o verde esconde.',
+  'entities.quests.q_pr_the_man_who_went_in.objectives.0.label': 'Encontre Okrim no Vinefall',
   'entities.quests.q_pr_the_man_who_went_in.completion':
     'Isha te mandou? A Mãe das Pérolas não fala meu nome há anos. Sente-se fora do alcance das trepadeiras, {playerName}, e vou lhe dizer o que sei: os tambores não são o perigo. Eles são o aviso.',
   'entities.quests.q_pr_what_the_drums_guard.title': 'O que os Tambores Guardam',
@@ -10923,15 +10761,15 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_wisp_lights.objectives.0.label': 'Partícula de Fogo-Fátuo',
   'entities.quests.q_wisp_lights.completion':
     'Suaves como as primeiras estrelas. Coloque-os aqui perto do altar; o santuário fará o resto.',
-  'entities.quests.q_ww_bells_of_gallowmere.title': 'Os Sinos de Gallowmere',
+  'entities.quests.q_ww_bells_of_gallowmere.title': 'Os Sinos de Gibbetmere',
   'entities.quests.q_ww_bells_of_gallowmere.text':
-    'Ouve aquele badalar, {playerName}? É Gallowmere, estrada norte acima, embalando seus mortos no sono. O Sacristão Marrow mantém a contagem de cada alma sob a copa, vivos e sepultados. Vá se fazer contar, antes que o bosque conte você por conta própria.',
+    'Ouve aquele badalar, {playerName}? É Gibbetmere, estrada norte acima, embalando seus mortos no sono. O Sacristão Marrow mantém a contagem de cada alma sob a copa, vivos e sepultados. Vá se fazer contar, antes que o bosque conte você por conta própria.',
   'entities.quests.q_ww_bells_of_gallowmere.objectives.0.label': 'Reporte-se ao Sacristão Marrow',
   'entities.quests.q_ww_bells_of_gallowmere.completion':
-    'Cobb te mandou estrada acima inteiro, foi? Bom homem. Ele mantém aquelas lanternas do portão acesas há trinta anos, e o bosque nunca passou por ele nem uma vez. Bem-vindo a Gallowmere, {playerName}. Cuidado com os sinos.',
+    'Cobb te mandou estrada acima inteiro, foi? Bom homem. Ele mantém aquelas lanternas do portão acesas há trinta anos, e o bosque nunca passou por ele nem uma vez. Bem-vindo a Gibbetmere, {playerName}. Cuidado com os sinos.',
   'entities.quests.q_ww_candles_at_the_bounds.title': 'Velas nos Limites',
   'entities.quests.q_ww_candles_at_the_bounds.text':
-    'Quatro pedras-limite cercam Gallowmere, {playerName}, uma em cada estrada de saída, e uma vela fúnebre arde em cada pedra. Enquanto ardem, os sepultados permanecem sepultados. A garoa as apagou, todas as quatro, e sou velho demais para percorrer os limites sozinho. Pegue minha vela e reacenda-as, depressa.',
+    'Quatro pedras-limite cercam Gibbetmere, {playerName}, uma em cada estrada de saída, e uma vela fúnebre arde em cada pedra. Enquanto ardem, os sepultados permanecem sepultados. A garoa as apagou, todas as quatro, e sou velho demais para percorrer os limites sozinho. Pegue minha vela e reacenda-as, depressa.',
   'entities.quests.q_ww_candles_at_the_bounds.objectives.0.label': 'Vela fúnebre reacesa',
   'entities.quests.q_ww_candles_at_the_bounds.completion':
     'Todas as quatro ardendo? Então respire, {playerName}. Você não ouviu, mas toda a aldeia ouviu: os sinos badalaram mais leves no instante em que o último pavio pegou fogo.',
@@ -10940,7 +10778,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'A esta altura você já deve ter ouvido a trompa, {playerName}, fina e distante, o som pelo qual todo o bosque prende a respiração. O Caçador Pálido cavalga sua clareira ao norte daqui, e cada túmulo que ele atravessa fica mais raso. Ele já foi um homem, e foi enterrado errado, e já desisti de fingir que a oração vai resolver. Leve um amigo, leve dois, e desmonte-o.',
   'entities.quests.q_ww_horn_of_the_huntsman.objectives.0.label': 'O Caçador Pálido desmontado',
   'entities.quests.q_ww_horn_of_the_huntsman.completion':
-    'A trompa parou no meio da nota. Todo sino em Gallowmere badalou uma vez, sozinho, e depois o bosque ficou mais silencioso do que já ouvi em trinta anos. Você cumpriu o rito que eu não pude, {playerName}. Use isto, e caminhe sob a copa sem medo.',
+    'A trompa parou no meio da nota. Todo sino em Gibbetmere badalou uma vez, sozinho, e depois o bosque ficou mais silencioso do que já ouvi em trinta anos. Você cumpriu o rito que eu não pude, {playerName}. Use isto, e caminhe sob a copa sem medo.',
   'entities.quests.q_ww_silk_in_the_eaves.title': 'Seda nos Beirais',
   'entities.quests.q_ww_silk_in_the_eaves.text':
     'Olhe para cima enquanto caminha pela estrada oeste, {playerName}, e as verá: formas envoltas na copa, balançando onde nenhum vento alcança. As fiandeiras de seda da viúva se arrastaram para fora da Moita e estenderam suas despensas sobre minhas lanternas. Mate dez, e a estrada volta a ser uma estrada.',
@@ -10957,12 +10795,12 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ww_walking_mosley_home.text':
     'Meu coveiro Mosley pegou a estrada da capela três dias atrás para abrir uma sepultura no velho cemitério, e a escavação desabou sobre ele. Ele se arrastou para fora com as próprias unhas, o tolo está vivo, mas está encolhido perto dos túmulos da capela e não se move por causa das fiandeiras na estrada. Leve-o para casa, {playerName}. Não posso tocar os sinos por um homem vivo.',
   'entities.quests.q_ww_walking_mosley_home.objectives.0.label':
-    'Coveiro Mosley levado em segurança de volta a Gallowmere',
+    'Coveiro Mosley levado em segurança de volta a Gibbetmere',
   'entities.quests.q_ww_walking_mosley_home.completion':
-    'Ele entrou pelo portão com as próprias pernas, jurando que dali em diante não vai cavar nada mais fundo que um canteiro de nabos. Estará de volta ao cemitério até domingo, sempre estão. Obrigado, {playerName}. Gallowmere cuida da sua gente, essa é toda a nossa lei.',
+    'Ele entrou pelo portão com as próprias pernas, jurando que dali em diante não vai cavar nada mais fundo que um canteiro de nabos. Estará de volta ao cemitério até domingo, sempre estão. Obrigado, {playerName}. Gibbetmere cuida da sua gente, essa é toda a nossa lei.',
   'entities.quests.q_ww_what_the_bark_holds.title': 'O que a Casca Guarda',
   'entities.quests.q_ww_what_the_bark_holds.text':
-    'Na Clareira dos Enforcados a leste de Gallowmere as fiandeiras penduram nos galhos seus mortos envoltos em seda, e os errantes de casca gravada montam guarda embaixo como carregadores de caixão pacientes. Aquela é a nossa gente lá em cima, {playerName}. Derrube cinco errantes, corte três dos mortos envoltos, e leve-os de volta para a terra.',
+    'Na Clareira dos Enforcados a leste de Gibbetmere as fiandeiras penduram nos galhos seus mortos envoltos em seda, e os errantes de casca gravada montam guarda embaixo como carregadores de caixão pacientes. Aquela é a nossa gente lá em cima, {playerName}. Derrube cinco errantes, corte três dos mortos envoltos, e leve-os de volta para a terra.',
   'entities.quests.q_ww_what_the_bark_holds.objectives.0.label':
     'Errante de Casca Gravada derrubado',
   'entities.quests.q_ww_what_the_bark_holds.objectives.1.label': 'Restos envoltos em seda cortados',
@@ -11177,12 +11015,12 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.amberPlaceNotes':
     'Lanternmere brilha no coração da colheita. O Goldmelt é a passagem escorregadia de âmbar que leva até lá; o Pomar Dourado e o Vale da Colheita guardam as colheitas mais doces e os ladrões mais ousados; a Grande Lagoa espelha as folhas ardentes; a Colina de Cindermaple se ergue mais alta e mais vermelha; e o Monólito Inclinado guarda a memória de algo mais antigo que o outono.',
   'guide.worldPage.duskBlurb':
-    'Um vale de crepúsculo permanente sob a grande árvore de Eldergleam, onde ruínas de cristal brilham e o ar vibra com magia antiga.',
-  'guide.worldPage.duskGreeter': 'Guardiã Saelwyn, Eldergleam',
+    'Um vale de crepúsculo permanente sob a grande árvore de Eldershine, onde ruínas de cristal brilham e o ar vibra com magia antiga.',
+  'guide.worldPage.duskGreeter': 'Guardiã Saelwyn, Eldershine',
   'guide.worldPage.duskGreeting':
     'Poucos da sua espécie já pisaram sob estes galhos. Ande com cuidado, e seja bem-vindo.',
   'guide.worldPage.duskPlaceNotes':
-    'Eldergleam se reúne sob a grande árvore. A Caverna de Duskfall e seu mirante são a entrada e o primeiro vislumbre do vale; o Bosque Antigo e a Bacia das Estrelas Cadentes guardam o silencioso sul; o Pátio Submerso guarda ruínas cobertas de vegetação a leste; e as Profundezas Reluzentes e os Baixios Cristalinos brilham ao norte.',
+    'Eldershine se reúne sob a grande árvore. A Caverna de Duskfall e seu mirante são a entrada e o primeiro vislumbre do vale; o Bosque Antigo e a Bacia das Estrelas Cadentes guardam o silencioso sul; o Pátio Submerso guarda ruínas cobertas de vegetação a leste; e as Profundezas Reluzentes e os Baixios Cristalinos brilham ao norte.',
   'guide.worldPage.emberBlurb':
     'Terras devastadas iluminadas por tempestades, de cinzas e vidro de sangue, onde dragões circulam sobre a caldeira e fogueiras de trolls ardem entre as dunas, vigiadas pela cidade-portão de Wyrmwatch.',
   'guide.worldPage.emberGreeter': 'O guardião do portão, Wyrmwatch',
@@ -11219,12 +11057,12 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.gardenPlaceNotes':
     'Hedgewick espera no Portão do Jardim. A Alameda do Parterre floresce em cores bem aparadas; o Castelo de Dawnhold treina seus cavaleiros atrás de muros novos; a Lagoa das Pétalas flutua rosa o ano todo; o Velho Moinho gira sobre seus próprios canteiros em anel; o Grande Labirinto reorganiza seus caminhos para cada visitante, seus arcos vigiados por raposas de folhas; a Vigia do Norte guarda a estrada de saída; a Bacia dos Lírios repousa além de tudo; e o Pátio da Fonte ainda corre límpido no coração do jardim.',
   'guide.worldPage.hauntBlurb':
-    'Uma floresta assombrada sob copas gigantescas, onde as lanternas de Gallowmere são a única luz honesta na estrada.',
-  'guide.worldPage.hauntGreeter': 'O acendedor de lampiões, Gallowmere',
+    'Uma floresta assombrada sob copas gigantescas, onde as lanternas de Gibbetmere são a única luz honesta na estrada.',
+  'guide.worldPage.hauntGreeter': 'O acendedor de lampiões, Gibbetmere',
   'guide.worldPage.hauntGreeting':
     'Fique perto das lanternas, viajante. E se o bosque chamar o seu nome de fora da estrada, não responda.',
   'guide.worldPage.hauntPlaceNotes':
-    'Gallowmere se aconchega entre suas lanternas. O Portão dos Corvos é a sombria porta de entrada do bosque; a Moita da Viúva é densa de teias; a Clareira dos Enforcados e a Capela de Mournstone guardam os lutos mais antigos da floresta; e a Clareira do Caçador pertence ao que quer que ainda cace por lá.',
+    'Gibbetmere se aconchega entre suas lanternas. O Portão dos Corvos é a sombria porta de entrada do bosque; a Moita da Viúva é densa de teias; a Clareira dos Enforcados e a Capela de Mournstone guardam os lutos mais antigos da floresta; e a Clareira do Caçador pertence ao que quer que ainda cace por lá.',
   'guide.worldPage.jungleBlurb':
     'Um emaranhado tropical de palmeiras, areia branca e pássaros barulhentos, com a cidade-praia de Drifthaven mantendo uma fogueira acesa na orla.',
   'guide.worldPage.jungleGreeter': 'A capitã do porto, Drifthaven',
@@ -11248,7 +11086,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.counter_shot.name': 'Tiro Silenciador',
   'entities.abilities.counterspell.description':
     'Interrompe a conjuração do alvo e impede lançar feitiços dessa escola por 6 s.',
-  'entities.abilities.counterspell.name': 'Quebra-feitiço',
   'entities.abilities.holy_taunt.description':
     'Provoca o alvo: sua ameaça sobe para igualar a do inimigo que ele mais odeia e o obriga a atacar você por 3 s.',
   'entities.abilities.holy_taunt.name': 'Aguilhão Sagrado',
@@ -11526,8 +11363,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.hoarfrost_vigil_staff.name': 'Vigília da Geada',
   'hudChrome.wocStore.skins.ice_fang_sword.look':
     'Lâmina curva de gelo glacial claro, cristais de geada irregulares ao longo da espinha, um núcleo congelado ciano brilhante na proteção cruzada de gelo mais cheia.',
-  'hudChrome.wocStore.skins.ice_fang_sword.lore':
-    'O destaque da linha congelada e a primeira peça que qualquer colecionador procura. Presa de Gelo foi esculpida, não forjada, em uma presa da geleira que coroa Thornpeak acima de Highwatch; seu núcleo ciano queima tão frio quanto a luz do Glimmermere. Ela cobre de geada o próprio ar que corta. Os guardas da muralha juram que um soldado a carregou na noite em que as neves altas repeliram o Culto do Wyrm e "deram à muralha mais um inverno".',
   'hudChrome.wocStore.skins.ice_fang_sword.name': 'Presa de Gelo',
   'hudChrome.wocStore.skins.lacquered_wand.look':
     'Varinha delgada lacada em vermelho escuro, duas bandas de metal polidas, pequena ponta de latão arredondada.',
@@ -11573,7 +11408,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Arco de aço prateado e gelo azul, núcleo ciano congelado e luminoso na empunhadura, flecha de gelo maciço engatilhada e vapor frio.',
   'hudChrome.wocStore.skins.winterbite.lore':
     'Um arco de aço prateado e gelo de Thornpeak, com a empunhadura iluminada por um núcleo ciano gelado que congela a flecha à corda. Ele engatilha uma haste de gelo glacial que se refaz a cada disparo; na muralha, o arqueiro não leva aljava, apenas o frio. Highwatch resistiu a um cerco na Crista do rastreador com um arco assim: um único arqueiro, dizem, e flechas para um inverno inteiro, sempre já prontas.',
-  'hudChrome.wocStore.skins.winterbite.name': 'Mordida de inverno',
   'hudChrome.wocStore.storeTab': 'Loja',
   'hudChrome.wocStore.tabsLabel': 'Seções da loja WOC',
   'hudChrome.wocStore.title': 'Loja WOC',
@@ -11817,7 +11651,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.battleTrance':
     'Seu próximo Golpe do Saqueador ou Golpe Mutilador não custa raiva',
   'hudChrome.auraEffect.revengeFree': 'Sua próxima Vingança não custa raiva',
-  'hudChrome.auraEffect.victoryRush': 'Ímpeto da Vitória está pronto',
   'hudChrome.auraEffect.maxHpPct': 'Aumenta a vida máxima em {pct}%',
   'hudChrome.statInfo.names.parry': 'Aparar',
   'hudChrome.statInfo.desc.parry':
@@ -11910,7 +11743,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.cragprowl_belt.name': 'Cinto Espreitador do Penhasco',
   'entities.items.cragthorn_greatstaff.name': 'Grande Cajado Espinho do Penhasco',
   'entities.items.cragward_pauldrons.name': 'Ombreiras da Guarda do Penhasco',
-  'entities.items.cryptbloom_shoulderguards.name': 'Guardas de Ombro Flor da Cripta',
   'entities.items.dreamroot_boots.name': 'Botas Raiz dos Sonhos',
   'entities.items.duskthorn_mantle.name': 'Manto Espinho do Crepúsculo',
   'entities.items.fenbark_leggings.name': 'Perneiras Casca do Pântano',
@@ -11950,7 +11782,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.wildgrove_cinch.name': 'Cinto do Bosque Selvagem',
   'entities.items.wildgrowth_leggings.name': 'Perneiras do Crescimento Selvagem',
   'entities.items.wildsoul_maul.name': 'Martelo da Alma Selvagem',
-  'entities.items.wyrmcult_spellgrips.name': 'Manoplas de Feitiço do Culto do Verme',
   'entities.items.abyssal_loop.name': 'Anel Abissal',
   'entities.items.abysswrought_band.name': 'Anel Forjado no Abismo',
   'entities.items.amberfall_sap_bucket.name': 'Balde de Coleta de Seiva',
@@ -11973,7 +11804,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.farshore_salt_moss.name': 'Musgo Salino de Farshore',
   'entities.items.fenway_mooring_line.name': 'Cabo de Amarração Cortado',
   'entities.items.fountain_court_mantle.name': 'Manto do Pátio da Fonte',
-  'entities.items.frostmane_mantle.name': 'Manto da Crina de Gelo',
   'entities.items.galecrest_ram_wool.name': 'Lã Untuosa de Carneiro',
   'entities.items.gallowmere_grave_candle.name': 'Vela Fúnebre',
   'entities.items.gilded_sap_clot.name': 'Coágulo de Seiva Dourada',
@@ -12248,7 +12078,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.hearthkeeper_maeve.title': 'Guardiã do Refúgio da Lareira',
   'entities.npcs.hearthkeeper_maeve.greeting':
     'Entre, saia do frio. O fogo do refúgio nunca se apaga, enquanto eu tiver fôlego.',
-  'entities.npcs.hermit_okku.name': 'Okku',
+  'entities.npcs.hermit_okku.name': 'Okrim',
   'entities.npcs.hermit_okku.title': 'O Homem que Entrou',
   'entities.npcs.hermit_okku.greeting':
     'Silêncio agora. Os tambores contam tudo que caminha sob as árvores, e já contaram você.',
@@ -12300,7 +12130,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.pearlmother_isha.greeting':
     'O mar dá, a areia guarda, e a selva toma. Fique na praia, estranho.',
   'entities.npcs.provisioner_fenna.name': 'Fornecedora Fenna',
-  'entities.npcs.provisioner_fenna.title': 'Fornecedora de Eldergleam',
+  'entities.npcs.provisioner_fenna.title': 'Fornecedora de Eldershine',
   'entities.npcs.provisioner_fenna.greeting':
     'Pão ainda quente, água ainda doce. O Vale provê, e eu também.',
   'entities.npcs.quartermaster_edda.name': 'Intendente Edda',
@@ -12336,7 +12166,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.scout_yerrin.greeting':
     'Fique abaixado. O som se propaga de forma estranha no vidro, e o portão lá embaixo tem ouvidos.',
   'entities.npcs.sexton_marrow.name': 'Sacristão Marrow',
-  'entities.npcs.sexton_marrow.title': 'Sacristão de Gallowmere',
+  'entities.npcs.sexton_marrow.title': 'Sacristão de Gibbetmere',
   'entities.npcs.sexton_marrow.greeting':
     'Aqui os enterramos fundo, e tocamos os sinos para que se lembrem de ficar quietos.',
   'entities.npcs.strandwatcher_pell.name': 'Vigia da Praia Pell',
@@ -12384,7 +12214,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.wickmother_sorrel.greeting':
     'Entre, sente-se, há licor no fogo. Só mantenha uma mão em tudo que for de ferro: os gnomos andam com dedos leves ultimamente.',
   'entities.npcs.widow_tansy.name': 'Viúva Tansy',
-  'entities.npcs.widow_tansy.title': 'Fabricante de Velas de Gallowmere',
+  'entities.npcs.widow_tansy.title': 'Fabricante de Velas de Gibbetmere',
   'entities.npcs.widow_tansy.greeting':
     'Uma vela para cada túmulo, e nenhuma pode se apagar. Nenhuma, está me ouvindo?',
   'gatherEvent.ancientHeartwood': '{finder} derrubou um cerne antigo!',
@@ -12517,48 +12347,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.trendNudgeNoMaster':
     'Suas mãos estão se inclinando para {archetype}. Procure um mestre de ofício para assumir.',
   'hudChrome.discord.roleTagChatTitle': 'Cargo verificado do servidor: {role}',
-  'hudChrome.enchantName.enchant_chest_armor': 'Encantar Torso - Reforço',
-  'hudChrome.enchantName.enchant_chest_greater_stamina': 'Encantar Torso - Vigor Superior',
-  'hudChrome.enchantName.enchant_chest_runeweave': 'Encantar Torso - Trama de Runas',
-  'hudChrome.enchantName.enchant_chest_spirit': 'Encantar Torso - Espírito',
-  'hudChrome.enchantName.enchant_chest_stamina': 'Encantar Torso - Vigor',
-  'hudChrome.enchantName.enchant_feet_agility': 'Encantar Botas - Agilidade',
-  'hudChrome.enchantName.enchant_feet_stamina': 'Encantar Botas - Vigor',
-  'hudChrome.enchantName.enchant_feet_strength': 'Encantar Botas - Força',
-  'hudChrome.enchantName.enchant_gloves_agility': 'Encantar Luvas - Agilidade',
-  'hudChrome.enchantName.enchant_gloves_greater_agility': 'Encantar Luvas - Agilidade Superior',
-  'hudChrome.enchantName.enchant_gloves_intellect': 'Encantar Luvas - Poder Mágico',
-  'hudChrome.enchantName.enchant_gloves_strength': 'Encantar Luvas - Força',
-  'hudChrome.enchantName.enchant_helmet_armor': 'Encantar Elmo - Reforço',
-  'hudChrome.enchantName.enchant_helmet_fortitude': 'Encantar Elmo - Fortitude',
-  'hudChrome.enchantName.enchant_helmet_greater_fortitude': 'Encantar Elmo - Fortitude Superior',
-  'hudChrome.enchantName.enchant_helmet_intellect': 'Encantar Elmo - Intelecto',
-  'hudChrome.enchantName.enchant_helmet_runed_links': 'Encantar Elmo - Elos Runados',
-  'hudChrome.enchantName.enchant_legs_greater_stamina': 'Encantar Pernas - Vigor Superior',
-  'hudChrome.enchantName.enchant_legs_intellect': 'Encantar Pernas - Intelecto',
-  'hudChrome.enchantName.enchant_legs_runed_hide': 'Encantar Pernas - Couro Runado',
-  'hudChrome.enchantName.enchant_legs_stamina': 'Encantar Pernas - Vigor',
-  'hudChrome.enchantName.enchant_neck_agility': 'Encantar Colar - Agilidade',
-  'hudChrome.enchantName.enchant_neck_intellect': 'Encantar Colar - Intelecto',
-  'hudChrome.enchantName.enchant_neck_spirit': 'Encantar Colar - Espírito',
-  'hudChrome.enchantName.enchant_offhand_stamina': 'Encantar Mão Secundária - Vigor',
-  'hudChrome.enchantName.enchant_ring_agility': 'Encantar Anel - Agilidade',
-  'hudChrome.enchantName.enchant_ring_intellect': 'Encantar Anel - Intelecto',
-  'hudChrome.enchantName.enchant_ring_spirit': 'Encantar Anel - Espírito',
-  'hudChrome.enchantName.enchant_ring_strength': 'Encantar Anel - Força',
-  'hudChrome.enchantName.enchant_shoulder_agility': 'Encantar Ombros - Agilidade',
-  'hudChrome.enchantName.enchant_shoulder_intellect': 'Encantar Ombros - Intelecto',
-  'hudChrome.enchantName.enchant_shoulder_strength': 'Encantar Ombros - Força',
-  'hudChrome.enchantName.enchant_waist_agility': 'Encantar Cinto - Agilidade',
-  'hudChrome.enchantName.enchant_waist_stamina': 'Encantar Cinto - Vigor',
-  'hudChrome.enchantName.enchant_waist_strength': 'Encantar Cinto - Força',
-  'hudChrome.enchantName.enchant_weapon_agility': 'Encantar Arma - Agilidade',
-  'hudChrome.enchantName.enchant_weapon_greater_might': 'Encantar Arma - Força Superior',
-  'hudChrome.enchantName.enchant_weapon_greater_spellpower':
-    'Encantar Arma - Poder Mágico Superior',
-  'hudChrome.enchantName.enchant_weapon_intellect': 'Encantar Arma - Poder Mágico',
-  'hudChrome.enchantName.enchant_weapon_might': 'Encantar Arma - Força',
-  'hudChrome.enchantName.enchant_weapon_runed_edge': 'Encantar Arma - Fio Runado',
   'hudChrome.enchanting.disenchantConfirmBody':
     'Isso destrói {item} e produz materiais arcanos. Não pode ser desfeito.',
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
@@ -12755,10 +12543,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.marketIndicator.aria': 'Receita ou itens do Mercado Mundial aguardam',
   'hudChrome.marketIndicator.tip':
     'Receita de vendas ou itens devolvidos estão esperando por você com o Mercador.',
-  'hudChrome.materialHint.arcaneDust':
-    'Reagente de encantamento. Desencantado de equipamento comum e incomum.',
-  'hudChrome.materialHint.arcaneEssence':
-    'Reagente de encantamento. Desencantado de equipamento raro.',
   'hudChrome.materialHint.arcaneShard':
     'Reagente de encantamento. Desencantado de equipamento épico e lendário.',
   'hudChrome.materialHint.resonantHide':
@@ -13455,7 +13239,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Nomeia o inimigo cujas ações e sofrimento alimentarão sua Condenação.',
   'hud.pet.abyssalChain': 'Corrente Abissal',
   'hud.pet.abyssalChainDesc':
-    'Comande Gloomshade para puxar de volta a si um inimigo normal a mais de 8 e até 20 m de distância. Chefes não podem ser puxados. Recarga de 15 segundos. Clique com o botão direito, toque e segure, ou pressione Shift+Enter para alternar o autolançamento.',
+    'Comande Duskmurk para puxar de volta a si um inimigo normal a mais de 8 e até 20 m de distância. Chefes não podem ser puxados. Recarga de 15 segundos. Clique com o botão direito, toque e segure, ou pressione Shift+Enter para alternar o autolançamento.',
   'hud.pet.abyssalChainTitle': 'Corrente Abissal',
   'hud.pet.autocastOff':
     'Autolançamento desativado. Clique com o botão direito, toque e segure, ou pressione Shift+Enter para ativá-lo.',
@@ -13842,6 +13626,22 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.challenging_roar.name': 'Rugido Funesto',
   'entities.abilities.cheap_shot.descriptionNoStealth': 'Golpeia o alvo causando {damage} de dano, atordoando-o por 4 s. Concede 2 pontos de combo.',
   'gpuNotice.bodyDiscreteInactive': 'O jogo não está usando a GPU dedicada (para jogos) e está sendo executado na GPU de economia de energia, o que prejudicará o desempenho. Atualize os drivers de placa de vídeo e reinicie o jogo. No Windows, defina o jogo como Alto desempenho em Configurações > Sistema > Vídeo > Gráficos.',
+  'guide.profPages.faq.q3': 'Qual é a diferença entre saquear e colher um cadáver?',
+  'guide.profPages.faq.q4': 'Por que meu Tronco de Ironbark está assinado?',
+  'guide.profPages.faq.q5': 'Como desvincular uma peça encomendada e quanto custa?',
+  'guide.profPages.faq.q6': 'Onde aprender receitas e quanto custam?',
+  'guide.profPages.faq.q7': 'Por que minha coleta ficou de repente mais lenta?',
+  'guide.profPages.faq.q8': 'Posso criar longe da cidade?',
+  'guide.profPages.faq.a3':
+    'Um clique cobre os dois. Tudo que um cadáver contém, moedas e drops mais quaisquer componentes coletáveis, abre na mesma janela: o saque segue as regras normais de saque, e a colheita é o lado das profissões, extraindo materiais do próprio cadáver.\n\nA colheita é por ordem de chegada e de uso único: cada cadáver pode ser colhido exatamente uma vez, por quem o reivindicar primeiro, inclusive online. O Foco do Vilarejo molda o que você obtém: enquanto estiver em um centro de vilarejo, você pode distribuir 10 pontos de foco pelos tipos de componente que lhe interessam, e cada componente focado rola um nível melhor (a cada 5 pontos sobe um degrau, no máximo dois degraus) e rende mais (10 por cento por ponto). Componentes sem foco nunca são piorados.',
+  'guide.profPages.faq.a4':
+    'Você teve um golpe de sorte. Aproximadamente 1 coleta em 90 dispara um evento de coleta raro (cerne antigo em uma árvore, uma veia imaculada no minério, uma flor ao luar entre as ervas): ele multiplica o rendimento por cinco, assina cada unidade com o seu nome e anuncia o achado para a zona inteira. Uma rolagem de raridade rara ou melhor em uma coleta comum também assina o rendimento.\n\nMateriais assinados valem a pena guardar ou vender caro: ter na bancada qualquer cópia assinada de um reagente exigido soma 2 pontos percentuais à chance de obra-prima. Só lembre que eles se empilham apenas com cópias assinadas de forma idêntica, então ficam em um encaixe de bolsa só deles.',
+  'guide.profPages.faq.a5':
+    'Vá a qualquer posto de criação com a peça nas bolsas e pague o mestre. A taxa segue a qualidade do item: 25 pratas para uma peça incomum, 1 ouro para uma rara, 4 ouros para uma épica; uma lendária paga a taxa épica, e uma peça comum encomendada paga a taxa de incomum. Deve ser um posto real: uma estação móvel nunca oferece o serviço.\n\nA taxa compra uma lousa limpa, não uma cura: a peça continua sendo uma encomenda, então ela se vincula novamente a quem a receber na próxima negociação. Se várias cópias vinculadas compartilharem uma pilha, uma cópia é separada e desvinculada por pagamento.',
+  'guide.profPages.faq.a8':
+    'Em parte. As nove receitas comuns de campo (os básicos iniciais de arma, armadura, comida e poção) podem ser criadas em qualquer lugar, a qualquer hora, e o mesmo vale para as três receitas combinadas dos pares jurados. Tudo o mais acima delas está preso a um tipo de bancada: forja, cozinhas, boticário, curtume, tear ou oficina de ferramentas, e você precisa estar a menos de 20 jardas da bancada para a criação se concretizar.\n\nCom 75 de habilidade em um ofício você se especializa e, junto com um desconto de 20 por cento em materiais, ganha uma bancada móvel: monte-a no campo e ela fica de pé por 10 minutos, atendendo as receitas daquele ofício como se você estivesse na bancada de verdade. A bancada móvel serve só para criar: aprender receitas e desvincular encomendas sempre exigem a bancada verdadeira na cidade.',
+  'guide.profPages.craftProse.cooking.materialsBody':
+    'A Pesca abastece os ingredientes marcantes, zona por zona: truta-espelho e perca de rio das águas do Vale de Eastbrook, lúcio de pântano e enguia de brejo do Pântano de Mirefen, truta de guelras gélidas e carpa de barbatana de ardósia das Alturas de Thornpeak. Os degraus misturam as zonas à vontade (o degrau gratuito já pede lúcio de pântano, o degrau do meio a guelra gélida de Thornpeak, e a ceia rara traz de volta a truta-espelho do Vale), então um cozinheiro que pesca onde quer que a estrada vá nunca fica sem.\n\nO lado do açougue vem dos cadáveres colhidos: carne de caça de javalis e seus parentes e, numa rolagem de colheita rara ou melhor, um Corte Principal assinado, a peça central do grande assado. Ervas temperam os pratos melhores, uma tora de freixo cinza defuma a enguia, e o Sal de cozinha sai a 8 cobre o saquinho na própria banca de Marlow.',
   // v0.40 release i18n fill.
   "abilityUi.tooltip.anyTarget": "Alvo inimigo ou amigo",
   "hudChrome.account.passwordSet": "Senha definida. Agora você pode fazer login com seu nome de usuário e senha em qualquer lugar.",

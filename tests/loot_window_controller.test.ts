@@ -18,12 +18,17 @@ import { isHarvestableCorpse } from '../src/sim/professions/gathering';
 import type { Entity } from '../src/sim/types';
 import { LootWindowController } from '../src/ui/hud/loot/loot_window_controller';
 import type { IWorld } from '../src/world_api';
+import {
+  UNMAPPED_FAMILY,
+  UNMAPPED_FAMILY_2,
+  withRetaggedTemplates,
+} from './helpers/unmapped_family';
 
 const itemIds = Object.keys(ITEMS);
 // isHarvestableCorpse, not a tag COUNT (#2513): a template can carry tags whose
-// every family is unmapped (the retagged fixture below: gills, horn), and the
-// sim refuses a harvest there. A count-based selector could pick such a template
-// under a future content reorder and silently invert every harvest case in this file.
+// every family is unmapped (the retagged fixture below), and the sim refuses a
+// harvest there. A count-based selector could pick such a template under a
+// future content reorder and silently invert every harvest case in this file.
 const harvestMob = Object.values(MOBS).find((mob) => isHarvestableCorpse(mob.componentTags));
 if (itemIds.length < 2) throw new Error('loot item fixtures not found');
 if (!harvestMob?.componentTags?.length) throw new Error('harvestable mob fixture not found');
@@ -31,23 +36,22 @@ const harvestMobId = harvestMob.id;
 const harvestMobTags = harvestMob.componentTags;
 
 // No shipped template is all-unmapped since #2905 wired claw and tusk (that
-// retired fen_troll, the old all-unmapped fixture here), so the #2513 cases
-// below drive a real template retagged for the duration of a callback: the
-// shared UNMAPPED fixture idiom of the sim suites
-// (tests/corpse_harvest_sim.test.ts). warlock_imp carries no tags of its own
-// (this file's untagged fixture elsewhere), so retagging it borrows no other
-// case's premise, and the mutation is always restored in a `finally`.
+// retired fen_troll, the old all-unmapped fixture here), and no shipped
+// template is MIXED since Masterwrought Phase 11m wired gills and horn (that
+// retired sethrael_palecoil, the old mixed fixture here), so the #2513 cases
+// below drive real templates retagged with the synthetic never-mapped
+// families (tests/helpers/unmapped_family.ts) for the duration of a callback:
+// the corpus's one shared retag idiom, withRetaggedTemplates from that same
+// helper. warlock_imp and warlock_voidwalker carry no tags of their own
+// (warlock_imp is this file's untagged fixture elsewhere), so retagging them
+// borrows no other case's premise (the helper throws if that ever changes),
+// and the mutation is always restored in a `finally`.
 const UNMAPPED_TEMPLATE_ID = 'warlock_imp';
-const UNMAPPED_TEMPLATE_TAGS = ['gills', 'horn'];
+const UNMAPPED_TEMPLATE_TAGS = [UNMAPPED_FAMILY, UNMAPPED_FAMILY_2];
+const MIXED_TEMPLATE_ID = 'warlock_voidwalker';
+const MIXED_TEMPLATE_TAGS = ['hide', 'claw', UNMAPPED_FAMILY];
 function withUnmappedTemplate<T>(body: () => T): T {
-  const template = MOBS[UNMAPPED_TEMPLATE_ID];
-  const prior = template.componentTags;
-  template.componentTags = [...UNMAPPED_TEMPLATE_TAGS];
-  try {
-    return body();
-  } finally {
-    template.componentTags = prior;
-  }
+  return withRetaggedTemplates({ [UNMAPPED_TEMPLATE_ID]: UNMAPPED_TEMPLATE_TAGS }, body);
 }
 
 function entity(
@@ -347,15 +351,16 @@ describe('LootWindowController', () => {
 
   it('opens for the coin but draws NO harvest picker on an all-unmapped corpse (#2513)', () => {
     // The gate the whole "no reason line is owed" argument rests on, pinned
-    // instead of asserted in prose. The retagged fixture carries gills and
-    // horn, neither mapped, so `harvestable` is false and openCorpse must skip
-    // the picker; it must still open, because the corpse holds copper the
-    // player can take. Driven through the REAL corpseLootAvailability against
-    // a real (retagged) template, so loosening `if (harvestable &&
-    // componentTags)` back to `if (componentTags)` reds here rather than
-    // passing with every other gate green. The premise pin goes red the day
-    // gills or horn gets its harvest item, which is the cue to move this
-    // fixture again (as #2905 mapping claw and tusk retired fen_troll here).
+    // instead of asserted in prose. The retagged fixture carries the two
+    // synthetic families, neither mapped, so `harvestable` is false and
+    // openCorpse must skip the picker; it must still open, because the corpse
+    // holds copper the player can take. Driven through the REAL
+    // corpseLootAvailability against a real (retagged) template, so loosening
+    // `if (harvestable && componentTags)` back to `if (componentTags)` reds
+    // here rather than passing with every other gate green. The premise pin
+    // goes red the day a synthetic family gets a row, which is the cue to move
+    // this fixture again (as #2905 mapping claw and tusk retired fen_troll
+    // here, and Phase 11m mapping gills and horn retired that pair).
     expect(isHarvestableCorpse(UNMAPPED_TEMPLATE_TAGS)).toBe(false);
     withUnmappedTemplate(() => {
       const imp = entity(20, {
@@ -380,27 +385,49 @@ describe('LootWindowController', () => {
       expect(test.element.querySelector('.town-focus-hint')).toBeNull();
     });
     // The discriminator on the identical rig: a MIXED template carrying the same
-    // unmapped `horn` beside two mapped families still draws its picker, so this
-    // is the predicate and not the controller refusing every corpse. Both
-    // halves of "mixed" are pinned: horn alone is unharvestable (so it is
-    // genuinely unmapped), and the tag list is palecoil's real shipped one.
-    expect(isHarvestableCorpse(['horn'])).toBe(false);
-    expect(MOBS.sethrael_palecoil.componentTags).toEqual(['hide', 'claw', 'horn']);
-    const palecoil = entity(21, {
+    // unmapped family beside two mapped families still draws its picker, so
+    // this is the predicate and not the controller refusing every corpse. Both
+    // halves of "mixed" are pinned: the synthetic family alone is
+    // unharvestable (so it is genuinely unmapped), and the retagged list is
+    // the shape sethrael_palecoil shipped with (hide, claw, horn) until Phase
+    // 11m mapped horn.
+    expect(isHarvestableCorpse([UNMAPPED_FAMILY])).toBe(false);
+    withRetaggedTemplates({ [MIXED_TEMPLATE_ID]: MIXED_TEMPLATE_TAGS }, () => {
+      expect(MOBS[MIXED_TEMPLATE_ID].componentTags).toEqual(['hide', 'claw', UNMAPPED_FAMILY]);
+      const mixed = entity(21, {
+        kind: 'mob',
+        templateId: MIXED_TEMPLATE_ID,
+        loot: { copper: 50, items: [] },
+      });
+      const mixedTest = harness([mixed], (entry) => corpseLootAvailability(entry, 7));
+      mixedTest.controller.openCorpse(21, 0, 0);
+      expect(mixedTest.element.querySelector('.corpse-harvest')).not.toBeNull();
+      expect(mixedTest.element.querySelectorAll('.corpse-harvest-check')).toHaveLength(3);
+      // The hint's other arm, on the same rig: where a harvest really is on offer
+      // the sentence is true and still rendered, so the gate is not a blanket
+      // removal.
+      expect(mixedTest.element.querySelector('.town-focus-hint')?.textContent).toBe(
+        'The interact key loots and harvests in one press, using your town focus.',
+      );
+    });
+    // ...and on real content, where every shipped tag maps since Phase 11m:
+    // sethrael_palecoil still carries horn, and its picker draws every row.
+    expect(MOBS.sethrael_palecoil.componentTags).toContain('horn');
+    expect(isHarvestableCorpse(['horn'])).toBe(true);
+    const palecoil = entity(22, {
       kind: 'mob',
       templateId: 'sethrael_palecoil',
       loot: { copper: 50, items: [] },
     });
-    const mixedTest = harness([palecoil], (entry) => corpseLootAvailability(entry, 7));
-    mixedTest.controller.openCorpse(21, 0, 0);
-    expect(mixedTest.element.querySelector('.corpse-harvest')).not.toBeNull();
-    expect(mixedTest.element.querySelectorAll('.corpse-harvest-check')).toHaveLength(3);
-    // The hint's other arm, on the same rig: where a harvest really is on offer
-    // the sentence is true and still rendered, so the gate is not a blanket
-    // removal.
-    expect(mixedTest.element.querySelector('.town-focus-hint')?.textContent).toBe(
-      'The interact key loots and harvests in one press, using your town focus.',
-    );
+    const shippedTest = harness([palecoil], (entry) => corpseLootAvailability(entry, 7));
+    shippedTest.controller.openCorpse(22, 0, 0);
+    expect(shippedTest.element.querySelector('.corpse-harvest')).not.toBeNull();
+    // The exact list as a literal, not derived from the template: the view
+    // renders the same componentTags a derived expectation would read, so it
+    // would move with a dropped tag and pass; the exact list also reds a
+    // same-count tag SWAP a bare length could not (11m QA).
+    expect(MOBS.sethrael_palecoil.componentTags).toEqual(['hide', 'claw', 'horn', 'venomSac']);
+    expect(shippedTest.element.querySelectorAll('.corpse-harvest-check')).toHaveLength(4);
   });
 
   it('drops the unified-press hint on an untagged corpse too, where it was also false', () => {

@@ -118,6 +118,12 @@ export interface MarketCollectRow {
  */
 export interface MarketCollectSaleRow {
   item: ItemDef;
+  /** The sold copy's own CHOSEN name, when the sale stamped one. The row
+   *  describes a past transaction with no copy left to inspect, so the ledger
+   *  is the only thing that can still say WHICH copy sold; without it a seller
+   *  with two listings of one id reads two identical rows. Absent for a plain
+   *  copy, and the painter falls back to the def name. */
+  itemName?: string;
   count: number;
   /** Net copper this sale contributed, after the Merchant's cut. */
   proceeds: number;
@@ -287,6 +293,7 @@ export function buildMarketCollect(info: MarketInfo): MarketCollectBody {
     }
     sales.push({
       item,
+      ...(sale.itemName ? { itemName: sale.itemName } : {}),
       count: sale.count,
       proceeds: sale.proceeds,
       buyerName: sale.buyerName,

@@ -554,7 +554,6 @@ export const de_DE: Record<string, string> = {
   'poi.thornpeak_heights.4': 'Drogmars Kriegslager',
   'poi.thornpeak_heights.5': 'Sturmfels',
   'poi.thornpeak_heights.6': 'Der Glimmersee',
-  'poi.thornpeak_heights.7': 'Wyrmkult-Zelte',
   'poi.thornpeak_heights.8': 'Wiedergänger-Felder',
   'poi.thornpeak_heights.9': 'Gravewyrm-Heiligtum',
   'location.kind.overworld': 'Oberwelt',

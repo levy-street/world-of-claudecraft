@@ -355,6 +355,19 @@ describe('sellableRows: the sell-tab pre-filter over real ITEMS', () => {
     ]);
   });
 
+  it('an unknown-tier rolled quality ranks as ITSELF under the floor, never as the def (the server twin)', () => {
+    // The sell pre-filter reads the sim's effectiveQuality, the same call
+    // server/woc_market_rules.ts makes: a legacy rolled 'mythic' on an epic
+    // def ranks 0 (QUALITY_RANK has no such tier) and is refused, exactly as
+    // the server refuses it. The tooltip's tier-narrowing wrapper read it as
+    // the def's epic and offered a listing the server rejects (the phase 13 QA
+    // fresh-reader finding on the first fix).
+    const instance = { rolled: { quality: 'mythic' as never } };
+    expect(sellableRows([{ itemId: epicEquipId, count: 1, instance }], 'epic', BOTH_ON)).toEqual(
+      [],
+    );
+  });
+
   it('lets a rolled epic quality lift a rare def over an epic floor', () => {
     const instance = { rolled: { quality: 'epic' } };
     expect(sellableRows([{ itemId: rareEquipId, count: 1, instance }], 'epic', BOTH_ON)).toEqual([

@@ -164,19 +164,49 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  // 17 mount cues across the 13 catalog mounts, not one per mount: the
-  // rickshaw carries a summon and a loop cue and no stride, while the
-  // Lanternback Troll and the Chimeglass Tortoise deliberately have no stride
-  // cue at all and borrow the player's surface footfall instead (see
-  // Sfx.mountRun's fallback branch, and the coverage tests in sfx.test.ts).
-  it('keeps the release catalog, 17 mount cues, and all 62 UI cues in one 272-key inventory', () => {
+  it('keeps the merged catalog, all 17 mount cues, and all 72 UI cues in one 282-key inventory', () => {
+    // 265 -> 267 and 63 -> 65 UI cues with the Farming render/juice placeholder
+    // pair (ui_farm_plant, ui_farm_harvest) joining UI_SFX_CATALOG, then
+    // 267 -> 268 and 65 -> 66 with the ready-notice placeholder
+    // (ui_farm_ready), then 268 -> 269 and 66 -> 67 with the golden-harvest
+    // sting placeholder (ui_farm_golden, the celebrations phase), then
+    // 269 -> 270 and 67 -> 68 with the shared-feast placement placeholder
+    // (ui_farm_feast, the Phase 12 feast).
+    // The release meanwhile retired ui_vcup_kickoff with the Vale Cup minigame
+    // (265 -> 264 keys and 63 -> 62 UI cues on its own arm), so the merged
+    // inventory composed as 264 + 5 farm cues = 269 keys and 62 + 5 = 67 UI
+    // cues, measured from scripts/sfx/sfx_prompts.mjs on the merged tree.
+    // Masterwrought phase 14 then added its four crafting-UX synth cues
+    // (ui_perfecting_attempt, ui_perfecting_success, ui_legendary_forged,
+    // ui_sunder_complete): 269 -> 273 keys and 67 -> 71 UI cues. The Phase 18
+    // sweep then closed the deferred withered disappointment sting
+    // (ui_farm_withered): 273 -> 274 keys and 71 -> 72 UI cues.
+    // The v0.42.0 release then added four NON-ui keys of its own: the two
+    // gendered player-voice cues from PR #2320 (player_hurt_female,
+    // player_death_female) and the rickshaw mount's summon/loop pair
+    // (mount_summon_rickshaw_mount, mount_loop_rickshaw_mount). 274 -> 278
+    // keys, UI unchanged at 72, and the mount cues 11 -> 13. The Mech Bird adds
+    // four mount-specific run, idle, jump, and land cues, taking the semantic
+    // union to 282 keys and 17 mount cues. There are 17 mount cues across 13
+    // catalog mounts, not one per mount: the
+    // rickshaw carries summon and loop cues but no stride, while the
+    // Lanternback Troll and Chimeglass Tortoise deliberately borrow the
+    // player's surface footfall through Sfx.mountRun's fallback branch.
     const keys = new Set(SFX.map((entry) => entry.key));
-    // 268 = the release catalog plus the two gendered player-voice keys from
-    // PR #2320 and the rickshaw mount's summon/loop cues.
-    // 272 = the 268 above plus the Mech Bird's run/idle/jump/land take set.
-    expect(keys.size).toBe(272);
-    expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(62);
+    expect(keys.size).toBe(282);
+    expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(72);
+    expect([...keys].filter((key) => key.startsWith('mount_'))).toHaveLength(17);
     expect(keys.has('ui_craft_cast')).toBe(true);
+    expect(keys.has('ui_farm_plant')).toBe(true);
+    expect(keys.has('ui_farm_harvest')).toBe(true);
+    expect(keys.has('ui_farm_withered')).toBe(true);
+    expect(keys.has('ui_farm_ready')).toBe(true);
+    expect(keys.has('ui_farm_golden')).toBe(true);
+    expect(keys.has('ui_farm_feast')).toBe(true);
+    expect(keys.has('ui_perfecting_attempt')).toBe(true);
+    expect(keys.has('ui_perfecting_success')).toBe(true);
+    expect(keys.has('ui_legendary_forged')).toBe(true);
+    expect(keys.has('ui_sunder_complete')).toBe(true);
     for (const key of [
       'cast_lightning_bolt',
       // the Mech Bird, the store mount: the 1-2-1 gait beat plus the game's
@@ -258,7 +288,7 @@ describe('buildManifest', () => {
     // purely filesystem-discovered.
     const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
     expect(mobFamilyKeys).toHaveLength(65); // 13 families x 5 actions
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(272);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(282);
   });
 });
 
@@ -453,6 +483,17 @@ describe('mob subfamily scanning', () => {
     expect(spatialForSfx('amb_campfire')).toBe(true);
     expect(spatialForSfx('amb_forge')).toBe(true);
     expect(spatialForSfx('amb_water')).toBe(false);
+  });
+});
+
+describe('Mech Bird jump and landing asset binding', () => {
+  it('ships byte-distinct launch and impact recordings', () => {
+    const jump = readFileSync(path.join(realSfxDir, 'mount_jump_mech_bird.mp3'));
+    const land = readFileSync(path.join(realSfxDir, 'mount_land_mech_bird.mp3'));
+    const jumpHash = createHash('sha256').update(jump).digest('hex');
+    const landHash = createHash('sha256').update(land).digest('hex');
+
+    expect(landHash).not.toBe(jumpHash);
   });
 });
 

@@ -49,6 +49,7 @@ describe('material_ids evaluation-order probe (pure table leaves keep the regist
     const professions = await import('../src/sim/content/professions');
     const crucible = await import('../src/sim/content/crucible_professions');
     const enchants = await import('../src/sim/content/enchants');
+    const farmCrops = await import('../src/sim/content/farm_crops');
     const gathering = await import('../src/sim/professions/gathering_materials');
     const grades = await import('../src/sim/professions/material_grades');
     const salvage = await import('../src/sim/professions/salvage_materials');
@@ -58,6 +59,7 @@ describe('material_ids evaluation-order probe (pure table leaves keep the regist
       harvestComponentItems: professions.HARVEST_COMPONENT_ITEMS,
       harvestComponentSpecimens: professions.HARVEST_COMPONENT_SPECIMENS,
       salvageMaterialByQuality: salvage.SALVAGE_MATERIAL_BY_QUALITY,
+      farmMaterialItemIds: farmCrops.FARM_MATERIAL_ITEM_IDS,
       recipes: data.ALL_RECIPES,
       enchants: enchants.ENCHANTS,
       recipePendingMaterialItemIds: crucible.CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS,

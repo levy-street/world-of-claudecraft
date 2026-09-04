@@ -224,7 +224,8 @@ describe('delve spatial band', () => {
     const pid = dst.addPlayer('warrior', 'Relogged', { state });
     const e = (dst as any).entities.get(pid)!;
     const door = DELVES.collapsed_reliquary.doorPos; // Brother Halven board door {-136,112}
-    expect(Math.abs(e.pos.x - door.x)).toBeLessThan(1); // at the board door (-5), NOT a dungeon door (~80)
+    // at the board door (-136), NOT a dungeon door (~80)
+    expect(Math.abs(e.pos.x - door.x)).toBeLessThan(1);
     expect(Math.abs(e.pos.z - (door.z - 4))).toBeLessThan(1); // z-4 eject offset
     expect(isDelvePos(e.pos.x)).toBe(false); // no longer stuck in the delve band
   });
@@ -592,7 +593,7 @@ describe('delve interactables and affixes', () => {
     expect(after).toBe(before);
   });
 
-  it('an evade/wipe reset cancels Deacon Varric in-flight Raise Dead channel', () => {
+  it('an evade/wipe reset cancels Deacon Vandric in-flight Raise Dead channel', () => {
     const sim = makeSim();
     enterReliquary(sim);
     const run = sim.delveRunForPlayer(sim.playerId)!;
@@ -1008,12 +1009,12 @@ describe('delve interactables and affixes', () => {
     }
   });
 
-  it('Deacon Varric enrages on Heroic but not on Normal (PRD §7.4)', () => {
+  it('Deacon Vandric enrages on Heroic but not on Normal (PRD §7.4)', () => {
     for (const tier of ['normal', 'heroic'] as const) {
       const sim = makeSim();
       enterReliquary(sim, tier);
       const run = sim.delveRunForPlayer(sim.playerId)!;
-      // Register a Varric in this run so delveRunForMob resolves him to its tier.
+      // Register a Vandric in this run so delveRunForMob resolves him to its tier.
       const boss = createMob((sim as any).nextId++, MOBS.deacon_varric, 12, {
         x: run.origin.x,
         y: 0,
@@ -1782,7 +1783,7 @@ describe('delve reward chest + surface exit flow', () => {
     return run;
   }
 
-  it('daily reset + first-vs-repeat XP keys off the injected UTC day (deterministic)', () => {
+  it('daily reset and first-vs-repeat XP key off the injected reset day, deterministically', () => {
     const sim = makeSim();
     sim.resetDay = '2026-06-18';
     sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel);

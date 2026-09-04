@@ -1,4 +1,4 @@
-// Frozen Orb: the frost mage's roaming Icicle generator (owner design
+// Frostglobe: the frost mage's roaming Icicle generator (owner design
 // 2026-07-11). The cast releases an orb that drifts slowly forward from the
 // caster, pulsing frost damage and a 30% snare on everything nearby once per
 // second for its 8s life. Each striking pulse banks one Icicle, never a
@@ -225,7 +225,7 @@ function pulseOrb(ctx: SimContext, orb: FrozenOrbState, source: Entity): void {
     struck++;
   }
   if (struck === 0) return;
-  // Each striking pulse also banks one Icicle toward Glacial Spike (deterministic,
+  // Each striking pulse also banks one Icicle toward Rimeneedle (deterministic,
   // no rng, so it never shifts the shared stream); this is what makes the orb the
   // spender's accelerator. One per pulse, not per target.
   gainIcicle(ctx, source);

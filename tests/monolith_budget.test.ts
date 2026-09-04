@@ -19,6 +19,17 @@ import { describe, expect, it } from 'vitest';
 //   small margin in the same change; the ratchet only works if it tightens.
 // - Raising a ceiling is a maintainer decision: do it only when a change genuinely
 //   cannot land behind a seam, keep the raise small, and justify it in the PR body.
+// - WHEN A RELEASE SYNC PUSHES A ZERO-SLACK ROW OVER, which is a different case and
+//   the one this branch will meet most often (added 2026-08-21 by the Phase 11d QA
+//   fix-round review). Most rows sit at zero slack, and a long-lived
+//   feature branch keeps merging release/**, so a routine upstream change can grow a
+//   file this branch does not own and land red on the sync. Do NOT extract upstream's
+//   code to buy the lines back, and do not raise the ceiling silently: re-pin at the
+//   exact merged count with a comment naming the sync, the release tip, and the
+//   parent pins, exactly as the hud.ts row does for its two syncs. That keeps the
+//   ratchet honest (the pin still equals the file) while recording that the growth
+//   was inherited rather than authored. If the growth is large enough that the merged
+//   file is materially worse, that is a maintainer conversation, not a quiet re-pin.
 // - A missing file usually means it was split or renamed: update or remove its row in
 //   the same change so the gate tracks the real tree.
 //
@@ -90,67 +101,59 @@ const MONOLITHS: MonolithRow[] = [
     // never a raise. A raise stays a maintainer decision, per the header.
     // Re-pinned down from 19338 after the error-text matcher moved out to
     // src/ui/error_text_i18n_core.ts, then from 19190 after the craft-deny
-    // message table moved to src/ui/crafting_deny_core.ts (the v0.37.0 sync
+    // message table moved to src/ui/hud/professions/crafting_deny_core.ts (the v0.37.0 sync
     // merge had pushed the file over), keeping the zero-headroom posture.
     // Re-pinned from 19177 after the v0.38.0 sync merge: the release's map
     // overhaul extracted marker interaction out of the coordinator, so the
     // merged file landed SMALLER and the ratchet follows it down.
     file: 'src/ui/hud.ts',
-    // Lowered after extracting the ability description prose (the placeholder
-    // values, the over-time string and the talent-conditional field choice) into
-    // src/ui/ability_description.ts (the ratchet's own rule: an extraction lowers
-    // the ceiling, never raises it).
-    // Raised 19420 -> 19432 (+12) for the desktop-client-update packet, a
-    // maintainer decision prepared for PR review: the branch's additions are
-    // thin-consumer wiring to extracted modules (presentation_gate,
-    // instance_music) riding on top of upstream's near-zero-slack re-pins, so
-    // no clean branch-owned extraction exists. Exact merged count: any
-    // further growth reds again.
-    // Re-pinned 19432 -> 19433: the release/v0.38.0 merge into this branch
-    // grew hud.ts by one line at HEAD without updating the row, so the gate
-    // arrived red. Same exact-count, zero-slack intent as above.
-    // Raised 19433 -> 19442 (+9) for the login preview-prewarm trim: thin-consumer
-    // wiring (a `looksModular` read plus three flag args to the pure
-    // buildPostEntryPreviewPrewarmUnits) that has no clean branch-owned
-    // extraction, landing on upstream's zero-slack re-pin. Maintainer decision,
-    // exact merged count: any further growth reds again.
-    // Re-pinned 19433 -> 19488 when the castle branch merged main: the castle
-    // additions are thin-consumer wiring to extracted modules (the two
-    // LastKeepMapPainter declarations and the two walk-in map branches on the
-    // clearMapHitState pattern), riding on main's zero-slack pin. Exact merged
-    // count: any further growth reds again.
-    // Raised for the controller cross hotbar, on top of the moved-base v0.39
-    // re-pin. The additions are thin-consumer wiring to an extracted domain
-    // (src/ui/hud/cross_hotbar/): the overlay's construction, its per-frame paint,
-    // and the one public seam the pad drives it through. Everything with substance
-    // (the view, painter, resolvers, panel-hooks shape) lives in that domain, and
-    // the earlier attempt to buy these lines by extracting UNRELATED pre-existing
-    // helpers out of hud.ts was reverted: refactoring code a change does not own to
-    // fit a budget inflates the diff and risks regressions elsewhere. A maintainer
-    // decision, taken rather than paid for with someone else's code. The last
-    // line is openSpellbook, which the pad needs so a confirm on an empty cell can
-    // reach the ability list; the toggle beside it would have closed it instead.
-    // castCrossHotbarAction is the other: it routes a pad press back through
-    // castSlot so a cross-hotbar cast keeps the SAME semantics a key press has
-    // (reticle, empower, sport, mouseover) instead of growing a second cast path,
-    // with the Attack branch beside it: Attack is the fixed slot-0 toggle rather
-    // than an ability, so it is the one action the seed cannot copy off the bar.
-    // Raised for the cross-hotbar cast-fallback fix: the fallback grows an item
-    // arm and a spoken refusal beside the ability one, and the shared item-use
-    // seam castSlot and the pad now both call. Exact merged count, zero slack:
-    // any further growth reds again.
-    // Re-pinned across the third release/v0.40.0 sync into the bank-storage
-    // branch. The release lowered this to 19476 by extracting the stale-focus
-    // chrome wiring (PR #3506) into src/ui/chrome_focus_wiring.ts; the branch
-    // side sat at 19512 with its Materials Vault HUD lines. Both land in the
-    // merged tree, so the exact merged count is the honest zero-slack bound.
-    // LOWERED 19498 -> 19496 by the Bank Storage phase 13 extraction. The
-    // banker's Claudium rung purchase needed a second window wired to the
-    // Claudium spend seam, and rather than copy the money-handling closure into
-    // a second deps literal, the whole seam moved to
-    // src/ui/claudium_purchase_bridge.ts and BOTH windows now spread it. The
-    // ratchet's own rule: an extraction lowers the ceiling, never raises it, so
-    // the two lines it bought are banked rather than spent.
+    // Lowered from 19600 at the Phase 07 review round (craft-denial key
+    // ternary out to craft_denial_line_view), then from 19500 at the Phase 07
+    // QA release sync: the v0.37.0 chat-quota wiring pushed the merged union
+    // 3 lines over, so the display-name resolver family moved out to
+    // entity_display_core (the ratchet: extract, then lower).
+    // Upstream meanwhile extracted the ability description prose (the
+    // placeholder values, the over-time string and the talent-conditional
+    // field choice) into src/ui/ability_description.ts and re-pinned its own
+    // row at the exact count through the desktop-client-update, castle, and
+    // moved-base v0.39 wrapper merges (ending at its own zero-slack 19387).
+    // Re-pinned for the merge of release/v0.40.0 into this branch: both
+    // parents' deletions land together (the release's extractions plus the
+    // branch SUNDER_ARMOR_PCT_PER_STACK import the release's extraction
+    // orphaned), so the merged file shrank below both prior pins (19337).
+    // Re-pinned again when release/v0.40.0 moved (the controller cross-hotbar
+    // and cast-fallback work): upstream raised its own row to a zero-slack
+    // 19490 for thin-consumer wiring to the extracted src/ui/hud/cross_hotbar/
+    // domain (a maintainer decision recorded on that side), while the branch's
+    // entity_display_core extraction still holds, so the merged union lands
+    // between the two parent pins. Exact merged count per this row's
+    // zero-slack rule: any further growth reds again.
+    // LOWERED at the farming absorb (masterwrought Phase 11d, decision 4 as
+    // amended 2026-08-20): both packets' independent extractions STACK, so
+    // the merged file lands under all three parent pins (ours 19445,
+    // farming 19186 measured against its own smaller file, and the
+    // release's 19487, itself lowered by the makeReliquaryTrackerInput
+    // extraction this branch absorbed at the Phase 11d sync). No raise, so
+    // the Phase 14 payback target of 19445-or-lower (ruling 11d-U6-PAYBACK)
+    // is already met at this pin; Phase 14 may not grow the file back, and
+    // the professions-module migration counts for nothing toward any future
+    // target (a file move relocates zero lines). Exact merged count, zero
+    // slack: any further growth reds again.
+    // LOWERED again 19248 -> 19235 at the Phase 11d QA release sync (release
+    // tip 35a6481825, prior synced tip f50b30de29): the stale-focus Space fix
+    // (PR #3506) extracted the tracker drops and the panel key-guard loop into
+    // src/ui/chrome_focus_wiring.ts, lowering the release's own row 19487 ->
+    // 19476, and this branch takes the same extraction. The merged fall is 13,
+    // two lines deeper than the release's own 11, because the branch's guarded
+    // panel list carried two roots the release never had (#harvest-journal-window
+    // and #plant-sheet-window, from the Phase 11b farming absorb); they moved
+    // into CHROME_GUARDED_PANELS with the rest rather than being dropped. No
+    // raise. Exact merged count, zero slack: any further growth reds again.
+    //
+    // UPSTREAM'S OWN HALF of this span, kept so the merge drops neither parent's
+    // record. The touch UI rework lowered the release's row five times by
+    // extraction and twice more in its review round, ending at a zero-slack
+    // 19031:
     // LOWERED 19490 -> 19386 by the touch radial ring: buildMobileActionRing's
     // whole body (the markup lookup, the slot-element minting, the attack /
     // slot / page-toggle wiring and both view constructions) moved behind the
@@ -198,69 +201,167 @@ const MONOLITHS: MonolithRow[] = [
     // share placeAbility's spellbook-refresh through one commitHotbarActions
     // helper, fixing a stale assign toggle when a bound spell is cleared or
     // swapped with the spellbook open behind the editor. Exact count, zero slack.
-    // Re-pinned across the FOURTH release/v0.40.0 sync into the bank-storage
-    // branch (the touch UI rework). Both arms extracted on their own base: the
-    // release took hud.ts to 19031 across the radial ring, consumables seat, bar
-    // editor, stance radial and the review fixes above; the branch sat at 19496
-    // with its bank chrome. Both land in the merged tree, so the exact merged
-    // count is the honest zero-slack bound, and it LOWERS the branch pin by 445.
-    // LOWERED 19051 -> 19035 by Bank Storage phase 15. The store's open-window
-    // refresh needs a line on the slow band and this file had zero slack, so it
-    // is paid for by an extraction the same phase owns: the daily-rewards /
-    // store launcher POLL (sequence guard, throttle stamp, fetch chain) moved
-    // into src/ui/daily_rewards_launcher_core.ts beside the predicate it already
-    // called, the ClaudiumLauncherBalance shape this file already composes. The
-    // headroom the move bought is BANKED, not spent.
-    // Re-pinned at the FIFTH release/v0.40.0 sync into the bank-storage branch
-    // (the Exchange / marketplace release). Both arms moved on their own base:
-    // the release took hud.ts to 18688 across the wallet-verify extraction and
-    // the PR 3606 review deletions, while the branch sat at 19035 with its bank
-    // and store chrome. Both land in the merged tree, so the exact MERGED count
-    // is the honest zero-slack bound. Re-derived from the merged tree, never
-    // taken from either side.
-    // Re-pinned at the SIXTH release/v0.40.0 sync (release tip 9a89e3483e). The
-    // release's own arm grew hud.ts 18688 -> 18694; this branch sat at 18692.
-    // The merged count is exactly base plus BOTH arms' deltas, which is the
-    // proof neither side's lines were dropped. Exact merged count, zero slack.
-    // Re-pinned at the release/v0.41.0 sync into the bank-storage branch (the New
-    // Eastbrook program, which retires the Vale Cup and demolishes the Sowfield).
-    // The release arm DELETES more than this branch adds, so the merged count lands
-    // below the branch pin and the ratchet follows it DOWN. Measured on the merged
-    // tree, never reconciled by arithmetic. Exact count, zero slack.
-    // Re-derived at the PR #3670 review-fix round. Against the release/v0.41.0
-    // base (18488) this file is +3: the bank-storage feature's own store and
-    // vault chrome wiring (the earlier notes about merged-tree arithmetic
-    // described branch history that the squash rebased away). The review round
-    // itself paid its Escape-rung addition by merging duplicate imports. The
-    // raise is this PR's REQUEST, not a settled ruling: merging is what
-    // ratifies it. Exact count, zero slack.
-    // Re-pinned at the second release/v0.41.0 sync (release tip b02da096dd, the
-    // Exchange balance + client-perf batch). The release arm added the wallet
-    // card's onWalletChanged fan-out and the refreshWocBalance(force) hook and
-    // paid both lines by trimming the Exchange-window comment, so its arm and
-    // the merged tree both net zero against this row. Measured on the merged
-    // tree, never reconciled by arithmetic. Exact count, zero slack.
-    // Re-pinned at the fourth release/v0.41.0 sync (release tip 8592df3866).
-    // The release arm carries two hud-heavy batches of its own: the PR #3284
-    // interface-unlock merge (raised, then partially taken back by the
-    // review-round extraction into the pure core interface_unlock_menu_core.ts;
-    // what remains on coordinator state, the dimension-mode mover wiring, the
-    // edit-preview painter closure and the player-frame bar lock, is the
-    // live-hooks half) and the snap-grid / edit-cursor rework under PR #3714.
-    // This branch's arm stays its +3 store and vault chrome. Measured on the
-    // merged tree, never reconciled by arithmetic. Exact count, zero slack.
+    //
+    // RE-PINNED 19235 -> 18792 at the Phase 11i QA release sync (release tip
+    // 14ab2e8630, prior synced release parent 50462dda83). BOTH parent pins for
+    // the record: ours 19235 against a 19235 file, the release 19031 against a
+    // 19031 file, and the base 19476 both descend from. The union composes
+    // exactly: 19476 - 241 (ours) - 445 (theirs) = 18790, plus 2 for the one
+    // conflict resolved by hand in hud.ts itself (the consumables block, where
+    // the release's extracted buildMobileConsumableSeat is taken and this
+    // branch's factual comment correction, elixirs AND scrolls, is carried onto
+    // it, rewrapping one comment line into two and restoring the blank line
+    // between methods). Measured at 18792. Both parents' extractions STACK, so
+    // the merged file lands under both pins and the ratchet TIGHTENS rather than
+    // inheriting slack: the release's own 19031 is NOT taken, since it sits 239
+    // lines above the merged file. Exact merged count, zero slack: any further
+    // growth reds again.
+    // RE-PINNED at the Phase 11k QA release sync (the FOURTEENTH sync,
+    // release/v0.40.0 b39b16022e to efb1220e85): the merged file lands
+    // UNDER both parent pins (ours 18792, the release's 18694) because both
+    // parents' extractions land together and the two deleted the same ability
+    // tooltip helpers, so the ratchet follows it down. Exact merged count, zero
+    // slack: any further growth reds again.
+    // MEASURED AGAIN AT THE 11k QA FIX ROUND and lowered by three: the number
+    // above was taken mid-resolution, and the conflict work then removed the
+    // twin display-name import block and the merge's own unused
+    // window_stack_state_core import. A row whose comment says zero slack and
+    // whose pin sits above the file is the defect this packet's sim.ts row
+    // already named, so it is re-measured rather than left green.
+    //
+    // UPSTREAM'S OWN HALF over the release/v0.41.0 span, kept so the merge drops
+    // neither parent's record:
+    // Lowered after extracting the ability description prose (the placeholder
+    // values, the over-time string and the talent-conditional field choice) into
+    // src/ui/ability_description.ts (the ratchet's own rule: an extraction lowers
+    // the ceiling, never raises it).
+    // Raised 19420 -> 19432 (+12) for the desktop-client-update packet, a
+    // maintainer decision prepared for PR review: the branch's additions are
+    // thin-consumer wiring to extracted modules (presentation_gate,
+    // instance_music) riding on top of upstream's near-zero-slack re-pins, so
+    // no clean branch-owned extraction exists. Exact merged count: any
+    // further growth reds again.
+    // Re-pinned 19432 -> 19433: the release/v0.38.0 merge into this branch
+    // grew hud.ts by one line at HEAD without updating the row, so the gate
+    // arrived red. Same exact-count, zero-slack intent as above.
+    // Raised 19433 -> 19442 (+9) for the login preview-prewarm trim: thin-consumer
+    // wiring (a `looksModular` read plus three flag args to the pure
+    // buildPostEntryPreviewPrewarmUnits) that has no clean branch-owned
+    // extraction, landing on upstream's zero-slack re-pin. Maintainer decision,
+    // exact merged count: any further growth reds again.
+    // Re-pinned 19433 -> 19488 when the castle branch merged main: the castle
+    // additions are thin-consumer wiring to extracted modules (the two
+    // LastKeepMapPainter declarations and the two walk-in map branches on the
+    // clearMapHitState pattern), riding on main's zero-slack pin. Exact merged
+    // count: any further growth reds again.
+    // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
+    // rework); exact merged count.
+    // Re-pinned for the tutorial mobile-coach fixes that followed that merge
+    // (SCOPED_POPUP_IDS + the greeting-close window-state resync); exact count.
+    // Re-pinned to the exact merged count of the v0.40.0 sync merge that
+    // brings in the OSSBrain v0.40 batch: the merged file lands below both
+    // parent pins, so the ratchet follows it down. Exact count, zero slack.
+    // Plus 1 for the board-note soft mask: the ONE line is the leaderboard
+    // deps' maskPlayerText wiring onto the existing maskChat. Exact count.
+    // Re-pinned for the signpost guild board window: the construction bag,
+    // the openGuildBoard seam, the noticeboard-event arm, and the close and
+    // relocalize wiring (the window itself lives in
+    // src/ui/hud/guild_board/). Then down one at the controller-tutorial
+    // merge. Exact count, zero slack.
+    // RE-PINNED at the merge of release/v0.41.0 (tip ff2837da1f) into
+    // feature/masterwrought (base 9a89e3483e). BOTH parent pins for the record: ours
+    // 18480, the release 18488. Set to the exact merged count measured on the
+    // merged working tree (wc -l < src/ui/hud.ts), neither parent's literal. Exact
+    // merged count, zero slack: any further growth reds again.
+    // LOWERED 18274 -> 18263 at Masterwrought phase 12 (2026-08-26): the
+    // unbindResult arm's reason-to-key ternary chain moved into the total
+    // UNBIND_DENY_KEY record in src/ui/hud/vendor/unbind_view.ts (the
+    // unbind_perfecting deny joined the vocabulary there, never here). Exact
+    // count, zero slack.
+    // RE-PINNED at the merge of release/v0.41.0 (tip b02da096dd) into
+    // feature/masterwrought. BOTH parent pins for the record: ours 18263, the
+    // release 18488. The release side's wallet-card fan-out and refresh hook
+    // (+2) land against its own comment shrink (-2), so the merged file
+    // measures the same 18263 (wc -l < src/ui/hud.ts). Exact merged count,
+    // zero slack.
+    // Masterwrought phase 13 landed NET ZERO at 18263: the celebration text
+    // moved out to craft_celebration_text_view.ts while the two legendary
+    // event cases and their imports moved in.
+    // LOWERED 18263 -> 18245 at the phase 13 review round: the item-comparison
+    // card (itemCompareBlock plus its per-slot body) moved into the
+    // item_compare_view.ts pure core so the compare card's worn-instance
+    // threading is unit-testable, and Hud keeps a thin consumer; the round's
+    // own additions (the log plainText opt-out, the celebration playCue
+    // consumption, the compare-card wiring) land inside that extraction.
+    // Exact count, zero slack.
+    // LOWERED 18245 -> 18242 at the Masterwrought Phase 13 QA (2026-08-27):
+    // the masterwork and tier-up toast lines' color moved into the
+    // craft_celebration_text_view bundle (craftToastLogLines: the pure core
+    // decides the color, the hud case cannot recolor a shared moment), and
+    // the itemIcon dep widened in place. Exact count, zero slack.
+    // LOWERED 18242 -> 18230 at Masterwrought phase 14 (2026-08-28): the
+    // whole Hud.inputDialog body moved out to src/ui/input_controller.ts (Hud
+    // keeps a thin delegator lending the confirm-trap slot and the pending
+    // no-choice cancel through a deps bag), which pays for the phase's own
+    // wiring (the PerfectingWindow construction, its closeAll case,
+    // relocalize arm, error-toast forward, open/togglePerfecting, and the
+    // crafting deps' onOpenPerfecting line) plus the 7 lines the
+    // hud/professions migration commit had landed over the pin. Exact count,
+    // zero slack.
+    // LOWERED 18230 -> 18220 in the same phase: the sunder completion cue's
+    // log arm landed as predicates in the registered pure cores instead of
+    // inline dispatch code (isSunderCompletionLog in
+    // profession_event_lines_core.ts; the chat-bubble decision and the
+    // Nythraxis vision line set moved verbatim to log_event_route.ts
+    // chatBubbleKind), so the case 'log' body shrank while gaining the cue.
+    // Exact count, zero slack.
+    // LOWERED 18220 -> 18217 wiring the same phase's cap-visibility and
+    // catalyst-readout arms: the masterwrought tooltip block collapsed onto
+    // masterwrought_cap_view.ts masterwroughtTooltipLines (which also brings
+    // the at-cap line), paying for the denial params thread
+    // (craftDenyMessage's retryAfterSeconds pass-through). Exact count, zero
+    // slack.
+    // Release arm, carried for the record: raised to 19002 at the PR #3284
+    // v0.41.0 sync merge (the interface-unlock live hooks: dimension-mode
+    // mover wiring, the edit-preview painter closure, the player-frame bar
+    // lock), after that PR's review-round extraction moved the frames-menu
+    // toggle/select tables, the reset-key table, and the party-sample roster
+    // builder to the pure core interface_unlock_menu_core.ts.
+    // RE-PINNED at the merge of release/v0.41.0 (tip 8592df3866) into
+    // feature/masterwrought (base cb10309ba6). BOTH parent pins for the
+    // record: ours 18217, the release 19002. Set to the exact merged count
+    // measured on the merged working tree (wc -l < src/ui/hud.ts), neither
+    // parent's literal. Exact merged count, zero slack: any further growth
+    // reds again.
+    //
+    // UPSTREAM'S OWN HALF over the remainder of the v0.41.0 span, kept so the
+    // merge drops neither parent's record (the release row rode the
+    // bank-storage branch; its full ledger lives in git on that arm):
     // Re-pinned at the fifth release/v0.41.0 sync (release tip ddc8988185,
     // the gamepad empower-hold batch). The release arm lowered its own pin
     // by 2 when the charge state and the XHB slot lookup moved to
-    // src/ui/empower_hold_core.ts; this branch's arm stays its +3 store and
-    // vault chrome. Measured on the merged tree, never reconciled by
-    // arithmetic. Exact count, zero slack.
+    // src/ui/empower_hold_core.ts; the bank-storage arm stays its +3 store
+    // and vault chrome. Exact count, zero slack.
     // Re-pinned at the sixth release/v0.41.0 sync, now on the PR 3676 arm: the
     // ground-aim branch had down-ratcheted its own row via the quickAimPoint
     // and reticle-sync-closure extractions (one under the empower-hold base),
+    // and the release arm carries the bank-storage +3 above. Exact count,
+    // zero slack.
+    // RE-PINNED at the merge of release/v0.41.0 (tip e19d832b47) into
+    // feature/masterwrought (base d3f8bae369). BOTH parent pins for the
+    // record: ours 18731, the release 19002. The release arm nets zero lines
+    // on this file over the span (its adds land against equal sheds), so the
+    // merged file measures exactly ours' pin (wc -l < src/ui/hud.ts). Exact
+    // merged count, zero slack: any further growth reds again.
+    // THE RELEASE PARENT'S OWN HALF over the v0.41.0 span (tip 3e801dc925),
+    // kept so the merge drops neither parent's record:
     // and the release arm carries the bank-storage +3 above. Measured on the
     // merged tree, never reconciled by arithmetic. Exact count, zero slack.
     // the Ignivar raid consolidation paid its callout/yell additions by moving the pure entity display-label resolver family to entity_display_labels.ts; exact count.
+    // (Since the eighth-sync trim that module keeps only combatAbilityName and
+    // parseSimMoney; the family's live homes are the branch's
+    // entity_display_core.ts, entity_display_name.ts and
+    // ability_tooltip_lines.ts, which won every consumer at the merge.)
     // Re-pinned to the exact count of the ignivar-raid-complete base merge
     // into the Phase B branch: the base's fork landed its own extractions
     // while this branch's healPower seam, sigil-shop progression views, and
@@ -270,10 +371,77 @@ const MONOLITHS: MonolithRow[] = [
     // call into item_affix_tooltip.ts (the Spell Power / Healing Power lines
     // themselves live in that sibling, gather_tool_tooltip pattern). Exact
     // count, zero slack; maintainer-review item.
+    // RE-PINNED at the merge of release/v0.41.0 (tip 3e801dc925, the Ignivar
+    // raid span, 294 commits) into feature/masterwrought (base e19d832b47).
+    // BOTH parent pins for the record: ours 18731, the release 18863. Measured on
+    // the merged tree, never reconciled by arithmetic. Exact merged count,
+    // zero slack: any further growth reds again.
+    // LOWERED 18731 -> 18718 at Masterwrought Phase 18 (2026-08-31, the hud.ts
+    // frontend unit): the toolEffectResult reason ternary moved into
+    // src/ui/hud/professions/tool_effect_result_view.ts, the tooltip
+    // placement math into src/ui/tooltip_clamp_core.ts (gaining the bottom
+    // clamp, the height cap and the mousemove left floor), and the
+    // battleground finish-line colour record into src/ui/hud_tones.ts, which
+    // also names every former inline hex literal (125 of them) by role.
+    // Those pay for the unit's own wiring: the Perfecting and Harvest Journal
+    // rail tiles (click + keycap rows), the commission board's focus pair, and
+    // the three tone imports. Exact count, zero slack.
+    // LOWERED AGAIN 18718 -> 18711 at the same phase's frontend review round,
+    // which is a net -11 from the review unit plus a +4 that is not its own.
+    // THE REVIEW UNIT'S -11, both findings paying for themselves and then some:
+    // the entity_display re-point folded three import statements into one
+    // against entity_display_core.ts and deleted the two re-export shims
+    // (entity_display_name.ts, entity_display_labels.ts), which the row above
+    // still names as live homes: they are gone, and this file's import surface
+    // was the last thing keeping them. The mob-tooltip cap fix took the corner
+    // placement math and its four margin constants into
+    // src/ui/tooltip_clamp_core.ts as mobTooltipCornerPlacement, so the two
+    // paint paths now share one core and the mob path writes the same height
+    // cap the cursor path does (it never wrote one, so it painted under
+    // whatever cap the last cursor tooltip left on the shared box).
+    // THE +4 IS THE CONCURRENT masterwrought-quality wiring landing in the same
+    // phase: masterwroughtTooltipLines gained its tooltipEffectiveQuality
+    // argument, which wrapped one call onto five lines. Recorded rather than
+    // folded in, so the next measure knows which half moved. Measured on the
+    // working tree (wc -l < src/ui/hud.ts), never reconciled by arithmetic.
+    // Exact count, zero slack.
+    // LOWERED 18711 -> 18686 at Phase 18 (U-FE-HUD, 2026-08-31), and it had to
+    // be: the row carried ZERO slack while the phase added two arms here, the
+    // farming press affordance (+13) and the flair line's language key. The
+    // extraction that paid for both is src/ui/target_flair_line_view.ts, which
+    // took the WHOLE of updateTargetDiscordLine's decision surface (is there
+    // anything to show, has anything changed, what markup) out of the
+    // coordinator and left it the element handling. That is the seam this row
+    // names, and it was also the fix's enabler: the stale-locale bug was in the
+    // signature, and a signature buried in a 60-line method inside an 18k-line
+    // file had no unit that could drive it across two locales. It has one now
+    // (tests/target_flair_line_view.test.ts). Net -25 after the two arms, with
+    // four import statements going with the move. Measured with
+    // wc -l < src/ui/hud.ts after biome. Exact count, zero slack.
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
-    ceiling: 18905,
+    // RE-PINNED at the TENTH release sync, the merge of release/v0.42.0 (tip
+    // 22e909839f, 380 commits) into feature/masterwrought (base e6b8edb375).
+    // BOTH parent pins for the record: ours 18686, the release 18905. Measured on
+    // the merged tree with wc -l < src/ui/hud.ts after the phase-close
+    // regeneration, never reconciled by arithmetic: the two arms' extractions
+    // compose, so the merged file is BELOW the higher parent. Exact merged
+    // count, zero slack: any further growth reds again.
+    // LOWERED 18728 -> 18718 at masterwrought Phase 19D (D129,
+    // qr-19-hud-coordinator-fanout-exemption): the blanket hud.ts language
+    // exemption was replaced by a per-memo registry, which cost a
+    // relocalizeCoordinatorMemos arm, and the compass strip's DOM half
+    // (build, paint, relabel) moved out to src/ui/compass_strip_painter.ts to pay
+    // it. The merged file lands ONE line above where it started, so the 11
+    // lines of slack an earlier merge had left are given back and the
+    // zero-slack posture returns: any further growth reds again.
+    // LOWERED again 18718 -> 18716 at the 19D review round: the rest badge's
+    // DOM half (the on/off class plus BOTH of its text sinks) moved out to
+    // src/ui/rest_indicator_painter.ts, which paid for writing the accessible
+    // name beside the tooltip AND for the two-line arena-signature note.
+    // Exact count, zero slack.
+    ceiling: 18716,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -327,8 +495,242 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered again by the castle branch's interior_light_rig.ts extraction;
     // after merging main the merged file lands below both prior pins, so the
     // ceiling is the exact merged count.
+    // Merging approved PRs #3425 and #3447 into the moved-base v0.39 wrapper
+    // keeps the delve tracker and mount prewarm extractions while preserving
+    // the wrapper's later renderer wiring, so the ceiling is the exact
+    // resolved count.
+    // PR #3468 changes the shadow-depth prewarm material contract, but this
+    // wrapper's combined renderer remains at the same resolved count.
+    // Lowered again on the integration branch, which combines three extractions
+    // out of the renderer: the shadow-depth prewarm material factory
+    // (src/render/prewarm_depth_material.ts, PR #3468), the character-visual
+    // pool take/store halves (src/render/characters/pooled_visual_lifecycle.ts,
+    // PR #3473) and the material texture-slot walk
+    // (src/render/material_texture_slots.ts, the streamed-decor reveal gate).
+    // The merged file lands below all three branches' own pins, so the ceiling
+    // is the exact merged count per the ratchet's rule: any growth reds again.
+    // Lowered again by the foliage reveal-gate wiring, which paid for its four
+    // lines by extracting the millisecond rollup into
+    // src/render/frame_ms_stats_core.ts (net -15).
+    // Lowered again by the GPU-preparation admission wiring, which paid for its
+    // lines by extracting the perfStats return-type literal and the renderer's
+    // frame/phase stat shapes into src/render/renderer_perf_stats.ts, so the
+    // report's contract is nameable instead of inline (net -32).
+    // The compile-gate stand-in wiring paid for itself in place: the form/base
+    // visibility fan-out moved to src/render/entity_gate_stand_in_core.ts, which
+    // covers the lines the shapeshift and base-swap stand-ins added (net 0).
+    // Lowered again by the piecewise reveal-gate wiring, which paid for its
+    // soft-deadline binding by extracting the shared reveal compile host
+    // (link, shadow arm, touch tail, learned soft deadline) into
+    // src/render/reveal_compile_host.ts (net -15).
+    // Lowered again by the prewarm slot generalization: the landmark and
+    // weather manifest entries became createPrewarmGroupSlot bindings and the
+    // impact-site prewarm clone moved to its own subsystem module,
+    // buildImpactSitePrewarmGroup in src/render/impact_site.ts (net -2).
+    // Lowered again by the GPU-preparation pacing fixes: three dead type
+    // imports went, and moving the budget's frame boundary into the sync
+    // prologue traded a five-line rationale in the governor for the one that
+    // now sits beside the queue's own noteFrame (net -3).
+    // Lowered again by the live-program telemetry, which paid for its arm by
+    // extracting the renderer's info.programs readouts into
+    // src/render/live_program_watch.ts; the per-draw bracket lives in
+    // frame_present.ts, where the draw is (net -5).
+    // Lowered again when the watch moved onto the injected present host: the
+    // host's placeholder fields went with it (net -1 with the zero-env
+    // prefilter size comment).
+    // Lowered again by the production-named coverage fixes, which paid their
+    // wiring by moving the empty phase-ms fixtures into
+    // renderer_frame_telemetry_core.ts and canvasDataUrlAsync into
+    // canvas_data_url.ts (net -26); the post-effect prewarm lane was then
+    // removed after the bench (its entry never ran inside the boot budget and
+    // resumed live), keeping the extraction (net -24).
+    // The touch tail's readiness threading (the gate result down to
+    // src/render/linked_program_readiness.ts) paid for itself in place: the
+    // single-use compilePriorityFor wrapper folded into the one gate that
+    // called it, the core it delegated to being its whole body (net 0).
+    // Lowered again by the build-ledger instrumentation, which paid for its
+    // producers (timed view and zone feature builds, the arrival mark, the
+    // hitch sample's two new fields) by moving the zone prepare report and its
+    // stat shapes into src/render/zone_prepare_stats.ts and the hitch scratch
+    // factory into scene_census_core.ts (net -1).
+    // Lowered again by the composed-look pieces hold (the live candidate path
+    // consults characters/look_pieces.ts), which paid for its wiring by moving
+    // the zero foliage readout into renderer_frame_telemetry_core.ts beside
+    // the other zero fixtures and the created-view type sampler into
+    // view_candidate_pool_core.ts (net -16).
+    // Lowered again by the gc hitch cause, whose heap read (heap_sample.ts)
+    // paid for its import and sample line by folding the key-light follow
+    // beside it onto its single statement (net -1).
+    // Lowered again by the deferred-decal stand-in (the live candidate path
+    // builds the body without its face decals and attaches them on the
+    // pieces' arrival), which paid for its wiring by moving the mobile
+    // opening render scale into dynamic_resolution_core.ts (net -1).
+    // Lowered again by the compile gate's piece cut (one queue unit per
+    // material group of the target, compile_gate_pieces.ts): the enumeration
+    // and the per-piece work live in that module, and the gate's rationale
+    // comment was rewritten to the design that ships (net -10).
+    // Lowered again by the hitch sample alignment (hitch_frame_align_core.ts:
+    // the start-of-sync reading and the aligned end-of-sync sample), which
+    // paid for its wiring by extracting the perfStats last-frame deep copy
+    // into src/render/renderer_frame_stats_snapshot.ts (net -21).
+    // Lowered again by the compile gate's variant settle
+    // (program_variant_settle.ts, the third piece arm both gates bind), which
+    // paid for its wiring by moving the open-air fog predicate beside the
+    // FogSceneState it classifies (interior_light_rig.ts isOpenAirFogState),
+    // landing with the shadow arm's every-mesh twin swap in the same change
+    // (net -3).
+    // Lowered again when the world gates' touch tail moved behind
+    // linked_program_touch_lane.ts runWorldGateTouchLane (no walk mark, the
+    // unproven walk recorded as a touch-unproven event) (net -2).
+    // The upstream/main merge landed upstream's own growth (the mount-program
+    // prewarm entry, the delve tracker extraction) on top of this branch's
+    // extractions, so the pin is the exact merged count, still lower than
+    // upstream main's own (13744), and any growth reds again.
+    // RECORDED RAISE at the farming absorb (masterwrought Phase 11d,
+    // decision 4 as amended 2026-08-20): the merge of
+    // origin/feature/farming-plan composes farming's 30 lines of
+    // farm-visual wiring (its own deviation (an) raise, confirmed thin
+    // wiring at the correct seam by the 11b frontend reviewer) into ours'
+    // smaller file, a two-packet union where neither side's extractions
+    // cover the other side's additions. Both parent pins for the record:
+    // ours 13546, farming 13774 (base 13744), so this is +30 against ours
+    // and a FALL of 198 against farming's own row; 13546 + (13774 - 13744)
+    // composes to the exact merged count. Payback: Phase 16 (the packet's
+    // polish phase), scoped to the merge-attributable growth only.
+    //
+    // The release side of that same history, kept because it is the reason
+    // this row moves again below. Upstream RAISED 13546 -> 13548 (+2) on the
+    // streamed-prewarm branch, and stated it as a raise: it extracts the
+    // compile SUBMIT LOOP with its deadline rule and never-drop contract
+    // (runPrewarmCompileSubmission, src/render/prewarm_compile_submission_core.ts,
+    // beside the per-unit submit that module already owned) and the weapon-skin
+    // resume unit PLAN (weaponVfxPrewarmUnits, src/render/weapon_vfx_prewarm.ts,
+    // beside the stage whose failure boundary shares its unit ids), and those
+    // two extractions still do not quite cover what it adds. That history
+    // matters because it is the failure mode this ratchet exists to catch: an
+    // earlier revision of that branch reported a NET REDUCTION while deleting
+    // 41 lines of load-bearing comments, 11 blank lines and folding three `let`
+    // declarations into one comma statement. Every comment was restored before
+    // it landed, so upstream's +2 is what its extractions alone earn.
+    //
+    // RE-PINNED 13576 -> 13578 at the Phase 11e QA release sync (release tip
+    // fd705304ee, PR #3531's shader-memory probes; prior synced release parent
+    // 2df374a074), under the MONOLITHS header rule for a release sync that
+    // pushes a zero-slack row over. BOTH parent pins for the record: ours
+    // 13576 against a 13576 file, the release 13548 against a 13548 file, and
+    // the base 13546 both descend from. The union composes exactly, which is
+    // why this is a re-pin and not a judgement call: 13546 + 30 (ours, the
+    // farm-visual wiring) + 2 (theirs, the submit-loop residue) = 13578, and
+    // the merged file measures 13578. INHERITED growth, not authored here: the
+    // branch added nothing to renderer.ts in this sync. Per that rule upstream's
+    // code is NOT extracted to buy the two lines back and the ceiling is NOT
+    // raised for headroom.
+    //
+    // UPSTREAM'S OWN HISTORY over the same span, kept because this row's value
+    // is the record of who grew it and why, and the merge must not drop either
+    // parent's half. The release re-pinned 13548 -> 13563 (+15) when the
+    // fast-loading-screen-variety branch merged release/v0.40.0 (its rebase
+    // onto the release had already paid this row's zero-slack pin once, at
+    // 13561 over the pre-streamed-prewarm base): thin-consumer wiring to
+    // extracted seams, the onCharacterAssetReady subscription plus its handler,
+    // which only enqueues a re-apply for views whose weapon skin GLB just
+    // landed, with the substance in src/render/characters/assets.ts (the ready
+    // registry) and src/render/characters/visual.ts (refreshWeaponSkin). Then
+    // 13563 -> 13573 (+10) for that branch's review-fix round: the nearby-view
+    // floor on the shared prewarm budget (the decision lives in
+    // src/render/prewarm_policy.ts portalPrewarmViewBudget and
+    // nearbyPrewarmViewBudget; the renderer carries the two call sites and the
+    // rationale comment) and the weapon-skin early-out in onCharacterAssetReady
+    // (the predicate lives in src/render/characters/assets.ts).
+    //
+    // RE-PINNED AGAIN 13578 -> 13603 at the Phase 11f release sync (release tip
+    // 098372138a, PR #3232's fast loading screens; prior synced release parent
+    // fd705304ee), the FIFTH sync and the fourth consecutive one to touch this
+    // file. BOTH parent pins for the record: ours 13578 against a 13578 file,
+    // the release 13573 against a 13573 file, and the base 13548 both descend
+    // from. The union composes exactly, so this is a re-pin and not a
+    // judgement call: 13548 + 30 (ours) + 25 (theirs) = 13603, and the merged
+    // file measures 13603. PREDICTED at 13603 before the merge ran and observed
+    // at 13603. INHERITED growth on both sides: the branch added nothing to
+    // renderer.ts in this sync either. Upstream's code is NOT extracted to buy
+    // the lines back and the ceiling is NOT raised for headroom. Exact merged
+    // count, zero slack: any further growth reds again.
+    //
+    // RE-PINNED AGAIN 13603 -> 13614 at the Phase 11g QA release sync (release
+    // tip 3e49dc11b3, PR #3566's rift long-session perf work; prior synced
+    // release parent 098372138a), the SIXTH sync and the fifth consecutive one
+    // to touch this file. BOTH parent pins for the record: ours 13603 against a
+    // 13603 file, the release 13584 against a 13584 file, and the base 13573
+    // both descend from. The union composes exactly, so this is a re-pin and
+    // not a judgement call: 13573 + 30 (ours) + 11 (theirs) = 13614, and the
+    // merged file measures 13614. INHERITED growth on both sides again: Phase
+    // 11g is a content-table phase and added nothing to renderer.ts. Upstream's
+    // code is NOT extracted to buy the lines back and the ceiling is NOT raised
+    // for headroom. Exact merged count, zero slack: any further growth reds
+    // again.
+    //
+    // UPSTREAM'S OWN HISTORY over this span, kept so the merge drops neither
+    // parent's half. The release re-pinned 13548 -> 13551 when its rift
+    // long-session perf branch merged this base (both parents grew the file
+    // independently: the base's interior resource registry wiring, that
+    // branch's object-view material disposal, sparkle tags and rift build-key
+    // cooldown, all thin consumers of extracted modules), then +8 in its own
+    // review round when the rift build-failure cooldown swapped an untracked
+    // setTimeout (a handle that outlives teardown and can fire into a recycled
+    // renderer) for a timestamp gate, the gate logic living in
+    // src/render/build_retry_gate.ts and the renderer keeping only the
+    // coordinator's thin wiring. It then re-pinned to the exact count of its
+    // own merged file at 13584.
+    //
+    // RE-PINNED AGAIN 13614 -> 13571 at the Phase 11h release sync (release tip
+    // 50462dda83, PR #3582's entry-admission perf work; prior synced release
+    // parent 3e49dc11b3), the SEVENTH sync and the sixth consecutive one to
+    // touch this file. IT LOWERS, which is the first time this row has moved
+    // DOWN at a sync, and the ratchet takes the lower number without argument.
+    // BOTH parent pins for the record: ours 13614 against a 13614 file, the
+    // release 13541 against a 13541 file, and the base 13584 both descend from.
+    // The union composes exactly, so this is a re-pin and not a judgement call:
+    // 13584 + 30 (ours) - 43 (theirs) = 13571, and the merged file measures
+    // 13571. PREDICTED at 13571 before the merge ran and observed at 13571.
+    // Phase 11h is a content-table phase and added nothing to renderer.ts.
+    // Exact merged count, zero slack: any further growth reds again.
+    //
+    // UPSTREAM'S OWN HISTORY over this span, kept so the merge drops neither
+    // parent's half, and it is why the number fell: entry-detail admission
+    // moved the settle step ahead of compile and texture collection while
+    // deleting the old reveal-time arm; the initial-scene texture collection
+    // and shared admission cursor were extracted into
+    // src/render/initial_scene_texture_admission.ts; the compile-root
+    // collection, near-first ordering and program-content dedupe were extracted
+    // into src/render/initial_scene_compile_units.ts; the release's rift
+    // lifecycle wiring landed on top of that; and its review hardening restored
+    // the measured residency rationale at its live call site and added only
+    // thin wiring for rebuild reveal-gate installation, entry-barrier cleanup
+    // and observed display pacing, with the policy and timer ownership left in
+    // sibling modules. The release re-pinned to its own exact 13541.
+    // LOWERED 13571 -> 13569 at the 11l QA's sixteenth sync
+    // (release/v0.40.0 efb1220e85 -> 9a89e3483e, merge 7553c795): the
+    // release's far-LOD repair (ec5e9e9afa, 13549 -> 13539, under the
+    // release's own ceiling of 13541) had already
+    // landed through the sync that merged efb1220e85 (57b1a09d43, the 11k
+    // QA's), whose re-measure covered the hud/sim/main/game/online/db rows
+    // but not this one, so the branch parent carried two lines of unbanked
+    // slack under a zero-slack comment; the merge audit measured the merged
+    // file at 13569 (base 13539 + 30 ours). Exact merged count, zero slack:
+    // any further growth reds again.
+    //
+    // UPSTREAM'S OWN HALF over the release/v0.41.0 span, kept so the merge drops
+    // neither parent's record:
     // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
     // rework); exact merged count.
+    // RE-PINNED at the merge of release/v0.41.0 (tip ff2837da1f) into
+    // feature/masterwrought (base 9a89e3483e). BOTH parent pins for the record: ours
+    // 13569, the release 13329. Set to the exact merged count measured on the
+    // merged working tree (wc -l < src/render/renderer.ts), neither parent's
+    // literal. Exact
+    // merged count, zero slack: any further growth reds again.
+    // UPSTREAM'S OWN HALF over the remainder of the v0.41.0 span, kept so the
+    // merge drops neither parent's record:
     // +1 for the entry horizon's scenery cull far at the live frame (one local
     // the four reveal-gated painters share); the prewarm frame inlines it.
     // Re-pinned at the v0.41.0 sync merge: the release arm's battleground
@@ -336,10 +738,31 @@ const MONOLITHS: MonolithRow[] = [
     // the branch's +1 above, so the merged file is 13331. Exact merged count,
     // zero headroom.
     // Re-pinned again after PR 3670 (bank storage) merged: its arm carried the
-    // exact release-side count 13328 (it never touches renderer.ts), while this
-    // branch's renderer edits still land the merged file at 13331. Measured on
-    // the merged tree. Exact merged count, zero headroom.
+    // exact release-side count 13328 (it never touches renderer.ts), while
+    // that branch's renderer edits still land the merged file at 13331.
     // Re-pinned at the PR 3676 sync after PR 3645 (entry fade gate) merged:
+    // that arm's entry-horizon cull and the ground-aim reticle pass-through
+    // both land in the merged file. Exact merged count, zero headroom.
+    // RE-PINNED at the merge of release/v0.41.0 (tip e19d832b47) into
+    // feature/masterwrought (base d3f8bae369). BOTH parent pins for the
+    // record: ours 13357, the release 13333. Both arms grew the file over the
+    // base and the union composes (ours +30, the release +6), so the merged
+    // file measures 13363 (wc -l < src/render/renderer.ts). INHERITED growth
+    // on the release arm (the entry-horizon cull and the compile gate). Exact
+    // merged count, zero slack: any further growth reds again.
+    // LOWERED at Phase 16 (2026-08-29): the farming absorb's recorded +30
+    // raise is PAID (rulings 11d-D-4 and 11d-U6-FIFTH; target 13333 by the
+    // moved-baseline arithmetic) by extracting the zone/archetype
+    // prewarm-group builder family into src/render/zone_prewarm_groups.ts
+    // (the mount_prewarm/great_tree_prewarm sibling shape). The file
+    // measured 13116 at the extraction commit (wc -l < src/render/renderer.ts).
+    // Adjusted in the same phase: Arm 1's orange-identity emit call and
+    // cached predicate, plus the visualPoolKeyFor cross-pointer comment from
+    // the review round (2026-08-29, +2), add the lines between 13116 and this
+    // count. Exact count, zero slack: any further growth reds again; the paid
+    // target 13333 stays cleared by exactly 200 lines.
+    // THE RELEASE PARENT'S OWN HALF over the v0.41.0 span (tip 3e801dc925),
+    // kept so the merge drops neither parent's record:
     // that arm's entry-horizon cull and this branch's ground-aim reticle
     // pass-through both land in the merged file. Measured on the merged tree,
     // never reconciled by arithmetic. Exact merged count, zero headroom.
@@ -351,14 +774,29 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at the PR 3685 base sync (release v0.41.0 through the raid
     // branch): both arms edited the renderer and the union lands at the count
     // below. Measured on the merged tree. Exact merged count, zero headroom.
+    // RE-PINNED at the merge of release/v0.41.0 (tip 3e801dc925, the Ignivar
+    // raid span, 294 commits) into feature/masterwrought (base e19d832b47).
+    // BOTH parent pins for the record: ours 13133, the release 13249. Measured on
+    // the merged tree, never reconciled by arithmetic. Exact merged count,
+    // zero slack: any further growth reds again.
+    // Lowered 13049 -> 13023 at the Masterwrought phase 18 farm producer unit:
+    // the compile gate's shadow arm moved to src/render/shadow_depth_compile.ts
+    // (a thin wrapper stays), which paid for the farm gate closure, the gate
+    // label parameter, the zone-prewarm host weld and the single-sited farm
+    // drive.
     // Re-pinned at the release/v0.42.0 sync of the Chimeglass Tortoise PR
     // (#3439, carrying the Lanternback Troll of #3399): the rideable-mount
     // lifecycle (build, live swap, teardown, rider seating, carried lamps
     // and glows, the summon/dismount FX) moved to src/render/mount_lifecycle.ts,
-    // and the release arm's rickshaw hooks moved with it, so the merged file
-    // lands below both prior pins. Measured on the merged tree. Exact merged
-    // count, zero headroom.
-    ceiling: 13214,
+    // and the release arm's rickshaw hooks moved with it. Composed with the
+    // Masterwrought extraction above, the merged file measures 12992 lines
+    // after the compile-gate stand-in fix found by the semantic merge audit.
+    // Exact merged count, zero headroom.
+    // Lowered 12992 -> 12989 in PR 3872's final cleanup after the farm
+    // compile gate gained its narrow actionable-priority override. Measured
+    // after formatting, banking the three remaining inherited lines of slack.
+    // Exact count, zero headroom.
+    ceiling: 12989,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -392,44 +830,90 @@ const MONOLITHS: MonolithRow[] = [
     // Exact merged count against release/v0.40.0 (tip eb20752e9e), still
     // far under the pre-marketplace 12660 row.
     file: 'src/sim/sim.ts',
-    // Lowered from 12660 by Bank Storage phase 11: the default-bank literal
-    // and the SavedBankState write literal moved into src/sim/bank.ts
-    // (emptyBankState / savedBankState), so the bank blob's shape is owned
-    // by ONE module and a new BankState field lands there once, never per
-    // sim.ts call site.
-    // Re-pinned 12632 -> 12661 across the fourth release/v0.40.0 sync into the
-    // bank-storage branch. Every one of the 29 lines is the RELEASE's: the rift
-    // perf set (spent-corpse skipping, the collider-cell index) grew sim.ts from
-    // 12518 to 12547 under the release's own 12660 ceiling, while this branch had
-    // already banked its phase 11 extraction down to an exact zero-slack 12632.
-    // The branch contributes no sim.ts line to the merge, so the honest bound is
-    // the merged count. Extracting the release's rift lines to buy the room back
-    // is the move this file's hud.ts row records as REVERTED: refactoring code a
-    // change does not own inflates the diff and risks regressions elsewhere.
-    // Exact merged count, zero slack: any further growth reds again.
-    // LOWERED 12661 -> 12660 by Bank Storage phase 15: the IWorld getter for the
-    // always-available ladder read is paid for by moving the host-stamped
-    // bank-bonus write into src/sim/bank.ts (applyBankBonusStamp), the same
-    // one-module-owns-the-blob rule the phase 11 note above records.
-    // Re-pinned at the FIFTH release/v0.40.0 sync: the release's own arm went
-    // DOWN to 12560 (the supported-sight and lethal-fall refactors), and its
-    // deletions land on top of this branch's phase 11 and phase 15 extractions.
-    // Exact merged count, re-derived from the merged tree, zero slack.
-    // Re-pinned at the SIXTH release/v0.40.0 sync (release tip 9a89e3483e): the
-    // release's arm went 12560 -> 12565 while this branch sat at 12673 with its
-    // phase 11 and phase 15 extractions. Merged count is base plus both deltas.
-    // LOWERED 12678 -> 12660 by Phase 16 QA. The spectate guard on the money
-    // scope needs `spectating` as a real IWorld member, which costs this file a
-    // field, so it is paid for by extracting RewardCounters and its zero value
-    // into src/sim/reward_counters.ts (the one-module-owns-the-blob rule the
-    // phase 11 note above records for the bank blob). The extraction frees 20
-    // and the guard spends 2, so the ratchet keeps the other 18.
-    // Exact merged count, re-derived from the merged tree, zero slack.
-    // Re-pinned at the release/v0.41.0 sync into the bank-storage branch (the New
-    // Eastbrook program, which retires the Vale Cup and demolishes the Sowfield).
-    // The release arm DELETES more than this branch adds, so the merged count lands
-    // below the branch pin and the ratchet follows it DOWN. Measured on the merged
-    // tree, never reconciled by arithmetic. Exact count, zero slack.
+    // Re-pinned at the farming absorb (masterwrought Phase 11d, the
+    // 11b-qa-B8 second-arm row): the pin previously sat 309 lines above the
+    // file with no comment, un-banked slack. The merged file FALLS under
+    // ours' pin because both packets extracted independently: farming's own
+    // row comment (verbatim at 8cd964d599) records its three extractions,
+    // the M5 boss support kit to src/sim/mob/boss_mechanics.ts, the retired
+    // mobMeleeRange / mobCombatProfile delegates, and countItem thinned
+    // over the shared countRawInSlots walk, landing its file at 12229 under
+    // its 12232 pin (all live at the absorbed tip: the delegate pair stayed
+    // retired), while this branch's pin stood at 12650. The merged count
+    // composes as base 12518 plus ours' +111 minus farming's -289, plus the
+    // one comment line the 11c QA trued. ALL THREE parent pins for the record
+    // (hud.ts sets the precedent of naming its third): ours 12650, farming
+    // 12232, and the release 12660 against a 12518 file at both f50b30de29 and
+    // 35a6481825. 12341 lands under all three. Exact merged count, zero slack:
+    // any further growth reds again.
+    //
+    // RE-PINNED 12341 -> 12370 at the Phase 11g QA release sync (release tip
+    // 3e49dc11b3). This row did not CONFLICT, which is exactly why it needed
+    // measuring rather than reading: the release grew src/sim/sim.ts by 29
+    // lines (the rift long-session work, whose substance lives in
+    // src/sim/collider_cells.ts and src/sim/mob/locomotion.ts) while never
+    // touching this row, because its own ceiling still sat at 12660 over a
+    // 12518 file. Ours had ratcheted the ceiling down to the extracted file's
+    // exact 12341, so the merged file lands 29 over a pin neither parent's
+    // diff mentions. BOTH parent pins for the record: ours 12341 against a
+    // 12341 file, the release 12660 against a 12547 file, base 12518. The
+    // union composes exactly: 12341 + 29 (theirs) = 12370, and the merged file
+    // measures 12370. INHERITED growth: Phase 11g is a content-table phase and
+    // added nothing to sim.ts. Upstream's code is NOT extracted to buy the
+    // lines back and the ceiling is NOT raised for headroom. Exact merged
+    // count, zero slack: any further growth reds again.
+    // RE-PINNED at the Phase 11k QA release sync (the FOURTEENTH sync,
+    // release/v0.40.0 b39b16022e to efb1220e85): RECORDED RAISE of exactly the
+    // release's own growth. This row did not CONFLICT, which is why it was
+    // measured rather than read (the ratchet rows that break without
+    // conflicting). Base 12547, ours 12370 against a 12370 file, the release
+    // 12565 against its own 12565 file: the union composes exactly as
+    // 12370 + 18 (theirs) = 12388, and the merged file measures 12388. INHERITED
+    // growth: Phase 11k authored nothing in sim.ts. Exact merged count, zero
+    // slack.
+    //
+    // UPSTREAM'S OWN HALF over the release/v0.41.0 span, kept so the merge drops
+    // neither parent's record:
+    // Re-pinned to the eastbrook-plus-tutorial integration merge output:
+    // both parents' additions combine, so keep the exact merged count.
+    // Re-pinned for the local tutorial-tweaks merge (the staged first death and
+    // the ability drill hook into the coordinator); exact merged count.
+    // Re-pinned +14 for the guild pledge board: setPlayerPledge (the server's
+    // nameplate stamp entry) and the four IWorld facet no-op stubs, the
+    // sanctioned both-worlds implementation seam. Exact count.
+    // Re-pinned to the exact merged count of the v0.40.0 sync merge (the
+    // OSSBrain v0.40 batch on the release arm). Exact count, zero slack.
+    // Plus 7 for the guildRoster IWorld stub (guilds are online-only, so the
+    // offline arm resolves null; the sanctioned both-worlds seam). Exact
+    // count, zero slack.
+    // Plus 7 at the v0.39.3 main back-merge: the Double Honor port grew the
+    // sim arm on main while the release pin sat at zero slack (the known
+    // both-arms compound). Exact merged count, zero slack.
+    // AT THE MERGE OF release/v0.41.0 (tip ff2837da1f) into feature/masterwrought
+    // (base 9a89e3483e): BOTH parent pins for the record, ours 12388, the
+    // release 12538. The release's value stood in as a placeholder while
+    // src/sim/sim.ts was still mid-resolution, then the row was re-measured on
+    // the fully resolved merged tree (wc -l < src/sim/sim.ts):
+    // the merged file lands below both parent pins (the release retired the
+    // Vale Cup arms this branch had kept), so the ratchet follows it down.
+    // Exact merged count, zero slack.
+    //
+    // RE-PINNED 12361 -> 12326 at Masterwrought Phase 12 (the Perfecting
+    // stage): the commission-order command emit bodies (the four verbs plus
+    // their two private board lookups) moved to
+    // src/sim/professions/commission_order_commands.ts, leaving four one-line
+    // delegates; the phase's own additions here are the two thin Perfecting
+    // delegates (perfectItem/perfectingInfo onto professions/perfecting.ts).
+    // Extraction first, then the phase's lines, netting 35 UNDER the old
+    // ceiling; the ceiling follows the file down. Exact count, zero slack.
+    // RE-PINNED 12326 -> 12324 at Masterwrought phase 14 (the daily-gate
+    // refusal countdown): the craftItem craftResult emit block moved into
+    // professions/crafting.ts emitCraftResult (the fourth copy of that emit;
+    // rule of three), paying for the host-fed dailyResetRemainingSec field,
+    // its buildSimContext getter, and the import. Exact count, zero slack.
+    //
+    // UPSTREAM'S OWN HALF over the remainder of the v0.41.0 span, kept so the
+    // merge drops neither parent's record:
     // Lowered after CharacterState and PetState moved to the type-only
     // character_state.ts leaf. Persistence callers keep the sim.ts re-export,
     // while the coordinator no longer owns the JSONB schema declaration.
@@ -439,12 +923,20 @@ const MONOLITHS: MonolithRow[] = [
     // Raised +3 at the third-round fixes for craftVaultDrawBlockedFor, the
     // cvault wire signature's gate-only probe: a one-line delegate to the
     // materials_vault module (which owns the logic), the same thin-consumer
-    // shape as its craftVaultStockFor neighbor. The raise is this PR's
-    // REQUEST, not a settled ruling: merging is what ratifies it. Exact
-    // count, zero slack.
+    // shape as its craftVaultStockFor neighbor.
     // Plus 4 for the groundAimPlacementPreview IWorld member (the placement
     // reticle's true-landing preview; the sanctioned both-worlds seam, a
     // one-line delegate into combat/heroic_leap.ts). Exact count, zero slack.
+    // RE-PINNED at the merge of release/v0.41.0 (tip e19d832b47) into
+    // feature/masterwrought (base d3f8bae369). BOTH parent pins for the
+    // record: ours 12324, the release 12359. The release's character_state
+    // extraction lands on top of the packet's own extractions, so the merged
+    // file falls BELOW both parent pins and the ratchet follows it down:
+    // measured 12128 (wc -l < src/sim/sim.ts), never reconciled by
+    // arithmetic. Exact merged count, zero slack: any further growth reds
+    // again.
+    // THE RELEASE PARENT'S OWN HALF over the v0.41.0 span (tip 3e801dc925),
+    // kept so the merge drops neither parent's record:
     // Re-pinned at the sixth release/v0.41.0 sync: the release arm's own row
     // moved down across the bank-storage and entry-fade merges while this
     // branch keeps its +4 above. Measured on the merged tree, never
@@ -464,7 +956,37 @@ const MONOLITHS: MonolithRow[] = [
     // Plus 2 for the Phase B set-bonus seam: the set_bonus_mods import and
     // the setPlayerLevel writer routing through computeCharacterModifiers
     // (the resolver itself is the extracted module). Exact count, zero slack.
-    ceiling: 12465,
+    // RE-PINNED at the merge of release/v0.41.0 (tip 3e801dc925, the Ignivar
+    // raid span, 294 commits) into feature/masterwrought (base e19d832b47).
+    // BOTH parent pins for the record: ours 12128, the release 12465. Measured on
+    // the merged tree, never reconciled by arithmetic. Exact merged count,
+    // zero slack: any further growth reds again.
+    // LOWERED 12043 -> 12040 at the eighth-sync audit round: the merge had
+    // kept three import tokens whose only uses the two arms' refactors had
+    // moved elsewhere (computeTalentModifiers superseded by the release's
+    // computeCharacterModifiers seam, NYTHRAXIS_SPIRIT_MENDING_CAST_ID's
+    // consumer extracted by the branch to mob/combat_profile.ts, and the
+    // already-dead PersistedFarmPlot type import); the ceiling follows the
+    // file down. Exact count, zero slack.
+    // LOWERED 12040 -> 12038 at masterwrought Phase 18 (the farming/feast
+    // hardening unit): the farm-plot load report (dropped-row counting plus
+    // its dev warn) moved to professions/farm_load_report.ts and the
+    // delve/heroic daily load clamps folded into the existing
+    // professions/daily_gate_load.ts leaf, which together pay for the
+    // phase's own coordinator wiring (the resetDay monotonic accessor, the
+    // transient farmWitheredAnnounced field, the onCropFarmedForQuests seam
+    // binding, and the claimed-instance pass-through on the two award
+    // delegates). Exact count, zero slack.
+    // LOWERED 12038 -> 12028 at Phase 18 (U-NET-WIRE, 2026-08-31): the
+    // auto-equip worn-family gate moved to src/sim/auto_equip_gate.ts (two
+    // conflict rules and the reason auto-equip declines rather than displacing,
+    // now a pure predicate a Vitest drives), which paid for the phase's own
+    // lines here (the placeFeast copy fold and the copy-anchor parameter on the
+    // three discard-class delegates) and left 10 over. Measured with
+    // wc -l < src/sim/sim.ts after biome. Exact count.
+    // Lowered 12028 -> 12006 in PR 3872 cleanup after removing the retired
+    // tutorial action and its write-only account fact. Exact count, zero slack.
+    ceiling: 12006,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -475,6 +997,100 @@ const MONOLITHS: MonolithRow[] = [
     // b650d9d7d2): release-side growth only (its own row went to 11490); the
     // branch's main.ts lines are unchanged. Exact merged count, zero headroom.
     file: 'src/main.ts',
+    // Pinned at the exact merged count. This branch's extractions (the blocking
+    // arrival chain into src/game/arrival_warmup.ts, the world-entry settle
+    // cover joining it) net against the base's pad-selection extraction plus
+    // controller-config growth (src/game/pad_target_pick.ts, ceiling 11552),
+    // landing below both parents' pins. Any further growth reds again.
+    // Re-pinned at the farming absorb (masterwrought Phase 11d, decision 4
+    // as amended): the merged file FALLS under both parent pins (ours
+    // 11516, farming 11460), composing exactly as base 11490 plus ours'
+    // +26 minus farming's -36.
+    //
+    // UPSTREAM'S OWN HISTORY over the same span, kept so the merge drops
+    // neither parent's half of the record. The release re-pinned 11516 ->
+    // 11522 (+6) for the fast-loading-screen-variety rebase onto
+    // release/v0.40.0: net-extractive there, MOVING the eager mob-body stream,
+    // far-vista settle and background preload lane out of the entry path into
+    // src/game/post_entry_warmups_core.ts and the backdrop rotation into
+    // src/ui/loading_backdrop.ts, leaving main.ts the call wiring for both
+    // (the controller construction and the runPostEntryWarmups options
+    // object), which is the firewall's job. Then 11522 -> 11534 (+12) for that
+    // branch's review-fix round: the mob-body stream kick moved from the
+    // post-fade callback to the first-paint checkpoint
+    // (kickCharacterPreloadStream, the seam stays in
+    // src/game/post_entry_warmups_core.ts), costing the call wiring plus the
+    // placement rationale where the reader needs it.
+    //
+    // RE-PINNED 11480 -> 11498 at the Phase 11f release sync (release tip
+    // 098372138a, prior synced release parent fd705304ee). BOTH parent pins for
+    // the record: ours 11480 against an 11480 file, the release 11534 against
+    // an 11534 file, and the base 11516 both descend from. The union composes
+    // exactly: 11516 - 36 (ours, the arrival-chain extractions) + 18 (theirs,
+    // the loading-screen wiring) = 11498, and the merged file measures 11498.
+    // PREDICTED at 11498 before the merge ran and observed at 11498. The
+    // release's own 11534 is NOT taken: it sits 36 lines above the merged file
+    // and would hand this row free slack it never earned, which is exactly the
+    // silent-raise the ratchet exists to prevent. INHERITED growth, so
+    // upstream's code is NOT extracted to buy the lines back. Exact merged
+    // count, zero slack: any further growth reds again.
+    //
+    // RE-PINNED 11498 -> 11500 at the Phase 11h release sync (release tip
+    // 50462dda83, prior synced release parent 3e49dc11b3). THIS ROW DID NOT
+    // CONFLICT IN src/main.ts ITSELF: the file auto-merged cleanly and only
+    // this ceiling broke, which is the exact class the Phase 11g QA recorded
+    // against src/sim/sim.ts and the reason a release sync MEASURES every
+    // ceiling whose file the release touched rather than only the ones git
+    // marked. A conflict marks disagreement about TEXT; the ratchet is about
+    // SIZE. BOTH parent pins for the record: ours 11498 against an 11498 file,
+    // the release 11536 against an 11536 file, and the base 11534 both descend
+    // from. The union composes exactly: 11534 - 36 (ours, the arrival-chain
+    // extractions, already banked) + 2 (theirs) = 11500, and the merged file
+    // measures 11500. The release's own 11536 is NOT taken: it sits 36 lines
+    // above the merged file and would hand this row free slack it never
+    // earned. INHERITED growth, so upstream's code is NOT extracted to buy the
+    // two lines back and the ceiling is NOT raised for headroom.
+    //
+    // UPSTREAM'S OWN HALF of this span, kept so the merge drops neither
+    // parent's record: the bounded first-paint gate is now owned per startGame
+    // invocation rather than by a mutable render-core singleton, its browser
+    // timer living in the sibling adapter, so main pays only factory and arm
+    // wiring. Exact merged count, zero slack: any further growth reds again.
+    //
+    // UPSTREAM'S OWN HALF of this span, kept so the merge drops neither parent's
+    // record. The touch UI rework moved this row twice on its own arm, ending at
+    // a zero-slack 11519:
+    // Raised 11516 -> 11517 (+1) for the touch bar editor: the More tray's Edit
+    // control routes through MobileControlCallbacks, whose bag is wired here and
+    // nowhere else, so the ONE line is `onBarEditor: () => hud.toggleBarEditor()`.
+    // Everything with substance (the grid model, the tap state machine, the
+    // window) lives in src/ui/hud/action_bar/bar_editor/, and the same change
+    // LOWERS hud.ts by 185. Maintainer decision, exact merged count: any further
+    // growth reds again.
+    // RESTORED and LOWERED 11517 -> 11499 by tap mode: raising a ceiling is a
+    // maintainer decision, so that +1 is paid back with an extraction rather than
+    // kept. main.ts carried a private escapeHtml duplicating src/ui/esc.ts, the
+    // canonical escaper the repo already mandates for every interpolation, so the
+    // copy is deleted and its 36 call sites use esc(). Exact count, zero slack.
+    //
+    // RE-PINNED 11500 -> 11483 at the Phase 11i QA release sync (release tip
+    // 14ab2e8630, prior synced release parent 50462dda83). BOTH parent pins for
+    // the record: ours 11500 against an 11500 file, the release 11519 against an
+    // 11519 file, and the base 11536 both descend from. The union composes
+    // exactly: 11536 - 36 (ours, the arrival-chain extractions, already banked)
+    // - 17 (theirs, the escapeHtml to esc() extraction net of the bar editor's
+    // +1) = 11483, and the merged file measures 11483. PREDICTED at 11483 from
+    // the two deltas before the file was measured, observed at 11483. The
+    // release's own 11519 is NOT taken: it sits 36 lines above the merged file
+    // and would hand this row free slack it never earned. Exact merged count,
+    // zero slack: any further growth reds again.
+    // RE-PINNED at the Phase 11k QA release sync (the FOURTEENTH sync,
+    // release/v0.40.0 b39b16022e to efb1220e85): the merged file FALLS under both
+    // parent pins (ours 11483, the release 11497), composing exactly as base
+    // 11519 - 36 (ours) - 22 (theirs) = 11461. Exact merged count, zero slack.
+    //
+    // UPSTREAM'S OWN HALF over the release/v0.41.0 span, kept so the merge drops
+    // neither parent's record:
     // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
     // rework); exact merged count.
     // Re-pinned to the exact merged count of the v0.40.0 sync merge (the
@@ -484,10 +1100,56 @@ const MONOLITHS: MonolithRow[] = [
     // the ratchet follows the merged file down). Exact count, zero slack.
     // Re-pinned to the exact merged count of the v0.39.3 main back-merge
     // (the utc_day import consolidation shed one line).
+    // RE-PINNED at the merge of release/v0.41.0 (tip ff2837da1f) into
+    // feature/masterwrought (base 9a89e3483e). BOTH parent pins for the record: ours
+    // 11461, the release 11566. Set to the exact merged count measured on the
+    // merged working tree (wc -l < src/main.ts), neither parent's literal. Exact
+    // merged count, zero slack: any further growth reds again.
+    // RE-PINNED at the merge of release/v0.41.0 (tip b02da096dd) into
+    // feature/masterwrought. BOTH parent pins for the record: ours 11530, the
+    // release 11564. The release span's balance-refresh rework sheds comment
+    // lines against its additions, so the merged file measures 11528
+    // (wc -l < src/main.ts), under both parents; the ratchet follows it down.
+    // Exact merged count, zero slack.
+    // Release arm, carried for the record: down 11564 -> 11563 at the
+    // desktop-signing round: the wallet-handoff availability probe and browser
+    // authorizer moved to src/net/desktop_wallet_handoff.ts (thin hoisted
+    // delegators remain), paying for the Exchange desktop-signer wiring at the
+    // attach site.
+    // RE-PINNED at the merge of release/v0.41.0 (tip cb10309ba6) into
+    // feature/masterwrought (base b02da096dd). BOTH parent pins for the record:
+    // ours 11528, the release 11563. The release span's one-line shed lands on
+    // top of ours, so the merged file measures 11527 (wc -l < src/main.ts), under
+    // both parents; the ratchet follows it down. Exact merged count, zero slack.
+    // Release arm, carried for the record: raised to 11629 at the PR #3284
+    // v0.41.0 sync merge (the applySetting arms for the interface-editor
+    // settings: frame dimensions, aura direction vars, the player-frame bar
+    // lock; folding them behind a src/game/ settings-application seam is
+    // flagged follow-up work on the release side).
+    // RE-PINNED at the merge of release/v0.41.0 (tip 8592df3866) into
+    // feature/masterwrought (base cb10309ba6). BOTH parent pins for the
+    // record: ours 11527, the release 11629. Set to the exact merged count
+    // measured on the merged working tree (wc -l < src/main.ts), neither
+    // parent's literal. Exact merged count, zero slack: any further growth
+    // reds again.
+    // UPSTREAM'S OWN HALF over the remainder of the v0.41.0 span, kept so the
+    // merge drops neither parent's record:
     // Re-pinned across the v0.41.0 sync merges after the first-spawn intro's
     // seen-marker persistence moved out into src/game/spawn_intro_seen.ts
     // (the establishing-shot entry wait needed one line here, and the ratchet
     // pays for it by extraction).
+    // The empower-hold sync merge lowered the release row by 1 (the pad cast
+    // routing lives in src/game/pad_cast_routing.ts), and the PR 3676 sync's
+    // reticle-sync closure extraction paid 2 more under the entry-fade row.
+    // RE-PINNED at the merge of release/v0.41.0 (tip e19d832b47) into
+    // feature/masterwrought (base d3f8bae369). BOTH parent pins for the
+    // record: ours 11593, the release 11623. Both arms shed lines over the
+    // base (ours -6, the release -6 via the extractions above), so the merged
+    // file falls BELOW both parent pins and the ratchet follows it down:
+    // measured 11587 (wc -l < src/main.ts). Exact merged count, zero slack:
+    // any further growth reds again.
+    // THE RELEASE PARENT'S OWN HALF over the v0.41.0 span (tip 3e801dc925),
+    // kept so the merge drops neither parent's record:
     // Down 11564 -> 11563 at the desktop-signing round: the wallet-handoff
     // availability probe and browser authorizer moved to
     // src/net/desktop_wallet_handoff.ts (thin hoisted delegators remain),
@@ -510,7 +1172,27 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the v0.41.0 base sync into the
     // raid branch: both arms extracted and added independently, so neither
     // parent pin fits the combined file; the merged count is the honest bound.
-    ceiling: 11551,
+    // RE-PINNED at the merge of release/v0.41.0 (tip 3e801dc925, the Ignivar
+    // raid span, 294 commits) into feature/masterwrought (base e19d832b47).
+    // BOTH parent pins for the record: ours 11587, the release 11551. Measured on
+    // the merged tree, never reconciled by arithmetic. Exact merged count,
+    // zero slack: any further growth reds again.
+    // LOWERED 11515 -> 11509 at Masterwrought Phase 18 (2026-08-31, the hud.ts
+    // frontend unit): the sheathe keybind's cue-on-state-change rule, carried
+    // verbatim at BOTH dispatch sites, moved to src/game/sheathe_toggle.ts,
+    // paying for the Perfecting keybind's two dispatch cases (keyboard and
+    // gamepad, the silent-drop bug class). Exact count, zero slack.
+    // LOWERED 11509 -> 11459 at the Phase 18 QA. Two movements, recorded apart
+    // because only the second is work: the tenth sync (release/v0.42.0) left the
+    // file at 11469, forty under the ceiling, and a ratcheted row is supposed to
+    // carry ZERO slack, so that alone owed a re-pin the merge did not make. Then
+    // the QA deleted main.ts's byte-identical private copy of trackMetaPixel and
+    // imported src/game/meta_pixel.ts instead, a further ten lines. That copy was
+    // not merely duplication: it meant three shipped pixel events (GitHubClick,
+    // DiscordClick and the registration send) were covered by NOTHING
+    // behavioral, since the only suite that drives the sender drives the module.
+    // Measured with wc -l after biome. Exact count, zero slack.
+    ceiling: 11459,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -529,44 +1211,89 @@ const MONOLITHS: MonolithRow[] = [
     // in the self-snapshot build plus its wireParkedMana import); the
     // branch's own surface is unchanged (exact merged count, zero headroom).
     file: 'server/game.ts',
-    // Lowered from 10900 with the vault-wire extraction (server/vault_wire.ts
-    // took the vault dispatch bodies, the cvault cadence rule, and the
-    // craft-consume batch); bank-storage phase 06+ server code lands THERE,
-    // never here. The ZERO margin is deliberate, a hard stop rather than the
-    // usual small slack: any growth of this file, one line included, is a
-    // conscious extraction-or-maintainer decision. Re-derived at the
-    // release/v0.40.0 sync: the release side grew the file (item lock,
-    // market sort dispatch, and friends), so the zero-margin pin moved to
-    // the merged size (10944). Lowered again by Bank Storage phase 07: the
-    // three inline personal-bank case bodies moved into server/bank_wire.ts,
-    // paying for the six-label case group and the socket HEAVY_SELF entries
-    // with seven lines to spare, and the phase 07 QA gate then deleted the
-    // caller-less replaceLiveAccountCosmetics (its caller left with the
-    // release's 1339b8f75d, and the dead member redded the changed-files
-    // biome step). Lowered again by Bank Storage phase 09: the boot SimConfig
-    // assembly moved to server/sim_boot_config.ts (where the STORAGE_PRICES
-    // knob joins it), leaving only the perfLap closure at the call site. The
-    // ratchet keeps every line of all three drops.
-    // LOWERED 10896 -> 10895 by Bank Storage phase 15: the bank family's
-    // self-block emission (both the proximity-gated `bank` and the new
-    // always-available `bpsl`) moved behind one call into server/bank_wire.ts,
-    // which already owns bankInfoForWire and the bank dispatch bodies. Same
-    // move phase 07 made for the dispatch cases: new wire surface lands in the
-    // sibling and this ceiling goes DOWN.
-    // Re-pinned at the FIFTH release/v0.40.0 sync: the release's own arm went
-    // DOWN to 10813 while this branch sat at 10895 with its bank wire. Both land
-    // in the merged tree, so the exact merged count is the honest bound. The
-    // ZERO margin above still holds: any growth is an extraction-or-maintainer
-    // decision.
-    // Re-pinned at the SIXTH release/v0.40.0 sync (release tip 9a89e3483e): the
-    // release's arm grew 10813 -> 10833 (the suspicion-flag dataset and friends)
-    // on top of this branch's 10814. Merged count is base plus both deltas. The
-    // ZERO margin above still holds: any growth is extraction-or-maintainer.
-    // Re-pinned at the release/v0.41.0 sync into the bank-storage branch (the New
-    // Eastbrook program, which retires the Vale Cup and demolishes the Sowfield).
-    // The release arm DELETES more than this branch adds, so the merged count lands
-    // below the branch pin and the ratchet follows it DOWN. Measured on the merged
-    // tree, never reconciled by arithmetic. Exact count, zero slack.
+    // LOWERED 10890 -> 10761 at the Phase 11d QA, banking un-banked slack the
+    // way the same packet already treated sim.ts (whose row called a pin
+    // sitting above its file "with no comment" a defect, not a licence). The
+    // merged file composes exactly: base 10894 - 32 (ours) - 101 (farming) =
+    // 10761. Ours' pin was 10890 against a 10862 file, so 28 lines of slack
+    // pre-dated the merge and the merge added 101 more; left alone, the two
+    // server monoliths a crafting and farming packet is most likely to grow
+    // could take 129 more lines with the ratchet green. Parent pins for the
+    // record: ours 10890, farming and release 10900. Exact merged count, zero
+    // slack: any further growth reds again, and the fix is extraction.
+    // RE-PINNED at the Phase 11k QA release sync (the FOURTEENTH sync,
+    // release/v0.40.0 b39b16022e to efb1220e85): the merged file FALLS under both
+    // parent pins (ours 10761, the release 10837), composing exactly as base
+    // 10894 - 136 (ours) - 61 (theirs) = 10697. Exact merged count, zero slack.
+    //
+    // UPSTREAM'S OWN HALF over the release/v0.41.0 span, kept so the merge drops
+    // neither parent's record:
+    // Re-pinned 10900 -> 10909 for the Proving Shore branch's now-retired
+    // ferry command and account-fact plumbing; the island greeting logic
+    // itself lives in a sim module. Exact merged count.
+    // Re-pinned to the eastbrook-plus-tutorial integration merge output: the
+    // combined tree lands below the branch ceilings, so keep the exact merged
+    // count.
+    // Re-pinned +43 for the guild pledge board: four dispatch cases (thin
+    // validated delegates onto SocialService), the applyPledge transport arm,
+    // and the join-time pledge stamp in sendSocialSnapshot; the service logic
+    // itself lives in server/social.ts. Exact count.
+    // Re-pinned to the exact merged count of the v0.40.0 sync merge (the
+    // OSSBrain v0.40 batch on the release arm). Exact count, zero slack.
+    // Raised +11 for the guild-signpost fill: the noticeboardGuilds provider
+    // field and the one routeEvents call into server/noticeboard_guilds.ts
+    // (thin-consumer wiring; the mapping and fill logic live in that
+    // module). Exact count, zero slack. Plus 4 for the board-note hard-tier
+    // screen: the SocialService construction wires ChatFilter.findHardHit
+    // (the screening logic lives in chat_filter.ts and social.ts). Then
+    // LOWERED to the exact count again when the signpost fill moved out of
+    // routeEvents into the guild board window's live REST read (the
+    // noticeboard_guilds event transform is deleted). Exact count, zero
+    // slack.
+    // AT THE MERGE OF release/v0.41.0 (tip ff2837da1f) into feature/masterwrought
+    // (base 9a89e3483e): BOTH parent pins for the record, ours 10697, the
+    // release 10645. The release's value stood in as a placeholder while
+    // server/game.ts was still mid-resolution, then the row was re-measured on
+    // the fully resolved merged tree (wc -l < server/game.ts):
+    // below both parent pins (the Vale Cup dispatch arms left with the
+    // release, the heavy-self sets live in server/heavy_self.ts), so the
+    // ratchet follows the file down. Exact merged count, zero slack.
+    // RE-PINNED 10509 -> 10501 at Masterwrought Phase 12 (the Perfecting
+    // stage, 2026-08-26): the three pure self-snapshot social rows
+    // (markersWire/tradeWire/duelWire, plain Sim readers) moved whole to
+    // server/self_social_wire.ts (-31 incl. their comments, +1 import, +1
+    // call-site note); the phase's own addition is the perfect_item dispatch
+    // case (+22 incl. its validation comment). Extraction first, then the
+    // phase's lines, netting 8 UNDER the old ceiling; the ceiling follows the
+    // file down. Exact count, zero slack.
+    // LOWERED 10501 -> 10492 in the phase 12 review round (2026-08-26): the
+    // perfect_item ref parse (its slot/bag/item validation and the XOR drop)
+    // moved into the pure core server/perfect_item_ref.ts, leaving the case a
+    // one-line parse and a one-line dispatch. Exact count, zero slack.
+    // LOWERED 10492 -> 10491 at Masterwrought Phase 13 (the orange promotion,
+    // 2026-08-27): the masterwork activity-card emit body (dedupe claim,
+    // opt-out read, R60 release) moved whole to server/craft_activity.ts,
+    // parameterized by kind; the phase's own additions are the legendary
+    // observer arm (a second thin call), the perfect_item name parse and
+    // content screen, and the eqi `name` allowlist line. Extraction first,
+    // then the phase's lines, netting 1 under the old ceiling; the ceiling
+    // follows the file down. Exact count, zero slack.
+    // LOWERED 10491 -> 10475 at the Masterwrought Phase 13 QA (2026-08-27):
+    // the name-screen lane (server/msg_lanes.ts) costs the dispatch one line
+    // (the classified lane is consumed instead of a hard-wired 'command'),
+    // paid for by the two biome correctness findings the QA's cleanup lane
+    // named (the unused bgOriginAt import and the never-called private
+    // replaceLiveAccountCosmetics member). Extraction first, then the line;
+    // the ceiling follows the file down. Exact count, zero slack.
+    // LOWERED 10475 -> 10473 at the phase 13 QA second fix round: the two
+    // name-screen refusal frames ride the existing sendChatNotice helper,
+    // paying for the cleanPetName import and the shape-first pet_rename arm.
+    // LOWERED 10473 -> 10465 at Masterwrought phase 14: the loop's calendar
+    // feed block (utcDay/resetDay/eventLeadDay plus its rationale comment)
+    // moved into server/sim_calendar_feed.ts, which also feeds the new
+    // dailyResetRemainingSec countdown; the ceiling follows the file down.
+    // UPSTREAM'S OWN HALF over the remainder of the v0.41.0 span, kept so the
+    // merge drops neither parent's record:
     // LOWERED 10644 -> 10632 after the paid guild creation, bounded lazy-load,
     // guild mutation, ledger-prefix, and activity-log delivery coordinators
     // moved behind narrow sibling seams. Exact count, zero slack.
@@ -574,52 +1301,173 @@ const MONOLITHS: MonolithRow[] = [
     // helpers moved to server/interest_candidates.ts and the sweep dueness
     // logic landed in storage_purchases.ts, paying for the ledger breach-hook
     // wiring and the event-relay filter. Exact count, zero slack.
+    // RE-PINNED at the merge of release/v0.41.0 (tip e19d832b47) into
+    // feature/masterwrought (base d3f8bae369). BOTH parent pins for the
+    // record: ours 10465, the release 10617. The resolution keeps the
+    // packet's heavy_self and interest_policy extractions (the release's five
+    // new heavy-self members were relocated into server/heavy_self.ts, and
+    // its inline interest helpers gave way to the packet's module), so the
+    // merged file falls BELOW both parent pins and the ratchet follows it
+    // down: measured 10462 (wc -l < server/game.ts). Exact merged count, zero
+    // slack: any further growth reds again.
+    // LOWERED at Phase 16 (2026-08-29): the activity-detection chain
+    // (detectActivity's else-if body) moved to server/activity_detect.ts
+    // behind a deps bag, which also pays for the golden_harvest arm the N10
+    // Discord card added there. The file measures 10329
+    // (wc -l < server/game.ts). Exact count, zero slack: any further growth
+    // reds again.
+    // THE RELEASE PARENT'S OWN HALF over the v0.41.0 span (tip 3e801dc925),
+    // kept so the merge drops neither parent's record:
     // the raid consolidation moved the ground-telegraph snapshot unit, the forge-portal replay lifecycle, eventAnchor, and the door gate out; exact count.
     // Plus 1 for the Healing Power wire field: the ONE line is maybe('hpw')
     // beside maybe('sp') in the delta-guarded self record; no clean extraction
     // exists for a single serializer line. Exact count.
     // Plus 7 for the crucible_buy command arm: the dispatch case is the
     // heroic_buy shape exactly; validation lives sim-side. Exact count.
+    // RE-PINNED at the merge of release/v0.41.0 (tip 3e801dc925, the Ignivar
+    // raid span, 294 commits) into feature/masterwrought (base e19d832b47).
+    // BOTH parent pins for the record: ours 10329, the release 10612. Measured on
+    // the merged tree, never reconciled by arithmetic. Exact merged count,
+    // zero slack: any further growth reds again.
+    // LOWERED 10298 -> 10294 at Phase 18 (U-SRV-HOT, 2026-08-31): the PERF_TICK_LOG
+    // heartbeat's three line formatters and the mob-zone phase-name cluster moved
+    // whole to server/tick_perf_log.ts, and the unequipAccountMechChroma hand-roll
+    // was deleted for the sim's own unequipWornMechChroma at its one call site;
+    // together those paid for the arm-marked heavy-self lines in the perfect_item
+    // and farming cases and the blobP99 heartbeat input. Extraction first, then
+    // the phase's lines, netting 4 under (wc -l < server/game.ts after biome);
+    // the ceiling follows the file down. Exact count, zero slack.
+    // LOWERED 10294 -> 10282 at Phase 18 (U-NET-WIRE addendum C, 2026-08-31):
+    // routeEvents' once-per-batch chat-flair prologue moved whole to
+    // server/chat_flair_stamp.ts (a pure function behind a two-call deps bag,
+    // paired suite tests/chat_flair_stamp.test.ts) and the private round2 copy
+    // was deleted for the one server/tick_perf_log.ts now exports. That paid
+    // for the per-pid routing index's wiring (server/event_pid_index.ts: the
+    // build call plus the merged per-session walk) with 12 lines to spare.
+    // Extraction first, then the phase's lines; measured with
+    // wc -l < server/game.ts after biome. Exact count, zero slack.
+    // RE-MEASURED 10282 -> 10294 in the same unit, after the wire half landed:
+    // the per-pid index's build call and merged walk, the three discard-class
+    // dispatch arms' copy-anchor parse, and the placed feast's crafter-mark
+    // wire line. The chat_flair_stamp and round2 extractions above paid the
+    // first 12 of those; the rest is the phase's own new surface, so the row
+    // sits back at its pre-unit value rather than below it. Exact count.
+    // LOWERED 10294 -> 10286 in the same unit, for the perfect_item name screen's
+    // narrowing (an offensive name now refuses the frame only on a copy the sim
+    // would route to the promotion ladder, and is stripped otherwise). The
+    // private chatChannelHint helper moved whole to server/chat_channel_hint.ts,
+    // narrowed from the whole ClientSession to the one field it read, which is
+    // what let its seven prefix rules get a paired suite at all
+    // (tests/chat_channel_hint.test.ts; nothing covered them before). That paid
+    // for the dispatch's promoting thunk with 8 lines to spare, so the ceiling
+    // follows the file down. Measured with wc -l < server/game.ts after biome.
+    // Exact count, zero slack.
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
-    ceiling: 10641,
+    // RE-PINNED at the TENTH release sync, the merge of release/v0.42.0 (tip
+    // 22e909839f, 380 commits) into feature/masterwrought (base e6b8edb375).
+    // BOTH parent pins for the record: ours 10286, the release 10641. Measured on
+    // the merged tree with wc -l < server/game.ts after the phase-close
+    // regeneration, never reconciled by arithmetic: the two arms' extractions
+    // compose, so the merged file is BELOW the higher parent. Exact merged
+    // count, zero slack: any further growth reds again.
+    // LOWERED 10350 -> 10347 at the Masterwrought Phase 19C (D147, the market
+    // sold-volume wiring): the dispatch swap to buyWithSoldVolume added one
+    // import, and inlining the one-use `delay` helper (a setTimeout promise) and
+    // dropping its definition paid for it and then some. Exact count, zero slack.
+    // Lowered 10347 -> 10336 in PR 3872 cleanup after removing the unused
+    // feast signer wire field plus the retired tutorial dispatch and account-fact
+    // plumbing. Measured after formatting; exact count.
+    ceiling: 10336,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
     file: 'src/net/online.ts',
-    // Re-pinned at the SIXTH release/v0.40.0 sync (release tip 9a89e3483e).
-    // Neither arm crossed 5950 on its own (branch 5942, release 5877 over a
-    // base of 5858); only the merge does, because both arms' growth stacks.
-    // Every one of the 19 lines over the branch's own count is the RELEASE's
-    // (the passwordless Set-a-Password flow and the first-connect join-reject
-    // tolerance). The merged count is base plus both deltas exactly, which is
-    // the proof no side's lines were dropped. Extracting release code this
-    // change does not own is the move the hud.ts row above records as
-    // REVERTED. Exact merged count, zero slack.
-    // Re-pinned at the release/v0.41.0 sync into the bank-storage branch (the New
-    // Eastbrook program, which retires the Vale Cup and demolishes the Sowfield).
-    // The release arm DELETES more than this branch adds, so the merged count lands
-    // below the branch pin and the ratchet follows it DOWN. Measured on the merged
-    // tree, never reconciled by arithmetic. Exact count, zero slack.
+    // RECORDED RAISE at the farming absorb (masterwrought Phase 11d, the
+    // fifth-monolith case under ruling 11d-U6-FIFTH): BOTH parents grew the
+    // online mirror under one shared 5950 pin (ours +47 for the
+    // masterwrought client surface, farming +65 for its farm facet mirror),
+    // and the union composes exactly as base 5855 + 47 + 65. Both parent
+    // pins for the record: ours 5950, farming 5950. The raise is scoped to
+    // this merge-attributable growth, never to growth a phase authors.
+    // Payback: Phase 16 (the packet's polish phase). Exact merged count,
+    // zero slack: any further growth reds again.
+    // RE-PINNED at the Phase 11k QA release sync (the FOURTEENTH sync,
+    // release/v0.40.0 b39b16022e to efb1220e85): RECORDED RAISE of exactly the
+    // release's own growth, on a row that did not conflict. Base 5855, ours
+    // 5967, the release 5877: the union composes exactly as 5967 + 22 (theirs)
+    // = 5989, and the merged file measures 5989. Phase 11k authored nothing in
+    // the online mirror. Payback stays Phase 16. Exact merged count, zero slack.
+    //
+    // UPSTREAM'S OWN HALF over the release/v0.41.0 span, kept so the merge drops
+    // neither parent's record:
+    // Re-pinned to the eastbrook-plus-tutorial integration merge output:
+    // both parents' additions combine, so keep the exact merged count.
+    // Re-pinned +29 for the guild pledge board: the four one-line command
+    // senders, the entity pg/gt decode, and the social-frame pledge-field
+    // normalization (wire mirror code that must live on ClientWorld). Exact
+    // count.
+    // Re-pinned to the exact merged count of the v0.40.0 sync merge: both
+    // arms added wire-mirror code, so the merged file lands above either
+    // parent pin. Exact count, zero slack.
+    // Plus 18 for the guildRoster REST mirror (the signpost guild board's
+    // roster drill-in; the cached read lives in server/guild_roster.ts),
+    // then re-pinned when the mirror gained the trust-boundary row
+    // validation and the 404-vs-transport-failure split, plus the roster
+    // class field. Exact count, zero slack.
+    // RE-PINNED at the merge of release/v0.41.0 (tip ff2837da1f) into
+    // feature/masterwrought (base 9a89e3483e). BOTH parent pins for the record: ours
+    // 5989, the release 5855. Set to the exact merged count measured on the
+    // merged working tree (wc -l < src/net/online.ts), neither parent's literal. Exact
+    // merged count, zero slack: any further growth reds again.
+    // RE-PINNED 5967 -> 5926 at Masterwrought Phase 12 (the Perfecting stage,
+    // 2026-08-26): the show-jumping race mirror (its shape, the `mntRace`
+    // self-snapshot decode, and the four-event fold) moved whole to
+    // src/net/mount_race_wire.ts (-73 incl. comments, +5 import and one-line
+    // delegates); the phase's own additions are the two IWorldProfessions
+    // members perfectItem/perfectingInfo (+27 incl. comments and the two type
+    // imports). Extraction first, then the phase's lines, netting 41 UNDER the
+    // old ceiling; the ceiling follows the file down. Exact count, zero slack.
+    // Release arm, carried for the record: down 5855 -> 5817 at the
+    // desktop-signing round: the handoff result validation moved to
+    // src/net/desktop_wallet_handoff.ts (parseDesktopWalletHandoffStatus),
+    // paying for the stepup action kind.
+    // RE-PINNED at the merge of release/v0.41.0 (tip cb10309ba6) into
+    // feature/masterwrought (base b02da096dd). BOTH parent pins for the record:
+    // ours 5926, the release 5817. The release span's 38-line net shed lands on
+    // top of ours (5926 - 38), so the merged file measures 5888
+    // (wc -l < src/net/online.ts), neither parent's literal; the ratchet follows
+    // it down. Exact merged count, zero slack.
+    //
+    // UPSTREAM'S OWN HALF over the remainder of the v0.41.0 span, kept so the
+    // merge drops neither parent's record:
     // Re-derived at the PR #3670 review-fix round. Against the release/v0.41.0
-    // base (5855) this file is +66: the ClientWorld half of the new bank/vault
-    // IWorld members, thin wiring by design (the earlier merged-tree notes
-    // described rebased-away history). The review round then LOWERED it from
-    // 5939 by folding the four self-key decode blocks into the
-    // bank_snapshot_wire sibling. The raise is this PR's REQUEST, not a
-    // settled ruling: merging is what ratifies it. Exact count, zero slack.
-    // Re-pinned at the third release/v0.41.0 sync (release tip cb10309ba6, the
-    // Exchange website desktop batch). The release arm LOWERED its own pin
-    // 5855 -> 5817 at the desktop-signing round (the handoff result validation
-    // moved to src/net/desktop_wallet_handoff.ts, paying for the stepup action
-    // kind); this branch's +66 rides on top, so the merged count lands below
-    // the branch pin and the ratchet follows it DOWN. Measured on the merged
-    // tree, never reconciled by arithmetic. Exact count, zero slack.
+    // base (5855) the bank-storage file is +66: the ClientWorld half of the
+    // new bank/vault IWorld members, thin wiring by design. The review round
+    // then LOWERED it from 5939 by folding the four self-key decode blocks
+    // into the bank_snapshot_wire sibling.
     // Plus 5 for the groundAimPlacementPreview IWorld member (the placement
     // reticle's true-landing preview; the sanctioned both-worlds seam, a
     // one-line delegate into the shared sim gate). Exact merged count, zero
     // slack.
+    // RE-PINNED at the merge of release/v0.41.0 (tip e19d832b47) into
+    // feature/masterwrought (base d3f8bae369). BOTH parent pins for the
+    // record: ours 5888, the release 5888 (the same literal over different
+    // files). Both arms grew the mirror by 71 lines over the base 5817 (the
+    // packet's masterwrought client surface; the release's bank/vault mirror
+    // plus the ground-aim preview) and the union composes exactly: the merged
+    // file measures 5959 (wc -l < src/net/online.ts). INHERITED growth on the
+    // release arm; the known both-arms compound. Payback stays Phase 16.
+    // Exact merged count, zero slack: any further growth reds again.
+    // LOWERED at Phase 16 (2026-08-29): the absorb's recorded +17 raise is
+    // PAID (target 5942 by the moved-baseline arithmetic) by folding the mst
+    // and cprof self-key decodes into src/net/crafting_wire.ts (the
+    // bank_snapshot_wire/mount_race_wire fold shape the row's own history
+    // records). The file measures 5922 (wc -l < src/net/online.ts). Exact
+    // count, zero slack: any further growth reds again.
+    // THE RELEASE PARENT'S OWN HALF over the v0.41.0 span (tip 3e801dc925),
+    // kept so the merge drops neither parent's record:
     // Re-pinned at the PR 3676 sixth v0.41.0 sync: the bank-storage arm's +66
     // and this branch's +5 above compose. Measured on the merged tree, never
     // reconciled by arithmetic. Exact count, zero slack.
@@ -642,10 +1490,36 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned again at the PR 3685 base sync: the release arm's Bank
     // Storage wiring and this branch's mirrors both grew the file; the
     // union lands at the count below. Exact merged count, zero headroom.
+    // RE-PINNED at the merge of release/v0.41.0 (tip 3e801dc925, the Ignivar
+    // raid span, 294 commits) into feature/masterwrought (base e19d832b47).
+    // BOTH parent pins for the record: ours 5922, the release 5856. Measured on
+    // the merged tree, never reconciled by arithmetic. Exact merged count,
+    // zero slack: any further growth reds again.
+    // LOWERED 5890 -> 5823 at Phase 18 (U-NET-WIRE, 2026-08-31): the whole aura
+    // half of applySnapshot moved to src/net/aura_wire_decode.ts, the
+    // directory's own "a new decode block is a new sibling" shape (the deadline
+    // clock, the in-place fast path that keeps a steady aura set
+    // allocation-free at 20 Hz, and every presence-only marker's decode, which
+    // had been written out twice inside one method). That paid for the phase's
+    // own additions here (the flask marker's mirror, the feast crafter mark,
+    // the place_feast slot, the discard-class anchor fields and their sender
+    // helper) with 67 lines to spare, so the row follows the file down.
+    // Measured with wc -l < src/net/online.ts after biome. Exact count.
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
-    ceiling: 5908,
+    // RE-PINNED at the TENTH release sync, the merge of release/v0.42.0 (tip
+    // 22e909839f, 380 commits) into feature/masterwrought (base e6b8edb375).
+    // BOTH parent pins for the record: ours 5823, the release 5908. Measured on
+    // the merged tree with wc -l < src/net/online.ts after the phase-close
+    // regeneration, never reconciled by arithmetic: the two arms' extractions
+    // compose, so the merged file is BELOW the higher parent. Exact merged
+    // count, zero slack: any further growth reds again.
+    // Lowered 5875 -> 5865 in PR 3872 cleanup after removing the unused
+    // feast signer mirror and retired tutorial command sender. Measured after
+    // formatting; exact count.
+    // Copy-safe Perfecting command construction extracted to perfecting_command.ts.
+    ceiling: 5861,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -677,15 +1551,65 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'server/db.ts',
-    // Re-pinned at the release/v0.41.0 sync into the bank-storage branch (the New
-    // Eastbrook program, which retires the Vale Cup and demolishes the Sowfield).
-    // The release arm DELETES more than this branch adds, so the merged count lands
-    // below the branch pin and the ratchet follows it DOWN. Measured on the merged
-    // tree, never reconciled by arithmetic. Exact count, zero slack.
+    // LOWERED 4980 -> 4865 at the Phase 11d QA, the sibling case to server/game.ts
+    // above. This row GREW at the absorb rather than falling (4835 to 4865, all of
+    // it farming's) and grew straight into pre-existing slack with no row comment,
+    // which is the shape that makes a ratchet stop ratcheting. The merged file is
+    // theirs' exactly (ours never touched it). Parent pins for the record: ours
+    // 4980, farming 4980. Exact merged count, zero slack: any further growth reds
+    // again, and the fix is a domain module, not a raise.
+    // RE-PINNED at the Phase 11k QA release sync (the FOURTEENTH sync,
+    // release/v0.40.0 b39b16022e to efb1220e85): RECORDED RAISE of exactly the
+    // release's own growth, on a row that did not conflict. Base 4835, ours
+    // 4865, the release 4853: the union composes exactly as 4865 + 18 (theirs)
+    // = 4883, and the merged file measures 4883. Phase 11k authored nothing in
+    // server/db.ts. Exact merged count, zero slack: the fix stays a domain
+    // module, never a raise.
+    // RE-PINNED at the merge of release/v0.41.0 (tip ff2837da1f) into
+    // feature/masterwrought (base 9a89e3483e): RECORDED RAISE of exactly the
+    // release's own growth, on a row that did not conflict (the ratchet rows
+    // that break without conflicting). Base 4853, ours 4883 against a 4883
+    // file, the release 4864 against its own 4864 file: the union composes
+    // exactly as 4883 + 11 (theirs) = 4894, and the merged file measures 4894.
+    // The merge authored nothing in server/db.ts. Exact merged count, zero
+    // slack: the fix stays a domain module, never a raise.
+    // LOWERED 4894 -> 4877 at the Masterwrought Phase 13 QA (2026-08-27): the
+    // character UPDATE statement builder (the lease fence shapes plus the
+    // size signal) moved whole to server/character_save_statement.ts, paying
+    // for the lease-fenced offline writer saveOfflineCharacterState that the
+    // clear-item-name strip now rides (the reconnect-window closure). Exact
+    // merged count, zero slack.
+    // UPSTREAM'S OWN HALF over the remainder of the v0.41.0 span, kept so the
+    // merge drops neither parent's record:
     // Raised +29 at the third-round fixes. The substance went to siblings
     // (db_backend_cancel.ts owns the dedicated cancel side pool;
     // BANK_LEDGER_BATCH_RECEIPTS_VALIDATE_SQL lives with its schema in
     // bank_ledger_batch_db.ts; the readback SQL moved beside its builder in
+    // bank_ledger_growth_budget.ts); what remains is coordinator wiring none
+    // of those can own. Lowered -1 at the fourth-round fixes: the notice
+    // filter moved to schema_notices.ts and the connection-budget arithmetic
+    // to db_connection_budget.ts. Exact count, zero slack.
+    // RE-PINNED at the merge of release/v0.41.0 (tip e19d832b47) into
+    // feature/masterwrought (base d3f8bae369). BOTH parent pins for the
+    // record: ours 4877, the release 4959. Both arms grew the file (the
+    // release's transactional save family and vault ledger wiring; the
+    // packet's fence-built statement and offline writer, which the resolution
+    // routes every save site through while keeping the release's transactional
+    // bodies), so the merged file measures 4999 (wc -l < server/db.ts).
+    // INHERITED growth on the release arm. Exact merged count, zero slack:
+    // the fix stays a domain module, never a raise.
+    // LOWERED 4999 -> 4937 at the Phase 18 database review (2026-08-31). Two
+    // extractions paid for that review's own growth and then some: the
+    // lease-fenced OFFLINE write moved whole to
+    // server/offline_character_save_db.ts (where its three transaction
+    // bounds and their rationale now live; db.ts keeps only the binding of
+    // the real transaction runner, the way the save family keeps its
+    // beginSaveTx binding), and the capped character CREATE moved whole to
+    // server/character_create_db.ts, the sibling of the already-extracted
+    // server/character_delete_db.ts, re-exported so no caller re-points.
+    // The growth they paid for is createCharacterCapped's optional level
+    // parameter, which removes the boost roster's nine redundant full-blob
+    // rewrites per registration. Exact count, zero slack.
     // bank_ledger_growth_budget.ts); what remains here is coordinator wiring
     // none of those can own: the readback issue-and-warn before COMMIT, the
     // post-listen VALIDATE call in the concurrent-index runner, and the
@@ -697,7 +1621,18 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
-    ceiling: 5145,
+    // RE-PINNED at the TENTH release sync, the merge of release/v0.42.0 (tip
+    // 22e909839f, 380 commits) into feature/masterwrought (base e6b8edb375).
+    // BOTH parent pins for the record: ours 4937, the release 5145. Measured on
+    // the merged tree with wc -l < server/db.ts after the phase-close
+    // regeneration, never reconciled by arithmetic: the two arms' extractions
+    // compose, so the merged file is BELOW the higher parent. Exact merged
+    // count, zero slack: any further growth reds again.
+    // Lowered 5123 -> 5120 in PR 3872 cleanup after removing the unused bank
+    // entitlement character-count subquery. Exact count, zero slack.
+    // Account export projection added; obsolete offline moderation prose removed.
+    // Measured after formatting, exact count.
+    ceiling: 5119,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {
@@ -770,11 +1705,34 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/render/nameplate_canvas.ts',
+    // The release's own row (the deed-border-cartouche packet) pinned 852
+    // as deliberate headroom when the file was 842 and never re-pinned after
+    // it grew to 851; taken to the exact merged count at the 11l QA's
+    // sixteenth sync (release tip 9a89e3483e, merge 7553c795) under this
+    // branch's per-row zero-slack posture. UPSTREAM-OWNED ROW: the next sync
+    // that re-pins it conflicts here, and a release-side growth to exactly
+    // 852 (green upstream) lands red on this branch; both are loud, never a
+    // skip. Resolve by keeping OURS at the exact merged count, not theirs.
+    //
+    // UPSTREAM'S OWN HALF over the release/v0.41.0 span, kept so the merge drops
+    // neither parent's record:
     // Re-pinned at the deed-cartouche base merge: the release arm's heraldry
     // (+70, one line under the old pin on its own tree) and this branch's
     // pledge nameplate line (+13) compound in the merged file. Exact count,
     // zero slack.
-    ceiling: 864,
+    // RE-PINNED at the merge of release/v0.41.0 (tip ff2837da1f) into
+    // feature/masterwrought (base 9a89e3483e). BOTH parent pins for the record: ours
+    // 851, the release 864. Set to the exact merged count measured on the
+    // merged working tree (wc -l < src/render/nameplate_canvas.ts), neither
+    // parent's literal. Exact
+    // merged count, zero slack: any further growth reds again.
+    // RE-PINNED at the merge of release/v0.41.0 (tip 3e801dc925, the Ignivar
+    // raid span) into feature/masterwrought (base e19d832b47): this row did not
+    // conflict, and that is exactly why it is measured (a conflict marks
+    // disagreement about TEXT; this gate is about SIZE). BOTH parent pins for
+    // the record: ours 864, the release 864. Measured on the merged tree,
+    // never reconciled by arithmetic. Exact merged count, zero slack.
+    ceiling: 863,
     seam: 'the pure src/render/nameplate_heraldry_core.ts geometry module',
   },
   {
@@ -818,7 +1776,13 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the v0.41.0 base sync into the
     // raid branch: both arms extracted and added independently, so neither
     // parent pin fits the combined file; the merged count is the honest bound.
-    ceiling: 2433,
+    // RE-PINNED at the merge of release/v0.41.0 (tip 3e801dc925, the Ignivar
+    // raid span) into feature/masterwrought (base e19d832b47): this row did not
+    // conflict, and that is exactly why it is measured (a conflict marks
+    // disagreement about TEXT; this gate is about SIZE). BOTH parent pins for
+    // the record: ours 2804, the release 2433. Measured on the merged tree,
+    // never reconciled by arithmetic. Exact merged count, zero slack.
+    ceiling: 2432,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {
@@ -958,8 +1922,47 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 1941 -> 1928 after the socket prompt's consent/echo state and
     // DOM feedback moved behind bank_socket_purchase_core/controller, with the
     // family live-region mechanics shared through bank_status_line.ts.
-    ceiling: 1928,
+    // RE-PINNED at the merge of release/v0.41.0 (tip e19d832b47) into
+    // feature/masterwrought (base d3f8bae369). This row arrives WITH the
+    // merge (the release minted it at 1928); the packet's phase 14 arm had
+    // already grown the file by 13 (the wornItemCellParts worn-compare
+    // wiring), authored before the row existed on this branch. Measured on
+    // the merged tree: 1941 (wc -l < src/ui/bank_window.ts). Exact merged
+    // count, zero slack: any further growth reds again.
+    //
+    // LOWERED 1941 -> 1937 by the localized bank-search unit, on the same
+    // terms. Matching and name-sorting on the name the CELL shows (so a
+    // renamed legendary is findable under the name the player can see) needed
+    // a line in a file with zero slack, and the rule it needed paid for
+    // itself: resolving a slot to its cell name is a pure function of the def,
+    // the copy and the active language, so it went to
+    // src/ui/bank_item_name_core.ts and the window's private method went with
+    // it. Measured after the fix round, the phase 17 rule.
+    ceiling: 1937,
     seam: 'a pure view-core plus a thin painter sibling (src/ui/CLAUDE.md)',
+  },
+  {
+    // ADDED by Masterwrought Phase 17 (the closing QA), on the frontend
+    // reviewer's note and the daily_rewards_window precedent: the two largest
+    // painters of the src/ui/hud/professions/ domain each grew about ten
+    // percent across the packet's phases and neither had a row, and a file
+    // with no row is exactly where unwatched growth accumulates. The domain's
+    // logic went to siblings correctly (professions_view.ts and the family
+    // view-cores carry the models); what stays is the flow and the DOM state
+    // it owns. Pinned at the exact count, zero slack: the next professions
+    // feature lands as a sibling module behind the domain barrel, never as
+    // another method cluster here.
+    file: 'src/ui/hud/professions/professions_window.ts',
+    ceiling: 845,
+    seam: 'a pure view-core plus a thin painter sibling (src/ui/hud/CLAUDE.md)',
+  },
+  {
+    // ADDED with the row above, same phase, same reasoning, same seam. The
+    // crafting window composes the family view-cores; growth belongs in a
+    // sibling module behind src/ui/hud/professions/index.ts.
+    file: 'src/ui/hud/professions/crafting_window.ts',
+    ceiling: 774,
+    seam: 'a pure view-core plus a thin painter sibling (src/ui/hud/CLAUDE.md)',
   },
 ];
 

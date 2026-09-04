@@ -34,6 +34,7 @@ export const en = {
   'nav.reports': 'Reports',
   'nav.flags': 'Flagged',
   'nav.topHolders': 'Top Holders',
+  'nav.marketMetrics': 'Market Metrics',
   'nav.history': 'History',
   'nav.sharedIps': 'Shared IPs',
   'nav.botDetector': 'Bot Detector',
@@ -438,6 +439,7 @@ export const en = {
   'moderationHistory.actionGeneralChatRateLimit': 'General chat rate limit changed',
   'moderationHistory.actionRestoreItem': 'Item restore',
   'moderationHistory.actionRestoreSlot': 'Slot restore',
+  'moderationHistory.actionClearItemName': 'Item name cleared',
   'moderationHistory.actionCheaterMark': 'Cheater mark applied',
   'moderationHistory.actionCheaterMarkLift': 'Cheater mark lifted',
   'moderationHistory.actionGuildRename': 'Guild rename',
@@ -705,6 +707,12 @@ export const en = {
   'alert.customExpiryRequired': 'Choose a custom suspension expiry.',
   'alert.actionFailed': 'moderation action failed',
   'auth.loginFailed': 'login failed, is the server up?',
+  // The one permission-denied treatment every data surface shares
+  // (components/PermissionDenied.svelte). Its sibling is each surface's own
+  // generic `<domain>.loadFailed` line, which stays per-surface.
+  'loadFailure.forbiddenTitle': 'Permission denied',
+  'loadFailure.forbiddenDetail':
+    'Your staff roles do not carry the permission this view reads. Ask a superadmin to grant it, then reload.',
   'common.unknown': 'unknown',
   'common.emptyValue': '-',
   'detail.since': 'since {value}',
@@ -743,6 +751,21 @@ export const en = {
   'error.restoreWentOffline': 'the character went offline before the restore landed',
   'error.restoreItemFailed': 'item restore failed',
   'error.restoreSlotFailed': 'slot restore failed',
+  'error.itemNameClearFailed': 'item name clear failed',
+  'error.clearItemNameTargetForms':
+    'name exactly one target: a worn slot, a bag cell, or all: true',
+  'error.clearItemNameUnknownSlot': 'unknown equipment slot',
+  'error.clearItemNameAllLiteral': 'all must be the literal true',
+  'error.clearItemNameBagPair': 'a bag target needs both the cell index and its item id',
+  'error.clearItemNameBagIndex': 'bag must be a non-negative whole number',
+  'error.clearItemNameBagRange': 'bag must be a whole number from {min} to {max}',
+  'error.clearItemNameOnline': 'character is online on this realm; disconnect them first',
+  'error.clearItemNameNoMatch': 'no named copy matched that target',
+  'error.clearItemNameCameOnline':
+    'character came online before the strip landed; kick them and retry',
+  'error.clearItemNameLeased':
+    'character holds a live session lease; kick them (or wait out the lease) and retry',
+  'error.clearItemNameWentOffline': 'character went offline before the strip landed; retry',
   'error.chatMuteFailed': 'chat mute failed',
   'error.chatUnmuteFailed': 'chat unmute failed',
   'error.accountNotChatMuted': 'account is not chat muted',
@@ -765,6 +788,41 @@ export const en = {
   'topHolders.colPurse': 'Purse',
   'topHolders.colMail': 'Mail',
   'topHolders.colMarket': 'Market',
+  // Economy oversight: live World Market listing metrics per supply bucket.
+  // (No marketMetrics.title row: AdminShell's PageHeader already renders the
+  // page h1 from nav.marketMetrics, and the TopHolders sibling's Panel is
+  // likewise title-less; a Panel title here would paint a duplicate.)
+  'marketMetrics.hint':
+    'Live World Market listings for the tracked supply buckets: what is on the book right now, not sold volume. The server caches this readout for about 15 seconds.',
+  'marketMetrics.autoRefresh': 'Auto-refresh ({seconds}s)',
+  'marketMetrics.loading': 'loading…',
+  'marketMetrics.loadFailed': 'failed to load market metrics',
+  'marketMetrics.empty': 'no live listings in any tracked bucket',
+  'marketMetrics.realm': 'Realm: {realm}',
+  'marketMetrics.bucketCores': 'Cores',
+  'marketMetrics.bucketEssence': 'Essence',
+  'marketMetrics.bucketPatterns': 'Patterns',
+  'marketMetrics.bucketProduce': 'Produce',
+  'marketMetrics.bucketSeeds': 'Seeds',
+  'marketMetrics.bucketCompost': 'Compost',
+  'marketMetrics.bucketSummary':
+    '{listings} listings, {quantity} units, {listed} of {tracked} items listed',
+  'marketMetrics.bucketEmpty': 'no live listings',
+  // Sold volume: what actually changed hands, from the server's accumulating
+  // store. Distinct from every listing figure above, which describe supply on
+  // offer right now.
+  'marketMetrics.bucketSold':
+    'Sold in the last {days} days: {sales} sales, {quantity} items, {copper}',
+  'marketMetrics.soldNone': 'Sold in the last {days} days: nothing',
+  'marketMetrics.soldUnavailable':
+    'Sold volume is unavailable right now, so only live listings are shown below.',
+  'marketMetrics.essenceNote':
+    'These materials are soulbound and can never be listed. Any row here means the market escrow invariant broke and needs engineering attention.',
+  'marketMetrics.colItem': 'Item',
+  'marketMetrics.colListings': 'Listings',
+  'marketMetrics.colQuantity': 'Quantity',
+  'marketMetrics.colLowest': 'Lowest (per unit)',
+  'marketMetrics.colMedian': 'Median (per unit)',
   // Economy oversight: the Flagged workflow queue.
   'flags.hint':
     'Accounts flagged by the monitoring systems. Flags only leave this queue through an explicit Clear or Actioned decision, and resolved flags stay on the account history.',
@@ -895,7 +953,7 @@ export const en = {
   'poi.thornpeak_heights.4': "Drogmar's War-Camp",
   'poi.thornpeak_heights.5': 'Stormcrag',
   'poi.thornpeak_heights.6': 'The Glimmermere',
-  'poi.thornpeak_heights.7': 'Wyrmcult Tents',
+  'poi.thornpeak_heights.7': 'Broodsworn Tents',
   'poi.thornpeak_heights.8': 'Revenant Fields',
   'poi.thornpeak_heights.9': 'Gravewyrm Sanctum',
   'location.kind.overworld': 'Overworld',

@@ -1,5 +1,5 @@
 // The Wraithwood's dressing, render-only: the giant overgrown trees the
-// realm is named for (the Eldergleam's twisted-elder model, cloned dark at
+// realm is named for (the Eldershine's twisted-elder model, cloned dark at
 // the same WRAITHWOOD_PROPS.greatTrees spots that give the sim its solid
 // trunk colliders), a low ground mist that never lifts, and ghost-lights
 // drifting between the trunks. Same contract as the sibling
@@ -22,7 +22,7 @@ export interface HauntFeaturesView {
 const WOOD_ZMIN = 1260;
 const WOOD_ZMAX = 1820;
 
-// The giant trees are the Eldergleam's twisted-elder model (realm_flora
+// The giant trees are the Eldershine's twisted-elder model (realm_flora
 // already preloads the same URL, so the loader cache makes this free),
 // cloned per greatTrees record and darkened into haunted silhouettes.
 const GREAT_TREE_URL = '/models/foliage/twisted_1.glb';
@@ -49,7 +49,7 @@ const WISP_HOMES = [
   { x: 384, z: 1674, r: 10, phase: 2.1 }, // the Huntsman's ring
   { x: 280, z: 1492, r: 8, phase: 3.8 },
   { x: 420, z: 1548, r: 9, phase: 5.0 },
-  { x: 384, z: 1418, r: 7, phase: 1.2 }, // Gallowmere's own graveyard
+  { x: 384, z: 1418, r: 7, phase: 1.2 }, // Gibbetmere's own graveyard
 ] as const;
 
 function mistTexture(): THREE.CanvasTexture | null {
@@ -87,7 +87,7 @@ export function buildHauntFeatures(seed: number): HauntFeaturesView {
   group.name = 'haunt-features';
   const glowLights: THREE.PointLight[] = [];
 
-  // --- the giant trees: the Eldergleam's twisted elder, grown grim ---
+  // --- the giant trees: the Eldershine's twisted elder, grown grim ---
   // One clone per greatTrees record (the same spots the sim's trunk
   // colliders use), scaled from the record's radius the way the Hollow's
   // centerpiece is (r 2.6 = scale 6.5), turned and sized with a little

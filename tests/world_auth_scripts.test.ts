@@ -13,6 +13,7 @@ import {
   ONLINE_WORLD_INCOMPATIBLE_MESSAGE,
   ONLINE_WORLD_LAYOUT_VERSION,
 } from '../src/world_api';
+import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const SCRIPTS_ROOT = join(ROOT, 'scripts');
@@ -65,6 +66,13 @@ const AUTHENTICATED_NODE_CLIENTS = [
     // world as the observer character itself, not as a bot.
     path: 'scripts/nythraxis_hitch_bench.mjs',
     authSend: 'socket.send(JSON.stringify(worldAuthMessage(fixture.token, fixture.characterId)))',
+  },
+  {
+    // The kick-then-clear-then-retry operator E2E (Masterwrought phase 18): the
+    // character has to be genuinely ONLINE for arm 1's refusal and arm 4's
+    // session lease to be real, so it joins the world as the remediation target.
+    path: 'scripts/kick_clear_retry_e2e.mjs',
+    authSend: 'ws.send(JSON.stringify(worldAuthMessage(reg.body.token, characterId)))',
   },
   {
     path: 'scripts/lib/perf_hitch_scenarios.mjs',
@@ -161,9 +169,9 @@ function nodeWebSocketSources(dir = SCRIPTS_ROOT): Array<[string, string]> {
 
 describe('standalone world WebSocket auth', () => {
   it('keeps the Node discriminator fresh with the authoritative world layout epoch', () => {
-    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(25);
+    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(26);
     expect(ONLINE_WORLD_AUTH_TYPE).toBe(`auth-world-${ONLINE_WORLD_LAYOUT_VERSION}`);
-    expect(SCRIPT_WORLD_AUTH_TYPE).toBe('auth-world-25');
+    expect(SCRIPT_WORLD_AUTH_TYPE).toBe('auth-world-26');
     expect(SCRIPT_WORLD_AUTH_TYPE).toBe(ONLINE_WORLD_AUTH_TYPE);
     expect(readFileSync(join(ROOT, 'scripts/lib/world_auth.d.mts'), 'utf8')).toContain(
       `export const ONLINE_WORLD_AUTH_TYPE: '${ONLINE_WORLD_AUTH_TYPE}';`,
@@ -228,10 +236,18 @@ describe('standalone world WebSocket auth', () => {
     // The server's `case 'chat'` lives in the COMMAND switch, so a top-level
     // { t: 'chat' } frame matches nothing and is dropped without an error: the
     // script keeps running and reports numbers for bots that were never
-    // levelled, geared, god-moded or teleported. Five perf scripts shipped that
+    // levelled, geared, god-moded or teleported. Several perf scripts shipped that
     // shape, which is why this is a scan and not a review note.
+    //
+    // Read over CODE, not prose: a script that documents the trap right above
+    // its chatCommandMessage call spells the forbidden frame out in a comment
+    // too, and a raw-text scan reads that sentence as an offense. Stripping
+    // full-line comments is the same discipline the loopback-guard call-site
+    // pins already run on, and it
+    // narrows the scan to what can actually be SENT: a comment sends nothing.
+    // Both directions are proven below, so the strip cannot blind the scan.
     const offenders = nodeWebSocketSources()
-      .filter(([, source]) => TOP_LEVEL_CHAT_FRAME.test(source))
+      .filter(([, source]) => TOP_LEVEL_CHAT_FRAME.test(codeWithoutLineComments(source)))
       .map(([path]) => path);
     expect(offenders).toEqual([]);
     expect(chatCommandMessage('/dev god')).toEqual({ t: 'cmd', cmd: 'chat', text: '/dev god' });
@@ -246,6 +262,19 @@ describe('standalone world WebSocket auth', () => {
     // catches the exact literal the five scripts carried.
     expect(TOP_LEVEL_CHAT_FRAME.test("send(JSON.stringify({ t: 'chat', text }))")).toBe(true);
     expect(TOP_LEVEL_CHAT_FRAME.test("if (message.t === 'chat') return;")).toBe(false);
+    // And the comment strip in front of it: prose describing the trap is not an
+    // offense, while the same literal on a real statement still is, INCLUDING
+    // one carrying a trailing comment (only whole comment lines are dropped).
+    expect(
+      TOP_LEVEL_CHAT_FRAME.test(
+        codeWithoutLineComments("  // a bare { t: 'chat' } frame matches nothing"),
+      ),
+    ).toBe(false);
+    expect(
+      TOP_LEVEL_CHAT_FRAME.test(
+        codeWithoutLineComments("send(JSON.stringify({ t: 'chat', text })); // the offense"),
+      ),
+    ).toBe(true);
   });
 
   it('leaves no legacy auth discriminator in any standalone Node script', () => {

@@ -10,7 +10,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { DEEDS } from '../src/sim/content/deeds';
-import { MASTERY_RESET_LETTER } from '../src/sim/content/letters';
+import { authoredLettersById, MASTERY_RESET_LETTER } from '../src/sim/content/letters';
 import { CRAFT_RING, GATHERING_PROFESSION_IDS } from '../src/sim/content/professions';
 import { markDeedsDirty } from '../src/sim/deeds';
 import {
@@ -22,6 +22,7 @@ import { proficiencyBandFor } from '../src/sim/professions/proficiency_bands';
 import { isSpecialized, tierCapability } from '../src/sim/professions/wheel';
 import { type CharacterState, type PlayerMeta, Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
+import { knownLetterId } from '../src/ui/entity_i18n';
 import { samplePlayerMeta } from './parity/trace';
 
 const makeSim = (seed = 42) => new Sim({ seed, playerClass: 'warrior', noPlayer: true });
@@ -118,16 +119,16 @@ describe('applyMasteryReset (pure, in place)', () => {
     expect(src.slice(start, end)).toContain(`'${MASTERY_RESET_LETTER_ID}'`);
   });
 
-  it('the letter is registered in the entity_i18n LETTERS_BY_ID runtime registry', () => {
-    // The SECOND ui letter registry (the tEntity runtime source); also
-    // module-private, so the same source-scan idiom pins the literal entry.
-    const src = fs.readFileSync(path.resolve(process.cwd(), 'src/ui/entity_i18n.ts'), 'utf8');
-    const start = src.indexOf('const LETTERS_BY_ID: Record<string, LetterDef> = {');
-    expect(start, 'the LETTERS_BY_ID declaration should exist').toBeGreaterThan(-1);
-    const end = src.indexOf('};', start);
-    expect(src.slice(start, end)).toContain(
-      '[MASTERY_RESET_LETTER.letterId]: MASTERY_RESET_LETTER',
-    );
+  it('the letter is known to the entity_i18n runtime registry, through the shared authored map', () => {
+    // The SECOND ui letter registry (the tEntity runtime source) is no longer a
+    // hand-seeded literal: entity_i18n.ts builds it from the ONE shared
+    // authoredLettersById() map (the Masterwrought phase 10 QA closed the
+    // Wyrmfall letter gap that way), so pin the RUNTIME registry through its
+    // exported stale-client guard and the shared map's own row, not source text.
+    expect(knownLetterId(MASTERY_RESET_LETTER_ID), 'the ui bundle knows the letter').toBe(true);
+    expect(authoredLettersById()[MASTERY_RESET_LETTER_ID]).toBe(MASTERY_RESET_LETTER);
+    // Negative control: the guard is not a tautology.
+    expect(knownLetterId('mastery_reset_notice_never_authored')).toBe(false);
   });
 });
 

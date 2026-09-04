@@ -30,7 +30,7 @@ const makeCase = (files: Record<string, Buffer>): string => {
   cwd = mkdtempSync(path.join(tmpdir(), 'woc-profession-icons-'));
   const professions = path.join(cwd, 'public/ui/professions');
   mkdirSync(professions, { recursive: true });
-  mkdirSync(path.join(cwd, 'src/ui'), { recursive: true });
+  mkdirSync(path.join(cwd, 'src/ui/hud/professions'), { recursive: true });
   for (const [name, buffer] of Object.entries(files))
     writeFileSync(path.join(professions, name), buffer);
   return professions;
@@ -42,7 +42,7 @@ const run = (): { status: number | null; stderr: string } => {
 };
 
 const generatedRegistry = (): string =>
-  readFileSync(path.join(cwd, 'src/ui/profession_image_ids.ts'), 'utf8');
+  readFileSync(path.join(cwd, 'src/ui/hud/professions/profession_image_ids.ts'), 'utf8');
 
 afterEach(() => {
   if (cwd) rmSync(cwd, { recursive: true, force: true });
@@ -81,13 +81,17 @@ describe('convert_profession_icons_webp', () => {
     });
 
     expect(run().status).toBe(0);
-    const firstRegistry = readFileSync(path.join(cwd, 'src/ui/profession_image_ids.ts'));
+    const firstRegistry = readFileSync(
+      path.join(cwd, 'src/ui/hud/professions/profession_image_ids.ts'),
+    );
     const firstMining = readFileSync(path.join(professions, 'gather_mining.webp'));
     const firstAlchemy = readFileSync(path.join(professions, 'prof_alchemy.webp'));
 
     expect(run().status).toBe(0);
 
-    expect(readFileSync(path.join(cwd, 'src/ui/profession_image_ids.ts'))).toEqual(firstRegistry);
+    expect(readFileSync(path.join(cwd, 'src/ui/hud/professions/profession_image_ids.ts'))).toEqual(
+      firstRegistry,
+    );
     expect(readFileSync(path.join(professions, 'gather_mining.webp'))).toEqual(firstMining);
     expect(readFileSync(path.join(professions, 'prof_alchemy.webp'))).toEqual(firstAlchemy);
   });

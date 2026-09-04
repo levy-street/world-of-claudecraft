@@ -10,7 +10,7 @@ import {
   HARVEST_COMPONENT_ITEMS,
   HARVEST_COMPONENT_SPECIMENS,
 } from '../src/sim/content/professions';
-import { MOBS } from '../src/sim/data';
+import { ITEMS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
@@ -76,6 +76,11 @@ function questDropRate(
 
 describe('the dedicated harvest-material map (pinned)', () => {
   it('every component tag maps to its dedicated material; fang stays wolf_fang', () => {
+    // horn and gills reuse SHIPPED ids rather than minting new ones: horn is
+    // the same hard
+    // keratin as tusk and feeds curved_tusk, the thinnest mapped family in
+    // the 11m census; gills feeds mudfin_scale, the trophy 11l promoted out
+    // of quality 'poor'. One item serving two families is deliberate.
     expect({ ...HARVEST_COMPONENT_ITEMS }).toEqual({
       hide: 'rough_hide',
       fang: 'wolf_fang',
@@ -85,16 +90,30 @@ describe('the dedicated harvest-material map (pinned)', () => {
       cloth: 'homespun_cloth',
       claw: 'sharp_claw',
       tusk: 'curved_tusk',
+      horn: 'curved_tusk',
+      gills: 'mudfin_scale',
     });
+    // The two 11m rows point at ids that ship (a typo here would grant
+    // nothing at the grant loop), and at ids that are NOT quality 'poor',
+    // which is the 11l promotion the gills row was gated on: sellAllJunk
+    // sweeps 'poor', so a poor harvest yield would be sold under the player.
+    expect(ITEMS.curved_tusk?.quality).toBe('common');
+    expect(ITEMS.mudfin_scale?.quality).toBe('common');
   });
 
-  it('the specimen map carries exactly the five jackpot families (fang, cloth and tusk have none)', () => {
+  it('the specimen map carries exactly the five jackpot families (fang, cloth, tusk, horn and gills have none)', () => {
     // Literal sibling pin: a dropped or mistargeted specimen row would break
     // a family's jackpot grant while every behavioral suite stays green on
     // the remaining families. claw carries one (pristine_claw) so no shipped
-    // corpse ever carries two specimen-less families at once (fen_troll:
-    // claw+tusk; old_greyjaw: fang+claw); tusk stays specimen-less like
-    // fang/cloth, since no template pairs it with either.
+    // corpse carried two specimen-less families at once when #2905 landed
+    // (fen_troll: claw+tusk; old_greyjaw: fang+claw); tusk stays
+    // specimen-less like fang/cloth. horn and gills (Phase 11m) are
+    // specimen-less by DECISION, not default: both sit at the bare-hands
+    // MONSTER_MATERIAL_TIERS floor, and a pristine jackpot on a
+    // bare-hands-floor component would invert the premium ladder. The
+    // one-specimen-less-family-per-corpse premise that keeps the capacity
+    // pre-gate honest is checked over the live MOBS table in
+    // tests/corpse_harvest_sim.test.ts, not restated here.
     expect({ ...HARVEST_COMPONENT_SPECIMENS }).toEqual({
       hide: 'pristine_hide',
       silk: 'pristine_silk',
@@ -178,13 +197,26 @@ describe('quest items stay obtainable through their kill-loot drop path', () => 
 
 describe('every mapped tag yields its dedicated material', () => {
   // Real templates covering each mapped tag: wild_boar (hide/tusk/meat),
-  // webwood_spider (venomSac/silk), vale_bandit (cloth), forest_wolf (fang).
+  // webwood_spider (venomSac/silk), vale_bandit (cloth), forest_wolf (fang),
+  // and the two Phase 11m rows on the templates that carried the tags while
+  // they were still orphans: mudfin_murloc (gills beside hide) and
+  // sethrael_palecoil (horn beside hide and claw). Those two rows are the
+  // pin that gills and horn GRANT now: pre-11m the same default harvest on
+  // either template drew nothing for the orphan family and granted nothing.
   const CASES: [string, string[]][] = [
     ['wild_boar', ['rough_hide', 'game_meat', 'curved_tusk']],
     ['webwood_spider', ['venom_gland', 'spider_silk']],
     ['vale_bandit', ['homespun_cloth']],
     ['forest_wolf', ['wolf_fang']],
+    ['mudfin_murloc', ['rough_hide', 'mudfin_scale']],
+    ['sethrael_palecoil', ['rough_hide', 'sharp_claw', 'curved_tusk']],
   ];
+  // Both 11m rows really ride the orphan tag and not a tusk or a second
+  // scale source on the same template: the template carries the tag, and it
+  // does not carry the family that shares the item id.
+  expect(MOBS.mudfin_murloc.componentTags).toContain('gills');
+  expect(MOBS.sethrael_palecoil.componentTags).toContain('horn');
+  expect(MOBS.sethrael_palecoil.componentTags).not.toContain('tusk');
 
   for (const [templateId, expected] of CASES) {
     it(`${templateId} yields ${expected.join(' + ')}`, () => {

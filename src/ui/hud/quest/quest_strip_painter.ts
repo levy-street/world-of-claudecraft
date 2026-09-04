@@ -30,6 +30,8 @@ const CLASS_DONE = 'done';
 const CLASS_COMPLETE = 'complete';
 const CLASS_PRESSED = 'gesturing';
 const MAX_WIDTH_PROP = 'max-width';
+// Visibility for the three nodes that also carry text; see the paint site.
+const DISPLAY_PROP = 'display';
 const HIDDEN = 'none';
 const SHOWN = '';
 
@@ -104,8 +106,16 @@ export class QuestStripPainter {
 
     this.writers.setText(d.title, model.title);
     this.writers.toggleClass(d.title, CLASS_COMPLETE, model.complete);
+    // completeMark, every objective line and `more` each need TWO INDEPENDENT
+    // FACETS, their text and their visibility, on ONE node. The single-slot cache
+    // holds one (kind, value) entry per element, so routing both through
+    // single-slot writers flips that entry on every call and BOTH bypass elision
+    // forever. Visibility takes a slot of its own, keyed (element, 'display'), and
+    // writes the same inline display it always did. Two separate nodes would have
+    // worked equally well; a second cache slot is cheaper than a second node.
+    // cycleHint and counter are DIFFERENT nodes, so they stay on setDisplay/setText.
     this.writers.setText(d.completeMark, model.completeLabel);
-    this.writers.setDisplay(d.completeMark, model.complete ? SHOWN : HIDDEN);
+    this.writers.setStyleProp(d.completeMark, DISPLAY_PROP, model.complete ? SHOWN : HIDDEN);
 
     this.writers.setDisplay(d.cycleHint, model.counterVisible ? SHOWN : HIDDEN);
     this.writers.setText(d.counter, model.counter);
@@ -113,13 +123,13 @@ export class QuestStripPainter {
     for (let i = 0; i < d.objectives.length; i++) {
       const line = model.objectives[i];
       const el = d.objectives[i];
-      this.writers.setDisplay(el, line ? SHOWN : HIDDEN);
+      this.writers.setStyleProp(el, DISPLAY_PROP, line ? SHOWN : HIDDEN);
       if (!line) continue;
       this.writers.setText(el, line.text);
       this.writers.toggleClass(el, CLASS_DONE, line.done);
     }
     this.writers.setText(d.more, model.more);
-    this.writers.setDisplay(d.more, model.more === '' ? HIDDEN : SHOWN);
+    this.writers.setStyleProp(d.more, DISPLAY_PROP, model.more === '' ? HIDDEN : SHOWN);
 
     this.writers.setText(d.hint, model.hint);
     this.writers.toggleClass(d.surface, CLASS_PRESSED, model.pressed);

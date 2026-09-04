@@ -112,7 +112,7 @@ function aura(
 }
 
 describe('character visual effects', () => {
-  it('shows Avenging Wrath wings only on a living Paladin carrying the exact aura', () => {
+  it('shows Zealwing wings only on a living Paladin carrying the exact aura', () => {
     const avenging = aura('avenging_wrath', 'buff_dmg_done', 1, 15);
     expect(characterAvengingWrathActive(entity({ templateId: 'paladin', auras: [avenging] }))).toBe(
       true,

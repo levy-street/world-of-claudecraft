@@ -19,6 +19,7 @@
 // prompt itself is Hud's one #confirm-dialog, injected as a dep.
 
 import { audio } from '../game/audio';
+import { ITEMS } from '../sim/data';
 import type { ItemInstancePayload, ItemSlot } from '../sim/types';
 import {
   type IWorld,
@@ -32,14 +33,26 @@ import { dropdownKeyNav } from './dropdown_nav';
 import { computeDropdownPlacement } from './dropdown_position';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
-import { formatMoney as formatLocalizedMoney, formatNumber, t } from './i18n';
-import { marketArmorBadge, marketArmorPips, marketHeroicStar } from './market_armor_badge';
+import {
+  formatMoney as formatLocalizedMoney,
+  formatNumber,
+  getLanguage,
+  languageTag,
+  t,
+} from './i18n';
+import {
+  marketArmorBadge,
+  marketArmorPips,
+  marketHeroicStar,
+  marketPatternMark,
+} from './market_armor_badge';
 import {
   type MarketBuyConfirm,
   marketBuyConfirm,
   recheckMarketBuy,
 } from './market_buy_confirm_core';
 import {
+  defaultMarketQuery,
   MARKET_ARMOR_CLASS_FILTERS,
   MARKET_ITEM_TYPE_FILTERS,
   MARKET_PRIMARY_STAT_FILTERS,
@@ -52,9 +65,11 @@ import {
   type MarketRarityFilter,
   type MarketSort,
   type MarketSubtypeFilter,
+  marketItemMatches,
 } from './market_filters';
 import { marketNameColor } from './market_name_color';
 import { marketPriceHtml } from './market_price_view';
+import { localizedMarketSearch } from './market_search_localized_core';
 import {
   buildMarketView,
   COPPER_PER_GOLD,
@@ -71,6 +86,7 @@ import {
 } from './market_view';
 import type { PainterHostPresentation } from './painter_host';
 import { svgIcon } from './ui_icons';
+import { wornItemCellParts } from './worn_item_cell_view';
 
 // The filter dropdown's natural size (mirrors .mkt-select-menu's max-height/gap in
 // components.css). #market-window clips with overflow: hidden on mobile, and a menu
@@ -127,6 +143,19 @@ export class MarketWindow {
   private sellItemId: string | null = null;
   private sellInstance: ItemInstancePayload | null = null;
   private searchQuery = '';
+  // Memo for the typed-to-sent search translation (effectiveSearch): the
+  // resolution walks the whole item catalog, and currentQuery() is reachable
+  // from the per-frame reconnect check as well as from a keystroke.
+  //
+  // The LANGUAGE is part of the key, not just the typed text. The resolution
+  // reads localized item names, so the same typed string resolves to a
+  // different search per locale, and a text-only key served the previous
+  // locale's substitution after a switch: not the empty result the untranslated
+  // path gives, but a wrong one, which is the single thing this feature must
+  // never produce. This is the memo half of the language fan-out rule
+  // (src/ui/CLAUDE.md); keying it is what answers it, so no relocalize() arm is
+  // owed and none is registered.
+  private searchEcho: { typed: string; lang: string; sent: string } | null = null;
   private lastSig = '';
   // The Sell tab's price-reference echo signature (issue 3043), tracked SEPARATELY
   // from lastSig: the Sell tab is excluded from the general per-frame rebuild (it
@@ -212,10 +241,32 @@ export class MarketWindow {
     this.render();
   }
 
+  /** The search string actually SENT, which is the typed text translated at the
+   *  UI boundary when the player is not typing English (see
+   *  market_search_localized_core.ts; the box keeps showing what they typed).
+   *  Memoized on the typed text because currentQuery() is also reached from the
+   *  per-frame reconnect check, while the resolution walks the whole catalog. */
+  private effectiveSearch(): string {
+    const lang = getLanguage();
+    if (this.searchEcho?.typed === this.searchQuery && this.searchEcho.lang === lang) {
+      return this.searchEcho.sent;
+    }
+    const sent = localizedMarketSearch({
+      query: this.searchQuery,
+      localeTag: languageTag(lang),
+      itemIds: Object.keys(ITEMS),
+      localizedNameOf: (id) => itemDisplayName(ITEMS[id]),
+      englishMatches: (id, search) => marketItemMatches(id, { ...defaultMarketQuery(), search }),
+      englishHaystackOf: (id) => `${id} ${ITEMS[id]?.name ?? ''}`,
+    });
+    this.searchEcho = { typed: this.searchQuery, lang, sent };
+    return sent;
+  }
+
   /** The current browse query (search + filters + page) the UI sends to the server. */
   private currentQuery(): MarketQuery {
     return {
-      search: this.searchQuery,
+      search: this.effectiveSearch(),
       itemType: this.itemTypeFilter,
       subtype: this.subtypeFilter,
       armorClass: this.armorClassFilter,
@@ -734,13 +785,17 @@ export class MarketWindow {
     for (const { listing: l, item } of page.items) {
       // The Browse-row NAME uses the market-readable quality color (rare/epic
       // lifted to clear WCAG AA on the panel; market_name_color.ts). The icon
-      // border below keeps the shipped hue via its own q-<quality> class, so
-      // quality still reads on the icon at full saturation while the name stays
-      // legible.
-      const qColor = marketNameColor(item.quality);
+      // keeps the shipped hue at full saturation via its q-<quality> class,
+      // driven by the SAME instance-effective quality as the name (the
+      // all-surfaces item-cell rule): the listing's publicInstanceView
+      // carries rolled, so a promoted legendary listing reads legendary on
+      // both the name and the icon rim, not its def tier.
+      const parts = wornItemCellParts(item, l.instance);
+      const effQuality = parts.quality;
+      const qColor = marketNameColor(effQuality);
       const row = document.createElement('div');
       row.className = 'mkt-row';
-      const itemName = itemDisplayName(item);
+      const itemName = parts.name;
       const each =
         l.count > 1
           ? `<br><span class="seller">${esc(t('itemUi.market.each', { money: formatLocalizedMoney(Math.ceil(l.price / l.count)) }))}</span>`
@@ -764,6 +819,10 @@ export class MarketWindow {
       // the bracketed [HEROIC] tooltip tag, so a screen reader reads "Heroic", not
       // "left-bracket HEROIC right-bracket".
       const heroicStar = marketHeroicStar(item, esc(t('hudChrome.itemHeroicLabel')));
+      // Pattern mark: the third corner of the same family, bottom-left (the two
+      // above hold top-left and bottom-right). Reuses the type chip's own word,
+      // so the mark and the filter that finds it read the same.
+      const patternMark = marketPatternMark(item, esc(t('itemUi.market.filterTypePattern')));
       // Gold-dominant, coinless, copper-trimmed price (market-scoped, see
       // market_price_view). The pure builder is i18n-free: pass the localized
       // short unit letters and the full localized amount (which rides the block's
@@ -775,7 +834,7 @@ export class MarketWindow {
         esc(formatLocalizedMoney(l.price, 'long')),
       );
       row.innerHTML =
-        `<span class="mkt-ico">${this.deps.itemIcon(item)}${badge}${heroicStar}</span>` +
+        `<span class="mkt-ico">${this.deps.itemIcon(item, effQuality)}${badge}${heroicStar}${patternMark}</span>` +
         `<span class="mkt-name"><span class="nm" style="color:${qColor}">${esc(itemName)}${stack}</span>` +
         `<span class="seller${l.house ? ' house' : ''}">${esc(l.house ? t('itemUi.market.merchantStock') : l.sellerName)}</span></span>` +
         `<span class="mkt-price">${priceHtml}${each}</span>`;
@@ -915,10 +974,15 @@ export class MarketWindow {
     // Keep the release Sell-tab lowest-price fields (priceRef, stagedItemId) AND
     // the redesign's market-scoped WCAG name color (marketNameColor), not raw QUALITY_COLOR.
     const { item, have, suggested, priceRef, itemId: stagedItemId } = view.form;
-    const qColor = marketNameColor(item.quality);
+    // The staged copy's own payload decides the name color AND the icon's
+    // q-<quality> rim (an instanced staging is single-copy, so the color,
+    // the rim, and the tooltip all describe one unit).
+    const staged = wornItemCellParts(item, view.form.instance);
+    const stagedQuality = staged.quality;
+    const qColor = marketNameColor(stagedQuality);
     const pick = document.createElement('div');
     pick.className = 'mkt-sell-pick';
-    pick.innerHTML = `${this.deps.itemIcon(item)}<span class="ps-name" style="color:${qColor}">${esc(itemDisplayName(item))}</span>`;
+    pick.innerHTML = `${this.deps.itemIcon(item, stagedQuality)}<span class="ps-name" style="color:${qColor}">${esc(staged.name)}</span>`;
     // The staged copy's tooltip carries its payload, so a player holding plain
     // AND special copies can see WHICH one is staged (the mail chip precedent).
     this.deps.attachTooltip(pick, () => this.deps.itemTooltip(item, view.form.instance));
@@ -1018,14 +1082,18 @@ export class MarketWindow {
     }
     this.renderCollectSales(body, view.sales, view.salesOmitted);
     for (const { item, count, instance } of view.rows) {
-      const qColor = marketNameColor(item.quality);
+      // Returned goods keep their copy identity: the name color and the icon
+      // rim both read the instance-effective quality (the all-surfaces rule).
+      const returned = wornItemCellParts(item, instance);
+      const returnedQuality = returned.quality;
+      const qColor = marketNameColor(returnedQuality);
       const row = document.createElement('div');
       row.className = 'mkt-collect';
       const stack =
         count > 1
           ? ` ${t('itemUi.market.stackCount', { count: formatNumber(count, { maximumFractionDigits: 0 }) })}`
           : '';
-      row.innerHTML = `<span class="mkt-collect-item">${this.deps.itemIcon(item)}<span class="mkt-collect-name" style="color:${qColor}">${esc(itemDisplayName(item))}${esc(stack)}</span></span>`;
+      row.innerHTML = `<span class="mkt-collect-item">${this.deps.itemIcon(item, returnedQuality)}<span class="mkt-collect-name" style="color:${qColor}">${esc(returned.name)}${esc(stack)}</span></span>`;
       this.deps.attachTooltip(row, () => this.deps.itemTooltip(item, instance));
       body.appendChild(row);
     }
@@ -1050,7 +1118,7 @@ export class MarketWindow {
     if (sales.length === 0 && omitted === 0) return;
     const list = document.createElement('div');
     list.className = 'mkt-sale-list';
-    for (const { item, count, proceeds, buyerName } of sales) {
+    for (const { item, itemName, count, proceeds, buyerName } of sales) {
       const qColor = marketNameColor(item.quality);
       const row = document.createElement('div');
       row.className = 'mkt-sale';
@@ -1058,11 +1126,18 @@ export class MarketWindow {
         count > 1
           ? ` ${t('itemUi.market.stackCount', { count: formatNumber(count, { maximumFractionDigits: 0 }) })}`
           : '';
-      // esc on the buyer: a player-authored name reaching innerHTML raw is the
-      // exact hole src/ui/CLAUDE.md names.
+      // esc on BOTH names: a chosen name and a buyer name are player-authored
+      // text, and either reaching innerHTML raw is the exact hole
+      // src/ui/CLAUDE.md names.
+      // The sold copy itself is gone, so the ICON still shows the def (there is
+      // no payload left to shade it by), but the NAME is the one the copy
+      // carried when it sold: the ledger stamped it at the sale, because
+      // nothing afterwards can recover it and two listings of one id otherwise
+      // read as two identical rows.
+      const saleName = itemName ?? itemDisplayName(item);
       row.innerHTML =
-        `<span class="mkt-collect-item">${this.deps.itemIcon(item)}` +
-        `<span class="mkt-sale-name"><span style="color:${qColor}">${esc(itemDisplayName(item))}${esc(stack)}</span>` +
+        `<span class="mkt-collect-item">${this.deps.itemIcon(item, item.quality)}` +
+        `<span class="mkt-sale-name"><span style="color:${qColor}">${esc(saleName)}${esc(stack)}</span>` +
         `<span class="mkt-sale-buyer">${esc(t('itemUi.market.saleBuyer', { buyer: buyerName }))}</span></span></span>` +
         `<span class="mkt-price">${this.deps.moneyHtml(proceeds)}</span>`;
       this.deps.attachTooltip(row, () => this.deps.itemTooltip(item));
@@ -1099,6 +1174,7 @@ export class MarketWindow {
     if (filter === 'consumable') return t('itemUi.market.filterTypeConsumable');
     if (filter === 'material') return t('itemUi.market.filterTypeMaterial');
     if (filter === 'cosmetic') return t('itemUi.market.filterTypeCosmetic');
+    if (filter === 'pattern') return t('itemUi.market.filterTypePattern');
     if (filter === 'other') return t('itemUi.market.filterTypeOther');
     return t('itemUi.market.filterTypeAll');
   }

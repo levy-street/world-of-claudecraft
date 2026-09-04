@@ -238,6 +238,55 @@ export const RIFT_EPIC_MOUNT_REINS = [
 ] as const;
 export const RIFT_EPIC_MOUNT_CHANCE = 0.003; // 0.3% per S clear
 
+/** Masterwrought apex ARMOR patterns (Phase 11, R8 channel doctrine): the rift
+ *  pillar carries the ten armorcrafting/leatherworking/tailoring patterns
+ *  (content/apex_patterns.ts) as the final appended draw on every winning
+ *  B/A/S clear. SORTED, and exported for tests: the rng.int pick below indexes
+ *  it, so the order is part of the draw contract. */
+export const RIFT_PATTERN_ITEM_IDS = [
+  'pattern_barksong_handguards',
+  'pattern_briarstep_jerkin',
+  'pattern_fenbloom_breeches',
+  'pattern_forgefold_legguards',
+  'pattern_spiritweld_girdle',
+  'pattern_sunspun_handwraps',
+  'pattern_sunspun_haversack',
+  'pattern_sunspun_leggings',
+  'pattern_sunspun_vestments',
+  'pattern_wardspeaker_sabatons',
+] as const;
+export const RIFT_PATTERN_CHANCE = 0.08; // one draw per winning B/A/S clear
+
+/** Farming's RIFT channel (Phase 11f, masterwrought R8): the three rung-100
+ *  farm patterns the raid does not carry, plus every tier-3 and tier-4 seed, as
+ *  the appended draw AFTER the apex-pattern roll on winning B/A/S clears.
+ *
+ *  SORTED, and exported for tests, for exactly the reason RIFT_PATTERN_ITEM_IDS
+ *  above is: the rng.int pick below indexes this array, so its ORDER is part of
+ *  the draw contract and a re-sort is a determinism change, not a tidy-up.
+ *
+ *  One list rather than two (patterns and seeds) because it must cost ONE
+ *  appended draw, not two: a rift clear either sheds a farming reward or it does
+ *  not, and which kind it is comes out of the same pick. That also keeps the
+ *  repeatable pillar from becoming the fastest route to a pattern, since a
+ *  pattern is 3 of the 11 slots behind an 8% gate. */
+export const FARM_RIFT_DROP_ITEM_IDS = [
+  'evergarden_greens_seed',
+  'evergarden_pumpkin_seed',
+  'frost_gourd_seed',
+  'frost_lentils_seed',
+  'gilded_sunmelon_seed',
+  'gilded_yam_seed',
+  'highland_barley_seed',
+  'pattern_evergarden_braised_greens',
+  'pattern_evergarden_harvest_platter',
+  'pattern_evergarden_sunmelon_tart',
+  'thornpeak_cabbage_seed',
+] as const;
+/** The SHIPPED rift pattern rate, reused rather than re-derived: farming's
+ *  appended draw is the same 8% gate the apex patterns ride. */
+export const FARM_RIFT_DROP_CHANCE = RIFT_PATTERN_CHANCE;
+
 /** Rank-gated gear payout on the winning clear: pushed onto the final boss's
  * corpse as PLAIN drops, so the normal party loot rules (rolls) decide who
  * takes them. Runs for every winning clear, ranked race or dev portal, with
@@ -253,6 +302,15 @@ export const RIFT_EPIC_MOUNT_CHANCE = 0.003; // 0.3% per S clear
  *         in array order (RIFT_LEGENDARY_CHANCE_S each)
  *   5. B/A/S: exactly one mount roll, for the rank's own tier only
  *         (green/blue/epic chance + rng.int pick)
+ *   6. B/A/S: one apex-pattern roll (RIFT_PATTERN_CHANCE, then an rng.int
+ *         pick over the sorted RIFT_PATTERN_ITEM_IDS). C never reaches this
+ *         draw BY DESIGN: the C arm returns after draw 0, so the pattern
+ *         channel stays a winning ranked-clear reward (the R8 channel split).
+ *   7. B/A/S: one FARMING roll (FARM_RIFT_DROP_CHANCE, then an rng.int pick
+ *         over the sorted FARM_RIFT_DROP_ITEM_IDS: three rung-100 farm
+ *         patterns plus every tier-3 and tier-4 seed). Appended by
+ *         masterwrought Phase 11f under the same append-only rule, and C
+ *         never reaches it either.
  *
  * B/A/S draws are unaffected by the new C draw (C returns after draw 0).
  */
@@ -304,6 +362,29 @@ export function addRiftClearGearLoot(ctx: SimContext, boss: Entity, baseLevel: n
   if (ctx.rng.chance(mount.chance)) {
     loot.items.push({
       itemId: mount.reins[ctx.rng.int(0, mount.reins.length - 1)],
+      count: 1,
+    });
+  }
+
+  // --- Draw 6: the apex armor pattern roll (see RIFT_PATTERN_ITEM_IDS) ---
+  // Appended AFTER the mount roll so every existing draw keeps its stream
+  // position; a plain tradable drop like the draws above, so party loot rules
+  // decide who takes it.
+  if (ctx.rng.chance(RIFT_PATTERN_CHANCE)) {
+    loot.items.push({
+      itemId: RIFT_PATTERN_ITEM_IDS[ctx.rng.int(0, RIFT_PATTERN_ITEM_IDS.length - 1)],
+      count: 1,
+    });
+  }
+
+  // --- Draw 7: the farming roll (see FARM_RIFT_DROP_ITEM_IDS) ---
+  // Appended AFTER draw 6 for the same reason draw 6 sits after the mount roll:
+  // every existing draw keeps its stream position, and only the goldens that
+  // reach this far move. C never arrives here, since its arm returned after
+  // draw 0, which is the same designed split the pattern channel already has.
+  if (ctx.rng.chance(FARM_RIFT_DROP_CHANCE)) {
+    loot.items.push({
+      itemId: FARM_RIFT_DROP_ITEM_IDS[ctx.rng.int(0, FARM_RIFT_DROP_ITEM_IDS.length - 1)],
       count: 1,
     });
   }

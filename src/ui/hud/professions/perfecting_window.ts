@@ -1,0 +1,747 @@
+// The Perfecting window painter (#perfecting-window): the Masterwrought
+// phase 14 home of the rank track and the orange promotion. The pure model
+// lives in perfecting_view.ts; this module paints it and sends the one
+// command (perfectItem, with the promotion's name riding its existing field).
+//
+// Structurally the plant sheet's shape (farming_plant_sheet_window.ts): an
+// APG roving-tabindex radiogroup of role=radio rows (one tab stop, the
+// checked row; arrows, Home and End move the pick and the focus together
+// through the shared roving_index core), aria-busy mirroring a
+// send-once flag, markDialogRoot at open, focus carried across the innerHTML
+// rebuild through focus_restore, an onVisibilityChange dep the Hud wires to
+// syncAnyWindowOpenState. It differs in two recorded ways: the root is MINTED
+// here (no markup entry; the dev_command_window precedent, which is why this
+// module registers in UI_DOM_MODULES and in the managed-close CODE_BUILT
+// registry), and it carries the harvest journal's 1 Hz signature-gated clock
+// (a counted COLD_PAINTER_ALLOWANCES driver), because THE ATTEMPT PATH EMITS
+// NO EVENT: feedback is the sim's notice/error lines plus the inv/einst
+// mirrors re-diffing, so the window converges by comparing a VALUE signature
+// once a second while open and repainting only when the model moved.
+//
+// The in-flight belief (pendingSend) clears on (a) the Hud's error-toast
+// forward (the sim's deny arms answer through ctx.error) and (b) any repaint
+// where the selected copy's info signature changed (the mirrors re-diffed:
+// the answer landed). No timeout: re-arming early is safe, the sim
+// re-validates every gate.
+
+import { audio } from '../../../game/audio';
+import { ITEMS } from '../../../sim/data';
+import type { PerfectItemRef } from '../../../sim/professions/perfecting';
+import type { IWorld } from '../../../world_api';
+import { markDialogRoot } from '../../dialog_root';
+import { itemDisplayName } from '../../entity_i18n';
+import { esc } from '../../esc';
+import { captureFocusKey, restoreFirstEnabled } from '../../focus_restore';
+import { formatNumber, t } from '../../i18n';
+import type { PainterHostPresentation } from '../../painter_host';
+import { installPromptDialog, type PromptDialogHandle } from '../../prompt_dialog';
+import { rovingTarget } from '../../roving_index';
+import { svgIcon } from '../../ui_icons';
+import { craftNameText } from './craft_name_view';
+import {
+  type LegendaryNamingDialogHandle,
+  openLegendaryNamingDialog,
+} from './legendary_naming_controller';
+import {
+  baggedCopyOrdinal,
+  buildPerfectingView,
+  type PerfectingCandidate,
+  type PerfectingDetail,
+  type PerfectingSelectionAnchor,
+  type PerfectingViewModel,
+  perfectingInfoSignature,
+  perfectingViewSignature,
+  samePerfectRef,
+  sameSelectedCopy,
+} from './perfecting_view';
+
+// The convergence poll while open (the harvest journal's cadence): the tick
+// compares a value signature and repaints only when the model moved.
+const PERFECTING_POLL_MS = 1000;
+
+const wholeNumber = (value: number): string => formatNumber(value, { maximumFractionDigits: 0 });
+
+export interface PerfectingWindowDeps extends PainterHostPresentation {
+  /** The live world (offline Sim or online ClientWorld mirror). */
+  world(): IWorld;
+  closeOthers(): void;
+  captureFocus(): HTMLElement | null;
+  restoreFocus(target: HTMLElement | null): void;
+  /** Fired after the root's display flips either way; Hud wires it to
+   *  syncAnyWindowOpenState (the farming windows' body-class family). */
+  onVisibilityChange?(): void;
+}
+
+interface BuiltView {
+  view: PerfectingViewModel;
+  syncing: boolean;
+}
+
+export class PerfectingWindow {
+  private rootEl: HTMLElement | null = null;
+  private shellEl: HTMLElement | null = null;
+  private liveEl: HTMLElement | null = null;
+  private openerFocus: HTMLElement | null = null;
+  private selectedRef: PerfectItemRef | null = null;
+  /** The selection's latched baggedCopyOrdinal, handed back to the view so a
+   *  bagged selection follows its copy across a bag shift (null for worn). */
+  private selectedAnchor: PerfectingSelectionAnchor | null = null;
+  private paintedView: PerfectingViewModel | null = null;
+  private namingDialog: LegendaryNamingDialogHandle | null = null;
+  private bindDialog: PromptDialogHandle | null = null;
+  private sessionWorld: IWorld | null = null;
+  private clock: number | null = null;
+  /** The whole-view value signature the 1 Hz tick compares (text-independent
+   *  BY DESIGN, which is why relocalize() below exists). */
+  private lastSig = '';
+  /** The SELECTED copy's info signature: a move under an in-flight send is
+   *  the mirrors answering, so it clears pendingSend. Null before any paint. */
+  private lastSelectedSig: string | null = null;
+  /** The selected copy's previous facts, for the observed-outcome edges (the
+   *  success cue on a rank advance, dismissing the naming dialog once the
+   *  promotion landed). Never a prediction: only what the mirrors now show.
+   *  When the gate refuses the pair (sameSelectedCopy false: a same-id count
+   *  move, even on a copy that kept its cell, or the selected copy itself
+   *  leaving the bags), the whole gated block below (the rank cue, both
+   *  announcements, the dialog auto-dismiss) is skipped for that one edge;
+   *  the dialog stays open but UNLOCKED (the selected-signature move still
+   *  calls notifyAnswered), and the status region carries the one line that
+   *  edge owes while a dialog is up (namingSelectionUnconfirmed: check the
+   *  selection before forging). Re-submission preserves the original copy
+   *  token, so a moved or replaced selection refuses server-side. */
+  private prevSelected: {
+    ref: PerfectItemRef;
+    anchor: PerfectingSelectionAnchor | null;
+    rank: number;
+    perfected: boolean;
+    promoted: boolean;
+  } | null = null;
+  /** Armed by an attempt/promotion send, cleared by the answering error toast
+   *  or the selected copy's signature moving. Write ONLY through
+   *  setPendingSend, which mirrors it onto the root's aria-busy (the plant
+   *  sheet's in-flight affordance). */
+  private pendingSend = false;
+
+  constructor(private readonly deps: PerfectingWindowDeps) {}
+
+  /** The minted #perfecting-window root (the dev_command_window shape): no
+   *  markup entry ships it, so the first reach creates it. The repaint
+   *  target is the inner .pf-shell (display: contents) so the LIVE REGION
+   *  beside it is a persistent node the innerHTML rewrite never destroys
+   *  (the harvest journal's structural trick: a region that leaves and
+   *  re-enters the tree drops or repeats its announcements). */
+  private root(): HTMLElement {
+    if (this.rootEl) return this.rootEl;
+    const root = document.createElement('div');
+    root.id = 'perfecting-window';
+    root.className = 'window panel';
+    const shell = document.createElement('div');
+    shell.className = 'pf-shell';
+    const live = document.createElement('span');
+    live.className = 'pf-live-status';
+    live.setAttribute('role', 'status');
+    root.append(shell, live);
+    (document.getElementById('ui') ?? document.body).appendChild(root);
+    this.rootEl = root;
+    this.shellEl = shell;
+    this.liveEl = live;
+    return root;
+  }
+
+  /** Announce a landed act through the persistent status region: a FRESH
+   *  child span per announcement (a byte-identical textContent write mutates
+   *  nothing and announces nothing; the journal's readyAnnounce shape). */
+  private announce(text: string): void {
+    if (!this.liveEl) return;
+    const line = document.createElement('span');
+    line.textContent = text;
+    this.liveEl.replaceChildren(line);
+  }
+
+  /** The {name} a status-region line takes: the item's display name, or the
+   *  localized fallback when this client's catalog lacks the id the mirrors
+   *  named (a content drift). Player copy never shows the raw id token. */
+  private announceName(itemId: string): string {
+    const def = ITEMS[itemId];
+    return def ? itemDisplayName(def) : t('hudChrome.perfecting.unknownItem');
+  }
+
+  private setPendingSend(value: boolean): void {
+    this.pendingSend = value;
+    this.root().setAttribute('aria-busy', value ? 'true' : 'false');
+  }
+
+  get isOpen(): boolean {
+    return this.rootEl !== null && this.rootEl.style.display === 'flex';
+  }
+
+  open(): void {
+    if (this.sessionWorld && this.sessionWorld !== this.deps.world()) this.close();
+    const root = this.root();
+    const wasOpen = this.isOpen;
+    if (!wasOpen) {
+      this.deps.closeOthers();
+      this.sessionWorld = this.deps.world();
+      this.openerFocus = this.deps.captureFocus();
+      markDialogRoot(root, { labelledBy: 'perfecting-title' });
+      // Flex: the column-flex window family (the plant sheet / journal shape).
+      root.style.display = 'flex';
+      this.deps.onVisibilityChange?.();
+      this.setPendingSend(false);
+      if (this.clock === null) {
+        this.clock = window.setInterval(() => this.tick(), PERFECTING_POLL_MS);
+      }
+    }
+    this.paint();
+    if (!wasOpen) root.querySelector<HTMLElement>('[data-close]')?.focus();
+  }
+
+  toggle(): void {
+    if (this.isOpen) this.close();
+    else this.open();
+  }
+
+  close(): void {
+    const root = this.rootEl;
+    if (!root) {
+      this.openerFocus = null;
+      return;
+    }
+    // Teardown order: hide FIRST so the dialog teardown's focus repair sees a
+    // closed window and stands down (its isOpen gate); the dialog's dismiss
+    // then clears inert itself, and the direct write after it is the backstop
+    // the prompt_dialog contract asks of a caller whose window can be
+    // force-closed under an open prompt.
+    root.style.display = 'none';
+    this.namingDialog?.dismiss();
+    this.bindDialog?.dismiss();
+    this.sessionWorld = null;
+    root.inert = false;
+    this.deps.onVisibilityChange?.();
+    if (this.clock !== null) {
+      window.clearInterval(this.clock);
+      this.clock = null;
+    }
+    this.setPendingSend(false);
+    // Drop the session latches so a reopen never replays a stale edge (a
+    // rank advance that happened while closed is old news, not a cue), and
+    // clear the standing announcement with them.
+    if (this.liveEl) this.liveEl.textContent = '';
+    this.lastSig = '';
+    this.lastSelectedSig = null;
+    this.prevSelected = null;
+    this.paintedView = null;
+    // The selection survives a close only where its exact cell still holds
+    // the copy; the anchor does not, so the closed span never becomes the
+    // ordinal's blind window (a same-id copy sold and another picked up
+    // while closed would reopen on the other copy). The safe direction: a
+    // shifted bagged pick falls back to the first candidate on reopen.
+    this.selectedAnchor = null;
+    this.deps.restoreFocus(this.openerFocus);
+    this.openerFocus = null;
+  }
+
+  /** The Hud's runtime-language-switch arm: the repaint signature is
+   *  text-independent by design, so force exactly one rebuild (paint()
+   *  re-latches the signature to the current state, never clears it). */
+  relocalize(): void {
+    if (!this.isOpen) return;
+    // The standing announcement was minted in the old locale; clear rather
+    // than re-announce (the journal's rule).
+    if (this.liveEl) this.liveEl.textContent = '';
+    this.paint();
+  }
+
+  /** The Hud's error-toast forward (the plant sheet precedent): the sim's
+   *  deny arms answer through ctx.error, so any error toast spends the
+   *  in-flight belief and lifts the naming dialog's submit lock early. */
+  notifyErrorToast(): void {
+    if (!this.isOpen) return;
+    this.setPendingSend(false);
+    this.namingDialog?.notifyAnswered();
+  }
+
+  /** The view over the live IWorld reads, with the latched selection and its
+   *  anchor (the answer-edge gate's same-copy rule is sameSelectedCopy in
+   *  perfecting_view.ts, the one spelling both sides share). */
+  private buildView(): BuiltView {
+    const world = this.deps.world();
+    const syncing = !world.craftingIdentity.synced;
+    const view = buildPerfectingView(
+      {
+        equipment: world.equipment,
+        equipmentInstances: world.equipmentInstances,
+        inventory: world.inventory,
+        identitySynced: !syncing,
+        perfectingInfo: (ref) => world.perfectingInfo(ref),
+      },
+      this.selectedRef,
+      this.selectedAnchor,
+    );
+    return { view, syncing };
+  }
+
+  /** The 1 Hz convergence tick: everything it does on an unchanged frame is
+   *  one isOpen read and the pure signature compare; a moved model repaints
+   *  whole through the SAME paintFrom an open takes (the counted
+   *  COLD_PAINTER_ALLOWANCES entry in tests/hud_perf_budget.test.ts). */
+  private tick(): void {
+    if (!this.sessionIsCurrent()) return;
+    const built = this.buildView();
+    if (perfectingViewSignature(built.view, built.syncing) === this.lastSig) return;
+    this.paintFrom(built);
+  }
+
+  private paint(): void {
+    this.paintFrom(this.buildView());
+  }
+
+  private paintFrom(built: BuiltView): void {
+    if (!this.isOpen) return;
+    const { view, syncing } = built;
+    const detail = view.detail;
+    // The answer edges, judged off what the mirrors NOW show (never a
+    // prediction). A moved selected-copy signature spends the in-flight
+    // belief; a rank advance or the Perfected stamp is the success cue; the
+    // landed promotion retires the naming dialog.
+    const selectedSig = perfectingInfoSignature(detail?.info ?? null);
+    if (this.lastSelectedSig !== null && selectedSig !== this.lastSelectedSig) {
+      if (this.pendingSend) this.setPendingSend(false);
+      this.namingDialog?.notifyAnswered();
+    }
+    const prev = this.prevSelected;
+    const anchor = detail ? baggedCopyOrdinal(view.candidates, detail.ref) : null;
+    // A refused pair skips the whole sameSelectedCopy block once (the cue,
+    // both announcements, the dismiss): see prevSelected's doc.
+    if (detail && prev && sameSelectedCopy(prev, detail.ref, anchor)) {
+      // The edge latches through prevSelected below, so whichever forced
+      // repaint observes it first (the 1 Hz tick, or a relocalize that beat
+      // it) plays the cue exactly once; a later repaint can never replay it.
+      if (detail.info.rank > prev.rank || (detail.info.perfected && !prev.perfected)) {
+        audio.perfectingSuccess();
+        // The aria-live half of the flip (the farming-arm acceptance): the
+        // Perfected stamp outranks a same-frame rank line.
+        const name = this.announceName(detail.itemId);
+        this.announce(
+          detail.info.perfected && !prev.perfected
+            ? t('hudChrome.perfecting.perfectedAnnounce', { name })
+            : t('hudChrome.perfecting.rankAnnounce', {
+                name,
+                rank: wholeNumber(detail.info.rank),
+                ranks: wholeNumber(detail.info.ranks),
+              }),
+        );
+      }
+      if (detail.info.promoted && !prev.promoted) {
+        this.namingDialog?.dismiss();
+        // The landed promotion is the window's biggest flip and the dialog
+        // auto-dismisses on it, so the region carries the confirmation the
+        // reader would otherwise never hear (the fix-round review); the
+        // chosen name is a raw VALUE (textContent, D13-2).
+        const name = this.announceName(detail.itemId);
+        this.announce(
+          t('hudChrome.perfecting.promotedAnnounce', {
+            name,
+            chosen: detail.chosenName ?? name,
+          }),
+        );
+      }
+    } else if (prev && this.namingDialog?.isOpen()) {
+      // The refused pair (or the selection gone whole) under an OPEN naming
+      // dialog: the gated block above stayed silent by design and the dialog
+      // stays open and unlocked, so this is the one line the reader gets
+      // before deciding whether to re-submit (see prevSelected's doc). Once
+      // per edge: prevSelected re-latches below, so the next repaint sees a
+      // same-copy pair again.
+      this.announce(t('hudChrome.perfecting.namingSelectionUnconfirmed'));
+    }
+    this.selectedRef = detail?.ref ?? null;
+    this.selectedAnchor = anchor;
+    this.paintedView = view;
+    const root = this.root();
+    const shell = this.shellEl ?? root;
+    const scroller = root.querySelector<HTMLElement>('.pf-body');
+    const scrollTop = scroller?.scrollTop ?? 0;
+    const focusKey = captureFocusKey(root);
+    // The rewrite targets the inner shell so the sibling live region never
+    // leaves the tree (see root()).
+    shell.innerHTML =
+      `<div class="panel-title"><span id="perfecting-title">${esc(t('hudChrome.perfecting.title'))}</span>` +
+      `<button type="button" class="x-btn" data-close data-focus-key="pfClose" aria-label="${esc(t('hudChrome.perfecting.close'))}" title="${esc(t('hudChrome.perfecting.close'))}">${svgIcon('close')}</button></div>` +
+      `<div class="pf-body">${this.bodyHtml(view)}</div>`;
+    this.wire(root, view);
+    const newScroller = root.querySelector<HTMLElement>('.pf-body');
+    if (newScroller) newScroller.scrollTop = scrollTop;
+    if (focusKey !== null) {
+      // The ladder: the same keyed control (candidate rows are keyed by copy
+      // identity, so a followed copy keeps its key across a shift), then the
+      // checked row (a keyed control that left the tree, say a vanished
+      // copy's row, lands on the selection rather than on Close), then Close.
+      restoreFirstEnabled([
+        root.querySelector<HTMLElement>(`[data-focus-key="${focusKey}"]`),
+        root.querySelector<HTMLElement>('.pf-cand[aria-checked="true"]'),
+        root.querySelector<HTMLElement>('[data-close]'),
+      ]);
+    }
+    this.lastSig = perfectingViewSignature(view, syncing);
+    this.lastSelectedSig = selectedSig;
+    this.prevSelected = detail
+      ? {
+          ref: detail.ref,
+          anchor,
+          rank: detail.info.rank,
+          perfected: detail.info.perfected,
+          promoted: detail.info.promoted,
+        }
+      : null;
+  }
+
+  /** Pick candidate `index` of the PAINTED model (a click or a roving-key
+   *  landing). `focusRow` is the row the key landed on, focused BEFORE the
+   *  repaint so captureFocusKey carries it by the copy's identity key; a
+   *  click passes null (a mouse click parks on the root through the pointer
+   *  blur, a keyboard click already holds the button). */
+  private pick(view: PerfectingViewModel, index: number, focusRow: HTMLElement | null): void {
+    const ref = view.candidates[index]?.ref;
+    if (!ref) return;
+    focusRow?.focus();
+    if (samePerfectRef(ref, this.selectedRef)) return;
+    this.selectedRef = ref;
+    // Latch the PICKED copy's anchor from the painted model before the
+    // repaint: buildView hands the anchor to the view, and the previous
+    // selection's ordinal applied to this copy's siblings could re-target
+    // a pick that landed after a bag shift onto the wrong same-id copy.
+    this.selectedAnchor = baggedCopyOrdinal(view.candidates, ref);
+    this.paint();
+  }
+
+  private wire(root: HTMLElement, view: PerfectingViewModel): void {
+    root.querySelector('[data-close]')?.addEventListener('click', () => this.close());
+    const rows = [...root.querySelectorAll<HTMLElement>('[data-cand-i]')];
+    for (const btn of rows) {
+      const index = Number(btn.dataset.candI);
+      btn.addEventListener('click', () => this.pick(view, index, null));
+      // The APG radiogroup keys through the shared roving core: arrows (both
+      // axes, the rows are a vertical stack), Home and End move the pick and
+      // the focus as one; every other key falls through to the window (Tab
+      // trap, Escape, Enter/Space activation stay native).
+      btn.addEventListener('keydown', (e) => {
+        const ke = e as KeyboardEvent;
+        const next = rovingTarget(ke.key, index, rows.length, 'both');
+        if (next === null) return;
+        ke.preventDefault();
+        this.pick(view, next, rows[next] ?? null);
+      });
+      // Owned stacks get the real item tooltip (the commission-board shape):
+      // a candidate resolves its own copy's payload so the Perfected badge
+      // and rank line ride along.
+      const c = view.candidates[Number(btn.dataset.candI)];
+      const def = c ? ITEMS[c.itemId] : undefined;
+      if (c && def) {
+        // Lazy thunk (the attachTooltip contract), resolving the painted
+        // copy at hover time off the LIVE world. Bag indices are not copy
+        // identities: another stack can shift the copy, and a same-id sibling
+        // can occupy its old cell. The row's ordinal/count identity follows
+        // a safe shift and stands down when the same-id population changes.
+        const identity = c.identity;
+        this.deps.attachTooltip(btn, () => {
+          const current = this.buildView().view.candidates.find(
+            (candidate) => candidate.identity === identity && candidate.itemId === c.itemId,
+          );
+          const live = this.deps.world();
+          const ref = current?.ref;
+          const cell = ref && 'bag' in ref ? live.inventory[ref.bag] : undefined;
+          const instance =
+            ref && 'slot' in ref
+              ? live.equipment[ref.slot] === c.itemId
+                ? live.equipmentInstances[ref.slot]
+                : undefined
+              : cell?.itemId === c.itemId
+                ? cell.instance
+                : undefined;
+          return this.deps.itemTooltip(def, instance);
+        });
+      }
+    }
+    for (const row of root.querySelectorAll<HTMLElement>('[data-mat-id]')) {
+      const def = ITEMS[row.dataset.matId ?? ''];
+      if (def) this.deps.attachTooltip(row, () => this.deps.itemTooltip(def));
+    }
+    root.querySelector('[data-action]')?.addEventListener('click', () => {
+      const detail = this.paintedView?.detail;
+      if (!this.sessionIsCurrent() || !detail?.actionEnabled || this.pendingSend) return;
+      if (this.bindDialog || this.namingDialog?.isOpen()) return;
+      if (detail.action === 'attempt') {
+        if (detail.bindWarning) this.confirmBindThenAttempt(detail);
+        else this.sendAttempt(detail.commandRef);
+      } else if (detail.action === 'promote') {
+        this.openNamingDialog(detail);
+      }
+    });
+  }
+
+  /** Focus repair after a prompt teardown: dismissAndReturn's captured opener
+   *  may have been detached by a mid-prompt 1 Hz repaint (the root rebuilds
+   *  through innerHTML), and a landed promotion dismisses with no return at
+   *  all, so whenever a teardown leaves focus outside the window put it on
+   *  the best live rung: the selected candidate row, the action button, then
+   *  close. All three carry focus keys, so a repaint that follows in the same
+   *  frame carries the choice across. This is the dialog-return half of focus
+   *  management, not a repaint-refocus (the #2377 ruling bars those; it runs
+   *  only when a prompt THIS window opened has just torn down, and the window
+   *  is FocusManager-registered).  */
+  private refocusAfterPrompt(): void {
+    if (!this.isOpen) return;
+    // Repair ONLY a dropped focus (body/null): a prompt teardown that leaves
+    // focus on any real control, this window's OR another's, keeps it. The
+    // fresh-read round's steal case: the promotion's repaint-driven
+    // auto-dismiss can fire while the player is typing in chat behind the
+    // dialog, and yanking them onto a perfecting rung mid-word is worse than
+    // the drop it repairs.
+    const active = document.activeElement;
+    if (active instanceof HTMLElement && active !== document.body) return;
+    const root = this.root();
+    restoreFirstEnabled([
+      root.querySelector<HTMLElement>('.pf-cand[aria-checked="true"]'),
+      root.querySelector<HTMLElement>('[data-action]'),
+      root.querySelector<HTMLElement>('[data-close]'),
+    ]);
+  }
+
+  private sessionIsCurrent(): boolean {
+    if (!this.isOpen) return false;
+    if (this.sessionWorld === this.deps.world()) return true;
+    this.close();
+    return false;
+  }
+
+  private sendAttempt(ref: PerfectItemRef): void {
+    if (!this.sessionIsCurrent()) return;
+    this.setPendingSend(true);
+    audio.perfectingAttempt();
+    // The live world at click time, never captured at render (the plant
+    // sheet precedent); the sim's own lines + mirrors are the feedback.
+    this.deps.world().perfectItem(ref);
+  }
+
+  /** The R2 confirm step: the first attempt on an unbound copy
+   *  binds it, so that attempt goes through an explicit confirm on the
+   *  shared modal recipe (never a hand-rolled trap). */
+  private confirmBindThenAttempt(detail: PerfectingDetail): void {
+    const stack = document.getElementById('prompt-stack');
+    if (!stack) {
+      // Dev-channel only: both entry documents ship #prompt-stack, so a miss
+      // is a broken embed, and a silently dead confirm would read as a bug.
+      console.warn('perfecting: #prompt-stack missing, bind confirm unavailable');
+      return;
+    }
+    const def = ITEMS[detail.itemId];
+    const name = def ? itemDisplayName(def) : detail.itemId;
+    const prompt = document.createElement('div');
+    prompt.className = 'prompt panel pf-bind-prompt';
+    const text = document.createElement('div');
+    text.className = 'prompt-text';
+    text.textContent = t('hudChrome.perfecting.bindConfirmText', { name });
+    const actions = document.createElement('div');
+    actions.className = 'pf-name-actions';
+    const cancel = document.createElement('button');
+    cancel.type = 'button';
+    // Named class so the mobile touch floor can reach it: a ~29px bare-.btn
+    // cancel beside the 44px confirm biased mis-taps toward the permanent
+    // bind (the QA round's mobile finding).
+    cancel.className = 'btn pf-bind-cancel';
+    cancel.textContent = t('hudChrome.perfecting.bindConfirmCancel');
+    const confirm = document.createElement('button');
+    confirm.type = 'button';
+    confirm.className = 'btn pf-bind-confirm';
+    confirm.textContent = t('hudChrome.perfecting.bindConfirmAccept');
+    actions.append(cancel, confirm);
+    prompt.append(text, actions);
+    const opener = this.root().querySelector<HTMLElement>('[data-action]');
+    let open = true;
+    const dialog = installPromptDialog(
+      prompt,
+      opener,
+      () => {
+        open = false;
+        this.bindDialog = null;
+        prompt.remove();
+        this.refocusAfterPrompt();
+      },
+      {
+        inertRoot: this.root(),
+        idPrefix: 'pf-bind-title',
+      },
+    );
+    this.bindDialog = dialog;
+    confirm.addEventListener('click', () => {
+      if (!open || !this.sessionIsCurrent()) return;
+      dialog.dismissAndReturn();
+      this.sendAttempt(detail.commandRef);
+    });
+    cancel.addEventListener('click', () => {
+      if (open) dialog.dismissAndReturn();
+    });
+    stack.appendChild(prompt);
+    confirm.focus();
+  }
+
+  private openNamingDialog(detail: PerfectingDetail): void {
+    if (this.namingDialog?.isOpen()) return;
+    const def = ITEMS[detail.itemId];
+    this.namingDialog = openLegendaryNamingDialog({
+      inertRoot: this.root(),
+      opener: this.root().querySelector<HTMLElement>('[data-action]'),
+      itemName: def ? itemDisplayName(def) : detail.itemId,
+      onSubmit: (name) => {
+        if (!this.sessionIsCurrent()) return;
+        // Never replace the paint-time capture with the current slot occupant.
+        this.setPendingSend(true);
+        this.deps.world().perfectItem(detail.commandRef, name);
+      },
+      onClosed: () => {
+        this.namingDialog = null;
+        this.refocusAfterPrompt();
+      },
+    });
+  }
+
+  // --- markup -------------------------------------------------------------
+
+  private bodyHtml(view: PerfectingViewModel): string {
+    if (view.candidates.length === 0) {
+      // The family empty state (.prof-empty, phase 14): body line alone, the
+      // section-empty variant.
+      return `<div class="prof-empty"><p>${esc(t('hudChrome.perfecting.empty'))}</p></div>`;
+    }
+    // Single-select rows are an APG roving-tabindex radiogroup (the plant
+    // sheet's a11y shape): the checked row is the ONE tab stop (the first row
+    // when nothing is checked, which the view never produces), the rest are
+    // arrow-reachable; the group borrows the dialog title as its name and the
+    // li wrappers are presentational.
+    const tabStop = Math.max(
+      0,
+      view.candidates.findIndex((c) => c.selected),
+    );
+    const rows = view.candidates.map((c, i) => this.candidateHtml(c, i, i === tabStop)).join('');
+    const list = `<ul class="pf-list" role="radiogroup" aria-labelledby="perfecting-title">${rows}</ul>`;
+    return `${list}${view.detail ? this.detailHtml(view.detail) : ''}`;
+  }
+
+  private stateText(state: PerfectingCandidate['state'], rank: number, ranks: number): string {
+    if (state === 'promoted') return t('hudChrome.perfecting.rowPromoted');
+    if (state === 'perfected') return t('hudChrome.perfecting.rowPerfected');
+    return t('hudChrome.perfecting.rowRank', {
+      rank: wholeNumber(rank),
+      ranks: wholeNumber(ranks),
+    });
+  }
+
+  private candidateHtml(c: PerfectingCandidate, index: number, tabStop: boolean): string {
+    const def = ITEMS[c.itemId];
+    const name = def ? itemDisplayName(def) : c.itemId;
+    const icon = def
+      ? this.deps.itemIcon(def, c.state === 'promoted' ? 'legendary' : undefined)
+      : '';
+    // Keyed by the copy's identity, not its cell, so the focus carry follows
+    // the same copy the selection anchor follows across a bag shift.
+    const focusKey = `cand:${c.identity}`;
+    const worn = c.worn
+      ? `<span class="pf-chip">${esc(t('hudChrome.perfecting.wornChip'))}</span>`
+      : '';
+    // A promoted legend's row leads with its player-chosen name (raw VALUE,
+    // esc'd standalone per D13-2) so two promotions of one base item read
+    // apart at a glance; the base name rides beneath, the detail-pane shape.
+    const rowName = c.state === 'promoted' && c.chosenName !== null ? c.chosenName : name;
+    const sub =
+      c.state === 'promoted' && c.chosenName !== null
+        ? `<span class="pf-cand-sub">${esc(name)}</span>`
+        : '';
+    return (
+      `<li role="none"><button type="button" role="radio" class="pf-cand" data-cand-i="${index}" data-focus-key="${esc(focusKey)}" aria-checked="${c.selected ? 'true' : 'false'}" tabindex="${tabStop ? '0' : '-1'}">` +
+      `<span class="pf-cand-socket">${icon}</span>` +
+      `<span class="pf-cand-main"><span class="pf-cand-names"><span class="pf-name${c.state === 'promoted' ? ' q-legendary' : ''}">${esc(rowName)}</span>${sub}</span>${worn}</span>` +
+      `<span class="pf-cand-state">${esc(this.stateText(c.state, c.rank, c.ranks))}</span>` +
+      `</button></li>`
+    );
+  }
+
+  private detailHtml(d: PerfectingDetail): string {
+    const def = ITEMS[d.itemId];
+    const name = def ? itemDisplayName(def) : d.itemId;
+    const icon = def
+      ? this.deps.itemIcon(def, d.state === 'promoted' ? 'legendary' : undefined)
+      : '';
+    // The promoted legend leads with its player-chosen name (a raw VALUE,
+    // esc'd standalone per the D13-2 ruling), the base name beneath it.
+    const promotedName = d.state === 'promoted' && d.chosenName !== null;
+    const head =
+      `<div class="pf-detail-head"><span class="pf-cand-socket">${icon}</span>` +
+      `<span class="pf-detail-names"><span class="pf-detail-name${d.state === 'promoted' ? ' q-legendary' : ''}">${esc(promotedName ? (d.chosenName as string) : name)}</span>` +
+      `${promotedName ? `<span class="pf-detail-sub">${esc(name)}</span>` : ''}</span></div>`;
+    const statusText = this.stateText(d.state, d.info.rank, d.info.ranks);
+    // The shared .prof-track family (phase 14) carries the anatomy; the
+    // pf- classes stay for the settled-state fills keyed off data-state.
+    const steps = Array.from({ length: d.info.ranks }, (_, i) => {
+      const filled = d.state !== 'track' || i < d.info.rank;
+      return `<span class="prof-track-step pf-step${filled ? ' filled' : ''}"></span>`;
+    }).join('');
+    const track =
+      `<div class="prof-track pf-track" data-state="${esc(d.state)}">` +
+      `<span class="prof-track-steps" aria-hidden="true">${steps}</span>` +
+      `<span class="prof-track-text pf-track-label">${esc(statusText)}</span></div>`;
+    const warning = d.bindWarning
+      ? `<div class="pf-warning" role="note">${svgIcon('alert')}<span>${esc(t('hudChrome.perfecting.bindWarn', { name }))} ${esc(t('hudChrome.perfecting.bindWarnDetail'))}</span></div>`
+      : '';
+    const lead =
+      d.state === 'perfected'
+        ? `<p class="pf-lead">${esc(t('hudChrome.perfecting.perfectedLead'))}</p>`
+        : d.state === 'promoted'
+          ? `<p class="pf-lead pf-done">${esc(t('hudChrome.perfecting.promotedLine'))}</p>`
+          : '';
+    // The bill: whichever rows arrive (the attempt materials, the Deed of
+    // Making once Perfected, none once promoted; the view contract).
+    const matRows = d.info.materials
+      .map((row) => {
+        const matDef = ITEMS[row.itemId];
+        const matName = matDef ? itemDisplayName(matDef) : row.itemId;
+        const matIcon = matDef ? this.deps.itemIcon(matDef) : '';
+        const short = row.have < row.required;
+        return (
+          `<li class="pf-mat${short ? ' short' : ''}" data-mat-id="${esc(row.itemId)}"><span class="pf-cand-socket">${matIcon}</span>` +
+          `<span class="pf-name">${esc(matName)}</span>` +
+          `<span class="pf-mat-count">${esc(t('hudChrome.perfecting.matCount', { have: wholeNumber(row.have), required: wholeNumber(row.required) }))}</span></li>`
+        );
+      })
+      .join('');
+    const mats =
+      d.info.materials.length > 0
+        ? `<div class="pf-mats-title">${esc(t(d.state === 'perfected' ? 'hudChrome.perfecting.promoteCost' : 'hudChrome.perfecting.attemptCost'))}</div><ul class="pf-mats" role="list">${matRows}</ul>`
+        : '';
+    // The skill line, gated on the identity mirror's sync (never a false
+    // "not met" before the first cprof frame lands).
+    const craft = d.info.craftId ? craftNameText(d.info.craftId) : '';
+    const skillState = d.syncing
+      ? t('hudChrome.perfecting.skillSyncing')
+      : d.info.skillMet
+        ? t('hudChrome.perfecting.skillMet')
+        : t('hudChrome.perfecting.skillUnmet');
+    const skill =
+      d.state === 'promoted'
+        ? ''
+        : `<div class="pf-skill${!d.syncing && !d.info.skillMet ? ' unmet' : ''}">${esc(t('hudChrome.perfecting.skillNeed', { craft, skill: wholeNumber(d.info.skillReq) }))} <span class="pf-skill-state">${esc(skillState)}</span></div>`;
+    const equipBlocked =
+      d.action === 'promote' && d.info.equipBlocked
+        ? `<div class="pf-warning" role="note">${svgIcon('alert')}<span>${esc(t('hudChrome.perfecting.equipBlocked'))}</span></div>`
+        : '';
+    const actionLabel =
+      d.action === 'attempt'
+        ? t('hudChrome.perfecting.attempt')
+        : t('hudChrome.perfecting.promote');
+    const action =
+      d.action === 'done'
+        ? ''
+        : `<button type="button" class="pf-action" data-action data-focus-key="pfAction"${d.actionEnabled ? '' : ' disabled'}>${esc(actionLabel)}</button>`;
+    return `<div class="pf-detail">${head}${track}${lead}${warning}${mats}${skill}${equipBlocked}${action}</div>`;
+  }
+}

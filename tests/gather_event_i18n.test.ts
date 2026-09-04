@@ -2,8 +2,16 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { GATHERING_PROFESSION_IDS } from '../src/sim/content/professions';
-import { GATHERING_PROFESSION_NAME_KEYS } from '../src/ui/gathering_profession_name';
+import type { GatherRareEventFlavor } from '../src/sim/types';
+import { GATHER_RARE_EVENT_LINE_KEYS } from '../src/ui/gather_rare_event_feedback';
+import { GATHERING_PROFESSION_NAME_KEYS } from '../src/ui/hud/professions/gathering_profession_name';
 import { hasTranslation, t } from '../src/ui/i18n';
+import { ja_JP } from '../src/ui/i18n.locales/ja_JP';
+import { ko_KR } from '../src/ui/i18n.locales/ko_KR';
+import { ru_RU } from '../src/ui/i18n.locales/ru_RU';
+import { zh_CN } from '../src/ui/i18n.locales/zh_CN';
+import { zh_TW } from '../src/ui/i18n.locales/zh_TW';
+import { stripComments } from './helpers/strip_comments';
 
 // Gather-event localization: the sim emits ids plus values only
 // (gatherResult / gatherRareEvent are text-free, the craftResult/skinEvent
@@ -13,10 +21,11 @@ import { hasTranslation, t } from '../src/ui/i18n';
 // their placeholders, and stay wired into the hud event switch.
 
 describe('gatherEvent broadcast lines (client-localized ids)', () => {
-  it('all three flavor keys exist', () => {
+  it('all four flavor keys exist', () => {
     expect(hasTranslation('gatherEvent.pristineVein')).toBe(true);
     expect(hasTranslation('gatherEvent.ancientHeartwood')).toBe(true);
     expect(hasTranslation('gatherEvent.moonlitBloom')).toBe(true);
+    expect(hasTranslation('gatherEvent.goldenHarvest')).toBe(true);
   });
 
   it('renders the exact contract English with the {finder} splice', () => {
@@ -27,6 +36,31 @@ describe('gatherEvent broadcast lines (client-localized ids)', () => {
     expect(t('gatherEvent.moonlitBloom', { finder: 'Alba' })).toBe(
       'Alba discovered a moonlit bloom!',
     );
+    expect(t('gatherEvent.goldenHarvest', { finder: 'Alba' })).toBe(
+      'Alba reaped a golden harvest!',
+    );
+  });
+
+  it('the goldenHarvest fill in each M16 overlay is real (non-empty, non-English, {finder} intact)', () => {
+    // The wordy new English value needs its five non-Latin fills in the SAME
+    // change (M16). The whole-catalog English-leak guard in
+    // tests/i18n_completeness.test.ts covers byte-identical leaks; this arm
+    // additionally binds the {finder} token surviving each fill verbatim,
+    // which that guard does not check.
+    const english = t('gatherEvent.goldenHarvest', { finder: '{finder}' });
+    const overlays: Array<[string, Partial<Record<'gatherEvent.goldenHarvest', string>>]> = [
+      ['zh_CN', zh_CN],
+      ['zh_TW', zh_TW],
+      ['ja_JP', ja_JP],
+      ['ko_KR', ko_KR],
+      ['ru_RU', ru_RU],
+    ];
+    for (const [locale, overlay] of overlays) {
+      const fill = overlay['gatherEvent.goldenHarvest'];
+      expect(fill, `${locale} fill present`).toBeTruthy();
+      expect(fill, `${locale} fill is not the English source`).not.toBe(english);
+      expect(fill, `${locale} fill keeps the verbatim splice token`).toContain('{finder}');
+    }
   });
 });
 
@@ -181,16 +215,19 @@ describe('hud event switch stays wired to the ids', () => {
   it('the client references every gather-event key the sim ids resolve to', () => {
     // Source liveness pin (the S3-scan spirit): losing one of these mappings
     // silently would strand the id-based event without player-visible text.
-    // The flavor-to-key mapping still lives in the hud.ts event switch; the
-    // two gather-line keys moved to the grant_line_view.ts pure core when the
-    // qty-variant choice was extracted there (#2430), so scan both files.
+    // The flavor-to-key mapping moved to the gather_rare_event_feedback.ts
+    // pure core at the Phase 10 QA (hud.ts consumes it through fb.lineKey);
+    // the two gather-line keys moved to the grant_line_view.ts pure core when
+    // the qty-variant choice was extracted there (#2430), so scan all three.
     const source =
       readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8') +
+      readFileSync(path.resolve(process.cwd(), 'src/ui/gather_rare_event_feedback.ts'), 'utf8') +
       readFileSync(path.resolve(process.cwd(), 'src/ui/grant_line_view.ts'), 'utf8');
     for (const key of [
       'gatherEvent.pristineVein',
       'gatherEvent.ancientHeartwood',
       'gatherEvent.moonlitBloom',
+      'gatherEvent.goldenHarvest',
       'hudChrome.gathering.gatherLine',
       'hudChrome.gathering.gatherLineQty',
     ]) {
@@ -213,25 +250,24 @@ describe('hud event switch stays wired to the ids', () => {
     expect(arm).toContain('itemStackDisplayName(match[1], match[2])');
   });
 
-  it('each flavor maps to its own broadcast key in the hud switch', () => {
-    // A swapped flavor-to-key mapping would pass the mere-existence pin above;
-    // bind each slug to its key through the conditional chain in the
-    // gatherRareEvent case (order: pristine_vein then ancient_heartwood, with
-    // moonlitBloom as the remaining arm).
-    const source = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+  it('the hud case consumes the feedback core: one case, one decision, one line sink', () => {
+    // The flavor-to-key mapping and the finder-only cue rules moved to the
+    // pure core src/ui/gather_rare_event_feedback.ts at the Phase 10 QA,
+    // where tests/gather_rare_event_feedback.test.ts drives every quadrant
+    // BEHAVIORALLY. What is left to pin here is the GLUE: hud.ts has exactly
+    // one gatherRareEvent case, that case makes exactly one core call with
+    // the recipient-correct arguments, and the rendered line reads the
+    // core's key. Comment-stripped (the recorded source-pin trap: a
+    // commented-out call satisfies a raw indexOf).
+    const source = stripComments(
+      readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8'),
+    );
+    expect(source.split("case 'gatherRareEvent'").length - 1).toBe(1);
     const caseStart = source.indexOf("case 'gatherRareEvent'");
-    expect(caseStart).toBeGreaterThan(-1);
     const block = source.slice(caseStart, source.indexOf('break;', caseStart));
-    const pv = block.indexOf("'pristine_vein'");
-    const pvKey = block.indexOf("'gatherEvent.pristineVein'");
-    const ah = block.indexOf("'ancient_heartwood'");
-    const ahKey = block.indexOf("'gatherEvent.ancientHeartwood'");
-    const mbKey = block.indexOf("'gatherEvent.moonlitBloom'");
-    expect(pv).toBeGreaterThan(-1);
-    expect(pvKey).toBeGreaterThan(pv);
-    expect(ah).toBeGreaterThan(pvKey);
-    expect(ahKey).toBeGreaterThan(ah);
-    expect(mbKey).toBeGreaterThan(ahKey);
+    const call = 'gatherRareEventFeedback(ev.flavor, ev.finderPid, sim.playerId)';
+    expect(block.split(call).length - 1).toBe(1);
+    expect(block.split('t(fb.lineKey, { finder: ev.finderName })').length - 1).toBe(1);
   });
 
   it('the gatherResult case adds no second loot cue (the loot event owns the cue)', () => {
@@ -243,20 +279,56 @@ describe('hud event switch stays wired to the ids', () => {
   });
 
   it('the achievement cue on gatherRareEvent is finder-only (the other D1 half)', () => {
-    // The zone fanout delivers one copy per in-zone recipient; only the
-    // finder may hear the celebratory cue. A regression that cues every
-    // recipient (or drops the cue) would pass the wording pins above, so
-    // bind the cue call to the finder guard: the conditional must appear in
-    // the case block BEFORE the cue call (same index-order technique as the
-    // flavor-to-key pin).
-    const source = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+    // The finder-only SEMANTICS are behavioral now (the feedback core's
+    // suite drives every flavor x recipient quadrant); this glue pin holds
+    // the hud side to the shape those semantics assume: the cue call sits
+    // INSIDE its fb guard as one statement (so a hoist or a polarity flip
+    // changes this exact line), exactly once, over comment-stripped source.
+    const source = stripComments(
+      readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8'),
+    );
     const caseStart = source.indexOf("case 'gatherRareEvent'");
     expect(caseStart).toBeGreaterThan(-1);
     const block = source.slice(caseStart, source.indexOf('break;', caseStart));
-    const guard = block.indexOf('ev.finderPid === sim.playerId');
-    const cue = block.indexOf('audio.achievement()');
-    expect(guard).toBeGreaterThan(-1);
-    expect(cue).toBeGreaterThan(guard);
+    expect(block.split('if (fb.achievementCue) audio.achievement();').length - 1).toBe(1);
+    expect(block.split('audio.achievement()').length - 1).toBe(1);
+  });
+
+  it('the golden sting is flavor-guarded, finder-only, and layered after the shared cue', () => {
+    // Phase 10 (celebrations): golden_harvest LAYERS its sting on top of the
+    // achievement cue the whole flavor family shares; the sting must never
+    // fire for another flavor or another recipient. The guard semantics are
+    // behavioral (the feedback core's suite: farmGoldenSting true only for
+    // golden AND finder); the glue pin holds the sting call INSIDE its fb
+    // guard as one statement, exactly once, AFTER the shared cue (layered,
+    // not replacing), over comment-stripped source.
+    const source = stripComments(
+      readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8'),
+    );
+    const caseStart = source.indexOf("case 'gatherRareEvent'");
+    expect(caseStart).toBeGreaterThan(-1);
+    const block = source.slice(caseStart, source.indexOf('break;', caseStart));
+    expect(block.split('if (fb.farmGoldenSting) audio.farmGolden();').length - 1).toBe(1);
+    expect(block.split('audio.farmGolden()').length - 1).toBe(1);
+    expect(block.indexOf('audio.farmGolden()')).toBeGreaterThan(
+      block.indexOf('audio.achievement()'),
+    );
+  });
+
+  it('the flavor-to-key table is exhaustive under tsc IN PRODUCTION and pinned to literals', () => {
+    // The Phase 10 QA moved the exhaustiveness guard into the shipping
+    // module: GATHER_RARE_EVENT_LINE_KEYS carries `satisfies
+    // Record<GatherRareEventFlavor, TranslationKey>`, so a fifth flavor reds
+    // `npx tsc --noEmit` on src/ui/gather_rare_event_feedback.ts itself,
+    // not just on a test-side mirror. This arm pins the table to its
+    // literals (the wire-name rule: never assert through the constant the
+    // production code reads without restating the values).
+    expect(GATHER_RARE_EVENT_LINE_KEYS).toEqual({
+      pristine_vein: 'gatherEvent.pristineVein',
+      ancient_heartwood: 'gatherEvent.ancientHeartwood',
+      moonlit_bloom: 'gatherEvent.moonlitBloom',
+      golden_harvest: 'gatherEvent.goldenHarvest',
+    } satisfies Record<GatherRareEventFlavor, string>);
   });
 
   it('both lines color through the existing quality token family only', () => {
@@ -342,7 +414,9 @@ describe('hudChrome.gathering catch line (Professions 2.0)', () => {
     const caseStart = source.indexOf("case 'fishingEarlyReel'");
     expect(caseStart).toBeGreaterThan(-1);
     const block = source.slice(caseStart, source.indexOf('break;', caseStart));
-    expect(block.includes("this.log(t('hudChrome.gathering.earlyReelLine'), '#a8a8a8')")).toBe(
+    // The got-away grey is the professions family's MISS tone by name (the
+    // Phase 18 sweep left hud.ts hex-free; tests/hud_tones.test.ts holds it).
+    expect(block.includes("this.log(t('hudChrome.gathering.earlyReelLine'), PROF_LOG_MISS)")).toBe(
       true,
     );
     expect([...block.matchAll(/audio\.(\w+)\(/g)]).toHaveLength(0);
@@ -389,6 +463,11 @@ describe('hudChrome.gathering catch line (Professions 2.0)', () => {
       expect(hasTranslation(key as Parameters<typeof hasTranslation>[0]), key).toBe(true);
       expect(GATHERING_PROFESSION_NAME_KEYS[id], `name key for ${id}`).toBe(key);
     }
+    // The loop above builds its expectation from the id itself, so it proves
+    // the SHAPE of every row rather than any one row's value. Farming, the
+    // newest id and the one whose absence the fan-out actually caught (an
+    // unlisted id renders NO name anywhere), is pinned to its literal key too.
+    expect(GATHERING_PROFESSION_NAME_KEYS.farming).toBe('hudChrome.gathering.farming');
     // No extra ids: an entry for a profession that no longer exists would
     // render a label for a row nothing produces.
     expect(Object.keys(GATHERING_PROFESSION_NAME_KEYS).sort()).toEqual(
@@ -412,7 +491,7 @@ describe('hudChrome.gathering catch line (Professions 2.0)', () => {
         .replace(/(^|\s)\/\/.*$/gm, '$1');
     for (const file of [
       'src/ui/char_window.ts',
-      'src/ui/professions_window.ts',
+      'src/ui/hud/professions/professions_window.ts',
       // The third consumer, which is why the table was extracted at all.
       'src/ui/hud/vendor/vendor_window.ts',
     ]) {

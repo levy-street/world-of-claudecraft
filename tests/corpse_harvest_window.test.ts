@@ -20,6 +20,7 @@ import {
 } from '../src/ui/hud/loot/corpse_harvest_view';
 import { renderCorpseHarvestPicker } from '../src/ui/hud/loot/corpse_harvest_window';
 import { expectDefined } from './helpers/defined';
+import { UNMAPPED_FAMILY, UNMAPPED_FAMILY_2 } from './helpers/unmapped_family';
 
 function view(overrides: Partial<CorpseHarvestViewModel> = {}): CorpseHarvestViewModel {
   return {
@@ -113,13 +114,18 @@ describe('renderCorpseHarvestPicker: picker section', () => {
 });
 
 // #2509: the picker's mirror of the command-boundary refusal. Checking only
-// families with no harvest item behind them (gills, horn) is a command the
-// sim refuses pre-claim, so the button goes dead and the section says why IN
-// PLACE: a `disabled` button takes no pointer events and leaves the tab order
-// (src/ui/focus_manager.ts), so a tooltip on it is unreachable.
+// families with no harvest item behind them is a command the sim refuses
+// pre-claim, so the button goes dead and the section says why IN PLACE: a
+// `disabled` button takes no pointer events and leaves the tab order
+// (src/ui/focus_manager.ts), so a tooltip on it is unreachable. gills and
+// horn were the shipped families in that shape until Masterwrought Phase 11m
+// mapped both, so the fixtures below carry the synthetic never-mapped pair
+// (tests/helpers/unmapped_family.ts) in the slots they used to fill.
 describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#2509)', () => {
-  // sethrael_palecoil's real tags. Only horn is unmapped (claw is mapped now).
-  const PALECOIL = ['hide', 'claw', 'horn'];
+  // The three-tag shape sethrael_palecoil shipped with (hide, claw, horn)
+  // until 11m mapped horn: the synthetic family is the one unmapped row (claw
+  // was mapped at #2905).
+  const PALECOIL = ['hide', 'claw', UNMAPPED_FAMILY];
 
   function render(tags: string[], checked: string[] = []) {
     const container = document.createElement('div');
@@ -162,7 +168,7 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
   });
 
   it('kills the button and states why when the last mapped box is unchecked', () => {
-    const t = render(PALECOIL, ['hide', 'horn']);
+    const t = render(PALECOIL, ['hide', UNMAPPED_FAMILY]);
     expect(t.btn.disabled).toBe(false);
     t.toggle('hide');
     expect(t.btn.disabled).toBe(true);
@@ -183,7 +189,7 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     // Said once, not twice: the sentence lives on the line alone, never also
     // on the button, so browse mode does not read it back to back.
     t.toggle('hide');
-    t.toggle('horn');
+    t.toggle(UNMAPPED_FAMILY);
     expect(t.warning.hidden).toBe(false);
     expect(t.btn.getAttribute('aria-label')).toBeNull();
   });
@@ -193,7 +199,7 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     // it would shove Harvest down at the exact moment the player is reaching
     // for it; below, only the popup's bottom edge moves. Pinned because the
     // whole layout-stability argument is invisible to every other assertion.
-    const t = render(PALECOIL, ['horn']);
+    const t = render(PALECOIL, [UNMAPPED_FAMILY]);
     expect(t.btn.nextElementSibling).toBe(t.warning);
   });
 
@@ -211,20 +217,20 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
   });
 
   it('comes back to life the moment a mapped family is checked again', () => {
-    const t = render(PALECOIL, ['horn']);
+    const t = render(PALECOIL, [UNMAPPED_FAMILY]);
     expect(t.btn.disabled).toBe(true);
     expect(t.warning.hidden).toBe(false);
     t.toggle('claw');
     expect(t.btn.disabled).toBe(false);
     expect(t.warning.hidden).toBe(true);
     t.btn.click();
-    expect(t.onHarvest).toHaveBeenLastCalledWith(['claw', 'horn']);
+    expect(t.onHarvest).toHaveBeenLastCalledWith(['claw', UNMAPPED_FAMILY]);
   });
 
   it('never disables on the way back to an empty selection, which spreads', () => {
-    const t = render(PALECOIL, ['horn']);
+    const t = render(PALECOIL, [UNMAPPED_FAMILY]);
     expect(t.btn.disabled).toBe(true);
-    t.toggle('horn');
+    t.toggle(UNMAPPED_FAMILY);
     expect(t.btn.disabled).toBe(false);
     expect(t.warning.hidden).toBe(true);
     t.btn.click();
@@ -232,10 +238,10 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
   });
 
   it('draws NO section at all for an all-unmapped corpse (#2513)', () => {
-    // warlock_imp retagged (gills, horn), the shared UNMAPPED fixture used
-    // across the sim suites now that claw and tusk are mapped (this branch's
-    // own fix retired fen_troll, the old fixture here, since claw and tusk
-    // were its tags). The sim refuses the command at its corpse-level gate,
+    // The synthetic never-mapped pair, the shared UNMAPPED fixture the sim
+    // suites retag warlock_imp with (gills and horn played that part until
+    // Phase 11m mapped both, as fen_troll's claw and tusk had until #2905
+    // mapped those). The sim refuses the command at its corpse-level gate,
     // so there is nothing for the picker to submit. Drawing the section with
     // a dead button would be a NEW state and a bad one: the reason line
     // reports a FORFEIT, which is a statement about the selection, and nothing
@@ -244,22 +250,30 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     // An untagged corpse already shows no section; this matches it.
     const container = document.createElement('div');
     const onHarvest = vi.fn();
-    renderCorpseHarvestPicker(container, corpseHarvestView(['gills', 'horn'], new Set()), {
-      onHarvest,
-      attachTooltip: () => {},
-    });
+    renderCorpseHarvestPicker(
+      container,
+      corpseHarvestView([UNMAPPED_FAMILY_2, UNMAPPED_FAMILY], new Set()),
+      {
+        onHarvest,
+        attachTooltip: () => {},
+      },
+    );
     expect(container.querySelector('.corpse-harvest')).toBeNull();
     expect(container.querySelector('.corpse-harvest-btn')).toBeNull();
     expect(container.querySelector('.corpse-harvest-check')).toBeNull();
     expect(container.children).toHaveLength(0);
     // The discriminator on the identical call: a MIXED corpse carrying the same
-    // unmapped families still draws its section, so this is the predicate and
+    // unmapped family still draws its section, so this is the predicate and
     // not the painter refusing everything.
     const mixed = document.createElement('div');
-    renderCorpseHarvestPicker(mixed, corpseHarvestView(['hide', 'horn', 'meat'], new Set()), {
-      onHarvest,
-      attachTooltip: () => {},
-    });
+    renderCorpseHarvestPicker(
+      mixed,
+      corpseHarvestView(['hide', UNMAPPED_FAMILY, 'meat'], new Set()),
+      {
+        onHarvest,
+        attachTooltip: () => {},
+      },
+    );
     expect(mixed.querySelector('.corpse-harvest')).not.toBeNull();
     expect(mixed.querySelectorAll('.corpse-harvest-check')).toHaveLength(3);
   });
@@ -287,21 +301,22 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     expect(on.querySelector('.corpse-harvest')).not.toBeNull();
   });
 
-  it('still submits on a MIXED corpse carrying the same unmapped families', () => {
-    // The discriminator for the case above: a template carrying horn beside
-    // hide and meat (e.g. the Temple's gills/horn-tagged fixtures use the same
-    // shape), so the button lives and the pick goes through.
-    const t = render(['hide', 'horn', 'meat'], []);
+  it('still submits on a MIXED corpse carrying the same unmapped family', () => {
+    // The discriminator for the case above: a corpse carrying the unmapped
+    // family beside hide and meat (the shape a horn-tagged beast shipped in
+    // before 11m), so the button lives and the pick goes through.
+    const t = render(['hide', UNMAPPED_FAMILY, 'meat'], []);
     expect(t.btn.disabled).toBe(false);
-    t.toggle('horn');
-    // horn alone forfeits every yield: that is the #2509 arm, with its line.
+    t.toggle(UNMAPPED_FAMILY);
+    // The unmapped family alone forfeits every yield: that is the #2509 arm,
+    // with its line.
     expect(t.btn.disabled).toBe(true);
     expect(t.warning.hidden).toBe(false);
     t.toggle('hide');
     expect(t.btn.disabled).toBe(false);
     expect(t.warning.hidden).toBe(true);
     t.btn.click();
-    expect(t.onHarvest).toHaveBeenLastCalledWith(['hide', 'horn']);
+    expect(t.onHarvest).toHaveBeenLastCalledWith(['hide', UNMAPPED_FAMILY]);
   });
 
   it('registers the tooltip exactly once, however many times the selection changes', () => {
@@ -309,8 +324,8 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     // per toggle would stack them silently.
     const t = render(PALECOIL, ['hide']);
     t.toggle('hide');
-    t.toggle('horn');
-    t.toggle('horn');
+    t.toggle(UNMAPPED_FAMILY);
+    t.toggle(UNMAPPED_FAMILY);
     expect(t.attachTooltip.mock.calls.filter(([target]) => target === t.btn)).toHaveLength(1);
   });
 
@@ -324,7 +339,8 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     const t = render(PALECOIL, []);
     const rows = [...t.container.querySelectorAll<HTMLElement>('.corpse-harvest-row')];
     expect(rows).toHaveLength(3);
-    // Only horn is marked, and it is marked in TEXT, not colour alone.
+    // Only the unmapped row is marked, and it is marked in TEXT, not colour
+    // alone.
     expect(rows.map((r) => r.classList.contains('corpse-harvest-row-no-yield'))).toEqual([
       false,
       false,
@@ -337,13 +353,13 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     // Still a live control: the sim ignores it either way, so the picker must
     // not pretend it cannot be pressed, and the pick still goes over the wire
     // verbatim (the sim boundary is what interprets it, never the client).
-    const horn = expectDefined(t.boxes.find((b) => b.value === 'horn'));
-    expect(horn.disabled).toBe(false);
+    const unmapped = expectDefined(t.boxes.find((b) => b.value === UNMAPPED_FAMILY));
+    expect(unmapped.disabled).toBe(false);
     t.toggle('hide');
-    t.toggle('horn');
+    t.toggle(UNMAPPED_FAMILY);
     expect(t.btn.disabled).toBe(false);
     t.btn.click();
-    expect(t.onHarvest).toHaveBeenLastCalledWith(['hide', 'horn']);
+    expect(t.onHarvest).toHaveBeenLastCalledWith(['hide', UNMAPPED_FAMILY]);
     // ...and checking it ALONE is still the #2509 refusal, which is the state a
     // filtered row list would have made unreachable from this picker.
     t.toggle('hide');
@@ -359,7 +375,12 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     const t = render(PALECOIL, []);
     const label = (tag: string) => t.boxes.find((b) => b.value === tag)?.getAttribute('aria-label');
     expect(label('hide')).toBe('Harvest Hide');
-    expect(label('horn')).toBe('Harvest Horn: nothing yet');
+    // A synthetic family has no label key (the label map is pinned against
+    // the tags shipped content really carries, tests/town_focus_i18n.test.ts),
+    // so componentLabel falls back to the raw tag: what is under test here is
+    // the fold, not the component's display name, and horn's own label
+    // (`Harvest Horn`) is a mapped, unmarked row since Phase 11m.
+    expect(label(UNMAPPED_FAMILY)).toBe(`Harvest ${UNMAPPED_FAMILY}: nothing yet`);
     const note = expectDefined(t.container.querySelector<HTMLElement>('.corpse-harvest-note'));
     expect(note.getAttribute('aria-hidden')).toBe('true');
     // WCAG 2.2 SC 2.5.3, Label in Name: the accessible name must CONTAIN the
@@ -368,10 +389,10 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     // as a second literal, so it holds in every locale: the aria key takes the
     // mark as a {note} placeholder rather than restating it, which is what
     // makes that structural instead of a translator convention.
-    expect(label('horn')).toContain(note.textContent);
+    expect(label(UNMAPPED_FAMILY)).toContain(note.textContent);
     // ...and the row's visible name is still in there too, so the containment
     // above cannot be satisfied by a label that dropped the component.
-    expect(label('horn')).toContain('Horn');
+    expect(label(UNMAPPED_FAMILY)).toContain(UNMAPPED_FAMILY);
   });
 
   it('marks nothing on an all-mapped corpse', () => {
@@ -404,19 +425,19 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     expect(section.classList.contains('is-concentrated')).toBe(true);
     // Ticking the unmapped box changes nothing, which is the whole ruling seen
     // from the client: the sim scores this pick exactly as it scores ['hide'].
-    t.toggle('horn');
+    t.toggle(UNMAPPED_FAMILY);
     expect(section.classList.contains('is-concentrated')).toBe(true);
     // The discriminating state, and the reason this case exists: naming both
     // MAPPED families is the widest pick this corpse offers, so it is not a
     // concentrate even though only two of the three boxes are checked. The
     // retired box-count definition called exactly this a concentrate, so a
     // painter still keyed off a count reds right here.
-    t.toggle('horn');
+    t.toggle(UNMAPPED_FAMILY);
     t.toggle('claw');
     expect(t.boxes.filter((b) => b.checked).map((b) => b.value)).toEqual(['hide', 'claw']);
     expect(section.classList.contains('is-concentrated')).toBe(false);
     // Checking every box is the same world again, by the same rule.
-    t.toggle('horn');
+    t.toggle(UNMAPPED_FAMILY);
     expect(section.classList.contains('is-concentrated')).toBe(false);
     // ...and a dead pick is never "concentrated", though its raw bonus is the
     // whole tag count.

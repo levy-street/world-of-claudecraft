@@ -4,6 +4,8 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { CRAFT_RING } from '../src/sim/content/professions';
+import { ITEMS } from '../src/sim/data';
+import { itemCopyPin } from '../src/sim/item_copy_ref';
 import { ARCHETYPE_PAIR_TARGETS } from '../src/sim/professions/archetype';
 import { STAT_DEFENSE, STAT_GRID } from '../src/ui/char_stats_view';
 import {
@@ -34,8 +36,21 @@ describe('char_window: no magic values', () => {
     );
   });
 
-  it('routes the quality + empty-slot colors through CSS tokens', () => {
-    expect(painter).toContain("const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)'");
+  it('routes the empty-slot colors through CSS tokens and the cell color through the hex map', () => {
+    // The cell color moved into the shared cell authority (worn_item_cell_view.ts,
+    // the phase 13 QA), which answers a HEX literal always (its fallback is the
+    // map's common rung, never the old var() token, since the inspect nameplate
+    // and the player-card canvas consume the same value); the empty-slot pair
+    // stays here.
+    // Comment-stripped both ways: a comment quoting the expression must not
+    // satisfy the positive pin, and one naming the retired token must not
+    // fail the negative (the source-text pin trap).
+    const cellView = readFileSync(join(__dirname, '../src/ui/worn_item_cell_view.ts'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|[^:'"`])\/\/.*$/gm, '$1');
+    expect(cellView).toContain("QUALITY_COLOR[quality ?? 'common'] ?? QUALITY_COLOR.common");
+    expect(cellView).not.toContain('var(--color-quality-default)');
+    expect(painter).not.toContain('QUALITY_DEFAULT_COLOR');
     expect(painter).toContain("const SLOT_EMPTY_TEXT_COLOR = 'var(--color-slot-empty-text)'");
     expect(painter).toContain("const SLOT_EMPTY_BORDER_COLOR = 'var(--color-slot-empty-border)'");
   });
@@ -122,7 +137,7 @@ describe('char_window: paperdoll helm-visibility eye', () => {
       togglePlaytimeVisible: vi.fn(),
       itemIcon: () => '',
       moneyHtml: () => '',
-      itemTooltip: () => '',
+      wornItemTooltip: () => '',
       attachTooltip: vi.fn(),
     });
     win.render();
@@ -141,8 +156,11 @@ describe('char_window: paperdoll helm-visibility eye', () => {
 });
 
 describe('char_window: profession art placements', () => {
-  it('renders gathering rows with their dedicated painted icons', () => {
-    expect(painter).toMatch(/professionImageUrl\(`gather_\$\{r\.professionId\}`\)/);
+  it('renders gathering rows through the art-or-procedural icon resolver', () => {
+    // professionIconUrl, not professionImageUrl: the resolver that falls back
+    // to the procedural composer, so a pending-art profession still paints
+    // (the five-icon render test below pins the behavior; this pins the seam).
+    expect(painter).toMatch(/professionIconUrl\(`gather_\$\{r\.professionId\}`, 56\)/);
     expect(painter).toContain('class="char-gather-icon"');
     expect(painter).toContain('class="char-gather-row"');
   });
@@ -184,6 +202,7 @@ describe('char_window: profession art placements', () => {
           { professionId: 'logging', skill: 12, maxSkill: 125 },
           { professionId: 'herbalism', skill: 13, maxSkill: 125 },
           { professionId: 'fishing', skill: 14, maxSkill: 125 },
+          { professionId: 'farming', skill: 0, maxSkill: 100 },
         ],
       },
     };
@@ -219,7 +238,7 @@ describe('char_window: profession art placements', () => {
       togglePlaytimeVisible: vi.fn(),
       itemIcon: () => '',
       moneyHtml: () => '',
-      itemTooltip: () => '',
+      wornItemTooltip: () => '',
       attachTooltip,
     });
 
@@ -250,6 +269,7 @@ describe('char_window: profession art placements', () => {
       '/ui/professions/gather_logging.webp',
       '/ui/professions/gather_herbalism.webp',
       '/ui/professions/gather_fishing.webp',
+      '/ui/professions/gather_farming.webp',
     ]);
     const crest = root.querySelector<HTMLImageElement>('.char-archetype-title-crest');
     expect(crest?.getAttribute('src')).toBe('/ui/professions/archetype_smith.webp');
@@ -343,7 +363,7 @@ describe('char_window: profession art placements', () => {
       togglePlaytimeVisible: vi.fn(),
       itemIcon: () => '',
       moneyHtml: () => '',
-      itemTooltip: () => '',
+      wornItemTooltip: () => '',
       attachTooltip: vi.fn(),
     });
 
@@ -351,9 +371,11 @@ describe('char_window: profession art placements', () => {
     const values = [...root.querySelectorAll('.char-gather-row b')].map((b) => b.textContent);
     // The row renders a BOUNDED "skill / max", never a bare integer. The floor
     // still holds (99.75 and 99.5 read 99, never a fake crossed 100), and
-    // fishing's denominator is its own 200 cap, not the 100 the other three
-    // share.
-    expect(values).toEqual(['99 / 100', '12 / 100', '100 / 100', '99 / 200']);
+    // fishing's denominator is its own 200 cap, not the 100 the other four
+    // share. Farming's untouched "0 / 100" tail is load-bearing: a gathering id
+    // missing from GATHERING_PROFESSION_NAME_KEYS renders NO row at all, so
+    // this list length is what catches the silent drop on a fifth profession.
+    expect(values).toEqual(['99 / 100', '12 / 100', '100 / 100', '99 / 200', '0 / 100']);
     // Decisive against a regression to the bare integer: no row may render a
     // lone number with no denominator.
     for (const value of values) expect(value).toMatch(/^\d+ \/ \d+$/);
@@ -409,7 +431,11 @@ describe('char_window: paperdoll core + HUD-owned preview boundary', () => {
   });
 
   it('drives the paperdoll off the pure char_view core', () => {
-    expect(painter).toContain('buildPaperdollView(world.equipment, ITEMS)');
+    // The instances argument rides along since phase 13 so each socket row can
+    // describe the worn COPY (color and chosen name).
+    expect(painter).toContain(
+      'buildPaperdollView(world.equipment, ITEMS, world.equipmentInstances)',
+    );
   });
 
   it('preserves the unequip / drag / context-menu dispatch', () => {
@@ -442,7 +468,10 @@ describe('char_window: focus carried across the 2 Hz rebuild', () => {
     );
   }
 
-  function makeWin(root: HTMLElement): CharWindow {
+  function makeWin(
+    root: HTMLElement,
+    extra: { world?: Record<string, unknown>; deps?: Record<string, unknown> } = {},
+  ): CharWindow {
     const world = {
       cfg: { playerClass: 'warrior' },
       player: { name: 'Aurelia', level: 60, skin: 0 },
@@ -454,6 +483,7 @@ describe('char_window: focus carried across the 2 Hz rebuild', () => {
       ownedMounts: () => [],
       selectMount: () => {},
       professionsState: { skills: [] },
+      ...extra.world,
     };
     return new CharWindow({
       root: () => root,
@@ -486,10 +516,96 @@ describe('char_window: focus carried across the 2 Hz rebuild', () => {
       togglePlaytimeVisible: vi.fn(),
       itemIcon: () => 'data:image/png;base64,stub',
       moneyHtml: () => '',
-      itemTooltip: () => '',
+      wornItemTooltip: () => '',
       attachTooltip: vi.fn(),
+      // A test's own recording deps win over the stubs above.
+      ...(extra.deps as object),
     });
   }
+
+  it('the own worn row, tooltip, and unequip aria all read the FULL worn copy (both hosts)', () => {
+    // The phase 13 QA parity finding, pinned behaviorally: the paperdoll
+    // tooltip closure must read IWorld.equipmentInstances (full on both
+    // hosts, `perfected` included) rather than the self entity mirror, which
+    // online is the eqi-trimmed peer projection and dropped the Unique-Equipped
+    // tag on one host only. The rig's world carries BOTH: the full worn copy
+    // on equipmentInstances and the online-shaped eqi-trimmed self entity
+    // mirror (no `perfected`, no bond), so a painter that reached for the
+    // mirror would hand the tooltip a copy WITHOUT the stamp and fail the
+    // whole-payload assertion below, rather than passing by absence.
+    canvasStub();
+    const root = document.createElement('div');
+    document.body.appendChild(root);
+    const tooltips: unknown[] = [];
+    const attached: { el: HTMLElement; build: () => string }[] = [];
+    try {
+      const win = makeWin(root, {
+        world: {
+          playerId: 1,
+          equipment: { neck: 'wyrmfall_pendant' },
+          equipmentInstances: {
+            neck: {
+              perfected: true,
+              rolled: { quality: 'legendary', stats: { int: 2 } },
+              name: 'Dawn Oath',
+              boundTo: 1,
+              signer: 'Forger',
+            },
+          },
+          entities: new Map([
+            [
+              1,
+              {
+                id: 1,
+                equippedInstances: {
+                  neck: {
+                    rolled: { quality: 'legendary', stats: { int: 2 } },
+                    name: 'Dawn Oath',
+                    signer: 'Forger',
+                  },
+                },
+              },
+            ],
+          ]),
+        },
+        deps: {
+          wornItemTooltip: (_item: unknown, instance: unknown) => {
+            tooltips.push(instance);
+            return '';
+          },
+          attachTooltip: (el: HTMLElement, build: () => string) => {
+            attached.push({ el, build });
+          },
+        },
+      });
+      win.render();
+      const row = root.querySelector<HTMLElement>('#equip-slot-neck');
+      expect(row, 'the neck socket rendered').not.toBeNull();
+      // The row label is the chosen name in legendary orange (the cell authority).
+      const label = row?.querySelector<HTMLElement>('.slot-item') ?? null;
+      expect(label?.textContent).toBe('Dawn Oath');
+      expect(label?.style.color.replace(/\s/g, '')).toBe('#ff8000');
+      // The unequip control hears the chosen name (a t() VALUE), never only the def.
+      const unequip = row?.querySelector<HTMLElement>('.equip-unequip-btn') ?? null;
+      expect(unequip?.getAttribute('aria-label')).toContain('Dawn Oath');
+      // The tooltip closure hands the widened dep the wornTooltipInstance
+      // projection of the FULL copy: name and the self-only `perfected` stamp
+      // kept (the unique tag's input), the bond dropped.
+      const hover = attached.find((a) => a.el === row);
+      expect(hover, 'the row attached a tooltip').toBeDefined();
+      hover?.build();
+      expect(tooltips).toEqual([
+        {
+          signer: 'Forger',
+          rolled: { quality: 'legendary', stats: { int: 2 } },
+          name: 'Dawn Oath',
+          perfected: true,
+        },
+      ]);
+    } finally {
+      document.body.removeChild(root);
+    }
+  });
 
   it('keeps focus on the same control when a signature repaint rebuilds the sheet', () => {
     // The behavioral arm for the latch's new trigger rate: refreshCharSheetIfChanged
@@ -562,6 +678,56 @@ describe('char_window: focus carried across the 2 Hz rebuild', () => {
       document.body.removeChild(root);
       document.body.removeChild(outside);
     }
+  });
+
+  it('clears every stale socket highlight when the dragged copy leaves the bags', () => {
+    canvasStub();
+    const root = document.createElement('div');
+    const inventory = [
+      {
+        itemId: 'warhewn_signet',
+        count: 1,
+        instance: { signer: 'Aurelia' },
+      },
+      { itemId: 'warhewn_signet', count: 1 },
+    ];
+    const dragState = new ItemDragState();
+    const win = makeWin(root, {
+      world: { inventory },
+      deps: { dragState },
+    });
+    win.render();
+
+    dragState.begin({
+      itemId: 'warhewn_signet',
+      count: 1,
+      index: 0,
+      copyPin: itemCopyPin(inventory[0]),
+    });
+    win.markDropTargets('warhewn_signet', 0);
+    expect(root.querySelectorAll('.equip-slot.drop-target')).toHaveLength(2);
+
+    // A snapshot moves the exact copy, then rebuilds the character sheet after
+    // the bags window synchronizes the old sockets. The rebuilt sockets must
+    // restore the live exact-copy hints, including on touch with no dragover.
+    inventory.reverse();
+    win.render();
+    expect(root.querySelectorAll('.equip-slot.drop-target')).toHaveLength(2);
+    const ring1 = root.querySelector<HTMLElement>('#equip-slot-ring1');
+
+    // A later snapshot removes the signed copy while an indistinguishable base-id
+    // neighbor shifts into its old cell. Revalidation must still reject the
+    // drop, and its visual promise must be withdrawn at the same time.
+    inventory.splice(1, 1);
+    const dragover = new Event('dragover', { bubbles: true, cancelable: true });
+    ring1?.dispatchEvent(dragover);
+
+    expect(dragover.defaultPrevented).toBe(false);
+    expect(root.querySelectorAll('.equip-slot.drop-target')).toHaveLength(0);
+
+    // A sheet rebuild must not resurrect the hints on its newly minted rows.
+    win.render();
+    expect(root.querySelectorAll('.equip-slot.drop-target')).toHaveLength(0);
   });
 });
 
@@ -772,7 +938,7 @@ describe('char_window: lifetime Time Played line (issue: character-sheet playtim
       togglePlaytimeVisible,
       itemIcon: () => '',
       moneyHtml: () => '',
-      itemTooltip: () => '',
+      wornItemTooltip: () => '',
       attachTooltip,
     });
     win.render();
@@ -851,15 +1017,192 @@ describe('char_window: lifetime Time Played line (issue: character-sheet playtim
   });
 });
 
+describe('char_window: the socket row consumes the worn payload (source pins)', () => {
+  // Moved here from tests/char_view.test.ts beside the painter's other pins
+  // (they pin char_window.ts source, not the pure core). The row's color,
+  // name, and icon-rim reads are plain string interpolations no behavioral
+  // suite reaches (the sheet needs a real DOM world), so the wiring is pinned
+  // at the source: the effective-quality resolver feeds the row color AND the
+  // icon's q-<quality> class, the chosen-name fallback feeds the line, and
+  // the unequip aria hears the same worn name.
+  const src = painter.replace(/^\s*\/\/.*$/gm, '');
+
+  it('threads instances into the view build and the row reads them through the one cell authority', () => {
+    // The triple (name, quality, color) comes from worn_item_cell_view.ts, the
+    // shared authority the inspect row and the player card read too (the
+    // phase 13 QA rule-of-three extraction); the row never re-derives it.
+    expect(src).toContain('const parts = item ? wornItemCellParts(item, instance) : null;');
+    expect(src).toContain('const wornName = parts ? parts.name : null;');
+    expect(src).not.toContain('tooltipEffectiveQuality(');
+  });
+
+  it('drives the socket icon rim off the same instance-effective quality, through the icon dep', () => {
+    // The orange-glow-purple-rim fix: the icon paints through the widened
+    // PainterHost itemIcon dep with the cell's own effective quality (the
+    // injected seam, never a direct import that bypasses it).
+    expect(src).toContain('this.deps.itemIcon(item, parts?.quality)');
+    expect(src).not.toContain('knownItemIconHtml');
+  });
+
+  it('the unequip aria interpolates the worn-copy name as a t() value', () => {
+    expect(src).toContain(
+      "t('hudChrome.paperdoll.unequipAria', { item: wornName ?? itemDisplayName(item) })",
+    );
+  });
+
+  it('maps the stale-selection refusal onto the sim-worded noItem toast', () => {
+    expect(src).toContain("case 'blockedSelection':");
+    expect(src).toContain("this.deps.showError(tSim('error.noItem'));");
+  });
+});
+
 describe('char_window: own-paperdoll per-copy tooltip threading', () => {
-  it('resolves the worn instance from the self entity mirror inside the tooltip closure', () => {
-    // Both worlds mirror the own worn set on the self entity
-    // (equippedInstances), so the paperdoll tooltip must read it per slot at
-    // hover time (a closure over deps.world(), never a stale capture) and
-    // forward it into the widened itemTooltip dep. Dropping either line
-    // reverts the own paperdoll to def-only tooltips while every pure-core
-    // suite stays green.
-    expect(painter).toContain('world.entities.get(world.playerId)?.equippedInstances?.[slot]');
-    expect(painter).toContain('this.deps.itemTooltip(item, instance)');
+  it('resolves the worn instance from IWorld.equipmentInstances inside the tooltip closure', () => {
+    // The owner's FULL worn map on both hosts (offline the live meta, online
+    // the einst self mirror), read per slot at hover time (a closure over
+    // deps.world(), never a stale capture) and forwarded into the widened
+    // itemTooltip dep. NOT the self ENTITY mirror: online that is the
+    // eqi-trimmed peer projection, which drops `perfected`, so a promoted
+    // copy's own Unique-Equipped tag vanished on one host only (the phase 13
+    // QA parity finding). Dropping either line reverts the own paperdoll to
+    // def-only tooltips while every pure-core suite stays green.
+    // Comment-stripped: a pin over raw source is satisfied by a comment that
+    // quotes the line (the source-text pin trap), so the code alone answers.
+    const painterCode = painter
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|[^:'"`])\/\/.*$/gm, '$1');
+    expect(painterCode).toContain('wornTooltipInstance(world.equipmentInstances?.[slot])');
+    expect(painterCode).toContain('this.deps.wornItemTooltip(item, instance)');
+    expect(painterCode).not.toContain('world.entities.get(world.playerId)?.equippedInstances');
+  });
+});
+
+describe('char_window: the Masterwrought cap visibility family (phase 14)', () => {
+  // Behavioral: the real CharWindow rendered over happy-dom, replacing the
+  // raw-source pins that a comment quoting the line would have satisfied
+  // (the source-text pin trap; the sibling describe above strips comments
+  // for exactly that reason, and these had not).
+  type SheetWorld = { equipment: Record<string, string> };
+  function renderSheet(equipment: Record<string, string>) {
+    const root = document.createElement('div');
+    const tips: Array<{ el: Element; resolve: () => string }> = [];
+    const world = {
+      cfg: { playerClass: 'warrior' },
+      player: { name: 'Aurelia', level: 60, skin: 0 },
+      equipment,
+      equipmentInstances: {},
+      honor: 0,
+      archetypeTitle: null,
+      hobbyCraft: null,
+      professionsState: { skills: [] },
+    };
+    const win = new CharWindow({
+      root: () => root,
+      world: () => world as never,
+      closeOthers: vi.fn(),
+      hideTooltip: vi.fn(),
+      captureFocus: () => null,
+      restoreFocus: vi.fn(),
+      slotName: (slot) => slot,
+      statCellHtml: () => '',
+      statTooltipHtml: () => '',
+      talentSummaryHtml: () => '',
+      progressionHtml: () => '',
+      unequip: vi.fn(),
+      beginUnequipDrag: vi.fn(),
+      endUnequipDrag: vi.fn(),
+      renderPreview: vi.fn(),
+      renderSkinPicker: vi.fn(),
+      openPlayerCard: vi.fn(),
+      openPrestige: vi.fn(),
+      openDeeds: vi.fn(),
+      openReliquary: vi.fn(),
+      dragState: new ItemDragState(),
+      renderBags: vi.fn(),
+      showError: vi.fn(),
+      helmSlotAvailable: () => true,
+      helmHidden: () => false,
+      toggleHelm: vi.fn(),
+      playtimeVisible: () => true,
+      togglePlaytimeVisible: vi.fn(),
+      itemIcon: () => '',
+      moneyHtml: () => '',
+      wornItemTooltip: () => 'deftip',
+      attachTooltip: (el: Element, resolve: () => string) => tips.push({ el, resolve }),
+    });
+    win.render();
+    return { root, tips, world: world as SheetWorld };
+  }
+
+  it('the slots row shows the live used count and hides entirely at zero worn', () => {
+    // Zero worn: no row at all (before endgame the cap never binds, and a
+    // standing "0 / 2" row would be noise on every sheet).
+    expect(renderSheet({}).root.querySelector('.char-mw-slots')).toBeNull();
+    // One worn, then two: the EXACT "{used} / {cap}" value tracks the flag
+    // walk (a substring check on '2' was satisfied by the cap in '1 / 2', so
+    // a frozen used-count survived it).
+    const one = renderSheet({ mainhand: 'duskforged_warblade' });
+    expect(one.root.querySelector('.char-mw-slots-value')?.textContent).toBe('1 / 2');
+    const two = renderSheet({ mainhand: 'duskforged_warblade', offhand: 'duskforged_bulwark' });
+    expect(two.root.querySelector('.char-mw-slots-value')?.textContent).toBe('2 / 2');
+    expect(two.root.querySelector('.char-mw-slots-label')?.textContent?.length).toBeGreaterThan(0);
+  });
+
+  it('the worn-piece diamond renders on the flagged slot only, with an accessible name', () => {
+    // A plain (unflagged) piece worn beside the Masterwrought one: the chip
+    // must gate on the def flag, so exactly one chip renders and it sits on
+    // the flagged slot (a chip-on-every-worn-item regression reds here).
+    const plainChest = Object.values(ITEMS).find(
+      (def) => def.kind === 'armor' && def.slot === 'chest' && !def.masterwrought,
+    );
+    expect(plainChest).toBeDefined();
+    if (!plainChest) throw new Error('missing plain chest fixture');
+    const { root } = renderSheet({ mainhand: 'duskforged_warblade', chest: plainChest.id });
+    const chips = [...root.querySelectorAll('.equip-mw-chip')];
+    expect(chips.length).toBe(1);
+    const chip = chips[0] as HTMLElement;
+    expect(chip.closest('#equip-slot-mainhand')).not.toBeNull();
+    expect(root.querySelector('#equip-slot-chest .equip-mw-chip')).toBeNull();
+    expect(chip.getAttribute('role')).toBe('img');
+    expect(chip.getAttribute('aria-label')?.length).toBeGreaterThan(0);
+  });
+
+  it('the worn tooltip adds the occupies-a-slot line with the LIVE count at hover time', () => {
+    const { root, tips, world } = renderSheet({ mainhand: 'duskforged_warblade' });
+    const row = root.querySelector('#equip-slot-mainhand') as Element;
+    const tip = tips.find((entry) => entry.el === row);
+    expect(tip).toBeDefined();
+    if (!tip) throw new Error('missing mainhand tooltip fixture');
+    const atOne = tip.resolve();
+    expect(atOne).toContain('deftip');
+    expect(atOne).toContain('1');
+    // The count resolves inside the closure, off the LIVE world: equipping a
+    // second piece between hovers moves the line with no re-render (an eager
+    // render-time count would serve the stale "1 of 2" byte-identically).
+    world.equipment.offhand = 'duskforged_bulwark';
+    const atTwo = tip.resolve();
+    expect(atTwo).not.toBe(atOne);
+    expect(atTwo).toContain('2');
+  });
+});
+
+describe('char_window: forced-colors Masterwrought marker', () => {
+  it('keeps the worn-piece diamond visible when author colors are suppressed', () => {
+    const css = readFileSync(join(__dirname, '../src/styles/components.css'), 'utf8');
+    expect(css).toMatch(
+      /@media\s*\(forced-colors: active\)\s*\{\s*\.equip-mw-chip \{[^}]*border:\s*1px solid CanvasText;/,
+    );
+  });
+});
+
+describe('char_window: production worn-tooltip wiring', () => {
+  it('disables comparison when Hud wires a worn-slot tooltip', () => {
+    const hud = readFileSync(join(__dirname, '../src/ui/hud.ts'), 'utf8');
+    const start = hud.indexOf('private readonly charWindow = new CharWindow({');
+    const wiring = hud.slice(start, hud.indexOf('\n  });', start));
+    expect(start).toBeGreaterThan(-1);
+    expect(wiring).toContain(
+      'wornItemTooltip: (item, instance) => this.itemTooltip(item, false, instance)',
+    );
   });
 });

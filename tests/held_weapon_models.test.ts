@@ -1,5 +1,8 @@
 import { existsSync } from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { KAYKIT_WEAPON_ACCESSORY, VARIANT_GRIPS } from '../src/render/characters/assets';
+import { BACK_GRIP_FAMILIES } from '../src/render/characters/back_grips';
 
 import {
   KAYKIT_SHIELD_ACCESSORIES,
@@ -198,12 +201,16 @@ describe('held weapon models', () => {
     expect(unmapped.map((item) => item.id)).toEqual([]);
   });
 
-  // The orbs, the lantern and the quivers (each with its generated heroic clone
-  // where the source is heroic-eligible) are the known held model gaps: the
-  // shared art set has no orb, lantern or quiver model to map them to, so they
-  // need new art, not a table row. The quivers are a softer gap than the orbs:
-  // the hunter's ranger.glb already carries a built-in quiver mesh, so an
-  // unmapped quiver reads correctly on the body instead of showing nothing.
+  // The orbs, the lantern, and the quivers (each with its generated heroic
+  // clone where the source is heroic-eligible) are the remaining held model
+  // gaps: the shared art set has no orb, lantern, or quiver model to map them
+  // to, so they need new art, not a table row. The quivers are a softer gap
+  // than the orbs: the hunter's ranger.glb already carries a built-in quiver
+  // mesh, so an unmapped quiver reads correctly on the body instead of
+  // showing nothing. The three inscription tomes LEFT this pin at the phase
+  // 06 QA, and voidbound_grimoire followed them out at phase 18: all four map
+  // to the procedural tome GLBs (scripts/assets/inscription_tomes, pinned by
+  // tests/inscription_tome_assets.test.ts).
   // Pinning the exact set makes the exception conscious: a future held_offhand
   // item must either map to a model or extend this pin.
   it('pins the held_offhand items without a model (orbs, lantern and quivers)', () => {
@@ -216,9 +223,27 @@ describe('held weapon models', () => {
       // The two Crucible held offhands follow the wraithfire_orb precedent
       // (a held orb/censer with no dedicated GLB yet).
       'cinder_of_the_first_design',
+      // copperlens_ocular: masterwrought Phase 11o's on-ramp gadget parks
+      // with its register sibling gyrelens_array below (the same lens-array
+      // class of gap; no shared model exists) until the art wave. RULED
+      // (qr-19-held-offhand-model-park, 2026-09-01, under
+      // qr-19-best-for-project): the park is RATIFIED for both lenses, so
+      // this is a ruled park rather than an open question, and the art wave
+      // that closes it is the maintainer's, not this phase's.
+      'copperlens_ocular',
       'cragmaw_huntquiver',
       'direfang_quiver',
+      // gyrelens_array: the shared art set has no lens-array model (the orb
+      // class of gap). Its phase 09 register sibling voidbound_grimoire LEFT
+      // this pin at phase 18: it was the half of the park with an existing
+      // pattern to follow, so it got its own procedural tome GLB
+      // (tome_voidbound) instead of an entry here. RULED
+      // (qr-19-held-offhand-model-park, 2026-09-01, under
+      // qr-19-best-for-project): the lens half KEEPS the park, precisely
+      // because a lens array has no pattern to reuse and the gap is
+      // cosmetic only. Commissioning is the maintainer's art wave.
       'gravewyrm_bone_quiver',
+      'gyrelens_array',
       'heroic_direfang_quiver',
       'heroic_gravewyrm_bone_quiver',
       'heroic_wraithfire_orb',
@@ -227,6 +252,33 @@ describe('held weapon models', () => {
       'valefire_lantern',
       'wraithfire_orb',
     ]);
+    // The retirement itself, stated as its own assertion so a re-add cannot
+    // pass by quietly restoring the row above.
+    expect(unmapped).not.toContain('voidbound_grimoire');
+  });
+
+  it('every inscription tome resolves its own held model GLB on disk', () => {
+    const expected: Record<string, string> = {
+      silverleaf_primer: 'models/weapons/tome_silverleaf.glb',
+      goldleaf_folio: 'models/weapons/tome_goldleaf.glb',
+      sunpetal_grimoire: 'models/weapons/tome_sunpetal.glb',
+      voidbound_grimoire: 'models/weapons/tome_voidbound.glb',
+    };
+    for (const [itemId, url] of Object.entries(expected)) {
+      expect(itemOffhandModelUrl(itemId), itemId).toBe(url);
+      expect(existsSync(path.join(__dirname, '..', 'public', url)), `${url} missing`).toBe(true);
+    }
+  });
+
+  it('every tome basename rides the VAR_BOOK grip family, hand and back', () => {
+    // Without an accessory row a model still renders but sits at the raw bone
+    // transform (no lift, no flip, no clamp), which no behavior suite can
+    // see: pin the table rows plus both grip tables the family resolves to.
+    for (const key of ['tome_silverleaf', 'tome_goldleaf', 'tome_sunpetal', 'tome_voidbound']) {
+      expect(KAYKIT_WEAPON_ACCESSORY[key], key).toBe('VAR_BOOK');
+    }
+    expect(VARIANT_GRIPS.VAR_BOOK).toBeDefined();
+    expect(BACK_GRIP_FAMILIES.has('VAR_BOOK')).toBe(true);
   });
 
   it('resolves actual offhands independently from the mainhand model', () => {
@@ -382,9 +434,20 @@ describe('held weapon models', () => {
     expect(rogue?.weaponSlots).toEqual([0]);
     expect(rogue?.offhandSlot).toBe(1);
     expect(rogue?.attach?.length).toBe(2);
-    expect(mechHeldWeaponOverride('paladin')?.offhandSlot).toBe(1);
-    expect(mechHeldWeaponOverride('shaman')?.offhandSlot).toBe(1);
-    for (const cls of ['hunter', 'priest', 'mage', 'warlock', 'druid'] as const) {
+    // The phase 06 QA gave priest, mage, and druid a real offhand slot (the
+    // inscription tomes), so the mech mirrors it for them exactly as it does
+    // for the shield classes. The warlock keeps its FIXED class spellbook
+    // (deliberately no offhandSlot; an equipped tome keeps the book visual),
+    // and the hunter has no offhand at all.
+    for (const cls of ['paladin', 'shaman', 'priest', 'mage', 'druid'] as const) {
+      expect(mechHeldWeaponOverride(cls)?.offhandSlot, cls).toBe(1);
+    }
+    // Accepted side effect, recorded in the Phase 06 QA ledger: a WEAPONLESS
+    // caster in the mech now shows the class staff base where it used to show
+    // the mech's sword default (the same layout adoption the shield classes
+    // already had). An armed character is unaffected (index 0 is a swap slot).
+    expect(mechHeldWeaponOverride('mage')?.attach?.[0]?.url).toBe('models/weapons/staff.glb');
+    for (const cls of ['hunter', 'warlock'] as const) {
       expect(mechHeldWeaponOverride(cls), `${cls} should keep the mech default`).toBeNull();
     }
 

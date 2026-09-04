@@ -118,7 +118,7 @@ describe('pet action bar icons', () => {
 });
 
 describe('petSpecialButtonState', () => {
-  it('projects Gloomshade and Emberkin skills with visible cooldown and autocast state', () => {
+  it('projects Duskmurk and Emberkin skills with visible cooldown and autocast state', () => {
     expect(petSpecialButtonState(MOBS.gloomshade, 14.2, true)).toEqual({
       iconId: 'gloomshade_abyssal_chain',
       labelKey: 'hud.pet.abyssalChain',

@@ -86,6 +86,33 @@ describe('mob purge affix (Spellgnaw)', () => {
     expect(player.auras.length).toBe(1); // exactly one eaten
   });
 
+  it('still devours a flask aura: the STK-2 ruling covers player counters only (recorded exception)', () => {
+    // The phase 10 QA STK-2 ruling (2026-08-16) stamps flask auras
+    // `undispellable`, which routes every PLAYER counter (dispel, purge,
+    // cleanse, Spellplunder, right-click cancel) through
+    // isPlayerRemovableAura's refusal. The mob Spellgnaw devour affix reads
+    // NEITHER flag: isDevourableAura is a bare beneficial-buff test, so a mob
+    // purge still eats a flask. Deliberate and recorded (the ruling's text
+    // names the player-driven counters; mob affix balance is untouched); if
+    // the maintainer ever widens the ruling to mobs, this pin is the one that
+    // flips.
+    const sim = makeSim();
+    const player = sim.player;
+    spawnGrubjaw(sim);
+    // The fixture is a GENUINE mint, never a hand-built literal: the player
+    // quaffs the real flask, so a mint-shape change (marker or flag rename)
+    // reaches this pin instead of leaving it green over a drifted shape.
+    player.auras = [];
+    sim.addItem('ironhusk_flask', 1, player.id);
+    sim.useItem('ironhusk_flask', player.id);
+    const flask = player.auras.find((a) => a.id === 'elixir_buff_sta');
+    expect(flask?.flask, 'sanity: the mint carries the marker').toBe(true);
+    expect(flask?.undispellable, 'sanity: the mint carries the flag').toBe(true);
+    const removed = devourBeneficialAura((sim as any).ctx, player, 'Spellgnaw');
+    expect(removed).toBe(true);
+    expect(player.auras.some((a) => a.id === 'elixir_buff_sta')).toBe(false);
+  });
+
   it('never strips a debuff or a negative buff_* drain', () => {
     const sim = makeSim();
     const player = sim.player;

@@ -316,9 +316,19 @@ describe('saveCharacterAndGuildBankState (the game-loop escrow save)', () => {
     );
     expect(seedCalls.map((c) => (c[1] as unknown[])[0])).toEqual([7, 9]);
     const charIndex = sqls.findIndex((s2) => /UPDATE characters/i.test(s2));
-    const lockIndex = sqls.findIndex((s2) => /FOR UPDATE/i.test(s2));
+    // The GUILD-BANK row lock comes AFTER the char update (it locks the shared
+    // book before merging this session's deltas), disambiguated from D145's
+    // CHARACTERS row lock, which precedes the fenced char UPDATE
+    // (qr-19-live-nonce-fence-write-loss).
+    const guildLockIndex = sqls.findIndex((s2) => /FROM guild_banks[\s\S]*FOR UPDATE/i.test(s2));
+    const charLockIndex = sqls.findIndex((s2) =>
+      /FROM characters\b[\s\S]*FOR NO KEY UPDATE/i.test(s2),
+    );
     expect(charIndex).toBeGreaterThan(0);
-    expect(lockIndex).toBeGreaterThan(charIndex);
+    expect(guildLockIndex).toBeGreaterThan(charIndex);
+    // D145: this is a fenced save, so the characters row lock precedes its UPDATE.
+    expect(charLockIndex).toBeGreaterThanOrEqual(0);
+    expect(charLockIndex).toBeLessThan(charIndex);
     // Both books are parameterized upserts on the SAME client, carrying the
     // MERGED book (this stub's SELECT returns no row, so the base is the empty
     // book and the merge is exactly this session's deltas).

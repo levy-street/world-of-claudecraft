@@ -150,6 +150,44 @@ describe('eqi over a real server broadcast into applySnapshot (liveness, not sha
   });
 });
 
+describe('eqi carries the player-chosen legendary name (Masterwrought phase 13)', () => {
+  it('an inspected promoted copy ships its name; the Perfected marker still never rides', () => {
+    const server = new GameServer();
+    const fcA = fakeWs();
+    const a = joinServer(server, fcA, 3, 'Namer');
+    const fcB = fakeWs();
+    const b = joinServer(server, fcB, 4, 'Inspector');
+
+    // The promoted shape the sim mints (rolled quality override plus the
+    // chosen name plus the Perfected stamp); the server is the only place
+    // payloads are born, the suite header's rule.
+    const promoted = {
+      rolled: { quality: 'legendary', masterwork: true, stats: { int: 3 } },
+      signer: 'Namer',
+      name: "Vel'tara's Oath",
+      perfected: true as const,
+    };
+    server.sim.addItemInstance(ITEM_ID, structuredClone(promoted), a.pid);
+    cmd(server, a, { cmd: 'equip', item: ITEM_ID });
+    fcB.sent.length = 0;
+    server.sim.tick();
+    broadcast(server);
+    const snap = lastSnap(fcB.sent);
+    const rec = snap?.ents.find((r: any) => r.id === a.pid);
+    // The cosmetic allowlist: name joins signer/enchant/rolled; the Perfected
+    // marker and bind state stay data-minimized off the peer wire.
+    expect(rec?.eqi?.chest?.name).toBe("Vel'tara's Oath");
+    expect(rec?.eqi?.chest?.rolled?.quality).toBe('legendary');
+    expect(rec?.eqi?.chest?.perfected).toBeUndefined();
+
+    // Liveness through the real decode: the inspecting client's mirror
+    // carries the name for the inspect window's widened itemTooltip.
+    const client = bareClient(b.pid);
+    (client as any).applySnapshot(snap);
+    expect(client.entities.get(a.pid)?.equippedInstances?.chest?.name).toBe("Vel'tara's Oath");
+  });
+});
+
 describe('server authority over instance payloads', () => {
   it('a client-supplied instance on a trade_offer wire message is stripped, never granted', () => {
     // Equip/craft/use commands carry only string ids, so an instance payload is
@@ -202,13 +240,24 @@ describe('inspect_window painter instance threading (source pins)', () => {
   const painter = readFileSync(new URL('../src/ui/inspect_window.ts', import.meta.url), 'utf8');
   const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
 
-  it('threads the inspected entity payload per slot into both paperdoll columns', () => {
-    expect(painter).toContain('this.buildSlotRow(cell, e.equippedInstances[cell.slot])');
+  it('threads the inspected entity payloads through the pure core into the paperdoll cells', () => {
+    // Since the 2026-08-27 QA round the payloads ride the VIEW MODEL: the
+    // painter hands equippedInstances to buildInspectView, and the core
+    // threads them into buildPaperdollView (third argument), whose cells carry
+    // each slot's eqi-projected instance for the row AND the tooltip.
+    // The 2026-08-27 host-parity ruling: SELF hands the full worn mirror via
+    // openInspect's fourth parameter; a peer stays on the eqi-shaped entity.
+    expect(painter).toContain('equippedInstances: selfEquippedInstances ?? e.equippedInstances');
+    const view = readFileSync(new URL('../src/ui/inspect_view.ts', import.meta.url), 'utf8');
+    expect(view).toContain(
+      'buildPaperdollView(input.equippedItems, items, input.equippedInstances)',
+    );
   });
 
-  it('the slot row forwards the instance into the tooltip builder', () => {
+  it('the slot row reads the cell payload and forwards it into the tooltip builder', () => {
+    expect(painter).toContain('const { slot, item, instance } = cell;');
     expect(painter).toContain(
-      'this.deps.attachTooltip(row, () => this.deps.itemTooltip(item, instance))',
+      'this.deps.attachTooltip(row, () => this.deps.itemTooltip(item, instance ?? undefined))',
     );
   });
 

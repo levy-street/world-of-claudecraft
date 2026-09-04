@@ -97,7 +97,7 @@ const CLASS_PLAN = {
     name: 'Rowmage',
     rows: {
       5: 'mag_r5_impulse', // Impulse (fire_blast cd)
-      8: 'mag_r8_counterspell', // Spellbreak (grant counterspell)
+      8: 'mag_r8_counterspell', // Spellsever (grant counterspell)
       11: 'mag_r11_cone_of_cold', // Frostsweep (grant cone_of_cold)
       14: 'mag_r14_presence_of_mind', // Racing Mind (grant presence_of_mind)
       17: 'mag_r17_ice_block', // Cold Coffin (grant ice_block)

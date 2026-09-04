@@ -32,6 +32,28 @@ import { fineMaterialFor } from './material_grades';
 import type { ProfessionReagent } from './types';
 
 // The base rows. An id absent here is tier 0.
+//
+// The ten Masterwrought intermediates (Phase 08, paying the Phase 07 ledger
+// obligation) sit on tier 2 by the arcanite_bar precedent: a refined reagent
+// keyed here directly rather than through a node family. They are one rung
+// past arcanite (skill-75 crafted, each consuming a Quickening Catalyst plus
+// tier-1/2 mats), but tier 2 is deliberately the ceiling: a new tier would
+// change the masterwork bonus scale, and masterwork.ts constants are locked
+// by ruling. Two consumer surfaces exist: the apex rows (the intended one,
+// every bill maxes at tier 2 via its intermediate) AND the nine phase 07
+// intermediate recipes themselves, whose Quickening Catalyst reagent now
+// carries tier 2, raising their masterworkProcChance INPUT (seven of nine
+// move: 0.01 to 0.02 for billet/plating/setting/chassis, 0 to 0.02 for
+// cording/stock/reagent; bolt and vellum already sat at 2 via sunpetal).
+// That input change is EFFECT-DEAD by a separate mechanism: every
+// intermediate output is slotless junk, so masterworkBonusStats returns
+// null and the crafting.ts effect gate never fires (pinned in
+// tests/professions_masterwork.test.ts). The proc draw is unconditional
+// either way, so no rng draw order moves anywhere. wyrmfall_core stays
+// DELIBERATELY untiered: the raid chase material's premium is availability,
+// not refinement, and every apex bill already maxes at tier 2 through its
+// intermediate; revisit only if a future apex row ever lists the core
+// without an intermediate beside it.
 const BASE_MATERIAL_TIERS: Readonly<Record<string, number>> = Object.freeze({
   iron_ore: 1,
   ashwood_log: 1,
@@ -40,6 +62,16 @@ const BASE_MATERIAL_TIERS: Readonly<Record<string, number>> = Object.freeze({
   elderwood_log: 2,
   sunpetal_herb: 2,
   arcanite_bar: 2,
+  duskforged_billet: 2,
+  forgefold_plating: 2,
+  wyrmhide_cording: 2,
+  sunspun_bolt: 2,
+  prismglass_setting: 2,
+  precision_chassis: 2,
+  quickening_catalyst: 2,
+  seasoned_stock: 2,
+  lucent_reagent: 2,
+  sablewax_vellum: 2,
 });
 
 // Pinned per-material tier table (tests/professions_masterwork.test.ts pins

@@ -98,6 +98,14 @@ export interface ProfessionRecipeRecord {
   // never costs anything beyond materials" rule. There is NO level arm: the
   // old hub's level-20 gate retired with it (2026-07-17 maintainer ruling).
   stationType?: StationType;
+  // Daily craft gate (Masterwrought Phase 07): at most ONE successful craft
+  // of this recipe per character per reset day, keyed on ctx.resetDay (the
+  // wyrmfallDaily idiom: a host that never sets resetDay sees a one-shot
+  // gate; see professions/masterwrought_materials.ts). The per-character
+  // state rides PlayerMeta.craftDaily, persisted with the same load clamps.
+  // Admission refuses with the 'daily_limit' CraftResult reason; the day
+  // stamp lands in resolveCraftForRecipe on successful consumption only.
+  oncePerDay?: true;
 }
 
 // One performed craft (a runtime instance of a RecipeRecord being worked),

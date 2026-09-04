@@ -158,6 +158,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.legend': 'ЛЕГЕНДА',
   'hudChrome.discord.roleTag.shill': 'ГЛАШАТАЙ',
   'guide.profPages.gainFmt': '{reduced} / {minimal} / {zero}',
+  'guide.profPages.gainNever': 'никогда',
   'guide.profPages.colWield': 'Нужно мастерство',
   'guide.profPages.wieldNone': 'Любое',
   'guide.profPages.fish.pctFmt': '{pct}%',
@@ -251,7 +252,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.seasoned_soldier.name': 'Бывалый солдат',
   'entities.abilities.storm_bolt.description':
     'Метает ваше оружие в цель на {damage}, оглушая ее на 3 сек.',
-  'entities.abilities.storm_bolt.name': 'Громовой разряд',
+  'entities.abilities.storm_bolt.name': 'Громовой бросок',
   'entities.abilities.sudden_death.description':
     'Ваши автоатаки могут позволить применить Раннюю могилу к цели с любым запасом здоровья, не потратив ярости. (ветка «Оружие»)',
   'entities.abilities.sudden_death.name': 'Внезапная смерть',
@@ -260,7 +261,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sweeping_strikes.name': 'Расширяющаяся дуга',
   'entities.abilities.victory_rush.description':
     'Бьет на урон оружием плюс {damage} и исцеляет на 20% от максимального здоровья. Можно использовать только в течение 20 сек после убийства врага.',
-  'entities.abilities.victory_rush.name': 'Порыв победы',
+  'entities.abilities.victory_rush.name': 'Порыв победителя',
   'hudChrome.specPanel.complexity': 'Сложность',
   'hudChrome.specPanel.complexityHigh': 'Высокая',
   'hudChrome.specPanel.complexityLow': 'Низкая',
@@ -276,7 +277,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aspect_of_the_wild.name': 'Облик дикого клыка',
   'entities.abilities.avenging_wrath.name': 'Гнев карателя',
   'entities.abilities.berserk.name': 'Багровая дымка',
-  'entities.abilities.blink.name': 'Мерцающий шаг',
+  'entities.abilities.blink.name': 'Порхающий шаг',
   'entities.abilities.bloodlust.name': 'Боевые барабаны',
   'entities.abilities.chain_lightning.name': 'Разветвленная молния',
   'entities.abilities.chaos_bolt.name': 'Стрела погибели',
@@ -447,7 +448,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.ice_fang_sword.look':
     'Изогнутый клинок из бледного ледникового льда, зубчатые кристаллы изморози на обухе, сияющее голубое замёрзшее ядро в доле и гарда-сосулька.',
   'hudChrome.wocStore.skins.ice_fang_sword.lore':
-    'Главный образец ледяной категории и первое, к чему тянется каждый коллекционер. Ice Fang не выковали, а вырезали из клыка ледника Thornpeak над Highwatch; его голубое ядро горит холодом, словно свет на Glimmermere. Он покрывает инеем сам воздух, который разрезает. Стражи стены клянутся, что солдат нёс его в ночь, когда высокие снега сдержали Wyrmcult, и «купил стене целую зиму».',
+    'Главный образец ледяной категории и первое, к чему тянется каждый коллекционер. Ice Fang не выковали, а вырезали из клыка ледника Thornpeak над Highwatch; его голубое ядро горит холодом, словно свет на Glimmermere. Он покрывает инеем сам воздух, который разрезает. Стражи стены клянутся, что солдат нёс его в ночь, когда высокие снега сдержали Broodsworn, и «купил стене целую зиму».',
   'hudChrome.wocStore.skins.glaciersplit_axe.name': 'Глейшерсплит',
   'hudChrome.wocStore.skins.glaciersplit_axe.look':
     'Навершие из полупрозрачного синего ледникового льда, голубое свечение в треснувшей сердцевине, щетина морозных кристаллов и холодный пар за рукоятью.',
@@ -473,7 +474,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Один шип сияющего голубого ледникового льда, иней, распускающийся из серебряной муфты, и лёгкая холодная дымка.',
   'hudChrome.wocStore.skins.everwinter_wand.lore':
     'Шип сияющего ледникового льда, отколотый, как говорят, от глубокого озера под Sanctum, где у горного холода есть зубы. Иней непрерывно расцветает на серебряной муфте и не тает ни в огне, ни летом. Маги держат его близко ради холода, который он придаёт их чарам, и далеко — в ночи, когда он будто клонится к склепу Nythraxis и прислушивается.',
-  'hudChrome.wocStore.skins.winterbite.name': 'Уинтербайт',
+  'hudChrome.wocStore.skins.winterbite.name': 'Зимогрыз',
   'hudChrome.wocStore.skins.winterbite.look':
     'Лук из посеребрённой стали и синего льда, сияющее голубое замёрзшее ядро в рукояти, наложенная стрела из цельного льда и холодный пар.',
   'hudChrome.wocStore.skins.winterbite.lore':
@@ -897,6 +898,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Истощённая трава, инструмент недоступен',
   'hud.core.mapMarkerLabels.station': 'Ремесленная станция: {name}',
   'hud.core.mapMarkerLabels.service': 'Служба: {name}',
+  'hud.core.mapMarkerLabels.farmPatch': 'Грядки',
   'hud.core.mapMarkerLabels.partyMember': 'Участник группы: {name}',
   'hud.core.mapMarkerLabels.deadPartyMember':
     'Погибший участник группы: {name}',
@@ -2640,6 +2642,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.logs.soldJunkMany': 'Вы продали серые предметы ({count}) за {money}.',
   'hud.logs.keptBoundOne': 'Оставлена {count} привязанная копия.',
   'hud.logs.keptBoundMany': 'Оставлены привязанные копии ({count}).',
+  'hud.logs.keptLockedOne': 'Оставлена {count} заблокированная копия.',
+  'hud.logs.keptLockedMany': 'Оставлены заблокированные копии ({count}).',
   'hud.logs.friendOnline': '{name} вошел в игру.',
   'hud.logs.friendOffline': '{name} вышел из игры.',
   'hud.markers.names.star': 'Звезда',
@@ -2824,6 +2828,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.forms.bear': 'медведя',
   'abilityUi.forms.cat': 'волка',
   'abilityUi.cast.fishing': 'Рыбная ловля',
+  'abilityUi.cast.farming': 'Посадка',
   'abilityUi.cast.gathering': 'Сбор ресурсов',
   'abilityUi.cast.thunzharrStormcall': 'Зов бури',
   'abilityUi.cast.demonHeal': 'Исцеление демона',
@@ -2952,9 +2957,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.material': 'Материал',
   'itemUi.kind.food': 'Еда',
   'itemUi.kind.drink': 'Напиток',
+  'itemUi.kind.recipe': 'Схема',
   'itemUi.kind.tool': 'Инструмент',
   'itemUi.kind.potion': 'Зелье',
   'itemUi.kind.elixir': 'Эликсир',
+  'itemUi.kind.scroll': 'Свиток',
+  'itemUi.kind.flask': 'Фляга',
   'itemUi.kind.mount': 'Транспорт',
   'itemUi.stats.armor': 'Броня',
   'itemUi.stats.str': 'Сила',
@@ -3000,11 +3008,30 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.useManaPotion':
     'Использование: мгновенно восстанавливает {amount} маны. Можно использовать в бою. Восстановление 1 мин.',
   'itemUi.tooltip.useElixir':
-    'Использование: повышает {stat} на {value} в течение {minutes} мин. Можно использовать в бою.',
+    'Использование: повышает {stat} на {value} в течение {minutes} мин. Заменяет любой другой эликсир или свиток той же характеристики. Можно использовать в бою.',
   'itemUi.tooltip.useElixirAura':
-    'Использование: дает эффект "{aura}" на {minutes} мин. Можно использовать в бою.',
+    'Использование: дает эффект "{aura}" на {minutes} мин. Заменяет любой другой эликсир или свиток того же рода. Можно использовать в бою.',
+  'itemUi.tooltip.flaskOnlyOne': 'Одновременно действует только одна фляга. Новая фляга заменяет эту.',
+  'itemUi.tooltip.flaskOutranks':
+    'Более слабый эликсир или свиток той же характеристики не может его заменить.',
+  'itemUi.tooltip.flaskUnremovable':
+    'Этот эффект нельзя рассеять, украсть или отменить вручную.',
+  'itemUi.tooltip.flaskThroughDeath':
+    'Эффект сохраняется после смерти, но пропадает при выходе из игры; инстансовые матчи и начинаются, и заканчиваются с чистого листа.',
+  'itemUi.tooltip.wellFed':
+    'Сытость: по окончании трапезы повышает {stat} на {value} в течение {minutes} мин. Одновременно действует только один эффект сытости: более свежая трапеза заменяет прежний.',
+  'itemUi.tooltip.wellFedAura':
+    'Сытость: по окончании трапезы дает эффект "{aura}" на {minutes} мин. Одновременно действует только один эффект сытости: более свежая трапеза заменяет прежний.',
+  'itemUi.tooltip.useFeast':
+    'Использование: накрывает пир, с которого могут поесть и другие, по одной порции каждому ({servings} порций, действует {minutes} мин).',
+  'itemUi.tooltip.useFeastBuff':
+    'Каждая порция дает эффект "{aura}": {stat} +{value} на {minutes} мин после {seconds} сек еды. Одновременно действует только один эффект сытости: более свежая трапеза заменяет прежний.',
+  'itemUi.tooltip.useFeastBuffAura':
+    'Каждая порция дает эффект "{aura}" на {minutes} мин после {seconds} сек еды. Одновременно действует только один эффект сытости: более свежая трапеза заменяет прежний.',
   'itemUi.tooltip.clickUseInstant': 'Нажмите, чтобы мгновенно использовать в бою',
   'itemUi.tooltip.clickUse': 'Нажмите, чтобы использовать',
+  'itemUi.tooltip.clickSetOut': 'Нажмите, чтобы накрыть стол',
+  'itemUi.tooltip.clickSetUp': 'Нажмите, чтобы установить',
   'itemUi.tooltip.clickBuyback': 'Нажмите, чтобы выкупить',
   'itemUi.bags.title': 'Сумки',
   'itemUi.bags.close': 'Закрыть сумки',
@@ -3076,6 +3103,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterTypeConsumable': 'Расходники',
   'itemUi.market.filterTypeMaterial': 'Материалы',
   'itemUi.market.filterTypeCosmetic': 'Косметика',
+  'itemUi.market.filterTypePattern': 'Схемы',
   'itemUi.market.filterTypeOther': 'Другое',
   'itemUi.market.filterArmorType': 'Тип брони',
   'itemUi.market.filterArmorAll': 'Вся броня',
@@ -3585,7 +3613,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.name': 'Подлатать',
   'entities.abilities.revive_pet.description':
     'Подлечивает питомца: если он жив, восстанавливает ему {overTime} ед. здоровья за 12 сек. с шагом в 3 сек. Если питомец мёртв, воскрешает его с 35% здоровья.',
-  'entities.abilities.holy_shock.name': 'Шок небес',
+  'entities.abilities.holy_shock.name': 'Разряд Света',
   'entities.abilities.holy_shock.description':
     'Поражает дружественную цель энергией Света и исцеляет ее на {damage}. (знаковое умение Света)',
   'entities.abilities.holy_shield.name': 'Священный щит',
@@ -3603,7 +3631,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.combustion.name': 'Транс феникса',
   'entities.abilities.combustion.description':
     'Повышает шанс критического эффекта заклинаний на 50% на 15 сек. (знаковое умение Огня)',
-  'entities.abilities.icy_veins.name': 'Ледяные жилы',
+  'entities.abilities.icy_veins.name': 'Волна стужи',
   'entities.abilities.icy_veins.description':
     'Повышает скорость заклинаний на 30% и предотвращает прерывание и задержку произнесения на 10 сек. (знаковое умение Льда)',
   'entities.abilities.cold_blood.name': 'Хладнокровие',
@@ -3803,7 +3831,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.ogre_war_totem.name': 'Боевой тотем огра',
   'entities.items.storm_core.name': 'Ядро бури',
   'entities.items.kazzix_heartshard.name': 'Осколок сердца Каззикса',
-  'entities.items.wyrmcult_orders.name': 'Приказы Культа Вирма',
+  'entities.items.wyrmcult_orders.name': 'Приказы Клятвы Выводка',
   'entities.items.ritual_phylactery.name': 'Ритуальная филактерия',
   'entities.items.gravewyrm_sigil.name': 'Сигил Могильного Вирма',
   'entities.items.blessed_embers.name': 'Благословенные угли',
@@ -3824,7 +3852,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.staff_of_velkhar.name': 'Посох Велхара',
   'entities.items.shadowmeld_tunic.name': 'Туника Ночной завесы',
   'entities.items.gravewyrm_scale_hauberk.name': 'Хауберк из чешуи Могильного Вирма',
-  'entities.items.wyrmcult_grand_robe.name': 'Великая роба Культа Вирма',
+  'entities.items.wyrmcult_grand_robe.name': 'Великая роба Клятвы Выводка',
   'entities.items.wyrmscale_jerkin.name': 'Куртка из вирмовой чешуи',
   'entities.items.wyrmfang_greatblade.name': 'Великий клинок Клык Вирма',
   'entities.items.staff_of_the_gravewyrm.name': 'Посох Могильного Вирма',
@@ -3891,7 +3919,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.tideguard_sabatons.name': 'Сабатоны Стража прилива',
   'entities.items.valeborn_spellblade.name': 'Долиннорожденный чароклинок',
   'entities.items.voss_sanctified_mace.name': 'Освященная булава Восса',
-  'entities.items.wyrmcult_soulsteps.name': 'Шаги души Культа вирма',
+  'entities.items.wyrmcult_soulsteps.name': 'Шаги души Клятвы Выводка',
   'entities.items.wyrmshadow_harness.name': 'Сбруя Ночного Клыка',
   'entities.items.wyrmshadow_legguards.name': 'Поножи Ночного Клыка',
   'entities.items.wyrmshadow_treads.name': 'Ступни Ночного Клыка',
@@ -3967,8 +3995,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.warlord_drogmar.name': 'Воевода Дрогмар',
   'entities.mobs.stormcrag_elemental.name': 'Элементаль Грозового Утеса',
   'entities.mobs.shardlord_kazzix.name': 'Осколочный владыка Каззикс',
-  'entities.mobs.wyrmcult_zealot.name': 'Фанатик Культа Вирма',
-  'entities.mobs.wyrmcult_necromancer.name': 'Некромант Культа Вирма',
+  'entities.mobs.wyrmcult_zealot.name': 'Фанатик Клятвы Выводка',
+  'entities.mobs.wyrmcult_necromancer.name': 'Некромант Клятвы Выводка',
   'entities.mobs.boneclad_revenant.name': 'Костепанцирный ревенант',
   'entities.mobs.crypt_shambler.name': 'Склепный шатун',
   'entities.mobs.hollow_acolyte.name': 'Послушник Пустоты',
@@ -3997,7 +4025,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sister_nhalia.name': 'Сестра Налия',
   'entities.mobs.varkas_boneguard.name': 'Костяной страж Варкаса',
   'entities.mobs.emberkin.name': 'Уголёк',
-  'entities.mobs.gloomshade.name': 'Мрачная тень',
+  'entities.mobs.gloomshade.name': 'Сумрачная мгла',
   'entities.mobs.grix_the_tunnelking.name': 'Грикс, Король туннелей',
   'entities.mobs.pyre_colossus.name': 'Погребальный колосс',
   'entities.mobs.choirmother_selthe.name': 'Матерь хора Селте',
@@ -4149,6 +4177,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_intro.completion':
     'Вот видите? Руда добыта, а на руках появились мозоли. В дороге продолжайте добывать руду, рубить лес и собирать травы. Вернувшись в город, не забудьте о доске городского направления у рынка и ремесленном столе рядом. Если захотите, все эти занятия обеспечат честный заработок.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Рудная жила разработана',
+  'entities.quests.q_farm_intro.title': 'Первая борозда',
+  'entities.quests.q_farm_intro.text':
+    'Возьми эту мотыгу и щепоть семян долинной пшеницы, {playerName}. Посей семена на одной из грядок рядом со мной, а потом займись своими делами. Возвращайся, когда захочешь, и собери урожай; я буду здесь.',
+  'entities.quests.q_farm_intro.completion':
+    'Вот он, твой первый урожай в собственных руках. Урожай растёт, пока тебя нет, и никогда не портится. В журнале урожая (Shift+K или строка Земледелие в окне профессий) перечислена каждая засеянная грядка и её таймер. Приходи за семенами всякий раз, как позовут грядки, {playerName}.',
+  'entities.quests.q_farm_intro.objectives.0.label': 'Долинная пшеница посажена',
+  'entities.quests.q_farm_intro.objectives.1.label': 'Долинная пшеница собрана',
   'entities.quests.q_wolves.title': 'Волки у дверей',
   'entities.quests.q_wolves.text':
     'Лесные волки осмелели и бросаются на путников у северной дороги, {playerName}. Убейте 8, чтобы Истврук вздохнул свободнее.',
@@ -4453,7 +4488,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_crushers.objectives.0.label': 'Крушитель Терновых Пиков: убито',
   'entities.quests.q_drogmar.title': 'Воевода Дрогмар',
   'entities.quests.q_drogmar.text':
-    'Дрогмар взял монету Культа Вирма и присягнул кланы пробуждению горы. И когда он бьет по земле, {playerName}, не стойте рядом. Войдите в лагерь и убейте его ради Хайвотча.',
+    'Дрогмар взял монету Клятвы Выводка и присягнул кланы пробуждению горы. И когда он бьет по земле, {playerName}, не стойте рядом. Войдите в лагерь и убейте его ради Хайвотча.',
   'entities.quests.q_drogmar.completion':
     'Дрогмар мертв в собственном лагере. Вы купили моей стене зиму, {playerName}.',
   'entities.quests.q_drogmar.objectives.0.label': 'Воевода Дрогмар: убито',
@@ -4479,7 +4514,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Ветер с южных пиков несет песнопения. Заставьте 12 фанатиков умолкнуть, {playerName}; каждая тишина дает горе еще ночь сна.',
   'entities.quests.q_zealots.completion':
     'Ветер стал тише. Но меня тревожит не пение, {playerName}, а то, что кто-то может отвечать.',
-  'entities.quests.q_zealots.objectives.0.label': 'Фанатик Культа Вирма: убито',
+  'entities.quests.q_zealots.objectives.0.label': 'Фанатик Клятвы Выводка: убито',
   'entities.quests.q_cult_orders.title': 'Приказы снизу',
   'entities.quests.q_cult_orders.text':
     'Фанатики движутся как солдаты перед осадой. Фанатики, что организуются, - это фанатики, исполняющие приказы, {playerName}. Убейте еще 8 и принесите 4 комплекта приказов.',
@@ -4522,7 +4557,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_voice_below.completion':
     'Коленопреклонение прекратилось. Мы не заставили голос умолкнуть, {playerName}; лишь проредили его хор.',
   'entities.quests.q_voice_below.objectives.0.label': 'Фанатик Культа Вирма: убито',
-  'entities.quests.q_voice_below.objectives.1.label': 'Некромант Культа Вирма: убито',
+  'entities.quests.q_voice_below.objectives.1.label': 'Некромант Клятвы Выводка: убито',
   'entities.quests.q_sanctum_gate.title': 'Врата святилища',
   'entities.quests.q_sanctum_gate.text':
     'Это последний порог, {playerName}. Культ разбил ключевой камень святилища и разбросал осколки на площади. Принесите 3, и я тихо открою путь.',
@@ -4627,13 +4662,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.4.label': 'Военный лагерь Дрогмара',
   'entities.zones.thornpeak_heights.pois.5.label': 'Грозовой Утес',
   'entities.zones.thornpeak_heights.pois.6.label': 'Глиммермир',
-  'entities.zones.thornpeak_heights.pois.7.label': 'Шатры Культа Вирма',
+  'entities.zones.thornpeak_heights.pois.7.label': 'Шатры Клятвы Выводка',
   'entities.zones.thornpeak_heights.pois.8.label': 'Поля ревенантов',
   'entities.zones.thornpeak_heights.pois.9.label': 'Святилище Могильного Вирма',
   'entities.zones.veiled_hollow.name': 'Сокрытая лощина',
   'entities.zones.veiled_hollow.welcome':
-    'Воздух гудит от древней магии. Найдите хранительницу Сэльвин под великим древом Элдерглима.',
-  'entities.zones.veiled_hollow.pois.0.label': 'Элдерглим',
+    'Воздух гудит от древней магии. Найдите хранительницу Сэльвин под великим древом Элдершайна.',
+  'entities.zones.veiled_hollow.pois.0.label': 'Элдершайн',
   'entities.zones.veiled_hollow.pois.1.label': 'Сумеречная пещера',
   'entities.zones.veiled_hollow.pois.2.label': 'Сумеречная смотровая площадка',
   'entities.zones.veiled_hollow.pois.3.label': 'Древняя роща',
@@ -4695,7 +4730,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.ice_wisp.name': 'Ледяной огонёк',
   'entities.mobs.rime_elemental.name': 'Инеевый элементаль',
   'entities.mobs.fen_sprite.name': 'Топяной дух',
-  'entities.mobs.frostmane_yeti.name': 'Морозогривый йети',
+  'entities.mobs.frostmane_yeti.name': 'Инеегривый йети',
   'entities.mobs.emberwing_drake.name': 'Углекрылый дрейк',
   'entities.mobs.ashbone_raider.name': 'Пеплокостный налётчик',
   'entities.mobs.ashbone_warcaller.name': 'Пеплокостный горлопан',
@@ -4703,7 +4738,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gilded_stag.name': 'Золочёный олень',
   'entities.mobs.gloam_fox.name': 'Сумеречный лис',
   'entities.mobs.orchard_treant.name': 'Садовый древень',
-  'entities.mobs.harvest_sprite.name': 'Жатвенный дух',
+  'entities.mobs.harvest_sprite.name': 'Колосковый дух',
   'entities.mobs.mere_lurker.name': 'Озёрный скрытень',
   'entities.mobs.bogtoad.name': 'Топяная жаба',
   'entities.mobs.drowsy_croaker.name': 'Дремотный Квакун',
@@ -4714,18 +4749,18 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'За Ночными Вратами грезит сам воздух. Иди по цветочному свету к Лунному Приюту и не пропусти спящий мир, что висит в небе.',
   'entities.zones.nightbloom.pois.0.label': 'Лунный Приют',
   'entities.zones.nightbloom.pois.1.label': 'Ночные Врата',
-  'entities.zones.nightbloom.pois.2.label': 'Лунный Колодец',
+  'entities.zones.nightbloom.pois.2.label': 'Лунный Родник',
   'entities.zones.nightbloom.pois.3.label': 'Сумеречное Поле',
   'entities.zones.nightbloom.pois.4.label': 'Стоячий Дозор',
   'entities.zones.nightbloom.pois.5.label': 'Курган Неспящего',
   'entities.mobs.moonfleece_grazer.name': 'Лунорунный зверь',
   'entities.mobs.gloam_strider.name': 'Сумеречный бегун',
-  'entities.mobs.nightkin_stargazer.name': 'Ночерождённый звездочёт',
+  'entities.mobs.nightkin_stargazer.name': 'Сумеречнорождённый звездочёт',
   'entities.mobs.barrow_king.name': 'Курганный Король',
   'entities.zones.wraithwood.name': 'Призрачная Чаща',
   'entities.zones.wraithwood.welcome':
-    'Кроны смыкаются над дорогой, как крышка гроба. Держись фонарей Гэллоумира, и если лес позовёт тебя по имени, не отвечай.',
-  'entities.zones.wraithwood.pois.0.label': 'Гэллоумир',
+    'Кроны смыкаются над дорогой, как крышка гроба. Держись фонарей Гиббетмира, и если лес позовёт тебя по имени, не отвечай.',
+  'entities.zones.wraithwood.pois.0.label': 'Гиббетмир',
   'entities.zones.wraithwood.pois.1.label': 'Вороньи Врата',
   'entities.zones.wraithwood.pois.2.label': 'Вдовья Чаща',
   'entities.zones.wraithwood.pois.3.label': 'Висельная Поляна',
@@ -4844,7 +4879,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.loremother_bryn.greeting':
     'Каждый огонёк в этой долине что-то помнит, {playerName}. Помоги мне вслушаться.',
   'entities.npcs.provisioner_fenna.name': 'Снабженец Фенна',
-  'entities.npcs.provisioner_fenna.title': 'Снабженец Элдерглима',
+  'entities.npcs.provisioner_fenna.title': 'Снабженец Элдершайна',
   'entities.npcs.provisioner_fenna.greeting':
     'Хлеб ещё тёплый, вода всё так же сладка. Лощина даёт, и я даю.',
   'entities.npcs.wardsmith_orun.name': 'Кузнец-оберегов Орун',
@@ -4993,6 +5028,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.kings_signet.name': 'Перстень короля',
   'entities.items.event_skin_token.name': 'Загадочный косметический тайник',
   'entities.items.heroic_mark.name': 'Героический знак',
+  'entities.items.wyrmfall_core.name': 'Ядро драконопада',
+  'entities.items.sundered_essence.name': 'Расколотая эссенция',
+  'entities.items.makers_ember.name': 'Уголёк мастера',
   'hudChrome.raidLockout.heroicName': 'Героический режим: {name}',
   'hudChrome.raidLockout.heroicLocked': 'Вы закреплены за героическим подземельем: {name}.',
   'hudChrome.riftTracker.title': 'Разлом',
@@ -5133,7 +5171,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Жатвенные духи, {playerName}. Они выковыривают мои краники из стволов ради сладости внутри, а вёдра швыряют в траву. Прогони восьмерых маленьких воришек и верни четыре моих ведёрка — и повозки снова покатятся.',
   'entities.quests.q_af_sprites_and_spigots.completion':
     'Четыре ведёрка снова на крюках, и в рядах стало тихо. Рука у тебя с духами тяжелее моей, {playerName}, и сегодня я этому рада.',
-  'entities.quests.q_af_sprites_and_spigots.objectives.0.label': 'Жатвенный дух прогнан',
+  'entities.quests.q_af_sprites_and_spigots.objectives.0.label': 'Колосковый дух прогнан',
   'entities.quests.q_af_sprites_and_spigots.objectives.1.label': 'Ведёрко для живицы возвращено',
   'entities.quests.q_af_amber_from_the_herd.title': 'Янтарь со стада',
   'entities.quests.q_af_amber_from_the_herd.text':
@@ -5386,12 +5424,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_howl_above.completion':
     'Восемь — и сумеречный хор стал жиже. Но ревуны не покидают вершин просто так. Что-то их согнало, и я боюсь, что у этого есть имя.',
   'entities.quests.q_fv_howl_above.objectives.0.label': 'Террасный ревун убит',
-  'entities.quests.q_fv_frostmane_tyrant.title': 'Тиран Морозная Грива',
+  'entities.quests.q_fv_frostmane_tyrant.title': 'Тиран Инеистая Грива',
   'entities.quests.q_fv_frostmane_tyrant.text':
-    'Ревуны не охотились, когда спускались по террасам. Они бежали. Высоты забрал себе йети — горный люд зовёт его Морозной Гривой, — и даже стаи не делят с ним склона. С этим надо покончить, {playerName}, пока зима не согнала его к моим стенам. Возьми друга. А лучше двух.',
+    'Ревуны не охотились, когда спускались по террасам. Они бежали. Высоты забрал себе йети — горный люд зовёт его Инеистой Гривой, — и даже стаи не делят с ним склона. С этим надо покончить, {playerName}, пока зима не согнала его к моим стенам. Возьми друга. А лучше двух.',
   'entities.quests.q_fv_frostmane_tyrant.completion':
-    'Когда этой ночью стих ветер, вся деревня услышала тишину там, где раньше была Морозная Грива. Предел в долгу перед тобой, и платить его будут годами, {playerName}. Носи это — и каждая дверь в Ледяной Мантии открыта для тебя.',
-  'entities.quests.q_fv_frostmane_tyrant.objectives.0.label': 'Морозная Грива убита',
+    'Когда этой ночью стих ветер, вся деревня услышала тишину там, где раньше была Инеистая Грива. Предел в долгу перед тобой, и платить его будут годами, {playerName}. Носи это — и каждая дверь в Ледяной Мантии открыта для тебя.',
+  'entities.quests.q_fv_frostmane_tyrant.objectives.0.label': 'Инеистая Грива убита',
   'entities.quests.q_gc_down_the_windway.title': 'Вниз по Ветровому Проходу',
   'entities.quests.q_gc_down_the_windway.text':
     'Ты одолел подъём, {playerName}, — значит, ветер решил тебя оставить. Викхарбор лежит к востоку по дороге через холмы, укрытый в затишье своей бухты. Начальница гавани Одиль считает каждую душу, что переваливает через проход, и захочет сосчитать тебя. Скажи ей, что Ветровой Проход ещё открыт.',
@@ -5455,7 +5493,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_hollow_the_huntsman.objectives.0.label': 'Найдите охотника Дерала',
   'entities.quests.q_hollow_old_marrowshell.title': 'Старый панцирь отмелей',
   'entities.quests.q_hollow_old_marrowshell.text':
-    'Первое имя — Старый Костнопанцирь, краб размером с повозку, что охотится в восточных отмелях с тех пор, когда у Элдерглима ещё не было ворот. Он бродит, {playerName}, так что придётся идти вдоль берега, пока не пересечёшь его след. Не ходи в одиночку и не верь его неподвижности.',
+    'Первое имя — Старый Костнопанцирь, краб размером с повозку, что охотится в восточных отмелях с тех пор, когда у Элдершайна ещё не было ворот. Он бродит, {playerName}, так что придётся идти вдоль берега, пока не пересечёшь его след. Не ходи в одиночку и не верь его неподвижности.',
   'entities.quests.q_hollow_old_marrowshell.completion':
     'Отмели снова стали просто водой. Я видел, как этот панцирь ломал охотников получше меня, {playerName}. Но не тебя.',
   'entities.quests.q_hollow_old_marrowshell.objectives.0.label': 'Старый Костнопанцирь убит',
@@ -5492,14 +5530,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nb_night_gardens.objectives.0.label': 'Цветок ночецвета собран',
   'entities.quests.q_nb_eyes_on_the_vigil.title': 'Глаза на Дозоре',
   'entities.quests.q_nb_eyes_on_the_vigil.text':
-    'Что-то сделало бегунов дерзкими, а стада — беспокойными, {playerName}, и по цветам мне этого не прочесть. Кассиан прочтёт по небу. Его обсерваторный лагерь стоит у Стоячего Дозора к востоку отсюда, там, где среди камней бродят ночерождённые. Найди его и спроси, что говорят звёзды.',
+    'Что-то сделало бегунов дерзкими, а стада — беспокойными, {playerName}, и по цветам мне этого не прочесть. Кассиан прочтёт по небу. Его обсерваторный лагерь стоит у Стоячего Дозора к востоку отсюда, там, где среди камней бродят сумеречнорождённые. Найди его и спроси, что говорят звёзды.',
   'entities.quests.q_nb_eyes_on_the_vigil.completion':
     'Тебя прислала Лира? Значит, и сады это чувствуют. Посиди у трубы, {playerName}. Звёзды не находят покоя уже месяц, и каждая карта, что я черчу, клонится на север, к кургану.',
   'entities.quests.q_nb_eyes_on_the_vigil.objectives.0.label':
     'Найдите астронома Кассиана у Стоячего Дозора',
   'entities.quests.q_nb_charts_of_the_stones.title': 'Карты в камнях',
   'entities.quests.q_nb_charts_of_the_stones.text':
-    'Камни Дозора старше Лунного Приюта, старше ночерождённых, что за ними ухаживают, и на их гранях высечены звёздные карты, которые я учился читать всю жизнь. Небо сдвинулось, {playerName}, и я должен знать, насколько. Прочти карты на трёх камнях и принеси мне их пеленги.',
+    'Камни Дозора старше Лунного Приюта, старше сумеречнорождённых, что за ними ухаживают, и на их гранях высечены звёздные карты, которые я учился читать всю жизнь. Небо сдвинулось, {playerName}, и я должен знать, насколько. Прочти карты на трёх камнях и принеси мне их пеленги.',
   'entities.quests.q_nb_charts_of_the_stones.completion':
     'Сомнений не осталось. Каждый пеленг сполз к Кургану Неспящего, будто само небо склонилось над этим холмом, чтобы смотреть. Старых королей не зря хоронили под выверенными звёздами, {playerName}.',
   'entities.quests.q_nb_charts_of_the_stones.objectives.0.label': 'Звёздная карта прочитана',
@@ -5514,7 +5552,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nb_the_barrow_king.text':
     'Каждый пеленг, каждая беспокойная звезда, каждый вскрытый могильник указывают на одно: под великим курганом просыпается Курганный Король, а у этого края нет рассвета, чтобы его сдержать. Его нужно вернуть в сон, прежде чем он вспомнит свою корону, {playerName}. Не ходи в одиночку: возьми друга, и пусть цветочный свет будет у тебя за спиной.',
   'entities.quests.q_nb_the_barrow_king.completion':
-    'Звёзды улеглись впервые за сезон, {playerName}. Могильники закрыты, ночерождённые замерли у своих камней, и король снова спит внизу. Носи эту мантию: Лунный Приют скроил её для того, кому ночь наконец доверилась.',
+    'Звёзды улеглись впервые за сезон, {playerName}. Могильники закрыты, сумеречнорождённые замерли у своих камней, и король снова спит внизу. Носи эту мантию: Лунный Приют скроил её для того, кому ночь наконец доверилась.',
   'entities.quests.q_nb_the_barrow_king.objectives.0.label': 'Курганный Король упокоен',
   'entities.quests.q_pr_down_to_drifthaven.title': 'Вниз, в Дрифтхейвен',
   'entities.quests.q_pr_down_to_drifthaven.text':
@@ -5550,10 +5588,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_pr_boars_in_the_gardens.objectives.0.label': 'Чащобный вепрь прогнан',
   'entities.quests.q_pr_the_man_who_went_in.title': 'Тот, кто вошёл в чащу',
   'entities.quests.q_pr_the_man_who_went_in.text':
-    'Ныряльщицы не ступят за кромку деревьев, {playerName}, и я не стану их просить. Барабаны ты уже слышал: их слышат все — ко второй ночи. Лишь один человек на этом острове пошёл на этот звук и вернулся. Окку. Он живёт под великими баньянами у Лианопада, в глубине дороги через Заросли. Найди его и спроси, что прячет зелень.',
+    'Ныряльщицы не ступят за кромку деревьев, {playerName}, и я не стану их просить. Барабаны ты уже слышал: их слышат все — ко второй ночи. Лишь один человек на этом острове пошёл на этот звук и вернулся. Окрим. Он живёт под великими баньянами у Лианопада, в глубине дороги через Заросли. Найди его и спроси, что прячет зелень.',
   'entities.quests.q_pr_the_man_who_went_in.completion':
     'Тебя прислала Иша? Мать-Жемчужница годами не произносила моего имени. Сядь подальше от лиан, {playerName}, и я расскажу, что знаю: барабаны — не опасность. Барабаны — предупреждение.',
-  'entities.quests.q_pr_the_man_who_went_in.objectives.0.label': 'Найдите Окку у Лианопада',
+  'entities.quests.q_pr_the_man_who_went_in.objectives.0.label': 'Найдите Окрим у Лианопада',
   'entities.quests.q_pr_canopy_silk.title': 'Шёлк из крон',
   'entities.quests.q_pr_canopy_silk.text':
     'Подними голову, {playerName}. Все кроны отсюда до идола затянуты паутиной, как рыбацкой сетью, и ткачи наглеют с каждым сезоном. Я натягиваю их же шёлк поперёк троп — колокольчики на растяжках, — чтобы джунгли не подкрались ко мне. Шесть добрых мотков с кроновых ткачей — и мои линии натянуты заново.',
@@ -5623,11 +5661,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_wf_croakers_hush.completion':
     'Слушай, {playerName}. Ничего. Первая настоящая тишина над этой топью за тридцать лет, и полгорода сегодня не уснёт от её непривычности. Ивы благодарят тебя — по-своему. Носи это, сплетено из его собственного кувшинкового ложа, — и топь признает в тебе друга всюду, куда дотягивается вода.',
   'entities.quests.q_wf_croakers_hush.objectives.0.label': 'Дремотный Квакун убит',
-  'entities.quests.q_ww_bells_of_gallowmere.title': 'Колокола Гэллоумира',
+  'entities.quests.q_ww_bells_of_gallowmere.title': 'Колокола Гиббетмира',
   'entities.quests.q_ww_bells_of_gallowmere.text':
-    'Слышишь звон, {playerName}? Это Гэллоумир, вверх по северной дороге, убаюкивает своих мёртвых. Пономарь Марроу ведёт счёт каждой душе под этими кронами — и живой, и погребённой. Иди и будь сосчитан, пока лес не сосчитал тебя сам.',
+    'Слышишь звон, {playerName}? Это Гиббетмир, вверх по северной дороге, убаюкивает своих мёртвых. Пономарь Марроу ведёт счёт каждой душе под этими кронами — и живой, и погребённой. Иди и будь сосчитан, пока лес не сосчитал тебя сам.',
   'entities.quests.q_ww_bells_of_gallowmere.completion':
-    'Кобб отправил тебя по дороге целым, вот как? Хороший человек. Тридцать лет он держит те привратные фонари зажжёнными, и лес ни разу его не обошёл. Добро пожаловать в Гэллоумир, {playerName}. Слушайся колоколов.',
+    'Кобб отправил тебя по дороге целым, вот как? Хороший человек. Тридцать лет он держит те привратные фонари зажжёнными, и лес ни разу его не обошёл. Добро пожаловать в Гиббетмир, {playerName}. Слушайся колоколов.',
   'entities.quests.q_ww_bells_of_gallowmere.objectives.0.label': 'Доложите пономарю Марроу',
   'entities.quests.q_ww_silk_in_the_eaves.title': 'Шёлк под кронами',
   'entities.quests.q_ww_silk_in_the_eaves.text':
@@ -5643,7 +5681,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ww_widows_skeins.objectives.0.label': 'Моток вдовьего шёлка',
   'entities.quests.q_ww_candles_at_the_bounds.title': 'Свечи на рубежах',
   'entities.quests.q_ww_candles_at_the_bounds.text':
-    'Гэллоумир окружают четыре пограничных камня, {playerName}, по одному на каждой дороге из города, и на каждом камне горит могильная свеча. Пока они горят, погребённые остаются погребёнными. Морось затопила их — все четыре, а я слишком стара, чтобы обходить рубежи одна. Возьми мою лучину и зажги их снова, скорее.',
+    'Гиббетмир окружают четыре пограничных камня, {playerName}, по одному на каждой дороге из города, и на каждом камне горит могильная свеча. Пока они горят, погребённые остаются погребёнными. Морось затопила их — все четыре, а я слишком стара, чтобы обходить рубежи одна. Возьми мою лучину и зажги их снова, скорее.',
   'entities.quests.q_ww_candles_at_the_bounds.completion':
     'Все четыре горят? Тогда выдохни, {playerName}. Ты этого не слышал, но слышала вся деревня: колокола зазвонили легче в тот самый миг, когда занялся последний фитиль.',
   'entities.quests.q_ww_candles_at_the_bounds.objectives.0.label': 'Могильная свеча зажжена вновь',
@@ -5661,7 +5699,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ww_wraiths_of_the_tarn.objectives.0.label': 'Лесной призрак убит',
   'entities.quests.q_ww_what_the_bark_holds.title': 'Что держит кора',
   'entities.quests.q_ww_what_the_bark_holds.text':
-    'На Висельной Поляне к востоку от Гэллоумира шелкопряды развешивают по ветвям своих спелёнутых шёлком мертвецов, а гробокорые шатуны стоят на страже внизу, как терпеливые носильщики гроба. Там, наверху, наши люди, {playerName}. Свали пятерых шатунов, срежь троих спелёнутых мёртвых и верни их домой, в землю.',
+    'На Висельной Поляне к востоку от Гиббетмира шелкопряды развешивают по ветвям своих спелёнутых шёлком мертвецов, а гробокорые шатуны стоят на страже внизу, как терпеливые носильщики гроба. Там, наверху, наши люди, {playerName}. Свали пятерых шатунов, срежь троих спелёнутых мёртвых и верни их домой, в землю.',
   'entities.quests.q_ww_what_the_bark_holds.completion':
     'Три души вернулись под честную землю до наступления ночи. Шатуны отрастут — кора всегда отрастает, — но этой ночью поляна висит пустой, и этого довольно.',
   'entities.quests.q_ww_what_the_bark_holds.objectives.0.label': 'Гробокорый шатун повержен',
@@ -5670,14 +5708,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ww_walking_mosley_home.text':
     'Мой могильщик Мозли три дня назад ушёл по дороге к часовне копать могилу на старом дворе, и раскоп обрушился прямо на него. Он выбрался, дурень жив, но сидит, сжавшись, у часовенных могил и не двинется с места из-за шелкопрядов на дороге. Доведи его до дома, {playerName}. Я не могу звонить в колокола по живому человеку.',
   'entities.quests.q_ww_walking_mosley_home.completion':
-    'Он вошёл в ворота на своих двоих, божась, что отныне не выкопает ничего глубже грядки под репу. К воскресенью вернётся на двор — они всегда возвращаются. Спасибо, {playerName}. Гэллоумир бережёт своих — вот и весь наш закон.',
+    'Он вошёл в ворота на своих двоих, божась, что отныне не выкопает ничего глубже грядки под репу. К воскресенью вернётся на двор — они всегда возвращаются. Спасибо, {playerName}. Гиббетмир бережёт своих — вот и весь наш закон.',
   'entities.quests.q_ww_walking_mosley_home.objectives.0.label':
-    'Могильщик Мозли благополучно доведён до Гэллоумира',
+    'Могильщик Мозли благополучно доведён до Гиббетмира',
   'entities.quests.q_ww_horn_of_the_huntsman.title': 'Рог Ловчего',
   'entities.quests.q_ww_horn_of_the_huntsman.text':
     'Ты уже слышал рог, {playerName}: тонкий, далёкий — звук, на котором весь лес задерживает дыхание. Бледный Ловчий объезжает свою поляну к северу отсюда, и каждая могила, мимо которой он проезжает, становится мельче. Когда-то он был человеком, и похоронили его неправильно, а я устал делать вид, что молитва с этим справится. Возьми друга, а лучше двух, и выбей его из седла.',
   'entities.quests.q_ww_horn_of_the_huntsman.completion':
-    'Рог оборвался на полуноте. Каждый колокол в Гэллоумире ударил по разу, сам по себе, а потом лес затих так, как не затихал на моей памяти тридцать лет. Ты совершил обряд, который был мне не по силам, {playerName}. Носи это — и ходи под кронами без страха.',
+    'Рог оборвался на полуноте. Каждый колокол в Гиббетмире ударил по разу, сам по себе, а потом лес затих так, как не затихал на моей памяти тридцать лет. Ты совершил обряд, который был мне не по силам, {playerName}. Носи это — и ходи под кронами без страха.',
   'entities.quests.q_ww_horn_of_the_huntsman.objectives.0.label': 'Бледный Ловчий выбит из седла',
   'hud.errors.silenced': 'Вы лишены дара речи!',
   'hud.pet.noPetFood': 'У вас нет пищи, чтобы покормить питомца.',
@@ -5726,6 +5764,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.raw_marsh_pike.name': 'Сырая болотная щука',
   'entities.items.raw_river_perch.name': 'Сырой речной окунь',
   'entities.items.raw_stonescale_carp.name': 'Сырой сланцеплавниковый карп',
+  'entities.items.raw_deepbarb_catfish.name': 'Сырой глубокоусый сом',
+  'entities.items.raw_hollowgill_sturgeon.name': 'Сырой полужаберный осётр',
+  'entities.items.raw_stillmere_salmon.name': 'Сырой тихоозёрный лосось',
+  'entities.items.clockreel_fishing_rod.name': 'Удочка с часовой катушкой',
+  'entities.items.peppered_deepbarb_catfish.name': 'Перчёный глубокоусый сом',
+  'entities.items.roast_hollowgill_sturgeon.name': 'Жареный полужаберный осётр',
+  'entities.items.pattern_peppered_deepbarb_catfish.name': 'Рецепт: Перчёный глубокоусый сом',
+  'entities.items.pattern_roast_hollowgill_sturgeon.name': 'Рецепт: Жареный полужаберный осётр',
+  'entities.items.pattern_clockreel_fishing_rod.name': 'Чертёж: Удочка с часовой катушкой',
   'entities.items.soggy_boot.name': 'Промокший сапог',
   'entities.items.elixir_of_the_bear.name': 'Эликсир медведя',
   'entities.items.healing_potion.name': 'Лечебное зелье',
@@ -5798,6 +5845,63 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.iron_ore.name': 'Железная руда',
   'entities.items.ironbark_log.name': 'Бревно железнокорого дерева',
   'entities.items.silverleaf_herb.name': 'Трава глянцелист',
+  'entities.items.vale_wheat_seed.name': 'Семена долинной пшеницы',
+  'entities.items.vale_wheat.name': 'Долинная пшеница',
+  'entities.items.fine_vale_wheat.name': 'Отборная долинная пшеница',
+  'entities.items.withered_husks.name': 'Засохшая шелуха',
+  'entities.items.compost.name': 'Компост',
+  'entities.items.growth_tonic.name': 'Тоник роста',
+  'entities.items.brook_carrot_seed.name': 'Семена ручьевой моркови',
+  'entities.items.brook_carrot.name': 'Ручьевая морковь',
+  'entities.items.fine_brook_carrot.name': 'Отборная ручьевая морковь',
+  'entities.items.marsh_rice_seed.name': 'Семена болотного риса',
+  'entities.items.marsh_rice.name': 'Болотный рис',
+  'entities.items.fine_marsh_rice.name': 'Отборный болотный рис',
+  'entities.items.bog_beet_seed.name': 'Семена болотной свёклы',
+  'entities.items.bog_beet.name': 'Болотная свёкла',
+  'entities.items.fine_bog_beet.name': 'Отборная болотная свёкла',
+  'entities.items.highland_barley_seed.name': 'Семена высокогорного ячменя',
+  'entities.items.highland_barley.name': 'Высокогорный ячмень',
+  'entities.items.fine_highland_barley.name': 'Отборный высокогорный ячмень',
+  'entities.items.frost_gourd_seed.name': 'Семена морозной тыквы',
+  'entities.items.frost_gourd.name': 'Морозная тыква',
+  'entities.items.fine_frost_gourd.name': 'Отборная морозная тыква',
+  'entities.items.gilded_sunmelon_seed.name': 'Семена золочёной солнечной дыни',
+  'entities.items.gilded_sunmelon.name': 'Золочёная солнечная дыня',
+  'entities.items.fine_gilded_sunmelon.name': 'Отборная золочёная солнечная дыня',
+  'entities.items.evergarden_greens_seed.name': 'Семена зелени Вечного Сада',
+  'entities.items.evergarden_greens.name': 'Зелень Вечного Сада',
+  'entities.items.fine_evergarden_greens.name': 'Отборная зелень Вечного Сада',
+  'entities.items.thornpeak_cabbage_seed.name': 'Семена терновой капусты',
+  'entities.items.thornpeak_cabbage.name': 'Терновая капуста',
+  'entities.items.fine_thornpeak_cabbage.name': 'Отборная терновая капуста',
+  'entities.items.frost_lentils_seed.name': 'Семена морозной чечевицы',
+  'entities.items.frost_lentils.name': 'Морозная чечевица',
+  'entities.items.fine_frost_lentils.name': 'Отборная морозная чечевица',
+  'entities.items.gilded_yam_seed.name': 'Семена золочёного ямса',
+  'entities.items.gilded_yam.name': 'Золочёный ямс',
+  'entities.items.fine_gilded_yam.name': 'Отборный золочёный ямс',
+  'entities.items.evergarden_pumpkin_seed.name': 'Семена тыквы Вечного Сада',
+  'entities.items.evergarden_pumpkin.name': 'Тыква Вечного Сада',
+  'entities.items.fine_evergarden_pumpkin.name': 'Отборная тыква Вечного Сада',
+  'entities.items.garden_hoe.name': 'Садовая мотыга',
+  'entities.items.bronze_hoe.name': 'Бронзовая мотыга',
+  'entities.items.skysilver_hoe.name': 'Небосеребряная мотыга',
+  'entities.items.osmium_hoe.name': 'Осмиевая мотыга',
+  'entities.items.evergarden_hoe.name': 'Мотыга Вечного Сада',
+  'entities.items.vale_hearth_loaf.name': 'Долинный подовый хлеб',
+  'entities.items.eastbrook_root_pottage.name': 'Истврукская похлёбка из корнеплодов',
+  'entities.items.fenbridge_rice_bowl.name': 'Миска риса из Фенбриджа',
+  'entities.items.fenbridge_beet_braise.name': 'Фенбриджская тушёная свёкла',
+  'entities.items.highwatch_barley_bannock.name': 'Хайвотчская ячменная лепёшка',
+  'entities.items.highwatch_gourd_soup.name': 'Хайвотчский суп из морозной тыквы',
+  'entities.items.evergarden_sunmelon_tart.name': 'Тарт с солнечной дыней из Вечного Сада',
+  'entities.items.evergarden_harvest_platter.name': 'Блюдо урожая Вечного Сада',
+  'entities.items.eastbrook_glazed_carrots.name': 'Истврукская глазированная морковь',
+  'entities.items.fenbridge_rice_pudding.name': 'Фенбриджский рисовый пудинг',
+  'entities.items.highwatch_barley_porridge.name': 'Хайвотчская ячменная каша',
+  'entities.items.evergarden_braised_greens.name': 'Тушёная зелень Вечного Сада',
+  'entities.items.harvest_feast.name': 'Пир урожая',
   'hud.core.chatChannels.add': 'Добавить канал чата',
   'hud.core.chatChannels.addTitle': 'Добавить канал',
   'hud.core.chatChannels.close': 'Закрыть вкладку {channel}',
@@ -6573,6 +6677,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.controls.leaderboard': 'Таблица лидеров',
   'guide.controls.deeds': 'Книга деяний',
   'guide.controls.reliquary': 'Реликварий',
+  'guide.controls.harvestJournal': 'Журнал урожая',
   'guide.controls.sheathe': 'Убрать/обнажить оружие',
   'guide.controls.crafting': 'Крафт',
   'guide.controls.mount': 'Сесть / Спешиться',
@@ -7253,6 +7358,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.gear.soulboundBody':
     'Многие ценные вещи персональны: они привязаны к вашему персонажу с момента получения. Персональный предмет нельзя передать, отправить почтой, продать торговцу или выставить на рынок; отныне он часть вашей истории, и никто другой не понесёт его за вас.',
   'guide.gear.uniqueTitle': 'Уникальный (экипируется): только одна легендарка каждого вида',
+  'guide.gear.masterwroughtTitle': 'Ковка мастера: вершина ремесла',
+  'guide.gear.masterwroughtBodyLegendary':
+    'Лучшие крафтовые вещи несут на подсказке золотую метку «Уникальный (экипируется): Ковка мастера». Эти предметы, вершина ремесленных профессий, создаются мастерами из редких материалов, свободно продаются на рынке и стоят в одном ряду с сокровищами глубочайших подземелий. Метка означает одно общее семейное правило: персонаж может носить не более двух предметов Ковки мастера одновременно, из каких бы ремесел они ни пришли, так что выбирайте два слота, где они послужат вашей сборке лучше всего. У правила есть ещё одна строка для самой вершины семейства: владелец, доведший предмет Ковки мастера до совершенства, может возвести его в легендарный предмет с именем по собственному выбору (весь путь рассказан на странице Ремесел), и из двух носимых предметов Ковки мастера легендарным одновременно может быть не более одного.',
+  'guide.gear.masterwroughtBody': 'Лучшие крафтовые вещи несут на подсказке золотую метку «Уникальный (экипируется): Ковка мастера». Эти предметы, вершина ремесленных профессий, создаются мастерами из редких материалов, свободно продаются на рынке и стоят в одном ряду с сокровищами глубочайших подземелий. Метка означает одно общее семейное правило: персонаж может носить не более двух предметов Ковки мастера одновременно, из каких бы ремесел они ни пришли, так что выбирайте два слота, где они послужат вашей сборке лучше всего.',
   'guide.gear.uniqueBody':
     'Легендарные предметы уникальны при экипировке: персонаж может носить только одну копию данного легендарного предмета одновременно, и его героическая версия считается тем же предметом. Вторую копию можно держать в сумках, банке или на рынке, но попытка надеть обе сразу будет отклонена. В подсказке предмета есть золотая метка "Уникальный (экипируется)", так что вы увидите это правило до того, как построите план на два таких предмета.',
   'guide.gear.soulboundTitle': 'Персональные предметы: ваши и только ваши',
@@ -7480,17 +7589,17 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.peaksGreeting':
     'Две сотни лет держится эта стена. На моём посту она не падёт, но стонет.',
   'guide.worldPage.peaksPlaceNotes':
-    'Хайвотч держит стену. Хребет Преследователя и Глубокоскальные норы принадлежат горным котам и землекопам; Огрские предгорья и Военный лагерь Дрогмара, наёмным громилам; Бурехребет трещит от элементалей, а под ним сияет Глиммермир, горное озеро, чей берег хранит врата бледного света, ведущие вниз, в Утонувший храм; Шатры Культа Вирма и Поля ревенантов кольцом окружают высоты культа, а на самом их пике, Святилище Могильного Вирма.',
+    'Хайвотч держит стену. Хребет Преследователя и Глубокоскальные норы принадлежат горным котам и землекопам; Огрские предгорья и Военный лагерь Дрогмара, наёмным громилам; Бурехребет трещит от элементалей, а под ним сияет Глиммермир, горное озеро, чей берег хранит врата бледного света, ведущие вниз, в Утонувший храм; Шатры Клятвы Выводка и Поля ревенантов кольцом окружают высоты культа, а на самом их пике, Святилище Могильного Вирма.',
   'guide.worldPage.duskGreeting':
     'Немногие из вашего рода стояли под этими ветвями. Ступайте мягко, и добро пожаловать.',
-  'guide.worldPage.duskGreeter': 'Хранительница Сэльвин, Элдерглим',
+  'guide.worldPage.duskGreeter': 'Хранительница Сэльвин, Элдершайн',
   'guide.worldPage.duskPlaceNotes':
-    'Элдерглим собрался под великим древом. Сумеречная пещера и её смотровая площадка служат входом и первым видом на долину; Древняя роща и Котловина Звездопада хранят тихий юг; Затонувший двор скрывает заросшие руины на востоке; а Мерцающая глубь и Хрустальные отмели светятся на севере.',
+    'Элдершайн собрался под великим древом. Сумеречная пещера и её смотровая площадка служат входом и первым видом на долину; Древняя роща и Котловина Звездопада хранят тихий юг; Затонувший двор скрывает заросшие руины на востоке; а Мерцающая глубь и Хрустальные отмели светятся на севере.',
   'guide.family.demon.name': 'Демоны',
   'guide.family.demon.desc':
     'Захватчики из-за разломов, сплошь огонь и злоба. Где стоит один из них, там и прорыв недалеко.',
   'guide.worldPage.duskBlurb':
-    'Долина вечных сумерек под великим древом Элдерглима, где светятся хрустальные руины, а воздух гудит от древней магии.',
+    'Долина вечных сумерек под великим древом Элдершайна, где светятся хрустальные руины, а воздух гудит от древней магии.',
   'guide.worldPage.emberBlurb':
     'Озарённые грозами пустоши пепла и кровостекла, где дрейки кружат над кальдерой, а в дюнах горят костры троллей; за всем этим следит привратный город Змеиный дозор.',
   'guide.worldPage.frostBlurb':
@@ -7502,7 +7611,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.nightBlurb':
     'Край звёздной полуночи, где тропы освещают цветы, а Лунный Приют несёт тихий дозор под грезящим небом.',
   'guide.worldPage.hauntBlurb':
-    'Населённый призраками лес под исполинскими кронами, где фонари Гэллоумира, единственный честный свет на дороге.',
+    'Населённый призраками лес под исполинскими кронами, где фонари Гиббетмира, единственный честный свет на дороге.',
   'guide.worldPage.galeBlurb':
     'Морские утёсы и воющие холмы, где ветер не знает покоя, Старый Маяк никогда не гаснет, а Викхарбор крепко запирает свои двери.',
   'guide.worldPage.jungleBlurb':
@@ -7526,7 +7635,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.nightGreeter': 'Страж дозора, Лунный Приют',
   'guide.worldPage.hauntGreeting':
     'Держись фонарей, путник. И если лес позовёт тебя по имени откуда-то с обочины, не отвечай.',
-  'guide.worldPage.hauntGreeter': 'Фонарщик, Гэллоумир',
+  'guide.worldPage.hauntGreeter': 'Фонарщик, Гиббетмир',
   'guide.worldPage.galeGreeting':
     'Ветер здесь не стихал ни разу, и Старый Маяк ни разу не гас. Закрой за собой дверь таверны.',
   'guide.worldPage.galeGreeter': 'Смотритель маяка, Викхарбор',
@@ -7545,9 +7654,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.fenPlaceNotes':
     'Бриджмир сидит верхом на тихой воде. Янтарные Ступени спускаются из края жатвы; Кувшинковые мхи и Светлые бочаги блестят огоньками и стрекозами; Плакучая заводь опускает свои ветви в озеро; а Дремотные отмели, это самое ласковое место во всём этом краю.',
   'guide.worldPage.nightPlaceNotes':
-    'Лунный Приют несёт дозор. Ночные Врата, это путь в полуночный край; Лунный Колодец хранит звёздный свет, рядом с которым можно постоять; Сумеречное Поле цветёт в темноте; Стоячий Дозор наблюдает, не шевелясь; а Курган Неспящего, единственное место здесь, которому не снятся сны.',
+    'Лунный Приют несёт дозор. Ночные Врата, это путь в полуночный край; Лунный Родник хранит звёздный свет, рядом с которым можно постоять; Сумеречное Поле цветёт в темноте; Стоячий Дозор наблюдает, не шевелясь; а Курган Неспящего, единственное место здесь, которому не снятся сны.',
   'guide.worldPage.hauntPlaceNotes':
-    'Гэллоумир жмётся к своим фонарям. Вороньи Врата, это мрачная парадная дверь леса; Вдовья Чаща густо оплетена паутиной; Висельная Поляна и Часовня Скорбного Камня хранят самые старые скорби этого леса; а Поляна Ловчего принадлежит тому, что до сих пор там охотится.',
+    'Гиббетмир жмётся к своим фонарям. Вороньи Врата, это мрачная парадная дверь леса; Вдовья Чаща густо оплетена паутиной; Висельная Поляна и Часовня Скорбного Камня хранят самые старые скорби этого леса; а Поляна Ловчего принадлежит тому, что до сих пор там охотится.',
   'guide.worldPage.galePlaceNotes':
     'Викхарбор стоит, накренившись против ветра. Ветровой Проход, это дорога по утёсам на входе; Воющие Холмы катятся под бурей без единого дерева; Старый Маяк горит столько, сколько кто-либо может припомнить; Отвесный Срез обрывается прямо к воде; Поля Кораблекрушений держат побережье в строгости; а Зеркальное Озеро, единственная неподвижная вещь во всём этом краю.',
   'guide.worldPage.junglePlaceNotes':
@@ -7574,7 +7683,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.reliquary_shoulder.name': 'Осыпавшиеся наплечники',
   'entities.items.reliquary_gloves_rog.name': 'Рукавицы Костяного стража',
   'entities.items.deacon_reliquary_helm.name': 'Шлем реликвария дьякона',
-  'entities.items.varric_shadow_cowl.name': 'Теневой капюшон Варрика',
+  'entities.items.varric_shadow_cowl.name': 'Теневой капюшон Вандрика',
   'entities.items.duskwisp_essence.name': 'Сущность сумеречного огонька',
   'entities.items.spore_heart.name': 'Споровое сердце',
   'entities.items.gleaming_antler.name': 'Сияющий рог',
@@ -7596,7 +7705,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.nightweave_tunic.name': 'Куртка ночного плетения',
   'entities.items.veilcloth_robe.name': 'Одеяние скрытой ткани',
   'entities.mobs.acolyte_tessa.name': 'Послушница Тесса',
-  'entities.mobs.deacon_varric.name': 'Дьякон Варрик',
+  'entities.mobs.deacon_varric.name': 'Дьякон Вандрик',
   'entities.mobs.reliquary_bonewalker.name': 'Поднятый костеход',
   'entities.mobs.reliquary_funeral_ringer.name': 'Погребальный звонарь',
   'entities.mobs.reliquary_gravecall_acolyte.name': 'Аколит могильного зова',
@@ -7632,24 +7741,24 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'delveUi.board.tier.heroic': 'Героическая',
   'delveUi.board.tier.normal': 'Обычная',
   'delveUi.board.title': 'Доска Вылазок',
-  'delveUi.boss.varric.bell.emote': 'Дьякон Варрик хватает погребённый колокол обеими руками!',
+  'delveUi.boss.varric.bell.emote': 'Дьякон Вандрик хватает погребённый колокол обеими руками!',
   'delveUi.boss.varric.bell.impact': 'Звон колокола раскалывает пол зала!',
   'delveUi.boss.varric.bell.lesson':
     'Колокольный звон: удар по земле каждые двенадцать секунд. Отойдите, прежде чем он обрушится.',
-  'delveUi.boss.varric.bell.log': 'Дьякон Варрик начинает звонить в погребальный колокол.',
-  'delveUi.boss.varric.bell.warning': 'Отойдите от Дьякона Варрика!',
+  'delveUi.boss.varric.bell.log': 'Дьякон Вандрик начинает звонить в погребальный колокол.',
+  'delveUi.boss.varric.bell.warning': 'Отойдите от Дьякона Вандрика!',
   'delveUi.boss.varric.defeat': 'Нет... у меня были имена... все до единого...',
   'delveUi.boss.varric.intro': 'Ни одна душа не потеряна. Лишь забыта.',
   'delveUi.boss.varric.mid30': 'Погребальный колокол отзывается на каждое имя, что он произносит.',
-  'delveUi.boss.varric.mid60': 'Дьякон Варрик читает имена из книги с дрожащим торжеством.',
+  'delveUi.boss.varric.mid60': 'Дьякон Вандрик читает имена из книги с дрожащим торжеством.',
   'delveUi.boss.varric.pull':
     'Ты ступаешь по священному праху с нечистым умыслом. На колени, и будешь сочтён.',
-  'delveUi.boss.varric.raise.emote': 'Дьякон Варрик призывает имена из разрытых могил!',
-  'delveUi.boss.varric.raise.interrupt_fail': 'Мёртвые отзываются на зов Дьякона Варрика!',
+  'delveUi.boss.varric.raise.emote': 'Дьякон Вандрик призывает имена из разрытых могил!',
+  'delveUi.boss.varric.raise.interrupt_fail': 'Мёртвые отзываются на зов Дьякона Вандрика!',
   'delveUi.boss.varric.raise.interrupt_ok': 'Могильный обряд сорван.',
   'delveUi.boss.varric.raise.lesson':
     'Прервите растрескавшуюся могилу в течение пяти секунд, иначе мёртвые восстанут на его зов.',
-  'delveUi.boss.varric.raise.log': 'Дьякон Варрик начинает Поднятие мёртвых.',
+  'delveUi.boss.varric.raise.log': 'Дьякон Вандрик начинает Поднятие мёртвых.',
   'delveUi.boss.varric.raise.object': 'Растрескавшаяся могила содрогается от украденного дыхания.',
   'delveUi.boss.varric.raise.warning': 'Остановите могильный обряд!',
   'delveUi.chest.flavor': 'Мёртвые отдали то, без чего могут обойтись.',
@@ -8367,6 +8476,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wyrmshadow.bonus6': 'Скорость атаки и чтения заклинаний повышается на 4%, меткость на 3%. Критические удары оружием наносят «Рваную рану»: цель теряет 4 ед. здоровья от кровотечения каждые 2 сек. в течение 12 сек. Суммируется до 3 раз.',
   'hudChrome.itemSoulbound': 'Персональный',
   'hudChrome.itemUniqueEquipped': 'Уникальный (экипируется)',
+  'hudChrome.itemMasterwrought': 'Уникальный (экипируется): Ковка мастера ({count})',
+  'hudChrome.masterwrought.slotsLabel': 'Ячейки Ковки мастера:',
+  'hudChrome.masterwrought.pieceMark': 'Ковка мастера',
+  'hudChrome.masterwrought.tooltipWorn': 'Занимает ячейку Ковки мастера (занято {used} из {cap}).',
+  'hudChrome.masterwrought.tooltipAtCap': 'Все ваши {cap} ячейки Ковки мастера заняты.',
+  'hudChrome.masterwrought.tooltipLegendaryLimit':
+    'Можно носить не более {cap} легендарного предмета Ковки мастера.',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemProc.onMeleeHit': 'Шанс при попадании ({chance}%): {effect}',
   'hudChrome.itemProc.onSpellDamage': 'Шанс от уронных заклинаний ({chance}%): {effect}',
@@ -8516,6 +8632,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.insufficientMaterials': 'У вас недостаточно материалов.',
   'hudChrome.crafting.reagentLocked': 'Один из реагентов заблокирован.',
   'hudChrome.crafting.unknownRecipe': 'Такого рецепта не существует.',
+  'hudChrome.crafting.dailyLimit': 'Это можно создать лишь раз в день.',
+  'hudChrome.crafting.dailyLimitRetry':
+    'Это можно создать лишь раз в день. Снова будет доступно через {duration}.',
   'hudChrome.crafting.comboRequires': 'Настройка: {craftA} + {craftB}, ранг {tier}.',
   'hudChrome.crafting.comboMet': 'Готово.',
   'hudChrome.crafting.comboSyncing': 'Проверяем настройку на сервере.',
@@ -9409,6 +9528,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.takeParcelsFirst': 'Сначала заберите посылки, затем удаляйте письмо.',
   'worldContent.mailboxName': 'Почтовый ящик',
   'worldContent.noticeboardName': 'Доска объявлений',
+  'worldContent.farmPatchName': 'Грядки',
   'entities.letters.ravenpost_welcome.sender': 'Вороновая почта',
   'entities.letters.ravenpost_welcome.subject': 'Теперь вороны летают и для вас',
   'entities.letters.ravenpost_welcome.body':
@@ -9429,6 +9549,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.letters.heroic_marks_reward.subject': 'Ваши героические знаки',
   'entities.letters.heroic_marks_reward.body':
     'Ваш отряд прошёл героическое испытание, пока вы сражались в тылу или лежали в пыли. Блокировка была наложена всё равно, поэтому ваша доля героических знаков прилетела к вам сюда, а не пропала. Расходуйте их с умом.\n\n- Героический интендант',
+  'entities.letters.wyrmfall_core_reward.sender': 'Героический интендант',
+  'entities.letters.wyrmfall_core_reward.subject': 'Ваши ядра драконопада',
+  'entities.letters.wyrmfall_core_reward.body':
+    'Зверь пал, пока вы сражались в тылу или лежали в пыли. Ваша доля ядер драконопада прилетела к вам сюда, а не досталась мародёрам. Пустите их в дело у верстака.\n\n- Героический интендант',
   'entities.letters.guild_trend_engineering_alchemy.sender': 'Гильдия ремесленников',
   'entities.letters.guild_trend_engineering_alchemy.subject':
     'О вашей работе: инженерное дело и алхимия',
@@ -9889,6 +10013,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.logging': 'Лесозаготовка',
   'hudChrome.gathering.herbalism': 'Травничество',
   'hudChrome.gathering.fishing': 'Рыбная ловля',
+  'hudChrome.gathering.farming': 'Земледелие',
   'hudChrome.gathering.notReady': 'Этот ресурсный узел еще не восстановился для вас.',
   'hudChrome.gathering.gatherLine': 'Вы добываете: {name}.',
   'hudChrome.gathering.gatherLineQty': 'Вы добываете: {name} x{qty}.',
@@ -9905,6 +10030,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.tierRequired.mining': 'Требуется шахтерская кирка {tier} уровня',
   'hudChrome.gathering.tierRequired.logging': 'Требуется лесорубный топор {tier} уровня',
   'hudChrome.gathering.tierRequired.herbalism': 'Требуется серп травника {tier} уровня',
+  'hudChrome.gathering.tierRequired.farming': 'Требуется мотыга земледельца {tier} уровня',
   'hudChrome.gathering.toolTierUnmet.mining':
     'Чтобы разработать эту жилу, нужна шахтерская кирка {tier} уровня.',
   'hudChrome.gathering.toolTierUnmet.logging':
@@ -9913,6 +10039,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Чтобы собрать эти заросли, нужен серп травника {tier} уровня.',
   'hudChrome.gathering.toolTierUnmet.fishing':
     'Чтобы рыбачить в этих водах, нужна удочка {tier} уровня.',
+  'hudChrome.gathering.toolTierUnmet.farming':
+    'Чтобы возделать эту грядку, нужна мотыга земледельца {tier} уровня.',
   'hudChrome.gathering.toolTierUnmetCorpse':
     'Чтобы добыть лучшие материалы, нужен инструмент сбора {tier} уровня.',
   'hudChrome.gathering.wieldUnmet.mining':
@@ -9921,6 +10049,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Чтобы махать лесорубным топором, который уже лежит в ваших сумках, нужен навык лесозаготовки {skill}.',
   'hudChrome.gathering.wieldUnmet.herbalism':
     'Чтобы работать серпом травника, который уже лежит в ваших сумках, нужен навык травничества {skill}.',
+  'hudChrome.gathering.wieldUnmet.farming':
+    'Чтобы махать мотыгой, которая уже лежит в ваших сумках, нужен навык земледелия {skill}.',
   'hudChrome.gathering.wieldUnmetCorpse':
     'Чтобы пустить в ход свой лучший инструмент, нужен навык сбора {skill}.',
   'hudChrome.gathering.requiresTool.mining': 'Требуется шахтерская кирка',
@@ -9931,38 +10061,130 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Чтобы срубить этот древостой, нужен лесорубный топор.',
   'hudChrome.gathering.toolRequired.herbalism': 'Чтобы собрать эти заросли, нужен серп травника.',
   'hudChrome.gathering.toolRequired.fishing': 'Чтобы рыбачить, нужна удочка.',
+  'hudChrome.gathering.toolRequired.farming':
+    'Чтобы возделать эту грядку, нужна мотыга земледельца.',
   'hudChrome.gathering.noNodeNearby.mining': 'Поблизости нет рудной жилы.',
   'hudChrome.gathering.noNodeNearby.logging': 'Поблизости нет древостоя.',
   'hudChrome.gathering.noNodeNearby.herbalism': 'Поблизости нет зарослей трав.',
+  'hudChrome.gathering.noNodeNearby.farming': 'Поблизости нет грядки.',
   'hudChrome.gathering.toolTooltip.kind.mining': 'Шахтерский инструмент ({tier} уровень)',
   'hudChrome.gathering.toolTooltip.kind.logging': 'Лесорубный инструмент ({tier} уровень)',
   'hudChrome.gathering.toolTooltip.kind.herbalism': 'Инструмент травника ({tier} уровень)',
   'hudChrome.gathering.toolTooltip.kind.fishing': 'Удочка ({tier} уровень)',
+  'hudChrome.gathering.toolTooltip.kind.farming': 'Земледельческий инструмент ({tier} уровень)',
   'hudChrome.gathering.toolTooltip.unlocks.mining': 'Нужна для добычи рудных жил до {tier} уровня.',
   'hudChrome.gathering.toolTooltip.unlocks.logging': 'Нужен для валки древостоев до {tier} уровня.',
   'hudChrome.gathering.toolTooltip.unlocks.herbalism':
     'Нужен для сбора зарослей трав до {tier} уровня.',
   'hudChrome.gathering.toolTooltip.unlocks.fishing': 'Нужна для рыбалки в водах до {tier} уровня.',
+  'hudChrome.gathering.toolTooltip.unlocks.farming':
+    'Нужна для посадки культур до {tier} уровня.',
   'hudChrome.gathering.toolTooltip.use.mining': 'Использование: добыть руду из ближайшей жилы.',
   'hudChrome.gathering.toolTooltip.use.logging': 'Использование: срубить ближайший древостой.',
   'hudChrome.gathering.toolTooltip.use.herbalism':
     'Использование: собрать травы из ближайших зарослей.',
+  'hudChrome.gathering.toolTooltip.use.farming':
+    'Действует из ваших сумок, когда вы сажаете культуру на грядке.',
   'hudChrome.gathering.toolTooltip.speed': 'Быстрее собирает на узлах ниже {tier} уровня.',
   'hudChrome.gathering.toolTooltip.rodRequired': 'Нужна для рыбалки.',
   'hudChrome.gathering.toolTooltip.rodBite': 'Рыба клюет до {seconds} с быстрее.',
   'hudChrome.gathering.toolTooltip.rodReel': 'Продлевает окно подсечки на {seconds} с.',
   'hudChrome.gathering.toolTooltip.rodBand':
     'Открывает более богатый улов при навыке рыбалки от {skill}.',
+  'hudChrome.gathering.toolTooltip.rodBandCatch':
+    'Открывает добычу «{fish}» при навыке рыбалки от {skill}.',
   'hudChrome.gathering.downgradeMark': 'Сумки полны: добыча сохранена без метки сборщика.',
+  'hudChrome.gathering.downgradeMarkCrop': 'Сумки полны: урожай сохранен без метки садовода.',
   'hudChrome.gathering.downgradeFind': 'Сумки полны: превосходная находка ускользнула.',
   'hudChrome.gathering.emptyHookNote': 'Пустой крючок',
   'hudChrome.gathering.stateReady': 'Готово',
   'hudChrome.gathering.stateCooldown': 'Восстанавливается',
   'hudChrome.gathering.stateCooldownTimed': 'Восстановится через {time}',
   'hudChrome.gathering.fineGradePreview': 'Ваш инструмент даёт здесь отборный сорт добычи.',
+  'hudChrome.farming.plantLine': 'Вы сажаете: {name}.',
+  'hudChrome.farming.harvestLine': 'Вы собираете урожай: {name}.',
+  'hudChrome.farming.harvestLineQty': 'Вы собираете урожай: {name} x{qty}.',
+  'hudChrome.farming.harvestFineLine': 'Вы также собираете: {name}.',
+  'hudChrome.farming.harvestFineLineQty': 'Вы также собираете: {name} x{qty}.',
+  'hudChrome.farming.witheredLine': 'Урожай засох. Вы расчищаете грядку: {name}.',
+  'hudChrome.farming.witheredLineQty': 'Урожай засох. Вы расчищаете грядку: {name} x{qty}.',
+  'hudChrome.farming.pressTarget.feastOverHarvest':
+    'Пир и ваш урожай оба в пределах досягаемости. Взаимодействие выберет пир, а не грядку; отойдите от пира, чтобы собрать урожай.',
+  'hudChrome.farming.pressTarget.feastOverPlant':
+    'Пир и пустая грядка оба в пределах досягаемости. Взаимодействие выберет пир, а не грядку; отойдите от пира, чтобы посадить.',
+  'hudChrome.farming.seedBackLine': 'Вы сохраняете семена на посадку: {name}.',
+  'hudChrome.farming.goldenBonusLine': 'Золотой урожай приносит вдобавок: {name}.',
+  'hudChrome.farming.seedBackLineQty': 'Вы сохраняете семена на посадку: {name} x{qty}.',
+  'hudChrome.farming.denied.bad_bed': 'Там нет грядки.',
+  'hudChrome.farming.denied.bad_crop': 'Это здесь посадить нельзя.',
+  'hudChrome.farming.denied.range': 'Вы слишком далеко от этой грядки.',
+  'hudChrome.farming.denied.no_farmer':
+    'Чтобы обменять шелуху на компост, нужно стоять рядом с фермером.',
+  'hudChrome.farming.huskTrade': 'Обменять шелуху на компост',
+  'hudChrome.farming.huskTradeAria': 'Обменять шелуху на компост у {name}',
+  'hudChrome.farming.plantSheet.title': 'Посадить культуру',
+  'hudChrome.farming.plantSheet.plant': 'Посадить',
+  'hudChrome.farming.plantSheet.sowAria': 'Посеять: {name}',
+  'hudChrome.farming.plantSheet.empty': 'У вас нет семян, которые можно посеять на этой грядке.',
+  'hudChrome.farming.plantSheet.close': 'Закрыть окно посадки',
+  'hudChrome.farming.denied.bed_taken': 'Там у вас уже растет урожай.',
+  'hudChrome.farming.denied.skill': 'Ваш навык земледелия слишком низок для этой культуры.',
+  'hudChrome.farming.denied.no_seed': 'У вас нет семян этой культуры.',
+  'hudChrome.farming.denied.not_ready': 'Этот урожай еще растет.',
+  'hudChrome.farming.denied.no_plot': 'На этой грядке ничего не посажено.',
+  'hudChrome.farming.denied.no_husks': 'У вас недостаточно засохшей шелухи.',
+  'hudChrome.farming.denied.no_compost': 'У вас нет компоста.',
+  'hudChrome.farming.denied.no_fee_produce': 'У вас нет урожая, чтобы оплатить присмотр.',
+  'hudChrome.farming.denied.no_tonic': 'У вас нет тоника роста.',
+  'hudChrome.farming.denied.tool': 'У вас нет мотыги земледельца, подходящей для этой культуры.',
+  'hudChrome.farming.denied.locked': 'Предмет, которым можно за это заплатить, заблокирован.',
+  'hudChrome.farming.denied.no_feast': 'У вас нет пира, который можно накрыть.',
+  'hudChrome.farming.denied.feast_active': 'Ваш пир уже накрыт.',
+  'hudChrome.farming.denied.feast_expired': 'Этого пира больше нет.',
+  'hudChrome.farming.denied.feast_finished': 'Этот пир съеден подчистую.',
+  'hudChrome.farming.denied.feast_eaten': 'Вы уже поели с этого пира.',
+  'hudChrome.farming.feastTitle': 'Пир урожая {name}',
+  'hudChrome.farming.stonepotFeastTitle': 'Пир каменного котла {name}',
+  'hudChrome.farming.warspiceFeastTitle': 'Боевой пряный пир {name}',
+  'hudChrome.farming.sageleafFeastTitle': 'Пир из мудролиста {name}',
+  'hudChrome.farming.feastPlacedLine': 'Вы накрыли свой пир урожая.',
+  'hudChrome.farming.husksConvertedLine': 'Вы обмениваете {husksName} x{husks} на {name}.',
+  'hudChrome.farming.husksConvertedLineQty':
+    'Вы обмениваете {husksName} x{husks} на {name} x{qty}.',
+  'hudChrome.farming.readyLine': 'Урожай на одной грядке готов к сбору.',
+  'hudChrome.farming.readyLineQty': 'Урожай готов к сбору на грядках: {count}.',
+  'hudChrome.farming.readyWitheredLine': 'Урожай на одной грядке засох.',
+  'hudChrome.farming.readyWitheredLineQty': 'Грядок с засохшим урожаем: {count}.',
+  'hudChrome.harvestJournal.title': 'Журнал урожая',
+  'hudChrome.harvestJournal.close': 'Закрыть',
+  'hudChrome.harvestJournal.listLabel': 'Засаженные грядки',
+  'hudChrome.harvestJournal.growing': 'Готово через {time}',
+  'hudChrome.harvestJournal.ready': 'Готово к сбору',
+  'hudChrome.harvestJournal.readyAnnounce': 'Готово к сбору: {name}',
+  'hudChrome.harvestJournal.finishing': 'Почти созрел',
+  'hudChrome.harvestJournal.withered': 'Засох',
+  'hudChrome.harvestJournal.remainingDaysHours': '{days} д {hours} ч',
+  'hudChrome.harvestJournal.remainingHoursMinutes': '{hours} ч {minutes} мин',
+  'hudChrome.harvestJournal.remainingMinutesSeconds': '{minutes} мин {seconds} с',
+  'hudChrome.harvestJournal.remainingSeconds': '{seconds} с',
+  'hudChrome.harvestJournal.bedLine': '{zone}, грядка {index}',
+  'hudChrome.harvestJournal.bedLineUnknown': 'Неизвестная грядка',
+  'hudChrome.harvestJournal.careWatch': 'Присмотр земледельца',
+  'hudChrome.harvestJournal.careNone': 'Без дополнений',
+  'hudChrome.harvestJournal.stageSprout': 'Росток',
+  'hudChrome.harvestJournal.stageSeedling': 'Всходы',
+  'hudChrome.harvestJournal.stageMaturing': 'Созревает',
+  'hudChrome.harvestJournal.stageRipe': 'Созрел',
+  'hudChrome.harvestJournal.emptyTitle': 'Ничего не посажено',
+  'hudChrome.harvestJournal.emptyBody':
+    'Посейте семя на любой грядке, и она появится здесь вместе с таймером.',
+  'hudChrome.harvestJournal.noviceTitle': 'Вы еще не работали на грядке',
+  'hudChrome.harvestJournal.noviceBody':
+    'Навык земледелия растет с каждым собранным урожаем. Посейте семя на любой грядке, чтобы начать.',
   'gatherEvent.pristineVein': '{finder} находит нетронутую жилу!',
   'gatherEvent.ancientHeartwood': '{finder} добывает древнюю сердцевину!',
   'gatherEvent.moonlitBloom': '{finder} находит лунный цветок!',
+  'gatherEvent.goldenHarvest': '{finder} собирает золотой урожай!',
   'hudChrome.archetypeTitle.label': 'Титул',
   'hudChrome.archetypeTitle.none': 'Нет',
   'hudChrome.archetypeTitle.hobbyLabel': 'Хобби',
@@ -10181,6 +10403,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.thornhide_leggings.name': 'Набедренники Терновой шкуры',
   'entities.items.thornhide_gloves.name': 'Перчатки Терновой шкуры',
   'entities.items.thornhide_boots.name': 'Башмаки Терновой шкуры',
+  'entities.items.hammered_copper_band.name': 'Кованое медное кольцо',
+  'entities.items.polished_copper_loop.name': 'Полированный медный перстень',
+  'entities.items.coiled_copper_torc.name': 'Витая медная гривна',
+  'entities.items.riveted_iron_signet.name': 'Клепаная железная печатка',
+  'entities.items.etched_iron_loop.name': 'Гравированный железный перстень',
+  'entities.items.iron_link_choker.name': 'Ожерелье из железных звеньев',
+  'entities.items.weighted_thorium_band.name': 'Увесистое осмиевое кольцо',
+  'entities.items.gleaming_thorium_loop.name': 'Блестящий осмиевый перстень',
+  'entities.items.burnished_thorium_amulet.name': 'Начищенный осмиевый амулет',
   'entities.items.final_oath_medallion.name': 'Медальон последней клятвы',
   'entities.items.razorwind_torque.name': 'Шейная гривна режущего ветра',
   'entities.items.cinder_sigil_pendant.name': 'Подвеска с печатью углей',
@@ -10279,7 +10510,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.searchAria': 'Поиск предметов в банке по названию',
   'hudChrome.bank.depositAll': 'Положить все материалы',
   'hudChrome.bank.depositAllTooltip':
-    'Отправляет в банк все материалы для крафта и хлам из ваших сумок за один раз. Инструменты для добычи, надетое снаряжение, квестовые предметы и расходники не затрагиваются.',
+    'Отправляет в банк все материалы для крафта (всё, что в подсказке помечено как «Материал» или «Отборный материал») из ваших сумок за один раз. Всё остальное остаётся в сумках, включая инструменты для добычи, квестовые предметы, расходники и серые предметы.',
   'hudChrome.bank.depositAllDone': 'Материалов положено: {count}.',
   'hudChrome.bank.depositAllFull': 'Материалов положено: {count}. Банк заполнен.',
   'hudChrome.bank.depositAllNone': 'Банк заполнен: ничего не положено.',
@@ -10394,10 +10625,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'sim.rift.detonateStormcallersWrath': 'Гнев призывателя бурь вырывается!',
   'sim.rift.detonateAbyssalMaw': 'Пасть бездны сжимается!',
   'sim.rift.detonateCrushingDepth': 'Сокрушающая глубина давит!',
-  'sim.rift.detonatePactSeal': 'Печать пакта взрывается!',
-  'sim.rift.detonateBloodRite': 'Кровавый обряд падает!',
-  'sim.rift.detonatePitSentence': 'Приговор ямы взрывается!',
-  'sim.rift.detonateHellfireBrand': 'Адское клеймо взрывается!',
   'entities.items.rift_essence.name': 'Эссенция разлома',
   'entities.items.rift_gem_crimson.name': 'Багровый самоцвет разлома',
   'entities.items.rift_gem_azure.name': 'Лазурный самоцвет разлома',
@@ -10697,7 +10924,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_chimeglass_tortoise':
     'Черепаха солончаков, пережившая в пути три поколения караванов. Приютившие её лудильщики выточили ей очки из штормового стекла и подвесили к горлу бронзовый колокольчик — дорога слышит её задолго до того, как увидит.',
   'hudChrome.mounts.name_thunderstrut_gobbler': 'Громоступ, великий индюк',
-  'hudChrome.mounts.name_terrorspark_groundshaker': 'Страхоискр, сотрясатель земли',
+  'hudChrome.mounts.name_terrorspark_groundshaker': 'Ужасоискр, сотрясатель земли',
   'hudChrome.mounts.name_rickshaw_mount': 'Костяная рикша',
   'hudChrome.mounts.desc_valorsteed':
     'Выносливый и твердо стоящий на ногах скакун, повышающий скорость передвижения.',
@@ -10920,7 +11147,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Выпускает веер стрел в выбранную область, нанося противникам в радиусе 8 м {damage} ед. физического урона. (талант охотника)',
   'entities.abilities.prayer_of_healing.description': 'Исцеляет союзников в пределах 30 м на {damage}. Исцеление растёт с силой заклинаний. (Свет)',
   'entities.abilities.preparation.description':
-    'Завершает восстановление «Спринта», «Уклонения» и «Исчезновения». (талант разбойника)',
+    'Завершает восстановление «Спринта», «Уклонения» и «Ухода в дым». (талант разбойника)',
   'entities.abilities.presence_of_mind.description':
     'Ваше следующее заклинание со временем произнесения становится мгновенным. Действует 60 сек. (Талант мага)',
   'entities.abilities.psychic_scream.description': 'Приводит в ужас врагов в пределах 8 м на срок до 4 сек. Урон может разрушить эффект.',
@@ -10975,13 +11202,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flurry.name': 'Зимняя плеть',
   'entities.abilities.flurry.description':
     'Выпускает три ледяных снаряда, каждый из которых наносит {damage} ед. урона от магии льда, и накладывает на цель «Зимнюю стужу»: следующие 2 подходящих заклинания считают её замороженной. «Заморозка мозгов» делает «Зимнюю плеть» мгновенной и позволяет игнорировать время восстановления. (ветка «Лёд»)',
-  'entities.abilities.frozen_orb.name': 'Ледяной шар',
+  'entities.abilities.frozen_orb.name': 'Морозный шар',
   'entities.abilities.frozen_orb.description':
     'Выпускает вихревой ледяной шар, который движется вперёд 8 сек., ежесекундно наносит ближайшим противникам {damage} ед. урона от магии льда и замедляет их на 30%. Каждый импульс, попавший во врага, создаёт одну «Сосульку». (ветка «Лёд»)',
   'entities.abilities.blizzard.name': 'Снежная буря',
   'entities.abilities.blizzard.description':
-    'Обрушивает на выбранную область ледяную бурю на 6 сек., ежесекундно нанося {damage} ед. урона от магии льда и замедляя врагов на 40%. Каждый поражённый враг сокращает восстановление «Ледяного шара» на 0,5 сек., но не более чем на 3 сек. за одно применение. (ветка «Лёд»)',
-  'entities.abilities.glacial_spike.name': 'Ледяной шип',
+    'Обрушивает на выбранную область ледяную бурю на 6 сек., ежесекундно нанося {damage} ед. урона от магии льда и замедляя врагов на 40%. Каждый поражённый враг сокращает восстановление «Морозного шара» на 0,5 сек., но не более чем на 3 сек. за одно применение. (ветка «Лёд»)',
+  'entities.abilities.glacial_spike.name': 'Инеевая игла',
   'entities.abilities.glacial_spike.description':
     'Создаёт огромный ледяной шип, расходуя 5 сосулек, чтобы нанести {damage} ед. урона от магии льда и приморозить цель к месту на 4 сек. (ветка «Лёд»)',
   'entities.abilities.glacial_front.name': 'Ледниковый фронт',
@@ -11024,7 +11251,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Окутывает вас пламенем, поглощая {damage} ед. урона в течение 60 сек. (ветка «Огонь»)',
   'entities.abilities.cold_snap.name': 'Зов зимы',
   'entities.abilities.cold_snap.description':
-    'Мгновенно завершает восстановление «Мерцающего шага», «Морозной завесы» и «Великой невидимости». (талант мага)',
+    'Мгновенно завершает восстановление «Порхающего шага», «Морозной завесы» и «Великой невидимости». (талант мага)',
   'entities.abilities.greater_invisibility.name': 'Великая невидимость',
   'entities.abilities.greater_invisibility.description':
     'Исчезаете на 20 сек. и снимаете 2 эффекта периодического урона. Когда невидимость заканчивается, получаемый урон снижается на 90% на 2 сек. (Талант мага)',
@@ -11167,7 +11394,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.battleTrance':
     'Ваш следующий Удар разорителя или Калечащий удар не потребует ярости',
   'hudChrome.auraEffect.revengeFree': 'Ваша следующая Месть не потребует ярости',
-  'hudChrome.auraEffect.victoryRush': '«Порыв победы» готов',
+  'hudChrome.auraEffect.victoryRush': '«Порыв победителя» готов',
   'hudChrome.auraEffect.maxHpPct': 'Повышает максимальное здоровье на {pct}%',
   'hud.combat.floatingParry': 'Парировано',
   'hud.combat.parried': '{target} парирует ваш {ability}.',
@@ -11232,6 +11459,22 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.cook_marlow.title': 'Хозяин кухни',
   'entities.npcs.cook_marlow.greeting':
     'Из моей кухни ничего не выходит полусырым, {className}. Садись, поешь, а потом обратно в путь.',
+  'entities.npcs.farmer_jessica.name': 'Фермер Джессика',
+  'entities.npcs.farmer_jessica.title': 'Хранительница огородов',
+  'entities.npcs.farmer_jessica.greeting':
+    'Доброй земли и ясной погоды, {playerName}. Купи у меня семена, посей их на одной из этих грядок и ступай по своим делам. Урожай растёт, пока тебя нет, и никогда не портится. В журнале урожая (Shift+K или строка Земледелие в окне профессий) перечислена каждая засеянная грядка и её таймер.',
+  'entities.npcs.farmer_teasel.name': 'Фермер Тизель',
+  'entities.npcs.farmer_teasel.title': 'Болотный рисовод',
+  'entities.npcs.farmer_teasel.greeting':
+    'Семена болотного риса и болотной свёклы, {className}, и компост, чтобы их подкормить. Вода с чеков уходит медленно, так что смотри под ноги.',
+  'entities.npcs.farmer_hollis.name': 'Фермер Холлис',
+  'entities.npcs.farmer_hollis.title': 'Террасник Хайвотча',
+  'entities.npcs.farmer_hollis.greeting':
+    'Террасы дают столько, сколько позволяет гора, {className}. Я продаю семена и компост, а если твой урожай засохнет, я переработаю шелуху обратно в добрую землю.',
+  'entities.npcs.farmer_verbena.name': 'Фермер Вербена',
+  'entities.npcs.farmer_verbena.title': 'Садовница партера',
+  'entities.npcs.farmer_verbena.greeting':
+    'Осторожнее с бордюром, {playerName}, эти грядки гордость партера. Я продаю семена и компост, а любую засохшую шелуху, что ты принесёшь, превращу в новый.',
   'entities.npcs.weaver_ottilie.name': 'Ткачиха Оттилия',
   'entities.npcs.weaver_ottilie.title': 'Хозяйка ткацкого стана',
   'entities.npcs.weaver_ottilie.greeting':
@@ -11290,7 +11533,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.hearthkeeper_maeve.title': 'Хозяйка Очажного дома',
   'entities.npcs.hermit_okku.greeting':
     'Тихо. Барабаны считают всех, кто ходит под деревьями, — и тебя они уже сосчитали.',
-  'entities.npcs.hermit_okku.name': 'Окку',
+  'entities.npcs.hermit_okku.name': 'Окрим',
   'entities.npcs.hermit_okku.title': 'Тот, кто вошёл в чащу',
   'entities.npcs.huntsman_deral.greeting': 'Тише. Стадо знает каждый звук этой долины — и я тоже.',
   'entities.npcs.huntsman_deral.name': 'Охотник Дерал',
@@ -11354,7 +11597,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.sexton_marrow.greeting':
     'Здесь мы хороним глубоко и звоним в колокола, чтобы мёртвые не забывали лежать смирно.',
   'entities.npcs.sexton_marrow.name': 'Пономарь Марроу',
-  'entities.npcs.sexton_marrow.title': 'Пономарь Гэллоумира',
+  'entities.npcs.sexton_marrow.title': 'Пономарь Гиббетмира',
   'entities.npcs.strandwatcher_pell.greeting':
     'Наконец-то из чёрных деревьев. Дыши, странник: по эту сторону прохода правит солнце.',
   'entities.npcs.strandwatcher_pell.name': 'Береговой дозорный Пелл',
@@ -11394,7 +11637,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.widow_tansy.greeting':
     'По свече на каждую могилу, и ни одна не должна погаснуть. Ни одна, слышишь?',
   'entities.npcs.widow_tansy.name': 'Вдова Пижма',
-  'entities.npcs.widow_tansy.title': 'Свечница Гэллоумира',
+  'entities.npcs.widow_tansy.title': 'Свечница Гиббетмира',
   'hudChrome.training.title': 'Обучение: {name}',
   'hudChrome.training.close': 'Закрыть обучение',
   'hudChrome.training.empty': 'Этому мастеру нечему вас научить.',
@@ -11414,6 +11657,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.training.notTaughtHere': 'Этот рецепт здесь не преподают.',
   'hudChrome.training.alreadyKnown': 'Вы уже знаете этот рецепт.',
   'hudChrome.training.outOfRange': 'Для обучения нужно стоять у мастерской.',
+  'hudChrome.pattern.teaches': 'Использование: обучает изготовлению предмета «{item}».',
   'entities.items.rough_hide.name': 'Грубая шкура',
   'entities.items.spider_silk.name': 'Паучий шелк',
   'entities.items.venom_gland.name': 'Ядовитая железа',
@@ -11489,6 +11733,90 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.sunpetal_healing_draught.name': 'Целебный настой солнцелепеста',
   'entities.items.sunpetal_mana_draught.name': 'Настой маны солнцелепеста',
   'entities.items.elixir_of_the_serpent.name': 'Эликсир змея',
+  'entities.items.silverleaf_primer.name': 'Букварь глянцелиста',
+  'entities.items.goldleaf_folio.name': 'Фолиант золотолиста',
+  'entities.items.sunpetal_grimoire.name': 'Гримуар солнцелепеста',
+  'entities.items.silverleaf_scroll.name': 'Свиток глянцелиста',
+  'entities.items.goldleaf_scroll.name': 'Свиток золотолиста',
+  'entities.items.sunpetal_scroll.name': 'Свиток солнцелепеста',
+  'entities.items.duskforged_billet.name': 'Заготовка сумеречной ковки',
+  'entities.items.forgefold_plating.name': 'Пластины складчатой ковки',
+  'entities.items.wyrmhide_cording.name': 'Шнуровка из драконьей шкуры',
+  'entities.items.sunspun_bolt.name': 'Штука солнцепрядной ткани',
+  'entities.items.prismglass_setting.name': 'Оправа из призменного стекла',
+  'entities.items.precision_chassis.name': 'Прецизионный каркас',
+  'entities.items.quickening_catalyst.name': 'Оживляющий катализатор',
+  'entities.items.seasoned_stock.name': 'Приправленный бульон',
+  'entities.items.lucent_reagent.name': 'Светозарный реагент',
+  'entities.items.sablewax_vellum.name': 'Черновосковый пергамент',
+  'entities.items.spiritweld_girdle.name': 'Пояс духовной спайки',
+  'entities.items.forgefold_legguards.name': 'Набедренники складчатой ковки',
+  'entities.items.wardspeaker_sabatons.name': 'Сабатоны заклинателя оберегов',
+  'entities.items.briarstep_jerkin.name': 'Куртка терновой поступи',
+  'entities.items.fenbloom_breeches.name': 'Бриджи болотного цветения',
+  'entities.items.barksong_handguards.name': 'Рукавицы поющей коры',
+  'entities.items.sunspun_vestments.name': 'Солнцепрядное облачение',
+  'entities.items.sunspun_leggings.name': 'Солнцепрядные поножи',
+  'entities.items.sunspun_handwraps.name': 'Солнцепрядные обмотки',
+  'entities.items.sunspun_haversack.name': 'Солнцепрядная котомка',
+  'entities.items.duskforged_warblade.name': 'Боевой клинок сумеречной ковки',
+  'entities.items.ridgebreaker.name': 'Хребтолом',
+  'entities.items.duskforged_bulwark.name': 'Бастион сумеречной ковки',
+  'entities.items.wyrmfall_pendant.name': 'Кулон драконопада',
+  'entities.items.warhewn_signet.name': 'Вытесанная войной печатка',
+  'entities.items.prismglass_loop.name': 'Перстень из призменного стекла',
+  'entities.items.gyrelens_array.name': 'Массив вихрелинз',
+  'entities.items.voidbound_grimoire.name': 'Скованный Пустотой гримуар',
+  'entities.items.masters_field_forge.name': 'Походная кузня мастера',
+  'entities.items.makers_charm.name': 'Оберег мастера',
+  'entities.items.ironhusk_flask.name': 'Железноскорлупная фляга',
+  'entities.items.warboar_flask.name': 'Фляга боевого вепря',
+  'entities.items.runewater_flask.name': 'Фляга рунной воды',
+  'entities.items.stonepot_stew.name': 'Похлебка из каменного котла',
+  'entities.items.warspice_skewers.name': 'Боевые пряные шашлычки',
+  'entities.items.sageleaf_chowder.name': 'Похлебка из мудролиста',
+  'entities.items.grand_cauldron.name': 'Великий котел',
+  'entities.items.laden_hearth.name': 'Обильный очаг',
+  'entities.items.pattern_spiritweld_girdle.name': 'Чертеж: Пояс духовной спайки',
+  'entities.items.pattern_forgefold_legguards.name': 'Чертеж: Набедренники складчатой ковки',
+  'entities.items.pattern_wardspeaker_sabatons.name': 'Чертеж: Сабатоны заклинателя оберегов',
+  'entities.items.pattern_briarstep_jerkin.name': 'Выкройка: Куртка терновой поступи',
+  'entities.items.pattern_fenbloom_breeches.name': 'Выкройка: Бриджи болотного цветения',
+  'entities.items.pattern_barksong_handguards.name': 'Выкройка: Рукавицы поющей коры',
+  'entities.items.pattern_sunspun_vestments.name': 'Выкройка: Солнцепрядное облачение',
+  'entities.items.pattern_sunspun_leggings.name': 'Выкройка: Солнцепрядные поножи',
+  'entities.items.pattern_sunspun_handwraps.name': 'Выкройка: Солнцепрядные обмотки',
+  'entities.items.pattern_sunspun_haversack.name': 'Выкройка: Солнцепрядная котомка',
+  'entities.items.pattern_duskforged_warblade.name': 'Чертеж: Боевой клинок сумеречной ковки',
+  'entities.items.pattern_ridgebreaker.name': 'Чертеж: Хребтолом',
+  'entities.items.pattern_duskforged_bulwark.name': 'Чертеж: Бастион сумеречной ковки',
+  'entities.items.pattern_wyrmfall_pendant.name': 'Эскиз: Кулон драконопада',
+  'entities.items.pattern_warhewn_signet.name': 'Эскиз: Вытесанная войной печатка',
+  'entities.items.pattern_prismglass_loop.name': 'Эскиз: Перстень из призменного стекла',
+  'entities.items.pattern_gyrelens_array.name': 'Схема: Массив вихрелинз',
+  'entities.items.pattern_masters_field_forge.name': 'Схема: Походная кузня мастера',
+  'entities.items.pattern_makers_charm.name': 'Схема: Оберег мастера',
+  'entities.items.pattern_voidbound_grimoire.name': 'Техника: Скованный Пустотой гримуар',
+  'entities.items.pattern_ironhusk_flask.name': 'Рецепт: Железноскорлупная фляга',
+  'entities.items.pattern_warboar_flask.name': 'Рецепт: Фляга боевого вепря',
+  'entities.items.pattern_runewater_flask.name': 'Рецепт: Фляга рунной воды',
+  'entities.items.pattern_stonepot_stew.name': 'Рецепт: Похлебка из каменного котла',
+  'entities.items.pattern_warspice_skewers.name': 'Рецепт: Боевые пряные шашлычки',
+  'entities.items.pattern_sageleaf_chowder.name': 'Рецепт: Похлебка из мудролиста',
+  'entities.items.stonepot_feast.name': 'Пир каменного котла',
+  'entities.items.warspice_feast.name': 'Боевой пряный пир',
+  'entities.items.sageleaf_feast.name': 'Пир из мудролиста',
+  'entities.items.pattern_stonepot_feast.name': 'Рецепт: Пир каменного котла',
+  'entities.items.pattern_warspice_feast.name': 'Рецепт: Боевой пряный пир',
+  'entities.items.pattern_sageleaf_feast.name': 'Рецепт: Пир из мудролиста',
+  'entities.items.pattern_grand_cauldron.name': 'Рецепт: Великий котел',
+  'entities.items.pattern_laden_hearth.name': 'Рецепт: Обильный очаг',
+  'entities.items.pattern_highwatch_gourd_soup.name': 'Рецепт: Хайвотчский суп из морозной тыквы',
+  'entities.items.pattern_highwatch_barley_porridge.name': 'Рецепт: Хайвотчская ячменная каша',
+  'entities.items.pattern_evergarden_sunmelon_tart.name': 'Рецепт: Тарт с солнечной дыней из Вечного Сада',
+  'entities.items.pattern_evergarden_harvest_platter.name': 'Рецепт: Блюдо урожая Вечного Сада',
+  'entities.items.pattern_evergarden_braised_greens.name': 'Рецепт: Тушёная зелень Вечного Сада',
+  'entities.items.pattern_harvest_feast.name': 'Рецепт: Пир урожая',
   'entities.mobs.wildheart_stalker.name': 'Лазутчик Лозокогтя',
   'entities.mobs.wildheart_ravager.name': 'Разоритель Кровавой Гривы',
   'entities.mobs.wildheart_hexcaller.name': 'Заклинатель Солнечной Кости',
@@ -11515,7 +11843,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.the_last_keep.name': 'Последний оплот',
   'entities.items.last_keep_signet.name': 'Печатка Последнего оплота',
   'entities.dungeons.the_last_keep.enterText': 'Вы входите в холодные безмолвные залы Последнего оплота.',
-  'entities.items.reins_terrorspark_groundshaker.name': 'Ключ зажигания Страхоискра',
+  'entities.items.reins_terrorspark_groundshaker.name': 'Ключ зажигания Ужасоискра',
   'entities.items.reins_lanternback_troll.name':
     'Ярмо фонарщика: Грумбол',
   'entities.items.reins_chimeglass_tortoise.name':
@@ -11551,7 +11879,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.farshore_salt_moss.name': 'Солёный мох Дальнего Берега',
   'entities.items.fenway_mooring_line.name': 'Перекушенный швартов',
   'entities.items.fountain_court_mantle.name': 'Мантия Фонтанного Двора',
-  'entities.items.frostmane_mantle.name': 'Мантия Морозной Гривы',
+  'entities.items.frostmane_mantle.name': 'Мантия Инеистой Гривы',
   'entities.items.galecrest_ram_wool.name': 'Жирная баранья шерсть',
   'entities.items.gallowmere_grave_candle.name': 'Могильная свеча',
   'entities.items.gilded_sap_clot.name': 'Сгусток золочёной живицы',
@@ -11614,10 +11942,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.revenantstep_treads.name': 'Сапоги шага призрака',
   'entities.items.shardfang_grips.name': 'Перчатки оскольчатого клыка',
   'entities.items.shardsong_mantle.name': 'Оплечье песни осколков',
-  'entities.items.wyrmcult_spellgrips.name': 'Перчатки заклинаний культа дракона',
+  'entities.items.wyrmcult_spellgrips.name': 'Перчатки заклинаний Клятвы Выводка',
   'entities.items.thornpeak_wildwraps.name': 'Дикие обмотки Терновых Пиков',
   'entities.items.stormvotive_hauberk.name': 'Хауберк грозового обета',
-  'entities.items.cryptbloom_shoulderguards.name': 'Наплечники склепного цветения',
+  'entities.items.cryptbloom_shoulderguards.name': 'Наплечники могильного лепестка',
   'entities.items.gravewyrm_thornmaul.name': 'Терновый молот могильного дракона',
   'entities.items.vestments_of_the_waking_grove.name': 'Облачение Пробуждающейся рощи',
   'entities.items.nightfangs_greatstaff.name': 'Большой посох Ночного клыка',
@@ -11632,23 +11960,33 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.wildgrowth_leggings.name': 'Поножи дикого роста',
   'entities.items.wildsoul_maul.name': 'Молот дикой души',
   'hudChrome.professions.skillValue': '{skill} / {max}',
-  'guide.profPages.toolsNote':
-    'Для каждой залежи нужен инструмент её ремесла в сумках, включая 1-й уровень: нет кирки, нет руды, нет удочки, нет рыбы. Торговая лестница охватывает уровни с 1-го по 3-й, и каждый узел держит только те уровни, которых требует его собственная земля, поэтому инструмент 1-го уровня продаётся в узле каждой зоны, а ступени выше продаются там, где лежат жилы, которым они нужны. За эти ступени торговцы спрашивают ещё и мастерство в самом ремесле инструмента: {tier2Prof} для 2-го уровня и {tier3Prof} для 3-го, и строка называет это требование. Инструменту достаточно лежать в сумках, ячейки экипировки и прочности у него нет, так что каждый покупается один раз, а то, чем вы уже владеете, продолжает работать. На ограничение влияет только уровень: более редкий инструмент того же уровня не открывает ничего сверх того. Но редкость не только цвет. Она продлевает вставленный эффект инструмента, а на удочке расширяет окно подсечки.\n\nХороший инструмент даёт три вещи, а не две. Он открывает землю более высокого уровня, сокращает сбор и улучшает то, что выходит: обработайте жилу инструментом рангом ВЫШЕ собственного материала зоны, и добыча даст тонкий сорт вместо обычного. Жила должна быть одной из полносортных жил зоны, поэтому лёгкие жилы, которые зона хранит для странников, по-прежнему дают обычный материал. Тонкие материалы — это то, что потребляют рецепты кованых инструментов, и тонкий сорт считается своей обычной версией всюду, где рецепт или наряд просит обычную, так что улучшение никогда не заводит в тупик: ваша медная руда просто приходит как тонкая медная руда.\n\nВыше торговой лестницы у каждого ремесла есть два кованых инструмента, 4-го и 5-го уровня, сделанные инженерами в мастерской инструментов или купленные за метки вылазок у стойки Утонувшей литании. Ни один торговец не продаёт их за монету. У рыбалки своя пара, и ей учат у мастера инструментов, а не знают с самого начала. Сегодня ни одна залежь и ни одна вода не требуют больше 3-го уровня, поэтому две верхние ступени покупают скорость, сорт и более щадящее окно подсечки, а не доступ, и они станут входным билетом, когда появится земля более высокого уровня.',
   'hudChrome.professions.toolEffectName.quickeningCharm': 'Оберег возрождения',
   'hudChrome.professions.toolEffectName.artisansEye': 'Глаз ремесленника',
   'hudChrome.professions.toolEffectName.gatherersCache': 'Сумка собирателя',
+  'hudChrome.professions.toolEffectName.makersCharm': 'Оберег мастера',
   'hudChrome.professions.toolEffectTooltip.kind': 'Талисман для инструмента',
   'hudChrome.professions.toolEffectTooltip.bonus.gatherersCache':
     'Пока есть заряды, каждый сбор приносит +1 к добыче.',
+  'hudChrome.professions.toolEffectTooltip.bonus.makersCharm':
+    'Пока есть заряды, каждый сбор приносит +2 к добыче, а на садовом инструменте +1.',
   'hudChrome.professions.toolEffectTooltip.bonus.artisansEye':
     'Пока есть заряды, повышает класс добычи на 1 уровень инструмента.',
   'hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm':
     'Сокращает таймер возрождения источника, на котором сработал.',
   'hudChrome.professions.toolEffectTooltip.howToSlot':
-    'Устанавливается на инструмент для горного дела, лесозаготовки или травничества в окне профессий. Расходуется при установке.',
+    'Устанавливается на инструмент для горного дела, лесозаготовки, травничества или земледелия в окне профессий. Расходуется при установке.',
   'hudChrome.professions.toolEffectTooltip.charges':
     'На обычном инструменте изначально {base} зарядов (+{bonus} за каждую ступень редкости).',
   'hudChrome.professions.toolEffectTooltip.landOnly': 'На удочку не устанавливается.',
+  'hudChrome.professions.mobileStationTooltip.kind': 'Походная станция',
+  'hudChrome.professions.mobileStationTooltip.use':
+    'Ставит у ваших ног общую для группы походную станцию: {station}.',
+  'hudChrome.professions.mobileStationTooltip.radius':
+    'Вы можете изготавливать у неё предметы с любого расстояния; членам группы нужно быть в пределах {radius} ярдов.',
+  'hudChrome.professions.mobileStationTooltip.duration': 'Действует {minutes} минут.',
+  'hudChrome.professions.mobileStationTooltip.notConsumed': 'Не расходуется при использовании.',
+  'hudChrome.professions.mobileStationTooltip.replace':
+    'Установка заменяет вашу действующую походную станцию, в том числе размещённую специализацией.',
   'hudChrome.professions.toolEffectTooltip.openProfessions':
     'Откройте окно профессий, чтобы установить талисман на инструмент для сбора.',
   'hudChrome.professions.toolEffectSlotButton': 'Установить {effect}',
@@ -11772,10 +12110,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.markFind.masterwork_armorcrafting': 'Шедевр доспешного дела',
   'hudChrome.reliquary.markFind.masterwork_tailoring': 'Шедевр портняжного дела',
   'hudChrome.reliquary.markFind.masterwork_leatherworking': 'Шедевр кожевничества',
+  'hudChrome.reliquary.markFind.masterwork_jewelcrafting': 'Шедевр ювелирного дела',
+  'hudChrome.reliquary.markFind.masterwork_inscription': 'Шедевр начертания',
   'hudChrome.reliquary.markFind.masterwork_engineering': 'Шедевр инженерии',
   'hudChrome.reliquary.markFind.gather_event_pristine_vein': 'Нетронутая жила',
   'hudChrome.reliquary.markFind.gather_event_ancient_heartwood': 'Древняя сердцевина',
   'hudChrome.reliquary.markFind.gather_event_moonlit_bloom': 'Лунный цвет',
+  'hudChrome.reliquary.markFind.gather_event_golden_harvest': 'Золотой урожай',
   'hudChrome.reliquary.markFind.gather_event_perfect_specimen': 'Идеальный образец',
   'hudChrome.reliquary.markFind.slain_old_greyjaw': 'Старый Серочелюст повержен',
   'hudChrome.reliquary.markFind.slain_mogger': 'Моггер повержен',
@@ -11864,54 +12205,62 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.errors.tradeBound': 'Этот предмет привязан и не может быть обменян.',
   'hud.errors.tradeWindowIneligible': 'Этот предмет можно передать только игрокам, разделившим эту добычу.',
   'hud.errors.marketListBound': 'Этот предмет привязан и не может быть выставлен на продажу.',
-  'hudChrome.enchantName.enchant_weapon_might': 'Зачарование оружия - Мощь',
-  'hudChrome.enchantName.enchant_weapon_intellect': 'Зачарование оружия - Сила заклинаний',
-  'hudChrome.enchantName.enchant_offhand_stamina': 'Зачарование левой руки - Выносливость',
-  'hudChrome.enchantName.enchant_helmet_fortitude': 'Зачарование шлема - Стойкость',
-  'hudChrome.enchantName.enchant_neck_spirit': 'Зачарование ожерелья - Дух',
-  'hudChrome.enchantName.enchant_shoulder_agility': 'Зачарование наплечников - Ловкость',
-  'hudChrome.enchantName.enchant_chest_stamina': 'Зачарование нагрудника - Выносливость',
-  'hudChrome.enchantName.enchant_waist_stamina': 'Зачарование пояса - Выносливость',
-  'hudChrome.enchantName.enchant_legs_stamina': 'Зачарование поножей - Выносливость',
-  'hudChrome.enchantName.enchant_gloves_agility': 'Зачарование перчаток - Ловкость',
-  'hudChrome.enchantName.enchant_gloves_intellect': 'Зачарование перчаток - Сила заклинаний',
-  'hudChrome.enchantName.enchant_feet_agility': 'Зачарование сапог - Ловкость',
-  'hudChrome.enchantName.enchant_ring_spirit': 'Зачарование кольца - Дух',
-  'hudChrome.enchantName.enchant_weapon_agility': 'Зачарование оружия - Ловкость',
-  'hudChrome.enchantName.enchant_helmet_intellect': 'Зачарование шлема - Интеллект',
-  'hudChrome.enchantName.enchant_helmet_armor': 'Зачарование шлема - Укрепление',
-  'hudChrome.enchantName.enchant_neck_intellect': 'Зачарование ожерелья - Интеллект',
-  'hudChrome.enchantName.enchant_neck_agility': 'Зачарование ожерелья - Ловкость',
-  'hudChrome.enchantName.enchant_shoulder_strength': 'Зачарование наплечников - Сила',
-  'hudChrome.enchantName.enchant_shoulder_intellect': 'Зачарование наплечников - Интеллект',
-  'hudChrome.enchantName.enchant_chest_spirit': 'Зачарование нагрудника - Дух',
-  'hudChrome.enchantName.enchant_chest_armor': 'Зачарование нагрудника - Укрепление',
-  'hudChrome.enchantName.enchant_waist_strength': 'Зачарование пояса - Сила',
-  'hudChrome.enchantName.enchant_waist_agility': 'Зачарование пояса - Ловкость',
-  'hudChrome.enchantName.enchant_legs_intellect': 'Зачарование поножей - Интеллект',
-  'hudChrome.enchantName.enchant_gloves_strength': 'Зачарование перчаток - Сила',
-  'hudChrome.enchantName.enchant_feet_strength': 'Зачарование сапог - Сила',
-  'hudChrome.enchantName.enchant_feet_stamina': 'Зачарование сапог - Выносливость',
-  'hudChrome.enchantName.enchant_ring_strength': 'Зачарование кольца - Сила',
-  'hudChrome.enchantName.enchant_ring_agility': 'Зачарование кольца - Ловкость',
-  'hudChrome.enchantName.enchant_ring_intellect': 'Зачарование кольца - Интеллект',
-  'hudChrome.enchantName.enchant_weapon_greater_might': 'Зачарование оружия - Высшая мощь',
+  'hudChrome.enchantName.enchant_weapon_might': 'Травление оружия: Мощь',
+  'hudChrome.enchantName.enchant_weapon_intellect': 'Травление оружия: Сила заклинаний',
+  'hudChrome.enchantName.enchant_offhand_stamina': 'Травление левой руки: Выносливость',
+  'hudChrome.enchantName.enchant_helmet_fortitude': 'Травление шлема: Стойкость',
+  'hudChrome.enchantName.enchant_neck_spirit': 'Травление ожерелья: Дух',
+  'hudChrome.enchantName.enchant_shoulder_agility': 'Травление наплечников: Ловкость',
+  'hudChrome.enchantName.enchant_chest_stamina': 'Травление нагрудника: Выносливость',
+  'hudChrome.enchantName.enchant_waist_stamina': 'Травление пояса: Выносливость',
+  'hudChrome.enchantName.enchant_legs_stamina': 'Травление поножей: Выносливость',
+  'hudChrome.enchantName.enchant_gloves_agility': 'Травление перчаток: Ловкость',
+  'hudChrome.enchantName.enchant_gloves_intellect': 'Травление перчаток: Сила заклинаний',
+  'hudChrome.enchantName.enchant_feet_agility': 'Травление сапог: Ловкость',
+  'hudChrome.enchantName.enchant_ring_spirit': 'Травление кольца: Дух',
+  'hudChrome.enchantName.enchant_weapon_agility': 'Травление оружия: Ловкость',
+  'hudChrome.enchantName.enchant_helmet_intellect': 'Травление шлема: Интеллект',
+  'hudChrome.enchantName.enchant_helmet_armor': 'Травление шлема: Укрепление',
+  'hudChrome.enchantName.enchant_neck_intellect': 'Травление ожерелья: Интеллект',
+  'hudChrome.enchantName.enchant_neck_agility': 'Травление ожерелья: Ловкость',
+  'hudChrome.enchantName.enchant_shoulder_strength': 'Травление наплечников: Сила',
+  'hudChrome.enchantName.enchant_shoulder_intellect': 'Травление наплечников: Интеллект',
+  'hudChrome.enchantName.enchant_chest_spirit': 'Травление нагрудника: Дух',
+  'hudChrome.enchantName.enchant_chest_armor': 'Травление нагрудника: Укрепление',
+  'hudChrome.enchantName.enchant_waist_strength': 'Травление пояса: Сила',
+  'hudChrome.enchantName.enchant_waist_agility': 'Травление пояса: Ловкость',
+  'hudChrome.enchantName.enchant_legs_intellect': 'Травление поножей: Интеллект',
+  'hudChrome.enchantName.enchant_gloves_strength': 'Травление перчаток: Сила',
+  'hudChrome.enchantName.enchant_feet_strength': 'Травление сапог: Сила',
+  'hudChrome.enchantName.enchant_feet_stamina': 'Травление сапог: Выносливость',
+  'hudChrome.enchantName.enchant_ring_strength': 'Травление кольца: Сила',
+  'hudChrome.enchantName.enchant_ring_agility': 'Травление кольца: Ловкость',
+  'hudChrome.enchantName.enchant_ring_intellect': 'Травление кольца: Интеллект',
+  'hudChrome.enchantName.enchant_weapon_greater_might': 'Травление оружия: Высшая мощь',
   'hudChrome.enchantName.enchant_weapon_greater_spellpower':
-    'Зачарование оружия - Высшая сила заклинаний',
-  'hudChrome.enchantName.enchant_helmet_greater_fortitude': 'Зачарование шлема - Высшая стойкость',
+    'Травление оружия: Высшая сила заклинаний',
+  'hudChrome.enchantName.enchant_helmet_greater_fortitude': 'Травление шлема: Высшая стойкость',
   'hudChrome.enchantName.enchant_chest_greater_stamina':
-    'Зачарование нагрудника - Высшая выносливость',
-  'hudChrome.enchantName.enchant_legs_greater_stamina': 'Зачарование поножей - Высшая выносливость',
-  'hudChrome.enchantName.enchant_gloves_greater_agility': 'Зачарование перчаток - Высшая ловкость',
-  'hudChrome.enchantName.enchant_weapon_runed_edge': 'Зачарование оружия - Рунная кромка',
-  'hudChrome.enchantName.enchant_weapon_runed_focus': 'Зачарование оружия - Рунная печать',
-  'hudChrome.enchantName.enchant_chest_runeweave': 'Зачарование нагрудника - Рунное плетение',
-  'hudChrome.enchantName.enchant_legs_runed_hide': 'Зачарование поножей - Рунная шкура',
-  'hudChrome.enchantName.enchant_helmet_runed_links': 'Зачарование шлема - Рунные звенья',
+    'Травление нагрудника: Высшая выносливость',
+  'hudChrome.enchantName.enchant_legs_greater_stamina': 'Травление поножей: Высшая выносливость',
+  'hudChrome.enchantName.enchant_gloves_greater_agility': 'Травление перчаток: Высшая ловкость',
+  'hudChrome.enchantName.enchant_weapon_runed_edge': 'Травление оружия: Рунная кромка',
+  'hudChrome.enchantName.enchant_weapon_runed_focus': 'Травление оружия: Рунная печать',
+  'hudChrome.enchantName.enchant_chest_runeweave': 'Травление нагрудника: Рунное плетение',
+  'hudChrome.enchantName.enchant_legs_runed_hide': 'Травление поножей: Рунная шкура',
+  'hudChrome.enchantName.enchant_helmet_runed_links': 'Травление шлема: Рунные звенья',
+  'hudChrome.enchantName.enchant_weapon_lucent_might': 'Травление оружия: Светозарная мощь',
+  'hudChrome.enchantName.enchant_weapon_lucent_spellpower':
+    'Травление оружия: Светозарная сила заклинаний',
+  'hudChrome.enchantName.enchant_chest_lucent_stamina':
+    'Травление нагрудника: Светозарная выносливость',
+  'hudChrome.enchantName.enchant_feet_lucent_agility': 'Травление сапог: Светозарная ловкость',
+  'hudChrome.enchantName.enchant_lucent_infusion': 'Светозарное вливание',
   'hudChrome.itemMenu.equip': 'Надеть',
   'hudChrome.itemMenu.use': 'Использовать',
   'hudChrome.itemMenu.disenchant': 'Распылить',
   'hudChrome.itemMenu.salvage': 'Разобрать',
+  'hudChrome.itemMenu.sunder': 'Расколоть',
   'hudChrome.itemMenu.applyEnchant': 'Наложить чары',
   'hudChrome.enchanting.disenchantedLine': 'Вы распыляете {item}.',
   'hudChrome.enchanting.disenchantedYield': 'Вы распыляете {item} в {material}.',
@@ -11942,6 +12291,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Это уничтожит {item} и даст ремесленные материалы. Действие необратимо.',
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     'Это уничтожит особый экземпляр предмета {item} (подписанный, шедевр или зачарованный) и даст ремесленные материалы. Действие необратимо.',
+  'hudChrome.enchanting.sunderConfirmTitle': 'Расколоть {item}?',
+  'hudChrome.enchanting.sunderConfirmBody':
+    'Это уничтожит {item} и даст расколотую эссенцию. Действие необратимо.',
+  'hudChrome.enchanting.sunderConfirmBodySpecial':
+    'Это уничтожит особый экземпляр предмета {item} (подписанный, шедевр или зачарованный) и даст расколотую эссенцию. Действие необратимо.',
   'hudChrome.enchanting.pickerTitle': 'Наложить чары',
   'hudChrome.enchanting.targetTitle': 'Выберите предмет для зачарования',
   'hudChrome.enchanting.noEnchants': 'Нет чар, использующих этот реагент.',
@@ -12008,6 +12362,18 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_workorder_kitchens.completion':
     'Вот теперь кладовая полна. Вот твоя плата. Возвращайся, когда сумки снова потяжелеют.',
   'entities.quests.q_prof_workorder_kitchens.objectives.0.label': 'Мясо дичи доставлено',
+  'entities.quests.q_prof_workorder_kitchens_wheat.title': 'Наряд на работу: кухни, пшеница',
+  'entities.quests.q_prof_workorder_kitchens_wheat.text':
+    'Хлеб сам себя не испечет, {playerName}, а мои лари с мукой скребут по дну. Принеси мне восемь снопов долинной пшеницы, и я честно заплачу за всю партию. Сам вырастил или купил на рынке, мне все равно, лишь бы мололось.',
+  'entities.quests.q_prof_workorder_kitchens_wheat.completion':
+    'Сухое доброе зерно, и вдоволь. Вот твоя плата, отсчитана до монеты. Когда подойдет следующий урожай, ты знаешь, в какую дверь стучать.',
+  'entities.quests.q_prof_workorder_kitchens_wheat.objectives.0.label': 'Долинная пшеница доставлена',
+  'entities.quests.q_prof_workorder_kitchens_rice.title': 'Наряд на работу: кухни, рис',
+  'entities.quests.q_prof_workorder_kitchens_rice.text':
+    'Болотный люд клянется своим рисом, {playerName}, и я намерен выяснить почему. Добудь мне пять мер болотного риса, и здесь тебя будут ждать деньги. И смотри, не намочи его в дороге: мокрый рис это каша, а каши я не заказывал.',
+  'entities.quests.q_prof_workorder_kitchens_rice.completion':
+    'Крупный и сухой, каждое зернышко. Вот твои деньги. Пока болото родит, я плачу.',
+  'entities.quests.q_prof_workorder_kitchens_rice.objectives.0.label': 'Болотный рис доставлен',
   'entities.quests.q_prof_workorder_loom.title': 'Наряд на работу: ткацкий станок',
   'entities.quests.q_prof_workorder_loom.text':
     'Станок стоит без дела, а праздные руки тратят дневной свет впустую, {playerName}. Принеси мне шесть мотков паучьего шёлка, и я заплачу по честной ставке, отсчитанной до последней медной монеты.',
@@ -12143,6 +12509,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.cannotAfford': 'Вам не хватает денег на снятие привязки.',
   'hudChrome.unbind.outOfRange': 'Для снятия привязки нужно стоять у мастерской.',
   'hudChrome.unbind.noSpace': 'В сумках нет места для предмета со снятой привязкой.',
+  'hudChrome.unbind.perfecting':
+    'Предмет на пути совершенствования или уже доведённый до совершенства остаётся привязанным.',
   // Commission order board (issue #1298, M16 non-Latin fills added with the keys).
   'hudChrome.commissionBoard.title': 'Доска заказов',
   'hudChrome.commissionBoard.close': 'Закрыть доску заказов',
@@ -12167,6 +12535,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.commissionBoard.rowFor': '{item} для {requester}',
   'hudChrome.commissionBoard.rowTargeted': '{item} для {requester} (мастеру {crafter})',
   'hudChrome.commissionBoard.acceptedBy': 'Принял: {name}',
+  'hudChrome.commissionBoard.crafterRecordLabel': 'Послужной список мастера:',
+  'hudChrome.plurals.commissionMasterworks.one': '{count} шедевр',
+  'hudChrome.plurals.commissionMasterworks.few': '{count} шедевра',
+  'hudChrome.plurals.commissionMasterworks.many': '{count} шедевров',
+  'hudChrome.plurals.commissionMasterworks.other': '{count} шедевра',
+  'hudChrome.plurals.commissionLegendaries.one': '{count} легендарный предмет',
+  'hudChrome.plurals.commissionLegendaries.few': '{count} легендарных предмета',
+  'hudChrome.plurals.commissionLegendaries.many': '{count} легендарных предметов',
+  'hudChrome.plurals.commissionLegendaries.other': '{count} легендарных предмета',
   'hudChrome.commissionBoard.statusOpen': 'Открыт',
   'hudChrome.commissionBoard.statusAccepted': 'Принят',
   'hudChrome.commissionBoard.statusDelivered': 'Доставлен',
@@ -12199,27 +12576,25 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   // /wiki/professions detail pages (M16 non-Latin fills, added with the keys).
   'guide.professions.ringHeading': 'Кольцо ремесел',
   'guide.professions.ringBody':
-    'Десять ремесел расположены на одном кольце, и каждое ведет свой навык отдельно; откройте карточку, чтобы увидеть полные таблицы рецептов и точные числа.',
+    'Каждое ремесло на кольце упирается в предел 125 навыка: оружейное дело, бронное дело, ювелирное дело, начертание, портняжное дело, кожевничество, кулинария, алхимия, инженерное дело и наложение чар. На пределе ремесло продолжает работать: сборы все так же приносят, изделия все так же выходят, и шедевры все еще случаются; расти перестает только число. Откройте карточку ниже ради полных таблиц рецептов и точных чисел ремесла.',
   'guide.professions.ringWaveNote':
-    'Ювелирное дело и начертание уже стоят на кольце, но пока не имеют рецептов; их наполнение придет вместе с расширением новых зон.',
+    'С тех пор как начертание взялось за перья, каждое место на колесе несет настоящие рецепты. Кольцо теперь укомплектовано, но не закончено: пределы поднимутся вместе с будущими зонами, так что ремесло на пределе сегодня, это фора перед тем расширением, а не финишная черта.',
   'guide.professions.capFmt': 'Предел {cap}',
   'guide.professions.comingSoon': 'Рецептов пока нет',
   'guide.professions.gatherHubHeading': 'Сбор',
   'guide.professions.gatherHubBody':
-    'Четыре ремесла сбора кормят производство: горное дело, лесозаготовка и травничество ограничены 100, рыбная ловля 200.',
+    'Ремесла сбора кормят производство: горное дело, лесозаготовка и травничество ограничены 100, земледелие растит урожай из семян на ухоженных грядках и тоже ограничено 100, рыбная ловля 200.',
   'guide.professions.archetypesHeading': 'Десять призваний',
   'guide.professions.archetypesBody':
     'Настройка на два соседних ремесла дарует парный титул: две основные специальности растут до полного предела, одно противоположное ремесло остается хобби с пределом на редком уровне, а прочие отдыхают на обычном.',
   'guide.professions.pairFmt': '{a} и {b}',
   'guide.professions.curveHeading': 'Кривая мастерства',
-  'guide.professions.curveBody':
-    'Каждые {step} очков навыка дают одну ступень: рецепт на вашей ступени или выше дает полный рост, а по мере того как рецепт опускается ниже вас, рост падает вдвое, вчетверо и затем прекращается.',
   'guide.professions.provenanceHeading': 'Происхождение',
   'guide.professions.provenanceBody':
     'Работа редкого качества и выше несет имя мастера, шедевр поднимает качество на ступень, а изделие на заказ привязывается к получателю (Узы мастера).',
   'guide.professions.stationsHeading': 'Станки и мастера',
   'guide.professions.stationsBody':
-    'Шесть типовых станков в трех городах; при них живут мастера, которые учат рецептам и выдают рабочие заказы.',
+    'Шесть типовых станков служат девяти привязанным к станку ремеслам и разбросаны по трем узловым городам. Eastbrook держит кузницу (ее делят оружейное дело, бронное дело и ювелирное дело), кухни, ткацкий стан и мастерскую; Fenbridge держит дубильню, а Highwatch, аптекарскую (ту скамью делят алхимия и начертание). При каждом станке живет мастер, что учит рецептам, вывешивает рабочие заказы и предлагает услугу снятия привязки.\n\nРабочий радиус, это 20 ярдов, примерно собственный двор станка, так что вы работаете, стоя у наковальни, а не через полгорода. Одно лишь наложение чар станка не имеет: оно по замыслу работает где угодно.',
   'guide.professions.colStation': 'Станок',
   'guide.professions.colHub': 'Город',
   'guide.professions.colMaster': 'Мастер',
@@ -12236,9 +12611,18 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.matFmt': '{name} x{count}',
   'guide.profPages.outputFmt': '{name} x{count}',
   'guide.profPages.comboReq': 'Нужны {a} и {b}',
+  'guide.profPages.effectFood': 'Восстанавливает {amount} здоровья за {seconds} сек. при еде.',
+  'guide.profPages.effectWellFed': 'Сытость после еды: +{value} к характеристике {stat} на {minutes} мин.',
+  'guide.profPages.effectWellFedAura': 'Дает {aura} на {minutes} мин., когда вы доедаете.',
+  'guide.profPages.effectFeast': 'Накрывает пир, из которого едят другие, по одной порции каждому: {servings} порций на {minutes} мин.',
+  'guide.profPages.effectFeastServing': 'Каждая порция восстанавливает {amount} здоровья за {seconds} сек.',
+  'guide.profPages.effectFeastWellFed': 'Сытость после порции: +{value} к характеристике {stat} на {minutes} мин.',
   'guide.profPages.sourceTrainerFee': 'Учитель, {fee}',
   'guide.profPages.sourceTrainerFree': 'Учитель, бесплатно',
   'guide.profPages.sourceKnown': 'Известен с самого начала',
+  'guide.profPages.sourceDrop': 'Из найденной схемы',
+  'guide.profPages.sourceVendor': 'Продаётся у героического интенданта',
+  'guide.profPages.sourceDropAndVendor': 'Из найденной схемы или у героического интенданта',
   'guide.profPages.colRecipe': 'Рецепт',
   'guide.profPages.colSkill': 'Навык',
   'guide.profPages.colSource': 'Источник',
@@ -12263,11 +12647,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftIntro.leatherworking':
     'Кожевничество выделывает ловкие кожаные доспехи в дубильне Фенбриджа: от простых шкур до редких изделий стража топей.',
   'guide.profPages.craftIntro.cooking':
-    'Кулинария превращает рыбу, дичь и травы в сытные блюда на кухнях Иствердья, вплоть до редких пиршественных яств.',
+    'Кулинария превращает рыбу, дичь и травы в сытные блюда на кухнях Иствердья, вплоть до трех вершинных блюд по ролям, которые лечат сильнее любой другой еды и оставляют эффект сытости тому, кто доел тарелку.',
   'guide.profPages.craftIntro.alchemy':
-    'Алхимия варит зелья лечения и маны, а также эликсиры выносливости в аптекарской Хайвотча.',
-  'guide.profPages.craftIntro.engineering':
-    'Инженерное дело собирает инструменты сбора 4 и 5 уровня в мастерской Иствердья, и каждый поглощает инструмент ступенью ниже.',
+    'Алхимия варит зелья лечения и маны, эликсиры выносливости, а на вершине, фляги, по одной на роль, в аптекарской Хайвотча. Фляга остается с вами даже после вашей смерти.',
   'guide.profPages.craftIntro.enchanting':
     'Наложение чар распыляет ненужное снаряжение в чародейные материалы и вкладывает их в постоянные чары на снаряжение; станок не нужен.',
   'guide.profPages.howHeading': 'Как устроено ремесло',
@@ -12284,7 +12666,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Каждое удачное изделие имеет {base}% шанса стать шедевром, плюс {perTier}% за каждую ступень выше рецепта, {signed}% за любой подписанный реагент и {spec}% при специализации, но не выше {cap}%.',
   'guide.profPages.trainingHeading': 'Обучение',
   'guide.profPages.trainingBody':
-    'Мастер учит рецепту, когда ваша ступень в этом ремесле достигает ступени самого рецепта: рецепты ступени 0 бесплатны, ступень 1 стоит {tier1}, ступень 2 стоит {tier2}.',
+    'Рецепты наставников приходят от местных мастеров, и учат им у их станков. Правило укладывается в одну строку: мастер учит рецепту, как только ваш разряд в этом ремесле достигает разряда самого рецепта, и больше ничто его не держит, ни ваш уровень, ни ваш архетип. Лестницы снаряжения и расходников ведут свои ступени на 0, 25 и 50 навыка, и каждое ремесло добавляет над ними одну промежуточную ступень на 75, которой учат у его станка (у Enchanting это «Светозарный реагент», рядом с двумя рецептами оберегов на ступени 25); два урока удочек у Engineering продолжают его лестницу на 75 и 125, так что новая ступень открывается по мере роста ваших разрядов.\n\nПлата разовая и одинаковая внутри ступени: начальная ступень бесплатна, ступень 25 навыка стоит {tier1} за рецепт, ступень 50 навыка, {tier2}, а ступени 75 и 125 над ними несут собственную плату, указанную рядом с каждым рецептом в таблице. Учиться нужно стоя у настоящего станка мастера, и передвижная станция не считается никогда. Общие полевые рецепты и шесть рецептов изготавливаемых наземных инструментов не требуют обучения вовсе; их знает каждый персонаж с самого начала.',
   'guide.profPages.specializationHeading': 'Специализация',
   'guide.profPages.specializationBody':
     'Достигнув навыка {at}, вы специализируетесь в этом ремесле, и материалы рецептов дешевеют на {pct}%.',
@@ -12307,6 +12689,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.ench.tier.base': 'Базовые',
   'guide.profPages.ench.tier.runed': 'Рунные',
   'guide.profPages.ench.tier.greater': 'Великие',
+  'guide.profPages.ench.tier.lucent': 'Светозарные',
   'guide.profPages.ench.salvageHeading': 'Утилизация',
   'guide.profPages.ench.salvageNote':
     'Любой может разобрать оружие или доспех на обычные материалы согласно качеству; навык наложения чар не нужен.',
@@ -12319,6 +12702,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Травничество собирает дикорастущее: глянцелист в Истврукской долине, золотолист в Мирефенской топи и солнцелепест на Терновых высотах, лист и стебель, на которых держатся аптечные ремёсла. Открыто для всех с 1 уровня, нужен лишь серп травника в сумках (20 меди в любом узловом городе), ведётся на собственном счётчике до предела в 100.',
   'guide.profPages.gatherIntro.fishing':
     'Рыбная ловля тянет улов из открытой воды каждой зоны в ритме поклевки и подсечки и ограничена 200.',
+  'guide.profPages.gatherIntro.farming':
+    'Земледелие: единственное собирательское ремесло, где урожай растят, а не добывают. Посейте семена на возделанных грядках: растения растут по своим часам, с вами или без вас, а вернувшись когда угодно, вы соберете созревший урожай, потому что на грядке ничто не портится. У каждого участка стоит земледелец, от наделов Eastbrook через Fenbridge и Highwatch до партера Evergarden, а начинается ремесло с Farmer Jessica в Eastbrook: она продает Garden Hoe и первые семена, а ее поручение проводит новичка через первый урожай. На каждой ступени лестницы растут свои культуры, по две на нижних ступенях и по четыре на верхних, умелые руки снимают и отборный сорт, а мотыги для более трудной земли выше первых грядок куют инженеры. Навык растет на собственном счетчике до предела 100.',
   'guide.profPages.rhythmHeading': 'Ритм сбора',
   'guide.profPages.rhythmBody':
     'Сбор идет как видимое действие: базовые {base} секунды, не короче {floor}; каждая ступень инструмента выше залежи срезает {tool} секунды, а каждый разряд мастерства еще {band}.',
@@ -12336,12 +12721,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.priceNone': 'Не продается',
   'guide.profPages.toolTierReq': 'Инструмент {tier} уровня',
   'guide.profPages.bandsHeading': 'Разряды мастерства',
-  'guide.profPages.bandsBody':
-    'Разряды мастерства ускоряют сбор, а в рыбной ловле еще и открывают таблицы улова.',
   'guide.profPages.bandFmt': 'Разряд {band}: с {at} мастерства',
   'guide.profPages.rareHeading': 'Редкие находки',
   'guide.profPages.rareBody':
     'Каждый сбор с шансом 1 к {oneIn} оборачивается редкой находкой: добыча умножается на {mult}, всегда подписана, и о ней узнает вся зона.',
+  'guide.profPages.rareBodyFourFlavors':
+    'Каждый сбор, каков бы ни был ваш навык, несет шанс 1 к {oneIn} на редкую находку: нетронутая жила в руде, древняя сердцевина в древесине, лунный цветок среди трав, золотой урожай с грядки. Находка умножает добычу этого сбора в {mult} раз, каждая единица приходит с вашей подписью независимо от выпавшего качества, и вся зона слышит о находке, объявленной с вашим именем. Каждая из четырех разновидностей к тому же вписывает собственное деяние с нулевой Известностью в вашу Книгу деяний: коллекционную отметку, что существует лишь ради доказательства, что это случилось именно с вами.',
   'guide.profPages.specimenBody':
     'Разделка туш может принести подписанный безупречный образец: примерно {pct}% разделок выпадают редкими или выше.',
   'guide.profPages.fish.biteHeading': 'Поклевка и подсечка',
@@ -12349,14 +12734,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Поклевка приходит через {min}-{max} секунд после заброса (хорошее удилище срезает до {rod} секунд ожидания), окно подсечки длится {reel} секунды плюс {reelRod} за каждую ступень удилища выше первой, а сессия не дольше {cap} секунд.',
   'guide.profPages.fish.earlyReelNote': 'Одно предостережение нетерпеливым пальцам: нажмёте удочку снова прежде, чем что-то клюнет, и вытянете пустую леску, завершив заброс. Первая секунда после того, как леска легла, прощается, поэтому случайное двойное нажатие не стоит вам ничего; дальше этого раннее нажатие — потраченный впустую заброс. Терпение и есть вся игра: дождитесь поклёвки, а затем подсекайте.',
   'guide.profPages.fish.scheduleHeading': 'Рост мастерства',
-  'guide.profPages.fish.scheduleNote':
-    'Рост в рыбной ловле идет по жесткой шкале мастерства, а хлам с {cutoff} и дальше не учит ничему.',
   'guide.profPages.fish.colProficiency': 'Мастерство',
   'guide.profPages.fish.colGain': 'Рост за улов',
   'guide.profPages.fish.belowFmt': 'Ниже {below}',
   'guide.profPages.fish.tablesHeading': 'Таблицы улова',
-  'guide.profPages.fish.tablesNote':
-    'Точные шансы улова по зонам для каждого разряда; в каждой строке редким уловом остается {rare}.',
   'guide.profPages.fish.bandHeading': 'Разряд {band}: мастерство от {at}, удилище {rod} уровня',
   'guide.profPages.fish.colCatch': 'Улов',
   'guide.profPages.fish.colOdds': 'Шанс',
@@ -12383,7 +12764,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.free': 'Бесплатно',
   'guide.profPages.econ.workOrdersHeading': 'Рабочие заказы',
   'guide.profPages.econ.workOrdersNote':
-    'Каждый мастер платит {pct}% от торговой цены за связку своего ходового материала, и заказ повторяется каждые {minutes} минут.',
+    'Каждый мастер вывешивает наряды, по одному на ходовой материал, и платит {pct}% от торговой цены за затребованную связку. У каждого наряда свои часы на {minutes} минут: сданный наряд закрывается до конца отсчета, а остальные наряды того же мастера остаются открытыми.',
   'guide.profPages.econ.colOrder': 'Заказ',
   'guide.profPages.econ.colMaster': 'Мастер',
   'guide.profPages.econ.colAsks': 'Просит',
@@ -12398,44 +12779,57 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.doctrineBody':
     'Сила созданных вещей всегда ниже рейдового порога, а перечисленные пошлины гонят товары в обмен между игроками, а не по кругу торговцев.',
   'guide.profPages.faq.title': 'Ремесла: вопросы и ответы',
+  'guide.profPages.prov.title':
+    'Снабжение: от поля до рейда',
+  'guide.profPages.prov.intro':
+    'Все линии добычи сходятся на одной кухне, а лестница над ней приводит к столу, за которым ест целый рейд.',
+  'guide.profPages.prov.suppliersHeading':
+    'Кто кормит кухню',
+  'guide.profPages.prov.suppliersBody':
+    'Кулинария берет материалы почти у всех линий добычи, и это сделано намеренно: повару, который вдобавок рыбачит, возделывает грядки или снимает шкуры, всегда есть из чего выбирать, а повар, не занятый ничем из этого, купит все на рынке.\n\nЧто приносит каждая линия, перечислено ниже. Этот список не переписан сюда вручную, а читается прямо из действующей таблицы рецептов, поэтому он всегда показывает то, что кухня просит сегодня.',
+  'guide.profPages.prov.lineCountFmt':
+    '{count} в кулинарных рецептах',
+  'guide.profPages.prov.lineCorpse':
+    'Разделка туш',
+  'guide.profPages.prov.ladderHeading':
+    'Лестница, ступень за ступенью',
+  'guide.profPages.prov.ladderBody':
+    'Кулинария поднимается привычными отрезками, и на каждой ступени перечислено то, чему она учит. Первые ступени дают блюда на одного, которые едят прямо из сумки. Выше кухня начинает готовить для других: тарелки со стойким усилением, а над ними пиры, которые не едят сами, а выставляют на землю, и берет каждый, кто стоит рядом.',
+  'guide.profPages.prov.rungFmt':
+    'Кулинария {skill}',
+  'guide.profPages.prov.placeableTag':
+    '(выставляют, а не едят)',
+  'guide.profPages.prov.stationTag': '(походная станция)',
+  'guide.profPages.prov.tableHeading':
+    'Стол на вершине',
+  'guide.profPages.prov.tableBody':
+    'Пир выставляют там, где вы стоите, и каждый, кто рядом, берет одну порцию. Порция дает ровно то блюдо, вокруг которого пир построен, поэтому собственной силы у пира нет и учить ее отдельно не нужно: это лишь способ раздать целой группе то, что вы и так умеете готовить.\n\nНа вершине лестницы стоят три пира, а не один, и выбор между ними, единственный, который здесь есть. Они стоят одинаково, просят одни и те же материалы и требуют одного и того же умения; каждый лишь подает свое из трех больших блюд, так что группа берет тот, что подходит к делу. С какой бы ступени пир ни был, одновременно у вас может стоять только один, и он держится несколько минут, прежде чем его уберут.',
+  'guide.profPages.prov.marketHeading':
+    'Если вы не готовите ничего из этого',
+  'guide.profPages.prov.marketBody':
+    'Ничто из перечисленного не становится преградой для того, кто не готовит. Каждый материал на этой странице, обычный товар, свободно продаваемый: рыбак продает улов, земледелец, урожай, а рейдер, не занятый ни тем ни другим, просто покупает готовый пир у повара, сделавшего лишний. Кухня, место встречи ремесел, а не пошлина для тех, кто прошел мимо.',
+  'guide.profPages.prov.cookingLink':
+    'Кулинария',
   'guide.profPages.faq.intro': 'Короткие ответы на вопросы, которые мастера задают чаще всего.',
-  'guide.profPages.faq.q1': 'Сколько ремесел можно выучить?',
+  'guide.profPages.faq.q1': 'Почему мои подписанные вещи не складываются в стопки?',
   'guide.profPages.faq.a1':
-    'Каждый персонаж может поднять все восемь прокачиваемых ремесел и все четыре ремесла сбора; единственным выбором остается призвание.',
-  'guide.profPages.faq.q2': 'Где учат рецептам?',
+    'Подписанная вещь, это отдельный экземпляр: она несет собственную небольшую запись (кто ее подписал, выпавшее качество, характеристики шедевра, чары, привязку) вместо того, чтобы быть безликой копией. Две копии сливаются в одну стопку лишь тогда, когда эти записи совпадают в точности.\n\nНа деле это значит: редкая руда, собранная вами, складывается с другой редкой рудой, собранной вами, ведь обе помечены «Сборщик: вы» и больше ничто не различается. Тот же материал с подписью друга занимает собственную ячейку, а простая неподписанная копия никогда не сливается с подписанной стопкой. Сумки, банк, обмен, почта и Мировой рынок, все подчиняются одному этому правилу.',
+  'guide.profPages.faq.q2': 'Поднимают ли обычные рецепты навык вечно?',
   'guide.profPages.faq.a2':
-    'Рецепты учительской лестницы дают мастера у своих станков, а девять общих полевых рецептов и рецепты инструментов известны всем с самого начала.',
-  'guide.profPages.faq.q3': 'Нужен ли инструмент для сбора?',
-  'guide.profPages.faq.a3':
-    'Залежи 1 уровня берутся голыми руками; залежи 2 и 3 уровня требуют подходящий инструмент не ниже их уровня.',
-  'guide.profPages.faq.q4': 'Почему навык перестал расти?',
-  'guide.profPages.faq.a4':
-    'Кривая мастерства гасит рост до половины, четверти и нуля по мере того, как рецепт опускается ниже вас, и каждое ремесло останавливается на своем пределе.',
-  'guide.profPages.faq.q5': 'Что такое шедевр?',
-  'guide.profPages.faq.a5':
-    'У каждого изделия есть небольшой шанс (от 3% до предела 15%) выйти на ступень качества выше, но никогда выше рейдового порога.',
-  'guide.profPages.faq.q6': 'Что значит подпись мастера на вещи?',
-  'guide.profPages.faq.a6':
-    'Девять общих полевых рецептов и шесть рецептов ремесленных инструментов сбора известны каждому с самого начала, как и три привязанных к станции рецепта (Мантия печной чешуи, Капюшон Стражеткани и Обмотки Сумеречной шкуры): им не нужен наставник, нужна только их станция. Всему остальному учат местные мастера при своих станциях в трёх узловых городах: большинство находится в Иствруке, кожевник держит дубильню в Фенбридже, а алхимик держит аптеку в Хайвотче.\n\nРецепты наставников идут ступенями: 0, 25 и 50 навыка для снаряжения и расходуемых ремёсел, единовременная плата бесплатно, 25 серебра и 1 золото; два рецепта талисманов Наложения чар стоят на ступени 25 навыка, а Механик Гиззел учит двум скрафченным удочкам на 75 и 125 навыке за 4 и 16 золота. Мастер обучает рецепту, как только ваш разряд в этом ремесле достигает разряда самого рецепта, и учиться нужно, стоя у его станции: передвижная станция не считается.',
-  'guide.profPages.faq.q7': 'Что такое Узы мастера?',
-  'guide.profPages.faq.a7':
-    'Изделие на заказ привязывается к тому, кто получит его в обмене, и любой мастер у станка снимет привязку за ступенчатую плату.',
-  'guide.profPages.faq.q8': 'Можно ли сменить призвание?',
-  'guide.profPages.faq.a8':
-    'Пара, которой вы никогда не держали, берется одним новым заданием настройки, а возврат к прежней паре требует искупительного поручения, дорожающего с каждой сменой.',
+    'Нет. Каждый рецепт оценивается по тому, насколько он опустился ниже вашего текущего разряда в этом ремесле, классическое чтение оранжевого, желтого, зеленого и серого: полный рост на вашем разряде и выше, половина на ступень ниже, четверть на две ступени ниже и ничего на три и более. Разряды идут каждые 25 навыка, так что бесплатные рецепты 0 навыка перестают учить вас чему-либо на 75 навыке.\n\nПределы тоже ниже классических 300, которых можно было ждать: каждое из десяти зарабатываемых ремесел упирается в 125, горное дело, лесозаготовка и травничество останавливаются на 100, а рыбная ловля тянется до 200. Подъем, это переход к рецептам своего собственного разряда, а не бесконечное повторение самого дешевого.',
   'guide.professions.whatHeading': 'Ремесло рядом с мечом',
   'guide.professions.whatBody':
-    'Профессии составляют трудовую жизнь мира: четыре собирательских ремесла, что добывают сырье прямо из земли, и кольцо из десяти ремесел, которые превращают его в снаряжение, еду, зелья и инструменты. Здесь все питает что-то другое. Добытая руда становится клинком, клинок принимает чары, а для чар нужна пыль, разобранная из старого снаряжения, так что собиратель, ремесленник и мастеровой оказываются звеньями одной цепи.\n\nНад числом профессий мучиться не нужно. Любой персонаж может поднимать все восемь ремесел, у которых сегодня есть содержание, и все четыре собирательских профессии разом; единственный исключающий выбор, это ваш архетип, призвание, которому вы в итоге присягнете, хотя после настройки ремесла, ушедшие в спячку, перестают расти. Навык никогда не падает, и ничто из выученного у вас не отнимается.',
+    'Профессии составляют трудовую жизнь мира: собирательские ремесла, что добывают сырье прямо из земли, и кольцо из десяти ремесел, которые превращают его в снаряжение, еду, зелья и инструменты. Здесь все питает что-то другое. Добытая руда становится клинком, клинок принимает чары, а для чар нужна пыль, разобранная из старого снаряжения, так что собиратель, ремесленник и мастеровой оказываются звеньями одной цепи.\n\nНад числом профессий мучиться не нужно. Любой персонаж может поднимать девять из десяти ремесел и все собирательские профессии разом (Engineering, единственный особый случай: все его рецепты начинаются выше свободного потолка, так что его лестница ждет клятвы Бомбардира); единственный исключающий выбор, это ваш архетип, призвание, которому вы в итоге присягнете, хотя после настройки ремесла, ушедшие в спячку за ним, растут только на своих обычных рецептах, а после 75 навыка не растут вовсе. Навык никогда не падает, и ничто из выученного у вас не отнимается.',
   'guide.professions.deedsHeading': 'Деяния, что хранят память о пути',
   'guide.professions.deedsBody':
-    'Книга деяний идет рядом с каждым шагом. Первая настройка приносит титул Присягнувшего ремеслу, а первый шедевр, Мастера-шедевральника, и оба носятся как титулы. Каждое из восьми зарабатываемых ремесел отмечает рубежное деяние на 50 навыке и венчает свой предел титулом Grandmaster, а Fishing дает Old Salt на 100 мастерства и титул Master Angler на 200.\n\nЕсть и более тихие страницы: деяния за первый сбор и первое изделие, за редкие находки, что удача подбрасывает в поле, и за то, что вы взялись за утилизацию. Все это чисто косметическое, только титулы и Известность. Деяние никогда не дает силы; оно лишь свидетельствует, что вы там были.',
+    'Книга деяний идет рядом с каждым шагом. Первая настройка приносит титул Присягнувшего ремеслу, а первый шедевр, Мастера-шедевральника, и оба носятся как титулы. Все десять зарабатываемых ремесел отмечают рубежное деяние на 50 навыке и венчают свой предел титулом Гранд-мастера, а рыбная ловля дает Морского волка на 100 мастерства и титул Мастера удочки на 200.\n\nЕсть и более тихие страницы: деяния за первый сбор и первое изделие, за редкие находки, что удача подбрасывает в поле, и за то, что вы взялись за утилизацию. Все это чисто косметическое, только титулы и Известность. Деяние никогда не дает силы; оно лишь свидетельствует, что вы там были.',
   'guide.professions.startHeading': 'С чего начать',
   'guide.professions.startBody':
     'Только с дороги в Иствруке? Найдите Прораба Оделла и возьмите задание «Ремесло для каждой руки»: он укажет вам на рудные жилы вокруг Медного прииска к северо-востоку от города и набьёт вам первые мозоли. Берегитесь самого прииска: Глубокоскальные туннельщики, что лагерем стоят на нём, на несколько уровней превосходят свежего новичка, так что сперва разрабатывайте окраинные жилы и оставьте сердце лагеря на потом, когда немного прокачаетесь. С этого момента собирайте каждую жилу, лесопосадку и грядку трав, что встречаете в странствиях; мастерство приходит к путешественникам само собой.\n\nВ городе нажмите T, чтобы открыть окно ремесла, и осваивайте общие рецепты, которые каждый персонаж знает с самого начала. Загляните к мастерам в кузницу, на кухни, к ткацкому станку и в мастерскую, чтобы увидеть, чему они учат, и берите их рабочие заказы ради стабильного дохода. К тому времени, как вас найдёт письмо Гильдии, вы уже будете знать, какая пара ощущается родной.',
   'guide.profPages.craftProse.weaponcrafting.identityHeading':
     'Клинок, за которым идет каждый боец',
   'guide.profPages.craftProse.weaponcrafting.identityBody':
-    'Работа этого ремесла нужна кому-нибудь в любой группе, ведь одна лишь редкая ступень покрывает все три аппетита: Osmium Warblade для силового ближнего боя, Glyphsteel War Axe для ловких бойцов и Highpine Battle Staff, посох на Интеллект и Дух для носителей мантий.\n\nНа кольце ремесел оно стоит между Armorcrafting и Jewelcrafting. Его живое лицо, это Smith, пара Weaponcrafting и Armorcrafting, присягаемая перед Forgemistress Darva у горна работой над тремя рудными жилами собственными руками; пара Bladewright с Jewelcrafting тоже названа на кольце, но присягнуть ей пока нельзя, ведь Jewelcrafting не даст рецептов до расширения зон в будущем.',
+    'Работа этого ремесла нужна кому-нибудь в любой группе, ведь одна лишь редкая ступень покрывает все три аппетита: Osmium Warblade для силового ближнего боя, Glyphsteel War Axe для ловких бойцов и Highpine Battle Staff, посох на Интеллект и Дух для носителей мантий.\n\nНа кольце ремесел оно стоит между Armorcrafting и Jewelcrafting. Его живое лицо, это Smith, пара Weaponcrafting и Armorcrafting, присягаемая перед Forgemistress Darva у горна работой над тремя рудными жилами собственными руками; пара Bladewright с Jewelcrafting тоже названа на кольце, и хотя Jewelcrafting теперь кует собственную лестницу украшений от 0 до 50 у этого же горна, пара все еще ждет своего клятвенного квеста, прежде чем ей можно будет присягнуть.',
   'guide.profPages.craftProse.weaponcrafting.materialsHeading': 'Чем поят горн',
   'guide.profPages.craftProse.weaponcrafting.materialsBody':
     'Mining, это костяк. Copper ore добывается с жил 1-го уровня Eastbrook Vale, iron ore в Mirefen Marsh, а osmium ore в Thornpeak Heights, и каждая ступень лестницы шагает так же. Logging важнее, чем можно подумать: ironbark идет на древко boar spear, ashwood держит maul, а одно бревно горной сосны образует battle staff.\n\nОстальное приходит с охоты и из-за прилавка. Rough hide для рукоятей снимается прямо с туш волков и вепрей, bone fragments падают с обычных убийств, а лестница горна жжет Smithing Flux, 20 меди за банку у самой Darva. Если ваша добыча отстает, Darva продает osmium ore у горна, а Tinker Gizzel держит слитки глифостали в toolworks по цене, на фоне которой друзья-собиратели кажутся дешевыми.',
@@ -12444,7 +12838,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Один полевой рецепт, Eastbrook Arming Sword, известен всем с самого начала и куется где угодно из охотничьих трофеев (пара wolf fangs и bone fragments) плюс шесть Smithing Flux с прилавка forge. Настоящая лестница, это девять рецептов у тренера в трех ступенях, все привязаны к forge: медная ступень (bearded axe, flanged mace, boar spear) учится бесплатно на 0 навыке, железная ступень (longsword, maul, dirk) открывается на 25 навыке по 25 серебра за рецепт, а осмиевая ступень (warblade, war axe, battle staff) открывается на 50 навыке по 1 золоту каждый. Darva учит рецепту, как только ваш разряд в ремесле достигает его собственного, так что каждая ступень открывается ровно с началом своей полосы навыка.\n\nЕще один рецепт едет с парой: Gravewyrm Gauntlets, комбинированная вещь от тренера, над которой может работать только настроенный Smith с Weaponcrafting и Armorcrafting на 25 навыке, и станок ей вовсе не нужен.',
   'guide.profPages.craftProse.weaponcrafting.routeHeading': 'Шедевры и рабочий путь к 125',
   'guide.profPages.craftProse.weaponcrafting.routeBody':
-    'Любая вещь с настоящей строкой характеристик, а на этой лестнице это железная ступень и выше, может сойти с наковальни шедевром; безхарактерные медные обычки не срабатывают никогда, ведь улучшать в них нечего. Iron считается материалом 1-го уровня для бонуса шедевра, горная сосна и глифосталь, 2-го, так что верхняя ступень срабатывает чуть чаще.\n\nПрокатитесь на медной ступени до 25, обучите железную в день ее открытия и катитесь до 50, затем осмиевую до 75. За 75 пока нет ничего выше, так что осмиевые рецепты гаснут до половины, а потом до четверти отдачи: заложите около 150 изделий до предела в 125 и помните об общем пределе в десять действий ремесла в минуту, когда садитесь за партию.\n\nФинансируйте подъем по ходу: рабочий заказ горна Darva забирает у вас восемь copper ore каждые 30 минут за немного монет и опыта, а железная и осмиевая ступени честно продаются растущим воинам ближнего боя. Книга деяний отмечает Edge and Temper на 50 навыке и венчает Grandmaster Weaponcrafting на 125.',
+    'Любая вещь с настоящей строкой характеристик, а на этой лестнице это железная ступень и выше, может сойти с наковальни шедевром, пока более тонкое качество умещается под потолком вашего разряда; медные обычки без характеристик не срабатывают никогда, ведь улучшать в них нечего. Железо и осмий считаются материалами 1-го уровня для бонуса шедевра, горная сосна и глифосталь, 2-го, а навык, стоящий выше собственного уровня рецепта, добавляет свое очко за каждый уровень, так что среди осмиевой тройки материальное преимущество несут боевой топор и боевой посох, а ступень срабатывает все лучше и после того, как вы ее переросли.\n\nПрокатитесь на медной ступени до 25, обучите железную в день ее открытия и катитесь до 50, затем осмиевую до 75. Выше осмиевой тройки стоит вершинная ступень, которой Darva не учит: ее рецепты находят, а не покупают. Оружейнику, у которого Weaponcrafting среди основных ремесел, а сегодня это значит присягнувший Кузнец, вершинное изделие платит полную отдачу до самого предела в 125; ниже потолка основного ремесла оно не учит вовсе ничему, так что неприсягнувший кузнец или кузнец-любитель кует его ради оружия, а не ради очков. Так или иначе подъем несут осмиевые рецепты, гаснущие до половины, а потом до четверти отдачи: заложите около 150 изделий до предела в 125, и помните, что каждое изделие занимает реальное время применения, так что длинную партию задает ее длительность, а не норма.\n\nФинансируйте подъем по ходу: рабочий заказ горна Darva забирает у вас восемь кусков медной руды каждые 30 минут за немного монет и опыта, а железная и осмиевая ступени честно продаются растущим воинам ближнего боя. Книга деяний отмечает Edge and Temper на 50 навыке и венчает Grandmaster Weaponcrafting на 125.',
   'guide.profPages.craftProse.armorcrafting.identityHeading': 'Кольчуга для передовой',
   'guide.profPages.craftProse.armorcrafting.identityBody':
     'Лестница Armorcrafting читается как карьера солдата: простой клепаный медный girdle, sabatons и gauntlets для начала, ironlink hauberk, legguards и spaulders с первыми настоящими характеристиками, и редкие osmiumscale greathelm, cuirass и leggings, вещи на Силу и Стойкость с самыми большими показателями брони, что может сделать ремесленник.\n\nЕсть у него и более тихая сторона: Eastbrook Warded Leggings, полевой обычок с характеристиками заклинателя, и Мантия печной чешуи, редкое наплечье кольчуги на Интеллект и Дух на 75 навыке, держат в списке клиентов и носителей кольчуги, склонных к магии. На кольце оно стоит между Weaponcrafting и Engineering; пара Smith с Weaponcrafting присягается перед Forgemistress Darva, а пара Шестерёнщика с Engineering названа, но пока не имеет задания клятвы.',
@@ -12459,7 +12853,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'От ступени ironlink и выше каждое изделие катит шанс шедевра; медные обычки, что только для брони, сработать не могут, ведь шедевр улучшает характеристики, а их у них нет. Iron считается материалом 1-го уровня для срабатывания, а глифосталь, 2-го.\n\nПодъем, это стандартная трехступенчатая поездка: copper до 25, ironlink до 50, osmiumscale до 75, обучая каждую ступень в день ее открытия. Где Armorcrafting везет, так это на отрезке после 75: Мантия печной чешуи, это рецепт 3-го уровня, так что он платит полную отдачу до 99 и половину после, а значит последние пятьдесят очков берут около 75 изделий вместо 150, что нужны ремеслу без венца. Каждая мантия стоит семь osmium ore и пять Smithing Flux, так что запаситесь в Thornpeak и у прилавка forge перед забегом.\n\nРабочий заказ Darva покупает восемь copper ore каждые 30 минут за монеты и опыт, приятный сток для низкой руды, из которой вы вырастаете. Книга деяний отмечает Hammer and Plate на 50 навыке, а Grandmaster Armorcrafting ждет на пределе в 125.',
   'guide.profPages.craftProse.tailoring.identityHeading': 'Ткань для заклинателей, сумки для всех',
   'guide.profPages.craftProse.tailoring.identityBody':
-    "Лестница поднимается от домотканых основ через набор золочёного плетения к редкой ступени: Silkbinder's Raiment и вещи sunweave. Ее второе ремесло всеобще: Silkspun Satchel, это сумка на десять ячеек, и нет класса, специализации или уровня, что не хотел бы больше места в сумках.\n\nНа кольце Tailoring сидит между Leatherworking и Inscription. Ее живая пара, это Outfitter, Leatherworking и Tailoring вместе, присягаемая перед Weaver Ottilie у loom Eastbrook после выбраковки четырех webwood spiders ради их шелка; пара Inkweaver с Inscription названа на кольце, но ждет первых рецептов Inscription, прежде чем ей можно будет присягнуть.",
+    "Лестница поднимается от домотканых основ через набор золочёного плетения к редкой ступени: Silkbinder's Raiment и вещи sunweave. Ее второе ремесло всеобще: Silkspun Satchel, это сумка на десять ячеек, и нет класса, специализации или уровня, что не хотел бы больше места в сумках.\n\nНа кольце Tailoring сидит между Leatherworking и Inscription. Ее живая пара, это Outfitter, Leatherworking и Tailoring вместе, присягаемая перед Weaver Ottilie у loom Eastbrook после выбраковки четырех webwood spiders ради их шелка; пара Чернилоткача с Inscription названа на кольце, и теперь, когда базовый каталог Inscription уже выведен чернилами, она ждет лишь собственного клятвенного квеста.",
   'guide.profPages.craftProse.tailoring.materialsHeading': 'Нить, шелк и, да, травы',
   'guide.profPages.craftProse.tailoring.materialsBody':
     "Loom работает на том, что роняет охота и растят поля. Linen scraps и homespun cloth снимаются с гуманоидных убийств, spider silk собирается с туш пауков, а центральная часть редкой ступени, Silkbinder's Raiment, хочет Pristine Silk, подписанный образец, что подбрасывает удачный сбор с туши.\n\nHerbalism кормит tailoring больше любого другого ремесла снаряжения: трава глянцелист отделывает тапочки, goldleaf красит набор золочёного плетения, а sunpetal прошивает всю редкую ступень, так что портной, что собирает свои травы, стабильно экономит. Spool of Thread стоит 12 меди у Ottilie, а loom не просит ни капли металла: даже капстоун Wardweave Cowl соткан из премиальных трав, Pristine Silk, spider silk и нити.",
@@ -12482,69 +12876,122 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftProse.leatherworking.routeBody':
     'Любое изделие с реальными характеристиками получает шанс на шедевр, пока более высокое качество укладывается в предел вашего разряда, включая обладающую характеристиками Друидскую шкуру Иствбрука, а подписанная Безупречная шкура в Куртке стража трясины даёт бонус за подписанный реагент автоматически; осмий засчитывается как материал 1-го уровня для срабатывания. Безхарактерные полевые обычные вещи из шкуры сработать не могут.\n\nПрокачивайте её естественным путём: собирайте с каждого волка и вепря, которых убиваете с первого уровня, пусть два полевых обычных предмета несут вас до 25 навыка, где бы вы ни находились, а затем обучитесь ступени кожи у чанов, когда задания всё равно потянут вас на болото. Болотный охотник несёт вас до 50, а вещи стража трясины и Обмотки Сумеречной шкуры несут редкий разряд с 50 до 75. После 75 эти рецепты 2-го уровня приносят половинную, а затем четвертную отдачу — около 150 изделий на последние пятьдесят очков до предела в 125; ниже потолка главного ремесла они всё равно соответствуют потолку изделий редкого качества, а не обнуляются вовсе.\n\nМобильная дубильня значит для этого ремесла больше, чем для любого другого: специализируйтесь на 75 навыке, и седельная сумка шкур становится готовым снаряжением у костра вместо похода обратно в Фенбридж. Рабочий заказ дубильни Хеска покупает восемь грубых шкур каждые 30 минут — неплохой доход со шкур, которые вы и так собирали, а Книга деяний отмечает «Дело кожевника» на 50 навыке и «Гранд-мастер кожевничества» на пределе.',
   'guide.profPages.craftProse.cooking.identityHeading': 'Котел, что кормит группу',
+  'guide.profPages.craftProse.cooking.identityBodyOneMeal':
+    "Съешьте приготовленное блюдо, и оно лечит вас за 18 секунд отдыха, что между заходами, это самое дешевое лечение в игре. Лестница идет от Pan-Seared River Perch на 90 здоровья через Marlow's Grand Roast на 980 к трем вершинным блюдам по ролям на 1392: это крупнейшее сидячее лечение в игре и самый сильный эффект сытости, какой оставляет доеденная тарелка (усиливающие блюда фермерской кухни занимают ступени ниже; та сторона истории рассказана на странице Земледелия). Одновременно действует только один эффект Сытости: более свежая трапеза заменяет прежний.\n\nНа кольце Cooking сидит между Alchemy и Leatherworking. Его живая пара, это Apothecary, Alchemy и Cooking, присягаемая перед Cook Marlow у кухонь Eastbrook после охоты на четырех диких вепрей для котла; пара Trapper с Leatherworking названа на кольце, но пока не имеет задания клятвы.",
   'guide.profPages.craftProse.cooking.identityBody':
-    "Съешьте приготовленное блюдо, и оно лечит вас за 18 секунд отдыха, что между заходами, это самое дешевое лечение в игре. Лестница идет от Pan-Seared River Perch на 90 здоровья до самого Marlow's Grand Roast на 980, крупнейшего сидячего лечения, что существует.\n\nНа кольце Cooking сидит между Alchemy и Leatherworking. Его живая пара, это Apothecary, Alchemy и Cooking, присягаемая перед Cook Marlow у кухонь Eastbrook после охоты на четырех диких вепрей для котла; пара Trapper с Leatherworking названа на кольце, но пока не имеет задания клятвы.",
+    "Съешьте приготовленное блюдо, и оно лечит вас за 18 секунд отдыха, что между заходами, это самое дешевое лечение в игре. Лестница идет от Pan-Seared River Perch на 90 здоровья через Marlow's Grand Roast на 980 к трем вершинным блюдам по ролям на 1392: это крупнейшее сидячее лечение в игре и самый сильный эффект сытости, какой оставляет доеденная тарелка (усиливающие блюда фермерской кухни занимают ступени ниже).\n\nНа кольце Cooking сидит между Alchemy и Leatherworking. Его живая пара, это Apothecary, Alchemy и Cooking, присягаемая перед Cook Marlow у кухонь Eastbrook после охоты на четырех диких вепрей для котла; пара Trapper с Leatherworking названа на кольце, но пока не имеет задания клятвы.",
   'guide.profPages.craftProse.cooking.materialsHeading': 'Кладовая, что кормится удочкой и ножом',
-  'guide.profPages.craftProse.cooking.materialsBody':
-    'Fishing поставляет фирменные ингредиенты, зона за зоной: mirror trout и river perch из вод Eastbrook Vale, marsh pike и bog eel из Mirefen Marsh, frostgill trout и slatefin carp из Thornpeak Heights. Каждая ступень лестницы готовит рыбу своего уровня, так что повар, что ловит, никогда не остается без запаса.\n\nМясницкая сторона приходит с туш, прошедших сбор: game meat с вепрей и их родни, а на редкий или лучше бросок сбора, подписанный Prime Cut, центральная часть grand roast. Травы приправляют лучшие блюда, одно бревно ashwood коптит eel, а Cooking Salt идет по 8 меди за мешочек у собственного лотка Marlow.',
   'guide.profPages.craftProse.cooking.ladderHeading': 'От вяленого мяса до grand roast',
   'guide.profPages.craftProse.cooking.ladderBody':
     "Salted Jerky, это полевой рецепт: известен с начала, одна spider leg, куется где угодно, походная еда каждого свежего искателя приключений. Лестница тренера готовит у кухонь Eastbrook на восточной стороне площади: бесплатная ступень на 0 навыке (perch, Hunter's Game Skewer, Herbed Marsh Pike), средняя ступень на 25 навыке по 25 серебра за рецепт (Ashwood Smoked Eel, Goldleaf Game Stew, Frostgill Chowder) и редкая ступень на 50 навыке по 1 золоту каждый (Silvered Carp Supper, Angler's Feast Platter, Marlow's Grand Roast).\n\nПартийные блюда растягивают ингредиенты: smoked eel и game stew дают по две порции за готовку, а feast platter, три. Marlow учит каждой ступени в тот миг, как ваш разряд в Cooking ее достигает.",
   'guide.profPages.craftProse.cooking.routeHeading': 'Специализация, а не шедевры, и путь к 125',
   'guide.profPages.craftProse.cooking.routeBody':
-    'Cooking, это честное исключение из истории шедевров: у блюда нет строки характеристик для улучшения, так что блюда не срабатывают никогда, и ни одному повару не стоит за этим гнаться. Мастерство ремесла, это специализация на 75: на пятую часть меньше каждого ингредиента, что быстро складывается на партийных блюдах, и мобильная полевая кухня, чтобы пир готовился у дверей подземелья.\n\nГотовьте то, что ловите: сочетайте подъем с рыбалкой, и два навыка кормят друг друга всю дорогу вверх. Jerky и бесплатная ступень несут вас до 25 по очку за готовку, средняя ступень до 50, а редкая до 75; за 75 пока нет блюда выше, так что редкие блюда гаснут до половины, а потом до четверти отдачи, примерно 150 готовок до предела. Относитесь к этому как к запасанию, а не гринду: гильдия съедает каждую порцию.\n\nРабочий заказ кухонь Marlow покупает восемь game meat каждые 30 минут за монеты и опыт, а Книга деяний отмечает Seasoned Chef на 50 навыке по пути к титулу Grandmaster Cooking на 125.',
+    'Cooking, это честное исключение из истории шедевров: у блюда нет строки характеристик для улучшения, так что блюда не срабатывают никогда, и ни одному повару не стоит за этим гнаться. Мастерство ремесла, это специализация на 75: на пятую часть меньше каждого ингредиента, что быстро складывается на партийных блюдах, и мобильная полевая кухня, чтобы пир готовился у дверей подземелья.\n\nГотовьте то, что ловите: сочетайте подъем с рыбалкой, и два навыка кормят друг друга всю дорогу вверх. Вяленое мясо и бесплатная ступень несут вас до 25 по очку за готовку, средняя ступень до 50, а редкая до 75. Выше редкой ступени стоит вершинная кухня, три блюда по ролям и «Обильный очаг»: им не учит ни один тренер, они приходят с найденных рецептов. Повару, у которого Cooking среди основных ремесел, а сегодня это значит присягнувший Аптекарь, вершинное блюдо платит полную отдачу до самого предела в 125; ниже потолка основного ремесла оно не учит вовсе ничему, так что неприсягнувший повар или повар-любитель готовит его ради тарелки, а не ради очков. Так или иначе последний отрезок несут редкие блюда, гаснущие до половины, а потом до четверти отдачи, примерно 150 готовок. Относитесь к этому как к запасанию, а не гринду: гильдия съедает каждую порцию.\n\nРабочий заказ кухонь Marlow покупает восемь порций мяса дичи каждые 30 минут за монеты и опыт, а Книга деяний отмечает Seasoned Chef на 50 навыке по пути к титулу Grandmaster Cooking на 125.',
   'guide.profPages.craftProse.alchemy.identityHeading': 'Бутылки, что выигрывают бои',
   'guide.profPages.craftProse.alchemy.identityBody':
-    'Ремесло работается у apothecary в Highwatch, доме Alchemist Verane, Master of the Apothecary, что учит лестнице рецептов, продает Glass Vials по 12 меди и платит монетой за травы через свой рабочий заказ.\n\nНа кольце ремесел Alchemy сидит с ремеслами проб и ошибок, рядом с Engineering с одной стороны и Cooking с другой. Это дает ему два лица пары: Bombardier (Engineering и Alchemy, берется перед Tinker Gizzel в Eastbrook) и Apothecary (Alchemy и Cooking, присягаемая перед Cook Marlow). Настройтесь на любую пару, чтобы сделать Alchemy основным и открыть навык до самого предела; до тех пор оно работает до редкого уровня, как любое необъявленное ремесло.',
+    'Ремесло работается в аптекарской Highwatch, доме Alchemist Verane, Master of the Apothecary, что учит лестнице рецептов, продает Стеклянные флаконы по 12 меди и платит монетой за травы через свой рабочий заказ.\n\nНа кольце ремесел Alchemy сидит с ремеслами проб и ошибок, рядом с Engineering с одной стороны и Cooking с другой. Это дает ему два лица пары: Бомбардир (Engineering и Alchemy, берется перед Tinker Gizzel в Eastbrook) и Аптекарь (Alchemy и Cooking, присягаемая перед Cook Marlow). Настройтесь на любую пару, чтобы сделать Alchemy основным и позволить вашей же подписанной работе учить вас в ответ; пара Бомбардира открывает еще и свое комбинированное варево, «Эликсир медведя», тогда как у пары Аптекаря комбинированного рецепта пока нет. Сама лестница с 0 до 50 при этом никого не ждет: каждая ее ступень лежит внутри редкого уровня, под которым работают неприсягнувшие ремесла, так что подъем до предела открыт до всякой клятвы. Выше этого потолка стоят две вещи, и свой навык они платят только основному ремеслу: «Оживляющий катализатор», промежуточная ступень на 75, которой Verane тоже учит, и ступени с найденных рецептов над лестницей; алхимик, что не присягнул или держит ремесло хобби, варит их ради товара, а не ради очков.',
   'guide.profPages.craftProse.alchemy.materialsHeading': 'Травы, железы и стекло',
   'guide.profPages.craftProse.alchemy.materialsBody':
     'Каждый draught хочет Glass Vial плюс травы под свою ступень: трава глянцелист растет в Eastbrook Vale, goldleaf в Mirefen Marsh, а sunpetal в Thornpeak Heights, по одной траве на зону, так что ваши бутылки взбираются по миру вместе с вами. Herbalism, это естественный напарник, хотя покупка у собирателей или на рынке работает ровно так же; более глубокие зоны держат грядки высших уровней, что просят лучший sickle, так что держите инструмент актуальным, если собираете сами.\n\nЛиния elixir добавляет охотничий ингредиент: Venom Glands, снятые с ядовитых туш, а верхний elixir просит Pristine Venom Gland, подписанный редкий образец, что подбрасывает удачный сбор с туши. Если вы не собираете сами, это ровно те товары, что стоит попросить принести друга-охотника.',
   'guide.profPages.craftProse.alchemy.ladderHeading': 'Лестница рецептов',
   'guide.profPages.craftProse.alchemy.ladderBody':
-    'Каждый знает Minor Healing Potion с начала и может смешать ее где угодно, без станка. Настоящая лестница, это девять рецептов, которым учит Verane у apothecary, три на каждой ступени: рецепты на 0 навыке бесплатны, ступень на 25 навыке стоит 25 серебра за рецепт, а ступень на 50 навыке, 1 золото за рецепт. Каждая ступень, это исцеляющий draught, draught маны и elixir стойкости, шагая от обычных бутылок с травой глянцелист (120 здоровья, 160 маны) через необычные goldleaf (200 здоровья, 260 маны) к редким sunpetal (280 здоровья, 360 маны).\n\nElixirs взбираются так же: Elixir of the Boar дает 6 Стойкости на 10 минут, Vipersear Elixir, 9 на 15 минут, а Elixir of the Serpent, 12 на 15 минут, варя по две бутылки за готовку. Еще один рецепт сидит в стороне: Elixir of the Bear, комбинированное варево, которому Verane учит за 25 серебра, как только ваш Alchemy достигает 25, смешиваемое где угодно, но только настроенным Bombardier с Alchemy и Engineering на 25.',
+    'Каждый знает Minor Healing Potion с начала и может смешать ее где угодно, без станка. Настоящая лестница, это рецепты, которым Verane учит у apothecary ступень за ступенью: рецепты на 0 навыке бесплатны, ступень на 25 навыке стоит 25 серебра за рецепт, а ступень на 50 навыке, 1 золото за рецепт. Каждая ступень, это исцеляющий draught, draught маны и elixir стойкости, шагая от обычных бутылок с травой глянцелист (120 здоровья, 160 маны) через необычные goldleaf (200 здоровья, 260 маны) к редким sunpetal (335 здоровья, 425 маны). С приходом экономики трофеев ступень на 25 навыке учит еще и Lesser Healing Potion из сала: бутылка дешевле draught из goldleaf и лишь чуть слабее.\n\nElixirs взбираются так же: Elixir of the Boar дает 6 Стойкости на 10 минут, Vipersear Elixir, 9 на 15 минут, а Elixir of the Serpent, 12 на 15 минут, варя по две бутылки за готовку. Еще один рецепт сидит в стороне: Elixir of the Bear, комбинированное варево, которому Verane учит за 25 серебра, как только ваш Alchemy достигает 25, смешиваемое где угодно, но только настроенным Bombardier с Alchemy и Engineering на 25.\n\nНад всей линией эликсиров стоит ступень фляг, которой никто не учит: она приходит с найденных рецептов. Фляга дает 13 на 20 минут и открывает две оси, которых у эликсиров не было, силу атаки и интеллект рядом с привычной стойкостью, по одной фляге на роль. У нее и свои правила: одновременно действует только одна фляга, какой бы ни была характеристика, более слабый эликсир или свиток той же характеристики не может ее заменить, ее нельзя рассеять, украсть или отменить вручную, и она остается с вами после вашей смерти, но пропадает при выходе из игры.',
   'guide.profPages.craftProse.alchemy.routeHeading': 'Путь пивовара к 125',
   'guide.profPages.craftProse.alchemy.routeBody':
-    'Draughts и elixirs не катят шедевры никогда; это срабатывание принадлежит снаряжению с характеристиками. Ваше имя все же путешествует: редкие draughts sunpetal варятся по одной бутылке за раз и приходят с подписью мастера, тогда как двойная партия Elixir of the Serpent остается простой. На 75 навыке вы специализируетесь, и каждый рецепт Alchemy стоит на 20 процентов меньше материалов с этого момента.\n\nВозьмите Herbalism рано и собирайте по мере прокачки: трава глянцелист повсюду в Vale, и как только вы доберетесь до стола Verane, бесплатная ступень чисто донесет вас до 25 навыка на травах, что вы и так бы собрали. Выучите ступень 25 в тот миг, как она включится, перенесите сбор на болото за goldleaf и пусть рабочий заказ Verane (шесть Goldleaf Herbs за 45 меди, повторяемый каждые 30 минут) возвращает немного монет по ходу.\n\nС 50 варите draughts sunpetal и партии Serpent из трав Thornpeak. Последний отрезок с 100 до 125, это намеренный ручеек, так что варите то, что реально продается, а не жгите травы ради числа, и помните, что расходники, это единственный крафтовый товар, который каждый перекупает вечно. Книга деяний отмечает Strange Brews на 50 навыке и Grandmaster Alchemy на пределе.',
+    'Настои и эликсиры не катят шедевры никогда; это срабатывание принадлежит снаряжению с характеристиками. Ваше имя все же путешествует: редкие настои солнцелепеста приходят с подписью мастера, и так же приходит каждая бутылка двойной партии «Эликсира змея», так что ничто редкое в этом ремесле не покидает стол без подписи. На 75 навыке вы специализируетесь, и каждый рецепт Alchemy стоит на 20 процентов меньше материалов с этого момента.\n\nВозьмите Herbalism рано и собирайте по мере прокачки: трава глянцелист повсюду в Vale, и как только вы доберетесь до стола Verane, бесплатная ступень чисто донесет вас до 25 навыка на травах, что вы и так бы собрали. Выучите ступень 25 в тот миг, как она включится, перенесите сбор на болото за золотолистом и пусть рабочий заказ Verane (шесть трав золотолиста за 45 меди, повторяемый каждые 30 минут) возвращает немного монет по ходу.\n\nС 50 варите настои солнцелепеста и партии «Эликсира змея» из солнцелепеста с Thornpeak, все еще подмешивая немного зелени из Vale и с болота. Выше «Эликсира змея» стоит вершинный стол: три фляги и, на самом верху, «Великий котел», венец 125 навыка. Им не учит ни один тренер, они приходят с найденных рецептов, и свой навык они платят только присягнувшему основному ремеслу (ниже потолка основного они не учат вовсе ничему). Последний отрезок с 100 до 125, это намеренный ручеек, так что варите то, что реально продается, а не жгите травы ради числа, и помните, что расходники, это единственный крафтовый товар, который каждый перекупает вечно. Книга деяний отмечает Strange Brews на 50 навыке и Grandmaster Alchemy на пределе.',
   'guide.profPages.craftProse.engineering.identityHeading': 'Монополия мастера инструментов',
-  'guide.profPages.craftProse.engineering.identityBody':
-    'Ремесло работается в toolworks в юго-восточном углу Eastbrook Square, доме Tinker Gizzel, Master of the Toolworks. Уровни с 1 по 3 каждой линии инструментов, это обычный товар торговца; уровни 4 и 5 существуют только через инженера.\n\nНа кольце оно сидит с ремеслами проб и ошибок, рядом с Alchemy и Armorcrafting, давая ему два лица пары: Bombardier (Engineering и Alchemy, берется перед самим Gizzel) и Шестерёнщик (Armorcrafting и Engineering, названа, но пока не присягаема). Одно предупреждение важнее здесь, чем где-либо: обе ступени рецептов Engineering сидят выше потолка редкого уровня, под которым работают хобби и необъявленные ремесленники, так что число навыка движется только у ремесленника, чьи основные включают Engineering, а сегодня это Bombardier. Строить инструменты может любой; ненастроенный ремесленник просто ничему не учится, делая их.',
   'guide.profPages.craftProse.engineering.materialsHeading': 'Реагенты и прежние инструменты',
   'guide.profPages.craftProse.engineering.materialsBody':
     'Каждый рецепт инструмента потребляет инструмент на уровень ниже плюс премиальный материал: четыре Osmium Ore и Небосеребряная кирка становятся Osmium Mining Pick, затем два слитка глифостали и та осмиевая кирка становятся Glyphsteel Mining Pick, а линии axe и sickle повторяют ту же форму с Ashwood и бревнами горной сосны, Goldleaf и Sunpetal Herbs.\n\nGizzel держит все шесть премиальных реагентов в toolworks, если вам нужна скорость вместо маржи, но руда, бревна и травы все добываются в Mirefen Marsh и Thornpeak Heights, и именно в добытом запасе живет прибыль. Единственное исключение, это слиток глифостали, что только у торговца, так что каждый инструмент уровня glyphsteel несет фиксированный монетный пол, встроенный в его цену.',
+  'guide.profPages.craftProse.engineering.materialsBodyThreeRods':
+    'Каждый рецепт наземного инструмента потребляет инструмент на уровень ниже плюс ОТБОРНЫЙ материал, и эта пара, это вся наземная лестница: четыре единицы Отборной железной руды и Небосеребряная кирка становятся Осмиевой киркой, затем два Слитка глифостали, две единицы Отборной осмиевой руды и та самая осмиевая кирка становятся Глифостальной киркой. Линии топора и серпа повторяют ту же форму «отборный материал плюс прежний инструмент» с Отборным бревном пепельного дерева и Отборным бревном горной сосны, Отборной травой золотолист и Отборной травой солнцелепест, но их ступени 5-го уровня не просят Слитков глифостали: кирка, это единственная линия, что дорожает на вершине. Три рецепта удочек нарочно ломают этот порядок: Удочка со штормовой катушкой берёт четыре Кои солнечного блика и Удочку серебряного ручья, Удочка приливной ковки, два Кои, восемь Сырых сланцеплавниковых карпов и ту самую штормовую удочку, а Удочка с часовой катушкой, два Кои, десять Сырых полужаберных осетров и ту самую приливную удочку, так что за вершину лестницы рыболова платят на воде, а не у жилы.\n\nОтборный материал нигде не продаётся и не выпадает с обычного сбора: его получают, разрабатывая одну из полноценных жил зоны инструментом рангом выше самого материала, а на деле это инструмент на ступень ниже того, который вы пытаетесь изготовить (жилы попроще, которые зона держит для путников, дают обычный материал, чем бы вы ни махали). Так задумано. На ремесленном пути инструмент 5-го уровня рождается из настоящей работы инструментом 4-го уровня, а не из похода по лавкам; прилавок за Метки Вылазок, это единственный обходной путь. Единственное исключение, это Слиток глифостали, выплавленный и доступный только у торговца, по 1 серебра и 60 меди за слиток у Квартирмейстера Бри в Хайвотче или на собственном прилавке Гиззела, так что одна лишь Глифостальная кирка несёт в своей цене твёрдый нижний порог в монетах.',
   'guide.profPages.craftProse.engineering.ladderHeading': 'Лестница инструментов',
-  'guide.profPages.craftProse.engineering.ladderBody':
-    'Вся лестница, это шесть рецептов, все привязаны к станку toolworks и все известны автоматически, никакой платы тренеру: инструменты 4-го уровня pick, axe и sickle на 75 навыке, а версии 5-го уровня на 150 навыке. Это второе число не опечатка, и оно сидит выше нынешнего предела в 125 нарочно: требования навыка здесь никогда не запирают ремесло, они лишь формируют его прирост, так что вы можете построить инструмент 5-го уровня в тот день, как держите его реагенты и его предшественника 4-го уровня.\n\nКаждый готовый инструмент редкого или эпического качества и выходит подписанным, так что ваше имя катается по зонам на поясах других игроков. Engineering также держит половину одного комбинированного рецепта: Elixir of the Bear, который варит настроенный Bombardier с Engineering и Alchemy на 25.',
   'guide.profPages.craftProse.engineering.routeHeading': 'Путь инженера к 125',
   'guide.profPages.craftProse.engineering.routeBody':
-    'Инструменты не несут боевых характеристик, так что они не катят шедевры никогда; это срабатывание принадлежит снаряжению с характеристиками. Специализация все же приходит на 75 навыке: на 20 процентов меньше материалов за готовку и временный полевой toolworks, что превращает любую вылазку за добычей в мастерскую. Математика прироста здесь почти не гаснет: рецепты 75 навыка платят полную отдачу до 100 и половину после, а рецепты 150 навыка платят полную отдачу до самого предела в 125, так что реальное ограничение, это реагенты и монеты, а не серые рецепты.\n\nСначала выберите пару, ведь без нее ничего не движется: возьмите настройку Bombardier у Tinker Gizzel. Затем кормите лестницу: качайте Mining, Logging или Herbalism сами или заводите друзей-собирателей, покупайте инструменты 3-го уровня у торговцев и относитесь к рабочему заказу Gizzel (восемь Ironbark Logs за 16 меди, повторяемый каждые 30 минут) как к карманным деньгам.\n\nEngineering, это малотиражное престижное ремесло, примерно одно очко навыка за готовый инструмент, так что относитесь к каждой готовке как к товару на продажу. Реклама для клиентов пишется сама: каждый уровень инструмента выше уровня жилы срезает 0,4 секунды с 2,5-секундного заброса сбора (до пола в 1,5 секунды), так что инструмент 5-го уровня, это ускорение на каждой жиле в мире, а сделать его можете только вы. Книга деяний отмечает Cogs and Sprockets на 50 навыке и Grandmaster Engineering на 125.',
+    'Инструменты не несут боевых характеристик, так что они не катят шедевры никогда; это срабатывание принадлежит снаряжению с характеристиками. Специализация все же приходит на 75 навыке: на 20 процентов меньше материалов за готовку и временный полевой toolworks, что превращает любую вылазку за добычей в мастерскую. Математика прироста здесь почти не гаснет: рецепты 75 навыка платят полную отдачу до 100 и половину после, а рецепты 125 навыка платят полную отдачу до самого предела, так что реальное ограничение, это реагенты и монеты, а не серые рецепты.\n\nВыберите пару пораньше, ведь без нее лестница инструментов не движется: возьмите настройку Bombardier у Tinker Gizzel. Затем кормите лестницу: качайте Mining, Logging или Herbalism сами или заводите друзей-собирателей, покупайте инструменты 3-го уровня у торговцев и относитесь к рабочему заказу Gizzel (восемь Ironbark Logs за 16 меди, повторяемый каждые 30 минут) как к карманным деньгам.\n\nEngineering, это малотиражное престижное ремесло, примерно одно очко навыка за готовый инструмент, так что относитесь к каждой готовке как к товару на продажу. Реклама для клиентов пишется сама: каждый уровень инструмента выше уровня жилы срезает 0,4 секунды с 2,5-секундного заброса сбора (до пола в 1,5 секунды), так что инструмент 5-го уровня, это ускорение на каждой жиле в мире, а сделать его можете только вы. Книга деяний отмечает Cogs and Sprockets на 50 навыке и Grandmaster Engineering на 125.',
   'guide.profPages.craftProse.enchanting.identityHeading': 'Снаряжение врозь, сила обратно внутрь',
   'guide.profPages.craftProse.enchanting.identityBody':
-    'Нет ни станка, ни тренера, ни списка рецептов для покупки: каждые чары известны с начала, разбирать может любой с первого дня, а навык упирается в 125, как у каждого ремесла.\n\nНа кольце оно сидит между Inscription и Jewelcrafting, так что два его лица пары, это Arcanist (Inscription и Enchanting) и Gembinder (Enchanting и Jewelcrafting). Ни одной пока нельзя присягнуть, ведь оба соседа ждут своих первых рецептов, так что сегодня Enchanting взбирается как ремесло каждого: бесплатное до редкого уровня до любой клятвы и естественный выбор хобби для Bombardier или Apothecary. Enchanters также держат мир сбора на ходу: три вставляемых эффекта инструментов, это работа Enchanter, а исходный мастер перезаряжает свои эффекты со скидкой, еще глубже после специализации.',
+    'Каждые чары известны с начала, разбирать может любой с первого дня, и ни тому ни другому никогда не нужен станок; навык упирается в 125, как у каждого ремесла. Единственный обучаемый угол ремесла, это три рецепта, все от Tinker Gizzel в мастерской в юго-западном углу Eastbrook Square, и все они работаются у того же станка: два оберега, «Сумка собирателя» и «Глаз ремесленника», за обычную плату ступени, как только ваш Enchanting достигает 25, а над ними «Светозарный реагент», собственный материал вершинной ступени, на 75.\n\nНа кольце оно сидит между Inscription и Jewelcrafting, так что два его лица пары, это Чародей (Inscription и Enchanting) и Камневяз (Enchanting и Jewelcrafting). Ни одной пока нельзя присягнуть: оба соседних ремесла уже ведут собственные лестницы (Inscription в аптекарской, Jewelcrafting у горна), но ни у одной пары пока нет клятвенного квеста. Так что сегодня Enchanting взбирается как ремесло каждого: бесплатное до редкого уровня до любой клятвы и естественный выбор хобби для Бомбардира или Аптекаря. Зачарователи также держат мир сбора на ходу: два вставляемых эффекта инструментов, это работа зачарователя, а исходный мастер перезаряжает свои эффекты со скидкой, еще глубже после специализации.',
   'guide.profPages.craftProse.enchanting.levelingHeading': 'Как растет enchanting',
   'guide.profPages.craftProse.enchanting.levelingBody':
-    'Навык движут два действия: разбор вещи и наложение чар. Каждый успех стоит до одного очка, масштабируясь по серьезности работы: редкость вещи, что вы ломаете, или уровень реагента чар, что вы накладываете. Обычные разборы и чары только на пыли считаются как обычная работа; необычные разборы и чары на essence, как необычная; редкие разборы и каждые Runed или Greater чары, как редкая; эпические и легендарные разборы, еще выше.\n\nЗнакомое угасание мастерства работает на 25-очковых уровнях, так что работа обычного сорта сереет на 75 навыке, необычная работа на 100, а работа редкого уровня ровно на пределе в 125. У Enchanting есть и своя доброта: вход выше потолка вашего архетипа округляется вниз до этого потолка, а не обнуляется, так что до настройки эпический разбор просто считается как редкий, а не учит ничему. Если Enchanting окажется спящим за другим призванием, все считается как обычная работа, и подъем застревает на 75; держите его хобби, и работа редкого уровня все еще платит, просто медленнее за 75.',
+    'Навык движут три действия: разбор вещи, наложение чар и изготовление двух рецептов оберегов, что идут по обычной кривой ремесла. Третий обучаемый рецепт, «Светозарный реагент», это исключение: на 75 навыке он лежит выше редкого потолка, под которым работает каждый зачарователь (у Enchanting нет клятвенной пары, так что оно никогда не бывает основным), а рецепт выше вашего потолка не учит ничему, так что делайте его ради реагента, а не ради очков. Каждый успех стоит до одного очка, масштабируясь по серьезности работы: редкость вещи, что вы ломаете, или уровень реагента чар, что вы накладываете. Обычные разборы и чары только на пыли считаются как обычная работа; необычные разборы и чары на эссенции, как необычная; редкие разборы и любые рунные или высшие чары, как редкая; эпические и легендарные разборы, а также любые светозарные чары, стоят в таблице еще выше, хотя сегодня ни одно лицо зачарователя не поднимается выше редкой ступени, так что на деле они платят столько же, сколько редкая работа. Над скамьей разбора стоит одна честность: вещь, что сошла со скамьи игрока (изготовленная, подписанная или ставшая шедевром), все так же дробится в материалы, но не учит ничему, так что круг «сделал и сломал» не поднимает никого, а уроки лежат в снаряжении, найденном в мире.\n\nЗнакомое угасание мастерства работает на 25-очковых уровнях, так что работа обычного сорта сереет на 75 навыке, необычная работа на 100, а работа редкого уровня ровно на пределе в 125. У Enchanting есть и своя доброта: вход выше потолка вашего архетипа округляется вниз до этого потолка, а не обнуляется, так что до настройки эпический разбор просто считается как редкий, а не пропадает впустую. Если Enchanting окажется спящим за другим призванием, разбор и наложение считаются как обычная работа, и подъем застревает на 75, а два оберега, что идут по кривой ремесла выше обычного потолка, спящего зачарователя не учат вовсе ничему; держите его хобби, и работа редкого уровня все еще платит, просто медленнее за 75.',
   'guide.profPages.craftProse.enchanting.marketHeading':
     'Зачарованные копии, происхождение и рынок',
   'guide.profPages.craftProse.enchanting.marketBody':
     'Наложение чар потребляет реагенты и помечает одну конкретную копию вещи. Направьте их на копию в сумке, и вы получите отдельную зачарованную копию; направьте на уже надетую вещь, и она зачаровывается на месте, без снятия и повторного надевания. В любом случае бонус следует за вещью вечно, через снятия, походы в банк и обмены. Одни чары на вещь: наложение других чар на зачарованную копию сначала просит подтверждения, а затем прямо заменяет старые чары, уничтожая их без возврата материалов. Продажа, выброс и разбор все предпочитают сначала простые копии, так что ваша готовая вещь не съедается по случайности. Одинаково зачарованные копии даже складываются вместе в ваших сумках.\n\nСнаряжение-шедевр и enchanting дружат: вещь-шедевр остается полностью зачаровываемой, а чары добавляются поверх бонуса шедевра, не тревожа ни его, ни подпись мастера. Складывая все источники, подписанный шедевр с чарами Greater, это лучшее, что бывает у крафтовой вещи, и он все равно сидит ниже рейдовой добычи по замыслу.\n\nНа рынке зачарованная или подписанная вещь выставляется как любая другая: отдельной позицией на одну штуку, подсказка показывает чары и метку мастера, а Вранья почта доставляет ее так же исправно. Материалы остаются надежной половиной ремесла: Dust, Essence и Shards выставляются свободно, выставление ничего не стоит, а Торговец берет 5 процентов только с завершенной продажи. Это делает два классических дохода enchanter продажей материалов на рынке и приемом вещи клиента в обмен, зачаровыванием ее и возвратом.',
+  'guide.profPages.craftIntro.jewelcrafting':
+    'Ювелирное дело, это тонкая скамья кузницы Eastbrook: кольца и ожерелья из меди, железа и редкого осмия, и на каждой ступени кольцо Силы, кольцо Интеллекта и ожерелье Ловкости. У украшений нет ни брони, ни классового замка, так что покупатели ремесла, это попросту все, у кого есть пальцы и шея.',
+  'guide.profPages.craftProse.jewelcrafting.identityHeading': 'Тонкая работа кузницы',
+  'guide.profPages.craftProse.jewelcrafting.identityBody':
+    'Лестница, это три ступени по три изделия: кольцо Силы, кольцо Интеллекта и ожерелье Ловкости, сначала в меди, затем в железе и наконец, на самом верху, в редком осмии. Украшения не несут брони и не знают классового замка, и даже медные вещи приходят с настоящими характеристиками, ведь кольцо без характеристик не значит ничего.\n\nНа кольце ремесел оно стоит между Enchanting и Weaponcrafting, что дает ему два лица пары: Камневяз (Enchanting и Jewelcrafting) и Клинкодел (Jewelcrafting и Weaponcrafting). Ни у одной пары пока нет клятвенного квеста, так что сегодня Jewelcrafting взбирается как ремесло каждого: все три ступени лестницы с 0 до 50 лежат внутри редкого уровня, под которым работают неприсягнувшие ремесла, так что лестница открыта до всякой клятвы. Выше этого потолка стоят две вещи: «Оправа из призменного стекла», промежуточная ступень на 75, которой Darva тоже учит, и ступень с найденного рецепта над ней; раз ни одной паре пока нельзя присягнуть, сегодня они не учат вовсе никого, так что делайте их ради товара, а не ради очков.',
+  'guide.profPages.craftProse.jewelcrafting.materialsHeading': 'Руда, пыль и эссенция',
+  'guide.profPages.craftProse.jewelcrafting.materialsBody':
+    'Скамья живет добычей и разбором. Copper ore приходит с жил 1-го уровня Eastbrook Vale, iron ore из Mirefen Marsh, osmium ore из Thornpeak Heights, и в каждый рецепт идет банка-другая Кузнечного флюса, по 20 меди у Forgemistress Darva. Вторая половина каждой вещи приходит со скамьи разбора: медную ступень насыщает Пыль перезвона, а железная и осмиевая просят Эссенцию перезвона, так что ювелир, это либо самый верный клиент зачарователя, либо мастер с собственной привычкой к разбору.\n\nОсмиевая ступень добавляет одно уточнение: каждой редкой вещи, помимо осмия, нужны две железные руды, идущие припоем под тонкую оправу. Ни руду, ни пыль не продает ни один прилавок: они приходят из мира или от другого игрока, обменом или через Мировой рынок; за монету покупается только флюс.',
+  'guide.profPages.craftProse.jewelcrafting.ladderHeading': 'Наука у наковальни',
+  'guide.profPages.craftProse.jewelcrafting.ladderBody':
+    'У ювелирного дела нет своего станка: весь каталог куется в кузнице Eastbrook, у той же наковальни, которую делят Weaponcrafting и Armorcrafting, и Forgemistress Darva учит ему там же. Лестница, это девять рецептов у тренера в трех ступенях: медная ступень (кольцо, перстень, гривна) бесплатна на 0 навыке, железная (печатка, перстень, ожерелье) стоит по 25 серебра за рецепт с 25 навыка, а осмиевая (кольцо, перстень, амулет) по 1 золоту с 50 навыка, и каждая ступень учится в тот миг, когда ваш разряд в ремесле достигает ее собственного.\n\nПолевых рецептов здесь нет, и комбинированной вещи пока тоже: каждая обучаемая ступень, это привязанная к кузнице работа у тренера, да и ступень с найденного рецепта над ними тоже привязана к кузнице, только нигде не продается, так что это ремесло учат, и практикуют, стоя там же, где стоят кузнецы.',
+  'guide.profPages.craftProse.jewelcrafting.routeHeading': 'Шедевры и рабочий маршрут до 125',
+  'guide.profPages.craftProse.jewelcrafting.routeBody':
+    'Ступени без характеристик здесь нет: каждая вещь на лестнице несет настоящую строку характеристик, так что всякая ковка бросает шанс шедевра, пока более тонкое качество умещается под потолком вашего разряда, а железо и осмий оба считаются материалами 1-го уровня для этого шанса. Медная и железная ступени могут выйти редкими шедеврами хоть у любителя, хоть у неприсягнувшего ювелира; осмиевая тройка редка сама по себе, и ее шедевры ждут потолка выше редкого, которого ни у одного ювелира не будет, пока не откроются пары этого ремесла.\n\nПодъем идет стандартной дорогой: медь до 25, железная ступень в день открытия до 50, затем осмий до 75. Выше них стоит вершинная ступень, которой никто не учит: ее рецепт находят, и ювелир, у которого он есть, работает его с полной отдачей до самого предела. Пока рецепт не выпал, остаток несут осмиевые рецепты, тускнеющие до половины и затем до четверти прироста: заложите еще примерно 150 изделий до предела 125 и окупайте их честно, ведь украшения носит каждый класс, а большинство путников растет с пустыми ячейками колец и шеи.\n\nКнига деяний отмечает «Отполирован до блеска» за вашу первую редкую вещь, «Грань и филигрань» на 50 навыке и «Гранд-мастер ювелирного дела» на пределе 125.',
+  'guide.profPages.craftIntro.inscription':
+    'Начертание, это письменный стол аптекарской Highwatch: тома заклинателей во вторую руку и свитки стойкости для всех подряд, растертые из тех же трав, что идут в настои по соседству. Его свитки, это вторая дверь к усилениям боевых эликсиров, так что даже бойцу, что в жизни не держал книги, есть повод постучать.',
+  'guide.profPages.craftProse.inscription.identityHeading':
+    'Чернила для разума, свитки в дорогу',
+  'guide.profPages.craftProse.inscription.identityBody':
+    'Лестница, это три ступени по два изделия: том заклинателя во вторую руку и свиток стойкости для кого угодно, сначала на глянцелисте, затем на золотолисте и наконец, на самом верху, на редком солнцелепесте. Тома, это держимые во второй руке носители характеристик для шести классов с маной, настоящие Интеллект и Дух с первой же ступени; свитки, это расходники без классового замка, так что половина каждой ступени продается всему миру.\n\nНа кольце ремесел оно стоит между Tailoring и Enchanting, что дает ему два лица пары: Чернилоткач (Tailoring и Inscription) и Чародей (Inscription и Enchanting). Ни у одной пары пока нет клятвенного квеста, так что сегодня Inscription взбирается как ремесло каждого: все три ступени лестницы с 0 до 50 лежат внутри редкого уровня, под которым работают неприсягнувшие ремесла, так что лестница открыта до всякой клятвы. Выше этого потолка стоят две вещи: «Черновосковый пергамент», промежуточная ступень на 75, которой Verane тоже учит, и ступень с найденного рецепта над ней; раз ни одной паре пока нельзя присягнуть, сегодня они не учат вовсе никого, так что пишите их ради товара, а не ради очков.',
+  'guide.profPages.craftProse.inscription.materialsHeading':
+    'Травы, чернила и флакон под них',
+  'guide.profPages.craftProse.inscription.materialsBody':
+    'Стол живет травничеством и скамьей разбора. Глянцелист приходит с грядок 1-го уровня Eastbrook Vale, золотолист из Mirefen Marsh, солнцелепест из Thornpeak Heights, и в каждый рецепт идет Стеклянный флакон, по 12 меди у мастера аптекарской, чтобы растереть их в пигмент. Волшебная половина чернил приходит со скамьи разбора: ступень глянцелиста насыщает Пыль перезвона, золотолистная и солнцелепестковая просят Эссенцию перезвона, а солнцелепестковый свиток возвращает в чернила щепоть пыли, так что начертатель, это либо верный клиент зачарователя, либо мастер с собственной привычкой к разбору.\n\nСтупень солнцелепеста оттачивает оба своих рецепта: редкому гримуару, помимо солнцелепеста, нужны два золотолиста, идущие на разметку иллюминаций, а двойная связка свитков берет вторую эссенцию с той самой щепотью пыли и по цене выходит вровень с Эликсиром змея, чье благословение она повторяет. Ни травы, ни пыль не продает ни один прилавок: они приходят из мира или от другого игрока; за монету покупается только флакон.',
+  'guide.profPages.craftProse.inscription.materialsBodyFrostGourd':
+    'Стол живет травничеством и скамьей разбора. Глянцелист приходит с грядок 1-го уровня Eastbrook Vale, золотолист из Mirefen Marsh, солнцелепест из Thornpeak Heights, и в каждый рецепт идет Стеклянный флакон, по 12 меди у мастера аптекарской, чтобы растереть их в пигмент. Волшебная половина чернил приходит со скамьи разбора: ступень глянцелиста насыщает Пыль перезвона, золотолистная и солнцелепестковая просят Эссенцию перезвона, а солнцелепестковый свиток возвращает в чернила щепоть пыли, так что начертатель, это либо верный клиент зачарователя, либо мастер с собственной привычкой к разбору.\n\nСтупень солнцелепеста оттачивает оба своих рецепта: редкому гримуару, помимо солнцелепеста, нужны два золотолиста, идущие на разметку иллюминаций, а двойная связка свитков берет вторую эссенцию с той самой щепотью пыли и Морозную тыкву с террас Highwatch, и как раз за счет тыквы по цене выходит вровень с Эликсиром змея, чье благословение она повторяет. Ни травы, ни пыль, ни тыкву не продает ни один прилавок: они приходят из мира, с грядки или от другого игрока; за монету покупается только флакон.',
+  'guide.profPages.craftProse.inscription.ladderHeading': 'Наука у перегонных кубов',
+  'guide.profPages.craftProse.inscription.ladderBody':
+    'У начертания нет своего станка: весь каталог работается в аптекарской Highwatch, у той же скамьи, где варит Alchemy, и Alchemist Verane учит ему там же. Лестница, это шесть рецептов у тренера в трех ступенях: ступень глянцелиста (букварь и свиток) бесплатна на 0 навыке, ступень золотолиста (фолиант и свиток) стоит по 25 серебра за рецепт с 25 навыка, а ступень солнцелепеста (гримуар и свиток) по 1 золоту с 50 навыка, и каждая ступень учится в тот миг, когда ваш разряд в ремесле достигает ее собственного. Свиток ступени 50 сходит со стола по два за раз.\n\nПолевых рецептов здесь нет, и комбинированной вещи пока тоже: каждая обучаемая ступень, это привязанная к аптекарской работа у тренера, да и ступень с найденного рецепта над ними тоже привязана к аптекарской, только нигде не продается, так что это ремесло учат, и практикуют, стоя там же, где стоят алхимики.',
+  'guide.profPages.craftProse.inscription.routeHeading':
+    'Свитки, эликсиры и рабочий маршрут до 125',
+  'guide.profPages.craftProse.inscription.routeBody':
+    'Свитки, это фирменное правило ремесла: свиток каждой ступени дает ровно то же усиление, что эликсир стойкости его полосы (полосы вепря, гадючьего жара и змея), и оба источника делят одну ячейку на панели усилений. Свиток, прочитанный поверх эликсира, заменяет его, эликсир, выпитый поверх свитка, заменяет тот, и новейшее применение всегда побеждает, так что свиток, это другая дверь к тому же усилению, а не вторая стопка поверх него.\n\nТома несут настоящие строки характеристик, так что каждый изготовленный том бросает шанс шедевра, пока более тонкое качество умещается под потолком вашего разряда; свитки, расходники без характеристик, не срабатывают никогда. Подъем идет стандартной дорогой: глянцелист до 25, ступень золотолиста в день открытия до 50, затем солнцелепест до 75. Выше них стоит вершинная ступень, которой Verane не учит: ее рецепт находят, и писец, у которого он есть, работает его с полной отдачей до самого предела. Пока рецепт не выпал, остаток несут рецепты солнцелепеста, тускнеющие до половины и затем до четверти прироста: заложите еще примерно 150 изделий до предела 125 и окупайте их честно, ведь свитки продаются каждому классу в игре.\n\nКнига деяний отмечает «Написано изящными чернилами» за вашу первую редкую вещь, «Перо и пигмент» на 50 навыке и «Гранд-мастер начертания» на пределе 125.',
   'guide.profPages.yieldsHeading': 'Что дает сбор',
   'guide.profPages.yieldsBody':
     'Каждый сбор катит качество для того, что он дает, и ваше мастерство, это вся история этого броска. Совсем новый собиратель всегда тянет обычный материал; каждое очко навыка стабильно переносит вес из обычного в высшие сорта и никогда назад, пока на пределе в 100 обычный сорт не исчезнет совсем: 60 процентов необычного, 30 процентов редкого, 8 процентов эпического и 2 процента легендарного, каждый раз.\n\nКачество означает и количество: обычный бросок дает 1 единицу, необычный и редкий дают 2, эпический 3, а легендарный 4. Любая редкая, эпическая или легендарная добыча приходит подписанным экземпляром с клеймом Gathered by you: на пределе это четыре сбора из десяти несут ваше имя, а правила происхождения на странице Crafting Economy объясняют, почему ремесленники платят сверху ровно за такие стопки.',
   'guide.profPages.gatherDeedsHeading': 'Деяния по пути',
   'guide.profPages.gatherDeeds.mining':
-    'Ваша первая жила любого ремесла зарабатывает Fruits of the Field, а предел в 100 в Mining вписывает Ore in the Blood. Достижение 100 в любых трех из Mining, Logging, Herbalism и Fishing добавляет Master Gatherer при 25 Известности, а вскрытие pristine vein записывает собственную коллекционную отметку. Ничто из этого не дает силы: деяния, это титулы и Известность, летопись дорог, что вы прошли.',
+    'Ваша первая жила любого ремесла зарабатывает Fruits of the Field, а предел в 100 в Mining вписывает Ore in the Blood. Достижение 100 в любых трех собирательских ремеслах добавляет Master Gatherer при 25 Известности, а вскрытие pristine vein записывает собственную коллекционную отметку. Ничто из этого не дает силы: деяния, это титулы и Известность, летопись дорог, что вы прошли.',
   'guide.profPages.gatherDeeds.logging':
-    'Ваша первая жила любого ремесла зарабатывает Fruits of the Field, а предел в 100 в Logging вписывает Heartwood Hewer. Достижение 100 в любых трех из Mining, Logging, Herbalism и Fishing добавляет Master Gatherer при 25 Известности, а срез ancient heartwood записывает собственную коллекционную отметку. Деяния, это только титулы и Известность, никогда не сила.',
+    'Ваша первая жила любого ремесла зарабатывает Fruits of the Field, а предел в 100 в Logging вписывает Heartwood Hewer. Достижение 100 в любых трех собирательских ремеслах добавляет Master Gatherer при 25 Известности, а срез ancient heartwood записывает собственную коллекционную отметку. Деяния, это только титулы и Известность, никогда не сила.',
   'guide.profPages.gatherDeeds.herbalism':
-    'Ваша первая жила любого ремесла зарабатывает Fruits of the Field, а предел в 100 в Herbalism вписывает Master of the Meadow. Достижение 100 в любых трех из Mining, Logging, Herbalism и Fishing добавляет Master Gatherer при 25 Известности, а moonlit bloom записывает собственную коллекционную отметку. Деяния, это только титулы и Известность, никогда не сила.',
+    'Ваша первая жила любого ремесла зарабатывает Fruits of the Field, а предел в 100 в Herbalism вписывает Master of the Meadow. Достижение 100 в любых трех собирательских ремеслах добавляет Master Gatherer при 25 Известности, а moonlit bloom записывает собственную коллекционную отметку. Деяния, это только титулы и Известность, никогда не сила.',
   'guide.profPages.gatherDeeds.fishing':
     'Рубеж в 100 вписывает Old Salt, а 200 вписывает Master Angler с его титулом, самую вершину искусства рыбака; Fishing также засчитывается в Master Gatherer, зарабатываемый при 100 в любых трех собирательских ремеслах. Первая рыба из вод каждой зоны заполняет свою страницу, а Кои солнечного блика записывает Glimmer of Hope, так что путники с удочкой в котомке заполняют книгу быстрее, чем ожидают.',
+  'guide.profPages.gatherDeeds.farming':
+    'У земледелия пока нет собственных деяний: теперь, когда грядки и культуры укоренились, вехи и деяния предела, что отмечают другие ремесла, придут с одним из будущих обновлений. Его мастерство уже засчитывается в Master Gatherer, зарабатываемый при 100 в любых трех собирательских ремеслах, так что земледелец заполнит эту страницу наравне со всеми. Деяния дают только титулы и известность, но никогда не силу.',
+  'guide.profPages.gatherDeeds.farmingSown':
+    'У земледелия теперь есть собственная полка в Книге деяний. Sow It Begins отмечает вашу первую посаженную культуру, а четыре страницы летописи отмечают первый удавшийся урожай на каждом из мест с грядками, от Eastbrook Vale до Evergarden. Золотой урожай записывает собственную коллекционную отметку без Известности, а мастерство земледелия засчитывается в Master Gatherer, зарабатываемый при 100 в любых трех собирательских ремеслах. Every Furrow Filled собирает весь список на одну страницу: вырастите каждую культуру, что несут четыре сада, и коллекция закроется. Венец над ней, Harvestmaster, титул за 100 мастерства этого ремесла, и раз горные семена и семена партера теперь лежат на прилавках своих земледельцев, это подъем, который можно завершить уже сегодня. Деяния, это только титулы и Известность, никогда не сила.',
+  'guide.profPages.farm.tableHeading': 'С грядки на стол',
+  'guide.profPages.farm.tableBodyOneMeal':
+    'Кухни, вот где сезон окупается. Помимо повседневных фермерских блюд, у каждой ступени культур есть блюдо побогаче, оставляющее Сытость: доешьте трапезу, и долгое благо останется с вами, то самое преимущество, которое группа хочет съесть перед дверью подземелья. Одновременно действует только один эффект Сытости: более свежая трапеза заменяет прежний. Венчает набор Harvest Feast, стол, который повар накрывает прямо в мире: каждый, кто рядом, берет свою порцию, по одной на каждого, и всякая доеденная трапеза платит то же благо Сытости, так что сезон одного земледельца может накрыть стол целой группе. Вершина этой лестницы, два самых богатых блюда и сам пир, опирается на горные культуры и культуры партера, чьи семена продаются у земледельцев возле тех самых грядок. С рецептами иначе: верхние ступени земледельческой лестницы больше не преподают ни за одним прилавком, их, как и любой другой финальный рецепт, находят в финальном содержимом или покупают за Героические знаки. Сама же лестница блюд, дело Кулинарии: каждую её ступень перечисляет страница Кулинарии.\n\nЗа этим столом есть место и удаче. Каждый собранный урожай бросает тот же шанс нежданной находки, что и другие собирательские ремесла, и время от времени культура выходит золотой: урожай далеко превосходит обычный, вместе с ним приходит кое-что сверх того (семя ступенью выше той земли, что вы возделываете, а изредка один из тех финальных рецептов), вся зона слышит о находке, объявленной с вашим именем, а Golden Harvest записывается в вашу Книгу деяний.',
+  'guide.profPages.farm.tableBody':
+    'Кухни, вот где сезон окупается. Помимо повседневных фермерских блюд, у каждой ступени культур есть блюдо побогаче, оставляющее Сытость: доешьте трапезу, и долгое благо останется с вами, то самое преимущество, которое группа хочет съесть перед дверью подземелья. Венчает набор Harvest Feast, стол, который повар накрывает прямо в мире: каждый, кто рядом, берет свою порцию, по одной на каждого, и всякая доеденная трапеза платит то же благо Сытости, так что сезон одного земледельца может накрыть стол целой группе. Вершина этой лестницы, два самых богатых блюда и сам пир, опирается на горные культуры и культуры партера, чьи семена продаются у земледельцев возле тех самых грядок. С рецептами иначе: верхние ступени земледельческой лестницы больше не преподают ни за одним прилавком, их, как и любой другой финальный рецепт, находят в финальном содержимом или покупают за Героические знаки.\n\nЗа этим столом есть место и удаче. Каждый собранный урожай бросает тот же шанс нежданной находки, что и другие собирательские ремесла, и время от времени культура выходит золотой: урожай далеко превосходит обычный, вместе с ним приходит кое-что сверх того (семя ступенью выше той земли, что вы возделываете, а изредка один из тех финальных рецептов), вся зона слышит о находке, объявленной с вашим именем, а Golden Harvest записывается в вашу Книгу деяний.',
+  'guide.profPages.farm.rhythmHeading':
+    'Ритм земледелия',
+  'guide.profPages.farm.rhythmBody':
+    'Посадка, это короткое видимое действие: {plant} секунды на любой ступени, ведь мотыга открывает землю, а не покупает скорость. Созревшую культуру снимают мгновенно. Ни действия, которое можно прервать, ни проверки сумок, что могла бы отказать, тут нет, а поспевшая грядка ждет ровно столько, сколько вы ее оставите, так что полная сумка не стоит земледельцу ничего, кроме дороги, чтобы ее разгрузить.\n\nСбор с грядки платит двумя вещами: самим урожаем и мастерством земледелия. В отличие от жилы, он не дает опыта персонажа вовсе, так что грядки, это ремесло, которым занимаются, а не способ поднимать уровень.',
+  'guide.profPages.farm.gainHeading':
+    'Чему учит урожай',
+  'guide.profPages.farm.gainBody':
+    'Рост навыка детерминирован и привязан к вашему собственному счетчику, а не к культуре: {g1} мастерства за урожай, пока счетчик ниже {p1}, {g2} ниже {p2}, {g3} ниже {p3} и {g4} на всем остатке пути до предела {cap}. Это никогда не бросок на повышение навыка, так что подъем ровно настолько долог, насколько его делает арифметика.\n\nСтупень культуры решает другое: как далеко способна довести вас грядка. Культура 1-й ступени учит до {c1} и там сереет, культура 2-й ступени до {c2}, а культуры 3-й ступени и выше до самого предела, так что переход на грядки повыше, это единственное, что вообще держит счетчик в движении.',
+  'guide.profPages.farm.yieldsHeading':
+    'Что дает урожай',
+  'guide.profPages.farm.yieldsBody':
+    'Грядка платит числом снятых единиц, а не сортовым броском. Каждая посадка начинается с запаса из {floor} жизней, и каждая снятая единица бросает шанс не потратить одну из них: {keep0} процентов на нулевом счетчике и {keepCap} процентов на пределе, что выходит примерно в три с половиной единицы в начале и в шесть в конце.\n\nКачество ложится на те же единицы, а не заменяет их. У каждой единицы есть шанс, {fine0} процента на нулевом счетчике и {fineCap} процентов на пределе, выйти отборным сортом той культуры, что росла на грядке, а не обычным, так что отборная единица улучшает единицу, а не добавляет новую. Лестницы от обычного до легендарного на грядке нет: культура чеканит два своих сорта и ничего сверх того.\n\nДве вещи добавляют единицы напрямую, и обе дают обычный сорт. Тоник роста от алхимика, добавленный при посадке, платит еще {tonicPicks} единицы с шансом в {tonicPct} процентов, а вставленный эффект на количество добавляет {effectCap} к их числу: это тот предел, что земледелие ставит «Оберегу мастера», чтобы у тоника осталась причина существовать. «Глаз ремесленника» с зарядом работает не по количеству, а по качеству: он добавляет {fineBonus} процентных пунктов к каждому броску на отборный сорт.',
+  'guide.profPages.farm.bedsHeading': 'Работа на грядках',
+  'guide.profPages.farm.bedsBody':
+    'Цикл короток. Купите семена и компост у земледельца возле грядок: Jessica в Eastbrook держит пару долинных культур, земледелец в Fenbridge пару болотных, Hollis на террасах Highwatch горные культуры, а Verbena культуры партера Evergarden. Урожай высокой ступени вдобавок возвращает одно-два своих семени, любое семя ходит через World Market, а горные семена и семена партера теперь выпадают в финальном содержимом и продаются у Героического квартирмейстера, так что земледелец возле грядок, это путь внутрь, а не единственный путь. Сейте с мотыгой в сумке и, если хотите, склоните шансы в свою пользу: компост с прилавка и присмотр земледельца, оплаченный урожаем при посеве, повышают шанс культуры выжить, тоник роста от алхимика дает урожаю шанс стать больше, а когда ваш навык поднимется на целую полосу выше ступени культуры, она перестанет гибнуть вовсе. Затем просто уходите. Грядка растет, пока вы не в игре, созревший урожай ждет сколько угодно, а Журнал урожая (Shift+K или строка Земледелие в окне профессий) показывает каждую засеянную грядку с ее таймером.\n\nПогибшая культура оставляет вместо урожая засохшую шелуху, и любой земледелец обменяет шелуху на компост, так что плохой сезон покупает страховку следующему. Собранное кормит кухни: урожай готовится в блюда на кухнях, а заказы Cook Marlow на пшеницу и рис забирают Vale Wheat и Marsh Rice за монету по тем же часам, что и любой другой наряд.',
+  'guide.profPages.farm.bedsBodyScribeBuyer':
+    'С грядок покупает и стол начертателя: Свиток солнцелепеста, что начертатель пишет на ступени 50, берет Морозную тыкву с террас Highwatch, ту самую тыкву, что берет и Эликсир змея, и потому обе дороги к этому усилению выходят по цене вровень.',
   'guide.profPages.fish.startHeading': 'С чего начать',
-  'guide.profPages.fish.startBody':
-    'Simple Fishing Pole стоит 20 меди у Fisherman Brandt в Eastbrook (ищите Old Salt, что зыркает на Mirror Lake с восточной окраины города); Tinker Gizzel, Provisioner Hale в Fenbridge и Quartermaster Bree в Highwatch тоже держат удочки. Используйте удочку лицом к воде, достаточно глубокой, чтобы держать рыбу, примерно до 24 ярдов перед вами, и ваш поплавок улетает.\n\nНельзя забрасывать в бою, вплавь или мертвым: заброс с берега, это задуманная поза, и любая рыбная вода годится, в каждой зоне.',
   'guide.profPages.fish.koiHeading': 'Кои солнечного блика',
-  'guide.profPages.fish.koiBody':
-    'Каждый водоем в игре прячет один и тот же приз: Кои солнечного блика, необычный проблеск на леске стоимостью 75 меди для торговца и куда больше для вашей гордости. Его шансы, это ровные 3 процента за пойманный улов (4 процента в холодной воде Thornpeak) на каждой полосе, и поимка одного записывает Glimmer of Hope в вашу Книгу деяний, коллекционную отметку с нулевой Известностью. Когда это случается, журнал позаботится, чтобы вы узнали.',
   'guide.profPages.econ.sellsHeading': 'Что продается и почему',
   'guide.profPages.econ.sellsBody':
     'Самый стабильный бизнес, это расходники, ведь их тратят и покупают снова. Зелья, приготовленная еда и чары все исчезают с использованием: боец, что купил меч однажды, будет покупать исцеляющие зелья вечно, а каждая свежая вещь снаряжения, это свежий шанс продать чары.\n\nВещи-шедевры, это премиальный край. Их нельзя сделать на заказ, так что одна желанная вещь берет реальную наценку, а ваша подпись на ней, это ходячая реклама. Реагенты, это третий столп: арканные материалы с разбора, типизированные вторичные Resonant, что текут прямо от ломателя к enchanter, и подписанные добытые материалы, за которые ремесленники, гонящиеся за срабатыванием шедевра, платят сверх меры.',
@@ -12560,9 +13007,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.materialHint.fineGrade':
     'Отборный сорт. Добывается на жиле полного уровня инструментом выше самого материала и засчитывается вместо обычной версии везде, где она требуется.',
   'hudChrome.materialHint.arcaneDust':
-    'Реагент для наложения чар. Выпадает при распылении обычного и необычного снаряжения.',
+    'Реагент для ремесла. Выпадает при распылении обычного и необычного снаряжения.',
   'hudChrome.materialHint.arcaneEssence':
-    'Реагент для наложения чар. Выпадает при распылении редкого снаряжения.',
+    'Реагент для ремесла. Выпадает при распылении редкого снаряжения.',
   'hudChrome.materialHint.arcaneShard':
     'Реагент для наложения чар. Выпадает при распылении эпического и легендарного снаряжения.',
   'hudChrome.materialHint.resonantThread':
@@ -12575,14 +13022,39 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Реагент для наложения чар. Выпадает при распылении оружия ближнего боя редкого качества и выше.',
   'hudChrome.materialHint.resonantTimber':
     'Реагент для наложения чар. Выпадает при распылении посохов, жезлов, луков и арбалетов редкого качества и выше.',
+  'hudChrome.materialHint.masterwroughtIntermediate': 'Компонент ковки мастера.',
+  'hudChrome.materialHint.quickeningCatalyst':
+    'Катализатор для ремесла. Алхимик может создать лишь один в день.',
+  'hudChrome.materialHint.growthTonic':
+    'Принадлежность для фермерства. Расходуется при посадке и даёт шанс собрать чуть больший урожай. Если растение засохнет, тоник пропадает вместе с ним.',
+  'hudChrome.materialHint.wyrmfallCore':
+    'Катализатор Ковки мастера. Финальный босс рейда раз в день на каждой сложности приносит каждому игроку от 1 до 3. Финальный босс каждого героического подземелья раз в день приносит каждому игроку от 1 до 3. Первая за день победа в гонке разлома ранга A или S даёт 1 за ранг A или 2 за ранг S. Героический интендант продаёт его за Героические знаки.',
+  'hudChrome.materialHint.mudfinScale':
+    'Реагент для ремесла. Илогривые скрытни роняют её примерно в половине случаев, рыбы глубоких топей чуть реже, а именные ужасы этих вод всегда.',
+  'hudChrome.materialHint.crackedWyrmScale':
+    'Реагент для ремесла. Чешуйчатые стражи святилища роняют её примерно в половине случаев, и больше нигде в мире её не найти.',
+  'hudChrome.materialHint.crackedOgreTusk':
+    'Реагент для ремесла. Бруток Сокрушитель черепов оставляет один каждый раз, когда падает, и он единственный источник.',
+  'hudChrome.materialHint.tallowCandle':
+    'Реагент для ремесла. Глубокоскальные копатели роняют её чаще, чем нет, культисты Могильного Зова изредка, а именные вожаки и тех и других всегда.',
+  'hudChrome.materialHint.banditBandana':
+    'Реагент для ремесла. Разбойники роняют её примерно в половине случаев, а их именные главари всегда.',
+  'hudChrome.materialHint.oldCragmawsPelt':
+    'Реагент для ремесла. Старый Крэгмо оставляет одну каждый раз, когда падает, и больше её не роняет ни один зверь.',
+  'hudChrome.materialHint.emberwingCinderscale':
+    'Реагент для ремесла. Воскар Жарокрыл оставляет одну каждый раз, когда падает, и больше её не роняет ни один зверь.',
   'hudChrome.enchanting.tier.base': 'Базовые чары',
   'hudChrome.enchanting.tier.runed': 'Рунные чары',
   'hudChrome.enchanting.tier.greater': 'Высшие чары',
+  'hudChrome.enchanting.tier.lucent': 'Светозарные чары',
   'hudChrome.enchanting.yieldHeader': 'Ожидаемые материалы:',
   'hudChrome.enchanting.yieldLineExact': '{item}: {count}',
   'hudChrome.enchanting.yieldLineRange': '{item}: {min}-{max}',
   'hudChrome.enchanting.alreadyEnchanted': 'Этот предмет уже зачарован.',
   'hudChrome.enchanting.sameEnchant': 'На этом предмете уже есть эти чары.',
+  'hudChrome.enchanting.notPerfected':
+    'Только доведённый до совершенства предмет может принять эти чары.',
+  'hudChrome.enchanting.enchantSkillTooLow': 'Ваш навык наложения чар слишком низок для этих чар.',
   'hudChrome.enchanting.replaceTag': 'Заменяет «{enchant}»',
   'hudChrome.enchanting.sameEnchantTag': 'Уже наложено',
   'hudChrome.enchanting.plainTag': 'Без чар',
@@ -12594,6 +13066,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Клеймо создателя',
   'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Бонус шедевра',
   'hudChrome.enchanting.replaceConfirmKeepsBond': 'Привязка изделия на заказ',
+  'hudChrome.enchanting.replaceConfirmKeepsPerfecting': 'Совершенствование',
   'hudChrome.enchanting.replaceConfirmCost': 'Стоимость: {cost}',
   'hudChrome.enchanting.replaceConfirmCostItem': '{name}: {count}',
   'hudChrome.enchanting.replaceConfirmAccept': 'Заменить',
@@ -12605,6 +13078,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemTooltip.enchantedFallback': 'Зачаровано',
   'hudChrome.itemTooltip.partyTradeWindow':
     'Вы можете передать этот предмет игрокам, разделившим эту добычу, ещё в течение {time}. Надев предмет, вы завершите период обмена.',
+  'hudChrome.itemTooltip.perfectedBadge': 'Доведён до совершенства',
+  'hudChrome.itemTooltip.perfectingRank': 'Совершенствование: ранг {rank} из {ranks}',
   'devCommand.actions.kit.description':
     'Надеть комплект уровня 20 (до Sanctum) для выбранной специализации, сначала сумки. Только снаряжение.',
   'devCommand.actions.kit.label': 'Экипировать комплект свежего 20 уровня',
@@ -12675,7 +13150,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.battleTrance': 'Боевой транс',
   'hudChrome.auraOverlay.procs.overpowerCharge': 'Усиление красной руки',
   'hudChrome.auraOverlay.procs.suddenDeath': 'Внезапная смерть',
-  'hudChrome.auraOverlay.procs.victoryRush': 'Победный натиск',
+  'hudChrome.auraOverlay.procs.victoryRush': 'Порыв победителя',
   'hudChrome.auraOverlay.procs.enrage': 'Хаос: Ярость',
   'hudChrome.auraOverlay.procs.heatingUp': 'Разогрев',
   'hudChrome.auraOverlay.procs.arcaneCharge': 'Чародейские заряды',
@@ -12687,6 +13162,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.disenchanting': 'Распыление',
   'abilityUi.cast.enchanting_apply': 'Наложение чар',
   'abilityUi.cast.salvaging': 'Разбор',
+  'abilityUi.cast.sundering': 'Раскалывание',
   'abilityUi.cast.tool_recharge': 'Перезарядка',
   'hudChrome.crafting.crafting': 'Изготовление',
   'hudChrome.crafting.create': 'Создать',
@@ -13639,7 +14115,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.home.world.galeName': 'Гейлкрест',
   'guide.home.world.gardenBlurb': 'Царство живых изгородей, которые до сих пор подстригает садовник, которого никто и никогда не видел; вход туда лежит за Хеджвиком и его фонтанными дворами.',
   'guide.home.world.gardenName': 'Вечный Сад',
-  'guide.home.world.hauntBlurb': 'Лес с призраками под исполинскими кронами, где фонари Гэллоумира — единственный честный свет на дороге.',
+  'guide.home.world.hauntBlurb': 'Лес с призраками под исполинскими кронами, где фонари Гиббетмира — единственный честный свет на дороге.',
   'guide.home.world.hauntName': 'Призрачная Чаща',
   'guide.home.world.jungleBlurb': 'Пальмы, белый песок и крикливые птицы, а пляжный городок Дрифтхейвен держит на берегу зажжённый костёр.',
   'guide.home.world.jungleName': 'Пальмовый Берег',
@@ -13748,16 +14224,36 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.orderBoardHeading': 'Доска заказов',
   'guide.profPages.ench.charmsBody': 'Обереги добытчика тоже родом из Enchanting. Tinker Gizzel учит обоим в мастерской Eastbrook, как только ваше Enchanting доходит до 25: «Сумке собирателя», что добавляет единицу к сбору, и «Глазу ремесленника», что поднимает уровень того, что выходит из земли. Каждый делается один раз, а потом ставится в кирку, топор или серп, где тратит заряд только на тех сборах, которые действительно улучшил.\n\nПополнение — вот где ремесло продолжает зарабатывать. Заряды восстанавливает тот, кто владеет инструментом, а не заезжий зачарователь, и пополнение стоит вдвое меньше материалов, когда этот владелец и есть зачарователь, подписавший оберег, и ещё меньше со специализацией в Enchanting. Поэтому оберег, проданный через прилавок, — это одна разовая продажа, а дешевле всего держать в ходу те обереги, что ездят на ваших собственных инструментах. Полная лестница зарядов и материалов есть на странице любой добывающей профессии, в разделе «Эффекты инструментов».',
   'guide.profPages.ench.charmsHeading': 'Обереги для инструментов добытчика',
-  'guide.profPages.ench.enchantsNoteOffhand': 'Чары делятся на три уровня. Базовый уровень работает на пыли перезвона (с небольшим добавлением эссенции на высоком конце) и покрывает слот оружия, вторую руку и каждый слот доспеха, с достаточным выбором по осям характеристик, чтобы каждая сборка нашла что-то для каждого слота: щиты и держимые заклинателем предметы во второй руке берут собственные чары на Стойкость, так что ни один надетый слот не остаётся без чар. Высший уровень стоит один осколок перезвона плюс эссенцию: более сильные бонусы для слотов с наибольшим влиянием. Кроме того, осколки кормят ещё два стока, два рецепта оберегов по пять штук за каждый и верхнюю ступень пополнения эффектов инструментов, так что отложите несколько, прежде чем тратить.\n\nМежду ними сидят пять рунных зачарований, по одному потребителю на каждый типовой дополнительный материал, так что ничто из того, что вы дробите, не становится тупиком: Runed Edge (оружие, Сила, расходует Resonant Steel), Runed Sigil (оружие, Интеллект, Resonant Timber), Runed Weave (нагрудник, Дух, Resonant Thread), Runed Hide (поножи, Ловкость, Resonant Hide) и Runed Links (шлем, Стойкость, Resonant Links). Каждое также берёт две эссенции перезвона; там, где у слота и характеристики есть и базовые, и высшие чары, рунный бонус ложится между ними, тогда как Runed Weave — самое сильное зачарование нагрудника на Дух вообще, а Runed Hide — единственное зачарование поножей на Ловкость. Точные бонусы все в таблице ниже.',
-  'guide.profPages.faq.a10': 'Оберег — это вставляемый в гнездо эффект инструмента: работа зачарователя, что сидит в инструменте сбора и улучшает то, что он приносит. «Сумка собирателя» добавляет единицу к сбору, «Глаз ремесленника» поднимает его уровень, и обоим учит Tinker Gizzel в мастерской Eastbrook при 25 Enchanting. Заряд тратится только тогда, когда оберег действительно изменил исход, так что сбор, который он улучшить не мог, не стоит вам ничего, а гнездо можно настроить так, чтобы оно спрашивало каждый раз, если вы предпочитаете решать заряд за зарядом.\\n\\nСвежий оберег несёт 20 зарядов на обычном инструменте и ещё 10 за каждую ступень редкости выше него, так что эпический инструмент начинает с 50. Кончившиеся заряды не уничтожают оберег: владелец инструмента пополняет гнездо, по 10 зарядов за арканный материал, а материал следует за лучшим из двух, инструментом, что он несёт, и лучшим инструментом, каким это гнездо когда-либо наполняли (пыль перезвона для обычного или необычного инструмента, эссенция перезвона для редкого, осколок перезвона для эпического). Убрать хороший инструмент в банк перед пополнением не сделает его дешевле никогда, лишь меньше за ту же цену, а поставить свежий оберег, держа инструмент попроще, — это и есть путь обратно на дешёвую ступень. Зачарователь, подписавший оберег, платит за пополнение своего вдвое меньше, и ещё меньше со специализацией в Enchanting.',
+  'guide.profPages.ench.enchantsNoteInfusionLive':
+    'Чары делятся на четыре уровня. Базовый уровень работает на пыли перезвона (с небольшим добавлением эссенции на высоком конце) и покрывает слот оружия, вторую руку и каждый слот доспеха, с достаточным выбором по осям характеристик, чтобы каждая сборка нашла что-то для каждого слота: щиты и держимые заклинателем предметы во второй руке берут собственные чары на Стойкость, так что ни один надетый слот не остаётся без чар. Высший уровень стоит один осколок перезвона плюс эссенцию: более сильные бонусы для слотов с наибольшим влиянием. Кроме того, осколки кормят ещё три стока: два рецепта оберегов по пять штук за каждый, верхнюю ступень пополнения эффектов инструментов и светозарный уровень, где чары оружия и нагрудника берут по одному, а «Светозарное вливание», два, так что отложите несколько, прежде чем тратить.\n\nМежду ними сидят пять рунных зачарований, по одному потребителю на каждый типовой дополнительный материал, так что ничто из того, что вы дробите, не становится тупиком: Runed Edge (оружие, Сила, расходует Resonant Steel), Runed Sigil (оружие, Интеллект, Resonant Timber), Runed Weave (нагрудник, Дух, Resonant Thread), Runed Hide (поножи, Ловкость, Resonant Hide) и Runed Links (шлем, Стойкость, Resonant Links). Каждое также берёт две эссенции перезвона; там, где у слота и характеристики есть и базовые, и высшие чары, рунный бонус ложится между ними, тогда как Runed Weave, самое сильное зачарование нагрудника на Дух вообще, а Runed Hide, единственное зачарование поножей на Ловкость. Точные бонусы все в таблице ниже.\n\nНад всеми ними стоит светозарный уровень, венец ремесла и единственные чары, которые вообще требуют навыка: Enchanting 100 для четырёх и 125 для «Светозарного вливания», как показано в столбце «Навык» ниже. Каждое берёт светозарный реагент и поднимает на одну ступень свой собственный слот: оружие (варианты мощи и силы заклинаний), нагрудник и сапоги. Последнее из них, «Светозарное вливание», ложится только на предмет, доведённый до совершенства: доведение до совершенства, это работа самого владельца, а не зачарователя, и страница Ремесел рассказывает, как предмет его достигает.',
+  'guide.profPages.ench.enchantsNoteOffhand':
+    'Чары делятся на четыре уровня. Базовый уровень работает на пыли перезвона (с небольшим добавлением эссенции на высоком конце) и покрывает слот оружия, вторую руку и каждый слот доспеха, с достаточным выбором по осям характеристик, чтобы каждая сборка нашла что-то для каждого слота: щиты и держимые заклинателем предметы во второй руке берут собственные чары на Стойкость, так что ни один надетый слот не остаётся без чар. Высший уровень стоит один осколок перезвона плюс эссенцию: более сильные бонусы для слотов с наибольшим влиянием. Кроме того, осколки кормят ещё три стока: два рецепта оберегов по пять штук за каждый, верхнюю ступень пополнения эффектов инструментов и светозарный уровень, где чары оружия и нагрудника берут по одному, а «Светозарное вливание», два, так что отложите несколько, прежде чем тратить.\n\nМежду ними сидят пять рунных зачарований, по одному потребителю на каждый типовой дополнительный материал, так что ничто из того, что вы дробите, не становится тупиком: Runed Edge (оружие, Сила, расходует Resonant Steel), Runed Sigil (оружие, Интеллект, Resonant Timber), Runed Weave (нагрудник, Дух, Resonant Thread), Runed Hide (поножи, Ловкость, Resonant Hide) и Runed Links (шлем, Стойкость, Resonant Links). Каждое также берёт две эссенции перезвона; там, где у слота и характеристики есть и базовые, и высшие чары, рунный бонус ложится между ними, тогда как Runed Weave — самое сильное зачарование нагрудника на Дух вообще, а Runed Hide — единственное зачарование поножей на Ловкость. Точные бонусы все в таблице ниже.\n\nНад всеми ними стоит светозарный уровень, венец ремесла и единственные чары, которые вообще требуют навыка: Enchanting 100 для четырёх и 125 для «Светозарного вливания», как показано в столбце «Навык» ниже. Каждое берёт светозарный реагент и поднимает на одну ступень свой собственный слот: оружие (варианты мощи и силы заклинаний), нагрудник и сапоги. Последнее из них, «Светозарное вливание», ложится только на предмет, доведённый до совершенства, а такого предмета пока быть не может: оно написано наперёд, до той работы по доведению до совершенства, которой оно ждёт.',
+  'guide.profPages.faq.a10': 'Оберег — это вставляемый в гнездо эффект инструмента: работа зачарователя, что сидит в инструменте сбора и улучшает то, что он приносит. «Сумка собирателя» добавляет единицу к сбору, «Глаз ремесленника» поднимает его уровень, и обоим учит Tinker Gizzel в мастерской Eastbrook при 25 Enchanting. Заряд тратится только тогда, когда оберег действительно изменил исход, так что сбор, который он улучшить не мог, не стоит вам ничего, а гнездо можно настроить так, чтобы оно спрашивало каждый раз, если вы предпочитаете решать заряд за зарядом.\n\nСвежий оберег несёт 20 зарядов на обычном инструменте и ещё 10 за каждую ступень редкости выше него, так что эпический инструмент начинает с 50. Кончившиеся заряды не уничтожают оберег: владелец инструмента пополняет гнездо, по 10 зарядов за арканный материал, а материал следует за лучшим из двух, инструментом, что он несёт, и лучшим инструментом, каким это гнездо когда-либо наполняли (пыль перезвона для обычного или необычного инструмента, эссенция перезвона для редкого, осколок перезвона для эпического). Убрать хороший инструмент в банк перед пополнением не сделает его дешевле никогда, лишь меньше за ту же цену, а поставить свежий оберег, держа инструмент попроще, — это и есть путь обратно на дешёвую ступень. Зачарователь, подписавший оберег, платит за пополнение своего вдвое меньше, и ещё меньше со специализацией в Enchanting.',
   'guide.profPages.faq.a9': 'Вывесьте её на доске заказов. Откройте окно ремесла, откройте доску из его шапки и назовите рецепт, который хотите получить: оставьте заявку открытой для любого мастера или нацельте её на одного мастера, которого уже знаете. Принятие обязывает этого мастера взяться за работу, и заявку всегда держит только один человек за раз.\n\nКогда вы вывешиваете заявку, ни монеты, ни материалы не удерживаются, так что о цене и о том, кто принесёт реагенты, договаривайтесь между собой, как заказы договаривались всегда. Свою заявку можно отменить, пока она ещё открыта, а заявка, которую никто не принял, истекает через сутки. Доставка личная: встаньте рядом со своим мастером со свободной ячейкой в сумке, когда вещь будет готова. Она придёт привязанной к вам Узами мастера, а любой мастер у станка снимет привязку за обычную плату.',
+  'guide.profPages.faq.q11': 'Как создать оранжевый предмет?',
+  'guide.profPages.faq.a11Promotion':
+    'Создайте или купите предмет вершины Ковки мастера, затем доведите его до совершенства: с навыком 125 в ремесле, которое его создало, каждая попытка тратит один Уголёк мастера, одну Расколотую эссенцию и одну Оправу из призменного стекла, удаётся четыре раза из пяти и при промахе никогда не вредит предмету. Первая попытка привязывает предмет к вам, а четыре успешных ранга делают его доведённым до совершенства. Затем потратьте одну Грамоту созидания (грамоту начертателя за навык 125, купить или заказать её может кто угодно), чтобы возвести совершенную копию в легендарный предмет с любым именем на ваш выбор. Возведение детерминировано: без броска, характеристики не меняются, меняются только имя и цвет.',
   'guide.profPages.faq.q10': 'Что такое оберег и что будет, когда он кончится?',
   'guide.profPages.faq.q9': 'Как заказать, чтобы что-то изготовили для меня?',
   'guide.profPages.findingNodesNote': 'Искать их глазами не обязательно. Каждый узел зоны нарисован на карте зоны везде, где карта показывает эту землю, и на миникарте, когда вы проходите мимо, так что маршрут для сбора можно проложить по карте ещё до выхода. Узел, который вашим инструментам пока не по зубам, помечен, а не спрятан: он остаётся на своём месте перечёркнутой тусклой меткой, так что видно, к какой земле вы движетесь. На настольной версии наведение на жилу, посадку или грядку в мире называет её, говорит, какой инструмент ей нужен, а после того, как вы её отработали, отсчитывает ваше личное возрождение до секунды. На сенсорном экране наводить нечего, поэтому ту же историю рассказывают метки на миникарте.',
-  'guide.profPages.specimenBodyFamilies': 'Оставляйте немного места в сумке, когда фармите: именной подарок удачи требует собственного места или подходящей именной стопки, куда он ляжет, а если не подойдёт ничто, добыча всё равно придёт, но подпись потеряется. У разделки туш тоже есть своё джекпот-плечо: примерно {pct}% каждого собранного компонента выходит редким или выше. Семейство, у которого есть безупречный образец (шкура, шёлк, яд, коготь, мясо), оставляет свою обычную добычу простой и чеканит именной образец рядом с ней; остальные три, клык, ткань и бивень, подписывают саму добычу.',
+  'guide.profPages.specimenBodyFamilies': 'Оставляйте немного места в сумке, когда фармите: именной подарок удачи требует собственного места или подходящей именной стопки, куда он ляжет, а если не подойдёт ничто, добыча всё равно придёт, но подпись потеряется. У разделки туш тоже есть своё джекпот-плечо: примерно {pct}% каждого собранного компонента выходит редким или выше. Семейство, у которого есть безупречный образец (шкура, шёлк, яд, коготь, мясо), оставляет свою обычную добычу простой и чеканит именной образец рядом с ней; остальные пять, клык, ткань, бивень, рог и жабры, подписывают саму добычу.',
   'guide.professions.focusBodyTiers': 'В каждом узловом городе для заезжих добытчиков есть панель «Фокус города»: стоя в городе, откройте её рядом с миникартой и распределите запас из 10 очков фокуса по тем видам компонентов, что вам важны. Каждые 5 очков на компоненте поднимают его уровень сбора на одну ступень (не более двух ступеней), а каждое очко добавляет 10 процентов к его выходу; компонентам без фокуса хуже не становится никогда.\n\nВаше распределение следует за персонажем повсюду, и перенаправить его можно при любом следующем визите в город, в том темпе, какой выберете вы. Не торопиться бесплатно: перенаправление идёт 1 минуту за каждое перемещённое очко. Небольшая плата ускоряет его до 15 секунд за очко плюс 5 медных и 1 пыль перезвона за очко, а полная оплата делает его мгновенным за 25 медных и 5 пыли перезвона за очко. Считаются только те очки, что вы действительно переместили, так что сдвинуть одно очко дёшево, а панель, которую открыли и закрыли без изменений, не стоит ничего ни на одном уровне оплаты.',
-  'guide.professions.harvestBodyFamilies': 'Сбор не кончается на узлах. Со многих убитых зверей можно один раз собрать, и кто успел первым, того и добыча: шкуры, клыки, когти, бивни, шёлк, яд, ткань и мясо, прямо с трупа, рядом с его обычной добычей; одно нажатие открывает и то и другое. Если зверь несёт больше одного пригодного компонента, выбор за вами: забрать всё, что он способен дать, или сосредоточиться на меньшем числе компонентов и взять то, что берёте, заметно более высокого уровня.\n\nРедкий или лучший результат сбора у семейства, дающего образцы, сверх обычного выхода приносит ещё и именной безупречный образец (Безупречную шкуру, Безупречный паучий шелк, Безупречную ядовитую железу, Безупречный коготь или Отборную вырезку) и записывает «Безупречный трофей» в вашу Книгу деяний. Собирать может любой персонаж, без всякого обучения, а любой имеющийся у вас инструмент сбора идёт в зачёт улучшенного броска, к какому бы ремеслу он ни принадлежал.',
-  'guide.professions.toolEffectsBody': 'У инструмента сбора есть гнездо, и в это гнездо ставится оберег зачарователя. «Сумка собирателя» добавляет единицу к тому, что даёт сбор; «Глаз ремесленника» поднимает уровень того, что удаётся поднять из земли. Tinker Gizzel, Master of the Toolworks в Eastbrook, учит обоим зачарователей, добравшихся до 25 навыка в ремесле, и оба делаются в его мастерской.\\n\\nСвежепоставленный оберег несёт 20 зарядов на обычном инструменте и ещё 10 за каждую ступень редкости выше обычной, так что тот же оберег в эпической кирке начинает с 50. Заряд тратится только тогда, когда оберег действительно изменил исход, и никогда на сборе, который он не улучшил, а гнездо можно настроить так, чтобы оно спрашивало каждый раз, и тогда оберег ждёт, пока вы не скажете «Потратить заряд». Установка свежего оберега заново чеканит гнездо вокруг того инструмента, что вы держите в этот миг, поэтому оно наполняется до того, что вмещает именно этот инструмент, а не возвращается к какой-то прежней высокой отметке, а переустановка, которая вообще ничего бы не изменила, отклоняется, вместо того чтобы съесть оберег.\\n\\nКончившиеся заряды не уничтожают оберег: владелец инструмента пополняет гнездо, по 10 зарядов за каждый потраченный арканный материал, а какой именно материал оно попросит, следует за лучшим из двух, инструментом, что вы несёте, и лучшим инструментом, каким это гнездо когда-либо наполняли: пыль перезвона для обычного или необычного инструмента, эссенция перезвона для редкого и осколок перезвона для эпического. Оставленный в банке хороший инструмент не купит вам пополнение дешевле, только меньшее по объёму за ту же цену; честный путь вниз, на дешёвую ступень, — поставить свежий оберег, держа в руках инструмент попроще, что перечеканит гнездо там же. Если потолок гнезда сидит выше того, что способен наполнить ваш нынешний инструмент, пополнение остановится там, где кончается этот инструмент, и попросит вас взять с собой тот, что получше. Пополнение стоит вдвое меньше материалов, если вы тот самый зачарователь, что подписал оберег, и ещё меньше, если вы специализируетесь на Enchanting; все остальные платят полную цену. Пополнение — это короткое чтение, как и всё прочее в этом ремесле.',
+  'guide.professions.endgameHeading': 'Финальная цепочка Ковки мастера',
+  'guide.professions.endgameBody':
+    'Над лестницей наставника каждого ремесла стоит одна общая вершина: семейство Ковки мастера, крафтовые вещи с золотой меткой «Уникальный (экипируется): Ковка мастера», которую описывает страница «Снаряжение и предметы». Какое бы ремесло ни поднималось, цепь одна и та же: схемы вершины находят, а не учат, ограниченные раз в день промежуточные крафты задают темп работы, и три общих материала питают каждую лестницу. Готовые вещи торгуются так же свободно, как любая другая крафтовая работа (правила торговли на странице «Экономика ремесел»), а предел ношения в две вещи оставляет их акцентом сборки, а не целым комплектом, так что мастер, не ступавший в глубочайший финал, всё равно продаёт тем, кто там живёт.',
+  'guide.professions.endgamePatternsBody':
+    'Схемы приходят тремя путями, и таблица рецептов на каждой странице ремесла помечает путь каждой строки: находка в глубочайших финальных победах, покупка у героического интенданта за Героические знаки, либо и то и другое сразу. Раздел проведён намеренно. Схемы снаряжения только находят и никогда не продают, схемы расходников стоят на прилавке интенданта с первого дня, а схемы земледелия идут обеими дорогами. Сами схемы, к тому же, обычный товар: находка, которая вам не нужна, это находка, которую можно продать.',
+  'guide.professions.endgameMaterialsBody':
+    'Всю цепь питают три общих материала. Ядро драконопада, свободно продаваемый катализатор: каждая зачтённая финальная победа глубочайшего финала платит зачтённому персонажу от 1 до 3 ядер, раз в день с каждого источника; высшие прохождения разломов платят свой фиксированный счёт по тем же дневным часам, а героический интендант продаёт одно ядро за 12 Героических знаков как страховку от невезения. Ядра торгуются свободно. Расколотая эссенция персональна, и раскалывание, её единственный источник: расколоть может любой персонаж, без всякой профессии, и чтение раскалывает один добытый в рейде эпический предмет этого яруса ровно в одну эссенцию, ценой служит сам предмет. Уголёк мастера тоже персонален, и он задаёт цепи ход времени: один в неделю на персонажа, выдаётся за первое подходящее финальное прохождение недели, а пропущенная неделя не пропадает: угольки копятся и выплачиваются при следующем прохождении.',
+  'guide.professions.endgameMaterialsBodyAnyRaid':
+    'Всю цепь питают три общих материала. Ядро драконопада, свободно продаваемый катализатор: каждая зачтённая финальная победа глубочайшего финала платит зачтённому персонажу от 1 до 3 ядер, раз в день с каждого источника; высшие прохождения разломов платят свой фиксированный счёт по тем же дневным часам, а героический интендант продаёт одно ядро за 12 Героических знаков как страховку от невезения. Ядра торгуются свободно. Расколотая эссенция персональна, и раскалывание, её единственный источник: расколоть может любой персонаж, без всякой профессии, и чтение раскалывает один добытый в рейде эпический предмет снаряжения, из любого рейда и любой сложности, ровно в одну эссенцию, ценой служит сам предмет. Уголёк мастера тоже персонален, и он задаёт цепи ход времени: один в неделю на персонажа, выдаётся за первое подходящее финальное прохождение недели, а пропущенная неделя не пропадает: угольки копятся и выплачиваются при следующем прохождении.',
+  'guide.professions.perfectingHeading': 'Доведение до совершенства и оранжевое возведение',
+  'guide.professions.perfectingBody':
+    'Готовый предмет вершины, это ещё не конец его истории. Владелец с навыком 125 в ремесле, которое его создало, может провести предмет по четырём рангам доведения до совершенства. Каждая попытка тратит один Уголёк мастера, одну Расколотую эссенцию и одну Оправу из призменного стекла и удаётся четыре раза из пяти; промах стоит только материалов и ничего больше, предмет никогда не страдает и не откатывается. Первая же попытка привязывает предмет к тому, кто его совершенствует, так что копию на продажу продают до начала работы. Доведённый до совершенства предмет несёт бонус к характеристикам сверх базы, и именно его ждёт «Светозарное вливание»: единственные чары, помеченные на странице Наложения чар «Только на доведённых до совершенства», не ложатся ни на что меньшее.',
+  'guide.professions.promotionBody':
+    'Последний шаг, оранжевое возведение, и в нём весь смысл Грамоты созидания. Принесите доведённый до совершенства предмет и одну Грамоту созидания (грамоту начертателя за навык 125), и копия возводится в легендарный предмет с именем по вашему выбору. Никакого броска здесь нет: возведение детерминировано, характеристики не меняются вовсе, меняются лишь имя и цвет. Сама грамота продаётся, так что писец и владелец не обязаны быть одним человеком, а добавленная строка семейного предела действует и здесь: из двух носимых предметов Ковки мастера легендарным одновременно может быть не более одного.',
+  'guide.professions.harvestBodyFamilies': 'Сбор не кончается на узлах. Со многих убитых зверей можно один раз собрать, и кто успел первым, того и добыча: шкуры, клыки, когти, бивни, рога, жабры, шёлк, яд, ткань и мясо, прямо с трупа, рядом с его обычной добычей; одно нажатие открывает и то и другое. Если зверь несёт больше одного пригодного компонента, выбор за вами: забрать всё, что он способен дать, или сосредоточиться на меньшем числе компонентов и взять то, что берёте, заметно более высокого уровня.\n\nРедкий или лучший результат сбора у семейства, дающего образцы, сверх обычного выхода приносит ещё и именной безупречный образец (Безупречную шкуру, Безупречный паучий шелк, Безупречную ядовитую железу, Безупречный коготь или Отборную вырезку) и записывает «Безупречный трофей» в вашу Книгу деяний. Собирать может любой персонаж, без всякого обучения, а любой имеющийся у вас инструмент сбора идёт в зачёт улучшенного броска, к какому бы ремеслу он ни принадлежал.',
+  'guide.professions.toolEffectsBody': 'У инструмента сбора есть гнездо, и в это гнездо ставится изготовленный оберег. «Сумка собирателя» добавляет единицу к тому, что даёт сбор; «Глаз ремесленника» поднимает уровень того, что удаётся поднять из земли; «Оберег мастера» тем же способом добавляет две единицы. Первые два — работа зачарователей: Tinker Gizzel, Master of the Toolworks в Eastbrook, учит им зачарователей, добравшихся до 25 навыка в ремесле. «Оберег мастера» — работа инженерная: его чертёж выпадает из добычи, а делается он при 100 навыка. Все три делаются в его мастерской.\n\nСвежепоставленный оберег несёт 20 зарядов на обычном инструменте и ещё 10 за каждую ступень редкости выше обычной, так что тот же оберег в эпической кирке начинает с 50. Заряд тратится только тогда, когда оберег действительно изменил исход, и никогда на сборе, который он не улучшил, а гнездо можно настроить так, чтобы оно спрашивало каждый раз, и тогда оберег ждёт, пока вы не скажете «Потратить заряд». Установка свежего оберега заново чеканит гнездо вокруг того инструмента, что вы держите в этот миг, поэтому оно наполняется до того, что вмещает именно этот инструмент, а не возвращается к какой-то прежней высокой отметке, а переустановка, которая вообще ничего бы не изменила, отклоняется, вместо того чтобы съесть оберег.\n\nКончившиеся заряды не уничтожают оберег: владелец инструмента пополняет гнездо, по 10 зарядов за каждый потраченный арканный материал, а какой именно материал оно попросит, следует за лучшим из двух, инструментом, что вы несёте, и лучшим инструментом, каким это гнездо когда-либо наполняли: пыль перезвона для обычного или необычного инструмента, эссенция перезвона для редкого и осколок перезвона для эпического. Оставленный в банке хороший инструмент не купит вам пополнение дешевле, только меньшее по объёму за ту же цену; честный путь вниз, на дешёвую ступень, — поставить свежий оберег, держа в руках инструмент попроще, что перечеканит гнездо там же. Если потолок гнезда сидит выше того, что способен наполнить ваш нынешний инструмент, пополнение остановится там, где кончается этот инструмент, и попросит вас взять с собой тот, что получше. Пополнение стоит вдвое меньше материалов, если вы тот самый мастер, что подписал оберег, и ещё меньше, если вы специализируетесь на ремесле самого оберега: Enchanting для «Сумки собирателя» и «Глаза ремесленника», Engineering для «Оберега мастера»; все остальные платят полную цену. Пополнение — это короткое чтение, как и всё прочее в этом ремесле.',
   'guide.professions.toolEffectsHeading': 'Эффекты инструментов',
   'guide.progression.ridingTitle': 'Учимся ездить верхом',
   'guide.questsPage.availableBody': 'Задания идут цепочками. Большинство предлагают, только когда вы сдали предыдущее, а многие просят ещё и минимальный уровень, так что NPC, у которого сегодня для вас ничего нет, может оказаться щедрым через пару уровней или когда вы закроете задание, что уже несёте. У некоторых есть собственное условие, как у уроков верховой езды, которые открываются лишь после того, как вы купили навык верховой езды. Групповые задания говорят об этом прямо, указывая, сколько игроков советуют взять с собой. Часть работы повторяема: её можно взять снова после ожидания, а значок над тем, кто её даёт, подскажет, когда она вернулась.',
@@ -13895,7 +14391,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.errors.notEnoughDevotion': 'Недостаточно Преданности!',
   'hud.pet.abyssalChain': 'Цепь бездны',
   'hud.pet.abyssalChainDesc':
-    'Приказывает Мрачной тени притянуть к себе обычного противника, находящегося дальше 8 и не далее 20 м. Боссов притянуть нельзя. Восстановление: 15 сек. Щёлкните правой кнопкой, удерживайте касание или нажмите Shift+Enter, чтобы переключить автоприменение.',
+    'Приказывает Сумрачной мгле притянуть к себе обычного противника, находящегося дальше 8 и не далее 20 м. Боссов притянуть нельзя. Восстановление: 15 сек. Щёлкните правой кнопкой, удерживайте касание или нажмите Shift+Enter, чтобы переключить автоприменение.',
   'hud.pet.abyssalChainTitle': 'Цепь бездны',
   'hud.pet.autocastOff':
     'Автоприменение выключено. Щёлкните правой кнопкой, удерживайте касание или нажмите Shift+Enter, чтобы включить его.',
@@ -14179,19 +14675,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.report.status.critical': 'критично',
   'hudChrome.perf.diagnostics.report.status.needsAttention': 'требует внимания',
   // The Proving Shore (tutorial island) + the spawn greeting dialog.
-  'hudChrome.tutorialGreeting.bodyFirst':
-    'Раньше я тебя здесь не видела, друг. В этих краях есть традиция: те, кто начинает свой путь, посещают Берег Испытаний, тихий остров за проливом. Там можно отточить навыки и освоиться в мире, прежде чем принимать его вызовы. Паром ходит в обе стороны, и никто не подумает о тебе хуже, как бы ты ни решил.',
-  'hudChrome.tutorialGreeting.bodyRefresher':
-    'Снова здесь, и с новым лицом? Значит, порядок ты знаешь. Но если перед дорогой хочется освежить память, Берег Испытаний никогда не отказывает вернувшимся ученикам, а паром готов, когда готов ты.',
-  'hudChrome.tutorialGreeting.play': 'Пройти обучение',
-  'hudChrome.tutorialGreeting.declineNote':
-    'Как пожелаешь, друг. Передумаешь - паромный колокол у почтового столба Вранопочты в любой час, днем и ночью, перезвонит тебя на Берег Испытаний. Волки ждать не станут, а он подождет.',
   'hudChrome.tutorialGreeting.bellHomeNote':
     'Уже вернулся с берега? Это был паромный колокол. Его близнец висит вон там, у почтового столба Вранопочты: позвони в любой момент, и переправа отнесет тебя обратно на Берег Испытаний. А если позвонил по ошибке - ничего страшного.',
   'hudChrome.tutorialGreeting.islandArrivalNote':
     'Только с переправы? Добро пожаловать на Берег Испытаний. Страж Там держит Полосу на берегу прямо перед тобой: подойди к нему вплотную, пока не покажется его имя, затем нажми F или щелкни по нему левой кнопкой мыши, и его дорожки научат твои ноги всему, что им нужно. А когда соберешься уходить, позвони в колокол, что стоит рядом с моим причалом, и переправа отвезет тебя домой, в Истврук.',
   'hudChrome.tutorialGreeting.noteClose': 'Понятно',
-  'hudChrome.tutorialGreeting.skip': 'Пропустить обучение',
   'hudChrome.bootcamp.title': 'Первые шаги',
   'hudChrome.bootcamp.talkTitle': 'Поговори со Стражем Тамом',
   'hudChrome.bootcamp.talkBody':
@@ -14604,6 +15092,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.ignivar_inner_crucible.name': 'Внутреннее Горнило',
   'entities.dungeons.ignivar_inner_crucible.enterText': 'Открытые врата ведут глубже в горнило.',
   'entities.dungeons.ignivar_inner_crucible.leaveText': 'Вы покидаете безмолвные глубины горнила.',
+  'guide.profPages.ench.perfectedOnly': 'Только на доведённых до совершенства',
   'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
   'hudChrome.mobile.barEditorAria': 'Изменить раскладку панели действий',
   'hudChrome.barEditor.title': 'Редактор панели действий',
@@ -14620,6 +15109,52 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.barEditor.clearAria': 'Очистить ячейку',
   'hudChrome.barEditor.clearArmed': 'Нажмите на ячейку, чтобы очистить её.',
   'hudChrome.spellbook.assignAria': 'Выберите ячейку для {name}',
+  'guide.professions.curveBodyRetunedFishing':
+    'Рост навыка везде подчиняется одному правилу — Кривой мастерства из четырех состояний. Каждые {step} очков навыка дают одну ступень: рецепт на вашей ступени или выше дает полный рост, а по мере того как рецепт опускается ниже вас, рост падает вдвое, вчетверо и затем прекращается.\n\nОкно ремесла рисует это прямо в списке рецептов классическими цветами: оранжевый — полный рост, желтый — уменьшенный, зеленый — тонкая струйка, серый — ничего. Рост детерминирован, это никогда не бросок на повышение навыка, поэтому одно и то же изделие на одной и той же ступени всегда двигает навык ровно на одну и ту же величину, а пожелтевший рецепт — знак, что пора учить следующую ступень.\n\nСбор идет по той же кривой с тем же шагом ступени, только оценивается по залежи, а не по рецепту: легкие залежи сереют, когда вы их перерастаете, а добить подъем помогают богатые залежи поздних зон. У рыбной ловли своя шкала: 0,08 очка за улов ниже 50 мастерства, 0,05 до 100, 0,04 до 150 и 0,03 до 200, причем хлам с 100 и дальше не учит ничему.',
+  'guide.profPages.toolsNoteFishingPageMarks':
+    'Для каждой залежи нужен инструмент её ремесла в сумках, включая 1-й уровень: нет кирки, нет руды, нет удочки, нет рыбы. Торговая лестница охватывает уровни с 1-го по 3-й в трёх узлах центральных земель: инструмент 1-го уровня продаётся во всех трёх, ступени выше — там, где начинается земля, которой они нужны (Fenbridge добавляет 2-й уровень, Highwatch — 3-й), а молодые поселения за ними не держат инструментов вовсе, так что снаряжайтесь до дороги. Земледелие закупается в другом месте: его мотыга 1-го уровня лежит у земледелицы, которая держит первый надел (она стоит у наделов Eastbrook, а не у какой-либо стойки с инструментами), и ни одна ступень мотыги выше неё нигде не продаётся за монету. Каждая стойка свободно продаёт любую ступень, что у неё есть, и любой инструмент передаётся прямым обменом; каждая ступень к тому же выставляется на Рынке и ходит почтой, кроме четырёх наземных начальных инструментов за 20 меди (Copper Mining Pick, Handaxe, Gathering Sickle и Garden Hoe): их берут у стойки или передают из рук в руки и никогда не сдают обратно, не шлют почтой и не выставляют. Ограничение стоит на владении. Наземный инструмент выше 1-го уровня работает лишь тогда, когда мастерство в его собственном ремесле это заслужило: {tier2Prof} для 2-го уровня, {tier3Prof} для 3-го, 85 для 4-го и 100 для 5-го, и строка торговца, подсказка и таблица ниже называют это требование сразу. До того купленный заранее инструмент просто ждёт в сумках, не открывая земли, не покупая скорости и не давая отборных сортов, а берётся в руки в тот миг, когда ваш счётчик касается его числа. Удочки — единственное исключение: ни одна удочка не несёт требования владения, и Trader Wilkes в Eastbrook нарочно держит удочки 2-го и 3-го уровня для рыбаков, покупающих наперёд. Инструмент никогда не занимает ячейку экипировки и никогда не изнашивается, так что каждый покупается один раз, а на ограничение влияет только уровень: более редкий инструмент того же уровня не открывает ничего сверх того. Но редкость не только цвет. Она продлевает вставленный эффект инструмента, а на удочке расширяет окно подсечки.\n\nХороший инструмент даёт три вещи, а не две. Он открывает землю более высокого уровня, сокращает сбор и улучшает то, что выходит: обработайте жилу инструментом рангом ВЫШЕ собственного материала зоны, и добыча даст отборный сорт вместо обычного. Жила должна быть одной из полносортных жил зоны, поэтому лёгкие жилы, которые зона хранит для странников, по-прежнему дают обычный материал. Отборные материалы — это то, что потребляют рецепты кованых инструментов, и отборный сорт считается своей обычной версией всюду, где рецепт или наряд просит обычную, так что улучшение никогда не заводит в тупик: ваша медная руда просто приходит как Fine Copper Ore.\n\nВыше торговой лестницы у каждого из трёх ремёсел залежей есть два кованых инструмента, 4-го и 5-го уровня, сделанные в мастерской инструментов (эти два рецепта знает каждый персонаж, а для работы растёт навык инженерного дела) или купленные за метки вылазок у стойки Утонувшей Литании, когда выполнены её пороги зачисток: таблица ниже несёт цену в метках и зачистки, которых просит каждая ступень. Ни один торговец не продаёт их за монету. У земледелия лестница самая длинная: каждая мотыга выше начальной за 20 меди кованая, со 2-го по 5-й уровень, всем четырём учит мастер инструментов, а не известны они с самого начала, и две верхние ступени к тому же лежат у той же стойки за метки. У рыбалки своих три, и им тоже учатся, а не знают с самого начала: мастер инструментов учит Stormreel 4-го уровня и Tidewrought 5-го, а Clockreel 6-го уровня собирают вместо этого по чертежу; Stormreel и Tidewrought к тому же лежат у той же стойки за метки, за теми же порогами зачисток, что и инструменты залежей их уровня, и таблица инструментов на странице рыбалки несёт их цены в метках. Удочки — единственная лестница, чьи верхние ступени покупают на воде ДОСТУП: каждая из трёх открывает полосу улова, до которой одному мастерству никогда не дотянуться, так что лучшая удочка — не удобство. У трёх ремёсел залежей сегодня ни одна залежь не требует больше 3-го уровня, поэтому их инструменты 4-го и 5-го уровня по-прежнему покупают скорость и сорт, а не доступ, и они станут входным билетом, когда появится земля более высокого уровня. Земледелие стоит между ними: мотыга нужна для посадки, так что грядка уровня N просит мотыгу уровня N вплоть до четвёртой, последней ступени культур, и лишь пятая ступень не открывает новой земли.',
+  'guide.profPages.bandsBodySplitLadder':
+    'Разряды мастерства — это общая лестница 0/100/200 над счетчиком наземного ремесла: разряд, взятый на 100, укорачивает сбор, а наземный предел делает разряд 1 потолком. У рыбной ловли своя лестница: шесть ступеней на 0, 100, 150 и еще три на 200. Ее полосы не укорачивают ничего, они выбирают таблицы улова, и к каждой нужна своя удочка, а после третьей ступени порог навыка сдвигается еще один раз, до предела в 200, и только там замирает: начиная с предела, до какой строки дойдет таблица, решает одна удочка. Подъем — это то, что тянет рыбака к воде поглубже, где живут и лучшие таблицы, и дальнейшие уроки.',
+  'guide.profPages.fish.startBodyThreeRods':
+    'Simple Fishing Pole стоит 20 меди у Fisherman Brandt в Eastbrook (ищите Old Salt, что зыркает на Mirror Lake с восточной окраины города); Tinker Gizzel, Provisioner Hale в Fenbridge и Quartermaster Bree в Highwatch тоже держат удочки. Используйте удочку лицом к воде, достаточно глубокой, чтобы держать рыбу, примерно до 24 ярдов перед вами, и ваш поплавок улетает.\n\nНельзя забрасывать в бою, вплавь или мертвым: заброс с берега, это задуманная поза. Но вода становится суровее вместе с землей: болото просит хотя бы Ironreel 2-го уровня, а пики — Silverstream 3-го, и леска, заброшенная без той удочки, которую берет эта вода, так и не покидает руки. Выше них стоят три удочки: Stormreel, Tidewrought и Clockreel. Все три инженеры куют в мастерской инструментов из того, что вытягивает леска, а стойка вылазок Утонувшей литании продает первые две за метки вылазок за своими порогами зачисток, но никогда не за монету. Ни одна вода их не требует, но это не одно удобство: каждая открывает полосу улова, до которой одному мастерству не дотянуться, так что, когда ваш счетчик уперся в предел, только удочка и решает, до какой глубины доходит ваша таблица. Вдобавок они укорачивают ожидание и расширяют окно подсечки, что на верхней ступени означает поклевку ровно через три секунды.',
+  'guide.profPages.fish.scheduleNoteRetuned':
+    'Рост в рыбной ловле идет по жесткой шкале, без костей: 0,08 очка за улов ниже 50 мастерства, 0,05 ниже 100, 0,04 ниже 150 и 0,03 от 150 до 200. Кривая нарочно пологая, а не сдвинутая к концу: весь подъем до 200 — это около одиннадцати часов деятельной рыбалки, и ни одна его четверть не стоит больше трети всего пути, так что последние пятьдесят очков — долгий отрезок, а не вся дорога.\n\nХлам с {cutoff} и дальше не учит ничему совсем: с этого места водоросли и сапоги — просто водоросли и сапоги. Сама вода тоже ставит уроку предел: воды 1-го уровня в Vale (и любой молодой берег за пределами центральных земель) не учат ничему после 100, воды болота останавливаются на 150, и только воды Thornpeak доводят рыбака до самых 200. В остальном каждый вытащенный улов дает рост по расписанию, так что, когда счетчик встал, шкала говорит вам искать воду поглубже.',
+  'guide.profPages.fish.tablesNoteSixBands':
+    'Ваше мастерство выбирает одну из шести полос улова: полоса 0 с самого начала, полоса 1 на 100, полоса 2 на 150, а три верхние — все на 200, и каждая перекладывает вес из хлама и пустых крючков в настоящую рыбу, зона за зоной. Каждая полоса выше первой требует еще и удочку, всякий раз на уровень выше: полосе 1 нужен Ironreel 2-го уровня, полосе 2 — Silverstream 3-го, полосе 3 — Stormreel 4-го, полосе 4 — Tidewrought 5-го, а полосе 5 — Clockreel 6-го. Полоса 2 открывается на 150, а последние три ждут предела в 200, так что порог навыка двигается еще раз и на этом встает: с предела и дальше поднять вашу таблицу может только удочка, ради чего кованые удочки и существуют и где живут три глубоководных улова. Ваша действующая полоса — меньшее из того, что заслужил навык, и того, что держит удочка, и предел этот молчалив: с удочкой попроще вы все равно ловите, просто по таблице нижней полосы, так что если улов словно застрял, пока навык растет, сначала проверьте удочку.\n\nВ водах каждой зоны своя пара кулинарных уловов, и чем глубже зона, тем выше уровень рыбы; все они кухонные реагенты и ничего не восстанавливают, пока их не приготовят. С полосы 3 и выше к таблице каждой зоны с тем же весом добавляются еще три, так что рецепт, называющий одну из них, просит от рыбака одного и того же, где бы тот ни ловил. Остальная часть таблицы — рыбацкий налог: водоросли, изредка сапог и пустой крючок, который никогда не исчезает совсем. Сколько вы заплатите, зависит от воды, куда упал поплавок, а не от того, где стоите вы: заброс достает до 24 ярдов, и удочка, которой требует вода, таблица, из которой она тянет, деяние, которое она засчитывает, и то, докуда она учит, — все отвечает зоне, которой эта вода принадлежит, и решается в тот миг, когда ложится леска. Вода каждой зоны написана под свою полосу: Vale под полосу 0, болото под полосу 1, пики под полосу 2, и ловля на полосу ниже нужной превращает примерно треть забросов в пустые крючки, а на две полосы ниже — больше половины. Удочка доводит вас до воды, а платит за нее навык, и подъем — это то, что тянет рыбака глубже, потому что лучшие полосы не просто лучше платят: за пределами Vale только эти воды и продолжают учить. Единственная строка, которая отвечает вашей полосе улова и больше ничему, это {rare}: одинаковые шансы в каждой зоне и вшестеро выше на полосе 2, чем на полосе 0, так что самое редкое, что есть на причале, — это то, в чем Мастер-рыбак и вправду лучше.',
+  'guide.profPages.fish.koiBodyBandFlat':
+    'Каждый водоем в игре прячет один и тот же приз: Кои солнечного блика, необычный проблеск на леске стоимостью 75 меди для торговца и куда больше для вашей гордости. Его шансы отвечают вашей полосе улова и больше ничему и одинаковы в каждой зоне: 1 процент в таблице улова на полосе 0, 3 на полосе 1 и 6 с полосы 2 и выше, и бросок делается на каждый вытащенный заброс, так что кои приходит к тому рыбаку, кто заслужил глубокие таблицы. Поимка одного записывает Glimmer of Hope в вашу Книгу деяний, коллекционную отметку с нулевой Известностью. Когда это случается, журнал позаботится, чтобы вы узнали.',
+  'guide.profPages.faq.a6ThreeRods':
+    'Девять общих полевых рецептов и шесть рецептов изготавливаемых наземных инструментов известны каждому с самого начала, как и три привязанных к станции высших рецепта (Мантия печной чешуи, Капюшон Стражеткани и Обмотки Сумеречной шкуры): им не нужен наставник, нужна только их станция. Всему остальному учат мастера при своих станциях в трёх узловых городах: большинство находится в Истбруке, кожевник держит дубильню в Фенбридже, а алхимик держит аптеку в Хайвотче.\n\nРецепты наставников идут ступенями: 0, 25 и 50 навыка для ремёсел снаряжения и расходников, и стоят они единовременно бесплатно, 25 серебра и 1 золото, и каждое ремесло добавляет над ними одну промежуточную ступень на 75 у своей станции (у Enchanting это «Светозарный реагент», рядом с двумя рецептами оберегов на ступени 25); мастер инструментов вдобавок учит двум из трёх изготавливаемых удочек на 75 и 125 за 4 и 16 золота (вершинная ступень изучается вместо этого по чертежу, так что ни один наставник не называет за неё платы). Мастер обучает рецепту, как только ваш разряд в этом ремесле достигает разряда самого рецепта, и учиться нужно стоя у его станции: передвижная станция не считается.',
+  'guide.profPages.faq.a7RetunedTaper':
+    'Заброс сбора начинается с 2,5 секунды и срезается двумя путями: 0,4 секунды за каждый уровень инструмента выше уровня самой залежи, который вы несёте и которым можете владеть, и 0,15 секунды, как только счётчик вашего ремесла пересекает полосу 100, при поле в 1,5 секунды. Перейдите с залежей 1-го уровня на залежи 3-го, и ваш излишек исчезает, так что та же кирка машет снова медленнее. Ровно требуемый уровень не покупает скорости; он лишь открывает залежь.\n\nРост навыка гаснет так же, как в ремесле: залежь сереет по мере того, как ваше мастерство поднимается выше её уровня (залежи 1-го уровня с 75 мастерства и дальше не учат ничему), так что ответ на медленный рост — залежи выше уровнем. Для них нужен инструмент не ниже их уровня в сумках (ни одна залежь никогда не берётся голыми руками, включая 1-й уровень), а наземному инструменту выше 1-го уровня нужно ещё и требование владения: 40/70/85/100 в его собственном ремесле для уровней со 2-го по 5-й. У рыбной ловли своя шкала: 0,08 очка за улов ниже 50 мастерства, 0,05 до 100, 0,04 до 150 и 0,03 до 200, причём хлам с 100 и дальше не учит ничему, а сама вода ставит предел уроку (воды 1-го уровня перестают учить на 100, болото — на 150), так что застывший счётчик может значить и то, что вы переросли воду.',
+  'guide.profPages.faq.q3':
+    'Чем разделка туши отличается от обычной добычи?',
+  'guide.profPages.faq.q4':
+    'Почему моё бревно железнокорого дерева подписано?',
+  'guide.profPages.faq.q5':
+    'Как снять привязку с заказной вещи и сколько это стоит?',
+  'guide.profPages.faq.q6':
+    'Где учат рецептам и сколько они стоят?',
+  'guide.profPages.faq.q7':
+    'Почему сбор вдруг стал медленнее?',
+  'guide.profPages.faq.q8':
+    'Можно ли изготавливать вещи вдали от города?',
+  'guide.profPages.faq.a3':
+    'Одно нажатие покрывает и то, и другое. Всё, что держит туша, монеты и выпавшие вещи вместе с компонентами для разделки, открывается в одном окне: добыча подчиняется обычным правилам добычи, а разделка — это сторона ремёсел, снятие материалов с самой туши.\n\nРазделка идёт по правилу «кто первый»: каждая туша разделывается ровно один раз, тем, кто заявит её первым, и в онлайне тоже. Что вам достанется, задаёт «Фокус города»: стоя в узловом городе, вы распределяете 10 очков фокуса по тем видам компонентов, что вам важны, и каждый компонент под фокусом выпадает уровнем выше (каждые 5 очков поднимают его на ступень, но не более чем на две ступени) и приносит больше (10 процентов за очко). Компонентам без фокуса хуже не становится никогда.',
+  'guide.profPages.faq.a4':
+    'Вам повезло. Примерно один сбор из 90 оборачивается редкой находкой (древняя сердцевина на дереве, нетронутая жила в руде, лунный цветок среди трав): добыча умножается впятеро, каждая единица подписывается вашим именем, и о находке узнаёт вся зона. Обычный сбор с броском редкого качества или выше тоже подписывает добычу.\n\nПодписанные материалы стоит беречь или продавать дорого: любая подписанная копия нужного реагента у станка добавляет 2 процентных пункта к шансу шедевра. Помните только, что они складываются в стопку лишь с одинаково подписанными копиями, поэтому занимают собственную ячейку сумки.',
+  'guide.profPages.faq.a5':
+    'Подойдите с вещью в сумках к любому ремесленному станку и заплатите мастеру. Плата идёт по качеству вещи: 25 серебра за необычную, 1 золото за редкую, 4 золота за эпическую; легендарная платит по ставке эпической, а заказная вещь обычного качества — по ставке необычной. Станок должен быть настоящим: передвижная станция такой услуги не оказывает никогда.\n\nПлата даёт чистый лист, а не лекарство: вещь остаётся заказной, так что при следующем обмене она снова привяжется к тому, кто её получит. Если в одной стопке лежит несколько привязанных копий, за каждую плату отделяется и освобождается одна копия.',
+  'guide.profPages.faq.a8':
+    'Отчасти. Девять общих полевых рецептов (начальные оружие, доспех, еда и зелья) работаются где угодно и когда угодно, и три комбинированных рецепта присягнувших пар тоже. Всё, что стоит выше них, привязано к типу станка: кузница, кухни, аптекарская, дубильня, ткацкий станок или мастерская, и чтобы изделие прошло, нужно быть не дальше 20 ярдов от станка.\n\nНа 75 навыке в ремесле вы специализируетесь и вместе со скидкой в 20 процентов на материалы получаете передвижную станцию: поставьте её в поле, и она простоит 10 минут, обслуживая рецепты этого ремесла так, будто вы стоите у настоящего станка. Передвижная станция годится только для изготовления: учиться рецептам и снимать привязку с заказных вещей всегда нужно у настоящего станка в городе.',
+  'guide.profPages.craftProse.cooking.materialsBody':
+    'Fishing поставляет фирменные ингредиенты, зона за зоной: mirror trout и river perch из вод Eastbrook Vale, marsh pike и bog eel из Mirefen Marsh, frostgill trout и slatefin carp из Thornpeak Heights. Каждая ступень лестницы готовит рыбу своего уровня, так что повар, что ловит, никогда не остается без запаса.\n\nМясницкая сторона приходит с туш, прошедших сбор: game meat с вепрей и их родни, а на редкий или лучше бросок сбора, подписанный Prime Cut, центральная часть grand roast. Травы приправляют лучшие блюда, одно бревно ashwood коптит eel, а Cooking Salt идет по 8 меди за мешочек у собственного лотка Marlow.',
+  'guide.profPages.craftIntro.engineering':
+    'Инженерное дело собирает инструменты, которых в итоге хочет каждый серьезный собиратель: кирки, топоры и серпы 4 и 5 уровня и три удочки, что поднимаются с 4 уровня до 6, и ни одну из них ни один прилавок никогда не продаст за монету, и каждый поглощает инструмент ступенью ниже.',
+  'guide.profPages.craftProse.engineering.identityBody':
+    'Ремесло работается в toolworks в юго-западном углу Eastbrook Square, доме Tinker Gizzel, Master of the Toolworks. Уровни с 1 по 3 каждой линии инструментов, это обычный товар торговца; всякая ступень выше сходит с верстака инженера или с прилавка вылазок Утонувшей Литании за Метки Вылазок, за ее порогами зачисток, и никогда не выходит ни из одной кассы за монету. Земляные линии останавливаются на 5 уровне; линия удочек поднимается на одну ступень дальше, до «Удочки с часовой катушкой» 6 уровня.\n\nНа кольце оно сидит с ремеслами проб и ошибок, рядом с Alchemy и Armorcrafting, давая ему два лица пары: Bombardier (Engineering и Alchemy, берется перед самим Gizzel) и Шестерёнщик (Armorcrafting и Engineering, названа, но пока не присягаема). Одно предупреждение все еще важно здесь: каждая ступень самой лестницы инструментов сидит выше потолка редкого уровня, под которым работают хобби и необъявленные ремесленники, так что работа на этой лестнице двигает навык только у ремесленника, чьи основные включают Engineering, а сегодня это Bombardier. Но верстак больше не закрыт для остальных: Gizzel теперь учит на 0 навыке «Заготовке шестерни» и «Бронзовой мотыге», обе без всякой платы, а на 25 за обычную плату ступени учит «Окуляру с медной линзой», так что ненастроенный ремесленник или ремесленник-хобби может поднять навык по ранним ступеням; ремесло, дремлющее позади другой личности, по-прежнему растет только от двух уроков 0 навыка. Строить земляные инструменты по-прежнему может любой; ненастроенный ремесленник просто ничему не учится, делая именно их, а два из трех рецептов удочек вдобавок просят обучения у Gizzel, тогда как ступень 6 уровня сходит с чертежа.',
+  'guide.profPages.craftProse.engineering.ladderBody':
+    'Каждая ступень лестницы инструментов привязана к станку toolworks (об изготовленных мотыгах, которым мастер учит отдельно, сказано на странице добычи, а два его начальных урока, это пара, названная выше). Шесть рецептов земляных инструментов известны автоматически, никакой платы тренеру никогда: инструменты 4-го уровня pick, axe и sickle на 75 навыке, а версии 5-го уровня на 125 навыке, самой ступени предела. Требования навыка здесь никогда не запирают ремесло, они лишь формируют его прирост, так что вы можете построить инструмент 5-го уровня в тот день, как держите его реагенты и его предшественника 4-го уровня. Две из трех кованых удочек, это обучаемое исключение: Gizzel учит «Удочке со штормовой катушкой» на 75 навыке за 4 золотых и «Удочке приливной ковки» на 125 навыке за 16 золотых, каждой в тот миг, как ваш разряд в ремесле доходит до ее собственного. «Удочка с часовой катушкой» 6 уровня, это третья, и ей ни один тренер не назначает платы вовсе: ее чертеж лежит на прилавке героического интенданта и учит рецепту сразу.\n\nКаждый готовый инструмент редкого или эпического качества и выходит подписанным, так что ваше имя катается по зонам на поясах других игроков. Engineering также держит половину одного комбинированного рецепта: Elixir of the Bear, который варит настроенный Bombardier с Engineering и Alchemy на 25.',
   'hudChrome.meters.threatFrozen': 'Итоговая угроза против {name}',
   'hudChrome.account.setPasswordTitle': 'Задать пароль',
   'hudChrome.account.setPasswordHint':
@@ -14846,5 +15381,98 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.forgefire_spire.name': 'Шпиль горнового огня',
   'entities.items.springtouched_crozier.name': 'Посох родникового касания',
   'entities.items.wand_of_quenched_sparks.name': 'Жезл угасших искр',
+  // masterwrought Phase 11o, the engineering on-ramp (M16 fills).
+  'entities.items.cogwheel_blank.name': 'Заготовка шестерни',
+  'entities.items.copperlens_ocular.name': 'Окуляр с медной линзой',
+  // masterwrought Phase 13, the orange promotion (M16 fills). The Deed of
+  // Making noun matches the sim_i18n.ts error.legendaryDeed row.
+  'entities.items.deed_of_making.name': 'Грамота созидания',
+  'hudChrome.materialHint.deedOfMaking':
+    'Каллиграфическая грамота. Расходуется, чтобы возвысить доведённое до совершенства творение Ковки мастера до легендарного и дать ему имя.',
+  'hudChrome.crafting.legendaryLine': '{item} перерождается как {name} и становится легендой!',
+  'hudChrome.crafting.legendaryZoneLine': '{player} перековывает {item} в легенду: {name}!',
+  // Masterwrought Phase 14: the Perfecting window + the crafting window's
+  // apex surfacing (M16 fills). Terms follow the shipped sim_i18n rows:
+  // Perfecting = совершенствование, Masterwrought = «Ковка мастера»,
+  // Rift = разлом.
+  'hudChrome.crafting.apexChip': 'Вершина',
+  'hudChrome.crafting.apexPatternRaid': 'Его чертёж - редкий трофей рейда.',
+  'hudChrome.crafting.apexPatternRift':
+    'Его чертёж добывается за победные прохождения разломов высокого ранга.',
+  'hudChrome.crafting.apexPatternVendor':
+    'Героический интендант продаёт его чертёж за Героические знаки.',
+  'hudChrome.crafting.apexPatternDrop': 'Его чертёж можно найти в мире.',
+  'hudChrome.crafting.perfectingLink': 'Совершенствование',
+  'hudChrome.perfecting.title': 'Совершенствование',
+  'hudChrome.perfecting.close': 'Закрыть окно совершенствования',
+  'hudChrome.perfecting.openButton': 'Совершенствование',
+  'hudChrome.perfecting.openButtonAria': 'Открыть окно совершенствования',
+  'hudChrome.perfecting.empty':
+    'У вас нет предмета «Ковка мастера», который можно совершенствовать. Его создают вершинные рецепты.',
+  'hudChrome.perfecting.wornChip': 'Надето',
+  'hudChrome.perfecting.rowRank': 'Ранг {rank} из {ranks}',
+  'hudChrome.perfecting.rowPerfected': 'Совершенство',
+  'hudChrome.perfecting.rankAnnounce': '{name}: достигнут ранг совершенствования {rank} из {ranks}.',
+  'hudChrome.perfecting.perfectedAnnounce': '{name}: предмет доведен до совершенства.',
+  'hudChrome.perfecting.promotedAnnounce': '{name} выкован как {chosen}.',
+  'hudChrome.perfecting.unknownItem': 'Неизвестный предмет',
+  'hudChrome.perfecting.namingSelectionUnconfirmed':
+    'Содержимое сумок изменилось: предмет, которому даётся имя, не удалось подтвердить. Проверьте выбор перед ковкой.',
+  'hudChrome.perfecting.rowPromoted': 'Легендарный',
+  'hudChrome.perfecting.attemptCost': 'Цена попытки',
+  'hudChrome.perfecting.promoteCost': 'Цена возвышения',
+  'hudChrome.perfecting.matCount': '{have} из {required}',
+  'hudChrome.perfecting.skillNeed': 'Требуется навык {skill}: {craft}.',
+  'hudChrome.perfecting.skillMet': 'Выполнено.',
+  'hudChrome.perfecting.skillUnmet': 'Не выполнено.',
+  'hudChrome.perfecting.skillSyncing': 'Проверяем ваш навык ремесла.',
+  'hudChrome.perfecting.bindWarn': 'Первая попытка совершенствования привяжет {name} к вам.',
+  'hudChrome.perfecting.bindWarnDetail':
+    'Совершенствование никогда не понижает ранг: неудачная попытка лишь расходует материалы. С предмета с прогрессом совершенствования или доведённого до совершенства привязку нельзя снять, а возвышение необратимо.',
+  'hudChrome.perfecting.bindConfirmText': 'Первая попытка привяжет {name} к вам. Всё равно попытаться?',
+  'hudChrome.perfecting.bindConfirmAccept': 'Привязать и попытаться',
+  'hudChrome.perfecting.bindConfirmCancel': 'Отмена',
+  'hudChrome.perfecting.attempt': 'Попытка совершенствования',
+  'hudChrome.perfecting.promote': 'Назвать и возвысить',
+  'hudChrome.perfecting.perfectedLead':
+    'Доведено до совершенства. Дайте предмету имя, чтобы выковать легенду.',
+  'hudChrome.perfecting.promotedLine': 'Завершённая легенда: совершенствовать больше нечего.',
+  'hudChrome.perfecting.equipBlocked':
+    'После возвышения вы не сможете его надеть. Сначала снимите конфликтующий предмет.',
+  'hudChrome.perfecting.nameTitle': 'Имя легенды',
+  'hudChrome.perfecting.nameLabel': 'Впишите имя для предмета {name}. Имя останется навсегда.',
+  'hudChrome.perfecting.nameInputAria': 'Легендарное имя',
+  'hudChrome.perfecting.nameHint':
+    'От 2 до 32 символов: латинские буквы, пробелы, апострофы и дефисы, первой должна быть буква.',
+  'hudChrome.perfecting.nameCount': '{count} из {max}',
+  'hudChrome.perfecting.nameSubmit': 'Выковать легенду',
+  'hudChrome.perfecting.nameSubmitBusy': 'Куём',
+  'hudChrome.perfecting.nameCancel': 'Отмена',
   'crucibleShop.balanceEntry': '{name} x{count}',
+  'guide.arenaPage.honorFinalNoteSoldBack':
+    'Покупки за честь окончательны. Список выкупа у торговца хранит лишь то, что вы продали: купленное за монеты обычно можно продать обратно по цене продажи и, если вы снова передумаете, выкупить из этого списка, но снаряжение Боевой мощи становится персональным в тот же миг, как вы его купили, так что его нельзя ни обменять, ни отправить почтой, ни продать обратно хоть за что-нибудь, и в этот список оно не попадает никогда. Потому магазин и просит подтверждения: прочтите описание вещи, прежде чем нажать.',
+  'guide.arenaPage.rewardsBodyLossShare':
+    'Победа в рейтинговом матче приносит честь, валюту сражений игрок против игрока, а поражение в бою, который вы доиграли до конца, всё равно приносит меньшую её долю, как и ничья, так что по-настоящему поражение стоит вам одного лишь рейтинга. Честь задумана как награда за настоящие бои: победа над тем же противником или той же командой ещё раз в тот же день не приносит ничего сверх (как и повторное поражение от них), за долгий победный день первые победы платят сполна, дальше победа платит вдвое меньше, а ещё глубже в дне снова вдвое меньше, и на том останавливается, а матч, который противник сдал, всё же двигает ваш рейтинг, но чести не приносит вовсе. Этот день принадлежит самому королевству: он сменяется в его ночной час сброса, на той же границе, где спадает каждая суточная привязка.',
+  'guide.arenaPage.warfareBodyStatsStay':
+    'На каждой вещи Боевой мощи есть рейтинг атаки и рейтинг защиты Боевой мощи, и против чудовищ эти два рейтинга не делают ровным счётом ничего. Они работают лишь тогда, когда вы сражаетесь с другим игроком: на дуэли, на арене или на поле боя, где атака добавляет урона вашим ударам, а защита срезает урон по вам, и каждая до своего предела. Каждое семейство брони к тому же и комплект, а его бонусы — снова рейтинг Боевой мощи или эффекты, что работают только против игроков, так что бонусы комплекта у полного набора за честь ничего не стоят против босса подземелья. Сами же вещи по-прежнему несут обычные характеристики, броню и урон оружия, и всё это работает везде; против чудовища замолкают лишь рейтинги Боевой мощи и бонусы комплекта.',
+  'guide.arenaPage.warfareTradeBodyRatingSpent':
+    'Такова осознанная плата. Снаряжение Боевой мощи создано для боёв с игроками, а не как обходной путь мимо ступеней подземелий: вещь Боевой мощи никогда не несёт тех боевых характеристик, что несёт эпическая вещь из подземелья в том же слоте, а рейтинг Боевой мощи и бонусы комплекта, которые она несёт взамен, целиком тратятся на других игроков. Хотите держаться на арене — покупайте её. Хотите быстрее проходить героические подземелья — добывайте снаряжение в подземельях.',
+  'guide.social.calendarBodyDoubleHonor':
+    'Нажмите I, чтобы открыть календарь событий. Он отмечает дни мира, вокруг которых стоит строить планы: еженедельные Рейдовый сбор, Ярмарочный день, Битва на арене, Выходные двойной чести и Рыбацкое дерби, а также ежемесячные День вылазки и Единение у лунных врат, и именно там гильдии ведут своё расписание: глава гильдии и офицеры могут вносить в него события, и каждый участник видит их на той же странице. Дни мира — это призыв собраться, а не бонус, с одним исключением: на протяжении всех Выходных двойной чести награды чести Терновой Лощины удваиваются, а сыгранное до конца поражение оплачивается как победа. Ничего другого в вашем персонаже не меняется оттого, что день отмечен.',
+  'guide.social.emotesBodyNamedTarget':
+    'Ваш персонаж может говорить и без слов: введите эмоцию вроде /wave, /dance, /cheer или /bow, добавьте имя, чтобы направить её кому-то, как в «/wave Aleph», или удерживайте X, клавишу колеса эмоций по умолчанию, чтобы открыть колесо эмоций для быстрого выражения над головой. То же колесо открывает кнопка «Эмоции» в ряду кнопок окон, а на сенсорном экране она находится в меню «Еще».',
+  'guide.social.finderBodyLeaderQueues':
+    'Чтобы собрать поход, вовсе не обязательно кричать в «Поиске группы». Откройте «Поиск подземелий», выберите нужный поход и роли, которые готовы взять на себя, и встаньте в очередь в одиночку, либо пусть лидер вашей группы поставит в очередь ту группу, что у вас уже есть (поставить группу в очередь может только лидер). Поиск ждёт, пока не наберётся полный набор ролей, а затем предлагает группу всем сразу: окно просит каждого согласиться, и группа собирается в тот миг, когда согласится последний. Отказ от предложения или просроченное окно выводят из очереди вас, а с вами и группу, с которой вы в неё встали, и ставят вас на короткую задержку, прежде чем вы сможете встать в очередь снова; все остальные участники предложения сохраняют своё место, кроме тех, кто поступил так же или встал в очередь вместе с тем, кто поступил так же, так что очередь не стоит на месте.',
+  'guide.social.lootRollBodyNeedBeatsGreed':
+    'Когда предмет выставляется на бросок, каждый имеющий право участник выбирает «Нужно», если он ему нужен, «Жадность», если он возьмёт его лишь про запас, или «Пас», чтобы воздержаться. «Нужно» бьёт «Жадность»: если хоть кто-то выбрал «Нужно», предмет достаётся тому, у кого наибольший бросок «Нужно», а броски «Жадности» не считаются; иначе побеждает наибольший бросок «Жадности».',
+  'guide.interfacePage.framesMoveBodyEditFrames':
+    'Вашу рамку, рамку цели и рамки группы можно двигать. У каждой в углу есть маленькая кнопка перемещения: снимите блокировку, перетащите рамку туда, где хотите её видеть, и заблокируйте снова, чтобы случайный клик её не сдвинул. «Редактирование фреймов» в верхней части вкладки «Рамки» раздела «Интерфейс» в настройках разом отпускает весь остальной интерфейс (а с ним и эти три рамки): панели способностей, полосу чтения, полосу замаха, полосу опыта, миникарту, ряд кнопок, рамку питомца, панель стоек, ряды усилений и ослаблений и плашку «Напоминание о списке желаемого», причём на каждой, пока она отпущена, висит ярлычок с её названием. Если они оказались там, где вам не нравится, кнопка «Сбросить настройки» внизу той же вкладки «Рамки» вернёт их все туда, где они были изначально.',
+  'guide.interfacePage.mapBodyZoneFirst':
+    'M открывает карту мира на той зоне, где вы стоите: ваша собственная стрелка на ней, окрестные точки интереса, те, кто выдаёт задания, с их метками и области, где лежат ваши цели, ремесленные станции, почтовые ящики, доски объявлений и грядки, входы в подземелья и каждый узел сбора в зоне, серый, пока он отрастает заново, и помеченный, когда вашим инструментам он ещё не по силам. Ваша группа тоже видна на ней. Щёлкните карту правой кнопкой или нажмите на ней кнопку «Карта мира», и она отступит до континента, где каждая зона вычерчена со своим названием, а клик по зоне открывает карту этой зоны. Ступите в вылазку, подземелье, разлом или замок, и карта переключится на план того места, где вы стоите; а поле боя «Терновая Лощина» получает собственную карту поля.\n\nПо правому краю, под миникартой, стопка трекеров держит ваши текущие дела на виду, ничего не открывая: отслеживаемые задания и их цели, ход ваших деяний, ваши страницы Реликвария, вылазка, в которой вы находитесь, и любой разлом, в котором вы участвуете. Трекер заданий сворачивается, когда экран нужен вам целиком.',
+  'guide.interfacePage.mobileBodyTwoPages':
+    'Сенсорное управление появляется само, а раскладка подгоняется под ваш экран: компактная на маленьком телефоне, обычная на телефоне побольше и просторная на планшете.\n\nСпособности лежат кольцом, а не рядом цифр: кнопка атаки и четыре кнопки действий рядом с ней, плюс переключатель страниц, который перебрасывает кольцо между его {pages} страницами, а вместе они дотягиваются до всех ваших ячеек способностей, всех {slots}, независимо от того, включены ли дополнительные настольные панели. Пятое место на дуге этого кольца отведено расходникам: коснитесь его, чтобы применить то, что там лежит, либо удержите его или смахните внутрь, чтобы открыть ряд, который сам наполняется из того, что вы несёте. Вокруг кольца стоят кнопки, к которым чаще всего тянется рука на сенсорном экране: смена цели, взаимодействие с тем, что перед вами, и прыжок.\n\nУ нижнего края вместо ряда кнопок стоит один элемент «Быстрые действия». Он открывает всё остальное: транспорт, чат, карту, сумки, общение, задания, персонажа, книгу заклинаний, игровое меню и пункт «Еще», в котором лежат остальные ваши окна, среди них «Поиск подземелий», PvP, эмоции и вики. Окна здесь занимают весь экран, а не висят поверх него.\n\nПеремещение рамок существ — дело настольной версии: на сенсорном экране раскладка расставляет их за вас.',
+  'guide.interfacePage.winMoreBodyNoValeCup':
+    'Карта мира (M), окно PvP (G), «Рейтинг» (K) и календарь событий (I) работают точно так же. Колесо эмоций (X) — исключение: удерживайте его клавишу, и появится колесо, а потом отпустите клавишу над эмоцией, чтобы её выполнить. «Рейтинг» заслуживает минуты внимания при первом визите: в ней есть вкладка игроков, вкладка гильдий, вкладка, которая ранжирует целые учётные записи по Известности из Книги деяний, вкладка ежедневных результатов и вкладка «Разработчики» для тех, кто делает игру, и она на месте, пока вы не выключите «Показывать значки разработчика».\n\nВыберите другого игрока целью и щёлкните рамку цели правой кнопкой (на сенсорном экране дважды коснитесь её или удержите), либо щёлкните правой кнопкой его имя в чате, и «Об игроке» откроет карточку о нём: надетое снаряжение с подсказками и открытые сведения о его персонаже. Это только взгляд, ничего больше. Для снаряжения нужно, чтобы он был достаточно близко и его можно было разглядеть: откройте карточку по имени из чата, пока он далеко, и вместо этого вы получите её открытую половину — портрет, имя, уровень, класс и гильдию.',
+  'guide.interfacePage.worldWindowsBodyStationMaster':
+    'Есть окна, для которых вы никогда не нажимаете клавишу: они открываются, когда вы говорите с нужным человеком или щёлкаете нужную вещь.\n\nТорговец открывает окно лавки с товаром на продажу и списком выкупа внизу той же панели, где лежит то, что вы продали последним, на случай если продали по ошибке. Рядом с товаром стоит ряд кнопок количества, так что стопка реагентов берётся одним нажатием по пять или по десять штук, а не десятью нажатиями, а когда не подходит ни то ни другое, есть произвольное количество. Классовым способностям учитель не нужен, они приходят с уровнями; учителя здесь — это мастера, живущие при ремесленных станциях, и «Обучение» у одного из них открывает рецепты, которым он может научить вас сейчас, те, что вы уже знаете, и те, что ещё заперты за более высоким навыком.\n\nБанкир открывает ваш банк со вкладкой «Личный» для сундука дополнительных ячеек, которых можно докупить ещё, и вкладкой «Хранилище», которая хранит ваши ремесленные материалы по видам. Если ваша гильдия открыла банк, вкладка «Гильдия» там показывает его: заглянуть внутрь может каждый участник, даже без права что-либо забирать, так что никому не приходится спрашивать, что у гильдии есть; ранги решают, кто может класть, забирать и двигать гильдейскую монету, а журнал записывает каждое движение.\n\nПочтовый ящик Вороновой почты открывает ваши письма: пришедшее на одной вкладке, бланк отправки на другой, со вложениями и всем прочим. У Мирового рынка, у Торговца в Иствруке или у Аукциониста Восса наверху, в Хайвотче, своё окно: смотреть и покупать на одной вкладке, выставлять свои товары на другой и забирать проданное на третьей. Торговля лицом к лицу с другим игроком открывает окно обмена со стороной для каждого.',
 };

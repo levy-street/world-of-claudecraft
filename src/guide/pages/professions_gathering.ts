@@ -1,6 +1,11 @@
 // Per-gathering-profession reference page (/wiki/professions/<id>), one module
-// for mining, logging, herbalism, and fishing (the classes-page parameterized
-// precedent). Renders entirely from GUIDE_PROF_* generated data plus guide.*
+// for every gathering trade (the classes-page parameterized precedent). A
+// trade renders only the sections whose data exists; the tools and nodes
+// sections length-guard rather than print prose over an empty table (farming
+// ships its hoe ladder but deliberately no nodes: it is fishing-shaped on
+// land, so its nodes section stays guarded off forever, and it carries its
+// own planting-loop section instead, the fishing sections' precedent).
+// Renders entirely from GUIDE_PROF_* generated data plus guide.*
 // t() keys; item/vendor names are baked English proper nouns and
 // profession/quality labels localize via their existing catalog keys.
 // TRANSPARENCY POLICY: professions pages publish EXACT
@@ -33,7 +38,8 @@ export function gatheringById(id: string): GuideProfGathering | undefined {
 
 // The Source cell's one decision, flattened: crafted tools name their craft
 // and, when a delve counter also stocks them, the Marks price behind its
-// clears gate (the eight top tools; naming only the craft made the table
+// clears gate (the ten top tools, eight until masterwrought Phase 11j put both
+// crafted hoe rungs on the counter; naming only the craft made the table
 // contradict the prose above it); bought tools name their counter.
 function toolSource(tool: GuideProfTool): string {
   if (tool.craftedBy) {
@@ -72,12 +78,18 @@ function toolRow(tool: GuideProfTool): string {
 }
 
 function toolsSection(g: GuideProfGathering): string {
+  // A trade with no tool ladder must render NOTHING here: the note
+  // interpolates the live gate constants, and prose about a vendor ladder
+  // that does not exist reads as invented content on a public page. Every
+  // shipped trade carries a ladder today (farming's hoes landed with the
+  // crop-ladder phase), so the guard is for the next registered-early trade.
+  if (!g.tools.length) return '';
   return `<section class="guide-block" id="prof-tools">
       <h2>${esc(t('guide.profPages.toolsHeading'))}</h2>
-      ${paras('guide.profPages.toolsNote', {
+      ${paras('guide.profPages.toolsNoteFishingPageMarks', {
         // Fed from the live gate constants, the sibling sections' idiom
         // (rhythmBody takes the cast curve, nodesNote the respawn), so a
-        // retune moves the prose in all 19 languages instead of leaving a
+        // retune moves the prose in every locale instead of leaving a
         // stale number behind in each of them. Named ...Prof because the
         // adjacent trainingBody key already uses {tier1}/{tier2} for training
         // COSTS in copper, and a fill pass reading both should never have to
@@ -103,7 +115,11 @@ function toolsSection(g: GuideProfGathering): string {
 }
 
 function nodesSection(g: GuideProfGathering): string {
-  if (!g.nodes) return '';
+  // Length-guarded, not just presence-guarded: an EMPTY nodes array
+  // (farming, which has no nodes by design) once rendered "respawns for you
+  // 0 seconds" from the `?? 0` fallback below, a fabricated number on a
+  // public page.
+  if (!g.nodes?.length) return '';
   const rows = g.nodes
     .map(
       (n) => `<tr>
@@ -158,11 +174,58 @@ function yieldsSection(): string {
     </section>`;
 }
 
+// Farming's own rhythm, gain and yields, rendered in place of the three node
+// paragraphs above (the wiki completeness audit, 2026-09-03). The node prose
+// describes a gather cast, the node gain curve and the common-to-legendary
+// material ladder, and farming uses none of the three: it harvests instantly,
+// pays FARMING_GAIN_SCHEDULE, and mints a crop's plain and fine grades. Every
+// value comes from GUIDE_PROF_CURVE.farm, generated from the farming module, so
+// a retune moves the page instead of rotting it.
+function farmRhythmSections(g: GuideProfGathering): string {
+  const f = GUIDE_PROF_CURVE.farm;
+  const sched = f.gainSchedule;
+  const ceil = (tier: number) =>
+    formatNumber(f.teachingCeilingByCropTier.find((r) => r.tier === tier)?.ceiling ?? 0);
+  return `<section class="guide-block" id="prof-rhythm">
+      <h2>${esc(t('guide.profPages.farm.rhythmHeading'))}</h2>
+      ${paras('guide.profPages.farm.rhythmBody', { plant: formatNumber(f.plantCastSec) })}
+    </section>
+    <section class="guide-block" id="prof-gain">
+      <h2>${esc(t('guide.profPages.farm.gainHeading'))}</h2>
+      ${paras('guide.profPages.farm.gainBody', {
+        g1: formatNumber(sched[0].gain),
+        p1: formatNumber(sched[0].belowProficiency),
+        g2: formatNumber(sched[1].gain),
+        p2: formatNumber(sched[1].belowProficiency),
+        g3: formatNumber(sched[2].gain),
+        p3: formatNumber(sched[2].belowProficiency),
+        g4: formatNumber(sched[3].gain),
+        cap: formatNumber(g.maxSkill),
+        c1: ceil(1),
+        c2: ceil(2),
+      })}
+    </section>
+    <section class="guide-block" id="prof-yields">
+      <h2>${esc(t('guide.profPages.farm.yieldsHeading'))}</h2>
+      ${paras('guide.profPages.farm.yieldsBody', {
+        floor: formatNumber(f.lifeFloor),
+        keep0: formatNumber(f.keepChancePctAtZero),
+        keepCap: formatNumber(f.keepChancePctAtCap),
+        fine0: formatNumber(f.finePctAtZero),
+        fineCap: formatNumber(f.finePctAtCap),
+        tonicPicks: formatNumber(f.tonicBonusPicks),
+        tonicPct: formatNumber(f.tonicChancePct),
+        effectCap: formatNumber(f.effectBonusPickCap),
+        fineBonus: formatNumber(f.fineEffectBonusPct),
+      })}
+    </section>`;
+}
+
 function rareSection(): string {
   const rare = GUIDE_PROF_CURVE.rareEvent;
   return `<section class="guide-block" id="prof-rare">
       <h2>${esc(t('guide.profPages.rareHeading'))}</h2>
-      ${paras('guide.profPages.rareBody', {
+      ${paras('guide.profPages.rareBodyFourFlavors', {
         oneIn: formatNumber(rare.oneIn),
         mult: formatNumber(rare.yieldMult),
       })}
@@ -199,9 +262,19 @@ function toolEffectsSection(): string {
 }
 
 function deedsSection(g: GuideProfGathering): string {
+  // Farming's arm re-points at a NEW leaf (the harvestBodyChoice
+  // precedent): the retired gatherDeeds.farming prose promised the trade
+  // kept no deeds yet, which the celebrations phase (D13) made false, and
+  // a reword would strand any filled locale copy.
+  // Only the template-literal arm needs the cast; casting the literal arm
+  // too would let a typo'd key name slip past tsc.
+  const key =
+    g.id === 'farming'
+      ? 'guide.profPages.gatherDeeds.farmingSown'
+      : (`guide.profPages.gatherDeeds.${g.id}` as TranslationKey);
   return `<section class="guide-block" id="prof-gather-deeds">
       <h2>${esc(t('guide.profPages.gatherDeedsHeading'))}</h2>
-      ${paras(`guide.profPages.gatherDeeds.${g.id}` as TranslationKey)}
+      ${paras(key)}
     </section>`;
 }
 
@@ -219,7 +292,7 @@ function bandsSection(g: GuideProfGathering): string {
     .join('');
   return `<section class="guide-block" id="prof-bands">
       <h2>${esc(t('guide.profPages.bandsHeading'))}</h2>
-      ${paras('guide.profPages.bandsBody')}
+      ${paras('guide.profPages.bandsBodySplitLadder')}
       <ul class="guide-prof-bands">${bands}</ul>
     </section>`;
 }
@@ -267,7 +340,7 @@ function fishingSections(g: GuideProfGathering): string {
   return `
     <section class="guide-block" id="prof-fish-start">
       <h2>${esc(t('guide.profPages.fish.startHeading'))}</h2>
-      ${paras('guide.profPages.fish.startBody')}
+      ${paras('guide.profPages.fish.startBodyThreeRods')}
     </section>
     <section class="guide-block" id="prof-bite">
       <h2>${esc(t('guide.profPages.fish.biteHeading'))}</h2>
@@ -283,7 +356,7 @@ function fishingSections(g: GuideProfGathering): string {
     </section>
     <section class="guide-block" id="prof-fish-schedule">
       <h2>${esc(t('guide.profPages.fish.scheduleHeading'))}</h2>
-      ${paras('guide.profPages.fish.scheduleNote', { cutoff: formatNumber(f.junkCutoff) })}
+      ${paras('guide.profPages.fish.scheduleNoteRetuned', { cutoff: formatNumber(f.junkCutoff) })}
       <div class="guide-table-scroll"><table class="guide-keytable">
         <thead><tr><th scope="col">${esc(t('guide.profPages.fish.colProficiency'))}</th><th scope="col">${esc(t('guide.profPages.fish.colGain'))}</th></tr></thead>
         <tbody>${scheduleRows}</tbody>
@@ -291,18 +364,35 @@ function fishingSections(g: GuideProfGathering): string {
     </section>
     <section class="guide-block" id="prof-fish-tables">
       <h2>${esc(t('guide.profPages.fish.tablesHeading'))}</h2>
-      ${paras('guide.profPages.fish.tablesNote', { rare: f.rareCatch })}
+      ${paras('guide.profPages.fish.tablesNoteSixBands', { rare: f.rareCatch })}
       ${bandTables}
     </section>
     <section class="guide-block" id="prof-koi">
       <h2>${esc(t('guide.profPages.fish.koiHeading'))}</h2>
-      ${paras('guide.profPages.fish.koiBody')}
+      ${paras('guide.profPages.fish.koiBodyBandFlat')}
+    </section>`;
+}
+
+// -------------------------------------------------------- farming only
+// The planting loop as a player works it (counter, knobs, journal, husks,
+// kitchens): farming has no nodes to map, so this is the section that tells a
+// reader where the trade actually happens. Prose only, no generated data.
+function farmingSection(): string {
+  return `<section class="guide-block" id="prof-farm-beds">
+      <h2>${esc(t('guide.profPages.farm.bedsHeading'))}</h2>
+      ${paras('guide.profPages.farm.bedsBody')}
+      ${paras('guide.profPages.farm.bedsBodyScribeBuyer')}
+    </section>
+    <section class="guide-block" id="prof-farm-table">
+      <h2>${esc(t('guide.profPages.farm.tableHeading'))}</h2>
+      ${paras('guide.profPages.farm.tableBodyOneMeal')}
     </section>`;
 }
 
 // ------------------------------------------------------------- page assembly
 export function gatheringDetailHtml(g: GuideProfGathering): string {
   const isFishing = g.id === 'fishing';
+  const isFarming = g.id === 'farming';
   return `
     <article class="guide-article guide-prof-page">
       <p class="guide-section-more"><a href="${esc(hrefFor('professions'))}">${esc(t('guide.profPages.back'))}</a></p>
@@ -311,7 +401,8 @@ export function gatheringDetailHtml(g: GuideProfGathering): string {
       <dl class="guide-class-facts guide-prof-facts">
         <div class="guide-fact"><dt>${esc(t('guide.profPages.capLabel'))}</dt><dd>${esc(formatNumber(g.maxSkill))}</dd></div>
       </dl>
-      ${isFishing ? fishingSections(g) : rhythmSection(g) + nodesSection(g) + yieldsSection()}
+      ${isFarming ? farmingSection() : ''}
+      ${isFishing ? fishingSections(g) : isFarming ? farmRhythmSections(g) : rhythmSection(g) + nodesSection(g) + yieldsSection()}
       ${toolsSection(g)}
       ${isFishing ? '' : toolEffectsSection()}
       ${bandsSection(g)}
@@ -319,6 +410,17 @@ export function gatheringDetailHtml(g: GuideProfGathering): string {
       ${deedsSection(g)}
       ${related([
         { href: hrefFor('professions'), key: 'guide.nav.professions' },
+        // Farming's table section hands its dish ladder to Cooking, so the
+        // farming page alone links the craft page it defers to (reusing the
+        // provisioning page's shipped 'Cooking' key: zero new rows).
+        ...(isFarming
+          ? [
+              {
+                href: hrefFor('professions/cooking'),
+                key: 'guide.profPages.prov.cookingLink' as const,
+              },
+            ]
+          : []),
         { href: hrefFor('professions/economy'), key: 'guide.profPages.econ.title' },
         { href: hrefFor('world'), key: 'guide.nav.world' },
       ])}

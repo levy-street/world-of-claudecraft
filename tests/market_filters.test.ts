@@ -6,7 +6,9 @@ import {
   marketItemMatches,
   sanitizeMarketQuery,
 } from '../src/sim/market_query';
+import { Sim } from '../src/sim/sim';
 import type { ItemDef } from '../src/sim/types';
+import { groundHeight } from '../src/sim/world';
 import {
   MARKET_ARMOR_CLASS_FILTERS,
   MARKET_ARMOR_TYPE_FILTERS,
@@ -44,16 +46,20 @@ function filterIds(ids: readonly string[], over: Partial<MarketQuery> = {}): str
 }
 
 describe('World Market filters', () => {
-  // wolf_fang became a crafting reagent (common, white), so the
-  // poor-quality exemplar here is mudfin_scale.
+  // wolf_fang became a crafting reagent (common, white), and phase 11l
+  // promoted mudfin_scale the same way, so the poor-quality exemplar here
+  // is soggy_moccasin.
   const items = [
-    'mudfin_scale',
+    'soggy_moccasin',
     'bone_fragments',
     'keen_dirk',
     'greyjaw_pelt_cloak',
     'roasted_boar',
     'minor_healing_potion',
     'elixir_of_the_bear',
+    // The phase 06 buff scroll: kind 'scroll' browses as a consumable beside
+    // the elixirs it alternates with.
+    'silverleaf_scroll',
   ];
 
   it('exposes stable item type and rarity filter options for the browse UI', () => {
@@ -65,6 +71,7 @@ describe('World Market filters', () => {
       'consumable',
       'material',
       'cosmetic',
+      'pattern',
       'other',
     ]);
     expect(MARKET_ARMOR_TYPE_FILTERS).toEqual([
@@ -109,6 +116,7 @@ describe('World Market filters', () => {
       'roasted_boar',
       'minor_healing_potion',
       'elixir_of_the_bear',
+      'silverleaf_scroll',
     ]);
   });
 
@@ -189,6 +197,22 @@ describe('World Market filters', () => {
       (id) => !buckets.some((itemType) => marketItemMatches(id, q({ itemType }))),
     );
     expect(orphans, `items no browse category can reach: ${orphans.join(', ')}`).toEqual([]);
+    // The other half of the exactly-one doctrine, over the WHOLE live
+    // catalog: no item answers two chips. The per-exemplar pins cover only
+    // their own kinds (every bag id, one mount id, one pattern id); this
+    // sweep is what reds when a predicate arm is widened onto a kind no
+    // exemplar carries (the phase 11 review probe proved a recipe-or-quest
+    // widening survived every per-exemplar pin while this sweep catches it).
+    const multi = Object.keys(ITEMS)
+      .map((id) => ({
+        id,
+        chips: buckets.filter((itemType) => marketItemMatches(id, q({ itemType }))),
+      }))
+      .filter((entry) => entry.chips.length > 1);
+    expect(
+      multi.map((entry) => `${entry.id}: ${entry.chips.join('+')}`),
+      'every catalog item answers at most one browse category',
+    ).toEqual([]);
     // Non-vacuity: the sweep is worthless if the catalog is empty, and `.some()` short
     // circuits, so prove every bucket was actually exercised and is LIVE. A category
     // whose predicate matches nothing passes the orphan check while browsing as a dead
@@ -220,9 +244,11 @@ describe('World Market filters', () => {
     // The SOURCE stays derived (that is the point); this is the line that reddens if a
     // catalog-side bagSlots typo moves the derivation and its mirror in lockstep, and it
     // is deliberately the one place a new bag capacity has to be acknowledged by a human.
-    // Acknowledged for phase 05 of the bank-storage packet: 16 (Wayfarer's Backpack,
-    // Resonantweave Bag), 20 (Necromancer's Reagent Satchel) and 24 (Loombound Reagent
-    // Satchel) are the new capacities that catalog shipped.
+    // '16' acknowledged at masterwrought phase 08: the tailoring apex bag
+    // (sunspun_haversack). Acknowledged for phase 05 of the bank-storage packet:
+    // 16 (Wayfarer's Backpack, Resonantweave Bag), 20 (Necromancer's Reagent
+    // Satchel) and 24 (Loombound Reagent Satchel) are the new capacities that
+    // catalog shipped.
     expect([...MARKET_BAG_SIZE_FILTERS]).toEqual([
       'all',
       '6',
@@ -288,9 +314,88 @@ describe('World Market filters', () => {
   it("routes mount reins through the 'other' chip so a listed reins stays browsable", () => {
     expect(filterIds(['reins_grag_bear'], { itemType: 'other' })).toEqual(['reins_grag_bear']);
     // And no narrower chip claims it.
-    for (const t of ['weapon', 'armor', 'consumable', 'bag', 'material', 'cosmetic'] as const) {
+    for (const t of [
+      'weapon',
+      'armor',
+      'consumable',
+      'bag',
+      'material',
+      'cosmetic',
+      'pattern',
+    ] as const) {
       expect(filterIds(['reins_grag_bear'], { itemType: t }), t).toEqual([]);
     }
+  });
+
+  // Phase 11: patterns (kind 'recipe') left the 'other' catch-all and earned
+  // their own chip once the apex pattern content shipped. The exemplar is a
+  // SHIPPED pattern id (the id contract: pattern_<output id>), so this is the
+  // live-catalog mirror of the synthetic-def pin in
+  // tests/recipe_pattern_items.test.ts.
+  it('browses patterns under their own chip, and exactly one browse category claims them', () => {
+    // The bag-exclusivity model, applied to the pattern exemplar: an item
+    // answers exactly one browse category, so the full chip answer is
+    // ['all', 'pattern'] and nothing else. Both sides SORTED, matching the
+    // synthetic-def mirror's recorded doctrine: reordering the filter list
+    // is a presentation change and must not red this pin.
+    expect(
+      MARKET_ITEM_TYPE_FILTERS.filter((itemType) =>
+        marketItemMatches('pattern_forgefold_legguards', q({ itemType })),
+      ).sort(),
+    ).toEqual(['all', 'pattern'].sort());
+    // Search finds a pattern by its output name and by the prefix word: the
+    // predicate is kind-agnostic (name/id substring), pinned here in BOTH
+    // halves so the new kind's searchability is a tested fact, not an
+    // inference.
+    expect(filterIds(['pattern_forgefold_legguards'], { search: 'forgefold' })).toEqual([
+      'pattern_forgefold_legguards',
+    ]);
+    expect(filterIds(['pattern_forgefold_legguards'], { search: 'plans' })).toEqual([
+      'pattern_forgefold_legguards',
+    ]);
+  });
+
+  // The phase 11 findability claim, pinned in BOTH halves: the masterwrought
+  // intermediates and wyrmfall_core browse under Materials (kind 'junk',
+  // unchanged by the pattern chip), and a shipped pattern browses under the
+  // new Patterns chip.
+  it('finds the masterwrought intermediates under Materials and patterns under Patterns', () => {
+    expect(
+      filterIds(['wyrmfall_core', 'duskforged_billet', 'sablewax_vellum'], {
+        itemType: 'material',
+      }),
+    ).toEqual(['wyrmfall_core', 'duskforged_billet', 'sablewax_vellum']);
+    expect(filterIds(['pattern_forgefold_legguards'], { itemType: 'pattern' })).toEqual([
+      'pattern_forgefold_legguards',
+    ]);
+  });
+
+  // The LIST (sell) half of the phase 11 chip: the browse pins above only prove
+  // the PREDICATE, so a listing-gate refusal of kind 'recipe' would leave every
+  // one of them green while no pattern could actually reach the book. This
+  // drives the real sim path (the market.test.ts rig in miniature): a seller
+  // standing at the Merchant lists a held shipped pattern, the listing lands,
+  // and the Patterns chip browse returns it.
+  it('lists a held pattern on the market and finds it under the Patterns chip', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const seller = sim.addPlayer('warrior', 'Seller');
+    const merchant = [...sim.entities.values()].find((e) => e.templateId === 'the_merchant');
+    if (!merchant) throw new Error('the Merchant was not spawned');
+    const e = sim.entities.get(seller);
+    if (!e) throw new Error(`missing entity ${seller}`);
+    // stand right on the Merchant so marketList's proximity gate passes
+    e.pos.x = merchant.pos.x;
+    e.pos.z = merchant.pos.z;
+    e.pos.y = groundHeight(e.pos.x, e.pos.z, sim.cfg.seed);
+    e.prevPos = { ...e.pos };
+    sim.addItem('pattern_forgefold_legguards', 1, seller);
+    sim.marketList('pattern_forgefold_legguards', 1, 100, seller);
+    const listing = sim.marketListings.find((l) => l.itemId === 'pattern_forgefold_legguards');
+    expect(listing, 'the pattern listing must land on the book').toBeDefined();
+    sim.marketSearch(q({ itemType: 'pattern' }), seller);
+    const info = sim.marketInfoFor(seller);
+    expect(info?.itemType).toBe('pattern');
+    expect(info?.listings.some((l) => l.itemId === 'pattern_forgefold_legguards')).toBe(true);
   });
 
   // The exhaustiveness tail in itemMatchesType is a tsc guard, and tsc is erased in
@@ -316,13 +421,38 @@ describe('World Market filters', () => {
     expect(sanitizeMarketQuery({ itemType: 'bag', subtype: '9999' }).subtype).toBe('all');
   });
 
+  // The 'pattern' twin of the bag acceptance above, and the online arm's
+  // load-bearing half: server/game.ts routes the untrusted msg.itemType of a
+  // market_search command through sanitizeMarketQuery, so the Patterns chip
+  // only browses online while the sanitizer keeps 'pattern' instead of
+  // falling back to 'all'.
+  it("keeps the 'pattern' item type through wire sanitization instead of falling back", () => {
+    expect(sanitizeMarketQuery({ itemType: 'pattern' }).itemType).toBe('pattern');
+  });
+
+  it('an adopted 11l trophy browses as a common material, and the holdout as poor', () => {
+    // itemMatchesRarity reads live quality, so the promotion moved every
+    // adopted trophy from the poor chip to the common one. The market's
+    // material chip is keyed on KIND (junk or tool, market_query.ts), not on
+    // the honest taxonomy, so the poor holdout browses there beside the
+    // promoted trophy and the rarity chip is what tells them apart.
+    const pair = ['cracked_wyrm_scale', 'soggy_moccasin'];
+    expect(filterIds(pair, { rarity: 'common' })).toEqual(['cracked_wyrm_scale']);
+    expect(filterIds(pair, { rarity: 'poor' })).toEqual(['soggy_moccasin']);
+    expect(filterIds(pair, { itemType: 'material' })).toEqual(pair);
+    expect(filterIds(pair, { itemType: 'material', rarity: 'common' })).toEqual([
+      'cracked_wyrm_scale',
+    ]);
+  });
+
   it('matches rarities by the game quality names', () => {
     // bone_fragments is a crafting reagent, so it is common (white), not poor.
-    expect(filterIds(items, { rarity: 'poor' })).toEqual(['mudfin_scale']);
+    expect(filterIds(items, { rarity: 'poor' })).toEqual(['soggy_moccasin']);
     expect(filterIds(items, { rarity: 'common' })).toEqual([
       'bone_fragments',
       'roasted_boar',
       'minor_healing_potion',
+      'silverleaf_scroll',
     ]);
     expect(filterIds(items, { rarity: 'uncommon' })).toEqual([
       'keen_dirk',
@@ -533,7 +663,7 @@ describe('World Market filters', () => {
   });
 
   it('matches an item name or id substring, and never an unknown item', () => {
-    expect(filterIds(items, { search: 'mudfin' })).toEqual(['mudfin_scale']);
+    expect(filterIds(items, { search: 'moccasin' })).toEqual(['soggy_moccasin']);
     expect(filterIds(items, { search: 'ZZZNOMATCH' })).toEqual([]);
     // The server drops listings whose item it no longer knows, so the predicate rejects them.
     expect(marketItemMatches('not_a_real_item', q())).toBe(false);

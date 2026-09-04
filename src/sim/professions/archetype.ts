@@ -252,45 +252,101 @@ export function hobbyCandidatesForPair(activeArchetype: string, pairedMajor: str
 // action outside the recipe table (only enchanting itself, via disenchanting;
 // see professions/enchanting.ts). Enchanting now also ships recipes in
 // ALL_RECIPES, so its explicit entry is a redundancy that keeps the
-// disenchanting path counted even if those recipes move. Jewelcrafting and
-// Inscription have neither (content/deeds.ts's prog_guildsworn comment: "no
-// live skill-gain path yet, zero recipes, no enchanting-style action"), so
-// defaulting a fresh hobby into either soft-locks the slot: no possible skill
-// gain until an unrelated hobby-switch quest moves it. Read once at module
-// load: ALL_RECIPES is a static content table, never mutated at runtime.
+// disenchanting path counted even if those recipes move. Jewelcrafting counts
+// through the recipe arm too since its forge-bound base catalog landed
+// (JEWELCRAFTING_RECIPES, content/recipes.ts), and inscription followed with
+// its apothecary-bound catalog (INSCRIPTION_RECIPES, Masterwrought phase 06),
+// so every ring craft now has content and the soft-lock case this set guards
+// against is empty today; the guard stays because a future craft seat would
+// reopen it. Read once at module load: ALL_RECIPES is a static content
+// table, never mutated at runtime.
 const CRAFTS_WITH_CONTENT: ReadonlySet<string> = new Set([
   ...ALL_RECIPES.map((recipe) => recipe.professionId),
   'enchanting',
 ]);
 
-function craftHasContent(craftId: string): boolean {
-  return CRAFTS_WITH_CONTENT.has(craftId);
+/**
+ * The content-set injection seam for the hobby default, and the ONLY way to
+ * reach `chooseDefaultHobby`'s content arm with a set other than the live
+ * derived one.
+ *
+ * WHY IT IS A BRANDED TYPE rather than a defaulted parameter. Since the phase
+ * 06 inscription catalog every ring craft has content, so no live pair can
+ * exercise the content arm; it stays because a future craft seat with no
+ * recipes reopens the soft-lock it guards against, and without an injection
+ * seam it would be untestable dead-looking code. The seam used to be a
+ * defaulted fourth parameter on `defaultHobbyForPair` kept off production call
+ * sites by PROSE alone. It is type-enforced now, two ways at once:
+ * `defaultHobbyForPair` takes exactly three parameters (a production caller
+ * that passes a content set is a compile error, not a review finding), and the
+ * injecting entry point below demands a value only `hobbyContentProbe` can
+ * mint (a bare `Set<string>` is a compile error too, so the entry point cannot
+ * be mistaken for an ordinary overload).
+ */
+declare const hobbyContentProbeBrand: unique symbol;
+export type HobbyContentProbe = {
+  readonly crafts: ReadonlySet<string>;
+} & { readonly [hobbyContentProbeBrand]: true };
+
+/** Mint a content-set probe for the hobby default's content arm. TEST-ONLY by
+ *  contract: no `src/` or `server/` module may import it, which
+ *  `tests/professions_archetype.test.ts` pins by scanning the tree. */
+export function hobbyContentProbe(crafts: Iterable<string>): HobbyContentProbe {
+  // The brand is a declared-only symbol with no runtime value, so the cast is
+  // how a probe is minted; nothing ever reads the brand.
+  return { crafts: new Set(crafts) } as unknown as HobbyContentProbe;
 }
 
 /** Choose the higher retained-skill hobby; among an equal-skill (typically
- * zero-skill) tie, prefer a candidate with real content (craftHasContent)
- * over one with none, and only then fall back to ring order as the final
- * stable tie break. This is used for first attunement and old-save backfill.
- * Deliberately NOT applied in hobbyCandidatesForPair: the explicit
- * hobby-switch quest still needs every ring-opposite candidate reachable by
- * player choice, content or not. */
-export function defaultHobbyForPair(
+ * zero-skill) tie, prefer a candidate with real content (`contentSet`) over
+ * one with none, and only then fall back to ring order as the final stable tie
+ * break. Shared body behind the two entry points below; the ONLY difference
+ * between them is which content set they hand it. */
+function chooseDefaultHobby(
   activeArchetype: string,
   pairedMajor: string,
-  skills: CraftSkills = {},
+  skills: CraftSkills,
+  contentSet: ReadonlySet<string>,
 ): string | null {
   const candidates = hobbyCandidatesForPair(activeArchetype, pairedMajor);
   if (candidates.length === 0) return null;
   return [...candidates].sort((a, b) => {
     const skillDelta = (skills[b] ?? 0) - (skills[a] ?? 0);
     if (skillDelta !== 0) return skillDelta;
-    const contentDelta = Number(craftHasContent(b)) - Number(craftHasContent(a));
+    const contentDelta = Number(contentSet.has(b)) - Number(contentSet.has(a));
     if (contentDelta !== 0) return contentDelta;
     return (
       CRAFT_RING.findIndex((craft) => craft.id === a) -
       CRAFT_RING.findIndex((craft) => craft.id === b)
     );
   })[0];
+}
+
+/** The production entry point: the hobby default over the LIVE derived content
+ * set. Used for first attunement and old-save backfill.
+ * Deliberately NOT applied in hobbyCandidatesForPair: the explicit
+ * hobby-switch quest still needs every ring-opposite candidate reachable by
+ * player choice, content or not.
+ *
+ * Three parameters, and that arity is the seam (see HobbyContentProbe above):
+ * a caller here can never choose the content set. */
+export function defaultHobbyForPair(
+  activeArchetype: string,
+  pairedMajor: string,
+  skills: CraftSkills = {},
+): string | null {
+  return chooseDefaultHobby(activeArchetype, pairedMajor, skills, CRAFTS_WITH_CONTENT);
+}
+
+/** The same decision over an INJECTED content set, for the arm live content
+ *  cannot reach. TEST-ONLY by contract, like the probe it demands. */
+export function defaultHobbyForPairWithContentProbe(
+  activeArchetype: string,
+  pairedMajor: string,
+  skills: CraftSkills,
+  content: HobbyContentProbe,
+): string | null {
+  return chooseDefaultHobby(activeArchetype, pairedMajor, skills, content.crafts);
 }
 
 // Escalation formula for the repeatable "make amends" quest: a modest linear

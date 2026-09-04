@@ -234,7 +234,7 @@ Setiap instance juga berjalan pada **Heroic**: musuh berlevel lebih tinggi, meka
 
 ### Delve
 
-Delve adalah mode grup kecil yang terpisah dan dapat diskalakan untuk satu atau dua pemain, dibangun ulang dari ruang acak di setiap putaran dan berakhir pada peti reliquary terkunci yang dibuka lewat minigame membobol kunci alih-alih lemparan loot. **The Collapsed Reliquary** (level 7 ke atas) berakhir di Deacon Varric, dengan seorang pendamping AI, Tessa, bertarung di sisi Anda jika Anda pergi sendiri. **The Drowned Litany** (level 12 ke atas) mengikuti jejak itu ke kuil yang terendam di tepi Mirefen Marsh. Sebuah papan delve menentukan tier-nya: Heroic menaikkan level musuh dan menambah afiks acak untuk reward yang lebih kaya.
+Delve adalah mode grup kecil yang terpisah dan dapat diskalakan untuk satu atau dua pemain, dibangun ulang dari ruang acak di setiap putaran dan berakhir pada peti reliquary terkunci yang dibuka lewat minigame membobol kunci alih-alih lemparan loot. **The Collapsed Reliquary** (level 7 ke atas) berakhir di Deacon Vandric, dengan seorang pendamping AI, Tessa, bertarung di sisi Anda jika Anda pergi sendiri. **The Drowned Litany** (level 12 ke atas) mengikuti jejak itu ke kuil yang terendam di tepi Mirefen Marsh. Sebuah papan delve menentukan tier-nya: Heroic menaikkan level musuh dan menambah afiks acak untuk reward yang lebih kaya.
 
 ### PvP berperingkat (the Ashen Coliseum)
 

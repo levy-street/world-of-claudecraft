@@ -1,0 +1,281 @@
+// Deliberately retired i18n catalog keys - the ONE shared source (Phase 14).
+//
+// Consumed by THREE places that must always agree:
+//   - tests/guide_key_coverage.test.ts: the guide coverage sweep's allowlist
+//     (a retired key may render nowhere; a live key may never hide here),
+//   - scripts/i18n_scan.mjs: a retired key's unprovided locale rows become
+//     `blocked` registry rows (with RETIRED_REASON), never `pending`, so the
+//     release fill pass is not asked to translate prose that never renders,
+//   - scripts/i18n_build.mjs: the runtime `pending` set excludes them the
+//     same way (the build and the registry stay in lockstep).
+//
+/**
+ * Keys kept in the catalog on purpose with NO live consumer left in the code.
+ *
+ * The catalog cannot simply drop them: every locale overlay under src/ui/i18n.locales/
+ * still carries a reviewed translation for each one, and the maintainer's release fill
+ * works from the catalog. Deleting the English source would orphan 21 locale rows and
+ * (for the placeholder migrations below) throw away prose a human already reviewed.
+ *
+ * Nothing distinguished a deliberately retired key from a key a page stopped rendering by
+ * accident until this list existed. Retiring a key is now an explicit, reviewed act: add
+ * it here WITH ITS REASON, or the guide coverage sweep fails.
+ *
+ * The rule that keeps this list honest: a retired key must have NO reference left in
+ * src/. The `has no live reference` test in tests/guide_key_coverage.test.ts proves it,
+ * so this list can never be used to silence a key that a page really does try to render.
+ */
+export const RETIRED_KEYS = [
+  // -- Placeholder migrations. A {placeholder} may never be added to an already-translated
+  // key: it breaks interpolation parity in all 21 locales. Each of these was replaced by a
+  // NEW *Count key carrying the token, and the original stays behind, untouched.
+  'guide.faqPage.a6', // -> guide.faqPage.a6Count ({zones})
+  'guide.home.faq.a4', // -> guide.home.faq.a4Count ({zones})
+  'guide.home.world.sub', // -> guide.home.world.subCount ({zones})
+  'guide.progression.journeyBody', // -> guide.progression.journeyBodyCount ({zones})
+
+  // -- Reworded successors. The replacement says something materially different, so the
+  // old value is not a stale translation to fix but a claim the game no longer makes.
+  'guide.gear.soulboundBody', // -> guide.gear.soulboundBodyBound (bind-on-trade rules)
+  'guide.profPages.ench.enchantsNote', // -> guide.profPages.ench.enchantsNoteOffhand
+  'guide.profPages.specimenBody', // -> guide.profPages.specimenBodyFamilies
+  'guide.professions.focusBody', // -> guide.professions.focusBodyTiers
+  'guide.professions.harvestBodyChoice', // folded into the harvest section's body copy
+  // -> guide.profPages.gatherDeeds.farmingSown (farming gained its own deeds at D13)
+  'guide.profPages.gatherDeeds.farming',
+
+  // -- Content the game no longer has, so the wiki must not define it.
+  // The glossary defined Augment as a draft pick in a two-on-two Fiesta match.
+  // Fiesta is retired and is not among the tabs the PvP window offers, so the term
+  // described content no player can reach.
+  'guide.glossary.augmentTerm',
+  'guide.glossary.augmentDef',
+  'guide.bestiary.flavor.mirejaw_frenzy', // summon-only encounter add, filtered from the bestiary
+  'guide.footer.communityWiki', // the standalone MediaWiki redirect this SPA replaced
+
+  // -- Superseded by generated content. These were hand-written dungeon facts before
+  // GUIDE_DUNGEONS carried the roster; the page now renders names and level bands from
+  // the sim, so a hardcoded name here could only ever drift.
+  'guide.dungeonsPage.bastionName',
+  'guide.dungeonsPage.hollowName',
+  'guide.dungeonsPage.sanctumName',
+  'guide.dungeonsPage.templeName',
+  'guide.dungeonsPage.levelAround',
+  'guide.dungeonsPage.raidSize',
+
+  // -- Label variants a redesign dropped. The information still reaches the reader; only
+  // this presentation of it is gone.
+  'guide.classPage.roleLabel', // role and resource are hero badges now, using the
+  'guide.classPage.resourceLabel', // shared classDetails.labels.* keys
+  'guide.delvesPage.affixesLabel', // the affix pills sit under affixesHeading instead
+  'guide.professions.craftHowTitle', // the crafting-window section was folded into craftBody
+  'guide.nav.onThisPage', // the in-page TOC is labelled by guide.toc.heading
+  'guide.nav.reference', // the sidebar heading comes from guide.groups.reference
+  'guide.nav.backToGame', // the guide links out with guide.nav.playNow
+  'guide.brandShort', // every surface renders the full guide.brand
+  'guide.loading', // the SPA shell paints its own skeleton, never a loading string
+  'guide.models.count', // the models page heads its grid without a running count
+
+  // -- Orphaned by a computed key whose input set moved.
+  // guide.groups.<GuideGroup>: 'compendium' was the single pre-split bucket, and is no
+  // longer a GuideGroup (see the split comment in src/guide/routes.ts).
+  'guide.groups.compendium',
+  // guide.classHook.<classId>: the one-line class teaser. The class chooser renders the
+  // curated feel tags from src/guide/class_meta.ts instead, so nothing calls it any more.
+  'guide.classHook.druid',
+  'guide.classHook.hunter',
+  'guide.classHook.mage',
+  'guide.classHook.paladin',
+  'guide.classHook.priest',
+  'guide.classHook.rogue',
+  'guide.classHook.shaman',
+  'guide.classHook.warlock',
+  'guide.classHook.warrior',
+  // guide.abilityHook.<abilityId>: rendered by class_view.ts for the first six hook-carrying
+  // abilities in a class's GENERATED signature kit (scripts/wiki/build_content.mjs takes
+  // kit-with-hook then slice(0, 6)). A key lands here when no class page asks for it any
+  // more. ('thorns' also resolves through src/ui/talent_i18n.ts, so it sits in
+  // LIVE_OFF_SWEEP_KEYS below instead.)
+  // These nine are mage abilities an earlier kit refresh already dropped from that slice.
+  'guide.abilityHook.blizzard',
+  'guide.abilityHook.brain_freeze',
+  'guide.abilityHook.conjure_food',
+  'guide.abilityHook.fingers_of_frost',
+  'guide.abilityHook.fireball_form',
+  'guide.abilityHook.flurry',
+  'guide.abilityHook.frozen_orb',
+  'guide.abilityHook.ice_lance',
+  'guide.abilityHook.shatter',
+  // The v0.31 class overhauls rebuilt every kit. 'judgement' no longer exists as an ability
+  // at all, and the next three are hiddenFromPlayer PALADIN_LEGACY ids kept only for the
+  // persisted action-bar contract, so the class page can never list any of them.
+  'guide.abilityHook.judgement',
+  'guide.abilityHook.blessing_of_might',
+  'guide.abilityHook.devotion_aura',
+  'guide.abilityHook.seal_of_righteousness',
+  // The rest are live abilities whose hooks fell out of the six signature slots when the
+  // overhauls reordered kits and spec-gated abilities ('primal_exaltation' and 'stoneward'
+  // left the kits entirely). The hook prose stays reviewed in every locale; a kit reorder
+  // that surfaces one again simply removes it from this list.
+  'guide.abilityHook.ancestor_return',
+  'guide.abilityHook.arcane_shot',
+  'guide.abilityHook.avenging_wrath',
+  'guide.abilityHook.bastion_sweep',
+  'guide.abilityHook.concussive_shot',
+  'guide.abilityHook.earth_shock',
+  'guide.abilityHook.flame_shock',
+  'guide.abilityHook.hammer_of_wrath',
+  'guide.abilityHook.healing_wave',
+  'guide.abilityHook.life_tap',
+  'guide.abilityHook.lifespring_weapon',
+  'guide.abilityHook.lightning_shield',
+  'guide.abilityHook.mongoose_bite',
+  'guide.abilityHook.oath_chain',
+  'guide.abilityHook.primal_exaltation',
+  'guide.abilityHook.stoneward',
+  'guide.abilityHook.stormsurge',
+  'guide.abilityHook.tidecall',
+  'guide.abilityHook.veilbound_march',
+  // Phase 16 (2026-08-30) rewords, the reword-is-a-new-key convention: each
+  // retired body's replacement renders in its place (masterwroughtBodyLegendary,
+  // identityBodyOneMeal, enchantsNoteInfusionLive, tableBodyOneMeal); the old
+  // keys keep their reviewed overlay fills until the release fill retires them.
+  'guide.gear.masterwroughtBody',
+  'guide.profPages.craftProse.cooking.identityBody',
+  'guide.profPages.ench.enchantsNoteOffhand',
+  'guide.profPages.farm.tableBody',
+  // Phase 19F (2026-09-02, ruling qr-19-crucible-gear-sundering-admission),
+  // the same convention: the endgame materials prose said sundering breaks a
+  // raid-won epic 'of the tier', a restriction the predicate never made (any
+  // raid tier, normal or heroic, feeds the essence); the successor
+  // endgameMaterialsBodyAnyRaid says what the predicate does, and its five
+  // non-Latin fills rode the same change.
+  'guide.professions.endgameMaterialsBody',
+  // Phase 19F review round (2026-09-02, under
+  // qr-19-materialsbody-onramp-bill-omission): the engineering materials prose
+  // counted TWO rod recipes where
+  // ROD_RECIPES holds three; the successor materialsBodyThreeRods names the
+  // Clockreel bill and rides the bodyKey override in professions_craft.ts, and
+  // its five non-Latin fills (fresh, the old ones predated the live English)
+  // rode the same change.
+  'guide.profPages.craftProse.engineering.materialsBody',
+  // Phase 19F (2026-09-02, ruling qr-19-rarebody-reword-landmine): the shared
+  // 'Rare finds' prose of the four gathering pages named the three node
+  // windfalls and not farming's golden harvest, which rolls the same event;
+  // the successor rareBodyFourFlavors names all four with the maintainer's
+  // wording, and its five non-Latin fills rode the same change (the old key's
+  // five non-Latin fills had omitted the flavor names and the deed sentence
+  // since they were written).
+  'guide.profPages.rareBody',
+  // Phase 19G (2026-09-02, ruling qr-19-scroll-elixir-15c-parity): the
+  // inscription materials prose told players the double scroll batch is
+  // 'priced even with the Elixir of the Serpent', false by 15 copper since
+  // Phase 11g put a gourd on the elixir alone; the repair puts the same gourd
+  // on the scroll, the successor materialsBodyFrostGourd names it, and its
+  // five non-Latin fills rode the same change (the old key's five reviewed
+  // rows are kept here, stale on the one clause the repair made true).
+  'guide.profPages.craftProse.inscription.materialsBody',
+  // Phase 20 (2026-09-03, the wiki completeness audit): the arena page's honor
+  // callout said a coin purchase 'can be undone from a vendor's buyback list';
+  // the list holds only what you SOLD (src/sim/items.ts recordVendorBuyback is
+  // reached from sellItem and sellAllJunk alone, buyItem records nothing). The
+  // successor honorFinalNoteSoldBack says so, and its five non-Latin fills rode
+  // the same change; this key keeps its reviewed overlay rows.
+  'guide.arenaPage.honorFinalNote',
+  // Phase 20 (2026-09-03, the wiki completeness audit): the arena rewards prose
+  // said a loss 'costs you nothing but rating' and that Honor's day 'rolls over
+  // on its own clock'; a played-out loss and a draw pay RANKED_ARENA_LOSS_HONOR
+  // and the day is ctx.resetDay, the realm's nightly reset (src/sim/pvp/honor.ts).
+  // The successor rewardsBodyLossShare says so, and its five non-Latin fills
+  // rode the same change; this key keeps its reviewed overlay rows.
+  'guide.arenaPage.rewardsBody',
+  // Phase 20 (2026-09-03, the wiki completeness audit): the Warfare prose said
+  // 'a full honor kit is worth nothing on a dungeon boss', but every WARFARE row
+  // carries ordinary stats and its slot's armor or weapon baseline
+  // (src/sim/content/pvp_honor.ts); only the two ratings and the set bonuses
+  // are PvP-only. The successor warfareBodyStatsStay says so, and its five
+  // non-Latin fills rode the same change; this key keeps its reviewed rows.
+  'guide.arenaPage.warfareBody',
+  // Phase 20 (2026-09-03, the wiki completeness audit): the Warfare trade prose
+  // said 'everything it does bring is spent on other players', false for the
+  // same reason as warfareBody above (every WARFARE row has a positive
+  // primary-stat sum). The successor warfareTradeBodyRatingSpent scopes the
+  // clause to the Warfare rating and set bonuses, and its five non-Latin fills
+  // rode the same change; this key keeps its reviewed overlay rows.
+  'guide.arenaPage.warfareTradeBody',
+  // Phase 20 (2026-09-03, the wiki completeness audit): the social page's
+  // calendar prose listed six realm days where SYSTEM_EVENTS ships seven and
+  // closed on 'not a bonus; nothing about your character changes', false on the
+  // Double Honor Weekend (src/sim/pvp/honor_event.ts doubles Thornhollow Fields
+  // honor all weekend); the successor calendarBodyDoubleHonor names the seventh
+  // day and the one exception, and its five non-Latin fills rode the change.
+  'guide.social.calendarBody',
+  // Phase 20 (2026-09-03, the wiki completeness audit): the social page's emote
+  // prose said 'target a friend first to aim it at them', while the emote arm of
+  // src/sim/social/chat.ts aims by the typed name alone and never reads the
+  // actor's target, and called X the wheel key where KeyX is only the default;
+  // the successor emotesBodyNamedTarget says both, and its five non-Latin fills
+  // rode the change (the old key keeps its five reviewed overlay rows here).
+  'guide.social.emotesBody',
+  // Phase 20 (2026-09-03, the wiki completeness audit): the social page's
+  // finder prose let any member queue 'with the party you already have'
+  // (dungeonFinderQueueJoin refuses everyone but the leader) and had a decline
+  // wait 'before the queue offers you another' (failProposal drops the
+  // decliner's unit from the queue and never re-queues it); the successor
+  // finderBodyLeaderQueues says both, and its five non-Latin fills rode the change.
+  'guide.social.finderBody',
+  // Phase 20 (2026-09-03, the wiki completeness audit): the social page's loot
+  // roll prose closed on 'The highest roll wins.', while resolveLootRoll in
+  // src/sim/loot/loot_roll.ts contends the Need rolls alone whenever anyone
+  // rolled Need, so a Greed roll of any size loses to a Need roll of 1; the
+  // successor lootRollBodyNeedBeatsGreed states the rule, and its five
+  // non-Latin fills rode the change (the old key keeps its reviewed rows here).
+  'guide.social.lootRollBody',
+  // Phase 20 (2026-09-03, the wiki completeness audit): the frames prose said
+  // only the three unit frames move and sent players to a 'Reset Frame
+  // Positions' options row that was retired (options_window.ts keeps the note
+  // where it stood); the successor framesMoveBodyEditFrames names Edit Frames,
+  // every HUD_FRAME_SPECS frame it loosens, and the Frames tab's Reset to
+  // Defaults footer, and its five non-Latin fills rode the same change (the
+  // old key keeps its reviewed overlay rows).
+  'guide.interfacePage.framesMoveBody',
+  // Phase 20 (2026-09-03, the wiki completeness audit): the map prose said M
+  // opens on the continent (Hud.toggleMap always opens the per-zone level),
+  // that it shows the gathering nodes 'you have found' (every authored node of
+  // the zone draws, ready/locked are its only per-player facets), that only a
+  // delve switches the map (five MapWindowMode surfaces plus the castle plan),
+  // and it skipped the Reliquary tracker; the successor mapBodyZoneFirst says
+  // all of it, and its five non-Latin fills rode the same change.
+  'guide.interfacePage.mapBody',
+  // Phase 20 (2026-09-03, the wiki completeness audit): the touch prose
+  // promised 'up to seven pages once you have all three action bars switched
+  // on' where the ring has MOBILE_ACTION_PAGE_COUNT pages over every ability
+  // slot regardless of the desktop rows, and listed the Vale Cup in a More
+  // tray that has no such button; the successor mobileBodyTwoPages
+  // interpolates {pages} and {slots} from the live pure core and drops the
+  // Vale Cup, and its five non-Latin fills rode the same change.
+  'guide.interfacePage.mobileBody',
+  // Phase 20 (2026-09-03, the wiki completeness audit): the extra-windows
+  // prose listed 'the Vale Cup (Y)' (no bind defaults to KeyY, no such
+  // window), counted the held emote wheel among the toggled windows, opened
+  // Player Info from a nameplate right-click (a world right-click only
+  // targets; the menu lives on the target frame) and made the card need
+  // proximity (only the gear does); the successor winMoreBodyNoValeCup says
+  // what the game does, adds the Developers tab, and its five non-Latin
+  // fills rode the same change.
+  'guide.interfacePage.winMoreBody',
+  // Phase 20 (2026-09-03, the wiki completeness audit): the world-windows
+  // prose promised a class trainer (none exists: abilities arrive by level and
+  // Training is the station masters' recipe ladder), a buyback TAB (one panel
+  // with a buyback section at its foot), a guild bank as 'a second tab' (the
+  // strip is Personal, Vault, Guild) and one market keeper where two NPCs
+  // carry the market flag; the successor worldWindowsBodyStationMaster says
+  // what the game does, and its five non-Latin fills rode the same change.
+  'guide.interfacePage.worldWindowsBody',
+];
+
+export const RETIRED_KEY_SET = new Set(RETIRED_KEYS);
+
+// The reason stamped on every retired blocked row in the registry.
+export const RETIRED_REASON =
+  'Retired key: kept only for its reviewed overlay rows and the release-fill ledger; no page renders it (tests/guide_key_coverage.test.ts RETIRED_KEYS), so it is never a fill work item.';

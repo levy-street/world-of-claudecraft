@@ -8,6 +8,7 @@ import { isSelfScheduled } from '../src/sim/respawn_policy';
 import type { MobTemplate } from '../src/sim/types';
 import { mobXpValue } from '../src/sim/types';
 import { coinEvPerKill, itemEvPerKill, worldFarmClusters, xpPerKill } from './helpers/farm_yield';
+import { UNMAPPED_FAMILY, UNMAPPED_FAMILY_2 } from './helpers/unmapped_family';
 
 // Budgets are pinned ~25% above the shipped maxima, so ordinary content tuning
 // has room while a structural regression (a coin fill an order of magnitude off,
@@ -220,31 +221,45 @@ describe('harvest-family trash carries usable components', () => {
     expect(governed().length).toBeGreaterThanOrEqual(21);
   });
 
-  it('gives every beast, spider and reptile at least one HARVESTABLE tag', () => {
-    // Mapped in HARVEST_COMPONENT_ITEMS specifically: unmapped tags like gills
-    // and horn are dead weight the corpse-harvest command cannot turn into an
-    // item.
-    const bare = governed()
-      .filter(
-        ({ template }) =>
-          !(template.componentTags ?? []).some((tag) => tag in HARVEST_COMPONENT_ITEMS),
-      )
+  // The ONE predicate both the sweep and its negative control run: the control
+  // is only decisive because a mutation here moves both. Its previous form
+  // re-implemented the filter inline, so flipping the sweep's `.some` to
+  // `.every` left the control green over its own copy (11m QA).
+  const isBare = (tags: readonly string[] | undefined) =>
+    !(tags ?? []).some((tag) => tag in HARVEST_COMPONENT_ITEMS);
+
+  // The sweep's whole pipeline as one callable, so the empty-sweep arm can be
+  // proven to produce a row before it is trusted (the filter or the row
+  // format breaking would otherwise leave the sweep AND its control green;
+  // the same class harvest_geography's scanner control closed, 11m QA).
+  const bareRows = (list: readonly { template: MobTemplate; zoneId: string }[]) =>
+    list
+      .filter(({ template }) => isBare(template.componentTags))
       .map(({ template, zoneId }) => `${template.id} (${zoneId})`);
-    expect(bare).toEqual([]);
+
+  it('gives every beast, spider and reptile at least one HARVESTABLE tag', () => {
+    // Mapped in HARVEST_COMPONENT_ITEMS specifically: an unmapped tag is dead
+    // weight the corpse-harvest command cannot turn into an item (gills and
+    // horn were the shipped examples until Phase 11m mapped both; the
+    // synthetic families below are what stand in for that shape now).
+    expect(bareRows(governed())).toEqual([]);
+    // Positive control on the PIPELINE, not only the predicate: one bare
+    // synthetic entry must come out as exactly one formatted row.
+    expect(
+      bareRows([
+        { template: { id: 'x', componentTags: [UNMAPPED_FAMILY] } as MobTemplate, zoneId: 'z' },
+      ]),
+    ).toEqual(['x (z)']);
   });
 
   it('rejects an unmapped-only tag set, running the same predicate as the rule', () => {
     // Negative control that actually exercises the check above rather than
     // restating the map's contents: a synthetic mob carrying only unmapped tags
     // must be reported as bare, and one carrying a mapped tag must not.
-    const bareOf = (tags: string[]) =>
-      [{ componentTags: tags }].filter(
-        (t) => !(t.componentTags ?? []).some((tag) => tag in HARVEST_COMPONENT_ITEMS),
-      ).length;
-    expect(bareOf(['gills', 'horn'])).toBe(1);
-    expect(bareOf(['hide'])).toBe(0);
-    expect(bareOf(['gills', 'hide'])).toBe(0);
-    expect(bareOf([])).toBe(1);
+    expect(isBare([UNMAPPED_FAMILY, UNMAPPED_FAMILY_2])).toBe(true);
+    expect(isBare(['hide'])).toBe(false);
+    expect(isBare([UNMAPPED_FAMILY_2, 'hide'])).toBe(false);
+    expect(isBare([])).toBe(true);
   });
 
   it('keeps the hedge constructs on coin, the one sanctioned exception', () => {

@@ -5,6 +5,7 @@
 // never drift from shipped content.
 
 import { afterEach, describe, expect, it } from 'vitest';
+import { FARM_PATCHES } from '../src/sim/content/farm_patches';
 import {
   CAMPS,
   ESCORTS,
@@ -506,6 +507,64 @@ describe('questObjectiveAreas', () => {
     }
   });
 
+  describe('objective-type dispatch exhaustiveness (the fall-through guard)', () => {
+    // The dispatch switches exhaustively over QuestObjective['type'] (a
+    // compile-time never default), and its RUNTIME posture for a value
+    // outside the union (a future save, a foreign server) is pinned here:
+    // draw nothing for that objective, never throw, and keep resolving the
+    // rest of the log. Installed as a temporary test-only quest, the
+    // sibling describe's pattern.
+    const TEST_QUEST_ID = 'q_test_future_objective_type';
+    const originalQuest = QUESTS[TEST_QUEST_ID];
+    afterEach(() => {
+      if (originalQuest) QUESTS[TEST_QUEST_ID] = originalQuest;
+      else delete QUESTS[TEST_QUEST_ID];
+    });
+
+    function installObjectives(objectives: unknown[]): Map<string, QuestProgress> {
+      QUESTS[TEST_QUEST_ID] = {
+        id: TEST_QUEST_ID,
+        name: 'Future Shapes',
+        giverNpcId: 'npc_none',
+        turnInNpcId: 'npc_none',
+        text: '',
+        completionText: '',
+        objectives,
+      } as unknown as QuestDef;
+      const log = new Map<string, QuestProgress>();
+      log.set(TEST_QUEST_ID, {
+        questId: TEST_QUEST_ID,
+        counts: objectives.map(() => 0),
+        state: 'active',
+      });
+      return log;
+    }
+
+    it('a craft objective deliberately draws nothing: no world anchor to circle', () => {
+      const log = installObjectives([
+        { type: 'craft', recipeId: 'copper_bar', count: 1, label: 'craft' },
+      ]);
+      expect(questObjectiveAreas(log)).toEqual([]);
+    });
+
+    it('an out-of-union objective type draws nothing, never throws, and spares the rest of the log', () => {
+      const log = installObjectives([
+        { type: 'attune_ley_line', count: 1, label: 'a future patch objective' },
+      ]);
+      const kill = requireKillQuest();
+      log.set(kill.quest.id, {
+        questId: kill.quest.id,
+        counts: kill.quest.objectives.map(() => 0),
+        state: 'active',
+      });
+      const areas = questObjectiveAreas(log);
+      // The unknown shape contributed no circle...
+      expect(areas.some((a) => a.objectives.some((o) => o.questId === TEST_QUEST_ID))).toBe(false);
+      // ...while the real quest beside it still resolved its camps.
+      expect(areas.some((a) => a.objectives.some((o) => o.questId === kill.quest.id))).toBe(true);
+    });
+  });
+
   describe('gather objective with only an itemId (no nodeType)', () => {
     // No shipped quest uses this shape yet (every gather objective in content
     // pins a nodeType), so it is installed as a temporary test-only quest, the
@@ -580,6 +639,90 @@ describe('questObjectiveAreas', () => {
         );
         expect(misleadingArea).toBeUndefined();
       }
+    });
+  });
+
+  describe('farm objective (the farming patches)', () => {
+    // The farm ACTION objective (Farming go-live) is credited by the plant and
+    // harvest actions (quest_credit.ts onCropFarmedForQuests), which never
+    // read patchId, so the marker arm is guidance only: the named patch's
+    // beds, or every patch when unnamed. Installed as a temporary test-only
+    // quest like the gather block above; the full arm (centroid, radius, ref
+    // merge, completion) lives in tests/farm_quest_objective.test.ts.
+    const TEST_QUEST_ID = 'q_test_farm_marker';
+    const originalQuest = QUESTS[TEST_QUEST_ID];
+    afterEach(() => {
+      if (originalQuest) QUESTS[TEST_QUEST_ID] = originalQuest;
+      else delete QUESTS[TEST_QUEST_ID];
+    });
+    function install(patchId: string | undefined): QuestDef {
+      const quest: QuestDef = {
+        id: TEST_QUEST_ID,
+        name: 'Test Farm Marker',
+        giverNpcId: 'foreman_odell',
+        turnInNpcId: 'foreman_odell',
+        text: 'Test only.',
+        completionText: 'Test complete.',
+        objectives: [
+          {
+            type: 'farm',
+            action: 'plant',
+            cropId: 'vale_wheat',
+            ...(patchId === undefined ? {} : { patchId }),
+            count: 1,
+            label: 'Vale Wheat planted',
+          },
+        ],
+        xpReward: 0,
+        copperReward: 0,
+        itemRewards: {},
+        retired: true,
+      };
+      QUESTS[TEST_QUEST_ID] = quest;
+      return quest;
+    }
+    function centroid(beds: readonly { x: number; z: number }[]): { x: number; z: number } {
+      return {
+        x: beds.reduce((sum, b) => sum + b.x, 0) / beds.length,
+        z: beds.reduce((sum, b) => sum + b.z, 0) / beds.length,
+      };
+    }
+
+    it("encloses the named patch's beds in one circle centred on their centroid", () => {
+      const patch = FARM_PATCHES.find((p) => p.id === 'patch_eastbrook');
+      expect(patch).toBeTruthy();
+      if (!patch) return;
+      const areas = questObjectiveAreas(activeLog(install(patch.id)));
+      expect(areas).toHaveLength(1);
+      const c = centroid(patch.beds);
+      expect(areas[0].center).toEqual(c);
+      for (const bed of patch.beds) {
+        expect(Math.hypot(bed.x - c.x, bed.z - c.z)).toBeLessThanOrEqual(areas[0].radius);
+      }
+      expect(areas[0].objectives).toEqual([{ questId: TEST_QUEST_ID, objectiveIndex: 0 }]);
+      // No other patch is circled: the marker follows the objective's patchId.
+      for (const other of FARM_PATCHES) {
+        if (other.id === patch.id) continue;
+        const oc = centroid(other.beds);
+        expect(areas.some((a) => a.center.x === oc.x && a.center.z === oc.z)).toBe(false);
+      }
+    });
+
+    it('draws every farming patch when the objective names none', () => {
+      const areas = questObjectiveAreas(activeLog(install(undefined)));
+      expect(FARM_PATCHES.length).toBeGreaterThan(1);
+      expect(areas).toHaveLength(FARM_PATCHES.length);
+      for (const patch of FARM_PATCHES) {
+        const c = centroid(patch.beds);
+        const area = areas.find((a) => a.center.x === c.x && a.center.z === c.z);
+        expect(area, `expected an area centred on ${patch.id}`).toBeTruthy();
+        expect(area?.objectives).toEqual([{ questId: TEST_QUEST_ID, objectiveIndex: 0 }]);
+      }
+    });
+
+    it('draws nothing once the objective is complete', () => {
+      const quest = install('patch_eastbrook');
+      expect(questObjectiveAreas(activeLog(quest, [1]))).toEqual([]);
     });
   });
 });

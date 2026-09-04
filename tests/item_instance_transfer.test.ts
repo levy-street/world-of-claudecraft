@@ -37,19 +37,28 @@ describe('isTransferLockedInstance', () => {
 });
 
 describe('publicInstanceView: the display trim', () => {
-  it('projects exactly signer/enchant/rolled and drops the rest', () => {
+  it('projects exactly signer/enchant/rolled/name and drops the rest', () => {
+    // The fixture carries EVERY dropped field by name, the Perfecting pair
+    // included, so the exclusion is pinned directly here rather than only
+    // transitively through the eqi cross-pin below. `name` (the player-chosen
+    // legendary name, Masterwrought phase 13) is the one cosmetic JOIN since
+    // the allowlist was written: it projects, the Perfected marker does not.
     const full: ItemInstancePayload = {
       signer: 'Ayla',
       enchant: 'ench_stat_str',
-      rolled: { quality: 'epic', stats: { str: 2 }, masterwork: true },
+      rolled: { quality: 'legendary', stats: { str: 2 }, masterwork: true },
+      name: "Vel'tara's Oath",
       charges: { zap: 3 },
       bindOnTrade: true,
       boundTo: 12,
+      perfecting: 2,
+      perfected: true,
     };
     expect(publicInstanceView(full)).toEqual({
       signer: 'Ayla',
       enchant: 'ench_stat_str',
-      rolled: { quality: 'epic', stats: { str: 2 }, masterwork: true },
+      rolled: { quality: 'legendary', stats: { str: 2 }, masterwork: true },
+      name: "Vel'tara's Oath",
     });
   });
 
@@ -62,17 +71,19 @@ describe('publicInstanceView: the display trim', () => {
 
   it('matches the eqi wire allowlist in server/game.ts: widen both or neither', () => {
     // Source-scrape the eqi projection loop (the enchant_apply_view.test.ts
-    // pin) and assert this module projects the identical key set.
+    // pin) and assert this module projects the identical key set. `name`
+    // joined both sites together (Masterwrought phase 13); the ban list below
+    // still holds every non-cosmetic field out by name.
     const game = readFileSync(new URL('../server/game.ts', import.meta.url), 'utf8');
     const projected = [...game.matchAll(/pub\.(\w+) = inst\.(\w+);/g)].map((m) => m[1]);
-    expect(projected.sort()).toEqual(['enchant', 'rolled', 'signer']);
+    expect(projected.sort()).toEqual(['enchant', 'name', 'rolled', 'signer']);
     const transfer = readFileSync(
       new URL('../src/sim/item_instance_transfer.ts', import.meta.url),
       'utf8',
     );
     const trimmed = [...transfer.matchAll(/pub\.(\w+) = /g)].map((m) => m[1]);
-    expect([...new Set(trimmed)].sort()).toEqual(['enchant', 'rolled', 'signer']);
-    for (const banned of ['boundTo', 'bindOnTrade', 'charges']) {
+    expect([...new Set(trimmed)].sort()).toEqual(['enchant', 'name', 'rolled', 'signer']);
+    for (const banned of ['boundTo', 'bindOnTrade', 'charges', 'perfecting', 'perfected']) {
       expect(transfer.includes(`pub.${banned}`), `${banned} must never project`).toBe(false);
     }
   });

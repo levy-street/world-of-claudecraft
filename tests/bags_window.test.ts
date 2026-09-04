@@ -531,16 +531,47 @@ describe('bags_window: touch peek + bank-cluster close', () => {
       /case 'marketSell':\s*this\.deps\.stageMarketSell\(s\.itemId, s\.instance\);/,
     );
     expect(body).toMatch(/case 'bankDeposit': \{/);
-    // feedPet and useItem now also forward WHICH bag copy was clicked, so the
-    // call no longer ends at `s.itemId`. These pins are about REACHABILITY from
-    // the shared dispatch, so they match the call opening and leave the argument
-    // list to tests/item_copy_addressing_guard.
-    expect(body).toMatch(/case 'petFeed':\s*this\.deps\.world\(\)\.feedPet\(s\.itemId/);
+    // feedPet and useItem now also forward WHICH bag copy was clicked, resolved
+    // through copyRefFor, which REFUSES a stale click rather than falling back
+    // to an id-only command that would spend an id-mate. These pins are about
+    // REACHABILITY from the shared dispatch, so they match through the refusal
+    // guard to the call opening and leave the argument list to
+    // tests/item_copy_addressing_guard.
+    expect(body).toMatch(
+      /case 'petFeed':[\s\S]{0,200}?const at = this\.copyRefFor\(s\);\s*if \(!at\) return;\s*this\.deps\.world\(\)\.feedPet\(s\.itemId, at\);/,
+    );
     // The 'use' case tries the gathering-tool routing first (#2343) and only
     // falls back to the plain useItem command when the hook declines.
     expect(body).toMatch(
-      /case 'use': \{[\s\S]{0,400}?if \(!item \|\| !this\.deps\.useGatherTool\(item\)\) \{[\s\S]{0,200}?this\.deps\.world\(\)\.useItem\(s\.itemId/,
+      /case 'use': \{[\s\S]{0,400}?if \(!item \|\| !this\.deps\.useGatherTool\(item\)\) \{[\s\S]{0,300}?this\.deps\.world\(\)\.useItem\(s\.itemId, at\);/,
     );
+  });
+
+  it('routes the placeFeast case to world.placeFeast() exactly once, never useItem (Farming Phase 12)', () => {
+    // The classification half lives in bags_view.test.ts; this pins that the
+    // dispatch actually reaches the IWorldFarming verb. Comment-stripped
+    // (line comments first, then blocks) so prose naming useItem cannot
+    // trip the negative arm, sliced to the case's own break so the claim
+    // cannot ride the neighboring 'use' case.
+    const code = painter.replace(/\/\/[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
+    const start = code.indexOf('private runBagAction(');
+    expect(start).toBeGreaterThan(-1);
+    const body = code.slice(start, code.indexOf('\n  }\n', start));
+    const caseAt = body.indexOf("case 'placeFeast':");
+    expect(caseAt).toBeGreaterThan(-1);
+    const caseEnd = body.indexOf('break;', caseAt);
+    expect(caseEnd).toBeGreaterThan(caseAt);
+    const caseBody = body.slice(caseAt, caseEnd);
+    // The verb now carries the clicked COPY (Phase 18, bags-feast-clicked-copy):
+    // the resolve refuses a stale click before the send, and the send names the
+    // copy rather than leaving the server's id-only walk to pick one.
+    expect(caseBody).toContain('const at = this.copyRefFor(s);');
+    expect(caseBody).toContain('if (!at) return;');
+    expect(caseBody).toContain('this.deps.world().placeFeast(at)');
+    expect(caseBody).not.toContain('useItem');
+    // Exactly one placeFeast call in the whole dispatch: the case is the one
+    // client entry point for the verb (the reachability suite pins the file).
+    expect(body.split('.placeFeast(').length - 1).toBe(1);
   });
 });
 
@@ -571,7 +602,21 @@ describe('bags_window: right-click uses, dragging destroys/equips', () => {
   });
 
   it('the world drop opens the destroy prompt and honors the noDiscard refusal', () => {
-    expect(painter).toContain('promptDestroy(itemId: string, count: number): void');
+    // The prompt takes the dragged COPY's identity (its pick-up index plus its
+    // pin), not a bare index: the bags shift mid-drag, and an index alone can
+    // come to name a different copy of the same id by the time the drop lands.
+    expect(painter).toContain(
+      'promptDestroy(itemId: string, count: number, ref: DraggedCopyRef | null = null): void',
+    );
+    // The touch drag ghost carries the copy's rim too (never exercised by the
+    // marker rig, whose render does not start a drag, so pinned here over
+    // COMMENT-STRIPPED source: it is the only coverage of that read, and a
+    // commented-out arrow must not satisfy it). The destroy prompt's TARGETED
+    // single-copy arm is behavioral (tests/bags_vendor_sell_confirm.test.ts).
+    const ghostCode = painter.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+    expect(ghostCode).toMatch(
+      /ghostHtml: \(\) =>\s*this\.deps\.itemIcon\(item, wornItemCellParts\(item, s\.instance\)\.quality\),/,
+    );
     expect(painter).toContain('destroyAction(itemId: string): BagDestroyAction');
     expect(painter).toContain("t('hudChrome.bags.cannotDestroy')");
     // The HUD installs the canvas as the world drop target with exactly those seams.
@@ -622,10 +667,11 @@ describe('bags_window: a vendor click confirms before selling anything but true 
   });
 
   it('the confirm prompt re-resolves the live slot at submit and refuses on a mismatch', () => {
-    const body = painter.slice(
-      painter.indexOf('private showSellConfirmPrompt('),
-      painter.indexOf('private showSellConfirmPrompt(') + 2200,
-    );
+    // Comment-stripped source (the source-text pin trap), sliced to the next
+    // method boundary rather than a magic length that rots on every edit.
+    const stripped = painter.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+    const start = stripped.indexOf('private showSellConfirmPrompt(');
+    const body = stripped.slice(start, stripped.indexOf('\n  private ', start + 1));
     // Re-resolved by reference identity at SUBMIT time, not the index captured
     // when the dialog opened: the whole point of this fix is that a stale
     // selection must REFUSE rather than fall back to an itemId-only sellItem

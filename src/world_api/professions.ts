@@ -3,11 +3,12 @@ import type {
   CommissionOrderStatus,
 } from '../sim/professions/commission_order';
 import type { MaterialRarity } from '../sim/professions/gathering';
+import type { PerfectItemRef, PerfectingInfoView } from '../sim/professions/perfecting';
 import type { PlayerProfessionSkill, ProfessionRecipeRecord } from '../sim/professions/types';
 import type { EquipSlot, StationDef } from '../sim/types';
 import type { WorldInteractionOutcome } from './interaction';
 
-export type { CommissionOrderScope, CommissionOrderStatus };
+export type { CommissionOrderScope, CommissionOrderStatus, PerfectItemRef, PerfectingInfoView };
 
 // Render-safe projection of a player's professions standing. Stub as of
 // #1164, now real for the gathering professions (#1119): `skills` carries one
@@ -40,7 +41,7 @@ export interface CraftingIdentityView {
   knownRecipes: readonly string[];
   // Repeatable work orders currently inside their cooldown window (Professions
   // 2.0), SORTED so the JSON form is a stable cprof signature. The
-  // SERVER computes this against ITS tickCount (the activeMobileStationCraft
+  // SERVER computes this against ITS tickCount (the activeMobileStationCrafts
   // precedent: tick-domain state is resolved server-side, never predicted by the
   // client) and it rides the existing cprof delta; the online client feeds it
   // into computeQuestState so a work order on cooldown shows unavailable there
@@ -96,7 +97,11 @@ export interface CraftResultView {
     | 'station_required'
     // #2350: denied because the output (modeled after reagent consumption)
     // cannot fit the pooled bag budget.
-    | 'no_bag_space';
+    | 'no_bag_space'
+    // Masterwrought phase 07: denied because the recipe is oncePerDay and
+    // this character already crafted it inside the current reset-day window
+    // (server-private stamp; the player learns of the gate on attempt).
+    | 'daily_limit';
   // Professions 2.0: true only when the masterwork effect applied to
   // this craft's output. `quality` now reports the output def's static
   // quality (outputs are deterministic; the quality roll is retired).
@@ -177,6 +182,11 @@ export interface ApplyEnchantResultView {
     // re-apply whose accept would be pure reagent loss.
     | 'already_enchanted'
     | 'same_enchant'
+    // Masterwrought phase 10, the Lucent tier: a requiresPerfected enchant on
+    // a copy carrying no Perfected marker, and an enchant whose skillReq is
+    // above the applier's flat Enchanting skill.
+    | 'not_perfected'
+    | 'insufficient_skill'
     | 'busy';
 }
 
@@ -193,6 +203,14 @@ export interface CommissionOrderView {
   crafterName?: string;
   status: CommissionOrderStatus;
   acceptedByName?: string;
+  /** The accepter's lifetime craft record (Masterwrought phase 14, the
+   *  commission quality signal), SNAPSHOT at accept time from the crafter's
+   *  deed stat counters (masterworksCrafted / legendariesForged): numbers
+   *  only, string-free per the seam rule. Present together once a crafter
+   *  has accepted (zero is a real, honest record); ABSENT on every open row
+   *  and on rows from a pre-signal server. */
+  readonly crafterMasterworks?: number;
+  readonly crafterLegendaries?: number;
   /** The viewer is the requester who opened this order. */
   mine: boolean;
   /** The viewer is the crafter who accepted this order, or (while it is
@@ -317,7 +335,11 @@ export interface IWorldProfessions {
   // mechanic): place the viewer's own temporary station for `craftId`.
   // Specialization-gated server-side (mobile_station.ts
   // placeMobileCraftingStation); Sim validates and stores on PlayerMeta,
-  // ClientWorld sends the place_mobile_station command.
+  // ClientWorld sends the place_mobile_station command. A SECOND placement
+  // path exists beside this command: the Master's Field Forge item places
+  // through the useItem arm WITHOUT the specialization gate (holding the
+  // item IS the credential; mobile_station.ts placeMobileStationFromItem),
+  // and its station is partyShared.
   placeMobileStation(craftId: string): void;
   // Recipe training (Professions 2.0): learn `recipeId` from the
   // resident master at its craft's STATIC station (a mobile station never
@@ -327,14 +349,19 @@ export interface IWorldProfessions {
   // once on success, and emits the personal text-free `trainResult` event;
   // ClientWorld sends the train_recipe command and never decides the outcome.
   trainRecipe(recipeId: string): void;
-  // The craft id of the viewer's own currently ACTIVE (placed, unexpired)
-  // mobile station, or null. An identifier, string-free per the seam rule.
-  // Offline this reads the live PlayerMeta slot (expiry checked against the
-  // sim tick); online it mirrors the server's `mst` self-delta
-  // (server/game.ts computes active-vs-expired against ITS tickCount, so the
-  // client never predicts placement or reasons about tick domains). The slot
-  // is transient either way: never serialized into the character save.
-  activeMobileStationCraft: string | null;
+  // The DEDUPED, SORTED set of mobile craft ids whose station currently
+  // serves the viewer: the viewer's own ACTIVE (placed, unexpired) station's
+  // craft at any distance, plus the craft of every ACTIVE partyShared
+  // station owned by a party member within STATION_RADIUS of the viewer.
+  // EMPTY array when none, never null. Identifiers, string-free per the seam
+  // rule. Offline this reads the live PlayerMeta slots (expiry checked
+  // against the sim tick); online it mirrors the server's `mst` self-delta,
+  // a comma-joined scalar the client splits (server/game.ts computes
+  // active-vs-expired and party range against ITS tickCount and positions,
+  // so the client never predicts placement or reasons about tick domains).
+  // The slot is transient either way: never serialized into the character
+  // save.
+  activeMobileStationCrafts: readonly string[];
   // Enchanting profession commands (Professions 2.0): disenchant a held
   // eligible weapon/armor piece into arcane materials, apply an enchant to a held
   // copy, or salvage a held piece into generic materials. `slotIndex`, when
@@ -347,6 +374,13 @@ export interface IWorldProfessions {
   // the client; ClientWorld sends the disenchant_item/apply_enchant/salvage_item
   // wire command and never decides the outcome.
   disenchantItem(itemId: string, target?: { slotIndex: number }): void;
+  // The Sundered Essence extraction (Masterwrought phase 04): a cast-paced,
+  // disenchant-adjacent break of a RAID-sourced epic into the bound ceiling
+  // material. Same slotIndex contract as disenchantItem above (a REQUEST the
+  // sim re-validates and pins; a mid-cast bag splice denies rather than
+  // redirecting the destroy). Server-authoritative: ClientWorld sends the
+  // extract_essence wire command and never decides the outcome.
+  extractEssence(itemId: string, target?: { slotIndex: number }): void;
   // `slot` targets the copy WORN in that equipment slot, enchanting it in place
   // (no unequip / enchant / re-equip round trip). Omitted, the enchant applies to
   // a bagged copy exactly as before. It is a SLOT and not an item id because
@@ -446,4 +480,33 @@ export interface IWorldProfessions {
   // and the server still prices authoritatively (the toolEffectResult event
   // carries the price actually paid).
   rechargeToolEffect(professionId: string): void;
+  // The Perfecting stage (Masterwrought phase 12): walk an apex
+  // (masterwrought-flagged) piece the viewer OWNS, worn or bagged, up the rank
+  // track to Perfected. `ref` is a passed selection, never an id (the
+  // item_copy_ref discipline): a worn ref names the equipment slot, a bagged
+  // ref the bag CELL index plus the item id seen there (the index-plus-id
+  // pin: a shifted cell resolves to nothing). Server-authoritative end to
+  // end: the Sim resolves
+  // the whole deny ladder and the one success roll in
+  // src/sim/professions/perfecting.ts (skill in the craft that made it,
+  // lock-aware materials, the first-attempt Maker's Bond stamp, fail-forward);
+  // ClientWorld sends the perfect_item command and never decides the outcome.
+  // Feedback is the sim's own error/log lines plus the self inv/einst mirrors
+  // re-diffing (the command is a HEAVY_SELF_CMDS member), no result event.
+  // `name` (Masterwrought phase 13): on an ALREADY-Perfected copy this same
+  // command is the orange promotion, and the optional player-chosen name is
+  // its input (sim-side shape check in legendary_name.ts; the online server
+  // screens content). Without a name a promotion-eligible copy refuses with
+  // the needs-a-name line; an unperfected copy never reads the field.
+  perfectItem(ref: PerfectItemRef, name?: string): void;
+  // The piece's Perfecting state as ONE shared view (rank, ranks, perfected,
+  // the phase 13 `promoted` flag, the gating craft and skill verdict, the
+  // bind, and the lock-aware bill for the NEXT act: the attempt materials, or
+  // the promotion's Deed of Making once Perfected), or null when the ref
+  // resolves to no item. Both hosts build it
+  // through the same pure function (perfectingInfoFrom): offline over live
+  // PlayerMeta, online over the inventory/equipment/equipmentInstances/
+  // craftingIdentity mirrors, so the two cannot drift. A pure read: no wire
+  // round trip, nothing predicted.
+  perfectingInfo(ref: PerfectItemRef): PerfectingInfoView | null;
 }

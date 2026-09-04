@@ -946,7 +946,10 @@ export const ITEM_SETS: Record<string, ItemSet> = {
         // consumes any HoT when the wearer has none of their own, so "only"
         // would overclaim the narrowing. Recorded as a copy deviation in the
         // wave's PR notes.
-        text: 'Swiftmend consumes your own Wildbloom or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.',
+        // "Fleetmend" is the ability's shipped display name (the Phase 03 naming
+        // audit renamed swiftmend; docs/design/naming-audit.md, pinned by
+        // tests/ip_scrub.test.ts): player copy names the ability as players see it.
+        text: 'Fleetmend consumes your own Wildbloom or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.',
       },
       {
         pieces: 4,

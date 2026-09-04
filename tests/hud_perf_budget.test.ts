@@ -70,9 +70,26 @@
 // together exercise all seven elided writers. The keyed-pool painters (auras, party,
 // fct) build + reconcile real DOM nodes; their steady-state *_painter.test.ts
 // tests prove no per-frame node CHURN plus targeted expensive-write gates (icon-url, crest
-// class), while facet-level DOM write-elision is guaranteed by makeWriterFacet and proven
-// with write/skip counters in tests/painter_host.test.ts; their bypass count rides ARM 3.
+// class), while facet-level DOM write-elision is proven with write/skip counters in
+// tests/painter_host.test.ts; their bypass count rides ARM 3.
 // ARM 1 still scans all eight painters (incl. the pooled ones) for raw writes + forced reflow.
+//
+// STATE THE GUARANTEE EXACTLY, because this note used to overstate it and the
+// overstatement cost real frames. makeWriterFacet guarantees elision PER (element,
+// KIND), not per element: the four single-slot writers share ONE (kind, value) entry
+// per element (painter_host.ts shouldWriteSingleSlot), so an element written through
+// TWO DIFFERENT single-slot writers has that entry flipped by every call and BOTH
+// writes bypass elision forever. This exemption waved exactly that case through:
+// auras_painter wrote the stacks badge with setDisplay AND setText, so every stacking
+// aura paid two un-elided writes per frame, for the life of the aura, and nothing here
+// could see it (ARM 2 does not drive auras; ARM 1 scans only for raw writes and
+// reflows; the *_painter.test.ts suites drive a RECORDING stub, which has no cache to
+// collide in). Seven such sites shipped across five modules. What covers the case now
+// is tests/painter_single_slot_collision_guard.test.ts, an AST scan of src/ui, plus
+// tests/painter_slot_collision.test.ts, which drives the real painters over the REAL
+// facet across steady polls and asserts SKIPS. Extending ARM 2 to the pooled painters
+// would NOT have caught it either: this defect is invisible to a per-file scan and to
+// any driver that does not compare counts across two identical frames.
 
 import { readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -563,6 +580,25 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'hud/cross_hotbar/cross_hotbar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/warlock/doom_meter_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'party_frames_painter.ts', allow: {}, reflowAllow: {} },
+  // The portrait rest badge. Cold by cadence (the caller gates it on the
+  // resting flag changing, and the language fan-out clears that memo so a
+  // locale switch repaints once), but facet-routed and raw-write-free anyway,
+  // so it belongs here rather than in an allowance list.
+  { file: 'rest_indicator_painter.ts', allow: {}, reflowAllow: {} },
+  // The compass strip. Its PER-FRAME path (paintCompassMarks, driven from
+  // Hud.updateCompass on the fast band) routes every write through the facet:
+  // two setStyleProp calls and setDisplay, zero raw writes. The three allowed
+  // raw writes are both OFF that path, and both are the reason the module
+  // exists as its own file: buildCompassMarks stamps a class and a label onto
+  // each pooled span ONCE when the pool is created, and relabelCompassMarks
+  // rewrites those labels exactly once per runtime language change (the labels
+  // are written at build time and nothing else ever touches them, which is the
+  // i18n defect masterwrought D129 found and fixed).
+  {
+    file: 'compass_strip_painter.ts',
+    allow: { '.className': 1, '.textContent': 2 },
+    reflowAllow: {},
+  },
   // party_below_target measures the target frame, its #tf-debuffs strip, the
   // party container, and (on mobile) the rows wrapper + move zone (five rect
   // reads) ONLY when its cheap invalidation key changes (target/buff-count/
@@ -860,7 +896,7 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   // arms nothing.
   { file: 'char_window.ts', reflowAllow: {}, driverAllow: {} },
   {
-    file: 'crafting_window.ts',
+    file: 'hud/professions/crafting_window.ts',
     // Three scroll regions carried across the rebuild, capture + write-back
     // each: .crafting-body, the identity card's capped .profession-skill-list
     // (desktop), and the card itself (the MOBILE scroller; hud.mobile.css
@@ -872,7 +908,11 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   // Same scroll pair as the vendor family's cold windows above: read the
   // position before the rebuild, write it back after, so the order list
   // does not jump under the player on their own action's repaint.
-  { file: 'commission_order_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
+  {
+    file: 'hud/professions/commission_order_window.ts',
+    reflowAllow: { '.scrollTop': 2 },
+    driverAllow: {},
+  },
   // Two polls that repaint an OPEN window only: a 15s refresh of the reward state and a 30s
   // countdown tick. Page cadence rather than frame cadence, and both no-op while closed.
   // A THIRD cadence reaches this same body and does NOT show up in the `drivers`
@@ -932,6 +972,77 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
     ],
   },
   { file: 'deeds_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
+  // The Harvest Journal's countdown clock: ONE 1 Hz interval armed on open and
+  // cleared on close, the finest resolution any line in that window renders. It
+  // is also the window's only refresh path (nothing else drives it but a
+  // language switch), which is deliberate: the plot model is re-read from the
+  // world every tick, so the journal stays consistent with the server's
+  // events-before-snapshots order without an event-forced cache.
+  {
+    file: 'hud/professions/harvest_journal_window.ts',
+    reflowAllow: {},
+    driverAllow: { setInterval: 1 },
+    drivers: [
+      {
+        driver: 'setInterval',
+        everyMs: 1000,
+        why: "the crop countdown: once a second, rebuild the pure view from a fresh myFarmPlots read and compare its VALUE signature with the painted one. A moved model (a plot planted or harvested, a growing plot flipping to ready or withered, a countdown crossing its deadline) repaints whole through the SAME paint an open takes; an unmoved one rewrites only the time cells' text. Armed on open, cleared on close, and never armed at rest.",
+        stopsAt: {
+          paint:
+            "the window's ordinary full re-render, shared with open() and the language-switch render(). Counting a render path per driver would re-run the argument the cold bucket settled (a count over a render churns on every edit and never moves when the real hazard lands); what this entry holds is that the tick does nothing EXTRA on its way there, and that it only gets there when the model actually moved.",
+        },
+        // `.style` is the `isOpen` getter reading root().style.display, the
+        // daily_rewards shape (this matcher counts ACCESSES, not writes).
+        // `.textContent` is ONE, the elided write alone: the tick compares
+        // against the CACHED rendered string (collected with the cell refs at
+        // the paint that minted them, the lockpick #2498 discipline), so an
+        // unchanged cell costs no DOM access at all and a journal of day-long
+        // crops touches nothing between minute boundaries. The former
+        // `.dataset` read per tick moved to the paint-time collection with
+        // the refs (phase 14).
+        writeAllow: { '.style': 1, '.textContent': 1 },
+        // ZERO: the countdown cell refs are collected once per paint, at the
+        // one innerHTML site that replaces the nodes, never re-queried from
+        // the tick (the same fix #2498 made to the lockpick clock).
+        queryAllow: {},
+        idlAllow: {},
+        // Zero: the tick writes text but never reads a layout box back.
+        reflowAllow: {},
+      },
+    ],
+  },
+  // The Perfecting window's convergence clock (Masterwrought phase 14): ONE
+  // 1 Hz interval armed on open and cleared on close, the harvest journal's
+  // shape. It exists because the attempt path emits NO event (feedback is the
+  // sim's lines plus the inv/einst mirrors re-diffing), so the window compares
+  // a VALUE signature once a second and repaints only when the model moved.
+  // The `.scrollTop` pair is the paint path's scroll carry (read before the
+  // innerHTML rebuild, write after), the reliquary shape.
+  {
+    file: 'hud/professions/perfecting_window.ts',
+    reflowAllow: { '.scrollTop': 2 },
+    driverAllow: { setInterval: 1 },
+    drivers: [
+      {
+        driver: 'setInterval',
+        everyMs: 1000,
+        why: 'the convergence poll: once a second while open, rebuild the pure view from fresh world reads and compare its VALUE signature with the painted one. A moved model (a material count, a rank landing, the Perfected or promoted stamp, the identity mirror syncing) repaints whole through the SAME paintFrom an open takes; an unmoved one does nothing at all.',
+        stopsAt: {
+          close:
+            'the normal window teardown, reached once only when the IWorld changes. It dismisses prompts and clears this interval; perfecting_window.test.ts pins that no prompt, command, or timer survives the world change.',
+
+          paintFrom:
+            "the window's ordinary full re-render, shared with open(), the selection click, and the language-switch relocalize(). The tick does nothing extra on its way there and only gets there when the model actually moved (the harvest journal's argument).",
+        },
+        // `.style` is the `isOpen` getter reading rootEl.style.display (the
+        // daily_rewards shape: the matcher counts ACCESSES, not writes).
+        writeAllow: { '.style': 1 },
+        queryAllow: {},
+        idlAllow: {},
+        reflowAllow: {},
+      },
+    ],
+  },
   { file: 'reliquary_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   { file: 'dungeon_finder_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   // The lockpick clock: a 100ms tick that repaints the remaining-time bar for the duration
@@ -1025,7 +1136,11 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   // path. ONE call, guarded by a feature check with a setTimeout fallback; the
   // count is 3 because the optional-API type declaration names it twice more.
   { file: 'options_window.ts', reflowAllow: {}, driverAllow: { requestIdleCallback: 3 } },
-  { file: 'professions_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
+  {
+    file: 'hud/professions/professions_window.ts',
+    reflowAllow: { '.scrollTop': 2 },
+    driverAllow: {},
+  },
   { file: 'spellbook_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   // The root, trigger, and popover rects position the target-aura configurator inside the
   // viewport. They run only when the player opens or changes that configurator, or when an
@@ -1608,6 +1723,8 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
       'gather_node_tooltip_controller.ts#0',
       'daily_rewards_window.ts#0',
       'daily_rewards_window.ts#1',
+      'hud/professions/harvest_journal_window.ts#0',
+      'hud/professions/perfecting_window.ts#0',
       'hud/delve/lockpick_window.ts#0',
     ]);
     // THIRD, the matchers must have seen real source. The positive control is the lockpick
@@ -1635,6 +1752,19 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
       // shown guard plus one pure model rebuild.
       'gather_node_tooltip_controller.ts: paintAt',
       'daily_rewards_window.ts: renderCurrent',
+      // The journal's countdown tick cuts at the SAME full paint an open takes,
+      // and only reaches it when the model's value signature actually moved
+      // (argued in the entry's why/stopsAt above): the tick body itself is the
+      // isOpen guard, one pure view rebuild, and the text-only cell rewrite.
+      'hud/professions/harvest_journal_window.ts: paint',
+      // The Perfecting window's convergence tick, the journal's exact shape:
+      // it cuts at the SAME full paint an open and a selection click take, and
+      // only reaches it when the value signature moved (argued in the entry's
+      // why/stopsAt above). The tick body itself is the isOpen guard plus one
+      // pure view rebuild and signature compare.
+      // A world change takes normal teardown once and cancels the driver.
+      'hud/professions/perfecting_window.ts: close',
+      'hud/professions/perfecting_window.ts: paintFrom',
     ]);
     expect(
       sweep.violations,

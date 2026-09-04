@@ -1,7 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const crestCanvas = {} as HTMLCanvasElement;
-vi.mock('../src/ui/icons', () => ({ iconCanvas: vi.fn(() => crestCanvas) }));
+// Additive, never bare (the reliquary_window_behavior lesson): only iconCanvas
+// stays stubbed; the module's other exports pass through.
+vi.mock('../src/ui/icons', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../src/ui/icons')>()),
+  iconCanvas: vi.fn(() => crestCanvas),
+}));
 vi.mock('../src/render/characters/portrait', () => ({
   playerPortraitDataUrl: vi.fn(),
   visualPortraitDataUrl: vi.fn(),

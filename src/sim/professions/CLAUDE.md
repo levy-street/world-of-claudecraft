@@ -49,7 +49,11 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
 - `fishing.ts`: the fourth gathering row (bite delay, reel window,
   `FISHING_TABLES_BY_BAND`, and since R19 the gain model: the schedule half
   `fishingCatchGain` composed with the water's teaching ceiling in
-  `fishingCatchGainAt`, the ONLY function a grant site may call); the TWO
+  `fishingCatchGainAt`, the ONLY function a grant site may call); the catch-band
+  ladder is NOT here since masterwrought Phase 11i (see `fishing_bands.ts`
+  below), and the schedule VALUES are derived from a recorded casts-to-200
+  model while its four BOUNDARIES stay frozen, because the teaching ceilings
+  derive from them; the TWO
   sessions' hidden per-cast state lives in
   transient Entity fields (`gatherCastNodeId`, `gatherCastToolRarity`, and
   the R40 consent `gatherCastEffectConfirmed` for the gather cast;
@@ -58,9 +62,16 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   together on every cast exit path.
 - `session_teardown.ts`: the ONE displacement cancel for a live gather or
   fishing session (`cancelProfessionSessionOnDisplacement`), called from every
-  hard-displacement site: the sim and server teleport paths, the
-  pitch eject and kickoff placements, and the `/follow` zone-line crossing;
-  gated on `isNonSpellCast`, delegates to `ctx.cancelCast`.
+  hard-displacement site. The caller list is the grep for that symbol, never a
+  list kept here; the families it spans are the shared sim teleport landing
+  (`displacePlayer`), instance entry and exit for dungeons, delves and rifts
+  (enter, leave, eject, module advance), the spirit paths (unstuck,
+  resurrection), the `/follow` zone-line crossing, the dev teleports (the sim's
+  `/dev` commands and the server's `dev_teleport` message), and the server's
+  own moderation moves (spectate enter and exit, jail and moderation
+  teleports). The Vale Cup's pitch eject and kickoff placements were sites too,
+  until it retired with release/v0.41.0. Gated on `isNonSpellCast`, delegates
+  to `ctx.cancelCast`.
 - `wheel.ts`: flat per-craft skills (`CraftSkills`, `gainCraftSkill`,
   `tierForSkill`/`tierCapability`, the four-state `tierProgressMultiplier`
   curve, perk-eligibility reads).
@@ -84,7 +95,15 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
 - `masterwork.ts` + `material_tier.ts`: the pure masterwork model
   (`masterworkProcChance`, `masterworkBumpedQuality`, `masterworkBonusStats`,
   the def-keyed `materialTierBonusForReagents`); `crafting.ts` consumes it at
-  the one post-consume proc draw per successful craft.
+  the one post-consume proc draw per successful craft. R1 (Masterwrought,
+  phase 08): a masterwrought-flagged def NEVER bakes a bonus record; the gate
+  is `craftBonusStatsFor` in `crafting.ts`, the ONE exported helper feeding
+  both the admission capacity model and the resolve effect gate (never call
+  raw `masterworkBonusStats` from production code; the draw itself stays
+  unconditional so draw order never moves). Phase 12 replaces this
+  suppression with the Perfecting head start AT the effect gate, where the
+  proc outcome is actually known. `masterwork.ts` itself is locked by R1's
+  own text and is never edited for this.
 - `archetype.ts`: the active-archetype state machine (`ArchetypeState`,
   `archetypeCeilingFor`/`craftCeiling`, `getHobbyCraft`, amends-gated
   switching via `requiredAmendsProgress`). The sim-side ceiling arm is
@@ -130,6 +149,21 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   unit comes from, never how many are owed or what may substitute). The VICTIM
   copy is out of scope and never routes through it. Disenchant, salvage,
   unbind and tool recharge draw from the bags only.
+- `perfecting.ts`: the Perfecting stage (Masterwrought phase 12) and the orange
+  promotion (phase 13) on one shared deny head: a four-rank fail-forward track over
+  an apex copy with exactly one rng draw per resolved attempt (zero on every
+  denial), binding on the first attempt and stamping `perfected` plus the R5 bonus
+  at the top; then the SEPARATE, draw-free promotion on an already-Perfected copy
+  (one Deed of Making plus a player-chosen name) that overrides `rolled.quality` to
+  legendary and stamps `payload.name`, presentation only. `perfectingInfoFrom` is
+  the one view builder both hosts answer through. `perfecting_copy.ts` carries
+  the selected copy's ordinal/count anchor and payload/provenance pin through
+  confirmation and the wire; the shared deny head refuses a stale token before
+  spending materials. Tokens are optional for legacy/headless callers.
+- `legendary_name.ts`: the pure SHAPE leaf for a player-chosen legendary name
+  (trim, collapse, `[A-Za-z' -]`, 2 to 32); the online server screens CONTENT
+  before the command reaches the sim, and the load bound in
+  `item_instance_load.ts` is deliberately looser (the signer doctrine).
 - `commission.ts`: the Maker's Bond (commission opt-in mints `bindOnTrade`,
   `resolveUnbind` + the quality-tier fee ladder).
 - `commission_order.ts`: the commission order board (#1298) layered on the
@@ -158,17 +192,39 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
 - `training.ts`: master training (`resolveTrain`, tier-gated learning,
   `TRAINING_FEE_BY_TIER`, the one-time `PRE_TRAINING_RECIPE_IDS`
   grandfather).
-- `tools.ts` / `stations.ts` / `focus.ts` / `mobile_station.ts`: pure-leaf
-  gates and bonuses (gather-tool tier, per-type crafting stations
-  (superseding the retired level-20 hub), town focus allocation, field
-  crafting station). Tool effects in `tools.ts` are LIVE end to end and this
-  leaf owns every DECISION: `resolveSlotToolEffect` is the one mint
-  authority (it also picks WHICH crafted charm copy the mint consumes, whose
-  signer becomes the slot's `craftedBy`) and `resolveRechargeToolEffect`
-  prices and sizes a refill (R30 fill from the tool held now, R39 material
-  identity, R47 price rung floored at the slot's own ceiling). The R9 slot
-  policy (`slotToolEffectRefused`) keeps Springback and fishing slots
-  refused until their arms have real behavior.
+- `pattern_items.ts`: recipe pattern items (kind 'recipe'): the pure
+  `resolvePatternLearn` deny ladder (invalid silent, already-known,
+  never-practiced, tier via the shared `teachTierMet`) plus the
+  `useRecipePatternItem` apply arm dispatched from the items.ts useItem kind
+  chain; learns via `acquireRecipe` source 'drop', consumes exactly one copy
+  on success only (the CLICKED copy when the use names a slot, per the
+  item_copy_ref tri-state contract with a pre-effect pin gate; the legacy
+  newest-first walk only when no selection is named), emits the text-free
+  `trainResult` ok; draws NO rng.
+- `masterwrought_materials.ts`: the Masterwrought chase-material income side
+  (`awardWyrmfallCores` from the death hub, the rift first-clear arm, the
+  weekly Maker's Ember accrual with its pure civil-date week math, the
+  per-character per-source reset-day gate on `PlayerMeta.wyrmfallDaily`).
+  ONE rng draw per credited eligible final-boss kill, appended after every
+  loot roll; the rift arm is draw-free.
+- `sundering.ts`: the Sundered Essence extraction (`extractEssence` /
+  `completeSunderCast`): a SUNDER_CAST_ID cast on the enchant-family session
+  seam, raid-sourced GEAR epics only (`isSunderable` over the item_level
+  source index PLUS the explicit gear-kind allowlist added at the eighth
+  v0.41.0 sync, when the Ignivar span's raid-sourced epic non-gear, sigils
+  and the staged core, would otherwise have widened the feedstock),
+  deterministic 1:1 yield, the disenchant-style pinned-slot re-check at
+  completion; draws NO rng.
+- `tools.ts` / `stations.ts` / `focus.ts`: pure-leaf gates and bonuses
+  (gather-tool tier, per-type crafting stations (superseding the retired
+  level-20 hub), town focus allocation). Tool effects in `tools.ts` are LIVE
+  end to end and this leaf owns every DECISION: `resolveSlotToolEffect` is
+  the one mint authority (it also picks WHICH crafted charm copy the mint
+  consumes, whose signer becomes the slot's `craftedBy`) and
+  `resolveRechargeToolEffect` prices and sizes a refill (R30 fill from the
+  tool held now, R39 material identity, R47 price rung floored at the slot's
+  own ceiling). The R9 slot policy (`slotToolEffectRefused`) keeps Springback
+  and fishing slots refused until their arms have real behavior.
 - `tool_effect_actions.ts`: the slot and recharge COMMAND BODIES behind the
   seam (`Sim` keeps thin delegates). Everything stateful lives here and, for
   those TWO, every decision in the `tools.ts` leaf above: resolve first, then
@@ -184,10 +240,106 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   NOT route through `resolveSlotToolEffect`: it carries its own copy of the
   shared gate chain, which the same test pins tuple-for-tuple against the
   resolver so the two cannot drift.
+- `mobile_station.ts`: the field crafting station. NOT a pure leaf: it takes
+  `SimContext`, and two placement paths write the transient
+  `PlayerMeta.mobileStation` slot. `placeMobileStationForPlayer` (the IWorld
+  member and the `/dev mobilestation` cheat) places through the
+  specialization-gated pure builder `placeMobileCraftingStation`, owner-only.
+  `placeMobileStationFromItem` (the Master's Field Forge, Masterwrought phase
+  09) has NO specialization gate, because holding the item IS the credential,
+  never consumes the item, and stamps the station `partyShared`. That
+  discriminator on `MobileCraftingStation` is what the party arm of the
+  crafting station gate reads: `partySharedStationSatisfies` walks the OTHER
+  party members for an ACTIVE partyShared station matching
+  `stationTypeForCraft` within a squared-distance STATION_RADIUS, while the
+  owner's own station still satisfies at ANY distance.
+  `activeMobileStationCraftsForViewer` is the per-viewer resolver behind the
+  `mst` snapshot delta: the deduped, sorted set of every craft a station
+  serves the viewer, so the crafting-window rows mirror the craft gate rather
+  than shadowing a shared craft behind the viewer's own. Both consumers run
+  their own plain loops over the ONE private per-member predicate
+  (`partySharedStationFor`), so the gate's deny and the row set cannot drift
+  and a partied viewer's 20 Hz call allocates nothing on an empty answer; the
+  station-TYPE filter deliberately stays out of the predicate (the gate
+  layers it per craft, the resolver leaves it to `inRangeStationTypes` on the
+  consumer side). Its one
+  player-visible emit is the placement log line (matched by `log.placeStation`
+  in `src/ui/sim_i18n.ts`); draws NO rng.
+- `fishing_bands.ts`: fishing's OWN catch-band ladder, a pure leaf
+  (masterwrought Phase 11i): `FISHING_CATCH_BAND_THRESHOLDS`
+  ([0, 100, 150, 200, 200, 200]), the exported `FishingCatchBand` type, and
+  `fishingCatchBandFor` / `fishingRodBandFor`. SEPARATE from
+  `proficiency_bands.ts` deliberately: that ladder is SHARED (gathering.ts
+  reads it for the land gather-cast duration, proficiency_display_heal.ts for
+  the display band), so carrying fishing's six bands on it would silently
+  retune land gathering. `fishing.ts` re-exports the old names and consumes
+  the leaf; "thin consumer" is about the SEAM, not about size, and the
+  module header records the measurement rather than implying one (fishing.ts
+  went 675 to 746 lines, all 71 of them comment, and its non-comment count is
+  287 on both sides, exactly flat). The band type is the ONE type every `0 | 1 | 2` site now
+  writes: the four fishing SimEvent variants, `effectiveFishingBand`,
+  `fishingRodBandFor`, and `server/fishing_telemetry.ts`'s label function, so
+  widening the ladder again is one edit rather than seven.
 - `fishing_zones.ts`: the per-zone rod-tier ladder (`rodTierRequiredForZone`,
   water gated by the WATER's zone) the cast gate and the vendor rows read;
   since R19 the SAME column also caps how far each water teaches
   (`fishingTeachingCeilingFor` in `fishing.ts` reads it at the gain site).
+- `farming.ts`: the farming GROWTH ENGINE, and the module the other `farm_*`
+  leaves orbit. Owns the plant and harvest command bodies and, above all, THE
+  DRAW CONTRACT stated in its own header: a plant costs exactly two contiguous
+  `ctx.rng` draws, a tier 1/2 harvest two contiguous (the golden-harvest roll
+  then the golden BONUS roll), a tier 3/4 harvest three (the seed-back roll
+  first), and every deny costs zero. The header is RESTATED WHOLE whenever a
+  draw moves, never amended one line at a time. Also owns the gain model (`FARMING_GAIN_SCHEDULE`
+  plus `farmingHarvestGain` / `farmingTeachingCeilingFor` /
+  `farmingHarvestGainAt`, the fishing R19 shape: the boundary column IS the
+  teaching-ceiling source, so it is not tuning and never moves), the
+  harvest-lives yield through a PRIVATE mulberry32 seed expansion that is not
+  `ctx.rng` (see the banner: it deliberately keeps seed 0 where `Rng` remaps
+  it), and `FARM_EFFECT_BONUS_PICK_CAP`, farming's own cap on a slotted
+  quantity tool effect, which lives here rather than in `TOOL_EFFECTS` so the
+  other three land professions keep the catalog value.
+- `farm_golden_bonus.ts`: pure leaf owning what a GOLDEN harvest's bonus draw
+  pays (masterwrought Phase 11f): a seed of the next tier up, or at a much
+  lower weight one farming pattern. One roll decides both the arm and the item
+  through a partition, which is what keeps the harvest at one new draw;
+  `farming.ts` re-exports the surface on the `farm_projection.ts` precedent.
+  Zero new item ids, and the pattern weight is the shipped per-pattern drop
+  point, held slower than the quartermaster marks route by ruling.
+- `farm_projection.ts`: pure leaf owning `PlotState` (the full per-player plot
+  record incl the hidden pre-rolled outcome slots) and `projectFarmPlots`, the
+  ONLY public projection: explicit field picks are the wire leak barrier, and
+  timestamps are absolutes in the host's own `lockoutNowMs` base.
+- `farm_persist.ts`: pure leaf bridging `PlayerMeta.farmPlots` and the optional
+  `CharacterState.farmPlots` row (`serializeFarmPlots`/`normalizeFarmPlots`);
+  the `node_persist.ts` anti-tamper doctrine with ABSOLUTE deadlines (allowlists
+  and the `FARM_MAX_GROW_MS` duration clamp on the load side; clamp before the
+  future re-anchor; the zero-clock offline guard).
+- `farm_load_report.ts`: pure leaf for the dev-channel visibility of a farm-plot
+  load's silent-drop arms (`droppedFarmPlotCounts`, `warnDroppedFarmPlotRows`),
+  extracted from `Sim.addPlayer` at masterwrought Phase 18; the counting half
+  is pure and the warn stays dev-channel English, never player-visible.
+- `farm_ready.ts`: the ONE ready notice (`notifyFarmReady`, called from the
+  login check and the 1 Hz sweep): a personal, text-free `farmReady` event
+  gated by the persisted `notified` flag, plus the Phase 18 withered-then-ready
+  correction over the transient `PlayerMeta.farmWitheredAnnounced` memory
+  (rides the same event as a fresh ready count; no new wire surface). Draws
+  no rng.
+- `feast.ts`, `feast_lifecycle.ts` + `feast_placement.ts`: the shared feast behind the `SimContext`
+  seam (`placeFeastAction`, `consumeFeastAction`, the 1 Hz `updateFarmFeasts` despawn sweep): the
+  catalog-derived placeable family, the one-active-per-placer rule and the
+  eatenBy ledger on the domain-tagged `feastOwnerKey`, and the existence-oracle
+  guard (out-of-range and nonexistent ids answer the same not-found frame).
+  Transient state on `SimContext.feasts`; draws no rng. Dungeon, delve and rift
+  object rosters own room teardown; the lifecycle sibling captures an arena or
+  battleground match scope at placement and removes only that match's tables
+  when its slot is released, including tables left by departed fighters.
+  Placement samples the player's supporting floor once, including raised rift
+  surfaces; retirement removes the table from its room's current object roster
+  so expired tables cannot accumulate in the rift's per-tick lift scan.
+- `farmer_npcs.ts`: the farmer-NPC range predicate (`nearFarmerNpc`,
+  `FARMER_TRADE_RANGE`) the husk trade gates on, resolved by the NpcDef
+  `farmer` flag through the grid's early-exit `someInRadius`; draws no rng.
 - `wield_gate.ts`: the R22 land-tool USE requirements, a pure leaf like
   `tools.ts` (items table as a parameter, no player-state import): the one
   frozen threshold table (40/70/85/100), the wield-filtered bag scans the
@@ -293,4 +445,3 @@ hosts, plus the pinned callback-name list in `tests/sim_context.test.ts`.
   entering the gathering system's import ring.
 - `salvage_materials.ts`: `SALVAGE_MATERIAL_BY_QUALITY` (frozen), the same extraction
   for the salvage side; consumed by `salvage.ts` and the material registry derive.
-

@@ -1,4 +1,4 @@
-// Regression pin for issue #2706: Blink/Shadowstep/Heroic Leap swept relocations
+// Regression pin for issue #2706: Blink/Shadowstep/Vaulting Charge swept relocations
 // must stop at a rift wall exactly like ordinary movement does. The crest
 // re-resolve inside sweptLanding (src/sim/combat/heroic_leap.ts) previously
 // called resolvePosition without the riftToken argument, so a rift wall never
@@ -24,8 +24,8 @@ function armWithRiftWall(sim: Sim): { origin: { x: number; z: number } } {
   return { origin };
 }
 
-describe('rift walls stop swept relocations (Blink, Shadowstep, Heroic Leap)', () => {
-  it('Heroic Leap aimed across a rift wall lands the player inside the shell', () => {
+describe('rift walls stop swept relocations (Blink, Shadowstep, Vaulting Charge)', () => {
+  it('Vaulting Charge aimed across a rift wall lands the player inside the shell', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true });
     sim.setPlayerLevel(MAX_LEVEL);
     const { origin } = armWithRiftWall(sim);
@@ -39,7 +39,7 @@ describe('rift walls stop swept relocations (Blink, Shadowstep, Heroic Leap)', (
     // The flight target is the swept landing computed at cast time: it must
     // already be clamped at the wall, not past it.
     const localTargetX = (p.leap?.to.x ?? 0) - origin.x;
-    expect(localTargetX, 'Heroic Leap flight target crossed the rift wall').toBeLessThan(36);
+    expect(localTargetX, 'Vaulting Charge flight target crossed the rift wall').toBeLessThan(36);
   });
 
   it('Blink aimed across a rift wall lands the player inside the shell', () => {

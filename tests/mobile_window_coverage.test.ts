@@ -109,7 +109,7 @@ const MOBILE_WINDOW_EXCEPTIONS: Record<string, string> = {
   'profession-tutorial':
     'small centered modal (dynamic, the first-tier profession tutorial); centered and clamped by its own base #profession-tutorial rule plus the shared .window viewport clamp, with its z-index floored above the mobile sheet (96) in JS',
   'tutorial-greeting':
-    'small centered modal (dynamic, the tutorial island spawn greeting); centered and clamped by its own base #tutorial-greeting rule plus the shared .window viewport clamp, with its z-index floored above the mobile sheet (96) in JS, the profession-tutorial precedent',
+    'small centered modal (dynamic, the live ferry-note dialog); centered and clamped by its own base #tutorial-greeting rule plus the shared .window viewport clamp, with its z-index floored above the mobile sheet (96) in JS, the profession-tutorial precedent',
   'delve-rite-panel': 'in-run gameplay overlay, not a menu window that docks to a sheet',
   'lockpick-panel': 'in-run gameplay overlay, not a menu window that docks to a sheet',
 };
@@ -238,13 +238,20 @@ describe('mobile window coverage (Phase 5 parity)', () => {
     // the same change that gives its window a mobile rule or an exception below.
     expect(dyn.windowClassFiles).toEqual([
       'dev_command_window.ts',
+      // The Perfecting window (Masterwrought phase 14) mints its own root and
+      // carries the four-edge body.mobile-touch pin in hud.mobile.css.
+      'hud/professions/perfecting_window.ts',
+      'hud/professions/profession_tutorial_window.ts',
       'hud.ts',
-      'profession_tutorial_window.ts',
+      // The extracted input modal (the other half of the shared
+      // #confirm-dialog id; the exception row below covers the id).
+      'input_controller.ts',
       'tutorial_greeting_window.ts',
     ]);
     expect([...dyn.ids].sort()).toEqual([
       'confirm-dialog',
       'dev-command-window',
+      'perfecting-window',
       'profession-tutorial',
       'tutorial-greeting',
     ]);

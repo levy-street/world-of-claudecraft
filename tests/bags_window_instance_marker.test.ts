@@ -15,6 +15,7 @@ import { describe, expect, it } from 'vitest';
 import type { InvSlot, QuestProgress } from '../src/sim/types';
 import { bagInstanceGlyphKind } from '../src/ui/bag_instance_glyph_view';
 import { BagsWindow, type BagsWindowDeps } from '../src/ui/bags_window';
+import { QUALITY_COLOR } from '../src/ui/icons';
 import { ItemDragState } from '../src/ui/item_drag_state';
 import type { IWorld } from '../src/world_api';
 
@@ -28,15 +29,24 @@ function fakeWorld(inventory: InvSlot[], questLog: Map<string, QuestProgress> = 
   } as unknown as IWorld;
 }
 
+// Every icon the grid asked its dep for, with the quality it asked with: the
+// rim regression class (a 1-ary call swallowing the copy's quality) is only
+// visible to a stub that records its second argument.
+const iconCalls: { id: string; quality: string | undefined }[] = [];
+
 function windowFor(
   inventory: InvSlot[],
   questLog: Map<string, QuestProgress> = new Map(),
 ): HTMLElement {
+  iconCalls.length = 0;
   const root = document.createElement('div');
   document.body.appendChild(root);
   const noop = (): void => {};
   const deps: BagsWindowDeps = {
-    itemIcon: () => '<span class="item-icon"></span>',
+    itemIcon: (item, quality) => {
+      iconCalls.push({ id: item.id, quality });
+      return '<span class="item-icon"></span>';
+    },
     moneyHtml: () => '',
     itemTooltip: () => '',
     attachTooltip: noop,
@@ -155,6 +165,55 @@ describe('bags grid instanced-slot marker', () => {
     // cell uses the maker-marked label, the plain cell keeps the pre-12d one.
     expect(cells[0].getAttribute('aria-label')).toContain('maker-marked copy');
     expect(cells[1].getAttribute('aria-label')).not.toContain('maker-marked copy');
+  });
+
+  it('a promoted copy paints the legendary rim; the plain copy of the same def keeps its tier', () => {
+    // The all-surfaces item-cell rule (phase 13): the q-<quality> class and the
+    // quality color var read INSTANCE-effective quality (bagQualityKey), so a
+    // promoted legendary keeps its rim in the grid, and the def-only sibling
+    // is the negative that proves the def alone decides nothing here.
+    const root = windowFor([
+      { itemId: 'copper_ore', count: 1, instance: { rolled: { quality: 'legendary' } } },
+      { itemId: 'copper_ore', count: 1 },
+    ]);
+    const cells = root.querySelectorAll('button.bag-item');
+    expect(cells.length).toBe(2);
+    expect(cells[0].classList.contains('q-legendary')).toBe(true);
+    expect(cells[0].classList.contains('q-common')).toBe(false);
+    expect((cells[0] as HTMLElement).style.getPropertyValue('--bag-slot-quality')).toBe(
+      QUALITY_COLOR.legendary,
+    );
+    expect(cells[1].classList.contains('q-common')).toBe(true);
+    expect(cells[1].classList.contains('q-legendary')).toBe(false);
+    // The icon rim asks the dep for the SAME instance-effective quality (the
+    // round-2 frontend finding: the grid's 1-ary call swallowed it, so a
+    // promoted copy painted a def-tier glow inside a legendary cell rim).
+    // The exact total first (this rig's socket bar is empty, so the grid owns
+    // every call), then the fixture-scoped tuple, so a spurious extra icon
+    // call for another id cannot hide outside the scoped view.
+    expect(iconCalls).toHaveLength(2);
+    expect(iconCalls.filter((c) => c.id === 'copper_ore').map((c) => c.quality)).toEqual([
+      'legendary',
+      'common',
+    ]);
+  });
+
+  it('a promoted copy announces its chosen name in the cell aria, never only the def', () => {
+    // The all-surfaces rule for the NAME half: the accessible name reads the
+    // cell authority (worn_item_cell_view.ts), so the chosen legendary name
+    // rides the existing t() template as a VALUE (D13-2).
+    const root = windowFor([
+      {
+        itemId: 'copper_ore',
+        count: 1,
+        instance: { rolled: { quality: 'legendary' }, name: 'Dawn Oath' },
+      },
+      { itemId: 'copper_ore', count: 1 },
+    ]);
+    const cells = root.querySelectorAll('button.bag-item');
+    expect(cells[0].getAttribute('aria-label')).toContain('Dawn Oath');
+    expect(cells[0].getAttribute('aria-label')).not.toContain('Copper Ore');
+    expect(cells[1].getAttribute('aria-label')).toContain('Copper Ore');
   });
 
   it('every glyph kind gives the CELL its own accessible name, never one label for all', () => {

@@ -58,6 +58,16 @@ import { svgIcon } from './ui_icons';
 const SUGGEST_DEBOUNCE_MS = 160;
 const SUGGEST_BLUR_CLEAR_MS = 150;
 
+// Founding a guild rides the metered name_screen WS lane (refill 2/s, burst 5,
+// shared with pet_rename and the named perfect_item promotion): a lane DROP
+// sends NOTHING back, so a mashed Found button would read as dead. Hold the
+// submit for a beat after each send, exactly as the legendary naming dialog
+// does (src/ui/hud/professions/legendary_naming_controller.ts, the same lane).
+// About 600ms: longer than the lane's 500ms per-token refill, so an honest
+// retry after the lock lifts always has a token waiting. Re-submitting is
+// always safe; the server re-validates the name.
+export const GUILD_CREATE_LOCK_MS = 600;
+
 // Guild billboard input cap; mirrors GUILD_MOTD_MAX in server/social.ts (the
 // server clamps authoritatively, this is UX only).
 const GUILD_MOTD_MAX = 240;
@@ -219,6 +229,11 @@ export class SocialWindow {
   // is actionable info, never gated on graphics tier). Loaded once; the delegated body
   // handler flips + persists it and refreshes the list in place.
   private hideOffline = loadGuildHideOffline();
+  // The name_screen lane hold on the Found button (GUILD_CREATE_LOCK_MS). It lives
+  // on the instance, not on the button, because the panel rebuilds its footer on
+  // every structural repaint; applyGuildCreateLock re-stamps the fresh button.
+  private guildCreateLocked = false;
+  private guildCreateTimer: number | undefined;
 
   constructor(private readonly deps: SocialWindowDeps) {}
 
@@ -410,6 +425,9 @@ export class SocialWindow {
     }
     this.refreshList();
     this.renderNotice();
+    // The footer was rebuilt above, so a hold taken before this repaint has to be
+    // re-stamped onto the fresh Found button.
+    this.applyGuildCreateLock();
   }
 
   // Lighter refresh: just the list inside the current tab, leaving the footer
@@ -930,9 +948,10 @@ export class SocialWindow {
       else if (act === 'guild-invite') void this.resolveAndAct('ginvite', field('ginvite'));
       else if (act === 'guild-create') {
         const n = field('gname');
-        if (n) {
+        if (n && !this.guildCreateLocked) {
           w.guildCreate(n);
           this.clearInput('gname');
+          this.lockGuildCreate();
         }
       } else if (act === 'guild-leave')
         this.deps.showPrompt(
@@ -1139,6 +1158,34 @@ export class SocialWindow {
       this.clearInput('ginvite');
     }
     this.renderSuggest(kind, []);
+  }
+
+  // Hold the Found button for one lane beat after a send. One-shot re-arm: the
+  // timer lifts the hold, and a landed creation lifts it sooner by retiring the
+  // create row entirely (the guild footer replaces it on the next repaint).
+  private lockGuildCreate(): void {
+    this.guildCreateLocked = true;
+    window.clearTimeout(this.guildCreateTimer);
+    this.guildCreateTimer = window.setTimeout(() => {
+      this.guildCreateTimer = undefined;
+      this.guildCreateLocked = false;
+      this.applyGuildCreateLock();
+    }, GUILD_CREATE_LOCK_MS);
+    this.applyGuildCreateLock();
+  }
+
+  // Stamp the hold onto whichever Found button is currently mounted. Called
+  // after every full render so a structural repaint mid-hold cannot hand the
+  // player a live button, and no player-visible string changes (disabled +
+  // aria-busy is the house busy form; `.btn:disabled` carries the visuals).
+  private applyGuildCreateLock(): void {
+    const btn = this.deps
+      .root()
+      .querySelector('.soc-add .btn[data-act="guild-create"]') as HTMLButtonElement | null;
+    if (!btn) return;
+    btn.disabled = this.guildCreateLocked;
+    if (this.guildCreateLocked) btn.setAttribute('aria-busy', 'true');
+    else btn.removeAttribute('aria-busy');
   }
 
   private clearInput(field: string): void {

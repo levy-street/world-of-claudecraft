@@ -546,6 +546,10 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     expect(meta.lastTrainResult?.ok, 'cooking train').toBe(true);
     sim.addItem('raw_stonescale_carp', 3, pid);
     sim.addItem('raw_mirror_trout', 1, pid);
+    // The rice bed the provisioning supply line (Phase 11g) added to this bill.
+    // These grants are literal, not derived from recipe.reagents, so they do
+    // not self-heal when a bill grows.
+    sim.addItem('marsh_rice', 2, pid);
     sim.addItem('goldleaf_herb', 1, pid);
     sim.addItem('cooking_salt', 1, pid);
     runCraft(sim, 'recipe_silvered_carp_supper', false, pid);

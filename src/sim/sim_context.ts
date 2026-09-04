@@ -22,6 +22,7 @@ import type { PendingLootRoll } from './loot/loot_roll';
 import type { MarketListing } from './market';
 import type { MobScanCounters } from './mob/scan_counters';
 import type { CommissionOrder } from './professions/commission_order';
+import type { FeastState } from './professions/feast';
 import type { PendingProjectile } from './projectile_travel';
 import type { NaturalRiftPortal } from './rift/portals';
 import type { RiftEvent, RiftInstance } from './rift/types';
@@ -138,6 +139,11 @@ export interface SimContextPrimitives {
   // stay on Sim (mutated in place), like E1's delayedEvents/groundAoEs.
   readonly tradeInvites: Map<number, { fromPid: number; expires: number }>;
   readonly duelInvites: Map<number, { fromPid: number; expires: number }>;
+  // Live placed shared feasts, keyed by entity id (professions/feast.ts).
+  // A LIVE view like the invite maps above: the backing field stays on Sim,
+  // mutated in place. TRANSIENT by design: never serialized anywhere (the
+  // feast module's header owns the rationale).
+  readonly feasts: Map<number, FeastState>;
   // The monotonically increasing entity-id counter (I1). Read-write so spawners (I1's
   // claimInstance) allocate ids exactly as `this.nextId++` did on Sim.
   nextId: number;
@@ -157,7 +163,7 @@ export interface SimContextPrimitives {
   // delayedEvents.
   pendingProjectiles: PendingProjectile[];
   readonly groundAoEs: GroundAoE[];
-  // Live frost-mage Frozen Orbs (combat/frozen_orb.ts): released by the cast's
+  // Live frost-mage Frostglobes (combat/frozen_orb.ts): released by the cast's
   // frozenOrb effect, drifted/pulsed by tickFrozenOrbs in the tick prologue.
   // Mutated in place (push/splice) like groundAoEs, so read-only.
   readonly frozenOrbs: FrozenOrbState[];
@@ -280,6 +286,12 @@ export interface SimContextPrimitives {
   // (src/sim/pvp/honor_event.ts). Only the event reads this; every daily
   // rollover stays on `resetDay` above.
   readonly eventLeadDay: string;
+  // Host-supplied countdown to the reset that closes the current `resetDay`
+  // window, in whole seconds (0 = unknown, the same no-calendar contract).
+  // Read only at REFUSAL time by the oncePerDay craft gate, so a daily_limit
+  // answer can say when the gate reopens (Masterwrought phase 14); nothing
+  // else may key behavior on it (gate state stays learn-on-attempt).
+  readonly dailyResetRemainingSec: number;
   // Wild-respawn queue (P1b: completeTame pushes the tamed beast's respawn). Live view;
   // the backing array stays on Sim, mutated in place (push), so read-only ref.
   readonly pendingMobRespawns: PendingMobRespawn[];
@@ -428,7 +440,18 @@ export interface SimContextCallbacks {
   riftOpenTreasure(objectId: number, pid?: number): void;
   dungeonDifficulty(pid?: number): DungeonDifficulty;
   setDungeonDifficulty(difficulty: DungeonDifficulty, pid?: number): void;
-  awardHeroicMarks(mob: Entity, recipients: PlayerMeta[]): void;
+  // Both award arms take the death hub's ONE pre-resolved claimed instance
+  // (instances/dungeons.ts claimedInstanceForMob; the Phase 18 scan dedupe):
+  // null = the hub scanned and found no claim, undefined = resolve yourself
+  // (the pre-widening shape foreign callers and tests keep using). An
+  // APPEND-ONLY widening: the two-argument call is unchanged in meaning.
+  awardHeroicMarks(mob: Entity, recipients: PlayerMeta[], claimed?: InstanceSlot | null): void;
+  // awardWyrmfallCores is owned by professions/masterwrought_materials: the C1
+  // death hub calls it AFTER the whole loot-roll block (awardHeroicMarks, then
+  // rollLoot/rollWorldBossLoot and the world-boss deed hook) with the same
+  // death-time participation snapshot (one rng draw per credited eligible
+  // kill; combat/damage.ts explains why that position is draw-order safe).
+  awardWyrmfallCores(mob: Entity, recipients: PlayerMeta[], claimed?: InstanceSlot | null): void;
 
   // C1 damage/death hub + the casting/leash/arena/duel/fiesta/loot teardown it
   // drives mid-tick. `dealDamage` is the post-mitigation entry (crit/dodge/miss and
@@ -624,6 +647,12 @@ export interface SimContextCallbacks {
   onMobKilledForQuests(mob: Entity, meta: PlayerMeta): void;
   onRecipeCraftedForQuests(recipeId: string, meta: PlayerMeta): void;
   onNodeGatheredForQuests(node: GatherNodeDef, itemId: string, meta: PlayerMeta): void;
+  // The farm action credit (quests/quest_credit.ts onCropFarmedForQuests),
+  // folded onto the seam at masterwrought Phase 18 beside its siblings:
+  // professions/farming.ts calls it after every committed plant and every
+  // harvest outcome (withered included; never from a deny arm). Like every
+  // crediter it takes ctx-bound state only and draws nothing.
+  onCropFarmedForQuests(action: 'plant' | 'harvest', cropId: string, meta: PlayerMeta): void;
   onInventoryChangedForQuests(meta: PlayerMeta): void;
   checkQuestReady(qp: QuestProgress, meta: PlayerMeta): void;
   countItem(itemId: string, pid?: number): number;
@@ -769,7 +798,7 @@ export interface SimContextCallbacks {
     e: Entity,
     ignoreFences?: boolean,
   ): { x: number; z: number };
-  // --- pet / delve-companion / boss-mechanic branches (owners: P1 / delve / M3-N1) ---
+  // --- pet / delve-companion / boss-mechanic branches (owners: P1 / delve / M3-N1 / M5) ---
   updatePet(pet: Entity): void;
   isDelveCompanionMob(mob: Entity): boolean;
   updateDelveCompanion(companion: Entity): void;
@@ -853,6 +882,7 @@ export interface SimContextCallbacks {
   ): void;
   // L2 World Market escrow (marketList) also consumes removeItem; it is declared once
   // above (P1b inventory-hub helper, points-at Sim) - deduped, not re-added here.
+  // Owned by mob/boss_mechanics.ts (M5); the delve boss scripts consume it.
   spawnBossAdds(boss: Entity, mobId: string, count: number): void;
   tradeFor(pid: number): TradeSession | null;
   duelFor(pid: number): DuelState | null;
@@ -913,6 +943,8 @@ export interface SimContextCallbacks {
   completeDisenchantCast(p: Entity, meta: PlayerMeta): void;
   completeApplyEnchantCast(p: Entity, meta: PlayerMeta): void;
   completeSalvageCast(p: Entity, meta: PlayerMeta): void;
+  // Sunder cast completion (Masterwrought phase 04, professions/sundering.ts).
+  completeSunderCast(p: Entity, meta: PlayerMeta): void;
   // Tool-effect recharge cast completion (Craft Cast System Phase 5).
   completeRechargeCast(p: Entity, meta: PlayerMeta): void;
   applyDemonHealTick(owner: Entity): void;
@@ -1051,6 +1083,12 @@ export interface SimContextCallbacks {
   // instances/dungeons.ts). Binding points at the PostOffice instance on Sim.
   mailHeroicMarks(pid: number, itemId: string, count: number): void;
 
+  // Ravenpost mail: posts Wyrmfall Cores to a final-boss participant who entered
+  // the run but was absent at the corpse (awardWyrmfallCores in
+  // professions/masterwrought_materials.ts). Binding points at the PostOffice
+  // instance on Sim.
+  mailWyrmfallCores(pid: number, count: number): void;
+
   // Ravenpost mail: books an authored letter to a character through the standard
   // system-mail path (mailKeyFor recipient key, 'system' kind, the letter's own
   // delivery delay). The Guild trend letter sweep (professions/guild_letter.ts)
@@ -1185,6 +1223,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get duelInvites() {
       return host.duelInvites;
+    },
+    get feasts() {
+      return host.feasts;
     },
     get nextId() {
       return host.nextId;
@@ -1378,6 +1419,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     get eventLeadDay() {
       return host.eventLeadDay;
     },
+    get dailyResetRemainingSec() {
+      return host.dailyResetRemainingSec;
+    },
     get utcDay() {
       return host.utcDay;
     },
@@ -1469,6 +1513,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     dungeonDifficulty: host.dungeonDifficulty,
     setDungeonDifficulty: host.setDungeonDifficulty,
     awardHeroicMarks: host.awardHeroicMarks,
+    awardWyrmfallCores: host.awardWyrmfallCores,
     dealDamage: host.dealDamage,
     handleDeath: host.handleDeath,
     cancelCast: host.cancelCast,
@@ -1534,6 +1579,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     onMobKilledForQuests: host.onMobKilledForQuests,
     onRecipeCraftedForQuests: host.onRecipeCraftedForQuests,
     onNodeGatheredForQuests: host.onNodeGatheredForQuests,
+    onCropFarmedForQuests: host.onCropFarmedForQuests,
     onInventoryChangedForQuests: host.onInventoryChangedForQuests,
     checkQuestReady: host.checkQuestReady,
     countItem: host.countItem,
@@ -1643,6 +1689,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     completeDisenchantCast: host.completeDisenchantCast,
     completeApplyEnchantCast: host.completeApplyEnchantCast,
     completeSalvageCast: host.completeSalvageCast,
+    completeSunderCast: host.completeSunderCast,
     completeRechargeCast: host.completeRechargeCast,
     applyDemonHealTick: host.applyDemonHealTick,
     awardCombo: host.awardCombo,
@@ -1679,6 +1726,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     // Ravenpost mail: the quest turn-in letter hook (points at the PostOffice on Sim).
     queueQuestLetter: host.queueQuestLetter,
     mailHeroicMarks: host.mailHeroicMarks,
+    mailWyrmfallCores: host.mailWyrmfallCores,
     mailAuthoredLetter: host.mailAuthoredLetter,
     mailboxHoldsItem: host.mailboxHoldsItem,
     applySetProcs: host.applySetProcs,

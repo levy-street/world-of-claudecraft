@@ -12,7 +12,6 @@ import {
   arenaOrigin,
   BG_SLOT_COUNT,
   battlegroundOrigin,
-  CLASSES,
   DELVE_MODULE_Z_START,
   DUNGEON_LIST,
   DUNGEON_X_THRESHOLD,
@@ -28,8 +27,6 @@ import {
   isDelvePos,
   isRiftPos,
   isYumiMazePos,
-  MOBS,
-  NPCS,
   YUMI_MAZE_SLOT_COUNT,
   yumiMazeOrigin,
   ZONES,
@@ -181,7 +178,7 @@ import {
   requestedCharacterForm,
   resolvedCharacterForm,
 } from './characters/form_visual_selection_core';
-import { skinCount, visualKeyFor, weaponSkinModelUrl } from './characters/manifest';
+import { visualKeyFor, weaponSkinModelUrl } from './characters/manifest';
 import { modularLookChanged } from './characters/player_look_core';
 import { PooledVisualLifecycle } from './characters/pooled_visual_lifecycle';
 import { playerRangedAttackStartsAtLaunch } from './characters/skin_attack';
@@ -293,6 +290,7 @@ import {
   FOGLESS_DETAIL_FAR,
   horizonHazePlan,
 } from './far_terrain_core';
+import { buildFarmPatchProps, type FarmBedSeat, FarmPatchVisuals } from './farm_patches';
 import { buildFarshoreFeatures } from './farshore_features';
 import { buildFenFeatures, type FenFeaturesView } from './fen_features';
 import { buildFenbridgeTownView, type FenbridgeTownView } from './fenbridge_town';
@@ -332,6 +330,7 @@ import { buildGatherNodes, type GatherNodesView, resolveGatherNodePick } from '.
 import {
   GFX,
   type GfxBucketLevels,
+  gfxTierAtLeast,
   initGfxTier,
   SUN_ANCHOR,
   SUN_DIR,
@@ -385,6 +384,7 @@ import {
 import { IslandGuidance } from './island_guidance';
 import { buildJailScene, type JailSceneView } from './jail_scene';
 import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
+import { legendaryRegaliaActive, legendaryRegaliaEmitDt } from './legendary_regalia_core';
 import { stepLichHeartbeat } from './lich_audio_state_core';
 import { LightPulses } from './light_pulses';
 import {
@@ -526,7 +526,6 @@ import {
   runPrewarmCompileSubmission,
   submitPrewarmCompileUnit,
 } from './prewarm_compile_submission_core';
-import { prewarmDepthMaterial } from './prewarm_depth_material';
 import {
   boundedPrewarmVisibility,
   runBackgroundPrewarm,
@@ -652,6 +651,7 @@ import {
   resetShadowCadence,
   updateShadowCadence,
 } from './shadow_cadence_core';
+import { compileShadowDepthPrograms } from './shadow_depth_compile';
 import {
   type ShadowAnchor,
   shadowTexelWorldSize,
@@ -765,6 +765,17 @@ import {
   type ZonePrewarmStats,
   type ZoneStreamingStats,
 } from './zone_prepare_stats';
+import {
+  buildEntityPrewarmGroup,
+  buildNpcPrewarmGroup,
+  buildObjectPrewarmGroup,
+  buildPlayerPrewarmGroup,
+  PREWARM_MOB_POOL_COPIES,
+  PREWARM_OBJECT_ITEM_IDS,
+  PREWARM_OBJECT_POOL_COPIES,
+  prewarmPlayerSkinVariantCount,
+  type ZonePrewarmGroupHost,
+} from './zone_prewarm_groups';
 import { zonePrewarmTemplateIds } from './zone_prewarm_templates_core';
 import {
   INITIAL_SKY_PREWARM_RADIUS,
@@ -1006,49 +1017,6 @@ const DAY_HEMI_GROUND_WARMTH = 0.22;
 const SUN_TRAVEL_DISTANCE = SUN_ANCHOR.length();
 const RENDERER_PHASE_SAMPLE_LIMIT = 720;
 const RENDER_STALL_ATTRIBUTION_MS = 80;
-const PREWARM_MOB_TEMPLATE_IDS = [
-  'forest_wolf',
-  'wild_boar',
-  'webwood_spider',
-  'mudfin_murloc',
-  'tunnel_rat',
-  'vale_bandit',
-  'restless_bones',
-  'old_greyjaw',
-  'mogger',
-  'mire_widow',
-  'fen_troll',
-  'gravecaller_cultist',
-  'stormcrag_elemental',
-  'thornpeak_ogre',
-  'glimmermere_wader',
-  'sethrael_palecoil',
-  'warlock_imp',
-  'warlock_voidwalker',
-] as const;
-const PREWARM_OBJECT_ITEM_IDS = [
-  'supply_crate',
-  'lost_caravan_goods',
-  'morthen_grimoire',
-  'gravecaller_sigil',
-  'weathered_ledger_page',
-  'fen_muster_order',
-  'rusted_censer',
-  'bastion_ward_stone',
-  'ogre_war_totem',
-  'sanctum_key_shard',
-  'gravewyrm_sigil',
-  'crypt_ritual_circle',
-] as const;
-const PREWARM_MOB_POOL_COPIES = 3;
-const PREWARM_OBJECT_POOL_COPIES = 2;
-// The common templates above are pooled several-deep (they spawn in groups); every
-// OTHER mob model is still built once so its shader program compiles at load.
-const PREWARM_MOB_COMMON_IDS = new Set<string>(PREWARM_MOB_TEMPLATE_IDS);
-
-function prewarmPlayerSkinVariantCount(): number {
-  return ALL_CLASSES.reduce((sum, cls) => sum + skinCount(`player_${cls}`), 0);
-}
 
 type RendererWorldPhase =
   | 'lights'
@@ -1163,6 +1131,9 @@ export interface EntityView extends RickshawMountViewState {
   formCompilePending: THREE.Object3D | null;
   lastOverheadEmoteKey: string | null;
   recklessSkullsSpawned?: boolean;
+  // orange worn-gear glow, recomputed only on equippedInstances identity change
+  legendaryRegalia?: boolean;
+  legendaryRegaliaRef?: unknown;
   // render-space position last frame, for true u/s locomotion speed
   lastX: number;
   lastZ: number;
@@ -1845,6 +1816,10 @@ export class Renderer {
   private abyssalRiftFx!: AbyssalRiftFx;
   private ringOfFrostVisuals!: RingOfFrostVisuals;
   private riftDeathZoneVisuals!: import('./rift_death_zone').RiftDeathZoneVisuals;
+  // The viewer's OWN farm plots. Seats are sampled once with the static beds;
+  // the visuals wait for the Vfx, which is built later in the same lifecycle.
+  private farmBedSeats: ReadonlyMap<string, FarmBedSeat> = new Map();
+  private farmPatchVisuals: FarmPatchVisuals | null = null;
   private temporalHourglassGroundVisuals!: TemporalHourglassGroundVisuals;
   private paladinConsecrationVisuals!: PaladinConsecrationVisuals;
   private readonly mageBarrierStateScratch: MageBarrierState = {
@@ -2607,6 +2582,14 @@ export class Renderer {
     this.flames.push(...stationProps.flames);
     // After the mass hide above, so these adopt individually.
     for (const light of stationProps.fireLights) this.fireLightAdopter.adopt(light);
+
+    // The garden beds and compost bins: static world furniture EVERY viewer
+    // sees, whatever they have planted (the per-viewer crops mount later).
+    const farmPatchProps = buildFarmPatchProps(this.sim.cfg.seed, this.sim.farmPatches);
+    setRenderCategory(farmPatchProps.group, 'props');
+    this.scene.add(farmPatchProps.group);
+    freezeStaticMatrices(farmPatchProps.group);
+    this.farmBedSeats = farmPatchProps.seats;
     bd('stations');
 
     // Town streetlamps: world-spanning dressing, so it is built here with the
@@ -2838,7 +2821,7 @@ export class Renderer {
 
     // particle system: projectiles, impacts, heal glows, ambience
     this.lightPulses = new LightPulses(this.scene);
-    // Frozen Orb: the roaming ice-sphere visual, animated locally from the one
+    // Frostglobe: the roaming ice-sphere visual, animated locally from the one
     // 'orb' release event (see src/render/frozen_orb_fx.ts).
     this.frozenOrbFx = new FrozenOrbFx(this.scene, (x, z) => groundHeight(x, z, this.sim.cfg.seed));
     this.glacialFrontVisual = new GlacialFrontVisual(this.scene, (x, z) =>
@@ -2969,6 +2952,14 @@ export class Renderer {
     this.vfx = new Vfx(this.scene, vfxAnchor, offsetVfxAnchor);
     this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
     this.bgFx = new BattlegroundFx(this.sim, this.views, this.vfx);
+    this.farmPatchVisuals = new FarmPatchVisuals(
+      this.scene,
+      this.farmBedSeats,
+      this.vfx,
+      this.asyncCompileSupported
+        ? (root, label, priority) => this.compileGate(root, false, label, priority)
+        : null,
+    );
     this.underwaterView = new UnderwaterView(this.lowGfx);
     this.scene.add(this.underwaterView.group);
     this.abilityVfxFx = new AbilityVfxFx(
@@ -3748,8 +3739,8 @@ export class Renderer {
       const zone = zoneAt(x, z);
       const deadline = performance.now() + 5000;
       const t0 = performance.now();
-      const mobPrewarm = this.buildEntityPrewarmGroup(zone);
-      const npcPrewarm = this.buildNpcPrewarmGroup(zone, deadline);
+      const mobPrewarm = buildEntityPrewarmGroup(this.zonePrewarmHost(), zone);
+      const npcPrewarm = buildNpcPrewarmGroup(this.zonePrewarmHost(), zone, deadline);
       const mobGroup = mobPrewarm.group;
       const npcGroup = npcPrewarm.group;
       // Hide before scene attachment. The shared GPU queue may be occupied by
@@ -4974,6 +4965,7 @@ export class Renderer {
       this.riftDeathZoneVisuals.sync(this.sim.riftBossDeathZones());
       this.riftDeathZoneVisuals.update(dt);
     }
+    this.farmPatchVisuals?.drive(this.sim, dt, this.sim.entities.has(this.sim.playerId));
     this.temporalHourglassGroundVisuals.sync(this.sim.activeTemporalHourglasses);
     this.temporalHourglassGroundVisuals.update(dt);
     this.paladinConsecrationVisuals.sync(this.sim.activeConsecrations);
@@ -5064,6 +5056,8 @@ export class Renderer {
     // view - that dispose + re-upload cycle is the open-world "asset-upload"
     // travel hitch (Skeleton.dispose via CharacterVisual.dispose in
     // removeView, pinned by GPU-upload profiling). Players never pool (A6).
+    // The extracted zone_prewarm_groups builders call characterVisualPoolKey
+    // directly: mirror any logic added here, or re-point them at this wrapper.
     return characterVisualPoolKey(e);
   }
 
@@ -5084,215 +5078,20 @@ export class Renderer {
     return zonePrewarmTemplateIds(zone.id, kind, this.sim.entities.values());
   }
 
-  private buildEntityPrewarmGroup(zone: ZoneDef): {
-    group: THREE.Group;
-    pooled: { key: string; visual: CharacterVisual }[];
-  } {
-    const group = new THREE.Group();
-    const pooled: { key: string; visual: CharacterVisual }[] = [];
-    const p = this.sim.player;
-    group.position.set(p.pos.x, p.pos.y, p.pos.z - 14);
-    setRenderCategory(group, 'prewarm');
-    let idx = 0;
-    const place = (obj: THREE.Object3D): void => {
-      obj.position.set(((idx % 6) - 2.5) * 3.2, 0, Math.floor(idx / 6) * 3.2);
-      group.add(obj);
-      idx++;
+  /** The typed weld for the zone_prewarm_groups builders. Their host parameter
+   *  is untyped because the members it names are private here, so binding each
+   *  one to the interface is what turns a signature drift into a tsc error
+   *  instead of a throw during zone prepare. */
+  private zonePrewarmHost(): ZonePrewarmGroupHost {
+    return {
+      sim: this.sim,
+      prewarmEntity: (kind, templateId, color, scale, skin, id) =>
+        this.prewarmEntity(kind, templateId, color, scale, skin, id),
+      storePooledObject: (key, object) => this.storePooledObject(key, object),
+      templateIdsInZone: (zone, kind) => this.templateIdsInZone(zone, kind),
+      prewarmedMobTemplates: this.prewarmedMobTemplates,
+      prewarmedNpcModels: this.prewarmedNpcModels,
     };
-    const build = (templateId: string, copies: number): void => {
-      const template = MOBS[templateId];
-      if (!template) return;
-      for (let i = 0; i < copies; i++) {
-        const entity = this.prewarmEntity('mob', template.id, template.color, template.scale);
-        const visual = createCharacterVisual(entity);
-        // Assets unavailable: skip the seed so a later zone preparation can retry it.
-        if (!visual) continue;
-        const poolKey = this.visualPoolKeyFor(entity);
-        if (poolKey) pooled.push({ key: poolKey, visual });
-        visual.root.visible = true;
-        place(visual.root);
-      }
-    };
-    // Warm only templates that can appear in this zone. The per-template set
-    // persists across transitions, so shared families are paid once per session.
-    for (const templateId of this.templateIdsInZone(zone, 'mob')) {
-      if (this.prewarmedMobTemplates.has(templateId)) continue;
-      const copies = PREWARM_MOB_COMMON_IDS.has(templateId) ? PREWARM_MOB_POOL_COPIES : 1;
-      build(templateId, copies);
-      this.prewarmedMobTemplates.add(templateId);
-    }
-    return { group, pooled };
-  }
-
-  // Every NPC visual MODEL once (NPCs were not prewarmed at all, entering a zone hub
-  // compiled their shaders live). Most NPCs share a handful of models (npc_knight,
-  // npc_mage, ...), so dedup by model key (visualKeyFor) builds each only once.
-  private buildNpcPrewarmGroup(
-    zone: ZoneDef,
-    deadline: number,
-  ): {
-    group: THREE.Group;
-    pooled: { key: string; visual: CharacterVisual }[];
-    /** Ids whose model ended the loop warm: freshly built here, already warm
-     *  from an earlier id or session pass, or with no static record to build.
-     *  An asset-unavailable skip stays uncounted so warmed < planned reports
-     *  the unwarmed remainder instead of masquerading as complete work. */
-    warmed: number;
-    planned: number;
-    trimmed: boolean;
-  } {
-    const group = new THREE.Group();
-    const pooled: { key: string; visual: CharacterVisual }[] = [];
-    const p = this.sim.player;
-    group.position.set(p.pos.x, p.pos.y, p.pos.z - 24);
-    setRenderCategory(group, 'prewarm');
-    let idx = 0;
-    const npcIds = this.templateIdsInZone(zone, 'npc');
-    let warmed = 0;
-    let trimmed = false;
-    for (const npcId of npcIds) {
-      if (performance.now() >= deadline) {
-        trimmed = true;
-        break;
-      }
-      const npc = NPCS[npcId];
-      // Dynamic-entity template with no static NPC record: nothing to build.
-      if (!npc) {
-        warmed++;
-        continue;
-      }
-      const entity = this.prewarmEntity('npc', npc.id, npc.color, 1);
-      const modelKey = visualKeyFor(entity);
-      // Shared model already warm: this id's planned work exists already.
-      if (this.prewarmedNpcModels.has(modelKey)) {
-        warmed++;
-        continue;
-      }
-      const visual = createCharacterVisual(entity);
-      // assets unavailable: skip the seed, leave the model unmarked and the
-      // id uncounted, so a later zone preparation can retry it
-      if (!visual) continue;
-      this.prewarmedNpcModels.add(modelKey);
-      warmed++;
-      const poolKey = this.visualPoolKeyFor(entity);
-      if (poolKey) pooled.push({ key: poolKey, visual });
-      visual.root.visible = true;
-      visual.root.position.set(((idx % 8) - 3.5) * 2.8, 0, Math.floor(idx / 8) * 2.8);
-      group.add(visual.root);
-      idx++;
-    }
-    return { group, pooled, warmed, planned: npcIds.length, trimmed };
-  }
-
-  private buildPlayerPrewarmGroup(deadline: number): {
-    group: THREE.Group;
-    visualCount: number;
-    visuals: CharacterVisual[];
-    plannedVisuals: number;
-    trimmed: boolean;
-  } {
-    const group = new THREE.Group();
-    const p = this.sim.player;
-    group.position.set(p.pos.x, p.pos.y, p.pos.z - 21);
-    setRenderCategory(group, 'prewarm');
-    // Skin variants plus one aura-glow rig per class (the second loop below).
-    const plannedVisuals = prewarmPlayerSkinVariantCount() + ALL_CLASSES.length;
-    let idx = 0;
-    const visuals: CharacterVisual[] = [];
-    const place = (obj: THREE.Object3D): void => {
-      obj.position.set(((idx % 8) - 3.5) * 2.8, 0, Math.floor(idx / 8) * 2.8);
-      group.add(obj);
-      idx++;
-    };
-    // Build Metamorphosis before regular player variants so first activation
-    // cannot pay prepareVisual's clone, traversal and far-LOD bake cost in
-    // combat. The form also joins the existing shader compile pass.
-    const metamorphEntity = this.prewarmEntity(
-      'player',
-      'warlock',
-      CLASSES.warlock?.color ?? 0xffffff,
-      1,
-      0,
-      -10_999,
-    );
-    const metamorph = createCharacterVisual(metamorphEntity, 'form_metamorph');
-    if (metamorph) {
-      metamorph.setActive(true);
-      place(metamorph.root);
-      visuals.push(metamorph);
-    }
-    for (const cls of ALL_CLASSES) {
-      const variants = skinCount(`player_${cls}`);
-      for (let skin = 0; skin < variants; skin++) {
-        if (performance.now() >= deadline) {
-          return { group, visualCount: idx, visuals, plannedVisuals, trimmed: true };
-        }
-        const color = CLASSES[cls]?.color ?? 0xffffff;
-        const entity = this.prewarmEntity('player', cls, color, 1, skin, -11_000 - idx);
-        const visual = createCharacterVisual(entity);
-        // assets unavailable: skip the seed
-        if (!visual) continue;
-        visual.root.visible = true;
-        place(visual.root);
-        visuals.push(visual);
-      }
-    }
-    // One EXTRA rig per class wearing the ability-VFX aura glow: setAuraGlow's
-    // on-edge swaps the rig materials for private clones, and the FIRST spec'd
-    // cast of a session used to compile them synchronously mid-frame (the
-    // measured 'mage' program link landing inside the player's own cast
-    // moment, e.g. mid Solemn Prayer cast bar). The clones now keep the
-    // source's shader hooks and therefore its program cache key
-    // (material_clone_hooks.ts), which is what closes that hole for mob rigs
-    // and non-default skins too; this seed stays as the boot-side belt for the
-    // player classes, and for any rig material with no hook to preserve. The
-    // group is removed in the prewarm finally, but linked programs stay cached
-    // for the session.
-    for (const cls of ALL_CLASSES) {
-      if (performance.now() >= deadline) {
-        return { group, visualCount: idx, visuals, plannedVisuals, trimmed: true };
-      }
-      const color = CLASSES[cls]?.color ?? 0xffffff;
-      const entity = this.prewarmEntity('player', cls, color, 1, 0, -11_500 - idx);
-      const visual = createCharacterVisual(entity);
-      if (!visual) continue;
-      visual.root.visible = true;
-      visual.setAuraGlow(0xffffff, 0.02);
-      place(visual.root);
-      visuals.push(visual);
-    }
-    return { group, visualCount: idx, visuals, plannedVisuals, trimmed: false };
-  }
-
-  private buildObjectPrewarmGroup(): THREE.Group {
-    const group = new THREE.Group();
-    const p = this.sim.player;
-    group.position.set(p.pos.x, p.pos.y, p.pos.z - 17);
-    setRenderCategory(group, 'prewarm');
-    let idx = 0;
-    const place = (obj: THREE.Object3D): void => {
-      obj.position.set(((idx % 6) - 2.5) * 3.2, 0, Math.floor(idx / 6) * 3.2);
-      group.add(obj);
-      idx++;
-    };
-    for (const itemId of PREWARM_OBJECT_ITEM_IDS) {
-      const key = `object:${itemId}`;
-      for (let i = 0; i < PREWARM_OBJECT_POOL_COPIES; i++) {
-        const built = buildGroundQuestObject(itemId, -20_000 - idx);
-        this.storePooledObject(key, built);
-        built.group.visible = true;
-        // Hide the object's own point light (e.g. the ritual circle glow) during
-        // the prewarm: it must not inflate numPointLights, or every material would
-        // compile for one more light than the open world's constant budget ever
-        // shows and they would all recompile on first travel. Restored in the
-        // prewarm finally so the pooled object lights normally when reused live.
-        built.group.traverse((o) => {
-          if ((o as THREE.PointLight).isPointLight) o.visible = false;
-        });
-        place(built.group);
-      }
-    }
-    return group;
   }
 
   private prewarmTexture(texture: THREE.Texture | null | undefined): void {
@@ -5411,66 +5210,21 @@ export class Renderer {
   }
 
   /**
-   * compileAsync(scene, camera) does not enumerate Three's renderer-owned
-   * shadow materials. Temporarily put equivalent MeshDepthMaterials on EVERY
-   * mesh under the root, skinned or not, so KHR_parallel_shader_compile links
-   * those variants before the shadow pass asks getUniforms for them: static
-   * and instanced casters (12 of the initial frame's 64 residual synchronous
-   * links), and meshes NOT casting at gate time, because castShadow is toggled
-   * at runtime by distance (entity shadow band, zone shadow volume, gather
-   * nodes) frames after this arm ran, so a rig created beyond the band linked
-   * cold at its first shadow draw (eleven depth programs of 20 to 41 ms in
-   * 0.3 s on the 3090 ride, ten through Eastbrook in production). Depth twins
-   * are few, cached per (material inputs x mesh shape): a cache hit, no link.
+   * The gate's shadow arm (shadow_depth_compile.ts): a depth twin on EVERY
+   * mesh under the root, caster or not, linked against the sun's shadow camera
+   * so the program WebGLShadowMap draws is warm before the first shadow draw.
    */
-  private async compileShadowPrograms(root: THREE.Object3D): Promise<void> {
-    if (!GFX.dynamicShadows || !this.asyncCompileSupported) return;
-    const swaps: { mesh: THREE.Mesh; material: THREE.Material | THREE.Material[] }[] = [];
-    // Walked inside the try below so a throw mid-walk still restores every swap.
-    const swapMaterials = (): void => {
-      root.traverse((obj) => {
-        const mesh = obj as THREE.Mesh;
-        if (!mesh.isMesh || !mesh.material) return;
-        const material = mesh.material;
-        swaps.push({ mesh, material });
-        mesh.material = Array.isArray(material)
-          ? material.map((item) => prewarmDepthMaterial(this.prewarmDepthMaterials, item, mesh))
-          : prewarmDepthMaterial(this.prewarmDepthMaterials, material, mesh);
-      });
-    };
-    // Match the real shadow pass's program key exactly. A bare
-    // compileAsync(root, shadowCamera) uses the canvas output colour space
-    // and sees no scene lights, producing a skinned depth program that still
-    // misses both the render-target and shadow-map bits. Conversely, passing
-    // the world scene verbatim would add fog bits that WebGLShadowMap omits
-    // (its renderBufferDirect call uses a null scene). Keep the world only as
-    // the light source, briefly suppress its fog, and compile while any
-    // offscreen target is current so outputColorSpace is the linear working
-    // space. compileAsync runs its compile() prologue synchronously; restore
-    // the globals AND the swapped materials before awaiting the parallel
-    // linker: the boot-resume lane runs these units on VISIBLE post-reveal
-    // scene meshes, and a swap held across the awaited link (10 ms+ of real
-    // frames) would draw them as depth noise. The link tracks the depth
-    // material object, not the mesh, so restoring early is safe.
+  private compileShadowPrograms(root: THREE.Object3D): Promise<void> {
+    if (!GFX.dynamicShadows || !this.asyncCompileSupported) return Promise.resolve();
     this.prewarmRenderTarget ??= new THREE.WebGLRenderTarget(8, 8);
-    const previousTarget = this.webgl.getRenderTarget();
-    const previousFog = this.scene.fog;
-    let compilePromise: Promise<THREE.Object3D> | null = null;
-    try {
-      swapMaterials();
-      if (swaps.length > 0) {
-        this.scene.fog = null;
-        this.webgl.setRenderTarget(this.prewarmRenderTarget);
-        compilePromise = this.webgl.compileAsync(root, this.sun.shadow.camera, this.scene);
-      }
-    } finally {
-      this.webgl.setRenderTarget(previousTarget);
-      this.scene.fog = previousFog;
-      for (const swap of swaps) swap.mesh.material = swap.material;
-    }
-    // Do not race a timer here. The underlying linker cannot be cancelled,
-    // so a timeout only lets it overlap the next child and gameplay.
-    if (compilePromise) await compilePromise;
+    return compileShadowDepthPrograms(
+      this.webgl,
+      this.scene,
+      this.sun.shadow.camera,
+      this.prewarmDepthMaterials,
+      this.prewarmRenderTarget,
+      root,
+    );
   }
 
   // Link the local player's own body spirit (ghost) transparent variants
@@ -5654,7 +5408,6 @@ export class Renderer {
       categories,
     };
   }
-
   async prewarmInitialScene(
     options: {
       maxMs?: number;
@@ -5667,6 +5420,7 @@ export class Renderer {
     void this.initialGpuWorkStart?.then(() => {
       this.initialGpuWorkStart = null;
     });
+    this.farmPatchVisuals?.stageProgramAnchors();
     this.installSceneryRevealGates();
     const policy: PrewarmPolicy = resolvePrewarmPolicy({
       constrainedMemory: GFX.constrainedMemory,
@@ -6365,7 +6119,7 @@ export class Renderer {
         priority: 34,
         required: true,
         run: () => {
-          const built = this.buildPlayerPrewarmGroup(buildDeadline);
+          const built = buildPlayerPrewarmGroup(this.zonePrewarmHost(), buildDeadline);
           playerPrewarmGroup = built.group;
           playerPrewarmVisuals = built.visualCount;
           playerPrewarmInstances = built.visuals;
@@ -6389,7 +6143,7 @@ export class Renderer {
         priority: 35,
         required: true,
         run: () => {
-          const built = this.buildEntityPrewarmGroup(activeZone);
+          const built = buildEntityPrewarmGroup(this.zonePrewarmHost(), activeZone);
           entityPrewarmGroup = built.group;
           entityPrewarmPool = built.pooled;
           this.scene.add(entityPrewarmGroup);
@@ -6403,7 +6157,7 @@ export class Renderer {
         priority: 36,
         required: true,
         run: () => {
-          const built = this.buildNpcPrewarmGroup(activeZone, buildDeadline);
+          const built = buildNpcPrewarmGroup(this.zonePrewarmHost(), activeZone, buildDeadline);
           npcPrewarmGroup = built.group;
           npcPrewarmPool = built.pooled;
           // Same derived rule as entities.player-archetypes above: done counts
@@ -6425,7 +6179,7 @@ export class Renderer {
         priority: 40,
         required: true,
         run: () => {
-          objectPrewarmGroup = this.buildObjectPrewarmGroup();
+          objectPrewarmGroup = buildObjectPrewarmGroup(this.zonePrewarmHost());
           this.scene.add(objectPrewarmGroup);
         },
         detail: () =>
@@ -7523,7 +7277,7 @@ export class Renderer {
         // reachable case today).
         if (ev.fx === 'selfCast') break;
         if (ev.fx === 'blinkStep') {
-          // A teleport step (Flickerstep / Shadowstep): reset the cached self
+          // A teleport step (Flitstep / Shadowstep): reset the cached self
           // position so the body snaps to the authoritative destination. A
           // short pulse sells the pop.
           if (ev.sourceId === this.sim.player.id) {
@@ -7987,6 +7741,14 @@ export class Renderer {
           nextSwirl: 0,
         });
         if (ev.entityId === this.sim.playerId) this.addShake(0.5);
+        break;
+      // The farm flourishes. These arrive on the viewer's own pid-scoped
+      // channel, so there is nothing to filter: the module turns each one into
+      // a puff or a sparkle over the bed it names.
+      case 'farmPlanted':
+      case 'farmHarvested':
+      case 'farmWithered':
+        this.farmPatchVisuals?.onFarmEvent(ev, this.sim.playerId);
         break;
     }
   }
@@ -8610,10 +8372,16 @@ export class Renderer {
   // crowd of composed players arriving in a live frame: 500 to 711 ms on the
   // first `live-gate` unit); the queue paces between units, never inside one,
   // and its released-tail cap now bounds the gate's links on the driver too.
-  private compileGate(target: THREE.Object3D, requiredForEntry = false): Promise<unknown> {
+  private compileGate(
+    target: THREE.Object3D,
+    requiredForEntry = false,
+    label = `live-gate:${target.name || target.type}`,
+    priorityOverride?: number,
+  ): Promise<unknown> {
     const lookup = (id: number) => this.sim.entities.get(id);
     const isCasting = castingAtPlayerPredicate(lookup, this.sim.player.id);
-    const priority = compilePriorityForTarget(target, this.sim.player.targetId, isCasting);
+    const priority =
+      priorityOverride ?? compilePriorityForTarget(target, this.sim.player.targetId, isCasting);
     // Compile the variant pair the boot prewarm proved out, never a bare
     // compileAsync at the ambient render target: three keys a program on the
     // bound target's output colour space, so on composer tiers an unbound
@@ -8630,7 +8398,7 @@ export class Renderer {
       this.liveCompileGates.runPieces(
         linkPieceWork(target, color, shadow, settle),
         VIEW_COMPILE_GATE_MAX_MS,
-        { priority, label: `live-gate:${target.name || target.type}` },
+        { priority, label },
       );
     const startAfterInitialPaint = compileMayStartBeforeInitialPaint(priority, requiredForEntry)
       ? null
@@ -10929,8 +10697,9 @@ export class Renderer {
       const mountSpec = e.kind === 'player' && e.mountKey ? mountVisualSpec(e.mountKey) : null;
       const mountShown = !!mountSpec && requestedForm === 'base' && !e.dead;
       syncMountVisual(v, mountSpec, this.mountHost);
-      if (v.mountVisual) v.mountVisual.root.visible = mountShown && !v.mountCompilePending;
-      v.mountLift = mountShown && v.mountVisual ? mountSpec.seat : 0;
+      const mountPresented = mountShown && !!v.mountVisual && !v.mountCompilePending;
+      if (v.mountVisual) v.mountVisual.root.visible = mountPresented;
+      v.mountLift = mountPresented && mountSpec ? mountSpec.seat : 0;
       const active = activeCharacterFormVisual(
         resolvedForm,
         v.visual,
@@ -10956,7 +10725,7 @@ export class Renderer {
         e.templateId.startsWith('vision_') ||
         e.ghost || // a released player spirit renders translucent (the ghost run)
         e.templateId === 'spirit_healer'; // the graveyard angel is an ethereal figure
-      // Duskveil/Smokestep wear the denser stealth fade; every spirit read
+      // Duskveil/Smokefade wear the denser stealth fade; every spirit read
       // (ghost run, ghost wolf, visions, the graveyard angel) keeps the thin
       // ethereal one. A dead stealther is a spirit first.
       const ghostStyle =
@@ -10980,15 +10749,16 @@ export class Renderer {
       // barrel (characters/visual.ts setRidePose). The seated loop stays the
       // base underneath: it is what carries his hips down onto the saddle, and
       // every seat offset in this file was fitted against it.
-      v.visual.setRidePose(mountShown && mountSpec ? mountSpec.ride : null);
+      v.visual.setRidePose(mountPresented && mountSpec ? mountSpec.ride : null);
       // The presented mount block below re-derives the whole rider transform
       // after the mixer advances (attitude, bob, seat bone), so the seat is
       // solved here only when that block will not run this frame.
-      if (!(runCharacterPresentation && mountShown && v.mountVisual)) {
-        placeRider(v, v.visual.root, mountSpec, v.mountLift, 0);
+      if (!(runCharacterPresentation && mountPresented)) {
+        placeRider(v, v.visual.root, mountPresented ? mountSpec : null, v.mountLift, 0);
       }
-      // Dismounted: relax the tip, or the rider keeps the cart's last attitude.
-      if (!mountShown) {
+      // Not presented: relax the tip, or the on-foot stand-in keeps the cart's
+      // last attitude while a replacement mount is still linking.
+      if (!mountPresented) {
         v.mountJumpPitch = 0;
         v.visual.root.rotation.x = 0;
       }
@@ -11268,6 +11038,24 @@ export class Renderer {
       // Facts about the ENTITY that override what its displayed motion implies
       // (battle-stance engagement, ice-slide suppression): anim_state_entity_core.
       applyEntityAnimOverrides(st, e, visuallyDead);
+      // Reset and prewarm mount audio BEFORE this frame can dispatch movement
+      // cues. A completed summon or live swap must not start the new idle/run
+      // voice only to have the transition edge immediately tear it down below.
+      if (e.kind === 'player') {
+        v.wasMountCasting = syncMountTransitionFx(v, {
+          mountCasting: e.mountCastRemaining > 0,
+          mountCastKey: e.mountCastKey,
+          mountCastRemaining: e.mountCastRemaining,
+          mountKey: e.mountKey,
+          poseAllowed: !visuallyDead && !swimming && runCharacterPresentation,
+          present: runCharacterPresentation,
+          playCallPose: (secs: number) => active.playCallPose(secs),
+          summonGlow: () => this.vfx.mountSummonGlow(e.id),
+          engineReset: () => this.audioSink?.mountEngineReset(e.id),
+          preloadEngine: (key: string) => this.audioSink?.preloadMountEngine(key),
+          summonCall: () => this.audioSink?.mountSummon(ax, ay, az, e.mountKey, isSelf),
+        });
+      }
       // --- spatial movement audio (self + others) --------------------------
       // All gated by audibility (squared distance) so far entities cost nothing.
       const sink = this.audioSink;
@@ -11324,6 +11112,9 @@ export class Renderer {
           // little bump in the road. Skipping the poll entirely leaves the
           // state machine (and any active loop) exactly where it was; the
           // next grounded frame picks the state back up on its own branch.
+          // The standstill hum is a separate loop, however, and must stop at
+          // takeoff rather than remain spatialized at the launch point.
+          sink.mountIdle(ax, ay, az, e.mountKey, false, e.id);
         } else if (logicallyMounted && !visuallyDead && !(st.sitting && !riderMounted)) {
           // Not moving while mounted (grounded and stopped): still poll an
           // engine mount every frame so the winddown fires on the stop edge;
@@ -11581,24 +11372,26 @@ export class Renderer {
           // hover cycle's idle float) and through any jump tip. A mount whose
           // seat MOVES (the troll's throne, the tortoise's shell) then re-seats
           // him on its seat bone, which wins over the fixed-lift placement.
-          applyMountJumpAttitude(
-            v,
-            v.mountVisual.root,
-            v.visual.root,
-            mountSpec,
-            this.time,
-            moving,
-            airborne,
-            dt > 1e-4 ? dyRaw / dt : 0,
-            dt,
-          );
-          seatRiderOnBone(v.group, v.visual.root, v.mountVisual.root, mountSpec, v);
-          // ambient mount particles: the snail paints its slime path while
-          // gliding, the hover cycle streams aether exhaust off its tail
-          if (mountSpec.fx === 'slime') {
-            if (moving) this.vfx.mountSlimeTrail(v.group.position, dt);
-          } else if (mountSpec.fx === 'exhaust') {
-            this.vfx.mountExhaust(v.group.position, facing, dt, moving);
+          if (mountPresented) {
+            applyMountJumpAttitude(
+              v,
+              v.mountVisual.root,
+              v.visual.root,
+              mountSpec,
+              this.time,
+              moving,
+              airborne,
+              dt > 1e-4 ? dyRaw / dt : 0,
+              dt,
+            );
+            seatRiderOnBone(v.group, v.visual.root, v.mountVisual.root, mountSpec, v);
+            // ambient mount particles: the snail paints its slime path while
+            // gliding, the hover cycle streams aether exhaust off its tail
+            if (mountSpec.fx === 'slime') {
+              if (moving) this.vfx.mountSlimeTrail(v.group.position, dt);
+            } else if (mountSpec.fx === 'exhaust') {
+              this.vfx.mountExhaust(v.group.position, facing, dt, moving);
+            }
           }
           // Carried lamps are DYNAMIC budget lights: the pass only ever zeroes
           // them, so the flame level has to be re-driven here, ahead of it.
@@ -11622,22 +11415,6 @@ export class Renderer {
         } else if (!emoteId) {
           v.lastOverheadEmoteKey = null;
         }
-      }
-
-      if (e.kind === 'player') {
-        v.wasMountCasting = syncMountTransitionFx(v, {
-          mountCasting: e.mountCastRemaining > 0,
-          mountCastKey: e.mountCastKey,
-          mountCastRemaining: e.mountCastRemaining,
-          mountKey: e.mountKey,
-          poseAllowed: !visuallyDead && !swimming && runCharacterPresentation,
-          present: runCharacterPresentation,
-          playCallPose: (secs: number) => active.playCallPose(secs),
-          summonGlow: () => this.vfx.mountSummonGlow(e.id),
-          engineReset: () => this.audioSink?.mountEngineReset(e.id),
-          preloadEngine: (key: string) => this.audioSink?.preloadMountEngine(key),
-          summonCall: () => this.audioSink?.mountSummon(ax, ay, az, e.mountKey, isSelf),
-        });
       }
 
       // per-ability windup orb + buff-orbit bands (spec-driven; no-op for
@@ -11695,6 +11472,15 @@ export class Renderer {
             this.vfx.lichAura(e.id, dt, soulFragments);
           } else if (hasMoonkin) this.vfx.formAura(e.id, 'moonkin', dt);
           else if (hasShadowform) this.vfx.formAura(e.id, 'shadowform', dt);
+          // orange worn-gear motes: STATIC-preset-gated sheddable prestige
+          if (e.kind === 'player' && gfxTierAtLeast(GFX.effectsTier, 'medium')) {
+            if (v.legendaryRegaliaRef !== e.equippedInstances) {
+              v.legendaryRegaliaRef = e.equippedInstances;
+              v.legendaryRegalia = legendaryRegaliaActive(e.equippedInstances);
+            }
+            const emitDt = legendaryRegaliaEmitDt(v.legendaryRegalia, this.reducedMotion(), dt, d2);
+            if (emitDt > 0) this.vfx.legendaryRegalia(e.id, emitDt);
+          }
         }
         // The graveyard angel: a soft, constant golden shimmer rising off the Spirit Healer.
         if (e.templateId === 'spirit_healer') this.vfx.castSparkle(e.id, 'holy', dt * 0.6);
@@ -12002,6 +11788,7 @@ export class Renderer {
       this.riftDeathZoneVisuals.sync(this.sim.riftBossDeathZones());
       this.riftDeathZoneVisuals.update(dt);
     }
+    this.farmPatchVisuals?.drive(this.sim, dt);
     this.temporalHourglassGroundVisuals.sync(this.sim.activeTemporalHourglasses);
     this.temporalHourglassGroundVisuals.update(dt);
     this.paladinConsecrationVisuals.sync(this.sim.activeConsecrations);

@@ -77,11 +77,25 @@ const DROWNED_LITANY_SHOP: DelveShopEntry[] = [
   { itemId: 'drowned_choir_fang', marks: 56, gate: 'heroicClear' },
   // -- the crafted top-tier gathering tools, as a NON-CRAFTER's route to them --
   //
-  // These eight are the tier-4 and tier-5 picks, axes, sickles and rods that
-  // otherwise only an engineer at a toolworks can produce (recipes.ts
-  // TOOL_RECIPES and ROD_RECIPES). A player who never took a crafting
-  // profession had no path to the top of the tool ladder at all; this is that
-  // path, priced in Marks rather than in a profession.
+  // The rows below are the tier-4 and tier-5 picks, axes, sickles, rods and
+  // hoes that otherwise only an engineer at a toolworks can produce (recipes.ts
+  // TOOL_RECIPES, ROD_RECIPES and HOE_RECIPES). A player who never took a
+  // crafting profession had no path to the top of the tool ladder at all; this
+  // is that path, priced in Marks rather than in a profession.
+  //
+  // NO COUNT HERE ON PURPOSE. This sentence said "these eight" and rotted to
+  // ten the day masterwrought Phase 11j seated the hoes, which is the anchor
+  // rule biting: the SET is derived and pinned in tests/delve_shop.test.ts
+  // (a filter over every gatherTool above tier 3 and below the apex rod's,
+  // with per-tier arms), so a number repeated here can only ever go stale.
+  //
+  // EIGHT UNTIL masterwrought Phase 11j, which added both HOE rungs under
+  // decision B and so closed the last gap in the family. Farming was the only
+  // gathering profession with no non-crafter route at the tier-4 rung, which
+  // masterwrought R18 forbids: nobody must have TAKEN a profession to get a
+  // thing. Five and five is also a more drift-resistant shape than four and
+  // five, and a hoe carries no combat power, so there is no masterwrought R5
+  // interaction to weigh against it.
   //
   // NO NEW PRICE RUNGS AND NO NEW GATES. Both rows reuse this shop's existing
   // top two: tier 4 sits on the helm's rung (24 Marks behind three clears, the
@@ -126,14 +140,43 @@ const DROWNED_LITANY_SHOP: DelveShopEntry[] = [
   // ships the first tier-4 node or water (the post-level-20 zone expansion)
   // turns these into ACCESS items: re-derive both Marks prices and the wield
   // table in that SAME change, not after.
+  //
+  // THE TRIGGER'S PREMISE IS HALF-FALSE SINCE masterwrought Phase 11i, and it
+  // fired by a route the wording did not anticipate. No tier-4 node or water
+  // shipped; the zone tiers are untouched. What changed is the CATCH LADDER:
+  // it went from three bands to six on the shipped band-b-takes-tier-b-plus-1
+  // gate, so the stormreel now opens catch band 3 and the tidewrought band 4.
+  // For the two ROD rows below, "a tier-4/5 tool opens no content" is simply no
+  // longer true, and 24 and 56 Marks are now ACCESS prices rather than comfort
+  // prices. The three LAND rows at each rung are unaffected: no node tier
+  // moved. Re-deriving the two rod prices is a delve-economy decision with no
+  // approved replacement values, so this code leaves the numbers alone rather
+  // than inventing two.
+  //
+  // THE TIER-6 APEX ROD IS DELIBERATELY ABSENT, and since masterwrought Phase
+  // 11j it is the ONLY such absence: osmium_hoe was the other one, and 11j
+  // resolved it by adding the row rather than by re-affirming the gap, so this
+  // paragraph no longer has a sibling to lean on. It stands on its own three
+  // reasons, and the first is the one that matters: pricing a
+  // tier-6 rung here means inventing a Marks number and a gate above
+  // heroicClear, which is the highest gate the vocabulary has, and this packet
+  // does not invent balance numbers. Second, the rung needs no bad-luck
+  // backstop: its SCHEMATIC is deterministic Heroic Marks stock and the rod
+  // itself is market-listable, so nothing in its chain is luck-gated, which is
+  // what a Marks route exists to answer. Third, the rod prices above are
+  // themselves now under the re-check the paragraph above describes, so adding
+  // a third rung to a ladder whose lower rungs are pending re-derivation would
+  // bake in the same stale premise one rung higher.
   { itemId: 'thorium_mining_pick', marks: 24, gate: 'clears:3' },
   { itemId: 'ashwood_axe', marks: 24, gate: 'clears:3' },
   { itemId: 'goldleaf_sickle', marks: 24, gate: 'clears:3' },
   { itemId: 'stormreel_fishing_rod', marks: 24, gate: 'clears:3' },
+  { itemId: 'osmium_hoe', marks: 24, gate: 'clears:3' },
   { itemId: 'arcanite_mining_pick', marks: 56, gate: 'heroicClear' },
   { itemId: 'elderwood_axe', marks: 56, gate: 'heroicClear' },
   { itemId: 'sunpetal_sickle', marks: 56, gate: 'heroicClear' },
   { itemId: 'tidewrought_fishing_rod', marks: 56, gate: 'heroicClear' },
+  { itemId: 'evergarden_hoe', marks: 56, gate: 'heroicClear' },
 ];
 
 // Per-delve shop stock, keyed by DelveDef.id. New delves register their stock

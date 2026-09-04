@@ -64,7 +64,8 @@ export const id_ID: EnTranslations = {
       "dungeon": "Dungeon",
       "difficulty": "Tingkat kesulitan",
       "name": "Nama",
-      "spec": "Spesialisasi"
+      "spec": "Spesialisasi",
+      "bed": "Bed id (optional)"
     },
     "difficulty": {
       "normal": "Normal",
@@ -150,6 +151,10 @@ export const id_ID: EnTranslations = {
       "gather": {
         "label": "Berikan keterampilan mengumpulkan",
         "description": "Tingkatkan profesi pengumpulan."
+      },
+      "farmgrow": {
+        "label": "Ripen crops",
+        "description": "Bring your planted crop beds to their ready time, or one bed by id. Nothing else changes: the outcome was rolled when you planted."
       },
       "teleport": {
         "label": "Teleportasi",
@@ -681,7 +686,7 @@ export const id_ID: EnTranslations = {
         "ice_fang_sword": {
           "name": "Taring Es",
           "look": "Bilah es glasial pucat yang melengkung, kristal rime bergerigi di sepanjang tulang belakang, inti beku sian yang bersinar di pelindung es yang lebih penuh.",
-          "lore": "Unggulan dari kelas beku, dan barang yang pertama kali diraih oleh setiap kolektor. Ice Fang diukir, bukan ditempa, dari taring gletser yang menutupi Thornpeak di atas Highwatch, inti cyannya terbakar dingin seperti cahaya dari Glimmermere. Itu sama dengan udara yang dipotongnya. Penjaga tembok bersumpah bahwa seorang tentara membawanya pada malam ketika salju tinggi menahan Wyrmcult, dan 'membeli tembok itu untuk musim dingin.'"
+          "lore": "Unggulan dari kelas beku, dan barang yang pertama kali diraih oleh setiap kolektor. Ice Fang diukir, bukan ditempa, dari taring gletser yang menutupi Thornpeak di atas Highwatch, inti cyannya terbakar dingin seperti cahaya dari Glimmermere. Itu sama dengan udara yang dipotongnya. Penjaga tembok bersumpah bahwa seorang tentara membawanya pada malam ketika salju tinggi menahan Broodsworn, dan 'membeli tembok itu untuk musim dingin.'"
         },
         "glaciersplit_axe": {
           "name": "Kapak Pembelah Gletser",
@@ -709,7 +714,7 @@ export const id_ID: EnTranslations = {
           "lore": "Pecahan es gletser bercahaya yang konon berasal dari kedalaman di bawah Sanctum, tempat hawa dingin gunung memiliki taring. Embun beku terus mekar dari kerah peraknya dan tidak mencair oleh api ataupun musim panas. Para Penyihir menyimpannya dekat saat bekerja, tetapi menjauhkannya ketika tongkat itu seolah mencondongkan diri untuk mendengar ruang bawah tanah Nythraxis."
         },
         "winterbite": {
-          "name": "Busur Winterbite",
+          "name": "Busur Wintergnaw",
           "look": "Baja berwarna perak dan busur es biru, inti beku sian yang bersinar di bagian atas, panah es padat, uap dingin.",
           "lore": "Busur dari baja perak dan es Thornpeak, dengan inti biru dingin yang membekukan anak panah pada talinya. Setiap tarikan membentuk kembali sebatang es gletser, sehingga pemanah di tembok tidak membawa tabung panah, hanya hawa dingin. Konon Highwatch mempertahankan Prowler Ridge sepanjang pengepungan dengan satu pemanah dan persediaan anak panah selama musim dingin."
         },
@@ -1035,11 +1040,6 @@ export const id_ID: EnTranslations = {
       "clearArmed": "Ketuk slot untuk mengosongkannya."
     },
     "tutorialGreeting": {
-      "bodyFirst": "Aku belum pernah melihatmu di sekitar sini sebelumnya, kawan. Sudah jadi tradisi di tanah ini bagi mereka yang memulai petualangan untuk mengunjungi Pesisir Pembuktian, sebuah pulau tenang di seberang selat. Di sana kamu bisa mengasah kemampuanmu dan membiasakan diri dengan dunia ini sebelum menghadapi tantangannya. Feri berlayar dua arah, dan tak seorang pun akan memandang rendah dirimu, apa pun pilihanmu.",
-      "bodyRefresher": "Kembali lagi dengan wajah baru, ya? Kalau begitu kamu sudah tahu cara kerjanya. Tapi, kalau kamu ingin mengingat-ingat dulu sebelum berangkat, Pesisir Pembuktian tak pernah menolak murid yang kembali, dan feri sudah siap kapan pun kamu mau.",
-      "play": "Ikuti Tutorial",
-      "skip": "Lewati Tutorial",
-      "declineNote": "Terserah kamu, kawan. Jika suatu saat kamu berubah pikiran, lonceng feri di dekat kotak surat Pos Gagak akan menyeberangkanmu ke Pesisir Pembuktian kapan saja, siang maupun malam. Ia akan tetap ada di sana, entah para serigala sedang berkeliaran atau tidak.",
       "bellHomeNote": "Sudah kembali dari pesisir? Itu tadi lonceng feri yang kamu bunyikan. Kembarnya tergantung persis di sana, dekat kotak surat Pos Gagak: bunyikan kapan saja dan penyeberangan itu akan membawamu kembali ke Pesisir Pembuktian. Tak ada ruginya, bagaimanapun jadinya.",
       "islandArrivalNote": "Selamat datang di Pesisir Pembuktian. Penjaga Tam sedang menunggu tak jauh di sepanjang pantai: temuilah dia.",
       "noteClose": "Mengerti"
@@ -1388,7 +1388,7 @@ export const id_ID: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage Sang Kodok Lompat-Bayangan",
       "name_stormfeather_griffin": "Stormfeather Penjelajah Langit",
       "name_thunderstrut_gobbler": "Thunderstrut Sang Kalkun Agung",
-      "name_terrorspark_groundshaker": "Percik Teror, Pengguncang Bumi",
+      "name_terrorspark_groundshaker": "Dreadspark Groundshaker",
       "name_drakemaw_raptor": "Raptor Drakemaw",
       "name_mech_bird": "Cluckwork Mech Bird",
       "name_lanternback_troll": "Grumbol the Lanternback",
@@ -1950,7 +1950,7 @@ export const id_ID: EnTranslations = {
         "battleTrance": "Kesurupan Pertempuran",
         "overpowerCharge": "Penguatan Tangan Merah",
         "suddenDeath": "Kematian Mendadak",
-        "victoryRush": "Terjangan Kemenangan",
+        "victoryRush": "Victor's Surge",
         "enrage": "Huru-hara: Murka",
         "heatingUp": "Memanas",
         "arcaneCharge": "Muatan Arkan",
@@ -2092,6 +2092,15 @@ export const id_ID: EnTranslations = {
     "itemHeroicLabel": "Heroik",
     "itemSoulbound": "Terikat Jiwa",
     "itemUniqueEquipped": "Unik-Dipakai",
+    "itemMasterwrought": "Unique-Equipped: Masterwrought ({count})",
+    "masterwrought": {
+      "slotsLabel": "Masterwrought slots:",
+      "slotsValue": "{used} / {cap}",
+      "pieceMark": "Masterwrought",
+      "tooltipWorn": "Occupies a Masterwrought slot ({used} of {cap} in use).",
+      "tooltipLegendaryLimit": "Only {cap} legendary Masterwrought piece can be worn.",
+      "tooltipAtCap": "All {cap} of your Masterwrought slots are in use."
+    },
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2121,6 +2130,18 @@ export const id_ID: EnTranslations = {
       "linkHint": "Shift-klik untuk menautkan item ini di obrolan."
     },
     "plurals": {
+      "commissionMasterworks": {
+        "one": "{count} masterwork",
+        "few": "{count} masterworks",
+        "many": "{count} masterworks",
+        "other": "{count} masterworks"
+      },
+      "commissionLegendaries": {
+        "one": "{count} legendary",
+        "few": "{count} legendaries",
+        "many": "{count} legendaries",
+        "other": "{count} legendaries"
+      },
       "guildMembers": {
         "one": "Anda adalah {rank}, {count} anggota",
         "few": "Anda adalah {rank}, {count} anggota",
@@ -2730,7 +2751,7 @@ export const id_ID: EnTranslations = {
       "sanguine": "Meningkatkan kecepatan serangan sebesar {hastePct}% dan kerusakan yang diberikan sebesar {dmgPct}%",
       "battleTrance": "Serangan Perampas atau Serangan Pelukai berikutnya tidak membutuhkan Amarah",
       "revengeFree": "Balas Dendam berikutnya tidak membutuhkan Amarah",
-      "victoryRush": "Terjangan Kemenangan siap digunakan",
+      "victoryRush": "Victor's Surge is ready",
       "maxHpPct": "Meningkatkan nyawa maksimum sebesar {pct}%",
       "enrage": "Kerusakan yang diberikan meningkat {damagePct}%, kecepatan serang {hastePct}%, dan kecepatan gerak {movePct}%",
       "suddenDeath": "Ajal Dini berikutnya tidak memakan Amarah dan mengabaikan syarat nyawanya",
@@ -3024,20 +3045,34 @@ export const id_ID: EnTranslations = {
       "riftSockets": "Permata Rift {used}/{total}",
       "statEnchanted": "+{value} {stat} (Dimantrai)",
       "enchantedFallback": "Dimantrai",
-      "partyTradeWindow": "Kamu dapat memperdagangkan barang ini kepada pemain yang berbagi jarahannya selama {time} berikutnya. Memakainya mengakhiri jendela perdagangan."
+      "partyTradeWindow": "Kamu dapat memperdagangkan barang ini kepada pemain yang berbagi jarahannya selama {time} berikutnya. Memakainya mengakhiri jendela perdagangan.",
+      "perfectedBadge": "Perfected",
+      "perfectingRank": "Perfecting: rank {rank} of {ranks}"
     },
     "materialHint": {
       "fineGrade": "Mutu halus. Dikumpulkan dari urat tingkat penuh dengan alat berperingkat di atas materialnya, dan dihitung sebagai versi biasa di mana pun versi biasa dibutuhkan.",
       "cookingCatch": "Bahan masakan. Harus dimasak sebelum dimakan.",
       "usedBy": "Digunakan oleh {crafts}.",
-      "arcaneDust": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan perlengkapan umum dan tak biasa.",
-      "arcaneEssence": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan perlengkapan langka.",
+      "arcaneDust": "Crafting reagent. Disenchanted from common and uncommon gear.",
+      "arcaneEssence": "Crafting reagent. Disenchanted from rare gear.",
       "arcaneShard": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan perlengkapan epik dan legendaris.",
       "resonantThread": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan zirah kain langka atau lebih baik.",
       "resonantHide": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan zirah kulit langka atau lebih baik.",
       "resonantLinks": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan zirah rantai langka atau lebih baik.",
       "resonantSteel": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan senjata jarak dekat langka atau lebih baik.",
-      "resonantTimber": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan staf, tongkat sihir, busur, dan busur silang langka atau lebih baik."
+      "resonantTimber": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan staf, tongkat sihir, busur, dan busur silang langka atau lebih baik.",
+      "masterwroughtIntermediate": "Masterwrought crafting component.",
+      "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day.",
+      "growthTonic": "Farming supply. Spent when you plant a crop for a chance of a slightly larger harvest. If the crop withers, the tonic is lost with it.",
+      "deedOfMaking": "Inscription writ. Consumed to raise a Perfected Masterwrought work to legendary and give it a name.",
+      "wyrmfallCore": "Masterwrought crafting catalyst. The raid final boss drops 1 to 3 to each player once per day on each difficulty. Heroic dungeon final bosses each drop 1 to 3 to each player once per day. Your first A or S rank Rift race win of the day grants 1 at A rank or 2 at S rank. The Heroic Quartermaster sells one for Heroic Marks.",
+      "mudfinScale": "Crafting reagent. Mudfin Skulkers drop it about half the time, the deeper marsh fish a little less often, and the named terrors of those waters always.",
+      "crackedWyrmScale": "Crafting reagent. Sanctum Scaleguards drop it about half the time, and nothing else in the world carries one.",
+      "crackedOgreTusk": "Crafting reagent. Brutok Skullsmasher carries one every time he falls, and he is its only source.",
+      "tallowCandle": "Crafting reagent. Deeprock diggers drop it more often than not and Gravecaller cultists now and then, while the named leaders of both always carry one.",
+      "banditBandana": "Crafting reagent. Bandits drop it about half the time, and their named leaders always carry one.",
+      "oldCragmawsPelt": "Crafting reagent. Old Cragmaw yields one every time he falls, and no other beast carries it.",
+      "emberwingCinderscale": "Crafting reagent. Voskar the Emberwing yields one every time he falls, and no other beast carries it."
     },
     "discord": {
       "title": "Discord",
@@ -3353,7 +3388,7 @@ export const id_ID: EnTranslations = {
       "sortAria": "Urutkan barang bank",
       "searchAria": "Cari barang bank menurut nama",
       "depositAll": "Setor semua bahan",
-      "depositAllTooltip": "Mengirim semua reagen kerajinan dan barang rongsokan dari tasmu ke bank dalam satu kali jalan. Alat pengumpul, perlengkapan yang dipakai, barang misi, dan barang habis pakai tidak pernah disentuh.",
+      "depositAllTooltip": "Mengirim semua bahan kerajinan (apa pun yang keterangannya bertuliskan \"Bahan\" atau \"Bahan Halus\") dari tasmu ke bank dalam satu kali jalan. Semua yang lain tetap di tasmu, termasuk alat pengumpul, barang misi, barang habis pakai, dan barang abu-abu.",
       "depositAllDone": "Bahan disetor: {count}.",
       "depositAllFull": "Bahan disetor: {count}. Bank kini penuh.",
       "depositAllNone": "Bank penuh: tidak ada yang disetor.",
@@ -3537,6 +3572,7 @@ export const id_ID: EnTranslations = {
       "logging": "Penebangan",
       "herbalism": "Herbalisme",
       "fishing": "Memancing",
+      "farming": "Farming",
       "notReady": "Simpul sumber daya ini belum muncul kembali untukmu.",
       "gatherLine": "Anda mengumpulkan: {name}.",
       "gatherLineQty": "Anda mengumpulkan: {name} x{qty}.",
@@ -3555,7 +3591,8 @@ export const id_ID: EnTranslations = {
       "tierRequired": {
         "mining": "Membutuhkan beliung pertambangan tingkat {tier}",
         "logging": "Membutuhkan kapak penebangan tingkat {tier}",
-        "herbalism": "Membutuhkan arit herbalisme tingkat {tier}"
+        "herbalism": "Membutuhkan arit herbalisme tingkat {tier}",
+        "farming": "Requires a tier {tier} farming hoe"
       },
       "requiresTool": {
         "mining": "Membutuhkan beliung penambangan",
@@ -3566,23 +3603,27 @@ export const id_ID: EnTranslations = {
         "mining": "Kamu membutuhkan beliung pertambangan tingkat {tier} untuk memanen urat ini.",
         "logging": "Kamu membutuhkan kapak penebangan tingkat {tier} untuk menebang rumpun ini.",
         "herbalism": "Kamu membutuhkan arit herbalisme tingkat {tier} untuk mengumpulkan petak ini.",
-        "fishing": "Kamu membutuhkan joran pancing tingkat {tier} untuk memancing di perairan ini."
+        "fishing": "Kamu membutuhkan joran pancing tingkat {tier} untuk memancing di perairan ini.",
+        "farming": "You need a tier {tier} farming hoe to work this bed."
       },
       "toolRequired": {
         "mining": "Kamu membutuhkan beliung penambangan untuk menambang urat ini.",
         "logging": "Kamu membutuhkan kapak penebangan untuk menebang tegakan ini.",
         "herbalism": "Kamu membutuhkan sabit herbalisme untuk mengumpulkan petak ini.",
-        "fishing": "Kamu membutuhkan joran pancing untuk melempar kail."
+        "fishing": "Kamu membutuhkan joran pancing untuk melempar kail.",
+        "farming": "You need a farming hoe to work this bed."
       },
       "noNodeNearby": {
         "mining": "Tidak ada urat bijih dalam jangkauan.",
         "logging": "Tidak ada tegakan pohon dalam jangkauan.",
-        "herbalism": "Tidak ada petak herba dalam jangkauan."
+        "herbalism": "Tidak ada petak herba dalam jangkauan.",
+        "farming": "There is no crop bed within reach."
       },
       "wieldUnmet": {
         "mining": "Kamu membutuhkan Penambangan {skill} untuk mengayunkan beliung yang sudah ada di tasmu.",
         "logging": "Kamu membutuhkan Penebangan {skill} untuk mengayunkan kapak yang sudah ada di tasmu.",
-        "herbalism": "Kamu membutuhkan Herbalisme {skill} untuk memakai sabit yang sudah ada di tasmu."
+        "herbalism": "Kamu membutuhkan Herbalisme {skill} untuk memakai sabit yang sudah ada di tasmu.",
+        "farming": "You need Farming {skill} to swing the hoe already in your bags."
       },
       "wieldUnmetCorpse": "Kamu membutuhkan keahlian pengumpulan {skill} untuk memakai alat terbaikmu.",
       "toolTierUnmetCorpse": "Kamu membutuhkan alat pengumpul tingkat {tier} untuk mendapatkan bahan terbaik.",
@@ -3591,26 +3632,31 @@ export const id_ID: EnTranslations = {
           "mining": "Alat penambangan (tingkat {tier})",
           "logging": "Alat penebangan (tingkat {tier})",
           "herbalism": "Alat herbalisme (tingkat {tier})",
-          "fishing": "Joran pancing (tingkat {tier})"
+          "fishing": "Joran pancing (tingkat {tier})",
+          "farming": "Farming tool (tier {tier})"
         },
         "unlocks": {
           "mining": "Diperlukan untuk menambang urat bijih hingga tingkat {tier}.",
           "logging": "Diperlukan untuk menebang tegakan pohon hingga tingkat {tier}.",
           "herbalism": "Diperlukan untuk mengumpulkan petak herba hingga tingkat {tier}.",
-          "fishing": "Diperlukan untuk memancing di perairan hingga tingkat {tier}."
+          "fishing": "Diperlukan untuk memancing di perairan hingga tingkat {tier}.",
+          "farming": "Required to plant crops up to tier {tier}."
         },
         "use": {
           "mining": "Gunakan: Menambang urat bijih terdekat.",
           "logging": "Gunakan: Menebang tegakan pohon terdekat.",
-          "herbalism": "Gunakan: Mengumpulkan dari petak herba terdekat."
+          "herbalism": "Gunakan: Mengumpulkan dari petak herba terdekat.",
+          "farming": "Works from your bags when you plant a crop bed."
         },
         "speed": "Mengumpulkan lebih cepat di simpul di bawah tingkat {tier}.",
         "rodRequired": "Diperlukan untuk memancing.",
         "rodBite": "Ikan menggigit hingga {seconds} dtk lebih cepat.",
         "rodReel": "Memperpanjang jendela penarikan sebesar {seconds} dtk.",
-        "rodBand": "Membuka hasil tangkapan yang lebih kaya pada keahlian memancing {skill} ke atas."
+        "rodBand": "Membuka hasil tangkapan yang lebih kaya pada keahlian memancing {skill} ke atas.",
+        "rodBandCatch": "Unlocks {fish} at fishing skill {skill} and above."
       },
       "downgradeMark": "Tas penuh: temuan disimpan tanpa tanda pengumpulnya.",
+      "downgradeMarkCrop": "Bags full: the harvest was stored without its grower's mark.",
       "downgradeFind": "Tas penuh: temuan murni terlewat.",
       "emptyHookNote": "Kail masih kosong",
       "stateReady": "Siap",
@@ -3618,6 +3664,90 @@ export const id_ID: EnTranslations = {
       "stateCooldownTimed": "Muncul kembali dalam {time}",
       "respawnClock": "{minutes}.{seconds}",
       "fineGradePreview": "Alatmu menyempurnakan hasil ini menjadi mutu halus."
+    },
+    "farming": {
+      "plantLine": "You plant: {name}.",
+      "harvestLine": "You bring in: {name}.",
+      "harvestLineQty": "You bring in: {name} x{qty}.",
+      "harvestFineLine": "You also bring in: {name}.",
+      "harvestFineLineQty": "You also bring in: {name} x{qty}.",
+      "witheredLine": "The crop withered. You clear the bed: {name}.",
+      "witheredLineQty": "The crop withered. You clear the bed: {name} x{qty}.",
+      "pressTarget": {
+        "feastOverHarvest": "A feast and your crop are both in reach. Interact takes the feast before the bed; step away from the feast to harvest.",
+        "feastOverPlant": "A feast and an empty bed are both in reach. Interact takes the feast before the bed; step away from the feast to plant."
+      },
+      "seedBackLine": "You recover seed: {name}.",
+      "seedBackLineQty": "You recover seed: {name} x{qty}.",
+      "goldenBonusLine": "The golden harvest yields: {name}.",
+      "denied": {
+        "bad_bed": "There is no crop bed there.",
+        "bad_crop": "You cannot plant that here.",
+        "range": "You are too far from that crop bed.",
+        "bed_taken": "You already have a crop growing there.",
+        "skill": "Your Farming skill is too low for that crop.",
+        "no_seed": "You have no seed for that crop.",
+        "not_ready": "That crop is still growing.",
+        "no_plot": "Nothing is planted in that bed.",
+        "no_husks": "You do not have enough withered husks.",
+        "no_compost": "You have no compost.",
+        "no_fee_produce": "You have no produce to pay the watch fee.",
+        "no_tonic": "You have no growth tonic.",
+        "tool": "You have no farming hoe fit for that crop.",
+        "locked": "An item that would pay for that is locked.",
+        "no_farmer": "You must be near a farmer to trade husks for compost.",
+        "no_feast": "You have no feast to set out.",
+        "feast_active": "Your feast is already set out.",
+        "feast_expired": "That feast is gone.",
+        "feast_finished": "That feast has been picked clean.",
+        "feast_eaten": "You have already eaten from that feast."
+      },
+      "feastTitle": "{name}'s Harvest Feast",
+      "stonepotFeastTitle": "{name}'s Stonepot Feast",
+      "warspiceFeastTitle": "{name}'s Warspice Feast",
+      "sageleafFeastTitle": "{name}'s Sageleaf Feast",
+      "feastPlacedLine": "You set out your harvest feast.",
+      "huskTrade": "Trade husks for compost",
+      "huskTradeAria": "Trade husks for compost with {name}",
+      "plantSheet": {
+        "title": "Plant a Crop",
+        "plant": "Plant",
+        "sowAria": "Sow {name}",
+        "empty": "You have no seed you can sow at this bed.",
+        "close": "Close the plant sheet"
+      },
+      "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
+      "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}.",
+      "readyLine": "A crop is ready to harvest.",
+      "readyLineQty": "{count} crops are ready to harvest.",
+      "readyWitheredLine": "A crop withered in its bed.",
+      "readyWitheredLineQty": "{count} crops withered in their beds."
+    },
+    "harvestJournal": {
+      "title": "Harvest Journal",
+      "close": "Close",
+      "listLabel": "Planted crop beds",
+      "growing": "Ready in {time}",
+      "ready": "Ready to harvest",
+      "finishing": "Finishing up",
+      "withered": "Withered",
+      "readyAnnounce": "Ready to harvest: {name}",
+      "remainingDaysHours": "{days}d {hours}h",
+      "remainingHoursMinutes": "{hours}h {minutes}m",
+      "remainingMinutesSeconds": "{minutes}m {seconds}s",
+      "remainingSeconds": "{seconds}s",
+      "bedLine": "{zone}, bed {index}",
+      "bedLineUnknown": "Unknown bed",
+      "careWatch": "Farmer's Watch",
+      "careNone": "No extras",
+      "stageSprout": "Sprout",
+      "stageSeedling": "Seedling",
+      "stageMaturing": "Maturing",
+      "stageRipe": "Ripe",
+      "emptyTitle": "No crops planted",
+      "emptyBody": "Sow a seed in any garden bed and the plot appears here with its timer.",
+      "noviceTitle": "You have not worked a garden bed yet",
+      "noviceBody": "Farming skill grows every time you bring in a crop. Sow a seed in any garden bed to begin."
     },
     "archetypeTitle": {
       "label": "Gelar",
@@ -3649,48 +3779,53 @@ export const id_ID: EnTranslations = {
       "leatherworking": "Pengolahan Kulit"
     },
     "enchantName": {
-      "enchant_weapon_might": "Mantrai Senjata - Kekuatan",
-      "enchant_weapon_intellect": "Mantrai Senjata - Daya Mantra",
-      "enchant_offhand_stamina": "Mantrai Tangan Sekunder - Stamina",
-      "enchant_helmet_fortitude": "Mantrai Helm - Keteguhan",
-      "enchant_neck_spirit": "Mantrai Kalung - Roh",
-      "enchant_shoulder_agility": "Mantrai Bahu - Kegesitan",
-      "enchant_chest_stamina": "Mantrai Dada - Stamina",
-      "enchant_waist_stamina": "Mantrai Ikat Pinggang - Stamina",
-      "enchant_legs_stamina": "Mantrai Celana - Stamina",
-      "enchant_gloves_agility": "Mantrai Sarung Tangan - Kegesitan",
-      "enchant_gloves_intellect": "Mantrai Sarung Tangan - Daya Mantra",
-      "enchant_feet_agility": "Mantrai Sepatu Bot - Kegesitan",
-      "enchant_ring_spirit": "Mantrai Cincin - Roh",
-      "enchant_weapon_agility": "Mantrai Senjata - Kegesitan",
-      "enchant_helmet_intellect": "Mantrai Helm - Kecerdasan",
-      "enchant_helmet_armor": "Mantrai Helm - Penguatan",
-      "enchant_neck_intellect": "Mantrai Kalung - Kecerdasan",
-      "enchant_neck_agility": "Mantrai Kalung - Kegesitan",
-      "enchant_shoulder_strength": "Mantrai Bahu - Kekuatan",
-      "enchant_shoulder_intellect": "Mantrai Bahu - Kecerdasan",
-      "enchant_chest_spirit": "Mantrai Dada - Roh",
-      "enchant_chest_armor": "Mantrai Dada - Penguatan",
-      "enchant_waist_strength": "Mantrai Ikat Pinggang - Kekuatan",
-      "enchant_waist_agility": "Mantrai Ikat Pinggang - Kegesitan",
-      "enchant_legs_intellect": "Mantrai Celana - Kecerdasan",
-      "enchant_gloves_strength": "Mantrai Sarung Tangan - Kekuatan",
-      "enchant_feet_strength": "Mantrai Sepatu Bot - Kekuatan",
-      "enchant_feet_stamina": "Mantrai Sepatu Bot - Stamina",
-      "enchant_ring_strength": "Mantrai Cincin - Kekuatan",
-      "enchant_ring_agility": "Mantrai Cincin - Kegesitan",
-      "enchant_ring_intellect": "Mantrai Cincin - Kecerdasan",
-      "enchant_weapon_greater_might": "Mantrai Senjata - Kekuatan Unggul",
-      "enchant_weapon_greater_spellpower": "Mantrai Senjata - Daya Mantra Unggul",
-      "enchant_helmet_greater_fortitude": "Mantrai Helm - Keteguhan Unggul",
-      "enchant_chest_greater_stamina": "Mantrai Dada - Stamina Unggul",
-      "enchant_legs_greater_stamina": "Mantrai Celana - Stamina Unggul",
-      "enchant_gloves_greater_agility": "Mantrai Sarung Tangan - Kegesitan Unggul",
-      "enchant_weapon_runed_edge": "Mantrai Senjata - Tepian Bersura",
-      "enchant_weapon_runed_focus": "Mantrai Senjata - Segel Bersura",
-      "enchant_chest_runeweave": "Mantrai Dada - Tenun Rune",
-      "enchant_legs_runed_hide": "Mantrai Celana - Kulit Bersura",
-      "enchant_helmet_runed_links": "Mantrai Helm - Kait Bersura"
+      "enchant_weapon_might": "Weapon Etching: Might",
+      "enchant_weapon_intellect": "Weapon Etching: Spellpower",
+      "enchant_offhand_stamina": "Offhand Etching: Stamina",
+      "enchant_helmet_fortitude": "Helmet Etching: Fortitude",
+      "enchant_neck_spirit": "Necklace Etching: Spirit",
+      "enchant_shoulder_agility": "Shoulder Etching: Agility",
+      "enchant_chest_stamina": "Chest Etching: Stamina",
+      "enchant_waist_stamina": "Belt Etching: Stamina",
+      "enchant_legs_stamina": "Leg Etching: Stamina",
+      "enchant_gloves_agility": "Glove Etching: Agility",
+      "enchant_gloves_intellect": "Glove Etching: Spellpower",
+      "enchant_feet_agility": "Boot Etching: Agility",
+      "enchant_ring_spirit": "Ring Etching: Spirit",
+      "enchant_weapon_agility": "Weapon Etching: Agility",
+      "enchant_helmet_intellect": "Helmet Etching: Intellect",
+      "enchant_helmet_armor": "Helmet Etching: Reinforcement",
+      "enchant_neck_intellect": "Necklace Etching: Intellect",
+      "enchant_neck_agility": "Necklace Etching: Agility",
+      "enchant_shoulder_strength": "Shoulder Etching: Strength",
+      "enchant_shoulder_intellect": "Shoulder Etching: Intellect",
+      "enchant_chest_spirit": "Chest Etching: Spirit",
+      "enchant_chest_armor": "Chest Etching: Reinforcement",
+      "enchant_waist_strength": "Belt Etching: Strength",
+      "enchant_waist_agility": "Belt Etching: Agility",
+      "enchant_legs_intellect": "Leg Etching: Intellect",
+      "enchant_gloves_strength": "Glove Etching: Strength",
+      "enchant_feet_strength": "Boot Etching: Strength",
+      "enchant_feet_stamina": "Boot Etching: Stamina",
+      "enchant_ring_strength": "Ring Etching: Strength",
+      "enchant_ring_agility": "Ring Etching: Agility",
+      "enchant_ring_intellect": "Ring Etching: Intellect",
+      "enchant_weapon_greater_might": "Weapon Etching: Greater Might",
+      "enchant_weapon_greater_spellpower": "Weapon Etching: Greater Spellpower",
+      "enchant_helmet_greater_fortitude": "Helmet Etching: Greater Fortitude",
+      "enchant_chest_greater_stamina": "Chest Etching: Greater Stamina",
+      "enchant_legs_greater_stamina": "Leg Etching: Greater Stamina",
+      "enchant_gloves_greater_agility": "Glove Etching: Greater Agility",
+      "enchant_weapon_runed_edge": "Weapon Etching: Runed Edge",
+      "enchant_weapon_runed_focus": "Weapon Etching: Runed Sigil",
+      "enchant_chest_runeweave": "Chest Etching: Runed Weave",
+      "enchant_legs_runed_hide": "Leg Etching: Runed Hide",
+      "enchant_helmet_runed_links": "Helmet Etching: Runed Links",
+      "enchant_weapon_lucent_might": "Weapon Etching: Lucent Might",
+      "enchant_weapon_lucent_spellpower": "Weapon Etching: Lucent Spellpower",
+      "enchant_chest_lucent_stamina": "Chest Etching: Lucent Stamina",
+      "enchant_feet_lucent_agility": "Boot Etching: Lucent Agility",
+      "enchant_lucent_infusion": "Lucent Infusion"
     },
     "professions": {
       "title": "Profesi",
@@ -3721,19 +3856,29 @@ export const id_ID: EnTranslations = {
       "toolEffectName": {
         "gatherersCache": "Simpanan Pengumpul",
         "artisansEye": "Mata Perajin",
-        "quickeningCharm": "Jimat Pegas Balik"
+        "quickeningCharm": "Jimat Pegas Balik",
+        "makersCharm": "Maker's Charm"
       },
       "toolEffectTooltip": {
         "kind": "Jimat Alat",
         "bonus": {
           "gatherersCache": "+1 hasil per panen selama masih memiliki muatan.",
           "artisansEye": "Meningkatkan mutu panen sebesar 1 tingkat alat selama masih memiliki muatan.",
-          "quickeningCharm": "Mempersingkat penghitung waktu munculnya kembali simpul yang dipicunya."
+          "quickeningCharm": "Mempersingkat penghitung waktu munculnya kembali simpul yang dipicunya.",
+          "makersCharm": "+2 yield per harvest while charged, or +1 on a farming tool."
         },
-        "howToSlot": "Pasangkan pada alat Penambangan, Penebangan, atau Herbalisme dari jendela Profesi. Habis terpakai saat dipasang.",
+        "howToSlot": "Pasangkan pada alat Penambangan, Penebangan, Herbalisme, atau Pertanian dari jendela Profesi. Habis terpakai saat dipasang.",
         "charges": "Dimulai dengan {base} muatan pada alat umum (+{bonus} per anak tangga kelangkaan).",
         "landOnly": "Tidak dapat dipasang pada joran pancing.",
         "openProfessions": "Buka Profesi untuk memasangnya pada alat pengumpulan."
+      },
+      "mobileStationTooltip": {
+        "kind": "Field station",
+        "use": "Places a party-shared {station} at your feet.",
+        "radius": "You can craft at it from anywhere; party members must be within {radius} yards.",
+        "duration": "Lasts {minutes} minutes.",
+        "notConsumed": "Never consumed.",
+        "replace": "Placing replaces your active field station, including a specialty-placed one."
       },
       "toolEffectSlotButton": "Pasang {effect}",
       "toolEffectRechargeButton": "Isi Ulang",
@@ -3860,6 +4005,9 @@ export const id_ID: EnTranslations = {
       "busy": "Kamu sedang sibuk.",
       "recipeNotLearned": "Kamu belum mempelajari resep itu.",
       "noBagSpace": "Kamu tidak punya ruang untuk barang hasil pembuatan.",
+      "dailyLimit": "You can only craft that once per day.",
+      "dailyLimitRetry": "You can only craft that once per day. Available again in {duration}.",
+      "oncePerDay": "Once per day",
       "skillReqLine": "Membutuhkan {craft} {skill}",
       "difficultyFull": "Peningkatan keterampilan penuh",
       "difficultyReduced": "Mengurangi perolehan keterampilan",
@@ -3868,8 +4016,16 @@ export const id_ID: EnTranslations = {
       "stationBadge": "Tempat Kerja Kerajinan",
       "stationOutOfRangeNamed": "Pindah ke {station} untuk membuat ini.",
       "learnMoreAtStation": "{master} di {station} dapat mengajarkan lebih banyak resep {craft} padamu.",
+      "apexChip": "Apex",
+      "apexPatternRaid": "Its pattern is a rare raid trophy.",
+      "apexPatternRift": "Its pattern is won on victorious high-rank Rift clears.",
+      "apexPatternVendor": "The Heroic Quartermaster sells its pattern for Heroic Marks.",
+      "apexPatternDrop": "Its pattern is found in the world.",
+      "perfectingLink": "Perfecting",
       "masterworkToast": "Karya besar! {name}",
       "masterworkZoneLine": "{crafter} membuat karya besar {name}!",
+      "legendaryLine": "{item} is reborn as {name}, a legend!",
+      "legendaryZoneLine": "{player} forged {item} into the legend {name}!",
       "tierUpToast": "{craft} maju ke tingkat {tier}!",
       "skillUpToast": "Keahlian {skill} meningkat ke {level}!",
       "skillUpSubtext": "Keahlian meningkat ke {level}!",
@@ -3898,6 +4054,7 @@ export const id_ID: EnTranslations = {
       "disenchant": "Hancurkan Pemantraan",
       "salvage": "Salvasi",
       "applyEnchant": "Terapkan Mantrai",
+      "sunder": "Sunder",
       "sell": "Jual",
       "sellAll": "Jual semua ({count})"
     },
@@ -3930,6 +4087,9 @@ export const id_ID: EnTranslations = {
       "salvageConfirmTitle": "Salvasi {item}?",
       "salvageConfirmBody": "Ini menghancurkan {item} dan menghasilkan bahan kerajinan. Tindakan ini tidak dapat dibatalkan.",
       "salvageConfirmBodySpecial": "Ini menghancurkan salinan khusus dari {item} (bertanda tangan, karya besar, atau terpesonan) dan menghasilkan bahan kerajinan. Tindakan ini tidak dapat dibatalkan.",
+      "sunderConfirmTitle": "Sunder {item}?",
+      "sunderConfirmBody": "This destroys {item} and yields Sundered Essence. This cannot be undone.",
+      "sunderConfirmBodySpecial": "This destroys a special copy of {item} (signed, masterwork, or enchanted) and yields Sundered Essence. This cannot be undone.",
       "pickerTitle": "Terapkan Mantrai",
       "targetTitle": "Pilih barang untuk dimantrai",
       "noEnchants": "Tidak ada mantrai yang menggunakan reagen ini.",
@@ -3939,13 +4099,16 @@ export const id_ID: EnTranslations = {
       "tier": {
         "base": "Mantra Dasar",
         "runed": "Mantra Bersura",
-        "greater": "Mantra Unggul"
+        "greater": "Mantra Unggul",
+        "lucent": "Lucent Enchants"
       },
       "yieldHeader": "Bahan yang diharapkan:",
       "yieldLineExact": "{count} {item}",
       "yieldLineRange": "{min} hingga {max} {item}",
       "alreadyEnchanted": "Barang itu sudah dimantrai.",
       "sameEnchant": "Barang itu sudah memiliki mantra itu.",
+      "notPerfected": "Only a Perfected item can bear that enchant.",
+      "enchantSkillTooLow": "Your Enchanting skill is too low for that enchant.",
       "replaceTag": "Menggantikan {enchant}",
       "sameEnchantTag": "Sudah diterapkan",
       "plainTag": "Belum dimantrai",
@@ -3956,6 +4119,7 @@ export const id_ID: EnTranslations = {
       "replaceConfirmKeepsSigner": "Tanda pembuat",
       "replaceConfirmKeepsMasterwork": "Bonus mahakarya",
       "replaceConfirmKeepsBond": "Ikatan komisi",
+      "replaceConfirmKeepsPerfecting": "Perfecting",
       "replaceConfirmCost": "Biaya: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Ganti"
@@ -3981,6 +4145,9 @@ export const id_ID: EnTranslations = {
       "alreadyKnown": "Anda sudah tahu resep itu.",
       "outOfRange": "Anda harus berada di stasiun untuk berlatih."
     },
+    "pattern": {
+      "teaches": "Use: Teaches you how to craft {item}."
+    },
     "unbind": {
       "title": "Pelepasan Ikat: {name}",
       "close": "Tutup pelepasan ikat",
@@ -3999,7 +4166,49 @@ export const id_ID: EnTranslations = {
       "notBound": "Barang itu tidak terikat.",
       "cannotAfford": "Kamu tidak mampu membayar biaya pelepasan ikat.",
       "outOfRange": "Kamu harus berada di stasiun kerajinan untuk melepas ikat.",
-      "noSpace": "Kamu tidak punya ruang untuk salinan yang sudah dilepas ikatnya."
+      "noSpace": "Kamu tidak punya ruang untuk salinan yang sudah dilepas ikatnya.",
+      "perfecting": "A piece on the Perfecting track, or already Perfected, stays bound."
+    },
+    "perfecting": {
+      "title": "Perfecting",
+      "close": "Close the Perfecting window",
+      "openButton": "Perfecting",
+      "openButtonAria": "Open the Perfecting window",
+      "empty": "You hold no Masterwrought piece. The apex recipes forge one.",
+      "wornChip": "Worn",
+      "rowRank": "Rank {rank} of {ranks}",
+      "rowPerfected": "Perfected",
+      "rankAnnounce": "{name} reaches Perfecting rank {rank} of {ranks}.",
+      "perfectedAnnounce": "{name} is now Perfected.",
+      "promotedAnnounce": "{name} is forged as {chosen}.",
+      "unknownItem": "Unknown item",
+      "namingSelectionUnconfirmed": "Your bags shifted: the piece being named could not be confirmed. Check the selection before you forge.",
+      "rowPromoted": "Legendary",
+      "attemptCost": "Attempt cost",
+      "promoteCost": "Promotion cost",
+      "matCount": "{have} of {required}",
+      "skillNeed": "Needs {craft} skill {skill}.",
+      "skillMet": "Met.",
+      "skillUnmet": "Not met.",
+      "skillSyncing": "Checking your craft skill.",
+      "bindWarn": "Your first perfecting attempt binds {name} to you.",
+      "bindWarnDetail": "Perfecting never lowers a rank: a failed attempt only spends its materials. A piece with Perfecting progress or a Perfected piece cannot be unbound, and a promotion is permanent.",
+      "bindConfirmText": "Your first attempt binds {name} to you. Attempt anyway?",
+      "bindConfirmAccept": "Bind and Attempt",
+      "bindConfirmCancel": "Cancel",
+      "attempt": "Attempt Perfecting",
+      "promote": "Name and Promote",
+      "perfectedLead": "Perfected. Give it a name to forge a legend.",
+      "promotedLine": "A finished legend: nothing left to perfect.",
+      "equipBlocked": "You could not equip it once promoted. Unequip the conflicting piece first.",
+      "nameTitle": "Name the Legend",
+      "nameLabel": "Inscribe a name for {name}. The name is permanent.",
+      "nameInputAria": "Legendary name",
+      "nameHint": "Two to 32 characters: letters, spaces, apostrophes, and hyphens, starting with a letter.",
+      "nameCount": "{count} of {max}",
+      "nameSubmit": "Forge the Legend",
+      "nameSubmitBusy": "Forging",
+      "nameCancel": "Cancel"
     },
     "commissionBoard": {
       "title": "Pesanan Komisi",
@@ -4025,6 +4234,7 @@ export const id_ID: EnTranslations = {
       "rowFor": "{item} untuk {requester}",
       "rowTargeted": "{item} untuk {requester} (oleh {crafter})",
       "acceptedBy": "Diterima oleh {name}",
+      "crafterRecordLabel": "Crafter's record:",
       "statusOpen": "Terbuka",
       "statusAccepted": "Diterima",
       "statusDelivered": "Diserahkan",
@@ -4216,10 +4426,13 @@ export const id_ID: EnTranslations = {
         "masterwork_armorcrafting": "Karya Besar Penempaan Zirah",
         "masterwork_tailoring": "Karya Besar Menjahit",
         "masterwork_leatherworking": "Karya Besar Pengolahan Kulit",
+        "masterwork_jewelcrafting": "Jewelcrafting Masterwork",
+        "masterwork_inscription": "Inscription Masterwork",
         "masterwork_engineering": "Karya Besar Rekayasa",
         "gather_event_pristine_vein": "Urat Bijih Murni",
         "gather_event_ancient_heartwood": "Teras Kayu Purba",
         "gather_event_moonlit_bloom": "Kuntum Cahaya Bulan",
+        "gather_event_golden_harvest": "Golden Harvest",
         "gather_event_perfect_specimen": "Spesimen Sempurna",
         "slain_old_greyjaw": "Dikalahkan: Greyjaw Tua",
         "slain_mogger": "Dikalahkan: Mogger",
@@ -4606,7 +4819,8 @@ export const id_ID: EnTranslations = {
   "gatherEvent": {
     "pristineVein": "{finder} memberikan kesan yang murni!",
     "ancientHeartwood": "{finder} menebang inti kayu kuno!",
-    "moonlitBloom": "{finder} menemukan mekarnya cahaya bulan!"
+    "moonlitBloom": "{finder} menemukan mekarnya cahaya bulan!",
+    "goldenHarvest": "{finder} reaped a golden harvest!"
   },
   "apiError": {
     "validation": {
@@ -4951,7 +5165,7 @@ export const id_ID: EnTranslations = {
         "nightName": "Kuntum Malam",
         "nightBlurb": "Sebuah negeri tengah malam berbintang tempat bunga-bunga menerangi jalan setapak dan Moonrest menjaga kesiagaannya.",
         "hauntName": "Hutan Arwah",
-        "hauntBlurb": "Sebuah hutan berhantu di bawah kanopi raksasa, tempat lentera-lentera Gallowmere menjadi satu-satunya cahaya jujur di jalan.",
+        "hauntBlurb": "Sebuah hutan berhantu di bawah kanopi raksasa, tempat lentera-lentera Gibbetmere menjadi satu-satunya cahaya jujur di jalan.",
         "jungleName": "Teluk Palem",
         "jungleBlurb": "Pohon palem, pasir putih, dan burung-burung yang riuh, dengan kota pantai Drifthaven menjaga api tetap menyala di sepanjang pesisir.",
         "gardenName": "Taman Abadi",
@@ -5042,6 +5256,7 @@ export const id_ID: EnTranslations = {
       "groupCamera": "Kamera",
       "talents": "Bakat",
       "professions": "Profesi",
+      "harvestJournal": "Harvest Journal",
       "arena": "Jendela PvP (arena dan Medan Thornhollow)",
       "leaderboard": "Papan Peringkat",
       "deeds": "Kitab Jasa",
@@ -5260,6 +5475,7 @@ export const id_ID: EnTranslations = {
       "framePetTitle": "Peliharaanmu",
       "framePetBody": "Pemburu, Penyihir Iblis, dan siapa pun lainnya yang mengeluarkan peliharaan mendapatkan sebuah bingkai kecil untuknya di samping bingkai milik mereka sendiri, lengkap dengan nama, level, dan nyawanya. Mengklik bingkai itu memilih peliharaanmu, dan Ctrl+6 melakukan hal yang sama dari papan ketik.",
       "framesMoveBody": "Bingkaimu, bingkai targetmu, dan bingkai party-mu semuanya bisa dipindahkan. Masing-masing membawa sebuah tombol pindah kecil di sudutnya: buka kuncinya, seret bingkai itu ke tempat yang kamu inginkan, lalu kunci lagi supaya klik yang tak disengaja tidak bisa menggesernya. Jika bingkai-bingkai itu berakhir di tempat yang kamu sesali, Atur Ulang Posisi Bingkai di opsi mengembalikan semuanya ke tempat asalnya.",
+      "framesMoveBodyEditFrames": "Your frame, your target frame, and your party frames can all be moved. Each carries a small move button in its corner: unlock it, drag the frame where you want it, and lock it again so a stray click cannot shift it. Edit Frames, at the top of the Frames tab in the Interface options, loosens the rest of the interface at once, those three frames with it: the action bars, the cast bar, the swing bar, the experience bar, the minimap, the button rail, the pet frame, the stance bar, the buff and debuff rows, and the Wishlist Reminder chip, each wearing a name chip while it is loose. If they end up somewhere you regret, Reset to Defaults at the foot of that same Frames tab snaps them all back to where they started.",
       "barsTitle": "Bilah, penghitung waktu, dan teks pertarungan",
       "barsBody": "Bilah rapalanmu muncul di tengah layar, tepat di atas bilah aksimu, setiap kali kamu merapal atau menyalurkan mantra, dan menampilkan nama mantra serta waktu yang tersisa. Targetmu mendapatkan bilah rapalannya sendiri pada bingkainya, sehingga kamu bisa melihat apa yang akan datang dan meresponsnya.\n\nSebuah bilah ayunan tipis berada di bawah bilah rapalanmu dan terisi di antara ayunan senjatamu, sehingga penyerang jarak dekat atau jarak jauh bisa melihat kapan pukulan otomatis berikutnya akan mendarat.\n\nBilah pengalamanmu membentang selebar penuh di bawah bilah aksimu, terbagi menjadi segmen-segmen, dengan sebuah bagian yang lebih terang menunjukkan pengalaman istirahat yang telah kamu tabung.\n\nBerenang di bawah air dan sebuah bilah napas biru muncul di bagian atas layar. Bilah itu berkurang selama kepalamu terendam, berkedip merah begitu habis dan kamu mulai tenggelam, lalu terisi cepat begitu kamu muncul ke permukaan. Space membuatmu berenang ke atas, dan tombol Berenang Turun, Ctrl secara bawaan, membawamu lebih dalam.\n\nKerusakan dan penyembuhan melayang ke atas dari apa pun yang menerimanya sebagai angka-angka kecil, sehingga kamu bisa membaca sebuah pertarungan tanpa membaca teks. Tab Catatan Tempur di kotak obrolanmu menyimpan catatan tertulis yang lengkap.",
       "aurasTitle": "Buff dan debuff",
@@ -5270,6 +5486,7 @@ export const id_ID: EnTranslations = {
       "minimapBody": "Kanan atas: sebuah peta mini bulat dengan nama zona di atasnya dan koordinatmu di bawahnya, dikelilingi oleh sebuah dial yang melukiskan waktu dalam sehari.\n\nCakram ini membawa lebih dari sekadar medan. Panahmu sendiri berada di tengah, menunjuk ke arah hadapmu, dengan party-mu di sekelilingmu sebagai titik-titik berwarna sesuai kelas dan sebuah panah tepi untuk siapa pun yang telah melenceng keluar darinya. Pemberi misi memakai tanda yang sama di sana seperti yang mereka pakai di dunia, dan kamu juga akan bisa mengenali titik pengumpulan dan stasiun kerajinan, portal perjalanan, mayat dan wadah yang bisa dijarah, musuh mana pun yang telah tertarik padamu, teman dan rekan guild yang berada di dekatmu, serta tubuhmu sendiri selagi kamu berlari kembali sebagai hantu.\n\nIndikator-indikator kecil muncul di atasnya saat ada sesuatu yang perlu disampaikan: sebuah amplop selagi surat yang belum dibaca menunggumu, sebuah koin selagi hasil penjualan atau barang kembalian menunggu di Sang Pedagang, dan sebuah tombol yang mendaftar lockout raid-mu.",
       "mapTitle": "Peta dunia dan pelacak-pelacakmu",
       "mapBody": "M membuka peta dunia: benua yang tergambar lengkap, dengan panahmu sendiri di atasnya, zona-zona beserta namanya, titik-titik menarik di sekitarmu, portal perjalanan, dan titik pengumpulan yang telah kamu temukan. Party-mu juga ditampilkan di sana. Di dalam sebuah delve, peta beralih menjadi skema ruangan-ruangan yang telah kamu jelajahi sejauh ini.\n\nDi sisi kanan, di bawah peta mini, setumpuk pelacak menjaga urusanmu saat ini tetap terlihat tanpa perlu membuka apa pun: misi yang kamu lacak beserta tujuannya, kemajuan jasamu, delve yang sedang kamu jalani, dan rift mana pun yang sedang kamu ikuti. Pelacak misi bisa diciutkan saat kamu ingin layarmu kembali lega.",
+      "mapBodyZoneFirst": "M opens the world map on the zone you are standing in, with your own arrow on it, the points of interest around you, the quest givers with their marks and the areas your objectives sit in, the crafting stations, mailboxes, noticeboards and garden beds, the dungeon entrances, and every gathering node in the zone, grayed out while it regrows and marked when your tools are not up to it. Your party shows on it too. Right-click the map, or press its World map button, and it pulls back to the continent, every zone drawn with its name, where a click on a zone opens that zone's map. Step into a delve, a dungeon, a rift or a castle keep and the map switches to a floor plan of where you stand; the Thornhollow Fields battleground gets a field map of its own.\n\nDown the right side, under the minimap, a stack of trackers keeps your current business in view without opening anything: your tracked quests and their objectives, your deed progress, your Reliquary pages, the delve you are in, and any rift you are taking part in. The quest tracker collapses when you want the screen back.",
       "chatTitle": "Kotak obrolan",
       "chatBody": "Kiri bawah. Tekan Enter untuk mulai mengetik dan Enter lagi untuk mengirim.\n\nDua tab selalu ada di sana: Obrolan, catatan gabungan dari semua yang dikatakan di sekitarmu, dan Catatan Tempur, catatan tertulis dari pertarunganmu. Tombol plus menambah lebih banyak lagi, satu per saluran: Ucap, Teriak, Party, Umum, Dunia, LFG, Guild, dan Perwira, ditambah sebuah tab Bisik yang mengumpulkan setiap bisikan yang kamu kirim dan terima di satu tempat. Mengetik di sebuah tab saluran mengirim ke saluran itu tanpa kamu perlu mengetik ulang perintahnya.\n\nSeluruh kotak ini bisa diseret ke tempat lain dan diubah ukurannya, dan ia mengingat di mana kamu meninggalkannya.",
       "keyWindowsTitle": "Jendela yang kamu buka dengan sebuah tombol",
@@ -5298,8 +5515,10 @@ export const id_ID: EnTranslations = {
       "winMetersBody": "Kerusakan, penyembuhan, dan ancaman untukmu dan semua orang bersamamu, disimpan dalam segmen-segmen sehingga kamu bisa melihat kembali pertarungan sebelum yang terakhir. Panel penyembuhan dan ancaman bisa ditarik keluar untuk berdiri sendiri.",
       "winMoreTitle": "Dan beberapa lagi",
       "winMoreBody": "Peta dunia (M), jendela PvP (G), Piala Lembah (Y), papan peringkat (K), kalender acara (I), dan roda emote (X) semuanya bekerja dengan cara yang sama. Papan peringkat layak diluangkan waktu pada kunjungan pertamamu: ia menyimpan sebuah tab untuk pemain, satu untuk guild, satu yang memberi peringkat seluruh akun berdasarkan Kemasyhuran dari Kitab Jasa, dan satu untuk peringkat harian.\n\nKlik kanan pemain lain, pada papan namanya atau pada namanya di obrolan, dan Info Pemain membuka sebuah kartu tentang mereka: perlengkapan yang mereka kenakan, lengkap dengan tooltip, dan detail publik dari karakter mereka. Ini hanyalah sebuah lihat sekilas, tidak lebih, dan mengharuskan mereka cukup dekat untuk terlihat.",
+      "winMoreBodyNoValeCup": "The world map (M), the PvP window (G), the leaderboard (K), and the event calendar (I) all work the same way. The emote wheel (X) is the exception: hold its key and the wheel appears, then let go over an emote to play it. The leaderboard is worth a moment on your first visit: it keeps a tab for players, one for guilds, one that ranks whole accounts by Renown from the Book of Deeds, one for the daily standings, and a Developers tab for the people who build the game, there unless you switch Show Developer Badges off.\n\nTarget another player and right-click the target frame (on touch, double-tap or long-press it), or right-click their name in chat, and Player Info opens a card on them: the gear they are wearing, with tooltips, and the public details of their character. It is a look, nothing more. The gear needs them close enough to see: look a name up from chat while they are far away and you get the public half of the card instead, their portrait, name, level, class, and guild.",
       "worldWindowsTitle": "Jendela yang dibukakan dunia untukmu",
       "worldWindowsBody": "Beberapa jendela tidak pernah kamu buka dengan menekan tombol: ia terbuka saat kamu bicara dengan orang yang tepat atau mengeklik hal yang tepat.\n\nSeorang pedagang membuka jendela pedagang, dengan dagangannya untuk dibeli dan sebuah tab Beli Kembali yang menyimpan apa yang terakhir kamu jual, untuk berjaga-jaga kalau kamu menjualnya karena keliru. Sebaris tombol jumlah menyertai daftar dagangan, sehingga setumpuk reagen bisa dibeli lima atau sepuluh sekaligus dalam satu klik alih-alih sepuluh kali klik, dan ada jumlah kustom saat tak satu pun dari keduanya pas. Seorang pelatih kelas membuka daftar apa yang bisa kamu pelajari sekarang dan apa yang masih menunggu di depanmu.\n\nSeorang bendahara membuka lemari besimu, brankas berisi slot tambahan yang bisa kamu beli lebih banyak. Jika guildmu telah membuka bank, sebuah tab kedua di sana menampilkannya: setiap anggota bisa melihat isinya bahkan tanpa izin untuk mengambil apa pun, sehingga tidak seorang pun perlu bertanya apa yang disimpan guild, pangkat menentukan siapa yang boleh menyetor, menarik, dan memindahkan uang guild, dan sebuah log mencatat setiap pergerakannya.\n\nKotak surat Pos Gagak membuka suratmu, dengan yang sudah tiba di satu tab dan formulir pengiriman di tab lain, lengkap dengan lampirannya. Pasar Dunia di tempat Sang Pedagang punya jendelanya sendiri: telusuri dan beli di satu tab, daftarkan daganganmu sendiri di tab lain, dan kumpulkan apa yang sudah terjual di tab ketiga. Berdagang langsung dengan pemain lain membuka jendela perdagangan dengan satu sisi untuk masing-masing.",
+      "worldWindowsBodyStationMaster": "Some windows you never press a key for: they open when you talk to the right person or click the right thing.\n\nA merchant opens the vendor window, with their stock to buy from and a buyback list at the foot of the same panel holding what you last sold, in case you sold it by mistake. A row of quantity buttons sits with the stock, so a stack of reagents is one press at five or ten at a time rather than ten presses, and a custom amount is there when neither suits. Your class abilities need no trainer, they come with your levels; the trainers here are the resident masters of the crafting stations, and Training on one of them opens the recipes they can teach you now, the ones you already know, and the ones still locked behind more skill.\n\nA banker opens your bank, with a Personal tab for the strongbox of extra slots you can buy more of and a Vault tab that stores your crafting materials by kind. If your guild has opened a bank, a Guild tab there shows it: every member can look inside even without permission to take anything out, so nobody has to ask what the guild is holding, ranks decide who may deposit, withdraw, and move the guild's coin, and a log records every movement.\n\nA Ravenpost mailbox opens your letters, with what has arrived on one tab and a form for sending on another, attachments and all. The World Market, at the Merchant in Eastbrook or Auctioneer Voss up in Highwatch, has its own window: browse and buy on one tab, list your own goods on another, and collect what has sold on a third. Trading face to face with another player opens a trade window with a side each.",
       "lootTitle": "Jarahan dan lemparan dadu",
       "lootBody": "Berinteraksi dengan sesosok mayat yang telah kamu peroleh dan jendela jarahan terbuka, mendaftar apa saja yang dijatuhkan. Klik sebuah baris untuk mengambilnya.\n\nDalam sebuah kelompok, sebuah jarahan bagus di bawah aturan jarahan kelompok justru menampilkan sebuah permintaan lemparan dadu di layarmu: Butuh jika kamu menginginkannya untuk dirimu sendiri, Tamak jika kamu akan mengambilnya untuk dijual, atau Lewati untuk menyerahkannya pada orang lain. Sebuah panel kecil kemudian menunjukkan siapa saja yang sudah melempar dan apa pilihan mereka selagi waktunya berjalan mundur.\n\nAturan jarahan itu sendiri berada di jendelanya sendiri yang kecil. Pemimpin kelompok bisa mengubahnya di sana, dan semua orang lain melihat jendela yang sama secara hanya-baca, sehingga aturannya tak pernah menjadi rahasia.\n\nBeberapa mayat juga bisa dipanen untuk bagian-bagiannya. Jika bisa, sebuah bagian Panen muncul di kaki jendela jarahan dengan sebuah kotak centang untuk tiap komponen yang kamu inginkan.",
       "playerCardTitle": "Kartu Pemainmu",
@@ -5308,6 +5527,7 @@ export const id_ID: EnTranslations = {
       "wikiBody": "Wiki ini hanya sejauh satu klik di dalam permainan. Sebuah tombol untuknya berada bersama yang lain di rel sudut kanan bawah, ada sebuah baris untuknya di menu permainan Esc, dan di ponsel ia berada di baki Lainnya. Karena membukanya akan mengalihkanmu ke peramban, tombol ini selalu meminta konfirmasi lebih dulu, sehingga sentuhan tak sengaja di tengah pertarungan tak akan pernah bisa menarikmu keluar darinya. Permainan tetap berjalan di baliknya.",
       "mobileTitle": "Di ponsel atau tablet",
       "mobileBody": "Kontrol sentuh muncul dengan sendirinya, dan tata letaknya menyesuaikan ukuran layarmu: susunan ringkas di ponsel kecil, susunan standar di ponsel yang lebih besar, dan susunan yang lebih lapang di tablet.\n\nKemampuanmu berada dalam sebuah cincin, bukan baris angka: tombol serang dengan lima tombol aksi di sampingnya, dan sebuah sakelar halaman yang menukar cincin itu melalui sisa slotmu, hingga tujuh halaman begitu ketiga bilah aksimu diaktifkan semua. Di sekelilingnya berada tombol-tombol yang paling sering dijangkau pemain sentuh: menukar target, menggunakan apa yang ada di depanmu, dan melompat, ditambah sebuah baris tarik keluar berisi bahan konsumsimu yang mengisi dirinya sendiri dari apa yang kamu bawa.\n\nDi sepanjang tepi bawah ada Obrolan, Sosial, Misi, Pengaturan, dan Lainnya. Lainnya membuka sebuah baki yang menyimpan sisa jendelamu, termasuk karaktermu, Pencari Dungeon, PvP, Piala Lembah, emote, dan wiki. Jendela di sini memenuhi seluruh layar alih-alih melayang di atasnya.\n\nMemindahkan bingkai unitmu adalah hal khas desktop: di layar sentuh, tata letak menempatkannya untukmu.",
+      "mobileBodyTwoPages": "Touch controls appear on their own, and the layout sizes itself to your screen: a compact arrangement on a small phone, a standard one on a larger phone, and a roomier one on a tablet.\n\nYour abilities sit in a ring rather than a number row: the attack button with four action buttons beside it, and a page toggle that swaps the ring between its {pages} pages, which together reach all {slots} of your ability slots whether or not the extra desktop bars are switched on. The fifth arc position of that ring is your consumables seat: tap it to use what is seated there, or hold it, or swipe it inward, to open a row that fills itself from what you are carrying. Around the ring sit the buttons a touch player reaches for most, swapping target, using what is in front of you, and jumping.\n\nOne Quick Actions control sits at the bottom edge in place of a row of buttons. It opens onto everything else: mount, chat, map, bags, social, quests, character, spellbook, game menu, and a More entry holding the rest of your windows, the Dungeon Finder, PvP, emotes and the wiki among them. Windows fill the screen here rather than floating over it.\n\nMoving your unit frames is a desktop thing: on touch the layout places them for you.",
       "railTitle": "Rel tombol",
       "railBody": "Di sudut kanan bawah layar, jauh dari peta mini, terdapat sebuah rel berisi tombol-tombol kecil persegi, satu untuk tiap jendela, tersusun dalam dua kolom pendek berdampingan. Sebagian besar dicetak dengan tombol bawaannya.\n\nKolom pertama mencakup karaktermu, buku mantra, talenta, catatan misi, Kitab Jasa, profesi, peta dunia, tas, dan kerajinan. Kolom kedua dibuka dengan Toko WOC dan berlanjut melalui PvP, Pencari Dungeon, Piala Lembah, Duel Kartu, papan peringkat, emote, musik, teman dan guild, wiki ini, dan menu permainan. Beberapa lagi bergabung dengan mereka hanya saat berlaku."
     },
@@ -5853,13 +6073,13 @@ export const id_ID: EnTranslations = {
       "valeBlurb": "Lembah awal yang hijau, tempat para pahlawan baru mengasah diri melawan serigala dan bandit di sekitar kota Eastbrook.",
       "marshBlurb": "Negeri yang tenggelam penuh kabut dan reruntuhan. Mudfin berkerumun di perairan dangkal dan sesuatu yang lebih tua bergerak di bawah air, diawasi dari kota-jembatan Fenbridge.",
       "peaksBlurb": "Punggung bukit yang dikikis angin dan galian tambang tua yang menanjak ke bahaya terberat di jalan awal, dipertahankan oleh pos Highwatch.",
-      "duskBlurb": "Sebuah lembah senja abadi di bawah pohon agung Eldergleam, tempat reruntuhan kristal bersinar dan udara berdengung dengan sihir kuno.",
+      "duskBlurb": "Sebuah lembah senja abadi di bawah pohon agung Eldershine, tempat reruntuhan kristal bersinar dan udara berdengung dengan sihir kuno.",
       "emberBlurb": "Padang tandus yang diterangi badai, berisi abu dan bloodglass, tempat drake-drake berputar di atas kaldera dan api troll membara di antara gumuk pasir, diawasi dari kota gerbang Wyrmwatch.",
       "frostBlurb": "Keheningan salju dan pohon pinus gelap di bawah aurora, tempat hawa dingin itu sendiri terasa terjaga dan Icemantle menjaga apinya tetap menyala.",
       "amberBlurb": "Musim gugur abadi berisi daun-daun keemasan dan merah yang tak pernah gugur, berkumpul di sekitar kota Lanternmere yang diterangi lentera.",
       "fenBlurb": "Sebuah lahan basah yang cerah dan berdengung, berisi bunga lili dan air yang tenang, diseberangi lewat jalan papan tua dari kota jembatan Bridgemere.",
       "nightBlurb": "Sebuah alam tengah malam berbintang tempat bunga-bunga menerangi jalan setapak dan Moonrest menjaga kesunyian di bawah langit yang bermimpi.",
-      "hauntBlurb": "Sebuah hutan berhantu di bawah kanopi raksasa, tempat lentera-lentera Gallowmere adalah satu-satunya cahaya jujur di jalan.",
+      "hauntBlurb": "Sebuah hutan berhantu di bawah kanopi raksasa, tempat lentera-lentera Gibbetmere adalah satu-satunya cahaya jujur di jalan.",
       "galeBlurb": "Tebing laut dan perbukitan melolong tempat angin tak pernah beristirahat, Suar Tua tak pernah padam, dan Wickharbor menutup rapat pintu-pintunya.",
       "jungleBlurb": "Sebuah belukar tropis berisi pohon palem, pasir putih, dan burung-burung berkicau riuh, dengan kota pantai Drifthaven menjaga api tetap menyala di pesisir.",
       "gardenBlurb": "Sebuah alam taman labirin pagar yang masih rapi terpangkas tanpa tukang kebun yang pernah terlihat siapa pun, dimasuki lewat Hedgewick dan pelataran air mancurnya.",
@@ -5870,7 +6090,7 @@ export const id_ID: EnTranslations = {
       "peaksGreeting": "Dua ratus tahun tembok ini bertahan. Ia tidak akan jebol dalam tugas jagaku, tetapi ia merintih.",
       "peaksGreeter": "Captain Thessaly, Highwatch",
       "duskGreeting": "Sedikit dari bangsamu pernah berdiri di bawah dahan-dahan ini. Melangkahlah dengan lembut, dan selamat datang.",
-      "duskGreeter": "Penjaga Saelwyn, Eldergleam",
+      "duskGreeter": "Penjaga Saelwyn, Eldershine",
       "emberGreeting": "Angin panas dari padang tandus, naga-naga di atas Drakemaw, dan api troll di gumuk pasir. Minumlah dulu sebelum kau melangkah keluar ke sana.",
       "emberGreeter": "Sang penjaga gerbang, Wyrmwatch",
       "frostGreeting": "Salju menelan setiap suara di luar tembok. Jika cahaya mulai menari, tenangkan suaramu dan jaga apimu tetap menyala.",
@@ -5882,7 +6102,7 @@ export const id_ID: EnTranslations = {
       "nightGreeting": "Melewati Gerbang Malam, udara itu sendiri bermimpi. Ikuti cahaya bunga, dan waspadai dunia tidur yang tergantung di langit.",
       "nightGreeter": "Sang penjaga malam, Moonrest",
       "hauntGreeting": "Tetaplah dekat lentera, wahai pengembara. Dan jika hutan ini memanggil namamu dari luar jalan, jangan menyahutnya.",
-      "hauntGreeter": "Sang penyala lentera, Gallowmere",
+      "hauntGreeter": "Sang penyala lentera, Gibbetmere",
       "galeGreeting": "Angin di sini tak pernah berhenti barang sekali, dan Suar Tua tak pernah padam barang sekali. Tutup pintu penginapan di belakangmu.",
       "galeGreeter": "Sang penjaga suar, Wickharbor",
       "jungleGreeting": "Pasir hangat, burung-burung berkicau riuh, dan rimba yang melahap cakrawala. Kami menjaga api tetap menyala di pantai; usahakanlah untuk kembali padanya.",
@@ -5891,14 +6111,14 @@ export const id_ID: EnTranslations = {
       "gardenGreeter": "Sang penjaga gerbang, Hedgewick",
       "valePlaceNotes": "Eastbrook adalah markas pertamamu. Wolf Run dan Boar Meadow adalah lahan berburu yang lembut; Mirror Lake adalah air yang bagus untuk memancing, meski mudfin memenuhi perairan dangkalnya; Sableweb dan Copper Dig menyembunyikan laba-laba dan penggali yang rakus bijih; sebuah Bandit Camp dan Fallen Chapel menyimpan pekerjaan yang lebih kasar; Reliquary Hill menurun ke Collapsed Reliquary, delve pertama realm; Brightwood Glade adalah hutan kecil tenang yang dibasuh sinar matahari di utara; dan Sowfield adalah lapangan bola babi hutan bertembok milik Eastbrook, tempat Piala Lembah dimainkan di bawah gencatan panen.",
       "marshPlaceNotes": "Fenbridge menjaga satu-satunya jalan kering. Prowler Reeds dan Deepfen Shallows dipenuhi binatang rawa dan Mudfin; Widow Thicket dipintal tebal oleh jaring; Drowned Chapel dan Troll Mounds menyimpan bahaya yang lebih tua, dengan Litani Tenggelam, delve milik rawa ini, terbuka tepat di utara gundukan itu; Gravecaller Encampment adalah sarang kultus yang menggali masuk, dan Benteng Karam adalah jantung berinstans rawa ini.",
-      "peaksPlaceNotes": "Highwatch menjaga tembok. Stalker Ridge dan Deeprock Burrows milik kucing punggung bukit dan penggali liang; Ogre Foothills dan Drogmar's War-Camp milik para bedebah bayaran; Stormcrag berderak oleh elemental, dan di bawahnya bersinar Glimmermere, tasik yang tepiannya menyimpan gerbang cahaya pucat menuju Kuil Tenggelam; Wyrmcult Tents dan Revenant Fields mengelilingi dataran tinggi kultus, dengan Sanktum Gravewyrm di puncaknya.",
-      "duskPlaceNotes": "Eldergleam berkumpul di bawah pohon agung itu. Gua Duskfall dan titik pandangnya adalah jalan masuk sekaligus pemandangan pertama lembah ini; Rimba Elder dan Cekungan Bintang Jatuh menjaga selatan yang sunyi; Pelataran Tenggelam menyimpan reruntuhan yang ditumbuhi semak di timur; dan Kedalaman Berkilau serta Perairan Dangkal Kristal bersinar di sepanjang utara.",
+      "peaksPlaceNotes": "Highwatch menjaga tembok. Stalker Ridge dan Deeprock Burrows milik kucing punggung bukit dan penggali liang; Ogre Foothills dan Drogmar's War-Camp milik para bedebah bayaran; Stormcrag berderak oleh elemental, dan di bawahnya bersinar Glimmermere, tasik yang tepiannya menyimpan gerbang cahaya pucat menuju Kuil Tenggelam; Broodsworn Tents dan Revenant Fields mengelilingi dataran tinggi kultus, dengan Sanktum Gravewyrm di puncaknya.",
+      "duskPlaceNotes": "Eldershine berkumpul di bawah pohon agung itu. Gua Duskfall dan titik pandangnya adalah jalan masuk sekaligus pemandangan pertama lembah ini; Rimba Elder dan Cekungan Bintang Jatuh menjaga selatan yang sunyi; Pelataran Tenggelam menyimpan reruntuhan yang ditumbuhi semak di timur; dan Kedalaman Berkilau serta Perairan Dangkal Kristal bersinar di sepanjang utara.",
       "emberPlaceNotes": "Wyrmwatch menjaga gerbang itu. Hutan Gerbang adalah kehijauan terakhir sebelum padang tandus; Gumuk Pasir Abu melayang dengan abu dan hal yang lebih buruk; Trollmoot adalah tempat troll gumuk pasir mengumpulkan api mereka; Padang Bloodglass berkilauan dengan pecahan tajam bagai silet; dan Kaldera Drakemaw adalah mahkota berasap yang dikitari para drake.",
       "frostPlaceNotes": "Icemantle menjaga perapian hangat terakhir. Garis Salju menandai tempat tumpukan salju mulai menguasai; Danau Gletser adalah air hitam yang tenang di bawah es; Tangga Aurora menanjak di bawah cahaya yang menari; Shiverfen adalah rawa beku yang tak pernah benar-benar tidur; dan Teras Lolongan membuktikan namanya setiap malam.",
       "amberPlaceNotes": "Lanternmere bersinar di jantung musim panen. Goldmelt adalah jalan masuk yang licin oleh damar; Kebun Bersepuh Emas dan Ceruk Panen menyimpan hasil petik yang termanis dan pencuri yang paling berani; Danau Besar memantulkan dedaunan yang membara; Ketinggian Cindermaple berdiri paling tinggi dan paling merah; dan Monolit Condong mengingat sesuatu yang lebih tua dari musim gugur.",
       "fenPlaceNotes": "Bridgemere berdiri mengangkangi air yang tenang. Tangga Amberfen turun dari negeri panen; Paya Lili dan Kolam Bogshine berkilauan dengan kunang rawa dan capung; Willowweep menjuntaikan dahan-dahannya ke danau; dan Dataran Mengantuk adalah bagian paling lembut dari tanah ini.",
       "nightPlaceNotes": "Moonrest menjaga kesunyian malam. Gerbang Malam adalah jalan menuju negeri tengah malam; Sumur Bulan menampung cahaya bintang yang bisa kau berdiri di sampingnya; Gloamfield mekar dalam kegelapan; Sang Penjaga Tegak mengawasi tanpa pernah bergerak; dan Gundukan Tanpa Tidur adalah satu-satunya tempat di sini yang tak pernah bermimpi.",
-      "hauntPlaceNotes": "Gallowmere meringkuk di dalam lentera-lenteranya. Gerbang Gagak adalah pintu depan hutan yang suram; Semak Janda terjalin tebal dengan jaring laba-laba; Padang Tergantung dan Kapel Mournstone menyimpan duka tertua hutan ini; dan Tanah Lapang Sang Pemburu menjadi milik apa pun yang masih berburu di sana.",
+      "hauntPlaceNotes": "Gibbetmere meringkuk di dalam lentera-lenteranya. Gerbang Gagak adalah pintu depan hutan yang suram; Semak Janda terjalin tebal dengan jaring laba-laba; Padang Tergantung dan Kapel Mournstone menyimpan duka tertua hutan ini; dan Tanah Lapang Sang Pemburu menjadi milik apa pun yang masih berburu di sana.",
       "galePlaceNotes": "Wickharbor bersandar melawan angin. Jalan Angin adalah jalan tebing masuk; Perbukitan Lolongan bergulung tanpa pohon di bawah badai; Suar Tua telah menyala selama yang bisa diingat siapa pun; Tebing Curam jatuh curam ke air; Ladang Bangkai Kapal menjaga kejujuran pesisir; dan Danau Cermin adalah satu-satunya hal yang diam di seluruh alam ini.",
       "junglePlaceNotes": "Drifthaven menjaga apinya di pantai. Muara Belukar adalah tempat sungai bertemu tembok hijau; Pesisir Palem membentang putih dan hangat di sepanjang ombak; Belukar Zamrud dan Air Terjun Sulur menelan pedalaman; Laguna Safir bersinar jernih dan dalam; dan Arca Tenggelam mengawasi dari bawah air.",
       "gardenPlaceNotes": "Hedgewick menanti di Gerbang Taman. Jalan Parterre mekar dalam warna yang tertata rapi; Kastel Dawnhold melatih para ksatrianya di balik tembok baru; Kolam Kelopak melayang merah muda sepanjang tahun; Kilang Tua memutar bedengannya sendiri; Labirin Besar mengatur ulang caranya untuk setiap tamu, lengkungannya diawasi oleh rubah-rubah berdaun; Pos Jaga Utara menjaga jalan keluar; Cekungan Lili beristirahat di luar semua itu; dan Pelataran Air Mancur masih mengalir jernih di jantung taman.",
@@ -6101,13 +6321,17 @@ export const id_ID: EnTranslations = {
       "ladderBody": "Permainan berperingkat melacak kedudukanmu dari waktu ke waktu. Lihat papan peringkat untuk mengetahui posisimu dan siapa yang memuncaki realm.",
       "rewardsHeading": "Yang dibayar oleh permainan berperingkat",
       "rewardsBody": "Kemenangan berperingkat membayar Kehormatan, mata uang pemain lawan pemain, dan kekalahan tidak merugikanmu apa pun selain peringkat. Kehormatan dimaksudkan untuk mengganjar pertandingan yang sungguhan: mengalahkan lawan atau tim yang sama lagi pada hari yang sama tidak membayar apa-apa lagi, hari kemenangan yang panjang membayar sedikit lebih kecil per kemenangan seiring berjalannya, dan sebuah pertandingan yang berakhir karena lawanmu menyerah tetap menggerakkan peringkatmu, tetapi sama sekali tidak membayar Kehormatan. Hari itu adalah milik Kehormatan sendiri, dan ia bergulir dengan jamnya sendiri, bukan mengikuti reset instansi realm.",
+      "rewardsBodyLossShare": "A ranked win pays Honor, the player versus player currency, and a loss you play to the end still pays a smaller share of it, as does a draw, so rating is the only thing a loss really costs you. Honor is meant to reward real matches: beating the same opponent or the same team again on the same day pays nothing further (nor does losing to them again), a long winning day pays in full for its first stretch of wins and then halves what a win pays, halving it again deeper in and staying there, and a match your opponent forfeits still moves your rating but pays no Honor at all. That day is the realm's own: it rolls over at the realm's nightly reset hour, the same boundary every daily lockout clears on.",
       "honorHeading": "Kehormatan",
       "honorBody": "Kehormatan adalah mata uang untuk bertarung melawan pemain lain. Kamu memperolehnya di Coliseum maupun di Medan Thornhollow; ia disimpan terpisah dari uangmu dan tak pernah tercampur dengannya, dan lembar karaktermu menunjukkan berapa banyak yang kamu miliki. Hanya ada satu hal untuk membelanjakannya: Perlengkapan Perang.",
       "quartermastersBody": "Dua kepala perbekalan menjaga rak dagangan yang sama, jadi berdaganglah dengan yang lebih dekat denganmu. AMARAH, Kepala Suku Kehormatan, berdiri di Lembah Eastbrook, dan Marsekal Perang Draven Kole, Master Gudang Perang, melayani di Highwatch. Persediaan mereka adalah tingkat Perang: lima keluarga zirah, ditambah kalung, cincin, dan senjata yang dibagikan di antara semuanya.",
       "honorFinalNote": "Pembelian dengan Kehormatan tidak dapat dikembalikan. Pembelian dengan uang bisa dibatalkan lewat daftar Beli Kembali milik pedagang, tetapi pembelian dengan Kehormatan tak pernah masuk ke sana, dan Perlengkapan Perang menjadi soulbound begitu kamu membelinya, sehingga tak pernah bisa ditukar, dikirim lewat pos, atau dijual kembali dengan cara apa pun. Karena itulah toko memintamu mengonfirmasi: baca perlengkapannya sebelum kamu menekan tombol itu.",
+      "honorFinalNoteSoldBack": "Honor purchases are final. The buyback list only ever holds what you sold: a coin purchase can usually be sold back for its sell price and reclaimed from that list if you change your mind again, but Warfare gear is soulbound the moment you buy it, so it can never be traded, mailed, or sold back for anything, and it never reaches that list. The shop asks you to confirm for that reason: read the piece before you press it.",
       "warfareHeading": "Perlengkapan Perang",
       "warfareBody": "Setiap perlengkapan Perang membawa Rating Serangan Perang dan Rating Pertahanan Perang, dan kedua rating itu sama sekali tak berguna melawan monster. Keduanya berlaku hanya saat kamu bertarung melawan pemain lain, dalam duel, di arena, atau di Medan Thornhollow, tempat Serangan menambah kerusakan yang kamu berikan dan Pertahanan mengurangi kerusakan yang kamu terima, masing-masing hingga batas tertingginya sendiri. Setiap keluarga zirah juga merupakan sebuah set, dan bonus setnya pun sama-sama berupa rating Perang atau efek yang hanya bekerja melawan pemain, sehingga satu set perlengkapan kehormatan penuh sama sekali tak berguna melawan bos dungeon.",
-      "warfareTradeBody": "Itulah kompromi yang disengaja. Perlengkapan Perang dibuat untuk bertarung melawan pemain, bukan sebagai jalan pintas melewati tingkatan dungeon: satu perlengkapan Perang tak pernah membawa rating pertarungan yang dimiliki perlengkapan Epik dungeon di slot yang sama, dan semua yang ia bawa dihabiskan untuk melawan pemain lain. Jika kamu ingin bertahan sendiri di arena, belilah. Jika kamu ingin menuntaskan heroik lebih cepat, dapatkan perlengkapanmu di dungeon."
+      "warfareBodyStatsStay": "Every Warfare piece carries Warfare Offense and Warfare Defense Rating, and those two ratings do nothing at all against monsters. They apply only when you fight another player, in a duel, in the arena, or on the battleground, where Offense adds to the damage you deal and Defense cuts the damage you take, each up to its own ceiling. Each armor family is also a set, and its set bonuses are likewise Warfare rating or effects that only work against players, so a full honor kit's set bonuses count for nothing on a dungeon boss. The pieces themselves still carry their ordinary stats, armor, and weapon damage, and those work everywhere; it is the Warfare ratings and the set bonuses that go quiet against a monster.",
+      "warfareTradeBody": "Itulah kompromi yang disengaja. Perlengkapan Perang dibuat untuk bertarung melawan pemain, bukan sebagai jalan pintas melewati tingkatan dungeon: satu perlengkapan Perang tak pernah membawa rating pertarungan yang dimiliki perlengkapan Epik dungeon di slot yang sama, dan semua yang ia bawa dihabiskan untuk melawan pemain lain. Jika kamu ingin bertahan sendiri di arena, belilah. Jika kamu ingin menuntaskan heroik lebih cepat, dapatkan perlengkapanmu di dungeon.",
+      "warfareTradeBodyRatingSpent": "That is the deliberate trade. Warfare gear is built for fighting players, not as a shortcut past the dungeon tiers: a Warfare piece never carries the combat ratings a dungeon epic in the same slot does, and the Warfare rating and set bonuses it carries instead are spent entirely on other players. If you want to hold your own in the arena, buy it. If you want to clear heroics faster, earn your gear in the dungeons."
     },
     "thornhollowPage": {
       "heading": "Medan Thornhollow",
@@ -6300,6 +6524,9 @@ export const id_ID: EnTranslations = {
       "soulboundBody": "Beberapa hadiah istimewa bersifat soulbound, terikat pada karaktermu sejak saat kamu meraihnya. Barang soulbound tak bisa ditukar, dikirim lewat pos, dijual ke penjaja, atau didaftarkan di pasar; ia milikmu dan hanya milikmu. Saat ini perlindungan itu menjaga token hadiah seperti Tanda Heroik, sementara perlengkapan yang kamu menangkan bebas kamu tukar, jual, atau bagikan.",
       "uniqueTitle": "Unik-Dipakai: satu legendaris dari tiap jenis",
       "uniqueBody": "Item legendaris bersifat unik-dipakai: karaktermu hanya bisa mengenakan satu salinan dari legendaris tertentu dalam satu waktu, dan versi heroiknya dihitung sebagai item yang sama. Salinan kedua bisa tersimpan di tasmu, di bank, atau di pasar, tetapi mencoba mengenakan keduanya sekaligus akan ditolak, dan tooltip menampilkan label emas Unik-Dipakai supaya kamu bisa melihat aturan ini sebelum merencanakan build di sekitar dua item itu.",
+      "masterwroughtTitle": "Masterwrought: the crafted summit",
+      "masterwroughtBody": "The finest crafted gear carries a gold Unique-Equipped: Masterwrought tag on its tooltip. These pieces are the summit of the crafting professions, made by master crafters from rare materials and traded freely on the open market, and they stand beside the treasures of the deepest dungeons. The tag is one shared family rule: a character can wear at most two Masterwrought pieces at once, whichever crafts they come from, so pick the two slots where they serve your build best.",
+      "masterwroughtBodyLegendary": "The finest crafted gear carries a gold Unique-Equipped: Masterwrought tag on its tooltip. These pieces are the summit of the crafting professions, made by master crafters from rare materials and traded freely on the open market, and they stand beside the treasures of the deepest dungeons. The tag is one shared family rule: a character can wear at most two Masterwrought pieces at once, whichever crafts they come from, so pick the two slots where they serve your build best. The rule keeps one further line for the very top of the family: a wearer who has Perfected a Masterwrought piece can promote it into a legendary of their own naming, a chain the Professions page tells in full, and a character can wear at most one legendary Masterwrought piece among the two.",
       "setsTitle": "Set dan bonus set",
       "setsBody": "Sebagian zirah datang dalam keluarga yang serasi, beberapa potongan yang dipotong agar tampak dan bertarung sebagai satu. Kenakan cukup banyak potongan dari satu keluarga sekaligus dan setnya terbangun, memberikan bonus di atas nilai masing-masing potongan, dan makin banyak potongan yang kamu kenakan makin kuat jadinya. Beberapa keluarga semacam itu muncul sebagai jarahan yang didambakan selagi kamu naik level, dan yang terbesar datang dari konten kelompok terberat di dekat level tertinggi, jadi memburu satu set penuh adalah tujuan akhir permainan yang klasik. Pertarungan melawan pemain lain punya keluarga serasinya sendiri, dibeli sepotong demi sepotong dengan Kehormatan; keluarga itu terbangun pada jumlah potongan yang berbeda dari keluarga jarahan, dan bonusnya hanya menjawab ketika musuhnya adalah pemain lain.",
       "consumablesTitle": "Barang Pakai Habis",
@@ -6340,35 +6567,43 @@ export const id_ID: EnTranslations = {
       "archetypeChooseBody": "Kamu tidak perlu mencari semua ini sendiri. Jalani perdaganganmu, dan begitu keahlian kriyamu pertama kali menunjukkan kecenderungan yang jelas ke arah satu pasangan, Serikat Kerajinan akan memperhatikan dan mengirim surat Ravenpost yang menyebut nama master yang harus ditemui serta misi yang harus diambil. Surat itu datang sekali per karakter, dan hanya jika kamu belum bersumpah pada suatu pasangan.",
       "archetypeSwitchBody": "Sebuah deklarasi juga bukan hukuman seumur hidup. Pasangan yang belum pernah kamu pegang hanyalah misi penyelarasan yang baru, sementara kembali ke pasangan yang pernah kamu tinggalkan menuntutmu menebus diri lebih dulu: lima tugas pada kali pertama, dan tiga tugas tambahan untuk setiap kepulangan yang sudah pernah kamu lakukan (mengambil pasangan yang benar-benar baru tidak pernah menaikkan hitungan itu). Pilihan itu tetap bermakna tanpa pernah mengunci pintu selamanya.",
       "whatHeading": "Sebuah perdagangan di samping pedang",
-      "whatBody": "Profesi adalah kehidupan kerja dunia ini: empat perdagangan pengumpulan yang menarik material mentah langsung dari tanah, dan sebuah cincin berisi sepuluh kerajinan yang mengubahnya menjadi perlengkapan, hidangan, ramuan, dan alat. Di sini segala sesuatu memberi makan sesuatu yang lain. Bijih yang kamu tambang menjadi sebilah pedang, pedang itu menerima mantra, dan mantra itu membutuhkan debu yang dipecah dari perlengkapan lama, sehingga seorang pengumpul, seorang pembuat, dan seorang perajin semuanya adalah mata rantai dalam satu rantai yang sama.\n\nTidak ada batas profesi yang perlu kamu risaukan. Setiap karakter bisa menaikkan tujuh dari delapan kerajinan yang memiliki konten hari ini dan keempat profesi pengumpulan secara berdampingan (Rekayasa adalah satu-satunya pengecualian: semua resepnya dimulai di atas langit-langit bebas, sehingga tangganya menunggu sumpah Pengebom); satu-satunya pilihan eksklusif adalah arketipemu, identitas yang pada akhirnya kamu sumpahkan, meski begitu kamu selaras, kerajinan yang menjadi tidak aktif di belakangnya hanya mendaki lewat resep biasanya, dan setelah keahlian 75 tidak sama sekali. Keahlian tidak pernah turun, dan tidak ada yang kamu pelajari yang pernah diambil kembali.",
+      "whatBody": "Professions are the working life of the world: the gathering trades that pull raw material straight out of the land, and a ring of ten crafts that turn it into gear, meals, potions, and tools. Everything feeds something else here. The ore you mine becomes a blade, the blade takes an enchant, and the enchant needs dust broken out of old gear, so a gatherer, a crafter, and a tinkerer are all links in one chain.\n\nThere is no profession limit to agonize over. Every character can raise nine of the ten crafts and every gathering profession side by side (Engineering is the one holdout: its recipes all start above the free ceiling, so its ladder waits for the Bombardier's oath); the only exclusive choice is your archetype, the identity you eventually swear to, though once you attune the crafts that fall dormant behind it climb only on their common recipes, and past skill 75 not at all. Skill never goes down, and nothing you learn is ever taken away.",
       "ringHeading": "Cincin kerajinan",
-      "ringBody": "Setiap kerajinan dengan konten hari ini mencapai batas pada keahlian 125: Penempaan Senjata, Penempaan Zirah, Menjahit, Pengolahan Kulit, Memasak, Alkimia, Rekayasa, dan Pemantraan. Di batas, perdagangan terus bekerja, panen tetap menghasilkan, pembuatan tetap terselesaikan, dan karya master masih bisa terjadi; hanya angkanya yang berhenti naik. Pilih kartu di bawah untuk tabel resep lengkap dan angka-angka suatu kerajinan.",
-      "ringWaveNote": "Dua kerajinan di roda, Kriya Permata dan Inskripsi, menempati posisinya tetapi belum memiliki resep. Ini disengaja, bukan kelalaian: kontennya hadir bersama zona-zona mendatang, dan batas di atas naik dengan cara yang sama, sehingga kerajinan yang sudah mencapai batas hari ini adalah keunggulan untuk ekspansi itu, bukan garis akhir.",
+      "ringBody": "Every craft on the ring caps at 125 skill: Weaponcrafting, Armorcrafting, Jewelcrafting, Inscription, Tailoring, Leatherworking, Cooking, Alchemy, Engineering, and Enchanting. At a cap the trade keeps working, harvests still yield, crafts still resolve, and masterworks can still happen; only the number stops climbing. Pick a card below for a craft's full recipe tables and numbers.",
+      "ringWaveNote": "With Inscription taking up its quills, every seat on the wheel now ships real recipes. The ring is complete rather than finished: the caps rise with future zones, so a capped craft today is a head start on that expansion, not a finish line.",
       "capFmt": "Batas {cap}",
       "comingSoon": "Belum ada resep",
       "gatherHubHeading": "Pengumpulan",
       "gatherHubBody": "Empat perdagangan pengumpulan memberi makan cincin dari lapangan: Penambangan, Penebangan, dan Herbalisme mengambil bijih, kayu, dan herba dari tanah dan mencapai batas pada keahlian 100, sementara Memancing berjalan pada ritme menggigit-dan-menggulung tersendiri hingga 200. Setiap halaman di bawah ini membawa peta simpul, tangga alat, dan peluang yang tepat.",
       "archetypesHeading": "Roda dan arketipenya",
-      "archetypesBody": "Sepuluh kerajinan duduk pada roda yang tetap, dan letak geografis pada roda itu penting. Setiap dua tetangga membentuk sebuah pasangan bernama: Pandai Besi untuk Penempaan Senjata dan Penempaan Zirah, Perajut Busana untuk Pengolahan Kulit dan Menjahit, Apoteker untuk Alkimia dan Memasak, Pengebom untuk Rekayasa dan Alkimia, dan enam lagi mengelilingi cincin itu.\n\nMenyelaraskan diri dengan sebuah pasangan adalah misi, bukan klik menu. Empat pasangan bisa dimasuki hari ini (Pandai Besi, Perajut Busana, Apoteker, dan Pengebom), masing-masing berlabuh pada seorang master yang menetap di Eastbrook, yang misi penerimaannya menyatakan seluruh kesepakatan di muka sebelum kamu mengambilnya. Sampai kamu berdeklarasi, setiap kerajinan maju bebas pada resep hingga tingkat langka (resep mana pun yang meminta keahlian 74 atau kurang), sehingga kamu bisa mencoba hampir segalanya sebelum memilih (hanya Rekayasa yang tidak punya resep serendah itu, jadi angkanya menunggu).\n\nBegitu kamu selaras, dua kerajinan pasanganmu menjadi bidang utamamu, tanpa langit-langit selain batas akhir. Sisa roda tidak lantas padam: satu kerajinan di seberang bidang utamamu tetap menyala sebagai hobi yang terus mendaki hingga tingkat langka (misi berulang di tempa Pandai Besi Haldren memungkinkanmu menukar yang mana), dan setiap kerajinan lain menjadi tidak aktif. Kerajinan yang tidak aktif mempertahankan keahlian dan resep biasanya, yang terus mengajarinya pada kurva normal hingga berubah abu-abu di 75; segala sesuatu di atas biasa berhenti membayar seketika, dan kerajinan yang tidak aktif tidak pernah menghasilkan karya master selama ia beristirahat.",
+      "archetypesBody": "Sepuluh kerajinan duduk pada roda yang tetap, dan letak geografis pada roda itu penting. Setiap dua tetangga membentuk sebuah pasangan bernama: Pandai Besi untuk Penempaan Senjata dan Penempaan Zirah, Perajut Busana untuk Pengolahan Kulit dan Menjahit, Apoteker untuk Alkimia dan Memasak, Pengebom untuk Rekayasa dan Alkimia, dan enam lagi mengelilingi cincin itu.\n\nMenyelaraskan diri dengan sebuah pasangan adalah misi, bukan klik menu. Empat pasangan bisa dimasuki hari ini (Pandai Besi, Perajut Busana, Apoteker, dan Pengebom), masing-masing berlabuh pada seorang master yang menetap di Eastbrook, yang misi penerimaannya menyatakan seluruh kesepakatan di muka sebelum kamu mengambilnya. Sampai kamu berdeklarasi, setiap kerajinan maju bebas pada resep hingga tingkat langka (resep mana pun yang meminta keahlian 74 atau kurang), sehingga kamu bisa mencoba segalanya sebelum memilih.\n\nBegitu kamu selaras, dua kerajinan pasanganmu menjadi bidang utamamu, tanpa langit-langit selain batas akhir. Sisa roda tidak lantas padam: satu kerajinan di seberang bidang utamamu tetap menyala sebagai hobi yang terus mendaki hingga tingkat langka (misi berulang di tempa Pandai Besi Haldren memungkinkanmu menukar yang mana), dan setiap kerajinan lain menjadi tidak aktif. Kerajinan yang tidak aktif mempertahankan keahlian dan resep biasanya, yang terus mengajarinya pada kurva normal hingga berubah abu-abu di 75; segala sesuatu di atas biasa berhenti membayar seketika, dan kerajinan yang tidak aktif tidak pernah menghasilkan karya master selama ia beristirahat.",
       "pairFmt": "{a} dan {b}",
       "curveHeading": "Kurva Penguasaan",
-      "curveBody": "Perolehan keahlian mengikuti satu aturan di mana-mana, Kurva Penguasaan empat-kondisi. Setiap {step} poin keahlian adalah satu tingkat, dan setiap resep dinilai berdasarkan posisinya terhadap milikmu: setingkat atau di atas tingkatmu memberikan perolehan penuh, satu tingkat di bawah memberikan setengah, dua tingkat di bawah seperempat, dan tiga atau lebih di bawah tidak ada sama sekali.\n\nJendela kerajinan melukis ini langsung ke daftar resep dalam warna klasik: oranye untuk perolehan penuh, kuning untuk pengurangan, hijau untuk tetesan, abu-abu untuk tidak ada. Perolehan bersifat deterministik, bukan lemparan naik-keahlian, sehingga pembuatan yang sama pada tingkat yang sama selalu menggerakkan keahlianmu sebesar jumlah yang persis sama, dan resep yang berubah kuning adalah isyaratmu untuk melatih tangga berikutnya.\n\nPengumpulan berjalan pada kurva yang sama dengan langkah tingkat yang sama, dinilai terhadap simpul alih-alih resep: simpul mudah menjadi abu-abu saat kamu melewatinya, dan simpul yang lebih kaya di zona-zona berikutnya adalah yang menyelesaikan pendakian. Memancing mempertahankan jadwalnya sendiri: satu poin penuh per tangkapan di bawah keahlian 50, setengah hingga 100, sepersepuluh hingga 150, dan ekor lambat sepanjang jalan ke 200, dengan tangkapan rongsokan tidak mengajarkan apa pun dari keahlian 100 ke atas.",
+      "curveBodyRetunedFishing": "Skill gain follows one rule everywhere, the four-state Mastery Curve. Every {step} points of skill is a tier, and each recipe is scored by where it sits against yours: at or above your tier it grants full gain, one tier below grants half, two below a quarter, and three or more below nothing at all.\n\nThe crafting window paints this straight onto the recipe list in the classic colors: orange for full gain, yellow for reduced, green for a trickle, gray for none. Gains are deterministic, never a skill-up roll, so the same craft at the same tier always moves your skill by exactly the same amount, and a recipe turning yellow is your cue to train the next rung.\n\nGathering runs on the same curve with the same tier step, scored against the node instead of a recipe: easy nodes gray out as you pass them, and the richer nodes of the later zones are what finish a climb. Fishing keeps its own schedule: 0.08 of a point per catch below 50 proficiency, 0.05 to 100, 0.04 to 150, and 0.03 to 200, with junk catches teaching nothing from 100 on.",
       "provenanceHeading": "Asal-usul",
       "provenanceBody": "Karya bagus di dunia ini mengingat pembuatnya: panen dan pembuatan langka atau lebih baik tiba dengan tanda tangan (Dikumpulkan oleh, Dibuat oleh), karya master selesai satu tingkat mutu lebih tinggi dengan nama pembuatnya selalu ada di sana, dan karya pesanan terikat pada penerimanya melalui Ikatan Pembuat. Halaman Ekonomi Kerajinan memuat aturan lengkapnya, dari tanda tangan dan penumpukan hingga biaya pelepasan ikat.",
+      "endgameHeading": "The Masterwrought endgame",
+      "endgameBody": "Above every craft's trainer ladder sits one shared summit: the Masterwrought family, the crafted pieces wearing the gold Unique-Equipped: Masterwrought tag the Gear page describes. The chain has the same shape whichever craft climbs it: apex patterns found rather than taught, daily-gated intermediate crafts that pace the work, and three shared materials every ladder drinks from. The finished pieces trade freely like any other crafted work (the Crafting Economy page carries the trading rules), and the two-piece wearing cap keeps them an accent on a build rather than a whole kit, so a crafter who never sets foot in the deepest endgame still sells to the people who live there.",
+      "endgamePatternsBody": "The patterns arrive through three channels, and the recipe tables on every craft page label each row's own: found in the deepest endgame victories, sold by the Heroic Quartermaster for Heroic Marks, or both at once. The split is deliberate. The gear patterns are found and never sold, the consumable patterns sit on the quartermaster's counter from day one, and the farming patterns ride both roads. Patterns are ordinary tradable goods besides, so a find you cannot use is a find you can sell.",
+      "endgameMaterialsBody": "Three shared materials feed the chain. The Wyrmfall Core is the tradable catalyst: each of the deepest endgame's final victories pays a credited character 1 to 3 cores, once per source per day, the highest rift clears pay a fixed count of their own on the same daily clock, and the Heroic Quartermaster sells one for 12 Heroic Marks as the bad-luck backstop; cores trade freely. The Sundered Essence is soulbound, and sundering is its only source: any character can sunder, no profession asked, and the cast breaks a raid-won piece of epic gear of the tier into exactly one essence, the gear itself being the price. The Maker's Ember is soulbound too, and it is the chain's clock: one per week per character, granted on your first eligible endgame completion of the week, and a missed week is never lost, since the embers accrue and pay out on your next completion.",
+      "endgameMaterialsBodyAnyRaid": "Three shared materials feed the chain. The Wyrmfall Core is the tradable catalyst: each of the deepest endgame's final victories pays a credited character 1 to 3 cores, once per source per day, the highest rift clears pay a fixed count of their own on the same daily clock, and the Heroic Quartermaster sells one for 12 Heroic Marks as the bad-luck backstop; cores trade freely. The Sundered Essence is soulbound, and sundering is its only source: any character can sunder, no profession asked, and the cast breaks a raid-won piece of epic gear, from any raid and either difficulty, into exactly one essence, the gear itself being the price. The Maker's Ember is soulbound too, and it is the chain's clock: one per week per character, granted on your first eligible endgame completion of the week, and a missed week is never lost, since the embers accrue and pay out on your next completion.",
+      "perfectingHeading": "Perfecting, and the orange promotion",
+      "perfectingBody": "A finished apex piece is not the end of its story. Its owner, with 125 skill in the craft that made it, can walk the piece up four ranks of Perfecting. Each attempt spends one Maker's Ember, one Sundered Essence, and one Prismglass Setting, and succeeds four times in five; a miss costs the materials and nothing else, the piece is never harmed or set back. The first attempt binds the piece to the one perfecting it, so a copy meant for sale is sold before the work begins. A Perfected piece carries a stat bonus over its base, and Perfected is exactly what the Lucent Infusion waits for: the one enchant the Enchanting page marks Perfected only lands on nothing less.\n\nThe walk can begin one rank in. A masterwork proc on an apex craft cannot finish the piece a tier finer, since apex is already the top of the ladder, so it grants the head start instead: the piece comes off the bench at the first rank of Perfecting, with three ranks left to walk rather than four. It is the same roll and the same odds the Masterworks section on every craft page publishes, spent on a rank instead of a quality.",
+      "promotionBody": "The last step is the orange promotion, and it is the Deed of Making's whole purpose. Bring a Perfected piece and one Deed of Making, an inscriptionist's skill-125 writ, and the copy is promoted into a legendary carrying a name of your own choosing. No roll rides it: the promotion is deterministic, the stats do not change at all, and what changes is the name and the color. The deed is tradable, so the scribe and the wearer need never be the same person, and the family cap keeps its one extra line: a character wears at most one legendary Masterwrought piece among their two.",
       "stationsHeading": "Stasiun dan tiga hub",
-      "stationsBody": "Enam stasiun bertipe melayani tujuh kerajinan terikat stasiun, tersebar di tiga hub kota. Eastbrook menyimpan tempa (Penempaan Senjata dan Penempaan Zirah berbagi tempa yang sama), dapur, alat tenun, dan bengkel alat; Fenbridge menyimpan penyamakan, dan Highwatch menyimpan apoteker. Setiap stasiun memiliki master yang menetap di sampingnya yang melatih resep, memposting pesanan kerja, dan menawarkan layanan pelepasan ikat.\n\nRadius kerja adalah 20 yard, kira-kira pekarangan stasiun sendiri, sehingga kamu membuat sambil berdiri di anvil bukan dari seberang kota. Kriya Permata, Inskripsi, dan Pemantraan tidak memiliki stasiun: dua yang pertama menunggu resepnya, dan Pemantraan bekerja di mana saja berdasarkan rancangan.",
+      "stationsBody": "Six typed stations serve the nine station-bound crafts, spread across the three town hubs. Eastbrook holds the forge (Weaponcrafting, Armorcrafting, and Jewelcrafting all share it), the kitchens, the loom, and the toolworks; Fenbridge keeps the tannery, and Highwatch the apothecary (Alchemy and Inscription share that bench). Each station has a resident master beside it who trains recipes, posts work orders, and offers the unbind service.\n\nThe working radius is 20 yards, roughly the station's own yard, so you craft standing at the anvil rather than from across town. Enchanting alone has no station: it works anywhere by design.",
       "deedsHeading": "Jasa yang mengingat perjalanan",
-      "deedsBody": "Kitab Jasa berjalan bersama setiap langkah ini. Penyelarasan pertamamu meraih jasa Tersumpah Karya dan karya master pertamamu meraih jasa Pandai Karya, keduanya bisa dipakai sebagai gelar. Setiap delapan kerajinan yang bisa diraih menandai jasa tonggak pada keahlian 50 dan memahkotai capnya dengan gelar Grandmaster, sementara Memancing mendapat jasa Garam Tua pada keahlian 100 dan gelar Pemancing Mahir pada keahlian 200.\n\nAda halaman yang lebih tenang juga: jasa untuk panen pertama dan pembuatan pertamamu, untuk temuan langka yang muncul di lapangan, dan untuk mengambil salvasi. Semua itu bersifat kosmetik, hanya gelar dan Kemasyhuran. Jasa tidak pernah memberikan kekuatan; ia hanya membuktikan bahwa kamu pernah ada di sana.",
+      "deedsBody": "The Book of Deeds walks beside every step of this. Your first attunement earns Craftsworn and your first masterwork earns Masterwright, both wearable as titles. All ten earnable crafts mark a milestone deed at 50 skill and crown their caps with a Grandmaster title, while Fishing gets Old Salt at 100 proficiency and the Master Angler title at 200.\n\nThere are quieter pages too: deeds for your first harvest and first craft, for the rare finds luck turns up in the field, and for taking up salvage. All of it is cosmetic, titles and Renown only. A deed never grants power; it only proves you were there.",
       "startHeading": "Dari mana memulai",
       "startBody": "Baru turun dari jalan di Eastbrook? Temui Mandor Odell dan ambil Pekerjaan untuk Setiap Tangan: ia akan menunjukkanmu urat bijih di sekitar Galian Tembaga di timur laut kota dan memberimu kapalan pertama di tanganmu. Waspadai galiannya sendiri: para Penggali Deeprock yang berkemah di sana berdiri beberapa level di atas pendatang baru, jadi kerjakan urat-urat di pinggirannya dulu dan simpan jantung perkemahan itu untuk saat levelmu sudah naik sedikit. Sejak saat itu, panenlah setiap urat bijih, rumpun kayu, dan petak herba yang kamu lewati sambil mengerjakan misi; kecakapan datang secara alami kepada para pengelana.\n\nKembali di kota, tekan T untuk membuka jendela kerajinan dan kerjakan resep biasa yang diketahui setiap karakter sejak awal. Kunjungi para master di tempa, dapur, alat tenun, dan bengkel alat untuk melihat apa yang mereka ajarkan, dan ambil pesanan kerja mereka demi koin yang stabil. Pada saat surat Serikat menemukanmu, kamu sudah akan tahu pasangan mana yang terasa seperti rumah.",
       "colStation": "Stasiun",
       "colHub": "Hub",
       "colMaster": "Master",
       "masterCellFmt": "{name}, {title}",
-      "harvestBodyFamilies": "Pengumpulan tidak berhenti di simpul. Banyak binatang yang dibunuh bisa dipanen sekali masing-masing, siapa cepat dia dapat, untuk kulit, taring, cakar, gading, sutra, bisa, kain, dan daging, langsung dari bangkai bersama jarahan biasanya; satu kali tekan membuka keduanya. Bila seekor binatang membawa lebih dari satu komponen yang bisa diolah, pilihannya ada di tanganmu: ambil semua yang bisa diberikannya, atau fokus pada lebih sedikit komponen dan dapatkan kualitas yang jauh lebih baik dari apa yang kamu ambil.\n\nLemparan panen langka atau lebih baik pada keluarga berisi spesimen juga memberikan spesimen sempurna bertanda tangan (Kulit Murni, Sutra Murni, Kelenjar Racun Murni, Cakar Murni, atau Potongan Perdana) di atas hasil biasa, dan mencatat Spesimen Sempurna di Kitab Jasamu. Karakter mana pun bisa memanen, tanpa pelatihan, dan alat pengumpul mana pun yang kamu miliki dihitung untuk bagian premium, dari perdagangan mana pun alat itu berasal.",
+      "harvestBodyFamilies": "Pengumpulan tidak berhenti di simpul. Banyak binatang yang dibunuh bisa dipanen sekali masing-masing, siapa cepat dia dapat, untuk kulit, taring, cakar, gading, tanduk, insang, sutra, bisa, kain, dan daging, langsung dari bangkai bersama jarahan biasanya; satu kali tekan membuka keduanya. Bila seekor binatang membawa lebih dari satu komponen yang bisa diolah, pilihannya ada di tanganmu: ambil semua yang bisa diberikannya, atau fokus pada lebih sedikit komponen dan dapatkan kualitas yang jauh lebih baik dari apa yang kamu ambil.\n\nLemparan panen langka atau lebih baik pada keluarga berisi spesimen juga memberikan spesimen sempurna bertanda tangan (Kulit Murni, Sutra Murni, Kelenjar Racun Murni, Cakar Murni, atau Potongan Perdana) di atas hasil biasa, dan mencatat Spesimen Sempurna di Kitab Jasamu. Karakter mana pun bisa memanen, tanpa pelatihan, dan alat pengumpul mana pun yang kamu miliki dihitung untuk bagian premium, dari perdagangan mana pun alat itu berasal.",
       "focusBodyTiers": "Setiap kota pusat menyimpan panel Fokus Kota bagi para pemanen yang berkunjung: berdirilah di kota, buka dari samping minimap, dan sebarkan anggaran 10 poin fokus ke jenis komponen yang kamu pedulikan. Setiap 5 poin pada sebuah komponen menaikkan tingkat panennya satu langkah (maksimal dua langkah), dan setiap poin menambah 10 persen pada hasilnya; komponen yang tidak difokuskan tidak pernah dibuat lebih buruk.\n\nAlokasimu mengikuti karaktermu ke mana pun kamu pergi, dan bisa diarahkan ulang pada kunjungan berikutnya ke kota, dengan kecepatan yang kamu pilih sendiri. Mengambil waktu itu gratis: penataan ulang berjalan 1 menit per poin yang kamu pindahkan. Membayar sedikit mempercepatnya, 15 detik per poin ditambah 5 tembaga dan 1 Debu Dentingan per poin, dan membayar penuh membuatnya instan seharga 25 tembaga dan 5 Debu Dentingan per poin. Hanya poin yang benar-benar kamu pindahkan yang dihitung, sehingga memindahkan satu poin saja murah, dan panel yang kamu buka lalu tutup tanpa perubahan tidak dikenai biaya sama sekali pada tingkat kecepatan mana pun.",
       "toolEffectsHeading": "Efek Alat",
-      "toolEffectsBody": "Alat pengumpul punya sebuah slot di dalamnya, dan karya seorang pemantra, sebuah jimat, adalah yang masuk ke sana. Simpanan Sang Pengumpul menambah satu unit pada hasil sebuah panen; Mata Sang Perajin menaikkan tingkat dari apa yang ditariknya ke atas. Gizzel Tinker, Ahli Perkakas di Eastbrook, mengajarkan keduanya kepada pemantra yang telah mencapai keahlian 25 dalam kerajinan itu, dan keduanya dibuat di bengkel perkakasnya.\n\nJimat yang baru dipasang membawa 20 muatan pada alat umum dan 10 lagi untuk setiap anak tangga kelangkaan di atas umum, sehingga jimat yang sama yang dipasang pada beliung epik dimulai dengan 50. Satu muatan dihabiskan hanya ketika jimat itu benar-benar mengubah hasilnya, tidak pernah pada panen yang tidak diperbaikinya, dan sebuah slot bisa diatur untuk bertanya setiap kali dipakai, sehingga jimat itu menunggu sampai kamu memilih Pakai Satu Muatan. Memasang jimat baru menata ulang slot itu mengikuti alat yang sedang kamu bawa saat itu, sehingga ia terisi sesuai kapasitas alat itu, bukan kembali ke rekor tertinggi sebelumnya, dan pemasangan ulang yang sama sekali tidak mengubah apa pun akan ditolak alih-alih memakan jimatnya.\n\nKehabisan muatan tidak menghancurkan jimatnya: pemilik alat mengisi ulang slot itu, 10 muatan untuk setiap material arkana yang dibelanjakan, dan material mana yang diminta mengikuti yang lebih baik antara alat yang sedang kamu bawa dan alat terbaik yang pernah mengisi slot itu, Debu Dentingan untuk alat umum atau tidak umum, Esensi Dentingan untuk yang langka, dan Serpihan Dentingan untuk yang epik. Meninggalkan alat yang bagus di bank tidak membeli pengisian ulang yang lebih murah, hanya yang lebih kecil dengan harga yang sama; cara jujur untuk turun ke anak tangga yang lebih murah adalah memasang jimat baru sambil membawa alat yang lebih rendah, yang menata ulang slot itu di sana. Jika langit-langit slot itu berada di atas kemampuan alatmu saat ini, pengisian ulang berhenti di titik alat itu berhenti dan memintamu membawa yang lebih baik. Pengisian ulang menelan separuh material saat kamu adalah pemantra yang menandatangani jimat itu, dan lebih sedikit lagi jika kamu berspesialisasi dalam Pemantraan; siapa pun yang lain membayar tarif penuh. Pengisian ulang adalah rapalan singkat, seperti sisanya dalam keluarga kerajinan ini."
+      "toolEffectsBody": "A gathering tool has a slot in it, and a crafted charm is what goes in. A Gatherer's Cache adds a unit to what a harvest yields; an Artisan's Eye raises the grade of what it pulls up; a Maker's Charm adds two units the same way. The first two are enchanting work: Tinker Gizzel, Master of the Toolworks in Eastbrook, teaches them to enchanters who have reached 25 skill in the craft. The Maker's Charm is engineering work instead, a dropped pattern crafted at 100 skill; all three are made at his toolworks.\n\nA freshly slotted charm carries 20 charges on a common tool and 10 more for every rarity rung above common, so the same charm slotted on an epic pick starts at 50. A charge is spent only when the charm actually changed the outcome, never on a harvest it did not improve, and a slot can be set to ask each use, so the charm waits until you say Use a Charge. Slotting a fresh charm re-mints the slot around the tool you are carrying at that moment, so it fills to what that tool can hold rather than back to some earlier high mark, and a re-slot that would change nothing at all is turned away instead of eating the charm.\n\nRunning out of charges does not destroy the charm: the tool's owner refills the slot, 10 charges for each arcane material spent, and which material it asks for follows the better of the tool you are carrying and the best tool that slot has ever been filled by, Chime Dust for a common or uncommon tool, Chime Essence for a rare one, and a Chime Shard for an epic. Leaving the good tool in the bank does not buy a cheaper refill, only a smaller one at the same price; the honest way down to a cheaper rung is to slot a fresh charm while carrying the lesser tool, which re-mints the slot there. If the slot's ceiling sits above what your current tool can fill, the refill stops where that tool stops and tells you to carry the better one. The refill costs half the materials when you are the crafter who signed the charm, and less again if you are specialized in the charm's own craft, Enchanting for a Cache or an Eye, Engineering for a Maker's Charm; anyone else pays the full rate. A refill is a short cast, like the rest of the craft family."
     },
     "profPages": {
       "back": "Kembali ke Profesi",
@@ -6383,10 +6618,21 @@ export const id_ID: EnTranslations = {
       "matFmt": "{name} x{count}",
       "outputFmt": "{name} x{count}",
       "comboReq": "Membutuhkan {a} dan {b}",
+      "oncePerDay": "Once per day",
+      "effectFood": "Restores {amount} health over {seconds} sec when eaten.",
+      "effectWellFed": "Well Fed when you finish eating: +{value} {stat} for {minutes} min.",
+      "effectWellFedAura": "Grants {aura} for {minutes} min when you finish eating.",
+      "effectFeast": "Sets out a feast others eat from, one serving each: {servings} servings, lasting {minutes} min.",
+      "effectFeastServing": "Each serving restores {amount} health over {seconds} sec.",
+      "effectFeastWellFed": "Well Fed when a serving is finished: +{value} {stat} for {minutes} min.",
       "sourceTrainerFee": "Pelatih, {fee}",
       "sourceTrainerFree": "Pelatih, gratis",
       "sourceKnown": "Diketahui dari awal",
+      "sourceDrop": "From a found pattern",
+      "sourceVendor": "Sold by the Heroic Quartermaster",
+      "sourceDropAndVendor": "From a found pattern, or the Heroic Quartermaster",
       "gainFmt": "{reduced} / {minimal} / {zero}",
+      "gainNever": "never",
       "colRecipe": "Resep",
       "colSkill": "Keahlian",
       "colSource": "Sumber",
@@ -6407,27 +6653,29 @@ export const id_ID: EnTranslations = {
         "armorcrafting": "Penempaan Zirah menempa surat-besi, zirah terberat yang bisa dibuat seorang perajin, dari dasar tembaga berpaku hingga set osmiumscale langka, dengan sepasang potongan berstatistik caster di sisinya. Pelanggannya adalah orang-orang yang berdiri di tempat serangan mendarat.",
         "tailoring": "Menjahit menenun kain Intelijen dan Roh yang dihuni para caster, dari dasar kain kasar melalui set gildenweave hingga karya sunweave langka, dan menjahit Kantong Silkspun, tas sepuluh slot yang tidak pernah ditolak siapa pun.",
         "leatherworking": "Pengolahan Kulit menyamak perlengkapan Kelincahan dan Stamina untuk kelas-kelas yang mengelak daripada menangkis, dari dasar kulit Fenbridge hingga set mirewarden langka, dan ini adalah satu-satunya kerajinan mendalam yang dilatih di rawa.",
-        "cooking": "Memasak mengubah tangkapan hari ini menjadi hidangan duduk yang menyembuhkan selama 18 detik istirahat, penyembuhan termurah dalam permainan, dari Dendeng Bergaram hingga Panggang Agung Marlow. Semua orang makan, sehingga tidak ada kerajinan yang lebih disambut secara universal dalam sebuah kelompok.",
-        "alchemy": "Alkimia mengubah herba, kelenjar, dan kaca menjadi botol-botol yang memenangkan pertarungan: ramuan pemulihan dan mana untuk saat segala sesuatu berjalan buruk, serta elixir stamina yang bertahan di bilah buff sepanjang satu dungeon.",
-        "engineering": "Rekayasa membangun alat yang pada akhirnya diinginkan setiap pengumpul serius: beliung, kapak, sabit, dan joran pancing tingkat 4 dan tingkat 5 yang tidak akan pernah dijual konter mana pun dengan koin, masing-masing melahap alat di bawahnya.",
-        "enchanting": "Pemantraan membongkar perlengkapan dan mengembalikan kekuatannya: pecah potongan yang tidak diinginkan menjadi material arkana, lalu belanjakan untuk bonus statistik permanen pada potongan yang memang ingin kamu simpan. Memecah dan memesona tidak membutuhkan stasiun maupun pelatih, dan siapa pun bisa memulai pada hari pertama; hanya dua resep jimatnya yang menuntut lebih, diajarkan di bengkel perkakas."
+        "cooking": "Cooking turns the day's catch and the season's harvest into sit-down meals that heal over 18 seconds of rest, the cheapest healing in the game, from Salted Jerky through Marlow's Grand Roast to the three apex role dishes, which heal more than any other food and leave a Well Fed buff on whoever finishes the plate. Everyone eats, so no craft is more universally welcome in a group.",
+        "alchemy": "Alchemy turns herbs, glands, and glass into bottles that win fights: healing and mana draughts for the moment things go wrong, stamina elixirs that sit on your buff bar through a whole dungeon, and at the top the flasks, one per role, that stay with you through your own death.",
+        "engineering": "Engineering builds the tools every serious gatherer ends up wanting: the tier 4 and tier 5 picks, axes and sickles, and the three fishing rods that climb from tier 4 to tier 6, none of which any counter will ever sell for coin, each one consuming the tool below it.",
+        "enchanting": "Enchanting takes gear apart and puts the power back in: break unwanted pieces into arcane materials, then spend them on a permanent stat bonus for a piece you mean to keep. Breaking and enchanting need no station and no trainer, and anyone can start on day one; only its three trainer recipes ask more, the two charms and the Lucent Reagent, taught and worked at the toolworks.",
+        "jewelcrafting": "Jewelcrafting is the finer bench of the Eastbrook forge: rings and necklaces in copper, iron, and rare osmium, with a Strength ring, an Intellect ring, and an Agility necklace on every rung. Jewelry has no armor and no class lock, so its customers are simply everyone with fingers and a neck.",
+        "inscription": "Inscription is the writing desk of the Highwatch apothecary: caster tomes for the offhand and stamina scrolls for everyone, milled from the same herbs the draughts beside them use. Its scrolls are the second door into the battle-elixir buffs, so even a fighter who never holds a book has reason to knock."
       },
       "craftProse": {
         "weaponcrafting": {
           "identityHeading": "Senjata yang dicari setiap pejuang",
-          "identityBody": "Seseorang di setiap kelompok menginginkan karya kerajinan ini, karena anak tangga langka saja mencakup ketiga selera: Osmium Warblade untuk pertarungan jarak dekat Kekuatan, Glyphsteel War Axe untuk pejuang Kelincahan, dan Highpine Battle Staff, staf Intelijen dan Roh untuk kerumunan jubah.\n\nPada roda kerajinan ia berdiri di antara Penempaan Zirah dan Kriya Permata. Identitas hidupnya adalah Pandai Besi, pasangan Pembuatan Senjata dan Penempaan Zirah, disumpah di hadapan Pandai Besi Darva di tempa dengan mengerjakan tiga urat bijih dengan tanganmu sendiri; pasangan Pandai Bilah dengan Kriya Permata juga dinamai pada roda, tetapi belum bisa disumpah, karena Kriya Permata tidak mengirimkan resep hingga ekspansi zona berikutnya.",
+          "identityBody": "Someone in every group wants this craft's work, because the rare rung alone covers all three appetites: the Osmium Warblade for Strength melee, the Glyphsteel War Axe for Agility fighters, and the Highpine Battle Staff, an Intellect and Spirit stave for the robe crowd.\n\nOn the craft ring it stands between Armorcrafting and Jewelcrafting. Its living identity is the Smith, the Weaponcrafting and Armorcrafting pair, sworn before Forgemistress Darva at the forge by working three ore veins with your own hands; the Bladewright pair with Jewelcrafting is named on the ring too, and though Jewelcrafting now works its own 0-to-50 jewelry ladder at this same forge, the pair still waits for its oath quest before it can be sworn.",
           "materialsHeading": "Apa yang diminum bengkel tempa",
-          "materialsBody": "Penambangan adalah tulang punggungnya. Bijih tembaga datang dari urat tingkat 1 Lembah Eastbrook, bijih besi dari Rawa Mirefen, dan bijih osmium dari Dataran Tinggi Thornpeak, dan setiap anak tangga menanjak dengan cara yang sama. Penebangan lebih penting daripada yang mungkin kamu duga: ironbark menggagangi tombak babi hutan, ashwood memikul gadanya, dan satu kayu gelondongan highpine membentuk staf tempurnya.\n\nSisanya datang dari perburuan dan konter. Kulit kasar untuk pegangan dipanen langsung dari bangkai serigala dan babi hutan, serpihan tulang datang dari mayat yang tak tenang atau dari perlengkapan biasa hasil salvasi, dan tangga tempa membakar Fluks Pandai Besi, 20 tembaga per guci dari Darva sendiri. Jika penambanganmu sendiri tertinggal, tidak ada konter yang akan menyelamatkanmu untuk bijihnya: osmium datang dari urat Thornpeak, dari urat pemula setiap zona yang lebih muda kecuali Pesisir Jauh (yang uratnya menggali besi), atau dari tumpukan pemain lain, lewat perdagangan atau Pasar Dunia. Hanya Batang Arkanit yang dibeli dengan koin, dari Gizzel Tinker di bengkel perkakas atau Kepala Perbekalan Bree di Highwatch.",
+          "materialsBody": "Mining is the backbone. Copper ore comes off the tier 1 veins of Eastbrook Vale, iron ore from Mirefen Marsh, and osmium ore from Thornpeak Heights, and each rung of the ladder steps up the same way. Logging matters more than you might expect: ironbark hafts the boar spear, ashwood shoulders the maul, and a single highpine log forms the battle staff.\n\nThe rest comes from the hunt and the counter. Rough hide for grips is harvested straight off wolf and boar corpses, bone fragments come off the restless dead or out of salvaged common gear, and the forge ladder burns Smithing Flux, 20 copper a jar from Darva herself. If your own mining lags behind, no counter will save you on the ore itself: osmium comes off the Thornpeak veins, off the starter veins of every younger zone but the Farshore (whose veins dig iron), or out of another player's stack, by trade or the World Market. Only the Glyphsteel Bar is bought for coin, from Tinker Gizzel at the toolworks or Quartermaster Bree in Highwatch.",
           "ladderHeading": "Tangga, anak tangga demi anak tangga",
           "ladderBody": "Satu resep lapangan, Pedang Siap Eastbrook, diketahui semua orang dari awal dan dibuat di mana saja dari hasil perburuan (beberapa taring serigala dan pecahan tulang) ditambah enam Fluks Pandai Besi dari konter tempa. Tangga sesungguhnya adalah sembilan resep pelatih dalam tiga anak tangga, semua terikat pada tempa: anak tangga tembaga (kapak berjanggut, gada bersayap, tombak babi hutan) gratis dipelajari pada keahlian 0, anak tangga besi (pedang panjang, gada besar, pisau belati) terbuka pada keahlian 25 seharga 25 perak per resep, dan anak tangga osmium (warblade, kapak perang, staf tempur) terbuka pada keahlian 50 seharga 1 emas masing-masing. Darva mengajarkan resep begitu tingkatmu dalam kerajinan mencapai tingkatnya sendiri, sehingga setiap anak tangga terbuka tepat saat band keahliannya dimulai.\n\nSatu resep lagi menumpang pada pasangan: Sarung Tangan Gravewyrm, potongan kombinasi yang diajarkan pelatih yang hanya bisa dikerjakan oleh Pandai Besi yang selaras dengan Pembuatan Senjata dan Penempaan Zirah masing-masing pada keahlian 25, dan tidak memerlukan stasiun sama sekali.",
           "routeHeading": "Karya besar, dan jalur kerja menuju 125",
-          "routeBody": "Setiap potongan dengan baris statistik nyata, yang pada tangga ini berarti anak tangga besi ke atas, bisa keluar dari landasan tempa sebagai karya besar selama mutu yang lebih halus muat di dalam langit-langit tingkatmu; field common tembaga yang tanpa statistik tidak pernah proc, karena tidak ada apa pun di dalamnya untuk ditingkatkan. Besi dan osmium dihitung sebagai material tingkat 1 untuk bonus karya besar, highpine dan glyphsteel sebagai tingkat 2, dan keahlian yang berada di atas tingkat resep itu sendiri menambah poinnya sendiri per tingkat, sehingga di antara ketiga osmium itu, kapak perang dan staf tempurlah yang membawa keunggulan material, dan sebuah anak tangga terus proc lebih baik setelah kamu melampauinya.\n\nNaiki anak tangga tembaga hingga 25, latih anak tangga besi pada hari ia terbuka dan naiki hingga 50, lalu anak tangga osmium hingga 75. Setelah 75 belum ada yang lebih tinggi dikirim, sehingga resep osmium memudar ke setengah lalu seperempat perolehan: anggarkan kira-kira 150 pembuatan lagi untuk mencapai batas 125, dan ingat batas tindakan bersama sepuluh tindakan pembuatan per menit saat kamu duduk untuk membuat sekaligus banyak.\n\nDanai pendakiannya sambil berjalan: pesanan kerja tempa Darva mengambil delapan bijih tembaga dari tanganmu setiap 30 menit demi sedikit koin dan XP, dan anak tangga besi serta osmium terjual jujur kepada petarung jarak dekat yang sedang naik level. Kitab Jasa menandai Mata dan Tempaan pada keahlian 50 dan memahkotai Penempaan Senjata Mahaguru di 125."
+          "routeBody": "Any piece with a real stat line, which on this ladder means the iron rung and up, can come off the anvil as a masterwork so long as the finer quality fits inside your tier ceiling; the statless copper commons never proc, because there is nothing in them to improve. Iron and osmium count as tier 1 materials for the masterwork bonus, highpine and glyphsteel as tier 2, and skill sitting above a recipe's own tier adds its own point per tier, so among the osmium three it is the war axe and the battle staff that carry the material edge, and a rung keeps proccing better after you have outgrown it.\n\nRide the copper rung to 25, train the iron rung the day it opens and ride it to 50, then the osmium rung to 75. Above the osmium three sits an apex rung Darva does not teach: its patterns are found, not bought. For a smith whose majors include Weaponcrafting, which today means the sworn Smith, an apex craft pays full gain right to the 125 cap; below a major's ceiling it teaches nothing at all, so an undeclared or hobby smith works one for the weapon, not the points. Either way the osmium recipes carry the climb, fading to half and then quarter gain: budget roughly 150 more crafts to reach the 125 cap, and each craft takes real cast time, so a long batch is paced by duration rather than a quota.\n\nFund the climb as you go: Darva's forge work order takes eight copper ore off your hands every 30 minutes for a little coin and XP, and the iron and osmium rungs sell honestly to leveling melee. The Book of Deeds marks Edge and Temper at skill 50 and crowns Grandmaster Weaponcrafting at 125."
         },
         "armorcrafting": {
           "identityHeading": "Surat-besi untuk garis depan",
           "identityBody": "Tangga Penempaan Zirah terbaca seperti karier seorang prajurit: sabuk, sabaton, dan sarung tangan tembaga berpaku yang polos untuk memulai, lalu hauberk, pelindung kaki, dan spaulder ironlink dengan baris statistik sungguhan pertama mereka, dan helm agung, kuiras, serta celana osmiumscale langka, potongan Kekuatan dan Stamina dengan angka zirah di puncak tertinggi seni seorang perajin.\n\nIa punya sisi yang lebih tenang juga: Celana Pelindung Eastbrook, sebuah field common berstatistik caster, dan Kilnscale Mantle, bahu surat-besi Intelijen dan Roh langka pada keahlian 75, menjaga para pemakai surat-besi yang berpikiran mantra tetap ada di daftar pelanggan. Pada cincin ia duduk di antara Penempaan Senjata dan Rekayasa; pasangan Pandai Besi dengan Penempaan Senjata disumpah di hadapan Empu Tempa Darva, sementara pasangan Pandai Roda Gigi dengan Rekayasa sudah dinamai tetapi belum punya misi sumpah.",
           "materialsHeading": "Bijih berlimpah",
-          "materialsBody": "Tidak ada kerajinan yang melahap bijih lebih cepat. Hauberk ironlink saja menelan lima bijih besi, dan setiap potongan osmiumscale menuntut tiga atau empat osmium ditambah satu Batang Arkanit, sehingga perajin zirah yang serius menambang Rawa Mirefen dan Dataran Tinggi Thornpeak atau membayar orang yang melakukannya. Tembaga memberi makan anak tangga pertama, langsung dari urat-urat di dekat Copper Dig.\n\nDi sekeliling logam itu ada bagian-bagian lunaknya: kulit kasar yang dipanen dari bangkai serigala dan babi hutan, serpihan tulang dari mayat yang tak tenang (atau hasil salvasi dari perlengkapan biasa), dan guci Fluks Pandai Besi (20 tembaga masing-masing di tempa) dalam hampir setiap resep. Tidak ada konter yang menjual osmium: yang tidak sabar membelinya dari pemain lain atau menambangnya sendiri, di Thornpeak atau di urat pemula sepuluh dari sebelas zona yang lebih muda (hanya Pesisir Jauh yang menggali besi).",
+          "materialsBody": "No craft eats ore faster. The ironlink hauberk alone takes five iron ore, and every osmiumscale piece wants three or four osmium plus a glyphsteel bar, so a serious armorcrafter mines Mirefen Marsh and Thornpeak Heights or pays someone who does. Copper feeds the first rung, straight from the veins by the Copper Dig.\n\nAround the metal go the soft parts: rough hide harvested off wolf and boar corpses, bone fragments off the restless dead (or salvaged out of common gear), and Smithing Flux jars (20 copper each at the forge) in nearly every recipe. No counter sells osmium: the impatient buy it off other players or mine it themselves, on Thornpeak or the starter veins of ten of the eleven younger zones (the Farshore alone digs iron).",
           "ladderHeading": "Belajar di tempa Darva",
           "ladderBody": "Dua field common, Rompi Rantai Eastbrook dan Celana Pelindung, diketahui dari awal dan dibuat di mana saja. Tangga pelatihnya adalah sembilan resep dalam tiga anak tangga di tempa Eastbrook: anak tangga tembaga gratis pada keahlian 0, anak tangga ironlink berharga 25 perak per resep pada keahlian 25, dan anak tangga osmiumscale berharga 1 emas masing-masing pada keahlian 50, dengan setiap anak tangga bisa diajarkan begitu tingkatmu mencapainya.\n\nDi luar tangga itu berdiri dua yang istimewa. Helm Batu Terikat adalah satu dari dua resep kombinasi Pandai Besi (Sarung Tangan Gravewyrm adalah saudaranya di sisi penempaan senjata), diajarkan pelatih, bebas stasiun, dan hanya bisa dikerjakan oleh Pandai Besi yang selaras dengan kedua kerajinan pada keahlian 25. Kilnscale Mantle sama sekali tidak butuh guru: semua orang mengetahuinya dari awal, dan tidak ada yang menggerbangi pengerjaannya selain tempa dan materialnya. Keahlian 75 yang tercantum padanya adalah soal perolehan, bukan izin: dengan Penempaan Zirah sebagai kerajinan utama, ia membayar perolehan keahlian penuh sejak pukulan palu pertama hingga 99, sehingga seorang Pandai Besi dengan osmium berlebih bisa bersandar padanya sejak dini. Di bawah langit-langit kerajinan utama, resep tingkat 3 tidak mengajarkan apa pun, jadi perajin zirah yang belum menyatakan diri atau yang menjadikannya hobi mengerjakannya demi potongannya, bukan demi poinnya.",
           "routeHeading": "Karya besar, dan rute kerja menuju 125",
@@ -6435,7 +6683,7 @@ export const id_ID: EnTranslations = {
         },
         "tailoring": {
           "identityHeading": "Kain untuk caster, tas untuk semua orang",
-          "identityBody": "Tangga naik dari dasar kain kasar melalui set gildenweave hingga anak tangga langka: Silkbinder's Raiment dan potongan sunweave. Perdagangan keduanya bersifat universal: Silkspun Satchel adalah tas sepuluh slot, dan tidak ada kelas, spesifikasi, atau level yang tidak menginginkan lebih banyak ruang tas.\n\nPada roda Menjahit berada di antara Pengolahan Kulit dan Prasasti. Pasangan hidupnya adalah Perajut Busana, Pengolahan Kulit dan Menjahit bersama, disumpah di hadapan Penenun Ottilie di alat tenun Eastbrook setelah memangkas empat laba-laba webwood untuk sutranya; pasangan Penenun Tinta dengan Prasasti dinamai pada roda tetapi menunggu resep pertama Prasasti sebelum bisa disumpah.",
+          "identityBody": "The ladder climbs from homespun basics through the gildenweave set to the rare rung: the Silkbinder's Raiment and the sunweave pieces. Its second trade is universal: the Silkspun Satchel is a ten-slot bag, and there is no class, spec, or level that does not want more bag space.\n\nOn the ring Tailoring sits between Leatherworking and Inscription. Its living pair is the Outfitter, Leatherworking and Tailoring together, sworn before Weaver Ottilie at the Eastbrook loom after culling four webwood spiders for their silk; the Inkweaver pair with Inscription is named on the ring, and with Inscription's base catalog now inked it waits only on an oath quest of its own.",
           "materialsHeading": "Benang, sutra, dan ya, herba",
           "materialsBody": "Alat tenun berjalan dari apa yang jatuh dari perburuan dan apa yang ditanam ladang. Serpihan linen dan kain kasar berasal dari pembunuhan humanoid, sutra laba-laba dipanen dari bangkai laba-laba, dan inti anak tangga langka, Silkbinder's Raiment, membutuhkan Sutra Murni, spesimen bertanda tangan yang muncul dari hasil panen bangkai yang beruntung.\n\nHerbalisme memberi makan penjahitan lebih dari kerajinan perlengkapan lainnya: sheenleaf memangkas sepatu sandal, goldleaf mewarnai set gildenweave, dan sunpetal menjahit seluruh anak tangga langka, sehingga penjahit yang memetik herba sendiri menghemat secara konsisten. Gulungan Benang berharga 12 tembaga dari Ottilie, dan alat tenun tidak meminta logam sama sekali: bahkan capstone Wardweave Cowl ditenun dari herba premium, Sutra Murni, sutra laba-laba, dan benang.",
           "ladderHeading": "Belajar di alat tenun Ottilie",
@@ -6455,45 +6703,68 @@ export const id_ID: EnTranslations = {
         },
         "cooking": {
           "identityHeading": "Periuk yang memberi makan kelompok",
-          "identityBody": "Santap hidangan matang dan ia menyembuhkanmu sepanjang 18 detik istirahat, yang di sela-sela tarikan musuh adalah penyembuhan termurah dalam permainan. Tangganya berjalan dari Ikan Tenggeran Sungai Panggang bernilai 90 nyawa sampai ke Panggang Agung Marlow di angka 980, penyembuhan duduk yang tidak tertandingi apa pun dalam permainan.\n\nPada cincin, Memasak duduk di antara Alkimia dan Pengolahan Kulit. Pasangan hidupnya adalah Apoteker, Alkimia dan Memasak, disumpah di hadapan Masak Marlow di dapur Eastbrook setelah memburu empat babi hutan liar untuk periuk; pasangan Pemburu Jebak dengan Pengolahan Kulit dinamai pada cincin tetapi belum punya misi sumpah.",
+          "identityBody": "Eat a cooked meal and it heals you over 18 seconds of rest, which between pulls is the cheapest healing in the game. The ladder runs from a 90-health Pan-Seared River Perch up through Marlow's Grand Roast at 980, and above even the roast sit the three apex role dishes at 1,392, the largest sit-heal in the game and the strongest Well Fed buff a finished plate can leave behind (the farm kitchen's buff dishes fill the rungs below it).\n\nOn the ring Cooking sits between Alchemy and Leatherworking. Its living pair is the Apothecary, Alchemy and Cooking, sworn before Cook Marlow at the Eastbrook kitchens after hunting four wild boars for the pot; the Trapper pair with Leatherworking is named on the ring but has no oath quest yet.",
+          "identityBodyOneMeal": "Eat a cooked meal and it heals you over 18 seconds of rest, which between pulls is the cheapest healing in the game. The ladder runs from a 90-health Pan-Seared River Perch up through Marlow's Grand Roast at 980, and above even the roast sit the three apex role dishes at 1,392, the largest sit-heal in the game and the strongest Well Fed buff a finished plate can leave behind (the farm kitchen's buff dishes fill the rungs below it; the Farming page tells that side of the story). Only one Well Fed effect at a time: a newer meal replaces it.\n\nOn the ring Cooking sits between Alchemy and Leatherworking. Its living pair is the Apothecary, Alchemy and Cooking, sworn before Cook Marlow at the Eastbrook kitchens after hunting four wild boars for the pot; the Trapper pair with Leatherworking is named on the ring but has no oath quest yet.",
           "materialsHeading": "Dapur yang diberi makan oleh joran dan pisau",
           "materialsBody": "Memancing memasok bahan-bahan khasnya, zona demi zona: trout cermin dan perch sungai dari perairan Lembah Eastbrook, ikan tombak rawa dan belut rawa dari Rawa Mirefen, trout frostgill dan ikan mas slatefin dari Dataran Tinggi Thornpeak. Anak-anak tangganya mencampur zona dengan bebas (anak tangga gratis sudah menuntut ikan tombak rawa, anak tangga tengah menuntut frostgill Thornpeak, dan santapan malam langkanya melipat kembali trout cermin milik Lembah), sehingga juru masak yang memancing ke mana pun jalan membawanya tidak pernah kehabisan.\n\nSisi jagalnya datang dari bangkai yang dipanen: daging buruan dari babi hutan dan kerabatnya, dan, pada lemparan panen langka atau lebih baik, satu Potongan Perdana bertanda tangan, bintang utama panggang agung itu. Herba membumbui hidangan yang lebih baik, satu kayu gelondongan ashwood mengasapi belutnya, dan Garam Memasak berharga 8 tembaga per kantong dari kios Marlow sendiri.",
           "ladderHeading": "Dari dendeng hingga panggang agung",
           "ladderBody": "Dendeng Bergaram adalah resep lapangan: diketahui dari awal, satu kaki laba-laba, bisa dibuat di mana saja, makanan jalan setiap petualang baru. Tangga pelatih memasak di dapur Eastbrook di sisi timur alun-alun: anak tangga gratis pada keahlian 0 (ikan sungai, Sate Buruan Pemburu, Ikan Rawa Berbumbu), anak tangga tengah pada keahlian 25 seharga 25 perak per resep (Belut Asap Ashwood, Semur Daging Daun Emas, Chowder Frostgill), dan anak tangga langka pada keahlian 50 seharga 1 emas masing-masing (Makan Malam Ikan Mas Berwarna, Piring Perjamuan Pemancing, Panggang Agung Marlow).\n\nHidangan kelompok merentangkan bahan-bahanmu: belut asap dan semur daging menyajikan dua per kerajinan, dan piring perjamuan menyajikan tiga. Marlow mengajarkan setiap anak tangga begitu tingkatmu dalam Memasak mencapainya.",
           "routeHeading": "Spesialisasi, bukan karya besar, dan rute menuju 125",
-          "routeBody": "Memasak adalah pengecualian jujur dari cerita karya besar: hidangan tidak memiliki baris statistik yang bisa ditingkatkan, sehingga hidangan tidak pernah proc, dan tidak ada juru masak yang harus mengejarnya. Penguasaan kerajinan adalah spesialisasi pada 75: seperlima lebih sedikit dari setiap bahan, yang bertambah cepat pada hidangan kelompok, dan dapur lapangan bergerak sehingga perjamuan bisa dimasak di depan pintu dungeon.\n\nMasak apa yang kamu tangkap: padukan pendakian dengan sesi memancing dan kedua keahlian saling memberi makan sepanjang jalan. Dendeng dan anak tangga gratis membawamu ke 25 dengan satu poin per kerajinan, anak tangga tengah ke 50, dan anak tangga langka ke 75; setelah 75 tidak ada hidangan yang lebih tinggi dikirim, sehingga hidangan langka memudar ke setengah lalu seperempat perolehan, sekitar 150 kerajinan lagi hingga batas. Perlakukan sebagai stok, bukan penggilingan: guild memakan setiap sajian.\n\nPesanan kerja dapur Marlow membeli delapan daging buruan setiap 30 menit untuk koin dan XP, dan Kitab Jasa menandai Koki Berpengalaman pada keahlian 50 dalam perjalanan menuju gelar Memasak Mahaguru di 125."
+          "routeBody": "Cooking is the honest exception to the masterwork story: a meal has no stat line to improve, so dishes never proc one, and no cook should chase it. The craft's mastery is specialization at 75: a fifth less of every ingredient, which compounds fast on batch dishes, and a mobile field kitchen so dinner gets cooked at the dungeon door.\n\nCook what you catch: pair the climb with a fishing session and the two skills feed each other all the way up. Jerky and the free rung carry you to 25 at a point per craft, the mid rung to 50, and the rare rung to 75. Above the rare rung sits the apex kitchen, the three role dishes and The Laden Hearth: no trainer teaches them, they come off found patterns. For a cook whose majors include Cooking, which today means the sworn Apothecary, an apex craft pays full gain right to the 125 cap; below a major's ceiling it teaches nothing at all, so an undeclared or hobby cook works one for the plate, not the points. Either way the rare dishes carry the last stretch, fading to half and then quarter gain, roughly 150 more crafts. Treat it as stocking, not grinding: a guild eats every serving.\n\nMarlow's kitchens work order buys eight game meat every 30 minutes for coin and XP, and the Book of Deeds marks Seasoned Chef at skill 50 on the way to the Grandmaster Cooking title at 125."
         },
         "alchemy": {
           "identityHeading": "Botol-botol yang memenangkan pertarungan",
-          "identityBody": "Kerajinan ini dikerjakan di apotek di Highwatch, kediaman Alkemis Verane, Master Apoteker, yang mengajarkan tangga resep, menjual Vial Kaca seharga 12 tembaga, dan membayar koin untuk herba melalui pesanan kerjanya.\n\nPada cincin kerajinan, Alkimia duduk bersama perdagangan coba-coba, bersebelahan dengan Rekayasa di satu sisi dan Memasak di sisi lain. Itu memberinya dua identitas pasangan: Pengebom (Rekayasa dan Alkimia, diambil di hadapan Gizzel Tinker di Eastbrook) dan Apoteker (Alkimia dan Memasak, disumpah di hadapan Masak Marlow). Selaraskan dirimu dengan salah satu pasangan untuk menjadikan Alkimia kerajinan utama dan biarkan karyamu sendiri yang bertanda tangan mengajarimu balik; pasangan Pengebom juga membuka seduhan kombinasinya, Eliksir Beruang, sementara pasangan Apoteker belum mengirimkan resep kombinasi apa pun. Namun tangganya sendiri tidak pernah menunggu, karena setiap resep Alkimia berada di dalam tingkat langka tempat kerajinan yang belum dinyatakan bekerja, sehingga seluruh pendakian menuju batas sudah terbuka sebelum sumpah apa pun.",
+          "identityBody": "The craft is worked at the apothecary in Highwatch, home of Alchemist Verane, Master of the Apothecary, who teaches the recipe ladder, sells Glass Vials at 12 copper, and pays coin for herbs through her work order.\n\nOn the craft ring, Alchemy sits with the trial-and-error trades, next to Engineering on one side and Cooking on the other. That gives it two pair identities: the Bombardier (Engineering and Alchemy, taken up before Tinker Gizzel in Eastbrook) and the Apothecary (Alchemy and Cooking, sworn before Cook Marlow). Attune to either pair to make Alchemy a major and let your own signed work teach you back; the Bombardier pair also opens its combination brew, the Elixir of the Bear, while the Apothecary pair ships no combination recipe yet. The 0-to-50 ladder itself never waits, though: every one of those rungs sits inside the rare tier that undeclared crafts work under, so the climb to the cap is open before any oath. Two things sit above that ceiling and pay their skill to a major alone: the Quickening Catalyst, the 75-rung intermediate Verane also teaches, and the found-pattern rungs above the ladder; an undeclared or hobby alchemist brews them for the goods, not the points.",
           "materialsHeading": "Herba, kelenjar, dan kaca",
           "materialsBody": "Setiap ramuan membutuhkan Vial Kaca ditambah herba yang sesuai dengan anak tangganya: sheenleaf tumbuh di Eastbrook Vale, goldleaf di Mirefen Marsh, dan sunpetal di Thornpeak Heights, satu herba per zona, sehingga botolmu naik bersama dunia. Herbalisme adalah keahlian mitra alami, meskipun membeli dari pengumpul atau pasar sama baiknya; zona yang lebih dalam memiliki ladang tingkat lebih tinggi yang membutuhkan sabit yang lebih baik, jadi jaga alatmu tetap terkini jika kamu memetik sendiri.\n\nLini elixir menambahkan bahan pemburu: Kelenjar Bisa yang dipanen dari bangkai beracun, dan elixir teratas membutuhkan Kelenjar Bisa Murni, spesimen langka bertanda tangan yang muncul dari hasil panen bangkai yang beruntung. Jika kamu tidak memanen sendiri, itulah tepatnya barang yang layak diminta teman pemburu untuk dibawakan.",
           "ladderHeading": "Tangga resep",
-          "ladderBody": "Semua orang mengetahui Ramuan Penyembuh Minor sejak awal dan bisa meraciknya di mana saja, tanpa stasiun. Tangga yang sesungguhnya adalah sembilan resep yang diajarkan Verane di apotek, tiga pada setiap anak tangga: resep keahlian 0 gratis, anak tangga keahlian 25 berharga 25 perak per resep, dan anak tangga keahlian 50 berharga 1 emas per resep. Setiap anak tangga terdiri dari satu ramuan penyembuh, satu ramuan mana, dan satu eliksir stamina, melangkah dari botol sheenleaf biasa (120 nyawa, 160 mana) melalui goldleaf tidak umum (200 nyawa, 260 mana) hingga sunpetal langka (280 nyawa, 360 mana).\n\nEliksirnya menanjak dengan cara yang sama: Ramuan Babi Hutan memberi 6 Stamina selama 10 menit, Eliksir Racun Api 9 selama 15 menit, dan Ramuan Ular 12 selama 15 menit, hanya Ular yang menyeduh dua botol per pembuatan. Satu resep lagi berdiri di sampingnya: Eliksir Beruang, seduhan kombinasi yang diajarkan Verane seharga 25 perak begitu Alkimiamu mencapai 25, bisa diracik di mana saja, tetapi hanya oleh Pengebom yang selaras dengan Alkimia dan Rekayasa masing-masing pada 25.",
+          "ladderBody": "Everyone knows the Minor Healing Potion from the start and can mix it anywhere, no station needed. The real ladder is taught by Verane at the apothecary, rung by rung: the skill 0 recipes are free, the skill 25 rung costs 25 silver per recipe, and the skill 50 rung costs 1 gold per recipe. Each rung carries a healing draught, a mana draught, and a stamina elixir, stepping from common sheenleaf bottles (120 health, 160 mana) through uncommon goldleaf (200 health, 260 mana) to rare sunpetal (335 health, 425 mana); since the trophy economy the skill 25 rung also teaches a Lesser Healing Potion brewed from tallow, a cheaper bottle a hair weaker than the goldleaf draught.\n\nThe elixirs climb the same way: the Elixir of the Boar grants 6 Stamina for 10 minutes, the Vipersear Elixir 9 for 15 minutes, and the Elixir of the Serpent 12 for 15 minutes, the Serpent alone brewing two bottles per craft. One more recipe sits off to the side: the Elixir of the Bear, a combination brew Verane teaches for 25 silver once your Alchemy reaches 25, mixable anywhere, but only by an attuned Bombardier with both Alchemy and Engineering at 25.\n\nAbove the whole elixir line sits the flask rung, which no trainer teaches and which comes off found patterns instead. A flask grants 13 for 20 minutes, and it opens two axes the elixirs never had: Attack Power and Intellect beside the familiar Stamina, one flask per role. It also keeps its own rules. Only one flask rides at a time whatever its stat, a weaker elixir or scroll of that stat cannot replace it, no dispel, steal, or hand cancel takes it off, and it stays with you through your own death, though it ends when you log out.",
           "routeHeading": "Rute seorang penyeduh hingga 125",
-          "routeBody": "Ramuan dan eliksir tidak pernah menghasilkan karya besar; proc itu milik perlengkapan yang membawa statistik. Namun namamu tetap berkelana: ramuan sunpetal langka datang bertanda tangan dengan tanda pembuat, begitu pula setiap botol Ramuan Ular yang diseduh ganda, sehingga tidak ada barang langka dalam kerajinan ini yang meninggalkan bangku kerja tanpa tanda tangan. Pada keahlian 75 kamu berspesialisasi, dan setiap resep Alkimia menelan 20 persen lebih sedikit material sejak saat itu.\n\nAmbil Herbalisme sejak dini dan petik sambil naik level: sheenleaf ada di mana-mana di Lembah, dan begitu kamu sampai di bangku kerja Verane, anak tangga gratis akan membawamu mulus ke keahlian 25 dengan herba yang toh akan kamu petik juga. Pelajari anak tangga 25 begitu ia terbuka, pindahkan pemetikanmu ke rawa untuk goldleaf, dan biarkan pesanan kerja Verane (enam Herba Daun Emas seharga 45 tembaga, bisa diulang setiap 30 menit) mengembalikan sedikit koin sambil kamu berjalan.\n\nDari 50 ke atas, seduh ramuan sunpetal dan kumpulan Ular dari sunpetal Thornpeak, dengan sedikit dedaunan Lembah dan rawa yang masih ikut dalam campuran. Rentang terakhir dari 100 ke 125 sengaja dibuat menetes, jadi seduhlah yang benar-benar laku alih-alih membakar herba demi angka, dan ingatlah bahwa konsumabel adalah satu-satunya barang buatan yang dibeli ulang semua orang selamanya. Kitab Jasa menandai Seduhan Aneh pada keahlian 50 dan Alkimia Mahaguru di batasnya."
+          "routeBody": "Draughts and elixirs never roll masterworks; that proc belongs to stat-bearing gear. Your name still travels, though: the rare sunpetal draughts arrive signed with a maker's mark, and so does every bottle of the double-batch Elixir of the Serpent, so nothing rare in this craft leaves the bench unsigned. At skill 75 you specialize, and every Alchemy recipe costs 20 percent fewer materials from then on.\n\nTake Herbalism early and pick as you level: sheenleaf is everywhere in the Vale, and once you reach Verane's bench the free rung will carry you cleanly to skill 25 on herbs you would have picked anyway. Learn the 25 rung the moment it turns on, move your picking to the marsh for goldleaf, and let Verane's work order (six Goldleaf Herbs for 45 copper, repeatable every 30 minutes) hand a little coin back as you go.\n\nFrom 50 on, brew sunpetal draughts and Serpent batches out of Thornpeak sunpetal, with a little Vale and marsh greenery still in the mix. Above the Serpent sits the apex bench, the three flasks and, at the very top, the Grand Cauldron, the skill-125 capstone: no trainer teaches them, they come off found patterns, and they pay their skill to a sworn major alone (below a major's ceiling they teach nothing at all). The last stretch from 100 to 125 is a deliberate trickle, so brew what actually sells rather than burning herbs for the number, and remember that consumables are the one crafted good everyone re-buys forever. The Book of Deeds marks Strange Brews at skill 50 and Grandmaster Alchemy at the cap."
         },
         "engineering": {
           "identityHeading": "Monopoli pembuat alat",
-          "identityBody": "Kerajinan ini dikerjakan di bengkel perkakas di sudut barat daya Eastbrook Square, kediaman Gizzel Tinker, Ahli Perkakas. Tingkat 1 sampai 3 dari setiap lini alat adalah stok penjaja biasa; tingkat 4 dan 5 keluar dari bangku kerja seorang insinyur, atau dari konter delve Litani Tenggelam dengan Tanda Delve di balik gerbang penuntasannya, dan tidak pernah dari laci kas mana pun dengan koin.\n\nPada cincin ia duduk bersama perdagangan coba-coba, bersebelahan dengan Alkimia dan Penempaan Zirah, memberinya dua identitas pasangan: Pengebom (Rekayasa dan Alkimia, diambil di hadapan Gizzel sendiri) dan Pandai Roda Gigi (Penempaan Zirah dan Rekayasa, sudah dinamai tetapi belum bisa disumpah). Satu peringatan lebih penting di sini daripada di mana pun: setiap anak tangga resep Rekayasa berada di atas langit-langit tingkat langka tempat para pehobi dan perajin yang belum menyatakan diri bekerja, sehingga angka keahliannya hanya bergerak bagi perajin yang kerajinan utamanya mencakup Rekayasa, yang hari ini berarti Pengebom. Siapa pun tetap bisa membangun alat darat; perajin yang belum selaras hanya saja tidak belajar apa pun darinya, dan kedua resep joran pun menuntut ajaran Gizzel.",
+          "identityBody": "The craft is worked at the toolworks in the southwest corner of Eastbrook Square, home of Tinker Gizzel, Master of the Toolworks. Tiers 1 through 3 of every tool line are ordinary vendor stock; every rung above that comes off an engineer's bench, or out of the Drowned Litany's delve counter for Delve Marks behind its clears gates, and never out of any till for coin. The land lines stop at tier 5; the rod line climbs one further, to the tier 6 Clockreel.\n\nOn the ring it sits with the trial-and-error trades, next to Alchemy and Armorcrafting, giving it two pair identities: the Bombardier (Engineering and Alchemy, taken up before Gizzel himself) and the Gearwright (Armorcrafting and Engineering, named but not yet swearable). One warning still matters here: every rung of the tool ladder itself sits above the rare-tier ceiling that hobbies and undeclared crafters work under, so ladder work only moves the skill for a crafter whose majors include Engineering, which today means the Bombardier. The bench is no longer closed to everyone else, though: Gizzel now starts anyone at skill 0 with the Cogwheel Blank and the Bronze Hoe, both free of any fee, and teaches the Copperlens Ocular at 25 for the ordinary tier fee, so an unattuned or hobby engineer can raise the skill through its early rungs; a craft left dormant behind another identity still gains only from the two skill-0 lessons. Anyone can still build the land tools; an unattuned crafter just learns nothing from doing those, and two of the three rod recipes ask for Gizzel's teaching besides, the tier 6 rung coming off a schematic instead.",
           "materialsHeading": "Reagen dan alat sebelumnya",
-          "materialsBody": "Setiap resep alat darat melahap alat satu tingkat di bawahnya ditambah satu material PILIHAN, dan pasangan itulah seluruh tangga daratnya: empat Bijih Besi Pilihan dan satu Beliung Tambang Mithril menjadi Beliung Tambang Thorium, lalu dua Batang Arkanit, dua Bijih Thorium Pilihan dan beliung osmium itu menjadi Beliung Tambang Arkanit. Lini kapak dan sabit mencerminkan bentuk pilihan-plus-alat-sebelumnya dengan Kayu Gelondongan Abu Pilihan dan Kayu Gelondongan Elderwood Pilihan, Herba Daun Emas Pilihan dan Herba Kelopak Matahari Pilihan, meski anak tangga tingkat 5 mereka tidak menuntut Batang Arkanit: beliung adalah satu-satunya lini yang menjadi lebih mahal di puncaknya. Dua resep joran sengaja melanggar polanya: Joran gulungan badai menelan empat Koi Kerlip Surya dan satu Joran arus perak, sedangkan Joran tempaan pasang menelan dua Koi, delapan Ikan Mas Slatefin Mentah dan Joran gulungan badai itu, sehingga puncak tangga sang pemancing dibayar di atas air alih-alih di sebuah urat bijih.\n\nMaterial pilihan tidak dijual di mana pun dan tidak jatuh dari panen biasa: kamu mendapatkannya dengan mengerjakan salah satu urat bermutu penuh milik sebuah zona memakai alat yang berperingkat di atas materialnya sendiri, yang dalam praktiknya berarti alat satu anak tangga di bawah alat yang sedang kamu coba bangun (urat yang lebih mudah, yang disimpan sebuah zona untuk para pengembara, menghasilkan material polos apa pun yang kamu ayunkan). Itu memang disengaja. Pada rute kerajinan, alat tingkat 5 datang dari benar-benar mengayunkan alat tingkat 4, bukan dari perjalanan belanja; konter Tanda Delve adalah satu-satunya jalan memutarnya. Satu-satunya pengecualian adalah Batang Arkanit, yang dimurnikan dan hanya dijual penjaja, 1 perak 60 tembaga per batang dari Kepala Perbekalan Bree di Highwatch atau dari konter Gizzel sendiri, sehingga hanya Beliung Tambang Arkanit yang membawa lantai koin tetap yang terpasang di dalam biayanya.",
+          "materialsBody": "Every land tool recipe consumes the tool one tier below it plus a FINE material, and that pairing is the whole land ladder: four Fine Iron Ore and a Skysilver Mining Pick become the Osmium Mining Pick, then two Glyphsteel Bars, two Fine Osmium Ore and that osmium pick become the Glyphsteel Mining Pick. The axe and sickle lines mirror the fine-plus-prior-tool shape with Fine Ashwood and Fine Highpine Logs, Fine Goldleaf and Fine Sunpetal Herbs, though their tier 5 rungs ask no Glyphsteel Bars: the pick is the one line that gets dearer at the top. The two rod recipes break the pattern on purpose: the Stormreel takes four Sunglint Koi and a Silverstream rod, the Tidewrought two Koi, eight Raw Slatefin Carp and that Stormreel, so the top of the angler's ladder is paid for on the water rather than at a vein.\n\nA fine material is not sold anywhere and does not drop from an ordinary harvest: you get it by working one of a zone's full-grade veins with a tool ranked above the material itself, which in practice means the tool one rung below the one you are trying to build (the easier veins a zone keeps for travellers yield the plain material whatever you swing). That is deliberate. On the craft route, a tier 5 tool comes from actually swinging the tier 4 one, not from a shopping trip; the Delve Marks counter is the one way around it. The single exception is the Glyphsteel Bar, refined and vendor-only, 1 silver 60 copper a bar from Quartermaster Bree in Highwatch or from Gizzel's own counter, so the Glyphsteel Mining Pick alone carries a fixed coin floor built into its cost.",
+          "materialsBodyThreeRods": "Every land tool recipe consumes the tool one tier below it plus a FINE material, and that pairing is the whole land ladder: four Fine Iron Ore and a Skysilver Mining Pick become the Osmium Mining Pick, then two Glyphsteel Bars, two Fine Osmium Ore and that osmium pick become the Glyphsteel Mining Pick. The axe and sickle lines mirror the fine-plus-prior-tool shape with Fine Ashwood and Fine Highpine Logs, Fine Goldleaf and Fine Sunpetal Herbs, though their tier 5 rungs ask no Glyphsteel Bars: the pick is the one line that gets dearer at the top. The three rod recipes break the pattern on purpose: the Stormreel takes four Sunglint Koi and a Silverstream rod, the Tidewrought two Koi, eight Raw Slatefin Carp and that Stormreel, and the Clockreel two Koi, ten Raw Hollowgill Sturgeon and that Tidewrought, so the top of the angler's ladder is paid for on the water rather than at a vein.\n\nA fine material is not sold anywhere and does not drop from an ordinary harvest: you get it by working one of a zone's full-grade veins with a tool ranked above the material itself, which in practice means the tool one rung below the one you are trying to build (the easier veins a zone keeps for travellers yield the plain material whatever you swing). That is deliberate. On the craft route, a tier 5 tool comes from actually swinging the tier 4 one, not from a shopping trip; the Delve Marks counter is the one way around it. The single exception is the Glyphsteel Bar, refined and vendor-only, 1 silver 60 copper a bar from Quartermaster Bree in Highwatch or from Gizzel's own counter, so the Glyphsteel Mining Pick alone carries a fixed coin floor built into its cost.",
           "ladderHeading": "Tangga alat",
-          "ladderBody": "Tangganya adalah delapan resep, semuanya terikat pada stasiun bengkel perkakas. Enam resep alat darat diketahui secara otomatis, tanpa biaya pelatih sama sekali: beliung, kapak, dan sabit tingkat 4 pada keahlian 75, dan versi tingkat 5 pada keahlian 150. Angka kedua itu bukan salah ketik, dan ia sengaja berada di atas batas 125 saat ini: syarat keahlian tidak pernah menggerbangi kerajinan di sini, ia hanya membentuk perolehan keahlian, sehingga kamu bisa membangun alat tingkat 5 pada hari kamu memegang reagennya dan pendahulunya di tingkat 4. Dua joran buatan adalah pengecualian yang diajarkan: Gizzel mengajarkan Joran gulungan badai pada keahlian 75 seharga 4 emas dan Joran tempaan pasang pada keahlian 125 seharga 16 emas, masing-masing begitu tingkatmu dalam kerajinan ini mencapai tingkatnya sendiri.\n\nSetiap alat yang selesai bermutu langka atau epik dan keluar bertanda tangan, sehingga namamu berkelana melintasi zona di sabuk alat pemain lain. Rekayasa juga menopang separuh dari satu resep kombinasi: Eliksir Beruang, diseduh oleh Pengebom yang selaras dengan Rekayasa dan Alkimia masing-masing pada 25.",
+          "ladderBody": "Every rung of the tool ladder is bound to the toolworks station (the crafted hoes the toolmaker also teaches have their own note on the gathering page, and his two starter lessons are the pair named above). The six land-tool recipes are known automatically, no trainer fee ever: the tier 4 pick, axe, and sickle at skill 75, and the tier 5 versions at skill 125, the cap tier itself. Skill requirements never gate a craft here, they only shape skill gain, so you can build a tier 5 tool the day you hold its reagents and its tier 4 predecessor. Two of the three crafted rods are the taught exception: Gizzel teaches the Stormreel at skill 75 for 4 gold and the Tidewrought at skill 125 for 16 gold, each the moment your tier in the craft reaches its own. The tier 6 Clockreel is the third, and no trainer quotes it a fee at all: its schematic sits on the Heroic Quartermaster's counter and teaches the recipe outright.\n\nEvery finished tool is rare or epic quality and comes out signed, so your name rides the zones on other players' toolbelts. Engineering also holds up half of one combination recipe: the Elixir of the Bear, brewed by an attuned Bombardier with both Engineering and Alchemy at 25.",
           "routeHeading": "Rute seorang insinyur hingga 125",
-          "routeBody": "Alat tidak memiliki statistik tempur, sehingga mereka tidak pernah menghasilkan karya besar; proc itu milik perlengkapan berstatistik. Spesialisasi masih tiba pada keahlian 75: 20 persen lebih sedikit material per kerajinan, dan bengkel alat lapangan sementara yang mengubah perjalanan pengumpulan mana pun menjadi bengkel. Matematika perolehan hampir tidak memudar di sini: resep keahlian 75 membayar perolehan penuh hingga 100 dan setengah setelahnya, dan resep keahlian 150 membayar perolehan penuh sepanjang jalan ke batas 125, sehingga kendala sesungguhnya adalah reagen dan koin, tidak pernah resep abu-abu.\n\nPilih pasanganmu terlebih dahulu, karena tidak ada yang bergerak tanpanya: ambil penyelarasan Pengebom dari Perajin Gizzel. Lalu beri makan tangga: tingkatkan Penambangan, Penebangan, atau Herbalisme sendiri atau berteman dengan pengumpul, beli alat tingkat 3 dari penjaja, dan perlakukan pesanan kerja Gizzel (delapan Kayu Ironbark seharga 16 tembaga, bisa diulang setiap 30 menit) sebagai uang jalan-jalan.\n\nRekayasa adalah perdagangan prestis volume rendah, sekitar satu poin keahlian per alat jadi, jadi perlakukan setiap kerajinan sebagai stok untuk dijual. Penawaran kepada pelangganmu menulis sendiri: setiap tingkat alat di atas simpul sendiri memangkas 0,4 detik dari rapal panen 2,5 detik (turun ke lantai 1,5 detik), sehingga alat tingkat 5 adalah peningkatan kecepatan pada setiap simpul di dunia, dan hanya kamu yang bisa membuatnya. Kitab Jasa menandai Roda Gigi dan Per pada keahlian 50 dan Rekayasa Mahaguru di 125."
+          "routeBody": "Alat tidak memiliki statistik tempur, sehingga mereka tidak pernah menghasilkan karya besar; proc itu milik perlengkapan berstatistik. Spesialisasi masih tiba pada keahlian 75: 20 persen lebih sedikit material per kerajinan, dan bengkel alat lapangan sementara yang mengubah perjalanan pengumpulan mana pun menjadi bengkel. Matematika perolehan hampir tidak memudar di sini: resep keahlian 75 membayar perolehan penuh hingga 100 dan setengah setelahnya, dan resep keahlian 125 membayar perolehan penuh sepanjang jalan ke batas, sehingga kendala sesungguhnya adalah reagen dan koin, tidak pernah resep abu-abu.\n\nPilih pasanganmu sejak awal, karena tangga alat tidak bergerak tanpanya: ambil penyelarasan Pengebom dari Perajin Gizzel. Lalu beri makan tangga: tingkatkan Penambangan, Penebangan, atau Herbalisme sendiri atau berteman dengan pengumpul, beli alat tingkat 3 dari penjaja, dan perlakukan pesanan kerja Gizzel (delapan Kayu Ironbark seharga 16 tembaga, bisa diulang setiap 30 menit) sebagai uang jalan-jalan.\n\nRekayasa adalah perdagangan prestis volume rendah, sekitar satu poin keahlian per alat jadi, jadi perlakukan setiap kerajinan sebagai stok untuk dijual. Penawaran kepada pelangganmu menulis sendiri: setiap tingkat alat di atas simpul sendiri memangkas 0,4 detik dari rapal panen 2,5 detik (turun ke lantai 1,5 detik), sehingga alat tingkat 5 adalah peningkatan kecepatan pada setiap simpul di dunia, dan hanya kamu yang bisa membuatnya. Kitab Jasa menandai Roda Gigi dan Per pada keahlian 50 dan Rekayasa Mahaguru di 125."
         },
         "enchanting": {
           "identityHeading": "Perlengkapan dibongkar, kekuatan dikembalikan",
-          "identityBody": "Setiap mantra diketahui dari awal, siapa pun bisa menghancurkan mantra sejak hari pertama, dan keduanya tidak pernah membutuhkan stasiun; keahliannya berbatas 125 seperti setiap kerajinan. Satu-satunya sudut perdagangan ini yang diajarkan adalah sepasang resep jimatnya: Gizzel Tinker mengajarkan Simpanan Sang Pengumpul dan Mata Sang Perajin di bengkel perkakas di sudut barat daya Eastbrook Square, dengan biaya tingkat biasa begitu Pemantraanmu mencapai 25, dan jimat-jimat itu sendiri dikerjakan di stasiunnya.\n\nPada cincin ia duduk di antara Inskripsi dan Kriya Permata, sehingga dua identitas pasangannya adalah Arkanis (Inskripsi dan Pemantraan) dan Pengikat Permata (Pemantraan dan Kriya Permata). Belum satu pun bisa disumpah, karena kedua tetangganya masih menunggu resep pertama mereka, jadi hari ini Pemantraan menanjak sebagai kerajinan milik semua orang: bebas hingga tingkat langka sebelum sumpah apa pun, dan pilihan hobi yang wajar bagi seorang Pengebom atau Apoteker. Para pemantra juga menjaga dunia pengumpulan tetap berjalan: dua efek alat yang bisa dipasang adalah karya Pemantra, dan perajin aslinya mengisi ulang efeknya sendiri dengan diskon, lebih dalam lagi begitu berspesialisasi.",
+          "identityBody": "Every enchant is known from the start, anyone can disenchant from day one, and neither ever needs a station; the skill caps at 125 like every craft. The one taught corner of the trade is three recipes, all Tinker Gizzel's at the toolworks in the southwest corner of Eastbrook Square, and all worked at that station: the two charms, the Gatherer's Cache and the Artisan's Eye, for the ordinary tier fee once your Enchanting reaches 25, and above them the Lucent Reagent, the apex tier's own material, at 75.\n\nOn the ring it sits between Inscription and Jewelcrafting, so its two pair identities are the Arcanist (Inscription and Enchanting) and the Gembinder (Enchanting and Jewelcrafting). Neither can be sworn yet: both neighbor crafts now work their own ladders (Inscription at the apothecary, Jewelcrafting at the forge), but neither pair has an oath quest yet. So today Enchanting climbs as everyone's craft: free to the rare tier before any oath, and a natural hobby pick for a Bombardier or an Apothecary. Enchanters also keep the gathering world running: the two slottable tool effects are Enchanter work, and an original crafter recharges their own effects at a discount, deeper still once specialized.",
           "levelingHeading": "Cara mempesona naik level",
-          "levelingBody": "Tiga tindakan menggerakkan keahlian ini: menghancurkan mantra sebuah potongan, menerapkan mantra, dan membuat dua jimatnya, yang menaiki kurva pembuatan biasa. Setiap keberhasilan bernilai hingga satu poin, diskalakan menurut seberapa serius pekerjaannya: kelangkaan potongan yang kamu pecah, atau tingkat reagen mantra yang kamu terapkan. Penghancuran mantra biasa dan mantra berbahan debu saja dinilai sebagai pekerjaan biasa; penghancuran tidak umum dan mantra esensi sebagai tidak umum; penghancuran langka dan setiap mantra Bersura atau Unggul sebagai langka; penghancuran epik dan legendaris berperingkat lebih tinggi lagi pada tabelnya, meski tidak ada identitas pemantraan hari ini yang menjangkau melampaui anak tangga langka, sehingga dalam praktiknya semuanya membayar sama dengan pekerjaan langka. Satu kejujuran menguasai bangku pemecah: potongan yang berasal dari bangku pemain (dibuat, bertanda tangan, atau berkarya besar) tetap tergiling menjadi material tetapi tidak mengajarkan apa pun, sehingga putaran buat-lalu-pecah tidak menaikkan level siapa pun, dan pelajarannya ada pada perlengkapan yang ditemukan di dunia.\n\nPemudaran penguasaan yang sudah dikenal berlaku pada tingkat berjarak 25 poin, sehingga pekerjaan bermutu biasa memudar abu-abu pada keahlian 75, pekerjaan tidak umum pada 100, dan pekerjaan tingkat langka tepat pada batas 125. Pemantraan juga punya satu kebaikan hatinya sendiri: masukan di atas langit-langit arketipemu dibulatkan turun ke langit-langit itu alih-alih dinolkan, sehingga sebelum kamu selaras, penghancuran epik cukup dinilai sebagai langka daripada tidak mengajarkan apa pun. Jika Pemantraan berakhir tidak aktif di balik identitas lain, memecah dan menerapkan dinilai sebagai pekerjaan biasa dan pendakiannya mandek di 75, sementara dua jimatnya, yang menumpang kurva pembuatan di atas langit-langit biasa, sama sekali tidak mengajarkan apa pun kepada pemantra yang tidak aktif; jadikan ia hobimu dan pekerjaan tingkat langka tetap membayar, hanya lebih lambat setelah 75.",
+          "levelingBody": "Three actions move the skill: disenchanting a piece, applying an enchant, and crafting the two charm recipes, which climb the ordinary crafting curve. The third taught recipe, the Lucent Reagent, is the exception: at skill 75 it sits above the rare ceiling every enchanter works under (Enchanting has no oath pair, so it is never a major), and a recipe above your ceiling teaches nothing, so craft it for the reagent, not the points. Each success is worth up to one point, scaled by how serious the work is: the rarity of the piece you break, or the reagent tier of the enchant you apply. Common disenchants and dust-only enchants score as common work; uncommon disenchants and essence enchants as uncommon; rare disenchants and every Runed or Greater enchant as rare; epic and legendary disenchants, and every Lucent enchant, rank higher still on the table, though no enchanting identity today reaches past the rare rung, so they pay the same as rare work in practice. One honesty rules the breaking bench: a piece that came off a player bench (crafted, signed, or masterworked) still mills into materials but teaches nothing, so a craft-and-break loop levels no one, and the lessons are in world-found gear.\n\nThe familiar mastery fade applies on 25-point tiers, so common-grade work goes gray at skill 75, uncommon work at 100, and rare-tier work exactly at the 125 cap. Enchanting also has one kindness of its own: input above your archetype ceiling is rounded down to that ceiling instead of zeroed, so before you attune, an epic disenchant simply scores as rare rather than teaching nothing. If Enchanting ends up dormant behind another identity, breaking and applying score as common work and the climb stalls at 75, while the two charms, riding the crafting curve above the common ceiling, teach a dormant enchanter nothing at all; keep it as your hobby and rare-tier work still pays, just slower past 75.",
           "marketHeading": "Salinan yang dipesona, asal-usul, dan pasar",
           "marketBody": "Menerapkan mantra menghabiskan reagennya dan menandai satu salinan spesifik dari item itu. Arahkan pada salinan di dalam tas dan kamu mendapatkan kembali satu salinan dipesona yang tersendiri; arahkan pada potongan yang sudah kamu kenakan dan ia dipesona di tempat, persis di tempatnya berada, tanpa tarian lepas-pasang. Bagaimanapun caranya, bonus itu mengikuti potongan tersebut selamanya, melewati pelepasan, perjalanan ke bank, dan perdagangan. Satu mantra per potongan: menerapkan mantra berbeda pada salinan yang sudah dipesona akan meminta konfirmasi, lalu menggantikan mantra lama sepenuhnya, menghancurkannya tanpa pengembalian materialnya. Menjual, membuang, dan menghancurkan mantra semuanya mendahulukan salinan polos, sehingga potongan jadimu tidak termakan tanpa sengaja.\n\nPerlengkapan karya besar dan pemantraan adalah sahabat: potongan karya besar tetap sepenuhnya bisa dipesona, dan mantranya menambah di atas bonus karya besar tanpa mengganggunya maupun tanda tangan pembuatnya. Dengan menumpuk semua sumber, karya besar bertanda tangan yang membawa mantra Unggul adalah yang terbaik yang bisa dicapai sebuah potongan buatan, dan ia tetap berada di bawah jarahan raid sesuai rancangan.\n\nDi pasar, potongan yang dipesona atau bertanda tangan didaftarkan seperti yang lain: ia naik sebagai daftar salinan-tunggalnya sendiri, tooltipnya menampilkan mantra dan tanda pembuatnya, dan Ravenpost membawanya dengan sama setianya. Materialnya tetap menjadi separuh yang stabil dari kerajinan ini: Debu, Esensi, dan Serpihan didaftarkan dengan bebas, mendaftarkan tidak memakan biaya, dan Pedagang hanya mengambil 5 persen dari penjualan yang tuntas. Itulah yang menjadikan dua penghasilan klasik seorang pemantra menjual material, dan menjual karya jadi: lewat pasar, lewat gagak, atau bertatap muka di jendela perdagangan."
+        },
+        "jewelcrafting": {
+          "identityHeading": "The finer work of the forge",
+          "identityBody": "The ladder is three rungs of three: a Strength ring, an Intellect ring, and an Agility necklace, first in copper, again in iron, and once more in rare osmium at the top. Jewelry carries no armor and no class lock, and even the copper pieces arrive with real stat lines, because a ring without stats would be nothing at all.\n\nOn the craft ring it sits between Enchanting and Weaponcrafting, giving it two pair identities: the Gembinder (Enchanting and Jewelcrafting) and the Bladewright (Jewelcrafting and Weaponcrafting). Neither has an oath quest yet, so today Jewelcrafting climbs as everyone's craft: the three rungs of the 0-to-50 ladder all sit inside the rare tier that undeclared crafts work under, so the ladder is open before any oath. Two things sit above that ceiling: the Prismglass Setting, the 75-rung intermediate Darva also teaches, and the found-pattern rung above it; since neither pair can be sworn yet, today they teach nothing to anyone, so cut them for the goods, not the points.",
+          "materialsHeading": "Ore, dust, and essence",
+          "materialsBody": "The bench runs on mining and breaking. Copper ore comes off the tier 1 veins of Eastbrook Vale, iron ore from Mirefen Marsh, and osmium ore from Thornpeak Heights, with a jar or two of Smithing Flux, 20 copper each from Forgemistress Darva, in every recipe. The other half of every piece comes off the breaking bench: Chime Dust settles the copper rung and Chime Essence the iron and osmium rungs, so a jewelcrafter is an enchanter's steadiest customer, or simply keeps a disenchanting habit of their own.\n\nThe osmium rung adds one refinement: every rare piece takes two iron ore besides its osmium, worked in as solder for the fine settings. No counter sells the ores or the dust: they come out of the world or off another player, by trade or the World Market; only the flux is bought for coin.",
+          "ladderHeading": "Taught beside the anvil",
+          "ladderBody": "Jewelcrafting has no station of its own: the whole catalog is worked at the Eastbrook forge, the same anvil Weaponcrafting and Armorcrafting share, and Forgemistress Darva teaches it there. The ladder is nine trainer recipes in three rungs: the copper rung (band, loop, torc) is free at skill 0, the iron rung (signet, loop, choker) costs 25 silver a recipe at skill 25, and the osmium rung (band, loop, amulet) costs 1 gold each at skill 50, each rung teachable the moment your tier in the craft reaches its own.\n\nThere are no field recipes and no combination piece yet: every taught rung is forge-bound trainer work, and the found-pattern rung above them is forge-bound too but bought nowhere, so this craft is learned, and practiced, standing where the smiths stand.",
+          "routeHeading": "Masterworks, and a working route to 125",
+          "routeBody": "There is no statless rung here: every piece on the ladder carries a real stat line, so every craft rolls the masterwork chance so long as the finer quality fits inside your tier ceiling, with iron and osmium counting as tier 1 materials for the proc. The copper and iron rungs, uncommon by make, can masterwork into rare for a hobby or undeclared jewelcrafter alike; the osmium three are rare already, so their epic masterworks wait on a ceiling above rare, which no jewelcrafter has until the craft's pairs open.\n\nThe climb is the standard ride: copper to 25, the iron rung the day it opens to 50, then osmium to 75. Above them sits an apex rung no trainer teaches: its patterns are found, not bought. Read that as an item you can make, not a shortcut up the ladder, because the same ceiling named above applies to skill gain as well as to masterworks: an apex pattern sits well over the rare ceiling every jewelcrafter works under today, so crafting one teaches nothing at all until this craft's pairs open and it can be a major. Whichever you hold, the osmium recipes carry the climb, fading to half and then quarter gain: budget roughly 150 more crafts to reach the 125 cap, and fund them honestly, since every class wears jewelry and most travelers level with their ring and neck slots empty.\n\nThe Book of Deeds marks Polished to Brilliance for your first rare-tier piece, Facet and Filigree at 50 skill, and Grandmaster Jewelcrafting at the 125 cap."
+        },
+        "inscription": {
+          "identityHeading": "Ink for the mind, scrolls for the road",
+          "identityBody": "The ladder is three rungs of two: a caster tome for the offhand and a stamina scroll for anyone at all, first in sheenleaf, again in goldleaf, and once more in rare sunpetal at the top. The tomes are held stat sticks for the six mana classes, real Intellect and Spirit from the first rung; the scrolls are consumables with no class lock, so half of every rung sells to the whole realm.\n\nOn the craft ring it sits between Tailoring and Enchanting, giving it two pair identities: the Inkweaver (Tailoring and Inscription) and the Arcanist (Inscription and Enchanting). Neither has an oath quest yet, so today Inscription climbs as everyone's craft: the three rungs of the 0-to-50 ladder all sit inside the rare tier that undeclared crafts work under, so the ladder is open before any oath. Two things sit above that ceiling: the Sablewax Vellum, the 75-rung intermediate Verane also teaches, and the found-pattern rung above it; since neither pair can be sworn yet, today they teach nothing to anyone, so scribe them for the goods, not the points.",
+          "materialsHeading": "Herbs, ink, and a vial to hold it",
+          "materialsBody": "The desk runs on herbalism and the breaking bench. Sheenleaf comes off the tier 1 herb patches of Eastbrook Vale, goldleaf from Mirefen Marsh, and sunpetal from Thornpeak Heights, ground into pigment with a Glass Vial, 12 copper from the apothecary master, in every recipe. The magical half of the ink comes off the breaking bench: Chime Dust settles the sheenleaf rung, Chime Essence the goldleaf and sunpetal rungs, and the sunpetal scroll binds a pinch of dust back in, so a scribe is an enchanter's steady customer, or keeps a disenchanting habit of their own.\n\nThe sunpetal rung refines both of its recipes: the rare grimoire takes two goldleaf besides its sunpetal, worked in to size the illuminations, and the double scroll batch takes a second essence with that pinch of dust, priced even with the Elixir of the Serpent whose buff it mirrors. No counter sells the herbs or the dust: they come out of the world or off another player; only the vial is bought for coin.",
+          "materialsBodyFrostGourd": "The desk runs on herbalism and the breaking bench. Sheenleaf comes off the tier 1 herb patches of Eastbrook Vale, goldleaf from Mirefen Marsh, and sunpetal from Thornpeak Heights, ground into pigment with a Glass Vial, 12 copper from the apothecary master, in every recipe. The magical half of the ink comes off the breaking bench: Chime Dust settles the sheenleaf rung, Chime Essence the goldleaf and sunpetal rungs, and the sunpetal scroll binds a pinch of dust back in, so a scribe is an enchanter's steady customer, or keeps a disenchanting habit of their own.\n\nThe sunpetal rung refines both of its recipes: the rare grimoire takes two goldleaf besides its sunpetal, worked in to size the illuminations, and the double scroll batch takes a second essence with that pinch of dust and a Frost Gourd off the Highwatch terraces, which prices it even with the Elixir of the Serpent whose buff it mirrors. No counter sells the herbs, the dust or the gourd: they come out of the world, a garden bed or off another player; only the vial is bought for coin.",
+          "ladderHeading": "Taught beside the alembics",
+          "ladderBody": "Inscription has no station of its own: the whole catalog is worked at the Highwatch apothecary, the same bench Alchemy brews at, and Alchemist Verane teaches it there. The ladder is six trainer recipes in three rungs: the sheenleaf rung (primer and scroll) is free at skill 0, the goldleaf rung (folio and scroll) costs 25 silver a recipe at skill 25, and the sunpetal rung (grimoire and scroll) costs 1 gold each at skill 50, each rung teachable the moment your tier in the craft reaches its own. The rung-50 scroll comes off the desk two at a time.\n\nThere are no field recipes and no combination piece yet: every taught rung is apothecary-bound trainer work, and the found-pattern rung above them is apothecary-bound too but bought nowhere, so this craft is learned, and practiced, standing where the alchemists stand.",
+          "routeHeading": "Scrolls, elixirs, and a working route to 125",
+          "routeBody": "The scrolls are the craft's signature rule: each rung's scroll grants exactly the buff of its band's stamina elixir (the boar, vipersear, and serpent bands), and the two sources share one slot on the buff bar. Reading a scroll over an elixir replaces it, drinking an elixir over a scroll replaces that, and the newest application always wins, so a scroll is an alternative door into the same buff, never a second stack on top of it.\n\nThe tomes carry real stat lines, so every tome craft rolls the masterwork chance so long as the finer quality fits inside your tier ceiling; the scrolls, statless consumables, never proc. The climb is the standard ride: sheenleaf to 25, the goldleaf rung the day it opens to 50, then sunpetal to 75. Above them sits an apex rung Verane does not teach: its pattern is found, not bought. Read that as a tome you can make, not a shortcut up the ladder: an apex pattern sits well over the rare ceiling every scribe works under today, and a recipe above your ceiling teaches nothing at all, so the skill it grants waits on this craft's pairs opening and Inscription becoming a major. Whichever you hold, the sunpetal recipes carry the climb, fading to half and then quarter gain: budget roughly 150 more crafts to reach the 125 cap, and fund them honestly, since the scrolls sell to every class in the game.\n\nThe Book of Deeds marks Written in Fine Ink for your first rare-tier piece, Quill and Pigment at 50 skill, and Grandmaster Inscription at the 125 cap."
         }
       },
       "howHeading": "Cara kerja kerajinan",
-      "howBody": "Buka jendela kerajinan (tombol bawaan T) dan setiap resep yang kamu ketahui terdaftar lengkap dengan apa yang dibutuhkannya dan apa yang ada di tanganmu. Resep terikat stasiun memintamu berdiri dalam 20 yard dari stasiun yang tepat di kota, resep lapangan bisa dibuat di mana saja, dan pemecahan serta pemantraan milik Pemantraan tidak membutuhkan stasiun sama sekali (hanya dua resep jimatnya yang merupakan pekerjaan stasiun, di bengkel alat). Tidak ada lemparan kegagalan: pembuatan dengan material di tangan selalu berhasil.\n\nDua gesekan kecil menjaga ekonomi tetap jujur. Setiap pembuatan yang berhasil membayar biaya 2 tembaga per poin anggaran stat item, dan tindakan bertipe kerajinan berbagi satu laju: paling banyak 10 pembuatan, penghancuran mantra, pemantraan, salvasi, atau pengisian ulang alat dalam setiap jendela 60 detik. Keduanya tidak akan mengganggu sesi normal; keduanya menghentikan spesialis mentok dari membanjiri pasar.",
+      "howBody": "Open the crafting window (default key T) and every recipe you know is listed with what it needs and what you have on hand. Station-bound recipes ask you to stand within 20 yards of the right station in town, field recipes craft anywhere, and Enchanting's breaking and enchanting need no station at all (only its three trainer recipes are station work, at the toolworks). There is no failure roll: a craft with the materials in hand always succeeds.\n\nTwo small frictions keep the economy honest. Every successful craft pays a fee of 2 copper per point of the item's stat budget, and every craft-family action takes real cast time (field crafts near two seconds, harder ladder crafts longer, and disenchant, enchant, salvage, and tool recharge each about a second and a half). Materials, the gold fee, stations, and skill ceilings do the rest; nothing scolds you for working too quickly.",
       "recipesHeading": "Resep",
       "recipesNote": "Setiap resep dari kerajinan: syarat keahlian tepat dan materialnya, di mana dipelajari dan dengan biaya berapa, serta tiga nilai keahlian di mana perolehannya memudar menjadi setengah, seperempat, dan tidak ada.",
       "masteryHeading": "Perolehan keahlian",
@@ -6501,7 +6772,7 @@ export const id_ID: EnTranslations = {
       "masterworkHeading": "Karya Master",
       "masterworkBody": "Setiap pembuatan yang berhasil adalah persis apa yang dijanjikan resepnya, dan kadang sedikit lebih: karya master menyelesaikan potongan yang sama satu tingkat mutu lebih halus, dengan stat bonus yang sudah tertanam saat pembuatan. Ia hanya menambah, tidak pernah menurunkan, dan tetap berada di bawah batas raid, sehingga perlengkapan buatan bisa sangat baik tanpa menggantikan jarahan raid.\n\nPeluangnya diumumkan, bukan mistis: {base}% dasar, ditambah {perTier}% per tingkat keahlianmu di atas resep, ditambah {signed}% ketika reagen bertanda tangan mana pun masuk, ditambah {spec}% begitu kamu terspesialisasi, dengan material bertingkat lebih tinggi menambahkan 1 sampai 2% lagi, semuanya dibatasi pada {cap}%. Hanya potongan dengan stat sungguhan yang bisa membaik, jadi barang biasa tanpa stat, alat, dan konsumabel tidak pernah proc; kerajinan yang tidak aktif tidak pernah menghasilkannya, dan kerajinan hobi tidak bisa menghasilkan karya master melewati langit-langit langkanya.\n\nKarya bagus membawa nama pembuatnya. Hasil langka atau lebih baik ditandatangani, setiap salinannya (Dibuat oleh; material yang dikumpulkan membawa Dikumpulkan oleh), dan karya master selalu ditandatangani apa pun mutunya. Tanda tangan adalah asal-usul, bukan gembok: barang bertanda tangan bebas diperdagangkan, dikirim lewat surat, dan didaftarkan di Pasar Dunia.",
       "trainingHeading": "Pelatihan",
-      "trainingBody": "Resep pelatih berasal dari para master yang menetap, diajarkan di stasiun mereka. Aturannya satu baris: seorang master mengajarkan resep begitu tingkatmu dalam kerajinan itu mencapai tingkat resepnya sendiri, dan tidak ada hal lain yang membatasinya, bukan levelmu, bukan arketipemu. Tangga perlengkapan dan konsumabel menjalankan anak tangganya pada keahlian 0, 25, dan 50; dua pelajaran joran milik Rekayasa melanjutkan tangga itu pada 75 dan 125, dan dua resep jimat Pemantraan duduk di anak tangga 25, sehingga anak tangga baru terbuka seiring naiknya tingkatmu.\n\nBiaya bersifat sekali bayar dan tetap per anak tangga: anak tangga awal gratis, anak tangga keahlian 25 berharga {tier1} per resep, anak tangga keahlian 50 {tier2}, dan pelajaran joran di atasnya membawa biayanya sendiri, tercantum di samping tiap resep pada tabel. Kamu harus berdiri di stasiun sungguhan milik sang master untuk berlatih, dan stasiun bergerak tidak pernah dihitung. Resep lapangan biasa dan enam resep alat darat buatan sama sekali tidak membutuhkan pelatihan; setiap karakter mengetahuinya sejak awal.",
+      "trainingBody": "Trainer recipes come from the resident masters, taught at their stations. The rule is one line: a master teaches a recipe once your tier in the craft has reached the recipe's own tier, and nothing else gates it, not your level, not your archetype. The gear and consumable ladders run their rungs at skill 0, 25, and 50, and every craft adds one 75-rung intermediate above them, taught at its station (Enchanting's is the Lucent Reagent, beside its two charm recipes on the 25 rung); Engineering's two rod lessons continue its ladder at 75 and 125, so a fresh rung opens as your tiers climb.\n\nFees are one-time and flat by rung: the starting rung is free, the skill 25 rung costs {tier1} a recipe, the skill 50 rung {tier2}, and the 75 and 125 rungs above them carry their own fees, listed beside each recipe in the table. You must stand at the master's actual station to train, and a mobile station never counts. The common field recipes and the six crafted land-tool recipes need no training at all; every character knows them from the start.",
       "specializationHeading": "Spesialisasi",
       "specializationBody": "Pada keahlian {at} kerajinan ini menspesialisasimu, tanpa perlu misi: resep menghabiskan {pct}% lebih sedikit material sejak saat itu, dan spesialisasi menambahkan kenaikannya sendiri pada peluang karya master.\n\nSpesialis juga belajar membawa bengkel bersama mereka: pengrajin terspesialisasi dapat mendirikan stasiun bergerak di lapangan selama sepuluh menit sekaligus, sehingga resep terikat stasiun bisa dikerjakan di mulut tambang daripada kembali ke kota. Batasannya disengaja: tidak pernah dihitung untuk berlatih dengan master atau untuk melepas ikat karya pesanan, dan berakhir pada timernya apakah digunakan atau tidak.",
       "ench": {
@@ -6521,12 +6792,15 @@ export const id_ID: EnTranslations = {
         "tier": {
           "base": "Dasar",
           "runed": "Bersura",
-          "greater": "Unggul"
+          "greater": "Unggul",
+          "lucent": "Lucent"
         },
+        "perfectedOnly": "Perfected only",
         "salvageHeading": "Salvasi",
         "salvageNote": "Salvasi adalah sepupu sederhana dari penghancuran mantra: senjata dan zirah yang sama, tidak memerlukan keahlian dan tidak menambah keahlian, mengembalikan serpihan kerajinan biasa berdasarkan kualitas alih-alih bahan arkana apa pun. Siapapun bisa melakukannya, pemantrai atau bukan. Saat memegang item yang layak dipecah, pilihannya sederhana: dari langka ke atas, penghancuran mantra jelas lebih menguntungkan, sementara pada biasa kedua hasil dijual dengan harga yang kira-kira sama ke pedagang, jadi pecah ke arah bahan yang benar-benar kamu butuhkan.",
         "bonusFmt": "+{value} {stat}",
-        "enchantsNoteOffhand": "Mantra hadir dalam tiga tingkat. Tingkat dasar berjalan dengan Debu Dentingan (dengan sedikit Esensi di ujung atasnya) dan mencakup slot senjata, off-hand, dan setiap slot zirah, dengan pilihan sumbu stat yang cukup banyak sehingga setiap build menemukan sesuatu untuk tiap slot: perisai dan off-hand kaster yang dipegang mendapat mantra Stamina tersendiri, sehingga tidak ada slot terpakai yang mati mantra. Tingkat Unggul berharga satu Serpihan Dentingan ditambah Esensi: bonus yang lebih kuat pada slot-slot paling berdampak. Serpihan juga memberi makan dua saluran pembuangan lain, dua resep jimat seharga lima buah masing-masing dan anak tangga teratas pengisian ulang efek alat, jadi tabunglah beberapa sebelum kamu membelanjakannya.\n\nDi antara keduanya duduk lima mantra Bersura, satu konsumen untuk tiap sekunder yang diketik, sehingga tidak ada yang kamu giling berakhir buntu: Tepian Bersura (senjata, Kekuatan, memakan Baja Resonant), Segel Bersura (senjata, Intelijen, Kayu Resonant), Tenun Rune (dada, Roh, Benang Resonant), Kulit Bersura (celana, Kelincahan, Kulit Resonant), dan Kait Bersura (helm, Stamina, Kait Resonant). Masing-masing juga menelan dua Esensi Dentingan; bila sebuah slot dan stat memiliki mantra dasar sekaligus mantra Unggul, bonus Bersura mendarat di antara keduanya, sementara Tenun Rune adalah mantra Roh dada terkuat secara mutlak dan Kulit Bersura adalah satu-satunya mantra Kelincahan untuk celana. Bonus persisnya semua ada di tabel di bawah.",
+        "enchantsNoteOffhand": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected, and no piece can be yet: it is authored ahead of the Perfecting work it waits on.",
+        "enchantsNoteInfusionLive": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected: Perfecting is the wearer's own work, not the enchanter's, and the Professions page tells how a piece earns it.",
         "charmsHeading": "Jimat untuk alat pengumpul",
         "charmsBody": "Pemantraan juga tempat asal jimat seorang pengumpul. Gizzel Tinker mengajarkan keduanya di bengkel perkakas Eastbrook begitu Pemantraanmu mencapai 25: Simpanan Sang Pengumpul, yang menambah satu unit pada sebuah panen, dan Mata Sang Perajin, yang menaikkan tingkat dari apa yang keluar. Masing-masing dibuat sekali, lalu dipasang pada beliung, kapak, atau sabit, tempat ia menghabiskan satu muatan hanya pada panen yang benar-benar diperbaikinya.\n\nPengisian ulang adalah tempat perdagangan ini terus menghasilkan. Muatan dipulihkan oleh siapa pun yang memiliki alat itu, bukan oleh pemantra yang lewat, dan pengisian ulang menelan separuh material saat pemiliknya adalah pemantra yang menandatangani jimat itu, lebih sedikit lagi dengan spesialisasi Pemantraan. Jadi sebuah jimat yang dijual di konter adalah penjualan satu kali, sementara jimat yang menumpang di alatmu sendiri adalah yang murah untuk terus dijalankan. Tangga muatan dan material lengkapnya ada di halaman profesi pengumpulan mana pun, di bawah Efek Alat."
       },
@@ -6534,7 +6808,8 @@ export const id_ID: EnTranslations = {
         "mining": "Penambangan menarik bijih langsung dari batuan dunia: tembaga di Lembah Eastbrook, besi di Rawa Mirefen, dan osmium di ketinggian Dataran Tinggi Thornpeak, dengan urat pemula tersebar di setiap zona yang lebih muda di luarnya, memberi makan kerajinan tempa. Terbuka untuk semua orang sejak level 1: beliung penambangan seharga 20 tembaga dari konter Eastbrook, Fenbridge, atau Highwatch membuka setiap urat pemula, dan anak tangga beliung yang lebih tinggi terbangun saat penghitungmu sendiri meraihnya. Dilacak pada penghitungnya sendiri hingga batas 100.",
         "logging": "Penebangan menumbangkan kayu dari rumpun pohon di seluruh dunia: ironbark di Lembah Eastbrook, ashwood di Rawa Mirefen, highpine di Dataran Tinggi Thornpeak, dan rumpun pemula di setiap zona yang lebih muda, bahan mentah untuk gagang, staf, dan bangku sang insinyur. Terbuka untuk semua orang sejak level 1 dengan kapak penebangan di tasmu (20 tembaga di konter Eastbrook, Fenbridge, dan Highwatch), dilacak pada penghitungnya sendiri hingga batas 100.",
         "herbalism": "Herbalisme mengumpulkan apa yang tumbuh liar: sheenleaf di Lembah Eastbrook, goldleaf di Rawa Mirefen, sunpetal di Dataran Tinggi Thornpeak, dan petak pemula di setiap zona yang lebih muda, daun dan batang yang membuat perdagangan apoteker terus menyeduh. Terbuka untuk semua orang sejak level 1 dengan sabit herbalisme di tasmu (20 tembaga di konter Eastbrook, Fenbridge, dan Highwatch), dilacak pada penghitungnya sendiri hingga batas 100.",
-        "fishing": "Memancing adalah yang paling berbeda di antara perdagangan pengumpulan, sekaligus yang paling dalam: minigame gigit-dan-tarik yang sungguhan, tabel tangkapan tersendiri di masing-masing tiga zona tanah inti (perairan muda di luar itu semuanya menyajikan tabel Lembah untuk saat ini), dan batas kecakapan 200, dua kali lipat yang lain. Beli joran, hadapi air terbuka, dan lemparkan kailmu."
+        "fishing": "Memancing adalah yang paling berbeda di antara perdagangan pengumpulan, sekaligus yang paling dalam: minigame gigit-dan-tarik yang sungguhan, tabel tangkapan tersendiri di masing-masing tiga zona tanah inti (perairan muda di luar itu semuanya menyajikan tabel Lembah untuk saat ini), dan batas kecakapan 200, dua kali lipat yang lain. Beli joran, hadapi air terbuka, dan lemparkan kailmu.",
+        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked garden beds, growing on their own clock whether you stay or go, and pulled up ripe whenever you come back, because nothing in a bed ever spoils. A farmer stands beside every bed site, from the Eastbrook allotments through Fenbridge and Highwatch to the Evergarden parterre, and Farmer Jessica in Eastbrook is where the trade starts: she sells the garden hoe and the first seeds, and her errand walks a new farmer through a first crop. Each rung of the ladder grows its own crops, two on the lower rungs and four on the upper ones, each with a finer grade for a practiced hand to pull, and engineers craft the hoes for the tougher ground above the starter beds. Tracked on its own counter to a cap of 100."
       },
       "rhythmHeading": "Ritme pengumpulan",
       "rhythmBody": "Panen adalah rapal singkat yang terlihat, bukan comotan instan: {base} detik dasar, tidak pernah di bawah lantai {floor} detik. Membawa alat di atas tingkat simpul, yang kecakapanmu izinkan untuk kamu gunakan, mempercepatmu {tool} detik per tingkat di atasnya, dan setiap band kecakapan yang kamu lewati memangkas {band} detik lagi; sekadar menyamai tingkat simpul hanya membuatmu masuk pintu, tingkat-tingkat di atasnyalah yang membuatmu cepat.\n\nTas yang penuh menolak rapal itu dengan sopan sebelum dimulai, sehingga tidak ada yang terbuang di tengah ayunan, dan setiap panen membayar sepotong kecil XP karakter, diskalakan berdasarkan level simpul terhadap levelmu sendiri seperti XP dari membunuh: simpul abu-abu yang remeh tidak mengajarkan apa pun kepada karakter yang sudah mentok.",
@@ -6542,7 +6817,7 @@ export const id_ID: EnTranslations = {
       "nodesHeading": "Simpul berdasarkan zona",
       "nodesNote": "Di mana simpul berada, tingkatnya, alat yang dibutuhkan, dan apa yang dihasilkan. Setiap simpul muncul kembali untukmu {respawn} detik setelah panenmu sendiri, dan timer itu hanya milikmu: pengumpul lain yang mengerjakan simpul yang sama tidak pernah menundamu, sehingga tidak ada persaingan simpul dan tidak ada penjagaan. Setiap zona yang lebih tinggi menghasilkan material yang lebih baik dari tanah yang lebih keras.",
       "toolsHeading": "Alat",
-      "toolsNote": "Setiap simpul membutuhkan alat perdagangannya di dalam tasmu, tingkat 1 sekalipun: tanpa beliung, tanpa bijih, dan tanpa joran, tanpa ikan. Tangga penjaja mencakup tingkat 1 sampai 3 di tiga hub tanah inti: alat tingkat 1 dijual di ketiganya, anak tangga di atasnya dijual di tempat tanah yang memakainya dimulai (Fenbridge menambahkan tingkat 2, Highwatch tingkat 3), dan permukiman yang lebih muda di luar itu sama sekali tidak menyetok alat, jadi berbekallah sebelum kamu bepergian. Setiap konter menjual bebas setiap anak tangga yang disetoknya, dan alat apa pun bisa berpindah lewat perdagangan langsung; setiap anak tangga juga bisa didaftarkan di Pasar dan dikirim lewat surat kecuali tiga alat darat pemula seharga 20 tembaga: yang itu dibeli di konter atau diserahkan dari tangan ke tangan, dan tidak pernah dijual kembali, dikirim lewat surat, atau didaftarkan. Yang dibatasi adalah penggunaannya. Alat darat di atas tingkat 1 baru bekerja setelah kecakapanmu dalam perdagangannya sendiri meraihnya, {tier2Prof} untuk tingkat 2, {tier3Prof} untuk tingkat 3, serta 85 dan 100 untuk dua anak tangga buatan, dan baris penjaja, tooltip, serta tabel di bawah semuanya menyebutkan syarat itu di muka. Sampai saat itu alat yang dibeli lebih awal hanya menunggu di tasmu, tidak membuka tanah, tidak membeli kecepatan, dan tidak mencetak mutu halus, lalu bisa digunakan begitu penghitungmu menyentuh angkanya. Joran pancing adalah satu-satunya pengecualian: tidak ada joran yang membawa syarat penggunaan, dan Saudagar Wilkes di Eastbrook sengaja menyetok joran tingkat 2 dan tingkat 3 untuk para pemancing yang membeli lebih awal. Alat tidak pernah menempati slot perlengkapan dan tidak pernah aus, jadi masing-masing adalah pembelian sekali saja, dan hanya tingkatnya yang penting bagi gerbang itu: alat yang lebih langka pada tingkat yang sama tidak membuka apa pun tambahan. Namun kelangkaan bukan sekadar warna. Ia membuat efek alat yang terpasang bertahan lebih lama, dan pada joran ia melebarkan jendela penarikan.\n\nAlat yang lebih baik membeli tiga hal, bukan dua. Ia membuka tanah bertingkat lebih tinggi, ia memperpendek rapal, dan ia memperbaiki apa yang keluar: kerjakan sebuah urat dengan alat berperingkat DI ATAS material milik zona itu dan panennya menghasilkan mutu halusnya alih-alih yang polos. Uratnya harus salah satu urat bermutu penuh milik zona itu, sehingga urat yang lebih mudah, yang disimpan sebuah zona untuk para pengelana, tetap menghasilkan material biasa. Material halus adalah apa yang dikonsumsi resep alat buatan, dan mutu halus dihitung sebagai versi biasanya di mana pun sebuah resep atau pesanan kerja memintanya, jadi meningkatkan alat tidak pernah membuatmu terdampar: itu hanya berarti bijih tembagamu tiba sebagai Bijih Tembaga Halus.\n\nDi atas tangga penjaja, tiap perdagangan memiliki dua alat buatan, tingkat 4 dan tingkat 5, dibuat di bengkel alat (setiap karakter mengetahui resep alat darat; keahlian yang naik dari pekerjaan itu adalah milik Rekayasa), atau dibeli dengan Tanda Delve di konter Litani Tenggelam begitu gerbang penuntasannya terpenuhi: tabel di bawah memuat harga Tanda dan jumlah penuntasan yang diminta tiap anak tangga. Tidak ada pedagang yang pernah menjualnya dengan koin. Memancing punya sepasangnya sendiri, dan keduanya dipelajari dari sang pembuat alat alih-alih diketahui sejak awal. Tidak ada simpul dan tidak ada perairan hari ini yang membutuhkan lebih dari tingkat 3, jadi dua anak tangga teratas membeli kecepatan, mutu, dan jendela penarikan yang lebih ramah alih-alih akses, dan keduanya akan menjadi tiket masuk saat tanah bertingkat lebih tinggi tiba.",
+      "toolsNoteFishingPageMarks": "Every node needs its trade's tool in your bags, tier 1 included: no pick, no ore, and no pole, no fish. The vendor ladder covers tiers 1 to 3 across the three heartland hubs: the tier-1 tool is sold at all three, the rungs above it where the ground that uses them begins (Fenbridge adds tier 2, Highwatch tier 3), and the younger settlements beyond them stock no tools at all, so kit up before you travel. Farming buys elsewhere: its tier-1 hoe is stocked by the farmer who keeps the first allotment (she stands at the Eastbrook allotments, not at any tool counter), and no hoe rung above it is sold for coin anywhere. Every counter sells every rung it stocks freely, and any tool passes by direct trade; every rung also lists on the Market and travels by mail except the four 20-copper land starters (the Copper Mining Pick, the Handaxe, the Gathering Sickle and the Garden Hoe): those are bought at a counter or passed hand to hand, and never sold back, mailed, or listed. What is gated is the wielding. A land tool above tier 1 works only once your proficiency in its own trade has earned it, {tier2Prof} for tier 2, {tier3Prof} for tier 3, and 85 for tier 4 and 100 for tier 5, and the vendor row, the tooltip, and the table below all name the requirement up front. Until then a tool bought ahead simply waits in your bags, opening no ground, buying no speed, and minting no fine grades, then wields the moment your counter touches its number. Fishing rods are the one exception: no rod carries a wield requirement, and Trader Wilkes in Eastbrook deliberately stocks the tier 2 and tier 3 rods for anglers buying ahead. A tool never occupies an equip slot and never wears out, so each is a one-time purchase, and only the tier matters to the gate: a rarer tool of the same tier opens nothing extra. Rarity is not only colour, though. It makes a slotted tool effect last longer, and on a rod it widens the reel window.\n\nA better tool buys three things, not two. It opens higher-tier ground, it shortens the cast, and it improves what comes out: work a vein with a tool ranked ABOVE the zone's own material and the harvest yields the fine grade of it instead of the plain one. The vein has to be one of the zone's full-grade ones, so the easier veins a zone keeps for travellers still yield the ordinary material. Fine materials are what the crafted tool recipes consume, and a fine grade counts as its ordinary version anywhere a recipe or a work order asks for one, so upgrading never strands you: it just means your copper ore arrives as Fine Copper Ore.\n\nAbove the vendor ladder the three node trades each have two crafted tools, tier 4 and tier 5, made at the toolworks (every character knows those two recipes; the skill that climbs for the work is Engineering's), or bought with Delve Marks at the Drowned Litany counter once its clears gates are met: the table below carries the Marks price and the clears each rung asks. No merchant ever sells them for coin. Farming's ladder is the long one: every hoe above the 20-copper starter is crafted, tiers 2 through 5, all four taught by the toolmaker rather than known from the start, and the top two rungs are also stocked at that same Marks counter. Fishing has three of its own, and they are learned rather than known from the start too: the toolmaker teaches the tier 4 Stormreel and the tier 5 Tidewrought, and the tier 6 Clockreel is built from a schematic instead; the Stormreel and the Tidewrought are also stocked at that same Marks counter, behind the same clears gates as the node tools of their tier, and the fishing page's tool table carries their Marks prices. Rods are the one ladder whose top rungs buy ACCESS on the water: every one of the three opens a catch band that skill alone can never reach, so a better rod is not comfort. For the three node trades no node today needs more than tier 3, so their tier 4 and tier 5 tools still buy speed and grade rather than access, and they will be the entry ticket when higher-tier ground arrives. Farming sits between the two: planting is what needs the hoe, so a bed of tier N asks a hoe of tier N right up to the fourth and last crop tier, and only the fifth rung opens no new ground.",
       "toolCrafted": "Dibuat ({craft})",
       "toolCraftedOrMarks": "Dibuat ({craft}) atau {marks} Tanda Delve setelah tiga penuntasan Litani Tenggelam",
       "toolCraftedOrMarksHeroic": "Dibuat ({craft}) atau {marks} Tanda Delve setelah satu penuntasan Litani Tenggelam Heroik",
@@ -6555,38 +6830,55 @@ export const id_ID: EnTranslations = {
       "yieldsHeading": "Apa yang dihasilkan panen",
       "yieldsBody": "Setiap panen menggulung mutu untuk apa yang diberikannya, dan keahlianmu adalah satu-satunya penentu gulungan itu. Pengumpul baru selalu mengambil material umum; setiap poin keahlian menggeser bobot secara stabil dari umum ke tingkat yang lebih tinggi dan tidak pernah mundur, hingga di batas 100 tingkat umum hilang sepenuhnya: 60 persen tidak umum, 30 persen langka, 8 persen epik, dan 2 persen legendaris, setiap saat.\n\nMutu juga berarti kuantitas: gulungan umum menghasilkan 1 unit, tidak umum dan langka menghasilkan 2, epik 3, dan legendaris 4. Setiap tarikan langka, epik, atau legendaris tiba sebagai salinan bertanda tangan yang distempel Dikumpulkan oleh kamu: di batas itu berarti empat dari sepuluh panen membawa namamu, dan aturan asal-usul pada halaman Ekonomi Kerajinan menjelaskan mengapa pengrajin membayar lebih untuk tumpukan-tumpukan itu.",
       "bandsHeading": "Band kecakapan",
-      "bandsBody": "Band kecakapan adalah tangga 0/100/200 bersama yang membentang di atas penghitung sebuah perdagangan. Untuk perdagangan darat, band yang dilewati pada 100 memangkas waktu pengumpulan, dan batas mereka menjadikan band 1 sebagai langit-langitnya. Band Memancing tidak memangkas apa pun: band menentukan tabel tangkapan (dengan joran yang sepadan), hanya memancing yang mencapai band 2, dan pendakian itu sendirilah yang menarik seorang pemancing ke air yang lebih dalam, tempat tabel yang lebih baik dan pelajaran yang lebih jauh sama-sama berada.",
+      "bandsBodySplitLadder": "Proficiency bands are the shared 0/100/200 ladder over a land trade's counter: the band crossed at 100 shaves the gather cast, and the land cap makes band 1 the ceiling. Fishing keeps a ladder of its own, six rungs at 0, 100, 150 and then three more at 200. Its bands shave nothing; they select the catch tables, each with a rod to match. After that third rung the gate moves once more, to the 200 cap, and then stops: from the cap on, the rod alone decides how far the table goes. The climb is what pulls an angler to deeper water, where the better tables and the further lessons both live.",
       "bandFmt": "Band {band}: dari kecakapan {at}",
       "rareHeading": "Temuan langka",
       "rareBody": "Setiap panen, berapapun keahlianmu, membawa peluang 1 dari {oneIn} untuk menemukan sesuatu yang langka: urat bijih pilihan pada bijih, kayu inti kuno pada kayu, mekar yang bersinar di bawah sinar bulan di antara herba. Temuan ini melipatgandakan hasil panen itu sebanyak {mult} kali lipat, setiap unit tiba dengan tanda tanganmu terlepas dari mutu yang digulir, dan seluruh zona mendengar tentangnya beserta namamu. Setiap jenis juga mengukir tanda kolektor tersendiri yang berhasil Kemasyhuran nol di Kitab Jasamu, sebuah penanda kolektor yang ada semata untuk membuktikan bahwa hal itu terjadi padamu.",
+      "rareBodyFourFlavors": "Every harvest, whatever your skill, carries a 1 in {oneIn} chance of a rare find: a pristine vein in ore, ancient heartwood in timber, a moonlit bloom among the herbs, a golden harvest from a garden bed. The find multiplies that harvest's yield {mult} times over, every unit arrives signed with your name regardless of the quality rolled, and the whole zone hears about it by name. Each flavor also inscribes its own zero-Renown deed in your Book of Deeds, a collector's mark that exists purely to prove it happened to you.",
       "specimenBody": "Sisakan sedikit ruang tas saat kamu berburu bahan: rejeki bertanda tangan butuh ruangnya sendiri atau tumpukan bertanda tangan yang cocok untuk mendarat, dan jika tidak ada yang muat hasilnya tetap datang tetapi tanda tangannya hilang. Pemanenan bangkai juga punya lengan jackpot tersendiri: sekitar {pct}% dari tiap komponen yang dipanen muncul langka atau lebih baik. Keluarga yang punya spesimen sempurna untuk diberikan (kulit, sutra, bisa, daging) menjaga hasil biasanya tetap polos dan mencetak spesimen bertanda tangan di sampingnya; setiap keluarga lain menandatangani hasil panennya sendiri.",
       "gatherDeedsHeading": "Jasa sepanjang jalan",
       "gatherDeeds": {
         "mining": "Simpul pertamamu dari perdagangan mana pun meraih jasa Buah dari Ladang, dan batas 100 dalam Penambangan mengukir jasa Bijih dalam Darah. Mencapai 100 dalam tiga dari Penambangan, Penebangan, Herbalisme, dan Memancing menambahkan jasa Pengumpul Mahir di 25 Kemasyhuran, dan memecahkan urat bijih pilihan mencatat tanda kolektor tersendiri. Tidak satu pun dari ini memberikan kekuatan: jasa adalah gelar dan Kemasyhuran, catatan jalan yang telah kamu lalui.",
         "logging": "Simpul pertamamu dari perdagangan mana pun meraih jasa Buah dari Ladang, dan batas 100 dalam Penebangan mengukir Penebang Kayu Inti. Mencapai 100 dalam tiga dari Penambangan, Penebangan, Herbalisme, dan Memancing menambahkan jasa Pengumpul Mahir di 25 Kemasyhuran, dan satu pukulan pada kayu inti kuno mencatat tanda kolektor tersendiri. Jasa adalah gelar dan Kemasyhuran saja, tidak pernah memberikan kekuatan.",
         "herbalism": "Simpul pertamamu dari perdagangan mana pun meraih jasa Buah dari Ladang, dan batas 100 dalam Herbalisme mengukir Penguasa Padang. Mencapai 100 dalam tiga dari Penambangan, Penebangan, Herbalisme, dan Memancing menambahkan jasa Pengumpul Mahir di 25 Kemasyhuran, dan mekar yang bersinar di bawah sinar bulan mencatat tanda kolektor tersendiri. Jasa adalah gelar dan Kemasyhuran saja, tidak pernah memberikan kekuatan.",
-        "fishing": "Tonggak 100 mengukir Garam Tua dan 200 mengukir Pemancing Mahir beserta gelarnya, puncak tertinggi seni sang pemancing; Memancing juga dihitung untuk Pengumpul Mahir, yang diraih pada 100 di tiga perdagangan pengumpulan mana pun. Ikan pertama dari perairan masing-masing enam zona mengisi halamannya sendiri, tiga zona tanah inti ditambah Paya Willow, Puncak Angin, dan Pesisir Jauh di luar sana, dan Koi Kerlip Surya mencatat Kilau Harapan, sehingga para pengelana yang membawa joran di ranselnya mengisi kitab mereka lebih cepat daripada yang mereka kira."
+        "fishing": "Tonggak 100 mengukir Garam Tua dan 200 mengukir Pemancing Mahir beserta gelarnya, puncak tertinggi seni sang pemancing; Memancing juga dihitung untuk Pengumpul Mahir, yang diraih pada 100 di tiga perdagangan pengumpulan mana pun. Ikan pertama dari perairan masing-masing enam zona mengisi halamannya sendiri, tiga zona tanah inti ditambah Paya Willow, Puncak Angin, dan Pesisir Jauh di luar sana, dan Koi Kerlip Surya mencatat Kilau Harapan, sehingga para pengelana yang membawa joran di ranselnya mengisi kitab mereka lebih cepat daripada yang mereka kira.",
+        "farming": "Farming keeps no deeds of its own yet: now that its beds and crops are in the ground, the milestone and cap deeds that mark the other trades arrive in a later patch. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power.",
+        "farmingSown": "Farming keeps its own shelf in the Book of Deeds now. Sow It Begins marks your first planted crop, and four chronicle pages mark a first thriving harvest at each of the bed sites, from Eastbrook Vale to the Evergarden. A golden harvest records its own zero-Renown collector's mark, and proficiency in Farming counts toward Master Gatherer, earned at 100 in any three gathering trades. Every Furrow Filled gathers the whole roster onto one page: grow every crop the four gardens carry and the collection closes. The capstone above it is Harvestmaster, the trade's 100-proficiency title, and with the mountain and parterre seeds now on their farmers' counters it is a climb you can finish today. Deeds are titles and Renown only, never power."
       },
       "fish": {
         "startHeading": "Memulai",
-        "startBody": "Joran Pancing Sederhana berharga 20 tembaga dari Nelayan Brandt di Eastbrook (cari sang Pelaut Tua di tepi timur kota, di dekat jalan menuju Danau Cermin); Perajin Gizzel, Penyedia Bekal Hale di Fenbridge, dan Kepala Perbekalan Bree di Highwatch juga menyetok joran. Gunakan joran sambil menghadap air yang cukup dalam untuk menampung ikan, hingga sekitar 24 yard di depanmu, dan pelampungmu pun melayang keluar.\n\nKamu tidak bisa melempar saat bertarung, saat berenang, atau saat mati: melempar dari tepian adalah sikap yang dimaksudkan. Namun air menjadi lebih keras seiring daratannya: rawa menuntut setidaknya Joran gulungan besi tingkat 2 dan puncak-puncak menuntut Joran arus perak tingkat 3, dan kail yang dilempar tanpa joran yang diminta air itu tidak akan pernah lepas dari tanganmu. Dua joran duduk di atas keduanya, Stormreel dan Tidewrought: para insinyur membuatnya di bengkel alat dari apa yang ditarik kail, dan konter delve Litani Tenggelam menjualnya dengan Tanda Delve di balik gerbang penuntasannya, meski tidak pernah dengan koin. Tidak ada air yang meminta keduanya, jadi mereka membeli tunggu yang lebih pendek dan jendela penarikan yang lebih lebar alih-alih akses, yang pada anak tangga teratas berarti gigitan dalam tepat tiga detik.",
+        "startBodyThreeRods": "A Simple Fishing Pole costs 20 copper from Fisherman Brandt in Eastbrook (look for the Old Salt at the town's east edge, by the road to Mirror Lake); Tinker Gizzel, Provisioner Hale in Fenbridge, and Quartermaster Bree in Highwatch stock poles too. Use the pole while facing water deep enough to hold fish, up to about 24 yards ahead of you, and your bobber sails out.\n\nYou cannot cast while in combat, while swimming, or while dead: casting from shore is the intended posture. Water gets harder as the land does, though: the marsh wants at least the tier 2 Ironreel and the peaks the tier 3 Silverstream, and a line cast without the rod that water takes never leaves your hand. Three rods sit above those, the Stormreel, the Tidewrought and the Clockreel: engineers craft all three at the toolworks out of what a line pulls up, and the Drowned Litany's delve counter sells the first two for Delve Marks behind its clears gates, though never for coin. No water asks for any of them, but they are not comfort alone: each one opens a catch band that skill by itself cannot reach, so once your counter is capped the rod is the only thing left that decides how deep your table goes. They shorten the wait and widen the reel window besides, which at the top rung means a bite in a flat three seconds.",
         "biteHeading": "Gigitan dan penarikan",
         "biteBody": "Setelah lemparan, gigitan datang pada saat tersembunyi antara {min} dan {max} detik; jedanya ditentukan ketika kail mendarat, jadi tidak ada dua lemparan yang terasa persis sama. Saat pelampung menggigit kamu punya jendela {reel} detik untuk menekan joran lagi dan menarik: tarik di dalam jendela itu dan tangkapan mendarat, ragu melewatinya dan ikan itu kabur tanpa meninggalkan apa pun. Satu sesi utuh dibatasi {cap} detik, sehingga bahkan lemparan yang sepi pun selesai dengan cepat.\n\nJoran yang lebih baik mempertajam kedua ujung minigame ini: setiap tingkat joran di atas yang pertama memangkas {rod} detik dari tunggu terlama yang mungkin, tidak pernah di bawah lantai tiga detik yang sudah disenggol joran teratas, dan menambah {reelRod} detik pada jendela penarikan, sehingga Joran gulungan besi menurunkan tunggu terburuk menjadi 6,5 detik dengan jendela 3,25 detik, dan Joran arus perak menjadi 5 dengan jendela lewat 4, kelangkaannya melebarkan penarikan sedikit di luar apa yang dibayar tingkatnya saja. Gigitan tercepat tidak pernah berubah apa pun yang kamu pegang, dan sebuah joran cukup berada di tasmu untuk dihitung.",
         "earlyReelNote": "Satu peringatan untuk jempol yang tak sabar: tekan joranmu lagi sebelum ada yang menyambar dan kamu menggulung tali kosong, mengakhiri lemparan. Satu detik pertama setelah tali mendarat dimaafkan, jadi tekanan ganda yang tak sengaja tidak merugikanmu; lewat dari itu, menekan terlalu dini berarti lemparan yang terbuang. Kesabaran adalah seluruh permainannya: tunggu sambarannya, lalu sentak.",
         "scheduleHeading": "Perolehan keahlian",
-        "scheduleNote": "Perolehan memancing mengikuti jadwal tetap tanpa lemparan dadu: satu poin penuh per tangkapan di bawah kecakapan 50, setengah poin di bawah 100, sepersepuluh di bawah 150, dan tetesan lambat 0,02 dari 150 ke 200. Rentang terakhir itu memang sengaja menjadi perjalanan ribuan tangkapan: 200 adalah sebuah pernyataan, bukan persinggahan menuju sesuatu yang lain.\n\nRongsokan berhenti mengajar sepenuhnya di {cutoff}: sejak titik itu, rumput air dan sepatu bot hanyalah rumput air dan sepatu bot. Airnya sendiri juga membatasi pelajaran: perairan tingkat 1 milik Lembah (dan setiap pesisir muda di luar tanah inti) tidak mengajarkan apa pun setelah 100, perairan rawa berhenti di 150, dan hanya perairan Thornpeak yang mendidik seorang pemancing sepanjang jalan ke 200. Selain itu setiap tangkapan yang mendarat memberi perolehan sesuai laju jadwalnya, jadi ketika penghitung mandek, jadwal itu sedang menyuruhmu mencari air yang lebih dalam.",
+        "scheduleNoteRetuned": "Fishing gain follows a fixed schedule with no dice: 0.08 of a point per catch below 50 proficiency, 0.05 below 100, 0.04 below 150, and 0.03 from 150 to 200. The curve is deliberately shallow rather than back-loaded: the whole climb to 200 is about eleven hours of active fishing, and no quarter of it costs more than a third of the total, so the last fifty points are a long stretch rather than the whole journey.\n\nJunk stops teaching entirely at {cutoff}: from there on, weeds and boots are just weeds and boots. The water itself caps the lesson too: the Vale's tier 1 waters (and every young shore beyond the heartland) teach nothing past 100, the marsh's stop at 150, and only Thornpeak's school an angler the whole way to 200. Every landed catch otherwise gains at the scheduled rate, so when the counter stalls, the schedule is telling you to seek deeper water.",
         "colProficiency": "Keahlian",
         "colGain": "Perolehan per tangkapan",
         "belowFmt": "Di bawah {below}",
         "tablesHeading": "Tabel tangkapan",
-        "tablesNote": "Kecakapanmu memilih salah satu dari tiga band tangkapan: band 0 sejak awal, band 1 pada 100, band 2 pada 200, masing-masing menggeser bobot dari rongsokan dan kail kosong ke ikan sungguhan, zona demi zona. Setiap band di atas yang pertama juga menuntut joran: band 1 meminta Joran gulungan besi tingkat 2, band 2 meminta Joran arus perak tingkat 3. Band efektifmu adalah yang lebih rendah antara apa yang telah diraih keahlianmu dan apa yang didukung joranmu, dan batas itu senyap: dengan joran yang lebih rendah kamu tetap menangkap, hanya saja dari tabel band yang lebih rendah, jadi jika tangkapanmu terasa mandek sementara keahlianmu naik, periksa joranmu lebih dulu.\n\nPerairan tiap zona menyimpan sepasang ikan pangannya sendiri, menyembuhkan lebih banyak semakin dalam zonanya, semuanya bahan masakan sekaligus makanan duduk-dan-santap yang sangat layak langsung dari kail. Sisa tabelnya adalah pajak sang pemancing: rumput air, sesekali sepatu bot, dan kail kosong, yang tidak pernah hilang sepenuhnya. Berapa besar yang kamu bayar bergantung pada air tempat pelampungmu mendarat, bukan tempatmu berdiri: satu lemparan menjangkau hingga 24 yard, dan joran yang dituntut air itu, tabel yang diundinya, jasa yang dikreditkannya, serta sejauh mana ia mengajar, semuanya menjawab zona pemilik air tersebut, ditentukan pada saat kail mendarat. Air setiap zona ditulis untuk satu band tersendiri, Lembah untuk band 0, rawa untuk band 1, puncak-puncak untuk band 2, dan memancing satu band di bawahnya mengubah kira-kira sepertiga lemparanmu menjadi kail kosong, dua band di bawahnya lebih dari separuh. Joran membawamu ke airnya; keahlianlah yang membuatnya membayar, dan pendakian itulah yang menarik seorang pemancing semakin dalam, karena band yang lebih baik bukan sekadar bayaran yang lebih baik: setelah Lembah, hanya perairan itulah yang terus mengajar. {rare} adalah satu-satunya baris yang menjawab band tangkapanmu dan tidak ada yang lain: peluang yang sama di setiap zona, dan enam kali lebih mungkin pada band 2 daripada pada band 0, sehingga hal paling langka di dermaga adalah hal yang benar-benar lebih dikuasai seorang Pemancing Mahir.",
+        "tablesNoteSixBands": "Your proficiency selects one of six catch bands: band 0 from the start, band 1 at 100, band 2 at 150, and the top three all at 200, each shifting weight out of junk and empty hooks into real fish, zone by zone. Each band above the first also demands a rod, one tier higher every time: band 1 wants the tier 2 Ironreel, band 2 the tier 3 Silverstream, band 3 the tier 4 Stormreel, band 4 the tier 5 Tidewrought, and band 5 the tier 6 Clockreel. Band 2 opens at 150 and the last three all wait for the 200 cap, so the skill gate moves once more and then stops: from the cap on, the rod is the only thing that lifts your table, which is what the crafted rods are for and where the three deep-water catches live. Your effective band is the lower of what your skill has earned and what your rod supports, and the cap is silent: with a lesser rod you still catch, just off the lower band's table, so if your catches feel stuck while your skill climbs, check your rod first.\n\nEach zone's waters hold their own pair of cooking catches, higher-tier fish the deeper the zone, all of them kitchen reagents that must be cooked before they restore anything; from band 3 up, three more join every zone's table at the same weight, so a recipe naming one of those asks the same of an angler wherever they fish. The rest of the table is the angler's tax: weed, the occasional boot, and the empty hook, which never fully disappears. How much you pay depends on the water your bobber lands in, not where you stand: a cast reaches up to 24 yards, and the rod the water demands, the table it draws from, the deed it credits, and how far it teaches all answer to the zone that water belongs to, decided the moment the line lands. Each zone's water is written for a band of its own, the Vale for band 0, the marsh for band 1, the peaks for band 2, and fishing one band under that turns roughly a third of your casts into empty hooks, two bands under it more than half. The rod gets you to the water; the skill is what makes it pay, and the climb is what pulls an angler deeper, because better bands are not just better pay: past the Vale they are the only waters that keep teaching. The {rare} is the one row that answers to your catch band and nothing else: the same odds in every zone, and six times likelier at band 2 than at band 0, so the rarest thing on the dock is the one a Master Angler really is better at.",
         "bandHeading": "Band {band}: keahlian {at} ke atas, tingkat joran {rod}",
         "colCatch": "Tangkapan",
         "colOdds": "Peluang",
         "pctFmt": "{pct}%",
         "emptyHook": "Tidak ada yang menggigit",
         "koiHeading": "Koi Kerlip Surya",
-        "koiBody": "Setiap perairan dalam permainan menyembunyikan hadiah yang sama: Koi Kerlip Surya, kilau tidak umum di ujung kail yang bernilai 75 tembaga bagi penjaja dan jauh lebih berharga bagi harga dirimu. Peluangnya hanya menjawab band tangkapanmu dan tidak ada yang lain, sama di setiap zona: baris 1 persen dari tabel tangkapan pada band 0, 3 pada band 1, dan 6 pada band 2, diundi pada setiap lemparan yang berhasil ditarik, sehingga sang koi datang kepada pemancing yang telah mendapatkan tabel-tabel dalam. Mendaratkan satu ekor mencatat Kilau Harapan di Kitab Jasamu, tanda kolektor tanpa Kemasyhuran. Saat itu terjadi, log memastikan kamu mengetahuinya."
+        "koiBodyBandFlat": "Every body of water in the game hides the same prize: the Sunglint Koi, an uncommon gleam on the line worth 75 copper to a vendor and rather more to your pride. Its odds answer to your catch band and to nothing else, the same in every zone: a 1 percent row of the catch table at band 0, 3 at band 1, and 6 from band 2 upward, drawn on every reeled-in cast, so the koi comes to the angler who earned the deep tables. Landing one records Glimmer of Hope in your Book of Deeds, a zero-Renown collector's mark. When it happens, the log makes sure you know."
+      },
+      "farm": {
+        "rhythmHeading": "The farming rhythm",
+        "rhythmBody": "Planting is the short visible cast: {plant} seconds flat at every rung, because a hoe opens ground rather than buying speed. Pulling a ripe crop is instant. There is no cast to interrupt and no bag check to refuse it, and a bed that has come ready waits as long as you leave it, so a full pack costs a farmer nothing but the walk to empty it.\n\nWhat a harvest pays is produce and farming proficiency. Unlike a vein, it grants no character XP at all, so the beds are a trade to work rather than a way to level.",
+        "gainHeading": "What a harvest teaches",
+        "gainBody": "Gain is deterministic and keyed to your own counter rather than to the crop: {g1} proficiency a harvest below {p1}, {g2} below {p2}, {g3} below {p3}, and {g4} the rest of the way to the cap of {cap}. It is never a skill-up roll, so the climb is exactly as long as the arithmetic makes it.\n\nWhat the crop tier decides is how far a bed can carry you. A tier 1 crop teaches to {c1} and grays there, a tier 2 crop to {c2}, and tier 3 and above to the cap, so moving up the beds is what keeps the counter moving at all.",
+        "yieldsHeading": "What a harvest yields",
+        "yieldsBody": "A bed pays picks rather than a graded pull. Every plot starts with a floor of {floor} lives, and each pick rolls a chance not to spend one: {keep0} percent at a fresh counter and {keepCap} percent at the cap, which works out at roughly three and a half picks at the start and six at the end.\n\nQuality rides those same picks instead of replacing them. Each pick has a {fine0} percent chance at a fresh counter, {fineCap} percent at the cap, of coming up as the crop the bed grew in its fine grade rather than its plain one, so a fine pick upgrades a pick and never adds one. There is no common-to-legendary ladder on a bed: a crop mints its own two grades and nothing else.\n\nTwo things add picks outright, and both land at the plain grade. An alchemist's growth tonic, armed when you plant, pays {tonicPicks} more picks on a {tonicPct} percent chance, and a slotted quantity effect adds {effectCap}, which is the cap farming puts on a Maker's Charm so the tonic keeps a reason to exist. A charged Artisan's Eye works on quality instead, adding {fineBonus} percentage points to every fine roll.",
+        "bedsHeading": "Working the beds",
+        "bedsBody": "The loop is short. Buy seeds and compost from the farmer beside the beds: Jessica in Eastbrook stocks the Vale pair, the Fenbridge farmer the marsh pair, Hollis on the Highwatch terraces the mountain crops, and Verbena the Evergarden parterre. A high-tier harvest also hands back a seed or two of its own, any seed changes hands on the World Market, and the mountain and parterre seeds now turn up in endgame drops and on the Heroic Quartermaster's counter besides, so the farmer beside the beds is the way in rather than the only way. Sow with a hoe in your bags, and tip the odds if you like: compost from the counter and the farmer's watch, paid in produce as you plant, each raise a crop's chance of coming through, an alchemist's growth tonic gives the harvest a shot at a larger yield, and once your skill has climbed a full band past a crop's tier that crop never fails at all. Then walk away. The bed keeps growing while you are logged out, a ripe crop waits as long as you leave it, and the Harvest Journal (Shift+K by default, or the Farming row of your professions window) lists every bed you have planted with its timer.\n\nA crop that fails leaves withered husks in place of produce, and any farmer trades husks for compost, so a bad season buys the next one's insurance. What you bring in feeds more than your own recipes: the produce cooks into the farm dishes at the kitchens, and it now goes into Cook Marlow's own trainer ladder and into the apothecary's elixirs besides, so a farmer has a buyer from the very first rung. And the garden no longer stops at the trainer ladder: the terrace crops season the raid's own role plates and every apex flask, and the Evergarden beds feed the two skill-125 capstone stations, so the last rung of both crafts is bought from a farmer too. Marlow's wheat and rice orders take Vale Wheat and Marsh Rice off your hands for coin on the same clock as every other work order.",
+        "bedsBodyScribeBuyer": "The scribe's desk buys from the beds too: the rung-50 Sunpetal Scroll takes a Frost Gourd off the Highwatch terraces, the same gourd the Elixir of the Serpent takes, which prices the two routes to that buff even.",
+        "tableHeading": "From the beds to the table",
+        "tableBody": "The kitchens are where a season pays forward. Beyond the everyday farm dishes, each crop tier has a richer dish that leaves you Well Fed: finish the meal and a lasting boon stays with you, the kind of edge a group wants eaten before the dungeon door. Crowning the set is the Harvest Feast, a spread a cook sets out in the world itself: everyone at hand takes a serving of their own, one each, and every finished meal pays the same Well Fed boon, so one farmer's season can set the table for a whole party. The top of that ladder, the two richest dishes and the feast itself, leans on the mountain and parterre crops, whose seeds the farmers beside those beds sell. The recipes are another matter: the upper rungs of the farm ladder are no longer taught at any counter, and are found in the endgame or bought with Heroic Marks like every other endgame recipe.\n\nLuck keeps a place at that table too. Every harvest you bring in rolls the same windfall chance the other gathering trades enjoy, and now and then a crop comes up golden: the yield lands far past a normal pull, something extra comes up with it (a seed for finer ground than you are working, or now and then one of those endgame recipes), the whole zone hears the find announced by name, and Golden Harvest is recorded in your Book of Deeds.",
+        "tableBodyOneMeal": "The kitchens are where a season pays forward. Beyond the everyday farm dishes, each crop tier has a richer dish that leaves you Well Fed: finish the meal and a lasting boon stays with you, the kind of edge a group wants eaten before the dungeon door. Only one Well Fed effect at a time: a newer meal replaces it. Crowning the set is the Harvest Feast, a spread a cook sets out in the world itself: everyone at hand takes a serving of their own, one each, and every finished meal pays the same Well Fed boon, so one farmer's season can set the table for a whole party. The top of that ladder, the two richest dishes and the feast itself, leans on the mountain and parterre crops, whose seeds the farmers beside those beds sell. The recipes are another matter: the upper rungs of the farm ladder are no longer taught at any counter, and are found in the endgame or bought with Heroic Marks like every other endgame recipe. The dish ladder itself is Cooking's work: the Cooking page carries every rung.\n\nLuck keeps a place at that table too. Every harvest you bring in rolls the same windfall chance the other gathering trades enjoy, and now and then a crop comes up golden: the yield lands far past a normal pull, something extra comes up with it (a seed for finer ground than you are working, or now and then one of those endgame recipes), the whole zone hears the find announced by name, and Golden Harvest is recorded in your Book of Deeds."
       },
       "econ": {
         "title": "Ekonomi Kerajinan",
@@ -6610,7 +6902,7 @@ export const id_ID: EnTranslations = {
         "marketHeading": "Pasar Dunia dan potongannya",
         "marketBody": "Pasar Dunia adalah bursa seluruh realm, dijaga oleh Pedagang di Eastbrook dan Pelelang Voss di Highwatch. Pendaftaran gratis: tidak ada setoran, dan daftar yang tidak terjual hanya kembali kepadamu. Rumah mengambil potongannya hanya ketika sesuatu benar-benar terjual: 5 persen dari harga jual, dan sisanya menunggumu untuk diambil.\n\nSatu batas penting: Pasar hanya menjadi perantara barang biasa. Salinan yang ditandatangani, karya besar, terpesonan, atau terikat tidak pernah masuk ke daftar, sehingga item istimewa berpindah tangan secara langsung di jendela perdagangan, yang membawa identitas lengkap item, termasuk tanda tangan. Tentukan harga sendiri; Pasar hanya memberi tahu kamu berapa harga versi biasanya.",
         "workOrdersHeading": "Pesanan kerja",
-        "workOrdersNote": "Setiap master stasiun memposting pesanan kerja tetap: bawa setumpuk bahan pokok kerajinan mereka dan langsung dibayar di tempat, ditambah sedikit pengalaman misi. Bayarannya sengaja {pct}% dari harga yang akan diberikan pedagang untuk tumpukan yang sama, dibulatkan ke bawah, sehingga pesanan kerja tidak pernah menjadi cara menguntungkan untuk menjual bahan, hanya alasan untuk mampir ke stasiun.\n\nSetiap pesanan berjalan pada jam {minutes} menit tersendiri per karakter: serahkan satu dan master itu tidak punya apa-apa lagi untukmu hingga penghitung waktu berputar. Perlakukan sebagai bonus kecil pada bahan yang sudah kamu kumpulkan, bukan bisnis.",
+        "workOrdersNote": "Setiap master stasiun memposting pesanan kerja tetap, satu per bahan pokok: bawa tumpukan yang diminta sebuah pesanan dan langsung dibayar di tempat, ditambah sedikit pengalaman misi. Bayarannya sengaja {pct}% dari harga yang akan diberikan pedagang untuk tumpukan yang sama, dibulatkan ke bawah, sehingga pesanan kerja tidak pernah menjadi cara menguntungkan untuk menjual bahan, hanya alasan untuk mampir ke stasiun.\n\nSetiap pesanan berjalan pada jam {minutes} menit tersendiri per karakter: serahkan satu dan pesanan itu tertutup untukmu hingga penghitung waktu berputar, sementara pesanan lain dari master tetap terbuka. Perlakukan sebagai bonus kecil pada bahan yang sudah kamu kumpulkan, bukan bisnis.",
         "colOrder": "Pesanan kerja",
         "colMaster": "Master",
         "colAsks": "Meminta",
@@ -6618,7 +6910,7 @@ export const id_ID: EnTranslations = {
         "commissionsHeading": "Karya pesanan dan Ikatan Pembuat",
         "commissionsBody": "Karya pesanan adalah pembuatan yang dilakukan untuk seseorang. Saat membuat senjata, potongan zirah, atau off-hand yang dipegang (ramuan tidak bisa membawa ikatan), pembuat bisa menandai pembuatan itu sebagai karya pesanan: item yang selesai berperilaku normal di tangan pembuatnya sendiri, tetapi begitu berpindah tangan dalam perdagangan, ia terikat pada orang yang menerimanya. Itulah Ikatan Pembuat: pembeli mendapat itemnya, dan item itu tidak bisa diteruskan atau dijual kembali.\n\nIkatan bukan untuk selamanya, hanya mahal. Setiap master stasiun bisa melepas ikatan karya pesanan sementara kamu berdiri di stasiunnya (stasiun bergerak tidak pernah menawarkan layanan ini), dengan biaya yang ditetapkan berdasarkan kualitas item: 25 perak untuk tidak umum, 1 emas untuk langka, 4 emas untuk epik, dengan item legendaris membayar tarif epik dan karya pesanan biasa membayar tarif tidak umum.\n\nBiaya tersebut membeli lembar bersih, bukan penyembuhan: item masih merupakan karya pesanan, sehingga ia terikat kembali pada siapa pun yang menerimanya dalam perdagangan berikutnya, dan semua hal lain tentangnya, tanda tangan, karya besar, dan mantra, tetap tidak berubah.",
         "provenanceHeading": "Karya bertanda tangan",
-        "provenanceBody": "Sebagian item membawa sebuah nama. Arahkan kursor padanya dan tooltipnya berkata Dikumpulkan oleh si anu pada material mentah, atau Dibuat oleh si anu pada potongan jadi: tanda yang sama, dirumuskan sesuai bagaimana item itu terwujud. Tanda tangan adalah bagian dari item itu sendiri, ikut berkelana bersamanya melewati perdagangan, bank, surat, Pasar Dunia, dan bahkan pembelian kembali oleh penjaja, dan tidak pernah memudar.\n\nPengumpulan menandatangani karya terbaiknya secara otomatis: setiap panen yang melempar langka atau lebih baik datang bertanda tangan, dan temuan langka menandatangani seluruh rejeki lima kali lipatnya. Lemparan beruntung pada panen bangkai menandatangani hasilnya jika keluarga itu tidak punya spesimen untuk diberikan, dan jika punya, hasilnya dibiarkan polos dan spesimen murni bertanda tangan dicetak di sampingnya. Pembuatan menandatangani menurut garis yang sama: setiap salinan keluaran langka atau lebih baik dicetak bertanda tangan, dan karya besar selalu bertanda tangan apa pun mutunya, sehingga versi terhalus dari potongan mana pun selalu menyebut nama pembuatnya. Satu-satunya hal yang bisa merenggut tanda tanganmu adalah tas yang penuh: satu unit bertanda tangan membutuhkan ruang tersendiri, atau tumpukan bertanda tangan yang cocok, untuk mendarat.\n\nSetumpuk item berbagi satu identitas, sehingga dua salinan menyatu hanya bila setiap tandanya cocok persis: item yang sama, penanda tangan yang sama, statistik karya besar yang sama, mantra yang sama, ikatan yang sama. Kayu gelondongan bertanda tangan tidak pernah bergabung dengan tumpukan polos ke arah mana pun (menyatukannya akan menghapus nama seseorang), tetapi muatan yang identik menyatu dengan senang hati, sehingga dua puluh bijih yang ditandatangani pengumpul yang sama duduk dalam satu tumpukan dan sebuah rejeki tidak mencabik-cabik tasmu.\n\nTanda tangan membayar balik para perajin: memegang salinan bertanda tangan mana pun dari reagen yang dibutuhkan di bangku kerja, siapa pun yang menandatanganinya, menambah 2 poin persentase peluang karya besar, dan memegang reagen yang ditandatangani tanganmu sendiri memangkas kuantitas yang diperlukan reagen itu sebanyak satu (tidak pernah di bawah satu). Karyamu sendiri yang bertanda tangan dan bermutu langka atau lebih baik bahkan terus mengajarimu, hari ini hanya lewat labu ramuan: minum ramuan yang kamu tandatangani dan setetes kecil keahlian mengalir kembali ke kerajinan yang menyeduhnya, selama kerajinan itu adalah salah satu kerajinan utamamu yang aktif.",
+        "provenanceBody": "Some items carry a name. Hover one and the tooltip says Gathered by so-and-so on a raw material, or Crafted by so-and-so on a finished piece: the same mark, worded for how the item came to be. A signature is part of the item itself, travels with it through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fades.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. The one thing that can cost you a signature is a full bag: a signed unit needs room of its own, or a matching signed stack, to land in.\n\nA stack of items shares one identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. A signed log never joins a plain pile in either direction (merging would erase somebody's name), but identical payloads merge happily, so twenty ore signed by the same gatherer sit in one stack and a windfall does not shred your bags.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
         "collectorsHeading": "Kolektor, piala, dan harga sebuah cerita",
         "collectorsBody": "Pedagang NPC buta terhadap asal-usul: item bertanda tangan dijual ke NPC dengan harga biasanya. Premium pada tanda tangan hanya ada di antara pemain, dan itulah yang membuatnya menarik: setumpuk bijih rejeki yang ditandatangani oleh pengumpul terkenal, Potongan Utama dari panen yang beruntung, sebuah bilah karya besar yang mencantumkan nama pembuat yang sudah pensiun, semuanya berharga sebanyak yang dikatakan ingatan seseorang.\n\nKitab Jasa bersandar pada naluri yang sama: Urat Murni, Kayu Hati Kuno, Mekar Bulan Purnama, Spesimen Sempurna, dan Kilau Harapan adalah tanda kolektor tanpa Kemasyhuran yang ada semata-mata untuk membuktikan bahwa sebuah momen pernah terjadi padamu. Simpan item yang mendapat jasa tersebut dan kamu memegang kuitansinya. Tidak ada daya di sini; asal-usul tidak membeli stat dan tidak memenangkan pertarungan, itu adalah jejak kertas permainan tentang hari-hari yang baik.",
         "castPaceHeading": "Waktu rapal dan saluran pembuangan koin",
@@ -6637,13 +6929,31 @@ export const id_ID: EnTranslations = {
         "orderBoardBody": "Kamu tidak perlu mencari perajin lewat obrolan. Buka jendela kerajinanmu dan papan pesanan komisi hanya sejauh satu klik di headernya. Siapa pun bisa memasang pesanan di sana: sebutkan resep yang ingin kamu buatkan, lalu biarkan terbuka untuk diambil perajin mana pun, atau tujukan pada satu perajin bernama, yang kemudian menjadi satu-satunya orang yang bisa mengambilnya. Seorang perajin yang menelusuri papan menerima sebuah pesanan, dan menerima berarti dia terikat padanya, sehingga sebuah pekerjaan hanya pernah dikerjakan oleh satu orang pada satu waktu.\n\nTidak ada yang ditahan saat kamu memasang pesanan: sebuah pesanan tidak memesan koin maupun material, sehingga harga dan siapa yang menyediakan reagen tetap menjadi urusan kalian berdua, disepakati sebagaimana komisi mana pun disepakati. Kamu bisa membatalkan pesananmu sendiri selama masih terbuka, dan pesanan yang tidak diambil siapa pun kedaluwarsa dengan sendirinya setelah satu hari. Begitu seorang perajin menerimanya, penyerahanlah yang menutup pesanan itu.\n\nPenyerahan terjadi secara langsung. Perajin itu membuat karyanya sebagai komisi, mendatangimu, dan menyerahkannya, jadi sisakan satu slot tas untuk menerimanya. Apa yang tiba mengikuti aturan komisi biasa di bawah, terikat kepadamu melalui Ikatan Pembuat.",
         "commissionsBoardNote": "Ada dua jalan menuju sebuah komisi: sebuah pesanan yang kamu pasang di papan di atas, yang membawa pekerjaan itu kepada seorang perajin, dan seorang perajin yang begitu saja memilih membuatkan sepotong karya untukmu. Keduanya berakhir pada ikatan yang sama."
       },
+      "prov": {
+        "title": "Provisioning: from the field to the raid",
+        "intro": "The gathering lines meet in one kitchen, and the ladder above it ends at a table a whole raid eats from.",
+        "suppliersHeading": "Who feeds the kitchen",
+        "suppliersBody": "Cooking takes from nearly every gathering line, and that is deliberate: a cook who also fishes, farms, or skins is never short of something to work with, and a cook who does none of those can buy the lot on the market.\n\nWhat each line brings is listed below, and it is read straight off the live recipe list rather than written down here, so it is always what the kitchen actually asks for today.",
+        "lineCountFmt": "{count} into cooking bills",
+        "lineCorpse": "Corpse harvesting",
+        "ladderHeading": "The ladder, rung by rung",
+        "ladderBody": "Cooking climbs in the usual brackets, and every rung is listed with what it teaches. The early rungs are single dishes you eat from your bags. Higher up the kitchen starts making things for other people: plates that carry a lasting buff, and above those the feasts, which you do not eat at all but set down on the ground for everyone standing near it.",
+        "rungFmt": "Cooking {skill}",
+        "placeableTag": "(placed, not eaten)",
+        "stationTag": "(field station)",
+        "tableHeading": "The table at the top",
+        "tableBody": "A feast is set down where you stand and anyone nearby takes one serving each. What a serving gives is exactly the dish that feast is built around, so a feast never has power of its own to learn: it is a way of handing a whole group the plate you already know how to cook.\n\nThe top of the ladder is three feasts rather than one, and picking between them is the only choice there is. They cost the same, ask for the same materials, and take the same skill; each simply serves a different one of the three great plates, so a group takes the one that suits what it is about to do. Only one feast of yours can stand at a time, whichever rung it came from, and it keeps for a few minutes before it is cleared away.",
+        "marketHeading": "If you cook none of it",
+        "marketBody": "None of this is a wall for anyone who does not cook. Every material on this page is ordinary tradable goods, so a fisher sells catches, a farmer sells crops, and a raider who does neither buys a feast outright from a cook who made a spare. The kitchen is a place the professions meet, never a toll on the ones who skip it.",
+        "cookingLink": "Cooking"
+      },
       "faq": {
         "title": "FAQ Profesi",
         "intro": "Jawaban cepat untuk pertanyaan yang paling sering ditanyakan para pembuat.",
-        "q1": "Mengapa item bertanda tangan saya tidak menumpuk?",
-        "a1": "Item bertanda tangan adalah item yang diinstansiasi: ia membawa catatan kecilnya sendiri (penanda tangan, kualitas yang dihasilkan, stat karya besar, mantra, ikatan) alih-alih menjadi salinan anonim. Dua salinan hanya bergabung menjadi satu tumpukan jika catatan tersebut cocok persis.\n\nDalam praktiknya: bijih langka yang kamu kumpulkan sendiri menumpuk dengan bijih langka lainnya yang kamu kumpulkan sendiri, karena keduanya mengatakan Dikumpulkan oleh kamu dan tidak ada perbedaan lain. Bahan yang sama yang ditandatangani oleh teman berada di slotnya sendiri, dan salinan biasa yang tidak ditandatangani tidak pernah bergabung ke tumpukan bertanda tangan. Tas, bank, dan perdagangan semuanya mengikuti satu aturan ini.",
+        "q1": "Why do my signed items not stack?",
+        "a1": "A signed item is an instanced item: it carries its own little record (the signer, any rolled quality, masterwork stats, an enchant, a bond) instead of being an anonymous copy. Two copies merge into one stack only when those records match exactly.\n\nIn practice: rare ore you gathered yourself stacks with more rare ore you gathered yourself, because both say Gathered by you and nothing else differs. The same material signed by a friend sits in its own slot, and a plain unsigned copy never merges into a signed stack. Bags, bank, trade, mail, and the World Market all follow this one rule.",
         "q2": "Apakah resep biasa menaikkan keahlian saya selamanya?",
-        "a2": "Tidak. Setiap resep dinilai berdasarkan seberapa jauh ia berada di bawah braketmu saat ini dalam kerajinan itu, pembacaan klasik oranye, kuning, hijau, abu-abu: keuntungan penuh pada atau di atas braketmu, setengah satu tingkat di bawah, seperempat dua tingkat di bawah, dan tidak ada tiga tingkat atau lebih di bawah. Braket setiap 25 keahlian, sehingga resep keahlian 0 gratis berhenti mengajarimu apapun pada keahlian 75.\n\nBatasnya juga lebih rendah dari 300 klasik yang mungkin kamu harapkan: masing-masing dari delapan kerajinan yang bisa diperoleh dibatasi pada 125, Penambangan, Penebangan, dan Herbalisme dibatasi pada 100, dan Memancing berjalan lebih panjang pada 200. Mendaki berarti naik ke resep di braketmu sendiri, bukan menggiling yang termurah.",
+        "a2": "No. Every recipe is scored by how far it sits below your current bracket in that craft, the classic orange, yellow, green, gray reading: full gain at or above your bracket, half one tier below, a quarter two tiers below, and nothing three or more below. Brackets are every 25 skill, so the free skill 0 recipes stop teaching you anything at 75 skill.\n\nThe caps are also lower than the classic 300 you might expect: each of the ten earnable crafts caps at 125, Mining, Logging, and Herbalism cap at 100, and Fishing runs long at 200. Climbing means moving up to recipes at your own bracket, not grinding the cheapest one.",
         "q3": "Apa perbedaan antara menjarah dan memanen bangkai?",
         "a3": "Satu tekanan mencakup keduanya. Semua yang dipegang bangkai, koin dan jarahan ditambah komponen yang bisa dipanen, terbuka di jendela yang sama: penjarahan mengikuti aturan jarahan normal, dan pemanenan adalah sisi profesi, mengupas bahan dari bangkai itu sendiri.\n\nPemanenan adalah siapa cepat, sekali pakai: setiap bangkai hanya bisa dipanen sekali, oleh siapapun yang mengklaimnya pertama, termasuk secara online. Fokus Kotamu membentuk apa yang kamu dapatkan: saat berdiri di pusat kota kamu bisa menyebarkan 10 poin fokus ke jenis komponen yang kamu pedulikan, dan setiap komponen yang difokuskan menghasilkan tingkat yang lebih baik (setiap 5 poin menaikkannya satu langkah, maksimal dua langkah) dan menghasilkan lebih banyak (10 persen per poin). Komponen yang tidak difokuskan tidak pernah dibuat lebih buruk.",
         "q4": "Mengapa Batang Kayu Ironbark saya bertanda tangan?",
@@ -6651,18 +6961,20 @@ export const id_ID: EnTranslations = {
         "q5": "Bagaimana cara melepas ikatan karya pesanan, dan berapa biayanya?",
         "a5": "Pergi ke stasiun kerajinan mana pun dengan item di tasmu dan bayar masternya. Biaya mengikuti kualitas item: 25 perak untuk item tidak umum, 1 emas untuk langka, 4 emas untuk epik; legendaris membayar tarif epik, dan karya pesanan biasa membayar tarif tidak umum. Harus berupa stasiun sungguhan: stasiun bergerak tidak pernah menawarkan layanan ini.\n\nBiaya tersebut membeli lembar bersih, bukan penyembuhan: item tetap merupakan karya pesanan, sehingga ia terikat kembali pada siapapun yang menerimanya dalam perdagangan berikutnya. Jika beberapa salinan terikat berbagi tumpukan, satu salinan diambil dan dilepas ikatannya per pembayaran.",
         "q6": "Di mana saya belajar resep, dan berapa biayanya?",
-        "a6": "Sembilan resep lapangan biasa dan enam resep alat darat buatan diketahui semua orang sejak awal, begitu pula tiga resep yang terikat stasiun (Kilnscale Mantle, Tudung Tenun Pelindung, dan Balutan Kulit Senja), yang tidak membutuhkan pelatih, hanya stasiunnya. Selebihnya diajarkan oleh para master yang menetap di stasiun mereka di tiga kota hub: sebagian besar berdiri di Eastbrook, sang penyamak menjaga penyamakan di Fenbridge, dan sang alkemis menjaga apoteker di Highwatch.\n\nResep pelatih berjalan dalam anak tangga: keahlian 0, 25, dan 50 untuk kerajinan perlengkapan dan konsumabel, dengan harga gratis, 25 perak, dan 1 emas sebagai biaya sekali bayar; dua resep jimat Pemantraan duduk di anak tangga 25, dan sang pembuat alat mengajarkan dua joran pancing buatan pada 75 dan 125 seharga 4 dan 16 emas. Seorang master mengajarkan resep begitu braketmu dalam kerajinan itu mencapai braket resepnya sendiri, dan kamu harus berdiri di stasiunnya untuk belajar: stasiun bergerak tidak dihitung.",
+        "a6ThreeRods": "The nine common field recipes and the six crafted land-tool recipes are known to everyone from the start, and so are three station-bound recipes (the Kilnscale Mantle, the Wardweave Cowl, and the Duskhide Wraps), which need no trainer, only their station. Everything else is taught by the resident masters at their stations across the three hub towns: most stand in Eastbrook, the tanner keeps the tannery in Fenbridge, and the alchemist keeps the apothecary in Highwatch.\n\nTrainer recipes run in rungs: skill 0, 25, and 50 for the gear and consumable crafts, priced free, 25 silver, and 1 gold as one-time fees, and every craft adds one 75-rung intermediate above them at its station (Enchanting's is the Lucent Reagent, beside its two charm recipes on the 25 rung); the toolmaker also teaches two of the three crafted fishing rods, at 75 and 125 for 4 and 16 gold (the apex rung is learned from a schematic instead, so no trainer quotes it a fee). A master teaches a recipe once your bracket in that craft has reached the recipe's own bracket, and you must be standing at their station to learn: a mobile station does not count.",
         "q7": "Mengapa pengumpulan saya tiba-tiba melambat?",
-        "a7": "Rapal panen dimulai pada 2,5 detik dan dipangkas dengan dua cara: 0,4 detik untuk setiap tingkat alat yang kamu bawa dan bisa kamu gunakan di atas tingkat simpul itu sendiri, dan 0,15 detik begitu penghitung perdaganganmu melewati band 100-nya, dengan lantai 1,5 detik. Berpindah dari simpul tingkat 1 ke simpul tingkat 3 dan kelebihanmu lenyap, sehingga beliung yang sama mengayun lebih lambat lagi. Memegang tepat tingkat yang disyaratkan tidak membeli kecepatan; itu hanya membuka simpulnya.\n\nPerolehan keahlian memudar dengan cara yang sama seperti pembuatan: sebuah simpul berubah abu-abu saat kecakapanmu naik melewati tingkatnya (simpul tingkat 1 tidak mengajarkan apa pun mulai dari kecakapan 75), jadi jawaban untuk perolehan yang lambat adalah simpul bertingkat lebih tinggi. Simpul itu membutuhkan alat setidaknya setingkat dengannya di tasmu (tidak ada simpul yang pernah dikerjakan dengan tangan kosong, tingkat 1 sekalipun), dan alat darat di atas tingkat 1 juga menuntut tanda penggunaannya lebih dulu, 40/70/85/100 dalam perdagangannya sendiri untuk tingkat 2 sampai 5. Memancing mengikuti penirusannya sendiri: perolehan penuh di bawah kecakapan 50, setengah di bawah 100, tetesan 0,1 di bawah 150 dan 0,02 di bawah 200, tangkapan rongsokan tidak mengajarkan apa pun sama sekali mulai dari 100, dan airnya sendiri membatasi pelajaran (perairan tingkat 1 berhenti mengajar pada 100, rawa pada 150), sehingga penghitung yang mandek juga bisa berarti kamu sudah melampaui airnya.",
+        "a7RetunedTaper": "The gather cast starts at 2.5 seconds and is shaved down two ways: 0.4 seconds for every tool tier you carry and can wield above the node's own tier, and 0.15 seconds once your trade's counter crosses its 100 band, with a floor of 1.5 seconds. Move from tier 1 nodes up to tier 3 nodes and your surplus vanishes, so the same pick swings slower again. Holding exactly the required tier buys no speed; it only opens the node.\n\nSkill gain fades the same way crafting does: a node grays out as your proficiency climbs past its tier (tier 1 nodes teach nothing from proficiency 75 on), so the answer to slow gains is higher tier nodes. Those need a tool of at least their tier in your bags (no node is ever worked bare-handed, tier 1 included), and a land tool above tier 1 also wants its wield mark first, 40/70/85/100 in its own trade for tiers 2 through 5. Fishing follows its own taper: 0.08 per catch below 50 proficiency, 0.05 below 100, 0.04 below 150 and 0.03 below 200, junk catches teach nothing at all from 100 on, and the water itself caps the lesson (tier 1 waters stop teaching at 100, the marsh at 150), so a stalled counter can also mean you have outgrown the water.",
         "q8": "Bisakah saya membuat di luar kota?",
         "a8": "Sebagian. Sembilan resep lapangan biasa (senjata, zirah, makanan, dan ramuan pokok untuk pemula) bisa dibuat di mana saja, kapan saja, begitu pula tiga resep kombinasi milik pasangan yang telah disumpah. Selebihnya di atas itu terikat pada satu jenis stasiun: tempa, dapur, apoteker, penyamakan, alat tenun, atau bengkel alat, dan kamu harus berada dalam 20 yard dari stasiun agar pembuatan bisa berjalan.\n\nPada keahlian 75 dalam sebuah kerajinan kamu terspesialisasi, dan bersama diskon material 20 persen kamu mendapatkan stasiun bergerak: letakkan di lapangan dan ia berdiri selama 10 menit, melayani resep kerajinan itu seolah-olah kamu berada di stasiun sungguhan. Stasiun bergerak hanya untuk membuat: mempelajari resep dan melepas ikatan karya pesanan selalu membutuhkan stasiun asli di kota.",
         "q9": "Bagaimana cara mendapatkan sesuatu yang dibuatkan untuk saya?",
         "a9": "Pasang di papan pesanan komisi. Buka jendela kerajinan, buka papannya dari headernya, dan sebutkan resep yang ingin kamu buatkan: biarkan pesanan itu terbuka untuk diterima siapa pun, atau tujukan pada satu perajin yang sudah kamu kenal. Menerima mengikat perajin itu pada pekerjaan tersebut, dan sebuah pesanan hanya pernah dipegang oleh satu orang pada satu waktu.\n\nTidak ada koin dan tidak ada material yang ditahan saat kamu memasang pesanan, jadi sepakati harga dan siapa yang membawa reagen di antara kalian berdua, sebagaimana komisi selalu diatur. Kamu bisa membatalkan pesananmu sendiri selama masih terbuka, dan pesanan yang tidak diterima siapa pun kedaluwarsa setelah satu hari. Penyerahan dilakukan secara langsung: berdirilah di dekat perajinmu dengan slot tas kosong saat karyanya sudah selesai. Ia tiba terikat kepadamu melalui Ikatan Pembuat, yang bisa dilepas oleh master stasiun mana pun dengan biaya seperti biasa.",
         "q10": "Apa itu jimat, dan apa yang terjadi ketika ia kehabisan muatan?",
-        "a10": "Jimat adalah efek alat yang dipasang di slot: karya seorang pemantra yang bersemayam di alat pengumpul dan memperbaiki apa yang dihasilkannya. Simpanan Sang Pengumpul menambah satu unit pada sebuah panen, Mata Sang Perajin menaikkan tingkatnya, dan Gizzel Tinker mengajarkan keduanya di bengkel perkakas Eastbrook pada Pemantraan 25. Satu muatan dihabiskan hanya ketika jimat itu benar-benar mengubah hasilnya, sehingga panen yang tidak bisa diperbaikinya tidak membebanimu sama sekali, dan sebuah slot bisa diatur untuk bertanya setiap kali dipakai jika kamu lebih suka memutuskan muatan demi muatan.\n\nJimat baru membawa 20 muatan pada alat umum dan 10 lagi untuk tiap anak tangga kelangkaan di atasnya, sehingga alat epik dimulai dengan 50. Kehabisan muatan tidak menghancurkan jimatnya: pemilik alat mengisi ulang slot itu, 10 muatan per material arkana, dengan material yang diminta mengikuti yang lebih baik antara alat yang sedang mereka bawa dan alat terbaik yang pernah mengisi slot itu (Debu Dentingan untuk alat umum atau tidak umum, Esensi Dentingan untuk yang langka, Serpihan Dentingan untuk yang epik). Menyimpan alat yang bagus di bank sebelum mengisi ulang tidak pernah membuatnya lebih murah, hanya lebih kecil dengan harga yang sama, dan memasang jimat baru sambil membawa alat yang lebih rendah adalah cara jujur untuk turun ke anak tangga yang lebih murah. Pemantra yang menandatangani jimat itu membayar separuh untuk mengisi ulang miliknya sendiri, dan lebih sedikit lagi dengan spesialisasi Pemantraan."
+        "a10": "Jimat adalah efek alat yang dipasang di slot: karya seorang pemantra yang bersemayam di alat pengumpul dan memperbaiki apa yang dihasilkannya. Simpanan Sang Pengumpul menambah satu unit pada sebuah panen, Mata Sang Perajin menaikkan tingkatnya, dan Gizzel Tinker mengajarkan keduanya di bengkel perkakas Eastbrook pada Pemantraan 25. Satu muatan dihabiskan hanya ketika jimat itu benar-benar mengubah hasilnya, sehingga panen yang tidak bisa diperbaikinya tidak membebanimu sama sekali, dan sebuah slot bisa diatur untuk bertanya setiap kali dipakai jika kamu lebih suka memutuskan muatan demi muatan.\n\nJimat baru membawa 20 muatan pada alat umum dan 10 lagi untuk tiap anak tangga kelangkaan di atasnya, sehingga alat epik dimulai dengan 50. Kehabisan muatan tidak menghancurkan jimatnya: pemilik alat mengisi ulang slot itu, 10 muatan per material arkana, dengan material yang diminta mengikuti yang lebih baik antara alat yang sedang mereka bawa dan alat terbaik yang pernah mengisi slot itu (Debu Dentingan untuk alat umum atau tidak umum, Esensi Dentingan untuk yang langka, Serpihan Dentingan untuk yang epik). Menyimpan alat yang bagus di bank sebelum mengisi ulang tidak pernah membuatnya lebih murah, hanya lebih kecil dengan harga yang sama, dan memasang jimat baru sambil membawa alat yang lebih rendah adalah cara jujur untuk turun ke anak tangga yang lebih murah. Pemantra yang menandatangani jimat itu membayar separuh untuk mengisi ulang miliknya sendiri, dan lebih sedikit lagi dengan spesialisasi Pemantraan.",
+        "q11": "How do I make an orange item?",
+        "a11Promotion": "Craft or buy an apex Masterwrought piece, then perfect it: with 125 skill in the craft that made it, each attempt spends one Maker's Ember, one Sundered Essence, and one Prismglass Setting, succeeds four times in five, and never harms the piece when it misses. The first attempt binds the piece to you, and four successful ranks make it Perfected. Then spend one Deed of Making, an inscriptionist's skill-125 writ anyone can buy or commission, to promote the Perfected copy into a legendary named whatever you choose. The promotion is deterministic: no roll, stats unchanged, only the name and the color change."
       },
       "findingNodesNote": "Kamu tidak perlu mencarinya dengan mata sendiri. Setiap simpul di zona itu digambar di peta zona di mana pun peta itu menampilkan tanah tersebut, dan di minimap saat kamu melewatinya, sehingga sebuah putaran panen bisa direncanakan dari layar peta sebelum kamu berangkat. Simpul yang belum bisa dikerjakan alatmu ditandai, bukan disembunyikan: ia tetap ada di tempatnya dengan tanda pudar bercoret, sehingga kamu bisa melihat tanah yang sedang kamu tuju lewat latihan. Di desktop, mengarahkan kursor ke sebuah urat, rumpun, atau petak di dunia menyebutkan namanya, memberitahumu alat yang dibutuhkannya, dan, begitu kamu pernah mengerjakannya, menghitung mundur kemunculannya kembali hingga ke detik. Di layar sentuh tidak ada yang bisa diarahkan kursor, sehingga tanda di minimap menyampaikan cerita yang sama.",
-      "specimenBodyFamilies": "Sisakan sedikit ruang tas saat kamu berburu bahan: rejeki bertanda tangan butuh ruangnya sendiri atau tumpukan bertanda tangan yang cocok untuk mendarat, dan jika tidak ada yang muat hasilnya tetap datang tetapi tanda tangannya hilang. Pemanenan bangkai juga punya lengan jackpot tersendiri: sekitar {pct}% dari tiap komponen yang dipanen muncul langka atau lebih baik. Keluarga yang punya spesimen sempurna untuk diberikan (kulit, sutra, bisa, cakar, daging) menjaga hasil biasanya tetap polos dan mencetak spesimen bertanda tangan di sampingnya; tiga keluarga lainnya, taring, kain, dan gading, menandatangani hasil panennya sendiri."
+      "specimenBodyFamilies": "Sisakan sedikit ruang tas saat kamu berburu bahan: rejeki bertanda tangan butuh ruangnya sendiri atau tumpukan bertanda tangan yang cocok untuk mendarat, dan jika tidak ada yang muat hasilnya tetap datang tetapi tanda tangannya hilang. Pemanenan bangkai juga punya lengan jackpot tersendiri: sekitar {pct}% dari tiap komponen yang dipanen muncul langka atau lebih baik. Keluarga yang punya spesimen sempurna untuk diberikan (kulit, sutra, bisa, cakar, daging) menjaga hasil biasanya tetap polos dan mencetak spesimen bertanda tangan di sampingnya; lima keluarga lainnya, taring, kain, gading, tanduk, dan insang, menandatangani hasil panennya sendiri."
     },
     "economy": {
       "intro": "Koin melumasi seluruh dunia: ia membeli perlengkapanmu, persediaan, dan perlengkapan perjalanan, serta berpindah tangan antarpemain. Kamu mengumpulkan semua ini hanya dengan bermain, jadi anggaplah halaman ini sebagai peta dari mana uangmu datang dan ke mana ia pergi.",
@@ -6731,6 +7043,7 @@ export const id_ID: EnTranslations = {
       "lootCommonBody": "Jarahan biasa bisa bergiliran di antara party atau jatuh ke siapa pun yang menjarah, sementara jarahan yang lebih baik diajukan untuk diundi agar semua orang mendapat kesempatan yang adil.",
       "lootRollTitle": "Need, Greed, atau Pass.",
       "lootRollBody": "Saat sebuah barang masuk undian, setiap anggota yang memenuhi syarat memilih Need jika menginginkannya, Greed jika hanya akan mengambilnya sebagai cadangan, atau Pass untuk mengundurkan diri. Lemparan tertinggi menang.",
+      "lootRollBodyNeedBeatsGreed": "When an item goes to a roll, each eligible member chooses Need if they want it, Greed if they would only take it spare, or Pass to bow out. Need beats Greed: if anyone rolls Need, the item goes to the highest Need roll and the Greed rolls do not count; otherwise the highest Greed roll wins.",
       "lootMasterTitle": "Penjarah utama.",
       "lootMasterBody": "Sebagai gantinya, pemimpin bisa memegang kendali atas jarahan yang lebih baik, membagikan tiap potongan kepada anggota yang seharusnya menerimanya. Ini menjaga perlengkapan berharga agar tidak jatuh ke undian acak, seperti cara kelompok yang terorganisir menjalankan dungeon.",
       "friendsHeading": "Teman, abaikan, dan blokir",
@@ -6744,8 +7057,10 @@ export const id_ID: EnTranslations = {
       "slashHeading": "Perintah garis miring yang praktis",
       "slashBody": "Beberapa perintah sehari-hari layak dihafal: /w Nama mengirim bisikan dan /r menjawab yang terakhir kamu terima, /invite mengajak seseorang ke party-mu, /follow membuntuti seorang teman, /roll melempar dadu agar dilihat kelompok, /who menampilkan siapa yang sedang daring, dan /afk menandaimu sedang pergi. Ketik /help dalam permainan untuk daftar lengkapnya.",
       "emotesBody": "Karaktermu juga bisa berbicara tanpa kata: ketik emote seperti /wave, /dance, /cheer, atau /bow, targetkan seorang teman dulu untuk mengarahkannya kepada mereka, atau tahan X untuk membuka roda emote demi ekspresi cepat di atas kepala.",
+      "emotesBodyNamedTarget": "Your character can also speak without words: type an emote like /wave, /dance, /cheer, or /bow, add a name to aim it at someone, as in /wave Aleph, or hold X, the emote wheel's default key, to open the emote wheel for a quick overhead expression. The Emotes button in the rail of window buttons, or under More on touch, opens the same wheel.",
       "calendarHeading": "Kalender acara",
       "calendarBody": "Tekan I untuk membuka kalender acara. Kalender itu menandai hari-hari alam yang layak direncanakan, Panggilan Raid mingguan, Hari Pasar, Bentrok Arena, dan Lomba Memancing, ditambah Hari Delve bulanan dan Persekutuan Gerbang Bulan, dan di sanalah guild menyimpan jadwalnya: pemimpin guild dan para perwira bisa memesan acara padanya, dan setiap anggota melihatnya di halaman yang sama. Hari-hari alam adalah ajakan untuk berkumpul, bukan bonus; tidak ada yang berubah pada karaktermu karena sebuah hari ditandai.",
+      "calendarBodyDoubleHonor": "Press I to open the event calendar. It marks the realm days worth planning around, the weekly Raid Call, Market Day, Arena Clash, Double Honor Weekend, and Fishing Derby, plus the monthly Delve Day and Moongate Communion, and it is where guilds keep their schedule: the guild leader and officers can book events on it, and every member sees them on the same page. The realm days are a prompt to gather rather than a bonus, with one exception: all through the Double Honor Weekend, Thornhollow Fields Honor pays double and a played-out loss pays like a win. Nothing else about your character changes because a day is marked.",
       "readyHeading": "Cek kesiapan",
       "readyBody": "Sebelum sebuah pull besar, pemimpin kelompok bisa mengetik /ready untuk menjajak seisi ruangan: semua yang lain mendapat perintah Siap atau Belum Siap, dan begitu semua telah menjawab, atau 30 detik habis, seluruh kelompok melihat satu ringkasan hitungannya. Tak ada yang ditunjuk; yang penting hitungannya, bukan si pelaku.",
       "markersHeading": "Penanda sasaran",
@@ -6757,6 +7072,7 @@ export const id_ID: EnTranslations = {
       "realmsScopeBody": "Apa yang kamu lakukan tetap berada di dunia yang kamu pilih: karaktermu, daftar temanmu, guildmu, dan Pasar semuanya berada di sana, dan papan guild serta papan pemain yang kamu buka dalam permainan hanya memeringkat dunia itu sendiri, sementara papan di situs web mengumpulkan semua dunia menjadi satu. Setiap dunia juga menyimpan reset raid harian miliknya sendiri, sesuai waktu lokalnya masing-masing.",
       "finderHeading": "Mencari kelompok",
       "finderBody": "Kamu tidak perlu berteriak di saluran Mencari Kelompok untuk mengisi sebuah lari. Buka Pencari Dungeon, pilih lari yang kamu inginkan dan peran yang bersedia kamu isi, lalu bergabung ke antrean sendirian atau bersama party yang sudah kamu miliki. Pencari menunggu sampai semua peran terisi penuh, lalu menawarkan kelompoknya kepada semua orang sekaligus: sebuah jendela sembul meminta kalian masing-masing untuk menerima, dan party terbentuk begitu orang terakhir mengatakan ya. Menolak sebuah tawaran, atau membiarkannya kedaluwarsa, menempatkanmu pada jeda singkat sebelum antrean menawarkanmu yang lain, sehingga barisnya terus bergerak.",
+      "finderBodyLeaderQueues": "You do not have to shout in Looking for Group to fill a run. Open the Dungeon Finder, choose the run you want and the roles you are willing to fill, and join the queue on your own, or have your party leader queue the party you already have (only the leader can put a group in). The finder waits until it has a full set of roles, then offers the group to everyone at once: a popup asks each of you to accept, and the party forms the moment the last person says yes. Turning an offer down, or letting it run out, drops you, and any party you queued with, out of the queue and puts you on a short cooldown before you can join it again; everyone else in the offer keeps their place, unless they did the same or queued with someone who did, so the line keeps moving.",
       "finderBoardBody": "Pencari juga menyimpan sebuah papan kelompok yang sudah dibentuk. Seorang pemimpin memasang daftar dengan tag yang menjelaskan tujuan larinya, dari kunjungan pertama sampai penuntasan penuh langsung, dan kamu melamar ke sana agar pemimpinnya menyetujui. Antrean otomatis mengisi dungeon dan raid endgame, masing-masing pada tingkat Normal dan Heroik, sementara papan juga bisa memuat lari penyelarasan solo, yang tidak pernah diisi oleh antrean untukmu; delve dan kegiatan dunia terbuka adalah urusanmu sendiri untuk mengaturnya. Bagaimanapun caranya, pencari hanya membentuk kelompoknya: berjalan ke pintu, mengatur tingkat kesulitan, dan menyepakati aturan jarahan tetap menjadi urusanmu.",
       "finderMore": "Lihat apa yang ada di dalam tiap dungeon",
       "blockBody": "Blokir adalah alat yang lebih keras, untuk pemain yang tak mau membiarkanmu tenang. Sebuah blokir memutus undangan, bisikan, dan surat mereka selain obrolan mereka, membuat kalian berdua tak terlihat satu sama lain di /who, dan menghapus mereka dari daftar temanmu jika mereka ada di sana. Blokir dari menu klik-kanan pada nama mereka atau dengan /block, /unblock mencabutnya kembali, dan /blocklist menampilkan siapa saja yang ada di dalamnya.",
@@ -7946,11 +8262,7 @@ export const id_ID: EnTranslations = {
       "detonateLightningRod": "Penangkal Petir menyambar!",
       "detonateStormcallersWrath": "Amarah Sang Pemanggil Badai meletus!",
       "detonateAbyssalMaw": "Rahang Jurang menutup!",
-      "detonateCrushingDepth": "Kedalaman Penghancur menghancurkan!",
-      "detonatePactSeal": "Segel Pakta meledak!",
-      "detonateBloodRite": "Ritus Darah turun!",
-      "detonatePitSentence": "Vonis Jurang meledak!",
-      "detonateHellfireBrand": "Cap Api Neraka meledak!"
+      "detonateCrushingDepth": "Kedalaman Penghancur menghancurkan!"
     },
     "delve": {
       "cannotEnterNow": "Kamu tidak dapat memasuki delve saat ini.",
@@ -8293,24 +8605,24 @@ export const id_ID: EnTranslations = {
     "boss": {
       "varric": {
         "bell": {
-          "emote": "Diakon Varric mencengkeram lonceng terkubur itu dengan kedua tangannya!",
-          "log": "Diakon Varric mulai membunyikan lonceng pemakaman.",
-          "warning": "Menjauhlah dari Diakon Varric!",
+          "emote": "Diakon Vandric mencengkeram lonceng terkubur itu dengan kedua tangannya!",
+          "log": "Diakon Vandric mulai membunyikan lonceng pemakaman.",
+          "warning": "Menjauhlah dari Diakon Vandric!",
           "impact": "Dentang lonceng meretakkan lantai ruangan!",
           "lesson": "Dentang Lonceng: hantaman tanah setiap dua belas detik. Menyingkirlah sebelum mendarat."
         },
         "raise": {
-          "emote": "Diakon Varric memanggil nama-nama dari kuburan yang hancur!",
-          "log": "Diakon Varric mulai membangkitkan orang mati.",
+          "emote": "Diakon Vandric memanggil nama-nama dari kuburan yang hancur!",
+          "log": "Diakon Vandric mulai membangkitkan orang mati.",
           "warning": "Hentikan ritus kubur itu!",
           "object": "Kubur yang retak bergetar oleh napas yang dicuri.",
           "interrupt_ok": "Ritus kubur itu tersendat.",
-          "interrupt_fail": "Para mati menjawab panggilan Diakon Varric!",
+          "interrupt_fail": "Para mati menjawab panggilan Diakon Vandric!",
           "lesson": "Putuskan ritus pada kubur yang retak dalam lima detik atau para mati akan bangkit memenuhi panggilannya."
         },
         "pull": "Kau menginjak debu suci dengan niat kotor. Berlututlah, dan dicatat.",
         "intro": "Tak ada jiwa yang hilang. Hanya tersesat.",
-        "mid60": "Diakon Varric membaca nama-nama dari buku catatan dengan kemenangan yang gemetar.",
+        "mid60": "Diakon Vandric membaca nama-nama dari buku catatan dengan kemenangan yang gemetar.",
         "mid30": "Lonceng pemakaman menjawab setiap nama yang ia ucapkan.",
         "defeat": "Tidak... aku sudah memiliki nama-nama itu... semuanya..."
       }
@@ -8938,6 +9250,7 @@ export const id_ID: EnTranslations = {
         "cooldownLockedHerb": "Petak herba telah dipanen, alat belum dapat digunakan",
         "station": "Stasiun kerajinan: {name}",
         "service": "Layanan: {name}",
+        "farmPatch": "Garden beds",
         "partyMember": "Anggota party: {name}",
         "deadPartyMember": "Anggota party yang tewas: {name}",
         "partyMemberGeneric": "Anggota party",
@@ -9372,6 +9685,8 @@ export const id_ID: EnTranslations = {
       "soldJunkMany": "Menjual {count} barang rongsok seharga {money}.",
       "keptBoundOne": "Menyimpan {count} salinan terikat.",
       "keptBoundMany": "Menyimpan {count} salinan terikat.",
+      "keptLockedOne": "Kept {count} locked copy.",
+      "keptLockedMany": "Kept {count} locked copies.",
       "friendOnline": "{name} telah daring.",
       "friendOffline": "{name} telah luring."
     },
@@ -9430,7 +9745,7 @@ export const id_ID: EnTranslations = {
       "felboltTitle": "Baut Fel",
       "felboltDesc": "Perintahkan Emberkin untuk melontarkan proyektil fel tambahan ke targetmu. Jeda 8 detik. Klik kanan, tekan-dan-tahan, atau tekan Shift+Enter untuk mengalihkan mode otomatis.",
       "abyssalChainTitle": "Rantai Jurang",
-      "abyssalChainDesc": "Perintahkan Gloomshade untuk menyeret musuh biasa dari jarak lebih dari 8 hingga 20 m kembali ke dirinya. Bos tidak bisa ditarik. Jeda 15 detik. Klik kanan, tekan-dan-tahan, atau tekan Shift+Enter untuk mengalihkan mode otomatis.",
+      "abyssalChainDesc": "Perintahkan Duskmurk untuk menyeret musuh biasa dari jarak lebih dari 8 hingga 20 m kembali ke dirinya. Bos tidak bisa ditarik. Jeda 15 detik. Klik kanan, tekan-dan-tahan, atau tekan Shift+Enter untuk mengalihkan mode otomatis.",
       "petTauntTitle": "Provokasi Peliharaan",
       "petTauntDesc": "Perintahkan peliharaan Anda untuk menyerbu dan Menggeram saat dalam jangkauan. Waktu jeda 10 detik.",
       "healDemonDesc": "Habiskan mana untuk menyalurkan penyembuhan ke iblis Anda selama 5 detik.",
@@ -9625,11 +9940,13 @@ export const id_ID: EnTranslations = {
     },
     "cast": {
       "fishing": "Memancing",
+      "farming": "Planting",
       "gathering": "Mengumpulkan",
       "crafting": "Membuat",
       "disenchanting": "Menghancurkan Pemantraan",
       "enchanting_apply": "Memantrai",
       "salvaging": "Menyalvasi",
+      "sundering": "Sundering",
       "tool_recharge": "Mengisi Ulang",
       "demonHeal": "Penyembuhan Iblis",
       "thunzharrStormcall": "Panggilan Badai",
@@ -9769,9 +10086,12 @@ export const id_ID: EnTranslations = {
       "material": "Bahan",
       "food": "Makanan",
       "drink": "Minuman",
+      "recipe": "Pola",
       "tool": "Perkakas",
       "potion": "Ramuan",
       "elixir": "Eliksir",
+      "flask": "Flask",
+      "scroll": "Scroll",
       "bag": "Tas",
       "mount": "Tunggangan"
     },
@@ -9798,8 +10118,17 @@ export const id_ID: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "Pakai: Memulihkan {amount} nyawa selama {seconds} detik. Harus tetap duduk selama makan.",
       "useDrink": "Pakai: Memulihkan {amount} mana selama {seconds} detik. Harus tetap duduk selama minum.",
-      "useElixir": "Pakai: Meningkatkan {stat} milikmu sebesar {value} selama {minutes} mnt. Bisa dipakai dalam pertempuran.",
-      "useElixirAura": "Pakai: Memberikan {aura} selama {minutes} mnt. Bisa dipakai dalam pertempuran.",
+      "useElixir": "Use: Increases your {stat} by {value} for {minutes} min. Replaces any other elixir or scroll of the same stat. Usable in combat.",
+      "useElixirAura": "Use: Grants {aura} for {minutes} min. Replaces any other elixir or scroll of its kind. Usable in combat.",
+      "flaskOnlyOne": "Only one flask effect at a time. Drinking another flask replaces this one.",
+      "flaskOutranks": "A weaker elixir or scroll of the same stat cannot replace it.",
+      "flaskUnremovable": "It cannot be dispelled, stolen, or canceled by hand.",
+      "flaskThroughDeath": "The effect remains through death, but ends when you log out; instanced matches begin and end on a clean slate.",
+      "wellFed": "Well Fed: Increases your {stat} by {value} for {minutes} min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.",
+      "wellFedAura": "Well Fed: Grants {aura} for {minutes} min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.",
+      "useFeast": "Use: Sets out a feast others can eat from, one serving each ({servings} servings, lasts {minutes} min).",
+      "useFeastBuff": "Each serving grants {aura}: +{value} {stat} for {minutes} min when you finish the {seconds} sec meal. Only one Well Fed effect at a time: a newer meal replaces it.",
+      "useFeastBuffAura": "Each serving grants {aura} for {minutes} min when you finish the {seconds} sec meal. Only one Well Fed effect at a time: a newer meal replaces it.",
       "questItem": "Barang Misi",
       "questRelated": "Misi: {quest}",
       "questRules": "Tidak dapat dijual, disimpan di bank, atau ditukar.",
@@ -9822,6 +10151,8 @@ export const id_ID: EnTranslations = {
       "useManaPotion": "Pakai: Memulihkan {amount} mana seketika. Bisa dipakai dalam pertempuran. Jeda 1 mnt.",
       "clickUseInstant": "Klik untuk memakai seketika dalam pertempuran",
       "clickUse": "Klik untuk memakai",
+      "clickSetOut": "Click to set out",
+      "clickSetUp": "Click to set up",
       "clickBuyback": "Klik untuk membeli kembali",
       "bagSlots": "Tas {slots} Slot",
       "bagSlotsMaterials": "Tas Bahan {slots} Slot"
@@ -9907,6 +10238,7 @@ export const id_ID: EnTranslations = {
       "filterTypeConsumable": "Konsumabel",
       "filterTypeMaterial": "Bahan",
       "filterTypeCosmetic": "Kosmetik",
+      "filterTypePattern": "Patterns",
       "filterTypeOther": "Lainnya",
       "filterArmorType": "Jenis zirah",
       "filterArmorAll": "Semua zirah",
@@ -10206,7 +10538,7 @@ export const id_ID: EnTranslations = {
       },
       "cold_snap": {
         "name": "Panggilan Musim Dingin",
-        "description": "Mengakhiri waktu pemulihan Langkah Kedip, Selubung Beku, dan Ketaklihatan Agung. (talenta mage)"
+        "description": "Finishes the cooldown on Flitstep, Frostveil, and Greater Invisibility. (Mage talent)"
       },
       "greater_invisibility": {
         "name": "Ketaklihatan Agung",
@@ -10257,15 +10589,15 @@ export const id_ID: EnTranslations = {
         "description": "Lepaskan tiga baut es untuk masing-masing kerusakan {damage} Frost dan terapkan Winter's Chill pada target: 2 mantra kompatibel berikutnya yang masuk akan memperlakukannya sebagai beku. Brain Freeze menjadikan Winterlash instan dan melewatkan cooldownnya. (Embun beku)"
       },
       "frozen_orb": {
-        "name": "Bola Beku",
+        "name": "Frostglobe",
         "description": "Melepaskan bola es yang berputar-putar yang melayang ke depan selama 8 detik, menimbulkan kerusakan {damage} Frost setiap detik ke musuh di sekitar dan memperlambat mereka sebesar 30%. Setiap denyut nadi menghasilkan satu es. (Embun beku)"
       },
       "blizzard": {
         "name": "Badai Salju",
-        "description": "Memanggil badai es ke area target selama 6 dtk, memberikan {damage} kerusakan Beku setiap detik dan memperlambat musuh sebesar 40%. Setiap musuh yang terkena mempersingkat Frozen Orb sebesar 0,5 dtk, hingga 3 dtk per rapalan. (Beku)"
+        "description": "Memanggil badai es ke area target selama 6 dtk, memberikan {damage} kerusakan Beku setiap detik dan memperlambat musuh sebesar 40%. Setiap musuh yang terkena mempersingkat Frostglobe sebesar 0,5 dtk, hingga 3 dtk per rapalan. (Beku)"
       },
       "glacial_spike": {
-        "name": "Pancang Glasial",
+        "name": "Rimeneedle",
         "description": "Konjur paku es raksasa, mengonsumsi 5 Jarum Es untuk memberikan {damage} kerusakan Beku dan membekukan target di tempat selama 4 dtk. (Beku)"
       },
       "glacial_front": {
@@ -10415,7 +10747,7 @@ export const id_ID: EnTranslations = {
         "description": "Jurus penutup yang melukai target: ia berdarah setiap 2 detik, selama 6 detik plus 2 detik per poin combo (5 poin combo: 16 detik dan {damage} total kerusakan)."
       },
       "vanish": {
-        "name": "Langkah Asap",
+        "name": "Smokefade",
         "description": "Menghilang dari pandangan, masuk ke Duskveil bahkan dalam pertempuran. Kau bergerak 50% lebih lambat saat tersembunyi. Bertahan hingga 10 detik."
       },
       "instant_poison": {
@@ -10891,7 +11223,7 @@ export const id_ID: EnTranslations = {
       "rejuvenation": {
         "name": "Mekar Liar",
         "description": "Menyembuhkan target sebesar {damage} selama 12 detik.",
-        "specNote_restoration": "Menanam kuntum BARU menambah 1 Verdance (maks 5). Pada 5 Verdance, Swiftmend berubah menjadi Overbloom."
+        "specNote_restoration": "Menanam kuntum BARU menambah 1 Verdance (maks 5). Pada 5 Verdance, Fleetmend berubah menjadi Overbloom."
       },
       "thorns": {
         "name": "Perisai Onak",
@@ -11021,7 +11353,7 @@ export const id_ID: EnTranslations = {
         "description": "Memasuki amukan mendidih, menghasilkan 20 amarah. (Talenta Prajurit)"
       },
       "crusader_strike": {
-        "name": "Serangan Tentara Salib",
+        "name": "Oathstrike",
         "description": "Menyerang target dengan kerusakan senjata ditambah {damage} kerusakan Suci. (talenta Paladin)"
       },
       "chain_heal": {
@@ -11125,7 +11457,7 @@ export const id_ID: EnTranslations = {
         "description": "Menjadi seorang lich selama 20 dtk, menciptakan 3 Serpihan Jiwa serta meningkatkan kerusakan mantra dan kecepatan perapalanmu sebesar 20%. Makhluk mayat hidupmu memberi 50% kerusakan lebih besar dan bertindak 20% lebih cepat, dan Soul Lance menembus sasarannya untuk memukul hingga 2 musuh terdekat sebesar 50% dari kerusakannya. (Ciri khas Nekromansi)"
       },
       "holy_shock": {
-        "name": "Kejutan Suci",
+        "name": "Lightjolt",
         "description": "Mengejutkan target kawan dengan energi Suci dan memulihkannya sebesar {damage}. (ciri khas Suci)"
       },
       "holy_shield": {
@@ -11153,7 +11485,7 @@ export const id_ID: EnTranslations = {
         "description": "Meningkatkan peluang kritis mantra sebesar 50% selama 15 dtk. (signature Fire)"
       },
       "icy_veins": {
-        "name": "Urat Es",
+        "name": "Coldsurge",
         "description": "Meningkatkan haste mantra sebesar 30% dan mencegah interupsi serta pushback cast selama 10 dtk. (signature Frost)"
       },
       "cold_blood": {
@@ -11229,8 +11561,8 @@ export const id_ID: EnTranslations = {
         "description": "Memanggil Emberkin di bawah perintah sang penyihir. Emberkin merapal Baut Fel ke musuhmu dari kejauhan. Memanggil iblis baru melepaskan iblismu yang sekarang. Kamu hanya boleh punya satu iblis pada satu waktu."
       },
       "summon_voidwalker": {
-        "name": "Panggil Gloomshade",
-        "description": "Memanggil Gloomshade di bawah perintah sang penyihir. Iblis tangguh ini mengejek musuh dan memakai Rantai Jurang untuk menyeret musuh biasa yang jauh kembali ke jangkauan. Bos tidak bisa ditarik. Memanggil iblis baru melepaskan iblismu yang sekarang. Kamu hanya boleh punya satu iblis pada satu waktu."
+        "name": "Panggil Duskmurk",
+        "description": "Memanggil Duskmurk di bawah perintah sang penyihir. Iblis tangguh ini mengejek musuh dan memakai Rantai Jurang untuk menyeret musuh biasa yang jauh kembali ke jangkauan. Bos tidak bisa ditarik. Memanggil iblis baru melepaskan iblismu yang sekarang. Kamu hanya boleh punya satu iblis pada satu waktu."
       },
       "summon_succubus": {
         "name": "Panggil Duskborn",
@@ -11329,7 +11661,7 @@ export const id_ID: EnTranslations = {
         "description": "Serangan otomatismu punya peluang membuatmu bisa merapal Ajal Dini pada target dengan kesehatan berapa pun, tanpa membutuhkan amarah. (Arms)"
       },
       "storm_bolt": {
-        "name": "Baut Badai",
+        "name": "Thunderhurl",
         "description": "Melemparkan senjatamu ke target sebesar {damage}, membuatnya terpana selama 3 detik."
       },
       "piercing_howl": {
@@ -11353,7 +11685,7 @@ export const id_ID: EnTranslations = {
         "description": "Mengisi senjatamu dengan darah musuh-musuhmu: kamu dan sekutu jarak dekatmu mendapatkan 10% kecepatan serangan dan 10% kerusakan selama 20 detik."
       },
       "victory_rush": {
-        "name": "Terjangan Kemenangan",
+        "name": "Victor's Surge",
         "description": "Menyerang sebesar kerusakan senjata ditambah {damage} dan memulihkan 20% dari nyawa maksimummu. Hanya dapat digunakan dalam 20 detik setelah membunuh musuh."
       },
       "intimidating_shout": {
@@ -11393,7 +11725,7 @@ export const id_ID: EnTranslations = {
         "description": "Menjadi badai baja yang berputar, menghantam semua musuh dalam jarak 6 meter sebesar {damage} setiap detik selama 4 detik."
       },
       "blink": {
-        "name": "Langkah Kilat",
+        "name": "Flitstep",
         "description": "Menteleportasimu 15 m ke depan dan membebaskan efek pengakaran. (talenta Mage)"
       },
       "bloodlust": {
@@ -11425,7 +11757,7 @@ export const id_ID: EnTranslations = {
         "description": "Golpea a di dekat musuh con escarcha e inflige {damage} de daño de Es. (talenta mage)"
       },
       "counterspell": {
-        "name": "Penangkal Mantra",
+        "name": "Spellsever",
         "description": "Menangkal perapalan mantra target dan mencegah perapalan dari aliran sihir itu selama 6 detik."
       },
       "curse_of_exhaustion": {
@@ -11609,7 +11941,7 @@ export const id_ID: EnTranslations = {
         "description": "Meningkatkan kecepatan gerak sebesar 35%, tetapi mengorbankan 2% dari nyawa maksimummu setiap detik. Rapal lagi untuk membatalkan. Efek ini nonaktif secara otomatis pada 20% nyawa."
       },
       "spellsteal": {
-        "name": "Pencurian Mantra",
+        "name": "Spellplunder",
         "description": "Mencuri efek sihir menguntungkan dari musuh dan memindahkannya kepadamu."
       },
       "startle_shot": {
@@ -12057,7 +12389,7 @@ export const id_ID: EnTranslations = {
         "name": "Serpihan Jantung Kazzix"
       },
       "wyrmcult_orders": {
-        "name": "Titah Sekte Wyrm"
+        "name": "Broodsworn Orders"
       },
       "ritual_phylactery": {
         "name": "Filakteri Ritual"
@@ -12120,7 +12452,7 @@ export const id_ID: EnTranslations = {
         "name": "Baju Zirah Sisik Gravewyrm"
       },
       "wyrmcult_grand_robe": {
-        "name": "Jubah Agung Sekte Wyrm"
+        "name": "Broodsworn Grand Robe"
       },
       "wyrmscale_jerkin": {
         "name": "Rompi Sisik Wyrm"
@@ -12321,13 +12653,13 @@ export const id_ID: EnTranslations = {
         "name": "Sabit Perunggu"
       },
       "silverleaf_sickle": {
-        "name": "Sabit Silverleaf"
+        "name": "Sheenleaf Sickle"
       },
       "thorium_mining_pick": {
         "name": "Beliung Tambang Thorium"
       },
       "arcanite_mining_pick": {
-        "name": "Beliung Tambang Arkanit"
+        "name": "Glyphsteel Mining Pick"
       },
       "ashwood_axe": {
         "name": "Kapak Kayu Abu"
@@ -12345,7 +12677,7 @@ export const id_ID: EnTranslations = {
         "name": "Bijih Thorium"
       },
       "arcanite_bar": {
-        "name": "Batang Arkanit"
+        "name": "Glyphsteel Bar"
       },
       "ashwood_log": {
         "name": "Kayu Gelondongan Abu"
@@ -12510,7 +12842,7 @@ export const id_ID: EnTranslations = {
         "name": "Batang Kayu Kulit Besi"
       },
       "silverleaf_herb": {
-        "name": "Herba Silverleaf"
+        "name": "Sheenleaf Herb"
       },
       "rough_hide": {
         "name": "Kulit Kasar"
@@ -12576,7 +12908,7 @@ export const id_ID: EnTranslations = {
         "name": "Bilah Perang Thorium"
       },
       "arcanite_war_axe": {
-        "name": "Kapak Perang Arkanit"
+        "name": "Glyphsteel War Axe"
       },
       "elderwood_battle_staff": {
         "name": "Tongkat Tempur Elderwood"
@@ -12690,10 +13022,10 @@ export const id_ID: EnTranslations = {
         "name": "Panggang Besar Marlow"
       },
       "silverleaf_healing_draught": {
-        "name": "Ramuan Penyembuhan Silverleaf"
+        "name": "Sheenleaf Healing Draught"
       },
       "silverleaf_mana_draught": {
-        "name": "Ramuan Mana Silverleaf"
+        "name": "Sheenleaf Mana Draught"
       },
       "elixir_of_the_boar": {
         "name": "Ramuan Babi Hutan"
@@ -12789,7 +13121,7 @@ export const id_ID: EnTranslations = {
         "name": "Mantel Nyanyian Serpihan"
       },
       "wyrmcult_spellgrips": {
-        "name": "Sarung Tangan Mantra Sekte Wyrm"
+        "name": "Broodsworn Spellgrips"
       },
       "thornpeak_wildwraps": {
         "name": "Pembalut Liar Puncak Duri"
@@ -12798,7 +13130,7 @@ export const id_ID: EnTranslations = {
         "name": "Baju Zirah Persembahan Badai"
       },
       "cryptbloom_shoulderguards": {
-        "name": "Pelindung Bahu Mekar Kripta"
+        "name": "Tombpetal Shoulderguards"
       },
       "gravewyrm_thornmaul": {
         "name": "Gada Duri Wyrm Kubur"
@@ -12873,7 +13205,7 @@ export const id_ID: EnTranslations = {
         "name": "Kayu Gelondongan Elderwood Pilihan"
       },
       "fine_silverleaf_herb": {
-        "name": "Herba Silverleaf Pilihan"
+        "name": "Fine Sheenleaf Herb"
       },
       "fine_goldleaf_herb": {
         "name": "Herba Daun Emas Pilihan"
@@ -13053,7 +13385,7 @@ export const id_ID: EnTranslations = {
         "name": "Alas Kaki Berlapis Perapian"
       },
       "frostmane_mantle": {
-        "name": "Mantel Frostmane"
+        "name": "Mantel Rimemane"
       },
       "ashbone_war_brand": {
         "name": "Bilah Perang Ashbone"
@@ -13212,7 +13544,7 @@ export const id_ID: EnTranslations = {
         "name": "Mata Sang Perajin"
       },
       "reins_terrorspark_groundshaker": {
-        "name": "Kunci Kontak: Percik Teror, Pengguncang Bumi"
+        "name": "Ignition Key: Dreadspark Groundshaker"
       },
       "reins_lanternback_troll": {
         "name": "Kuk Penyala Lentera: Grumbol"
@@ -13291,6 +13623,483 @@ export const id_ID: EnTranslations = {
       },
       "loombound_reagent_satchel": {
         "name": "Kantong Reagen Terikat Alat Tenun"
+      },
+      "hammered_copper_band": {
+        "name": "Hammered Copper Band"
+      },
+      "polished_copper_loop": {
+        "name": "Polished Copper Loop"
+      },
+      "coiled_copper_torc": {
+        "name": "Coiled Copper Torc"
+      },
+      "riveted_iron_signet": {
+        "name": "Riveted Iron Signet"
+      },
+      "etched_iron_loop": {
+        "name": "Etched Iron Loop"
+      },
+      "iron_link_choker": {
+        "name": "Iron Link Choker"
+      },
+      "weighted_thorium_band": {
+        "name": "Weighted Osmium Band"
+      },
+      "gleaming_thorium_loop": {
+        "name": "Gleaming Osmium Loop"
+      },
+      "burnished_thorium_amulet": {
+        "name": "Burnished Osmium Amulet"
+      },
+      "silverleaf_primer": {
+        "name": "Sheenleaf Primer"
+      },
+      "goldleaf_folio": {
+        "name": "Goldleaf Folio"
+      },
+      "sunpetal_grimoire": {
+        "name": "Sunpetal Grimoire"
+      },
+      "silverleaf_scroll": {
+        "name": "Sheenleaf Scroll"
+      },
+      "goldleaf_scroll": {
+        "name": "Goldleaf Scroll"
+      },
+      "sunpetal_scroll": {
+        "name": "Sunpetal Scroll"
+      },
+      "duskforged_billet": {
+        "name": "Duskforged Billet"
+      },
+      "forgefold_plating": {
+        "name": "Forgefold Plating"
+      },
+      "wyrmhide_cording": {
+        "name": "Wyrmhide Cording"
+      },
+      "sunspun_bolt": {
+        "name": "Sunspun Bolt"
+      },
+      "prismglass_setting": {
+        "name": "Prismglass Setting"
+      },
+      "precision_chassis": {
+        "name": "Precision Chassis"
+      },
+      "quickening_catalyst": {
+        "name": "Quickening Catalyst"
+      },
+      "seasoned_stock": {
+        "name": "Seasoned Stock"
+      },
+      "lucent_reagent": {
+        "name": "Lucent Reagent"
+      },
+      "sablewax_vellum": {
+        "name": "Sablewax Vellum"
+      },
+      "spiritweld_girdle": {
+        "name": "Spiritweld Girdle"
+      },
+      "forgefold_legguards": {
+        "name": "Forgefold Legguards"
+      },
+      "wardspeaker_sabatons": {
+        "name": "Wardspeaker Sabatons"
+      },
+      "briarstep_jerkin": {
+        "name": "Briarstep Jerkin"
+      },
+      "fenbloom_breeches": {
+        "name": "Fenbloom Breeches"
+      },
+      "barksong_handguards": {
+        "name": "Barksong Handguards"
+      },
+      "sunspun_vestments": {
+        "name": "Sunspun Vestments"
+      },
+      "sunspun_leggings": {
+        "name": "Sunspun Leggings"
+      },
+      "sunspun_handwraps": {
+        "name": "Sunspun Handwraps"
+      },
+      "sunspun_haversack": {
+        "name": "Sunspun Haversack"
+      },
+      "duskforged_warblade": {
+        "name": "Duskforged Warblade"
+      },
+      "ridgebreaker": {
+        "name": "Ridgebreaker"
+      },
+      "duskforged_bulwark": {
+        "name": "Duskforged Bulwark"
+      },
+      "wyrmfall_pendant": {
+        "name": "Wyrmfall Pendant"
+      },
+      "warhewn_signet": {
+        "name": "Warhewn Signet"
+      },
+      "prismglass_loop": {
+        "name": "Prismglass Loop"
+      },
+      "gyrelens_array": {
+        "name": "Gyrelens Array"
+      },
+      "voidbound_grimoire": {
+        "name": "Voidbound Grimoire"
+      },
+      "masters_field_forge": {
+        "name": "Master's Field Forge"
+      },
+      "makers_charm": {
+        "name": "Maker's Charm"
+      },
+      "ironhusk_flask": {
+        "name": "Ironhusk Flask"
+      },
+      "warboar_flask": {
+        "name": "Warboar Flask"
+      },
+      "runewater_flask": {
+        "name": "Runewater Flask"
+      },
+      "stonepot_stew": {
+        "name": "Stonepot Stew"
+      },
+      "warspice_skewers": {
+        "name": "Warspice Skewers"
+      },
+      "sageleaf_chowder": {
+        "name": "Sageleaf Chowder"
+      },
+      "grand_cauldron": {
+        "name": "Grand Cauldron"
+      },
+      "laden_hearth": {
+        "name": "The Laden Hearth"
+      },
+      "pattern_spiritweld_girdle": {
+        "name": "Plans: Spiritweld Girdle"
+      },
+      "pattern_forgefold_legguards": {
+        "name": "Plans: Forgefold Legguards"
+      },
+      "pattern_wardspeaker_sabatons": {
+        "name": "Plans: Wardspeaker Sabatons"
+      },
+      "pattern_briarstep_jerkin": {
+        "name": "Pattern: Briarstep Jerkin"
+      },
+      "pattern_fenbloom_breeches": {
+        "name": "Pattern: Fenbloom Breeches"
+      },
+      "pattern_barksong_handguards": {
+        "name": "Pattern: Barksong Handguards"
+      },
+      "pattern_sunspun_vestments": {
+        "name": "Pattern: Sunspun Vestments"
+      },
+      "pattern_sunspun_leggings": {
+        "name": "Pattern: Sunspun Leggings"
+      },
+      "pattern_sunspun_handwraps": {
+        "name": "Pattern: Sunspun Handwraps"
+      },
+      "pattern_sunspun_haversack": {
+        "name": "Pattern: Sunspun Haversack"
+      },
+      "pattern_duskforged_warblade": {
+        "name": "Plans: Duskforged Warblade"
+      },
+      "pattern_ridgebreaker": {
+        "name": "Plans: Ridgebreaker"
+      },
+      "pattern_duskforged_bulwark": {
+        "name": "Plans: Duskforged Bulwark"
+      },
+      "pattern_wyrmfall_pendant": {
+        "name": "Design: Wyrmfall Pendant"
+      },
+      "pattern_warhewn_signet": {
+        "name": "Design: Warhewn Signet"
+      },
+      "pattern_prismglass_loop": {
+        "name": "Design: Prismglass Loop"
+      },
+      "pattern_gyrelens_array": {
+        "name": "Schematic: Gyrelens Array"
+      },
+      "pattern_masters_field_forge": {
+        "name": "Schematic: Master's Field Forge"
+      },
+      "pattern_makers_charm": {
+        "name": "Schematic: Maker's Charm"
+      },
+      "pattern_voidbound_grimoire": {
+        "name": "Technique: Voidbound Grimoire"
+      },
+      "pattern_ironhusk_flask": {
+        "name": "Recipe: Ironhusk Flask"
+      },
+      "pattern_warboar_flask": {
+        "name": "Recipe: Warboar Flask"
+      },
+      "pattern_runewater_flask": {
+        "name": "Recipe: Runewater Flask"
+      },
+      "pattern_stonepot_stew": {
+        "name": "Recipe: Stonepot Stew"
+      },
+      "pattern_warspice_skewers": {
+        "name": "Recipe: Warspice Skewers"
+      },
+      "pattern_sageleaf_chowder": {
+        "name": "Recipe: Sageleaf Chowder"
+      },
+      "pattern_grand_cauldron": {
+        "name": "Recipe: Grand Cauldron"
+      },
+      "pattern_laden_hearth": {
+        "name": "Recipe: The Laden Hearth"
+      },
+      "vale_wheat_seed": {
+        "name": "Vale Wheat Seed"
+      },
+      "vale_wheat": {
+        "name": "Vale Wheat"
+      },
+      "fine_vale_wheat": {
+        "name": "Fine Vale Wheat"
+      },
+      "withered_husks": {
+        "name": "Withered Husks"
+      },
+      "compost": {
+        "name": "Compost"
+      },
+      "growth_tonic": {
+        "name": "Growth Tonic"
+      },
+      "brook_carrot_seed": {
+        "name": "Brook Carrot Seed"
+      },
+      "brook_carrot": {
+        "name": "Brook Carrot"
+      },
+      "fine_brook_carrot": {
+        "name": "Fine Brook Carrot"
+      },
+      "marsh_rice_seed": {
+        "name": "Marsh Rice Seed"
+      },
+      "marsh_rice": {
+        "name": "Marsh Rice"
+      },
+      "fine_marsh_rice": {
+        "name": "Fine Marsh Rice"
+      },
+      "bog_beet_seed": {
+        "name": "Bog Beet Seed"
+      },
+      "bog_beet": {
+        "name": "Bog Beet"
+      },
+      "fine_bog_beet": {
+        "name": "Fine Bog Beet"
+      },
+      "highland_barley_seed": {
+        "name": "Highland Barley Seed"
+      },
+      "highland_barley": {
+        "name": "Highland Barley"
+      },
+      "fine_highland_barley": {
+        "name": "Fine Highland Barley"
+      },
+      "frost_gourd_seed": {
+        "name": "Frost Gourd Seed"
+      },
+      "frost_gourd": {
+        "name": "Frost Gourd"
+      },
+      "fine_frost_gourd": {
+        "name": "Fine Frost Gourd"
+      },
+      "thornpeak_cabbage_seed": {
+        "name": "Thornpeak Cabbage Seed"
+      },
+      "thornpeak_cabbage": {
+        "name": "Thornpeak Cabbage"
+      },
+      "fine_thornpeak_cabbage": {
+        "name": "Fine Thornpeak Cabbage"
+      },
+      "frost_lentils_seed": {
+        "name": "Frost Lentils Seed"
+      },
+      "frost_lentils": {
+        "name": "Frost Lentils"
+      },
+      "fine_frost_lentils": {
+        "name": "Fine Frost Lentils"
+      },
+      "gilded_sunmelon_seed": {
+        "name": "Gilded Sunmelon Seed"
+      },
+      "gilded_sunmelon": {
+        "name": "Gilded Sunmelon"
+      },
+      "fine_gilded_sunmelon": {
+        "name": "Fine Gilded Sunmelon"
+      },
+      "evergarden_greens_seed": {
+        "name": "Evergarden Greens Seed"
+      },
+      "evergarden_greens": {
+        "name": "Evergarden Greens"
+      },
+      "fine_evergarden_greens": {
+        "name": "Fine Evergarden Greens"
+      },
+      "gilded_yam_seed": {
+        "name": "Gilded Yam Seed"
+      },
+      "gilded_yam": {
+        "name": "Gilded Yam"
+      },
+      "fine_gilded_yam": {
+        "name": "Fine Gilded Yam"
+      },
+      "evergarden_pumpkin_seed": {
+        "name": "Evergarden Pumpkin Seed"
+      },
+      "evergarden_pumpkin": {
+        "name": "Evergarden Pumpkin"
+      },
+      "fine_evergarden_pumpkin": {
+        "name": "Fine Evergarden Pumpkin"
+      },
+      "garden_hoe": {
+        "name": "Garden Hoe"
+      },
+      "bronze_hoe": {
+        "name": "Bronze Hoe"
+      },
+      "skysilver_hoe": {
+        "name": "Skysilver Hoe"
+      },
+      "osmium_hoe": {
+        "name": "Osmium Hoe"
+      },
+      "vale_hearth_loaf": {
+        "name": "Vale Hearth Loaf"
+      },
+      "eastbrook_root_pottage": {
+        "name": "Eastbrook Root Pottage"
+      },
+      "fenbridge_rice_bowl": {
+        "name": "Fenbridge Rice Bowl"
+      },
+      "fenbridge_beet_braise": {
+        "name": "Fenbridge Beet Braise"
+      },
+      "highwatch_barley_bannock": {
+        "name": "Highwatch Barley Bannock"
+      },
+      "highwatch_gourd_soup": {
+        "name": "Highwatch Gourd Soup"
+      },
+      "evergarden_sunmelon_tart": {
+        "name": "Evergarden Sunmelon Tart"
+      },
+      "evergarden_harvest_platter": {
+        "name": "Evergarden Harvest Platter"
+      },
+      "eastbrook_glazed_carrots": {
+        "name": "Eastbrook Glazed Carrots"
+      },
+      "fenbridge_rice_pudding": {
+        "name": "Fenbridge Rice Pudding"
+      },
+      "highwatch_barley_porridge": {
+        "name": "Highwatch Barley Porridge"
+      },
+      "evergarden_braised_greens": {
+        "name": "Evergarden Braised Greens"
+      },
+      "harvest_feast": {
+        "name": "Harvest Feast"
+      },
+      "pattern_highwatch_gourd_soup": {
+        "name": "Recipe: Highwatch Gourd Soup"
+      },
+      "pattern_highwatch_barley_porridge": {
+        "name": "Recipe: Highwatch Barley Porridge"
+      },
+      "pattern_evergarden_sunmelon_tart": {
+        "name": "Recipe: Evergarden Sunmelon Tart"
+      },
+      "pattern_evergarden_harvest_platter": {
+        "name": "Recipe: Evergarden Harvest Platter"
+      },
+      "pattern_evergarden_braised_greens": {
+        "name": "Recipe: Evergarden Braised Greens"
+      },
+      "pattern_harvest_feast": {
+        "name": "Recipe: Harvest Feast"
+      },
+      "raw_deepbarb_catfish": {
+        "name": "Raw Deepbarb Catfish"
+      },
+      "raw_hollowgill_sturgeon": {
+        "name": "Raw Hollowgill Sturgeon"
+      },
+      "raw_stillmere_salmon": {
+        "name": "Raw Stillmere Salmon"
+      },
+      "clockreel_fishing_rod": {
+        "name": "Clockreel Fishing Rod"
+      },
+      "peppered_deepbarb_catfish": {
+        "name": "Peppered Deepbarb Catfish"
+      },
+      "roast_hollowgill_sturgeon": {
+        "name": "Roast Hollowgill Sturgeon"
+      },
+      "pattern_peppered_deepbarb_catfish": {
+        "name": "Recipe: Peppered Deepbarb Catfish"
+      },
+      "pattern_roast_hollowgill_sturgeon": {
+        "name": "Recipe: Roast Hollowgill Sturgeon"
+      },
+      "pattern_clockreel_fishing_rod": {
+        "name": "Schematic: Clockreel Fishing Rod"
+      },
+      "evergarden_hoe": {
+        "name": "Evergarden Hoe"
+      },
+      "stonepot_feast": {
+        "name": "Stonepot Feast"
+      },
+      "warspice_feast": {
+        "name": "Warspice Feast"
+      },
+      "sageleaf_feast": {
+        "name": "Sageleaf Feast"
+      },
+      "pattern_stonepot_feast": {
+        "name": "Recipe: Stonepot Feast"
+      },
+      "pattern_warspice_feast": {
+        "name": "Recipe: Warspice Feast"
+      },
+      "pattern_sageleaf_feast": {
+        "name": "Recipe: Sageleaf Feast"
       },
       "ps_briny_lure": {
         "name": "Umpan Asin"
@@ -13910,6 +14719,15 @@ export const id_ID: EnTranslations = {
       "wand_of_quenched_sparks": {
         "name": "Tongkat Percik Padam"
       },
+      "cogwheel_blank": {
+        "name": "Cogwheel Blank"
+      },
+      "copperlens_ocular": {
+        "name": "Copperlens Ocular"
+      },
+      "deed_of_making": {
+        "name": "Deed of Making"
+      },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"
       },
@@ -14055,7 +14873,7 @@ export const id_ID: EnTranslations = {
         "name": "Gada Suci Voss"
       },
       "wyrmcult_soulsteps": {
-        "name": "Langkah Jiwa Sekte Wyrm"
+        "name": "Broodsworn Soulsteps"
       },
       "wyrmshadow_harness": {
         "name": "Tali Zirah Nightfang"
@@ -14286,7 +15104,7 @@ export const id_ID: EnTranslations = {
         "name": "Helm Relik Diakon"
       },
       "varric_shadow_cowl": {
-        "name": "Tudung Bayangan Varric"
+        "name": "Tudung Bayangan Vandric"
       },
       "siltguard_helm": {
         "name": "Helm Penjaga Lanau"
@@ -14393,6 +15211,15 @@ export const id_ID: EnTranslations = {
       "heroic_mark": {
         "name": "Tanda Heroik"
       },
+      "wyrmfall_core": {
+        "name": "Wyrmfall Core"
+      },
+      "sundered_essence": {
+        "name": "Sundered Essence"
+      },
+      "makers_ember": {
+        "name": "Maker's Ember"
+      },
       "eastbrook_buckler": {
         "name": "Perisai Kecil Eastbrook"
       },
@@ -14463,7 +15290,7 @@ export const id_ID: EnTranslations = {
         "name": "Tali Pinggang Dingin Tulang"
       },
       "mistforged_pauldrons": {
-        "name": "Bahu Tempaan Kabut"
+        "name": "Fogforged Pauldrons"
       },
       "tideguard_faceguard": {
         "name": "Pelindung Wajah Penjaga Pasang"
@@ -14792,10 +15619,10 @@ export const id_ID: EnTranslations = {
         "name": "Tuan Serpihan Kazzix"
       },
       "wyrmcult_zealot": {
-        "name": "Fanatik Wyrmcult"
+        "name": "Fanatik Broodsworn"
       },
       "wyrmcult_necromancer": {
-        "name": "Nekromancer Wyrmcult"
+        "name": "Nekromancer Broodsworn"
       },
       "boneclad_revenant": {
         "name": "Revenant Berbalut Tulang"
@@ -14924,7 +15751,7 @@ export const id_ID: EnTranslations = {
         "name": "Patung Tanpa Orang Suci"
       },
       "deacon_varric": {
-        "name": "Diaken Varric"
+        "name": "Diaken Vandric"
       },
       "acolyte_tessa": {
         "name": "Akolit Tessa"
@@ -15113,7 +15940,7 @@ export const id_ID: EnTranslations = {
         "name": "Peri Rawa"
       },
       "frostmane_yeti": {
-        "name": "Yeti Frostmane"
+        "name": "Yeti Rimemane"
       },
       "terrace_howler": {
         "name": "Pelolong Teras"
@@ -15161,7 +15988,7 @@ export const id_ID: EnTranslations = {
         "name": "Sang Meredark"
       },
       "harvest_sprite": {
-        "name": "Peri Panen"
+        "name": "Gleaning Sprite"
       },
       "mere_lurker": {
         "name": "Pengintai Danau"
@@ -15185,7 +16012,7 @@ export const id_ID: EnTranslations = {
         "name": "Penjelajah Kelam"
       },
       "nightkin_stargazer": {
-        "name": "Pengamat Bintang Nightkin"
+        "name": "Pengamat Bintang Gloamkin"
       },
       "barrow_king": {
         "name": "Sang Raja Gundukan"
@@ -15344,7 +16171,7 @@ export const id_ID: EnTranslations = {
         "name": "Emberkin"
       },
       "gloomshade": {
-        "name": "Gloomshade"
+        "name": "Duskmurk"
       },
       "grix_the_tunnelking": {
         "name": "Grix sang Raja Terowongan"
@@ -15625,7 +16452,7 @@ export const id_ID: EnTranslations = {
       },
       "provisioner_fenna": {
         "name": "Juru Bekal Fenna",
-        "title": "Juru Bekal Eldergleam",
+        "title": "Juru Bekal Eldershine",
         "greeting": "Roti masih hangat, air masih segar. Ceruk ini menyediakan, begitu pula aku."
       },
       "wardsmith_orun": {
@@ -15750,12 +16577,12 @@ export const id_ID: EnTranslations = {
       },
       "sexton_marrow": {
         "name": "Koster Marrow",
-        "title": "Sexton Gallowmere",
+        "title": "Sexton Gibbetmere",
         "greeting": "Kami mengubur mereka dalam-dalam di sini, dan kami membunyikan lonceng agar mereka ingat untuk tetap di bawah."
       },
       "widow_tansy": {
         "name": "Janda Tansy",
-        "title": "Pembuat Lilin Gallowmere",
+        "title": "Pembuat Lilin Gibbetmere",
         "greeting": "Sebatang lilin untuk setiap makam, dan tak satu pun boleh padam. Tak satu pun, kau dengar aku?"
       },
       "vicar_creel": {
@@ -15779,7 +16606,7 @@ export const id_ID: EnTranslations = {
         "greeting": "Laut memberi, pasir menyimpan, dan rimba mengambil. Tetaplah di pesisir, wahai orang asing."
       },
       "hermit_okku": {
-        "name": "Okku",
+        "name": "Okrim",
         "title": "Sang Pria yang Masuk ke Dalam",
         "greeting": "Diamlah sekarang. Genderang itu menghitung segala yang berjalan di bawah pepohonan, dan mereka sudah menghitungmu."
       },
@@ -15883,6 +16710,26 @@ export const id_ID: EnTranslations = {
         "title": "Master Apoteker",
         "greeting": "Ukur dua kali dan tuang sekali, {className}. Apoteker tidak mempunyai kesabaran terhadap reagen yang tumpah."
       },
+      "farmer_jessica": {
+        "name": "Farmer Jessica",
+        "title": "Allotment Keeper",
+        "greeting": "Good soil and fair weather, {playerName}. Buy a seed from me, sow it in one of those beds, and go about your day. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer."
+      },
+      "farmer_teasel": {
+        "name": "Farmer Teasel",
+        "title": "Fen Paddy Farmer",
+        "greeting": "Marsh rice and bog beet seed, {className}, and compost to feed them. The paddies drain slow, so mind where you tread."
+      },
+      "farmer_hollis": {
+        "name": "Farmer Hollis",
+        "title": "Highwatch Terrace Farmer",
+        "greeting": "The terraces give what the mountain allows, {className}. I sell seed and compost, and if a crop of yours comes up withered I will work the husks back into good soil for you."
+      },
+      "farmer_verbena": {
+        "name": "Farmer Verbena",
+        "title": "Parterre Gardener",
+        "greeting": "Mind the edging, {playerName}, these beds are the pride of the parterre. Seed and compost are what I sell, and I will turn any withered husks you carry into more of it."
+      },
       "wayfarer_bryn": {
         "name": "Pengelana Bryn",
         "title": "Pemandu Pelabuhan",
@@ -15942,6 +16789,19 @@ export const id_ID: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Urat bijih dipanen"
+          }
+        }
+      },
+      "q_farm_intro": {
+        "title": "First Furrow",
+        "text": "Take this hoe and a pinch of vale wheat seed, {playerName}. Sow the seed in one of the beds beside me, then go about your business. Come back whenever you like and bring the crop in; I will be here.",
+        "completion": "There, your first crop in your own hands. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer. Come back for seed whenever the beds call you, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat planted"
+          },
+          "1": {
+            "label": "Vale Wheat harvested"
           }
         }
       },
@@ -16492,7 +17352,7 @@ export const id_ID: EnTranslations = {
       },
       "q_drogmar": {
         "title": "Panglima Perang Drogmar",
-        "text": "Panglima Perang Drogmar mengambil keping emas Wyrmcult dan menyumpah klan-klan untuk kebangkitan sang gunung. Ia adalah palu yang hendak mereka ayunkan ke temboku, dan ketika ia menghantam tanah, {playerName}, jangan berdiri di dekatnya. Bawa rekan-rekanmu ke kemah perang dan akhiri dia, demi Highwatch.",
+        "text": "Panglima Perang Drogmar mengambil keping emas Broodsworn dan menyumpah klan-klan untuk kebangkitan sang gunung. Ia adalah palu yang hendak mereka ayunkan ke temboku, dan ketika ia menghantam tanah, {playerName}, jangan berdiri di dekatnya. Bawa rekan-rekanmu ke kemah perang dan akhiri dia, demi Highwatch.",
         "completion": "Drogmar, mati di kemahnya sendiri. Klan-klan akan tercerai ke jalur tinggi, kau telah membelikan satu musim dingin bagi temboku, {playerName}.",
         "objectives": {
           "0": {
@@ -16532,11 +17392,11 @@ export const id_ID: EnTranslations = {
       },
       "q_zealots": {
         "title": "Nyanyian di Angin",
-        "text": "Ketika angin datang dari puncak selatan, {playerName}, ia membawa nyanyian. Wyrmcult tak lagi bersembunyi, mereka telah mendirikan tenda di bawah Sanktum dan menyanyi untuk apa yang tidur di bawahnya. Bungkam dua belas fanatik. Setiap suara yang dibungkam membeli satu malam tidur lagi bagi gunung itu.",
+        "text": "Ketika angin datang dari puncak selatan, {playerName}, ia membawa nyanyian. Broodsworn tak lagi bersembunyi, mereka telah mendirikan tenda di bawah Sanktum dan menyanyi untuk apa yang tidur di bawahnya. Bungkam dua belas fanatik. Setiap suara yang dibungkam membeli satu malam tidur lagi bagi gunung itu.",
         "completion": "Angin lebih hening sekarang. Tapi yang merisaukanku bukan nyanyian itu, {playerName}, melainkan bahwa sesuatu mungkin menyahut.",
         "objectives": {
           "0": {
-            "label": "Fanatik Wyrmcult terbunuh"
+            "label": "Fanatik Broodsworn terbunuh"
           }
         }
       },
@@ -16546,7 +17406,7 @@ export const id_ID: EnTranslations = {
         "completion": "Aksara ini... terakhir kulihat yang serupa di grimoir Morthen, di Eastbrook. Tangan yang sama telah menuntun setiap makam yang kita perebutkan, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Fanatik Wyrmcult terbunuh"
+            "label": "Fanatik Broodsworn terbunuh"
           }
         }
       },
@@ -16556,7 +17416,7 @@ export const id_ID: EnTranslations = {
         "completion": "Semoga Cahaya mengampuni kita. Ini menampung para mati dari Lembah dan rawa - setiap mayat yang pernah dibangkitkan para Gravecaller, dipanen. Mereka tidak pernah membangun pasukan, {playerName}. Mereka sedang mengumpulkan upeti.",
         "objectives": {
           "0": {
-            "label": "Wyrmcult Necromancer dibunuh"
+            "label": "Necromancer Broodsworn dibunuh"
           }
         }
       },
@@ -16606,10 +17466,10 @@ export const id_ID: EnTranslations = {
         "completion": "Berlututnya telah berhenti. Kita belum membungkam suara itu, {playerName}, hanya menipiskan paduan suaranya. Itu harus cukup.",
         "objectives": {
           "0": {
-            "label": "Fanatik Wyrmcult terbunuh"
+            "label": "Fanatik Broodsworn terbunuh"
           },
           "1": {
-            "label": "Necromancer Wyrmcult terbunuh"
+            "label": "Necromancer Broodsworn terbunuh"
           }
         }
       },
@@ -16874,6 +17734,26 @@ export const id_ID: EnTranslations = {
           }
         }
       },
+      "q_prof_workorder_kitchens_wheat": {
+        "title": "Kitchens Wheat Order",
+        "text": "Bread does not bake itself, {playerName}, and my flour bins are scraping bottom. Bring me eight sheaves of vale wheat and I will pay you honest coin for the lot. Grown by your own hand or bought off the market, I do not care, so long as it grinds.",
+        "completion": "Good dry grain, and plenty of it. There is your pay, counted out. When the next crop comes in, you know which door to knock on.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat delivered"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_rice": {
+        "title": "Kitchens Rice Order",
+        "text": "The marsh folk swear by their rice, {playerName}, and I mean to find out why. Fetch me five measures of marsh rice and there is coin waiting for you here. Keep it dry on the road, mind: wet rice is porridge, and I did not order porridge.",
+        "completion": "Plump and dry, every grain. Here is your coin. If the marsh keeps giving, so do I.",
+        "objectives": {
+          "0": {
+            "label": "Marsh Rice delivered"
+          }
+        }
+      },
       "q_prof_workorder_loom": {
         "title": "Pesanan Kerja Alat Tenun",
         "text": "Alat tenun kehabisan bahan dan tangan yang menganggur menyia-nyiakan siang hari, {playerName}. Bawakan aku enam gulungan sutra laba-laba dan aku akan membayarmu dengan tarif yang adil, dihitung hingga tembaga.",
@@ -17082,7 +17962,7 @@ export const id_ID: EnTranslations = {
       },
       "q_hollow_old_marrowshell": {
         "title": "Cangkang Tua di Perairan Dangkal",
-        "text": "Nama pertama adalah Marrowshell Tua, seekor kepiting sebesar gerobak yang telah berburu di perairan dangkal timur sejak sebelum Eldergleam memiliki gerbang. Ia mengembara, {playerName}, jadi kau harus menyusuri garis pantai hingga kau menemukan jejaknya. Jangan pergi sendirian, dan jangan percaya pada kediamannya.",
+        "text": "Nama pertama adalah Marrowshell Tua, seekor kepiting sebesar gerobak yang telah berburu di perairan dangkal timur sejak sebelum Eldershine memiliki gerbang. Ia mengembara, {playerName}, jadi kau harus menyusuri garis pantai hingga kau menemukan jejaknya. Jangan pergi sendirian, dan jangan percaya pada kediamannya.",
         "completion": "Perairan dangkal itu kembali hanya menjadi air. Aku telah menyaksikan cangkang itu menghancurkan pemburu yang lebih baik dariku, {playerName}. Tapi tidak kau.",
         "objectives": {
           "0": {
@@ -17224,12 +18104,12 @@ export const id_ID: EnTranslations = {
         }
       },
       "q_fv_frostmane_tyrant": {
-        "title": "Tiran Frostmane",
-        "text": "Para pelolong itu tidak sedang berburu saat mereka turun dari teras-teras itu. Mereka sedang melarikan diri. Seekor yeti telah menguasai dataran tinggi itu, penduduk gunung menyebutnya Frostmane, dan bahkan kawanan serigala tak mau berbagi lereng dengannya. Ini harus diakhiri, {playerName}, sebelum musim dingin mendorongnya turun ke tembokku. Ajak seorang kawan. Ajak dua.",
-        "completion": "Saat angin mereda semalam, seluruh desa mendengar keheningan di tempat Frostmane biasa berada. Reach ini berutang budi yang akan butuh bertahun-tahun untuk dibayar, {playerName}. Kenakan ini, dan setiap pintu di Icemantle akan terbuka untukmu.",
+        "title": "Tiran Rimemane",
+        "text": "Para pelolong itu tidak sedang berburu saat mereka turun dari teras-teras itu. Mereka sedang melarikan diri. Seekor yeti telah menguasai dataran tinggi itu, penduduk gunung menyebutnya Rimemane, dan bahkan kawanan serigala tak mau berbagi lereng dengannya. Ini harus diakhiri, {playerName}, sebelum musim dingin mendorongnya turun ke tembokku. Ajak seorang kawan. Ajak dua.",
+        "completion": "Saat angin mereda semalam, seluruh desa mendengar keheningan di tempat Rimemane biasa berada. Reach ini berutang budi yang akan butuh bertahun-tahun untuk dibayar, {playerName}. Kenakan ini, dan setiap pintu di Icemantle akan terbuka untukmu.",
         "objectives": {
           "0": {
-            "label": "Sang Frostmane terbunuh"
+            "label": "Sang Rimemane terbunuh"
           }
         }
       },
@@ -17382,7 +18262,7 @@ export const id_ID: EnTranslations = {
         "completion": "Empat ember kembali tergantung di kaitnya dan barisan pohon kembali sunyi. Tanganmu lebih tegas menghadapi para peri dibanding aku, {playerName}, dan hari ini aku bersyukur karenanya.",
         "objectives": {
           "0": {
-            "label": "Peri Panen diusir"
+            "label": "Gleaning Sprite driven off"
           },
           "1": {
             "label": "Ember Sadap Getah ditemukan kembali"
@@ -17524,7 +18404,7 @@ export const id_ID: EnTranslations = {
       },
       "q_nb_eyes_on_the_vigil": {
         "title": "Mata pada Sang Penjaga Tegak",
-        "text": "Sesuatu telah membuat para penjelajah berani dan kawanan gelisah, {playerName}, dan aku tak bisa membacanya dari bunga-bunga. Cassian bisa membacanya dari langit. Ia menjaga perkemahan observatoriumnya di dekat Sang Penjaga Tegak sebelah timur sini, tempat kaum nightkin melayang di antara batu-batu. Temukan dia, dan tanyakan apa yang dikatakan bintang-bintang.",
+        "text": "Something has the striders bold and the herds uneasy, {playerName}, and I cannot read it in the flowers. Cassian can read it in the sky. He keeps his observatory camp by the Standing Vigil east of here, where the gloamkin drift among the stones. Find him, and ask what the stars are saying.",
         "completion": "Lira mengirimmu? Berarti taman-taman itu juga merasakannya. Duduklah di dekat teropong sejenak, {playerName}. Bintang-bintang telah gelisah selama sebulan, dan setiap peta yang kugambar condong ke utara menuju gundukan itu.",
         "objectives": {
           "0": {
@@ -17534,7 +18414,7 @@ export const id_ID: EnTranslations = {
       },
       "q_nb_charts_of_the_stones": {
         "title": "Peta di Batu-Batu",
-        "text": "Batu-batu Vigili lebih tua dari Moonrest, lebih tua dari kaum nightkin yang merawatnya, dan permukaannya terukir peta bintang yang telah kuhabiskan seumur hidupku mempelajari cara membacanya. Langit telah bergeser, {playerName}, dan aku harus tahu seberapa jauh. Baca peta pada tiga batu dan bawakan aku arahnya.",
+        "text": "The Vigil stones are older than Moonrest, older than the gloamkin who tend them, and their faces are cut with star charts I have spent my life learning to read. The sky has shifted, {playerName}, and I must know how far. Read the charts on three of the stones and bring me their bearings.",
         "completion": "Tak ada keraguan lagi. Setiap arah telah merangkak menuju Gundukan Tanpa Tidur, seolah langit itu sendiri condong di atas gundukan itu untuk mengawasi. Raja-raja tua dulu dikubur di bawah bintang yang sejajar dengan alasan tertentu, {playerName}.",
         "objectives": {
           "0": {
@@ -17558,7 +18438,7 @@ export const id_ID: EnTranslations = {
       "q_nb_the_barrow_king": {
         "title": "Sang Raja Gundukan Terbangun",
         "text": "Setiap arah, setiap bintang yang gelisah, setiap gundukan yang terbuka menunjuk pada satu hal: Sang Raja Gundukan sedang terbangun di bawah gundukan besar itu, dan alam ini tak punya fajar untuk menahannya. Ia harus diistirahatkan sebelum ia mengingat mahkotanya, {playerName}. Jangan pergi sendirian: ajak seorang kawan, dan jaga cahaya bunga tetap di belakangmu.",
-        "completion": "Bintang-bintang telah tenang untuk pertama kalinya dalam satu musim, {playerName}. Gundukan-gundukan itu tertutup, kaum nightkin telah kembali diam di batu-batu mereka, dan sang raja tidur lagi di bawah sana. Kenakan mantel ini: Moonrest memangkasnya untuk siapa pun yang akhirnya dipercaya malam.",
+        "completion": "The stars have settled for the first time in a season, {playerName}. The mounds are closed, the gloamkin have gone still at their stones, and the king sleeps below once more. Wear this mantle: Moonrest cut it for whoever the night finally trusted.",
         "objectives": {
           "0": {
             "label": "Sang Raja Gundukan diistirahatkan"
@@ -17566,9 +18446,9 @@ export const id_ID: EnTranslations = {
         }
       },
       "q_ww_bells_of_gallowmere": {
-        "title": "Lonceng-Lonceng Gallowmere",
-        "text": "Dengar dentang itu, {playerName}? Itu Gallowmere, di jalan utara, membunyikan lonceng untuk menidurkan yang mati. Sexton Marrow menghitung setiap jiwa di bawah kanopi, yang hidup dan yang terkubur. Pergilah dan dihitung, sebelum hutan ini menghitungmu sendiri.",
-        "completion": "Cobb mengirimmu ke jalan ini utuh, begitu? Pria yang baik. Ia telah menjaga lentera gerbang itu tetap menyala selama tiga puluh tahun, dan hutan ini belum pernah sekali pun melewatinya. Selamat datang di Gallowmere, {playerName}. Perhatikan lonceng-loncengnya.",
+        "title": "Lonceng-Lonceng Gibbetmere",
+        "text": "Dengar dentang itu, {playerName}? Itu Gibbetmere, di jalan utara, membunyikan lonceng untuk menidurkan yang mati. Sexton Marrow menghitung setiap jiwa di bawah kanopi, yang hidup dan yang terkubur. Pergilah dan dihitung, sebelum hutan ini menghitungmu sendiri.",
+        "completion": "Cobb mengirimmu ke jalan ini utuh, begitu? Pria yang baik. Ia telah menjaga lentera gerbang itu tetap menyala selama tiga puluh tahun, dan hutan ini belum pernah sekali pun melewatinya. Selamat datang di Gibbetmere, {playerName}. Perhatikan lonceng-loncengnya.",
         "objectives": {
           "0": {
             "label": "Lapor kepada Sexton Marrow"
@@ -17597,7 +18477,7 @@ export const id_ID: EnTranslations = {
       },
       "q_ww_candles_at_the_bounds": {
         "title": "Lilin-Lilin di Perbatasan",
-        "text": "Empat batu perbatasan mengelilingi Gallowmere, {playerName}, satu di setiap jalan keluar, dan sebuah lilin makam menyala di setiap batu. Selama mereka menyala, yang terkubur tetap terkubur. Gerimis telah memadamkan semuanya, keempatnya, dan aku terlalu tua untuk menyusuri perbatasan sendirian. Ambil lilin panjangku dan nyalakan kembali semuanya, dengan cepat.",
+        "text": "Empat batu perbatasan mengelilingi Gibbetmere, {playerName}, satu di setiap jalan keluar, dan sebuah lilin makam menyala di setiap batu. Selama mereka menyala, yang terkubur tetap terkubur. Gerimis telah memadamkan semuanya, keempatnya, dan aku terlalu tua untuk menyusuri perbatasan sendirian. Ambil lilin panjangku dan nyalakan kembali semuanya, dengan cepat.",
         "completion": "Keempatnya menyala? Kalau begitu bernapaslah, {playerName}. Kau tak mendengarnya, tapi seluruh desa mendengarnya: lonceng-lonceng berbunyi lebih lega tepat saat sumbu terakhir menyala.",
         "objectives": {
           "0": {
@@ -17627,7 +18507,7 @@ export const id_ID: EnTranslations = {
       },
       "q_ww_what_the_bark_holds": {
         "title": "Apa yang Disimpan Kulit Kayu",
-        "text": "Di Padang Tergantung sebelah timur Gallowmere, para pemintal menggantungkan yang mati terbungkus sutra dari dahan-dahan, dan para penyaruk gravenbark berjaga di bawahnya bagai pengusung jenazah yang sabar. Mereka adalah penduduk kami di atas sana, {playerName}. Hancurkan lima penyaruk, turunkan tiga yang mati terbungkus itu, dan bawa mereka pulang ke tanah.",
+        "text": "Di Padang Tergantung sebelah timur Gibbetmere, para pemintal menggantungkan yang mati terbungkus sutra dari dahan-dahan, dan para penyaruk gravenbark berjaga di bawahnya bagai pengusung jenazah yang sabar. Mereka adalah penduduk kami di atas sana, {playerName}. Hancurkan lima penyaruk, turunkan tiga yang mati terbungkus itu, dan bawa mereka pulang ke tanah.",
         "completion": "Tiga jiwa kembali di bawah tanah yang layak sebelum malam tiba. Para penyaruk akan tumbuh kembali, kulit kayu selalu begitu, tapi malam ini padang itu tergantung kosong, dan itu sudah cukup.",
         "objectives": {
           "0": {
@@ -17641,17 +18521,17 @@ export const id_ID: EnTranslations = {
       "q_ww_walking_mosley_home": {
         "title": "Mengantar Mosley Pulang",
         "text": "Penggali kuburku Mosley mengambil jalan kapel tiga hari lalu untuk membuka petak di pekarangan tua, dan galiannya runtuh menimpanya. Ia mencakar jalan keluarnya, orang bodoh itu masih hidup, tapi ia meringkuk di dekat makam-makam kapel dan tak mau bergerak karena para pemintal di jalan. Antarkan dia pulang, {playerName}. Aku tak bisa membunyikan lonceng untuk orang yang masih hidup.",
-        "completion": "Ia melewati gerbang dengan kedua kakinya sendiri, bersumpah tak akan menggali apa pun yang lebih dalam dari bedengan lobak mulai sekarang. Ia akan kembali ke pekarangan itu sebelum hari Minggu, mereka selalu begitu. Terima kasih, {playerName}. Gallowmere menjaga penduduknya, itulah seluruh hukum kami.",
+        "completion": "Ia melewati gerbang dengan kedua kakinya sendiri, bersumpah tak akan menggali apa pun yang lebih dalam dari bedengan lobak mulai sekarang. Ia akan kembali ke pekarangan itu sebelum hari Minggu, mereka selalu begitu. Terima kasih, {playerName}. Gibbetmere menjaga penduduknya, itulah seluruh hukum kami.",
         "objectives": {
           "0": {
-            "label": "Penggali Kubur Mosley diantar dengan selamat kembali ke Gallowmere"
+            "label": "Penggali Kubur Mosley diantar dengan selamat kembali ke Gibbetmere"
           }
         }
       },
       "q_ww_horn_of_the_huntsman": {
         "title": "Terompet Sang Pemburu",
         "text": "Kau pasti sudah mendengar terompet itu sekarang, {playerName}, tipis dan jauh, suara yang membuat seluruh hutan ini menahan napas. Sang Pemburu Pucat menunggangi tanah lapangnya di sebelah utara sini, dan setiap makam yang dilewatinya semakin dangkal. Ia pernah menjadi seorang pria, dan ia dikubur dengan salah, dan aku sudah berhenti berpura-pura bahwa doa saja akan cukup. Ajak seorang kawan, ajak dua, dan jatuhkan dia dari kudanya.",
-        "completion": "Terompet itu berhenti di tengah nada. Setiap lonceng di Gallowmere berbunyi sekali, dengan sendirinya, dan kemudian hutan ini menjadi lebih sunyi dari yang pernah kudengar selama tiga puluh tahun. Kau telah melakukan ritus yang tak bisa kulakukan, {playerName}. Kenakan ini, dan berjalanlah di bawah kanopi tanpa rasa takut.",
+        "completion": "Terompet itu berhenti di tengah nada. Setiap lonceng di Gibbetmere berbunyi sekali, dengan sendirinya, dan kemudian hutan ini menjadi lebih sunyi dari yang pernah kudengar selama tiga puluh tahun. Kau telah melakukan ritus yang tak bisa kulakukan, {playerName}. Kenakan ini, dan berjalanlah di bawah kanopi tanpa rasa takut.",
         "objectives": {
           "0": {
             "label": "Sang Pemburu Pucat dijatuhkan dari kudanya"
@@ -17700,11 +18580,11 @@ export const id_ID: EnTranslations = {
       },
       "q_pr_the_man_who_went_in": {
         "title": "Pria yang Pernah Masuk",
-        "text": "Para penyelam tak mau melangkah melewati batas pepohonan, {playerName}, dan aku tak akan memintanya. Kau pasti sudah mendengar genderang itu sekarang: semua orang mendengarnya, pada malam kedua. Hanya satu pria di pulau ini yang pernah berjalan menuju suara itu dan kembali. Okku. Ia berkemah di bawah pohon-pohon beringin besar di Air Terjun Sulur, jauh di jalan Belukar. Temukan dia, dan tanyakan apa yang disembunyikan kehijauan itu.",
+        "text": "Para penyelam tak mau melangkah melewati batas pepohonan, {playerName}, dan aku tak akan memintanya. Kau pasti sudah mendengar genderang itu sekarang: semua orang mendengarnya, pada malam kedua. Hanya satu pria di pulau ini yang pernah berjalan menuju suara itu dan kembali. Okrim. Ia berkemah di bawah pohon-pohon beringin besar di Air Terjun Sulur, jauh di jalan Belukar. Temukan dia, dan tanyakan apa yang disembunyikan kehijauan itu.",
         "completion": "Isha mengirimmu? Sang Ibu Mutiara belum menyebut namaku selama bertahun-tahun. Duduklah di luar jangkauan sulur-sulur ini, {playerName}, dan aku akan mengatakan apa yang kutahu: genderang itu bukanlah bahaya. Ia adalah sebuah peringatan.",
         "objectives": {
           "0": {
-            "label": "Temukan Okku di Air Terjun Sulur"
+            "label": "Temukan Okrim di Air Terjun Sulur"
           }
         }
       },
@@ -18289,7 +19169,7 @@ export const id_ID: EnTranslations = {
             "label": "Glimmermere"
           },
           "7": {
-            "label": "Tenda Wyrmcult"
+            "label": "Tenda Broodsworn"
           },
           "8": {
             "label": "Padang Arwah Gentayangan"
@@ -18301,10 +19181,10 @@ export const id_ID: EnTranslations = {
       },
       "veiled_hollow": {
         "name": "Ceruk Terselubung",
-        "welcome": "Udara ini berdengung dengan sihir kuno. Temui Penjaga Saelwyn di bawah pohon agung Eldergleam.",
+        "welcome": "Udara ini berdengung dengan sihir kuno. Temui Penjaga Saelwyn di bawah pohon agung Eldershine.",
         "pois": {
           "0": {
-            "label": "Eldergleam"
+            "label": "Eldershine"
           },
           "1": {
             "label": "Gua Duskfall"
@@ -18442,7 +19322,7 @@ export const id_ID: EnTranslations = {
             "label": "Gerbang Malam"
           },
           "2": {
-            "label": "Sumur Bulan"
+            "label": "The Moonspring"
           },
           "3": {
             "label": "Gloamfield"
@@ -18457,10 +19337,10 @@ export const id_ID: EnTranslations = {
       },
       "wraithwood": {
         "name": "Hutan Arwah",
-        "welcome": "Kanopi menutup di atas jalan bagai sebuah tutup. Tetaplah dekat lentera-lentera Gallowmere, dan jangan menyahut bila hutan ini memanggil namamu.",
+        "welcome": "Kanopi menutup di atas jalan bagai sebuah tutup. Tetaplah dekat lentera-lentera Gibbetmere, dan jangan menyahut bila hutan ini memanggil namamu.",
         "pois": {
           "0": {
-            "label": "Gallowmere"
+            "label": "Gibbetmere"
           },
           "1": {
             "label": "Gerbang Gagak"
@@ -18724,6 +19604,11 @@ export const id_ID: EnTranslations = {
         "sender": "Perbekal heroik",
         "subject": "Tanda Heroik milikmu",
         "body": "Kelompokmu menuntaskan ujian heroik saat kamu bertempur di barisan belakang atau telah tumbang. Penguncianmu juga tercatat, jadi bagian Tanda Heroik milikmu dikirim ke sini alih-alih hilang. Gunakan dengan baik.\n\n- Perbekal heroik"
+      },
+      "wyrmfall_core_reward": {
+        "sender": "The Heroic Quartermaster",
+        "subject": "Your Wyrmfall Cores",
+        "body": "The beast fell while you fought from the back, or from the dirt. Your share of its Wyrmfall Cores flies to you here rather than being lost to the corpse-pickers. Put them to good work at a bench.\n\n- The Heroic Quartermaster"
       },
       "guild_trend_engineering_alchemy": {
         "sender": "Persatuan Perajin",
@@ -19142,6 +20027,7 @@ export const id_ID: EnTranslations = {
     "delveRiteShrineReedInteract": "Altar Buluh: Tekan F untuk menyentuhnya",
     "delveRiteShrineSkullInteract": "Altar Tengkorak: Tekan F untuk menyentuhnya",
     "mailboxName": "Kotak Surat",
-    "noticeboardName": "Papan Pengumuman"
+    "noticeboardName": "Papan Pengumuman",
+    "farmPatchName": "Garden Beds"
   }
 };

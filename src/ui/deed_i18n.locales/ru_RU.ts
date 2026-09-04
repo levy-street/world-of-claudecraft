@@ -128,7 +128,7 @@ export const table: DeedLocaleTable = {
     desc: 'Soberi rudnuyu zhilu, lesnuyu porosl i gryadku trav v Nightbloom.',
   },
   chr_nightbloom_first_cast: {
-    name: 'Ryab na lunnom kolodtse',
+    name: 'Рябь на лунном роднике',
     desc: 'Poymay rybu v vodakh Nightbloom.',
   },
   chr_wraithwood_gatherer: {
@@ -230,7 +230,6 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: 'Хозяин луга', desc: 'Доведите навык травничества до 100.' },
   prog_master_gatherer: {
     name: 'Мастер-собиратель',
-    desc: 'Доведите навык до 100 в любых трёх из горного дела, лесозаготовки, травничества и рыбной ловли.',
   },
   prog_first_craft: { name: 'Ручная работа', desc: 'Успешно создайте своё первое изделие.' },
   prog_craft_specialist: {
@@ -344,7 +343,7 @@ export const table: DeedLocaleTable = {
     title: 'Вирмоборец',
   },
   dgn_sanctum_speed: {
-    name: 'Спринт по святилищу',
+    name: 'Забег по святилищу',
     desc: 'Одолейте Корзула Могильного Вирма в течение 15 минут после того, как ваша группа заняла Святилище Могильного Вирма.',
   },
   dgn_nythraxis_gravebreaker: {
@@ -410,7 +409,7 @@ export const table: DeedLocaleTable = {
   },
   dlv_varric_ringers: {
     name: 'Колокола умолкают',
-    desc: 'Одолейте Дьякона Варрика, когда все поднятые им Погребальные звонари уже перебиты.',
+    desc: 'Одолейте Дьякона Вандрика, когда все поднятые им Погребальные звонари уже перебиты.',
   },
   dlv_nhalia_bells: {
     name: 'Усмиритель колоколов',
@@ -486,7 +485,7 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: 'Летопись Терновых высот',
-    desc: 'Доведите историю горы до конца: Культ Вирма разбит, Святилище умолкло, Пробуждающийся пик низвергнут, и все именные ужасы утёсов повержены.',
+    desc: 'Доведите историю горы до конца: Клятва Выводка разбита, Святилище умолкло, Пробуждающийся пик низвергнут, и все именные ужасы утёсов повержены.',
     title: 'с Торнпика',
   },
   chr_peaks_sparring: {
@@ -581,7 +580,7 @@ export const table: DeedLocaleTable = {
   },
   col_quartermaster_buyout: {
     name: 'Почётный покупатель',
-    desc: 'Найдите все десять предметов из запасов Интенданта Векса.',
+    desc: 'Найдите все десять предметов снаряжения из запасов Интенданта Векса.',
   },
   col_glimmerfin: {
     name: 'Проблеск надежды',
@@ -1026,6 +1025,32 @@ export const table: DeedLocaleTable = {
   prog_armorcrafting_rare: {
     name: 'Закован до совершенства',
     desc: 'Впервые создайте предмет редкого качества по профессии «Бронное дело».',
+  },
+  prog_jewelcrafting_rare: {
+    name: 'Отполирован до блеска',
+    desc: 'Впервые создайте предмет редкого качества по профессии «Ювелирное дело».',
+  },
+  prog_jewelcrafting_50: {
+    name: 'Грань и филигрань',
+    desc: 'Доведите навык ювелирного дела до 50.',
+  },
+  prog_grandmaster_jewelcrafting: {
+    name: 'Гранд-мастер ювелирного дела',
+    desc: 'Доведите навык ювелирного дела до 125, до самой вершины ремесла.',
+    title: 'Гранд-мастер ювелирного дела',
+  },
+  prog_inscription_rare: {
+    name: 'Написано изящными чернилами',
+    desc: 'Впервые создайте предмет редкого качества по профессии «Начертание».',
+  },
+  prog_inscription_50: {
+    name: 'Перо и пигмент',
+    desc: 'Доведите навык начертания до 50.',
+  },
+  prog_grandmaster_inscription: {
+    name: 'Гранд-мастер начертания',
+    desc: 'Доведите навык начертания до 125, до самой вершины ремесла.',
+    title: 'Гранд-мастер начертания',
   },
   prog_ready_for_an_adventure: {
     name: 'Навстречу приключениям',

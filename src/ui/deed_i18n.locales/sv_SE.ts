@@ -88,7 +88,6 @@ export const table: DeedLocaleTable = {
     desc: 'Skorda en malmadra, ett tradbestand och en ortbadd i Nightbloom.',
   },
   chr_nightbloom_first_cast: {
-    name: 'En ring pa manbrunnen',
     desc: 'Fanga en fisk i Nightblooms vatten.',
   },
   chr_wraithwood_gatherer: {
@@ -172,7 +171,6 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: 'Ängens mästare', desc: 'Nå 100 i färdigheten Örtkunskap.' },
   prog_master_gatherer: {
     name: 'Mästersamlare',
-    desc: 'Nå 100 i skicklighet i tre valfria av Gruvdrift, Skogsavverkning, Örtkunskap och Fiske.',
   },
   prog_first_craft: { name: 'Handgjort', desc: 'Slutför ditt första lyckade hantverk.' },
   prog_craft_specialist: {
@@ -283,7 +281,6 @@ export const table: DeedLocaleTable = {
     title: 'Lindormsfällaren',
   },
   dgn_sanctum_speed: {
-    name: 'Helgedomssprinten',
     desc: 'Besegra Korzul Gravlindormen inom 15 minuter efter att din grupp gjort anspråk på Gravlindormens helgedom.',
   },
   dgn_nythraxis_gravebreaker: {
@@ -349,7 +346,7 @@ export const table: DeedLocaleTable = {
   },
   dlv_varric_ringers: {
     name: 'Klockorna tystnar',
-    desc: 'Besegra Diakon Varric när varje begravningsringare han väcker redan är dräpt.',
+    desc: 'Besegra Diakon Vandric när varje begravningsringare han väcker redan är dräpt.',
   },
   dlv_nhalia_bells: {
     name: 'Klockstillare',
@@ -425,7 +422,6 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: 'Törntoppens krönika',
-    desc: 'Följ bergets hela berättelse till slutet: Lindormskulten krossad, helgedomen tystad, den vaknande toppen fälld och klippornas alla namnkunniga fasor nedlagda.',
     title: 'av Törntoppen',
   },
   chr_peaks_sparring: {
@@ -511,7 +507,7 @@ export const table: DeedLocaleTable = {
   },
   col_quartermaster_buyout: {
     name: 'Stamkund',
-    desc: 'Upptäck alla tio delar av den heroiska kvartersmästarens utbud.',
+    desc: 'Upptäck alla tio utrustningsdelar i den heroiska kvartersmästarens utbud.',
   },
   col_glimmerfin: {
     name: 'Ett skimmer av hopp',

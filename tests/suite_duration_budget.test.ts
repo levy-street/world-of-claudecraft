@@ -63,6 +63,13 @@ const DEFAULT_FILE_ALLOWANCE = 300_000;
 const FILE_ALLOWANCE_LEDGER: ReadonlyMap<string, number> = new Map([
   ['tests/audit_conservation_property.test.ts', 2_700_000],
   ['tests/battleground_band.test.ts', 480_000],
+  // The shared PostgreSQL fence fixture (createdb + the schema ladder) carries
+  // a 120s beforeAll and a 30s afterAll drop, plus seven independently bounded
+  // 30s cases: the unleased, nonce, and offline-writer fence proofs, including
+  // the D136 nonce-expiry and D145 displacement-race arms this wave added, each
+  // parking on a contended row against the real lock_timeout. The exact row
+  // records that parallelizable shape without promoting it into the measured lane.
+  ['tests/character_save_statement_pg_integration.test.ts', 360_000],
   ['tests/chronomancy_balance_targets.test.ts', 420_000],
   // The real-suite shard collection case walks the complete test corpus and
   // needs a 60s allowance on low-worker hosts; the other timeout pins in this

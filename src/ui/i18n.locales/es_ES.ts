@@ -146,16 +146,16 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'delveUi.board.marks': 'Marcas de Profundidad: {count}',
   'delveUi.board.openDelveAria': 'Abrir el Tablón de Profundidades desde {name}',
   'delveUi.board.title': 'Tablón de Profundidades',
-  'delveUi.boss.varric.bell.log': 'El Diácono Varric empieza a tañer la campana funeraria.',
-  'delveUi.boss.varric.bell.warning': '¡Apártate del Diácono Varric!',
+  'delveUi.boss.varric.bell.log': 'El Diácono Vandric empieza a tañer la campana funeraria.',
+  'delveUi.boss.varric.bell.warning': '¡Apártate del Diácono Vandric!',
   'delveUi.boss.varric.mid30': 'La campana funeraria responde a cada nombre que pronuncia.',
   'delveUi.boss.varric.mid60':
-    'El Diácono Varric lee nombres del registro con un júbilo tembloroso.',
+    'El Diácono Vandric lee nombres del registro con un júbilo tembloroso.',
   'delveUi.boss.varric.pull':
     'Pisas el polvo sagrado con un propósito impuro. Arrodíllate y deja que te cuenten.',
-  'delveUi.boss.varric.raise.emote': '¡El Diácono Varric invoca nombres desde las tumbas rotas!',
+  'delveUi.boss.varric.raise.emote': '¡El Diácono Vandric invoca nombres desde las tumbas rotas!',
   'delveUi.boss.varric.raise.interrupt_ok': 'El rito sepulcral vacila.',
-  'delveUi.boss.varric.raise.log': 'El Diácono Varric empieza a alzar a los muertos.',
+  'delveUi.boss.varric.raise.log': 'El Diácono Vandric empieza a alzar a los muertos.',
   'delveUi.boss.varric.raise.object': 'La tumba agrietada se estremece con un aliento robado.',
   'delveUi.boss.varric.raise.warning': '¡Detén el rito sepulcral!',
   'delveUi.companion.tessa.combat_start':
@@ -197,8 +197,6 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blazing_barrier.description':
     'Rodéate de fuego para absorber {damage} de daño durante 60 s. (Fuego)',
   'entities.abilities.cold_snap.name': 'Llamada invernal',
-  'entities.abilities.cold_snap.description':
-    'Restablece el tiempo de reutilización de Paso centelleante, Velo de Escarcha e Invisibilidad mejorada. (Talento de mago)',
   'entities.abilities.greater_invisibility.name': 'Invisibilidad mejorada',
   'entities.abilities.hot_streak.name': 'Racha ardiente',
   'entities.abilities.hot_streak.description':
@@ -474,7 +472,7 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
     'Añade 1 de Ritual de Veneno y prolonga tu herida de Desgarro venenoso 6 s (nunca supera los 20 s).',
   'entities.items.soul_stone.name': 'Piedra de alma',
   'hud.pet.abyssalChainDesc':
-    'Ordena a tu Gloomshade que arrastre a un enemigo normal de más de 8 m y hasta 20 m de vuelta hacia sí. Los jefes no pueden ser arrastrados. Tiempo de reutilización: 15 segundos. Haz clic con el botón derecho, mantén la pulsación táctil, o pulsa Mayús+Intro para alternar el lanzamiento automático.',
+    'Ordena a tu Duskmurk que arrastre a un enemigo normal de más de 8 m y hasta 20 m de vuelta hacia sí. Los jefes no pueden ser arrastrados. Tiempo de reutilización: 15 segundos. Haz clic con el botón derecho, mantén la pulsación táctil, o pulsa Mayús+Intro para alternar el lanzamiento automático.',
   'hud.pet.autocastOff':
     'Lanzamiento automático desactivado. Haz clic con el botón derecho, mantén la pulsación táctil, o pulsa Mayús+Intro para activarlo.',
   'hud.pet.autocastOn':

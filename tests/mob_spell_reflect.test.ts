@@ -1,11 +1,11 @@
-// Innate "warded" mobs (Wyrmcult Necromancers) reflect flat damage onto any
+// Innate "warded" mobs (Broodsworn Necromancers) reflect flat damage onto any
 // caster whose SPELL connects — the magic-school twin of melee thorns. The
 // reflect lives in dealDamage, the single funnel every damage instance passes
 // through, so driving dealDamage directly exercises the exact production path.
 import { describe, expect, it } from 'vitest';
-import { Sim } from '../src/sim/sim';
-import { createMob } from '../src/sim/entity';
 import { MOBS } from '../src/sim/data';
+import { createMob } from '../src/sim/entity';
+import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 
 function makeSim() {

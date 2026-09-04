@@ -33,10 +33,10 @@ import {
 import { WEAPON_SKINS } from '../sim/content/weapon_skins';
 import { DELVES, DUNGEONS, ITEMS, MOBS, NPCS, QUESTS, ZONES } from '../sim/data';
 import { localizeWeaponSkin } from './armory_labels';
-import { craftNameKey } from './craft_name_view';
 import { deedName, deedTitleText } from './deed_i18n';
 import { dungeonDisplayName, itemDisplayName, tEntity, zoneDisplayName } from './entity_i18n';
-import { gatheringProfessionNameKey } from './gathering_profession_name';
+import { craftNameKey } from './hud/professions/craft_name_view';
+import { gatheringProfessionNameKey } from './hud/professions/gathering_profession_name';
 import { formatList, hasTranslation, type TranslationKey, t } from './i18n';
 import { ownEntry } from './known_item';
 import { MOUNT_NAME_KEYS } from './mount_labels';

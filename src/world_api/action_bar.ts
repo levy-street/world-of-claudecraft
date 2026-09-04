@@ -11,17 +11,14 @@
 // localStorage read/write side lives in `src/ui/hud/action_bar/
 // action_bar_layout_sync.ts` (browser-only), which imports the type from here.
 
-// The six action-bar "forms" a character can arrange independently: the base
-// bar, the druid Bear/Cat/Cat-stealth kits, the rogue Stealth bar, and the Vale
-// Cup sport bar. This is the full sibling set the localStorage keys cover.
-export const ACTION_BAR_LAYOUT_FORMS = [
-  'normal',
-  'bear',
-  'cat',
-  'cat_stealth',
-  'stealth',
-  'sport',
-] as const;
+// The five action-bar "forms" a character can arrange independently: the base
+// bar, the druid Bear/Cat/Cat-stealth kits, and the rogue Stealth bar. This is
+// the full sibling set the localStorage keys cover. The Vale Cup 'sport' bar
+// left the list with the minigame itself: nothing could arrange or show one
+// any more, so it stayed only as a token. A layout persisted before that
+// retirement still degrades cleanly, because sanitizeActionBarLayout IGNORES
+// an unknown form key rather than rejecting the payload it rides in.
+export const ACTION_BAR_LAYOUT_FORMS = ['normal', 'bear', 'cat', 'cat_stealth', 'stealth'] as const;
 export type ActionBarLayoutForm = (typeof ACTION_BAR_LAYOUT_FORMS)[number];
 
 // Bounds for the untrusted client payload (validated server-side). The slot cap

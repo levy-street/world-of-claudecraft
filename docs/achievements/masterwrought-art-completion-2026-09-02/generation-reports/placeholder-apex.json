@@ -1,0 +1,524 @@
+{
+  "schemaVersion": 1,
+  "batchId": "masterwrought-placeholder-apex-2026-09-02",
+  "generator": "OpenAI built-in image generation",
+  "skill": "imagegen",
+  "styleContract": "woc-item-icon-v1",
+  "sourceDirectory": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex",
+  "promptRecord": {
+    "format": "Each call used these labeled fields in order: Use case, Asset type, Primary request, Input images, Subject and identity, Composition, Scene and backdrop, Style, Constraints.",
+    "useCase": "style-transfer",
+    "commonIntent": "Replace the current programmatic icon while preserving only its authored object identity. Paint one complete tangible subject at about 72 percent fill on an opaque dark vignette in the premium hand-painted classic dark-fantasy MMORPG inventory style, with warm top-left key light, cool bottom-right shadow, safe padding, and 22px plus circular-crop legibility.",
+    "commonNegative": "No text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, or cropped silhouette. Pattern vellum must be completely blank, with no diagrams, drafting lines, or marks.",
+    "note": "Each item's exactPrompt preserves payload.item.revisedPrompt byte-for-byte from its completed image-generation event. promptBrief remains a human-readable index only."
+  },
+  "exactPromptRecovery": {
+    "sourceSession": "/Users/fernando/.codex/sessions/2026/09/02/rollout-2026-09-02T20-38-54-01a064eb-4366-7873-abb2-ac7d1eb8ffe6.jsonl",
+    "sourceField": "payload.item.revisedPrompt",
+    "recoveredCount": 32,
+    "verifiedByteExact": true,
+    "verifiedAgainstOriginalPromptArguments": true,
+    "oneGenerationCallPerItem": true,
+    "oneOutputPerCall": true,
+    "referencedImagesPerCall": 3,
+    "recoveryManifestSha256": "2600f203d57eea574596f62ddb0ac50a4d66c58502c6ee972b1406d8eefdcec9",
+    "recoveryManifestBytes": 70342
+  },
+  "review": {
+    "sourceInspection": "accepted",
+    "dimensions": "1254x1254 for every master",
+    "colorSpace": "sRGB for every master",
+    "opaque": true,
+    "retries": 0,
+    "contactSheets": {
+      "128": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/review/contact-128.png",
+      "40": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/review/contact-40.png",
+      "28Grayscale": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/review/contact-28gray.png",
+      "22": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/review/contact-22.png",
+      "circle64": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/review/contact-circle64.png"
+    },
+    "verdict": "All requested identities remain legible at delivery sizes and inside the circular crop. All pattern faces are blank and identity is carried by material samples, seals, binding, and parcel silhouette."
+  },
+  "items": [
+    {
+      "id": "duskforged_warblade",
+      "promptBrief": "One complete blue-black one-handed straight warblade with compact guard, leather grip, smith wear, and one narrow ember-orange temper seam, full lower-left to upper-right diagonal.",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Duskforged Warblade (item id duskforged_warblade) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder: preserve the straight one-handed sword silhouette, dark blade, simple crossguard, and controlled ember-orange temper edge, but do not preserve its flat vector treatment. Image 2 is the approved long-weapon house-style reference for diagonal composition, safe tip padding, brushwork, and lighting only. Image 3 is an approved hard-material reference for tactile metal and restrained magic only. Do not copy unrelated objects.\nSubject and identity: one complete forged one-handed warblade of blue-black duskforged alloy, long straight double-edged blade, compact dark crossguard and leather grip, with a narrow controlled ember-orange temper seam along one cutting edge and subtle smith wear. It must read as a practical master-crafted sword, not a dagger, glowing lightsaber, or oversized two-hander.\nComposition: full sword on a strong lower-left to upper-right diagonal, complete tip and pommel visible, centered with safe padding, about 72 percent subject fill, readable at 22px and inside a 64px circular crop.\nScene and backdrop: opaque deep charcoal and blue-black painted vignette with restrained forge-warm haze and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile forged metal and worn leather; crisp focal blade edges and softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow; ember accent subordinate to silhouette.\nConstraints: square single icon; exactly one weapon; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environment scene, clipped tip, or cropped pommel.",
+      "references": [
+        "public/ui/items/duskforged_warblade.webp (identity-only anti-reference)",
+        "public/ui/items/kingsbane_last_oath.webp (long-weapon composition)",
+        "public/ui/items/arcanite_mining_pick.webp (hard-material style)"
+      ],
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-4366-7873-abb2-ac7d1eb8ffe6/exec-c12ddcb1-876e-4d02-a9bf-658b5a7392c2.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/duskforged_warblade.png",
+      "sha256": "0386b200b53b228eecbc67766101e9a0ab4e9facfeda4efba9bebbbe573b693c",
+      "bytes": 2181300,
+      "status": "accepted"
+    },
+    {
+      "id": "duskforged_bulwark",
+      "promptBrief": "One heavy tall rounded blue-black bulwark shield with overlapping horizontal plates, reinforced rim, and a compact controlled ember-orange boss, front to slight three-quarter face.",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Duskforged Bulwark (item id duskforged_bulwark) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder: preserve its tall compact dark shield, layered horizontal plates, and small controlled ember-orange boss, but do not preserve flat vector treatment. Image 2 is the approved shield house-style reference for tactile construction, three-quarter face, safe padding, brushwork, and lighting only. Image 3 is an approved contained-glow reference only. Do not copy unrelated objects.\nSubject and identity: one complete heavy mail-class bulwark shield forged from blue-black duskforged alloy, slightly tall rounded heater silhouette, overlapping battered horizontal plates, reinforced dark rim and a compact central boss containing a restrained orange temper glow. Practical master-craft, not demonic, not a door, not a tower shield.\nComposition: front to slight three-quarter face, complete shield centered, about 72 percent subject fill, safe padding, readable at 22px and inside a 64px circular crop.\nScene and backdrop: opaque deep charcoal and smoky navy painted vignette with faint forge-warm atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile forged metal, hammer marks, controlled edge highlights; warm top-left key and cool deep bottom-right shadow; orange boss subordinate to the silhouette.\nConstraints: square single icon; exactly one shield; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, cropped rim, spikes, skulls, or unrelated weapons.",
+      "references": [
+        "public/ui/items/duskforged_bulwark.webp (identity-only anti-reference)",
+        "public/ui/items/eastbrook_buckler.webp (shield style)",
+        "public/ui/items/firebottle.webp (contained glow)"
+      ],
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-4366-7873-abb2-ac7d1eb8ffe6/exec-2d2b0a97-570a-4e3f-b060-f330a890ed5e.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/duskforged_bulwark.png",
+      "sha256": "1b387a6e2bf961ecfcaf486d960e03a08468322a6a96ce752b31080a77122550",
+      "bytes": 2275665,
+      "status": "accepted"
+    },
+    {
+      "id": "ridgebreaker",
+      "promptBrief": "One complete two-handed blue-black war maul with broad beveled head, single ember temper fracture, long ashwood haft, leather grip, and steel butt cap on a strong diagonal.",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Ridgebreaker (item id ridgebreaker) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder: preserve the complete two-handed maul, broad blocky dark head, long wrapped haft, and controlled orange fracture line, but do not preserve flat vector treatment. Image 2 is the approved hard-tool material reference; Image 3 controls long diagonal composition and safe tip padding only. Do not copy their objects.\nSubject and identity: one immense but usable two-handed war maul forged from blue-black duskforged alloy, broad squared hammer head with beveled battered faces, a single contained ember-orange temper seam through the metal, long ashwood haft with dark leather grip and a steel butt cap. It must read immediately as a two-handed maul, not a mining pick, axe, staff, or one-handed hammer.\nComposition: full long weapon corner-to-corner on a strong lower-left to upper-right diagonal, head and butt cap fully visible with safe margins, about 72 percent subject fill, readable at 22px and in a 64px circular crop.\nScene and backdrop: opaque deep charcoal and iron-blue painted vignette with restrained forge haze and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile pitted metal, wood grain, worn leather; crisp focal head and softer peripheral brushwork; warm top-left key with cool deep bottom-right shadow; orange seam subordinate.\nConstraints: square single icon; exactly one complete maul; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, clipped head, cropped haft, skulls, or excessive flame.",
+      "references": [
+        "public/ui/items/ridgebreaker.webp (identity-only anti-reference)",
+        "public/ui/items/arcanite_mining_pick.webp (hard-material style)",
+        "public/ui/items/kingsbane_last_oath.webp (long silhouette)"
+      ],
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-4366-7873-abb2-ac7d1eb8ffe6/exec-1a55b6ed-079e-4ba2-9fc5-fd82d6c8f401.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/ridgebreaker.png",
+      "sha256": "8966a3f4d4bcdb52d7c9b4b600ea9597e6b56f2ea9f99ebfec3d2fa9e9a62aac",
+      "bytes": 2180195,
+      "status": "accepted"
+    },
+    {
+      "id": "wyrmfall_pendant",
+      "promptBrief": "One aged-gold and dark-thorium torque holding a faceted teal Wyrmfall gemstone in scale-like claws, restrained inner glow and no creature face.",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Wyrmfall Pendant (item id wyrmfall_pendant) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder: preserve a strong gold neck ring and faceted teal hanging stone, but do not preserve flat vector treatment. Image 2 controls the authored teal Wyrmfall material family and tactile finish only. Image 3 controls contained luminous material and painted values only. Do not copy unrelated objects.\nSubject and identity: one complete master-crafted pendant, a substantial open torque of aged warm gold and dark thorium holding a single faceted teal Wyrmfall-core gemstone in a scale-like claw setting. The teal heart glows faintly from within; restrained dragon-forged detail without a creature face, rune, or heraldic symbol. It must read as valuable caster jewelry, not a magnifying glass, key ring, halo, or generic orb.\nComposition: one centered complete necklace in readable three-quarter presentation, pendant stone dominant, circular neck form fully visible, about 72 percent subject fill, safe padding, readable at 22px and inside a 64px circular crop.\nScene and backdrop: opaque deep charcoal with a restrained teal and umber painted vignette, subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile aged metal and crisp gemstone facets; warm top-left key light with cool deep bottom-right shadow; restrained teal internal glow, crisp focal stone, softer peripheral brushwork.\nConstraints: square single icon; exactly one necklace; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, extra loose gems, dragon head, or cropped chain.",
+      "references": [
+        "public/ui/items/wyrmfall_pendant.webp (identity-only anti-reference)",
+        "tmp/imagegen/masterwrought-review/wyrmfall_core.png (Wyrmfall material family)",
+        "public/ui/items/firebottle.webp (contained luminous material)"
+      ],
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-4366-7873-abb2-ac7d1eb8ffe6/exec-6e0fd02f-3a4c-4f09-bb4f-9e0db0caa2f7.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/wyrmfall_pendant.png",
+      "sha256": "7d1fa03257c4c2eda8e627bf43b2b6ca5f8ce9851be338487c2659fbf6374f0b",
+      "bytes": 2190242,
+      "status": "accepted"
+    },
+    {
+      "id": "warhewn_signet",
+      "promptBrief": "One heavy hammered blue-black martial signet with broad squared face, thick worn band, beveled shoulders, and a shallow crossed ember-metal smithing mark that is neither lettering nor rune.",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Warhewn Signet (item id warhewn_signet) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder: preserve the thick dark ring and raised rectangular signet face with restrained orange inlay, but not its flat vector treatment. Image 2 controls tactile worn metal and warm top-left lighting only. Image 3 controls the duskforged blue-black alloy and narrow orange temper accent only. Do not copy unrelated objects.\nSubject and identity: one heavy martial signet ring forged from hammered blue-black thorium, with a broad squared face, a shallow crossed temper-line inlay of ember-orange metal, thick worn band, and crisp beveled shoulders. The face is a deliberate simple smithing mark, not letters or a rune. It must read as a strength-focused warrior ring, not a buckle, bracelet, purse handle, or generic magic circle.\nComposition: one complete ring in readable three-quarter view, face toward viewer, centered and large enough to read, about 72 percent subject fill with safe padding, readable at 22px and inside a 64px circular crop.\nScene and backdrop: opaque deep charcoal and warm umber painted vignette with subtle contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile hammered metal, worn edges and controlled reflections; warm top-left key, cool deep bottom-right shadow; tiny orange inset subordinate to the ring silhouette.\nConstraints: square single icon; exactly one ring; borderless; no text, letters, numbers, label, rune, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, floating particles, extra gems, skulls, or cropped band.",
+      "references": [
+        "public/ui/items/warhewn_signet.webp (identity-only anti-reference)",
+        "public/ui/items/eastbrook_buckler.webp (worn metal)",
+        "duskforged_warblade.png (duskforged alloy family)"
+      ],
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-4366-7873-abb2-ac7d1eb8ffe6/exec-16e9cbbf-1ff5-4de0-ab03-777fa935b495.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/warhewn_signet.png",
+      "sha256": "ded5bc54c68d69d7ea8fda3f2d37c398350a15a4f6b05943c1b7d0c6d9fb81c8",
+      "bytes": 2203866,
+      "status": "accepted"
+    },
+    {
+      "id": "prismglass_loop",
+      "promptBrief": "One pale smoke-clear prismglass ring segmented by slim silver-thorium joints and crowned by one small colorless crystal, with restrained icy-cyan refraction.",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Prismglass Loop (item id prismglass_loop) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder: preserve a circular pale segmented ring crowned by one pointed pale crystal, but not its flat vector treatment. Image 2 controls master-crafted jewelry material richness and three-quarter presentation only. Image 3 controls crisp luminous glass edges and contained glow only. Do not copy unrelated objects.\nSubject and identity: one elegant caster ring made from a thick loop of pale smoke-clear prismglass set into slim silver-thorium joints, with one small faceted colorless crystal rising at the crown. Subtle internal spectral refractions, mostly icy silver and faint cyan, no rainbow flood. It must read as an intelligent haste ring, delicate but tangible, not a gear, portal, crown, halo, magnifying glass, or generic orb.\nComposition: one complete ring in readable three-quarter view, centered, crowned crystal clearly visible, about 72 percent subject fill with safe padding, readable at 22px and inside a 64px circular crop.\nScene and backdrop: opaque deep navy-charcoal painted vignette with cool haze and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile polished silver and crisp translucent glass facets; warm top-left key light with cool deep bottom-right shadow; restrained internal refraction, sharp crown focus and softer peripheral brushwork.\nConstraints: square single icon; exactly one ring; borderless; no text, letters, numbers, label, rune, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, excessive rainbow, extra loose gems, or cropped band.",
+      "references": [
+        "public/ui/items/prismglass_loop.webp (identity-only anti-reference)",
+        "wyrmfall_pendant.png (jewelry finish)",
+        "public/ui/items/firebottle.webp (glass edges)"
+      ],
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-4366-7873-abb2-ac7d1eb8ffe6/exec-c5709fcb-8a34-47a1-befd-72d7f29bec5b.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/prismglass_loop.png",
+      "sha256": "3f304a5435f55b8d33169bbba4a204157e05f127dc2d243818040f5c40ca48f1",
+      "bytes": 2112749,
+      "status": "accepted"
+    },
+    {
+      "id": "makers_charm",
+      "promptBrief": "One palm-sized mechanical charm with faceted violet prismglass in an oval blue-black steel cage, brass crown, three calibrated hanging beads, and leather suspension cord, explicitly not an eye.",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Maker's Charm (item id makers_charm) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder: preserve a compact oval violet jewel in an engineering mount with small brass suspension loops, but not its flat vector treatment or eye-like graphic. Image 2 controls the aged-brass and prismglass engineering family only. Image 3 controls tactile leather and compact inventory-object presentation only. Do not copy unrelated objects.\nSubject and identity: one palm-sized master engineer's charm, a faceted deep-violet prismglass lens locked in a rugged oval blue-black steel cage, with a short aged-brass winding crown, three small calibrated brass beads on articulated loops, and a dark leather suspension cord. The beads and lens suggest a reusable charged gathering tool. It must read as a crafted mechanical talisman, not an eye, necklace portrait, compass, dreamcatcher, insect, or generic magic orb.\nComposition: one complete connected charm centered in readable three-quarter view, oval lens dominant, hanging fittings compact and fully visible, about 72 percent subject fill with safe padding, readable at 22px and inside a 64px circular crop.\nScene and backdrop: opaque deep charcoal and muted violet painted vignette with grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile forged steel, tarnished brass, worn leather and crisp glass; warm top-left key light and cool deep bottom-right shadow; restrained violet internal glow subordinate to silhouette.\nConstraints: square single icon; exactly one connected charm; borderless; no eye or pupil, text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, loose gears, wings, creature features, or cropped fittings.",
+      "references": [
+        "public/ui/items/makers_charm.webp (identity-only anti-reference)",
+        "gyrelens_array.png (engineering family)",
+        "public/ui/items/linen_pouch.webp (leather and compact presentation)"
+      ],
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-4366-7873-abb2-ac7d1eb8ffe6/exec-b8dc46c7-3f32-4ba0-9cc4-5f6928ada03c.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/makers_charm.png",
+      "sha256": "4c8835eac4f36108ece9b5d78a62a24673145f3abd13485d97f8cae505d90f59",
+      "bytes": 1885380,
+      "status": "accepted"
+    },
+    {
+      "id": "gyrelens_array",
+      "promptBrief": "One connected handheld engineering optic with three graduated prismglass lenses on an articulated aged-brass and blue-black steel spine, largest lens facing the viewer.",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Gyrelens Array (item id gyrelens_array) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder: preserve an articulated three-lens brass-and-steel optic with one dominant circular lens and two smaller offset lenses, but not its flat vector treatment. Image 2 controls tactile hard-material rendering and restrained magical accent; Image 3 controls luminous glass rims and contained glow only. Do not copy unrelated objects.\nSubject and identity: one compact handheld engineering lens array for a caster offhand, built from aged brass collars, blue-black steel pivots, and three graduated round prismglass lenses mounted on a short articulated spine. The largest lens faces the viewer at a three-quarter angle with two smaller lenses stepping upward behind it, showing pale blue optical reflections. It must read as a clever portable instrument, not goggles, a telescope, a clock, a shield, bubbles, or a planetary diagram.\nComposition: one complete compact device centered in readable three-quarter view, dominant lens and stepped secondary lenses clear, about 72 percent subject fill with safe padding, readable at 22px and inside a 64px circular crop.\nScene and backdrop: opaque deep navy-charcoal and muted brass painted vignette with grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile tarnished brass, forged steel and crisp glass; warm top-left key and cool deep bottom-right shadow; restrained pale-cyan lens sheen, crisp focal rim and softer peripheral brushwork.\nConstraints: square single icon; exactly one connected instrument; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, face, mannequin, environmental scene, loose gears, extra tools, or cropped lenses.",
+      "references": [
+        "public/ui/items/gyrelens_array.webp (identity-only anti-reference)",
+        "public/ui/items/arcanite_mining_pick.webp (hard-material style)",
+        "public/ui/items/firebottle.webp (glass sheen)"
+      ],
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-4366-7873-abb2-ac7d1eb8ffe6/exec-129abdec-01f5-41f1-909a-d4207084969d.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/gyrelens_array.png",
+      "sha256": "b957615de1283e02cbba988e2afb593bbfea6f192cc18673962e36a110dc523c",
+      "bytes": 1987320,
+      "status": "accepted"
+    },
+    {
+      "id": "masters_field_forge",
+      "promptBrief": "One self-contained portable blue-black iron forge on folding legs, compact anvil plate above a contained ember chamber, side bellows housing, and leather carry straps.",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Master's Field Forge (item id masters_field_forge) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder: preserve a compact portable forge with a small anvil plate above a glowing ember chamber and folding feet, but not its flat vector treatment. Images 2 and 3 control tactile forged metal, worn hard surfaces, top-left light, and painted values only. Do not copy their objects.\nSubject and identity: one self-contained portable field forge, a stout blue-black iron brazier body on three folded-out steel legs, with a compact anvil plate locked across its top, small side bellows housing, leather carry straps, and a contained orange coal glow through the front vent. It must read as one carryable master engineer's station, not a full workshop, barbecue, treasure chest, robot, or ordinary anvil.\nComposition: one complete connected device centered in three-quarter view, all feet and anvil edges visible, about 72 percent subject fill with safe padding, readable at 22px and inside a 64px circular crop.\nScene and backdrop: opaque deep charcoal and smoky umber painted vignette with subtle forge haze and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile hammered iron, worn steel, leather straps and contained embers; warm top-left key with cool bottom-right shadow; orange fire subordinate to the device silhouette; crisp anvil focus and softer peripheral brushwork.\nConstraints: square single icon; exactly one portable forge device; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, person, hand, mannequin, environmental workshop, scattered tools, smoke plume obscuring silhouette, or cropped legs.",
+      "references": [
+        "public/ui/items/masters_field_forge.webp (identity-only anti-reference)",
+        "public/ui/items/eastbrook_buckler.webp (worn metal)",
+        "public/ui/items/arcanite_mining_pick.webp (hard-material style)"
+      ],
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-4366-7873-abb2-ac7d1eb8ffe6/exec-1dc89d85-bc82-4aa0-adea-7f9b2304ef51.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/masters_field_forge.png",
+      "sha256": "6c495672e28b81e05faf6bbffdf53b4c7364810fbf77912057f8bc5e7dde74b7",
+      "bytes": 2102260,
+      "status": "accepted"
+    },
+    {
+      "id": "voidbound_grimoire",
+      "promptBrief": "One closed obsidian-black cracked-leather tome with blue-black steel corners, broad side clasp, unlettered violet cabochon, worn page edges, and tightly contained violet binding light.",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Voidbound Grimoire (item id voidbound_grimoire) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder: preserve one closed dark tome with reinforced corners, side clasp, and a contained violet binding focus, but not its flat vector treatment or circular glyph. Image 2 controls dark cloth/leather values and painterly material separation; Image 3 controls contained magical glow only. Do not copy unrelated objects.\nSubject and identity: one closed heavy offhand grimoire bound in obsidian-black cracked leather over rigid boards, reinforced with blue-black steel corner plates and a broad side clasp. At the center sits one smooth unlettered violet crystal cabochon held by plain concentric metal bands, with a faint binding glow leaking only at the clasp and page edges. No symbol or writing on the cover. It must read as a dangerous but controlled healer-leaning magical tome, not a tablet, shield, door, spell effect, or modern notebook.\nComposition: one complete closed book centered in readable three-quarter view, cover and page block visible, all corners and clasp safely padded, about 72 percent subject fill, readable at 22px and inside a 64px circular crop.\nScene and backdrop: opaque deep navy-black and muted violet painted vignette with grounded contact shadow and restrained atmosphere, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile cracked leather, cold metal and worn parchment edges; crisp focal clasp and softer peripheral brushwork; warm top-left key with cool deep bottom-right shadow; violet glow contained and subordinate.\nConstraints: square single icon; exactly one closed book; borderless; no text, letters, numbers, labels, runes, pseudo-writing, arcane circle, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, skull, face, tentacles, loose pages, or cropped corners.",
+      "references": [
+        "public/ui/items/voidbound_grimoire.webp (identity-only anti-reference)",
+        "public/ui/items/cinderweave_raiment.webp (dark material values)",
+        "public/ui/items/firebottle.webp (contained glow)"
+      ],
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-4366-7873-abb2-ac7d1eb8ffe6/exec-712abbe0-50af-4481-b827-b8e45078a2e4.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/voidbound_grimoire.png",
+      "sha256": "39560a53cdc021363148754f08e769394c7d4a3259882cf134a63aaa8830e759",
+      "bytes": 2264771,
+      "status": "accepted"
+    },
+    {
+      "id": "ironhusk_flask",
+      "promptBrief": "One squat thick smoky-grey glass flask inside a hammered iron cage with broad ribs, short corked neck, and dense iron-grey liquid with a moss undertone.",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Ironhusk Flask (item id ironhusk_flask) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder: preserve a squat round bottle protected by dark iron ribs and a stout stopper, but not its flat vector treatment or bright red identity. Image 2 controls readable vessel, contained liquid, painted glass, and small-size silhouette. Image 3 controls tactile aged iron and controlled top-left reflections only. Do not copy unrelated objects.\nSubject and identity: one squat stamina flask made from thick smoky grey glass inside a hammered iron protective cage, with four broad vertical ribs, a short corked neck, and dense iron-grey liquid with a faint moss-green undertone. A small amber glint at the base suggests vitality without making it an ember potion. It must read as durable and fortifying, not explosive, poisonous, a grenade, or a beer bottle.\nComposition: one complete vessel centered in readable three-quarter view, liquid level and cage construction visible, about 72 percent subject fill with safe padding, readable at 22px and inside a 64px circular crop.\nScene and backdrop: opaque deep charcoal and cool slate painted vignette with grounded contact shadow and restrained atmosphere, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile worn iron, thick glass, cork and viscous liquid; warm top-left key with cool deep bottom-right shadow; restrained highlights and no magical flood.\nConstraints: square single icon; exactly one flask; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, environmental scene, flames, skull, face, weapon, extra bottles, or cropped stopper.",
+      "references": [
+        "public/ui/items/ironhusk_flask.webp (identity-only anti-reference)",
+        "public/ui/items/firebottle.webp (vessel style)",
+        "public/ui/items/eastbrook_buckler.webp (aged iron)"
+      ],
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-4366-7873-abb2-ac7d1eb8ffe6/exec-05587e1d-a235-43f0-8613-b03f4fe593bf.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/ironhusk_flask.png",
+      "sha256": "a5c6acf7ca4b6e3c243cf2779f1da429a0448f6b9574a5ecc4527fa31c2f694e",
+      "bytes": 2003994,
+      "status": "accepted"
+    },
+    {
+      "id": "warboar_flask",
+      "promptBrief": "One squat amber-glass flask of ember-red tonic with a rugged blue-black iron collar, paired natural ivory tusk guards, cork, and waxed leather binding, no animal face.",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Warboar Flask (item id warboar_flask) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder: preserve a compact warm-red flask with two pale tusk-like side guards and rugged stopper, but do not preserve flat vector treatment or its cartoon face medallion. Image 2 controls readable vessel and contained luminous liquid; Image 3 controls martial iron wear and restrained ember accents only. Do not copy unrelated objects.\nSubject and identity: one squat physical-might flask of thick dark amber glass filled with ember-red tonic, wrapped by a rugged blue-black iron collar with a natural paired ivory tusk guard curving up each side. A stout cork and waxed leather neck binding complete the vessel. No animal face, emblem, or label. It must read as a fierce martial draught, not a grenade, trophy skull, beer stein, or firebomb.\nComposition: one complete vessel centered in readable three-quarter view, red liquid level and paired tusk guards clear, about 72 percent subject fill with safe padding, readable at 22px and inside a 64px circular crop.\nScene and backdrop: opaque deep charcoal and warm umber painted vignette with grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile amber glass, worn iron, ivory, cork and liquid; warm top-left key with cool deep bottom-right shadow; controlled ember-red internal light subordinate to silhouette.\nConstraints: square single icon; exactly one connected flask; borderless; no text, letters, numbers, labels, runes, pseudo-writing, animal face, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, environmental scene, open flame, skull, weapon, extra bottles, or cropped stopper.",
+      "references": [
+        "public/ui/items/warboar_flask.webp (identity-only anti-reference)",
+        "public/ui/items/firebottle.webp (vessel style)",
+        "ridgebreaker.png (martial material family)"
+      ],
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-4366-7873-abb2-ac7d1eb8ffe6/exec-0ee7f39f-3491-41ae-91da-dc0927eeded7.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/warboar_flask.png",
+      "sha256": "50f07f0f70d0d71c4375af5572328913d5b9a5c036e025eb286aef64ef4e07df",
+      "bytes": 2183712,
+      "status": "accepted"
+    },
+    {
+      "id": "runewater_flask",
+      "promptBrief": "One squat faceted blue-glass flask filled with deep blue water, protected by slim silver-thorium braces and sealed with a frosted crystal stopper, with no visible rune or writing.",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Runewater Flask (item id runewater_flask) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder: preserve a blue intellect tonic in a clear faceted flask with slim silver support straps and a small pale stopper, but do not preserve flat vector treatment, lettering, or symbols. Image 2 controls readable liquid and painted glass; Image 3 controls pale blue prismglass reflections and aged metal only. Do not copy unrelated objects.\nSubject and identity: one squat faceted alchemical flask of clear blue glass filled with luminous deep rune-blue water, protected by three slim silver-thorium braces and sealed with a frosted crystal stopper tied by dark cord. The magic appears only as gentle internal currents and pinprick reflections, with absolutely no visible rune or writing. It must read as an intellect draught, not a laboratory beaker, perfume bottle, grenade, lamp, or mana crystal.\nComposition: one complete vessel centered in readable three-quarter view, liquid level, faceted glass and stopper clear, about 72 percent subject fill with safe padding, readable at 22px and inside a 64px circular crop.\nScene and backdrop: opaque deep navy-charcoal painted vignette with cool blue atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile cold metal, glass, cord and luminous liquid; warm top-left key with cool deep bottom-right shadow; controlled blue internal light subordinate to silhouette.\nConstraints: square single icon; exactly one flask; borderless; no text, letters, numbers, labels, runes, pseudo-writing, sigils, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, environmental scene, lightning, open flame, extra bottles, or cropped stopper.",
+      "references": [
+        "public/ui/items/runewater_flask.webp (identity-only anti-reference)",
+        "public/ui/items/firebottle.webp (vessel style)",
+        "gyrelens_array.png (prismglass and metal family)"
+      ],
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-4366-7873-abb2-ac7d1eb8ffe6/exec-92319f0c-39bb-44b8-931b-f6c4b988bc46.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/runewater_flask.png",
+      "sha256": "fcec1094cb791655dcd3e1c06ddfd45209d9875759436fd747dd28255c865447",
+      "bytes": 2092042,
+      "status": "accepted"
+    },
+    {
+      "id": "stonepot_stew",
+      "promptBrief": "One rough-carved grey stone pot of rich stew with golden Frost Gourd, browned prime cut, Deepbarb Catfish flakes, green herb, and one contained wooden spoon.",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Stonepot Stew (item id stonepot_stew) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder: preserve one rough stone bowl of thick orange-brown stew and a short wooden spoon, but not its flat vector treatment. Image 2 controls appetizing food separation, warm light, compact serving, and painterly finish. Image 3 controls tactile soft and natural materials only. Do not copy unrelated dishes or objects.\nSubject and identity: one hearty serving of thick tank-focused stew in a low rough-carved grey stone pot, with clearly separated golden Frost Gourd cubes, browned prime-cut meat, a few pale flakes of Deepbarb Catfish, and restrained green herb on a rich stock. One short wooden spoon rests inside as part of the serving. It must look nourishing and substantial, not soup in a metal cauldron, pet food, porridge, curry, or an ingredient pile.\nComposition: one complete compact stone pot centered in high three-quarter view, rim and contents readable, spoon contained within silhouette, about 72 percent subject fill with safe padding, readable at 22px and inside a 64px circular crop.\nScene and backdrop: opaque deep charcoal and warm hearth-umber painted vignette with soft steam and grounded contact shadow, never a table scene, transparency, or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; appetizing warm color, tactile stone, wood and distinct food textures; warm top-left key with cool deep bottom-right shadow; crisp ingredient focus and softer peripheral brushwork.\nConstraints: square single icon; exactly one served dish; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hands, diner, environmental kitchen, extra bowls, cutlery outside the pot, fish head, skull, or cropped rim.",
+      "references": [
+        "public/ui/items/stonepot_stew.webp (identity-only anti-reference)",
+        "public/ui/items/anglers_feast_platter.webp (food grouping)",
+        "public/ui/items/linen_pouch.webp (natural materials)"
+      ],
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-4366-7873-abb2-ac7d1eb8ffe6/exec-d2ce0f36-cf2e-413c-8060-5e230899cd11.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/stonepot_stew.png",
+      "sha256": "74531f597bc651f1cf3e3f18deceaa43ef9e8b5c5b400ac608030f10f006b471",
+      "bytes": 2161521,
+      "status": "accepted"
+    },
+    {
+      "id": "warspice_skewers",
+      "promptBrief": "One serving of three crossed wood skewers with glazed prime-cut meat, golden charred catfish, red warspice, herb, and cooked Highland Barley beneath.",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Warspice Skewers (item id warspice_skewers) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder: preserve a compact serving of several richly glazed skewers, but not its flat vector treatment. Image 2 controls appetizing grouping, warm light, readable separation and painted finish. Image 3 controls the Masterwrought role-food material richness only. Do not copy unrelated dishes or objects.\nSubject and identity: one compact serving of three crossed wooden skewers threaded with browned prime-cut meat, golden charred Deepbarb Catfish pieces, red warspice glaze and tiny green herb flecks, resting on a small mound of cooked Highland Barley. The skewers form one coherent plated serving, not loose ingredients. It must read as a physical-might meal, smoky, spicy and hearty, not kebab street signage, sausages, arrows, or raw meat.\nComposition: one complete compact serving centered in high three-quarter view, three skewers clearly separated and fully visible, about 72 percent subject fill with safe padding, readable at 22px and inside a 64px circular crop.\nScene and backdrop: opaque deep charcoal and warm ember-umber painted vignette with faint food steam and grounded contact shadow, never a table scene, transparency, or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; appetizing glaze, charred edges, wood grain and distinct food textures; warm top-left key with cool deep bottom-right shadow; crisp focal skewers and softer peripheral brushwork.\nConstraints: square single icon; exactly one plated serving; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hands, diner, environmental kitchen, extra dishes, weapons, bones, fish heads, flames obscuring food, or cropped skewer tips.",
+      "references": [
+        "public/ui/items/warspice_skewers.webp (identity-only anti-reference)",
+        "public/ui/items/anglers_feast_platter.webp (food grouping)",
+        "stonepot_stew.png (Masterwrought role-food family)"
+      ],
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-4366-7873-abb2-ac7d1eb8ffe6/exec-88d60acd-7e7f-448b-88a5-20b2d2a95151.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/warspice_skewers.png",
+      "sha256": "6b9f230cf35554021a78c936d0cdeaa0c83d14c2914a85f1b66d588da8d6dffa",
+      "bytes": 2361903,
+      "status": "accepted"
+    },
+    {
+      "id": "sageleaf_chowder",
+      "promptBrief": "One pale celadon bowl of creamy ivory-green chowder with distinct Deepbarb Catfish flakes, curled Thornpeak Cabbage, golden stock droplets, and sage-green herb.",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Sageleaf Chowder (item id sageleaf_chowder) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder: preserve one pale ceramic bowl of creamy green-tinted chowder with distinct leaf slices, but not its flat vector treatment. Image 2 controls appetizing food separation, compact serving, warm light and painterly finish. Image 3 controls the Masterwrought role-food material richness only. Do not copy unrelated dishes or objects.\nSubject and identity: one generous serving of creamy caster-focused chowder in a shallow pale celadon ceramic bowl, with distinct tender Deepbarb Catfish flakes, curled Thornpeak Cabbage leaf pieces, golden stock droplets, and restrained sage-green herb. The surface should be pale ivory-green rather than purple or neon. It must read as refined nourishing fish chowder, not salad, tea, cereal, generic soup, potion, or slime.\nComposition: one complete bowl centered in high three-quarter view, rim and varied contents readable, about 72 percent subject fill with safe padding, readable at 22px and inside a 64px circular crop.\nScene and backdrop: opaque deep charcoal with restrained sage-green and warm umber painted vignette, soft steam and grounded contact shadow, never a table scene, transparency, or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; appetizing creamy surface, tactile ceramic, fish and leaf textures; warm top-left key with cool deep bottom-right shadow; crisp ingredient focus and softer peripheral brushwork.\nConstraints: square single icon; exactly one served bowl; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hands, diner, environmental kitchen, extra bowls, utensils outside the bowl, whole fish, fish head, skull, purple liquid, neon glow, or cropped rim.",
+      "references": [
+        "public/ui/items/sageleaf_chowder.webp (identity-only anti-reference)",
+        "public/ui/items/anglers_feast_platter.webp (food grouping)",
+        "stonepot_stew.png (Masterwrought role-food family)"
+      ],
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-4366-7873-abb2-ac7d1eb8ffe6/exec-a1ea69a9-1ebf-4f98-b87c-271b459dc373.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/sageleaf_chowder.png",
+      "sha256": "c43400e9f261db861b5286b0bb7756096b5d26d457ab2bc3d94d77f3baf76899",
+      "bytes": 2033856,
+      "status": "accepted"
+    },
+    {
+      "id": "grand_cauldron",
+      "promptBrief": "One portable hammered blue-black alchemist cauldron on three folding legs with brass rim, locked carry handles, clipped paddle, violet-blue brew, and small under-bowl ember cup.",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Grand Cauldron (item id grand_cauldron) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder: preserve a compact three-legged dark cauldron with a restrained luminous brew, but not its flat vector treatment or decorative band symbols. Image 2 controls one self-contained portable station, tactile iron construction, and inventory-scale presentation. Image 3 controls contained liquid glow only. Do not copy unrelated objects.\nSubject and identity: one portable master alchemist's cauldron, a broad hammered blue-black iron pot on three short folding legs with a thick brass rim, two locked-down carry handles, a fitted stirring paddle clipped to the side, and a contained deep violet-blue brew visible inside. A small under-bowl ember cup makes it a complete field station. No markings on the metal. It must read as a permanent carryable apothecary station, not a soup bowl, witch scene, full camp, bathtub, or ordinary kitchen pot.\nComposition: one complete connected device centered in high three-quarter view, rim, brew, legs and carry fittings safely visible, about 72 percent subject fill, readable at 22px and inside a 64px circular crop.\nScene and backdrop: opaque deep charcoal and muted violet painted vignette with faint contained steam and grounded contact shadow, never an environmental scene, transparency, or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile hammered iron, aged brass, wood and luminous liquid; warm top-left key with cool deep bottom-right shadow; magical glow subordinate to cauldron silhouette, crisp focal rim and softer peripheral brushwork.\nConstraints: square single icon; exactly one connected portable cauldron station; borderless; no text, letters, numbers, labels, runes, pseudo-writing, symbols, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, person, hand, witch, environmental campsite, scattered bottles, skull, bones, face, or cropped legs.",
+      "references": [
+        "public/ui/items/grand_cauldron.webp (identity-only anti-reference)",
+        "masters_field_forge.png (portable station family)",
+        "public/ui/items/firebottle.webp (contained liquid glow)"
+      ],
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-4366-7873-abb2-ac7d1eb8ffe6/exec-22d237de-dd54-4de3-ad33-8a94c0574cf0.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/grand_cauldron.png",
+      "sha256": "249483c9c58f5ced803172d277574253381ed0bbfdea31259573691deff429b7",
+      "bytes": 2024837,
+      "status": "accepted"
+    },
+    {
+      "id": "laden_hearth",
+      "promptBrief": "One squat arched cast-iron portable cooking hearth on folding feet with an open coal firebox, folded brass grate, copper side handles, and compact smoke hood.",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint The Laden Hearth (item id laden_hearth) in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only context for the current placeholder: preserve a compact portable iron cooking hearth with warm fire visible through its front and a brass top bar, but not its flat vector treatment or lock-like ornament. Image 2 controls the self-contained portable station construction, worn metal and contained coals. Image 3 controls appetizing hearth warmth only. Do not copy unrelated objects.\nSubject and identity: one self-contained portable master cook's hearth, a squat arched cast-iron oven on four short folding feet with a wide open front showing contained golden coals, a small brass cooking grate folded over the top, copper side handles and a compact smoke hood. It is loaded and ready but shows no loose food or cookware. It must read as a carryable permanent kitchen station, not a fireplace in a room, house, treasure chest, furnace robot, shrine, or simple campfire.\nComposition: one complete connected hearth centered in three-quarter view, all feet, handles, hood and firebox safely visible, about 72 percent subject fill, readable at 22px and inside a 64px circular crop.\nScene and backdrop: opaque deep charcoal and hearth-umber painted vignette with restrained smoke and grounded contact shadow, never an environmental room, transparency, or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile blackened iron, aged brass and copper, ash and contained coals; warm top-left key with cool deep bottom-right shadow; fire subordinate to the appliance silhouette; crisp front opening and softer peripheral brushwork.\nConstraints: square single icon; exactly one connected portable hearth; borderless; no text, letters, numbers, labels, runes, pseudo-writing, symbols, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, person, hand, environmental kitchen, scattered utensils, loose food, chimney extending out of frame, face, or cropped feet.",
+      "references": [
+        "public/ui/items/laden_hearth.webp (identity-only anti-reference)",
+        "masters_field_forge.png (portable station family)",
+        "public/ui/items/anglers_feast_platter.webp (hearth warmth)"
+      ],
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-4366-7873-abb2-ac7d1eb8ffe6/exec-415034b0-be28-4502-9d2f-2b874bc77401.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/laden_hearth.png",
+      "sha256": "e8acb8ffc9977b23f581f99b13ea08eda4c2b14d126a1ef73927aa102a9e587b",
+      "bytes": 2195145,
+      "status": "accepted"
+    },
+    {
+      "id": "pattern_spiritweld_girdle",
+      "promptBrief": "Blank blue-grey forge-vellum roll with cold steel cuff, teal wax seal, and attached dark thorium chainmail plus violet-blue spiritweld wire sample.",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory recipe icon\nPrimary request: repaint Plans: Spiritweld Girdle (item id pattern_spiritweld_girdle) as a distinct tangible plan bundle in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only anti-reference for the old placeholder: preserve only the idea of one rolled plan secured by blue-grey metal fittings and a round seal; do not preserve or reproduce its flat vector treatment, shield-like drawing, lines, diagram, or marks. Image 2 controls tactile forged metal and painted light; Image 3 controls parchment, cord, and compact soft-good presentation. Do not copy unrelated objects.\nSubject and identity: one partially unrolled blank blue-grey forge vellum plan bundled around a short rod, secured with a cold steel cuff and deep teal wax seal. A small physical sample of fine dark thorium chainmail and violet-blue spiritweld wire is clipped prominently to the lower edge. The parchment face is completely blank and unmarked. It must read as a rare armorcrafting plan for a caster mail girdle, not a finished belt, shield, letter, map, diploma, or generic scroll.\nComposition: one complete connected plan bundle centered in readable three-quarter view, parchment roll silhouette, metal cuff, seal, and attached mail sample clear, about 72 percent subject fill with safe padding, readable at 22px and in a 64px circular crop.\nScene and backdrop: opaque deep charcoal and cool teal-navy painted vignette with grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile parchment fibers, wax, chainmail and metal; warm top-left key with cool deep bottom-right shadow; crisp attached sample and softer peripheral brushwork.\nConstraints: square single icon; exactly one connected recipe bundle; borderless; absolutely no text, letters, numbers, words, handwriting, pseudo-writing, diagrams, drafting lines, marks, runes, symbols, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, environmental desk, quill, finished armor, or cropped roll.",
+      "references": [
+        "public/ui/items/pattern_spiritweld_girdle.webp (identity-only anti-reference)",
+        "public/ui/items/eastbrook_buckler.webp (metal style)",
+        "public/ui/items/linen_pouch.webp (parchment and cord)"
+      ],
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-4366-7873-abb2-ac7d1eb8ffe6/exec-82e5f123-98a3-46db-8b67-02f2a047f312.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/pattern_spiritweld_girdle.png",
+      "sha256": "459d458f75cc9db1e9add7bd709031abcb7be7eb375e0c77f2f49b5b54654ebd",
+      "bytes": 2291363,
+      "status": "accepted"
+    },
+    {
+      "id": "pattern_forgefold_legguards",
+      "promptBrief": "Blank folded blue-grey forge-vellum packet with iron strap, orange wax seal, and attached sample of three overlapping blue-black forgefold plate scales with a narrow temper edge.",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory recipe icon\nPrimary request: repaint Plans: Forgefold Legguards (item id pattern_forgefold_legguards) as a distinct tangible plan bundle in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only anti-reference for the old placeholder: preserve only one rolled plan with blue-grey fittings and a seal; do not preserve or reproduce its flat vector treatment, shield-like drawing, lines, diagram, or marks. Image 2 controls the dark forgefold metal family, layered plate construction, and restrained ember seam. Image 3 controls parchment and compact bundle presentation. Do not copy unrelated objects.\nSubject and identity: one thick folded blank blue-grey forge vellum packet rolled at the top and bottom, bound by a blackened iron strap with a burnt-orange wax seal. A physical sample of three overlapping blue-black forgefold plate scales with one narrow ember temper edge is riveted prominently to the packet. The parchment surface is completely blank and unmarked. It must read as a rare armorcrafting plan for heavy legguards, not a finished shield, book, letter, map, diploma, or generic scroll.\nComposition: one complete connected plan packet centered in readable three-quarter view, sturdy rectangular silhouette, rolled ends, strap, seal, and layered metal sample clear, about 72 percent subject fill with safe padding, readable at 22px and in a 64px circular crop.\nScene and backdrop: opaque deep charcoal and forge-umber painted vignette with grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile vellum, worn iron, wax and hammered blue-black plates; warm top-left key with cool deep bottom-right shadow; controlled orange accent, crisp sample and softer peripheral brushwork.\nConstraints: square single icon; exactly one connected recipe bundle; borderless; absolutely no text, letters, numbers, words, handwriting, pseudo-writing, diagrams, drafting lines, marks, runes, symbols, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, environmental desk, quill, finished armor, or cropped roll.",
+      "references": [
+        "public/ui/items/pattern_forgefold_legguards.webp (identity-only anti-reference)",
+        "duskforged_bulwark.png (forgefold material family)",
+        "public/ui/items/linen_pouch.webp (parchment presentation)"
+      ],
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-4366-7873-abb2-ac7d1eb8ffe6/exec-a2e93f19-c472-484f-9abe-9a16922f9dfe.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/pattern_forgefold_legguards.png",
+      "sha256": "7408d5aadaf0320ed48d74248adefbc0ad95cab89b61529cc1ecbafa07c73af7",
+      "bytes": 2216982,
+      "status": "accepted"
+    },
+    {
+      "id": "pattern_wardspeaker_sabatons",
+      "promptBrief": "Blank diagonal blue-grey forge-vellum roll with teal seal, silver cord, and attached articulated silver-blue sabaton toe over fine dark mail with cool wardlight.",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory recipe icon\nPrimary request: repaint Plans: Wardspeaker Sabatons (item id pattern_wardspeaker_sabatons) as a distinct tangible plan bundle in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only anti-reference for the old placeholder: preserve only one rolled plan with blue-grey fittings and a seal; do not preserve or reproduce its flat vector treatment, shield-like drawing, lines, diagram, or marks. Image 2 controls tactile forged metal and lighting. Image 3 controls the blank plan bundle family and physical attached-sample grammar only. Do not copy unrelated objects.\nSubject and identity: one compact blank blue-grey forge vellum scroll rolled diagonally around a cold steel rod, bound by a pale teal wax seal and braided silver cord. A small physical sample of an articulated silver-blue sabaton toe cap over fine dark mail is clipped prominently to the roll, with restrained cool wardlight caught along one edge. The parchment face is entirely blank and unmarked. It must read as a rare armorcrafting plan for caster mail boots, not a finished boot, shield, letter, map, diploma, or generic scroll.\nComposition: one complete connected plan bundle centered in readable three-quarter view, diagonal roll, seal, cord, and small sabaton sample clear, about 72 percent subject fill with safe padding, readable at 22px and in a 64px circular crop.\nScene and backdrop: opaque deep charcoal and cool blue-grey painted vignette with grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile vellum fibers, wax, cord, mail and articulated steel; warm top-left key with cool deep bottom-right shadow; restrained teal edge light, crisp sample and softer peripheral brushwork.\nConstraints: square single icon; exactly one connected recipe bundle; borderless; absolutely no text, letters, numbers, words, handwriting, pseudo-writing, diagrams, drafting lines, marks, runes, symbols, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, environmental desk, quill, full-size finished armor, or cropped roll.",
+      "references": [
+        "public/ui/items/pattern_wardspeaker_sabatons.webp (identity-only anti-reference)",
+        "public/ui/items/eastbrook_buckler.webp (metal style)",
+        "pattern_spiritweld_girdle.png (blank plan family)"
+      ],
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-4366-7873-abb2-ac7d1eb8ffe6/exec-22c7722a-b64b-4e6c-aca8-fec69ccfc4dc.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/pattern_wardspeaker_sabatons.png",
+      "sha256": "2cd9d1d687982ba19d62e0a7ddd48c062c02c0551889d451d9a020008eb5c6b7",
+      "bytes": 2131560,
+      "status": "accepted"
+    },
+    {
+      "id": "pattern_briarstep_jerkin",
+      "promptBrief": "Blank tan pattern vellum around a dark chest-shaped leather template, secured with moss cord and forest-green seal, with attached rugged wyrmhide swatch and briar-like stitching.",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory recipe icon\nPrimary request: repaint Pattern: Briarstep Jerkin (item id pattern_briarstep_jerkin) as a distinct tangible leatherworking pattern bundle in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only anti-reference for the old placeholder: preserve only one rolled parchment pattern, warm fittings, and a round seal; do not preserve or reproduce its flat vector treatment, cloud-like drawing, lines, diagram, or marks. Image 2 controls tactile leather, cord and compact bundle presentation. Image 3 controls dark garment values and painted cloth treatment only. Do not copy unrelated objects.\nSubject and identity: one folded blank tan pattern vellum wrapped around a dark chest-shaped leather template, secured with moss-green cord and a deep forest-green wax seal. A broad physical swatch of rugged brown wyrmhide with raised briar-like stitching and one clipped thorn tip is attached prominently to the outside. The vellum is completely blank and unmarked. It must read as a rare leatherworking pattern for an agile chest jerkin, not a finished vest, plant, map, letter, diploma, or generic scroll.\nComposition: one complete connected pattern parcel centered in readable three-quarter view, folded vellum, chest-form template, cord, seal, and hide swatch clear, about 72 percent subject fill with safe padding, readable at 22px and in a 64px circular crop.\nScene and backdrop: opaque deep forest-charcoal and warm umber painted vignette with grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile vellum, leather grain, wax, cord and rugged stitching; warm top-left key with cool deep bottom-right shadow; crisp swatch and softer peripheral brushwork.\nConstraints: square single icon; exactly one connected recipe parcel; borderless; absolutely no text, letters, numbers, words, handwriting, pseudo-writing, diagrams, drafting lines, marks, runes, symbols, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, environmental desk, quill, full-size finished armor, loose leaves, or cropped parcel.",
+      "references": [
+        "public/ui/items/pattern_briarstep_jerkin.webp (identity-only anti-reference)",
+        "public/ui/items/linen_pouch.webp (leather and cord)",
+        "public/ui/items/cinderweave_raiment.webp (garment material values)"
+      ],
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-4366-7873-abb2-ac7d1eb8ffe6/exec-a80540e7-900c-48ed-8841-d5dfb84776e8.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/pattern_briarstep_jerkin.png",
+      "sha256": "3b728391c598573bf6e2e7a9109dc42411a48a67002e51bbbb431528d7972f3b",
+      "bytes": 2104668,
+      "status": "accepted"
+    },
+    {
+      "id": "pattern_fenbloom_breeches",
+      "promptBrief": "Blank grey-green double-roll pattern vellum with blue reed cord and copper clasp, plus attached moss-dark fen leather, pale lining, and one tiny pressed fen bloom in resin.",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory recipe icon\nPrimary request: repaint Pattern: Fenbloom Breeches (item id pattern_fenbloom_breeches) as a distinct tangible leatherworking pattern bundle in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only anti-reference for the old placeholder: preserve only one rolled parchment pattern, warm fittings, and seal; do not preserve or reproduce flat vector treatment, cloud-like drawing, lines, diagram, or marks. Image 2 controls tactile leather, cord and compact bundle presentation. Image 3 controls the family grammar of blank vellum plus an attached physical swatch only. Do not copy unrelated objects.\nSubject and identity: one long folded blank grey-green pattern vellum rolled inward at both ends, bound with muted blue reed cord and a weathered copper clasp. A physical swatch of supple moss-dark fen leather with pale blue-green lining and one tiny pressed fen bloom under a clear resin button is attached prominently. The vellum is completely blank and unmarked. It must read as a rare leatherworking pattern for spirit-focused breeches, damp and refined, not a finished garment, flower bouquet, map, letter, diploma, or generic scroll.\nComposition: one complete connected pattern bundle centered in readable three-quarter view, double rolled ends, cord, clasp, and green leather sample clear, about 72 percent subject fill with safe padding, readable at 22px and in a 64px circular crop.\nScene and backdrop: opaque deep fen-green charcoal and cool umber painted vignette with grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile vellum, supple leather, reed cord, copper and resin; warm top-left key with cool deep bottom-right shadow; crisp swatch and softer peripheral brushwork.\nConstraints: square single icon; exactly one connected recipe bundle; borderless; absolutely no text, letters, numbers, words, handwriting, pseudo-writing, diagrams, drafting lines, marks, runes, symbols, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, environmental desk, quill, full-size finished garment, loose flowers, or cropped roll.",
+      "references": [
+        "public/ui/items/pattern_fenbloom_breeches.webp (identity-only anti-reference)",
+        "public/ui/items/linen_pouch.webp (leather and cord)",
+        "pattern_briarstep_jerkin.png (blank leather-pattern family)"
+      ],
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-4366-7873-abb2-ac7d1eb8ffe6/exec-2453f7f8-b792-4623-aa2b-04984cca1fc9.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/pattern_fenbloom_breeches.png",
+      "sha256": "b19fbe2cc01fc6de946990fbc61d7faaa02779fad32ec5ea14c9aec711e830ab",
+      "bytes": 2110320,
+      "status": "accepted"
+    },
+    {
+      "id": "pattern_barksong_handguards",
+      "promptBrief": "Blank triangular-folded umber folio with braided leather thong and amber resin seal, plus an attached bark-textured wrist panel edged in green-gold thread.",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory recipe icon\nPrimary request: repaint Pattern: Barksong Handguards (item id pattern_barksong_handguards) as a distinct tangible leatherworking pattern bundle in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only anti-reference for the old placeholder: preserve only one rolled parchment pattern, warm fittings, and seal; do not preserve or reproduce flat vector treatment, cloud-like drawing, lines, diagram, or marks. Image 2 controls tactile leather and compact soft-good presentation. Image 3 controls dark wearable material values and painterly finish only. Do not copy unrelated objects.\nSubject and identity: one compact triangular-folded blank umber pattern folio secured by a braided brown leather thong and a warm amber resin seal. A broad physical sample of bark-textured dark leather, cut as a short protective wrist panel with green-gold thread around its edge, is buckled prominently across the folio. The vellum panels are completely blank and unmarked. It must read as a rare leatherworking pattern for a natural caster's handguards, not finished gloves, a piece of tree bark alone, map, letter, diploma, or generic scroll.\nComposition: one complete connected pattern folio centered in readable three-quarter view, folded silhouette, thong, amber seal, and bark-leather wrist sample clear, about 72 percent subject fill with safe padding, readable at 22px and in a 64px circular crop.\nScene and backdrop: opaque deep forest-charcoal and amber-brown painted vignette with grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile vellum, bark-grain leather, resin, thread and buckle; warm top-left key with cool deep bottom-right shadow; crisp attached sample and softer peripheral brushwork.\nConstraints: square single icon; exactly one connected recipe folio; borderless; absolutely no text, letters, numbers, words, handwriting, pseudo-writing, diagrams, drafting lines, marks, runes, symbols, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, environmental desk, quill, full-size finished gloves, loose branch, leaves, or cropped folio.",
+      "references": [
+        "public/ui/items/pattern_barksong_handguards.webp (identity-only anti-reference)",
+        "public/ui/items/linen_pouch.webp (leather presentation)",
+        "public/ui/items/cinderweave_raiment.webp (wearable material values)"
+      ],
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-4366-7873-abb2-ac7d1eb8ffe6/exec-1079ebe7-a11a-44ac-a23c-077345efcd92.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/pattern_barksong_handguards.png",
+      "sha256": "1d64f7e832fa04cafda6e33e3eb6ffa9a64c1a37f61d1e36b3c142e7b7fee1da",
+      "bytes": 2030262,
+      "status": "accepted"
+    },
+    {
+      "id": "pattern_sunspun_vestments",
+      "promptBrief": "Blank upright ivory tailoring vellum wrapped by a broad lustrous sun-gold cloth swatch with wine-red collar fold, pale trim, violet cord, and gold seal.",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory recipe icon\nPrimary request: repaint Pattern: Sunspun Vestments (item id pattern_sunspun_vestments) as a distinct tangible tailoring pattern bundle in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only anti-reference for the old placeholder: preserve only one rolled sewing pattern with purple fittings and seal; do not preserve or reproduce its flat vector treatment, needle drawing, lines, diagram, or marks. Image 2 controls rich cloth folds, garment material contrast, and dark-fantasy paint treatment. Image 3 controls compact bound parcel presentation. Do not copy unrelated objects.\nSubject and identity: one tall folded blank ivory tailoring vellum packet rolled at its upper edge, wrapped by a broad physical swatch of lustrous sun-gold cloth with a deep wine-red collar fold and fine pale trim, secured by a violet cord and warm gold wax seal. The vellum face is completely blank and unmarked. It must read as a rare tailoring pattern for ornate caster vestments, not a finished robe, letter, map, diploma, generic scroll, or sewing diagram.\nComposition: one complete connected pattern packet centered upright in readable three-quarter view, rolled top, broad cloth swatch, collar fold, cord and seal clear, about 72 percent subject fill with safe padding, readable at 22px and in a 64px circular crop.\nScene and backdrop: opaque deep plum-charcoal and warm umber painted vignette with grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile vellum, woven gold cloth, trim, cord and wax; warm top-left key with cool deep bottom-right shadow; crisp cloth fold and softer peripheral brushwork.\nConstraints: square single icon; exactly one connected recipe packet; borderless; absolutely no text, letters, numbers, words, handwriting, pseudo-writing, diagrams, drafting lines, marks, runes, symbols, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, environmental desk, loose needle, quill, full-size finished robe, or cropped roll.",
+      "references": [
+        "public/ui/items/pattern_sunspun_vestments.webp (identity-only anti-reference)",
+        "public/ui/items/cinderweave_raiment.webp (cloth style)",
+        "public/ui/items/linen_pouch.webp (parcel presentation)"
+      ],
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-4366-7873-abb2-ac7d1eb8ffe6/exec-a3cd5924-d3f1-4789-877c-db5a2f15f313.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/pattern_sunspun_vestments.png",
+      "sha256": "df332cc5c2fd0de302d7686729aecce3516d7f3d500786d75f916746e4af6a49",
+      "bytes": 2064629,
+      "status": "accepted"
+    },
+    {
+      "id": "pattern_sunspun_leggings",
+      "promptBrief": "Blank long cream double-roll tailoring vellum with indigo cord and violet seal, plus two attached pleated sun-gold cloth panels with pale blue selvedge.",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory recipe icon\nPrimary request: repaint Pattern: Sunspun Leggings (item id pattern_sunspun_leggings) as a distinct tangible tailoring pattern bundle in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only anti-reference for the old placeholder: preserve only one rolled sewing pattern with purple fittings and seal; do not preserve or reproduce its flat vector treatment, needle drawing, lines, diagram, or marks. Image 2 controls rich cloth folds and painted textile values. Image 3 controls a distinct double-roll bundle shape and attached material-sample grammar only. Do not copy unrelated objects.\nSubject and identity: one long blank cream tailoring vellum folded lengthwise and rolled inward at both ends, bound by indigo silk cord and a dark violet wax seal. A physical sample of two parallel pleated sun-gold cloth panels with pale blue selvedge is clipped prominently along the center, suggesting flowing leggings without showing a finished garment. The vellum is completely blank and unmarked. It must read as a rare tailoring pattern for caster leggings, not trousers, a map, letter, diploma, generic scroll, or sewing diagram.\nComposition: one complete connected double-roll pattern bundle centered in a gentle diagonal three-quarter view, long silhouette, cord, seal and paired pleated sample clear, about 72 percent subject fill with safe padding, readable at 22px and in a 64px circular crop.\nScene and backdrop: opaque deep indigo-charcoal and muted gold painted vignette with grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile vellum, lustrous woven cloth, silk cord and wax; warm top-left key with cool deep bottom-right shadow; crisp pleats and softer peripheral brushwork.\nConstraints: square single icon; exactly one connected recipe bundle; borderless; absolutely no text, letters, numbers, words, handwriting, pseudo-writing, diagrams, drafting lines, marks, runes, symbols, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, environmental desk, loose needle, quill, full-size finished pants, or cropped roll.",
+      "references": [
+        "public/ui/items/pattern_sunspun_leggings.webp (identity-only anti-reference)",
+        "public/ui/items/cinderweave_raiment.webp (cloth style)",
+        "pattern_fenbloom_breeches.png (double-roll family contrast)"
+      ],
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-4366-7873-abb2-ac7d1eb8ffe6/exec-e5c59531-ecc9-4de6-aef1-c6f045412960.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/pattern_sunspun_leggings.png",
+      "sha256": "e25bf3edeb0faa1498d51d56ccac6512737bddf2e8478824d325752d107f57a0",
+      "bytes": 2433743,
+      "status": "accepted"
+    },
+    {
+      "id": "pattern_sunspun_handwraps",
+      "promptBrief": "Blank short ivory vellum roll wrapped by two crossed sun-gold cloth strips with indigo edges, a violet seal, and slim bronze clasp.",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory recipe icon\nPrimary request: repaint Pattern: Sunspun Handwraps (item id pattern_sunspun_handwraps) as a distinct tangible tailoring pattern bundle in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only anti-reference for the old placeholder: preserve only one rolled sewing pattern with purple fittings and seal; do not preserve or reproduce its flat vector treatment, needle drawing, lines, diagram, or marks. Image 2 controls rich textile folds and painted material separation. Image 3 controls the blank Sunspun pattern family only. Do not copy unrelated objects.\nSubject and identity: one short cylindrical roll of completely blank ivory tailoring vellum, wrapped around its middle by two layered physical strips of luminous sun-gold cloth with deep indigo edging, held by a small violet wax seal and a slim bronze clasp. The cloth strips cross and coil like handwrap material but remain attached to the one recipe roll. It must read as a rare tailoring pattern for caster handwraps, not finished gloves, bandages alone, a map, letter, diploma, generic scroll, or sewing diagram.\nComposition: one complete connected compact roll centered on a strong gentle diagonal in three-quarter view, layered cloth strips, seal and clasp clear, about 72 percent subject fill with safe padding, readable at 22px and in a 64px circular crop.\nScene and backdrop: opaque deep indigo-charcoal and warm gold painted vignette with grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile vellum, woven gold cloth, silk edging, wax and bronze; warm top-left key with cool deep bottom-right shadow; crisp layered wraps and softer peripheral brushwork.\nConstraints: square single icon; exactly one connected recipe roll; borderless; absolutely no text, letters, numbers, words, handwriting, pseudo-writing, diagrams, drafting lines, marks, runes, symbols, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hands, environmental desk, loose needle, quill, full-size finished gloves, or cropped roll.",
+      "references": [
+        "public/ui/items/pattern_sunspun_handwraps.webp (identity-only anti-reference)",
+        "public/ui/items/cinderweave_raiment.webp (cloth style)",
+        "pattern_sunspun_leggings.png (Sunspun family)"
+      ],
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-4366-7873-abb2-ac7d1eb8ffe6/exec-4b038b6a-8e83-411e-852e-cf64dc0ca27f.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/pattern_sunspun_handwraps.png",
+      "sha256": "43c5168c663a467cc06a1975dd6ec22197bb220e6bc196e00cc3de308696bae4",
+      "bytes": 2383026,
+      "status": "accepted"
+    },
+    {
+      "id": "pattern_sunspun_haversack",
+      "promptBrief": "Blank broad cream vellum parcel enclosed by an attached sun-gold canvas sample pocket with deep red leather flap, aged brass buckle, and violet side cord.",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory recipe icon\nPrimary request: repaint Pattern: Sunspun Haversack (item id pattern_sunspun_haversack) as a distinct tangible tailoring pattern parcel in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only anti-reference for the old placeholder: preserve only one rolled sewing pattern with purple fittings and seal; do not preserve or reproduce its flat vector treatment, needle drawing, lines, diagram, or marks. Image 2 controls compact bag volume, leather closure, and soft-material rendering. Image 3 controls rich cloth folds and dark-fantasy paint treatment only. Do not copy unrelated objects.\nSubject and identity: one broad folded blank cream tailoring vellum parcel enclosed by a physical sample pocket of sturdy sun-gold canvas, with a deep red leather flap, aged brass buckle and violet side cord. The small sample pocket remains integrated around the pattern, suggesting a haversack without becoming a finished full bag. The vellum is completely blank and unmarked. It must read as a rare tailoring pattern for a capacious travel bag, not a finished backpack, purse, letter, map, diploma, generic scroll, or sewing diagram.\nComposition: one complete connected blocky pattern parcel centered in readable three-quarter view, folded vellum edges, sample pocket, flap, buckle and cord clear, about 72 percent subject fill with safe padding, readable at 22px and in a 64px circular crop.\nScene and backdrop: opaque deep burgundy-charcoal and warm umber painted vignette with grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile vellum, woven canvas, worn leather, brass and cord; warm top-left key with cool deep bottom-right shadow; crisp buckle and sample pocket, softer peripheral brushwork.\nConstraints: square single icon; exactly one connected recipe parcel; borderless; absolutely no text, letters, numbers, words, handwriting, pseudo-writing, diagrams, drafting lines, marks, runes, symbols, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hands, environmental desk, loose needle, quill, full-size finished bag, loose inventory, or cropped parcel.",
+      "references": [
+        "public/ui/items/pattern_sunspun_haversack.webp (identity-only anti-reference)",
+        "public/ui/items/linen_pouch.webp (bag construction)",
+        "public/ui/items/cinderweave_raiment.webp (cloth style)"
+      ],
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-4366-7873-abb2-ac7d1eb8ffe6/exec-6b2f4473-8a1d-4754-b73e-48c766837bb3.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/pattern_sunspun_haversack.png",
+      "sha256": "2c62eca8cc21563c81805b7f5be056abd1ae573f1f8e42802be2a97c83896091",
+      "bytes": 2441344,
+      "status": "accepted"
+    },
+    {
+      "id": "pattern_duskforged_warblade",
+      "promptBrief": "Blank slim blue-grey forge-vellum roll around a metal tube with red strap and orange seal, plus attached short pointed duskforged blade-test coupon with ember edge.",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory recipe icon\nPrimary request: repaint Plans: Duskforged Warblade (item id pattern_duskforged_warblade) as a distinct tangible weaponcrafting plan bundle in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only anti-reference for the old placeholder: preserve only one rolled plan with red fittings and wax seal; do not preserve or reproduce its flat vector treatment, crossed-tool drawing, lines, diagram, or marks. Image 2 controls the blue-black alloy, straight blade identity and narrow ember temper seam. Image 3 controls parchment, leather binding and compact bundle presentation only. Do not copy unrelated objects.\nSubject and identity: one slim blank blue-grey forge vellum plan tightly rolled around a dark metal tube, bound with a red leather strap and burnt-orange wax seal. A small physical blade-test coupon shaped as a short straight pointed strip of blue-black duskforged steel, with one narrow ember temper edge and a tiny leather-wrapped tang, is clipped diagonally across the roll. The vellum is entirely blank and unmarked. It must read as a rare weaponcrafting plan for a one-handed warblade, not the finished sword, a map, letter, diploma, generic scroll, or drawing.\nComposition: one complete connected plan bundle on a strong lower-left to upper-right diagonal, roll, strap, seal, and miniature blade sample fully visible, about 72 percent subject fill with safe padding, readable at 22px and in a 64px circular crop.\nScene and backdrop: opaque deep charcoal and forge-umber painted vignette with grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile vellum, leather, wax and forged steel; warm top-left key with cool deep bottom-right shadow; orange seam subordinate, crisp sample and softer peripheral brushwork.\nConstraints: square single icon; exactly one connected recipe bundle; borderless; absolutely no text, letters, numbers, words, handwriting, pseudo-writing, diagrams, drafting lines, marks, runes, symbols, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, environmental desk, quill, full-size finished weapon, crossed tools, or cropped roll.",
+      "references": [
+        "public/ui/items/pattern_duskforged_warblade.webp (identity-only anti-reference)",
+        "duskforged_warblade.png (output identity)",
+        "public/ui/items/linen_pouch.webp (parchment presentation)"
+      ],
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-4366-7873-abb2-ac7d1eb8ffe6/exec-903608f4-6b15-4dc4-b076-fa180d700ba5.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/pattern_duskforged_warblade.png",
+      "sha256": "c6b56ebf1075db7abe282e7ff84a41597edb745c7ba4a7132f13cd514bb42ab0",
+      "bytes": 2236105,
+      "status": "accepted"
+    },
+    {
+      "id": "pattern_ridgebreaker",
+      "promptBrief": "Blank thick folded forge-vellum packet with rolled end, twin iron bands, red seal, and attached squared duskforged maul-head coupon on a short ashwood haft sample.",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory recipe icon\nPrimary request: repaint Plans: Ridgebreaker (item id pattern_ridgebreaker) as a distinct tangible weaponcrafting plan parcel in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only anti-reference for the old placeholder: preserve only one rolled plan with red fittings and wax seal; do not preserve or reproduce its flat vector treatment, crossed-tool drawing, lines, diagram, or marks. Image 2 controls the broad duskforged maul head, long wood-and-leather construction and contained orange fracture line. Image 3 controls parchment and compact bound-parcel presentation only. Do not copy unrelated objects.\nSubject and identity: one thick folded blank forge vellum packet with one rolled end, cinched by two blackened iron bands and a dark red wax seal. A small physical maul test assembly, a broad squared blue-black metal head coupon with an ember temper crack mounted on a short ashwood haft sample, is strapped prominently across the packet. The vellum is entirely blank and unmarked. It must read as a rare weaponcrafting plan for a two-handed ridge-breaking maul, not the finished hammer, a map, letter, diploma, generic scroll, or drawing.\nComposition: one complete connected blocky plan parcel centered in three-quarter view, folded body, rolled end, twin bands, seal, and hammer sample clear, about 72 percent subject fill with safe padding, readable at 22px and in a 64px circular crop.\nScene and backdrop: opaque deep charcoal and iron-umber painted vignette with grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile vellum, iron, wax, wood and forged steel; warm top-left key with cool deep bottom-right shadow; controlled orange accent, crisp maul coupon and softer peripheral brushwork.\nConstraints: square single icon; exactly one connected recipe parcel; borderless; absolutely no text, letters, numbers, words, handwriting, pseudo-writing, diagrams, drafting lines, marks, runes, symbols, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, environmental desk, quill, full-size finished weapon, crossed tools, or cropped parcel.",
+      "references": [
+        "public/ui/items/pattern_ridgebreaker.webp (identity-only anti-reference)",
+        "ridgebreaker.png (output identity)",
+        "public/ui/items/linen_pouch.webp (parcel presentation)"
+      ],
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-4366-7873-abb2-ac7d1eb8ffe6/exec-cc5a6d97-a0e0-4abd-8555-8d21a24707cc.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/pattern_ridgebreaker.png",
+      "sha256": "b9dea579829c252fc3f6f9ba0476075e857dc98ca95dfd015168f8b5b170c2ac",
+      "bytes": 2453901,
+      "status": "accepted"
+    },
+    {
+      "id": "pattern_duskforged_bulwark",
+      "promptBrief": "Blank upright blue-grey forge-vellum packet with rolled ends, broad iron strap, red seal, and attached tall layered blue-black shield coupon with orange boss.",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory recipe icon\nPrimary request: repaint Plans: Duskforged Bulwark (item id pattern_duskforged_bulwark) as a distinct tangible armorcrafting plan bundle in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only anti-reference for the old placeholder: preserve only one rolled plan with red fittings and wax seal; do not preserve or reproduce its flat vector treatment, crossed-tool drawing, lines, diagram, or marks. Image 2 controls the tall layered duskforged shield identity and restrained orange boss. Image 3 controls the blank forge-plan family and attached physical metal-sample grammar only. Do not copy unrelated objects.\nSubject and identity: one upright blank blue-grey forge vellum packet rolled at top and bottom, bound by a broad blackened iron strap and burnt-red wax seal. A small physical shield test plate, a tall rounded blue-black alloy coupon with three overlapping horizontal ridges and one compact orange temper boss, is riveted prominently to the lower packet. The vellum is entirely blank and unmarked. It must read as a rare armorcrafting plan for a duskforged bulwark, not the full finished shield, a map, letter, diploma, generic scroll, or drawing.\nComposition: one complete connected upright plan bundle centered in readable three-quarter view, rolled ends, iron strap, seal, and shield-shaped material coupon clear, about 72 percent subject fill with safe padding, readable at 22px and in a 64px circular crop.\nScene and backdrop: opaque deep charcoal and smoky umber painted vignette with grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile vellum, iron, wax and hammered blue-black plate; warm top-left key with cool deep bottom-right shadow; orange boss subordinate, crisp sample and softer peripheral brushwork.\nConstraints: square single icon; exactly one connected recipe bundle; borderless; absolutely no text, letters, numbers, words, handwriting, pseudo-writing, diagrams, drafting lines, marks, runes, symbols, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, environmental desk, quill, full-size finished shield, crossed tools, or cropped roll.",
+      "references": [
+        "public/ui/items/pattern_duskforged_bulwark.webp (identity-only anti-reference)",
+        "duskforged_bulwark.png (output identity)",
+        "pattern_forgefold_legguards.png (blank forge-plan family)"
+      ],
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-4366-7873-abb2-ac7d1eb8ffe6/exec-31d60a6e-22fc-4efc-a143-a10a1d139bd6.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/pattern_duskforged_bulwark.png",
+      "sha256": "14495964fe87eef1a4e6de95d1d652c5bc064d47e3e749507b22d19d3399f088",
+      "bytes": 2328986,
+      "status": "accepted"
+    },
+    {
+      "id": "pattern_wyrmfall_pendant",
+      "promptBrief": "Blank compact charcoal jewelry vellum rolled from both sides around teal silk, with aged-gold clasp, teal seal, and attached faceted Wyrmfall gemstone setting.",
+      "exactPrompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory recipe icon\nPrimary request: repaint Design: Wyrmfall Pendant (item id pattern_wyrmfall_pendant) as a distinct tangible jewelcrafting design packet in the World of ClaudeCraft woc-item-icon-v1 house style.\nInput images: Image 1 is identity-only anti-reference for the old placeholder: preserve only one rolled design parchment with teal fittings and seal; do not preserve or reproduce its flat vector treatment, gem drawing, lines, diagram, or marks. Image 2 controls the aged-gold torque, faceted teal Wyrmfall gemstone and scale-like setting identity. Image 3 controls parchment, cord and compact parcel presentation only. Do not copy unrelated objects.\nSubject and identity: one compact dark charcoal jewelry vellum packet rolled from both sides around a teal silk center, secured by a slender aged-gold clasp and deep teal wax seal. A small physical sample setting with one faceted teal Wyrmfall gemstone held in scale-like gold claws is clipped prominently to the packet. The vellum is entirely blank and unmarked. It must read as a rare jewelcrafting design for a Wyrmfall pendant, not the finished necklace, a gem alone, map, letter, diploma, generic scroll, or drawing.\nComposition: one complete connected design packet centered in readable three-quarter view, double dark rolls, silk center, clasp, seal, and gemstone setting clear, about 72 percent subject fill with safe padding, readable at 22px and in a 64px circular crop.\nScene and backdrop: opaque deep teal-charcoal and cool navy painted vignette with grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile vellum, silk, aged gold, wax and crisp gemstone facets; warm top-left key with cool deep bottom-right shadow; restrained teal internal glow, crisp setting and softer peripheral brushwork.\nConstraints: square single icon; exactly one connected recipe packet; borderless; absolutely no text, letters, numbers, words, handwriting, pseudo-writing, diagrams, drafting lines, marks, runes, symbols, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, environmental desk, quill, full-size finished necklace, loose gems, dragon head, or cropped roll.",
+      "references": [
+        "public/ui/items/pattern_wyrmfall_pendant.webp (identity-only anti-reference)",
+        "wyrmfall_pendant.png (output identity)",
+        "public/ui/items/linen_pouch.webp (parcel presentation)"
+      ],
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-4366-7873-abb2-ac7d1eb8ffe6/exec-3d6ca7b6-4ef9-47e4-9ae3-72a8c5c65c67.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-apex/pattern_wyrmfall_pendant.png",
+      "sha256": "2d4fa9e7b3468616d3e4080441c535aee809adf2c110553a27ad679c813d61e6",
+      "bytes": 2108902,
+      "status": "accepted"
+    }
+  ]
+}

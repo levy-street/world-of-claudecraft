@@ -134,6 +134,7 @@ describe('mount catalog', () => {
     expect(spec('lanternback_troll')).toEqual(['epic', 0.8]);
     expect(spec('chimeglass_tortoise')).toEqual(['epic', 0.8]);
     expect(spec('terrorspark_groundshaker')).toEqual(['epic', 0.8]);
+    expect(spec('drakemaw_raptor')).toEqual(['epic', 0.8]);
     expect(spec('rickshaw_mount')).toEqual(['epic', 0.8]);
     // The level field is GONE, not merely unused: it never fired (reins carry no
     // requiredLevel and every source is level-20 content) and leaving it would
@@ -155,6 +156,15 @@ describe('mount catalog', () => {
         }
       }
     }
+  });
+
+  it('pins the Claudium-only Mech Bird card exactly', () => {
+    expect(MOUNTS.mech_bird).toEqual({
+      key: 'mech_bird',
+      name: 'Cluckwork Mech Bird',
+      rarity: 'rare',
+      moveSpeedPct: 0.75,
+    });
   });
 
   it('normalizeMountKey coerces unknown or absent keys to "" (unmounted)', () => {
@@ -230,6 +240,21 @@ describe('mount reins items (the collection: owning the item is owning the mount
     }
   });
 
+  it('pins the Mech Bird reins as a soulbound Claudium grant, never a copper purchase', () => {
+    expect(ITEMS.reins_mech_bird).toEqual({
+      id: 'reins_mech_bird',
+      name: 'Ignition Key: Cluckwork Mech Bird',
+      kind: 'mount',
+      mount: 'mech_bird',
+      quality: 'rare',
+      soulbound: true,
+      noVendorSell: true,
+      noDiscard: true,
+      sellValue: 0,
+    });
+    expect(isStoreMountItemId('reins_mech_bird')).toBe(true);
+  });
+
   it('pins each reins item to its acquisition path, DERIVED from its own rarity', () => {
     // Rarity is the single source of truth for where a mount comes from:
     //   uncommon -> heroic five-man at 0.5%   ("green")
@@ -297,6 +322,36 @@ describe('mount reins items (the collection: owning the item is owning the mount
           expect(
             pool as readonly string[],
             `${itemId} is store-only: not in ${name}`,
+          ).not.toContain(itemId);
+        }
+        for (const npc of Object.values(NPCS)) {
+          expect(
+            npc.vendorItems ?? [],
+            `${itemId} is store-only: not sold by ${npc.id}`,
+          ).not.toContain(itemId);
+        }
+        expect(
+          HEROIC_VENDOR_STOCK.map((offer) => offer.itemId),
+          `${itemId} is store-only: not sold by the Heroic Quartermaster`,
+        ).not.toContain(itemId);
+        for (const [delveId, offers] of Object.entries(DELVE_SHOPS)) {
+          expect(
+            offers.map((offer) => offer.itemId),
+            `${itemId} is store-only: not sold by delve shop ${delveId}`,
+          ).not.toContain(itemId);
+        }
+        expect(
+          MARKET_HOUSE_STOCK.map((offer) => offer.itemId),
+          `${itemId} is store-only: not seeded by the World Market`,
+        ).not.toContain(itemId);
+        for (const quest of Object.values(QUESTS)) {
+          expect(
+            Object.values(quest.itemRewards),
+            `${itemId} is store-only: not rewarded by ${quest.id}`,
+          ).not.toContain(itemId);
+          expect(
+            quest.requiredItems ?? [],
+            `${itemId} is store-only: not required by ${quest.id}`,
           ).not.toContain(itemId);
         }
         continue;

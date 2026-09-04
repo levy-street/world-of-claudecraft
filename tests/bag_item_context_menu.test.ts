@@ -34,6 +34,14 @@ describe('bag_item_context_menu: enchant reagent detection', () => {
     expect(reagentIds.size).toBeGreaterThan(1);
     for (const id of reagentIds) expect(isEnchantReagentItem(id)).toBe(true);
     expect(isEnchantReagentItem('arcane_dust')).toBe(true);
+    // Masterwrought phase 10: the apex intermediate became a reagent, which is
+    // the whole of its right-click entry point. Named as a LITERAL beside the
+    // derived sweep above, which reads the same table the predicate does and so
+    // cannot notice the id leaving the enchant table.
+    expect(isEnchantReagentItem('lucent_reagent')).toBe(true);
+    // And the action really is offered on it: nothing in the eligibility chain
+    // gates Apply Enchant on item kind, so a junk-kind material qualifies.
+    expect(bagItemNewActions(def('material'), 'lucent_reagent')).toEqual(['applyEnchant', 'lock']);
   });
   it('rejects a non-reagent id', () => {
     expect(isEnchantReagentItem('bone_fragments')).toBe(false);
@@ -79,6 +87,31 @@ describe('bag_item_context_menu: action eligibility', () => {
     expect(bagItemNewActions(def('material'), 'arcane_dust')).toEqual(['applyEnchant', 'lock']);
     expect(bagItemHasContextActions(def('material'), 'arcane_dust')).toBe(true);
   });
+  it('keeps Sunder on a locked raid epic: lock-exempt like disenchant', () => {
+    // The lock protects against salvage, craft consumption, and vendor sale
+    // only (the issue 3042 first-pass scope); sunder follows the disenchant
+    // precedent and stays offered on a locked copy, matching the sim, whose
+    // sunderAdmitted has no lock arm (pinned end to end in
+    // tests/masterwrought_materials.test.ts). Classification was taken at the
+    // v0.38.0 sync merge (fa51741408), and locked raid epics deliberately
+    // remain admitted;
+    // if the sim ever gains a lock deny for sunder, flip this pin and the sim-side
+    // pin in tests/masterwrought_materials.test.ts together, they are one surface.
+    const raidEpic = { ...def('armor', 'epic'), id: 'crownforged_dreadhelm' } as ItemDef;
+    const locked = { locked: true } as ItemInstancePayload;
+    // Self-validating fixture: the id must still be a live raid-sourced epic.
+    expect(bagItemNewActions(raidEpic, 'crownforged_dreadhelm')).toEqual([
+      'disenchant',
+      'salvage',
+      'sunder',
+      'lock',
+    ]);
+    expect(bagItemNewActions(raidEpic, 'crownforged_dreadhelm', locked)).toEqual([
+      'disenchant',
+      'sunder',
+      'unlock',
+    ]);
+  });
   it('offers Unlock instead of Lock, and never Salvage, on a locked copy', () => {
     const locked = { locked: true } as ItemInstancePayload;
     // Salvage would destroy the copy, so a locked one never offers it (mirrors
@@ -117,6 +150,13 @@ describe('bag_item_context_menu: special-copy classification', () => {
     expect(isSpecialCopy({ enchant: 'enchant_weapon_might' } as ItemInstancePayload)).toBe(true);
     // Legacy enchanted marker: bare rolled.stats without masterwork.
     expect(isSpecialCopy({ rolled: { stats: { str: 5 } } } as ItemInstancePayload)).toBe(true);
+    // Masterwrought phase 12: Perfecting progress and the Perfected stamp are
+    // special BY CONTRACT, with no signer and (for the stamp) a bare R5 record
+    // that isEnchantedInstance deliberately does not read as an enchant.
+    expect(isSpecialCopy({ perfecting: 1 } as ItemInstancePayload)).toBe(true);
+    expect(
+      isSpecialCopy({ perfected: true, rolled: { stats: { int: 1 } } } as ItemInstancePayload),
+    ).toBe(true);
     // A legacy rolled.quality-only copy is NOT special (never signed/mw/enchanted).
     expect(isSpecialCopy({ rolled: { quality: 'rare' } } as ItemInstancePayload)).toBe(false);
   });

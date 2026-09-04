@@ -9,6 +9,7 @@
 // stable forever).
 
 import type { DeedDef } from '../types';
+import { FARM_CROP_IDS } from './farm_crops';
 
 // The current content era. Bumped ONLY by the maintainer at era boundaries;
 // feats gated on an era stay visible afterward as history markers and a
@@ -207,12 +208,14 @@ export const DEEDS: Record<string, DeedDef> = {
   prog_master_gatherer: {
     id: 'prog_master_gatherer',
     name: 'Master Gatherer',
-    // Desc reword (fishing joined the gathering ring, and the any-three
-    // trigger counts it): the desc names all four professions.
+    // Desc reword, second time (farming joined the gathering ring after
+    // fishing did, and the any-three trigger counts every registered trade).
+    // Enumerating the roster is what went stale twice, so the desc no longer
+    // names or counts the trades at all and a sixth trade cannot restale it.
     // The trigger itself is untouched (rule 9); the stale locale desc fills
     // were dropped with the reword and refill at release (deed_i18n.locales,
-    // English fallback until then).
-    desc: 'Reach 100 proficiency in any three of Mining, Logging, Herbalism, and Fishing.',
+    // English fallback until then), the same protocol as the fishing round.
+    desc: 'Reach 100 proficiency in any three gathering trades.',
     category: 'progression',
     renown: 25,
     trigger: { kind: 'gathering', amount: 100, count: 3 },
@@ -507,7 +510,7 @@ export const DEEDS: Record<string, DeedDef> = {
   },
   dgn_sanctum_speed: {
     id: 'dgn_sanctum_speed',
-    name: 'Sanctum Sprint',
+    name: 'Sanctum Footrace',
     desc: 'Defeat Korzul the Gravewyrm within 15 minutes of your party claiming Gravewyrm Sanctum.',
     category: 'dungeon',
     renown: 25,
@@ -654,7 +657,7 @@ export const DEEDS: Record<string, DeedDef> = {
   dlv_varric_ringers: {
     id: 'dlv_varric_ringers',
     name: 'The Bells Fall Silent',
-    desc: 'Defeat Deacon Varric with every Funeral Ringer he raises already slain.',
+    desc: 'Defeat Deacon Vandric with every Funeral Ringer he raises already slain.',
     category: 'delve',
     renown: 10,
     trigger: { kind: 'manual' },
@@ -932,7 +935,7 @@ export const DEEDS: Record<string, DeedDef> = {
   chr_peaks_chapter_iii: {
     id: 'chr_peaks_chapter_iii',
     name: 'Chronicle of Thornpeak',
-    desc: "See the mountain's whole story through: the Wyrmcult broken, the Sanctum silenced, the Waking Peak felled, and every named terror of the crags laid low.",
+    desc: "See the mountain's whole story through: the Broodsworn broken, the Sanctum silenced, the Waking Peak felled, and every named terror of the crags laid low.",
     category: 'chronicle',
     renown: 50,
     trigger: {
@@ -1244,7 +1247,7 @@ export const DEEDS: Record<string, DeedDef> = {
   col_quartermaster_buyout: {
     id: 'col_quartermaster_buyout',
     name: 'Preferred Customer',
-    desc: "Discover all ten pieces of the Heroic Quartermaster's stock.",
+    desc: "Discover all ten pieces of the Heroic Quartermaster's gear stock.",
     category: 'collection',
     renown: 25,
     trigger: {
@@ -1995,10 +1998,24 @@ export const DEEDS: Record<string, DeedDef> = {
   // within this block only). Craft-skill thresholds reference ONLY resolved
   // caps or below: every CRAFT_RING craft caps at 125 (craftMaxSkillFor),
   // fishing at 200, the other gathering professions at 100
-  // (content/professions.ts maxSkill). Jewelcrafting and Inscription have no
-  // live skill-gain path yet (zero recipes, no enchanting-style action), so
-  // their milestone and Grandmaster deeds stay deferred with prog_ringwright
-  // rather than shipping visible-but-unearnable.
+  // (content/professions.ts maxSkill). Inscription gained its live skill-gain
+  // path with the Masterwrought phase 06 base catalog (INSCRIPTION_RECIPES);
+  // its milestone and Grandmaster deeds ship in the appended block at the
+  // table tail. prog_ringwright stays deferred on its OWN account now: the
+  // ring deed has no recorded design (no trigger shape, threshold, name, or
+  // renown anywhere), so it waits on a maintainer ruling, not on an engine
+  // surface. Jewelcrafting left the deferred set when its base catalog
+  // landed (JEWELCRAFTING_RECIPES); its rare-tier milestone is
+  // prog_jewelcrafting_rare in the appended block below, and the phase 05 QA
+  // ruling (2026-08-10) authored its skill-50 and Grandmaster pair behind it
+  // (prog_jewelcrafting_50 / prog_grandmaster_jewelcrafting): the 125 cap is
+  // reachable on the base catalog alone for an unattuned character, and
+  // post-attunement whenever jewelcrafting is the pair or the hobby (a
+  // non-hobby crafter stalls at the common ceiling like EVERY craft; the
+  // shipped switchHobby quest keeps the deed reachable for all), so the hold
+  // was authoring, not mechanics. No attunement quest names a jewelcrafting
+  // pair yet (content/zone1.ts ships four), so the craft climbs as a hobby.
+  // Earnability is pinned by derivation in tests/deeds_content.test.ts.
   prog_guildsworn: {
     id: 'prog_guildsworn',
     name: 'Craftsworn',
@@ -2482,10 +2499,14 @@ export const DEEDS: Record<string, DeedDef> = {
   // this is never luck-based, only whether the player knows the recipe and
   // holds the reagents: standard renown, no title, same tier as the other
   // moderate profession-depth milestones (prog_fishing_100). Covers exactly
-  // the seven crafts that ship a rare-or-better recipe today (see
-  // tests/deeds_content.test.ts for the derivation): enchanting has no
-  // item-def output to grade, and jewelcrafting/inscription stay deferred
-  // with prog_ringwright (docs/design/deeds.md, no live recipes yet).
+  // the crafts that ship a rare-or-better recipe (see
+  // tests/deeds_content.test.ts for the derivation): the seven below, plus
+  // prog_jewelcrafting_rare (Masterwrought phase 05) and
+  // prog_inscription_rare (phase 06), both appended at the table tail
+  // (DEED_ORDER is append-only). Enchanting alone stays out: it has no
+  // item-def output to grade. prog_ringwright stays deferred on its own
+  // account (the completed-ring deed has no recorded design; see the
+  // Professions 2.0 block above).
   prog_engineering_rare: {
     id: 'prog_engineering_rare',
     name: 'Precision Engineering',
@@ -2601,7 +2622,7 @@ export const DEEDS: Record<string, DeedDef> = {
   },
   chr_nightbloom_first_cast: {
     id: 'chr_nightbloom_first_cast',
-    name: 'A Ripple on the Moonwell',
+    name: 'A Ripple on the Moonspring',
     desc: 'Catch a fish from the waters of the Nightbloom.',
     category: 'chronicle',
     renown: 5,
@@ -2771,9 +2792,11 @@ export const DEEDS: Record<string, DeedDef> = {
   // feat: true, uniquely off the feat_ prefix (pinned with rationale in
   // tests/deeds_content.test.ts): the capstone is a dynamic meta over a
   // growing catalog, the feat_book_complete class, and the flag is what
-  // keeps it OUT of BOOK_COMPLETE_REQUIREMENTS. Three catalog slots are
-  // owner-pended today (masterwork:engineering, reins_drakemaw_raptor,
-  // reins_terrorspark_groundshaker), so a non-feat capstone would dead-end
+  // keeps it OUT of BOOK_COMPLETE_REQUIREMENTS. Two catalog slots are
+  // owner-pended today (reins_drakemaw_raptor, reins_terrorspark_groundshaker;
+  // masterwork:engineering was the third until masterwrought Phase 11o's
+  // stats-bearing copperlens_ocular made the mark earnable, 2026-08-25), so
+  // a non-feat capstone would dead-end
   // The Whole Book for every player (the retroFallbackGrants stranded-heal
   // doctrine names exactly that failure). It stays on the Collection shelf
   // beside its ladder; grant, marquee, and feed behavior are unaffected.
@@ -2823,7 +2846,6 @@ export const DEEDS: Record<string, DeedDef> = {
     trigger: { kind: 'manual' },
     reward: { kind: 'title', text: 'Light of the Sanctum' },
   },
-
   // The walk-in castle visits, appended per the append-only DEED_ORDER
   // contract. The Last Keep one retro-fixes a rule gap: the keep shipped
   // without its deeds (every new conquerable content authors deeds in the
@@ -2845,10 +2867,305 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 5,
     trigger: { kind: 'visit', markId: 'dungeon:dawnhold_castle' },
   },
+  // Jewelcrafting joins the per-craft rare-tier milestone family (issue
+  // #2055) with the Masterwrought phase 05 base catalog, whose rung-50
+  // outputs are the craft's first rare recipes. Same fields as the seven
+  // records in the family block above (standard renown, no title, the
+  // craft_rare mark professions/crafting.ts fires for every craft);
+  // appended here, not beside its siblings, because DEED_ORDER derives
+  // from table order and is append-only.
+  prog_jewelcrafting_rare: {
+    id: 'prog_jewelcrafting_rare',
+    name: 'Polished to Brilliance',
+    desc: 'Craft your first rare-tier item in Jewelcrafting.',
+    category: 'progression',
+    renown: 10,
+    trigger: { kind: 'visit', markId: 'craft_rare:jewelcrafting' },
+  },
+  // The jewelcrafting 50-skill and Grandmaster milestones join their
+  // cross-craft families (phase 05 QA ruling 2026-08-10: author both now
+  // rather than defer with the archetype pairs; enchanting shipped its pair
+  // in the same no-pair-quest position, and the 125 cap is reachable on the
+  // base catalog alone). Same fields as their family blocks above; appended
+  // at the tail because DEED_ORDER derives from table order and is
+  // append-only.
+  prog_jewelcrafting_50: {
+    id: 'prog_jewelcrafting_50',
+    name: 'Facet and Filigree',
+    desc: 'Reach 50 skill in Jewelcrafting.',
+    category: 'progression',
+    renown: 5,
+    trigger: { kind: 'craftSkill', craftId: 'jewelcrafting', level: 50 },
+  },
+  prog_grandmaster_jewelcrafting: {
+    id: 'prog_grandmaster_jewelcrafting',
+    name: 'Grandmaster Jewelcrafting',
+    desc: 'Reach 125 skill in Jewelcrafting, the very top of the craft.',
+    category: 'progression',
+    renown: 25,
+    trigger: { kind: 'craftSkill', craftId: 'jewelcrafting', level: 125 },
+    reward: { kind: 'title', text: 'Grandmaster Jewelcrafting' },
+  },
+  // Inscription joins all three cross-craft milestone families with the
+  // Masterwrought phase 06 base catalog (INSCRIPTION_RECIPES): the rung-50
+  // outputs are the craft's first rare recipes, so the rare-tier derivation
+  // demands the milestone, and the 50/Grandmaster pair follows the
+  // enchanting-then-jewelcrafting double precedent (author with the catalog,
+  // never visible-but-unearnable: the 125 cap is reachable on the base
+  // catalog alone). Same fields as the family blocks above; appended at the
+  // tail because DEED_ORDER derives from table order and is append-only. The
+  // Grandmaster title deed's Reliquary titles-page slot lands in the same
+  // change (content/reliquary.ts, the locked titles-page rule).
+  prog_inscription_rare: {
+    id: 'prog_inscription_rare',
+    name: 'Written in Fine Ink',
+    desc: 'Craft your first rare-tier item in Inscription.',
+    category: 'progression',
+    renown: 10,
+    trigger: { kind: 'visit', markId: 'craft_rare:inscription' },
+  },
+  prog_inscription_50: {
+    id: 'prog_inscription_50',
+    name: 'Quill and Pigment',
+    desc: 'Reach 50 skill in Inscription.',
+    category: 'progression',
+    renown: 5,
+    trigger: { kind: 'craftSkill', craftId: 'inscription', level: 50 },
+  },
+  prog_grandmaster_inscription: {
+    id: 'prog_grandmaster_inscription',
+    name: 'Grandmaster Inscription',
+    desc: 'Reach 125 skill in Inscription, the very top of the craft.',
+    category: 'progression',
+    renown: 25,
+    trigger: { kind: 'craftSkill', craftId: 'inscription', level: 125 },
+    reward: { kind: 'title', text: 'Grandmaster Inscription' },
+  },
+
+  // The angler's endgame deed (masterwrought Phase 11i). EXACTLY ONE row, and
+  // the count is the ruling rather than restraint: the shipped per-profession
+  // gathering ladder is measured and COMPLETE at 5 / 10 / 25 (a first-gather
+  // rung, a 100 rung, the cross-profession master, and a cap rung with a title
+  // where the cap exceeds 100, which for fishing is prog_master_angler at 200).
+  // No gathering profession in the game has a rung at 50 or 150, so adding them
+  // to fishing alone would make it the only five-rung ladder there is, which is
+  // the asymmetry R20's coverage test exists to stop recurring quietly.
+  //
+  // RENOWN 10 is the shipped per-profession 100-rung point (prog_mining_100,
+  // prog_fishing_100, prog_farming_100 all sit there), which is the right rung
+  // because this is DETERMINISTIC and skill-gated rather than luck-gated:
+  // docs/design/deeds.md rule 2 zeroes the Renown on a luck-dependent deed, and
+  // nothing here is a roll. NO TITLE, because prog_master_angler already owns
+  // fishing's one title and the catalog gives a profession one.
+  //
+  // THE TRIGGER IS 'collectItems', AND THE WORDING FOLLOWS THE TRIGGER RATHER
+  // THAN THE OTHER WAY ROUND. There is no shipped per-ITEM craft trigger
+  // in the DeedTrigger union: the craft-shaped kinds are craftSkill (a skill
+  // milestone, and prog_grandmaster_engineering above already owns that rung)
+  // and the 'craft_rare' / masterwork visit marks (per-CRAFT, not per-item).
+  // The shipped way to say "you got this specific thing" is collectItems over
+  // deedStats.itemsDiscovered, which col_glimmerfin and col_full_creel already
+  // use. That trigger fires on ANY acquisition, market purchase included, so
+  // the desc says OBTAIN and not CRAFT: a deed that claimed a craft while
+  // firing on a purchase would be a false player-facing claim. It is also
+  // the R18-consistent reading, since the rod must stay buyable.
+  //
+  // A per-item craft mark WAS the alternative and was declined here rather than
+  // silently: it needs a new namespace registered in src/sim/deeds.ts plus a
+  // save/load round-trip pin in the same change (an unregistered namespace
+  // serializes fine and is DROPPED on load, which has bitten this codebase
+  // twice), and it makes migration-safety a required reviewer. That remains a
+  // maintainer decision rather than an implicit content default.
+  //
+  // Category 'collection' matches its trigger family (col_glimmerfin,
+  // col_full_creel), and the row sits BEFORE the farming block below so that
+  // block stays last and contiguous under the catalog's three-tier ordering.
+  col_deepest_cast: {
+    id: 'col_deepest_cast',
+    name: 'The Deepest Cast',
+    desc: 'Obtain a Clockreel Fishing Rod, the only rod that reaches the deepest catches.',
+    category: 'collection',
+    renown: 10,
+    trigger: { kind: 'collectItems', itemIds: ['clockreel_fishing_rod'] },
+  },
+
+  // NO DEED FOR THE APEX HOE, recorded here beside the rod's because a
+  // decline nobody wrote down reads as an omission (masterwrought Phase 11j).
+  // docs/design/deeds.md scopes the same-change obligation to a dungeon,
+  // delve, raid, world boss, zone or rare, so a crafted item owes nothing,
+  // and the four sibling tier-5 tools (arcanite_mining_pick, elderwood_axe,
+  // sunpetal_sickle, tidewrought_fishing_rod) carry no deed either: the hoe
+  // matching them is the symmetry, and it is the reason.
+  //
+  // The rod above is NOT the counter-example it looks like, and the
+  // distinction is narrower than it first reads. BOTH deeds would be
+  // collectItems triggers: col_deepest_cast fires on obtaining the rod by any
+  // route, market purchase included, as its own note directly above says. So
+  // the difference is not owning-versus-conquering. It is WHAT THE OWNED
+  // THING OPENS: the clockreel is the only way to reach catch band 5, so
+  // holding one really does mark reaching the deepest water, while the apex
+  // hoe opens no crop tier the rung below does not already reach. A deed on
+  // the hoe would mark a purchase and nothing else.
+
+  // The farming celebration deeds (D13), appended per the append-only
+  // DEED_ORDER contract. All cosmetic, zero rng, no power. The farm:planted
+  // mark is written at plant success and the farm:<zone> marks at surviving
+  // harvest (src/sim/deeds.ts onCropHarvestedForDeeds), both from
+  // professions/farming.ts.
+  prog_first_planting: {
+    id: 'prog_first_planting',
+    name: 'Sow It Begins',
+    desc: 'Plant your first crop in a garden bed.',
+    category: 'progression',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'farm:planted' },
+  },
+  // The four first-harvest chronicles, one per farming hub
+  // (FARM_CHRONICLE_ZONES, src/sim/deeds.ts). ALL FOUR are earnable today:
+  // plantCrop carries no bed-tier gate (probed live in the celebrations
+  // phase), so vendor-stocked tier 1/2 seeds can be planted and harvested at
+  // every hub, Highwatch and the Evergarden included. That held even before
+  // tier 3/4 seeds had a faucet because only the high-tier CROPS were gated,
+  // never these marks; since GATE 1 (Phase 11e) stocked all eight
+  // upper seeds the caveat is moot, and the marks were never the constraint.
+  chr_vale_first_harvest: {
+    id: 'chr_vale_first_harvest',
+    name: 'First Fruits of the Vale',
+    desc: 'Harvest your first thriving crop from a garden bed in Eastbrook Vale.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'farm:eastbrook_vale' },
+  },
+  chr_marsh_first_harvest: {
+    id: 'chr_marsh_first_harvest',
+    name: 'Sprouts in the Peat',
+    desc: 'Harvest your first thriving crop from a garden bed in Mirefen Marsh.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'farm:mirefen_marsh' },
+  },
+  chr_peaks_first_harvest: {
+    id: 'chr_peaks_first_harvest',
+    name: 'A Crop Among the Crags',
+    desc: 'Harvest your first thriving crop from a garden bed in Thornpeak Heights.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'farm:thornpeak_heights' },
+  },
+  chr_evergarden_first_harvest: {
+    id: 'chr_evergarden_first_harvest',
+    name: 'A Plot in Paradise',
+    desc: 'Harvest your first thriving crop from a garden bed in the Evergarden.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'farm:evergarden' },
+  },
+  // Rare-find deed: luck-based, so renown 0 and no title (docs/design/deeds.md
+  // rule 2), and VISIBLE like col_pristine_vein (the hid_ shelf is for spoiler
+  // delights, not public zone-wide celebrations). Keys on the finder-only
+  // gather_event mark its announce site writes; golden_harvest joins the
+  // family from the farming rare-event seam (professions/gather_events.ts),
+  // and since masterwrought Phase 18 it also pages a Reliquary field note
+  // beside its three node siblings.
+  col_golden_harvest: {
+    id: 'col_golden_harvest',
+    name: 'Golden Harvest',
+    desc: 'Reap a golden harvest and let the whole zone hear about it.',
+    category: 'collection',
+    renown: 0,
+    trigger: { kind: 'visit', markId: 'gather_event:golden_harvest' },
+  },
+  // Renown 10, the prog_mining_100 / prog_fishing_100 family value; the title
+  // placement is the D13 mandate, and it is DELIBERATELY the catalog's first
+  // profession-100 title: farming caps at 100 with no 200 tier, so its
+  // capstone carries the program's one title the way fishing's 200-cap
+  // Master Angler does at its own cap. Whether the other gathering caps gain
+  // titles is a catalog-wide maintainer call, not taken here. Reaching 100
+  // requires tier 3+ crops (the tier-2 teaching ceiling grays at 75,
+  // farmingTeachingCeilingFor in professions/farming.ts).
+  //
+  // EARNABLE since masterwrought Phase 11e (2026-08-21). This row used to say
+  // those crops had no seed faucet until the D11 bootstrap ruling, and that
+  // GATE 1 shipped: both upper farmers now stock their tier's seeds with
+  // positive buyValues, so farming teaches to the cap and this deed and its
+  // title are live. The honesty arm in tests/deeds_content.test.ts was
+  // INVERTED with the faucet (green now means earnable, and it reds if the
+  // faucet is ever removed), and the docs/design/deeds.md dormancy waiver is
+  // closed with its date.
+  prog_farming_100: {
+    id: 'prog_farming_100',
+    name: 'Harvestmaster',
+    desc: 'Reach 100 Farming proficiency.',
+    category: 'progression',
+    renown: 10,
+    trigger: { kind: 'gathering', professionId: 'farming', amount: 100 },
+    reward: { kind: 'title', text: 'Harvestmaster' },
+  },
+  // The roster deed (masterwrought DECISION E). A single crop is not
+  // conquerable content, but the ROSTER is a collection, and 'collection' is
+  // the shipped category for exactly that; renown 5 is the gathering ladder's
+  // first-rung point (prog_first_harvest, prog_first_mine and their siblings
+  // all sit there). NO title and no border: it is what makes twelve crops read
+  // as a set rather than a longer list, and deeds are cosmetic-only.
+  //
+  // The mark ids are generated from FARM_CROP_IDS rather than listed, so a
+  // thirteenth crop joins the collection by existing. That is deliberate: a
+  // hand list would let a new crop ship outside the set silently, which is the
+  // opposite of what a completion deed is for.
+  //
+  // RENOWN 5 VERSUS deeds.md RULE 2, recorded rather than passed over (raised
+  // by the Phase 11e content review). Rule 2 says ZERO Renown for "dynamic
+  // metas whose requirements grow with content", and this is the catalog's
+  // FIRST visits deed whose markIds are derived from a live table rather than
+  // hand-listed, so its requirement really does grow. masterwrought DECISION E
+  // ruled renown 5 explicitly (the shipped gathering first-rung point), and
+  // that ruling stands here rather than being re-decided in passing.
+  // Why the two can coexist: rule 2's stated reason is that "the account score
+  // must never be able to decrease on any content patch", and it cannot here.
+  // deedsEarned is sticky (src/sim/deeds.ts skips any id already earned) and
+  // character_deeds is insert-only, so a farmer who completes the roster keeps
+  // the 5 when a thirteenth crop ships; only an UNFINISHED collection widens.
+  // If a maintainer prefers the letter of the rule to its rationale, the change
+  // is renown 5 to 0 here plus the totals in tests/deeds_content.test.ts.
+  col_farm_roster: {
+    id: 'col_farm_roster',
+    name: 'Every Furrow Filled',
+    desc: 'Harvest every crop the four gardens grow.',
+    category: 'collection',
+    renown: 5,
+    trigger: {
+      kind: 'visits',
+      markIds: [...FARM_CROP_IDS].sort().map((cropId) => `farm_crop:${cropId}`),
+    },
+  },
+  // THE CROSS-PACKET DEED (masterwrought Phase 11k). It cannot be earned
+  // without touching BOTH halves of the merged program, and that is structural
+  // rather than a claim: the apex feast bill names farm produce, a Wyrmfall
+  // Core from the rift, and all three high-band fishing catches, so a cook who
+  // has never farmed, never raided or never fished cannot complete one.
+  //
+  // Cosmetic with ZERO rng, satisfying D13 and docs/design/deeds.md: renown 5,
+  // NO title, no border. A capstone that is a ROLE rather than a stat is the
+  // whole design claim of this phase's prestige deliverable, and paying it in
+  // stats would refute it. The trigger is the shipped { kind: 'visit' } family
+  // on a mark written at the SAME craft-credit arm that already writes
+  // craft_rare and the masterwork marks (professions/crafting.ts), and the mark
+  // key is BOUNDED by the authored recipe set exactly as craft_rare's is: an
+  // unbounded key source writes permanent ledger noise nothing can read back.
+  prog_field_to_feast: {
+    id: 'prog_field_to_feast',
+    name: 'From Field to Feast',
+    desc: 'Cook an apex feast, the table a whole raid eats from.',
+    category: 'progression',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'apex_feast:crafted' },
+  },
   // Bank bag sockets (Bank Storage phase 06): the socket ladder's two rungs of
   // recognition, beside soc_room_for_more / soc_gilded_strongbox for the slot
   // ladder. The meter reads BankState.unlockedSockets, bumped only by
   // bankUnlockSocket (bank_sockets.ts), which marks deeds dirty on purchase.
+  // Placed behind the masterwrought packet tail at the v0.41.0 release merge,
+  // keeping both sides' tails in their own authored order.
   soc_strongbox_outfitter: {
     id: 'soc_strongbox_outfitter',
     name: 'Strongbox Outfitter',
@@ -2879,6 +3196,37 @@ export const DEEDS: Record<string, DeedDef> = {
     category: 'progression',
     renown: 5,
     trigger: { kind: 'stat', stat: 'tutorialGraduations', count: 1 },
+  },
+  // THE PACKET'S CAPSTONE (masterwrought Phase 13): the first legendary. The
+  // stat is bumped once per orange promotion at the promotePerfectedCopy
+  // stamp site (professions/perfecting.ts, reached via
+  // resolvePerfectingAttempt's internal promotion arm): a Perfected apex
+  // copy plus one Deed of Making plus a valid player-chosen name, raised to
+  // legendary presentation.
+  //
+  // Renown 50 is the deliberate-prestige band (deeds.md rule 7: sub-1%
+  // unlocks are deliberate prestige only), and positive Renown is legitimate
+  // under rule 2 because the earn is EFFORT-gated, not luck-gated: the
+  // fail-forward Perfecting rank track paces the road here (roughly five
+  // weeks at one Maker's Ember per week), and the promotion act itself never
+  // rolls, the prog_masterwright precedent. Double prog_masterwright's 25
+  // deliberately: this is the system's capstone, a roughly five-week paced
+  // chain stacked ON TOP of the masterwork moment that deed already rewards,
+  // so it sits in rule 7's top prestige band while staying zero-rng on the
+  // act itself.
+  //
+  // NO title and no border, deliberately: R3 gives the prestige to the ITEM
+  // (the named legendary IS the trophy), and a title deed would also force
+  // committed crest art under the Reliquary title-shelf rule
+  // (tests/reliquary_cell_art.test.ts), where this deed rides the
+  // DEED_ART_PENDING ledger until its commissioned art lands.
+  prog_legendmaker: {
+    id: 'prog_legendmaker',
+    name: 'The Legendmaker',
+    desc: 'Raise a Perfected work to legend with a Deed of Making, and grant it a name all its own.',
+    category: 'progression',
+    renown: 50,
+    trigger: { kind: 'stat', stat: 'legendariesForged', count: 1 },
   },
   // The Crucible of the Last Spring raid (the deeds its content rule owes,
   // docs/prd/ignivar-raid-loot.md "Obligations closeout"). Clear credit is

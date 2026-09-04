@@ -19,23 +19,25 @@
 
 import { audio } from '../game/audio';
 import { ITEMS } from '../sim/data';
-import { type EquipSlot, isMechWearer } from '../sim/types';
+import { type EquipSlot, type ItemDef, type ItemInstancePayload, isMechWearer } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { STAT_PANELS } from './char_stats_view';
 import { buildPaperdollView, type PaperdollSlot } from './char_view';
-import { craftNameText } from './craft_name_view';
 import { currencyIconHtml } from './currency_art';
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName, itemDisplayName } from './entity_i18n';
-import { dropRequiredLevel, paperdollDropAction } from './equip_drop_core';
+import { draggedCopySlotIndex, dropRequiredLevel, paperdollDropAction } from './equip_drop_core';
 import { esc } from './esc';
 import { focusedWithin, restoreFirstEnabled } from './focus_restore';
-import { gatheringProfessionNameKey } from './gathering_profession_name';
-import { buildGatheringProficiencyRows } from './gathering_view';
+import { craftNameText } from './hud/professions/craft_name_view';
+import { gatheringProfessionNameKey } from './hud/professions/gathering_profession_name';
+import { buildGatheringProficiencyRows } from './hud/professions/gathering_view';
+import { archetypeImageUrl } from './hud/professions/profession_art';
 import { formatNumber, type TranslationKey, t, tPlural } from './i18n';
-import { iconDataUrl, QUALITY_COLOR } from './icons';
+import { iconDataUrl, professionIconUrl } from './icons';
 import type { ItemDragState } from './item_drag_state';
 import { wornTooltipInstance } from './item_instance_tooltip';
+import { masterwroughtCapReadout } from './masterwrought_cap_view';
 import type { PainterHostPresentation } from './painter_host';
 import { playtimeParts, playtimeShape } from './playtime_view';
 import {
@@ -45,17 +47,16 @@ import {
   onPortraitUpdate,
   portraitChipHtml,
 } from './portrait_chip';
-import { archetypeImageUrl, professionImageUrl } from './profession_art';
 import { qualityGlowShadow } from './quality_glow';
 import { tSim } from './sim_i18n';
 import type { StatId } from './stat_tooltip';
 import { svgIcon } from './ui_icons';
+import { wornItemCellParts } from './worn_item_cell_view';
 
-// Quality / empty-slot colors as CSS custom properties: the shared
-// QUALITY_COLOR map carries the per-quality hex, and these tokens cover the
-// unranked item plus the empty-slot label and icon border, so no raw hex lives
-// in this painter.
-const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)';
+// Empty-slot colors as CSS custom properties (the worn cell's own color comes
+// from worn_item_cell_view.ts, which carries the unranked-item token): these
+// cover the empty-slot label and icon border, so no raw hex lives in this
+// painter.
 const SLOT_EMPTY_TEXT_COLOR = 'var(--color-slot-empty-text)';
 const SLOT_EMPTY_BORDER_COLOR = 'var(--color-slot-empty-border)';
 
@@ -138,7 +139,10 @@ export function playtimeText(seconds: number): string {
  * WCAG focus-return, and the two HUD-owned render regions (3D preview + skin
  * picker) invoked by callback.
  */
-export interface CharWindowDeps extends PainterHostPresentation {
+export interface CharWindowDeps extends Omit<PainterHostPresentation, 'itemTooltip'> {
+  /** Tooltip for a copy already worn on this paperdoll. It must not append a
+   *  comparison against the same equipped slot. */
+  wornItemTooltip(item: ItemDef, instance?: ItemInstancePayload): string;
   root(): HTMLElement;
   world(): IWorld;
   closeOthers(): void;
@@ -281,6 +285,7 @@ export class CharWindow {
       </div>
       <div class="equip-col equip-col-right" id="equip-col-right"></div>
     </div>`;
+    html += this.masterwroughtSlotsHtml(world);
     // Stats as the showcase layout: five primary tiles, then the Offense and
     // Defense panels. The partition + heading keys come from the char_stats_view
     // pure core; each cell is the same unit-tested stat_tooltip_view cell (colon
@@ -336,11 +341,21 @@ export class CharWindow {
         );
       });
     }
-    const view = buildPaperdollView(world.equipment, ITEMS);
+    const view = buildPaperdollView(world.equipment, ITEMS, world.equipmentInstances);
     const leftCol = el.querySelector('#equip-col-left');
     const rightCol = el.querySelector('#equip-col-right');
     for (const cell of view.left) leftCol?.appendChild(this.buildSlotRow(cell));
     for (const cell of view.right) rightCol?.appendChild(this.buildSlotRow(cell));
+
+    // A character-sheet rebuild mints new socket nodes, including after the
+    // inventory-change path has synchronized the old set. Restore the active
+    // exact-copy promise on those new nodes for both desktop and touch drags.
+    const drag = this.deps.dragState.get();
+    if (drag) {
+      const named = draggedCopySlotIndex(world.inventory, drag.itemId, drag);
+      if (named === null) this.markDropTargets(null);
+      else this.markDropTargets(drag.itemId, named);
+    }
 
     for (const cell of el.querySelectorAll<HTMLElement>('.stat-panels [data-stat]')) {
       const stat = cell.dataset.stat as StatId;
@@ -377,10 +392,12 @@ export class CharWindow {
       .map((r) => {
         const key = gatheringProfessionNameKey(r.professionId);
         if (key === undefined) return '';
-        const imageUrl = professionImageUrl(`gather_${r.professionId}`);
-        const icon = imageUrl
-          ? `<img class="char-gather-icon" src="${esc(imageUrl)}" alt="" draggable="false">`
-          : '';
+        // professionIconUrl, not professionImageUrl: a pending-art profession
+        // (farming) must paint its procedural composer icon, never an iconless
+        // gap beside painted siblings; the professions window resolves the
+        // same way. 56 keeps the 28px slot crisp on 2x displays.
+        const iconUrl = professionIconUrl(`gather_${r.professionId}`, 56);
+        const icon = `<img class="char-gather-icon" src="${esc(iconUrl)}" alt="" draggable="false">`;
         const skillValue = t('hudChrome.professions.skillValue', {
           skill: formatNumber(r.displayValue, { maximumFractionDigits: 0 }),
           max: formatNumber(r.maxSkill, { maximumFractionDigits: 0 }),
@@ -411,8 +428,26 @@ export class CharWindow {
     return `<div class="char-progression char-playtime"><span class="cp-title char-playtime-label">${esc(t('hudChrome.charSheet.playtimeLabel'))}</span><b class="char-playtime-value${visible ? '' : ' char-playtime-value-hidden'}">${esc(value)}</b><button type="button" class="char-playtime-eye" data-act="toggle-playtime" aria-pressed="${visible ? 'false' : 'true'}" aria-label="${esc(eyeLabel)}">${svgIcon(visible ? 'eye' : 'eye-off')}</button></div>`;
   }
 
+  // The Masterwrought slots readout (phase 14): the character-sheet face of
+  // the equip cap (src/sim/equipment_rules.ts MASTERWROUGHT_EQUIP_CAP),
+  // rendered as a slim row right under the paperdoll it describes. Shown only
+  // once a Masterwrought piece is actually worn: before endgame the cap never
+  // binds, and a standing "0 / 2" row would be noise on every sheet. Counts
+  // come from the masterwrought_cap_view pure core, the same flag walk the
+  // equip refusal runs, so the readout can never disagree with the rule.
+  private masterwroughtSlotsHtml(world: IWorld): string {
+    const readout = masterwroughtCapReadout(world.equipment, ITEMS);
+    if (!readout) return '';
+    const num = (n: number) => formatNumber(n, { maximumFractionDigits: 0 });
+    const value = t('hudChrome.masterwrought.slotsValue', {
+      used: num(readout.used),
+      cap: num(readout.cap),
+    });
+    return `<div class="char-progression char-mw-slots"><span class="cp-title char-mw-slots-label">${esc(t('hudChrome.masterwrought.slotsLabel'))}</span><b class="char-mw-slots-value">${esc(value)}</b></div>`;
+  }
+
   private buildSlotRow(cell: PaperdollSlot): HTMLElement {
-    const { slot, item } = cell;
+    const { slot, item, instance } = cell;
     const row = document.createElement('div');
     row.className = 'equip-slot';
     // Stable id + programmatic focusability so the corner-x rebuild can hand focus
@@ -423,14 +458,27 @@ export class CharWindow {
     // the touch hit test (item_drop_hit_test.ts), which has no drop event to read.
     row.dataset.equipSlot = slot;
     this.bindEquipDropTarget(row, slot);
-    const qColor = !item
-      ? SLOT_EMPTY_TEXT_COLOR
-      : (QUALITY_COLOR[item.quality ?? 'common'] ?? QUALITY_DEFAULT_COLOR);
+    // The row describes the worn COPY, not just its def (the all-surfaces
+    // item-cell rule, one authority: worn_item_cell_view.ts): instance-effective
+    // quality colors the line and drives the icon's q-<quality> rim (so a
+    // promoted copy's orange glow never sits on a purple def rim), and a
+    // promoted copy's player-chosen name replaces the def name. The chosen
+    // name is player-authored text, so it is esc'd raw, never through t().
+    const parts = item ? wornItemCellParts(item, instance) : null;
+    const wornName = parts ? parts.name : null;
+    const qColor = parts ? parts.color : SLOT_EMPTY_TEXT_COLOR;
     const icon = item
-      ? this.deps.itemIcon(item)
+      ? this.deps.itemIcon(item, parts?.quality)
       : `<img class="item-icon" style="border-color:${SLOT_EMPTY_BORDER_COLOR}" src="${iconDataUrl('item', 'slot_empty')}" alt="" draggable="false">`;
+    // The worn Masterwrought mark (phase 14): a small gold diamond beside the
+    // slot name, the paperdoll's per-slot half of the cap readout above it.
+    // role=img + a t() aria-label because the diamond is CSS-drawn (no glyph
+    // to read); the full cap relationship rides the row tooltip below.
+    const mwChip = item?.masterwrought
+      ? ` <span class="equip-mw-chip" role="img" aria-label="${esc(t('hudChrome.masterwrought.pieceMark'))}"></span>`
+      : '';
     row.innerHTML = `${icon}
-        <div><div class="slot-name">${esc(this.deps.slotName(slot))}</div><div class="slot-item" style="color:${qColor}">${item ? esc(itemDisplayName(item)) : esc(t('itemUi.equipment.empty'))}</div></div>`;
+        <div><div class="slot-name">${esc(this.deps.slotName(slot))}${mwChip}</div><div class="slot-item" style="color:${qColor}">${wornName !== null ? esc(wornName) : esc(t('itemUi.equipment.empty'))}</div></div>`;
     // The helmet-visibility eye (head socket only): a standing wardrobe control,
     // so unlike the corner x it is always visible, and it rides the socket
     // because that is where the player looks for "my helmet". State + side
@@ -463,16 +511,31 @@ export class CharWindow {
       const iconEl = row.querySelector<HTMLImageElement>('.item-icon');
       if (iconEl) iconEl.style.boxShadow = qualityGlowShadow(qColor);
       this.deps.attachTooltip(row, () => {
-        // Own worn copy's per-copy lines (seal, enchanted marker, maker's mark):
-        // the self entity mirror carries equippedInstances in both worlds.
-        // Projected through wornTooltipInstance so the offline
-        // full payload renders exactly what the online eqi-trimmed mirror
-        // does: worn identity is signer/enchant/rolled, never the bond.
+        // Own worn copy's per-copy lines (seal, enchanted marker, maker's mark,
+        // the phase 13 unique tag): read from IWorld.equipmentInstances, the
+        // owner's FULL worn map on both hosts (offline the live meta, online
+        // the einst self mirror), never the self ENTITY mirror, which online
+        // is the eqi-trimmed peer projection and drops `perfected` (the phase
+        // 13 QA parity finding: the tag vanished on one host only). Projected
+        // through wornTooltipInstance so the tooltip renders the worn
+        // identity plus the self-only Perfected stamp, never the bond.
         const world = this.deps.world();
-        const instance = wornTooltipInstance(
-          world.entities.get(world.playerId)?.equippedInstances?.[slot],
-        );
-        return `${this.deps.itemTooltip(item, instance)}<div class="tt-sub">${esc(t('hudChrome.paperdoll.unequipHint'))}</div>`;
+        const instance = wornTooltipInstance(world.equipmentInstances?.[slot]);
+        // The worn cap-relationship line (phase 14): this piece OCCUPIES one
+        // of the Masterwrought slots, with the live in-use count, resolved at
+        // hover so it tracks re-equips. Worn here, so the readout is never
+        // null; the def tooltip's own Masterwrought line states the budget,
+        // this one states this copy's claim on it.
+        const readout = item.masterwrought ? masterwroughtCapReadout(world.equipment, ITEMS) : null;
+        const mwLine = readout
+          ? `<div class="tt-sub" style="color:var(--gold)">${esc(
+              t('hudChrome.masterwrought.tooltipWorn', {
+                used: formatNumber(readout.used, { maximumFractionDigits: 0 }),
+                cap: formatNumber(readout.cap, { maximumFractionDigits: 0 }),
+              }),
+            )}</div>`
+          : '';
+        return `${this.deps.wornItemTooltip(item, instance)}${mwLine}<div class="tt-sub">${esc(t('hudChrome.paperdoll.unequipHint'))}</div>`;
       });
       // Corner x: a styled glyph control (not an in-game icon), revealed on
       // hover/focus and always shown on touch where right-click is unavailable.
@@ -480,9 +543,11 @@ export class CharWindow {
       unequip.type = 'button';
       unequip.className = 'equip-unequip-btn';
       unequip.innerHTML = svgIcon('close');
+      // The aria interpolates the same worn-copy name the row shows (a named
+      // legendary hears its chosen name), still as a t() VALUE.
       unequip.setAttribute(
         'aria-label',
-        t('hudChrome.paperdoll.unequipAria', { item: itemDisplayName(item) }),
+        t('hudChrome.paperdoll.unequipAria', { item: wornName ?? itemDisplayName(item) }),
       );
       unequip.addEventListener('click', (ev) => {
         ev.stopPropagation();
@@ -530,8 +595,16 @@ export class CharWindow {
         world.player.level,
         world.talentSpec,
         world.equipment,
+        world.equipmentInstances,
+        world.inventory,
+        target?.slotIndex,
       )
     ) {
+      case 'blockedSelection':
+        // The sim's early invalid-selection gate answers "You don't have that
+        // item." (items.ts equipItem); the mirror pre-empts with the same key.
+        this.deps.showError(tSim('error.noItem'));
+        return;
       case 'blockedSlot':
         this.deps.showError(tSim('error.wrongEquipSlot'));
         return;
@@ -548,6 +621,12 @@ export class CharWindow {
       case 'blockedUnique':
         this.deps.showError(tSim('error.uniqueEquipped'));
         return;
+      case 'blockedMasterwroughtCap':
+        this.deps.showError(tSim('error.masterwroughtCap'));
+        return;
+      case 'blockedMasterwroughtLegendary':
+        this.deps.showError(tSim('error.masterwroughtLegendary'));
+        return;
       case 'equip':
         world.equipItemToSlot(itemId, slot, target);
         audio.click();
@@ -559,8 +638,10 @@ export class CharWindow {
 
   /** Light up every socket that would ACCEPT the stack in flight (null clears them).
    *  Only the accepting sockets light: the feedback is the same pure decision the
-   *  drop itself runs, so a lit socket always takes the piece. */
-  markDropTargets(itemId: string | null): void {
+   *  drop itself runs, so a lit socket always takes the piece. `slotIndex` names
+   *  the drag source's bag cell (the copy the drop would consume), threaded so
+   *  the lit set matches the drop verdict for a named copy too. */
+  markDropTargets(itemId: string | null, slotIndex?: number): void {
     const el = this.deps.root();
     const world = this.deps.world();
     const item = itemId ? ITEMS[itemId] : undefined;
@@ -576,6 +657,9 @@ export class CharWindow {
           world.player.level,
           world.talentSpec,
           world.equipment,
+          world.equipmentInstances,
+          world.inventory,
+          slotIndex,
         ) === 'equip';
       row.classList.toggle('drop-target', accepts);
     }
@@ -590,8 +674,17 @@ export class CharWindow {
       if (!drag) return;
       const item = ITEMS[drag.itemId];
       const world = this.deps.world();
+      // Re-resolve the dragged COPY every dragover, not once at pick-up: the
+      // bags can shift mid-drag, after which the pick-up index either names
+      // nothing (the socket stays lit from dragstart while the drop is silently
+      // refused: the light-then-refuse) or names a different copy of the same id
+      // (worse, since that drop succeeds on the wrong piece).
+      const named = draggedCopySlotIndex(world.inventory, drag.itemId, drag);
+      if (!item || named === null) {
+        this.markDropTargets(null);
+        return;
+      }
       if (
-        !item ||
         paperdollDropAction(
           item,
           slot,
@@ -599,6 +692,9 @@ export class CharWindow {
           world.player.level,
           world.talentSpec,
           world.equipment,
+          world.equipmentInstances,
+          world.inventory,
+          named,
         ) !== 'equip'
       )
         return;
@@ -611,14 +707,21 @@ export class CharWindow {
       e.preventDefault();
       this.deps.dragState.end();
       this.markDropTargets(null);
-      // The desktop drop carries the drag's bag index the same way the touch path
+      // The desktop drop carries the drag's bag copy the same way the touch path
       // does; without it the most ordinary equip gesture fell back to the guess.
-      // `drag.index` is already null for a sorted or filtered grid, which names no
-      // position, so that case correctly sends no selection.
+      // Resolved by PIN against the live bags (see the dragover above), so an
+      // untouched drag lands on its own cell and a shifted one follows its copy;
+      // null means the copy left the bags, which refuses with the sim's own
+      // wording rather than letting the id-only walk take an id-mate.
+      const named = draggedCopySlotIndex(this.deps.world().inventory, drag.itemId, drag);
+      if (named === null) {
+        this.deps.showError(tSim('error.noItem'));
+        return;
+      }
       this.dropOnEquipSlot(
         drag.itemId,
         slot,
-        drag.index !== null && drag.index >= 0 ? { slotIndex: drag.index } : undefined,
+        named === undefined ? undefined : { slotIndex: named },
       );
     });
   }

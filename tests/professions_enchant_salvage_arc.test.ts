@@ -658,6 +658,97 @@ describe('online end-to-end (live GameServer, wire commands + self-deltas)', () 
     expect(remaining[0].instance).toEqual({ rolled: { masterwork: true, stats: { str: 2 } } });
   });
 
+  it('the server resolves extract_essence with the selected slot (Masterwrought phase 04)', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const st = joinServer(server, fc, 713, 'QaSunder');
+    placeAt(server, st.pid, { x: 0, z: 150 });
+    // A raid-sourced epic (Nythraxis loot): the one target class the sunder
+    // admission accepts. Two copies so the selected-slot pin has a decoy.
+    const RAID_EPIC = 'crownforged_dreadhelm';
+    server.sim.ctx.addItemInstance(RAID_EPIC, { signer: 'KeepMe' }, st.pid);
+    server.sim.addItem(RAID_EPIC, 1, st.pid);
+    const plainIndex = serverInv(server, st.pid).findIndex(
+      (slot) => slot.itemId === RAID_EPIC && !slot.instance,
+    );
+
+    cmd(server, st, { cmd: 'extract_essence', item: RAID_EPIC, slot: plainIndex });
+    flushEnchantFamilyCast(server, st.pid);
+
+    const inv = serverInv(server, st.pid);
+    expect(inv.filter((slot) => slot.itemId === 'sundered_essence')).toHaveLength(1);
+    const remainingEpics = inv.filter((slot) => slot.itemId === RAID_EPIC);
+    expect(remainingEpics).toHaveLength(1);
+    expect(remainingEpics[0].instance?.signer).toBe('KeepMe');
+    // The completion line rides the personal log event over the wire. Match
+    // the line's own prefix: the join broadcast also contains "Sunder" (the
+    // player is named QaSunder), which a loose regex would scoop up.
+    const logs = eventsFor(fc.sent, 'log').filter((e: any) =>
+      (e.text ?? '').startsWith('You sunder '),
+    );
+    expect(logs).toHaveLength(1);
+    expect((logs[0] as any).text).toBe('You sunder Bonewrought Dreadhelm into Sundered Essence.');
+  });
+
+  it('the client extract_essence frame carries the selected slot (and omits it untargeted)', () => {
+    // Behavior pin for the ADDRESSED_COMMANDS registry row: the source-scan
+    // guard's sender window is comment-bleed-prone on the client half, so the
+    // frame SHAPE is asserted here directly. Dropping `slot` from the sender
+    // silently degrades every online sunder to the unpinned re-resolve.
+    const client = bareClient(1);
+    const frames: Array<Record<string, unknown>> = [];
+    (client as unknown as { cmd: (p: Record<string, unknown>) => void }).cmd = (p) => {
+      frames.push(p);
+    };
+    client.extractEssence('crownforged_dreadhelm', { slotIndex: 3 });
+    client.extractEssence('crownforged_dreadhelm');
+    // toStrictEqual: toEqual treats an absent key and slot: undefined as
+    // equal, so only the strict compare pins the omission arm.
+    expect(frames).toStrictEqual([
+      { cmd: 'extract_essence', item: 'crownforged_dreadhelm', slot: 3 },
+      { cmd: 'extract_essence', item: 'crownforged_dreadhelm' },
+    ]);
+  });
+
+  it('a malformed slot on extract_essence degrades or refuses, never aims the destroy', () => {
+    // Three hostile shapes, two defenses: a NON-integer slot is coerced to
+    // undefined at the dispatch boundary (the untrusted-slot rule) and the
+    // sunder re-resolves its preferred victim fresh, so the PLAIN copy dies
+    // and the signed copy survives; an integer that PASSES Number.isInteger
+    // (-1, out-of-range) reaches the sim, whose own bound refuses it before
+    // any state is written. Together a hand-crafted frame can never aim the
+    // destroy at an index the pin did not cover.
+    const server = new GameServer();
+    const fc = fakeWs();
+    const st = joinServer(server, fc, 717, 'QaBadSlot');
+    placeAt(server, st.pid, { x: 0, z: 150 });
+    const RAID_EPIC = 'crownforged_dreadhelm';
+    server.sim.ctx.addItemInstance(RAID_EPIC, { signer: 'KeepMe' }, st.pid);
+    server.sim.addItem(RAID_EPIC, 1, st.pid);
+
+    // The integer-but-invalid shapes first: refused whole, nothing consumed.
+    cmd(server, st, { cmd: 'extract_essence', item: RAID_EPIC, slot: -1 });
+    cmd(server, st, { cmd: 'extract_essence', item: RAID_EPIC, slot: 4096 });
+    flushEnchantFamilyCast(server, st.pid);
+    expect(serverInv(server, st.pid).filter((s) => s.itemId === RAID_EPIC)).toHaveLength(2);
+    expect(serverInv(server, st.pid).filter((s) => s.itemId === 'sundered_essence')).toHaveLength(
+      0,
+    );
+    const refusals = eventsFor(fc.sent, 'error').filter(
+      (e: any) => e.text === 'You are not holding that item.',
+    );
+    expect(refusals.length).toBeGreaterThanOrEqual(2);
+
+    cmd(server, st, { cmd: 'extract_essence', item: RAID_EPIC, slot: 1.5 });
+    flushEnchantFamilyCast(server, st.pid);
+
+    const inv = serverInv(server, st.pid);
+    expect(inv.filter((slot) => slot.itemId === 'sundered_essence')).toHaveLength(1);
+    const remaining = inv.filter((slot) => slot.itemId === RAID_EPIC);
+    expect(remaining).toHaveLength(1);
+    expect(remaining[0].instance?.signer).toBe('KeepMe');
+  });
+
   it('resolves the three commands server-side and mirrors denc/ench/salv into a real ClientWorld', () => {
     const server = new GameServer();
     const fc = fakeWs();

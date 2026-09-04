@@ -128,7 +128,7 @@ export const table: DeedLocaleTable = {
     desc: 'Nightbloomで鉱脈、木立、薬草畑を収穫する。',
   },
   chr_nightbloom_first_cast: {
-    name: '月の井戸の波紋',
+    name: '月の泉の波紋',
     desc: 'Nightbloomの水辺で魚を釣る。',
   },
   chr_wraithwood_gatherer: {
@@ -198,7 +198,6 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: '野辺の名人', desc: '薬草学の熟練度100に到達する。' },
   prog_master_gatherer: {
     name: '採集の達人',
-    desc: '採掘、伐採、薬草学、釣りのうち、いずれか3つの熟練度100に到達する。',
   },
   prog_first_craft: { name: '手仕事の味', desc: '初めての製作を成功させる。' },
   prog_craft_specialist: {
@@ -345,7 +344,7 @@ export const table: DeedLocaleTable = {
   },
   dlv_varric_ringers: {
     name: '鳴りやむ鐘',
-    desc: '彼が甦らせる葬儀の鐘鳴らしをすべて先に仕留めてから、助祭ヴァリックを倒す。',
+    desc: '彼が甦らせる葬儀の鐘鳴らしをすべて先に仕留めてから、助祭ヴァンドリックを倒す。',
   },
   dlv_nhalia_bells: {
     name: '鐘鎮め',
@@ -421,7 +420,7 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: 'ソーンピークの年代記',
-    desc: '山の物語を最後まで見届ける：ワーム教団を壊滅させ、聖所を鎮め、目覚めし峰を打ち倒し、岩山に名だたる恐怖をことごとく討ち倒す。',
+    desc: '山の物語を最後まで見届ける：竜誓団を壊滅させ、聖所を鎮め、目覚めし峰を打ち倒し、岩山に名だたる恐怖をことごとく討ち倒す。',
     title: 'ソーンピークの語り部',
   },
   chr_peaks_sparring: {
@@ -510,7 +509,7 @@ export const table: DeedLocaleTable = {
   },
   col_quartermaster_buyout: {
     name: 'お得意様',
-    desc: '補給係ヴェックスの品揃え全10点を発見する。',
+    desc: '補給係ヴェックスの装備品全10点を発見する。',
   },
   col_glimmerfin: {
     name: '希望のきらめき',
@@ -904,6 +903,32 @@ export const table: DeedLocaleTable = {
   prog_armorcrafting_rare: {
     name: '完璧な装甲',
     desc: '防具鍛冶で初めてのレア級アイテムを作る。',
+  },
+  prog_jewelcrafting_rare: {
+    name: '磨かれた輝き',
+    desc: '宝石細工で初めてのレア級アイテムを作る。',
+  },
+  prog_jewelcrafting_50: {
+    name: '刻面と透かし細工',
+    desc: '宝石細工のスキルで50に到達する。',
+  },
+  prog_grandmaster_jewelcrafting: {
+    name: '宝石細工の大師',
+    desc: '宝石細工のスキルで125に到達し、その道の極みに立つ。',
+    title: '宝石細工の大師',
+  },
+  prog_inscription_rare: {
+    name: '見事な墨書',
+    desc: '銘文で初めてのレア級アイテムを作る。',
+  },
+  prog_inscription_50: {
+    name: '羽根ペンと顔料',
+    desc: '銘文のスキルで50に到達する。',
+  },
+  prog_grandmaster_inscription: {
+    name: '銘文の大師',
+    desc: '銘文のスキルで125に到達し、その道の極みに立つ。',
+    title: '銘文の大師',
   },
   prog_ready_for_an_adventure: {
     name: '冒険の準備は万端',

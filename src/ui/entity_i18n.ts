@@ -1,15 +1,4 @@
-import {
-  GUILD_TREND_LETTERS,
-  HEROIC_MARK_LETTER,
-  type LetterDef,
-  MASTER_TIER_LETTERS,
-  MASTERY_RESET_LETTER,
-  QUEST_LETTERS,
-  WELCOME_LETTER,
-  WOC_MARKET_DELIVERY_LETTER,
-  WOC_MARKET_RETURN_LETTER,
-  WOC_MARKET_SOLD_LETTER,
-} from '../sim/content/letters';
+import { authoredLettersById, type LetterDef } from '../sim/content/letters';
 import {
   ABILITIES,
   CLASSES,
@@ -203,21 +192,15 @@ const CLASS_DESCRIPTION_KEYS: Record<PlayerClass, string> = {
 const fallbackLog = new Map<string, EntityTranslationFallback>();
 
 // Ravenpost authored letters by letterId (the welcome letter, the Heroic Marks
-// reward letter, the quest thank-you letters, and the Guild trend letters), the
-// canonical English source the 'letter' kind reads.
-const LETTERS_BY_ID: Record<string, LetterDef> = {
-  [WELCOME_LETTER.letterId]: WELCOME_LETTER,
-  [HEROIC_MARK_LETTER.letterId]: HEROIC_MARK_LETTER,
-  [MASTERY_RESET_LETTER.letterId]: MASTERY_RESET_LETTER,
-  [WOC_MARKET_DELIVERY_LETTER.letterId]: WOC_MARKET_DELIVERY_LETTER,
-  [WOC_MARKET_RETURN_LETTER.letterId]: WOC_MARKET_RETURN_LETTER,
-  [WOC_MARKET_SOLD_LETTER.letterId]: WOC_MARKET_SOLD_LETTER,
-};
-for (const letter of Object.values(QUEST_LETTERS)) LETTERS_BY_ID[letter.letterId] = letter;
-for (const letter of Object.values(GUILD_TREND_LETTERS)) LETTERS_BY_ID[letter.letterId] = letter;
-for (const byTier of Object.values(MASTER_TIER_LETTERS)) {
-  for (const letter of Object.values(byTier)) LETTERS_BY_ID[letter.letterId] = letter;
-}
+// and Wyrmfall Core reward letters, the mastery reset notice, the quest
+// thank-you letters, the Guild trend letters, the master tier letters, and the
+// $WOC Exchange's three delivery letters), the canonical English source the
+// 'letter' kind reads. Built by the ONE shared builder in
+// src/sim/content/letters.ts, the same map world_entity_i18n.ts derives its key
+// set from, so a letter cannot be registered for translation yet unknown here
+// (the Wyrmfall Core letter was exactly that until this registry stopped
+// hand-seeding its own copy).
+const LETTERS_BY_ID: Record<string, LetterDef> = authoredLettersById();
 
 /** Whether THIS bundle ships the authored letter (stale-client guard, R34):
  *  the mail window falls back to the WIRE-shipped sender/subject/body for an

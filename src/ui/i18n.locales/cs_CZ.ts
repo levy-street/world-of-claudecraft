@@ -283,13 +283,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.woc.youDeclined': 'Nabídku jsi odmítl(a).',
   'hudChrome.trade.woc.youWithdrew': 'Svou nabídku jsi stáhl(a).',
   'hudChrome.tutorialGreeting.bellHomeNote': 'Už jsi zpátky z pobřeží? To zvonil trajektový zvon. Jeho dvojče visí hned tamhle u schránky Havraní pošty: zazvoň na něj, kdykoli budeš chtít, a přívoz tě donese zpátky na Zkušební pobřeží. Ať se rozhodneš tak či onak, nic se tím nezkazí.',
-  'hudChrome.tutorialGreeting.bodyFirst': 'Tebe jsem tu ještě neviděl, příteli. V těchto krajích je zvykem, že se ti, kdo se vydávají na dobrodružství, nejdřív vypraví na Zkušební pobřeží, tichý ostrůvek za úžinou. Tam si můžeš vybrousit dovednosti a zvyknout si na svět, než se pustíš do jeho výzev. Přívoz jezdí oběma směry a nikdo si o tobě nebude myslet nic zlého, ať se rozhodneš jakkoli.',
-  'hudChrome.tutorialGreeting.bodyRefresher': 'Zase tu jsi, tentokrát s novou tváří? Pak už víš, jak to tu chodí. Přesto, jestli by sis chtěl(a) před vyražením zopakovat základy, Zkušební pobřeží nikdy neodmítne vracejícího se žáka, a přívoz je připravený, kdykoli budeš chtít.',
-  'hudChrome.tutorialGreeting.declineNote': 'Jak myslíš, příteli. Kdybys to jednou přece jen rozmyslel(a), trajektový zvon u schránky Havraní pošty tě kdykoli, ve dne v noci, převeze na Zkušební pobřeží. Bude tu čekat i ve chvíli, kdy tu vlci nebudou.',
   'hudChrome.tutorialGreeting.islandArrivalNote': 'Vítej na Zkušebním pobřeží. Strážce Tam čeká kousek odsud na pláži: zajdi za ním.',
   'hudChrome.tutorialGreeting.noteClose': 'Rozumím',
-  'hudChrome.tutorialGreeting.play': 'Spustit tutoriál',
-  'hudChrome.tutorialGreeting.skip': 'Přeskočit tutoriál',
   'hudChrome.walletBridge.badResponse': 'Tvoje peněženka vrátila nepoužitelnou odpověď. Zkus to znovu.',
   'hudChrome.walletBridge.cancelled': 'Požadavek na peněženku byl zrušen. Nic nebylo odesláno.',
   'hudChrome.walletBridge.notConnected': 'Připoj a ověř peněženku, pak to zkus znovu.',
@@ -954,7 +949,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.home.world.galeName': 'Vichrný hřeben',
   'guide.home.world.gardenBlurb': 'Říše živého bludiště, které dosud stříhal jen zahradník, jehož nikdo nikdy nespatřil, do níž se vchází kolem Hedgewicku a jeho fontánových nádvoří.',
   'guide.home.world.gardenName': 'Věčná zahrada',
-  'guide.home.world.hauntBlurb': 'Strašidelný les pod obřími korunami stromů, kde jediným poctivým světlem na cestě jsou lucerny Gallowmere.',
+  'guide.home.world.hauntBlurb': 'Strašidelný les pod obřími korunami stromů, kde jediným poctivým světlem na cestě jsou lucerny Gibbetmere.',
   'guide.home.world.hauntName': 'Přízračný les',
   'guide.home.world.jungleBlurb': 'Palmy, bílý písek a hluční ptáci, a pobřežní městečko Drifthaven, které na pláži udržuje planoucí oheň.',
   'guide.home.world.jungleName': 'Palmový kraj',
@@ -1072,16 +1067,14 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.orderBoardHeading': 'Nástěnka zakázek',
   'guide.profPages.ench.charmsBody': 'Okouzlování je taky místo, odkud pocházejí amulety pro sběrače. Kutil Gizzel naučí oba recepty v Eastbrookské nástrojárně, jakmile tvé Okouzlování dosáhne 25: Sběračovu skrýš, která přidá jednotku k výnosu ze sklizně, a Řemeslníkovo oko, které zvýší jakost toho, co se vytěží. Každý se vyrobí jednou a pak se vloží do krumpáče, sekery nebo srpu, kde spotřebuje nabití jen na sklizních, které skutečně vylepší.\n\nNa dobíjení řemeslo dál vydělává. Nabití obnovuje ten, komu nástroj patří, ne procházející okouzlovatel, a dobití stojí polovinu materiálů, pokud je tím vlastníkem právě okouzlovatel, který amulet podepsal, a ještě méně se specializací na Okouzlování. Amulet prodaný přes pult je tedy jednorázový prodej, zatímco amulety jedoucí na tvých vlastních nástrojích jsou ty levné na udržování v chodu. Celý žebříček nabití a materiálů najdeš na stránce každého sběračského povolání, pod Efekty nástrojů.',
   'guide.profPages.ench.charmsHeading': 'Amulety pro sběračské nástroje',
-  'guide.profPages.ench.enchantsNoteOffhand': 'Okouzlení mají tři stupně. Základní stupeň běží na Zvonivém prachu (na horním konci s trochou Esence) a pokrývá slot na zbraň, vedlejší ruku a každý slot zbroje, s dost možnostmi na ose statistik, aby si každá sestava našla něco pro každý slot: štíty a držené kouzelnické vedlejší ruce mají vlastní okouzlení na Výdrž, takže žádný nasazený slot není bez okouzlení. Vynikající stupeň stojí jeden Zvonivý střep plus Esenci: silnější bonusy na slotech s nejvyšším dopadem. Střepy navíc krmí ještě dva další odbytiny, oba recepty na amulety po pěti kusech a nejvyšší příčel dobíjení efektů nástrojů, takže si pár nech stranou, než je utratíš.\n\nMezi nimi stojí pět Runových okouzlení, po jednom spotřebiteli na každou typovanou vedlejší statistiku, takže nic, co rozemeleš, nikdy nekončí naprázdno: Runové ostří (zbraň, Síla, spotřebuje Rezonující ocel), Runová pečeť (zbraň, Intelekt, Rezonující dřevo), Runová tkanina (hruď, Duch, Rezonující nit), Runová kůže (nohavice, Obratnost, Rezonující kůže) a Runové kroužky (helma, Výdrž, Rezonující kroužky). Každé také bere dvě Zvonivé esence; tam, kde má slot a statistika jak základní, tak Vynikající okouzlení, přistane Runový bonus mezi nimi, zatímco Runová tkanina je vysloveně nejsilnější okouzlení hrudi na Ducha a Runová kůže je jediné okouzlení nohavic na Obratnost vůbec. Přesné bonusy jsou všechny v tabulce níže.',
-  'guide.profPages.faq.a10': 'Amulet je vložený efekt nástroje: dílo okouzlovatele, které sedí ve sběračském nástroji a vylepšuje to, co přinese. Sběračova skrýš přidá jednotku k výnosu ze sklizně, Řemeslníkovo oko zvýší jeho jakost, a Kutil Gizzel naučí oba recepty v Eastbrookské nástrojárně na 25 Okouzlování. Nabití se spotřebuje, jen když amulet výsledek skutečně změnil, takže sklizeň, kterou nemohl vylepšit, tě nic nestojí, a slot lze nastavit, aby se ptal při každém použití, pokud chceš raději rozhodovat nabití od nabití.\\n\\nČerstvý amulet nese 20 nabití na běžném nástroji a o 10 víc za každý stupeň vzácnosti nad ním, takže epický nástroj začíná na 50. Když dojde, amulet se tím nezničí: majitel nástroje slot dobije, 10 nabití za jeden arkanový materiál, přičemž materiál se řídí tím lepším z nástroje, který právě nosí, a nejlepšího nástroje, kterým byl ten slot kdy naplněn (Zvonivý prach pro běžný nebo neobvyklý nástroj, Zvonivá esence pro vzácný, Zvonivý střep pro epický). Uložení dobrého nástroje do banky před dobitím ho nikdy nezlevní, jen zmenší za stejnou cenu, a vložení čerstvého amuletu, zatímco neseš horší nástroj, je poctivá cesta zpátky na levnější stupeň. Okouzlovatel, který amulet podepsal, platí polovinu za dobití toho svého, a ještě méně se specializací na Okouzlování.',
+  'guide.profPages.faq.a10': 'Amulet je vložený efekt nástroje: dílo okouzlovatele, které sedí ve sběračském nástroji a vylepšuje to, co přinese. Sběračova skrýš přidá jednotku k výnosu ze sklizně, Řemeslníkovo oko zvýší jeho jakost, a Kutil Gizzel naučí oba recepty v Eastbrookské nástrojárně na 25 Okouzlování. Nabití se spotřebuje, jen když amulet výsledek skutečně změnil, takže sklizeň, kterou nemohl vylepšit, tě nic nestojí, a slot lze nastavit, aby se ptal při každém použití, pokud chceš raději rozhodovat nabití od nabití.\n\nČerstvý amulet nese 20 nabití na běžném nástroji a o 10 víc za každý stupeň vzácnosti nad ním, takže epický nástroj začíná na 50. Když dojde, amulet se tím nezničí: majitel nástroje slot dobije, 10 nabití za jeden arkanový materiál, přičemž materiál se řídí tím lepším z nástroje, který právě nosí, a nejlepšího nástroje, kterým byl ten slot kdy naplněn (Zvonivý prach pro běžný nebo neobvyklý nástroj, Zvonivá esence pro vzácný, Zvonivý střep pro epický). Uložení dobrého nástroje do banky před dobitím ho nikdy nezlevní, jen zmenší za stejnou cenu, a vložení čerstvého amuletu, zatímco neseš horší nástroj, je poctivá cesta zpátky na levnější stupeň. Okouzlovatel, který amulet podepsal, platí polovinu za dobití toho svého, a ještě méně se specializací na Okouzlování.',
   'guide.profPages.faq.a9': 'Zadej ji na nástěnce zakázek. Otevři okno výroby, otevři nástěnku z jeho záhlaví a pojmenuj recept, který chceš nechat vyrobit: nech objednávku otevřenou pro kteréhokoli řemeslníka, nebo ji zaměř na jednoho řemeslníka, kterého už znáš. Přijetím se ten řemeslník k zakázce zaváže a objednávku vždy drží jen jeden člověk najednou.\n\nPři zadání se nedrží žádné mince ani materiály, takže si mezi sebou dohodněte cenu a to, kdo přinese suroviny, tak jak se zakázky vždy domlouvaly. Vlastní objednávku můžeš zrušit, dokud je ještě otevřená, a objednávka, kterou nikdo nepřijme, vyprší po dni. Doručení probíhá osobně: postav se ke svému řemeslníkovi s volným slotem v brašně, až bude kus hotový. Dorazí navázaný na tebe skrze Výrobcovo pouto, které ti kterýkoli správce stanice zruší za obvyklý poplatek.',
   'guide.profPages.faq.q10': 'Co je amulet a co se stane, když mu dojde nabití?',
   'guide.profPages.faq.q9': 'Jak si nechám něco vyrobit?',
   'guide.profPages.findingNodesNote': 'Nemusíš je hledat očima. Každý zdroj v zóně je vykreslený na mapě zóny všude, kde mapa tu oblast ukazuje, a na minimapě, jakmile kolem něj projdeš, takže si farmařskou trasu můžeš naplánovat z obrazovky mapy ještě předtím, než vyrazíš. Zdroj, který tvé nástroje ještě neumí zpracovat, je označený, ne skrytý: drží si své místo přeškrtnutou, ztlumenou značkou, takže vidíš, na jakou úroveň se ještě trénuješ. Na počítači ti najetí myší na žílu, strom nebo porost ukáže jeho název, řekne ti, jaký nástroj chce, a jakmile ho zpracuješ, odpočítá ti vlastní obnovu na sekundu přesně. Na dotykovém ovládání není co najíždět myší, takže totéž říkají značky na minimapě.',
-  'guide.profPages.specimenBodyFamilies': 'Když farmíš, nech si v brašnách trochu místa navíc: podepsaný nečekaný nález potřebuje vlastní místo nebo odpovídající podepsaný stack, kam přistát, a když se nikam nevejde, výnos i tak dorazí, ale podpis se ztratí. I sklizeň z těl má vlastní jackpotové rameno: zhruba {pct} % z každé sklizené složky vyjde vzácné nebo lepší. Rodina, která má co dát jako dokonalý exemplář (kůže, hedvábí, jed, dráp, maso), nechá svůj běžný výnos prostý a razí podepsaný exemplář vedle něj; ostatní tři, tesák, látka a kly, podepíšou přímo samotný výnos.',
+  'guide.profPages.specimenBodyFamilies': 'Když farmíš, nech si v brašnách trochu místa navíc: podepsaný nečekaný nález potřebuje vlastní místo nebo odpovídající podepsaný stack, kam přistát, a když se nikam nevejde, výnos i tak dorazí, ale podpis se ztratí. I sklizeň z těl má vlastní jackpotové rameno: zhruba {pct} % z každé sklizené složky vyjde vzácné nebo lepší. Rodina, která má co dát jako dokonalý exemplář (kůže, hedvábí, jed, dráp, maso), nechá svůj běžný výnos prostý a razí podepsaný exemplář vedle něj; ostatních pět, tesák, látka, kly, roh a žábry, podepíše přímo samotný výnos.',
   'guide.professions.focusBodyTiers': 'Každé větší město drží panel Zaměření města pro přicházející sběrače: postav se ve městě, otevři ho vedle minimapy a rozděl rozpočet 10 bodů zaměření mezi typy složek, na kterých ti záleží. Každých 5 bodů na složce zvýší její úroveň sklizně o jeden stupeň (nejvýš o dva stupně) a každý bod přidá 10 procent k jejímu výnosu; nezaměřené složky nikdy nic nezhorší.\n\nTvé rozdělení sleduje postavu kamkoli jde a lze ho přesměrovat při každé další návštěvě města, tempem, které si zvolíš. Nespěchat je zdarma: přesměrování běží 1 minutu na každý přesunutý bod. Malá platba to zrychlí, 15 sekund na bod plus 5 měďáků a 1 Zvonivý prach na bod, a plná platba to udělá okamžité za 25 měďáků a 5 Zvonivého prachu na bod. Počítají se jen body, které skutečně přesuneš, takže posunout jediný bod je levné, a panel, který otevřeš a zavřeš beze změny, nestojí nic při žádné úrovni platby.',
-  'guide.professions.harvestBodyFamilies': 'Sběr nekončí u nalezišť. Mnoho skolených tvorů lze jednou sklidit, kdo dřív přijde, ten dřív bere, na kůže, tesáky, drápy, kly, hedvábí, jed, látku a maso, přímo z těla vedle jeho běžné kořisti; jedno stisknutí otevře obojí. Když tvor nese víc než jednu zpracovatelnou složku, volba je na tobě: vezmi si všechno, co může dát, nebo se soustřeď na méně složek a získej měřitelně jemnější jakost toho, co si vezmeš.\n\nHod na vzácnou nebo lepší sklizeň u rodiny s dokonalým exemplářem ti navíc k běžnému výnosu udělí podepsaný dokonalý exemplář (Nepoškozenou kůži, Nedotčené hedvábí, Nedotčenou jedovou žlázu, Nedotčený dráp nebo Prvotřídní kus) a zapíše ti do Knihy skutků Dokonalý exemplář. Sklízet může kdokoli, žádný výcvik není potřeba, a do prémiového ramene se počítá jakýkoli sběračský nástroj, který vlastníš, ať patří k jakémukoli řemeslu.',
-  'guide.professions.toolEffectsBody': 'Sběračský nástroj má v sobě slot a to, co se do něj vkládá, je amulet od okouzlovatele. Sběračova skrýš přidá jednotku k tomu, co sklizeň vynese; Řemeslníkovo oko zvýší jakost toho, co se vytěží. Kutil Gizzel, Mistr nástrojárny v Eastbrooku, naučí oba recepty okouzlovatele, kteří dosáhli 25 dovednosti v řemesle, a oba se vyrábí v jeho nástrojárně.\\n\\nČerstvě vložený amulet nese 20 nabití na běžném nástroji a o 10 víc za každý stupeň vzácnosti nad běžným, takže stejný amulet vložený do epického krumpáče začíná na 50. Nabití se spotřebuje, jen když amulet výsledek skutečně změnil, nikdy na sklizni, kterou nevylepšil, a slot lze nastavit, aby se ptal při každém použití, takže amulet počká, dokud neřekneš Použít nabití. Vložení čerstvého amuletu přerazí slot podle nástroje, který právě nosíš, takže se naplní na to, co tento nástroj unese, místo aby se vrátil na nějaké dřívější maximum, a přeslotování, které by nezměnilo vůbec nic, se odmítne, místo aby spolklo amulet.\\n\\nKdyž dojdou nabití, amulet se tím nezničí: majitel nástroje slot dobije, 10 nabití za každý spotřebovaný arkanový materiál, a jaký materiál si žádá, se řídí tím lepším z nástroje, který právě nosíš, a nejlepšího nástroje, kterým byl ten slot kdy naplněn: Zvonivý prach pro běžný nebo neobvyklý nástroj, Zvonivá esence pro vzácný a Zvonivý střep pro epický. Ponechání dobrého nástroje v bance nekoupí levnější dobití, jen menší za stejnou cenu; poctivá cesta zpátky na levnější stupeň je vložit čerstvý amulet, zatímco neseš horší nástroj, což tam slot přerazí. Pokud strop slotu leží nad tím, co dokáže naplnit tvůj současný nástroj, dobití se zastaví tam, kde skončí tento nástroj, a řekne ti, ať neseš ten lepší. Dobití stojí polovinu materiálů, když jsi okouzlovatel, který amulet podepsal, a ještě méně, pokud jsi specializovaný na Okouzlování; kdokoli jiný platí plnou sazbu. Dobití je krátké sesílání, stejně jako zbytek řemeslné rodiny.',
+  'guide.professions.harvestBodyFamilies': 'Sběr nekončí u nalezišť. Mnoho skolených tvorů lze jednou sklidit, kdo dřív přijde, ten dřív bere, na kůže, tesáky, drápy, kly, rohy, žábry, hedvábí, jed, látku a maso, přímo z těla vedle jeho běžné kořisti; jedno stisknutí otevře obojí. Když tvor nese víc než jednu zpracovatelnou složku, volba je na tobě: vezmi si všechno, co může dát, nebo se soustřeď na méně složek a získej měřitelně jemnější jakost toho, co si vezmeš.\n\nHod na vzácnou nebo lepší sklizeň u rodiny s dokonalým exemplářem ti navíc k běžnému výnosu udělí podepsaný dokonalý exemplář (Nepoškozenou kůži, Nedotčené hedvábí, Nedotčenou jedovou žlázu, Nedotčený dráp nebo Prvotřídní kus) a zapíše ti do Knihy skutků Dokonalý exemplář. Sklízet může kdokoli, žádný výcvik není potřeba, a do prémiového ramene se počítá jakýkoli sběračský nástroj, který vlastníš, ať patří k jakémukoli řemeslu.',
   'guide.professions.toolEffectsHeading': 'Efekty nástrojů',
   'guide.progression.capEndgameBody': 'Trhliny jsou jediná věc, která čeká až na vrchol. Otevírají se v říších podle vlastního rozvrhu, odstupňované od C po S, a každá skupina ve světě závodí o to, kdo tu kterou uzavře jako první. Tabule výprav běží dál taky a jejich vyšší obtížnost stojí za druhý pohled, jakmile tvá výbava dožene tempo.',
   'guide.progression.journeyBodyCount': 'Svět je jedna souvislá země o {zones} zónách. Tři z nich tvoří cestu, po které stoupáš v úrovních, položenou od jihu k severu: začínáš v zeleném údolí, pokračuješ přes močál a končíš ve studených vysokých štítech. Sleduj stopu úkolů a země tě povede z jedné do druhé. U pobřeží údolí leží ostrov pro nízké úrovně a zbytek říší se otevírá podél téže cesty, stavěný pro postavy, které už výstup zvládly.',
@@ -1839,7 +1832,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.charges':
     'Na běžném nástroji začíná s {base} nabitími (+{bonus} za každý stupeň vzácnosti).',
   'hudChrome.professions.toolEffectTooltip.howToSlot':
-    'Vlož do hornického, dřevorubeckého nebo bylinkářského nástroje z okna Profese. Při vložení se spotřebuje.',
+    'Vlož do hornického, dřevorubeckého, bylinkářského nebo zemědělského nástroje z okna Profese. Při vložení se spotřebuje.',
   'hudChrome.professions.toolEffectTooltip.kind': 'Amulet nástroje',
   'hudChrome.professions.toolEffectTooltip.landOnly': 'Nelze vložit do rybářských prutů.',
   'hudChrome.professions.toolEffectTooltip.openProfessions':
@@ -1875,10 +1868,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.saleBuyer': 'Prodáno hráči {buyer}',
   'itemUi.market.saleOlder': 'Plus {count} dřívějších prodejů, zahrnuto v součtu.',
   'itemUi.tooltip.maxStack': 'Max. stack: {count}',
-  'itemUi.tooltip.useElixir':
-    'Použití: Zvyšuje {stat} o {value} po dobu {minutes} min. Použitelné v boji.',
-  'itemUi.tooltip.useElixirAura':
-    'Použití: Uděluje efekt {aura} po dobu {minutes} min. Použitelné v boji.',
   'hud.system.deathRecapAbility': 'Tvá postava zemřela. Příčina: {ability}.',
   'hud.system.deathRecapDrowned': 'Tvá postava zemřela. Utopila se.',
   'hud.system.deathRecapFalling': 'Tvá postava zemřela. Spadla k smrti.',
@@ -1889,7 +1878,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.noQuestItems': 'V batozích nemáš žádné úkolové předměty.',
   'hudChrome.bank.cannotDepositNow': 'Teď nelze uložit',
   'hudChrome.bank.depositAllTooltip':
-    'Pošle všechny řemeslné suroviny a odpadní předměty z tvých batohů do banky najednou. Sběrných nástrojů, nasazené výbavy, úkolových předmětů a spotřebních předmětů se nikdy nedotkne.',
+    'Pošle všechny řemeslné materiály (vše, co má v popisku „Materiál“ nebo „Jemný materiál“) z tvých batohů do banky najednou. Všechno ostatní zůstane v batozích, včetně sběrných nástrojů, úkolových předmětů, spotřebních předmětů a šedých předmětů.',
   'hudChrome.bank.guildBuyConfirm':
     'Koupit {count} dalších slotů cechovní banky za {price} z cechovní pokladny?',
   'hudChrome.bank.guildBuyNote': 'Placeno z cechovní pokladny',
@@ -2079,20 +2068,12 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Je vyžadováno aktuální vlastnictví Seeker Genesis Token.',
   'guide.professions.archetypeSwitchBody':
     'Ani prohlášení není doživotní trest. Pár, který jsi nikdy nedržel, je prostě nový úkol na naladění, zatímco návrat k páru, od kterého jsi odešel, po tobě chce nejdřív nápravu: pět úkolů poprvé a další tři přičtené za každý návrat, který jsi už udělal (převzetí zbrusu nového páru počet nikdy nezvyšuje). Volba zůstává významná, aniž by kdy nadobro zavřela dveře.',
-  'guide.professions.whatBody':
-    'Profese jsou pracovní život tohoto světa: čtyři sběratelské živnosti, které tahají surovinu přímo ze země, a prstenec deseti řemesel, která z ní dělají výbavu, pokrmy, lektvary a nástroje. Všechno tu něco dalšího živí. Ruda, kterou vytěžíš, se stane čepelí, čepel přijme okouzlení a okouzlení potřebuje prach vylámaný ze staré výbavy, takže sběrač, řemeslník i kutil jsou články jednoho řetězu.\n\nNení tu žádný limit profesí, nad kterým by ses musel trápit. Každá postava může zvedat sedm z osmi řemesel, která dnes mají obsah, a všechny čtyři sběratelské profese vedle sebe (jediná výjimka je Strojírenství: všechny jeho recepty začínají nad volným stropem, takže jeho žebříček čeká na Bombardérovu přísahu); jediná výlučná volba je tvůj archetyp, identita, které nakonec přísaháš, i když jakmile se naladíš, řemesla, která za ní upadnou do nečinnosti, stoupají už jen na svých běžných receptech, a nad dovedností 75 vůbec. Dovednost nikdy neklesá a nic, co ses naučil, ti není nikdy odebráno.',
   'guide.professions.archetypesBody':
-    'Deset řemesel sedí na pevném kole a geografie na tom kole má význam. Každí dva sousedé tvoří pojmenovaný pár: Kovář pro Kovářství zbraní a Zbrojnictví, Krejčovský kožešník pro Kožedělnictví a Krejčovství, Lékárník pro Alchymii a Vaření, Bombardér pro Strojírenství a Alchymii a dalších šest kolem prstence.\n\nNaladění na pár je úkol, ne kliknutí v nabídce. Dnes se lze připojit ke čtyřem párům (Kovář, Krejčovský kožešník, Lékárník a Bombardér), každý je ukotvený u místního mistra v Eastbrooku, jehož přijímací úkol celou dohodu vyloží rovnou, ještě než ji přijmeš. Dokud se neprohlásíš, každé řemeslo postupuje volně na receptech až po vzácnou úroveň (jakýkoli recept žádající dovednost 74 nebo méně), takže si můžeš skoro všechno vyzkoušet, než se rozhodneš (jen Strojírenství žádný tak nízký recept nemá, takže jeho číslo čeká).\n\nJakmile se naladíš, obě řemesla tvého páru se stanou tvými hlavními obory, bez jiného stropu než limitu. Zbytek kola nezhasne: jedno řemeslo naproti tvým hlavním oborům zůstane zapnuté jako koníček, který dál stoupá až po vzácnou úroveň (opakovatelný úkol u kovárny Kováře Haldrena ti dovolí prohodit, které to bude), a všechna ostatní řemesla upadnou do nečinnosti. Dočasně neaktivní řemeslo si drží svou dovednost i své běžné recepty, které ho dál učí po normální křivce, dokud nezešednou na 75; všechno nad běžnou úrovní přestane platit naráz a dočasně neaktivní řemeslo po dobu odpočinku nikdy nevydá mistrovské dílo.',
+    'Deset řemesel sedí na pevném kole a geografie na tom kole má význam. Každí dva sousedé tvoří pojmenovaný pár: Kovář pro Kovářství zbraní a Zbrojnictví, Krejčovský kožešník pro Kožedělnictví a Krejčovství, Lékárník pro Alchymii a Vaření, Bombardér pro Strojírenství a Alchymii a dalších šest kolem prstence.\n\nNaladění na pár je úkol, ne kliknutí v nabídce. Dnes se lze připojit ke čtyřem párům (Kovář, Krejčovský kožešník, Lékárník a Bombardér), každý je ukotvený u místního mistra v Eastbrooku, jehož přijímací úkol celou dohodu vyloží rovnou, ještě než ji přijmeš. Dokud se neprohlásíš, každé řemeslo postupuje volně na receptech až po vzácnou úroveň (jakýkoli recept žádající dovednost 74 nebo méně), takže si můžeš všechno vyzkoušet, než se rozhodneš.\n\nJakmile se naladíš, obě řemesla tvého páru se stanou tvými hlavními obory, bez jiného stropu než limitu. Zbytek kola nezhasne: jedno řemeslo naproti tvým hlavním oborům zůstane zapnuté jako koníček, který dál stoupá až po vzácnou úroveň (opakovatelný úkol u kovárny Kováře Haldrena ti dovolí prohodit, které to bude), a všechna ostatní řemesla upadnou do nečinnosti. Dočasně neaktivní řemeslo si drží svou dovednost i své běžné recepty, které ho dál učí po normální křivce, dokud nezešednou na 75; všechno nad běžnou úrovní přestane platit naráz a dočasně neaktivní řemeslo po dobu odpočinku nikdy nevydá mistrovské dílo.',
   'guide.professions.startBody':
     'Čerstvě z cesty v Eastbrooku? Najdi Předáka Odella a vezmi si Řemeslo pro každou ruku: ukáže ti rudné žíly kolem Měděné štoly severovýchodně od města a přidá ti první mozoly. Na samotnou štolu si dej pozor: Hlubokamenní kopáči, kteří u ní táboří, stojí pár úrovní nad čerstvým příchozím, takže zpracuj nejdřív okrajové žíly a srdce tábora si nech na dobu, až trochu povyrosteš. Od té chvíle sklízej každou žílu, skupinu stromů a porost bylin, kolem kterých při úkolech projdeš; cestovatelům přichází dovednost přirozeně.\n\nZpátky ve městě zmáčkni T, otevři okno výroby a pracuj na běžných receptech, které zná od začátku každá postava. Zajdi za mistry ke kovárně, kuchyním, tkalcovskému stavu a nástrojárně, podívej se, co učí, a ber jejich pracovní příkazy kvůli stálému přísunu mincí. Než si tě najde dopis od Cechu, budeš už vědět, který pár ti připadá jako domov.',
-  'guide.profPages.craftIntro.engineering':
-    'Strojírenství staví nástroje, po kterých každý vážný sběrač nakonec zatouží: krumpáče, sekery, srpy a rybářské pruty 4. a 5. úrovně, které ti žádná přepážka nikdy neprodá za mince, přičemž každý z nich spotřebuje nástroj pod sebou.',
-  'guide.profPages.craftIntro.enchanting':
-    'Okouzlování rozebírá výbavu a vrací do ní sílu: rozlož nechtěné kusy na arkanové materiály a pak je utrať za trvalý bonus ke statistikám kusu, který si chceš nechat. Rozklad ani okouzlování nepotřebují stanici ani trenéra a začít může kdokoli hned prvního dne; jen dva recepty na talismany chtějí víc a vyučují se v nástrojárně.',
   'guide.profPages.craftProse.weaponcrafting.materialsBody':
     'Páteří je Těžba. Měděná ruda pochází z žil 1. úrovně v Eastbrookském údolí, železná ruda z Mirefenského močálu a thoriová ruda z Thornpeakských výšin a každý stupeň žebříčku stoupá stejnou cestou. Dřevorubectví váží víc, než bys čekal: železokůra tvoří ratiště kančího kopí, jasan nese palici a jediná vysokoborová kláda tvoří bojovou hůl.\n\nZbytek přichází z lovu a od přepážky. Hrubá kůže na rukojeti se sklízí rovnou z těl vlků a kanců, úlomky kostí padají z neklidných mrtvých nebo z rozebrané běžné výbavy a kovářský žebříček spaluje Kovářské tavidlo, 20 mědiváků za sklenici přímo od Darvy. Pokud tvá vlastní těžba zaostává, u samotné rudy tě žádná přepážka nezachrání: thorium pochází z thornpeakských žil, ze začátečnických žil každé mladší zóny kromě Vzdáleného pobřeží (jehož žíly kopou železo), nebo z hromádky jiného hráče, výměnou či přes Světový trh. Za mince se kupuje jen Glyfocelový prut, od Kutila Gizzela v nástrojárně nebo od Intendantky Bree v Highwatchi.',
-  'guide.profPages.craftProse.weaponcrafting.routeBody':
-    'Každý kus se skutečným řádkem statistik, což na tomto žebříčku znamená železný stupeň a výš, může z kovadliny vyjít jako mistrovské dílo, pokud se jemnější kvalita vejde pod strop tvé úrovně; běžné měděné kusy bez statistik neprocnou nikdy, protože v nich není co zlepšovat. Železo a thorium se pro bonus k mistrovskému dílu počítají jako materiály 1. úrovně, vysoká borovice a glyfocel jako 2. úrovně, a dovednost stojící nad vlastní úrovní receptu přidává svůj bod za každou úroveň, takže mezi thoriovou trojicí nesou materiálovou výhodu válečná sekera a bojová hůl, a stupeň procuje čím dál lépe i poté, co jsi mu přerostl.\n\nJeď na měděném stupni do 25, natrénuj železný stupeň v den, kdy se otevře, a jeď na něm do 50, pak thoriový stupeň do 75. Za 75 zatím nic vyššího neexistuje, takže thoriové recepty slábnou na poloviční a pak čtvrtinový zisk: počítej zhruba se 150 dalšími výrobami ke stropu 125 a pamatuj na sdílené omezení deseti řemeslných akcí za minutu, až si sedneš k dávkové výrobě.\n\nVýstup si financuj cestou: Darvin kovářský pracovní příkaz od tebe každých 30 minut vezme osm měděných rud za trochu mincí a zkušeností a železný i thoriový stupeň se poctivě prodávají levelujícím bojovníkům na blízko. Kniha skutků označuje Ostří a kalení na dovednosti 50 a na 125 korunuje Velmistrem Kovářství zbraní.',
   'guide.profPages.craftProse.armorcrafting.identityBody':
     'Žebříček Zbrojnictví se čte jako vojákova kariéra: na začátku prostý nýtovaný měděný pás, sabatony a rukavice, pak železná kroužková košile, chrániče nohou a náplečníky s prvními skutečnými řádky statistik, a nakonec vzácná velká přilba, kyrys a nohavice z thoriumových šupin, kusy na Sílu a Výdrž s hodnotami brnění na samém vrcholu řemeslníkova umění.\n\nMá i tišší stránku: Eastbrookské chráněné nohavice, běžný polní kus se statistikami pro sesílatele, a Plášť z pecních šupin, vzácný kroužkový náramenník na Intelekt a Ducha na dovednosti 75, drží na seznamu zákazníků i kouzlící nositele kroužkové zbroje. Na prstenci sedí mezi Kovářstvím zbraní a Strojírenstvím; pár Kovář s Kovářstvím zbraní se přísahá před Mistryní kovárny Darvou, zatímco pár Ozubničář se Strojírenstvím je pojmenovaný, ale zatím nemá přísahový úkol.',
   'guide.profPages.craftProse.armorcrafting.materialsBody':
@@ -2105,34 +2086,12 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'A tady je zádrhel: koželužna stojí ve Fenbridge, na cestě Mirefenským močálem, takže Kožedělnictví je jediné hluboké řemeslo, které se vyučuje venku v močálu. Koželuh Hesk učí žebříček u svých kádí: fenbridgeský kožený stupeň zdarma na dovednosti 0, stupeň bažinného stopaře za 25 stříbrných za recept od dovednosti 25 a stupeň strážce močálu po 1 zlatém od dovednosti 50, přičemž každý stupeň se otevírá, jak ho tvá úroveň dosáhne.\n\nTři recepty trenéra přeskakují: běžné polní kusy (Kazajka z vydělané kůže a Kůže eastbrookského druida) se od začátku vyrábějí kdekoli a Omotávky ze soumračné kůže zná každý, leží na dovednosti 50 a jsou vázané na koželužnu. Všimni si, že samotná přísaha Krejčovského kožešníka se skládá zpátky v Eastbrooku u Ottilie; v močálu se odehrává jen výuka.',
   'guide.profPages.craftProse.leatherworking.routeBody':
     'Každý kus se skutečnými statistikami hází na šanci mistrovského díla, pokud se jemnější kvalita vejde pod strop tvé úrovně, včetně Kůže eastbrookského druida se statistikami, a podepsaná Nepoškozená kůže v Kazajce strážce močálu poskytne bonus za podepsaný reagent automaticky; thorium se pro proc počítá jako materiál 1. úrovně. Běžné kožené kusy bez statistik prockovat nemohou.\n\nLeveluj ho přirozeně: od první úrovně sklízej každého vlka a kance, kterého zabiješ, nech dva běžné polní kusy, ať tě donesou na 25, ať stojíš kdekoli, a pak natrénuj kožený stupeň u kádí, až tě úkoly stejně zatáhnou do močálu. Bažinný stopař tě donese na 50 a kusy strážce močálu spolu s Omotávkami ze soumračné kůže donesou vzácný stupeň z 50 na 75. Za 75 tyto recepty 2. úrovně upadají na poloviční a poté čtvrtinový zisk, tedy asi 150 výrob na posledních padesát bodů ke stropu 125; pod stropem hlavního oboru pořád odpovídají stropu výroby vzácné kvality, místo aby se úplně vynulovaly.\n\nMobilní koželužna znamená pro tohle řemeslo víc než pro kterékoli jiné: specializuj se na 75 a z brašny plné kůží se stane hotová výbava u táboráku místo cesty zpátky do Fenbridge. Heskův koželužnický pracovní příkaz kupuje osm hrubých kůží každých 30 minut, pěkný výnos z kožek, které jsi sbíral tak jako tak, a Kniha skutků označuje Koželuhovo řemeslo na dovednosti 50 a Velmistra Kožedělnictví na stropu.',
-  'guide.profPages.craftProse.cooking.identityBody':
-    'Sněz uvařené jídlo a bude tě léčit po 18 sekund odpočinku, což je mezi pully nejlevnější léčení ve hře. Žebříček běží od Okouna opečeného na pánvi za 90 zdraví až po Marlowovu slavnostní pečeni za 980, léčení vsedě, které nic ve hře nepřekoná.\n\nNa prstenci sedí Vaření mezi Alchymií a Kožedělnictvím. Jeho živým párem je Lékárník, Alchymie a Vaření, přísahaný před Kuchařem Marlowem v Eastbrookských kuchyních po ulovení čtyř divokých kanců do hrnce; pár Lapač s Kožedělnictvím je na prstenci pojmenovaný, ale zatím nemá přísahový úkol.',
-  'guide.profPages.craftProse.cooking.materialsBody':
-    'Charakteristické suroviny dodává Rybaření, zónu po zóně: zrcadlový pstruh a říční okoun z vod Eastbrookského údolí, bažinná štika a bažinný úhoř z Mirefenského močálu, pstruh mrazivých žaber a kapr břidlicových ploutví z Thornpeakských výšin. Stupně míchají zóny volně (stupeň zdarma už chce bažinnou štiku, střední stupeň thornpeakského pstruha mrazivých žaber a vzácná večeře zase vrací do hry zrcadlového pstruha z údolí), takže kuchaři, který loví ryby všude, kudy vede cesta, nikdy nedojdou zásoby.\n\nŘeznická strana pochází ze sklizených těl: zvěřina z kanců a jejich příbuzných a při hodu na vzácnou nebo lepší sklizeň podepsaný Prvotřídní kus, středobod slavnostní pečeně. Byliny ochucují lepší pokrmy, jedna jasanová kláda vyudí úhoře a Sůl na vaření běží po 8 mědivácích za sáček z Marlowova vlastního stánku.',
-  'guide.profPages.craftProse.alchemy.identityBody':
-    'Řemeslo se provozuje v lékárně v Highwatchi, domově Alchymisty Verane, Mistra lékárny, který učí žebříček receptů, prodává Skleněné lahvičky po 12 mědivácích a přes svůj pracovní příkaz platí mincemi za byliny.\n\nNa prstenci řemesel sedí Alchymie mezi obory pokusu a omylu, po jedné straně vedle Strojírenství a po druhé vedle Vaření. To jí dává dvě párové identity: Bombardéra (Strojírenství a Alchymie, přijímaného před Kutilem Gizzelem v Eastbrooku) a Lékárníka (Alchymie a Vaření, přísahaného před Kuchařem Marlowem). Nalaď se na kterýkoli z těch párů, aby se Alchymie stala hlavním oborem a tvá vlastní podepsaná práce tě začala učit zpět; pár Bombardér navíc otevírá svůj kombinovaný nápoj, Elixír medvěda, zatímco pár Lékárník zatím žádný kombinovaný recept nenabízí. Samotný žebříček ale nikdy nečeká, protože každý recept Alchymie leží uvnitř vzácné úrovně, pod kterou pracují nepřihlášená řemesla, takže celý výstup ke stropu je otevřený ještě před jakoukoli přísahou.',
-  'guide.profPages.craftProse.alchemy.ladderBody':
-    'Drobný léčivý lektvar zná každý od začátku a namíchat ho lze kdekoli, žádná stanice není potřeba. Skutečný žebříček tvoří devět receptů, které Verane učí v lékárně, tři na každém stupni: recepty na dovednosti 0 jsou zdarma, stupeň na dovednosti 25 stojí 25 stříbrných za recept a stupeň na dovednosti 50 stojí 1 zlatý za recept. Každý stupeň je léčivý nápoj, manový nápoj a elixír výdrže, od běžných lahviček ze stříbrolistu (120 zdraví, 160 many) přes neobvyklé ze zlatolistu (200 zdraví, 260 many) až po vzácné ze sluncokvětu (280 zdraví, 360 many).\n\nElixíry stoupají stejnou cestou: Kančí elixír dává 6 Výdrže na 10 minut, Elixír hadího ohně 9 na 15 minut a Hadí elixír 12 na 15 minut, přičemž jedině Hadí se vaří po dvou lahvičkách na výrobu. Stranou stojí ještě jeden recept: Elixír medvěda, kombinovaný nápoj, který Verane učí za 25 stříbrných, jakmile tvá Alchymie dosáhne 25, míchatelný kdekoli, ale jen naladěným Bombardérem, který má Alchymii i Strojírenství na 25.',
-  'guide.profPages.craftProse.alchemy.routeBody':
-    'Nápoje ani elixíry nikdy neházejí na mistrovské dílo; ten proc patří výbavě se statistikami. Tvé jméno přesto putuje: vzácné nápoje ze sluncokvětu přicházejí podepsané výrobcovou značkou a stejně tak každá lahvička dvojité várky Hadího elixíru, takže nic vzácného v tomto řemesle neopustí pracovní stůl nepodepsané. Na dovednosti 75 se specializuješ a každý recept Alchymie od té chvíle stojí o 20 procent méně materiálů.\n\nVezmi si Bylinkářství brzy a trhej cestou, jak levelíš: stříbrolist je v Eastbrookském údolí všude a jakmile dorazíš k Veranovu stolu, stupeň zdarma tě čistě donese na dovednost 25 na bylinách, které bys stejně natrhal. Nauč se stupeň 25 ve chvíli, kdy se zapne, přesuň trhání do močálu za zlatolistem a nech Veranův pracovní příkaz (šest Zlatolistů za 45 mědiváků, opakovatelný každých 30 minut) vracet ti cestou trochu mincí zpět.\n\nOd 50 výše vař nápoje ze sluncokvětu a várky Hadího elixíru z thornpeakského sluncokvětu, s trochou zeleně z údolí a z močálu stále v mixu. Poslední úsek od 100 do 125 je záměrná kapka, takže vař to, co se skutečně prodává, místo pálení bylin pro číslo, a pamatuj, že spotřební zboží je jediný vyráběný statek, který si všichni kupují znovu a napořád. Kniha skutků označuje Podivné várky na dovednosti 50 a Velmistra Alchymie na stropu.',
-  'guide.profPages.craftProse.engineering.identityBody':
-    'Řemeslo se provozuje v nástrojárně v jihozápadním rohu Eastbrookského náměstí, domově Kutila Gizzela, Mistra nástrojárny. Úrovně 1 až 3 každé řady nástrojů jsou běžné zboží u prodejce; úrovně 4 a 5 vycházejí ze strojírova pracovního stolu, nebo z výpravní přepážky Utopené litanie za Známky výprav za jejími branami dokončení, a nikdy z žádné pokladny za mince.\n\nNa prstenci sedí mezi obory pokusu a omylu, vedle Alchymie a Zbrojnictví, což mu dává dvě párové identity: Bombardéra (Strojírenství a Alchymie, přijímaného před samotným Gizzelem) a Ozubničáře (Zbrojnictví a Strojírenství, pojmenovaného, ale zatím nepřísahatelného). Jedno varování tu váží víc než kdekoli jinde: každý stupeň receptů Strojírenství leží nad stropem vzácné úrovně, pod kterým pracují koníčky a nepřihlášení řemeslníci, takže číslo dovednosti se hne jen řemeslníkovi, jehož hlavní obory zahrnují Strojírenství, což dnes znamená Bombardéra. Pozemní nástroje si přesto může postavit kdokoli; nenaladěný řemeslník se tím jen nic nenaučí a dva recepty na pruty navíc žádají Gizzelovu výuku.',
   'guide.profPages.craftProse.engineering.materialsBody':
     'Každý recept na pozemní nástroj spotřebuje nástroj o úroveň níž plus JEMNÝ materiál a právě tato dvojice je celý pozemní žebříček: čtyři Jemné železné rudy a Mithrilový hornický krumpáč se stanou Thoriovým hornickým krumpáčem, pak dva Glyfocelové pruty, dvě Jemné thoriové rudy a onen thoriový krumpáč udělají Glyfocelový hornický krumpáč. Řady seker a srpů zrcadlí tvar jemný materiál plus předchozí nástroj s Jemnými jasanovými a Jemnými vysokoborovými kládami a s Jemnými zlatolisty a Jemnými sluncokvěty, jejich stupně 5. úrovně však žádné Glyfocelové pruty nežádají: krumpáč je jediná řada, která na vrcholu zdraží. Dva recepty na pruty vzorec záměrně porušují: Prut s bouřkovým navijákem si vezme čtyři Slunolesklé koi a Prut stříbrného potoka, Prut kovaný přílivem dva koi, osm Syrových kaprů břidlicových ploutví a onen Prut s bouřkovým navijákem, takže vrchol rybářského žebříčku se platí na vodě, ne u žíly.\n\nJemný materiál se nikde neprodává a z obyčejné sklizně nepadá: získáš ho tím, že zpracuješ jednu z plnohodnotných žil zóny nástrojem zařazeným nad samotný materiál, což v praxi znamená nástroj o stupeň níž, než je ten, který se snažíš postavit (snazší žíly, které si zóna nechává pro cestovatele, vydají prostý materiál, ať máchneš čímkoli). To je záměr. Na řemeslné cestě vzniká nástroj 5. úrovně skutečným máchnutím tím 4. úrovně, ne nákupním výletem; přepážka se Známkami výprav je jediná cesta okolo. Jedinou výjimkou je Glyfocelový prut, rafinovaný a jen od prodejce, 1 stříbrný 60 mědiváků za prut od Intendantky Bree v Highwatchi nebo z Gizzelovy vlastní přepážky, takže jedině Glyfocelový hornický krumpáč nese ve své ceně zabudovanou pevnou mincovní podlahu.',
-  'guide.profPages.craftProse.engineering.ladderBody':
-    'Žebříček tvoří osm receptů, všechny vázané na stanici nástrojárny. Šest receptů na pozemní nástroje je známo automaticky, nikdy za žádný poplatek trenérovi: krumpáč, sekera a srp 4. úrovně na dovednosti 75 a verze 5. úrovně na dovednosti 150. To druhé číslo není překlep a leží nad současným stropem 125 záměrně: požadavky na dovednost tady výrobu nikdy nehlídají, jen tvarují zisk dovednosti, takže nástroj 5. úrovně můžeš postavit v den, kdy držíš jeho reagenty a jeho předchůdce 4. úrovně. Dva vyráběné pruty jsou vyučovanou výjimkou: Gizzel učí Prut s bouřkovým navijákem na dovednosti 75 za 4 zlaté a Prut kovaný přílivem na dovednosti 125 za 16 zlatých, každý v okamžiku, kdy tvá úroveň v řemesle dosáhne jeho vlastní.\n\nKaždý hotový nástroj má vzácnou nebo epickou kvalitu a vychází podepsaný, takže tvé jméno objíždí zóny na opascích jiných hráčů. Strojírenství také drží polovinu jednoho kombinovaného receptu: Elixíru medvěda, který vaří naladěný Bombardér se Strojírenstvím i Alchymií na 25.',
-  'guide.profPages.craftProse.enchanting.identityBody':
-    'Každé okouzlení je známé od začátku, rozzačarovat může kdokoli hned prvního dne a ani jedno nikdy nepotřebuje stanici; dovednost má strop 125 jako každé řemeslo. Jediným vyučovaným koutem tohoto oboru je jeho dvojice receptů na talismany: Kutil Gizzel učí Sběračovu skrýš a Řemeslníkovo oko v nástrojárně v jihozápadním rohu Eastbrookského náměstí, za obvyklý poplatek dané úrovně, jakmile tvé Okouzlování dosáhne 25, a samotné talismany se zpracovávají u jeho stanice.\n\nNa prstenci sedí mezi Písemnictvím a Klenotnictvím, takže jeho dvě párové identity jsou Arkanista (Písemnictví a Okouzlování) a Klenotovazač (Okouzlování a Klenotnictví). Ani na jeden zatím nelze přísahat, protože oba sousedé čekají na své první recepty, takže dnes Okouzlování stoupá jako řemeslo pro všechny: volné až po vzácnou úroveň ještě před jakoukoli přísahou a přirozená volba koníčku pro Bombardéra nebo Lékárníka. Okouzlovatelé také drží v chodu sběratelský svět: oba nasaditelné nástrojové efekty jsou dílem Okouzlovatele a původní tvůrce si své vlastní efekty dobíjí se slevou, a po specializaci ještě hlouběji.',
-  'guide.profPages.craftProse.enchanting.levelingBody':
-    'Dovedností hýbou tři akce: rozzačarování kusu, nanesení okouzlení a výroba dvou talismanů, které stoupají po obyčejné výrobní křivce. Každý úspěch má hodnotu až jednoho bodu, škálovanou tím, jak vážná ta práce je: vzácností kusu, který rozkládáš, nebo úrovní reagentu okouzlení, které nanášíš. Běžná rozzačarování a okouzlení jen z prachu se počítají jako běžná práce; neobvyklá rozzačarování a okouzlení z esence jako neobvyklá; vzácná rozzačarování a každé Runové či Vyšší okouzlení jako vzácná; epická a legendární rozzačarování stojí v tabulce ještě výš, i když dnes žádná okouzlovací identita nedosáhne nad vzácný stupeň, takže v praxi platí stejně jako vzácná práce. U rozkladného stolu vládne jedna poctivost: kus, který vyšel z hráčova pracovního stolu (vyrobený, podepsaný nebo mistrovský), se sice na materiály rozemele, ale nic nenaučí, takže smyčka vyrob a rozlož nikoho nevyleveluje a lekce leží ve výbavě nalezené ve světě.\n\nZnámé blednutí Křivky mistrovství platí po úrovních o 25 bodech, takže práce běžné jakosti zešedne na dovednosti 75, neobvyklá na 100 a práce vzácné úrovně přesně na stropu 125. Okouzlování má také jednu vlastní laskavost: vstup nad stropem tvého archetypu se zaokrouhlí dolů na tento strop, místo aby se vynuloval, takže než se naladíš, epické rozzačarování se prostě počítá jako vzácné, místo aby neučilo nic. Pokud Okouzlování skončí dočasně neaktivní za jinou identitou, rozklad i nanášení se počítají jako běžná práce a výstup se zasekne na 75, zatímco dva talismany, které jedou po výrobní křivce nad běžným stropem, nenaučí dočasně neaktivního okouzlovatele vůbec nic; nech si ho jako koníček a práce vzácné úrovně se pořád vyplácí, jen za 75 pomaleji.',
   'guide.profPages.craftProse.enchanting.marketBody':
     'Nanesení okouzlení spotřebuje reagenty a označí jednu konkrétní kopii předmětu. Zamiř ho na kopii v brašně a dostaneš zpět samostatnou okouzlenou kopii; zamiř ho na kus, který už máš na sobě, a okouzlí se na místě, přímo tam, kde sedí, bez tance se svlékáním a oblékáním. Tak či tak bonus provází ten kus navždy, přes odložení, cesty do banky i výměny. Jedno okouzlení na kus: nanesení jiného okouzlení na okouzlenou kopii si vyžádá potvrzení a pak staré okouzlení rovnou nahradí, zničí ho bez vrácení jeho materiálů. Prodej, zahození i rozzačarování dávají vždy přednost prostým kopiím, takže se tvůj hotový kus nesní omylem.\n\nMistrovská výbava a okouzlování jsou přátelé: mistrovský kus zůstává plně okouzlitelný a okouzlení se přičte nad bonus mistrovského díla, aniž by narušilo jeho nebo podpis tvůrce. Když se sečtou všechny zdroje, podepsané mistrovské dílo s Vyšším okouzlením je to nejlepší, čeho vyrobený kus dosáhne, a i tak záměrně zůstává pod nájezdovou kořistí.\n\nNa trhu se okouzlený nebo podepsaný kus vystavuje jako cokoli jiného: jde nahoru jako vlastní jednokusová nabídka, popisek ukazuje okouzlení i výrobcovu značku a Havraní pošta ho nese stejně věrně. Materiály zůstávají tou stálou polovinou řemesla: Prach, Esence a Střepy se vystavují volně, vystavení nic nestojí a Obchodník si bere 5 procent pouze z dokončeného prodeje. Díky tomu jsou dva klasické příjmy okouzlovatele prodej materiálů a prodej hotové práce: přes trh, havranem, nebo tváří v tvář v okně výměny.',
-  'guide.profPages.howBody':
-    'Otevři okno výroby (výchozí klávesa T) a každý recept, který znáš, je vypsaný s tím, co potřebuje a co máš po ruce. Recepty vázané na stanici po tobě chtějí, abys stál do 20 yardů od správné stanice ve městě, polní recepty se vyrábějí kdekoli a Okouzlování nepotřebuje ke svému rozzačarovávání ani okouzlování stanici vůbec (stanici vyžadují jen jeho dva recepty na amulety, a to v nástrojárně). Neexistuje hod na neúspěch: výroba s materiály po ruce vždycky vyjde.\n\nEkonomiku drží poctivou dvě drobná tření. Každá úspěšná výroba platí poplatek 2 měďáky za bod statistického rozpočtu předmětu a akce řemeslného typu sdílejí jedno tempo: nejvýše 10 výrob, rozzačarování, okouzlení, rozebrání nebo dobití nástroje v každém okně o délce 60 sekund. Ani jedno nebude vadit běžnému hraní; obojí brání vymaxovanému specialistovi zaplavit trh.',
   'guide.profPages.masterworkBody':
     'Každá úspěšná výroba je přesně to, co recept slibuje, a občas i trochu víc: mistrovské dílo dokončí tentýž kus o jeden stupeň kvality jemnější, s bonusovými statistikami zapečenými přímo při výrobě. Jen přidává, nikdy nezhoršuje, a zůstává pod nájezdovou hranicí, takže vyrobená výbava může být vynikající, aniž by nahrazovala kořist z nájezdu.\n\nŠance je zveřejněná, ne mystická: {base} % základ, plus {perTier} % za každou úroveň, o kterou tvá dovednost sedí nad receptem, plus {signed} %, když do práce jde jakákoli podepsaná surovina, plus {spec} %, jakmile jsi specializovaný, přičemž materiály vyšší úrovně přidají dalších 1 až 2 %, vše zastropováno na {cap} %. Zlepšit se může jen kus se skutečnými statistikami, takže běžné kusy bez statistik, nástroje a spotřební předměty nikdy neprocnou; dočasně neaktivní řemeslo mistrovské dílo nikdy nevydá a řemeslo držené jako koníček nedokáže vytvořit mistrovské dílo nad svým vzácným stropem.\n\nJemná práce nese svého tvůrce. Vzácné a lepší výstupy jsou podepsané, každá kopie (Vytvořil; sesbírané materiály nesou Sesbíráno) a mistrovské dílo je podepsané vždy, ať má jakoukoli kvalitu. Podpis je původ, ne zámek: podepsané zboží se volně směňuje, posílá poštou i vystavuje na Světovém trhu.',
-  'guide.profPages.trainingBody':
-    'Recepty od trenéra pocházejí od místních mistrů a vyučují se u jejich stanic. Pravidlo se vejde na jeden řádek: mistr tě recept naučí, jakmile tvá úroveň v řemesle dosáhne vlastní úrovně receptu, a nic jiného ho neblokuje, ani tvůj level, ani tvůj archetyp. Žebříčky na výbavu a spotřební předměty vedou své příčle na dovednosti 0, 25 a 50; dvě lekce prutů od Strojírenství pokračují v žebříčku na 75 a 125 a dva recepty Okouzlování na amulety sedí na příčli 25, takže se s růstem tvých úrovní otevírá vždy čerstvý příčel.\n\nPoplatky jsou jednorázové a pevné podle příčle: startovní příčel je zdarma, příčel na dovednosti 25 stojí {tier1} za recept, příčel na dovednosti 50 {tier2} a lekce prutů nad nimi nesou vlastní poplatky, uvedené v tabulce vedle každého receptu. K výcviku musíš stát u mistrovy skutečné stanice a mobilní stanice se nikdy nepočítá. Běžné polní recepty a šest receptů na vyráběné pozemní nástroje nepotřebují výcvik vůbec; zná je každá postava od začátku.',
   'guide.profPages.ench.enchantsNote':
     'Okouzlení mají tři úrovně. Základní úroveň běží na Zvonivém prachu (s trochou Esence na horním konci) a pokrývá slot zbraně plus každý slot zbroje kromě offhandu, s tolika možnostmi napříč statistikami, že si každý build najde něco pro každý slot. Vyšší úroveň stojí jeden Zvonivý střep plus Esenci: silnější bonusy na slotech s největším dopadem. Střepy krmí ještě dva další odlivy, dva recepty na amulety po pěti kusech a nejvyšší příčel dobíjení účinků nástrojů, takže si jich pár našetři, než začneš utrácet.\n\nMezi nimi sedí pět Runových okouzlení, jeden spotřebitel na každou typizovanou sekundární statistiku, takže nic, co rozemeleš, není nikdy slepá ulička: Runové ostří (zbraň, Síla, spotřebuje Rezonující ocel), Runová pečeť (zbraň, Intelekt, Rezonující dřevo), Runová tkanina (hruď, Duch, Rezonující nit), Runová kůže (nohavice, Obratnost, Rezonující kůže) a Runové kroužky (helma, Výdrž, Rezonující kroužky). Každé si navíc vezme dvě Zvonivé esence; tam, kde má slot se statistikou základní i Vyšší okouzlení, přistane runový bonus mezi nimi, zatímco Runová tkanina je bez debat nejsilnější okouzlení hrudi na Ducha a Runová kůže je vůbec jediné okouzlení nohavic na Obratnost. Přesné bonusy najdeš všechny v tabulce níže.',
   'guide.profPages.gatherIntro.mining':
@@ -2147,8 +2106,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Sklizeň je krátké viditelné nahození, ne okamžité chňapnutí: {base} sekundy základ, nikdy ne pod dolní hranici {floor} sekundy. Nošení nástroje nad úrovní naleziště, takového, který ti tvá dovednost dovolí použít, tě zrychlí o {tool} sekundy za každou úroveň nad ní a každé překročené dovednostní pásmo ukrojí ještě {band} sekundy; pouhé vyrovnání úrovně naleziště tě dostane do dveří, rychlým tě dělají teprve úrovně nad ní.\n\nPlná brašna zdvořile odmítne nahození ještě před začátkem, takže se uprostřed rozmachu nic nepromarní, a každá sklizeň vyplatí malý díl zkušeností postavy, škálovaný úrovní naleziště proti té tvé stejně, jako se škálují zkušenosti za zabití: triviální šedé naleziště postavě na stropu nedá nic.',
   'guide.profPages.gainBody':
     'Zisk je deterministický, nikdy to není hod na zvýšení dovednosti: naleziště na tvé úrovni zisku nebo nad ní učí celý bod za sklizeň a každých {step} bodů dovednosti je jedna úroveň hodnocená proti nalezišti. Naleziště 1. úrovně platí plně pod 25, polovinu do 49, čtvrtinu do 74 a od 75 výše nic; naleziště 2. úrovně platí plně do 49; dvě naleziště 3. úrovně každé živnosti platí plně do 74 a polovinu až ke stropu {cap}.\n\nZamýšlená cesta je prostá: uč se na začátečnických nalezištích Údolí, přesuň se do močálu a dokonči výstup na vysokých pláních Thornpeakských výšin. Na stropu učení skončí, ale výnosy ne: sběrač na stropu hází navždy nejlepší šance, jaké živnost nabízí.',
-  'guide.profPages.toolsNote':
-    'Každé naleziště potřebuje v brašnách nástroj své živnosti, 1. úroveň v to počítaje: bez krumpáče žádná ruda a bez prutu žádná ryba. Prodejní žebříček pokrývá úrovně 1 až 3 ve třech vnitrozemských centrech: nástroj 1. úrovně se prodává ve všech třech, příčle nad ním tam, kde začíná půda, která je používá (Fenbridge přidává 2. úroveň, Highwatch 3.), a mladší osady za nimi nevedou nástroje vůbec, takže se vystroj, než vyrazíš. Každá přepážka volně prodává každý příčel, který vede, a jakýkoli nástroj lze předat přímou výměnou; každý příčel se také dá vystavit na Trhu a poslat poštou, kromě tří pozemních začátečnických nástrojů za 20 měďáků: ty se kupují u přepážky nebo předávají z ruky do ruky a nikdy se neprodávají zpět, neposílají poštou ani nevystavují. Pod bránou je samotné používání. Pozemní nástroj nad 1. úrovní funguje teprve tehdy, až si ho tvá dovednost ve vlastní živnosti vyslouží, {tier2Prof} pro 2. úroveň, {tier3Prof} pro 3. úroveň a 85 a 100 pro dva vyráběné příčle, a řádek u prodejce, popisek i tabulka níže ten požadavek uvádějí rovnou. Do té doby nástroj koupený dopředu jen čeká v brašnách, neotevírá žádnou půdu, nekupuje žádnou rychlost a nerazí žádné jemné stupně, a použitelným se stane v okamžiku, kdy se tvé počitadlo dotkne jeho čísla. Rybářské pruty jsou jedinou výjimkou: žádný prut nenese požadavek na použití a Obchodník Wilkes v Eastbrooku záměrně vede pruty 2. a 3. úrovně pro rybáře, kteří nakupují dopředu. Nástroj nikdy nezabírá slot výbavy a nikdy se neopotřebuje, takže každý je jednorázový nákup, a pro bránu se počítá jen úroveň: vzácnější nástroj téže úrovně neotevře nic navíc. Vzácnost ale není jen barva. Prodlužuje trvání vloženého účinku nástroje a na prutu rozšiřuje okno navíjení.\n\nLepší nástroj kupuje tři věci, ne dvě. Otevírá půdu vyšší úrovně, zkracuje nahození a zlepšuje to, co z něj vyjde: zpracuj žílu nástrojem zařazeným NAD vlastní materiál zóny a sklizeň vydá jeho jemný stupeň místo obyčejného. Žíla musí být jedna z těch plnohodnotných v dané zóně, takže snazší žíly, které si zóna nechává pro cestovatele, dál vydávají obyčejný materiál. Jemné materiály jsou to, co spotřebovávají recepty na vyráběné nástroje, a jemný stupeň se počítá jako jeho obyčejná verze všude, kde si o ni recept nebo pracovní příkaz řekne, takže vylepšení tě nikdy nenechá na holičkách: znamená jen to, že ti měděná ruda dorazí jako Jemná měděná ruda.\n\nNad prodejním žebříčkem má každá živnost dva vyráběné nástroje, 4. a 5. úrovně, zhotovované v nástrojárně (pozemní recepty zná každá postava; dovednost, která za tu práci stoupá, patří Strojírenství), nebo koupené za Známky výprav u přepážky Utopené litanie, jakmile jsou splněny její brány vyčištění: tabulka níže nese cenu ve Známkách i počet vyčištění, o který každý příčel žádá. Žádný obchodník je nikdy neprodá za mince. Rybaření má vlastní dvojici a ty se člověk učí u výrobce nástrojů, místo aby je znal od začátku. Žádné naleziště ani žádná voda dnes nepotřebuje víc než 3. úroveň, takže dva nejvyšší příčle kupují rychlost, stupeň a laskavější okno navíjení místo přístupu, a stanou se vstupenkou, až přijde půda vyšší úrovně.',
   'guide.profPages.toolCraftedOrMarks':
     'Vyrobený ({craft}) nebo {marks} Známek výprav po třech vyčištěních Utopené litanie',
   'guide.profPages.toolCraftedOrMarksHeroic':
@@ -2156,34 +2113,14 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.priceNone': 'Neprodává se za mince',
   'guide.profPages.colWield': 'Použitelné od',
   'guide.profPages.wieldNone': 'Bez požadavku',
-  'guide.profPages.bandsBody':
-    'Dovednostní pásma jsou společný žebříček 0/100/200 nad počitadlem živnosti. U pozemních živností pásmo překročené na 100 zkracuje dobu sběru a jejich strop dělá z pásma 1 nejvyšší možné. Pásma Rybaření nezkracují nic: vybírají tabulky úlovků (s odpovídajícím prutem), na pásmo 2 dosáhne jedině Rybaření a právě ten výstup táhne rybáře do hlubší vody, kde bydlí jak lepší tabulky, tak i další lekce.',
   'guide.profPages.specimenBody':
     'Když farmíš, nech si v brašnách trochu místa navíc: podepsaný nečekaný nález potřebuje vlastní místo nebo odpovídající podepsaný stack, kam přistát, a pokud se nevejde nikam, výnos sice dorazí, ale podpis se ztratí. I sklizeň z těl má vlastní jackpotové rameno: zhruba {pct} % každé sklizené složky vyjde vzácné nebo lepší. Rodina, která má co dát dokonalý exemplář (kůže, hedvábí, jed, maso), nechá svůj obyčejný výnos prostý a razí podepsaný exemplář vedle něj; každá jiná rodina podepíše samotný výnos.',
   'guide.profPages.gatherDeeds.fishing':
     'Milník 100 zapíše Starého solanáře a 200 zapíše Mistrného rybáře i s jeho titulem, úplný vrchol rybářského umění; Rybaření se také počítá k Mistru sběrači, získanému na 100 ve třech libovolných sběratelských živnostech. První ryba z vod každé ze šesti zón zaplní vlastní stránku, tří vnitrozemských zón a Vrbové bažiny, Vichrného hřebene a Vzdáleného pobřeží za nimi, a Slunolesklý koi zapíše Záblesk naděje, takže cestovatelé s prutem v batohu si knihu plní rychleji, než čekají.',
-  'guide.profPages.fish.startBody':
-    'Jednoduchý rybářský prut stojí 20 měďáků u Rybáře Brandta v Eastbrooku (hledej Starého mořského vlka na východním okraji města, u cesty k Zrcadlovému jezeru); pruty vedou i Kutil Gizzel, Zásobovač Hale ve Fenbridge a Intendantka Bree v Highwatchi. Použij prut čelem k vodě dost hluboké, aby v ní byly ryby, až asi 24 yardů před sebou, a splávek vyletí ven.\n\nNahazovat nemůžeš v boji, při plavání ani po smrti: zamýšlený postoj je nahazování z břehu. Voda ale tvrdne stejně jako země: močál chce alespoň Prut se železným navijákem 2. úrovně a výšiny Prut stříbrného potoka 3. úrovně a vlasec nahozený bez prutu, který si daná voda žádá, ti nikdy neopustí ruku. Nad nimi sedí dva pruty, Prut s bouřným navijákem a Prut kovaný přílivem: strojíři je vyrábějí v nástrojárně z toho, co vlasec vytáhne, a přepážka výpravy u Utopené litanie je prodává za Známky výprav za branami svých vyčištění, nikdy však za mince. Nechce je žádná voda, takže místo přístupu kupují kratší čekání a širší okno navíjení, což na nejvyšším příčli znamená záběr v rovných třech sekundách.',
   'guide.profPages.fish.biteBody':
     'Po nahození přijde záběr ve skryté chvíli mezi {min} a {max} sekundami; prodleva se rozhodne v okamžiku, kdy vlasec dopadne, takže žádná dvě nahození nejsou tak úplně stejná. Když splávek zabere, máš okno {reel} sekundy na to znovu zmáčknout prut a navinout: navineš uvnitř něj a úlovek přistane, zaváháš déle a ryba ti unikne, aniž bys měl co ukázat. Celé sezení se zastropuje na {cap} sekundách, takže i tiché nahození se vyřeší rychle.\n\nLepší pruty zostřují oba konce minihry: každá úroveň prutu nad první ukrojí {rod} sekundy z nejdelšího možného čekání, nikdy ne pod třísekundovou dolní hranici, kterou nejvyšší prut už škrábe, a přidá {reelRod} sekundy do okna navíjení, takže Prut se železným navijákem stáhne nejhorší čekání na 6,5 sekundy s oknem 3,25 sekundy a Prut stříbrného potoka na 5 s oknem přes 4, přičemž jeho vzácnost rozšíří navíjení o kus víc, než platí samotná úroveň. Nejrychlejší záběry se nemění, ať držíš cokoli, a prutu stačí k započtení ležet v brašnách.',
-  'guide.profPages.fish.scheduleNote':
-    'Zisk v Rybaření se řídí pevným plánem bez kostek: celý bod za úlovek pod 50 zdatnosti, půl bodu pod 100, desetina pod 150 a pomalá kapka 0,02 od 150 do 200. Ten poslední úsek je záměrně cesta na tisíce úlovků: 200 je prohlášení, ne zastávka na cestě k něčemu jinému.\n\nOdpad přestane učit úplně na {cutoff}: od té chvíle jsou plevele a boty jen plevele a boty. Strop lekci klade i sama voda: vody 1. úrovně v Údolí (a každé mladé pobřeží za hranicemi vnitrozemí) neučí nic nad 100, ty močálové končí na 150 a jen thornpeakské vychovají rybáře celou cestu k 200. Každý vytažený úlovek jinak přidává podle plánu, takže když se počitadlo zastaví, plán ti říká, ať vyhledáš hlubší vodu.',
-  'guide.profPages.fish.tablesNote':
-    'Tvá zdatnost vybírá jedno ze tří pásem úlovků: pásmo 0 od začátku, pásmo 1 na 100, pásmo 2 na 200, přičemž každé přesouvá váhu z odpadu a prázdných háčků do skutečných ryb, zónu po zóně. Každé pásmo nad prvním navíc žádá prut: pásmo 1 chce Prut se železným navijákem 2. úrovně, pásmo 2 Prut stříbrného potoka 3. úrovně. Tvé účinné pásmo je to nižší z toho, co si vysloužila tvá dovednost, a toho, co podporuje tvůj prut, a strop je tichý: s horším prutem pořád chytáš, jen z tabulky nižšího pásma, takže pokud ti úlovky připadají zaseknuté, zatímco dovednost stoupá, zkontroluj nejdřív prut.\n\nVody každé zóny drží vlastní dvojici jedlých ryb, léčících tím víc, čím hlubší zóna, všechny jsou surovinou do kuchyně a syrové rovnou z vlasce naprosto slušným jídlem k posezení. Zbytek tabulky je rybářská daň: plevel, občasná bota a prázdný háček, který nikdy úplně nezmizí. Kolik zaplatíš, závisí na vodě, do níž dopadne splávek, ne na tom, kde stojíš: nahození dosáhne až 24 yardů a prut, který voda vyžaduje, tabulka, z níž losuje, skutek, který připisuje, i to, jak daleko učí, se všechno řídí zónou, do níž ta voda patří, rozhodnuto v okamžiku dopadu vlasce. Voda každé zóny je psaná pro vlastní pásmo, Údolí pro pásmo 0, močál pro pásmo 1, výšiny pro pásmo 2, a rybaření o jedno pásmo níž promění zhruba třetinu tvých nahození v prázdné háčky, o dvě pásma níž víc než polovinu. Prut tě dostane k vodě; teprve dovednost je to, co vodu zaplatí, a právě výstup táhne rybáře hlouběji, protože lepší pásma nejsou jen lepší výplata: za hranicemi Údolí jsou to jediné vody, které dál učí. {rare} je jediný řádek, který odpovídá tvému pásmu úlovků a ničemu jinému: stejné šance ve všech zónách a šestkrát pravděpodobnější v pásmu 2 než v pásmu 0, takže nejvzácnější věc na molu je právě ta, ve které je Mistrný rybář skutečně lepší.',
-  'guide.profPages.fish.koiBody':
-    'Každá vodní plocha ve hře skrývá stejnou výhru: Slunolesklého koie, neobvyklý záblesk na vlasci, který má u prodejce cenu 75 měďáků a o dost víc pro tvou hrdost. Jeho šance odpovídají tvému pásmu úlovků a ničemu jinému, ve všech zónách stejně: 1 procento řádku tabulky úlovků v pásmu 0, 3 v pásmu 1 a 6 v pásmu 2, losováno při každém navinutém nahození, takže koi připlave k rybáři, který si hluboké tabulky vysloužil. Ulovení jednoho zapíše do tvé Knihy skutků Záblesk naděje, sběratelský odkaz s nulovým Věhlasem. Až se to stane, log se postará, abys o tom věděl.',
   'guide.profPages.econ.trainingNote':
     'Jeden pevný poplatek za každý příčel receptů, účtovaný jednou v okamžiku, kdy tě ho mistr naučí; každý příčel tabulky níže je dnes v živém provozu, od bezplatných začátečnických receptů až po lekce prutů u výrobce nástrojů na jejím vrcholu.',
-  'guide.profPages.econ.provenanceBody':
-    'Některé předměty nesou jméno. Najeď na takový kurzorem a popisek u suroviny řekne Sesbíráno a čí jméno, u hotového kusu Vytvořil a čí jméno: tatáž značka, jen formulovaná podle toho, jak předmět vznikl. Podpis je součástí samotného předmětu, putuje s ním přes výměny, banku, poštu, Světový trh i zpětný odkup u prodejce, a nikdy nevybledne.\n\nSběr podepisuje svou nejlepší práci automaticky: každá sklizeň, která padne vzácná nebo lepší, přichází podepsaná a vzácné nálezy podepíšou celý svůj pětinásobný výnos. Šťastný hod při sklizni z těla podepíše výnos tam, kde rodina nemá co dát jako exemplář, a tam, kde má, nechá výnos prostý a vedle něj vyrazí podepsaný nepoškozený exemplář. Výroba podepisuje po téže linii: každá kopie vzácného nebo lepšího výrobku se razí podepsaná a mistrovské dílo podepisuje vždy, ať má jakoukoli kvalitu, takže nejjemnější verze každého kusu vždy jmenuje svého tvůrce. Jediné, co tě může připravit o podpis, je plná brašna: podepsaný kus potřebuje vlastní místo nebo odpovídající podepsaný stack, kam dopadne.\n\nStack předmětů sdílí jednu identitu, takže dvě kopie se sloučí jen tehdy, když se každá značka přesně shoduje: stejný předmět, stejný podepisující, stejné statistiky mistrovského díla, stejné okouzlení, stejné pouto. Podepsaná kláda se nikdy nepřidá k prosté hromadě ani v jednom směru (sloučení by smazalo něčí jméno), ale shodné náklady se slučují s radostí, takže dvacet rud podepsaných týmž sběračem sedí v jednom stacku a nečekaný nález ti nerozseká brašny.\n\nPodpisy se řemeslníkům vracejí: držet u pracovního stolu jakoukoli podepsanou kopii potřebného reagentu, ať ji podepsal kdokoli, přidá 2 procentní body k šanci na mistrovské dílo, a držet reagent podepsaný vlastní rukou sníží požadované množství toho reagentu o jeden kus (nikdy ne pod jeden). Tvá vlastní podepsaná vzácná nebo lepší práce tě dokonce dál učí, dnes jedině skrze lahvičku: vypij lektvar, který jsi podepsal, a malá kapka dovednosti odteče zpět do řemesla, které ho uvařilo, pokud je to řemeslo jedním z tvých aktivních hlavních oborů.',
-  'guide.profPages.faq.a4':
-    'Narazil jsi na nečekaný nález. Zhruba 1 sklizeň z 90 spustí vzácný sběratelský nález (prastaré jádrové dřevo na stromě, nedotčená žíla v rudě, měsíční květ mezi bylinami): pětinásobí výnos, podepíše každou jednotku tvým jménem a ohlásí nález celé zóně. Podpis přinese i vzácný nebo lepší hod na kvalitu při obyčejné sklizni.\n\nPodepsané materiály stojí za to si nechat nebo draze prodat: držení jakékoli podepsané kopie potřebné suroviny u pracovního stolu přidá 2 procentní body k šanci na mistrovské dílo. Jen pamatuj, že se skládají pouze se shodně podepsanými kopiemi, takže si drží vlastní místo v brašně.',
-  'guide.profPages.faq.a6':
-    'Devět běžných polních receptů a šest receptů na vyráběné pozemní nástroje zná každý od začátku a totéž platí pro tři recepty vázané na stanici (Náramenníky z pecních šupin, Kápě z ochranné tkaniny a Omotávky ze soumračné kůže), které nepotřebují trenéra, jen svou stanici. Vše ostatní učí místní mistři u svých stanic ve třech centrálních městech: většina stojí v Eastbrooku, koželuh drží koželužnu ve Fenbridge a alchymista lékárnu v Highwatchi.\n\nRecepty od trenéra běží po příčlích: dovednost 0, 25 a 50 pro řemesla na výbavu a spotřební předměty, oceněné zdarma, na 25 stříbrných a na 1 zlatý jako jednorázové poplatky; dva recepty Okouzlování na amulety sedí na příčli 25 a výrobce nástrojů učí dva vyráběné rybářské pruty na 75 a 125 za 4 a 16 zlatých. Mistr tě recept naučí, jakmile tvé pásmo v daném řemesle dosáhne vlastního pásma receptu, a k učení musíš stát u jeho stanice: mobilní stanice se nepočítá.',
-  'guide.profPages.faq.a7':
-    'Sběratelské nahození začíná na 2,5 sekundy a zkracuje se dvěma způsoby: o 0,4 sekundy za každou úroveň nástroje, který neseš a umíš použít nad vlastní úrovní naleziště, a o 0,15 sekundy, jakmile počitadlo tvé živnosti překročí pásmo 100, s dolní hranicí 1,5 sekundy. Přejdi z nalezišť 1. úrovně na naleziště 3. úrovně a tvůj přebytek zmizí, takže stejný krumpáč se rozmáchne zase pomaleji. Držet přesně požadovanou úroveň nekupuje žádnou rychlost; jen otevírá naleziště.\n\nZisk dovednosti bledne stejně jako u výroby: naleziště šedne, jak tvá dovednost stoupá nad jeho úroveň (naleziště 1. úrovně od dovednosti 75 výše neučí nic), takže odpovědí na pomalé zisky jsou naleziště vyšší úrovně. Ta vyžadují v brašnách nástroj alespoň své úrovně (žádné naleziště se nikdy nezpracovává holýma rukama, 1. úroveň v to počítaje) a pozemní nástroj nad 1. úrovní chce nejdřív i svůj nárok na použití, 40/70/85/100 ve vlastní živnosti pro úrovně 2 až 5. Rybaření se zužuje po svém: plný zisk pod 50 zdatnosti, poloviční pod 100, kapka 0,1 pod 150 a 0,02 pod 200, odpadní úlovky od 100 výše neučí vůbec nic a strop lekci klade i sama voda (vody 1. úrovně přestávají učit na 100, močál na 150), takže zastavené počitadlo může znamenat i to, že jsi vodě odrostl.',
-  'guide.profPages.faq.a8':
-    'Zčásti. Devět běžných polních receptů (základní zbraň, zbroj, jídlo a lektvary) se vyrábí kdekoli a kdykoli a totéž platí pro tři kombinované recepty přísežných párů. Vše ostatní nad nimi je vázáno na typ stanice: kovárnu, kuchyně, lékárnu, koželužnu, tkalcovský stav nebo nástrojárnu, a abys výrobu dotáhl do konce, musíš být do 20 yardů od stanice.\n\nNa dovednosti 75 v řemesle se specializuješ a spolu se slevou 20 procent na materiál získáš mobilní stanici: postav ji v terénu a stojí 10 minut, obsluhuje recepty daného řemesla, jako bys stál u té pravé. Mobilní stanice slouží jen k výrobě: učení receptů a rušení pouta u zakázek vždy vyžaduje skutečnou stanici ve městě.',
   'wallet.seekerAppHelp':
     'Pokračuj s peněženkou Seed Vault. Zkontroluj požadavky na připojení a ověření v Seed Vault, poté se vrať do hry.',
   'questUi.tracker.unknownQuest': 'Neznámý úkol ({id})',
@@ -2225,8 +2162,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.tidewrought_fishing_rod.name': 'Prut kovaný přílivem',
   'entities.items.gatherers_cache.name': 'Sběračova skrýš',
   'entities.items.artisans_eye.name': 'Řemeslníkovo oko',
-  'entities.items.reins_terrorspark_groundshaker.name':
-    'Klíček zapalování: Hrůzojiskra, otřásač země',
   'entities.items.reins_lanternback_troll.name':
     'Lampářovo jho: Grumbol',
   'hud.options.graphicsPresetInsane': 'Extrémní',
@@ -2266,7 +2201,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.overpowerCharge': 'Posílení Rudé ruky',
   'hudChrome.auraOverlay.procs.revenge': 'Odveta!',
   'hudChrome.auraOverlay.procs.suddenDeath': 'Náhlá smrt',
-  'hudChrome.auraOverlay.procs.victoryRush': 'Vítězný nápor',
   'hudChrome.auraOverlay.reposition': 'Nastavit pozice',
   'hudChrome.auraOverlay.reset': 'Resetovat pozici',
   'hudChrome.auraOverlay.screenPosition': 'Pozice na obrazovce',
@@ -2285,7 +2219,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.epic.unlink': 'Zrušit propojení s Epic',
   'hudChrome.mounts.desc_terrorspark_groundshaker':
     'Kompaktní obrněný stroj s těžkými pásy, velkorážním kanónem a sedlem pro nebojácné piloty.',
-  'hudChrome.mounts.name_terrorspark_groundshaker': 'Hrůzojiskra, otřásač země',
   'hudChrome.targetAuras.all': 'Vše',
   'hudChrome.targetAuras.buffs': 'Buffy',
   'hudChrome.targetAuras.configureRows': 'Nastavit aury cíle',
@@ -2303,7 +2236,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetAuras.visibleRows': 'Preferované řady aur: {count}',
   'hudChrome.bags.itemAriaMasterwork': '{item}, množství {count}, mistrovské dílo',
   'hudChrome.archetypePair.tailoring+inscription': 'Inkoustotkalec',
-  'hudChrome.enchantName.enchant_weapon_runed_focus': 'Okouzlení zbraně - Runová pečeť',
   'hudChrome.professions.ctaRaiseSpecialized':
     'Pokračuj ve zvyšování {craft}: do specializace zbývá {points} bodů a náklady na materiál klesnou.',
   'guide.professions.harvestBodyChoice':
@@ -2316,10 +2248,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Nemusíš po ničem z toho sám pátrat. Rozvíjej svá řemesla a jakmile tvé dovednosti poprvé jasně nakloní misku vah k jednomu páru, Řemeslnický cech si toho všimne a pošle havraní dopis s jménem mistra, za kterým zajít, a úkolem, který přijmout. Dopis přijde jednou za postavu, a jen tehdy, pokud jsi ještě nepřísahal žádnému páru.',
   'guide.professions.whatHeading': 'Živnost vedle meče',
   'guide.professions.ringHeading': 'Prstenec řemesel',
-  'guide.professions.ringBody':
-    'Každé řemeslo s dnešním obsahem má limit 125 dovednosti: Kovářství zbraní, Zbrojnictví, Krejčovství, Kožedělnictví, Vaření, Alchymie, Strojírenství a Okouzlování. Na limitu živnost dál pracuje, sklizně stále přinášejí výnos, výroby se stále dokončují a mistrovská díla se stále mohou přihodit; jen číslo přestane stoupat. Vyber kartu níže pro plné tabulky receptů a čísla daného řemesla.',
-  'guide.professions.ringWaveNote':
-    'Dvě řemesla na kole, Klenotnictví a Písemnictví, drží svá místa, ale zatím nenabízí žádné recepty. To je záměr, ne opomenutí: jejich obsah přichází s budoucími zónami a limity výše se zvýší stejně, takže řemeslo s dosaženým limitem dnes je náskok na tu expanzi, ne cílová čára.',
   'guide.professions.capFmt': 'Limit {cap}',
   'guide.professions.comingSoon': 'Zatím žádné recepty',
   'guide.professions.gatherHubHeading': 'Sběr',
@@ -2328,17 +2256,11 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.professions.archetypesHeading': 'Kolo a jeho archetypy',
   'guide.professions.pairFmt': '{a} a {b}',
   'guide.professions.curveHeading': 'Křivka mistrovství',
-  'guide.professions.curveBody':
-    'Zisk dovednosti se řídí jedním pravidlem všude, čtyřstavovou Křivkou mistrovství. Každých {step} bodů dovednosti je jedna úroveň a každý recept je ohodnocen podle toho, kde stojí oproti tvé: na tvé úrovni nebo nad ní dává plný zisk, o jednu úroveň níže dává polovinu, o dvě níže čtvrtinu a o tři nebo více níže nic.\n\nOkno výroby to vymaluje přímo na seznam receptů v klasických barvách: oranžová pro plný zisk, žlutá pro snížený, zelená pro kapičku, šedá pro nic. Zisky jsou deterministické, nikdy hod na zvýšení dovednosti, takže stejná výroba na stejné úrovni vždy posune tvou dovednost o přesně stejnou hodnotu a recept přecházející do žluté je tvým signálem k natrénování další příčle.\n\nSběr funguje na stejné křivce se stejným krokem úrovně, ohodnoceným oproti nalezišti namísto receptu: snadná naleziště zešednou, jak je přejdeš, a bohatší naleziště pozdějších zón jsou tím, co dokončuje výstup. Rybaření si drží vlastní plán: celý bod za úlovek pod 50 dovednosti, polovina do 100, desetina do 150 a pomalý konec celou cestu do 200, přičemž odpadky od 100 výše nic neučí.',
   'guide.professions.provenanceHeading': 'Původ',
   'guide.professions.provenanceBody':
     'Jemná práce v tomto světě pamatuje svého tvůrce: vzácné nebo lepší sklizně a výroby přicházejí podepsané (Sebral, Vytvořil), mistrovské dílo je dokončeno o jeden stupeň kvality výše se jménem tvůrce vždy na sobě a zakázkový kus je svázán s příjemcem skrze Pouto tvůrce. Stránka Řemeslnická ekonomika nese plná pravidla, od podpisů a stohování až po poplatky za odpoutání.',
   'guide.professions.stationsHeading': 'Stanice a tři centra',
-  'guide.professions.stationsBody':
-    'Šest typových stanic slouží sedmi řemeslům vázaným na stanici, rozprostřeným po třech městských centrech. Eastbrook drží kovárnu (Kovářství zbraní a Zbrojnictví ji sdílí), kuchyně, tkalcovský stav a dílnu; Fenbridge má koželužnu a Highwatch lékárnu. Každá stanice má místního mistra vedle ní, který naučí recepty, vyvěsí pracovní objednávky a nabídne službu odpoutání.\n\nPracovní rádius je 20 yardů, přibližně vlastní dvorek stanice, takže výroba probíhá stojíc u kovadliny, ne z druhého konce města. Klenotnictví, Písemnictví a Okouzlování nemají stanici: první dvě čekají na své recepty a Okouzlování funguje kdekoli záměrně.',
   'guide.professions.deedsHeading': 'Skutky, které pamatují cestu',
-  'guide.professions.deedsBody':
-    'Kniha skutků kráčí vedle každého kroku tohoto. Tvé první nalaďování získá titul Přísežný řemeslu a tvé první mistrovské dílo získá Velmistr řemesla, oba nositelné jako tituly. Každé ze osmi dosažitelných řemesel zaznamená milníkový skutek na dovednosti 50 a korunuje svůj limit titulem Velmistr, zatímco Rybaření dostane Starého Solanáře na dovednosti 100 a titul Mistrného rybáře na 200.\n\nExistují i tišší stránky: skutky za první sklizeň a první výrobu, za vzácné nálezy, které štěstí přinese v terénu, a za převzetí rozebírání. Vše je kosmetické, jen tituly a Věhlas. Skutek nikdy nedá moc; jen dokazuje, že jsi byl přítomen.',
   'guide.professions.startHeading': 'Kde začít',
   'guide.professions.colStation': 'Stanice',
   'guide.professions.colHub': 'Centrum',
@@ -2383,14 +2305,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Krejčovství tká látkové oděvy pro Intelekt a Ducha, ve kterých žijí sesílatelé, od základů z hrubého plátna přes sadu zlatotkaniny po vzácné kusy ze slunečné tkaniny, a šije Hedvábnopředenou brašnu, desetimístný vak, který nikdo neodmítne.',
   'guide.profPages.craftIntro.leatherworking':
     'Kožedělnictví vyrábí výbavu pro Obratnost a Výdrž pro třídy, které se vyhýbají místo blokování, od fenbridgeských základů z kůže po vzácnou sadu strážce bažin, a je jediným hlubokým řemeslem, které se učí venku v bažině.',
-  'guide.profPages.craftIntro.cooking':
-    'Vaření přeměňuje dnešní úlovek na posezení u jídla, které léčí po dobu 18 sekund odpočinku, nejlevnější léčení ve hře, od Soleného sušeného masa až po Marlowovu slavnostní pečeni. Jí každý, takže žádné řemeslo není ve skupině vítanější.',
-  'guide.profPages.craftIntro.alchemy':
-    'Alchymie přeměňuje byliny, žlázy a sklo na lahvičky, které rozhodují boje: léčivé a manové lektvary na okamžik, kdy věci jdou špatně, a stamina elixy, které ti zůstanou v buff baru po celý dungeon.',
   'guide.profPages.craftProse.weaponcrafting.identityHeading':
     'Ostří, pro které každý bojovník nakupuje',
-  'guide.profPages.craftProse.weaponcrafting.identityBody':
-    'Někdo v každé skupině chce práci tohoto řemesla, protože samotný vzácný stupeň pokrývá všechny tři chutě: Osmiumová válečná čepel pro Sílu v melee, Glyfocelová válečná sekera pro Obratnostní bojovníky a Vysokoborová bojová hůl, Intelekt a Duch berla pro huf v róbách.\n\nNa kole řemesel stojí mezi Zbrojnictvím a Klenotnictvím. Jeho živou identitou je Kovář, pár Kovářství zbraní a Zbrojnictví, přísaha složená před Mistryní kovárny Darvou u kovárny opracováním tří rudných žil vlastníma rukama; pár Čepelář s Klenotnictvím je také pojmenován na kole, ale ještě nelze přísahat, protože Klenotnictví nezavádí žádné recepty do pozdější zónové expanze.',
   'guide.profPages.craftProse.weaponcrafting.materialsHeading': 'Co kovárna spotřebuje',
   'guide.profPages.craftProse.weaponcrafting.ladderHeading': 'Žebříček, stupeň po stupni',
   'guide.profPages.craftProse.weaponcrafting.ladderBody':
@@ -2406,8 +2322,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Od kroužkového stupně výše každá výroba si hodí na šanci mistrovského díla; základní měděné kusy bez statistik prockovat nemohou, protože mistrovské dílo zlepšuje statistiky a ty žádné nemají. Železo se počítá jako materiál 1. úrovně pro proc a glyfocal jako 2. úrovně.\n\nVýstup je standardní tříkrokový výjezd: měď na 25, kroužkový kov na 50, osmiumové šupiny na 75, přičemž každý stupeň trénuješ v den, kdy se odemkne. Kde má Zbrojnictví štěstí, je úsek po 75: Náramenníky z pecních šupin jsou recept 3. úrovně, takže přinášejí plný zisk až do 99 a poloviční poté, což znamená, že posledních padesát bodů zabere přibližně 75 výrob místo 150, které by vyžadovalo řemeslo bez vrcholového kusu. Každý nárameník stojí sedm osmiumových rud a pět Kovářských tavidel, takže se zásobuj v Thornpeaku a u přepážky kovárny, než začneš.\n\nDarvin pracovní příkaz kupuje osm měděných rud každých 30 minut za mince a zkušenosti, pěkná konzumace rudy nižší úrovně, ze které jsi vyrostl. Kniha skutků označuje Kladivo a Plát na dovednosti 50 a Velmistr Zbrojnictví čeká na stropu 125.',
   'guide.profPages.craftProse.tailoring.identityHeading':
     'Látka pro sesílatele, brašny pro každého',
-  'guide.profPages.craftProse.tailoring.identityBody':
-    'Žebříček stoupá od základů z hrubého plátna přes sadu zlatotkaniny po vzácný stupeň: Roucho Hedvábosvazovače a kusy ze slunečné tkaniny. Jeho druhý obor je univerzální: Hedvábnopředená brašna je desetimístný vak a není třída, spec ani úroveň, která by nechtěla více místa v brašnách.\n\nNa kole sedí Krejčovství mezi Kožedělnictvím a Písemnictvím. Jeho živým párem je Krejčovský kožešník, Kožedělnictví a Krejčovství dohromady, přísaha složená před Tkadlenou Ottilie u Eastbrookského tkalcovského stavu po vybití čtyř pavouků lesního pavučníku pro jejich hedvábí; pár Inkoustotkalec s Písemnictvím je pojmenován na kole, ale čeká na první recepty Písemnictví, než bude moci být přísahán.',
   'guide.profPages.craftProse.tailoring.materialsHeading': 'Nitě, hedvábí a ano, byliny',
   'guide.profPages.craftProse.tailoring.materialsBody':
     'Tkalcovský stav funguje na tom, co padá z lovu a co rostou pole. Plátěné útržky a hrubé plátno přicházejí z humanoidních zabití, pavoučí hedvábí se sklízí z pavoučích těl a středobod vzácného stupně, Roucho Hedvábosvazovače, chce Prvotřídní hedvábí, podepsaný exemplář, který se tu a tam objeví při šťastné sklizni z těla.\n\nBylinkářství zásobuje krejčovství více než jakékoli jiné řemeslo s výbavou: stříbrolist zkracuje střevíce, zlatolist barví sadu zlatotkaniny a sluncokvět provléká celý vzácný stupeň, takže krejčí, který si trhá vlastní byliny, šetří soustavně. Cívka nití stojí 12 mědiváků u Ottilie a tkalcovský stav nevyžaduje žádný kov: i vrcholová Kápě z tkaní stráže je tkaná z prémiových bylin, Prvotřídního hedvábí, pavoučího hedvábí a nití.',
@@ -2431,8 +2345,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Solené sušené maso je polní recept: znám od začátku, jedna pavoučí nožička, lze vyrábět kdekoliv, cestovní jídlo každého začínajícího dobrodruha. Žebříček trenéra vaří v Eastbrookských kuchyních na východní straně náměstí: volný stupeň na dovednosti 0 (okoun, Špíz z lovcovy zvěřiny, Bažinná štika na bylinkách), střední stupeň na dovednosti 25 za 25 stříbrných za recept (Ashwoodský uzený úhoř, Dušená zvěřinová polévka ze zlatého listu, Polévka Frostgill) a vzácný stupeň na dovednosti 50 za 1 zlatý za kus (Večeře ze stříbrného kapra, Talíř Rybářova hodokvasu, Marlowova slavnostní pečeně).\n\nHromadná jídla roztáhnou suroviny: uzený úhoř a dušená polévka servírují dvě porce na výrobu a talíř hodokvasu servíruje tři. Marlow učí každý stupeň v okamžiku, kdy tvoje úroveň ve Vaření dosáhne odpovídajícího stupně.',
   'guide.profPages.craftProse.cooking.routeHeading':
     'Specializace, ne mistrovská díla, a cesta na 125',
-  'guide.profPages.craftProse.cooking.routeBody':
-    'Vaření je poctivou výjimkou z příběhu mistrovských dílek: jídlo nemá žádnou statistickou linku k vylepšení, takže pokrmy nikdy neprocují mistrovské dílo a žádný kuchař by ho neměl honit. Mistrovství tohoto řemesla je specializace na dovednosti 75: o pětinu méně každé suroviny, což se rychle sčítá na hromadných pokrmech, a mobilní polní kuchyně, takže se hodokvast vaří přímo u dveří dungeonu.\n\nVar, co chytíš: spoj výstup s rybářskou relací a dvě dovednosti se budou navzájem živit celou cestou. Sušené maso a volný stupeň tě dostanou na 25 za bod na výrobu, střední stupeň na 50 a vzácný stupeň na 75; za 75 zatím žádný vyšší pokrm neexistuje, takže vzácné pokrmy slábnou na polovinu a pak na čtvrtinový zisk, přibližně 150 dalších výrob ke stropu. Ber to jako zásobování, ne jako grindování: cech sní každou porci.\n\nMarlowův pracovní příkaz kuchyní kupuje osm kusů zvěřinového masa každých 30 minut za mince a zkušenosti a Kniha skutků označuje Zkušeného kuchaře na dovednosti 50 na cestě k titulu Velmistr Vaření na dovednosti 125.',
   'guide.profPages.craftProse.alchemy.identityHeading': 'Lahvičky, které rozhodují boje',
   'guide.profPages.craftProse.alchemy.materialsHeading': 'Byliny, žlázy a sklo',
   'guide.profPages.craftProse.alchemy.materialsBody':
@@ -2444,7 +2356,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftProse.engineering.ladderHeading': 'Žebříček nástrojů',
   'guide.profPages.craftProse.engineering.routeHeading': 'Strojírova cesta na 125',
   'guide.profPages.craftProse.engineering.routeBody':
-    'Nástroje nemají žádné bojové statistiky, takže nikdy neprocují mistrovské dílo; ten proc patří výbavě s bojovými statistikami. Specializace přesto přistane na dovednosti 75: o 20 procent méně materiálů na výrobu a dočasná polní nástrojárna, která proměňuje každý sběratelský výlet v dílnu. Matematika zisku zde téměř nevybledne: recepty na dovednosti 75 přinášejí plný zisk až do 100 a poloviční poté, a recepty na dovednosti 150 přinášejí plný zisk celou cestou ke stropu 125, takže skutečným omezením jsou reagenty a mince, nikdy šedé recepty.\n\nNejprve si vyber pár, protože bez toho se nic nepohne: přijmi ladění Bombardéra od Kutila Gizzela. Pak zásobuj žebříček: nazdvihni Těžbu, Dřevorubectví nebo Bylinkářství sám nebo si získej přítele sběrače, kup nástroje 3. úrovně u prodejců a ber Gizzelův pracovní příkaz (osm polen ze železokůry za 16 mědiváků, opakovatelný každých 30 minut) jako kapesné.\n\nStrojírenství je nízkoobrátkový prestižní obor, přibližně jeden bod dovednosti na hotový nástroj, takže každou výrobu berte jako zásoby k prodeji. Nabídka pro vaše zákazníky se píše sama: každá úroveň nástroje nad vlastní úroveň naleziště zkrátí o 0,4 sekundy dobu sběru 2,5 sekundy (až do dolní hranice 1,5 sekundy), takže nástroj 5. úrovně je rychlostní vylepšení na každém nalezišti světa a jen ty ho dokážeš vyrobit. Kniha skutků označuje Ozubená kola a Péra na dovednosti 50 a Velmistr Strojírenství na 125.',
+    'Nástroje nemají žádné bojové statistiky, takže nikdy neprocují mistrovské dílo; ten proc patří výbavě s bojovými statistikami. Specializace přesto přistane na dovednosti 75: o 20 procent méně materiálů na výrobu a dočasná polní nástrojárna, která proměňuje každý sběratelský výlet v dílnu. Matematika zisku zde téměř nevybledne: recepty na dovednosti 75 přinášejí plný zisk až do 100 a poloviční poté, a recepty na dovednosti 125 přinášejí plný zisk celou cestou ke stropu, takže skutečným omezením jsou reagenty a mince, nikdy šedé recepty.\n\nVyber si pár brzy, protože bez něj se žebříček nástrojů nepohne: přijmi ladění Bombardéra od Kutila Gizzela. Pak zásobuj žebříček: nazdvihni Těžbu, Dřevorubectví nebo Bylinkářství sám nebo si získej přítele sběrače, kup nástroje 3. úrovně u prodejců a ber Gizzelův pracovní příkaz (osm polen ze železokůry za 16 mědiváků, opakovatelný každých 30 minut) jako kapesné.\n\nStrojírenství je nízkoobrátkový prestižní obor, přibližně jeden bod dovednosti na hotový nástroj, takže každou výrobu berte jako zásoby k prodeji. Nabídka pro vaše zákazníky se píše sama: každá úroveň nástroje nad vlastní úroveň naleziště zkrátí o 0,4 sekundy dobu sběru 2,5 sekundy (až do dolní hranice 1,5 sekundy), takže nástroj 5. úrovně je rychlostní vylepšení na každém nalezišti světa a jen ty ho dokážeš vyrobit. Kniha skutků označuje Ozubená kola a Péra na dovednosti 50 a Velmistr Strojírenství na 125.',
   'guide.profPages.craftProse.enchanting.identityHeading': 'Výbava rozložena, síla vrácena zpět',
   'guide.profPages.craftProse.enchanting.levelingHeading': 'Jak se úroveň Okouzlování zvyšuje',
   'guide.profPages.craftProse.enchanting.marketHeading': 'Okouzlené kopie, původ a tržiště',
@@ -2543,7 +2455,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Světový trh je celosférickí burza spravovaná Obchodníkem v Eastbrooku a Dražitelem Vossem v Highwatchi. Vystavení je zdarma: žádná záloha a nevyužité vystavení se ti jednoduše vrátí. Dům si bere podíl pouze tehdy, když se něco skutečně prodá: 5 procent z prodejní ceny a zbytek na tebe čeká k vybrání.\n\nJedno důležité omezení: Trh zprostředkovává pouze běžné zboží. Podepsaná, mistrovská, okouzlená nebo vázaná kopie nikdy nevstoupí do výpisu, takže zvláštní kusy přecházejí z ruky do ruky tváří v tvář v okně výměny, které nese plnou identitu předmětu, podpis i vše ostatní. Cenu si určuj sám; Trh ti jen ukáže, co platí za běžnou verzi.',
   'guide.profPages.econ.workOrdersHeading': 'Pracovní příkazy',
   'guide.profPages.econ.workOrdersNote':
-    'Každý správce stanice zveřejňuje stálý pracovní příkaz: přines hromadu základního materiálu pro dané řemeslo a dostaneš okamžitou platbu plus trochu zkušeností z úkolu. Odměna je záměrně {pct} % z toho, co by ti za stejný stack dal prodejce, zaokrouhleno dolů, takže pracovní příkaz nikdy není výhodný způsob prodeje materiálů, jen důvod, proč se k stanici zastavit.\n\nKaždý příkaz běží na vlastním časovači {minutes} minut na postavu: odevzdej jeden a ten mistr pro tebe nic dalšího nemá, dokud časovač neoběhne. Berte je jako malý bonus za materiály, které jsi stejně sbíral, ne jako podnikání.',
+    'Každý správce stanice zveřejňuje stálé pracovní příkazy, jeden na každý základní materiál: přines hromadu, o kterou příkaz žádá, a dostaneš okamžitou platbu plus trochu zkušeností z úkolu. Odměna je záměrně {pct} % z toho, co by ti za stejný stack dal prodejce, zaokrouhleno dolů, takže pracovní příkaz nikdy není výhodný způsob prodeje materiálů, jen důvod, proč se k stanici zastavit.\n\nKaždý příkaz běží na vlastním časovači {minutes} minut na postavu: odevzdej jeden a ten příkaz je pro tebe uzavřený, dokud časovač neoběhne, zatímco ostatní příkazy mistra zůstávají otevřené. Berte je jako malý bonus za materiály, které jsi stejně sbíral, ne jako podnikání.',
   'guide.profPages.econ.colOrder': 'Pracovní příkaz',
   'guide.profPages.econ.colMaster': 'Mistr',
   'guide.profPages.econ.colAsks': 'Požaduje za',
@@ -2560,22 +2472,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Řemeslná ekonomika stojí na jediné myšlence: hráči zásobují hráče. Sběrači živí řemeslníky, řemeslníci živí hráče plnící úkoly a nájezdníky a rozebíratelé živí okouzlovatele, přičemž prodejci a správci stanic stojí na okraji, aby pohlcovali smetí a mince, nikoli aby s tebou soutěžili. Chceš-li vydělávat mince z profese, tvůj zákazník je osoba: zjisti, co ostatní hráči rychle spotřebují, porovnej ceny se Světovým trhem a chovej se k NPC systémům jako k podlaze pod svými cenami, ne jako k trhu samotnému.\n\nVybavení z řemesel je laděno tak, aby zůstávalo pod úrovní nájezdové hranice: i mistrovské dílo je vždy jen o jeden stupeň kvality nad svým receptem, nikdy ne přes legendární, a jeho rozpočet statistik zůstává pod pásmem nájezdové kořisti. Kovárna tě připraví na nejtěžší obsah; nenahrazuje ho. To udržuje řemeslníky, nájezdníky a trh ve stabilním trojúhelníku: nájezdové kusy zůstávají aspiračním cílem a řemeslné kusy nejlepším vybavením, které lze skutečně koupit za mince.',
   'guide.profPages.faq.title': 'Profese: nejčastější dotazy',
   'guide.profPages.faq.intro': 'Rychlé odpovědi na otázky, které řemeslníci kladou nejčastěji.',
-  'guide.profPages.faq.q1': 'Proč se moje podepsané předměty neskládají do stacků?',
-  'guide.profPages.faq.a1':
-    'Podepsaný předmět je instanciovaný předmět: nese svůj vlastní malý záznam (podepisující, jakákoli vylosovaná kvalita, statistiky mistrovského díla, okouzlení, pouto) namísto toho, aby byl anonymní kopií. Dvě kopie se sloučí do jednoho stacku pouze tehdy, když se tyto záznamy přesně shodují.\n\nV praxi: vzácná ruda, kterou jsi sám sesbíral, se slučuje s další vzácnou rudou, kterou jsi sám sesbíral, protože obě říkají Sesbíráno tebou a nic jiného se neliší. Stejný materiál podepsaný přítelem sedí ve vlastním slotu a prostá nepodepsaná kopie se nikdy nesloučí s podepsaným stackem. Brašny, banka i výměna se řídí tímto jediným pravidlem.',
   'guide.profPages.faq.q2': 'Zvyšují běžné recepty moji dovednost donekonečna?',
-  'guide.profPages.faq.a2':
-    'Ne. Každý recept je hodnocen podle toho, jak daleko leží pod tvým aktuálním pásmem v daném řemesle, klasické čtení oranžová, žlutá, zelená, šedá: plný zisk na tvém pásmu nebo nad ním, polovina o jedno pásmo níže, čtvrtina dvě pásma níže a nic tři nebo více pásem níže. Pásma jsou každých 25 bodů dovednosti, takže recepty zdarma dostupné od dovednosti 0 tě přestanou cokoliv učit při dovednosti 75.\n\nMaximální limity jsou také nižší než klasická 300, která možná očekáváš: každé z osmi získatelných řemesel je omezeno na 125, Těžba, Dřevorubectví a Bylinkářství na 100 a Rybaření má dlouhou cestu na 200. Postup znamená přecházet na recepty ve svém vlastním pásmu, ne drtit ten nejlevnější.',
-  'guide.profPages.faq.q3': 'Jaký je rozdíl mezi sběrem kořisti a sklizením z těla?',
-  'guide.profPages.faq.a3':
-    'Jedno stisknutí pokryje obojí. Vše, co tělo drží, mince a kořist plus jakékoli skliditelné součásti, se otevírá ve stejném okně: sběr kořisti se řídí normálními pravidly a sklizení je stranou profese, která strhuje materiály ze samotné mrtvoly.\n\nSklizení je první přijde první bere, pro jednoho hráče: každé tělo lze sklidit přesně jednou, tím, kdo si ho nárokuje jako první, online nevyjímaje. Tvoje Střediště zaměření určuje, co dostaneš: zatímco stojíš v uzlovém centru města, můžeš rozložit 10 bodů zaměření na typy složek, o které stojíš, a každá zaměřená složka hází za lepší stupeň (každých 5 bodů ji posune o krok výše, nejvýše o dva) a dává víc (10 procent za bod). Nezaměřené složky se nikdy nezhorší.',
-  'guide.profPages.faq.q4': 'Proč je moje Železná kůra podepsaná?',
-  'guide.profPages.faq.q5': 'Jak zruším vazbu zakázkového kusu a co to stojí?',
-  'guide.profPages.faq.a5':
-    'Jdi k jakékoli výrobní stanici s kusem v brašnách a zaplať mistrovi. Poplatek se řídí kvalitou předmětu: 25 stříbrných za neobvyklý kus, 1 zlatý za vzácný, 4 zlaté za epický; legendární platí epickou sazbu a zakázkový běžný kus sazbu neobvyklého. Musí to být skutečná stanice: mobilní stanice tuto službu nikdy nenabízí.\n\nPoplatek kupuje čistý začátek, ne trvalé vyléčení: kus zůstává zakázkový, takže se při příští výměně znovu naváže na toho, kdo ho obdrží. Pokud několik vázaných kopií sdílí stack, jedna kopie se odloupne a pouto se zruší za jeden poplatek.',
-  'guide.profPages.faq.q6': 'Kde se učím recepty a co stojí?',
-  'guide.profPages.faq.q7': 'Proč mi sběr najednou zpomalil?',
-  'guide.profPages.faq.q8': 'Mohu vyrábět mimo město?',
   'hud.logs.keptBoundOne': 'Ponechána {count} vázaná kopie.',
   'hud.logs.keptBoundMany': 'Ponecháno {count} vázaných kopií.',
   'hud.pet.waterJet': 'Vodní paprsek',
@@ -2615,8 +2512,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_surge.description':
     'Prožene nepřítelem příval surového éteru a způsobí mu {damage} poškození. Každé seslání zanechá Éterický náboj, který zvyšuje poškození a rychlost sesílání tvého příštího Přívalu éteru (o 5 % za každý) a ostře zdražuje jeho manový náklad, ukládá se až do 4; Éterické šipky náboje spotřebují. Každé seslání může také aktivovat Éterický spěch, takže tvůj příští Příval éteru nebude nic stát a budeš jej sesílat dvakrát rychleji.',
   'entities.abilities.arcane_surge.name': 'Příval éteru',
-  'entities.abilities.blizzard.description':
-    'Přivolá ledovou bouři na cílovou plochu po dobu 6 s, působí {damage} mrazivého poškození každou sekundu a zpomaluje nepřátele o 40 %. Každý zasažený nepřítel zkrátí cooldown Zmrzlé sféry o 0,5 s, nejvýše o 3 s za seslání. (Mráz)',
   'entities.abilities.blizzard.name': 'Vánice',
   'entities.abilities.brain_freeze.name': 'Zmrazení mozku',
   'entities.abilities.dragons_breath.description':
@@ -2629,13 +2524,11 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Přeměníš se v planoucí žar a zvýšíš rychlost pohybu o {buff} %. V přeměněné podobě nemůžeš útočit ani sesílat kouzla. Seslej znovu pro návrat do normální podoby.',
   'entities.abilities.fireball_form.name': 'Žárová podoba',
   'entities.abilities.flurry.name': 'Zimní bič',
-  'entities.abilities.frozen_orb.name': 'Zmrzlá sféra',
   'entities.abilities.glacial_front.description':
     'Podrž pro nabití rozšiřující se mrazivé fronty, pak ji pusť v kuželi. Delší nabití zasáhne dál a způsobí více poškození. Všichni zasažení nepřátelé jsou zpomaleni o 50 % na 4 s; maximální nabití je také ukotvuje na 1 s. (Mráz)',
   'entities.abilities.glacial_front.name': 'Ledová fronta',
   'entities.abilities.glacial_spike.description':
     'Přivoláš mohutný ledový hrot, spotřebuješ 5 Rampouchů a způsobíš {damage} mrazivého poškození a zmrazíš cíl na místě na 4 s. (Mráz)',
-  'entities.abilities.glacial_spike.name': 'Ledový hrot',
   'entities.abilities.ice_lance.description':
     'Vrhneš střep ledu, způsobíš {damage} mrazivého poškození, trojnásobný proti zmrazenému cíli. Spotřebuje Zmrzlé prsty nebo nabití Zimního chladu, aby byl cíl považován za zmrazený. (Mráz)',
   'entities.abilities.ice_lance.name': 'Ledové kopí',
@@ -3124,7 +3017,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.seasoned_soldier.name': 'Ostřílený voják',
   'entities.abilities.storm_bolt.description':
     'Mrštíš zbraní po cíli za {damage} poškození a omráčíš ho na 3 s.',
-  'entities.abilities.storm_bolt.name': 'Bouřná střela',
   'entities.abilities.sudden_death.description':
     'Tvoje automatické útoky mají šanci ti dovolit seslat Předčasný hrob na cíl s libovolným zdravím, a to zcela bez ceny vzteku. (Arms)',
   'entities.abilities.sudden_death.name': 'Náhlá smrt',
@@ -3133,7 +3025,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sweeping_strikes.name': 'Široký oblouk',
   'entities.abilities.victory_rush.description':
     'Udeříš za poškození zbraně plus {damage} a vyléčíš se za 20 % svého maximálního zdraví. Použitelné jen do 20 s od zabití nepřítele.',
-  'entities.abilities.victory_rush.name': 'Vítězný nápor',
   'hudChrome.specPanel.complexity': 'Složitost',
   'hudChrome.specPanel.complexityHigh': 'Vysoká',
   'hudChrome.specPanel.complexityLow': 'Nízká',
@@ -3149,7 +3040,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aspect_of_the_wild.name': 'Maska divokého tesáku',
   'entities.abilities.avenging_wrath.name': 'Mstivý hněv',
   'entities.abilities.berserk.name': 'Rudý opar',
-  'entities.abilities.blink.name': 'Mihokrok',
   'entities.abilities.bloodlust.name': 'Válečné bubny',
   'entities.abilities.chain_lightning.name': 'Rozvětvený blesk',
   'entities.abilities.chaos_bolt.name': 'Zkázný šíp',
@@ -3205,7 +3095,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.smoke_screen.name': 'Kouřová clona',
   'entities.abilities.smoke_screen.description':
     'Zmizíte v oblaku kouře a na 8 s zvýšíte svou šanci na úhyb o 30 %.',
-  'entities.abilities.spellsteal.name': 'Krádež kouzla',
   'entities.abilities.spellsteal.description':
     'Ukradne nepříteli prospěšný magický účinek a přenese jej na vás.',
   'entities.abilities.startle_shot.name': 'Lekavý výstřel',
@@ -3291,7 +3180,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.cragprowl_belt.name': 'Opasek skalního plížence',
   'entities.items.cragthorn_greatstaff.name': 'Velká hůl skalního trnu',
   'entities.items.cragward_pauldrons.name': 'Skalní nárameníky strážce',
-  'entities.items.cryptbloom_shoulderguards.name': 'Kryptkvětové chrániče ramen',
   'entities.items.cryptplate_helm.name': 'Kryptoplátová helma',
   'entities.items.deathless_greatblade.name': 'Nesmrtelná velká čepel',
   'entities.items.deathless_warguard_legmail.name': 'Nesmrtelné nohavice válečné stráže',
@@ -3314,7 +3202,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.medallion_of_endless_profit.name': 'Medailon nekonečného zisku',
   'entities.items.mirebloom_treads.name': 'Boty blatního květu',
   'entities.items.mistcallers_fang.name': 'Tesák poutače mlhy',
-  'entities.items.mistforged_pauldrons.name': 'Mlhou kované nárameníky',
   'entities.items.moonbark_vestments.name': 'Roucho z měsíční kůry',
   'entities.items.mosshide_vest.name': 'Vesta z mechaté kůže',
   'entities.items.morthens_cryptforged_hauberk.name': 'Morthenův kryptově kovaný hauberk',
@@ -3371,7 +3258,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.greatfang_of_the_basin.name': 'Velký tesák Kotliny',
   'entities.items.sunbone_oracles_crown.name': 'Slunečněkostní koruna orákula',
   'entities.items.bloodmane_war_legguards.name': 'Krvavohřívé válečné chrániče nohou',
-  'entities.items.wyrmcult_spellgrips.name': 'Kouzelné rukavice kultu dračích',
   'entities.items.yumis_keepsake_locket.name': 'Yumin památeční medailonek',
   'entities.items.zense_meridian.name': 'Zenseho meridián',
   'entities.items.zyzzs_deathless_signet.name': 'Zyzzův nesmrtelný pečetní prsten',
@@ -3896,6 +3782,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.armor': 'Brnění',
   'itemUi.kind.bag': 'Batoh',
   'itemUi.kind.drink': 'Nápoj',
+  'itemUi.kind.recipe': 'Vzor',
   'itemUi.kind.elixir': 'Elixír',
   'itemUi.kind.food': 'Jídlo',
   'itemUi.kind.junk': 'Odpad',
@@ -4761,24 +4648,24 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'delveUi.board.tier.heroic': 'Hrdinská',
   'delveUi.board.tier.normal': 'Normální',
   'delveUi.board.title': 'Tabule výprav',
-  'delveUi.boss.varric.bell.emote': 'Diákon Varric svírá pohřební zvon oběma rukama!',
+  'delveUi.boss.varric.bell.emote': 'Diákon Vandric svírá pohřební zvon oběma rukama!',
   'delveUi.boss.varric.bell.impact': 'Úder zvonu praská podlahu komnaty!',
   'delveUi.boss.varric.bell.lesson':
     'Úder zvonu: náraz do země každých dvanáct sekund. Ustup, než dopadne.',
-  'delveUi.boss.varric.bell.log': 'Diákon Varric začíná rozeznít pohřební zvon.',
-  'delveUi.boss.varric.bell.warning': 'Ustup od diákona Varrica!',
+  'delveUi.boss.varric.bell.log': 'Diákon Vandric začíná rozeznít pohřební zvon.',
+  'delveUi.boss.varric.bell.warning': 'Ustup od diákona Vandrica!',
   'delveUi.boss.varric.defeat': 'Ne... měl jsem jména... měl jsem je všechna...',
   'delveUi.boss.varric.intro': 'Žádná duše není ztracená. Jen špatně uložená.',
   'delveUi.boss.varric.mid30': 'Pohřební zvon odpovídá na každé jméno, které vysloví.',
-  'delveUi.boss.varric.mid60': 'Diákon Varric čte jména z knihy s třesoucím se triumfem.',
+  'delveUi.boss.varric.mid60': 'Diákon Vandric čte jména z knihy s třesoucím se triumfem.',
   'delveUi.boss.varric.pull':
     'Šlapeš po posvátném prachu s nečistým úmyslem. Poklekni a nech se sečíst.',
-  'delveUi.boss.varric.raise.emote': 'Diákon Varric vyvolává jména z rozbitých hrobů!',
-  'delveUi.boss.varric.raise.interrupt_fail': 'Mrtví odpovídají na volání diákona Varrica!',
+  'delveUi.boss.varric.raise.emote': 'Diákon Vandric vyvolává jména z rozbitých hrobů!',
+  'delveUi.boss.varric.raise.interrupt_fail': 'Mrtví odpovídají na volání diákona Vandrica!',
   'delveUi.boss.varric.raise.interrupt_ok': 'Hrobový rituál kolísá.',
   'delveUi.boss.varric.raise.lesson':
     'Přeruš prasklý hrob do pěti sekund, nebo mrtví povstanou na jeho volání.',
-  'delveUi.boss.varric.raise.log': 'Diákon Varric začíná sesílat Vzkříšení mrtvých.',
+  'delveUi.boss.varric.raise.log': 'Diákon Vandric začíná sesílat Vzkříšení mrtvých.',
   'delveUi.boss.varric.raise.object': 'Prasklý hrob se chvěje ukradeným dechem.',
   'delveUi.boss.varric.raise.warning': 'Zastav hrobový rituál!',
   'delveUi.chest.flavor': 'Mrtví odevzdali, co mohli postrádat.',
@@ -4985,7 +4872,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'sim.rift.detonateAbsoluteZero': 'Absolutní nula vybuchuje!',
   'sim.rift.detonateAbyssalMaw': 'Propastná tlama se zavírá!',
   'sim.rift.detonateArcaneAnnihilation': 'Arkánová anihilace vybuchuje!',
-  'sim.rift.detonateBloodRite': 'Krvavý rituál dopadá!',
   'sim.rift.detonateBroodmothersMark': 'Znamení Matky plodu detonuje!',
   'sim.rift.detonateCoreMeltdown': 'Tavení jádra detonuje!',
   'sim.rift.detonateCrushingDepth': 'Drtivá hlubina drtí!',
@@ -4993,11 +4879,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'sim.rift.detonateEarthshatter': 'Zemětřas detonuje!',
   'sim.rift.detonateFinalJudgment': 'Poslední soud dopadá!',
   'sim.rift.detonateGlacialGrave': 'Ledovcový hrob detonuje!',
-  'sim.rift.detonateHellfireBrand': 'Pekelný cejch detonuje!',
   'sim.rift.detonateLightningRod': 'Hromosvod udeří!',
   'sim.rift.detonateMagmaWell': 'Magmová studna vybuchuje!',
-  'sim.rift.detonatePactSeal': 'Pečeť paktu detonuje!',
-  'sim.rift.detonatePitSentence': 'Rozsudek jámy detonuje!',
   'sim.rift.detonateSoulGrave': 'Hrob duší detonuje!',
   'sim.rift.detonateStormcallersWrath': 'Hněv Vyvolávače bouří vybuchuje!',
   'sim.rift.detonateVenomPool': 'Jedová tůň vybuchuje!',
@@ -7755,7 +7638,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.valespun_robe.name': 'Údolně předené roucho',
   'entities.items.vanguard_azure_armor_plate.name': 'Předvojová azurová',
   'entities.items.vanguard_chrome_armor_plate.name': 'Předvojová chromová',
-  'entities.items.varric_shadow_cowl.name': 'Varricova stínová kápě',
+  'entities.items.varric_shadow_cowl.name': 'Vandricova stínová kápě',
   'entities.items.verlans_oathblade.name': 'Verlanova čepel přísahy',
   'entities.items.voss_sanctified_mace.name': 'Vossův posvěcený palcát',
   'entities.items.wanderers_chestguard.name': 'Chránič hrudi poutníka',
@@ -7854,9 +7737,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Po dobu 4 s usměrňuje léčivou energii a každou sekundu vyléčí spojence do 30 m o 42 až 52. (druidský talent)',
   'entities.items.worn_sword.name': 'Zubatý krátký meč',
   'entities.items.woven_robe.name': 'Údolně tkané roucho',
-  'entities.items.wyrmcult_grand_robe.name': 'Velké roucho kultu draka',
-  'entities.items.wyrmcult_orders.name': 'Rozkazy kultu draka',
-  'entities.items.wyrmcult_soulsteps.name': 'Dušokroky kultu draka',
   'entities.items.wyrmfang_greatblade.name': 'Velká čepel dračího tesáku',
   'entities.items.wyrmscale_jerkin.name': 'Kazajka z dračích šupin',
   'entities.items.wyrmshadow_harness.name': 'Postroj nočního tesáku',
@@ -7919,7 +7799,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.4.label': 'Drogmarův válečný tábor',
   'entities.zones.thornpeak_heights.pois.5.label': 'Bouřný skalní štít',
   'entities.zones.thornpeak_heights.pois.6.label': 'Třpytivé pleso',
-  'entities.zones.thornpeak_heights.pois.7.label': 'Stany kultu draka',
   'entities.zones.thornpeak_heights.pois.8.label': 'Pole revenantů',
   'entities.zones.thornpeak_heights.pois.9.label': 'Svatyně Hrobodraka',
   'entities.zones.thornpeak_heights.welcome':
@@ -7988,7 +7867,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.zones.nightbloom.name': 'Noční květ',
   'entities.zones.nightbloom.pois.0.label': 'Měsíční klid',
   'entities.zones.nightbloom.pois.1.label': 'Noční brána',
-  'entities.zones.nightbloom.pois.2.label': 'Měsíční studna',
   'entities.zones.nightbloom.pois.3.label': 'Soumrakové pole',
   'entities.zones.nightbloom.pois.4.label': 'Stálá hlídka',
   'entities.zones.nightbloom.pois.5.label': 'Bezesná mohyla',
@@ -8005,7 +7883,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.zones.palmreach.welcome':
     'Teplý písek, hlučné ptactvo a džungle, která pohlcuje obzor. Naplavený přístav ti na pláži drží zapálený oheň.',
   'entities.zones.veiled_hollow.name': 'Zahalená kotlina',
-  'entities.zones.veiled_hollow.pois.0.label': 'Prastarý svit',
   'entities.zones.veiled_hollow.pois.1.label': 'Jeskyně Soumračného pádu',
   'entities.zones.veiled_hollow.pois.2.label': 'Vyhlídka Soumračného pádu',
   'entities.zones.veiled_hollow.pois.3.label': 'Prastarý háj',
@@ -8013,8 +7890,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.zones.veiled_hollow.pois.5.label': 'Potopené nádvoří',
   'entities.zones.veiled_hollow.pois.6.label': 'Křišťálové mělčiny',
   'entities.zones.veiled_hollow.pois.7.label': 'Zářící hlubina',
-  'entities.zones.veiled_hollow.welcome':
-    'Vzduch hučí prastarou magií. Vyhledej Strážce Saelwyna pod velkým stromem Prastarého svitu.',
   'entities.zones.willowfen.name': 'Vrbová bažina',
   'entities.zones.willowfen.pois.0.label': 'Mostojezero',
   'entities.zones.willowfen.pois.1.label': 'Schody Jantarové bažiny',
@@ -8025,14 +7900,11 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.zones.willowfen.welcome':
     'Bažina hučí vážkami a včelami. Přejdi most do Mostojezera a chvíli si odpočiň.',
   'entities.zones.wraithwood.name': 'Přízračný les',
-  'entities.zones.wraithwood.pois.0.label': 'Šibeniční jezero',
   'entities.zones.wraithwood.pois.1.label': 'Vraní brána',
   'entities.zones.wraithwood.pois.2.label': 'Vdovin houština',
   'entities.zones.wraithwood.pois.3.label': 'Visící mýtina',
   'entities.zones.wraithwood.pois.4.label': 'Kaple Truchlokamene',
   'entities.zones.wraithwood.pois.5.label': 'Lovcova mýtina',
-  'entities.zones.wraithwood.welcome':
-    'Koruny stromů se zavírají nad cestou jako víko. Drž se lucern Šibeničního jezera a neodpovídej, pokud les zavolá tvé jméno.',
   'entities.dungeons.drowned_temple.enterText':
     'Projdeš měsíční bránou: vzduch se mění ve studenou vodu a bledé světlo a zpěv se nad tebou zavírá.',
   'entities.dungeons.drowned_temple.leaveText': 'Vynoříš se měsíční bránou do horské noci.',
@@ -8204,7 +8076,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.choirmother_selthe.name': 'Matka sboru Selthe',
   'entities.mobs.corrupted_priest_malric.name': 'Zkažený kněz Malric',
   'entities.mobs.crypt_shambler.name': 'Belhavec z krypty',
-  'entities.mobs.deacon_varric.name': 'Diákon Varric',
+  'entities.mobs.deacon_varric.name': 'Diákon Vandric',
   'entities.mobs.deacon_voss.name': 'Diákon Voss',
   'entities.mobs.deathstalker_voss.name': 'Smrtostopař Voss',
   'entities.mobs.deepfen_murloc.name': 'Chňapal z Deepfenu',
@@ -8222,7 +8094,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.forest_wolf.name': 'Lesní vlk',
   'entities.mobs.glimmermere_wader.name': 'Brodivec z Třpytivého plesa',
   'entities.mobs.glimmerscale_lurker.name': 'Třpytivošupinný číhač',
-  'entities.mobs.gloomshade.name': 'Šerostín',
   'entities.mobs.gorrak.name': 'Gorrak Nemilosrdný',
   'entities.mobs.grand_necromancer_velkhar.name': 'Velký nekromant Velkhar',
   'entities.mobs.grave_silt_bulwark.name': 'Hradba z hrobového bahna',
@@ -8385,8 +8256,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_drogmar.completion':
     'Drogmar, mrtvý ve vlastním táboře. Klany se rozprchnou do vysokých průsmyků, koupil jsi mé zdi zimu, {playerName}.',
   'entities.quests.q_drogmar.objectives.0.label': 'Válečný vůdce Drogmar zabit',
-  'entities.quests.q_drogmar.text':
-    'Válečný vůdce Drogmar vzal mince kultu draka a přísahal klany probuzení hory. Je to kladivo, kterým chtějí udeřit do mé zdi, a až udeří do země, {playerName}, nestůj u něj. Vezmi své společníky do válečného tábora a ukonči ho, za Highwatch.',
   'entities.quests.q_drogmar.title': 'Válečný vůdce Drogmar',
   'entities.quests.q_drowned.completion':
     'Každý, koho skolíš, je ukradená duše osvobozená. Ale ten, kdo je utopil, pořád lije vodu.',
@@ -8751,7 +8620,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_voice_below.completion':
     'Klečení ustalo. Neumlčeli jsme ten hlas, {playerName}, jen jsme prořídili jeho sbor. Musí to stačit.',
   'entities.quests.q_voice_below.objectives.0.label': 'Fanatik kultu draka zabit',
-  'entities.quests.q_voice_below.objectives.1.label': 'Nekromant kultu draka zabit',
   'entities.quests.q_voice_below.text':
     'Včera v noci si celý tábor kultu najednou klekl, {playerName}, každý fanatik, každý nekromant, všichni čelem ke svatyni. Korzul k nim teď mluví ve spánku; Vael slyšel stejný hlas v močálu a Morthen před ním. Skol shromáždění, deset fanatiků, šest nekromantů, dřív než ten hlas bude mít dost rukou, aby sám otevřel bránu.',
   'entities.quests.q_voice_below.title': 'Hlas zdola',
@@ -8781,9 +8649,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_wyrm_sigils.title': 'Pečeti Hrobodraka',
   'entities.quests.q_zealots.completion':
     'Vítr je tišší. Ale netrápí mě zpěv, {playerName}, nýbrž to, že něco může zpívat zpátky.',
-  'entities.quests.q_zealots.objectives.0.label': 'Fanatik kultu draka zabit',
-  'entities.quests.q_zealots.text':
-    'Když vítr vane z jižních štítů, {playerName}, nese zpěv. Kult draka se už neskrývá, vztyčil stany pod svatyní a zpívá tomu, co pod ní spí. Umlč dvanáct fanatiků. Každý utišený hlas kupuje hoře další noc spánku.',
   'entities.quests.q_zealots.title': 'Zpěvy ve větru',
   'guide.brand': 'World of ClaudeCraft',
   'guide.brandShort': 'ClaudeCraft',
@@ -9380,8 +9245,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Eastbrook je tvoje první domovská základna. Vlčí stezka a Kančí louka jsou mírná loviště; Zrcadlové jezero je pěkná voda pro rybaření, ač se v jeho mělčinách hemží bahnoploutví; Černopavučina a Měděná štola skrývají pavouky a rudychtivé kopáče; Tábor banditů a Padlá kaple drží drsnější práci; Vrch relikviáře klesá do Zhrouceného relikviáře, první výpravy světa; Mýtina Brightwoodu je tichý, sluncem zalitý háj na severu; a Prasečí pole je hrazené kančbalové hřiště Eastbrooku, kde se pod žňovým příměřím hraje o Pohár údolí.',
   'guide.worldPage.marshPlaceNotes':
     'Fenbridge hlídá jedinou suchou cestu. Rákosiny slídilů a Mělčiny Deepfenu se hemží močálovými šelmami a bahenními ploutvemi; Vdoví houština je hustě opředená pavučinami; Utopená kaple a Trollí mohyly drží starší nebezpečí a hned severně od mohyl se otevírá Utopená litanie, vlastní výprava močálu; Tábor Hrobovolajících je zakopaný kult a Potopená bašta je instancované srdce močálu.',
-  'guide.worldPage.peaksPlaceNotes':
-    'Highwatch drží zeď. Hřeben slídilů a Hlubokamenné nory patří hřebenovým kočkám a norníkům; Zlobří podhůří a Drogmarův válečný tábor surovcům za žold; Bouřný skalní štít praská elementály a pod ním září Třpytivé pleso, tůň, jejíž břeh střeží bránu bledého světla dolů do Utopeného chrámu; Stany kultu draka a Pole revenantů obkružují vyvýšeninu kultu, se Svatyní Hrobodraka na vrcholu.',
   'guide.worldPage.gladeTitle': 'Tichý kout: Mýtina Brightwoodu',
   'guide.worldPage.gladeBody':
     'Ne každý příběh v údolí je o mrtvých. Na severu si sluncem zalitý háj zvaný Mýtina Brightwoodu drží vlastní jemnější rytmus, samé tiché stezky a skvrnité světlo pod větvemi. Je to měkký protipól cesty, po které jdeš, a stojí za vidění, když ti cesta dá prostor se toulat.',
@@ -9898,7 +9761,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'yumi.queue.leave': 'Opouštíš frontu Ochraňte Yumi.',
   'yumi.queue.teamLeave': 'Tvůj tým opouští frontu Ochraňte Yumi.',
   'yumi.respawn.title': 'K ZEMI!',
-  'entities.abilities.crusader_strike.name': 'Křižácký úder',
   'entities.abilities.crusader_strike.description':
     'Zasáhne cíl za poškození zbraně plus {damage} svatého poškození. (talent paladina)',
   'entities.abilities.metamorphosis.name': 'Podoba liche',
@@ -9922,7 +9784,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.combustion.name': 'Fénixův trans',
   'entities.abilities.combustion.description':
     'Zvýší šanci na kritický zásah kouzlem o 50 % na 15 s. (klíčová schopnost Ohně)',
-  'entities.abilities.icy_veins.name': 'Ledové žíly',
   'entities.abilities.icy_veins.description':
     'Zvýší rychlost sesílání o 30 % a na 10 s zabrání přerušení i zpomalení sesílání. (klíčová schopnost Mrazu)',
   'entities.abilities.cold_blood.name': 'Klid zabijáka',
@@ -10072,7 +9933,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_af_orchard_call.title': 'Vozík pro sad',
   'entities.quests.q_af_sprites_and_spigots.completion':
     'Čtyři vědra zpátky na hácích a řady zase ztichly. Máš na víly tvrdší ruku než já, {playerName}, a dnes jsem tomu rád.',
-  'entities.quests.q_af_sprites_and_spigots.objectives.0.label': 'Sklizňová víla zahnána',
   'entities.quests.q_af_sprites_and_spigots.objectives.1.label': 'Vědro na sběr mízy nalezeno',
   'entities.quests.q_af_sprites_and_spigots.text':
     'Sklizňové víly, {playerName}. Vytrhávají mé mízové kohouty z kmenů kvůli sladkosti uvnitř a odhazují vědra do trávy. Zažeň osm těch malých zlodějek a přines zpátky čtyři má vědra, a vozíky se zase rozjedou.',
@@ -10264,12 +10124,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_ember_caches.text':
     'Sáně se skrýšemi žhavých uhlíků se minulou noc převrhly na cestě k jezírku: železné kotle, které udrží zahrabaný oheň živý po měsíc. Tři z nich stále leží ve sněhu, {playerName}, a chata nemůže postrádat, co obsahují. Přines oheň domů.',
   'entities.quests.q_fv_ember_caches.title': 'Uhlíky na cestě k jezírku',
-  'entities.quests.q_fv_frostmane_tyrant.completion':
-    'Když se včera v noci utišil vítr, celá vesnice slyšela ticho tam, kde bývala Mrazivá hříva. Kraj ti dluží dluh, který mu bude trvat roky splatit, {playerName}. Nos tohle, a každé dveře v Ledovém plášti jsou ti otevřené.',
-  'entities.quests.q_fv_frostmane_tyrant.objectives.0.label': 'Mrazivá hříva poražena',
-  'entities.quests.q_fv_frostmane_tyrant.text':
-    'Vytci nelovili, když sešli dolů po terasách. Prchali. Yeti si nárokoval vysočinu, horský lid ho nazývá Mrazivá hříva, a ani smečky s ním nechtějí sdílet svah. Musí to skončit, {playerName}, než ho zima zažene dolů k mým hradbám. Vezmi si přítele. Vezmi si dva.',
-  'entities.quests.q_fv_frostmane_tyrant.title': 'Tyran Mrazivé hřívy',
   'entities.quests.q_fv_howl_above.completion':
     'Osm, a soumrakový chór je díky tomu tišší. Ale vytci neopouštějí vrcholky bezdůvodně. Něco tam nahoře je pohnulo, a obávám se, že to má jméno.',
   'entities.quests.q_fv_howl_above.objectives.0.label': 'Terasový vytec zabit',
@@ -10404,8 +10258,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_hollow_old_marrowshell.completion':
     'Mělčiny jsou zase jen voda. Viděla jsem ten krunýř zlomit lepší lovce, než jsem já, {playerName}. Ne tebe.',
   'entities.quests.q_hollow_old_marrowshell.objectives.0.label': 'Starý Morkoškeble zabit',
-  'entities.quests.q_hollow_old_marrowshell.text':
-    'To první jméno je Starý Morkoškeble, krab velikosti vozu, který loví ve východních mělčinách od doby, kdy Prastarý svit ještě neměl bránu. Toulá se, {playerName}, takže budeš muset projít pobřežní linii, dokud nenarazíš na jeho stopu. Nechoď sám a nedůvěřuj jeho nehybnosti.',
   'entities.quests.q_hollow_old_marrowshell.title': 'Starý krunýř mělčin',
   'entities.quests.q_hollow_the_huntsman.completion':
     'Fenna tě poslala? Dobře. Pak ti věří, a já mám dvě jména, která potřebuji škrtnout.',
@@ -10424,15 +10276,11 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nb_charts_of_the_stones.completion':
     'Nezbývá žádná pochybnost. Každé zaměření se plíživě posunulo k Bezesné mohyle, jako by se samotná obloha nakláněla nad tu mohylu, aby ji sledovala. Staří králové byli pohřbeni pod srovnanými hvězdami z nějakého důvodu, {playerName}.',
   'entities.quests.q_nb_charts_of_the_stones.objectives.0.label': 'Hvězdná mapa přečtena',
-  'entities.quests.q_nb_charts_of_the_stones.text':
-    'Kameny Hlídky jsou starší než Měsíční klid, starší než Noční rod, který se o ně stará, a jejich plochy jsou vytesány hvězdnými mapami, které jsem se celý život učil číst. Obloha se posunula, {playerName}, a já musím vědět, o kolik. Přečti mapy na třech z kamenů a přines mi jejich zaměření.',
   'entities.quests.q_nb_charts_of_the_stones.title': 'Mapy v kamenech',
   'entities.quests.q_nb_eyes_on_the_vigil.completion':
     'Lira tě poslala? Pak to cítí i zahrady. Posaď se na chvíli u dalekohledu, {playerName}. Hvězdy jsou neklidné už měsíc, a každá mapa, kterou nakreslím, se naklání na sever směrem k mohyle.',
   'entities.quests.q_nb_eyes_on_the_vigil.objectives.0.label':
     'Najít Astronoma Cassiana u Stálé hlídky',
-  'entities.quests.q_nb_eyes_on_the_vigil.text':
-    'Něco dělá chodce odvážnými a stáda neklidnými, {playerName}, a já to nedokážu přečíst v květinách. Cassian to dokáže přečíst na obloze. Drží svůj pozorovací tábor u Stálé hlídky východně odtud, kde se Noční rod vznáší mezi kameny. Najdi ho a zeptej se, co říkají hvězdy.',
   'entities.quests.q_nb_eyes_on_the_vigil.title': 'Oči na Hlídce',
   'entities.quests.q_nb_night_gardens.completion':
     'Stále zářící, každý okvětní lístek. Svatyně bude vonět nocí celý týden, a Měsíční klid díky tomu spí lépe.',
@@ -10459,8 +10307,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nb_striders_in_the_dark.text':
     'Soumrakoví chodci byli vždy trpěliví lovci, {playerName}, ale v poslední době se plíží přímo do záhonů a berou jehňata měsíčního rouna přímo pod našimi lucernami. Sniž jejich počet o deset a vrať stráním jejich klid.',
   'entities.quests.q_nb_striders_in_the_dark.title': 'Chodci ve tmě',
-  'entities.quests.q_nb_the_barrow_king.completion':
-    'Hvězdy se poprvé po celou sezónu uklidnily, {playerName}. Mohyly jsou uzavřeny, Noční rod znehybněl u svých kamenů, a král znovu spí dole. Nos tento plášť: Měsíční klid ho ušil pro toho, komu noc konečně důvěřovala.',
   'entities.quests.q_nb_the_barrow_king.objectives.0.label': 'Mohylový král uložen k odpočinku',
   'entities.quests.q_nb_the_barrow_king.text':
     'Každé zaměření, každá neklidná hvězda, každá otevřená mohyla ukazuje na jednu věc: Mohylový král se probouzí pod velkou mohylou, a tato říše nemá žádné svítání, které by ho zadrželo. Musí být uložen k odpočinku, než si vzpomene na svou korunu, {playerName}. Nechoď sám: vezmi si přítele a měj květinové světlo v zádech.',
@@ -10511,9 +10357,9 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_pr_the_lost_navigator.title': 'Ztracená navigátorka',
   'entities.quests.q_pr_the_man_who_went_in.completion':
     'Isha tě poslala? Perlová matka nevyslovila mé jméno už roky. Sedni si mimo dosah lián, {playerName}, a řeknu ti, co vím: bubny nejsou nebezpečí. Jsou varováním.',
-  'entities.quests.q_pr_the_man_who_went_in.objectives.0.label': 'Najít Okku u Liánového pádu',
+  'entities.quests.q_pr_the_man_who_went_in.objectives.0.label': 'Najít Okrim u Liánového pádu',
   'entities.quests.q_pr_the_man_who_went_in.text':
-    'Potápěči nechtějí vkročit za linii stromů, {playerName}, a nebudu je o to žádat. Bubny jsi už slyšel: každý je slyší, do druhé noci. Jeden muž na tomto ostrově kdy šel k tomu zvuku a vrátil se. Okku. Táboří pod velkými banyány u Liánového pádu, hluboko nahoru po Spletené cestě. Najdi ho a zeptej se ho, co zeleň skrývá.',
+    'Potápěči nechtějí vkročit za linii stromů, {playerName}, a nebudu je o to žádat. Bubny jsi už slyšel: každý je slyší, do druhé noci. Jeden muž na tomto ostrově kdy šel k tomu zvuku a vrátil se. Okrim. Táboří pod velkými banyány u Liánového pádu, hluboko nahoru po Spletené cestě. Najdi ho a zeptej se ho, co zeleň skrývá.',
   'entities.quests.q_pr_the_man_who_went_in.title': 'Muž, který vešel dovnitř',
   'entities.quests.q_pr_what_the_drums_guard.completion':
     'Mech, perlová skořápka a kančí krev, nabalené prsty. Něco v té ruině stále dodržuje své obřady, {playerName}, a Strážce drží všechno ostatní venku. Je čas, abychom o tom mluvili otevřeně.',
@@ -10638,21 +10484,12 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_wisp_lights.text':
     'Třpytivé bludičky nesou zrnka starého hvězdného světla, které sem spadlo, když byla Kotlina zapečetěna. Šest zrnek, a svatyňové lampy budou hořet celý rok. Ber jen od těch, co blednou; Kotlina dává dost i bez hrabivosti.',
   'entities.quests.q_wisp_lights.title': 'Světla mělčin',
-  'entities.quests.q_ww_bells_of_gallowmere.completion':
-    'Cobb tě poslal po cestě celého, jo? Dobrý muž. Udržuje ty branové lucerny zapálené třicet let, a les se kolem něj nikdy nedostal. Vítej v Šibeničním jezeru, {playerName}. Dávej pozor na zvony.',
   'entities.quests.q_ww_bells_of_gallowmere.objectives.0.label':
     'Ohlásit se Kostelníkovi Marrowovi',
-  'entities.quests.q_ww_bells_of_gallowmere.text':
-    'Slyšíš to zvonění, {playerName}? To je Šibeniční jezero, nahoru po severní cestě, jak ukolébává své mrtvé zvoněním ke spánku. Kostelník Marrow vede počet každé duše pod korunami stromů, živé i pohřbené. Jdi a nech se spočítat, než tě spočítá les sám.',
-  'entities.quests.q_ww_bells_of_gallowmere.title': 'Zvony Šibeničního jezera',
   'entities.quests.q_ww_candles_at_the_bounds.completion':
     'Všechny čtyři hoří? Tak si oddechni, {playerName}. Neslyšel jsi to, ale celá vesnice ano: zvony zazněly lehčeji ve chvíli, kdy chytil poslední knot.',
   'entities.quests.q_ww_candles_at_the_bounds.objectives.0.label': 'Hrobová svíce znovu zapálena',
-  'entities.quests.q_ww_candles_at_the_bounds.text':
-    'Čtyři hraniční kameny obklopují Šibeniční jezero, {playerName}, jeden na každé cestě ven, a hrobová svíce hoří na každém kameni. Dokud hoří, pohřbení zůstávají pohřbeni. Mrholení je utopilo, všechny čtyři, a já jsem příliš stará na to, abych sama obcházela hranice. Vezmi si mou svíčku a znovu je zapal, rychle.',
   'entities.quests.q_ww_candles_at_the_bounds.title': 'Svíce na hranicích',
-  'entities.quests.q_ww_horn_of_the_huntsman.completion':
-    'Roh se zastavil uprostřed tónu. Každý zvon v Šibeničním jezeru zazněl jednou, sám od sebe, a pak les ztichl víc, než jsem ho slyšela za třicet let. Vykonal jsi obřad, který já nedokázala, {playerName}. Nos tohle, a choď pod korunami stromů beze strachu.',
   'entities.quests.q_ww_horn_of_the_huntsman.objectives.0.label': 'Bledý lovec shozen z koně',
   'entities.quests.q_ww_horn_of_the_huntsman.text':
     'Už jsi ten roh slyšel, {playerName}, tenký a vzdálený, zvuk, kvůli kterému celý les zadržuje dech. Bledý lovec projíždí svou mýtinou severně odtud, a každý hrob, kolem kterého projede, se prohlubuje mělčeji. Kdysi byl člověkem, a byl pohřben špatně, a já se přestala přetvařovat, že to spraví modlitba. Vezmi si přítele, vezmi si dva, a shoď ho z koně.',
@@ -10669,10 +10506,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ww_the_last_vicar.text':
     'Jižně odtud chátrá Kaple Truchlokamene u svého černého jezírka, a jeden muž se o ni stále stará: Vikář Creel, který neodešel, když se zřítila střecha. Zná staré obřady lépe než mé zvony, {playerName}, a měsíc neposlal žádnou zprávu. Projdi kapelní cestu a přesvědč se, že dýchá.',
   'entities.quests.q_ww_the_last_vicar.title': 'Poslední vikář',
-  'entities.quests.q_ww_walking_mosley_home.completion':
-    'Prošel bránou na vlastních nohou, přísahá, že od teď nebude kopat nic hlubšího než záhon tuřínu. Bude zpátky na hřbitově do neděle, vždycky jsou. Děkuji ti, {playerName}. Šibeniční jezero si udržuje své lidi, to je celý náš zákon.',
-  'entities.quests.q_ww_walking_mosley_home.objectives.0.label':
-    'Hrobník Mosley bezpečně doveden zpátky do Šibeničního jezera',
   'entities.quests.q_ww_walking_mosley_home.text':
     'Můj hrobník Mosley se před třemi dny vydal po kapelní cestě otevřít hrob na starém hřbitově, a výkop se na něj zřítil. Vyškrábal se ven, ten blázen žije, ale krčí se u kapelních hrobů a nechce se hnout kvůli tkalcům na cestě. Doveď ho domů, {playerName}. Nemohu zvonit na zvony pro živého muže.',
   'entities.quests.q_ww_walking_mosley_home.title': 'Doprovodit Mosleyho domů',
@@ -10680,8 +10513,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Tři duše zpátky pod poctivou zemí před setměním. Vlekouni znovu vyrostou, kůra to vždycky dělá, ale dnes v noci mýtina visí prázdná, a to stačí.',
   'entities.quests.q_ww_what_the_bark_holds.objectives.0.label': 'Rytokorý vlekoun poražen',
   'entities.quests.q_ww_what_the_bark_holds.objectives.1.label': 'Hedvábím ovinuté ostatky sřezány',
-  'entities.quests.q_ww_what_the_bark_holds.text':
-    'Ve Visící mýtině východně od Šibeničního jezera věší tkalci své hedvábím zabalené mrtvé z větví, a rytokorí vlekouni stojí na stráži pod nimi jako trpěliví nosiči rakví. To jsou naši lidé tam nahoře, {playerName}. Znič pět vlekounů, sřež tři ze zabalených mrtvých, a přines je domů do hlíny.',
   'entities.quests.q_ww_what_the_bark_holds.title': 'Co kůra drží',
   'entities.quests.q_ww_widows_skeins.completion':
     'Šest přaden, měkkých jako zadržený dech. Mrtví v tomto budou ležet lehčeji. Vezmi si tyto omotávky, ušila jsem je z poslední dávky, a les se skrze ně nikdy neprokousal.',
@@ -11015,13 +10846,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Každý list zde plane zlatě a rudě, přesto žádný nikdy nespadne. Lucerny jsou pro tebe rozsvíceny; dej pozor na Zlatotání na cestě nahoru.',
   'guide.worldPage.amberPlaceNotes':
     'Lucernojezero zář v srdci sklizně. Zlatotání je jantarem kluzký průsmyk dovnitř; Pozlacený sad a Sklizňová kotlina skrývají nejsladší úlovky a nejodvážnější zloděje; Velké jezero zrcadlí hořící listí; Popelojavorové návrší stojí nejvyšší a nejrudější; a Nakloněný monolit pamatuje něco staršího než podzim.',
-  'guide.worldPage.duskBlurb':
-    'Údolí trvalého soumraku pod velkým stromem Prastarého svitu, kde svítí křišťálové trosky a vzduch hučí prastarou magií.',
-  'guide.worldPage.duskGreeter': 'Strážce Saelwyn, Prastarý svit',
   'guide.worldPage.duskGreeting':
     'Málo z tvého druhu stálo pod těmito větvemi. Choď opatrně a buď vítán.',
-  'guide.worldPage.duskPlaceNotes':
-    'Prastarý svit se shromažďuje pod velkým stromem. Jeskyně Soumračného pádu a její vyhlídka jsou cestou dovnitř a prvním pohledem na údolí; Prastarý háj a Kotlina hvězdného pádu udržují tichý jih; Potopené nádvoří skrývá zarostlé trosky na východě; a Zářící hlubina s Křišťálovými mělčinami svítí přes celý sever.',
   'guide.worldPage.emberBlurb':
     'Bouří ozářené pustiny popela a krvavého skla, kde draci krouží nad kalderou a trollí ohně hoří v dunách, střežené z branného města Dračí hlídka.',
   'guide.worldPage.emberGreeter': 'Strážce brány, Dračí hlídka',
@@ -11057,13 +10883,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Někdo pořád stříhá živé ploty, ačkoliv zahradníka nikdo neviděl už sto let. Dej pozor na bludiště: ono dává pozor i na tebe.',
   'guide.worldPage.gardenPlaceNotes':
     'Živoplotov čeká u Zahradní brány. Parterová promenáda kvete v zastřižených barvách; Hrad Úsvitu cvičí své rytíře za novými hradbami; Okvětní rybník se rok co rok vznáší v růžové; Starý mlýn obrací své vlastní záhony; Velké bludiště přeskupuje své cesty pro každého hosta, jeho oblouky střeženy listnatými liškami; Severní hlídka střeží výjezdovou cestu; Liliová kotlina odpočívá za tím vším; a Fontánové nádvoří stále čistě protéká v srdci zahrady.',
-  'guide.worldPage.hauntBlurb':
-    'Strašidelný les pod obřími korunami, kde jsou lucerny Šibeničního jezera jediným poctivým světlem na cestě.',
-  'guide.worldPage.hauntGreeter': 'Lampář, Šibeniční jezero',
   'guide.worldPage.hauntGreeting':
     'Drž se lucern, poutníku. A pokud tě les zavolá jménem od cesty, neodpovídej mu.',
-  'guide.worldPage.hauntPlaceNotes':
-    'Šibeniční jezero se choulí uvnitř svých lucern. Vraní brána je pochmurnými předními dveřmi lesa; Vdovin houština je hustě spředena pavučinami; Visící mýtina a Kaple Truchlokamene uchovávají nejstarší žal lesa; a Lovcova mýtina patří tomu, co tam ještě pořád loví.',
   'guide.worldPage.jungleBlurb':
     'Tropický spletenec palem, bílého písku a hlučného ptactva, přičemž pobřežní město Naplavený přístav udržuje na pláži zapálený oheň.',
   'guide.worldPage.jungleGreeter': 'Přístavní velitelka, Naplavený přístav',
@@ -11336,8 +11157,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.hoarfrost_vigil_staff.name': 'Jinovatková stráž',
   'hudChrome.wocStore.skins.ice_fang_sword.look':
     'Zakřivená čepel z bledého ledovcového ledu, podél hřbetu zubaté krystaly jinovatky, ve žlábku zářící azurové zmrzlé jádro a záštita z rampouchů.',
-  'hudChrome.wocStore.skins.ice_fang_sword.lore':
-    'Vlajková zbraň zmrzlé kolekce a kus, po kterém každý sběratel sáhne jako první. Ledový tesák nebyl vykován, ale vyřezán z výběžku ledovce, který korunuje Thornpeak nad Highwatchem. Jeho azurové jádro plane chladem jako světlo Třpytivého plesa. Jinovatkou pokrývá i vzduch, který rozsekne. Strážci zdi přísahají, že jej jeden voják nesl v noci, kdy vysoký sníh zadržel kult draka, a „koupil zdi jednu zimu“.',
   'hudChrome.wocStore.skins.ice_fang_sword.name': 'Ledový tesák',
   'hudChrome.wocStore.skins.lacquered_wand.look':
     'Štíhlá hůlka s hluboce červeným lakem, dvěma pásky leštěné mosazi a drobnou zaoblenou mosaznou špičkou.',
@@ -11383,7 +11202,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Luk z postříbřené oceli a modrého ledu, ve středu září azurové zmrzlé jádro, na tětivě čeká šíp z pevného ledu a kolem proudí studená pára.',
   'hudChrome.wocStore.skins.winterbite.lore':
     'Luk z postříbřené oceli a thornpeakského ledu, jehož střed osvětluje studené azurové jádro, které přimrazí šíp k tětivě. S každým natažením se znovu vytvoří šíp z pevného ledovcového ledu. Lučištník na zdi nenosí toulec, jen chlad. Highwatch s podobným lukem udržel Stopařův hřeben během obléhání. Jediný lučištník, říká se, a zásoba šípů na celou zimu, které byly vždy připravené.',
-  'hudChrome.wocStore.skins.winterbite.name': 'Zimní skus',
   'hudChrome.wocStore.storeTab': 'Obchod',
   'hudChrome.wocStore.tabsLabel': 'Sekce obchodu WOC',
   'hudChrome.wocStore.title': 'Obchod WOC',
@@ -11407,8 +11225,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blazing_barrier.description':
     'Obklopíš se plameny a pohltíš {damage} bodů poškození po dobu 60 s. (Oheň)',
   'entities.abilities.cold_snap.name': 'Volání zimy',
-  'entities.abilities.cold_snap.description':
-    'Okamžitě dokončí dobu obnovení Mžikového kroku, Mrazivého závoje a Dokonalé neviditelnosti. (mágovský talent)',
   'entities.abilities.greater_invisibility.name': 'Dokonalá neviditelnost',
   'entities.abilities.hot_streak.name': 'Žhavá série',
   'entities.abilities.hot_streak.description':
@@ -11459,7 +11275,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.emberwing_drake.name': 'Žhavokřídlý drak',
   'entities.mobs.fen_sprite.name': 'Bažinná víla',
   'entities.mobs.fisher_bram.name': 'Rybář Bram',
-  'entities.mobs.frostmane_yeti.name': 'Yeti s mrazivou hřívou',
   'entities.mobs.gale_wisp.name': 'Vichrná bludička',
   'entities.mobs.gilded_stag.name': 'Pozlacený jelen',
   'entities.mobs.gleamstag.name': 'Zářivý jelen',
@@ -11468,7 +11283,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gloam_strider.name': 'Soumrakový chodec',
   'entities.mobs.gravedigger_mosley.name': 'Hrobník Mosley',
   'entities.mobs.gravenbark_shambler.name': 'Rytokorý vlekoun',
-  'entities.mobs.harvest_sprite.name': 'Sklizňová víla',
   'entities.mobs.hedge_gnome.name': 'Živoplotový gnóm',
   'entities.mobs.hedge_knight.name': 'Rytíř Hradu Úsvitu',
   'entities.mobs.ice_wisp.name': 'Ledová bludička',
@@ -11478,7 +11292,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.moonfleece_grazer.name': 'Spasovač měsíčního rouna',
   'entities.mobs.moor_ram.name': 'Vřesovištní beran',
   'entities.mobs.mushroom_pixie.name': 'Skřítek Zářilidu',
-  'entities.mobs.nightkin_stargazer.name': 'Hvězdopozorovatel Nočního rodu',
   'entities.mobs.old_marrowshell.name': 'Starý Morkoškeble',
   'entities.mobs.orchard_treant.name': 'Sadový stromový obr',
   'entities.mobs.pale_huntsman.name': 'Bledý lovec',
@@ -11691,7 +11504,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.battleTrance':
     'Tvůj příští Nájezdnický úder nebo Mrzačící úder nestojí žádný vztek',
   'hudChrome.auraEffect.revengeFree': 'Tvá příští Odveta nestojí žádný vztek',
-  'hudChrome.auraEffect.victoryRush': 'Vítězný nápor je připraven',
   'hudChrome.auraEffect.maxHpPct': 'Zvyšuje maximální zdraví o {pct} %',
   'hudChrome.statInfo.names.parry': 'Odražení',
   'hudChrome.statInfo.desc.parry':
@@ -11807,7 +11619,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.farshore_salt_moss.name': 'Slaný mech Vzdáleného pobřeží',
   'entities.items.fenway_mooring_line.name': 'Přeříznuté kotevní lano',
   'entities.items.fountain_court_mantle.name': 'Plášť Fontánového nádvoří',
-  'entities.items.frostmane_mantle.name': 'Plášť Mrazivé hřívy',
   'entities.items.galecrest_ram_wool.name': 'Mastná beraní vlna',
   'entities.items.gallowmere_grave_candle.name': 'Hrobová svíce',
   'entities.items.gilded_sap_clot.name': 'Pozlacená hrudka mízy',
@@ -12099,7 +11910,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.hearthkeeper_maeve.title': 'Strážkyně Ohnišťové chaty',
   'entities.npcs.hermit_okku.greeting':
     'Teď tiše. Bubny počítají všechno, co chodí pod stromy, a už spočítaly i tebe.',
-  'entities.npcs.hermit_okku.name': 'Okku',
+  'entities.npcs.hermit_okku.name': 'Okrim',
   'entities.npcs.hermit_okku.title': 'Muž, který vešel dovnitř',
   'entities.npcs.huntsman_deral.greeting':
     'Teď tiše. Stádo zná každý zvuk, který toto údolí vydává, a já také.',
@@ -12152,7 +11963,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.provisioner_fenna.greeting':
     'Chléb ještě teplý, voda ještě sladká. Kotlina poskytuje, a já také.',
   'entities.npcs.provisioner_fenna.name': 'Zásobovatelka Fenna',
-  'entities.npcs.provisioner_fenna.title': 'Zásobovatelka Prastarého svitu',
   'entities.npcs.quartermaster_edda.greeting':
     'Ocel a sůl, {className}, to je vše, co mi zbývá rozdávat. Vezmi si to a přiměj průlomy litovat, že se otevřely tam, kam jsem dosáhla.',
   'entities.npcs.quartermaster_edda.name': 'Intendantka Edda',
@@ -12188,7 +11998,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.sexton_marrow.greeting':
     'Pohřbíváme je tu hluboko a zvoníme na zvony, aby si pamatovali zůstat dole.',
   'entities.npcs.sexton_marrow.name': 'Kostelník Marrow',
-  'entities.npcs.sexton_marrow.title': 'Kostelník Šibeničního jezera',
   'entities.npcs.strandwatcher_pell.greeting':
     'Konečně venku z černých stromů. Dýchej, cizinče, slunce drží tuto stranu průsmyku.',
   'entities.npcs.strandwatcher_pell.name': 'Strážce pobřeží Pell',
@@ -12236,7 +12045,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.widow_tansy.greeting':
     'Svíce pro každý hrob, a ani jedna nesmí zhasnout. Ani jedna, slyšíš mě?',
   'entities.npcs.widow_tansy.name': 'Vdova Tansy',
-  'entities.npcs.widow_tansy.title': 'Svícařka Šibeničního jezera',
   'gatherEvent.ancientHeartwood': '{finder} pokácel prastaré jádrové dřevo!',
   'gatherEvent.moonlitBloom': '{finder} objevil měsíční květ!',
   'gatherEvent.pristineVein': '{finder} narazil na nedotčenou rudnou žílu!',
@@ -12322,49 +12130,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Dosáhněte dovednosti {target} v jakémkoli řemesle a odemkněte svou první úroveň.',
   'hudChrome.professions.unattunedIdentity':
     'Ještě nejste naladěni na archetyp. Zvyšte své řemeslo a dokončete naladění, abyste si vybrali svůj pár.',
-  'hudChrome.enchantName.enchant_chest_armor': 'Okouzlení hrudi - Posílení',
-  'hudChrome.enchantName.enchant_chest_greater_stamina': 'Okouzlení hrudi - Vynikající výdrž',
-  'hudChrome.enchantName.enchant_chest_runeweave': 'Okouzlení hrudi - Runová tkanina',
-  'hudChrome.enchantName.enchant_chest_spirit': 'Okouzlení hrudi - Duch',
-  'hudChrome.enchantName.enchant_chest_stamina': 'Okouzlení hrudi - Výdrž',
-  'hudChrome.enchantName.enchant_feet_agility': 'Okouzlení bot - Obratnost',
-  'hudChrome.enchantName.enchant_feet_stamina': 'Okouzlení bot - Výdrž',
-  'hudChrome.enchantName.enchant_feet_strength': 'Okouzlení bot - Síla',
-  'hudChrome.enchantName.enchant_gloves_agility': 'Okouzlení rukavic - Obratnost',
-  'hudChrome.enchantName.enchant_gloves_greater_agility':
-    'Okouzlení rukavic - Vynikající obratnost',
-  'hudChrome.enchantName.enchant_gloves_intellect': 'Okouzlení rukavic - Síla kouzel',
-  'hudChrome.enchantName.enchant_gloves_strength': 'Okouzlení rukavic - Síla',
-  'hudChrome.enchantName.enchant_helmet_armor': 'Okouzlení helmy - Posílení',
-  'hudChrome.enchantName.enchant_helmet_fortitude': 'Okouzlení helmy - Pevnost',
-  'hudChrome.enchantName.enchant_helmet_greater_fortitude': 'Okouzlení helmy - Vynikající pevnost',
-  'hudChrome.enchantName.enchant_helmet_intellect': 'Okouzlení helmy - Intelekt',
-  'hudChrome.enchantName.enchant_helmet_runed_links': 'Okouzlení helmy - Runové kroužky',
-  'hudChrome.enchantName.enchant_legs_greater_stamina': 'Okouzlení nohavic - Vynikající výdrž',
-  'hudChrome.enchantName.enchant_legs_intellect': 'Okouzlení nohavic - Intelekt',
-  'hudChrome.enchantName.enchant_legs_runed_hide': 'Okouzlení nohavic - Runová kůže',
-  'hudChrome.enchantName.enchant_legs_stamina': 'Okouzlení nohavic - Výdrž',
-  'hudChrome.enchantName.enchant_neck_agility': 'Okouzlení náhrdelníku - Obratnost',
-  'hudChrome.enchantName.enchant_neck_intellect': 'Okouzlení náhrdelníku - Intelekt',
-  'hudChrome.enchantName.enchant_neck_spirit': 'Okouzlení náhrdelníku - Duch',
-  'hudChrome.enchantName.enchant_offhand_stamina': 'Okouzlení vedlejší ruky - Výdrž',
-  'hudChrome.enchantName.enchant_ring_agility': 'Okouzlení prstenu - Obratnost',
-  'hudChrome.enchantName.enchant_ring_intellect': 'Okouzlení prstenu - Intelekt',
-  'hudChrome.enchantName.enchant_ring_spirit': 'Okouzlení prstenu - Duch',
-  'hudChrome.enchantName.enchant_ring_strength': 'Okouzlení prstenu - Síla',
-  'hudChrome.enchantName.enchant_shoulder_agility': 'Okouzlení nárameníků - Obratnost',
-  'hudChrome.enchantName.enchant_shoulder_intellect': 'Okouzlení nárameníků - Intelekt',
-  'hudChrome.enchantName.enchant_shoulder_strength': 'Okouzlení nárameníků - Síla',
-  'hudChrome.enchantName.enchant_waist_agility': 'Okouzlení opasku - Obratnost',
-  'hudChrome.enchantName.enchant_waist_stamina': 'Okouzlení opasku - Výdrž',
-  'hudChrome.enchantName.enchant_waist_strength': 'Okouzlení opasku - Síla',
-  'hudChrome.enchantName.enchant_weapon_agility': 'Okouzlení zbraně - Obratnost',
-  'hudChrome.enchantName.enchant_weapon_greater_might': 'Okouzlení zbraně - Vynikající moc',
-  'hudChrome.enchantName.enchant_weapon_greater_spellpower':
-    'Okouzlení zbraně - Vynikající síla kouzel',
-  'hudChrome.enchantName.enchant_weapon_intellect': 'Okouzlení zbraně - Síla kouzel',
-  'hudChrome.enchantName.enchant_weapon_might': 'Okouzlení zbraně - Moc',
-  'hudChrome.enchantName.enchant_weapon_runed_edge': 'Okouzlení zbraně - Runové ostří',
   'hudChrome.enchanting.disenchantConfirmBody':
     'Tímto se {item} zničí a získáš arcanové materiály. Tuto akci nelze vrátit.',
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
@@ -12528,10 +12293,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.marketIndicator.aria': 'Čekají výnosy nebo předměty ze Světového trhu',
   'hudChrome.marketIndicator.tip':
     'U Obchodníka na tebe čekají výnosy z prodeje nebo vrácené předměty.',
-  'hudChrome.materialHint.arcaneDust':
-    'Reagencie k okouzlení. Získává se rozzačarováním běžné a neobvyklé výbavy.',
-  'hudChrome.materialHint.arcaneEssence':
-    'Reagencie k okouzlení. Získává se rozzačarováním vzácné výbavy.',
   'hudChrome.materialHint.arcaneShard':
     'Reagencie k okouzlení. Získává se rozzačarováním epické a legendární výbavy.',
   'hudChrome.materialHint.resonantHide':
@@ -13255,7 +13016,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.evil_eye': 'Pojmenuje nepřítele, jehož činy a utrpení krmí tvé Odsouzení.',
   'hud.pet.abyssalChain': 'Propastný řetěz',
   'hud.pet.abyssalChainDesc':
-    'Přikaž Gloomshade přitáhnout běžného nepřítele od 8 do 20 yardů zpět k sobě. Bossy nelze přitáhnout. Čas obnovy 15 sekund. Klikni pravým tlačítkem, podrž dotykem nebo stiskni Shift+Enter pro přepnutí automatického seslání.',
+    'Přikaž Duskmurk přitáhnout běžného nepřítele od 8 do 20 yardů zpět k sobě. Bossy nelze přitáhnout. Čas obnovy 15 sekund. Klikni pravým tlačítkem, podrž dotykem nebo stiskni Shift+Enter pro přepnutí automatického seslání.',
   'hud.pet.abyssalChainTitle': 'Propastný řetěz',
   'hud.pet.autocastOff':
     'Automatické seslání vypnuto. Klikni pravým tlačítkem, podrž dotykem nebo stiskni Shift+Enter pro zapnutí.',
@@ -13629,6 +13390,22 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.challenging_roar.name': 'Zlověstný řev',
   'entities.abilities.cheap_shot.descriptionNoStealth': 'Zasáhni cíl za {damage} poškození a omrač ho na 4 s. Udělí 2 combo body.',
   'gpuNotice.bodyDiscreteInactive': 'Hra nepoužívá samostatnou (herní) grafickou kartu a místo toho běží na úsporné grafické kartě, takže výkon utrpí. Aktualizuj ovladače grafiky a restartuj hru. Ve Windows navíc nastav hru na Vysoký výkon v Nastavení, Systém, Displej, Grafika.',
+  'guide.profPages.faq.q3': 'Jaký je rozdíl mezi sběrem kořisti a sklizením z těla?',
+  'guide.profPages.faq.q4': 'Proč je moje Železná kůra podepsaná?',
+  'guide.profPages.faq.q5': 'Jak zruším vazbu zakázkového kusu a co to stojí?',
+  'guide.profPages.faq.q6': 'Kde se učím recepty a co stojí?',
+  'guide.profPages.faq.q7': 'Proč mi sběr najednou zpomalil?',
+  'guide.profPages.faq.q8': 'Mohu vyrábět mimo město?',
+  'guide.profPages.faq.a3':
+    'Jedno stisknutí pokryje obojí. Vše, co tělo drží, mince a kořist plus jakékoli skliditelné součásti, se otevírá ve stejném okně: sběr kořisti se řídí normálními pravidly a sklizení je stranou profese, která strhuje materiály ze samotné mrtvoly.\n\nSklizení je první přijde první bere, pro jednoho hráče: každé tělo lze sklidit přesně jednou, tím, kdo si ho nárokuje jako první, online nevyjímaje. Tvoje Střediště zaměření určuje, co dostaneš: zatímco stojíš v uzlovém centru města, můžeš rozložit 10 bodů zaměření na typy složek, o které stojíš, a každá zaměřená složka hází za lepší stupeň (každých 5 bodů ji posune o krok výše, nejvýše o dva) a dává víc (10 procent za bod). Nezaměřené složky se nikdy nezhorší.',
+  'guide.profPages.faq.a4':
+    'Narazil jsi na nečekaný nález. Zhruba 1 sklizeň z 90 spustí vzácný sběratelský nález (prastaré jádrové dřevo na stromě, nedotčená žíla v rudě, měsíční květ mezi bylinami): pětinásobí výnos, podepíše každou jednotku tvým jménem a ohlásí nález celé zóně. Podpis přinese i vzácný nebo lepší hod na kvalitu při obyčejné sklizni.\n\nPodepsané materiály stojí za to si nechat nebo draze prodat: držení jakékoli podepsané kopie potřebné suroviny u pracovního stolu přidá 2 procentní body k šanci na mistrovské dílo. Jen pamatuj, že se skládají pouze se shodně podepsanými kopiemi, takže si drží vlastní místo v brašně.',
+  'guide.profPages.faq.a5':
+    'Jdi k jakékoli výrobní stanici s kusem v brašnách a zaplať mistrovi. Poplatek se řídí kvalitou předmětu: 25 stříbrných za neobvyklý kus, 1 zlatý za vzácný, 4 zlaté za epický; legendární platí epickou sazbu a zakázkový běžný kus sazbu neobvyklého. Musí to být skutečná stanice: mobilní stanice tuto službu nikdy nenabízí.\n\nPoplatek kupuje čistý začátek, ne trvalé vyléčení: kus zůstává zakázkový, takže se při příští výměně znovu naváže na toho, kdo ho obdrží. Pokud několik vázaných kopií sdílí stack, jedna kopie se odloupne a pouto se zruší za jeden poplatek.',
+  'guide.profPages.faq.a8':
+    'Zčásti. Devět běžných polních receptů (základní zbraň, zbroj, jídlo a lektvary) se vyrábí kdekoli a kdykoli a totéž platí pro tři kombinované recepty přísežných párů. Vše ostatní nad nimi je vázáno na typ stanice: kovárnu, kuchyně, lékárnu, koželužnu, tkalcovský stav nebo nástrojárnu, a abys výrobu dotáhl do konce, musíš být do 20 yardů od stanice.\n\nNa dovednosti 75 v řemesle se specializuješ a spolu se slevou 20 procent na materiál získáš mobilní stanici: postav ji v terénu a stojí 10 minut, obsluhuje recepty daného řemesla, jako bys stál u té pravé. Mobilní stanice slouží jen k výrobě: učení receptů a rušení pouta u zakázek vždy vyžaduje skutečnou stanici ve městě.',
+  'guide.profPages.craftProse.cooking.materialsBody':
+    'Charakteristické suroviny dodává Rybaření, zónu po zóně: zrcadlový pstruh a říční okoun z vod Eastbrookského údolí, bažinná štika a bažinný úhoř z Mirefenského močálu, pstruh mrazivých žaber a kapr břidlicových ploutví z Thornpeakských výšin. Stupně míchají zóny volně (stupeň zdarma už chce bažinnou štiku, střední stupeň thornpeakského pstruha mrazivých žaber a vzácná večeře zase vrací do hry zrcadlového pstruha z údolí), takže kuchaři, který loví ryby všude, kudy vede cesta, nikdy nedojdou zásoby.\n\nŘeznická strana pochází ze sklizených těl: zvěřina z kanců a jejich příbuzných a při hodu na vzácnou nebo lepší sklizeň podepsaný Prvotřídní kus, středobod slavnostní pečeně. Byliny ochucují lepší pokrmy, jedna jasanová kláda vyudí úhoře a Sůl na vaření běží po 8 mědivácích za sáček z Marlowova vlastního stánku.',
   // v0.40 release i18n fill.
   "abilityUi.tooltip.anyTarget": "Nepřítel nebo přátelský cíl",
   "hudChrome.account.passwordSet": "Heslo nastaveno. Nyní se můžete přihlásit pomocí svého uživatelského jména a hesla kdekoli.",

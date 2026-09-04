@@ -23,6 +23,7 @@ import {
   type LetterDef,
   QUEST_LETTERS,
   WELCOME_LETTER,
+  WYRMFALL_CORE_LETTER,
 } from '../content/letters';
 import { ITEMS } from '../data';
 import { boundCraftedRecipeIdOnLoad, warnDroppedInstanceKeys } from '../item_instance_load';
@@ -36,6 +37,7 @@ import {
   sanitizeEscrowSlot,
 } from '../item_instance_transfer';
 import { removeVendorSellUnits } from '../items';
+import { WYRMFALL_CORE_ITEM_ID } from '../professions/masterwrought_materials';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import {
@@ -834,6 +836,20 @@ export class PostOffice {
       this.mailKeyFor(meta),
       meta.name,
       { ...HEROIC_MARK_LETTER, items: [{ itemId, count }] },
+      'system',
+    );
+  }
+
+  // Wyrmfall Core reward hook (awardWyrmfallCores): posts a participant's cores
+  // when they entered the run but were absent at the corpse when the kill paid
+  // out. Same absence-not-capacity contract as mailHeroicMarks above.
+  mailWyrmfallCores(pid: number, count: number): void {
+    const meta = this.ctx.players.get(pid);
+    if (!meta || count <= 0) return;
+    this.sendLetter(
+      this.mailKeyFor(meta),
+      meta.name,
+      { ...WYRMFALL_CORE_LETTER, items: [{ itemId: WYRMFALL_CORE_ITEM_ID, count }] },
       'system',
     );
   }

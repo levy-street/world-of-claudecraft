@@ -48,10 +48,12 @@ export interface SortableStack {
 
 // The clean-up ladder. Gear leads (weapons, then armor by paperdoll slot,
 // then held offhands and unequipped bags), consumables next (potions before
-// elixirs before food and drink), then tools and mount reins, then the junk
-// kind (every material lives there; gray vendor trash is hoisted out below),
-// then quest items where they are easy to find, and poor-quality trash dead
-// last so the sell-all-junk sweep reads straight off the bag's tail.
+// the buff family, which runs elixirs, then the flasks that replace them, then
+// scrolls, then food and drink), then tools, mount reins, and unlearned
+// recipe patterns, then the junk kind (every material lives there; gray
+// vendor trash is hoisted out below), then quest items where they are easy
+// to find, and poor-quality trash dead last so the sell-all-junk sweep reads
+// straight off the bag's tail.
 // Record<ItemKind, number> deliberately: a new kind fails to compile until it
 // is given a rank here, instead of silently sorting after gray trash.
 const KIND_RANK: Record<ItemKind, number> = {
@@ -61,22 +63,25 @@ const KIND_RANK: Record<ItemKind, number> = {
   bag: 3,
   potion: 4,
   elixir: 5,
-  food: 6,
-  drink: 7,
-  tool: 8,
-  mount: 9,
-  junk: 10,
-  quest: 11,
+  flask: 6,
+  scroll: 7,
+  food: 8,
+  drink: 9,
+  tool: 10,
+  mount: 11,
+  recipe: 12,
+  junk: 13,
+  quest: 14,
 };
-const TRASH_RANK = 12; // any poor-quality item, regardless of kind
+const TRASH_RANK = 15; // any poor-quality item, regardless of kind
 // The two defensive tails are DISTINCT ranks on purpose (comparator
 // transitivity): a missing-def stack compares by raw id while a known def
 // compares by the name/quality chain, and if the two populations could tie on
 // category the mixed bucket would order inconsistently (an intransitive
 // comparator makes Array.prototype.sort implementation-defined, a cross-host
 // hazard). Distinct ranks mean the buckets never meet in a tie.
-const UNRANKED_KIND_RANK = 13; // a known def whose kind escaped KIND_RANK (unreachable while the Record is total)
-const MISSING_DEF_RANK = 14; // a def the lookup cannot resolve (defensive; the sim's table is complete)
+const UNRANKED_KIND_RANK = 16; // a known def whose kind escaped KIND_RANK (unreachable while the Record is total)
+const MISSING_DEF_RANK = 17; // a def the lookup cannot resolve (defensive; the sim's table is complete)
 
 // Lower rank sorts first, so the grid reads legendary down to poor. Mirrors
 // the UI's bag_filter.ts ranks. Record<Quality, number> for the same reason

@@ -44,17 +44,27 @@ function teleport(sim: Sim, pid: number, x: number, z: number) {
 }
 
 // Queue six solos for yumi3 and run the countdown out so the bout is live.
-function startYumi3(seed = 42) {
+// `beforeQueue` runs with the six standing in the overworld, BEFORE anyone
+// queues, for arms about what a fighter carries INTO the match. queueYumi3
+// stops right after the matchmake tick (the match SEATED, in its countdown);
+// startYumi3 runs it on to active.
+function queueYumi3(seed = 42, beforeQueue?: (sim: Sim, pids: number[]) => void) {
   const sim = makeWorld(seed);
   const classes = ['warrior', 'mage', 'rogue', 'priest', 'hunter', 'druid'] as const;
   const pids = classes.map((c, i) => sim.addPlayer(c, `P${i}`));
   pids.forEach((p, i) => {
     teleport(sim, p, i * 4, -40);
   });
+  beforeQueue?.(sim, pids);
   pids.forEach((p) => {
     sim.arenaQueueJoin(p, 'yumi3');
   });
   sim.tick(); // matchmake
+  return { sim, pids };
+}
+
+function startYumi3(seed = 42, beforeQueue?: (sim: Sim, pids: number[]) => void) {
+  const { sim, pids } = queueYumi3(seed, beforeQueue);
   for (let i = 0; i < 20 * 8; i++) {
     const m = sim.arenaMatchFor(pids[0]);
     if (m && m.state === 'active') break;
@@ -392,6 +402,83 @@ describe('yumi: respawn', () => {
     const { catB } = cats(sim, match);
     const d = Math.hypot(b0.pos.x - catB.pos.x, b0.pos.z - catB.pos.z);
     expect(d).toBeLessThan(10);
+  });
+});
+
+// Masterwrought phase 10 QA: the flask accounting for Protect Yumi, pinned
+// BEHAVIORALLY (the caller scan in tests/resurrection.test.ts is the proxy). The
+// match seat runs ctx.resetForArena (the clean slate through its wrapper), so a
+// flask carried IN is gone before the whistle; a down runs fiestaDownEntity
+// (the direct clean slate) and the revive re-seats with clearPrep: true, so a
+// flask quaffed inside is gone at the first down and does not come back with
+// the fighter. Both are the arena-family parenthesis, not the battleground
+// death rule (which is Thornhollow Fields only).
+describe('yumi: flask auras (the phase 10 accounting)', () => {
+  const FLASK = 'ironhusk_flask';
+  const flaskAuras = (sim: Sim, pid: number) =>
+    sim.entities.get(pid)!.auras.filter((a) => a.flask === true);
+
+  it('a flask carried in from the overworld is wiped at the match seat (ctx.resetForArena)', () => {
+    let carrier = -1;
+    const { sim } = queueYumi3(42, (s, ps) => {
+      carrier = ps[0];
+      s.addItem(FLASK, 1, carrier);
+      s.useItem(FLASK, carrier);
+      expect(flaskAuras(s, carrier), 'worn in the overworld, before the queue').toHaveLength(1);
+    });
+    // Observed at the SEAT (the countdown has not run out), so the only wipe
+    // between the overworld and here is the match seat itself.
+    const match = sim.arenaMatchFor(carrier)!;
+    expect(match.state).toBe('countdown');
+    expect([...match.teamA, ...match.teamB]).toContain(carrier);
+    expect(flaskAuras(sim, carrier), 'the seat ran the clean slate').toHaveLength(0);
+  });
+
+  it('a flask quaffed inside is wiped by a down (fiestaDownEntity), and the revive wipes on its own', () => {
+    const { sim, match } = startYumi3();
+    const a0 = sim.entities.get(match.teamA[0])!;
+    const b0 = sim.entities.get(match.teamB[0])!;
+    sim.addItem(FLASK, 1, b0.id);
+    sim.useItem(FLASK, b0.id);
+    expect(flaskAuras(sim, b0.id), 'worn inside the live match').toHaveLength(1);
+    const worn = { ...flaskAuras(sim, b0.id)[0] };
+    (sim as any).dealDamage(a0, b0, 999999, false, 'physical', null, 'hit');
+    expect(b0.dead).toBe(true);
+    expect(flaskAuras(sim, b0.id), 'the down ran the clean slate').toHaveLength(0);
+    // The revive's OWN wipe, decisively: re-plant the flask on the benched body
+    // (a dead entity's auras do not tick, so it is still there at the revive);
+    // a revive that kept auras (clearPrep: false) would raise the fighter with it.
+    b0.auras.push(worn);
+    expect(flaskAuras(sim, b0.id), 'planted on the bench').toHaveLength(1);
+    for (let i = 0; i < 20 * (YUMI_RESPAWN_SECONDS + 1); i++) sim.tick();
+    expect(b0.dead, 'the bench revived the fighter').toBe(false);
+    expect(flaskAuras(sim, b0.id), 'the revive re-seats on a clean slate too').toHaveLength(0);
+  });
+
+  it('a fighter benched at the whistle is wiped by the match END (the endArenaMatch branch Yumi takes)', () => {
+    // A ranked loser sits in match.defeated and endArenaMatch skips it (the
+    // send-home wipes it later); a Yumi down never enters match.defeated, so a
+    // benched body takes the OTHER branch and is reset AT the end. Pinned
+    // here because tests/arena.test.ts can only reach the defeated branch.
+    const { sim, match } = startYumi3();
+    const a0 = sim.entities.get(match.teamA[0])!;
+    const b0 = sim.entities.get(match.teamB[0])!;
+    sim.addItem(FLASK, 1, b0.id);
+    sim.useItem(FLASK, b0.id);
+    const worn = { ...flaskAuras(sim, b0.id)[0] };
+    (sim as any).dealDamage(a0, b0, 999999, false, 'physical', null, 'hit');
+    expect(b0.dead).toBe(true);
+    expect(match.defeated.has(b0.id), 'a Yumi down is a bench, never a defeat').toBe(false);
+    b0.auras.push(worn);
+    expect(flaskAuras(sim, b0.id), 'planted on the bench').toHaveLength(1);
+    // Aleph's side kills the other cat: the match ends while b0 is still benched.
+    const { catB } = cats(sim, match);
+    (sim as any).dealDamage(a0, catB, 999999, false, 'physical', null, 'hit');
+    expect(match.state).toBe('over');
+    expect(b0.dead, 'the end reset raised the benched body').toBe(false);
+    expect(flaskAuras(sim, b0.id), 'the match end ran the clean slate on the bench').toHaveLength(
+      0,
+    );
   });
 });
 

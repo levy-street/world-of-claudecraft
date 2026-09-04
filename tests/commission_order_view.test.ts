@@ -5,7 +5,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
-import { buildCommissionOrderBoardModel } from '../src/ui/commission_order_view';
+import { buildCommissionOrderBoardModel } from '../src/ui/hud/professions/commission_order_view';
 import type { CommissionOrderView } from '../src/world_api/professions';
 
 const SWORD_RECIPE = 'recipe_eastbrook_arming_sword';
@@ -100,6 +100,33 @@ describe('buildCommissionOrderBoardModel', () => {
     expect(model.openableRecipes).toEqual([
       { recipeId: SWORD_RECIPE, itemId: SWORD, item: ITEMS[SWORD] },
     ]);
+  });
+
+  it('resolves crafterRecord only on accepted/delivered rows whose wire carried BOTH halves', () => {
+    // The phase 14 rendering gate, per dimension: status AND field presence
+    // both bind, and half a snapshot never invents a zero for the other half.
+    const model = buildCommissionOrderBoardModel(
+      [
+        order({ id: 1, status: 'accepted', crafterMasterworks: 12, crafterLegendaries: 3 }),
+        order({ id: 2, status: 'delivered', crafterMasterworks: 0, crafterLegendaries: 0 }),
+        // Open with (bogus) record fields: status gates it off.
+        order({ id: 3, status: 'open', crafterMasterworks: 5, crafterLegendaries: 5 }),
+        // Accepted from a pre-signal server: no fields, no record.
+        order({ id: 4, status: 'accepted' }),
+        // Half a snapshot: treated as none.
+        order({ id: 5, status: 'accepted', crafterMasterworks: 5 }),
+        // Never-accepted terminal rows carry nothing to show.
+        order({ id: 6, status: 'cancelled' }),
+      ],
+      [],
+      ITEMS,
+    );
+    const byId = new Map(model.board.map((r) => [r.id, r]));
+    expect(byId.get(1)?.crafterRecord).toEqual({ masterworks: 12, legendaries: 3 });
+    expect(byId.get(2)?.crafterRecord).toEqual({ masterworks: 0, legendaries: 0 });
+    for (const id of [3, 4, 5, 6]) {
+      expect(byId.get(id)?.crafterRecord, `row ${id}`).toBeUndefined();
+    }
   });
 
   it('an unresolved item id (stale content) still rows without throwing', () => {

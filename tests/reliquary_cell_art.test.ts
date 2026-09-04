@@ -46,6 +46,7 @@ import {
   weaponIconUrl,
 } from '../src/ui/icons';
 import {
+  RELIQUARY_GOLDEN_HARVEST_IMAGE_URL,
   RELIQUARY_PERFECT_SPECIMEN_IMAGE_URL,
   RELIQUARY_SLAIN_GLYPH_ID,
   RELIQUARY_SLAIN_GLYPH_URL,
@@ -237,6 +238,12 @@ describe('profession mark relics resolve the profession sheet', () => {
     expect(reliquaryCellArt({ kind: 'mark', id: 'gather_event:moonlit_bloom' })).toEqual({
       kind: 'url',
       url: '/ui/professions/gather_herbalism.webp',
+    });
+    expect(FIELD_NOTE_PROFESSIONS['gather_event:golden_harvest']).toBe('farming');
+    expect(reliquaryCellArt({ kind: 'mark', id: 'gather_event:golden_harvest' })).toEqual({
+      kind: 'url',
+      url: '/ui/professions/gather_farming.webp',
+      fallbackUrl: RELIQUARY_GOLDEN_HARVEST_IMAGE_URL,
     });
   });
 });
@@ -498,16 +505,19 @@ describe('unknown ids fall through to the caller fallback', () => {
   });
 
   it('every catalogued item relic is dark-card committed art or an enumerated art-pending opaque', () => {
-    // The item arm of reliquaryCellArtOpaque answers from the two committed
-    // pipelines: a /ui/items webp (non-weapons, alpha-less but dark-card) or
-    // a /ui/weapons rendered-model jpg (weapons via ITEM_WEAPON_VARIANTS,
-    // measured dark: mean luma ~25/255) stays on the silhouette-darken
-    // filter, while an item with NEITHER paints the procedural compositor's
-    // opaque radial tile and must take the crest-style opaque answer. The iff
-    // is swept both ways here, and every procedural relic must additionally
-    // be an ITEM_ART_PENDING member (the enumerated icon debt of the
-    // dev-gated Crucible raid), so an unenumerated procedural relic still
-    // reds rather than landing silently on either filter.
+    // Nearly every item the catalog can show ships one of two committed
+    // dark-card pipelines: a /ui/items webp (non-weapons, alpha-less but
+    // dark-card) or a /ui/weapons rendered-model jpg (weapons via
+    // ITEM_WEAPON_VARIANTS, measured dark: mean luma ~25/255), both of which
+    // stay legible under the silhouette darken. A catalogued item that falls
+    // through to the procedural compositor instead paints an OPAQUE radial
+    // tile, which must not be darkened as though it were a cutout.
+    //
+    // Check both directions: reliquaryCellArtOpaque must agree with the live
+    // pipeline, and any procedural relic must be explicitly enumerated in
+    // ITEM_ART_PENDING. The completed Masterwrought wave leaves that list
+    // empty today, while the guard still catches a future unpainted catalog
+    // item by name.
     const procedural: string[] = [];
     let itemsWebp = 0;
     let weaponsJpg = 0;
@@ -515,6 +525,8 @@ describe('unknown ids fall through to the caller fallback', () => {
       const art = reliquaryCellArt(slot);
       if (art === null || art.kind !== 'item') continue;
       const committed = itemImageUrl(art.itemId) !== null || weaponIconUrl(art.itemId) !== null;
+      // The pipeline and the predicate must never disagree: a committed
+      // painting is darkened, a parked one is not.
       expect(reliquaryCellArtOpaque(art), art.itemId).toBe(!committed);
       if (itemImageUrl(art.itemId) !== null) itemsWebp += 1;
       else if (weaponIconUrl(art.itemId) !== null) weaponsJpg += 1;
@@ -528,16 +540,21 @@ describe('unknown ids fall through to the caller fallback', () => {
     expect(weaponsJpg, 'anti-vacuity: the weapons-jpg pipeline really contributed').toBeGreaterThan(
       10,
     );
+    // Every procedural relic must be an enumerated ITEM_ART_PENDING member; an
+    // unenumerated one reds here by name.
     for (const itemId of procedural) {
       expect(
         ITEM_ART_PENDING.has(itemId),
         `${itemId} has only procedural art and is not an enumerated ITEM_ART_PENDING member`,
       ).toBe(true);
     }
-    // Snug ceiling: the pending set can only SHRINK as the Crucible icon wave
-    // lands (32 catalogued art-pending relics today); growth is a deliberate
-    // catalog decision that re-raises this literal.
-    expect(procedural.length).toBeLessThanOrEqual(32);
+    // The completion wave leaves no catalogued relic on procedural art. Any
+    // future growth is a deliberate exact-set edit here and in the debt ledger.
+    expect(
+      procedural,
+      `catalogued item relics with only procedural art (park them here deliberately):\n${procedural.join('\n')}`,
+    ).toEqual([]);
+    expect(procedural).toHaveLength(0);
   });
 
   it('preserves the item passthrough for a real item id (behavior unchanged)', () => {
@@ -733,8 +750,10 @@ describe('ReliquaryWindow cell markup', () => {
       .filter((line) => !/^\s*(\/\/|\/\*|\*)/.test(line))
       .map((line) => line.replace(/\s\/\/.*$/, ''))
       .join('\n');
+    // The dep widened at the phase 13 QA (the copy's effective quality rides
+    // to the rim); the delegation to knownItemIconHtml is the pinned half.
     expect(hud).toMatch(
-      /private itemIcon\(item: ItemDef\): string \{\s*return knownItemIconHtml\(item\);/,
+      /private itemIcon\(item: ItemDef, quality\?: ItemDef\['quality'\]\): string \{\s*return knownItemIconHtml\(item, quality\);/,
     );
   });
 
