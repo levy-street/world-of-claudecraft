@@ -735,9 +735,11 @@ export const guideStrings = {
     // Phase 20 wiki completeness audit (2026-09-03): the successor of mapBody, retired in
     // scripts/i18n_retired_keys.mjs. The prose said M opens on the continent, that the map shows
     // only nodes you have found, that only a delve switches the map, and it omitted five marker
-    // layers and the Reliquary tracker; the successor opens on the zone, names every layer and the
-    // continent level behind a right-click or the World map button, lists all five map surfaces,
-    // and adds the Reliquary tracker.
+    // layers and the Reliquary tracker; the successor opens on the zone, names every layer a
+    // player navigates by and the continent level behind a right-click or the World map button,
+    // lists all five map surfaces, and adds the Reliquary tracker. Three drawn layers stay
+    // deliberately unnamed (the castle curtain plans, the route badges, and the friend and
+    // guildmate markers); the pin in tests/guide.test.ts spells each one out as unnamed.
     mapBodyZoneFirst:
       "M opens the world map on the zone you are standing in, with your own arrow on it, the points of interest around you, the quest givers with their marks and the areas your objectives sit in, the crafting stations, mailboxes, noticeboards and garden beds, the dungeon entrances, and every gathering node in the zone, grayed out while it regrows and marked when your tools are not up to it. Your party shows on it too. Right-click the map, or press its World map button, and it pulls back to the continent, every zone drawn with its name, where a click on a zone opens that zone's map. Step into a delve, a dungeon, a rift or a castle keep and the map switches to a floor plan of where you stand; the Thornhollow Fields battleground gets a field map of its own.\n\nDown the right side, under the minimap, a stack of trackers keeps your current business in view without opening anything: your tracked quests and their objectives, your deed progress, your Reliquary pages, the delve you are in, and any rift you are taking part in. The quest tracker collapses when you want the screen back.",
 

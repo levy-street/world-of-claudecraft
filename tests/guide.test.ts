@@ -6228,6 +6228,12 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
       expect(body, `${cmd} is listed`).toContain(cmd);
       expect(emoteLine(cmd), `${cmd} is a live emote`).toBeDefined();
     }
+    // The predecessor's false clause, driven: with Bet SELECTED, an untargeted
+    // /wave still names nobody, because the emote arm reads the typed name alone.
+    // Without the selection the negative arm passes whatever the router reads.
+    const bet = [...sim.players.keys()].find((p) => p !== aleph) as number;
+    sim.targetEntity(bet, aleph);
+    sim.tick();
     expect(emoteLine('/wave')).not.toContain('Bet');
     expect(emoteLine('/wave Bet')).toContain('Bet');
     expect(body).toContain('add a name to aim it at someone, as in /wave Aleph');
@@ -6478,6 +6484,13 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     );
     // Every layer of the overworld draw model is spoken for (null: a layer the
     // prose leaves unnamed on purpose); a new OverworldMapModel field reds tsc.
+    // Three of the nulls are LAYERS THE MAP REALLY DRAWS and the prose still does
+    // not name: castles (the curtain plans), navigation (route badges and nearby
+    // live rift entrances) and allies (friends and guildmates). They are a
+    // recorded follow-up, not an oversight: naming them moves the English and its
+    // five fills, which the release fill has not run over yet. The rest are
+    // structural fields (view, cursor, region, zoneId, detail) or a layer another
+    // sentence covers (ping, rift).
     const layerPhrase: Record<keyof OverworldMapModel, string | null> = {
       view: null,
       cursor: null,

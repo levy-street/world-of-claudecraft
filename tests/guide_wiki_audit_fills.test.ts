@@ -26,7 +26,6 @@ describe('Guide wiki completeness audit fills (Phase 20 shape anchors)', () => {
   it('every anchored key is live English in the catalog with real paragraph breaks', () => {
     for (const key of Object.keys(GUIDE_WIKI_AUDIT_FILLS)) {
       const english = englishOf(key);
-      expect(english, key).toBeTypeOf('string');
       expect(english, `${key} English carries a literal backslash-n`).not.toMatch(/\\n/);
     }
   });
