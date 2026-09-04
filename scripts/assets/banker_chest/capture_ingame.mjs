@@ -41,7 +41,6 @@ const profiles = [
     expectedTier: 'ultra',
     settings: {
       graphicsPreset: 4,
-      graphicsDefaultApplied: true,
       terrainDetail: 1,
       foliageDensity: 1,
       effectsQuality: 1,
@@ -58,7 +57,6 @@ const profiles = [
     expectedTier: 'low',
     settings: {
       graphicsPreset: 1,
-      graphicsDefaultApplied: true,
       terrainDetail: 0,
       foliageDensity: 0,
       effectsQuality: 0,

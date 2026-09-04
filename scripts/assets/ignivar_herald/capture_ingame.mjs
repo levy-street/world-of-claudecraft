@@ -39,7 +39,6 @@ try {
       'woc_settings',
       JSON.stringify({
         graphicsPreset: 5,
-        graphicsDefaultApplied: true,
         terrainDetail: 1,
         effectsQuality: 1,
         shadowQuality: 1,

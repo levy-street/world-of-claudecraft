@@ -61,7 +61,6 @@ try {
         'woc_settings',
         JSON.stringify({
           graphicsPreset: stagedGraphicsPreset,
-          graphicsDefaultApplied: true,
           terrainDetail: stagedMobile ? 0 : 1,
           effectsQuality: stagedMobile ? 0 : 1,
           shadowQuality: stagedMobile ? 0 : 1,

@@ -93,7 +93,6 @@ async function seedSettings(profiler, preset) {
       const settings = JSON.parse(localStorage.getItem(key) ?? '{}');
       settings.fullscreen = 0;
       settings.graphicsPreset = value;
-      settings.graphicsDefaultApplied = true;
       localStorage.setItem(key, JSON.stringify(settings));
     } catch {
       /* a failed storage seed will surface as a tier mismatch */

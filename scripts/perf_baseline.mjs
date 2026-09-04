@@ -106,13 +106,7 @@ async function seedBenchSettings(p, preset) {
       const key = 'woc_settings';
       const cur = JSON.parse(localStorage.getItem(key) ?? '{}');
       cur.fullscreen = 0;
-      if (presetValue) {
-        cur.graphicsPreset = presetValue;
-        // Beside the preset, never without it: with no preset requested this
-        // rig deliberately leaves the first-run probe to choose, and setting
-        // the marker alone would silently pin the stored default instead.
-        cur.graphicsDefaultApplied = true;
-      }
+      if (presetValue) cur.graphicsPreset = presetValue;
       localStorage.setItem(key, JSON.stringify(cur));
     } catch {
       /* storage unavailable */

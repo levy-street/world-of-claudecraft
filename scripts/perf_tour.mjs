@@ -495,7 +495,6 @@ async function runViewport(browser, viewport) {
         const key = 'woc_settings';
         const cur = JSON.parse(localStorage.getItem(key) ?? '{}');
         cur.graphicsPreset = value;
-        cur.graphicsDefaultApplied = true;
         localStorage.setItem(key, JSON.stringify(cur));
       } catch {
         /* storage unavailable */
