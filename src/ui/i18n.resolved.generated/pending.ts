@@ -10,8 +10,10 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "apiError.discord.invalid_input",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
+    "hudChrome.discord.queuePingsLabel",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
     "hudChrome.mounts.desc_mech_bird",
@@ -23,8 +25,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.mountsTitle"
   ],
   "es_ES": [
+    "apiError.discord.invalid_input",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
+    "hudChrome.discord.queuePingsLabel",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
     "hudChrome.mounts.desc_mech_bird",
@@ -36,8 +40,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.mountsTitle"
   ],
   "fr_FR": [
+    "apiError.discord.invalid_input",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
+    "hudChrome.discord.queuePingsLabel",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
     "hudChrome.mounts.desc_mech_bird",
@@ -49,8 +55,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.mountsTitle"
   ],
   "fr_CA": [
+    "apiError.discord.invalid_input",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
+    "hudChrome.discord.queuePingsLabel",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
     "hudChrome.mounts.desc_mech_bird",
@@ -63,8 +71,10 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "apiError.discord.invalid_input",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
+    "hudChrome.discord.queuePingsLabel",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
     "hudChrome.mounts.desc_mech_bird",
@@ -76,8 +86,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.mountsTitle"
   ],
   "de_DE": [
+    "apiError.discord.invalid_input",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
+    "hudChrome.discord.queuePingsLabel",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
     "hudChrome.mounts.desc_mech_bird",
@@ -93,8 +105,10 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "apiError.discord.invalid_input",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
+    "hudChrome.discord.queuePingsLabel",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
     "hudChrome.mounts.desc_mech_bird",
@@ -107,8 +121,10 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "apiError.discord.invalid_input",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
+    "hudChrome.discord.queuePingsLabel",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
     "hudChrome.mounts.desc_mech_bird",
@@ -120,8 +136,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.mountsTitle"
   ],
   "nl_NL": [
+    "apiError.discord.invalid_input",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
+    "hudChrome.discord.queuePingsLabel",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
     "hudChrome.mounts.desc_mech_bird",
@@ -133,8 +151,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.mountsTitle"
   ],
   "pl_PL": [
+    "apiError.discord.invalid_input",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
+    "hudChrome.discord.queuePingsLabel",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
     "hudChrome.mounts.desc_mech_bird",
@@ -146,8 +166,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.mountsTitle"
   ],
   "id_ID": [
+    "apiError.discord.invalid_input",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
+    "hudChrome.discord.queuePingsLabel",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
     "hudChrome.mounts.desc_mech_bird",
@@ -159,8 +181,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.mountsTitle"
   ],
   "tr_TR": [
+    "apiError.discord.invalid_input",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
+    "hudChrome.discord.queuePingsLabel",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
     "hudChrome.mounts.desc_mech_bird",
@@ -172,8 +196,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.mountsTitle"
   ],
   "sv_SE": [
+    "apiError.discord.invalid_input",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
+    "hudChrome.discord.queuePingsLabel",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
     "hudChrome.mounts.desc_mech_bird",
@@ -185,8 +211,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.mountsTitle"
   ],
   "vi_VN": [
+    "apiError.discord.invalid_input",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
+    "hudChrome.discord.queuePingsLabel",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
     "hudChrome.mounts.desc_mech_bird",
@@ -198,8 +226,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.mountsTitle"
   ],
   "da_DK": [
+    "apiError.discord.invalid_input",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
+    "hudChrome.discord.queuePingsLabel",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
     "hudChrome.mounts.desc_mech_bird",

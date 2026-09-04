@@ -381,6 +381,11 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain(
       'ALTER TABLE accounts ADD COLUMN IF NOT EXISTS deed_broadcasts BOOLEAN NOT NULL DEFAULT TRUE',
     );
+    // The queue-pop Discord DM opt-in rides the same block, defaulting FALSE
+    // (a DM is asked for, never assumed; server/discord_queue_pops.ts).
+    expect(applied).toContain(
+      'ALTER TABLE accounts ADD COLUMN IF NOT EXISTS discord_queue_pings BOOLEAN NOT NULL DEFAULT FALSE',
+    );
     // Additive-only within the block (the bank-tables slicing idiom above),
     // save for the ONE sanctioned reconcile: the DROP INDEX IF EXISTS that
     // retires the deed_id index is index-only and idempotent, so strip that

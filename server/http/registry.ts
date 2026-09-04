@@ -33,6 +33,7 @@ import { routes as dailyRewardRoutes } from '../daily_rewards';
 import { routes as deedsRoutes } from '../deeds';
 import { routes as desktopLoginRoutes } from '../desktop_login_routes';
 import { routes as discordRoutes } from '../discord';
+import { routes as discordQueuePingsRoutes } from '../discord_queue_pings';
 import { routes as epicRoutes } from '../epic';
 import { routes as githubRoutes } from '../github';
 import { routes as guildRosterRoutes } from '../guild_roster';
@@ -148,6 +149,7 @@ export const apiRoutes: readonly RouteDef[] = [
   ...oauthRoutes,
   ...internalRoutes,
   ...deedsRoutes,
+  ...discordQueuePingsRoutes,
   ...steamRoutes,
   ...battlegroundRoutes,
   ...epicRoutes,

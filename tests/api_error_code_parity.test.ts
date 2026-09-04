@@ -76,6 +76,7 @@ const KNOWN_CODES = [
   'db.conflict',
   'discord.already_linked',
   'discord.expired',
+  'discord.invalid_input',
   'discord.link_required',
   'discord.not_configured',
   'discord.password_required',

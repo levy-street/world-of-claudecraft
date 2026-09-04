@@ -3046,6 +3046,7 @@ export const sv_SE: EnTranslations = {
       "close": "Stäng",
       "keybind": "Discord-panel",
       "disabled": "Discord-integrationen är inte tillgänglig just nu.",
+      "queuePingsLabel": "Send me a Discord direct message when my battleground or arena queue pops (needs a linked Discord account)",
       "tiers": {
         "none": "Orankad",
         "initiate": "Novis",
@@ -4699,7 +4700,8 @@ export const sv_SE: EnTranslations = {
       "link_required": "Koppla ditt Discord-konto först.",
       "swag_claimed": "Du har redan hämtat den här belöningen.",
       "swag_tier": "Nå en högre rang för att hämta den här.",
-      "swag_points": "Inte tillräckligt med poäng."
+      "swag_points": "Inte tillräckligt med poäng.",
+      "invalid_input": "Invalid input."
     },
     "deeds": {
       "invalid_input": "Ogiltig indata."
