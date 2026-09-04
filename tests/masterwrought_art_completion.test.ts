@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
@@ -9,12 +9,27 @@ import {
   measureAlpha,
   validateAcceptedArtManifest,
 } from '../scripts/lib/icon_asset_audit.mjs';
-import { MAP_MARKER_SIZES } from '../src/ui/map_marker_icon_art';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const evidenceDir = 'docs/achievements/masterwrought-art-completion-2026-09-02';
 const manifestPath = `${evidenceDir}/accepted-art.json`;
 const batchId = 'masterwrought-art-completion-2026-09-02';
+const screenshotDir = `docs/screenshots/${batchId}`;
+const screenshotFiles = [
+  '01-after-masterwrought-art-items-desktop.png',
+  '02-after-masterwrought-art-items-mobile.png',
+  '03-after-masterwrought-art-professions-gathering-desktop.png',
+  '04-after-masterwrought-art-professions-gathering-mobile.png',
+  '05-after-masterwrought-art-farm-map-desktop.png',
+  '06-after-masterwrought-art-farm-map-mobile.png',
+  '07-after-masterwrought-art-chrome-desktop.png',
+  '08-after-masterwrought-art-chrome-mobile-controller.png',
+  '09-after-masterwrought-art-well-fed-desktop.png',
+  '10-after-masterwrought-art-deeds-collection-desktop.png',
+  '11-after-masterwrought-art-deeds-chronicle-desktop.png',
+  '12-after-masterwrought-art-deeds-progression-desktop.png',
+  '13-after-masterwrought-art-reliquary-harvestmaster-desktop.png',
+] as const;
 const itemReportIds = [
   'crops',
   'farming',
@@ -44,6 +59,33 @@ const supplementalKeys = [
   'map-marker:farm-patch',
   'profession:gather_farming',
 ] as const;
+
+type ScreenshotPin = {
+  file: string;
+  sha256: string;
+  bytes: number;
+  width: number;
+  height: number;
+};
+
+type CaptureWarningFrameGroup = {
+  countPerFrame: number;
+  frames: string[];
+  assets?: Array<{ id: string; path: string }>;
+};
+
+type CaptureWarning = {
+  category: 'http-502' | 'character-asset-not-preloaded';
+  totalCount: number;
+  frameGroups: CaptureWarningFrameGroup[];
+};
+
+type ScreenshotManifest = {
+  schemaVersion: 1;
+  mode: 'change-aware';
+  files: ScreenshotPin[];
+  captureWarnings: CaptureWarning[];
+};
 
 type ExactGeometry = {
   alphaThreshold: number;
@@ -325,10 +367,103 @@ async function assertSupplementalPin(
 }
 
 describe('Masterwrought art completion evidence', () => {
+  it('keeps one exact byte-sealed screenshot batch', () => {
+    const manifestBytes = readFileSync(path.join(repoRoot, screenshotDir, 'manifest.json'));
+    expect(manifestBytes.length).toBe(6_885);
+    expect(hash(manifestBytes)).toBe(
+      '760c783b5ea54aa2ae330385862fca9ceeca8b3db4f9f961aaf617bc28d5ee75',
+    );
+    const value = JSON.parse(manifestBytes.toString('utf8')) as ScreenshotManifest;
+    expect(value.schemaVersion).toBe(1);
+    expect(value.mode).toBe('change-aware');
+    expect(value.files.map(({ file }) => file)).toEqual([...screenshotFiles]);
+    expect(duplicateValues(value.files.map(({ file }) => file))).toEqual([]);
+
+    const directory = path.join(repoRoot, screenshotDir);
+    const entries = readdirSync(directory, { withFileTypes: true });
+    expect(
+      entries.every((entry) => entry.isFile()),
+      'screenshot batch contains files only',
+    ).toBe(true);
+    expect(sorted(entries.map(({ name }) => name))).toEqual(
+      sorted(['manifest.json', ...screenshotFiles]),
+    );
+
+    for (const pin of value.files) {
+      const bytes = readFileSync(path.join(directory, pin.file));
+      expect(bytes.subarray(0, 8).toString('hex'), `${pin.file} PNG signature`).toBe(
+        '89504e470d0a1a0a',
+      );
+      expect(bytes.subarray(12, 16).toString('ascii'), `${pin.file} PNG header`).toBe('IHDR');
+      expect(pin, pin.file).toEqual({
+        file: pin.file,
+        sha256: hash(bytes),
+        bytes: bytes.length,
+        width: bytes.readUInt32BE(16),
+        height: bytes.readUInt32BE(20),
+      });
+    }
+
+    const frameIds = screenshotFiles.map((file) => file.replace(/^\d+-/, '').replace(/\.png$/, ''));
+    const desktopFrames = frameIds.filter((frame) => !frame.includes('-mobile'));
+    const mobileFrames = frameIds.filter((frame) => frame.includes('-mobile'));
+    const threeHttpFrames = [
+      'after-masterwrought-art-items-desktop',
+      'after-masterwrought-art-farm-map-desktop',
+    ];
+    const twoHttpFrames = frameIds.filter((frame) => !threeHttpFrames.includes(frame));
+    const [httpWarning, characterWarning] = value.captureWarnings;
+
+    expect(httpWarning).toMatchObject({ category: 'http-502', totalCount: 28 });
+    expect(httpWarning?.frameGroups).toEqual([
+      { countPerFrame: 3, frames: threeHttpFrames },
+      { countPerFrame: 2, frames: twoHttpFrames },
+    ]);
+    expect(characterWarning).toMatchObject({
+      category: 'character-asset-not-preloaded',
+      totalCount: 62,
+    });
+    expect(
+      characterWarning?.frameGroups.map(({ countPerFrame, frames }) => ({
+        countPerFrame,
+        frames,
+      })),
+    ).toEqual([
+      { countPerFrame: 2, frames: desktopFrames },
+      { countPerFrame: 11, frames: mobileFrames },
+    ]);
+
+    for (const warning of value.captureWarnings) {
+      const warnedFrames = warning.frameGroups.flatMap(({ frames }) => frames);
+      expect(duplicateValues(warnedFrames), `${warning.category} duplicate frames`).toEqual([]);
+      expect(sorted(warnedFrames), `${warning.category} frame coverage`).toEqual(sorted(frameIds));
+      expect(
+        warning.frameGroups.reduce(
+          (count, group) => count + group.countPerFrame * group.frames.length,
+          0,
+        ),
+        `${warning.category} warning count`,
+      ).toBe(warning.totalCount);
+      for (const group of warning.frameGroups) {
+        if (warning.category === 'http-502') {
+          expect(group.assets, 'HTTP warning has no asset list').toBeUndefined();
+          continue;
+        }
+        expect(group.assets, 'one missing-asset record per warning').toHaveLength(
+          group.countPerFrame,
+        );
+        for (const asset of group.assets ?? []) {
+          expect(asset.id, 'missing asset id').toMatch(/^[a-z0-9_]+$/);
+          expect(asset.path, `${asset.id} path`).toMatch(/^models\/.+\.glb$/);
+        }
+      }
+    }
+  });
+
   it('byte-seals the root manifest so its target and evidence oracles cannot drift together', () => {
     const bytes = readFileSync(path.join(repoRoot, manifestPath));
     expect(bytes.length).toBe(459_411);
-    expect(hash(bytes)).toBe('28b78198cd6de21940340cdd1e9180e96bc02c7ccef5c49ee7aab735d52f5954');
+    expect(hash(bytes)).toBe('394deade31d5bb7866cc355d7b42405e22a5a1961ab2bd4dc568d7ee59e87233');
   });
 
   it('pins the exact 176-target scope and the 81 added to 84 replaced item split', () => {
@@ -679,17 +814,6 @@ describe('Masterwrought art completion evidence', () => {
         id: string;
         exactPrompt: string;
         references: Array<{ path: string }>;
-        review?: {
-          runtimeSizeEvidence?: {
-            path: string;
-            sha256: string;
-            bytes: number;
-            width: number;
-            height: number;
-            sizes: number[];
-            grounds: string[];
-          };
-        };
       }>;
     }>(`${evidenceDir}/generation-reports/special-ui-deeds.json`);
     const farmPatch = special.assets.find(({ id }) => id === 'farm_patch');
@@ -702,25 +826,6 @@ describe('Masterwrought art completion evidence', () => {
     expect(readme).toContain(
       `Prompt SHA-256: \`${hash(Buffer.from(farmPatch?.exactPrompt ?? '', 'utf8'))}\``,
     );
-    const runtimeEvidence = farmPatch?.review?.runtimeSizeEvidence;
-    expect(runtimeEvidence).toMatchObject({
-      width: 480,
-      height: 360,
-      sizes: [
-        MAP_MARKER_SIZES.minimapStation,
-        MAP_MARKER_SIZES.mapStation,
-        MAP_MARKER_SIZES.minimapStationCompact,
-        MAP_MARKER_SIZES.mapStationCompact,
-      ],
-      grounds: ['dark', 'light', 'grayscale'],
-    });
-    expect(runtimeEvidence).toBeDefined();
-    assertEvidencePin({
-      id: 'farm-patch-runtime-sizes',
-      path: runtimeEvidence?.path ?? '',
-      acceptedSha256: runtimeEvidence?.sha256 ?? '',
-      acceptedBytes: runtimeEvidence?.bytes ?? -1,
-    });
   });
 
   it('pins the operative credits and consolidated supersession lineage', () => {

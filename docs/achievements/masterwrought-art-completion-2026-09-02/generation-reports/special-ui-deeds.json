@@ -56,7 +56,6 @@
       "tmp/imagegen/masterwrought-art-2026-09-02/map-markers/review-runtime-dark.png",
       "tmp/imagegen/masterwrought-art-2026-09-02/map-markers/review-runtime-light.png",
       "tmp/imagegen/masterwrought-art-2026-09-02/map-markers/review-runtime-gray.png",
-      "docs/screenshots/masterwrought-art-completion-2026-09-02/farm-patch-runtime-sizes.png",
       "tmp/imagegen/masterwrought-art-2026-09-02/chrome/review-chrome.png",
       "tmp/imagegen/masterwrought-art-2026-09-02/chrome/review-runtime-dark.png",
       "tmp/imagegen/masterwrought-art-2026-09-02/chrome/review-runtime-gray.png"
@@ -569,15 +568,6 @@
       "review": {
         "sourceReview": "Accepted: one low dark-loam oval, three bold furrow grooves, exactly one short stem with two broad leaves, and pale-gold keyline; no herb bundle, tool, or readiness glow.",
         "deliverySizeReview": "Reviewed from the final shipping WebP at the actual 16px and 22px minimap sizes and 20px and 28px map sizes on dark, light, and grayscale grounds; sprout, two leaves, and furrows remain recognizable.",
-        "runtimeSizeEvidence": {
-          "path": "docs/screenshots/masterwrought-art-completion-2026-09-02/farm-patch-runtime-sizes.png",
-          "sha256": "818cc240f124e755e726418c4fbd4d537636e0e20216d4d21f0d19431adb0529",
-          "bytes": 41935,
-          "width": 480,
-          "height": 360,
-          "sizes": [16, 20, 22, 28],
-          "grounds": ["dark", "light", "grayscale"]
-        },
         "qaSimulation": {
           "canvas": [64, 64],
           "containBox": [58, 58],

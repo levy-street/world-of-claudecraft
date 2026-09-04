@@ -683,8 +683,8 @@
     {
       "id": "special-ui-deeds",
       "path": "docs/achievements/masterwrought-art-completion-2026-09-02/generation-reports/special-ui-deeds.json",
-      "acceptedSha256": "cbf088cb7bd2a3b871fb6ab52bf4b0a0ae6df4b98ef3538d373902473a95e9db",
-      "acceptedBytes": 67336,
+      "acceptedSha256": "d2a19559149c88c6d6edd8194819481559c6ee19a034deb76653629de8f0996b",
+      "acceptedBytes": 66838,
       "role": "Exact generation prompts, ordered references, raw pins, retries, and review for 11 deeds plus the map marker and two chrome icons.",
       "assetIds": [
         "col_deepest_cast",

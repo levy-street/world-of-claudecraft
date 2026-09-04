@@ -1,110 +1,213 @@
 {
+  "schemaVersion": 1,
   "mode": "change-aware",
-  "captured": [
-    "01-after-masterwrought-art-items-desktop.png",
-    "02-after-masterwrought-art-items-mobile.png",
-    "03-after-masterwrought-art-professions-gathering-desktop.png",
-    "04-after-masterwrought-art-professions-gathering-mobile.png",
-    "05-after-masterwrought-art-farm-map-desktop.png",
-    "06-after-masterwrought-art-farm-map-mobile.png",
-    "07-after-masterwrought-art-chrome-desktop.png",
-    "08-after-masterwrought-art-chrome-mobile-controller.png",
-    "09-after-masterwrought-art-well-fed-desktop.png",
-    "10-after-masterwrought-art-deeds-collection-desktop.png",
-    "11-after-masterwrought-art-deeds-chronicle-desktop.png",
-    "12-after-masterwrought-art-deeds-progression-desktop.png",
-    "13-after-masterwrought-art-reliquary-harvestmaster-desktop.png"
+  "files": [
+    {
+      "file": "01-after-masterwrought-art-items-desktop.png",
+      "sha256": "80bf1f7430244f037b8c590a14de55d20e900d2aefae06886b413cc3430526f8",
+      "bytes": 85429,
+      "width": 334,
+      "height": 439
+    },
+    {
+      "file": "02-after-masterwrought-art-items-mobile.png",
+      "sha256": "a6183e4a3b68bc328ee143e7583b9a10a4b4c67ec31b1b7b0f95e434473c0780",
+      "bytes": 340620,
+      "width": 1688,
+      "height": 780
+    },
+    {
+      "file": "03-after-masterwrought-art-professions-gathering-desktop.png",
+      "sha256": "d2214285afaad93f37d8584dd13dc6a46a6c76a802662fbd91150a10905e15c1",
+      "bytes": 299835,
+      "width": 744,
+      "height": 765
+    },
+    {
+      "file": "04-after-masterwrought-art-professions-gathering-mobile.png",
+      "sha256": "6b9e58ea9652eecd422f689f523d002247e5944eb0047d5097f599371fa66cb5",
+      "bytes": 350176,
+      "width": 1688,
+      "height": 780
+    },
+    {
+      "file": "05-after-masterwrought-art-farm-map-desktop.png",
+      "sha256": "20e6e9ff31c6de79e936084c471b242cc60901cb3a6fbe23afbdc86d24bee04c",
+      "bytes": 448488,
+      "width": 620,
+      "height": 625
+    },
+    {
+      "file": "06-after-masterwrought-art-farm-map-mobile.png",
+      "sha256": "4decf89b986f4f1225ebe6c580f3053c6e26cde1ad3a79860d533d2a456ec6da",
+      "bytes": 440782,
+      "width": 736,
+      "height": 644
+    },
+    {
+      "file": "07-after-masterwrought-art-chrome-desktop.png",
+      "sha256": "59a15b36e78cb5076eac35aecaa24c4d99ba2e244e4232916fe06fecf19dccf8",
+      "bytes": 54290,
+      "width": 94,
+      "height": 428
+    },
+    {
+      "file": "08-after-masterwrought-art-chrome-mobile-controller.png",
+      "sha256": "5866e7edc0fc04552ca304a4af615cc25fd88ac7e02e6c1d1566b58d4ce385a4",
+      "bytes": 84128,
+      "width": 188,
+      "height": 432
+    },
+    {
+      "file": "09-after-masterwrought-art-well-fed-desktop.png",
+      "sha256": "6e35a12c7b44875792e0ed5304ad9087a1dfca77ae660cd366ad0516cabc1cce",
+      "bytes": 4057,
+      "width": 84,
+      "height": 52
+    },
+    {
+      "file": "10-after-masterwrought-art-deeds-collection-desktop.png",
+      "sha256": "31ffc0273f58f37073bb007613ce223c6225ac273013507a2c68e9e9b3345c6c",
+      "bytes": 211232,
+      "width": 584,
+      "height": 546
+    },
+    {
+      "file": "11-after-masterwrought-art-deeds-chronicle-desktop.png",
+      "sha256": "3563001f070e5be857f5a829625e06c8121f5acd0d7104d53dfd7c8e6091852a",
+      "bytes": 223570,
+      "width": 584,
+      "height": 546
+    },
+    {
+      "file": "12-after-masterwrought-art-deeds-progression-desktop.png",
+      "sha256": "d4468a5cbe8f4b20b3f0ecbeca938f3d3a82c4debbe892725451d31eb895d6aa",
+      "bytes": 218285,
+      "width": 584,
+      "height": 546
+    },
+    {
+      "file": "13-after-masterwrought-art-reliquary-harvestmaster-desktop.png",
+      "sha256": "f5542a4a72d7462a481fb71af0af0442ecbf10343a90f9508f27136afdf3f48b",
+      "bytes": 288999,
+      "width": 744,
+      "height": 686
+    }
   ],
-  "errors": [
-    "CONSOLE(after-masterwrought-art-items-desktop): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
-    "CONSOLE(after-masterwrought-art-items-desktop): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
-    "CONSOLE(after-masterwrought-art-items-desktop): character visual unavailable, skipping view (npc_modular_walking_staff): Error: character asset not preloaded: models/weapons/brasscrown_walking_staff.glb",
-    "CONSOLE(after-masterwrought-art-items-desktop): character visual unavailable, skipping view (mob_training_dummy): Error: character asset not preloaded: models/creatures/training_dummy.glb",
-    "CONSOLE(after-masterwrought-art-items-desktop): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
-    "CONSOLE(after-masterwrought-art-items-mobile): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
-    "CONSOLE(after-masterwrought-art-items-mobile): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
-    "CONSOLE(after-masterwrought-art-items-mobile): character visual unavailable, skipping view (skel_minion): Error: character asset not preloaded: models/chars/enemies/skeleton_minion.glb",
-    "CONSOLE(after-masterwrought-art-items-mobile): character visual unavailable, skipping view (mob_wolf): Error: character asset not preloaded: models/creatures/wolf_basic.glb",
-    "CONSOLE(after-masterwrought-art-items-mobile): character visual unavailable, skipping view (mob_grix): Error: character asset not preloaded: models/creatures/grix.glb",
-    "CONSOLE(after-masterwrought-art-items-mobile): character visual unavailable, skipping view (skel_boss): Error: character asset not preloaded: models/chars/enemies/skeleton_mage.glb",
-    "CONSOLE(after-masterwrought-art-items-mobile): character visual unavailable, skipping view (mob_murloc): Error: character asset not preloaded: models/creatures/frog.glb",
-    "CONSOLE(after-masterwrought-art-items-mobile): character visual unavailable, skipping view (greyjaw): Error: character asset not preloaded: models/creatures/greyjaw.glb",
-    "CONSOLE(after-masterwrought-art-items-mobile): character visual unavailable, skipping view (skel_mage): Error: character asset not preloaded: models/chars/enemies/skeleton_mage.glb",
-    "CONSOLE(after-masterwrought-art-items-mobile): character visual unavailable, skipping view (mob_kobold_digger): Error: character asset not preloaded: models/creatures/kobold.glb",
-    "CONSOLE(after-masterwrought-art-items-mobile): character visual unavailable, skipping view (mob_spider): Error: character asset not preloaded: models/creatures/spider.glb",
-    "CONSOLE(after-masterwrought-art-items-mobile): character visual unavailable, skipping view (mob_boar): Error: character asset not preloaded: models/creatures/wild_boar.glb",
-    "CONSOLE(after-masterwrought-art-items-mobile): character visual unavailable, skipping view (npc_modular_walking_staff): Error: character asset not preloaded: models/weapons/brasscrown_walking_staff.glb",
-    "CONSOLE(after-masterwrought-art-professions-gathering-desktop): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
-    "CONSOLE(after-masterwrought-art-professions-gathering-desktop): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
-    "CONSOLE(after-masterwrought-art-professions-gathering-desktop): character visual unavailable, skipping view (npc_modular_walking_staff): Error: character asset not preloaded: models/weapons/brasscrown_walking_staff.glb",
-    "CONSOLE(after-masterwrought-art-professions-gathering-desktop): character visual unavailable, skipping view (mob_training_dummy): Error: character asset not preloaded: models/creatures/training_dummy.glb",
-    "CONSOLE(after-masterwrought-art-professions-gathering-mobile): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
-    "CONSOLE(after-masterwrought-art-professions-gathering-mobile): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
-    "CONSOLE(after-masterwrought-art-professions-gathering-mobile): character visual unavailable, skipping view (skel_minion): Error: character asset not preloaded: models/chars/enemies/skeleton_minion.glb",
-    "CONSOLE(after-masterwrought-art-professions-gathering-mobile): character visual unavailable, skipping view (mob_wolf): Error: character asset not preloaded: models/creatures/wolf_basic.glb",
-    "CONSOLE(after-masterwrought-art-professions-gathering-mobile): character visual unavailable, skipping view (mob_grix): Error: character asset not preloaded: models/creatures/grix.glb",
-    "CONSOLE(after-masterwrought-art-professions-gathering-mobile): character visual unavailable, skipping view (skel_boss): Error: character asset not preloaded: models/chars/enemies/skeleton_mage.glb",
-    "CONSOLE(after-masterwrought-art-professions-gathering-mobile): character visual unavailable, skipping view (mob_murloc): Error: character asset not preloaded: models/creatures/frog.glb",
-    "CONSOLE(after-masterwrought-art-professions-gathering-mobile): character visual unavailable, skipping view (greyjaw): Error: character asset not preloaded: models/creatures/greyjaw.glb",
-    "CONSOLE(after-masterwrought-art-professions-gathering-mobile): character visual unavailable, skipping view (skel_mage): Error: character asset not preloaded: models/chars/enemies/skeleton_mage.glb",
-    "CONSOLE(after-masterwrought-art-professions-gathering-mobile): character visual unavailable, skipping view (mob_kobold_digger): Error: character asset not preloaded: models/creatures/kobold.glb",
-    "CONSOLE(after-masterwrought-art-professions-gathering-mobile): character visual unavailable, skipping view (mob_spider): Error: character asset not preloaded: models/creatures/spider.glb",
-    "CONSOLE(after-masterwrought-art-professions-gathering-mobile): character visual unavailable, skipping view (mob_boar): Error: character asset not preloaded: models/creatures/wild_boar.glb",
-    "CONSOLE(after-masterwrought-art-professions-gathering-mobile): character visual unavailable, skipping view (npc_modular_walking_staff): Error: character asset not preloaded: models/weapons/brasscrown_walking_staff.glb",
-    "CONSOLE(after-masterwrought-art-farm-map-desktop): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
-    "CONSOLE(after-masterwrought-art-farm-map-desktop): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
-    "CONSOLE(after-masterwrought-art-farm-map-desktop): character visual unavailable, skipping view (npc_modular_walking_staff): Error: character asset not preloaded: models/weapons/brasscrown_walking_staff.glb",
-    "CONSOLE(after-masterwrought-art-farm-map-desktop): character visual unavailable, skipping view (mob_training_dummy): Error: character asset not preloaded: models/creatures/training_dummy.glb",
-    "CONSOLE(after-masterwrought-art-farm-map-desktop): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
-    "CONSOLE(after-masterwrought-art-farm-map-mobile): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
-    "CONSOLE(after-masterwrought-art-farm-map-mobile): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
-    "CONSOLE(after-masterwrought-art-farm-map-mobile): character visual unavailable, skipping view (skel_minion): Error: character asset not preloaded: models/chars/enemies/skeleton_minion.glb",
-    "CONSOLE(after-masterwrought-art-farm-map-mobile): character visual unavailable, skipping view (mob_wolf): Error: character asset not preloaded: models/creatures/wolf_basic.glb",
-    "CONSOLE(after-masterwrought-art-farm-map-mobile): character visual unavailable, skipping view (mob_grix): Error: character asset not preloaded: models/creatures/grix.glb",
-    "CONSOLE(after-masterwrought-art-farm-map-mobile): character visual unavailable, skipping view (skel_boss): Error: character asset not preloaded: models/chars/enemies/skeleton_mage.glb",
-    "CONSOLE(after-masterwrought-art-farm-map-mobile): character visual unavailable, skipping view (mob_murloc): Error: character asset not preloaded: models/creatures/frog.glb",
-    "CONSOLE(after-masterwrought-art-farm-map-mobile): character visual unavailable, skipping view (greyjaw): Error: character asset not preloaded: models/creatures/greyjaw.glb",
-    "CONSOLE(after-masterwrought-art-farm-map-mobile): character visual unavailable, skipping view (skel_mage): Error: character asset not preloaded: models/chars/enemies/skeleton_mage.glb",
-    "CONSOLE(after-masterwrought-art-farm-map-mobile): character visual unavailable, skipping view (mob_kobold_digger): Error: character asset not preloaded: models/creatures/kobold.glb",
-    "CONSOLE(after-masterwrought-art-farm-map-mobile): character visual unavailable, skipping view (mob_spider): Error: character asset not preloaded: models/creatures/spider.glb",
-    "CONSOLE(after-masterwrought-art-farm-map-mobile): character visual unavailable, skipping view (mob_boar): Error: character asset not preloaded: models/creatures/wild_boar.glb",
-    "CONSOLE(after-masterwrought-art-farm-map-mobile): character visual unavailable, skipping view (npc_modular_walking_staff): Error: character asset not preloaded: models/weapons/brasscrown_walking_staff.glb",
-    "CONSOLE(after-masterwrought-art-chrome-desktop): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
-    "CONSOLE(after-masterwrought-art-chrome-desktop): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
-    "CONSOLE(after-masterwrought-art-chrome-desktop): character visual unavailable, skipping view (npc_modular_walking_staff): Error: character asset not preloaded: models/weapons/brasscrown_walking_staff.glb",
-    "CONSOLE(after-masterwrought-art-chrome-desktop): character visual unavailable, skipping view (mob_training_dummy): Error: character asset not preloaded: models/creatures/training_dummy.glb",
-    "CONSOLE(after-masterwrought-art-chrome-mobile-controller): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
-    "CONSOLE(after-masterwrought-art-chrome-mobile-controller): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
-    "CONSOLE(after-masterwrought-art-chrome-mobile-controller): character visual unavailable, skipping view (skel_minion): Error: character asset not preloaded: models/chars/enemies/skeleton_minion.glb",
-    "CONSOLE(after-masterwrought-art-chrome-mobile-controller): character visual unavailable, skipping view (mob_wolf): Error: character asset not preloaded: models/creatures/wolf_basic.glb",
-    "CONSOLE(after-masterwrought-art-chrome-mobile-controller): character visual unavailable, skipping view (mob_grix): Error: character asset not preloaded: models/creatures/grix.glb",
-    "CONSOLE(after-masterwrought-art-chrome-mobile-controller): character visual unavailable, skipping view (skel_boss): Error: character asset not preloaded: models/chars/enemies/skeleton_mage.glb",
-    "CONSOLE(after-masterwrought-art-chrome-mobile-controller): character visual unavailable, skipping view (mob_murloc): Error: character asset not preloaded: models/creatures/frog.glb",
-    "CONSOLE(after-masterwrought-art-chrome-mobile-controller): character visual unavailable, skipping view (greyjaw): Error: character asset not preloaded: models/creatures/greyjaw.glb",
-    "CONSOLE(after-masterwrought-art-chrome-mobile-controller): character visual unavailable, skipping view (skel_mage): Error: character asset not preloaded: models/chars/enemies/skeleton_mage.glb",
-    "CONSOLE(after-masterwrought-art-chrome-mobile-controller): character visual unavailable, skipping view (mob_kobold_digger): Error: character asset not preloaded: models/creatures/kobold.glb",
-    "CONSOLE(after-masterwrought-art-chrome-mobile-controller): character visual unavailable, skipping view (mob_spider): Error: character asset not preloaded: models/creatures/spider.glb",
-    "CONSOLE(after-masterwrought-art-chrome-mobile-controller): character visual unavailable, skipping view (mob_boar): Error: character asset not preloaded: models/creatures/wild_boar.glb",
-    "CONSOLE(after-masterwrought-art-chrome-mobile-controller): character visual unavailable, skipping view (npc_modular_walking_staff): Error: character asset not preloaded: models/weapons/brasscrown_walking_staff.glb",
-    "CONSOLE(after-masterwrought-art-well-fed-desktop): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
-    "CONSOLE(after-masterwrought-art-well-fed-desktop): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
-    "CONSOLE(after-masterwrought-art-well-fed-desktop): character visual unavailable, skipping view (npc_modular_walking_staff): Error: character asset not preloaded: models/weapons/brasscrown_walking_staff.glb",
-    "CONSOLE(after-masterwrought-art-well-fed-desktop): character visual unavailable, skipping view (mob_training_dummy): Error: character asset not preloaded: models/creatures/training_dummy.glb",
-    "CONSOLE(after-masterwrought-art-deeds-collection-desktop): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
-    "CONSOLE(after-masterwrought-art-deeds-collection-desktop): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
-    "CONSOLE(after-masterwrought-art-deeds-collection-desktop): character visual unavailable, skipping view (npc_modular_walking_staff): Error: character asset not preloaded: models/weapons/brasscrown_walking_staff.glb",
-    "CONSOLE(after-masterwrought-art-deeds-collection-desktop): character visual unavailable, skipping view (mob_training_dummy): Error: character asset not preloaded: models/creatures/training_dummy.glb",
-    "CONSOLE(after-masterwrought-art-deeds-chronicle-desktop): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
-    "CONSOLE(after-masterwrought-art-deeds-chronicle-desktop): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
-    "CONSOLE(after-masterwrought-art-deeds-chronicle-desktop): character visual unavailable, skipping view (npc_modular_walking_staff): Error: character asset not preloaded: models/weapons/brasscrown_walking_staff.glb",
-    "CONSOLE(after-masterwrought-art-deeds-chronicle-desktop): character visual unavailable, skipping view (mob_training_dummy): Error: character asset not preloaded: models/creatures/training_dummy.glb",
-    "CONSOLE(after-masterwrought-art-deeds-progression-desktop): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
-    "CONSOLE(after-masterwrought-art-deeds-progression-desktop): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
-    "CONSOLE(after-masterwrought-art-deeds-progression-desktop): character visual unavailable, skipping view (npc_modular_walking_staff): Error: character asset not preloaded: models/weapons/brasscrown_walking_staff.glb",
-    "CONSOLE(after-masterwrought-art-deeds-progression-desktop): character visual unavailable, skipping view (mob_training_dummy): Error: character asset not preloaded: models/creatures/training_dummy.glb",
-    "CONSOLE(after-masterwrought-art-reliquary-harvestmaster-desktop): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
-    "CONSOLE(after-masterwrought-art-reliquary-harvestmaster-desktop): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
-    "CONSOLE(after-masterwrought-art-reliquary-harvestmaster-desktop): character visual unavailable, skipping view (npc_modular_walking_staff): Error: character asset not preloaded: models/weapons/brasscrown_walking_staff.glb",
-    "CONSOLE(after-masterwrought-art-reliquary-harvestmaster-desktop): character visual unavailable, skipping view (mob_training_dummy): Error: character asset not preloaded: models/creatures/training_dummy.glb"
+  "captureWarnings": [
+    {
+      "category": "http-502",
+      "totalCount": 28,
+      "frameGroups": [
+        {
+          "countPerFrame": 3,
+          "frames": [
+            "after-masterwrought-art-items-desktop",
+            "after-masterwrought-art-farm-map-desktop"
+          ]
+        },
+        {
+          "countPerFrame": 2,
+          "frames": [
+            "after-masterwrought-art-items-mobile",
+            "after-masterwrought-art-professions-gathering-desktop",
+            "after-masterwrought-art-professions-gathering-mobile",
+            "after-masterwrought-art-farm-map-mobile",
+            "after-masterwrought-art-chrome-desktop",
+            "after-masterwrought-art-chrome-mobile-controller",
+            "after-masterwrought-art-well-fed-desktop",
+            "after-masterwrought-art-deeds-collection-desktop",
+            "after-masterwrought-art-deeds-chronicle-desktop",
+            "after-masterwrought-art-deeds-progression-desktop",
+            "after-masterwrought-art-reliquary-harvestmaster-desktop"
+          ]
+        }
+      ]
+    },
+    {
+      "category": "character-asset-not-preloaded",
+      "totalCount": 62,
+      "frameGroups": [
+        {
+          "countPerFrame": 2,
+          "frames": [
+            "after-masterwrought-art-items-desktop",
+            "after-masterwrought-art-professions-gathering-desktop",
+            "after-masterwrought-art-farm-map-desktop",
+            "after-masterwrought-art-chrome-desktop",
+            "after-masterwrought-art-well-fed-desktop",
+            "after-masterwrought-art-deeds-collection-desktop",
+            "after-masterwrought-art-deeds-chronicle-desktop",
+            "after-masterwrought-art-deeds-progression-desktop",
+            "after-masterwrought-art-reliquary-harvestmaster-desktop"
+          ],
+          "assets": [
+            {
+              "id": "npc_modular_walking_staff",
+              "path": "models/weapons/brasscrown_walking_staff.glb"
+            },
+            {
+              "id": "mob_training_dummy",
+              "path": "models/creatures/training_dummy.glb"
+            }
+          ]
+        },
+        {
+          "countPerFrame": 11,
+          "frames": [
+            "after-masterwrought-art-items-mobile",
+            "after-masterwrought-art-professions-gathering-mobile",
+            "after-masterwrought-art-farm-map-mobile",
+            "after-masterwrought-art-chrome-mobile-controller"
+          ],
+          "assets": [
+            {
+              "id": "skel_minion",
+              "path": "models/chars/enemies/skeleton_minion.glb"
+            },
+            {
+              "id": "mob_wolf",
+              "path": "models/creatures/wolf_basic.glb"
+            },
+            {
+              "id": "mob_grix",
+              "path": "models/creatures/grix.glb"
+            },
+            {
+              "id": "skel_boss",
+              "path": "models/chars/enemies/skeleton_mage.glb"
+            },
+            {
+              "id": "mob_murloc",
+              "path": "models/creatures/frog.glb"
+            },
+            {
+              "id": "greyjaw",
+              "path": "models/creatures/greyjaw.glb"
+            },
+            {
+              "id": "skel_mage",
+              "path": "models/chars/enemies/skeleton_mage.glb"
+            },
+            {
+              "id": "mob_kobold_digger",
+              "path": "models/creatures/kobold.glb"
+            },
+            {
+              "id": "mob_spider",
+              "path": "models/creatures/spider.glb"
+            },
+            {
+              "id": "mob_boar",
+              "path": "models/creatures/wild_boar.glb"
+            },
+            {
+              "id": "npc_modular_walking_staff",
+              "path": "models/weapons/brasscrown_walking_staff.glb"
+            }
+          ]
+        }
+      ]
+    }
   ]
 }

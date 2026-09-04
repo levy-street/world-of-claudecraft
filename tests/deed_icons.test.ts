@@ -426,7 +426,7 @@ describe('Book of Deeds webp icons', () => {
         'f3ff906d390920499779101c7d361be8b81d07398ab9c0133778ed5daed8ee49',
     };
     // The phase 06 inscription trio, same contract, recorded in the phase 06
-    // provenance README beside its committed crest SVG sources.
+    // provenance README; its superseded crest SVG sources remain in git history.
     const ACCEPTED_PHASE06_CREST_SHA256: Record<string, string> = {
       prog_inscription_rare: 'a165b790da1fb23e97bf4824df7595383ea14550a4f566e583054d113abe9368',
       prog_inscription_50: 'a9dc7528e104550baf7bed4f864fee96cb68d90e60fe6a9385bae65f18de9ab4',

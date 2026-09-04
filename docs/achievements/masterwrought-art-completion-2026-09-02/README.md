@@ -30,8 +30,9 @@ tree in the accepting worktree.
 
 The supersession records are immutable snapshots of the pre-replacement tree. Paths in those
 records may name placeholder sources that were later removed; their exact bytes remain recoverable
-from commit `6742cd8bf2e65b44b5f8a8887d3ec767c258eff2`. The six deed masters and four tome-fingerprint
-inputs that still have a live source role remain committed in their original locations.
+from commit `6742cd8bf2e65b44b5f8a8887d3ec767c258eff2`. The six superseded deed masters
+are recoverable from their recorded commits. Only the four tome-fingerprint inputs that still
+have a live source role remain committed.
 
 ## Runtime visual evidence
 
@@ -40,21 +41,11 @@ runtime capture set. Its numbered frames cover the seven non-blocking item watch
 desktop and mobile, the Farming gathering row on desktop and mobile, farm pins on desktop and
 mobile maps, the new launcher chrome on desktop and the mobile-controller rail, Well Fed in the
 live aura bar, all 11 deeds across their three real Book categories, and Harvestmaster in the
-Reliquary. The same directory also contains the desktop planting journey frames and the
-16/20/22/28px farm-marker ground matrix.
+Reliquary.
 
 The canonical capture runner completed all 13 requested targets and asserted the exact painted
 runtime URLs before each frame. Its manifest retains 28 expected offline API 502 notices and 62
 optional world-model prefetch notices; there were no target failures or art decode failures.
-
-The `before/` subdirectory is a strict comparison run against detached commit
-`2de55583b5fd4a11bed8ac7996f532cb687e9971`: the feature-complete Masterwrought surface before
-this uncommitted art wave. It captures 12 matched runtime frames with the old procedural or
-category-fallback artwork. There is deliberately no `09-before` frame: that baseline did not
-recognize `well_fed` as file-backed aura art and the canonical runtime wait found no renderable
-Well Fed node. The successful `09-after` frame therefore records both the newly wired presentation
-and its accepted painting; `before/manifest.json` preserves the baseline target failure rather
-than manufacturing a comparison image.
 
 ## Supplemental interface art
 
