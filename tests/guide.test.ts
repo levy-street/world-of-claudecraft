@@ -41,6 +41,7 @@ import { arena } from '../src/guide/pages/arena';
 import { controls as controlsPage } from '../src/guide/pages/controls';
 import { catalogSections, deeds as deedsPage } from '../src/guide/pages/deeds';
 import { dungeons as dungeonsPage } from '../src/guide/pages/dungeons';
+import { interfacePage } from '../src/guide/pages/interface';
 import { professions as professionsPage, ringCards } from '../src/guide/pages/professions';
 import { craftDetailHtml, effectLines, itemNameKey } from '../src/guide/pages/professions_craft';
 import { FAQ_ANSWER_KEYS, PROF_FAQ_COUNT } from '../src/guide/pages/professions_faq';
@@ -180,7 +181,15 @@ import { SYSTEM_EVENTS } from '../src/ui/calendar_view';
 import { DEED_IMAGE_IDS } from '../src/ui/deed_image_ids';
 import { entityTranslationKey } from '../src/ui/entity_i18n';
 import { esc } from '../src/ui/esc';
+import {
+  MOBILE_ACTION_BUTTONS,
+  MOBILE_ACTION_PAGE_COUNT,
+  MOBILE_ACTION_SOURCE_SLOT_COUNT,
+  mobileActionSourceSlotCount,
+  mobilePageCount,
+} from '../src/ui/hud/action_bar/mobile_action_page_view';
 import { WELLFED_STAT_KEYS } from '../src/ui/hud/professions/wellfed_stat_keys';
+import { VENDOR_MULTIPLES } from '../src/ui/hud/vendor/vendor_view';
 import {
   ensureLocaleLoaded,
   formatNumber,
@@ -191,6 +200,12 @@ import {
 } from '../src/ui/i18n';
 import { guideStrings } from '../src/ui/i18n.catalog/guide';
 import { itemStrings } from '../src/ui/i18n.catalog/items';
+import { HUD_FRAME_SPECS } from '../src/ui/interface_unlock_core';
+import type {
+  MapGatherNodeMarker,
+  MapWindowMode,
+  OverworldMapModel,
+} from '../src/ui/map_window_view';
 import { recipeInputValue } from './helpers/reagent_unit_value';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
@@ -6353,6 +6368,357 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
       .map((e) => e.text);
     expect(lines.some((l) => l.startsWith(`${need} Roll - 1 `))).toBe(true);
     expect(lines.some((l) => l.startsWith(`${greed} Roll`))).toBe(false);
+  });
+
+  it('the interface page names Edit Frames and the Frames tab Reset to Defaults for every movable frame (wiki completeness audit)', () => {
+    // The wiki completeness audit (2026-09-03). guide.interfacePage.framesMoveBody
+    // said only the three unit frames move and sent players to a 'Reset Frame
+    // Positions' options row that was retired (options_window.ts keeps the
+    // retirement note where the row stood). Live: Edit Frames at the top of the
+    // Frames tab of the Interface options loosens every HUD_FRAME_SPECS row and
+    // the three unit frames with them, and the tab's Reset to Defaults footer
+    // restores them (Hud.resetUnitFrames). Every control is named by its live
+    // label and every frame family is derived from the live table.
+    setLanguage('en');
+    const html = interfacePage.render({
+      params: [],
+      sub: 'reference/interface',
+      titleKey: 'guide.nav.interface',
+    });
+    const framesTab = t('hudChrome.interfaceTabs.frames');
+    expect(html).toContain(
+      `${t('hudChrome.interfaceUnlock.label')}, at the top of the ${framesTab} tab in the ${t('hud.options.interface')} options`,
+    );
+    expect(html).toContain(
+      `${t('hud.options.resetToDefaults')} at the foot of that same ${framesTab} tab snaps them all back`,
+    );
+    // Every frame the toggle governs has a phrase, and every phrase renders: a
+    // new HUD_FRAME_SPECS row with no phrase here reds.
+    const phraseFor: Record<string, string> = {
+      actionBar1: 'the action bars',
+      actionBar2: 'the action bars',
+      actionBar3: 'the action bars',
+      actionBarGroup: 'the action bars',
+      castBar: 'the cast bar',
+      swingBar: 'the swing bar',
+      steamWishlist: `the ${t('hudChrome.interfaceUnlock.frameNames.steamWishlist')} chip`,
+      menu: 'the button rail',
+      minimap: 'the minimap',
+      petFrame: 'the pet frame',
+      stanceBar: 'the stance bar',
+      xpBar: 'the experience bar',
+      buffBar: 'the buff and debuff rows',
+      debuffBar: 'the buff and debuff rows',
+    };
+    expect(Object.keys(phraseFor).sort()).toEqual(HUD_FRAME_SPECS.map((s) => s.id).sort());
+    for (const spec of HUD_FRAME_SPECS) {
+      expect(html, `the prose names ${spec.id}`).toContain(phraseFor[spec.id] as string);
+    }
+    // The unchanged clauses: the three unit frames and their corner button.
+    expect(html).toContain('Your frame, your target frame, and your party frames can all be moved');
+    expect(html).toContain('small move button in its corner');
+    // NEGATIVE: the retired row is gone from the page, and so is the predecessor.
+    expect(html).not.toContain('Reset Frame Positions');
+    expect(html).not.toContain(esc(guideStrings.interfacePage.framesMoveBody));
+    expect(RETIRED_KEYS).toContain('guide.interfacePage.framesMoveBody');
+  });
+
+  it('the interface page opens the world map on the zone and names every marker layer, map mode and tracker (wiki completeness audit)', () => {
+    // The wiki completeness audit (2026-09-03). guide.interfacePage.mapBody
+    // said M opens on 'the continent drawn out' (Hud.toggleMap always opens
+    // the per-zone level; the continent is the level behind a right-click or
+    // the level-toggle button), that the map shows 'the gathering nodes you
+    // have found' (buildOverworldMapModel walks every GATHER_NODES row of the
+    // zone with no discovery gate; a marker's only per-player facets are ready
+    // and locked), that only a delve switches the map (MapWindowMode has five
+    // modes and the castle keeps paint a plan of their own), and it skipped
+    // the always-on Reliquary tracker. The layers, modes, marker facets and
+    // trackers below are all derived from the live types and markup.
+    setLanguage('en');
+    const html = interfacePage.render({
+      params: [],
+      sub: 'reference/interface',
+      titleKey: 'guide.nav.interface',
+    });
+    expect(html).toContain('M opens the world map on the zone you are standing in');
+    expect(html).toContain(
+      `Right-click the map, or press its ${t('hudChrome.continentMap.toWorld')} button, and it pulls back to the continent`,
+    );
+    // Every layer of the overworld draw model is spoken for (null: a layer the
+    // prose leaves unnamed on purpose); a new OverworldMapModel field reds tsc.
+    const layerPhrase: Record<keyof OverworldMapModel, string | null> = {
+      view: null,
+      cursor: null,
+      region: null,
+      zoneId: null,
+      detail: null,
+      ping: null,
+      rift: null,
+      castles: null,
+      navigation: null,
+      allies: null,
+      player: 'with your own arrow on it',
+      pois: 'the points of interest around you',
+      npcs: 'the quest givers with their marks',
+      questAreas: 'the areas your objectives sit in',
+      stations: 'the crafting stations',
+      services: 'mailboxes, noticeboards',
+      farmPatches: 'garden beds',
+      portals: 'the travel portals',
+      gatherNodes: 'every gathering node in the zone',
+      party: 'Your party shows on it too',
+    };
+    for (const [layer, phrase] of Object.entries(layerPhrase)) {
+      if (phrase !== null) expect(html, `the prose names the ${layer} layer`).toContain(phrase);
+    }
+    // The two per-player facets of a node marker are the two states the prose
+    // describes; there is no discovery facet to describe.
+    const facetPhrase: Record<
+      Exclude<keyof MapGatherNodeMarker, 'mx' | 'my' | 'nodeId' | 'type'>,
+      string
+    > = {
+      ready: 'grayed out while it regrows',
+      locked: 'marked when your tools are not up to it',
+    };
+    for (const phrase of Object.values(facetPhrase)) expect(html).toContain(phrase);
+    expect(GATHER_NODES.length).toBeGreaterThan(0);
+    // Every non-overworld map mode is named; MapWindowMode is exhaustive here.
+    const modeWords: Record<MapWindowMode, string | null> = {
+      overworld: null,
+      delve: 'a delve',
+      dungeon: 'a dungeon',
+      rift: 'a rift',
+      battleground: `the ${t('hudChrome.bg.title')} battleground gets a field map of its own`,
+    };
+    for (const [mode, words] of Object.entries(modeWords)) {
+      if (words !== null) expect(html, `the prose names the ${mode} map`).toContain(words);
+    }
+    expect(html).toContain(
+      'Step into a delve, a dungeon, a rift or a castle keep and the map switches to a floor plan of where you stand',
+    );
+    // The tracker stack, read from the live markup: every child of
+    // #right-tracker-stack has a phrase, so a sixth tracker reds here.
+    const indexHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+    const stack = /id="right-tracker-stack">([\s\S]*?)\n\s*<\/div>\n/.exec(indexHtml);
+    expect(stack).not.toBeNull();
+    const trackerIds = [...(stack as RegExpExecArray)[1].matchAll(/id="([a-z-]+)"/g)].map(
+      (m) => m[1] ?? '',
+    );
+    const trackerPhrase: Record<string, string> = {
+      'quest-tracker': 'your tracked quests and their objectives',
+      'deed-tracker': 'your deed progress',
+      'reliquary-tracker': 'your Reliquary pages',
+      'delve-tracker': 'the delve you are in',
+      'rift-tracker': 'any rift you are taking part in',
+    };
+    expect([...trackerIds].sort()).toEqual(Object.keys(trackerPhrase).sort());
+    for (const id of trackerIds) {
+      expect(html, `the prose names ${id}`).toContain(trackerPhrase[id] as string);
+    }
+    // NEGATIVE: the false clauses and the predecessor are gone from the page.
+    for (const stale of [
+      'the continent drawn out',
+      'the gathering nodes you have found',
+      'Inside a delve the map switches to a schematic of the rooms you have explored so far',
+    ]) {
+      expect(html, `stale clause "${stale}"`).not.toContain(stale);
+    }
+    expect(html).not.toContain(esc(guideStrings.interfacePage.mapBody.split('\n\n')[0]));
+    expect(RETIRED_KEYS).toContain('guide.interfacePage.mapBody');
+  });
+
+  it('the interface page gives the touch ring its live page count and drops the Vale Cup from the More tray (wiki completeness audit)', () => {
+    // The wiki completeness audit (2026-09-03). guide.interfacePage.mobileBody
+    // promised 'up to seven pages once you have all three action bars
+    // switched on': the ring has MOBILE_ACTION_PAGE_COUNT pages over
+    // MOBILE_ACTION_SOURCE_SLOT_COUNT slots, and mobileActionSourceSlotCount
+    // ignores the desktop rows' visibility by design. It also listed the Vale
+    // Cup in the More tray, which #mobile-extra-grid does not hold. The
+    // successor interpolates both numbers from the live pure core, so a retune
+    // moves the page instead of rotting it.
+    setLanguage('en');
+    const html = interfacePage.render({
+      params: [],
+      sub: 'reference/interface',
+      titleKey: 'guide.nav.interface',
+    });
+    const start = html.indexOf(esc(t('guide.interfacePage.mobileTitle')));
+    expect(start).toBeGreaterThan(-1);
+    const mobile = html.slice(start);
+    const pages = formatNumber(MOBILE_ACTION_PAGE_COUNT);
+    const slots = formatNumber(MOBILE_ACTION_SOURCE_SLOT_COUNT);
+    expect(mobile).toContain(
+      `swaps the ring between its ${pages} pages, which together reach all ${slots} of your ability slots whether or not the extra desktop bars are switched on`,
+    );
+    expect(MOBILE_ACTION_PAGE_COUNT).toBe(mobilePageCount(MOBILE_ACTION_SOURCE_SLOT_COUNT));
+    expect(mobileActionSourceSlotCount()).toBe(MOBILE_ACTION_SOURCE_SLOT_COUNT);
+    expect(mobileActionSourceSlotCount({ bar2: false, bar3: false } as never)).toBe(
+      MOBILE_ACTION_SOURCE_SLOT_COUNT,
+    );
+    // The unchanged 'four action buttons' clause stays bound to its constant.
+    expect(MOBILE_ACTION_BUTTONS).toBe(4);
+    expect(mobile).toContain('the attack button with four action buttons beside it');
+    // The More tray, read from the live markup: no Vale Cup button, and every
+    // window the prose names has one.
+    const indexHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+    const grid = /<div id="mobile-extra-grid">([\s\S]*?)\n\s*<\/div>\n/.exec(indexHtml);
+    expect(grid).not.toBeNull();
+    const trayIds = [...(grid as RegExpExecArray)[1].matchAll(/ id="(mobile-[a-z-]+)"/g)].map(
+      (m) => m[1] ?? '',
+    );
+    expect(trayIds.length).toBeGreaterThan(0);
+    expect(trayIds.some((id) => /vale|cup/.test(id))).toBe(false);
+    for (const id of ['mobile-dfinder', 'mobile-arena', 'mobile-emote', 'mobile-wiki']) {
+      expect(trayIds, `${id} sits in the More tray`).toContain(id);
+    }
+    expect(mobile).toContain(
+      `the rest of your windows, the ${t('hudChrome.finder.title')}, ${t('hudChrome.pvp.mobileLabel')}, emotes and the wiki among them`,
+    );
+    // NEGATIVE: the false clauses and the predecessor are gone from the section.
+    for (const stale of [
+      'seven pages',
+      'once you have all three action bars switched on',
+      'the Vale Cup',
+    ]) {
+      expect(mobile, `stale clause "${stale}"`).not.toContain(stale);
+    }
+    expect(mobile).not.toContain(esc(guideStrings.interfacePage.mobileBody.split('\n\n')[1]));
+    expect(RETIRED_KEYS).toContain('guide.interfacePage.mobileBody');
+  });
+
+  it('the interface page keys its extra windows to live binds, opens Player Info from the target frame and names the Developers tab (wiki completeness audit)', () => {
+    // The wiki completeness audit (2026-09-03). guide.interfacePage.winMoreBody
+    // listed 'the Vale Cup (Y)' (no bind defaults to KeyY and no Vale Cup
+    // window exists), put the held emote wheel among the toggled windows,
+    // said a right-click on a nameplate opens Player Info (interactions.ts:
+    // a world right-click only targets; the unit menu lives on the target
+    // frame, with the touch double-tap and long press), said the card needs
+    // proximity (Hud.openPlayerInfo falls back to the public sheet out of
+    // view), and skipped the Developers tab. Keys, tabs and labels below are
+    // read from BIND_ACTIONS and the live catalog.
+    setLanguage('en');
+    const html = interfacePage.render({
+      params: [],
+      sub: 'reference/interface',
+      titleKey: 'guide.nav.interface',
+    });
+    const start = html.indexOf(esc(t('guide.interfacePage.winMoreTitle')));
+    expect(start).toBeGreaterThan(-1);
+    const beat = html.slice(start, html.indexOf('</div>', start));
+    const bind = (id: string) => {
+      const action = BIND_ACTIONS.find((b) => b.id === id);
+      expect(action, `${id} is a bind`).toBeDefined();
+      return action as NonNullable<typeof action>;
+    };
+    const key = (id: string) => keyLabel(bind(id).defaults[0] ?? null);
+    // The four toggled windows carry their live default key and are edge binds.
+    const windows = [
+      ['The world map', 'map'],
+      ['the PvP window', 'arena'],
+      ['the leaderboard', 'leaderboard'],
+      ['the event calendar', 'calendar'],
+    ] as const;
+    for (const [words, id] of windows) {
+      expect(bind(id).kind).toBe('edge');
+      expect(beat).toContain(`${words} (${key(id)})`);
+    }
+    // The emote wheel is the one held bind of the set, and the prose says so.
+    expect(bind('emoteWheel').kind).toBe('held');
+    expect(beat).toContain(`The emote wheel (${key('emoteWheel')}) is the exception: hold its key`);
+    // No bind defaults to Y and no Vale Cup bind exists: the dead entry is gone.
+    expect(BIND_ACTIONS.some((b) => b.defaults.includes('KeyY'))).toBe(false);
+    expect(BIND_ACTIONS.some((b) => /vale/i.test(b.id) || /vale cup/i.test(b.label))).toBe(false);
+    expect(beat).not.toContain('Vale Cup');
+    expect(beat).not.toContain('(Y)');
+    // The leaderboard's fifth tab and the setting that hides it, by live label.
+    expect(beat).toContain(`a ${t('hudChrome.leaderboard.tabDevs')} tab`);
+    expect(beat).toContain(`unless you switch ${t('hudChrome.options.showDevBadges')} off`);
+    // Player Info: the target frame or the chat name, and the out-of-view half.
+    expect(beat).toContain(
+      'right-click the target frame (on touch, double-tap or long-press it), or right-click their name in chat',
+    );
+    expect(beat).toContain('The gear needs them close enough to see');
+    expect(beat).toContain('their portrait, name, level, class, and guild');
+    // NEGATIVE: the false clauses and the predecessor are gone from the beat.
+    for (const stale of [
+      'on their nameplate',
+      'and it needs them to be close enough to see',
+      'and the emote wheel (X) all work the same way',
+    ]) {
+      expect(beat, `stale clause "${stale}"`).not.toContain(stale);
+    }
+    expect(beat).not.toContain(esc(guideStrings.interfacePage.winMoreBody));
+    expect(RETIRED_KEYS).toContain('guide.interfacePage.winMoreBody');
+  });
+
+  it('the interface page names the station masters, the three bank tabs, the buyback list and both market keepers (wiki completeness audit)', () => {
+    // The wiki completeness audit (2026-09-03). guide.interfacePage.worldWindowsBody
+    // promised a class trainer (none exists: abilities arrive by level through
+    // refreshKnownAbilities, and the gossip Training route is gated on a
+    // station master), a 'buyback tab' (renderVendorWindow appends a buyback
+    // SECTION at the foot of one panel), a guild bank as 'a second tab' (the
+    // strip is Personal, Vault, Guild), and one market keeper where two NPCs
+    // carry the market flag. Masters, tabs, multiples and keepers below are
+    // derived from the live tables.
+    setLanguage('en');
+    const html = interfacePage.render({
+      params: [],
+      sub: 'reference/interface',
+      titleKey: 'guide.nav.interface',
+    });
+    const start = html.indexOf(esc(t('guide.interfacePage.worldWindowsTitle')));
+    expect(start).toBeGreaterThan(-1);
+    const sect = html.slice(start, html.indexOf('</section>', start));
+    // Training belongs to the station masters, every one of them a real NPC.
+    expect(STATIONS.length).toBeGreaterThan(0);
+    for (const station of STATIONS) {
+      expect(
+        Object.values(NPCS).some((n) => n.id === station.masterNpcId),
+        `${station.masterNpcId} exists`,
+      ).toBe(true);
+    }
+    expect(sect).toContain(
+      `the resident masters of the crafting stations, and ${t('hudChrome.training.dialogOption')} on one of them opens the recipes they can teach you now, the ones you already know, and the ones still locked behind more skill`,
+    );
+    expect(sect).not.toContain('class trainer');
+    // The bank: three tabs by their live labels, in the strip's own order.
+    let cursor = 0;
+    for (const tabKey of ['personalTab', 'vaultTab', 'guildTab'] as const) {
+      const label = `${t(`hudChrome.bank.${tabKey}` as never)} tab`;
+      const at = sect.indexOf(label, cursor);
+      expect(at, `${label} is named in order`).toBeGreaterThan(-1);
+      cursor = at + label.length;
+    }
+    expect(sect).not.toContain('a second tab there shows it');
+    // The vendor: one panel with the buyback list at its foot; the quantity
+    // multiples of the unchanged clause are the live ones.
+    expect(sect).toContain(
+      'a buyback list at the foot of the same panel holding what you last sold',
+    );
+    expect(sect).not.toContain('buyback tab');
+    expect(VENDOR_MULTIPLES).toContain(5);
+    expect(VENDOR_MULTIPLES).toContain(10);
+    expect(VENDOR_MULTIPLES).toContain('custom');
+    expect(sect).toContain('one press at five or ten at a time');
+    // The World Market: every NPC flagged market is named with its town, the
+    // hub of the zone whose bounds hold it.
+    const keepers = Object.values(NPCS).filter((n) => n.market === true);
+    expect(keepers.length).toBeGreaterThan(1);
+    for (const keeper of keepers) {
+      expect(sect.toLowerCase(), `${keeper.id} is named`).toContain(keeper.name.toLowerCase());
+      const zone = ZONES.find(
+        (z) =>
+          keeper.pos.z >= z.zMin &&
+          keeper.pos.z <= z.zMax &&
+          (z.xMin === undefined || keeper.pos.x >= z.xMin) &&
+          (z.xMax === undefined || keeper.pos.x <= z.xMax),
+      );
+      expect(zone, `${keeper.id} sits in a zone`).toBeDefined();
+      expect(sect).toContain((zone as NonNullable<typeof zone>).hub.name);
+    }
+    expect(sect).not.toContain('The World Market at the Merchant has its own window');
+    expect(sect).not.toContain(esc(guideStrings.interfacePage.worldWindowsBody.split('\n\n')[1]));
+    expect(RETIRED_KEYS).toContain('guide.interfacePage.worldWindowsBody');
   });
 
   // END wiki completeness corrections (the inserter appends above this line)

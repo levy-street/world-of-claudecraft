@@ -231,6 +231,47 @@ export const RETIRED_KEYS = [
   // successor lootRollBodyNeedBeatsGreed states the rule, and its five
   // non-Latin fills rode the change (the old key keeps its reviewed rows here).
   'guide.social.lootRollBody',
+  // Phase 20 (2026-09-03, the wiki completeness audit): the frames prose said
+  // only the three unit frames move and sent players to a 'Reset Frame
+  // Positions' options row that was retired (options_window.ts keeps the note
+  // where it stood); the successor framesMoveBodyEditFrames names Edit Frames,
+  // every HUD_FRAME_SPECS frame it loosens, and the Frames tab's Reset to
+  // Defaults footer, and its five non-Latin fills rode the same change (the
+  // old key keeps its reviewed overlay rows).
+  'guide.interfacePage.framesMoveBody',
+  // Phase 20 (2026-09-03, the wiki completeness audit): the map prose said M
+  // opens on the continent (Hud.toggleMap always opens the per-zone level),
+  // that it shows the gathering nodes 'you have found' (every authored node of
+  // the zone draws, ready/locked are its only per-player facets), that only a
+  // delve switches the map (five MapWindowMode surfaces plus the castle plan),
+  // and it skipped the Reliquary tracker; the successor mapBodyZoneFirst says
+  // all of it, and its five non-Latin fills rode the same change.
+  'guide.interfacePage.mapBody',
+  // Phase 20 (2026-09-03, the wiki completeness audit): the touch prose
+  // promised 'up to seven pages once you have all three action bars switched
+  // on' where the ring has MOBILE_ACTION_PAGE_COUNT pages over every ability
+  // slot regardless of the desktop rows, and listed the Vale Cup in a More
+  // tray that has no such button; the successor mobileBodyTwoPages
+  // interpolates {pages} and {slots} from the live pure core and drops the
+  // Vale Cup, and its five non-Latin fills rode the same change.
+  'guide.interfacePage.mobileBody',
+  // Phase 20 (2026-09-03, the wiki completeness audit): the extra-windows
+  // prose listed 'the Vale Cup (Y)' (no bind defaults to KeyY, no such
+  // window), counted the held emote wheel among the toggled windows, opened
+  // Player Info from a nameplate right-click (a world right-click only
+  // targets; the menu lives on the target frame) and made the card need
+  // proximity (only the gear does); the successor winMoreBodyNoValeCup says
+  // what the game does, adds the Developers tab, and its five non-Latin
+  // fills rode the same change.
+  'guide.interfacePage.winMoreBody',
+  // Phase 20 (2026-09-03, the wiki completeness audit): the world-windows
+  // prose promised a class trainer (none exists: abilities arrive by level and
+  // Training is the station masters' recipe ladder), a buyback TAB (one panel
+  // with a buyback section at its foot), a guild bank as 'a second tab' (the
+  // strip is Personal, Vault, Guild) and one market keeper where two NPCs
+  // carry the market flag; the successor worldWindowsBodyStationMaster says
+  // what the game does, and its five non-Latin fills rode the same change.
+  'guide.interfacePage.worldWindowsBody',
 ];
 
 export const RETIRED_KEY_SET = new Set(RETIRED_KEYS);

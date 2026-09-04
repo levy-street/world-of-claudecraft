@@ -9,6 +9,11 @@
 // windows a normal player can reach are listed: nothing gated behind
 // ALLOW_DEV_COMMANDS or a linked wallet appears here.
 
+import {
+  MOBILE_ACTION_PAGE_COUNT,
+  MOBILE_ACTION_SOURCE_SLOT_COUNT,
+} from '../../ui/hud/action_bar/mobile_action_page_view';
+import { formatNumber } from '../../ui/i18n';
 import { hrefFor } from '../routes';
 import type { GuidePage } from './types';
 import { callout, loreBeat, p, pageHeader, paras, related, section } from './ui';
@@ -36,7 +41,7 @@ const KEY_WINDOWS = [
   ['guide.interfacePage.winSocialTitle', 'guide.interfacePage.winSocialBody'],
   ['guide.interfacePage.winFinderTitle', 'guide.interfacePage.winFinderBody'],
   ['guide.interfacePage.winMetersTitle', 'guide.interfacePage.winMetersBody'],
-  ['guide.interfacePage.winMoreTitle', 'guide.interfacePage.winMoreBody'],
+  ['guide.interfacePage.winMoreTitle', 'guide.interfacePage.winMoreBodyNoValeCup'],
 ] as const;
 
 export const interfacePage: GuidePage = {
@@ -58,7 +63,7 @@ export const interfacePage: GuidePage = {
           'guide.interfacePage.framesTitle',
           paras('guide.interfacePage.framesBody') +
             `<div class="guide-beat-grid">${frames}</div>` +
-            paras('guide.interfacePage.framesMoveBody'),
+            paras('guide.interfacePage.framesMoveBodyEditFrames'),
         )}
 
         ${section('guide.interfacePage.barsTitle', paras('guide.interfacePage.barsBody'))}
@@ -66,7 +71,7 @@ export const interfacePage: GuidePage = {
         ${section('guide.interfacePage.actionBarsTitle', paras('guide.interfacePage.actionBarsBody'))}
         ${section('guide.interfacePage.minimapTitle', paras('guide.interfacePage.minimapBody'))}
         ${section('guide.interfacePage.railTitle', paras('guide.interfacePage.railBody'))}
-        ${section('guide.interfacePage.mapTitle', paras('guide.interfacePage.mapBody'))}
+        ${section('guide.interfacePage.mapTitle', paras('guide.interfacePage.mapBodyZoneFirst'))}
         ${section('guide.interfacePage.chatTitle', paras('guide.interfacePage.chatBody'))}
 
         ${section(
@@ -77,12 +82,21 @@ export const interfacePage: GuidePage = {
 
         ${section(
           'guide.interfacePage.worldWindowsTitle',
-          paras('guide.interfacePage.worldWindowsBody'),
+          paras('guide.interfacePage.worldWindowsBodyStationMaster'),
         )}
         ${section('guide.interfacePage.lootTitle', paras('guide.interfacePage.lootBody'))}
         ${section('guide.interfacePage.playerCardTitle', paras('guide.interfacePage.playerCardBody'))}
         ${section('guide.interfacePage.wikiTitle', paras('guide.interfacePage.wikiBody'))}
-        ${section('guide.interfacePage.mobileTitle', paras('guide.interfacePage.mobileBody'))}
+        ${section(
+          'guide.interfacePage.mobileTitle',
+          // The ring's page count and slot span interpolate from the live pure
+          // core (the wiki completeness audit, 2026-09-03), so a ring retune
+          // moves the page instead of rotting it.
+          paras('guide.interfacePage.mobileBodyTwoPages', {
+            pages: formatNumber(MOBILE_ACTION_PAGE_COUNT),
+            slots: formatNumber(MOBILE_ACTION_SOURCE_SLOT_COUNT),
+          }),
+        )}
 
         ${related([
           { href: hrefFor('reference/controls'), key: 'guide.nav.controls' },
