@@ -93,6 +93,10 @@ export interface NormalDungeonTuning {
   id: string;
   difficulty: Extract<DungeonDifficulty, 'normal'>;
   healthMultiplier: number;
+  // Optional per-mob health override (the heroic table has the same field): a
+  // boss whose health pool is set on its own while the adds keep the shared
+  // multiplier (Nythraxis, 2026-09-04).
+  healthMultiplierByMob?: Record<string, number>;
   damageMultiplierByMob: Record<string, number>;
   // Optional per-mob override for mechanicDamageMult only (aoePulse, stomp,
   // infernoChannel); a mob absent here falls back to its damageMultiplierByMob
@@ -197,6 +201,13 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
     id: 'nythraxis_boss_arena',
     difficulty: 'normal',
     healthMultiplier: 2.0,
+    // The boss alone: 160,000 on the 60,000 template (owner call for the
+    // mechanics redo, 2026-09-04; was the shared 2.0 for 120,000). Adds and
+    // the Bone Spikes keep the shared multiplier.
+    healthMultiplierByMob: {
+      // 120,000 after the first playtest (2026-09-04; the redo tried 160,000).
+      nythraxis_scourge_of_thornpeak: 120_000 / 60_000,
+    },
     damageMultiplierByMob: {
       nythraxis_scourge_of_thornpeak: 5,
       nythraxis_skeleton_warrior: 5,
@@ -435,6 +446,13 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     // and its respawn gate (only after the previous court dies) self-limits.
     healthMultiplierByMob: {
       nythraxis_skeleton_warrior: 2.22,
+      // Bone Spikes are a DPS target-switch check, not a health sponge: 1.5x
+      // their normal pool (1,500 vs 1,000) so three spikes still shatter inside
+      // the impale drain window when the raid splits onto them.
+      nythraxis_bone_spike: 3.0,
+      // The boss alone: 192,000 on the 60,000 template (owner call after the
+      // first playtest, 2026-09-04; the redo tried 230,000).
+      nythraxis_scourge_of_thornpeak: 192_000 / 60_000,
     },
     armorMultiplier: 1.2,
     finalBossId: 'nythraxis_scourge_of_thornpeak',

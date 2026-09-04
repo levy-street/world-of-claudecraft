@@ -754,7 +754,7 @@ function finalBossAlive(ctx: SimContext, inst: InstanceSlot): boolean {
 
 // The royal door seals once Nythraxis is engaged (pulled, alive, pre-death).
 // It reopens on his death or a full raid wipe (handled in the encounter loop).
-function nythraxisInstanceSealed(ctx: SimContext, inst: InstanceSlot): boolean {
+export function nythraxisInstanceSealed(ctx: SimContext, inst: InstanceSlot): boolean {
   for (const id of inst.mobIds) {
     const e = ctx.entities.get(id);
     if (
@@ -1056,7 +1056,10 @@ function claimInstance(
   // the entrance (see enterDungeon / spirit.ts ghostGraveyard).
 }
 
-function freeInstance(ctx: SimContext, inst: InstanceSlot): void {
+// Exported for the dev practice raids only (nythraxis_dev_raid.ts switches a
+// claim's difficulty by releasing it); live play frees claims through the
+// reaper and the reset paths above.
+export function freeInstance(ctx: SimContext, inst: InstanceSlot): void {
   const claimId = inst.exitId;
   for (const id of inst.mobIds) {
     if (!ctx.entities.has(id)) continue;

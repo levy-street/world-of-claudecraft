@@ -1041,11 +1041,11 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // src/render/stride_audio_core.ts and the mounted audio branch gained the
 // idle-hum poll. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'acdad02b012824b6a0588fa8330eb7cc20fcd0112d9f159a04ab1062752869ab';
+  'f8d1df1d60bb2bc3fa8020cc8bf23da5f42bc99dc315dd80a718886a9673b509';
 // Re-minted at the release/v0.42.0 sync of PR #3439: renderer.ts moved for the
 // mount lifecycle seam (mount_lifecycle.ts) and the rickshaw hooks it absorbed.
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '87d8b0efb81ca5d41f5a57f7fd9654739ba16b59f9f8de4cda6a39031b5e8806';
+  '8ae24529f62c56634b8f16c8f5d85e8964f44d41bcbcbe43b9a3700ab4859c41';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2201,7 +2201,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
       // Re-minted for the Drakelands entrance merge into the raid branch: the
       // composite first, then this seal. No capture was retaken.
-    ).toBe('69c8bd5d29f52927682340a17af5935bdc33585a5b0599daa4c2682c04a3211f');
+    ).toBe('c39e61b97e0da13f673b46cfa1a956c77229edf10978aa60550486bba365c7da');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

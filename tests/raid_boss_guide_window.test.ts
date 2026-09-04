@@ -3,8 +3,13 @@
 import { readFileSync } from 'node:fs';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { IGNIVAR_RAID_ARENA_ID, IGNIVAR_SECOND_WING_ID } from '../src/sim/ignivar_raid_ids';
+import {
+  NYTHRAXIS_DREAD_CURSE_PER_STACK_HEROIC,
+  NYTHRAXIS_DREAD_CURSE_TANK_SWAP_STACKS,
+} from '../src/sim/nythraxis_dread_curse';
 import { VARKHUL_SHARED_PYRE_RAID_DAMAGE_PER_MISSING } from '../src/sim/varkhul_shared_pyre';
 import { ensureLocaleLoaded, formatNumber, setLanguage } from '../src/ui/i18n';
+import { NYTHRAXIS_BOSS_ARENA_ID } from '../src/ui/raid_boss_guide_view';
 import {
   RaidBossGuideWindow,
   raidBossGuideContextFallback,
@@ -65,7 +70,7 @@ describe('RaidBossGuideWindow', () => {
     expect(closeOthers).toHaveBeenCalledOnce();
     expect(root.style.display).toBe('block');
     expect(root.getAttribute('role')).toBe('dialog');
-    expect(root.querySelectorAll<HTMLButtonElement>('[data-boss]')).toHaveLength(2);
+    expect(root.querySelectorAll<HTMLButtonElement>('[data-boss]')).toHaveLength(3);
     expect(
       root.querySelector<HTMLButtonElement>('[data-boss="ignivar"]')?.getAttribute('aria-pressed'),
     ).toBe('true');
@@ -80,6 +85,46 @@ describe('RaidBossGuideWindow', () => {
     expect(root.querySelectorAll('.rbg-ability')).toHaveLength(9);
     expect(root.querySelectorAll('.rbg-ability-detail')).toHaveLength(0);
     expect(document.activeElement).toBe(root.querySelector('[data-boss="ignivar"]'));
+  });
+
+  it('opens the Nythraxis journal in the crypt arena with three phases and no add mechanics', () => {
+    const button = guide.syncAvailability(NYTHRAXIS_BOSS_ARENA_ID);
+    expect(button).toBe(guide.button);
+    expect(button?.textContent).toContain('Nythraxis');
+    button?.click();
+
+    expect(root.style.display).toBe('block');
+    expect(
+      root
+        .querySelector<HTMLButtonElement>('[data-boss="nythraxis"]')
+        ?.getAttribute('aria-pressed'),
+    ).toBe('true');
+    expect(root.querySelector<HTMLImageElement>('.rbg-model-poster')?.src).toContain(
+      '/ui/mobs/nythraxis_scourge_of_thornpeak.webp',
+    );
+    expect(root.querySelectorAll('.rbg-phase')).toHaveLength(3);
+    expect(root.querySelectorAll('.rbg-ability')).toHaveLength(12);
+    expect(root.textContent).toContain('The Throne');
+    expect(root.textContent).toContain('The Wardstones');
+    expect(root.textContent).toContain("The King's Wrath");
+    expect(root.textContent).not.toContain('Raise Fallen');
+    expect(root.textContent).not.toContain('The Deathless Court');
+
+    // The heroic tier lists the same twelve: the court is switched off with the adds.
+    root.querySelector<HTMLButtonElement>('[data-difficulty="heroic"]')?.click();
+    expect(root.querySelectorAll('.rbg-ability')).toHaveLength(12);
+    expect(root.textContent).not.toContain('The Deathless Court');
+
+    root.querySelector<HTMLButtonElement>('[data-mechanic="dread-curse"]')?.click();
+    const detail = root.querySelector<HTMLElement>('[data-detail="dread-curse"]');
+    expect(detail?.textContent).toContain(
+      formatNumber(NYTHRAXIS_DREAD_CURSE_PER_STACK_HEROIC, {
+        style: 'percent',
+        maximumFractionDigits: 0,
+      }),
+    );
+    expect(detail?.textContent).toContain(`${NYTHRAXIS_DREAD_CURSE_TANK_SWAP_STACKS} stacks`);
+    expect(detail?.textContent).not.toMatch(/\{[A-Za-z0-9_]+\}/);
   });
 
   it('never emits an aria-controls reference without its controlled detail', () => {

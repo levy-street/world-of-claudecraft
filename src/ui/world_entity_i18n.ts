@@ -94,6 +94,7 @@ const MOB_IDS = [
   'nythraxis_heroic_priest_add',
   'nythraxis_heroic_rogue_add',
   'nythraxis_scourge_of_thornpeak',
+  'nythraxis_bone_spike',
   'ignivar_herald_of_the_last_flame',
   'ignivar_heart_of_the_end',
   'ignivar_ember_sentinel',

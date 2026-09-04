@@ -1050,6 +1050,36 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     scale: 1.12,
     color: 0x776f83,
   },
+  // Bone Spike: the stationary pillar Nythraxis impales a raider on
+  // (src/sim/nythraxis_bone_spike.ts). It never moves, aggroes, or swings; the
+  // impaled raider drains until the raid kills it, so its health IS the
+  // mechanic's timer (about four seconds of two DPS on normal after the arena's
+  // 2.0x, 1.5x that on heroic via healthMultiplierByMob). xpMult 0: shattering a
+  // spike is the counterplay, never a kill worth experience.
+  nythraxis_bone_spike: {
+    id: 'nythraxis_bone_spike',
+    name: 'Bone Spike',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'undead',
+    elite: true,
+    ccImmune: true,
+    slowImmune: true,
+    ignoreTaunt: true,
+    quietMechanics: true,
+    xpMult: 0,
+    hpBase: 500 / 2.3,
+    hpPerLevel: 0,
+    dmgBase: 0,
+    dmgPerLevel: 0,
+    attackSpeed: 2.6,
+    armorPerLevel: 0,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    loot: [],
+    scale: 1,
+    color: 0xd9d2b8,
+  },
   // Brother Aldric is now a dynamically-spawned NPC (see NPCS.brother_aldric_raid
   // in zone3.ts and spawnNythraxisAldric in sim.ts), not a mob.
   nythraxis_scourge_of_thornpeak: {
@@ -1068,8 +1098,11 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     // this via the nythraxis_boss_arena healthMultiplier.
     hpBase: 60000 / 2.3,
     hpPerLevel: 0,
-    dmgBase: 54,
-    dmgPerLevel: 11.4,
+    // 70% of the pre-redo swing (54 / 11.4): the owner's first playtest of the
+    // mechanics redo (2026-09-04) found the white damage too high on top of
+    // the Dread Curse stacks. Gravebreaker's splash scales off the swing too.
+    dmgBase: 37.8,
+    dmgPerLevel: 7.98,
     attackSpeed: 2.6,
     armorPerLevel: 42,
     moveSpeed: 10.5,
@@ -1488,24 +1521,27 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     index: 5,
     doorPos: { x: -152, z: 610 },
     overworldDoor: false,
-    entry: { x: 0, z: 4 },
-    exitOffset: { x: 0, z: -6 },
+    // The hall runs z 16 to 116 (NYTHRAXIS_LAYOUT): raiders enter at the front
+    // wall and the exit portal sits just inside it.
+    entry: { x: 0, z: 20 },
+    exitOffset: { x: 0, z: 17 },
     spawns: NYTHRAXIS_RAID_SPAWN_LIST,
     objects: [
-      // Three soul wardstones in a wide forward triangle in front of the boss
-      // (spawn 0,96), well clear of his body so all three read distinctly and
-      // raiders must split to channel them. Kept within the encounter's
-      // wardstone search radius (see nythraxisWardstones in sim.ts). The item id
-      // doubles as the Sunken Bastion quest pickup, so without interactOnly the
-      // quest-collectable display gate hides them from every raider who is not on
-      // that zone 2 quest.
-      { itemId: 'bastion_ward_stone', name: 'Left Wardstone', x: -40, z: 79, interactOnly: true },
-      { itemId: 'bastion_ward_stone', name: 'Right Wardstone', x: 40, z: 79, interactOnly: true },
+      // Three soul wardstones in a forward triangle in front of the boss (spawn
+      // 0,96), 34 to 38 yd out so all three read distinctly and raiders must
+      // split to channel them, and 6 yd clear of the sigil and Soulfire
+      // placement rules. Kept within the encounter's wardstone search radius
+      // (see nythraxisWardstones in sim.ts). The item id doubles as the Sunken
+      // Bastion quest pickup, so without interactOnly the quest-collectable
+      // display gate hides them from every raider who is not on that zone 2
+      // quest.
+      { itemId: 'bastion_ward_stone', name: 'Left Wardstone', x: -30, z: 74, interactOnly: true },
+      { itemId: 'bastion_ward_stone', name: 'Right Wardstone', x: 30, z: 74, interactOnly: true },
       {
         itemId: 'bastion_ward_stone',
         name: 'Threshold Wardstone',
         x: 0,
-        z: 63,
+        z: 62,
         interactOnly: true,
       },
     ],

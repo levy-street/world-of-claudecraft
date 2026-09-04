@@ -51,6 +51,41 @@ import {
   VARKHUL_MAKERS_BRAND_PER_STACK,
   VARKHUL_MAKERS_BRAND_TANK_SWAP_STACKS,
 } from '../sim/encounters/varkhul';
+import {
+  NYTHRAXIS_ASCENSION_AURA_ID,
+  NYTHRAXIS_ASCENSION_HASTE_AURA_ID,
+  NYTHRAXIS_BOUND_AURA_ID,
+  NYTHRAXIS_BOUND_SECONDS_NORMAL,
+  NYTHRAXIS_BOUND_STUN_AURA_ID,
+  NYTHRAXIS_BOUND_VULNERABILITY,
+  NYTHRAXIS_UNBOUND_AURA_ID,
+} from '../sim/nythraxis_binding_sigil';
+import {
+  NYTHRAXIS_IMPALED_AURA_ID,
+  NYTHRAXIS_IMPALED_TICK_MAX_HP_HEROIC,
+  NYTHRAXIS_IMPALED_TICK_MAX_HP_NORMAL,
+  NYTHRAXIS_IMPALED_TICK_SECONDS,
+} from '../sim/nythraxis_bone_spike';
+import {
+  NYTHRAXIS_BONE_STORM_AURA_ID,
+  NYTHRAXIS_BONE_STORM_RADIUS,
+  NYTHRAXIS_BONE_STORM_WHIRL_TICK_MAX_HP_NORMAL,
+} from '../sim/nythraxis_bone_storm';
+import {
+  NYTHRAXIS_DREAD_CURSE_AURA_ID,
+  NYTHRAXIS_DREAD_CURSE_DURATION,
+  NYTHRAXIS_DREAD_CURSE_EVERY,
+  NYTHRAXIS_DREAD_CURSE_HIT_MAX_HP_NORMAL,
+  NYTHRAXIS_DREAD_CURSE_MAX_STACKS,
+  NYTHRAXIS_DREAD_CURSE_PER_STACK_NORMAL,
+  NYTHRAXIS_DREAD_CURSE_TANK_SWAP_STACKS,
+} from '../sim/nythraxis_dread_curse';
+import {
+  NYTHRAXIS_CROWN_ENDURES_AURA_ID,
+  NYTHRAXIS_CROWN_ENDURES_HASTE_AURA_ID,
+  NYTHRAXIS_ENRAGE_HASTE_BONUS,
+} from '../sim/nythraxis_enrage_clock';
+import { NYTHRAXIS_KINGS_WRATH_AURA_ID } from '../sim/nythraxis_kings_wrath';
 import type { AuraKind } from '../sim/types';
 import {
   ENRAGE_DMG_DONE,
@@ -183,6 +218,98 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
         max: VARKHUL_MAKERS_BRAND_MAX_STACKS,
         pct: pctFromFrac(VARKHUL_MAKERS_BRAND_PER_STACK),
         swap: VARKHUL_MAKERS_BRAND_TANK_SWAP_STACKS,
+      },
+    };
+  }
+  if (
+    a.id === NYTHRAXIS_ASCENSION_HASTE_AURA_ID ||
+    a.id === NYTHRAXIS_BOUND_STUN_AURA_ID ||
+    a.id === NYTHRAXIS_CROWN_ENDURES_HASTE_AURA_ID
+  ) {
+    return null;
+  }
+  if (a.id === NYTHRAXIS_ASCENSION_AURA_ID) {
+    return {
+      key: `${KEY}.nythraxisAscension`,
+      nums: {
+        stacks: Math.max(1, Math.trunc(a.stacks ?? 1)),
+        pct: pctFromFrac(a.value),
+      },
+    };
+  }
+  if (a.id === NYTHRAXIS_BOUND_AURA_ID) {
+    return {
+      key: `${KEY}.nythraxisBound`,
+      nums: {
+        pct: pctFromFrac(NYTHRAXIS_BOUND_VULNERABILITY),
+        // The burn window is per difficulty and rides the aura's value2.
+        duration: a.value2 ?? NYTHRAXIS_BOUND_SECONDS_NORMAL,
+      },
+    };
+  }
+  if (a.id === NYTHRAXIS_UNBOUND_AURA_ID) {
+    return {
+      key: `${KEY}.nythraxisUnbound`,
+      nums: { pct: pctFromFrac(a.value) },
+    };
+  }
+  if (a.id === NYTHRAXIS_KINGS_WRATH_AURA_ID) {
+    return {
+      key: `${KEY}.nythraxisKingsWrath`,
+      nums: { pct: pctFromFrac(a.value) },
+    };
+  }
+  if (a.id === NYTHRAXIS_BONE_STORM_AURA_ID) {
+    return {
+      key: `${KEY}.nythraxisBoneStorm`,
+      nums: {
+        // The whirl tick is per difficulty and rides the aura's value2; a
+        // mirror that has not carried it yet falls back to the normal number.
+        tick: pctFromFrac(a.value2 ?? NYTHRAXIS_BONE_STORM_WHIRL_TICK_MAX_HP_NORMAL),
+        radius: NYTHRAXIS_BONE_STORM_RADIUS,
+      },
+    };
+  }
+  if (a.id === NYTHRAXIS_CROWN_ENDURES_AURA_ID) {
+    return {
+      key: `${KEY}.nythraxisCrownEndures`,
+      nums: {
+        stacks: Math.max(1, Math.trunc(a.stacks ?? 1)),
+        pct: pctFromFrac(a.value),
+        haste: pctFromFrac(NYTHRAXIS_ENRAGE_HASTE_BONUS),
+      },
+    };
+  }
+  if (a.id === NYTHRAXIS_DREAD_CURSE_AURA_ID) {
+    // The aura's value is stacks x per-stack, and the per-stack bonus is the one
+    // number heroic changes (nythraxis_dread_curse.ts), so read it back off the
+    // live aura instead of guessing the difficulty; a mirror that has not
+    // carried the value yet falls back to the normal-mode bonus.
+    const stacks = Math.max(1, Math.trunc(a.stacks ?? 1));
+    const perStackFrac = a.value > 0 ? a.value / stacks : NYTHRAXIS_DREAD_CURSE_PER_STACK_NORMAL;
+    return {
+      key: `${KEY}.nythraxisDreadCurse`,
+      nums: {
+        perStack: pctFromFrac(perStackFrac),
+        duration: NYTHRAXIS_DREAD_CURSE_DURATION,
+        stacks,
+        max: NYTHRAXIS_DREAD_CURSE_MAX_STACKS,
+        pct: pctFromFrac(perStackFrac * stacks),
+        hit: pctFromFrac(a.value2 ?? NYTHRAXIS_DREAD_CURSE_HIT_MAX_HP_NORMAL),
+        every: NYTHRAXIS_DREAD_CURSE_EVERY,
+        swap: NYTHRAXIS_DREAD_CURSE_TANK_SWAP_STACKS,
+      },
+    };
+  }
+  if (a.id === NYTHRAXIS_IMPALED_AURA_ID) {
+    // Unbreakable encounter stun with a per-second max-health drain the aura does
+    // not carry (the driver reads the difficulty); both tiers are spelled.
+    return {
+      key: `${KEY}.nythraxisImpaled`,
+      nums: {
+        normal: pctFromFrac(NYTHRAXIS_IMPALED_TICK_MAX_HP_NORMAL),
+        heroic: pctFromFrac(NYTHRAXIS_IMPALED_TICK_MAX_HP_HEROIC),
+        interval: NYTHRAXIS_IMPALED_TICK_SECONDS,
       },
     };
   }

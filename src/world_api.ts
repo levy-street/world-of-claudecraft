@@ -176,7 +176,17 @@ export type {
 // the pre-merge raid branch, which forked before the Bank Storage and Materials
 // Vault bumps above; that branch's 11 through 20 were in turn 9 through 18
 // before the Eastbrook program bumps.)
-export const ONLINE_WORLD_LAYOUT_VERSION = 25 as const;
+// 26 = The Nythraxis mechanics redo added Grave Eruption warning rings and
+// Grave Flame patches as two server-authored snapshot families,
+// `nythraxisEruptions` (the meteor row shape) and `nythraxisFlames`, encoded by
+// server/nythraxis_wire.ts and decoded by src/net/ground_telegraph_wire.ts, plus
+// Binding Sigil and Gravefire snapshot families and the Grave Flame kind field,
+// the `nythraxisCallout` event and the Bone Spike mob. The keys are additive,
+// so an epoch-25 client would still connect, ignore them, and stand in rings
+// and fire it cannot see (the hazard entries 21 and 25 fenced). A bump moves
+// this constant, scripts/lib/world_auth.mjs and its .d.mts,
+// tests/bank_wire_epoch.test.ts, and tests/world_auth_scripts.test.ts together.
+export const ONLINE_WORLD_LAYOUT_VERSION = 26 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI
@@ -230,6 +240,10 @@ export type {
   ActiveConsecration,
   ActiveFrostRing,
   ActiveIgnivarMeteorWarning,
+  ActiveNythraxisBindingSigil,
+  ActiveNythraxisGraveEruption,
+  ActiveNythraxisGraveFlame,
+  ActiveNythraxisGravefire,
   ActiveTemporalHourglass,
   ActiveVarkhulAnvilMeteorWarning,
   ActiveVarkhulAssembly,

@@ -9,6 +9,7 @@ import type { Aura, Entity } from '../sim/types';
 import { abilityHexColor } from './ability_vfx_core';
 import { ABILITY_VFX_FULL_SPECS } from './ability_vfx_full_specs';
 import {
+  CHARACTER_EFFECT_IMPALED,
   CHARACTER_EFFECT_RECKLESSNESS,
   CHARACTER_EFFECT_SANGUINE,
   CHARACTER_EFFECT_SOUL_REND,
@@ -46,6 +47,13 @@ export type CharacterWeaponAuraMode = 'none' | 'sanguine' | 'stonebound';
 
 export function characterSoulRendActive(e: Entity): boolean {
   return hasCharacterEffect(characterEffectFlags(e.auras), CHARACTER_EFFECT_SOUL_REND);
+}
+
+/** Impaled on a Nythraxis Bone Spike: presentation drapes the death pose over
+ *  the living body (anim_state_entity_core.ts). Never true for a real corpse,
+ *  which already owns that pose. */
+export function characterImpaledActive(e: Entity): boolean {
+  return !e.dead && hasCharacterEffect(characterEffectFlags(e.auras), CHARACTER_EFFECT_IMPALED);
 }
 
 export interface CharacterWeaponAura {

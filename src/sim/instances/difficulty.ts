@@ -54,10 +54,11 @@ export function mobTemplateForDungeonDifficulty(
     const normal = NORMAL_DUNGEON_TUNING[dungeonId];
     if (!normal) return template;
     const dmgMult = normal.damageMultiplierByMob[template.id] ?? 1;
+    const hpMult = normal.healthMultiplierByMob?.[template.id] ?? normal.healthMultiplier;
     return {
       ...template,
-      hpBase: template.hpBase * normal.healthMultiplier,
-      hpPerLevel: template.hpPerLevel * normal.healthMultiplier,
+      hpBase: template.hpBase * hpMult,
+      hpPerLevel: template.hpPerLevel * hpMult,
       dmgBase: template.dmgBase * dmgMult,
       dmgPerLevel: template.dmgPerLevel * dmgMult,
     };

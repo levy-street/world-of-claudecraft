@@ -9,6 +9,19 @@ import { IGNIVAR_LAVA_MOAT_DAMAGE_FRACTION } from '../src/sim/ignivar_arena';
 import { ignivarJudgmentBurnDamageMaxHp } from '../src/sim/ignivar_forge_judgment';
 import { ignivarForgeWaveDamageMaxHp } from '../src/sim/ignivar_forge_wave';
 import { ignivarMeteorDamageMaxHp } from '../src/sim/ignivar_meteors';
+import { nythraxisUnboundHitMaxHp } from '../src/sim/nythraxis_binding_sigil';
+import { nythraxisImpaledTickMaxHp } from '../src/sim/nythraxis_bone_spike';
+import {
+  nythraxisBoneSlamDamageMaxHp,
+  nythraxisBoneStormWhirlTickMaxHp,
+} from '../src/sim/nythraxis_bone_storm';
+import { nythraxisDreadCursePerStack } from '../src/sim/nythraxis_dread_curse';
+import {
+  nythraxisGraveEruptionDamageMaxHp,
+  nythraxisGraveFlameTickMaxHp,
+} from '../src/sim/nythraxis_grave_eruption';
+import { nythraxisGravefireTickMaxHp } from '../src/sim/nythraxis_gravefire';
+import { nythraxisSoulfireTickMaxHp } from '../src/sim/nythraxis_soulfire';
 import {
   varkhulCinderFireDamageMaxHp,
   varkhulCinderOrbDamageMaxHp,
@@ -47,5 +60,33 @@ describe('raid avoidable damage tuning', () => {
       varkhulCinderOrbDamageMaxHp('heroic'),
       varkhulForgestormDamageMaxHp('heroic'),
     ]).toEqual([0.25, 0.55, 0.8]);
+  });
+
+  it('makes Nythraxis avoidable and answerable mechanics punishing on Normal and severe on Heroic', () => {
+    // Grave Eruption burst, Grave Flame per second, the impale drain per second
+    // (answered by shattering the spike), and the Dread Curse per-stack step
+    // (answered by the tank swap). Every mechanic runs on both difficulties.
+    expect([
+      nythraxisGraveEruptionDamageMaxHp('normal'),
+      nythraxisGraveFlameTickMaxHp('normal'),
+      nythraxisImpaledTickMaxHp('normal'),
+      nythraxisDreadCursePerStack('normal'),
+      nythraxisSoulfireTickMaxHp('normal'),
+      nythraxisGravefireTickMaxHp('normal'),
+      nythraxisUnboundHitMaxHp('normal'),
+      nythraxisBoneSlamDamageMaxHp('normal'),
+      nythraxisBoneStormWhirlTickMaxHp('normal'),
+    ]).toEqual([0.45, 0.06, 0.08, 0.35, 0.08, 0.1, 0.4, 0.35, 0.1]);
+    expect([
+      nythraxisGraveEruptionDamageMaxHp('heroic'),
+      nythraxisGraveFlameTickMaxHp('heroic'),
+      nythraxisImpaledTickMaxHp('heroic'),
+      nythraxisDreadCursePerStack('heroic'),
+      nythraxisSoulfireTickMaxHp('heroic'),
+      nythraxisGravefireTickMaxHp('heroic'),
+      nythraxisUnboundHitMaxHp('heroic'),
+      nythraxisBoneSlamDamageMaxHp('heroic'),
+      nythraxisBoneStormWhirlTickMaxHp('heroic'),
+    ]).toEqual([0.75, 0.09, 0.1, 0.45, 0.12, 0.15, 0.6, 0.55, 0.2]);
   });
 });

@@ -49,6 +49,7 @@ describe('interior encounter prewarm spec', () => {
     // never compiled npc_aldric), his 70% spawn linked ZERO programs because
     // the player bodies on screen already carry them.
     expect(Object.keys(spec).sort()).toEqual([
+      'nythraxisGraveVisuals',
       'soulRendLivePlayerVisuals',
       'soulRendPlayerClasses',
       'soulRendVfxWeaponSkins',

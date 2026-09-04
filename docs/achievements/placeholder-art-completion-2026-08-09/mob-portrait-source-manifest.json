@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "448a81d8c63a15b663c304ba52b285ed913382774a309dafb53c06b436f092ad",
+  "rendererFingerprint": "c86ce59db50b645017ad6d302d2963a1eedecc363bf9ee34c655013d364b9eee",
   "renderer": {
     "trackedFiles": [
       {
@@ -27,8 +27,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 4356414,
-      "sha256": "f443e52bdc3d91da3f8e1ce7ec06bcccae03c4efa350111e7e5b876aa4fc32ec",
+      "bytes": 4564436,
+      "sha256": "6f9275a7853c241d073f145f4c8e7079f9db80284022d5c64509f8f595573cf7",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -40,7 +40,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 242,
+  "portraitCount": 243,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -4407,6 +4407,40 @@
         "path": "public/ui/mobs/normal_boss_dummy.webp",
         "bytes": 1778,
         "sha256": "2fa2483ed8531151b14bcdb5d6427fd3e87d9445b83d5e0545238f210b577cb3"
+      }
+    },
+    {
+      "id": "nythraxis_bone_spike",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "mob_nythraxis_bone_spike",
+      "renderSpec": {
+        "model": {
+          "url": "models/props/nythraxis_bone_spike.glb",
+          "path": "public/models/props/nythraxis_bone_spike.glb",
+          "bytes": 258956,
+          "sha256": "54cef7af378d2f101639533bcf395eb82c9dfa117d078a03ff19b088fe694dc3"
+        },
+        "idle": "Idle",
+        "height": 2.6,
+        "yaw": 0,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "c5d61b8664623cf2eb0bbb924a602a424909e843ca6f970996548768148819e3",
+      "output": {
+        "path": "public/ui/mobs/nythraxis_bone_spike.webp",
+        "bytes": 1504,
+        "sha256": "c008e9692d97478f981866c792ba62a3a145dbc3a096eeb3d12a357440e5e7cc"
       }
     },
     {

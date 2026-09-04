@@ -324,6 +324,27 @@ void main() {
 const FLAME_GRID = 6.0;
 const FLAME_FRAMES = 36.0;
 
+/** The one flipbook flame atlas every sprite fire in the game samples. */
+export const FLAME_ATLAS_URL = '/textures/vfx/ignivar_flame_6x6.webp';
+export const FLAME_ATLAS_FRAMES = FLAME_FRAMES;
+
+/**
+ * GLSL shared by every shader that addresses the flame atlas: the per-sprite
+ * hash and the flipY'd cell lookup (frame 0 is the image's top-left cell).
+ * Other encounters' sprite fires (the Nythraxis grave fire) include this so
+ * they read the same atlas the same way.
+ */
+export const FLAME_ATLAS_GLSL = `
+float h11(float p) { return fract(sin(p * 78.233) * 43758.5453); }
+
+vec2 cellUv(vec2 corner, float f) {
+  float col = mod(f, ${FLAME_GRID.toFixed(1)});
+  float row = floor(f / ${FLAME_GRID.toFixed(1)});
+  return vec2((col + corner.x) / ${FLAME_GRID.toFixed(1)},
+              (${(FLAME_GRID - 1).toFixed(1)} - row + corner.y) / ${FLAME_GRID.toFixed(1)});
+}
+`;
+
 const FLAME_COMMON = `
 uniform float uTime;
 uniform float uFlame;
@@ -335,15 +356,7 @@ varying vec2 vUvA;
 varying vec2 vUvB;
 varying float vBlend;
 varying float vFade;
-float h11(float p) { return fract(sin(p * 78.233) * 43758.5453); }
-
-// flipY'd atlas: frame 0 is the image's top-left cell
-vec2 cellUv(vec2 corner, float f) {
-  float col = mod(f, ${FLAME_GRID.toFixed(1)});
-  float row = floor(f / ${FLAME_GRID.toFixed(1)});
-  return vec2((col + corner.x) / ${FLAME_GRID.toFixed(1)},
-              (${(FLAME_GRID - 1).toFixed(1)} - row + corner.y) / ${FLAME_GRID.toFixed(1)});
-}
+${FLAME_ATLAS_GLSL}
 `;
 
 const FLAME_VERT = `
@@ -1000,7 +1013,8 @@ export function attachIgnivarVfx(
 // these, and rebuilding geometry per spawn is the only real cost worth
 // avoiding. ~10 concurrent instances = 20 draw calls, 3 shader programs.
 const flameTexCache = new Map<string, THREE.Texture>();
-function getFlameTex(url: string): THREE.Texture {
+/** The module-cached atlas texture (never disposed by a consumer: fires respawn all fight). */
+export function getFlameTex(url: string = FLAME_ATLAS_URL): THREE.Texture {
   let t = flameTexCache.get(url);
   if (!t) {
     t =

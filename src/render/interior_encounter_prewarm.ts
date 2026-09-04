@@ -16,6 +16,10 @@ export interface InteriorEncounterPrewarmSpec {
   soulRendLivePlayerVisuals: boolean;
   varkhulVisuals?: boolean;
   ignivarVisuals?: boolean;
+  /** Nythraxis's Grave Eruption, Grave Flame, Gravefire, and Binding Sigil
+   *  floor materials: crypt-only actionable telegraphs warm here, never in
+   *  the boot manifest. */
+  nythraxisGraveVisuals?: boolean;
 }
 
 export const INTERIOR_ENCOUNTER_PREWARM: Record<string, InteriorEncounterPrewarmSpec> = {
@@ -23,6 +27,7 @@ export const INTERIOR_ENCOUNTER_PREWARM: Record<string, InteriorEncounterPrewarm
     soulRendPlayerClasses: true,
     soulRendVfxWeaponSkins: true,
     soulRendLivePlayerVisuals: true,
+    nythraxisGraveVisuals: true,
   },
   ignivar_depths: {
     soulRendPlayerClasses: false,

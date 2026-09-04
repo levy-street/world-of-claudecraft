@@ -59,13 +59,13 @@ describe('BankInfo wire compatibility epoch', () => {
     // pre-bank-storage shape out before any snapshot is admitted. The Ignivar
     // raid ladder moved the current epoch past the vault's own 11
     // (src/world_api.ts); any epoch at or above 11 keeps the fence.
-    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(25);
-    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-25');
+    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(26);
+    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-26');
   });
 
   it('separates identity-preserving vault snapshots from auth-world-10 before admission', () => {
-    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(25);
-    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-25');
+    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(26);
+    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-26');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-10');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-9');
   });

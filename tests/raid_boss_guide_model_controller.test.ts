@@ -46,7 +46,7 @@ describe('RaidBossGuideModelController', () => {
     createViewer = vi.fn(async () => viewer);
   });
 
-  it('pins the shipped Ignivar and Varkhul model framing', () => {
+  it('pins the shipped Ignivar, Varkhul, and Nythraxis model framing', () => {
     expect(RAID_BOSS_GUIDE_MODEL_SPECS).toEqual({
       ignivar: {
         url: 'models/creatures/ignivar_herald.glb',
@@ -58,6 +58,12 @@ describe('RaidBossGuideModelController', () => {
         url: 'models/creatures/varkhul_forgefather.glb',
         idle: 'Idle',
         height: 3,
+        yaw: 0,
+      },
+      nythraxis: {
+        url: 'models/chars/enemies/skeleton_golem.glb',
+        idle: 'Idle',
+        height: 3.4,
         yaw: 0,
       },
     });

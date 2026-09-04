@@ -355,7 +355,7 @@ interface AttributionTargetFixture {
 // src/render/stride_audio_core.ts and the mounted audio branch gained the
 // idle-hum poll. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '87d8b0efb81ca5d41f5a57f7fd9654739ba16b59f9f8de4cda6a39031b5e8806';
+  '8ae24529f62c56634b8f16c8f5d85e8964f44d41bcbcbe43b9a3700ab4859c41';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

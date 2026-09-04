@@ -645,7 +645,15 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
-    ceiling: 5908,
+    // Down 5908 -> 5895 with the Nythraxis mechanics redo: the whole
+    // ground-telegraph decode block (rings, Ignivar meteors, the Varkhul
+    // families, hourglasses, consecrations) and its four decoder imports
+    // moved behind applyGroundTelegraphSnapshot in
+    // src/net/ground_telegraph_wire.ts, which is also where the two new
+    // Nythraxis families (Grave Eruption rings, Grave Flames) decode; the
+    // IWorld field declarations stay on ClientWorld for the parity pin.
+    // Measured 5891 after the extraction, four lines of margin.
+    ceiling: 5895,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

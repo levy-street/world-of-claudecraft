@@ -66,6 +66,13 @@ export const DUNGEON_LEASH_DISTANCE = 70;
 // Nythraxis add template id. Used by the mob-locomotion slice (the add branch of
 // updateMob); the boss id NYTHRAXIS_BOSS_ID lives lower in this file (C1 relocation).
 export const NYTHRAXIS_ADD_ID = 'nythraxis_skeleton_warrior';
+// Owner playtest call 2026-09-04: the mechanics redo fields NO adds. Raise
+// Fallen's guard waves (phase 1) and the heroic court summon (phase 2) both read
+// this switch, and so do the Raid Boss Guide page and the Dungeon Finder blurbs,
+// so the fight and the text that describes it always agree. The add templates
+// and their AI stay authored (loot, portraits, deeds, and the direct-call unit
+// tests reference them); flipping this back restores the waves and the court.
+export const NYTHRAXIS_ADDS_ENABLED = false;
 export const GCD = 1.5; // seconds
 // Owner 2026-07-13: spell haste now shortens the global cooldown, floored here so it
 // never collapses to nothing. The base GCD is divided by spellHasteMult at cast time.
@@ -5136,8 +5143,16 @@ export interface NythraxisDialogueCue {
   text: string;
 }
 
+/** One live Bone Spike: the spike mob and the raider it holds. */
+export interface NythraxisBoneSpike {
+  spikeId: number;
+  playerId: number;
+  // Seconds until the next impale drain tick.
+  tickTimer: number;
+}
+
 export interface NythraxisEncounterState {
-  phase: 1 | 'transition' | 2 | 'dead';
+  phase: 1 | 'transition' | 2 | 3 | 'dead';
   introSpoken: boolean;
   transitionStarted: boolean;
   transitionTimer: number;
@@ -5159,11 +5174,83 @@ export interface NythraxisEncounterState {
   deathlessCastRemaining: number;
   deathlessStunRemaining: number;
   heroicSummonChannelRemaining?: number;
+  // The mechanic-redo fields below are optional on the TYPE only so the many
+  // hand-built state literals in tests stay valid; initNythraxisEncounter sets
+  // every one, and the driver backfills a missing field with its default
+  // (encounters/nythraxis.ts nythraxisMechanicState) before reading it.
+  // Dread Curse (the tank swap, both difficulties): only the cadence lives
+  // here; the stacks live on the victim's aura (nythraxis_dread_curse.ts).
   dreadCurseTimer?: number;
-  dreadCurseTargetId?: number | null;
-  dreadCurseStacks?: number;
+  // Bone Spike cadence and the live spike/victim pairs (nythraxis_bone_spike.ts).
+  boneSpikeTimer?: number;
+  boneSpikes?: NythraxisBoneSpike[];
+  // Spikes and fire never overlap: seconds left in the settle window after an
+  // eruption lands (spikes hold) and after a spike wave (eruptions hold).
+  eruptionSettleTimer?: number;
+  spikeSettleTimer?: number;
+  // Grave Eruption: the cadence, the live warning window, and the burning
+  // patches it left behind (nythraxis_grave_eruption.ts). eruptionCastKey is
+  // the stable id root the warning rows and their impact events share.
+  eruptionTimer?: number;
+  eruptionCastKey?: number;
+  eruptionImpactRemaining?: number;
+  eruptionPoints?: { x: number; z: number }[];
+  // Every burning patch, Grave Flame and Soulfire alike (kind tells them
+  // apart; nythraxis_soulfire.ts pushes the Soul Rend pools into this list).
+  graveFlames?: {
+    seq: number;
+    kind: 'grave' | 'soul';
+    radius: number;
+    x: number;
+    z: number;
+    remaining: number;
+    tickTimer: number;
+  }[];
+  graveFlameSeq?: number;
+  // Gravefire: the cadence and the live traveling lines (nythraxis_gravefire.ts).
+  gravefireTimer?: number;
+  gravefires?: {
+    seq: number;
+    x: number;
+    z: number;
+    dirX: number;
+    dirZ: number;
+    elapsed: number;
+    tickTimer: number;
+  }[];
+  gravefireSeq?: number;
+  // Binding Sigil: the cadence, the live sigil (null between casts), and the
+  // gap timer that keeps the body-owning majors (Deathless Rage, the sigil
+  // drag) from overlapping (nythraxis_binding_sigil.ts).
+  sigilTimer?: number;
+  sigil?: {
+    castKey: number;
+    x: number;
+    z: number;
+    remaining: number;
+    ascensionTimer: number;
+    ascensionStacks: number;
+  } | null;
+  majorGapTimer?: number;
+  // The Crown Endures: seconds since the first encounter tick (the clock runs
+  // through the transition) and the enrage stack the boss carries once it has
+  // run out (nythraxis_enrage_clock.ts).
+  enrageElapsed?: number;
+  enrageStacks?: number;
+  // Bone Storm (phase 3): the cadence and the live storm, null between storms
+  // (nythraxis_bone_storm.ts).
+  boneStormTimer?: number;
+  boneStorm?: {
+    castKey: number;
+    elapsed: number;
+    chargeIndex: number;
+    chargeTargetId: number | null;
+    slammed: boolean;
+    whirlTickTimer: number;
+    spikeCast: boolean;
+    chargedIds: number[];
+  } | null;
   wardChannels: NythraxisWardChannel[];
-  finalStand: boolean;
   deathSpoken: boolean;
   // Players seen alive inside the arena during this pull. Session-only attempt
   // roster used for raid-wipe recovery, so a remote group member cannot farm
@@ -5737,6 +5824,29 @@ export type SimEvent = { pid?: number } & (
         | 'worldfireBegins'
         | 'worldfireClosing'
         | 'worldfireConsumed';
+    }
+  // Text-free structured Nythraxis raid warning (the Varkhul callout's
+  // sibling): the sim ships the enum, the client renders localized copy.
+  | {
+      type: 'nythraxisCallout';
+      sourceId: number;
+      call:
+        | 'impaled'
+        | 'youAreImpaled'
+        | 'spikeBroken'
+        | 'dreadCurseSwap'
+        | 'sigilAppears'
+        | 'sigilBound'
+        | 'sigilUnbound'
+        | 'gravefireTarget'
+        | 'kingsWrath'
+        | 'boneStormBegins'
+        | 'boneStormCharge'
+        | 'boneStormEnds'
+        | 'crownEndures60'
+        | 'crownEndures30'
+        | 'crownEndures10'
+        | 'crownEndures';
     }
   | {
       type: 'aura';

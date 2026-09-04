@@ -281,8 +281,9 @@ describe('coverage: each scenario fires its subsystem', () => {
     const sim = rec.sim as any;
     const chats = ev.filter((e) => e.type === 'chat');
     const auras = ev.filter((e) => e.type === 'aura' && e.gained);
-    // Phase 1 raise-fallen wave + the three wardstones the transition lit.
-    expect(n.addIds.length).toBe(2);
+    // No phase 1 raise-fallen wave (the redo fields no adds, NYTHRAXIS_ADDS_ENABLED
+    // in src/sim/types.ts), plus the three wardstones the transition lit.
+    expect(n.addIds.length).toBe(0);
     expect(n.wardIds.length).toBe(3);
     // Transition: Shuddering Stomp room stun + Brother Aldric spawned and still present.
     expect(auras.some((e) => e.name === 'Shuddering Stomp')).toBe(true);
@@ -290,8 +291,40 @@ describe('coverage: each scenario fires its subsystem', () => {
     // Soul Rend marks pick (the rng.int callout) + Deathless Rage interrupt self-stun.
     expect(chats.some((e) => e.text === 'Your spirit belongs to me')).toBe(true);
     expect(auras.some((e) => e.name === 'Deathless Rage Interrupted')).toBe(true);
-    // Final Stand enrage aura.
-    expect(auras.some((e) => e.name === 'Final Stand')).toBe(true);
+    // Phase 3: The King's Wrath, a Bone Storm (its whirl, a Bone Slam, the
+    // mid-storm spike), and The Crown Endures enrage.
+    expect(auras.some((e) => e.name === "King's Wrath")).toBe(true);
+    expect(auras.some((e) => e.name === 'Bone Storm')).toBe(true);
+    expect(auras.some((e) => e.name === 'The Crown Endures')).toBe(true);
+    // The mechanics redo: Dread Curse landed on the tank, two raiders were
+    // impaled and freed when their spikes died, and the eruption burst then burned.
+    expect(n.spikeIds.length).toBe(2);
+    expect(auras.some((e) => e.name === 'Dread Curse')).toBe(true);
+    // Two from the forced slice 1 cast, two more from the mid-storm spike.
+    expect(auras.filter((e) => e.name === 'Impaled').length).toBe(4);
+    const callouts = ev.filter((e) => e.type === 'nythraxisCallout') as Array<{ call: string }>;
+    expect(callouts.some((e) => e.call === 'youAreImpaled')).toBe(true);
+    expect(callouts.some((e) => e.call === 'spikeBroken')).toBe(true);
+    const damage = ev.filter((e) => e.type === 'damage') as Array<{ ability: string | null }>;
+    expect(damage.some((e) => e.ability === 'Bone Spike')).toBe(true);
+    expect(damage.some((e) => e.ability === 'Grave Eruption')).toBe(true);
+    expect(damage.some((e) => e.ability === 'Grave Flame')).toBe(true);
+    // Slice 2: Soulfire burned the stacked mages after the Soul Rend detonation,
+    // Gravefire ran at the mages, and the sigil flared and was bound.
+    expect(damage.some((e) => e.ability === 'Soulfire')).toBe(true);
+    expect(damage.some((e) => e.ability === 'Gravefire')).toBe(true);
+    expect(callouts.some((e) => e.call === 'gravefireTarget')).toBe(true);
+    expect(callouts.some((e) => e.call === 'sigilAppears')).toBe(true);
+    expect(callouts.some((e) => e.call === 'sigilBound')).toBe(true);
+    expect(callouts.some((e) => e.call === 'kingsWrath')).toBe(true);
+    expect(callouts.some((e) => e.call === 'boneStormBegins')).toBe(true);
+    expect(callouts.some((e) => e.call === 'boneStormCharge')).toBe(true);
+    expect(callouts.some((e) => e.call === 'boneStormEnds')).toBe(true);
+    expect(callouts.some((e) => e.call === 'crownEndures')).toBe(true);
+    expect(damage.some((e) => e.ability === 'Bone Storm')).toBe(true);
+    expect(damage.some((e) => e.ability === 'Bone Slam')).toBe(true);
+    expect(auras.some((e) => e.name === 'Deathless Ascension')).toBe(true);
+    expect(auras.some((e) => e.name === 'Bound')).toBe(true);
     // Kill: raid lockout granted to the tank + the death-dialogue first line emitted.
     const boss = sim.entities.get(n.bossId);
     expect(boss.dead).toBe(true);

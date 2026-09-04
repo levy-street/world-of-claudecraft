@@ -1,4 +1,10 @@
 import type { ActiveIgnivarMeteorWarning } from '../sim/ignivar_meteors';
+import type { ActiveNythraxisBindingSigil } from '../sim/nythraxis_binding_sigil';
+import type {
+  ActiveNythraxisGraveEruption,
+  ActiveNythraxisGraveFlame,
+} from '../sim/nythraxis_grave_eruption';
+import type { ActiveNythraxisGravefire } from '../sim/nythraxis_gravefire';
 import type { ResolvedAbility } from '../sim/sim';
 import type { ActiveVarkhulAnvilMeteorWarning } from '../sim/varkhul_anvil_meteors';
 import type { ActiveVarkhulAssembly } from '../sim/varkhul_assembly';
@@ -10,6 +16,12 @@ import type { ActiveVarkhulForgestormWarning } from '../sim/varkhul_forgestorm';
 import type { WorldInteractionOutcome } from './interaction';
 
 export type { ActiveIgnivarMeteorWarning } from '../sim/ignivar_meteors';
+export type { ActiveNythraxisBindingSigil } from '../sim/nythraxis_binding_sigil';
+export type {
+  ActiveNythraxisGraveEruption,
+  ActiveNythraxisGraveFlame,
+} from '../sim/nythraxis_grave_eruption';
+export type { ActiveNythraxisGravefire } from '../sim/nythraxis_gravefire';
 export type { ActiveVarkhulAnvilMeteorWarning } from '../sim/varkhul_anvil_meteors';
 export type { ActiveVarkhulAssembly } from '../sim/varkhul_assembly';
 export type {
@@ -56,6 +68,12 @@ export interface IWorldCombat {
   /** Server-authored persistent traps currently visible to this world view. */
   activeFrostRings: ActiveFrostRing[];
   activeIgnivarMeteors: ActiveIgnivarMeteorWarning[];
+  /** Nythraxis Grave Eruption warning rings (the meteor-warning shape) and the
+   *  Grave Flame patches they leave behind, reconnect-safe from the snapshot. */
+  activeNythraxisGraveEruptions: ActiveNythraxisGraveEruption[];
+  activeNythraxisGraveFlames: ActiveNythraxisGraveFlame[];
+  activeNythraxisGravefires: ActiveNythraxisGravefire[];
+  activeNythraxisBindingSigils: ActiveNythraxisBindingSigil[];
   activeVarkhulForgestormWarnings: ActiveVarkhulForgestormWarning[];
   activeVarkhulAnvilMeteors: ActiveVarkhulAnvilMeteorWarning[];
   activeVarkhulAssemblies: ActiveVarkhulAssembly[];

@@ -98,6 +98,10 @@ import {
   type ActiveConsecration,
   type ActiveFrostRing,
   type ActiveIgnivarMeteorWarning,
+  type ActiveNythraxisBindingSigil,
+  type ActiveNythraxisGraveEruption,
+  type ActiveNythraxisGraveFlame,
+  type ActiveNythraxisGravefire,
   type ActiveTemporalHourglass,
   type ActiveVarkhulAnvilMeteorWarning,
   type ActiveVarkhulAssembly,
@@ -124,7 +128,6 @@ import {
   type DelveRunInfo,
   type DelveShopOfferView,
   type DevLeaderboardPage,
-  DUNGEON_ENTRY_FACING_WIRE_VERSION,
   type DuelInfo,
   type FriendInfo,
   type GuildBankInfo,
@@ -187,13 +190,7 @@ import {
   parseDesktopWalletHandoffStatus,
 } from './desktop_wallet_handoff';
 import { dungeonEntrySnapshotFacing } from './dungeon_entry_facing';
-import {
-  decodeConsecrations,
-  decodeFrostRings,
-  decodeIgnivarMeteors,
-  decodeTemporalHourglasses,
-  decodeVarkhulForgestormWarnings,
-} from './ground_telegraph_wire';
+import { applyGroundTelegraphSnapshot } from './ground_telegraph_wire';
 import { decodeGuildBankLogFrame, GUILD_BANK_LOG_TTL_MS } from './guild_bank_log_wire';
 import { foldInputAck } from './input_ack';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
@@ -218,11 +215,6 @@ import {
   stableCooldownRemaining,
   stableDeadlineRemaining,
 } from './snapshot_timer_wire';
-import { decodeVarkhulAnvilMeteors, decodeVarkhulAssemblies } from './varkhul_assembly_wire';
-import {
-  decodeVarkhulCinderFires,
-  decodeVarkhulCinderOrbProjectiles,
-} from './varkhul_cinder_orb_wire';
 import { vaultWithdrawPayload } from './vault_snapshot_wire';
 import { buildWebSocketAuthMessage } from './world_auth_message';
 
@@ -1926,6 +1918,10 @@ export class ClientWorld extends ReconWireState implements IWorld {
   private eventQueue: SimEvent[] = [];
   activeFrostRings: ActiveFrostRing[] = [];
   activeIgnivarMeteors: ActiveIgnivarMeteorWarning[] = [];
+  activeNythraxisGraveEruptions: ActiveNythraxisGraveEruption[] = [];
+  activeNythraxisGraveFlames: ActiveNythraxisGraveFlame[] = [];
+  activeNythraxisGravefires: ActiveNythraxisGravefire[] = [];
+  activeNythraxisBindingSigils: ActiveNythraxisBindingSigil[] = [];
   activeVarkhulForgestormWarnings: ActiveVarkhulForgestormWarning[] = [];
   activeVarkhulCinderFires: ActiveVarkhulCinderFire[] = [];
   activeVarkhulCinderOrbProjectiles: ActiveVarkhulCinderOrbProjectile[] = [];
@@ -2928,17 +2924,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     if (typeof snap.tickHz === 'number' && Number.isFinite(snap.tickHz) && snap.tickHz > 0) {
       this.serverTickHz = snap.tickHz;
     }
-    this.activeFrostRings = decodeFrostRings(snap.rings);
-    this.activeIgnivarMeteors = decodeIgnivarMeteors(snap.ignivarMeteors);
-    this.activeVarkhulForgestormWarnings = decodeVarkhulForgestormWarnings(snap.varkhulForgestorm);
-    this.activeVarkhulCinderFires = decodeVarkhulCinderFires(snap.varkhulCinderFires);
-    this.activeVarkhulCinderOrbProjectiles = decodeVarkhulCinderOrbProjectiles(
-      snap.varkhulCinderOrbs,
-    );
-    this.activeVarkhulAnvilMeteors = decodeVarkhulAnvilMeteors(snap.varkhulAnvilMeteors);
-    this.activeVarkhulAssemblies = decodeVarkhulAssemblies(snap.varkhulAssemblies);
-    this.activeTemporalHourglasses = decodeTemporalHourglasses(snap.hourglasses);
-    this.activeConsecrations = decodeConsecrations(snap.consecrations);
+    applyGroundTelegraphSnapshot(this, snap);
 
     // lazy init (not the field initializer alone): tests build bare instances
     // via Object.create(ClientWorld.prototype), which skips field initializers
