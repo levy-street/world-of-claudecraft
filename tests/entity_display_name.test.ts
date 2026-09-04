@@ -1,4 +1,4 @@
-// The extracted HUD entity-naming rule (src/ui/entity_display_name.ts, the
+// The extracted HUD entity-naming rule (src/ui/entity_display_core.ts, the
 // Phase 12 headroom extraction): which entities name by template, which keep
 // their sim-authored wire name, and the placed feast's composed title. Runs
 // in the default en locale, so every dictionary hop resolves synchronously.
@@ -7,8 +7,6 @@ import { MOBS, NPCS } from '../src/sim/data';
 import type { Entity } from '../src/sim/types';
 import { entityDisplayName } from '../src/ui/entity_display_core';
 import {
-  feastCrafterMarkFor,
-  feastTitleFor,
   feastTitleKeyedTemplateIds,
   feastTitleKeyFor,
   feastTitleTemplateIds,
@@ -143,31 +141,5 @@ describe('the apex feast titles', () => {
     // line covers every object template in the game that nobody did. The first
     // version of this comment claimed the `farm_bed` case, which was false.
     expect(feastTitleKeyedTemplateIds(), 'the map claims exactly the family').toEqual(templates);
-  });
-});
-
-describe("the placed feast's CRAFTER mark", () => {
-  it('reads the shipped signed-item wording, so ground and bags credit alike', () => {
-    // The same "Crafted by {name}" line a signed copy's tooltip shows, so a
-    // feast on the ground and the same feast in the bags name their cook
-    // identically rather than in two dialects.
-    expect(feastCrafterMarkFor('Mira')).toBe('Crafted by Mira');
-  });
-
-  it('is null for an unsigned feast, so nothing is rendered for one', () => {
-    expect(feastCrafterMarkFor(undefined)).toBeNull();
-    expect(feastCrafterMarkFor(null)).toBeNull();
-    expect(feastCrafterMarkFor('')).toBeNull();
-  });
-
-  it('is a SEPARATE string from the title, which still names only the PLACER', () => {
-    // The split is the design: the title answers "whose table", the mark
-    // answers "who cooked it". Folding the second into the first would put
-    // both on the floating world label, which is what the title's
-    // never-diverge rule is protecting.
-    const title = feastTitleFor('farm_feast', 'Aldric');
-    expect(title).toContain('Aldric');
-    expect(title).not.toContain('Mira');
-    expect(feastCrafterMarkFor('Mira')).not.toContain('Aldric');
   });
 });

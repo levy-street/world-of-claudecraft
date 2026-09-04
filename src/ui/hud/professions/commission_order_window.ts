@@ -15,7 +15,7 @@
 import { isCommissionEligibleKind } from '../../../sim/professions/commission';
 import { markDialogRoot } from '../../dialog_root';
 import { esc } from '../../esc';
-import { formatNumber, t, tPlural } from '../../i18n';
+import { formatList, formatNumber, t, tPlural } from '../../i18n';
 import { QUALITY_COLOR } from '../../icons';
 import type { PainterHostPresentation } from '../../painter_host';
 import { qualityGlowShadow } from '../../quality_glow';
@@ -65,9 +65,10 @@ function crafterRecordHtml(row: CommissionOrderRowModel): string {
   const legendaries = tPlural('hudChrome.plurals.commissionLegendaries', record.legendaries, {
     count: count(record.legendaries),
   });
+  const values = formatList([masterworks, legendaries]);
   return `<span class="vi-sub commission-crafter-record"><span class="ccr-label">${esc(
     t('hudChrome.commissionBoard.crafterRecordLabel'),
-  )}</span> <span class="ccr-values">${esc(masterworks)} · ${esc(legendaries)}</span></span>`;
+  )}</span> <span class="ccr-values">${esc(values)}</span></span>`;
 }
 
 function renderRow(row: CommissionOrderRowModel, deps: CommissionOrderWindowDeps): HTMLElement {
@@ -88,7 +89,8 @@ function renderRow(row: CommissionOrderRowModel, deps: CommissionOrderWindowDeps
   const acceptedLine = row.acceptedByName
     ? t('hudChrome.commissionBoard.acceptedBy', { name: row.acceptedByName })
     : '';
-  item.innerHTML = `${socket}<span class="vi-name">${esc(line)}<span class="vi-sub">${esc(statusText)}${acceptedLine ? ` · ${esc(acceptedLine)}` : ''}</span>${crafterRecordHtml(row)}</span>`;
+  const statusDetails = formatList(acceptedLine ? [statusText, acceptedLine] : [statusText]);
+  item.innerHTML = `${socket}<span class="vi-name">${esc(line)}<span class="vi-sub">${esc(statusDetails)}</span>${crafterRecordHtml(row)}</span>`;
   if (row.item) {
     const displayItem = row.item;
     deps.attachTooltip(item, () => deps.itemTooltip(displayItem));

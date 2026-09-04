@@ -144,11 +144,11 @@ describe('farming asset manifest binds to its pinned sources', () => {
     }
     expect(Object.keys(ri.biomePalettes).sort()).toEqual(Object.keys(FARM_BIOME_PALETTES).sort());
     for (const [zone, palette] of Object.entries(FARM_BIOME_PALETTES)) {
-      for (const channel of ['soil', 'wood', 'trim'] as const) {
+      for (const channel of ['soil', 'wood'] as const) {
         expect(ri.biomePalettes[zone][channel], `${zone} ${channel}`).toBe(hex(palette[channel]));
       }
     }
-    for (const channel of ['soil', 'wood', 'trim'] as const) {
+    for (const channel of ['soil', 'wood'] as const) {
       expect(ri.fallbackPalette[channel], `fallback ${channel}`).toBe(
         hex(FARM_FALLBACK_PALETTE[channel]),
       );
@@ -162,7 +162,9 @@ describe('farming asset manifest binds to its pinned sources', () => {
     // The hand-added fields a re-derivation must preserve.
     expect(manifest.heightNote.length).toBeGreaterThan(0);
     expect(manifest.regenerationNote).toContain('tests/farming_asset_manifest.test.ts');
-    expect(manifest.renderIdentity.channelUse).toContain('no draw-time consumer');
+    expect(manifest.renderIdentity.channelUse).toContain(
+      'wood is the compost bin whole-mesh multiply',
+    );
     // Teardown safety: this permanent manifest must not point into a temporary
     // planning packet.
     expect(manifestText.includes('/prd/')).toBe(false);

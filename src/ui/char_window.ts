@@ -19,7 +19,7 @@
 
 import { audio } from '../game/audio';
 import { ITEMS } from '../sim/data';
-import { type EquipSlot, isMechWearer } from '../sim/types';
+import { type EquipSlot, type ItemDef, type ItemInstancePayload, isMechWearer } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { STAT_PANELS } from './char_stats_view';
 import { buildPaperdollView, type PaperdollSlot } from './char_view';
@@ -139,7 +139,10 @@ export function playtimeText(seconds: number): string {
  * WCAG focus-return, and the two HUD-owned render regions (3D preview + skin
  * picker) invoked by callback.
  */
-export interface CharWindowDeps extends PainterHostPresentation {
+export interface CharWindowDeps extends Omit<PainterHostPresentation, 'itemTooltip'> {
+  /** Tooltip for a copy already worn on this paperdoll. It must not append a
+   *  comparison against the same equipped slot. */
+  wornItemTooltip(item: ItemDef, instance?: ItemInstancePayload): string;
   root(): HTMLElement;
   world(): IWorld;
   closeOthers(): void;
@@ -344,6 +347,16 @@ export class CharWindow {
     for (const cell of view.left) leftCol?.appendChild(this.buildSlotRow(cell));
     for (const cell of view.right) rightCol?.appendChild(this.buildSlotRow(cell));
 
+    // A character-sheet rebuild mints new socket nodes, including after the
+    // inventory-change path has synchronized the old set. Restore the active
+    // exact-copy promise on those new nodes for both desktop and touch drags.
+    const drag = this.deps.dragState.get();
+    if (drag) {
+      const named = draggedCopySlotIndex(world.inventory, drag.itemId, drag);
+      if (named === null) this.markDropTargets(null);
+      else this.markDropTargets(drag.itemId, named);
+    }
+
     for (const cell of el.querySelectorAll<HTMLElement>('.stat-panels [data-stat]')) {
       const stat = cell.dataset.stat as StatId;
       // Resolve the tooltip lazily, on show, so the breakdown reflects the
@@ -522,7 +535,7 @@ export class CharWindow {
               }),
             )}</div>`
           : '';
-        return `${this.deps.itemTooltip(item, instance)}${mwLine}<div class="tt-sub">${esc(t('hudChrome.paperdoll.unequipHint'))}</div>`;
+        return `${this.deps.wornItemTooltip(item, instance)}${mwLine}<div class="tt-sub">${esc(t('hudChrome.paperdoll.unequipHint'))}</div>`;
       });
       // Corner x: a styled glyph control (not an in-game icon), revealed on
       // hover/focus and always shown on touch where right-click is unavailable.
@@ -667,9 +680,11 @@ export class CharWindow {
       // refused: the light-then-refuse) or names a different copy of the same id
       // (worse, since that drop succeeds on the wrong piece).
       const named = draggedCopySlotIndex(world.inventory, drag.itemId, drag);
+      if (!item || named === null) {
+        this.markDropTargets(null);
+        return;
+      }
       if (
-        !item ||
-        named === null ||
         paperdollDropAction(
           item,
           slot,

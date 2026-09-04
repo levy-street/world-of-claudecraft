@@ -51,6 +51,8 @@ export type EnglishSearchMatch = (itemId: string, search: string) => boolean;
 export interface LocalizedMarketSearchInput {
   /** The raw text in the search box. */
   query: string;
+  /** BCP 47 locale tag used to fold the player-visible query and names. */
+  localeTag: string;
   /** Every item id the market can list. */
   itemIds: readonly string[];
   localizedNameOf: LocalizedItemName;
@@ -85,17 +87,19 @@ function wordsOf(haystack: string): string[] {
  * whenever it cannot prove a better one (see the four rules in the header).
  */
 export function localizedMarketSearch(input: LocalizedMarketSearchInput): string {
-  const q = input.query.trim().toLowerCase();
-  if (!q) return input.query;
+  const trimmed = input.query.trim();
+  if (!trimmed) return input.query;
+  const englishQuery = trimmed.toLowerCase();
 
   // Rule 1: the English/id matcher already finds something, so nothing changes.
   for (const id of input.itemIds) {
-    if (input.englishMatches(id, q)) return input.query;
+    if (input.englishMatches(id, englishQuery)) return input.query;
   }
 
   // Rule 2: what does this text name in the player's language?
+  const localizedQuery = trimmed.toLocaleLowerCase(input.localeTag);
   const localized = input.itemIds.filter((id) =>
-    input.localizedNameOf(id).toLowerCase().includes(q),
+    input.localizedNameOf(id).toLocaleLowerCase(input.localeTag).includes(localizedQuery),
   );
   if (localized.length === 0) return input.query;
 

@@ -475,7 +475,17 @@ export class BagsWindow {
     // failing every later drop on the action bar or a bag cell. Defer the rebuild
     // instead of tearing the dragged row out from under it; the row's own dragend
     // (or the touch drag's onEnd) flushes it once the drag actually concludes.
-    if (this.deps.dragState.get() || this.nativeBagCellDropAwaitingDragEnd) {
+    const drag = this.deps.dragState.get();
+    if (drag || this.nativeBagCellDropAwaitingDragEnd) {
+      // Inventory snapshots still have one small paint obligation while the
+      // grid rebuild is deferred: keep the paperdoll promise tied to the exact
+      // dragged copy. This covers desktop and touch alike without polling from
+      // high-frequency pointermove or dragover handlers.
+      if (drag) {
+        const named = draggedCopySlotIndex(this.deps.world().inventory, drag.itemId, drag);
+        if (named === null) this.deps.markEquipDropTargets(null);
+        else this.deps.markEquipDropTargets(drag.itemId, named);
+      }
       this.renderDeferredForDrag = true;
       return;
     }

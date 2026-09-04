@@ -10,26 +10,50 @@
   // role="status", not "alert": nothing here is urgent or time-critical, and a
   // polling surface would otherwise re-interrupt a screen reader on every
   // refused refresh.
+  import { onMount } from 'svelte';
   import { t } from '../i18n';
+
+  let announce = $state(false);
+
+  onMount(() => {
+    // This component appears only after an asynchronous 403. Mount the empty
+    // live region first, then populate it in a later task: inserting a status
+    // region with its message already present is not announced consistently.
+    const timer = window.setTimeout(() => {
+      announce = true;
+    }, 0);
+    return () => window.clearTimeout(timer);
+  });
 </script>
 
-<div class="permission-denied" role="status">
-  <strong>{t('loadFailure.forbiddenTitle')}</strong>
-  <span>{t('loadFailure.forbiddenDetail')}</span>
+<div class="permission-denied">
+  <div class="permission-denied-copy" aria-hidden="true">
+    <strong>{t('loadFailure.forbiddenTitle')}</strong>
+    <span>{t('loadFailure.forbiddenDetail')}</span>
+  </div>
+  <p class="visually-hidden" role="status" aria-live="polite" aria-atomic="true">
+    {#if announce}
+      <span>{t('loadFailure.forbiddenTitle')}</span>
+      <span>{t('loadFailure.forbiddenDetail')}</span>
+    {/if}
+  </p>
 </div>
 
 <style>
   /* Deliberately NOT the `.empty` italic-dim treatment the generic arm uses:
      the whole point is that an operator can tell the two apart at a glance. */
   .permission-denied {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
     padding: 14px 12px;
     color: var(--text);
     background: var(--surface-sunken);
     border-left: 3px solid var(--badge-warn-text);
     border-radius: 2px;
+  }
+
+  .permission-denied-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
   }
 
   .permission-denied strong {
@@ -39,5 +63,17 @@
   .permission-denied span {
     color: var(--text-soft);
     line-height: 1.5;
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 </style>

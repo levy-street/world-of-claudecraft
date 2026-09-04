@@ -10,6 +10,8 @@
 // naming dialog's cap, shape guidance, and submit debounce (the msg_lanes
 // name_screen obligation).
 
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../src/game/audio', () => ({
@@ -822,6 +824,64 @@ describe('the aria-busy send-once lifecycle', () => {
     expect(candidate!.resolve()).toBe('tip:2');
     win.close();
   });
+
+  it('a bag shift before hover follows the painted copy instead of reading the old cell', () => {
+    world.equipment = {};
+    world.equipmentInstances = {};
+    world.craftSkills.jewelcrafting = PERFECTING_SKILL_REQ;
+    world.inventory = [
+      { itemId: 'makers_ember', count: 1 },
+      { itemId: APEX, count: 1, instance: { boundTo: 1, perfecting: 1 } },
+      { itemId: 'wyrmfall_pendant', count: 1, instance: { boundTo: 1, perfecting: 3 } },
+    ];
+    const thunks: Array<{ el: Element; resolve: () => string }> = [];
+    const itemTooltip = vi.fn((_def: unknown, instance?: ItemInstancePayload) =>
+      String(instance?.perfecting ?? 'none'),
+    );
+    const win = makeWindow({
+      itemTooltip: itemTooltip as unknown as WindowDeps['itemTooltip'],
+      attachTooltip: (el, resolve) => thunks.push({ el, resolve }),
+    });
+    win.open();
+    const radio = root().querySelector('[role="radio"]') as HTMLElement;
+    const candidate = thunks.find((entry) => entry.el === radio);
+    expect(candidate).toBeDefined();
+    // The painted candidate was bag 1. Before hover a lower cell vanishes,
+    // so bag 1 now holds a different item. The stable same-id identity follows
+    // the apex copy to bag 0 and resolves its live payload.
+    world.inventory.splice(0, 1);
+    expect(candidate?.resolve()).toBe('1');
+    win.close();
+  });
+
+  it('a same-id departure before hover never retargets the tooltip to its sibling', () => {
+    world.equipment = {};
+    world.equipmentInstances = {};
+    world.craftSkills.jewelcrafting = PERFECTING_SKILL_REQ;
+    world.inventory = [
+      { itemId: APEX, count: 1, instance: { boundTo: 1, perfecting: 1 } },
+      { itemId: APEX, count: 1, instance: { boundTo: 1, perfecting: 3 } },
+    ];
+    const thunks: Array<{ el: Element; resolve: () => string }> = [];
+    const itemTooltip = vi.fn((_def: unknown, instance?: ItemInstancePayload) =>
+      String(instance?.perfecting ?? 'none'),
+    );
+    const win = makeWindow({
+      itemTooltip: itemTooltip as unknown as WindowDeps['itemTooltip'],
+      attachTooltip: (el, resolve) => thunks.push({ el, resolve }),
+    });
+    win.open();
+    const radio = root().querySelector('[role="radio"]') as HTMLElement;
+    const candidate = thunks.find((entry) => entry.el === radio);
+    expect(candidate).toBeDefined();
+
+    // The painted rank-1 copy leaves and its same-id sibling slides into the
+    // captured cell. The same-id count changed, so the identity refuses to
+    // guess and serves no instance-specific lines from the sibling.
+    world.inventory.splice(0, 1);
+    expect(candidate?.resolve()).toBe('none');
+    win.close();
+  });
 });
 
 describe('the R2 bind-warning confirm step', () => {
@@ -936,6 +996,7 @@ describe('the naming dialog (deliverable B)', () => {
     const input = prompt.querySelector('.pf-name-input') as HTMLInputElement;
     expect(input.maxLength).toBe(MAX_LEGENDARY_NAME_LENGTH);
     expect(input.getAttribute('aria-label')).toBeTruthy();
+    expect(input.getAttribute('aria-describedby')).toBe('legendary-name-hint');
     // The window behind the modal goes inert (the prompt_dialog recipe).
     expect(root().inert).toBe(true);
   });
@@ -949,10 +1010,12 @@ describe('the naming dialog (deliverable B)', () => {
     input.dispatchEvent(new Event('input'));
     expect(submit.disabled).toBe(true);
     expect((prompt.querySelector('.pf-name-hint') as HTMLElement).dataset.invalid).toBe('true');
+    expect(input.getAttribute('aria-invalid')).toBe('true');
     input.value = "Dawn's Edge";
     input.dispatchEvent(new Event('input'));
     expect(submit.disabled).toBe(false);
     expect((prompt.querySelector('.pf-name-hint') as HTMLElement).dataset.invalid).toBe('false');
+    expect(input.getAttribute('aria-invalid')).toBe('false');
   });
 
   it('the lock constant is sized to outlast one name-lane refill beat', () => {
@@ -1173,5 +1236,31 @@ describe('the naming dialog (deliverable B)', () => {
     expect(document.querySelector('.pf-name-prompt')).toBeNull();
     expect(root().inert).toBe(false);
     expect(root().style.display).toBe('none');
+  });
+});
+
+describe('promoted candidate name layout', () => {
+  it('stacks the chosen and base names inside a shrinkable name column', () => {
+    world.equipmentInstances = {
+      mainhand: {
+        perfected: true,
+        boundTo: 1,
+        rolled: { quality: 'legendary' },
+        name: 'A Very Long Chosen Legendary Name',
+      },
+    };
+    const win = makeWindow();
+    win.open();
+    const main = root().querySelector('.pf-cand-main') as HTMLElement;
+    const names = main.querySelector(':scope > .pf-cand-names') as HTMLElement;
+    expect(names).not.toBeNull();
+    expect(names.querySelector(':scope > .pf-name')?.textContent).toBe(
+      'A Very Long Chosen Legendary Name',
+    );
+    expect(names.querySelector(':scope > .pf-cand-sub')?.textContent).toBeTruthy();
+
+    const css = readFileSync(join(__dirname, '../src/styles/components.css'), 'utf8');
+    expect(css).toMatch(/\.pf-cand-names\s*\{[^}]*flex-direction:\s*column;/s);
+    expect(css).toMatch(/\.pf-cand-sub\s*\{[^}]*text-overflow:\s*ellipsis;/s);
   });
 });

@@ -1406,6 +1406,11 @@
     box-shadow: inset 0 0 0 1px var(--gold);
     vertical-align: baseline;
   }
+  @media (forced-colors: active) {
+    .equip-mw-chip {
+      border: 1px solid CanvasText;
+    }
+  }
   /* Item names WRAP (never ellipsized) so a full name always reads. */
   .equip-slot .slot-item {
     font-size: 11.5px;
@@ -6614,15 +6619,15 @@
     color: var(--gold);
   }
 
-  /* ---------- profession first-tier tutorial ---------- */
+  /* ---------- tutorial and ferry notes ---------- */
   /* The once-ever explainer modal (profession_tutorial_window.ts), reusing the
      confirm-dialog modal family (.window.panel shell, .cd-body/.cd-actions). A
      bounded, centered modal; body-appended (see the layout.css --window-scale:1
      group), and the JS floors its z-index above the mobile sheet (the
      scoped-popup 96 rule). Sized from existing tokens, no new ones. */
-  /* #tutorial-greeting (the tutorial island spawn greeting,
-     tutorial_greeting_window.ts) shares every rule: the same once-ever modal
-     shape, reusing the same confirm-dialog family chrome. */
+  /* #tutorial-greeting (the live ferry-note dialog,
+     tutorial_greeting_window.ts) shares every rule: the same single-button
+     modal shape, reusing the same confirm-dialog family chrome. */
   #profession-tutorial,
   #tutorial-greeting {
     left: 50%;
@@ -11033,19 +11038,16 @@
   .hj-content {
     display: contents;
   }
-  /* The in-dialog ready announcement (role=status, the a11y batch): a
-     visible status line that doubles as the polite live region, appended
-     once per open and never removed while the window lives (the #chatlog
-     persistent-region exemplar). Collapses while empty so the quiet journal
-     pays no layout for it; each announcement lands as a fresh child span so
-     a repeat of the same text still mutates the region. */
+  /* The in-dialog ready announcement. The empty role=status node stays in
+     the accessibility tree before its first content mutation; collapsing it
+     with display:none would make that first announcement unreliable. */
   .hj-live-status {
     margin: 6px 14px 10px;
     font-size: 11px;
     color: var(--gold);
   }
   .hj-live-status:empty {
-    display: none;
+    margin: 0;
   }
 
   /* ---------- plant sheet ---------- */
@@ -11100,6 +11102,8 @@
   .ps-seed[aria-checked="true"] {
     border-color: var(--gold);
     color: var(--gold);
+    text-decoration: underline;
+    text-underline-offset: 2px;
   }
   .ps-name {
     flex: 1 1 auto;
@@ -11152,6 +11156,8 @@
   .ps-knob[aria-pressed="true"] {
     border-color: var(--gold);
     color: var(--color-text-light);
+    text-decoration: underline;
+    text-underline-offset: 2px;
   }
   .ps-knob:disabled {
     opacity: 0.6;
@@ -11252,6 +11258,8 @@
   }
   .pf-cand[aria-checked="true"] {
     border-color: var(--gold);
+    text-decoration: underline;
+    text-underline-offset: 2px;
   }
   .pf-cand-socket {
     flex: none;
@@ -11264,6 +11272,22 @@
     display: flex;
     align-items: center;
     gap: 6px;
+  }
+  .pf-cand-names {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .pf-cand-sub {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 10px;
+    line-height: 1.2;
+    color: var(--color-text-muted);
   }
   .pf-name {
     min-width: 0;
@@ -13981,10 +14005,10 @@
     bottom: -3px;
     font-size: 10px;
     line-height: 1;
-    color: #d9c9a3;
+    color: var(--color-text-light);
     text-shadow:
-      0 1px 2px #000,
-      0 0 3px #000;
+      0 1px 2px var(--text-outline-color),
+      0 0 3px var(--text-outline-color);
     pointer-events: none;
   }
   /* Price is the number a shopper is actually comparing, so give it real weight.

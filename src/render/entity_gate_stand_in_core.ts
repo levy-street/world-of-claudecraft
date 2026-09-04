@@ -201,11 +201,10 @@ export const ENTITY_GATE_STAND_INS: readonly EntityGateStandIn[] = [
   {
     gate: 'attachSceneGroupGated',
     file: 'src/render/farm_patches.ts',
-    callSite:
-      'void attachSceneGroupGated(this.scene, group, (target) => gate(target, label), retired)',
+    callSite: 'void attachSceneGroupGated(',
     hides:
       "the viewer's own plot's growth-stage mesh on its create and on every rebuild (a stage advance, a wet-band flip), and a placed feast's table on its first appearance in interest scope; both link under the host gate as the label kinds farm-plot and farm-feast, and a group retired before its gate settles (its plot replaced again or removed, its feast despawned) is never shown",
     standIn:
-      'for a plot: the static bed drawn at boot by buildFarmPatchProps (never gated, drawn at every tier) and, on a rebuild, the OUTGOING stage mesh, which keeps drawing until the replacement links and is released on that settle (or at once when the plot is removed meanwhile, so a harvest still bares the bed on the row frame); for a feast: the feast ENTITY itself, whose own view (the invisible click proxy, raycastable through the hold) and nameplate (nameplate_view.ts feastNear, shown within INTERACT_RANGE + 1, exactly where the feast is actionable) never ride this gate; beyond eating range the table is decoration that shows when its programs link, bounded by GATED_ATTACH_WATCHDOG_MS, and warm in practice because the farm program anchors staged at construction retain every farm program',
+      'for a plot: the static bed drawn at boot by buildFarmPatchProps (never gated, drawn at every tier) and, on a rebuild, the OUTGOING stage mesh, which keeps drawing until the replacement links and is released on that settle (or at once when the plot is removed meanwhile, so a harvest still bares the bed on the row frame); for a feast: the feast ENTITY itself, whose own view (the invisible click proxy, raycastable through the hold) and nameplate (nameplate_view.ts feastNear, shown within INTERACT_RANGE + 1, exactly where the feast is actionable) never ride this gate; beyond eating range the table is decoration that shows when its programs link, bounded by GATED_ATTACH_WATCHDOG_MS, and warm in practice because the farm program anchors staged after the first-paint boundary retain every farm program',
   },
 ];

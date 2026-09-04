@@ -792,7 +792,11 @@ const MONOLITHS: MonolithRow[] = [
     // Masterwrought extraction above, the merged file measures 12992 lines
     // after the compile-gate stand-in fix found by the semantic merge audit.
     // Exact merged count, zero headroom.
-    ceiling: 12992,
+    // Lowered 12992 -> 12989 in PR 3872's final cleanup after the farm
+    // compile gate gained its narrow actionable-priority override. Measured
+    // after formatting, banking the three remaining inherited lines of slack.
+    // Exact count, zero headroom.
+    ceiling: 12989,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -980,7 +984,9 @@ const MONOLITHS: MonolithRow[] = [
     // lines here (the placeFeast copy fold and the copy-anchor parameter on the
     // three discard-class delegates) and left 10 over. Measured with
     // wc -l < src/sim/sim.ts after biome. Exact count.
-    ceiling: 12028,
+    // Lowered 12028 -> 12006 in PR 3872 cleanup after removing the retired
+    // tutorial action and its write-only account fact. Exact count, zero slack.
+    ceiling: 12006,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1222,11 +1228,9 @@ const MONOLITHS: MonolithRow[] = [
     //
     // UPSTREAM'S OWN HALF over the release/v0.41.0 span, kept so the merge drops
     // neither parent's record:
-    // Re-pinned 10900 -> 10909 for the Proving Shore branch: the +9 is the
-    // tutorial_start dispatch case (a thin delegate onto sim.startTutorial,
-    // where the real gates live) and the firstCharacter field on the join
-    // meta plumb; the island's ferry and greeting logic itself lives in sim
-    // modules. Exact merged count.
+    // Re-pinned 10900 -> 10909 for the Proving Shore branch's now-retired
+    // ferry command and account-fact plumbing; the island greeting logic
+    // itself lives in a sim module. Exact merged count.
     // Re-pinned to the eastbrook-plus-tutorial integration merge output: the
     // combined tree lands below the branch ceilings, so keep the exact merged
     // count.
@@ -1372,7 +1376,10 @@ const MONOLITHS: MonolithRow[] = [
     // sold-volume wiring): the dispatch swap to buyWithSoldVolume added one
     // import, and inlining the one-use `delay` helper (a setTimeout promise) and
     // dropping its definition paid for it and then some. Exact count, zero slack.
-    ceiling: 10347,
+    // Lowered 10347 -> 10336 in PR 3872 cleanup after removing the unused
+    // feast signer wire field plus the retired tutorial dispatch and account-fact
+    // plumbing. Measured after formatting; exact count.
+    ceiling: 10336,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1508,7 +1515,10 @@ const MONOLITHS: MonolithRow[] = [
     // regeneration, never reconciled by arithmetic: the two arms' extractions
     // compose, so the merged file is BELOW the higher parent. Exact merged
     // count, zero slack: any further growth reds again.
-    ceiling: 5875,
+    // Lowered 5875 -> 5865 in PR 3872 cleanup after removing the unused
+    // feast signer mirror and retired tutorial command sender. Measured after
+    // formatting; exact count.
+    ceiling: 5865,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -1617,7 +1627,9 @@ const MONOLITHS: MonolithRow[] = [
     // regeneration, never reconciled by arithmetic: the two arms' extractions
     // compose, so the merged file is BELOW the higher parent. Exact merged
     // count, zero slack: any further growth reds again.
-    ceiling: 5123,
+    // Lowered 5123 -> 5120 in PR 3872 cleanup after removing the unused bank
+    // entitlement character-count subquery. Exact count, zero slack.
+    ceiling: 5120,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {

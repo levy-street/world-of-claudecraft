@@ -437,14 +437,27 @@ export class PerfectingWindow {
       const c = view.candidates[Number(btn.dataset.candI)];
       const def = c ? ITEMS[c.itemId] : undefined;
       if (c && def) {
-        // Lazy thunk (the attachTooltip contract), resolving the copy's
-        // payload at hover time off the LIVE world so the badge lines track
-        // the mirrors rather than the render.
-        const ref = c.ref;
+        // Lazy thunk (the attachTooltip contract), resolving the painted
+        // copy at hover time off the LIVE world. Bag indices are not copy
+        // identities: another stack can shift the copy, and a same-id sibling
+        // can occupy its old cell. The row's ordinal/count identity follows
+        // a safe shift and stands down when the same-id population changes.
+        const identity = c.identity;
         this.deps.attachTooltip(btn, () => {
+          const current = this.buildView().view.candidates.find(
+            (candidate) => candidate.identity === identity && candidate.itemId === c.itemId,
+          );
           const live = this.deps.world();
+          const ref = current?.ref;
+          const cell = ref && 'bag' in ref ? live.inventory[ref.bag] : undefined;
           const instance =
-            'slot' in ref ? live.equipmentInstances[ref.slot] : live.inventory[ref.bag]?.instance;
+            ref && 'slot' in ref
+              ? live.equipment[ref.slot] === c.itemId
+                ? live.equipmentInstances[ref.slot]
+                : undefined
+              : cell?.itemId === c.itemId
+                ? cell.instance
+                : undefined;
           return this.deps.itemTooltip(def, instance);
         });
       }
@@ -642,7 +655,7 @@ export class PerfectingWindow {
     return (
       `<li role="none"><button type="button" role="radio" class="pf-cand" data-cand-i="${index}" data-focus-key="${esc(focusKey)}" aria-checked="${c.selected ? 'true' : 'false'}" tabindex="${tabStop ? '0' : '-1'}">` +
       `<span class="pf-cand-socket">${icon}</span>` +
-      `<span class="pf-cand-main"><span class="pf-name${c.state === 'promoted' ? ' q-legendary' : ''}">${esc(rowName)}</span>${sub}${worn}</span>` +
+      `<span class="pf-cand-main"><span class="pf-cand-names"><span class="pf-name${c.state === 'promoted' ? ' q-legendary' : ''}">${esc(rowName)}</span>${sub}</span>${worn}</span>` +
       `<span class="pf-cand-state">${esc(this.stateText(c.state, c.rank, c.ranks))}</span>` +
       `</button></li>`
     );

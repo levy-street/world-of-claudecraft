@@ -164,7 +164,7 @@ describe('farm biome palettes', () => {
     for (const patch of FARM_PATCHES) {
       const palette = farmBiomePalette(patch.zoneId);
       expect(palette).toBe(FARM_BIOME_PALETTES[patch.zoneId]);
-      seen.add(`${palette.soil}:${palette.wood}:${palette.trim}`);
+      seen.add(`${palette.soil}:${palette.wood}`);
     }
     expect(seen.size, 'two patches sharing a palette read as the same garden').toBe(
       FARM_PATCHES.length,
@@ -252,7 +252,7 @@ describe('plot rebuild key', () => {
   // The key a built plot would carry, as the adapter stores it.
   const keyOf = (p: FarmPlotView, now = 0) => {
     const v = resolveFarmPlotVisual(p, now);
-    return { cropId: p.cropId, status: p.status, stageMesh: v.stageMesh, wetBand: v.wetBand };
+    return { cropId: p.cropId, stageMesh: v.stageMesh, wetBand: v.wetBand };
   };
 
   it('matches for identical inputs', () => {
@@ -277,11 +277,15 @@ describe('plot rebuild key', () => {
     expect(farmPlotKeyMatches(keyOf(slow, 0), slow, FARM_WET_BAND_2_MS)).toBe(false);
   });
 
-  it('stops matching when the status changes', () => {
-    // Ready and withered differ, and both differ from growing at the same time.
+  it('ignores a raw status change when the resolved visual stays identical', () => {
     const ready = plot({ status: 'ready' });
-    expect(farmPlotKeyMatches(keyOf(ready, HOUR), plot({ status: 'withered' }), HOUR)).toBe(false);
-    expect(farmPlotKeyMatches(keyOf(base, 0), ready, 0)).toBe(false);
+    expect(resolveFarmPlotVisual(base, HOUR).stageMesh).toBe('stage4');
+    expect(resolveFarmPlotVisual(ready, HOUR).stageMesh).toBe('stage4');
+    expect(farmPlotKeyMatches(keyOf(base, HOUR), ready, HOUR)).toBe(true);
+  });
+
+  it('stops matching when a status change selects a different stage mesh', () => {
+    expect(farmPlotKeyMatches(keyOf(base, HOUR), plot({ status: 'withered' }), HOUR)).toBe(false);
   });
 
   it('allocates nothing: it is a predicate over fields, not a minted key', () => {

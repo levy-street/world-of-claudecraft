@@ -2178,7 +2178,7 @@ export class Hud {
       paintGroundRings: (rings) => this.renderer.setPlayerAuraRings(rings),
     });
     this.farmPressAffordance = new FarmPressAffordanceController({
-      root: () => $('#interact-affordance'),
+      root: $('#interact-affordance'),
       writers: this.writerFacet,
       text: (target) =>
         t(
@@ -5469,15 +5469,15 @@ export class Hud {
   private readonly bgKillFeed = new BattlegroundKillFeed({
     layer: () => document.getElementById('ui'),
   });
-  // Character window painter (char_view.ts paperdoll core + char_window.ts painter).
-  // It composes the presentation bag (icon/tooltip) for the equip slots and routes
-  // the HUD-built stat / talent / progression fragments plus the unequip + drag
+  // Character window painter (char_view.ts core + char_window.ts painter). It composes
+  // presentation helpers with HUD-built stats/progression plus the unequip + drag
   // plumbing. The shared 3D turntable preview and the cosmetic skin picker stay
   // HUD-owned (the single WebGL preview is borrowed by the skin-event overlay and
   // the player card), so the painter triggers them through renderPreview /
   // renderSkinPicker closures rather than building them.
   private readonly charWindow = new CharWindow({
     ...this.presentationBag,
+    wornItemTooltip: (item, instance) => this.itemTooltip(item, false, instance),
     root: () => $('#char-window'),
     world: () => this.sim,
     closeOthers: () => this.closeOtherWindows('#char-window'),

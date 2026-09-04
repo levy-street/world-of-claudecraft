@@ -139,8 +139,11 @@ export function openReportWindow(
   // Give the trigger the id the <label for="report-reason"> points at, so the
   // label (which lost its original target when the slot div was replaced)
   // associates with a real focusable control again.
-  reasonDD.querySelector('.ui-dd-btn')?.setAttribute('id', 'report-reason');
+  const reasonButton = reasonDD.querySelector<HTMLElement>('.ui-dd-btn');
+  reasonButton?.setAttribute('id', 'report-reason');
+  reasonButton?.setAttribute('aria-describedby', 'report-error');
   el.querySelector('#report-reason-slot')?.replaceWith(reasonDD);
+  reasonButton?.focus();
   el.querySelectorAll('[data-close]').forEach((btn) => {
     btn.addEventListener('click', () => {
       closeReportWindow();

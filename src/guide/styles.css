@@ -3105,11 +3105,11 @@ a.guide-poi:hover {
    Separated by the ADJACENT-SIBLING rule rather than a trailing margin on every
    entry, so a one-material cell gains no phantom gap; nowrap keeps an entry
    from breaking between its name and its count. */
-.guide-prof-mat {
+span.guide-prof-mat {
   display: inline-block;
   white-space: nowrap;
 }
-.guide-prof-mat + .guide-prof-mat {
+span.guide-prof-mat + span.guide-prof-mat {
   margin-inline-start: var(--g-xs);
 }
 .guide-set-impact {

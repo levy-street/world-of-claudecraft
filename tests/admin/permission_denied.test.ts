@@ -48,13 +48,24 @@ describe('PermissionDenied', () => {
     expect(screen.getByText(t('loadFailure.forbiddenDetail'))).toBeInTheDocument();
   });
 
-  it('announces politely rather than as an alert', () => {
+  it('mounts an empty polite sink before announcing the asynchronously inserted message', async () => {
     // A polling surface re-renders this on every refused refresh; role="alert"
     // would interrupt a screen reader each time.
-    render(PermissionDenied);
-    const region = screen.getByRole('status');
-    expect(region).toBeInTheDocument();
-    expect(region.getAttribute('role')).toBe('status');
+    vi.useFakeTimers();
+    try {
+      render(PermissionDenied);
+      const region = screen.getByRole('status');
+      expect(region).toBeEmptyDOMElement();
+      expect(region).toHaveAttribute('aria-live', 'polite');
+      expect(region).toHaveAttribute('aria-atomic', 'true');
+
+      await vi.runOnlyPendingTimersAsync();
+
+      expect(region).toHaveTextContent(t('loadFailure.forbiddenTitle'));
+      expect(region).toHaveTextContent(t('loadFailure.forbiddenDetail'));
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
 

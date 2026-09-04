@@ -109,7 +109,7 @@ const MOBILE_WINDOW_EXCEPTIONS: Record<string, string> = {
   'profession-tutorial':
     'small centered modal (dynamic, the first-tier profession tutorial); centered and clamped by its own base #profession-tutorial rule plus the shared .window viewport clamp, with its z-index floored above the mobile sheet (96) in JS',
   'tutorial-greeting':
-    'small centered modal (dynamic, the tutorial island spawn greeting); centered and clamped by its own base #tutorial-greeting rule plus the shared .window viewport clamp, with its z-index floored above the mobile sheet (96) in JS, the profession-tutorial precedent',
+    'small centered modal (dynamic, the live ferry-note dialog); centered and clamped by its own base #tutorial-greeting rule plus the shared .window viewport clamp, with its z-index floored above the mobile sheet (96) in JS, the profession-tutorial precedent',
   'delve-rite-panel': 'in-run gameplay overlay, not a menu window that docks to a sheet',
   'lockpick-panel': 'in-run gameplay overlay, not a menu window that docks to a sheet',
 };

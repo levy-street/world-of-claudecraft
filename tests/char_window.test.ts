@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { CRAFT_RING } from '../src/sim/content/professions';
 import { ITEMS } from '../src/sim/data';
+import { itemCopyPin } from '../src/sim/item_copy_ref';
 import { ARCHETYPE_PAIR_TARGETS } from '../src/sim/professions/archetype';
 import { STAT_DEFENSE, STAT_GRID } from '../src/ui/char_stats_view';
 import {
@@ -136,7 +137,7 @@ describe('char_window: paperdoll helm-visibility eye', () => {
       togglePlaytimeVisible: vi.fn(),
       itemIcon: () => '',
       moneyHtml: () => '',
-      itemTooltip: () => '',
+      wornItemTooltip: () => '',
       attachTooltip: vi.fn(),
     });
     win.render();
@@ -237,7 +238,7 @@ describe('char_window: profession art placements', () => {
       togglePlaytimeVisible: vi.fn(),
       itemIcon: () => '',
       moneyHtml: () => '',
-      itemTooltip: () => '',
+      wornItemTooltip: () => '',
       attachTooltip,
     });
 
@@ -362,7 +363,7 @@ describe('char_window: profession art placements', () => {
       togglePlaytimeVisible: vi.fn(),
       itemIcon: () => '',
       moneyHtml: () => '',
-      itemTooltip: () => '',
+      wornItemTooltip: () => '',
       attachTooltip: vi.fn(),
     });
 
@@ -515,7 +516,7 @@ describe('char_window: focus carried across the 2 Hz rebuild', () => {
       togglePlaytimeVisible: vi.fn(),
       itemIcon: () => 'data:image/png;base64,stub',
       moneyHtml: () => '',
-      itemTooltip: () => '',
+      wornItemTooltip: () => '',
       attachTooltip: vi.fn(),
       // A test's own recording deps win over the stubs above.
       ...(extra.deps as object),
@@ -568,7 +569,7 @@ describe('char_window: focus carried across the 2 Hz rebuild', () => {
           ]),
         },
         deps: {
-          itemTooltip: (_item: unknown, instance: unknown) => {
+          wornItemTooltip: (_item: unknown, instance: unknown) => {
             tooltips.push(instance);
             return '';
           },
@@ -677,6 +678,56 @@ describe('char_window: focus carried across the 2 Hz rebuild', () => {
       document.body.removeChild(root);
       document.body.removeChild(outside);
     }
+  });
+
+  it('clears every stale socket highlight when the dragged copy leaves the bags', () => {
+    canvasStub();
+    const root = document.createElement('div');
+    const inventory = [
+      {
+        itemId: 'warhewn_signet',
+        count: 1,
+        instance: { signer: 'Aurelia' },
+      },
+      { itemId: 'warhewn_signet', count: 1 },
+    ];
+    const dragState = new ItemDragState();
+    const win = makeWin(root, {
+      world: { inventory },
+      deps: { dragState },
+    });
+    win.render();
+
+    dragState.begin({
+      itemId: 'warhewn_signet',
+      count: 1,
+      index: 0,
+      copyPin: itemCopyPin(inventory[0]),
+    });
+    win.markDropTargets('warhewn_signet', 0);
+    expect(root.querySelectorAll('.equip-slot.drop-target')).toHaveLength(2);
+
+    // A snapshot moves the exact copy, then rebuilds the character sheet after
+    // the bags window synchronizes the old sockets. The rebuilt sockets must
+    // restore the live exact-copy hints, including on touch with no dragover.
+    inventory.reverse();
+    win.render();
+    expect(root.querySelectorAll('.equip-slot.drop-target')).toHaveLength(2);
+    const ring1 = root.querySelector<HTMLElement>('#equip-slot-ring1');
+
+    // A later snapshot removes the signed copy while an indistinguishable base-id
+    // neighbor shifts into its old cell. Revalidation must still reject the
+    // drop, and its visual promise must be withdrawn at the same time.
+    inventory.splice(1, 1);
+    const dragover = new Event('dragover', { bubbles: true, cancelable: true });
+    ring1?.dispatchEvent(dragover);
+
+    expect(dragover.defaultPrevented).toBe(false);
+    expect(root.querySelectorAll('.equip-slot.drop-target')).toHaveLength(0);
+
+    // A sheet rebuild must not resurrect the hints on its newly minted rows.
+    win.render();
+    expect(root.querySelectorAll('.equip-slot.drop-target')).toHaveLength(0);
   });
 });
 
@@ -887,7 +938,7 @@ describe('char_window: lifetime Time Played line (issue: character-sheet playtim
       togglePlaytimeVisible,
       itemIcon: () => '',
       moneyHtml: () => '',
-      itemTooltip: () => '',
+      wornItemTooltip: () => '',
       attachTooltip,
     });
     win.render();
@@ -1021,7 +1072,7 @@ describe('char_window: own-paperdoll per-copy tooltip threading', () => {
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/(^|[^:'"`])\/\/.*$/gm, '$1');
     expect(painterCode).toContain('wornTooltipInstance(world.equipmentInstances?.[slot])');
-    expect(painterCode).toContain('this.deps.itemTooltip(item, instance)');
+    expect(painterCode).toContain('this.deps.wornItemTooltip(item, instance)');
     expect(painterCode).not.toContain('world.entities.get(world.playerId)?.equippedInstances');
   });
 });
@@ -1076,7 +1127,7 @@ describe('char_window: the Masterwrought cap visibility family (phase 14)', () =
       togglePlaytimeVisible: vi.fn(),
       itemIcon: () => '',
       moneyHtml: () => '',
-      itemTooltip: () => 'deftip',
+      wornItemTooltip: () => 'deftip',
       attachTooltip: (el: Element, resolve: () => string) => tips.push({ el, resolve }),
     });
     win.render();
@@ -1105,7 +1156,8 @@ describe('char_window: the Masterwrought cap visibility family (phase 14)', () =
       (def) => def.kind === 'armor' && def.slot === 'chest' && !def.masterwrought,
     );
     expect(plainChest).toBeDefined();
-    const { root } = renderSheet({ mainhand: 'duskforged_warblade', chest: plainChest!.id });
+    if (!plainChest) throw new Error('missing plain chest fixture');
+    const { root } = renderSheet({ mainhand: 'duskforged_warblade', chest: plainChest.id });
     const chips = [...root.querySelectorAll('.equip-mw-chip')];
     expect(chips.length).toBe(1);
     const chip = chips[0] as HTMLElement;
@@ -1120,15 +1172,37 @@ describe('char_window: the Masterwrought cap visibility family (phase 14)', () =
     const row = root.querySelector('#equip-slot-mainhand') as Element;
     const tip = tips.find((entry) => entry.el === row);
     expect(tip).toBeDefined();
-    const atOne = tip!.resolve();
+    if (!tip) throw new Error('missing mainhand tooltip fixture');
+    const atOne = tip.resolve();
     expect(atOne).toContain('deftip');
     expect(atOne).toContain('1');
     // The count resolves inside the closure, off the LIVE world: equipping a
     // second piece between hovers moves the line with no re-render (an eager
     // render-time count would serve the stale "1 of 2" byte-identically).
     world.equipment.offhand = 'duskforged_bulwark';
-    const atTwo = tip!.resolve();
+    const atTwo = tip.resolve();
     expect(atTwo).not.toBe(atOne);
     expect(atTwo).toContain('2');
+  });
+});
+
+describe('char_window: forced-colors Masterwrought marker', () => {
+  it('keeps the worn-piece diamond visible when author colors are suppressed', () => {
+    const css = readFileSync(join(__dirname, '../src/styles/components.css'), 'utf8');
+    expect(css).toMatch(
+      /@media\s*\(forced-colors: active\)\s*\{\s*\.equip-mw-chip \{[^}]*border:\s*1px solid CanvasText;/,
+    );
+  });
+});
+
+describe('char_window: production worn-tooltip wiring', () => {
+  it('disables comparison when Hud wires a worn-slot tooltip', () => {
+    const hud = readFileSync(join(__dirname, '../src/ui/hud.ts'), 'utf8');
+    const start = hud.indexOf('private readonly charWindow = new CharWindow({');
+    const wiring = hud.slice(start, hud.indexOf('\n  });', start));
+    expect(start).toBeGreaterThan(-1);
+    expect(wiring).toContain(
+      'wornItemTooltip: (item, instance) => this.itemTooltip(item, false, instance)',
+    );
   });
 });

@@ -6,18 +6,20 @@
 
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import { buildCommissionOrderBoardModel } from '../src/ui/hud/professions/commission_order_view';
 import {
   type CommissionOrderWindowDeps,
   renderCommissionOrderWindow,
 } from '../src/ui/hud/professions/commission_order_window';
-import { t } from '../src/ui/i18n';
+import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
 import type { CommissionOrderView } from '../src/world_api/professions';
 
 const SWORD_RECIPE = 'recipe_eastbrook_arming_sword';
 const SWORD = 'eastbrook_arming_sword';
+
+afterEach(() => setLanguage('en'));
 
 function order(overrides: Partial<CommissionOrderView> = {}): CommissionOrderView {
   return {
@@ -250,5 +252,31 @@ describe('the crafter record line', () => {
     );
     renderCommissionOrderWindow(el, model, deps());
     expect(el.querySelector('.commission-crafter-record')).toBeNull();
+  });
+
+  it('uses locale-aware separators for status details and crafter record counts', async () => {
+    await ensureLocaleLoaded('ja_JP');
+    setLanguage('ja_JP');
+    const el = document.createElement('div');
+    const model = buildCommissionOrderBoardModel(
+      [
+        order({
+          status: 'accepted',
+          acceptedByName: 'Borin',
+          crafterMasterworks: 12,
+          crafterLegendaries: 1,
+        }),
+      ],
+      [],
+      ITEMS,
+    );
+
+    renderCommissionOrderWindow(el, model, deps());
+
+    expect(el.querySelector('.commission-order-row .vi-name > .vi-sub')?.textContent).toBe(
+      '引き受け済み、Borinが引き受け済み',
+    );
+    expect(el.querySelector('.ccr-values')?.textContent).toBe('傑作12点、伝説の品1点');
+    expect(el.querySelector('.commission-order-row')?.textContent).not.toContain(' · ');
   });
 });

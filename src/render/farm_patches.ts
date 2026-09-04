@@ -44,7 +44,7 @@
 // crowd) evicts the parked program and the next rebuild links it cold again.
 // The FARM PROGRAM ANCHORS close that class outright: one hidden mesh per
 // distinct (material signature x geometry attribute set) of the stage and
-// feast GLBs, wearing the source materials, staged at construction under the
+// feast GLBs, wearing the source materials, staged after the renderer installs its first-paint boundary under the
 // same gate and retained for the visuals' life, so every farm program keeps a
 // live use, never enters the retention FIFO, and cannot be evicted by it.
 import * as THREE from 'three';
@@ -54,6 +54,7 @@ import { terrainHeight } from '../sim/world';
 import type { FarmPatchDef, FarmPlotView } from '../world_api/farming';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { GPU_WORK_PRIORITY } from './background_gpu_queue';
 import {
   FARM_ACCENT_MATERIAL_NAME,
   FARM_ACCENT_MESH_NAME,
@@ -126,7 +127,11 @@ const WORLD_UP = new THREE.Vector3(0, 1, 0);
 /** The host's compile step for a farm group (the renderer's compile gate):
  *  link `target`'s programs off the frame before it shows, queued under
  *  `label` (a `kind:instance` the budget learns per kind, gpuPrepKindOfLabel). */
-export type FarmCompileGate = (target: THREE.Object3D, label: string) => Promise<unknown>;
+export type FarmCompileGate = (
+  target: THREE.Object3D,
+  label: string,
+  priority: number,
+) => Promise<unknown>;
 
 /** The hidden root of the farm program anchors (see the module header). */
 export const FARM_PROGRAM_ANCHORS_NAME = 'farmProgramAnchors';
@@ -409,7 +414,7 @@ export class FarmPatchVisuals {
   // KHR_parallel_shader_compile or a headless suite). Without one, attaches are
   // immediate and no anchors are staged.
   private readonly compileGate: FarmCompileGate | null;
-  // The hidden program anchors (module header), staged once at construction.
+  // The hidden program anchors (module header), built at construction and staged after the first-paint boundary is installed.
   private readonly anchors: THREE.Group | null;
 
   constructor(
@@ -420,13 +425,21 @@ export class FarmPatchVisuals {
   ) {
     this.compileGate = compileGate;
     this.anchors = this.compileGate ? buildFarmProgramAnchors() : null;
-    if (this.anchors && this.compileGate) {
-      // Added hidden and never revealed: the anchors exist to be compiled, so
-      // this is the one bare scene.add here, and the gate runs over it at
-      // once. Shutdown rejects queued GPU work on purpose; nothing to recover.
-      this.scene.add(this.anchors);
-      void this.compileGate(this.anchors, FARM_PROGRAM_ANCHORS_LABEL).catch(() => undefined);
-    }
+  }
+
+  /** Stages the retained program anchors after the renderer has installed its
+   *  first-paint boundary. Idempotent so a repeated prewarm request cannot
+   *  submit or attach the catalog twice. */
+  stageProgramAnchors(): void {
+    if (!this.anchors || !this.compileGate || this.anchors.parent) return;
+    // Added hidden and never revealed: the anchors exist only to keep farm
+    // programs linked. Shutdown rejects queued GPU work on purpose.
+    this.scene.add(this.anchors);
+    void this.compileGate(
+      this.anchors,
+      FARM_PROGRAM_ANCHORS_LABEL,
+      GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+    ).catch(() => undefined);
   }
 
   /**
@@ -495,7 +508,7 @@ export class FarmPatchVisuals {
       if (!seat) continue;
       this.seen.add(plot.bedId);
       const existing = this.plots.get(plot.bedId);
-      // The steady-state path: four field compares, no object and no string.
+      // The steady-state path: three field compares, no object and no string.
       if (existing && farmPlotKeyMatches(existing, plot, nowMs)) continue;
       // A rebuild hands the outgoing stage to the replacement, which keeps it
       // drawing as the stand-in until its own gate settles (create).
@@ -662,7 +675,12 @@ export class FarmPatchVisuals {
       this.scene.add(group);
       return;
     }
-    void attachSceneGroupGated(this.scene, group, (target) => gate(target, label), retired)
+    void attachSceneGroupGated(
+      this.scene,
+      group,
+      (target) => gate(target, label, GPU_WORK_PRIORITY.LIVE_VIEW),
+      retired,
+    )
       .catch(ignoreRetiredAttach)
       .finally(() => releaseOutgoing?.());
   }
@@ -796,7 +814,6 @@ export class FarmPatchVisuals {
       ownedGeometries,
       // The rebuild key, stored as fields so the next sync compares in place.
       cropId: plot.cropId,
-      status: plot.status,
       stageMesh: visual.stageMesh,
       wetBand: visual.wetBand,
       seatQuat: seat.quat,
@@ -804,7 +821,7 @@ export class FarmPatchVisuals {
       // of step, and the same bed sways the same way on every host.
       phase: (bedIdPhase(bedId) * Math.PI * 2) % (Math.PI * 2),
       sway: SWAY_AMPLITUDE[visual.stageMesh],
-      outgoing,
+      outgoing: this.collapseHiddenOutgoing(outgoing),
       released: false,
     };
     this.plots.set(bedId, record);
@@ -818,6 +835,30 @@ export class FarmPatchVisuals {
       () => this.plots.get(bedId) !== record,
       () => this.releaseOutgoing(record),
     );
+  }
+
+  /**
+   * Collapse a replacement that is itself still hidden behind its compile
+   * gate. Its oldest visible outgoing stage becomes the new stand-in, while
+   * every superseded hidden group is retired immediately. Once a visible
+   * stand-in is found, its older tail is released so the chain stays one deep.
+   * Clearing each link first keeps late gate settlements from releasing the
+   * inherited stand-in, and releasePlot makes every disposal once-only.
+   */
+  private collapseHiddenOutgoing(record: PlotVisual | null): PlotVisual | null {
+    let current = record;
+    while (current && !current.group.visible) {
+      const next = current.outgoing;
+      current.outgoing = null;
+      this.releasePlot(current);
+      current = next;
+    }
+    // Only one visible stand-in is needed. A watchdog-revealed group can
+    // still own an older stage while its gate is pending; sever and release
+    // that tail now so a later settlement cannot leak or retire it out from
+    // under the newest replacement.
+    if (current) this.releaseOutgoing(current);
+    return current;
   }
 
   /** Release the stage mesh `record` replaced, once (the settle, a retire and

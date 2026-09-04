@@ -12,6 +12,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
 import { attachBiomeHaze } from '../src/render/biome_haze_field';
 import {
   buildFarmPatchProps,
@@ -32,6 +33,7 @@ import {
   farmStageModelUrl,
   resolveFarmPlotVisual,
 } from '../src/render/farm_patches_core';
+import { GATED_ATTACH_WATCHDOG_MS } from '../src/render/gated_scene_attach';
 import { FARM_PATCHES } from '../src/sim/content/farm_patches';
 import type { Entity, SimEvent } from '../src/sim/types';
 import type { FarmPlotView } from '../src/world_api/farming';
@@ -945,11 +947,16 @@ describe('the prepared producer: the gated attach, the stand-ins and the program
   // item (the module header): every plot and feast group rides the host's
   // compile gate, the outgoing stage mesh stands in for a rebuild, a group
   // retired before its settle never shows or leaks, and the program anchors
-  // staged at construction retain every farm program across rebuilds.
+  // staged after the first-paint boundary retain every farm program across rebuilds.
   function fakeGate() {
-    const calls: { target: THREE.Object3D; label: string; release: () => void }[] = [];
-    const gate: FarmCompileGate = (target, label) =>
-      new Promise<void>((resolve) => calls.push({ target, label, release: resolve }));
+    const calls: {
+      target: THREE.Object3D;
+      label: string;
+      priority: number;
+      release: () => void;
+    }[] = [];
+    const gate: FarmCompileGate = (target, label, priority) =>
+      new Promise<void>((resolve) => calls.push({ target, label, priority, release: resolve }));
     return { calls, gate };
   }
   const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
@@ -966,11 +973,15 @@ describe('the prepared producer: the gated attach, the stand-ins and the program
     return spies;
   };
 
-  it('stages the program anchors once at construction, hidden, under the farm-prewarm label', () => {
+  it('defers the program anchors until explicitly staged, then stages them once', () => {
     const scene = new THREE.Scene();
     const { seats } = buildFarmPatchProps(SEED, FARM_PATCHES);
     const { calls, gate } = fakeGate();
-    new FarmPatchVisuals(scene, seats, recordingVfx().sink, gate);
+    const visuals = new FarmPatchVisuals(scene, seats, recordingVfx().sink, gate);
+    expect(scene.children.some((c) => c.name === FARM_PROGRAM_ANCHORS_NAME)).toBe(false);
+    expect(calls).toEqual([]);
+    visuals.stageProgramAnchors();
+    visuals.stageProgramAnchors();
     const anchors = scene.children.filter((c) => c.name === FARM_PROGRAM_ANCHORS_NAME);
     expect(anchors).toHaveLength(1);
     expect(anchors[0].visible).toBe(false);
@@ -989,10 +1000,12 @@ describe('the prepared producer: the gated attach, the stand-ins and the program
     expect(meshes).toBe(1);
     expect(calls).toHaveLength(1);
     expect(calls[0].label).toBe(FARM_PROGRAM_ANCHORS_LABEL);
+    expect(calls[0].priority).toBe(GPU_WORK_PRIORITY.VISIBLE_PREWARM);
     expect(calls[0].target).toBe(anchors[0]);
     // A rejected anchor gate (renderer shutdown) is swallowed, never surfaced.
     const rejecting: FarmCompileGate = () => Promise.reject(new Error('shut down'));
-    expect(() => new FarmPatchVisuals(scene, seats, recordingVfx().sink, rejecting)).not.toThrow();
+    const rejected = new FarmPatchVisuals(scene, seats, recordingVfx().sink, rejecting);
+    expect(() => rejected.stageProgramAnchors()).not.toThrow();
   });
 
   it('anchors one mesh per distinct (material signature x attribute set) of the loaded GLBs', () => {
@@ -1013,7 +1026,8 @@ describe('the prepared producer: the gated attach, the stand-ins and the program
     try {
       const scene = new THREE.Scene();
       const { seats } = buildFarmPatchProps(SEED, FARM_PATCHES);
-      new FarmPatchVisuals(scene, seats, recordingVfx().sink, fakeGate().gate);
+      const visuals = new FarmPatchVisuals(scene, seats, recordingVfx().sink, fakeGate().gate);
+      visuals.stageProgramAnchors();
       const anchors = scene.children.find((c) => c.name === FARM_PROGRAM_ANCHORS_NAME);
       const worn: THREE.Material[] = [];
       anchors?.traverse((o) => {
@@ -1032,17 +1046,18 @@ describe('the prepared producer: the gated attach, the stand-ins and the program
     }
   });
 
-  it('a first plant is held hidden under farm-plot:<bed> and shows when its gate settles', async () => {
+  it('a cross-zone plot stays below the first-paint boundary while its gate settles', async () => {
     const scene = new THREE.Scene();
     const { seats } = buildFarmPatchProps(SEED, FARM_PATCHES);
     const { calls, gate } = fakeGate();
     const visuals = new FarmPatchVisuals(scene, seats, recordingVfx().sink, gate);
-    visuals.sync(fakeWorld([plot()], 0).source, READ_DT);
+    visuals.sync(fakeWorld([plot({ bedId: 'bed_evergarden_8' })], 0).source, READ_DT);
     const [crop] = plotsIn(scene);
     expect(crop).toBeDefined();
     expect(crop.visible).toBe(false);
     const call = calls.at(-1);
-    expect(call?.label).toBe('farm-plot:bed_eastbrook_1');
+    expect(call?.label).toBe('farm-plot:bed_evergarden_8');
+    expect(call?.priority).toBe(GPU_WORK_PRIORITY.LIVE_VIEW);
     expect(call?.target).toBe(crop);
     // The sway still drives the held group (harmless while hidden, and the
     // record is live in the map from the first frame).
@@ -1133,6 +1148,7 @@ describe('the prepared producer: the gated attach, the stand-ins and the program
     const table = scene.children.find((c) => c.name === 'farmFeast:501');
     expect(table?.visible).toBe(false);
     expect(calls.at(-1)?.label).toBe('farm-feast:501');
+    expect(calls.at(-1)?.priority).toBe(GPU_WORK_PRIORITY.LIVE_VIEW);
     expect(calls.at(-1)?.target).toBe(table);
     // The placement flourish still fires at once (cosmetic, not a stand-in).
     expect(vfx.calls).toEqual(['puff', 'burst']);
@@ -1164,13 +1180,84 @@ describe('the prepared producer: the gated attach, the stand-ins and the program
     const at = src.indexOf('this.farmPatchVisuals = new FarmPatchVisuals(');
     expect(at).toBeGreaterThan(-1);
     const call = src.slice(at, src.indexOf(');', at));
-    expect(call).toContain(
-      'this.asyncCompileSupported ? (root, label) => this.compileGate(root, false, label) : null,',
+    expect(call).toMatch(
+      /\(root, label, priority\) =>\s*this\.compileGate\(root, false, label, priority\)/,
     );
+
+    // Anchor debt is submitted only after prewarmInitialScene installs the
+    // first-paint boundary. Cross-zone plot rows and feast tables stay in the
+    // ordinary live band, so a mature account cannot bypass that boundary.
+    const prewarmAt = src.indexOf('async prewarmInitialScene(');
+    const prewarm = src.slice(prewarmAt, src.indexOf('const policy:', prewarmAt));
+    const boundaryAt = prewarm.indexOf('this.initialGpuWorkStart =');
+    const anchorsAt = prewarm.indexOf('this.farmPatchVisuals?.stageProgramAnchors()');
+    expect(boundaryAt).toBeGreaterThan(-1);
+    expect(anchorsAt).toBeGreaterThan(boundaryAt);
+    const farm = readFileSync(join(__dirname, '..', 'src/render/farm_patches.ts'), 'utf8');
+    expect(farm).toContain('GPU_WORK_PRIORITY.VISIBLE_PREWARM');
+    expect(farm).toContain('gate(target, label, GPU_WORK_PRIORITY.LIVE_VIEW)');
+
     // ...and the gate honours the label the visuals pass (the kind the budget
     // learns), so a farm unit is priced as farm-plot / farm-feast, never as a
     // generic live-gate.
-    expect(src).toContain('label = `live-gate:${target.name || target.type}`,');
+    expect(src).toContain('label = `live-gate:');
     expect(src).toContain('{ priority, label },');
+  });
+  it('keeps one visible stand-in across a watchdog and three overlapping generations', async () => {
+    vi.useFakeTimers();
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const settlePromises = async () => {
+      for (let i = 0; i < 5; i++) await Promise.resolve();
+    };
+    try {
+      const scene = new THREE.Scene();
+      const { seats } = buildFarmPatchProps(SEED, FARM_PATCHES);
+      const { calls, gate } = fakeGate();
+      const visuals = new FarmPatchVisuals(scene, seats, recordingVfx().sink, gate);
+      const { state, source } = fakeWorld([plot()], 0);
+
+      // A is revealed by the watchdog but its compile promise remains pending.
+      visuals.sync(source, READ_DT);
+      const [stageA] = plotsIn(scene);
+      const stageASpies = disposeSpies(stageA);
+      vi.advanceTimersByTime(GATED_ATTACH_WATCHDOG_MS);
+      expect(stageA.visible).toBe(true);
+      expect(warn).toHaveBeenCalledOnce();
+
+      // B replaces visible A, then C replaces still-hidden B. C must inherit
+      // only A; B is retired exactly once and cannot release A when it settles late.
+      state.nowMs = HOUR / 2;
+      visuals.sync(source, READ_DT);
+      const stageB = plotsIn(scene).find((group) => group !== stageA) as THREE.Group;
+      const stageBSpies = disposeSpies(stageB);
+      expect(stageB.visible).toBe(false);
+      state.nowMs = HOUR;
+      state.rows = [plot({ status: 'ready' })];
+      visuals.sync(source, READ_DT);
+      const stageC = plotsIn(scene).find((group) => group !== stageA) as THREE.Group;
+      expect(stageB.parent).toBeNull();
+      for (const spy of stageBSpies) expect(spy).toHaveBeenCalledOnce();
+      expect(stageA.parent).toBe(scene);
+      expect(stageC.visible).toBe(false);
+
+      calls[2].release();
+      await settlePromises();
+      expect(stageC.visible).toBe(true);
+      expect(stageA.parent).toBeNull();
+      for (const spy of stageASpies) expect(spy).toHaveBeenCalledOnce();
+
+      // Neither late promise may reveal a retired group or dispose a stand-in twice.
+      calls[1].release();
+      calls[0].release();
+      await settlePromises();
+      expect(stageB.parent).toBeNull();
+      expect(stageA.parent).toBeNull();
+      expect(stageC.parent).toBe(scene);
+      for (const spy of stageBSpies) expect(spy).toHaveBeenCalledOnce();
+      for (const spy of stageASpies) expect(spy).toHaveBeenCalledOnce();
+    } finally {
+      vi.useRealTimers();
+      warn.mockRestore();
+    }
   });
 });

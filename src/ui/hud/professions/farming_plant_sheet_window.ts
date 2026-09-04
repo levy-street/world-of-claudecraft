@@ -330,10 +330,11 @@ export class PlantSheetWindow {
 
   private seedRowHtml(row: PlantSheetSeedRow, tabStop: boolean): string {
     const name = itemName(row.seedItemId);
+    const countId = `plant-sheet-seed-count-${row.cropId}`;
     return (
-      `<li role="none"><button type="button" role="radio" class="ps-seed" data-seed-crop="${esc(row.cropId)}" data-focus-key="seed:${esc(row.cropId)}" aria-checked="${row.selected ? 'true' : 'false'}" tabindex="${tabStop ? '0' : '-1'}" aria-label="${esc(t('hudChrome.farming.plantSheet.sowAria', { name }))}">` +
+      `<li role="none"><button type="button" role="radio" class="ps-seed" data-seed-crop="${esc(row.cropId)}" data-focus-key="seed:${esc(row.cropId)}" aria-checked="${row.selected ? 'true' : 'false'}" tabindex="${tabStop ? '0' : '-1'}" aria-describedby="${esc(countId)}" aria-label="${esc(t('hudChrome.farming.plantSheet.sowAria', { name }))}">` +
       `<span class="ps-name">${esc(name)}</span>` +
-      `<span class="ps-count">${esc(wholeNumber(row.seedCount))}</span>` +
+      `<span class="ps-count" id="${esc(countId)}">${esc(wholeNumber(row.seedCount))}</span>` +
       `</button></li>`
     );
   }

@@ -33,7 +33,13 @@ import { dropdownKeyNav } from './dropdown_nav';
 import { computeDropdownPlacement } from './dropdown_position';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
-import { formatMoney as formatLocalizedMoney, formatNumber, getLanguage, t } from './i18n';
+import {
+  formatMoney as formatLocalizedMoney,
+  formatNumber,
+  getLanguage,
+  languageTag,
+  t,
+} from './i18n';
 import {
   marketArmorBadge,
   marketArmorPips,
@@ -247,6 +253,7 @@ export class MarketWindow {
     }
     const sent = localizedMarketSearch({
       query: this.searchQuery,
+      localeTag: languageTag(lang),
       itemIds: Object.keys(ITEMS),
       localizedNameOf: (id) => itemDisplayName(ITEMS[id]),
       englishMatches: (id, search) => marketItemMatches(id, { ...defaultMarketQuery(), search }),

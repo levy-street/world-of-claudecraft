@@ -593,6 +593,13 @@ describe('market_window: Browse row cloth/leather/mail cue (#3104)', () => {
     expect(core).toContain("from '../sim/equipment_rules'");
   });
 
+  it('keeps the pattern mark on shared theme tokens', () => {
+    const rule = componentsCss.match(/\.mkt-pattern-mark\s*\{([^}]*)\}/s)?.[1] ?? '';
+    expect(rule).toContain('var(--color-text-light)');
+    expect(rule).toContain('var(--text-outline-color)');
+    expect(rule).not.toMatch(/#[0-9a-f]{3,8}/i);
+  });
+
   it('is not color-only: the cue is a countable pip symbol, distinguished by a per-type class, and still carries the word for assistive tech', () => {
     // The distinction survives with color removed because the pip COUNT differs
     // per armor type; color is only a bonus channel. The localized word rides the
@@ -930,6 +937,20 @@ describe('ClientWorld: reconnect re-push of session preferences (#2723 review)',
       expect(sent).toEqual([]);
     } finally {
       (globalThis as any).WebSocket = oldWebSocket;
+    }
+  });
+});
+
+describe('market_window: live locale-aware case folding', () => {
+  it('uses the active Turkish locale tag when resolving the sent search', async () => {
+    await ensureLocaleLoaded('tr_TR');
+    setLanguage('tr_TR');
+    try {
+      const win = new MarketWindow({} as never) as any;
+      win.searchQuery = 'ilik ucu';
+      expect(win.effectiveSearch()).toBe('marrowpoint');
+    } finally {
+      setLanguage('en');
     }
   });
 });

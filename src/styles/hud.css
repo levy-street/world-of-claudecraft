@@ -7995,7 +7995,7 @@
     left: 50%;
     bottom: 30%;
     transform: translateX(-50%);
-    display: none;
+    opacity: 0;
     max-width: min(420px, calc(100vw - 48px));
     box-sizing: border-box;
     padding: 6px 12px;
@@ -8012,7 +8012,7 @@
     pointer-events: none;
   }
   #interact-affordance.is-shown {
-    display: block;
+    opacity: 1;
   }
   /* The death actions use the same live Confirm binding as the rest of pad UI.
      Generated content leaves the localized button text intact while making the

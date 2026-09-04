@@ -3421,7 +3421,7 @@ describe('Guide professions enchanting and economy accuracy', () => {
     expect(e.enchants.map((row) => row.id).sort()).toEqual(Object.keys(ENCHANTS).sort());
     for (const row of e.enchants) {
       const def = ENCHANTS[row.id];
-      expect(row.name).toBe(def.name);
+      expect(row).not.toHaveProperty('name');
       expect(row.slot).toBe(def.itemSlot);
       // Id AND English name, the same pairing the recipe bills carry: the
       // enchant table rides the craft page's one materials cell, which
@@ -3505,6 +3505,20 @@ describe('Guide professions enchanting and economy accuracy', () => {
         material: ITEMS[m].name,
       })),
     );
+  });
+
+  it('renders enchant names in the reader locale instead of baked English', async () => {
+    await ensureLocaleLoaded('ja_JP');
+    try {
+      setLanguage('ja_JP');
+      const enchanting = GUIDE_PROF_CRAFTS.find((craft) => craft.id === 'enchanting');
+      if (!enchanting) throw new Error('missing generated enchanting guide data');
+      const html = craftDetailHtml(enchanting);
+      expect(html).toContain('武器銘刻：ルーンの刃');
+      expect(html).not.toContain('Weapon Etching: Runed Edge');
+    } finally {
+      setLanguage('en');
+    }
   });
 
   it('publishes the exact fees, masterwork odds, and market cut', () => {
@@ -3956,7 +3970,7 @@ describe('Guide professions pages and routes', () => {
     // class, and the sheet declares the adjacent-sibling separation.
     expect(weapon, 'recipe rows carry the scoped material class').toContain('guide-prof-mat');
     expect(guideCss, 'the joined material entries must be separated by the stylesheet').toMatch(
-      /\.guide-prof-mat\s*\+\s*\.guide-prof-mat\s*\{[^}]*margin-inline-start:/,
+      /span\.guide-prof-mat\s*\+\s*span\.guide-prof-mat\s*\{[^}]*margin-inline-start:/,
     );
     // The RENDERED source cell for a drop-taught apex row (phase 08): the
     // data-level mirror pins 'drop' in the corpus, but only a render pin can
@@ -4174,10 +4188,49 @@ describe('Guide professions pages and routes', () => {
     );
   });
 
+  it('localizes provisioning item names and lets semantic lists wrap', async () => {
+    await ensureLocaleLoaded('es');
+    try {
+      setLanguage('es');
+      const gameMeat = t(itemNameKey('game_meat'));
+      const smokedEel = t(itemNameKey('ashwood_smoked_eel'));
+      expect(gameMeat, 'Spanish premise for a supplied material').toBe('Carne de caza');
+      expect(smokedEel, 'Spanish premise for a cooking output').toBe('Anguila ahumada de fresno');
+
+      const html = professionsPage.render(ctx(['provisioning']));
+      expect(html, 'the supplier list uses the localized item name').toContain(
+        `<li>${esc(gameMeat)}</li>`,
+      );
+      expect(html, 'the cooking ladder uses the localized output name').toContain(
+        `<li>${esc(smokedEel)}</li>`,
+      );
+      expect(html).not.toContain('<li>Game Meat</li>');
+      expect(html).not.toContain('<li>Ashwood Smoked Eel</li>');
+      expect(html, 'provisioning lists do not inherit recipe-entry nowrap').not.toContain(
+        '<ul class="guide-prof-mat">',
+      );
+    } finally {
+      setLanguage('en');
+    }
+
+    const guideCss = readFileSync(resolve(process.cwd(), 'src/guide/styles.css'), 'utf8');
+    expect(guideCss).toMatch(
+      /span\.guide-prof-mat \{[^}]*display: inline-block;[^}]*white-space: nowrap;/s,
+    );
+    expect(guideCss, 'nowrap must not apply to lists sharing the class name').not.toMatch(
+      /(?:^|\n)\.guide-prof-mat \{[^}]*white-space: nowrap;/s,
+    );
+  });
+
   it('the provisioning page tells the story from real generated data', () => {
     setLanguage('en');
     const html = professionsPage.render(ctx(['provisioning']));
     expect((html.match(/<h1>/g) ?? []).length).toBe(1);
+    const itemDef = (itemId: string) => {
+      const def = ITEMS[itemId];
+      if (!def) throw new Error(`unknown provisioning item ${itemId}`);
+      return def;
+    };
 
     // THE THREE LINES THE PAGE EXISTS TO JOIN, each with a REAL contribution
     // rendered beside it. An empty story section would satisfy a heading check
@@ -4224,7 +4277,8 @@ describe('Guide professions pages and routes', () => {
     ).toContain('nearly every gathering line');
     for (const id of ['farming', 'fishing', 'herbalism', 'corpseHarvesting', 'logging']) {
       const line = lineOf(id);
-      for (const name of line.materials) {
+      for (const itemId of line.materials) {
+        const name = itemDef(itemId).name;
         expect(html, `${id} line missing ${name}`).toContain(name);
       }
     }
@@ -4253,6 +4307,9 @@ describe('Guide professions pages and routes', () => {
     expect(rungs.length, 'and the ladder is its real height').toBe(6);
     expect(rungs, 'it starts at the free rung').toContain(0);
     expect(rungs, 'the capstone rung is on the page').toContain(125);
+    for (const rung of GUIDE_PROF_PROVISIONING.ladder) {
+      for (const output of rung.outputs) itemDef(output.itemId);
+    }
     expect(html).toContain('Stonepot Feast');
     expect(html).toContain('Warspice Feast');
     expect(html).toContain('Sageleaf Feast');
@@ -4260,7 +4317,7 @@ describe('Guide professions pages and routes', () => {
     const placeables = GUIDE_PROF_PROVISIONING.ladder
       .flatMap((r) => r.outputs)
       .filter((o) => o.placeable)
-      .map((o) => o.name)
+      .map((o) => itemDef(o.itemId).name)
       .sort();
     expect(placeables, 'exactly the four feasts are marked placeable').toEqual([
       'Harvest Feast',
@@ -4277,7 +4334,7 @@ describe('Guide professions pages and routes', () => {
     const stations = GUIDE_PROF_PROVISIONING.ladder
       .flatMap((r) => r.outputs)
       .filter((o) => o.station)
-      .map((o) => o.name)
+      .map((o) => itemDef(o.itemId).name)
       .sort();
     expect(stations, 'the cooking mobile station is marked as one').toEqual(['The Laden Hearth']);
     expect(
@@ -4298,12 +4355,10 @@ describe('Guide professions pages and routes', () => {
     // The rung they share, so a reader meets both tags in one list: the claim
     // is about what sits BESIDE the feasts, not merely that a tag exists.
     const topRung = GUIDE_PROF_PROVISIONING.ladder.find((r) => r.skillReq === 125);
-    expect(topRung?.outputs.map((o) => o.name).sort(), 'the 125 rung holds both kinds').toEqual([
-      'Sageleaf Feast',
-      'Stonepot Feast',
-      'The Laden Hearth',
-      'Warspice Feast',
-    ]);
+    expect(
+      topRung?.outputs.map((o) => itemDef(o.itemId).name).sort(),
+      'the 125 rung holds both kinds',
+    ).toEqual(['Sageleaf Feast', 'Stonepot Feast', 'The Laden Hearth', 'Warspice Feast']);
 
     // THE PROSE'S OWN CLAIM, PINNED (the packet's recurring defect is a page
     // sentence nothing checks): the market section tells a reader that every
@@ -4311,7 +4366,6 @@ describe('Guide professions pages and routes', () => {
     // it can buy the lot. That is only true while no listed material is
     // soulbound or barred from the market, and it is checked here rather than
     // trusted, over the ids the page actually renders.
-    const nameToDef = new Map(Object.values(ITEMS).map((def) => [def.name, def]));
     const listed = GUIDE_PROF_PROVISIONING.lines.flatMap((l) => l.materials);
     // AT THE REAL COUNT, not a token floor. This used to read `> 10` against a
     // real population of 36, which the farming line alone satisfies: every
@@ -4320,11 +4374,13 @@ describe('Guide professions pages and routes', () => {
     // over the same lines, which is an identity of flatMap and could not fail;
     // the literal is the whole guard.)
     expect(listed.length, 'every listed material is swept, at the real count').toBe(36);
-    for (const name of listed) {
-      const def = nameToDef.get(name);
-      expect(def, `${name} must be a real item def`).toBeTruthy();
-      expect(def?.soulbound, `${name} is soulbound, so the market claim is false`).toBeFalsy();
-      expect(def?.noMarketList, `${name} cannot be listed, so the claim is false`).toBeFalsy();
+    for (const itemId of listed) {
+      const def = itemDef(itemId);
+      expect(def.soulbound, `${def.name} is soulbound, so the market claim is false`).toBeFalsy();
+      expect(
+        def.noMarketList,
+        `${def.name} cannot be listed, so the market claim is false`,
+      ).toBeFalsy();
     }
 
     // SPOILER-SAFE, and READ WHAT THIS DOES AND DOES NOT CLAIM. The four

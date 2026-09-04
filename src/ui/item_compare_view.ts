@@ -68,7 +68,7 @@ function compareBlockForSlot(
   candidateInstance?: ItemInstancePayload,
 ): string {
   const equippedId = source.equipment[slot];
-  if (!equippedId || equippedId === item.id) return '';
+  if (!equippedId) return '';
   const equipped = lookup(equippedId);
   if (!equipped) return '';
   // Both sides' per-copy payloads feed the delta math: the hovered candidate

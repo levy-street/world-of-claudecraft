@@ -34,8 +34,8 @@
 // spelling. The keys it is wired to are
 // `hudChrome.farming.pressTarget.feastOverHarvest` and `...feastOverPlant`.
 //
-// The module reaches no browser global (every DOM touch rides `deps.root()`,
-// the farming_plant_sheet_window shape), so it needs no UI_DOM_MODULES row.
+// The module reaches no browser global: Hud resolves its stable root once and
+// injects it through `deps.root`, so it needs no UI_DOM_MODULES row.
 
 import type { FarmPressTarget } from '../../../game/farm_press_target_core';
 import type { PainterHostWriters } from '../../painter_host';
@@ -48,7 +48,7 @@ export interface FarmPressAffordanceDeps {
   /** The notice element (`#interact-affordance`). Null on a document that does
    *  not carry it, which the controller treats as "nothing to paint" rather
    *  than an error: the HUD boots against two entry documents. */
-  root(): HTMLElement | null;
+  root: HTMLElement | null;
   /** Hud's shared write-elision facet. Narrowed to the two writers this uses so
    *  the dependency says exactly what the module touches. */
   writers: Pick<PainterHostWriters, 'setText' | 'toggleClass'>;
@@ -68,11 +68,11 @@ export class FarmPressAffordanceController {
    *  on every poll and elide nothing at all. The class cache is keyed per
    *  (element, class), so the two writes here elide independently. */
   paint(target: FarmPressTarget | null): void {
-    const el = this.deps.root();
+    const el = this.deps.root;
     if (!el) return;
-    // Text first, so the notice is already carrying its sentence in the same
-    // poll that reveals it; while hidden the copy is not resolved at all.
-    if (target !== null) this.deps.writers.setText(el, this.deps.text(target));
+    // Keep the persistent status node empty while hidden. Clearing it makes a
+    // later re-entry for the same target a fresh mutation that AT can announce.
+    this.deps.writers.setText(el, target === null ? '' : this.deps.text(target));
     this.deps.writers.toggleClass(el, FARM_PRESS_AFFORDANCE_SHOWN_CLASS, target !== null);
   }
 }

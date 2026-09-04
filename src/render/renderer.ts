@@ -2956,7 +2956,9 @@ export class Renderer {
       this.scene,
       this.farmBedSeats,
       this.vfx,
-      this.asyncCompileSupported ? (root, label) => this.compileGate(root, false, label) : null,
+      this.asyncCompileSupported
+        ? (root, label, priority) => this.compileGate(root, false, label, priority)
+        : null,
     );
     this.underwaterView = new UnderwaterView(this.lowGfx);
     this.scene.add(this.underwaterView.group);
@@ -5406,7 +5408,6 @@ export class Renderer {
       categories,
     };
   }
-
   async prewarmInitialScene(
     options: {
       maxMs?: number;
@@ -5419,6 +5420,7 @@ export class Renderer {
     void this.initialGpuWorkStart?.then(() => {
       this.initialGpuWorkStart = null;
     });
+    this.farmPatchVisuals?.stageProgramAnchors();
     this.installSceneryRevealGates();
     const policy: PrewarmPolicy = resolvePrewarmPolicy({
       constrainedMemory: GFX.constrainedMemory,
@@ -8374,10 +8376,12 @@ export class Renderer {
     target: THREE.Object3D,
     requiredForEntry = false,
     label = `live-gate:${target.name || target.type}`,
+    priorityOverride?: number,
   ): Promise<unknown> {
     const lookup = (id: number) => this.sim.entities.get(id);
     const isCasting = castingAtPlayerPredicate(lookup, this.sim.player.id);
-    const priority = compilePriorityForTarget(target, this.sim.player.targetId, isCasting);
+    const priority =
+      priorityOverride ?? compilePriorityForTarget(target, this.sim.player.targetId, isCasting);
     // Compile the variant pair the boot prewarm proved out, never a bare
     // compileAsync at the ambient render target: three keys a program on the
     // bound target's output colour space, so on composer tiers an unbound

@@ -61,7 +61,7 @@ function rig(options: { missingRoot?: boolean } = {}) {
   // target resolves to a different sentence.
   let harvestLine = 'FEAST BEFORE CROP';
   const deps: FarmPressAffordanceDeps = {
-    root: () => (options.missingRoot ? null : node.el),
+    root: options.missingRoot ? null : node.el,
     writers: facet,
     text: (target) => {
       textCalls.push(target);
@@ -146,10 +146,21 @@ describe('FarmPressAffordanceController', () => {
 
     r.controller.paint(null);
     expect(r.shown()).toBe(false);
-    expect(r.counts).toEqual({ writes: 1, skips: 0 });
+    expect(r.counts).toEqual({ writes: 2, skips: 0 });
+    expect(r.el.textContent).toBe('');
 
     r.controller.paint(null);
-    expect(r.counts).toEqual({ writes: 1, skips: 1 });
+    expect(r.counts).toEqual({ writes: 2, skips: 2 });
+  });
+
+  it('re-announces the same target after leaving and re-entering', () => {
+    const r = rig();
+    r.controller.paint('feast_over_harvest');
+    r.controller.paint(null);
+    r.reset();
+    r.controller.paint('feast_over_harvest');
+    expect(r.counts).toEqual({ writes: 2, skips: 0 });
+    expect(r.el.textContent).toBe('FEAST BEFORE CROP');
   });
 
   it('does not re-resolve the copy while hidden', () => {
@@ -194,15 +205,24 @@ describe('the notice surface the controller paints into', () => {
     expect(tag?.groups?.inner?.trim()).toBe('');
   });
 
-  it('hud.css hides the notice by default and reveals it with the painted class', () => {
-    // The controller writes ONLY the class; if the base rule stopped hiding the
-    // element, the notice would sit on screen permanently with stale copy.
+  it('hud.css keeps the status node present while visually hiding the notice', () => {
     const css = read('src/styles/hud.css');
-    expect(css).toMatch(/#interact-affordance\s*\{[^}]*display:\s*none/);
+    expect(css).toMatch(/#interact-affordance\s*\{[^}]*opacity:\s*0/s);
+    expect(css).not.toMatch(/#interact-affordance\s*\{[^}]*display:\s*none/s);
     expect(css).toMatch(
-      new RegExp(`#interact-affordance\\.${FARM_PRESS_AFFORDANCE_SHOWN_CLASS}\\s*\\{[^}]*display:`),
+      new RegExp(`#interact-affordance\\.${FARM_PRESS_AFFORDANCE_SHOWN_CLASS}\\s*\\{[^}]*opacity:`),
     );
     // pointer-events:none, or the line would eat world clicks aimed through it.
     expect(css).toMatch(/#interact-affordance\s*\{[^}]*pointer-events:\s*none/);
+  });
+
+  it('Hud resolves the stable notice node once when wiring the controller', () => {
+    const hud = read('src/ui/hud.ts');
+    const start = hud.indexOf('this.farmPressAffordance = new FarmPressAffordanceController({');
+    expect(start).toBeGreaterThan(-1);
+    const wiring = hud.slice(start, hud.indexOf('});', start) + 3);
+    expect(wiring.match(/interact-affordance/g)).toHaveLength(1);
+    expect(wiring).toContain('root: ');
+    expect(wiring).not.toContain('root: () =>');
   });
 });

@@ -151,19 +151,28 @@ describe('itemCompareBlocksHtml', () => {
     expect(withCandidate).not.toContain('tt-red');
   });
 
-  it('is empty for a slotless item, an empty slot, and the same worn id', () => {
+  it('compares separately rolled copies even when they share an item id', () => {
+    const { calls, render } = recordingRenderer();
+    const html = itemCompareBlocksHtml(
+      HOVERED_HELM,
+      {
+        equipment: { helmet: HOVERED_HELM.id },
+        instances: { helmet: { rolled: { stats: { sta: 3 } } } },
+      },
+      lookup,
+      render,
+      { rolled: { stats: { sta: 5 } } },
+    );
+    expect(html).toContain('[card:cmp_test_helm]');
+    expect(html).toContain('+2');
+    expect(calls).toEqual([{ id: HOVERED_HELM.id, instance: { rolled: { stats: { sta: 3 } } } }]);
+  });
+
+  it('is empty for a slotless item or an empty slot', () => {
     const { calls, render } = recordingRenderer();
     const potion = { id: 'cmp_test_potion', name: 'P', kind: 'potion' } as ItemDef;
     expect(itemCompareBlocksHtml(potion, { equipment: {} }, lookup, render)).toBe('');
     expect(itemCompareBlocksHtml(HOVERED_HELM, { equipment: {} }, lookup, render)).toBe('');
-    expect(
-      itemCompareBlocksHtml(
-        HOVERED_HELM,
-        { equipment: { helmet: HOVERED_HELM.id } },
-        lookup,
-        render,
-      ),
-    ).toBe('');
     expect(calls).toEqual([]);
   });
 });

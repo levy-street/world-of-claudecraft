@@ -245,3 +245,33 @@ describe('the receipt-marked family keeps its standing shape (the partition cont
     expect(heavyDirty(session)).toBe(false);
   });
 });
+
+describe('place_feast server slot validation', () => {
+  it('rejects present malformed slots before the sim', () => {
+    const server = new GameServer();
+    const { session } = joinServer(server, 912, 'Malformed Feast');
+    const place = vi.spyOn(server.sim, 'placeFeast');
+    for (const slot of [-1, 1.5, '0', null]) {
+      clearHeavyDirty(session);
+      cmd(server, session, { cmd: 'place_feast', slot });
+      expect(place, JSON.stringify(slot)).not.toHaveBeenCalled();
+      expect(heavyDirty(session), JSON.stringify(slot)).toBe(false);
+    }
+  });
+
+  it('preserves omitted-slot and zero-slot calls', () => {
+    const server = new GameServer();
+    const { session } = joinServer(server, 913, 'Valid Feast');
+    const place = vi.spyOn(server.sim, 'placeFeast');
+
+    clearHeavyDirty(session);
+    cmd(server, session, { cmd: 'place_feast' });
+    expect(place).toHaveBeenLastCalledWith(session.pid, undefined);
+    expect(heavyDirty(session)).toBe(true);
+
+    clearHeavyDirty(session);
+    cmd(server, session, { cmd: 'place_feast', slot: 0 });
+    expect(place).toHaveBeenLastCalledWith(session.pid, 0);
+    expect(heavyDirty(session)).toBe(true);
+  });
+});

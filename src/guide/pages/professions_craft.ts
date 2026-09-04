@@ -43,6 +43,7 @@ export function stationLabel(type: string): string {
 const qualityLabel = (q: string): string => t(`itemUi.quality.${q}` as TranslationKey);
 const slotLabel = (slot: string): string => t(`itemUi.slots.${slot}` as TranslationKey);
 const statLabel = (stat: string): string => t(`itemUi.stats.${stat}` as TranslationKey);
+const enchantLabel = (id: string): string => t(`hudChrome.enchantName.${id}` as TranslationKey);
 
 export function craftById(id: string): GuideProfCraft | undefined {
   return GUIDE_PROF_CRAFTS.find((c) => c.id === id);
@@ -331,7 +332,7 @@ function enchantingSections(): string {
   const enchantRows = e.enchants
     .map(
       (row) => `<tr>
-        <td>${esc(row.name)}${
+        <td>${esc(enchantLabel(row.id))}${
           row.perfectedOnly
             ? `<span class="guide-prof-combo">${esc(t('guide.profPages.ench.perfectedOnly'))}</span>`
             : ''

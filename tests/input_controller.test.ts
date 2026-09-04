@@ -3,11 +3,10 @@
 // The extracted input modal (src/ui/input_controller.ts, the Masterwrought
 // phase 14 hud.ts ratchet payback; renamed from input_dialog.ts at the Phase
 // 18 sweep so the painter gate's *_controller filename sweep covers it). The
-// move kept Hud.inputDialog's behavior
-// (the shared #confirm-dialog slot, the trap lifecycle through the deps bag,
-// Enter-submits, the copy affordance) and fixed three recorded gaps IN the
-// new module: the field's accessible name, the maxLength cap, and the busy
-// handle. The Hud-side delegator behavior (the pending no-choice cancel
+// move kept Hud.inputDialog's behavior: the shared #confirm-dialog slot,
+// trap lifecycle through the deps bag, Enter submission and copy affordance.
+// The extracted field is now named by the visible dialog title. The Hud-side
+// delegator behavior (the pending no-choice cancel
 // firing when the input modal takes the slot) stays pinned in
 // tests/hud_confirm_gates.test.ts, which now exercises the delegator.
 
@@ -95,45 +94,11 @@ describe('the move keeps the old dialog behavior', () => {
   });
 });
 
-describe('the recorded gap fixes', () => {
-  it('the field is never anonymous: the dialog title names it by default', () => {
+describe('the accessible field name', () => {
+  it('uses the dialog title so the field is never anonymous', () => {
     showInputDialog(makeDeps(), { title: 'Name it' });
     const input = el().querySelector('.cd-input') as HTMLInputElement;
     expect(input.getAttribute('aria-labelledby')).toBe('confirm-dialog-title');
-  });
-
-  it('an explicit inputAria wins over the title association', () => {
-    showInputDialog(makeDeps(), { title: 'T', inputAria: 'Build name' });
-    const input = el().querySelector('.cd-input') as HTMLInputElement;
-    expect(input.getAttribute('aria-label')).toBe('Build name');
-    expect(input.getAttribute('aria-labelledby')).toBeNull();
-  });
-
-  it('maxLength caps both field shapes', () => {
-    showInputDialog(makeDeps(), { title: 'T', maxLength: 32 });
-    expect((el().querySelector('.cd-input') as HTMLInputElement).maxLength).toBe(32);
-    showInputDialog(makeDeps(), { title: 'T', maxLength: 12, multiline: true });
-    expect((el().querySelector('.cd-input') as HTMLTextAreaElement).maxLength).toBe(12);
-  });
-
-  it('the busy handle holds the OK control and refuses a busy submit', () => {
-    const onOk = vi.fn();
-    const handle = showInputDialog(makeDeps(), { title: 'T', onOk });
-    const ok = el().querySelector('[data-ok]') as HTMLButtonElement;
-    handle.setBusy(true);
-    expect(ok.disabled).toBe(true);
-    expect(el().getAttribute('aria-busy')).toBe('true');
-    // A busy submit is refused even if driven directly (Enter on the field).
-    const input = el().querySelector('.cd-input') as HTMLInputElement;
-    input.value = 'x';
-    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
-    expect(onOk).not.toHaveBeenCalled();
-    expect(document.getElementById('confirm-dialog')).not.toBeNull();
-    handle.setBusy(false);
-    expect(ok.disabled).toBe(false);
-    expect(el().getAttribute('aria-busy')).toBeNull();
-    ok.click();
-    expect(onOk).toHaveBeenCalledWith('x');
   });
 });
 
@@ -188,5 +153,23 @@ describe('the previously unpinned arms (the phase 14 QA)', () => {
     const input = el().querySelector('.cd-input') as HTMLInputElement;
     expect(input.value).toBe('"><img src=x>');
     expect(input.placeholder).toBe('"><b>P</b>');
+  });
+});
+
+describe('the visible field label association', () => {
+  it('associates the visible label with both single-line and multiline fields', () => {
+    for (const multiline of [false, true]) {
+      showInputDialog(makeDeps(), { title: 'Import', label: 'Build code', multiline });
+      const field = el().querySelector('.cd-input') as HTMLInputElement | HTMLTextAreaElement;
+      const label = el().querySelector('label.cd-body') as HTMLLabelElement;
+      expect(field.id).toBe('confirm-dialog-input');
+      expect(label.htmlFor).toBe(field.id);
+      expect(label.id).toBe('confirm-dialog-field-label');
+      expect(label.textContent).toBe('Build code');
+      expect(field.getAttribute('aria-labelledby')?.split(/\s+/)).toEqual([
+        'confirm-dialog-title',
+        label.id,
+      ]);
+    }
   });
 });

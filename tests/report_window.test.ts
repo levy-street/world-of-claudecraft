@@ -95,6 +95,7 @@ describe('report window: open', () => {
     expect(el.querySelector('.panel-title span')?.textContent).toBe('Report Rega');
     // The dropdown trigger inherits the id the <label for="report-reason"> targets.
     expect(el.querySelector('.ui-dd-btn')?.id).toBe('report-reason');
+    expect(el.querySelector('.ui-dd-btn')?.getAttribute('aria-describedby')).toBe('report-error');
     expect(el.querySelector('#report-details')).not.toBeNull();
     expect(el.querySelector('#report-submit')?.textContent).toBe('Submit Report');
     expect(el.querySelectorAll('[data-close]')).toHaveLength(2);
@@ -416,11 +417,9 @@ describe('report window: the REAL focus bridge across a re-open', () => {
     // Flush anything FocusManager.restore may have scheduled. If the re-open
     // routed through close(), this is where focus would snap back to `first`.
     await new Promise((resolve) => setTimeout(resolve, 0));
-    // POSITIVE, not merely not-`first`: a bare not-`first` also passes in an
-    // environment where the bridge captures nothing and no restore ever fires,
-    // which would leave this arm inert instead of red. Focus must still be
-    // exactly where the second open left it.
-    expect(document.activeElement).toBe(second);
+    // A re-open moves focus into the fresh dialog, never back to the first
+    // opener or onto the second context-menu control outside it.
+    expect(document.activeElement).toBe(el.querySelector('#report-reason'));
     expect(el.querySelector('.panel-title span')?.textContent).toBe('Report Bram');
   });
 
@@ -430,15 +429,7 @@ describe('report window: the REAL focus bridge across a re-open', () => {
     opener1.focus();
     const bridge = makeWindowFocus(new FocusManager(), () => el);
     openReportWindow(realDeps(bridge), { pid: 7, name: 'Rega' });
-    // Focus MUST be driven off the opener first. Opening does not move it:
-    // FocusManager.open only pushes the trap state (focusFirst is an opt-in
-    // this window never takes) and report_window.ts calls .focus() nowhere, so
-    // an assert-activeElement-is-opener1 written straight after the open reads
-    // the same value whether close() restores anything or does nothing at all.
-    // That is precisely the vacuity this arm exists to rule out, and its first
-    // draft had it.
-    const inside = el.querySelector<HTMLElement>('#report-submit');
-    inside?.focus();
+    const inside = el.querySelector<HTMLElement>('#report-reason');
     expect(document.activeElement).toBe(inside);
     closeReportWindow();
     await vi.waitFor(() => expect(document.activeElement).toBe(opener1));

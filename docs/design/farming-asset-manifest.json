@@ -398,31 +398,26 @@
     "biomePalettes": {
       "eastbrook_vale": {
         "soil": "0xa87a52",
-        "wood": "0xc4a274",
-        "trim": "0xd8c69a"
+        "wood": "0xc4a274"
       },
       "mirefen_marsh": {
         "soil": "0x5c5140",
-        "wood": "0x7c8460",
-        "trim": "0x93a074"
+        "wood": "0x7c8460"
       },
       "thornpeak_heights": {
         "soil": "0x8a8578",
-        "wood": "0x9aa0a4",
-        "trim": "0xb4bcc0"
+        "wood": "0x9aa0a4"
       },
       "evergarden": {
         "soil": "0x8c7a5e",
-        "wood": "0xd6c9ae",
-        "trim": "0xf2ece0"
+        "wood": "0xd6c9ae"
       }
     },
     "fallbackPalette": {
       "soil": "0x8a7a62",
-      "wood": "0xb0a084",
-      "trim": "0xc8bca4"
+      "wood": "0xb0a084"
     },
-    "channelUse": "As consumed by src/render/farm_patches.ts: soil is the bed whole-mesh multiply, wood is the compost bin whole-mesh multiply; trim is authored for a future higher-tier trim pass and has no draw-time consumer today."
+    "channelUse": "As consumed by src/render/farm_patches.ts: soil is the bed whole-mesh multiply, wood is the compost bin whole-mesh multiply."
   },
   "adapterParameters": {
     "source": "src/render/farm_patches.ts and src/render/farm_patches_core.ts",

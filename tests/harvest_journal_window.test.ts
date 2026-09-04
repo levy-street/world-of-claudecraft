@@ -21,6 +21,7 @@ import {
   HARVEST_JOURNAL_TICK_MS,
   HarvestJournalWindow,
 } from '../src/ui/hud/professions/harvest_journal_window';
+import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
 import type { IWorld } from '../src/world_api';
 import { stripComments } from './helpers/strip_comments';
 
@@ -118,6 +119,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  setLanguage('en');
   vi.useRealTimers();
 });
 
@@ -300,6 +302,19 @@ describe('harvest journal window: the countdown clock', () => {
     expect(status()).toBe(node);
     expect(status()?.parentNode).toBe(root);
     expect(status()?.textContent).toBe('Ready to harvest: Vale Wheat');
+  });
+
+  it('formats a multi-crop ready announcement with the active locale', async () => {
+    await ensureLocaleLoaded('ja_JP');
+    setLanguage('ja_JP');
+    world.nowMs = 5 * MINUTE;
+    world.plots = [plot(), plot({ bedId: 'bed_eastbrook_2', cropId: 'brook_carrot' })];
+    makeWindow().open();
+    world.plots = world.plots.map((row) => ({ ...row, status: 'ready' }));
+    vi.advanceTimersByTime(HARVEST_JOURNAL_TICK_MS);
+    expect(root.querySelector('.hj-live-status')?.textContent).toBe(
+      '収穫可能: 渓谷小麦、小川ニンジン',
+    );
   });
 
   it('a repeat flip of the same crop still mutates the region (fresh child span)', () => {

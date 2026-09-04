@@ -19,7 +19,7 @@
 // through the facet, which is the seam render code reads plots on.
 import { farmGrowthStage } from '../sim/professions/farm_projection';
 import { FARM_FEAST_TEMPLATE_ID, feastTemplateIds } from '../sim/professions/feast';
-import type { FarmPatchDef, FarmPlotStatus, FarmPlotView } from '../world_api/farming';
+import type { FarmPatchDef, FarmPlotView } from '../world_api/farming';
 
 /**
  * The three crop silhouettes the art carries. TWELVE crops share three model
@@ -108,36 +108,31 @@ export function farmCropAccent(cropId: string): number {
 /** A patch's local colour grade, applied as a per-instance whole-mesh tint
  *  (glb_instanced_props writes it with setColorAt; no material-name
  *  selection happens at draw time) so one model set reads as four different
- *  gardens. As consumed by farm_patches.ts today: soil is the bed's
- *  whole-mesh multiply and wood is the compost bin's; trim is authored for
- *  a future higher-tier trim pass and has no draw-time consumer yet
- *  (ledgered in the Phase 13 handoff). */
+ *  gardens. Soil is the bed's whole-mesh multiply and wood is the compost
+ *  bin's. */
 export interface FarmBiomePalette {
   /** Multiplied into the bed (the whole-mesh instance tint). */
   readonly soil: number;
   /** Multiplied into the compost bin (the whole-mesh instance tint). */
   readonly wood: number;
-  /** Authored for the higher-tier trim pass; unconsumed at draw time today. */
-  readonly trim: number;
 }
 
 /** Keyed by FarmPatchDef.zoneId, exhaustive over FARM_PATCHES by test. */
 export const FARM_BIOME_PALETTES: Readonly<Record<string, FarmBiomePalette>> = Object.freeze({
   // the Eastbrook allotments: warm loam under fresh, new-cut timber
-  eastbrook_vale: Object.freeze({ soil: 0xa87a52, wood: 0xc4a274, trim: 0xd8c69a }),
+  eastbrook_vale: Object.freeze({ soil: 0xa87a52, wood: 0xc4a274 }),
   // the Mirefen beds: dark wet peat, moss creeping up the frames
-  mirefen_marsh: Object.freeze({ soil: 0x5c5140, wood: 0x7c8460, trim: 0x93a074 }),
+  mirefen_marsh: Object.freeze({ soil: 0x5c5140, wood: 0x7c8460 }),
   // the Thornpeak terraces: cold grey alpine grit and weathered timber
-  thornpeak_heights: Object.freeze({ soil: 0x8a8578, wood: 0x9aa0a4, trim: 0xb4bcc0 }),
+  thornpeak_heights: Object.freeze({ soil: 0x8a8578, wood: 0x9aa0a4 }),
   // the Evergarden parterre: manicured beds with warm white trim
-  evergarden: Object.freeze({ soil: 0x8c7a5e, wood: 0xd6c9ae, trim: 0xf2ece0 }),
+  evergarden: Object.freeze({ soil: 0x8c7a5e, wood: 0xd6c9ae }),
 });
 
 /** The palette a patch with no row takes (the neutral vale grade). */
 export const FARM_FALLBACK_PALETTE: FarmBiomePalette = Object.freeze({
   soil: 0x8a7a62,
   wood: 0xb0a084,
-  trim: 0xc8bca4,
 });
 
 export function farmBiomePalette(zoneId: string): FarmBiomePalette {
@@ -220,7 +215,6 @@ export interface FarmPlotVisualKey {
   readonly cropId: string;
   readonly stageMesh: FarmStageMesh;
   readonly wetBand: FarmWetBand;
-  readonly status: FarmPlotStatus;
 }
 
 /**
@@ -234,7 +228,6 @@ export function farmPlotKeyMatches(
 ): boolean {
   return (
     key.cropId === plot.cropId &&
-    key.status === plot.status &&
     key.stageMesh === farmStageMesh(plot, nowMs) &&
     key.wetBand === farmWetBand(plot, nowMs)
   );

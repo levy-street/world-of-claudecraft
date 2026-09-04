@@ -98,7 +98,9 @@ export function openLegendaryNamingDialog(
   count.setAttribute('aria-hidden', 'true');
   const hint = document.createElement('div');
   hint.className = 'pf-name-hint';
+  hint.id = 'legendary-name-hint';
   hint.textContent = t('hudChrome.perfecting.nameHint');
+  input.setAttribute('aria-describedby', hint.id);
   const actions = document.createElement('div');
   actions.className = 'pf-name-actions';
   const submit = document.createElement('button');
@@ -125,7 +127,9 @@ export function openLegendaryNamingDialog(
     // Guidance only: an ill-shaped draft disables the submit and flags the
     // hint (text is the signal; the tint is a redundant hint), while the sim
     // and the server stay the real validators.
-    hint.dataset.invalid = input.value.length > 0 && normalized === null ? 'true' : 'false';
+    const invalid = input.value.length > 0 && normalized === null;
+    hint.dataset.invalid = invalid ? 'true' : 'false';
+    input.setAttribute('aria-invalid', invalid ? 'true' : 'false');
     submit.disabled = locked || normalized === null;
     submit.textContent = locked
       ? t('hudChrome.perfecting.nameSubmitBusy')

@@ -89,6 +89,9 @@ describe('plant sheet window: paint', () => {
     expect(seed?.dataset.seedCrop).toBe(WHEAT.id);
     expect(seed?.getAttribute('aria-label')).toBe('Sow Vale Wheat Seed');
     expect(seed?.getAttribute('aria-checked')).toBe('true');
+    const count = root.querySelector<HTMLElement>('.ps-count');
+    expect(count?.textContent).toBe('3');
+    expect(seed?.getAttribute('aria-describedby')).toBe(count?.id);
     expect(root.querySelector('[data-plant]')?.textContent).toBe('Plant');
   });
 
@@ -728,33 +731,49 @@ describe('plant sheet window (source contract)', () => {
     expect(componentsCss).toMatch(/#plant-sheet-window \{[^}]*flex-direction: column;/s);
   });
 
-  it('keeps the forced-colors non-color cue for the picked seed and armed knob', () => {
-    // The picked/armed state is gold-hue-only in normal mode, so the
-    // forced-colors block in base.css must carry a redundant non-color cue
-    // for both selectors (the #tf-name.hostile idiom). Extract the block by
-    // BALANCED BRACES, not by slicing to the next media query, so a rule
-    // parked after the block's closing brace cannot satisfy the pin
-    // (tests/quest_marker_styles.test.ts is the precedent), and walk the
-    // COMMENT-STRIPPED sheet (the shared strip idiom, same as sheetSrc
-    // above): a CSS comment carrying a brace inside the forced-colors block
-    // would desync the raw depth count and truncate or overrun the extracted
-    // block (the F6 brace-walk remark, Phase 11 QA; quest_marker_styles
-    // already strips, this walk was the remaining raw reader).
-    const baseCss = stripComments(readFileSync(join(repoRoot, 'src/styles/base.css'), 'utf8'));
-    const marker = '@media (forced-colors: active)';
-    const start = baseCss.indexOf(marker);
-    expect(start).toBeGreaterThan(-1);
-    const open = baseCss.indexOf('{', start);
-    let depth = 1;
-    let end = open + 1;
-    while (end < baseCss.length && depth > 0) {
-      if (baseCss[end] === '{') depth++;
-      else if (baseCss[end] === '}') depth--;
-      end++;
-    }
-    const forcedBlock = baseCss.slice(start, end);
-    expect(forcedBlock).toMatch(
-      /\.ps-seed\[aria-checked="true"\],\s*\.ps-knob\[aria-pressed="true"\]\s*\{[^}]*text-decoration:\s*underline;/s,
+  it('keeps an always-on non-color cue for every selected farming control', () => {
+    const componentsCss = stripComments(
+      readFileSync(join(repoRoot, 'src/styles/components.css'), 'utf8'),
     );
+    for (const selector of [
+      '.ps-seed[aria-checked="true"]',
+      '.ps-knob[aria-pressed="true"]',
+      '.pf-cand[aria-checked="true"]',
+    ]) {
+      const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      expect(componentsCss).toMatch(
+        new RegExp(`${escaped}\\s*\\{[^}]*text-decoration:\\s*underline;`),
+      );
+    }
+  });
+});
+
+describe('farming windows: mobile UI-scale compensation', () => {
+  const css = readFileSync(join(repoRoot, 'src/styles/hud.mobile.css'), 'utf8');
+  const rule = (id: string): string => {
+    const start = css.indexOf(`body.mobile-touch #${id} {`);
+    expect(start, `${id} mobile rule`).toBeGreaterThanOrEqual(0);
+    const end = css.indexOf('\n  }', start);
+    expect(end, `${id} mobile rule end`).toBeGreaterThan(start);
+    return css.slice(start, end);
+  };
+
+  it('converts the centered plant-sheet viewport and notch caps out of #ui zoom', () => {
+    const block = rule('plant-sheet-window');
+    expect(block).toMatch(/var\(--app-vw[\s\S]*?safe-area-inset-right[\s\S]*?\/\s*var\(--ui-scale/);
+    expect(block).toMatch(
+      /var\(--app-vh[\s\S]*?safe-area-inset-bottom[\s\S]*?\/\s*var\(--ui-scale/,
+    );
+  });
+
+  it('converts every safe-area pin for the journal and perfecting sheets', () => {
+    for (const id of ['harvest-journal-window', 'perfecting-window']) {
+      const block = rule(id);
+      for (const side of ['left', 'right', 'top', 'bottom']) {
+        expect(block, `${id} ${side}`).toContain(
+          `${side}: calc(max(10px, env(safe-area-inset-${side})) / var(--ui-scale, 1));`,
+        );
+      }
+    }
   });
 });

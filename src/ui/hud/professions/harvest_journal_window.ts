@@ -42,7 +42,7 @@ import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName, zoneDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { captureFocusKey, findFocusKey, restoreFirstEnabled } from '../../focus_restore';
-import { formatNumber, type TranslationKey, t } from '../../i18n';
+import { formatList, formatNumber, type TranslationKey, t } from '../../i18n';
 import { svgIcon } from '../../ui_icons';
 import {
   buildHarvestJournalView,
@@ -390,7 +390,7 @@ export class HarvestJournalWindow {
     if (prior === null || view.kind !== 'rows') return;
     const flipped = view.rows.filter((row) => row.status === 'ready' && !prior.has(row.bedId));
     if (flipped.length === 0) return;
-    const name = flipped.map((row) => itemName(row.produceItemId)).join(', ');
+    const name = formatList(flipped.map((row) => itemName(row.produceItemId)));
     const line = document.createElement('span');
     line.textContent = t('hudChrome.harvestJournal.readyAnnounce', { name });
     this.liveStatusNode().replaceChildren(line);

@@ -7,11 +7,9 @@
 // #confirm-dialog slot, the trap lifecycle, and every listener are the same;
 // Hud keeps a thin delegator and passes the pieces that must stay Hud state
 // (the confirm-trap slot on the FocusManager, the pending no-choice cancel)
-// through the deps bag. Three known gaps are fixed HERE, keeping every old
-// call site's behavior identical: the input now carries an accessible name
-// (aria-labelledby the dialog title, or an explicit inputAria), an optional
-// maxLength caps it, and the returned handle can hold the OK control busy
-// for callers whose submit answers asynchronously.
+// through the deps bag. The extracted field now carries an accessible name
+// through the dialog title plus an associated visible label when one is supplied,
+// keeping every old call site's behavior intact.
 //
 // Registered in UI_DOM_MODULES (tests/architecture.test.ts): it mints the
 // #confirm-dialog element. The managed-close registry (CODE_BUILT) records
@@ -34,11 +32,6 @@ export interface InputDialogOpts {
   okText?: string;
   cancelText?: string;
   onOk?: (value: string) => void;
-  /** Cap the input length (the maxlength attribute on either field shape). */
-  maxLength?: number;
-  /** An explicit accessible name for the field; defaults to the dialog
-   *  title via aria-labelledby (the field was anonymous before this move). */
-  inputAria?: string;
 }
 
 export interface InputDialogDeps {
@@ -56,15 +49,7 @@ export interface InputDialogDeps {
   showError(text: string): void;
 }
 
-export interface InputDialogHandle {
-  /** Hold the OK control disabled with aria-busy (async submit affordance);
-   *  false re-enables it. A dialog without an OK button ignores this. */
-  setBusy(busy: boolean): void;
-  /** Tear the dialog down (trap release + element removal), firing nothing. */
-  close(): void;
-}
-
-export function showInputDialog(deps: InputDialogDeps, opts: InputDialogOpts): InputDialogHandle {
+export function showInputDialog(deps: InputDialogDeps, opts: InputDialogOpts): void {
   // Shares the #confirm-dialog slot: a replaced confirm's pending
   // no-choice callback (R40 family) fires before the input modal takes it.
   deps.replaceStandingDialog();
@@ -78,18 +63,17 @@ export function showInputDialog(deps: InputDialogDeps, opts: InputDialogOpts): I
   el.setAttribute('role', 'dialog');
   el.setAttribute('aria-modal', 'true');
   el.setAttribute('aria-labelledby', 'confirm-dialog-title');
-  const maxLength = opts.maxLength !== undefined ? ` maxlength="${opts.maxLength}"` : '';
-  // The field's accessible name (WCAG 1.3.1 / 4.1.2): an explicit label wins,
-  // else the dialog title names it, so the input is never anonymous.
-  const fieldName = opts.inputAria
-    ? ` aria-label="${esc(opts.inputAria)}"`
-    : ' aria-labelledby="confirm-dialog-title"';
+  const fieldLabelledBy = opts.label
+    ? 'confirm-dialog-title confirm-dialog-field-label'
+    : 'confirm-dialog-title';
   const field = opts.multiline
-    ? `<textarea class="cd-input" rows="3" ${opts.readOnly ? 'readonly' : ''}${maxLength}${fieldName} placeholder="${esc(opts.placeholder ?? '')}">${esc(opts.value ?? '')}</textarea>`
-    : `<input class="cd-input" type="text" ${opts.readOnly ? 'readonly' : ''}${maxLength}${fieldName} placeholder="${esc(opts.placeholder ?? '')}" value="${esc(opts.value ?? '')}">`;
+    ? `<textarea id="confirm-dialog-input" class="cd-input" rows="3" ${opts.readOnly ? 'readonly' : ''} aria-labelledby="${fieldLabelledBy}" placeholder="${esc(opts.placeholder ?? '')}">${esc(opts.value ?? '')}</textarea>`
+    : `<input id="confirm-dialog-input" class="cd-input" type="text" ${opts.readOnly ? 'readonly' : ''} aria-labelledby="${fieldLabelledBy}" placeholder="${esc(opts.placeholder ?? '')}" value="${esc(opts.value ?? '')}">`;
   el.innerHTML =
     `<div class="panel-title"><span id="confirm-dialog-title">${esc(opts.title)}</span><button type="button" class="x-btn" data-cancel aria-label="${esc(opts.cancelText ?? t('game.talents.cancel'))}">${svgIcon('close')}</button></div>` +
-    (opts.label ? `<div class="cd-body">${esc(opts.label)}</div>` : '') +
+    (opts.label
+      ? `<label id="confirm-dialog-field-label" class="cd-body" for="confirm-dialog-input">${esc(opts.label)}</label>`
+      : '') +
     `<div class="cd-field">${field}</div>` +
     `<div class="cd-actions"><button class="btn" data-cancel>${esc(opts.cancelText ?? t('game.talents.cancel'))}</button>` +
     (opts.copy ? `<button class="btn" data-copy>${esc(t('game.talents.copy'))}</button>` : '') +
@@ -102,13 +86,11 @@ export function showInputDialog(deps: InputDialogDeps, opts: InputDialogOpts): I
   deps.bindKeys(el);
   const input = el.querySelector('.cd-input') as HTMLInputElement | HTMLTextAreaElement;
   const okBtn = el.querySelector('[data-ok]') as HTMLButtonElement | null;
-  let busy = false;
   const close = () => {
     deps.trapClose();
     el.remove();
   };
   const submit = () => {
-    if (busy) return;
     const v = input?.value ?? '';
     close();
     opts.onOk?.(v);
@@ -136,13 +118,4 @@ export function showInputDialog(deps: InputDialogDeps, opts: InputDialogOpts): I
     });
   input?.focus();
   if (opts.readOnly || opts.selectText) input?.select?.();
-  return {
-    setBusy: (value: boolean) => {
-      busy = value;
-      if (okBtn) okBtn.disabled = value;
-      if (value) el.setAttribute('aria-busy', 'true');
-      else el.removeAttribute('aria-busy');
-    },
-    close,
-  };
 }

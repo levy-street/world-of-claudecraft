@@ -719,17 +719,6 @@
     .np-castfill {
       background: Highlight !important;
     }
-    /* The plant sheet's picked seed (aria-checked radio) and armed care knob
-       (aria-pressed) carry their state by the gold hue alone, which the
-       forced palette strips to one CanvasText (the #tf-name.hostile class of
-       failure), so picked and unpicked would read identically. Underline the
-       selected/armed control as the redundant non-color cue; assistive tech
-       already gets the state from the aria attribute, and normal mode is
-       unchanged. */
-    .ps-seed[aria-checked="true"],
-    .ps-knob[aria-pressed="true"] {
-      text-decoration: underline;
-    }
     /* Painted launcher art is an <img>, which the forced palette leaves untouched, but the
        button UNDER it collapses to Canvas: warm gold art on a forced-light Canvas is the
        one place this set loses contrast. Give the art its own dark chip (opted out of the

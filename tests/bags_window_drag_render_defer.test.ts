@@ -19,6 +19,7 @@
 // drag state clears the way it always should.
 
 import { describe, expect, it } from 'vitest';
+import { itemCopyPin } from '../src/sim/item_copy_ref';
 import type { InvSlot } from '../src/sim/types';
 import { BagsWindow, type BagsWindowDeps } from '../src/ui/bags_window';
 import { ItemDragState } from '../src/ui/item_drag_state';
@@ -34,6 +35,7 @@ function harness() {
   const dragState = new ItemDragState();
   let dragAction: { type: 'item'; id: string } | null = null;
   const moveCalls: string[] = [];
+  const markCalls: Array<[string | null, number | undefined]> = [];
   const noop = (): void => {};
   const deps: BagsWindowDeps = {
     itemIcon: () => '<span class="item-icon"></span>',
@@ -93,7 +95,7 @@ function harness() {
     dragState,
     isTouchHud: () => false,
     confirmVendorSell: () => true,
-    markEquipDropTargets: noop,
+    markEquipDropTargets: (itemId, slotIndex) => markCalls.push([itemId, slotIndex]),
     dropOnEquipSlot: noop,
     dropOnActionSlot: noop,
     dropOnActionRingSlot: noop,
@@ -104,6 +106,7 @@ function harness() {
     dragState,
     dragAction: () => dragAction,
     moveCalls: () => [...moveCalls],
+    markCalls: () => [...markCalls],
     root,
     setInventory: (next: InvSlot[]) => {
       inventory = next;
@@ -165,6 +168,36 @@ describe('BagsWindow.render defers a rebuild that would tear out a live drag', (
     h.setInventory([SWORD, POTION]);
     h.window.render();
     expect(h.itemKeys()).toEqual(['bag:healing_potion:0', 'bag:worn_sword:0']);
+  });
+
+  it('refreshes the exact-copy paperdoll highlights while the bag rebuild stays deferred', () => {
+    const h = harness();
+    const signed: InvSlot = {
+      itemId: 'worn_sword',
+      count: 1,
+      instance: { signer: 'Aurelia' },
+    };
+    const plain: InvSlot = { itemId: 'worn_sword', count: 1 };
+    h.setInventory([signed, plain]);
+    h.window.render();
+    h.dragState.begin({
+      itemId: 'worn_sword',
+      count: 1,
+      index: 0,
+      copyPin: itemCopyPin(signed),
+    });
+
+    // The exact copy moves while the source row remains mounted. The marker
+    // refresh follows it to its live slot, even though the grid rebuild waits.
+    h.setInventory([plain, signed]);
+    h.window.render();
+    expect(h.markCalls().at(-1)).toEqual(['worn_sword', 1]);
+
+    // The next snapshot removes that copy but leaves a same-id neighbor. The
+    // paperdoll promise clears instead of silently switching to the neighbor.
+    h.setInventory([plain]);
+    h.window.render();
+    expect(h.markCalls().at(-1)).toEqual([null, undefined]);
   });
 
   it('defers the native bag-cell drop repaint until dragend clears action drag state', () => {

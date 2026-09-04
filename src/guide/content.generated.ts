@@ -290,7 +290,6 @@ export interface GuideProfEnchanting {
   };
   enchants: {
     id: string;
-    name: string;
     slot: string;
     tier: 'base' | 'runed' | 'greater' | 'lucent';
     skillReq: number;
@@ -348,13 +347,13 @@ export interface GuideProfStation {
 
 export interface GuideProfStations { radius: number; stations: GuideProfStation[]; }
 
-/** One gathering line's contribution to the kitchen: the materials it supplies
- *  that cooking bills actually ask for, by English item name. */
+/** One gathering line's contribution to the kitchen: item ids for the
+ * materials its cooking bills actually ask for. */
 export interface GuideProfProvisioningLine { id: string; materials: string[]; }
 /** One rung of cooking's ladder and the outputs it teaches. */
 export interface GuideProfProvisioningRung {
   skillReq: number;
-  outputs: { name: string; quality: string; placeable: boolean; station: boolean }[];
+  outputs: { itemId: string; placeable: boolean; station: boolean }[];
 }
 export interface GuideProfProvisioning {
   lines: GuideProfProvisioningLine[];
@@ -16890,7 +16889,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
   "enchants": [
     {
       "id": "enchant_weapon_might",
-      "name": "Weapon Etching: Might",
       "slot": "mainhand",
       "tier": "base",
       "skillReq": 0,
@@ -16911,7 +16909,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_weapon_intellect",
-      "name": "Weapon Etching: Spellpower",
       "slot": "mainhand",
       "tier": "base",
       "skillReq": 0,
@@ -16932,7 +16929,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_offhand_stamina",
-      "name": "Offhand Etching: Stamina",
       "slot": "offhand",
       "tier": "base",
       "skillReq": 0,
@@ -16953,7 +16949,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_helmet_fortitude",
-      "name": "Helmet Etching: Fortitude",
       "slot": "helmet",
       "tier": "base",
       "skillReq": 0,
@@ -16974,7 +16969,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_neck_spirit",
-      "name": "Necklace Etching: Spirit",
       "slot": "neck",
       "tier": "base",
       "skillReq": 0,
@@ -16995,7 +16989,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_shoulder_agility",
-      "name": "Shoulder Etching: Agility",
       "slot": "shoulder",
       "tier": "base",
       "skillReq": 0,
@@ -17016,7 +17009,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_chest_stamina",
-      "name": "Chest Etching: Stamina",
       "slot": "chest",
       "tier": "base",
       "skillReq": 0,
@@ -17042,7 +17034,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_waist_stamina",
-      "name": "Belt Etching: Stamina",
       "slot": "waist",
       "tier": "base",
       "skillReq": 0,
@@ -17063,7 +17054,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_legs_stamina",
-      "name": "Leg Etching: Stamina",
       "slot": "legs",
       "tier": "base",
       "skillReq": 0,
@@ -17089,7 +17079,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_gloves_agility",
-      "name": "Glove Etching: Agility",
       "slot": "gloves",
       "tier": "base",
       "skillReq": 0,
@@ -17110,7 +17099,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_gloves_intellect",
-      "name": "Glove Etching: Spellpower",
       "slot": "gloves",
       "tier": "base",
       "skillReq": 0,
@@ -17131,7 +17119,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_feet_agility",
-      "name": "Boot Etching: Agility",
       "slot": "feet",
       "tier": "base",
       "skillReq": 0,
@@ -17152,7 +17139,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_ring_spirit",
-      "name": "Ring Etching: Spirit",
       "slot": "ring",
       "tier": "base",
       "skillReq": 0,
@@ -17173,7 +17159,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_weapon_agility",
-      "name": "Weapon Etching: Agility",
       "slot": "mainhand",
       "tier": "base",
       "skillReq": 0,
@@ -17194,7 +17179,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_helmet_intellect",
-      "name": "Helmet Etching: Intellect",
       "slot": "helmet",
       "tier": "base",
       "skillReq": 0,
@@ -17220,7 +17204,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_helmet_armor",
-      "name": "Helmet Etching: Reinforcement",
       "slot": "helmet",
       "tier": "base",
       "skillReq": 0,
@@ -17246,7 +17229,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_neck_intellect",
-      "name": "Necklace Etching: Intellect",
       "slot": "neck",
       "tier": "base",
       "skillReq": 0,
@@ -17267,7 +17249,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_neck_agility",
-      "name": "Necklace Etching: Agility",
       "slot": "neck",
       "tier": "base",
       "skillReq": 0,
@@ -17288,7 +17269,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_shoulder_strength",
-      "name": "Shoulder Etching: Strength",
       "slot": "shoulder",
       "tier": "base",
       "skillReq": 0,
@@ -17309,7 +17289,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_shoulder_intellect",
-      "name": "Shoulder Etching: Intellect",
       "slot": "shoulder",
       "tier": "base",
       "skillReq": 0,
@@ -17330,7 +17309,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_chest_spirit",
-      "name": "Chest Etching: Spirit",
       "slot": "chest",
       "tier": "base",
       "skillReq": 0,
@@ -17356,7 +17334,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_chest_armor",
-      "name": "Chest Etching: Reinforcement",
       "slot": "chest",
       "tier": "base",
       "skillReq": 0,
@@ -17382,7 +17359,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_waist_strength",
-      "name": "Belt Etching: Strength",
       "slot": "waist",
       "tier": "base",
       "skillReq": 0,
@@ -17403,7 +17379,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_waist_agility",
-      "name": "Belt Etching: Agility",
       "slot": "waist",
       "tier": "base",
       "skillReq": 0,
@@ -17424,7 +17399,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_legs_intellect",
-      "name": "Leg Etching: Intellect",
       "slot": "legs",
       "tier": "base",
       "skillReq": 0,
@@ -17450,7 +17424,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_gloves_strength",
-      "name": "Glove Etching: Strength",
       "slot": "gloves",
       "tier": "base",
       "skillReq": 0,
@@ -17471,7 +17444,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_feet_strength",
-      "name": "Boot Etching: Strength",
       "slot": "feet",
       "tier": "base",
       "skillReq": 0,
@@ -17492,7 +17464,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_feet_stamina",
-      "name": "Boot Etching: Stamina",
       "slot": "feet",
       "tier": "base",
       "skillReq": 0,
@@ -17513,7 +17484,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_ring_strength",
-      "name": "Ring Etching: Strength",
       "slot": "ring",
       "tier": "base",
       "skillReq": 0,
@@ -17534,7 +17504,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_ring_agility",
-      "name": "Ring Etching: Agility",
       "slot": "ring",
       "tier": "base",
       "skillReq": 0,
@@ -17555,7 +17524,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_ring_intellect",
-      "name": "Ring Etching: Intellect",
       "slot": "ring",
       "tier": "base",
       "skillReq": 0,
@@ -17576,7 +17544,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_weapon_greater_might",
-      "name": "Weapon Etching: Greater Might",
       "slot": "mainhand",
       "tier": "greater",
       "skillReq": 0,
@@ -17602,7 +17569,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_weapon_greater_spellpower",
-      "name": "Weapon Etching: Greater Spellpower",
       "slot": "mainhand",
       "tier": "greater",
       "skillReq": 0,
@@ -17628,7 +17594,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_helmet_greater_fortitude",
-      "name": "Helmet Etching: Greater Fortitude",
       "slot": "helmet",
       "tier": "greater",
       "skillReq": 0,
@@ -17654,7 +17619,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_chest_greater_stamina",
-      "name": "Chest Etching: Greater Stamina",
       "slot": "chest",
       "tier": "greater",
       "skillReq": 0,
@@ -17680,7 +17644,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_legs_greater_stamina",
-      "name": "Leg Etching: Greater Stamina",
       "slot": "legs",
       "tier": "greater",
       "skillReq": 0,
@@ -17706,7 +17669,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_gloves_greater_agility",
-      "name": "Glove Etching: Greater Agility",
       "slot": "gloves",
       "tier": "greater",
       "skillReq": 0,
@@ -17732,7 +17694,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_weapon_runed_edge",
-      "name": "Weapon Etching: Runed Edge",
       "slot": "mainhand",
       "tier": "runed",
       "skillReq": 0,
@@ -17758,7 +17719,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_weapon_runed_focus",
-      "name": "Weapon Etching: Runed Sigil",
       "slot": "mainhand",
       "tier": "runed",
       "skillReq": 0,
@@ -17784,7 +17744,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_chest_runeweave",
-      "name": "Chest Etching: Runed Weave",
       "slot": "chest",
       "tier": "runed",
       "skillReq": 0,
@@ -17810,7 +17769,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_legs_runed_hide",
-      "name": "Leg Etching: Runed Hide",
       "slot": "legs",
       "tier": "runed",
       "skillReq": 0,
@@ -17836,7 +17794,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_helmet_runed_links",
-      "name": "Helmet Etching: Runed Links",
       "slot": "helmet",
       "tier": "runed",
       "skillReq": 0,
@@ -17862,7 +17819,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_weapon_lucent_might",
-      "name": "Weapon Etching: Lucent Might",
       "slot": "mainhand",
       "tier": "lucent",
       "skillReq": 100,
@@ -17893,7 +17849,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_weapon_lucent_spellpower",
-      "name": "Weapon Etching: Lucent Spellpower",
       "slot": "mainhand",
       "tier": "lucent",
       "skillReq": 100,
@@ -17924,7 +17879,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_chest_lucent_stamina",
-      "name": "Chest Etching: Lucent Stamina",
       "slot": "chest",
       "tier": "lucent",
       "skillReq": 100,
@@ -17955,7 +17909,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_feet_lucent_agility",
-      "name": "Boot Etching: Lucent Agility",
       "slot": "feet",
       "tier": "lucent",
       "skillReq": 100,
@@ -17981,7 +17934,6 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_lucent_infusion",
-      "name": "Lucent Infusion",
       "slot": "chest",
       "tier": "lucent",
       "skillReq": 125,
@@ -18215,62 +18167,62 @@ export const GUIDE_PROF_PROVISIONING: GuideProfProvisioning = {
     {
       "id": "logging",
       "materials": [
-        "Ashwood Log"
+        "ashwood_log"
       ]
     },
     {
       "id": "herbalism",
       "materials": [
-        "Goldleaf Herb",
-        "Sheenleaf Herb",
-        "Sunpetal Herb"
+        "goldleaf_herb",
+        "silverleaf_herb",
+        "sunpetal_herb"
       ]
     },
     {
       "id": "fishing",
       "materials": [
-        "Raw Bog Eel",
-        "Raw Deepbarb Catfish",
-        "Raw Frostgill Trout",
-        "Raw Hollowgill Sturgeon",
-        "Raw Marsh Pike",
-        "Raw Mirror Trout",
-        "Raw River Perch",
-        "Raw Slatefin Carp",
-        "Raw Stillmere Salmon"
+        "raw_bog_eel",
+        "raw_deepbarb_catfish",
+        "raw_frostgill_trout",
+        "raw_hollowgill_sturgeon",
+        "raw_marsh_pike",
+        "raw_mirror_trout",
+        "raw_river_perch",
+        "raw_stonescale_carp",
+        "raw_stillmere_salmon"
       ]
     },
     {
       "id": "farming",
       "materials": [
-        "Bog Beet",
-        "Brook Carrot",
-        "Evergarden Greens",
-        "Evergarden Pumpkin",
-        "Fine Bog Beet",
-        "Fine Brook Carrot",
-        "Fine Evergarden Greens",
-        "Fine Evergarden Pumpkin",
-        "Fine Frost Gourd",
-        "Fine Frost Lentils",
-        "Fine Gilded Sunmelon",
-        "Fine Gilded Yam",
-        "Fine Thornpeak Cabbage",
-        "Frost Gourd",
-        "Frost Lentils",
-        "Gilded Sunmelon",
-        "Gilded Yam",
-        "Highland Barley",
-        "Marsh Rice",
-        "Thornpeak Cabbage",
-        "Vale Wheat"
+        "bog_beet",
+        "brook_carrot",
+        "evergarden_greens",
+        "evergarden_pumpkin",
+        "fine_bog_beet",
+        "fine_brook_carrot",
+        "fine_evergarden_greens",
+        "fine_evergarden_pumpkin",
+        "fine_frost_gourd",
+        "fine_frost_lentils",
+        "fine_gilded_sunmelon",
+        "fine_gilded_yam",
+        "fine_thornpeak_cabbage",
+        "frost_gourd",
+        "frost_lentils",
+        "gilded_sunmelon",
+        "gilded_yam",
+        "highland_barley",
+        "marsh_rice",
+        "thornpeak_cabbage",
+        "vale_wheat"
       ]
     },
     {
       "id": "corpseHarvesting",
       "materials": [
-        "Game Meat",
-        "Prime Cut"
+        "game_meat",
+        "prime_cut"
       ]
     }
   ],
@@ -18279,44 +18231,37 @@ export const GUIDE_PROF_PROVISIONING: GuideProfProvisioning = {
       "skillReq": 0,
       "outputs": [
         {
-          "name": "Eastbrook Glazed Carrots",
-          "quality": "common",
+          "itemId": "eastbrook_glazed_carrots",
           "placeable": false,
           "station": false
         },
         {
-          "name": "Eastbrook Root Pottage",
-          "quality": "common",
+          "itemId": "eastbrook_root_pottage",
           "placeable": false,
           "station": false
         },
         {
-          "name": "Herbed Marsh Pike",
-          "quality": "common",
+          "itemId": "herbed_marsh_pike",
           "placeable": false,
           "station": false
         },
         {
-          "name": "Hunter's Game Skewer",
-          "quality": "common",
+          "itemId": "hunters_game_skewer",
           "placeable": false,
           "station": false
         },
         {
-          "name": "Pan-Seared River Perch",
-          "quality": "common",
+          "itemId": "pan_seared_perch",
           "placeable": false,
           "station": false
         },
         {
-          "name": "Salted Jerky",
-          "quality": "common",
+          "itemId": "tough_jerky",
           "placeable": false,
           "station": false
         },
         {
-          "name": "Vale Hearth Loaf",
-          "quality": "common",
+          "itemId": "vale_hearth_loaf",
           "placeable": false,
           "station": false
         }
@@ -18326,38 +18271,32 @@ export const GUIDE_PROF_PROVISIONING: GuideProfProvisioning = {
       "skillReq": 25,
       "outputs": [
         {
-          "name": "Ashwood Smoked Eel",
-          "quality": "uncommon",
+          "itemId": "ashwood_smoked_eel",
           "placeable": false,
           "station": false
         },
         {
-          "name": "Fenbridge Beet Braise",
-          "quality": "uncommon",
+          "itemId": "fenbridge_beet_braise",
           "placeable": false,
           "station": false
         },
         {
-          "name": "Fenbridge Rice Bowl",
-          "quality": "uncommon",
+          "itemId": "fenbridge_rice_bowl",
           "placeable": false,
           "station": false
         },
         {
-          "name": "Fenbridge Rice Pudding",
-          "quality": "uncommon",
+          "itemId": "fenbridge_rice_pudding",
           "placeable": false,
           "station": false
         },
         {
-          "name": "Frostgill Chowder",
-          "quality": "uncommon",
+          "itemId": "frostgill_chowder",
           "placeable": false,
           "station": false
         },
         {
-          "name": "Goldleaf Game Stew",
-          "quality": "uncommon",
+          "itemId": "goldleaf_game_stew",
           "placeable": false,
           "station": false
         }
@@ -18367,26 +18306,22 @@ export const GUIDE_PROF_PROVISIONING: GuideProfProvisioning = {
       "skillReq": 50,
       "outputs": [
         {
-          "name": "Angler's Feast Platter",
-          "quality": "rare",
+          "itemId": "anglers_feast_platter",
           "placeable": false,
           "station": false
         },
         {
-          "name": "Highwatch Barley Bannock",
-          "quality": "rare",
+          "itemId": "highwatch_barley_bannock",
           "placeable": false,
           "station": false
         },
         {
-          "name": "Marlow's Grand Roast",
-          "quality": "rare",
+          "itemId": "marlows_grand_roast",
           "placeable": false,
           "station": false
         },
         {
-          "name": "Silvered Carp Supper",
-          "quality": "rare",
+          "itemId": "silvered_carp_supper",
           "placeable": false,
           "station": false
         }
@@ -18396,26 +18331,22 @@ export const GUIDE_PROF_PROVISIONING: GuideProfProvisioning = {
       "skillReq": 75,
       "outputs": [
         {
-          "name": "Highwatch Barley Porridge",
-          "quality": "rare",
+          "itemId": "highwatch_barley_porridge",
           "placeable": false,
           "station": false
         },
         {
-          "name": "Highwatch Gourd Soup",
-          "quality": "rare",
+          "itemId": "highwatch_gourd_soup",
           "placeable": false,
           "station": false
         },
         {
-          "name": "Peppered Deepbarb Catfish",
-          "quality": "rare",
+          "itemId": "peppered_deepbarb_catfish",
           "placeable": false,
           "station": false
         },
         {
-          "name": "Seasoned Stock",
-          "quality": "common",
+          "itemId": "seasoned_stock",
           "placeable": false,
           "station": false
         }
@@ -18425,50 +18356,42 @@ export const GUIDE_PROF_PROVISIONING: GuideProfProvisioning = {
       "skillReq": 100,
       "outputs": [
         {
-          "name": "Evergarden Braised Greens",
-          "quality": "rare",
+          "itemId": "evergarden_braised_greens",
           "placeable": false,
           "station": false
         },
         {
-          "name": "Evergarden Harvest Platter",
-          "quality": "rare",
+          "itemId": "evergarden_harvest_platter",
           "placeable": false,
           "station": false
         },
         {
-          "name": "Evergarden Sunmelon Tart",
-          "quality": "rare",
+          "itemId": "evergarden_sunmelon_tart",
           "placeable": false,
           "station": false
         },
         {
-          "name": "Harvest Feast",
-          "quality": "rare",
+          "itemId": "harvest_feast",
           "placeable": true,
           "station": false
         },
         {
-          "name": "Roast Hollowgill Sturgeon",
-          "quality": "rare",
+          "itemId": "roast_hollowgill_sturgeon",
           "placeable": false,
           "station": false
         },
         {
-          "name": "Sageleaf Chowder",
-          "quality": "epic",
+          "itemId": "sageleaf_chowder",
           "placeable": false,
           "station": false
         },
         {
-          "name": "Stonepot Stew",
-          "quality": "epic",
+          "itemId": "stonepot_stew",
           "placeable": false,
           "station": false
         },
         {
-          "name": "Warspice Skewers",
-          "quality": "epic",
+          "itemId": "warspice_skewers",
           "placeable": false,
           "station": false
         }
@@ -18478,26 +18401,22 @@ export const GUIDE_PROF_PROVISIONING: GuideProfProvisioning = {
       "skillReq": 125,
       "outputs": [
         {
-          "name": "Sageleaf Feast",
-          "quality": "epic",
+          "itemId": "sageleaf_feast",
           "placeable": true,
           "station": false
         },
         {
-          "name": "Stonepot Feast",
-          "quality": "epic",
+          "itemId": "stonepot_feast",
           "placeable": true,
           "station": false
         },
         {
-          "name": "The Laden Hearth",
-          "quality": "epic",
+          "itemId": "laden_hearth",
           "placeable": false,
           "station": true
         },
         {
-          "name": "Warspice Feast",
-          "quality": "epic",
+          "itemId": "warspice_feast",
           "placeable": true,
           "station": false
         }

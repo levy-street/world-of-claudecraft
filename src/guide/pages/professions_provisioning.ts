@@ -21,6 +21,7 @@ import { esc } from '../../ui/esc';
 import { formatNumber, type TranslationKey, t } from '../../ui/i18n';
 import { GUIDE_PROF_PROVISIONING } from '../content.generated';
 import { hrefFor } from '../routes';
+import { itemNameKey } from './professions_craft';
 import { gatheringLabel } from './professions_gathering';
 import { paras, related } from './ui';
 
@@ -41,6 +42,12 @@ function lineLabel(id: string): string {
   return gatheringLabel(id);
 }
 
+/** Resolve a generated item id through the same guide-safe key builder the
+ * craft recipe table uses, without baking a display name into guide content. */
+function itemName(itemId: string): string {
+  return t(itemNameKey(itemId));
+}
+
 /** One card per line that actually feeds the kitchen, listing what it brings.
  *  A line whose materials no cooking bill asks for never renders, so the page
  *  can only ever claim a supplier the tables agree with. */
@@ -48,11 +55,11 @@ function suppliersSection(): string {
   const cards = GUIDE_PROF_PROVISIONING.lines
     .map((line) => {
       const label = lineLabel(line.id);
-      const items = line.materials.map((name) => `<li>${esc(name)}</li>`).join('');
+      const items = line.materials.map((itemId) => `<li>${esc(itemName(itemId))}</li>`).join('');
       return `<div class="guide-fact">
           <dt>${esc(label)}</dt>
           <dd>${esc(t('guide.profPages.prov.lineCountFmt', { count: formatNumber(line.materials.length) }))}</dd>
-          <dd><ul class="guide-prof-mat">${items}</ul></dd>
+          <dd><ul>${items}</ul></dd>
         </div>`;
     })
     .join('');
@@ -78,7 +85,7 @@ function ladderSection(): string {
           // guide list of outputs leaves it to the shipped list styling, and
           // minting a class no sheet defines would be a silent no-op dressed as
           // a design decision.
-          const name = esc(out.name);
+          const name = esc(itemName(out.itemId));
           if (out.placeable) {
             return `<li>${name} ${esc(t('guide.profPages.prov.placeableTag'))}</li>`;
           }
@@ -98,7 +105,7 @@ function ladderSection(): string {
         .join('');
       return `<li>
           <strong>${esc(t('guide.profPages.prov.rungFmt', { skill: formatNumber(rung.skillReq) }))}</strong>
-          <ul class="guide-prof-mat">${outputs}</ul>
+          <ul>${outputs}</ul>
         </li>`;
     })
     .join('');

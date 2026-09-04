@@ -19,6 +19,7 @@ const CATALOG: Record<string, { english: string; localized: string }> = {
   steel_sword: { english: 'steel_sword Steel Sword', localized: 'Stahlschwert' },
   oak_shield: { english: 'oak_shield Oak Shield', localized: 'Eichenschild' },
   healing_draught: { english: 'healing_draught Healing Draught', localized: 'Heiltrank' },
+  marrowpoint: { english: 'marrowpoint Marrowpoint', localized: 'İlik Ucu' },
 };
 const IDS = Object.keys(CATALOG);
 
@@ -26,9 +27,10 @@ const IDS = Object.keys(CATALOG);
 const englishMatches = (id: string, search: string): boolean =>
   CATALOG[id].english.toLowerCase().includes(search.toLowerCase());
 
-function resolve(query: string, over: readonly string[] = IDS): string {
+function resolve(query: string, over: readonly string[] = IDS, localeTag = 'de-DE'): string {
   return localizedMarketSearch({
     query,
+    localeTag,
     itemIds: over,
     localizedNameOf: (id) => CATALOG[id].localized,
     englishMatches,
@@ -59,7 +61,8 @@ describe('localizedMarketSearch: an English search is never disturbed', () => {
   it('does not even consult the localized catalog when English already matches', () => {
     const localizedNameOf = vi.fn((id: string) => CATALOG[id].localized);
     localizedMarketSearch({
-      query: 'sword',
+      query: 'IRON',
+      localeTag: 'tr-TR',
       itemIds: IDS,
       localizedNameOf,
       englishMatches,
@@ -78,6 +81,11 @@ describe('localizedMarketSearch: a localized query resolves to a verified Englis
 
   it('is case-insensitive and trims, like the box the player types into', () => {
     expect(resolve('  EICHENSCHILD ')).toBe('oak_shield');
+  });
+
+  it('folds Turkish dotted I with the active locale', () => {
+    expect('İlik Ucu'.toLowerCase()).not.toContain('ilik');
+    expect(resolve('ilik', ['marrowpoint'], 'tr-TR')).toBe('marrowpoint');
   });
 
   it('names a localized FAMILY by the English word its members share', () => {
@@ -109,6 +117,7 @@ describe('localizedMarketSearch: it refuses rather than sending a wrong set', ()
     };
     const sent = localizedMarketSearch({
       query: 'schwert',
+      localeTag: 'de-DE',
       itemIds: ids,
       localizedNameOf: (id) => withExtra[id].localized,
       englishMatches: (id, search) =>
@@ -131,6 +140,7 @@ describe('localizedMarketSearch: it refuses rather than sending a wrong set', ()
     const ids = [...IDS, 'moon_ring', 'sun_cloak'];
     const sent = localizedMarketSearch({
       query: 'mond',
+      localeTag: 'de-DE',
       itemIds: ids,
       localizedNameOf: (id) => withPair[id].localized,
       englishMatches: (id, search) =>
@@ -151,6 +161,7 @@ describe('localizedMarketSearch against the REAL matcher and catalog', () => {
   function resolveReal(query: string, localizedNameOf: (id: string) => string): string {
     return localizedMarketSearch({
       query,
+      localeTag: 'en-US',
       itemIds: realIds,
       localizedNameOf,
       englishMatches: realMatches,
