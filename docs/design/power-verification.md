@@ -1,20 +1,16 @@
 # Masterwrought power verification (R5)
 
-PROMOTED 2026-08-30 from `docs/prd/masterwrought/` into `docs/design/` (Phase 17,
-NEW WORK N13, on the farming-asset-manifest precedent) so the live citations
-(`tests/r5_envelope_probe.test.ts`, `tests/masterwrought_budget.test.ts`,
+This is the durable measurement record cited by
+`tests/r5_envelope_probe.test.ts`, `tests/masterwrought_budget.test.ts`,
 `tests/provisioning_supply_line_apex.test.ts`, `scripts/r5_envelope_probe.ts`,
-and the two `src/sim/content` KNOWN COST comments) outlive the eventual
-packet-doc teardown. The body below is the unedited record: a bare `state.md`
-in it means `docs/prd/masterwrought/state.md`, its former sibling.
+and the related `src/sim/content` cost comments.
 
-The measured pass for masterwrought R5, the packet's defining gate:
+The measured pass for masterwrought R5, the system's defining power gate:
 
 > R5 Power envelope: full kit (2 Perfected pieces + apex enchants + flask + food)
 > at most 5 percent total throughput over pre-packet raid BiS, measured via
 > `docs/design/spell-balance-framework.md` before merge. Heroic raid and S-rift
 > clear difficulty is the protected asset.
-> (`docs/prd/masterwrought/state.md`, locked ruling 5.)
 
 The model, the kit, the baseline, the constants, the targets, the fixture and the
 arithmetic are all in this file, and no number here is quoted from another
@@ -26,8 +22,7 @@ column (section 12.3 defines it).
 ## Verdict
 
 **CLOSED BY RULING (2026-08-29).** The maintainer delivered all four priced
-rulings at the Phase 16 gate (the verbatim dated rows: state.md, "Maintainer
-rulings (2026-08-29)"): the baseline pool stands as written with its
+rulings recorded below: the baseline pool stands as written with its
 denominator caveat on the record (ruling 1a, section 3); the modelled
 "+2 lead-stat points" term is RATIFIED as the R5 quantity, its published
 percentages stated as floors (ruling 2b, section 8.1); R5 closes on the four
@@ -103,7 +98,7 @@ escalation four independent ways and priced the two owed definitions, the
 lane-set question and the apex-bag tie; the full pricing text (including
 the item-swap arm's piece-choice rule and its unmeasured class-free mail
 alternates, `spiritweld_girdle` and `wardspeaker_sabatons`) is preserved in
-state.md's "WHAT THE MAINTAINER OWNS" mirror and this file's git history.
+this file and its git history.
 
 HISTORY, second entry (2026-08-30, the eighth v0.41.0 sync, release tip
 3e801dc925, merge 4f72218ed4): THE CATALOG MOVED UNDER THIS RECORD, the first
@@ -127,15 +122,14 @@ pre-raid catalog they were taken on, the nine contradicted pins across
 tests/r5_envelope_probe.test.ts, tests/masterwrought_budget.test.ts,
 tests/dev_bis_gear.test.ts and tests/server/pbe_boost.test.ts are kept
 byte-identical under it.fails with escalation notes, and the maintainer's
-ruling is Phase 19 decision table rows 12 to 16
-(docs/prd/masterwrought/phase-19-rulings-gate.md): re-measure R5 on the
+ruling was to re-measure R5 on the
 merged world (which would also decide whether the new raid joins the
 protected-asset set beside heroic Nythraxis and S-rift) or ratify this
-record as the pre-raid measurement; the eighth-sync AMENDED block in
-state.md's Phase 15 ledger carries the item-by-item deltas.
+record as the pre-raid measurement. The item-by-item deltas are described
+immediately above.
 RULED (masterwrought qr-19-apex-tier-vs-crucible-placement, 2026-09-01), the
 PLACEMENT half only: the raid tier sitting above the masterwrought apex tier is
-ACCEPTED, and the packet amends its own placement prose rather than re-tiering
+ACCEPTED, and the system accepts that placement rather than re-tiering
 any def. Nothing in THIS record is rewritten under that ruling and no figure
 here moves: the sentence above about nothing having been rewritten still holds
 literally. Two of the nine contradicted pins are discharged by it, the
@@ -144,7 +138,7 @@ flipped back to it(). The other seven stay expected-fail and split between TWO
 owners, which is worth stating because a reader sent to one will not find the
 other: FIVE belong to the masterwrought R5 RE-MEASURE question (this file's own
 tests/r5_envelope_probe.test.ts arms, the tests/server/pbe_boost.test.ts pair
-whose note names that row, and the tests/masterwrought_budget.test.ts lead-cap
+whose note carries the same escalation, and the tests/masterwrought_budget.test.ts lead-cap
 arm). The remaining TWO are the forgefold_legguards and spiritweld_girdle twin
 rows at tests/masterwrought_budget.test.ts, whose own comment offers
 re-complementing the twins against the retuned references as an arm independent
@@ -216,8 +210,7 @@ epic-only. `WARLOCK_FULL_BIS_GEAR` carries the LEGENDARY mainhand
 `heroic_deathless_heartwood`, a STRONGER denominator, so the caster rows read
 lower than an epic-only pool would print, which is the safe direction.
 
-RULING 1a, RATIFIED 2026-08-29 (the maintainer, at the Phase 16 gate; the
-dated row is in state.md, "Maintainer rulings"): the pool rule above STANDS
+RULING 1a, RATIFIED 2026-08-29: the pool rule above STANDS
 AS WRITTEN. `bestEpicGearFor`'s raw-stat-sum scoring (class-agnostic and
 rating-blind: ratings and spellPower score zero, armor counts) remains the
 R5 baseline definition, and THE CAVEAT IS THE RECORD: the physical
@@ -483,8 +476,7 @@ expected sign is at or below the modelled row), so read the rest of this
 subsection with that correction in front of it.** The reasoning below was written before that was
 measured and is kept because it is still right about the caster.
 
-RULING 2b, RATIFIED 2026-08-29 (the maintainer, at the Phase 16 gate; the
-dated row is in state.md, "Maintainer rulings"): the modelled "+2 lead-stat
+RULING 2b, RATIFIED 2026-08-29: the modelled "+2 lead-stat
 points" term IS the R5 quantity. The record states plainly that the
 published percentages EXCLUDE the apex pieces' rating deltas and are
 therefore FLOORS, and the maintainer accepts on the record, per the
@@ -725,8 +717,7 @@ the section 3 pool choice alone, which was the pool ruling's question
 QA-run throwaway numbers, with the same non-reproducibility caveat as the
 7.69 / 6.44 figures.
 
-RULING 3a, RATIFIED 2026-08-29 (the maintainer, at the Phase 16 gate; the
-dated row is in state.md, "Maintainer rulings"): R5 CLOSES ON THE FOUR
+RULING 3a, RATIFIED 2026-08-29: R5 CLOSES ON THE FOUR
 MEASURED LANES. Enhancement stays bounded by this section's transfer
 argument plus the QA addendum above (the modelled kit measured inside and
 below fury; the realisable-kit inversion rides the pool question ruling 1a
@@ -844,8 +835,8 @@ piece" model scores as ZERO, because Perfecting moves primary stats only.
 **Measured**, same fixture, same seeds, same consumables, 60 seeds at 300 s,
 the only difference being whether the two Perfected pieces this arm equips
 (the phase's arithmetic pick, `forgefold_legguards` and `warhewn_signet`;
-the not-taken item-swap arm's piece-choice note, preserved in state.md's
-ruling mirror, named `spiritweld_girdle` and `wardspeaker_sabatons` as the
+the not-taken item-swap arm names `spiritweld_girdle` and
+`wardspeaker_sabatons` as the
 unmeasured class-free mail alternates) are applied as a
 stat delta or EQUIPPED as items:
 
@@ -975,7 +966,7 @@ magnitude R5 will let us move.
 
 With the three tunes above applied the measured kit still sat at 5.1 to 5.3
 percent on fury and 5.2 to 5.5 percent on the caster sustained profile. The flask
-is what closes it, and the packet's own record names flask 15 as the first
+is what closes it, and the measured sequence identifies flask 15 as the first
 tune-down knob for exactly this case.
 
 The value is now **envelope-derived rather than ladder-derived**, and the def,
@@ -1254,10 +1245,9 @@ RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as tooltip-screenshot
   tuned here.
   (RULED (qr-19-disenchant-ratio-outlier, 2026-09-02, under qr-19-best-for-project):
   ACCEPTED on the record with this note standing; the commissioned shard
-  supply-and-demand read lives in docs/prd/masterwrought/state.md, THE SINKS
-  section of the Phase 11m ledger, and counts reagent rows rather than spend,
-  so it leaves this substitution risk as recorded.)
-- **The phase file's "11e decision 6"** is ruling 11g-D-C, landed in 11g. The
+  supply-and-demand read counted reagent rows rather than spend, so it leaves
+  this substitution risk as recorded.)
+- **The historical "11e decision 6" label** is ruling 11g-D-C, landed in 11g. The
   content is correct; the label is stale.
   ACTIONED (qr-18-REOPEN, 2026-08-31): Phase 18 corrected the label everywhere
   it stood (item stale-11e-decision-6-label); this row stays as the record.
@@ -1280,8 +1270,8 @@ RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as tooltip-screenshot
   conservatism. Both ladders were solved AT their floors (`src/sim/content/dungeon_difficulty.ts`
   solves the 500 floor at each dungeon's weakest spawn-list mob, `src/sim/rift/ranks.ts` at the
   weakest template of each class), so re-basing the constant is a live difficulty change to R5's two
-  protected assets, not a calibration tidy, and the packet's stopping rule sends it to the row 12
-  re-measure rather than to this gate. Derived from the committed `armorReduction` in
+  protected assets, not a calibration tidy, and requires an explicit R5
+  re-measure rather than a calibration-only edit. Derived from the committed `armorReduction` in
   `src/sim/types.ts`, never from an R5 re-measure: against the level-22 heroic pin the armour step
   passes 44.24 percent at 2861 and 35.72 percent at 4085, so post-armour melee falls about 19 percent
   (19.3 at level 22, 19.0 at the S-rank level 23) and holding a melee floor would need about 24
@@ -1299,7 +1289,7 @@ RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as tooltip-screenshot
   mastery-folded reading of a catalog whose raw max-armour kit measured 2969. A third reading sits
   beside those two: `scripts/healing_montecarlo.ts` and `docs/healing-monte-carlo-analysis.md` pair
   2861 armour with 2762 hp on a max-EHP (stamina-first) pick, not a max-armour one. Settling which
-  tank and which basis 2861 names belongs to the row 12 re-measure. Phase 18's scoped but unlanded
+  tank and which basis 2861 names requires an explicit R5 re-measure. The
   provenance debt ("REF_ARMOR's stale calibration comment states its provenance") is paid in this
   same change at the fifteen sites that quote the constant as live fact.
 - **The two-piece bound is an equip-transition rule, not a worn-set invariant.**

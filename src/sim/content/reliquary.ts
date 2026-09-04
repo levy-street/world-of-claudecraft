@@ -467,7 +467,7 @@ export const RELIQUARY_HORIZON_TITLES = [
 // restoreReliquaryState keeps only currently catalogued ids), so a mark
 // dropped from the catalog and later re-added refills from the surviving
 // visit at join. A pre-Reliquary binary is NOT covered: it predates the
-// namespace registration and drops the visits too (state.md rollback note).
+// namespace registration and drops the visits too.
 // History is never invented (the visit exists only if the proc really
 // happened).
 export const RELIQUARY_PROFESSION_MARKS = {
@@ -510,8 +510,8 @@ export const RELIQUARY_PROFESSION_MARKS = {
     'masterwork:engineering',
   ],
   /** Rare gather / corpse specimen visit marks already written by professions.
-   *  golden_harvest joined at masterwrought Phase 18, retiring the farming
-   *  phase's ledgered deferral ((bv), farming/state.md): the farm bed's rare
+   *  golden_harvest joined at masterwrought Phase 18, closing the farm bed's
+   *  missing rare-event mapping: the farm bed's rare
    *  event is the fourth flavor the shared gather_event announce writes, and
    *  it sat outside this allowlist (so noteReliquaryMark no-opped for it)
    *  while its three node siblings each had a cell. Inserted BEFORE

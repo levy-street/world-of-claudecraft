@@ -3,10 +3,9 @@ import { afterAll, describe, expect, it } from 'vitest';
 // The recipe index memo contract (src/sim/content/recipes.ts
 // ensureRecipeIndexes): recipeById and recipeForResultItem are served from two
 // lazily built Maps that rebuild whenever ALL_RECIPES.length changes. Building
-// those maps ONCE at module load was rejected deliberately (see
-// docs/prd/masterwrought/state.md, phase 09 review record: "the pattern suites
-// push synthetic recipes at runtime, so load-frozen maps were rejected
-// deliberately"), so nothing here proposes freezing them, a WeakMap, or any
+// those maps ONCE at module load was rejected deliberately because the pattern
+// suites push synthetic recipes at runtime. Nothing here proposes freezing
+// them, a WeakMap, or any
 // other keying. What was missing is a pin on the rebuild contract itself:
 // every live pusher (tests/recipe_pattern_items.test.ts,
 // tests/recipe_pattern_tooltip_view.test.ts) depends on a push being visible
@@ -128,8 +127,8 @@ describe('recipe index memo rebuild contract', () => {
 
   // CONTRACT DOCUMENTATION, not a defect report. The source comment states it
   // outright: "a same-length in-place swap is outside the contract (nothing
-  // replaces rows)", and the load-frozen alternative was rejected deliberately
-  // per docs/prd/masterwrought/state.md. The assertions below therefore pin the
+  // replaces rows)", and the load-frozen alternative was rejected deliberately.
+  // The assertions below therefore pin the
   // DOCUMENTED limitation rather than argue with it: replacing a row in place
   // keeps the length unchanged, the length is the whole cache key, so the old
   // row keeps being served. If someone later changes the keying (a revision

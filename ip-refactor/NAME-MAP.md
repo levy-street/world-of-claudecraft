@@ -1270,8 +1270,8 @@ pre-ship as display names.
 
 ## MASTERWROUGHT PHASE 03 AMENDMENT (2026-08-07, the R15 naming audit)
 
-Authorized by the R15 maintainer directive (docs/prd/masterwrought/state.md: pre-existing
-shipped collisions get display-name-only renames in the dedicated naming phase). A
+Authorized by the R15 maintainer directive in `docs/design/naming-audit.md`:
+pre-existing shipped collisions get display-name-only renames. A
 web-verified audit of all 2605 shipped player-visible proper nouns (workflow: 20 sweep
 agents, adversarial verify, 4 hunters) confirmed the collisions below; every replacement
 name was itself web-verified before adoption. Per-name verdicts and evidence:

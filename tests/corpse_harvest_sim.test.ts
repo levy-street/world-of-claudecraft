@@ -246,8 +246,8 @@ function harvestCommand(
 // claw and tusk joining HARVEST_COMPONENT_ITEMS (content/professions.ts,
 // #2905) left no shipped template carrying only unmapped component families:
 // fen_troll (claw, tusk) was the one production fixture in that shape. gills
-// and horn joining it at Masterwrought Phase 11m (state.md row 11m-ORPHAN)
-// then left no shipped template MIXING mapped and unmapped families either:
+// and horn joining it then left no shipped template MIXING mapped and unmapped
+// families either:
 // the four `gills, hide` swamp dwellers, sethrael_palecoil (hide, claw, horn)
 // and wildheart_hexcaller (hide, horn) were the last six. The corpse-level
 // "every family unmapped" gate (#2513), the pick-level refusal (#2509) and
@@ -947,8 +947,7 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
     // qr-19-best-for-project): the premise is RATIFIED as a capacity-safety
     // guarantee, and the two spread candidates it refused (dune_troll for
     // tusk, frostmane_yeti for horn) keep their shipped substitutes instead
-    // of the pre-gate being relaxed. See docs/prd/masterwrought/state.md,
-    // the Phase 11m ledger, DEVIATIONS deviation (c).
+    // of the pre-gate being relaxed.
     const specimenless = new Set(
       Object.keys(HARVEST_COMPONENT_ITEMS).filter((tag) => !(tag in HARVEST_COMPONENT_SPECIMENS)),
     );
@@ -988,7 +987,7 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
       // Non-vacuity: the refusal only means anything while the candidate still
       // carries a specimen-less family of its own, which is what made the
       // second one unaffordable. If this ever empties, the refusal is moot and
-      // the ledger's stated reason needs re-deriving rather than re-asserting.
+      // its rationale needs re-deriving rather than re-asserting.
       const carried = tags.filter((tag) => specimenless.has(tag));
       expect(
         carried.length,
@@ -999,8 +998,8 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
   });
 
   it('the substitutes the refusals lean on are live: tusk on the Horror, horn on six', () => {
-    // The other half of the same warrant, and the half the ledger states as
-    // fact. Derived from the live tables, never a hand list: if the Sundered
+    // The other half of the same warrant. Derived from the live tables, never
+    // a hand list: if the Sundered
     // Horror loses tusk, or the horn floor drops below six camped carriers,
     // the ratification's stated ground is gone and this reds.
     expect(MOBS.sundered_horror?.componentTags ?? [], 'the tusk substitute').toContain('tusk');
@@ -1010,9 +1009,8 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
       .map((m) => m.id);
     // OPEN-WORLD carriers, meaning those with a CAMPS row. NOT "reachable":
     // the seventh tagged template is a Wildheart DUNGEON mob, reached through
-    // an instance, which structurally cannot carry a camp row at all. The
-    // ledger's six is the open-world farm route, which is what the
-    // ratification actually leans on.
+    // an instance, which structurally cannot carry a camp row at all. The six
+    // open-world carriers are the farm route the ratification leans on.
     const openWorldHorn = hornCarriers.filter((id) => campedMobIds.has(id)).sort();
     expect(openWorldHorn.length, `horn carriers with a camp row: ${openWorldHorn.join(', ')}`).toBe(
       6,
@@ -3099,8 +3097,8 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     // retires these cases instead of silently inverting what they claim. A
     // LITERAL set on both sides: deriving the unmapped list from
     // HARVEST_COMPONENT_ITEMS alone would make this pass against any table.
-    // claw and tusk joined the yield table at #2905 and gills and horn at
-    // Phase 11m (state.md row 11m-ORPHAN): the tagged-but-unmapped set is
+    // claw and tusk joined the yield table at #2905 and gills and horn later:
+    // the tagged-but-unmapped set is
     // EMPTY, which is the shipped reality this row pins, beside the ten
     // mapped families.
     const tagged = new Set(Object.values(MOBS).flatMap((m) => m.componentTags ?? []));
@@ -3163,7 +3161,7 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     // spread also gave it venomSac). The exact pick that used to be refused
     // is a plain concentrate now: claim spent, two draws (one tier roll, one
     // rarity roll, for horn alone) and curved_tusk in the bag, since horn
-    // feeds the same hard keratin as tusk (state.md row 11m-ORPHAN). This is
+    // feeds the same hard keratin as tusk. This is
     // the behavioural pin that horn GRANTS: drop the horn row and this corpse
     // is mixed again, the pick is refused, and the tusk count is zero.
     expect(MOBS.sethrael_palecoil.componentTags).toEqual(['hide', 'claw', 'horn', 'venomSac']);

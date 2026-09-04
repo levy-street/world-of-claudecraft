@@ -296,8 +296,8 @@ export class ProfessionsWindow {
 
   // -------------------------------------------------------------------------
   // Simplified mode (syncing / unattuned pre-first-tier): the identity
-  // paragraph plus ONE call to action, tutorial line promoted, then (since
-  // the farming Phase 8 QA, state.md deviation (be)) the gathering rows the
+  // paragraph plus ONE call to action, tutorial line promoted, then the
+  // gathering rows the
   // player has actually WORKED plus the Farming row while a bed is planted,
   // painted as bar and Harvest Journal opener ONLY: no slot, recharge, or
   // ask-each-use control reaches this body, so the one call to action stays
@@ -342,7 +342,7 @@ export class ProfessionsWindow {
       // a crop is in the ground), the same row markup the full mode paints
       // MINUS the tool-effect controls (they spend; the simplified body's
       // only spender stays its call to action), so a pre-attunement farmer
-      // reaches the Harvest Journal from this window too (deviation (be)).
+      // reaches the Harvest Journal from this window too.
       // Empty for a fresh character: the core decides, and the section
       // paints nothing at all when the list is empty.
       this.gatheringSectionHtml(model.simplifiedGathering, { effects: false })

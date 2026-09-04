@@ -12,7 +12,7 @@ import type { SimContext } from '../sim_context';
 import type { GatherRareEventFlavor, GatherRareEventSource, SimEvent } from '../types';
 import type { MasterworkProc } from './masterwork';
 
-// One shared cadence knob: state.md target of roughly 1 per zone per 20
+// One shared cadence knob: target roughly 1 per zone per 20
 // minutes, from 240s node respawn and 18 nodes per zone giving at most
 // ~90 harvests per zone per 20 minutes; tuned per family. The derivation is
 // the TUNED zones' (the R37 'complete' set): the v0.32.0 expansion's starter
@@ -63,8 +63,8 @@ export function gatherRareEventFlavor(source: GatherRareEventSource): GatherRare
 // contract). Draws EXACTLY ONE rng.next() on EVERY call, hit when the draw is
 // below GATHER_RARE_EVENT_CHANCE: a constant draw count per harvest keeps the
 // sim's rng stream identical across hosts regardless of the outcome. The
-// farming harvest draw block is the second caller (source 'crop', state.md
-// D12: the SAME shared chance, never a farming copy of the constant).
+// farming harvest draw block is the second caller (source 'crop') and uses the
+// SAME shared chance, never a farming copy of the constant.
 export function rollGatherRareEvent(
   rng: Rng,
   source: GatherRareEventSource,
@@ -121,7 +121,7 @@ export function announceGatherRareEvent(
   // Reliquary field-note trophies reuse the same stable gather_event:* ids
   // (catalog allowlist only; noteReliquaryMark no-ops an id the catalog does
   // not carry). All four flavors have a cell since masterwrought Phase 18,
-  // which retired the farming phase's ledgered golden_harvest deferral.
+  // which added the previously missing golden_harvest mapping.
   const visitMark = `gather_event:${flavor}`;
   ctx.markVisited(finder, visitMark);
   noteReliquaryMark(ctx, finder, visitMark);

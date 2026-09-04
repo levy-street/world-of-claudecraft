@@ -451,8 +451,7 @@ describe('every gathering tool is wieldable by the profession that owns it', () 
       // THE LADDER MUST KNOW THIS TIER. wieldRequirementForTier returns 0 for
       // any tier outside WIELD_REQUIREMENT_BY_TIER, so it fails OPEN: a tier-6
       // LAND tool would read requirement 0 and sail through the wieldability
-      // check below while shipping completely ungated. That is the precise
-      // hazard docs/prd/masterwrought/brainstorm.md records as the reason a
+      // check below while shipping completely ungated. That is why a
       // gathering-wide apex-tier expansion is one change and not three, and
       // until now it was prose with no test behind it.
       expect(

@@ -40,7 +40,7 @@
 // COMBO_RECIPES carry `acquisition: ['trainer']`, learned from the resident
 // master at their craft's station (professions/training.ts resolveTrain).
 // COMMON_RECIPES, TOOL_RECIPES, and CASTER_HUB_RECIPES deliberately keep NO
-// acquisition field: state.md locks them grandfathered, known to everyone via
+// acquisition field: they remain grandfathered, known to everyone via
 // the empty-acquisition arm of crafting.ts isRecipeKnown. Existing characters
 // keep the combo recipes too, via the one-time grandfather union
 // (training.ts PRE_TRAINING_RECIPE_IDS / grandfatherKnownRecipes); every
@@ -1385,8 +1385,7 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     // on a profession, but the vendor route is genuinely gone.
     // vale_wheat at 4 sits under the cap, and a vale_wheat 1
     // binder is the shipped shape farming's own tier-1 rows already use
-    // (recipe_eastbrook_root_pottage, recipe_eastbrook_glazed_carrots) under
-    // farming's (bz) binder ruling.
+    // (recipe_eastbrook_root_pottage, recipe_eastbrook_glazed_carrots).
     reagents: [
       { itemId: 'game_meat', count: 2 },
       { itemId: 'vale_wheat', count: 1 },
@@ -2189,9 +2188,8 @@ export const INSCRIPTION_RECIPES: ProfessionRecipeRecord[] = [
 ];
 
 // The Masterwrought intermediates rung (Phase 07, R13): one intermediate
-// material per profession at skill 75, per the Phase 07 pre-fan-out ledger in
-// docs/prd/masterwrought/state.md (the ten-row mapping and the demand math
-// phases 08/09/10 author against). The Quickening Catalyst is alchemy's 75
+// material per profession at skill 75, using the ten-row mapping and demand
+// model summarized in docs/design/professions.md. The Quickening Catalyst is alchemy's 75
 // rung and the time gate: `oncePerDay` limits it to one successful craft per
 // character per reset day (professions/types.ts), and every other row
 // consumes exactly one Catalyst, so each apex piece (3 intermediates) costs 3
@@ -3144,8 +3142,8 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
   // fine_evergarden_greens and fine_gilded_sunmelon were consumed by exactly
   // one recipe each, both farming's own tier-4 dishes at cooking 100. This
   // phase gives both their CAPSTONE consumer at skillReq 125, the top of the
-  // CONSUMABLE catalog, which is the masterwrought R20 shape the packet exists
-  // to close. (Scoped at the Phase 11h QA: 125 is cooking and alchemy's
+  // CONSUMABLE catalog, which is the shape masterwrought R20 guarantees.
+  // (125 is cooking and alchemy's
   // ceiling. ALL_RECIPES topped out at 150 at that phase's own runtime, the
   // apex tool family it recorded as out of scope, census "3 at 125, 3 at
   // 150"; masterwrought Phase 11o later re-tiered those three to 125, so the
@@ -3153,8 +3151,7 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
   // qr-11o-150. 2026-08-27, phase 13 / R13: INSCRIPTION
   // joins the 125 rung with recipe_deed_of_making, its first, a trainer row
   // in INSCRIPTION_RECIPES rather than a drop.) Neither is a hoe twin (the hoe ladder
-  // takes fine_vale_wheat,
-  // fine_marsh_rice and fine_highland_barley under farming's deviation (ad)),
+  // takes fine_vale_wheat, fine_marsh_rice and fine_highland_barley),
   // so nothing is double-booked.
   {
     id: 'recipe_grand_cauldron',
@@ -3299,9 +3296,8 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
   // exactly as they buy sunpetal_herb today (masterwrought R18); a cook with no
   // rift access buys cores.
   //
-  // THE BILL WAS RE-DERIVED AGAINST THE STANDING ACCENT RULES, and this is the
-  // part worth reading, because the phase file's own prescribed bill (both
-  // tier-4 FINE twins plus one catch) is illegal three ways on the merged tree
+  // THE BILL WAS RE-DERIVED AGAINST THE STANDING ACCENT RULES. An earlier
+  // proposal (both tier-4 FINE twins plus one catch) is illegal three ways on the merged tree
   // and was written before the rules that refuse it existed:
   //   - The fish-forward rule (masterwrought R17) wants fish to OUTNUMBER
   //     produce on any row carrying a raw catch. Two fine twins at 2 each is
@@ -3316,8 +3312,7 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
   //     phase should spend an open maintainer item on.
   // So the row takes the BASE crop, one family, at the accent cap. The fine
   // twins are not orphaned by that: 11h gave each its own station capstone and
-  // 11j gave the greens the apex hoe, which is the consumer the phase file
-  // thought was missing.
+  // 11j gave the greens the apex hoe as an additional consumer.
   //
   // EVERY COUNT IS DERIVED, and the precedent taken is named:
   // - seasoned_stock 3: the CAPSTONE idiom. recipe_laden_hearth and
@@ -3531,10 +3526,7 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
 // too, and masterwrought R18 is satisfied either way by the Marks counter
 // above, so nothing here is gated behind having taken engineering.
 //
-// THE TENSION IS REAL AND IS HANDED BACK, not resolved here: the phase file
-// and the Phase 11i QA handoff disagree about this rung's tier AND its
-// channel, and both are settled records. The ledger costs both readings. What
-// is NOT arguable is the TIER: a tier-6 land tool would ship ungated, because
+// THE TIER IS LOAD-BEARING: a tier-6 land tool would ship ungated, because
 // WIELD_REQUIREMENT_BY_TIER has no tier-6 row and wieldRequirementForTier
 // fails OPEN at 0, and only fishing is exempt from that gate.
 export const HOE_RECIPES: ProfessionRecipeRecord[] = [
@@ -3619,8 +3611,8 @@ export const HOE_RECIPES: ProfessionRecipeRecord[] = [
   },
 ];
 
-// The engineering on-ramp (masterwrought Phase 11o, qr-11o-ENG,
-// farming/state.md row 119). Measured before it: engineering had NOTHING
+// The engineering on-ramp (masterwrought Phase 11o, qr-11o-ENG). Measured
+// before it: engineering had NOTHING
 // craftable below skillReq 75 except the two mid hoe rungs, its cheapest
 // pre-absorb recipe sat at tier 3, ABOVE the unattuned archetype ceiling of
 // 2 (archetypeCeilingFor), so an unattuned character could never gain a
@@ -3763,16 +3755,10 @@ export const ENGINEERING_ONRAMP_RECIPES: ProfessionRecipeRecord[] = [
 // the recipe-economy unitValue basis (buyValue when one exists, else
 // sellValue); on a raw sellValue basis the beet braise is exactly break-even,
 // which converts produce without minting copper and is the intended shape.
-// DEVIATION (aj) IS DISCHARGED, both halves, and it is worth stating why
-// rather than deleting the paragraph. The deviation recorded that every farm
-// row shipped TRAINABLE before go-live so the crafting window could list them
-// while the farm was dormant, and its Phase 6 QA addendum recorded the FEE
-// half as a ruling owed: the rung-25 and rung-50 rows charged 2500 and 10000
-// copper for recipes nobody could yet cook. Both halves are gone now, from
-// opposite directions. Phase 11e stocked all eight upper seeds, so no farm row
-// is reagent-dormant any more, which retires the addendum's premise for the
-// held bannock (still trainer-taught at rung 50, still 10000, but now for a
-// dish a player can actually cook). And every OTHER formerly dormant row is at
+// Every farm row is craftable now that both farmer counters stock all eight
+// upper-tier seeds. The held bannock remains trainer-taught at rung 50 for
+// 10000, but now teaches a dish a player can actually cook. Every other
+// formerly dormant row is at
 // FARM_DROP_RUNG_FLOOR or above under the channel rule above, so it is not
 // trainer-taught at all and charges no fee, in advance or otherwise. What
 // remains trainer-taught is the rung 0 to 50 on-ramp, free at rung 0 on the
@@ -3993,10 +3979,8 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
   // to "three of the five" by subtracting from the stale number instead of
   // counting the live table, which is the exact failure it was correcting; the
   // fix-round review counted the nine.)
-  // The tier 3/4 pair SHIPPED reagent-dormant under deviation (bo), trainable
-  // and well-formed but with no tier 3/4 seed faucet. NO LONGER DORMANT: GATE 1
-  // (Phase 11e) stocked all eight upper seeds at farmer_hollis and
-  // farmer_verbena, so both rows are completable today. VALUES ARE PROPOSED AND
+  // The tier 3/4 pair is live: both farmer counters stock all eight upper
+  // seeds, so both rows are completable today. VALUES ARE PROPOSED AND
   // FLAGGED FOR THE MAINTAINER, reagent counts and rungs alike. STILL OPEN
   // DELIBERATELY (noted 2026-09-01): qr-19-dish-curve-point-assignments ratified
   // the EIGHT PLAIN dishes and retired their two proposal banners, and this pair
@@ -4010,9 +3994,8 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
   // intact (every farm recipe holds at least one reagent no counter stocks
   // and no vendor prices), so no dish, buff or plain, is craftable from
   // counter stock alone, and no rung-0 cooking skill-up faucet opens from
-  // vendor goods (the unresolved hazard the deviation (ai) QA addendum
-  // flagged for the tonic; opening a second one is a maintainer call this
-  // phase does not make).
+  // vendor goods. Opening a second vendor-funded skill-up faucet would require
+  // a separate maintainer decision.
   {
     id: 'recipe_eastbrook_glazed_carrots',
     professionId: 'cooking',
@@ -4054,9 +4037,8 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'cooking',
     resultItemId: 'highwatch_barley_porridge',
     resultCount: 1,
-    // The wall kitchens' buff dish. Shipped reagent-dormant under deviation
-    // (bo) while highland_barley had no seed faucet; GATE 1 (Phase 11e) stocked
-    // that seed at farmer_hollis, so this row is completable today.
+    // The wall kitchens' buff dish. Farmer Hollis stocks highland_barley seed,
+    // so this row is completable today.
     // Input 68 vs output 60.
     //
     // RUNG 75, A DROP (Phase 11f), the tier-3 band with the gourd soup.
@@ -4077,9 +4059,8 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'cooking',
     resultItemId: 'evergarden_braised_greens',
     resultCount: 1,
-    // The capstone buff dish. Shipped reagent-dormant under deviation (bo)
-    // while evergarden_greens had no seed faucet; GATE 1 (Phase 11e) stocked
-    // that seed at farmer_verbena, so this row is completable today.
+    // The capstone buff dish. Farmer Verbena stocks evergarden_greens seed, so
+    // this row is completable today.
     // Input 168 vs output 150.
     //
     // RUNG 100, A DROP (Phase 11f), the tier-4 band. Taught by
@@ -4108,17 +4089,14 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
     // 40x4 + salt 8x2 = 336 in against an output sellValue of 250:
     // gold-negative, like every farm row.
     //
-    // The (bz) whole-list invariant holds here too: both produce reagents
+    // The whole-list invariant holds here too: both produce reagents
     // (evergarden_greens, gilded_sunmelon) carry no buyValue and no counter
     // stocks them, so the feast can never be cooked from vendor stock alone
     // and stays out of the counterfactual vendor-fed set in
     // tests/recipe_economy.test.ts.
     //
-    // Shipped REAGENT-DORMANT under deviation (bo) with the (ca)
-    // reconciliation, because the D11 seed-bootstrap ruling owned the tier 3/4
-    // seed faucet. GATE 1 (Phase 11e) discharged that ruling and stocked all
-    // eight upper seeds, so this row is completable today, exactly like the
-    // tier 3/4 dishes above it.
+    // Both farmer counters stock all eight upper seeds, so this row is
+    // completable today, exactly like the tier 3/4 dishes above it.
     //
     // FLAGGED FOR THE MAINTAINER: the reagent counts (4 + 4 + 2) and the
     // 250 output sellValue are proposed tuning, like every farming constant.
@@ -4166,8 +4144,7 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
     // qr-19-best-for-project): both flags above are ANSWERED and stand as
     // shipped. The reagent counts (2 herbs plus the vial) and skillReq 0 do
     // not move; the cheaper rung-0 skill-up path this bill opens is accepted
-    // with the intent recorded on the (ai) block in
-    // docs/prd/masterwrought/farming/state.md.
+    // as the accessible entry to the alchemy ladder.
     reagents: [
       { itemId: 'silverleaf_herb', count: 2 },
       { itemId: 'glass_vial', count: 1 },
@@ -4274,9 +4251,9 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
 // Scope: the 21 junk mob-drop orphans (seven adopted below, twelve excluded
 // here, two holdouts); soggy_boot (fishing only) and the three Brightwood
 // Glade wildlife ids (no source) are not mob drops and carry no line.
-// Row 123 (docs/prd/masterwrought/farming/state.md) predicted
-// old_cragmaws_pelt and emberwing_cinderscale as value exclusions against
-// the CRAFTED ceiling (460, leather 420); row 122's doctrine picks UNCRAFTED
+// The initial review predicted old_cragmaws_pelt and emberwing_cinderscale as
+// value exclusions against
+// the CRAFTED ceiling (460, leather 420); the governing doctrine picks UNCRAFTED
 // outputs, whose leather pool answers 420 and 440, which is what admits them
 // (a divergence recorded, not a re-decision).
 //   gleamstag_charm 2500: value-excluded, jewelcrafting (the uncrafted neck
@@ -4286,8 +4263,8 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
 //     value no honest bill exceeds); nothing in (25, 460]).
 //   deepfen_pearl 600: value-excluded, jewelcrafting (the same pool).
 //   guardian_core 180: ruling-excluded, engineering (180 is under every
-//     ceiling; the lane goes empty by ruling, farming/state.md row 123, and
-//     its on-ramp is row 119).
+//     ceiling; the lane deliberately stays empty, and its on-ramp is the
+//     qr-11o-ENG block above).
 //   pale_pearl 30: output-excluded, jewelcrafting (no uncrafted neck or ring
 //     in (25, 460]: the same 25-item pool).
 //   ogre_toe_ring 25: output-excluded, jewelcrafting (the same gap).

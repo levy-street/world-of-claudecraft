@@ -430,8 +430,8 @@ export function bisKitForRole(
 /** Keep a kit inside the Masterwrought counted equip family: at most
  *  MASTERWROUGHT_EQUIP_CAP flagged picks. Without this, a role whose
  *  weakest-covered slots are all apex-crafted picks over the cap and
- *  buildBoostedCharacterState hard-throws at the third equip (the state.md
- *  phases 03/08 open item; four role kits really did hit 3 before this).
+ *  buildBoostedCharacterState hard-throws at the third equip; four role kits
+ *  really did hit 3 before this guard was added.
  *  The KEPT picks are the cap-highest scoring flagged ones. A demoted armor
  *  slot falls back to the best unflagged pick for the slot; a demoted ring
  *  refills from the scored ring list. A demoted HAND pick (mainhand or

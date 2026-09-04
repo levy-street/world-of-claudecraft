@@ -384,9 +384,8 @@ export const ZONE_FISH: Record<string, readonly string[]> = {
 // farm:<zone> mark (professions/farming.ts harvestCrop via the
 // onCropHarvestedForDeeds hook below). ANY crop counts on purpose: plantCrop
 // carries no bed-tier gate (probed live in the celebrations phase), so every
-// hub's chronicle is earnable today with vendor-stocked low-tier seeds even
-// while the tier 3/4 seed faucet stays open (state.md (bo), which gates only
-// the high-tier crops themselves, never these marks). Exported for the
+// hub's chronicle is earnable today with vendor-stocked low-tier seeds; the
+// high-tier crop gates never constrain these marks. Exported for the
 // new-zone checklist like ZONE_FISH above: a future farm patch zone earns its
 // chronicle only when a row lands here, and tests/deeds_content.test.ts pins
 // this list against the authored FARM_PATCHES zones from both directions.

@@ -236,36 +236,13 @@ authors deeds like any other.
 - **`pvp_vcup_bet_flex`**: cut; no betting-adjacent deeds ship, even at 0
   Renown.
 
-### A recorded dormancy-window waiver (CLOSED 2026-08-21, Masterwrought Phase 11e)
+### Farming capstone earnability
 
-- **`prog_farming_100` (the Harvestmaster title)** shipped with the farming
-  celebrations phase per the farming program's locked D13 scope
-  (`docs/prd/masterwrought/farming/state.md`) while the tier 3/4 seed bootstrap ruling
-  (state.md (bo)/D11) is still open, so the deed is temporarily unearnable:
-  farming teaching grays at the tier-2 ceiling of 75 until a tier 3 seed
-  exists. This is a deliberate, program-scoped exception to the "never ship
-  a deed no site can satisfy" line in the recipe above (contrast
-  `prog_ringwright`, which stayed out), bounded two ways: the self-clearing
-  honesty arm in `tests/deeds_content.test.ts` reds when any purchase
-  surface stocks a tier 3/4 seed, and the deed's own row comment states the
-  dependency. The D11 faucet phase closes the window; nothing here needs a
-  retro-edit when it does. Until then, Book completion and the catalog's
-  full Renown are capped one deed short for every player, which transitively
-  parks `feat_book_complete` too (`BOOK_COMPLETE_REQUIREMENTS` derives over
-  every non-feat non-hidden deed, so the dormant capstone joins it
-  automatically): TWO deeds sit dormant for the window, a consequence the
-  program accepts.
-
-**CLOSED 2026-08-21 by Masterwrought Phase 11e (GATE 1).** The window is over.
-Both farmer counters now stock their tier's seeds (farmer_hollis the four
-tier-3, farmer_verbena the four tier-4, each with a positive `buyValue`), so
-tier 3 and 4 crops are plantable, farming teaches to the profession cap of 100,
-and `prog_farming_100` is earnable. `feat_book_complete` unparks with it, so the
-two dormant deeds are one and zero. The self-clearing honesty arm in
-`tests/deeds_content.test.ts` did exactly what it was built to do: it reddened
-the moment the faucet landed, and it was INVERTED rather than deleted, so it now
-fails if the faucet is ever removed again and green means earnable rather than
-"the arm went vacuous". Nothing needed a retro-edit, as this waiver predicted.
+- **`prog_farming_100` (the Harvestmaster title)** is earnable. Farmer Hollis
+  stocks the four tier-3 seeds and Farmer Verbena stocks the four tier-4 seeds,
+  each with a positive `buyValue`, so farming teaches through the profession cap
+  of 100. `feat_book_complete` therefore remains earnable too. The derivation in
+  `tests/deeds_content.test.ts` fails if either high-tier seed faucet disappears.
 
 ### A recorded rule-2 exception (Masterwrought Phase 11e, `col_farm_roster`)
 
@@ -303,10 +280,9 @@ fails if the faucet is ever removed again and green means earnable rather than
   rolls in week-sized units (the ember faucet is weekly), larger than a
   masterwork proc's minutes. Recorded here so the next rolled-feeder deed is
   judged against the same distinction rather than re-deriving it.
-- **The storefront decision** for this deed is the packet-wide one (no Steam or
-  Epic achievement row for any deed the Masterwrought packet adds; recorded in
-  the packet's Phase 16 file), so its absence from `achievement_map.ts` is
-  deliberate, not an omission against step 7 above.
+- **The storefront decision** for this deed follows the Masterwrought family:
+  none of its deeds has a Steam or Epic achievement row, so its absence from
+  `achievement_map.ts` is deliberate, not an omission against step 7 above.
 
 The reviewed design blocks for all of these live in the deed catalog's
 authoring history; a deferred deed stays out of `DEED_ORDER` and off Steam

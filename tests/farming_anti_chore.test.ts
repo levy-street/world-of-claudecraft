@@ -5,9 +5,8 @@
 // farming calendar (about 65 days to about 74, and the first fifty points from
 // 6 days to 25). A slower curve is only acceptable because it changes PACING
 // and never OBLIGATION: nothing about the longer climb may make a player OWE
-// the game a visit. The five rows below are
-// docs/prd/masterwrought/farming/qa-checklist.md's anti-chore audit taken
-// verbatim, each given a pin or a stated proof against the re-tuned curve. If
+// the game a visit. The five rows below are the durable anti-chore contract,
+// each given a pin or a stated proof against the re-tuned curve. If
 // a later tune wants a faster ladder in exchange for a daily quota, a login
 // streak, a rested bonus or any catch-up mechanic, this file is what says no.
 //

@@ -716,8 +716,8 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // 4 x 90 = 360 stays strictly below the summed reagent value (about 422),
   // where Marlow's per-plate 150 on a four-plate batch (600) would turn the
   // recipe into a gold faucet. So an epic plate vendors for less than the
-  // rare Marlow's Grand Roast on purpose (a player-visible inversion, recorded
-  // as a maintainer call in the packet ledger; the earlier framing of a
+  // rare Marlow's Grand Roast on purpose (an accepted player-visible inversion;
+  // the earlier framing of a
   // 'multi-output curve' past silvered_carp_supper was wrong: both anchors
   // are single-output recipes). Never vendor-stocked (no buyValue). 'Well
   // Fed' is localized client-side through the sim_i18n aura matcher, like
@@ -996,10 +996,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // re-tune removes.
   //
   // foodHp and sellValue reuse shipped curve points; quality matches the
-  // rung. The tier 3/4 pair SHIPPED reagent-dormant under (bo): trainable and
-  // well-formed, but at the time tier 3/4 produce had no seed faucet and the
-  // D11 bootstrap ruling was still open. GATE 1 (Phase 11e) discharged that
-  // ruling and stocked all eight upper seeds, so the dormancy is over and both
+  // rung. Both farmer counters stock the tier 3/4 seed chain, so the two upper
   // rows are completable today.
   // Names are IP-safe per D17 (real culinary words plus
   // settlement flavor) and collide with none of the eight plain dishes.
@@ -1049,10 +1046,8 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // the feast). kind 'junk' is the tonic precedent for a crafted
   // non-equippable usable; quality 'rare' matches the tier-4 dish set, and
   // the junk-sale sweep keys on quality 'poor' so a feast can never ride
-  // the bulk junk sale. No buyValue: never vendor-stocked, and it SHIPPED
-  // reagent-dormant under deviation (bo) like the tier 3/4 dishes (the (ca)
-  // reconciliation: the D11 seed-bootstrap ruling owned the faucet). GATE 1
-  // (Phase 11e) discharged it, so the feast is completable today.
+  // the bulk junk sale. No buyValue: never vendor-stocked. Both high-tier
+  // farmer counters stock the seed chain, so the feast is completable today.
   // charges 10 and durationTicks 3600 (180s at 20 Hz) are
   // maintainer-flagged tuning, like every farming constant.
   harvest_feast: {
@@ -1189,14 +1184,15 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // the section 3 and 8.1 rulings, is CLOSED BY RULING since 2026-08-29
   // (that file's Verdict and section 9.6), so 13 is a conservative margin
   // rather than a proven crossing. The
-  // value is ENVELOPE-DERIVED rather than ladder-derived: R5 is the contract
-  // and the packet's own record names flask 15 as the first tune-down knob.
+  // value is ENVELOPE-DERIVED rather than ladder-derived: R5 is the contract,
+  // and docs/design/power-verification.md identifies flask 15 as the first
+  // tune-down knob.
   // 13 is still strictly above the elixir ceiling of 12, which is what keeps
   // the apex rung a rung. DURATION is untouched:
   // 1200 is the serpent's 900 plus the ladder's ONE non-zero duration step
   // (600 / 900 / 900: +300, then flat; a strictly-flat reading would give 900,
-  // rejected in the phase 10 ledger, and the classic 2x-elixir ratio would give
-  // 1800, so 1200 is the conservative rung). sellValue 25 continues the elixir
+  // while the classic 2x-elixir ratio would give 1800, so 1200 is the
+  // conservative rung). sellValue 25 continues the elixir
   // curve (10/15/20) by its +5 step. Never vendor-stocked (no buyValue). The
   // three aura display names are localized client-side through the sim_i18n
   // aura matcher (AURA_NAME_KEY), the same path as 'Might of the Serpent'.
@@ -1406,8 +1402,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
 
   // --- Masterwrought intermediates (Phase 07, R13) ---------------------------
   // The skill-75 rung: one intermediate material per profession, minted by
-  // INTERMEDIATE_RECIPES (content/recipes.ts) per the Phase 07 pre-fan-out
-  // ledger (docs/prd/masterwrought/state.md). The Quickening Catalyst is
+  // INTERMEDIATE_RECIPES (content/recipes.ts). The Quickening Catalyst is
   // alchemy's 75 rung and the bottom-of-chain time gate (one craft per day per
   // character via oncePerDay on its recipe); each of the other nine consumes
   // one Catalyst, and the phase 08/09/10 apex rows consume three of their own
@@ -1524,8 +1519,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // level 25 + epic bonus 6) whose primary sums EQUAL primaryStatBudget and
   // whose single rating follows the band's one-rating-at-40 law, each rating
   // chosen to COMPLEMENT the same-slot drop rather than duplicate it. Slots
-  // come from the committed slot coverage audit (state.md Phase 08 ledger):
-  // the weakest-covered cells per armor class. Armor values are copied from
+  // use the weakest-covered cells per armor class. Armor values are copied from
   // the same-band same-slot reference piece, never invented. All nine carry
   // masterwrought: true (the counted equip family). The level-20 equip gate
   // is DERIVED, never hand-authored (item_level_req.ts doctrine): source
@@ -1629,8 +1623,8 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     // clone of the caster BiS chest shroud_of_the_gravewyrm, whose only
     // difference was that it took the double-value rating, and caster chest
     // Hit had ZERO pre-packet carriers, so it was the sole source of the
-    // scarcest rating in the largest-budget slot: the Lionheart shape the
-    // packet's own research names. Measured at an S-rift target (level 23,
+    // scarcest rating in the largest-budget slot: the Lionheart shape described
+    // in docs/design/power-verification.md. Measured at an S-rift target (level 23,
     // where spell hit is uncapped) that was worth 2.8 to 4.1 percent of
     // throughput from one slot against an R5 budget of 5 percent for the
     // whole kit. Against the level-22 heroic target the same piece is close to

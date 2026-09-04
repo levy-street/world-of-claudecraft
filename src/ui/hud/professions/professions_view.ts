@@ -293,8 +293,8 @@ export interface ProfessionsViewInput {
    *  length). Read by the SIMPLIFIED body only: a farmer whose first crop is
    *  still in the ground has farming skill 0, and the Farming row (the
    *  Harvest Journal's in-window entry) must still reach them, so the row
-   *  joins simplifiedGathering while any bed is planted (state.md deviation
-   *  (be)). REQUIRED for the same compile-time-proof reason as `toolEffects`. */
+   *  joins simplifiedGathering while any bed is planted. REQUIRED for the
+   *  same compile-time-proof reason as `toolEffects`. */
   farmPlotCount: number;
 }
 
@@ -401,7 +401,7 @@ export interface ProfessionsViewModel {
   /** The gathering rows the SIMPLIFIED body paints beneath its call to action
    *  (EMPTY in full mode, which paints `gathering` whole): only rows the
    *  player has actually worked (skill above 0), plus the farming row while
-   *  a crop is in the ground. Deviation (be): the Harvest Journal's in-window
+   *  a crop is in the ground. The Harvest Journal's in-window
    *  entry rides the Farming row, and before this arm a pre-attunement
    *  farmer had no in-window entry at all (simplified mode painted no
    *  gathering section). Skill-0 rows stay hidden, so a fresh character's

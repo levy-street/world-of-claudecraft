@@ -2,8 +2,7 @@
 // THE HARVEST GEOGRAPHY INVARIANT (masterwrought R22, Phase 11m DECISION 12)
 // ---------------------------------------------------------------------------
 //
-// The rule, stated once so a contributor who has never read the Masterwrought
-// packet can act on a red here:
+// The rule, stated once so a contributor can act on a red here:
 //
 //   EVERY MAPPED CORPSE-HARVEST FAMILY MUST BE REACHABLE ACROSS THE WORLD. A
 //   component tag that HARVEST_COMPONENT_ITEMS maps to an item is a promise
@@ -12,9 +11,7 @@
 //   cannot keep, and the hole is invisible until a player at level 12 needs
 //   thirty-five of something only a level-3 spider drops.
 //
-// masterwrought R22 (docs/prd/masterwrought/farming/state.md rows 11m-D-12 and
-// qr-11m-SPREAD, the settled DECISION 12 of
-// docs/prd/masterwrought/phase-11m-harvest-geography.md) fixes the floor:
+// masterwrought R22 (docs/design/professions.md) fixes the floor:
 // every mapped tag reaches at least REACH_FLOOR.templates templates across at
 // least REACH_FLOOR.zones distinct zones spanning at least REACH_FLOOR.bands
 // level bands, COUNTED OVER THE REACHABLE SUBSET AND NEVER OVER MEMBERSHIP.
@@ -60,20 +57,19 @@
 // content/drakelands.ts, never a camp of its own). A camp authored ON the
 // instance plane would be refused too (the plane arm proves it), though the
 // shipped CAMPS carries none.
-// Count-1 rares and elites at overworld camps ARE reachable members: the
-// settled row says count-1 named mobs are legal floor members and spawn
-// density is RECORDED in the ledger, not asserted here (qr-11m-SPREAD (3)).
+// Count-1 rares and elites at overworld camps ARE reachable members. Spawn
+// density is observed for diagnosis, not asserted here.
 // old_greyjaw, a count-1 rare at an Eastbrook camp, pins that reading. The
 // same letter admits a QUEST-GATED camp: spider_egg (requiresQuestId
 // 'q_broodmother', damageable only while that quest is active or ready,
 // src/sim/combat/quest_damage_gate.ts) is silk's sixth carrier by the camp
-// predicate alone; the settled row says nothing about quest gates, so this
-// phase admits the clutch, records the admission as hollow (one quest window
+// predicate alone; R22 says nothing about quest gates, so this test admits the
+// clutch and records the admission as hollow (one quest window
 // per character), and the quest-gated census arm below pins the admitted set
 // as LITERALS so a second such member is a conscious edit with a maintainer
 // ruling, never a silent pass.
 //
-// LEVEL BANDS are THE PHASE'S OWN QUANTIZATION (the tree has no zone-band
+// LEVEL BANDS are THIS TEST'S QUANTIZATION (the tree has no zone-band
 // constant to import): LEVEL_BAND_WIDTH-wide buckets of a template's
 // minLevel, floor((minLevel - 1) / 5), so band 0 is levels 1 to 5, band 1 is
 // 6 to 10, band 2 is 11 to 15, band 3 is 16 to 20 (levelBandOf). This
@@ -130,9 +126,7 @@ import {
   withRetaggedTemplates,
 } from './helpers/unmapped_family';
 
-const WHERE_THE_RULE_LIVES =
-  'masterwrought R22, docs/prd/masterwrought/phase-11m-harvest-geography.md DECISION 12 ' +
-  '(state.md rows 11m-D-12 and qr-11m-SPREAD)';
+const WHERE_THE_RULE_LIVES = 'masterwrought R22, docs/design/professions.md';
 
 /** The decision-12 TARGET, the whole floor in one triple. */
 // biome-ignore lint/suspicious/noExportsInTest: the floor is read by the live arm, the teeth arm and the mutation probes alike, and one triple keeps them the same floor
@@ -219,7 +213,7 @@ export function carriersOf(tag: string, world: HarvestWorld): MobTemplate[] {
 }
 
 /** One family's measured reach over a world. */
-// biome-ignore lint/suspicious/noExportsInTest: the census row shape the ledger records
+// biome-ignore lint/suspicious/noExportsInTest: the diagnostic census row shape
 export interface FamilyReach {
   readonly tag: string;
   /** Every carrier, membership. */
@@ -236,7 +230,7 @@ export interface FamilyReach {
   readonly spawnPoints: number;
 }
 
-// biome-ignore lint/suspicious/noExportsInTest: the measurement the floor judges, exported so a probe can print the census the ledger records
+// biome-ignore lint/suspicious/noExportsInTest: the floor measurement, exported so a probe can print the diagnostic census
 export function familyReach(tag: string, world: HarvestWorld): FamilyReach {
   const carriers = carriersOf(tag, world);
   const reachable = carriers.filter((mob) => isReachable(mob.id, world));
@@ -316,7 +310,7 @@ const MAPPED_TAGS = Object.keys(HARVEST_COMPONENT_ITEMS);
 
 describe('masterwrought R22: every mapped harvest family is reachable across the world', () => {
   it('the floor IS the settled DECISION 12 triple, written as literals', () => {
-    // state.md row 11m-D-12: TARGET (6 templates, 4 zones, 2 level bands).
+    // TARGET: 6 templates, 4 zones, 2 level bands.
     // Every other expectation in this file DERIVES from REACH_FLOOR (the
     // shortfall clauses, the fixture sizes, the teeth arm's message); this
     // is the only place the floor is stated as a TRIPLE. The clause arms
@@ -357,7 +351,8 @@ describe('masterwrought R22: every mapped harvest family is reachable across the
     // floor tomorrow. Two things are worth pinning about it: a floor on its
     // size (an empty map would make the floor arm a statement about
     // nothing; 10 measured 2026-08-25, a ratchet: raise it when a family
-    // lands, lowering it needs a ledger entry) and that every key is
+    // lands, while lowering it requires an intentional rule and test change)
+    // and that every key is
     // carried by at least one shipped template (a mapped tag nobody carries
     // is a yield nobody can reach, which is the same hole in different
     // clothes).
@@ -383,9 +378,9 @@ describe('the reachability predicate', () => {
     // quest-gated: requiresQuestId 'q_broodmother', and
     // src/sim/combat/quest_damage_gate.ts lets a player harm it only while
     // that quest is active or ready, so each character harvests the clutch
-    // for one quest window. The settled row (farming/state.md,
-    // qr-11m-SPREAD) admits count-1 named mobs and says nothing about quest
-    // gates; this phase admits the clutch by the camp predicate, RECORDS it
+    // for one quest window. R22 admits count-1 named mobs and says nothing
+    // about quest gates; this test admits the clutch by the camp predicate,
+    // records it
     // as hollow, and adds no requiresQuestId refusal to isReachable (that
     // reds silk at 5 of 6 with no flavor-true candidate left: the
     // maintainer's ruling to make, not this file's). What this arm pins is

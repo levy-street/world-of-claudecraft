@@ -518,8 +518,7 @@ evaluated over the ownership options.
   claim: an earlier decline of a crafted item rested on conquerability and was
   right for the wrong reason, since this shelf does catalogue crafted uniques.
   Masterwrought ruling `qr-19-named-legendary-instance-reliquary-page`
-  (2026-09-01); the packet record is `docs/prd/masterwrought/farming/state.md`,
-  ruling 135.
+  (2026-09-01) settled this instance-versus-definition boundary.
 
 ## Migration hazards (one-way contracts)
 

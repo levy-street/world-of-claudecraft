@@ -1,7 +1,7 @@
 // Pure, host-agnostic core for the farming HUD lines: the deny-toast key and
 // the grant-line selectors the farm event arms in hud.ts render.
 //
-// Extracted on the rule of three (state.md, the Phase 3 QA addendum): farming's
+// Extracted on the rule of three: farming's
 // view logic previously spanned gathering_view.ts (the deny key) and
 // grant_line_view.ts (the grant-line selectors) by adjacency, and the knobs
 // phase's additions are the third arrival, so farming earns its own core. The

@@ -212,8 +212,7 @@ describe('mob portrait source manifest', () => {
   it('authorizes a fingerprint-only refresh without a receipt, and only that', () => {
     // The renderer fingerprint hashes the esbuild browser bundle, whose
     // import graph reaches sim content, so content work moves it with zero
-    // pixel impact (the farming branch hit this; deviation (al) in
-    // docs/prd/masterwrought/farming/state.md). The eligible shape is the drift classifier's
+    // pixel impact. The eligible shape is the drift classifier's
     // bookkeepingOnly verdict: ONLY the bundle digest moved. Row drift, a
     // row-set change, or an edit to a tracked renderer file (renderer work,
     // not content churn) still demands the rendered receipt.

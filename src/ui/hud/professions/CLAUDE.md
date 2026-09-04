@@ -96,9 +96,9 @@ Kept at `src/ui/` root on purpose; do not pull them in without a reason:
   crafting window's title-bar button (`.crafting-orders-btn`): it is
   crafting's own sub-surface (posting an order needs the recipe context), not
   a standalone destination, so it earns no tile and no keybind.
-- `professions_view.ts`'s simplified-mode body is governed by an OPEN
-  maintainer ruling ((be), `docs/prd/masterwrought/farming/state.md`): do
-  not restructure the simplified-mode gathering rows without that ruling.
+- `professions_view.ts`'s simplified-mode body keeps the gathering rows a
+  player has used plus Farming while a bed is planted. Do not restructure that
+  reachability path without a maintainer ruling.
 - `farm_press_affordance_controller.ts` states a COMPARATIVE claim on
   purpose ("the feast before the bed"), never "your press does X". Every
   other arm of `tryNearbyInteraction` (corpses, delve objects, lootable

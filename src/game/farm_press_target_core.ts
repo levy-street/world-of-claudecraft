@@ -1,7 +1,6 @@
 // Which of the two FARMING interact targets a press takes when both are in
-// reach: the placed feast, or the garden bed under it. The recorded gap this
-// closes is that nothing on screen said (masterwrought state.md, "no interact
-// affordance says whether a press hits the feast or the bed"), so a player who
+// reach: the placed feast, or the garden bed under it. Previously nothing on
+// screen said whether a press would hit the feast or the bed, so a player who
 // walked to their bed and found a feast dropped on top of it ate instead of
 // harvesting, with no way to predict it.
 //

@@ -344,10 +344,8 @@ describe('item-art consistency accepted-art provenance', () => {
         acceptedBytes: 294_428,
       },
       {
-        // Re-minted by the farming absorb's --refresh-verdict run (Phase 11d
-        // of docs/prd/masterwrought/; farming's deviation (al) in
-        // docs/prd/masterwrought/farming/state.md): only the catalog sha and
-        // the lib self-hash moved, so the byte count held.
+        // Re-minted by the farming absorb's --refresh-verdict run: only the
+        // catalog sha and the lib self-hash moved, so the byte count held.
         path: `${evidenceDir}/final-item-art-audit-verdict.json`,
         // Release v0.41.0 sync: the verdict was hand-merged (ours' review chain
         // plus the release's three Proving Shore clauses and its tutorial-island
@@ -653,9 +651,7 @@ describe('item-art consistency accepted-art provenance', () => {
       expect(pin.sha256, pin.id).toMatch(/^[0-9a-f]{64}$/);
     }
 
-    // Re-minted with the farming branch's ITEM_ART_PENDING exemption (Phase
-    // 11d of the Masterwrought absorb; farming's deviation (al) in
-    // docs/prd/masterwrought/farming/state.md): the catalog sha follows the
+    // Re-minted with the farming branch's ITEM_ART_PENDING exemption: the catalog sha follows the
     // audit lib's self-hash fingerprint; the reviewed 907-file evidence, the
     // catalog byte count, and the shipping catalog sha are untouched.
     expect(verdict.evidence.catalog).toEqual({

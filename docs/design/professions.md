@@ -1,8 +1,6 @@
 # Professions 2.0: the shipped system
 
-The single reference for the professions system as it ships in v0.29.0. It
-consolidates the retired planning packet (the `docs/professions-2/` directory,
-which no longer exists; the branch history is the archive). Companion
+The single reference for the professions system as it ships. Companion
 documents: the original design pitch under `docs/design/professions-system/`
 (built HTML at `docs/design/professions-system.html`), the designer asset
 catalog at `docs/design/professions-asset-manifest.json`, the deed authoring
@@ -22,11 +20,11 @@ engineering, alchemy, cooking, leatherworking, tailoring, inscription,
 enchanting, jewelcrafting, weaponcrafting, armorcrafting. Six are deep
 (weapon/armor/tailor/leather/cooking/alchemy), engineering is the toolmaker
 line, enchanting is shallow but reachable, jewelcrafting ships a 0 to 50 base
-catalog (nine trainer-taught, forge-bound recipes, `JEWELCRAFTING_RECIPES`)
-with its deeper tiers still to come, and inscription ships its own 0 to 50
-base catalog (six trainer-taught, apothecary-bound recipes,
-`INSCRIPTION_RECIPES`: caster tomes plus the battle-elixir-family buff
-scrolls) with its depth likewise waiting on a future zone expansion. An archetype is
+catalog (nine trainer-taught, forge-bound recipes, `JEWELCRAFTING_RECIPES`),
+and inscription ships its own 0 to 50 base catalog (six trainer-taught,
+apothecary-bound recipes, `INSCRIPTION_RECIPES`: caster tomes plus the
+battle-elixir-family buff scrolls). Both crafts also participate in the
+intermediate and apex catalogs described below. An archetype is
 a ring-adjacent PAIR of majors (`ArchetypeState` in
 `src/sim/professions/archetype.ts`: `activeArchetype` + `pairedMajor`,
 uncapped) plus a hobby (the opposite ring craft, capped at rare); every other
@@ -64,7 +62,7 @@ epics whose defs carry the `masterwrought` flag, crafted from
 `APEX_ARMOR_RECIPES`, `APEX_GEAR_RECIPES` and `APEX_CONSUMABLE_RECIPES`
 (`src/sim/content/recipes.ts`). This is the crafting half of the
 masterwrought amendment whose gathering half is the masterwrought R17
-through masterwrought R21 paragraphs below; a packet ruling is always
+through masterwrought R22 paragraphs below; a Masterwrought ruling is always
 cited as "masterwrought R<n>" in full, because a bare R-number in this
 file means the shipped Professions 2.0 review series, a different
 namespace.
@@ -113,7 +111,7 @@ is). Reaching the top rank stamps `perfected` and merges the bonus
 delta between the recipe's own level and `PERFECTED_SOURCE_LEVEL`,
 composed through the shipped item_budget primitives, never a magic
 number. The cadence is derived, not felt: the rank count and chance give
-an expected five attempts, the mid-band of the packet's 4-to-6-week
+an expected five attempts, the mid-band of the 4-to-6-week
 target at one keystone per week (ruling qr-12-CADENCE). masterwrought R11 explicitly
 supersedes the "masterwork stays below the raid band" intent for this
 stage ONLY; the shipped masterwork proc math
@@ -158,7 +156,7 @@ online server screens CONTENT before the command reaches the sim
 (`resolvePerfectItemName`, `server/perfect_item_ref.ts`). No unique
 combat effects, ever, and the sub-cap above is the whole power story: at
 most one legendary-quality crafted piece equipped, inside the global cap.
-The packet's capstone deed `prog_legendmaker`
+The system's capstone deed `prog_legendmaker`
 (`src/sim/content/deeds.ts`) celebrates the first legendary,
 cosmetic-only per `docs/design/deeds.md`.
 
@@ -209,7 +207,7 @@ reagent side rides `INTERMEDIATE_RECIPES` (masterwrought R13 places the
 intermediates a skill tier below the apex recipes): the Prismglass
 Setting is jewelcrafting's intermediate (`recipe_prismglass_setting`),
 and the whole chain paces off `recipe_quickening_catalyst`'s
-`oncePerDay` gate, the packet's one pacing gate, which is also why the
+`oncePerDay` gate, the system's one daily crafting gate, which is also why the
 provisioner firewall (masterwrought R17, below) names it: farm produce
 never feeds this chain, and gathering feeds it through the apex recipe
 bills instead (the supply matrix's endgame column).
@@ -277,9 +275,9 @@ promises no daily reset. What is new is that the WAIT is the gathering step
 rather than a cooldown on a step you already took. The growth engine and its draw
 contract live in `src/sim/professions/farming.ts`, the bed geography in
 `src/sim/content/farm_patches.ts`, and the crop catalog in
-`src/sim/content/farm_crops.ts`; the per-zone tier ladder is farming's own
-(`farmingZoneTierFor`, `src/sim/professions/farming_zones.ts`) and
-deliberately disagrees with the shipped progression column at one zone.
+`src/sim/content/farm_crops.ts`; `FARM_PATCHES[].tier` is the authoritative
+per-zone tier ladder and deliberately disagrees with the shipped progression
+column at one zone.
 
 Two things separate it from the node trades and both matter downstream.
 Planting is what needs the tool, so a crop of tier N needs a hoe of tier N
@@ -379,8 +377,7 @@ Hidden per-cast state is a set of transient Entity fields
 `fishCastZoneId`, `gatherCastToolRarity`), never wired, never
 persisted, cleared on every cast-end path.
 
-FISHING'S STATED IDENTITY (the content pass's richness audit, veto-able
-in the review worklist's ledger): fishing deliberately has NO fine-grade
+FISHING'S STATED IDENTITY: fishing deliberately has NO fine-grade
 axis. Its specials are the zone-exclusive catch ladder itself (every
 zone's fish are strictly better eating and coin), the Glimmerfin Koi and
 the Codfather as its rare moments, the Slatefin as its zone-3 exclusive,
@@ -550,12 +547,18 @@ nor from any 25-point band below it, and this is enforced by a TEST rather
 than by intention. **masterwrought R21** is the demand half of the same
 invariant, at the scope a test can actually hold: every id a family SUPPLIES
 must have at least one consumer. The wider masterwrought R21 question, whether the world
-eats what the crafts MAKE, is a judgment surface recorded in the packet
-ledger's ratio table rather than something this guard asserts. Both live in
+eats what the crafts MAKE, remains a tuning judgment rather than something
+this guard asserts. The enforceable rules live in
 `tests/gathering_supply_coverage.test.ts`, which derives every supply set
 and every band from the live content tables and asserts PRESENCE only, never
 a count: a numeric floor would turn a correctness guard into a content quota
 that passes on padding.
+
+**masterwrought R22, harvest components must be geographically reachable.**
+Every mapped corpse-harvest tag appears on at least six reachable templates in
+at least four zones spanning at least two level bands. Reachability excludes
+disabled content but admits named and quest-gated mobs; the literal floor and
+its mutation probes live in `tests/harvest_geography.test.ts`.
 
 **That test is the live authority for this table.** When the two disagree,
 the test is the truth and this table is what gets fixed.
@@ -743,7 +746,7 @@ by `tests/professions_station_placement.test.ts`). Field recipes
 anywhere; every ladder recipe is trainer-taught AND station-bound. The
 mobile-crafting-station specialization perk bypasses the station gate.
 
-THE CRAFTING-ANCHOR RECORD (the review worklist's content pass, item 5):
+THE CRAFTING-ANCHOR RECORD:
 engineering's all-Eastbrook placement, the one toolworks station with
 Tinker Gizzel as its only trainer, is the DELIBERATE hub design, not a
 gap. The craft's outward pull rides its reagent side (the tier-3-plus
@@ -796,8 +799,7 @@ active every other one reports unavailable in both hosts. One cadence-capped
 repeatable work-order quest per master (coin = floor(0.5 * summed vendor
 sellValue of the requested materials), `WORK_ORDER_PAYOUT_FRACTION`,
 cadence `WORK_ORDER_CADENCE_TICKS`; vendoring is always more gold by
-construction). Two settled work-order calls from the review worklist's
-content pass, both veto-able rulings in its ledger: the LATER-ZONE
+construction). Two settled work-order calls define the current design: the LATER-ZONE
 THINNESS (four orders in Eastbrook, one each in Fenbridge and Highwatch)
 is deliberate, because orders are a per-master convention and the zones
 have one station master each; filling it would need either non-master
@@ -881,7 +883,7 @@ guards.
 | FISHING_CATCH_BAND_THRESHOLDS | src/sim/professions/fishing_bands.ts | 0 / 100 / 150 / 200 / 200 / 200 (six bands; the SHARED PROFICIENCY_BAND_THRESHOLDS stays [0, 100, 200]) |
 | FISH_BITE_DELAY_MIN / MAX / ROD_REDUCTION (sec) | src/sim/professions/fishing.ts | 3 / 8 / 1.5 |
 | FISH_REEL_WINDOW_SEC / _ROD_BONUS_SEC / _RARITY_BONUS_SEC | src/sim/professions/fishing.ts | 2.5 / 0.75 / 0.25 |
-| FISHING_SESSION_CAP_SEC | src/sim/types.ts | 16 (moved from 15 at masterwrought Phase 11i, forced by the tier-6 rod: see the packet doc) |
+| FISHING_SESSION_CAP_SEC | src/sim/types.ts | 16 (moved from 15 when the tier-6 rod joined the catch ladder) |
 | FISHING_GAIN_SCHEDULE | src/sim/professions/fishing.ts | 0.08 below 50, 0.05 below 100, 0.04 below 150, 0.03 below 200 (retuned at masterwrought Phase 11i from a measured casts-to-200 model; the four BOUNDARIES are frozen because fishingTeachingCeilingFor derives from them) |
 | FISHING_JUNK_GAIN_CUTOFF_PROFICIENCY | src/sim/professions/fishing.ts | 100 |
 | WORK_ORDER_CADENCE_TICKS / PAYOUT_FRACTION | src/sim/professions/cadence.ts | 36000 / 0.5 |
@@ -904,8 +906,7 @@ LONGER MATCHES IT: masterwrought Phase 11i measured the climb rather than
 estimating it and retuned FISHING_GAIN_SCHEDULE to about 11 reference hours,
 redistributing the cost instead of lengthening it (the old values put 84
 percent of the climb in the last fifty points). The 15-to-25 band above is
-kept as the record of what was aimed at, not as a description of what ships. The craft-mastery band MOVED from the authored 10-to-20 by the
-content pass's veto-able ruling (the review worklist's ledger): the old
+kept as the record of what was aimed at, not as a description of what ships. The craft-mastery band MOVED from the authored 10-to-20 after measurement: the old
 figure predated the v0.32.0 expansion, whose starter zones re-grant the
 top-rung materials from ten more zones (the all-zones supply arm in
 `tests/professions_crafts_to_mastery.test.ts` prices the same bill at
@@ -1208,8 +1209,8 @@ must be re-derived if either number is ever tuned on its own.
 - Rare-event cadence stays ONE shared knob until zone-expansion data argues
   for a per-family split.
 - Fine-grade market depth floats free of supply pressure, by construction:
-  node timers are strictly per player (`PlayerMeta.nodeHarvestReadyAt`; the
-  shared-depletion rejection is recorded at the packet design record's D6),
+  node timers are strictly per player (`PlayerMeta.nodeHarvestReadyAt`; shared
+  depletion is rejected by design),
   so no player's harvesting tightens anyone else's supply, and every
   fine-grade ask on the market is priced against effectively unlimited
   personal faucets rather than scarcity. That is the accepted trade of the

@@ -37,7 +37,7 @@ import {
 } from './enchanting';
 import { SUNDERED_ESSENCE_ITEM_ID } from './masterwrought_materials';
 
-// Deterministic: one essence per sundered epic (recorded in state.md; the
+// Deterministic: one essence per sundered epic (the
 // RS3 trimmed-masterwork model this stage follows is a 1:1 sink).
 export const SUNDERED_ESSENCE_YIELD = 1;
 

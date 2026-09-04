@@ -4,7 +4,7 @@
 // (professions/sundering.ts). Consumers arrive with the apex recipe phases;
 // until then this module is the complete income side of the system.
 //
-// Faucet map (rulings R4 / R9, docs/prd/masterwrought/state.md):
+// Faucet map (rulings R4 / R9; see docs/design/professions.md):
 // - Wyrmfall Core: 1 to 3 per credited final-boss kill in the raid (either
 //   difficulty) and the heroic five-mans, per participant, once per character
 //   per source per reset day; rift A and S rank FIRST clears grant a
@@ -45,7 +45,7 @@ export const SUNDERED_ESSENCE_ITEM_ID = 'sundered_essence';
 export const MAKERS_EMBER_ITEM_ID = 'makers_ember';
 
 // One rng draw per credited eligible final-boss kill; every participant of
-// that kill shares the rolled count (recorded in state.md).
+// that kill shares the rolled count.
 export const WYRMFALL_BOSS_MIN = 1;
 export const WYRMFALL_BOSS_MAX = 3;
 

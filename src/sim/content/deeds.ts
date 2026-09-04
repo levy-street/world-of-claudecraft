@@ -2959,8 +2959,7 @@ export const DEEDS: Record<string, DeedDef> = {
   // fishing's one title and the catalog gives a profession one.
   //
   // THE TRIGGER IS 'collectItems', AND THE WORDING FOLLOWS THE TRIGGER RATHER
-  // THAN THE OTHER WAY ROUND. The phase file called for "the apex rod CRAFT on
-  // the shipped craft trigger", but there is no shipped per-ITEM craft trigger
+  // THAN THE OTHER WAY ROUND. There is no shipped per-ITEM craft trigger
   // in the DeedTrigger union: the craft-shaped kinds are craftSkill (a skill
   // milestone, and prog_grandmaster_engineering above already owns that rung)
   // and the 'craft_rare' / masterwork visit marks (per-CRAFT, not per-item).
@@ -2968,20 +2967,19 @@ export const DEEDS: Record<string, DeedDef> = {
   // deedStats.itemsDiscovered, which col_glimmerfin and col_full_creel already
   // use. That trigger fires on ANY acquisition, market purchase included, so
   // the desc says OBTAIN and not CRAFT: a deed that claimed a craft while
-  // firing on a purchase would be a false player-facing claim, which is the
-  // defect class this packet has spent the most review budget on. It is also
+  // firing on a purchase would be a false player-facing claim. It is also
   // the R18-consistent reading, since the rod must stay buyable.
   //
   // A per-item craft mark WAS the alternative and was declined here rather than
   // silently: it needs a new namespace registered in src/sim/deeds.ts plus a
   // save/load round-trip pin in the same change (an unregistered namespace
   // serializes fine and is DROPPED on load, which has bitten this codebase
-  // twice), and it makes migration-safety a required reviewer. That is a
-  // maintainer call, not a phase one; the discrepancy is recorded in state.md.
+  // twice), and it makes migration-safety a required reviewer. That remains a
+  // maintainer decision rather than an implicit content default.
   //
   // Category 'collection' matches its trigger family (col_glimmerfin,
   // col_full_creel), and the row sits BEFORE the farming block below so that
-  // block stays last and contiguous under the packet's three-tier ordering.
+  // block stays last and contiguous under the catalog's three-tier ordering.
   col_deepest_cast: {
     id: 'col_deepest_cast',
     name: 'The Deepest Cast',
@@ -3026,9 +3024,9 @@ export const DEEDS: Record<string, DeedDef> = {
   // (FARM_CHRONICLE_ZONES, src/sim/deeds.ts). ALL FOUR are earnable today:
   // plantCrop carries no bed-tier gate (probed live in the celebrations
   // phase), so vendor-stocked tier 1/2 seeds can be planted and harvested at
-  // every hub, Highwatch and the Evergarden included. That held even while
-  // tier 3/4 seeds had no faucet, because state.md (bo) gated the high-tier
-  // CROPS and never these marks; since GATE 1 (Phase 11e) stocked all eight
+  // every hub, Highwatch and the Evergarden included. That held even before
+  // tier 3/4 seeds had a faucet because only the high-tier CROPS were gated,
+  // never these marks; since GATE 1 (Phase 11e) stocked all eight
   // upper seeds the caveat is moot, and the marks were never the constraint.
   chr_vale_first_harvest: {
     id: 'chr_vale_first_harvest',
@@ -3212,7 +3210,7 @@ export const DEEDS: Record<string, DeedDef> = {
   // fail-forward Perfecting rank track paces the road here (roughly five
   // weeks at one Maker's Ember per week), and the promotion act itself never
   // rolls, the prog_masterwright precedent. Double prog_masterwright's 25
-  // deliberately: this is the packet's capstone, a roughly five-week paced
+  // deliberately: this is the system's capstone, a roughly five-week paced
   // chain stacked ON TOP of the masterwork moment that deed already rewards,
   // so it sits in rule 7's top prestige band while staying zero-rng on the
   // act itself.

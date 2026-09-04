@@ -108,8 +108,8 @@ export const GATHERING_PROFESSION_IDS: GatheringProfessionId[] = [
 // content tags is listed here. History, since the gap it closes is the kind
 // that reopens quietly: #1141 shipped six rows (hide, fang, silk, venomSac,
 // meat, cloth); `claw` and `tusk` were wired at #2905 (fen_troll's family);
-// `horn` and `gills` were wired at Masterwrought Phase 11m (state.md row
-// 11m-ORPHAN), which reuses two shipped ids rather than minting new ones:
+// `horn` and `gills` were wired at Masterwrought Phase 11m, reusing two
+// shipped ids rather than minting new ones:
 // horn reads as the same hard keratin as tusk, so it feeds curved_tusk, the
 // thinnest mapped family in the 11m census; gills feeds mudfin_scale, the
 // trophy 11l promoted out of quality 'poor' so the junk sweep never sells it.
@@ -214,7 +214,7 @@ export function monsterMaterialTierFor(component: string): number {
 // specimen-less too would have put fen_troll (claw, tusk) and old_greyjaw
 // (hide, fang, claw) each over that line.
 //
-// horn and gills (Phase 11m, state.md row 11m-ORPHAN) carry NO specimen, as a
+// horn and gills carry NO specimen, as a
 // decision and not a default: both sit at MONSTER_MATERIAL_TIERS 1, the
 // bare-hands floor, and a signed pristine jackpot on a bare-hands-floor
 // component would invert the premium ladder that tier table exists to state

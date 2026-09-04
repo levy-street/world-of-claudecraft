@@ -7,8 +7,8 @@
 // derived in tests/apex_pattern_items.test.ts rather than restated here, since
 // a hand count is the thing that goes stale.
 //
-// R8 channel doctrine (the recorded phase decision; docs/prd/masterwrought/
-// state.md, "Phase 11 pre-fan-out ledger"): the three pillars split the 28.
+// R8 channel doctrine, summarized in docs/design/professions.md: the three
+// pillars split the 28.
 //   RAID: the ten APEX_GEAR patterns ride the Nythraxis base loot table as the
 //     appended 'nythraxis_patterns' rollGroup (content/dungeons.ts), one
 //     partitioned draw at 0.04 each, at most one pattern per kill.

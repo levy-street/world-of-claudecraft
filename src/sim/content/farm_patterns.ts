@@ -20,8 +20,8 @@
 // never asks which craft owns it. pattern_items.ts, training.ts, wheel.ts and
 // crafting.ts are byte-identical across this phase.
 //
-// masterwrought R8 channel doctrine as wired (the recorded rates live in
-// docs/prd/masterwrought/state.md at this phase's ledger row):
+// masterwrought R8 channel doctrine as wired and summarized in
+// docs/design/professions.md:
 //   RAID: pattern_harvest_feast rides the Nythraxis base loot table as the
 //     appended 'nythraxis_farm' rollGroup, with the tier-4 seeds. The farm
 //     ladder's pinnacle on the pinnacle encounter.
@@ -63,9 +63,8 @@
 // sellValue stays UNIFORM at the shipped point of 100, the same single point
 // all 28 apex patterns use. sellValue on a kind 'recipe' item is a vendor
 // floor for a tradable teaching item, not a power statement, and the shipped
-// catalog carries exactly ONE point for that entire class; the rung is carried
-// by the mark price and the channel, which is where the packet already carries
-// it. Minting a second point for the farm set was rejected as a number nobody
+// catalog carries exactly ONE point for that entire class; the mark price and
+// channel already carry the rung. Minting a second point for the farm set was rejected as a number nobody
 // measured, bought to restate a rung two other surfaces already state.
 // Typed as the NARROW RecipeItemDef rather than the ItemDef union its apex
 // sibling uses, deliberately: the def shape above is a contract, and the narrow

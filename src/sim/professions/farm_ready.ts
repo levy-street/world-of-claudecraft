@@ -128,7 +128,7 @@ export function notifyFarmReady(ctx: SimContext, meta: PlayerMeta): void {
     }
   }
   if (ready + withered === 0) return;
-  // The notice is TRANSIENT by design (state.md deviation (bb)): a farmer
+  // The notice is TRANSIENT by design: a farmer
   // whose socket is not open when this frame is routed (the linkdead grace,
   // or a disconnect inside the one tick between addPlayer and its drain)
   // never hears it, and the flag above stays flipped, so nothing repeats it.

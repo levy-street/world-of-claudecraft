@@ -150,9 +150,8 @@ const DROWNED_LITANY_SHOP: DelveShopEntry[] = [
   // longer true, and 24 and 56 Marks are now ACCESS prices rather than comfort
   // prices. The three LAND rows at each rung are unaffected: no node tier
   // moved. Re-deriving the two rod prices is a delve-economy decision with no
-  // ruling behind it, so this phase records the invalidation and leaves the
-  // numbers alone rather than inventing two; flagged for the maintainer in
-  // state.md.
+  // approved replacement values, so this code leaves the numbers alone rather
+  // than inventing two.
   //
   // THE TIER-6 APEX ROD IS DELIBERATELY ABSENT, and since masterwrought Phase
   // 11j it is the ONLY such absence: osmium_hoe was the other one, and 11j

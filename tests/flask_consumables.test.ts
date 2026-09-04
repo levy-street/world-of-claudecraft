@@ -690,7 +690,7 @@ describe('flask auras are undispellable (the phase 10 QA STK-2 ruling, 2026-08-1
 });
 
 describe('the R5 full kit: a flask and a Well Fed plate ride together, both magnitudes at once', () => {
-  // ADDED AT PHASE 15. R5 (docs/prd/masterwrought/state.md) measures a geared
+  // R5 (docs/design/power-verification.md) measures a geared
   // individual carrying flask PLUS food, so that exact pair is the one the
   // envelope depends on. The death contrast above quaffs the flask BEFORE the
   // meal, which never puts a live Well Fed in front of the singleton strip or

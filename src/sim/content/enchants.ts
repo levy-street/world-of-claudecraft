@@ -531,9 +531,9 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   // declares ItemDef.slot 'mainhand' and is legal in the offhand, and the
   // enchant slot gate compares itemDef.slot to enchant.itemSlot, so a fury
   // warrior, an enhancement shaman and a rogue all carry the weapon enchant
-  // twice while recalcPlayerStats reads both instances. The packet's ratified
-  // R5 arithmetic (state.md, "the full physical kit at 4.2 to 4.7 percent") is
-  // consistent only with counting this term ONCE; the record states the
+  // twice while recalcPlayerStats reads both instances. The ratified R5
+  // arithmetic in docs/design/power-verification.md is consistent only with
+  // counting this term ONCE; the record states the
   // percentage, not the working, so that is an inference and is written as one.
   // At 7 the per-character delta over Greater was 4 str for a dual-wielder
   // against the 2 a single-weapon model gives; at 6 it is 2. The rung still

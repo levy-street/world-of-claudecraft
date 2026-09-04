@@ -2,16 +2,15 @@
 // THE GATHERING SUPPLY COVERAGE INVARIANT (masterwrought R20 and R21)
 // ---------------------------------------------------------------------------
 //
-// The rule, stated once so a contributor who has never read the Masterwrought
-// packet can act on a red here:
+// The rule, stated once so a contributor can act on a red here:
 //
 //   EVERY GATHERING FAMILY MUST FEED THE CRAFTS AT EVERY BAND. A gathering
 //   profession that supplies nothing at some 25-point skill band is a
 //   profession a player levelling through that band has no reason to have
 //   taken, and the hole is invisible until someone plays it.
 //
-// masterwrought R20 (docs/prd/masterwrought/state.md, restated in
-// docs/design/professions.md) is the supply half: every family appears in at
+// masterwrought R20 (docs/design/professions.md) is the supply half: every
+// family appears in at
 // least one recipe in every band below the gathering cap, AND in at least one
 // endgame recipe at or above it. masterwrought R21 is the demand half: every
 // id a family supplies has at least one consumer somewhere in the merged
@@ -26,8 +25,8 @@
 // 2026-08-20). No COVERAGE arm in this file asserts a count of bills. Zero is a
 // structural fact; everything above zero is a balance number nobody measured,
 // and a numeric floor would turn a correctness guard into a content quota that
-// passes on padding. The per-band and per-material counts ARE collected, and
-// they are recorded in the phase ledger as a judgment surface instead.
+// passes on padding. The per-band and per-material counts remain available as
+// a judgment surface instead.
 //
 // THE CARVE-OUT, written into the ruling rather than left for a reader to trip
 // over (masterwrought Phase 11j QA). The anti-vacuity block at the bottom DOES
@@ -81,8 +80,8 @@
 // consumer can only make the arm report an orphan that is not one, a false
 // RED that a human resolves, never a false green that hides a dead material.
 // The family-scoped arm keeps that two-mechanism scope and its pins untouched.
-// The MATERIAL-WIDE presence arm beside it (masterwrought Phase 11m, state.md
-// row 11m-FLOOR) is the one that took the trade the other way: it covers every
+// The MATERIAL-WIDE presence arm beside it is the one that took the trade the
+// other way: it covers every
 // id in MATERIAL_ITEM_IDS, so it walks the WIDE demand index (wideDemandIndex
 // below: recipes, enchants, quest collect objectives, the farming verbs, and
 // the same substitution credit), because over the whole material set the
@@ -120,10 +119,9 @@
 // census, tests/material_profession_affinity.test.ts, already pairs this same
 // skip with this same positive arm on this same live list, so the two
 // censuses on the merged tree agree about what a staged material is.
-// Whether masterwrought R21 should admit a staged-reagent state at all, or
-// the classification should instead wait for the recipes, is a scope call on
-// a ratified packet ruling (11m-FLOOR) and belongs to the maintainer: it is
-// routed to the Phase 19 decision table and is NOT settled here.
+// The staged-reagent exception remains limited to the live pending list; once
+// a consumer lands, the self-retiring checks below require the id to rejoin the
+// ordinary presence floor.
 //
 // EVERY DERIVATION READS THE LIVE TABLES: the subject list comes from
 // GATHERING_PROFESSION_IDS, the supply sets come from the content tables the
@@ -319,9 +317,8 @@ function consumptionIdsFor(itemId: string): string[] {
 /** The consumers of each id, over ALL reagent sources on the tree.
  *
  *  CONSUMERS ONLY. This used to accumulate a `units` total beside them and
- *  nothing ever read it: the ledger's demand RATIO table is measured by a
- *  temporary reporter over these same two corpora and then deleted, which is
- *  where the unit counts belong. A field the guard computes on every run and
+ *  nothing ever read it. Unit counts are tuning data rather than a correctness
+ *  contract. A field the guard computes on every run and
  *  never asserts is dead code that reads like coverage (masterwrought Phase
  *  11j QA). */
 function demandIndex(): Map<string, { consumers: string[] }> {
@@ -346,7 +343,7 @@ function demandIndex(): Map<string, { consumers: string[] }> {
 }
 
 /**
- * THE WIDE DEMAND INDEX (masterwrought Phase 11m, state.md row 11m-FLOOR):
+ * THE WIDE DEMAND INDEX:
  * every spend mechanism the tree has, for the MATERIAL-WIDE presence arm.
  * Starts from demandIndex() (recipes and enchants, unchanged) and adds:
  *
@@ -415,8 +412,7 @@ const MATRIX = bandMatrix();
 const DEMAND = demandIndex();
 const WIDE_DEMAND = wideDemandIndex();
 
-const WHERE_THE_RULE_LIVES =
-  'masterwrought R20, docs/prd/masterwrought/state.md, restated in docs/design/professions.md';
+const WHERE_THE_RULE_LIVES = 'masterwrought R20, docs/design/professions.md';
 
 describe('masterwrought R20: every gathering family feeds the crafts at every band', () => {
   it('reports EVERY empty levelling band at once, never just the first', () => {
@@ -524,8 +520,7 @@ describe('masterwrought R20: every gathering family feeds the crafts at every ba
 
 describe('masterwrought R21: the world eats what the gathering families supply', () => {
   it('every supplied id has at least ONE consumer (presence only, never a count)', () => {
-    // PRESENCE AND NOWHERE ELSE (masterwrought decision E). The counts are
-    // collected above and recorded in the ledger's ratio table; asserting one
+    // PRESENCE AND NOWHERE ELSE (masterwrought decision E). Asserting a count
     // here would convert this guard into a content quota.
     const orphans: string[] = [];
     for (const family of FAMILY_IDS) {
@@ -548,14 +543,14 @@ describe('masterwrought R21: the world eats what the gathering families supply',
   });
 
   it('every material id has at least ONE consumer across every spend mechanism (presence only)', () => {
-    // THE MATERIAL-WIDE ARM (masterwrought Phase 11m, state.md row 11m-FLOOR).
+    // THE MATERIAL-WIDE ARM.
     // Subject: every id in MATERIAL_ITEM_IDS (src/sim/material_taxonomy.ts),
     // not only what the six gathering families supply. Index: the WIDE one
     // (wideDemandIndex above): recipe reagents, enchant reagents, quest
     // collect objectives, the farming verbs, and downward grade substitution
     // through consumptionIdsFor. The ONLY assertion is presence, a consumer
-    // count at or above 1; consumer and unit counts per material are the
-    // ledger's ratio table and are never asserted here. A mechanism this
+    // count at or above 1; consumer and unit counts per material are diagnostic
+    // tuning data and are never asserted here. A mechanism this
     // index misses can only produce a FALSE RED (a spent material reported as
     // dead), never a false green, and the failure names the material and the
     // mechanisms walked so the reader knows what to add.
@@ -582,7 +577,7 @@ describe('masterwrought R21: the world eats what the gathering families supply',
           `${WIDE_DEMAND_MECHANISMS.join('; ')}. Either the material is dead content ` +
           `(the fix is a consumer at the rung that PRODUCES it, masterwrought R21) or it is ` +
           `spent by a mechanism wideDemandIndex does not walk yet (add the mechanism there, ` +
-          `citing its spend site). Rule: ${WHERE_THE_RULE_LIVES}, state.md row 11m-FLOOR.`,
+          `citing its spend site). Rule: ${WHERE_THE_RULE_LIVES}.`,
       );
     }
     expect(orphans).toEqual([]);
@@ -621,8 +616,7 @@ describe('masterwrought R21: the world eats what the gathering families supply',
           `CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS ` +
           `(src/sim/content/crucible_professions.ts), whose own contract retires an id ` +
           `the moment a live recipe names it, and reagent derivation owns the ` +
-          `classification from then on. Rule: ${WHERE_THE_RULE_LIVES}, state.md row ` +
-          `11m-FLOOR.`,
+          `classification from then on. Rule: ${WHERE_THE_RULE_LIVES}.`,
       ).toEqual([]);
     }
   });
@@ -679,7 +673,7 @@ describe('the derivation itself cannot pass by matching nothing', () => {
       herbalism: 6,
       fishing: 10,
       farming: 24,
-      // 14 since masterwrought Phase 11m (state.md row 11m-ORPHAN), two facts:
+      // 14 since horn and gills joined the mapping, for two reasons:
       // gills maps to mudfin_scale, an id NEW to the corpse set (+1), while
       // horn maps to curved_tusk, which tusk already supplied, so corpseSupply
       // (src/sim/professions/gathering_supply.ts spreads Object.values into a

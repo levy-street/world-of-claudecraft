@@ -1,4 +1,21 @@
-# Phase 20 fill package (the STEP 1 derivation, 2026-09-02, at 103934491b)
+# Masterwrought release fill handoff
+
+This is the only live handoff retained from the completed Masterwrought planning
+packet. The inventory below was derived on 2026-09-02 at `103934491b`; regenerate
+the registry and worklist before executing it against a newer release tip.
+
+The retired packet and the detailed 418-key wiki audit remain available in git
+history at `6742cd8bf2e65b44b5f8a8887d3ec767c258eff2`, under
+`docs/prd/masterwrought/`. References below to `state.md`, farming state, QA
+records, or numbered phases point to that immutable snapshot rather than live
+documentation. Current shipped behavior is documented in
+`docs/design/professions.md`.
+
+At that archival point the audit had verified 763 findings across 418 keys.
+Thirteen corrected keys had landed, 71 changes-page corrections were drafted
+but still required adversarial verification, and 332 lower-severity keys
+remained as a follow-up inventory. Re-audit the archived rows against the live
+tree before applying them.
 
 The complete fill set the release-tier pass must close, re-derived at execution from the
 registry AND from every source the registry cannot see. Counts are measured at the tip
@@ -273,9 +290,9 @@ otherwise left as a dated historical record.
 
 ### K (continued). What the wiki completeness audit lane added, 2026-09-03
 
-The audit lane (docs/prd/masterwrought/phase-20-wiki-audit.md, ledger at its foot; the
-per-finding record is phase-20-wiki-audit-findings.md) ran before this fill, as ruled. What
-it changed in the registry, measured rather than remembered:
+The audit lane in the retired packet ran before this fill. Its complete per-finding
+record is preserved at the immutable commit named above. What it changed in the
+registry, measured rather than remembered:
 
 - **SIX NEW KEYS, no retirement and no re-key** (commit a206370548). The farming page had
   been rendering the node trades' `guide.profPages.rhythmBody`, `gainBody` and `yieldsBody`,
@@ -299,6 +316,7 @@ it changed in the registry, measured rather than remembered:
 
 WHAT THIS FILL MUST NOT ASSUME: the audit's corrections are ONE UNIT IN, not finished. 418
 keys carry a verified defect and the scope of correcting them is an OPEN MAINTAINER RULING
-recorded in the audit doc's ledger, because every further correction mints pending rows and
-would re-open exactly the staleness this fill closes. Settle that ruling before filling, or
-the fill pays for the same keys twice.
+recorded in that historical audit ledger, because every further correction mints pending
+rows and would re-open exactly the staleness this fill closes. Re-audit those keys against
+the current tree and settle the scope before filling, or the fill pays for the same keys
+twice.

@@ -1048,8 +1048,8 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
   // seed itself is fenced (noVendorSell, noMarketList: no vendor, market,
   // mail, or guild-bank cash-out), so the faucet feeds beds, not coin;
   // face-to-face trade is the one exchange pipe that does not read those
-  // flags (a cooperative pair can pass free seeds), ledgered for the
-  // maintainer in docs/prd/masterwrought/farming/state.md. Accepted at go-live.
+  // flags (a cooperative pair can pass free seeds). That exception is accepted
+  // at go-live.
   q_farm_intro: {
     id: 'q_farm_intro',
     name: 'First Furrow',

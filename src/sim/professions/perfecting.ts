@@ -70,8 +70,7 @@ import type { CraftSkills } from './wheel';
 // The rank track: rank PERFECTING_RANKS is Perfected itself, so the persisted
 // `perfecting` field only ever holds a mid-track value in
 // [1, PERFECTING_RANKS - 1] (absent = rank 0). Counts derived against the
-// qr-12-CADENCE criterion (the derivation is recorded in
-// docs/prd/masterwrought/state.md): 4 ranks at 0.8 give E[attempts] = 5, the
+// qr-12-CADENCE criterion: 4 ranks at 0.8 give E[attempts] = 5, the
 // mid-band of the 4-to-6-week target at one Maker's Ember per week.
 export const PERFECTING_RANKS = 4;
 export const PERFECTING_SUCCESS_CHANCE = 0.8;

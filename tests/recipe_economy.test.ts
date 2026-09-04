@@ -156,14 +156,13 @@ describe('THE ECONOMY INVARIANT', () => {
     // with recipe_elixir_of_the_serpent because the two grant a byte-identical
     // buff (tests/inscription_scroll_exclusivity.test.ts pins the payload), and
     // the ruling lived only in a comment, so Phase 11g's frost_gourd on the
-    // elixir drifted it by 15 copper with nothing red. The pin the ledger asked
-    // for lives HERE, beside the rule it is computed through, and it records
+    // elixir drifted it by 15 copper with nothing red. The pin now lives HERE,
+    // beside the rule it is computed through, and it records
     // the NUMBERS and the equality (the maintainer's value (c)): a one-sided
     // insertion, a both-sided drift, and a reagent re-price all red and come
     // back to the maintainer instead of passing as a float. Rung 50 alone: the
-    // rung-25 (90 against 106) and rung-0 (26 against 36) pairs are recorded
-    // as drifted in docs/prd/masterwrought/state.md and deliberately unpinned,
-    // because pinning an unruled band's numbers would ratify its drift.
+    // rung-25 (90 against 106) and rung-0 (26 against 36) pairs are deliberately
+    // unpinned because pinning an unruled band's numbers would ratify its drift.
     const scroll = ALL_RECIPES.find((r) => r.id === 'recipe_sunpetal_scroll');
     const elixir = ALL_RECIPES.find((r) => r.id === 'recipe_elixir_of_the_serpent');
     expect(scroll, 'recipe_sunpetal_scroll').toBeDefined();
@@ -979,7 +978,7 @@ describe('REFERENTIAL INTEGRITY', () => {
   });
 
   it('every intermediate row holds the R13 rung shape, and the nine consume exactly one catalyst', () => {
-    // Per-row pins for the Phase 07 ledger contract (review round): the
+    // Per-row pins for the R13 intermediate contract: the
     // affinity consumer-set pin only proves catalyst PRESENCE, so a row
     // asking for five catalysts, or slipping off the 75 rung, would
     // otherwise stay green.

@@ -1,14 +1,7 @@
-# Phase 03 naming audit (R15): every shipped player-visible proper noun
+# Masterwrought naming audit (R15): every shipped player-visible proper noun
 
-PROMOTED 2026-08-30 from `docs/prd/masterwrought/` into `docs/design/` (Phase 17,
-NEW WORK N13, on the farming-asset-manifest precedent) so the live test citations
-(`tests/originality_renames.test.ts`, `tests/ip_scrub.test.ts`) outlive the
-eventual packet-doc teardown. The body below is the unedited record: a bare
-`state.md` or `farming/state.md` in it means `docs/prd/masterwrought/state.md`
-and `docs/prd/masterwrought/farming/state.md`, its former siblings.
-
-Audited 2026-08-07 on `feature/masterwrought` (base a2f0082a32). Ruling R15
-(`state.md`): never reuse a coined term or full item name distinctive to another
+Audited 2026-08-07 on `feature/masterwrought` (base a2f0082a32). Ruling R15:
+never reuse a coined term or full item name distinctive to another
 game; pre-existing shipped collisions get display-name-only renames (ids are
 frozen and never change). This document is the per-name verdict record the
 acceptance checklist requires; the standing authoring-time rule it feeds lives in
@@ -122,8 +115,8 @@ Marshal GENERIC keeps lost their subjects (both now ship under release-minted
 CLEAR names). The three release names carry the maintainer's own ruling and
 enter the appendix as CLEAR rows; the release also shipped real translations
 for all three in every locale, which refills the 26 knight-lieutenant Latin
-deed rows this phase had stripped (ledger obligation counts amended in
-state.md). Recorded id-rule keeps from the same merge: the release-baked
+deed rows this phase had stripped. Recorded id-rule keeps from the same merge:
+the release-baked
 shaman clip id Storm_Strike, the murloc/kobold GLB filename families, and
 lowercase generic vocabulary in dev comments ("imp") are id or dev surfaces,
 not display names, and stay frozen by the same rule that keeps
@@ -383,7 +376,7 @@ Vellum.
       (genre-standard condition vocabulary describing the character's state
       rather than a coined mark), per the ruling; any future trade-dress
       tightening starts here.
-      AMENDED 2026-08-29 (Phase 16, row state-OPEN-WELLFED): the
+      AMENDED 2026-08-29 after the 11c unification: the
       generic-with-caveat caveat from ruling (9) is RETIRED by the 11c
       unification. The merged-registry question ("two mechanics share the
       name, rename one?") DISSOLVED at 11c: after the unification there is
@@ -592,7 +585,7 @@ rejected).
 
 ### Phase 11o, the engineering on-ramp (web-verified 2026-08-25)
 
-Scope: the two new item ids qr-11o-ENG mints (farming/state.md row 119), a
+Scope: the two new item ids qr-11o-ENG mints, a
 skill-0 mechanical component and a skill-25 crafted caster offhand. Both
 identities derive from registers this catalog already owns: the
 precision_chassis mechanical-parts doctrine for the component, and the
@@ -785,7 +778,7 @@ Amberfall Harvest, Wrathwing... (renamed), Hellfire... (renamed).
   commit `fix(i18n): strip residual other-game coins from locale overlays`.
 - 219 stale-calque item rows and 23 calque-only prose rows (translations of
   pre-rename names carrying no other-game coin) remain for the release-time
-  locale fill, listed in the Phase 03 ledger.
+  locale fill.
 - This phase's renames refreshed the five non-Latin locales in-change (M16) and
   stripped the stale Latin rows to pending (720 rows), the exact c55bf057c2
   protocol; several replaced non-Latin values were the other game's official

@@ -240,8 +240,7 @@ export function effectiveFishingBand(meta: PlayerMeta): FishingCatchBand {
 //
 // THE VALUES ARE DERIVED FROM A MEASURED CASTS-TO-200 MODEL (masterwrought
 // Phase 11i, DECISION F), the same R19 discipline the farming curve gets. The
-// model itself is recorded in docs/prd/masterwrought/state.md so the tune
-// reproduces from the doc alone, and tests/professions_fishing.test.ts
+// model is restated below, and tests/professions_fishing.test.ts
 // RE-RUNS it against these four literals rather than restating them. In one
 // paragraph, so a reader here is not sent away:
 //

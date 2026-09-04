@@ -272,9 +272,8 @@ export const FARM_HUSKS_PER_COMPOST = 2;
 // retune. The re-argument above IS the answer: the faucet falsified the
 // premise these numbers were authored on, they were re-checked against the
 // faucet and still found defensible, and no phase or QA sweep since has
-// filed a finding against the 0.48 and 0.41 per-harvest expectation. A
-// retune would need numbers the packet does not hold, since it records no
-// replant-cost model and no market price series.
+// filed a finding against the 0.48 and 0.41 per-harvest expectation. No
+// replant-cost model or market price series supports a retune.
 export const FARM_SEED_BACK_MIN_TIER = 3;
 export const FARM_SEED_BACK_TWO_CHANCE: Readonly<Record<number, number>> = { 3: 0.08, 4: 0.06 };
 export const FARM_SEED_BACK_ONE_CHANCE: Readonly<Record<number, number>> = { 3: 0.4, 4: 0.35 };
@@ -289,10 +288,8 @@ export const FARM_SEED_BACK_ONE_CHANCE: Readonly<Record<number, number>> = { 3: 
 // tests/helpers/farming_calendar_model.ts, its inputs are read from shipped
 // content (FARM_PATCHES bed counts, farmCropSkillThreshold gates,
 // farmingTeachingCeilingFor ceilings, farmSurvivalChance), and
-// tests/professions_farming.test.ts re-derives this table from it, so the
-// doc and the code cannot drift. The full record, including the per-band
-// table and the arithmetic for both the old curve and this one, is in
-// docs/prd/masterwrought/state.md, "The farming calendar model".
+// tests/professions_farming.test.ts re-derives this table from it. The full
+// derivation is restated below so the code and its pin cannot drift.
 //
 // HOW THESE FOUR NUMBERS ARE FORCED, in three steps a reader can redo:
 //  1. EXACTNESS. Grants accumulate by plain float addition in
@@ -1101,7 +1098,7 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
     // overflow-tolerant grant for the remainder. Farming's nothing-rots rule
     // outranks the signature: the TOTAL granted quantity is always the full
     // five-fold yield, and only the SIGNATURE truncates on full bags. The
-    // truncation NAMES itself (the (bu) follow-up): one gatherDowngrade
+    // truncation NAMES itself: one gatherDowngrade
     // { surface: 'crop', lost: 'mark' } per harvest command (the dedupe
     // idiom, even when both grades truncate), always 'mark' and never
     // 'find' because the units themselves always land here.
