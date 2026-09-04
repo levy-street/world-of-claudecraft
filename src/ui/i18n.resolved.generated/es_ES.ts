@@ -2719,6 +2719,7 @@ export const es_ES: EnTranslations = {
       "forbiddenReflectionLock": "Reflejo prohibido aún no puede volver a prepararse",
       "internalCooldown": "Este efecto no puede volver a activarse hasta que termine el temporizador",
       "carriedFlag": "Llevas la bandera enemiga. Cancela este beneficio para soltarla.",
+      "carryingFreight": "You are carrying freight. Movement speed is reduced by {pct}%.",
       "battleStance": "Actitud de Combate: un 10% más de generación de ira",
       "berserkerStance": "Actitud Rabiosa: los críticos aciertan un 3% más a menudo y golpean un 3% más fuerte",
       "crit": "Incrementa la probabilidad de golpe crítico un {pct}%",
@@ -8923,6 +8924,9 @@ export const es_ES: EnTranslations = {
         "readyQuest": "Misión lista para entregar",
         "repeatQuest": "Misión repetible",
         "cooldownQuest": "Misión en espera",
+        "availableWorldQuest": "Available world quest: {name}",
+        "activeWorldQuest": "Active world quest: {name}",
+        "worldBoss": "World boss: {name}",
         "questObjective": "Área de objetivo de misión",
         "readyOre": "Veta de mineral lista",
         "readyWood": "Rodal de madera listo",
@@ -9712,8 +9716,57 @@ export const es_ES: EnTranslations = {
       "objectiveProgress": "{label}: {current}/{total}",
       "requiresLevel": "Requiere nivel {level}"
     },
+    "worldQuest": {
+      "title": "{zone}: {target}",
+      "unknown": "Misión de mundo desconocida ({id})",
+      "itemReward": "Recompensa de objeto: {name}",
+      "rewardLine": "Recompensas: {reward}",
+      "availableStatus": "Misión de mundo disponible",
+      "activeStatus": "Misión de mundo activa",
+      "expiresIn": "Caduca en {time}",
+      "mineOre": "Extrae mineral de cobre",
+      "recoverObject": "Recupera {name}",
+      "redirectLeyBeam": "Redirige el rayo ley",
+      "matchConfections": "Combina dulces encantados",
+      "loadFreight": "Load freight into the wagon",
+      "escortCaravan": "Escolta la caravana: {zone}",
+      "salvageWreckage": "Recupera restos del naufragio",
+      "puzzleTitle": "Alineación del rayo ley",
+      "puzzleLevel": "Nivel semanal {level}",
+      "puzzleInstructions": "Gira las fichas para llevar el rayo desde el origen hasta el destino.",
+      "puzzleRotateTile": "Girar ficha {tile}",
+      "puzzleConnectors": "Conexiones: {connectors}.",
+      "puzzlePowered": "El rayo llega a esta ficha.",
+      "puzzleUnpowered": "El rayo no llega a esta ficha.",
+      "puzzleClose": "Cerrar puzle del rayo ley",
+      "puzzleSource": "Origen",
+      "puzzleTarget": "Destino",
+      "puzzleSourceEndpoint": "Source: {direction}.",
+      "puzzleTargetEndpoint": "Destination: {direction}.",
+      "puzzleTileAria": "{rotation} {connectors} {power} {source} {target}",
+      "match3Title": "Cascada de dulces",
+      "match3Instructions": "Selecciona dos dulces adyacentes. El movimiento solo cuenta si forma una línea de tres o más.",
+      "match3Moves": "Movimientos: {current}/{total}",
+      "match3Cleared": "Dulces eliminados: {current}/{total}",
+      "match3Announcement": "{moves}. {cleared}.",
+      "match3Cell": "Fila {row}, columna {column}: {candy}",
+      "match3Selected": "Seleccionado",
+      "match3Reset": "Reiniciar nivel",
+      "match3Close": "Cerrar puzle de dulces",
+      "match3OutOfMoves": "No quedan movimientos. Reinicia el nivel para intentarlo de nuevo.",
+      "semanticSummary": "{name}. {progress}. {reward}.",
+      "semanticSummaryTimed": "{name}. {progress}. {reward}. {time}.",
+      "match3Candy": {
+        "berry": "cristal de frutos rojos",
+        "citrus": "orbe cítrico",
+        "mint": "triángulo de menta",
+        "grape": "cuadrado de uva",
+        "star": "estrella de azúcar"
+      }
+    },
     "logs": {
       "accepted": "Misión aceptada: {name}",
+      "worldQuestStarted": "Misión de mundo iniciada: {name}",
       "abandoned": "Misión abandonada: {name}",
       "completed": "Misión completada: {name}",
       "ready": "{name} ({status})",
@@ -13049,6 +13102,18 @@ export const es_ES: EnTranslations = {
       "sprung_trap": {
         "name": "Trampa de Ciénaga Disparada"
       },
+      "leyline_cache": {
+        "name": "Alijo de Línea Ley en Miniatura"
+      },
+      "confection_game_box": {
+        "name": "Caja de Juego del Confitero"
+      },
+      "eastbrook_freight_crate": {
+        "name": "Eastbrook Freight Crate"
+      },
+      "eastbrook_freight_wagon": {
+        "name": "Eastbrook Freight Wagon"
+      },
       "hearthlined_treads": {
         "name": "Botas Forradas de Hogar"
       },
@@ -14718,6 +14783,15 @@ export const es_ES: EnTranslations = {
       },
       "vale_bandit": {
         "name": "Bandido del Valle"
+      },
+      "eastbrook_freight_caravan": {
+        "name": "Caravana de mercancías de Eastbrook"
+      },
+      "willowfen_remedy_caravan": {
+        "name": "Caravana de remedios del Pantano de los Sauces"
+      },
+      "frostveil_supply_caravan": {
+        "name": "Caravana de suministros del Velo de Escarcha"
       },
       "restless_bones": {
         "name": "Huesos inquietos"

@@ -83,7 +83,6 @@ import {
   type MasterLootThreshold,
   type MoveInput,
   type PlayerClass,
-  type QuestProgress,
   type QuestState,
   type RiftTier,
   type RiteIntensity,
@@ -207,7 +206,9 @@ import {
 import { applyReconSelfWire, ReconWireState } from './movement_reconciliation_wire';
 import { createNativeAttestationProof } from './native_attestation';
 import { createNetPipelineStats, type NetPipelineStats } from './net_pipeline_stats';
+import { applyQuestSelfWire } from './quest_snapshot_wire';
 import { optimisticQuestState } from './quest_state_optimistic';
+import type { QuestWorldCommand } from './quest_world_wire_state';
 import { isTransientReconnectRejection, isTransientTimeoutRejection } from './reconnect_policy';
 import { isInputSendBackpressured } from './send_backpressure';
 import { snapshotAlpha } from './snapshot_alpha';
@@ -1544,11 +1545,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
   talentRole: Role | null = null;
   loadouts: SavedLoadout[] = [];
   activeLoadout = -1;
-  questLog = new Map<string, QuestProgress>();
-  questsDone = new Set<string>();
   // --- IWorldParty: party/raid roster, mirrored from the snapshot self (`party`).
-  // The raid-target markers ride the `markers` map below; IWorldPet keeps no mirror
-  // field (pet state lives on the owned-mob entity wire). ---
+  // Raid markers ride `markers`; pet state lives on the owned-mob entity wire. ---
   partyInfo: PartyInfo | null = null;
   private selectedDungeonDifficulty: DungeonDifficulty = 'normal';
   // --- IWorldTrade: active trade-window state, mirrored from the snapshot self
@@ -2581,9 +2579,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
         // before the socket died, so it trivially matches the window's own
         // query and the reconnect resync (issue #2416) would never detect the
         // fresh-join reset. Nulling it here forces MarketWindow to treat the
-        // resync as pending until a genuinely post-reconnect market snapshot
-        // decodes.
+        // resync stays pending until a genuinely post-reconnect market snapshot decodes.
         this.marketInfo = null;
+        this.resetQuestWorldWireState();
         this.onReconnected?.();
       }
       this.connected = true;
@@ -3593,10 +3591,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
         this.accountCosmetics = normalizeAccountCosmetics(s.cosmetics);
         this.cosmeticsChanged = true;
       }
-      if (s.qlog !== undefined)
-        this.questLog = new Map((s.qlog as QuestProgress[]).map((q) => [q.questId, q]));
-      if (s.qdone !== undefined) this.questsDone = new Set(s.qdone);
+      applyQuestSelfWire(this, s);
       if (s.lockouts !== undefined) this.selfLockouts = s.lockouts as Record<string, number>;
+      if (s.wba !== undefined) this.applyWorldBossWire(s.wba);
       // IWorldMounts self-decode: mntOwn is delta-guarded (omitted keeps the prior
       // mirror). The owned collection is mirrored VERBATIM (no horse prepend): the
       // horse is no longer auto-owned, so an empty owned list is legal and the
@@ -4159,6 +4156,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
     this.questLog.delete(questId);
     this.pendingQuestCommands.delete(questId);
     this.cmd({ cmd: 'abandon', quest: questId });
+  }
+  protected sendQuestWorldCommand(command: QuestWorldCommand): void {
+    this.cmd(command);
   }
   startTutorial(): void {
     if (!this.canSendCommand()) return;

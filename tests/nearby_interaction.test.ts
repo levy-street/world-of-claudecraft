@@ -1,7 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 import { tryNearbyInteraction } from '../src/game/nearby_interaction';
 import { ITEMS } from '../src/sim/data';
-import type { Entity, GatherNodeDef, QuestProgress } from '../src/sim/types';
+import { interactObjectCreditKey } from '../src/sim/quests/interact_object_credit';
+import type { Entity, GatherNodeDef, QuestProgress, WorldQuestProgress } from '../src/sim/types';
+import { worldQuestCycleForResetDay } from '../src/sim/world_quests';
 
 function entity(overrides: Partial<Entity> & Pick<Entity, 'id' | 'kind'>): Entity {
   return {
@@ -28,6 +30,8 @@ function rig(targets: Entity[] = [], nodes: GatherNodeDef[] = []) {
       ...targets.map((target): [number, Entity] => [target.id, target]),
     ]),
     questLog: new Map<string, QuestProgress>(),
+    worldQuestCycle: '',
+    worldQuestLog: new Map<string, WorldQuestProgress>(),
     targetEntity: (id: number | null) => {
       calls.push(`target:${id}`);
     },
@@ -93,6 +97,60 @@ function interact(r: ReturnType<typeof rig>) {
 }
 
 describe('tryNearbyInteraction', () => {
+  it('skips rotated-out shipwreck debris in favor of a visible weekly piece', () => {
+    const hidden = entity({
+      id: 2_147_100_108,
+      kind: 'object',
+      templateId: 'ground_wreckfield_flotsam_crate',
+      objectItemId: 'wreckfield_flotsam_crate',
+      lootable: true,
+      pos: { x: 1, y: 0, z: 0 },
+    });
+    const visible = entity({
+      id: 2_147_100_100,
+      kind: 'object',
+      templateId: 'ground_wreckfield_flotsam_crate',
+      objectItemId: 'wreckfield_flotsam_crate',
+      lootable: true,
+      pos: { x: 2, y: 0, z: 0 },
+    });
+    const r = rig([hidden, visible]);
+    r.world.worldQuestCycle = worldQuestCycleForResetDay('2026-09-06');
+
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toContain(`pickup:${visible.id}`);
+    expect(r.calls).not.toContain(`pickup:${hidden.id}`);
+  });
+
+  it('skips a personally recovered shipwreck piece in favor of the next one', () => {
+    const recovered = entity({
+      id: 2_147_100_100,
+      kind: 'object',
+      templateId: 'ground_wreckfield_flotsam_crate',
+      objectItemId: 'wreckfield_flotsam_crate',
+      lootable: true,
+      pos: { x: 1, y: 0, z: 0 },
+    });
+    const visible = entity({
+      ...recovered,
+      id: 2_147_100_101,
+      pos: { x: 2, y: 0, z: 0 },
+    });
+    const r = rig([recovered, visible]);
+    r.world.worldQuestCycle = worldQuestCycleForResetDay('2026-09-06');
+    r.world.worldQuestLog.set('wq_farshore_salvage', {
+      questId: 'wq_farshore_salvage',
+      count: 1,
+      state: 'active',
+      puzzleVariant: 0,
+      creditedObjects: [interactObjectCreditKey(0, recovered.pos)],
+    });
+
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toContain(`pickup:${visible.id}`);
+    expect(r.calls).not.toContain(`pickup:${recovered.id}`);
+  });
+
   it('dispatches the nearest visible corpse loot', () => {
     const fartherCorpse = entity({
       id: 2,

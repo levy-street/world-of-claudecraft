@@ -1,10 +1,11 @@
-import { QUESTS } from '../../../sim/data';
+import { QUESTS, WORLD_QUESTS_BY_ID } from '../../../sim/data';
 import { questObjectiveRequired } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
 import { esc } from '../../esc';
 import { formatNumber, t } from '../../i18n';
 import { ownEntry } from '../../known_item';
 import type { PainterHostWriters } from '../../painter_host';
+import { worldQuestDisplayName, worldQuestObjectiveLabel } from '../../world_quest_view';
 import { buildQuestStrip, type QuestStripController } from './quest_strip_controller';
 import { type QuestTrackerView, questTrackerView, type TrackedQuest } from './quest_tracker';
 
@@ -20,10 +21,11 @@ export interface QuestTrackerControllerDeps {
   writers: PainterHostWriters;
   element: HTMLElement;
   document: Document;
-  world(): Pick<IWorld, 'questLog'>;
+  world(): Pick<IWorld, 'questLog' | 'worldQuestLog'>;
   settings: QuestTrackerSettingsPort;
   questTitle(questId: string): string;
   objectiveLabel(questId: string, objectiveIndex: number): string;
+  openQuest?(questId: string): void;
   click(): void;
 }
 
@@ -48,7 +50,35 @@ export class QuestTrackerController {
   private lastHtml: string | null = null;
 
   constructor(private readonly deps: QuestTrackerControllerDeps) {
-    this.strip = buildQuestStrip({ writers: deps.writers, click: () => this.deps.click() });
+    this.strip = buildQuestStrip({
+      writers: deps.writers,
+      click: () => this.deps.click(),
+      activate: () => false,
+    });
+    deps.element.addEventListener('click', (event) => {
+      const target = event.target as HTMLElement;
+      if (target.closest('.qt-header')) this.toggleCollapsed();
+      this.activateRow(target.closest<HTMLElement>('.qt-title'));
+    });
+    deps.element.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ' && event.code !== 'Space') return;
+      const target = event.target as HTMLElement;
+      if (target.closest('.qt-header')) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.toggleCollapsed();
+        return;
+      }
+      const row = target.closest<HTMLElement>('.qt-title');
+      if (!row?.dataset.quest) return;
+      event.preventDefault();
+      event.stopPropagation();
+      this.activateRow(row);
+    });
+  }
+
+  private activateRow(row: HTMLElement | null): void {
+    if (row?.dataset.quest) this.deps.openQuest?.(row.dataset.quest);
   }
 
   /** Language switch: the desktop rows already re-resolve unconditionally in
@@ -91,6 +121,24 @@ export class QuestTrackerController {
               total: questObjectiveRequired(quest, progress, objectiveIndex),
             }))
           : [],
+      });
+    }
+    for (const progress of this.deps.world().worldQuestLog.values()) {
+      if (progress.state !== 'active') continue;
+      const quest = ownEntry(WORLD_QUESTS_BY_ID, progress.questId);
+      if (!quest) continue;
+      quests.push({
+        id: progress.questId,
+        number: quests.length + 1,
+        title: worldQuestDisplayName(progress.questId),
+        complete: false,
+        objectives: [
+          {
+            label: worldQuestObjectiveLabel(progress.questId),
+            current: Math.min(progress.count, quest.count),
+            total: quest.count,
+          },
+        ],
       });
     }
     if (collapsed && quests.length === 0 && this.deps.settings.available()) {
@@ -143,7 +191,11 @@ export class QuestTrackerController {
       `<span class="qt-h-label">${esc(t('questUi.tracker.title'))}</span>${count}</button>`;
     let rows = '';
     for (const quest of view.quests) {
-      rows += `<div class="qt-title" role="button" tabindex="0" data-quest="${esc(quest.id)}"><span class="qt-num">${esc(this.number(quest.number))}</span>${esc(quest.title)}${quest.complete ? ` <span class="quest-complete">(${esc(t('questUi.tracker.complete'))})</span>` : ''}</div>`;
+      const worldQuest = ownEntry(WORLD_QUESTS_BY_ID, quest.id);
+      const behavior = !worldQuest
+        ? ` role="button" tabindex="0" data-quest="${esc(quest.id)}"`
+        : '';
+      rows += `<div class="qt-title"${behavior}><span class="qt-num">${esc(this.number(quest.number))}</span>${esc(quest.title)}${quest.complete ? ` <span class="quest-complete">(${esc(t('questUi.tracker.complete'))})</span>` : ''}</div>`;
       for (const objective of quest.objectives) {
         rows += `<div class="qt-obj${objective.done ? ' done' : ''}">- ${esc(this.progressText(objective.label, objective.current, objective.total))}</div>`;
       }

@@ -22,6 +22,14 @@ import type {
   MapQuestAreaMarker,
   MapServiceMarker,
   MapStationMarker,
+  MapWorldBossMarker,
+  MapWorldQuestMarker,
+} from '../../map_window_view';
+import {
+  MAP_NPC_GLYPH_HIT_RADIUS,
+  MAP_TOUCH_POINT_HIT_RADIUS_CSS_PX,
+  worldBossMarkerAt,
+  worldQuestMarkerAt,
 } from '../../map_window_view';
 
 export interface MapMarkerInteractionDeps {
@@ -31,6 +39,8 @@ export interface MapMarkerInteractionDeps {
   station(marker: MapStationMarker): string;
   service(marker: MapServiceMarker): string;
   gather(marker: MapGatherNodeMarker): string;
+  worldQuest(marker: MapWorldQuestMarker): string;
+  worldBoss(marker: MapWorldBossMarker): string;
   questArea(refs: readonly QuestObjectiveRef[], activeCount: number): string;
   paint(html: string, clientX: number, clientY: number): void;
   clearMemo(): void;
@@ -40,6 +50,8 @@ const EMPTY_MARKERS = Object.freeze([]) as readonly never[];
 
 export class MapMarkerInteractionController {
   questAreas: readonly MapQuestAreaMarker[] = EMPTY_MARKERS;
+  worldQuests: readonly MapWorldQuestMarker[] = EMPTY_MARKERS;
+  worldBosses: readonly MapWorldBossMarker[] = EMPTY_MARKERS;
   npcs: readonly MapNpcMarker[] = EMPTY_MARKERS;
   gatherNodes: readonly MapGatherNodeMarker[] = EMPTY_MARKERS;
   stations: readonly MapStationMarker[] = EMPTY_MARKERS;
@@ -48,6 +60,7 @@ export class MapMarkerInteractionController {
   readonly semantics: MapSemanticAccessibilityCore;
   readonly pointHits: MapPointMarkerHit[] = [];
   readonly questObjectives: QuestObjectiveRef[] = [];
+  selectedWorldQuestId: string | null = null;
   private readonly geometry: MapMarkerTooltipGeometry = {
     ready: false,
     clientLeft: 0,
@@ -69,6 +82,8 @@ export class MapMarkerInteractionController {
       station: deps.station,
       service: deps.service,
       gather: deps.gather,
+      worldQuest: deps.worldQuest,
+      worldBoss: deps.worldBoss,
       questArea: deps.questArea,
       paint: deps.paint,
     };
@@ -101,6 +116,8 @@ export class MapMarkerInteractionController {
       clientY,
       touch,
       this.questAreas,
+      this.worldQuests,
+      this.worldBosses,
       this.npcs,
       this.gatherNodes,
       this.stations,
@@ -113,13 +130,41 @@ export class MapMarkerInteractionController {
     );
   }
 
+  selectWorldQuest(questId: string | null): boolean {
+    if (questId === this.selectedWorldQuestId) return false;
+    this.selectedWorldQuestId = questId;
+    return true;
+  }
+
+  selectWorldQuestAt(
+    canvas: HTMLCanvasElement,
+    clientX: number,
+    clientY: number,
+    touch = false,
+  ): boolean {
+    if (canvas !== this.geometryCanvas || !this.geometry.ready) return false;
+    const mx = (clientX - this.geometry.clientLeft) * this.geometry.backingPerClientX;
+    const my = (clientY - this.geometry.clientTop) * this.geometry.backingPerClientY;
+    const radius = touch
+      ? MAP_TOUCH_POINT_HIT_RADIUS_CSS_PX * this.geometry.backingPerCssPx
+      : MAP_NPC_GLYPH_HIT_RADIUS;
+    if (worldBossMarkerAt(this.worldBosses, mx, my, radius)) {
+      return this.selectWorldQuest(null);
+    }
+    const marker = worldQuestMarkerAt(this.worldQuests, mx, my, radius);
+    return this.selectWorldQuest(marker?.questId ?? null);
+  }
+
   clear(): void {
     this.questAreas = EMPTY_MARKERS;
+    this.worldQuests = EMPTY_MARKERS;
+    this.worldBosses = EMPTY_MARKERS;
     this.npcs = EMPTY_MARKERS;
     this.gatherNodes = EMPTY_MARKERS;
     this.stations = EMPTY_MARKERS;
     this.services = EMPTY_MARKERS;
     this.navigation = EMPTY_MARKERS;
+    this.selectedWorldQuestId = null;
     this.semantics.clear();
     this.pointHits.length = 0;
     this.clearMemo();
@@ -127,11 +172,19 @@ export class MapMarkerInteractionController {
 
   setOverworld(model: OverworldSemanticMapModel): void {
     this.questAreas = model.questAreas;
+    this.worldQuests = model.worldQuests ?? EMPTY_MARKERS;
+    this.worldBosses = model.worldBosses ?? EMPTY_MARKERS;
     this.npcs = model.npcs;
     this.gatherNodes = model.gatherNodes;
     this.stations = model.stations;
     this.services = model.services;
     this.navigation = model.navigation;
+    if (
+      this.selectedWorldQuestId &&
+      !this.worldQuests.some((marker) => marker.questId === this.selectedWorldQuestId)
+    ) {
+      this.selectedWorldQuestId = null;
+    }
     this.clearMemo();
   }
 }

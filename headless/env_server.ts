@@ -96,6 +96,9 @@ class Env {
       autoEquip: true,
       idleMobTickRadius: 80,
     });
+    // RL episodes deliberately have no wall calendar: resetDay stays empty, so
+    // calendar-window systems (including rotating World Quests) remain dormant
+    // instead of making a seeded episode depend on the machine's date or zone.
     if (playerLevel !== 1) this.sim.setPlayerLevel(playerLevel);
     if (talents && !this.sim.applyTalents(talents)) throw new Error('invalid talents');
     this.stepCount = 0;

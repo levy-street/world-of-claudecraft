@@ -871,4 +871,41 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(notes.raiderCooldownReset).toBe(true);
     expect(notes.encounterReset).toBe(true);
   });
+
+  it('world_quest_lifecycle: pins all states, reward families, counters, and zero RNG', () => {
+    const scenario = SCENARIOS.find((item) => item.name === 'world_quest_lifecycle');
+    expect(scenario).toBeDefined();
+    if (!scenario) return;
+    const { trace, rec } = record(scenario);
+    const events = rec.allEvents as Ev[];
+    expect(events.filter((event) => event.type === 'worldQuestStarted')).toHaveLength(4);
+    expect(events.filter((event) => event.type === 'worldQuestDone')).toHaveLength(3);
+    expect(events.some((event) => event.type === 'worldQuestProgress')).toBe(true);
+    expect(
+      events.filter(
+        (event) =>
+          event.type === 'aura' &&
+          event.abilityId === rec.notes.freightAuraId &&
+          event.gained === true,
+      ),
+    ).toHaveLength(6);
+    expect(
+      events.filter(
+        (event) =>
+          event.type === 'aura' &&
+          event.abilityId === rec.notes.freightAuraId &&
+          event.gained === false,
+      ),
+    ).toHaveLength(6);
+    expect(rec.notes.xpReward).toBe(2_784);
+    expect(rec.notes.copperReward).toBe(6_000);
+    expect(rec.notes.itemReward).toBe(1);
+    expect(rec.notes.questProgress).toBe(31);
+    expect(rec.notes.questsCompleted).toBe(3);
+    expect(rec.notes.sameCycleAfterOneDay).toBe(true);
+    expect(rec.notes.rotationChanged).toBe(true);
+    expect(rec.notes.rotatedQuestIds).toEqual(['wq_thornpeak_stormcrag']);
+    expect(trace.draws).toBe(0);
+    expect(trace.drawDigest).toBe('811c9dc5');
+  });
 });

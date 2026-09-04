@@ -185,6 +185,32 @@ describe('ClientWorld visibilitychange reconnect (mobile background/foreground)'
     });
   });
 
+  it('clears optional world-quest mirrors before a reconnected realm resends them', () => {
+    withDomStubs((_doc, harness) => {
+      const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
+      const wire = world as unknown as { onMessage(raw: string): void };
+      const first = StubWebSocket.instances[0];
+      wire.onMessage(JSON.stringify({ t: 'hello', pid: 1, seed: 42 }));
+      world.worldQuestCycle = 'wq3_9';
+      world.worldQuestExpiresAtMs = 123;
+      world.worldQuestLog = new Map([
+        ['wq_galecrest_wisps', { questId: 'wq_galecrest_wisps', count: 1, state: 'active' }],
+      ]);
+      world.applyWorldBossWire(['morthen']);
+
+      first.readyState = StubWebSocket.CLOSED;
+      first.onclose?.();
+      harness.fire(harness.timers[0].id);
+      wire.onMessage(JSON.stringify({ t: 'hello', pid: 1, seed: 42 }));
+
+      expect(world.worldQuestCycle).toBe('');
+      expect(world.worldQuestExpiresAtMs).toBe(0);
+      expect(world.worldQuestLog.size).toBe(0);
+      expect(world.worldBossActive('morthen')).toBe(false);
+      world.close();
+    });
+  });
+
   it('foregrounding onto a zombie socket (still "open" per JS state, but the real transport is dead) drives a fresh reconnect', () => {
     withDomStubs((doc) => {
       const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
@@ -600,7 +626,7 @@ describe('ClientWorld reconnect error-frame tolerance (auth timeout)', () => {
     });
   });
 
-  it('fails closed when an auth-world-25 client reaches an auth-world-11 server', () => {
+  it('fails closed when an auth-world-31 client reaches an auth-world-11 server', () => {
     withDomStubs((_doc, harness) => {
       const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
       const w = world as unknown as WorldProbe;
@@ -614,7 +640,7 @@ describe('ClientWorld reconnect error-frame tolerance (auth timeout)', () => {
       expect(socket.sent).toHaveLength(1);
       expect(JSON.parse(socket.sent[0])).toEqual(
         expect.objectContaining({
-          t: 'auth-world-25',
+          t: 'auth-world-31',
           token: 't',
           character: 1,
         }),

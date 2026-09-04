@@ -254,6 +254,8 @@ export const META_EXCLUDE: ReadonlySet<string> = new Set([
   'bankWireRev', // runtime-only bank snapshot dirty counter; never serialized/persisted
   'vaultWireRev', // runtime-only vault snapshot dirty counter; never serialized/persisted
   'wireRev', // runtime-only wire-dirty counter; never serialized/persisted
+  'worldQuestAreas', // session-only area-entry edge set; progress remains sampled
+  'openWorldQuestPuzzleId', // session-only physical-activator latch; progress remains sampled
 ]);
 
 function sampleExcluding(source: Record<string, unknown>, exclude: ReadonlySet<string>): unknown {

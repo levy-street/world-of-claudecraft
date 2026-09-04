@@ -217,6 +217,9 @@ export function collectCalmAnchorPads(): CalmPadRow[] {
   // every 8yd along each leg).
   for (const id in ESCORTS) {
     const escort = ESCORTS[id];
+    // World-quest caravans follow already-authored town roads and must not
+    // reshape global terrain merely by joining the rotating event catalog.
+    if (escort.worldQuestId !== undefined) continue;
     const line = [escort.start, ...escort.waypoints];
     for (let i = 0; i < line.length; i++) {
       pad('escortRoute', line[i].x, line[i].z, 4, 10);

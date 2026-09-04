@@ -78,6 +78,9 @@ const MINIMAP_COLOR_TOKENS = [
   '--color-minimap-party-pip',
   '--color-minimap-player',
   '--color-minimap-outline',
+  '--color-minimap-world-quest-available',
+  '--color-minimap-world-quest-active',
+  '--color-minimap-world-boss',
 ];
 
 describe('minimap_painter: no magic values (canvas sub-rule)', () => {
@@ -116,6 +119,8 @@ describe('minimap_painter: no magic values (canvas sub-rule)', () => {
       expect(code, `painter never reads ${tok}`).toContain(tok);
       expect(tokens, `missing ${tok}`).toContain(`${tok}:`);
     }
+    expect(tokens).toContain('--color-minimap-world-quest-available: #4aa3ff;');
+    expect(tokens).toContain('--color-minimap-world-boss: #a970ff;');
     // The hand list above cannot see a table entry it was never told about,
     // and resolveColors freezes the WHOLE color set on first resolve, so one
     // token absent from tokens.css draws default ink for the session. Pin
@@ -153,6 +158,14 @@ describe('minimap_painter: cached background + ~10Hz cadence preserved', () => {
 
   it("routes the '#zone-label' text through the elided setText (the one DOM write)", () => {
     expect(code).toContain('this.writers.setText(zoneLabelEl');
+  });
+
+  it('wires the small emblem through the touch-safe 40px hit target and opens its zone', () => {
+    expect(hud).toContain('bindTouchTap(mm,');
+    expect(hud).toContain('this.minimapPainter.worldObjectiveAt(');
+    expect(hud).toContain('20 * Math.max(mm.width / rect.width, mm.height / rect.height)');
+    expect(hud).toContain('this.mapZoneOverride = marker.zoneId;');
+    expect(hud).toContain("marker.kind === 'world-quest' ? marker.questId : null");
   });
 
   it('keeps the cached Thornhollow Fields sheet bounded for the 240x452yd field', () => {
@@ -674,6 +687,22 @@ afterEach(() => {
 });
 
 describe('minimap_painter: tiny procedural symbols carry identity without hue', () => {
+  it('draws the world boss as an outlined badge with a skull silhouette', () => {
+    const trace = drawSymbols([
+      { kind: 'world-boss', mx: 20, my: 30, bossId: 'boss', zoneId: 'zone' },
+    ]);
+
+    expect(trace.strokedArcs).toContainEqual({
+      x: 20,
+      y: 30,
+      radius: 6.5,
+      strokeStyle: 'paint:outline',
+      lineWidth: 1.5,
+    });
+    expect(trace.filledArcs.map((arc) => arc.radius)).toEqual([6.5, 4, 1.1, 1.1]);
+    expect(trace.rects.filter((rect) => rect.op === 'fill')).toHaveLength(2);
+  });
+
   it('draws a friend as an outlined circle and a guildmate as an outlined diamond', () => {
     const friend = drawSymbols([{ kind: 'ally', mx: 20, my: 30, ally: 'friend' }]);
     const guild = drawSymbols([{ kind: 'ally', mx: 20, my: 30, ally: 'guild' }]);

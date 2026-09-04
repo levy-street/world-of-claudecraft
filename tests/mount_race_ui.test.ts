@@ -12,6 +12,7 @@ const hudCss = read('src/styles/hud.css');
 const hudTs = read('src/ui/hud.ts');
 const controlsTs = read('src/ui/mount_race_controls.ts');
 const stripTs = read('src/ui/mount_race_strip.ts');
+const questEventViewTs = read('src/ui/quest_event_view.ts');
 
 describe('show-jumping race UI wiring', () => {
   it('ships the start, timer, and countdown controls in both game entries', () => {
@@ -72,7 +73,8 @@ describe('show-jumping race UI wiring', () => {
   });
 
   it('shows the live mount key after the riding lesson quest is turned in', () => {
-    expect(hudTs).toContain("ev.questId === 'q_riding_lessons'");
+    expect(questEventViewTs).toContain("mountOwnedPrompt: event.questId === 'q_riding_lessons'");
+    expect(hudTs).toContain('if (questEvent.mountOwnedPrompt)');
     expect(hudTs).toContain("t('hudChrome.mountTraining.ownedMountPrompt'");
     expect(hudTs).toContain('key: this.mountKey()');
     expect(hudTs).toContain("this.keybinds.primaryLabel('mount') || t('hud.options.unbound')");

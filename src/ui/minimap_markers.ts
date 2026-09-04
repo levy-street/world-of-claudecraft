@@ -48,6 +48,8 @@ import {
   type GatherNodeType,
   type StationType,
 } from '../sim/types';
+import { WORLD_BOSSES, worldBossLockoutId } from '../sim/world_boss';
+import { activeWorldQuestsForCycle } from '../sim/world_quest_rotation';
 import type { IWorld } from '../world_api';
 import { dungeonMapActive } from './dungeon_map_view';
 import { viewerUsableToolTier } from './gathering_view';
@@ -226,6 +228,25 @@ export type MinimapMarker =
   | { kind: 'party-arrow'; mx: number; my: number; angle: number; cls: string; dead: boolean }
   // The local player: a facing arrow at the centre.
   | { kind: 'player'; mx: number; my: number; angle: number }
+  // A nearby rotating world objective. The minimap never paints its area;
+  // selecting this small emblem opens the zone map where disclosure lives.
+  | {
+      kind: 'world-quest';
+      mx: number;
+      my: number;
+      questId: string;
+      zoneId: string;
+      state: 'available' | 'active';
+    }
+  // An incomplete fixed-position world boss. Like a world quest, this is an
+  // objective emblem rather than a live-entity blip; unlike one, it has no area.
+  | {
+      kind: 'world-boss';
+      mx: number;
+      my: number;
+      bossId: string;
+      zoneId: string;
+    }
   // A gatherable world node (ore/wood/herb, #1121): `ready` distinguishes
   // harvestable-for-THIS-viewer from on-cooldown-for-this-viewer (per-player,
   // see IWorldProfessions#nodeHarvestableByMe; two viewers can see opposite
@@ -264,6 +285,53 @@ export interface MinimapMarkers {
    *  `pxPerYard` is the minimap world scale (base scale * zoom); `S` is the canvas
    *  side in px. */
   build(world: IWorld, S: number, pxPerYard: number, profile?: MapMarkerProfile): MinimapModel;
+}
+
+export function minimapWorldQuestMarkerAt(
+  markers: readonly MinimapMarker[],
+  mx: number,
+  my: number,
+  hitRadius: number,
+): Extract<MinimapMarker, { kind: 'world-quest' }> | null {
+  const radius2 = Math.max(0, hitRadius) ** 2;
+  let best: Extract<MinimapMarker, { kind: 'world-quest' }> | null = null;
+  let bestDistance2 = Number.POSITIVE_INFINITY;
+  for (const marker of markers) {
+    if (marker.kind !== 'world-quest') continue;
+    const dx = mx - marker.mx;
+    const dy = my - marker.my;
+    const distance2 = dx * dx + dy * dy;
+    if (distance2 > radius2 || distance2 >= bestDistance2) continue;
+    best = marker;
+    bestDistance2 = distance2;
+  }
+  return best;
+}
+
+export type MinimapWorldObjectiveMarker = Extract<
+  MinimapMarker,
+  { kind: 'world-quest' | 'world-boss' }
+>;
+
+export function minimapWorldObjectiveMarkerAt(
+  markers: readonly MinimapMarker[],
+  mx: number,
+  my: number,
+  hitRadius: number,
+): MinimapWorldObjectiveMarker | null {
+  const radius2 = Math.max(0, hitRadius) ** 2;
+  let best: MinimapWorldObjectiveMarker | null = null;
+  let bestDistance2 = Number.POSITIVE_INFINITY;
+  for (const marker of markers) {
+    if (marker.kind !== 'world-quest' && marker.kind !== 'world-boss') continue;
+    const dx = mx - marker.mx;
+    const dy = my - marker.my;
+    const distance2 = dx * dx + dy * dy;
+    if (distance2 > radius2 || distance2 >= bestDistance2) continue;
+    best = marker;
+    bestDistance2 = distance2;
+  }
+  return best;
 }
 
 /** Which minimap surface this world renders. Delve when the player stands in a delve
@@ -594,6 +662,54 @@ export function createMinimapMarkers(): MinimapMarkers {
         markers.push(stableNavigationMarkers[i]);
       }
       for (let i = 0; i < navigationMarkers.length; i++) markers.push(navigationMarkers[i]);
+
+      // World quests are a compact emblem only on the circular minimap. Their
+      // objective radius is intentionally withheld until this emblem is selected
+      // and the zone map opens.
+      const worldQuestClearance = compact ? 10 : 7;
+      for (const quest of activeWorldQuestsForCycle(world.worldQuestCycle)) {
+        if (p.level < quest.minLevel) continue;
+        const progress = world.worldQuestLog.get(quest.id);
+        if (progress?.state === 'completed') continue;
+        const dx = -(quest.area.x - p.pos.x) * pxPerYard;
+        const dz = -(quest.area.z - p.pos.z) * pxPerYard;
+        const distance = Math.hypot(dx, dz);
+        const rim = minimapSafeCenterRadius(S, worldQuestClearance);
+        if (distance > rim + quest.area.radius * pxPerYard) continue;
+        const scale = distance > rim ? rim / distance : 1;
+        markers.push({
+          kind: 'world-quest',
+          mx: half + dx * scale,
+          my: half + dz * scale,
+          questId: quest.id,
+          zoneId: quest.zoneId,
+          state: progress?.state === 'active' ? 'active' : 'available',
+        });
+      }
+
+      // A world-boss lockout is the completion record: once personal loot is
+      // taken, the boss marker disappears until the shared raid reset. The boss
+      // has one authored point, so only that point entering the minimap is shown.
+      let raidLockouts: ReturnType<IWorld['raidLockouts']> | null = null;
+      for (const boss of WORLD_BOSSES) {
+        if (!world.worldBossActive?.(boss.templateId)) continue;
+        raidLockouts ??= world.raidLockouts();
+        if (raidLockouts.some((lockout) => lockout.id === worldBossLockoutId(boss.templateId))) {
+          continue;
+        }
+        const dx = -(boss.pos.x - p.pos.x) * pxPerYard;
+        const dz = -(boss.pos.z - p.pos.z) * pxPerYard;
+        const distance = Math.hypot(dx, dz);
+        const rim = minimapSafeCenterRadius(S, worldQuestClearance);
+        if (distance > rim) continue;
+        markers.push({
+          kind: 'world-boss',
+          mx: half + dx,
+          my: half + dz,
+          bossId: boss.templateId,
+          zoneId: zoneAt(boss.pos.x, boss.pos.z).id,
+        });
+      }
 
       // Navigation-critical dynamic markers paint over the larger static
       // paintings and the ordinary live-entity layer. Preserve the established

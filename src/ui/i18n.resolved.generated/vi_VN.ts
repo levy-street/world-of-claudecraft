@@ -2719,6 +2719,7 @@ export const vi_VN: EnTranslations = {
       "forbiddenReflectionLock": "Phản Chiếu Cấm Kỵ chưa thể chuẩn bị lại",
       "internalCooldown": "Hiệu ứng này chưa thể kích hoạt lại cho đến khi hết thời gian chờ",
       "carriedFlag": "Bạn đang mang cờ địch. Hủy hiệu ứng này để thả nó xuống.",
+      "carryingFreight": "You are carrying freight. Movement speed is reduced by {pct}%.",
       "battleStance": "Thế Công: tạo nộ khí nhiều hơn 10%",
       "berserkerStance": "Thế Cuồng Chiến: chí mạng thường xuyên hơn 3% và mạnh hơn 3%",
       "crit": "Tăng tỉ lệ chí mạng thêm {pct}%",
@@ -8923,6 +8924,9 @@ export const vi_VN: EnTranslations = {
         "readyQuest": "Nhiệm vụ sẵn sàng nộp",
         "repeatQuest": "Nhiệm vụ lặp lại",
         "cooldownQuest": "Nhiệm vụ đang trong thời gian hồi",
+        "availableWorldQuest": "Available world quest: {name}",
+        "activeWorldQuest": "Active world quest: {name}",
+        "worldBoss": "World boss: {name}",
         "questObjective": "Khu vực mục tiêu nhiệm vụ",
         "readyOre": "Mạch quặng sẵn sàng",
         "readyWood": "Cụm cây gỗ sẵn sàng",
@@ -9712,8 +9716,57 @@ export const vi_VN: EnTranslations = {
       "objectiveProgress": "{label}: {current}/{total}",
       "requiresLevel": "Yêu Cầu Cấp {level}"
     },
+    "worldQuest": {
+      "title": "{zone}: {target}",
+      "unknown": "Unknown world quest ({id})",
+      "itemReward": "Item reward: {name}",
+      "rewardLine": "Rewards: {reward}",
+      "availableStatus": "Available world quest",
+      "activeStatus": "Active world quest",
+      "expiresIn": "Expires in {time}",
+      "mineOre": "Mine copper ore",
+      "recoverObject": "Recover {name}",
+      "redirectLeyBeam": "Redirect the ley beam",
+      "matchConfections": "Match enchanted confections",
+      "loadFreight": "Load freight into the wagon",
+      "escortCaravan": "Escort the caravan: {zone}",
+      "salvageWreckage": "Salvage shipwreck debris",
+      "puzzleTitle": "Ley Beam Alignment",
+      "puzzleLevel": "Weekly level {level}",
+      "puzzleInstructions": "Rotate the tiles to carry the beam from the source to the destination.",
+      "puzzleRotateTile": "Rotate tile {tile}",
+      "puzzleConnectors": "Connectors: {connectors}.",
+      "puzzlePowered": "The beam reaches this tile.",
+      "puzzleUnpowered": "The beam does not reach this tile.",
+      "puzzleClose": "Close ley beam puzzle",
+      "puzzleSource": "Source",
+      "puzzleTarget": "Destination",
+      "puzzleSourceEndpoint": "Source: {direction}.",
+      "puzzleTargetEndpoint": "Destination: {direction}.",
+      "puzzleTileAria": "{rotation} {connectors} {power} {source} {target}",
+      "match3Title": "Confection Cascade",
+      "match3Instructions": "Select two adjacent confections. A swap only counts when it creates a line of three or more.",
+      "match3Moves": "Moves: {current}/{total}",
+      "match3Cleared": "Confections cleared: {current}/{total}",
+      "match3Announcement": "{moves}. {cleared}.",
+      "match3Cell": "Row {row}, column {column}: {candy}",
+      "match3Selected": "Selected",
+      "match3Reset": "Restart level",
+      "match3Close": "Close confection puzzle",
+      "match3OutOfMoves": "No moves remain. Restart the level to try again.",
+      "semanticSummary": "{name}. {progress}. {reward}.",
+      "semanticSummaryTimed": "{name}. {progress}. {reward}. {time}.",
+      "match3Candy": {
+        "berry": "berry crystal",
+        "citrus": "citrus orb",
+        "mint": "mint triangle",
+        "grape": "grape square",
+        "star": "sugar star"
+      }
+    },
     "logs": {
       "accepted": "Đã nhận nhiệm vụ: {name}",
+      "worldQuestStarted": "World quest started: {name}",
       "abandoned": "Đã từ bỏ nhiệm vụ: {name}",
       "completed": "Đã hoàn thành nhiệm vụ: {name}",
       "ready": "{name} ({status})",
@@ -13049,6 +13102,18 @@ export const vi_VN: EnTranslations = {
       "sprung_trap": {
         "name": "Bẫy Đầm Lầy Đã Sập"
       },
+      "leyline_cache": {
+        "name": "Miniature Ley Cache"
+      },
+      "confection_game_box": {
+        "name": "Confectioner's Game Box"
+      },
+      "eastbrook_freight_crate": {
+        "name": "Eastbrook Freight Crate"
+      },
+      "eastbrook_freight_wagon": {
+        "name": "Eastbrook Freight Wagon"
+      },
       "hearthlined_treads": {
         "name": "Giày Lót Lò Sưởi"
       },
@@ -14718,6 +14783,15 @@ export const vi_VN: EnTranslations = {
       },
       "vale_bandit": {
         "name": "Cướp Thung Lũng"
+      },
+      "eastbrook_freight_caravan": {
+        "name": "Eastbrook Freight Caravan"
+      },
+      "willowfen_remedy_caravan": {
+        "name": "Willowfen Remedy Caravan"
+      },
+      "frostveil_supply_caravan": {
+        "name": "Frostveil Supply Caravan"
       },
       "restless_bones": {
         "name": "Bộ Xương Bất An"

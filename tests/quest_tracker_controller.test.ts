@@ -1,10 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
-import { QUESTS } from '../src/sim/data';
-import type { QuestProgress } from '../src/sim/types';
+import { QUESTS, WORLD_QUESTS } from '../src/sim/data';
+import type { QuestProgress, WorldQuestProgress } from '../src/sim/types';
 import { QuestTrackerController } from '../src/ui/hud/quest/quest_tracker_controller';
 import { makeWriterFacet } from '../src/ui/painter_host';
 import { dropPointerFocus } from '../src/ui/pointer_blur';
-import type { IWorld } from '../src/world_api';
 
 /** A private facet per rig: the controller takes Hud's shared one in production,
  *  and a test needs only the elision behaviour. */
@@ -29,11 +28,13 @@ function progress(questId: string, state: QuestProgress['state'] = 'active'): Qu
   };
 }
 
-function harness(entries: QuestProgress[] = []) {
+function harness(entries: QuestProgress[] = [], worldEntries: WorldQuestProgress[] = []) {
   const questLog = new Map(entries.map((entry) => [entry.questId, entry]));
+  const worldQuestLog = new Map(worldEntries.map((entry) => [entry.questId, entry]));
   let html = '';
   let writes = 0;
   let collapsed = false;
+  const listeners = new Map<string, EventListener>();
   const header = {
     classList: { contains: (value: string) => value === 'qt-header' },
     focus: vi.fn(),
@@ -51,6 +52,9 @@ function harness(entries: QuestProgress[] = []) {
       html = value;
       writes++;
     },
+    addEventListener: (type: string, listener: EventListener) => {
+      listeners.set(type, listener);
+    },
     querySelector: (selector: string) => (selector === '.qt-header' ? header : null),
   } as unknown as HTMLElement;
   const document = docState as unknown as Document;
@@ -62,21 +66,25 @@ function harness(entries: QuestProgress[] = []) {
     }),
   };
   const click = vi.fn();
+  const openQuest = vi.fn();
   const controller = new QuestTrackerController({
     writers: writers(),
     element,
     document,
-    world: () => ({ questLog }) as Pick<IWorld, 'questLog'>,
+    world: () => ({ questLog, worldQuestLog }),
     settings,
     questTitle: (questId) => `title:${questId}`,
     objectiveLabel: (questId, index) => `objective:${questId}:${index}`,
+    openQuest,
     click,
   });
   return {
     controller,
     questLog,
+    worldQuestLog,
     settings,
     click,
+    openQuest,
     header,
     html: () => html,
     writes: () => writes,
@@ -84,6 +92,7 @@ function harness(entries: QuestProgress[] = []) {
       collapsed = next;
     },
     collapsed: () => collapsed,
+    dispatch: (type: string, event: unknown) => listeners.get(type)?.(event as Event),
   };
 }
 
@@ -102,6 +111,50 @@ describe('QuestTrackerController', () => {
     );
     expect(test.html()).toContain('objective:q_wolves:0');
     expect(test.html()).toContain('quest-complete');
+  });
+
+  it('tracks an active world quest without an accepted quest-log entry', () => {
+    const quest = WORLD_QUESTS[0];
+    const test = harness(
+      [],
+      [
+        { questId: quest.id, count: 2, state: 'active' },
+        { questId: WORLD_QUESTS[1].id, count: WORLD_QUESTS[1].count, state: 'completed' },
+      ],
+    );
+
+    test.controller.update(0);
+
+    expect(test.html()).toContain('Eastbrook Vale');
+    expect(test.html()).not.toContain(`data-quest="${quest.id}"`);
+    expect(test.html()).not.toMatch(/class="qt-title" role="button"[^>]*wq_/);
+    expect(test.html()).toContain(`2/${quest.count}`);
+    expect(test.html()).not.toContain(WORLD_QUESTS[1].id);
+  });
+
+  it('makes an active puzzle world quest keyboard-openable from the tracker', () => {
+    const quest = WORLD_QUESTS.find((entry) => entry.objective.type === 'puzzle');
+    expect(quest).toBeDefined();
+    if (!quest) return;
+    const test = harness([], [{ questId: quest.id, count: 0, state: 'active' }]);
+
+    test.controller.update(0);
+
+    expect(test.html()).not.toContain(`data-world-quest="${quest.id}"`);
+    const row = { dataset: { worldQuest: quest.id } };
+    const preventDefault = vi.fn();
+    const stopPropagation = vi.fn();
+    test.dispatch('keydown', {
+      key: 'Enter',
+      code: 'Enter',
+      target: { closest: (selector: string) => (selector === '.qt-title' ? row : null) },
+      preventDefault,
+      stopPropagation,
+    });
+
+    expect(preventDefault).not.toHaveBeenCalled();
+    expect(stopPropagation).not.toHaveBeenCalled();
+    expect(test.openQuest).not.toHaveBeenCalled();
   });
 
   it('keeps an unknown quest id tracked at its log position, never a throw (R34)', () => {

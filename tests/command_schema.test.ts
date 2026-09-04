@@ -6,8 +6,8 @@ import { describe, expect, it } from 'vitest';
 import { COMMAND_NAMES, type CommandName, DISPATCH_ONLY_COMMANDS } from '../src/world_api';
 
 // W0b boundary gate: the command-schema lockstep invariant (00-SHARED-CONVENTIONS
-// #2). Every command ClientWorld sends (`cmd:'X'` through the private cmd()
-// helper in src/net/online.ts) MUST have a matching `case 'X':` in the
+// #2). Every command ClientWorld sends (`cmd:'X'` through the online transport
+// or one of its wire-state bases) MUST have a matching `case 'X':` in the
 // server/game.ts dispatchMessage switch. This test pins the CURRENT contract by
 // re-deriving both sets directly from source (not from the brief's numbers) and
 // proving:
@@ -75,8 +75,8 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // six vcup_* send + dispatch pairs (docs/design/eastbrook-revamp/master-plan.md);
 // the Proving Shore tutorial adds its one start_tutorial pair back on top, and
 // the v0.40.0 sync merge brings the release side's one new pair with it.
-const EXPECTED_SEND_COUNT = 207;
-const EXPECTED_DISPATCH_COUNT = 220;
+const EXPECTED_SEND_COUNT = 210;
+const EXPECTED_DISPATCH_COUNT = 223;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch
@@ -107,10 +107,8 @@ function readSource(relPath: string): string {
   return stripComments(readFileSync(join(repoRoot, relPath), 'utf8'));
 }
 
-// Distinct `cmd:'X'` literals ClientWorld sends. Every send funnels through the
-// single private cmd() helper as an object literal, including the handshake send
-// (`challengeResponse`) outside the IWorld-commands block, so a whole-file scan
-// captures the complete send-set. There is no dynamic/computed cmd value.
+// Distinct `cmd:'X'` literals ClientWorld sends. Commands are authored as object
+// literals in online.ts and its wire-state bases; there is no dynamic cmd value.
 function scanSendSet(src: string): Set<string> {
   const tokens = new Set<string>();
   for (const m of src.matchAll(/cmd:\s*'([^']+)'/g)) tokens.add(m[1]);
@@ -141,14 +139,17 @@ function difference<T>(a: Set<T>, b: Set<T>): Set<T> {
   return out;
 }
 
-const sendSet = scanSendSet(readSource('src/net/online.ts'));
+const sendSet = new Set([
+  ...scanSendSet(readSource('src/net/online.ts')),
+  ...scanSendSet(readSource('src/net/quest_world_wire_state.ts')),
+]);
 const dispatchSet = scanDispatchSet(readSource('server/game.ts'));
 const tableSet = new Set<CommandName>(COMMAND_NAMES);
 const allowlistSet = new Set<CommandName>(DISPATCH_ONLY_COMMANDS);
 
 describe('command schema parity (W0b)', () => {
   it('re-derives the verified set sizes from source', () => {
-    expect(sendSet.size, 'distinct cmd:X sends in online.ts').toBe(EXPECTED_SEND_COUNT);
+    expect(sendSet.size, 'distinct cmd:X sends in ClientWorld sources').toBe(EXPECTED_SEND_COUNT);
     expect(dispatchSet.size, 'distinct case labels in dispatchMessage').toBe(
       EXPECTED_DISPATCH_COUNT,
     );

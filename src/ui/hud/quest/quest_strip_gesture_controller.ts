@@ -23,7 +23,7 @@
 //     has to advance the strip as well, or VoiceOver and Switch Control cannot
 //     reach the other tracked quests.
 
-import { type QuestStripStep, questStripStep } from './quest_strip_core';
+import { type QuestStripStep, questStripIsTap, questStripStep } from './quest_strip_core';
 
 /** An assistive or keyboard activation reports detail 0; a pointer-driven click
  *  reports its click count. Only the latter can be the compatibility click a
@@ -35,6 +35,7 @@ export interface QuestStripGestureDeps {
   surface: HTMLElement;
   /** Move the selection by one quest, wrapping in both directions. */
   cycle(step: QuestStripStep): void;
+  activate(): boolean;
   /** The finger is down on the strip; the owner paints the pressed state. */
   setPressed(pressed: boolean): void;
 }
@@ -75,7 +76,7 @@ export class QuestStripGesture {
         return;
       }
       this.suppressClick = false;
-      this.deps.cycle(1);
+      if (!this.deps.activate()) this.deps.cycle(1);
     });
   }
 
@@ -108,9 +109,10 @@ export class QuestStripGesture {
 
   private onUp(e: PointerEvent): void {
     if (e.pointerId !== this.pointerId) return;
-    const step = questStripStep(e.clientX - this.startX);
+    const dx = e.clientX - this.startX;
+    const step = questStripStep(dx);
     this.suppressClick = true;
     this.cancel();
-    this.deps.cycle(step);
+    if (!questStripIsTap(dx) || !this.deps.activate()) this.deps.cycle(step);
   }
 }

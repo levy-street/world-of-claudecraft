@@ -358,7 +358,9 @@ const MONOLITHS: MonolithRow[] = [
     // and the release arm's rickshaw hooks moved with it, so the merged file
     // lands below both prior pins. Measured on the merged tree. Exact merged
     // count, zero headroom.
-    ceiling: 13214,
+    // Quest caravan animation and entity-body picking now share the tested
+    // quest_entity_presentation.ts lifecycle adapter. Exact post-extraction count.
+    ceiling: 13210,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -464,7 +466,11 @@ const MONOLITHS: MonolithRow[] = [
     // Plus 2 for the Phase B set-bonus seam: the set_bonus_mods import and
     // the setPlayerLevel writer routing through computeCharacterModifiers
     // (the resolver itself is the extracted module). Exact count, zero slack.
-    ceiling: 12465,
+    // Lowered after world-quest state/persistence and static-object bootstrap
+    // moved behind their own modules. The feature's required facade and tick
+    // wiring now land with zero net growth against release/v0.42.0.
+    // World-quest credit callbacks moved behind world_quest_context.ts.
+    ceiling: 12268,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -583,7 +589,7 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
-    ceiling: 10641,
+    ceiling: 10640,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

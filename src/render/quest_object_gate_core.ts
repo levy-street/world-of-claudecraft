@@ -16,8 +16,14 @@
 // Resolving the flag ONCE into a closure keeps the per-entity path a single call rather
 // than a branch plus a predicate, and keeps the renderer coordinator down to the call
 // sites. Pure: no Three, no DOM, no i18n, no clock, no rng.
+
+import { WORLD_QUESTS_BY_ID } from '../sim/data';
 import { isQuestGatedGroundObjectHidden } from '../sim/quest_gated_entity';
-import type { Entity, QuestProgress } from '../sim/types';
+import type { Entity, QuestProgress, WorldQuestProgress } from '../sim/types';
+import {
+  isWorldQuestSalvageObject,
+  isWorldQuestSalvageObjectHidden,
+} from '../sim/world_quest_salvage';
 
 export interface QuestObjectGateOptions {
   /** Draw every ground quest collectable regardless of the viewer's quest log. The
@@ -28,7 +34,29 @@ export interface QuestObjectGateOptions {
 /** True when this viewer must not see the entity at all. */
 export type QuestObjectGate = (entity: Entity, questLog: Map<string, QuestProgress>) => boolean;
 
-export function makeQuestObjectGate(options: QuestObjectGateOptions): QuestObjectGate {
+export interface WorldQuestObjectReader {
+  worldQuestCycle: string;
+  worldQuestLog: ReadonlyMap<string, WorldQuestProgress>;
+}
+
+export function makeQuestObjectGate(
+  options: QuestObjectGateOptions,
+  worldQuests?: WorldQuestObjectReader,
+): QuestObjectGate {
   if (options.showAllQuestObjects === true) return () => false;
+  const salvageQuest = WORLD_QUESTS_BY_ID.wq_farshore_salvage;
+  if (worldQuests && salvageQuest) {
+    return (entity, questLog) => {
+      if (isWorldQuestSalvageObject(entity, salvageQuest)) {
+        return isWorldQuestSalvageObjectHidden(
+          entity,
+          salvageQuest,
+          worldQuests.worldQuestCycle,
+          worldQuests.worldQuestLog,
+        );
+      }
+      return isQuestGatedGroundObjectHidden(entity, questLog);
+    };
+  }
   return isQuestGatedGroundObjectHidden;
 }

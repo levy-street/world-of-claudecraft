@@ -42,6 +42,8 @@ import type {
   ZonePropsDef,
 } from '../sim/types';
 import type { Decoration } from '../sim/world';
+import { WORLD_BOSSES, worldBossLockoutId } from '../sim/world_boss';
+import { activeWorldQuestsForCycle } from '../sim/world_quest_rotation';
 import type { FriendInfo, IWorld } from '../world_api';
 import { buildCastlePlanMarkers, type CastlePlanMarker } from './castle_plan_core';
 import { dungeonMapActive } from './dungeon_map_view';
@@ -588,6 +590,67 @@ export interface MapQuestAreaMarker {
   numbers: number[];
 }
 
+/** A self-starting world objective. The area ring and its center emblem share
+ * this marker so paint, pointer, touch, and accessibility use one projection. */
+export interface MapWorldQuestMarker {
+  questId: string;
+  mx: number;
+  my: number;
+  radius: number;
+  state: 'available' | 'active';
+  /** The objective ring is disclosure-on-select; the emblem always remains visible. */
+  areaVisible?: boolean;
+}
+
+/** A fixed-position world boss that still offers personal loot to this player.
+ * Unlike a world quest, it owns no disclosure area: its authored spawn point is
+ * the whole objective. */
+export interface MapWorldBossMarker {
+  bossId: string;
+  mx: number;
+  my: number;
+}
+
+export function worldQuestMarkerAt(
+  markers: readonly MapWorldQuestMarker[],
+  mx: number,
+  my: number,
+  hitRadius: number,
+): MapWorldQuestMarker | null {
+  const radius2 = Math.max(0, hitRadius) ** 2;
+  let best: MapWorldQuestMarker | null = null;
+  let bestDistance2 = Number.POSITIVE_INFINITY;
+  for (const marker of markers) {
+    const dx = mx - marker.mx;
+    const dy = my - marker.my;
+    const distance2 = dx * dx + dy * dy;
+    if (distance2 > radius2 || distance2 >= bestDistance2) continue;
+    best = marker;
+    bestDistance2 = distance2;
+  }
+  return best;
+}
+
+export function worldBossMarkerAt(
+  markers: readonly MapWorldBossMarker[],
+  mx: number,
+  my: number,
+  hitRadius: number,
+): MapWorldBossMarker | null {
+  const radius2 = Math.max(0, hitRadius) ** 2;
+  let best: MapWorldBossMarker | null = null;
+  let bestDistance2 = Number.POSITIVE_INFINITY;
+  for (const marker of markers) {
+    const dx = mx - marker.mx;
+    const dy = my - marker.my;
+    const distance2 = dx * dx + dy * dy;
+    if (distance2 > radius2 || distance2 >= bestDistance2) continue;
+    best = marker;
+    bestDistance2 = distance2;
+  }
+  return best;
+}
+
 /** The distinct objectives under a canvas point, across every quest area that
  *  contains it (overlapping blobs merge into one tooltip). Pure hit-test the
  *  hover handler calls with the last painted model's areas. */
@@ -736,6 +799,8 @@ export interface OverworldMapModel {
   castles: CastlePlanMarker[];
   npcs: MapNpcMarker[];
   questAreas: MapQuestAreaMarker[];
+  worldQuests: MapWorldQuestMarker[];
+  worldBosses: MapWorldBossMarker[];
   /** Gather nodes in the committed zone (all zoom levels). Empty only when
    *  the zone has no authored nodes in view. */
   gatherNodes: MapGatherNodeMarker[];
@@ -780,6 +845,8 @@ export interface OverworldMapInput {
   ping?: { x: number; z: number } | null;
   /** Responsive marker profile, resolved once by the painter per redraw. */
   markerProfile?: MapMarkerProfile;
+  /** Session-only icon selection that reveals one world-quest objective area. */
+  selectedWorldQuestId?: string | null;
 }
 
 /** Which world-map surface this world renders. Delve when the player stands in a
@@ -921,6 +988,45 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     numbers.sort((a, b) => a - b);
     const { mx, my } = toMap(area.center.x, area.center.z);
     questAreas.push({ mx, my, radius: (area.radius / spanX) * S, objectives, numbers });
+  }
+
+  // World quests exist independently from the accepted quest log. Eligible
+  // objectives show before discovery, switch state when the player enters the
+  // area, and disappear for the rest of the realm-reset cycle after completion.
+  // An empty cycle is also the negotiated-capability fallback: an older server
+  // never sends wqday, so a newer client must not advertise phantom objectives.
+  const worldQuests: MapWorldQuestMarker[] = [];
+  const playerLevel = Number.isFinite(p.level) ? p.level : 0;
+  for (const quest of activeWorldQuestsForCycle(world.worldQuestCycle)) {
+    if (quest.zoneId !== zone.id || playerLevel < quest.minLevel) continue;
+    const progress = world.worldQuestLog?.get(quest.id);
+    if (progress?.state === 'completed') continue;
+    if (!inView(quest.area.x, quest.area.z)) continue;
+    const { mx, my } = toMap(quest.area.x, quest.area.z);
+    worldQuests.push({
+      questId: quest.id,
+      mx,
+      my,
+      radius: (quest.area.radius / spanX) * S,
+      state: progress?.state === 'active' ? 'active' : 'available',
+      areaVisible: input.selectedWorldQuestId === quest.id,
+    });
+  }
+
+  // World bosses use the same raid-lockout record for reward eligibility and
+  // the HUD countdown. A missing lockout means the boss is still incomplete for
+  // this player. Its authored spawn point is fixed, so there is deliberately no
+  // objective radius or selection disclosure attached to this marker.
+  const worldBosses: MapWorldBossMarker[] = [];
+  let raidLockouts: ReturnType<IWorld['raidLockouts']> | null = null;
+  for (const boss of WORLD_BOSSES) {
+    if (!world.worldBossActive?.(boss.templateId)) continue;
+    raidLockouts ??= world.raidLockouts();
+    if (raidLockouts.some((lockout) => lockout.id === worldBossLockoutId(boss.templateId)))
+      continue;
+    if (!inZone(boss.pos.x, boss.pos.z) || !inView(boss.pos.x, boss.pos.z)) continue;
+    const { mx, my } = toMap(boss.pos.x, boss.pos.z);
+    worldBosses.push({ bossId: boss.templateId, mx, my });
   }
 
   // Dungeon portals owned by the current zone (shown at every zoom).
@@ -1167,6 +1273,8 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     castles,
     npcs,
     questAreas,
+    worldQuests,
+    worldBosses,
     gatherNodes,
     stations,
     services,

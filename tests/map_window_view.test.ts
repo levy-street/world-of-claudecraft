@@ -23,7 +23,9 @@ import {
   STATIONS,
   STRIP_MAX_X,
   STRIP_MIN_X,
+  WORLD_QUESTS,
   ZONES,
+  zoneAt,
 } from '../src/sim/data';
 import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
 import type { QuestObjectiveRef } from '../src/sim/quest_targets';
@@ -32,10 +34,12 @@ import {
   isQuestTurnInNpc,
   type NoticeboardDef,
   type QuestProgress,
+  type WorldQuestProgress,
   type WorldServicesDef,
   type ZonePropsDef,
 } from '../src/sim/types';
 import type { Decoration } from '../src/sim/world';
+import { WORLD_BOSSES, worldBossLockoutId } from '../src/sim/world_boss';
 import { isNodeToolLockedFor } from '../src/ui/gathering_view';
 import { STABLE_MAP_NAVIGATION_LANDMARKS } from '../src/ui/map_navigation_landmarks_core';
 import {
@@ -63,6 +67,8 @@ import {
   questAreaObjectivesAtInto,
   serviceMarkerAt,
   stationMarkerAt,
+  worldBossMarkerAt,
+  worldQuestMarkerAt,
 } from '../src/ui/map_window_view';
 import type { IWorld } from '../src/world_api';
 
@@ -100,6 +106,9 @@ const READY_QUEST = requireReadyQuest();
 function makeOverworldWorld(
   shape: 'sim' | 'client',
   questLog: Map<string, QuestProgress> = new Map(),
+  level = 1,
+  worldQuestLog: Map<string, WorldQuestProgress> = new Map(),
+  worldQuestCycle = '2026-08-31',
 ): IWorld {
   const simJunk = shape === 'sim' ? { hp: 100, maxHp: 100, castingAbility: null } : {};
   const player = {
@@ -108,6 +117,7 @@ function makeOverworldWorld(
     name: 'Me',
     pos: { x: 0, z: ZONE_CZ },
     facing: 0.5,
+    level,
     ...simJunk,
   };
   const npc = {
@@ -150,6 +160,8 @@ function makeOverworldWorld(
     playerId: 1,
     questState: (q: string) => (q === GIVER_QUEST.id ? 'available' : 'unavailable'),
     questLog,
+    worldQuestCycle,
+    worldQuestLog,
     questsDone: new Set<string>(),
     craftingIdentity,
     // Gather-node marker inputs (mirrors minimap_markers fixture): inventory
@@ -158,6 +170,8 @@ function makeOverworldWorld(
     inventory: [],
     gatheringProficiency: {},
     nodeHarvestableByMe: () => true,
+    raidLockouts: () => [],
+    worldBossActive: () => false,
     stationPlacements: STATIONS,
     civicServicePlacements: [],
   } as unknown as IWorld;
@@ -1055,6 +1069,134 @@ describe('active-quest objective areas (the classic POI blobs)', () => {
     const retainedCapacity = [...output];
     expect(questAreaObjectivesAtInto(areas, 100, 100, output)).toBe(0);
     expect(output).toEqual(retainedCapacity);
+  });
+});
+
+describe('world-quest zone markers', () => {
+  const quest = (() => {
+    const found = WORLD_QUESTS.find((candidate) => candidate.zoneId === ZONE.id);
+    if (!found) throw new Error('expected a world quest in the first zone');
+    return found;
+  })();
+
+  function progress(state: WorldQuestProgress['state']): Map<string, WorldQuestProgress> {
+    return new Map([[quest.id, { questId: quest.id, count: 2, state }]]);
+  }
+
+  it('projects only the five objectives selected for the current rotation', () => {
+    let projected = 0;
+    for (const zone of ZONES) {
+      const world = makeOverworldWorld('sim', new Map(), quest.minLevel);
+      world.player.pos.x = ((zone.xMin ?? -500) + (zone.xMax ?? 500)) / 2;
+      world.player.pos.z = (zone.zMin + zone.zMax) / 2;
+      const model = buildOverworldMapModel({ ...input(world, 1), zone });
+      expect(model.worldQuests.length, zone.id).toBeLessThanOrEqual(1);
+      if (model.worldQuests[0]) {
+        expect(model.worldQuests[0].radius, zone.id).toBeGreaterThan(0);
+        projected++;
+      }
+    }
+    expect(projected).toBe(5);
+  });
+
+  it('appears from its minimum level in both hosts and changes to active state', () => {
+    const below = buildOverworldMapModel(
+      input(makeOverworldWorld('sim', new Map(), quest.minLevel - 1), 1),
+    );
+    expect(below.worldQuests).toEqual([]);
+
+    const sim = buildOverworldMapModel(
+      input(makeOverworldWorld('sim', new Map(), quest.minLevel), 1),
+    );
+    const client = buildOverworldMapModel(
+      input(makeOverworldWorld('client', new Map(), quest.minLevel), 1),
+    );
+    expect(sim.worldQuests).toEqual(client.worldQuests);
+    expect(sim.worldQuests).toEqual([
+      expect.objectContaining({ questId: quest.id, state: 'available' }),
+    ]);
+
+    const active = buildOverworldMapModel(
+      input(makeOverworldWorld('sim', new Map(), quest.minLevel, progress('active')), 1),
+    );
+    expect(active.worldQuests[0]).toMatchObject({ questId: quest.id, state: 'active' });
+  });
+
+  it('stays hidden when a legacy server never advertises a world-quest cycle', () => {
+    const legacy = buildOverworldMapModel(
+      input(makeOverworldWorld('client', new Map(), quest.minLevel, new Map(), ''), 1),
+    );
+    expect(legacy.worldQuests).toEqual([]);
+  });
+
+  it('hides a completed cycle entry and scales/hit-tests the live emblem', () => {
+    const completed = buildOverworldMapModel(
+      input(makeOverworldWorld('sim', new Map(), quest.minLevel, progress('completed')), 1),
+    );
+    expect(completed.worldQuests).toEqual([]);
+
+    const atQuest = (zoom: number) => {
+      const world = makeOverworldWorld('sim', new Map(), quest.minLevel);
+      world.player.pos.x = quest.area.x;
+      world.player.pos.z = quest.area.z;
+      return buildOverworldMapModel(input(world, zoom));
+    };
+    const z1 = atQuest(1);
+    const z2 = atQuest(2);
+    const marker = z1.worldQuests[0];
+    expect(z2.worldQuests[0].radius).toBeCloseTo(marker.radius * 2, 5);
+    expect(worldQuestMarkerAt(z1.worldQuests, marker.mx, marker.my, 14)).toBe(marker);
+    expect(worldQuestMarkerAt(z1.worldQuests, -10_000, -10_000, 14)).toBeNull();
+  });
+
+  it('keeps the objective area hidden until its icon is selected', () => {
+    const hidden = buildOverworldMapModel(
+      input(makeOverworldWorld('sim', new Map(), quest.minLevel), 1),
+    );
+    const revealed = buildOverworldMapModel({
+      ...input(makeOverworldWorld('sim', new Map(), quest.minLevel), 1),
+      selectedWorldQuestId: quest.id,
+    });
+    expect(hidden.worldQuests[0]).toMatchObject({ questId: quest.id, areaVisible: false });
+    expect(revealed.worldQuests[0]).toMatchObject({ questId: quest.id, areaVisible: true });
+  });
+});
+
+describe('world-boss zone markers', () => {
+  const boss = WORLD_BOSSES[0];
+  const bossZone = zoneAt(boss.pos.x, boss.pos.z);
+
+  function bossModel(shape: 'sim' | 'client', completed = false) {
+    const world = makeOverworldWorld(shape) as IWorld & {
+      raidLockouts(): Array<{ id: string; msRemaining: number }>;
+      worldBossActive(bossId: string): boolean;
+    };
+    world.worldBossActive = (bossId) => bossId === boss.templateId;
+    world.raidLockouts = () =>
+      completed ? [{ id: worldBossLockoutId(boss.templateId), msRemaining: 60_000 }] : [];
+    return buildOverworldMapModel({ ...input(world, 1), zone: bossZone });
+  }
+
+  it('projects the fixed boss location identically in both hosts while its lockout is absent', () => {
+    const sim = bossModel('sim');
+    const client = bossModel('client');
+
+    expect(sim.worldBosses).toEqual(client.worldBosses);
+    expect(sim.worldBosses).toEqual([expect.objectContaining({ bossId: boss.templateId })]);
+    const marker = sim.worldBosses[0];
+    expect(worldBossMarkerAt(sim.worldBosses, marker.mx, marker.my, 14)).toBe(marker);
+    expect(marker).not.toHaveProperty('radius');
+    expect(marker).not.toHaveProperty('areaVisible');
+  });
+
+  it('hides the marker after the personal-loot lockout marks the boss completed', () => {
+    expect(bossModel('sim', true).worldBosses).toEqual([]);
+    expect(bossModel('client', true).worldBosses).toEqual([]);
+  });
+
+  it('hides the marker while the scheduled boss is not alive', () => {
+    const world = makeOverworldWorld('sim');
+    expect(buildOverworldMapModel({ ...input(world, 1), zone: bossZone }).worldBosses).toEqual([]);
   });
 });
 

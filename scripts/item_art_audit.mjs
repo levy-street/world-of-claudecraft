@@ -108,11 +108,13 @@ const build = await buildItemArtAudit({
     // Tortoise) that joined at the release/v0.42.0 sync of PR #3439.
     // + the Cluckwork Mech Bird store mount reins icon (PR #3464); liveItemCount
     // moves with it.
-    catalogCount: 1044,
+    // + the two painted world-quest puzzle activators and two Eastbrook
+    // freight-delivery icons.
+    catalogCount: 1048,
     // 844 + the 201 Crucible raid loot definitions (192 of them art-pending)
     // + the base's 2 Varkhul legendary definitions, + the release sync's 7
     // bank-storage painted bags, + the two developer mount reins.
-    liveItemCount: 1059,
+    liveItemCount: 1063,
     generatedHeroicDefinitions: 64,
     heroicDefinitionsWithOwnWebp: 48,
     heroicWeaponArtAliases: 16,

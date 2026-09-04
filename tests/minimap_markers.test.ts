@@ -10,8 +10,18 @@
 // canvas no-magic-values guard is in tests/minimap_painter.test.ts.
 
 import { describe, expect, it } from 'vitest';
-import { DELVE_X_MIN, GATHER_NODES, ITEMS, QUESTS, STATIONS, YUMI_MAZE_X } from '../src/sim/data';
+import {
+  DELVE_X_MIN,
+  GATHER_NODES,
+  ITEMS,
+  QUESTS,
+  STATIONS,
+  WORLD_QUESTS_BY_ID,
+  YUMI_MAZE_X,
+  zoneAt,
+} from '../src/sim/data';
 import { isQuestTurnInNpc } from '../src/sim/types';
+import { WORLD_BOSSES, worldBossLockoutId } from '../src/sim/world_boss';
 import { STABLE_MAP_NAVIGATION_LANDMARKS } from '../src/ui/map_navigation_landmarks_core';
 import {
   createMinimapMarkers,
@@ -20,6 +30,8 @@ import {
   minimapMode,
   minimapPaintedMarkerClearance,
   minimapSafeCenterRadius,
+  minimapWorldObjectiveMarkerAt,
+  minimapWorldQuestMarkerAt,
 } from '../src/ui/minimap_markers';
 import type { IWorld } from '../src/world_api';
 import { assertAllocationStable } from './util/alloc_probe';
@@ -150,6 +162,8 @@ function makeWorld(shape: 'sim' | 'client'): IWorld {
     // itself whatever the map looks like.
     inventory: [],
     nodeHarvestableByMe: () => true,
+    raidLockouts: () => [],
+    worldBossActive: () => false,
     // The quest-marker inputs both worlds expose (the phase 23 classifier):
     // questsDone always, and the crafting identity whose cadenceBlockedQuests
     // mirror drives the cooldown variant. The sim shape carries a fuller
@@ -203,6 +217,136 @@ describe('minimapMode (delve vs overworld discriminator)', () => {
 });
 
 describe('createMinimapMarkers: the discriminated union per draw kind', () => {
+  it('shows a nearby available world quest as a hit-testable small marker', () => {
+    const quest = WORLD_QUESTS_BY_ID.wq_eastbrook_bandits;
+    const world = makeWorld('sim') as unknown as {
+      player: { level: number; pos: { x: number; z: number } };
+      worldQuestCycle: string;
+      worldQuestLog: ReadonlyMap<string, never>;
+    };
+    world.player.level = quest.minLevel;
+    world.player.pos.x = quest.area.x;
+    world.player.pos.z = quest.area.z;
+    world.worldQuestCycle = '2026-08-31';
+    world.worldQuestLog = new Map<string, never>();
+
+    const markers = buildMarkers(world as unknown as IWorld);
+    const marker = markers.find((candidate) => candidate.kind === 'world-quest');
+    expect(marker).toMatchObject({ questId: quest.id, zoneId: quest.zoneId, state: 'available' });
+    if (!marker || marker.kind !== 'world-quest') throw new Error('missing world quest marker');
+    expect(minimapWorldQuestMarkerAt(markers, marker.mx, marker.my, 10)).toBe(marker);
+  });
+
+  it('pins the icon to the rim before entry when the objective area is approaching', () => {
+    const quest = WORLD_QUESTS_BY_ID.wq_eastbrook_bandits;
+    const world = makeWorld('client') as unknown as {
+      player: { level: number; pos: { x: number; z: number } };
+      worldQuestCycle: string;
+      worldQuestLog: ReadonlyMap<string, never>;
+    };
+    world.player.level = quest.minLevel;
+    world.player.pos.x = quest.area.x + quest.area.radius + 25;
+    world.player.pos.z = quest.area.z;
+    world.worldQuestCycle = '2026-08-31';
+    world.worldQuestLog = new Map<string, never>();
+
+    const marker = buildMarkers(world as unknown as IWorld).find(
+      (candidate) => candidate.kind === 'world-quest',
+    );
+    expect(marker).toMatchObject({ questId: quest.id, state: 'available' });
+    if (!marker || marker.kind !== 'world-quest') throw new Error('missing rim marker');
+    expect(Math.hypot(marker.mx - S / 2, marker.my - S / 2)).toBeCloseTo(
+      minimapSafeCenterRadius(S, 7),
+      5,
+    );
+  });
+
+  it('hides below-level, completed, inactive-rotation, and distant world quests', () => {
+    const quest = WORLD_QUESTS_BY_ID.wq_eastbrook_bandits;
+    const world = makeWorld('sim') as unknown as {
+      player: { level: number; pos: { x: number; z: number } };
+      worldQuestCycle: string;
+      worldQuestLog: ReadonlyMap<string, { questId: string; count: number; state: string }>;
+    };
+    const worldQuestMarkers = () =>
+      buildMarkers(world as unknown as IWorld).filter((marker) => marker.kind === 'world-quest');
+    world.player.pos.x = quest.area.x;
+    world.player.pos.z = quest.area.z;
+    world.worldQuestCycle = '2026-08-31';
+
+    world.player.level = quest.minLevel - 1;
+    world.worldQuestLog = new Map();
+    expect(worldQuestMarkers()).toEqual([]);
+
+    world.player.level = quest.minLevel;
+    world.worldQuestLog = new Map([
+      [quest.id, { questId: quest.id, count: quest.count, state: 'completed' }],
+    ]);
+    expect(worldQuestMarkers()).toEqual([]);
+
+    world.worldQuestCycle = '2026-09-03';
+    world.worldQuestLog = new Map();
+    expect(worldQuestMarkers()).toEqual([]);
+
+    world.worldQuestCycle = '2026-08-31';
+    world.player.pos.x = quest.area.x + quest.area.radius + 1_000;
+    expect(worldQuestMarkers()).toEqual([]);
+  });
+
+  it('marks an entered objective active while keeping the same small emblem', () => {
+    const quest = WORLD_QUESTS_BY_ID.wq_eastbrook_bandits;
+    const world = makeWorld('client') as unknown as {
+      player: { level: number; pos: { x: number; z: number } };
+      worldQuestCycle: string;
+      worldQuestLog: ReadonlyMap<string, { questId: string; count: number; state: string }>;
+    };
+    world.player.level = quest.minLevel;
+    world.player.pos.x = quest.area.x;
+    world.player.pos.z = quest.area.z;
+    world.worldQuestCycle = '2026-08-31';
+    world.worldQuestLog = new Map([[quest.id, { questId: quest.id, count: 1, state: 'active' }]]);
+
+    expect(
+      buildMarkers(world as unknown as IWorld).find((marker) => marker.kind === 'world-quest'),
+    ).toMatchObject({ questId: quest.id, state: 'active' });
+  });
+
+  it('shows the fixed world boss as a hit-testable objective until its loot lockout lands', () => {
+    const boss = WORLD_BOSSES[0];
+    const world = makeWorld('sim') as unknown as {
+      player: { pos: { x: number; z: number } };
+      raidLockouts(): Array<{ id: string; msRemaining: number }>;
+      worldBossActive(bossId: string): boolean;
+    };
+    world.player.pos.x = boss.pos.x;
+    world.player.pos.z = boss.pos.z;
+    world.raidLockouts = () => [];
+    world.worldBossActive = (bossId) => bossId === boss.templateId;
+
+    const markers = buildMarkers(world as unknown as IWorld);
+    const marker = markers.find((candidate) => candidate.kind === 'world-boss');
+    expect(marker).toMatchObject({
+      bossId: boss.templateId,
+      zoneId: zoneAt(boss.pos.x, boss.pos.z).id,
+    });
+    if (!marker || marker.kind !== 'world-boss') throw new Error('missing world boss marker');
+    expect(minimapWorldObjectiveMarkerAt(markers, marker.mx, marker.my, 10)).toBe(marker);
+
+    world.raidLockouts = () => [{ id: worldBossLockoutId(boss.templateId), msRemaining: 60_000 }];
+    expect(
+      buildMarkers(world as unknown as IWorld).filter(
+        (candidate) => candidate.kind === 'world-boss',
+      ),
+    ).toEqual([]);
+
+    world.raidLockouts = () => [];
+    world.worldBossActive = () => false;
+    expect(
+      buildMarkers(world as unknown as IWorld).filter(
+        (candidate) => candidate.kind === 'world-boss',
+      ),
+    ).toEqual([]);
+  });
   it('keeps a painted marker full-corner-safe at the circular clip in both profiles', () => {
     for (const size of [16, 18, 20, 22, 24, 26]) {
       const clearance = minimapPaintedMarkerClearance(size);
@@ -876,6 +1020,8 @@ describe('station markers (Professions 2.0)', () => {
       stationPlacements: STATIONS,
       questState: () => 'unavailable',
       nodeHarvestableByMe: () => true,
+      raidLockouts: () => [],
+      worldBossActive: () => false,
       // Paired with nodeHarvestableByMe above: both gather-node reads, both
       // needed by any viewer with a node inside the rim, which the "field
       // viewer" case below now is (wood_eastbrook_5 is 12 yards from (0, 150)).
@@ -1034,6 +1180,8 @@ describe('gather-node markers: the locked dimension', () => {
       gatheringProficiency: opts.gatheringProficiency ?? {},
       nodeHarvestableByMe: opts.harvestable ?? (() => true),
       questState: () => 'unavailable',
+      raidLockouts: () => [],
+      worldBossActive: () => false,
     } as unknown as IWorld;
   }
 
@@ -1178,6 +1326,8 @@ describe('gather-node markers scale with the rim, not the node table (phase 16)'
       gatheringProficiency: {},
       nodeHarvestableByMe: () => true,
       questState: () => 'unavailable',
+      raidLockouts: () => [],
+      worldBossActive: () => false,
     } as unknown as IWorld;
   }
   function nodeMarkersAt(x: number, z: number) {

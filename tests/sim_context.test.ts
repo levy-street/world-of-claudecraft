@@ -251,6 +251,13 @@ const CALLBACK_KEYS = [
   // this list's append-only rule.
   // Thornhollow Fields battleground hooks (social/battleground.ts).
   'bgOnPlayerDeath',
+  // World-quest callbacks are append-only at the end of the established seam.
+  'onMobKilledForWorldQuests',
+  'onNodeGatheredForWorldQuests',
+  'onObjectInteractedForWorldQuests',
+  'currentWorldQuestRotation',
+  'hasActiveWorldQuest',
+  'completeWorldQuestEscort',
 ] as const;
 
 // A fully-spied fake host. `clock` is mutable so a test can prove the context reads
@@ -416,8 +423,14 @@ function makeFakeHost() {
     dropPartyMarkers: vi.fn(),
     formDungeonFinderGroup: vi.fn(() => null),
     onMobKilledForQuests: vi.fn(),
+    onMobKilledForWorldQuests: vi.fn(),
     onRecipeCraftedForQuests: vi.fn(),
     onNodeGatheredForQuests: vi.fn(),
+    onNodeGatheredForWorldQuests: vi.fn(),
+    onObjectInteractedForWorldQuests: vi.fn(() => false),
+    currentWorldQuestRotation: vi.fn(() => ({ cycle: '', quests: [] })),
+    hasActiveWorldQuest: vi.fn(() => false),
+    completeWorldQuestEscort: vi.fn(),
     onInventoryChangedForQuests: vi.fn(),
     checkQuestReady: vi.fn(),
     countItem: vi.fn(() => 0),

@@ -19,9 +19,14 @@ import {
 import { handlePickedEntity, hoverCursorKind } from '../src/game/interactions';
 import { tryNearbyInteraction } from '../src/game/nearby_interaction';
 import { ESCORTS } from '../src/sim/data';
-import type { Entity, QuestProgress } from '../src/sim/types';
+import type { Entity, QuestProgress, WorldQuestProgress } from '../src/sim/types';
 
 const WREN = ESCORTS.esc_fv_wren;
+if (WREN.questId === undefined) throw new Error('Wren must remain an ordinary escort quest');
+const WREN_QUEST_ID = WREN.questId;
+const CARAVAN = ESCORTS.esc_wq_eastbrook_caravan;
+if (CARAVAN.worldQuestId === undefined) throw new Error('Caravan must remain a world quest');
+const CARAVAN_QUEST_ID = CARAVAN.worldQuestId;
 const AWAY_TEXT = 'escort away';
 
 function entity(overrides: Partial<Entity> & Pick<Entity, 'id' | 'kind'>): Entity {
@@ -55,7 +60,20 @@ function escorteeAt(x = WREN.start.x, z = WREN.start.z, overrides: Partial<Entit
 }
 
 function activeLog(): Map<string, QuestProgress> {
-  return new Map([[WREN.questId, { questId: WREN.questId, counts: [0], state: 'active' }]]);
+  return new Map([[WREN_QUEST_ID, { questId: WREN_QUEST_ID, counts: [0], state: 'active' }]]);
+}
+
+function activeWorldLog(): Map<string, WorldQuestProgress> {
+  return new Map([[CARAVAN_QUEST_ID, { questId: CARAVAN_QUEST_ID, count: 0, state: 'active' }]]);
+}
+
+function caravanAt(): Entity {
+  return entity({
+    id: 3,
+    kind: 'mob',
+    templateId: CARAVAN.npcMobId,
+    pos: { x: CARAVAN.start.x, y: 0, z: CARAVAN.start.z },
+  });
 }
 
 function entities(...list: Entity[]): Map<number, Entity> {
@@ -79,7 +97,7 @@ describe('decideEscortPress', () => {
 
     for (const state of ['ready', 'done'] as const) {
       const log = new Map<string, QuestProgress>([
-        [WREN.questId, { questId: WREN.questId, counts: [1], state }],
+        [WREN_QUEST_ID, { questId: WREN_QUEST_ID, counts: [1], state }],
       ]);
       expect(decideEscortPress(player.pos, entities(player, wren), log)).toEqual({ kind: 'none' });
     }
@@ -172,11 +190,19 @@ describe('every escort def in the game is startable from the client', () => {
       templateId: def.npcMobId,
       pos: { x: def.start.x, y: 0, z: def.start.z },
     });
-    const log = new Map([
-      [def.questId, { questId: def.questId, counts: [0], state: 'active' as const }],
-    ]);
+    const log = new Map<string, QuestProgress>();
+    const worldLog = new Map<string, WorldQuestProgress>();
+    if (def.worldQuestId !== undefined) {
+      worldLog.set(def.worldQuestId, {
+        questId: def.worldQuestId,
+        count: 0,
+        state: 'active',
+      });
+    } else {
+      log.set(def.questId, { questId: def.questId, counts: [0], state: 'active' });
+    }
 
-    expect(decideEscortPress(player.pos, entities(player, escortee), log)).toEqual({
+    expect(decideEscortPress(player.pos, entities(player, escortee), log, worldLog)).toEqual({
       kind: 'start',
       entityId: escortee.id,
     });
@@ -186,11 +212,14 @@ describe('every escort def in the game is startable from the client', () => {
     });
   });
 
-  it('covers all four shipped escorts, so a fifth cannot be missed silently', () => {
+  it('covers every shipped escort, so a new route cannot be missed silently', () => {
     expect(Object.keys(ESCORTS).sort()).toEqual([
       'esc_fs_bram',
       'esc_fv_wren',
       'esc_pr_navigator',
+      'esc_wq_eastbrook_caravan',
+      'esc_wq_frostveil_caravan',
+      'esc_wq_willowfen_caravan',
       'esc_ww_mosley',
     ]);
   });
@@ -252,13 +281,19 @@ describe('isEscorteeEntity', () => {
 });
 
 describe('the Interact action reaches the escort run (tryNearbyInteraction)', () => {
-  function rig(list: Entity[], player: Entity, log = activeLog()) {
+  function rig(
+    list: Entity[],
+    player: Entity,
+    log = activeLog(),
+    worldLog = new Map<string, WorldQuestProgress>(),
+  ) {
     const calls: string[] = [];
     const world = {
       playerId: player.id,
       player,
       entities: entities(player, ...list),
       questLog: log,
+      worldQuestLog: worldLog,
       targetEntity: (id: number | null) => {
         calls.push(`target:${id}`);
       },
@@ -298,6 +333,19 @@ describe('the Interact action reaches the escort run (tryNearbyInteraction)', ()
 
     expect(r.press()).toBe(true);
     expect(r.calls).toEqual([`target:${wren.id}`, 'interact']);
+  });
+
+  it('dispatches the interact command for an active world-quest caravan', () => {
+    const caravan = caravanAt();
+    const r = rig(
+      [caravan],
+      playerAt(CARAVAN.start.x + 1, CARAVAN.start.z),
+      new Map(),
+      activeWorldLog(),
+    );
+
+    expect(r.press()).toBe(true);
+    expect(r.calls).toEqual([`target:${caravan.id}`, 'interact']);
   });
 
   it('explains an empty post instead of the generic nothing-to-interact line', () => {
@@ -363,7 +411,12 @@ describe('the Interact action reaches the escort run (tryNearbyInteraction)', ()
 });
 
 describe('a right-click reaches the escort run (handlePickedEntity)', () => {
-  function rig(wren: Entity, player: Entity, log = activeLog()) {
+  function rig(
+    wren: Entity,
+    player: Entity,
+    log = activeLog(),
+    worldLog = new Map<string, WorldQuestProgress>(),
+  ) {
     const startAutoAttack = vi.fn();
     const interact = vi.fn();
     const world = {
@@ -371,6 +424,7 @@ describe('a right-click reaches the escort run (handlePickedEntity)', () => {
       playerId: player.id,
       entities: entities(player, wren),
       questLog: log,
+      worldQuestLog: worldLog,
       targetEntity: vi.fn(),
       interact,
       enterDungeon: () => false as const,
@@ -400,6 +454,20 @@ describe('a right-click reaches the escort run (handlePickedEntity)', () => {
     // She is non-hostile, so the old path fell into the attackable branch and
     // did nothing at all.
     expect(r.startAutoAttack).not.toHaveBeenCalled();
+  });
+
+  it('starts an active world-quest caravan through the picked-entity path', () => {
+    const caravan = caravanAt();
+    const r = rig(
+      caravan,
+      playerAt(CARAVAN.start.x + 1, CARAVAN.start.z),
+      new Map(),
+      activeWorldLog(),
+    );
+
+    expect(handlePickedEntity(r.world, r.hud, caravan.id, 2, 0, 0)).toBe(true);
+    expect(r.world.targetEntity).toHaveBeenCalledWith(caravan.id);
+    expect(r.interact).toHaveBeenCalledTimes(1);
   });
 
   it('reports too far beyond the click range', () => {

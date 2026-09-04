@@ -910,6 +910,9 @@ export function completeGatherCast(ctx: SimContext, p: Entity, meta: PlayerMeta)
   // level-gated the same way kill XP is: a max-level player farming a
   // trivial (gray) node gets zero.
   ctx.grantXp(gatherActionXp(node.level, p.level), meta);
+  // World-quest XP can level the player. Credit it only after this harvest's
+  // own XP has been calculated from the level at which the cast completed.
+  ctx.onNodeGatheredForWorldQuests(node, meta);
   // Rare event: soft zone broadcast plus the dormant per-flavor
   // deed mark, resolved in gather_events.ts after the grant lands.
   if (rareEvent) announceGatherRareEvent(ctx, meta, node, rareEvent, itemId);

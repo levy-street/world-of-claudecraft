@@ -17,6 +17,7 @@
 // Intl.DateTimeFormat, new Date(ms), and Date.UTC.
 
 import { DOUBLE_HONOR_LEAD_MS } from '../src/sim/pvp/honor_event';
+import { worldQuestCycleForResetDay } from '../src/sim/world_quest_rotation';
 
 export const DEFAULT_RAID_RESET_TIME_ZONE = 'America/New_York';
 
@@ -121,6 +122,30 @@ export function nextRaidResetMs(
   const { y, mo, d } = zoneDate(nowMs, zone);
   const today = zoneResetInstant(y, mo, d, zone);
   return today > nowMs ? today : zoneResetInstant(y, mo, d + 1, zone);
+}
+
+/** Next realm boundary whose reset-day key belongs to a new world-quest rotation. */
+const WORLD_QUEST_EXPIRY_MEMO_MAX = 16;
+const worldQuestExpiryMemo = new Map<string, number>();
+
+export function nextWorldQuestRotationMs(
+  nowMs: number,
+  zone: string = DEFAULT_RAID_RESET_TIME_ZONE,
+): number {
+  const memoKey = `${Math.floor(nowMs / 60_000)}:${zone}`;
+  const memoized = worldQuestExpiryMemo.get(memoKey);
+  if (memoized !== undefined) return memoized;
+  const currentCycle = worldQuestCycleForResetDay(resetDayKey(nowMs, zone));
+  let boundary = nextRaidResetMs(nowMs, zone);
+  for (let day = 0; day < 3; day++) {
+    if (worldQuestCycleForResetDay(resetDayKey(boundary, zone)) !== currentCycle) {
+      if (worldQuestExpiryMemo.size >= WORLD_QUEST_EXPIRY_MEMO_MAX) worldQuestExpiryMemo.clear();
+      worldQuestExpiryMemo.set(memoKey, boundary);
+      return boundary;
+    }
+    boundary = nextRaidResetMs(boundary, zone);
+  }
+  throw new Error(`nextWorldQuestRotationMs found no boundary after ${nowMs} in ${zone}`);
 }
 
 // The civil weekday (0 Sunday .. 6 Saturday) of the reset-zone calendar date the

@@ -1,3 +1,4 @@
+import { WORLD_QUESTS_BY_ID } from '../sim/data';
 import { isQuestGatedGroundObjectHidden } from '../sim/quest_gated_entity';
 import { isObjectOpenedByViewer } from '../sim/quests/opened_object_view';
 import {
@@ -6,7 +7,12 @@ import {
   type GatherNodeDef,
   INTERACT_RANGE,
   type QuestProgress,
+  type WorldQuestProgress,
 } from '../sim/types';
+import {
+  isWorldQuestSalvageObject,
+  isWorldQuestSalvageObjectHidden,
+} from '../sim/world_quest_salvage';
 import { corpseLootAvailability, localPartyMemberIds } from './corpse_loot_availability';
 import { decideEscortPress, handleEscortPress } from './escort_interact';
 import {
@@ -29,6 +35,8 @@ export interface NearbyInteractionWorld {
   // quest has NO other client entry point, so a silently unwired arm would
   // make the quest uncompletable again.
   questLog: ReadonlyMap<string, QuestProgress>;
+  worldQuestCycle?: string;
+  worldQuestLog?: ReadonlyMap<string, WorldQuestProgress>;
   targetEntity(id: number | null): void;
   interact(): void;
   lootCorpse(id: number): InteractionOutcome;
@@ -81,6 +89,7 @@ export function tryNearbyInteraction(
 ): InteractionOutcome {
   const player = world.player;
   const playerId = world.playerId ?? player.id;
+  const salvageQuest = WORLD_QUESTS_BY_ID.wq_farshore_salvage;
   const partyIds = localPartyMemberIds(world.partyInfo);
   let bestCorpse: number | null = null;
   let bestCorpseDistance = INTERACT_RANGE;
@@ -136,8 +145,15 @@ export function tryNearbyInteraction(
       // covers an interact-objective object this player already credited (an
       // opened castaway crate): the renderer hides it for them, so the press
       // must not target it either.
-      !isQuestGatedGroundObjectHidden(entity, world.questLog) &&
-      !isObjectOpenedByViewer(entity, world.questLog)
+      (salvageQuest && isWorldQuestSalvageObject(entity, salvageQuest)
+        ? !isWorldQuestSalvageObjectHidden(
+            entity,
+            salvageQuest,
+            world.worldQuestCycle ?? '',
+            world.worldQuestLog ?? new Map(),
+          )
+        : !isQuestGatedGroundObjectHidden(entity, world.questLog) &&
+          !isObjectOpenedByViewer(entity, world.questLog))
     ) {
       if (distance <= objectInteractionRange(entity) && distance < bestObjectDistance) {
         bestObject = entity.id;
@@ -214,7 +230,7 @@ export function tryNearbyInteraction(
   // looting the ambush wave is never swallowed.
   const escort = player.dead
     ? ({ kind: 'none' } as const)
-    : decideEscortPress(player.pos, world.entities, world.questLog);
+    : decideEscortPress(player.pos, world.entities, world.questLog, world.worldQuestLog);
   if (escort.kind === 'start') return handleEscortPress(world, hud, escort, escortAwayText);
   if (bestNode !== null) {
     return handleGatherNodeInteract(

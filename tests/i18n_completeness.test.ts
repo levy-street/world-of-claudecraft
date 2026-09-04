@@ -225,26 +225,26 @@ describe('i18n whole-catalog completeness', () => {
 
   it('keeps every localized marker accessibility meaning pinned per locale', () => {
     const expected = {
-      es: 'a3b0facc6f346cab9b568ef8a175c2f278b698e02844be886a309d83a3d59236',
-      es_ES: 'a3b0facc6f346cab9b568ef8a175c2f278b698e02844be886a309d83a3d59236',
-      fr_FR: '4700a092a995bd13ec245920b2f3603be7cfba3cddc4e88e52874b4e1dd4ea61',
-      fr_CA: '4700a092a995bd13ec245920b2f3603be7cfba3cddc4e88e52874b4e1dd4ea61',
-      it_IT: 'fbf913501dc3bf7b9a0cf88f3b654bccaea8f50560bd378c56f2a04ba6b38060',
-      de_DE: '7fcca29608ee68a74d329ba58f3a2d5e91a3b5face81fde6adf9eecc840902b9',
-      zh_CN: 'a738be36830aacb67e1748030518e575d26e978f72676c33fb217b16988a391d',
-      zh_TW: 'eef84a2f3ee01485844c6477edb2d77339a50b49e55e01844b9d08c7194759c3',
-      ko_KR: 'c8e0dc983facc2d5fffa1f47e152078ae77d1beedb1a95e0c0c2c68da62533f5',
-      ja_JP: 'c12ab80566cadcc1b110954f5e3d36e0445fc15d5fd8aa961823980322ae948b',
-      pt_BR: 'a6e32a7ef00440fcd2e9f7ce4565f83884cbe6a3c62acd243077402ebcc01ce3',
-      ru_RU: '545527d526ab3214d9b1a8d003fa4f82fe38d9881be76480d98ddeed4eab3a74',
-      cs_CZ: 'c8bb2280b76279da5b0cc5f350fd8ba6dd7859d382179c7ba7d4be5bec9426d5',
-      nl_NL: 'dc8b8d5b30862f6eae769b1fd6385d35a17f050621ac03d84544c566af28c3e4',
-      pl_PL: '57efef4238801ef24418327e7040a62386f9cc590502201743ec22953fd5fd55',
-      id_ID: 'b9f192f7fef84c5037646bd499aac24a49461ebf9643384ce1fc53d98ba78915',
-      tr_TR: '76380b19af860657c0c28b4e0819860a5c5be0e000d6c3a2fe3870b58f2b4efb',
-      sv_SE: '0c441e36aeb4e410fa33b22bd6b9d5e688cfa6ffed19969938d73e7719e62eec',
-      vi_VN: '74316c1ae2c6aed1bac93823c13666d525f5323524fb3a32779b6e3d1c0f6aca',
-      da_DK: '980fac6b6bd64a0566b3624da401131f59375ff7b7efb0d2e4a9c7afc91896f6',
+      es: 'eb2be53228c54358df1955ad9c4b831e12d90c789d6671e6b5b19ec8a3e13c24',
+      es_ES: 'eb2be53228c54358df1955ad9c4b831e12d90c789d6671e6b5b19ec8a3e13c24',
+      fr_FR: '70511cfc030a80099268bcae2f807d15cc656c76bd47d54aa08f17532f333e42',
+      fr_CA: '70511cfc030a80099268bcae2f807d15cc656c76bd47d54aa08f17532f333e42',
+      it_IT: '87c5d9895ece09c9d0454c11a94e832a5f59dd12cc52354482eee05b1adca762',
+      de_DE: '7ace22cb4ce8e37d818caf00983240591c2d0bdbb60880f000b614cd0f100e0a',
+      zh_CN: '739a7919cfc9d060ffea4e73bd082e8a5e0181228ffbc417b25e20b89bf62df8',
+      zh_TW: 'c2e1641e2c1e64ebef3c1199c0ccf7983873470ffe08061a18924842213afe87',
+      ko_KR: 'b7d1e74280f501f047568083442af1ba10f276b081e1c136e0d632bc124486b4',
+      ja_JP: '33abf5b07ea4bcf29e92ec8fa8415d9ad3116df0939ff43c2a42aab491ed2762',
+      pt_BR: '58a7f14d5aa9623bfe9ad0b0a0c49af3164363dfc9623f548f6b2e37888e4827',
+      ru_RU: 'd213180277c1136051ce2124efd513b7939dcc6ef2d709e201ea777689bace6a',
+      cs_CZ: 'e0ba50357989654a8cb222bdecfa375a239cad6cb6cb722e4a9f6a2d97463897',
+      nl_NL: '958f0554915adf95f77d4f64eac5681ec0deded410658d2de53a495284472edc',
+      pl_PL: '202315f094a221e4d96829d5e92b1a2092aa1edbe4971d6c41a27cf9260ccb8a',
+      id_ID: '0ab6083d0502da16e8703b6bcfc0e2be47ba8dda211eec88410040216794818d',
+      tr_TR: '14d61c23e7d3a6f4851200a7c6934d6dfea1e63c32931148d4ad1ffa207e8797',
+      sv_SE: 'f670877f501c9ad770ca0f1b5d809cc2cec8aeb82f52be12c638e0a58f161057',
+      vi_VN: '5d8d8d036c7b35a2720bd55e7c38381ae06ceda4f792e1664ba5012db23c4c54',
+      da_DK: 'bfc23b5d241857355b3d567268e7819ab545ca79510fb12895e2f85b60172d01',
     } as const satisfies Partial<Record<SupportedLanguage, string>>;
 
     for (const [lang, digest] of Object.entries(expected) as Array<
@@ -253,7 +253,7 @@ describe('i18n whole-catalog completeness', () => {
       const markerRows = Object.entries(flatten(TABLES[lang])).filter(([key]) =>
         key.startsWith('hud.core.mapMarker'),
       );
-      expect(markerRows).toHaveLength(100);
+      expect(markerRows).toHaveLength(103);
       expect(createHash('sha256').update(JSON.stringify(markerRows)).digest('hex'), lang).toBe(
         digest,
       );

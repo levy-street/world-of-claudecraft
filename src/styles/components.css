@@ -17923,3 +17923,252 @@
   line-height: 1.25;
   font-weight: 600;
 }
+/* ---------- world quest: weekly minigames ---------- */
+#world-quest-puzzle-window {
+  width: 410px;
+  max-width: calc(var(--app-vw, 100vw) / var(--ui-scale, 1) - 24px);
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 18px;
+}
+
+.wqp-instructions {
+  margin: 2px 18px 4px;
+  color: var(--color-text-muted);
+  line-height: 1.45;
+}
+
+.wqp-level {
+  align-self: center;
+  color: var(--color-accent);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.wqp-grid {
+  --wqp-tile-size: 72px;
+  display: grid;
+  grid-template-columns: repeat(var(--wqp-columns), var(--wqp-tile-size));
+  grid-template-rows: repeat(var(--wqp-rows), var(--wqp-tile-size));
+  gap: 8px;
+  align-self: center;
+  padding: 14px;
+  border: 1px solid var(--color-border-default);
+  border-radius: 8px;
+  background: var(--color-bg-dark);
+}
+
+.wqm-status {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 18px;
+  color: var(--color-text-light);
+  font-size: 13px;
+}
+
+.wqm-grid {
+  --wqm-cell-size: 48px;
+  display: grid;
+  grid-template-columns: repeat(var(--wqm-columns), var(--wqm-cell-size));
+  grid-template-rows: repeat(var(--wqm-rows), var(--wqm-cell-size));
+  gap: 6px;
+  align-self: center;
+  padding: 12px;
+  border: 1px solid var(--color-border-default);
+  border-radius: 8px;
+  background: var(--color-bg-dark);
+}
+
+.wqm-cell {
+  min-width: 44px;
+  min-height: 44px;
+  border: 2px solid var(--color-border-default);
+  border-radius: 12px;
+  color: var(--color-bg-dark);
+  cursor: pointer;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1;
+  text-shadow: 0 1px 0 var(--color-text-overlay);
+}
+
+.wqm-cell.candy-0 {
+  background: var(--color-candy-berry);
+}
+.wqm-cell.candy-1 {
+  background: var(--color-candy-citrus);
+}
+.wqm-cell.candy-2 {
+  background: var(--color-candy-mint);
+}
+.wqm-cell.candy-3 {
+  background: var(--color-candy-grape);
+}
+.wqm-cell.candy-4 {
+  background: var(--color-candy-star);
+}
+
+.wqm-cell:hover,
+.wqm-cell:focus-visible,
+.wqm-cell.selected {
+  border-color: var(--color-accent);
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.wqm-cell:disabled {
+  cursor: default;
+  filter: grayscale(0.45);
+  opacity: 0.72;
+}
+
+.wqm-out {
+  margin: 0 18px;
+  color: var(--color-text-error);
+  text-align: center;
+}
+
+.wqm-reset {
+  align-self: center;
+}
+
+.wqp-tile {
+  position: relative;
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid var(--color-border-default);
+  border-radius: 8px;
+  background: var(--color-bg-input);
+  cursor: pointer;
+  overflow: visible;
+}
+
+.wqp-tile:hover {
+  border-color: var(--color-accent);
+}
+
+.wqp-tile:focus-visible {
+  border-color: var(--color-accent);
+  outline: 3px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.wqp-node,
+.wqp-arm {
+  position: absolute;
+  display: block;
+  background: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.wqp-node {
+  width: 18px;
+  height: 18px;
+  left: 50%;
+  top: 50%;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.wqp-arm.north,
+.wqp-arm.south {
+  width: 8px;
+  height: 50%;
+  left: calc(50% - 4px);
+}
+
+.wqp-arm.north {
+  top: 0;
+}
+.wqp-arm.south {
+  bottom: 0;
+}
+
+.wqp-arm.east,
+.wqp-arm.west {
+  width: 50%;
+  height: 8px;
+  top: calc(50% - 4px);
+}
+
+.wqp-arm.east {
+  right: 0;
+}
+.wqp-arm.west {
+  left: 0;
+}
+
+.wqp-tile.powered .wqp-node,
+.wqp-tile.powered .wqp-arm {
+  background: var(--color-accent);
+  box-shadow: 0 0 10px var(--color-accent);
+}
+
+.wqp-edge {
+  position: absolute;
+  z-index: 2;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  top: calc(50% - 7px);
+  pointer-events: none;
+}
+
+.wqp-edge.west {
+  left: -12px;
+}
+.wqp-edge.east {
+  right: -12px;
+}
+.wqp-edge.north {
+  top: -12px;
+  left: calc(50% - 7px);
+}
+.wqp-edge.south {
+  top: auto;
+  bottom: -12px;
+  left: calc(50% - 7px);
+}
+.wqp-edge.source {
+  background: var(--color-aura-rpg-electric);
+}
+.wqp-edge.source {
+  border-radius: 2px;
+  transform: rotate(45deg);
+}
+.wqp-edge.target {
+  background: var(--color-text-success);
+  border: 3px double var(--color-bg-dark);
+}
+
+@media (forced-colors: active) {
+  .wqp-tile:focus-visible {
+    outline-color: Highlight;
+  }
+  .wqp-tile.powered {
+    border: 3px double Highlight;
+  }
+  .wqp-tile.powered .wqp-node,
+  .wqp-tile.powered .wqp-arm {
+    background: Highlight;
+    box-shadow: none;
+  }
+  .wqp-edge.source {
+    background: CanvasText;
+  }
+  .wqp-edge.target {
+    background: Canvas;
+    border-color: CanvasText;
+  }
+  .wqm-cell,
+  .wqm-cell.selected {
+    border-color: ButtonText;
+    color: ButtonText;
+    forced-color-adjust: auto;
+  }
+  .wqm-cell.selected {
+    outline: 3px solid Highlight;
+  }
+}

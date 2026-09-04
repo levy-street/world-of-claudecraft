@@ -4,7 +4,15 @@
 // the success credit that readies the quest.
 import { describe, expect, it } from 'vitest';
 import { visualKeyFor } from '../src/render/characters/manifest';
-import { BUILTIN_WORLD, ESCORTS, MOBS, NPCS, QUESTS, ZONES } from '../src/sim/data';
+import {
+  BUILTIN_WORLD,
+  ESCORTS,
+  MOBS,
+  NPCS,
+  QUESTS,
+  WORLD_QUESTS_BY_ID,
+  ZONES,
+} from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import {
   dist2d,
@@ -14,6 +22,7 @@ import {
   type WorldContent,
 } from '../src/sim/types';
 import { groundHeight, WATER_LEVEL } from '../src/sim/world';
+import { worldQuestCycleOfferingQuest } from '../src/sim/world_quest_rotation';
 
 const ESCORT_ID = 'esc_fv_wren';
 const QUEST_ID = 'q_fv_seeing_wren_home';
@@ -85,11 +94,20 @@ describe('escort content integrity', () => {
       // The run drives all movement; wander AI must never move the escortee.
       expect(MOBS[def.npcMobId].moveSpeed).toBe(0);
       expect(MOBS[def.npcMobId].aggroRadius).toBe(0);
-      const quest = QUESTS[def.questId];
-      expect(quest, `${def.id} quest`).toBeTruthy();
-      const objective = quest.objectives.find((o) => o.type === 'escort' && o.escortId === def.id);
-      expect(objective, `${def.id} quest escort objective`).toBeTruthy();
-      expect(objective?.count).toBe(1);
+      if (def.worldQuestId !== undefined) {
+        const quest = WORLD_QUESTS_BY_ID[def.worldQuestId];
+        expect(quest, `${def.id} world quest`).toBeTruthy();
+        expect(quest?.objective).toEqual({ type: 'escort', escortId: def.id });
+        expect(quest?.count).toBe(1);
+      } else {
+        const quest = QUESTS[def.questId];
+        expect(quest, `${def.id} quest`).toBeTruthy();
+        const objective = quest.objectives.find(
+          (o) => o.type === 'escort' && o.escortId === def.id,
+        );
+        expect(objective, `${def.id} quest escort objective`).toBeTruthy();
+        expect(objective?.count).toBe(1);
+      }
       expect(def.waypoints.length).toBeGreaterThan(0);
       // Faster than the stuck-advance epsilon (0.05 yd per 1/20s tick = 1 yd/s):
       // a slower def would register as permanently stuck and skip every waypoint
@@ -153,6 +171,7 @@ describe('escort content integrity', () => {
   // from: only Wren was registered, and Mosley, Suli and Bram were not.
   it('gives every escortee an explicit character model, never the outlaw fallback', () => {
     for (const def of Object.values(ESCORTS)) {
+      if (def.worldQuestId !== undefined) continue;
       const key = visualKeyFor({ kind: 'mob', templateId: def.npcMobId } as Entity);
       expect(key, `${def.id} escortee model`).not.toBe('mob_bandit');
       expect(key.startsWith('npc_'), `${def.id} escortee model is ${key}`).toBe(true);
@@ -524,8 +543,16 @@ describe('every escort route completes in the real world', () => {
     // tests/stable_yard.test.ts's long real-world tick run.
     it(`${def.id} walks its full route to credit`, () => {
       const sim = makeSim();
+      if (def.worldQuestId !== undefined) {
+        const meta = sim.meta(sim.playerId);
+        if (!meta) throw new Error('Missing player metadata');
+        meta.devWorldQuestCycle = worldQuestCycleOfferingQuest('wq3_0', def.worldQuestId);
+        teleportTo(sim, def.start.x, def.start.z);
+        sim.tick();
+      } else {
+        sim.questLog.set(def.questId, { questId: def.questId, counts: [0], state: 'active' });
+      }
       teleportTo(sim, def.start.x, def.start.z);
-      sim.questLog.set(def.questId, { questId: def.questId, counts: [0], state: 'active' });
       sim.interact();
       const state = sim.escortRuns.get(def.id);
       expect(state?.run, `${def.id} run started`).toBeTruthy();
@@ -546,7 +573,15 @@ describe('every escort route completes in the real world', () => {
         }
         teleportTo(sim, npc.pos.x + 2, npc.pos.z + 2);
         const events = sim.tick();
-        credited = events.some((e) => e.type === 'questReady' && e.questId === def.questId);
+        credited = events.some(
+          (e) =>
+            (def.worldQuestId !== undefined &&
+              e.type === 'worldQuestDone' &&
+              e.questId === def.worldQuestId) ||
+            (def.worldQuestId === undefined &&
+              e.type === 'questReady' &&
+              e.questId === def.questId),
+        );
       }
       expect(credited, `${def.id} reached its destination`).toBe(true);
     }, 90_000);

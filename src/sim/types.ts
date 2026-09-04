@@ -580,6 +580,10 @@ export type AuraKind =
   // carry: applied at the pickup, removed by clearCarrierAuras on every path the
   // flag leaves the carrier.
   | 'flag_carried'
+  // Eastbrook freight World Quest: an inert, public marker worn exactly while
+  // the player carries a crate. The movement kernel applies its value as the
+  // cargo speed multiplier; no combat or stat-recalc path consumes it.
+  | 'world_quest_cargo'
   // Chronomancy Temporal Echo mark (docs/prd/mage-chronomancy.md section 13): a
   // per-caster (sourceId) buff on ONE ally; while it rides, a fraction of the
   // mage's Arcane damage heals the marked ally. Value is unused (1); the
@@ -3482,10 +3486,14 @@ export interface CampDef {
 }
 
 // Ground interactables (sparkle objects)
+export const STABLE_GROUND_OBJECT_ENTITY_ID_MIN = 2_147_000_000;
+
 export interface GroundObjectDef {
   itemId: string;
   name: string;
   positions: { x: number; z: number }[];
+  /** Optional ids in the reserved high range, used without shifting the legacy roster. */
+  entityIds?: readonly number[];
 }
 
 // Gatherable world nodes (ore/wood/herb). Permanent, unowned fixtures: this
@@ -3964,19 +3972,19 @@ export interface EscortAmbushDef {
   atWaypoint: number;
   mobId: string;
   count: number;
+  // Optional authored level for scaled public-event waves. Ordinary quest
+  // escorts omit it and keep using the template's minimum level.
+  level?: number;
   // Spawn scatter ring around the escortee (world yards).
   radius?: number;
 }
 
-export interface EscortDef {
+interface EscortDefBase {
   id: string;
   // MobTemplate of the escortee: a non-hostile mob with moveSpeed 0 (the run
   // drives all movement) and aggroRadius 0. Players cannot attack it; mobs
   // damage it through seeded ambush threat; players may heal it while live.
   npcMobId: string;
-  // The quest carrying this escort's { type: 'escort' } objective. Interacting
-  // with the idle escortee while this quest is active starts the run.
-  questId: string;
   start: { x: number; z: number };
   waypoints: { x: number; z: number }[];
   moveSpeed: number;
@@ -3992,7 +4000,29 @@ export interface EscortDef {
   startText: string;
   successText: string;
   failText: string;
+  // Optional checkpoint story, spoken only between ambushes. Each line becomes
+  // eligible after arriving at its waypoint, then waits for reading space.
+  story?: {
+    speaker: string;
+    lineSpacingSeconds: number;
+    ambushText: string;
+    lines: { atWaypoint: number; text: string }[];
+  };
 }
+
+export type EscortDef = EscortDefBase &
+  (
+    | {
+        // The ordinary quest carrying this escort objective.
+        questId: string;
+        worldQuestId?: never;
+      }
+    | {
+        // The public world quest carrying this escort objective.
+        worldQuestId: string;
+        questId?: never;
+      }
+  );
 
 // Live per-def escort state (src/sim/escort.ts; the backing map stays on Sim).
 // Exactly one of three phases: idle (npcId set, run null), live (npcId set,
@@ -4006,6 +4036,7 @@ export interface EscortRunState {
     startedAt: number;
     ambushIds: number[];
     fired: boolean[];
+    story?: { nextLine: number; nextSpeechAt: number; finaleAt?: number };
     // Stuck-advance bookkeeping: a walker pinned against a collider for a few
     // seconds counts its current waypoint as reached (escort.ts).
     lastX: number;
@@ -4116,6 +4147,89 @@ export interface QuestProgress {
   // resets the run when the def's rev has moved (quest_progress_migration.ts),
   // dropping the per-run scratch (burnedObjects, creditedObjects) with it.
   rev?: number;
+}
+
+export type WorldQuestReward =
+  | { type: 'xp'; rate: number }
+  | { type: 'copper'; base: number; perLevel: number }
+  | { type: 'item'; itemId: string; count: number };
+
+export type WorldQuestBeamSide = 'north' | 'east' | 'south' | 'west';
+
+export interface WorldQuestBeamPuzzleDef {
+  columns: number;
+  rows: number;
+  source: { tileIndex: number; side: WorldQuestBeamSide };
+  target: { tileIndex: number; side: WorldQuestBeamSide };
+  tiles: readonly {
+    kind: 'straight' | 'corner';
+    initialRotation: number;
+  }[];
+}
+
+export type WorldQuestMatch3Candy = 0 | 1 | 2 | 3 | 4;
+
+export interface WorldQuestMatch3LevelDef {
+  columns: number;
+  rows: number;
+  board: readonly WorldQuestMatch3Candy[];
+  refill: readonly WorldQuestMatch3Candy[];
+  target: number;
+  maxMoves: number;
+}
+
+export type WorldQuestObjective =
+  | { type: 'kill'; targetMobId: string }
+  | { type: 'escort'; escortId: string }
+  | { type: 'interact'; targetObjectItemId: string }
+  | {
+      type: 'salvage';
+      objectItemId: string;
+      /** Stable ground-object entity ids, one eight-piece arrangement per week. */
+      layouts: readonly (readonly number[])[];
+    }
+  | { type: 'gather'; nodeType: GatherNodeType }
+  | {
+      type: 'delivery';
+      pickupObjectItemId: string;
+      deliveryObjectItemId: string;
+    }
+  | {
+      type: 'puzzle';
+      activationObjectItemId: string;
+      puzzles: readonly WorldQuestBeamPuzzleDef[];
+    }
+  | {
+      type: 'match3';
+      activationObjectItemId: string;
+      levels: readonly WorldQuestMatch3LevelDef[];
+    };
+
+/** A repeatable open-world objective. World quests have no giver or turn-in:
+ *  entering the authored area starts them and completing the objective pays
+ *  the reward immediately. */
+export interface WorldQuestDef {
+  id: string;
+  zoneId: string;
+  minLevel: number;
+  area: { x: number; z: number; radius: number };
+  objective: WorldQuestObjective;
+  count: number;
+  reward: WorldQuestReward;
+}
+
+/** Per-character state for the current host-provided UTC cycle. Available
+ *  quests are absent; only started and completed entries are persisted. */
+export interface WorldQuestProgress {
+  questId: string;
+  count: number;
+  state: 'active' | 'completed';
+  creditedObjects?: string[];
+  puzzleVariant?: number;
+  puzzleRotations?: number[];
+  match3Board?: WorldQuestMatch3Candy[];
+  match3Moves?: number;
+  match3RefillIndex?: number;
 }
 
 export function questObjectiveRequired(
@@ -5719,6 +5833,23 @@ export type SimEvent = { pid?: number } & (
     }
   | { type: 'questReady'; questId: string }
   | { type: 'questDone'; questId: string }
+  | { type: 'worldQuestStarted'; questId: string }
+  | {
+      type: 'worldQuestProgress';
+      questId: string;
+      count: number;
+      required: number;
+    }
+  | { type: 'worldQuestPuzzleOpened'; questId: string }
+  | { type: 'worldQuestPuzzleClosed'; questId: string }
+  | {
+      type: 'worldQuestPuzzleUpdated';
+      questId: string;
+      tileIndex: number;
+      rotation: number;
+    }
+  | { type: 'worldQuestMatch3Updated'; questId: string }
+  | { type: 'worldQuestDone'; questId: string }
   | {
       type: 'varkhulCallout';
       sourceId: number;

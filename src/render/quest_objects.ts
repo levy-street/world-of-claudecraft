@@ -2,6 +2,14 @@
 
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
+import {
+  FARSHORE_SALVAGE_ENTITY_ID_START,
+  FARSHORE_SALVAGE_OBJECT_ITEM_ID,
+} from '../sim/content/world_quests';
+import {
+  FARSHORE_SALVAGE_VISUAL_COUNT,
+  worldQuestSalvageVisualIndex,
+} from '../sim/world_quest_salvage';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import {
@@ -14,12 +22,14 @@ import {
 } from './fenbridge_surface_atlas';
 import { GFX, surfaceMat } from './gfx';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
+import { buildWorldQuestFreightWagon } from './world_quest_freight_visual';
 import { applySurfaceDetail, wornFamilyFor } from './worn_stone';
 
 /** Target max height after normalization (~sparkle anchor at 1.35). */
 const TARGET_HEIGHT = 1.35;
 
 const QUEST_OBJECT_URLS: Record<string, string> = {
+  eastbrook_freight_crate: '/models/quest/supply_crate.glb',
   crypt_ritual_circle: '/models/quest/crypt_ritual_circle.glb',
   supply_crate: '/models/quest/supply_crate.glb',
   lost_caravan_goods: '/models/quest/lost_caravan_goods.glb',
@@ -40,6 +50,14 @@ const QUEST_OBJECT_URLS: Record<string, string> = {
   // The Proving Shore ferry bells (a clicked travel object, not a pickup):
   // the standing bell-on-frame prop the marsh dressing already ships.
   ps_ferry_bell: '/models/props/marsh_bell_gallows.glb',
+  leyline_cache: '/models/dungeon/chest.glb',
+  confection_game_box: '/models/dungeon/chest.glb',
+  farshore_salvage_0: '/models/props/wreckage_broken_planks.glb',
+  farshore_salvage_1: '/models/props/wreckage_waterlogged_barrel.glb',
+  farshore_salvage_2: '/models/props/wreckage_damaged_crate.glb',
+  farshore_salvage_3: '/models/props/wreckage_fallen_anchor.glb',
+  farshore_salvage_4: '/models/props/wreckage_hull_fragment.glb',
+  farshore_salvage_5: '/models/props/wreckage_capsized_rowboat.glb',
 };
 
 const QUEST_OBJECT_HEIGHTS: Record<string, number> = {
@@ -57,6 +75,14 @@ const QUEST_OBJECT_HEIGHTS: Record<string, number> = {
   // A standing bell frame players travel by: tall enough to read at range,
   // shy of the 3.4 the raid wardstones claim.
   ps_ferry_bell: 2.6,
+  leyline_cache: 0.85,
+  confection_game_box: 0.85,
+  farshore_salvage_0: 1.1,
+  farshore_salvage_1: 1.05,
+  farshore_salvage_2: 1.05,
+  farshore_salvage_3: 1.35,
+  farshore_salvage_4: 2.8,
+  farshore_salvage_5: 2.4,
 };
 
 const SCROLL_ITEM_IDS = new Set(['weathered_ledger_page', 'fen_muster_order', 'highwatch_summons']);
@@ -101,6 +127,8 @@ const ITEM_MAT_OVERRIDES: Record<
   soulshard_pillar: { color: 0x6f1b2c, emissive: 0x8f1232, emissiveIntensity: 0.42 },
   sanctum_key_shard: { emissive: 0x1a4060, emissiveIntensity: 0.5 },
   morthen_grimoire: { emissive: 0x3a1850, emissiveIntensity: 0.12 },
+  leyline_cache: { color: 0x4f8edc, emissive: 0x245fb0, emissiveIntensity: 0.18 },
+  confection_game_box: { color: 0xc45a88, emissive: 0x8e2f63, emissiveIntensity: 0.12 },
 };
 
 const gltfByUrl = new Map<string, GLTF>();
@@ -111,6 +139,33 @@ function castsDynamicShadow(itemId: string): boolean {
   return !AUTHORED_SCROLL_CUE_IDS.has(itemId);
 }
 
+function visualItemIdForEntity(itemId: string, entityId: number): string {
+  const salvageVisual = worldQuestSalvageVisualIndex(entityId);
+  return salvageVisual === null ? itemId : `farshore_salvage_${salvageVisual}`;
+}
+
+export const farshoreSalvagePrewarmPlan = Object.freeze(
+  Array.from({ length: FARSHORE_SALVAGE_VISUAL_COUNT }, (_, visual) =>
+    Object.freeze({
+      visual,
+      entityId: FARSHORE_SALVAGE_ENTITY_ID_START + visual,
+      itemId: FARSHORE_SALVAGE_OBJECT_ITEM_ID,
+      poolKey: `object:${FARSHORE_SALVAGE_OBJECT_ITEM_ID}:salvage-${visual}`,
+    }),
+  ),
+);
+
+export function prewarmFarshoreSalvageObjects<T>(
+  build: (itemId: string, entityId: number) => T,
+  store: (poolKey: string, object: T) => void,
+): T[] {
+  return farshoreSalvagePrewarmPlan.map((entry) => {
+    const object = build(entry.itemId, entry.entityId);
+    store(entry.poolKey, object);
+    return object;
+  });
+}
+
 /** Test-only window into the preload asset set (mirrors delve_props.ts). */
 export const questObjectPreloadInternalsForTest = {
   questObjectUrl: QUEST_OBJECT_URLS,
@@ -119,6 +174,7 @@ export const questObjectPreloadInternalsForTest = {
   usesSharedSurfaceDetail: (itemId: string) => !AUTHORED_SCROLL_CUE_IDS.has(itemId),
   castsDynamicShadow,
   convertMaterial,
+  visualItemIdForEntity,
 };
 
 /** Test-only cache reset, so a determinism test can force two independent builds. */
@@ -247,12 +303,13 @@ function convertMaterial(src: THREE.Material, itemId: string): THREE.Material {
     vertexColors: fenbridgeAtlas ? false : s.vertexColors,
     normalMap: fenbridgePbr.normalMap ?? s.normalMap ?? undefined,
     roughnessMap: fenbridgePbr.roughnessMap ?? s.roughnessMap ?? undefined,
-    metalnessMap: musterIron ? fenbridgePbr.roughnessMap : undefined,
+    metalnessMap: musterIron ? fenbridgePbr.roughnessMap : (s.metalnessMap ?? undefined),
     roughness: s.roughness ?? 0.88,
-    metalness: musterIron ? 1 : Math.min(s.metalness ?? 0, 0.75),
+    metalness: musterIron ? 1 : (s.metalness ?? 0),
     emissive: ov?.emissive,
     emissiveIntensity: ov?.emissiveIntensity,
     flatShading: !GFX.standardMaterials,
+    side: s.side,
   });
   if (musterIron && mat instanceof THREE.MeshStandardMaterial) {
     mat.normalScale.setScalar(FENBRIDGE_SURFACE_NORMAL_SCALE);
@@ -640,9 +697,17 @@ export function buildGroundQuestObject(
   itemId: string,
   entityId: number,
 ): { group: THREE.Group; height: number } {
+  if (itemId === 'eastbrook_freight_wagon') {
+    const freightWagon = buildWorldQuestFreightWagon();
+    if (freightWagon) return freightWagon;
+  }
   const group = new THREE.Group();
+  const visualItemId = visualItemIdForEntity(itemId, entityId);
   const key =
-    PROCEDURAL_ITEM_IDS.has(itemId) || QUEST_OBJECT_URLS[itemId] ? itemId : 'supply_crate';
+    PROCEDURAL_ITEM_IDS.has(visualItemId) || QUEST_OBJECT_URLS[visualItemId]
+      ? visualItemId
+      : 'supply_crate';
+  group.userData.questObjectVisualItemId = key;
   const template = prepareItem(key);
   if (template) {
     const model = template.clone(true);

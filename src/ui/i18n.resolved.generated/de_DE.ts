@@ -2719,6 +2719,7 @@ export const de_DE: EnTranslations = {
       "forbiddenReflectionLock": "Forbidden Reflection kann noch nicht erneut vorbereitet werden",
       "internalCooldown": "Dieser Effekt kann erst erneut auslösen, wenn der Timer abgelaufen ist",
       "carriedFlag": "Ihr tragt die gegnerische Flagge. Hebt diesen Effekt auf, um sie fallen zu lassen.",
+      "carryingFreight": "You are carrying freight. Movement speed is reduced by {pct}%.",
       "battleStance": "Kampfhaltung: 10% mehr Wuterzeugung",
       "berserkerStance": "Berserkerhaltung: Kritische Treffer gelingen 3% öfter und treffen 3% härter",
       "crit": "Erhöht kritische Trefferchance um {pct}%",
@@ -8923,6 +8924,9 @@ export const de_DE: EnTranslations = {
         "readyQuest": "Quest zur Abgabe bereit",
         "repeatQuest": "Wiederholbare Quest",
         "cooldownQuest": "Quest in Abklingzeit",
+        "availableWorldQuest": "Available world quest: {name}",
+        "activeWorldQuest": "Active world quest: {name}",
+        "worldBoss": "World boss: {name}",
         "questObjective": "Questzielgebiet",
         "readyOre": "Verfügbare Erzader",
         "readyWood": "Verfügbare Baumgruppe",
@@ -9712,8 +9716,57 @@ export const de_DE: EnTranslations = {
       "objectiveProgress": "{label}: {current}/{total}",
       "requiresLevel": "Benötigt Stufe {level}"
     },
+    "worldQuest": {
+      "title": "{zone}: {target}",
+      "unknown": "Unknown world quest ({id})",
+      "itemReward": "Item reward: {name}",
+      "rewardLine": "Rewards: {reward}",
+      "availableStatus": "Available world quest",
+      "activeStatus": "Active world quest",
+      "expiresIn": "Expires in {time}",
+      "mineOre": "Mine copper ore",
+      "recoverObject": "Recover {name}",
+      "redirectLeyBeam": "Redirect the ley beam",
+      "matchConfections": "Match enchanted confections",
+      "loadFreight": "Load freight into the wagon",
+      "escortCaravan": "Escort the caravan: {zone}",
+      "salvageWreckage": "Salvage shipwreck debris",
+      "puzzleTitle": "Ley Beam Alignment",
+      "puzzleLevel": "Weekly level {level}",
+      "puzzleInstructions": "Rotate the tiles to carry the beam from the source to the destination.",
+      "puzzleRotateTile": "Rotate tile {tile}",
+      "puzzleConnectors": "Connectors: {connectors}.",
+      "puzzlePowered": "The beam reaches this tile.",
+      "puzzleUnpowered": "The beam does not reach this tile.",
+      "puzzleClose": "Close ley beam puzzle",
+      "puzzleSource": "Source",
+      "puzzleTarget": "Destination",
+      "puzzleSourceEndpoint": "Source: {direction}.",
+      "puzzleTargetEndpoint": "Destination: {direction}.",
+      "puzzleTileAria": "{rotation} {connectors} {power} {source} {target}",
+      "match3Title": "Confection Cascade",
+      "match3Instructions": "Select two adjacent confections. A swap only counts when it creates a line of three or more.",
+      "match3Moves": "Moves: {current}/{total}",
+      "match3Cleared": "Confections cleared: {current}/{total}",
+      "match3Announcement": "{moves}. {cleared}.",
+      "match3Cell": "Row {row}, column {column}: {candy}",
+      "match3Selected": "Selected",
+      "match3Reset": "Restart level",
+      "match3Close": "Close confection puzzle",
+      "match3OutOfMoves": "No moves remain. Restart the level to try again.",
+      "semanticSummary": "{name}. {progress}. {reward}.",
+      "semanticSummaryTimed": "{name}. {progress}. {reward}. {time}.",
+      "match3Candy": {
+        "berry": "berry crystal",
+        "citrus": "citrus orb",
+        "mint": "mint triangle",
+        "grape": "grape square",
+        "star": "sugar star"
+      }
+    },
     "logs": {
       "accepted": "Quest angenommen: {name}",
+      "worldQuestStarted": "World quest started: {name}",
       "abandoned": "Quest aufgegeben: {name}",
       "completed": "Quest abgeschlossen: {name}",
       "ready": "{name} ({status})",
@@ -13049,6 +13102,18 @@ export const de_DE: EnTranslations = {
       "sprung_trap": {
         "name": "Ausgelöste Moorfalle"
       },
+      "leyline_cache": {
+        "name": "Miniature Ley Cache"
+      },
+      "confection_game_box": {
+        "name": "Confectioner's Game Box"
+      },
+      "eastbrook_freight_crate": {
+        "name": "Eastbrook Freight Crate"
+      },
+      "eastbrook_freight_wagon": {
+        "name": "Eastbrook Freight Wagon"
+      },
       "hearthlined_treads": {
         "name": "Herdgefütterte Tritte"
       },
@@ -14718,6 +14783,15 @@ export const de_DE: EnTranslations = {
       },
       "vale_bandit": {
         "name": "Talbandit"
+      },
+      "eastbrook_freight_caravan": {
+        "name": "Eastbrook Freight Caravan"
+      },
+      "willowfen_remedy_caravan": {
+        "name": "Willowfen Remedy Caravan"
+      },
+      "frostveil_supply_caravan": {
+        "name": "Frostveil Supply Caravan"
       },
       "restless_bones": {
         "name": "Ruhelose Knochen"

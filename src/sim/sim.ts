@@ -173,7 +173,6 @@ import {
 } from './content/skins';
 import {
   cloneAllocation,
-  computeTalentModifiers,
   emptyAllocation,
   emptyModifiers,
   FIRST_TALENT_LEVEL,
@@ -209,7 +208,6 @@ import {
   delveOrigin,
   dungeonAt,
   getActiveWorldContent,
-  INSTANCE_SLOT_COUNT,
   ITEMS,
   isArenaPos,
   isBgPos,
@@ -605,6 +603,7 @@ export type { MarketSave } from './market';
 
 import { updateBreath } from './breath';
 import { updateSwimFatigue } from './fatigue';
+import { spawnStaticWorldObjects } from './ground_object_spawns';
 import type { CombatExitMemory } from './instance_exit_memory';
 import { chainPullInstanceOnBossAggro } from './instances/boss_chain_pull';
 import { buyCrucibleVendorItem as buyCrucibleVendorItemImpl } from './instances/crucible_vendor';
@@ -632,7 +631,6 @@ import {
   updateInstances as updateInstancesImpl,
 } from './instances/dungeons';
 import { buyHeroicVendorItem as buyHeroicVendorItemImpl } from './instances/heroic_vendor';
-import { freshInstanceSlot } from './instances/instance_slot';
 import { updatePortalTriggers } from './portals';
 import * as questCommands from './quests/quest_commands';
 import {
@@ -673,6 +671,10 @@ import {
   updateRiftTriggers as updateRiftTriggersImpl,
 } from './rift/runs';
 import type { RiftEvent, RiftInstance } from './rift/types';
+import { worldQuestCreditBindings } from './world_quest_context';
+import { dropWorldQuestDeliveryCargo as dropWorldQuestDeliveryCargoImpl } from './world_quest_delivery';
+import * as worldQuestState from './world_quest_state';
+import * as worldQuestMod from './world_quests';
 
 // computeQuestState (the pure quest-state fn) moved to quests/quest_commands.ts (W4);
 // re-export it here so ClientWorld's `import { computeQuestState } from '../sim/sim'`
@@ -807,6 +809,7 @@ import {
   type WeaponSkinLoadout,
   type WeaponSkinType,
   type WorldContent,
+  type WorldQuestProgress,
   xpToReachLevel,
 } from './types';
 import type { VendorBuyOptions } from './vendor_buy_stack';
@@ -1254,7 +1257,7 @@ export type JoinableChannel = (typeof JOINABLE_CHANNELS)[number];
 
 // Per-player progression and bags. The entity holds combat state; this holds
 // everything that belongs to the character sheet.
-export interface PlayerMeta {
+export interface PlayerMeta extends worldQuestState.WorldQuestPlayerState {
   entityId: number;
   // Stable database character id when running on the server. Offline/sim-only
   // callers fall back to entityId for systems that need a rename-proof owner key.
@@ -1915,6 +1918,8 @@ export class Sim {
   // local one, so a daily never rolls over mid-evening the way midnight UTC did.
   // Empty string = "no calendar known" (headless/replay), same contract as utcDay.
   resetDay = '';
+  worldQuestExpiresAtMs = 0;
+  private worldQuestRotationCache = worldQuestState.freshWorldQuestRotationCache();
   // The weekend event early-open probe: the reset-day key DOUBLE_HONOR_LEAD_HOURS
   // ahead of now, fed by the host beside resetDay (server: `eventLeadDayKey`;
   // offline: `feedSimCalendar`). '' = no calendar, the event never opens early.
@@ -2219,63 +2224,14 @@ export class Sim {
       }
     }
 
-    // Ground objects
-    for (const objDef of worldContent.groundObjects) {
-      for (const p of objDef.positions) {
-        const obj = createGroundObject(
-          this.nextId++,
-          objDef.itemId,
-          objDef.name,
-          this.groundPos(p.x, p.z),
-        );
-        this.addEntity(obj);
-      }
-    }
-
-    // Ravenpost mailboxes: one interactable raven pillar per town, spawned at
-    // its exact authored spot (the noticeboard pattern): the pillar is solid
-    // civic furniture with a static collider at this position, so the spawn
-    // must never relocate away from it (findSafePos would, since the collider
-    // sits exactly here). Draws no rng.
-    for (const boxDef of worldContent.services?.mailboxes ?? []) {
-      const box = createGroundObject(
-        this.nextId++,
-        '',
-        'Mailbox',
-        this.groundPos(boxDef.x, boxDef.z),
-      );
-      box.templateId = 'mailbox';
-      box.objectItemId = null;
-      box.lootable = true; // interactable
-      if (boxDef.facing !== undefined) box.facing = boxDef.facing;
-      this.addEntity(box);
-      this.postOffice.mailboxIds.push(box.id);
-    }
-
-    // Dungeon entrances + their private instance slots
-    for (const dungeon of DUNGEON_LIST) {
-      if (dungeon.overworldDoor === false) {
-        for (let i = 0; i < INSTANCE_SLOT_COUNT; i++) {
-          this.instances.push(freshInstanceSlot(dungeon.id, i));
-        }
-        continue;
-      }
-      const doorName = dungeon.id === 'nythraxis_crypt' ? 'Abandoned Crypt' : dungeon.name;
-      const door = createGroundObject(
-        this.nextId++,
-        '',
-        doorName,
-        this.groundPos(dungeon.doorPos.x, dungeon.doorPos.z),
-      );
-      door.templateId = 'dungeon_door';
-      door.dungeonId = dungeon.id;
-      door.objectItemId = null;
-      door.lootable = true; // interactable
-      this.addEntity(door);
-      for (let i = 0; i < INSTANCE_SLOT_COUNT; i++) {
-        this.instances.push(freshInstanceSlot(dungeon.id, i));
-      }
-    }
+    spawnStaticWorldObjects(worldContent, {
+      entities: this.entities,
+      allocateEntityId: () => this.nextId++,
+      groundPos: (x, z) => this.groundPos(x, z),
+      addEntity: (entity) => this.addEntity(entity),
+      mailboxIds: this.postOffice.mailboxIds,
+      instances: this.instances,
+    });
 
     // Spirit Healers (the angels): one hovering at every overworld graveyard.
     // Per-instance dungeon/raid healers spawn on claim (instances/dungeons.ts).
@@ -2717,6 +2673,7 @@ export class Sim {
       known: [],
       questLog: new Map(),
       questsDone: new Set(),
+      ...worldQuestState.freshWorldQuestPlayerState(),
       counters: freshCounters(),
       autoEquip: opts?.autoEquip ?? false,
       joinedAt: this.time,
@@ -3089,6 +3046,7 @@ export class Sim {
         }
       }
       for (const q of s.questsDone) meta.questsDone.add(q);
+      worldQuestState.restoreWorldQuestState(meta, s.worldQuests);
       // A rev reset zeroes COLLECT counts too, and those are derived state only
       // onInventoryChangedForQuests re-credits: re-sync once (inventory is already
       // restored above) so a migrated character holding the collect items is not
@@ -3909,6 +3867,7 @@ export class Sim {
         ...(q.rev === undefined ? {} : { rev: q.rev }),
       })),
       questsDone: [...meta.questsDone],
+      ...worldQuestState.savedWorldQuestState(meta),
       arenaRating: meta.arenaRating,
       arenaWins: meta.arenaWins,
       arenaLosses: meta.arenaLosses,
@@ -4605,6 +4564,12 @@ export class Sim {
   get questsDone(): Set<string> {
     return this.primary.questsDone;
   }
+  get worldQuestCycle(): string {
+    return this.primary.worldQuestCycle;
+  }
+  get worldQuestLog(): ReadonlyMap<string, WorldQuestProgress> {
+    return this.primary.worldQuestLog;
+  }
   // --- IWorldDeeds: the Book of Deeds read surface + title/border selection.
   // The reads expose the live per-player state (the questLog precedent above);
   // the facet types them Readonly so no seam consumer mutates them. ---
@@ -4701,6 +4666,9 @@ export class Sim {
       if (msRemaining > 0) out.push({ id, msRemaining });
     }
     return out;
+  }
+  worldBossActive(bossId: string): boolean {
+    return worldQuestState.worldBossActive(this.entities, this.worldBossEntityIds, bossId);
   }
   get counters(): RewardCounters {
     return this.primary.counters;
@@ -5273,10 +5241,12 @@ export class Sim {
       // through `sim.ctx` (lazily read at call time, after the ctor sets it). countItem
       // stays on Sim (L2 inventory hub) and is consumed by the collect updater.
       onMobKilledForQuests: (mob, meta) => onMobKilledForQuests(sim.ctx, mob, meta),
+      ...worldQuestCreditBindings(() => sim.ctx),
       onRecipeCraftedForQuests: (recipeId, meta) =>
         onRecipeCraftedForQuests(sim.ctx, recipeId, meta),
       onNodeGatheredForQuests: (node, itemId, meta) =>
         onNodeGatheredForQuests(sim.ctx, node, itemId, meta),
+      currentWorldQuestRotation: () => sim.currentWorldQuestRotation(),
       onInventoryChangedForQuests: (meta) => onInventoryChangedForQuests(sim.ctx, meta),
       checkQuestReady: (qp, meta) => checkQuestReady(sim.ctx, qp, meta),
       countItem: sim.countItem.bind(sim),
@@ -5552,6 +5522,9 @@ export class Sim {
     return createSimContext(host);
   }
 
+  private currentWorldQuestRotation() {
+    return worldQuestState.currentWorldQuestRotation(this.worldQuestRotationCache, this.resetDay);
+  }
   private refreshKnownAbilities(meta: PlayerMeta, announce: boolean): void {
     const e = this.entities.get(meta.entityId);
     if (!e) return;
@@ -5905,11 +5878,13 @@ export class Sim {
     for (const meta of this.players.values()) {
       const p = this.entities.get(meta.entityId);
       if (!p) continue;
+      if (p.dead) worldQuestMod.updateWorldQuests(this.ctx, meta, p);
       if (!p.dead) {
         ensureWarriorStance(this.ctx, p, meta);
         this.updatePlayerMovement(p, meta);
         updateVeilboundMarchMovement(this.ctx, p);
         completeVeilboundMarch(this.ctx, p);
+        worldQuestMod.updateWorldQuests(this.ctx, meta, p);
         lap?.('p.move');
         this.updateDoorTriggers(p);
         this.updateRiftTriggers(p);
@@ -9774,6 +9749,26 @@ export class Sim {
     questCommands.abandonQuest(this.ctx, questId, pid);
   }
 
+  rotateWorldQuestPuzzleTile(questId: string, tileIndex: number, pid?: number): void {
+    worldQuestMod.rotateWorldQuestPuzzleTile(this.ctx, questId, tileIndex, pid);
+  }
+  swapWorldQuestMatch3Tiles(
+    questId: string,
+    fromIndex: number,
+    toIndex: number,
+    pid?: number,
+  ): void {
+    worldQuestMod.swapWorldQuestMatch3Tiles(this.ctx, questId, fromIndex, toIndex, pid);
+  }
+
+  resetWorldQuestMatch3(questId: string, pid?: number): void {
+    worldQuestMod.resetWorldQuestMatch3(this.ctx, questId, pid);
+  }
+
+  dropWorldQuestDeliveryCargo(pid = this.playerId): boolean {
+    const player = this.entities.get(pid);
+    return player ? dropWorldQuestDeliveryCargoImpl(this.ctx, player) : false;
+  }
   turnInQuest(questId: string, pid?: number): void {
     questCommands.turnInQuest(this.ctx, questId, pid);
   }

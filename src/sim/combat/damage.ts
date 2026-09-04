@@ -1739,6 +1739,7 @@ export function handleDeath(
         );
         if (xpGain > 0) grantXp(ctx, xpGain, member, { fromKill: true });
         ctx.onMobKilledForQuests(e, member);
+        ctx.onMobKilledForWorldQuests(e, member);
       }
       // A destroyed Broodmother egg may hatch a widow that swarms the killer.
       if (e.templateId === 'spider_egg' && killer) spawnWidowHatchlingOnEggDeath(ctx, e, killer);

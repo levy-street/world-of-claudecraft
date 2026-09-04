@@ -166,6 +166,7 @@ const FANOUT_ARMS: readonly string[] = [
   'this.mobileActionRingPainter.relocalize|',
   'this.mountRaceStrip.relocalize|',
   'this.mountRaceControls.relocalize|',
+  'this.worldQuestPuzzleWindow.relocalize|',
 ];
 
 const observedArms = scan.sites.map((s) => `${s.call}|${s.conditions.join(' && ')}`);
@@ -221,6 +222,12 @@ interface AnsweredSurface extends GatedModule {
 }
 
 const ANSWERED: readonly AnsweredSurface[] = [
+  {
+    file: 'world_quest_puzzle_window.ts',
+    memos: ['lastSignature'],
+    answer: 'this.worldQuestPuzzleWindow.relocalize',
+    why: 'the active puzzle id and its progress payload, neither of which changes when the locale does, so the open puzzle prompt and status text otherwise remain in the previous language',
+  },
   {
     file: 'hud/battleground/battleground_scoreboard_painter.ts',
     memos: ['lastSig'],

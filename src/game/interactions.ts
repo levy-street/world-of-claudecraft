@@ -27,6 +27,7 @@ export interface PickInteractionWorld {
   // Required for the escort arm below (see escort_interact.ts): a right-click is
   // the other half of an escort run's only client entry point.
   questLog: IWorld['questLog'];
+  worldQuestLog?: IWorld['worldQuestLog'];
   targetEntity(id: number | null): void;
   interact(): void;
   enterDungeon(dungeonId: string): InteractionOutcome;
@@ -301,7 +302,12 @@ export function handlePickedEntity(
         hud.showError(t('questUi.errors.tooFar'));
         return false;
       }
-      const verdict = decideEscortPress(world.player.pos, world.entities, world.questLog);
+      const verdict = decideEscortPress(
+        world.player.pos,
+        world.entities,
+        world.questLog,
+        world.worldQuestLog,
+      );
       if (verdict.kind === 'none') return false;
       return handleEscortPress(world, hud, verdict, t('questUi.errors.escortAway'));
     } else if (

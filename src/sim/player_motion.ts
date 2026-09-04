@@ -50,6 +50,10 @@ import {
   terrainWallStandoff,
   waterLevelAt,
 } from './world';
+import {
+  WORLD_QUEST_DELIVERY_AURA_ID,
+  WORLD_QUEST_DELIVERY_SPEED_MULT,
+} from './world_quest_delivery';
 
 export const BACKPEDAL_MULT = 0.65;
 export const GRAVITY = 16;
@@ -76,7 +80,13 @@ const moveParams: CharacterMoveParams = {
   swimming: false,
   ignoreFences: false,
 };
-const moveOut: CharacterMoveResult = { x: 0, y: 0, z: 0, blocked: false, stepped: 0 };
+const moveOut: CharacterMoveResult = {
+  x: 0,
+  y: 0,
+  z: 0,
+  blocked: false,
+  stepped: 0,
+};
 // Coyote time: seconds after WALKING off a ledge (never after a jump) during
 // which a jump still fires. Stateless on purpose: a walk-off starts at vy = 0,
 // so "recently left the ledge" is exactly vy > -GRAVITY * COYOTE_TIME.
@@ -211,7 +221,8 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
   // cannot be slowed): short-circuit the aura scan with the ghost-run multiplier.
   if (e.ghost) return GHOST_RUN_MULT;
   let slow = 1,
-    speed = 1;
+    speed = 1,
+    cargo = 1;
   const slowImmune =
     isVeilboundMarchActive(e) || e.auras.some((aura) => aura.kind === 'slow_immunity');
   for (const a of e.auras) {
@@ -222,6 +233,9 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
     }
     // Fury Enrage: +10% move speed (non-stacking with other speed buffs).
     if (a.kind === 'enrage') speed = Math.max(speed, ENRAGE_MOVE_MULT);
+    if (a.id === WORLD_QUEST_DELIVERY_AURA_ID && a.kind === 'world_quest_cargo') {
+      cargo = Math.min(cargo, WORLD_QUEST_DELIVERY_SPEED_MULT);
+    }
   }
   // Mounted travel: the active ground mount rides the entity mirror (mountKey,
   // synced over the wire like skin), so the online self-extrapolator predicts
@@ -230,7 +244,7 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
   if (e.mountKey) speed += mountMoveSpeedPct(e.mountKey);
   // Fiesta move-speed augments (only ever non-zero inside a Fiesta bout).
   if (extraSpeedPct) speed += extraSpeedPct;
-  return slow * speed;
+  return slow * speed * cargo;
 }
 
 // Fiesta "Moon Boots" power-up: a buff_jump aura multiplies jump height.

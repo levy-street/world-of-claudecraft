@@ -4308,6 +4308,39 @@
     box-sizing: border-box;
     overflow-y: auto;
   }
+  body.mobile-touch #world-quest-puzzle-window {
+    left: calc(max(10px, env(safe-area-inset-left)) / var(--ui-scale, 1));
+    right: calc(max(10px, env(safe-area-inset-right)) / var(--ui-scale, 1));
+    top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));
+    width: auto;
+    max-height: calc(
+      var(--app-vh) /
+      var(--ui-scale, 1) -
+      (max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1)) -
+      (max(10px, env(safe-area-inset-bottom)) / var(--ui-scale, 1))
+    );
+    transform: none;
+    box-sizing: border-box;
+    overflow-y: auto;
+  }
+  body.mobile-touch #world-quest-puzzle-window .wqp-grid {
+    --wqp-tile-size: clamp(
+      calc(40px / var(--ui-scale, 1)),
+      calc(17 * var(--app-vw) / 100 / var(--ui-scale, 1)),
+      calc(68px / var(--ui-scale, 1))
+    );
+  }
+  body.mobile-touch #world-quest-puzzle-window .wqm-grid {
+    --wqm-cell-size: clamp(
+      calc(40px / var(--ui-scale, 1)),
+      calc(12 * var(--app-vw) / 100 / var(--ui-scale, 1)),
+      calc(48px / var(--ui-scale, 1))
+    );
+  }
+  body.mobile-touch #world-quest-puzzle-window .wqm-cell {
+    min-width: calc(40px / var(--ui-scale, 1));
+    min-height: calc(40px / var(--ui-scale, 1));
+  }
   body.mobile-touch #dev-command-window {
     height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
     max-height: none;

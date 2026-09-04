@@ -52,7 +52,9 @@ describe('canonical', () => {
     ]);
   });
   it('omits inert default keys but keeps array length', () => {
-    expect(canonical({ a: 0, b: false, c: null, d: '', e: 1 })).toEqual({ e: 1 });
+    expect(canonical({ a: 0, b: false, c: null, d: '', e: 1 })).toEqual({
+      e: 1,
+    });
     expect(canonical([{ a: 0 }, { b: 1 }])).toEqual([{}, { b: 1 }]);
   });
   it('serializes Infinity as a sentinel, never null', () => {
@@ -186,6 +188,7 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
       'marketQuery',
       'moveInput',
       'name',
+      'openWorldQuestPuzzleId',
       'pendingSkinCatalog',
       'pendingSkinItemId',
       'pendingSkinRank',
@@ -194,6 +197,7 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
       'talentMods',
       'vaultWireRev',
       'wireRev',
+      'worldQuestAreas',
     ]);
   });
 

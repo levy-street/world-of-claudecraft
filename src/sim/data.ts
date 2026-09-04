@@ -26,6 +26,14 @@ import type {
 } from './types';
 
 export type { FishingEntry } from './content/items';
+export {
+  EASTBROOK_FREIGHT_CARAVAN_ESCORT_ID,
+  EASTBROOK_FREIGHT_CARAVAN_MOB_ID,
+  WORLD_QUEST_MIN_LEVEL,
+  WORLD_QUESTS,
+  WORLD_QUESTS_BY_ID,
+} from './content/world_quests';
+export type { WorldQuestDef } from './types';
 
 import { CASTLE_BLOCKERS } from './castle_layout';
 import {
@@ -233,6 +241,12 @@ import {
   WILLOWFEN_ZONE,
 } from './content/willowfen';
 import {
+  WORLD_QUEST_ESCORTS,
+  WORLD_QUEST_ITEMS,
+  WORLD_QUEST_MOBS,
+  WORLD_QUEST_OBJECTS,
+} from './content/world_quests';
+import {
   WRAITHWOOD_CAMPS,
   WRAITHWOOD_ESCORTS,
   WRAITHWOOD_ITEMS,
@@ -382,6 +396,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   DUNGEON_KEEPSAKE_ITEMS,
   IGNIVAR_DROP_ITEMS,
   CRUCIBLE_PROFESSION_ITEMS,
+  WORLD_QUEST_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
@@ -414,6 +429,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...GALECREST_MOBS,
   ...FARSHORE_MOBS,
   ...PROVING_SHORE_MOBS,
+  ...WORLD_QUEST_MOBS,
 };
 
 // Heroic upgraded drop variants: generated from the base item + mob loot tables and
@@ -568,6 +584,7 @@ export const ESCORTS: Record<string, EscortDef> = {
   ...WRAITHWOOD_ESCORTS,
   ...PALMREACH_ESCORTS,
   ...FARSHORE_ESCORTS,
+  ...WORLD_QUEST_ESCORTS,
 };
 
 export const GROUND_OBJECTS: GroundObjectDef[] = [
@@ -587,6 +604,7 @@ export const GROUND_OBJECTS: GroundObjectDef[] = [
   ...GALECREST_OBJECTS,
   ...FARSHORE_OBJECTS,
   ...PROVING_SHORE_OBJECTS,
+  ...WORLD_QUEST_OBJECTS,
 ];
 
 export const GATHER_NODES: GatherNodeDef[] = [...GATHER_NODES_CONTENT];

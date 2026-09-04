@@ -2719,6 +2719,7 @@ export const zh_TW: EnTranslations = {
       "forbiddenReflectionLock": "禁忌映像暫時無法再次準備",
       "internalCooldown": "計時結束前此效果無法再次觸發",
       "carriedFlag": "你正攜帶敵方旗幟。取消該增益即可丟下旗幟。",
+      "carryingFreight": "你正在搬運貨物。移動速度降低 {pct}%。",
       "battleStance": "戰鬥姿態：怒氣產生提高 10%",
       "berserkerStance": "狂暴姿態：暴擊機率提高 3%，暴擊傷害提高 3%",
       "crit": "暴擊機率提高 {pct}%",
@@ -8923,6 +8924,9 @@ export const zh_TW: EnTranslations = {
         "readyQuest": "可交任務",
         "repeatQuest": "可重複任務",
         "cooldownQuest": "冷卻中的任務",
+        "availableWorldQuest": "可用世界任務：{name}",
+        "activeWorldQuest": "進行中的世界任務：{name}",
+        "worldBoss": "世界首領：{name}",
         "questObjective": "任務目標區域",
         "readyOre": "可採集礦點",
         "readyWood": "可採伐木材點",
@@ -9712,8 +9716,57 @@ export const zh_TW: EnTranslations = {
       "objectiveProgress": "{label}：{current}/{total}",
       "requiresLevel": "需要等級 {level}"
     },
+    "worldQuest": {
+      "title": "{zone}：{target}",
+      "unknown": "未知世界任務（{id}）",
+      "itemReward": "物品獎勵：{name}",
+      "rewardLine": "獎勵：{reward}",
+      "availableStatus": "可用世界任務",
+      "activeStatus": "進行中的世界任務",
+      "expiresIn": "{time}後結束",
+      "mineOre": "開採銅礦石",
+      "recoverObject": "回收{name}",
+      "redirectLeyBeam": "引導魔網光束",
+      "matchConfections": "配對魔法糖果",
+      "loadFreight": "將貨物裝上馬車",
+      "escortCaravan": "護送{zone}商隊",
+      "salvageWreckage": "回收沉船殘骸",
+      "puzzleTitle": "魔網光束校準",
+      "puzzleLevel": "每週關卡 {level}",
+      "puzzleInstructions": "旋轉拼塊，將光束從起點引導至終點。",
+      "puzzleRotateTile": "旋轉拼塊{tile}",
+      "puzzleConnectors": "連接方向：{connectors}。",
+      "puzzlePowered": "光束已到達此拼塊。",
+      "puzzleUnpowered": "光束尚未到達此拼塊。",
+      "puzzleClose": "關閉魔網光束謎題",
+      "puzzleSource": "起點",
+      "puzzleTarget": "終點",
+      "puzzleSourceEndpoint": "起點：{direction}。",
+      "puzzleTargetEndpoint": "終點：{direction}。",
+      "puzzleTileAria": "{rotation} {connectors} {power} {source} {target}",
+      "match3Title": "糖果連鎖",
+      "match3Instructions": "選擇兩個相鄰的糖果。只有組成三個或更多相同糖果的一排時，交換才會計入。",
+      "match3Moves": "步數：{current}/{total}",
+      "match3Cleared": "已消除糖果：{current}/{total}",
+      "match3Announcement": "{moves}. {cleared}.",
+      "match3Cell": "第 {row} 行，第 {column} 列：{candy}",
+      "match3Selected": "已選擇",
+      "match3Reset": "重新開始關卡",
+      "match3Close": "關閉糖果謎題",
+      "match3OutOfMoves": "沒有剩餘步數。重新開始關卡再試一次。",
+      "semanticSummary": "{name}. {progress}. {reward}.",
+      "semanticSummaryTimed": "{name}. {progress}. {reward}. {time}.",
+      "match3Candy": {
+        "berry": "莓果水晶",
+        "citrus": "柑橘球",
+        "mint": "薄荷三角",
+        "grape": "葡萄方塊",
+        "star": "糖霜星"
+      }
+    },
     "logs": {
       "accepted": "已接受任務：{name}",
+      "worldQuestStarted": "世界任務已開始：{name}",
       "abandoned": "已放棄任務：{name}",
       "completed": "已完成任務：{name}",
       "ready": "{name}（{status}）",
@@ -13049,6 +13102,18 @@ export const zh_TW: EnTranslations = {
       "sprung_trap": {
         "name": "被觸發的沼澤陷阱"
       },
+      "leyline_cache": {
+        "name": "微型魔網秘藏"
+      },
+      "confection_game_box": {
+        "name": "糖果師的遊戲盒"
+      },
+      "eastbrook_freight_crate": {
+        "name": "東溪貨運箱"
+      },
+      "eastbrook_freight_wagon": {
+        "name": "東溪貨運馬車"
+      },
       "hearthlined_treads": {
         "name": "爐火襯裡之靴"
       },
@@ -14718,6 +14783,15 @@ export const zh_TW: EnTranslations = {
       },
       "vale_bandit": {
         "name": "谷地強盜"
+      },
+      "eastbrook_freight_caravan": {
+        "name": "東溪貨運商隊"
+      },
+      "willowfen_remedy_caravan": {
+        "name": "柳澤沼地藥品商隊"
+      },
+      "frostveil_supply_caravan": {
+        "name": "霜幕之境補給商隊"
       },
       "restless_bones": {
         "name": "不寧骸骨"

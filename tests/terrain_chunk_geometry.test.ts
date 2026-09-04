@@ -331,7 +331,9 @@ describe('generated chunk geometry is stable', () => {
     // Proving Shore island: both sides' intended terrain changes combine, so
     // the digest matches neither parent (set from a suite run on the merged
     // tree).
-    expect(digestOf(inRect)).toBe('1d9b0a4a7e0d97c5a11c918b1a8f29c3');
+    // Re-minted again for the world-quest ground objects: their standard calm
+    // anchors seat the Eastbrook freight crate and wagon on workable ground.
+    expect(digestOf(inRect)).toBe('034fe8c22a222adac06adbccb42baa2f');
     // The gap super-chunk digest pin is gone with the gap chunks themselves
     // (the island claims the old vale gap cells); gapFill.length above pins
     // their absence.

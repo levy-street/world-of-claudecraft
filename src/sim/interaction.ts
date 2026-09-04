@@ -85,6 +85,7 @@ import {
   OBJECT_RESPAWN,
 } from './types';
 import { markWorldBossLooted } from './world_boss';
+import { isFarshoreSalvageEntity } from './world_quest_salvage';
 
 const LOCKPICK_OFFER_COOLDOWN = 4; // seconds between repeated rift_locked_chest offer emits per player
 
@@ -838,13 +839,16 @@ export function pickUpObject(
   if (!ignivarLore.allowQuestCredit) return ignivarLore.handled;
   const beforeQuestProgress = meta.counters.questProgress;
   const beforeQuestNextId = ctx.nextId;
-  if (interactObjectForQuests(ctx, obj, meta)) {
+  const worldQuestHandled = ctx.onObjectInteractedForWorldQuests(obj, meta);
+  if (!isFarshoreSalvageEntity(obj) && interactObjectForQuests(ctx, obj, meta)) {
     return (
       ignivarLore.handled ||
+      worldQuestHandled ||
       meta.counters.questProgress !== beforeQuestProgress ||
       ctx.nextId !== beforeQuestNextId
     );
   }
+  if (worldQuestHandled) return true;
   if (ignivarLore.handled) return true;
   const def = ITEMS[objectItemId];
   if (def?.questId) {

@@ -2719,6 +2719,7 @@ export const en_XA: EnTranslations = {
       "forbiddenReflectionLock": "[Ƒóŕƀíððéñ Ŕéƒļéçţíóñ çáññóţ ƀé þŕéþáŕéð áĝáíñ ýéţ]",
       "internalCooldown": "[Ţĥíš éƒƒéçţ çáññóţ ţŕíĝĝéŕ áĝáíñ úñţíļ ţĥé ţíɱéŕ éẋþíŕéš]",
       "carriedFlag": "[Ýóú áŕé çáŕŕýíñĝ ţĥé éñéɱý ƒļáĝ. Çáñçéļ ţĥíš ƀúƒƒ ţó ðŕóþ íţ.]",
+      "carryingFreight": "[Ýóú áŕé çáŕŕýíñĝ ƒŕéíĝĥţ. Ɱóʋéɱéñţ šþééð íš ŕéðúçéð ƀý {pct}%.]",
       "battleStance": "[Ɓáţţļé Šţáñçé: 10% ɱóŕé ŕáĝé ĝéñéŕáţíóñ]",
       "berserkerStance": "[Ɓéŕšéŕķéŕ Šţáñçé: çŕíţš 3% ɱóŕé óƒţéñ áñð ĥíţ 3% ĥáŕðéŕ]",
       "crit": "[Íñçŕéášéš çŕíţíçáļ šţŕíķé çĥáñçé ƀý {pct}%]",
@@ -8923,6 +8924,9 @@ export const en_XA: EnTranslations = {
         "readyQuest": "[Ɋúéšţ ŕéáðý ţó ţúŕñ íñ]",
         "repeatQuest": "[Ŕéþéáţáƀļé ɋúéšţ]",
         "cooldownQuest": "[Ɋúéšţ óñ çóóļðóŵñ]",
+        "availableWorldQuest": "[Áʋáíļáƀļé ŵóŕļð ɋúéšţ: {name}]",
+        "activeWorldQuest": "[Áçţíʋé ŵóŕļð ɋúéšţ: {name}]",
+        "worldBoss": "[Ŵóŕļð ƀóšš: {name}]",
         "questObjective": "[Ɋúéšţ óƀĵéçţíʋé áŕéá]",
         "readyOre": "[Ŕéáðý óŕé ñóðé]",
         "readyWood": "[Ŕéáðý ŵóóð ñóðé]",
@@ -9712,8 +9716,57 @@ export const en_XA: EnTranslations = {
       "objectiveProgress": "[{label}: {current}/{total}]",
       "requiresLevel": "[Ŕéɋúíŕéš Ļéʋéļ {level}]"
     },
+    "worldQuest": {
+      "title": "[{zone}: {target}]",
+      "unknown": "[Úñķñóŵñ ŵóŕļð ɋúéšţ ({id})]",
+      "itemReward": "[Íţéɱ ŕéŵáŕð: {name}]",
+      "rewardLine": "[Ŕéŵáŕðš: {reward}]",
+      "availableStatus": "[Áʋáíļáƀļé ŵóŕļð ɋúéšţ]",
+      "activeStatus": "[Áçţíʋé ŵóŕļð ɋúéšţ]",
+      "expiresIn": "[Éẋþíŕéš íñ {time}]",
+      "mineOre": "[Ɱíñé çóþþéŕ óŕé]",
+      "recoverObject": "[Ŕéçóʋéŕ {name}]",
+      "redirectLeyBeam": "[Ŕéðíŕéçţ ţĥé ļéý ƀéáɱ]",
+      "matchConfections": "[Ɱáţçĥ éñçĥáñţéð çóñƒéçţíóñš]",
+      "loadFreight": "[Ļóáð ƒŕéíĝĥţ íñţó ţĥé ŵáĝóñ]",
+      "escortCaravan": "[Éšçóŕţ ţĥé çáŕáʋáñ: {zone}]",
+      "salvageWreckage": "[Šáļʋáĝé šĥíþŵŕéçķ ðéƀŕíš]",
+      "puzzleTitle": "[Ļéý Ɓéáɱ Áļíĝñɱéñţ]",
+      "puzzleLevel": "[Ŵééķļý ļéʋéļ {level}]",
+      "puzzleInstructions": "[Ŕóţáţé ţĥé ţíļéš ţó çáŕŕý ţĥé ƀéáɱ ƒŕóɱ ţĥé šóúŕçé ţó ţĥé ðéšţíñáţíóñ.]",
+      "puzzleRotateTile": "[Ŕóţáţé ţíļé {tile}]",
+      "puzzleConnectors": "[Çóññéçţóŕš: {connectors}.]",
+      "puzzlePowered": "[Ţĥé ƀéáɱ ŕéáçĥéš ţĥíš ţíļé.]",
+      "puzzleUnpowered": "[Ţĥé ƀéáɱ ðóéš ñóţ ŕéáçĥ ţĥíš ţíļé.]",
+      "puzzleClose": "[Çļóšé ļéý ƀéáɱ þúžžļé]",
+      "puzzleSource": "[Šóúŕçé]",
+      "puzzleTarget": "[Ðéšţíñáţíóñ]",
+      "puzzleSourceEndpoint": "[Šóúŕçé: {direction}.]",
+      "puzzleTargetEndpoint": "[Ðéšţíñáţíóñ: {direction}.]",
+      "puzzleTileAria": "[{rotation} {connectors} {power} {source} {target}]",
+      "match3Title": "[Çóñƒéçţíóñ Çášçáðé]",
+      "match3Instructions": "[Šéļéçţ ţŵó áðĵáçéñţ çóñƒéçţíóñš. Á šŵáþ óñļý çóúñţš ŵĥéñ íţ çŕéáţéš á ļíñé óƒ ţĥŕéé óŕ ɱóŕé.]",
+      "match3Moves": "[Ɱóʋéš: {current}/{total}]",
+      "match3Cleared": "[Çóñƒéçţíóñš çļéáŕéð: {current}/{total}]",
+      "match3Announcement": "[{moves}. {cleared}.]",
+      "match3Cell": "[Ŕóŵ {row}, çóļúɱñ {column}: {candy}]",
+      "match3Selected": "[Šéļéçţéð]",
+      "match3Reset": "[Ŕéšţáŕţ ļéʋéļ]",
+      "match3Close": "[Çļóšé çóñƒéçţíóñ þúžžļé]",
+      "match3OutOfMoves": "[Ñó ɱóʋéš ŕéɱáíñ. Ŕéšţáŕţ ţĥé ļéʋéļ ţó ţŕý áĝáíñ.]",
+      "semanticSummary": "[{name}. {progress}. {reward}.]",
+      "semanticSummaryTimed": "[{name}. {progress}. {reward}. {time}.]",
+      "match3Candy": {
+        "berry": "[ƀéŕŕý çŕýšţáļ]",
+        "citrus": "[çíţŕúš óŕƀ]",
+        "mint": "[ɱíñţ ţŕíáñĝļé]",
+        "grape": "[ĝŕáþé šɋúáŕé]",
+        "star": "[šúĝáŕ šţáŕ]"
+      }
+    },
     "logs": {
       "accepted": "[Ɋúéšţ áççéþţéð: {name}]",
+      "worldQuestStarted": "[Ŵóŕļð ɋúéšţ šţáŕţéð: {name}]",
       "abandoned": "[Ɋúéšţ áƀáñðóñéð: {name}]",
       "completed": "[Ɋúéšţ çóɱþļéţéð: {name}]",
       "ready": "[{name} ({status})]",
@@ -13049,6 +13102,18 @@ export const en_XA: EnTranslations = {
       "sprung_trap": {
         "name": "[Šþŕúñĝ Ƒéñ Ţŕáþ]"
       },
+      "leyline_cache": {
+        "name": "[Ɱíñíáţúŕé Ļéý Çáçĥé]"
+      },
+      "confection_game_box": {
+        "name": "[Çóñƒéçţíóñéŕ'š Ĝáɱé Ɓóẋ]"
+      },
+      "eastbrook_freight_crate": {
+        "name": "[Éášţƀŕóóķ Ƒŕéíĝĥţ Çŕáţé]"
+      },
+      "eastbrook_freight_wagon": {
+        "name": "[Éášţƀŕóóķ Ƒŕéíĝĥţ Ŵáĝóñ]"
+      },
       "hearthlined_treads": {
         "name": "[Ĥéáŕţĥ-Ļíñéð Ţŕéáðš]"
       },
@@ -14718,6 +14783,15 @@ export const en_XA: EnTranslations = {
       },
       "vale_bandit": {
         "name": "[Ʋáļé Ɓáñðíţ]"
+      },
+      "eastbrook_freight_caravan": {
+        "name": "[Éášţƀŕóóķ Ƒŕéíĝĥţ Çáŕáʋáñ]"
+      },
+      "willowfen_remedy_caravan": {
+        "name": "[Ŵíļļóŵƒéñ Ŕéɱéðý Çáŕáʋáñ]"
+      },
+      "frostveil_supply_caravan": {
+        "name": "[Ƒŕóšţʋéíļ Šúþþļý Çáŕáʋáñ]"
       },
       "restless_bones": {
         "name": "[Ŕéšţļéšš Ɓóñéš]"

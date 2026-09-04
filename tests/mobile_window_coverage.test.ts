@@ -241,12 +241,14 @@ describe('mobile window coverage (Phase 5 parity)', () => {
       'hud.ts',
       'profession_tutorial_window.ts',
       'tutorial_greeting_window.ts',
+      'world_quest_puzzle_window.ts',
     ]);
     expect([...dyn.ids].sort()).toEqual([
       'confirm-dialog',
       'dev-command-window',
       'profession-tutorial',
       'tutorial-greeting',
+      'world-quest-puzzle-window',
     ]);
   });
 

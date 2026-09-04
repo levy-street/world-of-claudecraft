@@ -120,6 +120,9 @@ export const IWORLD_MEMBERS = [
   { name: 'activeTemporalHourglasses', kind: 'data' },
   { name: 'questLog', kind: 'data' },
   { name: 'questsDone', kind: 'data' },
+  { name: 'worldQuestCycle', kind: 'data' },
+  { name: 'worldQuestExpiresAtMs', kind: 'data' },
+  { name: 'worldQuestLog', kind: 'data' },
   // --- commands + read-returning methods ---
   { name: 'questState', kind: 'method' }, // read-returning (1/6)
   { name: 'reactiveAbilityWindowRemaining', kind: 'method' },
@@ -156,6 +159,9 @@ export const IWORLD_MEMBERS = [
   { name: 'reportTelemetry', kind: 'method' },
   { name: 'abandonQuest', kind: 'method' },
   { name: 'acceptLinkedQuest', kind: 'method' },
+  { name: 'rotateWorldQuestPuzzleTile', kind: 'method' },
+  { name: 'swapWorldQuestMatch3Tiles', kind: 'method' },
+  { name: 'resetWorldQuestMatch3', kind: 'method' },
   { name: 'equipItem', kind: 'method' },
   { name: 'equipItemToSlot', kind: 'method' },
   { name: 'moveInventoryItem', kind: 'method' },
@@ -393,6 +399,7 @@ export const IWORLD_MEMBERS = [
   { name: 'slotToolEffect', kind: 'method' },
   { name: 'rechargeToolEffect', kind: 'method' },
   { name: 'raidLockouts', kind: 'method' }, // read-returning (5/6)
+  { name: 'worldBossActive', kind: 'method' }, // realm liveness, separate from loot lockout
   { name: 'riftFloor', kind: 'data' }, // active procedural rift floor (null outside)
   { name: 'riftCollisionToken', kind: 'data' }, // per-Sim rift collision registry key
   { name: 'riftBossDeathZones', kind: 'method' }, // live lethal zones on the boss floor
@@ -661,9 +668,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // even when the total agrees. Only running the suite says what these
     // numbers really are; never reconcile them by arithmetic in the diff (the
     // numbers below were set from a suite run, not from this narrative).
-    expect(IWORLD_MEMBERS.length).toBe(343);
-    expect(DATA_MEMBERS.length).toBe(95);
-    expect(METHOD_MEMBERS.length).toBe(248);
+    expect(IWORLD_MEMBERS.length).toBe(350);
+    expect(DATA_MEMBERS.length).toBe(98);
+    expect(METHOD_MEMBERS.length).toBe(252);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -935,6 +942,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'renamePet',
       'renown',
       'reportTelemetry',
+      'resetWorldQuestMatch3',
       'respec',
       'respondToResurrection',
       'restedXp',
@@ -946,6 +954,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'riftCollisionToken',
       'riftEventMsRemaining',
       'riftFloor',
+      'rotateWorldQuestPuzzleTile',
       'salvageItem',
       'saveActionBarLayout',
       'saveLoadout',
@@ -979,6 +988,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'stationPlacements',
       'stopAutoAttack',
       'submitLootRoll',
+      'swapWorldQuestMatch3Tiles',
       'switchLoadout',
       'tabTarget',
       'tabTargetPrev',
@@ -1016,6 +1026,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'vaultInfo',
       'vaultWithdraw',
       'vendorBuyback',
+      'worldBossActive',
+      'worldQuestCycle',
+      'worldQuestExpiresAtMs',
+      'worldQuestLog',
       'xp',
     ]);
   });
@@ -1116,6 +1130,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'unlockedMilestones',
       'vaultInfo',
       'vendorBuyback',
+      'worldQuestCycle',
+      'worldQuestExpiresAtMs',
+      'worldQuestLog',
       'xp',
     ]);
   });
@@ -1304,6 +1321,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'reliquaryRarity',
       'renamePet',
       'reportTelemetry',
+      'resetWorldQuestMatch3',
       'respec',
       'respondToResurrection',
       'resurrectAtCorpse',
@@ -1312,6 +1330,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'ridingTrained',
       'riftBossDeathZones',
       'riftEventMsRemaining',
+      'rotateWorldQuestPuzzleTile',
       'salvageItem',
       'saveActionBarLayout',
       'saveLoadout',
@@ -1342,6 +1361,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'startTutorial',
       'stopAutoAttack',
       'submitLootRoll',
+      'swapWorldQuestMatch3Tiles',
       'switchLoadout',
       'tabTarget',
       'tabTargetPrev',
@@ -1370,6 +1390,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'vaultDeposit',
       'vaultDepositAll',
       'vaultWithdraw',
+      'worldBossActive',
     ]);
   });
 });
@@ -1575,10 +1596,16 @@ type _ExhaustCosmetics = AssertNever<
 const FACET_QUESTS = [
   'questLog',
   'questsDone',
+  'worldQuestCycle',
+  'worldQuestExpiresAtMs',
+  'worldQuestLog',
   'questState',
   'acceptQuest',
   'turnInQuest',
   'abandonQuest',
+  'rotateWorldQuestPuzzleTile',
+  'swapWorldQuestMatch3Tiles',
+  'resetWorldQuestMatch3',
   'acceptLinkedQuest',
   'startTutorial',
 ] as const satisfies readonly (keyof IWorldQuests)[];
@@ -1801,6 +1828,7 @@ const FACET_DUNGEONS = [
   'enterDungeon',
   'leaveDungeon',
   'raidLockouts',
+  'worldBossActive',
   'riftFloor',
   'riftCollisionToken',
   'riftBossDeathZones',
@@ -2019,8 +2047,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(343);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(343);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(350);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(350);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

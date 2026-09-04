@@ -25,7 +25,11 @@
 // Three, no Math.random/Date.now), so it runs unchanged in Node, the browser, and
 // the headless RL env.
 
-import type { QuestProgress, Vec3 } from '../types';
+import type { Vec3 } from '../types';
+
+export interface InteractObjectCreditLedger {
+  creditedObjects?: string[];
+}
 
 /** Decimals kept in a credit key. Authored spots are whole or half yards; one
  *  decimal absorbs float drift without merging two distinct nearby objects. */
@@ -71,13 +75,13 @@ function coord(v: number): string {
 }
 
 /** Has this player already taken credit off this object for this objective? */
-export function hasInteractObjectCredit(qp: QuestProgress, key: string): boolean {
+export function hasInteractObjectCredit(qp: InteractObjectCreditLedger, key: string): boolean {
   return qp.creditedObjects?.includes(key) === true;
 }
 
 /** Record the credit. The field stays absent until the first credit so saves
  *  written by a player who touched no interact objective are byte-identical. */
-export function recordInteractObjectCredit(qp: QuestProgress, key: string): void {
+export function recordInteractObjectCredit(qp: InteractObjectCreditLedger, key: string): void {
   if (hasInteractObjectCredit(qp, key)) return;
   if (qp.creditedObjects) qp.creditedObjects.push(key);
   else qp.creditedObjects = [key];
@@ -105,7 +109,9 @@ export function recordInteractObjectCredit(qp: QuestProgress, key: string): void
 export function sanitizeCreditedObjects(raw: unknown): string[] | undefined {
   if (!Array.isArray(raw)) return undefined;
   const seen = new Set<string>();
-  for (const v of raw) {
+  const scanLimit = Math.min(raw.length, MAX_CREDITED_OBJECTS * 4);
+  for (let index = 0; index < scanLimit; index++) {
+    const v = raw[index];
     // Length first: it bounds the work the shape test does on a hostile string.
     if (typeof v !== 'string' || v.length > MAX_KEY_LENGTH || !KEY_SHAPE.test(v)) continue;
     seen.add(v);

@@ -6360,6 +6360,86 @@
       ]
     },
     {
+      "batchId": "world-quest-puzzle-activators-2026-09-01",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "bridgemere_toll_chest.webp was supplied as the style, lighting, scale, and composition reference for leyline_cache; hearth_ember_cache.webp served the same role for confection_game_box. Both references are World of ClaudeCraft project-generated art.",
+      "commonPrompt": "Classic dark-fantasy MMORPG painted inventory art of one complete compact magical puzzle chest centered in a square, with tactile metal and aged wood, a strong silhouette at 28px, top-left key light, an opaque near-black painted vignette, and no text, border, watermark, crop, or extra objects.",
+      "itemDirections": {
+        "leyline_cache": {
+          "canonicalDisplayName": "Miniature Ley Cache",
+          "canonicalGameplayMeaningOrAcquisition": "Physical activator for the rotating Galecrest ley-beam world quest.",
+          "intendedVisualSubject": "A compact ornate treasure chest whose carved runes and narrow seams glow with vivid blue-cyan ley energy.",
+          "reference": {
+            "path": "public/ui/items/bridgemere_toll_chest.webp",
+            "role": "style, lighting, scale, and composition reference",
+            "provenance": "World of ClaudeCraft project-generated art",
+            "license": "Project asset, rights reserved"
+          }
+        },
+        "confection_game_box": {
+          "canonicalDisplayName": "Confectioner's Game Box",
+          "canonicalGameplayMeaningOrAcquisition": "Physical activator for the rotating Palmreach confection match-three world quest.",
+          "intendedVisualSubject": "An ornate tabletop puzzle chest with jewel-like candy motifs and pink-magenta light glowing through narrow seams.",
+          "reference": {
+            "path": "public/ui/items/hearth_ember_cache.webp",
+            "role": "style, lighting, scale, and composition reference",
+            "provenance": "World of ClaudeCraft project-generated art",
+            "license": "Project asset, rights reserved"
+          }
+        }
+      },
+      "itemIds": [
+        "confection_game_box",
+        "leyline_cache"
+      ]
+    },
+    {
+      "batchId": "world-quest-freight-icons-2026-09-01",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "supply_crate.webp was supplied as the style, lighting, scale, and composition reference for eastbrook_freight_crate; reins_rickshaw_mount.webp served the same role for eastbrook_freight_wagon. Both references are World of ClaudeCraft project-generated art.",
+      "commonPrompt": "Fresh premium hand-painted classic dark-fantasy MMORPG inventory icon of one complete Eastbrook freight subject centered in a square, with a strong readable silhouette, tactile wood, iron, cloth, and rope, warm top-left key light, cool rim light, an opaque dark painted vignette, and no text, border, watermark, crop, person, or unrelated objects.",
+      "itemDirections": {
+        "eastbrook_freight_crate": {
+          "canonicalDisplayName": "Eastbrook Freight Crate",
+          "canonicalGameplayMeaningOrAcquisition": "The personal cargo picked up and carried to the wagon during the Eastbrook freight world quest.",
+          "intendedVisualSubject": "One sturdy closed wooden cargo crate with iron corner straps, pale-blue Eastbrook cloth, and rope handles, viewed in three-quarter perspective.",
+          "reference": {
+            "path": "public/ui/items/supply_crate.webp",
+            "role": "style, lighting, scale, and composition reference",
+            "provenance": "World of ClaudeCraft project-generated art",
+            "license": "Project asset, rights reserved"
+          }
+        },
+        "eastbrook_freight_wagon": {
+          "canonicalDisplayName": "Eastbrook Freight Wagon",
+          "canonicalGameplayMeaningOrAcquisition": "The destination players load during the Eastbrook freight world quest.",
+          "intendedVisualSubject": "One four-wheeled wooden merchant wagon with iron rims, an open cargo bed loaded with crates, and empty horse shafts, viewed in three-quarter perspective.",
+          "reference": {
+            "path": "public/ui/items/reins_rickshaw_mount.webp",
+            "role": "style, lighting, scale, and composition reference",
+            "provenance": "World of ClaudeCraft project-generated art",
+            "license": "Project asset, rights reserved"
+          }
+        }
+      },
+      "itemIds": [
+        "eastbrook_freight_crate",
+        "eastbrook_freight_wagon"
+      ]
+    },
+    {
       "batchId": "mech-bird-mount-icon-2026-08-17",
       "source": "Project Blender render of the shipped mount model (Cycles) with painted-treatment post (median brushwork pass, warm and cool grade, vignette multiply)",
       "owner": "World of ClaudeCraft",

@@ -5,8 +5,10 @@ import {
   DAILY_RESET_HOUR,
   eventLeadDayOf,
   feedSimCalendar,
+  nextWorldQuestRotationOf,
   resetDayOf,
 } from '../src/game/utc_day';
+import { worldQuestCycleForResetDay } from '../src/sim/world_quests';
 
 describe('currentUtcDay', () => {
   afterEach(() => {
@@ -122,10 +124,33 @@ describe('feedSimCalendar', () => {
     // Friday 2026-08-21, 8 PM local: inside the early-open lead window.
     const at = new Date(2026, 7, 21, 20, 0);
     vi.setSystemTime(at);
-    const sim = { utcDay: '', resetDay: '', eventLeadDay: '' };
+    const sim = { utcDay: '', resetDay: '', eventLeadDay: '', worldQuestExpiresAtMs: 0 };
     feedSimCalendar(sim);
     expect(sim.utcDay).toBe(at.toISOString().slice(0, 10));
     expect(sim.resetDay).toBe('2026-08-21');
     expect(sim.eventLeadDay).toBe('2026-08-22');
+    expect(sim.worldQuestExpiresAtMs).toBeGreaterThan(at.getTime());
+  });
+
+  it('targets the next local reset that changes the three-day rotation', () => {
+    const at = new Date(2026, 7, 31, 12, 0);
+    const expiry = nextWorldQuestRotationOf(at);
+    expect(expiry).toBeGreaterThan(at.getTime());
+    expect(expiry - at.getTime()).toBeLessThanOrEqual(3 * 24 * 60 * 60_000);
+    expect(worldQuestCycleForResetDay(resetDayOf(new Date(expiry)))).not.toBe(
+      worldQuestCycleForResetDay(resetDayOf(at)),
+    );
+  });
+
+  it('expires the opening rotation exactly at local 03:00', () => {
+    const expiry = new Date(nextWorldQuestRotationOf(new Date(2026, 8, 1, 12, 0, 0)));
+    expect([
+      expiry.getFullYear(),
+      expiry.getMonth(),
+      expiry.getDate(),
+      expiry.getHours(),
+      expiry.getMinutes(),
+      expiry.getSeconds(),
+    ]).toEqual([2026, 8, 3, 3, 0, 0]);
   });
 });

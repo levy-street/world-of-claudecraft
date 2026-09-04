@@ -27,7 +27,6 @@ import type { TrackedQuest } from '../src/ui/hud/quest/quest_tracker';
 import { QuestTrackerController } from '../src/ui/hud/quest/quest_tracker_controller';
 import * as i18nModule from '../src/ui/i18n';
 import { makeWriterFacet } from '../src/ui/painter_host';
-import type { IWorld } from '../src/world_api';
 
 /** A private facet per rig: the controller takes Hud's shared one in
  *  production, and a test needs only the elision behaviour. */
@@ -78,14 +77,18 @@ function quest(id: string, objectiveCount = 1): TrackedQuest {
   };
 }
 
-function mountStrip() {
+function mountStrip(activate?: (questId: string) => boolean) {
   const controls = document.createElement('section');
   controls.id = 'mobile-controls';
   controls.innerHTML = STRIP_MARKUP;
   document.body.append(controls);
   document.body.classList.add('mobile-touch');
   const click = vi.fn();
-  const controller = buildQuestStrip({ writers: writers(), click });
+  const controller = buildQuestStrip({
+    writers: writers(),
+    click,
+    ...(activate ? { activate } : {}),
+  });
   if (!controller) throw new Error('the strip markup did not resolve');
   const el = (id: string) => document.getElementById(id) as HTMLElement;
   return {
@@ -195,6 +198,18 @@ describe('the quest strip cycles through real pointer events', () => {
     swipe(rig.surface, -SWIPE_PX);
     expect(rig.title.textContent).toBe('Title a');
     expect(rig.click).not.toHaveBeenCalled();
+  });
+
+  it('activates a single puzzle quest on tap instead of trying to cycle it', () => {
+    const activate = vi.fn(() => true);
+    const rig = mountStrip(activate);
+    rig.controller.update([quest('wq_galecrest_wisps')], 0);
+
+    swipe(rig.surface, 0);
+
+    expect(activate).toHaveBeenCalledWith('wq_galecrest_wisps');
+    expect(rig.title.textContent).toBe('Title wq_galecrest_wisps');
+    expect(rig.click).toHaveBeenCalledOnce();
   });
 
   it('drops a gesture the button never sees through the window backstop', () => {
@@ -309,7 +324,7 @@ describe('the tracker hands its projection to the strip on touch', () => {
       writers: writers(),
       element,
       document,
-      world: () => ({ questLog }) as Pick<IWorld, 'questLog'>,
+      world: () => ({ questLog, worldQuestLog: new Map() }),
       settings: {
         available: () => true,
         collapsed: () => false,
@@ -336,6 +351,38 @@ describe('the tracker hands its projection to the strip on touch', () => {
     rig.controller.update(0);
     expect(rig.element.innerHTML).toContain('title:q_wolves');
     expect(rig.root.classList.contains('empty')).toBe(true);
+  });
+
+  it('does not bypass the in-world activator when a minigame strip row is tapped', () => {
+    const rig = mountStrip();
+    const element = document.createElement('div');
+    element.id = 'quest-tracker';
+    document.body.append(element);
+    const questId = 'wq_galecrest_wisps';
+    const controller = new QuestTrackerController({
+      writers: writers(),
+      element,
+      document,
+      world: () => ({
+        questLog: new Map(),
+        worldQuestLog: new Map([
+          [questId, { questId, count: 0, state: 'active', puzzleRotations: Array(9).fill(0) }],
+        ]),
+      }),
+      settings: {
+        available: () => true,
+        collapsed: () => false,
+        setCollapsed: () => {},
+      },
+      questTitle: (id) => id,
+      objectiveLabel: (id) => id,
+      click: () => {},
+    });
+    controller.update(0);
+
+    swipe(rig.surface, 0);
+
+    expect(document.getElementById('world-quest-puzzle-window')).toBeNull();
   });
 });
 

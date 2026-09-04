@@ -2719,6 +2719,7 @@ export const it_IT: EnTranslations = {
       "forbiddenReflectionLock": "Il Riflesso Proibito non può ancora essere preparato di nuovo",
       "internalCooldown": "Questo effetto non può attivarsi di nuovo prima che il timer scada",
       "carriedFlag": "Stai portando la bandiera nemica. Annulla questo effetto per lasciarla cadere.",
+      "carryingFreight": "You are carrying freight. Movement speed is reduced by {pct}%.",
       "battleStance": "Posizione di Battaglia: 10% di generazione di rabbia in più",
       "berserkerStance": "Posizione del Berserker: colpi critici il 3% più frequenti e il 3% più potenti",
       "crit": "Aumenta la probabilità di colpo critico del {pct}%",
@@ -8923,6 +8924,9 @@ export const it_IT: EnTranslations = {
         "readyQuest": "Missione pronta da consegnare",
         "repeatQuest": "Missione ripetibile",
         "cooldownQuest": "Missione in attesa",
+        "availableWorldQuest": "Available world quest: {name}",
+        "activeWorldQuest": "Active world quest: {name}",
+        "worldBoss": "World boss: {name}",
         "questObjective": "Area obiettivo della missione",
         "readyOre": "Filone di minerale pronto",
         "readyWood": "Boschetto di alberi pronto",
@@ -9712,8 +9716,57 @@ export const it_IT: EnTranslations = {
       "objectiveProgress": "{label}: {current}/{total}",
       "requiresLevel": "Richiede livello {level}"
     },
+    "worldQuest": {
+      "title": "{zone}: {target}",
+      "unknown": "Unknown world quest ({id})",
+      "itemReward": "Item reward: {name}",
+      "rewardLine": "Rewards: {reward}",
+      "availableStatus": "Available world quest",
+      "activeStatus": "Active world quest",
+      "expiresIn": "Expires in {time}",
+      "mineOre": "Mine copper ore",
+      "recoverObject": "Recover {name}",
+      "redirectLeyBeam": "Redirect the ley beam",
+      "matchConfections": "Match enchanted confections",
+      "loadFreight": "Load freight into the wagon",
+      "escortCaravan": "Escort the caravan: {zone}",
+      "salvageWreckage": "Salvage shipwreck debris",
+      "puzzleTitle": "Ley Beam Alignment",
+      "puzzleLevel": "Weekly level {level}",
+      "puzzleInstructions": "Rotate the tiles to carry the beam from the source to the destination.",
+      "puzzleRotateTile": "Rotate tile {tile}",
+      "puzzleConnectors": "Connectors: {connectors}.",
+      "puzzlePowered": "The beam reaches this tile.",
+      "puzzleUnpowered": "The beam does not reach this tile.",
+      "puzzleClose": "Close ley beam puzzle",
+      "puzzleSource": "Source",
+      "puzzleTarget": "Destination",
+      "puzzleSourceEndpoint": "Source: {direction}.",
+      "puzzleTargetEndpoint": "Destination: {direction}.",
+      "puzzleTileAria": "{rotation} {connectors} {power} {source} {target}",
+      "match3Title": "Confection Cascade",
+      "match3Instructions": "Select two adjacent confections. A swap only counts when it creates a line of three or more.",
+      "match3Moves": "Moves: {current}/{total}",
+      "match3Cleared": "Confections cleared: {current}/{total}",
+      "match3Announcement": "{moves}. {cleared}.",
+      "match3Cell": "Row {row}, column {column}: {candy}",
+      "match3Selected": "Selected",
+      "match3Reset": "Restart level",
+      "match3Close": "Close confection puzzle",
+      "match3OutOfMoves": "No moves remain. Restart the level to try again.",
+      "semanticSummary": "{name}. {progress}. {reward}.",
+      "semanticSummaryTimed": "{name}. {progress}. {reward}. {time}.",
+      "match3Candy": {
+        "berry": "berry crystal",
+        "citrus": "citrus orb",
+        "mint": "mint triangle",
+        "grape": "grape square",
+        "star": "sugar star"
+      }
+    },
     "logs": {
       "accepted": "Missione accettata: {name}",
+      "worldQuestStarted": "World quest started: {name}",
       "abandoned": "Missione abbandonata: {name}",
       "completed": "Missione completata: {name}",
       "ready": "{name} ({status})",
@@ -13049,6 +13102,18 @@ export const it_IT: EnTranslations = {
       "sprung_trap": {
         "name": "Trappola di Palude Scattata"
       },
+      "leyline_cache": {
+        "name": "Miniature Ley Cache"
+      },
+      "confection_game_box": {
+        "name": "Confectioner's Game Box"
+      },
+      "eastbrook_freight_crate": {
+        "name": "Eastbrook Freight Crate"
+      },
+      "eastbrook_freight_wagon": {
+        "name": "Eastbrook Freight Wagon"
+      },
       "hearthlined_treads": {
         "name": "Stivali Foderati per il Focolare"
       },
@@ -14718,6 +14783,15 @@ export const it_IT: EnTranslations = {
       },
       "vale_bandit": {
         "name": "Bandito della Valle"
+      },
+      "eastbrook_freight_caravan": {
+        "name": "Eastbrook Freight Caravan"
+      },
+      "willowfen_remedy_caravan": {
+        "name": "Willowfen Remedy Caravan"
+      },
+      "frostveil_supply_caravan": {
+        "name": "Frostveil Supply Caravan"
       },
       "restless_bones": {
         "name": "Ossa irrequiete"

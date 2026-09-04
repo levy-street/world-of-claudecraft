@@ -21,6 +21,30 @@ function devSpawns(sim: Sim, ownerId = sim.playerId) {
 }
 
 describe('dev commands', () => {
+  it.each([
+    ['2026-09-02', 'wq3_2', 0],
+    ['2026-09-13', 'wq3_5', 1],
+    ['2026-09-15', 'wq3_5', 2],
+  ] as const)(
+    '/dev salvage arms the weekly layout online on %s',
+    (resetDay, expectedCycle, expectedVariant) => {
+      const sim = devSim();
+      sim.resetDay = resetDay;
+
+      sim.chat('/dev salvage');
+
+      expect(sim.player.level).toBe(10);
+      expect(sim.worldQuestCycle).toBe(expectedCycle);
+      expect(sim.meta(sim.playerId)?.devWorldQuestCycle).toBe(expectedCycle);
+      expect(sim.worldQuestLog.get('wq_farshore_salvage')).toEqual({
+        questId: 'wq_farshore_salvage',
+        count: 0,
+        state: 'active',
+        puzzleVariant: expectedVariant,
+      });
+    },
+  );
+
   it('/dev bis uses the selected spec parse loadout without changing the live spec', () => {
     const sim = new Sim({
       seed: 42,

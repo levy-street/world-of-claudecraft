@@ -706,13 +706,13 @@ import {
 import { buildProfessionTutorialModel } from './profession_tutorial_view';
 import { renderProfessionTutorial } from './profession_tutorial_window';
 import { ProfessionsWindow } from './professions_window';
+import { questEventPresentation } from './quest_event_view';
 import {
   QUEST_ITEM_TOOLTIP_COLOR,
   type QuestItemTooltipModel,
   questItemTooltipModel,
   questItemTooltipRelatedKey,
 } from './quest_item_tooltip_view';
-import { questProgressEventText } from './quest_progress_text';
 import { RaidBossGuideWindow, raidBossGuideContextFallback } from './raid_boss_guide_window';
 import { lockoutParts, lockoutShape } from './raid_lockout';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
@@ -834,6 +834,8 @@ import { wocBalanceChipHtml } from './woc_balance_chip';
 import { promptWocMarketBrowserVisit, wocMarketToggleAction } from './woc_market_link';
 import { type WocMarketHooks, WocMarketWindow } from './woc_market_window';
 import { installWorldDropTarget } from './world_drop_target';
+import { WorldQuestPuzzleWindow } from './world_quest_puzzle_window';
+import { worldQuestDisplayName } from './world_quest_view';
 import { formatXp, type XpBarView, xpBarView } from './xp_bar';
 import { XpBarPainter } from './xp_bar_painter';
 import { YumiMatchPainter } from './yumi_match_painter';
@@ -2169,6 +2171,8 @@ export class Hud {
         rift: riftFloorLabel,
         npc: npcDisplayName,
         mob: mobDisplayName,
+        worldQuest: (questId) =>
+          this.mapMarkerTooltipContent.worldQuestSemantic(questId, Date.now()),
       },
       npc: (marker) => this.mapMarkerTooltipContent.npc(marker),
       navigation: (marker) =>
@@ -2178,6 +2182,8 @@ export class Hud {
       station: (marker) => this.mapMarkerTooltipContent.station(marker),
       service: (marker) => this.mapMarkerTooltipContent.service(marker),
       gather: (marker) => this.mapMarkerTooltipContent.gather(marker),
+      worldQuest: (marker) => this.mapMarkerTooltipContent.worldQuest(marker, Date.now()),
+      worldBoss: (marker) => this.mapMarkerTooltipContent.worldBoss(marker),
       questArea: (refs, count) => this.mapMarkerTooltipContent.questArea(refs, count),
       paint: (html, x, y) => this.paintTooltipAt(html, x, y),
       clearMemo: () => this.mapMarkerTooltipContent.clearMemo(),
@@ -2329,6 +2335,7 @@ export class Hud {
       },
       questTitle,
       objectiveLabel: questObjectiveLabel,
+      openQuest: (questId) => this.questlogWindow.openWithQuest(questId),
       click: () => audio.click(),
     });
     this.questDialog = new QuestDialogController({
@@ -2610,7 +2617,35 @@ export class Hud {
     }
     mm.style.cursor = 'var(--cursor-point)';
     mm.title = t('controls.worldMap');
-    mm.addEventListener('click', () => this.toggleMap());
+    // A touch-safe activation keeps the emblem usable while another thumb is
+    // steering. The 20 CSS-pixel radius meets the 40x40 touch-target floor;
+    // projection/layout is read only on activation, never in the painter.
+    bindTouchTap(mm, (event) => {
+      const ev = event as MouseEvent | PointerEvent;
+      const rect = mm.getBoundingClientRect();
+      const marker =
+        minimapMode(this.sim) === 'overworld' && rect.width > 0 && rect.height > 0
+          ? this.minimapPainter.worldObjectiveAt(
+              ((ev.clientX - rect.left) * mm.width) / rect.width,
+              ((ev.clientY - rect.top) * mm.height) / rect.height,
+              20 * Math.max(mm.width / rect.width, mm.height / rect.height),
+            )
+          : null;
+      if (!marker) {
+        this.toggleMap();
+        return;
+      }
+      if ($('#map-window').style.display !== 'block') this.toggleMap();
+      this.mapLevel = 'zone';
+      this.mapZoneOverride = marker.zoneId;
+      this.mapZoom = MAP_OPEN_ZOOM;
+      this.mapCenter = null;
+      this.mapPing = null;
+      this.mapMarkerInteraction.selectWorldQuest(
+        marker.kind === 'world-quest' ? marker.questId : null,
+      );
+      this.updateMapWindow();
+    });
     window.addEventListener('pointermove', (ev) => {
       if (this.emoteWheelOpen) this.updateEmoteWheelPointer(ev.clientX, ev.clientY);
     });
@@ -2803,39 +2838,6 @@ export class Hud {
     $('#mm-deeds').addEventListener('click', () => this.toggleDeeds());
     $('#mm-reliquary')?.addEventListener('click', () => this.toggleReliquary());
     $('#mm-professions').addEventListener('click', () => this.toggleProfessions());
-    // Collapse/expand the on-screen quest tracker by clicking its header. The
-    // overlay is click-through (pointer-events:none) except the header button, so
-    // delegate on the stable container (the header is rebuilt on each render).
-    $('#quest-tracker').addEventListener('click', (e) => {
-      if ((e.target as HTMLElement).closest('.qt-header')) this.toggleQuestTrackerCollapsed();
-      // A quest row jumps to that quest's detail in the quest log window.
-      const row = (e.target as HTMLElement).closest<HTMLElement>('.qt-title');
-      if (row?.dataset.quest) this.questlogWindow.openWithQuest(row.dataset.quest);
-    });
-    // Keyboard activation: handle Enter/Space here and stop the event before it
-    // bubbles to the window-level game keybinds (Enter is bound to Open Chat,
-    // Space is preventDefault'd for jump), which would otherwise hijack the
-    // focused header button's native activation. The tracker is a non-modal
-    // overlay, so canUseGameKeys() stays true and those binds fire while it has
-    // focus; stopping propagation here keeps the toggle reachable by keyboard.
-    $('#quest-tracker').addEventListener('keydown', (e) => {
-      const target = e.target as HTMLElement;
-      if (e.key !== 'Enter' && e.key !== ' ' && e.code !== 'Space') return;
-      if (target.closest('.qt-header')) {
-        e.preventDefault();
-        e.stopPropagation();
-        this.toggleQuestTrackerCollapsed();
-        return;
-      }
-      // Keyboard activation for the quest rows (role=button), stopped before
-      // the window-level game keybinds hijack Enter/Space (same as the header).
-      const row = target.closest<HTMLElement>('.qt-title');
-      if (row?.dataset.quest) {
-        e.preventDefault();
-        e.stopPropagation();
-        this.questlogWindow.openWithQuest(row.dataset.quest);
-      }
-    });
     // Collapse/expand the deed tracker from its header (the quest tracker
     // delegation pattern: click plus the Enter/Space keydown arm below,
     // stopped before the window-level chat-open/jump binds hijack the
@@ -2898,6 +2900,7 @@ export class Hud {
     $('#mm-map').addEventListener('click', () => this.toggleMap());
     $('#map-close').addEventListener('click', () => {
       $('#map-window').style.display = 'none';
+      this.mapMarkerInteraction.selectWorldQuest(null);
       this.hideTooltip(); // a touch marker tip can outlive the window otherwise
       this.syncAnyWindowOpenState();
     });
@@ -3006,7 +3009,12 @@ export class Hud {
       finishMapTap(
         mapPinch,
         mapTapReleaseFromPointer(ev, mapTapStart, MAP_TAP_MOVE_TOLERANCE_PX),
-        (clientX, clientY) => showMapTipAt(clientX, clientY, true),
+        (clientX, clientY) => {
+          if (this.mapMarkerInteraction.selectWorldQuestAt(mapCanvas, clientX, clientY, true)) {
+            this.updateMapWindow();
+          }
+          return showMapTipAt(clientX, clientY, true);
+        },
       );
       mapTapStart = null;
     };
@@ -3036,7 +3044,12 @@ export class Hud {
       this.toggleMapLevel();
     });
     mapCanvas.addEventListener('click', (ev) => {
-      if (this.mapLevel !== 'continent') return;
+      if (this.mapLevel === 'zone') {
+        if (this.mapMarkerInteraction.selectWorldQuestAt(mapCanvas, ev.clientX, ev.clientY)) {
+          this.updateMapWindow();
+        }
+        return;
+      }
       const { cx, cy } = canvasPoint(ev.clientX, ev.clientY);
       const zoneId = continentZoneAt(this.continentRegions, cx, cy);
       if (zoneId) {
@@ -3609,6 +3622,9 @@ export class Hud {
       case 'reliquary-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.reliquaryWindow.close();
+        break;
+      case 'world-quest-puzzle-window':
+        this.worldQuestPuzzleWindow.close();
         break;
       case 'professions-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
@@ -5820,7 +5836,13 @@ export class Hud {
       this.confirmDialog(title, body, okText, cancelText, onOk),
     insertQuestChatLink: (questId) => this.insertQuestChatLink(questId),
   });
-
+  private readonly worldQuestPuzzleWindow = new WorldQuestPuzzleWindow({
+    document,
+    world: () => this.sim,
+    closeOthers: (selector) => this.closeOtherWindows(selector),
+    openFocusTrap: (root) => this.focusManager.open({ root }),
+    click: () => audio.click(),
+  });
   /** The player's own frame portrait.
    *
    *  Their COMPOSED character when they have an authored look, the face they
@@ -6928,6 +6950,7 @@ export class Hud {
     this.mountRaceControls.relocalize();
     this.refreshKeybindLabels();
     this.questTracker.relocalize(); // the strip key cannot see a locale-only change.
+    this.worldQuestPuzzleWindow.relocalize();
     // NOT updateDelveTracker(): the tracker's own signature is ids + numbers, so
     // a plain update() early-returns here and re-emits nothing. relocalize()
     // clears it for exactly one rebuild (#2529).
@@ -9988,14 +10011,8 @@ export class Hud {
 
   private updateQuestTracker(now: number): void {
     this.questTracker.update(now);
+    this.worldQuestPuzzleWindow.refreshIfChanged();
   }
-
-  /** Flip the persisted tracker-collapsed preference (the header click/keyboard
-   *  activation), preserving keyboard focus across the innerHTML rebuild. */
-  private toggleQuestTrackerCollapsed(): void {
-    this.questTracker.toggleCollapsed();
-  }
-
   // -------------------------------------------------------------------------
   // Delve board & tracker
   // -------------------------------------------------------------------------
@@ -10781,6 +10798,7 @@ export class Hud {
     const el = $('#map-window');
     if (el.style.display === 'block') {
       el.style.display = 'none';
+      this.mapMarkerInteraction.selectWorldQuest(null);
       this.hideTooltip(); // a touch marker tip can outlive the window otherwise
       this.mapPing = null;
       this.mapZoneOverride = null;
@@ -11029,6 +11047,7 @@ export class Hud {
       zoom: this.mapZoom,
       center: this.mapCenter,
       ping: this.mapPing,
+      selectedWorldQuestId: this.mapMarkerInteraction.selectedWorldQuestId,
     });
     this.mapView = result.view;
     this.mapMarkerInteraction.setOverworld(result);
@@ -11455,6 +11474,25 @@ export class Hud {
       this.playEventSfx(ev); // positional sound for nearby combat/creatures
       this.meters.onEvent(ev);
       if (this.isNythraxisEvent(ev)) this.lastNythraxisCombatEventAt = performance.now();
+      const questEvent = questEventPresentation(ev);
+      if (questEvent) {
+        if (questEvent.logText) this.log(questEvent.logText, '#dcd29f');
+        if (questEvent.flashText) this.questBanner.show(questEvent.flashText);
+        if (questEvent.bannerText) this.showBanner(questEvent.bannerText);
+        if (questEvent.sound) sfx.playUi(questEvent.sound);
+        if (questEvent.mountOwnedPrompt)
+          this.showBanner(
+            t('hudChrome.mountTraining.ownedMountPrompt'),
+            true,
+            undefined,
+            'default',
+            undefined,
+            6000,
+          );
+        if (questEvent.refreshQuestDialog) this.questDialog.refresh();
+        this.worldQuestPuzzleWindow.applyEventPresentation(questEvent);
+        continue;
+      }
       switch (ev.type) {
         case 'damage': {
           const src = sim.entities.get(ev.sourceId);
@@ -12688,44 +12726,6 @@ export class Hud {
           }
           break;
         }
-        case 'questAccepted':
-          sfx.playUi('quest_accept');
-          this.questDialog.refresh();
-          break;
-        case 'questProgress': {
-          const progressText = questProgressEventText(ev);
-          this.log(progressText, '#dcd29f');
-          // The classic yellow top-center flash ("Forest Wolf slain: 3/8"); the
-          // log line above stays the durable, announced copy.
-          this.questBanner.show(progressText);
-          this.questDialog.refresh();
-          break;
-        }
-        case 'questReady': {
-          this.showBanner(
-            t('questUi.logs.ready', {
-              name: questTitle(ev.questId),
-              status: t('questUi.log.readyStatus'),
-            }),
-          );
-          sfx.playUi('quest_ready');
-          this.questDialog.refresh();
-          break;
-        }
-        case 'questDone':
-          sfx.playUi('quest_complete');
-          if (ev.questId === 'q_riding_lessons') {
-            this.showBanner(
-              t('hudChrome.mountTraining.ownedMountPrompt'),
-              true,
-              undefined,
-              'default',
-              undefined,
-              6000,
-            );
-          }
-          this.questDialog.refresh();
-          break;
         case 'varkhulCallout': {
           const text = t(varkhulCalloutKey(ev.call));
           this.questBanner.show(text);

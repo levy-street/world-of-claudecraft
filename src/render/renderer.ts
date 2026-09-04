@@ -1,3 +1,4 @@
+// biome-ignore-all format: Legacy monolith has exact-source contracts; format new seams in their modules.
 import * as THREE from 'three';
 import { NumberSampleRing } from '../game/sample_ring';
 import { coerceFxTier, nameplateIntervalSec } from '../game/ui_tier_knobs';
@@ -570,9 +571,15 @@ import { createPrewarmResumeLedger } from './prewarm_resume_ledger_core';
 import { type PriestMarkersVisual, syncPriestMarkersVisual } from './priest_markers_visual';
 import { pieceProgramSettle } from './program_variant_settle';
 import { buildPropMaterialPrewarmGroup, buildProps, propResidencySources } from './props';
-
+import {
+  attachEntityViewBody,
+  buildQuestCaravanBody,
+  isQuestCaravanEntity,
+  type MovingWorldQuestFreightWagonVisual,
+  syncQuestCaravanBody,
+} from './quest_entity_presentation';
 import { makeQuestObjectGate, type QuestObjectGateOptions } from './quest_object_gate_core';
-import { buildGroundQuestObject } from './quest_objects';
+import { buildGroundQuestObject, farshoreSalvagePrewarmPlan, prewarmFarshoreSalvageObjects } from './quest_objects';
 import { RaceLine } from './race_line';
 import {
   disposeRaidEncounterVisuals,
@@ -750,6 +757,7 @@ import { weaponVfxShedScale } from './weapon_vfx_shed_core';
 import { Weather } from './weather';
 import { precipForBiome } from './weather_field_core';
 import { buildWorldAmbientSources, footstepSurfaceAt } from './world_audio';
+import { hasWorldQuestDeliveryCargo, syncWorldQuestCarryVisual, type WorldQuestCarryViewState } from './world_quest_carry_visual';
 import { surfaceDetailPrewarmTextures } from './worn_stone';
 import { buildYumiMaze, type YumiMazeView } from './yumi_maze';
 import { YumiTeamMarkers } from './yumi_team_markers';
@@ -1083,7 +1091,7 @@ interface AoeRingSlot {
   elapsed: number; // seconds since spawn; >= AOE_RING_LIFETIME means free
 }
 
-export interface EntityView extends RickshawMountViewState {
+export interface EntityView extends RickshawMountViewState, WorldQuestCarryViewState {
   group: THREE.Group;
   /** rigged glTF visual for characters; null for object views (doors/crates) */
   visual: CharacterVisual | null;
@@ -1135,6 +1143,7 @@ export interface EntityView extends RickshawMountViewState {
   sparkle?: THREE.Sprite; // ground objects
   objectMesh?: THREE.Object3D;
   objectPoolKey: string | null;
+  freightCaravanVisual: MovingWorldQuestFreightWagonVisual | null;
   /** templateId the object mesh was built from. The sim swaps delve interactable
    *  templates in place (plate -> triggered, rope -> pulled); diffing this each
    *  frame drops the stale view so it rebuilds with the new mesh. */
@@ -2005,7 +2014,7 @@ export class Renderer {
     options: RendererCreateOptions = {},
   ) {
     this.canvas = canvas;
-    this.questObjectHidden = makeQuestObjectGate(options);
+    this.questObjectHidden = makeQuestObjectGate(options, this.sim);
     this.nameplateLayer = nameplateLayer;
     this.travelSpeedFx = new TravelSpeedFxPainter(nameplateLayer);
     // ?prep=legacy: admit every unit as before, while the ledger keeps learning
@@ -5292,6 +5301,7 @@ export class Renderer {
         place(built.group);
       }
     }
+    prewarmFarshoreSalvageObjects(buildGroundQuestObject, (poolKey, object) => this.storePooledObject(poolKey, object)).forEach(({ group: object }) => { object.visible = true; place(object); });
     return group;
   }
 
@@ -6429,7 +6439,7 @@ export class Renderer {
           this.scene.add(objectPrewarmGroup);
         },
         detail: () =>
-          `items=${PREWARM_OBJECT_ITEM_IDS.length};copies=${PREWARM_OBJECT_POOL_COPIES}`,
+          `items=${PREWARM_OBJECT_ITEM_IDS.length};copies=${PREWARM_OBJECT_POOL_COPIES};salvage=${farshoreSalvagePrewarmPlan.length}`,
       },
       {
         id: 'props.material-variants',
@@ -8171,6 +8181,7 @@ export class Renderer {
     let objectMesh: THREE.Object3D | undefined;
     let visualPoolKey: string | null = null;
     let objectPoolKey: string | null = null;
+    let freightCaravanVisual: MovingWorldQuestFreightWagonVisual | null = null;
     const isQuestVision = e.kind === 'mob' && e.templateId.startsWith('vision_');
 
     let portal: THREE.Mesh | undefined;
@@ -8256,6 +8267,10 @@ export class Renderer {
       body = built.group;
       height = built.height;
       objectMesh = built.group;
+    } else if (isQuestCaravanEntity(e)) {
+      freightCaravanVisual = buildQuestCaravanBody(e);
+      body = objectMesh = freightCaravanVisual.group;
+      height = freightCaravanVisual.height;
     } else if (e.kind === 'object' && e.templateId === 'mailbox') {
       // Ravenpost pillar: bespoke procedural prop (no sparkle; the unread-mail
       // votive in the group is the per-viewer beacon, toggled in sync()).
@@ -8424,30 +8439,7 @@ export class Renderer {
       this.sim.cfg.world?.npcs,
     );
 
-    let clickTarget: THREE.Object3D;
-    if (visual) {
-      // raycasting skinned meshes is expensive, pick against the invisible
-      // capsule proxy instead (three's raycaster ignores `visible`)
-      if (!isQuestVision) visual.clickProxy.userData.entityId = e.id;
-      clickTarget = visual.clickProxy;
-    } else {
-      // every object branch above built a body; the bare group is a benign
-      // fallback for the (unreachable) no-body case
-      if (body) {
-        group.add(body);
-        body.traverse((o) => {
-          o.userData.entityId = e.id;
-        });
-        // Prop builders hang their ambience handles (rolling rock, orbiting
-        // shards, pulsing veins, pylon flame, the mail votive) on the BODY they
-        // return, but the per-frame animation pass reads them from the view
-        // GROUP: hoist them across or every one of those animations sits inert.
-        for (const key of ['rollRock', 'riftOrbiters', 'riftPulse', 'riftFlame', 'mailGlow']) {
-          if (body.userData[key] !== undefined) group.userData[key] = body.userData[key];
-        }
-      }
-      clickTarget = body ?? group;
-    }
+    const clickTarget = attachEntityViewBody(group, body, e.id, visual, isQuestVision);
     group.scale.setScalar(e.scale);
     group.position.set(e.pos.x, e.pos.y, e.pos.z);
     group.userData.entityId = e.id;
@@ -8506,6 +8498,7 @@ export class Renderer {
       sparkle,
       objectMesh,
       objectPoolKey,
+      freightCaravanVisual,
       builtTemplateId: e.kind === 'object' ? e.templateId : undefined,
       portal,
       objectCasters,
@@ -10008,6 +10001,7 @@ export class Renderer {
       v.metamorphVisual?.dispose();
       v.fireballTravelVisual?.dispose();
     } else {
+      v.freightCaravanVisual?.dispose();
       if (!terminal && v.objectPoolKey && v.objectMesh instanceof THREE.Group) {
         this.storePooledObject(v.objectPoolKey, {
           group: v.objectMesh,
@@ -10637,6 +10631,20 @@ export class Renderer {
         // holy sparkle over beacon NPCs, gold over the current target.
         this.islandGuidance.npcFizz(this.sim, e, this.vfx, this.time, dt);
       }
+      if (v.freightCaravanVisual) {
+        syncQuestCaravanBody(
+          v,
+          dt,
+          this.frameIdx + e.id,
+          d2,
+          lodBands,
+          this.reducedMotion(),
+          this.cullCharacters ? this.cullFrustum : null,
+          this.cullSphere,
+        );
+        continue;
+      }
+      v.worldQuestCarryVisual = syncWorldQuestCarryVisual(v.worldQuestCarryVisual, v.group, !e.dead && !e.mountKey && hasWorldQuestDeliveryCargo(e));
       const sunVerdictPlan = paladinSunVerdictVisualPlanForAuraInto(
         e.dead,
         sunVerdictAura,

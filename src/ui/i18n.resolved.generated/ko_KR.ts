@@ -2719,6 +2719,7 @@ export const ko_KR: EnTranslations = {
       "forbiddenReflectionLock": "금지된 반영을 아직 다시 준비할 수 없습니다",
       "internalCooldown": "타이머가 끝날 때까지 이 효과가 다시 발동하지 않습니다",
       "carriedFlag": "적의 깃발을 운반하고 있습니다. 이 버프를 해제하면 깃발을 내려놓습니다.",
+      "carryingFreight": "화물을 운반 중입니다. 이동 속도가 {pct}% 감소합니다.",
       "battleStance": "전투 태세: 분노 생성 10% 증가",
       "berserkerStance": "광전사 태세: 치명타 확률 3% 증가, 피해 3% 증가",
       "crit": "치명타 확률이 {pct}% 증가합니다",
@@ -8923,6 +8924,9 @@ export const ko_KR: EnTranslations = {
         "readyQuest": "완료 가능한 퀘스트",
         "repeatQuest": "반복 퀘스트",
         "cooldownQuest": "재사용 대기 중인 퀘스트",
+        "availableWorldQuest": "가능한 전역 퀘스트: {name}",
+        "activeWorldQuest": "진행 중인 전역 퀘스트: {name}",
+        "worldBoss": "월드 보스: {name}",
         "questObjective": "퀘스트 목표 지역",
         "readyOre": "채광 가능한 광맥",
         "readyWood": "채집 가능한 목재",
@@ -9712,8 +9716,57 @@ export const ko_KR: EnTranslations = {
       "objectiveProgress": "{label}: {current}/{total}",
       "requiresLevel": "{level}레벨 필요"
     },
+    "worldQuest": {
+      "title": "{zone}: {target}",
+      "unknown": "알 수 없는 전역 퀘스트 ({id})",
+      "itemReward": "아이템 보상: {name}",
+      "rewardLine": "보상: {reward}",
+      "availableStatus": "가능한 전역 퀘스트",
+      "activeStatus": "진행 중인 전역 퀘스트",
+      "expiresIn": "{time} 후 종료",
+      "mineOre": "구리 광석 채굴",
+      "recoverObject": "{name} 회수",
+      "redirectLeyBeam": "지맥 광선의 방향을 바꾸기",
+      "matchConfections": "마법 과자 맞추기",
+      "loadFreight": "화물을 마차에 싣기",
+      "escortCaravan": "{zone} 대상단 호위",
+      "salvageWreckage": "난파선 잔해 회수",
+      "puzzleTitle": "지맥 광선 정렬",
+      "puzzleLevel": "주간 레벨 {level}",
+      "puzzleInstructions": "타일을 돌려 광선을 시작점에서 목적지까지 연결하세요.",
+      "puzzleRotateTile": "타일 {tile} 돌리기",
+      "puzzleConnectors": "연결 방향: {connectors}.",
+      "puzzlePowered": "광선이 이 타일에 도달합니다.",
+      "puzzleUnpowered": "광선이 이 타일에 도달하지 않습니다.",
+      "puzzleClose": "지맥 광선 퍼즐 닫기",
+      "puzzleSource": "시작점",
+      "puzzleTarget": "목적지",
+      "puzzleSourceEndpoint": "시작점: {direction}.",
+      "puzzleTargetEndpoint": "목적지: {direction}.",
+      "puzzleTileAria": "{rotation} {connectors} {power} {source} {target}",
+      "match3Title": "과자 연쇄",
+      "match3Instructions": "서로 인접한 과자 두 개를 선택하세요. 세 개 이상 한 줄을 만드는 교환만 이동으로 계산됩니다.",
+      "match3Moves": "이동: {current}/{total}",
+      "match3Cleared": "제거한 과자: {current}/{total}",
+      "match3Announcement": "{moves}. {cleared}.",
+      "match3Cell": "{row}행 {column}열: {candy}",
+      "match3Selected": "선택됨",
+      "match3Reset": "레벨 다시 시작",
+      "match3Close": "과자 퍼즐 닫기",
+      "match3OutOfMoves": "남은 이동이 없습니다. 레벨을 다시 시작하세요.",
+      "semanticSummary": "{name}. {progress}. {reward}.",
+      "semanticSummaryTimed": "{name}. {progress}. {reward}. {time}.",
+      "match3Candy": {
+        "berry": "베리 수정",
+        "citrus": "시트러스 구슬",
+        "mint": "민트 삼각형",
+        "grape": "포도 사각형",
+        "star": "설탕 별"
+      }
+    },
     "logs": {
       "accepted": "퀘스트 수락: {name}",
+      "worldQuestStarted": "전역 퀘스트 시작: {name}",
       "abandoned": "퀘스트 포기: {name}",
       "completed": "퀘스트 완료: {name}",
       "ready": "{name} ({status})",
@@ -13049,6 +13102,18 @@ export const ko_KR: EnTranslations = {
       "sprung_trap": {
         "name": "튕겨진 늪 덫"
       },
+      "leyline_cache": {
+        "name": "소형 지맥 보관함"
+      },
+      "confection_game_box": {
+        "name": "제과사의 게임 상자"
+      },
+      "eastbrook_freight_crate": {
+        "name": "이스트브룩 화물 상자"
+      },
+      "eastbrook_freight_wagon": {
+        "name": "이스트브룩 화물 마차"
+      },
       "hearthlined_treads": {
         "name": "화롯가 안감 장화"
       },
@@ -14718,6 +14783,15 @@ export const ko_KR: EnTranslations = {
       },
       "vale_bandit": {
         "name": "계곡 도적"
+      },
+      "eastbrook_freight_caravan": {
+        "name": "이스트브룩 화물 대상단"
+      },
+      "willowfen_remedy_caravan": {
+        "name": "버들늪 약품 대상단"
+      },
+      "frostveil_supply_caravan": {
+        "name": "서리장막 보급 대상단"
       },
       "restless_bones": {
         "name": "불안한 뼈무더기"

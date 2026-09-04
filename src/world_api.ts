@@ -172,11 +172,24 @@ export type {
 // 25 = Ignivar's compiled Rain of Cinders cone length grew from 24 to 30 yards.
 // Epoch 24 clients would display a dangerously shorter warning than the
 // authoritative server damage.
+// 26 = World Quests add server-authoritative automatic rewards plus the
+// rotating owner snapshot. Older clients cannot present their availability,
+// progress, or expiry, so they must be rejected before gameplay admission.
+// 27 = World Quests add an authoritative rotating-tile beam puzzle. Older
+// clients cannot send its tile-turn action or present its persisted board.
+// 28 = World Quests add physical minigame activators and authoritative match-three
+// swap/reset commands plus the persisted board, move and refill snapshot fields.
+// 29 = World Quests add an authoritative freight-delivery objective and a public
+// carried-cargo aura. Older clients cannot render or predict its movement state.
+// 30 = World Quests add personal rotating shipwreck-salvage props. Older clients
+// cannot gate, render, or select their stable object ids without leaking normal quest credit.
+// 31 = World Quests add a moving, interactable public caravan escort. Older clients
+// cannot identify its objective or render and start the authoritative escort entity.
 // (12 is deliberately unassigned: 13 through 25 were numbered 11 through 23 on
 // the pre-merge raid branch, which forked before the Bank Storage and Materials
 // Vault bumps above; that branch's 11 through 20 were in turn 9 through 18
 // before the Eastbrook program bumps.)
-export const ONLINE_WORLD_LAYOUT_VERSION = 25 as const;
+export const ONLINE_WORLD_LAYOUT_VERSION = 31 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI
@@ -707,6 +720,11 @@ export const COMMAND_NAMES = [
   // life, and band server-side). Appended because wire tokens are never
   // reordered.
   'tutorial_start',
+  // World-quest beam puzzle: rotate one bounded tile on the authoritative
+  // board. Appended because wire tokens are never reordered.
+  'world_quest_puzzle_rotate',
+  'world_quest_match3_swap',
+  'world_quest_match3_reset',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -801,6 +819,9 @@ export const COMMAND_FACETS = {
   stopattack: 'IWorldCombat',
   release: 'IWorldCombat',
   unstuck: 'IWorldCombat',
+  world_quest_puzzle_rotate: 'IWorldQuests',
+  world_quest_match3_swap: 'IWorldQuests',
+  world_quest_match3_reset: 'IWorldQuests',
   // Ghost resurrection: run the spirit to its corpse, or accept the Spirit Healer's
   // resurrection (with Resurrection Sickness). Wire strings are snake_case by design.
   resurrect_corpse: 'IWorldCombat',

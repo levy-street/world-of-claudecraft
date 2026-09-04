@@ -26,10 +26,12 @@ import {
   arenaOrigin,
   DELVES,
   DUNGEON_X_THRESHOLD,
+  GATHER_NODES,
   LAKE,
   MOBS,
   PROPS,
   QUESTS,
+  WORLD_QUESTS_BY_ID,
 } from '../../src/sim/data';
 import { EASTBROOK_LAYOUT } from '../../src/sim/eastbrook_layout';
 import {
@@ -74,6 +76,13 @@ import {
   xpForLevel,
 } from '../../src/sim/types';
 import { groundHeight, terrainHeight } from '../../src/sim/world';
+import { WORLD_QUEST_DELIVERY_AURA_ID } from '../../src/sim/world_quest_delivery';
+import { applyWorldQuestMatch3Move } from '../../src/sim/world_quest_match3';
+import {
+  onMobKilledForWorldQuests,
+  onNodeGatheredForWorldQuests,
+  updateWorldQuests,
+} from '../../src/sim/world_quests';
 import { WORLD_SEED } from '../../src/sim/world_seed';
 import { runCraft } from '../helpers/enchant_family_cast';
 import { OPEN_FIELD } from '../helpers/open_field';
@@ -6448,6 +6457,161 @@ function varkhulRaidTuning(): Scenario {
   };
 }
 
+function worldQuestLifecycle(): Scenario {
+  return {
+    name: 'world_quest_lifecycle',
+    coverage: [
+      'level-10 area auto-start state without an NPC accept/turn-in',
+      'active -> progress -> completed world-quest event sequence',
+      'delivery pickup -> public carried cargo -> wagon credit loop',
+      'max-level XP, level-scaled copper, and item rewards',
+      'three-day realm-reset rotation with a different deterministic selection',
+    ],
+    sampleEvery: 1,
+    build: () => new Sim({ seed: 1180, playerClass: 'warrior', autoEquip: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim;
+      const meta = requireValue(sim.meta(sim.playerId), 'world-quest player metadata');
+      sim.setPlayerLevel(MAX_LEVEL);
+      sim.utcDay = '2026-08-31';
+      sim.resetDay = '2026-08-31';
+
+      const complete = (questId: keyof typeof WORLD_QUESTS_BY_ID, checkpoints = false): void => {
+        const quest = WORLD_QUESTS_BY_ID[questId];
+        teleport(sim, sim.player as AnyEntity, quest.area.x, quest.area.z);
+        updateWorldQuests(sim.ctx, meta, sim.player);
+        if (checkpoints) rec.snapshot(`${quest.id}-started`);
+        if (quest.objective.type === 'gather') {
+          const nodeType = quest.objective.nodeType;
+          const nodes = GATHER_NODES.filter(
+            (node) =>
+              node.type === nodeType &&
+              (node.pos.x - quest.area.x) ** 2 + (node.pos.z - quest.area.z) ** 2 <=
+                quest.area.radius ** 2,
+          );
+          for (let count = 0; count < quest.count; count++) {
+            onNodeGatheredForWorldQuests(
+              sim.ctx,
+              requireValue(nodes[count], `${quest.id} node`),
+              meta,
+            );
+            if (checkpoints && count === 0) rec.snapshot(`${quest.id}-progress`);
+          }
+          if (checkpoints) rec.snapshot(`${quest.id}-completed`);
+          return;
+        }
+        if (quest.objective.type === 'delivery') {
+          const objective = quest.objective;
+          const pickup = requireValue(
+            [...sim.entities.values()].find(
+              (entity) => entity.objectItemId === objective.pickupObjectItemId,
+            ),
+            `${quest.id} pickup`,
+          );
+          const destination = requireValue(
+            [...sim.entities.values()].find(
+              (entity) => entity.objectItemId === objective.deliveryObjectItemId,
+            ),
+            `${quest.id} destination`,
+          );
+          for (let count = 0; count < quest.count; count++) {
+            teleport(sim, sim.player as AnyEntity, pickup.pos.x, pickup.pos.z);
+            sim.pickUpObject(pickup.id);
+            if (checkpoints && count === 0) rec.snapshot(`${quest.id}-carrying`);
+            teleport(sim, sim.player as AnyEntity, destination.pos.x, destination.pos.z);
+            sim.pickUpObject(destination.id);
+            if (checkpoints && count === 0) rec.snapshot(`${quest.id}-progress`);
+          }
+          if (checkpoints) rec.snapshot(`${quest.id}-completed`);
+          return;
+        }
+        if (quest.objective.type === 'match3') {
+          const activationObjectItemId = quest.objective.activationObjectItemId;
+          const activator = requireValue(
+            [...sim.entities.values()].find(
+              (entity) => entity.objectItemId === activationObjectItemId,
+            ),
+            `${quest.id} activator`,
+          );
+          teleport(sim, sim.player as AnyEntity, activator.pos.x, activator.pos.z);
+          sim.pickUpObject(activator.id);
+          const progress = requireValue(meta.worldQuestLog.get(quest.id), `${quest.id} progress`);
+          const level = requireValue(
+            quest.objective.levels[progress.puzzleVariant ?? 0],
+            `${quest.id} level`,
+          );
+          let board = [...level.board];
+          let refillIndex = 0;
+          for (let move = 0; move < level.maxMoves && progress.state === 'active'; move++) {
+            let best:
+              | {
+                  from: number;
+                  to: number;
+                  result: ReturnType<typeof applyWorldQuestMatch3Move>;
+                }
+              | undefined;
+            for (let from = 0; from < board.length; from++) {
+              for (const to of [from + 1, from + level.columns]) {
+                const result = applyWorldQuestMatch3Move(level, board, from, to, refillIndex);
+                if (!result.accepted) continue;
+                if (!best || result.cleared > best.result.cleared) best = { from, to, result };
+              }
+            }
+            if (!best) break;
+            sim.swapWorldQuestMatch3Tiles(quest.id, best.from, best.to);
+            board = best.result.board;
+            refillIndex = best.result.refillIndex;
+          }
+          if (progress.state !== 'completed') throw new Error(`${quest.id} did not complete`);
+          if (checkpoints) rec.snapshot(`${quest.id}-completed`);
+          return;
+        }
+        if (quest.objective.type !== 'kill') throw new Error(`${quest.id} is not auto-completable`);
+        const targetMobId = quest.objective.targetMobId;
+        const target = requireValue(
+          [...sim.entities.values()].find(
+            (entity) => entity.kind === 'mob' && entity.templateId === targetMobId,
+          ),
+          `${quest.id} target`,
+        );
+        teleport(sim, target as AnyEntity, quest.area.x, quest.area.z);
+        onMobKilledForWorldQuests(sim.ctx, target, meta);
+        if (checkpoints) rec.snapshot(`${quest.id}-progress`);
+        for (let count = 1; count < quest.count; count++) {
+          onMobKilledForWorldQuests(sim.ctx, target, meta);
+        }
+        if (checkpoints) rec.snapshot(`${quest.id}-completed`);
+      };
+
+      const xpBefore = meta.lifetimeXp;
+      complete('wq_eastbrook_bandits', true);
+      rec.notes.xpReward = meta.lifetimeXp - xpBefore;
+      const copperBefore = meta.copper;
+      complete('wq_mirefen_gravecallers');
+      rec.notes.copperReward = meta.copper - copperBefore;
+      const itemBefore = sim.countItem('rift_essence');
+      complete('wq_palmreach_confections');
+      rec.notes.itemReward = sim.countItem('rift_essence') - itemBefore;
+      rec.notes.questProgress = meta.counters.questProgress;
+      rec.notes.questsCompleted = meta.counters.questsCompleted;
+      rec.notes.freightAuraId = WORLD_QUEST_DELIVERY_AURA_ID;
+      rec.snapshot('all-reward-families');
+
+      const firstCycle = meta.worldQuestCycle;
+      sim.resetDay = '2026-09-01';
+      updateWorldQuests(sim.ctx, meta, sim.player);
+      rec.notes.sameCycleAfterOneDay = meta.worldQuestCycle === firstCycle;
+      sim.resetDay = '2026-09-03';
+      const nextQuest = WORLD_QUESTS_BY_ID.wq_thornpeak_stormcrag;
+      teleport(sim, sim.player as AnyEntity, nextQuest.area.x, nextQuest.area.z);
+      updateWorldQuests(sim.ctx, meta, sim.player);
+      rec.notes.rotationChanged = meta.worldQuestCycle !== firstCycle;
+      rec.notes.rotatedQuestIds = [...meta.worldQuestLog.keys()];
+      rec.snapshot('rotation-changed');
+    },
+  };
+}
+
 export const SCENARIOS: Scenario[] = [
   soloWarrior(),
   soloMage(),
@@ -6529,4 +6693,5 @@ export const SCENARIOS: Scenario[] = [
   supportedElevationLineOfSight(),
   ignivarRaidTuning(),
   varkhulRaidTuning(),
+  worldQuestLifecycle(),
 ];

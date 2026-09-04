@@ -99,6 +99,7 @@ export interface QuestStripDeps {
    * src/ui/hud/CLAUDE.md forbids for exactly this reason.
    */
   writers: PainterHostWriters;
+  activate?(questId: string): boolean;
 }
 
 /** The strip's static markup, resolved once at build. Identical in shape to the
@@ -160,6 +161,7 @@ export class QuestStripController {
     this.gesture = new QuestStripGesture({
       surface: els.surface,
       cycle: (step) => this.cycle(step),
+      activate: () => this.activateCurrent(),
       setPressed: (pressed) => {
         this.pressed = pressed;
         this.repaint();
@@ -221,6 +223,13 @@ export class QuestStripController {
     this.flash = { step, phase: this.flashPhase };
     this.deps.click();
     this.repaint();
+  }
+
+  private activateCurrent(): boolean {
+    const quest = this.quests[this.index];
+    if (!quest || this.deps.activate?.(quest.id) !== true) return false;
+    this.deps.click();
+    return true;
   }
 
   private repaint(): void {

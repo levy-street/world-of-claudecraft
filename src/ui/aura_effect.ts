@@ -284,6 +284,12 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
   if (a.id === 'bg_carried_flag' && a.kind === 'flag_carried') {
     return { key: `${KEY}.carriedFlag`, nums: {} };
   }
+  if (a.id === 'world_quest_delivery_cargo' && a.kind === 'world_quest_cargo') {
+    return {
+      key: `${KEY}.carryingFreight`,
+      nums: { pct: pctFromMult(a.value) },
+    };
+  }
   switch (a.kind) {
     case 'dot':
       return {

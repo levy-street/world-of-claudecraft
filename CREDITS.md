@@ -342,6 +342,12 @@ non-commercial. For commercial use, arrange your own licence with the author.
 | Generated creature model + animations (bear_form, the druid Bear Form quadruped) | World of ClaudeCraft | Project-generated Tripo AI 3D sculpt, owned under the Tripo paid-plan license; rigged and animated locally rather than auto-rigged (29 bone deform rig fitted to the sculpt by measurement, distance-solver skinning, and nine IK-authored clips), then KTX2-compressed via glTF-Transform | Project asset | With the project only |
 | Ignivar Ashcaller creature model + animations (`public/models/creatures/ignivar_ashcaller.glb`) | World of ClaudeCraft contributor handoff | Contributor-provided `Ignivar_Ashcaller.zip` (SHA-256 `aa7aac6ddd2eedefdaec7e0c645558701236e60081f74f45a1e4cf088711eda9`), optimized locally with meshopt and KTX2 for shipping | Project asset | With the project only |
 | Generated prop model (varkhul_grand_forge) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated prop model (wreckage_broken_planks) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated prop model (wreckage_waterlogged_barrel) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated prop model (wreckage_damaged_crate) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated prop model (wreckage_fallen_anchor) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated prop model (wreckage_hull_fragment) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated prop model (wreckage_capsized_rowboat) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 Assets were optimized for shipping (animation clip pruning, meshopt compression,
 texture resizing) via `scripts/assets/build_assets.mjs`; raw packs are not
 committed.

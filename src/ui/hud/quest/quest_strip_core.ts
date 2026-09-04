@@ -62,6 +62,13 @@ export function questStripStep(
   return dx < 0 ? 1 : -1;
 }
 
+export function questStripIsTap(
+  dx: number,
+  deadzone: number = QUEST_STRIP_SWIPE_DEADZONE_PX,
+): boolean {
+  return Math.abs(dx) < deadzone;
+}
+
 /** Move the selection by `step`, wrapping in both directions. A total below 2
  *  has nothing to cycle to, so the only valid index is 0. */
 export function cycleQuestStrip(index: number, step: number, total: number): number {

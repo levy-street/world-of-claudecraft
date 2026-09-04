@@ -52,7 +52,10 @@ import {
   createMinimapMarkers,
   MINIMAP_CLIP_INSET,
   type MinimapMarker,
+  type MinimapModel,
   type MinimapObjectSemantic,
+  minimapWorldObjectiveMarkerAt,
+  minimapWorldQuestMarkerAt,
 } from './minimap_markers';
 import type { PainterHostWriters } from './painter_host';
 
@@ -114,6 +117,10 @@ const GATHER_FALLBACK_LOCK_SHACKLE_TOP_WIDTH = 1.4;
 // apart from the round gather dots and the axis-aligned loot/mob squares at
 // minimap scale. Half-diagonal in px.
 const STATION_DIAMOND_RADIUS = 3;
+const WORLD_QUEST_MARKER_RADIUS = 5;
+const WORLD_QUEST_MARKER_COMPACT_SCALE = 1.45;
+const WORLD_QUEST_MARKER_LINE_WIDTH = 1.5;
+const WORLD_BOSS_MARKER_RADIUS = 6.5;
 
 // Party / player arrow triangle geometry (canvas-local, drawn under a rotation).
 const PARTY_ARROW_TIP_X = 6;
@@ -985,6 +992,9 @@ export const MINIMAP_COLOR_TOKENS = {
   gatherCooldown: '--color-minimap-gather-cooldown',
   gatherLocked: '--color-minimap-node-locked',
   station: '--color-minimap-station',
+  worldQuestAvailable: '--color-minimap-world-quest-available',
+  worldQuestActive: '--color-minimap-world-quest-active',
+  worldBoss: '--color-minimap-world-boss',
 } as const;
 
 /** The resolved minimap marker colors for one redraw. */
@@ -1009,6 +1019,7 @@ export type MinimapZoneBg = {
  */
 export class MinimapPainter {
   private readonly markers = createMinimapMarkers();
+  private lastModel: MinimapModel | null = null;
   // The resolved `--color-minimap-*` tokens, cached after the first successful resolve.
   // They are static `:root` tokens (src/styles/tokens.css) with no runtime mutation (no
   // setProperty, no theme / forced-colors / media-query redefinition), so re-reading them
@@ -1052,6 +1063,24 @@ export class MinimapPainter {
     return colors;
   }
 
+  worldQuestAt(
+    mx: number,
+    my: number,
+    hitRadius: number,
+  ): Extract<MinimapMarker, { kind: 'world-quest' }> | null {
+    if (!this.lastModel) return null;
+    return minimapWorldQuestMarkerAt(this.lastModel.markers, mx, my, hitRadius);
+  }
+
+  worldObjectiveAt(
+    mx: number,
+    my: number,
+    hitRadius: number,
+  ): Extract<MinimapMarker, { kind: 'world-quest' | 'world-boss' }> | null {
+    if (!this.lastModel) return null;
+    return minimapWorldObjectiveMarkerAt(this.lastModel.markers, mx, my, hitRadius);
+  }
+
   /**
    * Overworld minimap render: blit the cached terrain background under the player, then
    * draw the marker union over it, with the '#zone-label' text routed through the
@@ -1073,6 +1102,7 @@ export class MinimapPainter {
     // branches), so branch to the field raster here instead of blitting the
     // far-off overworld terrain cache the band sits outside of.
     if (isBgPos(world.player.pos.x)) {
+      this.lastModel = null;
       this.paintBattleground(ctx, world, zoneLabelEl, zoom, colors);
       return;
     }
@@ -1080,6 +1110,7 @@ export class MinimapPainter {
     const pxPerYard = MINIMAP_BASE_SCALE * zoom;
     const profile = this.markerProfile();
     const model = this.markers.build(world, S, pxPerYard, profile);
+    this.lastModel = model;
     // The one DOM write this Canvas painter routes through the write-elision facet.
     // In a rift, show the generated floor name + rank instead of the overworld zone.
     if (model.rift) {
@@ -1325,6 +1356,48 @@ export class MinimapPainter {
           ctx.fill();
           ctx.stroke();
           break;
+        case 'world-quest': {
+          const radius =
+            WORLD_QUEST_MARKER_RADIUS *
+            (profile === 'compact' ? WORLD_QUEST_MARKER_COMPACT_SCALE : 1);
+          ctx.fillStyle =
+            m.state === 'active' ? colors.worldQuestActive : colors.worldQuestAvailable;
+          ctx.strokeStyle = colors.outline;
+          ctx.lineWidth = WORLD_QUEST_MARKER_LINE_WIDTH;
+          ctx.beginPath();
+          ctx.arc(m.mx, m.my, radius, 0, FULL_CIRCLE);
+          ctx.fill();
+          ctx.stroke();
+          ctx.strokeStyle = colors.outline;
+          ctx.lineWidth = Math.max(1.5, radius * 0.28);
+          ctx.beginPath();
+          if (m.state === 'active') {
+            ctx.moveTo(m.mx - radius * 0.5, m.my);
+            ctx.lineTo(m.mx - radius * 0.1, m.my + radius * 0.42);
+            ctx.lineTo(m.mx + radius * 0.58, m.my - radius * 0.45);
+          } else {
+            ctx.moveTo(m.mx, m.my - radius * 0.55);
+            ctx.lineTo(m.mx, m.my + radius * 0.55);
+            ctx.moveTo(m.mx - radius * 0.55, m.my);
+            ctx.lineTo(m.mx + radius * 0.55, m.my);
+          }
+          ctx.stroke();
+          break;
+        }
+        case 'world-boss': {
+          const radius =
+            WORLD_BOSS_MARKER_RADIUS *
+            (profile === 'compact' ? WORLD_QUEST_MARKER_COMPACT_SCALE : 1);
+          ctx.fillStyle = colors.worldBoss;
+          ctx.strokeStyle = colors.outline;
+          ctx.lineWidth = WORLD_QUEST_MARKER_LINE_WIDTH;
+          ctx.beginPath();
+          ctx.arc(m.mx, m.my, radius, 0, FULL_CIRCLE);
+          ctx.fill();
+          ctx.stroke();
+          drawCorpseSkull(ctx, m.mx, m.my, colors.corpse, colors.outline, geometry);
+          break;
+        }
         case 'npc': {
           if (m.marker === 'none') {
             drawNeutralNpcRing(ctx, m.mx, m.my, colors.gatherCooldown, colors.outline, geometry);

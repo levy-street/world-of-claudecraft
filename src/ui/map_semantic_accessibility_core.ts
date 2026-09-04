@@ -26,6 +26,8 @@ import type {
   MapQuestAreaMarker,
   MapServiceMarker,
   MapStationMarker,
+  MapWorldBossMarker,
+  MapWorldQuestMarker,
 } from './map_window_view';
 
 export type MapInstanceSemantic = Exclude<MapMarkerSemantic, { kind: 'dungeon' | 'rift-entrance' }>;
@@ -264,6 +266,9 @@ export type MapSemanticLabelId =
   | 'readyQuest'
   | 'repeatQuest'
   | 'cooldownQuest'
+  | 'availableWorldQuest'
+  | 'activeWorldQuest'
+  | 'worldBoss'
   | 'questObjective'
   | 'readyOre'
   | 'readyWood'
@@ -388,6 +393,8 @@ function mapSummaryCategory(label: MapSemanticLabelId): MapSummaryCategory {
     case 'readyQuest':
     case 'repeatQuest':
     case 'cooldownQuest':
+    case 'availableWorldQuest':
+    case 'activeWorldQuest':
       return 'quest';
     case 'readyOre':
     case 'readyWood':
@@ -417,6 +424,7 @@ function mapSummaryCategory(label: MapSemanticLabelId): MapSummaryCategory {
     case 'aggressiveEnemy':
     case 'bossEnemy':
     case 'bossAggressiveEnemy':
+    case 'worldBoss':
     case 'lootableEnemy':
     case 'corpse':
     case 'teammate':
@@ -537,7 +545,8 @@ type ArgumentKind =
   | 'rift'
   | 'service'
   | 'npc'
-  | 'mob';
+  | 'mob'
+  | 'worldQuest';
 
 interface SummaryGroup extends MapMarkerLocation {
   label: MapSemanticLabelId;
@@ -571,6 +580,7 @@ export interface MapSemanticNameResolvers {
   rift(name: string, rank: string | null): string;
   npc(npcId: string): string;
   mob(mobId: string): string;
+  worldQuest(questId: string): string;
 }
 
 export interface DelveSemanticMapModel {
@@ -584,6 +594,8 @@ export interface DelveSemanticMapModel {
 
 export interface OverworldSemanticMapModel {
   questAreas: readonly MapQuestAreaMarker[];
+  worldQuests?: readonly MapWorldQuestMarker[];
+  worldBosses?: readonly MapWorldBossMarker[];
   npcs: readonly MapNpcMarker[];
   gatherNodes: readonly MapGatherNodeMarker[];
   stations: readonly MapStationMarker[];
@@ -749,6 +761,8 @@ export class MapSemanticAccessibilityCore {
         return this.names.npc(argument);
       case 'mob':
         return this.names.mob(argument);
+      case 'worldQuest':
+        return this.names.worldQuest(argument);
     }
   }
 
@@ -774,7 +788,10 @@ export class MapSemanticAccessibilityCore {
       label === 'bossAggressiveEnemy' ||
       label === 'dungeonEntrance' ||
       label === 'delveEntrance' ||
-      label === 'riftEntrance'
+      label === 'riftEntrance' ||
+      label === 'availableWorldQuest' ||
+      label === 'activeWorldQuest' ||
+      label === 'worldBoss'
     )
       values = { name };
     else if (label === 'worldPassage') values = { zone: name };
@@ -1058,6 +1075,16 @@ export class MapSemanticAccessibilityCore {
         );
     for (const areaMarker of model.questAreas)
       this.add(areaMarker.mx, areaMarker.my, 'questObjective');
+    for (const worldQuest of model.worldQuests ?? [])
+      this.add(
+        worldQuest.mx,
+        worldQuest.my,
+        worldQuest.state === 'active' ? 'activeWorldQuest' : 'availableWorldQuest',
+        'worldQuest',
+        worldQuest.questId,
+      );
+    for (const worldBoss of model.worldBosses ?? [])
+      this.add(worldBoss.mx, worldBoss.my, 'worldBoss', 'mob', worldBoss.bossId);
     for (const node of model.gatherNodes) {
       const label = node.ready
         ? node.locked

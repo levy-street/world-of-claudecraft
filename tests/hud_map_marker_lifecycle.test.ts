@@ -17,6 +17,8 @@ import type {
   MapServiceMarker,
   MapStationMarker,
   MapViewRect,
+  MapWorldBossMarker,
+  MapWorldQuestMarker,
 } from '../src/ui/map_window_view';
 import type { WindowDragDeps } from '../src/ui/window_drag';
 import type { IWorld, RiftFloorView } from '../src/world_api';
@@ -162,6 +164,7 @@ function semanticCore(): MapSemanticAccessibilityCore {
     rift: (name, rank) => `${name}${rank ? ` (${rank})` : ''}`,
     npc: (id) => id,
     mob: (id) => id,
+    worldQuest: (id) => id,
   });
 }
 
@@ -176,12 +179,15 @@ function wireTooltipResolvers(hud: MapHudHarness): void {
       rift: (name, rank) => `${name}${rank ? ` (${rank})` : ''}`,
       npc: (id) => id,
       mob: (id) => id,
+      worldQuest: (id) => id,
     },
     npc: (marker) => hud.questGiverTooltipHtml(marker),
     navigation: (marker) => hud.navigationMapTooltipHtml(marker),
     station: (marker) => hud.stationMapTooltipHtml(marker),
     service: (marker) => hud.serviceMapTooltipHtml(marker),
     gather: (marker) => hud.gatherNodeMapTooltipHtml(marker),
+    worldQuest: () => '<div>world quest</div>',
+    worldBoss: () => '<div>world boss</div>',
     questArea: (refs, count) => hud.questAreaTooltipHtml(refs, count),
     paint: (html, x, y) => hud.paintTooltipAt(html, x, y),
     clearMemo: () => {
@@ -260,6 +266,18 @@ const QUEST_AREA: MapQuestAreaMarker = {
   radius: 8,
   objectives: [],
   numbers: [],
+};
+const WORLD_QUEST: MapWorldQuestMarker = {
+  questId: 'wq_eastbrook_bandits',
+  mx: 140,
+  my: 200,
+  radius: 20,
+  state: 'available',
+};
+const WORLD_BOSS: MapWorldBossMarker = {
+  bossId: 'thunzharr_waking_peak',
+  mx: 140,
+  my: 200,
 };
 const VIEW: MapViewRect = {
   spanX: 300,
@@ -470,6 +488,52 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe('Hud zone-map marker interaction', () => {
+  it('selects only a clicked world-quest emblem and clears the disclosure on a miss', () => {
+    const canvas = canvasFixture();
+    const { hud } = markerHarness();
+    hud.mapMarkerInteraction.refreshGeometry(canvas);
+    hud.mapMarkerInteraction.worldQuests = [WORLD_QUEST];
+
+    expect(hud.mapMarkerInteraction.selectedWorldQuestId).toBeNull();
+    expect(hud.mapMarkerInteraction.selectWorldQuestAt(canvas, 170, 150)).toBe(true);
+    expect(hud.mapMarkerInteraction.selectedWorldQuestId).toBe(WORLD_QUEST.questId);
+    expect(hud.mapMarkerInteraction.selectWorldQuestAt(canvas, 10, 10)).toBe(true);
+    expect(hud.mapMarkerInteraction.selectedWorldQuestId).toBeNull();
+  });
+
+  it('prioritizes the world-quest emblem for hover and touch over overlapping markers', () => {
+    const canvas = canvasFixture();
+    const { hud, paint } = markerHarness();
+    hud.mapMarkerInteraction.refreshGeometry(canvas);
+    hud.mapMarkerInteraction.worldQuests = [WORLD_QUEST];
+
+    expect(hud.showMapTipAt(canvas, 170, 150)).toBe(true);
+    expect(paint).toHaveBeenLastCalledWith('<div>world quest</div>', 170, 150);
+    expect(mapPointMarkerHitsIntoCalls).not.toHaveBeenCalled();
+
+    expect(hud.showMapTipAt(canvas, 185, 150)).toBe(false);
+    expect(hud.showMapTipAt(canvas, 185, 150, true)).toBe(true);
+    expect(paint).toHaveBeenLastCalledWith('<div>world quest</div>', 185, 150);
+  });
+
+  it('prioritizes a world-boss skull without selecting a world-quest area', () => {
+    const canvas = canvasFixture();
+    const { hud, paint } = markerHarness();
+    hud.mapMarkerInteraction.refreshGeometry(canvas);
+    hud.mapMarkerInteraction.worldQuests = [WORLD_QUEST];
+    hud.mapMarkerInteraction.worldBosses = [WORLD_BOSS];
+
+    expect(hud.showMapTipAt(canvas, 170, 150)).toBe(true);
+    expect(paint).toHaveBeenLastCalledWith('<div>world boss</div>', 170, 150);
+    expect(hud.mapMarkerInteraction.selectedWorldQuestId).toBeNull();
+    expect(hud.mapMarkerInteraction.selectWorldQuestAt(canvas, 170, 150)).toBe(false);
+    expect(hud.mapMarkerInteraction.selectedWorldQuestId).toBeNull();
+
+    hud.mapMarkerInteraction.selectedWorldQuestId = WORLD_QUEST.questId;
+    expect(hud.mapMarkerInteraction.selectWorldQuestAt(canvas, 170, 150, true)).toBe(true);
+    expect(hud.mapMarkerInteraction.selectedWorldQuestId).toBeNull();
+  });
+
   it('converts client coordinates to backing pixels and passes each marker array in draw order', () => {
     const canvas = canvasFixture();
     const { hud, paint, calls } = markerHarness();

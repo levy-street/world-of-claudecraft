@@ -13,6 +13,7 @@ import { describe, expect, it } from 'vitest';
 import { CAMPS, DUNGEON_X_THRESHOLD, ESCORTS, MOBS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
+import { worldQuestCycleOfferingQuest } from '../src/sim/world_quest_rotation';
 
 /** Authored standing population per template, from the camp tables. */
 function authoredCounts(): Map<string, number> {
@@ -84,21 +85,37 @@ describe('open-world population never exceeds what the content authored', () => 
     assertPopulationSane(sim, 'at boot');
   });
 
-  it('holds after every shipped escort is run and its wave is killed, repeatedly', () => {
-    // One sim, every escort, several cycles each: the leak this guards compounds
-    // per run, so a survivor shows up as a growing template count.
-    const sim = new Sim({
-      seed: 424242,
-      playerClass: 'warrior',
-      playerName: 'Escorter',
-      respawnSeconds: 2, // resolve "did it come back?" in seconds of sim time
-    });
-    sim.player.level = 20;
+  it.each(Object.values(ESCORTS))(
+    'holds after $id is run and its wave is killed, repeatedly',
+    (def) => {
+      // Keep repeated runs in one Sim to expose accumulating survivors. Each
+      // route has its own test budget now that every regional caravan runs.
+      const sim = new Sim({
+        seed: 424242,
+        playerClass: 'warrior',
+        playerName: 'Escorter',
+        respawnSeconds: 2, // resolve "did it come back?" in seconds of sim time
+      });
+      sim.setPlayerLevel(20);
 
-    let ranAtLeastOne = false;
-    for (const def of Object.values(ESCORTS)) {
+      let ranAtLeastOne = false;
       for (let round = 0; round < 2; round++) {
-        sim.questLog.set(def.questId, { questId: def.questId, counts: [0], state: 'active' });
+        // Previous live-world waves may have killed the observer. An escort
+        // cannot start for a dead player, so restore the test actor each round.
+        sim.player.dead = false;
+        sim.player.hp = sim.player.maxHp;
+        sim.targetEntity(null);
+        if (def.worldQuestId !== undefined) {
+          const meta = sim.meta(sim.playerId);
+          if (!meta) throw new Error('Missing player metadata');
+          meta.devWorldQuestCycle = worldQuestCycleOfferingQuest('wq3_0', def.worldQuestId);
+          const start = sim.groundPos(def.start.x, def.start.z);
+          sim.player.pos = { ...start };
+          sim.player.prevPos = { ...start };
+          sim.tick();
+        } else {
+          sim.questLog.set(def.questId, { questId: def.questId, counts: [0], state: 'active' });
+        }
         const escortee = findByTemplate(sim, def.npcMobId);
         if (!escortee) continue; // not yet respawned; the next escort still runs
         const pos = sim.groundPos(escortee.pos.x, escortee.pos.z + 2);
@@ -125,9 +142,10 @@ describe('open-world population never exceeds what the content authored', () => 
 
         assertPopulationSane(sim, `${def.id} round ${round + 1}`);
       }
-    }
-    expect(ranAtLeastOne, 'no escort actually ran, so this proved nothing').toBe(true);
-  }, 120_000);
+      expect(ranAtLeastOne, 'no escort actually ran, so this proved nothing').toBe(true);
+    },
+    120_000,
+  );
 
   it('names the escort ambush templates it is protecting, so the sweep is visible', () => {
     // Every shipped escort wave template, spelled out. If a new escort ships,
@@ -136,13 +154,18 @@ describe('open-world population never exceeds what the content authored', () => 
       ...new Set(Object.values(ESCORTS).flatMap((d) => d.ambushes.map((a) => a.mobId))),
     ].sort();
     expect(waveTemplates).toEqual([
+      'bogtoad',
       'breach_wretch',
       'canopy_weaver',
       'fen_sprite',
+      'rime_elemental',
       'snowdrift_wolf',
+      'terrace_howler',
       'tide_scuttler',
+      'vale_bandit',
       'void_stalker',
       'widowsilk_spinner',
+      'willow_sprite',
       'wood_wraith',
     ]);
     // ...and each is a real template placed by real camps, so the budget above

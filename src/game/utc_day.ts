@@ -8,6 +8,7 @@
 // value that changes once a day, so cache and re-derive at most once a second.
 
 import { DOUBLE_HONOR_LEAD_MS } from '../sim/pvp/honor_event';
+import { worldQuestCycleForResetDay } from '../sim/world_quest_rotation';
 
 // The civil hour a daily window opens. Mirrors RAID_RESET_HOUR in
 // server/raid_reset.ts, which is the authority for the online realm; the two are
@@ -61,6 +62,34 @@ export function currentResetDay(): string {
   return cachedResetDay;
 }
 
+/** Next local 3 AM boundary that advances the three-day world-quest cycle. */
+export function nextWorldQuestRotationOf(at: Date): number {
+  const currentCycle = worldQuestCycleForResetDay(resetDayOf(at));
+  const boundary = new Date(at.getTime());
+  boundary.setHours(DAILY_RESET_HOUR, 0, 0, 0);
+  if (boundary.getTime() <= at.getTime()) boundary.setDate(boundary.getDate() + 1);
+  for (let day = 0; day < 3; day++) {
+    if (worldQuestCycleForResetDay(resetDayOf(boundary)) !== currentCycle) {
+      return boundary.getTime();
+    }
+    boundary.setDate(boundary.getDate() + 1);
+    boundary.setHours(DAILY_RESET_HOUR, 0, 0, 0);
+  }
+  throw new Error(`nextWorldQuestRotationOf found no boundary after ${at.toISOString()}`);
+}
+
+let cachedWorldQuestExpiryMs = 0;
+let worldQuestExpiryRefreshAtMs = 0;
+
+export function currentWorldQuestExpiresAtMs(): number {
+  const now = Date.now();
+  if (now >= worldQuestExpiryRefreshAtMs) {
+    cachedWorldQuestExpiryMs = nextWorldQuestRotationOf(new Date(now));
+    worldQuestExpiryRefreshAtMs = now + 1000;
+  }
+  return cachedWorldQuestExpiryMs;
+}
+
 /**
  * The weekend event's early-open probe: the daily-reset window the player will
  * be in DOUBLE_HONOR_LEAD_MS from the given instant, in their OWN local zone
@@ -96,8 +125,10 @@ export function feedSimCalendar(sim: {
   utcDay: string;
   resetDay: string;
   eventLeadDay: string;
+  worldQuestExpiresAtMs: number;
 }): void {
   sim.utcDay = currentUtcDay();
   sim.resetDay = currentResetDay();
   sim.eventLeadDay = currentEventLeadDay();
+  sim.worldQuestExpiresAtMs = currentWorldQuestExpiresAtMs();
 }

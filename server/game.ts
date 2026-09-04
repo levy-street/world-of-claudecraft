@@ -1,3 +1,4 @@
+// biome-ignore-all format: Legacy coordinator is line-ratcheted; format extracted wire modules instead.
 import { randomUUID } from 'node:crypto';
 import type { WebSocket } from 'ws';
 import { createBotDetector } from '#bot-detector';
@@ -347,7 +348,8 @@ import type { PerfCaptureResult, PerfCaptureStatus } from './perf_capture_types'
 export type { PerfCaptureResult, PerfCaptureStatus } from './perf_capture_types';
 
 import { recordFtueDeath, recordFtueQuest, recordLevelUp } from './progress_events';
-import { eventLeadDayKey, resetDayKey } from './raid_reset';
+import * as questWire from './quest_command_wire';
+import { emitQuestSelfKeys } from './quest_snapshot_wire';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
 import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './realm_readout_memo';
 import { RiftAssetCoordinator, riftAssetConfigFromEnv } from './rift_assets';
@@ -359,6 +361,7 @@ import {
   createSerialWriter,
 } from './serial_writer';
 import { buildRealmSimConfig } from './sim_boot_config';
+import { feedAuthoritativeCalendar } from './sim_calendar';
 import {
   jsonWithField,
   StableAuraWireCache,
@@ -386,6 +389,7 @@ import { buildVarkhulPortalReplayBatch, varkhulPortalReplayFrame } from './varkh
 import { dispatchVaultCommand, emitVaultSelfKeys } from './vault_wire';
 import { holderInfoForPubkey } from './woc_balance';
 import type { CharacterSaveArgs } from './woc_market';
+import { activeWorldBossIdsWireJson } from './world_boss_wire';
 import { isBackpressureExceeded } from './ws_backpressure';
 
 const ALDRIC_METEOR_QUEST_ID = 'q_aldrics_fallen_star';
@@ -2760,9 +2764,7 @@ export class GameServer {
           // than at midnight UTC (5 PM Pacific, mid-evening), and `eventLeadDay`
           // is the weekend event's early-open probe of the same boundary.
           const calendarNowMs = Date.now();
-          this.sim.utcDay = new Date(calendarNowMs).toISOString().slice(0, 10);
-          this.sim.resetDay = resetDayKey(calendarNowMs, REALM_RESET_TIME_ZONE);
-          this.sim.eventLeadDay = eventLeadDayKey(calendarNowMs, REALM_RESET_TIME_ZONE);
+          feedAuthoritativeCalendar(this.sim, calendarNowMs, REALM_RESET_TIME_ZONE);
           this.bcastGridNs = 0n;
           this.bcastSelfNs = 0n;
           this.selfWireNs.clear();
@@ -4184,6 +4186,7 @@ export class GameServer {
     if (session.spectating) this.exitSpectate(session, false);
     if (session.jailVisit) this.exitJailVisit(session, false);
     this.cancelAndRecordUnstuck(session);
+    this.sim.dropWorldQuestDeliveryCargo(session.pid);
     session.linkdead = true;
     session.graceUntil = Date.now() + LINKDEAD_GRACE_MS;
     this.botDetector.setTrackingConnection(session.botTrackingContext, false);
@@ -6822,14 +6825,7 @@ export class GameServer {
         );
         break;
       case 'accept':
-        if (typeof msg.quest === 'string') {
-          sim.acceptQuest(
-            msg.quest,
-            typeof msg.selection === 'string' ? msg.selection : undefined,
-            pid,
-          );
-          this.resyncQuests(session);
-        }
+        if (questWire.acceptQuestWire(sim, msg, pid)) this.resyncQuests(session);
         break;
       case 'tutorial_start':
         // No payload to validate: the sim re-runs every gate (alive, level 1,
@@ -6856,16 +6852,15 @@ export class GameServer {
         }
         break;
       case 'abandon':
-        if (typeof msg.quest === 'string') {
-          sim.abandonQuest(msg.quest, pid);
-          this.resyncQuests(session);
-        }
+        if (questWire.abandonQuestWire(sim, msg, pid)) this.resyncQuests(session);
+        break;
+      case 'world_quest_puzzle_rotate':
+      case 'world_quest_match3_swap':
+      case 'world_quest_match3_reset':
+        questWire.dispatchWorldQuestWire(sim, msg, pid);
         break;
       case 'qlinkaccept':
-        if (typeof msg.quest === 'string' && typeof msg.from === 'number') {
-          sim.acceptLinkedQuest(msg.quest, msg.from, pid);
-          this.resyncQuests(session);
-        }
+        if (questWire.acceptLinkedQuestWire(sim, msg, pid)) this.resyncQuests(session);
         break;
       case 'equip':
         if (typeof msg.item === 'string') {
@@ -8400,6 +8395,7 @@ export class GameServer {
     this.partyFrameGlobalsCache = null;
     this.partyFrameProjectionCache.beginBroadcast();
     const tick = this.sim.tickCount;
+    const bossIdsJson = activeWorldBossIdsWireJson(this.sim);
     // Vale Cup wire dueness, decided ONCE per broadcast pass and realm-global so the
     // tickHz rides the head at ~2 Hz, not on every snapshot: it is omitted while
     // the meter warms up (first ~1s, so a fresh server never shows a bogus
@@ -8590,7 +8586,7 @@ export class GameServer {
         }
         const selfStart = this.perfDetailActive ? process.hrtime.bigint() : 0n;
         if (this.perfDetailActive) this.bcastGridNs += selfStart - gridStart;
-        const selfJson = this.selfWireJson(session, anchorEntity, anchorMeta, anchorSession);
+        const selfJson = this.selfWireJson(session, anchorEntity, anchorMeta, anchorSession, bossIdsJson);
         if (this.perfDetailActive) this.bcastSelfNs += process.hrtime.bigint() - selfStart;
         const keepJson = keep.length > 0 ? `,"keep":[${keep.join(',')}]` : '';
         const aoeBase = isBgPos(anchorEntity.pos.x) ? BG_MATCH_DROP_RADIUS : INTEREST_QUERY_RADIUS;
@@ -8786,6 +8782,7 @@ export class GameServer {
     p: Entity,
     meta: PlayerMeta,
     anchorSession: ClientSession = session,
+    activeWorldBossIdsJson = '[]',
   ): string {
     // Per-bucket attribution for bcastSelf (SELF_WIRE_PHASES): one clock read
     // per bucket boundary, active only during a detailed capture, accumulated
@@ -8924,6 +8921,7 @@ export class GameServer {
       'lockouts',
       Object.fromEntries([...meta.raidLockouts].filter(([, until]) => until > Date.now())),
     );
+    maybeRaw('wba', activeWorldBossIdsJson);
     // Where the player's corpse lies while their spirit is a ghost (null otherwise).
     // Delta-guarded: ships on death-release and clears on resurrect. The client
     // draws the corpse marker and gates the resurrect-at-corpse button on it.
@@ -9307,10 +9305,7 @@ export class GameServer {
       maybe('equip', meta.equipment);
       maybe('einst', meta.equipmentInstance);
       maybe('cosmetics', anchorSession.accountCosmetics);
-      // qlog carries creditedObjects (the opened-crate per-viewer hide,
-      // src/sim/quests/opened_object_view.ts): bounded, personal, on-change.
-      maybe('qlog', [...meta.questLog.values()]);
-      maybe('qdone', [...meta.questsDone]);
+      emitQuestSelfKeys(maybe, this.sim, meta);
       maybe('milestones', [...meta.unlockedMilestones]);
       // Book of Deeds: the earned map (deed id -> utcDay) and the COMPLETE
       // lifetime stat block. Maps and Sets do not survive JSON.stringify, so
@@ -9944,9 +9939,9 @@ export class GameServer {
                 continue;
               }
               mine.push(fragments[i]);
-              // a sim-driven change to a heavy self field (loot, level-up, quest
-              // credit, ...) refreshes those fields on the next snapshot
-              if (HEAVY_SELF_EVENTS.has(ev.type)) session.selfHeavyDirty = true;
+              // Sim-driven heavy-self changes refresh those fields on the next snapshot.
+              if (HEAVY_SELF_EVENTS.has(ev.type) || ev.type.startsWith('worldQuest'))
+                session.selfHeavyDirty = true;
               // A match concluding (win, loss, draw, or forfeit) changes rating
               // and standings on the throttled `arena` self key (ARENA_WIRE_HZ):
               // force it fresh next snapshot instead of leaving the Arena

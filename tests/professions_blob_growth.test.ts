@@ -115,6 +115,7 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   'vendorBuyback',
   'questLog',
   'questsDone',
+  'worldQuests',
   'arenaRating',
   'arenaWins',
   'arenaLosses',

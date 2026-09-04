@@ -3547,6 +3547,7 @@ export const hudChromeStrings = {
     // The carried-flag buff's tooltip: the ONLY place the voluntary-drop
     // affordance is spelled out, so the player can find it without folklore.
     carriedFlag: 'You are carrying the enemy flag. Cancel this buff to drop it.',
+    carryingFreight: 'You are carrying freight. Movement speed is reduced by {pct}%.',
     battleStance: 'Battle Stance: 10% more rage generation',
     berserkerStance: 'Berserker Stance: crits 3% more often and hit 3% harder',
     crit: 'Increases critical strike chance by {pct}%',
@@ -4221,11 +4222,23 @@ export const hudChromeStrings = {
     // and cross-posts to Discord (looking-for-group, trade, recruiting, events).
     relay: {
       tooFast: 'You are posting too fast. Wait a moment and try again.',
-      lfg: { label: 'Looking for Group', hint: 'Find players for a dungeon or quest' },
-      wts: { label: 'Want to Sell', hint: 'Advertise an item or service for sale' },
+      lfg: {
+        label: 'Looking for Group',
+        hint: 'Find players for a dungeon or quest',
+      },
+      wts: {
+        label: 'Want to Sell',
+        hint: 'Advertise an item or service for sale',
+      },
       wtb: { label: 'Want to Buy', hint: 'Request an item you want to buy' },
-      recruit: { label: 'Guild Recruiting', hint: 'Recruit players for your guild' },
-      event: { label: 'Event / Raid', hint: 'Announce a raid, meetup or event' },
+      recruit: {
+        label: 'Guild Recruiting',
+        hint: 'Recruit players for your guild',
+      },
+      event: {
+        label: 'Event / Raid',
+        hint: 'Announce a raid, meetup or event',
+      },
       help: { label: 'Need Help', hint: 'Ask the community for help' },
     },
   },

@@ -5,12 +5,14 @@ import {
   isSupportedTimeZone,
   nextRaidResetMs,
   nextWeeklyRaidResetMs,
+  nextWorldQuestRotationMs,
   RAID_RESET_HOUR,
   resetDayKey,
 } from '../server/raid_reset';
 import { resolveRaidResetTimeZone } from '../server/realm';
 import { DAILY_RESET_HOUR } from '../src/game/utc_day';
 import { DOUBLE_HONOR_LEAD_MS } from '../src/sim/pvp/honor_event';
+import { worldQuestCycleForResetDay } from '../src/sim/world_quests';
 
 // The daily raid reset lands at 03:00 (3 AM, the classic daily-reset hour) in the realm's
 // civil time zone (default US Eastern, America/New_York), so a realm shares one
@@ -145,6 +147,19 @@ describe('isSupportedTimeZone', () => {
 });
 
 describe('resetDayKey: the ONE daily boundary a realm turns over on', () => {
+  it('finds the realm reset that expires the current world-quest rotation', () => {
+    const now = Date.UTC(2026, 7, 31, 16, 0, 0);
+    const expiry = nextWorldQuestRotationMs(now);
+    expect(expiry).toBeGreaterThan(now);
+    expect(expiry - now).toBeLessThanOrEqual(3 * 24 * 60 * 60_000);
+    expect(worldQuestCycleForResetDay(resetDayKey(expiry))).not.toBe(
+      worldQuestCycleForResetDay(resetDayKey(now)),
+    );
+  });
+  it('expires the opening rotation exactly at realm-local 03:00', () => {
+    const now = Date.UTC(2026, 8, 1, 12, 0, 0);
+    expect(nextWorldQuestRotationMs(now, 'America/New_York')).toBe(Date.UTC(2026, 8, 3, 7, 0, 0));
+  });
   it('holds one key across a whole evening of play, where midnight UTC split it', () => {
     // The reported bug, as instants. Both are 2026-08-07 in US Pacific, either
     // side of midnight UTC (5 PM Pacific in August), and the player won a
