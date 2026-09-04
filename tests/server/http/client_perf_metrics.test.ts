@@ -16,10 +16,12 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../server/db', () => ({
   accountAndScopeForToken: vi.fn(),
   getCharacter: vi.fn(),
+}));
+vi.mock('../../../server/client_perf_db', () => ({
   insertClientPerfReport: vi.fn(async () => {}),
 }));
 
-import { insertClientPerfReport } from '../../../server/db';
+import { insertClientPerfReport } from '../../../server/client_perf_db';
 import {
   CLIENT_PERF_DEVICE_CLASSES,
   CLIENT_PERF_FPS_AVG_BUCKETS,

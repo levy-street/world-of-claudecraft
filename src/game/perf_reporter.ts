@@ -574,6 +574,8 @@ function payloadFromSnapshot(
     rendererTextures: renderer.textures,
     rendererPrograms: renderer.programs,
     contextLostCount: renderer.contextLost,
+    contextRestoredCount: renderer.contextRestored,
+    contextRestoreFailures: renderer.contextRestoreFailures,
     longTaskCount: longTasks.count,
     longTaskP95Ms: longTasks.p95,
     memoryUsedMb: memory?.usedMB ?? null,

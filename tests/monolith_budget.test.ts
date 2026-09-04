@@ -697,7 +697,11 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
-    ceiling: 5145,
+    // Lowered 5145 -> 4933 after extracting the client_perf_reports domain
+    // (schema, insertClientPerfReport, pruneClientPerfReportsBatch, and the
+    // client_perf_indexes re-export) to server/client_perf_db.ts. Exact
+    // count, zero slack.
+    ceiling: 4933,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {

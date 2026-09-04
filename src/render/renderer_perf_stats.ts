@@ -103,6 +103,9 @@ export interface RendererPerfStats {
   glRenderer: string;
   contextLost: number;
   contextRestored: number;
+  /** Restore units that did not come back: render-target re-bakes that
+   *  failed plus KTX2 textures whose re-transcode exhausted its retries. */
+  contextRestoreFailures: number;
   /** 0 = full day, 1 = deep night; the night-visibility layers key off it. */
   nightAmount: number;
   phaseMs: RendererPhaseStats;

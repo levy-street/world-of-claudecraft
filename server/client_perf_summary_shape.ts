@@ -12,6 +12,7 @@ export interface PerfAggregate {
   p95FrameMs: number;
   p99FrameMs: number;
   contextLossCount: number;
+  contextRestoreFailureCount: number;
   avgRenderScale: number;
   avgEffectiveRenderScale: number;
 }
@@ -99,6 +100,7 @@ export type ClientPerfSummaryRow = {
   p95_frame_ms: number;
   p99_frame_ms: number;
   context_loss_count: number;
+  context_restore_failure_count: number;
   avg_render_scale: number;
   avg_effective_render_scale: number;
 };
@@ -133,6 +135,7 @@ export function perfAggregateFromRow(r: Record<string, unknown>): PerfAggregate 
     p95FrameMs: Number(r.p95_frame_ms ?? 0),
     p99FrameMs: Number(r.p99_frame_ms ?? 0),
     contextLossCount: Number(r.context_loss_count ?? 0),
+    contextRestoreFailureCount: Number(r.context_restore_failure_count ?? 0),
     avgRenderScale: Number(r.avg_render_scale ?? 0),
     avgEffectiveRenderScale: Number(r.avg_effective_render_scale ?? 0),
   };

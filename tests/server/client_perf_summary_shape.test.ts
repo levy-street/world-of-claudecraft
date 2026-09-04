@@ -26,6 +26,7 @@ type AggColumns = Pick<
   | 'p95_frame_ms'
   | 'p99_frame_ms'
   | 'context_loss_count'
+  | 'context_restore_failure_count'
   | 'avg_render_scale'
   | 'avg_effective_render_scale'
 >;
@@ -39,6 +40,7 @@ function agg(seed: number): AggColumns {
     p95_frame_ms: seed + 0.25,
     p99_frame_ms: seed + 0.75,
     context_loss_count: seed + 1,
+    context_restore_failure_count: seed + 3,
     avg_render_scale: seed + 0.1,
     avg_effective_render_scale: seed + 0.2,
   };
@@ -52,6 +54,7 @@ function expectedAgg(seed: number) {
     p95FrameMs: seed + 0.25,
     p99FrameMs: seed + 0.75,
     contextLossCount: seed + 1,
+    contextRestoreFailureCount: seed + 3,
     avgRenderScale: seed + 0.1,
     avgEffectiveRenderScale: seed + 0.2,
   };
@@ -162,6 +165,7 @@ describe('mapClientPerfSummaryRows classification', () => {
       p95FrameMs: 100.25,
       p99FrameMs: 100.75,
       contextLossCount: 101,
+      contextRestoreFailureCount: 103,
       avgRenderScale: 100.1,
       avgEffectiveRenderScale: 100.2,
     });
@@ -314,6 +318,7 @@ describe('mapClientPerfSummaryRows empty window', () => {
       p95FrameMs: 0,
       p99FrameMs: 0,
       contextLossCount: 0,
+      contextRestoreFailureCount: 0,
       avgRenderScale: 0,
       avgEffectiveRenderScale: 0,
     });

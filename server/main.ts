@@ -136,6 +136,7 @@ import {
   handleClaudiumStripeWebhook,
 } from './claudium';
 import { claudiumSpendDetailed } from './claudium_proxy';
+import { pruneClientPerfReportsBatch } from './client_perf_db';
 import { configureCommunityTestAccounts } from './community_test_accounts';
 import {
   bustDailyRewardBoardCache,
@@ -184,7 +185,6 @@ import {
   pool,
   primarySlugForAccount,
   pruneChatLogsBatch,
-  pruneClientPerfReportsBatch,
   pruneEmailChangeRequestsBatch,
   pruneEmailLogBatch,
   prunePasswordResetRequestsBatch,

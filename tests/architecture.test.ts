@@ -633,6 +633,10 @@ const RENDER_PURE_CORES = [
   'src/render/weapon_vfx_emissive_cache_core.ts',
   'src/render/weapon_vfx_shed_core.ts',
   'src/render/draw_stats_core.ts',
+  // In-place WebGL context restore (issue 3846): the re-bake coordinator and
+  // the environment-map rebuild, both host-agnostic (structural targets).
+  'src/render/context_restore_core.ts',
+  'src/render/environment_map_restore_core.ts',
   'src/render/fishing_bobber_core.ts',
   'src/render/flower_meadows_core.ts',
   'src/render/foliage_core.ts',

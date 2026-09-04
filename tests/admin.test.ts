@@ -1020,6 +1020,7 @@ describe('admin api auth', () => {
         p95FrameMs: 18,
         p99FrameMs: 22,
         contextLossCount: 0,
+        contextRestoreFailureCount: 0,
         avgRenderScale: 1,
         avgEffectiveRenderScale: 0.9,
       },

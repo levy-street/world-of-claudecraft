@@ -14,6 +14,13 @@
 //
 // One bake per session, a few milliseconds, before the terrain material
 // compiles. ?grassbake=off (dev) keeps the legacy photo splat layer.
+//
+// Context restore (issue 3846): the bake lives ONLY in its render target, so
+// an in-place WebGL context loss empties it and three never re-renders a
+// target it only samples. The renderer's restore coordinator calls
+// rebakeGrassGroundTexture, which re-renders the identical cluster field into
+// the SAME target: the terrain materials captured the target's texture object
+// at build time and keep sampling it, so nothing downstream needs rebinding.
 
 import * as THREE from 'three';
 import { clusterGeometry, mulberry32 } from './blade_grass';
@@ -31,6 +38,12 @@ export interface GrassGroundBake {
    *  fully-mip-averaged appearance; the band blades sink their bases toward
    *  it so contact points disappear. */
   mean: [number, number, number];
+  /** The render target behind `texture`, retained so a context restore can
+   *  re-render the bake into it (same texture object, see the header). */
+  target: THREE.WebGLRenderTarget;
+  /** The world seed the cluster field was built from; a re-bake rebuilds the
+   *  identical field, so `mean` stays exact without a second readback. */
+  seed: number;
 }
 
 // Module singleton: the renderer bakes once at construction; terrain.ts and
@@ -46,6 +59,13 @@ export function getGrassGroundBake(): GrassGroundBake | null {
   return activeBake;
 }
 
+/** Release the live bake's GPU target and clear the singleton (renderer
+ *  teardown; a rebuilt renderer bakes afresh on its own context). */
+export function disposeGrassGroundBake(): void {
+  activeBake?.target.dispose();
+  activeBake = null;
+}
+
 // Same integer hash family the carpet uses for placement decisions.
 function hash(i: number, j: number, k: number): number {
   let h = (i * 374761393 + j * 668265263 + k * 2246822519) | 0;
@@ -53,29 +73,22 @@ function hash(i: number, j: number, k: number): number {
   return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
 }
 
-/**
- * Render the bake. `renderer` must be the live WebGLRenderer; state (render
- * target, tone mapping) is saved and restored around the offscreen pass.
- */
-export function bakeGrassGroundTexture(
-  renderer: THREE.WebGLRenderer,
-  seed: number,
-): GrassGroundBake {
-  const patch = GRASS_BAKE_PATCH_YARDS;
-  const size = GRASS_BAKE_TEXTURE_SIZE;
+interface ClusterPlacement {
+  x: number;
+  z: number;
+  s: number;
+  sy: number;
+  yaw: number;
+  grey: number;
+}
 
-  // Cluster field over the patch at the CARPET's own density (0.46-yard
-  // cells) and the carpet's own size formula, so the strokes are the real
-  // blades at their real size. Instances are laid on a torus: every cluster
-  // is drawn at its cell position plus all eight patch-shifted copies, and
-  // the ortho camera clips to one period, so blades crossing an edge wrap
-  // and the texture tiles seamlessly.
+// Cluster field over the patch at the CARPET's own density (0.46-yard
+// cells) and the carpet's own size formula, so the strokes are the real
+// blades at their real size. Pure in the hash: the same patch every bake.
+function clusterPlacements(patch: number): ClusterPlacement[] {
   const CELL = 0.46;
   const cellsPerAxis = Math.floor(patch / CELL);
-  const geo = clusterGeometry(mulberry32(seed ^ 0x6b1a));
-  const mat = new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.DoubleSide });
-  const placements: { x: number; z: number; s: number; sy: number; yaw: number; grey: number }[] =
-    [];
+  const placements: ClusterPlacement[] = [];
   for (let cj = 0; cj < cellsPerAxis; cj++) {
     for (let ci = 0; ci < cellsPerAxis; ci++) {
       const r1 = hash(ci, cj, 11);
@@ -101,7 +114,23 @@ export function bakeGrassGroundTexture(
       });
     }
   }
+  return placements;
+}
 
+interface GrassBakeScene {
+  scene: THREE.Scene;
+  camera: THREE.OrthographicCamera;
+  dispose(): void;
+}
+
+// The offscreen scene: instances are laid on a torus (every cluster drawn at
+// its cell position plus all eight patch-shifted copies) and the ortho camera
+// clips to one period, so blades crossing an edge wrap and the texture tiles
+// seamlessly.
+function buildGrassBakeScene(seed: number, patch: number): GrassBakeScene {
+  const geo = clusterGeometry(mulberry32(seed ^ 0x6b1a));
+  const mat = new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.DoubleSide });
+  const placements = clusterPlacements(patch);
   const im = new THREE.InstancedMesh(geo, mat, placements.length * 9);
   im.instanceColor = new THREE.InstancedBufferAttribute(
     new Float32Array(placements.length * 9 * 3),
@@ -139,11 +168,50 @@ export function bakeGrassGroundTexture(
 
   // Top-down ortho over exactly one patch period. Y bounds cover the
   // tallest tuft (about 1.2 local yards times the tall-class scale).
-  const cam = new THREE.OrthographicCamera(0, patch, patch, 0, 0.1, 20);
-  cam.position.set(0, 10, 0);
-  cam.up.set(0, 0, -1);
-  cam.lookAt(0, 0, 0);
+  const camera = new THREE.OrthographicCamera(0, patch, patch, 0, 0.1, 20);
+  camera.position.set(0, 10, 0);
+  camera.up.set(0, 0, -1);
+  camera.lookAt(0, 0, 0);
 
+  return {
+    scene,
+    camera,
+    dispose() {
+      geo.dispose();
+      mat.dispose();
+      im.dispose();
+    },
+  };
+}
+
+// Albedo-space bake: tone mapping belongs to the lit frame, not the map.
+// Renderer state (target, tone mapping) is saved and restored around it.
+function renderGrassBake(
+  renderer: THREE.WebGLRenderer,
+  target: THREE.WebGLRenderTarget,
+  bake: GrassBakeScene,
+): void {
+  const prevTarget = renderer.getRenderTarget();
+  const prevToneMapping = renderer.toneMapping;
+  renderer.toneMapping = THREE.NoToneMapping;
+  try {
+    renderer.setRenderTarget(target);
+    renderer.render(bake.scene, bake.camera);
+  } finally {
+    renderer.setRenderTarget(prevTarget);
+    renderer.toneMapping = prevToneMapping;
+  }
+}
+
+/**
+ * Render the bake. `renderer` must be the live WebGLRenderer.
+ */
+export function bakeGrassGroundTexture(
+  renderer: THREE.WebGLRenderer,
+  seed: number,
+): GrassGroundBake {
+  const patch = GRASS_BAKE_PATCH_YARDS;
+  const size = GRASS_BAKE_TEXTURE_SIZE;
   const rt = new THREE.WebGLRenderTarget(size, size, {
     format: THREE.RGBAFormat,
     type: THREE.UnsignedByteType,
@@ -157,12 +225,12 @@ export function bakeGrassGroundTexture(
   });
   rt.texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
 
-  const prevTarget = renderer.getRenderTarget();
-  const prevToneMapping = renderer.toneMapping;
-  // Albedo-space bake: tone mapping belongs to the lit frame, not the map.
-  renderer.toneMapping = THREE.NoToneMapping;
-  renderer.setRenderTarget(rt);
-  renderer.render(scene, cam);
+  const bake = buildGrassBakeScene(seed, patch);
+  try {
+    renderGrassBake(renderer, rt, bake);
+  } finally {
+    bake.dispose();
+  }
 
   // Per-channel mean via one full readback (a few milliseconds, once per
   // session): the measured distant appearance the band blades sink toward.
@@ -179,11 +247,23 @@ export function bakeGrassGroundTexture(
   const inv = 1 / (size * size * 255);
   const mean: [number, number, number] = [r * inv, g * inv, b * inv];
 
-  renderer.setRenderTarget(prevTarget);
-  renderer.toneMapping = prevToneMapping;
-  geo.dispose();
-  mat.dispose();
-  im.dispose();
+  return { texture: rt.texture, mean, target: rt, seed };
+}
 
-  return { texture: rt.texture, mean };
+/**
+ * Re-render the live bake into its own target after a WebGL context restore
+ * (see the header). The cluster field is a pure function of the seed, so the
+ * result is the session-initial bake and `mean` needs no second readback.
+ * Returns false when no bake is live (dev flag, headless, low tier).
+ */
+export function rebakeGrassGroundTexture(renderer: THREE.WebGLRenderer): boolean {
+  const live = activeBake;
+  if (!live) return false;
+  const bake = buildGrassBakeScene(live.seed, GRASS_BAKE_PATCH_YARDS);
+  try {
+    renderGrassBake(renderer, live.target, bake);
+  } finally {
+    bake.dispose();
+  }
+  return true;
 }

@@ -4,10 +4,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../server/db', () => ({
   accountAndScopeForToken: vi.fn(),
   getCharacter: vi.fn(),
+}));
+vi.mock('../server/client_perf_db', () => ({
   insertClientPerfReport: vi.fn(async () => {}),
 }));
 
-import { accountAndScopeForToken, getCharacter, insertClientPerfReport } from '../server/db';
+import { insertClientPerfReport } from '../server/client_perf_db';
+import { accountAndScopeForToken, getCharacter } from '../server/db';
 import { handlePerfReport, perfReportInternalsForTest } from '../server/perf_report';
 import { resetRateLimitClock, setRateLimitClock } from '../server/ratelimit';
 import {
@@ -91,6 +94,8 @@ describe('perf report ingestion', () => {
           rendererTextures: 90,
           rendererPrograms: 40,
           contextLostCount: 0,
+          contextRestoredCount: 0,
+          contextRestoreFailures: 0,
           longTaskCount: 1,
           longTaskP95Ms: 70,
           memoryUsedMb: 120,
@@ -336,6 +341,53 @@ describe('perf report ingestion', () => {
         visibleViews: 31,
         worst10sFrameP95Ms: 1000,
       }),
+    );
+  });
+
+  it('clamps contextRestoredCount and contextRestoreFailures the same as contextLostCount', async () => {
+    // Missing on an old client: both default to 0, same as contextLostCount.
+    await handlePerfReport(
+      fakeReq({ sessionId: 'restore-missing', rawSummary: {} }, { remoteAddress: '203.0.113.67' }),
+      fakeRes(),
+    );
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({ contextRestoredCount: 0, contextRestoreFailures: 0 }),
+    );
+
+    // In range: passes through unchanged.
+    vi.mocked(insertClientPerfReport).mockClear();
+    await handlePerfReport(
+      fakeReq(
+        {
+          sessionId: 'restore-in-range',
+          contextRestoredCount: 5,
+          contextRestoreFailures: 5,
+          rawSummary: {},
+        },
+        { remoteAddress: '203.0.113.68' },
+      ),
+      fakeRes(),
+    );
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({ contextRestoredCount: 5, contextRestoreFailures: 5 }),
+    );
+
+    // Above the 0..1000 clamp: caps at 1000, same ceiling as contextLostCount.
+    vi.mocked(insertClientPerfReport).mockClear();
+    await handlePerfReport(
+      fakeReq(
+        {
+          sessionId: 'restore-hostile',
+          contextRestoredCount: 5000,
+          contextRestoreFailures: 5000,
+          rawSummary: {},
+        },
+        { remoteAddress: '203.0.113.69' },
+      ),
+      fakeRes(),
+    );
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({ contextRestoredCount: 1000, contextRestoreFailures: 1000 }),
     );
   });
 

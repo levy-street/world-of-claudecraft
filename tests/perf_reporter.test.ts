@@ -583,6 +583,7 @@ function snapshot(): PerfSnapshot {
       glRenderer: 'ANGLE (Apple, ANGLE Metal Renderer: Apple M3 Pro)',
       contextLost: 0,
       contextRestored: 0,
+      contextRestoreFailures: 0,
       phaseMs: {
         setup: { count: 1, avg: 1, p95: 1, max: 1 },
         entities: { count: 1, avg: 1, p95: 1, max: 1 },

@@ -1,10 +1,6 @@
 import type * as http from 'node:http';
-import {
-  accountAndScopeForToken,
-  type ClientPerfReportInsert,
-  getCharacter,
-  insertClientPerfReport,
-} from './db';
+import { type ClientPerfReportInsert, insertClientPerfReport } from './client_perf_db';
+import { accountAndScopeForToken, getCharacter } from './db';
 import { clientPerfMetricsSink } from './http/client_perf_metrics';
 import type { RateLimitOutcome } from './http/types';
 import { json, readBody } from './http_util';
@@ -831,6 +827,8 @@ export async function handlePerfReport(
     rendererTextures: intIn(body.rendererTextures, 0, 100_000, 0),
     rendererPrograms: intIn(body.rendererPrograms, 0, 100_000, 0),
     contextLostCount: intIn(body.contextLostCount, 0, 1000, 0),
+    contextRestoredCount: intIn(body.contextRestoredCount, 0, 1000, 0),
+    contextRestoreFailures: intIn(body.contextRestoreFailures, 0, 1000, 0),
     longTaskCount: intIn(body.longTaskCount, 0, 1_000_000, 0),
     longTaskP95Ms: numberIn(body.longTaskP95Ms, 0, 1000, 0),
     memoryUsedMb: nullableNumberIn(body.memoryUsedMb, 0, 1_000_000),

@@ -107,6 +107,7 @@ function baseSnapshot(): PerfSnapshot {
       glRenderer: 'ANGLE (NVIDIA, GeForce RTX 3060, D3D11)',
       contextLost: 0,
       contextRestored: 0,
+      contextRestoreFailures: 0,
       phaseMs: {
         setup: digest(0.5),
         entities: digest(2),
