@@ -13,10 +13,12 @@ import type { Aura } from '../../src/sim/types';
 import type { AuraStateSnapshot } from './contract';
 
 /**
- * Never snapshotted: identity the enrichment already carries beside the
- * snapshot (auraId / auraSourceId / auraStacks), and per-tick countdowns or
- * accruals whose value at application is either the duration (already
- * shipped) or zero.
+ * Never snapshotted. Three groups: identity the enrichment already carries
+ * beside the snapshot (auraId / auraSourceId / auraStacks); per-tick
+ * countdowns and accruals whose value at application is either the duration
+ * (already shipped) or zero; and per-application bookkeeping the owning
+ * mechanic keeps for itself (lockout and tick cursors, the extension ledger,
+ * the Chronomancy tick countdown), whose values are noise to a reader.
  */
 export const AURA_STATE_OMIT: ReadonlySet<keyof Aura> = new Set<keyof Aura>([
   'id',
@@ -27,6 +29,10 @@ export const AURA_STATE_OMIT: ReadonlySet<keyof Aura> = new Set<keyof Aura>([
   'tickTimer',
   'damageAccrued',
   'icd',
+  'actionGainLockout',
+  'gloomtitheTick',
+  'extendedBy',
+  'temporalHealTicksRemaining',
 ]);
 
 /** Defensive bounds: an aura is a handful of scalars, never a payload. */
@@ -37,12 +43,23 @@ export const MAX_AURA_STATE_STRING = 64;
  * Scalar (number / string / boolean) fields of a live aura, minus the omit
  * list, in the object's own key order (stable per construction site, which
  * keeps golden captures byte-identical). Undefined when nothing remains.
+ * `onTruncate` fires once when the field cap cuts the snapshot short, so a
+ * caller can count it (the recorder bumps ParseCounters.auraStateTruncated):
+ * the cap cannot trip with today's Aura, and if it ever does the loss must be
+ * visible, not silent, in the module whose point is completeness.
  */
-export function auraStateSnapshot(aura: object): AuraStateSnapshot | undefined {
+export function auraStateSnapshot(
+  aura: object,
+  onTruncate?: () => void,
+): AuraStateSnapshot | undefined {
   let out: AuraStateSnapshot | undefined;
   let count = 0;
-  for (const [key, value] of Object.entries(aura)) {
+  // for..in over own keys: same output as Object.entries with no tuple
+  // allocation per key on every gained aura event.
+  for (const key in aura) {
+    if (!Object.hasOwn(aura, key)) continue;
     if (AURA_STATE_OMIT.has(key as keyof Aura)) continue;
+    const value = (aura as Record<string, unknown>)[key];
     let scalar: number | string | boolean;
     if (typeof value === 'number') {
       if (!Number.isFinite(value)) continue;
@@ -54,7 +71,10 @@ export function auraStateSnapshot(aura: object): AuraStateSnapshot | undefined {
     } else {
       continue;
     }
-    if (count >= MAX_AURA_STATE_FIELDS) break;
+    if (count >= MAX_AURA_STATE_FIELDS) {
+      onTruncate?.();
+      break;
+    }
     out ??= {};
     out[key] = scalar;
     count++;

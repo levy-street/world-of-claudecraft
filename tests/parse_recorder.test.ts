@@ -236,8 +236,6 @@ describe('ParseRecorder enrichment', () => {
     const target = sim.entities.get(7);
     if (target !== undefined) {
       (target as { auras: unknown }).auras = [
-        // An unrelated same-source aura first: the join must pick the named one.
-        { id: 'brand', name: 'Brand', sourceId: 5, value: 1, remaining: 9, duration: 9 },
         {
           id: 'forge_chains',
           name: 'Chains',
@@ -254,6 +252,9 @@ describe('ParseRecorder enrichment', () => {
           empowerAbilities: ['x'],
           tickTimer: 0.35,
         },
+        // A same-source decoy applied LAST: the backward scan reaches it first,
+        // so the join must reject it by id (and name) to land on the chain.
+        { id: 'brand', name: 'Brand', sourceId: 5, value: 1, remaining: 9, duration: 9 },
       ];
     }
     const { recorder, records } = makeRecorder(sim);
@@ -288,9 +289,18 @@ describe('ParseRecorder enrichment', () => {
     });
   });
 
-  test('faded aura events carry no state snapshot', () => {
+  test('faded aura events carry no state snapshot even with a live matching aura', () => {
     const sim = fakeSim();
     seedArena(sim, arenaMatch());
+    const target = sim.entities.get(7);
+    if (target !== undefined) {
+      // The fade site strips after emitting in some paths and before in
+      // others, so a live same-named aura can still be present: the fade
+      // must not snapshot it (its state at removal is not the parse's business).
+      (target as { auras: unknown }).auras = [
+        { id: 'forge_chains', name: 'Chains', sourceId: 5, value: 0, linkedEntityId: 8 },
+      ];
+    }
     const { recorder, records } = makeRecorder(sim);
 
     sim.tickCount = 10;
@@ -299,6 +309,7 @@ describe('ParseRecorder enrichment', () => {
     recorder.observe([{ type: 'aura', targetId: 7, name: 'Chains', gained: false }]);
 
     const ev = records.find((r) => r.t === 'ev') as Record<string, unknown>;
+    expect(ev.ev).toEqual({ type: 'aura', targetId: 7, name: 'Chains', gained: false });
     expect(ev.x).toBeUndefined();
   });
 

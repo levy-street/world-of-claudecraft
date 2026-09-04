@@ -7,12 +7,13 @@
 // Typecheck is the real guard (the map is a Record over the union); this
 // script just saves the typing.
 //
-//   node scripts/parse/gen_event_policy.cjs
-const fs = require('node:fs');
-const path = require('node:path');
-const ts = require('typescript');
+//   node scripts/parse/gen_event_policy.mjs
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import ts from 'typescript';
 
-const root = path.resolve(__dirname, '..', '..');
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const typesPath = path.join(root, 'src', 'sim', 'types.ts');
 const policyPath = path.join(root, 'server', 'parse', 'event_policy.ts');
 
@@ -86,7 +87,7 @@ const out = `// Recording policy for every SimEvent type the drain can carry.
 // - skip: cosmetic, UI-only, or non-combat (chat, loot, quests, cues, ...).
 //   Volume or privacy, never "nobody asked yet".
 //
-// Regenerate the key list with scripts/parse/gen_event_policy.cjs when the
+// Regenerate the key list with scripts/parse/gen_event_policy.mjs when the
 // union changes (existing decisions are kept, new types land as 'skip' with
 // a TODO), or add the new key by hand; typecheck enforces completeness.
 import type { SimEvent } from '../../src/sim/types';

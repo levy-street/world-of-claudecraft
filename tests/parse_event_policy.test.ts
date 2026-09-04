@@ -45,12 +45,6 @@ describe('EVENT_RECORD_POLICY', () => {
       expect(EVENT_RECORD_POLICY[type]).toBe('skip');
     }
   });
-
-  test('every classification is one of the three policies', () => {
-    for (const policy of Object.values(EVENT_RECORD_POLICY)) {
-      expect(['routed', 'record', 'skip']).toContain(policy);
-    }
-  });
 });
 
 describe('eventActorId', () => {

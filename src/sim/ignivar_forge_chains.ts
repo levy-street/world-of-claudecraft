@@ -69,12 +69,17 @@ function clearChainAura(ctx: SimContext, player: Entity | undefined, bossId: num
   }
 }
 
-export function clearIgnivarForgeChainAura(player: Entity, bossId?: number): void {
+/** Encounter reset and arena departure: the same strip, the same fade announcement. */
+export function clearIgnivarForgeChainAura(ctx: SimContext, player: Entity, bossId?: number): void {
+  const before = player.auras.length;
   player.auras = player.auras.filter(
     (aura) =>
       aura.id !== IGNIVAR_FORGE_CHAINS_AURA_ID ||
       (bossId !== undefined && aura.sourceId !== bossId),
   );
+  if (player.auras.length !== before) {
+    ctx.emit({ type: 'aura', targetId: player.id, name: IGNIVAR_FORGE_CHAINS_NAME, gained: false });
+  }
 }
 
 function closestChainPair(candidates: readonly Entity[]): [Entity, Entity] | null {

@@ -129,13 +129,17 @@ object. Two structural guards now replace hand-picking:
   `recorder.ts`), `record` (shipped verbatim to the actor's fight via
   `routeRecorded`, e.g. `respawn`, `resurrectionOffer`) or `skip`. It is a
   `Record` over the union, so adding an event type to the sim fails typecheck
-  until it is classified; `scripts/parse/gen_event_policy.cjs` regenerates
+  until it is classified; `scripts/parse/gen_event_policy.mjs` regenerates
   the key list. Classify by volume and privacy, never by "nobody asked yet".
 - **Aura state ships whole.** `aura_state.ts` snapshots EVERY scalar field
   of the live aura on a gained event into `x.auraState`, minus a typed
-  omit list (`AURA_STATE_OMIT`, identity already carried beside it and
-  per-tick counters). A field added to `Aura` reaches the parse with no
-  recorder change; a field that must not ship is an explicit entry there.
+  omit list (`AURA_STATE_OMIT`: identity already carried beside it, per-tick
+  counters, and the mechanics' own bookkeeping cursors). A field added to
+  `Aura` reaches the parse with no recorder change; a field that must not
+  ship is an explicit entry there. The defensive field cap cannot trip with
+  today's `Aura`; if it ever does, `ParseCounters.auraStateTruncated`
+  (`woc_parse_aura_state_truncated_total`) says so rather than losing fields
+  silently.
   `linkedEntityId` is the one reserved key (tether partner; the service
   renders it as a link), so a new pairing mechanic that sets it is recorded
   and shown with no per-mechanic wiring.
@@ -147,8 +151,8 @@ object. Two structural guards now replace hand-picking:
   state-join fallback in `recorder.ts`.
 - Encounter code that strips an aura by filtering `entity.auras` directly
   bypasses the aura system's fade emit; the parse then sees the aura as up
-  until the next natural expiry. Emit the fade at such sites (Ignivar Chains
-  does since the state-snapshot change).
+  until the next natural expiry. Emit the fade at such sites (every Ignivar
+  Chains strip does: pair release, encounter reset, and arena departure).
 - Overheal: a periodic tick that FULLY overheals emits no heal2 at all (those
   sim sites gate on `healed > 0`, unchanged), so overheal totals undercount
   the at-full-health case; direct heals report it exactly.

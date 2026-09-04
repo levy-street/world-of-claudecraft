@@ -14,7 +14,7 @@
 // - skip: cosmetic, UI-only, or non-combat (chat, loot, quests, cues, ...).
 //   Volume or privacy, never "nobody asked yet".
 //
-// Regenerate the key list with scripts/parse/gen_event_policy.cjs when the
+// Regenerate the key list with scripts/parse/gen_event_policy.mjs when the
 // union changes (existing decisions are kept, new types land as 'skip' with
 // a TODO), or add the new key by hand; typecheck enforces completeness.
 import type { SimEvent } from '../../src/sim/types';
@@ -157,7 +157,7 @@ export const EVENT_RECORD_POLICY: Readonly<Record<SimEvent['type'], EventRecordP
   trainResult: 'skip',
   tutorialGreeting: 'skip',
   unbindResult: 'skip',
-  unstuck: 'skip', // TODO(parse): classify (new event type)
+  unstuck: 'skip',
   varkhulCallout: 'skip',
   vaultCraftConsume: 'skip',
   vendor: 'skip',

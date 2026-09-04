@@ -326,21 +326,27 @@ export class ParseRecorder {
       // The live aura object: the event names it, the object holds its state.
       // A fresh application or refresh always appends to the end (applyAura
       // splices then pushes), so the backward scan finds the most recent
-      // match. Matching by id + source when the event carries them (fidelity
-      // round 1 emit sites) and by name otherwise (the un-widened sites);
-      // the name fallback is best-effort: with two same-named auras from
-      // different casters the older one is unreachable by name alone.
+      // match. The name always has to agree; when the event also carries
+      // source and ability id (fidelity round 1 emit sites) those must agree
+      // too, so a same-source decoy applied later cannot be mistaken for the
+      // named aura. The bare-name fallback (un-widened sites) is best-effort:
+      // with two same-named auras from different casters the older one is
+      // unreachable by name alone.
+      //
+      // Known miss, inherited from base: the Sunder/Expose stack-bump re-emit
+      // (effect_dispatch.ts) deliberately names the CURRENT caster while the
+      // live aura keeps the original one, so a bump from a second caster
+      // finds no live match and ships identity and stacks with no auraState.
       const auras = this.opts.sim.entities.get(ev.targetId)?.auras;
       let live: (typeof auras extends readonly (infer A)[] | undefined ? A : never) | undefined;
       if (auras !== undefined) {
         for (let i = auras.length - 1; i >= 0; i--) {
           const aura = auras[i];
-          if (aura === undefined) continue;
+          if (aura === undefined || aura.name !== ev.name) continue;
           const matches =
-            ev.sourceId !== undefined
-              ? aura.sourceId === ev.sourceId &&
-                (ev.abilityId === undefined || aura.id === ev.abilityId)
-              : aura.name === ev.name;
+            ev.sourceId === undefined ||
+            (aura.sourceId === ev.sourceId &&
+              (ev.abilityId === undefined || aura.id === ev.abilityId));
           if (matches) {
             live = aura;
             break;
@@ -363,11 +369,17 @@ export class ParseRecorder {
       }
       // The aura's scalar state rides along automatically (aura_state.ts):
       // whatever the sim keeps on the aura is what the parse gets.
-      const auraState = live !== undefined ? auraStateSnapshot(live) : undefined;
+      const auraState =
+        live !== undefined ? auraStateSnapshot(live, this.noteAuraStateTruncated) : undefined;
       if (auraState !== undefined) enrichment = { ...(enrichment ?? {}), auraState };
     }
     fight.recordEvent(tick, ev as Record<string, unknown>, enrichment);
   }
+
+  /** Bound once so the aura join passes a stable callback, no closure per event. */
+  private readonly noteAuraStateTruncated = (): void => {
+    this.opts.counters.auraStateTruncated++;
+  };
 
   private routeDeath(ev: SimEvent & { type: 'death' }, tick: number): void {
     const match = this.fightFor(ev.entityId) ?? this.fightFor(ev.killerId);
