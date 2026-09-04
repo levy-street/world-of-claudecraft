@@ -133,6 +133,7 @@ const EXPECTED_CODES = [
   'woc_market.stepup_wallet_mismatch',
   'woc_market.stepup_binding_mismatch',
   'woc_market.stepup_signature_invalid',
+  'discord.invalid_input',
   'deeds.invalid_input',
   'guilds.invalid_roster_name',
   'guilds.unknown',

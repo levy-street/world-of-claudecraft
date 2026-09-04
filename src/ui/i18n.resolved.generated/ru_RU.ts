@@ -3046,6 +3046,7 @@ export const ru_RU: EnTranslations = {
       "close": "Закрыть",
       "keybind": "Панель Discord",
       "disabled": "Интеграция с Discord сейчас недоступна.",
+      "queuePingsLabel": "Присылать мне личное сообщение в Discord, когда очередь на поле боя или арену сработает (нужен привязанный аккаунт Discord)",
       "tiers": {
         "none": "Без ранга",
         "initiate": "Послушник",
@@ -4699,7 +4700,8 @@ export const ru_RU: EnTranslations = {
       "link_required": "Сначала привяжите аккаунт Discord.",
       "swag_claimed": "Вы уже получили эту награду.",
       "swag_tier": "Достигните более высокого ранга, чтобы получить это.",
-      "swag_points": "Недостаточно очков."
+      "swag_points": "Недостаточно очков.",
+      "invalid_input": "Недопустимые данные."
     },
     "deeds": {
       "invalid_input": "Недопустимые данные."

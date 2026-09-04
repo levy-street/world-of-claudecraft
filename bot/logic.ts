@@ -479,6 +479,79 @@ export function voiceMembersForChannel(
     .map((s) => ({ id: s.userId, name: nameOf(s.userId), speaking: false, selfMute: s.selfMute }));
 }
 
+// ── Queue-pop DMs (battleground offer opened / arena seated) ──────────────────
+// The server enqueues one item per opted-in, linked player whose queue popped;
+// the bot drains them through the outbox and DIRECT-MESSAGES the player, so a
+// player who alt-tabbed while waiting sees the pop before the Accept window
+// lapses. The item shape is the outbox's `queuePops` stream (server/internal.ts).
+export interface QueuePopItem {
+  accountId: number;
+  discordUserId: string;
+  characterName: string;
+  /** 'bg': an Accept/Decline offer with a window. 'arena': seated, no answer. */
+  kind: 'bg' | 'arena';
+  /** Arena format id ('1v1', '2v2', 'fiesta', 'yumi3', 'yumi5'), null for a bg pop. */
+  format: string | null;
+  /** The battleground Accept window in seconds (0 for arena). */
+  seconds: number;
+  /** Server wall-clock ms after which the pop is moot; rendered as a live countdown. */
+  expiresAtMs: number;
+  realm: string;
+}
+
+/** Player-facing names for the arena brackets; an unknown id falls back to itself. */
+const ARENA_FORMAT_LABELS: Record<string, string> = {
+  '1v1': '1v1',
+  '2v2': '2v2',
+  fiesta: 'Fiesta',
+  yumi3: 'Protect Yumi (3)',
+  yumi5: 'Protect Yumi (5)',
+};
+
+/**
+ * Full createMessage payload for a queue-pop DM: a short embed naming the
+ * queue, the character, and (for a battleground offer) a live Discord relative
+ * timestamp of the deadline, plus a link button back into the game. No mention
+ * (a DM already notifies its recipient) and no mention parsing. Pure data; the
+ * REST layer sends it. Unit-tested in tests/discord_bot.test.ts.
+ */
+export function buildQueuePopMessage(item: QueuePopItem, gameUrl: string): Record<string, unknown> {
+  // Discord renders <t:unix:R> as a live "in 25 seconds" in the reader's own
+  // clock, which is the one number a player alt-tabbed out of the game needs.
+  const deadline = `<t:${Math.floor(item.expiresAtMs / 1000)}:R>`;
+  const bg = item.kind === 'bg';
+  const formatLabel = item.format ? (ARENA_FORMAT_LABELS[item.format] ?? item.format) : '';
+  const embed: Record<string, unknown> = {
+    color: bg ? 0xe67e22 : 0x9b59b6,
+    title: bg ? 'Your battleground queue popped!' : 'Arena match found!',
+    description: bg
+      ? `A Thornhollow Fields match is ready for ${item.characterName}. Accept it in game ${deadline}, or the offer lapses and you are locked out of the queue for a while.`
+      : `${item.characterName} is being seated for a ${formatLabel} bout in the Ashen Coliseum. Get back in game: the gates open shortly.`,
+    fields: [
+      { name: 'Character', value: item.characterName, inline: true },
+      { name: 'Realm', value: item.realm, inline: true },
+    ],
+    footer: { text: 'World of ClaudeCraft' },
+  };
+  return {
+    embeds: [embed],
+    components: [
+      {
+        type: 1, // action row
+        components: [
+          {
+            type: 2, // button
+            style: 5, // link: opens the game (no interaction round-trip)
+            label: 'Open the game',
+            url: gameUrl.replace(/\/+$/, '') || gameUrl,
+          },
+        ],
+      },
+    ],
+    allowed_mentions: { parse: [] },
+  };
+}
+
 // ── In-game "!" community relay (LFG / trade / recruit / event / help) ─────────
 // The server enqueues these; the bot drains and posts them here with the issuer's
 // Discord identity (mention + avatar), their in-game location, and a button a

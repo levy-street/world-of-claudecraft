@@ -182,6 +182,9 @@ export const ERROR_CODES = deepFreeze({
   'discord.swag_tier': { params: [] },
   // identity: "points" (not enough reward points to claim this swag reward)
   'discord.swag_points': { params: [] },
+  // identity: "invalid input" (the queue-pings toggle body is not a boolean;
+  // server/discord_queue_pings.ts, the deeds.invalid_input shape)
+  'discord.invalid_input': { params: [] },
   'deeds.invalid_input': { params: [] },
   // The public guild roster read (server/guild_roster.ts).
   'guilds.invalid_roster_name': { params: [] },

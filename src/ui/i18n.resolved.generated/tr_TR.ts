@@ -3046,6 +3046,7 @@ export const tr_TR: EnTranslations = {
       "close": "Kapat",
       "keybind": "Discord Paneli",
       "disabled": "Discord entegrasyonu şu anda kullanılamıyor.",
+      "queuePingsLabel": "Send me a Discord direct message when my battleground or arena queue pops (needs a linked Discord account)",
       "tiers": {
         "none": "Rütbesiz",
         "initiate": "Çömez",
@@ -4699,7 +4700,8 @@ export const tr_TR: EnTranslations = {
       "link_required": "Önce Discord hesabınızı bağlayın.",
       "swag_claimed": "Bu ödülü zaten aldınız.",
       "swag_tier": "Bunu almak için daha yüksek bir rütbeye ulaşın.",
-      "swag_points": "Yeterli puan yok."
+      "swag_points": "Yeterli puan yok.",
+      "invalid_input": "Invalid input."
     },
     "deeds": {
       "invalid_input": "Geçersiz girdi."

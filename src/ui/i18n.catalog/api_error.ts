@@ -175,6 +175,8 @@ export const apiErrorStrings = {
     swag_tier: 'Reach a higher rank to claim this.',
     // reuses hudChrome.discord.swag.needPoints
     swag_points: 'Not enough points.',
+    // The queue-pings toggle body was not a boolean (server/discord_queue_pings.ts).
+    invalid_input: 'Invalid input.',
   },
   deeds: {
     invalid_input: 'Invalid input.',

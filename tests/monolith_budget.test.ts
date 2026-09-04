@@ -273,7 +273,10 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
-    ceiling: 18905,
+    // Lowered by 3 with the account-toggle seam: the OptionsHooks deed-broadcast
+    // shape and its queue-pop DM sibling both read the shared AccountToggleSeam
+    // type from options_window.ts instead of an inline object type each.
+    ceiling: 18902,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -583,7 +586,11 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
-    ceiling: 10641,
+    // Lowered by 10 with the queue-pop Discord DM hook: the duelEnd activity
+    // card moved to discord_activity_pvp.ts (the arm keeps the two session
+    // lookups and the enqueue), which paid for the one observer call, its
+    // deps field and the two imports (discord_queue_pops.ts). Exact count.
+    ceiling: 10631,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

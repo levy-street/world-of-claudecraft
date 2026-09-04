@@ -224,12 +224,20 @@ not stay phase-locked, and repeated event kicks coalesce into exactly one follow
   `cfg.presenceDebounceMs` window and every event inside it folds into one push.
 - Outbox (`outbox`): the ONE pickup loop, every `cfg.outboxPollMs` while it keeps
   finding work, decaying to `cfg.outboxIdleMs` once the drains come back empty.
-  `GET /internal/discord/outbox` answers four streams at once (relay posts, the activity
-  feed, the reward-winner days, and the link-change feed), replacing the three separate
-  pollers and the sweep's full flex re-read. `outbox_consumer.ts` owns what it does with
-  them: it will NOT drain while the rate governor's breaker is open or half-open (those
-  posts are non-essential, so the governor would refuse them, and a 200 is the outbox's only
-  acknowledgement, so draining into refusals loses the items); each post is caught per item;
+  `GET /internal/discord/outbox` answers five streams at once (relay posts, the activity
+  feed, the reward-winner days, the link-change feed, and the queue-pop DMs), replacing the
+  three separate pollers and the sweep's full flex re-read. `outbox_consumer.ts` owns what
+  it does with them: it will NOT drain while the rate governor's breaker is open or half-open
+  (those posts are non-essential, so the governor would refuse them, and a 200 is the
+  outbox's only acknowledgement, so draining into refusals loses the items); each post is
+  caught per item; the queue pops (a player's battleground offer opened or arena queue
+  seated them; `buildQueuePopMessage`, sent through `DiscordApi.sendDirectMessage` with a
+  `dm:<user>` subject so a user whose privacy settings refuse DMs costs ONE 403 and is then
+  refused locally for the forbidden TTL) go FIRST, before any channel post, and each is
+  re-checked against `expiresAtMs` at send time (a lapsed offer is skipped silently, never
+  DMed); the stream also carries `watching`, true while an opted-in linked player is waiting
+  in a queue, which the poll counts as WORK so the loop holds the active cadence for as long
+  as a 30 s Accept window could need it (server/discord_queue_pops.ts explains the signal);
   an activity item whose kind this build has no `buildActivityMessage` case for drains to a
   null payload and is dropped silently before the channel gate (at-most-once by design, and
   the Activity-kind parity rule above keeps the kind set aligned so the drop only ever
@@ -240,10 +248,12 @@ not stay phase-locked, and repeated event kicks coalesce into exactly one follow
   poll (the re-serve skips straight to the mark retry; a restart costs the one documented
   duplicate); and the poll runs on its own much longer
   deadline (`cfg.outboxTimeoutMs`), which must stay ABOVE the server's read deadline.
-  didWork is split by stream class: the three DRAINED streams count by carriage, the
+  didWork is split by stream class: the four DRAINED streams count by carriage, the
   re-served winners read counts by successful MARK (the event that stops the re-serve), so
   a winners day that cannot finish (unset channel, durable 403, a failing mark endpoint)
-  cannot pin the loop at the active cadence forever.
+  cannot pin the loop at the active cadence forever; the queue-pop `watching` flag counts
+  as work on its own, bounded by the server recomputing it from the sim's queue arrays
+  every tick (a player who leaves or disconnects drops it within a tick).
   Two honest limits of the consolidation, both deliberate: with a stream's channel id UNSET,
   drained relay/activity items are dropped after a once-per-channel notice (the pre-outbox
   pollers checked the channel BEFORE draining and left items queued; the drain is now

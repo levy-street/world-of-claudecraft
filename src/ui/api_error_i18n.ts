@@ -113,6 +113,7 @@ export const API_ERROR_KEYS = {
   'discord.swag_claimed': 'apiError.discord.swag_claimed',
   'discord.swag_tier': 'apiError.discord.swag_tier',
   'discord.swag_points': 'apiError.discord.swag_points',
+  'discord.invalid_input': 'apiError.discord.invalid_input',
   'deeds.invalid_input': 'apiError.deeds.invalid_input',
   'guilds.invalid_roster_name': 'apiError.guilds.invalid_roster_name',
   'guilds.unknown': 'apiError.guilds.unknown',

@@ -3046,6 +3046,7 @@ export const nl_NL: EnTranslations = {
       "close": "Sluiten",
       "keybind": "Discord-paneel",
       "disabled": "Discord-integratie is momenteel niet beschikbaar.",
+      "queuePingsLabel": "Send me a Discord direct message when my battleground or arena queue pops (needs a linked Discord account)",
       "tiers": {
         "none": "Ongerangschikt",
         "initiate": "Ingewijde",
@@ -4699,7 +4700,8 @@ export const nl_NL: EnTranslations = {
       "link_required": "Koppel eerst je Discord-account.",
       "swag_claimed": "Je hebt deze beloning al geclaimd.",
       "swag_tier": "Bereik een hogere rang om dit te claimen.",
-      "swag_points": "Niet genoeg punten."
+      "swag_points": "Niet genoeg punten.",
+      "invalid_input": "Invalid input."
     },
     "deeds": {
       "invalid_input": "Ongeldige invoer."
