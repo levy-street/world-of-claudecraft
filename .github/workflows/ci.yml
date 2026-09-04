@@ -1216,7 +1216,7 @@ jobs:
       # first-boot deploy artifact that trails content BY DESIGN through a cycle,
       # so the PR tier only guards its envelope and its dash-freedom, and the
       # byte-equality demand rides here, where a stale artifact is a real defect.
-      # Its own flag, never I18N_RELEASE_TIER: tests/release_i18n_tier_coverage.ts
+      # Its own flag, never I18N_RELEASE_TIER: tests/release_i18n_tier_coverage.test.ts
       # pins that flag's suite set three ways and would red on contact.
       MEDIAWIKI_SEED_RELEASE_TIER: '1'
 
