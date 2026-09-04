@@ -10,9 +10,9 @@
 // rather than ever degrading the tick loop.
 import type { SimEvent } from '../../src/sim/types';
 import { ArenaSegmenter } from './arena';
+import { auraStateSnapshot } from './aura_state';
 import { BattlegroundSegmenter } from './battleground';
 import { BossCastSynthesizer } from './boss_casts';
-import { auraStateSnapshot } from './aura_state';
 import type { EventEnrichment, FightParticipant, Surface } from './contract';
 import { EVENT_RECORD_POLICY, eventActorId } from './event_policy';
 import type { OpenFight, PendingClose } from './fights';

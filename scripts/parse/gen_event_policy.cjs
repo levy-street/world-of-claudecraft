@@ -53,7 +53,7 @@ if (names.size === 0) throw new Error('no event type literals found');
 const existing = new Map();
 if (fs.existsSync(policyPath)) {
   const current = fs.readFileSync(policyPath, 'utf8');
-  for (const m of current.matchAll(/^  ([A-Za-z0-9_]+): '(routed|record|skip)',/gm)) {
+  for (const m of current.matchAll(/^ {2}([A-Za-z0-9_]+): '(routed|record|skip)',/gm)) {
     existing.set(m[1], m[2]);
   }
 }
