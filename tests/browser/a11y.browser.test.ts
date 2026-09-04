@@ -31,6 +31,7 @@ import { ProfessionsWindow } from '../../src/ui/hud/professions/professions_wind
 import { QuestLogWindow } from '../../src/ui/hud/quest/questlog_window';
 import { renderVendorWindow } from '../../src/ui/hud/vendor/vendor_window';
 import { t } from '../../src/ui/i18n';
+import { ItemDragState } from '../../src/ui/item_drag_state';
 import { LeaderboardWindow } from '../../src/ui/leaderboard_window';
 import { MarketWindow } from '../../src/ui/market_window';
 import { OptionsWindow } from '../../src/ui/options_window';
@@ -735,6 +736,7 @@ describe('axe: character window', () => {
           });
         },
         captureFocus: () => null,
+        dragState: new ItemDragState(),
       }),
     );
     win.toggle();

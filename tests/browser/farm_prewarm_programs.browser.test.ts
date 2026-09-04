@@ -170,8 +170,11 @@ describe('farm patch programs on a real WebGL driver', () => {
       return linked;
     };
     const visuals = new FarmPatchVisuals(scene, beds.seats, { burst() {}, groundPuff() {} }, gate);
-    // The anchors' gate ran at construction: await it, then draw the (empty of
-    // crops) scene once. Everything linked so far is preparation.
+    // Mirror Renderer.prewarmInitialScene(): construction only builds the
+    // anchors, then the host stages them after installing its first-paint
+    // boundary. Await that gate before drawing the crop-free scene once.
+    expect(gated).toHaveLength(0);
+    visuals.stageProgramAnchors();
     expect(gated).toHaveLength(1);
     await Promise.all(gated);
     renderer.render(scene, camera);
