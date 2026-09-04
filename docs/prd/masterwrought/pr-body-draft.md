@@ -80,11 +80,14 @@ a player would act wrongly on what the page says. Sixteen such keys are
 corrected here (the farming page's own rhythm, gain and yield prose, plus the
 arena, social and interface pages); the remaining keys of that class and every
 lower-severity finding carry to a follow-up lane with the findings file as its
-worklist. Each correction retires its key and re-keys the successor, so the
-predecessor keeps the reviewed translations it already had, and each is pinned
-per clause in tests/guide.test.ts against the live table rather than against a
-restated number, with the old false clause asserted absent from the rendered
-page.
+worklist. One consequence to know about: the interface page's rail prose is one
+of the keys left for that lane, so it still lists a seasonal event the corrected
+mobile prose on the same page no longer names.
+
+Each correction retires its key and re-keys the successor, so the predecessor
+keeps the reviewed translations it already had, and each is pinned per clause in
+tests/guide.test.ts against the live table rather than against a restated
+number, with the old false clause asserted absent from the rendered page.
 
 One defect the audit could not see was found while re-deriving its numbers and
 repaired first: the guide's paragraph splitter breaks on real newlines, and two
@@ -123,6 +126,11 @@ program's design docs are in-tree).
   out because they had not passed the adversarial verification this branch
   requires before a correction lands; 332 lower-severity keys were never opened.
   The findings file carries the evidence for all of them.
+- **Three map layers the prose does not name** (the castle plans, the route
+  badges, the ally markers), recorded in the pin that walks the draw model
+  rather than passed over, because naming them moves the English and its fills.
+- **Two Korean rows outside these corrections** that carry English item names
+  the same way the corrected one did, folded into the fill lane.
 
 ## How was this tested?
 
@@ -138,6 +146,10 @@ program's design docs are in-tree).
     in the same commit as its source.
   - The export-and-symbol census as a delivery gate: RESULT PASS, every extra
     explained by a committed row.
+  - A fresh reader over the correction commits, treating them as unreviewed
+    code: six findings, all applied, none blocking. Two were assertions that
+    could not fail, which is why the finder rule the prose publishes now has a
+    test that drives a real party and was proved to fail without the behavior.
   - Earlier closes carry their own recorded stamps: the full gate pg-armed
     (3,670 test files, 54,550 cases), the frozen bounded suite stamp with its
     drift attributed exactly, and the union QA matrix.
