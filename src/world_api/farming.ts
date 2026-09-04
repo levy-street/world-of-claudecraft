@@ -99,13 +99,14 @@ export interface IWorldFarming {
   // the same INTERACT_RANGE + 2 the counter purchase uses.
   convertHusks(): void;
   // Set out a shared feast (the D16 tier-4 showcase) at the caller's feet,
-  // spending one harvest_feast item from the sender's own bags. Carries NO
-  // payload: the one feast item id, its charge count, its expiry, and the
-  // anti-abuse rule (one active feast per placer) all resolve server-side
-  // (src/sim/professions/feast.ts), so there is nothing to forge. The placed
-  // feast is a REAL entity (kind 'object', templateId 'farm_feast') riding
-  // the normal interest-scoped entity snapshot: no new wire mechanism, and
-  // clients learn despawn by snapshot absence. Every refusal is a text-free
+  // spending one harvest_feast item from the sender's own bags. Carries only
+  // the optional bag-copy target described below: the feast item id, its
+  // charge count, its expiry, and the anti-abuse rule (one active feast per
+  // placer) all resolve server-side (src/sim/professions/feast.ts), so no
+  // gameplay outcome rides the command. The placed feast is a REAL entity (kind
+  // object, templateId farm_feast) riding the normal interest-scoped entity
+  // snapshot. It introduces no new wire mechanism, and clients learn despawn
+  // by snapshot absence. Every refusal is a text-free
   // id-carrying farmDenied SimEvent; placement draws zero rng.
   // `target` NAMES the bag copy to spend (the item_copy_ref index-plus-id
   // selection every other item verb carries). OPTIONAL, and the omission is

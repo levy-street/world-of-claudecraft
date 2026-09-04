@@ -38,12 +38,7 @@ import {
   isConsuming,
 } from '../types';
 import { groundHeight, isInWaterBody, waterLevel } from '../world';
-import {
-  FISHING_CATCH_BAND_THRESHOLDS,
-  type FishingCatchBand,
-  fishingCatchBandFor,
-  fishingRodBandFor,
-} from './fishing_bands';
+import { type FishingCatchBand, fishingCatchBandFor, fishingRodBandFor } from './fishing_bands';
 import { rodTierRequiredForZone } from './fishing_zones';
 import { queueGatheringGrant } from './gathering';
 import {
@@ -62,26 +57,6 @@ const DEEPFEN_FISHING_SHORE_MARGIN = 10;
 const THE_CODFATHER_ITEM_ID = 'the_codfather';
 const THE_CODFATHER_QUEST_ID = 'q_the_codfather';
 
-// Catch rarity ladder band boundaries: the minimum fishing proficiency for
-// each of the SIX catch tables. The ladder itself lives in its own pure leaf
-// (professions/fishing_bands.ts) since masterwrought Phase 11i; these exports
-// delegate so every existing import keeps resolving.
-//
-// IT IS NO LONGER THE SHARED LADDER, and that is the point of the split.
-// Before 11i this aliased PROFICIENCY_BAND_THRESHOLDS, which gathering.ts also
-// reads for the land gather-cast duration; fishing's new bands would have
-// retuned land gathering through that alias. The shared array is untouched at
-// [0, 100, 200] and fishing's is [0, 100, 150, 200, 200, 200].
-// KEPT DELIBERATELY, with its real consumer named, because the QA round found
-// the block claiming three back-compat consumers where only one is production
-// code. This alias has NO production importer: its one reader is the arm in
-// tests/professions_fishing.test.ts that proves the old name now resolves to
-// FISHING'S ladder and not to the shared one, which is the whole point of the
-// split and is worth an anchor. The `FishingCatchBand` type re-export that sat
-// here had no consumer of any kind (src/sim/types.ts and
-// server/fishing_telemetry.ts both import the type straight from the leaf), so
-// it is deleted rather than described.
-export const FISHING_BAND_THRESHOLDS = FISHING_CATCH_BAND_THRESHOLDS;
 // The one genuinely load-bearing delegation: src/ui/gather_tool_tooltip.ts
 // imports fishingRodBandFor through this module.
 export { fishingRodBandFor };

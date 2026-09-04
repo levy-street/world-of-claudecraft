@@ -47,7 +47,6 @@ import {
   FISH_BITE_DELAY_MIN_SEC,
   FISH_EARLY_REEL_GRACE_SEC,
   FISH_REEL_WINDOW_SEC,
-  FISHING_BAND_THRESHOLDS,
   FISHING_GAIN_SCHEDULE,
   FISHING_JUNK_GAIN_CUTOFF_PROFICIENCY,
   fishBiteMaxSecFor,
@@ -845,16 +844,13 @@ describe('fishing catch gain schedule (Professions 2.0)', () => {
 describe('fishing band function (pin 4)', () => {
   // THE LADDER PIN MOVED ONTO FISHING'S OWN LEAF (masterwrought Phase 11i
   // DECISION B). It used to read [0, 100, 200] because
-  // FISHING_BAND_THRESHOLDS aliased PROFICIENCY_BAND_THRESHOLDS; the two are
+  // fishing previously aliased PROFICIENCY_BAND_THRESHOLDS; the two are
   // separate arrays now, and pinning them apart is the whole point of the
   // split. Both literals below are written out rather than derived from each
   // other, so an edit to either array has to visit this file.
   it('FISHING_CATCH_BAND_THRESHOLDS are literally [0, 100, 150, 200, 200, 200]', () => {
     expect([...FISHING_CATCH_BAND_THRESHOLDS]).toEqual([0, 100, 150, 200, 200, 200]);
     expect(FISHING_CATCH_BAND_THRESHOLDS).toHaveLength(6);
-    // The re-export fishing.ts keeps for its existing importers IS the leaf's
-    // array, not a copy that could drift from it.
-    expect(FISHING_BAND_THRESHOLDS).toBe(FISHING_CATCH_BAND_THRESHOLDS);
     // One table per band, so the ladder and the tables cannot disagree about
     // how many bands there are.
     expect(FISHING_TABLES_BY_BAND).toHaveLength(FISHING_CATCH_BAND_THRESHOLDS.length);

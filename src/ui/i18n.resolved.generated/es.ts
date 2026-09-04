@@ -1040,11 +1040,6 @@ export const es: EnTranslations = {
       "clearArmed": "Toca una ranura para vaciarla."
     },
     "tutorialGreeting": {
-      "bodyFirst": "No te había visto por aquí antes, amigo. Es tradición en estas tierras que quienes empiezan su aventura visiten la Costa de la Prueba, una isla tranquila más allá del estrecho. Allí puedes afinar tus habilidades y familiarizarte con el mundo antes de enfrentarte a sus desafíos. El transbordador va y vuelve, y nadie pensará peor de ti decidas lo que decidas.",
-      "bodyRefresher": "¿De vuelta con una cara nueva, eh? Entonces ya sabes cómo va esto. Aun así, si quieres refrescar lo aprendido antes de partir, la Costa de la Prueba nunca le cierra la puerta a un alumno que regresa, y el transbordador está listo cuando tú lo estés.",
-      "play": "Comenzar el tutorial",
-      "skip": "Saltar el tutorial",
-      "declineNote": "Como prefieras, amigo. Si alguna vez cambias de opinión, la campana del transbordador junto al buzón del Correo del Cuervo te llevará hasta la Costa de la Prueba a cualquier hora, de día o de noche. Seguirá aquí cuando los lobos ya no estén.",
       "bellHomeNote": "¿Ya de vuelta de la costa? Esa era la campana del transbordador que hiciste sonar. Su gemela cuelga justo ahí, junto al buzón del Correo del Cuervo: hazla sonar cuando quieras y la travesía te llevará de vuelta a la Costa de la Prueba. No pasa nada, decidas lo que decidas.",
       "islandArrivalNote": "Bienvenido a la Costa de la Prueba. El Guardián Tam te espera un poco más allá, en la playa: ve a verlo.",
       "noteClose": "Entendido"
@@ -3705,7 +3700,6 @@ export const es: EnTranslations = {
         "feast_active": "Your feast is already set out.",
         "feast_expired": "That feast is gone.",
         "feast_finished": "That feast has been picked clean.",
-        "feast_range": "You are too far from the feast.",
         "feast_eaten": "You have already eaten from that feast."
       },
       "feastTitle": "{name}'s Harvest Feast",

@@ -2,7 +2,7 @@
   "__provenance": {
     "run": "32621561241",
     "harvested": "2026-08-23",
-    "files": 3652,
+    "files": 3651,
     "harvestedFiles": 2938,
     "carried": {
       "tests/ability_avoidance.test.ts": {
@@ -4464,10 +4464,6 @@
         "ms": 4,
         "method": "prose-backfill"
       },
-      "tests/tutorial_start_dispatch.test.ts": {
-        "ms": 913,
-        "method": "prose-backfill"
-      },
       "tests/ui_scale_cache.test.ts": {
         "ms": 9,
         "method": "local-median",
@@ -8383,7 +8379,6 @@
   "tests/tutorial_graduation_deed.test.ts": 1276,
   "tests/tutorial_greeting.test.ts": 3106,
   "tests/tutorial_greeting_view.test.ts": 4,
-  "tests/tutorial_start_dispatch.test.ts": 913,
   "tests/two_factor_setup.test.ts": 10,
   "tests/twohand_itemization_v026.test.ts": 21,
   "tests/twohand_rebudget.test.ts": 8,

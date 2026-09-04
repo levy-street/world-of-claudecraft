@@ -35,7 +35,6 @@ import {
   PERFECTING_ATTEMPT_COST,
   PERFECTING_RANKS,
   PERFECTING_SKILL_REQ,
-  resolveLegendaryPromotion,
   resolvePerfectingAttempt,
 } from '../src/sim/professions/perfecting';
 import { stationsOfType } from '../src/sim/professions/stations';
@@ -1364,7 +1363,7 @@ describe('rare camp kills feed the Book of Deeds (RARE_SLAIN_TEMPLATES)', () => 
 });
 
 // The Phase 13 promotion capstone (prog_legendmaker, stat legendariesForged):
-// the grant site is resolveLegendaryPromotion (professions/perfecting.ts),
+// the grant site is resolvePerfectingAttempt (professions/perfecting.ts),
 // driven here end to end through a real Sim. The Perfected fixture comes from
 // the REAL producer, the rank track itself: resolvePerfectingAttempt walked
 // PERFECTING_RANKS times under a forced-success roll (the perfecting.test.ts
@@ -1413,7 +1412,7 @@ describe('legendary promotion feeds the Book of Deeds (prog_legendmaker)', () =>
   it('a real promotion bumps legendariesForged and grants after the tick-tail evaluator', () => {
     const { sim, meta, pid } = perfectedFixture();
     sim.addItem(DEED_ITEM, 1, pid);
-    resolveLegendaryPromotion(sim.ctx, pid, apexRef(meta), NAME);
+    resolvePerfectingAttempt(sim.ctx, pid, apexRef(meta), NAME);
     expect(sim.countItem(DEED_ITEM, pid), 'the Deed of Making is consumed').toBe(0);
     expect(meta.deedStats.counters.legendariesForged).toBe(1);
     // The counter site never grants directly: the tick-tail evaluator does.
@@ -1424,14 +1423,14 @@ describe('legendary promotion feeds the Book of Deeds (prog_legendmaker)', () =>
 
   it('a DENIED promotion (no Deed of Making in the bags) bumps nothing and grants nothing', () => {
     const { sim, meta, pid } = perfectedFixture();
-    resolveLegendaryPromotion(sim.ctx, pid, apexRef(meta), NAME);
+    resolvePerfectingAttempt(sim.ctx, pid, apexRef(meta), NAME);
     expect(meta.deedStats.counters.legendariesForged).toBe(0);
     updateDeeds(sim.ctx);
     expect(meta.deedsEarned.has('prog_legendmaker')).toBe(false);
     // The missing Deed of Making was the ONE gate: the same copy promotes the
     // moment it arrives, so the deny arm left the fixture intact.
     sim.addItem(DEED_ITEM, 1, pid);
-    resolveLegendaryPromotion(sim.ctx, pid, apexRef(meta), NAME);
+    resolvePerfectingAttempt(sim.ctx, pid, apexRef(meta), NAME);
     expect(meta.deedStats.counters.legendariesForged).toBe(1);
     updateDeeds(sim.ctx);
     expect(meta.deedsEarned.has('prog_legendmaker')).toBe(true);

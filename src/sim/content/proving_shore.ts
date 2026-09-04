@@ -2,9 +2,9 @@
 // WEST of Eastbrook Vale (negative x; the compass renders +x as east, see
 // src/ui/compass.ts: facing 0 = +Z = north, bearing 90 = east = +x), the
 // free mirror of the Farshore's slot on the opposite column. New
-// characters are offered passage here by Wayfarer Bryn at the Eastbrook
-// spawn (the tutorial greeting dialog, src/sim/tutorial/greeting.ts); the
-// island itself is a training camp: an on-rails quest chain that teaches
+// characters are ferried here automatically by the compulsory greeting
+// (src/sim/tutorial/greeting.ts). The island itself is a training camp:
+// an on-rails quest chain that teaches
 // fighting, looting, then the two mechanics lessons (the professions wheel,
 // the bank and bag slots, each explained in dialogue with its facts mirrored
 // from the sim, and each naming the literal key or click it needs), pays enough
@@ -149,12 +149,12 @@ export const PROVING_SHORE_ROADS: { x: number; z: number }[][] = [
 // src/sim/interactions/ferry_bell.ts), so nobody is ever teleported by
 // wandering over a trigger. The island bell sets the player down in
 // Eastbrook TOWN (beside the spawn square); the vale-strand bell rings a
-// returning player back to the island arrival for a refresher. The tutorial
-// greeting's accept path (sim/tutorial/greeting.ts) still lands at
+// returning player back to the island arrival for a refresher. The compulsory
+// tutorial greeting ferry (sim/tutorial/greeting.ts) lands at
 // PROVING_SHORE_ARRIVAL.
 export const PROVING_SHORE_PORTALS: PortalDef[] = [];
 
-/** Where the tutorial greeting's accept path sets a new adventurer down: at
+/** Where the compulsory tutorial greeting sets a new adventurer down: at
  *  the Gauntlet's open east mouth, facing due east (forward = (-sin f,
  *  cos f), so -PI/2 points at +x), toward the pier, the ferry bell, and the
  *  water they just crossed. The client snaps the chase camera to this facing
@@ -263,9 +263,8 @@ export const PROVING_SHORE_MOBS: Record<string, MobTemplate> = {
 };
 
 export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
-  // The greeter stands at the EASTBROOK spawn, not on the island: she is the
-  // face of the tutorial greeting dialog (sim/tutorial/greeting.ts) and the
-  // signpost back to the ferry for anyone who skipped it.
+  // The harbor guide stands at the EASTBROOK spawn, not on the island, as a
+  // signpost back to the ferry for anyone returning to the training grounds.
   wayfarer_bryn: {
     id: 'wayfarer_bryn',
     name: 'Wayfarer Bryn',

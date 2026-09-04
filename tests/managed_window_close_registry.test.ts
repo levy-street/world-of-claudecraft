@@ -347,10 +347,8 @@ describe('closeManagedWindow case registry', () => {
     // EXACT, not a floor: a floor cannot notice a new module joining.
     expect(sites).toEqual({
       'ui/dev_command_window.ts': 1,
-      // Two build sites, one element id: the two-choice greeting and its
-      // single-button note variant (decline follow-up, bell homecoming) both
-      // mint #tutorial-greeting, and one closeTutorialGreeting covers both.
-      'ui/tutorial_greeting_window.ts': 2,
+      // The live ferry-note renderer mints the managed #tutorial-greeting shell.
+      'ui/tutorial_greeting_window.ts': 1,
       'ui/hud.ts': 1, // confirmDialog's half of the shared #confirm-dialog id
       // The extracted input modal (Masterwrought phase 14): the other half of
       // the shared #confirm-dialog id, moved whole out of Hud.inputDialog.

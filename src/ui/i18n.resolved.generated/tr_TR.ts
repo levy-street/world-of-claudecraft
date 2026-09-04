@@ -1040,11 +1040,6 @@ export const tr_TR: EnTranslations = {
       "clearArmed": "Temizlemek için bir yuvaya dokun."
     },
     "tutorialGreeting": {
-      "bodyFirst": "Seni buralarda daha önce görmedim, dostum. Bu topraklarda macerasına yeni başlayanların, boğazın açığındaki sakin bir ada olan Sınav Kıyısı'nı ziyaret etmesi bir gelenektir. Orada, dünyanın zorluklarını göğüslemeden önce becerilerini geliştirip ona alışabilirsin. Feribot iki yöne de çalışır ve ne yaparsan yap kimse seni küçük görmez.",
-      "bodyRefresher": "Yeni bir yüzle yine mi geldin? O zaman bunun nasıl işlediğini biliyorsundur. Yine de yola çıkmadan önce belleğini tazelemek istersen, Sınav Kıyısı geri dönen bir öğrenciyi hiç geri çevirmez ve feribot sen hazır olduğunda hazırdır.",
-      "play": "Eğitime başla",
-      "skip": "Eğitimi atla",
-      "declineNote": "Nasıl istersen, dostum. Fikrini değiştirirsen, Kuzgun Postası kutusunun yanındaki feribot çanı seni gece gündüz istediğin an Sınav Kıyısı'na geçirir. Kurtlar olmadığında da o hâlâ burada olacak.",
       "bellHomeNote": "Kıyıdan bu kadar çabuk mu döndün? Çaldığın o feribot çanıydı. Onun eşi tam şurada, Kuzgun Postası kutusunun yanında asılı: istediğin an çal, geçiş seni yeniden Sınav Kıyısı'na taşır. Hangi yöne gidersen git, bir sakıncası yok.",
       "islandArrivalNote": "Sınav Kıyısı'na hoş geldin. Muhafız Tam kıyı boyunca az ileride seni bekliyor: git ve onunla görüş.",
       "noteClose": "Anladım"
@@ -3705,7 +3700,6 @@ export const tr_TR: EnTranslations = {
         "feast_active": "Your feast is already set out.",
         "feast_expired": "That feast is gone.",
         "feast_finished": "That feast has been picked clean.",
-        "feast_range": "You are too far from the feast.",
         "feast_eaten": "You have already eaten from that feast."
       },
       "feastTitle": "{name}'s Harvest Feast",

@@ -732,7 +732,8 @@ requester can `cancel` only before acceptance. A retention sweep
 (`updateCommissionOrders`) expires a stale open order after 24 sim-hours
 and prunes a terminal one after a short retain window. Client UI: a header
 button in the crafting window opens the order board window
-(`src/ui/commission_order_view.ts` + `commission_order_window.ts`).
+(`src/ui/hud/professions/commission_order_view.ts` +
+`src/ui/hud/professions/commission_order_window.ts`).
 Deliberately out of scope for this slice: guild/friends-scoped orders (the
 sim has no offline notion of either, both being account/server-only),
 cross-restart persistence, and recipient-tied required-material escrow.
@@ -836,9 +837,10 @@ stays DEF quality (the first-masterwork deed celebrates the feat; the
 discovery ledger does not double-count it).
 
 ### The windows and the design language
-The professions wheel window (Shift+P, `src/ui/professions_view.ts` +
-`professions_window.ts`) and the tabbed crafting book
-(`src/ui/crafting_view.ts` + `crafting_window.ts`) follow the pure-view-core
+The professions wheel window (Shift+P, `src/ui/hud/professions/professions_view.ts` +
+`src/ui/hud/professions/professions_window.ts`) and the tabbed crafting book
+(`src/ui/hud/professions/crafting_view.ts` +
+`src/ui/hud/professions/crafting_window.ts`) follow the pure-view-core
 plus thin-painter recipe; the identity card (`profession_identity_card.ts`)
 is COMPOSED by its consumers, never absorbed. The ring is DOM nodes styled
 from tokens, not canvas. Until the root `DESIGN.md` rollout lands its token

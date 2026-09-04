@@ -3200,7 +3200,7 @@ export const DEEDS: Record<string, DeedDef> = {
   // THE PACKET'S CAPSTONE (masterwrought Phase 13): the first legendary. The
   // stat is bumped once per orange promotion at the promotePerfectedCopy
   // stamp site (professions/perfecting.ts, reached via
-  // resolvePerfectingAttempt -> resolveLegendaryPromotion): a Perfected apex
+  // resolvePerfectingAttempt's internal promotion arm): a Perfected apex
   // copy plus one Deed of Making plus a valid player-chosen name, raised to
   // legendary presentation.
   //

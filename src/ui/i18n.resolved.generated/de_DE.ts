@@ -1040,11 +1040,6 @@ export const de_DE: EnTranslations = {
       "clearArmed": "Tippe einen Platz an, um ihn zu leeren."
     },
     "tutorialGreeting": {
-      "bodyFirst": "Ich habe dich hier noch nicht gesehen, Freund. Es ist Brauch in diesen Landen, dass alle, die ihr Abenteuer beginnen, die Bewährungsküste besuchen, eine stille Insel jenseits der Meerenge. Dort kannst du deine Fertigkeiten schärfen und dich an die Welt gewöhnen, bevor du dich ihren Herausforderungen stellst. Die Fähre fährt in beide Richtungen, und niemand wird schlechter von dir denken, wofür du dich auch entscheidest.",
-      "bodyRefresher": "Wieder da, mit einem neuen Gesicht, wie? Dann kennst du den Ablauf ja schon. Doch falls du dir eine Auffrischung wünschst, bevor du aufbrichst: Die Bewährungsküste weist nie einen wiederkehrenden Schüler ab, und die Fähre ist bereit, sobald du es bist.",
-      "play": "Das Tutorial beginnen",
-      "skip": "Tutorial überspringen",
-      "declineNote": "Wie du willst, Freund. Solltest du es dir je anders überlegen: Die Fährglocke beim Briefkasten der Rabenpost bringt dich jederzeit hinüber zur Bewährungsküste, bei Tag wie bei Nacht. Sie wird noch hier sein, wenn die Wölfe es nicht mehr sind.",
       "bellHomeNote": "Schon zurück von der Küste? Das war die Fährglocke, die du geläutet hast. Ihr Zwilling hängt gleich dort beim Briefkasten der Rabenpost: Läute sie jederzeit, und die Überfahrt bringt dich zurück zur Bewährungsküste. So oder so kein Schaden.",
       "islandArrivalNote": "Willkommen auf der Bewährungsküste. Wärter Tam wartet gleich den Strand hinauf: Geh zu ihm.",
       "noteClose": "Verstanden"
@@ -3705,7 +3700,6 @@ export const de_DE: EnTranslations = {
         "feast_active": "Your feast is already set out.",
         "feast_expired": "That feast is gone.",
         "feast_finished": "That feast has been picked clean.",
-        "feast_range": "You are too far from the feast.",
         "feast_eaten": "You have already eaten from that feast."
       },
       "feastTitle": "{name}'s Harvest Feast",

@@ -279,37 +279,6 @@ describe('the multi-session feast routing over the real broadcast path', () => {
     expect(feast).toBeDefined();
   });
 
-  it('a SIGNED feast rides fsg to a second session, distinct from the placer name', () => {
-    // The whole point of carrying the signer: the cook is usually not the
-    // host, so the mark has to reach the people looking at the table, not
-    // just the person who set it out.
-    const server = new GameServer();
-    const { session: placer } = join(server, 1, 'Placer');
-    const { session: guest, fc: guestFc } = join(server, 2, 'Guest');
-    const placerPid = placer.pid as number;
-    standNearBed(server, placerPid, BED, 1);
-    standNearBed(server, guest.pid as number, BED, 2);
-    server.sim.addItemInstance('harvest_feast', { signer: 'Mira' }, placerPid, 1, { silent: true });
-    for (let i = 0; i < 25; i++) routeTick(server);
-
-    const inv = server.sim.players.get(placerPid)?.inventory as { itemId: string }[];
-    const slot = inv.findIndex((s) => s.itemId === 'harvest_feast');
-    expect(slot).toBeGreaterThanOrEqual(0);
-    server.handleMessage(
-      placer,
-      captureFrame((world) => world.placeFeast({ slotIndex: slot })),
-    );
-
-    const row = awaitFrames(server, () => {
-      const snap = lastSnap(guestFc.sent);
-      const ents = (snap?.ents ?? []) as { tid?: string }[];
-      return (ents.find((r) => r.tid === 'farm_feast') as Record<string, unknown>) ?? null;
-    });
-    // The two names are distinct on the wire: nm is the host, fsg the cook.
-    expect(row.nm).toBe('Placer');
-    expect(row.fsg).toBe('Mira');
-  });
-
   it('routes place, the entity snapshot, the bite, Well Fed, the ledger deny, and the despawn across two sessions', () => {
     const server = new GameServer();
     const { session: placer, fc: placerFc } = join(server, 1, 'Placer');
@@ -341,9 +310,6 @@ describe('the multi-session feast routing over the real broadcast path', () => {
     // The name VALUE is the placer's raw player name (the client composes the
     // localized title from it; never sim-side English).
     expect(row.nm).toBe('Placer');
-    // An UNSIGNED feast carries no crafter mark at all: `fsg` is sparse, so it
-    // costs the common case zero bytes.
-    expect(row).not.toHaveProperty('fsg');
     const feastId = row.id as number;
     expect(server.sim.ctx.feasts.has(feastId)).toBe(true);
 

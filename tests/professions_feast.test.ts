@@ -34,6 +34,7 @@ import {
 } from '../src/sim/types';
 import { WELL_FED_AURA_ID } from '../src/sim/wellfed';
 import { groundHeight, isInWaterBody, waterLevelAt } from '../src/sim/world';
+import { EMPTY_TEST_WORLD, WOLF_TEST_WORLD } from './sim_shared';
 
 // The capstone dish the bite serves (ITEMS[FARM_FEAST_ITEM_ID].feast.dishItemId,
 // pinned as a literal in the content arm below).
@@ -97,7 +98,12 @@ const EATER_NAMES = [
  *  One tick after the joins (the wellfed.test.ts idiom), positions set after
  *  it so the spawn snap never moves anyone back out of reach. */
 function world(nEaters = 1, seed = 42): { sim: Sim; placer: Player; eaters: Player[] } {
-  const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true });
+  const sim = new Sim({
+    seed,
+    playerClass: 'warrior',
+    noPlayer: true,
+    world: EMPTY_TEST_WORLD,
+  });
   const placer = join(sim, 'Hostess');
   const eaters = EATER_NAMES.slice(0, nEaters).map((name) => join(sim, name));
   sim.tick();
@@ -247,7 +253,6 @@ describe('shared feast: placing', () => {
     // a tuning pass moves the content arm above together with this one).
     const st = sim.ctx.feasts.get(feastId)!;
     expect(st).toBeTruthy();
-    expect(st.entityId).toBe(feastId);
     expect(st.charges).toBe(10);
     expect(st.expiresAtTick).toBe(placedAt + 3600);
     expect(st.ownerKey).toBe(`entity:${placer.pid}`); // no characterId: the entity domain
@@ -376,39 +381,6 @@ describe('shared feast: placing', () => {
     expect(unlockedUnits(placer)).toBe(0);
   });
 
-  it("carries the CRAFTER'S signature from the spent copy onto the entity", () => {
-    // A feast is tradable, so the cook and the host are routinely different
-    // people. The placer's name rides the entity as `name` (the title); the
-    // crafter's rides beside it, read off the SOURCE copy before the spend
-    // splices it away.
-    const { sim, placer } = world(0);
-    sim.addItemInstance(FARM_FEAST_ITEM_ID, { signer: 'Mira' }, placer.pid, 1, { silent: true });
-    const idx = placer.meta.inventory.findIndex((s) => s.itemId === FARM_FEAST_ITEM_ID);
-    const from = sim.events.length;
-    sim.placeFeast(placer.pid, idx);
-    expect(eventsOf(sim, from, 'farmFeastPlaced')).toHaveLength(1);
-    const [entity] = feastEntities(sim);
-    expect(entity.feastSigner).toBe('Mira');
-    // The two names are DISTINCT: the placer is still the title's name.
-    expect(entity.name).toBe(placer.meta.name);
-    expect(entity.name).not.toBe('Mira');
-  });
-
-  it('an UNSIGNED copy leaves the mark absent on the placed entity', () => {
-    const { sim, placer } = world(0);
-    giveFeast(sim, placer);
-    const idx = placer.meta.inventory.findIndex((s) => s.itemId === FARM_FEAST_ITEM_ID);
-    sim.placeFeast(placer.pid, idx);
-    expect(feastEntities(sim)[0].feastSigner).toBeUndefined();
-  });
-
-  it('an ID-ONLY spend names no copy, so it carries no mark (unchanged behavior)', () => {
-    const { sim, placer } = world(0);
-    sim.addItemInstance(FARM_FEAST_ITEM_ID, { signer: 'Mira' }, placer.pid, 1, { silent: true });
-    sim.placeFeast(placer.pid);
-    expect(feastEntities(sim)[0].feastSigner).toBeUndefined();
-  });
-
   it('the placeFeast DELEGATE carries the named copy through to the spend', () => {
     // The IWorld verb itself, not the action body: Sim.placeFeast folds its
     // overloaded (pid | target) pair like every other item command, so the
@@ -496,7 +468,12 @@ describe('shared feast: placing', () => {
     // ids instead of the rename-proof key would pass them all. This arm is
     // the online shape: a keyed placer whose characterId differs from the
     // session pid must still be denied a second helping of placement.
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const placer = join(sim, 'Keyed', 501);
     sim.tick();
     expect(placer.meta.characterId).toBe(501);
@@ -791,10 +768,9 @@ describe('shared feast: the bite and the Well Fed mint', () => {
     // cannot legitimately see (anything beyond INTERACT_RANGE) must answer
     // EXACTLY what a nonexistent id answers, same reason, same frame shape,
     // zero draws, so sweeping ids over the wire learns nothing about which
-    // feasts exist, are drained, or were already eaten from. The dedicated
-    // 'feast_range' reason therefore no longer reaches the wire from this
-    // command; a legit client's own proximity gate (feast_interact.ts) is
-    // what keeps real players from ever seeing the merged reason.
+    // feasts exist, are drained, or were already eaten from. A legit client's
+    // own proximity gate (feast_interact.ts) keeps real players from ever
+    // sending the merged refusal.
     const { sim, placer, eaters } = world(1);
     const eater = eaters[0];
     const feastId = placeOk(sim, placer);
@@ -1148,7 +1124,12 @@ describe('shared feast: zero-draw determinism', () => {
     eater: Entity;
     sim: Sim;
   } {
-    const sim = new Sim({ seed: 4242, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 4242,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: WOLF_TEST_WORLD,
+    });
     const placer = join(sim, 'Hostess');
     const eater = join(sim, 'Anna');
     sim.tick();

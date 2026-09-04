@@ -625,7 +625,7 @@ import {
 } from './talent_save_migration';
 import { updateAbilityDrill } from './tutorial/ability_drill';
 import { updateGauntletRuns } from './tutorial/gauntlet_run';
-import { resolveStartTutorial, updateTutorialGreeting } from './tutorial/greeting';
+import { updateTutorialGreeting } from './tutorial/greeting';
 import * as unstuckMod from './unstuck';
 import {
   rollWorldBossLoot as rollWorldBossLootImpl,
@@ -1653,11 +1653,6 @@ export interface PlayerMeta {
   // characters. Persisted in CharacterState so no later load can re-fire it
   // (the guildLetterSent idiom).
   tutorialGreetingSent: boolean;
-  // Whether this is the account's FIRST character. TRANSIENT: never
-  // serialized; the server recomputes it from the character table at every
-  // join (the bankBonus idiom) and the offline Sim, which is stateless by
-  // design, is always a first character. Read only by the tutorial greeting.
-  firstCharacter: boolean;
   // In-memory trend-nudge cadence (Professions 2.0). TRANSIENT: never
   // serialized (a restart reopens the window, deliberately: the nudge is a hint,
   // not an award), and empty at construction and on load, so the parity sampler
@@ -2663,11 +2658,6 @@ export class Sim {
       // deposits refuse, nothing is destroyed). Never passed offline (bonusSlots
       // stays the sanitized save value, [] breakdown).
       bankBonus?: { bonusSlots: number; sources: BankBonusSource[] };
-      // Server-stamped account fact, recomputed at every join like bankBonus:
-      // whether this is the account's first character. Never persisted; the
-      // offline Sim omits it and defaults to true (offline is stateless).
-      // Read only by the tutorial greeting (sim/tutorial/greeting.ts).
-      firstCharacter?: boolean;
       // The character's authored modular look (characters.appearance column,
       // normalized at write; NOT part of CharacterState, so serializeCharacter
       // never re-emits it). Stamped onto the entity so it rides the identity
@@ -2873,7 +2863,6 @@ export class Sim {
       farmWitheredAnnounced: new Set(),
       profTierTutorialSent: false,
       tutorialGreetingSent: opts?.tutorialGreetingSent === true,
-      firstCharacter: opts?.firstCharacter ?? true,
       profNudgeCadence: new Map(),
       archetype: emptyArchetypeState(),
       delveMarks: 0,
@@ -8816,17 +8805,6 @@ export class Sim {
   // recent masterwork proc, or null before their first proc this session.
   get lastMasterwork(): MasterworkProc | null {
     return this.players.get(this.primaryId)?.lastMasterwork ?? null;
-  }
-
-  // The tutorial greeting's accept button (IWorldQuests.startTutorial): the
-  // ferry ride to the Proving Shore. All gates (alive, out of combat, level 1,
-  // overworld) re-run here on the authoritative copy; the client never
-  // predicts it.
-  startTutorial(pid?: number): void {
-    if (refusedWhileDead(this.ctx, pid)) return;
-    const r = this.ctx.resolve(pid);
-    if (!r) return;
-    resolveStartTutorial(this.ctx, r.e, r.meta);
   }
 
   // Mobile crafting station command (Professions 2.0, wiring #1134):

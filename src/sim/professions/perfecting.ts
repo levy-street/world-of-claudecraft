@@ -20,8 +20,8 @@
 // recalc is the ONE site the peer eqi mirror (Entity.equippedInstances) is
 // rebuilt, so peers see the promoted name and quality at the moment rather
 // than at the next unrelated recalc. Never folded into the rank-4 stamp, and
-// never a roll: the chain is resolvePerfectingAttempt ->
-// resolveLegendaryPromotion -> promotePerfectedCopy below.
+// never a roll: resolvePerfectingAttempt routes its perfected branch to
+// promotePerfectedCopy below.
 //
 // Behind the SimContext seam (src/sim/professions/CLAUDE.md): functions taking
 // (ctx, ...) plus pure leaves; never a Sim import (PlayerMeta arrives
@@ -37,8 +37,7 @@
 //                               the whole system
 //   attempt, every deny arm ... 0 (the whole ladder below, dead gate included)
 //   the promotion, WHOLE ...... 0 (deny and success alike: deterministic by
-//                               design, R3; no arm of
-//                               resolveLegendaryPromotion may ever draw)
+//                               design, R3; the promotion path never draws)
 //   the craft-time head start . 0 here (crafting.ts's single unconditional
 //                               proc draw decides it; this module only names
 //                               the rank it stamps)
@@ -111,7 +110,7 @@ export const LEGENDARY_PROMOTION_COST: readonly Readonly<{ itemId: string; count
  *  there and binding it). */
 export type PerfectItemRef = { slot: EquipSlot } | { bag: number; itemId: string };
 
-export interface PerfectingMaterialView {
+interface PerfectingMaterialView {
   itemId: string;
   required: number;
   /** Lock-aware: copies the owner has locked (item_lock.ts) do not count. */
@@ -260,7 +259,7 @@ function resolvePerfectTarget(
   return { itemId: bagged?.itemId, payload: bagged?.instance, wornSlot: null, bagged };
 }
 
-export interface PerfectingInfoInputs {
+interface PerfectingInfoInputs {
   ref: PerfectItemRef;
   inventory: InvSlot[];
   equipment: Readonly<Partial<Record<EquipSlot, string>>>;
@@ -416,7 +415,7 @@ function resolvePerfectingHead(
 
 /**
  * Resolve one Perfecting attempt, or route an already-Perfected copy to the
- * phase 13 promotion (resolveLegendaryPromotion below). The Sim wrappers
+ * phase 13 promotion branch below. The Sim wrappers
  * still run the dead gate first (dead_gate.ts, like every profession-action
  * wrapper); since phase 18 the shared head repeats it as real code, so a
  * direct caller of this export is refused too. DENY LADDER, in order, first
@@ -426,12 +425,10 @@ function resolvePerfectingHead(
  *   3. not apex (def.masterwrought !== true) (the shared head)
  *   4. skill under PERFECTING_SKILL_REQ in the craft that made it (the
  *      shared head: one gate guards BOTH acts)
- *   5. already Perfected: route to the promotion through the EXPORTED
- *      resolveLegendaryPromotion, so the export IS the production path,
- *      handing it the already-resolved target so the shared head runs
- *      EXACTLY ONCE per command (phase 18; the export left standalone
- *      resolves its own): zero draws, no emit, nothing consumed; its
- *      ladder arms are documented on promotePerfectedCopy
+ *   5. already Perfected: hand the already-resolved target to the
+ *      module-private promotion arm, so the shared head runs EXACTLY ONCE
+ *      per command: zero draws, no emit, nothing consumed; its ladder arms
+ *      are documented on promotePerfectedCopy
  *   6. lock-only material shortfall (raw counts meet the need, unlocked do
  *      not): the DEDICATED locked line, never the missing-materials one
  *   7. genuine material shortfall
@@ -549,41 +546,8 @@ export function resolvePerfectingAttempt(
   meta.wireRev++;
 }
 
-/**
- * The orange promotion's command entry (Masterwrought phase 13, R3), THE
- * production path: resolvePerfectingAttempt's perfected branch delegates
- * here, so a test or the deeds suite driving this export directly exercises
- * the same chain the live command takes (resolvePerfectingAttempt ->
- * resolveLegendaryPromotion -> promotePerfectedCopy). Runs the shared head
- * (resolvePerfectingHead: the same while-dead / noItem / not-masterwrought /
- * skill arms with the same lines); the attempt route instead calls the
- * module-private promoteResolvedTarget below with its already-resolved
- * target (phase 18), so the deny head runs exactly once per command while
- * this export's signature stays head-free: an outside caller cannot hand in
- * a synthesized target and skip the gates.
- * PRECONDITION arm rather than a fifth deny line: a copy that is
- * NOT Perfected is unreachable here through the real command
- * (resolvePerfectingAttempt owns that routing and sends an unperfected copy
- * down the attempt ladder instead), so a direct call on one is a caller bug
- * and no-ops: nothing consumed, nothing drawn, no invented player line.
- * THE DEAD GATE IS INSIDE THE SHARED HEAD (phase 18): a direct server or
- * headless caller of this export is refused while dead with the shared
- * matcher-covered line; the two Sim wrappers (perfectItem / perfectItemAs)
- * still gate first and skip the module entirely for a dead player.
- */
-export function resolveLegendaryPromotion(
-  ctx: SimContext,
-  pid: number | undefined,
-  ref: PerfectItemRef,
-  name: string | undefined,
-): void {
-  const target = resolvePerfectingHead(ctx, pid, ref);
-  promoteResolvedTarget(ctx, target, name);
-}
-
-/** The threaded promotion arm both routes share: the attempt route hands its
- *  already-resolved target (every shared gate passed an instant ago on the
- *  same tick), the export above resolves its own. Module-private on purpose
+/** The internal promotion arm receives the target the shared head just resolved.
+ *  Every shared gate passed on this tick before this function runs. Module-private on purpose
  *  (the phase 18 review): PerfectingTarget is structural, so exporting a
  *  target-taking form would let an outside caller synthesize one and skip
  *  the deny head, dead gate included. */
@@ -600,7 +564,7 @@ function promoteResolvedTarget(
 
 /**
  * The promotion ladder body, THE STAMP SITE (reached only through the chain
- * resolvePerfectingAttempt -> resolveLegendaryPromotion -> here; the dead
+ * resolvePerfectingAttempt -> promoteResolvedTarget -> here; the dead
  * gate, noItem, not-masterwrought, and skill arms have all answered
  * upstream and the copy is Perfected). DENY LADDER, first match wins, ZERO
  * rng on EVERY arm (deny and success alike, the header's draw contract),

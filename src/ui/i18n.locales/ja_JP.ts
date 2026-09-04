@@ -9909,7 +9909,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.denied.feast_active': 'あなたの宴はすでに広げられています。',
   'hudChrome.farming.denied.feast_expired': 'その宴はもうありません。',
   'hudChrome.farming.denied.feast_finished': 'その宴は食べ尽くされました。',
-  'hudChrome.farming.denied.feast_range': 'その宴から離れすぎています。',
   'hudChrome.farming.denied.feast_eaten': 'その宴からはすでに食べました。',
   'hudChrome.farming.feastTitle': '{name}の収穫の宴',
   'hudChrome.farming.stonepotFeastTitle': '{name}の石鍋の宴',
@@ -14448,19 +14447,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.report.status.critical': '重大',
   'hudChrome.perf.diagnostics.report.status.needsAttention': '要確認',
   // The Proving Shore (tutorial island) + the spawn greeting dialog.
-  'hudChrome.tutorialGreeting.bodyFirst':
-    '見かけない顔だね、旅の人。この土地では、冒険を始める者が修練の浜を訪れるのが習わしだ。海峡の先にある静かな島だよ。あそこなら世界の試練に挑む前に腕を磨き、この土地に慣れることができる。渡し船は行きも帰りも出ているし、行っても行かなくても誰も君を軽んじたりはしないよ。',
-  'hudChrome.tutorialGreeting.bodyRefresher':
-    '新しい顔でまた来たのかい？なら勝手は分かっているね。それでも旅立つ前におさらいがしたければ、修練の浜は出戻りの生徒を追い返したりしない。渡し船はいつでも出せるよ。',
-  'hudChrome.tutorialGreeting.play': 'チュートリアルを受ける',
-  'hudChrome.tutorialGreeting.declineNote':
-    'お好きにどうぞ、旅の人。気が変わったら、レイヴンポストの郵便柱のそばの渡しの鐘がいつでも修練の浜へ運んでくれる。昼でも夜でもね。狼は待ってくれないが、あの鐘は待っていてくれるよ。',
   'hudChrome.tutorialGreeting.bellHomeNote':
     'もう浜から戻ったのかい？さっき鳴らしたのが渡しの鐘だよ。その双子がすぐそこ、レイヴンポストの郵便柱のそばに掛かっている。いつでも鳴らせば、渡しが修練の浜へ運び直してくれる。間違って鳴らしたのなら、それはそれで構わないさ。',
   'hudChrome.tutorialGreeting.islandArrivalNote':
     '渡ってきたばかりかい？ようこそ修練の浜へ。ウォーデン・タムが目の前の浜でガントレットを預かっている。名前が見えるところまで歩み寄って、Fを押すか、左クリックすれば、そのレーンが体の動かし方を全部教えてくれる。発つ支度ができたら、私の桟橋のそばに立つ鐘を鳴らしなさい。渡しがイーストブルックの家まで運んでくれる。',
   'hudChrome.tutorialGreeting.noteClose': 'わかった',
-  'hudChrome.tutorialGreeting.skip': 'チュートリアルを飛ばす',
   'hudChrome.bootcamp.title': '最初の一歩',
   'hudChrome.bootcamp.talkTitle': 'ウォーデン・タムと話す',
   'hudChrome.bootcamp.talkBody':

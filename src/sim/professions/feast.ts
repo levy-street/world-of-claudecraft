@@ -52,16 +52,6 @@
 // ledger and one-active identities. The set is bounded by the feast's own
 // charge count and dropped wholesale at despawn, so it inherits none of the
 // persistence machinery the credited-objects ledger needs.
-//
-// THE RESERVED 'feast_range' REASON (masterwrought Phase 18 decision, recorded
-// here): since the existence-oracle guard in consumeFeastAction folded the
-// out-of-range refusal into the not-found frame ('feast_expired'), NOTHING
-// EMITS farmDenied 'feast_range' today. The reason stays in the wire union and
-// its hudChrome.farming.denied.feast_range key stays in the catalog and the
-// overlays as a RESERVED, currently-unemitted reason: the key's footprint is
-// six translated rows plus fifteen pending ones (only five overlay files
-// carry it), and retiring it is the release fill lane's call, not this
-// unit's. The QA twin re-judges it at the release fill.
 
 import { buildConsuming } from '../consuming';
 import { CRAFT_RING } from '../content/professions';
@@ -102,7 +92,7 @@ export const FARM_FEAST_TEMPLATE_ID = 'farm_feast';
  *  pins the map exhaustively in BOTH directions against feastTemplateIds().
  *
  *  FIVE SITES KEY ON A TEMPLATE ID and none of them names a string literal any
- *  more: src/ui/entity_display_name.ts and src/render/entity_labels.ts (the two
+ *  more: src/ui/entity_display_core.ts and src/render/entity_labels.ts (the two
  *  title composers, through the leaf above), src/render/nameplate_view.ts (the
  *  interact hysteresis band), src/render/farm_patches.ts (the applyFeasts
  *  filter; the shadow-cap sweep beside it iterates the ALREADY-filtered map and
@@ -158,7 +148,6 @@ export function isApexFeastRecipe(recipe: {
 
 /** One live placed feast. Keyed in SimContext.feasts by its entity id. */
 export interface FeastState {
-  entityId: number;
   /** The placer's rename-proof, domain-tagged owner key (feastOwnerKey). */
   ownerKey: string;
   /** Servings left. Decremented at bite START (the dish precedent: the
@@ -199,9 +188,10 @@ export function feastOwnerKey(meta: PlayerMeta): string {
  *
  *  `slotIndex` is the per-copy selection (item_copy_ref.ts): a use_item
  *  press NAMES the bag slot it came from and that copy is honored exactly,
- *  the consumeOneUnit thread every sibling use arm runs. Absent (the
- *  dedicated place_feast command carries no slot), the id-only lock-aware
- *  walk below stays byte-for-byte what it was.
+ *  the consumeOneUnit thread every sibling use arm runs. The dedicated
+ *  place_feast command may carry the same slot but preserves omission for
+ *  legacy clients; when absent, the id-only lock-aware walk below stays
+ *  byte-for-byte what it was.
  *
  *  `itemId` is the feast being placed (masterwrought Phase 11k). It DEFAULTS
  *  to the party feast, which is what keeps the dedicated `place_feast`
@@ -285,12 +275,6 @@ export function placeFeastAction(
   // plantCrop, locked slots are never victims). Both mutate the slot array
   // only, so the quest hook fires once here (place_feast stays a
   // HEAVY_SELF_CMDS member for the self snapshot).
-  // Read the crafter's signature off the SOURCE copy BEFORE the spend, which
-  // is the only moment it exists: the consume splices the slot away, and the
-  // id-only walk below never names one to read. An unsigned copy, and every
-  // id-only spend, leave this undefined and the feast carries no mark, exactly
-  // as before.
-  const signer = selected?.instance?.signer;
   if (selected) {
     // Branch on the tri-state as item_copy_ref.ts demands. Nothing mutates
     // the inventory between the resolve above and this consume today, so a
@@ -313,10 +297,6 @@ export function placeFeastAction(
   e.templateId = info.templateId;
   e.objectItemId = null;
   e.lootable = false;
-  // The CRAFTER'S mark rides beside the placer's name, as a VALUE like it:
-  // sparse (absent on an unsigned or id-only spend) and display-only, so it
-  // costs an unsigned feast nothing on the wire.
-  if (signer) e.feastSigner = signer;
   // The object-respawn sweep in sim.ts's entity loop treats EVERY
   // lootable-false object as a cooling pickup (respawnTimer -= DT, re-arm
   // at zero), which re-armed the feast one second after placement and
@@ -348,7 +328,6 @@ export function placeFeastAction(
   const run = delveRunForPlayer(ctx, meta.entityId);
   if (run) run.objectIds.push(e.id);
   ctx.feasts.set(e.id, {
-    entityId: e.id,
     ownerKey,
     charges: info.charges,
     expiresAtTick: ctx.tickCount + info.durationTicks,
@@ -383,9 +362,7 @@ export function consumeFeastAction(
   // sweeping ids learns nothing about which far-away feasts exist, are
   // drained, or were already eaten from. Every feast-specific reason below
   // (the tick-domain expiry, feast_finished, feast_eaten) therefore answers
-  // only INSIDE reach, where the feast is visible anyway. Nothing emits the
-  // 'feast_range' reason any more (it stays RESERVED in the union and the
-  // catalog; the header's decision record says why); the client's own
+  // only INSIDE reach, where the feast is visible anyway. The client's own
   // proximity gate (src/game/feast_interact.ts) is what real players see. All
   // three arms are draw-free and emit the identical frame shape (the extra
   // dist2d on the existing-feast arm is arithmetic, not an observable).

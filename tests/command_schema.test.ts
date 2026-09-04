@@ -100,12 +100,12 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // The release side (v0.41.0): the New Eastbrook program then retires the
 // Vale Cup minigame, removing its six vcup_* send + dispatch pairs
 // (docs/design/eastbrook-revamp/master-plan.md); the Proving Shore tutorial
-// adds its one tutorial_start pair back on top, and the v0.40.0 sync merge
+// added its now-retired ferry command pair on top, and the v0.40.0 sync merge
 // brings the release side's one new pair with it, so the release read
 // 199/212 on its own.
 // The v0.41.0 sync composes a SEVENTH time, and again CONFLICTED: off the
 // shared base 200/213, ours +6 (extract_essence plus farming's five), theirs
-// -1 (six vcup_* pairs out, one tutorial_start pair in), merged 205/218. The
+// -1 (six vcup_* pairs out, one now-retired ferry pair in), merged 205/218. The
 // numbers below were re-set from a suite run on the merged tree, never by
 // adding the two sides' deltas on paper.
 // Masterwrought phase 12 (the Perfecting stage) adds the perfect_item command
@@ -133,15 +133,15 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // The release side (v0.41.0, the Crucible raid loot landing): the raid's
 // Quartermaster sigil-redemption vendor adds its one crucible_buy send +
 // dispatch pair, so the release read 207/220 on its own (its own narrative
-// still spoke of the Vale Cup retirement and the start_tutorial pair).
+// still spoke of the Vale Cup retirement and the now-retired ferry pair).
 // The 2026-08-30 v0.41.0 sync composes a NINTH time and CONFLICTED (ours
 // 213/226 against the release's 207/220): the merged tree carries both arms,
 // ours' seven plus the release's one new pair, so the send and dispatch
 // counts each move by one over the eighth composition; dispatch-only stays
 // 13. Set from a suite run on the merged tree, never by arithmetic in the
 // diff.
-const EXPECTED_SEND_COUNT = 214;
-const EXPECTED_DISPATCH_COUNT = 227;
+const EXPECTED_SEND_COUNT = 213;
+const EXPECTED_DISPATCH_COUNT = 226;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch

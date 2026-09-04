@@ -1558,7 +1558,7 @@ export interface ItemInstancePayload {
   perfected?: true;
   /** Player-chosen legendary name (Masterwrought phase 13, R3): stamped by the
    *  orange promotion (professions/perfecting.ts, the chain
-   *  resolvePerfectingAttempt -> resolveLegendaryPromotion ->
+   *  resolvePerfectingAttempt -> its internal promotion arm ->
    *  promotePerfectedCopy, the last being the stamp site) alongside
    *  rolled.quality = 'legendary', on an already-Perfected copy only.
    *  Player-authored TEXT, always a VALUE and never an i18n key: standalone it
@@ -5267,13 +5267,6 @@ export interface Entity extends ClientMirroredEntityFields {
   devVendor?: boolean; // dev free-epic vendor (ptr_dev_vendor.ts)
   // object (ground interactable)
   objectItemId: string | null;
-  /** A placed feast's CRAFTER signature, copied from the spent copy's instance
-   *  payload at placement (professions/feast.ts). Display only, and a second
-   *  name beside `name`, which carries the PLACER: a feast is tradable, so the
-   *  cook and the host are routinely different people, and every other signed
-   *  item keeps its maker's mark visible. Sparse (absent on an unsigned feast
-   *  and on every non-feast object), so it costs nothing anywhere else. */
-  feastSigner?: string;
   // Runtime-only Soulwell ownership/eligibility state. The object itself is wired
   // through objectItemId; this authority data never needs to reach clients.
   soulwell?: {
@@ -7543,16 +7536,16 @@ export type SimEvent = { pid?: number } & (
         // (professions/farmer_npcs.ts). Its own reason rather than 'range',
         // whose HUD line names a crop bed; the trade has no bed.
         | 'no_farmer'
-        // The shared feast, appended (professions/feast.ts): the place arm's
-        // missing-item and one-active-feast-per-placer refusals, then the
-        // consume arm's stale-or-expired, picked-clean, own-range (its own
-        // reason: 'range' names a crop bed), and once-per-player refusals.
-        // The lock-caused shortfall reuses 'locked' above.
+        // The shared feast, appended (professions/feast.ts): place-arm
+        // refusals cover a missing item or an already-active table. Consume-arm
+        // refusals cover a stale or expired id, a picked-clean table, or a
+        // repeat diner. An out-of-range lookup is deliberately
+        // indistinguishable from a stale feast id, so it reuses feast_expired.
+        // The lock-caused shortfall reuses locked above.
         | 'no_feast'
         | 'feast_active'
         | 'feast_expired'
         | 'feast_finished'
-        | 'feast_range'
         | 'feast_eaten';
       bedId?: string;
       cropId?: string;
@@ -8214,8 +8207,7 @@ export type DeedStatKey =
   | 'tutorialGraduations'
   // Orange promotions performed (Masterwrought phase 13): bumped once per
   // legendary promotion at the promotePerfectedCopy stamp site
-  // (professions/perfecting.ts, reached via resolvePerfectingAttempt ->
-  // resolveLegendaryPromotion), feeding prog_legendmaker.
+  // (professions/perfecting.ts, reached via resolvePerfectingAttempt's internal promotion arm), feeding prog_legendmaker.
   | 'legendariesForged';
 
 // The canonical counter key list (init/serialize iterate it in this fixed

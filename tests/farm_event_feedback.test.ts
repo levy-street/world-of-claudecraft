@@ -260,7 +260,7 @@ describe('farm_event_feedback: the cue arms', () => {
     // is a menu conversion; a borrowed world-action cue on either is the bug
     // this negative arm exists to catch. The reason list is TYPE-FORCED
     // against the union in src/sim/types.ts (via the FarmDeniedReason
-    // extract): a sixteenth reason is a tsc error here until its row joins,
+    // extract): a new reason is a tsc error here until its row joins,
     // so no refusal branch can ship outside this sweep (the Phase 7 QA
     // hand-maintenance finding).
     const REASON_ROWS: Record<FarmDeniedReason, true> = {
@@ -279,13 +279,12 @@ describe('farm_event_feedback: the cue arms', () => {
       tool: true,
       locked: true,
       no_farmer: true,
-      // The shared-feast phase's six refusal reasons (professions/feast.ts):
+      // The shared-feast refusal reasons (professions/feast.ts):
       // error-toast only, like every row above.
       no_feast: true,
       feast_active: true,
       feast_expired: true,
       feast_finished: true,
-      feast_range: true,
       feast_eaten: true,
     };
     const reasons = Object.keys(REASON_ROWS) as FarmDeniedReason[];

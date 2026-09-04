@@ -1566,7 +1566,7 @@ describe('trigger references resolve against the real content tables', () => {
       "feat_brightwood_relic:Monarch's Crown",
       'hid_codfather:The Codfather',
       // Reviewed at masterwrought Phase 13: the promotion capstone's desc
-      // names the Deed of Making, and resolveLegendaryPromotion really does
+      // names the Deed of Making, and resolvePerfectingAttempt's promotion branch really does
       // consume exactly that item (LEGENDARY_PROMOTION_COST names
       // deed_of_making), so the desc names the RIGHT one.
       'prog_legendmaker:Deed of Making',

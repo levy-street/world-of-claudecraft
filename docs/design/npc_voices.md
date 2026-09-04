@@ -168,16 +168,11 @@ Fenna's market patter.
 ### Groundskeeper Bram: *Keeper of the Sowfield* (retired)
 Retired with the Sowfield and the Vale Cup in release/v0.41.0 (1c74387b4c): the
 NPC, his `VOICE_PROMPTS` entry and his country baritone are gone from the world.
-Three pieces of release-side residue still carry him, all orphaned and harmless:
-his ElevenLabs id in `scripts/voices/voice_ids.json`; his look row,
-`NPC_LOOKS.groundskeeper_bram` in `src/render/characters/npc_looks.ts`; and his
-greeting line in the generated voice manifest, `VOICE_LINES` in
-`src/game/voice_manifest.generated.ts`, which maps `greeting__groundskeeper_bram`
-to the mp3 still under `public/audio/voice/groundskeeper_bram/` (the manifest is
-written by `scripts/gen_npc_lines.mjs` from that audio directory, so it clears
-when the audio is removed, never by hand). Farmer Hollis borrowed this voice
-until then (see his section). (Not Keeper Bram of the Galecrest beacon, nor
-Fisher Bram of the Farshore.)
+Two pieces of release-side residue still carry him, both orphaned and harmless:
+his ElevenLabs id in `scripts/voices/voice_ids.json` and his look row,
+`NPC_LOOKS.groundskeeper_bram` in `src/render/characters/npc_looks.ts`. Farmer
+Hollis borrowed this voice until then (see his section). (Not Keeper Bram of the
+Galecrest beacon, nor Fisher Bram of the Farshore.)
 
 ### Tinker Gizzel: *Master of the Toolworks*
 **Visual:** `npc_smith`, brass (#b08d57), apron full of things that tick.

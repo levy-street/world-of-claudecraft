@@ -1040,11 +1040,6 @@ export const fr_FR: EnTranslations = {
       "clearArmed": "Touchez un emplacement pour l'effacer."
     },
     "tutorialGreeting": {
-      "bodyFirst": "Je ne vous ai jamais vu par ici, l'ami. La tradition, dans ces terres, veut que ceux qui débutent leur aventure se rendent au Rivage de l'Épreuve, une île paisible au large du détroit. Vous pourrez y affiner vos talents et vous habituer au monde avant d'en affronter les défis. Le bac fait la traversée dans les deux sens, et personne ne pensera moins de vous, quel que soit votre choix.",
-      "bodyRefresher": "De retour avec un nouveau visage, à ce que je vois ? Vous savez donc déjà comment ça se passe. Mais si vous souhaitez tout de même vous rafraîchir la mémoire avant de partir, le Rivage de l'Épreuve n'a jamais refusé un élève de retour, et le bac est prêt quand vous l'êtes.",
-      "play": "Commencer le tutoriel",
-      "skip": "Passer le tutoriel",
-      "declineNote": "Comme il vous plaira, l'ami. Si jamais vous changez d'avis, la cloche du bac près de la boîte aux lettres de la Poste aux Corbeaux vous fait traverser jusqu'au Rivage de l'Épreuve à toute heure, jour et nuit. Elle sera toujours là quand les loups n'y seront plus.",
       "bellHomeNote": "Déjà de retour du rivage ? C'était la cloche du bac que vous avez sonnée. Sa jumelle est accrochée juste là, près de la boîte aux lettres de la Poste aux Corbeaux : sonnez-la à tout moment et la traversée vous ramènera au Rivage de l'Épreuve. Aucun mal, dans un sens comme dans l'autre.",
       "islandArrivalNote": "Bienvenue au Rivage de l'Épreuve. Le Gardien Tam vous attend un peu plus haut sur la grève : allez le voir.",
       "noteClose": "Compris"
@@ -3705,7 +3700,6 @@ export const fr_FR: EnTranslations = {
         "feast_active": "Your feast is already set out.",
         "feast_expired": "That feast is gone.",
         "feast_finished": "That feast has been picked clean.",
-        "feast_range": "You are too far from the feast.",
         "feast_eaten": "You have already eaten from that feast."
       },
       "feastTitle": "{name}'s Harvest Feast",

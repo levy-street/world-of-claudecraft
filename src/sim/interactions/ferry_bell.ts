@@ -43,7 +43,7 @@ export function isFirstIslandVisit(meta: PlayerMeta): boolean {
 }
 
 /** The shared island-arrival marker, emitted by BOTH ferry routes (the
- *  greeting's accept in sim/tutorial/greeting.ts and the town bell below).
+ *  compulsory greeting ferry and the town bell below).
  *  Text-free: the client renders Odo's welcome note off `firstVisit`. */
 export function emitIslandArrival(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   ctx.emit({ type: 'ferryIslandArrival', pid: p.id, firstVisit: isFirstIslandVisit(meta) });
@@ -51,7 +51,7 @@ export function emitIslandArrival(ctx: SimContext, p: Entity, meta: PlayerMeta):
 
 /** Ring a ferry bell: travel to the OTHER shore, decided by which side of
  *  the strait the clicked bell stands on. In combat the crossing refuses
- *  (the startTutorial gate's wording), so the bell can never be a combat
+ *  (the shared ferry-refusal wording), so the bell can never be a combat
  *  exit. Always returns true: the click was the bell's, even when refused. */
 export function tryRingFerryBell(
   ctx: SimContext,

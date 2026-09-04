@@ -1040,11 +1040,6 @@ export const da_DK: EnTranslations = {
       "clearArmed": "Tryk på en plads for at rydde den."
     },
     "tutorialGreeting": {
-      "bodyFirst": "Jeg har ikke set dig heromkring før, ven. Det er tradition i disse lande, at de, der begynder deres eventyr, besøger Prøvestranden, en stille ø ud for strædet. Der kan du finpudse dine færdigheder og vænne dig til verden, før du tager dens udfordringer op. Færgen sejler begge veje, og ingen vil tænke mindre om dig, uanset hvad du vælger.",
-      "bodyRefresher": "Tilbage igen med et nyt ansigt, hvad? Så kender du proceduren. Men skulle du ønske en opfriskning, før du drager af sted, afviser Prøvestranden aldrig en elev, der vender tilbage, og færgen er klar, når du er.",
-      "play": "Gennemfør vejledningen",
-      "skip": "Spring vejledningen over",
-      "declineNote": "Som du vil, ven. Skulle du nogensinde ombestemme dig, ringer færgeklokken ved Ravnepostens postkasse dig over til Prøvestranden når som helst, dag eller nat. Den vil stadig være her, når ulvene ikke er det.",
       "bellHomeNote": "Tilbage fra kysten allerede? Det var færgeklokken, du ringede med. Dens tvilling hænger lige der ved Ravnepostens postkasse: ring med den når som helst, og overfarten vil bringe dig tilbage til Prøvestranden. Ingen skade sket, uanset hvad du vælger.",
       "islandArrivalNote": "Velkommen til Prøvestranden. Vogter Tam venter lidt længere oppe ad stranden: gå hen og find ham.",
       "noteClose": "Forstået"
@@ -3705,7 +3700,6 @@ export const da_DK: EnTranslations = {
         "feast_active": "Your feast is already set out.",
         "feast_expired": "That feast is gone.",
         "feast_finished": "That feast has been picked clean.",
-        "feast_range": "You are too far from the feast.",
         "feast_eaten": "You have already eaten from that feast."
       },
       "feastTitle": "{name}'s Harvest Feast",

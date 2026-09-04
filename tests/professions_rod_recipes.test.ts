@@ -161,7 +161,7 @@ describe('the crafted rod ladder', () => {
     // the pillars), so the protection moved to where it belongs, the
     // VOCABULARY: ROD_FEE_RECIPE_IDS now filters ROD_RECIPES to the
     // trainer-taught rows, so isRodFeeRecipe refuses a drop-taught rung by
-    // construction. Pinned here as well as in tests/fishing_telemetry.ts,
+    // construction. Pinned here as well as in tests/fishing_telemetry.test.ts,
     // because this is the file that made the promise.
     const cap = craftMaxSkillFor('engineering');
     for (const recipe of ROD_RECIPES) {

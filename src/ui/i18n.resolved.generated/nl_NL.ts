@@ -1040,11 +1040,6 @@ export const nl_NL: EnTranslations = {
       "clearArmed": "Tik op een vak om het te wissen."
     },
     "tutorialGreeting": {
-      "bodyFirst": "Ik heb je hier nog niet eerder gezien, vriend. Het is traditie in deze landen dat wie aan zijn avontuur begint, eerst de Beproevingskust bezoekt, een rustig eiland net buiten de zeestraat. Daar kun je je vaardigheden slijpen en aan de wereld wennen voordat je haar beproevingen aangaat. De veerboot vaart beide kanten op, en niemand zal minder over je denken, wat je ook kiest.",
-      "bodyRefresher": "Weer terug met een nieuw gezicht, hè? Dan weet je hoe dit werkt. Toch, als je liever nog wat oefent voordat je vertrekt: de Beproevingskust wijst nooit een terugkerende leerling af, en de veerboot ligt klaar wanneer jij dat bent.",
-      "play": "Volg de tutorial",
-      "skip": "Sla de tutorial over",
-      "declineNote": "Zoals je wilt, vriend. Mocht je ooit van gedachten veranderen: de veerbel bij de brievenbus van de Ravenpost brengt je op elk moment, dag of nacht, naar de Beproevingskust. Ze staat er nog wanneer de wolven dat niet meer doen.",
       "bellHomeNote": "Alweer terug van de kust? Dat was de veerbel die je luidde. Zijn tweelingbroer hangt daar bij de brievenbus van de Ravenpost: luid hem wanneer je wilt en de overtocht brengt je terug naar de Beproevingskust. Geen kwaad geschied, hoe dan ook.",
       "islandArrivalNote": "Welkom op de Beproevingskust. Warden Tam wacht verderop op het strand: ga naar hem toe.",
       "noteClose": "Begrepen"
@@ -3705,7 +3700,6 @@ export const nl_NL: EnTranslations = {
         "feast_active": "Your feast is already set out.",
         "feast_expired": "That feast is gone.",
         "feast_finished": "That feast has been picked clean.",
-        "feast_range": "You are too far from the feast.",
         "feast_eaten": "You have already eaten from that feast."
       },
       "feastTitle": "{name}'s Harvest Feast",

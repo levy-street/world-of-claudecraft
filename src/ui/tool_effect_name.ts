@@ -1,7 +1,7 @@
 // The one map from a tool-effect id to its localized display-name key.
 //
 // The gathering-profession counterpart of GATHERING_PROFESSION_NAME_KEYS
-// (./gathering_profession_name.ts), and it exists for the same reason: the sim
+// (./hud/professions/gathering_profession_name.ts), and it exists for the same reason: the sim
 // and the wire are language-agnostic and carry only a ToolEffectId, so the id
 // has to become a name somewhere on the UI side, once.
 //

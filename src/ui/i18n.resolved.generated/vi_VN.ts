@@ -1040,11 +1040,6 @@ export const vi_VN: EnTranslations = {
       "clearArmed": "Chạm vào một ô để xóa nó."
     },
     "tutorialGreeting": {
-      "bodyFirst": "Ta chưa từng thấy bạn quanh đây trước kia, bạn hỡi. Ở vùng đất này có một truyền thống: những ai mới bắt đầu cuộc phiêu lưu sẽ ghé thăm Bờ Biển Thử Thách, một hòn đảo yên tĩnh ngoài eo biển. Ở đó bạn có thể rèn giũa kỹ năng và làm quen với thế giới trước khi đối mặt với những thử thách của nó. Chuyến phà chạy cả hai chiều, và dù bạn chọn thế nào cũng chẳng ai nghĩ kém về bạn.",
-      "bodyRefresher": "Lại quay về với một gương mặt mới à? Vậy thì bạn đã biết cách này rồi. Nhưng nếu bạn muốn ôn lại đôi chút trước khi lên đường, Bờ Biển Thử Thách chẳng bao giờ từ chối một học trò trở lại, và chuyến phà luôn sẵn sàng khi bạn cần.",
-      "play": "Bắt đầu hướng dẫn",
-      "skip": "Bỏ qua hướng dẫn",
-      "declineNote": "Tùy ý bạn, bạn hỡi. Nếu có bao giờ bạn đổi ý, chiếc chuông phà cạnh hòm thư Bưu Quạ sẽ đưa bạn qua Bờ Biển Thử Thách bất kể ngày đêm. Nó vẫn sẽ ở đây, ngay cả khi lũ sói không còn.",
       "bellHomeNote": "Đã quay lại từ bờ biển rồi sao? Đó là tiếng chuông phà bạn vừa rung đấy. Chiếc chuông song sinh của nó treo ngay cạnh hòm thư Bưu Quạ: rung nó bất cứ lúc nào và chuyến phà sẽ đưa bạn trở lại Bờ Biển Thử Thách. Dù chọn cách nào cũng chẳng hại gì.",
       "islandArrivalNote": "Chào mừng đến với Bờ Biển Thử Thách. Vệ Quan Tam đang chờ ngay phía trên bãi biển: hãy đến gặp ông ấy.",
       "noteClose": "Đã hiểu"
@@ -3705,7 +3700,6 @@ export const vi_VN: EnTranslations = {
         "feast_active": "Your feast is already set out.",
         "feast_expired": "That feast is gone.",
         "feast_finished": "That feast has been picked clean.",
-        "feast_range": "You are too far from the feast.",
         "feast_eaten": "You have already eaten from that feast."
       },
       "feastTitle": "{name}'s Harvest Feast",

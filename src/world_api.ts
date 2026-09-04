@@ -708,10 +708,11 @@ export const COMMAND_NAMES = [
   // forge. Appended because wire tokens are never reordered.
   'convert_husks',
   // The shared feast (Sim.placeFeast / Sim.consumeFeast via
-  // src/sim/professions/feast.ts). place_feast carries NO payload (the one
-  // feast item id, charges, expiry and the anti-abuse rule resolve
-  // sim-side); consume_feast carries the feast ENTITY id only, and every
-  // outcome (ledger, charges, range, the Well Fed mint) is server state.
+  // src/sim/professions/feast.ts). place_feast carries only an optional bag
+  // slot naming the copy to spend (the feast item id, charges, expiry and the
+  // anti-abuse rule resolve sim-side); consume_feast carries the feast ENTITY
+  // id only, and every outcome (ledger, charges, range, the Well Fed mint) is
+  // server state.
   // Appended because wire tokens are never reordered.
   'place_feast',
   'consume_feast',
@@ -743,11 +744,6 @@ export const COMMAND_NAMES = [
   'bank_unlock_socket',
   'bank_socket_bag',
   'bank_unsocket_bag',
-  // The tutorial greeting's accept: the ferry ride to the Proving Shore
-  // (IWorldQuests.startTutorial; sim/tutorial/greeting.ts re-validates level,
-  // life, and band server-side). Appended because wire tokens are never
-  // reordered.
-  'tutorial_start',
   // The Perfecting stage (Masterwrought phase 12, IWorldProfessions.perfectItem):
   // one attempt on a worn (`slot`) or bagged (`bag`) apex piece; the server
   // validates the ref shape and the sim resolves every gate and the one roll.

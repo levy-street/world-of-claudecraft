@@ -238,7 +238,6 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
       'farmWitheredAnnounced',
       'fiestaMods',
       'fiestaSpecial',
-      'firstCharacter',
       'guildMembership',
       'joinedAt',
       'known',

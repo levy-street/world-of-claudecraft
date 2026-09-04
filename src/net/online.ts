@@ -3078,10 +3078,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
         e.dungeonId = w.dgn ?? null;
         e.riftTier = typeof w.rt === 'string' ? (w.rt as RiftTier) : undefined; // rift rank badge
         e.objectItemId = w.obj ?? null;
-        // A placed feast's CRAFTER mark, sparse on the wire: absent means an
-        // unsigned feast (or any other object), so it CLEARS rather than
-        // sticking, the way every other sparse mirror here does.
-        e.feastSigner = typeof w.fsg === 'string' ? w.fsg : undefined;
         e.guild = w.gd ?? '';
         e.pledgeGuild = w.pg ?? '';
         e.guildTier = w.gt ?? 0;
@@ -4072,12 +4068,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
     this.questLog.delete(questId);
     this.pendingQuestCommands.delete(questId);
     this.cmd({ cmd: 'abandon', quest: questId });
-  }
-  startTutorial(): void {
-    if (!this.canSendCommand()) return;
-    // Command only, never predicted: the server validates and the >30 yd
-    // displacement in the next snapshot drives the client's arrival flow.
-    this.cmd({ cmd: 'tutorial_start' });
   }
   acceptLinkedQuest(questId: string, fromPid: number): void {
     this.cmd({ cmd: 'qlinkaccept', quest: questId, from: fromPid });

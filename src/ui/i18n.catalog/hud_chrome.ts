@@ -919,35 +919,15 @@ export const hudChromeStrings = {
     clearAria: 'Clear a slot',
     clearArmed: 'Tap a slot to clear it.',
   },
-  // The tutorial island's greeter copy (tutorial_greeting_view.ts /
-  // tutorial_greeting_window.ts). THREE keys are live: the two notes the ferry
-  // event arms paint (bellHomeNote when the island bell sets a player down in
-  // town, islandArrivalNote for Ferryman Odo's welcome) and the noteClose
-  // button they share.
-  // The other five (bodyFirst, bodyRefresher, play, skip, declineNote) belong
-  // to the retired two-choice greeting dialog: the compulsory tutorial replaced
-  // the take-or-skip offer (src/sim/tutorial/greeting.ts), and the Phase 18
-  // dead-union sweep removed its never-emitted SimEvent arm and the Hud opener,
-  // so the only references left are view builders nothing outside tests calls.
-  // They are KEPT, not dropped: 90 reviewed overlay rows across 18 locales hang
-  // off them, and deleting an English source orphans those rows (see the
-  // doctrine in scripts/i18n_retired_keys.mjs, whose RETIRED_KEYS list is
-  // guide-only today). Retiring them is a maintainer ruling, not a sweep.
+  // The live ferry notes (tutorial_greeting_view.ts /
+  // tutorial_greeting_window.ts): the town-bell homecoming, the island
+  // welcome from Ferryman Odo, and the close button they share.
   tutorialGreeting: {
-    bodyFirst:
-      'I have not seen you around before, friend. It is tradition in these lands for those starting their adventure to visit the Proving Shore, a quiet island off the strait. There you can hone your skills and get used to the world before you take on its challenges. The ferry runs both ways, and no one will think less of you either way.',
-    bodyRefresher:
-      'Back again with a fresh face, are you? You know how this goes, then. Still, if you would like a refresher before you set out, the Proving Shore never turns away a returning student, and the ferry is ready when you are.',
-    play: 'Take the tutorial',
-    skip: 'Skip the tutorial',
-    // The decline follow-up: skipping is never a locked door.
-    declineNote:
-      'As you like, friend. Should you ever change your mind, the ferry bell by the Ravenpost mailbox rings you across to the Proving Shore any time, day or night. It will still be here when the wolves are not.',
     // The first bell homecoming: the ride may have been a misclick, so the
     // town's twin bell is pointed out once.
     bellHomeNote:
       'Back from the shore already? That was the ferry bell you rang. Its twin hangs just there by the Ravenpost mailbox: ring it any time and the crossing will carry you back to the Proving Shore. No harm done either way.',
-    // Ferryman Odo's island welcome, shown once per device on the first
+    // The island welcome from Ferryman Odo, shown on a character's first
     // arrival: the greeting ferry lands beside his pier.
     // Deliberately short (CX: the old note was a wall of text at the exact
     // moment a new player wants to look at the world). It says where they
@@ -4166,7 +4146,7 @@ export const hudChromeStrings = {
       'Farming supply. Spent when you plant a crop for a chance of a slightly larger ' +
       'harvest. If the crop withers, the tonic is lost with it.',
     // The Deed of Making (masterwrought Phase 13): written from the live
-    // mechanic (perfecting.ts resolveLegendaryPromotion consumes exactly one
+    // mechanic (perfecting.ts resolvePerfectingAttempt consumes exactly one
     // at the PROMOTION, the step after Perfecting completes: it stamps an
     // already-Perfected copy legendary under a chosen name; no Perfecting
     // rank attempt touches it).
@@ -5227,16 +5207,15 @@ export const hudChromeStrings = {
       // out of reach of a farmer NPC, professions/farmer_npcs.ts). Its own
       // leaf rather than `range` above, whose English names a crop bed.
       no_farmer: 'You must be near a farmer to trade husks for compost.',
-      // The shared feast (professions/feast.ts): the place arm's refusals
-      // (missing item, one active feast per placer), then the consume arm's
-      // (stale or expired, picked clean, range with its own leaf since
-      // `range` above names a crop bed, once per player). The lock-caused
-      // shortfall reuses `locked` above.
+      // The shared feast (professions/feast.ts): place refusals cover a
+      // missing item or an already-active table; consume refusals cover a
+      // stale or expired id, a picked-clean table, or a repeat diner. An
+      // out-of-range lookup deliberately reuses feast_expired, and a
+      // lock-caused shortfall reuses locked above.
       no_feast: 'You have no feast to set out.',
       feast_active: 'Your feast is already set out.',
       feast_expired: 'That feast is gone.',
       feast_finished: 'That feast has been picked clean.',
-      feast_range: 'You are too far from the feast.',
       feast_eaten: 'You have already eaten from that feast.',
     },
     // THE PLACED FEAST TITLES (professions/feast.ts), composed client-side off

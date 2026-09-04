@@ -10142,7 +10142,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.denied.feast_active': 'Ваш пир уже накрыт.',
   'hudChrome.farming.denied.feast_expired': 'Этого пира больше нет.',
   'hudChrome.farming.denied.feast_finished': 'Этот пир съеден подчистую.',
-  'hudChrome.farming.denied.feast_range': 'Вы слишком далеко от пира.',
   'hudChrome.farming.denied.feast_eaten': 'Вы уже поели с этого пира.',
   'hudChrome.farming.feastTitle': 'Пир урожая {name}',
   'hudChrome.farming.stonepotFeastTitle': 'Пир каменного котла {name}',
@@ -14676,19 +14675,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.report.status.critical': 'критично',
   'hudChrome.perf.diagnostics.report.status.needsAttention': 'требует внимания',
   // The Proving Shore (tutorial island) + the spawn greeting dialog.
-  'hudChrome.tutorialGreeting.bodyFirst':
-    'Раньше я тебя здесь не видела, друг. В этих краях есть традиция: те, кто начинает свой путь, посещают Берег Испытаний, тихий остров за проливом. Там можно отточить навыки и освоиться в мире, прежде чем принимать его вызовы. Паром ходит в обе стороны, и никто не подумает о тебе хуже, как бы ты ни решил.',
-  'hudChrome.tutorialGreeting.bodyRefresher':
-    'Снова здесь, и с новым лицом? Значит, порядок ты знаешь. Но если перед дорогой хочется освежить память, Берег Испытаний никогда не отказывает вернувшимся ученикам, а паром готов, когда готов ты.',
-  'hudChrome.tutorialGreeting.play': 'Пройти обучение',
-  'hudChrome.tutorialGreeting.declineNote':
-    'Как пожелаешь, друг. Передумаешь - паромный колокол у почтового столба Вранопочты в любой час, днем и ночью, перезвонит тебя на Берег Испытаний. Волки ждать не станут, а он подождет.',
   'hudChrome.tutorialGreeting.bellHomeNote':
     'Уже вернулся с берега? Это был паромный колокол. Его близнец висит вон там, у почтового столба Вранопочты: позвони в любой момент, и переправа отнесет тебя обратно на Берег Испытаний. А если позвонил по ошибке - ничего страшного.',
   'hudChrome.tutorialGreeting.islandArrivalNote':
     'Только с переправы? Добро пожаловать на Берег Испытаний. Страж Там держит Полосу на берегу прямо перед тобой: подойди к нему вплотную, пока не покажется его имя, затем нажми F или щелкни по нему левой кнопкой мыши, и его дорожки научат твои ноги всему, что им нужно. А когда соберешься уходить, позвони в колокол, что стоит рядом с моим причалом, и переправа отвезет тебя домой, в Истврук.',
   'hudChrome.tutorialGreeting.noteClose': 'Понятно',
-  'hudChrome.tutorialGreeting.skip': 'Пропустить обучение',
   'hudChrome.bootcamp.title': 'Первые шаги',
   'hudChrome.bootcamp.talkTitle': 'Поговори со Стражем Тамом',
   'hudChrome.bootcamp.talkBody':

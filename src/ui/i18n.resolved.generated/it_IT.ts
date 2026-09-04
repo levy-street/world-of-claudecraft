@@ -1040,11 +1040,6 @@ export const it_IT: EnTranslations = {
       "clearArmed": "Tocca uno slot per svuotarlo."
     },
     "tutorialGreeting": {
-      "bodyFirst": "Non ti avevo mai visto da queste parti, amico. È tradizione in queste terre che chi inizia la propria avventura visiti la Riva della Prova, un'isola tranquilla al largo dello stretto. Lì puoi affinare le tue abilità e abituarti al mondo prima di affrontarne le sfide. Il traghetto va in entrambe le direzioni, e nessuno penserà male di te in un caso o nell'altro.",
-      "bodyRefresher": "Di nuovo qui con un volto nuovo, eh? Allora sai già come funziona. Ma se desideri un ripasso prima di partire, la Riva della Prova non respinge mai uno studente di ritorno, e il traghetto è pronto quando lo sei tu.",
-      "play": "Inizia il tutorial",
-      "skip": "Salta il tutorial",
-      "declineNote": "Come preferisci, amico. Se mai dovessi cambiare idea, la campana del traghetto accanto alla cassetta della Posta dei Corvi ti farà attraversare fino alla Riva della Prova a qualunque ora, di giorno o di notte. Sarà ancora qui quando i lupi non ci saranno più.",
       "bellHomeNote": "Già di ritorno dalla riva? Quella era la campana del traghetto che hai suonato. La sua gemella è appesa proprio lì, accanto alla cassetta della Posta dei Corvi: suonala quando vuoi e la traversata ti riporterà alla Riva della Prova. Nessun danno in entrambi i casi.",
       "islandArrivalNote": "Benvenuto alla Riva della Prova. Il Guardiano Tam ti aspetta poco più avanti sulla spiaggia: vai a trovarlo.",
       "noteClose": "Capito"
@@ -3705,7 +3700,6 @@ export const it_IT: EnTranslations = {
         "feast_active": "Your feast is already set out.",
         "feast_expired": "That feast is gone.",
         "feast_finished": "That feast has been picked clean.",
-        "feast_range": "You are too far from the feast.",
         "feast_eaten": "You have already eaten from that feast."
       },
       "feastTitle": "{name}'s Harvest Feast",

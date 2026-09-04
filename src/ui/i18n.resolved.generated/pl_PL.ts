@@ -1040,11 +1040,6 @@ export const pl_PL: EnTranslations = {
       "clearArmed": "Dotknij slotu, aby go wyczyścić."
     },
     "tutorialGreeting": {
-      "bodyFirst": "Nie widziałem cię tu wcześniej, przyjacielu. W tych stronach jest tradycją, że ci, którzy zaczynają swoją przygodę, odwiedzają Wybrzeże Prób, spokojną wyspę za cieśniną. Możesz tam wyszlifować swoje umiejętności i oswoić się ze światem, zanim zmierzysz się z jego wyzwaniami. Prom pływa w obie strony i nikt nie pomyśli o tobie gorzej, którąkolwiek drogę wybierzesz.",
-      "bodyRefresher": "Znowu tu jesteś, z nową twarzą, co? W takim razie wiesz już, jak to wygląda. Mimo to, gdybyś chciał sobie wszystko przypomnieć, zanim wyruszysz, Wybrzeże Prób nigdy nie odprawia powracającego ucznia z niczym, a prom czeka, gdy tylko będziesz gotów.",
-      "play": "Rozpocznij samouczek",
-      "skip": "Pomiń samouczek",
-      "declineNote": "Jak sobie życzysz, przyjacielu. Gdybyś kiedyś zmienił zdanie, dzwon promowy przy skrzynce Kruczej Poczty przeprawi cię na Wybrzeże Prób o każdej porze, w dzień i w nocy. Będzie tu, kiedy wilków już nie będzie.",
       "bellHomeNote": "Już z powrotem z wybrzeża? To był dzwon promowy, w który uderzyłeś. Jego bliźniak wisi właśnie tam, przy skrzynce Kruczej Poczty: uderz w niego, kiedy zechcesz, a przeprawa zaniesie cię z powrotem na Wybrzeże Prób. Tak czy inaczej, nic się nie stało.",
       "islandArrivalNote": "Witaj na Wybrzeżu Prób. Strażnik Tam czeka kawałek dalej na plaży: idź się z nim zobaczyć.",
       "noteClose": "Zrozumiano"
@@ -3705,7 +3700,6 @@ export const pl_PL: EnTranslations = {
         "feast_active": "Your feast is already set out.",
         "feast_expired": "That feast is gone.",
         "feast_finished": "That feast has been picked clean.",
-        "feast_range": "You are too far from the feast.",
         "feast_eaten": "You have already eaten from that feast."
       },
       "feastTitle": "{name}'s Harvest Feast",

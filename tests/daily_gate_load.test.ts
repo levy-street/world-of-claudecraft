@@ -7,7 +7,7 @@ import { type CharacterState, Sim } from '../src/sim/sim';
 
 // Direct pins for the extracted load-hardening leaf (the clamps formerly
 // inlined in Sim.addPlayer; the Sim-level round-trip behavior stays pinned by
-// tests/masterwrought_materials.test.ts and tests/quickening_catalyst_gate.ts
+// tests/masterwrought_materials.test.ts and tests/quickening_catalyst_gate.test.ts
 // through the real load path). Every dimension gets a negative arm so a
 // dropped clamp reddens here even if the Sim fixtures never exercise it.
 

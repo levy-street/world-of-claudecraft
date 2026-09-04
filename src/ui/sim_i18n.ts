@@ -225,9 +225,8 @@ const baseEnTable = {
   'log.perfectFail': 'The perfecting attempt fails; the materials are spent.',
   'log.perfectDone': '{item} is now Perfected!',
   // The orange promotion's deny ladder (Masterwrought phase 13,
-  // src/sim/professions/perfecting.ts: the shared resolvePerfectingAttempt
-  // entry delegates to resolveLegendaryPromotion, whose success arm stamps
-  // the copy via promotePerfectedCopy). Four
+  // src/sim/professions/perfecting.ts: resolvePerfectingAttempt's internal
+  // promotion arm stamps the copy via promotePerfectedCopy). Four
   // placeholder-free EXACT refusal rows; there is deliberately NO success
   // text line (the legendaryForged / legendaryForgedZone events drive the
   // client copy instead). This block RETIRED error.perfectAlready ('That item
@@ -929,15 +928,14 @@ const baseEnTable = {
   'log.veilLeave': 'The veil closes behind you, and the mountain air bites again.',
   'log.ferryEnter': 'The ferry bell rings once, and the Farshore rises out of the spray.',
   'log.ferryLeave': 'The bell answers from the vale, and the mainland takes you back.',
-  // The Proving Shore (tutorial island): the greeting's ferry ride, the two
-  // clicked ferry bells, the startTutorial gate denials
-  // (sim/tutorial/greeting.ts + interactions/ferry_bell.ts), and the
+  // The Proving Shore (tutorial island): the compulsory greeting's ferry ride,
+  // the two clicked ferry bells (sim/tutorial/greeting.ts +
+  // interactions/ferry_bell.ts), and the
   // quest-gated vendor row denial (items.ts vendorQuestGates).
   'log.provingFerry': 'The ferry sets you down on the Proving Shore.',
   'log.provingEnter': 'The ferry bell tolls, and the Proving Shore rises to meet you.',
   'log.provingLeave': 'The crossing takes hold, and Eastbrook Vale spreads out before you.',
   'error.tutorialFromHere': 'You cannot set sail from here.',
-  'error.tutorialOutleveled': 'The Proving Shore has nothing left to teach you.',
   'log.passingStoneKneel': 'You close your hand on the Passing Stone, and the shore lets you go.',
   'error.passingStoneCold': 'The stone is cold. Instructor Maren has not asked this of you.',
   'log.longWalkCorpse': 'You are whole again, and you found your own way back.',
@@ -1095,7 +1093,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.provingEnter': 'The ferry bell tolls, and the Proving Shore rises to meet you.',
     'log.provingLeave': 'The crossing takes hold, and Eastbrook Vale spreads out before you.',
     'error.tutorialFromHere': 'You cannot set sail from here.',
-    'error.tutorialOutleveled': 'The Proving Shore has nothing left to teach you.',
     'log.passingStoneKneel': 'You close your hand on the Passing Stone, and the shore lets you go.',
     'error.passingStoneCold': 'The stone is cold. Instructor Maren has not asked this of you.',
     'log.longWalkCorpse': 'You are whole again, and you found your own way back.',
@@ -1299,7 +1296,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.passingStoneKneel':
       'Cierras la mano sobre la Piedra de Paso, y la orilla te deja marchar.',
     'error.tutorialFromHere': 'No puedes zarpar desde aquí.',
-    'error.tutorialOutleveled': 'La Costa de la Prueba ya no tiene nada que enseñarte.',
     'error.passingStoneCold': 'La piedra está fría. La Instructora Maren no te ha pedido esto.',
     'error.vendorQuestGated': 'Ese objeto no está a la venta para ti todavía.',
     'error.arenaMinLevel': 'Debes ser nivel {level} para entrar en cola de arena.',
@@ -1812,7 +1808,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.passingStoneKneel':
       'Cierras la mano sobre la Piedra de Paso, y la orilla te deja marchar.',
     'error.tutorialFromHere': 'No puedes zarpar desde aquí.',
-    'error.tutorialOutleveled': 'La Costa de la Prueba ya no tiene nada que enseñarte.',
     'error.passingStoneCold': 'La piedra está fría. La Instructora Maren no te ha pedido esto.',
     'error.vendorQuestGated': 'Ese objeto no está a la venta para ti todavía.',
     'error.arenaMinLevel': 'Debes ser nivel {level} para entrar en cola de arena.',
@@ -2328,7 +2323,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.passingStoneKneel':
       'Vous refermez la main sur la Pierre de trépas, et le rivage vous laisse partir.',
     'error.tutorialFromHere': 'Vous ne pouvez pas prendre le large depuis ici.',
-    'error.tutorialOutleveled': "Le Rivage de l'Épreuve n'a plus rien à vous apprendre.",
     'error.passingStoneCold':
       "La pierre est froide. L'Instructrice Maren ne vous a pas demandé cela.",
     'error.vendorQuestGated': 'Cet objet ne vous est pas encore proposé à la vente.',
@@ -2856,7 +2850,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.passingStoneKneel':
       'Vous refermez la main sur la Pierre de trépas, et le rivage vous laisse partir.',
     'error.tutorialFromHere': 'Vous ne pouvez pas prendre le large depuis ici.',
-    'error.tutorialOutleveled': "Le Rivage de l'Épreuve n'a plus rien à vous apprendre.",
     'error.passingStoneCold':
       "La pierre est froide. L'Instructrice Maren ne vous a pas demandé cela.",
     'error.vendorQuestGated': 'Cet objet ne vous est pas encore proposé à la vente.',
@@ -3391,7 +3384,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.provingEnter': 'The ferry bell tolls, and the Proving Shore rises to meet you.',
     'log.provingLeave': 'The crossing takes hold, and Eastbrook Vale spreads out before you.',
     'error.tutorialFromHere': 'You cannot set sail from here.',
-    'error.tutorialOutleveled': 'The Proving Shore has nothing left to teach you.',
     'log.passingStoneKneel': 'You close your hand on the Passing Stone, and the shore lets you go.',
     'error.passingStoneCold': 'The stone is cold. Instructor Maren has not asked this of you.',
     'log.longWalkCorpse': 'You are whole again, and you found your own way back.',
@@ -3593,7 +3585,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.passingStoneKneel':
       'Chiudi la mano sulla Pietra del trapasso, e la riva ti lascia andare.',
     'error.tutorialFromHere': 'Non puoi salpare da qui.',
-    'error.tutorialOutleveled': 'La Riva della Prova non ha più nulla da insegnarti.',
     'error.passingStoneCold': "La pietra è fredda. L'Istruttrice Maren non te lo ha chiesto.",
     'error.vendorQuestGated': "Quell'oggetto non è ancora in vendita per te.",
     'error.arenaMinLevel': "Devi essere di livello {level} per metterti in coda per l'arena.",
@@ -4110,7 +4101,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.passingStoneKneel':
       'Du schließt deine Hand um den Übergangsstein, und die Küste lässt dich ziehen.',
     'error.tutorialFromHere': 'Von hier aus kannst du nicht in See stechen.',
-    'error.tutorialOutleveled': 'Die Bewährungsküste hat dir nichts mehr beizubringen.',
     'error.passingStoneCold':
       'Der Stein ist kalt. Ausbilderin Maren hat dies nicht von dir verlangt.',
     'error.vendorQuestGated': 'Diesen Gegenstand kannst du noch nicht kaufen.',
@@ -4631,7 +4621,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   zh_CN: {
     'log.passingStoneKneel': '你的手合拢在往生石上，海滨这才放你离去。',
     'error.tutorialFromHere': '你无法从这里扬帆起航。',
-    'error.tutorialOutleveled': '试炼之滨已经没有什么能再教你的了。',
     'error.passingStoneCold': '石头是凉的。教官玛伦并未要求你这么做。',
     'error.vendorQuestGated': '这件物品暂时还不卖给你。',
     'error.arenaMinLevel': '你必须达到等级 {level} 才能加入竞技场队列。',
@@ -5180,7 +5169,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   zh_TW: {
     'log.passingStoneKneel': '你的手握住了往生石，海濱終於放你離去。',
     'error.tutorialFromHere': '你無法從這裡揚帆出海。',
-    'error.tutorialOutleveled': '試煉之濱已經沒有什麼能再教你的了。',
     'error.passingStoneCold': '石頭是冷的。教官瑪倫並未要求你這麼做。',
     'error.vendorQuestGated': '這件物品目前還不能賣給你。',
     'error.arenaMinLevel': '你必須達到等級 {level} 才能加入競技場佇列。',
@@ -5729,7 +5717,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   ko_KR: {
     'log.passingStoneKneel': '안식의 돌을 손에 쥐자, 해안이 당신을 놓아줍니다.',
     'error.tutorialFromHere': '여기서는 출항할 수 없습니다.',
-    'error.tutorialOutleveled': '수련의 해안은 더 이상 당신에게 가르칠 것이 없습니다.',
     'error.passingStoneCold': '돌이 차갑습니다. 교관 마렌은 당신에게 이것을 요구하지 않았습니다.',
     'error.vendorQuestGated': '그 아이템은 아직 당신에게 판매되지 않습니다.',
     'error.arenaMinLevel': '투기장 대기열에 참가하려면 레벨 {level} 이상이어야 합니다.',
@@ -6291,7 +6278,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   ja_JP: {
     'log.passingStoneKneel': 'たましいの石を握りしめると、渚がその手を解き放つ。',
     'error.tutorialFromHere': 'ここから出航することはできません。',
-    'error.tutorialOutleveled': '修練の浜には、もう教えることは何も残っていません。',
     'error.passingStoneCold': 'その石は冷たいままです。教官マレンはまだそれを求めていません。',
     'error.vendorQuestGated': 'そのアイテムはまだあなたには売り物ではありません。',
     'error.arenaMinLevel': 'アリーナのキューに参加するにはレベル{level}が必要です。',
@@ -6864,7 +6850,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.passingStoneKneel':
       'Você fecha a mão sobre a Pedra de Passagem, e a praia deixa você partir.',
     'error.tutorialFromHere': 'Você não pode zarpar daqui.',
-    'error.tutorialOutleveled': 'A Costa da Provação não tem mais nada a te ensinar.',
     'error.passingStoneCold': 'A pedra está fria. A Instrutora Maren não pediu isso de você.',
     'error.vendorQuestGated': 'Esse item ainda não está à venda para você.',
     'error.arenaMinLevel': 'Você precisa ser nível {level} para entrar na fila da arena.',
@@ -7375,7 +7360,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   ru_RU: {
     'log.passingStoneKneel': 'Вы сжимаете в ладони Камень Ухода, и берег отпускает вас.',
     'error.tutorialFromHere': 'Вы не можете отплыть отсюда.',
-    'error.tutorialOutleveled': 'Берегу Испытаний больше нечему вас научить.',
     'error.passingStoneCold': 'Камень холоден. Наставница Марен не просила вас об этом.',
     'error.vendorQuestGated': 'Этот предмет пока не продаётся вам.',
     'error.arenaMinLevel': 'Чтобы встать в очередь на арену, нужен {level} уровень.',
@@ -7953,7 +7937,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   cs_CZ: {
     'log.passingStoneKneel': 'Sevřeš dlaň kolem Kamene přechodu a pobřeží tě pouští.',
     'error.tutorialFromHere': 'Odsud nemůžeš vyplout.',
-    'error.tutorialOutleveled': 'Zkušební pobřeží tě už nemá co naučit.',
     'error.passingStoneCold': 'Kámen je studený. Instruktorka Maren tě o tohle nepožádala.',
     'error.vendorQuestGated': 'Tento předmět ti zatím není na prodej.',
     'error.arenaMinLevel': 'Musíš být na úrovni {level}, abys se mohl(a) zařadit do fronty arény.',
@@ -8144,7 +8127,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   nl_NL: {
     'log.passingStoneKneel': 'Je sluit je hand om de Doorgangssteen, en het strand laat je gaan.',
     'error.tutorialFromHere': 'Je kunt hier niet uitvaren.',
-    'error.tutorialOutleveled': 'De Beproevingskust heeft je niets meer te leren.',
     'error.passingStoneCold': 'De steen is koud. Instructeur Maren heeft je dit niet gevraagd.',
     'error.vendorQuestGated': 'Dat voorwerp is nog niet te koop voor jou.',
     'error.arenaMinLevel':
@@ -8340,7 +8322,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   pl_PL: {
     'log.passingStoneKneel': 'Zaciskasz dłoń na Kamieniu Przejścia, a wybrzeże pozwala ci odejść.',
     'error.tutorialFromHere': 'Nie możesz stąd podnieść żagli.',
-    'error.tutorialOutleveled': 'Wybrzeże Prób nie ma cię już czego nauczyć.',
     'error.passingStoneCold': 'Kamień jest zimny. Instruktorka Maren nie prosiła cię o to.',
     'error.vendorQuestGated': 'Ten przedmiot nie jest jeszcze dla ciebie na sprzedaż.',
     'error.arenaMinLevel': 'Musisz mieć poziom {level}, aby dołączyć do kolejki na arenę.',
@@ -8536,8 +8517,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.passingStoneKneel':
       'Kamu menggenggam Batu Pelepasan itu, dan pesisir ini melepaskanmu pergi.',
     'error.tutorialFromHere': 'Kamu tidak bisa berlayar dari sini.',
-    'error.tutorialOutleveled':
-      'Pesisir Pembuktian tidak punya apa pun lagi untuk diajarkan padamu.',
     'error.passingStoneCold': 'Batu itu dingin. Instruktur Maren belum memintamu melakukan ini.',
     'error.vendorQuestGated': 'Barang itu belum dijual untukmu.',
     'error.arenaMinLevel': 'Kamu harus level {level} untuk mengantre ke arena.',
@@ -8731,7 +8710,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.passingStoneKneel':
       "Elini Geçiş Taşı'nın üzerine kapatırsın, ve kıyı seni serbest bırakır.",
     'error.tutorialFromHere': 'Buradan yelken açamazsın.',
-    'error.tutorialOutleveled': "Sınav Kıyısı'nın sana öğretecek bir şeyi kalmadı.",
     'error.passingStoneCold': 'Taş soğuk. Eğitmen Maren senden bunu istemedi.',
     'error.vendorQuestGated': 'O eşya henüz sana satılık değil.',
     'error.arenaMinLevel': 'Arena sırasına girmek için {level}. seviyeye ulaşmalısın.',
@@ -8921,7 +8899,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   sv_SE: {
     'log.passingStoneKneel': 'Du sluter handen om Övergångsstenen, och stranden släpper dig.',
     'error.tutorialFromHere': 'Du kan inte sätta segel härifrån.',
-    'error.tutorialOutleveled': 'Prövostranden har inget mer att lära dig.',
     'error.passingStoneCold': 'Stenen är kall. Instruktör Maren har inte bett dig om detta.',
     'error.vendorQuestGated': 'Det föremålet är inte till salu för dig ännu.',
     'error.arenaMinLevel': 'Du måste vara nivå {level} för att köa till arenan.',
@@ -9114,7 +9091,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   vi_VN: {
     'log.passingStoneKneel': 'Bạn siết chặt tay quanh Đá Từ Trần, và bờ biển để bạn ra đi.',
     'error.tutorialFromHere': 'Bạn không thể ra khơi từ đây.',
-    'error.tutorialOutleveled': 'Bờ Biển Thử Thách không còn gì để dạy bạn nữa.',
     'error.passingStoneCold': 'Viên đá lạnh ngắt. Giáo Quan Maren chưa yêu cầu bạn làm điều này.',
     'error.vendorQuestGated': 'Vật phẩm đó chưa được bán cho bạn.',
     'error.arenaMinLevel': 'Bạn phải đạt cấp {level} để xếp hàng vào đấu trường.',
@@ -9306,7 +9282,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   da_DK: {
     'log.passingStoneKneel': 'Du lukker hånden om Hvilestenen, og kysten lader dig gå.',
     'error.tutorialFromHere': 'Du kan ikke sætte sejl herfra.',
-    'error.tutorialOutleveled': 'Prøvestranden har intet tilbage at lære dig.',
     'error.passingStoneCold': 'Stenen er kold. Instruktør Maren har ikke bedt dig om dette.',
     'error.vendorQuestGated': 'Den genstand er endnu ikke til salg for dig.',
     'error.arenaMinLevel': 'Du skal være niveau {level} for at stille dig i kø til arenaen.',

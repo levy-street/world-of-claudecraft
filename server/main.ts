@@ -3795,14 +3795,7 @@ export async function startServer(): Promise<http.Server> {
     maxPlayersPerRealm: config.maxPlayersPerRealm,
     acquireCharacterLease,
     releaseCharacterLease,
-    bankBonusForAccount: async (id) => {
-      // One round trip serves both fresh-join account facts: the entitlement
-      // inputs and the tutorial greeting's character count (PR #3467 review:
-      // a separate characterCountForAccount await lengthened every handshake
-      // for a fact only newborn characters use).
-      const facts = await bankBonusFactsForAccount(id);
-      return { ...computeBankBonus(facts), characterCount: facts.characterCount };
-    },
+    bankBonusForAccount: async (id) => computeBankBonus(await bankBonusFactsForAccount(id)),
   });
   wsAuth.attachUpgrade(server, wss);
 

@@ -1615,7 +1615,9 @@ export function handleDeath(
           : null;
     const meta = creditId !== null ? ctx.players.get(creditId) : null;
     const creditEntity = creditId !== null ? ctx.entities.get(creditId) : null;
-    const rewardInstance = claimedInstanceForMob(ctx, e.id);
+    // Resolve the owning claim once for corpse participation and both reward
+    // awarders below; the slot remains stable throughout this death path.
+    const claimedInst = claimedInstanceForMob(ctx, e.id);
     let heroicRewardRecipients: PlayerMeta[] = [];
     if (meta && creditEntity && !meta.leaving) {
       const tmpl = MOBS[e.templateId];
@@ -1640,7 +1642,7 @@ export function handleDeath(
           const matchingInstanceCorpse =
             mE?.ghost &&
             mE.corpsePos &&
-            (!rewardInstance || mE.corpseInstanceId === rewardInstance.exitId)
+            (!claimedInst || mE.corpseInstanceId === claimedInst.exitId)
               ? mE.corpsePos
               : null;
           const participationPos = matchingInstanceCorpse ?? mE?.pos;
@@ -1758,12 +1760,6 @@ export function handleDeath(
     // even without player credit so the owning group cannot dodge the lockout;
     // only the participation snapshot above receives marks.
     lockNormalDungeonResetOnBossKill(ctx, e);
-    // THE ONE claimed-instance resolution for this death (Phase 18 dedupe):
-    // both award arms below take it instead of re-running the mobIds scan.
-    // Nothing between the two calls can free the slot or move the mob's claim
-    // (the settles above and below only mutate the found slot in place), so
-    // the shared resolution answers exactly what each arm's own scan did.
-    const claimedInst = claimedInstanceForMob(ctx, e.id);
     ctx.awardHeroicMarks(e, heroicRewardRecipients, claimedInst);
     // A bossExitPortal dungeon opens its far-end exit the moment the final
     // boss falls (both difficulties; no-op everywhere else).

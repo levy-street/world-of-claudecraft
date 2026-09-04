@@ -248,11 +248,6 @@ export const ENTITY_EXCLUDE: ReadonlySet<string> = new Set([
 // drift and large nested blobs while their inputs stay pinned.
 export const META_EXCLUDE: ReadonlySet<string> = new Set([
   'characterId', // DB id; not sim-deterministic offline
-  // Server-supplied account fact (ws_auth's fresh-join stamp for the tutorial
-  // greeting), documented transient on PlayerMeta: never serialized, recomputed
-  // at every join. The characterId/bankBonusSources class: the two hosts must
-  // not digest an account-table readout.
-  'firstCharacter',
   'name', // identity
   'skin', // appearance
   'skinCatalog',

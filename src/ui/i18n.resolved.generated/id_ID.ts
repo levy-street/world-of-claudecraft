@@ -1040,11 +1040,6 @@ export const id_ID: EnTranslations = {
       "clearArmed": "Ketuk slot untuk mengosongkannya."
     },
     "tutorialGreeting": {
-      "bodyFirst": "Aku belum pernah melihatmu di sekitar sini sebelumnya, kawan. Sudah jadi tradisi di tanah ini bagi mereka yang memulai petualangan untuk mengunjungi Pesisir Pembuktian, sebuah pulau tenang di seberang selat. Di sana kamu bisa mengasah kemampuanmu dan membiasakan diri dengan dunia ini sebelum menghadapi tantangannya. Feri berlayar dua arah, dan tak seorang pun akan memandang rendah dirimu, apa pun pilihanmu.",
-      "bodyRefresher": "Kembali lagi dengan wajah baru, ya? Kalau begitu kamu sudah tahu cara kerjanya. Tapi, kalau kamu ingin mengingat-ingat dulu sebelum berangkat, Pesisir Pembuktian tak pernah menolak murid yang kembali, dan feri sudah siap kapan pun kamu mau.",
-      "play": "Ikuti Tutorial",
-      "skip": "Lewati Tutorial",
-      "declineNote": "Terserah kamu, kawan. Jika suatu saat kamu berubah pikiran, lonceng feri di dekat kotak surat Pos Gagak akan menyeberangkanmu ke Pesisir Pembuktian kapan saja, siang maupun malam. Ia akan tetap ada di sana, entah para serigala sedang berkeliaran atau tidak.",
       "bellHomeNote": "Sudah kembali dari pesisir? Itu tadi lonceng feri yang kamu bunyikan. Kembarnya tergantung persis di sana, dekat kotak surat Pos Gagak: bunyikan kapan saja dan penyeberangan itu akan membawamu kembali ke Pesisir Pembuktian. Tak ada ruginya, bagaimanapun jadinya.",
       "islandArrivalNote": "Selamat datang di Pesisir Pembuktian. Penjaga Tam sedang menunggu tak jauh di sepanjang pantai: temuilah dia.",
       "noteClose": "Mengerti"
@@ -3705,7 +3700,6 @@ export const id_ID: EnTranslations = {
         "feast_active": "Your feast is already set out.",
         "feast_expired": "That feast is gone.",
         "feast_finished": "That feast has been picked clean.",
-        "feast_range": "You are too far from the feast.",
         "feast_eaten": "You have already eaten from that feast."
       },
       "feastTitle": "{name}'s Harvest Feast",

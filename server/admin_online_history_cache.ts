@@ -27,7 +27,7 @@
 // missing-export error rather than anywhere near the change. The duplication
 // that buys is not left on trust: `cacheKeyForRange` and admin_db's
 // `cleanOnlineHistoryRange` are asserted to agree over a corpus of real,
-// junk, empty and case-variant inputs in tests/server/admin_analytics_reads.ts,
+// junk, empty and case-variant inputs in tests/server/admin_analytics_reads.test.ts,
 // so a drift in either one reds instead of quietly serving one range's numbers
 // under another range's key.
 //

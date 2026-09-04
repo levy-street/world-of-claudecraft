@@ -1040,11 +1040,6 @@ export const sv_SE: EnTranslations = {
       "clearArmed": "Tryck på en plats för att rensa den."
     },
     "tutorialGreeting": {
-      "bodyFirst": "Jag har inte sett dig här förut, min vän. Det är tradition i dessa trakter att den som ger sig ut på sitt äventyr besöker Prövostranden, en stillsam ö utanför sundet. Där kan du slipa dina färdigheter och vänja dig vid världen innan du tar dig an dess prövningar. Färjan går åt båda hållen, och ingen kommer att tänka sämre om dig oavsett vad du väljer.",
-      "bodyRefresher": "Tillbaka igen med ett nytt ansikte, är du? Då vet du hur det här går till. Men om du ändå vill friska upp minnet innan du ger dig av, avvisar Prövostranden aldrig en återvändande elev, och färjan är redo när du är det.",
-      "play": "Starta handledningen",
-      "skip": "Hoppa över handledningen",
-      "declineNote": "Som du vill, min vän. Skulle du någonsin ändra dig, så för färjeklockan vid Korppostens brevlåda dig över till Prövostranden när som helst, dag som natt. Den finns kvar här när vargarna inte gör det.",
       "bellHomeNote": "Redan tillbaka från stranden? Det var färjeklockan du ringde i. Dess tvilling hänger där borta vid Korppostens brevlåda: ring i den när som helst, så bär överfarten dig tillbaka till Prövostranden. Ingen skada skedd, hur du än väljer.",
       "islandArrivalNote": "Välkommen till Prövostranden. Väktaren Tam väntar strax uppe på stranden: gå och hälsa på honom.",
       "noteClose": "Förstått"
@@ -3705,7 +3700,6 @@ export const sv_SE: EnTranslations = {
         "feast_active": "Your feast is already set out.",
         "feast_expired": "That feast is gone.",
         "feast_finished": "That feast has been picked clean.",
-        "feast_range": "You are too far from the feast.",
         "feast_eaten": "You have already eaten from that feast."
       },
       "feastTitle": "{name}'s Harvest Feast",

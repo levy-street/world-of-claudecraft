@@ -1,8 +1,8 @@
-// Farming's server-side wire surface: the three command bodies (plant_crop,
-// harvest_crop, convert_husks) and the fplot self-snapshot row, both
-// extracted whole from server/game.ts at the v0.38.0 release sync (the
-// monolith-ratchet heal). The `case 'X':` labels stay in game.ts: the
-// command-schema suite scans that switch for the dispatch universe, and the
+// Farming wire surface: the farming and feast command bodies (plant_crop,
+// harvest_crop, convert_husks, place_feast, consume_feast) plus the fplot
+// self-snapshot row. All were extracted whole from server/game.ts during the
+// v0.38.0 release sync to heal the monolith ratchet. The case labels stay
+// in game.ts. The command-schema suite scans that switch for the dispatch universe, and the
 // labels ARE the protocol surface. This module owns the frame guards and the
 // fplot gating doctrine; the sim stays the single definition of legality.
 
@@ -94,19 +94,20 @@ export function dispatchFarmingCommand(
       // count, its expiry, and the one-active-feast-per-placer rule all
       // resolve sim-side (src/sim/professions/feast.ts) from the sender's own
       // bags and the live feast table, so nothing on this frame decides an
-      // outcome. The one field it carries is `slot`, WHICH bag copy to spend:
-      // a TYPE boundary only (a non-negative integer), because the sim
-      // re-resolves the index against its own inventory and answers a
-      // mismatch with farmDenied 'no_feast'. An absent or malformed slot
-      // falls through to the id-only walk, which is the command's original
-      // meaning and what the Phase 11k pin holds. Every refusal answers with
-      // the pid-scoped text-free farmDenied event.
-      sim.placeFeast(
-        pid,
-        typeof msg.slot === 'number' && Number.isInteger(msg.slot) && msg.slot >= 0
-          ? msg.slot
-          : undefined,
-      );
+      // outcome. The one optional field it carries is slot, WHICH bag copy to
+      // spend: a TYPE boundary only (a non-negative integer), because the sim
+      // re-resolves the index against its own inventory and answers a mismatch
+      // with farmDenied no_feast. Omission keeps the original id-only meaning;
+      // a present malformed value refuses the frame instead of being laundered
+      // into omission. Every sim refusal answers with a pid-scoped text-free
+      // farmDenied event.
+      if (
+        msg.slot !== undefined &&
+        (typeof msg.slot !== 'number' || !Number.isInteger(msg.slot) || msg.slot < 0)
+      ) {
+        return false;
+      }
+      sim.placeFeast(pid, msg.slot as number | undefined);
       return true;
     case 'consume_feast':
       // The shared feast's eat verb: the feast ENTITY id and nothing else.

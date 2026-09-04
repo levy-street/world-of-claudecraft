@@ -1234,7 +1234,6 @@ const profEnchanting = {
   // takes hold only on a Perfected copy, a fact the prose alone used to carry.
   enchants: Object.values(ENCHANTS).map((e) => ({
     id: e.id,
-    name: e.name,
     slot: e.itemSlot,
     tier: enchantTier(e),
     skillReq: e.skillReq ?? 0,
@@ -1352,10 +1351,8 @@ const provisioningLines = [...supplyByFamily.entries()]
   .map(([id, ids]) => ({
     id,
     materials: [...ids]
-      .filter((itemId) => cookingDemand.has(itemId))
-      .map((itemId) => ITEMS[itemId]?.name)
-      .filter((name) => typeof name === 'string')
-      .sort(),
+      .filter((itemId) => cookingDemand.has(itemId) && typeof ITEMS[itemId]?.name === 'string')
+      .sort((a, b) => ITEMS[a].name.localeCompare(ITEMS[b].name)),
   }))
   .filter((line) => line.materials.length > 0);
 
@@ -1368,8 +1365,7 @@ for (const recipe of cookingRecipes) {
   if (!provisioningLadderMap.has(rung)) provisioningLadderMap.set(rung, []);
   const def = ITEMS[recipe.resultItemId];
   provisioningLadderMap.get(rung).push({
-    name: def?.name ?? recipe.resultItemId,
-    quality: def?.quality ?? 'common',
+    itemId: recipe.resultItemId,
     // A placeable feast is not eaten from bags, and the ladder reads wrong
     // without saying so.
     placeable: !!(def && 'feast' in def && def.feast),
@@ -1387,7 +1383,9 @@ const provisioningLadder = [...provisioningLadderMap.entries()]
   .sort((a, b) => a[0] - b[0])
   .map(([skillReq, outputs]) => ({
     skillReq,
-    outputs: outputs.sort((a, b) => a.name.localeCompare(b.name)),
+    outputs: outputs.sort((a, b) =>
+      (ITEMS[a.itemId]?.name ?? a.itemId).localeCompare(ITEMS[b.itemId]?.name ?? b.itemId),
+    ),
   }));
 
 const profProvisioning = { lines: provisioningLines, ladder: provisioningLadder };
@@ -1684,7 +1682,6 @@ export interface GuideProfEnchanting {
   };
   enchants: {
     id: string;
-    name: string;
     slot: string;
     tier: 'base' | 'runed' | 'greater' | 'lucent';
     skillReq: number;
@@ -1742,13 +1739,13 @@ export interface GuideProfStation {
 
 export interface GuideProfStations { radius: number; stations: GuideProfStation[]; }
 
-/** One gathering line's contribution to the kitchen: the materials it supplies
- *  that cooking bills actually ask for, by English item name. */
+/** One gathering line's contribution to the kitchen: item ids for the
+ * materials its cooking bills actually ask for. */
 export interface GuideProfProvisioningLine { id: string; materials: string[]; }
 /** One rung of cooking's ladder and the outputs it teaches. */
 export interface GuideProfProvisioningRung {
   skillReq: number;
-  outputs: { name: string; quality: string; placeable: boolean; station: boolean }[];
+  outputs: { itemId: string; placeable: boolean; station: boolean }[];
 }
 export interface GuideProfProvisioning {
   lines: GuideProfProvisioningLine[];

@@ -9448,7 +9448,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.denied.feast_active': '你的盛宴已经摆出了。',
   'hudChrome.farming.denied.feast_expired': '那桌盛宴已经不在了。',
   'hudChrome.farming.denied.feast_finished': '那桌盛宴已被吃光。',
-  'hudChrome.farming.denied.feast_range': '你离盛宴太远了。',
   'hudChrome.farming.denied.feast_eaten': '你已经吃过那桌盛宴了。',
   'hudChrome.farming.feastTitle': '{name}的丰收盛宴',
   'hudChrome.farming.stonepotFeastTitle': '{name}的石锅盛宴',
@@ -14143,14 +14142,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.report.status.critical': '严重',
   'hudChrome.perf.diagnostics.report.status.needsAttention': '需要注意',
   // The Proving Shore (tutorial island) + the spawn greeting dialog.
-  'hudChrome.tutorialGreeting.bodyFirst':
-    '这张面孔我可没见过，朋友。在这片土地上，初次踏上冒险之路的人照传统都会去试炼之滨走一趟，那是海峡对面的一座安静小岛。在那里你可以先磨练身手、熟悉这个世界，再去迎接它的挑战。渡船来回都通，去或不去都没人会小看你。',
-  'hudChrome.tutorialGreeting.bodyRefresher':
-    '又换了一副新面孔回来了？那你知道该怎么做。不过，出发前若想温习一遍，试炼之滨从不拒绝回炉的学生，渡船随时候着你。',
-  'hudChrome.tutorialGreeting.play': '进行新手教学',
-  'hudChrome.tutorialGreeting.skip': '跳过新手教学',
-  'hudChrome.tutorialGreeting.declineNote':
-    '随你的意，朋友。哪天改了主意，鸦邮信箱旁的渡船铃随时都能送你去试炼之滨，不分昼夜。狼群不等人，它等。',
   'hudChrome.tutorialGreeting.bellHomeNote':
     '这么快就从海滨回来了？你刚才敲响的正是渡船铃。它的孪生兄弟就挂在那边鸦邮信箱旁：想回试炼之滨，随时敲响它，渡航就会送你过去。敲错了也不打紧。',
   'hudChrome.tutorialGreeting.islandArrivalNote':

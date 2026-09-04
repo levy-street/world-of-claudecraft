@@ -157,7 +157,6 @@ export const IWORLD_MEMBERS = [
   { name: 'setTownFocus', kind: 'method' },
   { name: 'acceptQuest', kind: 'method' },
   { name: 'turnInQuest', kind: 'method' },
-  { name: 'startTutorial', kind: 'method' },
   { name: 'reportTelemetry', kind: 'method' },
   { name: 'abandonQuest', kind: 'method' },
   { name: 'acceptLinkedQuest', kind: 'method' },
@@ -707,7 +706,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // New Eastbrook program
     // retires the Vale Cup facet (docs/design/eastbrook-revamp/master-plan.md),
     // removing cupInfo (data) plus the cup methods, and the tutorial greeting
-    // adds startTutorial (IWorldQuests, a method). The merged tree carries
+    // added the now-retired tutorial ferry member. The merged tree carries
     // both arms.
     // The bank-storage arm's own narrative from the same 323 point, kept
     // whole: the release branch's Materials Vault adds one
@@ -728,8 +727,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // a run on the MERGED tree, never reconciled by arithmetic across a merge.
     // The release arm then retires the Vale Cup facet with the New Eastbrook
     // program (cupInfo plus the cup methods leave), adds guildRoster
-    // (IWorldProgressionXp, a method) for the signpost guild board, and adds
-    // startTutorial (IWorldQuests, a method) for the tutorial greeting. Both
+    // (IWorldProgressionXp, a method) for the signpost guild board, and added
+    // the now-retired tutorial ferry member. Both
     // arms land in the merged tree and the totals below are read off a run on
     // it, never reconciled by arithmetic across a merge.
     // The PR 3676 arm's ground-aim landing preview adds groundAimPlacementPreview
@@ -752,7 +751,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // arithmetic in the diff.
     // The v0.41.0 sync composes a SEVENTH time and CONFLICTED again: the
     // release read 323 (85 data, 238 method) on its own after retiring the
-    // Vale Cup facet and adding guildRoster and startTutorial; ours read 333
+    // Vale Cup facet and adding guildRoster and the now-retired tutorial ferry
+    // member; ours read 333
     // (88, 245). The merged tree carries both arms: every farming and
     // Masterwrought member plus the release's two new methods, minus the
     // whole vale_cup facet: 332 members, 87 data, 245 method. Set from a
@@ -777,10 +777,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // tree carries both arms, ours plus the release's eight further adds
     // (six data, two method; no overlap, no kind flips): 354 members, 97
     // data, 257 method. Set from a suite run on the merged tree, never by
-    // arithmetic in the diff.
-    expect(IWORLD_MEMBERS.length).toBe(354);
+    // arithmetic in the diff. This cleanup removes that retired ferry method:
+    // 353 members, 97 data, 256 methods.
+    expect(IWORLD_MEMBERS.length).toBe(353);
     expect(DATA_MEMBERS.length).toBe(97);
-    expect(METHOD_MEMBERS.length).toBe(257);
+    expect(METHOD_MEMBERS.length).toBe(256);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -1103,7 +1104,6 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'spectating',
       'spinDailyReward',
       'startAutoAttack',
-      'startTutorial',
       'stationPlacements',
       'stopAutoAttack',
       'submitLootRoll',
@@ -1478,7 +1478,6 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'sortInventory',
       'spinDailyReward',
       'startAutoAttack',
-      'startTutorial',
       'stopAutoAttack',
       'submitLootRoll',
       'switchLoadout',
@@ -1719,7 +1718,6 @@ const FACET_QUESTS = [
   'turnInQuest',
   'abandonQuest',
   'acceptLinkedQuest',
-  'startTutorial',
 ] as const satisfies readonly (keyof IWorldQuests)[];
 type _ExhaustQuests = AssertNever<Exclude<keyof IWorldQuests, (typeof FACET_QUESTS)[number]>>;
 
@@ -2230,8 +2228,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(354);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(354);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(353);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(353);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);
