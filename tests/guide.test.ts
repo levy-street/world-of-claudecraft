@@ -164,6 +164,8 @@ import {
   WIELD_REQUIREMENT_BY_TIER,
 } from '../src/sim/professions/wield_gate';
 import {
+  ARENA_DAILY_TAPER_FLOOR_START,
+  ARENA_DAILY_TAPER_START,
   ARENA_LOSS_HONOR_SHARE,
   awardRankedArenaResultHonor,
   RANKED_ARENA_LOSS_HONOR,
@@ -5916,7 +5918,7 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     for (const kept of [
       'A ranked win pays Honor, the player versus player currency, and ',
       'Honor is meant to reward real matches: beating the same opponent or the same team again on the same day pays nothing further',
-      'a long winning day pays a little less per win as it goes on, and a match your opponent forfeits still moves your rating but pays no Honor at all.',
+      'and a match your opponent forfeits still moves your rating but pays no Honor at all.',
     ]) {
       expect(body).toContain(kept);
       expect(predecessor).toContain(kept);
@@ -5960,6 +5962,34 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
       RANKED_ARENA_LOSS_HONOR[format],
     );
     expect(body).toContain('(nor does losing to them again)');
+    // The taper: the predecessor's 'a little less per win' read as a trim, but
+    // arenaDailyMultiplier (src/sim/pvp/honor.ts) halves the award from
+    // ARENA_DAILY_TAPER_START wins, halves it again from
+    // ARENA_DAILY_TAPER_FLOOR_START, and holds there. Driven through the live
+    // module with a NEW opposing team every match, so the repeat curve never
+    // fires and only the daily taper moves the payout.
+    expect(body).toContain(
+      'a long winning day pays in full for its first stretch of wins and then halves what a win pays, halving it again deeper in and staying there',
+    );
+    expect(predecessor).toContain('a long winning day pays a little less per win as it goes on');
+    expect(ARENA_DAILY_TAPER_FLOOR_START).toBeGreaterThan(ARENA_DAILY_TAPER_START);
+    const taperMeta = fresh();
+    const paidWin = (index: number) =>
+      awardRankedArenaResultHonor(today, taperMeta, format, `team-${index}`, 'win');
+    const full = RANKED_ARENA_WIN_HONOR[format];
+    for (let i = 0; i < ARENA_DAILY_TAPER_START; i++) {
+      expect(paidWin(i), `win ${i + 1}`).toBe(full);
+    }
+    const halved = paidWin(ARENA_DAILY_TAPER_START);
+    expect(halved).toBe(Math.floor(full / 2));
+    for (let i = ARENA_DAILY_TAPER_START + 1; i < ARENA_DAILY_TAPER_FLOOR_START; i++) {
+      expect(paidWin(i), `win ${i + 1}`).toBe(halved);
+    }
+    const floored = paidWin(ARENA_DAILY_TAPER_FLOOR_START);
+    expect(floored).toBe(Math.floor(halved / 2));
+    // And it stays there: the next win pays the same again, never nothing.
+    expect(paidWin(ARENA_DAILY_TAPER_FLOOR_START + 1)).toBe(floored);
+    expect(floored).toBeGreaterThan(0);
   });
 
   it("guide.arenaPage.rewardsBodyLossShare: Honor's day is the realm's nightly reset, the daily lockout boundary (the wiki completeness audit)", () => {
@@ -6227,9 +6257,11 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     // Phase 20, the wiki completeness audit (2026-09-03). The predecessor
     // guide.social.finderBody let any member queue 'with the party you already
     // have' (dungeonFinderQueueJoin refuses everyone but the leader) and had a
-    // decline wait 'before the queue offers you another' (failProposal drops the
-    // decliner's unit and never re-queues it; the accepted units keep their
-    // place, pinned in tests/dungeon_finder.test.ts). The gate is driven live.
+    // decline wait 'before the queue offers you another' (failProposal drops every unit
+    // holding an offender and never re-queues it, so a premade mate who accepted loses their
+    // place alongside the offender, while the units with no offender return with their
+    // original joinedAt; both arms pinned in tests/dungeon_finder.test.ts). The gate is
+    // driven live.
     setLanguage('en');
     const html =
       pageFor('social')?.render({ params: [], sub: 'social', titleKey: 'guide.nav.social' }) ?? '';
@@ -6263,7 +6295,7 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     );
     expect(FINDER_DECLINE_COOLDOWN_SECONDS).toBeGreaterThan(0);
     expect(body).toContain(
-      'drops you, and any party you queued with, out of the queue and puts you on a short cooldown before you can join it again; everyone else in the offer keeps their place, so the line keeps moving.',
+      'drops you, and any party you queued with, out of the queue and puts you on a short cooldown before you can join it again; everyone else in the offer keeps their place, unless they did the same or queued with someone who did, so the line keeps moving.',
     );
     expect(body).not.toContain(String(FINDER_DECLINE_COOLDOWN_SECONDS));
     expect(body).not.toContain(String(FINDER_PROPOSAL_SECONDS));
@@ -6464,7 +6496,7 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
       stations: 'the crafting stations',
       services: 'mailboxes, noticeboards',
       farmPatches: 'garden beds',
-      portals: 'the travel portals',
+      portals: 'the dungeon entrances',
       gatherNodes: 'every gathering node in the zone',
       party: 'Your party shows on it too',
     };
