@@ -1,16 +1,18 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { apiGet } from '../api';
+  import { apiGet, apiPost } from '../api';
   import {
     readAutoRefreshPreference,
     writeAutoRefreshPreference,
   } from '../auto_refresh_preference';
   import AutoRefreshToggle from '../components/AutoRefreshToggle.svelte';
+  import ModerationActionPrompt from '../components/ModerationActionPrompt.svelte';
   import OnlineTable from '../components/OnlineTable.svelte';
   import Pager from '../components/Pager.svelte';
   import Panel from '../components/Panel.svelte';
   import { fmtNumber } from '../format';
-  import { adminLanguageTag, classLabel, t, zoneLabel } from '../i18n';
+  import { adminLanguageTag, classLabel, localizeAdminError, t, zoneLabel } from '../i18n';
+  import { kickPlayer } from '../moderation_actions';
   import {
     buildOnlinePlayersView,
     type OnlineSortColumn,
@@ -35,6 +37,14 @@
   let autoRefresh = $state(true);
   let mounted = $state(false);
   let requestId = 0;
+  // The Kick action: the row button picks the target, the prompt collects the
+  // reason, kickPlayer shapes the request, and the post lands after confirm. The
+  // button is hidden without moderation.act (presentation only, the server
+  // re-checks); the outcome line reports the server's answer either way, since
+  // the refreshed roster alone cannot tell a kick from a player who left.
+  let canKick = $derived(auth.can('moderation.act'));
+  let kickTarget = $state<LivePlayer | null>(null);
+  let kickOutcome = $state<string | null>(null);
 
   let view = $derived(
     buildOnlinePlayersView(players, {
@@ -76,6 +86,35 @@
     dir = sort === column && dir === 'asc' ? 'desc' : 'asc';
     sort = column;
     page = 1;
+  }
+
+  async function confirmKick(values: { reason: string }): Promise<void> {
+    const target = kickTarget;
+    if (!target) return;
+    const built = kickPlayer(target.accountId, target.name, values.reason);
+    if ('errorKey' in built) {
+      window.alert(t(built.errorKey));
+      return;
+    }
+    try {
+      await apiPost(built.pending.endpoint, built.pending.body);
+      kickOutcome = t('onlinePlayers.kicked', { name: target.name });
+      // Only a success closes the prompt (the AccountModerationActions rule): a
+      // refused or failed post keeps the typed reason in front of the operator.
+      kickTarget = null;
+    } catch (err) {
+      if (auth.handleAuthFailure(err)) return;
+      kickOutcome = t('onlinePlayers.kickFailed', {
+        name: target.name,
+        error: err instanceof Error ? localizeAdminError(err.message) : t('alert.actionFailed'),
+      });
+    }
+    void refresh();
+  }
+
+  function startKick(player: LivePlayer): void {
+    kickOutcome = null;
+    kickTarget = player;
   }
 
   function changeAutoRefresh(enabled: boolean): void {
@@ -131,6 +170,23 @@
       />
     </div>
   </div>
+  {#if kickOutcome}
+    <div class="kick-outcome" role="status">{kickOutcome}</div>
+  {/if}
+  {#if kickTarget}
+    <ModerationActionPrompt
+      title={t('dialog.confirmKick')}
+      rows={[
+        { label: t('dialog.character'), value: kickTarget.name },
+        { label: t('dialog.account'), value: `#${kickTarget.accountId}` },
+        { label: t('dialog.action'), value: t('dialog.actionKick') },
+      ]}
+      reasonPlaceholder={t('onlinePlayers.kickReasonPlaceholder')}
+      danger
+      onConfirm={confirmKick}
+      onCancel={() => (kickTarget = null)}
+    />
+  {/if}
   {#if failed}
     <div class="empty">{t('onlinePlayers.loadFailed')}</div>
   {:else if !loaded}
@@ -139,7 +195,24 @@
     <div class="empty">{t('onlinePlayers.filteredEmpty')}</div>
   {:else}
     <div class="table-scroll">
-      <OnlineTable players={view.rows} {sort} {dir} {onSort} />
+      <OnlineTable
+        players={view.rows}
+        {sort}
+        {dir}
+        {onSort}
+        onKick={canKick ? startKick : undefined}
+      />
     </div>
   {/if}
 </Panel>
+
+<style>
+  .kick-outcome {
+    margin-bottom: 12px;
+    padding: 8px 12px;
+    background: var(--control-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: 4px;
+    color: var(--text-bright);
+  }
+</style>

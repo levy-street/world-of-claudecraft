@@ -240,6 +240,13 @@ export const apiErrorStrings = {
     invalid_duration: 'Enter a mark duration of at least one second.',
     not_marked: 'That account is not marked.',
   },
+  // kick: the admin-panel kick of a live player (server/admin_kick_api.ts).
+  // Operator-facing copy: only the admin dashboard ever receives these codes.
+  kick: {
+    reason_required: 'A reason is required.',
+    admin_target: 'Operator accounts cannot be kicked.',
+    target_offline: 'That player is no longer online on this realm.',
+  },
   // woc_market: the config-gated $WOC Exchange family
   // (server/woc_market_routes.ts). USD-denominated auctions settled in $WOC;
   // every code here is a player-actionable refusal.

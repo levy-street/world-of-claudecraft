@@ -221,6 +221,15 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
     pattern: /^\/admin\/api\/moderation\/accounts\/(\d+)\/lift-cheater-mark$/,
     permission: 'moderation.act',
   },
+  // The admin-panel kick (server/admin_kick_api.ts): the dashboard twin of the
+  // in-game /kick, which the moderation service already gates on moderation.act
+  // (requiredCommandPermission), so the row states the same rule. Registry-only
+  // like the Cheater mark pair above, hence listed here by hand.
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/moderation\/accounts\/(\d+)\/kick$/,
+    permission: 'moderation.act',
+  },
   {
     method: 'POST',
     pattern: /^\/admin\/api\/moderation\/accounts\/(\d+)\/daily-rewards-(ban|unban)$/,

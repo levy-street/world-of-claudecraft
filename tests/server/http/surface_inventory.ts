@@ -1805,6 +1805,18 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: null,
     requireOwnedExpected: REQUIRE_OWNED.operator404,
   },
+  // The admin-panel kick (server/admin_kick_api.ts): registry-only like the
+  // Cheater mark pair, same shape, same REGISTRY_ONLY_PARAM_PATHS listing.
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'POST',
+    path: '/admin/api/moderation/accounts/:id/kick',
+    handler: 'server/admin.ts adminKickHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: REQUIRE_OWNED.operator404,
+  },
   {
     dispatcher: DISPATCH.admin,
     method: 'POST',

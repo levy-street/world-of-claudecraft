@@ -4752,6 +4752,11 @@ export const zh_TW: EnTranslations = {
       "invalid_duration": "標記時長至少須為 1 秒。",
       "not_marked": "該帳號未被標記。"
     },
+    "kick": {
+      "reason_required": "必須填寫原因。",
+      "admin_target": "管理員帳號無法被踢出。",
+      "target_offline": "該玩家已不在此伺服器上線。"
+    },
     "woc_market": {
       "invalid_input": "輸入無效。",
       "disabled": "本伺服器未開放 $WOC 交易所。",
@@ -8587,6 +8592,7 @@ export const zh_TW: EnTranslations = {
     "realmFull": "這個世界目前已滿，請於幾分鐘後再試。",
     "tooManyConnections": "您的網路對這個世界建立的連線過多。請關閉多餘的遊戲視窗，或於幾分鐘後再試。",
     "messageRateExceeded": "由於發送操作過快，您已中斷連線。請稍候片刻後重新登入。",
+    "kickedByModerator": "管理員已將您中斷連線：{reason}",
     "tips": {
       "classes": "提示：9 個職業玩法各不相同，投入之前不妨都試一試。",
       "talents": "提示：只要不在戰鬥中，隨時都能重置天賦，因此早期的選擇不會成為陷阱。",

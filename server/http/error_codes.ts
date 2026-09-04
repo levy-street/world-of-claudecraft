@@ -256,6 +256,21 @@ export const ERROR_CODES = deepFreeze({
   // A lift was asked for on an account that is not wearing the tag (409).
   'cheater_mark.not_marked': { params: [] },
 
+  // --- kick: the admin-panel kick of a live player (server/admin_kick_api.ts),
+  // the dashboard twin of the in-game /kick. A live-session effect only, so
+  // every code here is about the TARGET's state or standing, never account
+  // state. ---
+
+  // The audited reason was blank after trimming (400).
+  'kick.reason_required': { params: [] },
+  // The target account is an operator, and an operator cannot be kicked (400).
+  'kick.admin_target': { params: [] },
+  // The account has no live session on this realm process: the roster the
+  // operator clicked in is a snapshot, and the player left before the click
+  // landed. Answered BEFORE the audit write, so history never claims a
+  // disconnect that did not happen (409).
+  'kick.target_offline': { params: [] },
+
   // --- $WOC Exchange family codes (server/woc_market_routes.ts). The whole
   // surface is config-gated: with WOC_MARKET_ENABLED unset every mutating
   // route answers woc_market.disabled. ---

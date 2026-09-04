@@ -6,6 +6,7 @@ import {
   chatMuteCustom,
   chatMuteHours,
   forceRename,
+  kickPlayer,
   liftChatMute,
   moderateDailyRewardsIp,
   resetChatStrikes,
@@ -30,6 +31,20 @@ describe('moderation_actions', () => {
     expect(chatMuteHours(5, 1, '')).toEqual({ errorKey: 'alert.noteRequired' });
     expect(liftChatMute(5, '')).toEqual({ errorKey: 'alert.noteRequired' });
     expect(forceRename(9, 'Foo', '')).toEqual({ errorKey: 'alert.noteRequired' });
+    expect(kickPlayer(5, 'Foo', '')).toEqual({ errorKey: 'alert.noteRequired' });
+  });
+
+  it('builds a danger kick request against the ACCOUNT with the character as a row', () => {
+    const built = kickPlayer(42, 'Aragorn', 'AFK for two hours');
+    if (!('pending' in built)) throw new Error('expected pending');
+    expect(built.pending.endpoint).toBe('/admin/api/moderation/accounts/42/kick');
+    expect(built.pending.body).toEqual({ reason: 'AFK for two hours' });
+    expect(built.pending.danger).toBe(true);
+    // The row the operator clicked names the character; the request targets the
+    // account, since a kick tears down every session on it.
+    expect(built.pending.rows.map((row) => row.value)).toEqual(
+      expect.arrayContaining(['Aragorn', '#42', 'AFK for two hours']),
+    );
   });
 
   it('builds a suspend request with the right endpoint, reason, and future expiry', () => {

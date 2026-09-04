@@ -78,6 +78,13 @@ describe('admin route permission map', () => {
     expect(permissionForAdminRoute('POST', '/admin/api/accounts/42/general-chat-rate-limit')).toBe(
       'moderation.act',
     );
+    // The admin-panel kick is registry-only (no ladder regex for the scan above
+    // to find), so its row is pinned by hand: the same moderation.act the in-game
+    // /kick requires, and a POST only.
+    expect(permissionForAdminRoute('POST', '/admin/api/moderation/accounts/42/kick')).toBe(
+      'moderation.act',
+    );
+    expect(permissionForAdminRoute('GET', '/admin/api/moderation/accounts/42/kick')).toBeNull();
     expect(permissionForAdminRoute('GET', '/admin/api/blocked-ips')).toBe('moderation.read');
     expect(permissionForAdminRoute('GET', '/admin/api/moderation/history')).toBe('moderation.read');
     expect(permissionForAdminRoute('POST', '/admin/api/blocked-ips')).toBe('ipblocks.manage');
