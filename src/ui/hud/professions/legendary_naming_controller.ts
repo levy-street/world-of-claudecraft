@@ -158,11 +158,12 @@ export function openLegendaryNamingDialog(
   );
   const send = (): void => {
     const normalized = normalizeLegendaryName(input.value);
-    if (locked || normalized === null) return;
+    if (!open || locked || normalized === null) return;
     locked = true;
     prompt.setAttribute('aria-busy', 'true');
     refresh();
     opts.onSubmit(normalized);
+    if (!open) return;
     lockTimer = window.setTimeout(() => {
       lockTimer = null;
       locked = false;

@@ -19,6 +19,7 @@
 // through the facet, which is the seam render code reads plots on.
 import { farmGrowthStage } from '../sim/professions/farm_projection';
 import { FARM_FEAST_TEMPLATE_ID, feastTemplateIds } from '../sim/professions/feast';
+import type { Vec3 } from '../sim/types';
 import type { FarmPatchDef, FarmPlotView } from '../world_api/farming';
 
 /**
@@ -265,6 +266,22 @@ export function farmFeastModelUrl(templateId: string | null | undefined): string
   return typeof templateId === 'string' && APEX_FEAST_TEMPLATE_IDS.has(templateId)
     ? FARM_APEX_FEAST_MODEL_URL
     : FARM_FEAST_MODEL_URL;
+}
+
+/** A feast follows the WALKABLE surface normal (including floors and decks).
+ * Runtime rift lifts and standable props can sit above that height field;
+ * keep those tables upright instead of borrowing the terrain slope below.
+ * The tolerance allows the wire's position rounding at an ordinary seat. */
+export function farmFeastSurfaceNormal(
+  pos: Readonly<Vec3>,
+  groundAt: (x: number, z: number) => number,
+): Vec3 {
+  if (Math.abs(pos.y - groundAt(pos.x, pos.z)) > 0.05) return { x: 0, y: 1, z: 0 };
+  const step = 0.4;
+  const x = -(groundAt(pos.x + step, pos.z) - groundAt(pos.x - step, pos.z)) / (2 * step);
+  const z = -(groundAt(pos.x, pos.z + step) - groundAt(pos.x, pos.z - step)) / (2 * step);
+  const length = Math.hypot(x, 1, z);
+  return { x: x / length, y: 1 / length, z: z / length };
 }
 
 /** Both feast tables, for the preload sweep and the program anchors: every

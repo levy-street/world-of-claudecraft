@@ -1,8 +1,8 @@
 // The legendary-name strip core (server/clear_item_name.ts): target
 // validation (explicit-sweep, shape-bounded bag id), the blob region walk (the
 // rekeyInstanceSigner regions), and the runClearItemName endpoint body's
-// ordering contract (validate, offline, audit, load-strip, the pre-save
-// online re-check, save) over an injected deps bag. The RouteDef arm rides
+// ordering contract (validate, choose live/offline, audit, atomic strip)
+// over an injected deps bag. The RouteDef arm rides
 // the admin.test.ts rig ('phase 13 legendary-name strip' there).
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -10,6 +10,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { CHARACTER_SAVE_LEASED_LINE } from '../../server/character_save_statement';
 import {
   type ClearItemNameDeps,
+  type ClearItemNameOutcome,
   clearItemNameBodyError,
   clearItemNameTarget,
   describeClearItemNameTarget,
@@ -187,6 +188,20 @@ describe('clearItemNameBodyError / clearItemNameTarget', () => {
 });
 
 describe('stripLegendaryNames', () => {
+  it('strips a retired bagged item by its saved id while preserving an untargeted sibling', () => {
+    const retired = 'retired_masterwrought_blade_v1';
+    expect(Object.hasOwn(ITEMS, retired)).toBe(false);
+    const state = stateWith({
+      inventory: [
+        { itemId: 'wyrmfall_pendant', count: 1, instance: namedCopy('Keep') },
+        { itemId: retired, count: 1, instance: namedCopy('Strip') },
+      ],
+    });
+    expect(stripLegendaryNames(state, { kind: 'bag', bag: 1, itemId: retired })).toBe(1);
+    expect(state.inventory[1].instance?.name).toBeUndefined();
+    expect(state.inventory[0].instance?.name).toBe('Keep');
+  });
+
   it('a slot target strips the worn payload under BOTH equipment-map spellings', () => {
     const state = stateWith({
       equipmentInstance: { neck: namedCopy() },
@@ -248,37 +263,23 @@ describe('stripLegendaryNames', () => {
 
 describe('runClearItemName (the endpoint body over injected deps)', () => {
   function makeDeps(overrides: Partial<ClearItemNameDeps> = {}) {
-    const state = stateWith({
-      inventory: [{ itemId: 'wyrmfall_pendant', count: 1, instance: namedCopy() }],
-    });
-    const recordAudit = vi.fn(async () => ({ accountId: 9 }));
-    const saveCharacterState = vi.fn(async () => true);
     const deps: ClearItemNameDeps = {
-      characterOnline: () => false,
-      loadCharacter: vi.fn(async () => ({ level: 20, state })),
-      characterStateExists: vi.fn(async () => true),
-      saveCharacterState,
-      recordAudit,
+      characterOnline: vi.fn(() => false),
+      clearOfflineItemName: vi.fn(async () => ({ ok: true as const, cleared: 1 })),
+      recordAudit: vi.fn(async () => ({ accountId: 9 })),
       ...overrides,
     };
-    return { deps, state, recordAudit, saveCharacterState };
+    return {
+      deps,
+      recordAudit: vi.mocked(deps.recordAudit),
+      clearOfflineItemName: vi.mocked(deps.clearOfflineItemName),
+    };
   }
 
-  it('strips a bagged copy of a RETIRED id per-cell end to end', async () => {
-    // The validator's shape bound admits the id and the cell walk matches it
-    // by the persisted itemId, so a copy whose catalog record is gone is
-    // still remediable without the whole-character sweep.
+  it('forwards a retired bag item id to the atomic strip without requiring a live catalog entry', async () => {
     const retired = 'retired_masterwrought_blade_v1';
     expect(Object.hasOwn(ITEMS, retired)).toBe(false);
-    const state = stateWith({
-      inventory: [
-        { itemId: 'wyrmfall_pendant', count: 1, instance: namedCopy('Keep') },
-        { itemId: retired, count: 1, instance: namedCopy('Strip') },
-      ],
-    });
-    const { deps, recordAudit, saveCharacterState } = makeDeps({
-      loadCharacter: vi.fn(async () => ({ level: 20, state })),
-    });
+    const { deps, recordAudit, clearOfflineItemName } = makeDeps();
     const outcome = await runClearItemName(deps, {
       characterId: 5,
       adminAccountId: 7,
@@ -288,37 +289,47 @@ describe('runClearItemName (the endpoint body over injected deps)', () => {
     expect(recordAudit).toHaveBeenCalledWith(
       expect.objectContaining({ detail: `bag 1 ${retired}` }),
     );
-    expect(saveCharacterState).toHaveBeenCalledWith(5, 20, state);
-    expect(state.inventory[1].instance?.name).toBeUndefined();
-    expect(state.inventory[0].instance?.name).toBe('Keep');
+    expect(clearOfflineItemName).toHaveBeenCalledWith(5, {
+      kind: 'bag',
+      bag: 1,
+      itemId: retired,
+    });
   });
 
-  it('audits FIRST, then loads, strips, and saves the stripped blob', async () => {
-    const { deps, state, recordAudit, saveCharacterState } = makeDeps();
-    const outcome = await runClearItemName(deps, {
+  it('awaits the audit before starting the atomic offline strip', async () => {
+    let finishAudit!: () => void;
+    const auditPending = new Promise<void>((resolve) => {
+      finishAudit = resolve;
+    });
+    const { deps, recordAudit, clearOfflineItemName } = makeDeps({
+      recordAudit: vi.fn(() => auditPending),
+    });
+    const pending = runClearItemName(deps, {
       characterId: 5,
       adminAccountId: 7,
       body: { bag: 0, itemId: 'wyrmfall_pendant', reason: 'slur in the name' },
     });
-    expect(outcome).toEqual({ ok: true, cleared: 1 });
     expect(recordAudit).toHaveBeenCalledWith({
       characterId: 5,
       adminAccountId: 7,
       detail: 'bag 0 wyrmfall_pendant',
       reason: 'slur in the name',
     });
-    expect(saveCharacterState).toHaveBeenCalledWith(5, 20, state);
-    expect(state.inventory[0].instance?.name).toBeUndefined();
-    // A strip may never exist unaudited: the audit row precedes the save.
-    expect(recordAudit.mock.invocationCallOrder[0]).toBeLessThan(
-      saveCharacterState.mock.invocationCallOrder[0],
-    );
+    expect(clearOfflineItemName).not.toHaveBeenCalled();
+    finishAudit();
+    expect(await pending).toEqual({ ok: true, cleared: 1 });
+    expect(clearOfflineItemName).toHaveBeenCalledExactlyOnceWith(5, {
+      kind: 'bag',
+      bag: 0,
+      itemId: 'wyrmfall_pendant',
+    });
   });
 
-  it('refuses an ONLINE character before any audit write (the offline-writer doctrine)', async () => {
-    const { deps, recordAudit, saveCharacterState } = makeDeps({
+  it('refuses an online character without a live arm before auditing or starting an offline strip', async () => {
+    const { deps, recordAudit, clearOfflineItemName } = makeDeps({
       characterOnline: vi.fn(() => true),
     });
+    expect(deps.clearLiveItemName).toBeUndefined();
     const outcome = await runClearItemName(deps, {
       characterId: 5,
       adminAccountId: 7,
@@ -329,30 +340,20 @@ describe('runClearItemName (the endpoint body over injected deps)', () => {
       error: 'character is online on this realm; disconnect them first',
     });
     expect(recordAudit).not.toHaveBeenCalled();
-    expect(saveCharacterState).not.toHaveBeenCalled();
+    expect(clearOfflineItemName).not.toHaveBeenCalled();
   });
 
-  it('routes an ONLINE character to the live arm when one is bound, auditing first', async () => {
-    // The bucket-A live-session strip (the Phase 18 QA fix round). Nothing in
-    // the tree binds clearLiveItemName yet (the sim-side action is unlanded),
-    // so this drives the seam the sim half plugs into: with the member
-    // present, an online character is stripped IN THE SIM instead of refused,
-    // the persisted blob is never touched (a live session owns it and would
-    // clobber any write on its next autosave), and the audit row still
-    // precedes the effect.
+  it('routes an online character to the live arm when one is bound, auditing first', async () => {
     const clearLiveItemName = vi.fn(async () => ({ cleared: 2 }));
-    const { deps, recordAudit, saveCharacterState } = makeDeps({
+    const { deps, recordAudit, clearOfflineItemName } = makeDeps({
       characterOnline: () => true,
       clearLiveItemName,
     });
-    const loadCharacter = deps.loadCharacter as ReturnType<typeof vi.fn>;
-
     const outcome = await runClearItemName(deps, {
       characterId: 5,
       adminAccountId: 7,
       body: { all: true, reason: 'slur' },
     });
-
     expect(outcome).toEqual({ ok: true, cleared: 2 });
     expect(clearLiveItemName).toHaveBeenCalledWith(5, { kind: 'all' });
     expect(recordAudit).toHaveBeenCalledWith({
@@ -361,43 +362,15 @@ describe('runClearItemName (the endpoint body over injected deps)', () => {
       detail: 'all copies',
       reason: 'slur',
     });
-    // Audit before effect, the same no-effect-unaudited ordering as offline.
     expect(recordAudit.mock.invocationCallOrder[0]).toBeLessThan(
       clearLiveItemName.mock.invocationCallOrder[0],
     );
-    // The offline machinery stays entirely out of it: no blob read, no fenced
-    // write. A write here is the write loss the whole offline doctrine exists
-    // to prevent.
-    expect(loadCharacter).not.toHaveBeenCalled();
-    expect(saveCharacterState).not.toHaveBeenCalled();
+    expect(clearOfflineItemName).not.toHaveBeenCalled();
   });
 
-  it('keeps refusing an ONLINE character while NO live arm is bound', async () => {
-    // The tree's shipped behaviour, pinned so landing the seam cannot quietly
-    // change it: the deps member is optional, admin.ts injects nothing, and
-    // the refusal is byte-identical to the pre-seam line.
-    const { deps, recordAudit, saveCharacterState } = makeDeps({
-      characterOnline: () => true,
-    });
-    expect(deps.clearLiveItemName).toBeUndefined();
-
-    const outcome = await runClearItemName(deps, {
-      characterId: 5,
-      adminAccountId: 7,
-      body: { all: true, reason: 'slur' },
-    });
-
-    expect(outcome).toEqual({
-      ok: false,
-      error: 'character is online on this realm; disconnect them first',
-    });
-    expect(recordAudit).not.toHaveBeenCalled();
-    expect(saveCharacterState).not.toHaveBeenCalled();
-  });
-
-  it('reports the live arm finding nothing, and never falls back to the blob', async () => {
+  it('reports the live arm finding nothing and never falls back to the offline operation', async () => {
     const clearLiveItemName = vi.fn(async () => ({ cleared: 0 }));
-    const { deps, saveCharacterState } = makeDeps({
+    const { deps, clearOfflineItemName } = makeDeps({
       characterOnline: () => true,
       clearLiveItemName,
     });
@@ -407,64 +380,30 @@ describe('runClearItemName (the endpoint body over injected deps)', () => {
       body: { slot: 'neck', reason: 'slur' },
     });
     expect(outcome).toEqual({ ok: false, error: 'no named copy matched that target' });
-    expect(saveCharacterState).not.toHaveBeenCalled();
+    expect(clearOfflineItemName).not.toHaveBeenCalled();
   });
 
-  it('asks the operator to retry when the session leaves mid-strip, writing nothing', async () => {
-    // The live arm's own race: the session left between the online check and
-    // the sim action. Deliberately NOT a fall-through to the offline writer,
-    // which would land a second effect under the one audit row already
-    // written; the retry re-decides the arm honestly.
+  it('asks the operator to retry when the session leaves mid-strip without falling through', async () => {
     const clearLiveItemName = vi.fn(async () => 'offline' as const);
-    const { deps, recordAudit, saveCharacterState } = makeDeps({
+    const { deps, recordAudit, clearOfflineItemName } = makeDeps({
       characterOnline: () => true,
       clearLiveItemName,
     });
-    const loadCharacter = deps.loadCharacter as ReturnType<typeof vi.fn>;
-
     const outcome = await runClearItemName(deps, {
       characterId: 5,
       adminAccountId: 7,
       body: { all: true, reason: 'slur' },
     });
-
     expect(outcome).toEqual({
       ok: false,
       error: 'character went offline before the strip landed; retry',
     });
-    // The attempt is on the record, and nothing else happened.
     expect(recordAudit).toHaveBeenCalledTimes(1);
-    expect(loadCharacter).not.toHaveBeenCalled();
-    expect(saveCharacterState).not.toHaveBeenCalled();
+    expect(clearOfflineItemName).not.toHaveBeenCalled();
   });
 
-  it('re-checks online IMMEDIATELY before the save and refuses without writing (the login race)', async () => {
-    // The online check flips between the pre-check (false, so the strip
-    // proceeds) and the pre-save re-check (true: the character logged in
-    // mid-strip). The save must not land: the live session's autosave would
-    // clobber it anyway, so the refusal names the kick-and-retry flow. The
-    // audit row already recorded the REQUEST honestly ("requested" prose).
-    const online = vi
-      .fn(() => false)
-      .mockReturnValueOnce(false)
-      .mockReturnValue(true);
-    const { deps, recordAudit, saveCharacterState } = makeDeps({ characterOnline: online });
-    const outcome = await runClearItemName(deps, {
-      characterId: 5,
-      adminAccountId: 7,
-      body: { bag: 0, itemId: 'wyrmfall_pendant', reason: 'slur' },
-    });
-    expect(outcome).toEqual({
-      ok: false,
-      error: 'character came online before the strip landed; kick them and retry',
-    });
-    expect(online).toHaveBeenCalledTimes(2);
-    expect(recordAudit).toHaveBeenCalledTimes(1);
-    expect(saveCharacterState).not.toHaveBeenCalled();
-  });
-
-  it('refuses a malformed target before any audit write', async () => {
-    const { deps, recordAudit } = makeDeps();
+  it('refuses a malformed target before any audit or atomic operation', async () => {
+    const { deps, recordAudit, clearOfflineItemName } = makeDeps();
     const outcome = await runClearItemName(deps, {
       characterId: 5,
       adminAccountId: 7,
@@ -472,92 +411,68 @@ describe('runClearItemName (the endpoint body over injected deps)', () => {
     });
     expect(outcome).toEqual({ ok: false, error: 'unknown equipment slot' });
     expect(recordAudit).not.toHaveBeenCalled();
+    expect(clearOfflineItemName).not.toHaveBeenCalled();
   });
 
-  it('a no-match strip answers its own error AFTER the audit and never saves', async () => {
-    const { deps, recordAudit, saveCharacterState } = makeDeps();
-    const outcome = await runClearItemName(deps, {
-      characterId: 5,
-      adminAccountId: 7,
-      body: { slot: 'neck', reason: 'nothing worn there' },
-    });
-    expect(outcome).toEqual({ ok: false, error: 'no named copy matched that target' });
-    expect(recordAudit).toHaveBeenCalled();
-    expect(saveCharacterState).not.toHaveBeenCalled();
-  });
-
-  it('a vanished character answers character not found after the audit', async () => {
-    const { deps, recordAudit, saveCharacterState } = makeDeps({
-      loadCharacter: vi.fn(async () => null),
+  it.each<ClearItemNameOutcome>([
+    { ok: true, cleared: 3 },
+    { ok: false, error: 'no named copy matched that target' },
+    { ok: false, error: 'character not found' },
+    { ok: false, error: CHARACTER_SAVE_LEASED_LINE },
+  ])('returns the atomic operation outcome unchanged after the audit: %j', async (result) => {
+    const { deps, recordAudit, clearOfflineItemName } = makeDeps({
+      clearOfflineItemName: vi.fn(async () => result),
     });
     const outcome = await runClearItemName(deps, {
       characterId: 5,
       adminAccountId: 7,
       body: { all: true, reason: 'slur' },
     });
-    expect(outcome).toEqual({ ok: false, error: 'character not found' });
-    // "after the audit" is a claim of its own: the request row landed first.
-    expect(recordAudit).toHaveBeenCalledTimes(1);
-    expect(saveCharacterState).not.toHaveBeenCalled();
+    expect(outcome).toBe(result);
+    expect(clearOfflineItemName).toHaveBeenCalledExactlyOnceWith(5, { kind: 'all' });
+    expect(recordAudit.mock.invocationCallOrder[0]).toBeLessThan(
+      clearOfflineItemName.mock.invocationCallOrder[0],
+    );
   });
 
-  it('a live lease at the write refuses with the lease line (the fenced save said no)', async () => {
-    // The reconnect-window closure (the phase 13 QA): both in-process online
-    // checks passed, but the lease-fenced save (server/db.ts
-    // saveOfflineCharacterState) found a live lease and touched nothing, so the
-    // strip did NOT land and the endpoint must say so rather than report the
-    // stripped count as success. The audit row honestly records the request.
-    const { deps, state, recordAudit } = makeDeps({
-      saveCharacterState: vi.fn(async () => false),
-    });
-    const outcome = await runClearItemName(deps, {
-      characterId: 5,
-      adminAccountId: 7,
-      body: { all: true, reason: 'slur' },
-    });
-    expect(outcome).toEqual({ ok: false, error: CHARACTER_SAVE_LEASED_LINE });
-    expect(recordAudit).toHaveBeenCalledTimes(1);
-    // The fenced write was attempted exactly once with the stripped blob; the
-    // refusal is the statement's own 0-row answer, never a skipped call.
-    expect(deps.saveCharacterState).toHaveBeenCalledTimes(1);
-    expect(deps.saveCharacterState).toHaveBeenCalledWith(5, 20, state);
-    // The refusal asked the existence probe ONCE (SELECT 1 over the same
-    // id-realm-state predicate, server/clear_item_name_db.ts) to tell a lease
-    // from a vanished row; the blob itself loaded exactly once, never a
-    // second full load on the refusal path (the Phase 18
-    // clear-item-name-select1 item).
-    expect(deps.characterStateExists).toHaveBeenCalledTimes(1);
-    expect(deps.characterStateExists).toHaveBeenCalledWith(5);
-    expect(deps.loadCharacter).toHaveBeenCalledTimes(1);
-  });
+  it.each([false, true])(
+    'never starts either strip after an audit failure (online: %s)',
+    async (online) => {
+      const clearLiveItemName = vi.fn(async () => ({ cleared: 1 }));
+      const { deps, clearOfflineItemName } = makeDeps({
+        characterOnline: () => online,
+        clearLiveItemName,
+        recordAudit: vi.fn(async () => {
+          throw new Error('moderation reason is required');
+        }),
+      });
+      await expect(
+        runClearItemName(deps, {
+          characterId: 5,
+          adminAccountId: 7,
+          body: { all: true },
+        }),
+      ).rejects.toThrow('moderation reason is required');
+      expect(clearOfflineItemName).not.toHaveBeenCalled();
+      expect(clearLiveItemName).not.toHaveBeenCalled();
+    },
+  );
 
-  it('a row that vanished between the load and the fenced write answers not found, not the lease line', async () => {
-    // The fenced UPDATE's 0-row answer has two causes; a deleted character is
-    // the one no retry can cure, so the endpoint distinguishes it on the
-    // refusal path with the lightweight existence probe (the fresh reader's
-    // finding on the first QA fix, which read every 0-row answer as a lease).
-    // The probe carries the SAME predicate the first load answers not-found
-    // on (id, realm, state IS NOT NULL: tests/server/clear_item_name_db.test.ts
-    // pins the SQL), so a null-state row is not-found here too, never the
-    // kick-and-retry line; and the blob loads exactly ONCE, the probe being
-    // a SELECT 1 rather than a second full load.
-    const state = stateWith({ equipmentInstances: { neck: namedCopy() } });
-    const { deps, recordAudit } = makeDeps({
-      loadCharacter: vi.fn(async () => ({ level: 20, state })),
-      saveCharacterState: vi.fn(async () => false),
-      characterStateExists: vi.fn(async () => false),
+  it('propagates atomic-operation failure without retrying or reporting success', async () => {
+    const { deps, recordAudit, clearOfflineItemName } = makeDeps({
+      clearOfflineItemName: vi.fn(async () => {
+        throw new Error('database unavailable');
+      }),
     });
-    const outcome = await runClearItemName(deps, {
-      characterId: 5,
-      adminAccountId: 7,
-      body: { all: true, reason: 'slur' },
-    });
-    expect(outcome).toEqual({ ok: false, error: 'character not found' });
+    await expect(
+      runClearItemName(deps, {
+        characterId: 5,
+        adminAccountId: 7,
+        body: { all: true, reason: 'slur' },
+      }),
+    ).rejects.toThrow('database unavailable');
     expect(recordAudit).toHaveBeenCalledTimes(1);
-    expect(deps.saveCharacterState).toHaveBeenCalledTimes(1);
-    expect(deps.characterStateExists).toHaveBeenCalledTimes(1);
-    expect(deps.characterStateExists).toHaveBeenCalledWith(5);
-    expect(deps.loadCharacter).toHaveBeenCalledTimes(1);
+    expect(clearOfflineItemName).toHaveBeenCalledTimes(1);
   });
 });
 

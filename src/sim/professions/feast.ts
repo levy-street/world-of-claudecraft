@@ -61,9 +61,17 @@ import { createGroundObject } from '../entity';
 import { instanceAt } from '../instances/dungeons';
 import { consumeSelectedInventorySlot, selectedInventorySlot } from '../item_copy_ref';
 import { countUnlockedInSlots, isItemLocked, removeUnlockedFromSlots } from '../item_lock';
+import { riftInstanceAtPos } from '../rift/runs';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { dist2d, type Entity, INTERACT_RANGE, isConsuming, isNonSpellCast } from '../types';
+import {
+  type FeastMatchScope,
+  type FeastObjectOwner,
+  feastMatchScope,
+  removeFeast,
+} from './feast_lifecycle';
+import { feastPlacementHeight } from './feast_placement';
 
 /** The PARTY-tier placeable feast (content/profession_items.ts) and the
  *  templateId its placed entity carries. It is the default of the dedicated
@@ -148,6 +156,10 @@ export function isApexFeastRecipe(recipe: {
 
 /** One live placed feast. Keyed in SimContext.feasts by its entity id. */
 export interface FeastState {
+  /** Room roster owner, so expiry also removes ids from runtime lift scans. */
+  objectOwner?: FeastObjectOwner;
+  /** The placement's transient match claim; absent for an overworld table. */
+  match?: FeastMatchScope;
   /** The placer's rename-proof, domain-tagged owner key (feastOwnerKey). */
   ownerKey: string;
   /** Servings left. Decremented at bite START (the dish precedent: the
@@ -293,7 +305,10 @@ export function placeFeastAction(
   // raw name as a VALUE; the client composes the localized
   // "{name}'s Harvest Feast" title off the templateId (i18n: the text is
   // the key, the name is a param, never sim-side English).
-  const e = createGroundObject(ctx.nextId++, '', meta.name, { ...p.pos });
+  const e = createGroundObject(ctx.nextId++, '', meta.name, {
+    ...p.pos,
+    y: feastPlacementHeight(ctx, p),
+  });
   e.templateId = info.templateId;
   e.objectItemId = null;
   e.lootable = false;
@@ -318,7 +333,11 @@ export function placeFeastAction(
   // cleanup's designed job). Without this the entity outlived the run and
   // stood at the slot origin, still edible, for the next claiming party.
   const inst = instanceAt(ctx, e.pos);
-  if (inst && inst.partyKey !== null) inst.objectIds.push(e.id);
+  let objectOwner: FeastObjectOwner | undefined;
+  if (inst && inst.partyKey !== null) {
+    inst.objectIds.push(e.id);
+    objectOwner = inst;
+  }
   // The SAME rule for a delve run (its own spatial system with its own
   // roster): freeDelveRun AND the module advance both drop run.objectIds,
   // so the table dies with the room it was set out in, and the abandoned
@@ -326,8 +345,20 @@ export function placeFeastAction(
   // the PLACER (delveRunForPlayer), never the entity: the run lookup binds
   // players and mobs only, and the placer stands in the run when placing.
   const run = delveRunForPlayer(ctx, meta.entityId);
-  if (run) run.objectIds.push(e.id);
+  if (run) {
+    run.objectIds.push(e.id);
+    objectOwner = run;
+  }
+  // Rifts replace this roster on floor descent and on whole-run teardown.
+  // Registration also keeps the table on the rift's raised floor surfaces.
+  const rift = riftInstanceAtPos(ctx, e.pos);
+  if (rift) {
+    rift.objectIds.push(e.id);
+    objectOwner = rift;
+  }
   ctx.feasts.set(e.id, {
+    objectOwner,
+    match: feastMatchScope(ctx, meta.entityId),
     ownerKey,
     charges: info.charges,
     expiresAtTick: ctx.tickCount + info.durationTicks,
@@ -429,14 +460,13 @@ export function consumeFeastAction(
  *  existing 1 Hz sweep (never a second appended sim.ts sweep), decides from
  *  stored state alone, draws zero rng, and allocates nothing while no feast
  *  stands (the overwhelmingly common tick). The entities.has leg is the
- *  inverse cleanup: no other despawn path exists today, but if anything ever
- *  drops the entity out from under the state, the sweep reclaims the state
+ *  inverse cleanup: when a dungeon, delve or rift tears down its objects,
+ *  or another path drops the entity, the sweep reclaims the state
  *  (and the placer's one-active slot) instead of stranding both for 180s. */
 export function updateFarmFeasts(ctx: SimContext): void {
   if (ctx.feasts.size === 0) return;
   for (const [id, feast] of ctx.feasts) {
     if (feast.charges > 0 && ctx.tickCount < feast.expiresAtTick && ctx.entities.has(id)) continue;
-    ctx.feasts.delete(id);
-    if (ctx.entities.has(id)) ctx.dropEntity(id);
+    removeFeast(ctx, id);
   }
 }

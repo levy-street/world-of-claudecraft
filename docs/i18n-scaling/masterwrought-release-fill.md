@@ -217,10 +217,21 @@ Zero missing rows. One stale desc in all 18 locales: professions_field_notes.des
 
 ### J. Machine-anchored fills owed the maintainer's re-judgement
 
-70 keys (556 fills) in the main, sim and admin channels plus the 52 rift mechanic names (260
-sim rows), read at the private page 'Masterwrought Fill Re-judgement' published from this
-session; the sets, their originating review notes and their shape anchors are listed there. A
-re-cut re-cuts its anchor in the same change.
+The historical inventory reported 70 keys (556 fills) in the main, sim and admin
+channels plus 52 rift mechanic names (260 sim rows). Its private-page inventory was
+not retained in the repository, and the archived `phase-20-fill-package.md` repeats
+that pointer. These totals are historical context, not a verified execution list.
+
+At the release fill, rebuild the execution list from the immutable
+[Masterwrought state ledger](https://github.com/levy-street/world-of-claudecraft/blob/6742cd8bf2e65b44b5f8a8887d3ec767c258eff2/docs/prd/masterwrought/state.md)
+and its neighboring phase QA records. Locate `RELEASE-FILL OBLIGATIONS`,
+`machine-anchored`, and `re-judgement`; collect the explicit keys, locales,
+originating review notes, and named test anchors. Reconcile each with the current
+English source and the current anchor, since keys can have been superseded or
+retired. Keep the resulting dated key/locale/anchor list in this handoff before
+executing it. A re-cut re-cuts its anchor in the same change. This reconstruction
+and the locale fills belong to the actual release; ordinary feature changes add
+English only.
 
 Added after the critic's read: the 34 apex pattern names (entities.items.pattern_<id>.name,
 five non-Latin fills each, the fourth machine-anchored set the Phase 17 close counted), and
@@ -232,10 +243,11 @@ English where ja_JP and zh_TW translate them (a register split for class H).
 
 ### K. English rewords the ledgers queued onto this lane (each changes the source first, then every locale)
 
-1. guide.profPages.farm.bedsBody: the 'by default' qualifier on the rebindable Shift+K bind
-   (farming/state.md 599).
-2. guide.profPages.faq.q5 and a5: the commission FAQ promises the Maker's Bond unbind without the
-   Perfecting refusal (state.md 22573, D108).
+1. guide.profPages.farm.bedsBody: the English source now qualifies the rebindable
+   Shift+K shortcut with 'by default'. Carry that correction into the release fills.
+2. guide.profPages.faq.q5 and a5: the English source now states the Perfecting
+   refusal and the ratified failed-first-attempt rank-zero exception. Re-fill
+   against that corrected source at release.
 3. The older crafts' routeBody closing register (three deeds incl. the rare-tier deed, 'at 50
    skill'), Phase 06 QA ruling (4) queued to this pass (state.md 2216 to 2233).
 4. guide.profPages.craftProse.inscription.materialsHeading, under-enumerating by the gourd

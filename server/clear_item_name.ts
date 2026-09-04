@@ -50,30 +50,16 @@
 // them, so the omission is completeness, not the rename sweep's scoping limit
 // this header once cited.
 //
-// The reconnect window (the phase 13 QA, three reviewers converging): the two
-// in-process online checks below answer a session this process can see, but
-// a fresh login re-reads the blob BEFORE game.join registers it, and a
-// session on a peer process is invisible to the map entirely. So the blob
-// write itself is fenced on the character_leases table
-// (server/db.ts saveOfflineCharacterState): the handshake claims the lease
-// before its blob read, so any login that could hold the pre-strip state has
-// a live lease by the time the write runs, and the fenced UPDATE touches
-// nothing and reports false, which surfaces as a refusal to retry. A kicked
-// session releases its lease after its leave flush lands (server/game.ts
-// leave), so the decided kick-then-clear flow lands on the first retry; a
-// crashed process's orphan lease expires (LEASE_TTL_SECONDS) and the retry
-// lands after it. What the fence leaves (recorded, not closed): the UPDATE
-// evaluates NOT EXISTS in its own READ COMMITTED snapshot, so a lease
-// committed DURING the fenced statement whose blob read lands before this
-// commit still holds the pre-strip state (a millisecond window); and the
-// live save's own nonce fence carries no expiry term, so a session whose
-// lease lapsed (ninety seconds of missed heartbeats) and was never reclaimed
-// can autosave over a landed strip. An operator handling a contested name
-// suspends the account first (DEPLOY.md).
+// The database owns the offline read-modify-write (clear_item_name_db.ts).
+// Its realm-scoped character lock serializes concurrent strips before either
+// loads state. Removing the target's expired lease under that lock invalidates
+// stale nonces, while the shared unleased fence refuses a live lease. A racing
+// login or heartbeat either wins first and the strip refuses, or waits until
+// the corrected state is durable. The initial online check remains the local
+// operator guard; the transaction is the cross-process authority.
 
 import type { CharacterState } from '../src/sim/sim';
 import { type EquipSlot, isEquipSlot } from '../src/sim/types';
-import { CHARACTER_SAVE_LEASED_LINE } from './character_save_statement';
 
 /** The bag target's item-id SHAPE bound (the signer doctrine, never a catalog
  *  allowlist): a persisted id survives shape-bounded validation, so a bagged
@@ -269,18 +255,13 @@ export interface ClearItemNameDeps {
     characterId: number,
     target: ClearItemNameTarget,
   ): Promise<'offline' | { cleared: number }>;
-  loadCharacter(
+  /** Atomic realm-scoped load, strip, and lease-fenced save. The database
+   *  owns the character lock before reading its blob, so concurrent clears
+   *  cannot restore each other's removed names. */
+  clearOfflineItemName(
     characterId: number,
-  ): Promise<{ level: number; state: CharacterState | null } | null>;
-  /** The refusal arm's existence probe (server/clear_item_name_db.ts
-   *  characterStateExists): SELECT 1 over the SAME id-realm-state-not-null
-   *  predicate loadCharacter answers not-found on, so a fenced-out write is
-   *  read as the retry line without paying the blob a second time. */
-  characterStateExists(characterId: number): Promise<boolean>;
-  /** The lease-fenced offline save (server/db.ts saveOfflineCharacterState):
-   *  resolves false when a live load lease exists, in which case the strip
-   *  did NOT land and the endpoint refuses (the reconnect-window closure). */
-  saveCharacterState(characterId: number, level: number, state: CharacterState): Promise<boolean>;
+    target: ClearItemNameTarget,
+  ): Promise<ClearItemNameOutcome>;
   recordAudit(input: {
     characterId: number;
     adminAccountId: number;
@@ -298,14 +279,10 @@ export type ClearItemNameOutcome = { ok: true; cleared: number } | { ok: false; 
  * here. Online routes to the live arm when one is bound (audit, then the
  * sim-side strip, then done: the persisted blob is never touched, the live
  * session owns it) and otherwise refuses with the disconnect-first line, the
- * module header's live-session rationale. Offline keeps the original path:
- * write the audit row, then load-strip,
- * re-check OFFLINE once more immediately before the save (the login-race
- * close), then save, so a strip can never exist unaudited; a post-audit
- * refusal (deleted character, nothing matched, the character logging in
- * mid-strip) surfaces as an explicit error and the audit row honestly records
- * the attempt. recordAudit throws on a missing reason (moderation_db
- * cleanText), surfaced by the caller's catch like the restores.
+ * module header's live-session rationale. Offline writes the audit first,
+ * then delegates the entire read-modify-write to one bounded transaction.
+ * Post-audit refusals remain explicit, and the audit describes the attempt.
+ * recordAudit throws on a missing reason (moderation_db cleanText).
  */
 export async function runClearItemName(
   deps: ClearItemNameDeps,
@@ -354,34 +331,5 @@ export async function runClearItemName(
     detail: describeClearItemNameTarget(target),
     reason: input.body.reason,
   });
-  const row = await deps.loadCharacter(input.characterId);
-  if (!row?.state) return { ok: false, error: 'character not found' };
-  const cleared = stripLegendaryNames(row.state, target);
-  if (cleared === 0) return { ok: false, error: 'no named copy matched that target' };
-  // Narrow the login race: a character who came online between the pre-check
-  // and here would have a live session whose next autosave clobbers this
-  // write, so re-check IMMEDIATELY before the save and refuse without
-  // writing (the restore family's self-detecting shape). This check answers
-  // the sessions this process can see; the fenced save below answers the
-  // rest (a login mid-handshake, a session on a peer process). The audit row
-  // above already recorded the REQUEST honestly, "requested" prose and all.
-  if (deps.characterOnline(input.characterId)) {
-    return {
-      ok: false,
-      error: 'character came online before the strip landed; kick them and retry',
-    };
-  }
-  const landed = await deps.saveCharacterState(input.characterId, row.level, row.state);
-  if (!landed) {
-    // The fenced UPDATE's 0-row answer has two causes: a live lease (the
-    // retry line), or the character row vanishing between the load and the
-    // write (a deleted character, which no retry can cure). One SELECT 1 on
-    // the refusal path only, never a second blob load, over the same
-    // predicate the first load answers not-found on (a row with a null state
-    // is a vanished character too, never a lease), so the operator reads the
-    // true cause.
-    const still = await deps.characterStateExists(input.characterId);
-    return { ok: false, error: still ? CHARACTER_SAVE_LEASED_LINE : 'character not found' };
-  }
-  return { ok: true, cleared };
+  return deps.clearOfflineItemName(input.characterId, target);
 }

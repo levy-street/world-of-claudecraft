@@ -63,6 +63,10 @@ import type { SimContext } from '../sim_context';
 import type { CoreStats, Entity, EquipSlot, InvSlot, ItemDef, ItemInstancePayload } from '../types';
 import { announceZoneCelebration } from './gather_events';
 import { normalizeLegendaryName } from './legendary_name';
+import { type PerfectItemRef, perfectingCopyMatches } from './perfecting_copy';
+
+export type { PerfectItemRef } from './perfecting_copy';
+
 import type { ProfessionRecipeRecord } from './types';
 import type { CraftSkills } from './wheel';
 
@@ -100,15 +104,6 @@ export const PERFECTING_ATTEMPT_COST: readonly Readonly<{ itemId: string; count:
 export const LEGENDARY_PROMOTION_COST: readonly Readonly<{ itemId: string; count: number }>[] = [
   { itemId: 'deed_of_making', count: 1 },
 ];
-
-/** The target piece: a passed selection, never id-only (the item_copy_ref
- *  discipline). A worn ref names an equipment slot; a bagged ref names a bag
- *  CELL index AND the item id the caller saw there (validated server-side and
- *  re-validated here through selectedInventorySlot's index-plus-id pin, so a
- *  cell that shifted under a consumption or a sort between the click and the
- *  command resolves to nothing rather than to whatever apex piece now sits
- *  there and binding it). */
-export type PerfectItemRef = { slot: EquipSlot } | { bag: number; itemId: string };
 
 interface PerfectingMaterialView {
   itemId: string;
@@ -272,6 +267,7 @@ interface PerfectingInfoInputs {
  *  host-agnostic. Null when the ref resolves to no item. */
 export function perfectingInfoFrom(inputs: PerfectingInfoInputs): PerfectingInfoView | null {
   const { ref } = inputs;
+  if (!perfectingCopyMatches(inputs, ref)) return null;
   let itemId: string | undefined;
   let payload: ItemInstancePayload | undefined;
   if ('slot' in ref) {
@@ -388,6 +384,19 @@ function resolvePerfectingHead(
   const r = ctx.resolve(pid);
   if (!r) return null;
   const meta: PlayerMeta = r.meta;
+  if (
+    !perfectingCopyMatches(
+      {
+        inventory: meta.inventory,
+        equipment: meta.equipment,
+        equipmentInstances: meta.equipmentInstance,
+      },
+      ref,
+    )
+  ) {
+    ctx.error(meta.entityId, "You don't have that item.");
+    return null;
+  }
   const { itemId, payload, wornSlot, bagged } = resolvePerfectTarget(meta, ref);
   // Presence-only ownership (see above): holding the copy IS the credential,
   // so the only noItem arm is an unresolvable ref.

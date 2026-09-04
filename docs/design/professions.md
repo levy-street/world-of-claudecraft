@@ -85,12 +85,17 @@ Retuning either cap is never a one-line edit: the refusal prose in
 (`tests/masterwrought_cap.test.ts` is the reminder).
 
 **masterwrought R5, the power envelope, with masterwrought R14 and
-masterwrought R12 as its texture.** The full kit (two Perfected pieces
-plus apex enchants, flask and food) lands at most 5 percent total
-throughput over pre-packet raid BiS, measured via
-`docs/design/spell-balance-framework.md`; heroic raid and S-rift clear
-difficulty is the protected asset. v1 apex items carry PURE STATS and
-bounded utility only, no new proc effects anywhere in the family
+masterwrought R12 as its texture.** The original target was at most
+5 percent total throughput over pre-packet raid BiS for the full kit
+(two Perfected pieces plus apex enchants, flask and food). R5 closed by
+maintainer ratification, with the historical measurements accepted as
+floors that exclude apex rating deltas, not as proof of that upper bound.
+The baseline caveat and the closure-tip equipped-kit result above the
+target are retained in `docs/design/power-verification.md` (Verdict).
+Those sampled figures describe the closure revision; current deterministic
+harness inputs are pinned by `tests/r5_envelope_probe.test.ts`. Heroic raid
+and S-rift clear difficulty remain the protected asset. v1 apex items carry
+PURE STATS and bounded utility only, no new proc effects anywhere in the family
 (masterwrought R14), and an apex crafted epic disenchants to the standard
 single arcane_shard (masterwrought R12, revisit only if shard prices
 misbehave). Every authored apex piece is swept against the formula budget
@@ -123,12 +128,17 @@ delta are pinned by `tests/perfecting.test.ts`.
 
 **masterwrought R2, base pieces trade, the first attempt binds.** A base
 apex piece is freely tradable; it binds the moment Perfecting begins (the
-Maker's Bond `boundTo` reuse, stamped on the FIRST attempt). The
-Perfecting bind is permanent: the unbind service refuses any copy on the
-track or holding the stamp (`isPerfectingBound` and the dedicated
-`unbind_perfecting` deny reason, `src/sim/professions/commission.ts`),
-while a commissioned apex copy that never attempted still unbinds for the
-ordinary quality-tier fee (`resolveUnbind`).
+Maker's Bond `boundTo` reuse, stamped on the FIRST attempt). The unbind
+service refuses a bound copy with a positive Perfecting rank or the
+Perfected stamp (`isPerfectingBound` and the dedicated `unbind_perfecting`
+deny reason, `src/sim/professions/commission.ts`). A failed first attempt
+that leaves rank zero still permits the ordinary quality-tier unbind fee
+through `resolveUnbind`; the rank-zero behavior was explicitly ratified
+by `qr-19-rank0-bind-shape` in the
+[archived Masterwrought state](https://github.com/levy-street/world-of-claudecraft/blob/6742cd8bf2e65b44b5f8a8887d3ec767c258eff2/docs/prd/masterwrought/state.md).
+A bound commissioned copy with a masterwork head start already has a positive
+rank and is also refused, even before its first attempt. Both cases are
+pinned by `tests/professions_commissions.test.ts`.
 
 **The masterwork head start.** The craft-time masterwork proc on an apex
 craft grants `PERFECTING_HEADSTART_RANK` on the track INSTEAD OF a

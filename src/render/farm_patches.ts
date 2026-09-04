@@ -50,7 +50,7 @@
 import * as THREE from 'three';
 import { isFeastTemplateId } from '../sim/professions/feast';
 import type { Entity, SimEvent } from '../sim/types';
-import { terrainHeight } from '../sim/world';
+import { groundHeight, terrainHeight } from '../sim/world';
 import type { FarmPatchDef, FarmPlotView } from '../world_api/farming';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
@@ -70,6 +70,7 @@ import {
   farmCompostBinPosition,
   farmFeastModelUrl,
   farmFeastModelUrls,
+  farmFeastSurfaceNormal,
   farmModelUrls,
   farmPlotKeyMatches,
   farmStageModelUrl,
@@ -314,8 +315,8 @@ export function buildFarmPatchProps(
 }
 
 /** One placed harvest feast's table meshes (Phase 12, the shared feast). A
- *  feast never changes appearance while it stands, so its whole rebuild key is
- *  the entity id it is stored under. */
+ *  feast keeps its meshes while it stands; authoritative position changes
+ *  (including a rift floor lift) update their transform without rebuilding. */
 interface FeastVisual {
   group: THREE.Group;
   ownedMaterials: THREE.Material[];
@@ -569,7 +570,9 @@ export class FarmPatchVisuals {
     for (const e of entities.values()) {
       if (e.kind !== 'object' || !isFeastTemplateId(e.templateId)) continue;
       this.feastsSeen.add(e.id);
-      if (!this.feasts.has(e.id)) this.createFeast(e, seed, flourish);
+      const existing = this.feasts.get(e.id);
+      if (!existing) this.createFeast(e, seed, flourish);
+      else if (!existing.group.position.equals(e.pos)) this.seatFeast(existing.group, e, seed);
     }
     for (const [id, visual] of this.feasts) {
       if (!this.feastsSeen.has(id)) this.disposeFeast(id, visual);
@@ -685,23 +688,14 @@ export class FarmPatchVisuals {
       .finally(() => releaseOutgoing?.());
   }
 
-  /** Builds one feast table at the entity's ground seat (the bed idiom:
-   *  terrainHeight for y, tilted to the local ground normal), plus the
+  /** Builds one feast table at the entity's authoritative ground seat, plus the
    *  placement flourish when `flourish` is armed (every pass after the
    *  first; see applyFeasts). Cosmetic only, so both emitters go through
    *  vfx.ts, whose scaledCount path is the graphics-tier shed. */
   private createFeast(e: Entity, seed: number, flourish: boolean): void {
     const group = new THREE.Group();
     group.name = `farmFeast:${e.id}`;
-    const y = terrainHeight(e.pos.x, e.pos.z, seed);
-    group.position.set(e.pos.x, y, e.pos.z);
-    // Seat tilt plus a stable per-entity yaw (the ground-object (id % 7)
-    // idiom), composed in that order so the table still stands normal to the
-    // slope it was set out on.
-    const yawQuat = new THREE.Quaternion().setFromAxisAngle(WORLD_UP, (e.id % 7) * 0.45);
-    group.quaternion
-      .setFromUnitVectors(WORLD_UP, groundNormal(e.pos.x, e.pos.z, seed))
-      .multiply(yawQuat);
+    this.seatFeast(group, e, seed);
 
     const ownedMaterials: THREE.Material[] = [];
     const ownedGeometries: THREE.BufferGeometry[] = [];
@@ -745,10 +739,21 @@ export class FarmPatchVisuals {
     if (flourish) {
       // The placement flourish: turned earth under the table, then a warm
       // nature burst over the spread. Armed passes only (see applyFeasts).
-      const at = new THREE.Vector3(e.pos.x, y + FEAST_VFX_LIFT, e.pos.z);
+      const at = new THREE.Vector3(e.pos.x, e.pos.y + FEAST_VFX_LIFT, e.pos.z);
       this.vfx.groundPuff(at, 0.7, 0x6b4f34);
       this.vfx.burst(at, 'nature', 12, 0.8);
     }
+  }
+
+  /** Placement and later authority corrections share one transform path.
+   * Runs only when a table first appears or its position changes. */
+  private seatFeast(group: THREE.Group, e: Entity, seed: number): void {
+    group.position.copy(e.pos);
+    const normal = farmFeastSurfaceNormal(e.pos, (x, z) => groundHeight(x, z, seed));
+    const yaw = new THREE.Quaternion().setFromAxisAngle(WORLD_UP, (e.id % 7) * 0.45);
+    group.quaternion
+      .setFromUnitVectors(WORLD_UP, new THREE.Vector3(normal.x, normal.y, normal.z))
+      .multiply(yaw);
   }
 
   private cloneOwned(src: THREE.Material, owned: THREE.Material[]): THREE.Material {

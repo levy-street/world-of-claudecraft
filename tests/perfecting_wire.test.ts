@@ -33,6 +33,9 @@ vi.mock('../server/db', () => ({
 import { type ClientSession, GameServer } from '../server/game';
 import { HEAVY_SELF_CMDS } from '../server/heavy_self';
 import type { ClientWorld } from '../src/net/online';
+import { fingerprint128 } from '../src/sim/fingerprint128';
+import { itemCopyPin } from '../src/sim/item_copy_ref';
+import { sanitizeItemInstancePayloadOnLoad } from '../src/sim/item_instance_load';
 import {
   PERFECTING_ATTEMPT_COST,
   PERFECTING_RANKS,
@@ -222,13 +225,13 @@ afterEach(() => {
 });
 
 describe('ClientWorld emits the perfect_item frames the protocol declares', () => {
-  it('a worn ref rides as `slot` alone and a bagged ref as `bag` plus `item`, nothing else', () => {
+  it('missing mirrored selections emit invalid tokens and cannot acquire a later occupant', () => {
     const { client, sent } = sendingClient(1);
     client.perfectItem({ slot: 'neck' });
     client.perfectItem({ bag: 3, itemId: APEX_NECK });
     expect(sent).toEqual([
-      { t: 'cmd', cmd: 'perfect_item', slot: 'neck' },
-      { t: 'cmd', cmd: 'perfect_item', bag: 3, item: APEX_NECK },
+      { t: 'cmd', cmd: 'perfect_item', slot: 'neck', copy: { pin: '' } },
+      { t: 'cmd', cmd: 'perfect_item', bag: 3, item: APEX_NECK, copy: { pin: '' } },
     ]);
   });
 
@@ -238,6 +241,45 @@ describe('ClientWorld emits the perfect_item frames the protocol declares', () =
 });
 
 describe('perfect_item over the real online dispatch path', () => {
+  it.each([false, true])(
+    'carries a bounded token for a large accepted payload (changed=%s)',
+    (changed) => {
+      const server = new GameServer();
+      const fc = fakeWs();
+      const session = joinServer(server, fc, 927, 'Futurecrafter');
+      const pid = session.pid as number;
+      seedPerfecter(server, pid);
+      const ref = bagRefOf(server, pid, APEX_NECK);
+      const selected = serverMeta(server, pid).inventory[ref.bag];
+      const sanitized = sanitizeItemInstancePayloadOnLoad({
+        rolled: Object.fromEntries(
+          Array.from({ length: 9 }, (_, i) => [`future_${i}`, { data: 'x'.repeat(990) }]),
+        ),
+      });
+      expect(sanitized.dropped).toEqual([]);
+      selected.instance = sanitized.payload;
+      expect(itemCopyPin(selected).length).toBeGreaterThan(8192);
+      broadcast(server);
+      const { client, sent } = sendingClient(pid);
+      (client as unknown as { applySnapshot(s: unknown): void }).applySnapshot(lastSnap(fc.sent));
+      client.perfectItem(ref);
+      expect((sent[0].copy as { pin: string }).pin).toMatch(/^[0-9a-f]{32}$/);
+      expect(JSON.stringify(sent[0]).length).toBeLessThan(256);
+      if (changed) {
+        (
+          selected.instance as unknown as { rolled: { future_0: { data: string } } }
+        ).rolled.future_0.data = 'y'.repeat(990);
+      }
+      const before = materialCounts(server, pid);
+      const draws = withForcedRoll(server.sim, 0, () => {
+        server.handleMessage(session, JSON.stringify(sent[0]));
+      });
+      expect(draws).toBe(changed ? 0 : 1);
+      expect(selected.instance?.perfecting).toBe(changed ? undefined : 1);
+      expect(materialCounts(server, pid)).toEqual(changed ? before : before.map((n) => n - 1));
+    },
+  );
+
   it('a bagged ref resolves server-side and the inv mirror re-diffs on the next broadcast', () => {
     const server = new GameServer();
     const fc = fakeWs();
@@ -252,6 +294,7 @@ describe('perfect_item over the real online dispatch path', () => {
 
     // The frame ClientWorld emits, verbatim, into the real dispatch.
     const { client, sent } = sendingClient(pid);
+    (client as unknown as { applySnapshot(s: unknown): void }).applySnapshot(lastSnap(fc.sent));
     client.perfectItem(ref);
     setHeavyDirty(session, false);
     fc.sent.length = 0; // drop the join notice, so the lines below are the attempt's alone
@@ -313,6 +356,7 @@ describe('perfect_item over the real online dispatch path', () => {
     broadcast(server);
 
     const { client, sent } = sendingClient(pid);
+    (client as unknown as { applySnapshot(s: unknown): void }).applySnapshot(lastSnap(fc.sent));
     client.perfectItem({ slot: 'neck' });
     setHeavyDirty(session, false);
     const draws = withForcedRoll(server.sim, 0, () => {
@@ -356,6 +400,13 @@ describe('perfect_item over the real online dispatch path', () => {
       { cmd: 'perfect_item', slot: 'hat' }, // bogus slot string
       { cmd: 'perfect_item', slot: 3 }, // a number is not a slot
       { cmd: 'perfect_item', slot: 'hat', bag: 'x', item: APEX_NECK }, // both malformed
+      { cmd: 'perfect_item', bag: 0, item: APEX_NECK, copy: null },
+      { cmd: 'perfect_item', bag: 0, item: APEX_NECK, copy: { pin: 'x' } },
+      {
+        cmd: 'perfect_item',
+        slot: 'neck',
+        copy: { pin: 'a'.repeat(32), anchor: { ordinal: 0, count: 1 } },
+      },
     ];
     const draws = drawsDuring(server.sim, () => {
       for (const body of malformed) cmd(server, session, body);
@@ -763,5 +814,52 @@ describe('perfect_item over the real online dispatch path', () => {
       equipBlocked: false,
       materials: [],
     });
+  });
+});
+
+describe('Perfecting copy tokens across the real wire', () => {
+  it('refuses the same-ID sibling that shifts into a captured cell after send', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 9921, 'CopySmith');
+    const pid = session.pid as number;
+    const meta = serverMeta(server, pid);
+    meta.inventory.length = 0;
+    server.sim.addItem('linen_cloth', 1, pid);
+    seedPerfecter(server, pid);
+    server.sim.addItem(APEX_NECK, 1, pid);
+    const ref = bagRefOf(server, pid, APEX_NECK);
+    const selected = meta.inventory[ref.bag];
+    const sibling = meta.inventory[ref.bag + 1];
+    const { client, sent } = sendingClient(pid);
+    broadcast(server);
+    (client as unknown as { applySnapshot(s: unknown): void }).applySnapshot(lastSnap(fc.sent));
+    client.perfectItem(ref);
+    expect(sent[0].copy).toMatchObject({ anchor: { ordinal: 0, count: 2 } });
+    const before = materialCounts(server, pid);
+    server.sim.removeItem('linen_cloth', 1, pid);
+    expect(meta.inventory[ref.bag]).toBe(sibling);
+    const draws = withForcedRoll(server.sim, 0, () => {
+      server.handleMessage(session, JSON.stringify(sent[0]));
+    });
+    expect(selected.instance?.boundTo).toBeUndefined();
+    expect(sibling.instance?.boundTo).toBeUndefined();
+    expect(materialCounts(server, pid)).toEqual(before);
+    expect(draws).toBe(0);
+    routePending(server);
+    expect(textEvents(fc.sent)).toContain("You don't have that item.");
+  });
+
+  it('preserves a prompt capture when a newer snapshot shows a replacement', () => {
+    const { client, sent } = sendingClient(1);
+    client.equipment.neck = APEX_NECK;
+    client.equipmentInstances.neck = { signer: 'Replacement' };
+    const copy = {
+      pin: fingerprint128(
+        itemCopyPin({ itemId: APEX_NECK, count: 1, instance: { signer: 'Original' } }),
+      ),
+    };
+    client.perfectItem({ slot: 'neck', copy });
+    expect(sent[0]).toEqual({ t: 'cmd', cmd: 'perfect_item', slot: 'neck', copy });
   });
 });

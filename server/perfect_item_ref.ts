@@ -15,6 +15,7 @@
 // (the apply_enchant precedent: it is the sender's own explicit cell or slot,
 // never a guess). The sim re-validates the ref against ITS OWN bags and
 // paperdoll and resolves the whole deny ladder and the one roll itself.
+import { parseItemCopyAnchor } from '../src/sim/item_copy_anchor';
 import { MAX_INSTANCE_STRING_LENGTH } from '../src/sim/item_instance_load';
 import { normalizeLegendaryName } from '../src/sim/professions/legendary_name';
 import type { PerfectItemRef } from '../src/sim/professions/perfecting';
@@ -24,6 +25,7 @@ export function parsePerfectItemRef(msg: {
   slot?: unknown;
   bag?: unknown;
   item?: unknown;
+  copy?: unknown;
 }): PerfectItemRef | null {
   const slot = typeof msg.slot === 'string' && isEquipSlot(msg.slot) ? msg.slot : undefined;
   const item =
@@ -37,7 +39,21 @@ export function parsePerfectItemRef(msg: {
       ? msg.bag
       : undefined;
   if ((slot === undefined) === (bag === undefined)) return null;
-  return slot !== undefined ? { slot } : { bag: bag as number, itemId: item as string };
+  const ref: PerfectItemRef =
+    slot !== undefined ? { slot } : { bag: bag as number, itemId: item as string };
+  // An absent token is the legacy command. A present malformed token must
+  // refuse the frame, never silently downgrade to the legacy selection.
+  if (msg.copy === undefined) return ref;
+  if (msg.copy === null || typeof msg.copy !== 'object' || Array.isArray(msg.copy)) return null;
+  const copy = msg.copy as { pin?: unknown; anchor?: unknown };
+  if (typeof copy.pin !== 'string' || copy.pin.length !== 32 || !/^[0-9a-f]{32}$/.test(copy.pin)) {
+    return null;
+  }
+  if ('slot' in ref) return copy.anchor === undefined ? { ...ref, copy: { pin: copy.pin } } : null;
+  if (copy.anchor === null || typeof copy.anchor !== 'object') return null;
+  const raw = copy.anchor as { ordinal?: unknown; count?: unknown };
+  const anchor = parseItemCopyAnchor(raw.ordinal, raw.count);
+  return anchor ? { ...ref, copy: { pin: copy.pin, anchor } } : null;
 }
 
 // The optional legendary name riding a perfect_item frame (Masterwrought

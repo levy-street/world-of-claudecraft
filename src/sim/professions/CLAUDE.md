@@ -156,7 +156,10 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   at the top; then the SEPARATE, draw-free promotion on an already-Perfected copy
   (one Deed of Making plus a player-chosen name) that overrides `rolled.quality` to
   legendary and stamps `payload.name`, presentation only. `perfectingInfoFrom` is
-  the one view builder both hosts answer through.
+  the one view builder both hosts answer through. `perfecting_copy.ts` carries
+  the selected copy's ordinal/count anchor and payload/provenance pin through
+  confirmation and the wire; the shared deny head refuses a stale token before
+  spending materials. Tokens are optional for legacy/headless callers.
 - `legendary_name.ts`: the pure SHAPE leaf for a player-chosen legendary name
   (trim, collapse, `[A-Za-z' -]`, 2 to 32); the online server screens CONTENT
   before the command reaches the sim, and the load bound in
@@ -322,12 +325,18 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   correction over the transient `PlayerMeta.farmWitheredAnnounced` memory
   (rides the same event as a fresh ready count; no new wire surface). Draws
   no rng.
-- `feast.ts`: the shared feast behind the `SimContext` seam (`placeFeastAction`,
-  `consumeFeastAction`, the 1 Hz `updateFarmFeasts` despawn sweep): the
+- `feast.ts`, `feast_lifecycle.ts` + `feast_placement.ts`: the shared feast behind the `SimContext`
+  seam (`placeFeastAction`, `consumeFeastAction`, the 1 Hz `updateFarmFeasts` despawn sweep): the
   catalog-derived placeable family, the one-active-per-placer rule and the
   eatenBy ledger on the domain-tagged `feastOwnerKey`, and the existence-oracle
   guard (out-of-range and nonexistent ids answer the same not-found frame).
-  Transient state on `SimContext.feasts`; draws no rng.
+  Transient state on `SimContext.feasts`; draws no rng. Dungeon, delve and rift
+  object rosters own room teardown; the lifecycle sibling captures an arena or
+  battleground match scope at placement and removes only that match's tables
+  when its slot is released, including tables left by departed fighters.
+  Placement samples the player's supporting floor once, including raised rift
+  surfaces; retirement removes the table from its room's current object roster
+  so expired tables cannot accumulate in the rift's per-tick lift scan.
 - `farmer_npcs.ts`: the farmer-NPC range predicate (`nearFarmerNpc`,
   `FARMER_TRADE_RANGE`) the husk trade gates on, resolved by the NpcDef
   `farmer` flag through the grid's early-exit `someInRadius`; draws no rng.

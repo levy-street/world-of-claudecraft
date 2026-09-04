@@ -1,46 +1,53 @@
-// The clear-item-name SQL boundary (server/clear_item_name_db.ts): the
-// existence probe the fenced-save refusal arm asks instead of re-loading the
-// whole blob (the Phase 18 clear-item-name-select1 item). Exercised through
-// the REAL module over a mocked pg pool (the save_offline_character_state
-// idiom) so the statement text, its parameters, its statement-timeout
-// discipline, and the rowCount mapping are the production path's own; the
-// real-Postgres arm (a row with state, a null-state row, a missing row,
-// another realm's row) rides
-// tests/character_save_statement_pg_integration.test.ts.
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-const dbMock = vi.hoisted(() => ({
-  query: vi.fn(),
-  connect: vi.fn(),
-}));
+const dbMock = vi.hoisted(() => ({ query: vi.fn(), connect: vi.fn() }));
 vi.hoisted(() => {
   process.env.DATABASE_URL = 'postgres://test/test';
 });
 vi.mock('pg', () => ({
   Pool: function Pool() {
-    return { query: dbMock.query, connect: dbMock.connect };
+    return dbMock;
   },
 }));
 
-import {
-  CLEAR_ITEM_NAME_PROBE_TIMEOUT_MS,
-  characterStateExists,
-} from '../../server/clear_item_name_db';
-import { DB_STATEMENT_TIMEOUT_MS } from '../../server/db';
+import { CHARACTER_SAVE_LEASED_LINE } from '../../server/character_save_statement';
+import { clearOfflineItemName } from '../../server/clear_item_name_db';
 import { REALM } from '../../server/realm';
 
-/** A pooled client whose every statement answers with `rowCount`, the shape
- *  runWithStatementTimeout drives (BEGIN, SET LOCAL, the read, COMMIT). */
-function transactionClient(rowCount: number) {
-  const client = { query: vi.fn(), release: vi.fn() };
-  client.query.mockResolvedValue({ rows: rowCount > 0 ? [{ '?column?': 1 }] : [], rowCount });
-  return client;
-}
+const namedState = () => ({
+  level: 20,
+  questLog: [],
+  questsDone: [],
+  inventory: [
+    {
+      itemId: 'wyrmfall_pendant',
+      count: 1,
+      instance: {
+        name: 'Remove this',
+        signer: 'Maker',
+        boundTo: 'Owner',
+        rolled: { quality: 'legendary' },
+      },
+    },
+  ],
+});
 
-function probeCall(client: ReturnType<typeof transactionClient>) {
-  return client.query.mock.calls.find(
-    (call) => typeof call[0] === 'string' && call[0].includes('FROM characters'),
-  );
+function transactionClient(
+  row: unknown = { level: 20, state: namedState() },
+  saved: number | null = 1,
+  failAt?: string,
+) {
+  const client = {
+    query: vi.fn(async (sql: string) => {
+      if (failAt && sql.startsWith(failAt)) throw new Error('forced SQL failure');
+      if (sql.startsWith('SELECT level')) return { rows: row ? [row] : [], rowCount: row ? 1 : 0 };
+      if (sql.startsWith('UPDATE characters')) return { rows: [], rowCount: saved };
+      return { rows: [], rowCount: 0 };
+    }),
+    release: vi.fn(),
+  };
+  dbMock.connect.mockResolvedValue(client);
+  return client;
 }
 
 afterEach(() => {
@@ -48,77 +55,74 @@ afterEach(() => {
   dbMock.connect.mockReset();
 });
 
-describe('characterStateExists (the SELECT 1 probe behind the refusal arm)', () => {
-  it('asks SELECT 1 over id, realm, and state IS NOT NULL, never the blob columns', async () => {
-    const client = transactionClient(1);
-    dbMock.connect.mockResolvedValue(client as never);
-
-    expect(await characterStateExists(41)).toBe(true);
-
-    const call = probeCall(client);
-    if (!call) throw new Error('no probe statement was issued');
-    // The exact predicate the first load (db.ts getCharacterById) answers
-    // not-found on, id-realm-state, so the two arms can never disagree about
-    // what a vanished character is; and a projection of 1, so the refusal
-    // path never pays the JSONB blob a second time.
-    expect((call[0] as string).replace(/\s+/g, ' ').trim()).toBe(
-      'SELECT 1 FROM characters WHERE id = $1 AND realm = $2 AND state IS NOT NULL',
-    );
-    expect(call[1]).toEqual([41, REALM]);
-    // Never a bare pool read: the probe rides the same transaction wrapper its
-    // sibling write does.
+describe('atomic offline name moderation', () => {
+  it('locks before reading, invalidates only the expired target nonce, and uses the shared fenced writer', async () => {
+    const state = namedState();
+    const before = structuredClone(state);
+    const client = transactionClient({ level: 20, state });
+    expect(
+      await clearOfflineItemName(41, { kind: 'bag', bag: 0, itemId: 'wyrmfall_pendant' }),
+    ).toEqual({ ok: true, cleared: 1 });
+    const calls = client.query.mock.calls as unknown as [string, unknown[]?][];
+    expect(calls.slice(0, 6)).toEqual([
+      ['BEGIN'],
+      ['SET LOCAL statement_timeout = 5000'],
+      ['SET LOCAL lock_timeout = 2000', undefined],
+      ['SET LOCAL idle_in_transaction_session_timeout = 10000', undefined],
+      ['SELECT level, state FROM characters WHERE id = $1 AND realm = $2 FOR UPDATE', [41, REALM]],
+      ['DELETE FROM character_leases WHERE character_id = $1 AND expires_at <= now()', [41]],
+    ]);
+    const update = calls[6];
+    expect(update[0]).toContain('NOT EXISTS');
+    expect(update[0]).toContain('expires_at > now()');
+    expect(update[1]?.[0]).toBe(41);
+    expect(update[1]?.[1]).toBe(20);
+    expect(update[1]?.[3]).toBe(REALM);
+    delete (before.inventory[0].instance as { name?: string }).name;
+    expect(JSON.parse(update[1]?.[2] as string)).toEqual(before);
+    expect(calls[7]).toEqual(['COMMIT']);
+    expect(client.release).toHaveBeenCalledTimes(1);
     expect(dbMock.query).not.toHaveBeenCalled();
   });
 
-  it('runs under its OWN lowered statement timeout, not the 15s session default', async () => {
-    // The A2 arm of the Phase 18 security review. The probe is one indexed
-    // single-row read on the refusal path of an operator action, so a
-    // degraded database must cost it a couple of seconds, not the full
-    // session default with a pooled client pinned for all of it (the
-    // GUILD_BANK_LOG_TIMEOUT_MS lowering precedent, which is what "the same
-    // runWithStatementTimeout discipline its sibling write uses" means for a
-    // read this cheap). Pinned by literal so a quiet raise back to the
-    // default, or to the heavy allowance, reds here.
-    const client = transactionClient(1);
-    dbMock.connect.mockResolvedValue(client as never);
+  it.each([undefined, { level: 1, state: null }])(
+    'refuses absent/null state before any deletion or write',
+    async (row) => {
+      const client = transactionClient(row ?? null);
+      expect(await clearOfflineItemName(42, { kind: 'all' })).toEqual({
+        ok: false,
+        error: 'character not found',
+      });
+      expect(client.query.mock.calls.some(([sql]) => /^(DELETE|UPDATE)/.test(sql))).toBe(false);
+    },
+  );
 
-    await characterStateExists(41);
-
-    const statements = client.query.mock.calls.map((call) => String(call[0]));
-    expect(statements[0]).toBe('BEGIN');
-    expect(statements[1]).toBe('SET LOCAL statement_timeout = 2000');
-    expect(statements).toContain('COMMIT');
-    expect(client.release).toHaveBeenCalledTimes(1);
-    // The constant itself, and its relation to the session default it lowers.
-    expect(CLEAR_ITEM_NAME_PROBE_TIMEOUT_MS).toBe(2_000);
-    expect(CLEAR_ITEM_NAME_PROBE_TIMEOUT_MS).toBeLessThan(DB_STATEMENT_TIMEOUT_MS);
-  });
-
-  it('answers false on a 0-row result (no row, a null state, or another realm)', async () => {
-    const client = transactionClient(0);
-    dbMock.connect.mockResolvedValue(client as never);
-    expect(await characterStateExists(42)).toBe(false);
-
-    // A driver that reports no rowCount at all reads as absent, never as present.
-    const blind = { query: vi.fn(), release: vi.fn() };
-    blind.query.mockResolvedValue({ rows: [] } as never);
-    dbMock.connect.mockResolvedValue(blind as never);
-    expect(await characterStateExists(43)).toBe(false);
-  });
-
-  it('releases the pooled client and rolls back when the read throws', async () => {
-    // A statement timeout on this path must not leak a client: the refusal
-    // arm runs while an operator waits, and a leaked client is the failure
-    // that outlives the request.
-    const client = { query: vi.fn(), release: vi.fn() };
-    client.query.mockImplementation(async (text: string) => {
-      if (text.includes('FROM characters')) throw new Error('canceling statement due to timeout');
-      return { rows: [], rowCount: 0 };
+  it('does not expire a lease when no named copy matches', async () => {
+    const client = transactionClient();
+    expect(await clearOfflineItemName(41, { kind: 'slot', slot: 'neck' })).toEqual({
+      ok: false,
+      error: 'no named copy matched that target',
     });
-    dbMock.connect.mockResolvedValue(client as never);
-
-    await expect(characterStateExists(44)).rejects.toThrow('canceling statement');
-    expect(client.query.mock.calls.map((call) => String(call[0]))).toContain('ROLLBACK');
-    expect(client.release).toHaveBeenCalledTimes(1);
+    expect(client.query.mock.calls.some(([sql]) => /^(DELETE|UPDATE)/.test(sql))).toBe(false);
   });
+
+  it.each([0, null])('reports a live lease on a refused fenced update (%s)', async (count) => {
+    const client = transactionClient(undefined, count);
+    expect(await clearOfflineItemName(41, { kind: 'all' })).toEqual({
+      ok: false,
+      error: CHARACTER_SAVE_LEASED_LINE,
+    });
+    expect(client.query.mock.calls.filter(([sql]) => sql.startsWith('SELECT'))).toHaveLength(1);
+  });
+
+  it.each(['SELECT level', 'DELETE FROM', 'UPDATE characters'])(
+    'rolls back and returns the client after %s failure',
+    async (sql) => {
+      const client = transactionClient(undefined, 1, sql);
+      await expect(clearOfflineItemName(41, { kind: 'all' })).rejects.toThrow('forced SQL failure');
+      expect(client.query.mock.calls.map(([text]) => text)).toContain('ROLLBACK');
+      expect(client.query.mock.calls.map(([text]) => text)).not.toContain('COMMIT');
+      expect(client.release).toHaveBeenCalledTimes(1);
+    },
+  );
 });

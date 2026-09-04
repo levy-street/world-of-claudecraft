@@ -31,10 +31,13 @@ import {
   type PerfectItemRef,
   perfectingInfoFrom,
 } from '../src/sim/professions/perfecting';
+import { capturePerfectItemRef } from '../src/sim/professions/perfecting_copy';
+import { Sim } from '../src/sim/sim';
 import type { EquipSlot, InvSlot, ItemInstancePayload } from '../src/sim/types';
 import { NAME_SUBMIT_LOCK_MS, PerfectingWindow } from '../src/ui/hud/professions/index';
 import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
 import type { IWorld } from '../src/world_api';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 const APEX = 'duskforged_warblade';
 
@@ -203,7 +206,7 @@ describe('the aria-busy send-once lifecycle', () => {
     expect(action.disabled).toBe(false);
     action.click();
     expect(world.perfectItem).toHaveBeenCalledTimes(1);
-    expect(world.perfectItem).toHaveBeenCalledWith({ slot: 'mainhand' });
+    expect(world.perfectItem).toHaveBeenCalledWith(expect.objectContaining({ slot: 'mainhand' }));
     expect((audio.perfectingAttempt as ReturnType<typeof vi.fn>).mock.calls.length).toBe(1);
     expect(root().getAttribute('aria-busy')).toBe('true');
     action.click();
@@ -367,7 +370,9 @@ describe('the aria-busy send-once lifecycle', () => {
     expect(radios.length).toBe(2);
     radios[1].click(); // the bagged copy
     (root().querySelector('[data-action]') as HTMLButtonElement).click();
-    expect(world.perfectItem).toHaveBeenLastCalledWith({ bag: 3, itemId: APEX });
+    expect(world.perfectItem).toHaveBeenLastCalledWith(
+      expect.objectContaining({ bag: 3, itemId: APEX }),
+    );
     // The modeled answer: cell 0 spliced, one ember and one setting spent,
     // the copy lands rank 2 one cell lower.
     world.inventory.splice(0, 1);
@@ -383,7 +388,9 @@ describe('the aria-busy send-once lifecycle', () => {
     const after = [...root().querySelectorAll('[role="radio"]')];
     expect(after.map((r) => r.getAttribute('aria-checked'))).toEqual(['false', 'true']);
     (root().querySelector('[data-action]') as HTMLButtonElement).click();
-    expect(world.perfectItem).toHaveBeenLastCalledWith({ bag: 2, itemId: APEX });
+    expect(world.perfectItem).toHaveBeenLastCalledWith(
+      expect.objectContaining({ bag: 2, itemId: APEX }),
+    );
   });
 
   it('a mid-bag copy (stacks below AND above it) shifts and still cues', () => {
@@ -398,7 +405,9 @@ describe('the aria-busy send-once lifecycle', () => {
     const win = makeWindow();
     win.open();
     (root().querySelector('[data-action]') as HTMLButtonElement).click();
-    expect(world.perfectItem).toHaveBeenLastCalledWith({ bag: 1, itemId: APEX });
+    expect(world.perfectItem).toHaveBeenLastCalledWith(
+      expect.objectContaining({ bag: 1, itemId: APEX }),
+    );
     world.inventory.splice(0, 1);
     world.inventory[0] = { itemId: APEX, count: 1, instance: { boundTo: 1, perfecting: 2 } };
     world.inventory[1].count -= 1;
@@ -427,7 +436,9 @@ describe('the aria-busy send-once lifecycle', () => {
     const radios = [...root().querySelectorAll('[role="radio"]')] as HTMLButtonElement[];
     radios[1].click();
     (root().querySelector('[data-action]') as HTMLButtonElement).click();
-    expect(world.perfectItem).toHaveBeenLastCalledWith({ bag: 4, itemId: APEX });
+    expect(world.perfectItem).toHaveBeenLastCalledWith(
+      expect.objectContaining({ bag: 4, itemId: APEX }),
+    );
     world.inventory.splice(0, 1);
     world.inventory[0].count -= 1;
     world.inventory[1].count -= 1;
@@ -438,7 +449,9 @@ describe('the aria-busy send-once lifecycle', () => {
     const after = [...root().querySelectorAll('[role="radio"]')];
     expect(after.map((r) => r.getAttribute('aria-checked'))).toEqual(['false', 'true']);
     (root().querySelector('[data-action]') as HTMLButtonElement).click();
-    expect(world.perfectItem).toHaveBeenLastCalledWith({ bag: 3, itemId: APEX });
+    expect(world.perfectItem).toHaveBeenLastCalledWith(
+      expect.objectContaining({ bag: 3, itemId: APEX }),
+    );
   });
 
   it('a LOST selected copy (sold mid-attempt) beside a same-id sibling cues nothing', () => {
@@ -460,7 +473,9 @@ describe('the aria-busy send-once lifecycle', () => {
     win.open();
     expect(checkedRef()).toContain('Rank 1 of 4');
     (root().querySelector('[data-action]') as HTMLButtonElement).click();
-    expect(world.perfectItem).toHaveBeenLastCalledWith({ bag: 3, itemId: APEX });
+    expect(world.perfectItem).toHaveBeenLastCalledWith(
+      expect.objectContaining({ bag: 3, itemId: APEX }),
+    );
     world.inventory.splice(3, 1);
     world.inventory.splice(0, 1);
     vi.advanceTimersByTime(1000);
@@ -521,7 +536,9 @@ describe('the aria-busy send-once lifecycle', () => {
     // success cue.
     expect(successCues()).toBe(0);
     (root().querySelector('[data-action]') as HTMLButtonElement).click();
-    expect(world.perfectItem).toHaveBeenLastCalledWith({ bag: 2, itemId: APEX });
+    expect(world.perfectItem).toHaveBeenLastCalledWith(
+      expect.objectContaining({ bag: 2, itemId: APEX }),
+    );
   });
 
   it('the anchor never spans a close: a shifted bagged pick falls back on reopen', () => {
@@ -569,7 +586,9 @@ describe('the aria-busy send-once lifecycle', () => {
     win.open();
     expect(checkedRef()).toContain('Rank 1 of 4');
     (root().querySelector('[data-action]') as HTMLButtonElement).click();
-    expect(world.perfectItem).toHaveBeenLastCalledWith({ bag: 1, itemId: APEX });
+    expect(world.perfectItem).toHaveBeenLastCalledWith(
+      expect.objectContaining({ bag: 1, itemId: APEX }),
+    );
     world.inventory.splice(0, 1);
     world.inventory[2].count -= 1;
     world.inventory[3].count -= 1;
@@ -579,7 +598,9 @@ describe('the aria-busy send-once lifecycle', () => {
     expect(checkedRef()).toContain('Rank 1 of 4');
     expect(root().getAttribute('aria-busy')).toBe('false');
     (root().querySelector('[data-action]') as HTMLButtonElement).click();
-    expect(world.perfectItem).toHaveBeenLastCalledWith({ bag: 0, itemId: APEX });
+    expect(world.perfectItem).toHaveBeenLastCalledWith(
+      expect.objectContaining({ bag: 0, itemId: APEX }),
+    );
   });
 
   // Focus across the shift. The candidate rows are keyed by copy identity
@@ -700,7 +721,9 @@ describe('the aria-busy send-once lifecycle', () => {
     rowWithRank(2).click();
     expect(checkedRef()).toContain('Rank 2 of 4');
     (root().querySelector('[data-action]') as HTMLButtonElement).click();
-    expect(world.perfectItem).toHaveBeenLastCalledWith({ bag: 1, itemId: APEX });
+    expect(world.perfectItem).toHaveBeenLastCalledWith(
+      expect.objectContaining({ bag: 1, itemId: APEX }),
+    );
   });
 
   it('a bagged pick survives a close when its exact cell still holds the copy', () => {
@@ -726,7 +749,9 @@ describe('the aria-busy send-once lifecycle', () => {
     expect(checkedRef()).toContain('Rank 1 of 4');
     expect(successCues()).toBe(0);
     (root().querySelector('[data-action]') as HTMLButtonElement).click();
-    expect(world.perfectItem).toHaveBeenLastCalledWith({ bag: 2, itemId: APEX });
+    expect(world.perfectItem).toHaveBeenLastCalledWith(
+      expect.objectContaining({ bag: 2, itemId: APEX }),
+    );
   });
 
   it('a different-id bagged candidate taking the vacated selection cues nothing', () => {
@@ -932,12 +957,13 @@ describe('the R2 bind-warning confirm step', () => {
     // prompt and the 1 Hz repaint keeps running, so a bag shift while the
     // confirm is open makes a re-resolved selection fall back to another
     // candidate. The confirm must send the ref it was opened for; a stale
-    // captured ref dies on the server's index-plus-id pin instead.
+    // captured ref dies on the server's copy-token check instead.
     world.equipment = {};
     world.inventory.push({ itemId: APEX, count: 1 });
     const win = makeWindow();
     win.open();
     const bagIndex = world.inventory.length - 1;
+    const captured = capturePerfectItemRef(world, { bag: bagIndex, itemId: APEX });
     (root().querySelector('[data-action]') as HTMLButtonElement).click();
     expect(document.querySelector('.pf-bind-prompt')).not.toBeNull();
     // The bag shifts under the open prompt (a preceding stack is consumed),
@@ -947,7 +973,7 @@ describe('the R2 bind-warning confirm step', () => {
     const prompt = document.querySelector('.pf-bind-prompt') as HTMLElement;
     (prompt.querySelector('.pf-bind-confirm') as HTMLButtonElement).click();
     expect(world.perfectItem).toHaveBeenCalledTimes(1);
-    expect(world.perfectItem.mock.calls[0][0]).toEqual({ bag: bagIndex, itemId: APEX });
+    expect(world.perfectItem.mock.calls[0][0]).toEqual(captured);
   });
 
   it('a bound copy skips the confirm entirely', () => {
@@ -1038,6 +1064,7 @@ describe('the naming dialog (deliverable B)', () => {
     world.equipmentInstances = {};
     world.inventory.push({ itemId: APEX, count: 1, instance: { perfected: true, boundTo: 1 } });
     const bagIndex = world.inventory.length - 1;
+    const captured = capturePerfectItemRef(world, { bag: bagIndex, itemId: APEX });
     const win = makeWindow();
     win.open();
     (root().querySelector('[data-action]') as HTMLButtonElement).click();
@@ -1053,7 +1080,7 @@ describe('the naming dialog (deliverable B)', () => {
     input.dispatchEvent(new Event('input'));
     submit.click();
     expect(world.perfectItem).toHaveBeenCalledTimes(1);
-    expect(world.perfectItem.mock.calls[0][0]).toEqual({ bag: bagIndex, itemId: APEX });
+    expect(world.perfectItem.mock.calls[0][0]).toEqual(captured);
     expect(world.perfectItem.mock.calls[0][1]).toBe('Oath');
   });
 
@@ -1105,7 +1132,10 @@ describe('the naming dialog (deliverable B)', () => {
     input.dispatchEvent(new Event('input'));
     submit.click();
     expect(world.perfectItem).toHaveBeenCalledTimes(1);
-    expect(world.perfectItem).toHaveBeenCalledWith({ slot: 'mainhand' }, 'Dawn Edge');
+    expect(world.perfectItem).toHaveBeenCalledWith(
+      expect.objectContaining({ slot: 'mainhand' }),
+      'Dawn Edge',
+    );
     // The lock: disabled + a busy affordance, so a mash never reads as a
     // dead button while the name_screen lane may have dropped the frame.
     expect(submit.disabled).toBe(true);
@@ -1263,4 +1293,150 @@ describe('promoted candidate name layout', () => {
     expect(css).toMatch(/\.pf-cand-names\s*\{[^}]*flex-direction:\s*column;/s);
     expect(css).toMatch(/\.pf-cand-sub\s*\{[^}]*text-overflow:\s*ellipsis;/s);
   });
+});
+
+describe('Perfecting prompt teardown', () => {
+  it('closing dismisses bind confirmation and detached controls cannot submit', () => {
+    const win = makeWindow();
+    win.open();
+    (root().querySelector('[data-action]') as HTMLButtonElement).click();
+    const confirm = document.querySelector('.pf-bind-confirm') as HTMLButtonElement;
+    expect(confirm).not.toBeNull();
+    win.close();
+    expect(document.querySelector('.pf-bind-prompt')).toBeNull();
+    expect(root().inert).toBe(false);
+    confirm.click();
+    expect(world.perfectItem).not.toHaveBeenCalled();
+  });
+
+  it('repeated activation creates only one bind prompt', () => {
+    const win = makeWindow();
+    win.open();
+    const action = root().querySelector('[data-action]') as HTMLButtonElement;
+    action.click();
+    action.click();
+    expect(document.querySelectorAll('.pf-bind-prompt')).toHaveLength(1);
+    win.close();
+  });
+
+  it('a world change cancels a pending bind instead of submitting to the new character', () => {
+    const win = makeWindow();
+    win.open();
+    (root().querySelector('[data-action]') as HTMLButtonElement).click();
+    const confirm = document.querySelector('.pf-bind-confirm') as HTMLButtonElement;
+    const oldWorld = world;
+    world = new FakeWorld();
+    confirm.click();
+    expect(oldWorld.perfectItem).not.toHaveBeenCalled();
+    expect(world.perfectItem).not.toHaveBeenCalled();
+    expect(document.querySelector('.pf-bind-prompt')).toBeNull();
+    expect(win.isOpen).toBe(false);
+  });
+});
+
+describe('Perfecting naming lifetime', () => {
+  function openNaming(win: PerfectingWindow) {
+    world.equipmentInstances.mainhand = { perfected: true };
+    world.inventory.push({ itemId: 'deed_of_making', count: 1 });
+    win.open();
+    (root().querySelector('[data-action]') as HTMLButtonElement).click();
+    const input = document.querySelector('.pf-name-input') as HTMLInputElement;
+    input.value = 'Dawn Edge';
+    input.dispatchEvent(new Event('input'));
+    return document.querySelector('.pf-name-submit') as HTMLButtonElement;
+  }
+
+  it('a detached naming submit cannot send after the window closes', () => {
+    const win = makeWindow();
+    const submit = openNaming(win);
+    win.close();
+    submit.click();
+    expect(world.perfectItem).not.toHaveBeenCalled();
+    expect(document.querySelector('.pf-name-prompt')).toBeNull();
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('a world change before submit cancels naming and leaves no rearm timer', () => {
+    const win = makeWindow();
+    const submit = openNaming(win);
+    const oldWorld = world;
+    world = new FakeWorld();
+    submit.click();
+    expect(oldWorld.perfectItem).not.toHaveBeenCalled();
+    expect(world.perfectItem).not.toHaveBeenCalled();
+    expect(win.isOpen).toBe(false);
+    expect(document.querySelector('.pf-name-prompt')).toBeNull();
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('the convergence tick dismisses prompts after a world change without input', () => {
+    const win = makeWindow();
+    openNaming(win);
+    world = new FakeWorld();
+    vi.advanceTimersByTime(1000);
+    expect(win.isOpen).toBe(false);
+    expect(document.querySelector('.pf-name-prompt')).toBeNull();
+    expect(root().inert).toBe(false);
+    expect(vi.getTimerCount()).toBe(0);
+  });
+});
+
+describe('Perfecting prompt capture through the shared sim', () => {
+  it.each([false, true])(
+    'a same-ID bag shift cannot spend on another copy (promotion=%s)',
+    (promotion) => {
+      const sim = new Sim({
+        seed: 5,
+        playerClass: 'warrior',
+        autoEquip: false,
+        world: EMPTY_TEST_WORLD,
+      });
+      const meta = sim.meta(sim.playerId);
+      if (!meta) throw new Error('test player missing');
+      meta.craftSkills.weaponcrafting = PERFECTING_SKILL_REQ;
+      meta.inventory = [
+        { itemId: 'linen_cloth', count: 1 },
+        ...world.inventory,
+        { itemId: 'deed_of_making', count: 1 },
+        {
+          itemId: APEX,
+          count: 1,
+          instance: { signer: 'Original', ...(promotion ? { perfected: true } : {}) },
+        },
+        {
+          itemId: APEX,
+          count: 1,
+          instance: { signer: 'Sibling', ...(promotion ? { perfected: true } : {}) },
+        },
+      ];
+      world.equipment = {};
+      world.inventory = meta.inventory;
+      world.perfectItem.mockImplementation((ref: PerfectItemRef, name?: string) =>
+        sim.perfectItem(ref, name),
+      );
+      const win = makeWindow();
+      win.open();
+      (root().querySelector('[data-action]') as HTMLButtonElement).click();
+      meta.inventory.splice(0, 1);
+      vi.advanceTimersByTime(1000);
+      const before = structuredClone(meta.inventory);
+      const rng = vi.spyOn(sim.rng, 'next');
+      if (promotion) {
+        const input = document.querySelector('.pf-name-input') as HTMLInputElement;
+        input.value = 'Dawn Edge';
+        input.dispatchEvent(new Event('input'));
+        (document.querySelector('.pf-name-submit') as HTMLButtonElement).click();
+      } else {
+        (document.querySelector('.pf-bind-confirm') as HTMLButtonElement).click();
+      }
+      expect(world.perfectItem).toHaveBeenCalledTimes(1);
+      expect(meta.inventory).toEqual(before);
+      expect(rng).not.toHaveBeenCalled();
+      expect(sim.drainEvents()).toContainEqual(
+        expect.objectContaining({ type: 'error', text: "You don't have that item." }),
+      );
+      rng.mockRestore();
+      win.close();
+    },
+  );
 });

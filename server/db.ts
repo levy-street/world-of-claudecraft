@@ -10,6 +10,7 @@ import { sanitizeRemovedZone1Content } from '../src/sim/removed_zone1_content';
 import type { CharacterState, MailSave, MarketSave } from '../src/sim/sim';
 import type { ArenaFormat, PlayerClass } from '../src/sim/types';
 import type { ActionBarLayout } from '../src/world_api/action_bar';
+import { projectAccountExportState } from './account_export_state';
 import { ACCOUNT_WEALTH_SCHEMA } from './account_wealth_db';
 import { AD_SPEND_SCHEMA } from './ad_spend_db';
 import { bustAdminGuildListReads } from './admin_guilds_read';
@@ -2634,7 +2635,7 @@ export async function exportAccountData(
       name: c.name,
       class: c.class,
       level: c.level,
-      state: c.state,
+      state: projectAccountExportState(c.state),
       realm: c.realm,
       // The authored modular look: per-character personal data the account
       // created, so it belongs in the export beside the state blob.
@@ -3519,11 +3520,9 @@ export async function saveCharacterState(
   }
 }
 
-// The lease-fenced OFFLINE write (the two signer sweeps, the PBE roster save,
-// the admin clear-item-name strip). The statement, its three bounds, and the
-// rationale for each live in server/offline_character_save_db.ts; db.ts keeps
-// only the binding of the real transaction runner, the way the save family
-// keeps only its beginSaveTx binding.
+// Lease-fenced offline snapshots for the PBE roster fallback.
+// Signer and name mutations use offline_character_mutation_db.ts instead.
+// The snapshot writer and its bounds live in offline_character_save_db.ts.
 export function saveOfflineCharacterState(
   characterId: number,
   level: number,

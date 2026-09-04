@@ -28,6 +28,7 @@ import {
   type PerfectItemRef,
   type PerfectingInfoView,
 } from '../../../sim/professions/perfecting';
+import { capturePerfectItemRef } from '../../../sim/professions/perfecting_copy';
 import {
   ALL_EQUIP_SLOTS,
   type EquipSlot,
@@ -77,6 +78,8 @@ export type PerfectingAction = 'attempt' | 'promote' | 'done';
 
 export interface PerfectingDetail {
   ref: PerfectItemRef;
+  /** Captured at paint time; prompts preserve this exact authorization. */
+  commandRef: PerfectItemRef;
   itemId: string;
   worn: boolean;
   info: PerfectingInfoView;
@@ -302,6 +305,7 @@ export function buildPerfectingView(
           (action !== 'promote' || !info.equipBlocked);
     detail = {
       ref: selectedEntry.ref,
+      commandRef: capturePerfectItemRef(reads, selectedEntry.ref),
       itemId: info.itemId,
       worn: selectedEntry.worn,
       info,
@@ -349,5 +353,5 @@ export function perfectingViewSignature(view: PerfectingViewModel, syncing: bool
         `${c.state}:${c.rank}:${c.selected ? 1 : 0}:${c.chosenName ?? ''}`,
     )
     .join(';');
-  return `${syncing ? 'sync' : 'ok'}|${rows}|${perfectingInfoSignature(view.detail?.info ?? null)}`;
+  return `${syncing ? 'sync' : 'ok'}|${rows}|${perfectingInfoSignature(view.detail?.info ?? null)}|${view.detail?.commandRef.copy?.pin ?? ''}`;
 }

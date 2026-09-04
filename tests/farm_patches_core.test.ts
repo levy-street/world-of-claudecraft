@@ -1,7 +1,7 @@
 // The farm patch render core: the pure visual decisions behind the beds and
 // the growth-stage meshes. Plain Node Vitest, no three.js and no DOM, which is
 // the whole point of the core living apart from the adapter.
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   FARM_ACCENT_MATERIAL_NAME,
   FARM_ACCENT_MESH_NAME,
@@ -26,6 +26,7 @@ import {
   farmCropFamily,
   farmFeastModelUrl,
   farmFeastModelUrls,
+  farmFeastSurfaceNormal,
   farmModelUrls,
   farmPlotKeyMatches,
   farmStageModelUrl,
@@ -40,6 +41,32 @@ import type { FarmPlotView } from '../src/world_api/farming';
 // A one-hour growth window starting at t=0, so a stage boundary is a round
 // number: seedling at 1/3 (20 min), maturing at 2/3 (40 min), ready at 60 min.
 const HOUR = 60 * 60 * 1000;
+
+describe('placed feast surface normals', () => {
+  it('follows the actual walkable slope', () => {
+    // Analytic plane: the normal is (-0.25, 1, 0.5), independent of where
+    // the table stands. This also pins normalization before the 3D adapter.
+    const ground = (x: number, z: number) => 10 + x * 0.25 - z * 0.5;
+    const normal = farmFeastSurfaceNormal({ x: 4, y: 12, z: -2 }, ground);
+    const length = Math.sqrt(1.3125);
+    expect(normal.x).toBeCloseTo(-0.25 / length, 12);
+    expect(normal.y).toBeCloseTo(1 / length, 12);
+    expect(normal.z).toBeCloseTo(0.5 / length, 12);
+  });
+
+  it('tolerates rounded wire heights while preserving slope', () => {
+    const ground = (x: number) => 5 + x * 0.5;
+    const normal = farmFeastSurfaceNormal({ x: 1, y: 5.51, z: 2 }, ground);
+    expect(normal.x).toBeCloseTo(-1 / Math.sqrt(5), 12);
+    expect(normal.y).toBeCloseTo(2 / Math.sqrt(5), 12);
+  });
+
+  it('keeps runtime lifts and standable props upright above the height field', () => {
+    const ground = vi.fn((x: number) => 5 + x * 0.5);
+    expect(farmFeastSurfaceNormal({ x: 1, y: 8.5, z: 2 }, ground)).toEqual({ x: 0, y: 1, z: 0 });
+    expect(ground).toHaveBeenCalledTimes(1);
+  });
+});
 
 function plot(over: Partial<FarmPlotView> = {}): FarmPlotView {
   return {

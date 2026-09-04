@@ -72,6 +72,10 @@
 // against the save path or a lease acquire (the character_delete_db.ts
 // verify-read carve-out, same argument).
 //
+// Name moderation and signer sweeps use offline_character_mutation_db.ts;
+// that path also removes expired lease rows under the lock to close revival.
+// This snapshot writer remains for the PBE roster fallback.
+//
 // The transaction runner is INJECTED rather than imported, so this module
 // holds no pool of its own: db.ts binds the real runWithStatementTimeout at
 // its one call site, and the suite drives the whole statement build and the

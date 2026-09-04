@@ -226,6 +226,7 @@ import {
 import { applyReconSelfWire, ReconWireState } from './movement_reconciliation_wire';
 import { createNativeAttestationProof } from './native_attestation';
 import { createNetPipelineStats, type NetPipelineStats } from './net_pipeline_stats';
+import { perfectingCommand } from './perfecting_command';
 import { optimisticQuestState } from './quest_state_optimistic';
 import { isTransientReconnectRejection, isTransientTimeoutRejection } from './reconnect_policy';
 import { isInputSendBackpressured } from './send_backpressure';
@@ -4308,15 +4309,10 @@ export class ClientWorld extends ReconWireState implements IWorld {
   unbindItem(itemId: string): void {
     this.cmd({ cmd: 'unbind_item', item: itemId });
   }
-  // The Perfecting stage (Masterwrought phase 12): command only, never
-  // predicted. Exactly one of `slot` (worn) or `bag` plus `item` rides, the
-  // absent arm omitted; the server re-validates the shape and the sim every
-  // gate and the one roll. Feedback is the sim's error/log lines plus the
-  // self inv/einst re-diff (a HEAVY_SELF_CMDS member). Phase 13: the optional
-  // legendary name rides the same frame; undefined drops in JSON.stringify.
+  // Perfecting sends the captured copy and optional name; the server resolves
+  // every gate and roll. Feedback is the sim's lines and self inv/einst re-diff.
   perfectItem(ref: PerfectItemRef, name?: string): void {
-    if ('slot' in ref) this.cmd({ cmd: 'perfect_item', slot: ref.slot, name });
-    else this.cmd({ cmd: 'perfect_item', bag: ref.bag, item: ref.itemId, name });
+    this.cmd({ cmd: 'perfect_item', ...perfectingCommand(this, ref, name) });
   }
   // The one shared view builder the offline Sim also answers through
   // (perfectingInfoFrom), fed the self mirrors: the whole `inv` array, the

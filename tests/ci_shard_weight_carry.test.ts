@@ -5,8 +5,8 @@
 // exactly one clause of the contract the committed-table pin applies.
 //
 // The last describe drives the ENTRY that consumes this module,
-// scripts/ci_shard_weights_harvest.mjs, over BOTH of its local-carry modes with
-// an injected spawner, so their parsing and refusal paths remain executable
+// scripts/ci_shard_weights_harvest.mjs, over full harvest and local-carry modes
+// with injected I/O, so output, parsing and refusal paths remain executable
 // rather than prose-only contracts.
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type {
@@ -551,7 +551,7 @@ describe('serializeWeightTable', () => {
   });
 });
 
-describe('the harvest entry: the local-carry modes (an injected spawner)', () => {
+describe('the harvest entry: full harvest and local-carry modes (injected I/O)', () => {
   // gate-census items 3, 4 and 6. Two behaviors of this mode are load-bearing
   // and were unpinned: it ENUMERATES the unmeasured set itself rather than
   // taking a list, and it REFUSES rather than substituting a guess when a run
@@ -651,6 +651,40 @@ describe('the harvest entry: the local-carry modes (an injected spawner)', () =>
     entryIo.readFileSync.mockReset();
     entryIo.writeFileSync.mockReset();
     entryIo.walkShardTestFiles.mockReset();
+  });
+
+  it('a complete CI harvest replaces local attribution with a valid empty carried map', async () => {
+    const jobs = [
+      ...Array.from({ length: 8 }, (_, i) => `PR tests (${i + 1})`),
+      'PR long sims',
+      'PR gate',
+    ].map((name, i) => ({ id: i + 1, name, conclusion: 'success' }));
+    entryIo.readFileSync.mockReturnValue(JSON.stringify(baseTable()));
+    entryIo.execFileSync.mockImplementation((_cmd: string, args: string[]) => {
+      if (args.includes('--json')) return JSON.stringify(jobs);
+      const job = Number(args[args.indexOf('--job') + 1]);
+      return (
+        '[ci-shard-test] changes-job decision: mode=full\n' +
+        `\u2713 ${CARRIED} (1 test) ${200 + job}ms\n` +
+        `\u2713 tests/full_${job}.test.ts (1 test) ${30 + job}ms`
+      );
+    });
+
+    const { exitCode, out } = await runEntry(['456']);
+    expect(exitCode).toBe(0);
+    expect(out).toContain('replacing 1 carried weights with CI-harvested weights');
+    expect(entryIo.execFileSync).toHaveBeenCalledTimes(11);
+    const refreshed = written();
+    expect(refreshed[CARRIED]).toBe(210);
+    expect(refreshed.__provenance).toEqual({
+      run: '456',
+      harvested: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/),
+      files: 11,
+      harvestedFiles: 11,
+      carried: {},
+    });
+    expect(carriedDefects(refreshed, { fallbackMs: 41, requireMap: true })).toEqual([]);
+    expect(entryIo.spawnSync).not.toHaveBeenCalled();
   });
 
   it('ENUMERATES the unmeasured set itself and ignores any file named on the CLI', () => {

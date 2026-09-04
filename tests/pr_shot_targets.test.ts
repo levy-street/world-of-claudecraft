@@ -82,6 +82,28 @@ describe('classifyDiff', () => {
     expect(plan.generic).toHaveLength(0);
   });
 
+  it('captures Masterwrought modal teardown and indoor feast placement on desktop and mobile', () => {
+    for (const [path, key] of [
+      ['src/ui/hud/professions/perfecting_window.ts', 'perfecting-dismissal'],
+      ['src/render/farm_patches.ts', 'feast-dungeon-floor'],
+    ]) {
+      const target = classifyDiff([path]).specific.find(
+        (entry: { key: string }) => entry.key === key,
+      );
+      expect(target, path).toBeDefined();
+      expect(target.variants.map((variant: { key: string }) => variant.key)).toEqual([
+        'desktop',
+        'mobile',
+      ]);
+      expect(target.variants[1].mobile).toBe(true);
+      expect(
+        target.variants.every(
+          (variant: { beforeLoad: unknown }) => typeof variant.beforeLoad === 'function',
+        ),
+      ).toBe(true);
+    }
+  });
+
   it('maps a bags change to the inventory window target', () => {
     const plan = classifyDiff(['src/ui/bags.ts']);
     expect(plan.isVisual).toBe(true);

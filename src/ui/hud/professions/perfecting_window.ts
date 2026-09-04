@@ -34,7 +34,7 @@ import { esc } from '../../esc';
 import { captureFocusKey, restoreFirstEnabled } from '../../focus_restore';
 import { formatNumber, t } from '../../i18n';
 import type { PainterHostPresentation } from '../../painter_host';
-import { installPromptDialog } from '../../prompt_dialog';
+import { installPromptDialog, type PromptDialogHandle } from '../../prompt_dialog';
 import { rovingTarget } from '../../roving_index';
 import { svgIcon } from '../../ui_icons';
 import { craftNameText } from './craft_name_view';
@@ -88,6 +88,8 @@ export class PerfectingWindow {
   private selectedAnchor: PerfectingSelectionAnchor | null = null;
   private paintedView: PerfectingViewModel | null = null;
   private namingDialog: LegendaryNamingDialogHandle | null = null;
+  private bindDialog: PromptDialogHandle | null = null;
+  private sessionWorld: IWorld | null = null;
   private clock: number | null = null;
   /** The whole-view value signature the 1 Hz tick compares (text-independent
    *  BY DESIGN, which is why relocalize() below exists). */
@@ -105,13 +107,8 @@ export class PerfectingWindow {
    *  the dialog stays open but UNLOCKED (the selected-signature move still
    *  calls notifyAnswered), and the status region carries the one line that
    *  edge owes while a dialog is up (namingSelectionUnconfirmed: check the
-   *  selection before forging). A re-submit sends the ref the dialog was opened
-   *  for: where that cell still holds the promoted copy it is refused
-   *  server-side (the already-legendary arm); where a same-id sibling slid
-   *  onto the opened cell it reaches the sibling instead, the recorded
-   *  index-plus-id class (the Phase 14 ledger). The deliberate safe
-   *  direction for the cue: the cell is no witness of the copy in that
-   *  shape. */
+   *  selection before forging). Re-submission preserves the original copy
+   *  token, so a moved or replaced selection refuses server-side. */
   private prevSelected: {
     ref: PerfectItemRef;
     anchor: PerfectingSelectionAnchor | null;
@@ -179,10 +176,12 @@ export class PerfectingWindow {
   }
 
   open(): void {
+    if (this.sessionWorld && this.sessionWorld !== this.deps.world()) this.close();
     const root = this.root();
     const wasOpen = this.isOpen;
     if (!wasOpen) {
       this.deps.closeOthers();
+      this.sessionWorld = this.deps.world();
       this.openerFocus = this.deps.captureFocus();
       markDialogRoot(root, { labelledBy: 'perfecting-title' });
       // Flex: the column-flex window family (the plant sheet / journal shape).
@@ -204,7 +203,7 @@ export class PerfectingWindow {
 
   close(): void {
     const root = this.rootEl;
-    if (!root || root.style.display !== 'flex') {
+    if (!root) {
       this.openerFocus = null;
       return;
     }
@@ -215,6 +214,8 @@ export class PerfectingWindow {
     // force-closed under an open prompt.
     root.style.display = 'none';
     this.namingDialog?.dismiss();
+    this.bindDialog?.dismiss();
+    this.sessionWorld = null;
     root.inert = false;
     this.deps.onVisibilityChange?.();
     if (this.clock !== null) {
@@ -285,7 +286,7 @@ export class PerfectingWindow {
    *  whole through the SAME paintFrom an open takes (the counted
    *  COLD_PAINTER_ALLOWANCES entry in tests/hud_perf_budget.test.ts). */
   private tick(): void {
-    if (!this.isOpen) return;
+    if (!this.sessionIsCurrent()) return;
     const built = this.buildView();
     if (perfectingViewSignature(built.view, built.syncing) === this.lastSig) return;
     this.paintFrom(built);
@@ -468,10 +469,11 @@ export class PerfectingWindow {
     }
     root.querySelector('[data-action]')?.addEventListener('click', () => {
       const detail = this.paintedView?.detail;
-      if (!detail || !detail.actionEnabled || this.pendingSend) return;
+      if (!this.sessionIsCurrent() || !detail?.actionEnabled || this.pendingSend) return;
+      if (this.bindDialog || this.namingDialog?.isOpen()) return;
       if (detail.action === 'attempt') {
         if (detail.bindWarning) this.confirmBindThenAttempt(detail);
-        else this.sendAttempt(detail.ref);
+        else this.sendAttempt(detail.commandRef);
       } else if (detail.action === 'promote') {
         this.openNamingDialog(detail);
       }
@@ -506,7 +508,15 @@ export class PerfectingWindow {
     ]);
   }
 
+  private sessionIsCurrent(): boolean {
+    if (!this.isOpen) return false;
+    if (this.sessionWorld === this.deps.world()) return true;
+    this.close();
+    return false;
+  }
+
   private sendAttempt(ref: PerfectItemRef): void {
+    if (!this.sessionIsCurrent()) return;
     this.setPendingSend(true);
     audio.perfectingAttempt();
     // The live world at click time, never captured at render (the plant
@@ -514,7 +524,7 @@ export class PerfectingWindow {
     this.deps.world().perfectItem(ref);
   }
 
-  /** The R2 confirm step: the first attempt on an unbound copy permanently
+  /** The R2 confirm step: the first attempt on an unbound copy
    *  binds it, so that attempt goes through an explicit confirm on the
    *  shared modal recipe (never a hand-rolled trap). */
   private confirmBindThenAttempt(detail: PerfectingDetail): void {
@@ -548,10 +558,13 @@ export class PerfectingWindow {
     actions.append(cancel, confirm);
     prompt.append(text, actions);
     const opener = this.root().querySelector<HTMLElement>('[data-action]');
-    const { dismissAndReturn } = installPromptDialog(
+    let open = true;
+    const dialog = installPromptDialog(
       prompt,
       opener,
       () => {
+        open = false;
+        this.bindDialog = null;
         prompt.remove();
         this.refocusAfterPrompt();
       },
@@ -560,19 +573,15 @@ export class PerfectingWindow {
         idPrefix: 'pf-bind-title',
       },
     );
+    this.bindDialog = dialog;
     confirm.addEventListener('click', () => {
-      // Send the ref the dialog was OPENED for, never a re-resolve: the 1 Hz
-      // repaint keeps running behind the prompt and the HUD outside this
-      // window stays interactive, so a bag shift mid-dialog would make a
-      // re-resolved view fall back to another candidate and this confirm
-      // would bind THAT copy. A genuinely stale captured ref resolves to
-      // nothing server-side (the index-plus-id pin) and answers with the
-      // sim's own noItem line, which is the safe direction (the phase 13
-      // peek/consume ruling).
-      dismissAndReturn();
-      this.sendAttempt(detail.ref);
+      if (!open || !this.sessionIsCurrent()) return;
+      dialog.dismissAndReturn();
+      this.sendAttempt(detail.commandRef);
     });
-    cancel.addEventListener('click', () => dismissAndReturn());
+    cancel.addEventListener('click', () => {
+      if (open) dialog.dismissAndReturn();
+    });
     stack.appendChild(prompt);
     confirm.focus();
   }
@@ -585,14 +594,10 @@ export class PerfectingWindow {
       opener: this.root().querySelector<HTMLElement>('[data-action]'),
       itemName: def ? itemDisplayName(def) : detail.itemId,
       onSubmit: (name) => {
-        // Send the ref the dialog was OPENED for, never a re-resolve: a bag
-        // shift mid-dialog would retarget a re-resolved view onto another
-        // candidate and spend the Deed of Making naming the wrong copy. A
-        // stale captured ref resolves to nothing server-side (the
-        // index-plus-id pin) and answers with the sim's noItem line, the
-        // safe direction (the phase 13 peek/consume ruling).
+        if (!this.sessionIsCurrent()) return;
+        // Never replace the paint-time capture with the current slot occupant.
         this.setPendingSend(true);
-        this.deps.world().perfectItem(detail.ref, name);
+        this.deps.world().perfectItem(detail.commandRef, name);
       },
       onClosed: () => {
         this.namingDialog = null;

@@ -7,6 +7,7 @@
 // drive window.__game directly: sim.addItem, hud.toggleBags/toggleMap, sim.player.pos).
 
 import { dismissEntryOverlays } from './enter_offline_game.mjs';
+import { masterwroughtReviewTargets } from './lib/pr_shot_masterwrought.mjs';
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -794,6 +795,10 @@ const fakePadAxesSeed = async (page) => {
 };
 
 export const TARGETS = [
+  ...masterwroughtReviewTargets({
+    beforeLoad: lowGraphicsSeed,
+    dismissOverlays: dismissEntryOverlays,
+  }),
   {
     key: 'ravenrift',
     label:

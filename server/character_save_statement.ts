@@ -48,10 +48,10 @@
 //   One-Time Filter decided BEFORE the row lock is taken, and EvalPlanQual
 //   never re-runs an InitPlan after a lock wait. A lease committed during
 //   that wait was therefore unseen and the write landed (reproduced at the
-//   Phase 18 QA database review). Its one caller,
-//   server/offline_character_save_db.ts, takes the characters row lock
-//   FOR UPDATE in a preceding statement for exactly this reason; a SECOND
-//   caller that skips that step reopens the same write loss.
+//   Phase 18 QA database review). Both offline_character_save_db.ts and
+//   offline_character_mutation_db.ts take the character lock FOR UPDATE first.
+//   Fresh-blob mutations also delete expired leases under that lock, preventing
+//   their heartbeat revival or takeover from undoing a completed mutation.
 //
 // Pure apart from the size signal: no pool, no clock of its own, the holder
 // injected, so the statement text is unit-testable

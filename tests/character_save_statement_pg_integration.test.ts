@@ -21,8 +21,10 @@
 import type { Pool as PgPool } from 'pg';
 import { Pool } from 'pg';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { CHARACTER_SAVE_LEASED_LINE } from '../server/character_save_statement';
 import {
   applyOfflineCharacterSaveBounds,
+  type BoundedTransactionRunner,
   OFFLINE_CHARACTER_SAVE_LOCK_TIMEOUT_MS,
   OFFLINE_CHARACTER_SAVE_STATEMENT_TIMEOUT_MS,
 } from '../server/offline_character_save_db';
@@ -490,6 +492,15 @@ describeDb('lease-fenced character saves (REAL Postgres)', () => {
     it('the rename own-signer sweep lands with no lease and refuses under a live one, per character', async () => {
       const free = await makeCharacter();
       const leased = await makeCharacter();
+      await pool.query('UPDATE characters SET level = $2, state = $3::jsonb WHERE id = $1', [
+        free,
+        9,
+        JSON.stringify(SIGNED('rename-ok', 'Oldname')),
+      ]);
+      await pool.query('UPDATE characters SET state = $2::jsonb WHERE id = $1', [
+        leased,
+        JSON.stringify(SIGNED('must-stay', 'Oldname')),
+      ]);
       await grantLease(leased, 'live-nonce', 3600);
 
       await characters.rekeyRenamedCharacterOwnSigner(
@@ -515,8 +526,8 @@ describeDb('lease-fenced character saves (REAL Postgres)', () => {
           'Newname',
         ),
       ).resolves.toBeUndefined();
-      expect(await signerOf(leased)).toBeUndefined();
-      expect(await markerOf(leased)).toBeUndefined();
+      expect(await signerOf(leased)).toBe('Oldname');
+      expect(await markerOf(leased)).toBe('must-stay');
       expect(await levelOf(leased)).toBe(1);
       expect(consoleError).toHaveBeenCalledTimes(1);
       expect(String(consoleError.mock.calls[0][0])).toContain('lease');
@@ -525,6 +536,15 @@ describeDb('lease-fenced character saves (REAL Postgres)', () => {
     it('the reclaim holder sweep lands with no lease and refuses under a live one, per character', async () => {
       const free = await makeCharacter();
       const leased = await makeCharacter();
+      await pool.query('UPDATE characters SET level = $2, state = $3::jsonb WHERE id = $1', [
+        free,
+        4,
+        JSON.stringify(SIGNED('reclaim-ok', 'Freed')),
+      ]);
+      await pool.query('UPDATE characters SET state = $2::jsonb WHERE id = $1', [
+        leased,
+        JSON.stringify(SIGNED('must-stay', 'Freed')),
+      ]);
       await grantLease(leased, 'live-nonce', 3600);
 
       await characters.rekeyReclaimedCharacterWorldState(stubBooks(), {
@@ -548,8 +568,8 @@ describeDb('lease-fenced character saves (REAL Postgres)', () => {
           state: SIGNED('must-not-land', 'Freed'),
         }),
       ).resolves.toBeUndefined();
-      expect(await signerOf(leased)).toBeUndefined();
-      expect(await markerOf(leased)).toBeUndefined();
+      expect(await signerOf(leased)).toBe('Freed');
+      expect(await markerOf(leased)).toBe('must-stay');
       expect(consoleError).toHaveBeenCalledTimes(1);
       expect(String(consoleError.mock.calls[0][0])).toContain('lease');
     });
@@ -574,6 +594,11 @@ describeDb('lease-fenced character saves (REAL Postgres)', () => {
 
     it('the writers land once the lease is EXPIRED (the crashed-process arm)', async () => {
       const id = await makeCharacter();
+      await pool.query('UPDATE characters SET level = $2, state = $3::jsonb WHERE id = $1', [
+        id,
+        9,
+        JSON.stringify(SIGNED('expired-ok', 'Oldname')),
+      ]);
       await grantLease(id, 'stale-nonce', -60);
       await characters.rekeyRenamedCharacterOwnSigner(
         id,
@@ -587,39 +612,300 @@ describeDb('lease-fenced character saves (REAL Postgres)', () => {
     });
   });
 
-  describe('the existence probe (characterStateExists, the clear-item-name refusal arm)', () => {
-    // The SELECT 1 the refusal arm asks instead of re-loading the blob (the
-    // Phase 18 clear-item-name-select1 item): it must answer exactly what
-    // the first load (getCharacterById, id-realm) plus its state-not-null
-    // qualifier answers, so a lease refusal and a vanished row can never be
-    // confused in either direction.
-    it('answers true for a row carrying a state on this realm', async () => {
+  describe('signer sweeps preserve completed name moderation', () => {
+    it.each(['rename', 'reclaim'] as const)(
+      'a delayed %s sweep reads the current blob instead of restoring its stale capture',
+      async (kind) => {
+        const id = await makeCharacter();
+        const initial = {
+          ...STATE('captured-before-clear'),
+          inventory: [
+            {
+              itemId: 'wyrmfall_pendant',
+              count: 1,
+              instance: { name: 'Remove this', signer: 'Maker', rolled: { quality: 'legendary' } },
+            },
+          ],
+        };
+        await pool.query('UPDATE characters SET level = 5, state = $2::jsonb WHERE id = $1', [
+          id,
+          JSON.stringify(initial),
+        ]);
+        const captured = (
+          await pool.query('SELECT level, state FROM characters WHERE id = $1', [id])
+        ).rows[0];
+        // Another committed change makes preserving the newest non-name fields
+        // and level part of the same regression, not just one field special-case.
+        await pool.query('UPDATE characters SET level = 17, state = $2::jsonb WHERE id = $1', [
+          id,
+          JSON.stringify({ ...initial, level: 17, marker: 'fresh-after-capture', money: 9876 }),
+        ]);
+        expect(await clearItemNameDb.clearOfflineItemName(id, { kind: 'all' })).toEqual({
+          ok: true,
+          cleared: 1,
+        });
+        expect(captured.state.inventory[0].instance.name).toBe('Remove this');
+        if (kind === 'rename') {
+          await characters.rekeyRenamedCharacterOwnSigner(
+            id,
+            captured.level,
+            captured.state,
+            'Maker',
+            'Renamed',
+          );
+        } else {
+          await characters.rekeyReclaimedCharacterWorldState(
+            {
+              rekeyMarketSeller: () => false,
+              saveMarket: async () => {},
+              rekeyMailOwner: () => false,
+              saveMail: async () => {},
+            },
+            {
+              id,
+              level: captured.level,
+              state: captured.state,
+              freedName: 'Maker',
+              archivedName: 'Renamed',
+            },
+          );
+        }
+        const persisted = (
+          await pool.query('SELECT level, state FROM characters WHERE id = $1', [id])
+        ).rows[0];
+        expect(persisted.state.inventory[0].instance).toEqual({
+          signer: 'Renamed',
+          rolled: { quality: 'legendary' },
+        });
+        expect(persisted.level).toBe(17);
+        expect(persisted.state).toMatchObject({
+          level: 17,
+          marker: 'fresh-after-capture',
+          money: 9876,
+        });
+        expect(captured.state.inventory[0].instance.name).toBe('Remove this');
+      },
+    );
+  });
+
+  describe('atomic offline legendary-name moderation', () => {
+    const target = (bag: number) => ({ kind: 'bag' as const, bag, itemId: 'wyrmfall_pendant' });
+    const namedState = () => ({
+      ...STATE('moderation'),
+      inventory: [0, 1].map((i) => ({
+        itemId: 'wyrmfall_pendant',
+        count: 1,
+        instance: { name: `Name${i}`, signer: 'Maker', rolled: { quality: 'legendary' } },
+      })),
+    });
+    async function namedCharacter() {
       const id = await makeCharacter();
-      expect(await clearItemNameDb.characterStateExists(id)).toBe(true);
-      // A live lease does not change existence: this is what lets the
-      // refusal arm read a fenced-out write as the retry line.
-      await grantLease(id, 'live-nonce', 3600);
-      expect(await clearItemNameDb.characterStateExists(id)).toBe(true);
+      await pool.query('UPDATE characters SET state = $2::jsonb WHERE id = $1', [
+        id,
+        JSON.stringify(namedState()),
+      ]);
+      return id;
+    }
+    async function stateOf(id: number) {
+      return (await pool.query('SELECT state FROM characters WHERE id = $1', [id])).rows[0]?.state;
+    }
+    async function accountOf(id: number) {
+      return Number(
+        (await pool.query('SELECT account_id FROM characters WHERE id = $1', [id])).rows[0]
+          .account_id,
+      );
+    }
+    function pauseAfter(prefix: string) {
+      let release!: () => void;
+      let reached!: () => void;
+      const held = new Promise<void>((resolve) => {
+        release = resolve;
+      });
+      const ready = new Promise<void>((resolve) => {
+        reached = resolve;
+      });
+      const runner: BoundedTransactionRunner = (ms, fn) =>
+        db.runWithStatementTimeout(ms, (query) =>
+          fn(async (text, values) => {
+            const result = await query(text, values);
+            if (text.startsWith(prefix)) {
+              reached();
+              await held;
+            }
+            return result;
+          }),
+        );
+      return { runner, ready, release };
+    }
+
+    it('serializes concurrent removals so neither restores the other name', async () => {
+      const id = await namedCharacter();
+      const hold = pauseAfter('SELECT level');
+      const first = clearItemNameDb.clearOfflineItemName(id, target(0), hold.runner);
+      await hold.ready;
+      const second = clearItemNameDb.clearOfflineItemName(id, target(1));
+      try {
+        await waitForRowLockWaiter();
+      } finally {
+        hold.release();
+      }
+      expect(await Promise.all([first, second])).toEqual([
+        { ok: true, cleared: 1 },
+        { ok: true, cleared: 1 },
+      ]);
+      const expected = namedState();
+      for (const slot of expected.inventory) delete (slot.instance as { name?: string }).name;
+      expect(await stateOf(id)).toEqual(expected);
     });
 
-    it("answers false for a null-state row, a missing row, and another realm's row", async () => {
-      const acc = await pool.query(
-        `INSERT INTO accounts (username, password_hash) VALUES ($1, 'x') RETURNING id`,
-        [`csprobe_${seq()}`],
+    it.each([false, true])(
+      'lease acquisition after deletion waits and then reads stripped state (expired=%s)',
+      async (expired) => {
+        const id = await namedCharacter();
+        const accountId = await accountOf(id);
+        if (expired) await grantLease(id, 'old', -60);
+        const hold = pauseAfter('DELETE FROM character_leases');
+        const clear = clearItemNameDb.clearOfflineItemName(id, target(0), hold.runner);
+        await hold.ready;
+        const acquire = db.acquireCharacterLease(id, accountId, 'new', 'new-process');
+        try {
+          await waitForRowLockWaiter();
+        } finally {
+          hold.release();
+        }
+        expect(await clear).toEqual({ ok: true, cleared: 1 });
+        expect(await acquire).toBe(true);
+        const joined = await db.getCharacterById(id);
+        expect(joined?.state?.inventory[0].instance?.name).toBeUndefined();
+        expect(joined?.state?.inventory[1].instance?.name).toBe('Name1');
+      },
+    );
+
+    it('heartbeat behind the deletion cannot revive the old nonce or admit an old-session save', async () => {
+      const id = await namedCharacter();
+      await grantLease(id, 'old', -60);
+      const hold = pauseAfter('DELETE FROM character_leases');
+      const clear = clearItemNameDb.clearOfflineItemName(id, target(0), hold.runner);
+      await hold.ready;
+      const heartbeat = db.heartbeatCharacterLeases();
+      try {
+        await waitForRowLockWaiter();
+      } finally {
+        hold.release();
+      }
+      expect(await clear).toEqual({ ok: true, cleared: 1 });
+      await heartbeat;
+      expect(
+        (await pool.query('SELECT 1 FROM character_leases WHERE character_id = $1', [id])).rowCount,
+      ).toBe(0);
+      expect(await db.saveCharacterState(id, 7, namedState() as CharacterState, 'old')).toBe(false);
+      expect((await stateOf(id)).inventory[0].instance.name).toBeUndefined();
+    });
+
+    it.each(['heartbeat', 'takeover'])(
+      '%s winning before deletion makes moderation refuse unchanged',
+      async (winner) => {
+        const id = await namedCharacter();
+        const accountId = await accountOf(id);
+        await grantLease(id, 'old', -60);
+        const hold = pauseAfter('SELECT level');
+        const clear = clearItemNameDb.clearOfflineItemName(id, target(0), hold.runner);
+        await hold.ready;
+        try {
+          if (winner === 'heartbeat') await db.heartbeatCharacterLeases();
+          else
+            expect(await db.acquireCharacterLease(id, accountId, 'new', 'new-process')).toBe(true);
+        } finally {
+          hold.release();
+        }
+        expect(await clear).toEqual({ ok: false, error: CHARACTER_SAVE_LEASED_LINE });
+        expect(await stateOf(id)).toEqual(namedState());
+      },
+    );
+
+    it.each(['characters', 'character_leases'])(
+      'bounds contention on %s and rolls back without a write',
+      async (table) => {
+        const id = await namedCharacter();
+        await grantLease(id, 'expired', -60);
+        const blocker = await pool.connect();
+        try {
+          await blocker.query('BEGIN');
+          if (table === 'characters')
+            await blocker.query('SELECT 1 FROM characters WHERE id = $1 FOR UPDATE', [id]);
+          else
+            await blocker.query(
+              'SELECT 1 FROM character_leases WHERE character_id = $1 FOR UPDATE',
+              [id],
+            );
+          const start = Date.now();
+          await expect(clearItemNameDb.clearOfflineItemName(id, target(0))).rejects.toMatchObject({
+            code: '55P03',
+          });
+          const elapsed = Date.now() - start;
+          expect(elapsed).toBeGreaterThanOrEqual(
+            OFFLINE_CHARACTER_SAVE_LOCK_TIMEOUT_MS - LOCK_WAIT_SLACK_MS,
+          );
+          expect(elapsed).toBeLessThan(OFFLINE_CHARACTER_SAVE_STATEMENT_TIMEOUT_MS);
+          expect(await stateOf(id)).toEqual(namedState());
+        } finally {
+          await blocker.query('ROLLBACK');
+          blocker.release();
+        }
+        expect(
+          (await pool.query('SELECT nonce FROM character_leases WHERE character_id = $1', [id]))
+            .rows[0]?.nonce,
+        ).toBe('expired');
+      },
+    );
+
+    it('rolls back both the blob and expired-lease deletion after a write failure', async () => {
+      const id = await namedCharacter();
+      await grantLease(id, 'expired', -60);
+      const failing: BoundedTransactionRunner = (ms, fn) =>
+        db.runWithStatementTimeout(ms, (query) =>
+          fn(async (text, values) => {
+            const result = await query(text, values);
+            if (text.startsWith('UPDATE characters')) throw new Error('forced failure after write');
+            return result;
+          }),
+        );
+      await expect(clearItemNameDb.clearOfflineItemName(id, target(0), failing)).rejects.toThrow(
+        'forced failure after write',
       );
-      const nullState = await pool.query(
-        `INSERT INTO characters (account_id, name, class, realm, level, state)
-           VALUES ($1, $2, 'warrior', $3, 1, NULL) RETURNING id`,
-        [Number(acc.rows[0].id), `CSProbe${seq()}`, realm],
-      );
-      expect(await clearItemNameDb.characterStateExists(Number(nullState.rows[0].id))).toBe(false);
-      expect(await clearItemNameDb.characterStateExists(999_998)).toBe(false);
-      const other = await pool.query(
-        `INSERT INTO characters (account_id, name, class, realm, level, state)
-           VALUES ($1, $2, 'warrior', $3, 1, '{}'::jsonb) RETURNING id`,
-        [Number(acc.rows[0].id), `CSProbeX${seq()}`, `${realm}-other`],
-      );
-      expect(await clearItemNameDb.characterStateExists(Number(other.rows[0].id))).toBe(false);
+      expect(await stateOf(id)).toEqual(namedState());
+      expect(
+        (await pool.query('SELECT nonce FROM character_leases WHERE character_id = $1', [id]))
+          .rows[0]?.nonce,
+      ).toBe('expired');
+    });
+
+    it('distinguishes a missing, null-state, cross-realm, and nameless character without lease probes', async () => {
+      expect(await clearItemNameDb.clearOfflineItemName(999_998, target(0))).toEqual({
+        ok: false,
+        error: 'character not found',
+      });
+      const id = await namedCharacter();
+      await pool.query('UPDATE characters SET state = NULL WHERE id = $1', [id]);
+      expect(await clearItemNameDb.clearOfflineItemName(id, target(0))).toEqual({
+        ok: false,
+        error: 'character not found',
+      });
+      await pool.query('UPDATE characters SET state = $2::jsonb, realm = $3 WHERE id = $1', [
+        id,
+        JSON.stringify(namedState()),
+        `${realm}-other`,
+      ]);
+      expect(await clearItemNameDb.clearOfflineItemName(id, target(0))).toEqual({
+        ok: false,
+        error: 'character not found',
+      });
+      expect(await stateOf(id)).toEqual(namedState());
+      const empty = await makeCharacter();
+      expect(await clearItemNameDb.clearOfflineItemName(empty, target(0))).toEqual({
+        ok: false,
+        error: 'no named copy matched that target',
+      });
     });
   });
 

@@ -35,7 +35,9 @@ import {
 } from '../src/render/farm_patches_core';
 import { GATED_ATTACH_WATCHDOG_MS } from '../src/render/gated_scene_attach';
 import { FARM_PATCHES } from '../src/sim/content/farm_patches';
+import { DUNGEONS, instanceOrigin, PROPS } from '../src/sim/data';
 import type { Entity, SimEvent } from '../src/sim/types';
+import { groundHeight, terrainHeight } from '../src/sim/world';
 import type { FarmPlotView } from '../src/world_api/farming';
 
 const HOUR = 60 * 60 * 1000;
@@ -89,6 +91,11 @@ function feastEntity(id: number, over: Partial<Entity> = {}): Entity {
     pos: { x: 12, y: 0, z: -8 },
     ...over,
   } as Entity;
+}
+
+function required<T>(value: T | null | undefined): T {
+  if (value == null) throw new Error('Required farm fixture missing');
+  return value;
 }
 
 /** Records which emitter each event reached, so the arms are distinguishable. */
@@ -249,6 +256,101 @@ describe('farm patch per-viewer visuals', () => {
 });
 
 describe('the placed feast surface (Phase 12)', () => {
+  it.each([
+    ['dungeon entrance', 0, 0],
+    ['raised dungeon solar', 20, 40],
+  ])('seats a table on the authoritative %s floor', (_label, dx, dz) => {
+    const pos = { ...instanceOrigin(DUNGEONS.dawnhold_castle.index, 0), y: 0 };
+    pos.x += dx;
+    pos.z += dz;
+    pos.y = groundHeight(pos.x, pos.z, SEED);
+    expect(pos.y).not.toBe(terrainHeight(pos.x, pos.z, SEED));
+    const scene = new THREE.Scene();
+    const visuals = new FarmPatchVisuals(scene, new Map(), recordingVfx().sink);
+    const { state, source } = fakeWorld([]);
+    state.entities.set(501, feastEntity(501, { pos }));
+    visuals.sync(source, READ_DT);
+    const group = required(scene.getObjectByName('farmFeast:501'));
+    expect(group.position.toArray()).toEqual([pos.x, pos.y, pos.z]);
+    const up = new THREE.Vector3(0, 1, 0).applyQuaternion(group.quaternion);
+    expect(up.distanceTo(new THREE.Vector3(0, 1, 0))).toBeLessThan(1e-10);
+    visuals.dispose();
+  });
+
+  it('uses a raised dock surface for both height and tilt', () => {
+    const dock = required(
+      PROPS.docks.find((d) => Math.round(d.x) === -66 && Math.round(d.z) === 305),
+    );
+    const x = dock.x - 3.18 * Math.sin(dock.rot);
+    const z = dock.z - 3.18 * Math.cos(dock.rot);
+    const pos = { x, y: groundHeight(x, z, SEED), z };
+    expect(pos.y - terrainHeight(x, z, SEED)).toBeGreaterThan(0.3);
+    const scene = new THREE.Scene();
+    const visuals = new FarmPatchVisuals(scene, new Map(), recordingVfx().sink);
+    const { state, source } = fakeWorld([]);
+    state.entities.set(501, feastEntity(501, { pos }));
+    visuals.sync(source, READ_DT);
+    const group = required(scene.getObjectByName('farmFeast:501'));
+    expect(group.position.y).toBe(pos.y);
+    const expected = new THREE.Vector3(
+      -(groundHeight(x + 0.4, z, SEED) - groundHeight(x - 0.4, z, SEED)) / 0.8,
+      1,
+      -(groundHeight(x, z + 0.4, SEED) - groundHeight(x, z - 0.4, SEED)) / 0.8,
+    ).normalize();
+    const up = new THREE.Vector3(0, 1, 0).applyQuaternion(group.quaternion);
+    expect(up.distanceTo(expected)).toBeLessThan(1e-10);
+    visuals.dispose();
+  });
+
+  it('refreshes a lifted table in place without replaying its placement flourish', () => {
+    const scene = new THREE.Scene();
+    const vfx = recordingVfx();
+    const visuals = new FarmPatchVisuals(scene, new Map(), vfx.sink);
+    const { state, source } = fakeWorld([]);
+    visuals.sync(source, READ_DT);
+    const entity = feastEntity(501);
+    state.entities.set(501, entity);
+    visuals.sync(source, READ_DT);
+    expect(vfx.calls).toEqual(['puff', 'burst']);
+    const group = required(scene.getObjectByName('farmFeast:501'));
+    const mesh = group.children[0];
+    entity.pos = { x: 13, y: groundHeight(13, -8, SEED) + 3, z: -8 };
+    visuals.sync(source, READ_DT);
+    expect(scene.getObjectByName('farmFeast:501')).toBe(group);
+    expect(group.children[0]).toBe(mesh);
+    expect(group.position.toArray()).toEqual([entity.pos.x, entity.pos.y, entity.pos.z]);
+    const up = new THREE.Vector3(0, 1, 0).applyQuaternion(group.quaternion);
+    expect(up.distanceTo(new THREE.Vector3(0, 1, 0))).toBeLessThan(1e-10);
+    expect(vfx.calls).toEqual(['puff', 'burst']);
+    const copy = vi.spyOn(group.position, 'copy');
+    const tilt = vi.spyOn(group.quaternion, 'setFromUnitVectors');
+    visuals.sync(source, READ_DT);
+    expect(copy).not.toHaveBeenCalled();
+    expect(tilt).not.toHaveBeenCalled();
+    visuals.dispose();
+  });
+
+  it('centers the placement flourish over the authoritative floor', () => {
+    const scene = new THREE.Scene();
+    const points: number[][] = [];
+    const vfx = {
+      groundPuff: (at: THREE.Vector3) => points.push(at.toArray()),
+      burst: (at: THREE.Vector3) => points.push(at.toArray()),
+    };
+    const visuals = new FarmPatchVisuals(scene, new Map(), vfx);
+    const { state, source } = fakeWorld([]);
+    visuals.sync(source, READ_DT);
+    const pos = { ...instanceOrigin(DUNGEONS.dawnhold_castle.index, 0), y: 0 };
+    pos.y = 3;
+    state.entities.set(501, feastEntity(501, { pos }));
+    visuals.sync(source, READ_DT);
+    expect(points).toEqual([
+      [pos.x, 3.45, pos.z],
+      [pos.x, 3.45, pos.z],
+    ]);
+    visuals.dispose();
+  });
+
   it('draws a feast entity on the throttled read and removes it on despawn', () => {
     const scene = new THREE.Scene();
     const { seats } = buildFarmPatchProps(SEED, FARM_PATCHES);
@@ -1171,6 +1273,33 @@ describe('the prepared producer: the gated attach, the stand-ins and the program
     calls.at(-1)?.release();
     await flush();
     expect(shown?.visible).toBe(true);
+  });
+
+  it('a table moved while its compile gate is pending reveals at the latest seat', async () => {
+    const scene = new THREE.Scene();
+    const { calls, gate } = fakeGate();
+    const vfx = recordingVfx();
+    const visuals = new FarmPatchVisuals(scene, new Map(), vfx.sink, gate);
+    const { state, source } = fakeWorld([]);
+    visuals.sync(source, READ_DT);
+    const entity = feastEntity(501);
+    state.entities.set(entity.id, entity);
+    visuals.sync(source, READ_DT);
+    const table = required(scene.getObjectByName('farmFeast:501'));
+    const mesh = table.children[0];
+    expect(table.visible).toBe(false);
+    entity.pos = { ...entity.pos, y: 3 };
+    visuals.sync(source, READ_DT);
+    expect(table.visible).toBe(false);
+    expect(table.position.y).toBe(3);
+    expect(calls).toHaveLength(1);
+    calls[0].release();
+    await flush();
+    expect(table.visible).toBe(true);
+    expect(table.position.y).toBe(entity.pos.y);
+    expect(table.children[0]).toBe(mesh);
+    expect(vfx.calls).toEqual(['puff', 'burst']);
+    visuals.dispose();
   });
 
   it('the renderer hands the visuals its compile gate, guarded on async compile (source pin)', () => {

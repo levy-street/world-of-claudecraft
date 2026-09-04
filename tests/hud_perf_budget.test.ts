@@ -1028,6 +1028,9 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
         everyMs: 1000,
         why: 'the convergence poll: once a second while open, rebuild the pure view from fresh world reads and compare its VALUE signature with the painted one. A moved model (a material count, a rank landing, the Perfected or promoted stamp, the identity mirror syncing) repaints whole through the SAME paintFrom an open takes; an unmoved one does nothing at all.',
         stopsAt: {
+          close:
+            'the normal window teardown, reached once only when the IWorld changes. It dismisses prompts and clears this interval; perfecting_window.test.ts pins that no prompt, command, or timer survives the world change.',
+
           paintFrom:
             "the window's ordinary full re-render, shared with open(), the selection click, and the language-switch relocalize(). The tick does nothing extra on its way there and only gets there when the model actually moved (the harvest journal's argument).",
         },
@@ -1759,6 +1762,8 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
       // only reaches it when the value signature moved (argued in the entry's
       // why/stopsAt above). The tick body itself is the isOpen guard plus one
       // pure view rebuild and signature compare.
+      // A world change takes normal teardown once and cancels the driver.
+      'hud/professions/perfecting_window.ts: close',
       'hud/professions/perfecting_window.ts: paintFrom',
     ]);
     expect(

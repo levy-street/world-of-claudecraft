@@ -1518,7 +1518,8 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered 5875 -> 5865 in PR 3872 cleanup after removing the unused
     // feast signer mirror and retired tutorial command sender. Measured after
     // formatting; exact count.
-    ceiling: 5865,
+    // Copy-safe Perfecting command construction extracted to perfecting_command.ts.
+    ceiling: 5861,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -1629,7 +1630,9 @@ const MONOLITHS: MonolithRow[] = [
     // count, zero slack: any further growth reds again.
     // Lowered 5123 -> 5120 in PR 3872 cleanup after removing the unused bank
     // entitlement character-count subquery. Exact count, zero slack.
-    ceiling: 5120,
+    // Account export projection added; obsolete offline moderation prose removed.
+    // Measured after formatting, exact count.
+    ceiling: 5119,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {

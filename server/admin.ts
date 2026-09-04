@@ -103,7 +103,7 @@ import {
   rethrowCheaterMarkRefusal,
 } from './cheater_mark_api';
 import { runClearItemName } from './clear_item_name';
-import { characterStateExists } from './clear_item_name_db';
+import { clearOfflineItemName } from './clear_item_name_db';
 import { cleanContentModerationReason } from './content_moderation_db';
 import { currentDailyRewardDay } from './daily_rewards';
 import {
@@ -111,12 +111,10 @@ import {
   accountById,
   accountMailTarget,
   findAccount,
-  getCharacterById,
   isAdminAccount,
   loadAccountFlair,
   pool,
   revokeTokensExcept,
-  saveOfflineCharacterState,
   saveToken,
   touchLogin,
   updatePasswordHash,
@@ -2197,16 +2195,8 @@ function makeRealAdminDb() {
     updatePasswordHash,
     revokeTokensExcept,
     recordPasswordReset,
-    // The legendary-name strip (server/clear_item_name.ts): the offline blob
-    // read/write pair plus its audit row. saveOfflineCharacterState is the
-    // lease-fenced offline save (the phase 13 QA login-race closure): the
-    // handler's offline pre-checks answer the common case and the in-statement
-    // fence answers the reconnect window the session map cannot see.
-    getCharacterById,
-    saveOfflineCharacterState,
-    // The refusal arm's SELECT 1 existence probe (clear_item_name_db.ts): a
-    // fenced-out write is read as the retry line without a second blob load.
-    characterStateExists,
+    // Audited, atomic offline legendary-name moderation.
+    clearOfflineItemName,
     recordItemNameClear,
     setDailyRewardsBan,
     setDailyRewardsIpBan,
@@ -3340,13 +3330,8 @@ async function clearItemNameHandler(ctx: Ctx): Promise<void> {
     const outcome = await runClearItemName(
       {
         characterOnline: (characterId) => rt.adminCharacterOnline(characterId),
-        loadCharacter: async (characterId) => {
-          const row = await adminDb().getCharacterById(characterId);
-          return row ? { level: row.level, state: row.state } : null;
-        },
-        characterStateExists: (characterId) => adminDb().characterStateExists(characterId),
-        saveCharacterState: (characterId, level, state) =>
-          adminDb().saveOfflineCharacterState(characterId, level, state),
+        clearOfflineItemName: (characterId, target) =>
+          adminDb().clearOfflineItemName(characterId, target),
         recordAudit: (input) => adminDb().recordItemNameClear(input),
       },
       { characterId: id, adminAccountId: ctxAccountId(ctx), body },

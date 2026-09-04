@@ -4203,29 +4203,12 @@ describe('R35 GM restores: refusal prose arms', () => {
 });
 
 describe('phase 13 legendary-name strip (clear-item-name)', () => {
-  // The endpoint body's decision matrix lives in tests/server/
-  // clear_item_name.test.ts over the deps bag; this slice pins the RouteDef
-  // binder: the real middleware chain, the real bundle members it wires, and
-  // the restore family's envelope prose.
-  const NAMED_STATE = () =>
-    ({
-      level: 20,
-      inventory: [
-        {
-          itemId: 'wyrmfall_pendant',
-          count: 1,
-          instance: { rolled: { quality: 'legendary' }, name: 'Slurname', signer: 'Forger' },
-        },
-      ],
-      questLog: [],
-    }) as never;
-
-  it('audits FIRST, then strips the offline blob and saves it', async () => {
-    const state = NAMED_STATE() as { level: number; inventory: { instance?: { name?: string } }[] };
+  // The decision matrix lives in clear_item_name.test.ts. This slice drives
+  // the real middleware and binder into the atomic offline operation.
+  it('audits first, then passes the exact target to the atomic offline strip', async () => {
     const recordItemNameClear = vi.fn(async () => ({ accountId: 9 }));
-    const getCharacterById = vi.fn(async () => ({ id: 5, level: 20, state }) as never);
-    const saveOfflineCharacterState = vi.fn(async () => true);
-    authedAdminDb({ recordItemNameClear, getCharacterById, saveOfflineCharacterState } as never);
+    const clearOfflineItemName = vi.fn(async () => ({ ok: true, cleared: 1 }));
+    authedAdminDb({ recordItemNameClear, clearOfflineItemName });
     installAdminRuntime({ adminCharacterOnline: vi.fn(() => false) });
     const r = await runRoute('POST', '/admin/api/moderation/characters/:id/clear-item-name', {
       headers: { authorization: BEARER },
@@ -4240,18 +4223,20 @@ describe('phase 13 legendary-name strip (clear-item-name)', () => {
       detail: 'bag 0 wyrmfall_pendant',
       reason: 'reported slur in the stamped name',
     });
-    expect(saveOfflineCharacterState).toHaveBeenCalledWith(5, 20, state);
-    expect(state.inventory[0].instance?.name).toBeUndefined();
-    // A strip may never exist unaudited: the audit row precedes the save.
+    expect(clearOfflineItemName).toHaveBeenCalledExactlyOnceWith(5, {
+      kind: 'bag',
+      bag: 0,
+      itemId: 'wyrmfall_pendant',
+    });
     expect(recordItemNameClear.mock.invocationCallOrder[0]).toBeLessThan(
-      saveOfflineCharacterState.mock.invocationCallOrder[0],
+      clearOfflineItemName.mock.invocationCallOrder[0],
     );
   });
 
-  it('refuses an ONLINE character before any audit write (kick first, then clear)', async () => {
+  it('refuses an online character before any audit or offline strip', async () => {
     const recordItemNameClear = vi.fn(async () => ({ accountId: 9 }));
-    const saveOfflineCharacterState = vi.fn(async () => true);
-    authedAdminDb({ recordItemNameClear, saveOfflineCharacterState } as never);
+    const clearOfflineItemName = vi.fn(async () => ({ ok: true, cleared: 1 }));
+    authedAdminDb({ recordItemNameClear, clearOfflineItemName });
     const rt = installAdminRuntime({ adminCharacterOnline: vi.fn(() => true) });
     const r = await runRoute('POST', '/admin/api/moderation/characters/:id/clear-item-name', {
       headers: { authorization: BEARER },
@@ -4266,17 +4251,17 @@ describe('phase 13 legendary-name strip (clear-item-name)', () => {
     });
     expect(rt.adminCharacterOnline).toHaveBeenCalledWith(5);
     expect(recordItemNameClear).not.toHaveBeenCalled();
-    expect(saveOfflineCharacterState).not.toHaveBeenCalled();
+    expect(clearOfflineItemName).not.toHaveBeenCalled();
   });
 
-  it('surfaces a missing reason as the audited write refusal, and never saves', async () => {
-    const saveOfflineCharacterState = vi.fn(async () => true);
+  it('surfaces a missing reason from the audit and never starts the atomic strip', async () => {
+    const clearOfflineItemName = vi.fn(async () => ({ ok: true, cleared: 1 }));
     authedAdminDb({
       recordItemNameClear: vi.fn(async () => {
         throw new Error('moderation reason is required');
       }),
-      saveOfflineCharacterState,
-    } as never);
+      clearOfflineItemName,
+    });
     installAdminRuntime({ adminCharacterOnline: vi.fn(() => false) });
     const r = await runRoute('POST', '/admin/api/moderation/characters/:id/clear-item-name', {
       headers: { authorization: BEARER },
@@ -4285,21 +4270,17 @@ describe('phase 13 legendary-name strip (clear-item-name)', () => {
     });
     expect(r.status).toBe(400);
     expect(r.body).toEqual({ success: false, data: null, error: 'moderation reason is required' });
-    expect(saveOfflineCharacterState).not.toHaveBeenCalled();
+    expect(clearOfflineItemName).not.toHaveBeenCalled();
   });
 
-  it('refuses a moderator-role token at the central gate (superadmin-only permission)', async () => {
-    // The strip destroys a player-authored name with no undo, so it carries
-    // its own superadmin-only permission (moderation.clearItemName), never
-    // moderation.act: a moderator's full bundle must bounce off the gate
-    // before the handler or any db member is reached.
+  it('refuses a moderator-role token at the superadmin-only permission gate', async () => {
     const recordItemNameClear = vi.fn(async () => ({ accountId: 9 }));
-    const saveOfflineCharacterState = vi.fn(async () => true);
+    const clearOfflineItemName = vi.fn(async () => ({ ok: true, cleared: 1 }));
     authedAdminDb({
       recordItemNameClear,
-      saveOfflineCharacterState,
+      clearOfflineItemName,
       adminRolesForAccount: async () => ({ username: 'op', roles: ['moderator'] }),
-    } as never);
+    });
     installAdminRuntime({ adminCharacterOnline: vi.fn(() => false) });
     const r = await runRoute('POST', '/admin/api/moderation/characters/:id/clear-item-name', {
       headers: { authorization: BEARER },
@@ -4313,58 +4294,49 @@ describe('phase 13 legendary-name strip (clear-item-name)', () => {
       error: 'you do not have permission to do this',
     });
     expect(recordItemNameClear).not.toHaveBeenCalled();
-    expect(saveOfflineCharacterState).not.toHaveBeenCalled();
+    expect(clearOfflineItemName).not.toHaveBeenCalled();
   });
 
-  it('a no-match strip answers honestly after the audit, without a save', async () => {
+  it.each(['no named copy matched that target', 'character not found', CHARACTER_SAVE_LEASED_LINE])(
+    'returns the atomic strip refusal after recording the attempt: %s',
+    async (error) => {
+      const recordItemNameClear = vi.fn(async () => ({ accountId: 9 }));
+      const clearOfflineItemName = vi.fn(async () => ({ ok: false, error }));
+      authedAdminDb({ recordItemNameClear, clearOfflineItemName });
+      installAdminRuntime({ adminCharacterOnline: vi.fn(() => false) });
+      const r = await runRoute('POST', '/admin/api/moderation/characters/:id/clear-item-name', {
+        headers: { authorization: BEARER },
+        params: { id: '5' },
+        body: { slot: 'neck', reason: 'reported name' },
+      });
+      expect(r.status).toBe(400);
+      expect(r.body).toEqual({ success: false, data: null, error });
+      expect(clearOfflineItemName).toHaveBeenCalledExactlyOnceWith(5, {
+        kind: 'slot',
+        slot: 'neck',
+      });
+      expect(recordItemNameClear.mock.invocationCallOrder[0]).toBeLessThan(
+        clearOfflineItemName.mock.invocationCallOrder[0],
+      );
+    },
+  );
+
+  it('surfaces an atomic database failure without reporting a successful strip', async () => {
     const recordItemNameClear = vi.fn(async () => ({ accountId: 9 }));
-    const saveOfflineCharacterState = vi.fn(async () => true);
-    authedAdminDb({
-      recordItemNameClear,
-      saveOfflineCharacterState,
-      getCharacterById: vi.fn(async () => ({ id: 5, level: 20, state: NAMED_STATE() }) as never),
-    } as never);
+    const clearOfflineItemName = vi.fn(async () => {
+      throw new Error('database unavailable');
+    });
+    authedAdminDb({ recordItemNameClear, clearOfflineItemName });
     installAdminRuntime({ adminCharacterOnline: vi.fn(() => false) });
     const r = await runRoute('POST', '/admin/api/moderation/characters/:id/clear-item-name', {
       headers: { authorization: BEARER },
       params: { id: '5' },
-      body: { slot: 'neck', reason: 'nothing worn there' },
+      body: { all: true, reason: 'reported name' },
     });
     expect(r.status).toBe(400);
-    expect(r.body).toEqual({
-      success: false,
-      data: null,
-      error: 'no named copy matched that target',
-    });
-    expect(recordItemNameClear).toHaveBeenCalled();
-    expect(saveOfflineCharacterState).not.toHaveBeenCalled();
-  });
-
-  it('a fenced-out save asks the SELECT 1 probe, never a second blob load, to pick the lease line', async () => {
-    // The binder wires the refusal arm's existence probe (server/db.ts side:
-    // clear_item_name_db.ts characterStateExists) beside the blob read, so
-    // the endpoint's retry line costs one SELECT 1 and the blob loads once
-    // (the Phase 18 clear-item-name-select1 item).
-    const getCharacterById = vi.fn(
-      async () => ({ id: 5, level: 20, state: NAMED_STATE() }) as never,
-    );
-    const characterStateExists = vi.fn(async () => true);
-    authedAdminDb({
-      recordItemNameClear: vi.fn(async () => ({ accountId: 9 })),
-      saveOfflineCharacterState: vi.fn(async () => false),
-      getCharacterById,
-      characterStateExists,
-    } as never);
-    installAdminRuntime({ adminCharacterOnline: vi.fn(() => false) });
-    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/clear-item-name', {
-      headers: { authorization: BEARER },
-      params: { id: '5' },
-      body: { all: true, reason: 'slur' },
-    });
-    expect(r.status).toBe(400);
-    expect(r.body).toEqual({ success: false, data: null, error: CHARACTER_SAVE_LEASED_LINE });
-    expect(characterStateExists).toHaveBeenCalledWith(5);
-    expect(getCharacterById).toHaveBeenCalledTimes(1);
+    expect(r.body).toEqual({ success: false, data: null, error: 'database unavailable' });
+    expect(recordItemNameClear).toHaveBeenCalledTimes(1);
+    expect(clearOfflineItemName).toHaveBeenCalledTimes(1);
   });
 });
 

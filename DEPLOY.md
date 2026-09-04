@@ -602,10 +602,12 @@ For off-box safety, sync the directory to S3 occasionally:
   bags only, and with two same-id named copies a screenshot's index can strip the
   other one. The flow is KICK, THEN CLEAR: the endpoint refuses while the
   character is online on this realm (disconnect them with the in-game `/kick`
-  command or a dashboard suspension first) and its blob write is fenced on the
-  character's load lease, so a login racing the strip makes the write touch
-  nothing and the endpoint answers with a retry line rather than reporting a
-  strip that did not land; a player contesting the strip by reconnect-spamming is
+  command or a dashboard suspension first). The offline load, strip, and save
+  run in one locked transaction, so simultaneous removals preserve each other.
+  The lease fence refuses a live session; expired nonces are invalidated under
+  the lock so a stale heartbeat cannot restore the removed name. A racing login
+  either wins first and the endpoint asks for a retry, or waits and loads the
+  corrected state. A player contesting the strip by reconnect-spamming is
   answered by suspending the account first. The audit row (`clear_item_name`, a
   sanction badge in the moderation history) lands before the write, so a refused
   request still records what was asked. The strip removes ONLY the name: the
