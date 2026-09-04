@@ -175,6 +175,34 @@ export const RETIRED_KEYS = [
   // five non-Latin fills rode the same change (the old key's five reviewed
   // rows are kept here, stale on the one clause the repair made true).
   'guide.profPages.craftProse.inscription.materialsBody',
+  // Phase 20 (2026-09-03, the wiki completeness audit): the arena page's honor
+  // callout said a coin purchase 'can be undone from a vendor's buyback list';
+  // the list holds only what you SOLD (src/sim/items.ts recordVendorBuyback is
+  // reached from sellItem and sellAllJunk alone, buyItem records nothing). The
+  // successor honorFinalNoteSoldBack says so, and its five non-Latin fills rode
+  // the same change; this key keeps its reviewed overlay rows.
+  'guide.arenaPage.honorFinalNote',
+  // Phase 20 (2026-09-03, the wiki completeness audit): the arena rewards prose
+  // said a loss 'costs you nothing but rating' and that Honor's day 'rolls over
+  // on its own clock'; a played-out loss and a draw pay RANKED_ARENA_LOSS_HONOR
+  // and the day is ctx.resetDay, the realm's nightly reset (src/sim/pvp/honor.ts).
+  // The successor rewardsBodyLossShare says so, and its five non-Latin fills
+  // rode the same change; this key keeps its reviewed overlay rows.
+  'guide.arenaPage.rewardsBody',
+  // Phase 20 (2026-09-03, the wiki completeness audit): the Warfare prose said
+  // 'a full honor kit is worth nothing on a dungeon boss', but every WARFARE row
+  // carries ordinary stats and its slot's armor or weapon baseline
+  // (src/sim/content/pvp_honor.ts); only the two ratings and the set bonuses
+  // are PvP-only. The successor warfareBodyStatsStay says so, and its five
+  // non-Latin fills rode the same change; this key keeps its reviewed rows.
+  'guide.arenaPage.warfareBody',
+  // Phase 20 (2026-09-03, the wiki completeness audit): the Warfare trade prose
+  // said 'everything it does bring is spent on other players', false for the
+  // same reason as warfareBody above (every WARFARE row has a positive
+  // primary-stat sum). The successor warfareTradeBodyRatingSpent scopes the
+  // clause to the Warfare rating and set bonuses, and its five non-Latin fills
+  // rode the same change; this key keeps its reviewed overlay rows.
+  'guide.arenaPage.warfareTradeBody',
 ];
 
 export const RETIRED_KEY_SET = new Set(RETIRED_KEYS);

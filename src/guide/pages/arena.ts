@@ -19,17 +19,35 @@ export const arena: GuidePage = {
         ${pageHeader('guide.arenaPage.heading', 'guide.arenaPage.intro')}
         ${section('guide.arenaPage.duelsHeading', `<p>${esc(t('guide.arenaPage.duelsBody'))}</p>`)}
         ${section('guide.arenaPage.coliseumHeading', `<p>${esc(t('guide.arenaPage.coliseumBody'))}</p>`)}
-        ${section('guide.arenaPage.rewardsHeading', p('guide.arenaPage.rewardsBody'))}
+        ${section(
+          'guide.arenaPage.rewardsHeading',
+          // Retired and re-keyed at Phase 20 (the wiki completeness audit,
+          // 2026-09-03): rewardsBody said a loss pays nothing and that Honor's day
+          // rolls on its own clock. A played-out loss and a draw pay
+          // RANKED_ARENA_LOSS_HONOR, and the day is ctx.resetDay, the realm's
+          // nightly reset (src/sim/pvp/honor.ts).
+          p('guide.arenaPage.rewardsBodyLossShare'),
+        )}
         ${section('guide.arenaPage.ladderHeading', `<p>${esc(t('guide.arenaPage.ladderBody'))}</p>`)}
         ${section(
           'guide.arenaPage.honorHeading',
           p('guide.arenaPage.honorBody') +
             p('guide.arenaPage.quartermastersBody') +
-            callout(esc(t('guide.arenaPage.honorFinalNote')), { variant: 'warn' }),
+            // Retired and re-keyed at Phase 20 (the wiki completeness audit,
+            // 2026-09-03): honorFinalNote said a coin purchase can be undone from
+            // the buyback list, which only ever holds what you SOLD
+            // (src/sim/items.ts recordVendorBuyback).
+            callout(esc(t('guide.arenaPage.honorFinalNoteSoldBack')), { variant: 'warn' }),
         )}
         ${section(
           'guide.arenaPage.warfareHeading',
-          p('guide.arenaPage.warfareBody') + p('guide.arenaPage.warfareTradeBody'),
+          // Retired and re-keyed at Phase 20 (the wiki completeness audit,
+          // 2026-09-03): both bodies said a Warfare piece brings nothing a monster
+          // feels, but every row carries ordinary stats and its slot's armor or
+          // weapon baseline (src/sim/content/pvp_honor.ts); only the two ratings
+          // and the set bonuses are PvP-only.
+          p('guide.arenaPage.warfareBodyStatsStay') +
+            p('guide.arenaPage.warfareTradeBodyRatingSpent'),
         )}
         ${related([
           { href: hrefFor('thornhollow-fields'), key: 'guide.nav.thornhollow' },

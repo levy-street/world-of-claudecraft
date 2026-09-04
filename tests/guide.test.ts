@@ -11,6 +11,7 @@ import { patternChannelSets, recipeAcquisitionChannel } from '../scripts/wiki/ve
 // The English the /c/ public sheet resolves a mark id to. Imported here so the
 // generator's own hand table cannot drift away from what the sheet says.
 import { RELIQUARY_MARK_ENGLISH } from '../server/character_sheet';
+import { nextRaidResetMs, resetDayKey } from '../server/raid_reset';
 import { BIND_ACTIONS, keyLabel } from '../src/game/keybinds';
 import {
   GUIDE_CLASSES,
@@ -36,6 +37,7 @@ import {
   GUIDE_ZONES,
 } from '../src/guide/content.generated';
 import { pageFor } from '../src/guide/pages';
+import { arena } from '../src/guide/pages/arena';
 import { controls as controlsPage } from '../src/guide/pages/controls';
 import { catalogSections, deeds as deedsPage } from '../src/guide/pages/deeds';
 import { dungeons as dungeonsPage } from '../src/guide/pages/dungeons';
@@ -62,6 +64,7 @@ import { FARM_CROPS } from '../src/sim/content/farm_crops';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
+import { ITEM_SETS } from '../src/sim/content/item_sets';
 import { FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
 import { MOUNTS } from '../src/sim/content/mounts';
 import {
@@ -73,6 +76,7 @@ import {
   STATION_TYPE_BY_CRAFT,
   STATIONS,
 } from '../src/sim/content/professions';
+import { WARFARE_ITEMS } from '../src/sim/content/pvp_honor';
 import {
   ALL_RECIPES,
   COMBO_RECIPES,
@@ -89,6 +93,7 @@ import {
 import { ABILITIES, CAMPS, DUNGEONS, ITEMS, MOBS, NPCS, QUESTS, ZONES } from '../src/sim/data';
 import { FINAL_BOSS_DUNGEONS, FLAWLESS_TASKS } from '../src/sim/deeds';
 import { MASTERWROUGHT_EQUIP_CAP, MASTERWROUGHT_LEGENDARY_CAP } from '../src/sim/equipment_rules';
+import { itemLevel, primaryStatSum } from '../src/sim/item_level';
 import { MARKET_CUT, MARKET_LISTING_DEPOSIT_COPPER } from '../src/sim/market';
 import {
   WORK_ORDER_CADENCE_TICKS,
@@ -155,7 +160,14 @@ import {
   TIER5_TOOL_WIELD_PROFICIENCY,
   WIELD_REQUIREMENT_BY_TIER,
 } from '../src/sim/professions/wield_gate';
+import {
+  ARENA_LOSS_HONOR_SHARE,
+  awardRankedArenaResultHonor,
+  RANKED_ARENA_LOSS_HONOR,
+  RANKED_ARENA_WIN_HONOR,
+} from '../src/sim/pvp/honor';
 import { FARM_RIFT_DROP_ITEM_IDS, RIFT_PATTERN_ITEM_IDS } from '../src/sim/rift/progression';
+import { Sim } from '../src/sim/sim';
 import { CONSUME_DURATION, type DeedDef, DT } from '../src/sim/types';
 import { DEED_IMAGE_IDS } from '../src/ui/deed_image_ids';
 import { entityTranslationKey } from '../src/ui/entity_i18n';
@@ -5753,4 +5765,317 @@ describe('the craft ladder prose keeps its counts derived or count-free (Masterw
     expect(jewelTrainer).toHaveLength(9);
     expect(perRung(jewelTrainer)).toEqual({ 0: 3, 25: 3, 50: 3 });
   });
+});
+
+describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
+  // One pin per corrected key: every number and enumerated name derived from the live
+  // table, the corrected clause asserted against it, the old false clause asserted ABSENT,
+  // and for a re-key the predecessor's English asserted gone from the surface. Appended per
+  // lane by the Phase 20 inserter; the fills' shape anchors live in
+  // tests/guide_wiki_audit_fills.test.ts.
+  it('guide.arenaPage.honorFinalNoteSoldBack: the buyback list holds sales, never purchases (the wiki completeness audit)', () => {
+    // Phase 20 (2026-09-03). The predecessor honorFinalNote said a coin purchase
+    // 'can be undone from a vendor's buyback list'. The list holds what you SOLD:
+    // recordVendorBuyback (src/sim/items.ts) is reached from sellItem and
+    // sellAllJunk alone, and buyItem debits copper or Honor and records nothing.
+    // The successor says so; every other clause is the predecessor's byte for
+    // byte. The live vendor arm is the sibling pin below.
+    setLanguage('en');
+    const html = arena.render({ params: [], sub: 'arena', titleKey: 'guide.nav.arena' });
+    const body = t('guide.arenaPage.honorFinalNoteSoldBack');
+    const predecessor = guideStrings.arenaPage.honorFinalNote;
+    expect(html).toContain(esc(body));
+    // NEGATIVE: the false clause and the predecessor's English are off the page.
+    expect(html).not.toContain('can be undone from a vendor');
+    expect(html).not.toContain(esc(predecessor));
+    expect(RETIRED_KEYS).toContain('guide.arenaPage.honorFinalNote');
+    // Narrowness: the opening sentence, the soulbound clause and the closing
+    // sentence are the predecessor's.
+    const soulbound =
+      'Warfare gear is soulbound the moment you buy it, so it can never be traded, mailed, or sold back for anything';
+    const closing =
+      'The shop asks you to confirm for that reason: read the piece before you press it.';
+    for (const text of [body, predecessor]) {
+      expect(text.startsWith('Honor purchases are final. ')).toBe(true);
+      expect(text).toContain(soulbound);
+      expect(text.endsWith(closing)).toBe(true);
+    }
+    expect(body).toContain('The buyback list only ever holds what you sold');
+    expect(body).toContain('a coin purchase can usually be sold back for its sell price');
+    expect(body).toContain('reclaimed from that list if you change your mind again');
+    expect(body).toContain('and it never reaches that list');
+    // The Warfare tier, from the vendor rosters: every Honor-priced row is a
+    // Warfare row, soulbound with no sell value, so the sell gate refuses it.
+    const stocked = new Set(Object.values(NPCS).flatMap((n) => n.vendorItems ?? []));
+    const honorRows = [...stocked].filter((id) => (ITEMS[id].priceHonor ?? 0) > 0);
+    expect(honorRows.length).toBeGreaterThan(0);
+    for (const id of honorRows) {
+      expect(id in WARFARE_ITEMS, id).toBe(true);
+      expect(ITEMS[id].soulbound, id).toBe(true);
+      expect(ITEMS[id].sellValue, id).toBe(0);
+    }
+    // 'usually': the coin-priced rows no vendor buys back (the noVendorSell
+    // starter tools and the like) are the minority; the rest sell for sellValue.
+    const coinRows = [...stocked].filter((id) => (ITEMS[id].buyValue ?? 0) > 0);
+    const sellable = coinRows.filter(
+      (id) => !ITEMS[id].noVendorSell && !ITEMS[id].soulbound && ITEMS[id].kind !== 'quest',
+    );
+    expect(sellable.length).toBeGreaterThan(coinRows.length - sellable.length);
+  });
+
+  it('guide.arenaPage.honorFinalNoteSoldBack: the live vendor writes a buyback row on a sale, never on a purchase (the wiki completeness audit)', () => {
+    // The same Sim drive tests/items.test.ts uses, at Trader Wilkes: a purchase
+    // leaves the buyback list empty, a sale pays sellValue and writes the row,
+    // buying it back charges that same sellValue, and a Warfare piece is refused
+    // at the counter (soulbound), so it never reaches the list.
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Audit');
+    const world = sim as unknown as {
+      entities: Map<number, { id: number; templateId?: string; pos: { x: number; z: number } }>;
+      players: Map<
+        number,
+        { copper: number; inventory: unknown[]; vendorBuyback: { itemId: string; count: number }[] }
+      >;
+      rebucket(e: unknown): void;
+    };
+    const wilkes = [...world.entities.values()].find((e) => e.templateId === 'trader_wilkes');
+    const me = world.entities.get(pid);
+    const meta = world.players.get(pid);
+    expect(wilkes).toBeDefined();
+    expect(me).toBeDefined();
+    expect(meta).toBeDefined();
+    if (!wilkes || !me || !meta) return;
+    me.pos.x = wilkes.pos.x + 2;
+    me.pos.z = wilkes.pos.z;
+    world.rebucket(me);
+    meta.inventory.length = 0;
+    meta.copper = 10_000;
+    sim.buyItem(wilkes.id, 'baked_bread', undefined, pid);
+    const bought = sim.countItem('baked_bread', pid);
+    expect(bought).toBeGreaterThan(0);
+    expect(meta.vendorBuyback).toEqual([]);
+    const afterBuy = meta.copper;
+    sim.sellItem('baked_bread', bought, pid);
+    expect(meta.copper).toBe(afterBuy + ITEMS.baked_bread.sellValue * bought);
+    expect(meta.vendorBuyback.map((s) => s.itemId)).toEqual(['baked_bread']);
+    sim.buyBackItem('baked_bread', 0, undefined, pid);
+    expect(sim.countItem('baked_bread', pid)).toBe(1);
+    expect(meta.copper).toBe(afterBuy + ITEMS.baked_bread.sellValue * (bought - 1));
+    const warfareId = Object.keys(WARFARE_ITEMS)[0];
+    sim.addItem(warfareId, 1, pid);
+    sim.drainEvents();
+    sim.sellItem(warfareId, 1, pid);
+    const errors = sim.drainEvents().flatMap((e) => (e.type === 'error' ? [e.text] : []));
+    expect(errors).toContain('That item is not for sale.');
+    expect(sim.countItem(warfareId, pid)).toBe(1);
+    expect(meta.vendorBuyback.some((s) => s.itemId === warfareId)).toBe(false);
+  });
+
+  it('guide.arenaPage.rewardsBodyLossShare: a played-out loss and a draw pay a smaller share (the wiki completeness audit)', () => {
+    // Phase 20 (2026-09-03). The predecessor rewardsBody said a loss 'costs you
+    // nothing but rating'. awardRankedArenaResultHonor (src/sim/pvp/honor.ts)
+    // pays RANKED_ARENA_LOSS_HONOR, a derived ARENA_LOSS_HONOR_SHARE of the win,
+    // for a played-out loss AND a draw; the caller in src/sim/social/arena.ts
+    // endArenaMatch skips it on a forfeit, which the kept clause still says.
+    // Every figure is derived, none restated, and the live module is driven.
+    setLanguage('en');
+    const html = arena.render({ params: [], sub: 'arena', titleKey: 'guide.nav.arena' });
+    const body = t('guide.arenaPage.rewardsBodyLossShare');
+    const predecessor = guideStrings.arenaPage.rewardsBody;
+    expect(html).toContain(esc(body));
+    // NEGATIVE: the false clauses and the predecessor's English are off the page.
+    expect(html).not.toContain('a loss costs you nothing but rating');
+    expect(html).not.toContain(esc("That day is Honor's own"));
+    expect(html).not.toContain(esc(predecessor));
+    expect(RETIRED_KEYS).toContain('guide.arenaPage.rewardsBody');
+    // Narrowness: the kept clauses are the predecessor's.
+    for (const kept of [
+      'A ranked win pays Honor, the player versus player currency, and ',
+      'Honor is meant to reward real matches: beating the same opponent or the same team again on the same day pays nothing further',
+      'a long winning day pays a little less per win as it goes on, and a match your opponent forfeits still moves your rating but pays no Honor at all.',
+    ]) {
+      expect(body).toContain(kept);
+      expect(predecessor).toContain(kept);
+    }
+    // The share: a real, smaller, non-zero share of the win in every bracket.
+    const formats = Object.keys(RANKED_ARENA_WIN_HONOR) as (keyof typeof RANKED_ARENA_WIN_HONOR)[];
+    expect(formats.length).toBeGreaterThan(0);
+    expect(ARENA_LOSS_HONOR_SHARE).toBeGreaterThan(0);
+    expect(ARENA_LOSS_HONOR_SHARE).toBeLessThan(1);
+    for (const format of formats) {
+      expect(RANKED_ARENA_LOSS_HONOR[format], format).toBe(
+        Math.round(RANKED_ARENA_WIN_HONOR[format] * ARENA_LOSS_HONOR_SHARE),
+      );
+      expect(RANKED_ARENA_LOSS_HONOR[format], format).toBeGreaterThan(0);
+      expect(RANKED_ARENA_LOSS_HONOR[format], format).toBeLessThan(RANKED_ARENA_WIN_HONOR[format]);
+    }
+    expect(body).toContain(
+      'a loss you play to the end still pays a smaller share of it, as does a draw, so rating is the only thing a loss really costs you',
+    );
+    // The live module: the first loss to a team pays the share, losing to them
+    // again pays nothing, the first win over them still pays in full (the two
+    // counters are separate), beating them again pays nothing, a draw pays the
+    // loss share.
+    type Award = typeof awardRankedArenaResultHonor;
+    const day = (resetDay: string) =>
+      ({ resetDay, emit: () => {} }) as unknown as Parameters<Award>[0];
+    const fresh = () =>
+      ({ entityId: 1, honor: 0, lifetimeHonor: 0 }) as unknown as Parameters<Award>[1];
+    const [format] = formats;
+    const meta = fresh();
+    const today = day('2026-09-03');
+    expect(awardRankedArenaResultHonor(today, meta, format, 'them', 'loss')).toBe(
+      RANKED_ARENA_LOSS_HONOR[format],
+    );
+    expect(awardRankedArenaResultHonor(today, meta, format, 'them', 'loss')).toBe(0);
+    expect(awardRankedArenaResultHonor(today, meta, format, 'them', 'win')).toBe(
+      RANKED_ARENA_WIN_HONOR[format],
+    );
+    expect(awardRankedArenaResultHonor(today, meta, format, 'them', 'win')).toBe(0);
+    expect(awardRankedArenaResultHonor(today, fresh(), format, 'them', 'draw')).toBe(
+      RANKED_ARENA_LOSS_HONOR[format],
+    );
+    expect(body).toContain('(nor does losing to them again)');
+  });
+
+  it("guide.arenaPage.rewardsBodyLossShare: Honor's day is the realm's nightly reset, the daily lockout boundary (the wiki completeness audit)", () => {
+    // The predecessor said the day 'rolls over on its own clock rather than
+    // with the realm's instance reset'. dailyWindow (src/sim/pvp/honor.ts) rolls
+    // when ctx.resetDay changes; the server feeds that key from resetDayKey
+    // (server/sim_calendar_feed.ts) and hands the daily lockouts nextRaidResetMs
+    // (server/sim_boot_config.ts raidResetMs, read by finalBossLockedUntil in
+    // src/sim/instances/dungeons.ts). Both come from server/raid_reset.ts, and
+    // the key flips at exactly the instant the lockouts expire on.
+    setLanguage('en');
+    const body = t('guide.arenaPage.rewardsBodyLossShare');
+    expect(body).toContain(
+      "That day is the realm's own: it rolls over at the realm's nightly reset hour, the same boundary every daily lockout clears on.",
+    );
+    type Award = typeof awardRankedArenaResultHonor;
+    const day = (resetDay: string) =>
+      ({ resetDay, emit: () => {} }) as unknown as Parameters<Award>[0];
+    const meta = { entityId: 1, honor: 0, lifetimeHonor: 0 } as unknown as Parameters<Award>[1];
+    const [format] = Object.keys(RANKED_ARENA_WIN_HONOR) as (keyof typeof RANKED_ARENA_WIN_HONOR)[];
+    const noon = Date.UTC(2026, 8, 3, 12, 0, 0);
+    const reset = nextRaidResetMs(noon);
+    const before = resetDayKey(reset - 60_000);
+    const after = resetDayKey(reset);
+    expect(before).toBe(resetDayKey(noon));
+    expect(after).not.toBe(before);
+    // The same team pays in full again only once the host's key has moved to
+    // the window the lockout reset opens.
+    expect(awardRankedArenaResultHonor(day(before), meta, format, 'them', 'win')).toBe(
+      RANKED_ARENA_WIN_HONOR[format],
+    );
+    expect(awardRankedArenaResultHonor(day(before), meta, format, 'them', 'win')).toBe(0);
+    expect(awardRankedArenaResultHonor(day(after), meta, format, 'them', 'win')).toBe(
+      RANKED_ARENA_WIN_HONOR[format],
+    );
+  });
+
+  it('guide.arenaPage.warfareBodyStatsStay: the set bonuses are PvP-only, the pieces keep ordinary stats (the wiki completeness audit)', () => {
+    // Phase 20 (2026-09-03). The predecessor warfareBody closed 'so a full honor
+    // kit is worth nothing on a dungeon boss'. Every WARFARE row
+    // (src/sim/content/pvp_honor.ts) carries a positive primary-stat sum and its
+    // slot's armor or weapon baseline, which work anywhere; what is PvP-only is
+    // the pair of ratings (src/sim/pvp/power.ts) and the set bonuses, whose
+    // effects are Warfare rating, a hostile-player crowd-control reduction
+    // (src/sim/stun_dr.ts) or a pvpOnly proc (src/sim/combat/set_procs.ts).
+    setLanguage('en');
+    const html = arena.render({ params: [], sub: 'arena', titleKey: 'guide.nav.arena' });
+    const body = t('guide.arenaPage.warfareBodyStatsStay');
+    const predecessor = guideStrings.arenaPage.warfareBody;
+    expect(html).toContain(esc(body));
+    expect(html).not.toContain('is worth nothing on a dungeon boss');
+    expect(html).not.toContain(esc(predecessor));
+    expect(RETIRED_KEYS).toContain('guide.arenaPage.warfareBody');
+    // Narrowness: everything up to the corrected clause is the predecessor's.
+    const cut = 'effects that only work against players, so a full honor kit';
+    expect(body.indexOf(cut)).toBeGreaterThan(0);
+    expect(body.slice(0, body.indexOf(cut) + cut.length)).toBe(
+      predecessor.slice(0, predecessor.indexOf(cut) + cut.length),
+    );
+    expect(body).toContain("so a full honor kit's set bonuses count for nothing on a dungeon boss");
+    expect(body).toContain('still carry their ordinary stats, armor, and weapon damage');
+    // The rows: both ratings and a positive ordinary stat sum on every one;
+    // armor rows and weapon rows both exist in the kit.
+    const rows = Object.values(WARFARE_ITEMS);
+    expect(rows.length).toBeGreaterThan(0);
+    for (const item of rows) {
+      expect(item.pvpOffenseRating ?? 0, item.id).toBeGreaterThan(0);
+      expect(item.pvpDefenseRating ?? 0, item.id).toBeGreaterThan(0);
+      expect(primaryStatSum(item), item.id).toBeGreaterThan(0);
+    }
+    expect(rows.filter((i) => (i.stats?.armor ?? 0) > 0).length).toBeGreaterThan(0);
+    expect(rows.filter((i) => i.weapon !== undefined).length).toBeGreaterThan(0);
+    // The sets the rows name: every tier's effect is Warfare rating, the
+    // hostile-player control reduction, or a pvpOnly proc.
+    const setIds = new Set(rows.flatMap((i) => (i.set ? [i.set] : [])));
+    expect(setIds.size).toBeGreaterThan(0);
+    for (const setId of setIds) {
+      const set = ITEM_SETS[setId];
+      expect(set, setId).toBeDefined();
+      for (const tier of set.bonuses) {
+        const { proc, ...rest } = tier.effect;
+        if (proc) expect(proc.pvpOnly, `${setId} ${tier.pieces}pc proc`).toBe(true);
+        for (const [key, value] of Object.entries(rest)) {
+          if (value === undefined) continue;
+          expect(
+            ['pvpOffenseRating', 'pvpDefenseRating', 'ccDurationReduction'],
+            `${setId} ${tier.pieces}pc ${key}`,
+          ).toContain(key);
+        }
+      }
+    }
+  });
+
+  it('guide.arenaPage.warfareTradeBodyRatingSpent: only the Warfare rating and set bonuses are spent on players (the wiki completeness audit)', () => {
+    // Phase 20 (2026-09-03). The predecessor warfareTradeBody said 'everything it
+    // does bring is spent on other players'; every WARFARE row carries a positive
+    // primary-stat sum (src/sim/content/pvp_honor.ts), so the successor scopes
+    // the clause to the Warfare rating and set bonuses. The kept half, 'never
+    // carries the combat ratings a dungeon epic in the same slot does', is held
+    // to the tables: no WARFARE row carries crit, hit or haste rating, and every
+    // slotted PvE epic at the same item level carries at least one.
+    setLanguage('en');
+    const html = arena.render({ params: [], sub: 'arena', titleKey: 'guide.nav.arena' });
+    const body = t('guide.arenaPage.warfareTradeBodyRatingSpent');
+    const predecessor = guideStrings.arenaPage.warfareTradeBody;
+    expect(html).toContain(esc(body));
+    expect(html).not.toContain('everything it does bring is spent on other players');
+    expect(html).not.toContain(esc(predecessor));
+    expect(RETIRED_KEYS).toContain('guide.arenaPage.warfareTradeBody');
+    // Narrowness: the successor differs from the predecessor in exactly one clause.
+    const oldClause = 'and everything it does bring is spent on other players';
+    const newClause =
+      'and the Warfare rating and set bonuses it carries instead are spent entirely on other players';
+    expect(predecessor).toContain(oldClause);
+    expect(body).toBe(predecessor.replace(oldClause, newClause));
+    const rows = Object.values(WARFARE_ITEMS);
+    expect(rows.length).toBeGreaterThan(0);
+    const tier = itemLevel(rows[0]);
+    expect(tier).toBeDefined();
+    for (const item of rows) {
+      expect(itemLevel(item), item.id).toBe(tier);
+      expect(item.critRating ?? 0, item.id).toBe(0);
+      expect(item.hitRating ?? 0, item.id).toBe(0);
+      expect(item.hasteRating ?? 0, item.id).toBe(0);
+      expect(primaryStatSum(item), item.id).toBeGreaterThan(0);
+    }
+    const pveEpics = Object.values(ITEMS).filter(
+      (i) =>
+        i.quality === 'epic' &&
+        i.slot !== undefined &&
+        !(i.id in WARFARE_ITEMS) &&
+        itemLevel(i) === tier,
+    );
+    expect(pveEpics.length).toBeGreaterThan(0);
+    for (const i of pveEpics) {
+      expect((i.critRating ?? 0) + (i.hitRating ?? 0) + (i.hasteRating ?? 0), i.id).toBeGreaterThan(
+        0,
+      );
+    }
+  });
+
+  // END wiki completeness corrections (the inserter appends above this line)
 });

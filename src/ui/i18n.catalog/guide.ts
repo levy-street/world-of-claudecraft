@@ -2069,6 +2069,14 @@ export const guideStrings = {
     rewardsHeading: 'What ranked play pays',
     rewardsBody:
       "A ranked win pays Honor, the player versus player currency, and a loss costs you nothing but rating. Honor is meant to reward real matches: beating the same opponent or the same team again on the same day pays nothing further, a long winning day pays a little less per win as it goes on, and a match your opponent forfeits still moves your rating but pays no Honor at all. That day is Honor's own, and it rolls over on its own clock rather than with the realm's instance reset.",
+    // Phase 20 wiki completeness audit (2026-09-03): the successor of rewardsBody, retired in
+    // scripts/i18n_retired_keys.mjs. The prose said a loss pays nothing and that Honor's day runs
+    // on its own clock; the successor rewardsBodyLossShare says a played-out loss and a draw pay a
+    // smaller share (only rating is lost), that losing to the same team again pays nothing further,
+    // and that the day rolls at the realm's nightly reset hour, the daily lockout boundary, keeping
+    // the rematch, taper and forfeit clauses byte for byte.
+    rewardsBodyLossShare:
+      "A ranked win pays Honor, the player versus player currency, and a loss you play to the end still pays a smaller share of it, as does a draw, so rating is the only thing a loss really costs you. Honor is meant to reward real matches: beating the same opponent or the same team again on the same day pays nothing further (nor does losing to them again), a long winning day pays a little less per win as it goes on, and a match your opponent forfeits still moves your rating but pays no Honor at all. That day is the realm's own: it rolls over at the realm's nightly reset hour, the same boundary every daily lockout clears on.",
 
     // Honor and the Warfare tier (src/sim/content/pvp_honor.ts, the two
     // warfareVendor NPCs, src/sim/pvp/power.ts). Spoiler-safe: no prices, no
@@ -2080,11 +2088,32 @@ export const guideStrings = {
       'Two quartermasters keep the same shelves, so trade with whichever is nearer. FURY, the Honor Quartermaster, stands in Eastbrook Vale, and Warmarshal Draven Kole, Master of the Warfare Stores, keeps the counter in Highwatch. Their stock is the Warfare tier: five armor families, plus necks, rings, and weapons shared across all of them.',
     honorFinalNote:
       "Honor purchases are final. A coin purchase can be undone from a vendor's buyback list, but an Honor purchase never lands there, and Warfare gear is soulbound the moment you buy it, so it can never be traded, mailed, or sold back for anything. The shop asks you to confirm for that reason: read the piece before you press it.",
+    // Phase 20 wiki completeness audit (2026-09-03): the successor of honorFinalNote, retired in
+    // scripts/i18n_retired_keys.mjs. The callout said a coin purchase can be undone from the
+    // buyback list, which only ever holds what you sold; the successor honorFinalNoteSoldBack
+    // states the sell-back reality (sell price, reclaim from the list, soulbound Warfare gear never
+    // reaches it) and keeps the opening, the soulbound clause and the closing byte for byte.
+    honorFinalNoteSoldBack:
+      'Honor purchases are final. The buyback list only ever holds what you sold: a coin purchase can usually be sold back for its sell price and reclaimed from that list if you change your mind again, but Warfare gear is soulbound the moment you buy it, so it can never be traded, mailed, or sold back for anything, and it never reaches that list. The shop asks you to confirm for that reason: read the piece before you press it.',
     warfareHeading: 'Warfare gear',
     warfareBody:
       'Every Warfare piece carries Warfare Offense and Warfare Defense Rating, and those two ratings do nothing at all against monsters. They apply only when you fight another player, in a duel, in the arena, or on the battleground, where Offense adds to the damage you deal and Defense cuts the damage you take, each up to its own ceiling. Each armor family is also a set, and its set bonuses are likewise Warfare rating or effects that only work against players, so a full honor kit is worth nothing on a dungeon boss.',
+    // Phase 20 wiki completeness audit (2026-09-03): the successor of warfareBody, retired in
+    // scripts/i18n_retired_keys.mjs. The prose said a full honor kit is worth nothing on a dungeon
+    // boss, but the pieces' ordinary stats, armor and weapon damage are ordinary gear that works
+    // anywhere; the successor warfareBodyStatsStay scopes the nothing to the set bonuses and says
+    // so, keeping every earlier sentence byte for byte.
+    warfareBodyStatsStay:
+      "Every Warfare piece carries Warfare Offense and Warfare Defense Rating, and those two ratings do nothing at all against monsters. They apply only when you fight another player, in a duel, in the arena, or on the battleground, where Offense adds to the damage you deal and Defense cuts the damage you take, each up to its own ceiling. Each armor family is also a set, and its set bonuses are likewise Warfare rating or effects that only work against players, so a full honor kit's set bonuses count for nothing on a dungeon boss. The pieces themselves still carry their ordinary stats, armor, and weapon damage, and those work everywhere; it is the Warfare ratings and the set bonuses that go quiet against a monster.",
     warfareTradeBody:
       'That is the deliberate trade. Warfare gear is built for fighting players, not as a shortcut past the dungeon tiers: a Warfare piece never carries the combat ratings a dungeon epic in the same slot does, and everything it does bring is spent on other players. If you want to hold your own in the arena, buy it. If you want to clear heroics faster, earn your gear in the dungeons.',
+    // Phase 20 wiki completeness audit (2026-09-03): the successor of warfareTradeBody, retired in
+    // scripts/i18n_retired_keys.mjs. The prose said everything a Warfare piece brings is spent on
+    // other players, but its ordinary stats work anywhere; the successor
+    // warfareTradeBodyRatingSpent scopes that clause to the Warfare rating and set bonuses and
+    // changes nothing else.
+    warfareTradeBodyRatingSpent:
+      'That is the deliberate trade. Warfare gear is built for fighting players, not as a shortcut past the dungeon tiers: a Warfare piece never carries the combat ratings a dungeon epic in the same slot does, and the Warfare rating and set bonuses it carries instead are spent entirely on other players. If you want to hold your own in the arena, buy it. If you want to clear heroics faster, earn your gear in the dungeons.',
   },
 
   // The Thornhollow Fields 5v5 capture-the-flag battleground page
