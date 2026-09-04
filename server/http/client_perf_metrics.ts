@@ -169,8 +169,8 @@ const MS_PER_SECOND = 1000;
 
 /**
  * The slice of the sanitized insert row this module reads. Structurally
- * satisfied by db.ts ClientPerfReportInsert, declared apart so the module
- * depends on the ingest contract, never on the database layer.
+ * satisfied by client_perf_db.ts ClientPerfReportInsert, declared apart so the
+ * module depends on the ingest contract, never on the database layer.
  */
 export interface ClientPerfSample {
   source: string;

@@ -773,6 +773,7 @@ describe('db pool timeouts hold their literal values and the query_timeout layer
 describe('no consolidated tunable literal is duplicated at a call site', () => {
   const mainSrc = read('server/main.ts');
   const dbSrc = read('server/db.ts');
+  const clientPerfDbSrc = read('server/client_perf_db.ts');
   const reportsSrc = read('server/reports.ts');
   const dailySrc = read('server/daily_rewards.ts');
   const unstuckDbSrc = read('server/unstuck_db.ts');
@@ -1102,9 +1103,9 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
     expect(bodyOf(dbSrc, 'export async function pruneChatLogsBatch')).not.toContain(
       'runWithStatementTimeout',
     );
-    expect(bodyOf(dbSrc, 'export async function pruneClientPerfReportsBatch')).not.toContain(
-      'runWithStatementTimeout',
-    );
+    expect(
+      bodyOf(clientPerfDbSrc, 'export async function pruneClientPerfReportsBatch'),
+    ).not.toContain('runWithStatementTimeout');
   });
 
   it('the play-session retention prunes stay batched on the default allowance', () => {

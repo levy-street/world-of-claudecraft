@@ -21,7 +21,7 @@ process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_phase15_t
 import type * as http from 'node:http';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { recordSitePresence } from '../../server/admin_db';
-import { insertClientPerfReport } from '../../server/db';
+import { insertClientPerfReport } from '../../server/client_perf_db';
 import { compose } from '../../server/http/compose';
 import { withErrors } from '../../server/http/middleware/with_errors';
 import { apiRegistry } from '../../server/http/registry';
@@ -32,9 +32,9 @@ import { type FakeRes, fakeCtx } from './helpers';
 // perf-report self-reads its body and, for an authed caller only, reads
 // accountAndScopeForToken / getCharacter; our happy-path requests carry no bearer, so only
 // insertClientPerfReport is reached. Replace it with a fake; the ...actual spread
-// keeps every other db export real.
-vi.mock('../../server/db', async (importActual) => {
-  const actual = await importActual<typeof import('../../server/db')>();
+// keeps every other client_perf_db export real.
+vi.mock('../../server/client_perf_db', async (importActual) => {
+  const actual = await importActual<typeof import('../../server/client_perf_db')>();
   return {
     ...actual,
     insertClientPerfReport: vi.fn(async () => {}),

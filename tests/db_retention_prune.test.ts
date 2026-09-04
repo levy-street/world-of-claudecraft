@@ -33,9 +33,9 @@ vi.mock('pg', () => ({
 }));
 
 import { EMAIL_CHANGE_TTL_HOURS, PASSWORD_RESET_TTL_HOURS } from '../server/account';
+import { pruneClientPerfReportsBatch } from '../server/client_perf_db';
 import {
   pruneChatLogsBatch,
-  pruneClientPerfReportsBatch,
   pruneEmailChangeRequestsBatch,
   pruneEmailLogBatch,
   prunePasswordResetRequestsBatch,

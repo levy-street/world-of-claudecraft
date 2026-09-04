@@ -98,6 +98,12 @@ describe('clientPerfSummary SQL shape (mocked pool)', () => {
     expect(sql).toContain(
       '(g_preset + g_gfxtier + g_gpu + g_browser + g_os + g_scenario + g_crowd = 7)',
     );
+    // The context-restore-failures aggregate rides the SAME agg CTE column
+    // list as context_loss_count, so it is computed once for totals and every
+    // bucket, never a separate statement.
+    expect(sql).toContain(
+      'COALESCE(sum(context_restore_failures), 0)::int AS context_restore_failure_count',
+    );
     // The per-set caps bound what crosses to Node; the gpu set keeps candidates
     // for BOTH orderings so a low-volume worst-p95 bucket still surfaces.
     expect(sql).toContain('(g_preset = 0 AND vol_rank <= 20)');
@@ -163,6 +169,7 @@ describe('clientPerfSummary SQL shape (mocked pool)', () => {
       p95_frame_ms: 22.5,
       p99_frame_ms: 31.25,
       context_loss_count: 1,
+      context_restore_failure_count: 1,
       avg_render_scale: 0.9,
       avg_effective_render_scale: 0.85,
     };
@@ -234,6 +241,7 @@ interface LegacyAggregate {
   p95FrameMs: number;
   p99FrameMs: number;
   contextLossCount: number;
+  contextRestoreFailureCount: number;
   avgRenderScale: number;
   avgEffectiveRenderScale: number;
 }
@@ -247,6 +255,7 @@ function legacyAggregateFromRow(r: Record<string, unknown>): LegacyAggregate {
     p95FrameMs: Number(r.p95_frame_ms ?? 0),
     p99FrameMs: Number(r.p99_frame_ms ?? 0),
     contextLossCount: Number(r.context_loss_count ?? 0),
+    contextRestoreFailureCount: Number(r.context_restore_failure_count ?? 0),
     avgRenderScale: Number(r.avg_render_scale ?? 0),
     avgEffectiveRenderScale: Number(r.avg_effective_render_scale ?? 0),
   };
@@ -260,6 +269,7 @@ async function legacyPerfAggregate(query: BoundQueryLike, hours: number): Promis
        COALESCE(percentile_cont(0.95) WITHIN GROUP (ORDER BY frame_p95_ms), 0)::real AS p95_frame_ms,
        COALESCE(percentile_cont(0.99) WITHIN GROUP (ORDER BY frame_p95_ms), 0)::real AS p99_frame_ms,
        COALESCE(sum(context_lost_count), 0)::int AS context_loss_count,
+       COALESCE(sum(context_restore_failures), 0)::int AS context_restore_failure_count,
        COALESCE(avg(render_scale), 0)::real AS avg_render_scale,
        COALESCE(avg(effective_render_scale), 0)::real AS avg_effective_render_scale
      FROM client_perf_reports
@@ -285,6 +295,7 @@ async function legacyPerfBuckets(
        COALESCE(percentile_cont(0.95) WITHIN GROUP (ORDER BY frame_p95_ms), 0)::real AS p95_frame_ms,
        COALESCE(percentile_cont(0.99) WITHIN GROUP (ORDER BY frame_p95_ms), 0)::real AS p99_frame_ms,
        COALESCE(sum(context_lost_count), 0)::int AS context_loss_count,
+       COALESCE(sum(context_restore_failures), 0)::int AS context_restore_failure_count,
        COALESCE(avg(render_scale), 0)::real AS avg_render_scale,
        COALESCE(avg(effective_render_scale), 0)::real AS avg_effective_render_scale
      FROM client_perf_reports
@@ -351,6 +362,7 @@ interface SeedRow {
   fps: number;
   p95: number;
   ctx: number;
+  crf: number;
   rs: number;
   ers: number;
 }
@@ -403,6 +415,7 @@ for (let b = 0; b < 59; b++) {
       fps: 30 + (i % 47),
       p95: 10 + i * 0.37,
       ctx: i % 3,
+      crf: i % 2,
       rs: 0.5 + (i % 5) * 0.1,
       ers: 0.4 + (i % 6) * 0.1,
     });
@@ -419,6 +432,7 @@ SEED_ROWS.push({
   fps: 5,
   p95: 999,
   ctx: 2,
+  crf: 1,
   rs: 0.5,
   ers: 0.4,
 });
@@ -438,6 +452,7 @@ for (let k = 0; k < 3; k++) {
     fps: 20 + k,
     p95: 998,
     ctx: 0,
+    crf: 0,
     rs: 0.6,
     ers: 0.5,
   });
@@ -453,6 +468,7 @@ SEED_ROWS.push({
   fps: 19,
   p95: 998,
   ctx: 1,
+  crf: 1,
   rs: 0.6,
   ers: 0.5,
 });
@@ -467,10 +483,10 @@ async function seed(): Promise<void> {
     `INSERT INTO client_perf_reports
        (session_id, graphics_preset, gfx_tier, gl_renderer_bucket, browser_family, os_family,
         zone_or_scenario, crowd_bucket, fps_avg, frame_p95_ms, context_lost_count,
-        render_scale, effective_render_scale)
+        render_scale, effective_render_scale, context_restore_failures)
      SELECT * FROM unnest(
        $1::text[], $2::text[], $3::text[], $4::text[], $5::text[], $6::text[], $7::text[],
-       $8::text[], $9::real[], $10::real[], $11::int[], $12::real[], $13::real[])`,
+       $8::text[], $9::real[], $10::real[], $11::int[], $12::real[], $13::real[], $14::int[])`,
     [
       SEED_ROWS.map((_, i) => `${MARKER}-${i}`),
       SEED_ROWS.map((r) => r.preset),
@@ -485,13 +501,14 @@ async function seed(): Promise<void> {
       SEED_ROWS.map((r) => r.ctx),
       SEED_ROWS.map((r) => r.rs),
       SEED_ROWS.map((r) => r.ers),
+      SEED_ROWS.map((r) => r.crf),
     ],
   );
   // Phase 05 suggestion arrays: multi-id rows exercise the per-element unnest
   // (a report contributes to EVERY id it carries), the rest stay on the '{}'
   // column default like production healthy rows. unnest cannot bulk-insert an
   // array-typed column (it flattens multidim arrays), hence the follow-up
-  // UPDATE instead of a 14th insert lane.
+  // UPDATE instead of a 15th insert lane.
   await pool.query(
     `UPDATE client_perf_reports SET suggestion_ids = CASE session_id
        WHEN $1 THEN ARRAY['hardware-acceleration', 'high-dpi']

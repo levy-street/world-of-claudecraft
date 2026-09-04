@@ -1,5 +1,5 @@
 // Opt-in real-Postgres roundtrip for insertClientPerfReport and the phase 03
-// dimension columns plus the phase 05 suggestion_ids array. The insert's 44
+// dimension columns plus the phase 05 suggestion_ids array. The insert's 46
 // positional parameters are the one place a renumbering slip lands values in
 // the wrong columns while every mocked-pool suite stays green, so this
 // roundtrip is the ONLY decisive guard: it writes a row of pairwise-distinct
@@ -20,11 +20,17 @@ const MARKER = 'perfroundtrip';
 // database (the play_session_retention_integration pattern).
 type Db = typeof import('../server/db');
 let db: Db;
+// insertClientPerfReport lives in the extracted server/client_perf_db.ts; its
+// own pool access resolves the same dynamic import of server/db.ts, so it
+// shares the pool DATABASE_URL points at above.
+type ClientPerfDb = typeof import('../server/client_perf_db');
+let clientPerfDb: ClientPerfDb;
 
 describeDb('client perf report insert roundtrip (real Postgres)', () => {
   beforeAll(async () => {
     process.env.DATABASE_URL = DB_URL;
     db = await import('../server/db');
+    clientPerfDb = await import('../server/client_perf_db');
     await db.ensureSchema();
     // The worst-10s index this suite asserts on is a CREATE INDEX
     // CONCURRENTLY, which ensureSchema cannot build (it runs in a
@@ -55,7 +61,7 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
   it('lands every insert value in its own column, including the five phase 03 dimensions', async () => {
     // Every value is distinct from every other so ANY positional swap between
     // two columns of a compatible type flips at least one assertion below.
-    await db.insertClientPerfReport({
+    await clientPerfDb.insertClientPerfReport({
       schemaVersion: 2,
       releaseVersion: '0.30.0-test',
       buildId: 'roundtripbuild',
@@ -78,6 +84,8 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
       rendererTextures: 82,
       rendererPrograms: 37,
       contextLostCount: 1,
+      contextRestoredCount: 2,
+      contextRestoreFailures: 3,
       longTaskCount: 5,
       longTaskP95Ms: 71.5,
       memoryUsedMb: 143.5,
@@ -128,6 +136,8 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
     expect(r.renderer_textures).toBe(82);
     expect(r.renderer_programs).toBe(37);
     expect(r.context_lost_count).toBe(1);
+    expect(r.context_restored_count).toBe(2);
+    expect(r.context_restore_failures).toBe(3);
     expect(r.long_task_count).toBe(5);
     expect(r.long_task_p95_ms).toBeCloseTo(71.5, 5);
     expect(r.memory_used_mb).toBeCloseTo(143.5, 5);
@@ -159,6 +169,9 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
     const row = rows.find((x) => x.sessionId === `${MARKER}-row`);
     expect(row).toBeDefined();
     expect(row?.crowdBucket).toBe('25-49');
+    expect(row?.contextLostCount).toBe(1);
+    expect(row?.contextRestoredCount).toBe(2);
+    expect(row?.contextRestoreFailures).toBe(3);
     expect(row?.simEntities).toBe(244);
     expect(row?.activeViews).toBe(57);
     expect(row?.visibleViews).toBe(31);
@@ -183,7 +196,7 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
       [`${MARKER}-legacy`, 'gameplay'],
     );
     const res = await db.pool.query(
-      'SELECT crowd_bucket, sim_entities, active_views, visible_views, worst_10s_frame_p95_ms, suggestion_ids FROM client_perf_reports WHERE session_id = $1',
+      'SELECT crowd_bucket, sim_entities, active_views, visible_views, worst_10s_frame_p95_ms, suggestion_ids, context_restored_count, context_restore_failures FROM client_perf_reports WHERE session_id = $1',
       [`${MARKER}-legacy`],
     );
     expect(res.rows[0]).toEqual({
@@ -193,6 +206,8 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
       visible_views: 0,
       worst_10s_frame_p95_ms: 0,
       suggestion_ids: [],
+      context_restored_count: 0,
+      context_restore_failures: 0,
     });
   });
 

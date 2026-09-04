@@ -483,6 +483,8 @@ export interface PerfRawRow {
   rendererTextures: number;
   rendererPrograms: number;
   contextLostCount: number;
+  contextRestoredCount: number;
+  contextRestoreFailures: number;
   longTaskCount: number;
   longTaskP95Ms: number;
   memoryUsedMb: number | null;
@@ -556,6 +558,7 @@ export async function clientPerfSummary(hoursInput = 24): Promise<PerfSummary> {
            COALESCE(percentile_cont(0.95) WITHIN GROUP (ORDER BY frame_p95_ms), 0)::real AS p95_frame_ms,
            COALESCE(percentile_cont(0.99) WITHIN GROUP (ORDER BY frame_p95_ms), 0)::real AS p99_frame_ms,
            COALESCE(sum(context_lost_count), 0)::int AS context_loss_count,
+           COALESCE(sum(context_restore_failures), 0)::int AS context_restore_failure_count,
            COALESCE(avg(render_scale), 0)::real AS avg_render_scale,
            COALESCE(avg(effective_render_scale), 0)::real AS avg_effective_render_scale
          FROM client_perf_reports
@@ -620,6 +623,7 @@ export async function clientPerfRaw(
        graphics_preset, gfx_tier, auto_governor, target_fps, render_scale, effective_render_scale,
        fps_avg, frame_p95_ms, frame_p99_ms, long_frame_count,
        renderer_calls, renderer_triangles, renderer_textures, renderer_programs, context_lost_count,
+       context_restored_count, context_restore_failures,
        long_task_count, long_task_p95_ms, memory_used_mb, memory_limit_mb,
        dpr, viewport_bucket, device_memory, hardware_concurrency, mobile_touch,
        browser_family, os_family, gl_vendor, gl_renderer_bucket, zone_or_scenario, source,
@@ -656,6 +660,8 @@ export async function clientPerfRaw(
     rendererTextures: r.renderer_textures,
     rendererPrograms: r.renderer_programs,
     contextLostCount: r.context_lost_count,
+    contextRestoredCount: r.context_restored_count,
+    contextRestoreFailures: r.context_restore_failures,
     longTaskCount: r.long_task_count,
     longTaskP95Ms: r.long_task_p95_ms,
     memoryUsedMb: r.memory_used_mb,
