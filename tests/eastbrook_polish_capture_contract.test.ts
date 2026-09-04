@@ -562,8 +562,10 @@ interface AttributionTargetFixture {
 // The four evidence JSONs were swept again, with no capture retaken.
 // Re-minted at Masterwrought closeout after the Mech Bird transition/audio
 // sequencing fix moved renderer.ts to 7c10f934. No capture was retaken.
+// Re-minted during PR closeout after farm compile staging changed renderer.ts.
+// No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'eb47c467789a899e8a3bdbd1fd477006f0f4a15a257bd12d6d633d6dfa7ed541';
+  'd137e84a98c7eca03d0ea7eadc8d1a3a0665f726d6bd54e6c2b9a3af7995f493';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

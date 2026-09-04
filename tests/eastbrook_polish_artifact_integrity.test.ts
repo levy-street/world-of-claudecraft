@@ -1248,10 +1248,12 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // The four evidence JSONs were swept again, with no capture retaken.
 // Re-minted at Masterwrought closeout after the Mech Bird transition/audio
 // sequencing fix moved renderer.ts to 7c10f934. No capture was retaken.
+// Re-minted during PR closeout after farm compile staging changed renderer.ts.
+// No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'ede800c533550a61c65e775fbde3f4a2530da735f50a2c80ebea38f6890c57a2';
+  '9f33fa0fabff6173ffdb78c728ab1dd8495a12ec4775d0ceca261f57330bde1b';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'eb47c467789a899e8a3bdbd1fd477006f0f4a15a257bd12d6d633d6dfa7ed541';
+  'd137e84a98c7eca03d0ea7eadc8d1a3a0665f726d6bd54e6c2b9a3af7995f493';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2535,7 +2537,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // No capture was retaken.
       // Re-minted at Masterwrought closeout after the Mech Bird audio ordering
       // fix changed renderer.ts. This seal was recomputed LAST; no recapture.
-    ).toBe('765f05911f2a179ae9739af3164899eb4edf802f5c2db1cc0fa0def943b878aa');
+      // Re-minted during PR closeout after farm compile staging changed
+      // renderer.ts. This seal was recomputed LAST; no capture was retaken.
+    ).toBe('09cf2684e38684f7c8c9d0ba0fa95fb9ed83b8af2eafc6e98546b27b5e17c9f6');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
