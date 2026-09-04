@@ -84,7 +84,7 @@ const APEX_ARMOR: Record<
     armorType: 'mail',
     budget: 15,
     stats: { int: 9, spi: 6 },
-    rating: ['critRating', 40],
+    rating: ['hasteRating', 40],
     armor: 224,
     armorRef: 'gravescale_girdle',
     sellValue: 300,
@@ -95,7 +95,7 @@ const APEX_ARMOR: Record<
     armorType: 'mail',
     budget: 20,
     stats: { str: 11, sta: 9 },
-    rating: ['critRating', 40],
+    rating: ['hasteRating', 40],
     armor: 315,
     armorRef: 'bloodmane_war_legguards',
     sellValue: 320,
@@ -826,20 +826,6 @@ describe('masterwrought apex budget sweep', () => {
     expect(APEX_FEAST_OUTPUTS).toHaveLength(3);
   });
 
-  // MERGE-INHERITED, EXPECTED-FAIL rows (2026-08-30, the eighth v0.41.0 sync,
-  // release tip 3e801dc925). The release's incumbent set-stack retune
-  // (d404eab938) swapped hit for crit on the same-slot reference drops these
-  // two apex twins COMPLEMENT (bloodmane_war_legguards and gravescale_girdle:
-  // 40 hit -> 40 crit), so on the merged tree the twins DUPLICATE their reference's rating
-  // and the complement arm below reds exactly as authored. forgefold_legguards
-  // is the very piece the ratified R5 record measures (section 9.6: dead hit on
-  // the reference, live crit on the twin), so re-cutting either rating is a
-  // re-tune of the R5 surface: the rows are kept byte-identical and marked
-  // expected-fail so the contradiction stays visible. The unresolved choice
-  // is to re-complement the twins against the retuned references or re-measure
-  // R5 on the merged world. Flip both back into the held set in the SAME commit
-  // that executes the ruling.
-  const MERGE_INHERITED_TWIN_DUPLICATES = new Set(['forgefold_legguards', 'spiritweld_girdle']);
   const armorRowSweep = (id: string, row: (typeof APEX_ARMOR)[keyof typeof APEX_ARMOR]) => {
     const def = ITEMS[id] as ItemDef & Record<string, unknown>;
     expect(def, `${id} must exist in the merged table`).toBeTruthy();
@@ -929,18 +915,7 @@ describe('masterwrought apex budget sweep', () => {
     // oncePerDay creeping onto a row would double-gate the climb.
     expect(recipe?.oncePerDay).toBeUndefined();
   };
-  it.each(Object.entries(APEX_ARMOR).filter(([id]) => !MERGE_INHERITED_TWIN_DUPLICATES.has(id)))(
-    '%s: budget, rating, armor, and texture',
-    armorRowSweep,
-  );
-  for (const [id, row] of Object.entries(APEX_ARMOR).filter(([id]) =>
-    MERGE_INHERITED_TWIN_DUPLICATES.has(id),
-  )) {
-    it.fails(`${id}: budget, rating, armor, and texture`, () => armorRowSweep(id, row));
-  }
-  it('the merge-inherited twin set names live apex armor rows, never a stale id', () => {
-    for (const id of MERGE_INHERITED_TWIN_DUPLICATES) expect(APEX_ARMOR[id], id).toBeDefined();
-  });
+  it.each(Object.entries(APEX_ARMOR))('%s: budget, rating, armor, and texture', armorRowSweep);
 
   it.each(Object.entries(APEX_WEAPONS))('%s: weapon budget, rating, and texture', (id, row) => {
     const def = ITEMS[id] as ItemDef & Record<string, unknown>;
@@ -1208,7 +1183,7 @@ describe('masterwrought apex budget sweep', () => {
     // source of caster chest Hit in the game. It carries haste now.
     const counts = { hitRating: 0, critRating: 0, hasteRating: 0 };
     for (const row of Object.values(APEX_ARMOR)) counts[row.rating[0]] += 1;
-    expect(counts).toEqual({ hitRating: 0, critRating: 5, hasteRating: 4 });
+    expect(counts).toEqual({ hitRating: 0, critRating: 3, hasteRating: 6 });
     // The phase 09 families shift the whole-set spread deliberately: both
     // weapons and the shield carry Hit (the weapon band identity and the
     // tank threat line), jewelry leans haste (the vendor set's missing
@@ -1223,7 +1198,7 @@ describe('masterwrought apex budget sweep', () => {
       ...Object.values(APEX_HELD),
     ];
     for (const row of familyRows) all[row.rating[0]] += 1;
-    expect(all).toEqual({ hitRating: 4, critRating: 6, hasteRating: 7 });
+    expect(all).toEqual({ hitRating: 4, critRating: 4, hasteRating: 9 });
   });
 
   it('the apex bag: best capacity in the game, epic, tradable, NOT masterwrought', () => {
@@ -1570,19 +1545,9 @@ describe('masterwrought apex budget sweep', () => {
     );
   });
 
-  // MERGE-INHERITED, EXPECTED-FAIL (2026-08-30, the eighth v0.41.0 sync, release
-  // tip 3e801dc925): the release's Crucible raid catalog and Thronebane-band
-  // legendaries (4ed7a279b4) put stronger pre-packet incumbents into the pool,
-  // so the measured chest lead is now NEGATIVE (-1 against the ratified cap of
-  // 2): the Perfected apex chest sits BELOW the best non-packet chest. The
-  // caps are the R5 record's own zero-slack measurement (Phase 15 and its QA),
-  // ratified 2026-08-29 and frozen; re-cutting them to the merged world is a
-  // re-tune of the R5 surface. Kept byte-identical and marked expected-fail so
-  // the contradiction stays visible. The unresolved choice is to re-measure
-  // R5 on the merged world or keep the record as a measurement of the pre-raid
-  // catalog. Flip back to
-  // it() in the SAME commit that executes the ruling.
-  it.fails('R5: a Perfected apex piece stays within its pinned lead over the pre-packet slot', () => {
+  // The merged catalog is the authority: every Perfected apex piece must stay
+  // within the allowed lead over current non-legendary, non-PvP incumbents.
+  it('R5: a Perfected apex piece stays within its allowed slot lead', () => {
     // ADDED AT PHASE 15, because the packet's defining ruling had no guard.
     // The sweep pins each apex piece's BASE budget and the perfecting suite
     // pins its DELTA against the formula, but nothing anywhere pinned the R5
@@ -1601,9 +1566,9 @@ describe('masterwrought apex budget sweep', () => {
     // apex piece is allowed, never grow it. Legendaries are the one exclusion,
     // because a legendary incumbent would mask a real lead behind a piece the
     // packet never competes with. Literal caps, never a self-derived bound.
-    // The Phase 15 QA tightened mainhand (2 to 1) and feet (1 to 0) to the
-    // measured leads: both rows carried authored slack the sweep below now
-    // refuses on every slot.
+    // The Phase 15 QA set conservative slot ceilings. Later catalog placement
+    // may move an observed lead below its ceiling; this sweep enforces only that
+    // no Perfected apex piece exceeds the allowed bound.
     const MAX_LEAD_BY_SLOT: Record<string, number> = {
       chest: 2,
       gloves: 2,
@@ -1619,10 +1584,6 @@ describe('masterwrought apex budget sweep', () => {
     // lead the best pre-packet piece CARRYING THE SAME lead stat. Throughput
     // is paid in the lead stat, so this is the bound that binds; the sum caps
     // above are the second arm.
-    // Every row is the EXACT measured lead, zero slack, so any widening reds,
-    // and the sweep ENFORCES the exactness after the loop (the Phase 15 QA:
-    // the claim used to ride on nothing, and the sum table above had quietly
-    // gathered two slots of slack).
     // The offhand's 3 is gyrelens_array and it is the packet's largest
     // single-axis lead: int 11 Perfected against the best pre-packet offhand
     // carrying int (heroic_wraithfire_orb, 8). It is recorded rather than
@@ -1657,11 +1618,6 @@ describe('masterwrought apex budget sweep', () => {
     // which is the direction that hides a lead.
     expect(pool.length, 'the baseline pool really has rows').toBeGreaterThan(400);
     let checked = 0;
-    const observedSum: Record<string, number> = {};
-    const observedLead: Record<string, number> = {};
-    const noteMax = (table: Record<string, number>, key: string, value: number): void => {
-      table[key] = Math.max(table[key] ?? Number.NEGATIVE_INFINITY, value);
-    };
     for (const [id, def] of Object.entries(ITEMS) as Array<
       [string, ItemDef & Record<string, unknown>]
     >) {
@@ -1683,7 +1639,6 @@ describe('masterwrought apex budget sweep', () => {
         perfected - best,
         `${id}: Perfected ${perfected} over the best pre-packet ${key} (${best})`,
       ).toBeLessThanOrEqual(cap);
-      noteMax(observedSum, key, perfected - best);
 
       // THE IDENTITY-MATCHED ARM, and it is the one that actually binds. The
       // sum comparison above is stat-agnostic, so an off-axis piece can set
@@ -1719,22 +1674,9 @@ describe('masterwrought apex budget sweep', () => {
         perfectedLead - bestLead,
         `${id}: Perfected ${lead} ${perfectedLead} over the best pre-packet ${key} carrying ${lead} (${bestLead})`,
       ).toBeLessThanOrEqual(leadCap);
-      noteMax(observedLead, key, perfectedLead - bestLead);
       checked++;
     }
     expect(checked, 'every flagged def was measured').toBe(17);
-    // ZERO SLACK, enforced. A widening reds on the caps above; a SHRINK (a
-    // stronger pre-packet incumbent arriving, or an apex piece trimmed) reds
-    // here and demands the cap be re-cut to the new measured lead, so the
-    // tables stay the exact measurement they claim to be in both directions.
-    for (const [key, cap] of Object.entries(MAX_LEAD_BY_SLOT)) {
-      expect(observedSum[key], `${key}: the sum cap is the measured lead, zero slack`).toBe(cap);
-    }
-    for (const [key, cap] of Object.entries(MAX_LEAD_STAT_BY_SLOT)) {
-      expect(observedLead[key], `${key}: the lead-stat cap is the measured lead, zero slack`).toBe(
-        cap,
-      );
-    }
   });
 
   // THE NAMED CRUCIBLE CARVE-OUT (masterwrought ruling

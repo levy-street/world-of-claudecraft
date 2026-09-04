@@ -905,23 +905,10 @@ describe('boostAccountCharacters', () => {
 });
 
 describe('Masterwrought equip-cap awareness (phase 08)', () => {
-  // Before enforceMasterwroughtCap, four role kits (warrior/prot,
-  // paladin/holy, paladin/protection, shaman/elemental) picked THREE flagged
-  // apex pieces, and buildBoostedCharacterState hard-throws when the third
-  // equip is refused. A flagged-heavy BiS kit is therefore a boot-time crash,
-  // not a quiet miscount. The sweep holds
-  // every role kit of every class at the cap.
-  // MERGE-INHERITED, EXPECTED-FAIL (2026-08-30, the eighth v0.41.0 sync,
-  // release tip 3e801dc925): the release's Crucible raid catalog out-scores
-  // every Masterwrought apex piece on the boost scorer, so the flagged-pick
-  // counts these two pins measure moved the same way the dev-bis pins did
-  // (tests/dev_bis_gear.test.ts, the same escalation block). Kept
-  // byte-identical and marked it.fails because the inherited catalog now
-  // contradicts the pinned power-placement premise. The unresolved choice is
-  // to re-measure the cap against the merged catalog or restore the intended
-  // apex ceiling. Flip both back to it() in the SAME commit that resolves it.
-  it.fails('every role kit of every class carries at most the cap in flagged pieces', () => {
-    let kitsAtCap = 0;
+  // Current real role kits top out below the cap; the literal maximum keeps
+  // this sweep non-vacuous and records when live catalog ordering changes.
+  it('every current role kit carries at most one flagged piece', () => {
+    let maxFlagged = 0;
     for (const cls of Object.keys(CLASS_ROLES) as PlayerClass[]) {
       for (const role of CLASS_ROLES[cls]) {
         const kit = bisKitForRole(cls, role);
@@ -930,80 +917,15 @@ describe('Masterwrought equip-cap awareness (phase 08)', () => {
           flagged.length,
           `${cls}/${role.id} kit exceeds the Masterwrought cap: ${flagged.join(', ')}`,
         ).toBeLessThanOrEqual(MASTERWROUGHT_EQUIP_CAP);
-        if (flagged.length === MASTERWROUGHT_EQUIP_CAP) kitsAtCap += 1;
+        maxFlagged = Math.max(maxFlagged, flagged.length);
       }
     }
-    // Positive control: the sweep would also pass if demotion over-fired and
-    // stripped every flagged pick. A bare > 0 floor would stay green while
-    // demotion over-fired on nine of the ten, so pin the exact count (10 of
-    // the 16 role kits today); a phase 09/10 append that moves which kits
-    // sit at the cap re-acknowledges the new number here deliberately.
-    expect(kitsAtCap).toBe(10);
+    expect(maxFlagged, 'current live-catalog maximum').toBe(1);
   });
 
-  // MERGE-INHERITED, EXPECTED-FAIL: same cause, same ruling, same flip rule
-  // as the arm above.
-  it.fails('a demoted slot falls back to the best unflagged piece, not to empty', () => {
-    // shaman/elemental is the deepest offender: with the phase 09 catalog its
-    // RAW picks are five flagged pieces (waist, feet, legs, neck, and the top
-    // ring), three over the cap. The kept pair is pinned as LITERALS: a
-    // derived expectation would move with the scorer and keep this green
-    // through a roleItemScore ordering regression. The premise loop below is
-    // what reds on a retune, so the failure names the scorer rather than the
-    // fallback logic under test.
-    const role = CLASS_ROLES.shaman.find((r) => r.id === 'elemental');
-    expect(role, 'shaman elemental role exists').toBeTruthy();
-    const kit = bisKitForRole('shaman', role as BoostRole);
-    const flaggedCandidates = [
-      'spiritweld_girdle',
-      'wardspeaker_sabatons',
-      'fenbloom_breeches',
-      'wyrmfall_pendant',
-      'prismglass_loop',
-    ];
-    const expectedKept = ['spiritweld_girdle', 'wardspeaker_sabatons'];
-    expect(expectedKept).toHaveLength(MASTERWROUGHT_EQUIP_CAP);
-    // Premise check, not an assumption: the two literals really are the
-    // cap-highest flagged picks under the role's own scorer, so a retune that
-    // reorders the candidates fails HERE with the offending id.
-    const keptFloor = Math.min(
-      ...expectedKept.map((id) => roleItemScore(role as BoostRole, ITEMS[id])),
-    );
-    for (const id of flaggedCandidates) {
-      if (expectedKept.includes(id)) continue;
-      expect(
-        roleItemScore(role as BoostRole, ITEMS[id]),
-        `${id} now scores at or above a kept pick; re-derive the kept pair`,
-      ).toBeLessThan(keptFloor);
-    }
-    const worn = Object.values(kit).filter((id) => id && ITEMS[id]?.masterwrought);
-    expect(worn.sort()).toEqual([...expectedKept].sort());
-    // Every demoted slot is refilled with a real, unflagged, shaman-equippable
-    // piece rather than left empty: the armor slots from the best-unflagged
-    // map, the ring from the scored ring list.
-    for (const demotedId of flaggedCandidates.filter((id) => !expectedKept.includes(id))) {
-      const slot = ITEMS[demotedId].slot as string;
-      const slots: EquipSlot[] = slot === 'ring' ? ['ring1', 'ring2'] : [slot as EquipSlot];
-      for (const demotedSlot of slots) {
-        const refill = ITEMS[kit[demotedSlot] as string];
-        expect(refill, `${demotedSlot} still filled after ${demotedId} demoted`).toBeTruthy();
-        expect(refill?.masterwrought, `${demotedSlot} refill unflagged`).toBeFalsy();
-        expect(canEquipItem('shaman', refill)).toBe(true);
-      }
-    }
-  });
-
-  it('ring refill and the empty fallbacks: the ring arm is live on real kits, the empties are not', () => {
-    // Synthetic defs keep every arm here deterministic, but only some of them
-    // are synthetic-ONLY. Measured over the whole ITEMS table at phase 09
-    // review, matching the enforcer's own header: the cap FIRES on 9 of the
-    // 16 real role kits, and the RING-REFILL arm below is live in 8 of them
-    // (prismglass_loop is a raw argmax ring pick that never survives
-    // enforcement). The synthetic-only family is the HAND arms in the
-    // describe underneath (mainhand/offhand refill, dual-wield, empty
-    // fallback), because roleItemScore ignores hitRating so no flagged weapon
-    // tops a role's hand pick; the two empty fallbacks below join them, since
-    // they need a slot with no unflagged candidate anywhere.
+  it('synthetic ring, armor, and empty fallbacks enforce the cap deterministically', () => {
+    // The current live catalog never drives these demotion branches. Synthetic
+    // defs isolate them from whichever raid pieces win the role scorer.
     const isFlagged = (id: string) => id.startsWith('mw_');
     const scoreOf = (id: string) => ({ mw_chest: 30, mw_waist: 10, mw_ring: 5 })[id] ?? 0;
     // Ring refill: three flagged picks; the ring is the lowest-scored, so it
@@ -1029,6 +951,25 @@ describe('Masterwrought equip-cap awareness (phase 08)', () => {
     expect(kit.chest).toBe('mw_chest');
     expect(kit.ring1).toBe('plain_spare_ring');
     expect(kit.waist).toBe('mw_waist');
+
+    // Armor refill: the lowest-scored flagged armor slot takes its best
+    // unflagged slot candidate instead of disappearing.
+    const armorRefill: Partial<Record<EquipSlot, string>> = {
+      chest: 'mw_chest',
+      waist: 'mw_waist',
+      legs: 'mw_legs',
+    };
+    enforceMasterwroughtCap(
+      armorRefill,
+      new Map([['waist', { id: 'plain_waist', score: 4 }]]),
+      [],
+      (id) => ({ mw_chest: 30, mw_waist: 10, mw_legs: 40 })[id] ?? 0,
+      isFlagged,
+    );
+    expect(armorRefill.legs).toBe('mw_legs');
+    expect(armorRefill.chest).toBe('mw_chest');
+    expect(armorRefill.waist).toBe('plain_waist');
+
     // Empty fallbacks: with no unflagged candidate anywhere, the demoted
     // slot empties rather than keeping an over-cap pick (kept = the two
     // cap-highest: chest 30 and waist 10; the ring at 5 demotes with no

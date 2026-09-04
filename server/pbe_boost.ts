@@ -445,7 +445,7 @@ export function bisKitForRole(
  *  re-run re-selects them under the same ordering that picked them. Any slot
  *  with no eligible refill empties rather than keeping an over-cap or
  *  illegal pick; the sweep in tests/server/pbe_boost.test.ts holds every
- *  role kit at the cap either way. The legendary sub-cap needs no arm until
+ *  role kit within the cap either way. The legendary sub-cap needs no arm until
  *  a legendary-flagged def ships. */
 export function enforceMasterwroughtCap(
   kit: Partial<Record<EquipSlot, string>>,
@@ -455,14 +455,11 @@ export function enforceMasterwroughtCap(
   isFlagged: (id: string) => boolean = (id) => !!ITEMS[id]?.masterwrought,
   hands?: HandRefillSources,
 ): void {
-  // Exported with injectable score/flag/legality reads for tests. With the
-  // phase 09 catalog the enforcer FIRES on real kits: measured at phase 09
-  // review, 9 of 16 role kits pick three flagged pieces raw and demote one,
-  // with the RING-REFILL arm live in 8 of them (prismglass_loop is a raw
-  // argmax ring pick that never survives enforcement). The HAND-REFILL and
-  // empty-fallback arms remain synthetic-only today (no flagged hand item is
-  // a raw argmax pick; roleItemScore ignores hitRating), so the synthetic
-  // arms stay the deterministic coverage for those two.
+  // Exported with injectable score, flag, and legality reads so deterministic
+  // synthetic catalogs can drive every demotion and refill branch. The current
+  // live raid catalog tops out at one flagged piece per role kit, so the broad
+  // real-kit sweep is a safety check while the synthetic cases are the branch
+  // coverage for ring, armor, hand, and empty fallbacks.
   const flagged = (Object.entries(kit) as [EquipSlot, string][]).filter(([, id]) => isFlagged(id));
   if (flagged.length <= MASTERWROUGHT_EQUIP_CAP) return;
   const scored = flagged

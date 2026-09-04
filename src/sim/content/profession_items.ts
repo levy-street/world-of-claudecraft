@@ -1538,7 +1538,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     // ilvl-31 waist epic budget = 15; int:9+spi:6 = 15. Armor: gravescale_girdle.
     stats: { armor: 224, int: 9, spi: 6 },
-    critRating: 40,
+    hasteRating: 40,
     sellValue: 300,
     masterwrought: true,
   },
@@ -1551,7 +1551,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     // ilvl-31 legs epic budget = 20; str:11+sta:9 = 20. Armor: bloodmane_war_legguards.
     stats: { armor: 315, str: 11, sta: 9 },
-    critRating: 40,
+    hasteRating: 40,
     sellValue: 320,
     masterwrought: true,
   },

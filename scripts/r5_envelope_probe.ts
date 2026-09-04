@@ -1,11 +1,10 @@
 // THE R5 ENVELOPE PROBE (masterwrought Phase 15).
 //
-// Produces docs/design/power-verification.md sections 9.2 and 9.5
-// exactly: the rogue rows and the tank table from the start, and the fury and
-// caster rows since the 2026-08-29 re-cut (the R5 closure re-measured them
-// from this committed harness at the documented invocations, retiring the
-// superseded-fixture figures the 9.2 blockquote had marked stale). R5 is the
-// packet's defining gate:
+// This is the executable companion to docs/design/power-verification.md.
+// Its sampled throughput output consumes the live catalog, while the document's
+// 2026-08-29 throughput table remains a revision-bound historical capture. The
+// current deterministic fury and tank bodies are pinned by
+// tests/r5_envelope_probe.test.ts. R5 is the packet's defining gate:
 //
 //   "full kit (2 Perfected pieces + apex enchants + flask + food) at most
 //    5 percent total throughput over pre-packet raid BiS, measured via
@@ -536,33 +535,18 @@ const WAR_ENCH: SlotStats = {
   shoulder: { str: 2 },
   waist: { str: 3 },
 };
-// The gear term is the upper bound a strength archetype can reach with two
-// Perfected pieces (+1 lead stat each), applied to the highest-throughput
-// strength spec. A fury warrior's own realisable pair is smaller:
-// forgefold_legguards is the only apex armour piece it can take without
-// giving up a primary-stat line (spiritweld_girdle and wardspeaker_sabatons
-// are also mail and class-free, but each trades the slot's strength for
-// caster primaries to buy the same rating conversion, and neither is
-// measured), and the apex two-hander is a weapon-dps loss against
-// deathless_greatblade. The chest step is +3 rather than +6 because no mail
-// or plate apex CHEST ships, so enchant_lucent_infusion (requiresPerfected)
-// is unreachable here.
+// The modelled gear term gives a strength archetype +1 lead stat on each of
+// two Perfected pieces. The chest step is +3 rather than +6 because no mail or
+// plate apex chest ships, so enchant_lucent_infusion is unreachable here.
 const WAR_GEAR: SlotStats = { legs: { str: 2 } };
-// THE EQUIPPED ARM, and it exists because the modelled term above is NOT the
-// upper bound section 8.1 claims on this lane. WAR_BIS carries 355 hit rating
-// against a need of 190 at the heroic target and 260 at S-rift, so its
-// effective SPECIAL-attack miss is already zero (white swings additionally
-// carry the flat dual-wield 10 percent penalty, which no hit reduces) and 95
-// to 165 rating is DEAD. forgefold_legguards is a stat-and-armour identical
-// twin of the baseline legs except that its 40 HIT is 40 CRIT, so equipping
-// it converts dead rating into live rating, a gain "+2 lead stat" scores as
-// nothing. warhewn_signet is the second piece of the pair this arm equips,
-// the phase's ARITHMETIC pick rather than a measured argmax: spiritweld_girdle
-// and wardspeaker_sabatons offer the same dead-hit-to-live-rating conversion
-// at the cost of a strength line and are unmeasured, which is one more reason
-// ruling 2's item-swap option needs its piece-choice rule measured, not
-// asserted. Both are swapped as ITEMS with their real Perfecting bonuses,
-// which is what a player would actually hold.
+// The equipped arm keeps the actual item-swap path beside that abstract model.
+// On the current catalog, the baseline body has 165 hit, 315 crit, and 50
+// haste. forgefold_legguards replaces the baseline legs' 40 crit with 40
+// haste, while warhewn_signet replaces a 25-haste ring with 25 hit. The final
+// equipped profile is 190 hit, 275 crit, and 65 haste: capped at the current
+// S-rift special-hit need and over the 130 heroic need. Both pieces are
+// equipped with their real Perfecting and enchant deltas, so a sampled rerun
+// measures the actual current loadout rather than a hand-written rating model.
 export const WAR_EQUIPPED_ITEMS: Record<string, string> = Object.freeze({
   legs: 'forgefold_legguards',
   ring2: 'warhewn_signet',
@@ -634,15 +618,13 @@ function furyDress(seed: number, arm: Arm): FurySim {
   return { sim, s, p: s.player };
 }
 
-// Dress-only readout of the fury lane's derived stats, deterministic (no
-// fight, no seeds), so the suite can pin the escalation's MECHANISM: the base
-// arm's 355 hit rating, the equipped arm's dead-hit-to-live-crit conversion,
-// and that effective special miss is zero on both arms at both targets.
+// Dress-only readout of the fury lane's derived stats. It is deterministic,
+// so the suite can pin the current modelled and item-swapping inputs without
+// paying for a Monte Carlo fight.
 export interface FuryBody {
   str: number;
   sta: number;
   hitRating: number;
-  hitBonus: number;
   critRating: number;
   hasteRating: number;
 }
@@ -653,7 +635,6 @@ export function furyBody(arm: Arm): FuryBody {
     str: p.stats.str,
     sta: p.stats.sta,
     hitRating: p.hitRating,
-    hitBonus: p.hitBonus,
     critRating: p.critRating,
     hasteRating: p.hasteRating,
   };

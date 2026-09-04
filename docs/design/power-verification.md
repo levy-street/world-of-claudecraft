@@ -14,10 +14,14 @@ The measured pass for masterwrought R5, the system's defining power gate:
 
 The model, the kit, the baseline, the constants, the targets, the fixture and the
 arithmetic are all in this file, and no number here is quoted from another
-document. The two things a reader must RUN rather than read are named where they
-are used: the fight harness, committed as `scripts/r5_envelope_probe.ts` (section
-9.1 gives the invocation), and the catalog read behind section 12's reagent-cost
-column (section 12.3 defines it).
+document. Sampled throughput percentages are revision-bound measurements, since
+the harness deliberately reads the live catalog. Current deterministic fury and
+tank inputs are pinned in `tests/r5_envelope_probe.test.ts`; section 9 separates
+those current inputs from the 2026-08-29 closure capture. The two things a reader
+must run rather than read are named where they are used: the fight harness,
+committed as `scripts/r5_envelope_probe.ts` (section 9.1 gives the invocation),
+and the catalog read behind section 12's reagent-cost column (section 12.3
+defines it).
 
 ## Verdict
 
@@ -34,13 +38,14 @@ final). The envelope question this Verdict re-opened on 2026-08-28 is
 thereby SETTLED BY RATIFICATION, not by a demonstrated bound: the ratified
 quantity is a floor, an at-most bound cannot be verified from floors, and
 the maintainer accepts the measured record below, together with section
-9.6's equipped-kit measurement (roughly twice the envelope on the binding
-fury lane), as the closure. The four downward content tunes stand.
+9.6's closure-tip equipped-kit measurement (roughly twice the envelope on
+the binding fury lane at that revision), as the closure. The four downward
+content tunes stand.
 
-The table below is the ratified quantity, RE-CUT 2026-08-29 from the
-committed harness at the closure tip (the section 9.2 re-cut; every cell
-reproduces from `scripts/r5_envelope_probe.ts` at the documented
-invocations):
+The table below is the ratified quantity captured from the committed harness at
+the 2026-08-29 closure tip. It is a historical snapshot of that revision, not a
+promise that a current checkout emits the same sampled percentages after its
+catalog dependencies move:
 
 | lane | heroic raid, level 22 | S-rift, level 23 |
 |---|---|---|
@@ -53,9 +58,22 @@ invocations):
 | caster, apex chest actually equipped, 60 s | +2.53% | +2.41% |
 | tank, effective health | +4.28% | +4.27% |
 
-Read the binding row honestly. At the recorded sample (60 seeds, 600 s) its
-central estimate is INSIDE the envelope at heroic (2-standard-error interval
-[3.69, 5.51]) and ABOVE the nominal 5 at S-rift (interval [4.86, 6.66]); the
+The current-tree deterministic refresh is separately pinned and reproducible:
+
+| input | baseline | full or equipped |
+|---|---|---|
+| fury ratings (hit / crit / haste) | 165 / 315 / 50 | 190 / 275 / 65 |
+| tank body (hp / armor) | 3532 / 3383 | 3672 / 3386 |
+| tank EHP delta (level 22 / level 23) | - | +4.019% / +4.018% |
+
+No current Monte Carlo throughput re-measure is claimed by those deterministic
+rows. A new sampled pass must use the section 9.1 invocation and be recorded as
+a new dated result rather than silently replacing the closure capture.
+
+Read the historical binding row honestly. At the recorded sample (60 seeds,
+600 s), its central estimate is INSIDE the envelope at heroic (2-standard-error
+interval [3.69, 5.51]) and ABOVE the nominal 5 at S-rift (interval [4.86,
+6.66]); the
 300-seed precision pair at 600 s reads **+5.06% / +5.24%** (+/-0.40 each,
 byte-reproduced at the closure tip), the tightest
 committed estimate of the lane, sitting AT the line; and resolving 5.0 from
@@ -78,11 +96,12 @@ inside.
 Before the tunes the same fixtures read **+5.86% / +6.08%** on warrior fury and
 **+6.24%** on tank effective health, both outside the envelope.
 
-Every percentage in the table above is the MODELLED kit, the ratified R5
-quantity: a floor, not the equipped premium. Section 9.6 carries what the
-modelled term omits, measured (fury equipped +10.42 / +10.21 against
-modelled +4.97 / +5.27 at 60 seeds, 300 s), kept on the record as the
-acceptance ruling 2b names.
+At the closure tip, the ordinary rogue, fury, and caster rows were the
+modelled kit, the ratified R5 quantity: a floor, not the equipped premium.
+The explicitly named caster-apex and tank rows were item-swapping evidence.
+Section 9.6 keeps the closure-tip fury equipped measurement (+10.42 / +10.21
+against modelled +4.97 / +5.27 at 60 seeds, 300 s) as the historical evidence
+acceptance ruling 2b names. It is not described as current-tree output.
 
 HISTORY, kept for the trail. On 2026-08-28 this Verdict was **SUSPENDED**
 and the envelope question RE-OPENED: a fresh reader's adversarial pass
@@ -116,34 +135,23 @@ of the tank move; the 2pc replacement above is about +100 more) and, with
 the lineage lines, took the section 9.5 tank baseline from 3332 to 3532
 health while buffing the caster's legendary mainhand; and the raid catalog's
 incumbents put the section 8 apex chest lead at -1 against the ratified cap
-of 2 while displacing every apex piece from bestEpicGearFor's picks. NOTHING
-IN THIS RECORD WAS REWRITTEN: its figures are the measurement of the
-pre-raid catalog they were taken on, the nine contradicted pins across
-tests/r5_envelope_probe.test.ts, tests/masterwrought_budget.test.ts,
-tests/dev_bis_gear.test.ts and tests/server/pbe_boost.test.ts are kept
-byte-identical under it.fails with escalation notes, and the maintainer's
-ruling was to re-measure R5 on the
-merged world (which would also decide whether the new raid joins the
-protected-asset set beside heroic Nythraxis and S-rift) or ratify this
-record as the pre-raid measurement. The item-by-item deltas are described
-immediately above.
-RULED (masterwrought qr-19-apex-tier-vs-crucible-placement, 2026-09-01), the
-PLACEMENT half only: the raid tier sitting above the masterwrought apex tier is
-ACCEPTED, and the system accepts that placement rather than re-tiering
-any def. Nothing in THIS record is rewritten under that ruling and no figure
-here moves: the sentence above about nothing having been rewritten still holds
-literally. Two of the nine contradicted pins are discharged by it, the
-tests/dev_bis_gear.test.ts pair, re-derived against the merged measurement and
-flipped back to it(). The other seven stay expected-fail and split between TWO
-owners, which is worth stating because a reader sent to one will not find the
-other: FIVE belong to the masterwrought R5 RE-MEASURE question (this file's own
-tests/r5_envelope_probe.test.ts arms, the tests/server/pbe_boost.test.ts pair
-whose note carries the same escalation, and the tests/masterwrought_budget.test.ts lead-cap
-arm). The remaining TWO are the forgefold_legguards and spiritweld_girdle twin
-rows at tests/masterwrought_budget.test.ts, whose own comment offers
-re-complementing the twins against the retuned references as an arm independent
-of any re-measure; they belong to the twin-complement row, not to the
-re-measure. Both rows are still the maintainer's.
+of 2 while displacing every apex piece from bestEpicGearFor's picks. The
+closure throughput capture was not rewritten in place: it remains the
+measurement of the pre-raid catalog it was taken on. At that merge, nine
+contradicted pins across the R5, budget, BiS, and PBE suites were temporarily
+recorded as expected failures while the placement ruling was pending. The
+current deterministic inputs are now recorded separately below.
+
+RULED (masterwrought qr-19-apex-tier-vs-crucible-placement, 2026-09-01): the
+raid tier above masterwrought apex is accepted. The two BiS pins were then
+re-derived against the merged catalog. During the PR cleanup on 2026-09-04,
+the remaining historical expected-fail wrappers were removed: current
+placement, role-cap, lead-cap, and tank-envelope behavior is covered by passing
+invariants; forgefold_legguards and spiritweld_girdle were re-complemented
+against their retuned references without changing total budget; and obsolete
+exact snapshots now live only in this historical record. No active expected
+failure belongs to R5. This cleanup does not turn the ratified throughput floor
+into a demonstrated upper bound or alter any measurement above.
 
 ## 1. What R5 measures, and what it does not
 
@@ -199,9 +207,8 @@ different numbers in the neck slot alone, so this document fixes it:
 
 > **The baseline pool is PvE, class-equippable, best-in-slot (this phrase was
 > under Verdict item 1's ruling; RATIFIED as written 2026-08-29, ruling 1a,
-> with the denominator caveat recorded below), with the 17
-> masterwrought-flagged defs
-> removed. The three THROUGHPUT lanes take the repo's maintained EPIC-ONLY
+> with the denominator caveat recorded below), with masterwrought-flagged
+> defs removed. The three THROUGHPUT lanes take the repo's maintained EPIC-ONLY
 > pickers; the derived TANK arm additionally takes legendaries and held
 > offhands.**
 
@@ -213,15 +220,15 @@ lower than an epic-only pool would print, which is the safe direction.
 RULING 1a, RATIFIED 2026-08-29: the pool rule above STANDS
 AS WRITTEN. `bestEpicGearFor`'s raw-stat-sum scoring (class-agnostic and
 rating-blind: ratings and spellPower score zero, armor counts) remains the
-R5 baseline definition, and THE CAVEAT IS THE RECORD: the physical
-denominators are roughly 3 percent under a hand-optimised kit (the two
-physical baselines carry two rings worth zero attack power, and the fury
-baseline carries 355 hit against a need of 190 or 260). The +7.69 / +6.44
-percent readings behind that figure are a non-reproducible throwaway
-measurement (the AP-correct baseline was never committed as an arm) and are
-priced with that uncertainty. The caveat cuts in the packet's favour when
-reading the table: a throughput-correct denominator is stronger, so every
-published percentage would read LOWER against it, never higher.
+R5 baseline definition. The ruling's roughly 3 percent denominator caveat
+belongs to the closure revision: there, the two physical baselines carried
+two rings worth zero attack power and fury carried 355 hit against needs of
+190 or 260. Its +7.69 / +6.44 readings came from a non-reproducible
+throwaway arm. On the current merged catalog, the committed fury baseline
+carries 165 hit against needs of 130 and 190. That current input is pinned,
+but no replacement percentage is inferred from it. The historical caveat
+cut in the packet's favour because a throughput-correct denominator was
+stronger.
 
 The split is stated rather than assumed because the two readings differ by 20
 stat points in the neck slot alone. The throughput loadouts are
@@ -469,23 +476,22 @@ delta of 1 goes entirely to the lead stat and a delta of 2 puts the second point
 on the secondary. Measured across all 17: every piece gains exactly +1 lead.
 
 With the equip cap at 2, **the gear term is +2 lead-stat points**, and that is the
-figure the measurement uses for every lane. **Section 9.6 shows that on the
-FURY lane this is a LOWER bound rather than an upper one, and by roughly the
-width of the envelope (the rogue lane's equipped arm is unmeasured and its
-expected sign is at or below the modelled row), so read the rest of this
-subsection with that correction in front of it.** The reasoning below was written before that was
-measured and is kept because it is still right about the caster.
+figure the measurement uses for every lane. At the closure tip, section 9.6
+measured that term as a lower bound on the fury lane by roughly the width of the
+envelope. The current catalog has a different rating exchange, so that sampled
+conclusion remains historical until a new throughput pass is recorded. The
+rogue equipped arm is unmeasured. The reasoning below remains applicable to the
+caster.
 
 RULING 2b, RATIFIED 2026-08-29: the modelled "+2 lead-stat
-points" term IS the R5 quantity. The record states plainly that the
-published percentages EXCLUDE the apex pieces' rating deltas and are
-therefore FLOORS, and the maintainer accepts on the record, per the
-Verdict's own pricing of this arm, that an at-most bound cannot be verified
-from floors and that the equipped fury kit moves the binding lane roughly
-twice the envelope (section 9.6's 10.42 / 10.21 against modelled
-4.97 / 5.27). The gear term does NOT become an item swap on any lane; the
-three item-swapping arms (tank, maximal caster, fury equipped) remain
-reported evidence beside the ratified quantity, not the quantity itself.
+points" term IS the R5 quantity. At the closure revision, the published
+percentages excluded the apex pieces' rating deltas and were therefore floors.
+The maintainer accepted that an at-most bound could not be verified from floors,
+together with the historical fury item-swap result (section 9.6's 10.42 / 10.21
+against modelled 4.97 / 5.27). The gear term does not become an item swap on any
+lane; the tank, maximal-caster, and fury-equipped arms remain separate evidence.
+Current deterministic inputs are explicit below so the historical sampled result
+cannot be mistaken for a live one.
 
 It is claimed as an upper bound in two ways: a
 character whose baseline in a slot is a legendary gains nothing there (the apex
@@ -561,35 +567,35 @@ arguments with.
 
 ### 9.1 Fixture
 
-**The harness is committed: `scripts/r5_envelope_probe.ts`.** The documented
-table takes TWO invocations, because the binding lane needs a bigger sample
-than the others and a single default run would print a different fury row:
+**The harness is committed: `scripts/r5_envelope_probe.ts`.** The historical
+closure table used two invocations because the binding lane needed a bigger
+sample than the others:
 
     npx tsx scripts/r5_envelope_probe.ts                       # rogue, caster, tank
     WOC_R5_SEEDS=60 WOC_R5_SECONDS=600 \
       npx tsx scripts/r5_envelope_probe.ts fury                # the binding row
 
-The binding-row command runs WITHOUT `WOC_R5_ARMS`, so it prints the fury
-gear and gear+ench columns and the equipped aside alongside FULL (the
-2026-08-29 re-cut took all four fury cells from that one command;
-`WOC_R5_ARMS` remains available for a precision pass on one arm, e.g.
-`WOC_R5_ARMS=FULL` at 300 seeds).
+The binding-row command runs without `WOC_R5_ARMS`, so it prints the fury
+gear and gear+ench columns and the equipped aside alongside FULL.
+`WOC_R5_ARMS` remains available for a precision pass on one arm, for example
+`WOC_R5_ARMS=FULL` at 300 seeds. Running either command today measures the
+current live catalog; reproducing the closure percentages requires the closure
+revision.
 
 `WOC_R5_SEEDS`, `WOC_R5_SECONDS` and `WOC_R5_ARMS` override the sample and
-restrict which kit arms run. The binding-row invocation's 60 seeds at 600 s is
-the recorded sample, and the documented invocation and the recorded sample
-were kept identical at the post-ruling re-cut (executed 2026-08-29, the R5
-closure: the fury row including its gear and gear+ench cells was taken from
-the fury command above run WITHOUT `WOC_R5_ARMS`, and the rogue, caster and
-tank rows from the default run). Its constants (`HEROIC_TARGET`,
-`SRIFT_TARGET`, the baseline loadouts, the enchant maps, the kit deltas) are
+restrict which kit arms run. The closure's binding-row sample used 60 seeds at
+600 s: its fury cells came from the command above without `WOC_R5_ARMS`, and
+the rogue, caster, and tank rows came from the default run. Its constants
+(`HEROIC_TARGET`, `SRIFT_TARGET`, the baseline loadouts, the enchant maps,
+the kit deltas) are
 the section-3 and section-8 tables in executable form, and the enchant and
 consumable deltas are READ from the catalog rather than written as literals,
 so a magnitude the packet later moves moves the harness with it; the gear and
 Perfecting deltas are literals cross-pinned by
 `tests/masterwrought_budget.test.ts`'s Perfected-lead arm.
-`tests/r5_envelope_probe.test.ts` pins the deterministic tank lane and the
-target derivations against this document.
+`tests/r5_envelope_probe.test.ts` pins the exact current fury and tank bodies,
+their item identities and rating exchange, and the target derivations against
+this document.
 
 Level 20, `autoEquip: false`, an ambient-free world (no camps, npcs or ground
 objects), the probe anchored in the open field, and an inert target: `hostile`,
@@ -617,26 +623,13 @@ rating line or armour rather than a lead primary.
 
 ### 9.2 Results
 
-> **RE-CUT 2026-08-29 FROM THE COMMITTED HARNESS** (Phase 16 STEP 0.5, the
-> R5 closure, under ruling 2b; the refresh this blockquote's earlier form
-> deliberately deferred pending that ruling). Every fury and caster cell
-> below now REPRODUCES from `scripts/r5_envelope_probe.ts` at the
-> documented invocations (fury: 60 seeds at 600 s; everything else: the
-> default run), measured at the closure tip, never a mid-span capture. The
-> superseded-fixture figures this table carried until the re-cut (fury
-> 4.94 / 4.50, caster 4.55 / 5.06 / 4.58 / 4.75, and their gear columns),
-> and the three understood causes of their staleness (caster figures taken
-> at 10 seeds while the section claimed 25; a first-version resource refill
-> handing a fury warrior 100 rage it must earn; unpaired error bars on a
-> paired design inflating the rogue and caster intervals about 35-fold, all
-> three fixed in the committed harness), are preserved in this file's git
-> history and the Phase 15 ledgers. The rogue rows and the whole of 9.5
-> reproduced unchanged throughout (the assassination heroic cell read +3.78
-> from an intermediate harness state; the Phase 15 QA corrected it to the
-> committed +3.79, 2026-08-29). The fury gear and gear+enchant columns sit
-> inside their own noise at this sample (bars near +/-0.8 on centrals at or
-> under 2 points, per-seed spreads over 10 points) and are reported as
-> printed.
+> **HISTORICAL CLOSURE CAPTURE, 2026-08-29.** The values below were emitted
+> by the committed harness at the closure revision under ruling 2b. The harness
+> intentionally reads live catalog data, so a current checkout is not expected
+> to reproduce these sampled percentages after later catalog changes. The exact
+> current deterministic inputs are recorded in sections 9.5 and 9.6 and pinned
+> by `tests/r5_envelope_probe.test.ts`. A new Monte Carlo result belongs in a
+> new dated pass, not as a silent rewrite of this capture.
 
 Rogue: 25 seeds, 180 s. Caster: 25 seeds, at both the 60 s burst and the 180 s
 sustained profile. Warrior fury: 60 seeds, at both 180 s and 600 s. Error bars
@@ -675,9 +668,9 @@ is correspondingly weaker and the tree maintains no such BiS set to measure
 against; the effect is bounded by the +2.00 percent a 40-haste line is worth at
 either target.
 
-The fury FULL figures are the 600 s, 60-seed runs (base 168.35 at heroic,
-base 151.18 at S-rift; all re-cut 2026-08-29 from the committed harness).
-The same run prints the equipped aside at +9.33% / +10.39%: equipped
+At the closure tip, the fury FULL figures were the 600 s, 60-seed runs
+(base 168.35 at heroic, base 151.18 at S-rift). The same historical run
+printed the equipped aside at +9.33% / +10.39%: equipped
 evidence of the kind ruling 2b's acceptance covers, at this sample (the
 pair the ruling itself names is 9.6's 300 s 10.42/10.21), never the
 ratified quantity (the modelled term is the R5 quantity per ruling 2b,
@@ -756,111 +749,90 @@ recorded so the coupling is visible.
 ### 9.5 The tank effective-health arm
 
 Effective health is `maxHp / (1 - armorReduction(armor, attackerLevel))`. This
-arm SWAPS ITEMS rather than adding a stat delta, because its gear term is armour
+arm swaps items rather than adding a stat delta, because its gear term is armour
 and stamina rather than a lead primary. Its inputs, all executable in
 `scripts/r5_envelope_probe.ts` (`TANK_BIS`, `TANK_ENCH`, `TANK_KIT_ITEMS`,
-`TANK_KIT_DELTA`):
+`TANK_KIT_DELTA`), are the section-3 level-20 protection baseline, the
+pre-packet enchant set, two Perfected item swaps, the plate chest-enchant step,
+and `ironhusk_flask` replacing the serpent elixir.
 
-- the section-3 tank baseline in the `prot` spec at level 20;
-- the pre-packet enchant set both arms carry: mainhand str 5, gloves str 3,
-  shoulder and both rings str 2, helmet and legs sta 6, chest sta 7, waist and
-  offhand sta 3, feet sta 2, neck spi 3;
-- the two Perfected pieces this arm equips (the max-effective-health pair:
-  the other class-free apex mail, `spiritweld_girdle` and
-  `wardspeaker_sabatons`, trades stamina-bearing baseline pieces for caster
-  primaries and strictly lowers effective health): `duskforged_bulwark` in the
-  offhand (Perfected `{str:1, sta:1}`) replacing `heroic_bonewrought_bulwark`,
-  and `forgefold_legguards` (Perfected `{str:1}`) replacing
-  `furyforged_legguards`;
-- a chest enchant step of +3, not +6: no mail or plate apex chest ships, so the
-  Perfected-only Lucent Infusion is unreachable for a plate wearer;
-- `ironhusk_flask` REPLACING the serpent elixir rather than riding beside it.
+Current-tree deterministic refresh, 2026-09-04:
 
-| arm | hp | armor | EHP vs level 22 | delta |
-|---|---|---|---|---|
-| baseline | 3332 | 3369 | 8277 | - |
-| consumables only | 3432 | 3369 | 8526 | +3.00% |
-| consumables + apex chest enchant | 3472 | 3369 | 8625 | +4.20% |
-| full kit (2 Perfected pieces) | 3472 | 3373 | 8631 | **+4.28%** |
-
-The last row's +4 armour with ZERO health is the piece swap, not a stat delta,
-and it is worth spelling out because no additive model produces it: the shield is
-armour-identical (680 on both sides) and nets +1 stamina from Perfecting, the
-legs are armour-identical (315 on both sides) and net minus 1 stamina (9 against
-10), so stamina lands at 326 either way and health does not move. Strength nets
-+4 (shield 6 to 6, legs 8 to 12) and protection's `armorFromStrPct` turns that
-into the +4 on the stat book.
-
-Against a level-23 attacker: 8099 to 8445, **+4.27%**. Protection's stamina
-multiplier (`staPct: 0.40` on the prot mastery,
-`src/sim/content/talents_warrior.ts`, which also carries `armorPct: 0.10` and
-`armorFromStrPct: 0.70`) amplifies the flat stamina terms, which is why a +7 raw
-stamina consumable delta reads as +100 health.
-
-Before this phase's shield tune the same arm read **+6.24%**, most of it armour.
-
-### 9.6 What the modelled gear term omits, measured
-
-The gear term everywhere above is "+2 lead-stat points" (section 8.1), applied
-as an instance stat delta. Section 8.1 claimed that as an upper bound before
-the 2026-08-29 ruling ratified it as a floor. On the FURY
-lane it is a measured lower bound, and the gap is larger than the envelope.
-The rogue lane's equipped arm is UNMEASURED and its hit arithmetic differs:
-the rogue baseline carries exactly 190 hit rating, at the heroic cap with zero
-headroom and 70 short at S-rift, so the fury dead-rating mechanism does not
-transfer, and the rogue equipped arm's expected sign is at or below its
-modelled row (converting live hit to crit is a loss at both targets there).
-
-**The mechanism.** `swingMissChance` is `max(0, miss - hitBonus)` and `hitBonus`
-is `hitRating / 1000`, so hit past the miss chance is worth exactly nothing.
-`WAR_BIS` carries **355 hit rating**; the heroic target needs 190 and the S-rift
-target 260. Its effective miss on SPECIAL attacks is already **0.0 percent at
-both targets**, and 95 to 165 rating is dead weight. White swings additionally
-carry the flat dual-wield 10 percent penalty
-(`DUAL_WIELD_WHITE_MISS_PENALTY`, `src/sim/combat/auto_attack.ts`), added
-after the `max(0, ...)` floor, which no amount of hit rating reduces, so the
-dead-rating conclusion is unchanged. Now compare the two legs:
-
-| def | armour | str | sta | hit | crit |
+| arm | hp | armor | stamina | EHP vs level 22 | delta |
 |---|---|---|---|---|---|
-| `bloodmane_war_legguards` (baseline) | 315 | 11 | 9 | 40 | 0 |
-| `forgefold_legguards` (apex) | 315 | 11 | 9 | 0 | 40 |
+| baseline | 3532 | 3383 | 332 | 8796 | - |
+| consumables only | 3632 | 3383 | 342 | 9045 | +2.831% |
+| consumables + apex chest enchant | 3672 | 3383 | 346 | 9144 | +3.964% |
+| full kit (2 Perfected pieces) | 3672 | 3386 | 346 | 9149 | **+4.019%** |
 
-They are stat-and-armour identical except that the apex piece's 40 hit is 40
-CRIT (the defs also differ on sellValue, requiredLevel, requiredClass and the
-masterwrought flag, none of which moves combat stats).
-Equipping it converts dead rating into live rating, a gain the "+1 lead stat per
-piece" model scores as ZERO, because Perfecting moves primary stats only.
+The last row adds exactly 3 armour and no health over the consumables-plus-enchant
+arm. `duskforged_bulwark` is armour-identical to
+`heroic_bonewrought_bulwark`; after Perfecting it nets +1 stamina.
+`forgefold_legguards` is armour-identical to `furyforged_legguards`; after
+Perfecting it nets +4 strength and -1 stamina. The stamina changes cancel.
+Protection's `armorFromStrPct` and final rounding turn the +4 strength into the
+3 armour visible in the stat book.
 
-**Measured**, same fixture, same seeds, same consumables, 60 seeds at 300 s,
-the only difference being whether the two Perfected pieces this arm equips
-(the phase's arithmetic pick, `forgefold_legguards` and `warhewn_signet`;
-the not-taken item-swap arm names `spiritweld_girdle` and
-`wardspeaker_sabatons` as the
-unmeasured class-free mail alternates) are applied as a
-stat delta or EQUIPPED as items:
+Against a level-23 attacker, the same current bodies move from 8606 to 8952 EHP,
+**+4.018%**. Protection's stamina multiplier (`staPct: 0.40` on the prot
+mastery, `src/sim/content/talents_warrior.ts`) amplifies the flat stamina
+terms, which is why a +7 raw stamina consumable delta reads as +100 health.
+
+For historical context, before the original shield tune this arm read
+**+6.24%**, most of it armour.
+
+### 9.6 Equipped fury: current inputs and historical measurement
+
+The modelled gear term is still +2 lead-stat points (section 8.1), applied as
+an instance stat delta. The equipped arm swaps `forgefold_legguards` and
+`warhewn_signet` in as real items, then applies their real Perfecting and
+enchant deltas. The current deterministic bodies are:
+
+| arm | str | sta | hit | crit | haste |
+|---|---|---|---|---|---|
+| baseline | 201 | 194 | 165 | 315 | 50 |
+| modelled full kit | 205 | 197 | 165 | 315 | 50 |
+| the same two pieces equipped | 213 | 202 | 190 | 275 | 65 |
+
+The rating exchange is no longer the closure revision's dead-hit-to-live-crit
+case. `bloodmane_war_legguards` and `forgefold_legguards` are stat-and-armour
+identical, but the baseline legs carry 40 crit and the apex legs carry 40
+haste. `architects_cornerstone` carries 25 haste, while
+`warhewn_signet` carries 25 hit and replaces caster primaries with strength
+and stamina. Across the whole body, the item swaps therefore add 25 hit,
+remove 40 crit, and add 15 haste.
+
+The current special-attack hit needs are 130 at the level-22 heroic target and
+190 at the level-23 S-rift target. Baseline hit is 35 over the heroic need and
+25 short at S-rift; the equipped arm is 60 over heroic and exactly capped at
+S-rift. The exchange mixes dead heroic hit, live S-rift hit, crit, haste, and
+primary stats, so its current throughput direction must be measured rather
+than inferred from the closure mechanism.
+
+For historical context, the 2026-08-29 closure revision measured the following
+60-seed, 300-second pass:
 
 | arm | heroic raid, L22 | S-rift, L23 |
 |---|---|---|
 | modelled, "+2 lead-stat points" | +4.97% +/-1.18 | +5.27% +/-1.03 |
-| **the same two pieces EQUIPPED** | **+10.42% +/-1.42** | **+10.21% +/-1.20** |
+| **the same two pieces equipped** | **+10.42% +/-1.42** | **+10.21% +/-1.20** |
 
-Roughly twice the envelope, and about double what the modelled term reports.
-Reproduce with `WOC_R5_SEEDS=60 WOC_R5_SECONDS=300 WOC_R5_ARMS=FULL,FULL+equipped
-npx tsx scripts/r5_envelope_probe.ts fury`.
+Those values remain ruling evidence, but they do not reproduce from the current
+catalog and are not presented as current results. The rerun recipe is
+`WOC_R5_SEEDS=60 WOC_R5_SECONDS=300 WOC_R5_ARMS=FULL,FULL+equipped npx tsx
+scripts/r5_envelope_probe.ts fury`; a completed rerun belongs in a new dated
+measurement block.
 
-**The bound on the bound.** This measurement uses section 3's baseline, which
-carries the dead hit above and two rings worth zero attack power, so it flatters
-the packet: a throughput-correct baseline is stronger and the percentage lower.
-The adversarial reader who first raised this measured +7.69 and +6.44 percent
-against an attack-power-correct baseline (a throwaway measurement: that
-baseline was never committed as an arm, so the two figures are not
-reproducible from the harness). Every reading, on every baseline
-tried, is above 5. That is why the 2026-08-28 verdict was suspended rather
-than restated with a new number: which baseline is correct was section 3's
-ruling to make, not this section's, and ruling 1a (2026-08-29) made it by
-keeping the pool with the caveat on record. This measurement stays on the
-record as the acceptance ruling 2b names.
+**The historical bound on the bound.** The closure measurement used section
+3's then-current baseline, whose surplus hit and two rings worth zero attack
+power made it weaker than a throughput-correct baseline. The adversarial reader
+who first raised this measured +7.69 and +6.44 percent against an
+attack-power-correct baseline, but that throwaway arm was never committed and
+is not reproducible from the harness. Every closure-tip reading tried was above
+5. That is why the 2026-08-28 verdict was suspended and why ruling 1a kept the
+pool only with its caveat on record. The current rating profile above replaces
+the stale arithmetic, while the sampled closure measurement stays solely as the
+acceptance evidence ruling 2b names.
 
 Note what this does NOT say. The caster lane's equipped arm (section 9.2) reads
 BELOW its modelled arm, because a caster's apex chest breaks a set bonus and its
@@ -1251,12 +1223,13 @@ RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as tooltip-screenshot
   content is correct; the label is stale.
   ACTIONED (qr-18-REOPEN, 2026-08-31): Phase 18 corrected the label everywhere
   it stood (item stale-11e-decision-6-label); this row stays as the record.
-- **The server PBE boost gives a prot tank a caster belt.** `spiritweld_girdle`
-  wins the tank waist in `server/pbe_boost.ts`'s scorer, because a tank role adds
-  any armour to identity and the rating term then breaks the tie, costing the
-  boosted tank 60 health, 9 strength and 6 stamina for 9 dead intellect. The fix
-  is server scorer logic, which is outside this phase's scope. `spiritweld_girdle`
-  is correct on its own budget and must not be nerfed for it.
+- **The historical PBE caster-belt offender no longer reproduces.**
+  `spiritweld_girdle` once won the protection waist because the scorer counted
+  any armour toward tank identity and ratings broke the tie. On the current
+  catalog, both protection kits choose `forgewall_girdle`, which carries their
+  role stats. `tests/server/pbe_boost.test.ts` keeps the offender eligible and
+  compares it with the live winner, so the recorded regression shape cannot
+  quietly return.
 - **`REF_ARMOR = 2861` is a pinned calibration constant, not a live property of
   the catalog** (`tests/heroic_difficulty_floors.test.ts` and its three sibling
   floor suites, `tests/rift_difficulty_floors.test.ts`,
@@ -1280,8 +1253,9 @@ RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as tooltip-screenshot
   the gap, and on the raw basis it never described it. The committed max-armour kit pins at 4085
   (`tests/heroic_difficulty_floors.test.ts`, re-pinned 2969 to 4085 at the release/v0.41.0 merge), so
   the live gap is 1224 points, where the pre-raid gap on that same raw basis was 108 (2969 minus
-  2861). A gap of 508 does exist, but to R5's own prot-spec tank baseline of 3369 in section 9.5,
-  which is a different kit again. The BASIS of 2861 is UNSETTLED and this line does not paper over
+  2861). At the closure revision, a gap of 508 existed to R5's then-current
+  prot-spec tank baseline of 3369; the current section 9.5 baseline is 3383 and
+  is pinned separately. The BASIS of 2861 is UNSETTLED and this line does not paper over
   it: the four floor-suite headers call 2861 the max-armour kit with prot mastery folded in, the
   re-pin note calls 4085 and 1582 the raw kit numbers without prot mastery, and prot mastery RAISES
   armour (Recompense `armorPct` 0.10 plus `armorFromStrPct` 0.70 in

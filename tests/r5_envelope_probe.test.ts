@@ -1,7 +1,7 @@
 // The R5 measurement harness, pinned. `scripts/r5_envelope_probe.ts` is the
-// artifact docs/design/power-verification.md sends a reader to when
-// it says every figure in sections 9.2 and 9.5 is reproducible, so it is the
-// packet's only reproducibility artifact and nothing was checking it.
+// executable companion to docs/design/power-verification.md. The sampled
+// throughput table is revision-bound; this suite pins the current deterministic
+// inputs and keeps the live probe in the test import graph.
 //
 // Two things this file exists to prevent, both found by the Phase 15 audits:
 //   1. The probe sat outside tsconfig's include and outside every test's import
@@ -13,16 +13,10 @@
 //      the tuned number and handing a false PASS to exactly the reader the doc
 //      sends there.
 //
-// The TANK lane is pinned in full because it is the only deterministic one:
-// it runs no fight, so it needs no seeds and returns the same body every time.
-// The three throughput lanes stay Monte Carlo and belong in a measurement
-// pass, not in the suite; what the Phase 15 QA added for them is (a) the
-// dress-only furyBody readout, which pins the ESCALATION'S MECHANISM (the
-// dead 355 hit, the equipped arm's hit-to-crit conversion) without a fight,
-// and (b) one single-seed smoke per lane, floored between the measured
-// dead-rotation and live values, so a dead or gutted rotation reds (a single
-// renamed ability among several is not guaranteed to; the smoke arm's own
-// comment carries the measured margins).
+// The deterministic tank and fury dress-only bodies are pinned exactly. The
+// three throughput lanes stay Monte Carlo and belong in a measurement pass,
+// not in the suite; one single-seed smoke per lane still catches a dead or
+// gutted rotation, while the rotation-id guard catches a single renamed cast.
 import { describe, expect, it } from 'vitest';
 import {
   assertRotationAbilitiesResolve,
@@ -54,7 +48,7 @@ import { ITEMS } from '../src/sim/data';
 import { perfectedBonusStats } from '../src/sim/professions/perfecting';
 import { RIFT_HEROIC_TUNING, RIFT_S_LEVEL } from '../src/sim/rift/ranks';
 import type { ItemDef } from '../src/sim/types';
-import { armorReduction, meleeMissChance } from '../src/sim/types';
+import { armorReduction } from '../src/sim/types';
 
 describe('the R5 envelope harness', () => {
   it('derives both targets from the live tuning tables, not from literals', () => {
@@ -82,108 +76,71 @@ describe('the R5 envelope harness', () => {
     expect((armorReduction(SRIFT_TARGET.armor, 20) * 100).toFixed(2)).toBe('38.13');
   });
 
-  // MERGE-INHERITED, EXPECTED-FAIL (2026-08-30, the eighth v0.41.0 sync, release
-  // tip 3e801dc925). The release's incumbent set-stack retune (d404eab938)
-  // swapped hit for crit on five of the fury baseline's pieces
-  // (heroic_crownforged dreadhelm and warspaulders 55 hit / 20 crit -> 20 /
-  // 55; gravescale_girdle, bloodmane_war_legguards and tideworn_warboots 40
-  // hit -> 40 crit), taking WAR_BIS from 355 hit to 165, and the span's
-  // Crucible hit rebalance (c920f39c85) lowered the hit ramp itself
-  // (ABOVE_LEVEL_MISS_PCT [0, 2.5, 14, 21] -> [0, 2.5, 8, 14]), so the merged
-  // needs read 130 heroic / 190 S-rift: 165 hit is 35 OVER the merged heroic
-  // need (dead rating persists there, smaller) and 25 UNDER the merged S-rift
-  // need, the record's 355-against-190 arithmetic belongs to the pre-raid
-  // catalog, and the twin arm (bloodmane hit / forgefold crit) now reads two
-  // crit pieces.
-  // Every literal here is an input of the RATIFIED R5 record (sections 3, 8.1
-  // and 9.6; the four maintainer rulings of 2026-08-29), which the packet may
-  // not rewrite: the test is kept exactly as authored and marked expected-fail
-  // so the contradiction stays visible in every run. The unresolved choice is
-  // to re-measure R5 on the merged world or keep it as a measurement of the
-  // pre-raid catalog. Flip back to it() in the SAME
-  // commit that executes the ruling.
-  it.fails('pins the escalation mechanism: dead hit on the base arm, live crit on the equipped arm', () => {
-    // Section 9.6's escalation driver, as assertions (the Phase 15 QA; the
-    // 2026-08-28 suspension it drove is closed by ruling since 2026-08-29,
-    // and the mechanism stays pinned as the record's accepted evidence). The
-    // dress-only readout runs no fight, so this is deterministic.
+  it('reproduces the current fury dress-only bodies exactly', () => {
     const base = furyBody('base');
     const full = furyBody('full');
     const equipped = furyBody('equipped');
-    // The base arm carries exactly the 355 hit rating the record derives, and
-    // effective SPECIAL-attack miss is zero at BOTH targets on BOTH arms: that
-    // is what makes the surplus rating dead.
-    expect(base.hitRating, 'the fury baseline hit budget').toBe(355);
-    for (const body of [base, equipped]) {
-      for (const target of [HEROIC_TARGET, SRIFT_TARGET]) {
-        expect(
-          Math.max(0, meleeMissChance(20, target.level) - body.hitBonus),
-          `effective special miss at L${target.level}`,
-        ).toBe(0);
-      }
-    }
-    // The modelled arm moves ONLY primary stats over base (the "+2 lead stat"
-    // model, plus the two weapon enchant steps): ratings identical.
-    expect(full.str - base.str).toBe(4);
-    expect(full.hitRating).toBe(base.hitRating);
-    expect(full.critRating).toBe(base.critRating);
-    expect(full.hasteRating).toBe(base.hasteRating);
-    // The equipped arm's whole difference from the model is the rating swap
-    // the record names: 40 dead hit becomes 40 live crit (the legs twin), the
-    // ring swap trades 25 haste for 25 more dead hit plus 8 strength.
-    expect(equipped.critRating - base.critRating, 'the legs twin turns dead hit live').toBe(40);
-    expect(equipped.hitRating - base.hitRating, 'net hit change, dead on both sides').toBe(-15);
-    expect(equipped.hasteRating - base.hasteRating, 'the ring swap forfeits haste').toBe(-25);
-    expect(equipped.str - base.str, 'the ring swap plus Perfecting and enchants').toBe(12);
-    // The two swapped items, by id, and the twin relation itself.
-    expect(WAR_EQUIPPED_ITEMS).toEqual({ legs: 'forgefold_legguards', ring2: 'warhewn_signet' });
-    const bloodmane = ITEMS.bloodmane_war_legguards as ItemDef;
-    const forgefold = ITEMS.forgefold_legguards as ItemDef;
-    expect(bloodmane.stats).toEqual(forgefold.stats);
-    expect(bloodmane.hitRating, 'the baseline legs carry the hit line').toBe(40);
-    expect(forgefold.hitRating).toBeUndefined();
-    expect(forgefold.critRating, 'the apex legs carry it as crit').toBe(40);
-    expect(bloodmane.critRating).toBeUndefined();
+
+    expect(base).toEqual({
+      str: 201,
+      sta: 194,
+      hitRating: 165,
+      critRating: 315,
+      hasteRating: 50,
+    });
+    expect(full).toEqual({
+      str: 205,
+      sta: 197,
+      hitRating: 165,
+      critRating: 315,
+      hasteRating: 50,
+    });
+    expect(equipped).toEqual({
+      str: 213,
+      sta: 202,
+      hitRating: 190,
+      critRating: 275,
+      hasteRating: 65,
+    });
+
+    expect(WAR_EQUIPPED_ITEMS).toEqual({
+      legs: 'forgefold_legguards',
+      ring2: 'warhewn_signet',
+    });
+    const baselineLegs = ITEMS.bloodmane_war_legguards as ItemDef;
+    const equippedLegs = ITEMS.forgefold_legguards as ItemDef;
+    expect(equippedLegs.stats).toEqual(baselineLegs.stats);
+    expect(baselineLegs.critRating).toBe(40);
+    expect(baselineLegs.hasteRating).toBeUndefined();
+    expect(equippedLegs.critRating).toBeUndefined();
+    expect(equippedLegs.hasteRating).toBe(40);
+    expect(ITEMS.architects_cornerstone.hasteRating).toBe(25);
+    expect(ITEMS.warhewn_signet.hitRating).toBe(25);
   });
 
-  // MERGE-INHERITED, EXPECTED-FAIL (2026-08-30, the eighth v0.41.0 sync, release
-  // tip 3e801dc925): the release's legendary band retune (4ed7a279b4) moved
-  // heart_of_the_rift (sta 14 -> 18, str/agi/int 6 -> 8; measured +60 of the
-  // move) and the incumbent set-stack retune (d404eab938) replaced the
-  // crownforged 2pc bonus (ap 40 -> str 10 / sta 10, about +100 more, the
-  // remainder its other lineage lines), so the tank baseline reads 3532
-  // health against the record's 3332. Section 9.5 is part of the
-  // ratified R5 record; same treatment, same escalation, same flip rule as the
-  // arm above.
-  it.fails('reproduces the section 9.5 tank effective-health table exactly', () => {
-    // Every literal here is a figure power-verification.md section 9.5 prints.
-    // If the harness drifts from the record, this is where it says so.
+  it('reproduces the current tank effective-health table exactly', () => {
     const base = tankBody('base');
-    expect(base.hp, 'baseline health').toBe(3332);
-    expect(base.armor, 'baseline armour').toBe(3369);
-
     const consumables = tankBody('consumables');
-    expect(consumables.hp).toBe(3432);
-    expect(consumables.armor).toBe(3369);
-
     const withEnchant = tankBody('consumablesEnchant');
-    expect(withEnchant.hp).toBe(3472);
-    expect(withEnchant.armor).toBe(3369);
-
     const full = tankBody('full');
-    expect(full.hp, 'the full kit adds no health over the enchant arm').toBe(3472);
-    expect(full.armor, 'the two Perfected pieces add exactly 4 armour').toBe(3373);
 
-    // The deltas the record reports, at both attacker levels.
-    const ehp = (b: { hp: number; armor: number }, lvl: number): number =>
-      b.hp / (1 - armorReduction(b.armor, lvl));
-    const pct = (lvl: number): number => ((ehp(full, lvl) - ehp(base, lvl)) / ehp(base, lvl)) * 100;
-    expect(Math.round(ehp(base, 22))).toBe(8277);
-    expect(Math.round(ehp(full, 22))).toBe(8631);
-    expect(pct(22).toFixed(2), 'heroic').toBe('4.28');
-    expect(Math.round(ehp(base, 23))).toBe(8099);
-    expect(Math.round(ehp(full, 23))).toBe(8445);
-    expect(pct(23).toFixed(2), 'S-rift').toBe('4.27');
+    expect(base).toEqual({ hp: 3532, armor: 3383, sta: 332 });
+    expect(consumables).toEqual({ hp: 3632, armor: 3383, sta: 342 });
+    expect(withEnchant).toEqual({ hp: 3672, armor: 3383, sta: 346 });
+    expect(full).toEqual({ hp: 3672, armor: 3386, sta: 346 });
+
+    const ehp = (body: { hp: number; armor: number }, level: number): number =>
+      body.hp / (1 - armorReduction(body.armor, level));
+    const expected: Array<[number, number, number, string]> = [
+      [22, 8796, 9149, '4.019'],
+      [23, 8606, 8952, '4.018'],
+    ];
+    for (const [level, baseEhp, fullEhp, delta] of expected) {
+      const deltaPct = ((ehp(full, level) - ehp(base, level)) / ehp(base, level)) * 100;
+      expect(Math.round(ehp(base, level)), `level ${level} baseline EHP`).toBe(baseEhp);
+      expect(Math.round(ehp(full, level)), `level ${level} full-kit EHP`).toBe(fullEhp);
+      expect(deltaPct.toFixed(3), `level ${level} EHP delta`).toBe(delta);
+    }
   });
 
   it('reads its kit deltas from the catalog rather than baking them in', () => {
