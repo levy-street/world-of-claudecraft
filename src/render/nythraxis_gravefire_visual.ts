@@ -23,8 +23,10 @@ import {
   NYTHRAXIS_GRAVEFIRE_GLOW_FRACTION,
   NYTHRAXIS_GRAVEFIRE_GROUND_LIFT,
   NYTHRAXIS_GRAVEFIRE_LAYER_OPACITY,
+  NYTHRAXIS_GRAVEFIRE_MODELLED_TONGUES_PER_YARD,
   NYTHRAXIS_GRAVEFIRE_PALETTE,
   NYTHRAXIS_GRAVEFIRE_TONGUE_UPDATE_SECONDS,
+  NYTHRAXIS_GRAVEFIRE_TONGUES_PER_YARD,
   type NythraxisGravefirePlan,
   type NythraxisGravefirePulse,
   type NythraxisGravefireTonguePose,
@@ -269,11 +271,18 @@ const TONGUE_POSE: NythraxisGravefireTonguePose = {
 };
 const TONGUE_DUMMY = new THREE.Object3D();
 
-/** The fire for one line: the modelled Gravefire tongue when loaded, else the procedural quad. */
+/** Tongues per yard for the fire a line draws: the modelled bank is sparser than the quads. */
+function tonguesPerYard(usesAsset: boolean): number {
+  return usesAsset
+    ? NYTHRAXIS_GRAVEFIRE_MODELLED_TONGUES_PER_YARD
+    : NYTHRAXIS_GRAVEFIRE_TONGUES_PER_YARD;
+}
+
+/** The fire for one line: the modelled Gravefire bank when loaded, else the procedural quad. */
 function newGravefireFire(): NythraxisFireInstances {
   return new NythraxisFireInstances(
     'gravefire',
-    nythraxisGravefireTongueCount(),
+    nythraxisGravefireTongueCount(tonguesPerYard(nythraxisPropAsset('gravefire') !== null)),
     {
       color: NYTHRAXIS_GRAVEFIRE_PALETTE.tongue,
       opacity: NYTHRAXIS_GRAVEFIRE_LAYER_OPACITY.tongue,
@@ -294,6 +303,7 @@ function poseTongues(visual: GravefireVisual, reducedMotion: boolean): void {
   // run never tiles. The procedural quad is centred and faces any way.
   const heading = Math.atan2(-visual.dirZ, visual.dirX);
   const halfHeight = fire.usesAsset ? 0 : METEOR_FLAME_GEOMETRY_HALF_HEIGHT;
+  const perYard = tonguesPerYard(fire.usesAsset);
   for (let index = 0; index < fire.count; index++) {
     const pose = nythraxisGravefireTonguePoseInto(
       TONGUE_POSE,
@@ -302,6 +312,7 @@ function poseTongues(visual: GravefireVisual, reducedMotion: boolean): void {
       visual.phase,
       reducedMotion,
       halfHeight,
+      perYard,
     );
     if (!pose.visible) {
       TONGUE_DUMMY.position.set(0, -1000, 0);
@@ -318,7 +329,14 @@ function poseTongues(visual: GravefireVisual, reducedMotion: boolean): void {
         fire.usesAsset ? heading + (pose.yaw - Math.PI) * 0.12 : pose.yaw,
         0,
       );
-      TONGUE_DUMMY.scale.set(pose.width, pose.height, pose.width);
+      // The modelled bank keeps its authored proportions (near-uniform scale,
+      // a little shorter along the line so neighbours interleave); the quad
+      // takes its own width.
+      if (fire.usesAsset) {
+        TONGUE_DUMMY.scale.set(pose.height * 0.75, pose.height, pose.height);
+      } else {
+        TONGUE_DUMMY.scale.set(pose.width, pose.height, pose.width);
+      }
     }
     TONGUE_DUMMY.updateMatrix();
     fire.setMatrixAt(index, TONGUE_DUMMY.matrix);

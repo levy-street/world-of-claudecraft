@@ -3,6 +3,7 @@ import path from 'node:path';
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
+  NYTHRAXIS_FIRE_BRIGHTNESS,
   NYTHRAXIS_PROP_ASSET_DEFS,
   NythraxisFireInstances,
   type NythraxisPropKind,
@@ -63,23 +64,30 @@ describe('Nythraxis prop asset defs', () => {
 });
 
 describe('prepareNythraxisPropAsset', () => {
-  it('normalizes a fire model to its target height, foot at y 0, centred on XZ, unlit additive', () => {
+  it('normalizes a fire model to its target height, foot at y 0, centred on XZ, unlit and saturated', () => {
     const { group } = syntheticSource(2, 4, 2);
     const asset = prepareNythraxisPropAsset('soul', group);
     expect(asset.parts).toHaveLength(1);
-    expect(asset.height).toBeCloseTo(NYTHRAXIS_PROP_ASSET_DEFS.soul.targetHeight, 5);
-    expect(asset.width).toBeCloseTo(0.5, 5);
-    expect(asset.depth).toBeCloseTo(0.5, 5);
+    const target = NYTHRAXIS_PROP_ASSET_DEFS.soul.targetHeight;
+    expect(asset.height).toBeCloseTo(target, 5);
+    expect(asset.width).toBeCloseTo(target / 2, 5);
+    expect(asset.depth).toBeCloseTo(target / 2, 5);
     const box = asset.parts[0].geometry.boundingBox as THREE.Box3;
     expect(box.min.y).toBeCloseTo(0, 5);
     expect(box.min.x + box.max.x).toBeCloseTo(0, 5);
     expect(box.min.z + box.max.z).toBeCloseTo(0, 5);
     const material = asset.parts[0].material as THREE.MeshBasicMaterial;
     expect(material).toBeInstanceOf(THREE.MeshBasicMaterial);
-    expect(material.blending).toBe(THREE.AdditiveBlending);
+    expect(material.blending).toBe(THREE.NormalBlending);
     expect(material.transparent).toBe(true);
     expect(material.depthWrite).toBe(false);
-    expect(material.color.getHex()).toBe(0x40ff80);
+    expect(material.toneMapped).toBe(false);
+    // The albedo is over-driven so it glows unlit: every channel of the
+    // authored (linear-space) colour is multiplied by the boost.
+    const authored = new THREE.Color(0x40ff80);
+    expect(material.color.r).toBeCloseTo(authored.r * NYTHRAXIS_FIRE_BRIGHTNESS, 5);
+    expect(material.color.g).toBeCloseTo(authored.g * NYTHRAXIS_FIRE_BRIGHTNESS, 5);
+    expect(material.color.b).toBeCloseTo(authored.b * NYTHRAXIS_FIRE_BRIGHTNESS, 5);
   });
 
   it('keeps the cage a lit surface at its own target height', () => {

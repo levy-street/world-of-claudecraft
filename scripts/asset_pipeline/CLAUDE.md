@@ -45,7 +45,7 @@ so animation style matches the shipped set by construction.
 ```
 node scripts/asset_pipeline/pipeline.mjs weapon --name emberfang_sword \
   [--prompt "..."] [--image path|url|task_id] [--family sword] [--items id1,id2] \
-  [--flip] [--model hifi] [--face-limit n] [--apply] [--job id]
+  [--flip] [--model p2|hifi] [--face-limit n] [--apply] [--job id]
 ```
 Produces a normalized GLB (origin AT the grip, blade/head along +Y, family height and
 gripFrac from `lib/families.mjs`, WebP 512 textures, meshopt) plus a 128px model-preview JPG.
@@ -297,7 +297,7 @@ Mechanics:
   a headless browser is NOT required. Server-side PNG previews degrade to a no-op when no local
   browser is installed (`renderPreviewsIfPossible`, `browser_path_resolve.mjs`), instead of failing
   the run. Weapon HUD icons and held renders still need a local browser (they rasterize an image).
-- The form exposes each lane's API generation options: model quality (`--model` low-poly/hifi),
+- The form exposes each lane's API generation options: model quality (`--model` low-poly/p2/hifi),
   `--face-limit`, and an optional reference image (`--image`, URL or `task_`/`file_` id) for all
   lanes; creatures add rig type (`--rig-type` auto/biped/quadruped/hexapod/octopod/serpentine/
   aquatic) and `--height`; weapons add `--family`; props add `--height` and `--rotate-y`.

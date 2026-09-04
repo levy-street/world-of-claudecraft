@@ -26,19 +26,27 @@ export type NythraxisPropKind = NythraxisFireKind | 'cage';
 
 export interface NythraxisPropAssetDef {
   url: string;
-  /** World units the prepared model stands, foot at y 0. */
+  /**
+   * World units the prepared model stands at instance scale 1, foot at y 0.
+   * The fire painters scale each plume by its pose height (roughly 0.25 to
+   * 0.8, flickering), so a fire's unit height is set well above the flame
+   * height wanted on the floor: a typical plume lands near half of it.
+   */
   targetHeight: number;
-  /** Fire is unlit additive glow; the cage is a lit prop. */
+  /** Fire is unlit and never lit by the crypt; the cage is a lit prop. */
   surface: 'fire' | 'prop';
 }
 
 export const NYTHRAXIS_PROP_ASSET_DEFS: Readonly<Record<NythraxisPropKind, NythraxisPropAssetDef>> =
   {
-    grave: { url: '/models/props/nythraxis_grave_flame.glb', targetHeight: 1.0, surface: 'fire' },
-    soul: { url: '/models/props/nythraxis_soulfire.glb', targetHeight: 1.0, surface: 'fire' },
-    gravefire: { url: '/models/props/nythraxis_gravefire.glb', targetHeight: 0.9, surface: 'fire' },
+    grave: { url: '/models/props/nythraxis_grave_flame.glb', targetHeight: 4.4, surface: 'fire' },
+    soul: { url: '/models/props/nythraxis_soulfire.glb', targetHeight: 4.8, surface: 'fire' },
+    gravefire: { url: '/models/props/nythraxis_gravefire.glb', targetHeight: 3.4, surface: 'fire' },
     cage: { url: '/models/props/nythraxis_binding_cage.glb', targetHeight: 6, surface: 'prop' },
   };
+
+/** Multiplier on a fire model's albedo colour: unlit and untonemapped, above 1 glows. */
+export const NYTHRAXIS_FIRE_BRIGHTNESS = 1.35;
 
 export interface NythraxisPropPart {
   geometry: THREE.BufferGeometry;
@@ -90,17 +98,27 @@ function attributeToFloat(geometry: THREE.BufferGeometry, name: string): void {
   geometry.setAttribute(name, new THREE.BufferAttribute(values, attribute.itemSize));
 }
 
-/** Fire: the authored colour map as unlit additive glow. */
+/**
+ * Fire: the authored colour map, unlit and untonemapped so it burns at full
+ * saturation in the dark crypt. Normal blending on purpose: additive fire
+ * summed over the bright telegraph strips washed out to white, while a solid
+ * painted plume keeps its yellow core and coloured tips (cartoon fire, the
+ * same read as the rest of the low-poly world).
+ */
 function fireMaterial(source: THREE.Material): THREE.Material {
   const standard = source as THREE.MeshStandardMaterial;
+  const color = standard.color?.clone() ?? new THREE.Color(0xffffff);
+  // The generated albedo is painted for a lit scene and reads dull unlit;
+  // over-driving the colour (untonemapped) brings the cores back to a glow.
+  color.multiplyScalar(NYTHRAXIS_FIRE_BRIGHTNESS);
   return new THREE.MeshBasicMaterial({
     name: `nythraxis-fire:${source.name}`,
     map: standard.map ?? null,
-    color: standard.color?.clone() ?? new THREE.Color(0xffffff),
+    color,
     vertexColors: standard.vertexColors === true,
     transparent: true,
     opacity: 1,
-    blending: THREE.AdditiveBlending,
+    blending: THREE.NormalBlending,
     depthWrite: false,
     side: THREE.DoubleSide,
     toneMapped: false,

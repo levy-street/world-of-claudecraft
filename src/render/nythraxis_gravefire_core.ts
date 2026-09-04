@@ -38,8 +38,10 @@ export const NYTHRAXIS_GRAVEFIRE_EDGE_WIDTH = 0.18;
 /** The glow band covers this fraction of the half-width on each side. */
 export const NYTHRAXIS_GRAVEFIRE_GLOW_FRACTION = 0.6;
 
-/** Flame tongues per lit yard, identical on every graphics tier. */
+/** Procedural flame tongues per lit yard, identical on every graphics tier. */
 export const NYTHRAXIS_GRAVEFIRE_TONGUES_PER_YARD = 3;
+/** The modelled tongue is itself a bank of flames: one per yard reads as a wall of fire. */
+export const NYTHRAXIS_GRAVEFIRE_MODELLED_TONGUES_PER_YARD = 1;
 /** Tongue re-pose cadence: 20 Hz stays visually continuous and bounds the CPU. */
 export const NYTHRAXIS_GRAVEFIRE_TONGUE_UPDATE_SECONDS = 1 / 20;
 /** Tongues in the head cap burn this much taller: the advancing edge is the fire's face. */
@@ -47,8 +49,10 @@ export const NYTHRAXIS_GRAVEFIRE_HEAD_TONGUE_BOOST = 1.4;
 const TONGUE_HASH_SEED = 0x6f1a3;
 
 /** The fixed instance budget for one line: enough tongues for the whole length. */
-export function nythraxisGravefireTongueCount(): number {
-  return NYTHRAXIS_GRAVEFIRE_TONGUES_PER_YARD * NYTHRAXIS_GRAVEFIRE_LENGTH;
+export function nythraxisGravefireTongueCount(
+  perYard: number = NYTHRAXIS_GRAVEFIRE_TONGUES_PER_YARD,
+): number {
+  return perYard * NYTHRAXIS_GRAVEFIRE_LENGTH;
 }
 
 export interface NythraxisGravefirePlan {
@@ -131,8 +135,9 @@ export function nythraxisGravefireTonguePoseInto(
   phase: number,
   reducedMotion: boolean,
   geometryHalfHeight: number,
+  perYard: number = NYTHRAXIS_GRAVEFIRE_TONGUES_PER_YARD,
 ): NythraxisGravefireTonguePose {
-  const yard = Math.floor(index / NYTHRAXIS_GRAVEFIRE_TONGUES_PER_YARD);
+  const yard = Math.floor(index / perYard);
   out.along = yard + hash2(index, 0, TONGUE_HASH_SEED);
   out.visible = out.along >= plan.tail && out.along <= plan.head;
   out.across = (hash2(index, 1, TONGUE_HASH_SEED) * 2 - 1) * plan.halfWidth * 0.8;

@@ -52,14 +52,19 @@ const EMBER_SPIN = 0.35; // rad/s, the violet inner ring's lazy drift
 // Tongues are posed in the patch group's own space, so their bound sits on its origin.
 const TONGUE_BOUND_CENTER = new THREE.Vector3();
 
-/** The fire for one patch: the kind's Tripo flame cluster when loaded, else the procedural quad. */
+/** Modelled plumes per patch: each is a whole flame, so fewer of them read as one blaze. */
+export const NYTHRAXIS_GRAVE_FLAME_MODELLED_TONGUES = 9;
+
+/** The fire for one patch: the kind's Tripo flame plume when loaded, else the procedural quad. */
 function newFlameFire(
   kind: ActiveNythraxisGraveFlame['kind'],
   tongueColor: number,
 ): NythraxisFireInstances {
   return new NythraxisFireInstances(
     kind,
-    NYTHRAXIS_GRAVE_FLAME_TONGUES,
+    nythraxisPropAsset(kind)
+      ? NYTHRAXIS_GRAVE_FLAME_MODELLED_TONGUES
+      : NYTHRAXIS_GRAVE_FLAME_TONGUES,
     { color: tongueColor, opacity: 0.6, unitHeight: NYTHRAXIS_FLAME_TONGUE_MAX_HEIGHT },
     NYTHRAXIS_GRAVE_FLAME_TONGUES_NAME,
     13,
@@ -184,7 +189,9 @@ function poseTongues(
     );
     dummy.position.set(pose.dx, pose.y, pose.dz);
     dummy.rotation.set(0, pose.yaw, 0);
-    dummy.scale.set(pose.width, pose.height, pose.width);
+    // The modelled plume keeps its authored proportions; the quad takes its own width.
+    if (fire.usesAsset) dummy.scale.setScalar(pose.height);
+    else dummy.scale.set(pose.width, pose.height, pose.width);
     dummy.updateMatrix();
     fire.setMatrixAt(index, dummy.matrix);
   }
