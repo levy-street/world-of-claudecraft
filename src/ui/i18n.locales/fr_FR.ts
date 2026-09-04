@@ -14018,7 +14018,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   "entities.abilities.nightshade_coating.name": "Revêtement Morelle",
   "guide.settingsPage.ifShowReliquaryTracker": "Si le tracker Reliquaire (vos pages épinglées et leur progression) se trouve sur votre HUD. La fenêtre Reliquaire a un bouton en forme d'œil correspondant, et épingler une page réactive le tracker.",
   // v0.41 release i18n fill.
-  'entities.items.reins_rickshaw_mount.name': "Rênes liées : Rickshaw d'os liés",
   'hudChrome.itemMenu.sell': 'Vendre',
   'hudChrome.itemMenu.sellAll': 'Tout vendre ({count})',
   'hudChrome.mounts.desc_rickshaw_mount':

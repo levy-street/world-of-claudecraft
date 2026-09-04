@@ -14019,7 +14019,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   "entities.abilities.nightshade_coating.name": "Recubrimiento de solanáceas",
   "guide.settingsPage.ifShowReliquaryTracker": "Si el rastreador del Relicario (tus páginas fijadas y su progreso) se encuentra en tu HUD. La ventana del Relicario tiene un botón de ojo a juego y al fijar una página se vuelve a activar el rastreador.",
   // v0.41 release i18n fill.
-  'entities.items.reins_rickshaw_mount.name': 'Riendas vinculadas: Rickshaw Atahuesos',
   'hudChrome.itemMenu.sell': 'Vender',
   'hudChrome.itemMenu.sellAll': 'Vender todo ({count})',
   'hudChrome.mounts.desc_rickshaw_mount':

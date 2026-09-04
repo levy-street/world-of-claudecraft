@@ -2,6 +2,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { FORGE_MAX_DISTANCE, MAX_DISTANCE, REF_DISTANCE, sfx } from '../src/game/sfx';
 import { SFX_CLIPS, type SfxEntry } from '../src/game/sfx_manifest.generated';
+import { MOUNT_SKIN_IDS } from '../src/sim/content/mount_skins';
 import { MOUNT_KEYS } from '../src/sim/content/mounts';
 
 // The footstep "jingling" bug: foot clips are ~0.48s but steps fire every ~0.22s
@@ -27,13 +28,17 @@ interface FakeSource {
 // here rather than derived from the manifest, so silently losing some OTHER
 // mount's cue still fails the coverage tests below instead of quietly
 // redefining what full coverage means.
+// Every key a ridden mount can PRESENT as: the catalog mounts plus the mount
+// skins (src/sim/content/mount_skins.ts mountPresentationKey). Audio keys off
+// the presentation key, so a skin owns its own cue set exactly like a mount.
+const MOUNT_AUDIO_KEYS: readonly string[] = [...MOUNT_KEYS, ...MOUNT_SKIN_IDS];
 const FOOTFALL_MOUNTS = new Set(['lanternback_troll', 'chimeglass_tortoise']);
 // A mount with a continuous loop (the rickshaw's mount_loop_ cue) gets no
 // per-stride one-shot either: mountRun no-ops for it by design (see its own
 // comment in sfx.ts), checking the real SFX_CLIPS catalog for a mount_loop_*
 // entry, so it is excluded from the stride coverage below rather than asserted
 // against a source mountRun never actually plays.
-const CUSTOM_STRIDE_MOUNTS = MOUNT_KEYS.filter(
+const CUSTOM_STRIDE_MOUNTS = MOUNT_AUDIO_KEYS.filter(
   (mountKey) => !FOOTFALL_MOUNTS.has(mountKey) && !(`mount_loop_${mountKey}` in SFX_CLIPS),
 );
 // SFX_CLIPS is a generated object LITERAL type, so a mount_run_ key that is
@@ -300,7 +305,7 @@ describe('mount running audio', () => {
     // because the key is missing, so an entry sneaking back in would silently
     // switch these two mounts off the player footfall again.
     for (const mountKey of FOOTFALL_MOUNTS) {
-      expect(MOUNT_KEYS).toContain(mountKey);
+      expect(MOUNT_AUDIO_KEYS).toContain(mountKey);
       expect(CLIPS_BY_KEY[`mount_run_${mountKey}`]).toBeUndefined();
     }
   });
@@ -374,6 +379,9 @@ describe('mount running audio', () => {
     // mount_loop_rickshaw_mount is a real SFX_CLIPS entry (checked by
     // mountRun itself), so no mock setup is needed here.
     const before = sources.length;
+    // 'rickshaw_mount' is a PRESENTATION key here (a mount skin worn over any
+    // ride, src/sim/content/mount_skins.ts), no longer a catalog MountKey: the
+    // loop-owner rule keys off what the mount presents as.
     sfx.mountRun(0, 0, 0, 'rickshaw_mount', 'grass', true);
     expect(sources.length).toBe(before);
   });

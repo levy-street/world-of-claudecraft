@@ -87,15 +87,11 @@ const JOBS = [
     id: 'reins_drakemaw_raptor',
     cfg: { headFwd: 0.95, headUp: 0.82, fill: 0.55, yaw: 0.52, pitch: 0.14 },
   },
-  {
-    // The tortoise's whole identity is on his face: storm-glass spectacles, the
-    // crest, and the bell just under his chin. Anchor high and forward onto the
-    // head and pitch down a touch so the bell reads at the bottom of the frame
-    // instead of the shell filling it.
-    file: 'chimeglass_tortoise.glb',
-    id: 'reins_chimeglass_tortoise',
-    cfg: { headFwd: 0.88, headUp: 0.76, fill: 0.6, yaw: 0.58, pitch: 0.2 },
-  },
+  // The Chimeglass Tortoise, the Cluckwork Mech Bird and the Bonebound Rickshaw
+  // are mount SKINS now (src/sim/content/mount_skins.ts): their renders ship as
+  // store art under public/ui/store/mount_skins, outside the item-icon set this
+  // script fills (the rickshaw's icon was a woc-item-icon-v1 generation, never a
+  // job here).
 ];
 
 const only = process.env.ONLY ? new Set(process.env.ONLY.split(',')) : null;

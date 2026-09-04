@@ -414,7 +414,6 @@ import {
   stopStoragePurchaseRecovery,
   storagePurchaseRecoveryMetrics,
 } from './storage_purchases';
-import { materializeStoreMountGrants } from './store_mount_grants';
 import { configureSuspicionFlagDataset, suspicionFlagsIdle } from './suspicion_flags';
 import { listSuspicionFlagDataset } from './suspicion_flags_db';
 import { passesTurnstile } from './turnstile';
@@ -3288,13 +3287,7 @@ configureStoragePurchaseRuntime(storagePurchaseHost);
 configureClaudiumRuntime({
   grantWeaponSkins: (accountId, skinIds) =>
     liveGame().grantWeaponSkinsToAccount(accountId, skinIds),
-  // Store-mount purchases materialize the soulbound reins item directly through
-  // the grant module (server/store_mount_grants.ts): GameServer needs no method
-  // of its own, keeping the monolith at its ratchet ceiling.
-  grantStoreMounts: (accountId, itemIds) => {
-    const game = liveGame();
-    materializeStoreMountGrants(game.clients.values(), game.sim, accountId, itemIds);
-  },
+  grantMountSkins: (accountId, skinIds) => liveGame().grantMountSkinsToAccount(accountId, skinIds),
   storagePurchase: (input) => executeStoragePurchase(storagePurchaseHost(), input),
 });
 

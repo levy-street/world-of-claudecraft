@@ -43,7 +43,7 @@ describe('bindStoreBodyActions', () => {
       body(
         `<button type="button" data-buy-claudium>top up</button>` +
           `<button type="button" ${ARMORY_SKIN_ATTR}="guildmark_arming_sword">skin</button>` +
-          `<button type="button" ${STORE_MOUNT_BUY_ATTR}="reins_mech_bird">mount</button>` +
+          `<button type="button" ${STORE_MOUNT_BUY_ATTR}="mech_bird">mount</button>` +
           `<button type="button" ${CHARTER_BUY_ATTR}="storage_charter_small">charter</button>`,
       ),
       a as unknown as StoreBodyActions,
@@ -54,7 +54,7 @@ describe('bindStoreBodyActions', () => {
     click(`[${CHARTER_BUY_ATTR}]`);
     expect(a.buyClaudium).toHaveBeenCalledTimes(1);
     expect(a.inspectArmorySkin).toHaveBeenCalledWith('guildmark_arming_sword');
-    expect(a.buyStoreMount).toHaveBeenCalledWith('reins_mech_bird');
+    expect(a.buyStoreMount).toHaveBeenCalledWith('mech_bird');
     expect(a.buyCharter).toHaveBeenCalledWith('storage_charter_small');
   });
 

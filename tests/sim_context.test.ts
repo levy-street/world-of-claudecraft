@@ -261,6 +261,13 @@ function makeFakeHost() {
   const clock = { time: 0, tick: 0 };
   const host: SimContextHost = {
     riftCollisionToken: 1,
+    accountCosmetics: {
+      completedQuestIds: [],
+      mechChromaIds: [],
+      weaponSkinIds: [],
+      weaponSkinLoadout: {},
+      mountSkinIds: [],
+    },
     storagePrices: DEFAULT_STORAGE_PRICES,
     naturalRiftPortals: [],
     riftEvents: [],

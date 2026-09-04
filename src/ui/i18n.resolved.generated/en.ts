@@ -570,9 +570,10 @@ export const en: EnTranslations = {
       "tabsLabel": "WOC Store sections",
       "storeTab": "Store",
       "rewardsTab": "Daily Rewards",
-      "mountsEyebrow": "Account Mounts",
+      "mountsEyebrow": "Account Mount Skins",
       "mountsTitle": "Machine Stable",
       "mountBuyAria": "Purchase {item}",
+      "mountSkinType": "Mount skin",
       "loading": "Loading WOC Store...",
       "error": "The WOC Store is unavailable right now. Please try again shortly.",
       "balance": "Claudium Balance",
@@ -4165,6 +4166,32 @@ export const en: EnTranslations = {
         "wardstones": "Wardstone channels (phase transition)",
         "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
+    },
+    "cosmetics": {
+      "title": "Cosmetics",
+      "close": "Close Cosmetics",
+      "tabsLabel": "Cosmetics sections",
+      "tabMounts": "Mounts",
+      "tabSkins": "Skins",
+      "tabMech": "Mech",
+      "legend": "Account: shared by every character. Character: this character only.",
+      "scopeAccount": "Account",
+      "scopeCharacter": "Character",
+      "wear": "Wear",
+      "takeOff": "Take off",
+      "worn": "Worn",
+      "apply": "Apply",
+      "detach": "Detach",
+      "applied": "Applied",
+      "owned": "Owned",
+      "storeOnly": "Available in the WOC Store",
+      "cardAria": "{name}, {rarity}",
+      "mountsIntro": "A mount skin is drawn over whichever mount this character rides. It never changes speed.",
+      "mountsNoMount": "Own a mount first: a skin needs something to ride.",
+      "skinsEmpty": "No weapon skins owned yet. Visit the WOC Store.",
+      "skinsApplyHint": "Equip a {type} to apply this skin.",
+      "mechIntro": "The Combat Mech replaces this character's body. One chroma is worn at a time.",
+      "mechEmpty": "No Combat Mech chromas owned yet."
     },
     "reliquary": {
       "title": "The Reliquary",
@@ -13217,17 +13244,8 @@ export const en: EnTranslations = {
       "reins_lanternback_troll": {
         "name": "Lamplighter's Yoke: Grumbol"
       },
-      "reins_chimeglass_tortoise": {
-        "name": "Roadwarden's Bellstrap: Tolliver"
-      },
-      "reins_rickshaw_mount": {
-        "name": "Bound Reins: Bonebound Rickshaw"
-      },
       "reins_drakemaw_raptor": {
         "name": "Reins of the Drakemaw Raptor"
-      },
-      "reins_mech_bird": {
-        "name": "Ignition Key: Cluckwork Mech Bird"
       },
       "rimefang": {
         "name": "Rimefang"

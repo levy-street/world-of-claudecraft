@@ -26,6 +26,7 @@
 //
 // `src/sim`-pure and rng-free.
 
+import { normalizeMountSkinId } from './content/mount_skins';
 import { MOUNT_KEYS, type MountKey, mountDef, TRAINING_MOUNT_KEY } from './content/mounts';
 import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
@@ -203,6 +204,23 @@ function cancelFormsAndGhostWolf(ctx: SimContext, e: Entity): void {
  *
  *  Already riding something else: swap INSTANTLY, no dismount channel and no new
  *  summon channel. Clicking the reins you are already riding dismounts. */
+/** Wear (skinId) or take off (null) a mount SKIN (content/mount_skins.ts) on a
+ *  player: the persisted meta field plus the entity mirror the identity wire
+ *  (`msk`) reads. Cosmetic only: the ridden mount keeps its own key, so speed,
+ *  the melee block and crit are untouched. The account-ownership gate is the
+ *  caller's (the server's session cosmetics; Sim.changeMountSkin offline).
+ *  An id outside the catalog is refused. */
+export function setMountSkin(ctx: SimContext, pid: number, skinId: string | null): boolean {
+  const meta = ctx.players.get(pid);
+  const e = ctx.entities.get(pid);
+  if (!meta || e?.kind !== 'player') return false;
+  const next = skinId === null ? null : normalizeMountSkinId(skinId);
+  if (skinId !== null && next === null) return false;
+  meta.mountSkinId = next;
+  e.mountSkinId = next;
+  return true;
+}
+
 export function summonMountItem(ctx: SimContext, pid: number, key: string): boolean {
   const meta = ctx.players.get(pid);
   const e = ctx.entities.get(pid);

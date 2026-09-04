@@ -570,9 +570,10 @@ export const ko_KR: EnTranslations = {
       "tabsLabel": "WOC 상점 구역",
       "storeTab": "상점",
       "rewardsTab": "일일 보상",
-      "mountsEyebrow": "계정 탈것",
+      "mountsEyebrow": "계정 탈것 스킨",
       "mountsTitle": "기계 마구간",
       "mountBuyAria": "{item} 구매",
+      "mountSkinType": "탈것 스킨",
       "loading": "WOC 상점 불러오는 중…",
       "error": "현재 WOC 상점을 이용할 수 없습니다. 잠시 후 다시 시도해 주세요.",
       "balance": "Claudium 잔액",
@@ -4165,6 +4166,32 @@ export const ko_KR: EnTranslations = {
         "wardstones": "수호석 정신집중(단계 전환)",
         "dread_curse": "공포의 저주(영웅 전용, 누적되는 탱커 교대 디버프)"
       }
+    },
+    "cosmetics": {
+      "title": "외형",
+      "close": "외형 닫기",
+      "tabsLabel": "외형 구역",
+      "tabMounts": "탈것",
+      "tabSkins": "스킨",
+      "tabMech": "메카",
+      "legend": "계정: 모든 캐릭터가 공유. 캐릭터: 이 캐릭터만.",
+      "scopeAccount": "계정",
+      "scopeCharacter": "캐릭터",
+      "wear": "착용",
+      "takeOff": "벗기",
+      "worn": "착용 중",
+      "apply": "적용",
+      "detach": "해제",
+      "applied": "적용됨",
+      "owned": "보유 중",
+      "storeOnly": "WOC 상점에서 구매 가능",
+      "cardAria": "{name}, {rarity}",
+      "mountsIntro": "탈것 스킨은 이 캐릭터가 타는 어떤 탈것 위에도 덧입혀집니다. 속도는 바뀌지 않습니다.",
+      "mountsNoMount": "먼저 탈것을 얻으세요. 스킨에는 탈 대상이 필요합니다.",
+      "skinsEmpty": "아직 보유한 무기 스킨이 없습니다. WOC 상점을 방문하세요.",
+      "skinsApplyHint": "{type}을(를) 장착하면 이 스킨을 적용할 수 있습니다.",
+      "mechIntro": "전투 메카는 이 캐릭터의 몸을 대체합니다. 한 번에 하나의 크로마만 착용합니다.",
+      "mechEmpty": "아직 보유한 전투 메카 크로마가 없습니다."
     },
     "reliquary": {
       "title": "성물고",
@@ -13217,17 +13244,8 @@ export const ko_KR: EnTranslations = {
       "reins_lanternback_troll": {
         "name": "점등인의 멍에: 그룸볼"
       },
-      "reins_chimeglass_tortoise": {
-        "name": "길지기의 종끈: 톨리버"
-      },
-      "reins_rickshaw_mount": {
-        "name": "결속된 고삐: 뼈에 묶인 인력거"
-      },
       "reins_drakemaw_raptor": {
         "name": "화산구 랩터의 고삐"
-      },
-      "reins_mech_bird": {
-        "name": "태엽 기계새 시동 열쇠"
       },
       "rimefang": {
         "name": "서리엄니"

@@ -1285,7 +1285,7 @@ describe('axe: reliquary window search, filters, and relic grid', () => {
       reliquaryRecent: [] as string[],
       reliquaryFirstFind: {},
       ownedMounts: () => [] as string[],
-      accountCosmetics: { weaponSkinIds: [] as string[] },
+      accountCosmetics: { weaponSkinIds: [] as string[], mountSkinIds: [] as string[] },
       deedsEarned: new Map<string, number>(),
       reliquaryPageClearCount: () => undefined,
       reliquaryCatalogCompletion: () => ({ owned: 0, total: 100 }),

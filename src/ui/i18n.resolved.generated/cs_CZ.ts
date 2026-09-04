@@ -570,9 +570,10 @@ export const cs_CZ: EnTranslations = {
       "tabsLabel": "Sekce obchodu WOC",
       "storeTab": "Obchod",
       "rewardsTab": "Denní odměny",
-      "mountsEyebrow": "Account Mounts",
+      "mountsEyebrow": "Account Mount Skins",
       "mountsTitle": "Machine Stable",
       "mountBuyAria": "Purchase {item}",
+      "mountSkinType": "Mount skin",
       "loading": "Načítání obchodu WOC…",
       "error": "Obchod WOC nyní není dostupný. Zkus to za chvíli znovu.",
       "balance": "Zůstatek Claudium",
@@ -4165,6 +4166,32 @@ export const cs_CZ: EnTranslations = {
         "wardstones": "Kanály ochranných kamenů (přechod fáze)",
         "dread_curse": "Děsivá kletba (pouze heroická, sčítající se oslabení pro střídání tanků)"
       }
+    },
+    "cosmetics": {
+      "title": "Cosmetics",
+      "close": "Close Cosmetics",
+      "tabsLabel": "Cosmetics sections",
+      "tabMounts": "Mounts",
+      "tabSkins": "Skins",
+      "tabMech": "Mech",
+      "legend": "Account: shared by every character. Character: this character only.",
+      "scopeAccount": "Account",
+      "scopeCharacter": "Character",
+      "wear": "Wear",
+      "takeOff": "Take off",
+      "worn": "Worn",
+      "apply": "Apply",
+      "detach": "Detach",
+      "applied": "Applied",
+      "owned": "Owned",
+      "storeOnly": "Available in the WOC Store",
+      "cardAria": "{name}, {rarity}",
+      "mountsIntro": "A mount skin is drawn over whichever mount this character rides. It never changes speed.",
+      "mountsNoMount": "Own a mount first: a skin needs something to ride.",
+      "skinsEmpty": "No weapon skins owned yet. Visit the WOC Store.",
+      "skinsApplyHint": "Equip a {type} to apply this skin.",
+      "mechIntro": "The Combat Mech replaces this character's body. One chroma is worn at a time.",
+      "mechEmpty": "No Combat Mech chromas owned yet."
     },
     "reliquary": {
       "title": "Relikviář",
@@ -13217,17 +13244,8 @@ export const cs_CZ: EnTranslations = {
       "reins_lanternback_troll": {
         "name": "Lampářovo jho: Grumbol"
       },
-      "reins_chimeglass_tortoise": {
-        "name": "Roadwarden's Bellstrap: Tolliver"
-      },
-      "reins_rickshaw_mount": {
-        "name": "Spoutané otěže: Kostipoutaná rikša"
-      },
       "reins_drakemaw_raptor": {
         "name": "Otěže raptora z Dračí tlamy"
-      },
-      "reins_mech_bird": {
-        "name": "Ignition Key: Cluckwork Mech Bird"
       },
       "rimefang": {
         "name": "Jinovatkový tesák"

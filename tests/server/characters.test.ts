@@ -143,6 +143,7 @@ function authedDb(overrides: DbOverrides = {}): void {
       mechChromaIds: [],
       weaponSkinIds: [],
       weaponSkinLoadout: {},
+      mountSkinIds: [],
     }),
     ...overrides,
   });
@@ -367,6 +368,7 @@ describe('character list handlers', () => {
         mechChromaIds: [],
         weaponSkinIds: ['ice_fang_sword'],
         weaponSkinLoadout: { sword: 'ice_fang_sword' },
+        mountSkinIds: [],
       }),
     });
     // Online status comes from the injected runtime: row 1 online, row 2 offline.

@@ -570,9 +570,10 @@ export const nl_NL: EnTranslations = {
       "tabsLabel": "Onderdelen van de WOC-winkel",
       "storeTab": "Winkel",
       "rewardsTab": "Dagelijkse beloningen",
-      "mountsEyebrow": "Account Mounts",
+      "mountsEyebrow": "Account Mount Skins",
       "mountsTitle": "Machine Stable",
       "mountBuyAria": "Purchase {item}",
+      "mountSkinType": "Mount skin",
       "loading": "WOC-winkel laden...",
       "error": "De WOC Store is momenteel niet beschikbaar. Probeer het binnenkort opnieuw.",
       "balance": "Claudium-saldo",
@@ -4165,6 +4166,32 @@ export const nl_NL: EnTranslations = {
         "wardstones": "Wardstone-kanalen (faseovergang)",
         "dread_curse": "Schrikvloek (alleen heroisch, stapelende verzwakking voor tankwissel)"
       }
+    },
+    "cosmetics": {
+      "title": "Cosmetics",
+      "close": "Close Cosmetics",
+      "tabsLabel": "Cosmetics sections",
+      "tabMounts": "Mounts",
+      "tabSkins": "Skins",
+      "tabMech": "Mech",
+      "legend": "Account: shared by every character. Character: this character only.",
+      "scopeAccount": "Account",
+      "scopeCharacter": "Character",
+      "wear": "Wear",
+      "takeOff": "Take off",
+      "worn": "Worn",
+      "apply": "Apply",
+      "detach": "Detach",
+      "applied": "Applied",
+      "owned": "Owned",
+      "storeOnly": "Available in the WOC Store",
+      "cardAria": "{name}, {rarity}",
+      "mountsIntro": "A mount skin is drawn over whichever mount this character rides. It never changes speed.",
+      "mountsNoMount": "Own a mount first: a skin needs something to ride.",
+      "skinsEmpty": "No weapon skins owned yet. Visit the WOC Store.",
+      "skinsApplyHint": "Equip a {type} to apply this skin.",
+      "mechIntro": "The Combat Mech replaces this character's body. One chroma is worn at a time.",
+      "mechEmpty": "No Combat Mech chromas owned yet."
     },
     "reliquary": {
       "title": "Het Reliquarium",
@@ -13217,17 +13244,8 @@ export const nl_NL: EnTranslations = {
       "reins_lanternback_troll": {
         "name": "Juk van de lantaarnopsteker: Grumbol"
       },
-      "reins_chimeglass_tortoise": {
-        "name": "Roadwarden's Bellstrap: Tolliver"
-      },
-      "reins_rickshaw_mount": {
-        "name": "Gebonden teugels: Beengebonden Riksja"
-      },
       "reins_drakemaw_raptor": {
         "name": "Teugels van de Drakenmuil-Raptor"
-      },
-      "reins_mech_bird": {
-        "name": "Ignition Key: Cluckwork Mech Bird"
       },
       "rimefang": {
         "name": "Rijptand"

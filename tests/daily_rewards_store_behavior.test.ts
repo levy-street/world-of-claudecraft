@@ -50,9 +50,9 @@ import type { DailyRewardStatus, IWorld } from '../src/world_api';
 function worldStub(): IWorld {
   return {
     player: { templateId: 'warrior', mainhandItemId: null },
-    accountCosmetics: { weaponSkinIds: [], weaponSkinLoadout: {} },
-    // The store's Machine Stable strip unions service ownership with the live
-    // mount mirror (IWorldMounts.ownedMounts); nothing is owned in this stub.
+    accountCosmetics: { weaponSkinIds: [], weaponSkinLoadout: {}, mountSkinIds: [] },
+    // The store's Machine Stable strip unions service ownership with the account
+    // cosmetics mirror (accountCosmetics.mountSkinIds); nothing is owned here.
     ownedMounts: () => [],
   } as unknown as IWorld;
 }
@@ -802,7 +802,7 @@ function charterHarness(
           ...(options.scope ? { name: options.scope.name } : {}),
         },
         ...(options.scope ? { cfg: { playerClass: options.scope.playerClass } } : {}),
-        accountCosmetics: { weaponSkinIds: [], weaponSkinLoadout: {} },
+        accountCosmetics: { weaponSkinIds: [], weaponSkinLoadout: {}, mountSkinIds: [] },
         ownedMounts: () => [],
         get bankPurchasedSlots() {
           return state.purchasedSlots;
@@ -2933,16 +2933,16 @@ describe('the charter idempotency-key minter', () => {
 });
 
 describe('WOC Store Machine Stable', () => {
-  // The store-mount strip rides the same body paint as the charters. These arms
+  // The mount-skin strip rides the same body paint as the charters. These arms
   // pin the ordering nothing else does: the mount rows are re-projected by
   // rebuildArmorySections BEFORE paintStore reads sectionHtml(), so an open
   // store shows the strip (a paint that reached the section before any rebuild
   // would silently emit nothing), and the card button reaches the purchase
   // prompt through the store body binding.
   const MOUNT_ITEM: WocStoreItemInput = {
-    itemId: 'reins_mech_bird',
+    itemId: 'mech_bird',
     name: 'service name',
-    kind: 'item',
+    kind: 'skin',
     costClaudium: 1_200,
     owned: false,
   };
@@ -2952,8 +2952,8 @@ describe('WOC Store Machine Stable', () => {
     await h.internals.renderStore(null);
 
     expect(h.html()).toContain('<section class="armory-section store-mounts rarity-rare">');
-    expect(h.html()).toContain('data-store-mount-buy="reins_mech_bird"');
-    expect(h.html()).toContain('/ui/items/reins_mech_bird.webp');
+    expect(h.html()).toContain('data-store-mount-buy="mech_bird"');
+    expect(h.html()).toContain('/ui/store/mount_skins/mech_bird.webp');
     // The service price, in the shared cost slot, never a computed one.
     expect(h.html()).toMatch(/<span class="armory-cost"><img [^>]*><strong>1,200<\/strong>/);
     const button = h.root.querySelector<HTMLButtonElement>('[data-store-mount-buy]');

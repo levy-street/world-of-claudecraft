@@ -570,9 +570,10 @@ export const es_ES: EnTranslations = {
       "tabsLabel": "Secciones de la tienda WOC",
       "storeTab": "Tienda",
       "rewardsTab": "Recompensas diarias",
-      "mountsEyebrow": "Account Mounts",
+      "mountsEyebrow": "Account Mount Skins",
       "mountsTitle": "Machine Stable",
       "mountBuyAria": "Purchase {item}",
+      "mountSkinType": "Mount skin",
       "loading": "Cargando la tienda WOC...",
       "error": "La tienda WOC no está disponible en este momento. Vuelve a intentarlo dentro de poco.",
       "balance": "Saldo de Claudium",
@@ -4165,6 +4166,32 @@ export const es_ES: EnTranslations = {
         "wardstones": "Canalizacion de piedras de guardia (transicion de fase)",
         "dread_curse": "Maldicion Pavorosa (solo heroico, perjuicio acumulativo para cambio de tanque)"
       }
+    },
+    "cosmetics": {
+      "title": "Cosmetics",
+      "close": "Close Cosmetics",
+      "tabsLabel": "Cosmetics sections",
+      "tabMounts": "Mounts",
+      "tabSkins": "Skins",
+      "tabMech": "Mech",
+      "legend": "Account: shared by every character. Character: this character only.",
+      "scopeAccount": "Account",
+      "scopeCharacter": "Character",
+      "wear": "Wear",
+      "takeOff": "Take off",
+      "worn": "Worn",
+      "apply": "Apply",
+      "detach": "Detach",
+      "applied": "Applied",
+      "owned": "Owned",
+      "storeOnly": "Available in the WOC Store",
+      "cardAria": "{name}, {rarity}",
+      "mountsIntro": "A mount skin is drawn over whichever mount this character rides. It never changes speed.",
+      "mountsNoMount": "Own a mount first: a skin needs something to ride.",
+      "skinsEmpty": "No weapon skins owned yet. Visit the WOC Store.",
+      "skinsApplyHint": "Equip a {type} to apply this skin.",
+      "mechIntro": "The Combat Mech replaces this character's body. One chroma is worn at a time.",
+      "mechEmpty": "No Combat Mech chromas owned yet."
     },
     "reliquary": {
       "title": "El Relicario",
@@ -13217,17 +13244,8 @@ export const es_ES: EnTranslations = {
       "reins_lanternback_troll": {
         "name": "Yugo del farolero: Grumbol"
       },
-      "reins_chimeglass_tortoise": {
-        "name": "Roadwarden's Bellstrap: Tolliver"
-      },
-      "reins_rickshaw_mount": {
-        "name": "Riendas vinculadas: Rickshaw Atahuesos"
-      },
       "reins_drakemaw_raptor": {
         "name": "Riendas del Raptor de Drakemaw"
-      },
-      "reins_mech_bird": {
-        "name": "Ignition Key: Cluckwork Mech Bird"
       },
       "rimefang": {
         "name": "Colmillo de Escarcha"

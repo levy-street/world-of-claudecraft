@@ -570,9 +570,10 @@ export const it_IT: EnTranslations = {
       "tabsLabel": "Sezioni del negozio WOC",
       "storeTab": "Negozio",
       "rewardsTab": "Premi giornalieri",
-      "mountsEyebrow": "Account Mounts",
+      "mountsEyebrow": "Account Mount Skins",
       "mountsTitle": "Machine Stable",
       "mountBuyAria": "Purchase {item}",
+      "mountSkinType": "Mount skin",
       "loading": "Caricamento del negozio WOC...",
       "error": "Il negozio WOC non è al momento disponibile. Per favore riprova a breve.",
       "balance": "Saldo Claudium",
@@ -4165,6 +4166,32 @@ export const it_IT: EnTranslations = {
         "wardstones": "Canalizzazione delle pietre di guardia (transizione di fase)",
         "dread_curse": "Maledizione del Terrore (solo eroica, penalità cumulativa per cambio tank)"
       }
+    },
+    "cosmetics": {
+      "title": "Cosmetics",
+      "close": "Close Cosmetics",
+      "tabsLabel": "Cosmetics sections",
+      "tabMounts": "Mounts",
+      "tabSkins": "Skins",
+      "tabMech": "Mech",
+      "legend": "Account: shared by every character. Character: this character only.",
+      "scopeAccount": "Account",
+      "scopeCharacter": "Character",
+      "wear": "Wear",
+      "takeOff": "Take off",
+      "worn": "Worn",
+      "apply": "Apply",
+      "detach": "Detach",
+      "applied": "Applied",
+      "owned": "Owned",
+      "storeOnly": "Available in the WOC Store",
+      "cardAria": "{name}, {rarity}",
+      "mountsIntro": "A mount skin is drawn over whichever mount this character rides. It never changes speed.",
+      "mountsNoMount": "Own a mount first: a skin needs something to ride.",
+      "skinsEmpty": "No weapon skins owned yet. Visit the WOC Store.",
+      "skinsApplyHint": "Equip a {type} to apply this skin.",
+      "mechIntro": "The Combat Mech replaces this character's body. One chroma is worn at a time.",
+      "mechEmpty": "No Combat Mech chromas owned yet."
     },
     "reliquary": {
       "title": "Il Reliquiario",
@@ -13217,17 +13244,8 @@ export const it_IT: EnTranslations = {
       "reins_lanternback_troll": {
         "name": "Giogo del lampionaio: Grumbol"
       },
-      "reins_chimeglass_tortoise": {
-        "name": "Roadwarden's Bellstrap: Tolliver"
-      },
-      "reins_rickshaw_mount": {
-        "name": "Redini vincolate: Risciò Vincolato alle Ossa"
-      },
       "reins_drakemaw_raptor": {
         "name": "Redini del Raptor di Drakemaw"
-      },
-      "reins_mech_bird": {
-        "name": "Ignition Key: Cluckwork Mech Bird"
       },
       "rimefang": {
         "name": "Zanna di Brina"

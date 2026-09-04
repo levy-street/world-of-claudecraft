@@ -1,12 +1,4 @@
 {
-  "__provenance": {
-    "run": "32621561241",
-    "harvested": "2026-08-23",
-    "files": 3268,
-    "mergedLocal": "2026-09-03",
-    "mergedFiles": 244,
-    "note": "release/v0.42.0 sync of PR #3439 (Chimeglass Tortoise + Lanternback Troll + the bag-row Space guard) 2026-09-03: 6 new test files carry locally measured durations (single vitest run, jest-json start/end per file, skipped floor 100ms); 0 rows pruned for files absent from the merged tree. v0.41.0 base sync into the ignivar raid branch 2026-08-30: union of both arms' tables (release harvest wins shared rows, raid rows keep their locally measured durations), pruned to files present in the merged tree. Prior note: v0.41.0 sync into the ignivar raid consolidation: release CI harvest kept for shared files; the raid-branch and post-harvest test files carry locally measured durations (full vitest run of the absent files, jest-json start/end per file, skipped floor 100ms) 2026-08-26 prune: dropped 26 rows whose test file no longer exists in the tree. The 192 mergedLocal rows are LOCAL-scale durations (CI runs ~1.6x slower per ci_shard_plan.mjs); three of them exceed the 90s long-lane threshold locally (varkhul_forge_encounter, ignivar_encounter, nameplate_pledge) and CI_LONG_SUITES membership is deliberately deferred until a full-mode CI shard log provides in-shard numbers."
-  },
   "tests/abilities_command.test.ts": 2582,
   "tests/ability_audio_defers_to_recordings.test.ts": 141,
   "tests/ability_damage.test.ts": 24,
@@ -621,6 +613,8 @@
   "tests/corpse_lifecycle.test.ts": 2626,
   "tests/corpse_loot_availability.test.ts": 9,
   "tests/corpse_loot_rights.test.ts": 14,
+  "tests/cosmetics_view.test.ts": 4,
+  "tests/cosmetics_window.test.ts": 43,
   "tests/count_format.test.ts": 10,
   "tests/crab_summon.test.ts": 2323,
   "tests/craft_cast_view.test.ts": 12,
@@ -1766,6 +1760,7 @@
   "tests/mount_race.test.ts": 7155,
   "tests/mount_race_ui.test.ts": 11,
   "tests/mount_race_view.test.ts": 5,
+  "tests/mount_skins.test.ts": 4,
   "tests/mount_transition.test.ts": 3727,
   "tests/mount_visuals.test.ts": 24,
   "tests/mounts.test.ts": 3842,
@@ -2473,6 +2468,7 @@
   "tests/sentence_vfx_core.test.ts": 13,
   "tests/serial_writer.test.ts": 32,
   "tests/server/account.test.ts": 79,
+  "tests/server/account_cosmetics_live.test.ts": 8,
   "tests/server/ad_spend.test.ts": 18,
   "tests/server/admin.test.ts": 700,
   "tests/server/admin_activity_cache.test.ts": 8,
@@ -2628,6 +2624,7 @@
   "tests/server/mob_scan_tick_stats.test.ts": 9,
   "tests/server/moderation_error_body.test.ts": 9,
   "tests/server/moderation_queue_cache.test.ts": 9,
+  "tests/server/mount_skin_reconcile.test.ts": 7,
   "tests/server/new_endpoint.test.ts": 8283,
   "tests/server/newborn_island_spawn.test.ts": 1949,
   "tests/server/oauth.test.ts": 35,
@@ -3187,6 +3184,7 @@
   "tests/weapon_icons.test.ts": 369,
   "tests/weapon_proc_view.test.ts": 8,
   "tests/weapon_skin_materials.test.ts": 7,
+  "tests/weapon_skin_optimistic.test.ts": 3,
   "tests/weapon_skin_point_lights.test.ts": 10,
   "tests/weapon_skin_sim.test.ts": 2504,
   "tests/weapon_skins.test.ts": 779,
@@ -3274,5 +3272,13 @@
   "tests/zone_streaming.test.ts": 15,
   "tests/zone_transition.test.ts": 5,
   "tests/zone_warm_tracker.test.ts": 30,
-  "tests/zones_command.test.ts": 2652
+  "tests/zones_command.test.ts": 2652,
+  "__provenance": {
+    "run": "32621561241",
+    "harvested": "2026-08-23",
+    "files": 3274,
+    "mergedLocal": "2026-09-04",
+    "mergedFiles": 250,
+    "note": "release/v0.42.0 sync of PR #3439 (Chimeglass Tortoise + Lanternback Troll + the bag-row Space guard) 2026-09-03: 6 new test files carry locally measured durations (single vitest run, jest-json start/end per file, skipped floor 100ms); 0 rows pruned for files absent from the merged tree. v0.41.0 base sync into the ignivar raid branch 2026-08-30: union of both arms' tables (release harvest wins shared rows, raid rows keep their locally measured durations), pruned to files present in the merged tree. Prior note: v0.41.0 sync into the ignivar raid consolidation: release CI harvest kept for shared files; the raid-branch and post-harvest test files carry locally measured durations (full vitest run of the absent files, jest-json start/end per file, skipped floor 100ms) 2026-08-26 prune: dropped 26 rows whose test file no longer exists in the tree. The 192 mergedLocal rows are LOCAL-scale durations (CI runs ~1.6x slower per ci_shard_plan.mjs); three of them exceed the 90s long-lane threshold locally (varkhul_forge_encounter, ignivar_encounter, nameplate_pledge) and CI_LONG_SUITES membership is deliberately deferred until a full-mode CI shard log provides in-shard numbers. Cosmetics window + mount skins (PR #3859) 2026-09-04: 6 new test files carry locally measured durations (single vitest run, jest-json start/end per file); pruned rows: none."
+  }
 }

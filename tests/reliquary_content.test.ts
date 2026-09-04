@@ -66,7 +66,6 @@ import {
   RIFT_LEGENDARY_ITEM_IDS,
   RIFT_RARE_ITEM_IDS,
 } from '../src/sim/content/rift/items';
-import { isStoreMountItemId } from '../src/sim/content/store_mounts';
 import { WEAPON_SKIN_LIST, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 import {
   ALL_RECIPES,
@@ -398,8 +397,10 @@ describe('Reliquary Conqueror catalog structure', () => {
     // epics, 16 wing epics, 3 + 5 heroic-only weapons and shields), on top of
     // the batch's own page: 340 + 1 + 45, plus the two developer mount slots
     // (Lanternback Troll, Chimeglass Tortoise): 388, plus the Cluckwork Mech
-    // Bird store mount on Horizons: 389.
-    expect(full).toEqual({ owned: 389, total: 389 });
+    // Bird store mount on Horizons: 389; then the Mech Bird, the Chimeglass
+    // Tortoise and the Bonebound Rickshaw left the shelf as account mount
+    // skins (not relics): 386.
+    expect(full).toEqual({ owned: 386, total: 386 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -411,7 +412,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // Rickshaw's new mount slot and the 41 Crucible raid relics; marks are
     // character-scoped, so this trails the overview by the 29 account-scoped
     // weapon skins).
-    expect(character).toEqual({ owned: 360, total: 360 });
+    expect(character).toEqual({ owned: 357, total: 357 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -442,7 +443,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(424);
+    ).toBe(421);
     // Distinct mark ids: the 10 shipped before Phase 21 plus the 19
     // rare-slain proofs of conquerors_rares_of_the_realm.
     expect(
@@ -2530,17 +2531,11 @@ const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
   // drakemaw_raptor: NO acquisition path exists anywhere in content, see the
   // def comment in content/drakelands.ts. Owner call recorded 2026-08-04: the
   // slot stays listed and sourceless until the mount gets a route.
-  // terrorspark_groundshaker, lanternback_troll, chimeglass_tortoise and
-  // rickshaw_mount: DEVELOPER_MOUNTS, dev-grant only, deliberately absent from
+  // terrorspark_groundshaker and lanternback_troll: DEVELOPER_MOUNTS,
+  // dev-grant only, deliberately absent from
   // vendors, quests, mob loot, heroic loot, and the rift reins pools (see the
   // def comments in content/mounts.ts).
-  horizons_mounts: [
-    'chimeglass_tortoise',
-    'drakemaw_raptor',
-    'lanternback_troll',
-    'rickshaw_mount',
-    'terrorspark_groundshaker',
-  ],
+  horizons_mounts: ['drakemaw_raptor', 'lanternback_troll', 'terrorspark_groundshaker'],
   // masterwork:engineering: unearnable, QA ruling 2026-08-07. Every live
   // engineering recipe produces a slotless, statless tool, masterworkBonusStats
   // returns null for all of them, so the masterwork proc can never fire and
@@ -2648,9 +2643,9 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // their Litany board keeper (Phase 21).
   professions_specimens: 7,
   // 11 = the four heroic bosses + the raid + Marla + rift A/B/S + the two
-  // pending-ruling absences resolve to nothing, plus the storefront carrying
-  // the Mech Bird (the 'store' door the Armory skins already opened).
-  horizons_mounts: 11,
+  // pending-ruling absences resolve to nothing. The storefront door left with
+  // the Mech Bird: a paid mount is a mount SKIN now, never a relic.
+  horizons_mounts: 10,
   horizons_weapon_skins: 1,
   // Every title relic's source is its own deed, so the count tracks the page
   // rows: 36 + the four Phase 18 completion-ladder titles + the Crucible
@@ -3234,16 +3229,11 @@ describe('Reliquary source hints resolve against live content', () => {
       for (const hint of reliquaryRelicSource(page, relic)) {
         if (hint.sourceKind !== 'store') continue;
         checked += 1;
-        if (relic.kind === 'mount') {
-          // The second store-granted family: a mount slot may carry the store
-          // hint ONLY when its reins is a declared store SKU
-          // (content/store_mounts.ts; the spend gate in server/claudium.ts is
-          // widened by the same list, so this pins UI hint and server door to
-          // one authority).
-          if (!isStoreMountItemId(mountItemId(slotId) ?? '')) {
-            offenders.push(`${page.id}:${slotId} is not a declared store mount`);
-          }
-        } else if (relic.kind !== 'weapon_skin') {
+        if (relic.kind !== 'weapon_skin') {
+          // The store's other cosmetic family, the mount SKINS
+          // (content/mount_skins.ts), are account cosmetics and never relics:
+          // a mount slot with a store hint would be a mount item sold for
+          // money, which no longer exists.
           offenders.push(`${page.id}:${slotId} is a ${relic.kind} slot with a store hint`);
         } else if (!Object.hasOwn(WEAPON_SKINS, slotId)) {
           offenders.push(`${page.id}:${slotId} is not a live Armory skin`);
@@ -3523,10 +3513,8 @@ describe('Reliquary source hint coverage', () => {
       'professions_masterwork',
     ]);
     expect(SOURCE_PENDING_RULING.horizons_mounts).toEqual([
-      'chimeglass_tortoise',
       'drakemaw_raptor',
       'lanternback_troll',
-      'rickshaw_mount',
       'terrorspark_groundshaker',
     ]);
     // masterwork:engineering pended by the QA ruling 2026-08-07: no
@@ -4058,7 +4046,6 @@ describe('Reliquary source hint coverage', () => {
         'mount x boss',
         'mount x vendor',
         'mount x rift',
-        'mount x store',
         // weapon_skin: the account storefront, page-wide.
         'weapon_skin x store',
         // title: the deed that grants it, always.

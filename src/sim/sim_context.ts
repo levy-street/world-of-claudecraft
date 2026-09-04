@@ -12,6 +12,7 @@
 // game/net/DOM/Three, no `Math.random`/`Date.now`), so it runs unchanged in Node,
 // the browser, and the headless RL env (enforced by tests/architecture.test.ts).
 
+import type { AccountCosmetics } from '../world_api';
 import type { FrozenOrbState } from './combat/frozen_orb';
 import type { LetterDef } from './content/letters';
 import type { TalentModifiers } from './content/talents';
@@ -117,6 +118,14 @@ export interface SimContextPrimitives {
   // Live player roster (keyed by entity id). Stays a Sim field; exposed here so the
   // moved party machine (A1) resolves member names/metas through the seam.
   readonly players: Map<number, PlayerMeta>;
+  // The session's account cosmetics view (offline: the Sim's own mirror; the
+  // server seeds the primary session's). Writable so a sibling module can
+  // grant into it (dev_commands' /dev mountskins); replaced whole, never
+  // mutated in place, so consumers can diff by identity. On the SERVER this is
+  // one realm-wide field, never per-account state: no server-side ownership
+  // decision may read it (the session's own accountCosmetics is the authority),
+  // or a dev grant on a dev-enabled realm would become a cross-account cheat.
+  accountCosmetics: AccountCosmetics;
   /** Static crafting stations owned by this Sim's authored world bundle. */
   readonly stationPlacements: readonly StationDef[];
   // The local / RL player id (single-player + renderer contexts). Reassigned on the
@@ -1170,6 +1179,12 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get players() {
       return host.players;
+    },
+    get accountCosmetics() {
+      return host.accountCosmetics;
+    },
+    set accountCosmetics(value: AccountCosmetics) {
+      host.accountCosmetics = value;
     },
     get masteryResetNoticeCounter() {
       return host.masteryResetNoticeCounter;

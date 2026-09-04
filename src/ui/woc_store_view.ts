@@ -4,7 +4,7 @@
 // supplies the skins themselves (model and rarity) and the apply rules
 // decide which skins the player can attach right now. DOM-free and unit-tested.
 
-import { STORE_MOUNT_ITEM_IDS } from '../sim/content/store_mounts';
+import { MOUNT_SKIN_IDS, type MountSkinId } from '../sim/content/mount_skins';
 import {
   eligibleClassesForWeaponSkinType,
   skinnableWeaponTypesFor,
@@ -129,8 +129,9 @@ export function buildArmorySections(
 // ── Store mounts ─────────────────────────────────────────────────────────────
 
 export interface StoreMountRow {
+  /** The mount skin id, which is also the kind 'skin' economy SKU item id. */
   itemId: string;
-  mountKey: string;
+  skinId: MountSkinId;
   /** Claudium cost from the economy service, or null when the SKU is unavailable. */
   costClaudium: number | null;
   /** The economy service has this SKU with a valid price, so Buy can succeed. */
@@ -140,28 +141,36 @@ export interface StoreMountRow {
   shortfall: number | null;
 }
 
-/** Rows for the store's Mounts section. Catalog-first like the Armory: every
- *  store mount always shows; one missing from the service snapshot renders
- *  unavailable with no invented price. Owned unions the service grant flag
- *  with the live mount ownership mirror (the reins already in this
- *  character's bags or bank), so a fresh purchase reflects immediately. */
+/** Where the mount skin store art ships (src/sim/content/mount_skins.ts ids),
+ *  outside the item-art audit like the Armory skin art: a skin is not an item. */
+export const MOUNT_SKIN_ART_DIR = '/ui/store/mount_skins';
+
+export function mountSkinArt(skinId: string): string {
+  return `${MOUNT_SKIN_ART_DIR}/${skinId}.webp`;
+}
+
+/** Rows for the store's Machine Stable section: every catalog mount skin
+ *  (src/sim/content/mount_skins.ts), catalog-first like the Armory, so a skin
+ *  missing from the service snapshot renders unavailable with no invented
+ *  price. Owned unions the service grant flag with the account cosmetics
+ *  mirror (IWorldCosmetics.accountCosmetics.mountSkinIds), so a fresh purchase
+ *  reflects the moment the live push lands. */
 export function buildStoreMountRows(
   balance: number | null,
   items: WocStoreItemInput[],
-  ownedMountKeys: readonly string[],
+  ownedMountSkinIds: readonly string[],
 ): StoreMountRow[] {
-  const serviceRows = new Map(items.filter((i) => i.kind === 'item').map((i) => [i.itemId, i]));
-  return STORE_MOUNT_ITEM_IDS.map((itemId) => {
-    const mountKey = (ITEMS[itemId] as { mount?: string } | undefined)?.mount ?? '';
-    const service = serviceRows.get(itemId);
-    const owned = (service?.owned ?? false) || ownedMountKeys.includes(mountKey);
+  const serviceRows = new Map(items.filter((i) => i.kind === 'skin').map((i) => [i.itemId, i]));
+  return MOUNT_SKIN_IDS.map((skinId) => {
+    const service = serviceRows.get(skinId);
+    const owned = (service?.owned ?? false) || ownedMountSkinIds.includes(skinId);
     const costClaudium =
       service && Number.isFinite(service.costClaudium) && service.costClaudium > 0
         ? service.costClaudium
         : null;
     return {
-      itemId,
-      mountKey,
+      itemId: skinId,
+      skinId,
       costClaudium,
       purchasable: costClaudium !== null,
       owned,

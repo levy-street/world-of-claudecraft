@@ -13879,7 +13879,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   "entities.abilities.nightshade_coating.name": "Nachtschade-coating",
   "guide.settingsPage.ifShowReliquaryTracker": "Of de Reliquary-tracker (uw vastgezette pagina's en hun voortgang) op uw HUD staat. Het Reliquary-venster heeft een bijpassende oogknop, en als u een pagina vastzet, wordt de tracker weer ingeschakeld.",
   // v0.41 release i18n fill.
-  'entities.items.reins_rickshaw_mount.name': 'Gebonden teugels: Beengebonden Riksja',
   'hudChrome.itemMenu.sell': 'Verkopen',
   'hudChrome.itemMenu.sellAll': 'Alles verkopen ({count})',
   'hudChrome.mounts.desc_rickshaw_mount':

@@ -14071,7 +14071,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   "entities.abilities.nightshade_coating.name": "Nachtschattenbeschichtung",
   "guide.settingsPage.ifShowReliquaryTracker": "Ob sich der Reliquiar-Tracker (Ihre angehefteten Seiten und deren Fortschritt) auf Ihrem HUD befindet. Das Reliquiar-Fenster verfügt über eine entsprechende Augenschaltfläche und durch das Anheften einer Seite wird der Tracker wieder aktiviert.",
   // v0.41 release i18n fill.
-  'entities.items.reins_rickshaw_mount.name': 'Gebundene Zügel: Knochengebundene Rikscha',
   'hudChrome.itemMenu.sell': 'Verkaufen',
   'hudChrome.itemMenu.sellAll': 'Alles verkaufen ({count})',
   'hudChrome.mounts.desc_rickshaw_mount':

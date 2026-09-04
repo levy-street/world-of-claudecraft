@@ -570,9 +570,10 @@ export const zh_TW: EnTranslations = {
       "tabsLabel": "WOC 商店分區",
       "storeTab": "商店",
       "rewardsTab": "每日獎勵",
-      "mountsEyebrow": "帳號坐騎",
+      "mountsEyebrow": "帳號坐騎造型",
       "mountsTitle": "機械馬廄",
       "mountBuyAria": "購買{item}",
+      "mountSkinType": "坐騎造型",
       "loading": "正在載入 WOC 商店…",
       "error": "WOC 商店目前無法使用，請稍後再試。",
       "balance": "Claudium 餘額",
@@ -4165,6 +4166,32 @@ export const zh_TW: EnTranslations = {
         "wardstones": "護符石引導（階段轉換）",
         "dread_curse": "恐懼詛咒（僅英雄難度，累加坦克輪換減益）"
       }
+    },
+    "cosmetics": {
+      "title": "外觀",
+      "close": "關閉外觀",
+      "tabsLabel": "外觀分區",
+      "tabMounts": "坐騎",
+      "tabSkins": "造型",
+      "tabMech": "機甲",
+      "legend": "帳號：所有角色共用。角色：僅此角色。",
+      "scopeAccount": "帳號",
+      "scopeCharacter": "角色",
+      "wear": "穿戴",
+      "takeOff": "取下",
+      "worn": "已穿戴",
+      "apply": "套用",
+      "detach": "解除",
+      "applied": "已套用",
+      "owned": "已擁有",
+      "storeOnly": "可在 WOC 商店購買",
+      "cardAria": "{name}，{rarity}",
+      "mountsIntro": "坐騎造型會覆蓋在此角色騎乘的任何坐騎上，絕不改變速度。",
+      "mountsNoMount": "先擁有一匹坐騎：造型需要可騎乘的對象。",
+      "skinsEmpty": "尚未擁有武器造型。請前往 WOC 商店。",
+      "skinsApplyHint": "裝備一件{type}後即可套用此造型。",
+      "mechIntro": "戰鬥機甲會取代此角色的身體。一次只能穿戴一種配色。",
+      "mechEmpty": "尚未擁有戰鬥機甲配色。"
     },
     "reliquary": {
       "title": "聖物庫",
@@ -13217,17 +13244,8 @@ export const zh_TW: EnTranslations = {
       "reins_lanternback_troll": {
         "name": "點燈人之軛：格倫博"
       },
-      "reins_chimeglass_tortoise": {
-        "name": "守道人的鈴帶：托利弗"
-      },
-      "reins_rickshaw_mount": {
-        "name": "白骨人力車縛繩"
-      },
       "reins_drakemaw_raptor": {
         "name": "龍喉迅猛龍的韁繩"
-      },
-      "reins_mech_bird": {
-        "name": "發條機械鳥點火鑰匙"
       },
       "rimefang": {
         "name": "霜牙"

@@ -20,11 +20,8 @@ export type MountKey =
   | 'stormfeather_griffin'
   | 'thunderstrut_gobbler'
   | 'drakemaw_raptor'
-  | 'mech_bird'
   | 'lanternback_troll'
-  | 'chimeglass_tortoise'
-  | 'terrorspark_groundshaker'
-  | 'rickshaw_mount';
+  | 'terrorspark_groundshaker';
 
 export type MountRarity = 'common' | 'uncommon' | 'rare' | 'epic';
 
@@ -82,22 +79,15 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     rarity: 'rare',
     moveSpeedPct: 0.75,
   },
-  // The store mount: sold for Claudium (the one paid mount; see
-  // content/store_mounts.ts and server/claudium.ts). Deliberately RARE tier, not
-  // epic: a real-money purchase buys the look, never the top speed, matching the
-  // cosmetics-only paid design the weapon skins established.
-  mech_bird: {
-    key: 'mech_bird',
-    name: 'Cluckwork Mech Bird',
-    rarity: 'rare',
-    moveSpeedPct: 0.75,
-  },
+  // There is deliberately no store mount here. Paid looks are MOUNT SKINS
+  // (content/mount_skins.ts): account-wide cosmetics worn over whatever mount
+  // the character rides, so real money never buys a catalog row, a reins item,
+  // or a speed tier, the same line the weapon skins hold.
   // Epic tier (80%): the hover-cycle and the gobbler come from Rift S clears.
-  // The Terrorspark Groundshaker, the Lanternback Troll, the Chimeglass
-  // Tortoise and the Bonebound Rickshaw are developer-only for now and have no
-  // player-facing acquisition. The tank and the rickshaw stay LAST in the
-  // catalog (the tests pin the rickshaw as the tail, so a new player-facing
-  // mount lands above them); see DEVELOPER_MOUNTS below for the shared gate.
+  // The Terrorspark Groundshaker and the Lanternback Troll are developer-only
+  // for now and have no player-facing acquisition. The tank stays LAST in the
+  // catalog (the tests pin it as the tail, so a new player-facing mount lands
+  // above it); see DEVELOPER_MOUNTS below for the shared gate.
   aether_hover_cycle: {
     key: 'aether_hover_cycle',
     name: 'Aether-Jouster Hover-Cycle',
@@ -128,38 +118,15 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     rarity: 'epic',
     moveSpeedPct: 0.8,
   },
-  // A salt-flat tortoise who has outwalked three caravan generations. The
-  // tinkers who adopted him ground his spectacles from storm-glass and hung a
-  // bronze bell at his throat so the road could hear him coming. He takes the
-  // flat epic 80% like the rest of his tier: speed is set by rarity here, and
-  // the joke that he is slow lives in his gait and his lore, not in his stats.
-  chimeglass_tortoise: {
-    key: 'chimeglass_tortoise',
-    name: 'Tolliver the Chimeglass',
-    rarity: 'epic',
-    moveSpeedPct: 0.8,
-  },
   terrorspark_groundshaker: {
     key: 'terrorspark_groundshaker',
     name: 'Terrorspark Groundshaker',
     rarity: 'epic',
     moveSpeedPct: 0.8,
   },
-  // Developer-only, like the tank above: no player-facing acquisition path
-  // yet. A Halloween-flavored hand-pulled cart with a skeleton puller (its own
-  // rig, skel_rickshaw_puller in characters/manifest.ts, attached by a fixed
-  // offset, see src/render/rickshaw_mount.ts) built into the front, gripping
-  // the shafts. The puller runs a real gait, and the wheels roll from
-  // actual per-frame ground travel (rickshaw_mount.ts's spinMountWheels), so the
-  // moveSpeedPct below needs no matching animation constant anywhere: change it
-  // and the wheels simply roll faster. Stays LAST in the catalog
-  // alongside the tank; a new player-facing mount lands above both.
-  rickshaw_mount: {
-    key: 'rickshaw_mount',
-    name: 'Bonebound Rickshaw',
-    rarity: 'epic',
-    moveSpeedPct: 0.8,
-  },
+  // The Bonebound Rickshaw left this catalog with the v0.42.0 cosmetics
+  // change: it is a mount SKIN now (content/mount_skins.ts, id rickshaw_mount),
+  // worn over whatever the character actually rides.
 };
 
 /** Catalog order: rarity tier, then declaration order. */
@@ -174,9 +141,7 @@ export const MOUNT_KEYS = Object.keys(MOUNTS) as readonly MountKey[];
  *  are still under development. */
 export const DEVELOPER_MOUNTS: readonly MountKey[] = [
   'lanternback_troll',
-  'chimeglass_tortoise',
   'terrorspark_groundshaker',
-  'rickshaw_mount',
 ];
 
 /** True while a mount has no player-facing acquisition path (see DEVELOPER_MOUNTS). */

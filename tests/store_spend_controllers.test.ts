@@ -1,11 +1,11 @@
 // The grant-SKU spend controller factory (src/ui/store_spend_controllers.ts):
 // one seam object, two controllers. The arms prove the split that matters for
 // money: the Armory spends with kind 'skin' and the Machine Stable with kind
-// 'item', each through the SAME window spend seam, and the shared seams reach
+// 'skin' for the Machine Stable too, each through the SAME window spend seam, and the shared seams reach
 // both controllers unchanged.
 
 import { describe, expect, it, vi } from 'vitest';
-import { STORE_MOUNT_ITEM_IDS } from '../src/sim/content/store_mounts';
+import { MOUNT_SKIN_IDS } from '../src/sim/content/mount_skins';
 import type { StoreSpendResult } from '../src/ui/claudium_purchase_bridge';
 import { StoreArmoryPurchase } from '../src/ui/store_armory_purchase';
 import { StoreMountPurchase } from '../src/ui/store_mount_purchase';
@@ -15,7 +15,7 @@ import {
 } from '../src/ui/store_spend_controllers';
 import { buildArmorySections, type WocStoreItemInput } from '../src/ui/woc_store_view';
 
-const REINS = STORE_MOUNT_ITEM_IDS[0];
+const REINS = MOUNT_SKIN_IDS[0];
 
 function deps(): { [K in keyof StoreSpendControllerDeps]: ReturnType<typeof vi.fn> } {
   const granted: StoreSpendResult = { granted: true, balance: 0, costClaudium: 1, reason: null };
@@ -72,21 +72,21 @@ describe('storeSpendControllers', () => {
     expect(controllers.mounts).toBeInstanceOf(StoreMountPurchase);
   });
 
-  it("the Machine Stable spends with kind 'item' through the shared spend seam", async () => {
+  it("the Machine Stable spends with kind 'skin' through the shared spend seam", async () => {
     const d = deps();
     const { mounts } = storeSpendControllers(d as unknown as StoreSpendControllerDeps);
     const service: WocStoreItemInput = {
       itemId: REINS,
       name: 'x',
-      kind: 'item',
+      kind: 'skin',
       costClaudium: 1200,
       owned: false,
     };
-    mounts.rebuild(5000, [service], []);
+    mounts.rebuild(5000, [service], { mountSkinIds: [] });
     const row = mounts.rowById(REINS);
     if (!row) throw new Error('no mount row');
     await mounts.purchase(row);
-    expect(d.spend).toHaveBeenCalledWith(REINS, 'item', 1200);
+    expect(d.spend).toHaveBeenCalledWith(REINS, 'skin', 1200);
     expect(d.refreshStore).toHaveBeenCalledTimes(1);
   });
 
@@ -109,11 +109,11 @@ describe('storeSpendControllers', () => {
     const service: WocStoreItemInput = {
       itemId: REINS,
       name: 'x',
-      kind: 'item',
+      kind: 'skin',
       costClaudium: 1200,
       owned: false,
     };
-    mounts.rebuild(10, [service], []);
+    mounts.rebuild(10, [service], { mountSkinIds: [] });
     mounts.request(REINS);
     expect(d.showNeedMore).toHaveBeenCalledTimes(2);
     expect(d.showDecision).not.toHaveBeenCalled();

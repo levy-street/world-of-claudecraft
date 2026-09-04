@@ -224,6 +224,7 @@ import {
   decodeVarkhulCinderOrbProjectiles,
 } from './varkhul_cinder_orb_wire';
 import { vaultWithdrawPayload } from './vault_snapshot_wire';
+import { optimisticWeaponSkinChange } from './weapon_skin_optimistic';
 import { buildWebSocketAuthMessage } from './world_auth_message';
 
 export { buildWebSocketAuthMessage } from './world_auth_message';
@@ -1481,6 +1482,7 @@ function blankEntity(id: number): Entity {
     offhandItemId: null,
     weaponSkinLoadout: {},
     weaponSkinId: null,
+    mountSkinId: null,
     equippedItems: {},
     equippedInstances: {},
     guild: '',
@@ -1523,6 +1525,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     mechChromaIds: [],
     weaponSkinIds: [],
     weaponSkinLoadout: {},
+    mountSkinIds: [],
   };
   // --- IWorldProgressionXp: XP + post-cap progression scalars + unlocked
   // milestones, mirrored from snapshot self. ---
@@ -2986,6 +2989,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         e.mainhandItemId = w.mh ?? null; // equipped mainhand → held weapon model (render-only)
         e.offhandItemId = w.oh ?? null; // equipped offhand → held weapon model (render-only)
         e.weaponSkinId = w.wsk ?? null; // active weapon-skin cosmetic (render-only)
+        e.mountSkinId = w.msk ?? null; // worn mount skin cosmetic (render-only, like wsk)
         e.equippedItems = w.eq ?? {}; // full worn set (render-only), for the inspect window
         // Worn per-slot instance payloads (masterwork/enchant rolls), for the
         // inspect window (terse `eqi`, sparse like `eq`: an absent key on a
@@ -4602,32 +4606,28 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
   changeWeaponSkin(skinId: string | null, weaponType?: WeaponSkinType): void {
     // Optimistic local nudge mirroring the server's resolution, so the held
-    // weapon swaps without a round trip; the identity wire reconciles.
+    // weapon swaps without a round trip; the identity wire reconciles. The
+    // math lives in weapon_skin_optimistic.ts; a malformed request sends nothing.
     const p = this.entities.get(this.playerId);
     const def = skinId ? WEAPON_SKINS[skinId] : null;
     if (skinId !== null && !def) return;
     const type = def ? def.weaponType : weaponType;
     if (p && type) {
-      const next = { ...p.weaponSkinLoadout };
-      if (def) {
-        const applied = withWeaponSkinApplied(next, def.id);
-        if (!applied) return;
-        p.weaponSkinLoadout = applied;
-      } else delete next[type];
-      if (!def) p.weaponSkinLoadout = next;
-      const appliedLoadout = p.weaponSkinLoadout;
-      p.weaponSkinId = resolveActiveWeaponSkin(
-        p.templateId,
-        p.mainhandItemId,
-        appliedLoadout,
-        p.skinCatalog ?? 'class',
-      );
-      const loadout: Record<string, string> = {};
-      for (const [t, id] of Object.entries(appliedLoadout)) if (id) loadout[t] = id;
-      this.accountCosmetics = { ...this.accountCosmetics, weaponSkinLoadout: loadout };
+      const next = optimisticWeaponSkinChange(p, skinId, type);
+      if (!next) return;
+      p.weaponSkinLoadout = next.loadout;
+      p.weaponSkinId = next.weaponSkinId;
+      this.accountCosmetics = { ...this.accountCosmetics, weaponSkinLoadout: next.loadoutRecord };
       this.cosmeticsChanged = true;
     }
     this.cmd({ cmd: 'change_weapon_skin', skin: skinId, wtype: type ?? null });
+  }
+  changeMountSkin(skinId: string | null): void {
+    // Optimistic own-entity nudge (the identity wire reconciles); an unowned id skips the send.
+    if (skinId !== null && !this.accountCosmetics.mountSkinIds.includes(skinId)) return;
+    const p = this.entities.get(this.playerId);
+    if (p) p.mountSkinId = skinId;
+    this.cmd({ cmd: 'change_mount_skin', skin: skinId });
   }
   saveActionBarLayout(layout: ActionBarLayout): void {
     // Debounced, deduped upload of the whole layout. The controller has already

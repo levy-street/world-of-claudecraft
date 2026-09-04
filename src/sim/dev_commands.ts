@@ -1,5 +1,6 @@
 import { applyCourserDaze } from './combat/hunter_shared';
 import { DEV_KIT_ROLES, devKitRole } from './content/dev_kit_roles';
+import { MOUNT_SKIN_IDS } from './content/mount_skins';
 import { MOUNT_KEYS } from './content/mounts';
 import { GATHERING_PROFESSIONS } from './content/professions';
 import { DUNGEONS, ITEMS, MOBS, NPCS } from './data';
@@ -268,6 +269,22 @@ export function handleDevChat(
         `[dev] Granted ${granted} mount reins (${MOUNT_KEYS.length} owned)${levelNote}. Use a reins item from your bags to ride.`,
       );
     }
+    return null;
+  }
+
+  // Grant every catalog mount skin to the (offline, session-local) account
+  // cosmetics so the Cosmetics window can be exercised without the store.
+  // Server-side the session cosmetics are the authority, so this only ever
+  // affects the offline Sim's own mirror.
+  if (/^\/(?:dev\s+mountskins?|devmountskins?)\s*$/i.test(raw)) {
+    const owned = new Set(ctx.accountCosmetics.mountSkinIds);
+    for (const id of MOUNT_SKIN_IDS) owned.add(id);
+    ctx.accountCosmetics = { ...ctx.accountCosmetics, mountSkinIds: [...owned] };
+    emitDevLog(
+      ctx,
+      pid,
+      `[dev] Granted ${MOUNT_SKIN_IDS.length} mount skins to the account. Wear one from the Cosmetics screen.`,
+    );
     return null;
   }
 

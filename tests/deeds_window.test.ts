@@ -33,6 +33,7 @@ const stripLineComments = (src: string): string =>
 const painter = read('../src/ui/deeds_window.ts');
 const tracker = read('../src/ui/deed_tracker_painter.ts');
 const hud = read('../src/ui/hud.ts');
+const sideButtons = read('../src/ui/hud/menu/side_buttons.ts');
 const mainSrc = read('../src/main.ts');
 const inputSrc = read('../src/game/input.ts');
 const settingsSrc = read('../src/game/settings.ts');
@@ -635,7 +636,7 @@ describe('entry HTMLs', () => {
     }
     // hud.ts binds the click and repaints the keycap from the live binding.
     expect(hud).toContain("$('#mm-deeds').addEventListener('click', () => this.toggleDeeds());");
-    expect(hud).toContain("['#mm-deeds', 'deeds', 'hudChrome.deeds.title'],");
+    expect(sideButtons).toContain("['#mm-deeds', 'deeds', 'hudChrome.deeds.title'],");
   });
 });
 

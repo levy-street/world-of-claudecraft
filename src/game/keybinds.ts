@@ -326,6 +326,15 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['Shift+KeyX'],
   },
+  // Cosmetics parks on Shift+K, the next free shifted letter beside the
+  // Reliquary (Shift+X) and Deeds (Shift+Z); bare KeyK stays unbound.
+  {
+    id: 'cosmetics',
+    label: 'Cosmetics',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['Shift+KeyK'],
+  },
   {
     id: 'chat',
     label: 'Open Chat',

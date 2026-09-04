@@ -6,6 +6,7 @@ import {
   emptyPriestMarkerState,
   priestMarkerStateForAuras,
 } from '../sim/combat/priest/presentation';
+import { mountPresentationKey } from '../sim/content/mount_skins';
 import {
   ABILITIES,
   ARENA_SLOT_COUNT,
@@ -426,11 +427,11 @@ import {
   syncMountVisual,
 } from './mount_lifecycle';
 import {
-  mountPrewarmKeys,
+  mountPrewarmKeysFor,
   stageMountPrewarmVisual,
   stageResidentMountPrewarmVisual,
 } from './mount_prewarm';
-import { mountVisualSpec } from './mount_visuals';
+import { mountVisualSpecFor } from './mount_visuals';
 import { NameplatePainter } from './nameplate_painter';
 import {
   isProjectedNameplateAnchorVisible,
@@ -5786,7 +5787,7 @@ export class Renderer {
       buildAbilityMaterialPrewarmGroup,
     );
     let mountPrewarmGroup: THREE.Group | null = null;
-    const mountPrewarmPlannedKeys = mountPrewarmKeys(this.sim.ownedMounts());
+    const mountPrewarmPlannedKeys = mountPrewarmKeysFor(this.sim);
     const mountPrewarmPendingKeys = new Set(mountPrewarmPlannedKeys);
     let mountPrewarmWarmed = 0;
     let surfaceDetailTexturesWarmed = 0;
@@ -8588,7 +8589,8 @@ export class Renderer {
     // entering interest range, or an already-mounted player logging in, is
     // born with a mountKey and no edge to detect, so without this it always
     // hits the cold path (see the edge-site comment near preloadMountEngine).
-    if (e.mountKey !== '') this.audioSink?.preloadMountEngine(e.mountKey);
+    const look = mountPresentationKey(e.mountKey, e.mountSkinId);
+    if (look !== '') this.audioSink?.preloadMountEngine(look);
   }
 
   // Shared core for every compile gate below: link `target`'s programs off the
@@ -10926,7 +10928,7 @@ export class Renderer {
       // the visual appears once ready. A druid form replaces the whole body,
       // so the form wins visually and the mount hides (the sim's speed math
       // is untouched either way).
-      const mountSpec = e.kind === 'player' && e.mountKey ? mountVisualSpec(e.mountKey) : null;
+      const mountSpec = e.kind === 'player' ? mountVisualSpecFor(e.mountKey, e.mountSkinId) : null;
       const mountShown = !!mountSpec && requestedForm === 'base' && !e.dead;
       syncMountVisual(v, mountSpec, this.mountHost);
       if (v.mountVisual) v.mountVisual.root.visible = mountShown && !v.mountCompilePending;
@@ -11234,7 +11236,8 @@ export class Renderer {
       // A mounted rider stays planted in the saddle: the MOUNT carries the
       // jump arc (its anim scratch below keeps the real airborne flag), while
       // the rider holds the seated pose instead of replaying the jump clip.
-      const logicallyMounted = e.mountKey !== '';
+      const mountLook = mountPresentationKey(e.mountKey, e.mountSkinId);
+      const logicallyMounted = mountLook !== '';
       const riderMounted = v.mountLift > 0;
       st.airborne = airborne && !riderMounted;
       // Long-fall flail: displayed vertical speed past what any hop reaches
@@ -11274,14 +11277,14 @@ export class Renderer {
       if (sink && d2 < SFX_MOVE_RANGE_SQ) {
         // jump / land / water-entry edges
         if (airborne && !v.wasAirborne && !visuallyDead)
-          sink.movement('jump', ax, ay, az, isSelf, e.mountKey || undefined);
+          sink.movement('jump', ax, ay, az, isSelf, mountLook || undefined);
         else if (!airborne && v.wasAirborne && !visuallyDead) {
           // A flight that ends by catching a ledge is not a fall, and the
           // heavy landing thud on one reads as a bug: you hopped onto a rock
           // mid-arc and the game played a crash. Anything softer than a plain
           // jump's own landing speed gets a footfall instead.
           if (v.fallSpeed >= SOFT_LANDING_SPEED) {
-            sink.movement('land', ax, ay, az, isSelf, e.mountKey || undefined);
+            sink.movement('land', ax, ay, az, isSelf, mountLook || undefined);
           } else {
             sink.footstep(ax, ay, az, this.surfaceAt(ax, az, ay), false, isSelf);
           }
@@ -11307,12 +11310,12 @@ export class Renderer {
           // mount) drives its own state machine every frame instead of the
           // per-stride gait beat below; mountEngine reports whether this
           // mountKey actually has one, so ordinary mounts fall through.
-          sink.mountIdle(ax, ay, az, e.mountKey, false, e.id); // moving: hum off
-          if (sink.mountEngine(ax, ay, az, e.mountKey, true, e.id)) {
+          sink.mountIdle(ax, ay, az, mountLook, false, e.id); // moving: hum off
+          if (sink.mountEngine(ax, ay, az, mountLook, true, e.id)) {
             // handled entirely by mountEngine
           } else if (loco.speed >= FOOT_RUN_SPEED) {
             if (strideHit(v, loco.speed, dt, MOUNT_STRIDE_RUN))
-              sink.mountRun(ax, ay, az, e.mountKey, this.surfaceAt(ax, az, ay), isSelf);
+              sink.mountRun(ax, ay, az, mountLook, this.surfaceAt(ax, az, ay), isSelf);
           } else {
             v.stepAccum = MOUNT_STRIDE_RUN * 0.6;
           }
@@ -11328,8 +11331,8 @@ export class Renderer {
           // Not moving while mounted (grounded and stopped): still poll an
           // engine mount every frame so the winddown fires on the stop edge;
           // a non-engine mount has nothing to do here (mountEngine no-ops).
-          sink.mountEngine(ax, ay, az, e.mountKey, false, e.id);
-          sink.mountIdle(ax, ay, az, e.mountKey, true, e.id); // stopped: hum on
+          sink.mountEngine(ax, ay, az, mountLook, false, e.id);
+          sink.mountIdle(ax, ay, az, mountLook, true, e.id); // stopped: hum on
         } else if (moving && !airborne) {
           const running = loco.speed >= FOOT_RUN_SPEED;
           if (strideHit(v, loco.speed, dt, running ? FOOT_STRIDE_RUN : FOOT_STRIDE_WALK))
@@ -11354,7 +11357,7 @@ export class Renderer {
         sink,
         v,
         e.id,
-        e.mountKey,
+        mountLook,
         ax,
         ay,
         az,
@@ -11630,13 +11633,14 @@ export class Renderer {
           mountCastKey: e.mountCastKey,
           mountCastRemaining: e.mountCastRemaining,
           mountKey: e.mountKey,
+          mountLook,
           poseAllowed: !visuallyDead && !swimming && runCharacterPresentation,
           present: runCharacterPresentation,
           playCallPose: (secs: number) => active.playCallPose(secs),
           summonGlow: () => this.vfx.mountSummonGlow(e.id),
           engineReset: () => this.audioSink?.mountEngineReset(e.id),
           preloadEngine: (key: string) => this.audioSink?.preloadMountEngine(key),
-          summonCall: () => this.audioSink?.mountSummon(ax, ay, az, e.mountKey, isSelf),
+          summonCall: () => this.audioSink?.mountSummon(ax, ay, az, mountLook, isSelf),
         });
       }
 

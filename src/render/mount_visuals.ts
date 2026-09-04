@@ -5,6 +5,8 @@
 // renderer is a thin consumer. The catalog itself (names, gates, combat
 // numbers) is sim content: src/sim/content/mounts.ts.
 
+import type { MountSkinId } from '../sim/content/mount_skins';
+import { isMountSkinId } from '../sim/content/mount_skins';
 import type { MountKey } from '../sim/content/mounts';
 import { MOUNTS } from '../sim/content/mounts';
 
@@ -270,10 +272,6 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
   // The Drakemaw Raptor: authored saddle sits over the hips behind the neck
   // spines (hence the slight rear shift), gait-rigged Walk/Run cycles.
   drakemaw_raptor: spec('mount_drakemaw_raptor', 2.35, true, undefined, -0.1),
-  // The Cluckwork Mech Bird: authored rigid-servo clips (no procedural bob,
-  // the clips carry the motion). Saddle surface sits at 0.60 of the raw model
-  // (x3.4 height), dead over the origin, so no fore/aft shift.
-  mech_bird: spec('mount_mech_bird', 2.05, true),
   // The Lanternback Troll: the rider sits IN the iron throne strapped across
   // his shoulders, not astride a back, so the seat is high and set BEHIND the
   // model origin. `seat`/`seatFwd` here are only the FALLBACK and the anchor the
@@ -300,6 +298,28 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
     // weight onto it.
     { bone: 'chair', offset: [0, 0.918, 0.25] },
   ),
+};
+
+/** Spec for an entity's active mountKey, or null when dismounted/unknown. */
+export function mountVisualSpec(mountKey: string): MountVisualSpec | null {
+  return mountKey in MOUNTS ? MOUNT_VISUAL_SPECS[mountKey as MountKey] : null;
+}
+
+/** World-unit rider lift for the active mountKey ('' or unknown: 0). */
+export function mountSeatLift(mountKey: string): number {
+  return mountVisualSpec(mountKey)?.seat ?? 0;
+}
+
+/** Mount SKIN looks (src/sim/content/mount_skins.ts): the same spec shape as a
+ *  catalog mount, keyed by skin id, drawn OVER whatever mount the rider actually
+ *  owns. A skin is a look only: the ridden mount keeps its key and its stats,
+ *  so nothing in the sim ever reads this table. Each `visualKey` here must equal
+ *  MOUNT_SKINS[id].visualKey (tests/mount_skins.test.ts pins the lockstep). */
+export const MOUNT_SKIN_VISUAL_SPECS: Record<MountSkinId, MountVisualSpec> = {
+  // The Cluckwork Mech Bird: authored rigid-servo clips (no procedural bob,
+  // the clips carry the motion). Saddle surface sits at 0.60 of the raw model
+  // (x3.4 height), dead over the origin, so no fore/aft shift.
+  mech_bird: spec('mount_mech_bird', 2.05, true),
   // The Chimeglass Tortoise: a low, broad carapace, so the rider sits astride
   // the shell rather than in a chair. No procedural bob, his authored plod
   // carries what little bounce a tortoise has, and his legs rest 99.6%
@@ -362,7 +382,8 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
       ride: { spread: 0.68, thigh: 0.8, knee: 0.6, ankle: -0.45, hips: -0.18 },
     },
   ),
-  // Bonebound Rickshaw: ships no baked clips (its wheels roll procedurally from
+  // The Bonebound Rickshaw (a mount skin since v0.42.0; the id keeps its old
+  // catalog key): ships no baked clips (its wheels roll procedurally from
   // rickshaw_mount.ts's spinMountWheels), so the body gets a light procedural jostle
   // instead of a gait cycle. seat/seatFwd are the authored bench-seat socket
   // at the cart's own RICKSHAW_SCALE (2.0).
@@ -399,14 +420,24 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
   ),
 };
 
-/** Spec for an entity's active mountKey, or null when dismounted/unknown. */
-export function mountVisualSpec(mountKey: string): MountVisualSpec | null {
-  return mountKey in MOUNTS ? MOUNT_VISUAL_SPECS[mountKey as MountKey] : null;
+/** Spec for what an entity's mount PRESENTS as: the worn skin's look when a
+ *  catalog skin is worn, else the ridden mount's own look; null when dismounted
+ *  or riding an unknown key. The one resolver every mount visual path uses, so
+ *  the skin override lives in exactly one place. */
+export function mountVisualSpecFor(
+  mountKey: string,
+  mountSkinId: string | null | undefined,
+): MountVisualSpec | null {
+  // Only a catalog mount can be skinned: an unknown or empty key is not a ride,
+  // whatever the save says is worn.
+  if (!mountKey || !(mountKey in MOUNTS)) return null;
+  if (mountSkinId && isMountSkinId(mountSkinId)) return MOUNT_SKIN_VISUAL_SPECS[mountSkinId];
+  return MOUNT_VISUAL_SPECS[mountKey as MountKey];
 }
 
-/** World-unit rider lift for the active mountKey ('' or unknown: 0). */
-export function mountSeatLift(mountKey: string): number {
-  return mountVisualSpec(mountKey)?.seat ?? 0;
+/** World-unit rider lift for what the mount presents as ('' or unknown: 0). */
+export function mountSeatLiftFor(mountKey: string, mountSkinId: string | null | undefined): number {
+  return mountVisualSpecFor(mountKey, mountSkinId)?.seat ?? 0;
 }
 
 /**

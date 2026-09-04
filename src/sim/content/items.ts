@@ -399,21 +399,6 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noDiscard: true,
     sellValue: 0,
   },
-  // The store mount (content/store_mounts.ts): granted by a verified Claudium
-  // spend, never sold for copper and never dropped. SOULBOUND like the dev tank:
-  // a real-money grant that could trade hands would be an economy leak, and a
-  // lost paid mount is a support ticket. No buyValue: Claudium is not copper.
-  reins_mech_bird: {
-    id: 'reins_mech_bird',
-    name: 'Ignition Key: Cluckwork Mech Bird',
-    kind: 'mount',
-    mount: 'mech_bird',
-    quality: 'rare',
-    soulbound: true,
-    noVendorSell: true,
-    noDiscard: true,
-    sellValue: 0,
-  },
   // Developer-only mount. It is intentionally absent from vendors, quests,
   // creature loot, heroic loot, and Rift reward pools. Use /dev mounts or
   // /dev give reins_terrorspark_groundshaker while the feature remains under development.
@@ -438,32 +423,6 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: "Lamplighter's Yoke: Grumbol",
     kind: 'mount',
     mount: 'lanternback_troll',
-    quality: 'epic',
-    soulbound: true,
-    noDiscard: true,
-    sellValue: 0,
-  },
-  // Developer-only on the same terms (DEVELOPER_MOUNTS in content/mounts.ts):
-  // no vendor, quest, creature, heroic or Rift source, soulbound so a dev grant
-  // cannot be traded in. Use /dev mounts or /dev give reins_chimeglass_tortoise.
-  reins_chimeglass_tortoise: {
-    id: 'reins_chimeglass_tortoise',
-    name: "Roadwarden's Bellstrap: Tolliver",
-    kind: 'mount',
-    mount: 'chimeglass_tortoise',
-    quality: 'epic',
-    soulbound: true,
-    noDiscard: true,
-    sellValue: 0,
-  },
-  // Developer-only, same treatment as the tank above: no acquisition path, so
-  // it stays soulbound rather than tradable. Use /dev give reins_rickshaw_mount
-  // while the feature remains under development.
-  reins_rickshaw_mount: {
-    id: 'reins_rickshaw_mount',
-    name: 'Bound Reins: Bonebound Rickshaw',
-    kind: 'mount',
-    mount: 'rickshaw_mount',
     quality: 'epic',
     soulbound: true,
     noDiscard: true,

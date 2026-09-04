@@ -13542,7 +13542,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   "entities.abilities.nightshade_coating.name": "Lớp phủ bóng đêm",
   "guide.settingsPage.ifShowReliquaryTracker": "Trình theo dõi Thánh tích (các trang được ghim của bạn và tiến trình của chúng) có nằm trên HUD của bạn hay không. Cửa sổ Thánh tích có nút mắt phù hợp và việc ghim một trang sẽ bật lại trình theo dõi.",
   // v0.41 release i18n fill.
-  'entities.items.reins_rickshaw_mount.name': 'Dây cương ràng buộc: Xe kéo Buộc Xương',
   'hudChrome.itemMenu.sell': 'Bán',
   'hudChrome.itemMenu.sellAll': 'Bán tất cả ({count})',
   'hudChrome.mounts.desc_rickshaw_mount':

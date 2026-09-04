@@ -9,6 +9,14 @@ vi.mock('../../server/db', () => ({
     mechChromaIds: [],
     weaponSkinIds: [],
     weaponSkinLoadout: {},
+    mountSkinIds: [],
+  })),
+  grantAccountMountSkins: vi.fn(async () => ({
+    completedQuestIds: [],
+    mechChromaIds: [],
+    weaponSkinIds: [],
+    weaponSkinLoadout: {},
+    mountSkinIds: [],
   })),
   moderationStatusForAccount: vi.fn(),
   scopeAllowsMutation: vi.fn(() => true),
@@ -46,7 +54,7 @@ import { FakeRes, fakeCtx, makeReq } from './helpers';
 const spendMock = vi.mocked(claudiumSpend);
 const storeMock = vi.mocked(claudiumStore);
 const grantWeaponSkins = vi.fn();
-const grantStoreMounts = vi.fn();
+const grantMountSkins = vi.fn();
 const storagePurchase = vi.fn(async () => ({
   granted: false,
   balance: null,
@@ -76,7 +84,7 @@ const MONETARY_MUTATION_ROUTES = [
 beforeEach(() => {
   vi.clearAllMocks();
   resetClaudiumMutationRateLimits();
-  configureClaudiumRuntime({ grantWeaponSkins, grantStoreMounts, storagePurchase });
+  configureClaudiumRuntime({ grantWeaponSkins, grantMountSkins, storagePurchase });
 });
 
 afterEach(() => {
@@ -420,15 +428,15 @@ describe('Claudium spend entitlement mirroring', () => {
     expect(grantWeaponSkins).toHaveBeenCalledWith(7, ['guildmark_arming_sword']);
   });
 
-  it('accepts the store-mount SKU (kind item) and mirrors it through the mount grant hook', () => {
+  it('accepts a mount skin SKU (kind skin) and mirrors it through the mount skin hook only', () => {
     spendMock.mockResolvedValue({ granted: true, balance: 800, costClaudium: 1200, reason: null });
     storeMock.mockResolvedValue({
       available: true,
       items: [
         {
-          itemId: 'reins_mech_bird',
-          name: 'Ignition Key: Cluckwork Mech Bird',
-          kind: 'item',
+          itemId: 'mech_bird',
+          name: 'Cluckwork Mech Bird',
+          kind: 'skin',
           costClaudium: 1200,
           owned: true,
         },
@@ -440,10 +448,10 @@ describe('Claudium spend entitlement mirroring', () => {
         method: 'POST',
         url: '/api/claudium/spend',
         body: {
-          itemId: 'reins_mech_bird',
-          kind: 'item',
+          itemId: 'mech_bird',
+          kind: 'skin',
           expectedCostClaudium: 1200,
-          idempotencyKey: 'mount-key',
+          idempotencyKey: 'mount-skin-key',
         },
       }),
       res as never,
@@ -451,18 +459,19 @@ describe('Claudium spend entitlement mirroring', () => {
     ).then(() => {
       expect(spendMock).toHaveBeenCalledWith({
         accountId: 7,
-        itemId: 'reins_mech_bird',
-        kind: 'item',
+        itemId: 'mech_bird',
+        kind: 'skin',
         expectedCostClaudium: 1200,
-        idempotencyKey: 'mount-key',
+        idempotencyKey: 'mount-skin-key',
       });
-      // Routed by kind: the mount hook fires, the skin hook does not.
-      expect(grantStoreMounts).toHaveBeenCalledWith(7, ['reins_mech_bird']);
+      // One SKU family, two disjoint registries: the mount skin hook fires
+      // with the id, the weapon skin hook is never reached.
+      expect(grantMountSkins).toHaveBeenCalledWith(7, ['mech_bird']);
       expect(grantWeaponSkins).not.toHaveBeenCalled();
     });
   });
 
-  it('never mirrors a mount the authoritative store does not confirm as owned (anti-forge)', () => {
+  it('never mirrors a mount skin the authoritative store does not confirm as owned (anti-forge)', () => {
     spendMock.mockResolvedValue({
       granted: true,
       balance: 800,
@@ -473,9 +482,9 @@ describe('Claudium spend entitlement mirroring', () => {
       available: true,
       items: [
         {
-          itemId: 'reins_mech_bird',
-          name: 'Ignition Key: Cluckwork Mech Bird',
-          kind: 'item',
+          itemId: 'mech_bird',
+          name: 'Cluckwork Mech Bird',
+          kind: 'skin',
           costClaudium: 1200,
           owned: false,
         },
@@ -487,8 +496,8 @@ describe('Claudium spend entitlement mirroring', () => {
         method: 'POST',
         url: '/api/claudium/spend',
         body: {
-          itemId: 'reins_mech_bird',
-          kind: 'item',
+          itemId: 'mech_bird',
+          kind: 'skin',
           expectedCostClaudium: 1200,
           idempotencyKey: 'replayed-key',
         },
@@ -496,35 +505,62 @@ describe('Claudium spend entitlement mirroring', () => {
       res as never,
       7,
     ).then(() => {
-      expect(grantStoreMounts).not.toHaveBeenCalled();
+      expect(grantMountSkins).not.toHaveBeenCalled();
       expect(grantWeaponSkins).not.toHaveBeenCalled();
     });
   });
 
-  it('rejects the mount SKU under the wrong kind before debiting Claudium', async () => {
-    const res = new FakeRes();
-    await handleClaudiumApi(
-      makeReq({
-        method: 'POST',
-        url: '/api/claudium/spend',
-        body: {
-          itemId: 'reins_mech_bird',
-          kind: 'skin',
-          expectedCostClaudium: 1200,
-          idempotencyKey: 'wrong-kind',
-        },
-      }),
-      res as never,
-      7,
-    );
-    expect(responseJson(res)).toMatchObject({ granted: false, reason: 'unknown_item' });
+  it('refuses the retired kind item store-mount SKU before debiting Claudium', async () => {
+    // reins_mech_bird was the reins-in-bags store mount; mounts are sold as
+    // account skins now, so the legacy kind and the legacy id both fall
+    // through as unknown_item.
+    for (const body of [
+      { itemId: 'reins_mech_bird', kind: 'item' },
+      { itemId: 'mech_bird', kind: 'item' },
+      { itemId: 'reins_mech_bird', kind: 'skin' },
+    ]) {
+      const res = new FakeRes();
+      await handleClaudiumApi(
+        makeReq({
+          method: 'POST',
+          url: '/api/claudium/spend',
+          body: { ...body, expectedCostClaudium: 1200, idempotencyKey: 'retired-kind' },
+        }),
+        res as never,
+        7,
+      );
+      expect(responseJson(res)).toMatchObject({ granted: false, reason: 'unknown_item' });
+    }
     expect(spendMock).not.toHaveBeenCalled();
+    expect(grantMountSkins).not.toHaveBeenCalled();
+    expect(grantWeaponSkins).not.toHaveBeenCalled();
   });
 
-  it('passes the store-mount SKU through the store read and reconciles its grant', () => {
+  it('passes mount skins through the store read and routes each owned skin to its own mirror', () => {
     storeMock.mockResolvedValue({
       available: true,
       items: [
+        {
+          itemId: 'mech_bird',
+          name: 'Cluckwork Mech Bird',
+          kind: 'skin',
+          costClaudium: 1200,
+          owned: true,
+        },
+        {
+          itemId: 'chimeglass_tortoise',
+          name: 'Tolliver the Chimeglass',
+          kind: 'skin',
+          costClaudium: 2400,
+          owned: false,
+        },
+        {
+          itemId: 'guildmark_arming_sword',
+          name: 'Guildmark Arming Sword',
+          kind: 'skin',
+          costClaudium: 200,
+          owned: true,
+        },
         {
           itemId: 'reins_mech_bird',
           name: 'Ignition Key: Cluckwork Mech Bird',
@@ -533,9 +569,9 @@ describe('Claudium spend entitlement mirroring', () => {
           owned: true,
         },
         {
-          itemId: 'some_unrelated_item',
+          itemId: 'some_unrelated_skin',
           name: 'Unrelated',
-          kind: 'item',
+          kind: 'skin',
           costClaudium: 50,
           owned: true,
         },
@@ -548,10 +584,17 @@ describe('Claudium spend entitlement mirroring', () => {
       7,
     ).then(() => {
       const body = responseJson(res) as { items: { itemId: string }[] };
-      // The declared store mount survives the whitelist; the unknown item is
-      // filtered out and never reconciled.
-      expect(body.items.map((i) => i.itemId)).toEqual(['reins_mech_bird']);
-      expect(grantStoreMounts).toHaveBeenCalledWith(7, ['reins_mech_bird']);
+      // Both mount skins and the weapon skin survive the whitelist (owned or
+      // not); the retired kind item row and the unknown skin are filtered out
+      // and never reconciled.
+      expect(body.items.map((i) => i.itemId)).toEqual([
+        'mech_bird',
+        'chimeglass_tortoise',
+        'guildmark_arming_sword',
+      ]);
+      // The two mirrors get the same owned list and keep only their own ids.
+      expect(grantMountSkins).toHaveBeenCalledWith(7, ['mech_bird']);
+      expect(grantWeaponSkins).toHaveBeenCalledWith(7, ['guildmark_arming_sword']);
     });
   });
 });

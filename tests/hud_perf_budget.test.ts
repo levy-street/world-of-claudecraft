@@ -933,6 +933,7 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   },
   { file: 'deeds_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   { file: 'reliquary_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
+  { file: 'hud/cosmetics/cosmetics_window.ts', reflowAllow: {}, driverAllow: {} },
   { file: 'dungeon_finder_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   // The lockpick clock: a 100ms tick that repaints the remaining-time bar for the duration
   // of one attempt, generation-guarded and cleared on stop. The fastest module-owned driver

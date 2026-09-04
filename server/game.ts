@@ -14,9 +14,9 @@ import { wireParkedMana } from '../src/sim/combat/form_auto_unshift';
 import { rewindHealAmount } from '../src/sim/combat/rewind';
 import { DEEDS } from '../src/sim/content/deeds';
 import { isFinderListingTag, isFinderRole } from '../src/sim/content/dungeon_finder';
+import { isMountSkinId } from '../src/sim/content/mount_skins';
 import { RELIQUARY_PAGES_BY_ID } from '../src/sim/content/reliquary';
 import { MECH_CHROMAS, mechChromaSkinIndex } from '../src/sim/content/skins';
-import { withWeaponSkinApplied } from '../src/sim/content/weapon_skin_rules';
 import { isWeaponSkinType, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 import {
   DELVES,
@@ -113,6 +113,8 @@ import {
 } from '../src/world_api';
 import { type ActionBarLayout, sanitizeActionBarLayout } from '../src/world_api/action_bar';
 import { sameAppearance } from '../src/world_api/appearance';
+import { ownedWeaponSkinLoadout } from './account_cosmetics_live';
+import { AccountCosmeticsService } from './account_cosmetics_service';
 import { recordOnlineSample } from './admin_db';
 import { type AdminGuildBankView, adminGuildBankView } from './admin_guild_bank_view';
 import { offensiveName } from './auth';
@@ -187,6 +189,7 @@ import {
   closePlaySession,
   GUILD_BANK_ROW_MAX_BYTES,
   grantAccountMechChroma,
+  grantAccountMountSkins,
   grantAccountWeaponSkins,
   heartbeatCharacterLeases,
   insertChatLogs,
@@ -306,6 +309,7 @@ import {
   type ModerationHost,
   ModerationService,
 } from './moderation_service';
+import { wornMountSkinAllowed } from './mount_skin_reconcile';
 import { MovementInputTimelineTickStats } from './movement_input_timeline_stats';
 import {
   applyMovementInputFrame,
@@ -1379,6 +1383,7 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.mainhandItemId) out.mh = e.mainhandItemId; // equipped mainhand → held weapon model (render-only)
   if (e.offhandItemId) out.oh = e.offhandItemId; // equipped offhand → held weapon model (render-only)
   if (e.weaponSkinId) out.wsk = e.weaponSkinId; // active weapon-skin cosmetic (render-only, like mh)
+  if (e.mountSkinId) out.msk = e.mountSkinId; // worn mount-skin cosmetic (render-only, like wsk)
   // Full worn set, for the inspect-another-player window. Players only and only
   // when something is equipped; rides the identity record (first appearance +
   // on change), never the per-tick dynamic fields. Render-only, like `mh`.
@@ -1742,7 +1747,11 @@ export class GameServer {
   clients = new Map<number, ClientSession>(); // by pid
   private readonly sessionsByCharacterId = new Map<number, ClientSession>();
   private readonly storageRecoverySweep = new RecoverySweep(this.sessionsByCharacterId);
-  private readonly accountCosmeticsByAccount = new Map<number, AccountCosmetics>();
+  private readonly cosmetics = new AccountCosmeticsService({
+    sim: () => this.sim,
+    sessions: () => this.clients.values(),
+    resyncQuests: (session) => this.resyncQuests(session as ClientSession),
+  });
   private readonly bankVaultLedgerGuardCoordinator: BankVaultLedgerGuardCoordinator =
     createBankVaultLedgerGuardCoordinator(() => Date.now() / 1000, {
       // Sized from the resolved realm player cap; cap<=0 (disabled) keeps the floor.
@@ -1825,7 +1834,6 @@ export class GameServer {
   // Weapon-skin loadouts are whole-record replacements in their dedicated paid
   // state row. Keep one FIFO per account so rapid apply/detach commands cannot
   // commit on separate pool clients in reverse order and resurrect stale state.
-  private readonly weaponSkinLoadoutSaveQueues = createKeyedSerialWriter<number>();
   // Action-bar layout is a whole-record replacement in its own character column.
   // One FIFO per character so a burst of debounced client saves cannot commit on
   // separate pool clients in reverse order and persist a stale layout.
@@ -3444,184 +3452,20 @@ export class GameServer {
 
   // -------------------------------------------------------------------------
 
-  private applyAccountQuestLockouts(pid: number, cosmetics: AccountCosmetics): void {
-    const meta = this.sim.meta(pid);
-    if (!meta) return;
-    for (const questId of cosmetics.completedQuestIds) {
-      meta.questsDone.add(questId);
-      meta.questLog.delete(questId);
-    }
-    // The bare adds bypass the quest-credit mark site, and the lockout quests
-    // can satisfy quest/meta deed triggers: request a full evaluator pass.
-    if (cosmetics.completedQuestIds.length > 0) this.sim.ctx.markDeedsDirty(pid);
-  }
-
-  private mergeAccountCosmetics(a: AccountCosmetics, b: AccountCosmetics): AccountCosmetics {
-    // The weapon-skin reads stay nullish-tolerant: pre-weapon-skin callers and
-    // test doubles still hand over the older two-field shape at runtime.
-    return {
-      completedQuestIds: [...new Set([...a.completedQuestIds, ...b.completedQuestIds])],
-      mechChromaIds: [...new Set([...a.mechChromaIds, ...b.mechChromaIds])],
-      // Ownership is additive (a purchase is never un-bought here); the applied
-      // loadout is last-write-wins so a detach (key removed in the fresh state)
-      // never resurrects from the stale side.
-      weaponSkinIds: [...new Set([...(a.weaponSkinIds ?? []), ...(b.weaponSkinIds ?? [])])],
-      weaponSkinLoadout: { ...(b.weaponSkinLoadout ?? {}) },
-    };
-  }
-
-  /** The account loadout filtered to owned skins, as the Sim seeds it. */
-  private ownedWeaponSkinLoadout(cosmetics: AccountCosmetics): Record<string, string> {
-    const out: Record<string, string> = {};
-    for (const [t, skinId] of Object.entries(cosmetics.weaponSkinLoadout ?? {})) {
-      if (skinId && (cosmetics.weaponSkinIds ?? []).includes(skinId)) out[t] = skinId;
-    }
-    return out;
-  }
-
-  private rememberAccountCosmetics(
-    accountId: number,
-    cosmetics: AccountCosmetics,
-  ): AccountCosmetics {
-    const merged = this.mergeAccountCosmetics(
-      this.accountCosmeticsByAccount.get(accountId) ?? {
-        completedQuestIds: [],
-        mechChromaIds: [],
-        weaponSkinIds: [],
-        weaponSkinLoadout: {},
-      },
-      cosmetics,
-    );
-    this.accountCosmeticsByAccount.set(accountId, merged);
-    return merged;
-  }
-
-  private updateLiveAccountCosmetics(accountId: number, cosmetics: AccountCosmetics): void {
-    const merged = this.rememberAccountCosmetics(accountId, cosmetics);
-    for (const live of this.clients.values()) {
-      if (live.accountId !== accountId) continue;
-      live.accountCosmetics = merged;
-      this.applyAccountQuestLockouts(live.pid, merged);
-      this.sim.setWeaponSkinLoadout(live.pid, this.ownedWeaponSkinLoadout(merged));
-      this.resyncQuests(live);
-    }
-  }
-
-  private noteAccountQuestComplete(session: ClientSession, questId: string): void {
-    const current = session.accountCosmetics;
-    const completedQuestIds = current.completedQuestIds.includes(questId)
-      ? current.completedQuestIds
-      : [...current.completedQuestIds, questId];
-    this.updateLiveAccountCosmetics(session.accountId, { ...current, completedQuestIds });
-    void markAccountQuestComplete(session.accountId, questId)
-      .then((cosmetics) => this.updateLiveAccountCosmetics(session.accountId, cosmetics))
-      .catch((err) => console.error('failed to save account quest cosmetic state:', err));
-  }
-
-  private noteAccountMechChroma(session: ClientSession, chromaId: string): void {
-    const current = session.accountCosmetics;
-    const mechChromaIds = current.mechChromaIds.includes(chromaId)
-      ? current.mechChromaIds
-      : [...current.mechChromaIds, chromaId];
-    this.updateLiveAccountCosmetics(session.accountId, { ...current, mechChromaIds });
-    void grantAccountMechChroma(session.accountId, chromaId)
-      .then((cosmetics) => this.updateLiveAccountCosmetics(session.accountId, cosmetics))
-      .catch((err) => console.error('failed to save account mech chroma:', err));
-  }
-
-  /**
-   * Grant a mech-chroma cosmetic to an account by id (a Discord swag claim, whose
-   * points/claim are already resolved durably server-side). Best-effort live update:
-   * persist the grant, then push the refreshed cosmetics to any online session on the
-   * account. The live push is a no-op when the account is offline. Injected into the
-   * ported Discord swag route via configureDiscordRuntime (server/discord.ts).
-   */
+  // Account-wide cosmetics (quest lockouts, mech chromas, weapon + mount skins)
+  // live in AccountCosmeticsService (server/account_cosmetics_service.ts); these
+  // three stay on GameServer as the hook surface server/main.ts injects into the
+  // Discord and Claudium routes.
   grantMechChromaToAccount(accountId: number, chromaId: string): void {
-    void grantAccountMechChroma(accountId, chromaId)
-      .then((cosmetics) => this.updateLiveAccountCosmetics(accountId, cosmetics))
-      .catch((err) => console.error('failed to grant swag mech chroma:', err));
+    this.cosmetics.grantMechChroma(accountId, chromaId);
   }
 
-  /**
-   * Mirror Season 1 Armory weapon-skin ownership into accounts.cosmetics and
-   * push it to any live session on the account. Injected into the Claudium
-   * spend/store routes via configureClaudiumRuntime (server/claudium.ts); the
-   * economy service's grant ledger stays the purchase source of truth.
-   */
   grantWeaponSkinsToAccount(accountId: number, skinIds: string[]): void {
-    const known = skinIds.filter((id) => WEAPON_SKINS[id]);
-    if (known.length === 0) return;
-    const current = this.accountCosmeticsByAccount.get(accountId);
-    if (current && known.every((id) => current.weaponSkinIds.includes(id))) return;
-    // Optimistic live union first (mirrors noteAccountMechChroma): the buyer can
-    // hit Apply the moment the spend response lands, without racing the write.
-    if (current) {
-      this.updateLiveAccountCosmetics(accountId, {
-        ...current,
-        weaponSkinIds: [...new Set([...current.weaponSkinIds, ...known])],
-      });
-    }
-    void grantAccountWeaponSkins(accountId, known)
-      .then((cosmetics) => this.updateLiveAccountCosmetics(accountId, cosmetics))
-      .catch((err) => console.error('failed to grant account weapon skins:', err));
+    this.cosmetics.grantWeaponSkins(accountId, skinIds);
   }
 
-  /** Take a mech chroma off the acting character's own current appearance. The
-   *  account-wide unlock (accountCosmetics.mechChromaIds) is permanent, exactly
-   *  like an owned Season 1 Armory weapon skin: this never revokes it, so any
-   *  character on the account (online or not, now or later) can still take the
-   *  look off, and can freely put it back on via change_skin with no item
-   *  involved. Only the acting character's OWN display changes; every other
-   *  character's independently chosen look is left alone. */
-  private unequipAccountMechChroma(session: ClientSession, chromaId: string): void {
-    const skin = mechChromaSkinIndex(chromaId);
-    if (skin < 0) return;
-    const e = this.sim.entities.get(session.pid);
-    if (e?.skinCatalog === 'mech' && e.skin === skin) {
-      this.sim.setPlayerSkin(session.pid, 0, 'class');
-    }
-  }
-
-  /** Apply (skinId set) or detach (skinId null + wtype) a Season 1 Armory weapon
-   *  skin. Server-authoritative: the account must own the skin, and the Sim
-   *  re-validates that a weapon of the skin's type is equipped right now. The
-   *  loadout is account state, so every session on the account updates live. */
-  private changeAccountWeaponSkin(
-    session: ClientSession,
-    skinId: string | null,
-    wtype?: string,
-  ): void {
-    const current = session.accountCosmetics;
-    let weaponSkinLoadout: Record<string, string>;
-    if (skinId !== null) {
-      const def = WEAPON_SKINS[skinId];
-      if (!def) return;
-      if (!current.weaponSkinIds.includes(skinId)) return; // must own it (anti-forge)
-      if (!this.sim.setWeaponSkin(session.pid, skinId)) return; // type-match gate
-      weaponSkinLoadout = withWeaponSkinApplied(current.weaponSkinLoadout, skinId) ?? {};
-    } else {
-      if (!wtype || !isWeaponSkinType(wtype)) return;
-      if (!current.weaponSkinLoadout[wtype]) return;
-      this.sim.setWeaponSkin(session.pid, null, wtype);
-      weaponSkinLoadout = { ...current.weaponSkinLoadout };
-      delete weaponSkinLoadout[wtype];
-    }
-    this.updateLiveAccountCosmetics(session.accountId, { ...current, weaponSkinLoadout });
-    this.enqueueWeaponSkinLoadoutSave(session.accountId, weaponSkinLoadout);
-  }
-
-  private enqueueWeaponSkinLoadoutSave(
-    accountId: number,
-    weaponSkinLoadout: Record<string, string>,
-  ): void {
-    const snapshot = { ...weaponSkinLoadout };
-    // Fire and forget BY CONTRACT: a failed save is a cosmetic loss the next
-    // apply overwrites, so it swallows to the log.
-    void this.weaponSkinLoadoutSaveQueues
-      .enqueue(accountId, () => setAccountWeaponSkinLoadout(accountId, snapshot))
-      .catch((err) => {
-        console.error('failed to save weapon skin loadout:', err);
-      });
+  grantMountSkinsToAccount(accountId: number, skinIds: string[]): void {
+    this.cosmetics.grantMountSkins(accountId, skinIds);
   }
 
   private enqueueHotbarLayoutSave(characterId: number, layout: ActionBarLayout): void {
@@ -3748,14 +3592,20 @@ export class GameServer {
       accountCosmetics: meta.accountCosmetics ?? EMPTY_ACCOUNT_COSMETICS,
       catalog: player?.skinCatalog,
       skin: player?.skin ?? 0,
-      remember: (cosmetics) => this.rememberAccountCosmetics(accountId, cosmetics),
+      remember: (cosmetics) => this.cosmetics.remember(accountId, cosmetics),
       grant: (chromaId) => grantAccountMechChroma(accountId, chromaId),
-      updateLive: (cosmetics) => this.updateLiveAccountCosmetics(accountId, cosmetics),
+      updateLive: (cosmetics) => this.cosmetics.updateLive(accountId, cosmetics),
     });
-    this.applyAccountQuestLockouts(pid, accountCosmetics);
+    this.cosmetics.applyQuestLockouts(pid, accountCosmetics);
     // Seed the account-wide weapon-skin loadout onto the fresh sim entity so the
     // applied skin shows from the first snapshot (owned skins only).
-    this.sim.setWeaponSkinLoadout(pid, this.ownedWeaponSkinLoadout(accountCosmetics));
+    this.sim.setWeaponSkinLoadout(pid, ownedWeaponSkinLoadout(accountCosmetics));
+    // The worn mount skin rides the character save, ownership rides the
+    // account: a saved skin the account does not own comes off here (never
+    // healed into ownership; server/mount_skin_reconcile.ts).
+    if (!wornMountSkinAllowed(accountCosmetics, this.sim.meta(pid)?.mountSkinId)) {
+      this.sim.setMountSkin(pid, null);
+    }
     const sessionIp = meta.ip ?? '';
     const initialLevel = this.sim.entities.get(pid)?.level ?? state?.level ?? 1;
     const botTrackingContext = this.botDetector.createTrackingContext(
@@ -6849,7 +6699,7 @@ export class GameServer {
               })
               .catch((err) => console.error('daily reward quest task failed:', err));
             if (msg.quest === ALDRIC_METEOR_QUEST_ID) {
-              this.noteAccountQuestComplete(session, msg.quest);
+              this.cosmetics.noteQuestComplete(session, msg.quest);
             }
           }
           this.resyncQuests(session);
@@ -6908,7 +6758,8 @@ export class GameServer {
           // id-only path), never as index 0.
           const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
           const result = sim.useItem(msg.item, pid, slot);
-          if (result?.type === 'mechChroma') this.noteAccountMechChroma(session, result.chromaId);
+          if (result?.type === 'mechChroma')
+            this.cosmetics.noteMechChroma(session, result.chromaId);
         }
         break;
       case 'discard':
@@ -7179,7 +7030,7 @@ export class GameServer {
         }
         break;
       case 'unequip_mech_chroma':
-        if (typeof msg.chroma === 'string') this.unequipAccountMechChroma(session, msg.chroma);
+        if (typeof msg.chroma === 'string') this.cosmetics.unequipMechChroma(session, msg.chroma);
         break;
       // Rideable mounts: the Sim re-validates everything (catalog key, level
       // gate, combat gate); the entity mirror + self `mnt` field carry the result.
@@ -7221,9 +7072,15 @@ export class GameServer {
       case 'change_weapon_skin': {
         const skinId = typeof msg.skin === 'string' ? msg.skin : null;
         const wtype = typeof msg.wtype === 'string' ? msg.wtype : undefined;
-        if (skinId !== null || wtype) this.changeAccountWeaponSkin(session, skinId, wtype);
+        if (skinId !== null || wtype) this.cosmetics.changeWeaponSkin(session, skinId, wtype);
         break;
       }
+      // Mount skins: wear (skin: string) or take off (skin: null) an account
+      // mount skin on the acting character. Ownership is checked against the
+      // session's account cosmetics here; the Sim only validates the id.
+      case 'change_mount_skin':
+        this.cosmetics.changeMountSkin(session, msg.skin);
+        break;
       // Z-key sheathe toggle: cosmetic, no payload; the Sim owns the dead-gate
       // and the combat auto-unsheathe rule.
       case 'stow_weapon':
@@ -7251,7 +7108,7 @@ export class GameServer {
         if (typeof msg.skin === 'number') {
           const claim = sim.claimEventSkin(msg.skin, pid);
           if (claim?.catalog === 'mech' && claim.chromaId) {
-            this.noteAccountMechChroma(session, claim.chromaId);
+            this.cosmetics.noteMechChroma(session, claim.chromaId);
           }
         }
         break;
@@ -8230,7 +8087,7 @@ export class GameServer {
           sim.completeQuestForDev(msg.quest, pid);
           const afterDone = sim.meta(pid)?.questsDone.has(msg.quest) ?? false;
           if (!beforeDone && afterDone && msg.quest === ALDRIC_METEOR_QUEST_ID) {
-            this.noteAccountQuestComplete(session, msg.quest);
+            this.cosmetics.noteQuestComplete(session, msg.quest);
           }
           this.resyncQuests(session);
         }
@@ -8242,7 +8099,7 @@ export class GameServer {
           sim.completeCurrentQuestsForDev(pid);
           const afterDone = sim.meta(pid)?.questsDone.has(ALDRIC_METEOR_QUEST_ID) ?? false;
           if (!beforeDone && afterDone) {
-            this.noteAccountQuestComplete(session, ALDRIC_METEOR_QUEST_ID);
+            this.cosmetics.noteQuestComplete(session, ALDRIC_METEOR_QUEST_ID);
           }
           this.resyncQuests(session);
         }

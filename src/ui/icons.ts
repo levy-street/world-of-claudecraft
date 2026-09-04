@@ -5289,8 +5289,6 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'reins_thunderstrut_gobbler',
   'reins_terrorspark_groundshaker',
   'reins_lanternback_troll',
-  'reins_chimeglass_tortoise',
-  'reins_rickshaw_mount',
 ]);
 
 // The grouped literals above preserve the curated catalog's provenance history. Derive the

@@ -583,7 +583,8 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
-    ceiling: 10641,
+    // Lowered after extracting the live account-cosmetics fan-out and the skin command handlers into server/account_cosmetics_service.ts.
+    ceiling: 10498,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -697,7 +698,8 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
-    ceiling: 5145,
+    // Lowered after extracting the account cosmetics persistence cluster into server/account_cosmetics_db.ts (re-exported here).
+    ceiling: 4996,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {

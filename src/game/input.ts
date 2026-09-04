@@ -99,6 +99,7 @@ export interface InputCallbacks {
       | 'deeds'
       | 'professions'
       | 'reliquary'
+      | 'cosmetics'
       | 'crafting'
       | 'sheathe'
       | 'mount',
@@ -1211,6 +1212,9 @@ export class Input {
         return;
       case 'reliquary':
         this.cb.onUiKey('reliquary');
+        return;
+      case 'cosmetics':
+        this.cb.onUiKey('cosmetics');
         return;
       case 'chat':
         this.cb.onUiKey('chat');

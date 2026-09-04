@@ -486,6 +486,7 @@ import {
 import { type ChatClock, clampChatClock, formatChatTimestamp } from './hud/chat/chat_timestamp';
 import { ChatWindowController } from './hud/chat/chat_window_controller';
 import { DEED_NAME_TOKEN, deedChatLinkEl, deedLineNodes } from './hud/chat/deed_chat_line';
+import { CosmeticsWindow } from './hud/cosmetics';
 import { SkinEventController } from './hud/cosmetics/skin_event_controller';
 import {
   CrossHotbarController,
@@ -506,6 +507,7 @@ import { lootSettingsView } from './hud/loot/loot_settings_view';
 import { renderLootSettingsWindow } from './hud/loot/loot_settings_window';
 import { LootWindowController } from './hud/loot/loot_window_controller';
 import { MapMarkerInteractionController, MapMarkerTooltipContent } from './hud/map';
+import { refreshSideButtonLabels } from './hud/menu/side_buttons';
 import { livingSecondaryPet } from './hud/pet_bar_core';
 import { CARD_POSES } from './hud/player_card/player_card';
 import { PlayerCardController } from './hud/player_card/player_card_controller';
@@ -2802,6 +2804,7 @@ export class Hud {
     $('#mm-quest').addEventListener('click', () => this.toggleQuestLog());
     $('#mm-deeds').addEventListener('click', () => this.toggleDeeds());
     $('#mm-reliquary')?.addEventListener('click', () => this.toggleReliquary());
+    $('#mm-cosmetics')?.addEventListener('click', () => this.cosmeticsWindow.toggle());
     $('#mm-professions').addEventListener('click', () => this.toggleProfessions());
     // Collapse/expand the on-screen quest tracker by clicking its header. The
     // overlay is click-through (pointer-events:none) except the header button, so
@@ -3609,6 +3612,9 @@ export class Hud {
       case 'reliquary-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.reliquaryWindow.close();
+        break;
+      case 'cosmetics-window':
+        this.cosmeticsWindow.close();
         break;
       case 'professions-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
@@ -5309,6 +5315,15 @@ export class Hud {
   // trapping window (windowFocus), the deeds/professions shape exactly.
   // onPinChanged repaints the HUD tracker immediately so a pin toggle never
   // waits for the slow band.
+  // The Cosmetics window: account-wide + per-character looks (mount skins,
+  // weapon skins, mech chromas), every read and change across IWorld.
+  private readonly cosmeticsWindow = new CosmeticsWindow({
+    root: () => $('#cosmetics-window'),
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#cosmetics-window'),
+    hideTooltip: () => this.hideTooltip(),
+    ...this.windowFocus('#cosmetics-window'),
+  });
   private readonly reliquaryWindow = new ReliquaryWindow({
     ...this.presentationBag,
     root: () => $('#reliquary-window'),
@@ -5490,6 +5505,7 @@ export class Hud {
     },
     openPrestige: () => this.openPrestigeDialog(),
     openDeeds: () => this.openDeeds(),
+    openCosmetics: () => this.cosmeticsWindow.open(),
     openReliquary: () => this.openReliquary(),
     dragState: this.itemDragState,
     renderBags: () => this.renderBags(),
@@ -6995,6 +7011,7 @@ export class Hud {
     this.calendarWindow.relocalize();
     this.mailboxWindow.relocalize();
     this.socialWindow.relocalize();
+    this.cosmeticsWindow.relocalize();
     this.cardDuelWindow.relocalize();
     this.spellbookWindow.relocalize();
     this.barEditorWindow.relocalize();
@@ -8135,33 +8152,7 @@ export class Hud {
     // frame in-game). Refreshing them here too would be a second writer bypassing that
     // elision cache. This method owns only the side-menu buttons, which
     // have no per-frame painter.
-    const sideButtons: [selector: string, action: string, labelKey: TranslationKey][] = [
-      ['#mm-char', 'char', 'hud.keybinds.actions.char'],
-      ['#mm-spell', 'spellbook', 'abilityUi.spellbook.title'],
-      ['#mm-talents', 'talents', 'game.talents.title'],
-      ['#mm-quest', 'questlog', 'questUi.log.title'],
-      ['#mm-deeds', 'deeds', 'hudChrome.deeds.title'],
-      ['#mm-reliquary', 'reliquary', 'hudChrome.reliquary.title'],
-      ['#mm-professions', 'professions', 'hudChrome.professions.title'],
-      ['#mm-map', 'map', 'hud.core.mobileMap'],
-      ['#mm-bag', 'bags', 'itemUi.bags.title'],
-      ['#mm-crafting', 'crafting', 'hudChrome.crafting.title'],
-      ['#mm-arena', 'arena', 'hudChrome.pvp.launcherTitle'],
-      ['#mm-dfinder', 'dungeonFinder', 'hudChrome.finder.title'],
-      ['#mm-leaderboard', 'leaderboard', 'game.leaderboard.title'],
-      ['#mm-emote', 'emoteWheel', 'hudChrome.emoteWheel.label'],
-      ['#mm-social', 'social', 'hud.social.friendsTab'],
-      ['#mm-discord', 'discord', 'hudChrome.discord.title'],
-    ];
-    for (const [selector, action, labelKey] of sideButtons) {
-      const btn = document.querySelector<HTMLElement>(selector);
-      if (!btn) continue;
-      const key = this.keybinds.primaryLabel(action);
-      const label = t(labelKey);
-      const keyEl = btn.querySelector<HTMLElement>('.keybind');
-      if (keyEl) keyEl.textContent = keyCapLabel(key);
-      btn.setAttribute('aria-label', key ? `${label} (${key})` : label);
-    }
+    refreshSideButtonLabels(document, (action) => this.keybinds.primaryLabel(action));
   }
 
   // -------------------------------------------------------------------------
@@ -9748,6 +9739,7 @@ export class Hud {
     if (slowHud) this.bagsWindow.refreshIfChanged();
     if (slowHud && this.deedsWindow.isOpen) this.deedsWindow.refreshIfChanged();
     if (slowHud && this.reliquaryWindow.isOpen) this.reliquaryWindow.refreshIfChanged();
+    if (slowHud && this.cosmeticsWindow.isOpen) this.cosmeticsWindow.refreshIfChanged();
     if (slowHud) this.refreshOpenProfessionSurfacesIfChanged();
     if (slowHud) this.refreshCharSheetIfChanged();
     if (slowHud && this.professionsWindow.isOpen) this.professionsWindow.refreshIfChanged();
@@ -16314,6 +16306,10 @@ export class Hud {
     this.reliquaryWindow.toggle();
   }
 
+  toggleCosmetics(): void {
+    this.cosmeticsWindow.toggle();
+  }
+
   // Repaint the deed tracker from the live facet: the slow band, a watch
   // toggle, the collapse toggle, and language switches all funnel here; the
   // elided writers make an unchanged repaint free.
@@ -16534,6 +16530,7 @@ export class Hud {
     // A grant or apply from another session on the account (or a server
     // correction of an optimistic apply) must refresh an open armory too.
     this.dailyRewardsWindow.onCosmeticsChanged();
+    this.cosmeticsWindow.refreshIfChanged();
   }
 
   // Public for the main.ts options arm (showPlaytime): the sheet is a cold

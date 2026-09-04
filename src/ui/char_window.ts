@@ -164,6 +164,8 @@ export interface CharWindowDeps extends PainterHostPresentation {
   openPrestige(): void;
   /** Open the Book of Deeds (the active-title line's button). */
   openDeeds(): void;
+  /** Open the Cosmetics window (the skin row's manage button). */
+  openCosmetics(): void;
   /** Open The Reliquary (the sheet completion line's button). */
   openReliquary(): void;
   /** The shared in-flight bag-item drag (published by the bags grid). The paperdoll
@@ -278,6 +280,7 @@ export class CharWindow {
       <div class="char-model-panel">
         <div id="char-model-preview" class="char-model-preview" role="img" aria-label="${esc(t('hudChrome.character.modelPreview'))}"></div>
         <div id="char-skin-row" class="skin-row char-skin-row" role="list" aria-label="${esc(t('auth.appearance'))}"></div>
+        <button type="button" class="btn char-cosmetics-btn" data-act="open-cosmetics">${esc(t('hudChrome.cosmetics.title'))}</button>
       </div>
       <div class="equip-col equip-col-right" id="equip-col-right"></div>
     </div>`;
@@ -306,6 +309,10 @@ export class CharWindow {
     el.querySelector('[data-act="open-deeds"]')?.addEventListener('click', () => {
       audio.click();
       this.deps.openDeeds();
+    });
+    el.querySelector('[data-act="open-cosmetics"]')?.addEventListener('click', () => {
+      audio.click();
+      this.deps.openCosmetics();
     });
     el.querySelector('[data-act="open-reliquary"]')?.addEventListener('click', () => {
       audio.click();

@@ -108,11 +108,15 @@ const build = await buildItemArtAudit({
     // Tortoise) that joined at the release/v0.42.0 sync of PR #3439.
     // + the Cluckwork Mech Bird store mount reins icon (PR #3464); liveItemCount
     // moves with it.
-    catalogCount: 1044,
+    // - the Mech Bird, Chimeglass Tortoise and Bonebound Rickshaw reins icons,
+    // retired when those mounts became account mount skins (v0.42.0); the
+    // renders moved to public/ui/store/mount_skins, outside this audit.
+    catalogCount: 1041,
     // 844 + the 201 Crucible raid loot definitions (192 of them art-pending)
     // + the base's 2 Varkhul legendary definitions, + the release sync's 7
-    // bank-storage painted bags, + the two developer mount reins.
-    liveItemCount: 1059,
+    // bank-storage painted bags, + the two developer mount reins, - the three
+    // reins retired as mount skins.
+    liveItemCount: 1056,
     generatedHeroicDefinitions: 64,
     heroicDefinitionsWithOwnWebp: 48,
     heroicWeaponArtAliases: 16,

@@ -8,6 +8,7 @@
 // own module (no per-locale blocks) so new chrome keys are an English-only add.
 
 import { armoryCollectionStrings, armorySkinStrings } from './armory';
+import { cosmeticsStrings } from './cosmetics';
 
 export const hudChromeStrings = {
   warlock: {
@@ -379,11 +380,12 @@ export const hudChromeStrings = {
     tabsLabel: 'WOC Store sections',
     storeTab: 'Store',
     rewardsTab: 'Daily Rewards',
-    // The store's Mounts strip (content/store_mounts.ts): account mounts sold
-    // for Claudium; the purchase grants the soulbound reins to every character.
-    mountsEyebrow: 'Account Mounts',
+    // The store's Machine Stable strip (content/mount_skins.ts): account-wide
+    // mount skins sold for Claudium; wearing one is the Cosmetics window's job.
+    mountsEyebrow: 'Account Mount Skins',
     mountsTitle: 'Machine Stable',
     mountBuyAria: 'Purchase {item}',
+    mountSkinType: 'Mount skin',
     loading: 'Loading WOC Store...',
     error: 'The WOC Store is unavailable right now. Please try again shortly.',
     balance: 'Claudium Balance',
@@ -5853,6 +5855,8 @@ export const hudChromeStrings = {
   // deed_i18n.ts, never through these keys.
   // The Reliquary: cold collection trophy window (Overview + shelf chrome in
   // Phase 4; page grids and Illumination celebration land later).
+  // The Cosmetics window (src/ui/hud/cosmetics/): English lives in cosmetics.ts.
+  cosmetics: cosmeticsStrings,
   reliquary: {
     title: 'The Reliquary',
     close: 'Close The Reliquary',

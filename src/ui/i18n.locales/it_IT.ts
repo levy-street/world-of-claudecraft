@@ -13960,7 +13960,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   "entities.abilities.nightshade_coating.name": "Rivestimento Nightshade",
   "guide.settingsPage.ifShowReliquaryTracker": "Se il tracker del Reliquiario (le tue pagine appuntate e il loro progresso) si trova sul tuo HUD. La finestra del Reliquiario ha un pulsante a forma di occhio corrispondente e il blocco di una pagina riattiva il tracker.",
   // v0.41 release i18n fill.
-  'entities.items.reins_rickshaw_mount.name': 'Redini vincolate: Risciò Vincolato alle Ossa',
   'hudChrome.itemMenu.sell': 'Vendi',
   'hudChrome.itemMenu.sellAll': 'Vendi tutto ({count})',
   'hudChrome.mounts.desc_rickshaw_mount':

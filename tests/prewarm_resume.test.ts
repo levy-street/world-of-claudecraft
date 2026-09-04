@@ -755,9 +755,7 @@ describe('resumeDroppedPrewarmEntries', () => {
     // Derived from the real catalog, never a hand-maintained list: this is
     // exactly the property that kept vfx.weapon-skins from drifting the way
     // mounts did, and mount_prewarm.test.ts pins the derivation itself.
-    expect(source).toContain(
-      'const mountPrewarmPlannedKeys = mountPrewarmKeys(this.sim.ownedMounts());',
-    );
+    expect(source).toContain('const mountPrewarmPlannedKeys = mountPrewarmKeysFor(this.sim);');
     expect(source).toContain('const mountPrewarmPendingKeys = new Set(mountPrewarmPlannedKeys);');
     expect(source).toContain('const mountPrewarmResumeUnits = (): PrewarmResumeUnit[] =>');
     expect(helperBlock).toContain(`id: \`mount:\${key}\``);

@@ -9505,6 +9505,196 @@
     font-family: var(--title-font);
     margin-top: -2px;
   }
+  /* ---------- cosmetics ---------- */
+  /* The Cosmetics window (src/ui/hud/cosmetics/): a cold window with the shared
+     WAI-ARIA tab strip and a card grid per tab. Cards are rebuilt on every
+     action (no per-frame writes). Colours are tokens throughout; the rarity chip
+     reuses the classic .q-* quality family and the scope badges read as plain
+     chips so the account/character split stays legible on every preset. */
+  #cosmetics-window {
+    width: 720px;
+    max-height: calc(var(--app-vh, 100vh) * 0.82 / var(--window-scale) - 24px);
+    flex-direction: column;
+  }
+  #cosmetics-window.open {
+    display: flex;
+  }
+  #cosmetics-window .panel-title {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+  #cosmetics-window .panel-title > span {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .cos-legend {
+    flex: none;
+    margin: 0 0 var(--spacing-sm);
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  .cos-tabs {
+    flex: none;
+    display: flex;
+    gap: 2px;
+    height: 32px;
+    border-bottom: 1px solid var(--color-border-default);
+    margin-bottom: var(--spacing-sm);
+  }
+  .cos-tab {
+    flex: 0 0 auto;
+    min-width: 72px;
+    padding: 0 var(--spacing-md);
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid transparent;
+    color: var(--color-text-muted);
+    font: inherit;
+    cursor: pointer;
+  }
+  .cos-tab:hover {
+    color: var(--color-text-light);
+  }
+  .cos-tab.on {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+  }
+  .cos-tab:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: -2px;
+  }
+  .cos-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 2px;
+  }
+  .cos-intro,
+  .cos-hint,
+  .cos-empty {
+    margin: 0 0 var(--spacing-sm);
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  .cos-hint {
+    color: var(--color-text-muted);
+  }
+  .cos-group {
+    margin-bottom: var(--spacing-md);
+  }
+  .cos-group-title {
+    margin: 0 0 var(--spacing-xs);
+    font-size: 13px;
+    color: var(--color-accent);
+  }
+  .cos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--spacing-sm);
+  }
+  .cos-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    background: rgba(0, 0, 0, 0.25);
+  }
+  .cos-card:hover,
+  .cos-card:focus-within {
+    border-color: var(--gold);
+  }
+  .cos-card.worn {
+    border-color: var(--color-accent);
+    background: rgba(120, 90, 30, 0.28);
+  }
+  .cos-card-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-size: 11px;
+  }
+  .cos-scope {
+    padding: 1px 6px;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 10px;
+  }
+  .cos-scope-worn {
+    color: var(--gold);
+    border-color: var(--color-accent);
+  }
+  .cos-rarity {
+    margin-left: auto;
+    font-size: 11px;
+  }
+  .cos-card-name {
+    margin: 0;
+    font-size: 14px;
+    color: var(--color-text-light);
+  }
+  .cos-card-desc,
+  .cos-card-hint {
+    margin: 0;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .cos-mech-swatch {
+    height: 24px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border-default);
+    background: rgba(255, 255, 255, 0.05);
+  }
+  .cos-card-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+    margin-top: auto;
+  }
+  .cos-state {
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .cos-state.worn {
+    color: var(--gold);
+  }
+  .cos-action {
+    min-height: 40px;
+    min-width: 40px;
+    padding: 0 var(--spacing-md);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--color-text-light);
+    font: inherit;
+    cursor: pointer;
+  }
+  .cos-action:hover {
+    border-color: var(--gold);
+  }
+  .cos-action:active {
+    transform: translateY(1px);
+  }
+  .cos-action:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .cos-action:disabled {
+    opacity: 0.55;
+    cursor: default;
+  }
+  .char-cosmetics-btn {
+    margin-top: var(--spacing-xs);
+    min-height: 40px;
+  }
   /* ---------- reliquary ---------- */
   /* The Reliquary: cold collection browser (summary strip, shelf rail,
      Overview recent/nearly, shelf page rows, page grids, search + filter).

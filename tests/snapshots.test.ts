@@ -26,6 +26,7 @@ vi.mock('../server/db', () => ({
     mechChromaIds: [],
     weaponSkinIds: [],
     weaponSkinLoadout: {},
+    mountSkinIds: [],
   })),
   loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
 }));
@@ -1224,6 +1225,7 @@ describe('delta snapshots', () => {
         mechChromaIds: ['amber_crimson'],
         weaponSkinIds: [],
         weaponSkinLoadout: {},
+        mountSkinIds: [],
       },
     });
     if ('error' in joined) throw new Error(joined.error);
@@ -1236,6 +1238,7 @@ describe('delta snapshots', () => {
       mechChromaIds: ['amber_crimson'],
       weaponSkinIds: [],
       weaponSkinLoadout: {},
+      mountSkinIds: [],
     });
 
     const client = bareClient(session.pid);
@@ -1245,6 +1248,7 @@ describe('delta snapshots', () => {
       mechChromaIds: ['amber_crimson'],
       weaponSkinIds: [],
       weaponSkinLoadout: {},
+      mountSkinIds: [],
     });
   });
 
@@ -4249,6 +4253,7 @@ describe('weapon skin wire (weaponSkinId)', () => {
       mechChromaIds: [],
       weaponSkinIds: ['winterbite', 'meteorlatch_crossbow'],
       weaponSkinLoadout: {},
+      mountSkinIds: [],
     };
     internals.applySnapshot({
       t: 'snap',
@@ -4339,6 +4344,7 @@ describe('weapon skin wire (weaponSkinId)', () => {
         mechChromaIds: [],
         weaponSkinIds: ['ice_fang_sword'],
         weaponSkinLoadout: {},
+        mountSkinIds: [],
       },
     });
     if ('error' in joined) throw new Error(joined.error);
@@ -5254,6 +5260,7 @@ function dirtyEveryDeltaField(): {
     mechChromaIds: ['amber_crimson'],
     weaponSkinIds: [],
     weaponSkinLoadout: {},
+    mountSkinIds: [],
   };
   // Session-scoped stored action-bar layout (`hbl`, self-only): set the frozen
   // join-time copy so the heavy self block wires it once.
@@ -5527,6 +5534,7 @@ describe('full self-state snapshot delta fixture', () => {
       mechChromaIds: ['amber_crimson'],
       weaponSkinIds: [],
       weaponSkinLoadout: {},
+      mountSkinIds: [],
     });
     expect([...client.questLog.values()]).toEqual([
       { questId: 'q_widows', counts: [10, 0], state: 'active' },
