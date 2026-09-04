@@ -105,9 +105,9 @@ describe('Rogue fight-6498 deterministic DPS bands', () => {
     // Lionheart/Lariat precedent, first measured there). With the
     // masterwrought defs removed the picker restores the release loadout
     // and measures about 186.3 / 202.8 / 179.2 (assassination, combat,
-    // subtlety), matching the release bands of that day: that pre-apex
-    // baseline is recorded here and in state.md for phase 15, which
-    // measures fights, never scores. These bounds protect the DEV-BIS
+    // subtlety), matching the release bands of that day. That pre-apex
+    // baseline is recorded by these literal bounds, which measure fights,
+    // never scores. These bounds protect the DEV-BIS
     // FIXTURE's throughput (the suite's actual subject), not a played
     // rogue's.
     //

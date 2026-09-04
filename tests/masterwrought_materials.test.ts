@@ -839,9 +839,9 @@ describe('sundered essence: the extraction', () => {
     // consumption, and vendor sell only; sundering.ts deliberately carries no
     // lock arm (the disenchant precedent from the release's own first-pass
     // scope), so a deliberately targeted locked raid epic still breaks. This
-    // classification was taken at the v0.38.0 sync merge (fa51741408) and is
-    // RULED as shipped by qr-19-sunder-lock-exemption-ratification
-    // (2026-09-01, state.md): if sunder ever gains a lock deny, flip this pin
+    // classification was taken at the v0.38.0 sync merge (fa51741408), and
+    // locked raid epics deliberately remain admitted. If sunder ever gains a
+    // lock deny, flip this pin
     // and the locked-copy menu pin in tests/bag_item_context_menu.test.ts
     // together, they are one surface.
     const sim = makeSunderSim();
@@ -896,8 +896,8 @@ describe('sundered essence: the extraction', () => {
     expect(errors.map((e) => e.text)).toEqual(['Only raid-won epics can be sundered.']);
     expect(sim.countItem('deathless_heartwood', pid)).toBe(1);
     expect(sim.countItem(SUNDERED_ESSENCE_ITEM_ID, pid)).toBe(0);
-    // The boundary MOVED at Phase 18, implementing the ratified Phase 05 QA
-    // ruling (2026-08-10, state.md): heroic-raid epics ARE sunderable, the
+    // The boundary deliberately includes heroic-raid epics: they ARE
+    // sunderable, the
     // normal-only line having been an accident of the raid: false
     // registration. The registration still reads false (it prices the item
     // level), so the predicate asks itemFromHeroicRaid instead: the premise

@@ -157,8 +157,9 @@ describe('corpseHarvestView: a selection that forfeits every yield (#2509)', () 
   it('is about families no row maps: none ships since Phase 11m, so the synthetic pair carries the case', () => {
     // Literal on both sides, so the cases below cannot be measuring the table
     // against itself. gills and horn were the tagged-but-unmapped families
-    // until Phase 11m mapped both (state.md row 11m-ORPHAN); the shipped set
-    // is EMPTY now, pinned as such with the ten mapped families beside it,
+    // until they shipped as mudfin_scale and curved_tusk mappings; the
+    // shipped unmapped set is EMPTY now, pinned as such with the ten mapped
+    // families beside it,
     // and the synthetic pair is unmapped by construction: no row and no
     // shipped carrier (tests/harvest_geography.test.ts pins both from the
     // content side).

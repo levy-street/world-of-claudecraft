@@ -184,9 +184,8 @@ const APEX_ARMOR: Record<
 };
 
 // The apex reagent bill per craft: exactly 3 of the profession's own
-// intermediate (the phase 07 demand-math law: one piece = 3 catalyst-days),
-// 2 Wyrmfall Cores, and the craft's gathered family, quantities recorded in
-// the state.md phase 08 ledger.
+// intermediate (one piece = 3 catalyst-days), 2 Wyrmfall Cores, and the
+// craft's gathered family. These literals are the shipped per-craft budget.
 const APEX_BILLS: Record<string, { itemId: string; count: number }[]> = {
   armorcrafting: [
     { itemId: 'forgefold_plating', count: 3 },
@@ -835,11 +834,10 @@ describe('masterwrought apex budget sweep', () => {
   // and the complement arm below reds exactly as authored. forgefold_legguards
   // is the very piece the ratified R5 record measures (section 9.6: dead hit on
   // the reference, live crit on the twin), so re-cutting either rating is a
-  // re-tune of the R5 surface, which the packet may not do: the rows are kept
-  // byte-identical and marked expected-fail so the contradiction stays visible,
-  // and the question goes to the maintainer (state.md, the Phase 19 table:
-  // re-complement the twins against the retuned references, or re-measure R5
-  // on the merged world). Flip both back into the held set in the SAME commit
+  // re-tune of the R5 surface: the rows are kept byte-identical and marked
+  // expected-fail so the contradiction stays visible. The unresolved choice
+  // is to re-complement the twins against the retuned references or re-measure
+  // R5 on the merged world. Flip both back into the held set in the SAME commit
   // that executes the ruling.
   const MERGE_INHERITED_TWIN_DUPLICATES = new Set(['forgefold_legguards', 'spiritweld_girdle']);
   const armorRowSweep = (id: string, row: (typeof APEX_ARMOR)[keyof typeof APEX_ARMOR]) => {
@@ -1579,10 +1577,10 @@ describe('masterwrought apex budget sweep', () => {
   // 2): the Perfected apex chest sits BELOW the best non-packet chest. The
   // caps are the R5 record's own zero-slack measurement (Phase 15 and its QA),
   // ratified 2026-08-29 and frozen; re-cutting them to the merged world is a
-  // re-tune of the R5 surface, which the packet may not do. Kept byte-identical
-  // and marked expected-fail so the contradiction stays visible; escalated
-  // (state.md, the Phase 19 table: re-measure R5 on the merged world, or
-  // ratify the record as a measurement of the pre-raid catalog). Flip back to
+  // re-tune of the R5 surface. Kept byte-identical and marked expected-fail so
+  // the contradiction stays visible. The unresolved choice is to re-measure
+  // R5 on the merged world or keep the record as a measurement of the pre-raid
+  // catalog. Flip back to
   // it() in the SAME commit that executes the ruling.
   it.fails('R5: a Perfected apex piece stays within its pinned lead over the pre-packet slot', () => {
     // ADDED AT PHASE 15, because the packet's defining ruling had no guard.

@@ -640,11 +640,10 @@ describe('the farming gain curve is DERIVED from the calendar model, not felt', 
     // true while every crop of the band is ready between two check-ins: a crop
     // longer than the gap silently halves the attempts the model credits.
     //
-    // The drift is not hypothetical. state.md's reference-farmer paragraph was
-    // written at STEP 0 saying "the longest shipped duration is 10.5 hours",
-    // and this very phase then added evergarden_pumpkin at 645 minutes (10.75
-    // hours), so the phase falsified its own recorded input with nothing to
-    // catch it.
+    // The drift is not hypothetical. The original reference-farmer model used
+    // "the longest shipped duration is 10.5 hours", then evergarden_pumpkin
+    // shipped at 645 minutes (10.75 hours), invalidating that input. This
+    // assertion makes future duration drift visible.
     const gapMs = (24 / REFERENCE_FARMER.visitsPerDay) * 60 * 60_000;
     const longest = Math.max(...Object.values(FARM_CROPS).map((c) => c.durationMs));
     expect(longest, 'the longest shipped crop must be ready between two check-ins').toBeLessThan(
@@ -2447,7 +2446,7 @@ describe('harvestCrop TIER 1/2: two draws (golden roll, golden bonus) on every o
     // Unlike plantCrop, whose deliberate-action trio breaks stealth, stands
     // the farmer up and dismounts (a cast is a deliberate act), the harvest
     // performs NO state-breaking side effects, and the omission is a decision,
-    // not an oversight (state.md deviation (v), the QA round): the harvest is
+    // not an oversight: the harvest is
     // the instant second visit of the two a cycle ever gets, and forcing a
     // per-bed dismount or reveal would tax exactly the walk-the-row pattern
     // the anti-chore thesis protects. Personal plots are uncontested, so

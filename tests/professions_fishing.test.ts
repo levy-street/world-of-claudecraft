@@ -533,7 +533,7 @@ describe('fishing draw contract (pin 2, the bite-and-reel shape)', () => {
     try {
       const p = sim.player;
       startFishing(sim.ctx, p, meta);
-      // The SHIPPED codfather choice (state.md): the cast still rolls its one
+      // The SHIPPED codfather behavior: the cast still rolls its one
       // hidden bite delay (startFishing has no quest special-case) and the
       // reel's completeFishing early return rolls NO table draw.
       expect(draws).toBe(1);
@@ -960,8 +960,8 @@ const prePhaseEffectiveBand = (proficiency: number, rodTier: number): number =>
 // The DECISION F derivation (Phase 11i, qr-11i-PACE): the four
 // FISHING_GAIN_SCHEDULE values are DERIVED from a measured casts-to-200 model,
 // and this is the arm that reproduces the model rather than restating its
-// output. The 11e idiom: the model recorded in state.md is the authority, the
-// literals in fishing.ts are what it is held against.
+// output. The derivation below is authoritative; the literals in fishing.ts
+// are what it is held against.
 //
 // EVERY INPUT IS A SHIPPED CONSTANT, imported rather than transcribed, so a
 // retune of the bite ladder or the reel window reds this instead of leaving a
@@ -1257,8 +1257,8 @@ describe('the DECISION B regression walk: nobody loses access (Phase 11i)', () =
   });
 
   it('the pairs that MOVE are exactly the set the ledger predicted, and it is not empty', () => {
-    // PREDICTED IN THE LEDGER BEFORE THIS RAN (state.md, the Phase 11i
-    // ledger): 203 pairs move and nothing else does.
+    // Predicted from the derivation above before this ran: 203 pairs move and
+    // nothing else does.
     //   200 pairs  proficiency 150-199 x rod tier 3-6   band 1 -> 2
     //     1 pair   proficiency 200     x rod tier 4     band 2 -> 3
     //     1 pair   proficiency 200     x rod tier 5     band 2 -> 4

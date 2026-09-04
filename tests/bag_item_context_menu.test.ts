@@ -92,9 +92,9 @@ describe('bag_item_context_menu: action eligibility', () => {
     // only (the issue 3042 first-pass scope); sunder follows the disenchant
     // precedent and stays offered on a locked copy, matching the sim, whose
     // sunderAdmitted has no lock arm (pinned end to end in
-    // tests/masterwrought_materials.test.ts). Classification taken at the
-    // v0.38.0 sync merge (fa51741408) and RULED as shipped by
-    // qr-19-sunder-lock-exemption-ratification (2026-09-01, state.md);
+    // tests/masterwrought_materials.test.ts). Classification was taken at the
+    // v0.38.0 sync merge (fa51741408), and locked raid epics deliberately
+    // remain admitted;
     // if the sim ever gains a lock deny for sunder, flip this pin and the sim-side
     // pin in tests/masterwrought_materials.test.ts together, they are one surface.
     const raidEpic = { ...def('armor', 'epic'), id: 'crownforged_dreadhelm' } as ItemDef;

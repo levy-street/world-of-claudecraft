@@ -237,8 +237,8 @@ describe('the hosting surfaces are live content', () => {
   });
 
   it('the rift draw is wired live: the exported chance and list drive addRiftClearGearLoot', () => {
-    // The recorded rate is a literal, never re-derived (state.md phase 11
-    // ledger); the statistical arm lives in apex_pattern_items.test.ts.
+    // The shipped rate is pinned as a literal here, never re-derived; the
+    // statistical arm lives in apex_pattern_items.test.ts.
     expect(RIFT_PATTERN_CHANCE).toBe(0.08);
     // Exercise the LIVE function: winning B clears across a fixed seed range
     // must shed at least one pattern, and every pattern shed must be a member

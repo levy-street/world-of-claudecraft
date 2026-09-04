@@ -5,9 +5,9 @@
 // two families shipped content really tagged that HARVEST_COMPONENT_ITEMS
 // (src/sim/content/professions.ts) did not map, so every "carried but
 // unmapped" arm (#2509's pick-level refusal, #2513's corpse-level gate,
-// #2514's concentration bonus) could be driven on a shipped template. 11m
-// mapped both (state.md row 11m-ORPHAN: horn to curved_tusk, gills to
-// mudfin_scale), so no shipped template carries an unmapped tag any more and
+// #2514's concentration bonus) could be driven on a shipped template. Mapping
+// horn to curved_tusk and gills to mudfin_scale closed both gaps, so no
+// shipped template carries an unmapped tag any more and
 // every one of those arms needs a family that will NEVER gain a row.
 //
 // Two facts make these safe to build a fixture on, and both are pinned in

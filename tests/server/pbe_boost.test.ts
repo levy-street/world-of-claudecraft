@@ -908,19 +908,18 @@ describe('Masterwrought equip-cap awareness (phase 08)', () => {
   // Before enforceMasterwroughtCap, four role kits (warrior/prot,
   // paladin/holy, paladin/protection, shaman/elemental) picked THREE flagged
   // apex pieces, and buildBoostedCharacterState hard-throws when the third
-  // equip is refused (the state.md phases 03/08 open item: a flagged-heavy
-  // BiS kit is a boot-time crash, not a quiet miscount). The sweep holds
+  // equip is refused. A flagged-heavy BiS kit is therefore a boot-time crash,
+  // not a quiet miscount. The sweep holds
   // every role kit of every class at the cap.
   // MERGE-INHERITED, EXPECTED-FAIL (2026-08-30, the eighth v0.41.0 sync,
   // release tip 3e801dc925): the release's Crucible raid catalog out-scores
   // every Masterwrought apex piece on the boost scorer, so the flagged-pick
   // counts these two pins measure moved the same way the dev-bis pins did
   // (tests/dev_bis_gear.test.ts, the same escalation block). Kept
-  // byte-identical and marked it.fails per the packet rule (a finding that
-  // contradicts a ratified row is an escalation, never a re-tune); the ruling
-  // is Phase 19 decision table rows 12 and 13 (state.md, the eighth-sync
-  // AMENDED block). Flip both back to it() in the SAME commit that executes
-  // the ruling.
+  // byte-identical and marked it.fails because the inherited catalog now
+  // contradicts the pinned power-placement premise. The unresolved choice is
+  // to re-measure the cap against the merged catalog or restore the intended
+  // apex ceiling. Flip both back to it() in the SAME commit that resolves it.
   it.fails('every role kit of every class carries at most the cap in flagged pieces', () => {
     let kitsAtCap = 0;
     for (const cls of Object.keys(CLASS_ROLES) as PlayerClass[]) {

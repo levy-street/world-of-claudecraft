@@ -27,9 +27,9 @@ import { baseMaterialFor, MATERIAL_GRADES } from '../src/sim/professions/materia
 //
 // HISTORY, so the shape is not relearned: through the growth-engine phase
 // this was an enumerated CONSUMER_DEFERRED_MATERIALS list whose self-clearing
-// arm demanded an entry leave when its recipe consumer landed. The knobs
-// phase REPLACED it (state.md deviation (w)): the consumers that actually
-// closed the loop are commands, which that arm could never see, and compost
+// arm demanded an entry leave when its recipe consumer landed. That check was
+// replaced because the consumers that actually closed the loop are commands,
+// which the old arm could never see, and compost
 // and the tonic will never have a recipe consumer at all, so keeping them
 // "deferred" would have been a permanent lie. The anti-abuse gate the old
 // exact pin provided did not go away, it moved to the content layer: this

@@ -1,5 +1,4 @@
-// Masterwrought Phase 11o (qr-11o-ENG, farming/state.md row 119): the
-// engineering on-ramp acceptance.
+// Masterwrought engineering on-ramp acceptance.
 //
 // The measured fault: engineering had nothing craftable below skillReq 75
 // beyond the two mid hoe rungs, its cheapest recipe tier sat above the

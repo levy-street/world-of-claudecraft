@@ -1,5 +1,4 @@
-// Masterwrought Phase 11o (qr-11o-WEAR, farming/state.md row 118): the crafted
-// mid-band wearability windows and the level-20 shelf.
+// Masterwrought crafted mid-band wearability windows and the level-20 shelf.
 //
 // The measured fault: rare-and-above quality derives requiredLevel from item
 // SOURCE level (src/sim/item_level_req.ts), a crafted item's source level IS

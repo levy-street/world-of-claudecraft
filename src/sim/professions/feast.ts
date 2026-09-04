@@ -365,8 +365,8 @@ export function placeFeastAction(
  *  at completion are the Phase 11 machinery (the gate SET mirrors the
  *  items.ts food arm; the ORDER follows plantCrop's family order, so a
  *  dead mid-cast player hears the dead line first here), zero draws
- *  (consume-slot chosen over instant-mint: it keeps one mint site and the
- *  classic eat ritual; the decision record lives in state.md). */
+ *  (consume-slot is deliberate: it keeps one mint site and preserves the
+ *  classic eat ritual). */
 export function consumeFeastAction(
   ctx: SimContext,
   p: Entity,

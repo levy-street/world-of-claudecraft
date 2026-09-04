@@ -948,8 +948,8 @@ describe('the professions blob growth bound (phase 16)', () => {
     //
     // AND AGAIN AT masterwrought Phase 11m: 17,120 bytes, upper edge 17,112
     // to 17,121, floor 16,721 to 16,740. The delta is +19 and it is the
-    // townFocus record, not knownRecipes for once: 11m mapped horn and gills
-    // (state.md row 11m-ORPHAN), which appends two keys to
+    // townFocus record, not knownRecipes for once: mapping horn to
+    // curved_tusk and gills to mudfin_scale appends two keys to
     // HARVEST_COMPONENT_ITEMS and so two rows to the fixture's full-budget
     // focus allocation, `,"horn":1` (9 bytes) and `,"gills":1` (10 bytes):
     // predicted 17,101 + 19 = 17,120 and measured so (the same temporary

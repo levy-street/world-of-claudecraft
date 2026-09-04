@@ -98,9 +98,9 @@ describe('the R5 envelope harness', () => {
   // Every literal here is an input of the RATIFIED R5 record (sections 3, 8.1
   // and 9.6; the four maintainer rulings of 2026-08-29), which the packet may
   // not rewrite: the test is kept exactly as authored and marked expected-fail
-  // so the contradiction stays visible in every run. ESCALATED (state.md, the
-  // Phase 19 table: re-measure R5 on the merged world, or ratify the record as
-  // a measurement of the pre-raid catalog). Flip back to it() in the SAME
+  // so the contradiction stays visible in every run. The unresolved choice is
+  // to re-measure R5 on the merged world or keep it as a measurement of the
+  // pre-raid catalog. Flip back to it() in the SAME
   // commit that executes the ruling.
   it.fails('pins the escalation mechanism: dead hit on the base arm, live crit on the equipped arm', () => {
     // Section 9.6's escalation driver, as assertions (the Phase 15 QA; the

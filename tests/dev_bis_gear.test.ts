@@ -136,23 +136,11 @@ describe('dev bis gear: Masterwrought cap (phase 08)', () => {
   // tip 3e801dc925, the Ignivar raid span), RE-DERIVED AND FLIPPED BACK TO it()
   // 2026-09-01 under masterwrought ruling qr-19-apex-tier-vs-crucible-placement.
   // The ruling ACCEPTS the raid tier above the apex tier and amends the packet's
-  // power-placement PROSE rather than re-tiering any def, so the contradiction
-  // below is no longer a contradiction: it is the placement, and these arms now
-  // pin the merged truth instead of the pre-merge expectation. Nothing about the
-  // measurement changed, only its status. What the arms said before: the release's Crucible raid catalog (the Phase B set pieces and the
-  // Thronebane-band legendaries) out-scores every Masterwrought apex piece on
-  // bestEpicGearFor's raw-stat score(), so on the merged tree NO class's dev-bis
-  // loadout carries a flagged piece (all nine classes measure [] while the
-  // flagged family is still 17). That is a power-placement contradiction with
-  // the packet's ratified premise (apex = the purple ceiling; state.md "Power
-  // placement" and the Phase 15 R5 record), and the packet rule is that a
-  // finding which contradicts a ratified row is an ESCALATION, never a re-tune:
-  // the assertions are kept exactly as authored and marked it.fails so the
-  // contradiction stays visible in every run instead of being re-pinned to the
-  // release's truth. Flip both back to it() in the SAME commit that executes the
-  // maintainer's ruling (re-tier the apex pieces above the Crucible tier, or
-  // amend the power placement and re-derive these pins; Phase 19 decision
-  // table). Consumers that re-geared silently with the pool: the friendly
+  // power-placement PROSE rather than re-tiering any def. The Crucible catalog
+  // therefore out-scores every Masterwrought apex piece under bestEpicGearFor,
+  // and each dev-bis loadout currently carries zero flagged pieces. These
+  // assertions pin that merged catalog while separately enforcing the two-piece
+  // Masterwrought cap. Consumers that re-geared with the same pool: the friendly
   // practice dummy's reference vitals (src/sim/mob/practice_dummies.ts), the
   // server PBE boost kit, scripts/druid_balance_probe.ts and its harness, and
   // tests/rogue_dps_balance.test.ts (whose identity pins were re-anchored to

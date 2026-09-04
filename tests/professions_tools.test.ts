@@ -812,9 +812,9 @@ describe('crafted higher-tier base tools and monster-material gating (#1135)', (
       // Marks stock (content/heroic_vendor.ts) rather than a drop, so any
       // engineer can learn it on a fixed price. The rod itself also stays
       // market-listable by R18, which is the non-engineer's route. Adding a
-      // tier-6 apex tool to a delve counter would be a delve pricing and tier
-      // decision this phase has no ruling for; the absence is pinned here
-      // rather than assumed, and flagged for the maintainer in state.md.
+      // tier-6 apex tool to a delve counter would require a separate delve
+      // pricing and tier decision; the absence is pinned here rather than
+      // assumed.
       if (id === 'clockreel_fishing_rod') {
         expect(delveStocked.has(id)).toBe(false);
         // The deterministic route the exception rests on, asserted rather than

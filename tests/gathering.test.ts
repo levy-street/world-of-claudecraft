@@ -116,9 +116,9 @@ describe('isHarvestableCorpse', () => {
   it('reads the real yield table, so a family gaining an item retires the case', () => {
     // Both sides literal, the tests/corpse_harvest_sim.test.ts idiom: deriving
     // the unmapped list from HARVEST_COMPONENT_ITEMS alone would pass against
-    // any table, including an empty one. Ten rows since Phase 11m mapped horn
-    // and gills (state.md row 11m-ORPHAN), the last two families shipped
-    // content tagged without an item behind them.
+    // any table, including an empty one. Ten rows now include horn ->
+    // curved_tusk and gills -> mudfin_scale, the last two families that
+    // shipped content tagged without an item behind them.
     expect(Object.keys(HARVEST_COMPONENT_ITEMS).sort()).toEqual([
       'claw',
       'cloth',

@@ -23,8 +23,8 @@ import { WORLD_SEED } from '../src/sim/world_seed';
 // The four farmers and the patch each one keeps, as LITERALS: the flag walk
 // below proves the set is exactly these four, so a fifth farmer (or a
 // re-homed one) reds here and re-decides its patch deliberately.
-// The four seats as authored (state.md's Phase 9 head block; Jessica
-// re-seated at the release/v0.41.0 merge, when the rebuilt wolf runs overran
+// The four shipped seats as authored. Jessica was re-seated at the
+// release/v0.41.0 merge, when the rebuilt wolf runs overran
 // the north-lane site): a re-seat is a deliberate content edit that also
 // moves the terrain atlas, the Eastbrook chunk digest, the map plates and
 // every golden (deviation (bh)), so it must red HERE first, by literal, not

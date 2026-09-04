@@ -314,8 +314,8 @@ describe('the fan-out measurement premises (batch size x session count)', () => 
     // this constant (see the derivation in this file's header), so a retune
     // moves the recorded rate and must re-open the record here first.
     expect(GATHER_RARE_EVENT_CHANCE).toBe(1 / 90);
-    // Both harvest paths draw on the SAME constant (state.md D12: never a
-    // farming copy of it), which is why the realm rate is the node term PLUS
+    // Both harvest paths deliberately draw on the SAME constant rather than a
+    // farming-specific copy, which is why the realm rate is the node term PLUS
     // an unpriced farming term rather than the node term alone. Read as source
     // text: a second constant, or a caller that stops sharing this one, is
     // exactly the change that would invalidate the derivation.

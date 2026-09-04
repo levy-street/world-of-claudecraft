@@ -8,12 +8,11 @@
 // is a real entry point (talkToNpc, buyItem, plantCrop, the tick sweep,
 // harvestCrop, talkToNpc again), never a hand-set quest state.
 //
-// LAYER HONESTY (Phase 9 QA, state.md deviation (bn)): the entry points here
-// are the SIM's. plantCrop and harvestCrop have no client-side caller yet
-// (no bed interaction, no plant sheet, no /dev plant), so this suite proves
-// the sim half of the journey and cannot see whether a player can reach it;
-// the client verb and its browser test are the (bn) follow-up, and until
-// they land the phase's "reachable by ordinary players" note is unmet.
+// LAYER COVERAGE: this suite intentionally drives the sim entry points.
+// Ordinary-player reachability is covered separately: nearby_interaction
+// opens the plant sheet for a free bed and dispatches harvest for a planted
+// bed, while farming_plant_sheet_window proves the Plant control calls
+// world.plantCrop. Together those tests cover the client-to-sim journey.
 import { describe, expect, it } from 'vitest';
 import { FARM_CROPS, type FarmCropDef } from '../src/sim/content/farm_crops';
 import { farmBedById } from '../src/sim/content/farm_patches';
@@ -225,8 +224,8 @@ describe('the go-live journey: q_farm_intro at Farmer Jessica, end to end', () =
   });
 
   it('the magic sentence and the journal pointer live in BOTH the greeting and the completion text', () => {
-    // D20 (state.md): Jessica's dialog states the anti-chore promise, and the
-    // Phase 8 (be) carry says both surfaces point at the Harvest Journal so a
+    // Jessica's dialog states the anti-chore promise, and both surfaces point
+    // at the Harvest Journal so a
     // pre-attunement farmer finds the timer surface without a keyboard.
     expect(NPCS[GIVER_ID].greeting).toContain(MAGIC_SENTENCE);
     expect(NPCS[GIVER_ID].greeting).toContain(JOURNAL_POINTER);

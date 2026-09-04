@@ -76,8 +76,8 @@ function questDropRate(
 
 describe('the dedicated harvest-material map (pinned)', () => {
   it('every component tag maps to its dedicated material; fang stays wolf_fang', () => {
-    // horn and gills (Masterwrought Phase 11m, state.md row 11m-ORPHAN)
-    // reuse SHIPPED ids rather than minting new ones: horn is the same hard
+    // horn and gills reuse SHIPPED ids rather than minting new ones: horn is
+    // the same hard
     // keratin as tusk and feeds curved_tusk, the thinnest mapped family in
     // the 11m census; gills feeds mudfin_scale, the trophy 11l promoted out
     // of quality 'poor'. One item serving two families is deliberate.

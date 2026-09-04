@@ -292,8 +292,7 @@ describe('plant sheet window: selection and knobs', () => {
   });
 
   it('the seed radios are ONE roving tab stop: arrows move the pick and focus, Home/End jump', () => {
-    // APG roving tabindex over the radiogroup (the Phase 18 sweep closed the
-    // recorded farming/state.md follow-up): only the checked seed is in the
+    // APG roving tabindex over the radiogroup: only the checked seed is in the
     // Tab order, arrows move the pick and the focus together (the repaint
     // carries focus by the seed's key), Home/End jump, the ends wrap, and a
     // key the roving core does not own falls through untouched.
