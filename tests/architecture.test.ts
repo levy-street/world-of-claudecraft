@@ -573,6 +573,7 @@ const RENDER_PURE_CORES = [
   'src/render/nythraxis_grave_core.ts',
   'src/render/nythraxis_gravefire_core.ts',
   'src/render/nythraxis_sigil_core.ts',
+  'src/render/nythraxis_soft_fire_core.ts',
   'src/render/roof_darkness_core.ts',
   'src/render/varkhul_assembly_focus_core.ts',
   'src/render/delve_interior_cache_core.ts',

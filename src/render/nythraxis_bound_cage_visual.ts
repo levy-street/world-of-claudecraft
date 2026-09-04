@@ -16,7 +16,7 @@ import {
   nythraxisCageScaleFor,
   nythraxisCageSunk,
 } from './nythraxis_bound_cage_core';
-import { nythraxisPropAsset } from './nythraxis_fire_assets';
+import { nythraxisPropAsset } from './nythraxis_prop_assets';
 
 export const NYTHRAXIS_CAGE_VISUAL_NAME = 'nythraxis-bound-cage';
 export const NYTHRAXIS_CAGE_FALLBACK_NAME = 'nythraxis-bound-cage-bars';

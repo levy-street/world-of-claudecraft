@@ -19,11 +19,11 @@ import {
   NYTHRAXIS_CAGE_VISUAL_NAME,
   NythraxisBoundCageVisuals,
 } from '../src/render/nythraxis_bound_cage_visual';
-import {
-  nythraxisFireAssetInternalsForTest,
-  nythraxisPropAsset,
-} from '../src/render/nythraxis_fire_assets';
 import { buildNythraxisGravePrewarmVisual } from '../src/render/nythraxis_grave_flame_visual';
+import {
+  nythraxisPropAsset,
+  nythraxisPropAssetInternalsForTest,
+} from '../src/render/nythraxis_prop_assets';
 import { NYTHRAXIS_BOUND_STUN_AURA_ID } from '../src/sim/nythraxis_binding_sigil';
 import { NYTHRAXIS_BOSS_ID } from '../src/sim/types';
 
@@ -55,7 +55,7 @@ function world(...entities: NythraxisCageBossLike[]): {
 }
 
 afterEach(() => {
-  nythraxisFireAssetInternalsForTest.reset();
+  nythraxisPropAssetInternalsForTest.reset();
 });
 
 describe('nythraxis bound cage core', () => {
@@ -111,7 +111,7 @@ describe('nythraxis bound cage visual', () => {
     );
     source.add(bars);
     source.updateMatrixWorld(true);
-    nythraxisFireAssetInternalsForTest.installSource('cage', source);
+    nythraxisPropAssetInternalsForTest.installSource('cage', source);
     const asset = nythraxisPropAsset('cage');
     if (!asset) throw new Error('cage should be prepared');
     const built = buildNythraxisBoundCage({ scale: 3.1 });

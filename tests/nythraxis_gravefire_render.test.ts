@@ -2,39 +2,40 @@ import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import { abilityVfxFullSpecFor } from '../src/render/ability_vfx/encounter_specs';
+import { getFlameTex } from '../src/render/ignivar_fire_vfx';
 import { INTERIOR_ENCOUNTER_PREWARM } from '../src/render/interior_encounter_prewarm';
-import { NYTHRAXIS_FLAME_TONGUE_GEOMETRY } from '../src/render/nythraxis_flame_tongue';
 import {
   buildNythraxisGravePrewarmVisual,
   NYTHRAXIS_GRAVE_PREWARM_NAME,
 } from '../src/render/nythraxis_grave_flame_visual';
 import {
   NYTHRAXIS_GRAVEFIRE_EDGE_WIDTH,
+  NYTHRAXIS_GRAVEFIRE_GROUND_LIFT,
   NYTHRAXIS_GRAVEFIRE_HEAD_CAP_YARDS,
   NYTHRAXIS_GRAVEFIRE_HEAD_TONGUE_BOOST,
   NYTHRAXIS_GRAVEFIRE_LAYER_OPACITY,
   NYTHRAXIS_GRAVEFIRE_PALETTE,
-  NYTHRAXIS_GRAVEFIRE_TONGUE_UPDATE_SECONDS,
-  NYTHRAXIS_GRAVEFIRE_TONGUES_PER_YARD,
   type NythraxisGravefirePlan,
-  type NythraxisGravefireTonguePose,
   nythraxisGravefirePlanInto,
   nythraxisGravefirePulseInto,
-  nythraxisGravefireTongueCount,
-  nythraxisGravefireTonguePoseInto,
 } from '../src/render/nythraxis_gravefire_core';
 import {
   buildNythraxisGravefireStrip,
+  NYTHRAXIS_GRAVEFIRE_FIRE_NAME,
   NYTHRAXIS_GRAVEFIRE_STRIP_NAME,
-  NYTHRAXIS_GRAVEFIRE_TONGUES_NAME,
   NYTHRAXIS_GRAVEFIRE_VISUAL_NAME,
   NythraxisGravefireVisuals,
   nythraxisGravefireVisualInternalsForTest,
 } from '../src/render/nythraxis_gravefire_visual';
+import type { NythraxisSoftFire } from '../src/render/nythraxis_soft_fire';
+import {
+  NYTHRAXIS_SOFT_FIRE_RAMPS,
+  nythraxisGravefireSpotInto,
+  nythraxisGravefireSpriteCount,
+} from '../src/render/nythraxis_soft_fire_core';
 import {
   type ActiveNythraxisGravefire,
   NYTHRAXIS_GRAVEFIRE_CAST_ID,
-  NYTHRAXIS_GRAVEFIRE_LENGTH,
 } from '../src/sim/nythraxis_gravefire';
 import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 
@@ -63,8 +64,28 @@ function stripOf(
   >;
 }
 
-function tonguesOf(root: THREE.Object3D): THREE.InstancedMesh {
-  return root.getObjectByName(NYTHRAXIS_GRAVEFIRE_TONGUES_NAME) as THREE.InstancedMesh;
+function fireMeshOf(
+  root: THREE.Object3D,
+): THREE.Mesh<THREE.InstancedBufferGeometry, THREE.ShaderMaterial> {
+  return root.getObjectByName(NYTHRAXIS_GRAVEFIRE_FIRE_NAME) as THREE.Mesh<
+    THREE.InstancedBufferGeometry,
+    THREE.ShaderMaterial
+  >;
+}
+
+function fireOf(root: THREE.Object3D): NythraxisSoftFire {
+  return root.userData.fire as NythraxisSoftFire;
+}
+
+/** Sprites whose fixed spot lies inside the lit window, straight from the core. */
+function litSpriteCount(row: ActiveNythraxisGravefire): number {
+  const spot = { along: 0, across: 0 };
+  let lit = 0;
+  for (let index = 0; index < nythraxisGravefireSpriteCount(); index++) {
+    nythraxisGravefireSpotInto(spot, index, row.halfWidth);
+    if (spot.along >= row.tail && spot.along <= row.head) lit++;
+  }
+  return lit;
 }
 
 function planOf(row: ActiveNythraxisGravefire): NythraxisGravefirePlan {
@@ -83,16 +104,6 @@ function planOf(row: ActiveNythraxisGravefire): NythraxisGravefirePlan {
     row,
   );
 }
-
-const freshPose = (): NythraxisGravefireTonguePose => ({
-  along: 0,
-  across: 0,
-  y: 0,
-  height: 0,
-  width: 0,
-  yaw: 0,
-  visible: false,
-});
 
 describe('Nythraxis Gravefire rendering', () => {
   it('dresses the actionable footprint as an ember bed with legible edges, never a flat stripe', () => {
@@ -149,40 +160,50 @@ describe('Nythraxis Gravefire rendering', () => {
     );
   });
 
-  it('carries a fixed budget of instanced flame tongues on the shared tongue geometry', () => {
-    const root = buildNythraxisGravefireStrip(LINE, () => 0);
-    const tongues = tonguesOf(root);
-    expect(tongues).toBeInstanceOf(THREE.InstancedMesh);
-    expect(tongues.count).toBe(nythraxisGravefireTongueCount());
-    expect(nythraxisGravefireTongueCount()).toBe(
-      NYTHRAXIS_GRAVEFIRE_TONGUES_PER_YARD * NYTHRAXIS_GRAVEFIRE_LENGTH,
+  it('burns a violet soft fire over the strip: one sprite draw, windowed to the lit yards', () => {
+    const root = buildNythraxisGravefireStrip(LINE, () => 3);
+    const mesh = fireMeshOf(root);
+    const fire = fireOf(root);
+    expect(mesh).toBeInstanceOf(THREE.Mesh);
+    expect(mesh).toBe(fire.mesh);
+    expect(mesh.geometry.instanceCount).toBe(nythraxisGravefireSpriteCount());
+    expect(mesh.material.blending).toBe(THREE.AdditiveBlending);
+    expect(mesh.material.depthWrite).toBe(false);
+    expect(mesh.renderOrder).toBeGreaterThan(stripOf(root).renderOrder);
+    expect((mesh.material.uniforms.uBody.value as THREE.Color).getHex()).toBe(
+      NYTHRAXIS_SOFT_FIRE_RAMPS.gravefire.body,
     );
-    expect(NYTHRAXIS_GRAVEFIRE_TONGUES_PER_YARD).toBe(3);
-    expect(tongues.geometry).toBe(NYTHRAXIS_FLAME_TONGUE_GEOMETRY);
-    const material = tongues.material as THREE.MeshBasicMaterial;
-    expect(material.color.getHex()).toBe(NYTHRAXIS_GRAVEFIRE_PALETTE.tongue);
-    expect(material.blending).toBe(THREE.AdditiveBlending);
-    expect(material.depthWrite).toBe(false);
-    // Only the tongues inside the lit window are posed; the rest are scaled away.
-    const matrix = new THREE.Matrix4();
-    const position = new THREE.Vector3();
-    const scale = new THREE.Vector3();
-    let visible = 0;
-    for (let index = 0; index < tongues.count; index++) {
-      tongues.getMatrixAt(index, matrix);
-      position.setFromMatrixPosition(matrix);
-      scale.setFromMatrixScale(matrix);
-      if (scale.y === 0) continue;
-      visible++;
-      expect(position.x).toBeGreaterThanOrEqual(LINE.x + LINE.tail);
-      expect(position.x).toBeLessThanOrEqual(LINE.x + LINE.head);
-      expect(Math.abs(position.z - LINE.z)).toBeLessThanOrEqual(LINE.halfWidth);
-      expect(position.y).toBeGreaterThan(0);
+    expect(mesh.material.uniforms.uOpacity.value).toBe(NYTHRAXIS_GRAVEFIRE_LAYER_OPACITY.tongue);
+    // The lit window and the head cap ride two uniforms, not a re-upload.
+    const plan = planOf(LINE);
+    expect(mesh.material.uniforms.uTail.value).toBe(plan.tail);
+    expect(mesh.material.uniforms.uHead.value).toBe(plan.head);
+    expect(mesh.material.uniforms.uHeadCapTail.value).toBe(plan.headCapTail);
+    expect(mesh.material.uniforms.uHeadBoost.value).toBe(NYTHRAXIS_GRAVEFIRE_HEAD_TONGUE_BOOST);
+    // Only the sprites the window reaches are placed, on the ground, inside the footprint.
+    const spots = mesh.geometry.getAttribute('iSpot');
+    const placed = (root.userData.visual as { spotPlaced: Uint8Array }).spotPlaced;
+    let placedCount = 0;
+    for (let index = 0; index < fire.count; index++) {
+      if (placed[index] === 0) continue;
+      placedCount++;
+      const along = fire.spotAlong(index);
+      expect(along).toBeGreaterThanOrEqual(LINE.tail);
+      expect(along).toBeLessThanOrEqual(LINE.head);
+      expect(spots.getX(index)).toBeCloseTo(LINE.x + along, 5);
+      expect(Math.abs(spots.getZ(index) - LINE.z)).toBeLessThanOrEqual(LINE.halfWidth);
+      expect(spots.getY(index)).toBeCloseTo(3 + NYTHRAXIS_GRAVEFIRE_GROUND_LIFT, 5);
     }
-    expect(visible).toBe((LINE.head - LINE.tail) * NYTHRAXIS_GRAVEFIRE_TONGUES_PER_YARD);
+    expect(placedCount).toBe(litSpriteCount(LINE));
+    expect(placedCount).toBeGreaterThan(0);
+    expect(placedCount).toBeLessThan(fire.count);
+    // The fire's cull bound covers the strip plus the sprites' rise.
+    const stripSphere = stripOf(root).geometry.boundingSphere as THREE.Sphere;
+    expect(mesh.geometry.boundingSphere?.center.equals(stripSphere.center)).toBe(true);
+    expect(mesh.geometry.boundingSphere?.radius).toBeGreaterThan(stripSphere.radius);
   });
 
-  it('keeps one preallocated geometry and rewrites the moving window in place, tongues following', () => {
+  it('keeps one preallocated geometry and rewrites the moving window in place, fire following', () => {
     const scene = new THREE.Scene();
     const visuals = new NythraxisGravefireVisuals(scene, () => 0);
     visuals.sync([LINE]);
@@ -200,10 +221,12 @@ describe('Nythraxis Gravefire rendering', () => {
     expect(positions.getX(glowEnd)).toBeCloseTo(18, 5);
     expect(positions.getX(headStart)).toBeCloseTo(16, 5);
     expect(positions.getX(headEnd)).toBeCloseTo(18, 5);
-    const tongues = tonguesOf(root);
-    const before = tongues.instanceMatrix.array.slice();
+    const mesh = fireMeshOf(root);
+    const placed = (root.userData.visual as { spotPlaced: Uint8Array }).spotPlaced;
+    const placedBefore = placed.reduce((sum, flag) => sum + flag, 0);
 
-    visuals.sync([{ ...LINE, tail: 3, head: 10, remaining: 4.8 }]);
+    const moved = { ...LINE, tail: 3, head: 10, remaining: 4.8 };
+    visuals.sync([moved]);
 
     expect(scene.children[0]).toBe(root);
     expect(strip.geometry).toBe(geometry);
@@ -212,8 +235,18 @@ describe('Nythraxis Gravefire rendering', () => {
     expect(positions.getX(glowStart + 6 * 4 + 2)).toBeCloseTo(20, 5);
     expect(positions.getX(headStart)).toBeCloseTo(18, 5);
     expect(positions.getX(headEnd)).toBeCloseTo(20, 5);
-    // The fire moved with the window in the same sync, not a frame later.
-    expect(tongues.instanceMatrix.array).not.toEqual(before);
+    // The fire moved with the window in the same sync, not a frame later: the
+    // window uniforms follow and the newly lit yards' sprites are placed, while
+    // the sprites already placed keep their spot (a spot never moves).
+    expect(fireMeshOf(root)).toBe(mesh);
+    expect(mesh.material.uniforms.uTail.value).toBe(3);
+    expect(mesh.material.uniforms.uHead.value).toBe(10);
+    const placedAfter = placed.reduce((sum, flag) => sum + flag, 0);
+    expect(placedAfter).toBeGreaterThan(placedBefore);
+    expect(placedAfter).toBe(
+      litSpriteCount(moved) +
+        (litSpriteCount(LINE) - litSpriteCount({ ...LINE, tail: 3, head: 8 })),
+    );
   });
 
   it('caches one-yard ground samples until the head reaches a new yard', () => {
@@ -231,59 +264,59 @@ describe('Nythraxis Gravefire rendering', () => {
     expect(groundY).toHaveBeenCalledTimes(initialCalls + 1);
   });
 
-  it('syncs rows by id and disposes each row, sparing the shared tongue geometry', () => {
+  it('syncs rows by id and disposes each row, sparing the shared flame atlas', () => {
     const scene = new THREE.Scene();
     const visuals = new NythraxisGravefireVisuals(scene, () => 0);
     visuals.syncWorld({ activeNythraxisGravefires: [LINE, { ...LINE, id: '42:gfl:4' }] });
     expect(scene.children).toHaveLength(2);
     const first = scene.children.find((child) => child.userData.gravefireId === LINE.id);
     const strip = stripOf(first as THREE.Object3D);
-    const tongues = tonguesOf(first as THREE.Object3D);
+    const fire = fireOf(first as THREE.Object3D);
     const geometryDispose = vi.spyOn(strip.geometry, 'dispose');
     const materialDisposes = strip.material.map((material) => vi.spyOn(material, 'dispose'));
-    const tongueDispose = vi.spyOn(tongues, 'dispose');
-    const tongueMaterialDispose = vi.spyOn(tongues.material as THREE.Material, 'dispose');
-    const sharedGeometryDispose = vi.spyOn(NYTHRAXIS_FLAME_TONGUE_GEOMETRY, 'dispose');
+    const fireGeometryDispose = vi.spyOn(fire.geometry, 'dispose');
+    const fireMaterialDispose = vi.spyOn(fire.material, 'dispose');
+    const atlasDispose = vi.spyOn(getFlameTex(), 'dispose');
 
     visuals.syncWorld({ activeNythraxisGravefires: [{ ...LINE, id: '42:gfl:4' }] });
 
     expect(scene.children).toHaveLength(1);
     expect(geometryDispose).toHaveBeenCalledOnce();
     for (const dispose of materialDisposes) expect(dispose).toHaveBeenCalledOnce();
-    expect(tongueDispose).toHaveBeenCalledOnce();
-    expect(tongueMaterialDispose).toHaveBeenCalledOnce();
-    expect(sharedGeometryDispose).not.toHaveBeenCalled();
+    expect(fireGeometryDispose).toHaveBeenCalledOnce();
+    expect(fireMaterialDispose).toHaveBeenCalledOnce();
+    expect(atlasDispose).not.toHaveBeenCalled();
     visuals.dispose();
     expect(scene.children).toHaveLength(0);
-    expect(sharedGeometryDispose).not.toHaveBeenCalled();
+    expect(atlasDispose).not.toHaveBeenCalled();
   });
 
-  it('flickers the tongues at 20 Hz and holds them still under reduced motion', () => {
+  it('runs the fire clock every frame and holds it under reduced motion, edges legible', () => {
     const scene = new THREE.Scene();
     const visuals = new NythraxisGravefireVisuals(scene, () => 0);
     visuals.sync([LINE]);
     const root = scene.children[0];
-    const tongues = tonguesOf(root);
+    const mesh = fireMeshOf(root);
     const edge = stripOf(root).material[nythraxisGravefireVisualInternalsForTest.edgeMaterial];
-    const start = tongues.instanceMatrix.array.slice();
-    // Under the re-pose cadence nothing moves yet; past it the fire flickers.
-    visuals.update(NYTHRAXIS_GRAVEFIRE_TONGUE_UPDATE_SECONDS / 2, false);
-    expect(tongues.instanceMatrix.array).toEqual(start);
-    visuals.update(NYTHRAXIS_GRAVEFIRE_TONGUE_UPDATE_SECONDS, false);
-    expect(tongues.instanceMatrix.array).not.toEqual(start);
-    // Reduced motion: the pulse and the tongues settle and stay put, edges legible.
+    expect(mesh.material.uniforms.uTime.value).toBe(0);
+    visuals.update(0.25, false);
+    expect(mesh.material.uniforms.uTime.value).toBeCloseTo(0.25, 9);
+    visuals.update(0.25, false);
+    expect(mesh.material.uniforms.uTime.value).toBeCloseTo(0.5, 9);
+    // Reduced motion: the pulse settles and the fire clock holds, edges legible.
     visuals.update(0.5, true);
     const settledEdge = edge.opacity;
-    const settled = tongues.instanceMatrix.array.slice();
+    const heldTime = mesh.material.uniforms.uTime.value;
     visuals.update(0.5, true);
     expect(edge.opacity).toBe(settledEdge);
-    expect(tongues.instanceMatrix.array).toEqual(settled);
+    expect(mesh.material.uniforms.uTime.value).toBe(heldTime);
     expect(settledEdge).toBeGreaterThanOrEqual(0.9);
     visuals.update(0.5, false);
     expect(edge.opacity).toBeGreaterThanOrEqual(0.9);
+    expect(mesh.material.uniforms.uTime.value).toBeGreaterThan(heldTime);
   });
 
-  it('is driven by the shared renderer facade and staged at crypt attach with its tongues', () => {
+  it('is driven by the shared renderer facade and staged at crypt attach with its fire', () => {
     const renderer = readSource('../src/render/renderer.ts');
     expect(
       renderer.match(/this\.nythraxisMechanicVisuals\?\.syncWorld\(this\.sim\);/g),
@@ -299,7 +332,7 @@ describe('Nythraxis Gravefire rendering', () => {
     expect(prewarm.name).toBe(NYTHRAXIS_GRAVE_PREWARM_NAME);
     const line = prewarm.getObjectByName(NYTHRAXIS_GRAVEFIRE_VISUAL_NAME);
     expect(line).toBeDefined();
-    expect(line?.getObjectByName(NYTHRAXIS_GRAVEFIRE_TONGUES_NAME)).toBeDefined();
+    expect(line?.getObjectByName(NYTHRAXIS_GRAVEFIRE_FIRE_NAME)).toBeDefined();
   });
 });
 
@@ -326,52 +359,13 @@ describe('Nythraxis Gravefire core', () => {
       nythraxisGravefirePulseInto(pulse, phase, false);
       expect(pulse.edge).toBeGreaterThanOrEqual(0.9);
       expect(pulse.glow).toBeLessThanOrEqual(0.4);
+      expect(pulse.tongue).toBeGreaterThan(0.5);
     }
     expect(nythraxisGravefirePulseInto(pulse, 1.7, true).edge).toBeCloseTo(0.95, 5);
     expect(NYTHRAXIS_GRAVEFIRE_LAYER_OPACITY.edge).toBeGreaterThan(
       NYTHRAXIS_GRAVEFIRE_LAYER_OPACITY.underlay,
     );
-  });
-
-  it('poses every tongue inside its yard and the half-width, hiding the ones outside the window', () => {
-    const plan = planOf(LINE);
-    const pose = freshPose();
-    let visible = 0;
-    for (let index = 0; index < nythraxisGravefireTongueCount(); index++) {
-      nythraxisGravefireTonguePoseInto(pose, index, plan, 1.3, false, 0.45);
-      const yard = Math.floor(index / NYTHRAXIS_GRAVEFIRE_TONGUES_PER_YARD);
-      expect(pose.along).toBeGreaterThanOrEqual(yard);
-      expect(pose.along).toBeLessThan(yard + 1);
-      expect(Math.abs(pose.across)).toBeLessThanOrEqual(plan.halfWidth * 0.8);
-      expect(pose.visible).toBe(pose.along >= plan.tail && pose.along <= plan.head);
-      expect(pose.height).toBeGreaterThan(0);
-      expect(pose.width).toBeGreaterThan(0);
-      if (pose.visible) visible++;
-    }
-    expect(visible).toBe(6 * NYTHRAXIS_GRAVEFIRE_TONGUES_PER_YARD);
-  });
-
-  it('burns taller in the head cap, deterministically, and stands still under reduced motion', () => {
-    const plan = planOf(LINE);
-    // Yard 7 sits in the two-yard head cap; yard 3 does not: same index modulo,
-    // same flicker, so the only difference is the boost.
-    const capIndex = 7 * NYTHRAXIS_GRAVEFIRE_TONGUES_PER_YARD;
-    const bodyIndex = 3 * NYTHRAXIS_GRAVEFIRE_TONGUES_PER_YARD;
-    const cap = nythraxisGravefireTonguePoseInto(freshPose(), capIndex, plan, 0, true, 0.45);
-    const body = nythraxisGravefireTonguePoseInto(freshPose(), bodyIndex, plan, 0, true, 0.45);
-    expect(cap.height / body.height).toBeCloseTo(NYTHRAXIS_GRAVEFIRE_HEAD_TONGUE_BOOST, 6);
-    // Deterministic: the same index gives the same spot.
-    const again = nythraxisGravefireTonguePoseInto(freshPose(), capIndex, plan, 0, true, 0.45);
-    expect(again).toEqual(cap);
-    // Reduced motion: no phase dependence at all.
-    const later = nythraxisGravefireTonguePoseInto(freshPose(), capIndex, plan, 4.2, true, 0.45);
-    expect(later).toEqual(cap);
-    // Live: the flicker and the spin move with the phase, the spot does not.
-    const live0 = nythraxisGravefireTonguePoseInto(freshPose(), capIndex, plan, 0, false, 0.45);
-    const live1 = nythraxisGravefireTonguePoseInto(freshPose(), capIndex, plan, 1, false, 0.45);
-    expect(live1.along).toBe(live0.along);
-    expect(live1.across).toBe(live0.across);
-    expect(live1.yaw).not.toBe(live0.yaw);
+    expect(NYTHRAXIS_GRAVEFIRE_HEAD_TONGUE_BOOST).toBeGreaterThan(1);
   });
 
   it('registers Gravefire as a shadow beam and line cue', () => {

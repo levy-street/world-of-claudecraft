@@ -144,10 +144,6 @@ export function nythraxisGraveShardPoseInto(
 
 export const NYTHRAXIS_GRAVE_FLAME_GROUND_LIFT = 0.09;
 export const NYTHRAXIS_GRAVE_FLAME_RIM_INNER_FRACTION = 0.84;
-/** Flame tongues per patch, identical on every graphics tier. */
-export const NYTHRAXIS_GRAVE_FLAME_TONGUES = 16;
-/** Tongue re-pose cadence: 20 Hz stays visually continuous and bounds the CPU. */
-export const NYTHRAXIS_GRAVE_FLAME_TONGUE_UPDATE_SECONDS = 1 / 20;
 
 export interface NythraxisGraveFlamePlan {
   id: string;
@@ -193,37 +189,5 @@ export function nythraxisGraveFlamePulseInto(
   out.fill = 0.3 + wave * 0.08;
   out.ember = 0.26 + wave * 0.16;
   out.tongue = 0.48 + wave * 0.24;
-  return out;
-}
-
-export interface NythraxisGraveFlameTonguePose {
-  dx: number;
-  dz: number;
-  y: number;
-  width: number;
-  height: number;
-  yaw: number;
-}
-
-/** One flame tongue: the same golden-angle scatter as the shards (so the burst
- *  visibly becomes the fire), flickering in height on its own phase offset. */
-export function nythraxisGraveFlameTonguePoseInto(
-  out: NythraxisGraveFlameTonguePose,
-  index: number,
-  count: number,
-  radius: number,
-  phase: number,
-  reducedMotion: boolean,
-  geometryHalfHeight: number,
-): NythraxisGraveFlameTonguePose {
-  const angle = index * GOLDEN_ANGLE;
-  const spread = Math.sqrt((index + 0.5) / Math.max(1, count)) * radius * 0.88;
-  const flicker = reducedMotion ? 0.72 : 0.62 + 0.2 * Math.sin(phase * 7 + index * 1.73);
-  out.dx = Math.cos(angle) * spread;
-  out.dz = Math.sin(angle) * spread;
-  out.width = 0.5 + (index % 3) * 0.1;
-  out.height = (0.55 + ((index * 5) % 4) * 0.13) * flicker;
-  out.y = geometryHalfHeight * out.height;
-  out.yaw = angle + (reducedMotion ? 0 : phase * 0.4);
   return out;
 }

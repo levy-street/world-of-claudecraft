@@ -4,8 +4,10 @@
 // persistent danger patches, one per row, disposed the frame a row vanishes.
 // It has no graphics-tier input on purpose: standing in a patch is gameplay,
 // so Low and Ultra render identical actionable geometry (the same rule the
-// Forgestorm and cinder-fire painters follow). Pose and opacity math lives in
-// nythraxis_grave_core.ts.
+// Forgestorm and cinder-fire painters follow). The footprint is a fill, a rim
+// and an ember ring; over it burns a soft fire, a cloud of flame sprites
+// rising from fixed spots inside the circle (nythraxis_soft_fire.ts). Pose and
+// opacity math lives in nythraxis_grave_core.ts and nythraxis_soft_fire_core.ts.
 //
 // Prewarm: these palettes are reachable only inside the Nythraxis crypt, so
 // its programs warm at that interior's attach (interior_encounter_prewarm.ts,
@@ -20,56 +22,38 @@ import {
   NYTHRAXIS_GRAVE_ERUPTION_CAST_ID,
   NYTHRAXIS_GRAVE_ERUPTION_RADIUS,
 } from '../sim/nythraxis_grave_eruption';
-import { MageGroundFx, METEOR_FLAME_GEOMETRY_HALF_HEIGHT } from './mage_ground_fx';
+import { MageGroundFx } from './mage_ground_fx';
 import { buildNythraxisBoundCagePrewarmVisual } from './nythraxis_bound_cage_visual';
-import { NythraxisFireInstances, nythraxisPropAsset } from './nythraxis_fire_assets';
-import { NYTHRAXIS_FLAME_TONGUE_MAX_HEIGHT } from './nythraxis_flame_tongue';
 import {
   NYTHRAXIS_GRAVE_FLAME_RIM_INNER_FRACTION,
-  NYTHRAXIS_GRAVE_FLAME_TONGUE_UPDATE_SECONDS,
-  NYTHRAXIS_GRAVE_FLAME_TONGUES,
   type NythraxisGraveFlamePlan,
   type NythraxisGraveFlamePulse,
-  type NythraxisGraveFlameTonguePose,
   nythraxisFlamePalette,
   nythraxisGraveFlamePlanInto,
   nythraxisGraveFlamePulseInto,
-  nythraxisGraveFlameTonguePoseInto,
 } from './nythraxis_grave_core';
 import { buildNythraxisGravefirePrewarmVisual } from './nythraxis_gravefire_visual';
 import { buildNythraxisBindingSigilPrewarmVisual } from './nythraxis_sigil_visual';
+import { NythraxisSoftFire } from './nythraxis_soft_fire';
+import {
+  NYTHRAXIS_SOFT_FIRE_SHAPES,
+  type NythraxisSoftFireDiscSpot,
+  nythraxisGraveFlameSpriteCount,
+  nythraxisSoftFireDiscSpotInto,
+} from './nythraxis_soft_fire_core';
 
 export const NYTHRAXIS_GRAVE_FLAME_VISUAL_NAME = 'nythraxis-grave-flame';
 export const NYTHRAXIS_GRAVE_FLAME_FILL_NAME = 'nythraxis-grave-flame-fill';
 export const NYTHRAXIS_GRAVE_FLAME_RIM_NAME = 'nythraxis-grave-flame-rim';
 export const NYTHRAXIS_GRAVE_FLAME_EMBERS_NAME = 'nythraxis-grave-flame-embers';
-export const NYTHRAXIS_GRAVE_FLAME_TONGUES_NAME = 'nythraxis-grave-flame-tongues';
+export const NYTHRAXIS_GRAVE_FLAME_FIRE_NAME = 'nythraxis-grave-flame-fire';
 export const NYTHRAXIS_GRAVE_PREWARM_NAME = 'nythraxis-grave-prewarm';
 
 const SEGMENTS = 64;
 const EMBER_SEGMENTS = 48;
 const EMBER_SPIN = 0.35; // rad/s, the violet inner ring's lazy drift
-// Tongues are posed in the patch group's own space, so their bound sits on its origin.
-const TONGUE_BOUND_CENTER = new THREE.Vector3();
-
-/** Modelled plumes per patch: each is a whole flame, so fewer of them read as one blaze. */
-export const NYTHRAXIS_GRAVE_FLAME_MODELLED_TONGUES = 9;
-
-/** The fire for one patch: the kind's Tripo flame plume when loaded, else the procedural quad. */
-function newFlameFire(
-  kind: ActiveNythraxisGraveFlame['kind'],
-  tongueColor: number,
-): NythraxisFireInstances {
-  return new NythraxisFireInstances(
-    kind,
-    nythraxisPropAsset(kind)
-      ? NYTHRAXIS_GRAVE_FLAME_MODELLED_TONGUES
-      : NYTHRAXIS_GRAVE_FLAME_TONGUES,
-    { color: tongueColor, opacity: 0.6, unitHeight: NYTHRAXIS_FLAME_TONGUE_MAX_HEIGHT },
-    NYTHRAXIS_GRAVE_FLAME_TONGUES_NAME,
-    13,
-  );
-}
+const FIRE_BOUND_CENTER = new THREE.Vector3();
+const DISC_SPOT: NythraxisSoftFireDiscSpot = { dx: 0, dz: 0 };
 
 function graveMaterial(
   color: number,
@@ -92,11 +76,31 @@ interface GraveFlameVisual {
   rimMaterial: THREE.MeshBasicMaterial;
   emberMaterial: THREE.MeshBasicMaterial;
   embers: THREE.Mesh;
-  fire: NythraxisFireInstances;
-  kind: ActiveNythraxisGraveFlame['kind'];
+  fire: NythraxisSoftFire;
   radius: number;
   phase: number;
-  tongueElapsed: number;
+}
+
+/** The soft fire over one patch: every sprite seated at its fixed spot inside the circle. */
+function buildPatchFire(
+  kind: ActiveNythraxisGraveFlame['kind'],
+  radius: number,
+): NythraxisSoftFire {
+  const fire = new NythraxisSoftFire(
+    kind,
+    nythraxisGraveFlameSpriteCount(radius),
+    NYTHRAXIS_GRAVE_FLAME_FIRE_NAME,
+    13,
+  );
+  for (let index = 0; index < fire.count; index++) {
+    const spot = nythraxisSoftFireDiscSpotInto(DISC_SPOT, index, radius);
+    fire.setSpot(index, spot.dx, 0, spot.dz);
+  }
+  fire.commitSpots();
+  const shape = NYTHRAXIS_SOFT_FIRE_SHAPES[kind];
+  FIRE_BOUND_CENTER.set(0, shape.rise * 0.5, 0);
+  fire.setBoundingSphere(FIRE_BOUND_CENTER, radius + shape.rise + shape.spriteScale);
+  return fire;
 }
 
 /** One patch at the authored circle, positioned on the sampled ground. Every
@@ -156,9 +160,8 @@ export function buildNythraxisGraveFlamePatch(
   embers.renderOrder = 12;
   group.add(embers);
 
-  const fire = newFlameFire(row.kind, palette.tongue);
-  fire.setBoundingSphere(TONGUE_BOUND_CENTER, plan.radius + fire.unitHeight);
-  fire.addTo(group);
+  const fire = buildPatchFire(row.kind, plan.radius);
+  group.add(fire.mesh);
 
   group.userData.fillMaterial = fillMaterial;
   group.userData.rimMaterial = rimMaterial;
@@ -168,56 +171,9 @@ export function buildNythraxisGraveFlamePatch(
   return group;
 }
 
-function poseTongues(
-  visual: GraveFlameVisual,
-  dummy: THREE.Object3D,
-  scratch: NythraxisGraveFlameTonguePose,
-  reducedMotion: boolean,
-): void {
-  const { fire } = visual;
-  // The modelled cluster stands with its foot at y 0; the procedural quad is centred.
-  const halfHeight = fire.usesAsset ? 0 : METEOR_FLAME_GEOMETRY_HALF_HEIGHT;
-  for (let index = 0; index < fire.count; index++) {
-    const pose = nythraxisGraveFlameTonguePoseInto(
-      scratch,
-      index,
-      fire.count,
-      visual.radius,
-      visual.phase,
-      reducedMotion,
-      halfHeight,
-    );
-    dummy.position.set(pose.dx, pose.y, pose.dz);
-    dummy.rotation.set(0, pose.yaw, 0);
-    // The modelled plume keeps its authored proportions; the quad takes its own width.
-    if (fire.usesAsset) dummy.scale.setScalar(pose.height);
-    else dummy.scale.set(pose.width, pose.height, pose.width);
-    dummy.updateMatrix();
-    fire.setMatrixAt(index, dummy.matrix);
-  }
-  fire.commit();
-  fire.setBoundingSphere(TONGUE_BOUND_CENTER, visual.radius + fire.unitHeight);
-}
-
-/** Once the kind's model has loaded, a patch still drawing the procedural quad swaps over. */
-function upgradeFire(
-  visual: GraveFlameVisual,
-  dummy: THREE.Object3D,
-  scratch: NythraxisGraveFlameTonguePose,
-): void {
-  if (visual.fire.usesAsset || !nythraxisPropAsset(visual.kind)) return;
-  visual.fire.dispose();
-  visual.fire = newFlameFire(visual.kind, nythraxisFlamePalette(visual.kind).tongue);
-  visual.fire.addTo(visual.group);
-  visual.group.userData.fire = visual.fire;
-  poseTongues(visual, dummy, scratch, true);
-}
-
 function disposeVisual(visual: GraveFlameVisual): void {
-  // The tongue geometry (procedural quad or prepared model) is shared, never
-  // disposed per patch: the fire helper drops its own buffers and materials.
   for (const child of visual.group.children) {
-    if ((child as THREE.InstancedMesh).isInstancedMesh) continue;
+    if (child === visual.fire.mesh) continue;
     const mesh = child as THREE.Mesh;
     if (mesh.isMesh) mesh.geometry.dispose();
   }
@@ -232,16 +188,7 @@ export class NythraxisGraveFlameVisuals {
   private readonly visuals = new Map<string, GraveFlameVisual>();
   private readonly activeIds = new Set<string>();
   // Per-frame scratch: the sync and update paths allocate nothing.
-  private readonly dummy = new THREE.Object3D();
   private readonly pulse: NythraxisGraveFlamePulse = { rim: 0, fill: 0, ember: 0, tongue: 0 };
-  private readonly tonguePose: NythraxisGraveFlameTonguePose = {
-    dx: 0,
-    dz: 0,
-    y: 0,
-    width: 1,
-    height: 1,
-    yaw: 0,
-  };
 
   constructor(
     private readonly scene: THREE.Scene,
@@ -255,11 +202,7 @@ export class NythraxisGraveFlameVisuals {
     this.activeIds.clear();
     for (const row of rows) {
       this.activeIds.add(row.id);
-      const existing = this.visuals.get(row.id);
-      if (existing) {
-        upgradeFire(existing, this.dummy, this.tonguePose);
-        continue;
-      }
+      if (this.visuals.has(row.id)) continue;
       const group = buildNythraxisGraveFlamePatch(row, this.groundY(row.x, row.z));
       const visual: GraveFlameVisual = {
         group,
@@ -267,13 +210,10 @@ export class NythraxisGraveFlameVisuals {
         rimMaterial: group.userData.rimMaterial as THREE.MeshBasicMaterial,
         emberMaterial: group.userData.emberMaterial as THREE.MeshBasicMaterial,
         embers: group.userData.embers as THREE.Mesh,
-        fire: group.userData.fire as NythraxisFireInstances,
-        kind: row.kind,
+        fire: group.userData.fire as NythraxisSoftFire,
         radius: row.radius,
         phase: 0,
-        tongueElapsed: NYTHRAXIS_GRAVE_FLAME_TONGUE_UPDATE_SECONDS,
       };
-      poseTongues(visual, this.dummy, this.tonguePose, true);
       this.scene.add(group);
       this.visuals.set(row.id, visual);
     }
@@ -300,14 +240,8 @@ export class NythraxisGraveFlameVisuals {
       visual.fillMaterial.opacity = pulse.fill;
       visual.emberMaterial.opacity = pulse.ember;
       visual.fire.setOpacity(pulse.tongue);
-      // Tongues re-pose at 20 Hz (one instanced-matrix upload per patch per
-      // tick, not per frame); reduced motion holds the pose it has.
-      if (reducedMotion) continue;
-      visual.tongueElapsed += step;
-      if (visual.tongueElapsed >= NYTHRAXIS_GRAVE_FLAME_TONGUE_UPDATE_SECONDS) {
-        visual.tongueElapsed %= NYTHRAXIS_GRAVE_FLAME_TONGUE_UPDATE_SECONDS;
-        poseTongues(visual, this.dummy, this.tonguePose, false);
-      }
+      // The sprites move on the GPU from one clock; reduced motion holds it.
+      visual.fire.update(step, reducedMotion);
     }
   }
 
@@ -320,8 +254,9 @@ export class NythraxisGraveFlameVisuals {
 
 /**
  * Stages every grave-palette program before the crypt is playable: one flame
- * patch, plus a real Grave Eruption telegraph spawned through MageGroundFx and
- * landed, so the recoloured warning materials AND the instanced bone-shard
+ * patch (with its sprite fire), the Gravefire line, the Binding Sigil, the
+ * Bound cage, plus a real Grave Eruption telegraph spawned through MageGroundFx
+ * and landed, so the recoloured warning materials AND the instanced bone-shard
  * burst both link here rather than under the first cast. The falling-body
  * materials are fire-only and never drawn by the grave flavour, so they stay
  * hidden. The group is kept alive by the caller for the session (three drops a
@@ -345,6 +280,20 @@ export function buildNythraxisGravePrewarmVisual(): THREE.Group {
     0,
   );
   root.add(patch);
+  const soul = buildNythraxisGraveFlamePatch(
+    {
+      id: 'prewarm-soulfire',
+      sourceId: 0,
+      kind: 'soul',
+      x: 0,
+      z: -16,
+      radius: 4,
+      duration: 1,
+      remaining: 1,
+    },
+    0,
+  );
+  root.add(soul);
   const gravefire = buildNythraxisGravefirePrewarmVisual();
   gravefire.position.set(0, 0, 8);
   root.add(gravefire);

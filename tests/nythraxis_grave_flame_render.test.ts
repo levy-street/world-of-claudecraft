@@ -4,28 +4,33 @@ import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import { abilityVfxFullSpecFor } from '../src/render/ability_vfx/encounter_specs';
+import { getFlameTex } from '../src/render/ignivar_fire_vfx';
 import { INTERIOR_ENCOUNTER_PREWARM } from '../src/render/interior_encounter_prewarm';
 import {
   NYTHRAXIS_GRAVE_FLAME_GROUND_LIFT,
   NYTHRAXIS_GRAVE_FLAME_PALETTE,
-  NYTHRAXIS_GRAVE_FLAME_TONGUES,
   NYTHRAXIS_SOUL_FLAME_PALETTE,
   nythraxisFlamePalette,
   nythraxisGraveFlamePlanInto,
   nythraxisGraveFlamePulseInto,
-  nythraxisGraveFlameTonguePoseInto,
 } from '../src/render/nythraxis_grave_core';
 import {
   buildNythraxisGraveFlamePatch,
   buildNythraxisGravePrewarmVisual,
   NYTHRAXIS_GRAVE_FLAME_EMBERS_NAME,
   NYTHRAXIS_GRAVE_FLAME_FILL_NAME,
+  NYTHRAXIS_GRAVE_FLAME_FIRE_NAME,
   NYTHRAXIS_GRAVE_FLAME_RIM_NAME,
-  NYTHRAXIS_GRAVE_FLAME_TONGUES_NAME,
   NYTHRAXIS_GRAVE_FLAME_VISUAL_NAME,
   NYTHRAXIS_GRAVE_PREWARM_NAME,
   NythraxisGraveFlameVisuals,
 } from '../src/render/nythraxis_grave_flame_visual';
+import {
+  NYTHRAXIS_SOFT_FIRE_INSET,
+  NYTHRAXIS_SOFT_FIRE_RAMPS,
+  NYTHRAXIS_SOFT_FIRE_SHAPES,
+  nythraxisGraveFlameSpriteCount,
+} from '../src/render/nythraxis_soft_fire_core';
 import {
   type ActiveNythraxisGraveFlame,
   NYTHRAXIS_GRAVE_ERUPTION_RADIUS,
@@ -46,6 +51,12 @@ const FLAME: ActiveNythraxisGraveFlame = {
 
 const readSource = (path: string): string =>
   codeWithoutLineComments(readFileSync(new URL(path, import.meta.url), 'utf8'));
+
+type FireMesh = THREE.Mesh<THREE.InstancedBufferGeometry, THREE.ShaderMaterial>;
+
+function fireOf(root: THREE.Object3D): FireMesh {
+  return root.getObjectByName(NYTHRAXIS_GRAVE_FLAME_FIRE_NAME) as FireMesh;
+}
 
 function maxRadiusOf(mesh: THREE.Mesh): number {
   const positions = mesh.geometry.getAttribute('position');
@@ -84,10 +95,8 @@ describe('Nythraxis Grave Flame rendering', () => {
       const fill = visual.getObjectByName(NYTHRAXIS_GRAVE_FLAME_FILL_NAME) as THREE.Mesh;
       expect(maxRadiusOf(fill)).toBeLessThan(FLAME.radius);
       expect(visual.getObjectByName(NYTHRAXIS_GRAVE_FLAME_EMBERS_NAME)).toBeDefined();
-      const tongues = visual.getObjectByName(
-        NYTHRAXIS_GRAVE_FLAME_TONGUES_NAME,
-      ) as THREE.InstancedMesh;
-      expect(tongues.count).toBe(NYTHRAXIS_GRAVE_FLAME_TONGUES);
+      const fire = fireOf(visual);
+      expect(fire.geometry.instanceCount).toBe(nythraxisGraveFlameSpriteCount(FLAME.radius));
       expect((rim.material as THREE.MeshBasicMaterial).color.getHex()).toBe(
         NYTHRAXIS_GRAVE_FLAME_PALETTE.rim,
       );
@@ -96,6 +105,33 @@ describe('Nythraxis Grave Flame rendering', () => {
     const secondRim = second.getObjectByName(NYTHRAXIS_GRAVE_FLAME_RIM_NAME) as THREE.Mesh;
     expect(firstRim.geometry.getAttribute('position').count).toBe(
       secondRim.geometry.getAttribute('position').count,
+    );
+  });
+
+  it('burns a soft sprite fire over the patch, seated inside the circle on the ground', () => {
+    const patch = buildNythraxisGraveFlamePatch(FLAME, 3);
+    const fire = fireOf(patch);
+    expect(fire).toBeInstanceOf(THREE.Mesh);
+    expect(fire.material).toBeInstanceOf(THREE.ShaderMaterial);
+    expect(fire.material.blending).toBe(THREE.AdditiveBlending);
+    expect(fire.material.depthWrite).toBe(false);
+    expect(fire.material.uniforms.uTex.value).toBe(getFlameTex());
+    expect((fire.material.uniforms.uBody.value as THREE.Color).getHex()).toBe(
+      NYTHRAXIS_SOFT_FIRE_RAMPS.grave.body,
+    );
+    // A patch is lit end to end: the window is open and nothing is boosted.
+    expect(fire.material.uniforms.uTail.value).toBeLessThan(-1e6);
+    expect(fire.material.uniforms.uHead.value).toBeGreaterThan(1e6);
+    expect(fire.material.uniforms.uHeadBoost.value).toBe(1);
+    const spots = fire.geometry.getAttribute('iSpot');
+    for (let index = 0; index < fire.geometry.instanceCount; index++) {
+      expect(Math.hypot(spots.getX(index), spots.getZ(index))).toBeLessThanOrEqual(
+        FLAME.radius * NYTHRAXIS_SOFT_FIRE_INSET + 1e-9,
+      );
+      expect(spots.getY(index)).toBe(0);
+    }
+    expect(fire.renderOrder).toBeGreaterThan(
+      (patch.getObjectByName(NYTHRAXIS_GRAVE_FLAME_EMBERS_NAME) as THREE.Mesh).renderOrder,
     );
   });
 
@@ -111,9 +147,7 @@ describe('Nythraxis Grave Flame rendering', () => {
     const soulFill = soul.getObjectByName(NYTHRAXIS_GRAVE_FLAME_FILL_NAME) as THREE.Mesh;
     const soulRim = soul.getObjectByName(NYTHRAXIS_GRAVE_FLAME_RIM_NAME) as THREE.Mesh;
     const soulEmbers = soul.getObjectByName(NYTHRAXIS_GRAVE_FLAME_EMBERS_NAME) as THREE.Mesh;
-    const soulTongues = soul.getObjectByName(
-      NYTHRAXIS_GRAVE_FLAME_TONGUES_NAME,
-    ) as THREE.InstancedMesh;
+    const soulFire = fireOf(soul);
     expect((graveRim.material as THREE.MeshBasicMaterial).color.getHex()).toBe(
       NYTHRAXIS_GRAVE_FLAME_PALETTE.rim,
     );
@@ -126,9 +160,11 @@ describe('Nythraxis Grave Flame rendering', () => {
     expect((soulEmbers.material as THREE.MeshBasicMaterial).color.getHex()).toBe(
       NYTHRAXIS_SOUL_FLAME_PALETTE.ember,
     );
-    expect((soulTongues.material as THREE.MeshBasicMaterial).color.getHex()).toBe(
-      NYTHRAXIS_SOUL_FLAME_PALETTE.tongue,
+    expect((soulFire.material.uniforms.uBody.value as THREE.Color).getHex()).toBe(
+      NYTHRAXIS_SOFT_FIRE_RAMPS.soul.body,
     );
+    expect(soulFire.material.uniforms.uRise.value).toBe(NYTHRAXIS_SOFT_FIRE_SHAPES.soul.rise);
+    expect(soulFire.geometry.instanceCount).toBe(nythraxisGraveFlameSpriteCount(4));
     expect(maxRadiusOf(graveRim)).toBeCloseTo(3, 5);
     expect(maxRadiusOf(soulRim)).toBeCloseTo(4, 5);
     expect(soul.userData.kind).toBe('soul');
@@ -140,26 +176,25 @@ describe('Nythraxis Grave Flame rendering', () => {
     });
   });
 
-  it('frustum-culls tongues with a reusable conservative patch bound', () => {
+  it('frustum-culls the fire with a reusable conservative patch bound', () => {
     const patch = buildNythraxisGraveFlamePatch(FLAME, 3);
-    const tongues = patch.getObjectByName(
-      NYTHRAXIS_GRAVE_FLAME_TONGUES_NAME,
-    ) as THREE.InstancedMesh;
-    expect(tongues.frustumCulled).toBe(true);
-    expect(tongues.boundingSphere).not.toBeNull();
-    expect(tongues.boundingSphere?.center.toArray()).toEqual([0, 0, 0]);
-    expect(tongues.boundingSphere?.radius).toBeGreaterThanOrEqual(FLAME.radius + 0.9);
+    const fire = fireOf(patch);
+    expect(fire.frustumCulled).toBe(true);
+    expect(fire.geometry.boundingSphere).not.toBeNull();
+    const shape = NYTHRAXIS_SOFT_FIRE_SHAPES.grave;
+    expect(fire.geometry.boundingSphere?.center.toArray()).toEqual([0, shape.rise * 0.5, 0]);
+    expect(fire.geometry.boundingSphere?.radius).toBeGreaterThanOrEqual(FLAME.radius + shape.rise);
 
     const scene = new THREE.Scene();
     const visuals = new NythraxisGraveFlameVisuals(scene, () => 0);
     visuals.sync([FLAME]);
-    const liveTongues = scene.children[0].getObjectByName(
-      NYTHRAXIS_GRAVE_FLAME_TONGUES_NAME,
-    ) as THREE.InstancedMesh;
-    const bound = liveTongues.boundingSphere;
+    const liveFire = fireOf(scene.children[0]);
+    const bound = liveFire.geometry.boundingSphere;
     visuals.update(0.1);
-    expect(liveTongues.boundingSphere).toBe(bound);
-    expect(liveTongues.boundingSphere?.radius).toBeGreaterThanOrEqual(FLAME.radius + 0.9);
+    expect(liveFire.geometry.boundingSphere).toBe(bound);
+    expect(liveFire.geometry.boundingSphere?.radius).toBeGreaterThanOrEqual(
+      FLAME.radius + shape.rise,
+    );
   });
 
   it('creates one patch per row, keeps it across snapshots, and samples the ground once', () => {
@@ -188,21 +223,21 @@ describe('Nythraxis Grave Flame rendering', () => {
     const rim = first.getObjectByName(NYTHRAXIS_GRAVE_FLAME_RIM_NAME) as THREE.Mesh;
     const fill = first.getObjectByName(NYTHRAXIS_GRAVE_FLAME_FILL_NAME) as THREE.Mesh;
     const embers = first.getObjectByName(NYTHRAXIS_GRAVE_FLAME_EMBERS_NAME) as THREE.Mesh;
-    const tongues = first.getObjectByName(
-      NYTHRAXIS_GRAVE_FLAME_TONGUES_NAME,
-    ) as THREE.InstancedMesh;
-    const materialDisposes = [fill, rim, embers, tongues].map((mesh) =>
+    const fire = fireOf(first);
+    const materialDisposes = [fill, rim, embers, fire].map((mesh) =>
       vi.spyOn(mesh.material as THREE.Material, 'dispose'),
     );
-    const geometryDisposes = [fill, rim, embers].map((mesh) => vi.spyOn(mesh.geometry, 'dispose'));
-    const tonguesDispose = vi.spyOn(tongues, 'dispose');
+    const geometryDisposes = [fill, rim, embers, fire].map((mesh) =>
+      vi.spyOn(mesh.geometry, 'dispose'),
+    );
+    const atlasDispose = vi.spyOn(getFlameTex(), 'dispose');
     expect(scene.children).toHaveLength(2);
     visuals.sync([{ ...FLAME, id: '42:gf:4', x: 12 }]);
     expect(scene.children).toHaveLength(1);
     expect(scene.children[0].userData.flameId).toBe('42:gf:4');
     for (const dispose of materialDisposes) expect(dispose).toHaveBeenCalledOnce();
     for (const dispose of geometryDisposes) expect(dispose).toHaveBeenCalledOnce();
-    expect(tonguesDispose).toHaveBeenCalledOnce();
+    expect(atlasDispose).not.toHaveBeenCalled();
     visuals.dispose();
     expect(scene.children).toHaveLength(0);
     // An empty sync after dispose is a no-op, not a rebuild.
@@ -210,31 +245,30 @@ describe('Nythraxis Grave Flame rendering', () => {
     expect(scene.children).toHaveLength(0);
   });
 
-  it('breathes the rim above a readable floor and settles it for reduced motion', () => {
+  it('breathes the rim above a readable floor, runs the fire clock, and settles both for reduced motion', () => {
     const scene = new THREE.Scene();
     const visuals = new NythraxisGraveFlameVisuals(scene, () => 0);
     visuals.sync([FLAME]);
     const patch = scene.children[0] as THREE.Group;
     const rim = patch.getObjectByName(NYTHRAXIS_GRAVE_FLAME_RIM_NAME) as THREE.Mesh;
-    const tongues = patch.getObjectByName(
-      NYTHRAXIS_GRAVE_FLAME_TONGUES_NAME,
-    ) as THREE.InstancedMesh;
+    const fire = fireOf(patch);
     const rimMaterial = rim.material as THREE.MeshBasicMaterial;
 
     visuals.update(0.5, true);
     const settled = rimMaterial.opacity;
+    const heldTime = fire.material.uniforms.uTime.value;
     visuals.update(0.5, true);
     expect(rimMaterial.opacity).toBe(settled);
+    expect(fire.material.uniforms.uTime.value).toBe(heldTime);
     expect(settled).toBeGreaterThan(0.75);
 
-    const before = tongues.instanceMatrix.array.slice();
-    let moved = false;
     for (let step = 0; step < 12; step++) {
       visuals.update(0.1);
       expect(rimMaterial.opacity).toBeGreaterThan(0.75);
-      if (tongues.instanceMatrix.array.some((v, i) => v !== before[i])) moved = true;
     }
-    expect(moved).toBe(true);
+    expect(fire.material.uniforms.uTime.value).toBeCloseTo(heldTime + 1.2, 6);
+    // The fire's opacity rides the same pulse as the footprint.
+    expect(fire.material.uniforms.uOpacity.value).toBeGreaterThan(0);
   });
 
   it('syncs the world projection field the renderer hands it', () => {
@@ -261,7 +295,7 @@ describe('Nythraxis Grave Flame rendering', () => {
     expect(facade).toContain('this.flames.dispose()');
   });
 
-  it('has its prewarm home at the crypt attach, staging the patch and the eruption', () => {
+  it('has its prewarm home at the crypt attach, staging both patches and the eruption', () => {
     expect(INTERIOR_ENCOUNTER_PREWARM.nythraxis.nythraxisGraveVisuals).toBe(true);
     expect(INTERIOR_ENCOUNTER_PREWARM.ignivar_depths.nythraxisGraveVisuals).toBeUndefined();
     const pass = readSource('../src/render/interior_encounter_prewarm_pass.ts');
@@ -270,8 +304,10 @@ describe('Nythraxis Grave Flame rendering', () => {
 
     const root = buildNythraxisGravePrewarmVisual();
     expect(root.name).toBe(NYTHRAXIS_GRAVE_PREWARM_NAME);
-    const patch = root.getObjectByName(NYTHRAXIS_GRAVE_FLAME_VISUAL_NAME);
-    expect(patch).toBeDefined();
+    const patches = root.children.filter((c) => c.name === NYTHRAXIS_GRAVE_FLAME_VISUAL_NAME);
+    // Both fire programs (green and red ramps) are staged so neither links under a cast.
+    expect(patches.map((c) => c.userData.kind).sort()).toEqual(['grave', 'soul']);
+    for (const patch of patches) expect(fireOf(patch)).toBeDefined();
     const eruption = root.getObjectByName('mage-meteor-fx') as THREE.Group;
     expect(eruption.userData.graveEruption).toBe(true);
     // The landed shard burst is staged (instanced program), the fire-only
@@ -300,30 +336,9 @@ describe('Nythraxis grave flame core', () => {
       expect(pulse.rim).toBeGreaterThanOrEqual(0.78);
       expect(pulse.rim).toBeLessThanOrEqual(0.96);
       expect(pulse.fill).toBeGreaterThan(0);
+      expect(pulse.tongue).toBeGreaterThan(0);
     }
     const reduced = nythraxisGraveFlamePulseInto(pulse, 1.3, true);
     expect(reduced.rim).toBeCloseTo(0.87, 5);
-  });
-
-  it('scatters every tongue inside the circle with its base on the ground', () => {
-    const pose = { dx: 0, dz: 0, y: 0, width: 1, height: 1, yaw: 0 };
-    for (let index = 0; index < NYTHRAXIS_GRAVE_FLAME_TONGUES; index++) {
-      nythraxisGraveFlameTonguePoseInto(
-        pose,
-        index,
-        NYTHRAXIS_GRAVE_FLAME_TONGUES,
-        3,
-        0.7,
-        false,
-        0.45,
-      );
-      expect(Math.hypot(pose.dx, pose.dz)).toBeLessThan(3);
-      expect(pose.height).toBeGreaterThan(0);
-      expect(pose.y).toBeCloseTo(0.45 * pose.height, 9);
-    }
-    // Deterministic: the same inputs pose the same tongue.
-    const a = { ...nythraxisGraveFlameTonguePoseInto(pose, 5, 16, 3, 2, false, 0.45) };
-    const b = { ...nythraxisGraveFlameTonguePoseInto(pose, 5, 16, 3, 2, false, 0.45) };
-    expect(a).toEqual(b);
   });
 });
