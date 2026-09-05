@@ -12387,6 +12387,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.continentMap.toggleAria': '세계 지도와 지역 지도 전환',
   'hudChrome.continentMap.levels': '레벨 {min}부터 {max}까지',
   'hudChrome.continentMap.toZone': '지역 지도',
+  'hudChrome.continentMap.toInstance': '인스턴스 지도',
   'hudChrome.enchanting.wornTagIndexed': '착용 중 ({slot} {index})',
   'hudChrome.targetAuras.title': '대상 오라',
   'hudChrome.targetAuras.keybindLabel': '대상 강화 및 약화 효과',

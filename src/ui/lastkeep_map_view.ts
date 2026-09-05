@@ -49,6 +49,7 @@ import {
   roomAt,
 } from '../sim/rift/authored';
 import type { IWorld } from '../world_api';
+import type { MapAnchor } from './dungeon_map_view';
 
 // ---------------------------------------------------------------------------
 // Stories: each castle's lift bands. The lift field is single-valued (stories
@@ -434,10 +435,14 @@ export interface LastKeepMapModel {
 // Shared marker collector: projects exit/loot objects, party members, and the
 // player through the surface's local->canvas transform, in draw order.
 function collectMarkers(
+  interior: string,
   world: IWorld,
   local: LastKeepLocalPos,
   toCanvas: (lx: number, lz: number) => { cx: number; cy: number },
   visible: (cx: number, cy: number) => boolean,
+  /** The local player's own instance-local position, null when they are not
+   *  inside THIS instance (a plan viewed from outside draws no player arrow). */
+  playerLocal: LastKeepLocalPos | null,
 ): LastKeepMarker[] {
   const markers: LastKeepMarker[] = [];
   const p = world.player;
@@ -453,13 +458,22 @@ function collectMarkers(
   if (party) {
     for (const m of party.members) {
       if (m.pid === p.id) continue;
+      // Same instance copy only: local coordinates repeat per copy.
+      const mLocal = castleLocal(interior, m.x, m.z);
+      if (!mLocal || mLocal.originX !== local.originX || mLocal.originZ !== local.originZ) continue;
       const { cx, cy } = toCanvas(m.x - local.originX, m.z - local.originZ);
       if (!visible(cx, cy)) continue;
       markers.push({ kind: 'party', cx, cy, cls: m.cls, dead: m.dead !== 0 });
     }
   }
-  const { cx, cy } = toCanvas(local.lx, local.lz);
-  markers.push({ kind: 'player', cx, cy, angle: -p.facing });
+  if (
+    playerLocal &&
+    playerLocal.originX === local.originX &&
+    playerLocal.originZ === local.originZ
+  ) {
+    const { cx, cy } = toCanvas(playerLocal.lx, playerLocal.lz);
+    markers.push({ kind: 'player', cx, cy, angle: -p.facing });
+  }
   return markers;
 }
 
@@ -495,7 +509,11 @@ function buildMinimapModel<S extends string>(
   });
   const visible = (cx: number, cy: number): boolean =>
     (cx - half) * (cx - half) + (cy - half) * (cy - half) <= rim2;
-  return { storyId, plate, markers: collectMarkers(world, local, toCanvas, visible) };
+  return {
+    storyId,
+    plate,
+    markers: collectMarkers(spec.interior, world, local, toCanvas, visible, local),
+  };
 }
 
 /**
@@ -508,9 +526,11 @@ function buildWorldMapModel<S extends string>(
   world: IWorld,
   S_: number,
   pad: number,
+  anchor: MapAnchor | undefined,
 ): LastKeepMapModel | null {
   const p = world.player;
-  const local = castleLocal(spec.interior, p.pos.x, p.pos.z);
+  const at = anchor ?? p.pos;
+  const local = castleLocal(spec.interior, at.x, at.z);
   if (!local) return null;
   const storyId = spec.storyForLift(spec.liftAt(local.lx, local.lz));
   const b = boundsFor(spec);
@@ -525,7 +545,12 @@ function buildWorldMapModel<S extends string>(
     cy: oy + (b.maxZ - lz) * scale,
   });
   const visible = (cx: number, cy: number): boolean => cx >= 0 && cx <= S_ && cy >= 0 && cy <= S_;
-  return { storyId, plate, markers: collectMarkers(world, local, toCanvas, visible) };
+  const playerLocal = castleLocal(spec.interior, p.pos.x, p.pos.z);
+  return {
+    storyId,
+    plate,
+    markers: collectMarkers(spec.interior, world, local, toCanvas, visible, playerLocal),
+  };
 }
 
 export function buildLastKeepMinimapModel(
@@ -540,8 +565,9 @@ export function buildLastKeepWorldMapModel(
   world: IWorld,
   S: number,
   pad: number,
+  anchor?: MapAnchor,
 ): LastKeepMapModel | null {
-  return buildWorldMapModel(LASTKEEP_SPEC, world, S, pad);
+  return buildWorldMapModel(LASTKEEP_SPEC, world, S, pad, anchor);
 }
 
 export function buildDawnholdMinimapModel(
@@ -556,6 +582,7 @@ export function buildDawnholdWorldMapModel(
   world: IWorld,
   S: number,
   pad: number,
+  anchor?: MapAnchor,
 ): LastKeepMapModel | null {
-  return buildWorldMapModel(DAWNHOLD_SPEC, world, S, pad);
+  return buildWorldMapModel(DAWNHOLD_SPEC, world, S, pad, anchor);
 }

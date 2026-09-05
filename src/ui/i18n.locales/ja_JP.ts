@@ -12409,6 +12409,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.continentMap.toggleAria': 'ワールドマップとゾーンマップを切り替える',
   'hudChrome.continentMap.levels': 'レベル {min} から {max}',
   'hudChrome.continentMap.toZone': 'ゾーンマップ',
+  'hudChrome.continentMap.toInstance': 'インスタンスマップ',
   'hudChrome.enchanting.wornTagIndexed': '装備中 ({slot}{index})',
   'hudChrome.targetAuras.title': 'ターゲットのオーラ',
   'hudChrome.targetAuras.keybindLabel': 'ターゲットのバフとデバフ',

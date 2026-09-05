@@ -279,7 +279,12 @@ const MONOLITHS: MonolithRow[] = [
     // is the six lines that cannot live anywhere else: the import, the
     // field, its relocalize() call, and the three-line event arm. Exact
     // merged count, zero slack; maintainer-review item.
-    ceiling: 18911,
+    // LOWERED 18911 -> 18903 by the map-level cycle: the surface choice
+    // (instance plan / zone / continent, and the party's dungeon from outside)
+    // moved into src/ui/map_surface_core.ts, and the dungeon + castle world-map
+    // branches collapsed into one InteriorMapController.paintWorldMap call.
+    // Exact count, zero slack.
+    ceiling: 18903,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

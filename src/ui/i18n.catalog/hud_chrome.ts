@@ -6219,6 +6219,9 @@ export const hudChromeStrings = {
     // static aria/title is generic so it never needs a per-level setAttribute.
     toWorld: 'World map',
     toZone: 'Zone map',
+    // Third stop of the cycle inside an instance (and outside, when a party member
+    // is in a dungeon whose floor plan can be drawn): the schematic instance map.
+    toInstance: 'Instance map',
     toggleAria: 'Switch between the world map and the zone map',
     // Hover tooltip over a zone region: its name plus the suggested level band.
     levels: 'Levels {min} to {max}',

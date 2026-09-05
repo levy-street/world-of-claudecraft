@@ -15,7 +15,9 @@ import {
   CAMPS,
   DELVE_LIST,
   DELVE_X_MIN,
+  DUNGEONS,
   GATHER_NODES,
+  instanceOrigin,
   NPCS,
   PORTALS,
   PROPS,
@@ -250,6 +252,16 @@ function noticeboardAt(x: number, z: number): NoticeboardDef {
 }
 
 describe('mapWindowMode (delve vs overworld discriminator)', () => {
+  it('classifies the Last Keep and Dawnhold interiors as castle, never overworld', () => {
+    for (const id of ['the_last_keep', 'dawnhold_castle'] as const) {
+      const origin = instanceOrigin(DUNGEONS[id].index, 0);
+      const world = makeOverworldWorld('client');
+      world.player.pos.x = origin.x;
+      world.player.pos.z = origin.z;
+      expect(mapWindowMode(world)).toBe('castle');
+    }
+  });
+
   it('returns overworld for an overworld position with no run (both shapes)', () => {
     expect(mapWindowMode(makeOverworldWorld('sim'))).toBe('overworld');
     expect(mapWindowMode(makeOverworldWorld('client'))).toBe('overworld');

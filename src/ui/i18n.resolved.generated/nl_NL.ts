@@ -4385,6 +4385,7 @@ export const nl_NL: EnTranslations = {
       "summary": "Wereldkaart. Kies een gebied om de kaart ervan te openen.",
       "toWorld": "Wereldkaart",
       "toZone": "Gebiedskaart",
+      "toInstance": "Instance map",
       "toggleAria": "Schakel tussen de wereldkaart en de gebiedskaart",
       "levels": "Niveaus {min} tot {max}"
     },

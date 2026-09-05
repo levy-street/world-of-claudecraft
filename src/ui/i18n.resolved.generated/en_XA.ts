@@ -4385,6 +4385,7 @@ export const en_XA: EnTranslations = {
       "summary": "[Ŵóŕļð ɱáþ. Çĥóóšé á žóñé ţó óþéñ íţš ɱáþ.]",
       "toWorld": "[Ŵóŕļð ɱáþ]",
       "toZone": "[Žóñé ɱáþ]",
+      "toInstance": "[Íñšţáñçé ɱáþ]",
       "toggleAria": "[Šŵíţçĥ ƀéţŵééñ ţĥé ŵóŕļð ɱáþ áñð ţĥé žóñé ɱáþ]",
       "levels": "[Ļéʋéļš {min} ţó {max}]"
     },

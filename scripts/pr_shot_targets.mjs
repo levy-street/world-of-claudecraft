@@ -51,6 +51,17 @@ async function awaitWorldPainted(page) {
 // evaluate callbacks). Every themed variant seeds explicitly, never relies on a
 // clean default: the harness profile's localStorage outlives page.close, so a
 // prior variant's preset would silently leak into the next shot otherwise.
+/** Close the first-login greeting modal when it is up (it sits above every
+ *  window, so it photobombs any centred capture). */
+async function dismissTutorialGreeting(page) {
+  await page.evaluate(() => {
+    const greeting = document.getElementById('tutorial-greeting');
+    if (!(greeting instanceof HTMLElement) || getComputedStyle(greeting).display === 'none') return;
+    [...greeting.querySelectorAll('button')].at(-1)?.click();
+  });
+  await wait(300);
+}
+
 const themeSeed = (preset) => async (page) => {
   await page.evaluateOnNewDocument(
     `try { localStorage.setItem('woc_theme', JSON.stringify({ preset: '${preset}', custom: {} })); } catch {}`,
@@ -3519,6 +3530,129 @@ export const TARGETS = [
       await wait(400);
       await page.evaluate(() => window.__game?.hud?.toggleMap?.());
       await wait(600);
+      const open = await page.evaluate(() => {
+        const w = document.querySelector('#map-window');
+        return !!w && getComputedStyle(w).display !== 'none';
+      });
+      return open ? { clip: '#map-window' } : {};
+    },
+  },
+  // The world-map level cycle inside an instance and the party plan from
+  // outside (map_surface_core.ts). Each target is one press further along the
+  // cycle: on a build that predates the cycle the toggle is hidden / inert, so
+  // the BEFORE half of every frame shows the same locked instance plan, which
+  // is exactly the reported bug.
+  ...[
+    {
+      key: 'instance-map-plan',
+      label: 'World map inside a dungeon: the instance plan',
+      presses: 0,
+    },
+    {
+      key: 'instance-map-zone',
+      label: 'World map inside a dungeon: one press, the zone map',
+      presses: 1,
+    },
+    {
+      key: 'instance-map-world',
+      label: 'World map inside a dungeon: two presses, the continent overview',
+      presses: 2,
+    },
+  ].map(({ key, label, presses }) => ({
+    key,
+    label,
+    when: ['map_surface_core', 'interior_map_controller'],
+    variants: [{ key: 'desktop' }, ...(presses === 1 ? [{ key: 'mobile', mobile: true }] : [])],
+    async capture(page) {
+      await page.evaluate(() => window.__game?.sim?.enterDungeon?.('hollow_crypt'));
+      await wait(1500); // let the instance teleport and its zone stream settle
+      await awaitWorldPainted(page);
+      await dismissTutorialGreeting(page);
+      await page.evaluate(() => window.__game?.hud?.toggleMap?.());
+      await wait(600);
+      for (let i = 0; i < presses; i++) {
+        await page.evaluate(() => document.querySelector('#map-level-toggle')?.click());
+        await wait(600);
+      }
+      const open = await page.evaluate(() => {
+        const w = document.querySelector('#map-window');
+        return !!w && getComputedStyle(w).display !== 'none';
+      });
+      return open ? { clip: '#map-window' } : {};
+    },
+  })),
+  {
+    key: 'party-dungeon-map-outside',
+    label: "World map outside: the party member's dungeon plan (two presses from the zone map)",
+    when: ['map_surface_core', 'interior_map_controller'],
+    variants: [{ key: 'desktop' }],
+    // Offline there is no party, so the roster is overridden on the Sim instance
+    // (the getter lives on the prototype) with one member standing in the crypt
+    // instance the player just left: the same IWorld read the online mirror
+    // streams from the server.
+    async capture(page) {
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        if (!sim) return;
+        sim.enterDungeon?.('hollow_crypt');
+        const inside = { x: sim.player.pos.x + 6, z: sim.player.pos.z - 4 };
+        // A raw position write back to the meadow (like the world-map target),
+        // not leaveDungeon: the exit teleport raises the loading curtain again.
+        const p = sim.player;
+        p.pos.x = 65; // Boar Meadow, Eastbrook Vale
+        p.pos.z = 0;
+        Object.defineProperty(sim, 'partyInfo', {
+          configurable: true,
+          get: () => ({
+            leader: p.id,
+            raid: false,
+            master: { enabled: false, looter: 0, threshold: 'uncommon' },
+            members: [
+              {
+                pid: p.id,
+                name: p.name,
+                cls: 'warrior',
+                level: p.level,
+                hp: 100,
+                mhp: 100,
+                res: 0,
+                mres: 0,
+                rtype: null,
+                x: p.pos.x,
+                z: p.pos.z,
+                dead: 0,
+                inCombat: 0,
+                group: 1,
+              },
+              {
+                pid: 9001,
+                name: 'Selene',
+                cls: 'mage',
+                level: 20,
+                hp: 90,
+                mhp: 100,
+                res: 50,
+                mres: 100,
+                rtype: 'mana',
+                x: inside.x,
+                z: inside.z,
+                dead: 0,
+                inCombat: 0,
+                group: 1,
+              },
+            ],
+          }),
+        });
+      });
+      await wait(1500);
+      await awaitWorldPainted(page);
+      await dismissTutorialGreeting(page);
+      await page.evaluate(() => window.__game?.hud?.toggleMap?.());
+      await wait(600);
+      for (let i = 0; i < 2; i++) {
+        await page.evaluate(() => document.querySelector('#map-level-toggle')?.click());
+        await wait(600);
+      }
       const open = await page.evaluate(() => {
         const w = document.querySelector('#map-window');
         return !!w && getComputedStyle(w).display !== 'none';
