@@ -659,6 +659,7 @@ const RENDER_PURE_CORES = [
   'src/render/frame_present.ts',
   'src/render/self_motion_rift_lift.ts',
   'src/render/shadow_cadence_core.ts',
+  'src/render/shadow_extent_core.ts',
   'src/render/shadow_texel_snap_core.ts',
   'src/render/frost_ice_fields_core.ts',
   'src/render/frost_sky_fade_core.ts',

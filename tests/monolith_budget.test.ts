@@ -411,7 +411,13 @@ const MONOLITHS: MonolithRow[] = [
     // literal like the noticeboard arm beside it; tests/realm_builder_monument
     // pins the literal to the constant). They land exactly on the pin above,
     // so the ceiling does not move but the slack is now zero.
-    ceiling: 13214,
+    // Lowered by the sun-shadow shed: the four constructor ortho writes and
+    // the texel derivation folded into applyShadowShed, snapShadowAnchor took
+    // points instead of six scalars (two 11-line call sites became one line
+    // each), and the extent policy moved to src/render/shadow_extent_core.ts.
+    // Re-pinned after the v0.42 release hooks and live zone-feature shadow
+    // extent wiring merged. Exact count, zero headroom.
+    ceiling: 13208,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

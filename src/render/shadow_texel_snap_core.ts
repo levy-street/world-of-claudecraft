@@ -23,6 +23,14 @@ export interface ShadowAnchor {
   z: number;
 }
 
+/** A read-only point: three's Vector3 satisfies it structurally, so the
+ *  per-frame path passes its live vectors with no copy and no allocation. */
+export interface ShadowPoint {
+  readonly x: number;
+  readonly y: number;
+  readonly z: number;
+}
+
 /** A light direction this vertical has no stable lookAt basis (matches the
  *  MIN_HORIZONTAL_DIR guard in foliage_shadow_core.ts); below it the snap
  *  passes the anchor through untouched rather than inventing a basis. */
@@ -35,26 +43,29 @@ export function shadowTexelWorldSize(orthoWidth: number, mapSize: number): numbe
 }
 
 /**
- * Snap `(x, y, z)` to the shadow-map texel grid of a directional light
- * looking along `-dir` (dir points from the target toward the light; it need
- * not be normalized). Fills and returns the caller-owned `out` (per-frame
- * path: no allocation). A degenerate direction or a non-positive texel size
- * passes the anchor through unsnapped.
+ * Snap `at` to the shadow-map texel grid of a directional light looking along
+ * `-dir` (dir points from the target toward the light; it need not be
+ * normalized). Fills and returns the caller-owned `out` (per-frame path: no
+ * allocation). A degenerate direction or a non-positive texel size passes the
+ * anchor through unsnapped.
+ *
+ * `texelWorld` must come from the LIVE ortho box, not the tier's base extent:
+ * the budget governor shrinks that box under sustained pressure
+ * (shadow_extent_core.ts), and a snap quantized to a stale grid would put the
+ * anchor off the real texel centres and reintroduce the swim it removes.
  */
 export function snapShadowAnchor(
-  dirX: number,
-  dirY: number,
-  dirZ: number,
-  x: number,
-  y: number,
-  z: number,
+  dir: ShadowPoint,
+  at: ShadowPoint,
   texelWorld: number,
   out: ShadowAnchor,
 ): ShadowAnchor {
+  const { x, y, z } = at;
   out.x = x;
   out.y = y;
   out.z = z;
   if (!(texelWorld > 0)) return out;
+  const { x: dirX, y: dirY, z: dirZ } = dir;
   const len = Math.hypot(dirX, dirY, dirZ);
   if (!(len > 0)) return out;
   const dx = dirX / len;

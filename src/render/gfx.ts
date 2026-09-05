@@ -1039,17 +1039,26 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     // Shadows are cosmetic and duplicate the visible scene draw. Both constrained browsers and
     // the stricter iOS WebKit residency profile remove that duplicate pass.
     dynamicShadows: tier !== 'low' && !constrainedMemory,
+    // 2560 is the working map size for every tier that is not paying for a
+    // showcase: at the 210 yd ortho box it is 0.082 yd per texel against
+    // 4096's 0.051, and the sun's own PCF radius (2.25 texels) filters over
+    // more than that difference, so High reads the same for 2.56x fewer texels
+    // (2560^2 / 4096^2) on a pass that is already about a third of the frame's
+    // draw calls. 4096 is gated on `gfxTierAtLeast(tier, 'ultra')` rather than
+    // spelled as the fall-through arm, so a NEW top tier added below ultra
+    // defaults to the cheap side instead of silently inheriting the showcase
+    // allocation.
     shadowMap: iosMemoryProfile
       ? 1024
       : tier === 'low'
         ? 2048
-        : tier === 'medium'
-          ? constrainedMemory
+        : constrainedMemory
+          ? tier === 'medium'
             ? 1536
-            : 2560
-          : constrainedMemory
-            ? 2048
-            : 4096,
+            : 2048
+          : gfxTierAtLeast(tier, 'ultra')
+            ? 4096
+            : 2560,
     standardMaterials: !iosMemoryProfile && gfxTierAtLeast(tier, 'medium'),
     // Round-10 detail-knob defaults (see the interface comment): High takes the
     // existing Advanced-Medium profile to bound its steady cost (basic worn
@@ -1274,15 +1283,22 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
       settings = { ...settings, ao: true, aoFullRes: false, bloom: false, smaa: false };
     // Shadow Quality: pure map-size steps (1024 / 2560 / 4096); terrain-cast
     // shadows join at High, matching the tier ladder where every
-    // dynamic-shadow tier casts terrain. The ladder caps at High's 4096 map:
-    // the retired Insane rung's single 8192x8192 target was a ~256 MB-class
-    // GPU allocation redrawn every frame for marginal visible gain, so a
-    // historical stored Insane value falls through to the High base here
-    // (and the settings store clamps it to High on its next write).
+    // dynamic-shadow tier casts terrain. The ladder caps at 4096: the retired
+    // Insane rung's single 8192x8192 target was a ~256 MB-class GPU
+    // allocation redrawn every frame for marginal visible gain, so a
+    // historical stored Insane value lands on the top rung here (and the
+    // settings store clamps it to High on its next write).
+    //
+    // The top rung WRITES 4096 rather than falling through to the tier base:
+    // the High base is 2560 now, and a stored dial value has to keep the map
+    // size the player chose. It stays inside the device policy, so a
+    // constrained or iOS-memory profile keeps its own smaller base (that arm
+    // is what the retired explicit 8192 write used to override).
     const shadowLevel = levelOf(hints.shadowQuality ?? 1);
     if (shadowLevel === 0) settings = { ...settings, shadowMap: 1024, terrainCastShadows: false };
     else if (shadowLevel === 1)
       settings = { ...settings, shadowMap: 2560, terrainCastShadows: false };
+    else if (!constrainedMemory && !iosMemoryProfile) settings = { ...settings, shadowMap: 4096 };
     // Per-effect switches (round 12), layered AFTER Effects & Lighting and
     // authoritative over its per-effect writes: Effects & Lighting stays the
     // post-CHAIN master (its Low arm sheds the composer, and with no composer

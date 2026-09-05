@@ -170,9 +170,22 @@ API, while `@typescript/native` provides the `tsc` binary. Things to know:
   `patches/` (regenerated with `pnpm patch three@0.185.1`); a three version
   bump must re-verify every hunk it carries, the compileAsync disposal race, the
   degenerate-normal shader guard, the released-program retention, the count 0
-  instanced-mesh render-list skip, and the low-tier NaN output scrub alike
-  (`tests/three_compile_async_patch.test.ts` pins them all), before dropping or
-  re-rolling it.
+  instanced-mesh render-list skip, the low-tier NaN output scrub, and the
+  colour-write-free shadow depth pass (the non-VSM shadow map's unread RGBA8
+  colour attachment is still cleared, deliberately, but never written;
+  re-verify that `colorWrite` is still absent from the program cache key, or
+  the prewarm depth twins in `src/render/prewarm_depth_material.ts` have to
+  follow) alike (`tests/three_compile_async_patch.test.ts` pins them all),
+  before dropping or re-rolling it.
+  One scope limit worth stating for every hunk, not just this one: the patch covers
+  `build/three.module.js` ONLY. `build/three.cjs`, the `.min.js` bundles, `three.core*`
+  and `three.webgpu*`/`three.tsl*` carry the UNPATCHED code, so a CommonJS
+  `require('three')` (which resolves the package's `require` export condition to
+  `three.cjs`) or a `three/webgpu` / `three/tsl` subpath import would silently run a
+  different renderer with none of these fixes. `tests/three_compile_async_patch.test.ts`
+  scans the tree to prove nothing outside `node_modules` reaches those bundles, and uses
+  `three.cjs` as the unpatched control for its GONE pins; keep both roles in mind before
+  adding a dependency that pulls three through CJS.
 - **When to revisit.** Collapse the dual alias back to a single `typescript`
   dependency once BOTH hold: the TypeScript 7.1 stable JS API has shipped
   (TypeScript 7.0 ships no JS API at all; the replacement is tracked in
