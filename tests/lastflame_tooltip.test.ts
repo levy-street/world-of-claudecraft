@@ -5,7 +5,7 @@ import { instanceBonusStatLines } from '../src/ui/item_instance_tooltip';
 describe('Last Flame enchant live tooltip facts', () => {
   it('shows the actual Strength buff magnitude', () => {
     expect(auraEffectDescriptor({ kind: 'buff_str', value: 50 })).toMatchObject({
-      key: 'hudChrome.auraEffect.flatStat',
+      key: 'hudChrome.auraEffect.increase.str',
       nums: { value: 50 },
     });
   });
