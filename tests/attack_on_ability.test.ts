@@ -3,6 +3,7 @@ import { ABILITIES } from '../src/sim/data';
 import type { AbilityEffect, Entity } from '../src/sim/types';
 import {
   abilityStartsAutoAttack,
+  confirmPendingAutoAttackEngage,
   deferAutoAttackUntilCastEnd,
   hasAutoAttackTarget,
   isPvpHostileTarget,
@@ -349,5 +350,34 @@ describe('deferAutoAttackUntilCastEnd (the aggro-before-damage bug)', () => {
 
   it('engages immediately for instants (their damage lands the same tick)', () => {
     expect(deferAutoAttackUntilCastEnd(0)).toBe(false);
+  });
+});
+
+describe('confirmPendingAutoAttackEngage (the Soulwell aggro-pull bug)', () => {
+  it('keeps the request when castStart confirms the same ability', () => {
+    expect(confirmPendingAutoAttackEngage('shadow_bolt', 'shadow_bolt')).toBe('shadow_bolt');
+  });
+
+  it('drops the request when a DIFFERENT ability is the one that actually started', () => {
+    // The reported repro: a damaging cast (shadow_bolt) gets refused server-side
+    // (range/cost/cooldown/out-of-combat all skip castStart entirely), leaving the
+    // request armed with no matching castStop to consume it. The player then
+    // casts Soulwell, requiresOutOfCombat and never itself gated by
+    // abilityStartsAutoAttack (summonSoulwell classifies 'other'); its OWN
+    // castStart must drop the stale shadow_bolt request rather than let it
+    // survive to Soulwell's castStop and pull whatever the player has targeted.
+    expect(confirmPendingAutoAttackEngage('shadow_bolt', 'soulwell')).toBeNull();
+  });
+
+  it('stays null with no outstanding request', () => {
+    expect(confirmPendingAutoAttackEngage(null, 'soulwell')).toBeNull();
+  });
+
+  it('Soulwell itself never arms the deferred engage', () => {
+    // Belt-and-suspenders: the effect-table classification this bug also depends
+    // on. If summonSoulwell were ever reclassified 'damage', the button-press
+    // gate (abilityStartsAutoAttack) would arm a request for Soulwell itself,
+    // reopening the same pull on ITS OWN successful cast.
+    expect(abilityStartsAutoAttack(effectsOf('soulwell'))).toBe(false);
   });
 });

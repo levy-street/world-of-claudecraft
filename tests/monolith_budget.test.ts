@@ -308,7 +308,19 @@ const MONOLITHS: MonolithRow[] = [
     // is the six lines that cannot live anywhere else: the import, the
     // field, its relocalize() call, and the three-line event arm. Exact
     // merged count, zero slack; maintainer-review item.
-    ceiling: 18958,
+    // Raised 18958 -> 18969 (+11) for the Soulwell aggro-pull fix: the deferred
+    // "Auto-Attack on Ability Use" pending state was armed optimistically at
+    // button-press time, before the sim confirmed the cast actually began, so a
+    // refused prior cast left it stuck armed and leaked an unwanted engage into
+    // the next unrelated successful cast (Soulwell, which never arms it itself).
+    // The actual decision (does a just-started cast still match the outstanding
+    // request) is a pure function in the existing sibling module
+    // attack_on_ability.ts, directly unit-tested there; what remains here is the
+    // stateful wiring the fix needs at all three sites that already touched this
+    // field (button press, castStart, castStop) and cannot be extracted further
+    // without duplicating Hud's own event-switch/settings-hook state. A
+    // maintainer decision, taken rather than paid for with someone else's code.
+    ceiling: 18969,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -566,7 +578,10 @@ const MONOLITHS: MonolithRow[] = [
     // the merged tree, never reconciled by arithmetic.
     // Re-pinned at the release/v0.42.0 reconcile with the Realm Builder and
     // store mount release-side hooks. Exact merged count, zero headroom.
-    ceiling: 11520,
+    // Re-pinned at the v0.42 candidate integration after the raid reset and
+    // generated guide hooks landed on top of that reconcile. Exact merged
+    // count, zero headroom.
+    ceiling: 11526,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
