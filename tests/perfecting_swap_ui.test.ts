@@ -1,4 +1,5 @@
 // @vitest-environment happy-dom
+import { readFileSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../src/game/audio', () => ({
@@ -6,6 +7,7 @@ vi.mock('../src/game/audio', () => ({
 }));
 
 import { STATIONS } from '../src/sim/content/professions';
+import { audio } from '../src/game/audio';
 import { type PerfectItemRef, perfectingInfoFrom } from '../src/sim/professions/perfecting';
 import { capturePerfectItemRef } from '../src/sim/professions/perfecting_copy';
 import { perfectingSwapInfoFrom } from '../src/sim/professions/perfecting_swap';
@@ -87,6 +89,93 @@ afterEach(() => {
 });
 
 describe('Perfecting rank exchange inside the existing window', () => {
+  it('recovers a lost success after reconnect without guessing the outcome or replaying the exchange', () => {
+    world.inventory[0] = { itemId: CHEST, count: 1, instance: { perfecting: 1 } };
+    world.inventory[1] = {
+      itemId: WAIST, count: 1,
+      instance: { perfected: true, perfectingBonus: { str: 2 }, rolled: { stats: { str: 2 } } },
+    };
+    win.open();
+    target().click();
+    action().click();
+    document.querySelector<HTMLButtonElement>('[data-swap-confirm]')!.click();
+    const request = world.swapPerfectingRanks.mock.calls[0][0];
+    win.onReconnected();
+    expect(root().getAttribute('aria-busy')).toBe('false');
+    expect(action().disabled).toBe(true);
+    expect(target().disabled).toBe(true);
+    expect(root().querySelector('[role="status"]')?.textContent).toContain('could not confirm');
+    // A full post-reconnect snapshot arrives after hello. Its cprof identity is
+    // a fresh object even when progression values did not change.
+    world.inventory[0] = {
+      itemId: CHEST, count: 1,
+      instance: { perfected: true, perfectingBonus: { str: 2 }, rolled: { stats: { str: 2 } } },
+    };
+    world.inventory[1] = { itemId: WAIST, count: 1, instance: { perfecting: 1 } };
+    world.craftingIdentity = { synced: true };
+    vi.advanceTimersByTime(1000);
+    win.onSwapResult({ type: 'perfectingSwapResult', pid: 1, ok: true, request });
+    expect(root().querySelector('[role="status"]')?.textContent).toContain('could not confirm');
+    expect(root().textContent).not.toContain('ranks exchanged');
+    expect(audio.perfectingSuccess).not.toHaveBeenCalled();
+    expect(world.swapPerfectingRanks).toHaveBeenCalledTimes(1);
+    expect(target().disabled).toBe(false);
+    expect(action().disabled).toBe(true);
+  });
+
+  it('recovers a lost refusal after reconnect but waits for a fresh snapshot before permitting a new deliberate exchange', () => {
+    win.open();
+    target().click();
+    action().click();
+    document.querySelector<HTMLButtonElement>('[data-swap-confirm]')!.click();
+    win.onReconnected();
+    vi.advanceTimersByTime(30_000);
+    expect(root().getAttribute('aria-busy')).toBe('false');
+    expect(target().disabled).toBe(true);
+    target().click();
+    expect(action().disabled).toBe(true);
+    expect(world.swapPerfectingRanks).toHaveBeenCalledTimes(1);
+    win.close();
+    win.open();
+    expect(target().disabled).toBe(true);
+    world.craftingIdentity = { synced: false };
+    vi.advanceTimersByTime(1000);
+    expect(target().disabled).toBe(true);
+    world.craftingIdentity = { synced: true };
+    vi.advanceTimersByTime(1000);
+    expect(target().disabled).toBe(false);
+    expect(action().disabled).toBe(true);
+    target().click();
+    action().click();
+    expect(world.swapPerfectingRanks).toHaveBeenCalledTimes(1);
+    document.querySelector<HTMLButtonElement>('[data-swap-confirm]')!.click();
+    expect(world.swapPerfectingRanks).toHaveBeenCalledTimes(2);
+  });
+
+  it('dismisses an unsent pre-reconnect confirmation and makes its detached confirm inert', () => {
+    win.open();
+    target().click();
+    action().click();
+    const oldConfirm = document.querySelector<HTMLButtonElement>('[data-swap-confirm]')!;
+    win.onReconnected();
+    expect(document.querySelector('.pf-swap-prompt')).toBeNull();
+    expect(root().inert).toBe(false);
+    oldConfirm.click();
+    expect(world.swapPerfectingRanks).not.toHaveBeenCalled();
+    expect(root().querySelector('[role="status"]')?.textContent).not.toContain('could not confirm');
+  });
+
+  it('routes reconnect to Perfecting and preserves the existing market resync', () => {
+    const hud = readFileSync('src/ui/hud.ts', 'utf8');
+    const main = readFileSync('src/main.ts', 'utf8');
+    const method = hud.slice(hud.indexOf('resyncAfterReconnect(): void {'), hud.indexOf('resyncAfterReconnect(): void {') + 250);
+    expect(method).toContain('this.marketWindow.onReconnected();');
+    expect(method).toContain('this.perfectingWindow?.onReconnected();');
+    const chain = main.slice(main.indexOf('const priorOnReconnected = online.onReconnected;'), main.indexOf('const priorOnReconnected = online.onReconnected;') + 650);
+    expect(chain).toContain('priorOnReconnected?.();');
+    expect(chain).toContain('hud.resyncAfterReconnect();');
+  });
+
   it('requires a second owned selection and previews both rank changes before confirming', () => {
     win.open();
     expect(root().querySelector('[data-swap-section]')).not.toBeNull();

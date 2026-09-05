@@ -3,6 +3,7 @@ import { updateAuras } from '../src/sim/combat/auras';
 import { castAbility, updateCasting } from '../src/sim/combat/casting_lifecycle';
 import { dealDamage } from '../src/sim/combat/damage';
 import { applyHeal } from '../src/sim/combat/heal';
+import { CRUCIBLE_SIGNATURE_TEXT } from '../src/sim/content/crucible_collections';
 import { MOBS } from '../src/sim/data';
 import { createMob, recalcPlayerStats } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -60,9 +61,7 @@ describe('Crucible healer participation through real combat healing', () => {
       updateCasting(ctx, healer, meta);
     }
     expect(healer.castingAbility).toBeNull();
-    const heal = sim.events.find(
-      (event) => event.type === 'heal2' && event.sourceId === healer.id,
-    );
+    const heal = sim.events.find((event) => event.type === 'heal2' && event.sourceId === healer.id);
     expect(heal).toMatchObject({ type: 'heal2', targetId: ally.id, amount: 1 });
     if (heal?.type !== 'heal2') throw new Error('Regrowth did not heal the tank');
     expect(heal.overheal).toBeGreaterThan(0);
@@ -77,6 +76,10 @@ describe('Crucible healer participation through real combat healing', () => {
     expect(before - ally.hp).toBe(10);
     expect(ward(ally)).toBeUndefined();
     expect(healer.inCombat).toBe(false);
+    expect(CRUCIBLE_SIGNATURE_TEXT.healer).toContain('Healing an ally who is in combat');
+    expect(CRUCIBLE_SIGNATURE_TEXT.healer).not.toContain('you and the healed ally');
+    expect(CRUCIBLE_SIGNATURE_TEXT.healer).toContain('the shielded ally leaves combat');
+    expect(CRUCIBLE_SIGNATURE_TEXT.healer).not.toContain('you or the shielded ally');
   });
 
   it('a real Wildbloom cannot shield before the pull but its later combat tick can', () => {
@@ -108,53 +111,62 @@ describe('Crucible healer participation through real combat healing', () => {
     expect(healer.inCombat).toBe(false);
   });
 
-  it.each(['prepull', 'self-prepull', 'dead source', 'dead target', 'hostile', 'nonplayer', 'foreign source', 'foreign target'])(
-    'does not admit %s healing',
-    (invalid) => {
-      const { sim, healer, ally, enemy, ctx } = groveheart();
-      engage(ctx, enemy, ally);
-      let recipient = ally;
-      if (invalid === 'prepull') ally.inCombat = false;
-      if (invalid === 'self-prepull') recipient = healer;
-      if (invalid === 'dead source') healer.dead = true;
-      if (invalid === 'dead target') ally.dead = true;
-      if (invalid === 'hostile') {
-        healer.jailed = true;
-        ally.jailed = true;
-        expect(ctx.isFriendlyTo(healer, ally)).toBe(false);
-      }
-      if (invalid === 'nonplayer') healer.kind = 'mob';
-      if (invalid === 'foreign source') sim.entities.delete(healer.id);
-      if (invalid === 'foreign target') sim.entities.delete(ally.id);
-      applyHeal(ctx, healer, recipient, 1000, 'Heal', 'regrowth', false, false);
-      expect(ward(recipient)).toBeUndefined();
-    },
-  );
+  it.each([
+    'prepull',
+    'self-prepull',
+    'dead source',
+    'dead target',
+    'hostile',
+    'nonplayer',
+    'foreign source',
+    'foreign target',
+  ])('does not admit %s healing', (invalid) => {
+    const { sim, healer, ally, enemy, ctx } = groveheart();
+    engage(ctx, enemy, ally);
+    let recipient = ally;
+    if (invalid === 'prepull') ally.inCombat = false;
+    if (invalid === 'self-prepull') recipient = healer;
+    if (invalid === 'dead source') healer.dead = true;
+    if (invalid === 'dead target') ally.dead = true;
+    if (invalid === 'hostile') {
+      healer.jailed = true;
+      ally.jailed = true;
+      expect(ctx.isFriendlyTo(healer, ally)).toBe(false);
+    }
+    if (invalid === 'nonplayer') healer.kind = 'mob';
+    if (invalid === 'foreign source') sim.entities.delete(healer.id);
+    if (invalid === 'foreign target') sim.entities.delete(ally.id);
+    applyHeal(ctx, healer, recipient, 1000, 'Heal', 'regrowth', false, false);
+    expect(ward(recipient)).toBeUndefined();
+  });
 
-  it.each(['source death', 'pair loss', 'recipient combat exit', 'hostility change', 'source departure'])(
-    'revalidates %s before absorbing damage',
-    (change) => {
-      const { sim, healer, ally, enemy, ctx, meta } = groveheart();
-      engage(ctx, enemy, ally);
-      applyHeal(ctx, healer, ally, 1000, 'Heal', 'regrowth', false, false);
-      expect(ward(ally)?.value).toBeGreaterThan(0);
-      if (change === 'source death') healer.dead = true;
-      if (change === 'pair loss') {
-        delete meta.equipment.chest;
-        recalcPlayerStats(healer, 'druid', meta.equipment, meta.talentMods, meta.equipmentInstance);
-      }
-      if (change === 'recipient combat exit') ally.inCombat = false;
-      if (change === 'hostility change') {
-        healer.jailed = true;
-        ally.jailed = true;
-      }
-      if (change === 'source departure') sim.entities.delete(healer.id);
-      const before = ally.hp;
-      dealDamage(ctx, enemy, ally, 50, false, 'fire', 'Raid hit', 'hit');
-      expect(before - ally.hp).toBe(50);
-      expect(ward(ally)).toBeUndefined();
-    },
-  );
+  it.each([
+    'source death',
+    'pair loss',
+    'recipient combat exit',
+    'hostility change',
+    'source departure',
+  ])('revalidates %s before absorbing damage', (change) => {
+    const { sim, healer, ally, enemy, ctx, meta } = groveheart();
+    engage(ctx, enemy, ally);
+    applyHeal(ctx, healer, ally, 1000, 'Heal', 'regrowth', false, false);
+    expect(ward(ally)?.value).toBeGreaterThan(0);
+    if (change === 'source death') healer.dead = true;
+    if (change === 'pair loss') {
+      delete meta.equipment.chest;
+      recalcPlayerStats(healer, 'druid', meta.equipment, meta.talentMods, meta.equipmentInstance);
+    }
+    if (change === 'recipient combat exit') ally.inCombat = false;
+    if (change === 'hostility change') {
+      healer.jailed = true;
+      ally.jailed = true;
+    }
+    if (change === 'source departure') sim.entities.delete(healer.id);
+    const before = ally.hp;
+    dealDamage(ctx, enemy, ally, 50, false, 'fire', 'Raid hit', 'hit');
+    expect(before - ally.hp).toBe(50);
+    expect(ward(ally)).toBeUndefined();
+  });
 
   it('allows ordinary combat self-healing but excludes the Zeal proc heal', () => {
     const { healer, enemy, ctx } = groveheart();
