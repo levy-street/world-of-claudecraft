@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
+import { collectionFitsRole, selectLegalGear } from '../src/sim/dev/gear_selection';
 import { canEquipItem } from '../src/sim/equipment_rules';
 import { Sim } from '../src/sim/sim';
 import { armorReduction, type EquipSlot, type ItemDef, type PlayerClass } from '../src/sim/types';
@@ -20,7 +21,7 @@ function tankEhp(cls: PlayerClass, spec: string, form?: string): number {
   sim.applyTalents({ spec, rows: {} }, pid);
   const p = sim.entities.get(pid)!;
   const score = (i: ItemDef) => (i.stats?.sta ?? 0) * 100 + (i.stats?.armor ?? 0) * 0.1;
-  for (const slot of [
+  const slots: EquipSlot[] = [
     'helmet',
     'neck',
     'shoulder',
@@ -29,40 +30,34 @@ function tankEhp(cls: PlayerClass, spec: string, form?: string): number {
     'legs',
     'gloves',
     'feet',
-  ] as EquipSlot[]) {
+    'ring1',
+    'ring2',
+    'offhand',
+  ];
+  const candidates: [EquipSlot, ItemDef[]][] = slots.map((slot) => {
     // The parity contract measures the ATTAINABLE tier: BiS means epic-only
     // (the maintainer's corrected-target ruling), legendaries extend beyond
     // the cap by design and asymmetrically (the 2026-08-30 band Emberward
     // only helps shield tanks, which is the point of a chase item, not a
     // parity violation).
-    const best = Object.values(ITEMS)
+    const pool = Object.values(ITEMS)
       .filter(
         (i) =>
-          i.slot === slot &&
-          i.kind === 'armor' &&
+          i.slot === (slot === 'ring1' || slot === 'ring2' ? 'ring' : slot) &&
+          (slot === 'offhand' || i.kind === 'armor') &&
           i.quality !== 'legendary' &&
+          collectionFitsRole(i, cls, 'tank') &&
           canEquipItem(cls, i),
       )
-      .sort((a, b) => score(b) - score(a))[0];
-    if (best) {
-      sim.addItem(best.id, 1, pid);
-      sim.equipItem(best.id, pid);
-    }
-  }
-  const rings = Object.values(ITEMS)
-    .filter((i) => i.slot === 'ring' && i.quality !== 'legendary' && canEquipItem(cls, i))
-    .sort((a, b) => score(b) - score(a))
-    .slice(0, 2);
-  rings.forEach((r, j) => {
-    sim.addItem(r.id, 1, pid);
-    sim.equipItemToSlot(r.id, `ring${j + 1}` as EquipSlot, pid);
+      .sort((a, b) => score(b) - score(a));
+    return [slot, pool];
   });
-  const offhand = Object.values(ITEMS)
-    .filter((i) => i.slot === 'offhand' && i.quality !== 'legendary' && canEquipItem(cls, i))
-    .sort((a, b) => score(b) - score(a))[0];
-  if (offhand) {
-    sim.addItem(offhand.id, 1, pid);
-    sim.equipItem(offhand.id, pid);
+  const kit = selectLegalGear(cls, spec, candidates, (id) => ITEMS[id]);
+  expect(Object.keys(kit), `${cls} reference kit fills every measured slot`).toEqual(slots);
+  for (const [slot, itemId] of Object.entries(kit) as [EquipSlot, string][]) {
+    sim.addItem(itemId, 1, pid);
+    sim.equipItemToSlot(itemId, slot, pid);
+    expect(sim.meta(pid)?.equipment[slot], `${cls} ${slot} equip actually succeeded`).toBe(itemId);
   }
   if (cls === 'warrior') {
     sim.castAbility('defensive_stance', pid);

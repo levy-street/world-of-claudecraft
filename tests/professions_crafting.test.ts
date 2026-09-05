@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { CRUCIBLE_COLLECTION_RECIPES } from '../src/sim/content/crucible_collections';
 import { FORGEBREAKER_RECIPES } from '../src/sim/content/forgebreaker_recipe';
 import { STATION_TYPE_BY_CRAFT } from '../src/sim/content/professions';
 import {
@@ -460,6 +461,7 @@ describe('craftItem command (#1127)', () => {
       ...TROPHY_RECIPES,
       ...ENGINEERING_ONRAMP_RECIPES,
       ...BAG_RECIPES,
+      ...CRUCIBLE_COLLECTION_RECIPES,
       ...FORGEBREAKER_RECIPES,
     ]
       .map((r) => r.id)
@@ -487,8 +489,13 @@ describe('craftItem command (#1127)', () => {
         // tests/recipe_economy.test.ts (masterwrought Phase 11o).
         ENGINEERING_ONRAMP_RECIPES.length +
         BAG_RECIPES.length +
+        CRUCIBLE_COLLECTION_RECIPES.length +
         FORGEBREAKER_RECIPES.length,
     );
+    expect(CRUCIBLE_COLLECTION_RECIPES).toHaveLength(33);
+    expect(FORGEBREAKER_RECIPES.map((recipe) => recipe.id)).toEqual([
+      'recipe_varkhul_forgebreaker',
+    ]);
     expect(sim.recipeList.map((r) => r.id).sort()).toEqual(allIds);
   });
 

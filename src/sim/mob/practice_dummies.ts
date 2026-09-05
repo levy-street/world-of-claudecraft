@@ -31,7 +31,7 @@ import type { Entity, PlayerClass } from '../types';
 // spec's passive stamina and armor multipliers are what they bring themselves.
 // Excluding them keeps this number a property of the item tables alone.
 const REFERENCE_CLASS: PlayerClass = 'warrior';
-const REFERENCE_SPEC = 'protection';
+const REFERENCE_SPEC = 'prot';
 export const PLAYER_DUMMY_LEVEL = 20;
 
 // A friendly dummy rests here rather than at full, so a healer arriving at it
