@@ -3302,6 +3302,15 @@ export const ru_RU: EnTranslations = {
       "popupTitle": "Гильдейский столб",
       "close": "Закрыть"
     },
+    "realmBuilder": {
+      "title": "Зодчий месяца",
+      "currentLabel": "Отмечен в этом месяце",
+      "placeholderName": "Ваше имя",
+      "placeholderHint": "Эта табличка ждёт своего первого имени.",
+      "pastTitle": "Прежние зодчие",
+      "pastEmpty": "В списке пока нет имён.",
+      "close": "Закрыть"
+    },
     "bank": {
       "title": "Банк",
       "subtitle": "Золочёный сундук",
@@ -19142,6 +19151,7 @@ export const ru_RU: EnTranslations = {
     "delveRiteShrineReedInteract": "Святилище тростника: нажмите F, чтобы коснуться",
     "delveRiteShrineSkullInteract": "Святилище черепа: нажмите F, чтобы коснуться",
     "mailboxName": "Почтовый ящик",
-    "noticeboardName": "Доска объявлений"
+    "noticeboardName": "Доска объявлений",
+    "realmBuilderMonumentName": "Памятник зодчим королевства"
   }
 };

@@ -582,6 +582,7 @@ import {
   syncRaidEncounterRigVisuals,
 } from './raid_encounter_visuals';
 import { isOwnedPetHostile } from './reaction';
+import { buildRealmBuilderMonumentPickBody } from './realm_builder_monument_fx';
 import { buildRealmFlora, type RealmFloraView } from './realm_flora';
 import {
   RenderBudgetGovernor,
@@ -1683,6 +1684,11 @@ export class Renderer {
   /** The foliage bucket reveal gate (armed at world entry, like the bands). */
   private foliageRevealGate: RevealGateCore | null = null;
   private eastbrookTownView!: EastbrookTownView;
+
+  /** Re-bake the monument's projected name (src/game/realm_builder_boot.ts). */
+  setRealmBuilderHonouree(name: string): void {
+    this.eastbrookTownView?.setRealmBuilderHonouree(name);
+  }
   private fenbridgeTownView!: FenbridgeTownView;
   private hollowGates!: HollowGatesView;
   private lightRank: RankedPointLight[] = [];
@@ -8267,6 +8273,12 @@ export class Renderer {
       // The civic board is itself the readable interaction landmark. Keep the
       // complete GLB on every tier and avoid the generic loot sparkle.
       const built = buildEastbrookNoticeboard();
+      body = built.group;
+      height = built.height;
+      objectMesh = body;
+    } else if (e.kind === 'object' && e.templateId === 'realm_builder_monument') {
+      // Art lives in the town view: this entity is a pick volume only.
+      const built = buildRealmBuilderMonumentPickBody();
       body = built.group;
       height = built.height;
       objectMesh = body;

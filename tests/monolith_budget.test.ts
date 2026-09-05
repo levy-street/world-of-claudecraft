@@ -273,7 +273,13 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
-    ceiling: 18905,
+    // Up 18905 -> 18911 for the Realm Builder monument's honour-roll card
+    // (PR #3695, re-measured at its release/v0.42.0 base merge). The card
+    // is its own module (src/ui/realm_builder_popup.ts); what is left here
+    // is the six lines that cannot live anywhere else: the import, the
+    // field, its relocalize() call, and the three-line event arm. Exact
+    // merged count, zero slack; maintainer-review item.
+    ceiling: 18911,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -358,6 +364,12 @@ const MONOLITHS: MonolithRow[] = [
     // and the release arm's rickshaw hooks moved with it, so the merged file
     // lands below both prior pins. Measured on the merged tree. Exact merged
     // count, zero headroom.
+    // The Realm Builder monument (PR #3695) adds 12 lines here: one import,
+    // the one-line setRealmBuilderHonouree delegation, and the entity arm
+    // that returns the monument's pick volume (matched on the template-id
+    // literal like the noticeboard arm beside it; tests/realm_builder_monument
+    // pins the literal to the constant). They land exactly on the pin above,
+    // so the ceiling does not move but the slack is now zero.
     ceiling: 13214,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
@@ -702,7 +714,13 @@ const MONOLITHS: MonolithRow[] = [
     // pattern, a schema module db.ts imports and that never imports db.ts
     // back), which more than paid for the four new columns' insert wiring. The
     // table's accessors stay here beside the pool. Exact count, zero slack.
-    ceiling: 5103,
+    // Re-pinned to the exact merged count of the release/v0.42.0 base merge
+    // (Realm Builder of the Month, PR #3695): that arm added the schema
+    // import and the one ensureSchema() apply line for
+    // server/realm_builder_db.ts (its own table and SQL live there); this
+    // branch's GPU-dimensions reduction still stands beside it. Measured on
+    // the merged tree, not summed by arithmetic. Exact count, zero slack.
+    ceiling: 5109,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {

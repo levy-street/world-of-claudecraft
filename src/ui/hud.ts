@@ -716,6 +716,7 @@ import { questProgressEventText } from './quest_progress_text';
 import { RaidBossGuideWindow, raidBossGuideContextFallback } from './raid_boss_guide_window';
 import { lockoutParts, lockoutShape } from './raid_lockout';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
+import { presentRealmBuilder, RealmBuilderPopup } from './realm_builder_popup';
 import {
   reliquaryIlluminationBroadcastLine,
   reliquaryIlluminationBroadcastRendered,
@@ -2131,6 +2132,7 @@ export class Hud {
   private tutorial = new TutorialOverlay();
   private bootcamp = new BootcampOverlay();
   private noticeboardPopup = new NoticeboardPopup();
+  private realmBuilderPopup = new RealmBuilderPopup();
   private lastPetBarSig = '';
   // Value-diffed body-class flag: true while a live pet bar is shown. The mobile
   // top-band layout reads body.mobile-pet-active to yield the top-centre line to the
@@ -7002,6 +7004,7 @@ export class Hud {
     this.tutorial.relocalize(this.sim, this.keybinds);
     this.bootcamp.relocalize(this.sim, this.keybinds);
     this.noticeboardPopup.relocalize();
+    this.realmBuilderPopup.relocalize();
     this.guildBoardWindow.relocalize();
     // The ring latches its page indicator on the page/count pair; dropping the
     // latch relabels it on the next paint (mobile layouts only build the ring).
@@ -12570,6 +12573,9 @@ export class Hud {
             // looks inert on any host.
             this.openGuildBoard();
           }
+          break;
+        case 'realmBuilder':
+          presentRealmBuilder(this.realmBuilderPopup, this.renderer, ev.current, ev.past);
           break;
         case 'mailArrived': {
           // Player names splice verbatim; authored letters carry their

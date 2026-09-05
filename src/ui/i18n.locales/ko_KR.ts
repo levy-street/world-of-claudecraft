@@ -14644,4 +14644,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.springtouched_crozier.name': '샘닿은 홀장',
   'entities.items.wand_of_quenched_sparks.name': '꺼진 불꽃의 마법봉',
   'crucibleShop.balanceEntry': '{name} x{count}',
+  'hudChrome.realmBuilder.title': '이달의 왕국 건설자',
+  'hudChrome.realmBuilder.currentLabel': '이달의 수상자',
+  'hudChrome.realmBuilder.placeholderName': '당신의 이름',
+  'hudChrome.realmBuilder.placeholderHint': '이 명판은 첫 번째 이름을 기다리고 있습니다.',
+  'hudChrome.realmBuilder.pastTitle': '역대 수상자',
+  'hudChrome.realmBuilder.pastEmpty': '아직 명단에 이름이 없습니다.',
+  'hudChrome.realmBuilder.close': '닫기',
+  'worldContent.realmBuilderMonumentName': '왕국 건설자 기념비',
 };

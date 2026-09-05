@@ -538,6 +538,7 @@ import {
   WARFARE_QUARTERMASTER_NPC_ID,
 } from './pvp/warfare_quartermaster';
 import { sanitizeCreditedObjects } from './quests/interact_object_credit';
+import { spawnRealmBuilderMonument } from './realm_builder_monument_spawn';
 import {
   catalogRankOwned,
   catalogRelicCompletion,
@@ -2415,6 +2416,7 @@ export class Sim {
       this.addEntity(board);
     }
 
+    spawnRealmBuilderMonument(this.ctx, this.worldContent.props);
     if (cfg.noPlayer && this.devCommands) this.spawnHealerPracticeDummy();
 
     if (!cfg.noPlayer) {

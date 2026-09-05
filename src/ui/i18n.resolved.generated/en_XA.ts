@@ -3302,6 +3302,15 @@ export const en_XA: EnTranslations = {
       "popupTitle": "[Ĝúíļð Šíĝñþóšţ]",
       "close": "[Çļóšé]"
     },
+    "realmBuilder": {
+      "title": "[Ŕéáļɱ Ɓúíļðéŕ óƒ ţĥé Ɱóñţĥ]",
+      "currentLabel": "[Ĥóñóúŕéð ţĥíš ɱóñţĥ]",
+      "placeholderName": "[Ýóúŕ Ñáɱé Ĥéŕé]",
+      "placeholderHint": "[Ţĥíš þļáţé íš ŵáíţíñĝ ƒóŕ íţš ƒíŕšţ ñáɱé.]",
+      "pastTitle": "[Þášţ ĥóñóúŕééš]",
+      "pastEmpty": "[Ñó ñáɱéš óñ ţĥé ŕóļļ ýéţ.]",
+      "close": "[Çļóšé]"
+    },
     "bank": {
       "title": "[Ɓáñķ]",
       "subtitle": "[Ţĥé Ĝíļðéð Šţŕóñĝƀóẋ]",
@@ -19142,6 +19151,7 @@ export const en_XA: EnTranslations = {
     "delveRiteShrineReedInteract": "[Ŕééð Šĥŕíñé: Þŕéšš Ƒ ţó ţóúçĥ íţ]",
     "delveRiteShrineSkullInteract": "[Šķúļļ Šĥŕíñé: Þŕéšš Ƒ ţó ţóúçĥ íţ]",
     "mailboxName": "[Ɱáíļƀóẋ]",
-    "noticeboardName": "[Ñóţíçé Ɓóáŕð]"
+    "noticeboardName": "[Ñóţíçé Ɓóáŕð]",
+    "realmBuilderMonumentName": "[Ŕéáļɱ Ɓúíļðéŕ Ɱóñúɱéñţ]"
   }
 };

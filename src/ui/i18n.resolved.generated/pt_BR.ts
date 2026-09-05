@@ -3302,6 +3302,15 @@ export const pt_BR: EnTranslations = {
       "popupTitle": "Placa da Guilda",
       "close": "Fechar"
     },
+    "realmBuilder": {
+      "title": "Realm Builder of the Month",
+      "currentLabel": "Honoured this month",
+      "placeholderName": "Your Name Here",
+      "placeholderHint": "This plate is waiting for its first name.",
+      "pastTitle": "Past honourees",
+      "pastEmpty": "No names on the roll yet.",
+      "close": "Close"
+    },
     "bank": {
       "title": "Banco",
       "subtitle": "A Arca Dourada",
@@ -19142,6 +19151,7 @@ export const pt_BR: EnTranslations = {
     "delveRiteShrineReedInteract": "Santuário do Junco: Pressione F para tocá-lo",
     "delveRiteShrineSkullInteract": "Santuário da Caveira: Pressione F para tocá-lo",
     "mailboxName": "Caixa de correio",
-    "noticeboardName": "Quadro de Avisos"
+    "noticeboardName": "Quadro de Avisos",
+    "realmBuilderMonumentName": "Realm Builder Monument"
   }
 };

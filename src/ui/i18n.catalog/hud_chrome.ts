@@ -4386,6 +4386,23 @@ export const hudChromeStrings = {
     popupTitle: 'Guild Signpost',
     close: 'Close',
   },
+  // The Eastbrook Vale Realm Builder monument's honour roll
+  // (src/ui/realm_builder_popup.ts), opened by inspecting the statue. Honouree
+  // names are world data and splice verbatim like player names, never
+  // translated; only this chrome and the Intl-formatted month localize.
+  realmBuilder: {
+    title: 'Realm Builder of the Month',
+    currentLabel: 'Honoured this month',
+    // The unclaimed plate's stand-in name (src/sim/content/realm_builders.ts
+    // ships the English constant; every surface substitutes this key for it).
+    placeholderName: 'Your Name Here',
+    // Shown only while the plate still carries the unclaimed placeholder name,
+    // so nobody reads the placeholder as a real award.
+    placeholderHint: 'This plate is waiting for its first name.',
+    pastTitle: 'Past honourees',
+    pastEmpty: 'No names on the roll yet.',
+    close: 'Close',
+  },
   // The bank window (the Gilded Strongbox): a pooled deposit box shown while standing
   // at a banker NPC. Plain click withdraws a stack; shift-click withdraws a partial
   // amount; the footer buys 6-slot expansion blocks. The withdraw-quantity and

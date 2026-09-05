@@ -1866,12 +1866,12 @@ export const ZONE1_PROPS: ZonePropsDef = {
   ],
   wells: [
     {
-      id: EASTBROOK_LAYOUT.civic.wellBeacon.id,
-      assetId: EASTBROOK_LAYOUT.civic.wellBeacon.assetId,
-      x: EASTBROOK_LAYOUT.civic.wellBeacon.position.x,
-      z: EASTBROOK_LAYOUT.civic.wellBeacon.position.z,
-      r: EASTBROOK_LAYOUT.civic.wellBeacon.radius,
-      height: EASTBROOK_LAYOUT.civic.wellBeacon.height,
+      id: EASTBROOK_LAYOUT.civic.monument.id,
+      assetId: EASTBROOK_LAYOUT.civic.monument.assetId,
+      x: EASTBROOK_LAYOUT.civic.monument.position.x,
+      z: EASTBROOK_LAYOUT.civic.monument.position.z,
+      r: EASTBROOK_LAYOUT.civic.monument.radius,
+      height: EASTBROOK_LAYOUT.civic.monument.height,
     },
   ],
   stalls: EASTBROOK_LAYOUT.market.stalls.map((stall) => ({

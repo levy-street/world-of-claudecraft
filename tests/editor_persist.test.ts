@@ -45,7 +45,7 @@ describe('CustomMap build + projection', () => {
         ...EASTBROOK_LAYOUT.preservedBuildings.map((placement) => placement.id),
         ...EASTBROOK_LAYOUT.buildings.map((placement) => placement.id),
       ]),
-      wells: new Set<string>([EASTBROOK_LAYOUT.civic.wellBeacon.id]),
+      wells: new Set<string>([EASTBROOK_LAYOUT.civic.monument.id]),
       stalls: new Set<string>(EASTBROOK_LAYOUT.market.stalls.map((placement) => placement.id)),
       fences: new Set<string>(EASTBROOK_LAYOUT.fences.map((placement) => placement.id)),
       benches: new Set<string>(EASTBROOK_LAYOUT.civic.benches.map((placement) => placement.id)),

@@ -3302,6 +3302,15 @@ export const en_CA: EnTranslations = {
       "popupTitle": "Guild Signpost",
       "close": "Close"
     },
+    "realmBuilder": {
+      "title": "Realm Builder of the Month",
+      "currentLabel": "Honoured this month",
+      "placeholderName": "Your Name Here",
+      "placeholderHint": "This plate is waiting for its first name.",
+      "pastTitle": "Past honourees",
+      "pastEmpty": "No names on the roll yet.",
+      "close": "Close"
+    },
     "bank": {
       "title": "Bank",
       "subtitle": "The Gilded Strongbox",
@@ -19142,6 +19151,7 @@ export const en_CA: EnTranslations = {
     "delveRiteShrineReedInteract": "Reed Shrine: Press F to touch it",
     "delveRiteShrineSkullInteract": "Skull Shrine: Press F to touch it",
     "mailboxName": "Mailbox",
-    "noticeboardName": "Notice Board"
+    "noticeboardName": "Notice Board",
+    "realmBuilderMonumentName": "Realm Builder Monument"
   }
 };

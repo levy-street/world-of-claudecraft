@@ -14330,4 +14330,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.springtouched_crozier.name': '泉息牧杖',
   'entities.items.wand_of_quenched_sparks.name': '熄火花魔杖',
   'crucibleShop.balanceEntry': '{name} x{count}',
+  'hudChrome.realmBuilder.title': '本月王国建造者',
+  'hudChrome.realmBuilder.currentLabel': '本月荣誉获得者',
+  'hudChrome.realmBuilder.placeholderName': '你的名字',
+  'hudChrome.realmBuilder.placeholderHint': '这块铭牌还在等待它的第一个名字。',
+  'hudChrome.realmBuilder.pastTitle': '历届荣誉获得者',
+  'hudChrome.realmBuilder.pastEmpty': '荣誉榜上还没有名字。',
+  'hudChrome.realmBuilder.close': '关闭',
+  'worldContent.realmBuilderMonumentName': '王国建造者纪念碑',
 };

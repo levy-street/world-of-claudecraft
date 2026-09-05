@@ -913,6 +913,8 @@ export const en = {
   // the 13 overlays omit them, so the build English-fills them and the registry
   // marks them `pending` until a release fill provides translations.
   'nav.chatFilter': 'Chat Filter',
+  'nav.realmContent': 'Realm Content',
+  'nav.realmBuilders': 'Realm Builders',
   'nav.bugReports': 'Bug Reports',
   'nav.unstuckReports': 'Unstuck Reports',
   'bugReports.title': 'Bug Reports',
@@ -1176,6 +1178,46 @@ export const en = {
   'auth.retry': 'Retry',
   'auth.noAccess':
     'This account has no dashboard permissions. Ask an administrator to assign a role.',
+
+  // Realm Builder of the Month (src/admin/pages/RealmBuilders.svelte): the
+  // honour roll the Eastbrook Vale monument reads. Honouree NAMES are community
+  // members' own names and splice verbatim, never translated.
+  'realmBuilders.loading': 'Loading the honour roll...',
+  'realmBuilders.currentTitle': 'Honoured this month',
+  'realmBuilders.currentHint': 'The name the monument in Eastbrook Vale is projecting right now.',
+  'realmBuilders.noneYet': 'Nobody has been named yet, so the plaque shows its placeholder.',
+  'realmBuilders.addTitle': 'Name this month\u2019s builder',
+  'realmBuilders.editTitle': 'Edit an honoured month',
+  'realmBuilders.addHint': 'Saving publishes to the live world straight away.',
+  'realmBuilders.publishHint':
+    'The plaque updates for players already in the world, without a reload.',
+  'realmBuilders.yearLabel': 'Year',
+  'realmBuilders.monthLabel': 'Month (1-12)',
+  'realmBuilders.nameLabel': 'Name',
+  'realmBuilders.namePlaceholder': 'The community member\u2019s name',
+  'realmBuilders.noteLabel': 'Note (optional)',
+  'realmBuilders.notePlaceholder': 'What they built. Shown on the dashboard only.',
+  'realmBuilders.useNextMonth': 'Next month',
+  'realmBuilders.saveNew': 'Publish',
+  'realmBuilders.saveEdit': 'Save changes',
+  'realmBuilders.rollTitle': 'Past honourees',
+  'realmBuilders.rollHint': 'Everyone the monument lists when a player inspects it.',
+  'realmBuilders.rollEmpty': 'No past honourees yet.',
+  'realmBuilders.colMonth': 'Month',
+  'realmBuilders.colName': 'Name',
+  'realmBuilders.colNote': 'Note',
+  'realmBuilders.colUpdated': 'Updated',
+  'realmBuilders.edit': 'Edit',
+  'realmBuilders.remove': 'Remove',
+  'realmBuilders.removeTitle': 'Remove from the honour roll?',
+  'realmBuilders.loadFailed': 'Could not load the honour roll.',
+  'realmBuilders.saveFailed': 'Could not publish that entry.',
+  'realmBuilders.deleteFailed': 'Could not remove that entry.',
+  'realmBuilders.errorYear': 'Year must be a whole calendar year.',
+  'realmBuilders.errorMonth': 'Month must be between 1 and 12.',
+  'realmBuilders.errorNameEmpty': 'Enter the name to honour.',
+  'realmBuilders.errorNameLong': 'That name is too long for the plaque.',
+  'realmBuilders.errorNoteLong': 'That note is too long.',
 };
 
 export type AdminTranslations = typeof en;

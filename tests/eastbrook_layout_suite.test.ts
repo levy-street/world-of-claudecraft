@@ -41,9 +41,9 @@ function nonWallSolidObbs(): Obb2[] {
 function pointClearance(point: Point2, includeWall = false): number {
   let clearance =
     Math.hypot(
-      point.x - EASTBROOK_LAYOUT.civic.wellBeacon.position.x,
-      point.z - EASTBROOK_LAYOUT.civic.wellBeacon.position.z,
-    ) - EASTBROOK_LAYOUT.civic.wellBeacon.radius;
+      point.x - EASTBROOK_LAYOUT.civic.monument.position.x,
+      point.z - EASTBROOK_LAYOUT.civic.monument.position.z,
+    ) - EASTBROOK_LAYOUT.civic.monument.radius;
   const obbs = includeWall
     ? [...nonWallSolidObbs(), ...EASTBROOK_LAYOUT.wall.segments.map((segment) => segment.footprint)]
     : nonWallSolidObbs();
@@ -605,13 +605,27 @@ describe('authoritative Eastbrook replacement plan', () => {
     // radiusFromCivic values and both derived front standing points.
     expect(EASTBROOK_LAYOUT.civic.center).toEqual({ x: -14, z: -102 });
     expect(EASTBROOK_LAYOUT.civic.ring).toEqual({ radius: 4.75, pathHalfWidth: 1.5 });
-    expect(EASTBROOK_LAYOUT.civic.wellBeacon).toEqual({
-      id: 'eastbrook_civic_well_beacon',
-      assetId: '/models/props/eastbrook_civic_well_beacon.glb',
+    // Round 7: the Realm Builder monument replaced the well beacon on the same
+    // civic point. Its nativeDimensions are the shipped sculpt's own bounding
+    // box scaled to a 3.8 yard height, so the statue cannot shear; the radius
+    // is the sculpt's widest ring (the lantern outriggers) rather than the
+    // beacon's loose 1.5; and it carries a rotation now, facing its front
+    // honour plate at the open east arrival lane.
+    expect(EASTBROOK_LAYOUT.civic.monument).toEqual({
+      id: 'eastbrook_realm_builder_monument',
+      assetId: '/models/props/eastbrook_realm_builder_monument.glb',
+      entityId: 2_000_000_100,
+      templateId: 'realm_builder_monument',
+      name: 'Realm Builder Monument',
       position: { x: -14.75, z: -102 },
-      radius: 1.5,
-      height: 3.1,
-      nativeDimensions: { width: 3.2, height: 3.1, depth: 3.2 },
+      rotation: -Math.PI / 2,
+      radius: 3.19,
+      height: 7.6,
+      nativeDimensions: {
+        width: 5.78622625189773,
+        height: 7.6,
+        depth: 5.383339079451678,
+      },
     });
     expect(
       EASTBROOK_LAYOUT.civic.benches.map((bench) => ({
@@ -626,7 +640,7 @@ describe('authoritative Eastbrook replacement plan', () => {
       {
         id: 'eastbrook_civic_bench_north',
         assetId: '/models/dungeon/bench.glb',
-        position: { x: -14, z: -99.1 },
+        position: { x: -14.75, z: -97.9 },
         rotation: Math.PI,
         width: 1.8,
         depth: 0.6,
@@ -634,7 +648,7 @@ describe('authoritative Eastbrook replacement plan', () => {
       {
         id: 'eastbrook_civic_bench_south',
         assetId: '/models/dungeon/bench.glb',
-        position: { x: -14, z: -104.9 },
+        position: { x: -14.75, z: -106.1 },
         rotation: 0,
         width: 1.8,
         depth: 0.6,
@@ -642,7 +656,7 @@ describe('authoritative Eastbrook replacement plan', () => {
       {
         id: 'eastbrook_civic_bench_west',
         assetId: '/models/dungeon/bench.glb',
-        position: { x: -11.1, z: -102 },
+        position: { x: -10.65, z: -102 },
         rotation: Math.PI / 2,
         width: 1.8,
         depth: 0.6,
@@ -1124,8 +1138,8 @@ describe('layout clearance and service anchors', () => {
       expect(
         circleIntersectsObb(
           {
-            center: EASTBROOK_LAYOUT.civic.wellBeacon.position,
-            radius: EASTBROOK_LAYOUT.civic.wellBeacon.radius,
+            center: EASTBROOK_LAYOUT.civic.monument.position,
+            radius: EASTBROOK_LAYOUT.civic.monument.radius,
           },
           obbs[left],
         ),

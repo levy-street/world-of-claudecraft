@@ -120,6 +120,7 @@ import {
 import { PROGRESS_EVENTS_SCHEMA } from './progress_events_db';
 import { RATELIMIT_PRUNE_SQL, RATELIMIT_SCHEMA } from './ratelimit_db';
 import { REALM, REALM_DIRECTORY } from './realm';
+import { REALM_BUILDER_SCHEMA } from './realm_builder_db';
 import { chooseArchiveName } from './reclaim_name';
 import { attachSchemaNoticeForwarder } from './schema_notices';
 import { SEEKER_ENTITLEMENT_SCHEMA } from './seeker_entitlement_db';
@@ -1287,6 +1288,11 @@ export async function ensureSchema(): Promise<void> {
     // beside the other analytics schemas. Bounded (one row per campaign-day),
     // deliberately keep-forever (see ad_spend_db.ts).
     await client.query(AD_SPEND_SCHEMA);
+    // The Realm Builder of the Month roll (the Eastbrook Vale monument, named
+    // from the admin dashboard). FK-references accounts(id) for the "who named
+    // them" column, so it runs after SCHEMA. Bounded at one row a month and
+    // deliberately keep-forever: deleting an old row erases a real award.
+    await client.query(REALM_BUILDER_SCHEMA);
     await client.query(SOCIAL_SCHEMA);
     await client.query(ADMIN_GUILDS_SCHEMA);
     await client.query(SEEKER_ENTITLEMENT_SCHEMA);

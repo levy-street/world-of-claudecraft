@@ -3302,6 +3302,15 @@ export const zh_TW: EnTranslations = {
       "popupTitle": "公會告示柱",
       "close": "關閉"
     },
+    "realmBuilder": {
+      "title": "本月王國建造者",
+      "currentLabel": "本月榮譽獲得者",
+      "placeholderName": "你的名字",
+      "placeholderHint": "這塊銘牌還在等待它的第一個名字。",
+      "pastTitle": "歷屆榮譽獲得者",
+      "pastEmpty": "榮譽榜上還沒有名字。",
+      "close": "關閉"
+    },
     "bank": {
       "title": "銀行",
       "subtitle": "鍍金保險箱",
@@ -19142,6 +19151,7 @@ export const zh_TW: EnTranslations = {
     "delveRiteShrineReedInteract": "蘆葦神龕：按 F 觸碰",
     "delveRiteShrineSkullInteract": "骷髏神龕：按 F 觸碰",
     "mailboxName": "郵箱",
-    "noticeboardName": "告示板"
+    "noticeboardName": "告示板",
+    "realmBuilderMonumentName": "王國建造者紀念碑"
   }
 };

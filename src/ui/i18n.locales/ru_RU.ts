@@ -14847,4 +14847,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.springtouched_crozier.name': 'Посох родникового касания',
   'entities.items.wand_of_quenched_sparks.name': 'Жезл угасших искр',
   'crucibleShop.balanceEntry': '{name} x{count}',
+  'hudChrome.realmBuilder.title': 'Зодчий месяца',
+  'hudChrome.realmBuilder.currentLabel': 'Отмечен в этом месяце',
+  'hudChrome.realmBuilder.placeholderName': 'Ваше имя',
+  'hudChrome.realmBuilder.placeholderHint': 'Эта табличка ждёт своего первого имени.',
+  'hudChrome.realmBuilder.pastTitle': 'Прежние зодчие',
+  'hudChrome.realmBuilder.pastEmpty': 'В списке пока нет имён.',
+  'hudChrome.realmBuilder.close': 'Закрыть',
+  'worldContent.realmBuilderMonumentName': 'Памятник зодчим королевства',
 };

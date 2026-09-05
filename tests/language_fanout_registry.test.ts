@@ -162,6 +162,10 @@ const FANOUT_ARMS: readonly string[] = [
   'this.tutorial.relocalize|',
   'this.bootcamp.relocalize|',
   'this.noticeboardPopup.relocalize|',
+  // the Realm Builder monument's honour-roll card: the month labels are
+  // Intl-formatted and the placeholder hint is prose, so a locale switch alone
+  // moves both without any state changing.
+  'this.realmBuilderPopup.relocalize|',
   'this.guildBoardWindow.relocalize|',
   'this.mobileActionRingPainter.relocalize|',
   'this.mountRaceStrip.relocalize|',

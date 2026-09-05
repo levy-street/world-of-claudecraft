@@ -3302,6 +3302,15 @@ export const it_IT: EnTranslations = {
       "popupTitle": "Cartello della Gilda",
       "close": "Chiudi"
     },
+    "realmBuilder": {
+      "title": "Realm Builder of the Month",
+      "currentLabel": "Honoured this month",
+      "placeholderName": "Your Name Here",
+      "placeholderHint": "This plate is waiting for its first name.",
+      "pastTitle": "Past honourees",
+      "pastEmpty": "No names on the roll yet.",
+      "close": "Close"
+    },
     "bank": {
       "title": "Banca",
       "subtitle": "Il Forziere Dorato",
@@ -19142,6 +19151,7 @@ export const it_IT: EnTranslations = {
     "delveRiteShrineReedInteract": "Santuario delle Canne: premi F per toccarlo",
     "delveRiteShrineSkullInteract": "Santuario del Teschio: premi F per toccarlo",
     "mailboxName": "Cassetta postale",
-    "noticeboardName": "Bacheca degli annunci"
+    "noticeboardName": "Bacheca degli annunci",
+    "realmBuilderMonumentName": "Realm Builder Monument"
   }
 };
