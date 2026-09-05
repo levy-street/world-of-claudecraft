@@ -3286,6 +3286,17 @@ export const DEEDS: Record<string, DeedDef> = {
     trigger: { kind: 'manual' },
     reward: { kind: 'title', text: 'the Unscorched' },
   },
+  // A class-restricted, soulbound quest craft is a personal celebration,
+  // never a mandatory Book completion or Renown step for other classes.
+  hid_forgebreaker: {
+    id: 'hid_forgebreaker',
+    name: 'A Spring Unchained',
+    desc: 'Shape Forgebreaker yourself and return to Maelin with the finished hammer.',
+    category: 'hidden',
+    renown: 0,
+    trigger: { kind: 'quest', questId: 'q_requiem_at_the_forge' },
+    hidden: true,
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

@@ -463,7 +463,7 @@ describe('Masterwrought art completion evidence', () => {
   it('byte-seals the root manifest so its target and evidence oracles cannot drift together', () => {
     const bytes = readFileSync(path.join(repoRoot, manifestPath));
     expect(bytes.length).toBe(459_411);
-    expect(hash(bytes)).toBe('5a82761cc7f9b233c0ee0535facfdd2f5b7fe756a556aa6d5e5530a69606dbd9');
+    expect(hash(bytes)).toBe('c2ec8bf6adedc3a4df2b0565fa65749c0049ae34b853779295774e74a81ca646');
   });
 
   it('pins the exact 176-target scope and the 81 added to 84 replaced item split', () => {
@@ -790,13 +790,13 @@ describe('Masterwrought art completion evidence', () => {
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
     expect(duplicateValues(currentOwnerIds)).toEqual([]);
-    expect(currentOwnerIds).toHaveLength(1254);
+    expect(currentOwnerIds).toHaveLength(1255);
     const crucibleBatches = mapping.generatedBatches.filter(
       ({ batchId: id }) => id === 'crucible-professions-2026-09-05',
     );
     expect(crucibleBatches).toHaveLength(1);
     const crucibleIds = new Set(crucibleBatches[0].itemIds);
-    expect(crucibleIds.size).toBe(45);
+    expect(crucibleIds.size).toBe(46);
     expect(value.targetSets.items.filter((id) => crucibleIds.has(id))).toEqual([]);
     const completionOwnerIds = currentOwnerIds.filter((id) => !crucibleIds.has(id));
     expect(completionOwnerIds).toHaveLength(1209);

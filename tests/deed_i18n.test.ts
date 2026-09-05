@@ -84,8 +84,17 @@ describe('deed_i18n English resolution', () => {
     // 298 since the release/v0.41.0 merge (2026-08-30) brought in the five
     // Crucible raid deeds; the Varkhul flawless task carries a title (the
     // release's own chain read 281 * 2 + 43), so the title count moves to 46.
-    expect(manifest.length).toBe(298 * 2 + 46);
+    // The personal hammer quest adds a name and desc, but no title reward.
+    expect(manifest.length).toBe(299 * 2 + 46);
     expect(manifest.filter((row) => row.field === 'title').length).toBe(46);
+    expect(manifest.filter((row) => row.id === 'hid_forgebreaker')).toEqual([
+      { id: 'hid_forgebreaker', field: 'name', source: 'A Spring Unchained' },
+      {
+        id: 'hid_forgebreaker',
+        field: 'desc',
+        source: 'Shape Forgebreaker yourself and return to Maelin with the finished hammer.',
+      },
+    ]);
     expect(manifest).toContainEqual({
       id: 'prog_veteran',
       field: 'title',

@@ -162,8 +162,8 @@ export function onInventoryChangedForQuests(ctx: SimContext, meta: PlayerMeta): 
         // the plain grade stops dropping for them entirely.
         const carried = countAcrossGrades(obj.itemId, (id) => ctx.countItem(id, meta.entityId));
         // An ownership objective (QuestDef.keepsCollectedItems) also counts
-        // copies worn in a bag socket, so following the quest's own "buckle it
-        // on" instruction cannot un-complete it.
+        // worn equipment and bag sockets, so equipping the quest's item
+        // cannot un-complete it.
         const have = Math.min(
           required,
           quest.keepsCollectedItems ? ownedItemCount(carried, meta, obj.itemId) : carried,

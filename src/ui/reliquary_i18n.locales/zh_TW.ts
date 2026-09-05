@@ -195,4 +195,8 @@ export const table: ReliquaryLocaleTable = {
     name: '英雄：內環熔爐',
     desc: '末焰鍛父瓦爾庫爾身上僅限英雄難度掉落的盾牌與武器。',
   },
+  professions_forgebreaker: {
+    name: '碎爐者',
+    desc: '末泉的聲音從鍛爐中解放，寄宿在你親手打造的戰鎚中。',
+  },
 };

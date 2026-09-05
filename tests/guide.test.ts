@@ -1022,7 +1022,7 @@ describe('Guide Reliquary spoiler-safe catalog', () => {
     }
   });
 
-  it('labels exactly the two outside-completion pages, and renders tag plus note for each', () => {
+  it('labels all three outside-completion pages, and renders tag plus note for each', () => {
     // The generated blob carries the flag for exactly the live flagged set
     // (a third flagged page must surface here the moment it is authored)...
     expect(
@@ -1033,13 +1033,14 @@ describe('Guide Reliquary spoiler-safe catalog', () => {
     ).toEqual([
       ['horizons_vault_of_ages', 'retired'],
       ['horizons_riftbound', 'personal'],
+      ['professions_forgebreaker', 'personal'],
     ]);
     // ...and the rendered catalog SHOWS the label: the tag beside the page
     // heading and the explanatory note, one pair per flagged page, resolved
     // through t() (never hardcoded English), with none on ordinary pages.
     const html = reliquaryCatalogSections(GUIDE_RELIQUARY);
-    expect(html.match(/guide-reliquary-flag/g)?.length).toBe(2);
-    expect(html.match(/guide-reliquary-note/g)?.length).toBe(2);
+    expect(html.match(/guide-reliquary-flag/g)?.length).toBe(3);
+    expect(html.match(/guide-reliquary-note/g)?.length).toBe(3);
     expect(html).toContain(`(${t('guide.reliquaryPage.retiredTag')})`);
     expect(html).toContain(`(${t('guide.reliquaryPage.personalTag')})`);
     expect(html).toContain(t('guide.reliquaryPage.retiredNote'));
@@ -3777,13 +3778,12 @@ describe('Guide professions pages and routes', () => {
     const rows = GUIDE_PROF_CRAFTS.flatMap((c) =>
       c.recipes.map((r) => ({ cap: c.maxSkill, gain: r.gain })),
     );
-    // The 33 skill-100 Crucible recipes all carry an unreachable zero-gain
-    // boundary too; keep the original 170-row behavior plus that exact growth.
-    expect(rows.length, 'published recipe rows').toBe(203);
+    // 33 Crucible crafts and the one-time Forgebreaker quest recipe.
+    expect(rows.length, 'published recipe rows').toBe(204);
     expect(
       rows.filter((r) => r.gain.zeroAt > r.cap).length,
       'rows carrying at least one unreachable boundary',
-    ).toBe(96);
+    ).toBe(97);
 
     const never = t('guide.profPages.gainNever');
     const cell = (reduced: string, minimal: string, zero: string): string =>

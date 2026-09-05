@@ -160,8 +160,8 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       normalOnlyRow('varkhul_offset', 'orb_of_the_last_spring', 0.09375),
       normalOnlyRow('varkhul_offset', 'cinder_of_the_first_design', 0.09375),
       // Neither legendary drops on Normal. Emberward's 3 percent roll lives
-      // in Varkhul's heroic-only exclusive group; Forgebreaker remains reserved
-      // for the crafting professions until its recipe chain lands.
+      // in Varkhul's heroic-only exclusive group; Forgebreaker's one-time
+      // quest shaping belongs to Weaponcrafting, never a boss loot row.
       normalOnlyRow('varkhul_offset', 'seal_of_the_forgewall', 0.125),
       normalOnlyRow('varkhul_offset', 'band_of_marked_strikes', 0.125),
       normalOnlyRow('varkhul_offset', 'circle_of_cinders', 0.125),
@@ -174,6 +174,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'lastflame_core', chance: 1 },
       { itemId: 'lastflame_core', chance: 0.5 },
       ...CRUCIBLE_PROFESSION_PATTERN_LOOT,
+      { itemId: 'forgefathers_ember', chance: 1, questId: 'q_forgefathers_requiem' },
     ],
     scale: 3.2,
     color: 0x9f351c,

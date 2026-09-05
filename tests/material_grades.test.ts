@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { CRUCIBLE_COLLECTION_RECIPES } from '../src/sim/content/crucible_collections';
+import { FORGEBREAKER_RECIPES } from '../src/sim/content/forgebreaker_recipe';
 import { GATHER_NODE_TYPES, GATHER_NODES } from '../src/sim/content/gather_nodes';
 import { ALL_RECIPES, TOOL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS, QUESTS } from '../src/sim/data';
@@ -417,7 +418,7 @@ describe('the tool ladder the grades exist to build', () => {
     ]);
   });
 
-  it('Fine grades stay confined to tool recipes and the approved Crucible mail collections', () => {
+  it('Fine grades stay confined to tools, Crucible mail collections, and the quest hammer', () => {
     const fineIds = new Set(Object.values(MATERIAL_GRADES).map((row) => row.fineItemId));
     const toolRecipeIds = new Set(TOOL_RECIPES.map((r) => r.id));
     const collectionFineRecipes = CRUCIBLE_COLLECTION_RECIPES.filter(
@@ -434,8 +435,27 @@ describe('the tool ladder the grades exist to build', () => {
         { itemId: 'fine_elderwood_log', count: 2 },
       ]);
     }
+    expect(FORGEBREAKER_RECIPES.map((recipe) => recipe.id)).toEqual([
+      'recipe_varkhul_forgebreaker',
+    ]);
+    const hammer = FORGEBREAKER_RECIPES[0];
+    expect(hammer).toMatchObject({
+      professionId: 'weaponcrafting',
+      skillReq: 125,
+      acquisition: ['quest'],
+      consumeOnCraft: true,
+    });
+    expect(hammer.reagents.filter((reagent) => fineIds.has(reagent.itemId))).toEqual([
+      { itemId: 'fine_thorium_ore', count: 10 },
+      { itemId: 'fine_elderwood_log', count: 6 },
+    ]);
     for (const recipe of ALL_RECIPES) {
-      if (toolRecipeIds.has(recipe.id) || collectionRecipeIds.has(recipe.id)) continue;
+      if (
+        toolRecipeIds.has(recipe.id) ||
+        collectionRecipeIds.has(recipe.id) ||
+        recipe.id === hammer.id
+      )
+        continue;
       for (const reagent of recipe.reagents) {
         expect(
           fineIds.has(reagent.itemId),

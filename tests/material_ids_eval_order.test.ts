@@ -90,11 +90,26 @@ describe('material_ids evaluation-order probe (pure table leaves keep the regist
     // material derivation must retain it without a pending-list exception.
     expect(mod.CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS).toEqual([]);
     const recipes = await import('../src/sim/content/recipes');
+    const coreConsumers = recipes.ALL_RECIPES.filter((recipe) =>
+      recipe.reagents.some((reagent) => reagent.itemId === 'lastflame_core'),
+    );
+    const collections = await import('../src/sim/content/crucible_collections');
+    const hammer = await import('../src/sim/content/forgebreaker_recipe');
+    expect(collections.CRUCIBLE_COLLECTION_RECIPES).toHaveLength(33);
+    expect(hammer.FORGEBREAKER_RECIPES.map((recipe) => recipe.id)).toEqual([
+      'recipe_varkhul_forgebreaker',
+    ]);
+    expect(coreConsumers).toHaveLength(34);
+    expect(coreConsumers.map((recipe) => recipe.id).sort()).toEqual(
+      [...collections.CRUCIBLE_COLLECTION_RECIPES, ...hammer.FORGEBREAKER_RECIPES]
+        .map((recipe) => recipe.id)
+        .sort(),
+    );
     expect(
-      recipes.ALL_RECIPES.filter((recipe) =>
-        recipe.reagents.some((reagent) => reagent.itemId === 'lastflame_core'),
+      hammer.FORGEBREAKER_RECIPES[0].reagents.filter(
+        (reagent) => reagent.itemId === 'lastflame_core',
       ),
-    ).toHaveLength(33);
+    ).toEqual([{ itemId: 'lastflame_core', count: 15, noDiscount: true }]);
     const ids = await import('../src/sim/material_ids');
     expect(ids.isMaterialItemId('lastflame_core')).toBe(true);
   });

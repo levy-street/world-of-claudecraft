@@ -1304,6 +1304,10 @@ export function resolveCraftForRecipe(
       if (xp > 0) ctx.grantXp(xp, meta);
     }
   }
+  // A single-use quest shaping is spent only after the output is granted.
+  // The normal known-recipe admission closes direct replays and batch tails;
+  // failed casts and failed material/capacity checks never reach this point.
+  if (recipe.consumeOnCraft && meta) meta.knownRecipes.delete(recipe.id);
   const result: CraftResult = {
     ok: true,
     recipeId: recipe.id,
@@ -1379,17 +1383,23 @@ export function maxCraftCountForRecipe(
 ): number {
   const meta = ctx.players.get(pid);
   const craftSkills = meta ? meta.craftSkills : {};
-  // Masterwrought phase 07: never promise a batch the resolve refuses. A
+  // Never promise a batch the resolve refuses. One-use quest knowledge
+  // permits one craft while learned and none after it is consumed.
+  // Masterwrought phase 07: a
   // oncePerDay recipe previews at most ONE craft, zero once today's stamp is
   // set (the same stamp-and-knownness read the admission gate denies on,
   // kept term-for-term in step with the gate at evaluateCraftAdmission), so
   // the Create All affordance and the qty clamp can never overpromise.
-  const dailyCap = recipe.oncePerDay
-    ? craftDailyLimitReached(ctx, meta, recipe) && isRecipeKnown(meta, recipe)
-      ? 0
-      : 1
-    : CRAFT_BATCH_MAX;
-  if (recipe.reagents.length === 0) return dailyCap;
+  const craftCap = recipe.consumeOnCraft
+    ? isRecipeKnown(meta, recipe)
+      ? 1
+      : 0
+    : recipe.oncePerDay
+      ? craftDailyLimitReached(ctx, meta, recipe) && isRecipeKnown(meta, recipe)
+        ? 0
+        : 1
+      : CRAFT_BATCH_MAX;
+  if (recipe.reagents.length === 0) return craftCap;
   if (!meta) {
     // No meta resolves no inventory to simulate: keep the one-shot division
     // (no self-signed copy, and by the same reasoning no locked copy either,
@@ -1406,7 +1416,7 @@ export function maxCraftCountForRecipe(
       const have = countAcrossGrades(reagent.itemId, (id) => ctx.countItem(id, pid));
       max = Math.min(max, Math.floor(have / required));
     }
-    return Math.min(Math.max(0, max), dailyCap);
+    return Math.min(Math.max(0, max), craftCap);
   }
   // Simulate the batch craft by craft on a scratch copy, re-deriving each
   // craft's per-reagent requirement from the SCRATCH state: the #1145
@@ -1472,7 +1482,7 @@ export function maxCraftCountForRecipe(
     }
     crafts++;
   }
-  return Math.min(crafts, dailyCap);
+  return Math.min(crafts, craftCap);
 }
 
 /** Clamp a requested batch count: default/invalid -> 1, floor, then

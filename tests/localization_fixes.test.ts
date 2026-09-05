@@ -1355,6 +1355,9 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // to literals the hud quest matchers already recognize, so a rewording of THIS
     // file's sites was invisible to the guard before this entry.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/quests/quest_commands.ts'), 'utf8'),
+    // Quest-taught recipes reuse an existing localized refusal, but their
+    // new module must still join the scan so later wording cannot escape it.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/quests/quest_recipe_rewards.ts'), 'utf8'),
     // Bank system: the pooled bank deposit/withdraw/buy-slots command bodies
     // emit the quest-item/full/only-materials-space/afford/max-slots refusals
     // + the purchase notice.
@@ -1938,23 +1941,26 @@ describe('server restart-countdown announcements are localized (broadcastSystem 
 // while the gate stays green. This reads THIS test file's own source and fails
 // if the entry ever leaves the list. The marker strings are concatenated at
 // runtime so this guard can never match its own source instead of the list. ---
-describe('S3 meta-guard: quest_commands.ts stays on the simSrc scan list', () => {
-  it('keeps src/sim/quests/quest_commands.ts in the S3 scan list', () => {
-    const self = fs.readFileSync(
-      path.resolve(process.cwd(), 'tests/localization_fixes.test.ts'),
-      'utf8',
-    );
-    const listStart = self.indexOf(['const simSrc', '= ['].join(' '));
-    expect(listStart, 'the simSrc scan-list declaration should exist').toBeGreaterThan(-1);
-    const listEnd = self.indexOf([']', 'join'].join('.'), listStart);
-    expect(listEnd, 'the simSrc scan list should close with a join').toBeGreaterThan(listStart);
-    const listBlock = self.slice(listStart, listEnd);
-    const entry = ['src/sim/quests', 'quest_commands.ts'].join('/');
-    expect(
-      listBlock.includes(`'${entry}'`),
-      `${entry} must stay in the S3 simSrc scan list (the PR 2039 blind-spot fix)`,
-    ).toBe(true);
-  });
+describe('S3 meta-guard: quest command and recipe-reward modules stay on the simSrc scan list', () => {
+  it.each(['quest_commands.ts', 'quest_recipe_rewards.ts'])(
+    'keeps %s in the S3 scan list',
+    (module) => {
+      const self = fs.readFileSync(
+        path.resolve(process.cwd(), 'tests/localization_fixes.test.ts'),
+        'utf8',
+      );
+      const listStart = self.indexOf(['const simSrc', '= ['].join(' '));
+      expect(listStart, 'the simSrc scan-list declaration should exist').toBeGreaterThan(-1);
+      const listEnd = self.indexOf([']', 'join'].join('.'), listStart);
+      expect(listEnd, 'the simSrc scan list should close with a join').toBeGreaterThan(listStart);
+      const listBlock = self.slice(listStart, listEnd);
+      const entry = ['src/sim/quests', module].join('/');
+      expect(
+        listBlock.includes(`'${entry}'`),
+        `${entry} must stay in the S3 simSrc scan list (the PR 2039 blind-spot fix)`,
+      ).toBe(true);
+    },
+  );
 });
 
 // --- Elixir aura names must round-trip the AURA_NAME_KEY reverse map. The

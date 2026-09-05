@@ -963,4 +963,8 @@ export const table: DeedLocaleTable = {
     desc: 'レイドの誰ひとり死なせずに、英雄難易度で「最後の炎の鍛造父、ヴァルクル」を倒す。',
     title: '無傷',
   },
+  hid_forgebreaker: {
+    name: '解き放たれた泉',
+    desc: 'フォージブレイカーを自ら鍛え、完成した槌を携えてメイリンのもとへ戻る。',
+  },
 };

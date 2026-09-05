@@ -14157,6 +14157,9 @@ export const zh_TW: EnTranslations = {
       "lastflame_core": {
         "name": "末焰之核"
       },
+      "forgefathers_ember": {
+        "name": "鍛父的餘燼"
+      },
       "slagbreaker_helmet": {
         "name": "破渣头盔"
       },
@@ -17797,6 +17800,26 @@ export const zh_TW: EnTranslations = {
         "objectives": {
           "0": {
             "label": "擊敗瓦爾庫爾"
+          }
+        }
+      },
+      "q_forgefathers_requiem": {
+        "title": "鍛父的安魂曲",
+        "text": "瓦爾庫爾將末泉的一縷餘燼藏在心中。從他身上取回餘燼，帶來交給我。武器鍛造技能達到125後，你就能學習親手鍛造碎爐者。接受此任務期間，在任意難度下擊敗他都能獲得餘燼。",
+        "completion": "它仍在歌唱。留著餘燼，你的戰鎚需要它的聲音。我已傳授給你一次鍛造碎爐者的技藝。只有製作成功，餘燼和這份技藝才會消耗。",
+        "objectives": {
+          "0": {
+            "label": "取回鍛父的餘燼"
+          }
+        }
+      },
+      "q_requiem_at_the_forge": {
+        "title": "鍛爐旁的安魂曲",
+        "text": "將餘燼、十五枚末焰之核、優質鋨礦石和優質高松原木帶到鍛爐。親手鍛造碎爐者，然後將它放在背包中或裝備上，回來見我。戰鎚歸你所有，並與你綁定。這份技藝只能製作一把戰鎚。",
+        "completion": "泉水的聲音在鋼鐵中迴盪。瓦爾庫爾囚禁的事物，已被你的雙手解放。鍛造者，好好持有碎爐者吧。",
+        "objectives": {
+          "0": {
+            "label": "鍛造並攜帶碎爐者"
           }
         }
       },

@@ -10,8 +10,9 @@
 //
 // - Eligibility: the 2026-07-20 maintainer ruling scopes the opt-in to
 //   EQUIPMENT ONLY (weapon, armor, held_offhand: the kinds that already carry
-//   instances). The craft resolver consults isCommissionEligible and silently
-//   ignores the flag for any other kind, so a tampered command can never arm
+//   instances), excluding soulbound equipment that cannot be delivered. The
+//   craft resolver consults isCommissionEligible and silently ignores the
+//   flag for ineligible output, so a tampered command can never arm
 //   a potion (server authority: the flag is a boolean, the marker is minted
 //   server-side).
 // - The unbind fee: tier-scaled on the training-fee family by the item DEF's
@@ -51,10 +52,10 @@ export function isCommissionEligibleKind(kind: ItemDef['kind'] | undefined): boo
   return kind === 'weapon' || kind === 'armor' || kind === 'held_offhand';
 }
 
-/** The def-level form of the opt-in rule. Everything ineligible ignores the
- *  commission flag at craft time. */
+/** The def-level form of the opt-in rule. Soulbound equipment is owner-only,
+ *  not a deliverable commission. Everything ineligible ignores the flag at craft time. */
 export function isCommissionEligible(def: ItemDef | undefined): boolean {
-  return !!def && isCommissionEligibleKind(def.kind);
+  return !!def && !def.soulbound && isCommissionEligibleKind(def.kind);
 }
 
 // The unbind fee ladder, in copper, indexed from the uncommon rung of

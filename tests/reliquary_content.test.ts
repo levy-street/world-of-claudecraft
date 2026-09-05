@@ -221,7 +221,14 @@ function isReliquaryCarvedOut(itemId: string): boolean {
 // professions doctrine: the crafted OUTPUTS are the uniques). The liveness
 // arm in the raid-page describe proves this filter excludes a real epic row.
 function isMaterialId(itemId: string): boolean {
-  return ITEMS[itemId]?.kind === 'junk';
+  return (
+    ITEMS[itemId]?.kind === 'junk' ||
+    // Forgebreaker's retained quest ember is spent by its one-use recipe.
+    // The hammer is the unique, not the consumed proof. Ordinary quest items
+    // are NOT excluded: only live recipe reagents join the material rule.
+    (ITEMS[itemId]?.kind === 'quest' &&
+      ALL_RECIPES.some((recipe) => recipe.reagents.some((reagent) => reagent.itemId === itemId)))
+  );
 }
 
 function dungeonRarePlusLootIds(
@@ -368,10 +375,10 @@ describe('Reliquary Conqueror catalog structure', () => {
     // 27 + the four Crucible raid pages (per-boss N+H, the obligations
     // closeout of docs/prd/ignivar-raid-loot.md).
     expect(CONQUEROR_PAGES.length).toBe(31);
-    expect(PROFESSION_PAGES.length).toBe(4);
+    expect(PROFESSION_PAGES.length).toBe(5);
     expect(HORIZON_PAGES.length).toBe(5);
     // Literal: update when product adds a page.
-    expect(RELIQUARY_PAGES.length).toBe(40);
+    expect(RELIQUARY_PAGES.length).toBe(41);
     expect(
       RELIQUARY_PAGES.every(
         (p) => p.shelf === 'conquerors' || p.shelf === 'professions' || p.shelf === 'horizons',
@@ -420,12 +427,12 @@ describe('Reliquary Conqueror catalog structure', () => {
     // rung of the crafted rod ladder the specimen page already catalogues: 346.
     // Catalog growth reverts
     // page completion for finished players, per docs/design/reliquary.md.
-    // The two excludeFromCompletion pages add
+    // The three excludeFromCompletion pages add
     // slots and 0 to BOTH pairs: the Vault of Ages contributes four retired
     // slots and horizons_riftbound the three class-personal Riftbound bands,
-    // and the flag keeps each whole page out of owned AND total (the dedicated
+    // plus the personal Forgebreaker quest craft. The flag keeps each page out of owned AND total (the dedicated
     // vault and riftbound pins in this file and tests/reliquary_state.test.ts
-    // hold both sides), so neither page moves these two literals.
+    // hold both sides), so none of these pages moves these two literals.
     // The bank-storage merge (release/v0.41.0, 2026-08-29) pages the release's
     // two live bag drops (wayfarers_backpack on Spoils,
     // necromancers_reagent_satchel on Gravewyrm Sanctum), the
@@ -487,12 +494,12 @@ describe('Reliquary Conqueror catalog structure', () => {
     // Bonebound Rickshaw slot the release/v0.42.0 merge added to
     // horizons_mounts: 384 total. Lanternback Troll and Chimeglass Tortoise
     // add the next two mount slots: 386 before later catalog growth.
-    // Slots, not unique relics: the seven excludeFromCompletion slots (four
-    // vault, three bands) count here while adding zero to every completion
+    // Slots, not unique relics: the eight excludeFromCompletion slots (four
+    // vault, three bands, one Forgebreaker) count here while adding zero to every completion
     // pair, and every duplicate ITEM slot counts again here where the overview
     // counts the relic once (28 such slots, the two Spoils set repeats among
     // them; most predate Phase 21), which is why this number exceeds the
-    // overview total above by 35.
+    // overview total above by 36.
     const slots = RELIQUARY_PAGES.reduce((n, page) => n + page.relics.length, 0);
     // Diagnostic names the per-page breakdown, so a red here says WHICH page
     // moved instead of only that the sum did. The four Crucible raid pages
@@ -505,11 +512,13 @@ describe('Reliquary Conqueror catalog structure', () => {
     // next: 428. Lanternback Troll and Chimeglass Tortoise bring the merged
     // total to 430. The Cluckwork Mech Bird adds one more mount slot: 431.
     // Moving Emberward from Varkhul's normal page to its heroic page in the
-    // same release re-slots it and keeps this total fixed.
+    // same release re-slots it and keeps this total fixed. The one-time
+    // Forgebreaker quest adds one personal slot beside 33 Crucible crafts,
+    // taking the total to 465.
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(464);
+    ).toBe(465);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -731,7 +740,8 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // crafting chain; the release's own chain read 284 = 242 + 42): 285, the
     // sixth figure of the ledger row's "all pinned" claim; the other five are
     // the page/overview/character/slot/mark literals nearby.
-    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(318);
+    // 33 Crucible collection items plus the personal Forgebreaker shaping.
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(319);
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
     }
@@ -1219,11 +1229,11 @@ describe('Reliquary Riftbound page (class-personal, outside completion)', () => 
 });
 
 describe('Reliquary outside-completion pages (the flagged set)', () => {
-  it('flags exactly the two pages, in catalog order, each with its reason', () => {
+  it('flags exactly the three pages, in catalog order, each with its reason', () => {
     // Catalog-wide companion to the per-page pins: the flag is the one lever
     // that removes a page from every completion pair, so its whole membership
-    // is pinned in one place. A third flagged page is a product decision and
-    // reds here until it is made deliberately.
+    // is pinned in one place. Forgebreaker's approved one-time, class-restricted
+    // shaping adds the third personal page without widening completion.
     expect(
       RELIQUARY_PAGES.filter((p) => p.excludeFromCompletion !== undefined).map((p) => [
         p.id,
@@ -1232,6 +1242,7 @@ describe('Reliquary outside-completion pages (the flagged set)', () => {
     ).toEqual([
       ['horizons_vault_of_ages', 'retired'],
       ['horizons_riftbound', 'personal'],
+      ['professions_forgebreaker', 'personal'],
     ]);
     // Both reasons are live, so neither arm of the reason-driven chrome
     // (window chip, styles) is pinned against an empty set. Sorting keeps
@@ -1723,6 +1734,26 @@ const EQUALITY_PAGES: Record<string, { pageId: string; floor: number }> = {
 };
 
 describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
+  it('excludes exactly the consumed Forgefather quest ember, not ordinary quest relics', () => {
+    const questMaterials = [
+      ...new Set(Object.keys(DUNGEONS).flatMap((id) => [...dungeonLootIdsAnyQuality(id)])),
+    ]
+      .filter((id) => ITEMS[id]?.kind === 'quest' && isRarePlus(id) && isMaterialId(id))
+      .sort();
+    expect(questMaterials).toEqual(['forgefathers_ember']);
+    expect(ALL_RECIPES.find((recipe) => recipe.id === 'recipe_varkhul_forgebreaker')).toMatchObject(
+      {
+        acquisition: ['quest'],
+        consumeOnCraft: true,
+        reagents: expect.arrayContaining([
+          { itemId: 'forgefathers_ember', count: 1, noDiscount: true },
+        ]),
+      },
+    );
+    expect(dungeonRarePlusLootIds('ignivar_inner_crucible')).not.toContain('forgefathers_ember');
+    expect(isCataloguedRelicItem('forgefathers_ember')).toBe(false);
+  });
+
   it('normal dungeon and raid pages equal their live rare+ mob drops', () => {
     for (const [dungeonId, { pageId, floor }] of Object.entries(EQUALITY_PAGES)) {
       const derived = dungeonRarePlusLootIds(dungeonId);
@@ -1811,11 +1842,11 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
     }
   });
 
-  it('the Varkhul legendaries: Emberward is Heroic-only and Forgebreaker is craft-pending', () => {
+  it('the Varkhul legendaries: Emberward is Heroic-only and Forgebreaker is personally crafted', () => {
     // Emberward's drop and museum route move as one unit: it is absent from
     // Varkhul's normal table and page, present in the heroic append and page,
     // and remains catalogued globally. Forgebreaker is deliberately off both
-    // tables and pages while its crafting route is pending.
+    // loot tables and catalogued on its own personal professions page.
     const normalLootIds = (MOBS.varkhul_forgefather_of_the_last_flame.loot ?? []).map(
       (entry) => entry.itemId,
     );
@@ -1832,7 +1863,10 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
     expect(itemRelicIds(RELIQUARY_PAGES_BY_ID.conquerors_varkhul_heroic)).toContain(
       'varkhul_emberward',
     );
-    expect(isCataloguedRelicItem('varkhul_forgebreaker')).toBe(false);
+    expect(isCataloguedRelicItem('varkhul_forgebreaker')).toBe(true);
+    expect(itemRelicIds(RELIQUARY_PAGES_BY_ID.professions_forgebreaker)).toEqual([
+      'varkhul_forgebreaker',
+    ]);
     expect(normalLootIds).not.toContain('varkhul_forgebreaker');
     expect(heroicLootIds).not.toContain('varkhul_forgebreaker');
   });
@@ -2046,11 +2080,12 @@ function craftIsGearCapable(craftId: string): boolean {
 }
 
 describe('Reliquary Professions shelf (Phase 7)', () => {
-  it('authors masterwork, field notes, and specimen pages (not empty stubs)', () => {
+  it('authors masterwork, field notes, specimens, and the personal Forgebreaker page', () => {
     expect(PROFESSION_PAGES.map((p) => p.id).sort()).toEqual(
       [
         'professions_crucible',
         'professions_field_notes',
+        'professions_forgebreaker',
         'professions_masterwork',
         'professions_specimens',
       ].sort(),
@@ -2980,6 +3015,7 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // their Litany board keeper (Phase 21).
   professions_specimens: 7,
   professions_crucible: 3,
+  professions_forgebreaker: 1,
   // 11 = the four heroic bosses + the raid + Marla + rift A/B/S + the two
   // pending-ruling absences resolve to nothing, plus the storefront carrying
   // the Mech Bird (the 'store' door the Armory skins already opened).
@@ -3475,6 +3511,7 @@ describe('Reliquary source hints resolve against live content', () => {
       'gravewyrm_gauntlets',
       'stormreel_fishing_rod',
       'tidewrought_fishing_rod',
+      'varkhul_forgebreaker',
     ]);
   });
 
@@ -4516,10 +4553,11 @@ describe('Reliquary source hint coverage', () => {
       if (inherited === 0) offenders.push(`${page.id} defaults but every relic owns a hint`);
     }
     expect(offenders).toEqual([]);
-    // All fourteen defaults are live today (nine boss pages, the storefront
-    // on the skins page, and the four Crucible raid pages); update
+    // All fifteen defaults are live today (nine boss pages, the storefront
+    // on the skins page, the four Crucible raid pages, and Forgebreaker's
+    // one Weaponcrafting door); update
     // deliberately with the authoring.
-    expect(defaults).toBe(14);
+    expect(defaults).toBe(15);
   });
 });
 

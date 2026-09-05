@@ -92,7 +92,7 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 298 deeds worth 3525 total Renown', () => {
+  it('ships exactly 299 deeds worth 3525 total Renown', () => {
     // Release base (262 / 3145 after the WARFARE lifetime-honor ladder) plus
     // four Reliquary Curator rank bridges and the five Phase 18 completion
     // ladder deeds (all nine renown 0: catalog prestige never scores the
@@ -149,7 +149,9 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // The NAME carries the numbers too, deliberately: vitest prints it in the
     // failure header, and a stale name there is the one part of this pin a
     // reader can act on without seeing the diff. It went stale once already.
-    expect(DEED_ORDER.length).toBe(298);
+    // Forgebreaker's personal, class-restricted quest celebration adds one
+    // hidden deed at zero Renown: 299 / 3525, all older content untouched.
+    expect(DEED_ORDER.length).toBe(299);
     expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3525);
   });
 
@@ -185,7 +187,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       social: 20,
       exploration: 11,
       feat: 3,
-      hidden: 9,
+      hidden: 10,
     });
   });
 
@@ -372,6 +374,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'dgn_varkhul',
       'dgn_varkhul_heroic',
       'dgn_varkhul_flawless',
+      'hid_forgebreaker',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -960,7 +963,9 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // appended rows reproduce the release's bd95099f..., so the merged catalog
   // is a pure append on BOTH sides. No shipped trigger or renown changed on
   // either side.
-  const FROZEN_CATALOG_SHA256 = '77b670a2b8eefdfb6768290dbbee7146828636c3b7327d0cb88cb5683c072a4b';
+  // Forgebreaker's personal quest adds one hidden, zero-Renown tail row.
+  // The pre-append proof below preserves every earlier trigger and value.
+  const FROZEN_CATALOG_SHA256 = 'ed5078343bcd897c66006561b7eb5bbeef7c98c0a5597807235ff4e11529e47d';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -993,32 +998,23 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // release's five Crucible raid deeds, and the previous mint is the
   // d1c102c3... literal that merge rotated down here; the proof below
   // reproduces it exactly, so no older row was retro-edited by the merge.
+  // The one-time Forgebreaker quest appends one hidden, zero-Renown deed.
+  // Removing it must reproduce the preceding frozen catalogue exactly.
   const PRE_APPEND_CATALOG_SHA256 =
-    'd1c102c3eebce38a337164d7164d3954108393b9f9b93a5f2d14242c0c403530';
-  const APPENDED_SINCE: readonly string[] = [
-    'dgn_ignivar',
-    'dgn_ignivar_heroic',
-    'dgn_varkhul',
-    'dgn_varkhul_heroic',
-    'dgn_varkhul_flawless',
-  ];
+    '77b670a2b8eefdfb6768290dbbee7146828636c3b7327d0cb88cb5683c072a4b';
+  const APPENDED_SINCE: readonly string[] = ['hid_forgebreaker'];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
     const appended = new Set(APPENDED_SINCE);
     for (const id of APPENDED_SINCE) {
       expect(DEED_ORDER.includes(id), `${id} is in the live catalog`).toBe(true);
     }
-    // The appended rows sit as one contiguous run at a PINNED position: the
-    // 2026-08-29 merge seated the release's soc pair ahead of the shared
-    // graduation tail (the release's own authored order), so that pin was the
-    // exact final four; this merge seats the release's Crucible raid block
-    // behind the branch's prog_legendmaker, so the run IS the tail, pinned
-    // together with the two rows it follows. Still an append into a known
-    // seat, never a scattered insert, and never a retro-edit (the digest
-    // below proves it).
+    // The new quest celebration sits at the true tail after the raid block.
+    // Pin its two predecessors too: this is an append into a known seat,
+    // never a scattered insert or a retro-edit (the digest below proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      'prog_ready_for_an_adventure',
-      'prog_legendmaker',
+      'dgn_varkhul_heroic',
+      'dgn_varkhul_flawless',
       ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
@@ -1234,7 +1230,8 @@ describe('table shape', () => {
     // 2026-08-30 sync merge seats the release's Crucible raid block behind
     // that (appended behind the branch's rows; the flawless task is its
     // final entry).
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('dgn_varkhul_flawless');
+    // The one-time Forgebreaker quest's hidden celebration appends after it.
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('hid_forgebreaker');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

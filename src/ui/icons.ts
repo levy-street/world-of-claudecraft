@@ -5368,8 +5368,8 @@ const DEED_ICON_DIR = '/ui/deeds';
 const DEED_CREST_PREFIX = 'deed_';
 
 // Exhaustive live-deed art debt ledger. The Masterwrought completion wave clears its
-// eleven crests (including the commissioned Harvestmaster replacement); the remaining rows
-// belong to independent release work and retain their deliberate procedural category fallback.
+// eleven crests (including the commissioned Harvestmaster replacement). Inherited release
+// rows and the hidden hammer celebration retain their deliberate procedural category fallback.
 // Insertion order mirrors DEED_ORDER because the deed-art gate derives its exact debt in order.
 export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'exp_the_last_keep',
@@ -5382,6 +5382,8 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'dgn_varkhul',
   'dgn_varkhul_heroic',
   'dgn_varkhul_flawless',
+  // Hidden self-craft celebration; 512px RGBA commission brief in docs/achievements/icon-brief.md.
+  'hid_forgebreaker',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

@@ -2736,6 +2736,7 @@ const ITEM_ENTITY_IDS = [
   'ps_passing_stone',
   // Crucible raid professions (docs/prd/ignivar-raid-professions.md).
   'lastflame_core',
+  'forgefathers_ember',
   // Ignivar raid loot (Crucible of the Last Spring), src/sim/content/ignivar_loot.ts.
   'slagbreaker_helmet',
   'slagbreaker_shoulder',
@@ -3392,6 +3393,7 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   // Crucible raid professions, English-appended like the waves above (the
   // maintainer fills every locale at release).
   lastflame_core: 'Core of the Last Flame',
+  forgefathers_ember: "Forgefather's Ember",
   // Ignivar raid loot, English-appended like the sets above; the five non-Latin
   // locales carry their M16 fills in src/ui/i18n.locales/ and the Latin locales
   // fold in at the release fill.

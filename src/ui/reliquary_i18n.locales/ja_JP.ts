@@ -196,4 +196,8 @@ export const table: ReliquaryLocaleTable = {
     name: '英雄: 内部るつぼ',
     desc: '最後の炎の鍛造父、ヴァルクルからヒロイックでのみ得られる盾と武器。',
   },
+  professions_forgebreaker: {
+    name: 'フォージブレイカー',
+    desc: '鍛冶場から解き放たれ、自ら作った槌に宿る最後の泉の声。',
+  },
 };

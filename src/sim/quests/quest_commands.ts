@@ -52,6 +52,7 @@ import {
   validateProfessionQuestSelection,
 } from './profession_quest_effects';
 import { playerHoldsQuestItem } from './quest_item_presence';
+import { grantQuestRecipeReward, validateQuestRecipeReward } from './quest_recipe_rewards';
 
 // Pure quest-state computation, shared by the sim and the network client. Relocated
 // from sim.ts (W4) and re-exported from sim.ts so the ClientWorld import
@@ -415,6 +416,7 @@ export function turnInQuestCore(
 ): boolean {
   const qp = meta.questLog.get(questId);
   if (!qp) return false;
+  if (!validateQuestRecipeReward(ctx, quest, meta)) return false;
   if (!applyProfessionQuestEffect(ctx, quest, qp, meta)) return false;
   for (const [index, obj] of quest.objectives.entries()) {
     // An ownership objective (QuestDef.keepsCollectedItems) proves the player
@@ -460,6 +462,7 @@ export function turnInQuestCore(
   }
   const rewardItem = questRewardItemId(quest, meta.cls);
   if (rewardItem) ctx.addItem(rewardItem, 1, meta.entityId);
+  grantQuestRecipeReward(ctx, quest, meta);
   ctx.grantXp(quest.xpReward, meta);
   // Arm the repeat-cadence window (work orders): the quest stays
   // unavailable (computeQuestState) until now + repeatCadenceTicks, server-

@@ -854,8 +854,8 @@ describe('the professions blob growth bound (phase 16)', () => {
     expect(s2.knownRecipes ?? []).toHaveLength(RETAINABLE_KNOWN_IDS.size);
     expect(new Set(s2.knownRecipes)).toEqual(RETAINABLE_KNOWN_IDS);
     expect(MAX_KNOWN_RECIPE_IDS).toBe(512);
-    expect(new Set(ALL_RECIPES.map((recipe) => recipe.id)).size).toBe(203);
-    expect(RETAINABLE_KNOWN_IDS.size).toBe(204);
+    expect(new Set(ALL_RECIPES.map((recipe) => recipe.id)).size).toBe(204);
+    expect(RETAINABLE_KNOWN_IDS.size).toBe(205);
     expect(RETAINABLE_KNOWN_IDS.size).toBeLessThan(MAX_KNOWN_RECIPE_IDS);
     expect(s2.knownRecipes).toContain('enchant_weapon_lastflame_zeal');
     // Derived from the refusal policy so a profession becoming slottable
@@ -1134,8 +1134,9 @@ describe('the professions blob growth bound (phase 16)', () => {
     // Crucible 2026-09-05: 18,807 = 17,596 + 1,189 (33 new recipe ids) + 32
     // (Zeal) - 10 (legal equipment payloads, including new binding/provenance,
     // replacing the invented three-stat rolls). Same narrow tracking band.
-    expect(bytes).toBeGreaterThan(18427);
-    expect(bytes).toBeLessThan(18808);
+    // One quest recipe adds exactly 30 UTF-8 bytes to retained knowledge.
+    expect(bytes).toBeGreaterThan(18457);
+    expect(bytes).toBeLessThan(18838);
     // Strictly dominated by the band's upper edge while the band holds:
     // kept as documentation that the structural ceiling also bounds this
     // state, never the live guard.
@@ -1754,8 +1755,8 @@ describe('the whole-character maximal blob (Phase 18 U-MEASURE)', () => {
     // professions arm pins, so the two measurements can never describe
     // different fixtures.
     const professions = professionsBytes(s2);
-    expect(professions).toBeGreaterThan(18427);
-    expect(professions).toBeLessThan(18808);
+    expect(professions).toBeGreaterThan(18457);
+    expect(professions).toBeLessThan(18838);
 
     // Every container really reached its ceiling through the load (the
     // `field in state` and non-empty pins above are the pattern): a load clamp
@@ -1970,9 +1971,31 @@ describe('the whole-character maximal blob (Phase 18 U-MEASURE)', () => {
       inventory: 16320,
       bank: 35904,
       vendorBuyback: 756,
-      knownRecipes: 32,
+      knownRecipes: 62,
     });
-    expect(bytes - 156144).toBe(Object.values(fixtureDelta).reduce((sum, value) => sum + value, 0));
+    // The one-time quest adds 213 bytes against the integration fixture:
+    // 30 knowledge bytes already counted above, plus 183 in existing quest,
+    // deed and Reliquary catalogs. No additional saved field or ledger.
+    expect(bytes - 156144).toBe(
+      Object.values(fixtureDelta).reduce((sum, value) => sum + value, 0) + 183,
+    );
+    const forgeBaseline = {
+      questsDone: 4606,
+      knownRecipes: 5953,
+      deeds: 10360,
+      deedStats: 31570,
+      reliquary: 18895,
+    } as const;
+    expect(
+      Object.fromEntries(
+        Object.entries(forgeBaseline).map(([key, previous]) => [
+          key,
+          Buffer.byteLength(JSON.stringify(s2[key as keyof typeof forgeBaseline]), 'utf8') -
+            previous,
+        ]),
+      ),
+    ).toEqual({ questsDone: 50, knownRecipes: 30, deeds: 32, deedStats: 21, reliquary: 80 });
+    expect(bytes - 209261).toBe(213);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -1996,8 +2019,8 @@ describe('the whole-character maximal blob (Phase 18 U-MEASURE)', () => {
       }),
     );
     expect(metadataDelta).toEqual({ perfectingBonus: 11880, perfectingBound: 5934 });
-    expect(bytes, reMint).toBeGreaterThan(208881);
-    expect(bytes, reMint).toBeLessThan(209262);
+    expect(bytes, reMint).toBeGreaterThan(209094);
+    expect(bytes, reMint).toBeLessThan(209475);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above this corrected 209,261-byte storage-rich fixture. The

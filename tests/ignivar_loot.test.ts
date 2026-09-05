@@ -661,12 +661,18 @@ describe('ignivar loot: the boss drop tables (one item per five raiders)', () =>
         })),
       );
     }
-    // The ungrouped rows remain exactly the money row and the reagent rows.
+    // Money/core rows are unchanged. Only Varkhul also carries the personal
+    // quest proof, separately pinned so it cannot become ordinary raid loot.
     for (const [entries, groups] of [
       [ignivar, ['ignivar_sigils', 'ignivar_offset']],
       [varkhul, ['varkhul_sigils', 'varkhul_offset']],
     ] as const) {
-      const rest = entries.filter((entry) => !entry.rollGroup);
+      expect(entries.filter((entry) => entry.questId)).toEqual(
+        entries === varkhul
+          ? [{ itemId: 'forgefathers_ember', chance: 1, questId: 'q_forgefathers_requiem' }]
+          : [],
+      );
+      const rest = entries.filter((entry) => !entry.rollGroup && !entry.questId);
       expect(rest.map((entry) => entry.itemId ?? 'copper')).toEqual([
         'copper',
         'lastflame_core',

@@ -43,9 +43,9 @@ const SCRIPTED_COLLECT_ITEMS = new Set(['the_codfather']);
 // (HARVEST_COMPONENT_ITEMS maps a component tag to game_meat, spider_silk,
 // rough_hide, etc), plus the farm harvest path the produce work orders use
 // (FARM_CROPS: harvestCrop grants a crop's produceItemId, vale_wheat, marsh_rice,
-// etc). Both the obtainability check and its negative control call
+// etc), and crafted recipe outputs. Both the obtainability check and its negative control call
 // this one predicate, so the negative control proves the REAL model, not a copy.
-function collectItemAcquirable(itemId: string): boolean {
+function collectItemAcquirable(itemId: string, recipes = ALL_RECIPES): boolean {
   const fromLoot = Object.values(MOBS).some((m) => m.loot.some((l) => l.itemId === itemId));
   const fromGround = GROUND_OBJECTS.some((g) => g.itemId === itemId);
   const fromScript = SCRIPTED_COLLECT_ITEMS.has(itemId);
@@ -60,7 +60,17 @@ function collectItemAcquirable(itemId: string): boolean {
   // shipped lesson is q_ps_pouch_and_purse collecting linen_pouch, the one
   // collect objective only the vendor arm satisfies on the merged tree.)
   const fromVendor = Object.values(NPCS).some((n) => n.vendorItems?.includes(itemId) === true);
-  return fromLoot || fromGround || fromScript || fromNode || fromHarvest || fromFarm || fromVendor;
+  const fromCraft = recipes.some((r) => r.resultItemId === itemId && r.resultCount > 0);
+  return (
+    fromLoot ||
+    fromGround ||
+    fromScript ||
+    fromNode ||
+    fromHarvest ||
+    fromFarm ||
+    fromVendor ||
+    fromCraft
+  );
 }
 
 describe('content referential integrity', () => {
@@ -127,6 +137,18 @@ describe('content referential integrity', () => {
       }
     }
     expect(problems).toEqual([]);
+  });
+
+  it('recognizes the taught quest craft without treating an uncrafted legendary as obtainable', () => {
+    expect(QUESTS.q_forgefathers_requiem.recipeReward).toBe('recipe_varkhul_forgebreaker');
+    expect(QUESTS.q_requiem_at_the_forge.requiresQuest).toBe('q_forgefathers_requiem');
+    expect(collectItemAcquirable('varkhul_forgebreaker')).toBe(true);
+    expect(
+      collectItemAcquirable(
+        'varkhul_forgebreaker',
+        ALL_RECIPES.filter((recipe) => recipe.id !== 'recipe_varkhul_forgebreaker'),
+      ),
+    ).toBe(false);
   });
 
   it('the collect-obtainability model rejects a fabricated unobtainable item (negative control)', () => {

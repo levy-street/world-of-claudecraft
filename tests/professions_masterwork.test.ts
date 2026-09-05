@@ -286,7 +286,7 @@ describe('masterworkBonusStats (the baked tier-delta budget)', () => {
   });
 });
 
-// The masterwork acceptance bound: a masterworked crafted output must stay
+// The masterwork acceptance bound: an ordinary masterworked output must stay
 // STRICTLY below the raid-loot band. Derivation (src/sim/item_level.ts, no
 // invented constants): a raid drop from band-level B content reads item level
 // B + QUALITY_ILVL_BONUS[quality] + RAID_ILVL_BONUS (itemLevel(): raid loot
@@ -298,6 +298,10 @@ describe('masterworkBonusStats (the baked tier-delta budget)', () => {
 // strongest source for a dual-source output like boundstone_helm, which also
 // drops in the level-20 dungeon).
 describe('masterwork stays strictly below the raid-loot band (acceptance bound)', () => {
+  // The existing raid legendary gained a one-use quest crafting route, not
+  // ordinary recipe power. Keep the exception identity-specific: any other
+  // legendary or unflagged crafted item still enters the bound below.
+  const questLegendaryRecipeId = 'recipe_varkhul_forgebreaker';
   const equippable = ALL_RECIPES.filter((r) => {
     const def = ITEMS[r.resultItemId];
     return !!def && isItemLevelEligible(def);
@@ -358,14 +362,51 @@ describe('masterwork stays strictly below the raid-loot band (acceptance bound)'
     expect(equippable.length).toBeGreaterThanOrEqual(8);
   });
 
-  it('every equippable recipe output, masterworked, stays strictly below its raid floor', () => {
+  it('every ordinary equippable recipe output, masterworked, stays strictly below its raid floor', () => {
     for (const recipe of equippable) {
+      if (recipe.id === questLegendaryRecipeId) continue;
       const row = boundRow(recipe, 1);
       expect(
         row.total,
         `${row.recipeId} (${row.itemId}): masterwork total ${row.total} must stay strictly below raid floor ${row.floor}`,
       ).toBeLessThan(row.floor);
     }
+  });
+
+  it('the sole quest-legendary exception preserves its existing stats and cannot masterwork', () => {
+    const recipe = recipeById(questLegendaryRecipeId)!;
+    expect(recipe).toMatchObject({
+      resultItemId: 'varkhul_forgebreaker',
+      resultCount: 1,
+      professionId: 'weaponcrafting',
+      skillReq: 125,
+      acquisition: ['quest'],
+      consumeOnCraft: true,
+    });
+    const def = ITEMS[recipe.resultItemId];
+    expect(def).toMatchObject({
+      quality: 'legendary',
+      soulbound: true,
+      hand: 'twohand',
+    });
+    expect(def.stats).toEqual({ str: 44, sta: 32, agi: 19 });
+    expect(def.weapon).toEqual({ min: 77, max: 115, speed: 3.6 });
+    expect(def.masterwrought).toBeUndefined();
+    expect(masterworkBumpedQuality(def.quality)).toBeNull();
+    expect(
+      masterworkBonusStats({
+        level: recipe.level,
+        quality: def.quality,
+        slot: def.slot,
+        stats: def.stats,
+      }),
+    ).toBeNull();
+    expect(boundRow(recipe, 1)).toEqual({
+      recipeId: 'recipe_varkhul_forgebreaker',
+      itemId: 'varkhul_forgebreaker',
+      total: 95,
+      floor: 73,
+    });
   });
 
   it('pins the concrete numbers for a hub rare-def recipe and a common-band recipe (drift tripwires)', () => {

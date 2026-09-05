@@ -22,6 +22,7 @@
 import { describe, expect, it } from 'vitest';
 import { CRUCIBLE_COLLECTION_RECIPES } from '../src/sim/content/crucible_collections';
 import { FARM_CROPS, farmCropSkillThreshold } from '../src/sim/content/farm_crops';
+import { FORGEBREAKER_RECIPES } from '../src/sim/content/forgebreaker_recipe';
 import { GATHERING_PROFESSIONS } from '../src/sim/content/professions';
 import {
   ALL_RECIPES,
@@ -1469,13 +1470,19 @@ describe('masterwrought Phase 11h: what it did NOT touch', () => {
     // Then 170 at the merge of release/v0.41.0 (tip e19d832b47): the
     // release's four Bank Storage BAG_RECIPES join ALL_RECIPES; this branch
     // minted nothing at the sync.
-    // The Crucible integration adds eleven three-slot collections, not new
-    // provisioning rows. Preserve the old universe independently of the append.
+    // The Crucible integration adds eleven three-slot collections and one
+    // quest hammer, not provisioning rows. Preserve the old universe separately.
     expect(CRUCIBLE_COLLECTION_RECIPES).toHaveLength(33);
+    expect(FORGEBREAKER_RECIPES.map((recipe) => recipe.id)).toEqual([
+      'recipe_varkhul_forgebreaker',
+    ]);
     expect(
-      ALL_RECIPES.filter((recipe) => !CRUCIBLE_COLLECTION_RECIPES.includes(recipe)),
+      ALL_RECIPES.filter(
+        (recipe) =>
+          !CRUCIBLE_COLLECTION_RECIPES.includes(recipe) && !FORGEBREAKER_RECIPES.includes(recipe),
+      ),
     ).toHaveLength(170);
-    expect(ALL_RECIPES).toHaveLength(203);
+    expect(ALL_RECIPES).toHaveLength(204);
     for (const row of APEX_ROWS) {
       expect(requireRecipe(row.id).skillReq, `${row.id} rung`).toBe(row.rung);
     }

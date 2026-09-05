@@ -7777,6 +7777,18 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
         "name": "Crucible Healer's Slippers"
       }
     ]
+  },
+  {
+    "id": "professions_forgebreaker",
+    "shelf": "professions",
+    "name": "Forgebreaker",
+    "excludeFromCompletion": "personal",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Forgebreaker, Engine of Varkhul"
+      }
+    ]
   }
 ];
 
@@ -15454,6 +15466,49 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 75,
           "minimalAt": 100,
           "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_varkhul_forgebreaker",
+        "name": "Forgebreaker, Engine of Varkhul",
+        "skillReq": 125,
+        "tier": 5,
+        "station": "forge",
+        "acquisition": "known",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "forgefathers_ember",
+            "name": "Forgefather's Ember",
+            "count": 1
+          },
+          {
+            "itemId": "lastflame_core",
+            "name": "Core of the Last Flame",
+            "count": 15
+          },
+          {
+            "itemId": "fine_thorium_ore",
+            "name": "Fine Osmium Ore",
+            "count": 10
+          },
+          {
+            "itemId": "fine_elderwood_log",
+            "name": "Fine Highpine Log",
+            "count": 6
+          }
+        ],
+        "output": {
+          "name": "Forgebreaker, Engine of Varkhul",
+          "count": 1,
+          "quality": "legendary"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 150,
+          "minimalAt": 175,
+          "zeroAt": 200
         }
       }
     ]

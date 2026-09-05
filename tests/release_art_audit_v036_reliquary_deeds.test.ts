@@ -197,8 +197,8 @@ describe('v0.36 release-audit Reliquary deed art', () => {
     // crest in the change that authored them, and the farming phase
     // committed the prog_farming_100 crest. The later Masterwrought art wave
     // paints ten more live rows and records the replacement separately, while
-    // the historical v0.36 evidence remains untouched. Only release-owned
-    // post-audit additions remain on the current pending ledger.
+    // the historical v0.36 evidence remains untouched. The release-owned
+    // additions and the personal hammer quest remain on the current pending ledger.
     expect([...DEED_ART_PENDING]).toEqual([
       'exp_the_last_keep',
       'exp_dawnhold_castle',
@@ -218,9 +218,11 @@ describe('v0.36 release-audit Reliquary deed art', () => {
       'dgn_varkhul',
       'dgn_varkhul_heroic',
       'dgn_varkhul_flawless',
+      // The personal hammer quest ships with the explicit category-crest fallback.
+      'hid_forgebreaker',
     ]);
-    // Current arithmetic: 298 live - 10 release-owned pending = 288 painted.
-    expect(DEED_ORDER).toHaveLength(298);
+    // Current arithmetic: 299 live - 11 explicitly pending = 288 painted.
+    expect(DEED_ORDER).toHaveLength(299);
     expect(DEED_IMAGE_IDS.size).toBe(288);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(

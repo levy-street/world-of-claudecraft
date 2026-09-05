@@ -1703,19 +1703,26 @@ describe('masterwrought apex budget sweep', () => {
   //
   // The ruling's shape is a NAMED carve-out on the ignivar_loot precedent, NOT
   // a re-key of the sweep to the masterwrought family: re-keying would remove
-  // exactly the hole the arm exists to close. Empty today, because none of
-  // those recipes is in the tree yet. Adding an entry is a reviewable act with
+  // exactly the hole the arm exists to close. The collection epics now carry
+  // the family flag; only the existing raid legendary's one-use quest craft
+  // needs an exception. Adding an entry is a reviewable act with
   // a written reason, and the arm below checks the claim rather than trusting
   // it, so an entry that does not describe a real band-reaching unflagged
   // recipe fails here instead of silently exempting something else.
   const CRUCIBLE_BAND_CARVE_OUT: ReadonlyArray<{
     readonly recipeId: string;
     readonly reason: string;
-  }> = [];
+  }> = [
+    {
+      recipeId: 'recipe_varkhul_forgebreaker',
+      reason:
+        'The existing iLvl-55 soulbound raid legendary is shaped once through its skill-125 quest recipe, outside ordinary Masterwrought gear.',
+    },
+  ];
 
-  // The per-entry check, hoisted out of the arm so it can be DRIVEN. The list is
-  // empty until PR 3704 lands, so an arm that only walked it would assert
-  // [] === [] and prove nothing about the validation the next author leans on;
+  // The per-entry check, hoisted out of the arm so it can be DRIVEN. The list
+  // began empty, so an arm that only walked it would assert [] === [] and
+  // prove nothing about the validation the next author leans on;
   // the control below runs each refusal branch over synthetic entries.
   const carveOutDefects = (
     entries: ReadonlyArray<{ readonly recipeId: string; readonly reason: string }>,
@@ -1744,12 +1751,30 @@ describe('masterwrought apex budget sweep', () => {
 
   it('every band carve-out entry names a real, unflagged, band-reaching recipe', () => {
     expect(carveOutDefects(CRUCIBLE_BAND_CARVE_OUT), 'a carve-out entry is stale').toEqual([]);
+    expect(CRUCIBLE_BAND_CARVE_OUT.map((entry) => entry.recipeId)).toEqual([
+      'recipe_varkhul_forgebreaker',
+    ]);
+    const recipe = ALL_RECIPES.find((r) => r.id === 'recipe_varkhul_forgebreaker')!;
+    expect(recipe).toMatchObject({
+      resultItemId: 'varkhul_forgebreaker',
+      professionId: 'weaponcrafting',
+      skillReq: 125,
+      acquisition: ['quest'],
+      consumeOnCraft: true,
+    });
+    const def = ITEMS[recipe.resultItemId];
+    expect(def).toMatchObject({
+      quality: 'legendary',
+      soulbound: true,
+    });
+    expect(def.stats).toEqual({ str: 44, sta: 32, agi: 19 });
+    expect(def.weapon).toEqual({ min: 77, max: 115, speed: 3.6 });
+    expect(itemLevel(def)).toBe(55);
+    expect(primaryStatSum(def)).toBe(95);
   });
 
   it('the carve-out validation refuses each shape it exists to refuse', () => {
-    // Every branch, driven, because the live list is empty and stays empty until
-    // another packet's PR lands: the day the first entry arrives the reviewer
-    // must not be trusting unexercised code.
+    // Every refusal branch stays driven even when the live entries are valid.
     const reason = 'a stated reason long enough to clear the written-reason floor here';
     expect(carveOutDefects([{ recipeId: 'no_such_recipe_id', reason }])).toEqual([
       'no_such_recipe_id: no such recipe; drop the entry',

@@ -109,13 +109,13 @@ const build = await buildItemArtAudit({
     // 1,128 to 1,209 after the three v0.42 mount reins join the reviewed base.
     // Crucible professions adds 33 armor pieces, 11 patterns, and one formula,
     // bringing the current shipping census to 1,254 without replacing old art.
-    catalogCount: 1254,
+    catalogCount: 1255,
     // The art-subject universe is every live definition minus the explicit
     // pending-art ledger. Masterwrought cleared that ledger at 1,224 live
     // definitions; Crucible professions raises it to 1,269, all painted.
     // Sixteen Heroic weapons intentionally alias base paintings; the implicit
     // backpack is the one non-definition catalog id.
-    liveItemCount: 1269,
+    liveItemCount: 1270,
     pendingArtCount: 0,
     generatedHeroicDefinitions: 64,
     heroicDefinitionsWithOwnWebp: 48,
