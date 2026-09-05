@@ -103,7 +103,9 @@ describe('Perfecting rank exchange inside the existing window', () => {
     };
     input.releaseMouseActivatedFocus({ type: 'click', detail: 1 });
     expect(document.activeElement).toBe(prompt);
-    prompt.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', bubbles: true }));
+    prompt.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', bubbles: true }),
+    );
     expect(document.querySelector('.pf-swap-prompt')).toBeNull();
     expect(win.isOpen).toBe(true);
     expect(document.activeElement).toBe(action());
