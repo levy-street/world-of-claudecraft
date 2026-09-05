@@ -248,12 +248,16 @@ const KAYKIT_HAND_GRIPS: Record<string, { r: HandGrip; l?: HandGrip }> = {
   '1H_Crossbow': {
     r: {
       position: [0.2286, 0.0213, -0.0012],
-      quaternion: [0, 0.7071068, 0, 0.7071067],
+      quaternion: [0, Math.SQRT1_2, 0, Math.SQRT1_2],
       scale: 0.6109,
     },
   },
   '2H_Crossbow': {
-    r: { position: [0.3381, 0.058, 0], quaternion: [0, 0.7071068, 0, 0.7071067], scale: 0.7204 },
+    r: {
+      position: [0.3381, 0.058, 0],
+      quaternion: [0, Math.SQRT1_2, 0, Math.SQRT1_2],
+      scale: 0.7204,
+    },
   },
   '1H_Sword': {
     r: { position: [0, 0.555174, 0], quaternion: [0, 1, 0, 0], scale: 0.8876 },

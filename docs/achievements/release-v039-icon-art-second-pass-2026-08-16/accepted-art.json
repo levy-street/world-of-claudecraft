@@ -27,9 +27,7 @@
     "acceptedPaintings": 223,
     "acceptedFirstOutputs": 222,
     "rejectedOutputs": 1,
-    "retriedAssets": [
-      "dismiss_pet"
-    ],
+    "retriedAssets": ["dismiss_pet"],
     "review": "Every raster was reviewed at its native 128px size and relevant runtime sizes down to 13px or 16px, with grayscale and circular-crop review where the runtime surface requires it."
   },
   "acceptedRecords": [

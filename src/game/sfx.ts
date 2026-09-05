@@ -1584,7 +1584,8 @@ class Sfx {
     if (mountKey && (kind === 'jump' || kind === 'land')) {
       const mkey = `mount_${kind}_${mountKey}`;
       if (mkey in SFX_CLIPS) {
-        this.playAt(mkey, x, y, z, { gain: 0.8, cooldown: 0.08 });
+        const gain = kind === 'land' ? MOVE_GAIN * MOUNT_LAND_BOOST : MOVE_GAIN;
+        this.playAt(mkey, x, y, z, { gain, cooldown: 0.08 });
         return;
       }
     }

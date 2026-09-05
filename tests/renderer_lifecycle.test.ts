@@ -184,12 +184,13 @@ describe('Renderer lifecycle wiring', () => {
   });
 
   it('resets engine state BEFORE arming the summon, not after', () => {
-    const mountKeyEdge = slice(
-      'if (e.mountKey !== v.lastMountKey) {',
-      '\n      }\n\n      // per-ability windup orb',
+    const mountKeyEdge = sliceIn(
+      mountLifecycleSource,
+      'if (x.mountKey !== v.lastMountKey) {',
+      '\n  }\n  return x.mountCasting;',
     );
-    const resetAt = mountKeyEdge.indexOf('this.audioSink?.mountEngineReset(e.id)');
-    const summonAt = mountKeyEdge.indexOf('sink?.mountSummon(');
+    const resetAt = mountKeyEdge.indexOf('x.engineReset()');
+    const summonAt = mountKeyEdge.indexOf('x.summonCall()');
     expect(resetAt).toBeGreaterThan(-1);
     expect(summonAt).toBeGreaterThan(-1);
     // Order is load-bearing, not cosmetic. mountSummon ARMS the per-entity idle

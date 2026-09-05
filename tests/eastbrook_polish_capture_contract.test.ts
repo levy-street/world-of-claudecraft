@@ -361,7 +361,7 @@ interface AttributionTargetFixture {
 // Re-minted for the release/v0.42.0 reconcile with the Realm Builder and
 // store-mount renderer leaves. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '7feeabfe5c608b45d950cb8d32a5cb9dd18be410846697a56f67e82b193473b9';
+  'e6771b3099603671f4772f4a8650cd7f0f5a2322a08f5f22a9e8ccca69dfeaeb';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

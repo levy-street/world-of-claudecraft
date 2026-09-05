@@ -256,14 +256,16 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
     raw: string,
     req: http.IncomingMessage,
   ): Promise<void> {
-    let msg: any;
+    let parsed: unknown;
     try {
-      msg = JSON.parse(raw);
+      parsed = JSON.parse(raw);
     } catch (err) {
       console.error('ws auth: malformed first frame, rejecting handshake', err);
       rejectHandshake(ws, WS_AUTH_ERROR.badAuthMessage);
       return;
     }
+    const msg =
+      parsed !== null && typeof parsed === 'object' ? (parsed as Record<string, unknown>) : {};
     if (msg?.t !== ONLINE_WORLD_AUTH_TYPE) {
       const authType = msg?.t;
       const isWorldAuthAttempt =

@@ -22,8 +22,8 @@ import { clearVarkhulEncounterAuras } from '../encounters/varkhul';
 import { createGroundObject, createMob, createNpc } from '../entity';
 import { updateIgnivarForgeLift } from '../ignivar_forge_lift';
 import {
-  IGNIVAR_RAID_ARENA_ID,
   IGNIVAR_LIFT_ROOM_ID,
+  IGNIVAR_RAID_ARENA_ID,
   IGNIVAR_RAID_ROOM_IDS,
   IGNIVAR_SECOND_WING_ID,
   ignivarPreviousRaidRoom,

@@ -1047,9 +1047,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the release/v0.42.0 reconcile with the Realm Builder and
 // store-mount renderer leaves. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'a78d38ac99b18ecf13d007f4833fb7186be95ee614cea603e7c4482065a58632';
+  '9002f01645226993b4a9ea6aa3160750142817bdb9cbdf3d236536337ce816b7';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '7feeabfe5c608b45d950cb8d32a5cb9dd18be410846697a56f67e82b193473b9';
+  'e6771b3099603671f4772f4a8650cd7f0f5a2322a08f5f22a9e8ccca69dfeaeb';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2212,7 +2212,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('3cd89a9e73d1dc110227414af023d25e71a50d8d3b89c1e758b8171bb212c101');
+    ).toBe('e18babc5ea7fde2e9f73f2c48b854a330d5ef74984df654d4ba61cf6b71a6f94');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

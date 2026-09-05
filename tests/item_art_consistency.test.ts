@@ -540,7 +540,7 @@ describe('item-art consistency accepted-art provenance', () => {
       rejectCount: 0,
       reject: [],
       summary:
-        "All 1046 shipping item-art files pass the visual contract: plus the Lanternback Troll, Chimeglass Tortoise, Cluckwork Mech Bird, Goblin Rocket Sled, and Rallycart RXT mount icons previously accepted in their parent records and joined in this v0.42 reconcile.",
+        'All 1046 shipping item-art files pass the visual contract: plus the Lanternback Troll, Chimeglass Tortoise, Cluckwork Mech Bird, Goblin Rocket Sled, and Rallycart RXT mount icons previously accepted in their parent records and joined in this v0.42 reconcile.',
     });
     expect(verdict.visualVerdict.passIds).toEqual(currentIds);
     expect(verdict.nonVisualContentWatch).toEqual([

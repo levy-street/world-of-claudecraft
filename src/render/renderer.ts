@@ -426,8 +426,8 @@ import { collectObjectTextures } from './material_texture_slots';
 import { buildMobNightGlow, type MobNightGlowView } from './mob_night_glow';
 import { buildMotes, type MotesView } from './motes';
 import { MountBeacon } from './mount_beacon';
-import { type MountGlows } from './mount_glow';
-import { type MountLamps } from './mount_lamps';
+import type { MountGlows } from './mount_glow';
+import type { MountLamps } from './mount_lamps';
 import {
   disposeMountView,
   type MountViewHost,
@@ -632,10 +632,7 @@ import {
 import { createRevealCompileHost, REVEAL_GATE_PREP_KIND } from './reveal_compile_host';
 import { createRevealGate } from './reveal_gate';
 import type { RevealGateCore } from './reveal_gate_core';
-import {
-  type RickshawMountViewState,
-  updateRollingMountLoop,
-} from './rickshaw_mount';
+import { type RickshawMountViewState, updateRollingMountLoop } from './rickshaw_mount';
 import { collectRiftAmbientSources } from './rift_ambience';
 import { buildRiftRankBadge } from './rift_rank';
 import { syncRigMatrixFreeze, unfreezeRigMatrices } from './rig_visibility_freeze';
@@ -11304,14 +11301,11 @@ export class Renderer {
         const rocketSledMounted = logicallyMounted && e.mountKey === 'goblin_rocket_sled';
         // jump / land / water-entry edges
         if (airborne && !v.wasAirborne && !visuallyDead) {
-          if (!rocketSledMounted) sink.movement('jump', ax, ay, az, isSelf, e.mountKey || undefined);
+          if (!rocketSledMounted)
+            sink.movement('jump', ax, ay, az, isSelf, e.mountKey || undefined);
         } else if (!airborne && v.wasAirborne && !visuallyDead) {
-          // A flight that ends by catching a ledge is not a fall, and the
-          // heavy landing thud on one reads as a bug: you hopped onto a rock
-          // mid-arc and the game played a crash. Anything softer than a plain
-          // jump's own landing speed gets a footfall instead.
-          // The sled skips both: its turbine pitch and nozzle compression
-          // carry the landing instead.
+          // A caught ledge is not a fall; anything softer than a plain jump's
+          // landing speed gets a footfall. The sled carries landing on turbine audio.
           if (rocketSledMounted) {
           } else if (v.fallSpeed >= SOFT_LANDING_SPEED) {
             sink.movement('land', ax, ay, az, isSelf, e.mountKey || undefined);
@@ -11355,7 +11349,17 @@ export class Renderer {
           // whole winddown/windup cycle. Two poll anyway, being never quiet:
           // the sled, and any mount idling a loop.
           if (rocketSledMounted || sink.mountEngineIdles(e.mountKey)) {
-            sink.mountEngine(ax, ay, az, e.mountKey, moving, e.id, st.backwards, true, v.mountPivot);
+            sink.mountEngine(
+              ax,
+              ay,
+              az,
+              e.mountKey,
+              moving,
+              e.id,
+              st.backwards,
+              true,
+              v.mountPivot,
+            );
           }
         } else if (logicallyMounted && !visuallyDead && !(st.sitting && !riderMounted)) {
           // Not moving while mounted (grounded and stopped): still poll an

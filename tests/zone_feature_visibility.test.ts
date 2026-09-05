@@ -12,10 +12,10 @@ import {
   hasUnseededInstanceMatrix,
   isZoneFeatureShadowCasting,
   isZoneFeatureVisible,
-  zoneFeatureShadowRangeForHalfExtent,
   ZONE_FEATURE_SHADOW_BASE_HALF_EXTENT,
   ZONE_FEATURE_SHADOW_HYSTERESIS,
   ZONE_FEATURE_SHADOW_RANGE,
+  zoneFeatureShadowRangeForHalfExtent,
 } from '../src/render/zone_feature_visibility_core';
 
 // The Willowfen's feature group, roughly: a zone-spanning band of geometry in

@@ -169,7 +169,7 @@ function buyClaudiumModel(
   info: BankInfo,
   input: BankClaudiumInput | undefined,
 ): BankBuyClaudiumModel | undefined {
-  if (!input || !input.storeEnabled || input.nativeBuild) return undefined;
+  if (!input?.storeEnabled || input.nativeBuild) return undefined;
   const cost = info.nextRungClaudiumPrice;
   if (cost === undefined) return undefined;
   // The gold ladder's own maxed answer, reused verbatim: one ceiling, one

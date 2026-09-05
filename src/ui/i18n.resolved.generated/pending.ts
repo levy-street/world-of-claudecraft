@@ -178,22 +178,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.mountsTitle",
     "worldContent.realmBuilderMonumentName"
   ],
-  "zh_CN": [
-    "guide.dungeonsPage.resetBody",
-    "guide.settingsPage.keybindsBody"
-  ],
-  "zh_TW": [
-    "guide.dungeonsPage.resetBody",
-    "guide.settingsPage.keybindsBody"
-  ],
-  "ko_KR": [
-    "guide.dungeonsPage.resetBody",
-    "guide.settingsPage.keybindsBody"
-  ],
-  "ja_JP": [
-    "guide.dungeonsPage.resetBody",
-    "guide.settingsPage.keybindsBody"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
@@ -222,10 +210,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.mountsTitle",
     "worldContent.realmBuilderMonumentName"
   ],
-  "ru_RU": [
-    "guide.dungeonsPage.resetBody",
-    "guide.settingsPage.keybindsBody"
-  ],
+  "ru_RU": [],
   "cs_CZ": [
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",

@@ -193,7 +193,7 @@ export function deedDesc(id: string): string {
  *  unknown or carries no title reward (callers hide the surface entirely). */
 export function deedTitleText(id: string): string {
   const def = deedDef(id);
-  if (!def || def.reward?.kind !== 'title') return '';
+  if (def?.reward?.kind !== 'title') return '';
   return maybePseudoString(localeEntry(id)?.title ?? def.reward.text);
 }
 
