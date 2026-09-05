@@ -4761,7 +4761,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Lao về phía trước, tăng tốc độ di chuyển 50% trong 15 giây. Chỉ dùng được ở Hình Sói.',
   'entities.abilities.dash.name': 'Lao Nhanh',
   'entities.abilities.deadly_poison.description':
-    'Bôi lên vũ khí trong 30 phút, khiến mỗi đòn cận chiến gây thêm 14 sát thương Tự Nhiên.',
+    'Bôi lên vũ khí trong 30 phút. Mỗi đòn cận chiến cộng thêm một lớp độc lên mục tiêu, tối đa 5, và làm mới thời lượng 12 giây. Mỗi lớp gây {damage} sát thương tự nhiên mỗi 2 giây.',
   'entities.abilities.deadly_poison.name': 'Nọc Độc Ung Mủ',
   'entities.abilities.defensive_stance.description':
     'Thế đứng phòng thủ: bạn tạo ra nhiều hơn 30% mối đe dọa nhưng gây và nhận ít hơn 10% sát thương. Thi triển lại để rời khỏi thế đứng.',
@@ -4884,7 +4884,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Kẻ địch bị bầy côn trùng bủa vây, nhận {damage} sát thương Tự Nhiên trong 12 giây.',
   'entities.abilities.insect_swarm.name': 'Bầy Đốt Chích',
   'entities.abilities.instant_poison.description':
-    'Bôi lên vũ khí trong 30 phút, khiến mỗi đòn cận chiến gây thêm 8 sát thương Tự Nhiên.',
+    'Bôi lên vũ khí trong 30 phút, khiến mỗi đòn cận chiến gây thêm {damage} sát thương Tự Nhiên.',
   'entities.abilities.instant_poison.name': 'Vết Cắn Rắn Độc',
   'entities.abilities.judgement.description':
     'Giải phóng Ấn đang kích hoạt của bạn lên kẻ địch, tiêu hao nó để gây lượng sát thương Thánh tích trữ trong đó.',
@@ -13551,9 +13551,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   "hudChrome.reliquary.trackerToggleLabel": "Trình theo dõi HUD",
   "hudChrome.reliquary.trackerToggleShowHint": "Hiển thị trình theo dõi Thánh tích trên màn hình của bạn",
   "apiError.account.password_already_set": "Tài khoản này đã có mật khẩu. Thay vào đó hãy sử dụng Thay đổi mật khẩu.",
-  "entities.abilities.melting_acid.description": "Tấn công mục tiêu bằng chất độc ăn da, gây {damage} sát thương tự nhiên và giảm 5% giáp của mục tiêu trong 12 giây.",
+  "entities.abilities.melting_acid.description": "Bôi lên vũ khí trong 30 phút. Mỗi đòn cận chiến tạt axit ăn da lên mục tiêu và giảm 5% giáp của mục tiêu trong 12 giây.",
   "entities.abilities.melting_acid.name": "Axit nóng chảy",
-  "entities.abilities.nightshade_coating.description": "Bao phủ mục tiêu trong màn đêm, gây {damage} sát thương tự nhiên và giảm khả năng hồi máu mà mục tiêu nhận được đi 25% trong 12 giây.",
+  "entities.abilities.nightshade_coating.description": "Bôi lên vũ khí trong 30 phút. Mỗi đòn cận chiến bao phủ mục tiêu trong màn đêm và giảm khả năng hồi máu mà mục tiêu nhận được đi 25% trong 12 giây.",
   "entities.abilities.nightshade_coating.name": "Lớp phủ bóng đêm",
   "guide.settingsPage.ifShowReliquaryTracker": "Trình theo dõi Thánh tích (các trang được ghim của bạn và tiến trình của chúng) có nằm trên HUD của bạn hay không. Cửa sổ Thánh tích có nút mắt phù hợp và việc ghim một trang sẽ bật lại trình theo dõi.",
   // v0.41 release i18n fill.

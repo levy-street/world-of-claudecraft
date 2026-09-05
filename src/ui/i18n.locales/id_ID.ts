@@ -4822,7 +4822,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Melesat ke depan, meningkatkan kecepatan gerak sebesar 50% selama 15 detik. Hanya dalam Wujud Serigala.',
   'entities.abilities.dash.name': 'Lesatan',
   'entities.abilities.deadly_poison.description':
-    'Melapisi senjatamu selama 30 menit, membuat setiap ayunan jarak dekatmu memberi 14 kerusakan Alam tambahan.',
+    'Melapisi senjatamu selama 30 menit. Setiap ayunan jarak dekatmu menambah satu tumpukan racun pada target, hingga 5, dan menyegarkan durasi 12 detik. Setiap tumpukan memberi {damage} Kerusakan alam setiap 2 detik.',
   'entities.abilities.deadly_poison.name': 'Bisa Membusuk',
   'entities.abilities.defensive_stance.description':
     'Kuda-kuda tempur bertahan: kamu menghasilkan 30% lebih banyak ancaman tetapi memberi dan menerima 10% lebih sedikit kerusakan. Rapal lagi untuk meninggalkan kuda-kuda ini.',
@@ -4949,7 +4949,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Musuh dikerumuni serangga, menerima {damage} kerusakan Alam selama 12 detik.',
   'entities.abilities.insect_swarm.name': 'Kerumunan Penyengat',
   'entities.abilities.instant_poison.description':
-    'Melapisi senjatamu selama 30 menit, membuat setiap ayunan jarak dekatmu memberi 8 kerusakan Alam tambahan.',
+    'Melapisi senjatamu selama 30 menit, membuat setiap ayunan jarak dekatmu memberi {damage} kerusakan Alam tambahan.',
   'entities.abilities.instant_poison.name': 'Gigitan Beludak',
   'entities.abilities.judgement.description':
     'Melepaskan Segel aktifmu kepada musuh, melahapnya untuk memberi kerusakan Suci yang tersimpan.',
@@ -13876,9 +13876,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   "hudChrome.reliquary.trackerToggleLabel": "pelacak HUD",
   "hudChrome.reliquary.trackerToggleShowHint": "Tampilkan pelacak Reliquary di layar Anda",
   "apiError.account.password_already_set": "Akun ini sudah memiliki kata sandi. Gunakan Ubah Kata Sandi sebagai gantinya.",
-  "entities.abilities.melting_acid.description": "Mencipratkan racun kaustik ke target, menimbulkan {damage} Kerusakan alam dan mengurangi armornya sebesar 5% selama 12 detik.",
+  "entities.abilities.melting_acid.description": "Melapisi senjatamu selama 30 menit. Setiap ayunan jarak dekatmu mencipratkan asam kaustik ke target dan mengurangi armornya sebesar 5% selama 12 detik.",
   "entities.abilities.melting_acid.name": "Asam Meleleh",
-  "entities.abilities.nightshade_coating.description": "Melapisi target dalam nightshade, menimbulkan {damage} Kerusakan alam dan mengurangi penyembuhan yang diterimanya sebesar 25% selama 12 detik.",
+  "entities.abilities.nightshade_coating.description": "Melapisi senjatamu selama 30 menit. Setiap ayunan jarak dekatmu melapisi target dalam nightshade dan mengurangi penyembuhan yang diterimanya sebesar 25% selama 12 detik.",
   "entities.abilities.nightshade_coating.name": "Lapisan Nightshade",
   "guide.settingsPage.ifShowReliquaryTracker": "Apakah pelacak Reliquary (halaman yang Anda sematkan dan kemajuannya) ada di HUD Anda. Jendela Reliquary memiliki tombol mata yang cocok, dan menyematkan halaman akan mengaktifkan kembali pelacak.",
   // v0.41 release i18n fill.

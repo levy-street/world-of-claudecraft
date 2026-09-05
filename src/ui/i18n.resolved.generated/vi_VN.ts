@@ -10428,11 +10428,11 @@ export const vi_VN: EnTranslations = {
       },
       "melting_acid": {
         "name": "Axit nóng chảy",
-        "description": "Tấn công mục tiêu bằng chất độc ăn da, gây {damage} sát thương tự nhiên và giảm 5% giáp của mục tiêu trong 12 giây."
+        "description": "Bôi lên vũ khí trong 30 phút. Mỗi đòn cận chiến tạt axit ăn da lên mục tiêu và giảm 5% giáp của mục tiêu trong 12 giây."
       },
       "nightshade_coating": {
         "name": "Lớp phủ bóng đêm",
-        "description": "Bao phủ mục tiêu trong màn đêm, gây {damage} sát thương tự nhiên và giảm khả năng hồi máu mà mục tiêu nhận được đi 25% trong 12 giây."
+        "description": "Bôi lên vũ khí trong 30 phút. Mỗi đòn cận chiến bao phủ mục tiêu trong màn đêm và giảm khả năng hồi máu mà mục tiêu nhận được đi 25% trong 12 giây."
       },
       "expose_armor": {
         "name": "Xuyên Phá Giáp",
@@ -10448,11 +10448,11 @@ export const vi_VN: EnTranslations = {
       },
       "instant_poison": {
         "name": "Vết Cắn Rắn Độc",
-        "description": "Bôi lên vũ khí trong 30 phút, khiến mỗi đòn cận chiến gây thêm 8 sát thương Tự Nhiên."
+        "description": "Bôi lên vũ khí trong 30 phút, khiến mỗi đòn cận chiến gây thêm {damage} sát thương Tự Nhiên."
       },
       "deadly_poison": {
         "name": "Nọc Độc Ung Mủ",
-        "description": "Bôi lên vũ khí trong 30 phút, khiến mỗi đòn cận chiến gây thêm 14 sát thương Tự Nhiên."
+        "description": "Bôi lên vũ khí trong 30 phút. Mỗi đòn cận chiến cộng thêm một lớp độc lên mục tiêu, tối đa 5, và làm mới thời lượng 12 giây. Mỗi lớp gây {damage} sát thương tự nhiên mỗi 2 giây."
       },
       "blind": {
         "name": "Hất Cát",

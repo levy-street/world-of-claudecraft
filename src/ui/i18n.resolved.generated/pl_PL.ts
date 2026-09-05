@@ -10428,11 +10428,11 @@ export const pl_PL: EnTranslations = {
       },
       "melting_acid": {
         "name": "Topniejący kwas",
-        "description": "Opryskuje cel żrącą trucizną, zadając {damage} obrażeń natury i zmniejszając jego pancerz o 5% na 12 sek."
+        "description": "Pokrywa twój oręż na 30 min. Każde uderzenie wręcz opryskuje cel żrącym kwasem i zmniejsza jego pancerz o 5% na 12 sek."
       },
       "nightshade_coating": {
         "name": "Powłoka Nocnego Cienia",
-        "description": "Pokrywa cel psianką, zadając {damage} obrażeń natury i redukując otrzymywane leczenie o 25% na 12 sek."
+        "description": "Pokrywa twój oręż na 30 min. Każde uderzenie wręcz pokrywa cel psianką i redukuje otrzymywane przez niego leczenie o 25% na 12 sek."
       },
       "expose_armor": {
         "name": "Wyłom w pancerzu",
@@ -10448,11 +10448,11 @@ export const pl_PL: EnTranslations = {
       },
       "instant_poison": {
         "name": "Ukąszenie żmii",
-        "description": "Pokrywa twój oręż na 30 min, sprawiając, że każde uderzenie wręcz zadaje 8 dodatkowych obrażeń od natury."
+        "description": "Pokrywa twój oręż na 30 min, sprawiając, że każde uderzenie wręcz zadaje {damage} dodatkowych obrażeń od natury."
       },
       "deadly_poison": {
         "name": "Jątrzący jad",
-        "description": "Pokrywa twój oręż na 30 min, sprawiając, że każde uderzenie wręcz zadaje 14 dodatkowych obrażeń od natury."
+        "description": "Pokrywa twój oręż na 30 min. Każde uderzenie wręcz dodaje celowi warstwę trucizny, do 5, i odnawia czas trwania 12 sek. Każda warstwa zadaje {damage} obrażeń natury co 2 sek."
       },
       "blind": {
         "name": "Rzut piaskiem",

@@ -10428,11 +10428,11 @@ export const en: EnTranslations = {
       },
       "melting_acid": {
         "name": "Melting Acid",
-        "description": "Splashes the target with a caustic poison, dealing {damage} Nature damage and reducing its armor by 5% for 12 sec."
+        "description": "Coats your weapon for 30 min. Each of your melee swings splashes the target with caustic acid, reducing its armor by 5% for 12 sec."
       },
       "nightshade_coating": {
         "name": "Nightshade Coating",
-        "description": "Coats the target in nightshade, dealing {damage} Nature damage and reducing the healing it receives by 25% for 12 sec."
+        "description": "Coats your weapon for 30 min. Each of your melee swings coats the target in nightshade, reducing the healing it receives by 25% for 12 sec."
       },
       "expose_armor": {
         "name": "Armor Breach",
@@ -10448,11 +10448,11 @@ export const en: EnTranslations = {
       },
       "instant_poison": {
         "name": "Adder's Bite",
-        "description": "Coats your weapon for 30 min, causing each of your melee swings to deal 8 additional Nature damage."
+        "description": "Coats your weapon for 30 min, causing each of your melee swings to deal {damage} additional Nature damage."
       },
       "deadly_poison": {
         "name": "Festering Venom",
-        "description": "Coats your weapon for 30 min, causing each of your melee swings to deal 14 additional Nature damage."
+        "description": "Coats your weapon for 30 min. Each of your melee swings adds a stack of venom to the target, up to 5, and refreshes the 12 sec duration. Each stack deals {damage} Nature damage every 2 sec."
       },
       "blind": {
         "name": "Dirt Toss",

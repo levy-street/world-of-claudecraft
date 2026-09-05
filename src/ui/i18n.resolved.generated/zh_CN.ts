@@ -10428,11 +10428,11 @@ export const zh_CN: EnTranslations = {
       },
       "melting_acid": {
         "name": "溶解酸",
-        "description": "向目标泼洒腐蚀性毒液，造成 {damage} 点自然伤害，并使其护甲降低 5%，持续 12 秒。"
+        "description": "为你的武器淬毒，持续 30 分钟。你的每次近战攻击都会向目标泼洒腐蚀性强酸，使其护甲降低 5%，持续 12 秒。"
       },
       "nightshade_coating": {
         "name": "夜影涂层",
-        "description": "用夜影覆盖目标，造成 {damage} 点自然伤害，并使其受到的治疗降低 25%，持续 12 秒。"
+        "description": "为你的武器淬毒，持续 30 分钟。你的每次近战攻击都会用夜影覆盖目标，使其受到的治疗降低 25%，持续 12 秒。"
       },
       "expose_armor": {
         "name": "护甲突破",
@@ -10448,11 +10448,11 @@ export const zh_CN: EnTranslations = {
       },
       "instant_poison": {
         "name": "蝰蛇之咬",
-        "description": "为你的武器淬毒，持续 30 分钟，使你的每次近战攻击额外造成 8 点自然伤害。"
+        "description": "为你的武器淬毒，持续 30 分钟，使你的每次近战攻击额外造成 {damage} 点自然伤害。"
       },
       "deadly_poison": {
         "name": "溃烂毒液",
-        "description": "为你的武器淬毒，持续 30 分钟，使你的每次近战攻击额外造成 14 点自然伤害。"
+        "description": "为你的武器淬毒，持续 30 分钟。你的每次近战攻击都会为目标叠加 1 层毒素，最多 5 层，并刷新 12 秒的持续时间。每层每 2 秒造成 {damage} 点自然伤害。"
       },
       "blind": {
         "name": "扬尘",

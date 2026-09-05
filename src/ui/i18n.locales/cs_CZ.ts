@@ -7128,7 +7128,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Vyrazíš vpřed a zvýšíš rychlost pohybu o 50 % na 15 s. Pouze ve vlčí podobě.',
   'entities.abilities.dash.name': 'Úprk',
   'entities.abilities.deadly_poison.description':
-    'Potře zbraň na 30 min, takže každý tvůj úder na blízko způsobí 14 dodatečného přírodního poškození.',
+    'Potře zbraň na 30 min. Každý tvůj úder na blízko přidá cíli vrstvu jedu, až do 5, a obnoví trvání 12 sekund. Každá vrstva způsobí {damage} poškození přírody každé 2 sekundy.',
   'entities.abilities.deadly_poison.name': 'Hnisavý jed',
   'entities.abilities.defensive_stance.description':
     'Obranný bojový postoj: vytváříš o 30 % více hrozby, ale způsobuješ i utrpíš o 10 % méně poškození. Sesláním znovu postoj opustíš.',
@@ -7245,7 +7245,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Nepřítele obklopí roj hmyzu a způsobí {damage} přírodního poškození během 12 s.',
   'entities.abilities.insect_swarm.name': 'Bodavý roj',
   'entities.abilities.instant_poison.description':
-    'Potře zbraň na 30 min, takže každý tvůj úder na blízko způsobí 8 dodatečného přírodního poškození.',
+    'Potře zbraň na 30 min, takže každý tvůj úder na blízko způsobí {damage} dodatečného přírodního poškození.',
   'entities.abilities.instant_poison.name': 'Zmijí kousnutí',
   'entities.abilities.judgement.description':
     'Vypustí tvou aktivní pečeť na nepřítele, spotřebuje ji a způsobí uložené svaté poškození.',
@@ -13679,9 +13679,9 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   "hudChrome.reliquary.trackerToggleLabel": "HUD tracker",
   "hudChrome.reliquary.trackerToggleShowHint": "Ukažte na obrazovce sledovač relikviářů",
   "apiError.account.password_already_set": "Tento účet již má heslo. Místo toho použijte Změnit heslo.",
-  "entities.abilities.melting_acid.description": "Postříká cíl žíravým jedem, způsobí poškození přírody {damage} a sníží jeho brnění o 5 % na 12 sekund.",
+  "entities.abilities.melting_acid.description": "Potře zbraň na 30 min. Každý tvůj úder na blízko postříká cíl žíravou kyselinou a sníží jeho brnění o 5 % na 12 sekund.",
   "entities.abilities.melting_acid.name": "Tavící kyselina",
-  "entities.abilities.nightshade_coating.description": "Pokryje cíl v nočním stínu, způsobí {damage} poškození přírody a sníží léčení, které obdrží, o 25 % po dobu 12 sekund.",
+  "entities.abilities.nightshade_coating.description": "Potře zbraň na 30 min. Každý tvůj úder na blízko pokryje cíl nočním stínem a sníží léčení, které obdrží, o 25 % po dobu 12 sekund.",
   "entities.abilities.nightshade_coating.name": "Nátěr Nightshade",
   "guide.settingsPage.ifShowReliquaryTracker": "Zda je sledovač relikviářů (vaše připnuté stránky a jejich průběh) umístěn na vašem HUD. Okno Relikviář má odpovídající tlačítko oka a připnutím stránky se sledovač opět zapne.",
   // v0.41 release i18n fill.

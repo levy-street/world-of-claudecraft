@@ -339,6 +339,7 @@ describe('classifyDiff', () => {
       'src/sim/incapacitate_dr.ts',
       'src/sim/combat/stealth_focus.ts',
       'src/sim/combat/auto_attack.ts',
+      'src/sim/combat/poison_coating.ts',
     ]) {
       const plan = classifyDiff([file]);
       expect(
@@ -351,6 +352,8 @@ describe('classifyDiff', () => {
     );
     expect((target?.variants ?? []).map((v: { key: string } | null) => v?.key)).toEqual([
       'melting-acid',
+      'instant-poison',
+      'deadly-poison',
       'nightshade-coating',
       'sap',
       'eye-jab',

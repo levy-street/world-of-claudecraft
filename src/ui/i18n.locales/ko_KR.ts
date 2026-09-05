@@ -3265,10 +3265,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '시야에서 사라져 전투 중에도 황혼장막 상태가 됩니다. 숨어 있는 동안 이동 속도가 50% 감소합니다. 최대 10초 동안 지속됩니다.',
   'entities.abilities.instant_poison.name': '독사의 이빨',
   'entities.abilities.instant_poison.description':
-    '30분 동안 무기에 독을 발라 근접 공격마다 8의 추가 자연 피해를 입힙니다.',
+    '30분 동안 무기에 독을 발라 근접 공격마다 {damage}의 추가 자연 피해를 입힙니다.',
   'entities.abilities.deadly_poison.name': '곪는 독',
   'entities.abilities.deadly_poison.description':
-    '30분 동안 무기에 독을 발라 근접 공격마다 14의 추가 자연 피해를 입힙니다.',
+    '30분 동안 무기에 독을 바릅니다. 근접 공격마다 대상에게 독 중첩을 1 추가하고(최대 5) 지속시간 12초를 갱신합니다. 중첩 1당 2초마다 {damage}의 자연 피해를 입힙니다.',
   'entities.abilities.blind.name': '흙 뿌리기',
   'entities.abilities.blind.description':
     '대상의 눈을 멀게 해 8초 동안 방향을 잃고 헤매게 만듭니다. 피해를 받으면 효과가 해제됩니다.',
@@ -14456,10 +14456,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.anyTarget': '적 또는 아군 대상',
   'entities.abilities.melting_acid.name': '용해 산',
   'entities.abilities.melting_acid.description':
-    '대상에게 부식성 독을 끼얹어 {damage}의 자연 피해를 주고 12초 동안 방어도를 5% 감소시킵니다.',
+    '30분 동안 무기에 독을 바릅니다. 근접 공격마다 대상에게 부식성 산을 끼얹어 12초 동안 방어도를 5% 감소시킵니다.',
   'entities.abilities.nightshade_coating.name': '가지독 코팅',
   'entities.abilities.nightshade_coating.description':
-    '대상을 가지독으로 뒤덮어 {damage}의 자연 피해를 주고 12초 동안 받는 치유 효과를 25% 감소시킵니다.',
+    '30분 동안 무기에 독을 바릅니다. 근접 공격마다 대상을 가지독으로 뒤덮어 12초 동안 받는 치유 효과를 25% 감소시킵니다.',
   // v0.41 release i18n fill.
   'hudChrome.itemMenu.sell': '판매',
   'hudChrome.itemMenu.sellAll': '모두 판매 ({count})',

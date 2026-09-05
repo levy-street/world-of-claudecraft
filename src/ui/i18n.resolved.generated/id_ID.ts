@@ -10428,11 +10428,11 @@ export const id_ID: EnTranslations = {
       },
       "melting_acid": {
         "name": "Asam Meleleh",
-        "description": "Mencipratkan racun kaustik ke target, menimbulkan {damage} Kerusakan alam dan mengurangi armornya sebesar 5% selama 12 detik."
+        "description": "Melapisi senjatamu selama 30 menit. Setiap ayunan jarak dekatmu mencipratkan asam kaustik ke target dan mengurangi armornya sebesar 5% selama 12 detik."
       },
       "nightshade_coating": {
         "name": "Lapisan Nightshade",
-        "description": "Melapisi target dalam nightshade, menimbulkan {damage} Kerusakan alam dan mengurangi penyembuhan yang diterimanya sebesar 25% selama 12 detik."
+        "description": "Melapisi senjatamu selama 30 menit. Setiap ayunan jarak dekatmu melapisi target dalam nightshade dan mengurangi penyembuhan yang diterimanya sebesar 25% selama 12 detik."
       },
       "expose_armor": {
         "name": "Tembus Zirah",
@@ -10448,11 +10448,11 @@ export const id_ID: EnTranslations = {
       },
       "instant_poison": {
         "name": "Gigitan Beludak",
-        "description": "Melapisi senjatamu selama 30 menit, membuat setiap ayunan jarak dekatmu memberi 8 kerusakan Alam tambahan."
+        "description": "Melapisi senjatamu selama 30 menit, membuat setiap ayunan jarak dekatmu memberi {damage} kerusakan Alam tambahan."
       },
       "deadly_poison": {
         "name": "Bisa Membusuk",
-        "description": "Melapisi senjatamu selama 30 menit, membuat setiap ayunan jarak dekatmu memberi 14 kerusakan Alam tambahan."
+        "description": "Melapisi senjatamu selama 30 menit. Setiap ayunan jarak dekatmu menambah satu tumpukan racun pada target, hingga 5, dan menyegarkan durasi 12 detik. Setiap tumpukan memberi {damage} Kerusakan alam setiap 2 detik."
       },
       "blind": {
         "name": "Lemparan Tanah",

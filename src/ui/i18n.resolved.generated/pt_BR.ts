@@ -10428,11 +10428,11 @@ export const pt_BR: EnTranslations = {
       },
       "melting_acid": {
         "name": "Ácido Derretido",
-        "description": "Salpica o alvo com um veneno cáustico, causando {damage} dano de Natureza e reduzindo sua armadura em 5% por 12 s."
+        "description": "Reveste sua arma por 30 min. Cada um de seus golpes corpo a corpo salpica o alvo com ácido cáustico e reduz sua armadura em 5% por 12 s."
       },
       "nightshade_coating": {
         "name": "Revestimento de erva-moura",
-        "description": "Cobre o alvo com beladona, causando {damage} de dano de Natureza e reduzindo em 25% a cura que ele recebe por 12 s."
+        "description": "Reveste sua arma por 30 min. Cada um de seus golpes corpo a corpo cobre o alvo com beladona e reduz em 25% a cura que ele recebe por 12 s."
       },
       "expose_armor": {
         "name": "Brecha na Armadura",
@@ -10448,11 +10448,11 @@ export const pt_BR: EnTranslations = {
       },
       "instant_poison": {
         "name": "Mordida da Víbora",
-        "description": "Reveste sua arma por 30 min, fazendo cada um de seus golpes corpo a corpo causar 8 de dano adicional da Natureza."
+        "description": "Reveste sua arma por 30 min, fazendo cada um de seus golpes corpo a corpo causar {damage} de dano adicional da Natureza."
       },
       "deadly_poison": {
         "name": "Veneno Purulento",
-        "description": "Reveste sua arma por 30 min, fazendo cada um de seus golpes corpo a corpo causar 14 de dano adicional da Natureza."
+        "description": "Reveste sua arma por 30 min. Cada um de seus golpes corpo a corpo adiciona um acúmulo de veneno ao alvo, até 5, e renova a duração de 12 s. Cada acúmulo causa {damage} de dano de Natureza a cada 2 s."
       },
       "blind": {
         "name": "Punhado de Terra",

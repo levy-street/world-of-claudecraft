@@ -10428,11 +10428,11 @@ export const es: EnTranslations = {
       },
       "melting_acid": {
         "name": "Ácido de fusión",
-        "description": "Salpica al objetivo con un veneno cáustico, lo que inflige {damage} daño de Naturaleza y reduce su armadura en un 5 % durante 12 s."
+        "description": "Recubre tu arma durante 30 min. Cada uno de tus golpes cuerpo a cuerpo salpica al objetivo con ácido cáustico y reduce su armadura en un 5 % durante 12 s."
       },
       "nightshade_coating": {
         "name": "Recubrimiento de solanáceas",
-        "description": "Cubre al objetivo con belladona, lo que inflige {damage} daño de Naturaleza y reduce la curación que recibe en un 25 % durante 12 s."
+        "description": "Recubre tu arma durante 30 min. Cada uno de tus golpes cuerpo a cuerpo cubre al objetivo con belladona y reduce la curación que recibe en un 25 % durante 12 s."
       },
       "expose_armor": {
         "name": "Brecha en la Armadura",
@@ -10448,11 +10448,11 @@ export const es: EnTranslations = {
       },
       "instant_poison": {
         "name": "Mordisco de Víbora",
-        "description": "Recubre tu arma durante 30 min, haciendo que cada uno de tus golpes cuerpo a cuerpo inflija 8 de daño de Naturaleza adicional."
+        "description": "Recubre tu arma durante 30 min, haciendo que cada uno de tus golpes cuerpo a cuerpo inflija {damage} de daño de Naturaleza adicional."
       },
       "deadly_poison": {
         "name": "Veneno Purulento",
-        "description": "Recubre tu arma durante 30 min, haciendo que cada uno de tus golpes cuerpo a cuerpo inflija 14 de daño de Naturaleza adicional."
+        "description": "Recubre tu arma durante 30 min. Cada uno de tus golpes cuerpo a cuerpo añade una acumulación de veneno al objetivo, hasta 5, y renueva la duración de 12 s. Cada acumulación inflige {damage} de daño de Naturaleza cada 2 s."
       },
       "blind": {
         "name": "Puñado de Tierra",

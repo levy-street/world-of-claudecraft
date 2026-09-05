@@ -4673,7 +4673,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Spurta framåt och öka förflyttningshastigheten med 50 % i 15 sek. Endast i vargform.',
   'entities.abilities.dash.name': 'Rusa',
   'entities.abilities.deadly_poison.description':
-    'Bestryker ditt vapen i 30 min så att vart och ett av dina närstridshugg vållar 14 extra naturskada.',
+    'Bestryker ditt vapen i 30 min. Vart och ett av dina närstridshugg lägger till en giftstapling på målet, upp till 5, och förnyar varaktigheten på 12 sekunder. Varje stapling vållar {damage} naturskada varannan sekund.',
   'entities.abilities.deadly_poison.name': 'Varande gift',
   'entities.abilities.defensive_stance.description':
     'En defensiv stridsställning: du genererar 30 % mer hot men vållar och tar 10 % mindre skada. Kasta igen för att lämna ställningen.',
@@ -4795,7 +4795,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Fienden svärmas av insekter och tar {damage} naturskada över 12 sek.',
   'entities.abilities.insect_swarm.name': 'Stickande svärm',
   'entities.abilities.instant_poison.description':
-    'Bestryker ditt vapen i 30 min så att vart och ett av dina närstridshugg vållar 8 extra naturskada.',
+    'Bestryker ditt vapen i 30 min så att vart och ett av dina närstridshugg vållar {damage} extra naturskada.',
   'entities.abilities.instant_poison.name': 'Huggormens bett',
   'entities.abilities.judgement.description':
     'Släpper lös ditt aktiva sigill mot fienden och förbrukar det för att vålla dess lagrade heliga skada.',
@@ -13763,9 +13763,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   "hudChrome.reliquary.trackerToggleLabel": "HUD tracker",
   "hudChrome.reliquary.trackerToggleShowHint": "Visa Reliquary-spåraren på din skärm",
   "apiError.account.password_already_set": "Detta konto har redan ett lösenord. Använd Ändra lösenord istället.",
-  "entities.abilities.melting_acid.description": "Stänker målet med ett frätande gift, gör {damage} naturskada och minskar dess rustning med 5 % i 12 sekunder.",
+  "entities.abilities.melting_acid.description": "Bestryker ditt vapen i 30 min. Vart och ett av dina närstridshugg stänker frätande syra på målet och minskar dess rustning med 5 % i 12 sekunder.",
   "entities.abilities.melting_acid.name": "Smältande syra",
-  "entities.abilities.nightshade_coating.description": "Belägger målet i nattskugga, gör {damage} naturskada och minskar läkningen den får med 25 % under 12 sek.",
+  "entities.abilities.nightshade_coating.description": "Bestryker ditt vapen i 30 min. Vart och ett av dina närstridshugg belägger målet i nattskugga och minskar läkningen det får med 25 % i 12 sekunder.",
   "entities.abilities.nightshade_coating.name": "Nightshade beläggning",
   "guide.settingsPage.ifShowReliquaryTracker": "Om Reliquary-spåraren (dina fästa sidor och deras framsteg) sitter på din HUD. Reliquary-fönstret har en matchande ögonknapp, och genom att fästa en sida slås spåraren på igen.",
   // v0.41 release i18n fill.

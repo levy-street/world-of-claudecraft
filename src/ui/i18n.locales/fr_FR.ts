@@ -6736,10 +6736,10 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Vous disparaissez et entrez en Duskveil, même en plein combat. Vous vous déplacez 50% plus lentement tant que vous êtes dissimulé. Dure jusqu'à 10 s.",
   'entities.abilities.instant_poison.name': 'Morsure de vipère',
   'entities.abilities.instant_poison.description':
-    'Enduit votre arme pendant 30 min, chacune de vos attaques en mêlée infligeant 8 dégâts de Nature supplémentaires.',
+    'Enduit votre arme pendant 30 min, chacune de vos attaques en mêlée infligeant {damage} dégâts de Nature supplémentaires.',
   'entities.abilities.deadly_poison.name': 'Venin purulent',
   'entities.abilities.deadly_poison.description':
-    'Enduit votre arme pendant 30 min, chacune de vos attaques en mêlée infligeant 14 dégâts de Nature supplémentaires.',
+    'Enduit votre arme pendant 30 min. Chacune de vos attaques en mêlée ajoute un cumul de venin sur la cible, jusqu\'à 5, et rafraîchit la durée de 12 s. Chaque cumul inflige {damage} dégâts de Nature toutes les 2 s.',
   'entities.abilities.blind.name': 'Jet de terre',
   'entities.abilities.blind.description':
     "Aveugle la cible, la faisant errer désorientée pendant 8 s. Le moindre dégât rompt l'effet.",
@@ -14027,9 +14027,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   "hudChrome.reliquary.trackerToggleLabel": "Traqueur HUD",
   "hudChrome.reliquary.trackerToggleShowHint": "Afficher le tracker Reliquaire sur votre écran",
   "apiError.account.password_already_set": "Ce compte a déjà un mot de passe. Utilisez plutôt Modifier le mot de passe.",
-  "entities.abilities.melting_acid.description": "Projette la cible d'un poison caustique, infligeant {damage} dégâts de Nature et réduisant son armure de 5% pendant 12 s.",
+  "entities.abilities.melting_acid.description": "Enduit votre arme pendant 30 min. Chacune de vos attaques en mêlée projette de l'acide caustique sur la cible et réduit son armure de 5% pendant 12 s.",
   "entities.abilities.melting_acid.name": "Acide fondant",
-  "entities.abilities.nightshade_coating.description": "Enduit la cible de morelle, infligeant {damage} dégâts de Nature et réduisant les soins qu'elle reçoit de 25% pendant 12 s.",
+  "entities.abilities.nightshade_coating.description": "Enduit votre arme pendant 30 min. Chacune de vos attaques en mêlée enduit la cible de morelle et réduit les soins qu'elle reçoit de 25% pendant 12 s.",
   "entities.abilities.nightshade_coating.name": "Revêtement Morelle",
   "guide.settingsPage.ifShowReliquaryTracker": "Si le tracker Reliquaire (vos pages épinglées et leur progression) se trouve sur votre HUD. La fenêtre Reliquaire a un bouton en forme d'œil correspondant, et épingler une page réactive le tracker.",
   // v0.41 release i18n fill.

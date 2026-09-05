@@ -6304,10 +6304,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Desaparece de la vista, entrando en Duskveil incluso en combate. Te mueves un 50% más lento mientras estás oculto. Dura hasta 10 s.',
   'entities.abilities.instant_poison.name': 'Mordisco de Víbora',
   'entities.abilities.instant_poison.description':
-    'Recubre tu arma durante 30 min, haciendo que cada uno de tus golpes cuerpo a cuerpo inflija 8 de daño de Naturaleza adicional.',
+    'Recubre tu arma durante 30 min, haciendo que cada uno de tus golpes cuerpo a cuerpo inflija {damage} de daño de Naturaleza adicional.',
   'entities.abilities.deadly_poison.name': 'Veneno Purulento',
   'entities.abilities.deadly_poison.description':
-    'Recubre tu arma durante 30 min, haciendo que cada uno de tus golpes cuerpo a cuerpo inflija 14 de daño de Naturaleza adicional.',
+    'Recubre tu arma durante 30 min. Cada uno de tus golpes cuerpo a cuerpo añade una acumulación de veneno al objetivo, hasta 5, y renueva la duración de 12 s. Cada acumulación inflige {damage} de daño de Naturaleza cada 2 s.',
   'entities.abilities.blind.name': 'Puñado de Tierra',
   'entities.abilities.blind.description':
     'Ciega al objetivo, haciéndolo deambular desorientado durante 8 s. Cualquier daño rompe el efecto.',
@@ -14028,9 +14028,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   "hudChrome.reliquary.trackerToggleLabel": "rastreador HUD",
   "hudChrome.reliquary.trackerToggleShowHint": "Muestra el rastreador de Relicario en tu pantalla",
   "apiError.account.password_already_set": "Esta cuenta ya tiene una contraseña. Utilice Cambiar contraseña en su lugar.",
-  "entities.abilities.melting_acid.description": "Salpica al objetivo con un veneno cáustico, lo que inflige {damage} daño de Naturaleza y reduce su armadura en un 5 % durante 12 s.",
+  "entities.abilities.melting_acid.description": "Recubre tu arma durante 30 min. Cada uno de tus golpes cuerpo a cuerpo salpica al objetivo con ácido cáustico y reduce su armadura en un 5 % durante 12 s.",
   "entities.abilities.melting_acid.name": "Ácido de fusión",
-  "entities.abilities.nightshade_coating.description": "Cubre al objetivo con belladona, lo que inflige {damage} daño de Naturaleza y reduce la curación que recibe en un 25 % durante 12 s.",
+  "entities.abilities.nightshade_coating.description": "Recubre tu arma durante 30 min. Cada uno de tus golpes cuerpo a cuerpo cubre al objetivo con belladona y reduce la curación que recibe en un 25 % durante 12 s.",
   "entities.abilities.nightshade_coating.name": "Recubrimiento de solanáceas",
   "guide.settingsPage.ifShowReliquaryTracker": "Si el rastreador del Relicario (tus páginas fijadas y su progreso) se encuentra en tu HUD. La ventana del Relicario tiene un botón de ojo a juego y al fijar una página se vuelve a activar el rastreador.",
   // v0.41 release i18n fill.

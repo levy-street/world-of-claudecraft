@@ -6245,10 +6245,10 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Scompari dalla vista, entrando in Duskveil anche in combattimento. Ti muovi il 50% più lentamente mentre sei nascosto. Dura fino a 10 sec.',
   'entities.abilities.instant_poison.name': 'Morso della Vipera',
   'entities.abilities.instant_poison.description':
-    'Ricopre la tua arma per 30 min, facendo sì che ognuno dei tuoi attacchi in mischia infligga 8 danni della Natura aggiuntivi.',
+    'Ricopre la tua arma per 30 min, facendo sì che ognuno dei tuoi attacchi in mischia infligga {damage} danni della Natura aggiuntivi.',
   'entities.abilities.deadly_poison.name': 'Veleno Putrescente',
   'entities.abilities.deadly_poison.description':
-    'Ricopre la tua arma per 30 min, facendo sì che ognuno dei tuoi attacchi in mischia infligga 14 danni della Natura aggiuntivi.',
+    'Ricopre la tua arma per 30 min. Ognuno dei tuoi attacchi in mischia aggiunge una carica di veleno al bersaglio, fino a 5, e rinnova la durata di 12 sec. Ogni carica infligge {damage} danni da natura ogni 2 sec.',
   'entities.abilities.blind.name': 'Lancio di Terra',
   'entities.abilities.blind.description':
     "Acceca il bersaglio, facendolo vagare disorientato per 8 sec. Qualsiasi danno interrompe l'effetto.",
@@ -13969,9 +13969,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   "hudChrome.reliquary.trackerToggleLabel": "Localizzatore HUD",
   "hudChrome.reliquary.trackerToggleShowHint": "Mostra il tracker del reliquiario sullo schermo",
   "apiError.account.password_already_set": "Questo account ha già una password. Utilizza invece Cambia password.",
-  "entities.abilities.melting_acid.description": "Spruzza il bersaglio con un veleno caustico, infliggendo {damage} danni da natura e riducendone l'armatura del 5% per 12 sec.",
+  "entities.abilities.melting_acid.description": "Ricopre la tua arma per 30 min. Ognuno dei tuoi attacchi in mischia spruzza il bersaglio con acido caustico e ne riduce l'armatura del 5% per 12 sec.",
   "entities.abilities.melting_acid.name": "Acido Fondere",
-  "entities.abilities.nightshade_coating.description": "Ricopre il bersaglio di ombra notturna, infliggendo {damage} danni da natura e riducendo le cure ricevute del 25% per 12 sec.",
+  "entities.abilities.nightshade_coating.description": "Ricopre la tua arma per 30 min. Ognuno dei tuoi attacchi in mischia ricopre il bersaglio di ombra notturna e riduce le cure ricevute del 25% per 12 sec.",
   "entities.abilities.nightshade_coating.name": "Rivestimento Nightshade",
   "guide.settingsPage.ifShowReliquaryTracker": "Se il tracker del Reliquiario (le tue pagine appuntate e il loro progresso) si trova sul tuo HUD. La finestra del Reliquiario ha un pulsante a forma di occhio corrispondente e il blocco di una pagina riattiva il tracker.",
   // v0.41 release i18n fill.
