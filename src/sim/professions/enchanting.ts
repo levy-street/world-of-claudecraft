@@ -21,12 +21,16 @@
 // and boundTo/bindOnTrade flags carry through byte-identical
 // (replacedEnchantPayloadFor below). Without the flag the deny is the
 // dedicated already_enchanted reason, on both the bagged and the worn arm.
-// WITH the flag, re-applying the identical enchant id denies as same_enchant
-// on both arms, because its accept would be pure reagent loss with zero state
-// change. The order matters and is deliberate: the flag check precedes the id
-// compare, so an unconfirmed same-id apply reads already_enchanted, not
-// same_enchant. Replacement is just an apply: same shared action throttle, no
-// extra fee or skill gate.
+// WITH the flag, re-applying the identical enchant id is now a NORMAL
+// replace (player-requested QoL): the old bonus is subtracted and the exact
+// same bonus re-added by replacedEnchantPayloadFor, netting to
+// byte-identical stats, so the only observable effect is the reagent spend
+// (bags then the Materials Vault, same as any other apply) and the
+// Enchanting skill gain. That is deliberate: it gives players a controlled
+// way to burn reagents and train the Enchanting skill on a piece they intend
+// to keep, without having to hunt down a spare target or a different enchant
+// just to spend materials. Replacement is just an apply: same shared action
+// throttle, no extra fee or skill gate.
 //
 // Layered on top of, not a replacement for, the existing everyone-can-salvage
 // system (./salvage.ts, issue #1300): salvage still yields the same generic
@@ -702,10 +706,9 @@ export interface ApplyEnchantResult {
     | 'no_bag_space'
     // #2415: the target copy is already enchanted and the command carried no
     // confirmReplace flag (the honest deny that replaced the misleading
-    // not_held), and the identical-enchant-id re-apply, denied on every arm
-    // because its accept would be pure reagent loss with zero state change.
+    // not_held). A confirmed identical-enchant-id re-apply is NOT a deny: it
+    // is a normal replace that nets to the same stats (see the file banner).
     | 'already_enchanted'
-    | 'same_enchant'
     | 'busy';
 }
 
@@ -774,8 +777,9 @@ export function enchantedPayloadFor(
  *  and must use the masterwork flag or a new marker instead.
  *
  *  Callers must resolve and validate the old enchant id BEFORE calling (the
- *  same_enchant deny, and the defensive unknown-old-id deny): this function
- *  assumes a marker id resolves. Shared by both replace arms' success paths
+ *  defensive unknown-old-id deny): this function assumes a marker id
+ *  resolves, whether or not it happens to equal the incoming one. Shared by
+ *  both replace arms' success paths
  *  and the bagged arm's #2350 capacity gate, so the modeled grant never
  *  drifts from the minted one. */
 export function replacedEnchantPayloadFor(
@@ -968,11 +972,12 @@ function resolveApplyEnchantWorn(
     if (confirmReplace !== true) {
       return { ok: false, itemId, enchantId, reason: 'already_enchanted' };
     }
-    // Re-applying the identical enchant id is denied outright rather than
-    // confirmed: its accept would be pure reagent loss with zero state change.
-    if (worn.enchant === enchantId) {
-      return { ok: false, itemId, enchantId, reason: 'same_enchant' };
-    }
+    // Re-applying the identical enchant id is NOT denied: it falls straight
+    // through to the ordinary replace mint below, which subtracts the old
+    // bonus and re-adds the same one, netting to byte-identical stats. The
+    // player still pays the reagent cost and still gains Enchanting skill, so
+    // this is the sanctioned way to burn materials and train the profession
+    // on a piece already carrying the enchant they want.
     // Defensive, unreachable on honest data (enchant ids are frozen
     // content-as-code): a marker id that no longer resolves cannot be
     // subtracted exactly, so the copy stays refused instead of stacking the
@@ -1037,8 +1042,9 @@ function resolveApplyEnchantWorn(
  *  this repo walks). Reached only from resolveApplyEnchant below, which has
  *  already cleared the shared unknown_item/unknown_enchant/wrong_slot gates,
  *  proven an enchanted copy is held, and seen the explicit confirmReplace
- *  flag. Gate order mirrors the plain arm one for one: target validity
- *  (same_enchant, plus the defensive unknown-old-marker refuse), reagents
+ *  flag. Gate order mirrors the plain arm one for one: target validity (the
+ *  defensive unknown-old-marker refuse; an identical-enchant-id victim falls
+ *  through as a normal replace, not a deny), reagents
  *  all-or-nothing, the shared action throttle, then the #2350 capacity gate,
  *  every deny side-effect-free. The gate and the live removal share ONE
  *  victim walk (consumeEnchantedVictim) and ONE mint transform
@@ -1069,12 +1075,10 @@ function resolveReplaceEnchantBagged(
   // Unreachable (the caller proved an enchanted copy is held), kept as the
   // honest deny for a torn intermediate state rather than a crash.
   if (!meta || !victim) return { ok: false, itemId, enchantId, reason: 'not_held' };
-  // Re-applying the identical enchant id is denied outright rather than
-  // confirmed: its accept would be pure reagent loss with zero state change.
-  // A legacy pre-marker victim has no id to compare, so it never denies here.
-  if (victim.enchant === enchantId) {
-    return { ok: false, itemId, enchantId, reason: 'same_enchant' };
-  }
+  // Re-applying the identical enchant id is NOT denied here either: it falls
+  // straight through to the ordinary replace mint below (subtract the old
+  // bonus, re-add the same one, net byte-identical stats), paying reagents
+  // and gaining Enchanting skill exactly like any other confirmed replace.
   // Defensive, unreachable on honest data (enchant ids are frozen
   // content-as-code): a marker id that no longer resolves cannot be
   // subtracted exactly, so the copy stays refused instead of stacking the old
@@ -1376,9 +1380,8 @@ export function evaluateApplyEnchantAdmission(
       if (confirmReplace !== true) {
         return { ok: false, itemId, enchantId, reason: 'already_enchanted' };
       }
-      if (worn.enchant === enchantId) {
-        return { ok: false, itemId, enchantId, reason: 'same_enchant' };
-      }
+      // An identical-enchant-id target is NOT denied: it admits like any
+      // other confirmed replace (see resolveApplyEnchantWorn).
       if (worn.enchant !== undefined && !ENCHANTS[worn.enchant]) {
         return { ok: false, itemId, enchantId, reason: 'already_enchanted' };
       }
@@ -1398,9 +1401,8 @@ export function evaluateApplyEnchantAdmission(
     const victimIdx = replaceVictimIndex(meta.inventory, itemId);
     const victim = victimIdx >= 0 ? meta.inventory[victimIdx].instance : undefined;
     if (!victim) return { ok: false, itemId, enchantId, reason: 'not_held' };
-    if (victim.enchant === enchantId) {
-      return { ok: false, itemId, enchantId, reason: 'same_enchant' };
-    }
+    // An identical-enchant-id victim is NOT denied: it admits like any other
+    // confirmed replace (see resolveReplaceEnchantBagged).
     if (victim.enchant !== undefined && !ENCHANTS[victim.enchant]) {
       return { ok: false, itemId, enchantId, reason: 'already_enchanted' };
     }

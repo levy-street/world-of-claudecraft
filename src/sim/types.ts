@@ -6482,10 +6482,10 @@ export type SimEvent = { pid?: number } & (
         | 'insufficient_materials'
         | 'throttled'
         | 'no_bag_space'
-        // #2415: already-enchanted target without the confirmReplace flag,
-        // and the identical-enchant-id re-apply denied on every arm.
+        // #2415: already-enchanted target without the confirmReplace flag. A
+        // confirmed identical-enchant-id re-apply is a normal replace, not a
+        // deny (professions/enchanting.ts).
         | 'already_enchanted'
-        | 'same_enchant'
         | 'busy';
     }
   // Outcome of applying a loadout's saved gear set. TEXT-FREE on purpose: the sim

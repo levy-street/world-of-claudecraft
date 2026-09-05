@@ -10242,9 +10242,9 @@ export const TARGETS = [
       { key: 'targets-rings-mobile', targets: true, rings: true, drill: 'Ring', mobile: true },
       // The #2415 replace flow: already-enchanted copies list as FLAGGED
       // replace rows (worn and bagged families both, the meta naming the
-      // enchant a confirm would destroy, the same-enchant row disabled), and
-      // accepting one runs the destroy-confirm dialog that names the doomed
-      // enchant, the no-refund ruling, and the reagent cost.
+      // enchant a confirm would destroy), and accepting one runs the
+      // destroy-confirm dialog that names the doomed enchant, the no-refund
+      // ruling, and the reagent cost.
       { key: 'targets-replace', targets: true, replace: true },
       { key: 'targets-replace-mobile', targets: true, replace: true, mobile: true },
       { key: 'replace-confirm', targets: true, replace: true, replaceConfirm: true },
@@ -10258,6 +10258,22 @@ export const TARGETS = [
         replace: true,
         replaceConfirm: true,
         mobile: true,
+      },
+      // QoL re-apply: a copy (worn AND bagged) already carrying the PICKED
+      // enchant. The sim now allows this (a normal replace netting to the
+      // same stats: the accept just burns reagents and trains Enchanting),
+      // so both rows stay enabled, tagged "Already applied" in the plain
+      // meta style rather than the destructive one.
+      { key: 'targets-same-enchant', targets: true, sameEnchant: true },
+      { key: 'targets-same-enchant-mobile', targets: true, sameEnchant: true, mobile: true },
+      // Accepting a same-enchant row still routes through the ONE confirm
+      // family (same dialog, same no-refund line): only the picker row's
+      // tag and enabled state changed, not the confirm step itself.
+      {
+        key: 'same-enchant-confirm',
+        targets: true,
+        sameEnchant: true,
+        replaceConfirm: true,
       },
     ],
     async capture(page, variant) {
@@ -10275,10 +10291,29 @@ export const TARGETS = [
           wantsReplace,
           wantsHeroicPair,
           wantsRings,
+          wantsSameEnchant,
         ) => {
           const game = window.__game;
           const sim = game?.sim;
           if (!game || !sim?.player) return { ok: false, reason: 'offline world unavailable' };
+          if (wantsSameEnchant) {
+            // The QoL re-apply scene: a WORN copy and a BAGGED copy both
+            // already carrying enchant_weapon_might, the same enchant the
+            // drill step targets by default ('Might'), so both families
+            // land on the sim's now-enabled same-enchant row instead of the
+            // old disabled one. Real ids only, never a hand-written payload.
+            sim.addItemInstance('eastbrook_arming_sword', {
+              enchant: 'enchant_weapon_might',
+              rolled: { stats: { str: 2 } },
+            });
+            sim.equipItemToSlot('eastbrook_arming_sword', 'mainhand');
+            sim.addItemInstance('eastbrook_arming_sword', {
+              enchant: 'enchant_weapon_might',
+              rolled: { stats: { str: 2 } },
+            });
+            sim.addItem('arcane_dust', 6);
+            return { ok: true, itemName: 'Chime Dust' };
+          }
           if (wantsHeroicPair) {
             // #2466: a base item and its HEROIC variant, two ids that resolve to
             // ONE display name. Both copies stay PLAIN, which is the worst case:
@@ -10380,6 +10415,7 @@ export const TARGETS = [
         Boolean(variant?.replace),
         Boolean(variant?.heroicPair),
         Boolean(variant?.rings),
+        Boolean(variant?.sameEnchant),
       );
       if (!staged.ok) throw new Error(staged.reason);
       await page.evaluate(() => {
@@ -10425,11 +10461,17 @@ export const TARGETS = [
         return { clip: '#ui' };
       }
       if (variant?.picker || variant?.targets) {
-        // Click the Apply Enchant row (the staged reagent's only action).
-        await page.evaluate(() => {
-          const rows = [...document.querySelectorAll('#ctx-menu .ctx-item')];
-          rows[rows.length - 1]?.click();
+        // Click the Apply Enchant row by its action id, not position: issue
+        // 3042 appended a lock/unlock row after every action set, so Apply
+        // Enchant is no longer the menu's last row (bag_item_context_menu.ts
+        // bagItemNewActions).
+        const enchantClicked = await page.evaluate(() => {
+          const row = document.querySelector('#ctx-menu .ctx-item[data-act="applyEnchant"]');
+          if (!row) return false;
+          row.click();
+          return true;
         });
+        if (!enchantClicked) throw new Error('no Apply Enchant row on the staged reagent');
         await wait(500);
         if (!(await pollForSize(page, '#ctx-menu'))) throw new Error('enchant picker did not open');
         if (variant?.targets) {
