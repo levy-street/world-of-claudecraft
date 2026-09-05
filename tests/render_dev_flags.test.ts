@@ -67,3 +67,34 @@ describe('render dev flags: the GPU-preparation mode switch', () => {
     expect(renderLayerDisabled('n8ao')).toBe(true);
   });
 });
+
+describe('render dev flags: the blade-grass sector split', () => {
+  it('splits four ways per axis by default', async () => {
+    const { bladeSectorAxis, BLADE_SECTOR_AXIS_DEFAULT } = await loadFlags('');
+    expect(BLADE_SECTOR_AXIS_DEFAULT).toBe(4);
+    expect(bladeSectorAxis()).toBe(4);
+  });
+
+  it('restores the single uncullable mesh per pool at ?bladesectors=1', async () => {
+    const { bladeSectorAxis } = await loadFlags('?bladesectors=1');
+    expect(bladeSectorAxis()).toBe(1);
+  });
+
+  it('takes any other A/B arm the flag names, bounded', async () => {
+    for (const [search, axis] of [
+      ['?bladesectors=2', 2],
+      ['?bladesectors=6', 6],
+      ['?bladesectors=99', 16],
+    ] as const) {
+      const { bladeSectorAxis } = await loadFlags(search);
+      expect(bladeSectorAxis(), search).toBe(axis);
+    }
+  });
+
+  it('falls back to the default for a missing, empty or nonsense value', async () => {
+    for (const search of ['', '?bladesectors=', '?bladesectors=off', '?bladesectors=0', null]) {
+      const { bladeSectorAxis } = await loadFlags(search);
+      expect(bladeSectorAxis(), String(search)).toBe(4);
+    }
+  });
+});
