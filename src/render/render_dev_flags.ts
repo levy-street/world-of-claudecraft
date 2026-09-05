@@ -7,6 +7,11 @@
 // NOT a player surface: the options menu owns the supported knobs.
 //
 // Live flags (grep renderLayerDisabled call sites for the authoritative set):
+//   charcull    - the per-rig character cull (character_cull_core.ts); off
+//                 restores the pre-cull submission, every rig in the draw band
+//                 drawn and shadowed every frame, which is the A/B arm for
+//                 pricing the cull on a machine whose driver hates the extra
+//                 sphere tests more than it hates the draws
 //   worndetail  - the whole triplanar surface-detail family layer (worn_stone)
 //   ebdetail    - the Eastbrook town triplanar-over-atlas layer only
 //   bladegrass  - the near-field blade-grass carpet

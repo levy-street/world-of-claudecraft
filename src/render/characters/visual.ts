@@ -97,6 +97,7 @@ import {
   weaponSkinOrientPin,
 } from './skin_attack';
 import { configureTightBoneTextures } from './skin_gpu_layout';
+import { applySkinnedCullBounds } from './skinned_cull_bounds';
 import { applySoulRendOverlay } from './soul_rend_overlay';
 import { soulRendPrewarmTargets } from './soul_rend_prewarm_core';
 import { createStowTransition, forceStow, requestStow, tickStow } from './stow_transition';
@@ -514,7 +515,7 @@ export class CharacterVisual {
       attachSharedDepthMaterials(decal, decal.material);
       decal.castShadow = this.shadowOn;
       decal.receiveShadow = false;
-      decal.frustumCulled = false;
+      applySkinnedCullBounds(decal, this.root, this.height);
       this.casters.push(decal);
       this.revealDecalOnCompile(decal);
     }
@@ -904,9 +905,11 @@ export class CharacterVisual {
         mesh.castShadow = castsShadow;
         mesh.receiveShadow = false;
         if (!castsShadow) return;
-        // skinned bounds drift outside bind-pose spheres; entity-level culling
-        // (80u draw range) already bounds the cost
-        if ((mesh as unknown as THREE.SkinnedMesh).isSkinnedMesh) mesh.frustumCulled = false;
+        // a padded sphere lets three cull this caster in each pass on its own
+        // question (the camera frustum, then the shadow camera's own ortho
+        // box), which a bind-pose sphere could not answer: skinned_cull_bounds
+        const skinned = mesh as unknown as THREE.SkinnedMesh;
+        if (skinned.isSkinnedMesh) applySkinnedCullBounds(skinned, this.root, this.height);
         this.casters.push(mesh);
       });
 
@@ -3179,7 +3182,8 @@ export class CharacterVisual {
       }
       mesh.castShadow = this.shadowOn;
       mesh.receiveShadow = false;
-      if ((mesh as unknown as THREE.SkinnedMesh).isSkinnedMesh) mesh.frustumCulled = false;
+      const skinned = mesh as unknown as THREE.SkinnedMesh;
+      if (skinned.isSkinnedMesh) applySkinnedCullBounds(skinned, this.root, this.height);
       this.originalMaterials.set(mesh, mesh.material);
       this.casters.push(mesh);
     });

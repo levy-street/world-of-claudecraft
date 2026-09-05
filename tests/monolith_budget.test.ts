@@ -417,7 +417,13 @@ const MONOLITHS: MonolithRow[] = [
     // each), and the extent policy moved to src/render/shadow_extent_core.ts.
     // Re-pinned after the v0.42 release hooks and live zone-feature shadow
     // extent wiring merged. Exact count, zero headroom.
-    ceiling: 13208,
+    // Lowered 13249 -> 13245 by the character cull: the group-level frustum
+    // sphere, its scratch Frustum/Sphere/Matrix4 and the per-frame frustum
+    // rebuild moved into src/render/character_cull_core.ts, which also owns the
+    // new shadow-reach test, so the renderer keeps only the two pushes and the
+    // bitmask read. Re-pinned on the combined candidate after the live shadow
+    // extent wiring from #3825. Exact count, zero headroom.
+    ceiling: 13212,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
