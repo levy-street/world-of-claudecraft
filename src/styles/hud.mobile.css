@@ -4329,18 +4329,58 @@
      touch rule): the button drops under the sentence at the 44px floor rather
      than squeezing the copy into half the width. */
   body.mobile-touch #woc-market-window .wm-banner-wallet {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  body.mobile-touch #woc-market-window .wm-banner-wallet > strong,
+  body.mobile-touch #woc-market-window .wm-banner-wallet p {
+    grid-column: 1;
   }
   body.mobile-touch #woc-market-window .wm-banner-wallet button {
-    grid-column: 1;
+    grid-column: 1 / -1;
     grid-row: auto;
     min-height: 44px;
+  }
+  /* The dismiss glyph shares the title row so hiding the card is one tap from
+     the corner, at the shared 44px touch floor. */
+  body.mobile-touch #woc-market-window .wm-banner-wallet button.wm-banner-dismiss {
+    grid-column: 2;
+    grid-row: 1;
+    min-height: 44px;
+    min-width: 44px;
+    align-self: start;
   }
   body.mobile-touch #woc-market-window .wm-wallet-balance {
     grid-column: 1;
     grid-row: auto;
     align-items: flex-start;
     text-align: left;
+  }
+  /* Landscape phone (the only in-game orientation): the sheet is short, so
+     the card lays out as ONE row (title over the sentence, balance, action,
+     dismiss) instead of the portrait-style stack that spent four rows of a
+     412px viewport on a status line. The action keeps the 44px floor. */
+  @media (orientation: landscape) {
+    body.mobile-touch #woc-market-window .wm-banner-wallet {
+      grid-template-columns: minmax(0, 1fr) auto minmax(150px, 200px) auto;
+      padding-top: 6px;
+      padding-bottom: 6px;
+    }
+    body.mobile-touch #woc-market-window .wm-wallet-balance {
+      grid-column: 2;
+      grid-row: 1 / 3;
+      align-items: flex-end;
+      text-align: right;
+    }
+    body.mobile-touch #woc-market-window .wm-banner-wallet button {
+      grid-column: 3;
+      grid-row: 1 / 3;
+      align-self: center;
+    }
+    body.mobile-touch #woc-market-window .wm-banner-wallet button.wm-banner-dismiss {
+      grid-column: 4;
+      grid-row: 1 / 3;
+      align-self: center;
+    }
   }
   /* Row rhythm on the phone sheet (the 15 QA sign-off note): taller cells
      than the desktop 6px, and the FIRST row clears the header hairline with

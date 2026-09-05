@@ -1839,3 +1839,29 @@ describe('woc_market_window: informed commitment before the first charge (H13/R9
     expect(confirmFields).toContain('model.activity?.termsAccepted');
   });
 });
+
+describe('woc_market_window: the wallet card can be hidden (the mobile reconnect prompt)', () => {
+  it('drops the card while the live kind matches the dismissed one, and only then', () => {
+    // render() hands the chrome builder null instead of the view when the pure
+    // core says the card is hidden; paintedWalletSig still latches the LIVE view,
+    // so onWalletChanged() repaints (and the card returns) when the kind moves.
+    expect(painter).toContain(
+      'wallet: walletCardHidden(wallet.kind, this.walletCardDismissed) ? null : wallet,',
+    );
+    expect(painter).toContain('this.paintedWalletSig = wocWalletCardSig(wallet);');
+    expect(painter).toContain('private walletCardDismissed = loadWalletCardDismissal();');
+  });
+
+  it('the dismiss click arm stores the KIND, persists it, and repaints', () => {
+    const arm = painter.slice(
+      painter.indexOf("case 'dismiss-wallet-card': {"),
+      painter.indexOf("case 'connect-wallet':"),
+    );
+    expect(arm).toContain('const kind = walletConnectionView().kind;');
+    // A non-dismissible kind can only reach here through a stale DOM; refuse it.
+    expect(arm).toContain('if (!walletCardDismissible(kind)) break;');
+    expect(arm).toContain('this.walletCardDismissed = kind;');
+    expect(arm).toContain('saveWalletCardDismissal(kind);');
+    expect(arm).toContain('this.render();');
+  });
+});

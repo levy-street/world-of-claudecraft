@@ -4419,6 +4419,7 @@ export const pl_PL: EnTranslations = {
       "walletLinkedConnected": "Twoja powiązana aplikacja portfela jest połączona i gotowa do zakupów $WOC.",
       "walletUsdBalance": "{amount} USD",
       "walletUsdUnknown": "Nieznane",
+      "walletCardDismiss": "Hide wallet card",
       "rateNote": "Kurs: około {tokens} $WOC za 1,00 USD, stan na {time}.",
       "rateNotePaused": "Ostatni znany kurs: około {tokens} $WOC za 1,00 USD, stan na {time}.",
       "estimateNote": "Około {tokens} $WOC za {usd} po obecnym kursie.",

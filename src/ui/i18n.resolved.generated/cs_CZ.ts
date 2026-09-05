@@ -4419,6 +4419,7 @@ export const cs_CZ: EnTranslations = {
       "walletLinkedConnected": "Tvoje propojená aplikace peněženky je připojena a připravena na nákupy za $WOC.",
       "walletUsdBalance": "{amount} USD",
       "walletUsdUnknown": "Neznámé",
+      "walletCardDismiss": "Hide wallet card",
       "rateNote": "Kurz: přibližně {tokens} $WOC za 1,00 USD k {time}.",
       "rateNotePaused": "Poslední známý kurz: přibližně {tokens} $WOC za 1,00 USD k {time}.",
       "estimateNote": "Přibližně {tokens} $WOC za {usd} při aktuálním kurzu.",

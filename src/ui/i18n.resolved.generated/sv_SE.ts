@@ -4419,6 +4419,7 @@ export const sv_SE: EnTranslations = {
       "walletLinkedConnected": "Din länkade plånboksapp är ansluten och redo för $WOC-köp.",
       "walletUsdBalance": "{amount} USD",
       "walletUsdUnknown": "Okänt",
+      "walletCardDismiss": "Hide wallet card",
       "rateNote": "Kurs: ungefär {tokens} $WOC per 1 USD, per {time}.",
       "rateNotePaused": "Senast kända kurs: ungefär {tokens} $WOC per 1 USD, per {time}.",
       "estimateNote": "Ungefär {tokens} $WOC för {usd} till aktuell kurs.",

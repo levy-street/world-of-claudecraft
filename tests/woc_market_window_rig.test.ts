@@ -35,6 +35,7 @@ import {
   WocMarketWindow,
   type WocMarketWindowDeps,
 } from '../src/ui/woc_market_window';
+import { WOC_WALLET_CARD_DISMISS_KEY } from '../src/ui/woc_wallet_card_dismiss';
 import type { IWorld } from '../src/world_api';
 
 // The icon path stays real for QUALITY_COLOR but composes no canvas: a
@@ -339,6 +340,8 @@ beforeEach(() => {
   setWalletUiEnabled(false);
   setWalletConnectionAddresses(null, null);
   setWocBalance(null);
+  // The wallet card's persisted dismissal is read at window construction.
+  localStorage.removeItem(WOC_WALLET_CARD_DISMISS_KEY);
 });
 
 describe('WocMarketWindow live rig: open, browse, select', () => {
@@ -1542,5 +1545,53 @@ describe('WocMarketWindow live rig: resolved disclosure figures and the select s
     expect(caption).toContain(t('hudChrome.wocMarket.sellEmptyFloor', { floor: 'Epic' }));
     expect(caption).not.toContain(t('hudChrome.wocMarket.sellCollectiblesMounts'));
     expect(caption).not.toContain(t('hudChrome.wocMarket.sellCollectiblesChromas'));
+  });
+});
+
+describe('WocMarketWindow live rig: the reconnect wallet card can be hidden', () => {
+  it('a tap on the glyph drops the card, keeps focus in the window, persists, and the card returns on a state change', async () => {
+    setWalletUiEnabled(true);
+    // The phone reading of a desktop-linked account: linked, nothing connected.
+    setWalletConnectionAddresses('linked', null);
+    const r = rig({ walletLinked: true });
+    r.win.open();
+    await flush();
+    const card = q<HTMLElement>(r.root, '.wm-banner-wallet');
+    expect(card.getAttribute('data-wallet-kind')).toBe('linked_disconnected');
+    const dismiss = q<HTMLButtonElement>(card, 'button[data-action="dismiss-wallet-card"]');
+    expect(dismiss.getAttribute('aria-label')).toBe(t('hudChrome.wocMarket.walletCardDismiss'));
+    dismiss.focus();
+    dismiss.click();
+    // The real click handler drove the real rebuild: no card, focus on the
+    // selected tab (the glyph removed itself), and the choice persisted.
+    expect(r.root.querySelector('.wm-banner-wallet')).toBeNull();
+    expect(r.root.querySelector('#woc-market-panel')).not.toBeNull();
+    expect(document.activeElement).toBe(q(r.root, '.wm-tab-selected'));
+    expect(localStorage.getItem(WOC_WALLET_CARD_DISMISS_KEY)).toBe('linked_disconnected');
+    // Still hidden across the wallet fan-out while the kind is unchanged.
+    r.win.onWalletChanged();
+    expect(r.root.querySelector('.wm-banner-wallet')).toBeNull();
+    // The wallet connects: a different kind, so the card is back, as the
+    // Manage card, which offers no glyph of its own.
+    setWalletConnectionAddresses('linked', 'linked');
+    r.win.onWalletChanged();
+    const back = q<HTMLElement>(r.root, '.wm-banner-wallet');
+    expect(back.getAttribute('data-wallet-kind')).toBe('linked_connected');
+    expect(back.querySelector('button[data-action="dismiss-wallet-card"]')).toBeNull();
+    expect(q(back, 'button[data-action="connect-wallet"]').textContent).toBe(
+      t('hudChrome.wocStore.wallet.manage'),
+    );
+  });
+
+  it('a persisted dismissal hides the card from the first paint of a new window', async () => {
+    setWalletUiEnabled(true);
+    setWalletConnectionAddresses('linked', null);
+    localStorage.setItem(WOC_WALLET_CARD_DISMISS_KEY, 'linked_disconnected');
+    const r = rig({ walletLinked: true });
+    r.win.open();
+    await flush();
+    expect(r.root.querySelector('.wm-banner-wallet')).toBeNull();
+    // Browse itself is untouched: the filters still lead the panel.
+    expect(r.root.querySelector('#woc-market-panel .wm-browse select')).not.toBeNull();
   });
 });

@@ -4419,6 +4419,7 @@ export const ja_JP: EnTranslations = {
       "walletLinkedConnected": "リンク済みのウォレットアプリに接続され、$WOC で支払う準備ができています。",
       "walletUsdBalance": "{amount} USD",
       "walletUsdUnknown": "不明",
+      "walletCardDismiss": "ウォレットカードを隠す",
       "rateNote": "レート: {time} 時点で 1 USD あたり約 {tokens} $WOC。",
       "rateNotePaused": "最後に確認したレート: {time} 時点で 1 USD あたり約 {tokens} $WOC。",
       "estimateNote": "{usd} は現在のレートで約 {tokens} $WOC です。",

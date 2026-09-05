@@ -4419,6 +4419,7 @@ export const zh_CN: EnTranslations = {
       "walletLinkedConnected": "已关联的钱包应用已连接，可用于 $WOC 付款。",
       "walletUsdBalance": "{amount} USD",
       "walletUsdUnknown": "未知",
+      "walletCardDismiss": "隐藏钱包卡片",
       "rateNote": "汇率：截至 {time}，约每美元 {tokens} $WOC。",
       "rateNotePaused": "最近已知汇率：截至 {time}，约每美元 {tokens} $WOC。",
       "estimateNote": "{usd} 按当前汇率约合 {tokens} $WOC。",

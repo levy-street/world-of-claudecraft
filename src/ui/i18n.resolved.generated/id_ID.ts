@@ -4419,6 +4419,7 @@ export const id_ID: EnTranslations = {
       "walletLinkedConnected": "Aplikasi dompet tertautmu sudah terhubung dan siap untuk pembelian $WOC.",
       "walletUsdBalance": "{amount} USD",
       "walletUsdUnknown": "Tidak diketahui",
+      "walletCardDismiss": "Hide wallet card",
       "rateNote": "Kurs: sekitar {tokens} $WOC per $1,00 USD per {time}.",
       "rateNotePaused": "Kurs terakhir yang diketahui: sekitar {tokens} $WOC per $1,00 USD per {time}.",
       "estimateNote": "Sekitar {tokens} $WOC untuk {usd} pada kurs saat ini.",

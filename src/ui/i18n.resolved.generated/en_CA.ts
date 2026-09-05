@@ -4419,6 +4419,7 @@ export const en_CA: EnTranslations = {
       "walletLinkedConnected": "Your linked wallet app is connected and ready for $WOC purchases.",
       "walletUsdBalance": "{amount} USD",
       "walletUsdUnknown": "Unknown",
+      "walletCardDismiss": "Hide wallet card",
       "rateNote": "Rate: about {tokens} $WOC per $1.00 USD as of {time}.",
       "rateNotePaused": "Last known rate: about {tokens} $WOC per $1.00 USD as of {time}.",
       "estimateNote": "About {tokens} $WOC for {usd} at the current rate.",

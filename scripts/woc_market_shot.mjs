@@ -25,6 +25,10 @@
 //                 suffixes every capture with the locale; run it AFTER a
 //                 STRESS=1 pass so the listings it browses already exist.
 //   SHOT_PREFIX=before  names the files before-* instead of after-*.
+//   WALLET_CARD_ONLY=1  shoots only the mobile landscape Browse with the Solana
+//                 wallet card (a linked account with no wallet in the phone
+//                 browser reads "reconnect"), then taps the card's dismiss
+//                 glyph when the build offers one and shoots the hidden state.
 import { randomBytes } from 'node:crypto';
 import fs from 'node:fs';
 import { ed25519 } from '@noble/curves/ed25519';
@@ -70,6 +74,7 @@ const SHOT_PREFIX = process.env.SHOT_PREFIX ?? 'after';
 // seeded (a rerun, or the before-state pass over the same database), so an
 // iteration costs a browser flow rather than five minutes of paced seeding.
 const SEED = process.env.SEED !== '0';
+const WALLET_CARD_ONLY = process.env.WALLET_CARD_ONLY === '1';
 const REUSE_BUYER = process.env.BUYER ?? '';
 // The page URL: the locale rides the boot query (the client's own language
 // switch), so every capture of a locale pass reads in that locale.
@@ -782,6 +787,92 @@ async function clickListing(page, listingId, { sortNewest = true } = {}) {
   return false;
 }
 
+// The mobile landscape entry the main arm below uses (register, link a
+// throwaway wallet, enter on the desktop shell, flip to phone metrics + the
+// mobile-touch class), shared by the wallet-card capture.
+async function enterMobileLandscape(browser) {
+  const mob = await registerAccount('wocmob');
+  await linkThrowawayWallet(mob.token);
+  const mobileContext = await browser.createBrowserContext();
+  const mobile = await mobileContext.newPage();
+  await mobile.setViewport({ width: 1280, height: 800 });
+  await enterWorldInBrowser(mobile, {
+    username: mob.username,
+    charName: `Wren${nameSuffix}`,
+    cls: 'mage',
+  });
+  await mobile.setViewport({ width: 915, height: 412, deviceScaleFactor: 2 });
+  const client = await mobile.createCDPSession();
+  await client.send('Emulation.setTouchEmulationEnabled', { enabled: true });
+  await mobile.evaluate(() => {
+    document.body.classList.add('mobile-touch');
+    window.dispatchEvent(new Event('resize'));
+  });
+  await sleep(1500);
+  return mobile;
+}
+
+// WALLET_CARD_ONLY: the Solana wallet card on the landscape phone sheet, with
+// the card standing and (when the build offers the glyph) hidden.
+async function walletCardShots(browser) {
+  // Desktop first: the same linked-but-unconnected account on the wide window
+  // (the card's fourth column carries the glyph there).
+  const desk = await registerAccount('wocdesk');
+  await linkThrowawayWallet(desk.token);
+  const page = await browser.newPage();
+  await page.setViewport({ width: 1600, height: 1000 });
+  await enterWorldInBrowser(page, {
+    username: desk.username,
+    charName: `Rook${nameSuffix}`,
+    cls: 'rogue',
+  });
+  await page.evaluate(() => document.getElementById('tutorial-greeting')?.remove());
+  await openExchange(page);
+  await page
+    .waitForSelector('#woc-market-window .wm-row', { timeout: 8000 })
+    .catch(() => console.log('desktop: no listing rows within 8s'));
+  await sleep(500);
+  await shoot(page, shotName('desktop-browse-wallet-card'));
+  await page.close();
+
+  const mobile = await enterMobileLandscape(browser);
+  // A fresh character's Ferryman Odo greeting (#tutorial-greeting) paints over
+  // the sheet; the card is the subject here, so drop the greeting first.
+  await mobile.evaluate(() => document.getElementById('tutorial-greeting')?.remove());
+  await openExchange(mobile);
+  // Give the first Browse page its rows (a seeded listing lands within a poll).
+  await mobile
+    .waitForSelector('#woc-market-window .wm-row', { timeout: 8000 })
+    .catch(() => console.log('no listing rows within 8s (an empty Browse)'));
+  await sleep(500);
+  const kind = await mobile.evaluate(
+    () =>
+      document
+        .querySelector('#woc-market-window .wm-banner-wallet')
+        ?.getAttribute('data-wallet-kind') ?? null,
+  );
+  check(kind === 'linked_disconnected', `wallet card reads linked_disconnected (got ${kind})`);
+  await shoot(mobile, shotName('mobile-browse-wallet-card'), null);
+  const dismissed = await mobile.evaluate(() => {
+    const btn = document.querySelector('#woc-market-window .wm-banner-dismiss');
+    if (!(btn instanceof HTMLElement)) return false;
+    btn.click();
+    return true;
+  });
+  if (!dismissed) {
+    console.log('no dismiss glyph in this build (a BEFORE capture)');
+    return;
+  }
+  await sleep(800);
+  check(
+    await mobile.evaluate(
+      () => document.querySelector('#woc-market-window .wm-banner-wallet') === null,
+    ),
+    'the wallet card is gone after the dismiss tap',
+  );
+  await shoot(mobile, shotName('mobile-browse-wallet-hidden'), null);
+}
+
 async function main() {
   if (SEED) {
     await seedSellerListing();
@@ -795,6 +886,12 @@ async function main() {
     headless: 'new',
     args: ['--window-size=1600,1000', '--use-angle=swiftshader'],
   });
+
+  if (WALLET_CARD_ONLY) {
+    await walletCardShots(browser);
+    await browser.close();
+    return;
+  }
 
   // Buyer main: the account exists (and has its wallet linked) BEFORE the
   // browser signs in, so refreshWalletLinkStatus sees the link at login and
@@ -932,36 +1029,7 @@ async function main() {
   // path diverges under emulation), then the viewport flips to landscape
   // device metrics + mobile-touch, which is what the HUD's sheet layout keys
   // on (body class + viewport), before the window opens.
-  const mob = await registerAccount('wocmob');
-  await linkThrowawayWallet(mob.token);
-  // A fresh browser context: the default profile keeps the buyer's stored
-  // session, whose auto-resume skips the login panel this flow waits on.
-  const mobileContext = await browser.createBrowserContext();
-  const mobile = await mobileContext.newPage();
-  await mobile.setViewport({ width: 1280, height: 800 });
-  await enterWorldInBrowser(mobile, {
-    username: mob.username,
-    charName: `Wren${nameSuffix}`,
-    cls: 'mage',
-  });
-  // Puppeteer's OWN setViewport, not a raw Emulation.setDeviceMetricsOverride.
-  // A raw CDP override is invisible to puppeteer, and page.screenshot re-asserts
-  // the metrics it believes in before capturing: the layout snapped back to
-  // 1280 wide and the clip then cropped the top-left of a desktop-width window,
-  // which looks exactly like a window overflowing its viewport. The logged rect
-  // vs viewport pair below is what caught it.
-  // No isMobile/hasTouch here: flipping either makes puppeteer RELOAD the page,
-  // which throws away the entered world (window.__game) this flow then drives.
-  // The mobile sheet keys on the body.mobile-touch class, set below, so the
-  // metrics alone are what the viewport has to supply.
-  await mobile.setViewport({ width: 915, height: 412, deviceScaleFactor: 2 });
-  const client = await mobile.createCDPSession();
-  await client.send('Emulation.setTouchEmulationEnabled', { enabled: true });
-  await mobile.evaluate(() => {
-    document.body.classList.add('mobile-touch');
-    window.dispatchEvent(new Event('resize'));
-  });
-  await sleep(1500);
+  const mobile = await enterMobileLandscape(browser);
   await openExchange(mobile);
   // No clip: the viewport IS the frame now that puppeteer owns the metrics.
   await shoot(mobile, shotName('mobile-browse'), null);

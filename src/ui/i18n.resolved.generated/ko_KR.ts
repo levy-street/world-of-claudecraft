@@ -4419,6 +4419,7 @@ export const ko_KR: EnTranslations = {
       "walletLinkedConnected": "연결된 지갑 앱이 접속되어 $WOC로 결제할 준비가 되었습니다.",
       "walletUsdBalance": "{amount} USD",
       "walletUsdUnknown": "알 수 없음",
+      "walletCardDismiss": "지갑 카드 숨기기",
       "rateNote": "환율: {time} 기준 1 USD당 약 {tokens} $WOC.",
       "rateNotePaused": "마지막으로 확인된 환율: {time} 기준 1 USD당 약 {tokens} $WOC.",
       "estimateNote": "{usd}는 현재 환율로 약 {tokens} $WOC입니다.",

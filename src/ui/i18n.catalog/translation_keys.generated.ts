@@ -11295,6 +11295,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.wocMarket.termsLink'
   | 'hudChrome.wocMarket.title'
   | 'hudChrome.wocMarket.variableTokenWarning'
+  | 'hudChrome.wocMarket.walletCardDismiss'
   | 'hudChrome.wocMarket.walletLinkedConnected'
   | 'hudChrome.wocMarket.walletLinkedDisconnected'
   | 'hudChrome.wocMarket.walletUsdBalance'

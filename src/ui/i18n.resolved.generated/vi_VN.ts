@@ -4419,6 +4419,7 @@ export const vi_VN: EnTranslations = {
       "walletLinkedConnected": "Ứng dụng ví đã liên kết của bạn đang được kết nối và sẵn sàng cho các giao dịch mua $WOC.",
       "walletUsdBalance": "{amount} USD",
       "walletUsdUnknown": "Không xác định",
+      "walletCardDismiss": "Hide wallet card",
       "rateNote": "Tỷ giá: khoảng {tokens} $WOC cho 1,00 USD, tính đến {time}.",
       "rateNotePaused": "Tỷ giá được biết lần cuối: khoảng {tokens} $WOC cho 1,00 USD, tính đến {time}.",
       "estimateNote": "Khoảng {tokens} $WOC cho {usd} theo tỷ giá hiện tại.",

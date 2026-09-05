@@ -17008,7 +17008,7 @@
      borrowing the store's palette. */
   #woc-market-window .wm-banner-wallet {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto minmax(160px, 220px);
+    grid-template-columns: minmax(0, 1fr) auto minmax(160px, 220px) auto;
     grid-template-rows: auto auto;
     gap: 4px var(--spacing-md);
     align-items: start;
@@ -17033,6 +17033,17 @@
     align-self: center;
     width: 100%;
     white-space: nowrap;
+  }
+  /* The dismiss glyph: the window-chrome .x-btn family in the card's own
+     corner column, top-aligned like a title-bar close. It is one selector more
+     specific than the action-button rule above so the grid placement wins. */
+  #woc-market-window .wm-banner-wallet button.wm-banner-dismiss {
+    grid-column: 4;
+    grid-row: 1;
+    align-self: start;
+    width: auto;
+    min-height: 0;
+    line-height: 1;
   }
   #woc-market-window .wm-wallet-balance {
     grid-column: 2;

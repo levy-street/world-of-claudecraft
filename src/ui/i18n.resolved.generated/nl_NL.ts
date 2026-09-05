@@ -4419,6 +4419,7 @@ export const nl_NL: EnTranslations = {
       "walletLinkedConnected": "Je gekoppelde portemonnee-app is verbonden en klaar voor $WOC-aankopen.",
       "walletUsdBalance": "{amount} USD",
       "walletUsdUnknown": "Onbekend",
+      "walletCardDismiss": "Hide wallet card",
       "rateNote": "Koers: ongeveer {tokens} $WOC per $1.00 USD, vanaf {time}.",
       "rateNotePaused": "Laatst bekende koers: ongeveer {tokens} $WOC per $1.00 USD, vanaf {time}.",
       "estimateNote": "Ongeveer {tokens} $WOC voor {usd} tegen de huidige koers.",
