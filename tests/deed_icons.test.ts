@@ -367,8 +367,11 @@ describe('Book of Deeds webp icons', () => {
     // The Masterwrought completion wave paints its ten formerly pending deed
     // identities (and replaces prog_farming_100), leaving only the ten
     // release-owned castle, bank, tutorial, and Crucible rows on fallback art.
-    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(298);
+    // The self-crafted hammer's hidden celebration adds one explicit pending crest.
+    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(299);
     expect(DEED_IMAGE_IDS.size, 'every live deed but the pending set is painted').toBe(288);
+    expect(DEED_ART_PENDING_IDS).toHaveLength(11);
+    expect(DEED_ART_PENDING_IDS.at(-1)).toBe('hid_forgebreaker');
     expect(DEED_ORDER.length - DEED_IMAGE_IDS.size).toBe(DEED_ART_PENDING_IDS.length);
     for (const id of artless) {
       const catCrestId = deedCrestId(id, DEEDS[id].category);
