@@ -3022,6 +3022,7 @@ export const es_ES: EnTranslations = {
       "riftTier": "Objeto de Brecha de rango {tier}",
       "riftUpgrade": "Mejora de brecha {level}/{max}",
       "riftSockets": "Gemas de brecha {used}/{total}",
+      "durability": "Durability {current} / {max}",
       "statEnchanted": "+{value} {stat} (Encantado)",
       "enchantedFallback": "Encantado",
       "partyTradeWindow": "Puedes intercambiar este objeto con jugadores que compartieron su botín durante los próximos {time}. Equiparlo termina la ventana de intercambio."
@@ -9882,7 +9883,11 @@ export const es_ES: EnTranslations = {
       "sellQuantityCancel": "Cancelar",
       "sellJunk": "Vender basura",
       "sellJunkAria": "Vender toda la basura por {price}",
-      "sellJunkHint": "Vende todos los objetos grises de tus bolsas excepto los objetos de misión."
+      "sellJunkHint": "Vende todos los objetos grises de tus bolsas excepto los objetos de misión.",
+      "repairAll": "Repair All",
+      "repairAllAria": "Repair all equipment for {price}",
+      "repairAllHint": "Repairs every worn weapon and piece of armor to full durability. Rings and necklaces never wear.",
+      "repairAllUnaffordable": "You cannot afford this repair."
     },
     "market": {
       "title": "Mercado Mundial",

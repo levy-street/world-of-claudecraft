@@ -3022,6 +3022,7 @@ export const pt_BR: EnTranslations = {
       "riftTier": "Item da Fenda de nível {tier}",
       "riftUpgrade": "Aprimoramento da fenda {level}/{max}",
       "riftSockets": "Gemas da fenda {used}/{total}",
+      "durability": "Durability {current} / {max}",
       "statEnchanted": "+{value} {stat} (Encantado)",
       "enchantedFallback": "Encantado",
       "partyTradeWindow": "Você pode negociar este item com jogadores que compartilharam esse saque pelos próximos {time}. Equipá-lo encerra a janela de troca."
@@ -9882,7 +9883,11 @@ export const pt_BR: EnTranslations = {
       "sellQuantityCancel": "Cancelar",
       "sellJunk": "Vender tralha",
       "sellJunkAria": "Vender toda a tralha por {price}",
-      "sellJunkHint": "Vende todos os itens cinza nas suas bolsas, exceto itens de missão."
+      "sellJunkHint": "Vende todos os itens cinza nas suas bolsas, exceto itens de missão.",
+      "repairAll": "Repair All",
+      "repairAllAria": "Repair all equipment for {price}",
+      "repairAllHint": "Repairs every worn weapon and piece of armor to full durability. Rings and necklaces never wear.",
+      "repairAllUnaffordable": "You cannot afford this repair."
     },
     "market": {
       "title": "Mercado Mundial",

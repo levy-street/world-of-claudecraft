@@ -3022,6 +3022,7 @@ export const it_IT: EnTranslations = {
       "riftTier": "Oggetto dello Squarcio di rango {tier}",
       "riftUpgrade": "Potenziamento dello squarcio {level}/{max}",
       "riftSockets": "Gemme dello squarcio {used}/{total}",
+      "durability": "Durability {current} / {max}",
       "statEnchanted": "+{value} {stat} (Incantato)",
       "enchantedFallback": "Incantato",
       "partyTradeWindow": "Puoi scambiare questo oggetto con i giocatori che hanno condiviso il suo bottino per i prossimi {time}. Indossarlo pone fine alla finestra di scambio."
@@ -9882,7 +9883,11 @@ export const it_IT: EnTranslations = {
       "sellQuantityCancel": "Annulla",
       "sellJunk": "Vendi cianfrusaglie",
       "sellJunkAria": "Vendi tutte le cianfrusaglie per {price}",
-      "sellJunkHint": "Vende tutti gli oggetti grigi nelle borse tranne gli oggetti di missione."
+      "sellJunkHint": "Vende tutti gli oggetti grigi nelle borse tranne gli oggetti di missione.",
+      "repairAll": "Repair All",
+      "repairAllAria": "Repair all equipment for {price}",
+      "repairAllHint": "Repairs every worn weapon and piece of armor to full durability. Rings and necklaces never wear.",
+      "repairAllUnaffordable": "You cannot afford this repair."
     },
     "market": {
       "title": "Mercato Mondiale",

@@ -3022,6 +3022,7 @@ export const tr_TR: EnTranslations = {
       "riftTier": "{tier} dereceli Yarık eşyası",
       "riftUpgrade": "Yarık yükseltmesi {level}/{max}",
       "riftSockets": "Yarık mücevherleri {used}/{total}",
+      "durability": "Durability {current} / {max}",
       "statEnchanted": "+{value} {stat} (Büyülü)",
       "enchantedFallback": "Büyülü",
       "partyTradeWindow": "Bu eşyayı, düşüşünü paylaşan oyunculara önümüzdeki {time} boyunca takas edebilirsin. Kuşanmak takas penceresini sona erdirir."
@@ -9882,7 +9883,11 @@ export const tr_TR: EnTranslations = {
       "sellQuantityCancel": "İptal",
       "sellJunk": "Döküntüleri Sat",
       "sellJunkAria": "Tüm döküntüleri {price} karşılığında sat",
-      "sellJunkHint": "Görev eşyaları hariç çantalarınızdaki tüm gri eşyaları satar."
+      "sellJunkHint": "Görev eşyaları hariç çantalarınızdaki tüm gri eşyaları satar.",
+      "repairAll": "Repair All",
+      "repairAllAria": "Repair all equipment for {price}",
+      "repairAllHint": "Repairs every worn weapon and piece of armor to full durability. Rings and necklaces never wear.",
+      "repairAllUnaffordable": "You cannot afford this repair."
     },
     "market": {
       "title": "Dünya Pazarı",

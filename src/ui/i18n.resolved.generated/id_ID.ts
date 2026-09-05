@@ -3022,6 +3022,7 @@ export const id_ID: EnTranslations = {
       "riftTier": "Barang Rift peringkat {tier}",
       "riftUpgrade": "Peningkatan Rift {level}/{max}",
       "riftSockets": "Permata Rift {used}/{total}",
+      "durability": "Durability {current} / {max}",
       "statEnchanted": "+{value} {stat} (Dimantrai)",
       "enchantedFallback": "Dimantrai",
       "partyTradeWindow": "Kamu dapat memperdagangkan barang ini kepada pemain yang berbagi jarahannya selama {time} berikutnya. Memakainya mengakhiri jendela perdagangan."
@@ -9882,7 +9883,11 @@ export const id_ID: EnTranslations = {
       "sellQuantityCancel": "Batal",
       "sellJunk": "Jual Rongsokan",
       "sellJunkAria": "Jual semua rongsokan seharga {price}",
-      "sellJunkHint": "Menjual setiap barang abu-abu di tasmu kecuali barang misi."
+      "sellJunkHint": "Menjual setiap barang abu-abu di tasmu kecuali barang misi.",
+      "repairAll": "Repair All",
+      "repairAllAria": "Repair all equipment for {price}",
+      "repairAllHint": "Repairs every worn weapon and piece of armor to full durability. Rings and necklaces never wear.",
+      "repairAllUnaffordable": "You cannot afford this repair."
     },
     "market": {
       "title": "Pasar Dunia",

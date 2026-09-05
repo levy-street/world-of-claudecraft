@@ -3022,6 +3022,7 @@ export const zh_CN: EnTranslations = {
       "riftTier": "{tier}级裂隙物品",
       "riftUpgrade": "裂隙强化 {level}/{max}",
       "riftSockets": "裂隙宝石 {used}/{total}",
+      "durability": "耐久度 {current} / {max}",
       "statEnchanted": "+{value} {stat}（附魔）",
       "enchantedFallback": "已附魔",
       "partyTradeWindow": "在接下来的{time}内，你可以将此物品交易给共同获得该掉落的玩家。装备后交易期限即告结束。"
@@ -9882,7 +9883,11 @@ export const zh_CN: EnTranslations = {
       "sellQuantityCancel": "取消",
       "sellJunk": "出售杂物",
       "sellJunkAria": "以 {price} 出售所有杂物",
-      "sellJunkHint": "出售背包中除任务物品外的所有灰色物品。"
+      "sellJunkHint": "出售背包中除任务物品外的所有灰色物品。",
+      "repairAll": "全部修理",
+      "repairAllAria": "花费{price}修理全部装备",
+      "repairAllHint": "将所有穿戴中的武器和护甲修理至满耐久。戒指和项链不会磨损。",
+      "repairAllUnaffordable": "你付不起这笔修理费。"
     },
     "market": {
       "title": "世界市场",

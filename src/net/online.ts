@@ -198,6 +198,7 @@ import { decodeGuildBankLogFrame, GUILD_BANK_LOG_TTL_MS } from './guild_bank_log
 import { foldInputAck } from './input_ack';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
 import { inputSignature } from './input_signature';
+import { copyPos, wrapAngle } from './mirror_math';
 import {
   type MovementFrameV2,
   MovementFrameV2Outbox,
@@ -1191,21 +1192,6 @@ export class Api {
 // ---------------------------------------------------------------------------
 // World mirror
 // ---------------------------------------------------------------------------
-
-function wrapAngle(d: number): number {
-  while (d > Math.PI) d -= 2 * Math.PI;
-  while (d < -Math.PI) d += 2 * Math.PI;
-  return d;
-}
-
-function copyPos(
-  dst: { x: number; y: number; z: number },
-  src: { x: number; y: number; z: number },
-): void {
-  dst.x = src.x;
-  dst.y = src.y;
-  dst.z = src.z;
-}
 
 // A single position update never moves an entity more than a few yards by
 // walking; anything past this is a teleport (arena pit, dungeon portal,
@@ -4410,6 +4396,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
   sellAllJunk(): void {
     this.cmd({ cmd: 'sell_all_junk' });
+  }
+  repairAllGear(npcId: number): void {
+    this.cmd({ cmd: 'repair', npc: npcId });
   }
   buyBackItem(
     itemId: string,

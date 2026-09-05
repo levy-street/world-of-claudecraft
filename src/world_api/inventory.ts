@@ -59,6 +59,15 @@ export interface IWorldInventory {
   // Sell every gray (poor-quality) item in the bags at once while a vendor is open.
   // Quest items and anything flagged noVendorSell are left untouched.
   sellAllJunk(): void;
+  /** Repair every worn piece, and every damaged copy in the bags, to full
+   *  durability at merchant `npcId` (Repair All,
+   *  src/sim/durability.ts): the sim re-derives the bill from its own equipment
+   *  maps (durability_rules.ts repairAllCost, the same helper the window quotes
+   *  with) and refuses whole when the purse is short. The paperdoll and vendor
+   *  window read the worn state off `equipmentInstances` (a damaged copy
+   *  carries `durability`; an undamaged one carries no field), so no new data
+   *  member rides the wire for this. */
+  repairAllGear(npcId: number): void;
   // `index` addresses the exact row in vendorBuyback the player clicked
   // (VendorView.buyback[].index); rows can share an itemId with different
   // instance payloads, so the index disambiguates which copy comes back.

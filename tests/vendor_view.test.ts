@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import type { InvSlot, ItemDef } from '../src/sim/types';
 import { buyPurchaseTotals } from '../src/sim/vendor_buy_stack';
-import { buildVendorView, sellJunkButtonState } from '../src/ui/hud/vendor/vendor_view';
+import {
+  buildVendorView,
+  repairButtonState,
+  sellJunkButtonState,
+} from '../src/ui/hud/vendor/vendor_view';
 
 // Minimal ItemDef fixtures: buildVendorView only reads id / buyValue / sellValue.
 function item(
@@ -358,5 +362,71 @@ describe('buildVendorView count multiples (phase 21)', () => {
     expect(view.goods[0].countBuy).toBeUndefined();
     expect(view.goods[0].affordable).toBe(true);
     expect(view.goods[1].customBuy).toBeUndefined();
+  });
+});
+
+describe('repairButtonState (the Repair All quote)', () => {
+  const chest = {
+    id: 'chest',
+    name: 'chest',
+    quality: 'common',
+    kind: 'armor',
+    slot: 'chest',
+    armorType: 'leather',
+    requiredLevel: 10,
+    sellValue: 0,
+  } as unknown as ItemDef;
+  const ring = {
+    id: 'ring',
+    name: 'ring',
+    quality: 'common',
+    kind: 'armor',
+    slot: 'ring',
+    requiredLevel: 10,
+    sellValue: 0,
+  } as unknown as ItemDef;
+  const items = { chest, ring };
+
+  it('is disabled with a zero quote when nothing worn is damaged', () => {
+    const state = repairButtonState(
+      {
+        equipment: { chest: 'chest', ring1: 'ring' },
+        equipmentInstances: {},
+        inventory: [],
+        copper: 0,
+      },
+      items,
+    );
+    expect(state).toEqual({ enabled: false, cost: 0, affordable: true });
+  });
+
+  it('quotes the sim formula (5c x ilvl x missing) and tracks affordability against the purse', () => {
+    // A leather chest pools 100; 40 missing at required level 10 is 2000c.
+    const world = {
+      equipment: { chest: 'chest', ring1: 'ring' },
+      equipmentInstances: { chest: { durability: 60 }, ring1: { durability: 0 } },
+      inventory: [] as InvSlot[],
+      copper: 1999,
+    };
+    expect(repairButtonState(world, items)).toEqual({
+      enabled: true,
+      cost: 2000,
+      affordable: false,
+    });
+    expect(repairButtonState({ ...world, copper: 2000 }, items)).toEqual({
+      enabled: true,
+      cost: 2000,
+      affordable: true,
+    });
+  });
+
+  it('bills a damaged copy carried in the bags on the same quote', () => {
+    const world = {
+      equipment: {},
+      equipmentInstances: {},
+      inventory: [{ itemId: 'chest', count: 1, instance: { durability: 90 } }] as InvSlot[],
+      copper: 500,
+    };
+    expect(repairButtonState(world, items)).toEqual({ enabled: true, cost: 500, affordable: true });
   });
 });

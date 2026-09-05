@@ -3012,6 +3012,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.vendor.sellJunkAria': '{price}ですべての不要品を売却',
   'itemUi.vendor.sellJunkHint':
     'クエストアイテムを除くバッグ内のすべての灰色アイテムを売却します。',
+  'itemUi.vendor.repairAll': 'すべて修理',
+  'itemUi.vendor.repairAllAria': '{price}で装備をすべて修理',
+  'itemUi.vendor.repairAllHint': '装備中のすべての武器と防具の耐久度を全回復します。指輪と首飾りは摩耗しません。',
+  'itemUi.vendor.repairAllUnaffordable': 'この修理費を支払えません。',
   'itemUi.market.title': 'ワールドマーケット',
   'itemUi.market.subtitle': '商人の取引所',
   'itemUi.market.close': '市場を閉じる',
@@ -10193,6 +10197,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemTooltip.riftTier': '{tier}ランク・リフト装備',
   'hudChrome.itemTooltip.riftUpgrade': 'リフト強化 {level}/{max}',
   'hudChrome.itemTooltip.riftSockets': 'リフト宝石 {used}/{total}',
+  'hudChrome.itemTooltip.durability': '耐久度 {current} / {max}',
   'sim.rift.alreadyCleared': 'このリフトはすでに {names} が攻略しました。',
   'sim.rift.raceLost': 'このリフトはすでに {names} が攻略しました。挑戦は終了します。',
   'sim.rift.raceWorldWin': '{names} が {seconds}秒で{tier}ランク・リフトレースに勝利！',

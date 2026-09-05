@@ -10,6 +10,7 @@
 // lines it actually caused (instanceBonusStatLines), which is the fact a player
 // is reading the tooltip for.
 import { ENCHANTS } from '../sim/content/enchants';
+import { currentDurability, maxDurability } from '../sim/durability_rules';
 import { isCommissionEligibleKind } from '../sim/professions/commission';
 import { isEnchantedInstance } from '../sim/professions/enchanting';
 import type { ItemDef, ItemInstancePayload, Stats } from '../sim/types';
@@ -62,6 +63,10 @@ export function wornTooltipInstance(
   if (instance.signer !== undefined) worn.signer = instance.signer;
   if (instance.enchant !== undefined) worn.enchant = instance.enchant;
   if (instance.rolled !== undefined) worn.rolled = instance.rolled;
+  // The worn copy's durability (durability_rules.ts): a SELF-only fact, read
+  // off the full einst payload in both hosts; the public eqi trim never
+  // carries it, so another player's inspect shows no durability line.
+  if (instance.durability !== undefined) worn.durability = instance.durability;
   return worn;
 }
 
@@ -128,10 +133,31 @@ export function instanceLockLine(instance?: ItemInstancePayload): string {
  *  a bare "Enchanted" badge told a player their copy was enchanted but not what
  *  the enchant DID or which of the listed bonuses it accounted for, so the fact
  *  now rides the bonus stat lines themselves (instanceBonusStatLines below). */
-export function instanceBadgeLines(instance?: ItemInstancePayload): string {
+export function instanceBadgeLines(instance?: ItemInstancePayload, item?: ItemDef): string {
   if (!instance) return '';
-  if (!instance.rolled?.masterwork) return '';
-  return `<div class="tt-sub tt-masterwork-seal" style="color:var(--gold)"><img class="tt-masterwork-seal-icon" src="${MASTERWORK_SEAL_IMAGE_URL}" alt="" aria-hidden="true" draggable="false"><span>${esc(t('hudChrome.crafting.masterworkSeal'))}</span></div>`;
+  let html = '';
+  if (instance.rolled?.masterwork) {
+    html += `<div class="tt-sub tt-masterwork-seal" style="color:var(--gold)"><img class="tt-masterwork-seal-icon" src="${MASTERWORK_SEAL_IMAGE_URL}" alt="" aria-hidden="true" draggable="false"><span>${esc(t('hudChrome.crafting.masterworkSeal'))}</span></div>`;
+  }
+  html += instanceDurabilityLine(instance, item);
+  return html;
+}
+
+/** The classic "Durability current / max" line (durability_rules.ts), shown
+ *  ONLY while the copy is damaged (an undamaged copy carries no field, and a
+ *  full pool is not a fact worth a tooltip line). Red at zero: the piece is
+ *  worn but inert until repaired; the ordinary warm text otherwise. Rides the
+ *  badge slot so the paperdoll and bag tooltips both get it with no extra
+ *  composition site in hud.ts. */
+export function instanceDurabilityLine(instance?: ItemInstancePayload, item?: ItemDef): string {
+  if (!instance || !item || instance.durability === undefined) return '';
+  const max = maxDurability(item);
+  if (max === 0) return '';
+  const current = currentDurability(item, instance);
+  const cls = current === 0 ? 'tt-sub tt-durability tt-durability-broken' : 'tt-sub tt-durability';
+  return `<div class="${cls}">${esc(
+    t('hudChrome.itemTooltip.durability', { current: itemNumber(current), max: itemNumber(max) }),
+  )}</div>`;
 }
 
 function statLine(key: TranslationKey, value: number, stat: string): string {

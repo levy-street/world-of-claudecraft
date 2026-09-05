@@ -69,8 +69,10 @@ function deps(overrides: Partial<VendorWindowDeps> = {}): VendorWindowDeps {
     buyCustomMax: () => 0,
     onBuyBack: () => {},
     onSellJunk: () => {},
+    onRepair: () => {},
     onClose: () => {},
     sellJunk: { enabled: false, proceeds: 0 },
+    repair: { enabled: false, cost: 0, affordable: true },
     ...overrides,
   };
 }
@@ -1630,5 +1632,61 @@ describe('buy_quantity_prompt_window: force-close backstop and focus landing net
       el.remove();
       stack.remove();
     }
+  });
+});
+
+describe('renderVendorWindow: the Repair All button', () => {
+  const emptyView: VendorView = {
+    goods: [],
+    buyback: [],
+    honorBalance: 0,
+    hasHonorGoods: false,
+    multiple: 1,
+  };
+
+  it('renders after Sell Junk, disabled with no price while nothing is damaged', () => {
+    const el = document.createElement('div');
+    renderVendorWindow(el, 'Darva', emptyView, deps());
+    const repair = el.querySelector<HTMLButtonElement>('.vendor-repair');
+    expect(repair).not.toBeNull();
+    expect(repair?.disabled).toBe(true);
+    expect(repair?.dataset.focusKey).toBe('repair-all');
+    expect(repair?.querySelector('.vi-price')).toBeNull();
+    expect(repair?.getAttribute('aria-label')).toBe('Repair All');
+    const junk = el.querySelector('.vendor-sell-junk:not(.vendor-repair)');
+    expect(junk?.nextElementSibling).toBe(repair);
+  });
+
+  it('shows the quote, names it in the accessible label, and dispatches onRepair on click', () => {
+    const el = document.createElement('div');
+    let clicks = 0;
+    renderVendorWindow(
+      el,
+      'Darva',
+      emptyView,
+      deps({ repair: { enabled: true, cost: 39600, affordable: true }, onRepair: () => clicks++ }),
+    );
+    const repair = el.querySelector<HTMLButtonElement>('.vendor-repair');
+    expect(repair?.disabled).toBe(false);
+    expect(repair?.querySelector('.vi-price')?.textContent).toBe('39600c');
+    expect(repair?.getAttribute('aria-label')).toMatch(/^Repair all equipment for /);
+    repair?.click();
+    expect(clicks).toBe(1);
+  });
+
+  it('stays disabled (quote still shown) when the purse cannot cover the bill', () => {
+    const el = document.createElement('div');
+    let clicks = 0;
+    renderVendorWindow(
+      el,
+      'Darva',
+      emptyView,
+      deps({ repair: { enabled: true, cost: 500, affordable: false }, onRepair: () => clicks++ }),
+    );
+    const repair = el.querySelector<HTMLButtonElement>('.vendor-repair');
+    expect(repair?.disabled).toBe(true);
+    expect(repair?.querySelector('.vi-price')?.textContent).toBe('500c');
+    repair?.click();
+    expect(clicks).toBe(0);
   });
 });

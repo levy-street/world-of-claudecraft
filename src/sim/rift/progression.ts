@@ -131,6 +131,10 @@ export function sanitizeRiftGearInstance(
   const clean: ItemInstancePayload = {
     boundTo: ownerId,
     rolled: { quality: 'epic', stats: {} },
+    // Gear durability (durability_rules.ts) rides the same copy; a rebuild
+    // that dropped it would hand every relog a free repair.
+    ...(typeof input.durability === 'number' &&
+      Number.isFinite(input.durability) && { durability: input.durability }),
     rift: {
       sourceEventId: source.sourceEventId,
       tier: source.tier,

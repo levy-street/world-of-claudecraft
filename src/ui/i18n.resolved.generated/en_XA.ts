@@ -3022,6 +3022,7 @@ export const en_XA: EnTranslations = {
       "riftTier": "[{tier}-ŕáñķ Ŕíƒţ íţéɱ]",
       "riftUpgrade": "[Ŕíƒţ úþĝŕáðé {level}/{max}]",
       "riftSockets": "[Ŕíƒţ ĝéɱš {used}/{total}]",
+      "durability": "[Ðúŕáƀíļíţý {current} / {max}]",
       "statEnchanted": "[+{value} {stat} (Éñçĥáñţéð)]",
       "enchantedFallback": "[Éñçĥáñţéð]",
       "partyTradeWindow": "[Ýóú ɱáý ţŕáðé ţĥíš íţéɱ ţó þļáýéŕš ŵĥó šĥáŕéð íţš ðŕóþ ƒóŕ ţĥé ñéẋţ {time}. Éɋúíþþíñĝ íţ éñðš ţĥé ţŕáðé ŵíñðóŵ.]"
@@ -9882,7 +9883,11 @@ export const en_XA: EnTranslations = {
       "sellQuantityCancel": "[Çáñçéļ]",
       "sellJunk": "[Šéļļ Ĵúñķ]",
       "sellJunkAria": "[Šéļļ áļļ ĵúñķ ƒóŕ {price}]",
-      "sellJunkHint": "[Šéļļš éʋéŕý ĝŕáý íţéɱ íñ ýóúŕ ƀáĝš éẋçéþţ ɋúéšţ íţéɱš.]"
+      "sellJunkHint": "[Šéļļš éʋéŕý ĝŕáý íţéɱ íñ ýóúŕ ƀáĝš éẋçéþţ ɋúéšţ íţéɱš.]",
+      "repairAll": "[Ŕéþáíŕ Áļļ]",
+      "repairAllAria": "[Ŕéþáíŕ áļļ éɋúíþɱéñţ ƒóŕ {price}]",
+      "repairAllHint": "[Ŕéþáíŕš éʋéŕý ŵóŕñ ŵéáþóñ áñð þíéçé óƒ áŕɱóŕ ţó ƒúļļ ðúŕáƀíļíţý. Ŕíñĝš áñð ñéçķļáçéš ñéʋéŕ ŵéáŕ.]",
+      "repairAllUnaffordable": "[Ýóú çáññóţ áƒƒóŕð ţĥíš ŕéþáíŕ.]"
     },
     "market": {
       "title": "[Ţĥé Ŵóŕļð Ɱáŕķéţ]",

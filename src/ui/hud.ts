@@ -530,6 +530,7 @@ import { buildUnbindView } from './hud/vendor/unbind_view';
 import { renderUnbindWindow } from './hud/vendor/unbind_window';
 import {
   buildVendorView,
+  repairButtonState,
   sellJunkButtonState,
   type VendorMultiple,
 } from './hud/vendor/vendor_view';
@@ -6474,7 +6475,7 @@ export class Hud {
     // Per-copy instance badges (Professions 2.0): the masterwork
     // seal and the enchanted marker (item_instance_tooltip.ts owns the copy
     // rules, incl. never claiming a quality-rank upgrade).
-    html += instanceBadgeLines(instance);
+    html += instanceBadgeLines(instance, item);
     if (item.weapon) {
       const dps = (item.weapon.min + item.weapon.max) / 2 / item.weapon.speed;
       html += `<div class="tt-stat">${esc(
@@ -15272,13 +15273,10 @@ export class Hud {
     if (this.openVendorNpcId === null) return;
     const npc = this.sim.entities.get(this.openVendorNpcId);
     if (!npc) return;
-    // The Sell Junk decision is ONE pure helper (vendor_view.ts
-    // sellJunkButtonState): eligibility shares the sim's junkSellableSlot so
-    // the quote and the sweep agree on what this bundle can price, and the
-    // unknown-id arm (R34) keeps the button live for grays only the server's
-    // newer table can classify; that helper's doc owns the
-    // enabled-quoting-zero trade the two rules compose into.
+    // Sell Junk and Repair All are each ONE pure helper (vendor_view.ts
+    // sellJunkButtonState / repairButtonState); their docs own the quoting rules.
     const sellJunkState = sellJunkButtonState(this.sim.inventory, ITEMS);
+    const repairState = repairButtonState(this.sim, ITEMS);
     const buyAndRefresh = (buy: () => void) => {
       buy();
       if ($('#bags').style.display !== 'none') this.renderBags();
@@ -15332,8 +15330,10 @@ export class Hud {
         onBuyBack: (itemId, index, instance, craftedRecipeId) =>
           buyAndRefresh(() => this.sim.buyBackItem(itemId, index, instance, craftedRecipeId)),
         onSellJunk: () => buyAndRefresh(() => this.sim.sellAllJunk()),
+        onRepair: () => buyAndRefresh(() => this.sim.repairAllGear(npc.id)),
         onClose: () => this.closeVendor(),
         sellJunk: sellJunkState,
+        repair: repairState,
       },
     );
   }

@@ -595,7 +595,7 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
-    ceiling: 10641,
+    ceiling: 10504,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -657,7 +657,7 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
-    ceiling: 5908,
+    ceiling: 5897,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

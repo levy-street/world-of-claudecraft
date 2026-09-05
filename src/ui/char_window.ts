@@ -463,15 +463,15 @@ export class CharWindow {
       const iconEl = row.querySelector<HTMLImageElement>('.item-icon');
       if (iconEl) iconEl.style.boxShadow = qualityGlowShadow(qColor);
       this.deps.attachTooltip(row, () => {
-        // Own worn copy's per-copy lines (seal, enchanted marker, maker's mark):
-        // the self entity mirror carries equippedInstances in both worlds.
-        // Projected through wornTooltipInstance so the offline
-        // full payload renders exactly what the online eqi-trimmed mirror
-        // does: worn identity is signer/enchant/rolled, never the bond.
+        // Own worn copy's per-copy lines (seal, enchanted marker, maker's mark,
+        // durability): IWorldInventory.equipmentInstances is the self's FULL
+        // worn payload in both worlds (PlayerMeta offline, the einst mirror
+        // online), unlike the entity mirror, whose online copy is the public
+        // eqi trim and never carries durability. Projected through
+        // wornTooltipInstance so both hosts render the same worn line set:
+        // identity (signer/enchant/rolled) plus durability, never the bond.
         const world = this.deps.world();
-        const instance = wornTooltipInstance(
-          world.entities.get(world.playerId)?.equippedInstances?.[slot],
-        );
+        const instance = wornTooltipInstance(world.equipmentInstances?.[slot]);
         return `${this.deps.itemTooltip(item, instance)}<div class="tt-sub">${esc(t('hudChrome.paperdoll.unequipHint'))}</div>`;
       });
       // Corner x: a styled glyph control (not an in-game icon), revealed on

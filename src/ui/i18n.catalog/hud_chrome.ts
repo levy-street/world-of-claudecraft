@@ -4023,6 +4023,11 @@ export const hudChromeStrings = {
     riftTier: '{tier}-rank Rift item',
     riftUpgrade: 'Rift upgrade {level}/{max}',
     riftSockets: 'Rift gems {used}/{total}',
+    // The classic durability line (item_instance_tooltip.ts
+    // instanceDurabilityLine), shown only while the copy is damaged; both
+    // numbers run through formatNumber. Wordy (M16): non-Latin fills ride
+    // this same change.
+    durability: 'Durability {current} / {max}',
     // The enchant-attributed sibling of itemUi.tooltip.stat, rendered on the
     // share of a per-copy bonus stat that an applied enchant granted
     // (item_instance_tooltip.ts instanceBonusStatLines). It replaced the old

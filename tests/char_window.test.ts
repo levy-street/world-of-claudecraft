@@ -859,7 +859,10 @@ describe('char_window: own-paperdoll per-copy tooltip threading', () => {
     // forward it into the widened itemTooltip dep. Dropping either line
     // reverts the own paperdoll to def-only tooltips while every pure-core
     // suite stays green.
-    expect(painter).toContain('world.entities.get(world.playerId)?.equippedInstances?.[slot]');
+    // Since gear durability the read is the IWorld inventory facet's FULL own
+    // worn payload (PlayerMeta offline, the einst mirror online); the entity
+    // mirror's online copy is the public eqi trim and never carries durability.
+    expect(painter).toContain('world.equipmentInstances?.[slot]');
     expect(painter).toContain('this.deps.itemTooltip(item, instance)');
   });
 });

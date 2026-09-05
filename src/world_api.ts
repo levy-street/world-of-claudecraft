@@ -420,6 +420,7 @@ export const COMMAND_NAMES = [
   'sell',
   'buyback',
   'sell_all_junk',
+  'repair',
   'harvest_node',
   'craft_item',
   'place_mobile_station',

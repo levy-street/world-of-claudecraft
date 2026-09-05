@@ -3022,6 +3022,7 @@ export const de_DE: EnTranslations = {
       "riftTier": "Riss-Gegenstand (Rang {tier})",
       "riftUpgrade": "Riss-Aufwertung {level}/{max}",
       "riftSockets": "Riss-Edelsteine {used}/{total}",
+      "durability": "Durability {current} / {max}",
       "statEnchanted": "+{value} {stat} (Verzaubert)",
       "enchantedFallback": "Verzaubert",
       "partyTradeWindow": "Du kannst diesen Gegenstand noch {time} lang an Spieler weitergeben, die denselben Beutefund erhalten haben. Das Anlegen beendet dieses Handelsfenster."
@@ -9882,7 +9883,11 @@ export const de_DE: EnTranslations = {
       "sellQuantityCancel": "Abbrechen",
       "sellJunk": "Graues verkaufen",
       "sellJunkAria": "Alle grauen Gegenstände für {price} verkaufen",
-      "sellJunkHint": "Verkauft alle grauen Gegenstände in euren Taschen außer Questgegenständen."
+      "sellJunkHint": "Verkauft alle grauen Gegenstände in euren Taschen außer Questgegenständen.",
+      "repairAll": "Repair All",
+      "repairAllAria": "Repair all equipment for {price}",
+      "repairAllHint": "Repairs every worn weapon and piece of armor to full durability. Rings and necklaces never wear.",
+      "repairAllUnaffordable": "You cannot afford this repair."
     },
     "market": {
       "title": "Weltmarkt",

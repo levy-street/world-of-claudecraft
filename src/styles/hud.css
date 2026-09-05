@@ -6633,6 +6633,14 @@
     color: var(--color-text-muted);
     font-size: 11px;
   }
+  /* The gear durability line (item_instance_tooltip.ts instanceDurabilityLine):
+     warm text while damaged, the danger tone once the piece is broken. */
+  #tooltip .tt-durability {
+    color: #ffe6a8;
+  }
+  #tooltip .tt-durability-broken {
+    color: var(--danger, #e06c6c);
+  }
   #tooltip .tt-masterwork-seal,
   #tooltip .tt-makers-mark {
     display: flex;

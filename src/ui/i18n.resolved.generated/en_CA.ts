@@ -3022,6 +3022,7 @@ export const en_CA: EnTranslations = {
       "riftTier": "{tier}-rank Rift item",
       "riftUpgrade": "Rift upgrade {level}/{max}",
       "riftSockets": "Rift gems {used}/{total}",
+      "durability": "Durability {current} / {max}",
       "statEnchanted": "+{value} {stat} (Enchanted)",
       "enchantedFallback": "Enchanted",
       "partyTradeWindow": "You may trade this item to players who shared its drop for the next {time}. Equipping it ends the trade window."
@@ -9882,7 +9883,11 @@ export const en_CA: EnTranslations = {
       "sellQuantityCancel": "Cancel",
       "sellJunk": "Sell Junk",
       "sellJunkAria": "Sell all junk for {price}",
-      "sellJunkHint": "Sells every gray item in your bags except quest items."
+      "sellJunkHint": "Sells every gray item in your bags except quest items.",
+      "repairAll": "Repair All",
+      "repairAllAria": "Repair all equipment for {price}",
+      "repairAllHint": "Repairs every worn weapon and piece of armor to full durability. Rings and necklaces never wear.",
+      "repairAllUnaffordable": "You cannot afford this repair."
     },
     "market": {
       "title": "The World Market",

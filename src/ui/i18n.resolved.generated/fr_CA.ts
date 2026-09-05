@@ -3022,6 +3022,7 @@ export const fr_CA: EnTranslations = {
       "riftTier": "Objet de faille de rang {tier}",
       "riftUpgrade": "Amélioration de faille {level}/{max}",
       "riftSockets": "Gemmes de faille {used}/{total}",
+      "durability": "Durability {current} / {max}",
       "statEnchanted": "+{value} {stat} (Enchanté)",
       "enchantedFallback": "Enchanté",
       "partyTradeWindow": "Vous pouvez échanger cet objet aux joueurs qui ont partagé son butin pendant encore {time}. L'équiper met fin à la fenêtre d'échange."
@@ -9882,7 +9883,11 @@ export const fr_CA: EnTranslations = {
       "sellQuantityCancel": "Annuler",
       "sellJunk": "Vendre les rebuts",
       "sellJunkAria": "Vendre tous les rebuts pour {price}",
-      "sellJunkHint": "Vend tous les objets gris dans vos sacs, sauf les objets de quête."
+      "sellJunkHint": "Vend tous les objets gris dans vos sacs, sauf les objets de quête.",
+      "repairAll": "Repair All",
+      "repairAllAria": "Repair all equipment for {price}",
+      "repairAllHint": "Repairs every worn weapon and piece of armor to full durability. Rings and necklaces never wear.",
+      "repairAllUnaffordable": "You cannot afford this repair."
     },
     "market": {
       "title": "Marché mondial",

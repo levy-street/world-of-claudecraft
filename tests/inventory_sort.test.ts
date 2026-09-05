@@ -652,9 +652,15 @@ describe('server wiring for inv_sort (source pins)', () => {
   );
 
   it("keeps 'inv_sort' in HEAVY_SELF_CMDS", () => {
-    const start = gameSource.indexOf('const HEAVY_SELF_CMDS = new Set<string>([');
+    // The set lives in its own module since the durability extraction
+    // (server/self_heavy_keys.ts); game.ts imports it for the dispatch flag.
+    const keysSource = readFileSync(
+      fileURLToPath(new URL('../server/self_heavy_keys.ts', import.meta.url)),
+      'utf8',
+    );
+    const start = keysSource.indexOf('export const HEAVY_SELF_CMDS = new Set<string>([');
     expect(start).toBeGreaterThanOrEqual(0);
-    const declaration = gameSource.slice(start, gameSource.indexOf(']);', start));
+    const declaration = keysSource.slice(start, keysSource.indexOf(']);', start));
     expect(declaration).toContain("'inv_sort'");
   });
 

@@ -75,8 +75,9 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // six vcup_* send + dispatch pairs (docs/design/eastbrook-revamp/master-plan.md);
 // the Proving Shore tutorial adds its one start_tutorial pair back on top, and
 // the v0.40.0 sync merge brings the release side's one new pair with it.
-const EXPECTED_SEND_COUNT = 207;
-const EXPECTED_DISPATCH_COUNT = 220;
+// Gear durability adds the one repair send + dispatch pair.
+const EXPECTED_SEND_COUNT = 208;
+const EXPECTED_DISPATCH_COUNT = 221;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch

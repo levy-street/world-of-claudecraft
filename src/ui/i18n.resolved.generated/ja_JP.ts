@@ -3022,6 +3022,7 @@ export const ja_JP: EnTranslations = {
       "riftTier": "{tier}ランク・リフト装備",
       "riftUpgrade": "リフト強化 {level}/{max}",
       "riftSockets": "リフト宝石 {used}/{total}",
+      "durability": "耐久度 {current} / {max}",
       "statEnchanted": "+{value} {stat}（エンチャント）",
       "enchantedFallback": "エンチャント済み",
       "partyTradeWindow": "このアイテムはあと{time}の間、同じドロップを分かち合ったプレイヤーと取引できます。装備すると取引期間は終了します。"
@@ -9882,7 +9883,11 @@ export const ja_JP: EnTranslations = {
       "sellQuantityCancel": "キャンセル",
       "sellJunk": "不要品を売却",
       "sellJunkAria": "{price}ですべての不要品を売却",
-      "sellJunkHint": "クエストアイテムを除くバッグ内のすべての灰色アイテムを売却します。"
+      "sellJunkHint": "クエストアイテムを除くバッグ内のすべての灰色アイテムを売却します。",
+      "repairAll": "すべて修理",
+      "repairAllAria": "{price}で装備をすべて修理",
+      "repairAllHint": "装備中のすべての武器と防具の耐久度を全回復します。指輪と首飾りは摩耗しません。",
+      "repairAllUnaffordable": "この修理費を支払えません。"
     },
     "market": {
       "title": "ワールドマーケット",

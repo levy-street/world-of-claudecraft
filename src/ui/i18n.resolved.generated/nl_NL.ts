@@ -3022,6 +3022,7 @@ export const nl_NL: EnTranslations = {
       "riftTier": "{tier}-rangs Rift-voorwerp",
       "riftUpgrade": "Rift-verbetering {level}/{max}",
       "riftSockets": "Riftjuwelen {used}/{total}",
+      "durability": "Durability {current} / {max}",
       "statEnchanted": "+{value} {stat} (Betoverd)",
       "enchantedFallback": "Betoverd",
       "partyTradeWindow": "Je kunt dit voorwerp de komende {time} ruilen met spelers die deze buit deelden. Uitrusten beëindigt het ruilvenster."
@@ -9882,7 +9883,11 @@ export const nl_NL: EnTranslations = {
       "sellQuantityCancel": "Annuleren",
       "sellJunk": "Rommel Verkopen",
       "sellJunkAria": "Verkoop alle rommel voor {price}",
-      "sellJunkHint": "Verkoopt elk grijs voorwerp in je tassen behalve questvoorwerpen."
+      "sellJunkHint": "Verkoopt elk grijs voorwerp in je tassen behalve questvoorwerpen.",
+      "repairAll": "Repair All",
+      "repairAllAria": "Repair all equipment for {price}",
+      "repairAllHint": "Repairs every worn weapon and piece of armor to full durability. Rings and necklaces never wear.",
+      "repairAllUnaffordable": "You cannot afford this repair."
     },
     "market": {
       "title": "De Wereldmarkt",

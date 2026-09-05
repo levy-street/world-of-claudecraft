@@ -2,12 +2,14 @@ import { BATTLE_STANCE, buildStanceAura } from './combat/warrior_stances';
 import type { TalentModifiers } from './content/talents';
 import { resolveActiveWeaponSkin } from './content/weapon_skin_rules';
 import { aggregateSetBonuses, CLASSES, ITEMS, MOBS, type NpcDef } from './data';
+import { isBrokenGear } from './durability_rules';
 import { canDualWield, isShieldItem } from './equipment_rules';
 import { meetsLevelRequirement } from './item_level_req';
 import { pvpFractionsFromRatings } from './pvp';
 import type {
   Entity,
   EquipSlot,
+  ItemDef,
   ItemInstancePayload,
   MobTemplate,
   PlayerClass,
@@ -326,6 +328,14 @@ export function recalcPlayerStats(
   let bonusHitRating = 0;
   let bonusPvpOffenseRating = 0;
   let bonusPvpDefenseRating = 0;
+  // A worn piece contributes ONLY while it is level-legal AND not broken (an
+  // empty durability pool, durability_rules.ts): both are the same kind of
+  // inert, still worn and rendered, granting nothing until the level is
+  // reached or the piece is repaired. Every derivation below (the stat loop,
+  // the weapon, the offhand, Titan's Grip, the shield) gates through this one
+  // predicate so the two rules cannot drift apart.
+  const usableGear = (slot: EquipSlot, item: ItemDef): boolean =>
+    meetsLevelRequirement(lvl, item) && !isBrokenGear(item, equipmentInstance?.[slot]);
   for (const slot of ALL_EQUIP_SLOTS) {
     const itemId = equipment[slot];
     if (!itemId) continue;
@@ -336,7 +346,7 @@ export function recalcPlayerStats(
     // armor, spell power, or set pieces until the character reaches its required
     // level. This only arises for a character loaded wearing gear equipped before
     // the level gate existed; the equip path blocks equipping over-level gear.
-    if (!meetsLevelRequirement(lvl, item)) continue;
+    if (!usableGear(slot, item)) continue;
     if (item.set) setCounts.set(item.set, (setCounts.get(item.set) ?? 0) + 1);
     bonusSp += item.spellPower ?? 0;
     bonusHealPower += item.healPower ?? 0;
@@ -540,15 +550,13 @@ export function recalcPlayerStats(
   // e.mainhandItemId below) so the weapon model keeps rendering.
   const mainhand = equipment.mainhand ? ITEMS[equipment.mainhand] : undefined;
   const weapon =
-    mainhand?.weapon && meetsLevelRequirement(lvl, mainhand)
+    mainhand?.weapon && usableGear('mainhand', mainhand)
       ? mainhand.weapon
       : { min: 1, max: 2, speed: 2 };
   e.weapon = weapon;
   const offhand = equipment.offhand ? ITEMS[equipment.offhand] : undefined;
   const offhandWeapon =
-    canDualWield(cls, mods?.spec) &&
-    offhand?.kind === 'weapon' &&
-    meetsLevelRequirement(lvl, offhand)
+    canDualWield(cls, mods?.spec) && offhand?.kind === 'weapon' && usableGear('offhand', offhand)
       ? offhand.weapon
       : null;
   e.offhandWeapon = offhandWeapon;
@@ -563,18 +571,18 @@ export function recalcPlayerStats(
     offhandWeapon !== null &&
     ((mainhand?.kind === 'weapon' &&
       mainhand.hand === 'twohand' &&
-      meetsLevelRequirement(lvl, mainhand)) ||
+      usableGear('mainhand', mainhand)) ||
       (offhand?.kind === 'weapon' && offhand.hand === 'twohand'));
   const activeShield =
     (cls === 'warrior' || cls === 'paladin') &&
     isShieldItem(offhand) &&
-    meetsLevelRequirement(lvl, offhand);
+    usableGear('offhand', offhand);
   e.blockChance = activeShield ? SHIELD_BLOCK_BASE : 0;
   e.blockValue = activeShield ? (offhand.blockValue ?? 0) : 0;
   // The equipped mainhand item id: drives the held weapon model on the client
   // (mapped via ITEM_WEAPON_VARIANTS) AND legendary weapon procs in combat
-  // (combat/equip_procs.ts, which re-applies the level gate above so an inert
-  // over-level weapon's procs are inert too). Gated on the item actually being
+  // (combat/equip_procs.ts, which re-applies the level AND broken-gear gates
+  // above so an inert weapon's procs are inert too). Gated on the item actually being
   // a weapon, mirroring the e.weapon derivation above (so a non-weapon mainhand,
   // were one ever stored, never resolves to a held model).
   e.mainhandItemId =

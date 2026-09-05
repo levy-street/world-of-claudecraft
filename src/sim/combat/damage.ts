@@ -26,6 +26,7 @@
 import { computeTalentModifiers } from '../content/talents';
 import { ABILITIES, DELVES, GROUP_XP_BONUS, ITEMS, MOBS } from '../data';
 import * as deedsMod from '../deeds';
+import { applyDeathDurabilityLoss } from '../durability';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
@@ -1439,6 +1440,9 @@ export function handleDeath(
       clearFieldcraftState(ctx, e);
     }
     if (meta) meta.counters.deaths++;
+    // The classic death penalty: worn gear loses durability (durability.ts).
+    // Bags are untouched; rings and necklaces carry no pool.
+    if (meta) applyDeathDurabilityLoss(ctx, meta, e);
     // Death force-dismounts (the mount bolts); the persisted selection stays,
     // so remounting after the corpse run is one keypress. Stats recalc on the
     // next mount toggle / resurrect recalc, and a dead player draws no swings,

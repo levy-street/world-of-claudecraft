@@ -3022,6 +3022,7 @@ export const sv_SE: EnTranslations = {
       "riftTier": "Revföremål av grad {tier}",
       "riftUpgrade": "Revuppgradering {level}/{max}",
       "riftSockets": "Revstenar {used}/{total}",
+      "durability": "Durability {current} / {max}",
       "statEnchanted": "+{value} {stat} (Förtrollad)",
       "enchantedFallback": "Förtrollad",
       "partyTradeWindow": "Du kan överlåta det här föremålet till spelare som delade bytet i {time} till. Att ta på det avslutar handelsfönstret."
@@ -9882,7 +9883,11 @@ export const sv_SE: EnTranslations = {
       "sellQuantityCancel": "Avbryt",
       "sellJunk": "Sälj skräp",
       "sellJunkAria": "Sälj allt skräp för {price}",
-      "sellJunkHint": "Säljer varje grått föremål i dina väskor utom uppdragsföremål."
+      "sellJunkHint": "Säljer varje grått föremål i dina väskor utom uppdragsföremål.",
+      "repairAll": "Repair All",
+      "repairAllAria": "Repair all equipment for {price}",
+      "repairAllHint": "Repairs every worn weapon and piece of armor to full durability. Rings and necklaces never wear.",
+      "repairAllUnaffordable": "You cannot afford this repair."
     },
     "market": {
       "title": "Världsmarknaden",

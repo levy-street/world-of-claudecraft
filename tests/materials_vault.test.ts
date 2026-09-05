@@ -1629,12 +1629,14 @@ describe('the vault wire tokens', () => {
     // 40-tick staggered refresh, aiming the next index-keyed deposit at the
     // wrong item. vault_buy_upgrade stays OUT on purpose: copper rides the
     // always-sent base self object (the documented guild-bank gold-op rule).
+    // The set lives in server/self_heavy_keys.ts since the durability
+    // extraction; game.ts imports it for the dispatch flag.
     const gameSrc = readFileSync(
-      fileURLToPath(new URL('../server/game.ts', import.meta.url)),
+      fileURLToPath(new URL('../server/self_heavy_keys.ts', import.meta.url)),
       'utf8',
     );
-    const start = gameSrc.indexOf('const HEAVY_SELF_CMDS');
-    expect(start, 'HEAVY_SELF_CMDS should exist in server/game.ts').toBeGreaterThan(-1);
+    const start = gameSrc.indexOf('export const HEAVY_SELF_CMDS');
+    expect(start, 'HEAVY_SELF_CMDS should exist in server/self_heavy_keys.ts').toBeGreaterThan(-1);
     // Comments are stripped so the pin reads only live members: a token named
     // in a comment can neither satisfy a positive arm nor redden the negative
     // one (the source-text-pin comment-gaming trap).

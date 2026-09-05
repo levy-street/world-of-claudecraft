@@ -1286,6 +1286,14 @@ export interface ItemInstancePayload {
    *  good. Additive and JSONB-safe: an absent or expired window is an
    *  ordinary soulbound copy. */
   partyTrade?: { untilMs: number; eligible: string[]; eligibleIds?: number[] };
+  /** Current durability of this copy (durability_rules.ts), present ONLY while
+   *  the piece is damaged: absent means a full pool, so an undamaged copy stays
+   *  a plain stack and a pre-durability save loads unchanged. Written only by
+   *  the death penalty and the Spirit Healer surcharge, stripped by Repair All
+   *  (durability.ts). Rides with the copy on unequip, so damage follows the
+   *  piece into the bags rather than vanishing. The max is a pure function of
+   *  the def and is never stored. */
+  durability?: number;
   /** Long-term Rift gear progression. `rolled.stats` is the authoritative
    * aggregate bonus consumed by recalcPlayerStats; this record explains how it
    * was earned and lets forge operations rebuild it deterministically. */

@@ -3022,6 +3022,7 @@ export const pl_PL: EnTranslations = {
       "riftTier": "Przedmiot Szczeliny rangi {tier}",
       "riftUpgrade": "Ulepszenie Szczeliny {level}/{max}",
       "riftSockets": "Klejnoty Szczeliny {used}/{total}",
+      "durability": "Durability {current} / {max}",
       "statEnchanted": "+{value} {stat} (Zaklęty)",
       "enchantedFallback": "Zaklęty",
       "partyTradeWindow": "Możesz wymienić ten przedmiot z graczami, z którymi wypadł, jeszcze przez {time}. Założenie go kończy okno wymiany."
@@ -9882,7 +9883,11 @@ export const pl_PL: EnTranslations = {
       "sellQuantityCancel": "Anuluj",
       "sellJunk": "Sprzedaj śmieci",
       "sellJunkAria": "Sprzedaj wszystkie śmieci za {price}",
-      "sellJunkHint": "Sprzedaje każdy szary przedmiot w twoich torbach z wyjątkiem przedmiotów zadań."
+      "sellJunkHint": "Sprzedaje każdy szary przedmiot w twoich torbach z wyjątkiem przedmiotów zadań.",
+      "repairAll": "Repair All",
+      "repairAllAria": "Repair all equipment for {price}",
+      "repairAllHint": "Repairs every worn weapon and piece of armor to full durability. Rings and necklaces never wear.",
+      "repairAllUnaffordable": "You cannot afford this repair."
     },
     "market": {
       "title": "Rynek Świata",

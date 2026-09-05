@@ -3022,6 +3022,7 @@ export const ru_RU: EnTranslations = {
       "riftTier": "Предмет разлома ранга {tier}",
       "riftUpgrade": "Улучшение разлома {level}/{max}",
       "riftSockets": "Самоцветы разлома {used}/{total}",
+      "durability": "Прочность {current} / {max}",
       "statEnchanted": "+{value} {stat} (зачаровано)",
       "enchantedFallback": "Зачаровано",
       "partyTradeWindow": "Вы можете передать этот предмет игрокам, разделившим эту добычу, ещё в течение {time}. Надев предмет, вы завершите период обмена."
@@ -9882,7 +9883,11 @@ export const ru_RU: EnTranslations = {
       "sellQuantityCancel": "Отмена",
       "sellJunk": "Продать хлам",
       "sellJunkAria": "Продать весь хлам за {price}",
-      "sellJunkHint": "Продает все серые предметы в сумках, кроме предметов заданий."
+      "sellJunkHint": "Продает все серые предметы в сумках, кроме предметов заданий.",
+      "repairAll": "Починить все",
+      "repairAllAria": "Починить все снаряжение за {price}",
+      "repairAllHint": "Полностью чинит все надетое оружие и броню. Кольца и ожерелья не изнашиваются.",
+      "repairAllUnaffordable": "Вам не по карману этот ремонт."
     },
     "market": {
       "title": "Мировой рынок",

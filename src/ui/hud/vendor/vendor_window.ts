@@ -56,10 +56,19 @@ export interface VendorWindowDeps extends PainterHostPresentation {
     craftedRecipeId: string | undefined,
   ): void;
   onSellJunk(): void;
+  /** Repair All (IWorldInventory.repairAllGear): the sim re-derives the bill. */
+  onRepair(): void;
   onClose(): void;
   sellJunk: {
     enabled: boolean;
     proceeds: number;
+  };
+  /** The Repair All quote (vendor_view.ts repairButtonState): disabled when
+   *  nothing is damaged or the purse cannot cover the whole bill. */
+  repair: {
+    enabled: boolean;
+    cost: number;
+    affordable: boolean;
   };
 }
 
@@ -340,6 +349,31 @@ export function renderVendorWindow(
   );
   el.appendChild(sellJunk);
 
+  // Repair All: the classic repair bill, one button for every worn piece.
+  // Same family as Sell Junk (a service row under the goods grid, price on
+  // the right), disabled when nothing needs repair or the purse is short.
+  const repair = document.createElement('button');
+  repair.type = 'button';
+  repair.className = 'vendor-sell-junk vendor-repair';
+  repair.disabled = !deps.repair.enabled || !deps.repair.affordable;
+  repair.innerHTML = `<span class="vi-name">${esc(t('itemUi.vendor.repairAll'))}</span>${deps.repair.enabled ? `<span class="vi-price">${deps.moneyHtml(deps.repair.cost)}</span>` : ''}`;
+  repair.setAttribute(
+    'aria-label',
+    deps.repair.enabled
+      ? t('itemUi.vendor.repairAllAria', { price: formatLocalizedMoney(deps.repair.cost) })
+      : t('itemUi.vendor.repairAll'),
+  );
+  repair.dataset.focusKey = 'repair-all';
+  repair.addEventListener('click', () => deps.onRepair());
+  deps.attachTooltip(repair, () => {
+    const hint =
+      deps.repair.enabled && !deps.repair.affordable
+        ? t('itemUi.vendor.repairAllUnaffordable')
+        : t('itemUi.vendor.repairAllHint');
+    return `<div class="tt-sub">${esc(hint)}</div>`;
+  });
+  el.appendChild(repair);
+
   const buybackTitle = document.createElement('div');
   buybackTitle.className = 'vendor-section-title';
   buybackTitle.textContent = t('itemUi.vendor.buybackTitle');
@@ -422,6 +456,7 @@ export function renderVendorWindow(
       exact,
       ...neighbors,
       keyed.find((b) => b.dataset.focusKey === 'sell-junk'),
+      keyed.find((b) => b.dataset.focusKey === 'repair-all'),
       keyed.find((b) => b.dataset.focusKey === 'close'),
     ]);
   }

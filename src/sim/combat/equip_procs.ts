@@ -15,6 +15,7 @@
 // hostilesInRadius); no DOM/Three/Math.random.
 
 import { ITEMS } from '../data';
+import { isBrokenGear } from '../durability_rules';
 import { meetsLevelRequirement } from '../item_level_req';
 import type { SimContext } from '../sim_context';
 import { duelJustEndedBetween } from '../social/duel';
@@ -29,6 +30,7 @@ export function runWeaponProcs(
   target: Entity,
   trigger: WeaponProcTrigger,
   weaponItemId?: string | null,
+  hand?: 'mainhand' | 'offhand',
 ): void {
   if (target.dead) return;
   // Which hand's weapon rolled procs. `undefined` = not specified: fall back to
@@ -47,6 +49,14 @@ export function runWeaponProcs(
   const item = ITEMS[id];
   if (item?.kind !== 'weapon' || !item.weaponProcs) return;
   if (!meetsLevelRequirement(wielder.level, item)) return;
+  // A broken weapon (empty durability pool) is inert in recalcPlayerStats the
+  // same way; its procs must be too. The wielder's equippedInstances mirror is
+  // the deep copy recalcPlayerStats keeps for exactly this kind of read.
+  // The swinging hand comes from the caller (auto_attack.ts knows it); every
+  // other trigger (ability strike, heal, spell) rolls the mainhand. Never
+  // re-derive the hand from the item id: a dual-wielder holding two copies of
+  // one item would read the wrong hand's pool.
+  if (isBrokenGear(item, wielder.equippedInstances?.[hand ?? 'mainhand'])) return;
   const procs = item.weaponProcs;
   for (const proc of procs) {
     if (proc.trigger !== trigger) continue;

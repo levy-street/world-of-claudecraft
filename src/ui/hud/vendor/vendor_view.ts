@@ -11,8 +11,10 @@
 
 import { stackSizeOf } from '../../../sim/bags';
 import { resolveVendorRowGate, type VendorRowGate } from '../../../sim/content/vendor_row_gates';
+import { repairAllCost } from '../../../sim/durability_rules';
+import type { PlayerEquipmentInstances } from '../../../sim/entity';
 import { junkSellableSlot } from '../../../sim/items';
-import type { InvSlot, ItemDef, ItemInstancePayload } from '../../../sim/types';
+import type { EquipSlot, InvSlot, ItemDef, ItemInstancePayload } from '../../../sim/types';
 import { bulkBuyQuantity, vendorCountForced } from '../../../sim/vendor_buy_stack';
 import { vendorStackSize } from '../../../sim/vendor_stack';
 import { knownItemDef } from '../../known_item';
@@ -255,4 +257,24 @@ export function sellJunkButtonState(
       0,
     ),
   };
+}
+
+/** The Repair All button's state (durability_rules.ts repairAllCost, the
+ *  SAME helper the sim charges with, so the quote can never disagree with the
+ *  bill): `enabled` when any worn piece is damaged, `cost` the full bill,
+ *  `affordable` whether the purse covers it. Advisory only; repairAllGear
+ *  re-derives everything. The world is read through the IWorld inventory
+ *  shape both hosts implement (equipment + equipmentInstances + copper), so
+ *  the offline paperdoll and the online einst mirror quote identically. */
+export function repairButtonState(
+  world: {
+    equipment: Partial<Record<EquipSlot, string>>;
+    equipmentInstances: PlayerEquipmentInstances;
+    inventory: readonly InvSlot[];
+    copper: number;
+  },
+  items: Readonly<Record<string, ItemDef>>,
+): { enabled: boolean; cost: number; affordable: boolean } {
+  const cost = repairAllCost(world.equipment, world.equipmentInstances, items, world.inventory);
+  return { enabled: cost > 0, cost, affordable: world.copper >= cost };
 }

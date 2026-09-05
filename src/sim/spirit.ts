@@ -44,6 +44,7 @@ import {
   SPIRIT_HEALER,
   SPIRIT_HEALER_NPC_ID,
 } from './data';
+import { applySpiritRezDurabilityLoss } from './durability';
 import { createNpc, recalcPlayerStats } from './entity';
 import { releaseSpiritInDelve } from './entity_roster';
 import { restorePetOnOwnerRevive } from './pet/pet_owner_revive';
@@ -349,6 +350,10 @@ export function resurrectAtSpiritHealer(ctx: SimContext, pid?: number): boolean 
   if (!spiritHealerInRange(ctx, p)) return false;
   // The Spirit Healer always inflicts Resurrection Sickness and returns you at only
   // RES_HEALER_HP_FRACTION of your pools (the corpse run is the penalty-free choice).
+  // It also costs the gear a further SPIRIT_REZ_DURABILITY_LOSS on top of the
+  // death loss (durability.ts), applied before the revive so the recalc it runs
+  // already sees any piece this pushes to broken.
+  applySpiritRezDurabilityLoss(ctx, meta, p);
   reviveAt(ctx, meta, p, p.pos, RES_HEALER_HP_FRACTION, 'resurrection');
   ctx.emit({ type: 'respawn', pid: meta.entityId });
   // Credited too, deliberately: the lesson teaches the corpse run, but a

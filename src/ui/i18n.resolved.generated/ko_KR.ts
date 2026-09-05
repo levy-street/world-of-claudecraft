@@ -3022,6 +3022,7 @@ export const ko_KR: EnTranslations = {
       "riftTier": "{tier} 등급 균열 아이템",
       "riftUpgrade": "균열 강화 {level}/{max}",
       "riftSockets": "균열 보석 {used}/{total}",
+      "durability": "내구도 {current} / {max}",
       "statEnchanted": "+{value} {stat} (마법부여)",
       "enchantedFallback": "마법부여됨",
       "partyTradeWindow": "앞으로 {time} 동안 이 아이템을 같은 전리품을 함께 획득한 플레이어와 거래할 수 있습니다. 착용하면 거래 기간이 끝납니다."
@@ -9882,7 +9883,11 @@ export const ko_KR: EnTranslations = {
       "sellQuantityCancel": "취소",
       "sellJunk": "잡동사니 판매",
       "sellJunkAria": "모든 잡동사니를 {price}에 판매",
-      "sellJunkHint": "퀘스트 아이템을 제외한 가방의 모든 회색 아이템을 판매합니다."
+      "sellJunkHint": "퀘스트 아이템을 제외한 가방의 모든 회색 아이템을 판매합니다.",
+      "repairAll": "모두 수리",
+      "repairAllAria": "{price}(으)로 모든 장비 수리",
+      "repairAllHint": "착용 중인 모든 무기와 방어구의 내구도를 완전히 수리합니다. 반지와 목걸이는 마모되지 않습니다.",
+      "repairAllUnaffordable": "이 수리 비용을 지불할 수 없습니다."
     },
     "market": {
       "title": "세계 시장",

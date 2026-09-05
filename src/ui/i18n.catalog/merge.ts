@@ -586,6 +586,14 @@ const mergeStringsEn = {
       sellJunk: 'Sell Junk',
       sellJunkAria: 'Sell all junk for {price}',
       sellJunkHint: 'Sells every gray item in your bags except quest items.',
+      // Repair All (src/sim/durability.ts): the classic repair bill for every
+      // worn piece. All wordy (M16): the five non-Latin fills land in this
+      // same change.
+      repairAll: 'Repair All',
+      repairAllAria: 'Repair all equipment for {price}',
+      repairAllHint:
+        'Repairs every worn weapon and piece of armor to full durability. Rings and necklaces never wear.',
+      repairAllUnaffordable: 'You cannot afford this repair.',
     },
     logs: {
       ...itemNames.en.itemUi.logs,

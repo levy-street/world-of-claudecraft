@@ -12,10 +12,12 @@ import {
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import { NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
+import type { ItemDef } from '../src/sim/types';
 import {
   instanceBadgeLines,
   instanceBindingLines,
   instanceBonusStatLines,
+  instanceDurabilityLine,
   instanceMakersMarkLine,
   instancePartyTradeLine,
   isGatheredProvenanceKind,
@@ -307,9 +309,10 @@ describe('wornTooltipInstance (the eqi-mirror worn projection)', () => {
   it('char_window routes the paperdoll tooltip through the projection (source pin)', () => {
     const charWindow = readFileSync(new URL('../src/ui/char_window.ts', import.meta.url), 'utf8');
     expect(charWindow).toContain('wornTooltipInstance(');
-    // The raw equippedInstances read feeds ONLY the projection, never the
-    // tooltip directly.
-    const site = charWindow.indexOf('equippedInstances?.[slot]');
+    // The raw worn-payload read (IWorldInventory.equipmentInstances, the
+    // self's FULL payload in both hosts, durability included) feeds ONLY the
+    // projection, never the tooltip directly.
+    const site = charWindow.indexOf('equipmentInstances?.[slot]');
     expect(site).toBeGreaterThan(-1);
     const before = charWindow.slice(Math.max(0, site - 220), site);
     expect(before).toContain('wornTooltipInstance(');
@@ -363,7 +366,9 @@ import { readFileSync } from 'node:fs';
 describe('hud.itemTooltip composition order (source pins)', () => {
   const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
   const hudCss = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
-  const badges = hud.indexOf('instanceBadgeLines(instance)');
+  // The badge slot takes the def too: the durability line resolves its max
+  // from item at the one composition site (instanceDurabilityLine).
+  const badges = hud.indexOf('instanceBadgeLines(instance, item)');
   const bonus = hud.indexOf('instanceBonusStatLines(instance)');
   // The mark line takes the def's kind too: the gathered-vs-crafted
   // wording split resolves from item.kind at the one composition site.
@@ -375,7 +380,7 @@ describe('hud.itemTooltip composition order (source pins)', () => {
     expect(badges).toBeGreaterThan(-1);
     expect(bonus).toBeGreaterThan(-1);
     expect(mark).toBeGreaterThan(-1);
-    expect(hud.indexOf('instanceBadgeLines(instance)', badges + 1)).toBe(-1);
+    expect(hud.indexOf('instanceBadgeLines(', badges + 1)).toBe(-1);
     expect(hud.indexOf('instanceBonusStatLines(instance)', bonus + 1)).toBe(-1);
     expect(hud.indexOf('instanceMakersMarkLine(', mark + 1)).toBe(-1);
   });
@@ -431,5 +436,42 @@ describe('instancePartyTradeLine (the BoP party trade window line)', () => {
     expect(hud.indexOf('instancePartyTradeLine(', partyTrade + 1)).toBe(-1);
     // The remaining span resolves through the IWorld clock, never Date.now().
     expect(hud).toContain('this.sim.partyTradeMsRemaining(untilMs)');
+  });
+});
+
+describe('instanceDurabilityLine / the badge slot (gear durability)', () => {
+  const chest = {
+    id: 'chest',
+    name: 'chest',
+    quality: 'common',
+    kind: 'armor',
+    slot: 'chest',
+    armorType: 'leather',
+    sellValue: 0,
+  } as unknown as ItemDef;
+  const ring = { ...chest, id: 'ring', slot: 'ring', armorType: undefined } as unknown as ItemDef;
+
+  it('renders "Durability current / max" only for a damaged copy of a pooled def', () => {
+    expect(instanceDurabilityLine({ durability: 63 }, chest)).toBe(
+      '<div class="tt-sub tt-durability">Durability 63 / 100</div>',
+    );
+    expect(instanceDurabilityLine({}, chest)).toBe('');
+    expect(instanceDurabilityLine(undefined, chest)).toBe('');
+    expect(instanceDurabilityLine({ durability: 63 }, undefined)).toBe('');
+    expect(instanceDurabilityLine({ durability: 0 }, ring)).toBe('');
+  });
+
+  it('turns red at zero (the piece is worn but inert)', () => {
+    expect(instanceDurabilityLine({ durability: 0 }, chest)).toContain('tt-durability-broken');
+    expect(instanceDurabilityLine({ durability: 0 }, chest)).toContain('Durability 0 / 100');
+  });
+
+  it('rides the badge slot beside the masterwork seal, and the worn projection keeps the field', () => {
+    const both = instanceBadgeLines({ rolled: { masterwork: true }, durability: 10 }, chest);
+    expect(both).toContain('tt-masterwork-seal');
+    expect(both).toContain('Durability 10 / 100');
+    expect(instanceBadgeLines({ durability: 10 })).toBe('');
+    expect(wornTooltipInstance({ durability: 10, boundTo: 4 })).toEqual({ durability: 10 });
+    expect(wornTooltipInstance({ signer: 'Aki' })).toEqual({ signer: 'Aki' });
   });
 });

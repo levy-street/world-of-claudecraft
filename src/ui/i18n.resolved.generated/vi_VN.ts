@@ -3022,6 +3022,7 @@ export const vi_VN: EnTranslations = {
       "riftTier": "Vật phẩm Rạn Nứt hạng {tier}",
       "riftUpgrade": "Nâng cấp Rạn Nứt {level}/{max}",
       "riftSockets": "Ngọc Rạn Nứt {used}/{total}",
+      "durability": "Durability {current} / {max}",
       "statEnchanted": "+{value} {stat} (Đã Pháp Khắc)",
       "enchantedFallback": "Đã Pháp Khắc",
       "partyTradeWindow": "Bạn có thể giao dịch vật phẩm này cho những người chơi đã cùng nhận nó rơi ra, trong {time} tới. Trang bị nó sẽ kết thúc khoảng thời gian giao dịch này."
@@ -9882,7 +9883,11 @@ export const vi_VN: EnTranslations = {
       "sellQuantityCancel": "Hủy",
       "sellJunk": "Bán Đồ Bỏ",
       "sellJunkAria": "Bán tất cả đồ bỏ với giá {price}",
-      "sellJunkHint": "Bán mọi vật phẩm màu xám trong túi trừ vật phẩm nhiệm vụ."
+      "sellJunkHint": "Bán mọi vật phẩm màu xám trong túi trừ vật phẩm nhiệm vụ.",
+      "repairAll": "Repair All",
+      "repairAllAria": "Repair all equipment for {price}",
+      "repairAllHint": "Repairs every worn weapon and piece of armor to full durability. Rings and necklaces never wear.",
+      "repairAllUnaffordable": "You cannot afford this repair."
     },
     "market": {
       "title": "Chợ Thế Giới",

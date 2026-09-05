@@ -3022,6 +3022,7 @@ export const cs_CZ: EnTranslations = {
       "riftTier": "Trhlinový předmět stupně {tier}",
       "riftUpgrade": "Vylepšení trhliny {level}/{max}",
       "riftSockets": "Trhlinové drahokamy {used}/{total}",
+      "durability": "Durability {current} / {max}",
       "statEnchanted": "+{value} {stat} (okouzleno)",
       "enchantedFallback": "Okouzlený",
       "partyTradeWindow": "Tento předmět můžeš dalších {time} směňovat s hráči, kteří sdíleli jeho kořist. Nasazení předmětu okno pro směnu ukončí."
@@ -9882,7 +9883,11 @@ export const cs_CZ: EnTranslations = {
       "sellQuantityCancel": "Zrušit",
       "sellJunk": "Prodat odpad",
       "sellJunkAria": "Prodat všechen odpad za {price}",
-      "sellJunkHint": "Prodá všechny šedé předměty v batozích kromě úkolových předmětů."
+      "sellJunkHint": "Prodá všechny šedé předměty v batozích kromě úkolových předmětů.",
+      "repairAll": "Repair All",
+      "repairAllAria": "Repair all equipment for {price}",
+      "repairAllHint": "Repairs every worn weapon and piece of armor to full durability. Rings and necklaces never wear.",
+      "repairAllUnaffordable": "You cannot afford this repair."
     },
     "market": {
       "title": "Světový trh",

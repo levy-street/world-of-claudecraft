@@ -239,6 +239,7 @@ import { CASCADE_SCENARIO } from './dev/cascade_playtest';
 import { despawnMobsForDev } from './dev_commands';
 import { projectOutsideDungeonDoors } from './dungeon_door_clearance';
 import { arenaMapForSlot } from './dungeon_layout';
+import * as durabilityMod from './durability';
 import * as nythraxis from './encounters/nythraxis';
 // A3: ARENA_SPAWNS_A_2v2/B_2v2 (read only by the moved fiestaRevive) now live with
 // social/fiesta.ts. The dungeon-wall consts (DUNGEON_WALL_HW/X) are now read only by
@@ -8959,6 +8960,10 @@ export class Sim {
 
   sellAllJunk(pid?: number): void {
     items.sellAllJunk(this.ctx, pid);
+  }
+
+  repairAllGear(npcId: number, pid?: number): boolean {
+    return durabilityMod.repairAllGear(this.ctx, npcId, pid);
   }
 
   buyBackItem(

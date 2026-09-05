@@ -3022,6 +3022,7 @@ export const da_DK: EnTranslations = {
       "riftTier": "{tier}-rangs Rift-genstand",
       "riftUpgrade": "Rift-opgradering {level}/{max}",
       "riftSockets": "Rift-juveler {used}/{total}",
+      "durability": "Durability {current} / {max}",
       "statEnchanted": "+{value} {stat} (Fortryllet)",
       "enchantedFallback": "Fortryllet",
       "partyTradeWindow": "Du kan handle denne genstand til spillere, der delte dens bytte, i de næste {time}. Udstyrer du den, afsluttes handelsvinduet."
@@ -9882,7 +9883,11 @@ export const da_DK: EnTranslations = {
       "sellQuantityCancel": "Annullér",
       "sellJunk": "Sælg skrammel",
       "sellJunkAria": "Sælg alt skrammel for {price}",
-      "sellJunkHint": "Sælger alle grå genstande i dine tasker undtagen questgenstande."
+      "sellJunkHint": "Sælger alle grå genstande i dine tasker undtagen questgenstande.",
+      "repairAll": "Repair All",
+      "repairAllAria": "Repair all equipment for {price}",
+      "repairAllHint": "Repairs every worn weapon and piece of armor to full durability. Rings and necklaces never wear.",
+      "repairAllUnaffordable": "You cannot afford this repair."
     },
     "market": {
       "title": "Verdensmarkedet",
