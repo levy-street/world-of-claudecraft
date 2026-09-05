@@ -32,6 +32,7 @@ import type {
   TokenScope,
 } from './db';
 import type { GameServer } from './game';
+import { noteClientFrame } from './keepalive_sweep';
 import { negotiateMovementWireVersion } from './movement_wire_version';
 import { kickStoragePurchaseRecovery } from './storage_purchases';
 import type { HandshakeFlushMode } from './ws_buffer';
@@ -561,7 +562,14 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         // here too: an in-flight purchase still holds the per-character mutex
         // and the recovery yields to it immediately.
         kickStoragePurchaseRecovery(session.characterId);
+        // Every processed frame (input here, pong below) stamps the socket's
+        // liveness clock for the sweep's hard silence deadline
+        // (server/keepalive_sweep.ts socketSilentPastDeadline); the handshake
+        // itself counts as the first frame so a fresh socket is never judged
+        // against a clock it has not started.
+        noteClientFrame(ws);
         ws.on('message', (data) => {
+          noteClientFrame(ws);
           game.handleMessage(session, String(data));
         });
         // A dropped socket starts the linkdead grace instead of logging the
@@ -582,6 +590,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         // on socket identity so a late pong from a pre-resume socket cannot mask
         // a black-holed replacement.
         ws.on('pong', () => {
+          noteClientFrame(ws);
           if (session.ws === ws) session.awaitingPong = false;
         });
         // The socket can die DURING the handshake's awaits, before the close
