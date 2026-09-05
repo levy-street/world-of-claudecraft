@@ -7,6 +7,7 @@ vi.mock('../src/game/audio', () => ({
 }));
 
 import { audio } from '../src/game/audio';
+import { Input } from '../src/game/input';
 import { STATIONS } from '../src/sim/content/professions';
 import { type PerfectItemRef, perfectingInfoFrom } from '../src/sim/professions/perfecting';
 import { capturePerfectItemRef } from '../src/sim/professions/perfecting_copy';
@@ -89,6 +90,27 @@ afterEach(() => {
 });
 
 describe('Perfecting rank exchange inside the existing window', () => {
+  it('keeps a mouse-opened confirmation focused through the real input focus release', () => {
+    win.open();
+    target().click();
+    action().click();
+    const prompt = document.querySelector<HTMLElement>('.pf-swap-prompt')!;
+    // The input's bubbling click handler runs AFTER the opener focused Cancel.
+    // A dialog without a focusable root drops that focus to body, allowing
+    // Escape to reach the game dispatcher and close the underlying window.
+    const input = Input.prototype as unknown as {
+      releaseMouseActivatedFocus(event: { type: string; detail: number }): void;
+    };
+    input.releaseMouseActivatedFocus({ type: 'click', detail: 1 });
+    expect(document.activeElement).toBe(prompt);
+    prompt.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', bubbles: true }),
+    );
+    expect(document.querySelector('.pf-swap-prompt')).toBeNull();
+    expect(win.isOpen).toBe(true);
+    expect(document.activeElement).toBe(action());
+  });
+
   it('distinguishes duplicate bagged and worn targets by rank and copy location through confirmation', () => {
     world.equipment = { waist: WAIST };
     world.equipmentInstances = { waist: { perfecting: 3 } };

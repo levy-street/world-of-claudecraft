@@ -228,6 +228,9 @@ export class PerfectingSwapController {
     if (!request || !stack) return;
     const prompt = document.createElement('div');
     prompt.className = 'prompt panel pf-swap-prompt';
+    // Mouse activation parks focus on the dialog root through Input's shared
+    // focus release. Keep Escape and subsequent Tab presses inside this modal.
+    prompt.tabIndex = -1;
     const text = document.createElement('div');
     text.className = 'prompt-text';
     const actions = document.createElement('div');
