@@ -5,11 +5,13 @@ import {
   NORMAL_DUNGEON_TUNING,
 } from '../content/dungeon_difficulty';
 import { MOBS } from '../data';
+import { IGNIVAR_LIFT_ROOM_ID } from '../ignivar_raid_ids';
 import type { DungeonDifficulty, Entity, MobTemplate } from '../types';
 
 export const HEROIC_DUNGEON_IDS = new Set([
   ...Object.keys(HEROIC_DUNGEON_TUNING),
   ...Object.keys(HEROIC_MOB_TUNING),
+  IGNIVAR_LIFT_ROOM_ID,
 ]);
 
 function heroicMobTuningFor(dungeonId: string): HeroicMobTuning | undefined {

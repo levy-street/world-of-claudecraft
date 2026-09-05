@@ -12,6 +12,7 @@ export const pending: Record<string, readonly string[]> = {
   "es": [
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
+    "guide.dungeonsPage.resetBody",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
     "hudChrome.mounts.desc_mech_bird",
@@ -33,6 +34,7 @@ export const pending: Record<string, readonly string[]> = {
   "es_ES": [
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
+    "guide.dungeonsPage.resetBody",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
     "hudChrome.mounts.desc_mech_bird",
@@ -54,6 +56,7 @@ export const pending: Record<string, readonly string[]> = {
   "fr_FR": [
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
+    "guide.dungeonsPage.resetBody",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
     "hudChrome.mounts.desc_mech_bird",
@@ -75,6 +78,7 @@ export const pending: Record<string, readonly string[]> = {
   "fr_CA": [
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
+    "guide.dungeonsPage.resetBody",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
     "hudChrome.mounts.desc_mech_bird",
@@ -97,6 +101,7 @@ export const pending: Record<string, readonly string[]> = {
   "it_IT": [
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
+    "guide.dungeonsPage.resetBody",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
     "hudChrome.mounts.desc_mech_bird",
@@ -118,6 +123,7 @@ export const pending: Record<string, readonly string[]> = {
   "de_DE": [
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
+    "guide.dungeonsPage.resetBody",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
     "hudChrome.mounts.desc_mech_bird",
@@ -136,13 +142,22 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.mountsTitle",
     "worldContent.realmBuilderMonumentName"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "guide.dungeonsPage.resetBody"
+  ],
+  "zh_TW": [
+    "guide.dungeonsPage.resetBody"
+  ],
+  "ko_KR": [
+    "guide.dungeonsPage.resetBody"
+  ],
+  "ja_JP": [
+    "guide.dungeonsPage.resetBody"
+  ],
   "pt_BR": [
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
+    "guide.dungeonsPage.resetBody",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
     "hudChrome.mounts.desc_mech_bird",
@@ -161,10 +176,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.mountsTitle",
     "worldContent.realmBuilderMonumentName"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "guide.dungeonsPage.resetBody"
+  ],
   "cs_CZ": [
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
+    "guide.dungeonsPage.resetBody",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
     "hudChrome.mounts.desc_mech_bird",
@@ -186,6 +204,7 @@ export const pending: Record<string, readonly string[]> = {
   "nl_NL": [
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
+    "guide.dungeonsPage.resetBody",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
     "hudChrome.mounts.desc_mech_bird",
@@ -207,6 +226,7 @@ export const pending: Record<string, readonly string[]> = {
   "pl_PL": [
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
+    "guide.dungeonsPage.resetBody",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
     "hudChrome.mounts.desc_mech_bird",
@@ -228,6 +248,7 @@ export const pending: Record<string, readonly string[]> = {
   "id_ID": [
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
+    "guide.dungeonsPage.resetBody",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
     "hudChrome.mounts.desc_mech_bird",
@@ -249,6 +270,7 @@ export const pending: Record<string, readonly string[]> = {
   "tr_TR": [
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
+    "guide.dungeonsPage.resetBody",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
     "hudChrome.mounts.desc_mech_bird",
@@ -270,6 +292,7 @@ export const pending: Record<string, readonly string[]> = {
   "sv_SE": [
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
+    "guide.dungeonsPage.resetBody",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
     "hudChrome.mounts.desc_mech_bird",
@@ -291,6 +314,7 @@ export const pending: Record<string, readonly string[]> = {
   "vi_VN": [
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
+    "guide.dungeonsPage.resetBody",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
     "hudChrome.mounts.desc_mech_bird",
@@ -312,6 +336,7 @@ export const pending: Record<string, readonly string[]> = {
   "da_DK": [
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
+    "guide.dungeonsPage.resetBody",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
     "hudChrome.mounts.desc_mech_bird",
