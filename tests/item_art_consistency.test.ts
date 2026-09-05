@@ -784,19 +784,19 @@ describe('item-art consistency accepted-art provenance', () => {
     expect(verdict.schemaVersion).toBe(1);
     expect(verdict.auditScope).toMatchObject({
       shippingDirectory: 'public/ui/items',
-      itemArtFilesReviewed: 1209,
-      liveItemDefinitions: 1224,
+      itemArtFilesReviewed: 1254,
+      liveItemDefinitions: 1269,
       generatedHeroicDefinitions: 64,
       heroicDefinitionsWithOwnWebp: 48,
       heroicWeaponArtAliases: 16,
     });
-    expect(Object.keys(ITEMS)).toHaveLength(1224);
+    expect(Object.keys(ITEMS)).toHaveLength(1269);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
-      1209,
+      1254,
     );
     expect(Object.keys(verdict.auditScope.groups)).toHaveLength(25);
-    expect(currentIds).toHaveLength(1209);
-    expect(new Set(currentIds).size).toBe(1209);
+    expect(currentIds).toHaveLength(1254);
+    expect(new Set(currentIds).size).toBe(1254);
     expect(shippingIds).toEqual(currentIds);
 
     const generatedHeroics = Object.entries(ITEMS).filter(
@@ -836,7 +836,7 @@ describe('item-art consistency accepted-art provenance', () => {
     }>(`${CURRENT_EVIDENCE_DIR}/generation-reports/all-items-qa.json`);
     expect(verdict.visualVerdict).toMatchObject({
       status: 'pass',
-      passCount: 1209,
+      passCount: 1254,
       watchCount: completionQa.result.watchNoteCount,
       watch: completionQa.watchNotes,
       rejectCount: 0,
@@ -850,18 +850,18 @@ describe('item-art consistency accepted-art provenance', () => {
       bytes: 657_748,
     });
     expect(verdict.evidence.rendererFingerprint).toBe(ITEM_ART_AUDIT_RENDERER_FINGERPRINT);
-    expect(verdict.evidence.sheetCount).toBe(240);
+    expect(verdict.evidence.sheetCount).toBe(248);
     expect(verdict.evidence.sheetModeCounts).toEqual({
-      '128-color': 30,
-      '40-color': 30,
-      '28-color': 30,
-      '22-color': 30,
-      '28-grayscale': 30,
-      '64-circle': 30,
-      'small-multiview': 30,
-      identity: 30,
+      '128-color': 31,
+      '40-color': 31,
+      '28-color': 31,
+      '22-color': 31,
+      '28-grayscale': 31,
+      '64-circle': 31,
+      'small-multiview': 31,
+      identity: 31,
     });
-    expect(verdict.evidence.sheets).toHaveLength(240);
+    expect(verdict.evidence.sheets).toHaveLength(248);
     const sheetSetDigest = createHash('sha256');
     for (const sheet of verdict.evidence.sheets) {
       expect(sheet.sha256).toMatch(/^[0-9a-f]{64}$/);
@@ -991,7 +991,7 @@ describe('item-art consistency accepted-art provenance', () => {
     // one generated batch. The surviving ordinary-art cohort stays explicit.
     expect(mapping.entries).toHaveLength(43);
     expect(mapping.entries.every(({ license }) => Boolean(license))).toBe(true);
-    expect(mapping.generatedBatches).toHaveLength(25);
+    expect(mapping.generatedBatches).toHaveLength(26);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1043,8 +1043,8 @@ describe('item-art consistency accepted-art provenance', () => {
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(1209);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1209);
+    expect(allCurrentOwnerIds).toHaveLength(1254);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1254);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1196,9 +1196,9 @@ describe('item-art consistency accepted-art provenance', () => {
     for (const id of ownerIds) ownerCountById.set(id, (ownerCountById.get(id) ?? 0) + 1);
 
     const violations: string[] = [];
-    if (ownerIds.length !== 1209)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1209`);
-    if (fileIds.length !== 1209) violations.push(`shipping WebP count: ${fileIds.length} != 1209`);
+    if (ownerIds.length !== 1254)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1254`);
+    if (fileIds.length !== 1254) violations.push(`shipping WebP count: ${fileIds.length} != 1254`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);
