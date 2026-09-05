@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import {
   applyTerrainDetailShed,
   createTerrainDetailShedState,
+  nextTerrainDetailRestoreTarget,
+  nextTerrainDetailShedTarget,
   resetTerrainDetailShed,
   shedTerrainDetailKnob,
   TERRAIN_DETAIL_ENTER_PRESSURE,
@@ -9,8 +11,8 @@ import {
   TERRAIN_DETAIL_EXIT_PRESSURE,
   TERRAIN_DETAIL_EXIT_SECONDS,
   TERRAIN_DETAIL_FLOOR,
+  TERRAIN_DETAIL_LADDER,
   TERRAIN_DETAIL_SLEW_PER_SECOND,
-  TERRAIN_DETAIL_STEP,
   type TerrainDetailShedState,
   type TerrainDetailUniformRefs,
   terrainDetailKnobs,
@@ -26,7 +28,9 @@ function run(state: TerrainDetailShedState, seconds: number, pressure: number): 
 }
 
 /** Enough time for one dwell step AND for the applied level to settle on it. */
-const STEP_SETTLE_SECONDS = TERRAIN_DETAIL_ENTER_SECONDS + TERRAIN_DETAIL_STEP / 0.5 + 0.1;
+/** The widest rung gap, the time the slew needs for the first shed step. */
+const FIRST_STEP = 1 - TERRAIN_DETAIL_LADDER[1];
+const STEP_SETTLE_SECONDS = TERRAIN_DETAIL_ENTER_SECONDS + FIRST_STEP / 0.5 + 0.1;
 
 // The static requests (gfx.ts): ultra relief 3 / 3 taps / clamp 0.85,
 // insane 3 / 4 / 1, high 1 / 0 / 0 (the floor on every knob), medium 0 / 0 / 0.
@@ -187,7 +191,13 @@ describe('terrain detail shed core: dwell hysteresis', () => {
     expect(TERRAIN_DETAIL_EXIT_PRESSURE).toBe(0.85);
     expect(TERRAIN_DETAIL_ENTER_SECONDS).toBe(2.5);
     expect(TERRAIN_DETAIL_EXIT_SECONDS).toBe(6);
-    expect(TERRAIN_DETAIL_STEP).toBe(0.34);
+    expect(TERRAIN_DETAIL_LADDER).toEqual([1, 0.32, 0]);
+    expect(nextTerrainDetailShedTarget(1)).toBe(0.32);
+    expect(nextTerrainDetailShedTarget(0.32)).toBe(0);
+    expect(nextTerrainDetailShedTarget(0)).toBe(0);
+    expect(nextTerrainDetailRestoreTarget(0)).toBe(0.32);
+    expect(nextTerrainDetailRestoreTarget(0.32)).toBe(1);
+    expect(nextTerrainDetailRestoreTarget(1)).toBe(1);
     expect(TERRAIN_DETAIL_SLEW_PER_SECOND).toBe(0.5);
     expect(TERRAIN_DETAIL_EXIT_SECONDS).toBeGreaterThan(TERRAIN_DETAIL_ENTER_SECONDS);
     expect(TERRAIN_DETAIL_EXIT_PRESSURE).toBeLessThan(TERRAIN_DETAIL_ENTER_PRESSURE);
@@ -220,18 +230,20 @@ describe('terrain detail shed core: dwell hysteresis', () => {
     run(state, 1, 0.3);
     run(state, TERRAIN_DETAIL_ENTER_SECONDS * 0.6, 1.4);
     expect(state.target).toBe(1);
-    // Sustained pressure sheds exactly ONE step of the plan.
+    // Sustained pressure from a cleared dwell clock sheds exactly ONE step of
+    // the plan (a second dwell would need 2.5 s more than the settle window).
+    run(state, 1, 0.3);
     run(state, STEP_SETTLE_SECONDS, 1.4);
-    expect(state.target).toBeCloseTo(1 - TERRAIN_DETAIL_STEP, 10);
-    expect(state.level).toBeCloseTo(1 - TERRAIN_DETAIL_STEP, 10);
+    expect(state.target).toBeCloseTo(TERRAIN_DETAIL_LADDER[1], 10);
+    expect(state.level).toBeCloseTo(TERRAIN_DETAIL_LADDER[1], 10);
   });
 
   it('crossfades a step: the applied level slews at the pinned rate, never jumps', () => {
     const state = createTerrainDetailShedState();
     run(state, TERRAIN_DETAIL_ENTER_SECONDS + DT * 2, 1.4);
-    expect(state.target).toBeCloseTo(1 - TERRAIN_DETAIL_STEP, 10);
+    expect(state.target).toBeCloseTo(TERRAIN_DETAIL_LADDER[1], 10);
     // Two frames past the step the level has moved only two slew increments.
-    expect(state.level).toBeGreaterThan(1 - TERRAIN_DETAIL_STEP);
+    expect(state.level).toBeGreaterThan(TERRAIN_DETAIL_LADDER[1]);
     expect(state.level).toBeCloseTo(1 - 2 * TERRAIN_DETAIL_SLEW_PER_SECOND * DT, 6);
     let previous = state.level;
     while (state.level > state.target) {
@@ -252,7 +264,7 @@ describe('terrain detail shed core: dwell hysteresis', () => {
       targets.push(state.target);
     }
     for (let i = 1; i < targets.length; i++) expect(targets[i]).toBeLessThanOrEqual(targets[i - 1]);
-    expect(targets.slice(0, 4)).toEqual([1, 0.66, 0.32, 0]);
+    expect(targets.slice(0, 3)).toEqual([1, 0.32, 0]);
     expect(state.target).toBe(0);
     expect(state.level).toBe(0);
   });
@@ -271,8 +283,8 @@ describe('terrain detail shed core: dwell hysteresis', () => {
     run(state, TERRAIN_DETAIL_EXIT_SECONDS * 0.9, 0.3);
     expect(state.level).toBe(shed);
     // Sustained calm restores exactly one step.
-    run(state, TERRAIN_DETAIL_EXIT_SECONDS + TERRAIN_DETAIL_STEP / 0.5 + 0.1, 0.3);
-    expect(state.target).toBeCloseTo(Math.min(1, shed + TERRAIN_DETAIL_STEP), 10);
+    run(state, TERRAIN_DETAIL_EXIT_SECONDS + FIRST_STEP / 0.5 + 0.1, 0.3);
+    expect(state.target).toBe(nextTerrainDetailRestoreTarget(shed));
     expect(state.level).toBe(state.target);
   });
 

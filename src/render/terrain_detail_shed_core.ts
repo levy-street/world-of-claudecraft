@@ -21,9 +21,9 @@
  * edge (the consumers scale their existing distance fades by the level, and
  * worn-stone weighs its marginal refinement tap by the fractional tap count).
  * The ladder is not even across the three knobs: at ultra the first step
- * (0.66) mostly thins the worn-stone walk (taps 3 -> 1.98) and dims the micro
- * sun-shadow to a third, while the terrain parallax only starts fading at the
- * second step (0.32, relief 1.64); read a capture with that in mind.
+ * (0.32) thins the worn-stone walk (taps 3 -> 0.96), dims the micro
+ * sun-shadow and starts fading the terrain parallax (relief 1.64); the floor
+ * removes what is left. Read a capture with that in mind.
  *
  * The shared uniform refs are one page-wide singleton (gfx.ts
  * `sharedUniforms`), so a secondary GL context that compiles a worn-stone
@@ -161,13 +161,32 @@ export const TERRAIN_DETAIL_ENTER_SECONDS = 2.5;
 /** Sustained calm needed before EACH restore step, the governor's own
  *  shed-fast/restore-slow asymmetry. */
 export const TERRAIN_DETAIL_EXIT_SECONDS = 6;
-/** One shed/restore step of the plan: 1.0 -> 0.66 -> 0.32 -> 0 (floor
- *  clamped), a coarse ladder so a session dwells at a stable level rather
- *  than drifting continuously. */
-export const TERRAIN_DETAIL_STEP = 0.34;
+/** The plan's rungs in shed order: the tier's own request, the level where
+ *  the parallax walk has faded, the floor. A coarse ladder so a session
+ *  dwells at a stable level rather than drifting continuously. There is no
+ *  rung between 1 and 0.32: on ANGLE D3D11 (RTX 4070 Laptop GPU and Iris Xe)
+ *  a 0.66 rung read as level 1 within noise at every stage, so the first
+ *  shed step lands where the gain is instead of spending a dwell for
+ *  nothing. */
+export const TERRAIN_DETAIL_LADDER: readonly number[] = [1, 0.32, 0];
 /** Slew rate of the applied level toward the plan, in level units per
- *  second: one step crossfades over about 0.7 s, the whole ladder over 2 s. */
+ *  second: the first step crossfades over about 1.4 s, the whole ladder over
+ *  2 s. */
 export const TERRAIN_DETAIL_SLEW_PER_SECOND = 0.5;
+
+/** The next rung below `target` (the floor when already there). */
+export function nextTerrainDetailShedTarget(target: number): number {
+  for (const rung of TERRAIN_DETAIL_LADDER) if (rung < target) return rung;
+  return TERRAIN_DETAIL_LADDER[TERRAIN_DETAIL_LADDER.length - 1];
+}
+
+/** The next rung above `target` (the tier's own request when already there). */
+export function nextTerrainDetailRestoreTarget(target: number): number {
+  for (let i = TERRAIN_DETAIL_LADDER.length - 1; i >= 0; i--) {
+    if (TERRAIN_DETAIL_LADDER[i] > target) return TERRAIN_DETAIL_LADDER[i];
+  }
+  return TERRAIN_DETAIL_LADDER[0];
+}
 
 export interface TerrainDetailShedState {
   /** The applied level the uniforms take: 1 = the tier's own static
@@ -192,10 +211,6 @@ export function resetTerrainDetailShed(state: TerrainDetailShedState): void {
   state.target = 1;
   state.overSeconds = 0;
   state.calmSeconds = 0;
-}
-
-function round2(v: number): number {
-  return Math.round(v * 100) / 100;
 }
 
 /**
@@ -231,14 +246,14 @@ export function updateTerrainDetailShed(
     state.overSeconds += dt;
     state.calmSeconds = 0;
     if (state.target > 0 && state.overSeconds >= TERRAIN_DETAIL_ENTER_SECONDS) {
-      state.target = Math.max(0, round2(state.target - TERRAIN_DETAIL_STEP));
+      state.target = nextTerrainDetailShedTarget(state.target);
       state.overSeconds = 0;
     }
   } else if (pressure <= TERRAIN_DETAIL_EXIT_PRESSURE) {
     state.calmSeconds += dt;
     state.overSeconds = 0;
     if (state.target < 1 && state.calmSeconds >= TERRAIN_DETAIL_EXIT_SECONDS) {
-      state.target = Math.min(1, round2(state.target + TERRAIN_DETAIL_STEP));
+      state.target = nextTerrainDetailRestoreTarget(state.target);
       state.calmSeconds = 0;
     }
   } else {

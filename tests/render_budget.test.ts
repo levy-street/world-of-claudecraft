@@ -561,13 +561,13 @@ describe('render budget governor', () => {
       let state = governor.update(sample({ dt: 1 }));
       expect(state.levels.detail).toBe(1);
       // 200 ms frames sit far over ultra's 30 ms drop line from the first
-      // sample. One step per 2.5 s dwell plus the 0.5/s slew: at 6.67 s the
-      // plan has stepped twice (0.66 at 2.5 s, 0.32 at 5 s) and the applied
-      // level has settled on the second rung, not the floor.
-      for (let i = 0; i < 400; i++) state = governor.update(heavy());
+      // sample. One step per 2.5 s dwell plus the 0.5/s slew: the plan steps
+      // to 0.32 at 2.5 s and the applied level settles there by 3.9 s, so at
+      // 4.17 s the session sits on the middle rung, not the floor.
+      for (let i = 0; i < 250; i++) state = governor.update(heavy());
       expect(state.levels.detail).toBeCloseTo(0.32, 2);
-      // A third dwell (7.5 s) reaches the floor by 8.2 s.
-      for (let i = 0; i < 100; i++) state = governor.update(heavy());
+      // The second dwell (5 s) reaches the floor by 5.7 s.
+      for (let i = 0; i < 150; i++) state = governor.update(heavy());
       expect(state.levels.detail).toBe(0);
     });
 
@@ -580,11 +580,11 @@ describe('render budget governor', () => {
       governor.reset(1, 0.65, 1);
       let state = governor.update(sample({ dt: 1 }));
       for (let i = 0; i < 400; i++) state = governor.update(heavy());
-      expect(state.levels.detail).toBeCloseTo(0.32, 2);
+      expect(state.levels.detail).toBe(0);
       // The frame EMA needs about 25 calm frames to fall under the 0.85 exit
-      // line, then 6 s of calm restores one step: 0.66 well before 8.3 s.
+      // line, then 6 s of calm restores one step: 0.32 well before 8.3 s.
       for (let i = 0; i < 500; i++) state = governor.update(calm());
-      expect(state.levels.detail).toBeCloseTo(0.66, 2);
+      expect(state.levels.detail).toBeCloseTo(0.32, 2);
       for (let i = 0; i < 500; i++) state = governor.update(calm());
       expect(state.levels.detail).toBe(1);
     });
@@ -616,7 +616,7 @@ describe('render budget governor', () => {
       });
       governor.reset(1, 0.65, 1);
       let state = governor.update(sample({ dt: 1 }));
-      for (let i = 0; i < 400; i++) state = governor.update(heavy());
+      for (let i = 0; i < 250; i++) state = governor.update(heavy());
       expect(state.levels.detail).toBeCloseTo(0.32, 2);
     });
 
