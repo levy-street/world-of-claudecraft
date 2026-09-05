@@ -463,7 +463,7 @@ describe('Masterwrought art completion evidence', () => {
   it('byte-seals the root manifest so its target and evidence oracles cannot drift together', () => {
     const bytes = readFileSync(path.join(repoRoot, manifestPath));
     expect(bytes.length).toBe(459_411);
-    expect(hash(bytes)).toBe('394deade31d5bb7866cc355d7b42405e22a5a1961ab2bd4dc568d7ee59e87233');
+    expect(hash(bytes)).toBe('5a82761cc7f9b233c0ee0535facfdd2f5b7fe756a556aa6d5e5530a69606dbd9');
   });
 
   it('pins the exact 176-target scope and the 81 added to 84 replaced item split', () => {
@@ -779,7 +779,7 @@ describe('Masterwrought art completion evidence', () => {
     }
   });
 
-  it('proves the historical to current 1209-item union and the mapping batch equality', () => {
+  it('preserves the 1209-item completion union separately from the Crucible additions', () => {
     const value = manifest();
     const mapping = readJson<ItemMapping>('public/ui/items/mapping.json');
     const currentBatch = mapping.generatedBatches.find(({ batchId: id }) => id === batchId);
@@ -790,8 +790,17 @@ describe('Masterwrought art completion evidence', () => {
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
     expect(duplicateValues(currentOwnerIds)).toEqual([]);
-    expect(currentOwnerIds).toHaveLength(1209);
-    const retainedHistoricalIds = currentOwnerIds.filter(
+    expect(currentOwnerIds).toHaveLength(1254);
+    const crucibleBatches = mapping.generatedBatches.filter(
+      ({ batchId: id }) => id === 'crucible-professions-2026-09-05',
+    );
+    expect(crucibleBatches).toHaveLength(1);
+    const crucibleIds = new Set(crucibleBatches[0].itemIds);
+    expect(crucibleIds.size).toBe(45);
+    expect(value.targetSets.items.filter((id) => crucibleIds.has(id))).toEqual([]);
+    const completionOwnerIds = currentOwnerIds.filter((id) => !crucibleIds.has(id));
+    expect(completionOwnerIds).toHaveLength(1209);
+    const retainedHistoricalIds = completionOwnerIds.filter(
       (id) => !value.targetSets.items.includes(id),
     );
     expect(retainedHistoricalIds).toHaveLength(1044);
