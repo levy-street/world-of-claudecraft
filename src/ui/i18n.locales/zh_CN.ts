@@ -330,6 +330,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.tabsLabel': 'WOC 商店分区',
   'hudChrome.wocStore.storeTab': '商店',
   'hudChrome.wocStore.rewardsTab': '每日奖励',
+  'hudChrome.wocStore.mountsEyebrow': '账号坐骑',
+  'hudChrome.wocStore.mountsTitle': '机械马厩',
+  'hudChrome.wocStore.mountBuyAria': '购买{item}',
   'hudChrome.wocStore.loading': '正在加载 WOC 商店…',
   'hudChrome.wocStore.error': 'WOC 商店暂时不可用，请稍后再试。',
   'hudChrome.wocStore.balance': 'Claudium 余额',
@@ -8650,6 +8653,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_stormfeather_griffin.name': '凌天风暴之羽的缰绳',
   'entities.items.reins_drakemaw_raptor.name': '龙喉迅猛龙的缰绳',
   'entities.items.reins_thunderstrut_gobbler.name': '雷霆阔步大火鸡的缰绳',
+  'entities.items.reins_mech_bird.name': '发条机械鸟点火钥匙',
   'entities.mobs.drowned_cantor.name': '溺亡诵经者',
   'entities.mobs.reedbound_acolyte.name': '芦苇缚信徒',
   'entities.mobs.deepfen_spearjaw.name': '深沼枪颚兽',
@@ -10032,8 +10036,17 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_shadowjump_toad': '影跃蟾蜍卡玛影',
   'hudChrome.mounts.name_stormfeather_griffin': '凌天风暴之羽',
   'hudChrome.mounts.name_drakemaw_raptor': '龙喉迅猛龙',
+  'hudChrome.mounts.name_lanternback_troll': '提灯背者格伦博',
+  'hudChrome.mounts.name_chimeglass_tortoise': '钟晶的托利弗',
   'hudChrome.mounts.desc_drakemaw_raptor':
     '来自龙喉火山口的驯服巢生迅猛龙，浑身筋肉、疾若奔雷，身上仍带着淡淡的灰烬气味。',
+  'hudChrome.mounts.name_mech_bird': '发条机械鸟',
+  'hudChrome.mounts.desc_mech_bird':
+    '一只手工打造的发条战斗鸡，伺服关节铿锵疾驰，发条钥匙仍在转动。',
+  'hudChrome.mounts.desc_lanternback_troll':
+    '被点灯人驯服的山地巨魔，肩上扛着一把铁王座，两侧扶手各挂一盏燃烧的风灯。',
+  'hudChrome.mounts.desc_chimeglass_tortoise':
+    '盐原上的陆龟，走过了三代商队。收留他的补锅匠用暴风晶磨成眼镜，又在他喉前挂上一枚青铜铃——道路总是先听见他，才看见他。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '雷霆阔步大火鸡',
   'hudChrome.mounts.name_terrorspark_groundshaker': '惊雷撼地者',
   'hudChrome.mounts.name_goblin_rocket_sled': '哥布林火箭雪橇',
@@ -10789,6 +10802,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_terrorspark_groundshaker.name': '惊雷撼地者点火钥匙',
   'entities.items.reins_goblin_rocket_sled.name': '哥布林火箭雪橇点火钥匙',
   'entities.items.reins_rallycart_rxt.name': '拉力卡丁车 RXT 点火钥匙',
+  'entities.items.reins_lanternback_troll.name':
+    '点灯人之轭：格伦博',
+  'entities.items.reins_chimeglass_tortoise.name':
+    '守道人的铃带：托利弗',
   'entities.items.reins_rickshaw_mount.name': '白骨人力车缚绳',
   'entities.dungeons.the_last_keep.leaveText': '你带上堡门，重新走进龙裔荒原的寒风中。',
   'entities.dungeons.dawnhold_castle.name': '晨曦堡',
@@ -14335,4 +14352,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.springtouched_crozier.name': '泉息牧杖',
   'entities.items.wand_of_quenched_sparks.name': '熄火花魔杖',
   'crucibleShop.balanceEntry': '{name} x{count}',
+  'hudChrome.realmBuilder.title': '本月王国建造者',
+  'hudChrome.realmBuilder.currentLabel': '本月荣誉获得者',
+  'hudChrome.realmBuilder.placeholderName': '你的名字',
+  'hudChrome.realmBuilder.placeholderHint': '这块铭牌还在等待它的第一个名字。',
+  'hudChrome.realmBuilder.pastTitle': '历届荣誉获得者',
+  'hudChrome.realmBuilder.pastEmpty': '荣誉榜上还没有名字。',
+  'hudChrome.realmBuilder.close': '关闭',
+  'worldContent.realmBuilderMonumentName': '王国建造者纪念碑',
 };

@@ -324,6 +324,9 @@ const UI_PURE_CORES = [
   // The Season 1 Armory's section / card / class-chip markup, the charter_card_view
   // twin on the other half of the same store body (Bank Storage phase 15).
   'src/ui/armory_card_view.ts',
+  // The Machine Stable's section / card markup (the store-mount strip), the
+  // armory_card_view twin for the account-mount SKUs.
+  'src/ui/store_mount_card_view.ts',
   // The daily-rewards spin wheel's markup and its landing geometry (Bank Storage
   // phase 17). The overlay ELEMENT lives in the thin painter beside it.
   'src/ui/daily_rewards_spin_view.ts',
@@ -415,6 +418,7 @@ const UI_PURE_CORES = [
   'src/ui/wallet_bridge_reason_text.ts',
   'src/ui/terms_link.ts',
   'src/ui/duration_text.ts',
+  'src/ui/realm_builder_name.ts',
   'src/ui/woc_affordable_core.ts',
   'src/ui/woc_market_poll_core.ts',
   'src/ui/woc_market_reason_text.ts',
@@ -593,7 +597,9 @@ const RENDER_PURE_CORES = [
   'src/render/characters/soul_rend_prewarm_core.ts',
   'src/render/characters/design_code_core.ts',
   'src/render/live_program_watch_core.ts',
+  'src/render/realm_builder_monument_fx_core.ts',
   'src/render/reveal_gate_core.ts',
+  'src/render/stride_audio_core.ts',
   'src/render/town_reveal_core.ts',
   'src/render/foliage_bucket_reveal_core.ts',
   'src/render/foliage_prewarm_twins_core.ts',
@@ -787,6 +793,7 @@ const BARE_NAMED = [
   'src/ui/wallet_bridge_reason_text.ts',
   'src/ui/terms_link.ts',
   'src/ui/duration_text.ts',
+  'src/ui/realm_builder_name.ts',
   'src/ui/woc_market_reason_text.ts',
   'src/render/foliage_lod.ts',
   'src/render/frame_present.ts',
@@ -1902,6 +1909,7 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/purchase_intent_record.ts',
   'src/ui/quality_glow.ts',
   'src/ui/quest_marker_tags.ts',
+  'src/ui/realm_builder_name.ts',
   'src/ui/reliquary_cell_art.ts',
   'src/ui/rest_indicator.ts',
   'src/ui/roving_index.ts',
@@ -2357,6 +2365,7 @@ const UI_DOM_MODULES = [
   'src/ui/movable_frame.ts',
   'src/ui/native_update_prompt.ts',
   'src/ui/noticeboard_popup.ts',
+  'src/ui/realm_builder_popup.ts',
   'src/ui/options_window.ts',
   'src/ui/ota_update_overlay.ts',
   'src/ui/perf_metrics_sampler.ts',

@@ -2258,6 +2258,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.artisans_eye.name': 'Ojo del Artesano',
   'entities.items.reins_terrorspark_groundshaker.name':
     'Llave de encendido: Aterrachispa, Sacudetierras',
+  'entities.items.reins_lanternback_troll.name':
+    'Yugo del farolero: Grumbol',
   'hudChrome.auraOverlay.allOff': 'Desactivar todas',
   'hudChrome.auraOverlay.allOn': 'Activar todas',
   'hudChrome.auraOverlay.arcs': 'Medialunas laterales',

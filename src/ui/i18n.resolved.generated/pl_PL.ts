@@ -570,6 +570,9 @@ export const pl_PL: EnTranslations = {
       "tabsLabel": "Sekcje sklepu WOC",
       "storeTab": "Sklep",
       "rewardsTab": "Codzienne nagrody",
+      "mountsEyebrow": "Account Mounts",
+      "mountsTitle": "Machine Stable",
+      "mountBuyAria": "Purchase {item}",
       "loading": "Ładowanie sklepu WOC...",
       "error": "Sklep WOC jest obecnie niedostępny. Spróbuj ponownie wkrótce.",
       "balance": "Saldo Claudium",
@@ -1392,6 +1395,9 @@ export const pl_PL: EnTranslations = {
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Groziskra, Wstrząsacz Ziemi",
       "name_drakemaw_raptor": "Raptor Smoczej Paszczy",
+      "name_mech_bird": "Cluckwork Mech Bird",
+      "name_lanternback_troll": "Grumbol the Lanternback",
+      "name_chimeglass_tortoise": "Tolliver the Chimeglass",
       "name_rickshaw_mount": "Spętana Kośćmi Riksza",
       "desc_valorsteed": "Wytrzymały, pewny kroku rumak, który zapewnia zwiększoną prędkość podróżowania.",
       "desc_grag_bear": "Wytrzymały, pewny kroku niedźwiedź, który zapewnia zwiększoną prędkość podróżowania.",
@@ -1404,6 +1410,9 @@ export const pl_PL: EnTranslations = {
       "desc_rallycart_rxt": "Mała maszyna rajdowa, która zwiększa prędkość podróży.",
       "desc_terrorspark_groundshaker": "Zwarta opancerzona maszyna z ciężkimi gąsienicami, wielkokalibrowym działem i siodłem stworzonym dla nieustraszonych pilotów.",
       "desc_drakemaw_raptor": "Ujeżdżony wylęgowy raptor z Kaldery Smoczej Paszczy: same ścięgna i pęd, wciąż pachnący z lekka popiołem.",
+      "desc_mech_bird": "A hand-built clockwork war chicken that sprints on snapping servos, wind-up key still turning.",
+      "desc_lanternback_troll": "A hill troll broken to the yoke by lamplighters, carrying an iron throne across his shoulders with a storm lantern burning on either arm.",
+      "desc_chimeglass_tortoise": "A salt-flat tortoise who has outwalked three generations of caravans. Tinkers ground him spectacles from storm-glass and hung a bronze bell at his throat, so the road hears him long before it sees him.",
       "desc_rickshaw_mount": "Grzechoczący wózek z kości, z kościstym pachołkiem zaprzężonym do dyszli, ciągnącym cię w pełnym pędzie."
     },
     "mountTraining": {
@@ -3300,6 +3309,15 @@ export const pl_PL: EnTranslations = {
       "back": "Wstecz",
       "popupTitle": "Tablica gildii",
       "close": "Zamknij"
+    },
+    "realmBuilder": {
+      "title": "Realm Builder of the Month",
+      "currentLabel": "Honoured this month",
+      "placeholderName": "Your Name Here",
+      "placeholderHint": "This plate is waiting for its first name.",
+      "pastTitle": "Past honourees",
+      "pastEmpty": "No names on the roll yet.",
+      "close": "Close"
     },
     "bank": {
       "title": "Bank",
@@ -13230,11 +13248,20 @@ export const pl_PL: EnTranslations = {
       "reins_rallycart_rxt": {
         "name": "Kluczyk zapłonu: Rallycart RXT"
       },
+      "reins_lanternback_troll": {
+        "name": "Jarzmo latarnika: Grumbol"
+      },
+      "reins_chimeglass_tortoise": {
+        "name": "Roadwarden's Bellstrap: Tolliver"
+      },
       "reins_rickshaw_mount": {
         "name": "Spętane lejce: Spętana Kośćmi Riksza"
       },
       "reins_drakemaw_raptor": {
         "name": "Wodze Raptora Smoczej Paszczy"
+      },
+      "reins_mech_bird": {
+        "name": "Ignition Key: Cluckwork Mech Bird"
       },
       "rimefang": {
         "name": "Szronowy Kieł"
@@ -19149,6 +19176,7 @@ export const pl_PL: EnTranslations = {
     "delveRiteShrineReedInteract": "Kapliczka Trzciny: Naciśnij F, aby jej dotknąć",
     "delveRiteShrineSkullInteract": "Kapliczka Czaszki: Naciśnij F, aby jej dotknąć",
     "mailboxName": "Skrzynka pocztowa",
-    "noticeboardName": "Tablica ogłoszeń"
+    "noticeboardName": "Tablica ogłoszeń",
+    "realmBuilderMonumentName": "Realm Builder Monument"
   }
 };

@@ -129,9 +129,12 @@ which already computes interpolated position, `loco.speed/moving`, `swimming`,
   dock decks→wood → dungeon→stone → snow if weather is snowing. Suppressed while airborne /
   swimming / dead and gated by `d2 < SFX_RANGE_SQ`.
 - **Mount running:** the same distance accumulator fires a mount-specific
-  `sink.mountRun(x,y,z, mountKey, self)` gait beat while a grounded mount runs.
-  Mount walking stays quiet. These cues use the normal SFX mix and remain audible
-  when the optional on-foot footstep setting is disabled.
+  `sink.mountRun(x,y,z, mountKey, surface, self)` gait beat while a grounded mount
+  runs. Mount walking stays quiet. These cues use the normal SFX mix and remain
+  audible when the optional on-foot footstep setting is disabled. A mount with no
+  `mount_run_<key>` in the catalog (the Lanternback Troll and the Chimeglass
+  Tortoise) falls back to the plain `foot_<surface>` cue at running-step gain and
+  pitch: hence the `surface` argument, which the custom-cue branch ignores.
 - **Jump / land / splash / swim:** per-view edge detection on `airborne` and
   `swimming` transitions fires `sink.movement('jump'|'land'|'splash'|'swim', …)`.
 - **Listener:** after the camera is positioned (~L1583), `sink.setListener(camPos,
@@ -203,6 +206,10 @@ until that loop stops.
 | `mount_run_goblin_rocket_sled_reverse` | 10.53 | seamless reverse rocket sustain loop |
 | `mount_run_goblin_rocket_sled_reverse_stop` | 1.18 | authored reverse turbine shutdown ramp, directly interruptible |
 | `mount_run_terrorspark_groundshaker` | 0.55 | compact tread clatter with a low mechanical drive pulse |
+| `mount_run_mech_bird` | 0.68 | servo footsteps assembled 1-2-1 per stride (scripts/gen_mech_bird_sfx.mjs) |
+| `mount_idle_mech_bird` | 10 | standstill powered-on servo hum loop (Sfx.mountIdle) |
+| `mount_jump_mech_bird` | 0.67 | launch servo burst, replaces move_jump while riding (Sfx.movement mount arm) |
+| `mount_land_mech_bird` | 0.67 | landing clank, replaces move_land while riding |
 | `move_jump` | 0.5 | quick light gear/leather exertion and fabric rustle, a person leaping up |
 | `move_land` | 0.6 | a person landing from a jump, boots thud with armor and gear settle |
 | `move_splash` | 0.8 | a body plunging into water, big splash |

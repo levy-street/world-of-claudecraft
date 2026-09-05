@@ -4,6 +4,7 @@
 // supplies the skins themselves (model and rarity) and the apply rules
 // decide which skins the player can attach right now. DOM-free and unit-tested.
 
+import { STORE_MOUNT_ITEM_IDS } from '../sim/content/store_mounts';
 import {
   eligibleClassesForWeaponSkinType,
   skinnableWeaponTypesFor,
@@ -15,6 +16,7 @@ import {
   type WeaponSkinDef,
   type WeaponSkinRarity,
 } from '../sim/content/weapon_skins';
+import { ITEMS } from '../sim/data';
 import type { PlayerClass, SkinCatalog, WeaponSkinType } from '../sim/types';
 import type { AccountCosmetics } from '../world_api/cosmetics';
 
@@ -122,6 +124,56 @@ export function buildArmorySections(
   }
   const rarityRank = (r: WeaponSkinRarity) => WEAPON_SKIN_RARITY_ORDER.indexOf(r);
   return [...sections.values()].sort((a, b) => rarityRank(b.rarity) - rarityRank(a.rarity));
+}
+
+// ── Store mounts ─────────────────────────────────────────────────────────────
+
+export interface StoreMountRow {
+  itemId: string;
+  mountKey: string;
+  /** Claudium cost from the economy service, or null when the SKU is unavailable. */
+  costClaudium: number | null;
+  /** The economy service has this SKU with a valid price, so Buy can succeed. */
+  purchasable: boolean;
+  owned: boolean;
+  affordable: boolean;
+  shortfall: number | null;
+}
+
+/** Rows for the store's Mounts section. Catalog-first like the Armory: every
+ *  store mount always shows; one missing from the service snapshot renders
+ *  unavailable with no invented price. Owned unions the service grant flag
+ *  with the live mount ownership mirror (the reins already in this
+ *  character's bags or bank), so a fresh purchase reflects immediately. */
+export function buildStoreMountRows(
+  balance: number | null,
+  items: WocStoreItemInput[],
+  ownedMountKeys: readonly string[],
+): StoreMountRow[] {
+  const serviceRows = new Map(items.filter((i) => i.kind === 'item').map((i) => [i.itemId, i]));
+  return STORE_MOUNT_ITEM_IDS.map((itemId) => {
+    const mountKey = (ITEMS[itemId] as { mount?: string } | undefined)?.mount ?? '';
+    const service = serviceRows.get(itemId);
+    const owned = (service?.owned ?? false) || ownedMountKeys.includes(mountKey);
+    const costClaudium =
+      service && Number.isFinite(service.costClaudium) && service.costClaudium > 0
+        ? service.costClaudium
+        : null;
+    return {
+      itemId,
+      mountKey,
+      costClaudium,
+      purchasable: costClaudium !== null,
+      owned,
+      affordable: !owned && balance !== null && costClaudium !== null && balance >= costClaudium,
+      shortfall:
+        costClaudium === null || balance === null
+          ? null
+          : owned
+            ? 0
+            : Math.max(0, costClaudium - balance),
+    };
+  });
 }
 // ── Strongbox charters ──────────────────────────────────────────────────────
 //

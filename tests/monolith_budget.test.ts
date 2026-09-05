@@ -302,7 +302,13 @@ const MONOLITHS: MonolithRow[] = [
     // fullscreen resize, folds release's windowMoved stamp into that path, and
     // leaves window_position_core.ts fully superseded. Measured on the merged
     // tree, never reconciled by arithmetic. Exact count, zero slack.
-    ceiling: 18952,
+    // Up 18905 -> 18911 for the Realm Builder monument's honour-roll card
+    // (PR #3695, re-measured at its release/v0.42.0 base merge). The card
+    // is its own module (src/ui/realm_builder_popup.ts); what is left here
+    // is the six lines that cannot live anywhere else: the import, the
+    // field, its relocalize() call, and the three-line event arm. Exact
+    // merged count, zero slack; maintainer-review item.
+    ceiling: 18958,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -380,7 +386,20 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at the PR 3685 base sync (release v0.41.0 through the raid
     // branch): both arms edited the renderer and the union lands at the count
     // below. Measured on the merged tree. Exact merged count, zero headroom.
-    ceiling: 13249,
+    // Re-pinned at the release/v0.42.0 sync of the Chimeglass Tortoise PR
+    // (#3439, carrying the Lanternback Troll of #3399): the rideable-mount
+    // lifecycle (build, live swap, teardown, rider seating, carried lamps
+    // and glows, the summon/dismount FX) moved to src/render/mount_lifecycle.ts,
+    // and the release arm's rickshaw hooks moved with it, so the merged file
+    // lands below both prior pins. Measured on the merged tree. Exact merged
+    // count, zero headroom.
+    // The Realm Builder monument (PR #3695) adds 12 lines here: one import,
+    // the one-line setRealmBuilderHonouree delegation, and the entity arm
+    // that returns the monument's pick volume (matched on the template-id
+    // literal like the noticeboard arm beside it; tests/realm_builder_monument
+    // pins the literal to the constant). They land exactly on the pin above,
+    // so the ceiling does not move but the slack is now zero.
+    ceiling: 13214,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -545,7 +564,9 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned on the current v0.42 candidate after the action-bar, deed,
     // window-reflow, controller tutorial, render, and pet merges. Measured on
     // the merged tree, never reconciled by arithmetic.
-    ceiling: 11518,
+    // Re-pinned at the release/v0.42.0 reconcile with the Realm Builder and
+    // store mount release-side hooks. Exact merged count, zero headroom.
+    ceiling: 11520,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -765,7 +786,13 @@ const MONOLITHS: MonolithRow[] = [
     // client_perf_schema.ts (ensureSchema applies it after the core tables it
     // FK-references); the insert and prune primitives stay here, so only the
     // table definition left. Exact count, zero slack.
-    ceiling: 5091,
+    // Up 5145 -> 5151 for the Realm Builder of the Month roll (PR #3695, at
+    // its release/v0.42.0 base merge): the table and its SQL live in
+    // server/realm_builder_db.ts; the residue here is the schema import and
+    // the one ensureSchema() apply line with its ordering note, the same
+    // shape every other domain *_SCHEMA takes. Exact merged count, zero
+    // slack; maintainer-review item.
+    ceiling: 5097,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {
@@ -963,7 +990,12 @@ const MONOLITHS: MonolithRow[] = [
     // the full guarded skin purchase flow moved to store_armory_purchase.ts.
     // The new Store-owned modal itself lives in store_decision_prompt.ts, while
     // the cold shell markup moved to daily_rewards_chrome_view.ts.
-    ceiling: 1264,
+    // LOWERED 1264 -> 1262 by the Cluckwork Mech Bird store mount (PR #3464): the
+    // Machine Stable strip landed as src/ui/store_mount_card_view.ts (markup) +
+    // src/ui/store_mount_purchase.ts (the spend controller), the store body's
+    // button wiring moved to src/ui/store_body_actions.ts, and both grant-SKU
+    // controllers now build over one seam object (store_spend_controllers.ts).
+    ceiling: 1262,
     seam: 'a pure view-core plus a thin painter sibling (src/ui/CLAUDE.md)',
   },
   {

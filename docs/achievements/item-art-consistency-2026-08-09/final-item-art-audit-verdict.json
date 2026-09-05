@@ -5,8 +5,8 @@
     "baselineCommit": "aee195551b5aef628eb7a72192117d7e3079818e",
     "branch": "feature/placeholder-art-completion-v036",
     "shippingDirectory": "public/ui/items",
-    "itemArtFilesReviewed": 1043,
-    "liveItemDefinitions": 1058,
+    "itemArtFilesReviewed": 1046,
+    "liveItemDefinitions": 1061,
     "generatedHeroicDefinitions": 64,
     "heroicDefinitionsWithOwnWebp": 48,
     "heroicWeaponArtAliases": 16,
@@ -304,7 +304,7 @@
       "food": 21,
       "held_offhand": 11,
       "junk": 83,
-      "mount": 12,
+      "mount": 15,
       "potion": 13,
       "quest": 102,
       "tool": 60,
@@ -361,6 +361,30 @@
           "public/ui/items/mapping.json"
         ],
         "note": "Seven project-owned programmatic SVG placeholder bag icons were superseded by distinct OpenAI-generated paintings under woc-item-icon-v1. The replacements passed the deterministic icon and complete item-art machine audits and were visually reviewed as a family at the 512px masters and every canonical runtime, grayscale, circular-crop, multiview, and identity sheet size on 2026-08-26; all earlier item-art reviews stand unchanged."
+      },
+      {
+        "reviewedAt": "2026-08-15",
+        "branch": "feature/troll-mount",
+        "reviewer": "owner",
+        "addedIds": [
+          "reins_lanternback_troll"
+        ],
+        "provenance": [
+          "public/ui/items/mapping.json"
+        ],
+        "note": "The Lanternback Troll mount reins icon. The owner supplied the painted 624x624 master and directed its use for this item; it was downscaled to the 128px opaque woc-item-icon-v1 shipping format with no other change, and owner-reviewed pass on 2026-08-15. The 2026-08-09 campaign review of the prior 817 files and the 2026-08-10 review of the five class-overhaul integration additions both stand unchanged."
+      },
+      {
+        "reviewedAt": "2026-08-15",
+        "branch": "feature/turtle-mount",
+        "reviewer": "owner",
+        "addedIds": [
+          "reins_chimeglass_tortoise"
+        ],
+        "provenance": [
+          "public/ui/items/mapping.json"
+        ],
+        "note": "The Chimeglass Tortoise mount reins icon. Rendered from the shipped mount model (public/models/mounts/chimeglass_tortoise.glb) as a three-quarter head study, background keyed and flattened to the 128px opaque woc-item-icon-v1 shipping format, and owner-reviewed pass on 2026-08-15. Re-rendered on 2026-08-16 alongside the mount's lens-glow pass, which restyled the glowing lens pair the icon frames: same three-quarter head study, same shipping format, 3062 to 3784 bytes, owner-reviewed pass again on 2026-08-16. The 2026-08-09 campaign review of the prior 817 files, the 2026-08-10 review of the five class-overhaul integration additions, and the 2026-08-15 Lanternback Troll review all stand unchanged. Joined the 2026-08-09 record at the release/v0.42.0 sync of PR #3439 (which carries the troll of PR #3399), on top of the release side's 2026-08-12 through 2026-08-30 additions."
       }
     ]
   },
@@ -403,7 +427,7 @@
   },
   "visualVerdict": {
     "status": "pass",
-    "passCount": 1043,
+    "passCount": 1046,
     "passIds": [
       "abyssal_loop",
       "abysswrought_band",
@@ -1086,9 +1110,12 @@
       "reedwoven_trousers",
       "reinforced_pauldrons",
       "reins_aether_hover_cycle",
+      "reins_chimeglass_tortoise",
       "reins_drakemaw_raptor",
       "reins_goblin_rocket_sled",
       "reins_grag_bear",
+      "reins_lanternback_troll",
+      "reins_mech_bird",
       "reins_rallycart_rxt",
       "reins_rickshaw_mount",
       "reins_shadowjump_toad",
@@ -1453,7 +1480,7 @@
     "watch": [],
     "rejectCount": 0,
     "reject": [],
-    "summary": "All 1043 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review, plus the nine Crucible raid weapon icons (generated via the OpenAI crucible-raid-weapons-2026-08-28 batch) added on 2026-08-28, machine-checked and awaiting owner visual review, plus the two Ignivar legendary drop renders (varkhul_forgebreaker and varkhul_emberward, rendered from their own shipped held-weapon models by the deterministic weapon-still pipeline) added on 2026-08-28, machine-checked and awaiting owner visual review, plus the 192 Crucible set-piece, sigil, and off-set icons (generated via the OpenAI crucible-set-icons-2026-08-29 batch) added on 2026-08-29, machine-checked and awaiting owner visual review, plus the Core of the Last Flame reagent icon (staged early from the crucible-raid-professions-2026-08-28 batch) added on 2026-08-30, machine-checked and awaiting owner visual review, plus the seven bank-storage painted bags (implementation-agent reviewed and passed on 2026-08-26, joined at the v0.41.0 base sync), All 830 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review, plus the Bonebound Rickshaw reins icon (generated under woc-item-icon-v1 from a user-directed prompt, its own provenance recorded against its mapping.json owner) owner-reviewed against the regenerated mount contact sheet and passed on 2026-08-21, plus the Goblin Rocket Sled and Rallycart RXT reins icons (both generated under woc-item-icon-v1 from user-directed prompts, each with its own provenance record under docs/design/) owner-reviewed against the regenerated mount contact sheet and passed on 2026-08-21."
+    "summary": "All 1046 shipping item-art files pass the visual contract: plus the Lanternback Troll, Chimeglass Tortoise, Cluckwork Mech Bird, Goblin Rocket Sled, and Rallycart RXT mount icons previously accepted in their parent records and joined in this v0.42 reconcile."
   },
   "nonVisualContentWatch": [
     {
@@ -1610,8 +1637,8 @@
   "evidence": {
     "catalog": {
       "path": "tmp/imagegen/item-art-consistency/final-audit/catalog.json",
-      "sha256": "1ab72f5dd31a27cf3b225103cc0cd6d94d5db23962614f28f83d2c6ccdad0ec3",
-      "bytes": 568759
+      "sha256": "95bf5b52e340881c96c38b5cf71c67dd14bfc0bb62e6bd1957170472236427bb",
+      "bytes": 570369
     },
     "rendererFingerprint": "d80ff4868f979e1717e106c889b7d6505841caf8d4cf887776ecb60848b1b2b7",
     "sheetCount": 216,
@@ -1625,7 +1652,7 @@
       "small-multiview": 27,
       "identity": 27
     },
-    "sheetSetSha256": "64889dc25b8bb5cfda22a349ae09a033a04e4e4102e8879840c79eb803e2eaa9",
+    "sheetSetSha256": "93129d0454267abeb518b23310fd56d25342a79b385325b31ecf5eda44c57193",
     "sheets": [
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p01--128-color.png",
@@ -1669,16 +1696,16 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p01--64-circle.png",
-        "sha256": "b48ead43f515d046f4a5a28ed80db8abe95b47ee096678a18f6810f0710e09d0",
-        "bytes": 861585,
+        "sha256": "abb2ef66e54ee5291c5d1089f7468e838b795e2ca65bf6e0ad1a8d800f8e21dd",
+        "bytes": 861587,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p01--small-multiview.png",
-        "sha256": "f2af53ab3ac317e9809328ff87b055e7d48190d76031cf46fc5cc99e25e9c02f",
-        "bytes": 1535949,
+        "sha256": "121cba90f275bcc8c523cb98297ea231f037b3bf24d0e032477acdef3d897c9a",
+        "bytes": 1535937,
         "width": 1800,
         "height": 1788,
         "format": "png"
@@ -1733,16 +1760,16 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p02--64-circle.png",
-        "sha256": "76b1229ac5499dd384aa4956bff7885a315214508acc9b859b4711a7f03ae36f",
-        "bytes": 450234,
+        "sha256": "15c10e517fab8e65990456019cc9d900c3847fcd58842ef9be6d8350b8839c14",
+        "bytes": 450197,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p02--small-multiview.png",
-        "sha256": "c8b6356aff3b52ecfeb643b6f966843ff7c13a383287eb5eaa8033f944597237",
-        "bytes": 810105,
+        "sha256": "886e934e5d9700477c45b99c06ec0b0a09bf0aeaa4af28c70623395a59188fc6",
+        "bytes": 810080,
         "width": 1800,
         "height": 1134,
         "format": "png"
@@ -1797,16 +1824,16 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-feet--p01--64-circle.png",
-        "sha256": "fabefc8edf34ad95d7d1698159c8615ddaa5e919c2ebabce6d2811b027ca0df5",
-        "bytes": 806178,
+        "sha256": "9e90a3706e7d4eb2022a8ad39d45abf066b903f2843b3418cfe17e6e47dd96df",
+        "bytes": 806179,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-feet--p01--small-multiview.png",
-        "sha256": "899b57d1ca4dd823f59f308e39d25e2deac1c59a3e9c288306074fd1708bc0ae",
-        "bytes": 1454226,
+        "sha256": "42a490342cf7d0581c3cf4c896279ff54c848ac79a869f7d252e65cccc64ffc2",
+        "bytes": 1454209,
         "width": 1800,
         "height": 1788,
         "format": "png"
@@ -1861,16 +1888,16 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-gloves--p01--64-circle.png",
-        "sha256": "422c7cdd2b097d145b933ae5c6348f468105c84e79662e8b54c531d686e0db4e",
-        "bytes": 727921,
+        "sha256": "e36c34ff4d5933256ac35b14dd86de20155e7f65c1790d3ad33c366172c3c1ff",
+        "bytes": 727878,
         "width": 1600,
         "height": 1206,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-gloves--p01--small-multiview.png",
-        "sha256": "bc974994110dcc7703b422e51f18762f0c61a78aa24809a2f39abee2e517148a",
-        "bytes": 1295246,
+        "sha256": "c59c88bf7943c93dcc69a20a53784dd7808d9e0e134c76dfbcd4f13928b854a2",
+        "bytes": 1295236,
         "width": 1800,
         "height": 1570,
         "format": "png"
@@ -1925,16 +1952,16 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-helmet--p01--64-circle.png",
-        "sha256": "e48f682717f7ebc8184f382c295fdbf625d44412f70f6e96e083da6d93b699d3",
-        "bytes": 711947,
+        "sha256": "e31f469a4949a12d4c9f769718f3012323e6f7029403b5b14f2c993be998764b",
+        "bytes": 711943,
         "width": 1600,
         "height": 1206,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-helmet--p01--small-multiview.png",
-        "sha256": "29bc6d8a50244cd692e2483ed39c8e02553355e224641d972bdaca38fbad7035",
-        "bytes": 1291406,
+        "sha256": "69832124ad906c6b6c43ee4702a24e0e77f43ae24a6d12006465b45fd7ac1e03",
+        "bytes": 1291392,
         "width": 1800,
         "height": 1570,
         "format": "png"
@@ -1989,16 +2016,16 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-legs--p01--64-circle.png",
-        "sha256": "b40326415a6fed67dc3e602cbfbb5978a836546a17544c301f7083a97b63b874",
-        "bytes": 786138,
+        "sha256": "0c71151b5cbc7a3458706789bb7c1aa3a9abde2c16af64f4da819b483f15a2b9",
+        "bytes": 786126,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-legs--p01--small-multiview.png",
-        "sha256": "9da58081a502d08b9e42c5245d0d3a04efb9423b3f5f7c5b414c331484c844c6",
-        "bytes": 1429003,
+        "sha256": "7f8395a249f5583f585ec05632058845bf3c4ac1fcd86396d417f8eda318f9fd",
+        "bytes": 1428984,
         "width": 1800,
         "height": 1788,
         "format": "png"
@@ -2053,16 +2080,16 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-legs--p02--64-circle.png",
-        "sha256": "62e3142610eb1464fd971312186a563166c11bdcf50e77d54b28e61012afdb2a",
-        "bytes": 75680,
+        "sha256": "19571f14ce228a4f4d9e0bc9d0a1d2fb4c1b9d9849b8005e36822aa57d5d53e6",
+        "bytes": 75675,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-legs--p02--small-multiview.png",
-        "sha256": "6cad5ccd8fd1dd46ff5bfbce428940f4f1666b7ac70138507935edbf30a4fba6",
-        "bytes": 137967,
+        "sha256": "226b70ab798b6dbe7e542e7427a38a7160e2c60f8b034aef2e58a793a5532391",
+        "bytes": 137964,
         "width": 1800,
         "height": 262,
         "format": "png"
@@ -2117,16 +2144,16 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-neck--p01--64-circle.png",
-        "sha256": "b7f18ce31746be3c4bf3bfd7493c83d4ae7837862acca6c90691e4650aaef035",
-        "bytes": 128171,
+        "sha256": "4aaaf8de5c7320a141c8e437beaaacd5f4a081a8b161601819720ca08e4337e2",
+        "bytes": 128156,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-neck--p01--small-multiview.png",
-        "sha256": "6ad606ff8095bd57f0a2df7b738b89e8085635f35749e1cd505c34acffef095f",
-        "bytes": 232240,
+        "sha256": "3fd25f1d9d85e845e4536929b6c4d067be2c497ec80233b25464c393ebeb008f",
+        "bytes": 232249,
         "width": 1800,
         "height": 480,
         "format": "png"
@@ -2181,16 +2208,16 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-offhand--p01--64-circle.png",
-        "sha256": "ae1f8e1dfad1686331788207dcb5ae0dd3441f18e827776b8b6eee8a45637af4",
-        "bytes": 94245,
+        "sha256": "0a48e4e101f6128df6511521159110e925678f5747b64fdcca7c6af8f2dea69b",
+        "bytes": 94242,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-offhand--p01--small-multiview.png",
-        "sha256": "b2f32d37141825a84e11bf0989edb4434dec566b4f4cc3ec2599af2d70ff5c7a",
-        "bytes": 165851,
+        "sha256": "9e0bc009b43236bd8a04de18ea0b127ac1e58c56045ff2845b7caba02424782a",
+        "bytes": 165849,
         "width": 1800,
         "height": 262,
         "format": "png"
@@ -2245,16 +2272,16 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-ring--p01--64-circle.png",
-        "sha256": "353f2796226e390ee9ea3354d8d9d4342626237e4f610842e4ba5aa800280b1d",
-        "bytes": 229450,
+        "sha256": "359ba1473b2eefefeaddc55eadf73f899fcb77a1f46a59442c59fc5da6c0d153",
+        "bytes": 229460,
         "width": 1600,
         "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-ring--p01--small-multiview.png",
-        "sha256": "8c42ceabe9b22062a8fc0a7ce59e922fc6b55777d206adb122b5cf4d211fd2a2",
-        "bytes": 410662,
+        "sha256": "d122546fa806a451692bc164f88e58773817ad1b13cdafce39de91216795f737",
+        "bytes": 410658,
         "width": 1800,
         "height": 698,
         "format": "png"
@@ -2309,16 +2336,16 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-shoulder--p01--64-circle.png",
-        "sha256": "8998808c2ae0f3ac8f86103c6896bbd0e22f76c8279177e92463886cfa2f8178",
-        "bytes": 814513,
+        "sha256": "75d8cd56cf403c626d0a7495983d3f3674be8e3f7c01e4438bac386c4fd309e9",
+        "bytes": 814475,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-shoulder--p01--small-multiview.png",
-        "sha256": "367583675167e5229d00dea37547fc89143255285b4d1b175afe780a9b001c16",
-        "bytes": 1445106,
+        "sha256": "0e5658e78ca660e191abd8989a025328773b8a5bb4a1ca3d62b59f0c04e82c40",
+        "bytes": 1445071,
         "width": 1800,
         "height": 1788,
         "format": "png"
@@ -2373,16 +2400,16 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-waist--p01--64-circle.png",
-        "sha256": "99a30f62be25b032ccc013ff674c3b8d3de28909dbfe318a9a2bc3f92884104e",
-        "bytes": 382571,
+        "sha256": "7b5c72749fff0ff7a0b764aaf552f23bdd9923a013b8bed24cc02a8219fbb23d",
+        "bytes": 382559,
         "width": 1600,
         "height": 708,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-waist--p01--small-multiview.png",
-        "sha256": "46abedb42d78f09f926a4327da277e7b36ee82ae62fc7766d003baf2a9496ff2",
-        "bytes": 684978,
+        "sha256": "2c959d3190fcb14a98a5cbe77417e5848dbb661bfccd5370b145d6a6846fd50c",
+        "bytes": 684966,
         "width": 1800,
         "height": 916,
         "format": "png"
@@ -2437,16 +2464,16 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--64-circle.png",
-        "sha256": "39eaeaac0afba4a9679b5b8e73461d6961da4b99dd30daf832db394a8fff9fc0",
-        "bytes": 137853,
+        "sha256": "b8ea239ee01c9764eb07dd35b782ccdbcb76f64be7f63890cb0bb324f8e11459",
+        "bytes": 137854,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--small-multiview.png",
-        "sha256": "71e5d5474a416238942554830cdb5dd860ca99e07a1fce6925437dd2ae817261",
-        "bytes": 247595,
+        "sha256": "0d8ae727897555cc1ea382e32152ad193d065c1b27c6db23dd3d53f7fb396d90",
+        "bytes": 247594,
         "width": 1800,
         "height": 480,
         "format": "png"
@@ -2501,16 +2528,16 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/drink--p01--64-circle.png",
-        "sha256": "476827107719ec3dfbf439bc4f17c332e3a73ce37d33ed74be62412f92f0ab8b",
-        "bytes": 97531,
+        "sha256": "f4ae7c8450ea8bbc29e39ae919efde7545ea8497d067517ac66612e1c71ff1b1",
+        "bytes": 97539,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/drink--p01--small-multiview.png",
-        "sha256": "ae2379d85281724d5611831d237a755aaf808b88060615e97fa05d5ecc0b3520",
-        "bytes": 181160,
+        "sha256": "a3539605e1d729b986e18d53be0b8172f1c3913fc0ce6373f08f65e5ddd65f89",
+        "bytes": 181151,
         "width": 1800,
         "height": 262,
         "format": "png"
@@ -2565,15 +2592,15 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/elixir--p01--64-circle.png",
-        "sha256": "7bf5eff343ae0e60c0bb74ea9c00a8415b735bd7fdc88a1b47250706865d0a08",
-        "bytes": 49768,
+        "sha256": "ddb1736eeca23cff1432faa330a94e18d684fde0c5f59c48f5f19cd8998e5306",
+        "bytes": 49769,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/elixir--p01--small-multiview.png",
-        "sha256": "85a6f40aea5c2cdd95a90978f9ae768cd76dcef328980c8d75bce5dbac4fa354",
+        "sha256": "b8f86d1f6ddc7fc6fc53eeeff2b89c500ee23aa7066f6fe935208fce2c9566c0",
         "bytes": 89703,
         "width": 1800,
         "height": 262,
@@ -2629,16 +2656,16 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/food--p01--64-circle.png",
-        "sha256": "1f249116f08463b342d27c77a24491e52cf2f4cc866cea52a8c0d0ead81799e0",
-        "bytes": 247076,
+        "sha256": "ad5e9655b233de0e7eb009c8df68e3b4c31f948d389e1bd36e4a5b274abe0ab3",
+        "bytes": 247058,
         "width": 1600,
         "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/food--p01--small-multiview.png",
-        "sha256": "657728c30e0236444ebe647f0b1bae2592645e9de81ac71b15ca8e34b0635418",
-        "bytes": 442148,
+        "sha256": "da5ae0608bb8862dbe09ffb86fb59dadbf9a082a26b4d2cbddbf155ee74f461a",
+        "bytes": 442144,
         "width": 1800,
         "height": 698,
         "format": "png"
@@ -2693,16 +2720,16 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/held_offhand--p01--64-circle.png",
-        "sha256": "b2dddb18ce6a2d05cf7f4ff2c7a7b73426f7cb464cfb27a47ac78589dba1848b",
-        "bytes": 111188,
+        "sha256": "c09178ff8ffd5177c95c6dc1d054f6e875fc630f7126387c2d2b5462fe29bfa5",
+        "bytes": 111195,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/held_offhand--p01--small-multiview.png",
-        "sha256": "422934a45e78f788256d2b99aff3cba616ffadcca7d9db797fc5f12b194536b8",
-        "bytes": 193986,
+        "sha256": "5b4a778b4d3d82ec6ed21a6bee433b4726b367e6e4e7b851e818f6c93f04959d",
+        "bytes": 193976,
         "width": 1800,
         "height": 480,
         "format": "png"
@@ -2757,16 +2784,16 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p01--64-circle.png",
-        "sha256": "b52837958900778e558485ce25c07d668175a789a5eadf721efe4d6163e7dcb3",
-        "bytes": 782110,
+        "sha256": "4b71b5830bac3d8c9e038328394c531372dd9fe1bc3560dac4d68cd61b895d0d",
+        "bytes": 782114,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p01--small-multiview.png",
-        "sha256": "ad88a3714e5b1ad16a62c502877bab4a016abe88cd54fdab830fb930b27546e9",
-        "bytes": 1442873,
+        "sha256": "8dd8d5308f192c0f091045f2a9cb67ddb11b2281962d5c92ccd89af444d46b24",
+        "bytes": 1442832,
         "width": 1800,
         "height": 1788,
         "format": "png"
@@ -2821,16 +2848,16 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p02--64-circle.png",
-        "sha256": "116cd3f039a0321daa9a2ad5c0080ce0ad91c645f33dba1aa560564e3b8bf416",
-        "bytes": 33221,
+        "sha256": "e09b17c746bd75aaa1f944ac1766468f65add3090d2c6ef5be45f8bb4c33ef71",
+        "bytes": 33212,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p02--small-multiview.png",
-        "sha256": "4456300896238596b732810a8572940cae021828d5e66b761d7126c1abed1ec3",
-        "bytes": 61909,
+        "sha256": "18fed9e03d5b53951d4b4e863cf36e63a4c2d5e23fa4649931a7d947da798fe2",
+        "bytes": 61897,
         "width": 1800,
         "height": 262,
         "format": "png"
@@ -2845,64 +2872,64 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--128-color.png",
-        "sha256": "918230c163486d681bb45d8bc8631d300fe3d1e03fba252a70373cf8d5cd8031",
-        "bytes": 434754,
+        "sha256": "d7ef91ce18c8a0cc00a458ab4f6ffa81d74c1f27b3708118b46c741a4802ed4b",
+        "bytes": 552811,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--40-color.png",
-        "sha256": "e5433d564185b985c7dfec2f8ac7b9533a2cc0dea454fd1e485d552e39d26348",
-        "bytes": 81294,
+        "sha256": "16211e41f72f72e02fcaa053dc5a70a55c862799270cafd4eb013b4678bc3ad8",
+        "bytes": 98920,
         "width": 1600,
         "height": 288,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--28-color.png",
-        "sha256": "f18b7f53a7420ae4f12333fea76fc794600b14cd084f7eef56623d5a5a4f25c9",
-        "bytes": 56648,
+        "sha256": "182c2d571745474a6c5e649b5c6d954c2a00e55b2e3db09e4117410485d93dd4",
+        "bytes": 67865,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--22-color.png",
-        "sha256": "404e0ced9ddaf848301eff9a68c42b0f51e0a8cb1d2742f50221686e7a0f01ff",
-        "bytes": 45077,
+        "sha256": "180479805668c2669014eccd6cd8ebaf2af104fe10c8379b64409d125b9ff62f",
+        "bytes": 53477,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--28-grayscale.png",
-        "sha256": "e3b26b7e9885e0e237701153a522e81b1f953497c945af287a1b4f1e7cfe996a",
-        "bytes": 43238,
+        "sha256": "c18c6188127a69e02c9ed675c4da4683cb1d5d2fb61e7e4bb928442eba44e2f1",
+        "bytes": 51631,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--64-circle.png",
-        "sha256": "7cc76e0e856c17ff19aaf408c263e74afdf0777c85b3ac6133d353663f3189ef",
-        "bytes": 135800,
+        "sha256": "38e4dbe35de63718e389feb09283c36b80518bbaee8f3db565566063ce5cf8b8",
+        "bytes": 167538,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--small-multiview.png",
-        "sha256": "b7ccdb7435ca975c6411fc58476aba83af1fc77c6f05986be961798bace7126e",
-        "bytes": 246572,
+        "sha256": "f0ee890f7d7858deeb6781db4fcdbba262e41986524a504e2cf0b1df4dfd4a97",
+        "bytes": 306301,
         "width": 1800,
         "height": 480,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--identity.png",
-        "sha256": "60e2d56c82eb038e571e5156c7042d3d2daf9a23b0cb2cdf814b67935c2aa12f",
-        "bytes": 457808,
+        "sha256": "f00aed39d46433fddda7066968b818898293c0e74457eea2bec812ea1735dd8c",
+        "bytes": 579744,
         "width": 1800,
         "height": 452,
         "format": "png"
@@ -2949,7 +2976,7 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/potion--p01--64-circle.png",
-        "sha256": "85a029469c6f6efd9153f1f85e154478dd1700bedb4d9d3f29db19b1bddbc250",
+        "sha256": "1644edaf116380813d6f0b5929b2505675103b3e6526102ce037718c0cbc6233",
         "bytes": 148332,
         "width": 1600,
         "height": 376,
@@ -2957,8 +2984,8 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/potion--p01--small-multiview.png",
-        "sha256": "b23303bee631e9faaf0f37ddd659990d11c7b26848726ecd43ed3fee9291d2cf",
-        "bytes": 267228,
+        "sha256": "b49bf1ce436e16473d429d864ca3b28d0c27f98d982bf1217c66c453a8951e87",
+        "bytes": 267225,
         "width": 1800,
         "height": 480,
         "format": "png"
@@ -3013,16 +3040,16 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p01--64-circle.png",
-        "sha256": "01cbb192971ada5cb252fc296bb35f3b6aea96fe814fccb0847c98ee8dd17b5f",
-        "bytes": 773769,
+        "sha256": "be29256eeaac8ab6820cde000dd7905f358b41ff469c80c415b6d6b519e5a996",
+        "bytes": 773729,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p01--small-multiview.png",
-        "sha256": "ca1f8178de176e9933279c30570c454df4ccb760a55518e0e78633eb2748c1d5",
-        "bytes": 1415974,
+        "sha256": "1bef34c2c34254ecc3a0c53f942ee98e68726fe28b2897b33c9a6fb3ee3b1df5",
+        "bytes": 1415968,
         "width": 1800,
         "height": 1788,
         "format": "png"
@@ -3077,16 +3104,16 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p02--64-circle.png",
-        "sha256": "61c04405303e55bb338034a96b8733096e7b6d28c9b1d561770a65ee1a6f5820",
-        "bytes": 219964,
+        "sha256": "03e3bc224b01092141c70c6350d83a7dbc0189dd420dea92ba6337f30a706b06",
+        "bytes": 219946,
         "width": 1600,
         "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p02--small-multiview.png",
-        "sha256": "5216cd1c9e488ca4174d2ce0c88569dc0debacf49c914d4d6593cd8a37d14069",
-        "bytes": 406045,
+        "sha256": "60ff1fcf62553ed9ff475943bf35db8f81d7e4a23217f9222958a20c72845419",
+        "bytes": 406033,
         "width": 1800,
         "height": 698,
         "format": "png"
@@ -3141,16 +3168,16 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/tool--p01--64-circle.png",
-        "sha256": "e9dc1c192b1827aa93555a35d3c4960524b0bb937d3e0ec76f907446d525346f",
-        "bytes": 598061,
+        "sha256": "515fcc069733e3e0ac2a56ebcef6d2480ea18259fe0aaf200e19fe215128fe38",
+        "bytes": 598030,
         "width": 1600,
         "height": 1040,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/tool--p01--small-multiview.png",
-        "sha256": "5d0208e255fdc98993f1174d8e072eecbe70acbd93c1cbdb0b80a410d603deaf",
-        "bytes": 1099940,
+        "sha256": "9ef6853946652ef40979aa9f02338e535231c83c2e5987458080c0446319dde1",
+        "bytes": 1099948,
         "width": 1800,
         "height": 1352,
         "format": "png"
@@ -3213,8 +3240,8 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/ui-backpack--p01--small-multiview.png",
-        "sha256": "798aa18a424e7d140c5300fbe19fb128f13754fa1c810f16c4c69d835d312f6f",
-        "bytes": 29832,
+        "sha256": "e039b5553e7600a304d5675a9ea8279da54cfb262c76de1a8973b9f440f455bc",
+        "bytes": 29830,
         "width": 1800,
         "height": 262,
         "format": "png"
@@ -3269,16 +3296,16 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p01--64-circle.png",
-        "sha256": "d811526b76fa10d0f3c1f4367ff3a6fc9e1b30498859c4a64b5158a710612ea2",
-        "bytes": 713109,
+        "sha256": "eedb00be07aabf036b927ffbf82a410292284bcfa460c78991af57dde34853b0",
+        "bytes": 713065,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p01--small-multiview.png",
-        "sha256": "22d85964253bb1660e1ddc66e8edf7bb8ec0ed85169b2a495f7fc55c44a4b002",
-        "bytes": 1364178,
+        "sha256": "4fcc4b1b89b35739ff0ac2f89dd12539db6d0ee8b4cc038152c0798a3bc5c03b",
+        "bytes": 1364170,
         "width": 1800,
         "height": 1788,
         "format": "png"
@@ -3333,16 +3360,16 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p02--64-circle.png",
-        "sha256": "ddfa20402c434a3cd93e4c85cdd6a1db88223189e339d9c251055a590c71a076",
-        "bytes": 432218,
+        "sha256": "358673441c2e4c26ce90a57e667434482220c51c71b86d44765e9c3b7369a717",
+        "bytes": 432214,
         "width": 1600,
         "height": 1040,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p02--small-multiview.png",
-        "sha256": "d9ece89cd1a1d8b3475b77118c4efcb5aabc9d790b53a6855642f396f0950528",
-        "bytes": 810745,
+        "sha256": "be9555a331a43e12c61235571f593785cd0461486c3278c70f42b64af0b4e9c9",
+        "bytes": 810777,
         "width": 1800,
         "height": 1352,
         "format": "png"
@@ -3356,6 +3383,6 @@
         "format": "png"
       }
     ],
-    "shippingCatalogSha256": "3c0120d25c3b7fb28a718192faf9b1e3c83fb569d8cc6dd535d63c78c3b68f0c"
+    "shippingCatalogSha256": "2195f18375e439dd4a0ebc05f0ce4e59bee0efc7dfb5de7ef8588cad775b28d6"
   }
 }

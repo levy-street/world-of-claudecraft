@@ -570,6 +570,9 @@ export const ko_KR: EnTranslations = {
       "tabsLabel": "WOC 상점 구역",
       "storeTab": "상점",
       "rewardsTab": "일일 보상",
+      "mountsEyebrow": "계정 탈것",
+      "mountsTitle": "기계 마구간",
+      "mountBuyAria": "{item} 구매",
       "loading": "WOC 상점 불러오는 중…",
       "error": "현재 WOC 상점을 이용할 수 없습니다. 잠시 후 다시 시도해 주세요.",
       "balance": "Claudium 잔액",
@@ -1392,6 +1395,9 @@ export const ko_KR: EnTranslations = {
       "name_rallycart_rxt": "랠리카트 RXT",
       "name_terrorspark_groundshaker": "대지를 뒤흔드는 테러스파크",
       "name_drakemaw_raptor": "화산구 랩터",
+      "name_mech_bird": "태엽 기계새",
+      "name_lanternback_troll": "등불지기 그룸볼",
+      "name_chimeglass_tortoise": "종유리의 톨리버",
       "name_rickshaw_mount": "뼈에 묶인 인력거",
       "desc_valorsteed": "여행 속도를 높여 주는 튼튼하고 발이 안정된 군마입니다.",
       "desc_grag_bear": "여행 속도를 높여 주는 튼튼하고 발이 안정된 곰입니다.",
@@ -1404,6 +1410,9 @@ export const ko_KR: EnTranslations = {
       "desc_rallycart_rxt": "작지만 본격적인 랠리 머신. 이동 속도를 높여준다.",
       "desc_terrorspark_groundshaker": "묵직한 궤도와 대구경 포, 겁 없는 조종사를 위한 안장을 갖춘 소형 장갑 기계입니다.",
       "desc_drakemaw_raptor": "화산구 칼데라에서 길들여진 둥지 태생 랩터. 온몸이 힘줄과 질주로 이루어졌으며, 아직도 희미한 재 냄새가 난다.",
+      "desc_mech_bird": "수제 태엽 전투 닭. 서보 관절을 튕기며 질주하고, 태엽 열쇠는 지금도 돌아가고 있다.",
+      "desc_lanternback_troll": "점등인들이 멍에로 길들인 언덕 트롤. 어깨에 무쇠 왕좌를 지고, 양쪽 팔걸이마다 폭풍 등불이 타오른다.",
+      "desc_chimeglass_tortoise": "소금 평원의 육지거북. 대상 세 세대를 앞질러 걸었다. 그를 거둔 땜장이들이 폭풍유리를 갈아 안경을 만들고 목에 청동 종을 달아, 길은 그를 보기 전에 먼저 듣는다.",
       "desc_rickshaw_mount": "덜컹거리는 뼈 수레입니다. 뼈만 앙상한 잡졸이 채에 매인 채 전속력으로 당신을 끌고 달립니다."
     },
     "mountTraining": {
@@ -3299,6 +3308,15 @@ export const ko_KR: EnTranslations = {
       "rosterTitle": "{guild}의 명단 보기",
       "back": "뒤로",
       "popupTitle": "길드 게시 기둥",
+      "close": "닫기"
+    },
+    "realmBuilder": {
+      "title": "이달의 왕국 건설자",
+      "currentLabel": "이달의 수상자",
+      "placeholderName": "당신의 이름",
+      "placeholderHint": "이 명판은 첫 번째 이름을 기다리고 있습니다.",
+      "pastTitle": "역대 수상자",
+      "pastEmpty": "아직 명단에 이름이 없습니다.",
       "close": "닫기"
     },
     "bank": {
@@ -13230,11 +13248,20 @@ export const ko_KR: EnTranslations = {
       "reins_rallycart_rxt": {
         "name": "랠리카트 RXT 시동 열쇠"
       },
+      "reins_lanternback_troll": {
+        "name": "점등인의 멍에: 그룸볼"
+      },
+      "reins_chimeglass_tortoise": {
+        "name": "길지기의 종끈: 톨리버"
+      },
       "reins_rickshaw_mount": {
         "name": "결속된 고삐: 뼈에 묶인 인력거"
       },
       "reins_drakemaw_raptor": {
         "name": "화산구 랩터의 고삐"
+      },
+      "reins_mech_bird": {
+        "name": "태엽 기계새 시동 열쇠"
       },
       "rimefang": {
         "name": "서리엄니"
@@ -19149,6 +19176,7 @@ export const ko_KR: EnTranslations = {
     "delveRiteShrineReedInteract": "갈대 제단: F를 눌러 만지기",
     "delveRiteShrineSkullInteract": "해골 제단: F를 눌러 만지기",
     "mailboxName": "우편함",
-    "noticeboardName": "게시판"
+    "noticeboardName": "게시판",
+    "realmBuilderMonumentName": "왕국 건설자 기념비"
   }
 };

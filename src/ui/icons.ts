@@ -5288,6 +5288,8 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'reins_stormfeather_griffin',
   'reins_thunderstrut_gobbler',
   'reins_terrorspark_groundshaker',
+  'reins_lanternback_troll',
+  'reins_chimeglass_tortoise',
   'reins_rickshaw_mount',
 ]);
 

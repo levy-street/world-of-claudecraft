@@ -570,6 +570,9 @@ export const ja_JP: EnTranslations = {
       "tabsLabel": "WOCストアのセクション",
       "storeTab": "ストア",
       "rewardsTab": "デイリー報酬",
+      "mountsEyebrow": "アカウント共有マウント",
+      "mountsTitle": "機械の厩舎",
+      "mountBuyAria": "{item}を購入",
       "loading": "WOCストアを読み込み中…",
       "error": "WOCストアは現在利用できません。しばらくしてからお試しください。",
       "balance": "Claudium残高",
@@ -1392,6 +1395,9 @@ export const ja_JP: EnTranslations = {
       "name_rallycart_rxt": "ラリーカートRXT",
       "name_terrorspark_groundshaker": "地揺らしのテラースパーク",
       "name_drakemaw_raptor": "火口のラプトル",
+      "name_mech_bird": "ゼンマイ・メカバード",
+      "name_lanternback_troll": "ランタンバックのグルンボル",
+      "name_chimeglass_tortoise": "鐘硝子のトリヴァー",
       "name_rickshaw_mount": "骨縛りの人力車",
       "desc_valorsteed": "頑健で足取り確かな駿馬。移動速度を高める。",
       "desc_grag_bear": "頑健で足取り確かな熊。移動速度を高める。",
@@ -1404,6 +1410,9 @@ export const ja_JP: EnTranslations = {
       "desc_rallycart_rxt": "小型ながら本格的なラリーマシン。移動速度を高めてくれる。",
       "desc_terrorspark_groundshaker": "重厚な履帯と大口径砲、恐れ知らずの操縦士向けの鞍を備えた小型装甲車両。",
       "desc_drakemaw_raptor": "火口のカルデラで鞍慣らしされた巣育ちのラプトル。筋肉と疾走のかたまりで、いまなお灰の匂いをかすかに漂わせている。",
+      "desc_mech_bird": "手作りのゼンマイ仕掛けの戦闘ニワトリ。サーボを軋ませて疾走し、ゼンマイのキーは今も回り続けている。",
+      "desc_lanternback_troll": "点灯人に軛で馴らされた丘トロル。肩に鉄の玉座を担ぎ、その両の肘掛けには嵐提灯が灯る。",
+      "desc_chimeglass_tortoise": "塩平原の陸亀。隊商三代を歩き通した。彼を引き取った鋳掛屋たちは嵐硝子を削って眼鏡を作り、喉元に青銅の鈴を吊るした。道は姿を見るより先に、その音を聞く。",
       "desc_rickshaw_mount": "がたがたと音を立てる骨の荷車。骨だらけの雑兵が轅に繋がれ、全力疾走であなたを引いていく。"
     },
     "mountTraining": {
@@ -3299,6 +3308,15 @@ export const ja_JP: EnTranslations = {
       "rosterTitle": "{guild}のメンバー一覧を見る",
       "back": "戻る",
       "popupTitle": "ギルドの掲示柱",
+      "close": "閉じる"
+    },
+    "realmBuilder": {
+      "title": "今月の王国建設者",
+      "currentLabel": "今月の受賞者",
+      "placeholderName": "あなたの名前",
+      "placeholderHint": "この銘板は最初の名前を待っています。",
+      "pastTitle": "これまでの受賞者",
+      "pastEmpty": "まだ名前が刻まれていません。",
       "close": "閉じる"
     },
     "bank": {
@@ -13230,11 +13248,20 @@ export const ja_JP: EnTranslations = {
       "reins_rallycart_rxt": {
         "name": "ラリーカートRXTの始動キー"
       },
+      "reins_lanternback_troll": {
+        "name": "点灯人の軛：グルンボル"
+      },
+      "reins_chimeglass_tortoise": {
+        "name": "道守の鈴帯：トリヴァー"
+      },
       "reins_rickshaw_mount": {
         "name": "縛りの手綱：骨縛りの人力車"
       },
       "reins_drakemaw_raptor": {
         "name": "火口のラプトルの手綱"
+      },
+      "reins_mech_bird": {
+        "name": "ゼンマイ・メカバードの始動キー"
       },
       "rimefang": {
         "name": "霜牙"
@@ -19149,6 +19176,7 @@ export const ja_JP: EnTranslations = {
     "delveRiteShrineReedInteract": "葦の祠：Fで触れる",
     "delveRiteShrineSkullInteract": "髑髏の祠：Fで触れる",
     "mailboxName": "メールボックス",
-    "noticeboardName": "掲示板"
+    "noticeboardName": "掲示板",
+    "realmBuilderMonumentName": "王国建設者の記念碑"
   }
 };

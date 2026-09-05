@@ -164,16 +164,22 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  it('keeps the release catalog, all 13 mount cues, and all 62 UI cues in one 285-key inventory', () => {
+  it('keeps the release catalog, all 34 mount cues, and all 62 UI cues in one 289-key inventory', () => {
     const keys = new Set(SFX.map((entry) => entry.key));
-    // 285 = the merged catalog: the release line (rickshaw summon/loop and the
-    // gendered player-voice keys included) plus this branch's sled and
-    // rallycart cues.
-    expect(keys.size).toBe(285);
+    // 289 = the release catalog plus the Mech Bird's four cues and this
+    // branch's Goblin Rocket Sled / Rallycart RXT engine, summon, and
+    // mount-specific jump/land cues.
+    expect(keys.size).toBe(289);
     expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(62);
     expect(keys.has('ui_craft_cast')).toBe(true);
     for (const key of [
       'cast_lightning_bolt',
+      // the Mech Bird, the store mount: the 1-2-1 gait beat plus the game's
+      // first standstill idle hum and mount-specific jump/land takes
+      'mount_run_mech_bird',
+      'mount_idle_mech_bird',
+      'mount_jump_mech_bird',
+      'mount_land_mech_bird',
       'mob_mudfin_attack',
       'mob_burrower_attack',
       'mob_reptile_attack',
@@ -247,7 +253,7 @@ describe('buildManifest', () => {
     // purely filesystem-discovered.
     const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
     expect(mobFamilyKeys).toHaveLength(65); // 13 families x 5 actions
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(285);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(289);
   });
 });
 

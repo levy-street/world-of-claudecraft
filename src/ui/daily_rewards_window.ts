@@ -34,7 +34,7 @@ import { hydratePortraits } from './portrait_chip';
 import { durableIntents, type PurchaseIntentLedger } from './purchase_intent_durability';
 import { mintIntentKey } from './purchase_intent_key';
 import { rovingTarget } from './roving_index';
-import { StoreArmoryPurchase } from './store_armory_purchase';
+import { bindStoreBodyActions } from './store_body_actions';
 import type { StoreDecisionPromptOptions } from './store_decision_prompt';
 import {
   planStoreFocus,
@@ -42,6 +42,7 @@ import {
   restoreStoreFocus,
   StoreFocusStash,
 } from './store_focus_policy';
+import { storeSpendControllers } from './store_spend_controllers';
 import { StoreSurfaceRuntime } from './store_surface_runtime';
 import { usdDollarsText } from './usd_text';
 import {
@@ -222,12 +223,12 @@ export class DailyRewardsWindow {
   // refuse while it is held.
   private readonly charterInFlight = new Set<string>();
   private readonly storeRuntime = new StoreSurfaceRuntime(() => this.deps.root());
-  private readonly armoryPurchases = new StoreArmoryPurchase({
+  private readonly storeSpend = storeSpendControllers({
     balance: () => this.storeBalance,
     setBalance: (balance) => (this.storeBalance = balance),
     captureSurface: () => this.storeRuntime.captureSurface(),
     surfaceIsCurrent: (generation) => this.storeSurfaceIsCurrent(generation),
-    spend: async (itemId, cost) => this.deps.spendStoreItem?.(itemId, 'skin', cost),
+    spend: async (itemId, kind, cost) => this.deps.spendStoreItem?.(itemId, kind, cost),
     showDecision: (options) => this.showStoreDecision(options),
     showNeedMore: (item, cost, balance, generation) =>
       this.openNeedMoreDialog(item, cost, balance, generation),
@@ -240,7 +241,7 @@ export class DailyRewardsWindow {
     },
     refreshStore: () => this.renderStore(null),
     rebuildAndPaint: () => this.paintArmoryState(true),
-    rowById: (itemId) => this.armoryRowById(itemId),
+    armoryRowById: (itemId) => this.armoryRowById(itemId),
     refreshInspector: (row) => this.armoryInspect?.refresh(row),
   });
   // The one-attempt focus stash; store_focus_policy.ts owns its lifetime rule.
@@ -537,6 +538,7 @@ export class DailyRewardsWindow {
       mainhandItemId: player.mainhandItemId,
       skinCatalog: player.skinCatalog,
     });
+    this.storeSpend.mounts.rebuild(this.storeBalance, this.storeItems, world.ownedMounts());
   }
 
   /** Live account-cosmetics change (another session's grant/apply, or a server
@@ -590,6 +592,7 @@ export class DailyRewardsWindow {
       `<div class="woc-store-hero"><div><span>${esc(t('hudChrome.wocStore.armoryEyebrow'))}</span><h2>${esc(t('hudChrome.wocStore.armoryTitle'))}</h2><p>${esc(t('hudChrome.wocStore.armoryBody'))}</p></div>` +
       `<div class="woc-store-balance"><img src="/claudium/icons/claudium_coin_64.webp" alt=""><span>${esc(t('hudChrome.wocStore.balance'))}</span><strong>${balance}</strong><button type="button" data-buy-claudium${focusKeyAttr('topup')}>${esc(t('hudChrome.wocStore.buyClaudium'))}</button></div></div>` +
       notice +
+      this.storeSpend.mounts.sectionHtml() +
       this.charterNoticeHtml() +
       armory +
       charters;
@@ -613,19 +616,14 @@ export class DailyRewardsWindow {
     // so this markup stays kilobytes rather than megabytes. Hydration assigns
     // the already-cached nine class portraits by DOM property after mounting.
     hydratePortraits(body);
-    body.querySelector<HTMLButtonElement>('[data-buy-claudium]')?.addEventListener('click', () => {
-      this.openClaudiumFromStore();
-    });
-    body.querySelectorAll<HTMLButtonElement>('[data-armory-skin]').forEach((button) => {
-      button.addEventListener('click', () => {
-        const row = this.armoryRowById(button.dataset.armorySkin ?? '');
+    bindStoreBodyActions(body, {
+      buyClaudium: () => this.openClaudiumFromStore(),
+      inspectArmorySkin: (skinId) => {
+        const row = this.armoryRowById(skinId);
         if (row) this.openArmoryInspect(row);
-      });
-    });
-    body.querySelectorAll<HTMLButtonElement>('[data-charter-buy]').forEach((button) => {
-      button.addEventListener('click', () => {
-        this.requestCharterPurchase(button.dataset.charterBuy ?? '');
-      });
+      },
+      buyStoreMount: (itemId) => this.storeSpend.mounts.request(itemId),
+      buyCharter: (itemId) => this.requestCharterPurchase(itemId),
     });
     restoreStoreFocus(body, plan, body.querySelector<HTMLElement>('[data-buy-claudium]'));
   }
@@ -736,7 +734,7 @@ export class DailyRewardsWindow {
             mainhandItemId: player.mainhandItemId,
           };
         },
-        requestBuy: (target) => this.armoryPurchases.request(target),
+        requestBuy: (target) => this.storeSpend.armory.request(target),
         applySkin: (skinId) => {
           this.deps.world().changeWeaponSkin(skinId);
           this.afterArmoryChange(skinId);
@@ -754,7 +752,7 @@ export class DailyRewardsWindow {
   /** Re-project + repaint after an optimistic apply/detach or a grant, keeping
    *  the open inspect panel's actions in step with the store grid. */
   private afterArmoryChange(skinId: string): void {
-    this.armoryPurchases.refreshAfterAppearanceChange(skinId);
+    this.storeSpend.armory.refreshAfterAppearanceChange(skinId);
   }
 
   private paintArmoryState(rebuild: boolean): void {

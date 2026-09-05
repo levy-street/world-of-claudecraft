@@ -376,6 +376,7 @@ import {
 } from './ratelimit';
 import { createPgRateLimitStore } from './ratelimit_db';
 import { isPublicCorsPath, publicOriginFromRequest, REALM, REALM_DIRECTORY } from './realm';
+import { publishRealmBuilderRoll } from './realm_builder';
 import { configureReliquaryRuntime } from './reliquary';
 import { reliquaryRarityCounts } from './reliquary_rarity_db';
 import { resolveReportTarget } from './report_target';
@@ -414,6 +415,7 @@ import {
   stopStoragePurchaseRecovery,
   storagePurchaseRecoveryMetrics,
 } from './storage_purchases';
+import { materializeStoreMountGrants } from './store_mount_grants';
 import { configureSuspicionFlagDataset, suspicionFlagsIdle } from './suspicion_flags';
 import { listSuspicionFlagDataset } from './suspicion_flags_db';
 import { passesTurnstile } from './turnstile';
@@ -3287,6 +3289,13 @@ configureStoragePurchaseRuntime(storagePurchaseHost);
 configureClaudiumRuntime({
   grantWeaponSkins: (accountId, skinIds) =>
     liveGame().grantWeaponSkinsToAccount(accountId, skinIds),
+  // Store-mount purchases materialize the soulbound reins item directly through
+  // the grant module (server/store_mount_grants.ts): GameServer needs no method
+  // of its own, keeping the monolith at its ratchet ceiling.
+  grantStoreMounts: (accountId, itemIds) => {
+    const game = liveGame();
+    materializeStoreMountGrants(game.clients.values(), game.sim, accountId, itemIds);
+  },
   storagePurchase: (input) => executeStoragePurchase(storagePurchaseHost(), input),
 });
 
@@ -3616,6 +3625,19 @@ export async function startServer(): Promise<http.Server> {
       : {};
   for (const error of game.applyAntibotConfig(antibotOverrides).errors) {
     console.warn(`bot-detector config override skipped: ${error}`);
+  }
+  // The Realm Builder of the Month roll: hand this realm's records to the sim
+  // before any player can inspect the monument, so the plaque never spends the
+  // first minutes of a boot naming the shipped placeholder. Every admin write
+  // re-publishes through the same call (server/realm_builder.ts).
+  //
+  // NON-FATAL on purpose. This is one cosmetic name on one statue; a transient
+  // read failure here must not cost the realm its boot. The sim keeps the
+  // shipped placeholder, and the first admin save republishes.
+  try {
+    await publishRealmBuilderRoll();
+  } catch (err) {
+    console.warn('realm builder roll not published at boot:', err);
   }
   const orphans = await closeOrphanSessions();
   if (orphans > 0) console.log(`closed ${orphans} orphaned play session(s) from a previous run`);

@@ -379,6 +379,11 @@ export const hudChromeStrings = {
     tabsLabel: 'WOC Store sections',
     storeTab: 'Store',
     rewardsTab: 'Daily Rewards',
+    // The store's Mounts strip (content/store_mounts.ts): account mounts sold
+    // for Claudium; the purchase grants the soulbound reins to every character.
+    mountsEyebrow: 'Account Mounts',
+    mountsTitle: 'Machine Stable',
+    mountBuyAria: 'Purchase {item}',
     loading: 'Loading WOC Store...',
     error: 'The WOC Store is unavailable right now. Please try again shortly.',
     balance: 'Claudium Balance',
@@ -1596,6 +1601,9 @@ export const hudChromeStrings = {
     name_rallycart_rxt: 'Rallycart RXT',
     name_terrorspark_groundshaker: 'Terrorspark Groundshaker',
     name_drakemaw_raptor: 'Drakemaw Raptor',
+    name_mech_bird: 'Cluckwork Mech Bird',
+    name_lanternback_troll: 'Grumbol the Lanternback',
+    name_chimeglass_tortoise: 'Tolliver the Chimeglass',
     name_rickshaw_mount: 'Bonebound Rickshaw',
     desc_valorsteed: 'A hardy, sure-footed steed that provides enhanced travel speed.',
     desc_grag_bear: 'A hardy, sure-footed bear that provides enhanced travel speed.',
@@ -1615,6 +1623,12 @@ export const hudChromeStrings = {
       'A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots.',
     desc_drakemaw_raptor:
       'A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash.',
+    desc_mech_bird:
+      'A hand-built clockwork war chicken that sprints on snapping servos, wind-up key still turning.',
+    desc_lanternback_troll:
+      'A hill troll broken to the yoke by lamplighters, carrying an iron throne across his shoulders with a storm lantern burning on either arm.',
+    desc_chimeglass_tortoise:
+      'A salt-flat tortoise who has outwalked three generations of caravans. Tinkers ground him spectacles from storm-glass and hung a bronze bell at his throat, so the road hears him long before it sees him.',
     desc_rickshaw_mount:
       'A rattling bone-cart with a bony grunt harnessed to the shafts, hauling you along at a dead run.',
   },
@@ -4382,6 +4396,23 @@ export const hudChromeStrings = {
     // (src/ui/noticeboard_popup.ts). Guild names and notes are world data,
     // spliced verbatim like player names, never translated.
     popupTitle: 'Guild Signpost',
+    close: 'Close',
+  },
+  // The Eastbrook Vale Realm Builder monument's honour roll
+  // (src/ui/realm_builder_popup.ts), opened by inspecting the statue. Honouree
+  // names are world data and splice verbatim like player names, never
+  // translated; only this chrome and the Intl-formatted month localize.
+  realmBuilder: {
+    title: 'Realm Builder of the Month',
+    currentLabel: 'Honoured this month',
+    // The unclaimed plate's stand-in name (src/sim/content/realm_builders.ts
+    // ships the English constant; every surface substitutes this key for it).
+    placeholderName: 'Your Name Here',
+    // Shown only while the plate still carries the unclaimed placeholder name,
+    // so nobody reads the placeholder as a real award.
+    placeholderHint: 'This plate is waiting for its first name.',
+    pastTitle: 'Past honourees',
+    pastEmpty: 'No names on the roll yet.',
     close: 'Close',
   },
   // The bank window (the Gilded Strongbox): a pooled deposit box shown while standing

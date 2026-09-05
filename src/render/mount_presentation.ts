@@ -23,7 +23,10 @@
 import type * as THREE from 'three';
 import type { AnimState, CharacterVisual } from './characters/visual';
 import { applyRocketSledAttitude } from './goblin_rocket_sled_fx';
+import { type MountGlows, updateMountGlows } from './mount_glow';
 import { applyMountJumpAttitude } from './mount_jump_attitude';
+import { seatRiderOnBone } from './mount_lifecycle';
+import { type MountLamps, updateMountLamps } from './mount_lamps';
 import { type MountVisualSpec, mountBobY } from './mount_visuals';
 import { spinMountWheels, updateRickshawPuller } from './rickshaw_mount';
 import { type ExhaustPhase, RALLYCART_EXHAUST_PORTS } from './vehicle_exhaust_core';
@@ -60,6 +63,9 @@ export interface MountPresentationHost {
   mountJumpPitch: number;
   mountWheels?: Parameters<typeof spinMountWheels>[0]['mountWheels'];
   mountPullerVisual: Parameters<typeof updateRickshawPuller>[0]['mountPullerVisual'];
+  mountLamps: MountLamps | null;
+  mountGlows: MountGlows | null;
+  mountSeatBone: THREE.Object3D | null;
   /** Turning on the spot, for the engine audio's pitch bend. Written here
    *  rather than in renderer.ts because the suspension rig is what knows it. */
   mountPivot: boolean;
@@ -171,6 +177,9 @@ export function updateMountPresentation(
         spec.seatFwd,
       );
     }
+    if (spec.seatBone) {
+      seatRiderOnBone(v.group, riderRoot, v.mountVisual.root, spec, v);
+    }
     // A wheeled mount reads the ground under each of its four wheels and
     // answers with body pitch/roll plus per-corner spring travel. The rig is
     // probed once per mount and cached as null for everything without
@@ -223,6 +232,8 @@ export function updateMountPresentation(
         dt,
       });
     }
+    if (v.mountLamps) updateMountLamps(v.mountLamps, input.time);
+    if (v.mountGlows) updateMountGlows(v.mountGlows, input.time);
     // Last: the puller is parented into the cart, so it reads the attitude
     // this pass just wrote rather than last frame's.
     updateRickshawPuller(v, dt, input.anim, input.animate, true);

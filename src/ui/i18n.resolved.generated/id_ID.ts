@@ -570,6 +570,9 @@ export const id_ID: EnTranslations = {
       "tabsLabel": "Bagian Toko WOC",
       "storeTab": "Toko",
       "rewardsTab": "Hadiah Harian",
+      "mountsEyebrow": "Account Mounts",
+      "mountsTitle": "Machine Stable",
+      "mountBuyAria": "Purchase {item}",
       "loading": "Memuat Toko WOC...",
       "error": "Toko WOC tidak tersedia saat ini. Silakan coba lagi sebentar lagi.",
       "balance": "Saldo Claudium",
@@ -1392,6 +1395,9 @@ export const id_ID: EnTranslations = {
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Percik Teror, Pengguncang Bumi",
       "name_drakemaw_raptor": "Raptor Drakemaw",
+      "name_mech_bird": "Cluckwork Mech Bird",
+      "name_lanternback_troll": "Grumbol the Lanternback",
+      "name_chimeglass_tortoise": "Tolliver the Chimeglass",
       "name_rickshaw_mount": "Becak Terikat Tulang",
       "desc_valorsteed": "Kuda tunggangan tangguh berpijakan mantap yang memberikan kecepatan perjalanan tambahan.",
       "desc_grag_bear": "Beruang tangguh berpijakan mantap yang memberikan kecepatan perjalanan tambahan.",
@@ -1404,6 +1410,9 @@ export const id_ID: EnTranslations = {
       "desc_rallycart_rxt": "Mesin reli mungil yang meningkatkan kecepatan perjalanan.",
       "desc_terrorspark_groundshaker": "Mesin lapis baja ringkas dengan rantai roda berat, meriam berkaliber besar, dan pelana yang dibuat untuk pilot tanpa rasa takut.",
       "desc_drakemaw_raptor": "Seekor raptor sarang dari Kaldera Drakemaw yang telah dijinakkan untuk ditunggangi, seluruhnya otot dan kecepatan, masih samar berbau abu.",
+      "desc_mech_bird": "A hand-built clockwork war chicken that sprints on snapping servos, wind-up key still turning.",
+      "desc_lanternback_troll": "A hill troll broken to the yoke by lamplighters, carrying an iron throne across his shoulders with a storm lantern burning on either arm.",
+      "desc_chimeglass_tortoise": "A salt-flat tortoise who has outwalked three generations of caravans. Tinkers ground him spectacles from storm-glass and hung a bronze bell at his throat, so the road hears him long before it sees him.",
       "desc_rickshaw_mount": "Gerobak tulang yang berderak, dengan serdadu kurus bertulang diikat pada porosnya, menarikmu melaju kencang."
     },
     "mountTraining": {
@@ -3300,6 +3309,15 @@ export const id_ID: EnTranslations = {
       "back": "Kembali",
       "popupTitle": "Papan Petunjuk Guild",
       "close": "Tutup"
+    },
+    "realmBuilder": {
+      "title": "Realm Builder of the Month",
+      "currentLabel": "Honoured this month",
+      "placeholderName": "Your Name Here",
+      "placeholderHint": "This plate is waiting for its first name.",
+      "pastTitle": "Past honourees",
+      "pastEmpty": "No names on the roll yet.",
+      "close": "Close"
     },
     "bank": {
       "title": "Bank",
@@ -13230,11 +13248,20 @@ export const id_ID: EnTranslations = {
       "reins_rallycart_rxt": {
         "name": "Kunci kontak: Rallycart RXT"
       },
+      "reins_lanternback_troll": {
+        "name": "Kuk Penyala Lentera: Grumbol"
+      },
+      "reins_chimeglass_tortoise": {
+        "name": "Roadwarden's Bellstrap: Tolliver"
+      },
       "reins_rickshaw_mount": {
         "name": "Kendali Terikat: Becak Terikat Tulang"
       },
       "reins_drakemaw_raptor": {
         "name": "Tali Kekang Raptor Drakemaw"
+      },
+      "reins_mech_bird": {
+        "name": "Ignition Key: Cluckwork Mech Bird"
       },
       "rimefang": {
         "name": "Taring Beku"
@@ -19149,6 +19176,7 @@ export const id_ID: EnTranslations = {
     "delveRiteShrineReedInteract": "Altar Buluh: Tekan F untuk menyentuhnya",
     "delveRiteShrineSkullInteract": "Altar Tengkorak: Tekan F untuk menyentuhnya",
     "mailboxName": "Kotak Surat",
-    "noticeboardName": "Papan Pengumuman"
+    "noticeboardName": "Papan Pengumuman",
+    "realmBuilderMonumentName": "Realm Builder Monument"
   }
 };

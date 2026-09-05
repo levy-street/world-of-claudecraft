@@ -121,6 +121,10 @@ const REGISTRY_ONLY_PATHS = new Set<string>([
   '/api/epic/status',
   '/api/ota/updates',
   '/api/seeker/entitlement',
+  // The Realm Builder of the Month roll the Eastbrook Vale monument reads
+  // (server/realm_builder.ts): registry-only on the same terms as the deeds
+  // family.
+  '/api/realm-builder',
   // The $WOC Exchange family (server/woc_market_routes.ts): a brand-new,
   // config-gated /api/woc-market/* prefix with no legacy ladder twin.
   '/api/woc-market/status',
@@ -354,6 +358,9 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     // The Thornhollow Fields ladder (server/battleground.ts): registry-only like the
     // deeds family, per the same new-route rule.
     { method: 'GET', path: '/api/battleground/leaderboard' },
+    // The Realm Builder of the Month roll (server/realm_builder.ts):
+    // registry-only like the deeds family, per the same new-route rule.
+    { method: 'GET', path: '/api/realm-builder' },
     // The Steam link trio (server/steam/routes.ts): registry-only like the
     // deeds pair, env-gated dark until STEAM_ENABLED=1.
     { method: 'POST', path: '/api/steam/link' },

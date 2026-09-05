@@ -133,6 +133,9 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/ignivar_model_vfx.ts': 1,
   'src/render/pbr_fragment_shader.ts': 1,
   'src/render/post_output_grade.ts': 1,
+  // the monument's beam falloff, lantern-halo core and ember climb/core
+  // (bases clamped with clamp(x, 0, 1) or max(x, 0))
+  'src/render/realm_builder_monument_fx.ts': 5,
   'src/render/sky.ts': 1,
   'src/render/water.ts': 1,
   'src/render/weapon_vfx.ts': 4,

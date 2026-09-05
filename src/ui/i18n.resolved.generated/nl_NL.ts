@@ -570,6 +570,9 @@ export const nl_NL: EnTranslations = {
       "tabsLabel": "Onderdelen van de WOC-winkel",
       "storeTab": "Winkel",
       "rewardsTab": "Dagelijkse beloningen",
+      "mountsEyebrow": "Account Mounts",
+      "mountsTitle": "Machine Stable",
+      "mountBuyAria": "Purchase {item}",
       "loading": "WOC-winkel laden...",
       "error": "De WOC Store is momenteel niet beschikbaar. Probeer het binnenkort opnieuw.",
       "balance": "Claudium-saldo",
@@ -1392,6 +1395,9 @@ export const nl_NL: EnTranslations = {
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Schrikvonk, de Grondschudder",
       "name_drakemaw_raptor": "Drakenmuil-Raptor",
+      "name_mech_bird": "Cluckwork Mech Bird",
+      "name_lanternback_troll": "Grumbol the Lanternback",
+      "name_chimeglass_tortoise": "Tolliver the Chimeglass",
       "name_rickshaw_mount": "Beengebonden Riksja",
       "desc_valorsteed": "Een sterk, standvastig strijdros dat extra reissnelheid geeft.",
       "desc_grag_bear": "Een sterke, standvastige beer die extra reissnelheid geeft.",
@@ -1404,6 +1410,9 @@ export const nl_NL: EnTranslations = {
       "desc_rallycart_rxt": "Een compacte rallymachine die de reissnelheid verhoogt.",
       "desc_terrorspark_groundshaker": "Een compacte gepantserde machine met zware rupsbanden, een grootkaliberkanon en een zadel gebouwd voor onverschrokken piloten.",
       "desc_drakemaw_raptor": "Een zadelmakke broedraptor uit de Drakenmuil-Caldera, één en al pezen en vaart, nog altijd zwak naar as geurend.",
+      "desc_mech_bird": "A hand-built clockwork war chicken that sprints on snapping servos, wind-up key still turning.",
+      "desc_lanternback_troll": "A hill troll broken to the yoke by lamplighters, carrying an iron throne across his shoulders with a storm lantern burning on either arm.",
+      "desc_chimeglass_tortoise": "A salt-flat tortoise who has outwalked three generations of caravans. Tinkers ground him spectacles from storm-glass and hung a bronze bell at his throat, so the road hears him long before it sees him.",
       "desc_rickshaw_mount": "Een ratelende bottenkar met een benige handlanger aan de disselbomen, die je in volle vaart voortsleurt."
     },
     "mountTraining": {
@@ -3300,6 +3309,15 @@ export const nl_NL: EnTranslations = {
       "back": "Terug",
       "popupTitle": "Gildebord",
       "close": "Sluiten"
+    },
+    "realmBuilder": {
+      "title": "Realm Builder of the Month",
+      "currentLabel": "Honoured this month",
+      "placeholderName": "Your Name Here",
+      "placeholderHint": "This plate is waiting for its first name.",
+      "pastTitle": "Past honourees",
+      "pastEmpty": "No names on the roll yet.",
+      "close": "Close"
     },
     "bank": {
       "title": "Bank",
@@ -13230,11 +13248,20 @@ export const nl_NL: EnTranslations = {
       "reins_rallycart_rxt": {
         "name": "Contactsleutel: Rallycart RXT"
       },
+      "reins_lanternback_troll": {
+        "name": "Juk van de lantaarnopsteker: Grumbol"
+      },
+      "reins_chimeglass_tortoise": {
+        "name": "Roadwarden's Bellstrap: Tolliver"
+      },
       "reins_rickshaw_mount": {
         "name": "Gebonden teugels: Beengebonden Riksja"
       },
       "reins_drakemaw_raptor": {
         "name": "Teugels van de Drakenmuil-Raptor"
+      },
+      "reins_mech_bird": {
+        "name": "Ignition Key: Cluckwork Mech Bird"
       },
       "rimefang": {
         "name": "Rijptand"
@@ -19149,6 +19176,7 @@ export const nl_NL: EnTranslations = {
     "delveRiteShrineReedInteract": "Rietschrijn: druk op F om het aan te raken",
     "delveRiteShrineSkullInteract": "Schedelschrijn: druk op F om het aan te raken",
     "mailboxName": "Brievenbus",
-    "noticeboardName": "Mededelingenbord"
+    "noticeboardName": "Mededelingenbord",
+    "realmBuilderMonumentName": "Realm Builder Monument"
   }
 };

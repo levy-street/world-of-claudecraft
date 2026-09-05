@@ -145,7 +145,6 @@ import {
   type CharacterVisual,
   composedLookPiecesOf,
   createCharacterVisual,
-  createMountVisual,
   type FarBakeGate,
   lookPiecesStats,
   modularLookFor,
@@ -168,10 +167,8 @@ import {
   characterResidencySources,
   isWeaponSkinModelUrl,
   mechAssetsReady,
-  mountAssetsReady,
   onCharacterAssetReady,
   preloadMechAssets,
-  preloadMountAssets,
   preloadTrainingDummyAssets,
   trainingDummyAssetsReady,
 } from './characters/assets';
@@ -420,13 +417,22 @@ import { collectObjectTextures } from './material_texture_slots';
 import { buildMobNightGlow, type MobNightGlowView } from './mob_night_glow';
 import { buildMotes, type MotesView } from './motes';
 import { MountBeacon } from './mount_beacon';
+import { type MountGlows } from './mount_glow';
+import { type MountLamps } from './mount_lamps';
+import {
+  disposeMountView,
+  type MountViewHost,
+  placeRider,
+  syncMountTransitionFx,
+  syncMountVisual,
+} from './mount_lifecycle';
 import { updateMountPresentation } from './mount_presentation';
 import {
   mountPrewarmKeys,
   stageMountPrewarmVisual,
   stageResidentMountPrewarmVisual,
 } from './mount_prewarm';
-import { releaseMountFx, releaseMountVisual } from './mount_visual_lifecycle';
+import { releaseMountFx } from './mount_visual_lifecycle';
 import { mountVisualSpec } from './mount_visuals';
 import { NameplatePainter } from './nameplate_painter';
 import {
@@ -579,6 +585,7 @@ import {
   syncRaidEncounterRigVisuals,
 } from './raid_encounter_visuals';
 import { isOwnedPetHostile } from './reaction';
+import { buildRealmBuilderMonumentPickBody } from './realm_builder_monument_fx';
 import { buildRealmFlora, type RealmFloraView } from './realm_flora';
 import {
   RenderBudgetGovernor,
@@ -617,11 +624,7 @@ import { createRevealCompileHost, REVEAL_GATE_PREP_KIND } from './reveal_compile
 import { createRevealGate } from './reveal_gate';
 import type { RevealGateCore } from './reveal_gate_core';
 import {
-  attachPullerIfRickshaw,
-  preloadPullerIfRickshaw,
   type RickshawMountViewState,
-  releaseRickshawMountState,
-  rickshawMountBuildReady,
   updateRollingMountLoop,
 } from './rickshaw_mount';
 import { collectRiftAmbientSources } from './rift_ambience';
@@ -684,6 +687,7 @@ import { buildStationProps } from './stations';
 import { shouldRenderStealthGhost } from './stealth';
 import { createStepSmooth, type StepSmoothState, stepSmoothHeight } from './step_smooth_core';
 import { buildStreetlamps, type StreetlampsView } from './streetlamps';
+import { strideHit } from './stride_audio_core';
 import { buildFlaredConeFan, buildRingXZ, drapeConeWorld } from './target_cone_debug';
 import {
   syncTemporalHourglassVisual,
@@ -1098,6 +1102,9 @@ export interface EntityView extends RickshawMountViewState {
   mountVisual: CharacterVisual | null; // rideable mount under a player, built lazily
   mountVisualKey: string; // '' = none; diffed each frame for live mount swaps
   goblinRocketSledFx: GoblinRocketSledFx | null;
+  mountLamps: MountLamps | null; // point lights the mount carries on its own bones
+  mountGlows: MountGlows | null; // additive halos the mount carries on its own bones
+  mountSeatBone: THREE.Object3D | null; // resolved seat bone the rider anchors to
   /** world-unit rider saddle lift while mounted (0 dismounted); the nameplate,
    *  chat-bubble, and sloppy-pick overhead anchors add it (scaled by e.scale) */
   mountLift: number;
@@ -1690,6 +1697,11 @@ export class Renderer {
   /** The foliage bucket reveal gate (armed at world entry, like the bands). */
   private foliageRevealGate: RevealGateCore | null = null;
   private eastbrookTownView!: EastbrookTownView;
+
+  /** Re-bake the monument's projected name (src/game/realm_builder_boot.ts). */
+  setRealmBuilderHonouree(name: string): void {
+    this.eastbrookTownView?.setRealmBuilderHonouree(name);
+  }
   private fenbridgeTownView!: FenbridgeTownView;
   private hollowGates!: HollowGatesView;
   private lightRank: RankedPointLight[] = [];
@@ -8266,6 +8278,12 @@ export class Renderer {
       body = built.group;
       height = built.height;
       objectMesh = body;
+    } else if (e.kind === 'object' && e.templateId === 'realm_builder_monument') {
+      // Art lives in the town view: this entity is a pick volume only.
+      const built = buildRealmBuilderMonumentPickBody();
+      body = built.group;
+      height = built.height;
+      objectMesh = body;
     } else if (e.kind === 'object' && e.objectItemId === 'soulwell') {
       // Temporary Warlock party utility: bespoke procedural prop today, kept
       // behind buildSoulwell so a generated GLB can replace it later.
@@ -8480,6 +8498,9 @@ export class Renderer {
       mountVisual: null,
       mountVisualKey: '',
       goblinRocketSledFx: null,
+      mountLamps: null,
+      mountGlows: null,
+      mountSeatBone: null,
       mountPullerVisual: null,
       mountLift: 0,
       mountJumpPitch: 0,
@@ -8903,6 +8924,12 @@ export class Renderer {
       if (view) this.applyWeaponSkin(view, entry.skinId, kind);
     }
   }
+
+  private readonly mountHost: MountViewHost = {
+    reconcileViewLights: (v) => this.reconcileViewLights(v as EntityView),
+    gateSwapFlagOnCompile: (root, done) => this.gateSwapFlagOnCompile(root, done),
+    recordBuild: (ms, startedAt) => this.buildLedger.record('view:mount', ms, startedAt),
+  };
 
   private reconcileViewLights(v: EntityView): void {
     const reconciled = reconcileViewPointLights(v.group, v.viewLights, this.viewLights);
@@ -9997,9 +10024,8 @@ export class Renderer {
       v.bearVisual?.dispose();
       v.catVisual?.dispose();
       v.travelVisual?.dispose();
-      v.mountVisual?.dispose();
+      disposeMountView(v);
       v.metamorphVisual?.dispose();
-      releaseRickshawMountState(v, true);
       v.fireballTravelVisual?.dispose();
     } else {
       if (!terminal && v.objectPoolKey && v.objectMesh instanceof THREE.Group) {
@@ -10879,9 +10905,15 @@ export class Renderer {
       v.visual.setFerocityStage(petFrenzy ? 3 : ferocityStage);
       v.visual.setPresentationScale(hunterPetVisualScale(ferocityStage, petFrenzy));
 
-      // The live sheathe toggle (Z key) is diffed further down, folded into
-      // the swim/mount stow overlay. Do NOT re-add a second diff here:
-      // `v.weaponStowed` takes exactly one writer (weaponStowedOverlay).
+      // The live sheathe toggle (Z key) is diffed further down, folded into the
+      // swim/mount stow overlay: ONE writer for `v.weaponStowed`. Two diffs
+      // against the same field fight, because they compute different targets:
+      // this one the bare sim bit, the other the union with swimming/riding. A
+      // swimmer with a weapon drawn had them ping-pong the field every frame,
+      // replaying the sheathe one-shot forever (for a player rig that clip is
+      // 1H_Melee_Attack_Chop), which pins `currentIsOneShot` true and so
+      // suppresses every base-state fade: the authored strokes never played and
+      // the body froze in the chop's windup.
 
       // lazy form visuals, swapped by visibility like the old sheep/bear rigs
       // (build, compile gate and encounter prewarm all live in buildFormVisual)
@@ -10916,33 +10948,20 @@ export class Renderer {
       // is untouched either way).
       const mountSpec = e.kind === 'player' && e.mountKey ? mountVisualSpec(e.mountKey) : null;
       const mountShown = !!mountSpec && requestedForm === 'base' && !e.dead;
-      if (mountSpec && v.mountVisualKey !== mountSpec.visualKey) {
-        releaseMountVisual(v);
-        if (rickshawMountBuildReady(mountSpec.visualKey, mountAssetsReady(mountSpec.visualKey))) {
-          const mountStarted = performance.now();
-          v.mountVisual = createMountVisual(mountSpec.visualKey);
-          this.buildLedger.record('view:mount', performance.now() - mountStarted, mountStarted);
-          v.group.add(v.mountVisual.root); // group.scale already carries e.scale
-          v.mountVisualKey = mountSpec.visualKey;
-          if (mountSpec.visualKey === 'mount_goblin_rocket_sled') {
-            v.goblinRocketSledFx = GoblinRocketSledFx.create(v.mountVisual.root);
-          }
-          attachPullerIfRickshaw(v, mountSpec.visualKey, v.mountVisual.root);
-          // A newly summoned mount is exactly a brand-new rig's materials
-          // linking for the first time; gate it like a gear swap instead of
-          // freezing the frame the mount lands on (#2571).
-          v.mountCompilePending = true;
-          this.gateSwapFlagOnCompile(v.mountVisual.root, () => {
-            v.mountCompilePending = false;
-          });
-        } else {
-          void preloadMountAssets(mountSpec.visualKey).catch((err) =>
-            console.error('Failed to preload mount model:', err),
-          );
-          preloadPullerIfRickshaw(mountSpec.visualKey);
-        }
-      } else if (!mountSpec && v.mountVisual) {
-        releaseMountVisual(v);
+      const targetMountVisualKey = mountSpec?.visualKey ?? '';
+      if (v.mountVisualKey !== targetMountVisualKey) {
+        releaseMountFx(v);
+        v.mountSuspension = undefined;
+        v.mountExhaust = null;
+        v.mountPivot = false;
+      }
+      syncMountVisual(v, mountSpec, this.mountHost);
+      if (
+        v.mountVisual &&
+        v.mountVisualKey === 'mount_goblin_rocket_sled' &&
+        !v.goblinRocketSledFx
+      ) {
+        v.goblinRocketSledFx = GoblinRocketSledFx.create(v.mountVisual.root);
       }
       if (v.mountVisual) v.mountVisual.root.visible = mountShown && !v.mountCompilePending;
       v.mountLift = mountShown && v.mountVisual ? mountSpec.seat : 0;
@@ -10991,8 +11010,17 @@ export class Renderer {
       // the seat height while mounted; 0 whenever the mount is absent/hidden.
       // seatFwd slides the rider along facing onto saddles that sit off the
       // model origin (the toad's is well back toward the tail).
-      v.visual.root.position.y = v.mountLift;
-      v.visual.root.position.z = v.mountLift > 0 && mountSpec ? mountSpec.seatFwd : 0;
+      // A mount with a straddle spec re-poses the rider's legs around its
+      // barrel (characters/visual.ts setRidePose). The seated loop stays the
+      // base underneath: it is what carries his hips down onto the saddle, and
+      // every seat offset in this file was fitted against it.
+      v.visual.setRidePose(mountShown && mountSpec ? mountSpec.ride : null);
+      // The presented mount block below re-derives the whole rider transform
+      // after the mixer advances (attitude, bob, seat bone), so the seat is
+      // solved here only when that block will not run this frame.
+      if (!(runCharacterPresentation && mountShown && v.mountVisual)) {
+        placeRider(v, v.visual.root, mountSpec, v.mountLift, 0);
+      }
       // Dismounted: relax the tip, or the rider keeps the cart's last attitude.
       if (!mountShown) {
         v.mountJumpPitch = 0;
@@ -11280,7 +11308,7 @@ export class Renderer {
         const rocketSledMounted = logicallyMounted && e.mountKey === 'goblin_rocket_sled';
         // jump / land / water-entry edges
         if (airborne && !v.wasAirborne && !visuallyDead) {
-          if (!rocketSledMounted) sink.movement('jump', ax, ay, az, isSelf, e.mountKey);
+          if (!rocketSledMounted) sink.movement('jump', ax, ay, az, isSelf, e.mountKey || undefined);
         } else if (!airborne && v.wasAirborne && !visuallyDead) {
           // A flight that ends by catching a ledge is not a fall, and the
           // heavy landing thud on one reads as a bug: you hopped onto a rock
@@ -11290,7 +11318,7 @@ export class Renderer {
           // carry the landing instead.
           if (rocketSledMounted) {
           } else if (v.fallSpeed >= SOFT_LANDING_SPEED) {
-            sink.movement('land', ax, ay, az, isSelf, e.mountKey);
+            sink.movement('land', ax, ay, az, isSelf, e.mountKey || undefined);
           } else {
             sink.footstep(ax, ay, az, this.surfaceAt(ax, az, ay), false, isSelf);
           }
@@ -11308,25 +11336,20 @@ export class Renderer {
         // footfalls / swim strokes via a distance accumulator (no timers)
         if (visuallyDead || (st.sitting && !riderMounted)) {
           v.stepAccum = 0;
+          sink.mountEngineReset(e.id); // a dead rider must not hold a frozen engine/idle loop
         } else if (swimming) {
-          v.stepAccum += loco.speed * dt;
-          if (v.stepAccum >= SWIM_STRIDE) {
-            v.stepAccum = 0;
-            sink.movement('swim', ax, ay, az, isSelf);
-          }
+          if (strideHit(v, loco.speed, dt, SWIM_STRIDE)) sink.movement('swim', ax, ay, az, isSelf);
         } else if (logicallyMounted && moving && !airborne) {
           // An engine mount (windup/loop/winddown take set, e.g. the tank
           // mount) drives its own state machine every frame instead of the
           // per-stride gait beat below; mountEngine reports whether this
           // mountKey actually has one, so ordinary mounts fall through.
+          sink.mountIdle(ax, ay, az, e.mountKey, false, e.id); // moving: hum off
           if (sink.mountEngine(ax, ay, az, e.mountKey, true, e.id, st.backwards, false)) {
             // handled entirely by mountEngine
           } else if (loco.speed >= FOOT_RUN_SPEED) {
-            v.stepAccum += loco.speed * dt;
-            if (v.stepAccum >= MOUNT_STRIDE_RUN) {
-              v.stepAccum = 0;
-              sink.mountRun(ax, ay, az, e.mountKey, isSelf);
-            }
+            if (strideHit(v, loco.speed, dt, MOUNT_STRIDE_RUN))
+              sink.mountRun(ax, ay, az, e.mountKey, this.surfaceAt(ax, az, ay), isSelf);
           } else {
             v.stepAccum = MOUNT_STRIDE_RUN * 0.6;
           }
@@ -11336,27 +11359,18 @@ export class Renderer {
           // whole winddown/windup cycle. Two poll anyway, being never quiet:
           // the sled, and any mount idling a loop.
           if (rocketSledMounted || sink.mountEngineIdles(e.mountKey)) {
-            sink.mountEngine(ax, ay, az, e.mountKey, moving, e.id, st.backwards, true);
+            sink.mountEngine(ax, ay, az, e.mountKey, moving, e.id, st.backwards, true, v.mountPivot);
           }
         } else if (logicallyMounted && !visuallyDead && !(st.sitting && !riderMounted)) {
           // Not moving while mounted (grounded and stopped): still poll an
           // engine mount every frame so the winddown fires on the stop edge;
           // a non-engine mount has nothing to do here (mountEngine no-ops).
           sink.mountEngine(ax, ay, az, e.mountKey, false, e.id, false, false, v.mountPivot);
+          sink.mountIdle(ax, ay, az, e.mountKey, true, e.id); // stopped: hum on
         } else if (moving && !airborne) {
-          v.stepAccum += loco.speed * dt;
-          const stride = loco.speed >= FOOT_RUN_SPEED ? FOOT_STRIDE_RUN : FOOT_STRIDE_WALK;
-          if (v.stepAccum >= stride) {
-            v.stepAccum = 0;
-            sink.footstep(
-              ax,
-              ay,
-              az,
-              this.surfaceAt(ax, az, ay),
-              loco.speed >= FOOT_RUN_SPEED,
-              isSelf,
-            );
-          }
+          const running = loco.speed >= FOOT_RUN_SPEED;
+          if (strideHit(v, loco.speed, dt, running ? FOOT_STRIDE_RUN : FOOT_STRIDE_WALK))
+            sink.footstep(ax, ay, az, this.surfaceAt(ax, az, ay), running, isSelf);
         } else {
           // standing still, prime the accumulator so the first step after moving
           // lands promptly rather than after a full stride of travel.
@@ -11633,66 +11647,21 @@ export class Renderer {
         }
       }
 
-      // Mount summon/dismount transition FX (render-only; the wire fields carry
-      // the state to every client, so no SimEvent is needed). The rider throws up
-      // a call pose the instant a summon begins, and a yellow-orange shimmer rings
-      // them when the mount actually appears, swaps, or clears.
       if (e.kind === 'player') {
-        const mountCasting = e.mountCastRemaining > 0;
-        // idle -> summoning edge (mountCastKey set): play the arm-raise call pose
-        // for ~the transition window. A dismount (mountCastKey === '') gets no
-        // pose; its effect is the completion glow below. Gated like the emote path
-        // (the sim roots the player, so moving/airborne is unlikely regardless).
-        if (
-          mountCasting &&
-          !v.wasMountCasting &&
-          e.mountCastKey !== '' &&
-          !visuallyDead &&
-          !swimming &&
-          runCharacterPresentation
-        ) {
-          active.playCallPose(e.mountCastRemaining);
-          // The 1.5s channel is the window that covers the fetch and decode, so
-          // the take is ready by the time the mount actually appears.
-          sink?.preloadMountSummon(e.mountCastKey);
-        }
-        v.wasMountCasting = mountCasting;
-        // mountKey change = summon completed, dismount completed, or a live
-        // swap: shimmer always, the mount's own call only on an APPEARANCE.
-        // Tracked separately from mountVisualKey, which lags asset loading.
-        if (e.mountKey !== v.lastMountKey) {
-          v.lastMountKey = e.mountKey;
-          if (runCharacterPresentation) this.vfx.mountSummonGlow(e.id);
-          // The mount's own call, on the same edge as the glow but only when a
-          // mount actually APPEARED: e.mountKey === '' is a dismount, which
-          // keeps the glow and gets no call. A live swap is a genuine
-          // appearance and does play the new mount's call. lastMountKey is
-          // seeded from the entity's current state at view creation, so a rider
-          // already mounted when they enter interest range (or at login) never
-          // reaches this edge and stays silent.
-          // A mountKey change (dismount, a live mount swap, or a fresh summon
-          // reusing this entity id) must drop any engine mount's windup/loop
-          // state; otherwise the old loop node stays connected forever once
-          // logicallyMounted goes false (the entity/view-removal reset at
-          // removeView() never fires for a live swap or dismount), and a swap
-          // would carry the old moving state into the new mount, skipping its
-          // windup. Runs BEFORE the summon, which ARMS the idle gate it clears.
-          this.audioSink?.mountEngineReset(e.id);
-          // Same edge as the glow, minus dismounts: a mountKey going empty is a
-          // put-away, not an appearance. This branch's call carries the entity
-          // id as well, which the sled's does not: the cart gates its parked
-          // idle loop on the summon take finishing, and that gate is per entity.
-          if (e.mountKey !== '') {
-            sink?.mountSummon(ax, ay, az, e.mountKey, e.id === this.sim.playerId, e.id);
-          }
-          // Warm the new mount's engine clips right away (not e.g. lazily on
-          // the first movement frame): a cold first ride otherwise plays the
-          // windup through playAt's cold path (silently dropped past a 0.12s
-          // fetch/decode window) and the loop's cold path (a fallback fade-in
-          // instead of the immediate splice), reading as ~0.9s of silence
-          // then a swell. A no-op for an ordinary (non-engine) mount.
-          if (e.mountKey !== '') this.audioSink?.preloadMountEngine(e.mountKey);
-        }
+        v.wasMountCasting = syncMountTransitionFx(v, {
+          mountCasting: e.mountCastRemaining > 0,
+          mountCastKey: e.mountCastKey,
+          mountCastRemaining: e.mountCastRemaining,
+          mountKey: e.mountKey,
+          poseAllowed: !visuallyDead && !swimming && runCharacterPresentation,
+          present: runCharacterPresentation,
+          playCallPose: (secs: number) => active.playCallPose(secs),
+          summonGlow: () => this.vfx.mountSummonGlow(e.id),
+          engineReset: () => this.audioSink?.mountEngineReset(e.id),
+          preloadSummon: (key: string) => this.audioSink?.preloadMountSummon(key),
+          preloadEngine: (key: string) => this.audioSink?.preloadMountEngine(key),
+          summonCall: () => this.audioSink?.mountSummon(ax, ay, az, e.mountKey, isSelf, e.id),
+        });
       }
 
       // per-ability windup orb + buff-orbit bands (spec-driven; no-op for

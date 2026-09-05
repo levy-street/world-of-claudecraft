@@ -570,6 +570,9 @@ export const cs_CZ: EnTranslations = {
       "tabsLabel": "Sekce obchodu WOC",
       "storeTab": "Obchod",
       "rewardsTab": "Denní odměny",
+      "mountsEyebrow": "Account Mounts",
+      "mountsTitle": "Machine Stable",
+      "mountBuyAria": "Purchase {item}",
       "loading": "Načítání obchodu WOC…",
       "error": "Obchod WOC nyní není dostupný. Zkus to za chvíli znovu.",
       "balance": "Zůstatek Claudium",
@@ -1392,6 +1395,9 @@ export const cs_CZ: EnTranslations = {
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Hrůzojiskra, otřásač země",
       "name_drakemaw_raptor": "Raptor z Dračí tlamy",
+      "name_mech_bird": "Cluckwork Mech Bird",
+      "name_lanternback_troll": "Grumbol the Lanternback",
+      "name_chimeglass_tortoise": "Tolliver the Chimeglass",
       "name_rickshaw_mount": "Kostipoutaná rikša",
       "desc_valorsteed": "Otužilý, jistonohý oř poskytující zvýšenou rychlost cestování.",
       "desc_grag_bear": "Otužilý, jistonohý medvěd poskytující zvýšenou rychlost cestování.",
@@ -1404,6 +1410,9 @@ export const cs_CZ: EnTranslations = {
       "desc_rallycart_rxt": "Malý rallye stroj, který zvyšuje rychlost cestování.",
       "desc_terrorspark_groundshaker": "Kompaktní obrněný stroj s těžkými pásy, velkorážním kanónem a sedlem pro nebojácné piloty.",
       "desc_drakemaw_raptor": "Osedlaný raptor z líhně v Kaldeře Dračí tlamy, samé šlachy a hbitost, ještě slabě páchnoucí popelem.",
+      "desc_mech_bird": "A hand-built clockwork war chicken that sprints on snapping servos, wind-up key still turning.",
+      "desc_lanternback_troll": "A hill troll broken to the yoke by lamplighters, carrying an iron throne across his shoulders with a storm lantern burning on either arm.",
+      "desc_chimeglass_tortoise": "A salt-flat tortoise who has outwalked three generations of caravans. Tinkers ground him spectacles from storm-glass and hung a bronze bell at his throat, so the road hears him long before it sees him.",
       "desc_rickshaw_mount": "Chrastící kostěný vozík s kostnatým pěšákem zapřaženým do ojí, který tě veze tryskem."
     },
     "mountTraining": {
@@ -3300,6 +3309,15 @@ export const cs_CZ: EnTranslations = {
       "back": "Zpět",
       "popupTitle": "Cechovní vývěska",
       "close": "Zavřít"
+    },
+    "realmBuilder": {
+      "title": "Realm Builder of the Month",
+      "currentLabel": "Honoured this month",
+      "placeholderName": "Your Name Here",
+      "placeholderHint": "This plate is waiting for its first name.",
+      "pastTitle": "Past honourees",
+      "pastEmpty": "No names on the roll yet.",
+      "close": "Close"
     },
     "bank": {
       "title": "Banka",
@@ -13230,11 +13248,20 @@ export const cs_CZ: EnTranslations = {
       "reins_rallycart_rxt": {
         "name": "Klíček zapalování: Rallycart RXT"
       },
+      "reins_lanternback_troll": {
+        "name": "Lampářovo jho: Grumbol"
+      },
+      "reins_chimeglass_tortoise": {
+        "name": "Roadwarden's Bellstrap: Tolliver"
+      },
       "reins_rickshaw_mount": {
         "name": "Spoutané otěže: Kostipoutaná rikša"
       },
       "reins_drakemaw_raptor": {
         "name": "Otěže raptora z Dračí tlamy"
+      },
+      "reins_mech_bird": {
+        "name": "Ignition Key: Cluckwork Mech Bird"
       },
       "rimefang": {
         "name": "Jinovatkový tesák"
@@ -19149,6 +19176,7 @@ export const cs_CZ: EnTranslations = {
     "delveRiteShrineReedInteract": "Rákosová svatyně: stiskni F a dotkni se jí",
     "delveRiteShrineSkullInteract": "Lebková svatyně: stiskni F a dotkni se jí",
     "mailboxName": "Poštovní schránka",
-    "noticeboardName": "Vývěska"
+    "noticeboardName": "Vývěska",
+    "realmBuilderMonumentName": "Realm Builder Monument"
   }
 };

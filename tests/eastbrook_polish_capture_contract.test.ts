@@ -358,8 +358,10 @@ interface AttributionTargetFixture {
 // retaken.
 // Re-minted for the v0.42.0 release batch renderer merge: runtimeRender.renderer
 // moved with the shipped renderer tree. No capture was retaken.
+// Re-minted for the release/v0.42.0 reconcile with the Realm Builder and
+// store-mount renderer leaves. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'f1021ba495ff3cdd683c08ab11e0a53d22c85c0c33ac30b9365cb8711fab90de';
+  '7feeabfe5c608b45d950cb8d32a5cb9dd18be410846697a56f67e82b193473b9';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
@@ -510,7 +512,7 @@ describe('Eastbrook polish capture contract', () => {
       'apothecary_lin',
       'mailbox_eastbrook',
       'eastbrook_noticeboard',
-      'eastbrook_civic_well_beacon',
+      'eastbrook_realm_builder_monument',
       'chronicler_saul',
       'fury',
     ]);
@@ -764,7 +766,7 @@ describe('Eastbrook polish capture contract', () => {
       },
       'chapel-and-weaving': {
         camera: { x: 26, y: 12, z: -100 },
-        target: { x: -13, y: 3, z: -100 },
+        target: { x: -10.5, y: 3, z: -100 },
       },
       'toolworks-service-perimeter': {
         camera: { x: -11, y: 7, z: -120 },
@@ -1010,9 +1012,9 @@ describe('Eastbrook polish capture contract', () => {
       EASTBROOK_LAYOUT.services.noticeboard.id,
       EASTBROOK_LAYOUT.services.noticeboard.frontStandingPoint,
     );
-    subjectPoints.set(EASTBROOK_LAYOUT.civic.wellBeacon.id, {
-      x: EASTBROOK_LAYOUT.civic.wellBeacon.position.x,
-      z: EASTBROOK_LAYOUT.civic.wellBeacon.position.z - 2,
+    subjectPoints.set(EASTBROOK_LAYOUT.civic.monument.id, {
+      x: EASTBROOK_LAYOUT.civic.monument.position.x + 2.7,
+      z: EASTBROOK_LAYOUT.civic.monument.position.z - 3.2,
     });
     for (const npc of EASTBROOK_LAYOUT.services.npcs) {
       subjectPoints.set(npc.id, npc.position);

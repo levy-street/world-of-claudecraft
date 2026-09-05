@@ -66,6 +66,7 @@ await page.evaluate(() => {
     'reins_valorsteed',
     'reins_grag_bear',
     'reins_stalkglider_snail',
+    'reins_mech_bird',
     'reins_aether_hover_cycle',
     'reins_shadowjump_toad',
     'reins_stormfeather_griffin',
@@ -74,6 +75,8 @@ await page.evaluate(() => {
     'reins_goblin_rocket_sled',
     'reins_rallycart_rxt',
     'reins_terrorspark_groundshaker',
+    'reins_lanternback_troll',
+    'reins_chimeglass_tortoise',
     'reins_rickshaw_mount',
   ])
     sim.addItem(id, 1);

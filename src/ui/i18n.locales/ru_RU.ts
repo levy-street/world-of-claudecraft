@@ -330,6 +330,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.tabsLabel': 'Разделы магазина WOC',
   'hudChrome.wocStore.storeTab': 'Магазин',
   'hudChrome.wocStore.rewardsTab': 'Ежедневные награды',
+  'hudChrome.wocStore.mountsEyebrow': 'Маунты аккаунта',
+  'hudChrome.wocStore.mountsTitle': 'Механическая конюшня',
+  'hudChrome.wocStore.mountBuyAria': 'Купить: {item}',
   'hudChrome.wocStore.loading': 'Загрузка магазина WOC…',
   'hudChrome.wocStore.error': 'Магазин WOC сейчас недоступен. Повторите попытку позже.',
   'hudChrome.wocStore.balance': 'Баланс Claudium',
@@ -9169,6 +9172,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_stormfeather_griffin.name': 'Поводья Штормокрыла Поднебесного',
   'entities.items.reins_drakemaw_raptor.name': 'Поводья раптора Дрейкмо',
   'entities.items.reins_thunderstrut_gobbler.name': 'Поводья Громоступа, великого индюка',
+  'entities.items.reins_mech_bird.name': 'Ключ зажигания механоптицы',
   'entities.mobs.drowned_cantor.name': 'Утопший Кантор',
   'entities.mobs.reedbound_acolyte.name': 'Тростниковый Послушник',
   'entities.mobs.deepfen_spearjaw.name': 'Глубокотрясинный Копьечелюст',
@@ -10695,7 +10699,16 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_shadowjump_toad': 'Кама-Кагэ, жаба теневых прыжков',
   'hudChrome.mounts.name_stormfeather_griffin': 'Штормокрыл Поднебесный',
   'hudChrome.mounts.name_drakemaw_raptor': 'Раптор Дрейкмо',
+  'hudChrome.mounts.name_lanternback_troll': 'Грумбол Фонареносец',
+  'hudChrome.mounts.name_chimeglass_tortoise': 'Толливер Звонкостёкл',
   'hudChrome.mounts.desc_drakemaw_raptor': 'Приученный к седлу выводковый раптор из кальдеры Дрейкмо: сплошные жилы и бег, и от него всё ещё едва пахнет пеплом.',
+  'hudChrome.mounts.name_mech_bird': 'Заводная механоптица',
+  'hudChrome.mounts.desc_mech_bird':
+    'Заводная боевая курица ручной сборки: несётся на щёлкающих сервоприводах, а заводной ключ всё ещё крутится.',
+  'hudChrome.mounts.desc_lanternback_troll':
+    'Холмовой тролль, укрощённый фонарщиками: на плечах он несёт железный трон, а на обоих подлокотниках горит по штормовому фонарю.',
+  'hudChrome.mounts.desc_chimeglass_tortoise':
+    'Черепаха солончаков, пережившая в пути три поколения караванов. Приютившие её лудильщики выточили ей очки из штормового стекла и подвесили к горлу бронзовый колокольчик — дорога слышит её задолго до того, как увидит.',
   'hudChrome.mounts.name_thunderstrut_gobbler': 'Громоступ, великий индюк',
   'hudChrome.mounts.name_terrorspark_groundshaker': 'Страхоискр, сотрясатель земли',
   'hudChrome.mounts.name_goblin_rocket_sled': 'Гоблинские ракетные сани',
@@ -11522,6 +11535,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_terrorspark_groundshaker.name': 'Ключ зажигания Страхоискра',
   'entities.items.reins_goblin_rocket_sled.name': 'Ключ зажигания гоблинских ракетных саней',
   'entities.items.reins_rallycart_rxt.name': 'Ключ зажигания ралликарта RXT',
+  'entities.items.reins_lanternback_troll.name':
+    'Ярмо фонарщика: Грумбол',
+  'entities.items.reins_chimeglass_tortoise.name':
+    'Колокольный ремень путеблюстителя: Толливер',
   'entities.items.reins_rickshaw_mount.name': 'Связанные поводья: Костяная рикша',
   'entities.dungeons.the_last_keep.leaveText': 'Вы затворяете дверь оплота и возвращаетесь под ветер Земель Драконов.',
   'entities.dungeons.dawnhold_castle.name': 'Замок Рассвета',
@@ -14855,4 +14872,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.springtouched_crozier.name': 'Посох родникового касания',
   'entities.items.wand_of_quenched_sparks.name': 'Жезл угасших искр',
   'crucibleShop.balanceEntry': '{name} x{count}',
+  'hudChrome.realmBuilder.title': 'Зодчий месяца',
+  'hudChrome.realmBuilder.currentLabel': 'Отмечен в этом месяце',
+  'hudChrome.realmBuilder.placeholderName': 'Ваше имя',
+  'hudChrome.realmBuilder.placeholderHint': 'Эта табличка ждёт своего первого имени.',
+  'hudChrome.realmBuilder.pastTitle': 'Прежние зодчие',
+  'hudChrome.realmBuilder.pastEmpty': 'В списке пока нет имён.',
+  'hudChrome.realmBuilder.close': 'Закрыть',
+  'worldContent.realmBuilderMonumentName': 'Памятник зодчим королевства',
 };

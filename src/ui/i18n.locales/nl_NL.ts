@@ -2238,6 +2238,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.items.artisans_eye.name': 'Oog van de Ambachtsman',
   'entities.items.reins_terrorspark_groundshaker.name':
     'Contactsleutel: Schrikvonk, de Grondschudder',
+  'entities.items.reins_lanternback_troll.name':
+    'Juk van de lantaarnopsteker: Grumbol',
   'hud.options.graphicsPresetInsane': 'Extreem',
   'hud.options.surfaceDetail': 'Oppervlaktedetail',
   'hud.options.surfaceDetailBasic': 'Basis',
