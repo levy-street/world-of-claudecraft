@@ -10110,6 +10110,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.depositAllDone': '素材を預けました：{count}。',
   'hudChrome.bank.depositAllFull': '素材を預けました：{count}。銀行がいっぱいになりました。',
   'hudChrome.bank.depositAllNone': '銀行がいっぱいです：何も預けられませんでした。',
+  'hudChrome.bank.depositAllNotable': '素材を預けました：{count}（{item}を含む）。',
+  'hudChrome.bank.depositAllNotableFull':
+    '素材を預けました：{count}（{item}を含む）。銀行がいっぱいになりました。',
   'hudChrome.bank.bonusTitle': 'ボーナススロット',
   'hudChrome.bank.bonusEarned': '+{count}',
   'hudChrome.bank.bonusStatusEarned': '+{count}',
@@ -10140,6 +10143,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.vaultDepositAllDone': '預けた素材：{count}個。',
   'hudChrome.bank.vaultDepositAllFull': '預けた素材：{count}個。上限に達した素材があります。',
   'hudChrome.bank.vaultDepositAllNone': '保管庫の上限に達しているため、何も預けられませんでした。',
+  'hudChrome.bank.vaultDepositAllNotable': '預けた素材：{count}個（{item}を含む）。',
+  'hudChrome.bank.vaultDepositAllNotableFull':
+    '預けた素材：{count}個（{item}を含む）。上限に達した素材があります。',
   'hudChrome.bank.vaultWithdrawShort': 'バッグには{count}個のうち{fit}個しか入りません。',
   'hudChrome.bank.vaultDepositHint': 'クリックで保管庫に預ける',
   'hudChrome.bank.vaultCannotDeposit': '保管庫には預けられません',

@@ -2641,6 +2641,87 @@ export const TARGETS = [
     },
   },
   {
+    key: 'vault-deposit-all-notable',
+    label: 'Materials Vault Deposit All: names an epic-or-better material instead of a bare count',
+    when: ['ui/vault_view', 'ui/vault_window'],
+    variants: [{ key: 'desktop', beforeLoad: seedClassicOnLowPreset }],
+    async capture(page) {
+      await page.waitForFunction(() => window.__game?.sim?.player, { timeout: 90000 });
+      await dismissEntryOverlays(page);
+      await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        try {
+          // Stand beside the banker first: the vault ops are nearBanker-gated
+          // (the bank-vault target's idiom).
+          for (const e of sim.entities.values()) {
+            if (e.kind === 'npc' && e.templateId === 'bursar_fernando') {
+              const p = sim.entities.get(sim.playerId);
+              p.pos = { ...e.pos };
+              p.prevPos = { ...p.pos };
+              sim.rebucket(p);
+              break;
+            }
+          }
+          const meta = sim.players.get(sim.playerId);
+          meta.copper = 200000;
+          sim.vaultBuyUpgrade(); // rung 0: the 2g unlock
+          // An ordinary common material plus lastflame_core (the epic raid
+          // reagent the reported "items vanished" case turned on): the click
+          // must name the epic one, not fold it into a bare count.
+          sim.addItem('copper_ore', 5);
+          sim.addItem('lastflame_core', 1);
+        } catch {}
+        game?.hud?.openBank?.();
+      });
+      if (!(await pollForSize(page, '#bank-window'))) {
+        throw new Error('bank window did not open');
+      }
+      const tabReady = await pollForSize(page, '#bank-window .bank-tab[data-tab="vault"]');
+      if (!tabReady) throw new Error('vault tab did not render');
+      await page.evaluate(() => {
+        const tab = document.querySelector('#bank-window .bank-tab[data-tab="vault"]');
+        if (tab instanceof HTMLElement) tab.click();
+      });
+      if (!(await pollForSize(page, '#bank-window .vault-pane'))) {
+        throw new Error('vault pane did not render after the tab click');
+      }
+      await awaitWorldPainted(page);
+      await dismissEntryOverlays(page);
+      // The first-spawn greeting is a window, not the tutorial overlay the
+      // shared entry helper owns (the bank-vault target's idiom above). It can
+      // arrive after the banker teleport and cover the pane while every
+      // underlying DOM geometry check still looks healthy, so dismiss it at
+      // the last responsible moment, before the deposit-all click.
+      const dismissedGreeting = await page.evaluate(() => {
+        const greeting = document.getElementById('tutorial-greeting');
+        if (!(greeting instanceof HTMLElement) || getComputedStyle(greeting).display === 'none') {
+          return false;
+        }
+        const close = [...greeting.querySelectorAll('button')].at(-1);
+        close?.click();
+        return true;
+      });
+      if (dismissedGreeting) await wait(400);
+      const depositReady = await pollForSize(page, '#bank-window .vault-deposit-all');
+      if (!depositReady) throw new Error('deposit-all button did not render');
+      await page.evaluate(() => {
+        const btn = document.querySelector('#bank-window .vault-deposit-all');
+        if (btn instanceof HTMLElement) btn.click();
+      });
+      const statusReady = await pollForSize(page, '#bank-window .vault-status');
+      if (!statusReady) throw new Error('deposit-all status line did not render');
+      const text = await page.evaluate(
+        () => document.querySelector('#bank-window .vault-status')?.textContent ?? '',
+      );
+      if (!text.includes('Core of the Last Flame')) {
+        throw new Error(`status line did not name the notable item: ${text}`);
+      }
+      await wait(400);
+      return {};
+    },
+  },
+  {
     key: 'bank-instance-marks',
     label: 'Bank grid corner marks: masterwork seal, per-copy glyphs, and the fine-grade mark',
     when: [
