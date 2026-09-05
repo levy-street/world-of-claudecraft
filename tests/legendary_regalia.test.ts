@@ -351,8 +351,8 @@ describe('legendary regalia graphics fairness (sheddable prestige cosmetic)', ()
   });
 
   it('the core reads no actionable or non-wire state', () => {
-    // `perfected` is the load-bearing token: offline entity mirrors carry it,
-    // the peer wire does not, so one read here forks the treatment per host.
+    // `perfected` is gameplay state now carried by both entity mirrors. The
+    // cosmetic glow still keys only on rolled quality, never on active rank.
     const source = read(CORE);
     for (const token of [
       'perfected',
@@ -380,8 +380,10 @@ describe('legendary regalia graphics fairness (sheddable prestige cosmetic)', ()
     // no cross-wire: every projected field copies from ITS OWN source field
     for (const m of assigns) expect(m[2], `cross-wired eqi projection: ${m[0]}`).toBe(m[1]);
     const projected = assigns.map((m) => m[1]).sort();
-    expect(projected).toEqual(['enchant', 'name', 'rolled', 'signer']);
-    // The pub block itself carries exactly the four assignment-shaped writes
+    expect(projected).toEqual(['enchant', 'name', 'perfected', 'rolled', 'signer']);
+    // Perfected is public for accurate equipped-copy tooltip comparisons; the
+    // cosmetic predicate above must still ignore it after a rank exchange.
+    // The pub block itself carries exactly the five assignment-shaped writes
     // and no spread, so a widened wire SHAPE (a spread, a conditional copy in
     // another form) reds this alarm instead of slipping past the scrape above.
     const pubAt = game.indexOf('let eqi: Record<string, unknown> | undefined;');
@@ -389,14 +391,14 @@ describe('legendary regalia graphics fairness (sheddable prestige cosmetic)', ()
     const pubEnd = game.indexOf('if (eqi) out.eqi = eqi;', pubAt);
     expect(pubEnd).toBeGreaterThan(pubAt);
     const pubBlock = game.slice(pubAt, pubEnd);
-    expect([...pubBlock.matchAll(/pub\.(\w+) = inst\.(\w+);/g)]).toHaveLength(4);
-    expect(pubBlock.match(/\bpub\.\w+\s*=/g) ?? []).toHaveLength(4);
+    expect([...pubBlock.matchAll(/pub\.(\w+) = inst\.(\w+);/g)]).toHaveLength(5);
+    expect(pubBlock.match(/\bpub\.\w+\s*=/g) ?? []).toHaveLength(5);
     expect(pubBlock).not.toContain('...');
     // ... and none of the KNOWN non-dotted write shapes either (the Phase 16
     // QA): Object.assign, Reflect writes, defineProperty, a cast that opens
     // computed keys ('pub as'), or a direct pub[...] index all evade the
-    // 4-count and spread bans above. A blocklist, not completeness: a wholly
-    // novel write shape is the reviewer's to catch, and the dotted 4-count
+    // 5-count and spread bans above. A blocklist, not completeness: a wholly
+    // novel write shape is the reviewer's to catch, and the dotted 5-count
     // stays the positive arm.
     const eqiWriteShapes = /Object\.assign|Reflect\.|defineProperty|\bpub\s+as\b|pub\[/;
     expect(pubBlock).not.toMatch(eqiWriteShapes);

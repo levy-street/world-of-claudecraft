@@ -11,6 +11,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { BIND_ACTIONS, keyCapLabel } from '../src/game/keybinds';
 import { hasChromeIconArt } from '../src/ui/chrome_icon_art';
+import { hudChromeStrings } from '../src/ui/i18n.catalog/hud_chrome';
 import { hasUiIcon, hydrateIcons, svgIcon } from '../src/ui/ui_icons';
 
 const read = (rel: string): string => readFileSync(join(__dirname, rel), 'utf8');
@@ -20,7 +21,6 @@ const mainSrc = read('../src/main.ts');
 const inputSrc = read('../src/game/input.ts');
 const keybindsSrc = read('../src/game/keybinds.ts');
 const optionsWindow = read('../src/ui/options_window.ts');
-const chrome = read('../src/ui/i18n.catalog/hud_chrome.ts');
 const entries = [
   ['index.html', read('../index.html')],
   ['play.html', read('../play.html')],
@@ -54,7 +54,7 @@ describe('the Perfecting rail tile and keybind (the seven-piece exemplar)', () =
   });
 
   it('reuses the window title key for the tile (no new string), and the key exists in English', () => {
-    expect(chrome).toMatch(/perfecting:\s*\{[^}]*title:\s*'Perfecting'/);
+    expect(hudChromeStrings.perfecting.title).toBe('Perfecting');
   });
 
   it('hud.ts wires the click to the existing togglePerfecting and repaints the keycap', () => {

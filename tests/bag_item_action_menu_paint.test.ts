@@ -72,6 +72,8 @@ interface WorldStub {
    *  craftingIdentity for the Lucent tier's skill gate. Defaults to 0, a fresh
    *  character, which is what every pre-Lucent case here assumes. */
   enchantingSkill?: number;
+  /** Learned formula ids share craftingIdentity.knownRecipes with recipes. */
+  knownRecipes?: string[];
   /** craftingIdentity.synced. Defaults to TRUE, which is the offline Sim always
    *  and an online client from its first cprof delta on: the state every case
    *  here means unless it says otherwise. False is the online STARTUP window,
@@ -123,6 +125,7 @@ function harness(innerHeight: number, stubOrInventory: WorldStub | InvSlot[] = {
     craftingIdentity: {
       synced: stub.synced ?? true,
       craftSkills: { enchanting: stub.enchantingSkill ?? 0 },
+      knownRecipes: stub.knownRecipes ?? [],
     },
     playerId: 1,
     // No `entities` map at all: a painter that reached back for the trimmed
@@ -1528,7 +1531,15 @@ describe('BagItemActionMenu target step: unique accessible names (#2466)', () =>
         }
         // Skill 125, the cap: the sweep is about row NAMES, so the viewer has
         // to clear every skillReq in the table or the gated ids paint nothing.
-        const h = harness(768, { inventory, equipment, equippedInstances, enchantingSkill: 125 });
+        const h = harness(768, {
+          inventory,
+          equipment,
+          equippedInstances,
+          enchantingSkill: 125,
+          // This sweep proves target names, not formula acquisition. Explicit
+          // knowledge keeps the new formula-gated enchant non-vacuous too.
+          knownRecipes: [enchantId],
+        });
         h.openTargets(enchantId);
         const texts = h.rows().map((row) => row.text);
         expect(texts.length, `${enchantId} paints rows`).toBeGreaterThan(1);

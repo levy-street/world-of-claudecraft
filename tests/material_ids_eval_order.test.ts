@@ -86,7 +86,15 @@ describe('material_ids evaluation-order probe (pure table leaves keep the regist
 
   it('evaluates cleanly with the recipe-pending material table as the entry module', async () => {
     const mod = await import('../src/sim/content/crucible_professions');
-    expect(mod.CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS).toContain('lastflame_core');
+    // The formerly staged core now has live consuming recipes, so eager
+    // material derivation must retain it without a pending-list exception.
+    expect(mod.CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS).toEqual([]);
+    const recipes = await import('../src/sim/content/recipes');
+    expect(
+      recipes.ALL_RECIPES.filter((recipe) =>
+        recipe.reagents.some((reagent) => reagent.itemId === 'lastflame_core'),
+      ),
+    ).toHaveLength(33);
     const ids = await import('../src/sim/material_ids');
     expect(ids.isMaterialItemId('lastflame_core')).toBe(true);
   });

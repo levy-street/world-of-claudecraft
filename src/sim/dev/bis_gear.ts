@@ -18,8 +18,9 @@ import {
 } from '../equipment_rules';
 import { refreshModsForEquipmentChange } from '../progression/talents';
 import type { SimContext } from '../sim_context';
-import type { EquipSlot, ItemDef } from '../types';
+import type { EquipSlot, ItemDef, PlayerClass } from '../types';
 import { ALL_EQUIP_SLOTS } from '../types';
+import { collectionFitsRole, collectionRoleForSpec } from './gear_selection';
 import { parseBisGearFor } from './parse_bis_loadouts';
 
 // Rough single-number item power: weapon dps dominates for weapons, stat
@@ -45,8 +46,12 @@ export function bestEpicGearFor(
   cls: string,
   spec: string | null,
 ): Partial<Record<EquipSlot, string>> {
+  const collectionRole = collectionRoleForSpec(cls as PlayerClass, spec);
   const epics = Object.values(ITEMS).filter(
-    (item) => item.quality === 'epic' && (item.kind === 'armor' || item.kind === 'weapon'),
+    (item) =>
+      item.quality === 'epic' &&
+      (item.kind === 'armor' || item.kind === 'weapon') &&
+      collectionFitsRole(item, cls as PlayerClass, collectionRole),
   );
   const picks: Partial<Record<EquipSlot, string>> = {};
   const used = new Set<string>();

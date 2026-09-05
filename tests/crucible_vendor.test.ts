@@ -4,6 +4,7 @@
 // tests/ignivar_loot.test.ts.
 
 import { describe, expect, it } from 'vitest';
+import { CRUCIBLE_COLLECTIONS } from '../src/sim/content/crucible_collections';
 import {
   CRUCIBLE_VENDOR_NPC_ID,
   CRUCIBLE_VENDOR_STOCK,
@@ -170,6 +171,10 @@ describe('crucible quartermaster: buy path', () => {
 
 describe('crucible vendor view (pure core)', () => {
   const count = (held: Record<string, number>) => (sigilId: string) => held[sigilId] ?? 0;
+  const scrollIds = [
+    ...CRUCIBLE_COLLECTIONS.map((collection) => `pattern_${collection.id}`),
+    'formula_lastflame_zeal',
+  ].sort();
 
   it('filters the stock to the viewer class and prices rows by sigil possession', () => {
     const view = buildCrucibleVendorView(
@@ -178,10 +183,22 @@ describe('crucible vendor view (pure core)', () => {
       'warrior',
       count({ sigil_anvil_helmet: 1 }),
     );
-    // Warrior: 3 sets x 5 slots.
-    expect(view.rows.length).toBe(15);
+    // Warrior: three raid sets of five slots, plus every tradable manual/formula.
+    expect(view.rows.length).toBe(27);
+    expect(view.rows.filter((row) => row.item.kind !== 'recipe')).toHaveLength(15);
+    expect(
+      view.rows
+        .filter((row) => row.item.kind === 'recipe')
+        .map((row) => row.itemId)
+        .sort(),
+    ).toEqual(scrollIds);
     for (const row of view.rows) {
-      expect(row.item.requiredClass).toContain('warrior');
+      if (row.item.kind === 'recipe') {
+        expect(row.sigilId).toBe('lastflame_core');
+        expect(row.item.requiredClass).toBeUndefined();
+      } else {
+        expect(row.item.requiredClass).toContain('warrior');
+      }
       expect(row.affordable).toBe(row.sigilId === 'sigil_anvil_helmet');
     }
     expect(view.balances).toEqual([
@@ -192,8 +209,16 @@ describe('crucible vendor view (pure core)', () => {
   it('druid and shaman see four sets (the hybrid tank lane)', () => {
     const druid = buildCrucibleVendorView(CRUCIBLE_VENDOR_STOCK, ITEMS, 'druid', count({}));
     const shaman = buildCrucibleVendorView(CRUCIBLE_VENDOR_STOCK, ITEMS, 'shaman', count({}));
-    expect(druid.rows.length).toBe(20);
-    expect(shaman.rows.length).toBe(20);
+    for (const view of [druid, shaman]) {
+      expect(view.rows.length).toBe(32);
+      expect(view.rows.filter((row) => row.item.kind !== 'recipe')).toHaveLength(20);
+      expect(
+        view.rows
+          .filter((row) => row.item.kind === 'recipe')
+          .map((row) => row.itemId)
+          .sort(),
+      ).toEqual(scrollIds);
+    }
     expect(druid.balances).toEqual([]);
   });
 
@@ -205,6 +230,25 @@ describe('crucible vendor view (pure core)', () => {
       count({}),
     );
     expect(view.rows.some((row) => row.itemId === 'no_such_piece')).toBe(false);
-    expect(view.rows.length).toBe(15);
+    expect(view.rows.length).toBe(27);
+  });
+
+  it('one core makes every collection manual and the Zeal formula affordable, not raid sigil gear', () => {
+    const view = buildCrucibleVendorView(
+      CRUCIBLE_VENDOR_STOCK,
+      ITEMS,
+      'warrior',
+      count({ lastflame_core: 1 }),
+    );
+    expect(scrollIds).toHaveLength(12);
+    expect(
+      view.rows
+        .filter((row) => row.affordable)
+        .map((row) => row.itemId)
+        .sort(),
+    ).toEqual(scrollIds);
+    expect(view.balances).toEqual([
+      expect.objectContaining({ sigilId: 'lastflame_core', count: 1 }),
+    ]);
   });
 });

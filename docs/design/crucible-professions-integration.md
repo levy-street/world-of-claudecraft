@@ -2,8 +2,10 @@
 
 ## Status and authority
 
-Implementation and targeted balance measurements are complete; final shared
-QA and publication are in progress. This is not a merge recommendation.
+Implementation and targeted balance measurements are complete. Draft PRs
+[#3884](https://github.com/levy-street/world-of-claudecraft/pull/3884) and
+[#3885](https://github.com/levy-street/world-of-claudecraft/pull/3885) are published;
+CI repair and final shared QA are in progress. This is not a merge recommendation.
 The maintainer approved this direction on 2026-09-05. The integration PR targets
 FernandoX7's `feature/masterwrought`, initially based on
 `0f53c92ff738ebebb6add787a61caecdf7e8e884`. No change is merged into that branch
@@ -49,6 +51,14 @@ tested offensive profiles by 3.4 to 13.1 percent over old six-piece equipment.
 The healer and tank findings depend on encounter pressure and are reported
 separately, not as misleading damage-equivalent percentages. These controlled
 measurements are not optimized best-in-slot rankings or full raid simulations.
+
+CI integration exposed an illegal reference-kit selection: a third Masterwrought
+piece was rejected at equip time, leaving its slot empty. Reference harnesses now
+apply the existing class, spec, hand, unique-family, and crafted-item limits before
+accepting each ordered candidate, and assert that the real equip succeeds. New
+collection candidates also respect their authored role; legacy scoring is unchanged.
+The corrected friendly Protection Warrior dummy reference is 1382 HP and 3265 armor.
+This is a reference-fixture correction, not a relaxation of raid balance bounds.
 
 - Eleven armor/stat profiles share physical, caster, tank, and healer signatures.
   Each profile offers all three slots. Generic proper names receive the normal

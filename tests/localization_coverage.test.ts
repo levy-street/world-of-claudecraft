@@ -998,8 +998,9 @@ describe('i18n Localization Key Coverage', () => {
     // the 5 WARFARE families x (name + bonus2/4/7), and the Crucible tier
     // sets x (name + bonus2/bonus4). The druid wave completed the Crucible
     // rollout, so all 29 sets are registered (the ledger in
-    // tests/ignivar_loot.test.ts).
-    expect(itemSetEntries).toHaveLength(7 * 4 + 3 * 2 + 5 * 4 + 29 * 3);
+    // tests/ignivar_loot.test.ts). The eleven crafted collections each carry
+    // a name plus one two-piece bonus, not another raid four-piece tier.
+    expect(itemSetEntries).toHaveLength(7 * 4 + 3 * 2 + 5 * 4 + 29 * 3 + 11 * 2);
     expect(missingEntityTranslationsForGroups(['itemSet'])).toHaveLength(0);
 
     for (const lang of ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const) {

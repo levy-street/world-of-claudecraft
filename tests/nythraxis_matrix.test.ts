@@ -3,6 +3,7 @@ import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { ITEMS } from '../src/sim/data';
 
 const source = readFileSync('scripts/nythraxis_matrix.ts', 'utf8');
 
@@ -54,6 +55,9 @@ describe('Nythraxis matrix DPS rotations', () => {
         }>;
       };
       expect(report.run).toBe(4);
+      expect(report.sharedTankGear).toHaveLength(12);
+      expect(report.sharedTankGear.filter((id) => ITEMS[id]?.masterwrought)).toHaveLength(2);
+      expect(report.sharedTankGear.some((id) => ITEMS[id]?.slot === 'feet')).toBe(true);
       expect(report.runs.map((run) => run.seed)).toEqual([1, 1, 1, 1]);
 
       const expectedRows = {
