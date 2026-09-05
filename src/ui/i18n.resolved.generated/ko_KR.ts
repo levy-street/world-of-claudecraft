@@ -5227,6 +5227,7 @@ export const ko_KR: EnTranslations = {
       "ifChatOpacity": "채팅 배경이 얼마나 불투명한지 정합니다.",
       "ifCompactChat": "채팅 줄 간격을 좁혀 더 많은 줄이 들어가게 합니다.",
       "ifChatTimestamps": "채팅 줄마다 시각을 붙입니다. 12시간제와 24시간제 중에서 고를 수 있습니다.",
+      "ifFilterProfanity": "채팅의 비속어를 별표로 가립니다. 기본적으로 켜져 있으며, 필터 없이 채팅을 읽고 싶다면 여기서 끌 수 있습니다.",
       "ifStartAttack": "능력을 쓸 때 자동 공격도 함께 시작할지 정합니다. 기본값은 켜짐이며, 대부분의 플레이어가 기대하는 클래식 동작입니다.",
       "ifStopAutoAttack": "대상을 바꿀 때 공격을 멈출지 정합니다. 기본값은 꺼짐이라, 공격이 새 대상으로 그대로 이어집니다.",
       "ifShowAttackButton": "행동 단축바에 공격 버튼을 따로 올립니다.",
@@ -5239,7 +5240,7 @@ export const ko_KR: EnTranslations = {
       "ifHideUnused": "비어 있는 행동 슬롯을 숨겨 실제로 쓰는 버튼만 그립니다.",
       "ifLockBars": "단축바를 잠가 실수로 슬롯에서 능력을 끌어내지 않도록 합니다.",
       "keybindsHeading": "키 설정 패널",
-      "keybindsBody": "그 패널에서 키 목록은 절반에 지나지 않습니다. 그 위에는 마우스가 게임을 어떻게 조종할지 정하는 스위치들이 놓여 있습니다. 마우스 카메라, 회전하는 동안 커서를 고정할지, 클릭 이동과 그것을 실행할 마우스 버튼, 공격 이동, 왼손잡이용 터치 배치, 그리고 채팅 비속어 필터까지 있습니다.",
+      "keybindsBody": "The key list is only half of that panel. Above it sit the switches that decide how your mouse drives the game: mouse camera, whether the cursor locks while you rotate, click to move and which mouse button triggers it, attack move, and the left-handed touch layout.",
       "keybindsMouseBody": "그중 놓치기 쉬운 것이 둘 있습니다. 마우스 버튼도 키처럼 지정할 수 있어 휠 클릭과 엄지 버튼에 능력을 올릴 수 있으며, 왼쪽과 오른쪽 클릭은 카메라와 세계 클릭용으로 남습니다. 그리고 행동 단축바에서 곧바로 지정할 수도 있습니다. 여기서 단축바 지정 모드를 켠 뒤, 슬롯을 클릭하고 원하는 키를 누르면 됩니다."
     },
     "combat": {

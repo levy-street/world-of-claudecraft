@@ -5227,6 +5227,7 @@ export const ja_JP: EnTranslations = {
       "ifChatOpacity": "チャット背景の濃さです。",
       "ifCompactChat": "チャットの行間を詰めて、より多くの行を表示します。",
       "ifChatTimestamps": "チャットの各行に時刻を添えます。12時間表記と24時間表記を選べます。",
+      "ifFilterProfanity": "チャット内の暴言をアスタリスクで伏せ字にします。初期状態ではオンです。フィルターなしでチャットを読みたい場合は、ここでオフにしてください。",
       "ifStartAttack": "アビリティを使ったときに自動攻撃も始めるかどうかです。初期設定はオンで、多くのプレイヤーが期待する昔ながらの挙動です。",
       "ifStopAutoAttack": "ターゲットを切り替えたときに攻撃の手を止めるかどうかです。初期設定はオフなので、攻撃は新しいターゲットへ引き継がれます。",
       "ifShowAttackButton": "アクションバーに攻撃ボタンを明示的に置きます。",
@@ -5239,7 +5240,7 @@ export const ja_JP: EnTranslations = {
       "ifHideUnused": "空のアクションスロットを隠し、実際に使うボタンだけを描画します。",
       "ifLockBars": "バーをロックして、うっかりアビリティをスロットから引き出してしまうのを防ぎます。",
       "keybindsHeading": "「キー割り当て」パネル",
-      "keybindsBody": "キーの一覧は、あのパネルの半分にすぎません。その上には、マウスがどうゲームを動かすかを決めるスイッチが並びます。マウスカメラ、視点を回すあいだカーソルを固定するかどうか、クリック移動とそれを担うマウスボタン、アタックムーブ、左利き向けのタッチレイアウト、そしてチャットの不適切語フィルタです。",
+      "keybindsBody": "The key list is only half of that panel. Above it sit the switches that decide how your mouse drives the game: mouse camera, whether the cursor locks while you rotate, click to move and which mouse button triggers it, attack move, and the left-handed touch layout.",
       "keybindsMouseBody": "見落としやすい点が2つあります。まず、マウスボタンはキーと同じように割り当てられるので、ホイールクリックやサムボタンにアビリティを載せられます。左右のクリックは、カメラと世界のクリック操作のために予約されたままです。もう一つ、アクションバーから直接割り当てることもできます。ここでバー上での割り当てモードをオンにし、スロットをクリックして、割り当てたいキーを押すだけです。"
     },
     "combat": {

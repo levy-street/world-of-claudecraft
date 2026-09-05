@@ -5227,6 +5227,7 @@ export const pl_PL: EnTranslations = {
       "ifChatOpacity": "Jak nieprzezroczyste jest tło czatu.",
       "ifCompactChat": "Ścieśnia linie czatu, więc mieści się ich więcej.",
       "ifChatTimestamps": "Dodaje godzinę do każdej linii czatu, w formacie 12 lub 24-godzinnym.",
+      "ifFilterProfanity": "Masks profanity in chat with asterisks. On by default; switch it off here if you would rather read chat unfiltered.",
       "ifStartAttack": "Czy użycie umiejętności uruchamia też twój automatyczny atak. Domyślnie włączone i to klasyczne zachowanie, którego oczekuje większość graczy.",
       "ifStopAutoAttack": "Czy zmiana celu przerywa twój zamach. Domyślnie wyłączone, więc atak przechodzi na nowy cel.",
       "ifShowAttackButton": "Dodaje wyraźny Przycisk Ataku na twoim pasku akcji.",
@@ -5239,7 +5240,7 @@ export const pl_PL: EnTranslations = {
       "ifHideUnused": "Ukrywa puste pola akcji, więc rysowane są tylko przyciski, których faktycznie używasz.",
       "ifLockBars": "Blokuje twoje paski, żebyś przypadkiem nie wyciągnął umiejętności z pola.",
       "keybindsHeading": "Panel Przypisań Klawiszy",
-      "keybindsBody": "Lista klawiszy to tylko połowa tego panelu. Nad nią siedzą przełączniki, które decydują, jak twoja mysz prowadzi grę: kamera myszy, czy kursor blokuje się podczas obracania, ruch kliknięciem i to, który przycisk myszy go wywołuje, ruch z atakiem, układ leworęczny dla sterowania dotykowego oraz filtr wulgaryzmów na czacie.",
+      "keybindsBody": "The key list is only half of that panel. Above it sit the switches that decide how your mouse drives the game: mouse camera, whether the cursor locks while you rotate, click to move and which mouse button triggers it, attack move, and the left-handed touch layout.",
       "keybindsMouseBody": "Dwie rzeczy łatwo tam przeoczyć. Przyciski myszy przypisuje się jak klawisze, więc kliknięcie kółkiem i boczne przyciski mogą nosić umiejętności, podczas gdy lewy i prawy przycisk pozostają zarezerwowane dla kamery i klikania w świecie. Możesz też przypisywać klawisze bezpośrednio z paska akcji: włącz tu tryb przypisywania na pasku, kliknij pole i naciśnij klawisz, który chcesz przypisać."
     },
     "combat": {

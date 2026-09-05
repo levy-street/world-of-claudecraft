@@ -5227,6 +5227,7 @@ export const vi_VN: EnTranslations = {
       "ifChatOpacity": "Nền khung chat đặc đến mức nào.",
       "ifCompactChat": "Thu gọn các dòng chat để hiển thị được nhiều dòng hơn.",
       "ifChatTimestamps": "Thêm giờ vào mỗi dòng chat, theo định dạng 12 giờ hoặc 24 giờ.",
+      "ifFilterProfanity": "Masks profanity in chat with asterisks. On by default; switch it off here if you would rather read chat unfiltered.",
       "ifStartAttack": "Việc dùng một kỹ năng có tự động bắt đầu tự đánh hay không. Mặc định bật, và đây là hành vi cổ điển mà hầu hết người chơi mong đợi.",
       "ifStopAutoAttack": "Việc đổi mục tiêu có dừng đòn tự đánh của bạn hay không. Mặc định tắt, nên đòn tấn công của bạn tiếp tục chuyển sang mục tiêu mới.",
       "ifShowAttackButton": "Đặt hẳn một nút Tấn Công lên thanh hành động của bạn.",
@@ -5239,7 +5240,7 @@ export const vi_VN: EnTranslations = {
       "ifHideUnused": "Ẩn các ô hành động trống để chỉ vẽ những nút bạn thực sự dùng.",
       "ifLockBars": "Khóa các thanh của bạn để bạn không vô tình kéo một kỹ năng ra khỏi ô.",
       "keybindsHeading": "Bảng Gán Phím",
-      "keybindsBody": "Danh sách phím chỉ là một nửa của bảng đó. Phía trên nó là các công tắc quyết định cách con chuột của bạn điều khiển trò chơi: Camera Chuột, con trỏ có khóa lại khi bạn xoay hay không, Bấm Để Di Chuyển và nút chuột nào kích hoạt nó, Di Chuyển Tấn Công, bố cục cảm ứng thuận tay trái, và bộ lọc lời tục tĩu cho khung chat.",
+      "keybindsBody": "The key list is only half of that panel. Above it sit the switches that decide how your mouse drives the game: mouse camera, whether the cursor locks while you rotate, click to move and which mouse button triggers it, attack move, and the left-handed touch layout.",
       "keybindsMouseBody": "Có hai điều dễ bị bỏ sót ở đó. Nút chuột được gán như phím thường, nên nút cuộn và các nút ngón cái có thể mang kỹ năng, trong khi chuột trái và chuột phải vẫn được dành riêng cho camera và cho việc nhấp vào thế giới. Và bạn cũng có thể gán phím ngay từ thanh hành động: bật chế độ gán phím trên thanh tại đây, sau đó nhấp vào một ô và nhấn phím bạn muốn."
     },
     "combat": {

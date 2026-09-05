@@ -13,6 +13,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "guide.dungeonsPage.resetBody",
+    "guide.settingsPage.ifFilterProfanity",
+    "guide.settingsPage.keybindsBody",
     "hudChrome.bank.depositAllNotable",
     "hudChrome.bank.depositAllNotableFull",
     "hudChrome.bank.vaultDepositAllNotable",
@@ -39,6 +41,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "guide.dungeonsPage.resetBody",
+    "guide.settingsPage.ifFilterProfanity",
+    "guide.settingsPage.keybindsBody",
     "hudChrome.bank.depositAllNotable",
     "hudChrome.bank.depositAllNotableFull",
     "hudChrome.bank.vaultDepositAllNotable",
@@ -65,6 +69,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "guide.dungeonsPage.resetBody",
+    "guide.settingsPage.ifFilterProfanity",
+    "guide.settingsPage.keybindsBody",
     "hudChrome.bank.depositAllNotable",
     "hudChrome.bank.depositAllNotableFull",
     "hudChrome.bank.vaultDepositAllNotable",
@@ -91,6 +97,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "guide.dungeonsPage.resetBody",
+    "guide.settingsPage.ifFilterProfanity",
+    "guide.settingsPage.keybindsBody",
     "hudChrome.bank.depositAllNotable",
     "hudChrome.bank.depositAllNotableFull",
     "hudChrome.bank.vaultDepositAllNotable",
@@ -118,6 +126,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "guide.dungeonsPage.resetBody",
+    "guide.settingsPage.ifFilterProfanity",
+    "guide.settingsPage.keybindsBody",
     "hudChrome.bank.depositAllNotable",
     "hudChrome.bank.depositAllNotableFull",
     "hudChrome.bank.vaultDepositAllNotable",
@@ -144,6 +154,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "guide.dungeonsPage.resetBody",
+    "guide.settingsPage.ifFilterProfanity",
+    "guide.settingsPage.keybindsBody",
     "hudChrome.bank.depositAllNotable",
     "hudChrome.bank.depositAllNotableFull",
     "hudChrome.bank.vaultDepositAllNotable",
@@ -167,21 +179,27 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.realmBuilderMonumentName"
   ],
   "zh_CN": [
-    "guide.dungeonsPage.resetBody"
+    "guide.dungeonsPage.resetBody",
+    "guide.settingsPage.keybindsBody"
   ],
   "zh_TW": [
-    "guide.dungeonsPage.resetBody"
+    "guide.dungeonsPage.resetBody",
+    "guide.settingsPage.keybindsBody"
   ],
   "ko_KR": [
-    "guide.dungeonsPage.resetBody"
+    "guide.dungeonsPage.resetBody",
+    "guide.settingsPage.keybindsBody"
   ],
   "ja_JP": [
-    "guide.dungeonsPage.resetBody"
+    "guide.dungeonsPage.resetBody",
+    "guide.settingsPage.keybindsBody"
   ],
   "pt_BR": [
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "guide.dungeonsPage.resetBody",
+    "guide.settingsPage.ifFilterProfanity",
+    "guide.settingsPage.keybindsBody",
     "hudChrome.bank.depositAllNotable",
     "hudChrome.bank.depositAllNotableFull",
     "hudChrome.bank.vaultDepositAllNotable",
@@ -205,12 +223,15 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.realmBuilderMonumentName"
   ],
   "ru_RU": [
-    "guide.dungeonsPage.resetBody"
+    "guide.dungeonsPage.resetBody",
+    "guide.settingsPage.keybindsBody"
   ],
   "cs_CZ": [
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "guide.dungeonsPage.resetBody",
+    "guide.settingsPage.ifFilterProfanity",
+    "guide.settingsPage.keybindsBody",
     "hudChrome.bank.depositAllNotable",
     "hudChrome.bank.depositAllNotableFull",
     "hudChrome.bank.vaultDepositAllNotable",
@@ -237,6 +258,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "guide.dungeonsPage.resetBody",
+    "guide.settingsPage.ifFilterProfanity",
+    "guide.settingsPage.keybindsBody",
     "hudChrome.bank.depositAllNotable",
     "hudChrome.bank.depositAllNotableFull",
     "hudChrome.bank.vaultDepositAllNotable",
@@ -263,6 +286,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "guide.dungeonsPage.resetBody",
+    "guide.settingsPage.ifFilterProfanity",
+    "guide.settingsPage.keybindsBody",
     "hudChrome.bank.depositAllNotable",
     "hudChrome.bank.depositAllNotableFull",
     "hudChrome.bank.vaultDepositAllNotable",
@@ -289,6 +314,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "guide.dungeonsPage.resetBody",
+    "guide.settingsPage.ifFilterProfanity",
+    "guide.settingsPage.keybindsBody",
     "hudChrome.bank.depositAllNotable",
     "hudChrome.bank.depositAllNotableFull",
     "hudChrome.bank.vaultDepositAllNotable",
@@ -315,6 +342,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "guide.dungeonsPage.resetBody",
+    "guide.settingsPage.ifFilterProfanity",
+    "guide.settingsPage.keybindsBody",
     "hudChrome.bank.depositAllNotable",
     "hudChrome.bank.depositAllNotableFull",
     "hudChrome.bank.vaultDepositAllNotable",
@@ -341,6 +370,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "guide.dungeonsPage.resetBody",
+    "guide.settingsPage.ifFilterProfanity",
+    "guide.settingsPage.keybindsBody",
     "hudChrome.bank.depositAllNotable",
     "hudChrome.bank.depositAllNotableFull",
     "hudChrome.bank.vaultDepositAllNotable",
@@ -367,6 +398,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "guide.dungeonsPage.resetBody",
+    "guide.settingsPage.ifFilterProfanity",
+    "guide.settingsPage.keybindsBody",
     "hudChrome.bank.depositAllNotable",
     "hudChrome.bank.depositAllNotableFull",
     "hudChrome.bank.vaultDepositAllNotable",
@@ -393,6 +426,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "guide.dungeonsPage.resetBody",
+    "guide.settingsPage.ifFilterProfanity",
+    "guide.settingsPage.keybindsBody",
     "hudChrome.bank.depositAllNotable",
     "hudChrome.bank.depositAllNotableFull",
     "hudChrome.bank.vaultDepositAllNotable",

@@ -579,7 +579,7 @@ const FRAMES_KEYS = [
   'showTargetSwingTimer',
   'showPetFrame',
 ];
-const CHAT_KEYS = ['chatFontScale', 'chatOpacity', 'compactChat'];
+const CHAT_KEYS = ['chatFontScale', 'chatOpacity', 'compactChat', 'filterProfanity'];
 const COMBAT_KEYS = [
   'startAttackOnAbilityUse',
   'stopAutoAttackOnTargetSwitch',

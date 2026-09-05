@@ -13193,6 +13193,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifChatIntro': '聊天窗口读起来是什么样。聊天窗口本身的重置也放在这里。',
   'guide.settingsPage.ifChatOpacity': '聊天背景有多实。',
   'guide.settingsPage.ifChatTimestamps': '为每一行聊天加上时间，可选 12 小时制或 24 小时制。',
+  'guide.settingsPage.ifFilterProfanity': '用星号遮住聊天中的脏话。默认开启；如果你想不加过滤地阅读聊天，可以在这里关闭。',
   'guide.settingsPage.ifCombatIntro': '你的技能栏如何表现，以及战斗会在屏幕上放些什么。',
   'guide.settingsPage.ifCompactChat': '收紧聊天行距，让一屏能装下更多内容。',
   'guide.settingsPage.ifDailyChest': '每日奖励宝箱是否显示在你的 HUD 上。',
@@ -13251,8 +13252,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.interfaceHeading': '“界面”面板',
   'guide.settingsPage.interfaceIntro':
     '界面是游戏里最大的一个面板，分成四个标签页。这里面没有任何东西会改变世界能对你做什么：它改变的是显示给你什么、显示得多大。下面这些行最值得了解。',
-  'guide.settingsPage.keybindsBody':
-    '按键列表只是那个面板的一半。它上面还有一排开关，决定你的鼠标如何驾驭这个游戏：鼠标镜头、旋转视角时是否锁定光标、点击移动以及由哪个鼠标键触发、攻击移动、左手触控布局，还有聊天的脏话过滤。',
   'guide.settingsPage.keybindsHeading': '“按键绑定”面板',
   'guide.settingsPage.keybindsMouseBody':
     '那里有两件事很容易被忽略。鼠标按键可以像键盘按键一样绑定，所以滚轮点击和拇指键都能承载技能，而左右键则保留给镜头和点击世界。此外，你可以直接从动作条上绑定：在这里打开条上绑定模式，然后点一个格子，按下你想要的键。',

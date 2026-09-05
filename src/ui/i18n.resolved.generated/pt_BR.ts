@@ -5227,6 +5227,7 @@ export const pt_BR: EnTranslations = {
       "ifChatOpacity": "O quão sólido é o fundo do chat.",
       "ifCompactChat": "Aperta as linhas do chat para caber mais delas na tela.",
       "ifChatTimestamps": "Adiciona um horário a cada linha do chat, no formato de 12 ou 24 horas.",
+      "ifFilterProfanity": "Masks profanity in chat with asterisks. On by default; switch it off here if you would rather read chat unfiltered.",
       "ifStartAttack": "Se usar uma habilidade também inicia seu ataque automático. Ativado por padrão, e o comportamento clássico que a maioria dos jogadores espera.",
       "ifStopAutoAttack": "Se trocar de alvo interrompe seu golpe. Desativado por padrão, então seu ataque continua no novo alvo.",
       "ifShowAttackButton": "Coloca um botão explícito de Ataque na sua barra de ação.",
@@ -5239,7 +5240,7 @@ export const pt_BR: EnTranslations = {
       "ifHideUnused": "Oculta espaços de ação vazios para que só os botões que você realmente usa sejam desenhados.",
       "ifLockBars": "Trava suas barras para que você não arraste uma habilidade para fora de um espaço sem querer.",
       "keybindsHeading": "O painel Teclas de Atalho",
-      "keybindsBody": "A lista de teclas é só metade desse painel. Acima dela ficam os interruptores que decidem como o seu mouse comanda o jogo: Câmera pelo mouse, se o cursor trava enquanto você gira, Clique para mover e qual botão do mouse o aciona, Mover e atacar, o layout para canhotos no toque, e o filtro de palavrões do chat.",
+      "keybindsBody": "The key list is only half of that panel. Above it sit the switches that decide how your mouse drives the game: mouse camera, whether the cursor locks while you rotate, click to move and which mouse button triggers it, attack move, and the left-handed touch layout.",
       "keybindsMouseBody": "Duas coisas ali são fáceis de passar despercebidas. Botões do mouse se atribuem como teclas, então o clique da rodinha e os botões laterais podem carregar habilidades, enquanto o clique esquerdo e o direito ficam reservados para a câmera e para clicar no mundo. E você pode atribuir direto pela barra de ação: ative aqui o modo Editar teclas da barra de ação, depois clique em um espaço e pressione a tecla que você quiser."
     },
     "combat": {

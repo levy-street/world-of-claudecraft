@@ -13197,6 +13197,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifChatIntro': '聊天視窗讀起來的樣子。重設聊天視窗本身的按鈕也在這裡。',
   'guide.settingsPage.ifChatOpacity': '聊天背景有多不透明。',
   'guide.settingsPage.ifChatTimestamps': '替每一行聊天加上時間，可選 12 小時制或 24 小時制。',
+  'guide.settingsPage.ifFilterProfanity': '用星號遮住聊天中的髒話。預設開啟；如果你想不加過濾地閱讀聊天，可以在這裡關閉。',
   'guide.settingsPage.ifCombatIntro': '你的動作列如何運作，以及戰鬥會在畫面上放些什麼。',
   'guide.settingsPage.ifCompactChat': '收緊聊天行距，讓畫面裝得下更多行。',
   'guide.settingsPage.ifDailyChest': '每日獎勵寶箱是否留在你的 HUD 上。',
@@ -13255,8 +13256,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.interfaceHeading': '「介面」面板',
   'guide.settingsPage.interfaceIntro':
     '「介面」是遊戲中最大的一個面板，並分成四個分頁。這裡頭沒有任何東西會改變世界能對你做什麼：它改變的是你被顯示了什麼、以及顯示得多大。以下是最值得認識的那幾列。',
-  'guide.settingsPage.keybindsBody':
-    '按鍵清單只是那個面板的一半。清單上方是決定滑鼠如何驅動遊戲的那些開關：滑鼠鏡頭、旋轉視角時游標是否鎖定、點擊移動以及用哪個滑鼠鍵觸發、攻擊移動、左撇子的觸控佈局，還有聊天的髒話過濾。',
   'guide.settingsPage.keybindsHeading': '「按鍵設定」面板',
   'guide.settingsPage.keybindsMouseBody':
     '那裡有兩件事很容易錯過。滑鼠鍵和一般按鍵一樣可以綁定，因此滾輪按下與拇指鍵都能承載技能，而左鍵與右鍵則保留給鏡頭以及點擊世界。另外，你也可以直接從動作列綁定：在這裡開啟列上綁定模式，然後點一個格子，再按下你想要的按鍵。',

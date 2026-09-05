@@ -5227,6 +5227,7 @@ export const sv_SE: EnTranslations = {
       "ifChatOpacity": "Hur solid chattens bakgrund är.",
       "ifCompactChat": "Gör chattraderna tätare så att fler ryms.",
       "ifChatTimestamps": "Lägger till en tid på varje chattrad, i 12- eller 24-timmarsformat.",
+      "ifFilterProfanity": "Masks profanity in chat with asterisks. On by default; switch it off here if you would rather read chat unfiltered.",
       "ifStartAttack": "Om det att använda en förmåga även startar ditt automatiska anfall. Aktiverat som standard, och det klassiska beteendet de flesta spelare förväntar sig.",
       "ifStopAutoAttack": "Om målbyte stoppar ditt anfall. Avstängt som standard, så ditt anfall fortsätter över till det nya målet.",
       "ifShowAttackButton": "Lägger en tydlig Anfall-knapp på ditt handlingsfält.",
@@ -5239,7 +5240,7 @@ export const sv_SE: EnTranslations = {
       "ifHideUnused": "Döljer tomma handlingsplatser så att bara knapparna du faktiskt använder ritas ut.",
       "ifLockBars": "Låser dina handlingsfält så att du inte råkar dra ut en förmåga ur en plats av misstag.",
       "keybindsHeading": "Panelen Tangentbindningar",
-      "keybindsBody": "Tangentlistan är bara halva den panelen. Ovanför den sitter brytarna som avgör hur din mus styr spelet: muskamera, om pekaren låses medan du roterar, klicka för att flytta och vilken musknapp som utlöser det, anfallsförflyttning, den vänsterhänta pekstyrningen, och svordomsfiltret för chatten.",
+      "keybindsBody": "The key list is only half of that panel. Above it sit the switches that decide how your mouse drives the game: mouse camera, whether the cursor locks while you rotate, click to move and which mouse button triggers it, attack move, and the left-handed touch layout.",
       "keybindsMouseBody": "Två saker där är lätta att missa. Musknappar binds som tangenter, så klick på hjulet och tumknapparna kan bära förmågor, medan vänster- och högerklick förblir reserverade för kameran och för att klicka i världen. Och du kan binda direkt från handlingsfältet: slå på läget för att binda från fältet här, klicka sedan på en plats och tryck på tangenten du vill ha."
     },
     "combat": {

@@ -5227,6 +5227,7 @@ export const nl_NL: EnTranslations = {
       "ifChatOpacity": "Hoe dekkend de achtergrond van de chat is.",
       "ifCompactChat": "Maakt de chatregels compacter zodat er meer op het scherm passen.",
       "ifChatTimestamps": "Voegt een tijd toe aan elke chatregel, in 12-uurs of 24-uurs vorm.",
+      "ifFilterProfanity": "Masks profanity in chat with asterisks. On by default; switch it off here if you would rather read chat unfiltered.",
       "ifStartAttack": "Of het gebruiken van een vaardigheid ook je auto-aanval start. Standaard aan, en het klassieke gedrag dat de meeste spelers verwachten.",
       "ifStopAutoAttack": "Of het wisselen van doelwit je aanval stopt. Standaard uit, zodat je aanval overgaat op het nieuwe doelwit.",
       "ifShowAttackButton": "Zet een expliciete knop Aanvallen op je actiebalk.",
@@ -5239,7 +5240,7 @@ export const nl_NL: EnTranslations = {
       "ifHideUnused": "Verbergt lege actievakjes zodat alleen de knoppen die je echt gebruikt, getekend worden.",
       "ifLockBars": "Vergrendelt je balken zodat je niet per ongeluk een vaardigheid uit een vak sleept.",
       "keybindsHeading": "Het paneel Toetsbindingen",
-      "keybindsBody": "De toetsenlijst is maar de helft van dat paneel. Erboven staan de schakelaars die bepalen hoe je muis het spel bestuurt: muiscamera, of de cursor vergrendelt terwijl je draait, klik om te bewegen en welke muisknop dat activeert, aanvalsbeweging, de linkshandige aanraakindeling, en het filter voor grof taalgebruik in de chat.",
+      "keybindsBody": "The key list is only half of that panel. Above it sit the switches that decide how your mouse drives the game: mouse camera, whether the cursor locks while you rotate, click to move and which mouse button triggers it, attack move, and the left-handed touch layout.",
       "keybindsMouseBody": "Twee dingen daar zijn makkelijk over het hoofd te zien. Muisknoppen binden als toetsen, dus de wielklik en de duimknoppen kunnen vaardigheden dragen, terwijl links- en rechtsklikken gereserveerd blijven voor de camera en voor klikken in de wereld. En je kunt rechtstreeks vanaf de actiebalk binden: zet hier de bindmodus op de actiebalk aan, klik dan op een vak en druk op de gewenste toets."
     },
     "combat": {

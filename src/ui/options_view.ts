@@ -759,6 +759,8 @@ export function buildInterfaceControls(
       slider(s, 'chatFontScale', 'hud.options.chatFontScale'),
       slider(s, 'chatOpacity', 'hud.options.chatOpacity'),
       boolToggle(s, 'compactChat', 'hud.options.compactChat'),
+      // A chat setting, so its switch sits with the chat rows (hud.ts maskChat reads it).
+      boolToggle(s, 'filterProfanity', 'hud.options.filterProfanity'),
     ]),
     ...tag('combat', [
       boolToggle(s, 'startAttackOnAbilityUse', 'hudChrome.options.startAttackOnAbility'),

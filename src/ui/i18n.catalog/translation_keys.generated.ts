@@ -6766,6 +6766,7 @@ export type TranslationKeyFlat =
   | 'guide.settingsPage.ifDailyChest'
   | 'guide.settingsPage.ifExtraBars'
   | 'guide.settingsPage.ifFctScale'
+  | 'guide.settingsPage.ifFilterProfanity'
   | 'guide.settingsPage.ifFramesIntro'
   | 'guide.settingsPage.ifGeneralIntro'
   | 'guide.settingsPage.ifGroundReticle'

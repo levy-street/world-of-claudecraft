@@ -5227,6 +5227,7 @@ export const it_IT: EnTranslations = {
       "ifChatOpacity": "Quanto è solido lo sfondo della chat.",
       "ifCompactChat": "Comprime le righe di chat così ce ne stanno di più.",
       "ifChatTimestamps": "Aggiunge un orario a ogni riga di chat, in formato 12 ore o 24 ore.",
+      "ifFilterProfanity": "Masks profanity in chat with asterisks. On by default; switch it off here if you would rather read chat unfiltered.",
       "ifStartAttack": "Se usare un'abilità avvia anche il tuo attacco automatico. Attivata di default, ed è il comportamento classico che la maggior parte dei giocatori si aspetta.",
       "ifStopAutoAttack": "Se cambiare bersaglio interrompe il tuo attacco. Disattivata di default, così il tuo attacco prosegue sul nuovo bersaglio.",
       "ifShowAttackButton": "Mette un pulsante Attacco esplicito sulla tua barra delle azioni.",
@@ -5239,7 +5240,7 @@ export const it_IT: EnTranslations = {
       "ifHideUnused": "Nasconde gli slot azione vuoti così vengono disegnati solo i pulsanti che usi davvero.",
       "ifLockBars": "Blocca le tue barre così non puoi trascinare per sbaglio un'abilità fuori da uno slot.",
       "keybindsHeading": "Il pannello Comandi da tastiera",
-      "keybindsBody": "L'elenco dei tasti è solo metà di quel pannello. Sopra di esso si trovano gli interruttori che decidono come il mouse guida il gioco: telecamera con mouse, se il cursore si blocca durante la rotazione, clic per muoversi e quale pulsante del mouse lo attiva, movimento d'attacco, il layout touch per mancini, e il filtro del linguaggio per la chat.",
+      "keybindsBody": "The key list is only half of that panel. Above it sit the switches that decide how your mouse drives the game: mouse camera, whether the cursor locks while you rotate, click to move and which mouse button triggers it, attack move, and the left-handed touch layout.",
       "keybindsMouseBody": "Due cose lì sono facili da non notare. I pulsanti del mouse si associano come i tasti, quindi il clic della rotellina e i pulsanti laterali possono portare abilità, mentre il clic sinistro e destro restano riservati alla telecamera e al clic sul mondo. E puoi associare i tasti direttamente dalla barra delle azioni: attiva qui la modalità di associazione sulla barra, poi fai clic su uno slot e premi il tasto che vuoi."
     },
     "combat": {

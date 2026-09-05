@@ -5227,6 +5227,7 @@ export const de_DE: EnTranslations = {
       "ifChatOpacity": "Wie deckend der Hintergrund des Chats ist.",
       "ifCompactChat": "Staucht die Chatzeilen zusammen, damit mehr davon Platz finden.",
       "ifChatTimestamps": "Fügt jeder Chatzeile eine Uhrzeit hinzu, wahlweise im 12-Stunden- oder im 24-Stunden-Format.",
+      "ifFilterProfanity": "Masks profanity in chat with asterisks. On by default; switch it off here if you would rather read chat unfiltered.",
       "ifStartAttack": "Ob der Einsatz einer Fähigkeit auch Ihren Automatikangriff startet. Standardmäßig an, und das klassische Verhalten, das die meisten Spieler erwarten.",
       "ifStopAutoAttack": "Ob ein Zielwechsel Ihren Schwung stoppt. Standardmäßig aus, sodass Ihr Angriff auf das neue Ziel übergeht.",
       "ifShowAttackButton": "Setzt eine eigene Angriffs-Schaltfläche auf Ihre Aktionsleiste.",
@@ -5239,7 +5240,7 @@ export const de_DE: EnTranslations = {
       "ifHideUnused": "Blendet leere Aktionsfelder aus, sodass nur die Schaltflächen gezeichnet werden, die Sie tatsächlich nutzen.",
       "ifLockBars": "Sperrt Ihre Leisten, damit Sie eine Fähigkeit nicht versehentlich aus einem Feld ziehen.",
       "keybindsHeading": "Das Bedienfeld Tastenbelegung",
-      "keybindsBody": "Die Tastenliste ist nur die Hälfte dieses Bedienfelds. Darüber sitzen die Schalter, die bestimmen, wie Ihre Maus das Spiel steuert: Mauskamera, ob der Cursor beim Drehen gesperrt wird, Klicken zum Bewegen und welche Maustaste es auslöst, Angriffsbewegung, das Linkshänder-Touch-Layout und der Schimpfwortfilter für den Chat.",
+      "keybindsBody": "The key list is only half of that panel. Above it sit the switches that decide how your mouse drives the game: mouse camera, whether the cursor locks while you rotate, click to move and which mouse button triggers it, attack move, and the left-handed touch layout.",
       "keybindsMouseBody": "Zwei Dinge dort übersieht man leicht. Maustasten lassen sich wie Tasten belegen, sodass der Mausradklick und die Daumentasten Fähigkeiten tragen können, während Links- und Rechtsklick der Kamera und dem Klicken in der Welt vorbehalten bleiben. Und Sie können direkt von der Aktionsleiste aus belegen: Schalten Sie hier den Belegungsmodus auf der Leiste ein, klicken Sie dann ein Feld an und drücken Sie die gewünschte Taste."
     },
     "combat": {

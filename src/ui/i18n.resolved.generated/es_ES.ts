@@ -5227,6 +5227,7 @@ export const es_ES: EnTranslations = {
       "ifChatOpacity": "Qué tan sólido es el fondo del chat.",
       "ifCompactChat": "Compacta las líneas de chat para que quepan más.",
       "ifChatTimestamps": "Añade una hora a cada línea de chat, en formato de 12 o 24 horas.",
+      "ifFilterProfanity": "Masks profanity in chat with asterisks. On by default; switch it off here if you would rather read chat unfiltered.",
       "ifStartAttack": "Si usar una habilidad también inicia tu ataque automático. Activado de forma predeterminada, y el comportamiento clásico que la mayoría de los jugadores espera.",
       "ifStopAutoAttack": "Si cambiar de objetivo detiene tu ataque. Desactivado de forma predeterminada, así que tu ataque continúa sobre el nuevo objetivo.",
       "ifShowAttackButton": "Pone un botón explícito de Atacar en tu barra de acción.",
@@ -5239,7 +5240,7 @@ export const es_ES: EnTranslations = {
       "ifHideUnused": "Oculta las ranuras de acción vacías para que solo se dibujen los botones que realmente usas.",
       "ifLockBars": "Bloquea tus barras para que no puedas arrastrar una habilidad fuera de una ranura por accidente.",
       "keybindsHeading": "El panel de Atajos de teclado",
-      "keybindsBody": "La lista de teclas es solo la mitad de ese panel. Encima de ella están los interruptores que deciden cómo maneja el ratón el juego: Cámara con ratón, si el cursor se bloquea al rotar, Clic para moverse y qué botón del ratón lo activa, Ataque en movimiento, la disposición reflejada para zurdos, y el filtro de lenguaje del chat.",
+      "keybindsBody": "The key list is only half of that panel. Above it sit the switches that decide how your mouse drives the game: mouse camera, whether the cursor locks while you rotate, click to move and which mouse button triggers it, attack move, and the left-handed touch layout.",
       "keybindsMouseBody": "Hay dos cosas ahí fáciles de pasar por alto. Los botones del ratón se asignan como si fueran teclas, así que el clic de la rueda y los botones laterales pueden llevar habilidades, mientras que el clic izquierdo y el derecho siguen reservados para la cámara y para hacer clic en el mundo. Y puedes asignar teclas directamente desde la barra de acción: activa aquí el modo de edición de teclas de la barra de acción, luego haz clic en una ranura y presiona la tecla que quieras."
     },
     "combat": {

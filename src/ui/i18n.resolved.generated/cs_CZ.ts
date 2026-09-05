@@ -5227,6 +5227,7 @@ export const cs_CZ: EnTranslations = {
       "ifChatOpacity": "Jak neprůhledné je pozadí chatu.",
       "ifCompactChat": "Zhustí řádky chatu, aby se jich vešlo víc.",
       "ifChatTimestamps": "Přidá ke každému řádku chatu čas, ve 12hodinovém nebo 24hodinovém formátu.",
+      "ifFilterProfanity": "Masks profanity in chat with asterisks. On by default; switch it off here if you would rather read chat unfiltered.",
       "ifStartAttack": "Zda použití schopnosti spustí i tvůj automatický útok. Ve výchozím stavu zapnuto, klasické chování, které většina hráčů čeká.",
       "ifStopAutoAttack": "Zda přepnutí cíle zastaví tvůj úder. Ve výchozím stavu vypnuto, takže tvůj útok přejde na nový cíl.",
       "ifShowAttackButton": "Přidá na tvou akční lištu výslovné tlačítko Útok.",
@@ -5239,7 +5240,7 @@ export const cs_CZ: EnTranslations = {
       "ifHideUnused": "Skryje prázdné akční sloty, takže se vykreslí jen tlačítka, která doopravdy používáš.",
       "ifLockBars": "Uzamkne tvé lišty, abys omylem nevytáhl schopnost ze slotu.",
       "keybindsHeading": "Panel Klávesové zkratky",
-      "keybindsBody": "Seznam kláves je jen polovina tohoto panelu. Nad ním sedí přepínače, které rozhodují, jak myš ovládá hru: kamera myší, jestli se kurzor při otáčení uzamkne, kliknutím k pohybu a které tlačítko myši ho spouští, útok pohybem, rozvržení pro leváky na dotyku a filtr vulgarit pro chat.",
+      "keybindsBody": "The key list is only half of that panel. Above it sit the switches that decide how your mouse drives the game: mouse camera, whether the cursor locks while you rotate, click to move and which mouse button triggers it, attack move, and the left-handed touch layout.",
       "keybindsMouseBody": "Dvě věci se tam snadno přehlédnou. Tlačítka myši se váží jako klávesy, takže kliknutí kolečkem i palcová tlačítka mohou nést schopnosti, zatímco levé a pravé tlačítko zůstávají vyhrazená kameře a klikání do světa. A vázat můžeš rovnou z akční lišty: zapni si tu režim vázání přímo na liště, pak klikni na slot a stiskni klávesu, kterou chceš."
     },
     "combat": {

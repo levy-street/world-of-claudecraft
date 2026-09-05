@@ -5227,6 +5227,7 @@ export const tr_TR: EnTranslations = {
       "ifChatOpacity": "Sohbet arka planının ne kadar dolgun olduğu.",
       "ifCompactChat": "Sohbet satırlarını sıkılaştırarak daha fazlasının sığmasını sağlar.",
       "ifChatTimestamps": "Her sohbet satırına 12 saatlik ya da 24 saatlik biçimde bir zaman ekler.",
+      "ifFilterProfanity": "Masks profanity in chat with asterisks. On by default; switch it off here if you would rather read chat unfiltered.",
       "ifStartAttack": "Bir yetenek kullanmanın otomatik saldırınızı da başlatıp başlatmayacağı. Varsayılan olarak açıktır ve çoğu oyuncunun beklediği klasik davranıştır.",
       "ifStopAutoAttack": "Hedef değiştirmenin savuruşunuzu durdurup durdurmayacağı. Varsayılan olarak kapalıdır, bu yüzden saldırınız yeni hedefe taşınır.",
       "ifShowAttackButton": "Eylem çubuğuna belirgin bir Saldır düğmesi ekler.",
@@ -5239,7 +5240,7 @@ export const tr_TR: EnTranslations = {
       "ifHideUnused": "Boş eylem yuvalarını gizler, böylece yalnızca gerçekten kullanılan düğmeler çizilir.",
       "ifLockBars": "Çubukları kilitler, böylece bir yetenek yanlışlıkla bir yuvadan sürüklenip çıkarılamaz.",
       "keybindsHeading": "Tuş Atamaları paneli",
-      "keybindsBody": "Tuş listesi o panelin yalnızca yarısıdır. Üstünde, farenizin oyunu nasıl yönettiğine karar veren anahtarlar bulunur: fare kamerası, döndürürken imlecin kilitlenip kilitlenmeyeceği, tıklayarak hareket ve bunu hangi fare düğmesinin tetiklediği, saldırı hareketi, solaklar için dokunmatik yerleşim ve sohbet için küfür filtresi.",
+      "keybindsBody": "The key list is only half of that panel. Above it sit the switches that decide how your mouse drives the game: mouse camera, whether the cursor locks while you rotate, click to move and which mouse button triggers it, attack move, and the left-handed touch layout.",
       "keybindsMouseBody": "Orada gözden kaçması kolay iki şey var. Fare düğmeleri tuşlar gibi atanır, bu yüzden tekerlek tıklaması ve baş parmak düğmeleri yetenek taşıyabilir; sol ve sağ tık ise kamera ve dünyaya tıklamak için ayrılmış kalır. Ayrıca doğrudan eylem çubuğundan da atama yapabilirsiniz: buradan çubuk üzerinden atama kipini açın, ardından bir yuvaya tıklayıp istediğiniz tuşa basın."
     },
     "combat": {

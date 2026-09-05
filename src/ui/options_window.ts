@@ -142,12 +142,13 @@ interface NumericChoiceBinding {
   set(key: NumericSettingKey, value: number): void;
 }
 
-// The seven GameSettings the Key Bindings panel renders alongside the
+// The six GameSettings the Key Bindings panel renders alongside the
 // rebindable keys (the settingToggleKeybind + clickMoveMouseButtonRow calls in
 // renderKeybinds below). Its Reset to Defaults must restore these too, not just
 // the key-code map: without this list, a player's custom mouse-camera,
-// click-to-move (and its mouse button), attack-move, left-handed-touch, or
-// profanity-filter choice silently survived a "reset everything" click.
+// click-to-move (and its mouse button), attack-move, or left-handed-touch
+// choice silently survived a "reset everything" click. (The profanity filter
+// is a chat setting: it renders in Interface > Chat, whose own footer resets it.)
 const KEYBIND_PANEL_SETTING_KEYS: (keyof GameSettings)[] = [
   'mouseCamera',
   'lockCursorOnRotate',
@@ -155,7 +156,6 @@ const KEYBIND_PANEL_SETTING_KEYS: (keyof GameSettings)[] = [
   'clickToMoveButton',
   'attackMove',
   'leftHandedTouch',
-  'filterProfanity',
 ];
 
 // Endonyms for the in-game language picker; never localized (they render
@@ -2275,7 +2275,6 @@ export class OptionsWindow {
     this.clickMoveMouseButtonRow(el);
     this.settingToggleKeybind(el, t('hud.keybinds.actions.attackMove'), 'attackMove');
     this.settingToggleKeybind(el, t('hud.options.leftHandedTouch'), 'leftHandedTouch');
-    this.settingToggleKeybind(el, t('hud.options.filterProfanity'), 'filterProfanity');
     const note = document.createElement('div');
     note.className = 'kb-note';
     note.textContent = this.keybindNote || t('hud.options.keybindHelpMouseCamera');
@@ -2391,10 +2390,10 @@ export class OptionsWindow {
     reset.addEventListener('click', () => {
       audio.click();
       this.deps.keybinds().reset();
-      // The panel also renders seven GameSettings toggles alongside the
-      // rebindable keys (mouse camera, click-to-move and its mouse button,
-      // attack move, left-handed touch, profanity filter); Reset to Defaults
-      // must restore those too, not just the key-code map.
+      // The panel also renders six GameSettings toggles alongside the rebindable
+      // keys (mouse camera, click-to-move and its mouse button, attack move,
+      // left-handed touch); Reset to Defaults must restore those too, not just
+      // the key-code map.
       const hooks = this.deps.options();
       hooks?.settings.reset(KEYBIND_PANEL_SETTING_KEYS);
       for (const k of KEYBIND_PANEL_SETTING_KEYS) hooks?.onSettingChange(k, hooks.settings.get(k));

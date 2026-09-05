@@ -5227,6 +5227,7 @@ export const zh_TW: EnTranslations = {
       "ifChatOpacity": "聊天背景有多不透明。",
       "ifCompactChat": "收緊聊天行距，讓畫面裝得下更多行。",
       "ifChatTimestamps": "替每一行聊天加上時間，可選 12 小時制或 24 小時制。",
+      "ifFilterProfanity": "用星號遮住聊天中的髒話。預設開啟；如果你想不加過濾地閱讀聊天，可以在這裡關閉。",
       "ifStartAttack": "使用技能時是否同時開始自動攻擊。預設開啟，也是多數玩家預期的經典行為。",
       "ifStopAutoAttack": "切換目標時是否停下你的揮擊。預設關閉，因此你的攻擊會延續到新目標身上。",
       "ifShowAttackButton": "在你的動作列上放一個明確的「攻擊」按鈕。",
@@ -5239,7 +5240,7 @@ export const zh_TW: EnTranslations = {
       "ifHideUnused": "隱藏空的動作格，只畫出你實際會用的按鈕。",
       "ifLockBars": "鎖定你的動作列，讓你不會不小心把技能拖出格子。",
       "keybindsHeading": "「按鍵設定」面板",
-      "keybindsBody": "按鍵清單只是那個面板的一半。清單上方是決定滑鼠如何驅動遊戲的那些開關：滑鼠鏡頭、旋轉視角時游標是否鎖定、點擊移動以及用哪個滑鼠鍵觸發、攻擊移動、左撇子的觸控佈局，還有聊天的髒話過濾。",
+      "keybindsBody": "The key list is only half of that panel. Above it sit the switches that decide how your mouse drives the game: mouse camera, whether the cursor locks while you rotate, click to move and which mouse button triggers it, attack move, and the left-handed touch layout.",
       "keybindsMouseBody": "那裡有兩件事很容易錯過。滑鼠鍵和一般按鍵一樣可以綁定，因此滾輪按下與拇指鍵都能承載技能，而左鍵與右鍵則保留給鏡頭以及點擊世界。另外，你也可以直接從動作列綁定：在這裡開啟列上綁定模式，然後點一個格子，再按下你想要的按鍵。"
     },
     "combat": {

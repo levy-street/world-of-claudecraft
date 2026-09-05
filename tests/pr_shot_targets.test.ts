@@ -132,16 +132,17 @@ describe('classifyDiff', () => {
     expect(plan.generic).toHaveLength(0);
   });
 
-  it('maps an options_view change to the unlock, graphics dial, interface tab, and confirm-vendor-sell targets, in order', () => {
-    // All four targets key on 'ui/options_view'; registry order is the
-    // capture order: interface-unlock leads, then the graphics dial, then
-    // interface tabs, then the confirm-vendor-sell toggle row (the last one
-    // added). An ordering or selector regression here silently drops or
+  it('maps an options_view change to the unlock, chat tab, graphics dial, interface tab, and confirm-vendor-sell targets, in order', () => {
+    // All five targets key on 'ui/options_view'; registry order is the
+    // capture order: interface-unlock leads, then the Chat tab (registered
+    // beside it), then the graphics dial, then interface tabs, then the
+    // confirm-vendor-sell toggle row. An ordering or selector regression here silently drops or
     // duplicates the options-panel evidence.
     const plan = classifyDiff(['src/ui/options_view.ts']);
     expect(plan.isVisual).toBe(true);
     expect(plan.specific.map((t: { key: string }) => t.key)).toEqual([
       'interface-unlock-option',
+      'interface-chat-tab',
       'graphics-options-shadow-dial',
       'interface-options-tabs',
       'interface-options-confirm-vendor-sell',

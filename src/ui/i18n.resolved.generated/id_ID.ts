@@ -5227,6 +5227,7 @@ export const id_ID: EnTranslations = {
       "ifChatOpacity": "Seberapa pekat latar belakang obrolan.",
       "ifCompactChat": "Merapatkan baris obrolan agar lebih banyak yang muat.",
       "ifChatTimestamps": "Menambahkan waktu pada setiap baris obrolan, dalam format 12 jam atau 24 jam.",
+      "ifFilterProfanity": "Masks profanity in chat with asterisks. On by default; switch it off here if you would rather read chat unfiltered.",
       "ifStartAttack": "Apakah memakai sebuah kemampuan juga memulai serangan otomatis Anda. Aktif secara bawaan, dan inilah perilaku klasik yang diharapkan sebagian besar pemain.",
       "ifStopAutoAttack": "Apakah berganti sasaran menghentikan ayunan Anda. Nonaktif secara bawaan, sehingga serangan Anda berlanjut ke sasaran yang baru.",
       "ifShowAttackButton": "Menampilkan tombol Serang secara eksplisit pada bilah aksi Anda.",
@@ -5239,7 +5240,7 @@ export const id_ID: EnTranslations = {
       "ifHideUnused": "Menyembunyikan slot aksi yang kosong sehingga hanya tombol yang benar-benar Anda pakai yang ditampilkan.",
       "ifLockBars": "Mengunci bilah Anda sehingga Anda tidak bisa menyeret sebuah kemampuan keluar dari slotnya secara tidak sengaja.",
       "keybindsHeading": "Panel Pengaturan Tombol",
-      "keybindsBody": "Daftar tombol hanyalah separuh dari panel itu. Di atasnya ada sakelar-sakelar yang menentukan bagaimana mouse Anda mengendalikan permainan: kamera mouse, apakah kursor terkunci saat Anda memutar pandangan, klik untuk bergerak dan tombol mouse mana yang memicunya, serang sambil bergerak, tata letak sentuh untuk tangan kiri, dan penyaring kata kasar untuk obrolan.",
+      "keybindsBody": "The key list is only half of that panel. Above it sit the switches that decide how your mouse drives the game: mouse camera, whether the cursor locks while you rotate, click to move and which mouse button triggers it, attack move, and the left-handed touch layout.",
       "keybindsMouseBody": "Ada dua hal di sana yang mudah terlewat. Tombol mouse bisa diikat seperti tombol papan ketik, sehingga klik roda dan tombol jempol bisa membawa kemampuan, sementara klik kiri dan kanan tetap dicadangkan untuk kamera dan untuk mengeklik dunia. Dan Anda bisa mengikat langsung dari bilah aksi: aktifkan mode pengikatan pada-bilah di sini, lalu klik sebuah slot dan tekan tombol yang Anda inginkan."
     },
     "combat": {

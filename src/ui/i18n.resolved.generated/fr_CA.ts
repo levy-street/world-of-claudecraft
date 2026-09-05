@@ -5227,6 +5227,7 @@ export const fr_CA: EnTranslations = {
       "ifChatOpacity": "À quel point le fond de la discussion est opaque.",
       "ifCompactChat": "Resserre les lignes de discussion pour qu'il en tienne davantage à l'écran.",
       "ifChatTimestamps": "Ajoute une heure à chaque ligne de discussion, au format 12 heures ou 24 heures.",
+      "ifFilterProfanity": "Masks profanity in chat with asterisks. On by default; switch it off here if you would rather read chat unfiltered.",
       "ifStartAttack": "Si utiliser une capacité démarre aussi votre attaque automatique. Activé par défaut, et le comportement classique attendu par la plupart des joueurs.",
       "ifStopAutoAttack": "Si changer de cible arrête votre attaque. Désactivé par défaut, si bien que votre attaque se poursuit sur la nouvelle cible.",
       "ifShowAttackButton": "Ajoute un bouton Attaque explicite sur votre barre d'action.",
@@ -5239,7 +5240,7 @@ export const fr_CA: EnTranslations = {
       "ifHideUnused": "Masque les emplacements d'action vides pour n'afficher que les boutons que vous utilisez réellement.",
       "ifLockBars": "Verrouille vos barres pour éviter de glisser une capacité hors d'un emplacement par accident.",
       "keybindsHeading": "Le panneau Raccourcis clavier",
-      "keybindsBody": "La liste des touches n'est que la moitié de ce panneau. Au-dessus se trouvent les interrupteurs qui décident comment votre souris pilote le jeu : la Caméra à la souris, si le curseur se verrouille pendant la rotation, Cliquer pour se déplacer et le bouton de souris qui le déclenche, le Déplacement d'attaque, la disposition pour gaucher tactile, et le filtre de langage pour la discussion.",
+      "keybindsBody": "The key list is only half of that panel. Above it sit the switches that decide how your mouse drives the game: mouse camera, whether the cursor locks while you rotate, click to move and which mouse button triggers it, attack move, and the left-handed touch layout.",
       "keybindsMouseBody": "Deux détails sont faciles à manquer. Les boutons de la souris s'assignent comme des touches, si bien que le clic molette et les boutons latéraux peuvent porter des capacités, tandis que le clic gauche et le clic droit restent réservés à la caméra et au clic dans le monde. Et vous pouvez aussi assigner directement depuis la barre d'action : activez ici le mode Modifier les touches de la barre d'action, puis cliquez sur un emplacement et appuyez sur la touche voulue."
     },
     "combat": {

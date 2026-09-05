@@ -5227,6 +5227,7 @@ export const da_DK: EnTranslations = {
       "ifChatOpacity": "Hvor solid chatbaggrunden er.",
       "ifCompactChat": "Strammer chatlinjerne, så flere af dem kan være der.",
       "ifChatTimestamps": "Tilføjer et klokkeslæt til hver chatlinje, i 12-timers eller 24-timers form.",
+      "ifFilterProfanity": "Masks profanity in chat with asterisks. On by default; switch it off here if you would rather read chat unfiltered.",
       "ifStartAttack": "Hvorvidt brug af en evne også starter dit autoangreb. Til som standard, og den klassiske opførsel, de fleste spillere forventer.",
       "ifStopAutoAttack": "Hvorvidt skift af mål stopper dit sving. Fra som standard, så dit angreb følger med over på det nye mål.",
       "ifShowAttackButton": "Sætter en tydelig Angrib-knap på din handlingsbjælke.",
@@ -5239,7 +5240,7 @@ export const da_DK: EnTranslations = {
       "ifHideUnused": "Skjuler tomme handlingsfelter, så kun de knapper, du faktisk bruger, bliver tegnet.",
       "ifLockBars": "Låser dine bjælker, så du ikke ved et uheld kan trække en evne ud af et felt.",
       "keybindsHeading": "Tastebindings-panelet",
-      "keybindsBody": "Tastelisten er kun halvdelen af det panel. Over den sidder de kontakter, der afgør, hvordan din mus styrer spillet: musekamera, hvorvidt markøren låses, mens du drejer, klik for at flytte og hvilken museknap der udløser det, angrebsbevægelse, det venstrehåndede touch-layout og bandeordsfilteret til chatten.",
+      "keybindsBody": "The key list is only half of that panel. Above it sit the switches that decide how your mouse drives the game: mouse camera, whether the cursor locks while you rotate, click to move and which mouse button triggers it, attack move, and the left-handed touch layout.",
       "keybindsMouseBody": "To ting der er lette at overse. Museknapper bindes som taster, så hjulklikket og tommelfingerknapperne kan bære evner, mens venstre- og højreklik forbliver reserveret til kameraet og til at klikke på verden. Og du kan binde direkte fra handlingsbjælken: slå bindingstilstanden på bjælken til her, klik derefter på et felt, og tryk på den tast, du ønsker."
     },
     "combat": {

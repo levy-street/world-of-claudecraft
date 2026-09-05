@@ -5227,6 +5227,7 @@ export const zh_CN: EnTranslations = {
       "ifChatOpacity": "聊天背景有多实。",
       "ifCompactChat": "收紧聊天行距，让一屏能装下更多内容。",
       "ifChatTimestamps": "为每一行聊天加上时间，可选 12 小时制或 24 小时制。",
+      "ifFilterProfanity": "用星号遮住聊天中的脏话。默认开启；如果你想不加过滤地阅读聊天，可以在这里关闭。",
       "ifStartAttack": "使用技能时是否同时开始自动攻击。默认开启，也是大多数玩家熟悉的经典行为。",
       "ifStopAutoAttack": "切换目标时是否停下你的挥击。默认关闭，因此你的攻击会延续到新目标身上。",
       "ifShowAttackButton": "在你的动作条上放一个明确的“攻击”按钮。",
@@ -5239,7 +5240,7 @@ export const zh_CN: EnTranslations = {
       "ifHideUnused": "隐藏空的动作格，只绘制你真正会用到的按钮。",
       "ifLockBars": "锁定你的技能栏，免得不小心把技能从格子里拖出来。",
       "keybindsHeading": "“按键绑定”面板",
-      "keybindsBody": "按键列表只是那个面板的一半。它上面还有一排开关，决定你的鼠标如何驾驭这个游戏：鼠标镜头、旋转视角时是否锁定光标、点击移动以及由哪个鼠标键触发、攻击移动、左手触控布局，还有聊天的脏话过滤。",
+      "keybindsBody": "The key list is only half of that panel. Above it sit the switches that decide how your mouse drives the game: mouse camera, whether the cursor locks while you rotate, click to move and which mouse button triggers it, attack move, and the left-handed touch layout.",
       "keybindsMouseBody": "那里有两件事很容易被忽略。鼠标按键可以像键盘按键一样绑定，所以滚轮点击和拇指键都能承载技能，而左右键则保留给镜头和点击世界。此外，你可以直接从动作条上绑定：在这里打开条上绑定模式，然后点一个格子，按下你想要的键。"
     },
     "combat": {

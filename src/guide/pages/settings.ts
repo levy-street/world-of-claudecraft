@@ -388,6 +388,7 @@ const INTERFACE_TABS: InterfaceTabBlock[] = [
       { setting: 'hud.options.chatOpacity', body: 'guide.settingsPage.ifChatOpacity' },
       { setting: 'hud.options.compactChat', body: 'guide.settingsPage.ifCompactChat' },
       { setting: 'hudChrome.chatTimestamps.show', body: 'guide.settingsPage.ifChatTimestamps' },
+      { setting: 'hud.options.filterProfanity', body: 'guide.settingsPage.ifFilterProfanity' },
     ],
   },
   {
