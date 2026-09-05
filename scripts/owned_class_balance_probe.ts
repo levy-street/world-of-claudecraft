@@ -814,6 +814,7 @@ export function runOwnedClassDpsProbe(
   // isolates un-geared spec parity, the same low-gear axis a leveling or
   // fresh-alt player experiences.
   gear: 'pbe' | 'naked' = 'pbe',
+  setupEquipment?: (sim: Sim) => void,
 ): OwnedClassBalanceResult {
   const fixture = FIXTURES[spec];
   const sim = new Sim({ seed, playerClass: fixture.cls, autoEquip: false }) as ProbeSim;
@@ -827,6 +828,7 @@ export function runOwnedClassDpsProbe(
     throw new Error(`failed to apply ${fixture.talentSpec}`);
   }
   if (gear === 'pbe') equipPbeLoadout(sim, spec);
+  setupEquipment?.(sim);
   // Keep all three targets in one unobstructed cluster. The starter-world origin
   // has a static collider just left of the player, so a negative offset turns the
   // third target into a line-of-sight fixture instead of an area-damage fixture.
@@ -1099,6 +1101,7 @@ export function runOwnedHealerProbe(
   head = 'working-tree',
   talentRows?: Record<number, string>,
   seconds = 60,
+  setupEquipment?: (sim: Sim) => void,
 ): OwnedHealerBalanceResult {
   const fixture = healerFixture(spec);
   const sim = new Sim({ seed, playerClass: fixture.cls, autoEquip: false }) as ProbeSim;
@@ -1110,6 +1113,7 @@ export function runOwnedHealerProbe(
     throw new Error(`failed to apply ${fixture.talentSpec}`);
   }
   equipExactLoadout(sim, fixture.loadout);
+  setupEquipment?.(sim);
   const healer = sim.player;
   placeEntity(sim, healer, 720, 0);
   const allies: Entity[] = [];
