@@ -875,7 +875,10 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered after extracting the world trees' camera-occluder fade (the
     // hideable records, the trunk hit test, the gated instance/ghost swap)
     // into src/render/tree_hide_fade.ts.
-    ceiling: 3996,
+    // Lowered again after extracting the per-frame distance-window resolver
+    // (detail swap, rock/dress swaps, collapse uniforms) into
+    // src/render/foliage_frame_windows_core.ts.
+    ceiling: 3983,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {

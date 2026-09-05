@@ -37,9 +37,11 @@ export const LOD_HIGH: LodDists = {
   treeFillFar: 310,
 };
 
-// low caps must clear the worst camera-to-bucket distance (~158u for a
-// 2-column x 240u-band bucket) or nearby dressing vanishes and trunks pop at
-// bucket boundaries
+// Low caps: the tree rows still measure from the bucket CENTER, so these must
+// clear the worst camera-to-bucket-center distance a tree row can see (~158u
+// for a 2-column x 240u-band bucket) or trunks pop at bucket boundaries. The
+// rock and dressing rows measure from the near edge (maxNearEdge, below) and
+// no longer depend on this margin.
 export const LOD_LOW: LodDists = {
   barkFar: 170,
   treeDetailFar: 250,
@@ -149,6 +151,16 @@ export interface BucketWindowInput {
    */
   minAtDetail?: boolean;
   maxAtDetail?: boolean;
+  /**
+   * Measure the numeric max cap from the bucket's NEAR edge instead of its
+   * center. Only for rows whose vertex shader collapses every instance past
+   * that same cap (foliage_collapse.ts binds the cap as the row's window):
+   * the slab then survives until its nearest instance crosses the cap, and
+   * the instances beyond it cost a vertex-shader early-out each, never a
+   * rasterized triangle. Without that per-instance window a near-edge cap
+   * keeps a half-bucket of live triangles past the cull.
+   */
+  maxNearEdge?: boolean;
   /** adaptive budget scale applied to the build-time bounds */
   distanceScale: number;
   /** runtime tree-detail boundary (see treeDetailDistance) */
@@ -179,6 +191,16 @@ export interface BucketWindowInput {
  * edge would keep every bucket alive for another half-bucket past its cap and
  * quietly multiply the triangles they exist to cut.
  *
+ * The lean-arm rock and dressing rows are the one exception (maxNearEdge). A
+ * shipped slab is half the world wide (bounding radius ~270-310u) against a
+ * lean rock cap of ~106-190u, so keyed on the center the whole slab, boulders a
+ * stride from the player included, dropped out whenever the CAMERA orbited its
+ * center past the cap: rocks and bushes popping in and out with the view angle
+ * on Low, while the rock's collider still blocked movement. Those rows now
+ * measure from the near edge, and their vertex shader collapses each instance
+ * past the very same cap, so the extra kept instances are vertex early-outs,
+ * not the half-bucket of triangles the center rule exists to prevent.
+ *
  * The tree-detail swap is the exception: its two arms are COVERAGE tests, not a
  * partition. The real model draws while any part of the bucket is inside the
  * swap (near edge), the impostor while any part is outside it (far edge), so a
@@ -206,7 +228,11 @@ export function bucketVisible(w: BucketWindowInput): boolean {
     w.maxDist === undefined
       ? Number.POSITIVE_INFINITY
       : w.maxDist * w.distanceScale * w.revealScale;
-  if (w.centerDist < minCap || w.centerDist >= maxCap) return false;
+  // The cap probe: the center, or the near edge for the rows whose shader
+  // owns the per-instance boundary (see maxNearEdge). Camera-keyed either
+  // way, so an orbit of the camera moves it by the camera's own offset.
+  const maxProbe = w.maxNearEdge ? nearEdge : w.centerDist;
+  if (w.centerDist < minCap || maxProbe >= maxCap) return false;
 
   if (w.minAtDetail) {
     // Sprite rows come alive at the earliest per-instance handoff their
