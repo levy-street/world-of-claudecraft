@@ -22,6 +22,7 @@ import type { SimContext } from '../sim_context';
 import type { RecipeItemDef } from '../types';
 import { collectionManualRecipes } from './collection_manual';
 import { acquireRecipe, isRecipeKnown } from './crafting';
+import { useEnchantFormula } from './enchant_formula';
 import { teachTierMet } from './training';
 import type { ProfessionRecipeRecord } from './types';
 
@@ -91,6 +92,10 @@ export function useRecipePatternItem(
   meta: PlayerMeta,
   slotIndex?: number,
 ): void {
+  if (def.teachesEnchantId) {
+    useEnchantFormula(ctx, itemId, def, meta, slotIndex);
+    return;
+  }
   // The pinned-selection gate, BEFORE any effect. useItem already refused an
   // invalid selection, but this function holds the item_copy_ref tri-state
   // contract for ANY caller: a bad pin refuses outright (silently, the same

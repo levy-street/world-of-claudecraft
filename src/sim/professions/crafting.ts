@@ -118,6 +118,7 @@ import { countAcrossGrades, type GradeRemoval, materialGradeIds } from './materi
 import { materialTierBonusForReagents } from './material_tier';
 import { isStationActive, partySharedStationSatisfies } from './mobile_station';
 import { PERFECTING_HEADSTART_RANK } from './perfecting';
+import { withPerfectingBonus } from './perfecting_bonus';
 import { craftActionXp } from './profession_xp';
 import {
   countMinusPlanned,
@@ -1218,10 +1219,10 @@ export function resolveCraftForRecipe(
     // occupies the same one slot the plain signed shape already models.
     // Remainder copies (no shipped apex recipe has any) land exactly as the
     // masterwork arm's do.
-    const payload: ItemInstancePayload = {
+    const payload: ItemInstancePayload = withPerfectingBonus(def, recipe, {
       signer: meta.name,
       perfecting: PERFECTING_HEADSTART_RANK,
-    };
+    });
     if (commissioned) payload.bindOnTrade = true;
     ctx.addItemInstance(recipe.resultItemId, payload, pid, 1, {
       silent: true,
@@ -1246,7 +1247,7 @@ export function resolveCraftForRecipe(
       }
     }
   } else if (meta && mintsSignedCraftOutput(def)) {
-    const payload: ItemInstancePayload = { signer: meta.name };
+    const payload: ItemInstancePayload = withPerfectingBonus(def, recipe, { signer: meta.name });
     if (commissioned) payload.bindOnTrade = true;
     ctx.addItemInstance(recipe.resultItemId, payload, pid, recipe.resultCount, {
       silent: true,

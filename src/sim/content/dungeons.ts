@@ -28,6 +28,7 @@ import type {
   LootEntry,
   MobTemplate,
 } from '../types';
+import { CRUCIBLE_PROFESSION_PATTERN_LOOT } from './crucible_collections';
 import { HEROIC_FINALE_COPPER, NYTHRAXIS_HEROIC_COPPER } from './dungeon_difficulty';
 import { CRUCIBLE_VENDOR_NPC_ID } from './ignivar_loot';
 import {
@@ -172,6 +173,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       // shape with the scroll roll group and the hammer chain starter).
       { itemId: 'lastflame_core', chance: 1 },
       { itemId: 'lastflame_core', chance: 0.5 },
+      ...CRUCIBLE_PROFESSION_PATTERN_LOOT,
     ],
     scale: 3.2,
     color: 0x9f351c,
@@ -354,6 +356,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       // shape with the scroll roll group and the hammer chain starter).
       { itemId: 'lastflame_core', chance: 1 },
       { itemId: 'lastflame_core', chance: 0.5 },
+      ...CRUCIBLE_PROFESSION_PATTERN_LOOT,
     ],
     scale: 3.4,
     color: 0xd64316,

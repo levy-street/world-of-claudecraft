@@ -160,6 +160,15 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   the selected copy's ordinal/count anchor and payload/provenance pin through
   confirmation and the wire; the shared deny head refuses a stale token before
   spending materials. Tokens are optional for legacy/headless callers.
+- `perfecting_swap.ts`: atomic rank exchange for two owned pieces from the same
+  Crucible collection. Both refs require copy pins; the shared pure view gates
+  death, combat/casts, locks, distinct copies, valid progress, skill and the
+  appropriate static station before either payload changes. Each swap binds both
+  copies permanently, preserves names and promotion, draws no rng and charges
+  nothing. `perfecting_bonus.ts` freezes each new collection copy's primary-stat
+  contribution when crafted, so repeated exchanges cannot duplicate or retune it.
+  `../item_instance_stats.ts` projects active stats while a Perfected-only enchant
+  is dormant; its full stored contribution remains available for replacement.
 - `legendary_name.ts`: the pure SHAPE leaf for a player-chosen legendary name
   (trim, collapse, `[A-Za-z' -]`, 2 to 32); the online server screens CONTENT
   before the command reaches the sim, and the load bound in

@@ -76,7 +76,7 @@ plausibly covers means the table needs a new row in the same change.
 | `combat/casting_lifecycle.ts` | `updateCasting`, `castAbility(BySlot)`, `cancelCast`, `pushbackCast`, GCD/cost/cooldown |
 | `combat/effect_dispatch.ts` | `runEffects` (the per-effect switch) |
 | `combat/auto_attack.ts` | start/stop/update auto-attack, `meleeSwing`, `rangedSwing` |
-| `combat/equip_procs.ts` + `combat/set_procs.ts` | legendary weapon on-action procs; item-set bonus procs |
+| `combat/equip_procs.ts` + `combat/set_procs.ts` + `combat/crafted_collection_effects.ts` | legendary weapon and per-hand enchant procs; item-set bonus procs; shared crafted-collection damage windows, tank wards, and overheal protection |
 | `combat/empower_next.ts` + `combat/thorns_charge.ts` | next-cast empower/free aura consumption; charge-limited thorns |
 | the per-class combat suites | EVERY class has one: flat `combat/<class>_*.ts` prefixed siblings (the `paladin_*` family, `warrior_stances.ts`, `rogue_engines.ts`, `druid_engines.ts`, the `shaman_*` and `hunter_*` sets, the mage `fire_mage.ts`/`frost_mage.ts`/`chronomancy.ts` modules, the warlock `necromancy*` set beside the shared class-talent state in `warlock_talents.ts`) or a per-class subdirectory once the family earns one (`combat/priest/` is the precedent: the class's suite behind one directory; `ls` it for the module set). A new class mechanic lands as a new sibling in its class's suite, never inside a shared dispatcher |
 | `projectile_travel.ts` | in-flight homing projectiles: `pendingProjectiles` + the prologue `advancePendingProjectiles` phase |

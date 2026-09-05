@@ -79,6 +79,9 @@ export const HEAVY_SELF_CMDS = new Set<string>([
   // marks nothing; a frame that reaches sim.perfectItemAs marks, whatever
   // the sim's own deny ladder then decides.
   'perfect_item',
+  // Two owned payloads change atomically, in bags or equipment. Invalid
+  // unpinned frames do not reach the sim and must not force serialization.
+  'swap_perfecting_ranks',
   'loot',
   'harvestCorpse',
   'pickup',
@@ -151,7 +154,7 @@ export const HEAVY_SELF_CMDS = new Set<string>([
 // itself refuses (a malformed perfect_item ref, a screened legendary name, a
 // farming frame whose bed/crop/knob fields fail their type guards) never
 // buys a heavy self re-serialize. The trade every entry above still makes
-// ("marks on receipt regardless of outcome") narrows for these five to
+// ("marks on receipt regardless of outcome") narrows for this family to
 // "marks when the sim is called": a SIM-side refusal (the deny ladder, a
 // farmDenied) still marks, because the dispatch cannot see the sim's verdict
 // without a return channel the sim does not have, and the success paths keep
@@ -159,6 +162,7 @@ export const HEAVY_SELF_CMDS = new Set<string>([
 // farmPlanted events) exactly as the entries' own comments record.
 export const HEAVY_SELF_ARM_MARKED_CMDS = new Set<string>([
   'perfect_item',
+  'swap_perfecting_ranks',
   'plant_crop',
   'harvest_crop',
   'convert_husks',
@@ -230,6 +234,7 @@ export const HEAVY_SELF_EVENTS = new Set<string>([
   // offer an enchant the player can no longer afford. The bagged arm's loot
   // event already covered it; this makes both arms explicit.
   'enchantResult',
+  'perfectingSwapResult',
   // Commission order board delivery (issue #1298): the crafter's arm
   // removes the delivered copy directly from PlayerMeta.inventory (no
   // addItem/removeItem call, so no loot event fires on that side), so the

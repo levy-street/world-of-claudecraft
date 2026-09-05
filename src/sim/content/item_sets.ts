@@ -28,6 +28,7 @@
 // `entity.ts`.
 
 import type { ItemSet, SetBonusEffect, SetBonusTier, SetProc } from '../types';
+import { CRUCIBLE_COLLECTION_SETS } from './crucible_collections';
 
 // Haste granted by a set tier after the global combat-rating conversion: what
 // SET_HASTE_3PC_RATING is worth once recalcPlayerStats converts it. Read only
@@ -357,6 +358,7 @@ function warfareBonuses(signature: SetProc, capstoneText: string): SetBonusTier[
 }
 
 export const ITEM_SETS: Record<string, ItemSet> = {
+  ...CRUCIBLE_COLLECTION_SETS,
   [SET_DEATHLORD]: {
     id: SET_DEATHLORD,
     name: 'Barrowlord Battlegear',

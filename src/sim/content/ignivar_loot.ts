@@ -34,6 +34,7 @@
 // (CRUCIBLE_VENDOR_STOCK).
 
 import type { ItemDef, NpcDef } from '../types';
+import { CRUCIBLE_PATTERN_VENDOR_STOCK } from './crucible_collections';
 
 // Source level the whole Ignivar raid loot table reads as in the item-level
 // index: level-20 content two tiers above the five-man heroics, so epics land
@@ -3310,6 +3311,7 @@ export interface CrucibleVendorOffer {
 }
 
 export const CRUCIBLE_VENDOR_STOCK: readonly CrucibleVendorOffer[] = [
+  ...CRUCIBLE_PATTERN_VENDOR_STOCK,
   { itemId: 'slagbreaker_helmet', sigilId: 'sigil_anvil_helmet' },
   { itemId: 'slagbreaker_shoulder', sigilId: 'sigil_anvil_shoulder' },
   { itemId: 'slagbreaker_chest', sigilId: 'sigil_anvil_chest' },

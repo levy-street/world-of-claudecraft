@@ -88,9 +88,10 @@ export function slotAcceptsItem(item: ItemDef, slot: EquipSlot): boolean {
 // (phase 13) the instance widening is ADD-ONLY and PROMOTION-SCOPED, not a
 // raw effective-quality read (corrected 2026-08-27, same day): a def-level
 // legendary ALWAYS counts (a below-def rolled quality can never remove
-// def-level uniqueness), and a legendary-ROLLED copy counts only when the
-// payload also carries the promotion's own `perfected` stamp (the orange
-// promotion requires a Perfected copy, so every promoted copy has it). Legacy
+// def-level uniqueness), and outside crafted collections a legendary-ROLLED
+// copy counts only when its payload carries `perfected` or the permanent
+// `perfectingBound` marker.
+// A promoted collection donor retains uniqueness when its ranks move away. Legacy
 // legendary-rolled payloads never do (old masterwork bumps wrote
 // rolled.quality; crafting.ts retired that for new writes but keeps loading
 // them), so a live character legally wearing two legacy legendary-rolled
@@ -104,7 +105,16 @@ export function slotAcceptsItem(item: ItemDef, slot: EquipSlot): boolean {
 // either side to match the other.
 export function isUniqueEquipped(item: ItemDef, instance?: ItemInstancePayload): boolean {
   if (item.quality === 'legendary') return true;
-  return instance?.perfected === true && instance.rolled?.quality === 'legendary';
+  // Crafted set membership first shipped with Crucible collections, after
+  // legacy quality rolls retired. Their only legendary writer is promotion,
+  // so a public copy does not need private binding proof to show uniqueness.
+  // The original Masterwrought roster has no set membership; the exact
+  // distinction is pinned in crucible_public_uniqueness.test.ts.
+  const craftedCollection = item.masterwrought === true && !!item.set;
+  return (
+    (craftedCollection || instance?.perfected === true || instance?.perfectingBound === true) &&
+    instance?.rolled?.quality === 'legendary'
+  );
 }
 
 // The uniqueness KEY. A heroic upgrade variant (content/heroic_variants.ts,

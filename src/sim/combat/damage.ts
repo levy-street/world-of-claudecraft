@@ -75,6 +75,12 @@ import {
 import { isUnbreakableControlAura } from './cc';
 import { stopChannelVisual } from './channel_visuals';
 import { chronomancyConvertArcaneDamage, stripTemporalEchoes } from './chronomancy';
+import {
+  cleanupCraftedCollectionAuras,
+  craftedPetDamageMultiplier,
+  isCraftedCollectionAura,
+  onCraftedCollectionDamage,
+} from './crafted_collection_effects';
 import { recordDamageTaken } from './damage_history';
 import { destructionOnDeath } from './destruction';
 import {
@@ -375,6 +381,7 @@ export function dealDamage(
   }
 
   if (!alreadyFinal && source && source.id !== target.id && amount > 0) {
+    cleanupCraftedCollectionAuras(ctx, source);
     let damageDone = 0;
     for (const aura of source.auras) {
       if (
@@ -388,6 +395,7 @@ export function dealDamage(
         damageDone += aura.value2 ?? 0;
       }
     }
+    damageDone += craftedPetDamageMultiplier(ctx, source) - 1;
     if (damageDone !== 0) amount = Math.round(amount * Math.max(0, 1 + damageDone));
   }
 
@@ -563,6 +571,7 @@ export function dealDamage(
   // is ALREADY an exact landed-HP-loss copy (the Ruinous Brand echo) has passed
   // through the target's absorbs once and must not be soaked a second time.
   if (!resolvedHpLoss && amount > 0) {
+    cleanupCraftedCollectionAuras(ctx, target);
     for (let i = target.auras.length - 1; i >= 0 && amount > 0; i--) {
       const a = target.auras[i];
       if (a.kind !== 'absorb') continue;
@@ -579,7 +588,12 @@ export function dealDamage(
         ctx.emit({ type: 'aura', targetId: target.id, name: a.name, gained: false });
         // Talent procs listening for a fully consumed shield (deterministic).
         const shielder = ctx.entities.get(a.sourceId);
-        if (shielder && !shielder.dead && shielder.kind === 'player') {
+        if (
+          shielder &&
+          !shielder.dead &&
+          shielder.kind === 'player' &&
+          !isCraftedCollectionAura(a.id)
+        ) {
           onShieldConsumed(ctx, shielder, a.id, target);
           priestOnShieldConsumed(ctx, shielder, a, target, source);
         }
@@ -922,6 +936,8 @@ export function dealDamage(
 
   const preHp = target.hp;
   target.hp = guardianWardRestore || Math.max(0, target.hp - amount);
+  // Snapshot before reactive heals can restore health or nested damage can add loss.
+  const craftedHpLoss = Math.max(0, preHp - target.hp);
   if (resolution) resolution.landedHpLoss = Math.max(0, preHp - target.hp);
   // Chronomancy Rewind (combat/damage_history.ts): log the REAL HP loss this player
   // just took, tagged by sim tick, so Rewind can restore a fraction of recent damage.
@@ -1035,6 +1051,7 @@ export function dealDamage(
   }
 
   if (source && source.id !== target.id) ctx.enterCombat(source, target);
+  onCraftedCollectionDamage(ctx, source, target, craftedHpLoss, school, direct, alreadyFinal);
   if (direct) ctx.refreshMobLeashFromAction(source, target);
 
   // classic threat: damage (and the ability's flat bonus) lands on the mob's

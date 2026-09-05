@@ -3,8 +3,8 @@
 // resolution logic lives in ../professions/enchanting.ts behind the
 // SimContext seam.
 //
-// Scope: a two-tier enchant table, always known (no recipe learning; the
-// free-floor rule in ../professions/enchanting.ts applies to both tiers):
+// Scope: ordinary always-known stat tiers and a learned Crucible weapon proc.
+// The free-floor rule in ../professions/enchanting.ts applies to base/Greater:
 //   1. Base enchants (arcane_dust, some arcane_essence): the per-slot basics.
 //      They cover the weapon and offhand slots plus every armor slot (helmet
 //      through ring), with several stat-axis options per slot so every build
@@ -79,9 +79,9 @@
 // tests/enchants_magnitude_invariants.test.ts pins the per-axis stacks and the
 // tier ladder shape.
 //
-// Every enchant grants a flat primary-stat or armor bonus (the only bonus
-// categories recalcPlayerStats reads off an item instance's rolled.stats, see
-// src/sim/entity.ts); a weapon-damage enchant is deliberately out of scope
+// Stat enchants grant flat primary-stat or armor bonuses through rolled.stats.
+// Last Flame's Zeal instead uses weaponProc and the shared melee proc hub; it
+// has no baked stat bonus. A weapon-damage enchant is deliberately out of scope
 // since damage rolls read the item DEFINITION's weapon.min/max, not
 // per-instance data, and wiring that is a larger, separate change. `itemSlot`
 // matches ItemDef['slot'] (see src/sim/types.ts): rings declare slot 'ring',
@@ -113,9 +113,29 @@ export interface EnchantDef {
    *  until phase 12 lands, deliberately. Only ever `true`; absent is the
    *  ordinary any-copy enchant. */
   requiresPerfected?: true;
+  /** Absent means the existing always-known tier. Drop formulas teach this id. */
+  acquisition?: 'drop';
+  description?: string;
+  /** Per-hand melee proc. Chance uses the striking weapon's unmodified speed. */
+  weaponProc?: { ppm: number; strength: number; duration: number; heal: number };
 }
 
 export const ENCHANTS: Record<string, EnchantDef> = {
+  enchant_weapon_lastflame_zeal: {
+    id: 'enchant_weapon_lastflame_zeal',
+    name: "Last Flame's Zeal",
+    itemSlot: 'mainhand',
+    skillReq: 100,
+    acquisition: 'drop',
+    reagents: [
+      { itemId: 'lastflame_core', count: 3 },
+      { itemId: 'arcane_shard', count: 2 },
+    ],
+    statBonus: {},
+    weaponProc: { ppm: 1, strength: 50, duration: 15, heal: 200 },
+    description:
+      "Your landed melee attacks can grant 50 Strength for 15 sec and heal you for 200 health. Healing modifiers apply. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Each hand has its own buff; repeated triggers refresh that hand. Ranged attacks do not trigger this effect. Wolf Form uses its 1 sec base swing speed instead.",
+  },
   enchant_weapon_might: {
     id: 'enchant_weapon_might',
     name: 'Weapon Etching: Might',
