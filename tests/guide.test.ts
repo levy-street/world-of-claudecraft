@@ -3777,11 +3777,13 @@ describe('Guide professions pages and routes', () => {
     const rows = GUIDE_PROF_CRAFTS.flatMap((c) =>
       c.recipes.map((r) => ({ cap: c.maxSkill, gain: r.gain })),
     );
-    expect(rows.length, 'published recipe rows').toBe(170);
+    // The 33 skill-100 Crucible recipes all carry an unreachable zero-gain
+    // boundary too; keep the original 170-row behavior plus that exact growth.
+    expect(rows.length, 'published recipe rows').toBe(203);
     expect(
       rows.filter((r) => r.gain.zeroAt > r.cap).length,
       'rows carrying at least one unreachable boundary',
-    ).toBe(63);
+    ).toBe(96);
 
     const never = t('guide.profPages.gainNever');
     const cell = (reduced: string, minimal: string, zero: string): string =>
