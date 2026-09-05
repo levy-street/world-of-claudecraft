@@ -127,6 +127,65 @@ describe('ClientWorld gap-resume continuity', () => {
   });
 });
 
+// Jitter-resilience regression (entity_reanchor.ts): the flat 40yd snap
+// threshold ignored elapsed time, so a fast-but-plausible mover crossed it
+// during an ordinary network gap and got a hard pop instead of a glide.
+describe('ClientWorld jitter resilience (entity_reanchor)', () => {
+  const self = {
+    id: 1,
+    k: 'player',
+    tid: 'warrior',
+    nm: 'Watcher',
+    lv: 10,
+    x: 0,
+    y: 0,
+    z: 0,
+    f: 0,
+    hp: 100,
+    mhp: 100,
+    res: 0,
+    mres: 100,
+    rtype: 'rage',
+  };
+  const mob = (x: number, full = false) => ({
+    id: 2,
+    ...(full ? { k: 'mob', tid: 'forest_wolf', nm: 'Forest Wolf', lv: 5 } : {}),
+    x,
+    y: 0,
+    z: 3,
+    f: 0,
+    hp: 50,
+    mhp: 50,
+  });
+
+  it('a fast-plausible move (~45yd over a 2s gap) glides instead of hard-snapping', () => {
+    const client = bareClient(1);
+    const internals = client as unknown as { applySnapshot(snapshot: unknown): void };
+    internals.applySnapshot({ t: 'snap', ents: [mob(0, true)], self });
+    const tracked = client.entities.get(2);
+    if (!tracked) throw new Error('mob entity missing');
+    (tracked as any).netUpdatedAt = performance.now() - 2000;
+    internals.applySnapshot({ t: 'snap', ents: [mob(45)], self });
+    // the OLD flat 40yd threshold would have hard-snapped: prevPos.x === 45
+    // exactly. The plausible-speed window (24 yd/s over this 2s gap) glides
+    // instead, so prevPos must NOT land exactly on the new wire position.
+    expect(tracked.pos.x).toBe(45);
+    expect(tracked.prevPos.x).not.toBeCloseTo(45, 6);
+  });
+
+  it('a genuine teleport in a short gap still hard-snaps (regression guard)', () => {
+    const client = bareClient(1);
+    const internals = client as unknown as { applySnapshot(snapshot: unknown): void };
+    internals.applySnapshot({ t: 'snap', ents: [mob(0, true)], self });
+    const tracked = client.entities.get(2);
+    if (!tracked) throw new Error('mob entity missing');
+    (tracked as any).netUpdatedAt = performance.now() - 100;
+    internals.applySnapshot({ t: 'snap', ents: [mob(200)], self });
+    expect(tracked.pos.x).toBe(200);
+    expect(tracked.prevPos.x).toBe(200);
+  });
+});
+
 describe('ClientWorld prevFacing basis', () => {
   it('stays bounded in (-PI, PI] while a mob turns full circles across the seam', () => {
     const client = bareClient(1);

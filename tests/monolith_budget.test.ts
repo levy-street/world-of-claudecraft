@@ -604,6 +604,20 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/net/online.ts',
+    // Re-pinned to the eastbrook-plus-tutorial integration merge output:
+    // both parents' additions combine, so keep the exact merged count.
+    // Re-pinned +29 for the guild pledge board: the four one-line command
+    // senders, the entity pg/gt decode, and the social-frame pledge-field
+    // normalization (wire mirror code that must live on ClientWorld). Exact
+    // count.
+    // Re-pinned to the exact merged count of the v0.40.0 sync merge: both
+    // arms added wire-mirror code, so the merged file lands above either
+    // parent pin. Exact count, zero slack.
+    // Plus 18 for the guildRoster REST mirror (the signpost guild board's
+    // roster drill-in; the cached read lives in server/guild_roster.ts),
+    // then re-pinned when the mirror gained the trust-boundary row
+    // validation and the 404-vs-transport-failure split, plus the roster
+    // class field. Exact count, zero slack.
     // Re-pinned at the SIXTH release/v0.40.0 sync (release tip 9a89e3483e).
     // Neither arm crossed 5950 on its own (branch 5942, release 5877 over a
     // base of 5858); only the merge does, because both arms' growth stacks.
@@ -661,7 +675,18 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
-    ceiling: 5908,
+    // Lowered on the net-interp-jitter-resilience branch after extracting the
+    // remote-entity reanchor decision into src/net/entity_reanchor.ts (a pure
+    // sibling module with its own tests): the extraction is the whole point
+    // of the ratchet, so the ceiling followed the file down to its new exact
+    // count rather than keeping the old headroom.
+    // Re-pinned to the exact merged count of the release/v0.42.0 sync into
+    // that branch: the release arm's growth (Ignivar/Varkhul raid wire,
+    // bank/vault mirrors, movement frame v2, dungeon entry facing) outweighs
+    // this branch's entity_reanchor extraction, so the merged file lands
+    // above either parent's own pin. Measured on the merged tree, never
+    // reconciled by arithmetic. Exact count, zero slack.
+    ceiling: 5910,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
