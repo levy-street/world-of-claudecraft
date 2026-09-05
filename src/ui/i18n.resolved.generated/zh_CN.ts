@@ -14116,6 +14116,9 @@ export const zh_CN: EnTranslations = {
       "lastflame_core": {
         "name": "末焰之核"
       },
+      "forgefathers_ember": {
+        "name": "锻父的余烬"
+      },
       "slagbreaker_helmet": {
         "name": "破渣头盔"
       },
@@ -17621,6 +17624,26 @@ export const zh_CN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "击败瓦尔库尔"
+          }
+        }
+      },
+      "q_forgefathers_requiem": {
+        "title": "锻父的安魂曲",
+        "text": "瓦尔库尔将末泉的一缕余烬藏在心中。从他身上取回余烬，带来交给我。武器锻造技能达到125后，你就能学习亲手锻造碎炉者。接受此任务期间，在任意难度下击败他都能获得余烬。",
+        "completion": "它仍在歌唱。留着余烬，你的战锤需要它的声音。我已传授给你一次锻造碎炉者的技艺。只有制作成功，余烬和这份技艺才会消耗。",
+        "objectives": {
+          "0": {
+            "label": "取回锻父的余烬"
+          }
+        }
+      },
+      "q_requiem_at_the_forge": {
+        "title": "锻炉旁的安魂曲",
+        "text": "将余烬、十五枚末焰之核、优质锇矿石和优质高松原木带到锻炉。亲手锻造碎炉者，然后将它放在背包中或装备上，回来见我。战锤归你所有，并与你绑定。这份技艺只能制作一把战锤。",
+        "completion": "泉水的声音在钢铁中回荡。瓦尔库尔囚禁的事物，已被你的双手解放。锻造者，好好持有碎炉者吧。",
+        "objectives": {
+          "0": {
+            "label": "锻造并携带碎炉者"
           }
         }
       },

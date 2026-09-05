@@ -636,7 +636,6 @@ export function equipItem(
   } else {
     consumed = consumeNewestInventoryUnit(meta.inventory, itemId);
   }
-  ctx.onInventoryChangedForQuests(meta);
   if (old) {
     // Return the piece that was worn: if it carried an enchant, give it back
     // its own instanced slot (never merged into a plain stack, which would
@@ -656,6 +655,9 @@ export function equipItem(
   } else if (meta.equipmentInstance) {
     delete meta.equipmentInstance[slot];
   }
+  // Recompute only after both sides of the swap exist. An ownership quest
+  // must never see its item disappear between the bag and the equipment slot.
+  ctx.onInventoryChangedForQuests(meta);
   // The all-slots deed reads equipment, so re-check this player's triggers.
   ctx.markDeedsDirty(meta.entityId);
   refreshModsForEquipmentChange(ctx, meta);

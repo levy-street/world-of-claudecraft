@@ -1,8 +1,7 @@
 // Varkhul's two authored legendaries have separate acquisition routes.
 // Emberward drops at 3 percent from the heroic-only shield partition and is
-// catalogued on Varkhul's heroic Reliquary page. Forgebreaker remains defined
-// for development and item-budget coverage while its crafting route is
-// pending; it has no boss-loot or Reliquary row yet.
+// catalogued on Varkhul's heroic Reliquary page. Forgebreaker is a one-time,
+// owner-crafted quest legendary, never a boss drop.
 import type { ItemDef } from '../types';
 
 /** Handover placeholders excluded from whole-catalog gear pickers. Empty on
@@ -11,6 +10,17 @@ import type { ItemDef } from '../types';
 export const IGNIVAR_DROP_PLACEHOLDER_IDS: ReadonlySet<string> = new Set([]);
 
 export const IGNIVAR_DROP_ITEMS: Record<string, ItemDef> = {
+  forgefathers_ember: {
+    id: 'forgefathers_ember',
+    name: "Forgefather's Ember",
+    kind: 'quest',
+    quality: 'epic',
+    questId: 'q_forgefathers_requiem',
+    soulbound: true,
+    noDiscard: true,
+    noVendorSell: true,
+    sellValue: 0,
+  },
   varkhul_forgebreaker: {
     id: 'varkhul_forgebreaker',
     name: 'Forgebreaker, Engine of Varkhul',
@@ -18,6 +28,7 @@ export const IGNIVAR_DROP_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     hand: 'twohand',
     quality: 'legendary',
+    soulbound: true,
     // The new-raid legendary tier (2026-08-30 three-tier ladder): on the
     // ilvl-55 two-hand curve exactly (26.68 at 3.6 speed), stats at the full
     // ilvl-55 legendary 2H budget (95).

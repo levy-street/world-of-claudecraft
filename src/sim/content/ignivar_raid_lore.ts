@@ -32,6 +32,11 @@ export const IGNIVAR_LORE_QUEST_IDS = {
   forgefather: 'q_ignivar_the_forgefather',
 } as const;
 
+export const CRUCIBLE_HAMMER_QUEST_IDS = {
+  requiem: 'q_forgefathers_requiem',
+  forging: 'q_requiem_at_the_forge',
+} as const;
+
 export const IGNIVAR_RAID_LORE_NPCS: Record<string, NpcDef> = {
   [IGNIVAR_MAELIN_NPC_ID]: {
     id: IGNIVAR_MAELIN_NPC_ID,
@@ -54,7 +59,10 @@ export const IGNIVAR_RAID_LORE_NPCS: Record<string, NpcDef> = {
     pos: { x: 0, z: 0 },
     facing: 0,
     color: 0xff6a2a,
-    questIds: Object.values(IGNIVAR_LORE_QUEST_IDS),
+    questIds: [
+      ...Object.values(IGNIVAR_LORE_QUEST_IDS),
+      ...Object.values(CRUCIBLE_HAMMER_QUEST_IDS),
+    ],
     greeting: "The embers carry Maelin's voice forward through the forge.",
     dynamic: true,
   },
@@ -134,6 +142,54 @@ export const IGNIVAR_RAID_LORE_QUESTS: Record<string, QuestDef> = {
     ],
     requiresQuest: IGNIVAR_LORE_QUEST_IDS.heraldsHeart,
   },
+  [CRUCIBLE_HAMMER_QUEST_IDS.requiem]: {
+    ...DEV_RAID_QUEST,
+    id: CRUCIBLE_HAMMER_QUEST_IDS.requiem,
+    giverNpcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID,
+    turnInNpcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID,
+    name: "The Forgefather's Requiem",
+    text: 'Varkhul kept an ember of the Last Spring at his heart. Recover it from him and bring it to me. With Weaponcrafting skill 125, you can learn to shape Forgebreaker yourself. His defeat on either difficulty will yield the ember while this task is active.',
+    completionText:
+      'It still sings. Keep the ember: your hammer will need its voice. I have taught you one shaping of Forgebreaker. The ember and the shaping are spent only when your craft succeeds.',
+    rev: 1,
+    objectives: [
+      {
+        type: 'collect',
+        itemId: 'forgefathers_ember',
+        count: 1,
+        label: "Forgefather's Ember recovered",
+      },
+    ],
+    requiresQuest: IGNIVAR_LORE_QUEST_IDS.forgefather,
+    requiredClass: ['warrior', 'paladin', 'shaman', 'druid'],
+    keepsCollectedItems: true,
+    recipeReward: 'recipe_varkhul_forgebreaker',
+  },
+  [CRUCIBLE_HAMMER_QUEST_IDS.forging]: {
+    ...DEV_RAID_QUEST,
+    id: CRUCIBLE_HAMMER_QUEST_IDS.forging,
+    giverNpcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID,
+    turnInNpcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID,
+    name: 'Requiem at the Forge',
+    text: 'Take the ember, fifteen Cores of the Last Flame, Fine Osmium Ore and Fine Highpine Logs to a forge. Shape Forgebreaker yourself, then return to me with it in your bags or equipped. You keep the hammer, and it binds to you. This shaping can create only one hammer.',
+    completionText:
+      "The spring's voice carries through the iron. What Varkhul chained, your hands have set free. Carry Forgebreaker well, smith.",
+    rev: 1,
+    objectives: [
+      {
+        type: 'collect',
+        itemId: 'varkhul_forgebreaker',
+        count: 1,
+        label: 'Forgebreaker forged and carried',
+      },
+    ],
+    requiresQuest: CRUCIBLE_HAMMER_QUEST_IDS.requiem,
+    requiredClass: ['warrior', 'paladin', 'shaman', 'druid'],
+    keepsCollectedItems: true,
+  },
 };
 
-export const IGNIVAR_RAID_LORE_QUEST_ORDER = Object.values(IGNIVAR_LORE_QUEST_IDS);
+export const IGNIVAR_RAID_LORE_QUEST_ORDER = [
+  ...Object.values(IGNIVAR_LORE_QUEST_IDS),
+  ...Object.values(CRUCIBLE_HAMMER_QUEST_IDS),
+];

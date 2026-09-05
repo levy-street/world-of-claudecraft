@@ -441,6 +441,8 @@ const QUEST_IDS = [
   'q_ignivar_echoes_in_iron',
   'q_ignivar_heralds_heart',
   'q_ignivar_the_forgefather',
+  'q_forgefathers_requiem',
+  'q_requiem_at_the_forge',
   'q_mogger',
   'q_prof_attune_smith',
   'q_prof_attune_outfitter',

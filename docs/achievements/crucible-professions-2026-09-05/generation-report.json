@@ -1,0 +1,33 @@
+{
+  "batchId": "crucible-professions-2026-09-05",
+  "source": "OpenAI built-in image generation",
+  "owner": "World of ClaudeCraft",
+  "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "items": [
+    {
+      "id": "forgefathers_ember",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one irregular fist-sized living golden-orange ember enclosed by three interlocking soot-black iron prongs of an ancient smith's small reliquary. The crystalline ember has a dark fractured crust and a luminous heart, with restrained forge glow lighting bronze tool marks. A physical recovered proof for reforging a legendary hammer, not the hammer itself, not a rune, no pedestal. Full complete object, generous padding, no flying effects.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/forgefathers_ember.png",
+        "bytes": 2121572,
+        "sha256": "464efce0688ca71feaedb788c5d2b76a18523fdb9861f3bdaea13f84181a95b1",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/forgefathers_ember.png",
+        "bytes": 480171,
+        "sha256": "db02273ead451e18f6cce5ca5df2b508d56f5ed93851d1c2a4110cd5606b6eb6",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    }
+  ]
+}

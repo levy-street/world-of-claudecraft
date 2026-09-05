@@ -156,6 +156,7 @@ describe('the real catalog', () => {
       'col_seven_regalia',
       'col_true_colors',
       'hid_bountiful_coffer',
+      'hid_forgebreaker',
       'hid_roll_hundred',
     ]);
   });

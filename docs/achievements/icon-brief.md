@@ -9,9 +9,11 @@
 > `src/ui/icons.ts`: the two walk-in castles, two bank sockets, Proving Shore graduation, and
 > five Crucible deeds. The completed Masterwrought set and its provenance are recorded in
 > `masterwrought-art-completion-2026-09-02/accepted-art.json`.
+> Updated 2026-09-05: the hidden Forgebreaker celebration adds one pending crest,
+> bringing the ledger to 11. Its commission brief is at the end of this file.
 
 Ready to send. One line per new deed, same format as the v1 brief; icon files
-are named exactly by deed id at 512x512 RGBA like the existing set. The 10 rows
+are named exactly by deed id at 512x512 RGBA like the existing set. The 11 rows
 named above still use their procedural category crests while commissioning is
 in progress; every Masterwrought deed resolves to accepted painted art. The two
 deferred salvage ids are listed at the end, marked, so they can be commissioned
@@ -194,3 +196,18 @@ Dungeon (the Crucible of the Last Spring raid):
 - [v1] `dgn_varkhul`, The Forge Goes Cold: Varkhul's great anvil under a raised silent hammer, the forge glow fading to blue-grey ash, one thin line of spring water cutting through the coals.
 - [v1] `dgn_varkhul_heroic`, Heroic: The Forge Goes Cold: the cold anvil and hammer ringed by a gold heroic laurel, frost creeping over the anvil face.
 - [v1] `dgn_varkhul_flawless`, Not One Ember Lost: ten unbroken candle flames in a ring above the forge floor, none guttering, warm gold on deep bronze.
+
+## The self-crafted Forgebreaker celebration (2026-09-05)
+
+One hidden, zero-Renown deed from the one-time hammer quest. It uses the existing
+procedural hidden-category crest until an accepted painting lands, explicitly
+tracked in `DEED_ART_PENDING` in `src/ui/icons.ts`. Deliver
+`hid_forgebreaker.png` as a centered 512x512 RGBA medallion with genuinely transparent
+exterior pixels, then ingest with `npm run assets:deeds <source-dir>`. Do not paint a
+checkerboard into the background: both initial generated candidates failed that
+alpha requirement and are not shipping art. The quest reagent has its own accepted
+item icon; this commission is only for the deed crest.
+
+Hidden (the one-time Forgebreaker shaping):
+
+- [v1] `hid_forgebreaker`, A Spring Unchained: a finished dark-iron two-handed hammer over a broken forge chain, a single clear spring-water ribbon flowing through its open links; restrained ember-orange highlights against cool spring blue, framed as a readable medallion with no text, letters, watermark or background plate. Keep the hammer head and broken link legible at 32px and 48px; transparent exterior, never a painted checkerboard.

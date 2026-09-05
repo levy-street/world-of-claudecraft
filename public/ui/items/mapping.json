@@ -406,6 +406,18 @@
   ],
   "generatedBatches": [
     {
+      "batchId": "crucible-professions-2026-09-05",
+      "commonPrompt": "Classic dark-fantasy painted inventory icon, centered complete subject on an opaque dark ground, tactile materials, warm top-left light, no text, watermark, UI frame or cropped subject. Separate generation per item; exact prompts and hashes in generation-report.json.",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "woc-item-icon-v1; existing painted item catalog",
+      "provenanceRecord": "docs/achievements/crucible-professions-2026-09-05/generation-report.json",
+      "itemIds": [
+        "forgefathers_ember"
+      ]
+    },
+    {
       "source": "OpenAI built-in image generation",
       "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
       "styleReference": "existing painted WebP catalog in public/ui/items/",

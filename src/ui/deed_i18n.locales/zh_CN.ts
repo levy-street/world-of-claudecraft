@@ -771,4 +771,8 @@ export const table: DeedLocaleTable = {
     desc: '在英雄难度下击败"末焰锻父瓦尔库尔"，全程无一名团队成员死亡。',
     title: '未焚者',
   },
+  hid_forgebreaker: {
+    name: '解放之泉',
+    desc: '亲手锻造碎炉者，携带完成的战锤回到梅琳身边。',
+  },
 };

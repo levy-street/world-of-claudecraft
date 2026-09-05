@@ -34,6 +34,8 @@ export interface ProfessionNodeRecord {
 export interface ProfessionReagent {
   itemId: string;
   count: number;
+  // Rare raid inputs and one-time quest proofs retain their authored cost.
+  noDiscount?: true;
 }
 
 // A static recipe a crafting profession can learn: what it consumes, what it
@@ -87,6 +89,9 @@ export interface ProfessionRecipeRecord {
   // grandfathered set and is never correct for new content (a new recipe with
   // no list would be silently known to every character with no learn step).
   acquisition?: readonly ('trainer' | 'drop' | 'quest')[];
+  // A one-use shaping taught by a non-repeatable quest. A successful craft
+  // consumes the knownRecipes entry; denied or cancelled attempts keep it.
+  consumeOnCraft?: true;
   // Station-bound crafting (Professions 2.0, the hands-vs-stations
   // split; supersedes #1297's requiresHubStation boolean and its level-20
   // hub). Present only on a recipe that must be crafted AT a station of this

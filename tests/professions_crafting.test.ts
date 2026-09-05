@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { FORGEBREAKER_RECIPES } from '../src/sim/content/forgebreaker_recipe';
 import { STATION_TYPE_BY_CRAFT } from '../src/sim/content/professions';
 import {
   APEX_ARMOR_RECIPES,
@@ -459,6 +460,7 @@ describe('craftItem command (#1127)', () => {
       ...TROPHY_RECIPES,
       ...ENGINEERING_ONRAMP_RECIPES,
       ...BAG_RECIPES,
+      ...FORGEBREAKER_RECIPES,
     ]
       .map((r) => r.id)
       .sort();
@@ -484,7 +486,8 @@ describe('craftItem command (#1127)', () => {
         // Sibling literal: the two-row on-ramp pin in
         // tests/recipe_economy.test.ts (masterwrought Phase 11o).
         ENGINEERING_ONRAMP_RECIPES.length +
-        BAG_RECIPES.length,
+        BAG_RECIPES.length +
+        FORGEBREAKER_RECIPES.length,
     );
     expect(sim.recipeList.map((r) => r.id).sort()).toEqual(allIds);
   });

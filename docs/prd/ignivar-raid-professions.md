@@ -27,8 +27,10 @@ Scope decisions fixed by the maintainer:
 - Crafted epic gear is item level 37, two above the dropped tier, so the
   crafted piece is a genuine chase upgrade and not a sidegrade: the point of
   the whole arm is to make crafting worth organizing a raid around.
-- The hammer is a level 39 two-handed weapon by item-level derivation,
-  soulbound, and reached through a quest chain: it must be self-crafted.
+- The hammer route now uses the existing item-level-55 Forgebreaker, Engine
+  of Varkhul, soulbound and self-crafted through a one-time quest chain.
+  The implementation below supersedes the original level-39 proposal;
+  it does not introduce a second hammer or retune the existing weapon.
 
 ## Mechanics
 
@@ -154,7 +156,7 @@ fifth-slot swap: it composes with 4pc instead of competing with it.
 | Leatherworking | epic leather legs, item level 37 | leather wearers swap legs |
 | Tailoring | epic robe, item level 37 | cloth wearers swap chest |
 | Enchanting | proc weapon enchant | the tier's weapon enchant ceiling |
-| Weaponcrafting | legendary two-hand hammer, item level 39 | quest chain, soulbound |
+| Weaponcrafting | existing Forgebreaker two-hand hammer, item level 55 | one-time quest chain, soulbound |
 
 Stat rules:
 
@@ -171,18 +173,61 @@ Stat rules:
   recipe's own level field, through the recipe arm of the source index in
   src/sim/item_level.ts (that arm carries no raid bonus), plus the quality
   bonus (QUALITY_ILVL_BONUS in src/sim/item_budget.ts). The epic recipes are
-  authored at level 31 (31 plus the epic bonus is 37) and the hammer recipe
-  at level 29 (29 plus the legendary bonus is 39), so both numbers are plain
-  content edits with no new registration machinery. The hammer stays one
-  quality rung and two item levels above the crafted epics, and its proc
-  rides the existing legendary weapon proc seam.
+  authored at level 31 (31 plus the epic bonus is 37). The implemented hammer
+  instead retains its existing source-index raid flag and uses recipe level
+  42: 42 plus legendary 10 plus raid 3 gives its unchanged item level 55.
+  Its existing damage, speed, stats and class restrictions are untouched;
+  this quest slice adds no weapon proc.
 
-The hammer chain: the starter reagent drops from Varkhul, Forgefather of the
-Last Flame (the forge boss starts the forging quest), the chain runs collect
-objectives through the raid, and the finale is a craft objective (the
-QuestObjective 'craft' type in src/sim/types.ts) at the forge at skill 125.
-The output is minted soulbound: the self-crafted rule is the point of the
-chain.
+### Forgebreaker: the one-time quest shaping
+
+Updated 2026-09-05 for the professions integration. Maelin's Ember Projection
+offers The Forgefather's Requiem (`q_forgefathers_requiem`) after the existing
+The Forgefather quest is complete. Its eligible classes match the hammer:
+warrior, paladin, shaman and druid. This preserves the existing Varkhul-kill
+prerequisite; the recovery kill happens after that unlock.
+
+While the recovery quest is active, Varkhul drops one personal Forgefather's
+Ember on either Normal or Heroic. It is a soulbound quest reagent, not the
+weekly Maker's Ember used by Perfecting. It cannot be sold, banked, traded or
+discarded. Full bags leave the proof on the corpse for a later loot attempt;
+accepting or abandoning the quest never creates a free replacement.
+
+Return to the projection with Weaponcrafting skill 125. The turn-in keeps the
+ember and teaches `recipe_varkhul_forgebreaker` through the existing quest
+acquisition source. There is no recipe-learning fee. The recipe requires a
+forge and consumes:
+
+| Reagent | Base quantity | Discount policy |
+|---|---|---|
+| Forgefather's Ember | 1 | Never discounted |
+| Core of the Last Flame | 15 | Never discounted |
+| Fine Osmium Ore (`fine_thorium_ore`) | 10 | Ordinary crafting discounts apply |
+| Fine Highpine Log (`fine_elderwood_log`) | 6 | Ordinary crafting discounts apply |
+
+Successful crafting consumes both the proof and the learned shaping. The
+one-use recipe previews at most one craft and cannot be replayed, even with
+extra stale corpse proof. Failed or cancelled crafts consume neither. The
+existing save fields carry the quest completion and learned/spent knowledge;
+there is no new permanent quest ledger, cooldown or weekly gate.
+
+Requiem at the Forge (`q_requiem_at_the_forge`) is an ownership turn-in for
+the finished hammer, which the player keeps. Carried or equipped copies count;
+banked copies must be withdrawn. Crafting before accepting this follow-up,
+abandoning and accepting it again, and saving/loading all remain valid.
+Forgebreaker is not Masterwrought and does not use Perfecting or promotion.
+It is soulbound to its crafter, so the commission board does not offer it and a
+commission flag cannot arm its output for trade. Ordinary weapon commissions
+remain available.
+
+The result has one personal Reliquary page, outside global completion and
+Curator rank because five classes cannot earn it. The quest finale awards the
+hidden zero-Renown A Spring Unchained deed. The consumed ember is a material
+step, not a second Reliquary collectible. Both catalogue rows append at their
+tables' true tails; no new persistence hooks or database calls are needed.
+The hidden deed uses the supported procedural category crest while its explicitly
+tracked painting commission is pending; the ember's item painting ships with the
+quest. See `docs/achievements/icon-brief.md` for the crest delivery brief.
 
 ## Gathering materials
 

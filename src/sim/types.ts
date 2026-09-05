@@ -4365,6 +4365,10 @@ export interface QuestDef {
   xpReward: number;
   copperReward: number;
   itemRewards: Partial<Record<PlayerClass, string>>;
+  // Teaches through acquisition source 'quest' on a successful turn-in.
+  // The recipe's own craft skill floor is checked before any rewards or
+  // consumption, so an early hand-in cannot lose the recipe.
+  recipeReward?: string;
   requiresQuest?: string; // prerequisite quest id (must be turned in)
   // Acceptance requires the purchased riding skill (PlayerMeta.ridingTrained).
   // Enforced in finalizeQuestAccept so every accept path (npc, linked share,
@@ -4377,7 +4381,7 @@ export interface QuestDef {
   minLevel?: number;
   retired?: boolean; // remains finishable if already accepted, but cannot be newly accepted
   // OWNERSHIP collect objectives instead of DELIVERY ones: the collect count
-  // includes copies worn in a bag socket (quests/quest_owned_count.ts) and the
+  // includes worn equipment and bag sockets (quests/quest_owned_count.ts) and the
   // turn-in never consumes them. For a quest that asks the player to acquire
   // and KEEP a thing rather than fetch it, e.g. the tutorial island's Pouch
   // and Purse: it tells the player to buy a Linen Pouch and buckle it on, so

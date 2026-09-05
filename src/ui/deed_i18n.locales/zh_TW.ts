@@ -786,4 +786,8 @@ export const table: DeedLocaleTable = {
     desc: '以英雄難度擊敗「末焰鍛父瓦爾庫爾」，且沒有任何團隊成員死亡。',
     title: '未焚者',
   },
+  hid_forgebreaker: {
+    name: '解放之泉',
+    desc: '親手鍛造碎爐者，攜帶完成的戰鎚回到梅琳身邊。',
+  },
 };

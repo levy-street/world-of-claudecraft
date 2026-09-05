@@ -1,0 +1,14 @@
+{
+  "styleContract": "woc-item-icon-v1",
+  "processing": "Separate generated originals normalized to512px sRGB; canonical assets:items converter128px WebP q82",
+  "items": [
+    {
+      "id": "forgefathers_ember",
+      "width": 128,
+      "height": 128,
+      "bytes": 3316,
+      "sha256": "4292b49979a49cccaf5d52bf049801d893556bd361e2eef39aae790edb66b4d0",
+      "opaque": true
+    }
+  ]
+}
