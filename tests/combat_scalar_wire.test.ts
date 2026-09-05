@@ -82,3 +82,22 @@ describe('applySelfCombatScalars: offhandWeapon presence vs. weapon fallback', (
     expect(e.dualWielding).toBe(false); // derived from offhandWeapon (null), not the injected key
   });
 });
+
+describe('applySelfCombatScalars: the authoritative in-combat bit (cbt)', () => {
+  it('cbt 1 flags the mirror in combat and cbt 0 clears it', () => {
+    const e = entity({ inCombat: false });
+    applySelfCombatScalars(e, { cbt: 1 });
+    expect(e.inCombat).toBe(true);
+    applySelfCombatScalars(e, { cbt: 0 });
+    expect(e.inCombat).toBe(false);
+  });
+
+  it('an omitted cbt key keeps the prior mirrored combat state (delta contract)', () => {
+    const held = entity({ inCombat: true });
+    applySelfCombatScalars(held, {});
+    expect(held.inCombat).toBe(true);
+    const calm = entity({ inCombat: false });
+    applySelfCombatScalars(calm, { ap: 1 });
+    expect(calm.inCombat).toBe(false);
+  });
+});

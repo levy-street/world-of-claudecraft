@@ -279,7 +279,10 @@ const MONOLITHS: MonolithRow[] = [
     // is the six lines that cannot live anywhere else: the import, the
     // field, its relocalize() call, and the three-line event arm. Exact
     // merged count, zero slack; maintainer-review item.
-    ceiling: 18911,
+    // Lowered 18911 -> 18910 by the self in-combat wire (the zone-entry vista
+    // gate dropped its recent-personal-event heuristic once p.inCombat became
+    // authoritative online; the music input gained the one flag line).
+    ceiling: 18910,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -595,7 +598,10 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
-    ceiling: 10641,
+    // Lowered 10641 -> 10625 by the self-scalar emitter extraction
+    // (server/self_scalar_wire.ts took the static combat-rating / progression
+    // maybe(...) cohort and is where the in-combat bit cbt landed).
+    ceiling: 10625,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

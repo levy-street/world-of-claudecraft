@@ -353,6 +353,7 @@ import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './
 import { RiftAssetCoordinator, riftAssetConfigFromEnv } from './rift_assets';
 import { refusedRiftForgeCommand } from './rift_forge_gate';
 import { RiftUpgradeCoordinator, riftUpgraderConfigFromEnv } from './rift_upgrader';
+import { emitSelfScalarKeys } from './self_scalar_wire';
 import {
   createDepthWarnedSerialWriter,
   createKeyedSerialWriter,
@@ -8873,29 +8874,12 @@ export class GameServer {
     };
     if (session.dungeonEntryFacing.enabled)
       maybeSerialized('de', `${this.sim.entities.get(session.pid)?.dungeonEntrySeq ?? 0}`);
-    // Static combat-rating/progression scalars: rarely change (gear/talent swap,
-    // level or XP gain, a copper transaction, a heroic-key toggle), unlike every
-    // other field on this record which was still being rebuilt and stringified
-    // every tick regardless. Delta-guarded like the rest of this record; the
-    // reconciliation-critical fields above (resource, gcd, swing, combo, target,
-    // auto, queued) stay unconditional since they change on most combat ticks.
-    maybe('xp', meta.xp);
-    maybe('lxp', meta.lifetimeXp);
-    maybe('rxp', Math.round(meta.restedXp));
-    maybe('prk', meta.prestigeRank);
-    maybe('copper', meta.copper);
-    maybe('ap', p.attackPower);
-    maybe('sp', p.spellPower);
-    maybe('hpw', p.healPower);
-    maybe('sh', p.spellHaste);
-    maybe('crit', p.critChance);
-    maybe('dodge', p.dodgeChance);
-    maybe('blk', p.blockChance);
-    maybe('bval', p.blockValue);
-    maybe('crat', p.critRating);
-    maybe('hrat', p.hasteRating);
-    maybe('hirat', p.hitRating);
-    maybe('ddiff', this.sim.dungeonDifficulty(anchorSession.pid));
+    // Static combat-rating/progression scalars plus the in-combat bit: rarely
+    // change, unlike every other field on this record which is rebuilt and
+    // stringified every tick. Delta-guarded like the rest of this record; the
+    // reconciliation-critical fields above stay unconditional since they change
+    // on most combat ticks. The cohort lives in server/self_scalar_wire.ts.
+    emitSelfScalarKeys(maybe, meta, p, this.sim.dungeonDifficulty(anchorSession.pid));
     // The viewer's OWN authored look. It cannot come from the entity list (the
     // broadcast loop skips `e.id === anchorEntity.id`), and it is exactly what
     // `maybeRaw` is for: heavy, already serialized once (appearanceWireJson),

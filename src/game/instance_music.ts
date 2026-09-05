@@ -25,6 +25,11 @@ export interface InstanceMusicInput {
   now: number;
   lastCombatEventAt: number;
   lastBossCombatEventAt: number;
+  // The world's own in-combat flag (IWorld player.inCombat): the sim's engaged
+  // pass offline, the server's mirrored `cbt` bit online. Authoritative, so it
+  // alone puts the player in combat; the aggro-target and recent-event arms
+  // below stay as the fallback that bridges a snapshot in flight.
+  inCombat: boolean;
   playerId: number;
   playerPos: { x: number; z: number };
   zone: Pick<ZoneDef, 'id' | 'biome' | 'hub'>;
@@ -73,7 +78,8 @@ export function instanceMusicDecision(input: InstanceMusicInput): InstanceMusicD
   // Thornhollow Fields battleground: the whole match rides the existing battle track
   // (the raid-arena musicCombat treatment; no dedicated audio asset).
   const inBattleground = isBgPos(input.playerPos.x);
-  const inCombat = aggroed || input.now - input.lastCombatEventAt < RECENT_COMBAT_MS;
+  const inCombat =
+    input.inCombat || aggroed || input.now - input.lastCombatEventAt < RECENT_COMBAT_MS;
   bossEngaged =
     bossEngaged || inRaidArena || input.now - input.lastBossCombatEventAt < RECENT_BOSS_COMBAT_MS;
 

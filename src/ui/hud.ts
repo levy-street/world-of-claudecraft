@@ -8933,6 +8933,7 @@ export class Hud {
         now,
         lastCombatEventAt: this.lastCombatEventAt,
         lastBossCombatEventAt: this.lastNythraxisCombatEventAt,
+        inCombat: p.inCombat,
         playerId: sim.playerId,
         playerPos: p.pos,
         zone: zoneAt(p.pos.x, p.pos.z),
@@ -9584,11 +9585,9 @@ export class Hud {
           // Zone-entry vista: a slow up-and-out camera sweep over the new
           // zone alongside the banner. Display-only, cancelled by any
           // camera input, skipped in combat/while dead and under reduced
-          // motion (the renderer gates the latter). Online mirrors never
-          // set p.inCombat, so the recent-personal-combat-event window (the
-          // same signal the combat music rides) carries that gate there.
-          const recentCombat = performance.now() - this.lastCombatEventAt < 6000;
-          if (!p.dead && !p.inCombat && !recentCombat) this.renderer.vistaPan();
+          // motion (the renderer gates the latter). p.inCombat is authoritative
+          // online too (the self record's cbt bit, src/net/combat_scalar_wire.ts).
+          if (!p.dead && !p.inCombat) this.renderer.vistaPan();
         }
         this.lastZoneId = currentZone.id;
         this.prewarmMapBg(currentZone.id); // get the new zone's map bg ready before the player opens it
