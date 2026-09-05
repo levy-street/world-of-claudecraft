@@ -93,6 +93,7 @@ import {
 import { vaultDrawStock } from '../vault_craft_gate';
 import { enchantingGainMultiplier } from './archetype';
 import { DISENCHANT_MATERIAL_BY_QUALITY, typedSecondaryFor } from './disenchant_reagents';
+import { isEnchantKnown } from './enchant_formula';
 import type { GradeRemoval } from './material_grades';
 import {
   countMinusPlanned,
@@ -165,7 +166,10 @@ export { DISENCHANT_MATERIAL_BY_QUALITY };
 export function isEnchantedInstance(instance: ItemInstancePayload): boolean {
   return (
     instance.enchant !== undefined ||
-    (!!instance.rolled?.stats && !instance.rolled.masterwork && instance.perfected !== true)
+    (!!instance.rolled?.stats &&
+      !instance.rolled.masterwork &&
+      instance.perfected !== true &&
+      instance.perfectingBonus === undefined)
   );
 }
 
@@ -728,6 +732,7 @@ export interface ApplyEnchantResult {
   reason?:
     | 'unknown_item'
     | 'unknown_enchant'
+    | 'recipe_not_learned'
     | 'wrong_slot'
     | 'not_held'
     | 'insufficient_materials'
@@ -1363,6 +1368,9 @@ export function resolveApplyEnchant(
   // arm: a missing meta refuses the same way a marker-less copy and a skill-0
   // character do, and neither gate touches state or draws rng.
   const applier = ctx.resolve(pid)?.meta;
+  if (!isEnchantKnown(enchant, applier?.knownRecipes)) {
+    return { ok: false, itemId, enchantId, reason: 'recipe_not_learned' };
+  }
   if (
     enchant.requiresPerfected &&
     !(applier && holdsPerfectedTarget(applier, itemId, slot, confirmReplace))
@@ -1520,6 +1528,9 @@ export function evaluateApplyEnchantAdmission(
   // ORDER is unchanged: the two gates still answer before not_held.
   const r = ctx.resolve(pid);
   const applier = r?.meta;
+  if (!isEnchantKnown(enchant, applier?.knownRecipes)) {
+    return { ok: false, itemId, enchantId, reason: 'recipe_not_learned' };
+  }
   if (
     enchant.requiresPerfected &&
     !(applier && holdsPerfectedTarget(applier, itemId, slot, confirmReplace))

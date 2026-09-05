@@ -281,7 +281,7 @@ export function buildPerfectingView(
       identity,
       selected: entry === selectedEntry,
       state: trackState(info),
-      rank: info.rank,
+      rank: info.perfected ? info.ranks : info.rank,
       ranks: info.ranks,
       chosenName: info.promoted ? chosenNameFor(reads, entry.ref) : null,
     };
@@ -292,8 +292,11 @@ export function buildPerfectingView(
     const state = trackState(info);
     const syncing = !reads.identitySynced;
     const materialsMet = info.materials.every((row) => row.have >= row.required);
-    const action: PerfectingAction =
-      state === 'promoted' ? 'done' : state === 'perfected' ? 'promote' : 'attempt';
+    const action: PerfectingAction = !info.perfected
+      ? 'attempt'
+      : info.promoted
+        ? 'done'
+        : 'promote';
     const actionEnabled =
       action === 'done'
         ? false

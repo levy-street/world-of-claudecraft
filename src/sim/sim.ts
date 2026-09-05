@@ -507,12 +507,14 @@ import {
   isLiveGatherNodeId,
   serializeNodeReadiness,
 } from './professions/node_persist';
+import type { PerfectItemRef, PerfectingInfoView } from './professions/perfecting';
+import type { PerfectingSwapRequest } from './professions/perfecting_swap';
 import {
-  type PerfectItemRef,
-  type PerfectingInfoView,
-  perfectingInfoFrom,
-  resolvePerfectingAttempt,
-} from './professions/perfecting';
+  perfectItemCommand,
+  perfectingInfoFor,
+  perfectingSwapInfoFor,
+  swapPerfectingRanksCommand,
+} from './professions/perfecting_world_view';
 import { updateProfNudges } from './professions/prof_nudges';
 import { healDisplayRoundedProficiency } from './professions/proficiency_display_heal';
 import {
@@ -8871,29 +8873,25 @@ export class Sim {
     });
   }
 
-  // Perfecting plus the phase 13 promotion: thin delegates onto
-  // professions/perfecting.ts behind the shared dead gate (dead_gate.ts); the
-  // IWorld (ref, name?) arm, then the server's pid-explicit perfectItemAs.
+  // Perfecting mutations and reads stay on the shared professions seam.
   perfectItem(ref: PerfectItemRef, name?: string): void {
-    if (refusedWhileDead(this.ctx, undefined)) return;
-    resolvePerfectingAttempt(this.ctx, undefined, ref, name);
+    perfectItemCommand(this.ctx, undefined, ref, name);
   }
 
   perfectItemAs(pid: number, ref: PerfectItemRef, name?: string): void {
-    if (refusedWhileDead(this.ctx, pid)) return;
-    resolvePerfectingAttempt(this.ctx, pid, ref, name);
+    perfectItemCommand(this.ctx, pid, ref, name);
   }
 
   perfectingInfo(ref: PerfectItemRef, pid?: number): PerfectingInfoView | null {
-    const meta = this.players.get(pid ?? this.primaryId);
-    if (!meta) return null;
-    return perfectingInfoFrom({
-      ref,
-      inventory: meta.inventory,
-      equipment: meta.equipment,
-      equipmentInstances: meta.equipmentInstance,
-      craftSkills: meta.craftSkills,
-    });
+    return perfectingInfoFor(this.ctx, pid, ref);
+  }
+
+  swapPerfectingRanks(request: PerfectingSwapRequest, pid?: number): void {
+    swapPerfectingRanksCommand(this.ctx, pid, request);
+  }
+
+  perfectingSwapInfo(request: PerfectingSwapRequest, pid?: number) {
+    return perfectingSwapInfoFor(this.ctx, pid, request);
   }
 
   // Commission order board (Professions 2.0, issue #1298): four thin

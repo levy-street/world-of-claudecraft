@@ -107,19 +107,23 @@ const build = await buildItemArtAudit({
     // replaces 84 interim project-owned placeholders. The replacements do
     // not grow the catalog; the new identities take the shipping census from
     // 1,128 to 1,209 after the three v0.42 mount reins join the reviewed base.
-    catalogCount: 1209,
+    // Crucible professions adds 33 armor pieces, 11 patterns, and one formula,
+    // bringing the current shipping census to 1,254 without replacing old art.
+    catalogCount: 1255,
     // The art-subject universe is every live definition minus the explicit
-    // pending-art ledger. This wave clears that ledger, so all 1,224 live
-    // definitions are painted (16 Heroic weapons intentionally alias base
-    // paintings; the implicit backpack is the one non-definition catalog id).
-    liveItemCount: 1224,
+    // pending-art ledger. Masterwrought cleared that ledger at 1,224 live
+    // definitions; Crucible professions raises it to 1,269, all painted.
+    // Sixteen Heroic weapons intentionally alias base paintings; the implicit
+    // backpack is the one non-definition catalog id.
+    liveItemCount: 1270,
     pendingArtCount: 0,
     generatedHeroicDefinitions: 64,
     heroicDefinitionsWithOwnWebp: 48,
     heroicWeaponArtAliases: 16,
-    // The 81 additions land inside the existing 25 kind groups without
-    // crossing another 80-record page boundary: 30 pages, eight modes each.
-    sheetPageCount: 30,
+    // Masterwrought's 81 additions kept the existing 25 kind groups at 30 pages.
+    // The 11 Crucible boots raise armor-feet from 77 to 88, crossing its
+    // 80-record boundary: now 31 pages, eight modes each.
+    sheetPageCount: 31,
     groupCount: 25,
   },
 });

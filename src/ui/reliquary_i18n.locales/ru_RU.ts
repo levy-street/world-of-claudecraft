@@ -11,6 +11,10 @@
 import type { ReliquaryLocaleTable } from '../reliquary_i18n';
 
 export const table: ReliquaryLocaleTable = {
+  professions_crucible: {
+    name: 'Мастерство Горнила',
+    desc: 'Одиннадцать комплектов из рейдовых материалов, в каждом есть нагрудник, пояс и обувь. Выкройки и формулы дают знания, но не считаются реликвиями.',
+  },
   // Dungeon, delve and world-boss pages: entities.* names verbatim.
   conquerors_hollow_crypt: {
     name: 'Пустая крипта',

@@ -9,6 +9,951 @@
   },
   "items": [
     {
+      "id": "crucible_str_mail_chest",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon for World of ClaudeCraft: Crucible Striker's Hauberk, item crucible_str_mail_chest. Subject: one empty front-facing torso hauberk of dark tempered interlocking iron chainmail, angled overlapping chest scales, red-brown padded lining, broad bronze neck binding and two ember-orange rivet accents. A master smith's aggressive mail armor, no body, helmet, hands or person. Matching crafted Crucible family identity: hammered bronze edge bands, tiny contained orange forge glow and soot-dark materials. Classic premium hand-painted fantasy MMO inventory art, tactile metal, warm key light top-left, cool deep shadow, crisp focal edges, soft peripheral brushwork. Opaque deep charcoal and umber painted vignette, subtle contact shadow. Complete centered silhouette fills 70 percent square with safe padding, recognizable at 22 pixels and in circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped subject, mannequin or held presentation. Produce one icon only, square.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/crucible_str_mail_chest.png",
+        "bytes": 2265284,
+        "sha256": "3c078618c6d8ca6c298d6729daf5f0de00b36106b8bd1c4ba73ba4d86d6fa796",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/crucible_str_mail_chest.png",
+        "bytes": 492320,
+        "sha256": "e0141fd2035d92d5330aacf78aac7a882849b8fccf36ec81e9bd0f5b60ff0877",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "crucible_str_mail_waist",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one complete curved waist belt with central buckle, named Crucible Striker's Girdle. Construction: dark iron chainmail with angular overlapping scale insets, hammered bronze edge bands and tiny ember-orange rivets. Distinct silhouette and ornament: aggressive V-shaped scales. Crafted Crucible family styling, not raid armor. Do not include unrelated equipment.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/crucible_str_mail_waist.png",
+        "bytes": 2048476,
+        "sha256": "b3dc7261a0d9f3c303a183a635730c425586a772d66d300c7df6dc076c685f4b",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/crucible_str_mail_waist.png",
+        "bytes": 447283,
+        "sha256": "dcc6d1cd733595c90d0af505945f043c9832375bfa5eac35c347873ba7465ad7",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "crucible_str_mail_feet",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: a compact natural pair of fully visible armored boots, named Crucible Striker's Sabatons. Construction: dark iron chainmail with angular overlapping scale insets, hammered bronze edge bands and tiny ember-orange rivets. Distinct silhouette and ornament: aggressive V-shaped scales. Crafted Crucible family styling, not raid armor. Do not include unrelated equipment.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/crucible_str_mail_feet.png",
+        "bytes": 2423966,
+        "sha256": "6b07a1e151d4c77e7999dfdd9fbef6bf28a96f36c157f3e1795deb8447d1146b",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/crucible_str_mail_feet.png",
+        "bytes": 547215,
+        "sha256": "7963dba40876946b30b1bba1389c7c821f4627c76a062248dcd91c67d362b93c",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "pattern_crucible_str_mail",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one closed compact artisan's pattern manual, a tangible thick bound book for a striker's mail armor collection. Binding echoing dark iron chainmail with angular overlapping scale insets, hammered bronze edge bands and tiny ember-orange rivets; cover construction inspired by aggressive V-shaped scales. A single deliberate small raised metal hauberk on the cover denotes an armor manual. Three little blank bronze page tabs, no letters or diagrams visible. Show complete book in readable three-quarter view with spine and clasp. No other objects.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/pattern_crucible_str_mail.png",
+        "bytes": 2387484,
+        "sha256": "6e5beac11db9402b2e6994a22ee61517bd09bcdc62d8c189117846bd4a7f0aca",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/pattern_crucible_str_mail.png",
+        "bytes": 502226,
+        "sha256": "3ed3218e4c04336d0bce7406f61234df2d2c36e73f5f44fb5b428d99425298c2",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "crucible_tank_mail_chest",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one empty front-facing torso garment, named Crucible Guardian's Hauberk. Construction: dense soot-black chainmail with broad heavy iron plates, reinforced hammered bronze flanges and dull red-orange rivets. Distinct silhouette and ornament: square anvil-like blocks and thick overlapping guard plates. Crafted Crucible family styling, not raid armor. Do not include unrelated equipment.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/crucible_tank_mail_chest.png",
+        "bytes": 2383550,
+        "sha256": "4d317589a61fd0d45d817d642388cecb544436f106ea82d349c99a333fc7b8b3",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/crucible_tank_mail_chest.png",
+        "bytes": 514066,
+        "sha256": "ce849d08c889fb19eaf925abe54bcd9bb6894a748479fef11bfac557a8aa91e2",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "crucible_tank_mail_waist",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one complete curved waist belt with central buckle, named Crucible Guardian's Girdle. Construction: dense soot-black chainmail with broad heavy iron plates, reinforced hammered bronze flanges and dull red-orange rivets. Distinct silhouette and ornament: square anvil-like blocks and thick overlapping guard plates. Crafted Crucible family styling, not raid armor. Do not include unrelated equipment.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/crucible_tank_mail_waist.png",
+        "bytes": 2023829,
+        "sha256": "919eb8fb990757466dfcfbae28561573bdc710ecd95a3c11f52580d2627b7920",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/crucible_tank_mail_waist.png",
+        "bytes": 453844,
+        "sha256": "2bb4d3e521f91f14d9ac59760ead0b87357c50125511a609e17955e278578c2d",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "crucible_tank_mail_feet",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: a compact natural pair of fully visible armored boots, named Crucible Guardian's Sabatons. Construction: dense soot-black chainmail with broad heavy iron plates, reinforced hammered bronze flanges and dull red-orange rivets. Distinct silhouette and ornament: square anvil-like blocks and thick overlapping guard plates. Crafted Crucible family styling, not raid armor. Do not include unrelated equipment.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/crucible_tank_mail_feet.png",
+        "bytes": 2344789,
+        "sha256": "1fb2b46e5143a1dc8f26b83a4c42bfe7a433b39e3246063b75978d34a712163d",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/crucible_tank_mail_feet.png",
+        "bytes": 520373,
+        "sha256": "e130dae32961485689551f015843ae90a069d17b2c6d98f02c317b2dc0c0b1df",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "pattern_crucible_tank_mail",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one closed compact artisan's pattern manual, a tangible thick bound book for a guardian's mail armor collection. Binding echoing dense soot-black chainmail with broad heavy iron plates, reinforced hammered bronze flanges and dull red-orange rivets; cover construction inspired by square anvil-like blocks and thick overlapping guard plates. A single deliberate small raised metal hauberk on the cover denotes an armor manual. Three little blank bronze page tabs, no letters or diagrams visible. Show complete book in readable three-quarter view with spine and clasp. No other objects.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/pattern_crucible_tank_mail.png",
+        "bytes": 2530407,
+        "sha256": "bc49419badf10b96215b6a8e6d241e86a764e18f45c9df84794235c61385d39b",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/pattern_crucible_tank_mail.png",
+        "bytes": 521735,
+        "sha256": "cce11d78cab18107ad9b7a82dfe6c90ade09cac3b6efd3ec85577fb00c0c902d",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "crucible_caster_mail_chest",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one empty front-facing torso garment, named Crucible Spellcaster's Hauberk. Construction: fine silver-grey chain links, narrow copper binding, indigo lining and small contained blue ember stones. Distinct silhouette and ornament: sweeping arched copper ribs framing teardrop stones. Crafted Crucible family styling, not raid armor. Do not include unrelated equipment.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/crucible_caster_mail_chest.png",
+        "bytes": 2337080,
+        "sha256": "82e6a18cf4de98867618e4c91ad7269fcd07bc982bb3dfdb61b009258704904e",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/crucible_caster_mail_chest.png",
+        "bytes": 526080,
+        "sha256": "d3b862ea6e720e7fa6b961147d98480d5de829752c2a0f8a3492c7669a296f07",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "crucible_caster_mail_waist",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one complete curved waist belt with central buckle, named Crucible Spellcaster's Girdle. Construction: fine silver-grey chain links, narrow copper binding, indigo lining and small contained blue ember stones. Distinct silhouette and ornament: sweeping arched copper ribs framing teardrop stones. Crafted Crucible family styling, not raid armor. Do not include unrelated equipment.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/crucible_caster_mail_waist.png",
+        "bytes": 2053405,
+        "sha256": "eab83bf557a5a2a4f628ec4379f6064c85f95c6e9284e999d1ade643ff69ed55",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/crucible_caster_mail_waist.png",
+        "bytes": 444325,
+        "sha256": "e66f6c5f181e6aff5d1bb918869b115f7452df425ff47af59fec8cf8b7b0c730",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "crucible_caster_mail_feet",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: a compact natural pair of fully visible armored boots, named Crucible Spellcaster's Sabatons. Construction: fine silver-grey chain links, narrow copper binding, indigo lining and small contained blue ember stones. Distinct silhouette and ornament: sweeping arched copper ribs framing teardrop stones. Crafted Crucible family styling, not raid armor. Do not include unrelated equipment.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/crucible_caster_mail_feet.png",
+        "bytes": 2402776,
+        "sha256": "db42ea9b556283a3523cab7c31a3878c26a19897b43641117d8dfd6203248e77",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/crucible_caster_mail_feet.png",
+        "bytes": 552785,
+        "sha256": "5e747223cf19d9440161cc7bec5575c6e45e9d70f823032a82c5577f98f00170",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "pattern_crucible_caster_mail",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one closed compact artisan's pattern manual, a tangible thick bound book for a spellcaster's mail armor collection. Binding echoing fine silver-grey chain links, narrow copper binding, indigo lining and small contained blue ember stones; cover construction inspired by sweeping arched copper ribs framing teardrop stones. A single deliberate small raised metal hauberk on the cover denotes an armor manual. Three little blank bronze page tabs, no letters or diagrams visible. Show complete book in readable three-quarter view with spine and clasp. No other objects.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/pattern_crucible_caster_mail.png",
+        "bytes": 2622837,
+        "sha256": "42cc5752c475ad0d0cbe91edd3d0a877997fc121aab4c6bdbff3decefdd599ca",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/pattern_crucible_caster_mail.png",
+        "bytes": 545540,
+        "sha256": "a61a7ffdd5cb0ce7f3f74639e68b4c9f24b2dd7973b257e3aa889d8b0d4833b6",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "crucible_healer_mail_chest",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one empty front-facing torso garment, named Crucible Healer's Hauberk. Construction: polished pewter chainmail, ivory padded lining, warm bronze binding and small pale-gold stones. Distinct silhouette and ornament: rounded petal-shaped metal insets and smooth broad curves. Crafted Crucible family styling, not raid armor. Do not include unrelated equipment.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/crucible_healer_mail_chest.png",
+        "bytes": 2494057,
+        "sha256": "f6c1cc4f907a5e807df051f2e7d47633c3f34cf7965b0f5081efe7723789437a",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/crucible_healer_mail_chest.png",
+        "bytes": 540041,
+        "sha256": "584307a173f2d08a47a3c35832f0da04190620abee4b9996cc99215b069ba9d1",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "crucible_healer_mail_waist",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one complete curved waist belt with central buckle, named Crucible Healer's Girdle. Construction: polished pewter chainmail, ivory padded lining, warm bronze binding and small pale-gold stones. Distinct silhouette and ornament: rounded petal-shaped metal insets and smooth broad curves. Crafted Crucible family styling, not raid armor. Do not include unrelated equipment.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/crucible_healer_mail_waist.png",
+        "bytes": 2053182,
+        "sha256": "ddc476a8472961e41c072c8ea3d46295f1365c4587ba96c08f3342a46a5b4baa",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/crucible_healer_mail_waist.png",
+        "bytes": 481209,
+        "sha256": "c4f3fec84b04aaf93000ce014975a68fbe3bd738839f550e550a8ee876ad77e0",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "crucible_healer_mail_feet",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: a compact natural pair of fully visible armored boots, named Crucible Healer's Sabatons. Construction: polished pewter chainmail, ivory padded lining, warm bronze binding and small pale-gold stones. Distinct silhouette and ornament: rounded petal-shaped metal insets and smooth broad curves. Crafted Crucible family styling, not raid armor. Do not include unrelated equipment.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/crucible_healer_mail_feet.png",
+        "bytes": 2424721,
+        "sha256": "4bd32a78966102dea6c4eeb3c669700f84f89996c560885c706d52b464cb5e70",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/crucible_healer_mail_feet.png",
+        "bytes": 553360,
+        "sha256": "42d3ace923102c3248cfdc8e56e768dfffd3310f61fa623bf68fd62a199beb56",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "pattern_crucible_healer_mail",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one closed compact artisan's pattern manual, a tangible thick bound book for a healer's mail armor collection. Binding echoing polished pewter chainmail, ivory padded lining, warm bronze binding and small pale-gold stones; cover construction inspired by rounded petal-shaped metal insets and smooth broad curves. A single deliberate small raised metal hauberk on the cover denotes an armor manual. Three little blank bronze page tabs, no letters or diagrams visible. Show complete book in readable three-quarter view with spine and clasp. No other objects.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/pattern_crucible_healer_mail.png",
+        "bytes": 2592039,
+        "sha256": "e75b754f18d2dfa89e69ac0f23c8bf8552173dfd3e040da10ea80a12d1dbbaa9",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/pattern_crucible_healer_mail.png",
+        "bytes": 587037,
+        "sha256": "f79232645a98086fb0deaf5db89b482805b2072dc57df056bf78dac7501e1b1f",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "crucible_agi_leather_chest",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one empty front-facing torso garment, named Crucible Skirmisher's Jerkin. Construction: flexible soot-brown leather, flat bronze clasps, oxblood stitching and restrained amber studs. Distinct silhouette and ornament: asymmetric close-fitting overlapping straps and pointed panels. Crafted Crucible family styling, not raid armor. Do not include unrelated equipment.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/crucible_agi_leather_chest.png",
+        "bytes": 2110329,
+        "sha256": "1c259feb3fe7b7992d29eb51e495b13a4005fc894b4c7adc17e81563cd810d8c",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/crucible_agi_leather_chest.png",
+        "bytes": 449505,
+        "sha256": "404e786d0df7afc688b3833daf290f1b79cf50a9fc208d735139a3f3b80a5dd3",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "crucible_agi_leather_waist",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one complete curved waist belt with central buckle, named Crucible Skirmisher's Belt. Construction: flexible soot-brown leather, flat bronze clasps, oxblood stitching and restrained amber studs. Distinct silhouette and ornament: asymmetric close-fitting overlapping straps and pointed panels. Crafted Crucible family styling, not raid armor. Do not include unrelated equipment.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/crucible_agi_leather_waist.png",
+        "bytes": 2203702,
+        "sha256": "7529c51c3c1c9296bb40d31491f272d6a8f5785307a7effe6a8c0fb751e14c40",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/crucible_agi_leather_waist.png",
+        "bytes": 462872,
+        "sha256": "269437cd29ad9655bbce9ecffdf31b7d2d56b5981c5ca7a9a6b56060139f6e72",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "crucible_agi_leather_feet",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: a compact natural pair of fully visible leather boots, named Crucible Skirmisher's Boots. Construction: flexible soot-brown leather, flat bronze clasps, oxblood stitching and restrained amber studs. Distinct silhouette and ornament: asymmetric close-fitting overlapping straps and pointed panels. Crafted Crucible family styling, not raid armor. Do not include unrelated equipment.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/crucible_agi_leather_feet.png",
+        "bytes": 2218400,
+        "sha256": "0351f614143c714ef351cedd48fa6cd85dcf2c28e1d57fbb96c2919061512dec",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/crucible_agi_leather_feet.png",
+        "bytes": 492014,
+        "sha256": "023c998b3097c18c526f03e6082cbe489896e4198e76840eafa36ab4619a0000",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "pattern_crucible_agi_leather",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one closed compact artisan's pattern manual, a tangible thick bound book for a skirmisher's leather armor collection. Binding echoing flexible soot-brown leather, flat bronze clasps, oxblood stitching and restrained amber studs; cover construction inspired by asymmetric close-fitting overlapping straps and pointed panels. A single deliberate stitched leather jerkin silhouette on the cover denotes an armor manual. Three little blank bronze page tabs, no letters or diagrams visible. Show complete book in readable three-quarter view with spine and clasp. No other objects.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/pattern_crucible_agi_leather.png",
+        "bytes": 2364619,
+        "sha256": "9979dc7473ac9078d2894234921e31e48204044a6a4bc21363b4aaaf23878a1b",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/pattern_crucible_agi_leather.png",
+        "bytes": 492670,
+        "sha256": "33ca0298a1517d5bbde051f49dc99d819ac43c5bf9c6af83969275cc046e0b2e",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "crucible_str_leather_chest",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one empty front-facing torso garment, named Crucible Prowler's Jerkin. Construction: dark red-brown leather reinforced by tapered dark iron splints, bronze bindings and tiny orange ember studs. Distinct silhouette and ornament: curved claw-shaped layered panels with stout angled straps. Crafted Crucible family styling, not raid armor. Do not include unrelated equipment.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/crucible_str_leather_chest.png",
+        "bytes": 2337710,
+        "sha256": "7c776c96c740c53f0384ea6ed2ec12fc85945dcebc8016f4d63e71de4dc5ab8a",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/crucible_str_leather_chest.png",
+        "bytes": 490819,
+        "sha256": "f107445529034dc7c12d634c1d89b4ca4ce89a26681d004e7973a3dd0d35e396",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "crucible_str_leather_waist",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one complete curved waist belt with central buckle, named Crucible Prowler's Belt. Construction: dark red-brown leather reinforced by tapered dark iron splints, bronze bindings and tiny orange ember studs. Distinct silhouette and ornament: curved claw-shaped layered panels with stout angled straps. Crafted Crucible family styling, not raid armor. Do not include unrelated equipment.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/crucible_str_leather_waist.png",
+        "bytes": 1892482,
+        "sha256": "afbd19a126a1d93017df7a848780e8ad6163887f074752fdf97f168372dc668f",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/crucible_str_leather_waist.png",
+        "bytes": 434190,
+        "sha256": "6bc4070c6d68c0324959d717d0181661097b957fcab776aad5e7074e22378cb3",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "crucible_str_leather_feet",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: a compact natural pair of fully visible leather boots, named Crucible Prowler's Boots. Construction: dark red-brown leather reinforced by tapered dark iron splints, bronze bindings and tiny orange ember studs. Distinct silhouette and ornament: curved claw-shaped layered panels with stout angled straps. Crafted Crucible family styling, not raid armor. Do not include unrelated equipment.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/crucible_str_leather_feet.png",
+        "bytes": 2264112,
+        "sha256": "73b6e047cf19fdd67ff4beb3d9dbc26fad4713e821ccbb93ea1afe56a941b082",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/crucible_str_leather_feet.png",
+        "bytes": 516148,
+        "sha256": "f66e1449369311e860d53f4d4e5a4ecf23303616bea136470832fa132536e2d7",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "pattern_crucible_str_leather",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one closed compact artisan's pattern manual, a tangible thick bound book for a prowler's leather armor collection. Binding echoing dark red-brown leather reinforced by tapered dark iron splints, bronze bindings and tiny orange ember studs; cover construction inspired by curved claw-shaped layered panels with stout angled straps. A single deliberate stitched leather jerkin silhouette on the cover denotes an armor manual. Three little blank bronze page tabs, no letters or diagrams visible. Show complete book in readable three-quarter view with spine and clasp. No other objects.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/pattern_crucible_str_leather.png",
+        "bytes": 2389625,
+        "sha256": "e377b8dcf4e32f7ef4f21cb512a2808ac318699669f6567b6969e74897b8fe2a",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/pattern_crucible_str_leather.png",
+        "bytes": 492251,
+        "sha256": "ba0c384e2368165ce41e08b7f533757b3a19a62fd59d17828a25655f264a8e99",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "crucible_tank_leather_chest",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one empty front-facing torso garment, named Crucible Guardian's Jerkin. Construction: thick umber leather, dark bark-like layered panels, broad bronze rivets and deep moss stitching. Distinct silhouette and ornament: bulky rounded padded layers and thick folded protective edges. Crafted Crucible family styling, not raid armor. Do not include unrelated equipment.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/crucible_tank_leather_chest.png",
+        "bytes": 2383554,
+        "sha256": "5013f7f7cabd52c14936da76465e321046509a23f0be5376952eb01733612782",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/crucible_tank_leather_chest.png",
+        "bytes": 517612,
+        "sha256": "d2ddf7e162a94056b979d53bb592c1e23ebcef86a36d5059aa11dcc66e1ebe15",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "crucible_tank_leather_waist",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one complete curved waist belt with central buckle, named Crucible Guardian's Belt. Construction: thick umber leather, dark bark-like layered panels, broad bronze rivets and deep moss stitching. Distinct silhouette and ornament: bulky rounded padded layers and thick folded protective edges. Crafted Crucible family styling, not raid armor. Do not include unrelated equipment.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/crucible_tank_leather_waist.png",
+        "bytes": 2135233,
+        "sha256": "03bda324ac2fb7bd8cf09f4dbc49ad50dbe64264b101f0aa2bfe5a033d9e669f",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/crucible_tank_leather_waist.png",
+        "bytes": 473719,
+        "sha256": "27c6ab5a3d1fbe5bd2b2ff41fe766d782c9856e019e108cc028c763dd6f10f5b",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "crucible_tank_leather_feet",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: a compact natural pair of fully visible leather boots, named Crucible Guardian's Boots. Construction: thick umber leather, dark bark-like layered panels, broad bronze rivets and deep moss stitching. Distinct silhouette and ornament: bulky rounded padded layers and thick folded protective edges. Crafted Crucible family styling, not raid armor. Do not include unrelated equipment.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/crucible_tank_leather_feet.png",
+        "bytes": 2241393,
+        "sha256": "28af43359e2cfc32da3d785692af2bf60f39a4f54ba858cea6095d6938cebbed",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/crucible_tank_leather_feet.png",
+        "bytes": 541382,
+        "sha256": "f506b1122df2ed9ab741b773c8d2eb172c467cf6aa89e43fb96af1921f6884bf",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "pattern_crucible_tank_leather",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one closed compact artisan's pattern manual, a tangible thick bound book for a guardian's leather armor collection. Binding echoing thick umber leather, dark bark-like layered panels, broad bronze rivets and deep moss stitching; cover construction inspired by bulky rounded padded layers and thick folded protective edges. A single deliberate stitched leather jerkin silhouette on the cover denotes an armor manual. Three little blank bronze page tabs, no letters or diagrams visible. Show complete book in readable three-quarter view with spine and clasp. No other objects.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/pattern_crucible_tank_leather.png",
+        "bytes": 2283939,
+        "sha256": "1e99690888f53e8a580350b8249b74e5849ecb6963e2cd7e6d134e244551fbc4",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/pattern_crucible_tank_leather.png",
+        "bytes": 498209,
+        "sha256": "77d756957b066aac3066d3c661dceefa53aa6683538c7678862f6be6859f4bd3",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "crucible_caster_leather_chest",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one empty front-facing torso garment, named Crucible Spellcaster's Jerkin. Construction: soft charcoal leather with indigo lining, silver-copper trim and small dim blue stones. Distinct silhouette and ornament: leaf-shaped overlapping panels and curved openwork clasps. Crafted Crucible family styling, not raid armor. Do not include unrelated equipment.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/crucible_caster_leather_chest.png",
+        "bytes": 2076575,
+        "sha256": "b27cded0fd73be7b0e6e5b39a0b764786b1e688feb4e41006d107effaf917bb7",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/crucible_caster_leather_chest.png",
+        "bytes": 498681,
+        "sha256": "35068961dfe8446c7d61c21eae13dc6d0cf5be2517955d699c1c6ed888824e30",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "crucible_caster_leather_waist",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one complete curved waist belt with central buckle, named Crucible Spellcaster's Belt. Construction: soft charcoal leather with indigo lining, silver-copper trim and small dim blue stones. Distinct silhouette and ornament: leaf-shaped overlapping panels and curved openwork clasps. Crafted Crucible family styling, not raid armor. Do not include unrelated equipment.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/crucible_caster_leather_waist.png",
+        "bytes": 2113593,
+        "sha256": "e442a5921be4b16cff5b32c6817f1cdafdf75679928a3eea3ab03c9067f8e1f9",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/crucible_caster_leather_waist.png",
+        "bytes": 462502,
+        "sha256": "343550e0ecf0ffab6816286df41cd5e508d1ef07b2e85da6a0b2070ad044dfa7",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "crucible_caster_leather_feet",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: a compact natural pair of fully visible leather boots, named Crucible Spellcaster's Boots. Construction: soft charcoal leather with indigo lining, silver-copper trim and small dim blue stones. Distinct silhouette and ornament: leaf-shaped overlapping panels and curved openwork clasps. Crafted Crucible family styling, not raid armor. Do not include unrelated equipment.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/crucible_caster_leather_feet.png",
+        "bytes": 2323222,
+        "sha256": "29baa581c2912d35c502ef7d245ffeff3b012fe3758906ed810c528c3bb4c2a0",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/crucible_caster_leather_feet.png",
+        "bytes": 526723,
+        "sha256": "d125a6904035c67e8d640c7790350275738e3eba4ba1a7dd4db5a20af5cbeef9",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "pattern_crucible_caster_leather",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one closed compact artisan's pattern manual, a tangible thick bound book for a spellcaster's leather armor collection. Binding echoing soft charcoal leather with indigo lining, silver-copper trim and small dim blue stones; cover construction inspired by leaf-shaped overlapping panels and curved openwork clasps. A single deliberate stitched leather jerkin silhouette on the cover denotes an armor manual. Three little blank bronze page tabs, no letters or diagrams visible. Show complete book in readable three-quarter view with spine and clasp. No other objects.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/pattern_crucible_caster_leather.png",
+        "bytes": 2435316,
+        "sha256": "ef52db6340ec61a7ded6f707f3335f0c91633eea655e333663da2addd4b5462b",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/pattern_crucible_caster_leather.png",
+        "bytes": 531281,
+        "sha256": "2b3f5d456969a56ed6ea26e4be62e243a22fd7639b691f0b08baaff94085854d",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "crucible_healer_leather_chest",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one empty front-facing torso garment, named Crucible Healer's Jerkin. Construction: warm chestnut leather with cream lining, pale bronze clasps and amber cabochons. Distinct silhouette and ornament: rounded stitched layers and broad folded leaf shapes. Crafted Crucible family styling, not raid armor. Do not include unrelated equipment.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/crucible_healer_leather_chest.png",
+        "bytes": 2228027,
+        "sha256": "84bc17636326bdb35f98814b8d46620def182ce4d32b86244fea4aab7b61be2c",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/crucible_healer_leather_chest.png",
+        "bytes": 497114,
+        "sha256": "3859e58cacb7651a5059562e47c5c682d4eea46c18ddfdd4bcc2e9848b3a434c",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "crucible_healer_leather_waist",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one complete curved waist belt with central buckle, named Crucible Healer's Belt. Construction: warm chestnut leather with cream lining, pale bronze clasps and amber cabochons. Distinct silhouette and ornament: rounded stitched layers and broad folded leaf shapes. Crafted Crucible family styling, not raid armor. Do not include unrelated equipment.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/crucible_healer_leather_waist.png",
+        "bytes": 2131150,
+        "sha256": "ed77e4dbad23c9fd8e3a02f84195e4fe23664f47ed28e4c58e2a95550d5a64e6",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/crucible_healer_leather_waist.png",
+        "bytes": 522735,
+        "sha256": "aefe9626e8f4b7efc22ba847b9e68b98d054f6d35a8d245430667b39963aa7a3",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "crucible_healer_leather_feet",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: a compact natural pair of fully visible leather boots, named Crucible Healer's Boots. Construction: warm chestnut leather with cream lining, pale bronze clasps and amber cabochons. Distinct silhouette and ornament: rounded stitched layers and broad folded leaf shapes. Crafted Crucible family styling, not raid armor. Do not include unrelated equipment.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/crucible_healer_leather_feet.png",
+        "bytes": 2265308,
+        "sha256": "f149814d9a2d494cd5a343cc3ab8d6bb5fcdcfde92b40001dead3ab1b213a112",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/crucible_healer_leather_feet.png",
+        "bytes": 541344,
+        "sha256": "05e968d8b862c7dcb0eb63b6264e86957d5185290bb33c436748548612668347",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "pattern_crucible_healer_leather",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one closed compact artisan's pattern manual, a tangible thick bound book for a healer's leather armor collection. Binding echoing warm chestnut leather with cream lining, pale bronze clasps and amber cabochons; cover construction inspired by rounded stitched layers and broad folded leaf shapes. A single deliberate stitched leather jerkin silhouette on the cover denotes an armor manual. Three little blank bronze page tabs, no letters or diagrams visible. Show complete book in readable three-quarter view with spine and clasp. No other objects.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/pattern_crucible_healer_leather.png",
+        "bytes": 2327462,
+        "sha256": "47564c3d5b0bb47861cb1a434f4f5503a2304276bd824237395a384fa6b08512",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/pattern_crucible_healer_leather.png",
+        "bytes": 513662,
+        "sha256": "42d52050e6d8b05e8ea2032bb519c5d15ab61f9e2116f753521358ae13294448",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "crucible_caster_cloth_chest",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one complete empty front-facing long robe, named Crucible Spellcaster's Robe. Construction: deep indigo and charcoal woven cloth, copper thread binding and small restrained blue ember stones. Distinct silhouette and ornament: long folded tapered panels and angular copper clasps. Crafted Crucible family styling, not raid armor. Do not include unrelated equipment.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/crucible_caster_cloth_chest.png",
+        "bytes": 2162903,
+        "sha256": "7b7878245b2984aa9c96ce3ad55d9f32327a55e638b679fd67e4ae6ba174a3d6",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/crucible_caster_cloth_chest.png",
+        "bytes": 483339,
+        "sha256": "e6f7905f069796284b33043b536f18543494b0aec8ece743463e3ea50b823278",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "crucible_caster_cloth_waist",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one folded cloth waist sash with a central clasp, named Crucible Spellcaster's Sash. Construction: deep indigo and charcoal woven cloth, copper thread binding and small restrained blue ember stones. Distinct silhouette and ornament: long folded tapered panels and angular copper clasps. Crafted Crucible family styling, not raid armor. Do not include unrelated equipment.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/crucible_caster_cloth_waist.png",
+        "bytes": 2255255,
+        "sha256": "3e81e66195456c56745e323a267f76eac3e9b6f838973545edc3939aeeeb398d",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/crucible_caster_cloth_waist.png",
+        "bytes": 475315,
+        "sha256": "0133427176a2ca7650da2de494daa7aa9bf68f31e12e7b47a6b17dd6f3a12e38",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "crucible_caster_cloth_feet",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: a compact natural pair of fully visible soft slippers, named Crucible Spellcaster's Slippers. Construction: deep indigo and charcoal woven cloth, copper thread binding and small restrained blue ember stones. Distinct silhouette and ornament: long folded tapered panels and angular copper clasps. Crafted Crucible family styling, not raid armor. Do not include unrelated equipment.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/crucible_caster_cloth_feet.png",
+        "bytes": 2117623,
+        "sha256": "91939b841a2a816cb7caad29c3339a417fe7b98a41837ca5c0d5863b7aae177a",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/crucible_caster_cloth_feet.png",
+        "bytes": 471016,
+        "sha256": "33cafb8bfb634f5be08041f0659562e7d2fd427732bfecc56c04a2b9672101ad",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "pattern_crucible_caster_cloth",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one closed compact artisan's pattern manual, a tangible thick bound book for a spellcaster's cloth armor collection. Binding echoing deep indigo and charcoal woven cloth, copper thread binding and small restrained blue ember stones; cover construction inspired by long folded tapered panels and angular copper clasps. A single deliberate embroidered robe silhouette on the cover denotes an armor manual. Three little blank bronze page tabs, no letters or diagrams visible. Show complete book in readable three-quarter view with spine and clasp. No other objects.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/pattern_crucible_caster_cloth.png",
+        "bytes": 2339235,
+        "sha256": "74419d17a4ea40b3dbe3325cc9477af794b1a6856286444f84d291651cb85a26",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/pattern_crucible_caster_cloth.png",
+        "bytes": 474389,
+        "sha256": "43ba301eeee057b4be80aff5016a530f989ea2a3896b7f86ffe42b4526c9ee57",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "crucible_healer_cloth_chest",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one complete empty front-facing long robe, named Crucible Healer's Robe. Construction: heavy ivory and warm ash-grey woven cloth with bronze hems and tiny amber stones. Distinct silhouette and ornament: broad rounded overlapping folds and simple sunburst clasp without writing. Crafted Crucible family styling, not raid armor. Do not include unrelated equipment.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/crucible_healer_cloth_chest.png",
+        "bytes": 2483528,
+        "sha256": "03af68dc642aa2cf540e51a197642568a8bd61a20166ee52e81a37c943df98b1",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/crucible_healer_cloth_chest.png",
+        "bytes": 573732,
+        "sha256": "4ad270d0fc1ae614bec26a331834b2872907b140f9f41f1a4940290b21b4599d",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "crucible_healer_cloth_waist",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one folded cloth waist sash with a central clasp, named Crucible Healer's Sash. Construction: heavy ivory and warm ash-grey woven cloth with bronze hems and tiny amber stones. Distinct silhouette and ornament: broad rounded overlapping folds and simple sunburst clasp without writing. Crafted Crucible family styling, not raid armor. Do not include unrelated equipment.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/crucible_healer_cloth_waist.png",
+        "bytes": 2596823,
+        "sha256": "632402c05e89424d17ad9f9b22ea471db2da778c106fd031563bcd1807d9c697",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/crucible_healer_cloth_waist.png",
+        "bytes": 548259,
+        "sha256": "fde4f5ee9e8584ffd457b81d34ae3dded9db73965cfd62e289bc0d23d943f7dc",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "crucible_healer_cloth_feet",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: a compact natural pair of fully visible soft slippers, named Crucible Healer's Slippers. Construction: heavy ivory and warm ash-grey woven cloth with bronze hems and tiny amber stones. Distinct silhouette and ornament: broad rounded overlapping folds and simple sunburst clasp without writing. Crafted Crucible family styling, not raid armor. Do not include unrelated equipment.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/crucible_healer_cloth_feet.png",
+        "bytes": 2223720,
+        "sha256": "e0b4dd90bccbe36ac15667c229ff0c970e0600e43736a24d6e811fd71b513a2d",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/crucible_healer_cloth_feet.png",
+        "bytes": 564404,
+        "sha256": "1c78796fdb5482307709c1fa99107283e0d4f7e873460fb42fb9dc0a52bda836",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "pattern_crucible_healer_cloth",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one closed compact artisan's pattern manual, a tangible thick bound book for a healer's cloth armor collection. Binding echoing heavy ivory and warm ash-grey woven cloth with bronze hems and tiny amber stones; cover construction inspired by broad rounded overlapping folds and simple sunburst clasp without writing. A single deliberate embroidered robe silhouette on the cover denotes an armor manual. Three little blank bronze page tabs, no letters or diagrams visible. Show complete book in readable three-quarter view with spine and clasp. No other objects.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/pattern_crucible_healer_cloth.png",
+        "bytes": 2590966,
+        "sha256": "fff28e1aa21c16bb19e4631b3ab5ad04ba2362308b28db68d92fe2e963a60cb7",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/pattern_crucible_healer_cloth.png",
+        "bytes": 567451,
+        "sha256": "0e0effef2b054b61c16d3c8d455580167c9b19bed01d7267244dea37da8c4e5c",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
+      "id": "formula_lastflame_zeal",
+      "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one tightly rolled ivory parchment enchantment formula secured with a bronze clasp containing one tiny bright amber ember crystal, with a short red-brown ribbon. Two curving parchment ends remain closed so no writing appears. It is a valuable physical crafting formula from a fiery raid forge, not a potion, not a spell burst. Full compact diagonal silhouette, restrained warm glow.",
+      "master": {
+        "path": "tmp/imagegen/crucible-professions/masters/formula_lastflame_zeal.png",
+        "bytes": 1982799,
+        "sha256": "759706eb16b08ee7219afbb8e301d10d34bad7519725b809713485937b3e6c6b",
+        "width": 1254,
+        "height": 1254,
+        "format": "png"
+      },
+      "source": {
+        "path": "tmp/imagegen/crucible-professions/accepted/formula_lastflame_zeal.png",
+        "bytes": 497802,
+        "sha256": "a2acff2f22ff8688720e1452360b09c579c39c94ada9b5ad24183c6c34f9f156",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "alpha": "opaque"
+      }
+    },
+    {
       "id": "forgefathers_ember",
       "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon in World of ClaudeCraft woc-item-icon-v1 style. Premium hand-painted classic fantasy MMO art, tactile materials, warm key light top-left, cool deep shadows, crisp focal edges, soft peripheral brushwork. Full-square opaque deep charcoal and umber painted atmospheric vignette with subtle contact shadow. Entire centered subject fills about 70 percent of square with generous safe padding, recognizable at22pixels and in a circular crop. No text, letters, runes, numbers, labels, frame, border, UI, watermark, transparency, collage, split sheet, cropped parts, people, body, mannequin or held presentation. One icon only. Subject: one irregular fist-sized living golden-orange ember enclosed by three interlocking soot-black iron prongs of an ancient smith's small reliquary. The crystalline ember has a dark fractured crust and a luminous heart, with restrained forge glow lighting bronze tool marks. A physical recovered proof for reforging a legendary hammer, not the hammer itself, not a rune, no pedestal. Full complete object, generous padding, no flying effects.",
       "master": {

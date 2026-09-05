@@ -2787,6 +2787,7 @@ export const ja_JP: EnTranslations = {
       "healEcho": "体力が{threshold}%未満になると体力を{value}回復する",
       "increase": {
         "ap": "攻撃力を{value}上昇させる",
+        "str": "筋力を{value}上昇させる",
         "sp": "呪文の威力を{value}上昇させる",
         "armor": "防御力を{value}上昇させる",
         "int": "知力を{value}上昇させる",
@@ -2797,6 +2798,7 @@ export const ja_JP: EnTranslations = {
       },
       "reduce": {
         "ap": "攻撃力を{value}低下させる",
+        "str": "筋力を{value}低下させる",
         "armor": "防御力を{value}低下させる",
         "int": "知力を{value}低下させる",
         "agi": "敏捷性を{value}低下させる",
@@ -3779,6 +3781,7 @@ export const ja_JP: EnTranslations = {
       "leatherworking": "皮革加工"
     },
     "enchantName": {
+      "enchant_weapon_lastflame_zeal": "最後の炎の熱情",
       "enchant_weapon_might": "武器銘刻：剛力",
       "enchant_weapon_intellect": "武器銘刻：呪文威力",
       "enchant_offhand_stamina": "オフハンド銘刻：スタミナ",
@@ -3826,6 +3829,9 @@ export const ja_JP: EnTranslations = {
       "enchant_chest_lucent_stamina": "胸銘刻：光輝のスタミナ",
       "enchant_feet_lucent_agility": "足銘刻：光輝の敏捷性",
       "enchant_lucent_infusion": "光輝の注入"
+    },
+    "enchantDescription": {
+      "enchant_weapon_lastflame_zeal": "命中した近接攻撃は、確率で15秒間筋力を50増加させ、自分の体力を200回復する。回復量の補正が適用される。命中ごとの発動率は、攻撃した武器の基本速度0.6秒につき1%。内部クールダウンはない。左右の手にそれぞれ独立した強化があり、同じ手で再発動するとその持続時間が更新される。遠隔攻撃では発動しない。狼形態では代わりに1秒の基本攻撃速度を使う。"
     },
     "professions": {
       "title": "専門技能",
@@ -4059,6 +4065,7 @@ export const ja_JP: EnTranslations = {
       "sellAll": "すべて売却（{count}）"
     },
     "enchanting": {
+      "recipeNotLearned": "この付呪を施すには、先に製法書で習得してください。",
       "disenchantedLine": "{item}を魔力分解した。",
       "disenchantedYield": "{item}を魔力分解して{material}にした。",
       "disenchantedYieldQty": "{item}を魔力分解して{material}{qty}個にした。",
@@ -4146,7 +4153,8 @@ export const ja_JP: EnTranslations = {
       "outOfRange": "訓練するには作業台のそばにいる必要があります。"
     },
     "pattern": {
-      "teaches": "使用: {item}の作成法を習得します。"
+      "teaches": "使用: {item}の作成法を習得します。",
+      "teachesEnchant": "使用：{enchant}の付与方法を習得する。"
     },
     "unbind": {
       "title": "バインド解除：{name}",
@@ -4170,12 +4178,35 @@ export const ja_JP: EnTranslations = {
       "perfecting": "完全化の途中、または完全化済みのアイテムはバインドされたままです。"
     },
     "perfecting": {
+      "swapTitle": "完全化ランクの交換",
+      "swapIntro": "同じセットに属する、所持している別の装備を選択します。戦闘外で対応する製作台に近づき、製作スキル{skill}でランクを交換できます。素材の消費や失敗はありません。",
+      "swapChoose": "交換結果を確認するため、もう一つの装備を選択してください。",
+      "swapRank": "{name}：ランク{before}から{after}へ",
+      "swapAction": "ランク交換を確認",
+      "swapPending": "ランクを交換中",
+      "swapConfirm": "両方の装備があなたに永久に帰属します。完全化ランクを交換しますか？",
+      "swapConfirmAccept": "帰属させてランクを交換",
+      "swapPreserve": "装備は消費されません。名前、外観上の伝説昇格、付与効果は元の装備に残ります。装備数の制限も維持されます。",
+      "swapEnchantInactive": "完全化限定の付与効果は、この装備が再び完全化されるまで無効になります。",
+      "swapEnchantActive": "完全化限定の付与効果が再び有効になります。",
+      "swapSuccess": "完全化ランクを交換しました。両方の装備が永久に帰属しました。",
+      "swapInterrupted": "再接続後、交換の結果を確認できませんでした。次の交換を選ぶ前に、両方の装備の完全化ランクを確認してください。",
+      "swapChanged": "選択した装備が変化しました。再選択して新しいランクを確認してください。",
+      "swapDead": "ランクを交換するには生存している必要があります。",
+      "swapBusy": "戦闘から離れ、現在の動作を終えてからランクを交換してください。",
+      "swapInvalid": "この装備の完全化進行状況は未対応のため、ランクを交換できません。",
+      "swapSameRank": "この装備同士の完全化ランクはすでに同じです。",
+      "swapSkill": "このセットの製作スキルが{skill}必要です。",
+      "swapStation": "対応する製作台に移動してランクを交換してください。",
+      "swapLocked": "ランク交換前に両方の装備のロックを解除してください。",
+      "enchantInactive": "付与効果は無効です。この装備を完全化すると再び有効になります。付与効果は保持されます。",
       "title": "完全化",
       "close": "完全化ウィンドウを閉じる",
       "openButton": "完全化",
       "openButtonAria": "完全化ウィンドウを開く",
       "empty": "完全化できる名匠鍛造アイテムを持っていません。頂点レシピで作り出せます。",
       "wornChip": "装備中",
+      "bagCopy": "バッグ内の装備 {index}/{count}",
       "rowRank": "ランク{rank}/{ranks}",
       "rowPerfected": "完全化済み",
       "rankAnnounce": "{name}が完全化ランク{rank}/{ranks}に到達しました。",
@@ -6584,10 +6615,13 @@ export const ja_JP: EnTranslations = {
       "provenanceBody": "レア以上の作品には作り手の名が刻まれ、傑作は品質が1段階上がり、受注品は受け取った相手にバインドされます（作り手の絆）。",
       "endgameHeading": "名匠鍛造の終盤",
       "endgameBody": "どのクラフトの訓練師の梯子の上にも、同じ一つの頂が待っています：名匠鍛造の一族、つまりギアとアイテムのページが述べる、金色の「装備ユニーク：名匠鍛造」タグをまとうクラフト装備です。どのクラフトが登っても鎖の形は同じです：頂点の図案は教わるものではなく見つけるもの、一日一回に区切られた中間クラフトが仕事の歩みを刻み、三つの共有素材があらゆる梯子を潤します。仕上がった品は他のクラフト品と同じく自由に取引でき（取引の決まりは製作経済のページが載せています）、装備2つまでの上限があるため、ビルドの主役一式ではなく引き立て役にとどまります。だからこそ、最深部の終盤に足を踏み入れない職人でも、そこに住む人々へ品物を売れるのです。",
+      "endgameBodyRaidCollections": "Masterwrought is the shared family marked Unique-Equipped: Masterwrought. The older apex ladder still uses its found patterns, daily intermediate crafts, and shared endgame materials. The Crucible collections are a separate raid-funded route, not another set of costs added to that ladder. Both families share the same two-piece wearing cap, so they compete for the same two places in your build. Finished pieces trade freely until Perfecting or a commission binds the individual copy.",
       "endgamePatternsBody": "図案は三つの経路でやって来ます。そしてどのクラフトページのレシピ表も、行ごとに自分の経路を記しています：最深部の終盤の勝利で見つかるか、英雄補給係がヒーローの記章と引き換えに売るか、その両方かです。この割り振りは意図されたものです。装備の図案は見つけるだけで決して売られず、消耗品の図案は初日から補給係の台に並び、農耕の図案は両方の道を行きます。図案そのものも普通に取引できる品なので、自分に使えない発見は、売れる発見でもあります。",
+      "endgamePatternsBodyCollections": "The older gear patterns are found rather than sold; the older consumable patterns are sold by the Heroic Quartermaster for Heroic Marks, and farming patterns use both routes. Crucible collection manuals and the Last Flame's Zeal formula instead drop from either Crucible boss on either difficulty. Their shared drop group has a 30% chance per boss, choosing one of twelve equally likely scrolls. The Crucible quartermaster also sells any of these scrolls for one core, a deterministic alternative to a lucky drop. Each collection manual teaches all three of its recipes at skill 100. A partly learned manual fills the missing lessons and consumes only one scroll. Manuals and formulas can be traded.",
       "endgameMaterialsBody": "三つの共有素材が鎖全体を養います。竜墜の核は取引できる触媒です：最深部の終盤の最終勝利は、討伐が認められたキャラクターへ核を1個から3個支払い、供給源ごとに一日一回です。最高位のリフト踏破も同じ日次の時計で決まった数を支払い、英雄補給係は不運の保険としてヒーローの記章12個で1個を売ります。核は自由に取引できます。断たれし精髄は魂縛で、断つことだけが入手源です：どのキャラクターでも職業を問わず断つことができ、その詠唱はレイドで入手したこの層のエピック1個を断ち、ちょうど1個の精髄にします。代価はそのエピックそのものです。匠の残り火も魂縛で、鎖の時計です：キャラクターごとに週1個、その週最初の資格ある終盤クリアで授けられます。逃した週が失われることはなく、残り火は積み立てられ、次のクリアでまとめて支払われます。",
       "endgameMaterialsBodyAnyRaid": "三つの共有素材が鎖全体を養います。竜墜の核は取引できる触媒です：最深部の終盤の最終勝利は、討伐が認められたキャラクターへ核を1個から3個支払い、供給源ごとに一日一回です。最高位のリフト踏破も同じ日次の時計で決まった数を支払い、英雄補給係は不運の保険としてヒーローの記章12個で1個を売ります。核は自由に取引できます。断たれし精髄は魂縛で、断つことだけが入手源です：どのキャラクターでも職業を問わず断つことができ、その詠唱はレイドで入手したエピック装備1個を、どのレイドで得たものでもノーマルでもヒロイックでも問わず断ち、ちょうど1個の精髄にします。代価はそのエピックそのものです。匠の残り火も魂縛で、鎖の時計です：キャラクターごとに週1個、その週最初の資格ある終盤クリアで授けられます。逃した週が失われることはなく、残り火は積み立てられ、次のクリアでまとめて支払われます。",
       "perfectingHeading": "完全化とオレンジへの昇格",
+      "crucibleCollectionsBody": "Each of the eleven Crucible collections offers chest, waist, and feet pieces in its own native armor and role profile. Any two pieces activate its only set bonus, even before Perfecting; there is no three-piece bonus. Each item starts at item level 35 and costs 3 Cores of the Last Flame plus ordinary high-grade gathering materials, so a pair costs six cores before the optional manual purchase. No Wyrmfall Core, daily intermediate, or Maker's Ember is required for the base craft. At rank four, Perfecting raises the primary-stat budget to item level 38. Perfecting still follows its own weekly Ember progression, independent of obtaining and wearing the base gear.\n\nYou can exchange Perfecting ranks between two copies from the same collection at the appropriate crafting station, with skill 125, while alive, idle, and out of combat. The ranks are swapped, never duplicated, and each slot applies its own Perfected stat bonus. The exchange has no material cost and no cooldown. Both copies bind to you; their individual names, enchants, and maker marks stay with their original items.",
       "perfectingBody": "仕上がった頂点装備の物語は、そこで終わりではありません。持ち主は、その品を作ったクラフトの技能125があれば、装備を完全化の4つのランクへ歩ませられます。挑戦一回ごとに匠の残り火1個、断たれし精髄1個、プリズムガラスの石座1個を費やし、五回に四回成功します。外れても失うのは素材だけで、品が傷ついたり後戻りしたりすることはありません。最初の挑戦で品は完全化する本人にバインドされるので、売るつもりの品は仕事を始める前に売っておきましょう。完全化された品は元の性能に加えて能力値ボーナスを帯び、そして完全化こそ光輝の注入が待っているものです：エンチャントのページで「完全化品のみ」と記されたただ一つのエンチャントは、それ未満には決して宿りません。",
       "promotionBody": "最後の一歩がオレンジへの昇格で、創造の証書の使い道はこれがすべてです。完全化された品と創造の証書1枚（銘文職の技能125の証文）を用意すれば、その品は自分で名を付けた伝説の品へと昇格します。ここに賽の目はありません：昇格は確定で、能力値はいっさい変わらず、変わるのは名前と色です。証書そのものは取引できるので、書き手と使い手が同じ人である必要はありません。そして一族の上限に加わった一行はここでも生きています：装備できる2つのうち、伝説の名匠鍛造の品は最大1つまでです。",
       "stationsHeading": "作業場と師匠",
@@ -6771,10 +6805,12 @@ export const ja_JP: EnTranslations = {
       "masteryBody": "スキル{step}ポイントごとに1段階。自分の段階以上のレシピは全量、1段下は半分、2段下は四分の一、3段以上下は成長なしで、この職の上限は{cap}です。",
       "masterworkHeading": "傑作",
       "masterworkBody": "製作成功のたびに{base}%の傑作率があり、レシピより1段高いごとに{perTier}%、署名入り素材の使用で{signed}%、特化で{spec}%が加算され、上限は{cap}%です。",
+      "masterworkBodyRaidCollections": "Every successful craft is exactly what the recipe promises, and sometimes a little more: a masterwork finishes the same piece one quality tier finer, with the bonus stats baked in at craft time. It is add-only, never a downgrade. Ordinary crafting follows its existing gear ladder; the raid-funded Crucible collections are a separate alternative at the current raid tier.\n\nThe apex Masterwrought crafts are the one exception, and they pay the same proc a different way. An apex piece already sits at the top of its ladder, so there is no finer tier to finish it in; a masterwork there hands the piece over one rank into Perfecting instead, a free first rank on the four-rank walk the Professions page describes. Nothing is baked into the stats, and the chance and its gates are the ones below.\n\nThe chance is published, not mystical: {base}% base, plus {perTier}% per tier your skill sits above the recipe, plus {signed}% when any signed reagent goes in, plus {spec}% once you are specialized, with higher-tier materials adding 1 to 2% more, all capped at {cap}%. Only a piece with real stats can improve, so statless commons, tools, and consumables never proc; a dormant craft never produces one, and a hobby craft cannot masterwork past its rare ceiling.\n\nFine work carries its maker. Rare and better outputs are signed, every copy (Crafted by; gathered materials carry Gathered by), a masterwork is always signed whatever its quality. A signature is provenance, not a lock: signed goods trade, mail, and list on the World Market freely.",
       "trainingHeading": "訓練",
       "trainingBody": "トレーナーのレシピは、その土地に住まう師匠たちが自分の作業場で教えます。規則は一行です。この職でのあなたの段階がレシピ自身の段階に達すると師匠がそれを教えてくれ、他に条件はありません。レベルもアーキタイプも関係しません。装備と消耗品の梯子はスキル0、25、50に段を置き、どの職もその上に、それぞれの作業場で教わる75の中間段をひとつ加えます（エンチャントのそれは光輝の試薬で、25の段にある二つの護符レシピと並びます）。工作の二つの竿の教程は75と125で梯子を先へ延ばすので、段階が上がるごとに新しい段が開きます。\n\n料金は一度きりで、段ごとに一律です。最初の段は無料、スキル25の段はレシピごとに{tier1}、スキル50の段は{tier2}、その上の75と125の段はそれぞれ固有の料金を持ち、表の各レシピの隣に記されています。修行には師匠の実際の作業場に立っている必要があり、移動式の作業場は数に入りません。共通の野外レシピと、製作で作る六つの陸の道具のレシピは修行が一切不要で、どのキャラクターも最初から知っています。",
       "specializationHeading": "特化",
       "specializationBody": "スキルが{at}に達するとこの職に特化し、レシピの素材コストが{pct}%減ります。",
+      "specializationBodyUndiscounted": "At skill {at} this craft specializes you, no quest needed: discountable recipe materials cost {pct}% less from then on, and specialization adds its own bump to the masterwork chance. Raid-core costs are never discounted.\n\nSpecialists also learn to take the workshop with them: a specialized crafter can set up a mobile station in the field for ten minutes at a time, so station-bound recipes can be worked at the mine mouth instead of back in town. Its limits are deliberate: it never counts for training with a master or for unbinding a commissioned piece, and it expires on its timer whether or not you used it.",
       "ench": {
         "disenchantHeading": "分解",
         "disenchantNote": "分解は、コモン品質以上の武器や防具を一個消費し、素材へと砕く作業です。未付呪の品が先に消費され、付呪済みの品しか残っていない場合は、その一個が付呪ごと砕かれます。コモンとアンコモンの品は、まとまった量の鈴音の粉塵へと砕けます。レアや高品質な品ほど多く出ます。レア以上になると収量の形が変わり、レア品からは鈴音の精髄が一個、エピックや伝説品からは鈴音のかけらが一個、そして素材の種別に応じた副産物が一つ追加されます。",
@@ -6801,7 +6837,9 @@ export const ja_JP: EnTranslations = {
         "bonusFmt": "+{value} {stat}",
         "enchantsNoteOffhand": "エンチャントは四段階あります。基礎段階は鈴音の粉塵（高位は精髄も少量使用）を消費し、武器スロット、副手、そしてすべての防具スロットをカバーします。各ビルドがすべてのスロットに合った選択肢を見つけられるだけの能力値の軸が揃っており、盾と術者が持つ副手には専用のスタミナエンチャントがあるので、装備スロットにエンチャントの死角はありません。上位段階はGreaterと呼ばれ、鈴音のかけら1個と精髄を消費します。より影響の大きいスロットに強力なボーナスを付与します。かけらの使い道はほかに三つ、二種の護符レシピが各5個、道具効果の再充填の最上段、そして光輝段階です。光輝段階では武器と胸のエンチャントが1個ずつ、注入が2個を求めます。使う前に少し蓄えておきましょう。\n\nその間に五つのルーンエンチャントが挟まります。種別副産物を一個ずつ使う構成で、砕いた素材が無駄になりません。ルーンの刃（武器、筋力、共鳴の鋼）、ルーンの印章（武器、知力、共鳴の木材）、ルーン織り（胸、精神、共鳴の糸）、ルーンの革（脚、敏捷、共鳴の革）、ルーンの鎖（兜、スタミナ、共鳴の鎖）の五種。いずれも鈴音の精髄2個を必要とします。同じスロットと能力値に基礎とGreaterの両方がある場合、ルーンのボーナスはその中間に収まります。その一方でルーン織りは胸の精神エンチャントとして端的に最強であり、ルーンの革は脚の敏捷エンチャントとして唯一の存在です。詳細なボーナスは下の表を参照してください。\n\nそのすべての上に立つのが光輝段階、この職の頂点の仕事であり、技能そのものを問う唯一のエンチャントです。四種にはエンチャント100、注入には125が必要で、下の表の「スキル」の欄に示されています。いずれも光輝の試薬を必要とし、武器（剛力と呪文威力の二種）、胸、足という各スロットの階段をもう一段だけ上げます。その最後の一つ、光輝の注入は、完全化された品にしか宿りません。そして今はまだ完全化できる品がありません。これは、待っている完全化の仕事に先んじて記されたものなのです。",
         "enchantsNoteInfusionLive": "エンチャントは四段階あります。基礎段階は鈴音の粉塵（高位は精髄も少量使用）を消費し、武器スロット、副手、そしてすべての防具スロットをカバーします。各ビルドがすべてのスロットに合った選択肢を見つけられるだけの能力値の軸が揃っており、盾と術者が持つ副手には専用のスタミナエンチャントがあるので、装備スロットにエンチャントの死角はありません。上位段階はGreaterと呼ばれ、鈴音のかけら1個と精髄を消費します。より影響の大きいスロットに強力なボーナスを付与します。かけらの使い道はほかに三つ、二種の護符レシピが各5個、道具効果の再充填の最上段、そして光輝段階です。光輝段階では武器と胸のエンチャントが1個ずつ、注入が2個を求めます。使う前に少し蓄えておきましょう。\n\nその間に五つのルーンエンチャントが挟まります。種別副産物を一個ずつ使う構成で、砕いた素材が無駄になりません。ルーンの刃（武器、筋力、共鳴の鋼）、ルーンの印章（武器、知力、共鳴の木材）、ルーン織り（胸、精神、共鳴の糸）、ルーンの革（脚、敏捷、共鳴の革）、ルーンの鎖（兜、スタミナ、共鳴の鎖）の五種。いずれも鈴音の精髄2個を必要とします。同じスロットと能力値に基礎とGreaterの両方がある場合、ルーンのボーナスはその中間に収まります。その一方でルーン織りは胸の精神エンチャントとして端的に最強であり、ルーンの革は脚の敏捷エンチャントとして唯一の存在です。詳細なボーナスは下の表を参照してください。\n\nそのすべての上に立つのが光輝段階、この職の頂点の仕事であり、技能そのものを問う唯一のエンチャントです。四種にはエンチャント100、注入には125が必要で、下の表の「スキル」の欄に示されています。いずれも光輝の試薬を必要とし、武器（剛力と呪文威力の二種）、胸、足という各スロットの階段をもう一段だけ上げます。その最後の一つ、光輝の注入は、完全化された品にしか宿りません。完全化はエンチャンターではなく持ち主自身の仕事であり、品がそこへ至る道は生産職のページが語ります。",
+        "enchantsNoteRaidFormula": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove the ordinary lower tiers sits the Lucent tier, the capstone ordinary work of the craft: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected: Perfecting is the wearer's own work, not the enchanter's, and the Professions page tells how a piece earns it.\n\nLast Flame's Zeal is a separate raid formula, not a free ordinary enchant. Learn its tradable formula at Enchanting 100 before applying it. Each application uses 3 Cores of the Last Flame and 2 Chime Shards; the formula can drop in the Crucible or be bought from its quartermaster for one core. Its melee proc and weapon-speed rules are shown in full below.",
         "charmsHeading": "採集者の道具に付ける護符",
+        "formulaRequired": "Formula required",
         "charmsBody": "採集者の護符が生まれるのも、このエンチャントです。エンチャントが25に届くと、イーストブルックの工房でからくり師ギッゼルが両方を教えてくれます。採取の産出を1つ増やす「採集者の貯蔵袋」と、上がってくるものの等級を上げる「職人の眼」です。どちらも一度作ってから、つるはし、斧、鎌に装着し、実際に成果を良くした採取のときにだけ充填を消費します。\n\nこの職が稼ぎ続けるのは再充填です。充填を戻せるのは道具の持ち主であって、訪ねてきたエンチャンターではありません。そしてその持ち主が護符に署名したエンチャンター本人なら再充填の素材は半分で済み、エンチャントの特化があればさらに少なくなります。ですからカウンター越しに売った護符は一度きりの商いですが、自分の道具に乗せた護符は安く回し続けられます。充填と素材の梯子の全体は、どの採集職のページでも「道具効果」の項にあります。"
       },
       "gatherIntro": {
@@ -6911,6 +6949,7 @@ export const ja_JP: EnTranslations = {
         "commissionsBody": "任意で選ぶ受注製作には作り手の絆が宿ります。作品は取引で受け取った相手にバインドされ、どの作業場の師匠でも段階料金で解除できます。",
         "provenanceHeading": "署名入りの品",
         "provenanceBody": "レア以上の製作品と発見には作り手の署名が入り、署名が完全に一致する品は今でもスタックできます。",
+        "provenanceBodyUndiscounted": "Some items carry a name. Hover one and the tooltip says Gathered by so-and-so on a raw material, or Crafted by so-and-so on a finished piece: the same mark, worded for how the item came to be. A signature is part of the item itself, travels with it through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fades.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. The one thing that can cost you a signature is a full bag: a signed unit needs room of its own, or a matching signed stack, to land in.\n\nA stack of items shares one identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. A signed log never joins a plain pile in either direction (merging would erase somebody's name), but identical payloads merge happily, so twenty ore signed by the same gatherer sit in one stack and a windfall does not shred your bags.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one), unless that reagent is marked undiscountable; raid cores always keep their full cost. Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
         "collectorsHeading": "収集家と戦利品、物語の値段",
         "collectorsBody": "商人は来歴を見ません。署名入りでもNPCへの売値は無印と同額です。署名の上乗せはプレイヤーの間にだけ存在し、だからこそ面白いのです。名の知れた採集者が署名した幸運の鉱石、Prime Cutの一切れ、引退した職人の名を刻む傑作の剣。値段は誰かの記憶が決めます。功績の書も同じ心を汲みます。Pristine Vein、Ancient Heartwood、Moonlit Bloom、A Perfect Specimen、Glimmer of Hopeはいずれも名声ゼロの収集印で、その瞬間があなたに起きた証のためだけにあります。これらは力ではありません。来歴は能力値を買わず、戦いにも勝ちません。良き日々の控えです。",
         "castPaceHeading": "詠唱時間とゴールドの消費",
@@ -6924,7 +6963,9 @@ export const ja_JP: EnTranslations = {
         "castPaceRecharge": "道具効果の充填: 詠唱 {seconds} 秒",
         "castPaceBatch": "まとめて作成: 一度の注文で最大 {count} 個、1個ずつ詠唱",
         "doctrineHeading": "プレイヤー同士の取引",
+        "introRaidCollections": "How coin moves through the trades: the exact fees and sinks, what actually sells, World Market rules, work orders, commissions, and the place of raid-funded collections alongside ordinary crafting.",
         "doctrineBody": "製作装備の強さは常にレイドの下限を下回り、上記の費用は品物を商店の循環ではなくプレイヤー間の取引へと押し出します。",
+        "doctrineBodyRaidCollections": "The crafting economy is built on one idea: players supply players. Gatherers feed crafters, crafters feed questers and raiders, and breakers feed enchanters, with vendors and station masters standing at the edges to absorb junk and coin rather than to compete with you. If you want to make money from a profession, your customer is a person: learn what other players burn through, price against the World Market, and treat the NPC systems as a floor under your prices, not as the market itself.\n\nOrdinary crafted equipment supports the climb into endgame. The Crucible's raid-funded collections also offer an alternative to current raid drops: their materials come from raiding, while crafting turns those materials into a chosen armor and role profile. Their three slot choices and any-two bonus allow different combinations with raid gear. They still share the global two-piece Masterwrought cap, so crafting complements the rest of the raid kit without supplying an entire replacement set.",
         "orderBoardHeading": "依頼ボード",
         "orderBoardBody": "チャットで職人を探し回る必要はありません。製作ウィンドウを開けば、そのヘッダーからワンクリックで依頼ボードへ行けます。誰でもそこに依頼を出せます。作ってほしいレシピを指定し、どの職人でも引き受けられる公開のままにするか、特定の職人ひとりに宛てるかを選びます。宛てた場合、引き受けられるのはその人だけです。ボードを眺めていた職人が依頼を承諾し、承諾がその人を縛るので、一つの仕事を同時に進めるのは常に一人だけです。\n\n出すときに預けるものは何もありません。依頼はお金も素材も確保しないので、値段と誰が材料を用意するかは二人の間の話であり、受注が昔からそうであるように取り決めます。まだ公開中の自分の依頼は取り消せますし、誰にも引き受けられなかった依頼は一日で自然に期限切れになります。職人が承諾したあとは、受け渡しが依頼を締めくくります。\n\n受け渡しは対面です。職人がその品を受注品として作り、あなたのところへ来て手渡すので、受け取るためのバッグの空きを一つ残しておきましょう。届いた品は下記の通常の受注のきまりに従い、作り手の絆によってあなたにバインドされます。",
         "commissionsBoardNote": "受注に至る道は二つあります。上の掲示板に出す依頼で職人のもとへ仕事を運ぶ道と、職人がただあなたのために一品を作ろうと決める道です。どちらも同じ絆に行き着きます。"
@@ -14731,6 +14772,141 @@ export const ja_JP: EnTranslations = {
       "deed_of_making": {
         "name": "創造の証書"
       },
+      "crucible_str_mail_chest": {
+        "name": "坩堝の強襲者の鎖帷子"
+      },
+      "crucible_str_mail_waist": {
+        "name": "坩堝の強襲者の鎖帯"
+      },
+      "crucible_str_mail_feet": {
+        "name": "坩堝の強襲者の鎖靴"
+      },
+      "crucible_tank_mail_chest": {
+        "name": "坩堝の守護者の鎖帷子"
+      },
+      "crucible_tank_mail_waist": {
+        "name": "坩堝の守護者の鎖帯"
+      },
+      "crucible_tank_mail_feet": {
+        "name": "坩堝の守護者の鎖靴"
+      },
+      "crucible_caster_mail_chest": {
+        "name": "坩堝の術者の鎖帷子"
+      },
+      "crucible_caster_mail_waist": {
+        "name": "坩堝の術者の鎖帯"
+      },
+      "crucible_caster_mail_feet": {
+        "name": "坩堝の術者の鎖靴"
+      },
+      "crucible_healer_mail_chest": {
+        "name": "坩堝の治癒者の鎖帷子"
+      },
+      "crucible_healer_mail_waist": {
+        "name": "坩堝の治癒者の鎖帯"
+      },
+      "crucible_healer_mail_feet": {
+        "name": "坩堝の治癒者の鎖靴"
+      },
+      "crucible_agi_leather_chest": {
+        "name": "坩堝の遊撃者の革上着"
+      },
+      "crucible_agi_leather_waist": {
+        "name": "坩堝の遊撃者の革帯"
+      },
+      "crucible_agi_leather_feet": {
+        "name": "坩堝の遊撃者の革靴"
+      },
+      "crucible_str_leather_chest": {
+        "name": "坩堝の徘徊者の革上着"
+      },
+      "crucible_str_leather_waist": {
+        "name": "坩堝の徘徊者の革帯"
+      },
+      "crucible_str_leather_feet": {
+        "name": "坩堝の徘徊者の革靴"
+      },
+      "crucible_tank_leather_chest": {
+        "name": "坩堝の守護者の革上着"
+      },
+      "crucible_tank_leather_waist": {
+        "name": "坩堝の守護者の革帯"
+      },
+      "crucible_tank_leather_feet": {
+        "name": "坩堝の守護者の革靴"
+      },
+      "crucible_caster_leather_chest": {
+        "name": "坩堝の術者の革上着"
+      },
+      "crucible_caster_leather_waist": {
+        "name": "坩堝の術者の革帯"
+      },
+      "crucible_caster_leather_feet": {
+        "name": "坩堝の術者の革靴"
+      },
+      "crucible_healer_leather_chest": {
+        "name": "坩堝の治癒者の革上着"
+      },
+      "crucible_healer_leather_waist": {
+        "name": "坩堝の治癒者の革帯"
+      },
+      "crucible_healer_leather_feet": {
+        "name": "坩堝の治癒者の革靴"
+      },
+      "crucible_caster_cloth_chest": {
+        "name": "坩堝の術者のローブ"
+      },
+      "crucible_caster_cloth_waist": {
+        "name": "坩堝の術者の腰帯"
+      },
+      "crucible_caster_cloth_feet": {
+        "name": "坩堝の術者の布靴"
+      },
+      "crucible_healer_cloth_chest": {
+        "name": "坩堝の治癒者のローブ"
+      },
+      "crucible_healer_cloth_waist": {
+        "name": "坩堝の治癒者の腰帯"
+      },
+      "crucible_healer_cloth_feet": {
+        "name": "坩堝の治癒者の布靴"
+      },
+      "pattern_crucible_str_mail": {
+        "name": "型紙：坩堝の強襲者の鎖装備"
+      },
+      "pattern_crucible_tank_mail": {
+        "name": "型紙：坩堝の守護者の鎖装備"
+      },
+      "pattern_crucible_caster_mail": {
+        "name": "型紙：坩堝の術者の鎖装備"
+      },
+      "pattern_crucible_healer_mail": {
+        "name": "型紙：坩堝の治癒者の鎖装備"
+      },
+      "pattern_crucible_agi_leather": {
+        "name": "型紙：坩堝の遊撃者の革装備"
+      },
+      "pattern_crucible_str_leather": {
+        "name": "型紙：坩堝の徘徊者の革装備"
+      },
+      "pattern_crucible_tank_leather": {
+        "name": "型紙：坩堝の守護者の革装備"
+      },
+      "pattern_crucible_caster_leather": {
+        "name": "型紙：坩堝の術者の革装備"
+      },
+      "pattern_crucible_healer_leather": {
+        "name": "型紙：坩堝の治癒者の革装備"
+      },
+      "pattern_crucible_caster_cloth": {
+        "name": "型紙：坩堝の術者の布装備"
+      },
+      "pattern_crucible_healer_cloth": {
+        "name": "型紙：坩堝の治癒者の布装備"
+      },
+      "formula_lastflame_zeal": {
+        "name": "製法書：最後の炎の熱情"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },
@@ -19844,6 +20020,50 @@ export const ja_JP: EnTranslations = {
         "bonus2": "筋力が10、スタミナが10上昇します。",
         "bonus4": "攻撃力が25上昇します。武器のクリティカルヒット時に50%の確率で「グレイブマイト」が発動し、攻撃力が10秒間40上昇します。",
         "bonus6": "攻撃速度と詠唱速度が4%、命中が3%上昇します。武器のクリティカルヒットで対象に「ボーンスプリンター」を刻み、2秒ごとに5ダメージの出血を12秒間与えます。最大3回まで累積します。"
+      },
+      "crucible_agi_leather": {
+        "name": "坩堝の遊撃者の革装備",
+        "bonus2": "自分とペットの直接物理ダメージでチャージを1つ得る。獲得は毎秒1つまで。6つに達すると、自分とペットの全与ダメージが6秒間8%増加する。対象となる攻撃が8秒間なければチャージは消える。ダメージ増加中はチャージを獲得できない。戦闘を離れるか、このセットを2部位以上装備しなくなると、チャージとダメージ増加は消える。"
+      },
+      "crucible_caster_cloth": {
+        "name": "坩堝の術者の布装備",
+        "bonus2": "自分とペットの魔法ダメージでチャージを1つ得る。継続ダメージも対象となり、獲得は毎秒1つまで。6つに達すると、自分とペットの全与ダメージが6秒間8%増加する。対象となる攻撃が8秒間なければチャージは消える。ダメージ増加中はチャージを獲得できない。戦闘を離れるか、このセットを2部位以上装備しなくなると、チャージとダメージ増加は消える。"
+      },
+      "crucible_caster_leather": {
+        "name": "坩堝の術者の革装備",
+        "bonus2": "自分とペットの魔法ダメージでチャージを1つ得る。継続ダメージも対象となり、獲得は毎秒1つまで。6つに達すると、自分とペットの全与ダメージが6秒間8%増加する。対象となる攻撃が8秒間なければチャージは消える。ダメージ増加中はチャージを獲得できない。戦闘を離れるか、このセットを2部位以上装備しなくなると、チャージとダメージ増加は消える。"
+      },
+      "crucible_caster_mail": {
+        "name": "坩堝の術者の鎖装備",
+        "bonus2": "自分とペットの魔法ダメージでチャージを1つ得る。継続ダメージも対象となり、獲得は毎秒1つまで。6つに達すると、自分とペットの全与ダメージが6秒間8%増加する。対象となる攻撃が8秒間なければチャージは消える。ダメージ増加中はチャージを獲得できない。戦闘を離れるか、このセットを2部位以上装備しなくなると、チャージとダメージ増加は消える。"
+      },
+      "crucible_healer_cloth": {
+        "name": "坩堝の治癒者の布装備",
+        "bonus2": "戦闘中の味方を回復すると、超過回復量の20%を、その味方を6秒間守るシールドに変換する。継続回復とダメージから変換された回復も対象となる。戦闘中に自分を回復した場合も有効。全装備者が与えるこのシールドの合計は、保護対象の最大体力の5%まで。追加の超過回復はシールドを補充するが、持続時間は延長しない。このシールドは他の回復効果を発動させない。保護された味方が戦闘を離れるか、自分が死亡するか、このセットを2部位以上装備しなくなると、自分が与えたシールドは消える。"
+      },
+      "crucible_healer_leather": {
+        "name": "坩堝の治癒者の革装備",
+        "bonus2": "戦闘中の味方を回復すると、超過回復量の20%を、その味方を6秒間守るシールドに変換する。継続回復とダメージから変換された回復も対象となる。戦闘中に自分を回復した場合も有効。全装備者が与えるこのシールドの合計は、保護対象の最大体力の5%まで。追加の超過回復はシールドを補充するが、持続時間は延長しない。このシールドは他の回復効果を発動させない。保護された味方が戦闘を離れるか、自分が死亡するか、このセットを2部位以上装備しなくなると、自分が与えたシールドは消える。"
+      },
+      "crucible_healer_mail": {
+        "name": "坩堝の治癒者の鎖装備",
+        "bonus2": "戦闘中の味方を回復すると、超過回復量の20%を、その味方を6秒間守るシールドに変換する。継続回復とダメージから変換された回復も対象となる。戦闘中に自分を回復した場合も有効。全装備者が与えるこのシールドの合計は、保護対象の最大体力の5%まで。追加の超過回復はシールドを補充するが、持続時間は延長しない。このシールドは他の回復効果を発動させない。保護された味方が戦闘を離れるか、自分が死亡するか、このセットを2部位以上装備しなくなると、自分が与えたシールドは消える。"
+      },
+      "crucible_str_leather": {
+        "name": "坩堝の徘徊者の革装備",
+        "bonus2": "自分とペットの直接物理ダメージでチャージを1つ得る。獲得は毎秒1つまで。6つに達すると、自分とペットの全与ダメージが6秒間8%増加する。対象となる攻撃が8秒間なければチャージは消える。ダメージ増加中はチャージを獲得できない。戦闘を離れるか、このセットを2部位以上装備しなくなると、チャージとダメージ増加は消える。"
+      },
+      "crucible_str_mail": {
+        "name": "坩堝の強襲者の鎖装備",
+        "bonus2": "自分とペットの直接物理ダメージでチャージを1つ得る。獲得は毎秒1つまで。6つに達すると、自分とペットの全与ダメージが6秒間8%増加する。対象となる攻撃が8秒間なければチャージは消える。ダメージ増加中はチャージを獲得できない。戦闘を離れるか、このセットを2部位以上装備しなくなると、チャージとダメージ増加は消える。"
+      },
+      "crucible_tank_leather": {
+        "name": "坩堝の守護者の革装備",
+        "bonus2": "敵からダメージを受けると10秒間の集計が始まる。その間に失った体力が最大体力の40%に達すると、最大体力の8%のダメージを吸収するシールドを6秒間得る。発動は20秒に1回まで。吸収されたダメージと自傷ダメージは数えない。戦闘を離れるか、このセットを2部位以上装備しなくなると、集計中のダメージとシールドは消える。クールダウンはリセットされない。"
+      },
+      "crucible_tank_mail": {
+        "name": "坩堝の守護者の鎖装備",
+        "bonus2": "敵からダメージを受けると10秒間の集計が始まる。その間に失った体力が最大体力の40%に達すると、最大体力の8%のダメージを吸収するシールドを6秒間得る。発動は20秒に1回まで。吸収されたダメージと自傷ダメージは数えない。戦闘を離れるか、このセットを2部位以上装備しなくなると、集計中のダメージとシールドは消える。クールダウンはリセットされない。"
       },
       "dawnforged": {
         "name": "ドーンフォージの祭服",

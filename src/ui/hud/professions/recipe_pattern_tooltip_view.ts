@@ -41,14 +41,17 @@
 //
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
 
+import { ENCHANTS } from '../../../sim/content/enchants';
 import { recipeById } from '../../../sim/content/recipes';
 import { ITEMS } from '../../../sim/data';
+import { collectionManualRecipes } from '../../../sim/professions/collection_manual';
 import { tierForSkill } from '../../../sim/professions/wheel';
 import type { ItemDef } from '../../../sim/types';
 import { itemDisplayName } from '../../entity_i18n';
 import { formatNumber, t } from '../../i18n';
 import { tooltipLine } from '../../tooltip_line_core';
 import { craftNameKey } from './craft_name_view';
+import { enchantNameKey } from './enchant_apply_view';
 
 /** The viewer state the host projects in, satisfied structurally by IWorld's
  *  `craftingIdentity` (CraftingIdentityView) from BOTH worlds. */
@@ -76,6 +79,10 @@ export interface RecipePatternTooltipModel {
   recipeId: string;
   /** The item that recipe crafts, for the teaches line. */
   resultItemId: string;
+  /** Collection manuals teach all of these outputs atomically. */
+  resultItemIds?: readonly string[];
+  /** Formulas teach an enchant, not a craftable surrogate item. */
+  enchantId?: string;
   professionId: string;
   skillReq: number;
   /** True when the viewer's skill in that craft clears the learn gate, meaning
@@ -110,8 +117,26 @@ export function recipePatternTooltipModel(
   viewer: RecipePatternViewerInput,
 ): RecipePatternTooltipModel | null {
   if (item.kind !== 'recipe') return null;
-  const recipe = recipeById(item.teachesRecipeId);
-  if (!recipe) return null;
+  if (item.teachesEnchantId) {
+    const enchant = Object.hasOwn(ENCHANTS, item.teachesEnchantId)
+      ? ENCHANTS[item.teachesEnchantId]
+      : undefined;
+    if (!enchant || enchant.acquisition !== 'drop' || item.teachesRecipeId !== enchant.id)
+      return null;
+    const skill = craftSkillOf(viewer.craftSkills, 'enchanting');
+    return {
+      recipeId: enchant.id,
+      resultItemId: '',
+      enchantId: enchant.id,
+      professionId: 'enchanting',
+      skillReq: enchant.skillReq ?? 0,
+      skillMet: Number.isFinite(skill) && skill >= (enchant.skillReq ?? 0),
+      known: viewer.knownRecipes.includes(enchant.id),
+    };
+  }
+  const recipes = collectionManualRecipes(item, recipeById);
+  if (!recipes) return null;
+  const recipe = recipes[0];
   // The SAME acquisition predicate resolvePatternLearn refuses on (its
   // `invalid` arm). A pattern naming a recipe no drop may teach is an authoring
   // bug whose click is a silent no-op, so the hover must not describe it.
@@ -120,12 +145,13 @@ export function recipePatternTooltipModel(
   return {
     recipeId: recipe.id,
     resultItemId: recipe.resultItemId,
+    ...(item.teachesRecipeIds ? { resultItemIds: recipes.map((entry) => entry.resultItemId) } : {}),
     professionId: recipe.professionId,
     skillReq: recipe.skillReq,
     // Both of resolvePatternLearn's skill arms, in its order: practiced at all,
     // then the tier band. See the field doc on RecipePatternTooltipModel.
     skillMet: skill > 0 && tierForSkill(skill) >= tierForSkill(recipe.skillReq),
-    known: viewer.knownRecipes.includes(recipe.id),
+    known: recipes.every((entry) => viewer.knownRecipes.includes(entry.id)),
   };
 }
 
@@ -137,12 +163,20 @@ export function recipePatternTooltipLines(item: ItemDef, viewer: RecipePatternVi
   // hasOwn-gated like icons.ts itemFallback: ITEMS is a prototype-bearing
   // Record, so a resultItemId of 'constructor' would otherwise resolve a
   // FUNCTION and hand itemDisplayName a non-def.
-  const result = Object.hasOwn(ITEMS, model.resultItemId) ? ITEMS[model.resultItemId] : undefined;
-  if (result) {
+  if (model.enchantId) {
     html += tooltipLine(
       'tt-desc',
-      t('hudChrome.pattern.teaches', { item: itemDisplayName(result) }),
+      t('hudChrome.pattern.teachesEnchant', { enchant: t(enchantNameKey(model.enchantId)) }),
     );
+  } else {
+    for (const id of model.resultItemIds ?? [model.resultItemId]) {
+      const result = Object.hasOwn(ITEMS, id) ? ITEMS[id] : undefined;
+      if (result)
+        html += tooltipLine(
+          'tt-desc',
+          t('hudChrome.pattern.teaches', { item: itemDisplayName(result) }),
+        );
+    }
   }
   // Everything below answers off the viewer's own progression, which an online
   // client does not have until its first cprof snapshot lands. Stop at the

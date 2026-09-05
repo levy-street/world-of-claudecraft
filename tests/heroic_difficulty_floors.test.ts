@@ -21,6 +21,7 @@
 // and about 32.1%, derived in the arm named REF_ARMOR provenance below.
 
 import { describe, expect, it } from 'vitest';
+import { crucibleCollectionForItem } from '../src/sim/content/crucible_collections';
 import {
   HEROIC_DUNGEON_TUNING,
   NORMAL_DUNGEON_TUNING,
@@ -269,8 +270,14 @@ describe('the reference warrior is a CALIBRATION CONSTANT, and the catalog must 
         if (!canEquipItemInSlot('warrior', def, slot, 'prot')) continue;
         if ((requiredLevelFor(def) ?? 0) > 20) continue;
         const armor = (def.stats as { armor?: number } | undefined)?.armor ?? 0;
-        // Deterministic tie-break by id so the pick cannot drift with table order.
-        if (armor > bestArmor || (armor === bestArmor && best !== null && def.id < best.id)) {
+        // Equal armor does not raise the defensive ceiling. Keep the incumbent
+        // non-Masterwrought pick on a tie, then compare ids within that category.
+        const preferredTie =
+          armor === bestArmor &&
+          best !== null &&
+          ((best.masterwrought === true && def.masterwrought !== true) ||
+            ((def.masterwrought === true) === (best.masterwrought === true) && def.id < best.id));
+        if (armor > bestArmor || preferredTie) {
           bestArmor = armor;
           best = def;
         }
@@ -291,21 +298,28 @@ describe('the reference warrior is a CALIBRATION CONSTANT, and the catalog must 
     expect(
       Object.values(ITEMS).filter((d) => d.masterwrought === true).length,
       'the flagged family is really there to exclude',
-    ).toBe(17);
+    ).toBe(50);
+    expect(
+      Object.values(ITEMS).filter(
+        (def) => def.masterwrought === true && !crucibleCollectionForItem(def.id),
+      ),
+      'the original Masterwrought family remains intact',
+    ).toHaveLength(17);
+    expect(
+      Object.values(ITEMS).filter(
+        (def) => def.masterwrought === true && crucibleCollectionForItem(def.id),
+      ),
+      'the new raid collections are included in the ceiling',
+    ).toHaveLength(33);
     expect(withFlagged, 'a flagged def won a max-mitigation slot').toEqual(withoutFlagged);
     const a = characterDerivedStats('warrior', 20, withFlagged);
     const b = characterDerivedStats('warrior', 20, withoutFlagged);
     expect(a.stats.armor).toBe(b.stats.armor);
     expect(a.maxHp).toBe(b.maxHp);
-    // THE RULE ITSELF, stated rather than left to the tie-break. The equality
-    // above holds today partly by accident: after the shield tune the
-    // prot-legal offhand pool is a three-way armour TIE at 680, and the id
-    // tie-break happens to hand both arms an unflagged def. Rename the crafted
-    // shield to sort earlier and the equality would red with no power change;
-    // add a future apex piece that TIES with a late-sorting id and it would
-    // stay green while a crafted piece matched the raid line. So the armour
-    // comparison is made directly, per slot: a crafted piece may sit beside
-    // the raid line, it may never take it.
+    // THE RULE ITSELF, independent of the stable tie-break: every flagged
+    // candidate is compared directly with the non-Masterwrought slot ceiling.
+    // This includes the original family and the new Crucible collections.
+    // Matching an existing armor line is permitted; exceeding it is not.
     for (const slot of ALL_EQUIP_SLOTS) {
       let bestFlagged = 0;
       let bestUnflagged = 0;

@@ -48,6 +48,7 @@
 // the field doc in ../professions/types.ts).
 
 import type { ProfessionRecipeRecord } from '../professions/types';
+import { CRUCIBLE_COLLECTION_RECIPES } from './crucible_collections';
 import { FORGEBREAKER_RECIPES } from './forgebreaker_recipe';
 
 // Economy invariant: the reagent lists of the former
@@ -4677,6 +4678,7 @@ export const ALL_RECIPES: ProfessionRecipeRecord[] = [
   ...TROPHY_RECIPES,
   // Appended at the END (masterwrought Phase 11o): no earlier position moves.
   ...ENGINEERING_ONRAMP_RECIPES,
+  ...CRUCIBLE_COLLECTION_RECIPES,
   ...FORGEBREAKER_RECIPES,
 ];
 

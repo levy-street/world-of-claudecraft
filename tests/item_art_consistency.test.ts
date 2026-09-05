@@ -15,6 +15,7 @@ const BATCH_ID = 'item-art-consistency-2026-08-09';
 const CURRENT_EVIDENCE_DIR = 'docs/achievements/masterwrought-art-completion-2026-09-02';
 const CURRENT_VERDICT_PATH = `${CURRENT_EVIDENCE_DIR}/final-item-art-audit-verdict.json`;
 const CURRENT_BATCH_ID = 'masterwrought-art-completion-2026-09-02';
+const CRUCIBLE_BATCH_ID = 'crucible-professions-2026-09-05';
 const LICENSE = 'World of ClaudeCraft project-generated art, project asset, rights reserved';
 
 type ReportPin = {
@@ -784,19 +785,19 @@ describe('item-art consistency accepted-art provenance', () => {
     expect(verdict.schemaVersion).toBe(1);
     expect(verdict.auditScope).toMatchObject({
       shippingDirectory: 'public/ui/items',
-      itemArtFilesReviewed: 1209,
-      liveItemDefinitions: 1224,
+      itemArtFilesReviewed: 1255,
+      liveItemDefinitions: 1270,
       generatedHeroicDefinitions: 64,
       heroicDefinitionsWithOwnWebp: 48,
       heroicWeaponArtAliases: 16,
     });
-    expect(Object.keys(ITEMS)).toHaveLength(1224);
+    expect(Object.keys(ITEMS)).toHaveLength(1270);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
-      1209,
+      1255,
     );
     expect(Object.keys(verdict.auditScope.groups)).toHaveLength(25);
-    expect(currentIds).toHaveLength(1209);
-    expect(new Set(currentIds).size).toBe(1209);
+    expect(currentIds).toHaveLength(1255);
+    expect(new Set(currentIds).size).toBe(1255);
     expect(shippingIds).toEqual(currentIds);
 
     const generatedHeroics = Object.entries(ITEMS).filter(
@@ -836,7 +837,7 @@ describe('item-art consistency accepted-art provenance', () => {
     }>(`${CURRENT_EVIDENCE_DIR}/generation-reports/all-items-qa.json`);
     expect(verdict.visualVerdict).toMatchObject({
       status: 'pass',
-      passCount: 1209,
+      passCount: 1255,
       watchCount: completionQa.result.watchNoteCount,
       watch: completionQa.watchNotes,
       rejectCount: 0,
@@ -846,22 +847,22 @@ describe('item-art consistency accepted-art provenance', () => {
 
     expect(verdict.evidence.catalog).toEqual({
       path: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      sha256: 'febda89453efdcf50432cf3cab6ba638435b301eea6c429e9e0046b8a829e25e',
-      bytes: 657_748,
+      sha256: '218b9cdadae321ddecccd2c7a3a4bace2ec5dd5bd5d117053915f1e3f7df2a31',
+      bytes: 683_834,
     });
     expect(verdict.evidence.rendererFingerprint).toBe(ITEM_ART_AUDIT_RENDERER_FINGERPRINT);
-    expect(verdict.evidence.sheetCount).toBe(240);
+    expect(verdict.evidence.sheetCount).toBe(248);
     expect(verdict.evidence.sheetModeCounts).toEqual({
-      '128-color': 30,
-      '40-color': 30,
-      '28-color': 30,
-      '22-color': 30,
-      '28-grayscale': 30,
-      '64-circle': 30,
-      'small-multiview': 30,
-      identity: 30,
+      '128-color': 31,
+      '40-color': 31,
+      '28-color': 31,
+      '22-color': 31,
+      '28-grayscale': 31,
+      '64-circle': 31,
+      'small-multiview': 31,
+      identity: 31,
     });
-    expect(verdict.evidence.sheets).toHaveLength(240);
+    expect(verdict.evidence.sheets).toHaveLength(248);
     const sheetSetDigest = createHash('sha256');
     for (const sheet of verdict.evidence.sheets) {
       expect(sheet.sha256).toMatch(/^[0-9a-f]{64}$/);
@@ -877,7 +878,7 @@ describe('item-art consistency accepted-art provenance', () => {
       shippingCatalogDigest.update(`${id}\0${sha256(bytes)}\0${bytes.length}\n`);
     }
     expect(verdict.evidence.shippingCatalogSha256).toBe(
-      'bdec0afdcd3349a34b74bca9b0e01aee5b3ab2b3a82568bd9019fe0b0bb0b38c',
+      'e08ee4e613a4f3b777df8235f197a669fe39ef50217e8886f3bd7e6ba6f27df8',
     );
     expect(shippingCatalogDigest.digest('hex')).toBe(verdict.evidence.shippingCatalogSha256);
   });
@@ -991,7 +992,7 @@ describe('item-art consistency accepted-art provenance', () => {
     // one generated batch. The surviving ordinary-art cohort stays explicit.
     expect(mapping.entries).toHaveLength(43);
     expect(mapping.entries.every(({ license }) => Boolean(license))).toBe(true);
-    expect(mapping.generatedBatches).toHaveLength(25);
+    expect(mapping.generatedBatches).toHaveLength(26);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1035,26 +1036,38 @@ describe('item-art consistency accepted-art provenance', () => {
       itemIds: ['reins_mech_bird'],
     });
 
+    const crucibleBatch = mapping.generatedBatches.find(
+      ({ batchId }) => batchId === CRUCIBLE_BATCH_ID,
+    );
+    expect(crucibleBatch?.itemIds).toHaveLength(46);
+    expect(crucibleBatch?.provenanceRecord).toBe(
+      'docs/achievements/crucible-professions-2026-09-05/generation-report.json',
+    );
     const priorGeneratedIds = mapping.generatedBatches
-      .filter(({ batchId }) => batchId !== BATCH_ID && batchId !== CURRENT_BATCH_ID)
+      .filter(
+        ({ batchId }) =>
+          batchId !== BATCH_ID && batchId !== CURRENT_BATCH_ID && batchId !== CRUCIBLE_BATCH_ID,
+      )
       .flatMap(({ itemIds }) => itemIds);
     expect(priorGeneratedIds).toHaveLength(727);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(1209);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1209);
+    expect(allCurrentOwnerIds).toHaveLength(1255);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1255);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
       historicalAudit: batch?.itemIds.length,
       masterwroughtCompletion: completionBatch?.itemIds.length,
+      crucibleProfessions: crucibleBatch?.itemIds.length,
     }).toEqual({
       entries: 43,
       priorGenerated: 727,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
+      crucibleProfessions: 46,
     });
     const historicalVerdict = readJson<FinalAuditVerdict>(
       `${evidenceDir}/final-item-art-audit-verdict.json`,
@@ -1069,8 +1082,9 @@ describe('item-art consistency accepted-art provenance', () => {
       sorted([
         ...historicalVerdict.visualVerdict.passIds.filter((id) => !completionIdSet.has(id)),
         ...(completionBatch?.itemIds ?? []),
+        ...(crucibleBatch?.itemIds ?? []),
       ]),
-      'historical carry-forward plus the completion wave is the current catalog',
+      'historical carry-forward plus completion and Crucible waves is the current catalog',
     ).toEqual(sorted(allCurrentOwnerIds));
     expect(batch?.provenanceRecords).toEqual([
       `${evidenceDir}/accepted-art.json`,
@@ -1196,9 +1210,9 @@ describe('item-art consistency accepted-art provenance', () => {
     for (const id of ownerIds) ownerCountById.set(id, (ownerCountById.get(id) ?? 0) + 1);
 
     const violations: string[] = [];
-    if (ownerIds.length !== 1209)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1209`);
-    if (fileIds.length !== 1209) violations.push(`shipping WebP count: ${fileIds.length} != 1209`);
+    if (ownerIds.length !== 1255)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1255`);
+    if (fileIds.length !== 1255) violations.push(`shipping WebP count: ${fileIds.length} != 1255`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

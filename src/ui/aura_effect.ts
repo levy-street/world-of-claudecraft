@@ -320,6 +320,8 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
 
     case 'buff_ap':
       return flatStat('ap', a.value);
+    case 'buff_str':
+      return flatStat('str', a.value);
     case 'debuff_ap':
       return flatStat('ap', -Math.abs(a.value));
     case 'buff_armor':

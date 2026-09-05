@@ -1,6 +1,8 @@
 // Pure item-comparison helper (no DOM), so the stat-delta math can be unit
 // tested directly the way xp_bar.ts / player_context_menu.ts are. The HUD turns
 // these deltas into coloured tooltip lines; see Hud.itemCompareBlock.
+
+import { activeItemInstanceStats } from '../sim/item_instance_stats';
 import type { CoreStats, ItemDef, ItemInstancePayload } from '../sim/types';
 
 // Stable stat identifier; the HUD maps it to a localized label via t().
@@ -39,7 +41,7 @@ function effectiveStat(
   instance: ItemInstancePayload | undefined,
   stat: keyof CoreStats,
 ): number {
-  const rolled = instance?.rolled?.stats?.[stat];
+  const rolled = activeItemInstanceStats(instance)?.[stat];
   return (def.stats?.[stat] ?? 0) + (Number.isFinite(rolled) ? (rolled as number) : 0);
 }
 

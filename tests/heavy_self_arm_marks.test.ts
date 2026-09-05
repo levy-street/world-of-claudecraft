@@ -13,9 +13,16 @@ import {
 } from '../server/heavy_self';
 
 describe('the arm-marked subset', () => {
-  it('is exactly the perfect-item and farming members the two reopened reads named', () => {
+  it('is exactly the Perfecting and farming command family', () => {
     expect([...HEAVY_SELF_ARM_MARKED_CMDS].sort()).toEqual(
-      ['convert_husks', 'harvest_crop', 'perfect_item', 'place_feast', 'plant_crop'].sort(),
+      [
+        'convert_husks',
+        'harvest_crop',
+        'perfect_item',
+        'place_feast',
+        'plant_crop',
+        'swap_perfecting_ranks',
+      ].sort(),
     );
   });
 

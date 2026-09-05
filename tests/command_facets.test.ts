@@ -52,6 +52,10 @@ describe('command facet tags (W6)', () => {
     );
   });
 
+  it('tags the confirmed rank exchange to professions', () => {
+    expect(tags.swap_perfecting_ranks).toBe('IWorldProfessions');
+  });
+
   it('tags every W6 combat/targeting/loot/telemetry command with its facet', () => {
     for (const [cmd, facet] of Object.entries(W6_TAGS)) {
       expect(tags[cmd], `facet tag for '${cmd}'`).toBe(facet);

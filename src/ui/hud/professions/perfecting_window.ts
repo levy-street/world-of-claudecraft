@@ -27,6 +27,7 @@
 import { audio } from '../../../game/audio';
 import { ITEMS } from '../../../sim/data';
 import type { PerfectItemRef } from '../../../sim/professions/perfecting';
+import type { SimEvent } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
 import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName } from '../../entity_i18n';
@@ -42,6 +43,8 @@ import {
   type LegendaryNamingDialogHandle,
   openLegendaryNamingDialog,
 } from './legendary_naming_controller';
+import { perfectingCandidateLocation, perfectingCandidateState } from './perfecting_candidate_view';
+import { PerfectingSwapController } from './perfecting_swap_controller';
 import {
   baggedCopyOrdinal,
   buildPerfectingView,
@@ -122,7 +125,28 @@ export class PerfectingWindow {
    *  sheet's in-flight affordance). */
   private pendingSend = false;
 
-  constructor(private readonly deps: PerfectingWindowDeps) {}
+  private readonly swap: PerfectingSwapController;
+
+  constructor(private readonly deps: PerfectingWindowDeps) {
+    this.swap = new PerfectingSwapController({
+      world: () => this.deps.world(),
+      root: () => this.root(),
+      current: () => this.sessionIsCurrent(),
+      blocked: () => this.pendingSend || this.bindDialog !== null || !!this.namingDialog?.isOpen(),
+      repaint: () => this.paint(),
+      pending: (value) => this.setPendingSend(value),
+      announce: (text) => this.announce(text),
+      returnFocus: () => this.refocusAfterPrompt(),
+    });
+  }
+
+  onSwapResult(event: Extract<SimEvent, { type: 'perfectingSwapResult' }>): void {
+    this.swap.onResult(event);
+  }
+
+  onReconnected(): void {
+    this.swap.onReconnected();
+  }
 
   /** The minted #perfecting-window root (the dev_command_window shape): no
    *  markup entry ships it, so the first reach creates it. The repaint
@@ -213,6 +237,7 @@ export class PerfectingWindow {
     // the prompt_dialog contract asks of a caller whose window can be
     // force-closed under an open prompt.
     root.style.display = 'none';
+    this.swap.close();
     this.namingDialog?.dismiss();
     this.bindDialog?.dismiss();
     this.sessionWorld = null;
@@ -250,6 +275,7 @@ export class PerfectingWindow {
     // than re-announce (the journal's rule).
     if (this.liveEl) this.liveEl.textContent = '';
     this.paint();
+    this.swap.relocalize();
   }
 
   /** The Hud's error-toast forward (the plant sheet precedent): the sim's
@@ -257,6 +283,7 @@ export class PerfectingWindow {
    *  in-flight belief and lifts the naming dialog's submit lock early. */
   notifyErrorToast(): void {
     if (!this.isOpen) return;
+    if (this.swap.pending) return;
     this.setPendingSend(false);
     this.namingDialog?.notifyAnswered();
   }
@@ -266,7 +293,7 @@ export class PerfectingWindow {
    *  perfecting_view.ts, the one spelling both sides share). */
   private buildView(): BuiltView {
     const world = this.deps.world();
-    const syncing = !world.craftingIdentity.synced;
+    const syncing = !world.craftingIdentity.synced || this.swap.waitingForSnapshot;
     const view = buildPerfectingView(
       {
         equipment: world.equipment,
@@ -288,7 +315,7 @@ export class PerfectingWindow {
   private tick(): void {
     if (!this.sessionIsCurrent()) return;
     const built = this.buildView();
-    if (perfectingViewSignature(built.view, built.syncing) === this.lastSig) return;
+    if (this.viewSignature(built) === this.lastSig) return;
     this.paintFrom(built);
   }
 
@@ -296,9 +323,13 @@ export class PerfectingWindow {
     this.paintFrom(this.buildView());
   }
 
+  private viewSignature(built: BuiltView): string {
+    return `${perfectingViewSignature(built.view, built.syncing)}|${this.swap.signature(built.view)}`;
+  }
+
   private paintFrom(built: BuiltView): void {
     if (!this.isOpen) return;
-    const { view, syncing } = built;
+    const { view } = built;
     const detail = view.detail;
     // The answer edges, judged off what the mirrors NOW show (never a
     // prediction). A moved selected-copy signature spends the in-flight
@@ -306,14 +337,19 @@ export class PerfectingWindow {
     // landed promotion retires the naming dialog.
     const selectedSig = perfectingInfoSignature(detail?.info ?? null);
     if (this.lastSelectedSig !== null && selectedSig !== this.lastSelectedSig) {
-      if (this.pendingSend) this.setPendingSend(false);
+      if (this.pendingSend && !this.swap.pending) this.setPendingSend(false);
       this.namingDialog?.notifyAnswered();
     }
     const prev = this.prevSelected;
     const anchor = detail ? baggedCopyOrdinal(view.candidates, detail.ref) : null;
     // A refused pair skips the whole sameSelectedCopy block once (the cue,
     // both announcements, the dismiss): see prevSelected's doc.
-    if (detail && prev && sameSelectedCopy(prev, detail.ref, anchor)) {
+    if (
+      detail &&
+      prev &&
+      sameSelectedCopy(prev, detail.ref, anchor) &&
+      !this.swap.outcomeUnconfirmed
+    ) {
       // The edge latches through prevSelected below, so whichever forced
       // repaint observes it first (the 1 Hz tick, or a relocalize that beat
       // it) plays the cue exactly once; a later repaint can never replay it.
@@ -383,7 +419,7 @@ export class PerfectingWindow {
         root.querySelector<HTMLElement>('[data-close]'),
       ]);
     }
-    this.lastSig = perfectingViewSignature(view, syncing);
+    this.lastSig = this.viewSignature(built);
     this.lastSelectedSig = selectedSig;
     this.prevSelected = detail
       ? {
@@ -402,10 +438,12 @@ export class PerfectingWindow {
    *  click passes null (a mouse click parks on the root through the pointer
    *  blur, a keyboard click already holds the button). */
   private pick(view: PerfectingViewModel, index: number, focusRow: HTMLElement | null): void {
+    if (this.swap.pending || this.swap.confirming) return;
     const ref = view.candidates[index]?.ref;
     if (!ref) return;
     focusRow?.focus();
     if (samePerfectRef(ref, this.selectedRef)) return;
+    this.swap.clearSelection();
     this.selectedRef = ref;
     // Latch the PICKED copy's anchor from the painted model before the
     // repaint: buildView hands the anchor to the view, and the previous
@@ -416,6 +454,7 @@ export class PerfectingWindow {
   }
 
   private wire(root: HTMLElement, view: PerfectingViewModel): void {
+    this.swap.wire(view);
     root.querySelector('[data-close]')?.addEventListener('click', () => this.close());
     const rows = [...root.querySelectorAll<HTMLElement>('[data-cand-i]')];
     for (const btn of rows) {
@@ -470,7 +509,7 @@ export class PerfectingWindow {
     root.querySelector('[data-action]')?.addEventListener('click', () => {
       const detail = this.paintedView?.detail;
       if (!this.sessionIsCurrent() || !detail?.actionEnabled || this.pendingSend) return;
-      if (this.bindDialog || this.namingDialog?.isOpen()) return;
+      if (this.bindDialog || this.namingDialog?.isOpen() || this.swap.confirming) return;
       if (detail.action === 'attempt') {
         if (detail.bindWarning) this.confirmBindThenAttempt(detail);
         else this.sendAttempt(detail.commandRef);
@@ -623,21 +662,19 @@ export class PerfectingWindow {
       0,
       view.candidates.findIndex((c) => c.selected),
     );
-    const rows = view.candidates.map((c, i) => this.candidateHtml(c, i, i === tabStop)).join('');
+    const rows = view.candidates
+      .map((c, i) => this.candidateHtml(c, i, i === tabStop, view.candidates))
+      .join('');
     const list = `<ul class="pf-list" role="radiogroup" aria-labelledby="perfecting-title">${rows}</ul>`;
-    return `${list}${view.detail ? this.detailHtml(view.detail) : ''}`;
+    return `${list}${view.detail ? this.detailHtml(view.detail) : ''}${this.swap.html(view)}`;
   }
 
-  private stateText(state: PerfectingCandidate['state'], rank: number, ranks: number): string {
-    if (state === 'promoted') return t('hudChrome.perfecting.rowPromoted');
-    if (state === 'perfected') return t('hudChrome.perfecting.rowPerfected');
-    return t('hudChrome.perfecting.rowRank', {
-      rank: wholeNumber(rank),
-      ranks: wholeNumber(ranks),
-    });
-  }
-
-  private candidateHtml(c: PerfectingCandidate, index: number, tabStop: boolean): string {
+  private candidateHtml(
+    c: PerfectingCandidate,
+    index: number,
+    tabStop: boolean,
+    candidates: readonly PerfectingCandidate[],
+  ): string {
     const def = ITEMS[c.itemId];
     const name = def ? itemDisplayName(def) : c.itemId;
     const icon = def
@@ -646,9 +683,8 @@ export class PerfectingWindow {
     // Keyed by the copy's identity, not its cell, so the focus carry follows
     // the same copy the selection anchor follows across a bag shift.
     const focusKey = `cand:${c.identity}`;
-    const worn = c.worn
-      ? `<span class="pf-chip">${esc(t('hudChrome.perfecting.wornChip'))}</span>`
-      : '';
+    const location = perfectingCandidateLocation(c.ref, candidates);
+    const worn = location ? `<span class="pf-chip">${esc(location)}</span>` : '';
     // A promoted legend's row leads with its player-chosen name (raw VALUE,
     // esc'd standalone per D13-2) so two promotions of one base item read
     // apart at a glance; the base name rides beneath, the detail-pane shape.
@@ -661,7 +697,7 @@ export class PerfectingWindow {
       `<li role="none"><button type="button" role="radio" class="pf-cand" data-cand-i="${index}" data-focus-key="${esc(focusKey)}" aria-checked="${c.selected ? 'true' : 'false'}" tabindex="${tabStop ? '0' : '-1'}">` +
       `<span class="pf-cand-socket">${icon}</span>` +
       `<span class="pf-cand-main"><span class="pf-cand-names"><span class="pf-name${c.state === 'promoted' ? ' q-legendary' : ''}">${esc(rowName)}</span>${sub}</span>${worn}</span>` +
-      `<span class="pf-cand-state">${esc(this.stateText(c.state, c.rank, c.ranks))}</span>` +
+      `<span class="pf-cand-state">${esc(perfectingCandidateState(c.state, c.rank, c.ranks))}</span>` +
       `</button></li>`
     );
   }
@@ -679,11 +715,15 @@ export class PerfectingWindow {
       `<div class="pf-detail-head"><span class="pf-cand-socket">${icon}</span>` +
       `<span class="pf-detail-names"><span class="pf-detail-name${d.state === 'promoted' ? ' q-legendary' : ''}">${esc(promotedName ? (d.chosenName as string) : name)}</span>` +
       `${promotedName ? `<span class="pf-detail-sub">${esc(name)}</span>` : ''}</span></div>`;
-    const statusText = this.stateText(d.state, d.info.rank, d.info.ranks);
+    const statusText = perfectingCandidateState(
+      d.state,
+      d.info.perfected ? d.info.ranks : d.info.rank,
+      d.info.ranks,
+    );
     // The shared .prof-track family (phase 14) carries the anatomy; the
     // pf- classes stay for the settled-state fills keyed off data-state.
     const steps = Array.from({ length: d.info.ranks }, (_, i) => {
-      const filled = d.state !== 'track' || i < d.info.rank;
+      const filled = d.info.perfected || i < d.info.rank;
       return `<span class="prof-track-step pf-step${filled ? ' filled' : ''}"></span>`;
     }).join('');
     const track =
@@ -696,7 +736,7 @@ export class PerfectingWindow {
     const lead =
       d.state === 'perfected'
         ? `<p class="pf-lead">${esc(t('hudChrome.perfecting.perfectedLead'))}</p>`
-        : d.state === 'promoted'
+        : d.state === 'promoted' && d.info.perfected
           ? `<p class="pf-lead pf-done">${esc(t('hudChrome.perfecting.promotedLine'))}</p>`
           : '';
     // The bill: whichever rows arrive (the attempt materials, the Deed of
@@ -727,7 +767,7 @@ export class PerfectingWindow {
         ? t('hudChrome.perfecting.skillMet')
         : t('hudChrome.perfecting.skillUnmet');
     const skill =
-      d.state === 'promoted'
+      d.state === 'promoted' && d.info.perfected
         ? ''
         : `<div class="pf-skill${!d.syncing && !d.info.skillMet ? ' unmet' : ''}">${esc(t('hudChrome.perfecting.skillNeed', { craft, skill: wholeNumber(d.info.skillReq) }))} <span class="pf-skill-state">${esc(skillState)}</span></div>`;
     const equipBlocked =

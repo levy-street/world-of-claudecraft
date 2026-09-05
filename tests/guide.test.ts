@@ -65,6 +65,7 @@ import { FARM_CROPS } from '../src/sim/content/farm_crops';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
+import { CRUCIBLE_VENDOR_STOCK } from '../src/sim/content/ignivar_loot';
 import { ITEM_SETS } from '../src/sim/content/item_sets';
 import { FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
 import { MOUNTS } from '../src/sim/content/mounts';
@@ -1021,7 +1022,7 @@ describe('Guide Reliquary spoiler-safe catalog', () => {
     }
   });
 
-  it('labels exactly the two outside-completion pages, and renders tag plus note for each', () => {
+  it('labels all three outside-completion pages, and renders tag plus note for each', () => {
     // The generated blob carries the flag for exactly the live flagged set
     // (a third flagged page must surface here the moment it is authored)...
     expect(
@@ -1032,13 +1033,14 @@ describe('Guide Reliquary spoiler-safe catalog', () => {
     ).toEqual([
       ['horizons_vault_of_ages', 'retired'],
       ['horizons_riftbound', 'personal'],
+      ['professions_forgebreaker', 'personal'],
     ]);
     // ...and the rendered catalog SHOWS the label: the tag beside the page
     // heading and the explanatory note, one pair per flagged page, resolved
     // through t() (never hardcoded English), with none on ordinary pages.
     const html = reliquaryCatalogSections(GUIDE_RELIQUARY);
-    expect(html.match(/guide-reliquary-flag/g)?.length).toBe(2);
-    expect(html.match(/guide-reliquary-note/g)?.length).toBe(2);
+    expect(html.match(/guide-reliquary-flag/g)?.length).toBe(3);
+    expect(html.match(/guide-reliquary-note/g)?.length).toBe(3);
     expect(html).toContain(`(${t('guide.reliquaryPage.retiredTag')})`);
     expect(html).toContain(`(${t('guide.reliquaryPage.personalTag')})`);
     expect(html).toContain(t('guide.reliquaryPage.retiredNote'));
@@ -1953,11 +1955,12 @@ describe('Guide professions generated content accuracy', () => {
     // named recipe id, and tests/wiki_vendor_channel.test.ts drives the module
     // itself off synthetic tables.
     const patternChannels = patternChannelSets({
+      items: ITEMS,
       mobs: MOBS,
       heroicBossLoot: HEROIC_BOSS_LOOT,
       riftPatternItemIds: RIFT_PATTERN_ITEM_IDS,
       farmRiftDropItemIds: FARM_RIFT_DROP_ITEM_IDS,
-      heroicVendorStock: HEROIC_VENDOR_STOCK,
+      heroicVendorStock: [...HEROIC_VENDOR_STOCK, ...CRUCIBLE_VENDOR_STOCK],
     });
     for (const c of GUIDE_PROF_CRAFTS) {
       const simIds = ALL_RECIPES.filter((r) => r.professionId === c.id)
@@ -3457,7 +3460,12 @@ describe('Guide professions enchanting and economy accuracy', () => {
       'enchant_weapon_runed_edge',
       'enchant_weapon_runed_focus',
     ]);
-    expect(e.enchants.filter((row) => row.tier === 'greater')).toHaveLength(6);
+    // Zeal uses the shard-derived section but its formula gate and proc are
+    // displayed explicitly. Preserve the original six ordinary enchants.
+    expect(e.enchants.filter((row) => row.tier === 'greater' && !row.requiresFormula)).toHaveLength(
+      6,
+    );
+    expect(e.enchants.filter((row) => row.tier === 'greater')).toHaveLength(7);
     // The five Lucent (apex) enchants: the phase 10 quartet plus the weapon
     // int twin the phase 10 QA D10-D1 ruling added at the head of phase 11.
     expect(
@@ -3770,11 +3778,12 @@ describe('Guide professions pages and routes', () => {
     const rows = GUIDE_PROF_CRAFTS.flatMap((c) =>
       c.recipes.map((r) => ({ cap: c.maxSkill, gain: r.gain })),
     );
-    expect(rows.length, 'published recipe rows').toBe(170);
+    // 33 Crucible crafts and the one-time Forgebreaker quest recipe.
+    expect(rows.length, 'published recipe rows').toBe(204);
     expect(
       rows.filter((r) => r.gain.zeroAt > r.cap).length,
       'rows carrying at least one unreachable boundary',
-    ).toBe(63);
+    ).toBe(97);
 
     const never = t('guide.profPages.gainNever');
     const cell = (reduced: string, minimal: string, zero: string): string =>

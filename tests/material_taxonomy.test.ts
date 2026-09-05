@@ -510,11 +510,12 @@ describe('MATERIAL_ITEM_IDS: every source table is fully represented', () => {
     expect(junkReagents).toBeGreaterThan(30);
   });
 
-  it('contains every recipe-pending material', () => {
-    expect(CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS.length).toBeGreaterThan(0);
-    for (const id of CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS) {
-      expect(MATERIAL_ITEM_IDS.has(id), id).toBe(true);
-    }
+  it('retires the staged core classification once actual recipes consume it', () => {
+    expect(CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS).toEqual([]);
+    expect(
+      ALL_RECIPES.some((r) => r.reagents.some((reagent) => reagent.itemId === 'lastflame_core')),
+    ).toBe(true);
+    expect(MATERIAL_ITEM_IDS.has('lastflame_core')).toBe(true);
   });
 
   it('contains every disenchant output (the one source reached only via the reagent union)', () => {

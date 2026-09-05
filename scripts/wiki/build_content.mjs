@@ -67,6 +67,7 @@ const entrySource = `
   export { ALL_RECIPES } from './src/sim/content/recipes.ts';
   export { gatheringSupplyByFamily, CORPSE_HARVEST_FAMILY } from './src/sim/professions/gathering_supply.ts';
   export { HEROIC_VENDOR_STOCK } from './src/sim/content/heroic_vendor.ts';
+  export { CRUCIBLE_VENDOR_STOCK } from './src/sim/content/ignivar_loot.ts';
   export { HEROIC_BOSS_LOOT } from './src/sim/content/heroic_loot.ts';
   export { RIFT_PATTERN_ITEM_IDS, FARM_RIFT_DROP_ITEM_IDS } from './src/sim/rift/progression.ts';
   export { ENCHANTS } from './src/sim/content/enchants.ts';
@@ -180,6 +181,7 @@ const {
   ALL_RECIPES,
   gatheringSupplyByFamily,
   HEROIC_VENDOR_STOCK,
+  CRUCIBLE_VENDOR_STOCK,
   HEROIC_BOSS_LOOT,
   RIFT_PATTERN_ITEM_IDS,
   FARM_RIFT_DROP_ITEM_IDS,
@@ -780,11 +782,12 @@ const gainBoundaries = (skillReq) => {
 // one. Two copies were two chances to drift; the guard would have gone on
 // agreeing with a generator that had moved.
 const patternChannels = patternChannelSets({
+  items: ITEMS,
   mobs: MOBS,
   heroicBossLoot: HEROIC_BOSS_LOOT,
   riftPatternItemIds: RIFT_PATTERN_ITEM_IDS,
   farmRiftDropItemIds: FARM_RIFT_DROP_ITEM_IDS,
-  heroicVendorStock: HEROIC_VENDOR_STOCK,
+  heroicVendorStock: [...HEROIC_VENDOR_STOCK, ...CRUCIBLE_VENDOR_STOCK],
 });
 
 // Consumable effect facts for a recipe's output item, straight from the live
@@ -1238,6 +1241,8 @@ const profEnchanting = {
     tier: enchantTier(e),
     skillReq: e.skillReq ?? 0,
     perfectedOnly: e.requiresPerfected === true,
+    requiresFormula: e.acquisition === 'drop',
+    hasDescription: typeof e.description === 'string',
     // Same shape and the same reason as a recipe's `materials` above: the
     // enchant table rides the craft page's one materials cell, so the id is
     // what the page localizes through.
@@ -1686,6 +1691,8 @@ export interface GuideProfEnchanting {
     tier: 'base' | 'runed' | 'greater' | 'lucent';
     skillReq: number;
     perfectedOnly: boolean;
+    requiresFormula: boolean;
+    hasDescription: boolean;
     reagents: GuideProfMaterial[];
     bonus: { stat: string; value: number }[];
   }[];

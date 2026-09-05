@@ -360,7 +360,8 @@ import {
 import { PartyFrameProjectionCache } from './party_frame_projection';
 import { applyBoostKitToPlayer, pbeBoostEnabled } from './pbe_boost';
 import type { PerfCaptureResult, PerfCaptureStatus } from './perf_capture_types';
-import { parsePerfectItemRef, resolvePerfectItemName } from './perfect_item_ref';
+import { dispatchPerfectItemCommand } from './perfect_item_command';
+import { parsePerfectingSwapCommand } from './perfecting_swap_command';
 import { runPeriodicSaveFlush } from './periodic_save_flush';
 
 export type { PerfCaptureResult, PerfCaptureStatus } from './perf_capture_types';
@@ -1260,14 +1261,15 @@ function identityFields(e: Entity): Record<string, unknown> {
     // `eq` above: players only, only when at least one worn piece carries a
     // payload, riding the identity record (wireCacheFor diffs the identity
     // JSON, so an equip/unequip of an instanced piece re-emits automatically).
-    // Data minimization: only the cosmetic inspect fields (signer, enchant,
-    // rolled, name) leave the server; boundTo, charges, and the bindOnTrade
+    // Data minimization: only the inspect fields (signer, enchant,
+    // rolled, name, perfected) leave the server; boundTo, charges, and the bindOnTrade
     // arm are gameplay state no inspecting client needs and never ride this key.
     // The pub allowlist below is what enforces this, so a new non-cosmetic
     // ItemInstancePayload field is excluded by construction; the owner still
     // sees their own payload in full via the self `inv` mirror. 2026-08-27:
     // `name` (the player-chosen legendary name, Masterwrought phase 13) is
-    // the FIRST cosmetic JOIN since the rule was written.
+    // the FIRST cosmetic JOIN since the rule was written. The visible Perfected
+    // marker now lets inspect resolve active versus dormant enchants accurately.
     let eqi: Record<string, unknown> | undefined;
     for (const [slot, inst] of Object.entries(e.equippedInstances)) {
       if (!inst) continue;
@@ -1276,6 +1278,7 @@ function identityFields(e: Entity): Record<string, unknown> {
       if (inst.enchant !== undefined) pub.enchant = inst.enchant;
       if (inst.rolled !== undefined) pub.rolled = inst.rolled;
       if (inst.name !== undefined) pub.name = inst.name;
+      if (inst.perfected === true) pub.perfected = inst.perfected;
       for (const _ in pub) {
         if (eqi === undefined) eqi = {};
         eqi[slot] = pub;
@@ -6870,31 +6873,22 @@ export class GameServer {
         if (typeof msg.item === 'string') sim.unbindItem(msg.item, pid);
         break;
       case 'perfect_item': {
-        // The Perfecting stage (Masterwrought phase 12): the untrusted ref
-        // parse is the pure core in server/perfect_item_ref.ts (a null drops
-        // the frame whole); the sim re-validates the ref against its own bags
-        // and paperdoll and resolves the deny ladder and the one roll itself;
-        // the outcome reaches this client as the sim's own error/log lines
-        // plus the heavy self re-diff (perfect_item is a HEAVY_SELF_CMDS
-        // member: an attempt spends materials and mutates a payload in place).
-        // Phase 13: the optional legendary name's whole decision is the pure
-        // core resolvePerfectItemName (shape-first, screen NORMALIZED). Phase
-        // 18 narrows its refusal: only a copy the sim would route to the
-        // promotion ladder can consume the name, so this is the one site that
-        // can answer that (the frame cannot), and an offensive name on any
-        // other copy is STRIPPED rather than costing the attempt. The read is
-        // a thunk so it is paid only when the screen actually matches.
-        const ref = parsePerfectItemRef(msg);
-        if (ref) {
-          const promoting = () => sim.perfectingInfo(ref, pid)?.perfected === true;
-          const named = resolvePerfectItemName(msg, offensiveName, promoting);
-          if (named.refused) this.sendChatNotice(session, 'That name is not allowed.');
-          else {
-            // Arm-marked: the heavy-self mark rides the frame that reaches the sim,
-            // never the malformed-ref or screened-name refusals above.
+        dispatchPerfectItemCommand(msg, {
+          sim,
+          pid,
+          offensiveName,
+          accepted: () => {
             if (heavySelfMarkOnAccept(command)) session.selfHeavyDirty = true;
-            sim.perfectItemAs(pid, ref, named.name);
-          }
+          },
+          refusedName: () => this.sendChatNotice(session, 'That name is not allowed.'),
+        });
+        break;
+      }
+      case 'swap_perfecting_ranks': {
+        const request = parsePerfectingSwapCommand(msg);
+        if (request) {
+          if (heavySelfMarkOnAccept(command)) session.selfHeavyDirty = true;
+          sim.swapPerfectingRanks(request, pid);
         }
         break;
       }

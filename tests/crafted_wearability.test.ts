@@ -14,6 +14,7 @@
 // The scope below is DERIVED from ALL_RECIPES, never hand-listed, so a new
 // rung-50/75 gear recipe authored at level 20 reds the window arm by name.
 import { describe, expect, it } from 'vitest';
+import { CRUCIBLE_COLLECTION_ITEMS } from '../src/sim/content/crucible_collections';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS, MOBS } from '../src/sim/data';
 import { isItemLevelEligible, itemLevel, itemSourceLevel } from '../src/sim/item_level';
@@ -104,7 +105,12 @@ describe('crafted wearability: the level-20 shelf is unmoved (masterwrought R5 s
   // silent membership change reds rather than diluting the claim.
   it('every masterwrought apex equippable still requires level 20, exact set', () => {
     const apex = Object.values(ITEMS)
-      .filter((d) => d.masterwrought && isItemLevelEligible(d))
+      .filter(
+        (d) =>
+          d.masterwrought &&
+          isItemLevelEligible(d) &&
+          !Object.hasOwn(CRUCIBLE_COLLECTION_ITEMS, d.id),
+      )
       .map((d) => d.id)
       .sort();
     expect(apex).toEqual([
@@ -167,7 +173,9 @@ describe('crafted wearability: the level-20 shelf is unmoved (masterwrought R5 s
     // past the cap (the Crucible set roster, the raid drop tables, the
     // Thronebane-band legendaries), every one deriving the same level-20
     // gate the sweep below asserts; no packet row moved.
-    expect(shelf.length).toBe(454);
+    // The Crucible crafting tier adds 33 items without moving any old shelf gate.
+    expect(Object.keys(CRUCIBLE_COLLECTION_ITEMS)).toHaveLength(33);
+    expect(shelf.length).toBe(487);
     for (const def of shelf) {
       expect(requiredLevelFor(def), `${def.id} shelf gate`).toBe(20);
     }

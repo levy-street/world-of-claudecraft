@@ -11429,6 +11429,24 @@
     opacity: 0.6;
     cursor: default;
   }
+  .pf-swap-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-top: 1px solid var(--color-border-showcase);
+    padding-top: 12px;
+  }
+  .pf-swap-section h3,
+  .pf-swap-section p {
+    margin: 0;
+  }
+  .pf-swap-preview {
+    padding-left: 20px;
+    overflow-wrap: anywhere;
+  }
+  .pf-swap-preview li + li {
+    margin-top: 8px;
+  }
   /* The naming prompt (#prompt-stack tenant) and the bind confirm: the shared
      .prompt panel chrome plus the name form's own rows. The 16px mobile input
      floor is base.css's coarse-pointer rule; nothing here undercuts it. */

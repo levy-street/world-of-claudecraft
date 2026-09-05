@@ -11,6 +11,10 @@
 import type { ReliquaryLocaleTable } from '../reliquary_i18n';
 
 export const table: ReliquaryLocaleTable = {
+  professions_crucible: {
+    name: '도가니의 장인 정신',
+    desc: '공격대 재료로 만드는 11종의 세트로, 각 세트에는 가슴, 허리, 발 부위가 있습니다. 도안과 공식은 지식이며 수집 유물이 아닙니다.',
+  },
   // Dungeon, delve and world-boss pages: entities.* names verbatim.
   conquerors_hollow_crypt: {
     name: '텅 빈 묘실',

@@ -294,6 +294,8 @@ export interface GuideProfEnchanting {
     tier: 'base' | 'runed' | 'greater' | 'lucent';
     skillReq: number;
     perfectedOnly: boolean;
+    requiresFormula: boolean;
+    hasDescription: boolean;
     reagents: GuideProfMaterial[];
     bonus: { stat: string; value: number }[];
   }[];
@@ -7638,6 +7640,145 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
     ]
   },
   {
+    "id": "professions_crucible",
+    "shelf": "professions",
+    "name": "Crucible Craftsmanship",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Crucible Striker's Hauberk"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Striker's Girdle"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Striker's Sabatons"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Guardian's Hauberk"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Guardian's Girdle"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Guardian's Sabatons"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Spellcaster's Hauberk"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Spellcaster's Girdle"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Spellcaster's Sabatons"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Healer's Hauberk"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Healer's Girdle"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Healer's Sabatons"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Skirmisher's Jerkin"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Skirmisher's Belt"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Skirmisher's Boots"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Prowler's Jerkin"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Prowler's Belt"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Prowler's Boots"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Guardian's Jerkin"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Guardian's Belt"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Guardian's Boots"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Spellcaster's Jerkin"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Spellcaster's Belt"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Spellcaster's Boots"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Healer's Jerkin"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Healer's Belt"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Healer's Boots"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Spellcaster's Robe"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Spellcaster's Sash"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Spellcaster's Slippers"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Healer's Robe"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Healer's Sash"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Healer's Slippers"
+      }
+    ]
+  },
+  {
     "id": "professions_forgebreaker",
     "shelf": "professions",
     "name": "Forgebreaker",
@@ -11874,6 +12015,576 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "minimalAt": 100,
           "zeroAt": 125
         }
+      },
+      {
+        "id": "recipe_crucible_agi_leather_chest",
+        "name": "Crucible Skirmisher's Jerkin",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "tannery",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "lastflame_core",
+            "name": "Core of the Last Flame",
+            "count": 3
+          },
+          {
+            "itemId": "pristine_hide",
+            "name": "Pristine Hide",
+            "count": 4
+          },
+          {
+            "itemId": "tanning_agent",
+            "name": "Tanning Agent",
+            "count": 4
+          }
+        ],
+        "output": {
+          "name": "Crucible Skirmisher's Jerkin",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_crucible_agi_leather_waist",
+        "name": "Crucible Skirmisher's Belt",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "tannery",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "lastflame_core",
+            "name": "Core of the Last Flame",
+            "count": 3
+          },
+          {
+            "itemId": "pristine_hide",
+            "name": "Pristine Hide",
+            "count": 4
+          },
+          {
+            "itemId": "tanning_agent",
+            "name": "Tanning Agent",
+            "count": 4
+          }
+        ],
+        "output": {
+          "name": "Crucible Skirmisher's Belt",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_crucible_agi_leather_feet",
+        "name": "Crucible Skirmisher's Boots",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "tannery",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "lastflame_core",
+            "name": "Core of the Last Flame",
+            "count": 3
+          },
+          {
+            "itemId": "pristine_hide",
+            "name": "Pristine Hide",
+            "count": 4
+          },
+          {
+            "itemId": "tanning_agent",
+            "name": "Tanning Agent",
+            "count": 4
+          }
+        ],
+        "output": {
+          "name": "Crucible Skirmisher's Boots",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_crucible_str_leather_chest",
+        "name": "Crucible Prowler's Jerkin",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "tannery",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "lastflame_core",
+            "name": "Core of the Last Flame",
+            "count": 3
+          },
+          {
+            "itemId": "pristine_hide",
+            "name": "Pristine Hide",
+            "count": 4
+          },
+          {
+            "itemId": "tanning_agent",
+            "name": "Tanning Agent",
+            "count": 4
+          }
+        ],
+        "output": {
+          "name": "Crucible Prowler's Jerkin",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_crucible_str_leather_waist",
+        "name": "Crucible Prowler's Belt",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "tannery",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "lastflame_core",
+            "name": "Core of the Last Flame",
+            "count": 3
+          },
+          {
+            "itemId": "pristine_hide",
+            "name": "Pristine Hide",
+            "count": 4
+          },
+          {
+            "itemId": "tanning_agent",
+            "name": "Tanning Agent",
+            "count": 4
+          }
+        ],
+        "output": {
+          "name": "Crucible Prowler's Belt",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_crucible_str_leather_feet",
+        "name": "Crucible Prowler's Boots",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "tannery",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "lastflame_core",
+            "name": "Core of the Last Flame",
+            "count": 3
+          },
+          {
+            "itemId": "pristine_hide",
+            "name": "Pristine Hide",
+            "count": 4
+          },
+          {
+            "itemId": "tanning_agent",
+            "name": "Tanning Agent",
+            "count": 4
+          }
+        ],
+        "output": {
+          "name": "Crucible Prowler's Boots",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_crucible_tank_leather_chest",
+        "name": "Crucible Guardian's Jerkin",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "tannery",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "lastflame_core",
+            "name": "Core of the Last Flame",
+            "count": 3
+          },
+          {
+            "itemId": "pristine_hide",
+            "name": "Pristine Hide",
+            "count": 4
+          },
+          {
+            "itemId": "tanning_agent",
+            "name": "Tanning Agent",
+            "count": 4
+          }
+        ],
+        "output": {
+          "name": "Crucible Guardian's Jerkin",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_crucible_tank_leather_waist",
+        "name": "Crucible Guardian's Belt",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "tannery",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "lastflame_core",
+            "name": "Core of the Last Flame",
+            "count": 3
+          },
+          {
+            "itemId": "pristine_hide",
+            "name": "Pristine Hide",
+            "count": 4
+          },
+          {
+            "itemId": "tanning_agent",
+            "name": "Tanning Agent",
+            "count": 4
+          }
+        ],
+        "output": {
+          "name": "Crucible Guardian's Belt",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_crucible_tank_leather_feet",
+        "name": "Crucible Guardian's Boots",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "tannery",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "lastflame_core",
+            "name": "Core of the Last Flame",
+            "count": 3
+          },
+          {
+            "itemId": "pristine_hide",
+            "name": "Pristine Hide",
+            "count": 4
+          },
+          {
+            "itemId": "tanning_agent",
+            "name": "Tanning Agent",
+            "count": 4
+          }
+        ],
+        "output": {
+          "name": "Crucible Guardian's Boots",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_crucible_caster_leather_chest",
+        "name": "Crucible Spellcaster's Jerkin",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "tannery",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "lastflame_core",
+            "name": "Core of the Last Flame",
+            "count": 3
+          },
+          {
+            "itemId": "pristine_hide",
+            "name": "Pristine Hide",
+            "count": 4
+          },
+          {
+            "itemId": "tanning_agent",
+            "name": "Tanning Agent",
+            "count": 4
+          }
+        ],
+        "output": {
+          "name": "Crucible Spellcaster's Jerkin",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_crucible_caster_leather_waist",
+        "name": "Crucible Spellcaster's Belt",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "tannery",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "lastflame_core",
+            "name": "Core of the Last Flame",
+            "count": 3
+          },
+          {
+            "itemId": "pristine_hide",
+            "name": "Pristine Hide",
+            "count": 4
+          },
+          {
+            "itemId": "tanning_agent",
+            "name": "Tanning Agent",
+            "count": 4
+          }
+        ],
+        "output": {
+          "name": "Crucible Spellcaster's Belt",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_crucible_caster_leather_feet",
+        "name": "Crucible Spellcaster's Boots",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "tannery",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "lastflame_core",
+            "name": "Core of the Last Flame",
+            "count": 3
+          },
+          {
+            "itemId": "pristine_hide",
+            "name": "Pristine Hide",
+            "count": 4
+          },
+          {
+            "itemId": "tanning_agent",
+            "name": "Tanning Agent",
+            "count": 4
+          }
+        ],
+        "output": {
+          "name": "Crucible Spellcaster's Boots",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_crucible_healer_leather_chest",
+        "name": "Crucible Healer's Jerkin",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "tannery",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "lastflame_core",
+            "name": "Core of the Last Flame",
+            "count": 3
+          },
+          {
+            "itemId": "pristine_hide",
+            "name": "Pristine Hide",
+            "count": 4
+          },
+          {
+            "itemId": "tanning_agent",
+            "name": "Tanning Agent",
+            "count": 4
+          }
+        ],
+        "output": {
+          "name": "Crucible Healer's Jerkin",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_crucible_healer_leather_waist",
+        "name": "Crucible Healer's Belt",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "tannery",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "lastflame_core",
+            "name": "Core of the Last Flame",
+            "count": 3
+          },
+          {
+            "itemId": "pristine_hide",
+            "name": "Pristine Hide",
+            "count": 4
+          },
+          {
+            "itemId": "tanning_agent",
+            "name": "Tanning Agent",
+            "count": 4
+          }
+        ],
+        "output": {
+          "name": "Crucible Healer's Belt",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_crucible_healer_leather_feet",
+        "name": "Crucible Healer's Boots",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "tannery",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "lastflame_core",
+            "name": "Core of the Last Flame",
+            "count": 3
+          },
+          {
+            "itemId": "pristine_hide",
+            "name": "Pristine Hide",
+            "count": 4
+          },
+          {
+            "itemId": "tanning_agent",
+            "name": "Tanning Agent",
+            "count": 4
+          }
+        ],
+        "output": {
+          "name": "Crucible Healer's Boots",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
       }
     ]
   },
@@ -12789,6 +13500,234 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 25,
           "minimalAt": 50,
           "zeroAt": 75
+        }
+      },
+      {
+        "id": "recipe_crucible_caster_cloth_chest",
+        "name": "Crucible Spellcaster's Robe",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "loom",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "lastflame_core",
+            "name": "Core of the Last Flame",
+            "count": 3
+          },
+          {
+            "itemId": "spider_silk",
+            "name": "Spider Silk",
+            "count": 8
+          },
+          {
+            "itemId": "spool_of_thread",
+            "name": "Spool of Thread",
+            "count": 4
+          }
+        ],
+        "output": {
+          "name": "Crucible Spellcaster's Robe",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_crucible_caster_cloth_waist",
+        "name": "Crucible Spellcaster's Sash",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "loom",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "lastflame_core",
+            "name": "Core of the Last Flame",
+            "count": 3
+          },
+          {
+            "itemId": "spider_silk",
+            "name": "Spider Silk",
+            "count": 8
+          },
+          {
+            "itemId": "spool_of_thread",
+            "name": "Spool of Thread",
+            "count": 4
+          }
+        ],
+        "output": {
+          "name": "Crucible Spellcaster's Sash",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_crucible_caster_cloth_feet",
+        "name": "Crucible Spellcaster's Slippers",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "loom",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "lastflame_core",
+            "name": "Core of the Last Flame",
+            "count": 3
+          },
+          {
+            "itemId": "spider_silk",
+            "name": "Spider Silk",
+            "count": 8
+          },
+          {
+            "itemId": "spool_of_thread",
+            "name": "Spool of Thread",
+            "count": 4
+          }
+        ],
+        "output": {
+          "name": "Crucible Spellcaster's Slippers",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_crucible_healer_cloth_chest",
+        "name": "Crucible Healer's Robe",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "loom",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "lastflame_core",
+            "name": "Core of the Last Flame",
+            "count": 3
+          },
+          {
+            "itemId": "spider_silk",
+            "name": "Spider Silk",
+            "count": 8
+          },
+          {
+            "itemId": "spool_of_thread",
+            "name": "Spool of Thread",
+            "count": 4
+          }
+        ],
+        "output": {
+          "name": "Crucible Healer's Robe",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_crucible_healer_cloth_waist",
+        "name": "Crucible Healer's Sash",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "loom",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "lastflame_core",
+            "name": "Core of the Last Flame",
+            "count": 3
+          },
+          {
+            "itemId": "spider_silk",
+            "name": "Spider Silk",
+            "count": 8
+          },
+          {
+            "itemId": "spool_of_thread",
+            "name": "Spool of Thread",
+            "count": 4
+          }
+        ],
+        "output": {
+          "name": "Crucible Healer's Sash",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_crucible_healer_cloth_feet",
+        "name": "Crucible Healer's Slippers",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "loom",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "lastflame_core",
+            "name": "Core of the Last Flame",
+            "count": 3
+          },
+          {
+            "itemId": "spider_silk",
+            "name": "Spider Silk",
+            "count": 8
+          },
+          {
+            "itemId": "spool_of_thread",
+            "name": "Spool of Thread",
+            "count": 4
+          }
+        ],
+        "output": {
+          "name": "Crucible Healer's Slippers",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
         }
       }
     ]
@@ -15273,6 +16212,462 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "minimalAt": 150,
           "zeroAt": 175
         }
+      },
+      {
+        "id": "recipe_crucible_str_mail_chest",
+        "name": "Crucible Striker's Hauberk",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "forge",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "lastflame_core",
+            "name": "Core of the Last Flame",
+            "count": 3
+          },
+          {
+            "itemId": "fine_thorium_ore",
+            "name": "Fine Osmium Ore",
+            "count": 6
+          },
+          {
+            "itemId": "fine_elderwood_log",
+            "name": "Fine Highpine Log",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Crucible Striker's Hauberk",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_crucible_str_mail_waist",
+        "name": "Crucible Striker's Girdle",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "forge",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "lastflame_core",
+            "name": "Core of the Last Flame",
+            "count": 3
+          },
+          {
+            "itemId": "fine_thorium_ore",
+            "name": "Fine Osmium Ore",
+            "count": 6
+          },
+          {
+            "itemId": "fine_elderwood_log",
+            "name": "Fine Highpine Log",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Crucible Striker's Girdle",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_crucible_str_mail_feet",
+        "name": "Crucible Striker's Sabatons",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "forge",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "lastflame_core",
+            "name": "Core of the Last Flame",
+            "count": 3
+          },
+          {
+            "itemId": "fine_thorium_ore",
+            "name": "Fine Osmium Ore",
+            "count": 6
+          },
+          {
+            "itemId": "fine_elderwood_log",
+            "name": "Fine Highpine Log",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Crucible Striker's Sabatons",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_crucible_tank_mail_chest",
+        "name": "Crucible Guardian's Hauberk",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "forge",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "lastflame_core",
+            "name": "Core of the Last Flame",
+            "count": 3
+          },
+          {
+            "itemId": "fine_thorium_ore",
+            "name": "Fine Osmium Ore",
+            "count": 6
+          },
+          {
+            "itemId": "fine_elderwood_log",
+            "name": "Fine Highpine Log",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Crucible Guardian's Hauberk",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_crucible_tank_mail_waist",
+        "name": "Crucible Guardian's Girdle",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "forge",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "lastflame_core",
+            "name": "Core of the Last Flame",
+            "count": 3
+          },
+          {
+            "itemId": "fine_thorium_ore",
+            "name": "Fine Osmium Ore",
+            "count": 6
+          },
+          {
+            "itemId": "fine_elderwood_log",
+            "name": "Fine Highpine Log",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Crucible Guardian's Girdle",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_crucible_tank_mail_feet",
+        "name": "Crucible Guardian's Sabatons",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "forge",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "lastflame_core",
+            "name": "Core of the Last Flame",
+            "count": 3
+          },
+          {
+            "itemId": "fine_thorium_ore",
+            "name": "Fine Osmium Ore",
+            "count": 6
+          },
+          {
+            "itemId": "fine_elderwood_log",
+            "name": "Fine Highpine Log",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Crucible Guardian's Sabatons",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_crucible_caster_mail_chest",
+        "name": "Crucible Spellcaster's Hauberk",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "forge",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "lastflame_core",
+            "name": "Core of the Last Flame",
+            "count": 3
+          },
+          {
+            "itemId": "fine_thorium_ore",
+            "name": "Fine Osmium Ore",
+            "count": 6
+          },
+          {
+            "itemId": "fine_elderwood_log",
+            "name": "Fine Highpine Log",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Crucible Spellcaster's Hauberk",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_crucible_caster_mail_waist",
+        "name": "Crucible Spellcaster's Girdle",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "forge",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "lastflame_core",
+            "name": "Core of the Last Flame",
+            "count": 3
+          },
+          {
+            "itemId": "fine_thorium_ore",
+            "name": "Fine Osmium Ore",
+            "count": 6
+          },
+          {
+            "itemId": "fine_elderwood_log",
+            "name": "Fine Highpine Log",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Crucible Spellcaster's Girdle",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_crucible_caster_mail_feet",
+        "name": "Crucible Spellcaster's Sabatons",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "forge",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "lastflame_core",
+            "name": "Core of the Last Flame",
+            "count": 3
+          },
+          {
+            "itemId": "fine_thorium_ore",
+            "name": "Fine Osmium Ore",
+            "count": 6
+          },
+          {
+            "itemId": "fine_elderwood_log",
+            "name": "Fine Highpine Log",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Crucible Spellcaster's Sabatons",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_crucible_healer_mail_chest",
+        "name": "Crucible Healer's Hauberk",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "forge",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "lastflame_core",
+            "name": "Core of the Last Flame",
+            "count": 3
+          },
+          {
+            "itemId": "fine_thorium_ore",
+            "name": "Fine Osmium Ore",
+            "count": 6
+          },
+          {
+            "itemId": "fine_elderwood_log",
+            "name": "Fine Highpine Log",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Crucible Healer's Hauberk",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_crucible_healer_mail_waist",
+        "name": "Crucible Healer's Girdle",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "forge",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "lastflame_core",
+            "name": "Core of the Last Flame",
+            "count": 3
+          },
+          {
+            "itemId": "fine_thorium_ore",
+            "name": "Fine Osmium Ore",
+            "count": 6
+          },
+          {
+            "itemId": "fine_elderwood_log",
+            "name": "Fine Highpine Log",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Crucible Healer's Girdle",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_crucible_healer_mail_feet",
+        "name": "Crucible Healer's Sabatons",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "forge",
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "lastflame_core",
+            "name": "Core of the Last Flame",
+            "count": 3
+          },
+          {
+            "itemId": "fine_thorium_ore",
+            "name": "Fine Osmium Ore",
+            "count": 6
+          },
+          {
+            "itemId": "fine_elderwood_log",
+            "name": "Fine Highpine Log",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Crucible Healer's Sabatons",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        }
       }
     ]
   }
@@ -16943,11 +18338,35 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
   },
   "enchants": [
     {
+      "id": "enchant_weapon_lastflame_zeal",
+      "slot": "mainhand",
+      "tier": "greater",
+      "skillReq": 100,
+      "perfectedOnly": false,
+      "requiresFormula": true,
+      "hasDescription": true,
+      "reagents": [
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 3
+        },
+        {
+          "itemId": "arcane_shard",
+          "name": "Chime Shard",
+          "count": 2
+        }
+      ],
+      "bonus": []
+    },
+    {
       "id": "enchant_weapon_might",
       "slot": "mainhand",
       "tier": "base",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_dust",
@@ -16968,6 +18387,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_dust",
@@ -16988,6 +18409,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_dust",
@@ -17008,6 +18431,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_dust",
@@ -17028,6 +18453,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_dust",
@@ -17048,6 +18475,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_dust",
@@ -17068,6 +18497,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_dust",
@@ -17093,6 +18524,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_dust",
@@ -17113,6 +18546,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_dust",
@@ -17138,6 +18573,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_dust",
@@ -17158,6 +18595,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_dust",
@@ -17178,6 +18617,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_dust",
@@ -17198,6 +18639,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_dust",
@@ -17218,6 +18661,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_dust",
@@ -17238,6 +18683,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_dust",
@@ -17263,6 +18710,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_dust",
@@ -17288,6 +18737,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_dust",
@@ -17308,6 +18759,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_dust",
@@ -17328,6 +18781,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_dust",
@@ -17348,6 +18803,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_dust",
@@ -17368,6 +18825,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_dust",
@@ -17393,6 +18852,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_dust",
@@ -17418,6 +18879,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_dust",
@@ -17438,6 +18901,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_dust",
@@ -17458,6 +18923,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_dust",
@@ -17483,6 +18950,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_dust",
@@ -17503,6 +18972,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_dust",
@@ -17523,6 +18994,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_dust",
@@ -17543,6 +19016,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_dust",
@@ -17563,6 +19038,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_dust",
@@ -17583,6 +19060,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_dust",
@@ -17603,6 +19082,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "greater",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_shard",
@@ -17628,6 +19109,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "greater",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_shard",
@@ -17653,6 +19136,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "greater",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_shard",
@@ -17678,6 +19163,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "greater",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_shard",
@@ -17703,6 +19190,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "greater",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_shard",
@@ -17728,6 +19217,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "greater",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_shard",
@@ -17753,6 +19244,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "runed",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_essence",
@@ -17778,6 +19271,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "runed",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_essence",
@@ -17803,6 +19298,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "runed",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_essence",
@@ -17828,6 +19325,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "runed",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_essence",
@@ -17853,6 +19352,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "runed",
       "skillReq": 0,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "arcane_essence",
@@ -17878,6 +19379,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "lucent",
       "skillReq": 100,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "lucent_reagent",
@@ -17908,6 +19411,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "lucent",
       "skillReq": 100,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "lucent_reagent",
@@ -17938,6 +19443,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "lucent",
       "skillReq": 100,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "lucent_reagent",
@@ -17968,6 +19475,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "lucent",
       "skillReq": 100,
       "perfectedOnly": false,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "lucent_reagent",
@@ -17993,6 +19502,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "lucent",
       "skillReq": 125,
       "perfectedOnly": true,
+      "requiresFormula": false,
+      "hasDescription": false,
       "reagents": [
         {
           "itemId": "lucent_reagent",

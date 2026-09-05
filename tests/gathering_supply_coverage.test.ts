@@ -588,7 +588,8 @@ describe('masterwrought R21: the world eats what the gathering families supply',
     // when the list EMPTIES, because that is this exemption retiring and the
     // block above it going stale. Either way the fix is to re-read that
     // block, never to widen this number.
-    expect(exempted).toBe(1);
+    // Core of the Last Flame now has live raid recipes; no staged exemption remains.
+    expect(exempted).toBe(0);
     // Subject non-vacuity: the material set is the live derived one, and it
     // is not empty (tests/material_taxonomy.test.ts pins its exact members).
     expect(MATERIAL_ITEM_IDS.size).toBeGreaterThan(0);
@@ -603,7 +604,8 @@ describe('masterwrought R21: the world eats what the gathering families supply',
     // explicitly classified"), except that the index here is the WIDE one,
     // so the skip is spent against every spend mechanism this file walks
     // rather than against crafts alone.
-    expect(CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS.length).toBeGreaterThan(0);
+    expect(CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS).toEqual([]);
+    expect(WIDE_DEMAND.get('lastflame_core')?.consumers.length).toBeGreaterThan(0);
     for (const id of CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS) {
       expect(MATERIAL_ITEM_IDS.has(id), `${id} is no longer a material`).toBe(true);
       const consumers = consumptionIdsFor(id).flatMap(

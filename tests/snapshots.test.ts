@@ -4478,10 +4478,11 @@ describe('equipped instance wire (eqi)', () => {
         charges: { mend: 2 },
         bindOnTrade: true,
         perfected: true,
-        // Both Perfecting fields at once (a contradictory live state, since
-        // the Perfected stamp deletes the rank; deliberate here, so ONE fixture
-        // proves the trim drops each independently).
+        // Contradictory rank beside Perfected, to prove the privacy trim drops
+        // progression independently of the visible marker.
         perfecting: 2,
+        perfectingBound: true,
+        perfectingBonus: { int: 3 },
       },
       pid,
     );
@@ -4495,20 +4496,13 @@ describe('equipped instance wire (eqi)', () => {
     expect(wired.chest.boundTo).toBeUndefined();
     expect(wired.chest.charges).toBeUndefined();
     expect(wired.chest.bindOnTrade).toBeUndefined();
-    // The Masterwrought Perfecting state stays server-and-owner-side too:
-    // BOTH the mid-track rank (`perfecting`) and the Perfected marker
-    // (`perfected`), the DECISION Masterwrought phase 12 executed (the phase
-    // 10 QA's third option). The OWNER sees both through the whole self `inv`
-    // array and the untrimmed `einst` self mirror, which is what the Apply
-    // Enchant picker's worn arm reads since phase 12 (IWorld.equipmentInstances,
-    // never this trimmed peer mirror); an INSPECTING viewer cannot see the
-    // Perfected MARKER or the rank, while the R5 bonus merged into rolled.stats
-    // rides `rolled` unlabeled exactly as a masterwork roll does (the stats
-    // show, the stamp does not), and that is recorded rather than accidental.
-    // Pinned by NAME so widening the wire is a deliberate edit.
-    expect(wired.chest.perfected).toBeUndefined();
+    // Inspect must know whether a Perfected-only enchant is currently active.
+    // Binding proof, rank and immutable bonus provenance remain owner-only.
+    expect(wired.chest.perfected).toBe(true);
     expect(wired.chest.perfecting).toBeUndefined();
-    expect(Object.keys(wired.chest).sort()).toEqual(['rolled', 'signer']);
+    expect(wired.chest.perfectingBound).toBeUndefined();
+    expect(wired.chest.perfectingBonus).toBeUndefined();
+    expect(Object.keys(wired.chest).sort()).toEqual(['perfected', 'rolled', 'signer']);
   });
 
   it('welds the regalia predicate across hosts: one legendary roll through the real wire', () => {

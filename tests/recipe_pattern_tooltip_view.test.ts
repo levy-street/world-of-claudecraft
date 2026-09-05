@@ -12,6 +12,7 @@
 // the shipped catalog rather than a made-up name.
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { ALL_RECIPES, recipeById } from '../src/sim/content/recipes';
+import { ITEMS } from '../src/sim/data';
 import { resolvePatternLearn } from '../src/sim/professions/pattern_items';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
 import { Sim } from '../src/sim/sim';
@@ -109,6 +110,55 @@ function pattern(teachesRecipeId: string): RecipeItemDef {
 function viewer(over: Partial<RecipePatternViewerInput> = {}): RecipePatternViewerInput {
   return { synced: true, knownRecipes: [], craftSkills: {}, ...over };
 }
+
+describe('collection manual and enchant formula tooltips', () => {
+  it('shows every taught slot and stays learnable when only the first recipe is known', () => {
+    const item = ITEMS.pattern_crucible_str_mail;
+    const state = viewer({
+      craftSkills: { armorcrafting: 100 },
+      knownRecipes: ['recipe_crucible_str_mail_chest'],
+    });
+    const model = recipePatternTooltipModel(item, state);
+    expect(model?.known).toBe(false);
+    expect(model?.resultItemIds).toEqual([
+      'crucible_str_mail_chest',
+      'crucible_str_mail_waist',
+      'crucible_str_mail_feet',
+    ]);
+    const html = recipePatternTooltipLines(item, state);
+    expect(html).toContain('Crucible Striker&#39;s Hauberk');
+    expect(html).toContain('Crucible Striker&#39;s Girdle');
+    expect(html).toContain('Crucible Striker&#39;s Sabatons');
+    expect(html).not.toContain('You already know that recipe.');
+  });
+
+  it('calls a whole collection known only when all three recipes are known', () => {
+    const knownRecipes = ['chest', 'waist', 'feet'].map(
+      (slot) => `recipe_crucible_str_mail_${slot}`,
+    );
+    expect(
+      recipePatternTooltipModel(ITEMS.pattern_crucible_str_mail, viewer({ knownRecipes }))?.known,
+    ).toBe(true);
+  });
+
+  it('previews the enchant formula and its real enchanting skill requirement', () => {
+    const item = ITEMS.formula_lastflame_zeal;
+    const model = recipePatternTooltipModel(item, viewer({ craftSkills: { enchanting: 100 } }));
+    expect(model).toMatchObject({
+      enchantId: 'enchant_weapon_lastflame_zeal',
+      professionId: 'enchanting',
+      skillReq: 100,
+      skillMet: true,
+      known: false,
+    });
+    const html = recipePatternTooltipLines(item, viewer({ craftSkills: { enchanting: 99 } }));
+    expect(html).toContain('Last Flame');
+    expect(html).toContain('Enchanting');
+    expect(html).toContain('100');
+    expect(html).toContain('tt-red');
+    expect(html).not.toContain('how to craft');
+  });
+});
 
 describe('recipePatternTooltipModel', () => {
   it('resolves the taught recipe off the live table', () => {

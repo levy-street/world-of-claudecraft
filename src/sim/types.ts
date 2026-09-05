@@ -6,6 +6,10 @@ import type { CraftDef, GatheringProfessionId, ToolEffectId } from './content/pr
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 import type { FishingCatchBand } from './professions/fishing_bands';
 import type { HarvestYield } from './professions/harvest_yields';
+import type {
+  PerfectingSwapDenyReason,
+  PerfectingSwapRequest,
+} from './professions/perfecting_swap';
 import type { RespawnWindow } from './respawn_policy';
 import type {
   VarkhulAssemblyDifficulty,
@@ -335,6 +339,7 @@ export type AuraKind =
   | 'pet_spellhaste'
   | 'buff_armor'
   | 'buff_int'
+  | 'buff_str'
   | 'buff_agi'
   | 'buff_dodge'
   | 'buff_speed'
@@ -1473,6 +1478,11 @@ export interface MountItemDef extends BaseItemDef {
 export interface RecipeItemDef extends BaseItemDef {
   kind: 'recipe';
   teachesRecipeId: string;
+  /** A collection manual teaches these recipes atomically. The first id also
+   *  occupies teachesRecipeId for legacy discovery and preview consumers. */
+  teachesRecipeIds?: readonly string[];
+  /** A formula uses the enchant catalog rather than the crafting catalog. */
+  teachesEnchantId?: string;
   armorType?: never;
   weapon?: never;
   use?: never;
@@ -1543,18 +1553,19 @@ export interface ItemInstancePayload {
    *  cloneItemInstancePayload's spread covers it; the load bound keeps only a
    *  legal in-range integer (item_instance_load.ts, drop-only). */
   perfecting?: number;
+  /** Permanent Perfecting binding, retained when a collection rank swap leaves rank zero. */
+  perfectingBound?: true;
+  /** This collection copy's immutable primary bonus, applied in rolled.stats only while Perfected. */
+  perfectingBonus?: Partial<CoreStats>;
   /** Marks a copy that has completed the Perfecting stage (Masterwrought R1).
    *  Minted by phase 12's rank walk (professions/perfecting.ts
    *  resolvePerfectingAttempt, when the track reaches PERFECTING_RANKS); the
    *  phase 10 Lucent Infusion guard (content/enchants.ts requiresPerfected,
    *  professions/enchanting.ts) reads it. Only ever `true`; absent is an
-   *  ordinary copy, so pre-phase saves load clean. Deliberately kept OFF the
-   *  server's `eqi` peer wire allowlist (the phase 12 decision, executed:
-   *  an INSPECTING viewer cannot see another player's Perfected MARKER; the
-   *  R5 bonus merged into rolled.stats rides `eqi` unlabeled, exactly as a
-   *  masterwork roll does, so the stats are visible and the stamp is not);
-   *  the OWNER sees it via the wholesale `inv` mirror and the whole `einst`
-   *  self mirror. */
+   *  ordinary copy, so pre-phase saves load clean. Included in the public
+   *  inspect projection so Perfected-only enchants can correctly become
+   *  dormant after rank exchange; mid-track ranks and binding/bonus
+   *  provenance remain owner-only via `inv` and `einst`. */
   perfected?: true;
   /** Player-chosen legendary name (Masterwrought phase 13, R3): stamped by the
    *  orange promotion (professions/perfecting.ts, the chain
@@ -1564,7 +1575,7 @@ export interface ItemInstancePayload {
    *  Player-authored TEXT, always a VALUE and never an i18n key: standalone it
    *  renders raw through the entity-name path (esc, untranslated); composed
    *  lines interpolate it into a t() template (the feast/makers-mark
-   *  precedent). Unlike `perfected` above this field is COSMETIC PRESTIGE and
+   *  precedent). This field is COSMETIC PRESTIGE and
    *  deliberately JOINS the server's `eqi` peer wire allowlist and
    *  publicInstanceView (the phase 13 decision: an inspecting viewer seeing
    *  the name is the point of the promotion), beside signer/enchant/rolled.
@@ -1617,6 +1628,12 @@ export interface ItemInstancePayload {
 export function cloneItemInstancePayload(src: ItemInstancePayload): ItemInstancePayload {
   const instance: ItemInstancePayload = { ...src };
   if (src.charges) instance.charges = { ...src.charges };
+  if (
+    src.perfectingBonus &&
+    typeof src.perfectingBonus === 'object' &&
+    !Array.isArray(src.perfectingBonus)
+  )
+    instance.perfectingBonus = { ...src.perfectingBonus };
   if (src.rolled)
     instance.rolled = {
       ...src.rolled,
@@ -4761,6 +4778,8 @@ export interface Entity extends ClientMirroredEntityFields {
   rangedHaste: number;
   spellHaste: number;
   setProcs: SetProc[];
+  /** Derived from two worn pieces of one Crucible crafting collection; never saved. */
+  craftedCollectionId?: string;
   procReadyAt: Record<string, number>;
   critChance: number; // 0..1
   critRating: number; // accumulated crit rating from gear + set bonuses
@@ -6845,6 +6864,7 @@ export type SimEvent = { pid?: number } & (
       reason?:
         | 'unknown_item'
         | 'unknown_enchant'
+        | 'recipe_not_learned'
         | 'wrong_slot'
         | 'not_held'
         | 'insufficient_materials'
@@ -6965,6 +6985,20 @@ export type SimEvent = { pid?: number } & (
         | 'unbind_no_space'
         | 'unbind_cannot_afford';
       fee: number;
+    }
+  // Personal, text-free confirmation outcome. Echo both capture tokens so a
+  // stale refusal cannot complete a newer prompt for the same item ids.
+  | {
+      type: 'perfectingSwapResult';
+      ok: boolean;
+      sourceItemId?: string;
+      targetItemId?: string;
+      sourceRank?: number;
+      targetRank?: number;
+      craftId?: string | null;
+      skillReq?: number;
+      reason?: PerfectingSwapDenyReason;
+      request?: PerfectingSwapRequest;
     }
   // Commission order board outcome (issue #1298): mirrors one of
   // professions/commission_order.ts's four result shapes (OpenOrderResult/

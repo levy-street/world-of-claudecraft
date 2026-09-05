@@ -3,7 +3,7 @@
 //
 // Three things are under test and they are deliberately different in kind. The
 // pure helper is pinned on its own, including the threshold LITERAL: asserting
-// the constant against itself would pass for any value, so the number 163_840 is
+// the constant against itself would pass for any value, so the number 229_376 is
 // written out here and a re-mint has to be a reviewed edit in two files. The
 // call site is then exercised through the REAL saveCharacterState with a mocked
 // pool, because the load-bearing claim is not "a warning is produced" but "an
@@ -77,7 +77,7 @@ function realCharacterState(): CharacterState {
 function oversizedCharacterState(): CharacterState {
   const state = realCharacterState();
   const questsDone = [...state.questsDone];
-  for (let i = questsDone.length; questsDone.length < 3000; i++) {
+  for (let i = questsDone.length; questsDone.length < 4000; i++) {
     questsDone.push(`synthetic_blob_padding_quest_${i}_${'x'.repeat(40)}`);
   }
   return { ...state, questsDone };
@@ -102,32 +102,33 @@ function characterUpdateCall(client: ReturnType<typeof transactionClient>) {
 
 describe('characterBlobSizeWarning: the pure decision', () => {
   it('pins the warn threshold to its literal value', () => {
-    // The number itself, not the constant compared against itself. 163,840 is
-    // 160 KiB, the smallest 32-KiB step above the measured legal worst case
-    // (151,656 bytes, frozen by the professions_blob_growth whole-character arm)
-    // and one 32-KiB step below the 262,144-byte guild-bank row scale; re-minted
-    // from 131,072 by qr-19-character-blob-warn-threshold. See the derivation in
-    // server/character_blob_size.ts. Moving it means re-measuring.
-    expect(CHARACTER_BLOB_WARN_BYTES).toBe(163_840);
+    // The number itself, not the constant compared against itself. 229,376 is
+    // 224 KiB, the smallest 32-KiB step above the measured storage-rich fixture
+    // (209,261 bytes, frozen by the professions_blob_growth whole-character arm)
+    // and one 32-KiB step below the 262,144-byte guild-bank row scale. The
+    // database review approved this re-mint from 163,840 after measuring legal
+    // Crucible payloads through serialize/load. Moving it means re-measuring.
+    expect(CHARACTER_BLOB_WARN_BYTES).toBe(229_376);
   });
 
   it('stays silent below the threshold and AT it (the bound is inclusive)', () => {
     expect(characterBlobSizeWarning(1, 0)).toBeNull();
     expect(characterBlobSizeWarning(1, 38_900)).toBeNull();
-    expect(characterBlobSizeWarning(1, 163_839)).toBeNull();
-    expect(characterBlobSizeWarning(1, 163_840)).toBeNull();
+    expect(characterBlobSizeWarning(1, 209_261)).toBeNull();
+    expect(characterBlobSizeWarning(1, 229_375)).toBeNull();
+    expect(characterBlobSizeWarning(1, 229_376)).toBeNull();
   });
 
   it('warns one byte past the threshold and above', () => {
-    expect(characterBlobSizeWarning(1, 163_841)).not.toBeNull();
+    expect(characterBlobSizeWarning(1, 229_377)).not.toBeNull();
     expect(characterBlobSizeWarning(1, 1_000_000)).not.toBeNull();
   });
 
   it('names the character and the measured size, so the line is actionable', () => {
-    const warning = characterBlobSizeWarning(4291, 200_000);
+    const warning = characterBlobSizeWarning(4291, 300_000);
     expect(warning).toContain('4291');
-    expect(warning).toContain('200000');
-    expect(warning).toContain('163840-byte');
+    expect(warning).toContain('300000');
+    expect(warning).toContain('229376-byte');
   });
 
   it('leaves a real freshly serialized character far under the threshold', () => {

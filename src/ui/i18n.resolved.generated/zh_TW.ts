@@ -2787,6 +2787,7 @@ export const zh_TW: EnTranslations = {
       "healEcho": "生命值低於 {threshold}% 時恢復 {value} 點生命值",
       "increase": {
         "ap": "攻擊強度提高 {value}",
+        "str": "力量提高 {value}",
         "sp": "法術強度提高 {value}",
         "armor": "護甲提高 {value}",
         "int": "智力提高 {value}",
@@ -2797,6 +2798,7 @@ export const zh_TW: EnTranslations = {
       },
       "reduce": {
         "ap": "攻擊強度降低 {value}",
+        "str": "力量降低 {value}",
         "armor": "護甲降低 {value}",
         "int": "智力降低 {value}",
         "agi": "敏捷降低 {value}",
@@ -3779,6 +3781,7 @@ export const zh_TW: EnTranslations = {
       "leatherworking": "製皮"
     },
     "enchantName": {
+      "enchant_weapon_lastflame_zeal": "末焰熱忱",
       "enchant_weapon_might": "武器蝕刻：威力",
       "enchant_weapon_intellect": "武器蝕刻：法術強度",
       "enchant_offhand_stamina": "副手蝕刻：耐力",
@@ -3826,6 +3829,9 @@ export const zh_TW: EnTranslations = {
       "enchant_chest_lucent_stamina": "胸部蝕刻：瑩光耐力",
       "enchant_feet_lucent_agility": "腳部蝕刻：瑩光敏捷",
       "enchant_lucent_infusion": "瑩光灌注"
+    },
+    "enchantDescription": {
+      "enchant_weapon_lastflame_zeal": "命中的近戰攻擊有機率使你獲得50點力量，持續15秒，並為你恢復200點生命值。治療加成與減益生效。每次命中的觸發機率為攻擊武器基礎速度每0.6秒對應1%。沒有內置冷卻時間。雙手各有獨立增益；同一隻手再次觸發會刷新其增益。遠程攻擊不會觸發此效果。狼形態改用其1秒的基礎揮擊速度。"
     },
     "professions": {
       "title": "專業",
@@ -4059,6 +4065,7 @@ export const zh_TW: EnTranslations = {
       "sellAll": "全部出售（{count}）"
     },
     "enchanting": {
+      "recipeNotLearned": "施加此附魔前，請先學習配方。",
       "disenchantedLine": "你分解了 {item}。",
       "disenchantedYield": "你將 {item} 分解為 {material}。",
       "disenchantedYieldQty": "你將 {item} 分解為 {material} x{qty}。",
@@ -4146,7 +4153,8 @@ export const zh_TW: EnTranslations = {
       "outOfRange": "你必須站在對應的工作臺旁才能訓練。"
     },
     "pattern": {
-      "teaches": "使用：教你製作{item}。"
+      "teaches": "使用：教你製作{item}。",
+      "teachesEnchant": "使用：教你如何施加{enchant}。"
     },
     "unbind": {
       "title": "解綁：{name}",
@@ -4170,12 +4178,35 @@ export const zh_TW: EnTranslations = {
       "perfecting": "處於完美化過程中或已臻至完美的物品會保持綁定。"
     },
     "perfecting": {
+      "swapTitle": "交換完美化等級",
+      "swapIntro": "選擇你擁有的同一套裝中的另一件裝備。脫離戰鬥後，在對應製造台以製造技能{skill}交換等級。不消耗材料，也沒有失敗機率。",
+      "swapChoose": "選擇第二件裝備以預覽交換結果。",
+      "swapRank": "{name}：等級從{before}變為{after}",
+      "swapAction": "檢視等級交換",
+      "swapPending": "正在交換等級",
+      "swapConfirm": "兩件裝備都會永久綁定給你。要交換它們的完美化等級嗎？",
+      "swapConfirmAccept": "綁定並交換等級",
+      "swapPreserve": "不會消耗任何裝備。名稱、傳奇外觀晉升和附魔仍保留在原裝備上。裝備數量限制仍然有效。",
+      "swapEnchantInactive": "僅限完美裝備的附魔將失效，直到此裝備再次達到完美狀態。",
+      "swapEnchantActive": "僅限完美裝備的附魔將重新生效。",
+      "swapSuccess": "已交換完美化等級。兩件裝備都已永久綁定。",
+      "swapInterrupted": "重新連線後，無法確認交換結果。再次選擇交換前，請檢查兩件裝備的完美化等級。",
+      "swapChanged": "所選裝備已發生變化。請重新選擇並檢視新的等級。",
+      "swapDead": "你必須活著才能交換等級。",
+      "swapBusy": "交換等級前，請先脫離戰鬥並完成目前動作。",
+      "swapInvalid": "這些裝備的完美化進度不受支援，無法交換等級。",
+      "swapSameRank": "這些裝備的完美化等級已經相同。",
+      "swapSkill": "此套裝需要對應製造技能達到{skill}。",
+      "swapStation": "請前往對應製造台交換等級。",
+      "swapLocked": "交換等級前，請先解鎖兩件裝備。",
+      "enchantInactive": "附魔未生效：此裝備必須達到完美狀態。附魔仍然保留。",
       "title": "完美化",
       "close": "關閉完美化視窗",
       "openButton": "完美化",
       "openButtonAria": "開啟完美化視窗",
       "empty": "你沒有可完美化的大師鍛造裝備。巔峰配方可以打造一件。",
       "wornChip": "已裝備",
+      "bagCopy": "背包內第{index}件，共{count}件",
       "rowRank": "第{rank}階，共{ranks}階",
       "rowPerfected": "臻至完美",
       "rankAnnounce": "{name}的完美化達到第{rank}階，共{ranks}階。",
@@ -6584,10 +6615,13 @@ export const zh_TW: EnTranslations = {
       "provenanceBody": "精良及以上的成品帶有製作者的名字，傑作會額外提升一個品質層級，而委託製品會綁定給它的收貨人（製作者之約）。",
       "endgameHeading": "大師鍛造終局",
       "endgameBody": "每門手藝的訓練師階梯之上，都坐落著同一座峰頂：大師鍛造家族，也就是裝備與物品頁面所述、帶著金色「裝備唯一：大師鍛造」標籤的製造裝備。無論哪門手藝攀登，這條鏈都是同一個形狀：頂級圖樣靠尋獲而非傳授，按日限定的中間製作為整件事定下節奏，三種共享材料供每架階梯取用。成品像任何其他製造品一樣自由交易（交易規則載於製作經濟頁面），而兩件的穿戴上限讓它們是配裝上的點睛，而非整套行頭，所以從不踏足最深終局的工匠，照樣把貨賣給住在那裡的人。",
+      "endgameBodyRaidCollections": "Masterwrought is the shared family marked Unique-Equipped: Masterwrought. The older apex ladder still uses its found patterns, daily intermediate crafts, and shared endgame materials. The Crucible collections are a separate raid-funded route, not another set of costs added to that ladder. Both families share the same two-piece wearing cap, so they compete for the same two places in your build. Finished pieces trade freely until Perfecting or a commission binds the individual copy.",
       "endgamePatternsBody": "圖樣經由三條渠道而來，而每個手藝頁面的配方表都會標註各行自己的渠道：在最深的終局勝利中尋獲、由英雄軍需官以英雄紋章出售，或兩者兼有。這樣劃分是有意為之。裝備圖樣只能尋獲、從不出售；消耗品圖樣從第一天起就擺在軍需官的櫃檯上；耕作圖樣則兩條路都走。圖樣本身也是尋常的可交易貨物，所以你用不上的發現，正是你可以賣掉的發現。",
+      "endgamePatternsBodyCollections": "The older gear patterns are found rather than sold; the older consumable patterns are sold by the Heroic Quartermaster for Heroic Marks, and farming patterns use both routes. Crucible collection manuals and the Last Flame's Zeal formula instead drop from either Crucible boss on either difficulty. Their shared drop group has a 30% chance per boss, choosing one of twelve equally likely scrolls. The Crucible quartermaster also sells any of these scrolls for one core, a deterministic alternative to a lucky drop. Each collection manual teaches all three of its recipes at skill 100. A partly learned manual fills the missing lessons and consumes only one scroll. Manuals and formulas can be traded.",
       "endgameMaterialsBody": "三種共享材料供養著整條鏈。墜龍核心是可交易的催化劑：最深終局的每一場最終勝利，都會付給記入戰功的角色 1 到 3 枚核心，每個來源每日一次；最高階的裂隙通關按同樣的每日時鐘支付固定數量；而英雄軍需官以 12 枚英雄紋章出售一枚，作為壞運氣的兜底。核心自由交易。斷裂精華是靈魂綁定的，裂斷是它唯一的來源：任何角色不需要任何專業就能裂斷，這段吟唱會把一件團隊副本打下的本層史詩裂斷為恰好一份斷裂精華，史詩本身就是代價。匠人餘燼同樣靈魂綁定，它是這條鏈的時鐘：每個角色每週一枚，在你當週第一次合格的終局通關時發放；錯過的一週絕不會丟失，餘燼會累積起來，在你下一次通關時一併補發。",
       "endgameMaterialsBodyAnyRaid": "三種共享材料供養著整條鏈。墜龍核心是可交易的催化劑：最深終局的每一場最終勝利，都會付給記入戰功的角色 1 到 3 枚核心，每個來源每日一次；最高階的裂隙通關按同樣的每日時鐘支付固定數量；而英雄軍需官以 12 枚英雄紋章出售一枚，作為壞運氣的兜底。核心自由交易。斷裂精華是靈魂綁定的，裂斷是它唯一的來源：任何角色不需要任何專業就能裂斷，這段吟唱會把一件團隊副本打下的史詩裝備，不論出自哪個團隊副本、普通或英雄難度，裂斷為恰好一份斷裂精華，史詩本身就是代價。匠人餘燼同樣靈魂綁定，它是這條鏈的時鐘：每個角色每週一枚，在你當週第一次合格的終局通關時發放；錯過的一週絕不會丟失，餘燼會累積起來，在你下一次通關時一併補發。",
       "perfectingHeading": "臻至完美與橙色晉升",
+      "crucibleCollectionsBody": "Each of the eleven Crucible collections offers chest, waist, and feet pieces in its own native armor and role profile. Any two pieces activate its only set bonus, even before Perfecting; there is no three-piece bonus. Each item starts at item level 35 and costs 3 Cores of the Last Flame plus ordinary high-grade gathering materials, so a pair costs six cores before the optional manual purchase. No Wyrmfall Core, daily intermediate, or Maker's Ember is required for the base craft. At rank four, Perfecting raises the primary-stat budget to item level 38. Perfecting still follows its own weekly Ember progression, independent of obtaining and wearing the base gear.\n\nYou can exchange Perfecting ranks between two copies from the same collection at the appropriate crafting station, with skill 125, while alive, idle, and out of combat. The ranks are swapped, never duplicated, and each slot applies its own Perfected stat bonus. The exchange has no material cost and no cooldown. Both copies bind to you; their individual names, enchants, and maker marks stay with their original items.",
       "perfectingBody": "一件做好的頂級裝備並不是它故事的終點。它的主人只要在做出它的那門手藝上有 125 點技能，就能帶著這件裝備走完臻至完美的四個等級。每次嘗試花費一枚匠人餘燼、一份斷裂精華和一個稜晶琉璃鑲座，五次裡成功四次；失手只損失材料，別無其他，裝備永遠不會受損或倒退。第一次嘗試就會把裝備綁定給臻至它的人，所以打算出售的副本要在動工之前賣掉。臻至完美的裝備在原有基礎上帶有屬性加成，而臻至完美正是瑩光灌注所等待的：附魔頁面上標著「僅限臻至完美」的那一件附魔，非它不落。",
       "promotionBody": "最後一步是橙色晉升，而這正是造物契據的全部用途。帶上一件臻至完美的裝備和一份造物契據（銘文師的 125 技能文書），這份副本就會晉升為一件由你親自命名的傳說裝備。這裡沒有任何擲骰：晉升是確定性的，屬性完全不變，變的只是名字和顏色。契據本身可以交易，所以書寫者與佩戴者不必是同一個人；而家族上限多出的那一行依然生效：角色穿戴的兩件之中，傳說品質的大師鍛造裝備同時至多一件。",
       "stationsHeading": "工位與大師",
@@ -6771,10 +6805,12 @@ export const zh_TW: EnTranslations = {
       "masteryBody": "每{step}點技能為一個層級：配方在你層級或以上給予全額成長，低一層減半，低兩層為四分之一，低三層及以上則毫無成長；本行業的上限為{cap}。",
       "masterworkHeading": "傑作",
       "masterworkBody": "每次成功製作都有{base}%的傑作機率，你每高於配方一層再加{perTier}%，使用任何署名材料加{signed}%，專精後加{spec}%，上限為{cap}%。",
+      "masterworkBodyRaidCollections": "Every successful craft is exactly what the recipe promises, and sometimes a little more: a masterwork finishes the same piece one quality tier finer, with the bonus stats baked in at craft time. It is add-only, never a downgrade. Ordinary crafting follows its existing gear ladder; the raid-funded Crucible collections are a separate alternative at the current raid tier.\n\nThe apex Masterwrought crafts are the one exception, and they pay the same proc a different way. An apex piece already sits at the top of its ladder, so there is no finer tier to finish it in; a masterwork there hands the piece over one rank into Perfecting instead, a free first rank on the four-rank walk the Professions page describes. Nothing is baked into the stats, and the chance and its gates are the ones below.\n\nThe chance is published, not mystical: {base}% base, plus {perTier}% per tier your skill sits above the recipe, plus {signed}% when any signed reagent goes in, plus {spec}% once you are specialized, with higher-tier materials adding 1 to 2% more, all capped at {cap}%. Only a piece with real stats can improve, so statless commons, tools, and consumables never proc; a dormant craft never produces one, and a hobby craft cannot masterwork past its rare ceiling.\n\nFine work carries its maker. Rare and better outputs are signed, every copy (Crafted by; gathered materials carry Gathered by), a masterwork is always signed whatever its quality. A signature is provenance, not a lock: signed goods trade, mail, and list on the World Market freely.",
       "trainingHeading": "訓練",
       "trainingBody": "訓練師配方來自各地的常駐大師，在他們的工位上傳授。規則只有一句：當你在該行業的檔位達到配方自身的檔位時，大師便會傳授，除此之外沒有任何門檻，不看你的等級，也不看你的命途。裝備與消耗品的梯子把檔位擺在技能0、25與50，而每一門行業都在它們之上再加一個75檔的中階配方，在自己的工位傳授（附魔的那一個是瑩光試劑，與它那兩張位於25檔的符物配方並列）；工程學的兩堂魚竿課則在75與125延續它的梯子，因此隨著你的檔位攀升，總會有新的一檔開啟。\n\n費用是一次性的，並按檔位固定：起始檔免費，技能25檔每個配方{tier1}，技能50檔{tier2}，而它們之上的75檔與125檔各有自己的費用，都列在表中每個配方的旁邊。訓練時你必須站在大師本人的工位前，移動工位一概不算。通用的野外配方與六種製作的陸地工具配方則完全不需要訓練；每個角色從一開始就會。",
       "specializationHeading": "專精",
       "specializationBody": "技能達到{at}即在本行業專精，配方材料消耗減少{pct}%。",
+      "specializationBodyUndiscounted": "At skill {at} this craft specializes you, no quest needed: discountable recipe materials cost {pct}% less from then on, and specialization adds its own bump to the masterwork chance. Raid-core costs are never discounted.\n\nSpecialists also learn to take the workshop with them: a specialized crafter can set up a mobile station in the field for ten minutes at a time, so station-bound recipes can be worked at the mine mouth instead of back in town. Its limits are deliberate: it never counts for training with a master or for unbinding a commissioned piece, and it expires on its timer whether or not you used it.",
       "ench": {
         "disenchantHeading": "分解",
         "disenchantNote": "分解任何普通品質及以上的武器或護甲，每次只消耗一件，優先消耗未附魔的；當只剩下已附魔的裝備時，會連同附魔一併分解其中一件。普通與優秀品質的裝備研磨後隨機產出若干鈴音之塵，稀有度越高、等級越高則產量越豐；精良品起，產出形態改變：精良件出一個鈴音精華，史詩或傳說件出一個鈴音碎片，另附一個與原件材質掛鉤的定向副產物。",
@@ -6801,7 +6837,9 @@ export const zh_TW: EnTranslations = {
         "bonusFmt": "+{value}{stat}",
         "enchantsNoteOffhand": "附魔分四個層級。基礎層以鈴音之塵（高端配方加少量鈴音精華）驅動，涵蓋武器槽、副手與全部護甲槽，屬性軸選項豐富，每種配裝都能為每個槽位找到合適的附魔：盾牌與法系手持副手另有專屬的耐力附魔，因此沒有任何已裝備的槽位是附魔死角。強效層消耗一個鈴音碎片加鈴音精華：為高價值槽位提供更強的加成。鈴音碎片另外還有三個去處：兩種符物配方各需五個，工具效果補充的最高一階，以及瑩光層級（其中武器與胸部附魔各需一個，瑩光灌注需兩個），所以動用之前先存幾個起來。\n\n兩層之間另有五種符文附魔，每種消耗一個定向副產物，確保研磨所得無一浪費：符文鋒刃（武器，力量，消耗共鳴鋼材）、符文印記（武器，智力，共鳴木材）、符文織紋（胸部，精神，共鳴絲線）、符文獸皮（腿部，敏捷，共鳴獸皮）、符文鎖環（頭部，耐力，共鳴鎖環）。每種符文附魔還需要兩個鈴音精華；若某槽位同時有基礎與強效附魔，符文加成落在兩者之間，但符文織紋是胸部最強的精神附魔，符文獸皮則是腿部唯一的敏捷附魔。確切加成數值見下表。\n\n凌駕於三者之上的是瑩光層級，本行當的巔峰之作，也是唯一對技能本身提出要求的附魔：其中四件需要附魔100，瑩光灌注需要125，數值見下方的技能欄。每一件都需要一份瑩光試劑，並在武器（威力與法術強度兩種選擇）、胸部與腳部各自的階梯上再邁出一級。其中最後一件瑩光灌注，只會在臻至完美的物品上生效，而目前還沒有任何物品能臻至完美：它是搶在它所等待的臻至完美工程之前就先寫就的。",
         "enchantsNoteInfusionLive": "附魔分四個層級。基礎層以鈴音之塵（高端配方加少量鈴音精華）驅動，涵蓋武器槽、副手與全部護甲槽，屬性軸選項豐富，每種配裝都能為每個槽位找到合適的附魔：盾牌與法系手持副手另有專屬的耐力附魔，因此沒有任何已裝備的槽位是附魔死角。強效層消耗一個鈴音碎片加鈴音精華：為高價值槽位提供更強的加成。鈴音碎片另外還有三個去處：兩種符物配方各需五個，工具效果補充的最高一階，以及瑩光層級（其中武器與胸部附魔各需一個，瑩光灌注需兩個），所以動用之前先存幾個起來。\n\n兩層之間另有五種符文附魔，每種消耗一個定向副產物，確保研磨所得無一浪費：符文鋒刃（武器，力量，消耗共鳴鋼材）、符文印記（武器，智力，共鳴木材）、符文織紋（胸部，精神，共鳴絲線）、符文獸皮（腿部，敏捷，共鳴獸皮）、符文鎖環（頭部，耐力，共鳴鎖環）。每種符文附魔還需要兩個鈴音精華；若某槽位同時有基礎與強效附魔，符文加成落在兩者之間，但符文織紋是胸部最強的精神附魔，符文獸皮則是腿部唯一的敏捷附魔。確切加成數值見下表。\n\n凌駕於三者之上的是瑩光層級，本行當的巔峰之作，也是唯一對技能本身提出要求的附魔：其中四件需要附魔100，瑩光灌注需要125，數值見下方的技能欄。每一件都需要一份瑩光試劑，並在武器（威力與法術強度兩種選擇）、胸部與腳部各自的階梯上再邁出一級。其中最後一件瑩光灌注，只會在臻至完美的物品上生效：臻至完美是佩戴者自己的工作，而非附魔師的，物品如何走到那一步由專業頁面講述。",
+        "enchantsNoteRaidFormula": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove the ordinary lower tiers sits the Lucent tier, the capstone ordinary work of the craft: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected: Perfecting is the wearer's own work, not the enchanter's, and the Professions page tells how a piece earns it.\n\nLast Flame's Zeal is a separate raid formula, not a free ordinary enchant. Learn its tradable formula at Enchanting 100 before applying it. Each application uses 3 Cores of the Last Flame and 2 Chime Shards; the formula can drop in the Crucible or be bought from its quartermaster for one core. Its melee proc and weapon-speed rules are shown in full below.",
         "charmsHeading": "給採集者工具的符物",
+        "formulaRequired": "Formula required",
         "charmsBody": "附魔也是採集者的符物的來源。你的附魔技能達到 25 之後，Tinker Gizzel 會在 Eastbrook 工坊把兩者都教給你：採集者儲囊，讓一次採收多出一個單位；以及匠人之眼，提升採上來之物的品級。兩者各製作一次，然後插進鎬、斧或鐮刀裡，在那裡它只有在確實改善了採收時才會消耗一次充能。\n\n補充充能才是這門手藝持續賺錢的地方。充能由工具的持有者恢復，而不是由來訪的附魔師恢復；當那位持有者就是簽下符物的附魔師時，補充只需一半的材料，有附魔專精則更少。所以隔著櫃台賣出的符物只是一筆買賣，而插在你自己工具上的符物，才是最便宜的長期用品。完整的充能與材料階梯，可在任何一門採集專業的頁面上、「工具效果」一節查看。"
       },
       "gatherIntro": {
@@ -6911,6 +6949,7 @@ export const zh_TW: EnTranslations = {
         "commissionsBody": "自願選擇的委託製作會附上製作者之約：成品會綁定給交易中收到它的人，而任意工位大師都可按層級費用為其解綁。",
         "provenanceHeading": "署名作品",
         "provenanceBody": "精良及以上的成品與發現都帶有製作者的署名，而署名完全相同的物品仍可堆疊。",
+        "provenanceBodyUndiscounted": "Some items carry a name. Hover one and the tooltip says Gathered by so-and-so on a raw material, or Crafted by so-and-so on a finished piece: the same mark, worded for how the item came to be. A signature is part of the item itself, travels with it through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fades.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. The one thing that can cost you a signature is a full bag: a signed unit needs room of its own, or a matching signed stack, to land in.\n\nA stack of items shares one identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. A signed log never joins a plain pile in either direction (merging would erase somebody's name), but identical payloads merge happily, so twenty ore signed by the same gatherer sit in one stack and a windfall does not shred your bags.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one), unless that reagent is marked undiscountable; raid cores always keep their full cost. Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
         "collectorsHeading": "收藏家、戰利品與故事的價格",
         "collectorsBody": "商人看不見出處：署名物品賣給NPC只值普通價，簽名的溢價只存在於玩家之間。名家署名的橫財礦石、一塊Prime Cut、一柄署著已退隱工匠之名的傑作之刃，價格全憑記憶開價。功業之書裡的Pristine Vein、Ancient Heartwood、Moonlit Bloom、A Perfect Specimen與Glimmer of Hope都是零聲望的收藏印記，只為證明那一刻發生在你身上。出處不買屬性也不贏戰鬥，它是這遊戲裡美好日子的存根。",
         "castPaceHeading": "讀條時間與金幣消耗",
@@ -6924,7 +6963,9 @@ export const zh_TW: EnTranslations = {
         "castPaceRecharge": "工具效果充能：施放 {seconds} 秒",
         "castPaceBatch": "批量製作：單次最多 {count} 件，逐件施放",
         "doctrineHeading": "玩家與玩家交易",
+        "introRaidCollections": "How coin moves through the trades: the exact fees and sinks, what actually sells, World Market rules, work orders, commissions, and the place of raid-funded collections alongside ordinary crafting.",
         "doctrineBody": "製作裝備的強度始終低於團隊副本的底線，而上述費用會把貨物推向玩家之間的交易，而非商店循環。",
+        "doctrineBodyRaidCollections": "The crafting economy is built on one idea: players supply players. Gatherers feed crafters, crafters feed questers and raiders, and breakers feed enchanters, with vendors and station masters standing at the edges to absorb junk and coin rather than to compete with you. If you want to make money from a profession, your customer is a person: learn what other players burn through, price against the World Market, and treat the NPC systems as a floor under your prices, not as the market itself.\n\nOrdinary crafted equipment supports the climb into endgame. The Crucible's raid-funded collections also offer an alternative to current raid drops: their materials come from raiding, while crafting turns those materials into a chosen armor and role profile. Their three slot choices and any-two bonus allow different combinations with raid gear. They still share the global two-piece Masterwrought cap, so crafting complements the rest of the raid kit without supplying an entire replacement set.",
         "orderBoardHeading": "委託板",
         "orderBoardBody": "你不必在聊天頻道裡找製作者。打開你的製作視窗，委託板就在它的標題列上、一鍵之遙。任何人都能在上頭張貼訂單：指名你想要做的配方，然後或是敞開來讓任何製作者接手，或是指定給某一位製作者，那麼便只有那個人能夠接下它。瀏覽委託板的製作者接下一則訂單，而接單即代表承諾，因此一件工作在同一時間只會由一個人進行。\n\n你張貼時不會扣留任何東西：訂單不會預留任何錢幣、也不會預留任何材料，所以價格與由誰提供材料，是你們兩人之間談定的事，就像任何委託一向那樣談。訂單還開著時你可以自行取消，而沒有人接的訂單會在一天後自動失效。一旦有製作者接下，交件才是結案的方式。\n\n交件是面對面進行的。製作者以委託的形式做出成品，來到你面前交給你，所以請留一格背包空間收下它。送到的東西遵循下方一般的委託規則，會透過製作者之約綁定給你。",
         "commissionsBoardNote": "委託有兩種起頭的方式：你在上方的委託板張貼一則訂單，把工作送到製作者面前；或是某位製作者純粹決定為你做一件成品。兩者最後都歸於同一份製作者之約。"
@@ -14731,6 +14772,141 @@ export const zh_TW: EnTranslations = {
       "deed_of_making": {
         "name": "造物契據"
       },
+      "crucible_str_mail_chest": {
+        "name": "熔爐強襲者鎖甲"
+      },
+      "crucible_str_mail_waist": {
+        "name": "熔爐強襲者鎖甲腰帶"
+      },
+      "crucible_str_mail_feet": {
+        "name": "熔爐強襲者鎖甲戰靴"
+      },
+      "crucible_tank_mail_chest": {
+        "name": "熔爐守護者鎖甲"
+      },
+      "crucible_tank_mail_waist": {
+        "name": "熔爐守護者鎖甲腰帶"
+      },
+      "crucible_tank_mail_feet": {
+        "name": "熔爐守護者鎖甲戰靴"
+      },
+      "crucible_caster_mail_chest": {
+        "name": "熔爐施法者鎖甲"
+      },
+      "crucible_caster_mail_waist": {
+        "name": "熔爐施法者鎖甲腰帶"
+      },
+      "crucible_caster_mail_feet": {
+        "name": "熔爐施法者鎖甲戰靴"
+      },
+      "crucible_healer_mail_chest": {
+        "name": "熔爐治療者鎖甲"
+      },
+      "crucible_healer_mail_waist": {
+        "name": "熔爐治療者鎖甲腰帶"
+      },
+      "crucible_healer_mail_feet": {
+        "name": "熔爐治療者鎖甲戰靴"
+      },
+      "crucible_agi_leather_chest": {
+        "name": "熔爐游擊者皮衣"
+      },
+      "crucible_agi_leather_waist": {
+        "name": "熔爐游擊者皮帶"
+      },
+      "crucible_agi_leather_feet": {
+        "name": "熔爐游擊者皮靴"
+      },
+      "crucible_str_leather_chest": {
+        "name": "熔爐潛行者皮衣"
+      },
+      "crucible_str_leather_waist": {
+        "name": "熔爐潛行者皮帶"
+      },
+      "crucible_str_leather_feet": {
+        "name": "熔爐潛行者皮靴"
+      },
+      "crucible_tank_leather_chest": {
+        "name": "熔爐守護者皮衣"
+      },
+      "crucible_tank_leather_waist": {
+        "name": "熔爐守護者皮帶"
+      },
+      "crucible_tank_leather_feet": {
+        "name": "熔爐守護者皮靴"
+      },
+      "crucible_caster_leather_chest": {
+        "name": "熔爐施法者皮衣"
+      },
+      "crucible_caster_leather_waist": {
+        "name": "熔爐施法者皮帶"
+      },
+      "crucible_caster_leather_feet": {
+        "name": "熔爐施法者皮靴"
+      },
+      "crucible_healer_leather_chest": {
+        "name": "熔爐治療者皮衣"
+      },
+      "crucible_healer_leather_waist": {
+        "name": "熔爐治療者皮帶"
+      },
+      "crucible_healer_leather_feet": {
+        "name": "熔爐治療者皮靴"
+      },
+      "crucible_caster_cloth_chest": {
+        "name": "熔爐施法者長袍"
+      },
+      "crucible_caster_cloth_waist": {
+        "name": "熔爐施法者腰帶"
+      },
+      "crucible_caster_cloth_feet": {
+        "name": "熔爐施法者便鞋"
+      },
+      "crucible_healer_cloth_chest": {
+        "name": "熔爐治療者長袍"
+      },
+      "crucible_healer_cloth_waist": {
+        "name": "熔爐治療者腰帶"
+      },
+      "crucible_healer_cloth_feet": {
+        "name": "熔爐治療者便鞋"
+      },
+      "pattern_crucible_str_mail": {
+        "name": "圖樣：熔爐強襲者鎖甲套裝"
+      },
+      "pattern_crucible_tank_mail": {
+        "name": "圖樣：熔爐守護者鎖甲套裝"
+      },
+      "pattern_crucible_caster_mail": {
+        "name": "圖樣：熔爐施法者鎖甲套裝"
+      },
+      "pattern_crucible_healer_mail": {
+        "name": "圖樣：熔爐治療者鎖甲套裝"
+      },
+      "pattern_crucible_agi_leather": {
+        "name": "圖樣：熔爐游擊者皮甲套裝"
+      },
+      "pattern_crucible_str_leather": {
+        "name": "圖樣：熔爐潛行者皮甲套裝"
+      },
+      "pattern_crucible_tank_leather": {
+        "name": "圖樣：熔爐守護者皮甲套裝"
+      },
+      "pattern_crucible_caster_leather": {
+        "name": "圖樣：熔爐施法者皮甲套裝"
+      },
+      "pattern_crucible_healer_leather": {
+        "name": "圖樣：熔爐治療者皮甲套裝"
+      },
+      "pattern_crucible_caster_cloth": {
+        "name": "圖樣：熔爐施法者布甲套裝"
+      },
+      "pattern_crucible_healer_cloth": {
+        "name": "圖樣：熔爐治療者布甲套裝"
+      },
+      "formula_lastflame_zeal": {
+        "name": "配方：末焰熱忱"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },
@@ -19844,6 +20020,50 @@ export const zh_TW: EnTranslations = {
         "bonus2": "力量提高 10 點，耐力提高 10 點。",
         "bonus4": "攻擊強度提高 25 點。你的武器致命一擊有 50% 的機率觸發「墓塚之力」，使攻擊強度提高 40 點，持續 10 秒。",
         "bonus6": "攻擊與施法速度提高 4%，命中提高 3%。你的武器致命一擊會使目標產生「骨刺」，每 2 秒流血 5 點傷害，持續 12 秒。最多疊加 3 層。"
+      },
+      "crucible_agi_leather": {
+        "name": "熔爐游擊者皮甲套裝",
+        "bonus2": "你和寵物的直接物理傷害會積攢一層充能，每秒最多一層。達到6層時，你和寵物造成的所有傷害提高8%，持續6秒。連續8秒未造成符合條件的傷害時，充能消失。傷害增益期間無法積攢充能。脫離戰鬥或不再穿戴本套裝中的兩件裝備時，充能和傷害增益消失。"
+      },
+      "crucible_caster_cloth": {
+        "name": "熔爐施法者布甲套裝",
+        "bonus2": "你和寵物的魔法傷害會積攢一層充能，每秒最多一層，包括持續傷害。達到6層時，你和寵物造成的所有傷害提高8%，持續6秒。連續8秒未造成符合條件的傷害時，充能消失。傷害增益期間無法積攢充能。脫離戰鬥或不再穿戴本套裝中的兩件裝備時，充能和傷害增益消失。"
+      },
+      "crucible_caster_leather": {
+        "name": "熔爐施法者皮甲套裝",
+        "bonus2": "你和寵物的魔法傷害會積攢一層充能，每秒最多一層，包括持續傷害。達到6層時，你和寵物造成的所有傷害提高8%，持續6秒。連續8秒未造成符合條件的傷害時，充能消失。傷害增益期間無法積攢充能。脫離戰鬥或不再穿戴本套裝中的兩件裝備時，充能和傷害增益消失。"
+      },
+      "crucible_caster_mail": {
+        "name": "熔爐施法者鎖甲套裝",
+        "bonus2": "你和寵物的魔法傷害會積攢一層充能，每秒最多一層，包括持續傷害。達到6層時，你和寵物造成的所有傷害提高8%，持續6秒。連續8秒未造成符合條件的傷害時，充能消失。傷害增益期間無法積攢充能。脫離戰鬥或不再穿戴本套裝中的兩件裝備時，充能和傷害增益消失。"
+      },
+      "crucible_healer_cloth": {
+        "name": "熔爐治療者布甲套裝",
+        "bonus2": "治療處於戰鬥中的友方時，你的過量治療的20%會轉化為該友方身上持續6秒的護盾。包括持續治療和由傷害轉化的治療。戰鬥中治療自己也可生效。所有穿戴者提供的此類護盾總量不超過受保護者最大生命值的5%。後續過量治療會補充護盾，但不會延長持續時間。此護盾不會觸發其他治療效果。當受護盾保護的友方脫離戰鬥、你死亡或你不再穿戴本套裝中的兩件裝備時，你提供的護盾消失。"
+      },
+      "crucible_healer_leather": {
+        "name": "熔爐治療者皮甲套裝",
+        "bonus2": "治療處於戰鬥中的友方時，你的過量治療的20%會轉化為該友方身上持續6秒的護盾。包括持續治療和由傷害轉化的治療。戰鬥中治療自己也可生效。所有穿戴者提供的此類護盾總量不超過受保護者最大生命值的5%。後續過量治療會補充護盾，但不會延長持續時間。此護盾不會觸發其他治療效果。當受護盾保護的友方脫離戰鬥、你死亡或你不再穿戴本套裝中的兩件裝備時，你提供的護盾消失。"
+      },
+      "crucible_healer_mail": {
+        "name": "熔爐治療者鎖甲套裝",
+        "bonus2": "治療處於戰鬥中的友方時，你的過量治療的20%會轉化為該友方身上持續6秒的護盾。包括持續治療和由傷害轉化的治療。戰鬥中治療自己也可生效。所有穿戴者提供的此類護盾總量不超過受保護者最大生命值的5%。後續過量治療會補充護盾，但不會延長持續時間。此護盾不會觸發其他治療效果。當受護盾保護的友方脫離戰鬥、你死亡或你不再穿戴本套裝中的兩件裝備時，你提供的護盾消失。"
+      },
+      "crucible_str_leather": {
+        "name": "熔爐潛行者皮甲套裝",
+        "bonus2": "你和寵物的直接物理傷害會積攢一層充能，每秒最多一層。達到6層時，你和寵物造成的所有傷害提高8%，持續6秒。連續8秒未造成符合條件的傷害時，充能消失。傷害增益期間無法積攢充能。脫離戰鬥或不再穿戴本套裝中的兩件裝備時，充能和傷害增益消失。"
+      },
+      "crucible_str_mail": {
+        "name": "熔爐強襲者鎖甲套裝",
+        "bonus2": "你和寵物的直接物理傷害會積攢一層充能，每秒最多一層。達到6層時，你和寵物造成的所有傷害提高8%，持續6秒。連續8秒未造成符合條件的傷害時，充能消失。傷害增益期間無法積攢充能。脫離戰鬥或不再穿戴本套裝中的兩件裝備時，充能和傷害增益消失。"
+      },
+      "crucible_tank_leather": {
+        "name": "熔爐守護者皮甲套裝",
+        "bonus2": "受到敵人傷害後，開始一個10秒的統計時段。該時段內損失的生命值達到最大生命值的40%時，獲得可吸收相當於最大生命值8%的傷害的護盾，持續6秒。每20秒最多觸發一次。被吸收的傷害和自身造成的傷害不計入統計。脫離戰鬥或不再穿戴本套裝中的兩件裝備時，已累計的傷害和護盾消失，但冷卻時間不會重置。"
+      },
+      "crucible_tank_mail": {
+        "name": "熔爐守護者鎖甲套裝",
+        "bonus2": "受到敵人傷害後，開始一個10秒的統計時段。該時段內損失的生命值達到最大生命值的40%時，獲得可吸收相當於最大生命值8%的傷害的護盾，持續6秒。每20秒最多觸發一次。被吸收的傷害和自身造成的傷害不計入統計。脫離戰鬥或不再穿戴本套裝中的兩件裝備時，已累計的傷害和護盾消失，但冷卻時間不會重置。"
       },
       "dawnforged": {
         "name": "曉鑄聖裝",

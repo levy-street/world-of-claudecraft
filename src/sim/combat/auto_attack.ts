@@ -704,6 +704,13 @@ export function meleeSwing(
   // dual-wield bug). Ability strikes (autoAttackHand undefined) use the mainhand.
   const procWeaponId =
     opts.autoAttackHand === 'offhand' ? attacker.offhandItemId : attacker.mainhandItemId;
-  runWeaponProcs(ctx, attacker, target, 'weaponHit', procWeaponId);
+  runWeaponProcs(
+    ctx,
+    attacker,
+    target,
+    'weaponHit',
+    procWeaponId,
+    opts.autoAttackHand === 'offhand' ? 'offhand' : 'mainhand',
+  );
   return true;
 }

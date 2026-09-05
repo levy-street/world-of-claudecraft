@@ -39,6 +39,29 @@ const table = (over: Partial<PatternChannelTables> = {}): PatternChannelTables =
 const recipe = (resultItemId: string, acquisition?: string[]) => ({ resultItemId, acquisition });
 
 describe('wiki pattern channel derivation', () => {
+  it('follows a collection manual teaching all three recipes through both channels', () => {
+    const sets = patternChannelSets(
+      table({
+        items: {
+          manual: {
+            kind: 'recipe',
+            teachesRecipeId: 'chest_recipe',
+            teachesRecipeIds: ['chest_recipe', 'waist_recipe', 'feet_recipe'],
+          },
+        },
+        mobs: { boss: { loot: [{ itemId: 'manual' }] } },
+        heroicVendorStock: [{ itemId: 'manual' }],
+      }),
+    );
+    for (const slot of ['chest', 'waist', 'feet']) {
+      expect(
+        recipeAcquisitionChannel(
+          { id: `${slot}_recipe`, resultItemId: slot, acquisition: ['drop'] },
+          sets,
+        ),
+      ).toBe('dropAndVendor');
+    }
+  });
   it('spells the teaching-pattern id convention exactly once', () => {
     expect(patternItemIdFor('harvest_feast')).toBe('pattern_harvest_feast');
   });

@@ -1,9 +1,10 @@
 // The wiki's pattern-CHANNEL classification, in one place.
 //
 // A profession recipe whose sim-side acquisition is ['drop'] can actually be
-// taught by up to two live channels at once: a teaching pattern item
-// (pattern_<resultItemId>) sitting in a drop table, and the same pattern
-// sitting in the Heroic Quartermaster's marks stock. The wiki row must name
+// taught by up to two live channels at once: a teaching pattern or collection
+// manual in a drop table, and the same item at a quartermaster's counter.
+// Teaching metadata supports multi-recipe manuals; output-based ids remain
+// the fallback for callers without item definitions. The wiki row must name
 // the channels that really exist, so the classification is DERIVED from the
 // tables themselves rather than from a hand-kept list: a channel added
 // anywhere reaches the wiki, and its pins, by existing.
@@ -32,12 +33,12 @@ export function patternItemIdFor(resultItemId) {
 }
 
 /** Every pattern id a LIVE drop table carries, plus every pattern id the
- *  Heroic Quartermaster stocks, derived from the tables themselves.
+ *  supplied quartermaster stocks carry, derived from the tables themselves.
  *
  *  `mobs` is the overworld/raid bestiary (each def's optional `loot` rows carry
  *  the raid channel), `heroicBossLoot` the heroic-only five-man tables,
  *  `riftPatternItemIds` and `farmRiftDropItemIds` the two rift pick lists, and
- *  `heroicVendorStock` the marks counter's offers. A pattern nobody drops is
+ *  `heroicVendorStock` the combined quartermaster offers. A pattern nobody drops is
  *  vendor-only and says so; a pattern nobody sells is drop-only and says so. */
 export function patternChannelSets({
   mobs,
@@ -45,6 +46,7 @@ export function patternChannelSets({
   riftPatternItemIds,
   farmRiftDropItemIds,
   heroicVendorStock,
+  items = {},
 }) {
   const dropped = new Set([
     ...Object.values(mobs).flatMap((m) =>
@@ -57,7 +59,21 @@ export function patternChannelSets({
     ...farmRiftDropItemIds,
   ]);
   const vendor = new Set(heroicVendorStock.map((o) => o.itemId));
-  return { dropped, vendor };
+  // Manuals can teach several recipes and need not share an output's id.
+  const patternsByRecipe = new Map();
+  for (const [itemId, item] of Object.entries(items)) {
+    if (item.kind !== 'recipe' || !item.teachesRecipeId || item.teachesEnchantId) continue;
+    for (const recipeId of item.teachesRecipeIds ?? [item.teachesRecipeId]) {
+      const patterns = patternsByRecipe.get(recipeId) ?? new Set();
+      patterns.add(itemId);
+      patternsByRecipe.set(recipeId, patterns);
+    }
+  }
+  return { dropped, vendor, patternsByRecipe };
+}
+
+function patternIdsForRecipe(recipe, sets) {
+  return sets.patternsByRecipe?.get(recipe.id) ?? [patternItemIdFor(recipe.resultItemId)];
 }
 
 /** True when `recipe` is drop-acquisition AND a live drop table carries its
@@ -65,16 +81,16 @@ export function patternChannelSets({
 export function dropTaughtRecipe(recipe, sets) {
   return (
     Boolean(recipe.acquisition?.includes('drop')) &&
-    sets.dropped.has(patternItemIdFor(recipe.resultItemId))
+    [...patternIdsForRecipe(recipe, sets)].some((id) => sets.dropped.has(id))
   );
 }
 
-/** True when `recipe` is drop-acquisition AND the Heroic Quartermaster stocks
+/** True when `recipe` is drop-acquisition AND a supplied quartermaster stocks
  *  its teaching pattern. */
 export function vendorTaughtRecipe(recipe, sets) {
   return (
     Boolean(recipe.acquisition?.includes('drop')) &&
-    sets.vendor.has(patternItemIdFor(recipe.resultItemId))
+    [...patternIdsForRecipe(recipe, sets)].some((id) => sets.vendor.has(id))
   );
 }
 

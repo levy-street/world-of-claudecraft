@@ -17,78 +17,36 @@
 // never rejects, never truncates, and never short-circuits. It measures, and if
 // the number is surprising it says so, and the write proceeds regardless.
 //
-// THE THRESHOLD, and where it comes from. Measured on the v0.36.0 tree with the
-// real Sim.serializeCharacter path:
-//   - a freshly created level-1 character serializes to about 1.8 KB;
-//   - a deliberately maximal character (max level, every one of the 202 quests
-//     completed, every recipe known, every authored gather node on cooldown,
-//     every farm bed planted, all gathering and craft skills capped, and 140
-//     inventory / bank / buyback slots each carrying an instance payload with a
-//     24-character signer) serializes to about 38.9 KB.
-// The professions-owned portion alone is the largest content-scaled block
-// inside that 38.9 KB, independently pinned by
-// tests/professions_blob_growth.test.ts. That pin was PARKED at the 11b absorb
-// on the pre-merge masterwrought literal, whose fixture plants no farm bed;
-// Phase 11d restored the farming branch's every-bed worst-case fixture and
-// re-derived the merged bound, which is what this sentence now records:
-//   professions block, merged tree: 16,727 bytes measured, two-sided tracking
-//   band 16,544..16,864, ceiling 17,408.
-// Phase 11e re-measured that block from 16,704 to 16,727: the whole +23 is
-// evergarden_pumpkin being one character wider than the previous widest crop id
-// across all 23 farm rows. The band and the ceiling did not move.
-// The 16,704 it re-measured FROM includes the two production-shape corrections
-// the 11d review round
-// applied (the fourth tool-effect slot, farming having become slottable, and a
-// fixed production-width epoch anchor across the measure arm's three sims).
+// THE THRESHOLD, and where it comes from. The Crucible integration database
+// review re-measured the real Sim.serializeCharacter UTF-8 JSON on 2026-09-05:
+//   - professions subset: 18,807 bytes, with a 20-KiB structural ceiling;
+//   - storage-rich whole character: 209,261 bytes, stable across two further
+//     real load/serialize passes, with a narrow 208,881..209,262 tracking band.
+// tests/professions_blob_growth.test.ts is the live authority. Its fixture uses
+// legal equipped caps, 80 carried slots, 176 bank slots and 12 unbound buyback
+// rows. Stored Perfected/promoted copies carry their real bonus and permanent
+// binding provenance; the 204 retained recipe/formula ids remain below 512.
+// The fixture's documented exclusions still apply: this is a storage-rich
+// modeled character, not proof of the largest possible state across all systems.
+// These are serialized bytes, not measured PostgreSQL storage, WAL or latency.
 //
-// Both figures above are dated. The professions block was re-measured through
-// the phases that followed and now measures 17,596 bytes, tracking band
-// 17,216..17,597, ceiling 18,432; tests/professions_blob_growth.test.ts is the
-// live authority for that number and its ledger records every move, so read it
-// there rather than trusting this sentence to stay current.
+// The old 151,656-byte measurement omitted legitimate stored progress and
+// promotion. Its unchanged fixture on the current catalog measured 156,144;
+// correcting payloads and identities added 53,117 bytes. Exact per-field and
+// metadata-only attribution lives in the test and in
+// docs/design/crucible-professions-integration.md. The former 163,840-byte warn
+// threshold sat 45,421 bytes BELOW the corrected fixture, so it would warn on
+// every save of this modeled character despite no unexpected field growth.
 //
-// THE 38.9 KB WHOLE-CHARACTER FIGURE IS SUPERSEDED, and the relation it implied
-// is INVERTED rather than merely stale. It was never re-measured after v0.36.0;
-// the "roughly 41.4 KB" that followed it was an arithmetic carry and said so.
-// Masterwrought Phase 18 measured a maximal character through the real
-// Sim.serializeCharacter path, settled to a fixed point across two further real
-// loads with every container at its LEGAL ceiling:
-//   maximal character, merged tree: 151,656 bytes after the v0.42.0 mount syncs
-//   (pinned with its band and its full derivation in
-//   tests/professions_blob_growth.test.ts, the whole-character arm).
-// That is 3.66x the 41.4 KB carry. The old fixture is why: it armed level,
-// quests, recipes, nodes, beds, skills and 140 instanced container slots and
-// nothing else, so it predates the Book of Deeds (deedStats alone now measures
-// 30,217 in the live fixture, the largest single term), the Reliquary, the
-// Materials Vault, the raid lockouts, the loadout list and the bank purchase
-// ladder, and it counted 140 instanced slots where the legal ceiling is now 268
-// (80 carried, 176 bank, 12 buyback).
-//
-// So the OLD 131,072 was NOT "about 3.2x the legitimate worst case": it sat
-// BELOW that worst case, at about 0.87x, so a character who really reached every
-// legal ceiling crossed this threshold on every autosave. That false relation is
-// what row D122 was opened to fix.
-//
-// RE-MINTED to 163,840 (160 KiB) by qr-19-character-blob-warn-threshold (Phase
-// 19, under qr-19-best-for-project). The value is DERIVED, not guessed: it is the
-// smallest 32-KiB-aligned step strictly above the measured legal worst case
-// (151,656 bytes, the post-release-sync figure the professions_blob_growth
-// whole-character arm freezes), and it keeps a full 32-KiB step below the 262,144
-// (256 KiB) guild-bank scale named below. A maxed character therefore no longer
-// trips the line on every save, while a character past 160 KiB is still worth a
-// look. This is a WARN threshold that never blocks a write, so the maintainer may
-// retune the digits; the REAL fleet-creep watch is the p99 windowed gauge and the
-// high-water mark below, and this line is now the coarse over-cap tripwire that
-// gauge stands behind. Re-minting reds the professions_blob_growth whole-character
-// arm BY DESIGN (that arm pins the measured relation between the two numbers), so
-// the threshold and its measurement were re-read together in this same change.
-//
-// The guild-bank relationship is preserved: 163,840 is 160 KiB, one 32-KiB step
-// below the 262,144-byte (256 KiB) guild-bank scale, the largest single row this
-// codebase considers plausible at all. A character past this number may be a
-// field that grew per-player without a bound, which is the defect this signal
-// exists to catch early; it may also be a character who simply owns a great deal.
-export const CHARACTER_BLOB_WARN_BYTES = 163_840;
+// RE-MINTED to 229,376 (224 KiB) after database review: the smallest 32-KiB step
+// above 209,261, leaving 20,115 bytes of headroom and one 32-KiB step below the
+// 262,144-byte (256 KiB) guild-bank scale. This is still only a coarse warning,
+// never a save limit. The p99 window and high-water mark below remain the
+// fleet-growth watch even below this threshold. The independent literal and
+// boundary tests plus the whole-character relation require a reviewed
+// re-measurement if the threshold changes or content outgrows it. A crossing
+// may be an unbounded field, or simply a character who owns a great deal.
+export const CHARACTER_BLOB_WARN_BYTES = 229_376;
 
 // The decision, kept pure so it is unit-testable without a database: returns the
 // dev-channel log line for an oversized blob, or null when the size is
@@ -167,15 +125,12 @@ export function createCharacterBlobSizeReporter(): CharacterBlobSizeReporter {
 // prints one line a minute, not three).
 export const reportCharacterBlobSize = createCharacterBlobSizeReporter();
 
-// The scrape-visible twin of the warn line (the Phase 17 database review): the
-// warn threshold sits about 3.2x above the modelled worst case, so the whole
-// band where real growth lives (10 to 50 KB) emits nothing at all in logs. The
-// high-water mark makes the measurement the chokepoint already pays visible to
-// a scrape (server/http/game_metrics.ts, woc_character_state_bytes_max), so a
-// per-character blob regression shows as a climbing gauge long before it is 3x
-// worse than any modelled character. Process-lifetime monotonic max, reset only
-// by restart: the question it answers is "did a bigger blob than we modelled
-// ever save here", which decays with the process, not with a window.
+// The scrape-visible twin of the warn line: below-threshold growth is silent
+// in logs, but every measurement already paid at the save chokepoint feeds
+// this gauge (server/http/game_metrics.ts, woc_character_state_bytes_max).
+// Process-lifetime monotonic max, reset only by restart: it answers how large
+// a serialized state has been observed here, while the p99 below distinguishes
+// broad growth from a lone outlier.
 let blobBytesHighWater = 0;
 export function recordCharacterBlobBytes(bytes: number): void {
   if (bytes > blobBytesHighWater) blobBytesHighWater = bytes;

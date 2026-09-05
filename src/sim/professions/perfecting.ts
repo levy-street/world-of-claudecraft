@@ -48,22 +48,17 @@ import { refusedWhileDead } from '../dead_gate';
 import { markItemDiscovered } from '../deeds';
 import { recalcPlayerStats } from '../entity';
 import { masterwroughtConflictSlot, uniqueEquipConflictSlot } from '../equipment_rules';
-import {
-  normalizePrimaryStats,
-  PRIMARY_STATS,
-  primaryStatBudget,
-  QUALITY_ILVL_BONUS,
-  slotStatMultForItem,
-  TWOHAND_STAT_MULT,
-} from '../item_budget';
 import { selectedInventorySlot } from '../item_copy_ref';
 import { countRawInSlots, countUnlockedInSlots, removeUnlockedFromSlots } from '../item_lock';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import type { CoreStats, Entity, EquipSlot, InvSlot, ItemDef, ItemInstancePayload } from '../types';
+import type { Entity, EquipSlot, InvSlot, ItemDef, ItemInstancePayload } from '../types';
 import { announceZoneCelebration } from './gather_events';
 import { normalizeLegendaryName } from './legendary_name';
+import { perfectedBonusStats, withPerfectingBonus } from './perfecting_bonus';
 import { type PerfectItemRef, perfectingCopyMatches } from './perfecting_copy';
+
+export { PERFECTED_SOURCE_LEVEL, perfectedBonusStats } from './perfecting_bonus';
 
 export type { PerfectItemRef } from './perfecting_copy';
 
@@ -83,10 +78,6 @@ export const PERFECTING_SUCCESS_CHANCE = 0.8;
 export const PERFECTING_HEADSTART_RANK = 1;
 // masterwrought R13: skill 125 in the craft that made the piece.
 export const PERFECTING_SKILL_REQ = 125;
-// The R5 Power placement: a Perfected piece is budgeted as if its source were
-// level 28 (one tier over the raid chest's 27) instead of its recipe's own
-// level, at the def's own epic quality.
-export const PERFECTED_SOURCE_LEVEL = 28;
 
 // Consumed on EVERY resolved attempt, success or failure. The Maker's Ember is
 // the pacing lever (1/week accrual, R4 untouched); the essence and setting
@@ -149,8 +140,8 @@ export interface PerfectingInfoView {
    *  deny arm stays the authority. */
   equipBlocked: boolean;
   /** The NEXT act's bill, lock-aware: the three attempt materials while the
-   *  copy is unperfected, the promotion's Deed of Making once
-   *  `perfected && !promoted`, and EMPTY once promoted (no act is left, so no
+   *  copy is unperfected (including promoted rank donors), the promotion's Deed of Making once
+   *  `perfected && !promoted`, and EMPTY while perfected and promoted (no act is left, so no
    *  row is promised; the phase 14 window renders whichever rows arrive).
    *  Minimal on purpose: one field, one row shape. */
   materials: PerfectingMaterialView[];
@@ -174,51 +165,6 @@ function apexRecipeFor(itemId: string): ProfessionRecipeRecord | null {
  *  (masterwrought R13), or null for a non-apex id. */
 export function craftForApexItem(itemId: string): string | null {
   return apexRecipeFor(itemId)?.professionId ?? null;
-}
-
-/** The def's stat budget at a given SOURCE level, composed exactly the way
- *  item_level.ts expectedStatBudget composes it for the live item (itemLevel's
- *  source + QUALITY_ILVL_BONUS floor, primaryStatBudget with the
- *  slotStatMultForItem override, the two-hand mult applied the same way):
- *  the shipped primitives, never a re-derivation. */
-function apexBudgetAtSource(def: ItemDef, sourceLevel: number): number {
-  const ilvl = Math.max(1, sourceLevel + (QUALITY_ILVL_BONUS[def.quality ?? 'common'] ?? 0));
-  const base = primaryStatBudget(ilvl, def.quality, def.slot, slotStatMultForItem(def));
-  return def.kind === 'weapon' && def.hand === 'twohand'
-    ? Math.round(base * TWOHAND_STAT_MULT)
-    : base;
-}
-
-/**
- * The R5 bonus a Perfected copy carries: the primary-stat budget DELTA between
- * source PERFECTED_SOURCE_LEVEL (28) and source recipe.level at the def's own
- * (epic) quality and slot, redistributed over the def's primary profile with
- * normalizePrimaryStats (largest-remainder, deterministic), exactly the
- * masterwork.ts bake's shape. Formula-derived, never a magic number.
- *
- * NOTE: this makes a FOURTH consumer of recipe.level (after item_level.ts's
- * source-index registration, craftActionXp in profession_xp.ts, and the
- * masterwork bake's MasterworkStatsInput.level via crafting.ts
- * craftBonusStatsFor; the 11o QA's "exactly three" was a probe, not a pin).
- * Null when the def carries no slot/primary profile or the delta is not
- * positive.
- */
-export function perfectedBonusStats(
-  def: ItemDef,
-  recipe: Pick<ProfessionRecipeRecord, 'level'>,
-): Partial<CoreStats> | null {
-  if (!def.slot || !def.stats) return null;
-  // Primary stats only, the masterworkBonusStats filter: armor would double.
-  const profile: Partial<CoreStats> = {};
-  for (const stat of PRIMARY_STATS) {
-    const value = def.stats[stat] ?? 0;
-    if (value > 0) profile[stat] = value;
-  }
-  if (Object.keys(profile).length === 0) return null;
-  const delta =
-    apexBudgetAtSource(def, PERFECTED_SOURCE_LEVEL) - apexBudgetAtSource(def, recipe.level);
-  if (delta <= 0) return null;
-  return normalizePrimaryStats(profile, delta);
 }
 
 /** Resolve a bagged ref through the shared selection walk
@@ -327,17 +273,16 @@ export function perfectingInfoFrom(inputs: PerfectingInfoInputs): PerfectingInfo
     skillReq: PERFECTING_SKILL_REQ,
     skillMet: craftId !== null && (inputs.craftSkills[craftId] ?? 0) >= PERFECTING_SKILL_REQ,
     bound: payload?.boundTo !== undefined,
-    // The NEXT act's bill, or NO bill once promoted: a legendary copy has no
-    // act left (arm 1 of the promotion ladder refuses it), and the affordance
-    // rule says a view promises nothing the path refuses, so the deed row is
-    // not listed at have-counts on a finished legend (the phase 13 QA).
-    materials: promoted
-      ? []
-      : (perfected ? LEGENDARY_PROMOTION_COST : PERFECTING_ATTEMPT_COST).map((c) => ({
-          itemId: c.itemId,
-          required: c.count,
-          have: countUnlockedInSlots(inputs.inventory, c.itemId),
-        })),
+    // A promoted rank donor can earn ranks again, but can never buy another
+    // cosmetic promotion. Only a currently Perfected legend has no act left.
+    materials:
+      promoted && perfected
+        ? []
+        : (perfected ? LEGENDARY_PROMOTION_COST : PERFECTING_ATTEMPT_COST).map((c) => ({
+            itemId: c.itemId,
+            required: c.count,
+            have: countUnlockedInSlots(inputs.inventory, c.itemId),
+          })),
   };
 }
 
@@ -498,6 +443,18 @@ export function resolvePerfectingAttempt(
     if (wornSlot) meta.equipmentInstance[wornSlot] = payload;
     else if (bagged) bagged.instance = payload;
   }
+  const recipe = apexRecipeFor(itemId);
+  if (recipe) {
+    const initialized = withPerfectingBonus(def, recipe, payload);
+    if (initialized !== payload) {
+      payload = initialized;
+      if (wornSlot) meta.equipmentInstance[wornSlot] = payload;
+      else if (bagged) bagged.instance = payload;
+    }
+  }
+  // New collections keep their binding independent of rank. Existing item
+  // semantics are unchanged, including legacy rank-zero payloads.
+  if (payload.perfectingBonus !== undefined) payload.perfectingBound = true;
   if (payload.boundTo === undefined) {
     payload.boundTo = meta.entityId;
     ctx.notice(meta.entityId, `Perfecting begins: ${def.name} is now bound to you.`);
@@ -513,8 +470,7 @@ export function resolvePerfectingAttempt(
     if (rank >= PERFECTING_RANKS) {
       delete payload.perfecting;
       payload.perfected = true;
-      const recipe = apexRecipeFor(itemId);
-      const bonus = recipe ? perfectedBonusStats(def, recipe) : null;
+      const bonus = payload.perfectingBonus ?? (recipe ? perfectedBonusStats(def, recipe) : null);
       if (bonus) {
         // Additive merge into the pre-existing generic recalc channel, the
         // enchantedPayloadFor shape; rolled.masterwork is never set here.
