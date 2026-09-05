@@ -126,7 +126,7 @@ describe('the Proving Shore cue, resolved from the shipped zone record', () => {
     }
   });
 
-  it('keeps the room cue selected while ordinary raid combat uses the global combat layer', () => {
+  it('keeps the final room soundtrack active instead of the global combat layer', () => {
     const room = 'ignivar_inner_crucible';
     const origin = instanceOrigin(DUNGEONS[room].index, 0);
     const decision = instanceMusicDecision(
@@ -145,6 +145,8 @@ describe('the Proving Shore cue, resolved from the shipped zone record', () => {
     );
 
     expect(decision.zone).toBe(room);
-    expect(decision.musicCombat).toBe(true);
+    expect(decision.inCombat).toBe(true);
+    expect(decision.musicCombat).toBe(false);
+    expect(decision.crucibleFloor).toBe(4);
   });
 });

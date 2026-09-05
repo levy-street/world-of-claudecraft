@@ -668,7 +668,8 @@ const MONOLITHS: MonolithRow[] = [
     // the raid theme registrations were paid for by moving the Gravewyrm Sanctum composer to its sibling module; exact count.
     // Re-pinned 4943 -> 4935: the molten-assembly music row paid for itself by
     // moving the DUNGEON_MUSIC table to dungeon_music_zones.ts. Exact count.
-    ceiling: 4935,
+    // Pure location/rift routing moved to music_zones.ts; floor streams reuse the director.
+    ceiling: 4850,
     seam: 'a src/game sibling module (the refactor/game-music split is the template)',
   },
   {

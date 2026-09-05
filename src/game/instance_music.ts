@@ -1,4 +1,5 @@
 import { delveAt, dungeonAt, isBgPos, isDelvePos, type ZoneDef } from '../sim/data';
+import { type CrucibleFloor, crucibleFloorForDungeon } from './crucible_music';
 import {
   type MusicZone,
   musicZoneForLocation,
@@ -43,13 +44,14 @@ export interface InstanceMusicDecision {
   musicCombat: boolean;
   bossEngaged: boolean;
   instanceId: string | null;
+  crucibleFloor: CrucibleFloor | null;
 }
 
 export interface InstanceMusicPort {
   // A procedural Rift floor has no DUNGEON_MUSIC row (its cue follows the
   // floor's RiftTheme), so the resolved zone rides along explicitly.
   resetForDungeonEntry(dungeonId: string | null, zone?: MusicZone): void;
-  update(zone: MusicZone, inCombat: boolean): void;
+  update(zone: MusicZone, inCombat: boolean, crucibleFloor?: CrucibleFloor | null): void;
   setBossCombat(active: boolean): void;
 }
 
@@ -90,6 +92,7 @@ export function instanceMusicDecision(input: InstanceMusicInput): InstanceMusicD
   const scoredInstanceId =
     instanceId === 'ignivar_forge_lift' ? 'ignivar_forge_approach' : instanceId;
   const riftFloor = input.riftFloor;
+  const crucibleFloor = input.inDungeon && !riftFloor ? crucibleFloorForDungeon(instanceId) : null;
   const zone = riftFloor
     ? riftMusicZoneForTheme(riftFloor.themeName)
     : musicZoneForLocation(
@@ -108,8 +111,10 @@ export function instanceMusicDecision(input: InstanceMusicInput): InstanceMusicD
   return {
     zone,
     inCombat,
-    musicCombat: inCombat || inRaidArena || inBattleground,
-    bossEngaged,
+    // The complete room score owns the mix through pulls and boss fights.
+    musicCombat: crucibleFloor === null && (inCombat || inRaidArena || inBattleground),
+    bossEngaged: crucibleFloor === null && bossEngaged,
+    crucibleFloor,
     instanceId: musicInstanceId,
   };
 }
@@ -125,7 +130,11 @@ export class InstanceMusicController {
       this.music.resetForDungeonEntry(decision.instanceId, decision.zone);
     }
     this.lastInstanceId = decision.instanceId;
-    this.music.update(decision.zone, decision.musicCombat);
+    if (decision.crucibleFloor !== null) {
+      this.music.update(decision.zone, decision.musicCombat, decision.crucibleFloor);
+    } else {
+      this.music.update(decision.zone, decision.musicCombat);
+    }
     this.music.setBossCombat(decision.bossEngaged);
     return decision;
   }
