@@ -3,6 +3,7 @@
 import type { ChatSenderFlair, StreamerLinks } from './account_flair';
 import type { MountKey } from './content/mounts';
 import type { GatheringProfessionId, ToolEffectId } from './content/professions';
+import type { RealmBuilderHonour } from './content/realm_builders';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 import type { HarvestYield } from './professions/harvest_yields';
 import type { RespawnWindow } from './respawn_policy';
@@ -5803,6 +5804,15 @@ export type SimEvent = { pid?: number } & (
   // 'listings' carries the board's posted notices verbatim (guild names and
   // notes are world data, spliced by the client like player names, never
   // translated); a board with nothing posted stays the bare 'empty' shape.
+  | {
+      // The Realm Builder monument was inspected. Carries the whole roll so
+      // the card renders identically offline and online, and so a later live
+      // source (Postgres, or the Discord role sync) only has to change what
+      // fills these fields. Honouree names splice verbatim, like player names.
+      type: 'realmBuilder';
+      current: RealmBuilderHonour;
+      past: readonly RealmBuilderHonour[];
+    }
   | { type: 'noticeboard'; noticeboardId: string; state: 'empty' }
   | {
       type: 'noticeboard';
@@ -7133,6 +7143,23 @@ export interface MailboxDef {
    *  always had; content sets it only where a slot faces the wrong way. */
   facing?: number;
 }
+
+// The Eastbrook Vale Realm Builder monument. One singleton static service, so
+// it needs a templateId rather than a def list: interaction.ts recognises the
+// entity by this id and the client sizes its click range from it.
+export const REALM_BUILDER_MONUMENT_TEMPLATE_ID = 'realm_builder_monument' as const;
+/**
+ * How close (yards, from the statue's centre) a player must stand for the
+ * monument to be the object an interact press picks. Its collider keeps the
+ * player 3.19 yd out, so the live band is 3.19 to 4 yd: arm's reach from the
+ * plinth. The Ravenpost mailbox stands 6.21 yd from the centre and its posting
+ * spot about 7 yd, so a player who walked up to post a letter is outside this
+ * band, and one pressed against the plinth on the mailbox's side is nearer
+ * the mailbox anyway: nearest wins, and the monument never takes the press
+ * from it. The client sizes its click range from the same constant
+ * (src/game/interactions.ts objectInteractionRange).
+ */
+export const REALM_BUILDER_MONUMENT_INTERACT_RADIUS = 4;
 
 // Noticeboards currently have one complete cross-platform implementation. Keep
 // the world-content shape closed over that renderer/collider contract instead

@@ -41,6 +41,7 @@ import { routes as leaderboardRoutes } from '../leaderboard';
 import { routes as mapsRoutes } from '../maps_routes';
 import { routes as oauthRoutes } from '../oauth';
 import { routes as otaUpdatesRoutes } from '../ota_updates';
+import { routes as realmBuilderRoutes } from '../realm_builder';
 import { routes as reliquaryRoutes } from '../reliquary';
 import { routes as reportsRoutes } from '../reports';
 import { routes as seekerEntitlementRoutes } from '../seeker_entitlement';
@@ -130,6 +131,7 @@ export interface ApiRegistry {
  */
 export const apiRoutes: readonly RouteDef[] = [
   ...leaderboardRoutes,
+  ...realmBuilderRoutes,
   ...authRoutes,
   ...appleAuthRoutes,
   ...characterRoutes,

@@ -611,6 +611,89 @@
     line-height: 1.45;
     color: #d8d0bc;
   }
+  /* The Realm Builder honour roll (realm_builder_popup.ts): the same tutorial
+     card chrome as the signpost popup above, with the current honouree set
+     apart in gold at the top and the past roll scrolling underneath. */
+  .tut-card.rb-popup {
+    top: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 380px;
+    animation: none;
+  }
+  .rb-current {
+    margin-top: 8px;
+    padding: 10px 12px;
+    border: 1px solid #d4a23c40;
+    border-radius: 8px;
+    background: linear-gradient(180deg, #d4a23c1a, #00000022);
+    text-align: center;
+  }
+  .rb-label,
+  .rb-past-title {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #b6ab93;
+  }
+  .rb-past-title {
+    margin-top: 12px;
+  }
+  .rb-name {
+    margin-top: 4px;
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--gold);
+    text-shadow: 0 0 10px #d4a23c55;
+  }
+  .rb-month {
+    margin-top: 2px;
+    font-size: 12.5px;
+    color: #d8d0bc;
+  }
+  .rb-hint {
+    margin-top: 6px;
+    font-size: 12px;
+    font-style: italic;
+    line-height: 1.4;
+    color: #a49a86;
+  }
+  .rb-list {
+    margin-top: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: calc(var(--app-vh, 100vh) * 0.34);
+    overflow-y: auto;
+  }
+  .rb-item {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    border: 1px solid #ffffff14;
+    border-radius: 8px;
+    padding: 6px 10px;
+    background: #00000022;
+  }
+  .rb-item-month {
+    flex: 0 0 auto;
+    font-size: 11.5px;
+    color: #b6ab93;
+  }
+  .rb-item-name {
+    flex: 1 1 auto;
+    text-align: right;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gold);
+  }
+  .rb-empty {
+    padding: 8px 2px;
+    font-size: 12.5px;
+    font-style: italic;
+    color: #a49a86;
+  }
   .tut-arrow {
     position: absolute;
     left: 0;

@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
 
 const mocks = vi.hoisted(() => ({
   loadGltf: vi.fn(),
@@ -107,11 +108,16 @@ describe('Eastbrook town preload', () => {
       const custom = module.buildEastbrookTownView(20061);
       expect(custom.group.name).toBe(module.EASTBROOK_TOWN_ROOT_NAME);
       expect(custom.group.children).toEqual([]);
-      // The five kit buildings keep their GLB cache entries resident: their
-      // clones share the decoded KTX2 palette textures, so releasing would
-      // break a later same-page rebuild (the kit-building path in
-      // eastbrook_town.ts, docs/design/eastbrook-revamp/site-plan.md).
-      const released = allUrls.filter((url) => !url.startsWith('/models/biome/'));
+      // Everything that keeps its OWN materials keeps its GLB cache entry
+      // resident: the clones share that entry's decoded textures, so releasing
+      // it would break a later same-page rebuild (the keepsOwnMaterials path in
+      // eastbrook_town.ts, docs/design/eastbrook-revamp/site-plan.md). That is
+      // the five kit buildings, whose clones share decoded KTX2 palette
+      // textures, plus the Realm Builder monument, which is off the merged
+      // micro-batch precisely so it can keep its baked albedo.
+      const keepsOwnMaterials = (url: string): boolean =>
+        url.startsWith('/models/biome/') || url === EASTBROOK_LAYOUT.civic.monument.assetId;
+      const released = allUrls.filter((url) => !keepsOwnMaterials(url));
       expect(mocks.releaseGltf.mock.calls.map(([url]) => url)).toEqual(released);
 
       data.setActiveWorldContent(data.BUILTIN_WORLD);

@@ -26,6 +26,7 @@ import {
   MAX_LEVEL,
   normAngle,
   questObjectiveRequired,
+  REALM_BUILDER_MONUMENT_TEMPLATE_ID,
   xpForLevel,
 } from './types';
 
@@ -303,7 +304,15 @@ export function encodeObs(sim: Sim): number[] {
       bestCorpse = { e, d2, type: 0.33 };
       bestCorpseD2 = d2;
     }
-    if (e.kind === 'object' && e.lootable && d2 < bestObjectD2) {
+    // The Realm Builder monument is an honour roll, not a pickup: nothing an
+    // agent can gain from it, and as a permanent object in the middle of the
+    // square it would otherwise shadow the mailbox in this slot.
+    if (
+      e.kind === 'object' &&
+      e.lootable &&
+      e.templateId !== REALM_BUILDER_MONUMENT_TEMPLATE_ID &&
+      d2 < bestObjectD2
+    ) {
       const noticeboardDef = noticeboardDefByEntityId(sim.noticeboardDefinitions, e.id);
       if (!noticeboardDef || d2 <= noticeboardDef.interactionRadius ** 2) {
         bestObject = { e, d2, type: 0.66 };

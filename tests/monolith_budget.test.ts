@@ -273,7 +273,13 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
-    ceiling: 18905,
+    // Up 18905 -> 18911 for the Realm Builder monument's honour-roll card
+    // (PR #3695, re-measured at its release/v0.42.0 base merge). The card
+    // is its own module (src/ui/realm_builder_popup.ts); what is left here
+    // is the six lines that cannot live anywhere else: the import, the
+    // field, its relocalize() call, and the three-line event arm. Exact
+    // merged count, zero slack; maintainer-review item.
+    ceiling: 18911,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -381,7 +387,17 @@ const MONOLITHS: MonolithRow[] = [
     // branch: the release arm's mount lifecycle and stride audio moves land
     // beside this branch's extractions, so the merged file sits below both
     // parent pins. Measured on the merged tree. Exact merged count, zero headroom.
-    ceiling: 13073,
+    // The Realm Builder monument (PR #3695) adds 12 lines here: one import,
+    // the one-line setRealmBuilderHonouree delegation, and the entity arm
+    // that returns the monument's pick volume (matched on the template-id
+    // literal like the noticeboard arm beside it; tests/realm_builder_monument
+    // pins the literal to the constant). They land exactly on the pin above,
+    // so the ceiling does not move but the slack is now zero.
+    // Re-pinned at the 2026-09-05 release/v0.42.0 sync into the shader-warm
+    // branch: the release arm's Realm Builder monument lines (PR #3695) land
+    // beside this branch's extractions, so the merged file sits below both
+    // parent pins. Measured on the merged tree. Exact merged count, zero headroom.
+    ceiling: 13085,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -535,7 +551,11 @@ const MONOLITHS: MonolithRow[] = [
     // dev-command extraction and Discord login-choice rows land alongside this
     // branch's extractions; the merged count is the honest bound. Measured on
     // the merged tree. Exact merged count, zero headroom.
-    ceiling: 11501,
+    // Re-pinned 11501 -> 11503 at the 2026-09-05 release/v0.42.0 sync (PR #3695,
+    // the Realm Builder monument): release-side growth only; the branch's own
+    // helpers are unchanged and the merged file stays under the release's own
+    // 11551 row. Exact merged count, zero headroom.
+    ceiling: 11503,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -730,7 +750,17 @@ const MONOLITHS: MonolithRow[] = [
     // is also what keeps a db.ts -> schema -> db.ts cycle impossible). Exact
     // count, zero slack. The next candidate behind the same seam is the table's
     // accessors (insert, prune, row type).
-    ceiling: 5095,
+    // Up 5145 -> 5151 for the Realm Builder of the Month roll (PR #3695, at
+    // its release/v0.42.0 base merge): the table and its SQL live in
+    // server/realm_builder_db.ts; the residue here is the schema import and
+    // the one ensureSchema() apply line with its ordering note, the same
+    // shape every other domain *_SCHEMA takes. Exact merged count, zero
+    // slack; maintainer-review item.
+    // Re-pinned at the 2026-09-05 release/v0.42.0 sync into the shader-warm
+    // branch: the release arm's realm_builder_db.ts schema residue (PR #3695)
+    // lands beside this branch's client_perf_reports_schema.ts extraction, so the
+    // merged file sits below both parent pins. Exact merged count, zero slack.
+    ceiling: 5101,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {

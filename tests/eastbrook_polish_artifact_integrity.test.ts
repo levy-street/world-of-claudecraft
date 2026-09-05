@@ -1050,10 +1050,22 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // both arms had re-minted, and the merged renderer (the mount lifecycle and
 // stride audio moves beside this branch's changes) and evidence inputs land
 // together. No capture was retaken.
+// Re-minted for the Realm Builder monument (PR #3695) at its release/v0.42.0
+// base merge: the civic centrepiece changed asset, subject and shader cache
+// key, so every provenance block was swept onto the merged fingerprinted
+// inputs. No capture was retaken.
+// Re-minted for the PR #3695 review fixes: the impostor fragment's fog and
+// tone-mapping tail moved realm_builder_monument_fx.ts. No capture was retaken.
+// Re-minted for the 2026-09-05 release/v0.42.0 sync into the shader-warm branch:
+// the Realm Builder monument (PR #3695) and this branch's renderer changes
+// land together on the merged tree. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'bb6f8117590a1d6c81c73e374d0f54e13afd5448635ef0ef9a62a2e053834a60';
+  'bd53b31882af899715dcc7bb4a2d9159fa63b5ac1eb5b4ff3b342d2f63b76a08';
+// Re-minted at the release/v0.42.0 sync of PR #3439: renderer.ts moved for the
+// mount lifecycle seam (mount_lifecycle.ts) and the rickshaw hooks it absorbed.
+// Re-minted again for the PR #3695 review fixes (the impostor fragment tail).
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'c31833196d4b756604eba1bb30a3b07e4d5e37381db2a7828a4d1ce2ba411974';
+  '3a5b183e08a217c7421c7fecd4b61e43598b3a081fe8b07ba7fdabed559d0f7b';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2215,7 +2227,18 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // the composite first, then this seal. No capture was retaken.
       // Re-minted for the 2026-09-04 release/v0.42.0 sync into the shader-warm
       // branch: the composite first, then this seal. No capture was retaken.
-    ).toBe('2ae19af726d8213e099a216186801c6dcb20d7decb1165242b42d3b5d6420e59');
+      // Re-minted for the Realm Builder monument (PR #3695) at its
+      // release/v0.42.0 base merge: the first-order composite follows the
+      // renderer, town and civicShader leaves, then this second-order seal
+      // follows the swept evidence bytes. No capture was retaken.
+      // Re-minted for the PR #3695 review fixes: the impostor fragment's fog
+      // and tone-mapping tail moved realm_builder_monument_fx.ts, the composite
+      // followed it, then this seal followed the swept bytes. No capture was
+      // retaken.
+      // Re-minted for the 2026-09-05 release/v0.42.0 sync into the shader-warm branch:
+      // the Realm Builder monument (PR #3695) and this branch's renderer changes
+      // land together on the merged tree. No capture was retaken.
+    ).toBe('7691517f80fb2fc7620a55adcfc2e5fbfb6ded72bb5f0d77ca4e050c90dfe9ff');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

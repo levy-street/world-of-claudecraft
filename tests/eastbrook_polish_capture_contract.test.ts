@@ -367,8 +367,19 @@ interface AttributionTargetFixture {
 // both arms had re-minted, and the merged renderer (the mount lifecycle and
 // stride audio moves beside this branch's changes) and evidence inputs land
 // together. No capture was retaken.
+// Re-minted for the Realm Builder monument (PR #3695) at its release/v0.42.0
+// base merge: the civic centrepiece changed asset, subject and shader cache
+// key on top of the mount-lifecycle and occluder-fade moves already sealed
+// above, so every fingerprinted input carries the merged bytes. No capture
+// was retaken.
+// Re-minted for the PR #3695 review fixes: the monument's impostor fragment
+// gained the fog, tonemapping and colourspace tail, moving
+// realm_builder_monument_fx.ts. No capture was retaken.
+// Re-minted for the 2026-09-05 release/v0.42.0 sync into the shader-warm branch:
+// the Realm Builder monument (PR #3695) and this branch's renderer changes
+// land together on the merged tree. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'c31833196d4b756604eba1bb30a3b07e4d5e37381db2a7828a4d1ce2ba411974';
+  '3a5b183e08a217c7421c7fecd4b61e43598b3a081fe8b07ba7fdabed559d0f7b';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
@@ -519,7 +530,7 @@ describe('Eastbrook polish capture contract', () => {
       'apothecary_lin',
       'mailbox_eastbrook',
       'eastbrook_noticeboard',
-      'eastbrook_civic_well_beacon',
+      'eastbrook_realm_builder_monument',
       'chronicler_saul',
       'fury',
     ]);
@@ -773,7 +784,10 @@ describe('Eastbrook polish capture contract', () => {
       },
       'chapel-and-weaving': {
         camera: { x: 26, y: 12, z: -100 },
-        target: { x: -13, y: 3, z: -100 },
+        // Round 8: the aim was the middle of the square, which the doubled
+        // Realm Builder monument now occupies, so it moved a yard past the
+        // plinth's west face. Same establishing shot, statue as its backdrop.
+        target: { x: -10.5, y: 3, z: -100 },
       },
       'toolworks-service-perimeter': {
         camera: { x: -11, y: 7, z: -120 },
@@ -1019,9 +1033,12 @@ describe('Eastbrook polish capture contract', () => {
       EASTBROOK_LAYOUT.services.noticeboard.id,
       EASTBROOK_LAYOUT.services.noticeboard.frontStandingPoint,
     );
-    subjectPoints.set(EASTBROOK_LAYOUT.civic.wellBeacon.id, {
-      x: EASTBROOK_LAYOUT.civic.wellBeacon.position.x,
-      z: EASTBROOK_LAYOUT.civic.wellBeacon.position.z - 2,
+    // Off-axis on purpose (see capture_contract.mjs, civic-motion): the middle
+    // of the square is the statue and due south of it is a bench, so the aim
+    // sits on the southwest diagonal, outside the plinth.
+    subjectPoints.set(EASTBROOK_LAYOUT.civic.monument.id, {
+      x: EASTBROOK_LAYOUT.civic.monument.position.x + 2.7,
+      z: EASTBROOK_LAYOUT.civic.monument.position.z - 3.2,
     });
     for (const npc of EASTBROOK_LAYOUT.services.npcs) {
       subjectPoints.set(npc.id, npc.position);

@@ -207,8 +207,16 @@ function legacyEastbrookProps(current: ZonePropsDef): ZonePropsDef {
       ...current.buildings.filter((building) => !building.id || !townBuildingIds.has(building.id)),
     ],
     wells: [
-      { x: -14.75, z: -102, r: 1.5 },
-      ...current.wells.filter((well) => well.id !== EASTBROOK_LAYOUT.civic.wellBeacon.id),
+      // The legacy fixture is the PRE-rebuild world, so it keeps an unnamed
+      // well on the civic point and strips whatever the rebuild seats there.
+      // The RADIUS follows the live centrepiece rather than the old 1.5, for
+      // the same reason the mailbox row below follows the live pillar: this
+      // test's whole premise is identical collision in both worlds, and a
+      // 0.1 yard difference on a solid in the middle of the square is exactly
+      // the kind of thing that deflects one wanderer 2,000 ticks later and
+      // reds this as a mystery.
+      { x: -14.75, z: -102, r: EASTBROOK_LAYOUT.civic.monument.radius },
+      ...current.wells.filter((well) => well.id !== EASTBROOK_LAYOUT.civic.monument.id),
     ],
     stalls: [
       {
@@ -275,13 +283,15 @@ describe('Eastbrook authored gameplay data integration', () => {
     expect(ZONE1_PROPS.buildings.some((building) => building.landmark)).toBe(false);
     // Re-pinned 2026-08-18 for the harbor move (commit d19aa33f76,
     // docs/design/eastbrook-revamp/site-plan.md): the well beacon moved with
-    // the civic square to the harbor site.
+    // the civic square to the harbor site. Round 7 replaced it in place with
+    // the Realm Builder monument, which keeps the point and tightens the
+    // radius onto its own art.
     expect(ZONE1_PROPS.wells).toEqual([
       expect.objectContaining({
-        id: EASTBROOK_LAYOUT.civic.wellBeacon.id,
+        id: EASTBROOK_LAYOUT.civic.monument.id,
         x: -14.75,
         z: -102,
-        r: 1.5,
+        r: 3.19,
       }),
     ]);
     expect(
@@ -715,7 +725,7 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
       'retired artisan stall collider',
     ).toBeUndefined();
 
-    const well = EASTBROOK_LAYOUT.civic.wellBeacon;
+    const well = EASTBROOK_LAYOUT.civic.monument;
     const wellCollider = colliders.find(
       (collider) =>
         collider.type === 'circle' &&
@@ -829,10 +839,20 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
   // coastal buildings along the dock road, each bringing its own entrance
   // back into the proof (34).
   it('pathfinds bidirectionally from the square to every service, NPC, station, and entrance', () => {
-    // Middle of the new market square: inside the civic ring, clear of the
-    // well beacon and the benches, and directly connected to the east-road
-    // circulation (the east road's authored tail ends beside it at -11,-101).
-    const square = { x: -12.5, z: -100.5 };
+    // A standing spot in the square, DERIVED from the centrepiece rather than
+    // hardcoded. It used to be (-12.5, -100.5), which was clear of the well
+    // beacon's 1.5 cylinder and is now buried inside the Realm Builder
+    // monument's 3.19 one: round 8 doubled the statue, and the square's old
+    // middle is the statue. Deriving it keeps this proof honest through the
+    // next resize instead of quietly starting a route inside a collider.
+    // A yard and a bit off the plinth, on the open east quadrant the layout
+    // deliberately leaves clear as the spawn-to-square arrival lane (east is
+    // NEGATIVE x here).
+    const monumentCentre = EASTBROOK_LAYOUT.civic.monument;
+    const square = {
+      x: monumentCentre.position.x - (monumentCentre.radius + 1.2),
+      z: monumentCentre.position.z,
+    };
     const destinations = [
       ...EASTBROOK_LAYOUT.services.npcs.map((npc) => ({ id: npc.id, point: npc.position })),
       ...EASTBROOK_LAYOUT.services.stations.map((station) => ({
@@ -1087,7 +1107,17 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
     const stableProjection = (sim: Sim) =>
       [...sim.entities.values()]
         .filter((entity) => entity.kind === 'mob' || entity.kind === 'object')
-        .filter((entity) => entity.templateId !== 'mailbox')
+        // The mailbox and the Realm Builder monument are static services the
+        // REBUILT world seats and the legacy fixture has no equivalent for.
+        // Both are inert click targets with no collider of their own (the
+        // monument's solid is the wells row above, which both worlds carry),
+        // so neither can move a wanderer: excluding them compares the two
+        // worlds' actual simulations rather than their service rosters.
+        .filter(
+          (entity) =>
+            entity.templateId !== 'mailbox' &&
+            entity.templateId !== EASTBROOK_LAYOUT.civic.monument.templateId,
+        )
         .map((entity) => ({
           id: entity.id,
           kind: entity.kind,

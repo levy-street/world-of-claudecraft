@@ -20,15 +20,19 @@ describe('Knockback on-hit affix (Crushing Sweep)', () => {
     // terrain-clamped. Re-staged 2026-08-18 for the Eastbrook harbor move
     // (d19aa33f76): the vacated town ground at (0,0) is no longer
     // street-flattened and its slope clamped the 6yd shove at 4.14yd.
+    // Re-staged again for the Realm Builder monument: the civic centrepiece at
+    // (-14.75, -102) carries a 3.19yd collider, so the old z = -100 lane ran
+    // straight into it and the shove stopped 1yd out. Same flat plat, 10yd
+    // south, clear of the square.
     p.pos.x = -18;
-    p.pos.z = -100;
+    p.pos.z = -110;
     p.pos.y = 0;
     const tmpl = MOBS.marrowlord_varkas;
     const saved = tmpl.knockback!.chance;
     tmpl.knockback!.chance = 1; // force the proc; misses/dodges still possible
     try {
       // spawn at the player's level for an even hit table, on top of the player
-      const mob = createMob(900700, tmpl, p.level, { x: -20, y: 0, z: -100 });
+      const mob = createMob(900700, tmpl, p.level, { x: -20, y: 0, z: -110 });
       const startGap = dist2d(p.pos, mob.pos);
       let moved = false;
       for (let i = 0; i < 80 && !moved; i++) {
