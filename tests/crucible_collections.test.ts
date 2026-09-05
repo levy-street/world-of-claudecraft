@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
-  CRUCIBLE_COLLECTIONS,
   CRUCIBLE_COLLECTION_ITEMS,
   CRUCIBLE_COLLECTION_PATTERNS,
   CRUCIBLE_COLLECTION_RECIPES,
+  CRUCIBLE_COLLECTIONS,
   CRUCIBLE_PROFESSION_PATTERN_LOOT,
   crucibleCollectionFamilyForSet,
   crucibleCollectionForItem,
@@ -109,13 +109,18 @@ describe('Crucible crafted collections', () => {
       expect(pattern.soulbound).not.toBe(true);
       expect(pattern.teachesRecipeIds).toEqual(collection.itemIds.map((id) => `recipe_${id}`));
       expect(pattern.teachesRecipeId).toBe(pattern.teachesRecipeIds?.[0]);
-      expect(CRUCIBLE_VENDOR_STOCK).toContainEqual({ itemId: pattern.id, sigilId: 'lastflame_core' });
+      expect(CRUCIBLE_VENDOR_STOCK).toContainEqual({
+        itemId: pattern.id,
+        sigilId: 'lastflame_core',
+      });
     }
   });
 
   it('adds a separate thirty-percent shared boss pattern roll and a deterministic formula fallback', () => {
     expect(CRUCIBLE_PROFESSION_PATTERN_LOOT).toHaveLength(12);
-    expect(CRUCIBLE_PROFESSION_PATTERN_LOOT.reduce((sum, row) => sum + row.chance, 0)).toBeCloseTo(0.3);
+    expect(CRUCIBLE_PROFESSION_PATTERN_LOOT.reduce((sum, row) => sum + row.chance, 0)).toBeCloseTo(
+      0.3,
+    );
     expect(new Set(CRUCIBLE_PROFESSION_PATTERN_LOOT.map((row) => row.rollGroup)).size).toBe(1);
     for (const bossId of [IGNIVAR_BOSS_ID, VARKHUL_BOSS_ID]) {
       for (const row of CRUCIBLE_PROFESSION_PATTERN_LOOT) {
@@ -124,7 +129,8 @@ describe('Crucible crafted collections', () => {
       }
     }
     expect(CRUCIBLE_VENDOR_STOCK).toContainEqual({
-      itemId: 'formula_lastflame_zeal', sigilId: 'lastflame_core',
+      itemId: 'formula_lastflame_zeal',
+      sigilId: 'lastflame_core',
     });
   });
 });

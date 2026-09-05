@@ -11,6 +11,10 @@
 import type { ReliquaryLocaleTable } from '../reliquary_i18n';
 
 export const table: ReliquaryLocaleTable = {
+  professions_crucible: {
+    name: '坩堝の匠技',
+    desc: 'レイド素材で作る11種のセット。各セットに胴、腰、足の装備がある。型紙と製法書は知識であり、収集品には含まれない。',
+  },
   // Dungeon, delve and world-boss pages: entities.* names verbatim.
   conquerors_hollow_crypt: {
     name: '虚ろの墓所',

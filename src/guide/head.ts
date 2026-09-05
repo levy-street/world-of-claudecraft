@@ -95,7 +95,7 @@ function profDescription(detailId: string): string {
   if (craftById(detailId)) return t(`guide.profPages.craftIntro.${detailId}` as TranslationKey);
   if (gatheringById(detailId))
     return t(`guide.profPages.gatherIntro.${detailId}` as TranslationKey);
-  if (detailId === 'economy') return t('guide.profPages.econ.intro');
+  if (detailId === 'economy') return t('guide.profPages.econ.introRaidCollections');
   return t('guide.profPages.faq.intro');
 }
 

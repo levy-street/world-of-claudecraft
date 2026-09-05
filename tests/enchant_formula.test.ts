@@ -10,7 +10,12 @@ const ENCHANT = 'enchant_weapon_lastflame_zeal';
 const WEAPON = 'duskforged_warblade';
 
 function setup(skill = 100) {
-  const sim = new Sim({ seed: 317, playerClass: 'warrior', autoEquip: false, world: EMPTY_TEST_WORLD });
+  const sim = new Sim({
+    seed: 317,
+    playerClass: 'warrior',
+    autoEquip: false,
+    world: EMPTY_TEST_WORLD,
+  });
   const pid = sim.playerId;
   const meta = sim.meta(pid);
   if (!meta) throw new Error('test player missing');
@@ -29,7 +34,12 @@ describe('raid enchant formula acquisition', () => {
     sim.useItem(FORMULA);
     expect(meta.knownRecipes.has(ENCHANT)).toBe(true);
     expect(sim.countItem(FORMULA)).toBe(1);
-    expect(sim.drainEvents()).toContainEqual({ type: 'trainResult', pid, ok: true, recipeId: ENCHANT });
+    expect(sim.drainEvents()).toContainEqual({
+      type: 'trainResult',
+      pid,
+      ok: true,
+      recipeId: ENCHANT,
+    });
     sim.useItem(FORMULA);
     expect(sim.countItem(FORMULA)).toBe(1);
     expect(sim.serializeCharacter(pid)?.knownRecipes).toContain(ENCHANT);
@@ -53,9 +63,14 @@ describe('raid enchant formula acquisition', () => {
     const { sim, pid, meta } = setup();
     const before = structuredClone(meta.inventory);
     const ctx = (sim as unknown as { ctx: Parameters<typeof resolveApplyEnchant>[0] }).ctx;
-    expect(resolveApplyEnchant(ctx, pid, WEAPON, ENCHANT)).toMatchObject({ ok: false, reason: 'recipe_not_learned' });
+    expect(resolveApplyEnchant(ctx, pid, WEAPON, ENCHANT)).toMatchObject({
+      ok: false,
+      reason: 'recipe_not_learned',
+    });
     sim.applyEnchant(WEAPON, ENCHANT);
-    expect(sim.drainEvents()).toContainEqual(expect.objectContaining({ type: 'enchantResult', ok: false, reason: 'recipe_not_learned' }));
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({ type: 'enchantResult', ok: false, reason: 'recipe_not_learned' }),
+    );
     expect(meta.inventory).toEqual(before);
     sim.useItem(FORMULA);
     expect(resolveApplyEnchant(ctx, pid, WEAPON, ENCHANT)).toMatchObject({ ok: true });

@@ -15,6 +15,7 @@ const BATCH_ID = 'item-art-consistency-2026-08-09';
 const CURRENT_EVIDENCE_DIR = 'docs/achievements/masterwrought-art-completion-2026-09-02';
 const CURRENT_VERDICT_PATH = `${CURRENT_EVIDENCE_DIR}/final-item-art-audit-verdict.json`;
 const CURRENT_BATCH_ID = 'masterwrought-art-completion-2026-09-02';
+const CRUCIBLE_BATCH_ID = 'crucible-professions-2026-09-05';
 const LICENSE = 'World of ClaudeCraft project-generated art, project asset, rights reserved';
 
 type ReportPin = {
@@ -846,8 +847,8 @@ describe('item-art consistency accepted-art provenance', () => {
 
     expect(verdict.evidence.catalog).toEqual({
       path: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      sha256: 'febda89453efdcf50432cf3cab6ba638435b301eea6c429e9e0046b8a829e25e',
-      bytes: 657_748,
+      sha256: 'a955642750056910f7d591182c2e177e275f93e97032a3a117bfc5d63857e64a',
+      bytes: 683_315,
     });
     expect(verdict.evidence.rendererFingerprint).toBe(ITEM_ART_AUDIT_RENDERER_FINGERPRINT);
     expect(verdict.evidence.sheetCount).toBe(248);
@@ -877,7 +878,7 @@ describe('item-art consistency accepted-art provenance', () => {
       shippingCatalogDigest.update(`${id}\0${sha256(bytes)}\0${bytes.length}\n`);
     }
     expect(verdict.evidence.shippingCatalogSha256).toBe(
-      'bdec0afdcd3349a34b74bca9b0e01aee5b3ab2b3a82568bd9019fe0b0bb0b38c',
+      '05d4aae41021d3baa51df057b8a5821cc7092ad3f3eaa48edd0ebee4655d6618',
     );
     expect(shippingCatalogDigest.digest('hex')).toBe(verdict.evidence.shippingCatalogSha256);
   });
@@ -1035,8 +1036,18 @@ describe('item-art consistency accepted-art provenance', () => {
       itemIds: ['reins_mech_bird'],
     });
 
+    const crucibleBatch = mapping.generatedBatches.find(
+      ({ batchId }) => batchId === CRUCIBLE_BATCH_ID,
+    );
+    expect(crucibleBatch?.itemIds).toHaveLength(45);
+    expect(crucibleBatch?.provenanceRecord).toBe(
+      'docs/achievements/crucible-professions-2026-09-05/generation-report.json',
+    );
     const priorGeneratedIds = mapping.generatedBatches
-      .filter(({ batchId }) => batchId !== BATCH_ID && batchId !== CURRENT_BATCH_ID)
+      .filter(
+        ({ batchId }) =>
+          batchId !== BATCH_ID && batchId !== CURRENT_BATCH_ID && batchId !== CRUCIBLE_BATCH_ID,
+      )
       .flatMap(({ itemIds }) => itemIds);
     expect(priorGeneratedIds).toHaveLength(727);
     const allCurrentOwnerIds = [
@@ -1050,11 +1061,13 @@ describe('item-art consistency accepted-art provenance', () => {
       priorGenerated: priorGeneratedIds.length,
       historicalAudit: batch?.itemIds.length,
       masterwroughtCompletion: completionBatch?.itemIds.length,
+      crucibleProfessions: crucibleBatch?.itemIds.length,
     }).toEqual({
       entries: 43,
       priorGenerated: 727,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
+      crucibleProfessions: 45,
     });
     const historicalVerdict = readJson<FinalAuditVerdict>(
       `${evidenceDir}/final-item-art-audit-verdict.json`,
@@ -1069,8 +1082,9 @@ describe('item-art consistency accepted-art provenance', () => {
       sorted([
         ...historicalVerdict.visualVerdict.passIds.filter((id) => !completionIdSet.has(id)),
         ...(completionBatch?.itemIds ?? []),
+        ...(crucibleBatch?.itemIds ?? []),
       ]),
-      'historical carry-forward plus the completion wave is the current catalog',
+      'historical carry-forward plus completion and Crucible waves is the current catalog',
     ).toEqual(sorted(allCurrentOwnerIds));
     expect(batch?.provenanceRecords).toEqual([
       `${evidenceDir}/accepted-art.json`,

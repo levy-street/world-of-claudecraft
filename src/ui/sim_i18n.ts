@@ -28,6 +28,11 @@ import { ARENA_NEW, BASE_NEW, ITEM_NEW, PET_NEW, QUEST_NEW, RAID_NEW } from './s
 import { localizeTalentTitle } from './talent_i18n';
 
 const baseEnTable = {
+  'aura.craftedMomentum': 'Crafted Momentum',
+  'aura.craftedShelter': 'Crafted Shelter',
+  'aura.craftedPreservation': 'Crafted Preservation',
+  'aura.craftedCollection': 'Crafted Collection',
+  'aura.lastflameZeal': "Last Flame's Zeal",
   'log.deathwardSaves': 'A deathward saves you!',
   'error.lineOfSight': 'Line of sight.',
   'error.notInGroup': 'That ally is not in your group.',
@@ -4620,6 +4625,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   },
   zh_CN: {
     'log.passingStoneKneel': '你的手合拢在往生石上，海滨这才放你离去。',
+    'aura.craftedMomentum': '匠造势能',
+    'aura.craftedShelter': '匠造庇护',
+    'aura.craftedPreservation': '匠造护佑',
+    'aura.craftedCollection': '匠造套装',
+    'aura.lastflameZeal': '末焰热忱',
     'error.tutorialFromHere': '你无法从这里扬帆起航。',
     'error.passingStoneCold': '石头是凉的。教官玛伦并未要求你这么做。',
     'error.vendorQuestGated': '这件物品暂时还不卖给你。',
@@ -5168,6 +5178,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   },
   zh_TW: {
     'log.passingStoneKneel': '你的手握住了往生石，海濱終於放你離去。',
+    'aura.craftedMomentum': '匠造勢能',
+    'aura.craftedShelter': '匠造庇護',
+    'aura.craftedPreservation': '匠造護佑',
+    'aura.craftedCollection': '匠造套裝',
+    'aura.lastflameZeal': '末焰熱忱',
     'error.tutorialFromHere': '你無法從這裡揚帆出海。',
     'error.passingStoneCold': '石頭是冷的。教官瑪倫並未要求你這麼做。',
     'error.vendorQuestGated': '這件物品目前還不能賣給你。',
@@ -5716,6 +5731,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   },
   ko_KR: {
     'log.passingStoneKneel': '안식의 돌을 손에 쥐자, 해안이 당신을 놓아줍니다.',
+    'aura.craftedMomentum': '장인의 기세',
+    'aura.craftedShelter': '장인의 피난처',
+    'aura.craftedPreservation': '장인의 보존',
+    'aura.craftedCollection': '장인의 세트',
+    'aura.lastflameZeal': '마지막 불꽃의 열의',
     'error.tutorialFromHere': '여기서는 출항할 수 없습니다.',
     'error.passingStoneCold': '돌이 차갑습니다. 교관 마렌은 당신에게 이것을 요구하지 않았습니다.',
     'error.vendorQuestGated': '그 아이템은 아직 당신에게 판매되지 않습니다.',
@@ -6277,6 +6297,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   },
   ja_JP: {
     'log.passingStoneKneel': 'たましいの石を握りしめると、渚がその手を解き放つ。',
+    'aura.craftedMomentum': '匠の勢い',
+    'aura.craftedShelter': '匠の庇護',
+    'aura.craftedPreservation': '匠の保護',
+    'aura.craftedCollection': '匠のセット',
+    'aura.lastflameZeal': '最後の炎の熱情',
     'error.tutorialFromHere': 'ここから出航することはできません。',
     'error.passingStoneCold': 'その石は冷たいままです。教官マレンはまだそれを求めていません。',
     'error.vendorQuestGated': 'そのアイテムはまだあなたには売り物ではありません。',
@@ -7359,6 +7384,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   },
   ru_RU: {
     'log.passingStoneKneel': 'Вы сжимаете в ладони Камень Ухода, и берег отпускает вас.',
+    'aura.craftedMomentum': 'Импульс мастера',
+    'aura.craftedShelter': 'Укрытие мастера',
+    'aura.craftedPreservation': 'Защита мастера',
+    'aura.craftedCollection': 'Комплект мастера',
+    'aura.lastflameZeal': 'Рвение Последнего Пламени',
     'error.tutorialFromHere': 'Вы не можете отплыть отсюда.',
     'error.passingStoneCold': 'Камень холоден. Наставница Марен не просила вас об этом.',
     'error.vendorQuestGated': 'Этот предмет пока не продаётся вам.',
@@ -10527,6 +10557,11 @@ function locPetGrowlAutoState(state: string): string {
 // player (stun/incapacitate/absorb aura) and as the boss "unleashes" combat-log line, so
 // they share a single English source here.
 const AURA_NAME_KEY: Record<string, SimMessageKey> = {
+  'Crafted Momentum': 'aura.craftedMomentum',
+  'Crafted Shelter': 'aura.craftedShelter',
+  'Crafted Preservation': 'aura.craftedPreservation',
+  'Crafted Collection': 'aura.craftedCollection',
+  "Last Flame's Zeal": 'aura.lastflameZeal',
   Moontide: 'aura.moontide',
   // The operator-applied Cheater mark's countdown debuff (cheaterMarkAura in
   // src/sim/moderation/cheater_mark.ts). Without this row localizeSimAuraName

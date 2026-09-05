@@ -74,11 +74,11 @@ describe('reliquary_i18n English resolution', () => {
     // by a name row in every shipped locale chunk (the per-locale row count is
     // pinned to the same 39 below), so a new page cannot quietly render English
     // to a CJK or Cyrillic reader. 35 + the four Crucible raid pages.
-    expect(pageCount).toBe(39);
-    expect(descCount).toBe(39);
+    expect(pageCount).toBe(40);
+    expect(descCount).toBe(40);
     expect(manifest.length).toBe(pageCount + descCount);
-    expect(manifest.filter((row) => row.field === 'name').length).toBe(39);
-    expect(manifest.filter((row) => row.field === 'desc').length).toBe(39);
+    expect(manifest.filter((row) => row.field === 'name').length).toBe(40);
+    expect(manifest.filter((row) => row.field === 'desc').length).toBe(40);
     expect(manifest).toContainEqual({
       id: 'conquerors_thunzharr',
       field: 'name',
@@ -167,8 +167,14 @@ describe('reliquary locale chunks (the shipped non-Latin fill)', () => {
   it('carries only real catalog page ids, and no empty values', () => {
     for (const lang of tableLocales()) {
       // Vacuity floor: an emptied chunk would satisfy every for-loop in this
-      // suite silently. One row per catalog page, in every shipped locale.
-      expect(Object.keys(tables[lang]).length, `${lang} row count`).toBe(39);
+      // suite silently. Preserve all 39 reviewed pages. The new Crucible page
+      // ships M16 names now; its Latin-language prose follows release fill.
+      const crucibleFilled = ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'].includes(lang);
+      expect(
+        Object.keys(tables[lang]).filter((id) => id !== 'professions_crucible').length,
+        `${lang} original row count`,
+      ).toBe(39);
+      expect(Object.hasOwn(tables[lang], 'professions_crucible')).toBe(crucibleFilled);
       for (const [id, entry] of Object.entries(tables[lang])) {
         expect(RELIQUARY_PAGES_BY_ID[id], `${lang}.${id} is not a catalog page`).toBeDefined();
         for (const field of ['name', 'desc'] as const) {
@@ -265,6 +271,15 @@ describe('reliquary locale chunks (the shipped non-Latin fill)', () => {
       const table = tables[lang];
       for (const row of nameRows) {
         const value = table[row.id]?.name;
+        // Existing 39-page translations remain mandatory in every locale.
+        // New content fills M16 now; this page's Latin names use English until release fill.
+        if (
+          row.id === 'professions_crucible' &&
+          !['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'].includes(lang)
+        ) {
+          expect(value).toBeUndefined();
+          continue;
+        }
         expect(value !== undefined && value.trim().length > 0, `${lang}.${row.id}.name`).toBe(true);
       }
     }

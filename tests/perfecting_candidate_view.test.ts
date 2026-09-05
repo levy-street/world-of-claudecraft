@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { perfectingCandidateLocation, perfectingCandidateState } from '../src/ui/hud/professions/perfecting_candidate_view';
+import {
+  perfectingCandidateLocation,
+  perfectingCandidateState,
+} from '../src/ui/hud/professions/perfecting_candidate_view';
 import type { PerfectingCandidate } from '../src/ui/hud/professions/perfecting_view';
 
 describe('shared Perfecting copy presentation', () => {
@@ -11,10 +14,20 @@ describe('shared Perfecting copy presentation', () => {
   });
 
   it('labels bag ordinal rather than absolute inventory cell, and distinguishes worn shared slots', () => {
-    const refs = [{ bag: 2, itemId: 'x' }, { bag: 8, itemId: 'x' }];
+    const refs = [
+      { bag: 2, itemId: 'x' },
+      { bag: 8, itemId: 'x' },
+    ];
     const candidates: PerfectingCandidate[] = refs.map((ref) => ({
-      ref, itemId: ref.itemId, worn: false, identity: String(ref.bag), selected: false,
-      state: 'track', rank: 0, ranks: 4, chosenName: null,
+      ref,
+      itemId: ref.itemId,
+      worn: false,
+      identity: String(ref.bag),
+      selected: false,
+      state: 'track',
+      rank: 0,
+      ranks: 4,
+      chosenName: null,
     }));
     expect(perfectingCandidateLocation(refs[1], candidates)).toBe('Bag copy 2 of 2');
     expect(perfectingCandidateLocation({ bag: 99, itemId: 'x' }, candidates)).toBeNull();

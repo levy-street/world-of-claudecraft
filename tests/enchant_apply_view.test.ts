@@ -151,7 +151,9 @@ describe('enchant_apply_view: effect facts on the pick row', () => {
         const bonus = enchant.statBonus;
         if (enchant.weaponProc) {
           const descriptions = hudChromeStrings.enchantDescription as Record<string, string>;
-          expect(descriptions[row.enchantId], `${row.enchantId} proc description`).toBe(enchant.description);
+          expect(descriptions[row.enchantId], `${row.enchantId} proc description`).toBe(
+            enchant.description,
+          );
           expect(descriptions[row.enchantId]).toContain(String(enchant.weaponProc.strength));
           expect(descriptions[row.enchantId]).toContain(String(enchant.weaponProc.duration));
           expect(descriptions[row.enchantId]).toContain(String(enchant.weaponProc.heal));
@@ -783,9 +785,9 @@ describe('enchant_apply_view: preservedReplaceTraits (#2421)', () => {
       rolled: { masterwork: true },
       boundTo: 9,
       bindOnTrade: true,
-      // Phase 14: the Perfecting family sits BELOW the trim gate with the
-      // bond, because the peer eqi projection carries neither field (the
-      // allowlist pin below), so a trimmed reader must stay silent about it.
+      // The old trimmed-reader flag conservatively hides the whole progress
+      // family. Public inspection now carries the final Perfected stamp, but
+      // still cannot disclose partial ranks or permanent binding.
       perfected: true as const,
     };
     expect(preservedReplaceTraits(victim, true)).toEqual(['signer', 'masterwork']);
@@ -816,9 +818,8 @@ describe('enchant_apply_view: preservedReplaceTraits (#2421)', () => {
     // not read as coverage either.
     const body = (block?.[0] ?? '').replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
     const projected = [...body.matchAll(/pub\.(\w+) = inst\.\w+/g)].map((m) => m[1]);
-    // Exactly the cosmetic inspect fields, and NOTHING that carries bind
-    // state. `name` (the player-chosen legendary name) joined at Masterwrought
-    // phase 13, the first cosmetic widening since the allowlist was written.
+    // Cosmetic fields plus the Perfected stamp needed for active enchants and
+    // collection item levels. Nothing that carries bind state or partial ranks.
     expect(projected.sort()).toEqual(['enchant', 'name', 'perfected', 'rolled', 'signer']);
     // Syntax-independent backstop: the extractor above only sees dot-notation
     // assignment, so a widening written as pub['boundTo'] = inst.boundTo or an
@@ -1336,7 +1337,11 @@ describe('enchant_apply_view: name discriminators (#2466)', () => {
     // The selectivity half: a dual-wielded pair reads "Main Hand" / "Off Hand"
     // already, so numbering it would be noise. Both arms of the same list.
     const sword = itemForSlot('mainhand');
-    const rows = wornEnchantTargets({ mainhand: sword, offhand: sword }, {}, 'enchant_weapon_might');
+    const rows = wornEnchantTargets(
+      { mainhand: sword, offhand: sword },
+      {},
+      'enchant_weapon_might',
+    );
     expect(rows.map((row) => row.slot)).toEqual(['mainhand', 'offhand']);
     for (const row of rows) expect(Object.hasOwn(row, 'slotIndex')).toBe(false);
   });

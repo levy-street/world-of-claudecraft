@@ -39,6 +39,7 @@
 import { ENCHANTS, type EnchantDef } from '../../../sim/content/enchants';
 import { ITEMS } from '../../../sim/data';
 import { countRawInSlots } from '../../../sim/item_lock';
+import { isEnchantKnown } from '../../../sim/professions/enchant_formula';
 import {
   baggedEnchantVictim,
   isEnchantedInstance,
@@ -112,6 +113,7 @@ export interface EnchantViewerInput {
   /** The viewer's flat Enchanting skill
    *  (craftingIdentity.craftSkills.enchanting). Read only while `synced`. */
   enchantingSkill: number;
+  knownRecipes?: readonly string[];
   /** The worn set (IWorld.equipment) and its per-slot payload mirror
    *  (IWorld.equipmentInstances, the SELF `einst` mirror, whole in both hosts),
    *  read by the PERFECTED candidate scan alone (perfectedCandidateExists
@@ -168,6 +170,7 @@ export interface EnchantPickRow {
    *  gear they already had. Always true for an UNSYNCED viewer (see
    *  EnchantViewerInput.synced: an all-zero skill mirror is not a shortfall). */
   skillMet: boolean;
+  known: boolean;
   /** False only when the enchant requires a PERFECTED copy (EnchantDef
    *  requiresPerfected) and no candidate copy carries the marker: the row is
    *  LISTED and painted inert with its own line, the skill dimension exactly.
@@ -221,6 +224,7 @@ export function enchantsForReagent(
       reagents,
       affordable: reagents.every((reagent) => reagent.have >= reagent.required),
       skillMet: skillMeetsEnchant(enchant, viewer),
+      known: !viewer.synced || isEnchantKnown(enchant, viewer.knownRecipes),
       perfectedMet: perfectedCandidateExists(enchant, inventory, viewer),
     };
     if (enchant.skillReq !== undefined) row.skillReq = enchant.skillReq;
@@ -715,6 +719,7 @@ export function enchantTargets(
   const enchant = ENCHANTS[enchantId];
   if (!enchant) return [];
   if (!skillMeetsEnchant(enchant, viewer)) return [];
+  if (viewer.synced && !isEnchantKnown(enchant, viewer.knownRecipes)) return [];
   const byItem = new Map<string, number>();
   const enchantedByItem = new Map<string, number>();
   inventory.forEach((slot) => {
@@ -846,6 +851,7 @@ export function wornEnchantTargets(
   const enchant = ENCHANTS[enchantId];
   if (!enchant) return [];
   if (!skillMeetsEnchant(enchant, viewer)) return [];
+  if (viewer.synced && !isEnchantKnown(enchant, viewer.knownRecipes)) return [];
   const rows: WornEnchantTargetRow[] = [];
   for (const slot of ALL_EQUIP_SLOTS) {
     const itemId = equipment[slot];

@@ -121,27 +121,35 @@ describe('collection manual and enchant formula tooltips', () => {
     const model = recipePatternTooltipModel(item, state);
     expect(model?.known).toBe(false);
     expect(model?.resultItemIds).toEqual([
-      'crucible_str_mail_chest', 'crucible_str_mail_waist', 'crucible_str_mail_feet',
+      'crucible_str_mail_chest',
+      'crucible_str_mail_waist',
+      'crucible_str_mail_feet',
     ]);
     const html = recipePatternTooltipLines(item, state);
-    expect(html).toContain("Crucible Striker&#39;s Hauberk");
-    expect(html).toContain("Crucible Striker&#39;s Girdle");
-    expect(html).toContain("Crucible Striker&#39;s Sabatons");
+    expect(html).toContain('Crucible Striker&#39;s Hauberk');
+    expect(html).toContain('Crucible Striker&#39;s Girdle');
+    expect(html).toContain('Crucible Striker&#39;s Sabatons');
     expect(html).not.toContain('You already know that recipe.');
   });
 
   it('calls a whole collection known only when all three recipes are known', () => {
-    const knownRecipes = ['chest', 'waist', 'feet'].map((slot) => `recipe_crucible_str_mail_${slot}`);
-    expect(recipePatternTooltipModel(ITEMS.pattern_crucible_str_mail, viewer({ knownRecipes }))?.known)
-      .toBe(true);
+    const knownRecipes = ['chest', 'waist', 'feet'].map(
+      (slot) => `recipe_crucible_str_mail_${slot}`,
+    );
+    expect(
+      recipePatternTooltipModel(ITEMS.pattern_crucible_str_mail, viewer({ knownRecipes }))?.known,
+    ).toBe(true);
   });
 
   it('previews the enchant formula and its real enchanting skill requirement', () => {
     const item = ITEMS.formula_lastflame_zeal;
     const model = recipePatternTooltipModel(item, viewer({ craftSkills: { enchanting: 100 } }));
     expect(model).toMatchObject({
-      enchantId: 'enchant_weapon_lastflame_zeal', professionId: 'enchanting',
-      skillReq: 100, skillMet: true, known: false,
+      enchantId: 'enchant_weapon_lastflame_zeal',
+      professionId: 'enchanting',
+      skillReq: 100,
+      skillMet: true,
+      known: false,
     });
     const html = recipePatternTooltipLines(item, viewer({ craftSkills: { enchanting: 99 } }));
     expect(html).toContain('Last Flame');

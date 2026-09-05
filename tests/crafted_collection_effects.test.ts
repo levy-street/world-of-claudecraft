@@ -37,7 +37,8 @@ function harness(...entities: Entity[]) {
     rng: { chance: vi.fn(), next: vi.fn() },
     emit: vi.fn(),
     isHostileTo: (source: Entity, target: Entity) => source.id !== target.id,
-    isFriendlyTo: (source: Entity, target: Entity) => source.kind === 'player' && target.kind === 'player',
+    isFriendlyTo: (source: Entity, target: Entity) =>
+      source.kind === 'player' && target.kind === 'player',
     applyAura: (target: Entity, aura: Aura) => {
       target.auras = target.auras.filter(
         (active) => active.id !== aura.id || active.sourceId !== aura.sourceId,

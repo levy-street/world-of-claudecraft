@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
-  CRUCIBLE_COLLECTIONS,
   CRUCIBLE_COLLECTION_ITEMS,
   CRUCIBLE_COLLECTION_PATTERNS,
+  CRUCIBLE_COLLECTIONS,
   CRUCIBLE_SIGNATURE_TEXT,
 } from '../src/sim/content/crucible_collections';
 import { CRUCIBLE_PROFESSION_ITEMS } from '../src/sim/content/crucible_professions';
@@ -19,7 +19,11 @@ const NEW_ITEMS = [
   CRUCIBLE_PROFESSION_ITEMS.formula_lastflame_zeal,
 ];
 const NON_LATIN: Record<string, Record<string, string | undefined>> = {
-  zh_CN, zh_TW, ja_JP, ko_KR, ru_RU,
+  zh_CN,
+  zh_TW,
+  ja_JP,
+  ko_KR,
+  ru_RU,
 };
 
 describe('Crucible profession content localization', () => {

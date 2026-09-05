@@ -59,6 +59,7 @@ import {
   wornEnchantTargets,
 } from './hud/professions/enchant_apply_view';
 import { formatNumber, t } from './i18n';
+import type { TranslationKey } from './i18n.catalog';
 import { itemNumber, itemStatName } from './item_instance_tooltip';
 import { wornItemCellParts } from './worn_item_cell_view';
 
@@ -328,6 +329,7 @@ export class BagItemActionMenu {
     return {
       synced: world.craftingIdentity.synced,
       enchantingSkill: world.craftingIdentity.craftSkills.enchanting ?? 0,
+      knownRecipes: world.craftingIdentity.knownRecipes,
       // The worn set, for the Perfected candidate scan alone: a Perfected copy
       // on the body must keep the capstone row live, since the target step
       // lists worn copies beside bagged ones. The same two reads
@@ -426,14 +428,16 @@ export class BagItemActionMenu {
         // The effect line reuses the item tooltip's own stat-line key and stat
         // names, so "+4 Stamina" reads identically here and on the enchanted
         // copy's tooltip; no new i18n for the effect itself.
-        const effectsText = pick.effects
-          .map((effect) =>
-            t('itemUi.tooltip.stat', {
-              value: itemNumber(effect.value),
-              stat: itemStatName(effect.stat),
-            }),
-          )
-          .join(', ');
+        const effectsText = ENCHANTS[pick.enchantId]?.weaponProc
+          ? t(`hudChrome.enchantDescription.${pick.enchantId}` as TranslationKey)
+          : pick.effects
+              .map((effect) =>
+                t('itemUi.tooltip.stat', {
+                  value: itemNumber(effect.value),
+                  stat: itemStatName(effect.stat),
+                }),
+              )
+              .join(', ');
         const effectHtml = effectsText
           ? `<span class="ctx-item-effect">${esc(effectsText)}</span>`
           : '';
@@ -446,15 +450,18 @@ export class BagItemActionMenu {
         // size bump: on a phone this sub-line is the ONLY explanation of why a
         // visible row cannot be tapped, so it is not reference fine print.
         const skillHtml = pick.skillMet ? '' : this.gateMeta(this.skillGateText(pick.skillReq));
+        const knownHtml = pick.known
+          ? ''
+          : this.gateMeta(t('hudChrome.enchanting.recipeNotLearned'));
         const perfectedHtml = pick.perfectedMet
           ? ''
           : this.gateMeta(t('hudChrome.enchanting.notPerfected'));
-        const html = `${esc(t(enchantNameKey(pick.enchantId)))}${effectHtml}<span class="ctx-item-meta">${esc(this.deps.slotName(pick.itemSlot as ItemSlot))}: ${reagentsHtml}</span>${skillHtml}${perfectedHtml}`;
+        const html = `${esc(t(enchantNameKey(pick.enchantId)))}${effectHtml}<span class="ctx-item-meta">${esc(this.deps.slotName(pick.itemSlot as ItemSlot))}: ${reagentsHtml}</span>${skillHtml}${knownHtml}${perfectedHtml}`;
         // One routing rule over every dimension: a row is selectable only when
         // it clears ALL of them, so hover and click agree and no gate can be
         // answered later, on the target list, with a sentence about the bags.
         rows.push(
-          pick.affordable && pick.skillMet && pick.perfectedMet
+          pick.affordable && pick.skillMet && pick.known && pick.perfectedMet
             ? { act: `enchant:${pick.enchantId}`, html }
             : { html, disabled: true },
         );

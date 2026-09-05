@@ -11,10 +11,14 @@ import type { ItemInstancePayload } from '../src/sim/types';
 describe('inspect preserves the visible Perfected state without private rank provenance', () => {
   it.each([false, true])('mirrors active enchant stats when Perfected=%s', (perfected) => {
     const instance: ItemInstancePayload = {
-      signer: 'Ayla', name: 'Lastlight', enchant: 'enchant_lucent_infusion',
+      signer: 'Ayla',
+      name: 'Lastlight',
+      enchant: 'enchant_lucent_infusion',
       rolled: { quality: 'legendary', stats: { sta: 13, str: 2 } },
       ...(perfected ? { perfected: true } : { perfecting: 1 }),
-      perfectingBound: true, perfectingBonus: { str: 2 }, boundTo: 77,
+      perfectingBound: true,
+      perfectingBonus: { str: 2 },
+      boundTo: 77,
     };
     const projected = publicInstanceView(instance);
     expect(projected.perfected).toBe(perfected ? true : undefined);

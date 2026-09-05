@@ -15,23 +15,38 @@ describe('Crucible collection per-copy item level', () => {
         expect(itemInstanceLevel(item, { perfecting }), `${item.id} rank ${perfecting}`).toBe(35);
       }
       expect(itemInstanceLevel(item, { perfected: true }), item.id).toBe(38);
-      expect(itemInstanceLevel(item, { perfected: true, rolled: { quality: 'legendary' } }), item.id).toBe(38);
-      expect(itemInstanceLevel(item, { perfectingBound: true, rolled: { quality: 'legendary' } }), item.id).toBe(35);
+      expect(
+        itemInstanceLevel(item, { perfected: true, rolled: { quality: 'legendary' } }),
+        item.id,
+      ).toBe(38);
+      expect(
+        itemInstanceLevel(item, { perfectingBound: true, rolled: { quality: 'legendary' } }),
+        item.id,
+      ).toBe(35);
     }
   });
 
   it('agrees for the owner and public worn projection using only the public Perfected stamp', () => {
     const item = ITEMS.crucible_str_mail_chest;
-    const worn = wornTooltipInstance({ perfected: true, perfectingBonus: { str: 1 }, perfectingBound: true });
+    const worn = wornTooltipInstance({
+      perfected: true,
+      perfectingBonus: { str: 1 },
+      perfectingBound: true,
+    });
     expect(worn).toEqual({ perfected: true });
     expect(itemInstanceLevel(item, worn)).toBe(38);
   });
 
   it('does not reprice legacy Masterwrought or other ordinary gear from an instance stamp', () => {
-    const legacy = Object.values(ITEMS).filter((item) => item.masterwrought && !crucibleCollectionForItem(item.id));
+    const legacy = Object.values(ITEMS).filter(
+      (item) => item.masterwrought && !crucibleCollectionForItem(item.id),
+    );
     expect(legacy).toHaveLength(17);
-    for (const item of legacy) expect(itemInstanceLevel(item, { perfected: true })).toBe(itemLevel(item));
-    expect(itemInstanceLevel(ITEMS.greyjaw_pelt_cloak, { perfected: true })).toBe(itemLevel(ITEMS.greyjaw_pelt_cloak));
+    for (const item of legacy)
+      expect(itemInstanceLevel(item, { perfected: true })).toBe(itemLevel(item));
+    expect(itemInstanceLevel(ITEMS.greyjaw_pelt_cloak, { perfected: true })).toBe(
+      itemLevel(ITEMS.greyjaw_pelt_cloak),
+    );
     expect(itemInstanceLevel(ITEMS.conjured_water, { perfected: true })).toBeUndefined();
   });
 });

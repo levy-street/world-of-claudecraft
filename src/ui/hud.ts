@@ -88,7 +88,7 @@ import {
 } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
 import { canEquipItem, isUniqueEquipped, weaponHand } from '../sim/equipment_rules';
-import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
+import { isItemLevelEligible, itemInstanceLevel, itemScore } from '../sim/item_level';
 import { requiredLevelFor } from '../sim/item_level_req';
 import type { Ante, PickAction } from '../sim/lockpick';
 import { petCanForceTaunt } from '../sim/pet/pet_taunt_gate';
@@ -532,6 +532,7 @@ import {
   gatherToolNoNodeKey,
 } from './hud/professions/gathering_view';
 import { HarvestJournalWindow } from './hud/professions/harvest_journal_window';
+import { learnedProfessionMessage } from './hud/professions/learned_profession_name';
 import { materialHintLine } from './hud/professions/material_hint_view';
 import { materialProfessionHintText } from './hud/professions/material_profession_hint_view';
 import { mobileStationTooltipLines } from './hud/professions/mobile_station_tooltip';
@@ -6484,7 +6485,7 @@ export class Hud {
     // hover. Combat gear only: sourceless items (vendor/starter) have no level,
     // and non-combat items never get an item-level line.
     if (isItemLevelEligible(item) && this.optionsHooks?.settings.get('showItemLevel')) {
-      const level = itemLevel(item);
+      const level = itemInstanceLevel(item, instance);
       if (level !== undefined) {
         html += `<div class="tt-stat" style="color:var(--gold)">${esc(
           t('hudChrome.options.itemLevelLine', { level: itemNumber(level) }),
@@ -11980,13 +11981,7 @@ export class Hud {
           this.trainLearns.resolve(ev.recipeId, ev.ok);
           const trainedRecipe = recipeById(ev.recipeId);
           if (ev.ok) {
-            const item = trainedRecipe ? ITEMS[trainedRecipe.resultItemId] : undefined;
-            this.log(
-              t('hudChrome.training.learned', {
-                recipe: item ? itemDisplayName(item) : ev.recipeId,
-              }),
-              PROF_LOG_GRANT,
-            );
+            this.log(learnedProfessionMessage(ev.recipeId), PROF_LOG_GRANT);
           } else if (ev.reason) {
             // A reason-less deny is the malformed-recipe-id probe arm
             // (resolveTrain's silent arm): nothing legible to tell the player,
@@ -12019,6 +12014,9 @@ export class Hud {
           if ($('#crafting-window').style.display === 'flex') this.renderCrafting();
           break;
         }
+        case 'perfectingSwapResult':
+          this.perfectingWindow?.onSwapResult(ev);
+          break;
         case 'unbindResult': {
           // Maker's Bond unbind outcome (Professions 2.0). The
           // event is text-free: the item name derives from itemId plus static
@@ -16187,12 +16185,11 @@ export class Hud {
     return this.marketWindow.isOpen;
   }
 
-  // Reconnect resync (issue #2416): re-push the market window's own browse query
-  // if it drifted from what the server echoes back after a fresh-join reconnect.
-  // Wired from the client's onReconnected hook (main.ts); a no-op when the window
-  // is closed or the echoed query still matches (see MarketWindow.onReconnected).
-  marketResyncAfterReconnect(): void {
+  // The shared reconnect hook preserves market browse resync and retires any
+  // unconfirmed Perfecting exchange without replaying its mutation.
+  resyncAfterReconnect(): void {
     this.marketWindow.onReconnected();
+    this.perfectingWindow?.onReconnected();
   }
 
   openMailbox(): void {

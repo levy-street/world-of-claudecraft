@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { CRUCIBLE_COLLECTIONS, CRUCIBLE_COLLECTION_ITEMS } from '../src/sim/content/crucible_collections';
+import {
+  CRUCIBLE_COLLECTION_ITEMS,
+  CRUCIBLE_COLLECTIONS,
+} from '../src/sim/content/crucible_collections';
 
 describe('crafted collection armor stays alongside the current raid', () => {
   it('uses the current raid boot ceiling for all three armor weights', () => {

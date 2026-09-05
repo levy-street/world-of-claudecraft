@@ -11,6 +11,7 @@
 // is reading the tooltip for.
 import { ENCHANTS } from '../sim/content/enchants';
 import { effectiveQuality } from '../sim/equipment_rules';
+import { activeItemInstanceStats, isItemEnchantActive } from '../sim/item_instance_stats';
 import { isCommissionEligibleKind } from '../sim/professions/commission';
 import { isEnchantedInstance } from '../sim/professions/enchanting';
 import { LEGENDARY_PROMOTION_COST, PERFECTING_RANKS } from '../sim/professions/perfecting';
@@ -50,8 +51,8 @@ export function itemNumber(value: number, fractionDigits = 0): string {
 }
 
 /** The WORN-slot tooltip payload (Professions 2.0): the fields
- *  the public eqi wire carries (signer/enchant/rolled, plus the
- *  phase 13 legendary name; the worn-identity trim), so the offline
+ *  the public eqi wire carries (signer/enchant/rolled/name/perfected;
+ *  the worn-identity trim), so the offline
  *  paperdoll and the online mirror render identical worn tooltips. Online, equippedInstances is decoded from
  *  the stripped eqi allowlist and never carries bindOnTrade/boundTo/charges;
  *  offline the self entity holds the FULL payload, so without this trim the
@@ -70,15 +71,9 @@ export function wornTooltipInstance(
   // cosmetic field to JOIN the eqi allowlist since it was written, so the
   // offline paperdoll title matches what an online inspector sees.
   if (instance.name !== undefined) worn.name = instance.name;
-  // The Perfected stamp (2026-08-27): the one DELIBERATE divergence from the
-  // eqi allowlist, and a CLIENT-SIDE SELF projection only. The owner's own
-  // paperdoll may know the copy is Perfected (einst carries the full payload
-  // on both hosts), and the promotion-scoped isUniqueEquipped needs the stamp
-  // or a promoted copy's own worn tooltip drops its Unique-Equipped tag. The
-  // PEER inspect card deliberately shows no Unique-Equipped tag for an
-  // instance-legendary copy: `perfected` stays OFF the eqi wire (the phase 12
-  // data-minimization decision, pinned in tests/enchant_apply_view.test.ts),
-  // and that missing tag is the recorded consequence.
+  // Public inspection now carries the Perfected stamp so active enchants and
+  // collection item levels agree in both hosts. Partial ranks, binding and the
+  // immutable Perfecting contribution remain private and are never copied here.
   if (instance.perfected !== undefined) worn.perfected = instance.perfected;
   return worn;
 }
@@ -195,9 +190,8 @@ export function instanceLockLine(instance?: ItemInstancePayload): string {
  *  Phase 14, the Perfecting badges, both DATA-DRIVEN off the payload alone so
  *  every trim stays authoritative about what shows where:
  *   - a `perfected` copy states it in one gold line. The worn projection
- *     (wornTooltipInstance) deliberately carries `perfected`, so the OWNER'S
- *     paperdoll shows it; the peer inspect card's eqi mirror never carries the
- *     field (D13-3, perfected stays off that wire) and correctly stays silent.
+ *     (wornTooltipInstance) and the peer inspect card's public eqi mirror both
+ *     carry `perfected`, so the badge and active enchant facts agree.
  *   - a HEAD-STARTED copy (rank-walk `perfecting` in [1, PERFECTING_RANKS-1],
  *     not yet perfected) states its rank on the owner's own full-payload
  *     surfaces (bags, the market sell staging, returned listings). The
@@ -251,8 +245,10 @@ function statLine(key: TranslationKey, value: number, stat: string): string {
  *  plain line's output. */
 export function instanceBonusStatLines(instance?: ItemInstancePayload): string {
   if (!instance) return '';
-  const bonusStats = instance.rolled?.stats;
-  const enchantShare = instance.enchant ? ENCHANTS[instance.enchant]?.statBonus : undefined;
+  const bonusStats = activeItemInstanceStats(instance);
+  const active = isItemEnchantActive(instance);
+  const enchant = instance.enchant ? ENCHANTS[instance.enchant] : undefined;
+  const enchantShare = active ? enchant?.statBonus : undefined;
   const legacyEnchanted = instance.enchant === undefined && isEnchantedInstance(instance);
   let html = '';
   let attributed = false;
@@ -276,12 +272,16 @@ export function instanceBonusStatLines(instance?: ItemInstancePayload): string {
     const remainder = value - share;
     if (remainder !== 0) html += statLine('itemUi.tooltip.stat', remainder, stat);
   }
-  // Safety net: attribution can only speak through a stat line, so a copy that
-  // IS enchanted but produced none (an enchant id this client cannot resolve, or
-  // a payload carrying the marker without rolled.stats) still states the fact.
-  // Its bag corner already paints the enchant glyph, so silence here would be a
-  // real information loss, not just a missing flourish.
-  if (!attributed && isEnchantedInstance(instance)) {
+  // A weapon proc describes its temporary effect, never a permanent stat gain.
+  // Unknown or incomplete enchanted payloads retain the marker fallback when
+  // no stat could be attributed. A dormant enchant instead states its gate.
+  if (!active) {
+    html += `<div class="tt-sub">${esc(t('hudChrome.perfecting.enchantInactive'))}</div>`;
+  } else if (enchant?.weaponProc) {
+    html += `<div class="tt-green tt-instance-bonus">${esc(
+      t(`hudChrome.enchantDescription.${enchant.id}` as TranslationKey),
+    )}</div>`;
+  } else if (!attributed && isEnchantedInstance(instance)) {
     html += `<div class="tt-sub" style="color:${QUALITY_COLOR.uncommon}">${esc(
       t('hudChrome.itemTooltip.enchantedFallback'),
     )}</div>`;

@@ -835,9 +835,22 @@ describe('ENCHANTS table integrity', () => {
     for (const [key, e] of Object.entries(ENCHANTS)) {
       expect(e.id).toBe(key);
       expect(VALID_ITEM_SLOTS.has(e.itemSlot)).toBe(true);
-      // A real, non-empty stat bonus using only categories recalcPlayerStats reads.
+      // Stat enchants still need a real, non-empty bonus. A proc-only weapon
+      // enchant may omit flat stats only when its complete runtime shape is valid.
       const bonusKeys = Object.keys(e.statBonus);
-      expect(bonusKeys.length).toBeGreaterThan(0);
+      if (e.weaponProc) {
+        expect(['mainhand', 'offhand']).toContain(e.itemSlot);
+        expect(Object.keys(e.weaponProc).sort()).toEqual(['duration', 'heal', 'ppm', 'strength']);
+        for (const value of Object.values(e.weaponProc)) {
+          expect(Number.isFinite(value)).toBe(true);
+          expect(value).toBeGreaterThan(0);
+        }
+        expect(Number.isInteger(e.weaponProc.strength)).toBe(true);
+        expect(Number.isInteger(e.weaponProc.heal)).toBe(true);
+        expect(e.description?.trim().length ?? 0).toBeGreaterThan(0);
+      } else {
+        expect(bonusKeys.length).toBeGreaterThan(0);
+      }
       for (const k of bonusKeys) {
         expect(VALID_STAT_KEYS.has(k)).toBe(true);
         expect(e.statBonus[k as keyof typeof e.statBonus]).toBeGreaterThan(0);

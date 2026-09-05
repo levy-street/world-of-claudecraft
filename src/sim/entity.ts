@@ -5,8 +5,8 @@ import type { TalentModifiers } from './content/talents';
 import { resolveActiveWeaponSkin } from './content/weapon_skin_rules';
 import { aggregateSetBonuses, CLASSES, ITEMS, MOBS, type NpcDef } from './data';
 import { canDualWield, isShieldItem } from './equipment_rules';
-import { meetsLevelRequirement } from './item_level_req';
 import { activeItemInstanceStats } from './item_instance_stats';
+import { meetsLevelRequirement } from './item_level_req';
 import { pvpFractionsFromRatings } from './pvp';
 import type {
   Entity,

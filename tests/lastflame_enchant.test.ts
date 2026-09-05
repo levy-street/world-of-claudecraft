@@ -9,7 +9,7 @@ import { createMob, createPlayer, recalcPlayerStats } from '../src/sim/entity';
 import { advancePendingProjectiles } from '../src/sim/projectile_travel';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
-import type { Aura } from '../src/sim/types';
+import { type Aura, DT } from '../src/sim/types';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 const ENCHANT = 'enchant_weapon_lastflame_zeal';
@@ -48,7 +48,8 @@ function meleeHarness(itemId: string, seed = 44) {
   sim.setPlayerLevel(20);
   const source = sim.player;
   const ctx = (sim as unknown as { ctx: SimContext }).ctx;
-  const meta = sim.players.get(source.id)!;
+  const meta = sim.players.get(source.id);
+  if (!meta) throw new Error('fixture player missing');
   meta.equipment.mainhand = itemId;
   meta.equipmentInstance.mainhand = { enchant: ENCHANT };
   recalcPlayerStats(source, 'warrior', meta.equipment, meta.talentMods, meta.equipmentInstance);
@@ -64,6 +65,22 @@ function trainingTarget(sim: Sim, hp: number, id = 9500) {
   target.hostile = true;
   sim.entities.set(target.id, target);
   return target;
+}
+
+function differentSpeedHands() {
+  const fixture = meleeHarness('duskforged_warblade');
+  const { sim, source } = fixture;
+  expect(sim.setSpec('fury')).toBe(true);
+  const meta = sim.players.get(source.id);
+  if (!meta) throw new Error('fixture player missing');
+  meta.equipment.offhand = 'rusty_dagger';
+  meta.equipmentInstance.offhand = { enchant: ENCHANT };
+  recalcPlayerStats(source, 'warrior', meta.equipment, meta.talentMods, meta.equipmentInstance);
+  expect(source.dualWielding).toBe(true);
+  expect(source.weapon.speed).toBe(2.5);
+  expect(source.offhandWeapon?.speed).toBe(1.8);
+  expect(source.auras.some((aura) => aura.kind === 'buff_stats_pct')).toBe(false);
+  return { ...fixture, target: trainingTarget(sim, 100_000) };
 }
 
 describe("Last Flame's Zeal", () => {
@@ -213,6 +230,111 @@ describe("Last Flame's Zeal", () => {
     expect(raw.rng.chance).toHaveBeenCalledTimes(3);
   });
 
+  it.each([
+    ['mainhand', 0.041666666666666664, 0.04166666666666666, true],
+    ['mainhand', 0.041666666666666664, 0.041666666666666664, false],
+    ['mainhand', 0.041666666666666664, 0.04166666666666667, false],
+    ['offhand', 0.030000000000000002, 0.03, true],
+    ['offhand', 0.030000000000000002, 0.030000000000000002, false],
+    ['offhand', 0.030000000000000002, 0.030000000000000006, false],
+  ] as const)(
+    'a real %s hit uses literal proc chance %f at draw %f (proc: %s)',
+    (hand, probability, roll, procs) => {
+      const { source, target, ctx } = differentSpeedHands();
+      const beforeStr = source.stats.str;
+      // White-hit table, weapon roll, crit, then Zeal. Rng.chance keeps its
+      // real strict boundary comparison; only the underlying draws are scripted.
+      const next = vi
+        .spyOn(ctx.rng, 'next')
+        .mockReturnValue(0.5)
+        .mockReturnValueOnce(0.5)
+        .mockReturnValueOnce(0.5)
+        .mockReturnValueOnce(0.5)
+        .mockReturnValueOnce(roll);
+      const chance = vi.spyOn(ctx.rng, 'chance');
+      try {
+        expect(
+          meleeSwing(ctx, source, target, 0, null, {
+            autoAttackHand: hand,
+            autoAttack: true,
+            weapon: hand === 'offhand' ? (source.offhandWeapon ?? undefined) : source.weapon,
+          }),
+        ).toBe(true);
+        expect(target.hp).toBeLessThan(target.maxHp);
+        expect(chance).toHaveBeenCalledTimes(2);
+        expect(chance).toHaveBeenLastCalledWith(probability);
+        expect(next).toHaveBeenCalledTimes(4);
+        expect(source.stats.str - beforeStr).toBe(procs ? 50 : 0);
+        expect(
+          source.auras.filter((aura) => aura.id.startsWith(ENCHANT)).map((aura) => aura.id),
+        ).toEqual(procs ? [`${ENCHANT}_${hand}`] : []);
+      } finally {
+        next.mockRestore();
+        chance.mockRestore();
+      }
+    },
+  );
+
+  it('different-speed real hands grant exactly 100 Strength and refresh only their own aura', () => {
+    const { source, target, ctx } = differentSpeedHands();
+    const beforeStr = source.stats.str;
+    const beforeAp = source.attackPower;
+    const next = vi.spyOn(ctx.rng, 'next');
+    const chance = vi.spyOn(ctx.rng, 'chance');
+    const strike = (hand: 'mainhand' | 'offhand', probability: number) => {
+      next
+        .mockReset()
+        .mockReturnValue(0.5)
+        .mockReturnValueOnce(0.5)
+        .mockReturnValueOnce(0.5)
+        .mockReturnValueOnce(0.5)
+        .mockReturnValueOnce(0);
+      chance.mockClear();
+      expect(
+        meleeSwing(ctx, source, target, 0, null, {
+          autoAttackHand: hand,
+          autoAttack: true,
+          weapon: hand === 'offhand' ? (source.offhandWeapon ?? undefined) : source.weapon,
+        }),
+      ).toBe(true);
+      expect(chance).toHaveBeenLastCalledWith(probability);
+      expect(chance).toHaveBeenCalledTimes(2);
+      expect(next).toHaveBeenCalledTimes(4);
+    };
+    try {
+      strike('mainhand', 0.041666666666666664);
+      expect(source.stats.str - beforeStr).toBe(50);
+      for (let tick = 0; tick < 20; tick++) updateAuras(ctx, source);
+      strike('offhand', 0.030000000000000002);
+      expect(source.stats.str - beforeStr).toBe(100);
+      expect(source.attackPower - beforeAp).toBe(200);
+      expect(source.auras.filter((aura) => aura.kind === 'buff_str')).toHaveLength(2);
+      const main = source.auras.find((aura) => aura.id === `${ENCHANT}_mainhand`);
+      const off = source.auras.find((aura) => aura.id === `${ENCHANT}_offhand`);
+      expect(main).toMatchObject({ value: 50, duration: 15 });
+      expect(main?.remaining).toBeCloseTo(14);
+      expect(off).toMatchObject({ value: 50, duration: 15, remaining: 15 });
+      for (let tick = 0; tick < 20; tick++) updateAuras(ctx, source);
+      const offRemaining = off?.remaining;
+      strike('mainhand', 0.041666666666666664);
+      expect(source.stats.str - beforeStr).toBe(100);
+      expect(source.auras.filter((aura) => aura.kind === 'buff_str')).toHaveLength(2);
+      expect(source.auras.find((aura) => aura.id === `${ENCHANT}_mainhand`)?.remaining).toBe(15);
+      expect(source.auras.find((aura) => aura.id === `${ENCHANT}_offhand`)?.remaining).toBe(
+        offRemaining,
+      );
+      for (let tick = 0; tick < 281; tick++) updateAuras(ctx, source);
+      expect(source.stats.str - beforeStr).toBe(50);
+      expect(source.auras.some((aura) => aura.id === `${ENCHANT}_offhand`)).toBe(false);
+      for (let tick = 0; tick < 20; tick++) updateAuras(ctx, source);
+      expect(source.stats.str).toBe(beforeStr);
+      expect(source.attackPower).toBe(beforeAp);
+    } finally {
+      next.mockRestore();
+      chance.mockRestore();
+    }
+  });
+
   it('does not proc from ranged Auto Shot, spells, heals, an empty hand, or a dead wielder', () => {
     const { ctx, raw, wielder, target } = harness();
     runWeaponProcs(ctx, wielder, target, 'weaponHit');
@@ -329,6 +451,7 @@ describe("Last Flame's Zeal", () => {
         });
         timeline.push({
           swing,
+          time: sim.time,
           landed,
           killed: target.dead,
           healed: source.hp - beforeHp,
@@ -336,7 +459,7 @@ describe("Last Flame's Zeal", () => {
           remaining: source.auras.find((aura) => aura.id === `${ENCHANT}_mainhand`)?.remaining ?? 0,
         });
         for (let tick = 0; tick < 60; tick++) {
-          sim.time += ctx.dt;
+          sim.time += DT;
           updateAuras(ctx, source);
         }
       }
@@ -349,6 +472,7 @@ describe("Last Flame's Zeal", () => {
     }
     const first = replay();
     expect(replay()).toEqual(first);
+    expect(first.timeline.at(-1)?.time).toBeCloseTo(477);
     expect(first.timeline.some((entry) => entry.killed && entry.healed === 200)).toBe(true);
     expect(first.timeline.some((entry) => entry.remaining > 0 && entry.remaining < 15)).toBe(true);
     expect(first.activeAfterExpiry).toBe(false);

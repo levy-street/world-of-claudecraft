@@ -92,10 +92,16 @@ describe('Perfecting rank exchange inside the existing window', () => {
   it('distinguishes duplicate bagged and worn targets by rank and copy location through confirmation', () => {
     world.equipment = { waist: WAIST };
     world.equipmentInstances = { waist: { perfecting: 3 } };
-    world.inventory.push({ itemId: WAIST, count: 1, instance: { perfecting: 2, perfectingBound: true } });
+    world.inventory.push({
+      itemId: WAIST,
+      count: 1,
+      instance: { perfecting: 2, perfectingBound: true },
+    });
     win.open();
     root().querySelectorAll<HTMLButtonElement>('[data-cand-i]')[1].click();
-    const labels = [...root().querySelectorAll<HTMLButtonElement>('[data-swap-target]')].map((row) => row.textContent);
+    const labels = [...root().querySelectorAll<HTMLButtonElement>('[data-swap-target]')].map(
+      (row) => row.textContent,
+    );
     expect(new Set(labels).size).toBe(labels.length);
     expect(target(0).textContent).toContain('Worn (Waist)');
     expect(target(0).textContent).toContain('Rank 3 of 4');
@@ -103,7 +109,9 @@ describe('Perfecting rank exchange inside the existing window', () => {
     expect(target(1).textContent).toContain('Rank 1 of 4');
     expect(target(3).textContent).toContain('Bag copy 2 of 2');
     expect(target(3).textContent).toContain('Rank 2 of 4');
-    expect(root().querySelectorAll<HTMLButtonElement>('[data-cand-i]')[1].textContent).toContain('Bag copy 1 of 1');
+    expect(root().querySelectorAll<HTMLButtonElement>('[data-cand-i]')[1].textContent).toContain(
+      'Bag copy 1 of 1',
+    );
     target(3).click();
     action().click();
     const prompt = document.querySelector('.pf-swap-prompt')!;

@@ -2,7 +2,8 @@
 
 ## Status and authority
 
-Implementation in progress, not a balance verdict or merge recommendation.
+Implementation and targeted balance measurements are complete; final shared
+QA and publication are in progress. This is not a merge recommendation.
 The maintainer approved this direction on 2026-09-05. The integration PR targets
 FernandoX7's `feature/masterwrought`, initially based on
 `0f53c92ff738ebebb6add787a61caecdf7e8e884`. No change is merged into that branch
@@ -39,9 +40,15 @@ extraction scaffolding removes raid loot that must remain live.
 - The separate legendary quest leads to the existing iLvl 55 Forgebreaker, not
   the historical iLvl 39 Requiem. The raid legendary is not Masterwrought-flagged.
 
-## Initial tuning, subject to measurement
+## Tuning and measured comparison
 
-These are implementation candidates, not claims of measured raid balance.
+The [balance report](crucible-professions-balance-measurement.md) records all 11
+profiles, all three slot pairs, base/Perfected comparisons, and signature-disabled
+controls through real simulation rotations. Base mixed pairs improve the six
+tested offensive profiles by 3.4 to 13.1 percent over old six-piece equipment.
+The healer and tank findings depend on encounter pressure and are reported
+separately, not as misleading damage-equivalent percentages. These controlled
+measurements are not optimized best-in-slot rankings or full raid simulations.
 
 - Eleven armor/stat profiles share physical, caster, tank, and healer signatures.
   Each profile offers all three slots. Generic proper names receive the normal
@@ -55,7 +62,7 @@ These are implementation candidates, not claims of measured raid balance.
 - A base armor craft consumes three existing Cores of the Last Flame plus
   ordinary high-grade materials. Core quantities are discount-exempt. No daily
   catalyst or Wyrmfall Core is layered onto these raid recipes.
-- Last Flame's Zeal starts testing at 50 Strength for 15 seconds and 200 healing,
+- Last Flame's Zeal grants 50 Strength for 15 seconds and 200 healing,
   using one nominal proc per minute based on the striking weapon's base speed.
   No internal cooldown; independent mainhand/offhand auras, same-hand refresh.
   Melee weapon attacks qualify, ranged shots do not borrow the melee enchant.
@@ -95,6 +102,76 @@ once. Repeated swaps must not accumulate power or serialized metadata.
 The finished diff receives database-performance, persistence, security, parity,
 sim-architecture, frontend, content-obligation, and test-coverage review as applicable.
 
+### Serialized-size evidence, 2026-09-05
+
+`tests/professions_blob_growth.test.ts` measures UTF-8 JSON produced by the real
+serializer, then requires two further load/serialize passes to reach the same
+fixed point. These are serialized bytes, not measurements of PostgreSQL storage,
+compression, WAL, or query latency.
+
+The corrected professions subset is **18,807 bytes**. Its tracking band remains
+measurement minus 380 to measurement plus one; its separate structural ceiling
+is now 20 KiB. The storage-rich whole-character fixture is **209,261 bytes**, with
+the same narrow tracking discipline. The prior recorded whole-character figure
+was 151,656 bytes; running its unchanged fixture against the current catalog
+measured 156,144 bytes. Correcting the fixture accounts for the remaining 53,117
+bytes, separately from catalog growth.
+
+The exact per-field change from the recorded 151,656-byte baseline is:
+
+| Field | UTF-8 byte change | Cause |
+| --- | ---: | --- |
+| `knownRecipes` | +1,221 | 33 collection recipes (+1,189), plus the learned Zeal id (+32) |
+| `deedStats` | +1,328 | Discovery ids for 33 pieces, 11 manuals, and the formula |
+| `reliquary` | +1,971 | 33 first-find/count records and the collection page |
+| `equipment` | +115 | Actual slot-compatible equipped item ids |
+| `equipmentInstance` | -10 | Real slot-compatible enchant payloads and collection provenance, replacing invented flat-stat rolls |
+| `inventory` | +16,320 | 80 stored Perfected/promoted collection copies instead of plain signed copies |
+| `bank` | +35,904 | The same correction across 176 storage slots |
+| `vendorBuyback` | +756 | 12 unbound collection copies with minted bonus provenance |
+| Total | +57,605 | 209,261 bytes |
+
+The fixture respects the two-Masterwrought worn cap and one-promoted worn cap.
+Stored copies have no equipment cap: their progress, full-width names, signer,
+legal enchant, and production-width binding id survive the fixed point. Bound
+copies cannot be sold, so buyback rows carry `perfectingBonus` but neither
+`perfectingBound` nor progress/promotion. Their distinct full-width legal signers
+keep the vendor's identical-payload merging from collapsing the 12 rows.
+The new fields are named
+`perfectingBonus` and `perfectingBound`; the fixture uses catalog-minted primary
+profiles, not the loader's much larger anti-corruption numeric limits. Other
+documented exclusions in the existing fixture, including Rift gear and optional
+loadout gear snapshots, remain exclusions; this is a modeled storage-rich
+character, not a proof of the largest possible JSON object across all game systems.
+
+The assembled retainable recipe/formula set is tested as an exact load/serialize
+set: 203 craft recipes plus Zeal, 204 ids total, strictly below the existing
+512-id cap. Removing just the new fields from the settled fixture measures
+11,880 bytes for `perfectingBonus` across 270 copies and 5,934 bytes for
+`perfectingBound` across 258 progressed copies: 17,814 bytes combined. The rest
+of the increase is catalog growth and correcting previously omitted legitimate
+payload/identity state. No rank-exchange
+ledger, new timer, or additional save/query path is introduced.
+
+The database review approved the **229,376-byte (224 KiB)** warning threshold,
+the next 32 KiB step above this measurement. It leaves 20,115 bytes of headroom
+and remains one 32 KiB step below the 256 KiB guild-bank scale. The previous
+163,840-byte threshold was below the corrected fixture by 45,421 bytes.
+Independent literal/boundary tests and the whole-character relation pin the
+new value. This remains a warning, never permission to truncate or reject a
+character save; p99/high-water tracking, warning dampening, and save paths are
+unchanged.
+
+### Rollback compatibility
+
+A rollback to the parent branch is not lossless after players acquire this
+content. The old binary preserves unknown instance fields but does not enforce
+the new permanent binding rule. Its item and Reliquary allowlists also do not
+recognize new discoveries or pages and can discard that history on resave.
+Prefer a forward fix. An older-binary rollback requires a compatibility backport
+or a drained deployment with a verified character-state backup and recovery
+plan; merely retaining unknown JSON fields is not a safe rollback guarantee.
+
 ## Vertical slices and acceptance
 
 1. Acquisition and content: test valid/invalid manual learning, partial-known
@@ -102,7 +179,7 @@ sim-architecture, frontend, content-obligation, and test-coverage review as appl
    drop/vendor reachability, role coverage, all three slot pairs, and honest budgets.
 2. Combat: test each signature through real combat paths, old behavior with no new
    gear, pet/periodic/conversion cases, equipment loss, PvP/duel endings, and proc
-   recursion. Verify Zeal speed rates, identical dual-wield weapons, refresh/stack
+   recursion. Verify Zeal speed rates, different-speed dual-wield weapons, refresh/stack
    limits, actual Strength scaling, healing, and enchant replacement.
 3. Perfecting: test all rank pairs, double swaps, exact stat restoration, permanent
    binding, gated-enchant suspension/reactivation, promoted-but-unperfected pieces,

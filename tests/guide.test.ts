@@ -65,6 +65,7 @@ import { FARM_CROPS } from '../src/sim/content/farm_crops';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
+import { CRUCIBLE_VENDOR_STOCK } from '../src/sim/content/ignivar_loot';
 import { ITEM_SETS } from '../src/sim/content/item_sets';
 import { FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
 import { MOUNTS } from '../src/sim/content/mounts';
@@ -1953,11 +1954,12 @@ describe('Guide professions generated content accuracy', () => {
     // named recipe id, and tests/wiki_vendor_channel.test.ts drives the module
     // itself off synthetic tables.
     const patternChannels = patternChannelSets({
+      items: ITEMS,
       mobs: MOBS,
       heroicBossLoot: HEROIC_BOSS_LOOT,
       riftPatternItemIds: RIFT_PATTERN_ITEM_IDS,
       farmRiftDropItemIds: FARM_RIFT_DROP_ITEM_IDS,
-      heroicVendorStock: HEROIC_VENDOR_STOCK,
+      heroicVendorStock: [...HEROIC_VENDOR_STOCK, ...CRUCIBLE_VENDOR_STOCK],
     });
     for (const c of GUIDE_PROF_CRAFTS) {
       const simIds = ALL_RECIPES.filter((r) => r.professionId === c.id)
@@ -3457,7 +3459,12 @@ describe('Guide professions enchanting and economy accuracy', () => {
       'enchant_weapon_runed_edge',
       'enchant_weapon_runed_focus',
     ]);
-    expect(e.enchants.filter((row) => row.tier === 'greater')).toHaveLength(6);
+    // Zeal uses the shard-derived section but its formula gate and proc are
+    // displayed explicitly. Preserve the original six ordinary enchants.
+    expect(e.enchants.filter((row) => row.tier === 'greater' && !row.requiresFormula)).toHaveLength(
+      6,
+    );
+    expect(e.enchants.filter((row) => row.tier === 'greater')).toHaveLength(7);
     // The five Lucent (apex) enchants: the phase 10 quartet plus the weapon
     // int twin the phase 10 QA D10-D1 ruling added at the head of phase 11.
     expect(

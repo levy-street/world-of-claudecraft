@@ -15,6 +15,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 // sees them and no content has to exist yet for this behavior to be pinned.
 
 import { stackSizeOf } from '../src/sim/bags';
+import { ENCHANTS } from '../src/sim/content/enchants';
 import { ALL_RECIPES, FARM_RECIPES, recipeById } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import { isItemLocked } from '../src/sim/item_lock';
@@ -787,10 +788,21 @@ describe('shipped pattern content shape', () => {
     );
   });
 
-  it('every kind:recipe item teaches a resolvable, drop-acquirable recipe', () => {
+  it('every kind:recipe item teaches resolvable, drop-acquirable crafting or enchanting knowledge', () => {
     for (const [id, def] of Object.entries(ITEMS)) {
       if (def.kind !== 'recipe') continue;
       if (id.startsWith(SYNTHETIC_ID_PREFIX)) continue;
+      if (def.teachesEnchantId !== undefined) {
+        const enchant = ENCHANTS[def.teachesEnchantId];
+        expect(enchant, `${id} must name an existing enchant`).toBeDefined();
+        expect(enchant.acquisition, `${id} must teach drop-only knowledge`).toBe('drop');
+        expect(def.teachesRecipeId).toBe(def.teachesEnchantId);
+        expect(def.teachesRecipeIds).toBeUndefined();
+        continue;
+      }
+      for (const recipeId of def.teachesRecipeIds ?? [def.teachesRecipeId]) {
+        expect(recipeById(recipeId)?.acquisition, `${id} teaches ${recipeId}`).toContain('drop');
+      }
       const recipe = recipeById(def.teachesRecipeId);
       expect(
         recipe,

@@ -368,10 +368,10 @@ describe('Reliquary Conqueror catalog structure', () => {
     // 27 + the four Crucible raid pages (per-boss N+H, the obligations
     // closeout of docs/prd/ignivar-raid-loot.md).
     expect(CONQUEROR_PAGES.length).toBe(31);
-    expect(PROFESSION_PAGES.length).toBe(3);
+    expect(PROFESSION_PAGES.length).toBe(4);
     expect(HORIZON_PAGES.length).toBe(5);
     // Literal: update when product adds a page.
-    expect(RELIQUARY_PAGES.length).toBe(39);
+    expect(RELIQUARY_PAGES.length).toBe(40);
     expect(
       RELIQUARY_PAGES.every(
         (p) => p.shelf === 'conquerors' || p.shelf === 'professions' || p.shelf === 'horizons',
@@ -442,7 +442,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // Moving Emberward from Varkhul's normal page to its
     // heroic page in the same release re-slots a relic already catalogued, so
     // it moves neither this pair nor the character pair below.
-    expect(full).toEqual({ owned: 396, total: 396 });
+    // Eleven Crucible collections add 33 distinct crafted item relics.
+    expect(full).toEqual({ owned: 429, total: 429 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -463,7 +464,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // overview (only the weapon skins are account-scoped). Lanternback Troll
     // and Chimeglass Tortoise add two more character-scoped slots: 366. The
     // Cluckwork Mech Bird is another character-scoped mount slot: 367.
-    expect(character).toEqual({ owned: 367, total: 367 });
+    expect(character).toEqual({ owned: 400, total: 400 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -508,7 +509,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(431);
+    ).toBe(464);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -730,7 +731,7 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // crafting chain; the release's own chain read 284 = 242 + 42): 285, the
     // sixth figure of the ledger row's "all pinned" claim; the other five are
     // the page/overview/character/slot/mark literals nearby.
-    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(285);
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(318);
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
     }
@@ -1751,6 +1752,18 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
       }
     }
     expect([...removed].sort()).toEqual([
+      'formula_lastflame_zeal',
+      'pattern_crucible_agi_leather',
+      'pattern_crucible_caster_cloth',
+      'pattern_crucible_caster_leather',
+      'pattern_crucible_caster_mail',
+      'pattern_crucible_healer_cloth',
+      'pattern_crucible_healer_leather',
+      'pattern_crucible_healer_mail',
+      'pattern_crucible_str_leather',
+      'pattern_crucible_str_mail',
+      'pattern_crucible_tank_leather',
+      'pattern_crucible_tank_mail',
       'pattern_duskforged_bulwark',
       'pattern_duskforged_warblade',
       'pattern_gyrelens_array',
@@ -2035,7 +2048,12 @@ function craftIsGearCapable(craftId: string): boolean {
 describe('Reliquary Professions shelf (Phase 7)', () => {
   it('authors masterwork, field notes, and specimen pages (not empty stubs)', () => {
     expect(PROFESSION_PAGES.map((p) => p.id).sort()).toEqual(
-      ['professions_field_notes', 'professions_masterwork', 'professions_specimens'].sort(),
+      [
+        'professions_crucible',
+        'professions_field_notes',
+        'professions_masterwork',
+        'professions_specimens',
+      ].sort(),
     );
     for (const page of PROFESSION_PAGES) {
       expect(page.relics.length).toBeGreaterThan(0);
@@ -2961,6 +2979,7 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // (mining, logging, herbalism, fishing) + the rods' engineering craft and
   // their Litany board keeper (Phase 21).
   professions_specimens: 7,
+  professions_crucible: 3,
   // 11 = the four heroic bosses + the raid + Marla + rift A/B/S + the two
   // pending-ruling absences resolve to nothing, plus the storefront carrying
   // the Mech Bird (the 'store' door the Armory skins already opened).
@@ -3419,6 +3438,39 @@ describe('Reliquary source hints resolve against live content', () => {
     expect([...craftable].sort()).toEqual([
       'boundstone_helm',
       'clockreel_fishing_rod',
+      'crucible_agi_leather_chest',
+      'crucible_agi_leather_feet',
+      'crucible_agi_leather_waist',
+      'crucible_caster_cloth_chest',
+      'crucible_caster_cloth_feet',
+      'crucible_caster_cloth_waist',
+      'crucible_caster_leather_chest',
+      'crucible_caster_leather_feet',
+      'crucible_caster_leather_waist',
+      'crucible_caster_mail_chest',
+      'crucible_caster_mail_feet',
+      'crucible_caster_mail_waist',
+      'crucible_healer_cloth_chest',
+      'crucible_healer_cloth_feet',
+      'crucible_healer_cloth_waist',
+      'crucible_healer_leather_chest',
+      'crucible_healer_leather_feet',
+      'crucible_healer_leather_waist',
+      'crucible_healer_mail_chest',
+      'crucible_healer_mail_feet',
+      'crucible_healer_mail_waist',
+      'crucible_str_leather_chest',
+      'crucible_str_leather_feet',
+      'crucible_str_leather_waist',
+      'crucible_str_mail_chest',
+      'crucible_str_mail_feet',
+      'crucible_str_mail_waist',
+      'crucible_tank_leather_chest',
+      'crucible_tank_leather_feet',
+      'crucible_tank_leather_waist',
+      'crucible_tank_mail_chest',
+      'crucible_tank_mail_feet',
+      'crucible_tank_mail_waist',
       'gravewyrm_bone_quiver',
       'gravewyrm_gauntlets',
       'stormreel_fishing_rod',

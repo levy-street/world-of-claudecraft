@@ -92,8 +92,8 @@ import {
 } from '../types';
 import { vaultDrawStock } from '../vault_craft_gate';
 import { enchantingGainMultiplier } from './archetype';
-import { isEnchantKnown } from './enchant_formula';
 import { DISENCHANT_MATERIAL_BY_QUALITY, typedSecondaryFor } from './disenchant_reagents';
+import { isEnchantKnown } from './enchant_formula';
 import type { GradeRemoval } from './material_grades';
 import {
   countMinusPlanned,
@@ -166,7 +166,10 @@ export { DISENCHANT_MATERIAL_BY_QUALITY };
 export function isEnchantedInstance(instance: ItemInstancePayload): boolean {
   return (
     instance.enchant !== undefined ||
-    (!!instance.rolled?.stats && !instance.rolled.masterwork && instance.perfected !== true && instance.perfectingBonus === undefined)
+    (!!instance.rolled?.stats &&
+      !instance.rolled.masterwork &&
+      instance.perfected !== true &&
+      instance.perfectingBonus === undefined)
   );
 }
 

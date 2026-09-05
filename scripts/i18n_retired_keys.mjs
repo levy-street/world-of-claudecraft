@@ -26,6 +26,15 @@
  * so this list can never be used to silence a key that a page really does try to render.
  */
 export const RETIRED_KEYS = [
+  // Crucible collections add a raid-funded route beside the original ladder.
+  'guide.professions.endgameBody',
+  'guide.professions.endgamePatternsBody',
+  'guide.profPages.masterworkBody',
+  'guide.profPages.econ.doctrineBody',
+  'guide.profPages.econ.intro',
+  'guide.profPages.ench.enchantsNoteInfusionLive',
+  'guide.profPages.specializationBody',
+  'guide.profPages.econ.provenanceBody',
   // -- Placeholder migrations. A {placeholder} may never be added to an already-translated
   // key: it breaks interpolation parity in all 21 locales. Each of these was replaced by a
   // NEW *Count key carrying the token, and the original stays behind, untouched.

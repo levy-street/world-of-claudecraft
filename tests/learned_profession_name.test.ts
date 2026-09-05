@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { ALL_RECIPES, ITEMS } from '../src/sim/data';
 import { itemDisplayName } from '../src/ui/entity_i18n';
-import { learnedProfessionMessage, learnedProfessionName } from '../src/ui/hud/professions/learned_profession_name';
+import {
+  learnedProfessionMessage,
+  learnedProfessionName,
+} from '../src/ui/hud/professions/learned_profession_name';
 import { t } from '../src/ui/i18n';
 
 describe('shared learned profession feedback', () => {
@@ -16,7 +19,9 @@ describe('shared learned profession feedback', () => {
     if (!recipe) throw new Error('missing live recipe');
     expect(learnedProfessionName(recipe.id)).toBe(itemDisplayName(ITEMS[recipe.resultItemId]));
     for (const id of [recipe.id, 'future_recipe']) {
-      expect(learnedProfessionMessage(id)).toBe(t('hudChrome.training.learned', { recipe: learnedProfessionName(id) }));
+      expect(learnedProfessionMessage(id)).toBe(
+        t('hudChrome.training.learned', { recipe: learnedProfessionName(id) }),
+      );
     }
   });
 });

@@ -8,6 +8,7 @@
 // Sim.
 import { describe, expect, it } from 'vitest';
 import { stackSizeOf } from '../src/sim/bags';
+import { crucibleCollectionForItem } from '../src/sim/content/crucible_collections';
 import { STATIONS } from '../src/sim/content/professions';
 import { ALL_RECIPES, recipeById } from '../src/sim/content/recipes';
 import { ALL_RECIPES as ALL_RECIPES_SNAPSHOT, ITEMS, QUESTS } from '../src/sim/data';
@@ -578,9 +579,9 @@ describe('R5: the Perfected bonus is exactly the source-28 budget delta', () => 
     sunspun_handwraps: 2, // gloves
   };
 
-  it('every shipped apex item bakes the formula delta, pinned per slot', () => {
+  it('every original apex item keeps its source-28 formula delta, pinned per slot', () => {
     const apexIds = Object.values(ITEMS)
-      .filter((d) => d.masterwrought === true)
+      .filter((d) => d.masterwrought === true && !crucibleCollectionForItem(d.id))
       .map((d) => d.id)
       .sort();
     expect(apexIds, 'the shipped apex roster (add the literal for a new one)').toEqual(

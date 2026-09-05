@@ -336,7 +336,7 @@ function enchantingSections(): string {
           row.perfectedOnly
             ? `<span class="guide-prof-combo">${esc(t('guide.profPages.ench.perfectedOnly'))}</span>`
             : ''
-        }</td>
+        }${row.requiresFormula ? `<span class="guide-prof-combo">${esc(t('guide.profPages.ench.formulaRequired'))}</span>` : ''}</td>
         <td>${esc(slotLabel(row.slot))}</td>
         <td>${esc(tierLabel(row.tier))}</td>
         <td>${esc(formatNumber(row.skillReq))}</td>
@@ -351,7 +351,9 @@ function enchantingSections(): string {
                 }),
               )}</span>`,
           )
-          .join('')}</td>
+          .join(
+            '',
+          )}${row.hasDescription ? esc(t(`hudChrome.enchantDescription.${row.id}` as TranslationKey)) : ''}</td>
       </tr>`,
     )
     .join('');
@@ -382,7 +384,7 @@ function enchantingSections(): string {
     </section>
     <section class="guide-block" id="prof-enchants">
       <h2>${esc(t('guide.profPages.ench.enchantsHeading'))}</h2>
-      ${paras('guide.profPages.ench.enchantsNoteInfusionLive')}
+      ${paras('guide.profPages.ench.enchantsNoteRaidFormula')}
       <div class="guide-table-scroll"><table class="guide-keytable guide-prof-table">
         <thead><tr>
           <th scope="col">${esc(t('guide.profPages.ench.colEnchant'))}</th>
@@ -485,7 +487,7 @@ export function craftDetailHtml(c: GuideProfCraft): string {
       </section>
       <section class="guide-block" id="prof-masterwork">
         <h2>${esc(t('guide.profPages.masterworkHeading'))}</h2>
-        ${paras('guide.profPages.masterworkBody', {
+        ${paras('guide.profPages.masterworkBodyRaidCollections', {
           base: formatNumber(mw.basePct),
           perTier: formatNumber(mw.perTierAbovePct),
           signed: formatNumber(mw.signedReagentPct),
@@ -496,7 +498,7 @@ export function craftDetailHtml(c: GuideProfCraft): string {
       ${training}
       <section class="guide-block" id="prof-specialization">
         <h2>${esc(t('guide.profPages.specializationHeading'))}</h2>
-        ${paras('guide.profPages.specializationBody', {
+        ${paras('guide.profPages.specializationBodyUndiscounted', {
           at: formatNumber(c.specialization.at),
           pct: formatNumber(c.specialization.materialDiscountPct),
         })}

@@ -2787,6 +2787,7 @@ export const ru_RU: EnTranslations = {
       "healEcho": "При падении здоровья ниже {threshold}% восстанавливает {value} здоровья",
       "increase": {
         "ap": "Повышает силу атаки на {value}",
+        "str": "Повышает силу на {value}",
         "sp": "Повышает силу заклинаний на {value}",
         "armor": "Повышает броню на {value}",
         "int": "Повышает интеллект на {value}",
@@ -2797,6 +2798,7 @@ export const ru_RU: EnTranslations = {
       },
       "reduce": {
         "ap": "Снижает силу атаки на {value}",
+        "str": "Снижает силу на {value}",
         "armor": "Снижает броню на {value}",
         "int": "Снижает интеллект на {value}",
         "agi": "Снижает ловкость на {value}",
@@ -3779,6 +3781,7 @@ export const ru_RU: EnTranslations = {
       "leatherworking": "Кожевничество"
     },
     "enchantName": {
+      "enchant_weapon_lastflame_zeal": "Рвение Последнего Пламени",
       "enchant_weapon_might": "Травление оружия: Мощь",
       "enchant_weapon_intellect": "Травление оружия: Сила заклинаний",
       "enchant_offhand_stamina": "Травление левой руки: Выносливость",
@@ -3826,6 +3829,9 @@ export const ru_RU: EnTranslations = {
       "enchant_chest_lucent_stamina": "Травление нагрудника: Светозарная выносливость",
       "enchant_feet_lucent_agility": "Травление сапог: Светозарная ловкость",
       "enchant_lucent_infusion": "Светозарное вливание"
+    },
+    "enchantDescription": {
+      "enchant_weapon_lastflame_zeal": "Попавшие в цель атаки ближнего боя могут повысить силу на 50 на 15 сек. и восстановить вам 200 ед. здоровья. Действуют модификаторы исцеления. При каждом попадании шанс срабатывания равен 1% за каждые 0,6 сек. базовой скорости атакующего оружия. Внутренней перезарядки нет. Каждая рука дает отдельное усиление; повторное срабатывание обновляет усиление той же руки. Дальние атаки не вызывают этот эффект. В облике волка вместо этого используется базовая скорость атаки в 1 сек."
     },
     "professions": {
       "title": "Профессии",
@@ -4059,6 +4065,7 @@ export const ru_RU: EnTranslations = {
       "sellAll": "Продать все ({count})"
     },
     "enchanting": {
+      "recipeNotLearned": "Изучите формулу, прежде чем накладывать эти чары.",
       "disenchantedLine": "Вы распыляете {item}.",
       "disenchantedYield": "Вы распыляете {item} в {material}.",
       "disenchantedYieldQty": "Вы распыляете {item} в {material} x{qty}.",
@@ -4146,7 +4153,8 @@ export const ru_RU: EnTranslations = {
       "outOfRange": "Для обучения нужно стоять у мастерской."
     },
     "pattern": {
-      "teaches": "Использование: обучает изготовлению предмета «{item}»."
+      "teaches": "Использование: обучает изготовлению предмета «{item}».",
+      "teachesEnchant": "Использование: обучает наложению чар «{enchant}»."
     },
     "unbind": {
       "title": "Снятие привязки: {name}",
@@ -4170,12 +4178,35 @@ export const ru_RU: EnTranslations = {
       "perfecting": "Предмет на пути совершенствования или уже доведённый до совершенства остаётся привязанным."
     },
     "perfecting": {
+      "swapTitle": "Обмен рангами совершенствования",
+      "swapIntro": "Выберите другую принадлежащую вам вещь из того же комплекта. Обменивайте ранги вне боя у подходящего ремесленного станка с навыком ремесла {skill}. Материалы не тратятся, неудачи невозможны.",
+      "swapChoose": "Выберите вторую вещь, чтобы посмотреть результат обмена.",
+      "swapRank": "{name}: ранг с {before} до {after}",
+      "swapAction": "Проверить обмен рангами",
+      "swapPending": "Обмен рангами",
+      "swapConfirm": "Обе вещи навсегда привяжутся к вам. Обменять их ранги совершенствования?",
+      "swapConfirmAccept": "Привязать и обменять ранги",
+      "swapPreserve": "Вещи не расходуются. Имена, внешнее легендарное повышение и чары остаются на исходных вещах. Ограничения на экипировку сохраняются.",
+      "swapEnchantInactive": "Чары только для совершенной вещи станут неактивными, пока она снова не станет совершенной.",
+      "swapEnchantActive": "Чары только для совершенной вещи снова станут активными.",
+      "swapSuccess": "Ранги совершенствования обменены. Обе вещи навсегда привязаны.",
+      "swapInterrupted": "После переподключения не удалось подтвердить результат обмена. Проверьте ранги совершенствования обеих вещей перед новым обменом.",
+      "swapChanged": "Выбранные вещи изменились. Выберите их заново и проверьте новые ранги.",
+      "swapDead": "Для обмена рангами нужно быть в живых.",
+      "swapBusy": "Выйдите из боя и завершите текущее действие перед обменом рангами.",
+      "swapInvalid": "У этих вещей неподдерживаемый прогресс совершенствования. Обмен рангами невозможен.",
+      "swapSameRank": "У этих вещей уже одинаковый ранг совершенствования.",
+      "swapSkill": "Нужен навык ремесла этого комплекта {skill}.",
+      "swapStation": "Подойдите к подходящему ремесленному станку для обмена рангами.",
+      "swapLocked": "Перед обменом рангами разблокируйте обе вещи.",
+      "enchantInactive": "Чары неактивны: вещь должна быть совершенной. Чары сохранены.",
       "title": "Совершенствование",
       "close": "Закрыть окно совершенствования",
       "openButton": "Совершенствование",
       "openButtonAria": "Открыть окно совершенствования",
       "empty": "У вас нет предмета «Ковка мастера», который можно совершенствовать. Его создают вершинные рецепты.",
       "wornChip": "Надето",
+      "bagCopy": "В сумке: экземпляр {index} из {count}",
       "rowRank": "Ранг {rank} из {ranks}",
       "rowPerfected": "Совершенство",
       "rankAnnounce": "{name}: достигнут ранг совершенствования {rank} из {ranks}.",
@@ -6584,10 +6615,13 @@ export const ru_RU: EnTranslations = {
       "provenanceBody": "Работа редкого качества и выше несет имя мастера, шедевр поднимает качество на ступень, а изделие на заказ привязывается к получателю (Узы мастера).",
       "endgameHeading": "Финальная цепочка Ковки мастера",
       "endgameBody": "Над лестницей наставника каждого ремесла стоит одна общая вершина: семейство Ковки мастера, крафтовые вещи с золотой меткой «Уникальный (экипируется): Ковка мастера», которую описывает страница «Снаряжение и предметы». Какое бы ремесло ни поднималось, цепь одна и та же: схемы вершины находят, а не учат, ограниченные раз в день промежуточные крафты задают темп работы, и три общих материала питают каждую лестницу. Готовые вещи торгуются так же свободно, как любая другая крафтовая работа (правила торговли на странице «Экономика ремесел»), а предел ношения в две вещи оставляет их акцентом сборки, а не целым комплектом, так что мастер, не ступавший в глубочайший финал, всё равно продаёт тем, кто там живёт.",
+      "endgameBodyRaidCollections": "Masterwrought is the shared family marked Unique-Equipped: Masterwrought. The older apex ladder still uses its found patterns, daily intermediate crafts, and shared endgame materials. The Crucible collections are a separate raid-funded route, not another set of costs added to that ladder. Both families share the same two-piece wearing cap, so they compete for the same two places in your build. Finished pieces trade freely until Perfecting or a commission binds the individual copy.",
       "endgamePatternsBody": "Схемы приходят тремя путями, и таблица рецептов на каждой странице ремесла помечает путь каждой строки: находка в глубочайших финальных победах, покупка у героического интенданта за Героические знаки, либо и то и другое сразу. Раздел проведён намеренно. Схемы снаряжения только находят и никогда не продают, схемы расходников стоят на прилавке интенданта с первого дня, а схемы земледелия идут обеими дорогами. Сами схемы, к тому же, обычный товар: находка, которая вам не нужна, это находка, которую можно продать.",
+      "endgamePatternsBodyCollections": "The older gear patterns are found rather than sold; the older consumable patterns are sold by the Heroic Quartermaster for Heroic Marks, and farming patterns use both routes. Crucible collection manuals and the Last Flame's Zeal formula instead drop from either Crucible boss on either difficulty. Their shared drop group has a 30% chance per boss, choosing one of twelve equally likely scrolls. The Crucible quartermaster also sells any of these scrolls for one core, a deterministic alternative to a lucky drop. Each collection manual teaches all three of its recipes at skill 100. A partly learned manual fills the missing lessons and consumes only one scroll. Manuals and formulas can be traded.",
       "endgameMaterialsBody": "Всю цепь питают три общих материала. Ядро драконопада, свободно продаваемый катализатор: каждая зачтённая финальная победа глубочайшего финала платит зачтённому персонажу от 1 до 3 ядер, раз в день с каждого источника; высшие прохождения разломов платят свой фиксированный счёт по тем же дневным часам, а героический интендант продаёт одно ядро за 12 Героических знаков как страховку от невезения. Ядра торгуются свободно. Расколотая эссенция персональна, и раскалывание, её единственный источник: расколоть может любой персонаж, без всякой профессии, и чтение раскалывает один добытый в рейде эпический предмет этого яруса ровно в одну эссенцию, ценой служит сам предмет. Уголёк мастера тоже персонален, и он задаёт цепи ход времени: один в неделю на персонажа, выдаётся за первое подходящее финальное прохождение недели, а пропущенная неделя не пропадает: угольки копятся и выплачиваются при следующем прохождении.",
       "endgameMaterialsBodyAnyRaid": "Всю цепь питают три общих материала. Ядро драконопада, свободно продаваемый катализатор: каждая зачтённая финальная победа глубочайшего финала платит зачтённому персонажу от 1 до 3 ядер, раз в день с каждого источника; высшие прохождения разломов платят свой фиксированный счёт по тем же дневным часам, а героический интендант продаёт одно ядро за 12 Героических знаков как страховку от невезения. Ядра торгуются свободно. Расколотая эссенция персональна, и раскалывание, её единственный источник: расколоть может любой персонаж, без всякой профессии, и чтение раскалывает один добытый в рейде эпический предмет снаряжения, из любого рейда и любой сложности, ровно в одну эссенцию, ценой служит сам предмет. Уголёк мастера тоже персонален, и он задаёт цепи ход времени: один в неделю на персонажа, выдаётся за первое подходящее финальное прохождение недели, а пропущенная неделя не пропадает: угольки копятся и выплачиваются при следующем прохождении.",
       "perfectingHeading": "Доведение до совершенства и оранжевое возведение",
+      "crucibleCollectionsBody": "Each of the eleven Crucible collections offers chest, waist, and feet pieces in its own native armor and role profile. Any two pieces activate its only set bonus, even before Perfecting; there is no three-piece bonus. Each item starts at item level 35 and costs 3 Cores of the Last Flame plus ordinary high-grade gathering materials, so a pair costs six cores before the optional manual purchase. No Wyrmfall Core, daily intermediate, or Maker's Ember is required for the base craft. At rank four, Perfecting raises the primary-stat budget to item level 38. Perfecting still follows its own weekly Ember progression, independent of obtaining and wearing the base gear.\n\nYou can exchange Perfecting ranks between two copies from the same collection at the appropriate crafting station, with skill 125, while alive, idle, and out of combat. The ranks are swapped, never duplicated, and each slot applies its own Perfected stat bonus. The exchange has no material cost and no cooldown. Both copies bind to you; their individual names, enchants, and maker marks stay with their original items.",
       "perfectingBody": "Готовый предмет вершины, это ещё не конец его истории. Владелец с навыком 125 в ремесле, которое его создало, может провести предмет по четырём рангам доведения до совершенства. Каждая попытка тратит один Уголёк мастера, одну Расколотую эссенцию и одну Оправу из призменного стекла и удаётся четыре раза из пяти; промах стоит только материалов и ничего больше, предмет никогда не страдает и не откатывается. Первая же попытка привязывает предмет к тому, кто его совершенствует, так что копию на продажу продают до начала работы. Доведённый до совершенства предмет несёт бонус к характеристикам сверх базы, и именно его ждёт «Светозарное вливание»: единственные чары, помеченные на странице Наложения чар «Только на доведённых до совершенства», не ложатся ни на что меньшее.",
       "promotionBody": "Последний шаг, оранжевое возведение, и в нём весь смысл Грамоты созидания. Принесите доведённый до совершенства предмет и одну Грамоту созидания (грамоту начертателя за навык 125), и копия возводится в легендарный предмет с именем по вашему выбору. Никакого броска здесь нет: возведение детерминировано, характеристики не меняются вовсе, меняются лишь имя и цвет. Сама грамота продаётся, так что писец и владелец не обязаны быть одним человеком, а добавленная строка семейного предела действует и здесь: из двух носимых предметов Ковки мастера легендарным одновременно может быть не более одного.",
       "stationsHeading": "Станки и мастера",
@@ -6771,10 +6805,12 @@ export const ru_RU: EnTranslations = {
       "masteryBody": "Каждые {step} очков навыка дают одну ступень: рецепт на вашей ступени или выше дает полный рост, на ступень ниже дает половину, на две ступени четверть, а на три и более ничего; предел этого ремесла {cap}.",
       "masterworkHeading": "Шедевры",
       "masterworkBody": "Каждое удачное изделие имеет {base}% шанса стать шедевром, плюс {perTier}% за каждую ступень выше рецепта, {signed}% за любой подписанный реагент и {spec}% при специализации, но не выше {cap}%.",
+      "masterworkBodyRaidCollections": "Every successful craft is exactly what the recipe promises, and sometimes a little more: a masterwork finishes the same piece one quality tier finer, with the bonus stats baked in at craft time. It is add-only, never a downgrade. Ordinary crafting follows its existing gear ladder; the raid-funded Crucible collections are a separate alternative at the current raid tier.\n\nThe apex Masterwrought crafts are the one exception, and they pay the same proc a different way. An apex piece already sits at the top of its ladder, so there is no finer tier to finish it in; a masterwork there hands the piece over one rank into Perfecting instead, a free first rank on the four-rank walk the Professions page describes. Nothing is baked into the stats, and the chance and its gates are the ones below.\n\nThe chance is published, not mystical: {base}% base, plus {perTier}% per tier your skill sits above the recipe, plus {signed}% when any signed reagent goes in, plus {spec}% once you are specialized, with higher-tier materials adding 1 to 2% more, all capped at {cap}%. Only a piece with real stats can improve, so statless commons, tools, and consumables never proc; a dormant craft never produces one, and a hobby craft cannot masterwork past its rare ceiling.\n\nFine work carries its maker. Rare and better outputs are signed, every copy (Crafted by; gathered materials carry Gathered by), a masterwork is always signed whatever its quality. A signature is provenance, not a lock: signed goods trade, mail, and list on the World Market freely.",
       "trainingHeading": "Обучение",
       "trainingBody": "Рецепты наставников приходят от местных мастеров, и учат им у их станков. Правило укладывается в одну строку: мастер учит рецепту, как только ваш разряд в этом ремесле достигает разряда самого рецепта, и больше ничто его не держит, ни ваш уровень, ни ваш архетип. Лестницы снаряжения и расходников ведут свои ступени на 0, 25 и 50 навыка, и каждое ремесло добавляет над ними одну промежуточную ступень на 75, которой учат у его станка (у Enchanting это «Светозарный реагент», рядом с двумя рецептами оберегов на ступени 25); два урока удочек у Engineering продолжают его лестницу на 75 и 125, так что новая ступень открывается по мере роста ваших разрядов.\n\nПлата разовая и одинаковая внутри ступени: начальная ступень бесплатна, ступень 25 навыка стоит {tier1} за рецепт, ступень 50 навыка, {tier2}, а ступени 75 и 125 над ними несут собственную плату, указанную рядом с каждым рецептом в таблице. Учиться нужно стоя у настоящего станка мастера, и передвижная станция не считается никогда. Общие полевые рецепты и шесть рецептов изготавливаемых наземных инструментов не требуют обучения вовсе; их знает каждый персонаж с самого начала.",
       "specializationHeading": "Специализация",
       "specializationBody": "Достигнув навыка {at}, вы специализируетесь в этом ремесле, и материалы рецептов дешевеют на {pct}%.",
+      "specializationBodyUndiscounted": "At skill {at} this craft specializes you, no quest needed: discountable recipe materials cost {pct}% less from then on, and specialization adds its own bump to the masterwork chance. Raid-core costs are never discounted.\n\nSpecialists also learn to take the workshop with them: a specialized crafter can set up a mobile station in the field for ten minutes at a time, so station-bound recipes can be worked at the mine mouth instead of back in town. Its limits are deliberate: it never counts for training with a master or for unbinding a commissioned piece, and it expires on its timer whether or not you used it.",
       "ench": {
         "disenchantHeading": "Распыление",
         "disenchantNote": "Распыление берет любое оружие или доспех обычного качества и выше и уничтожает одну копию, сперва обычную, а не зачарованную; если остались только зачарованные копии, одна из них уничтожается вместе с чарами. Обычные и необычные вещи дробятся в горсть пыли перезвона, чуть богаче для более редких и высокоуровневых вещей; от редкого и выше выход меняет форму: ровно одна эссенция перезвона из редкой вещи или один осколок перезвона из эпической или легендарной, плюс типовой дополнительный материал, привязанный к тому, из чего была сделана вещь.",
@@ -6801,7 +6837,9 @@ export const ru_RU: EnTranslations = {
         "bonusFmt": "+{value} к {stat}",
         "enchantsNoteOffhand": "Чары делятся на четыре уровня. Базовый уровень работает на пыли перезвона (с небольшим добавлением эссенции на высоком конце) и покрывает слот оружия, вторую руку и каждый слот доспеха, с достаточным выбором по осям характеристик, чтобы каждая сборка нашла что-то для каждого слота: щиты и держимые заклинателем предметы во второй руке берут собственные чары на Стойкость, так что ни один надетый слот не остаётся без чар. Высший уровень стоит один осколок перезвона плюс эссенцию: более сильные бонусы для слотов с наибольшим влиянием. Кроме того, осколки кормят ещё три стока: два рецепта оберегов по пять штук за каждый, верхнюю ступень пополнения эффектов инструментов и светозарный уровень, где чары оружия и нагрудника берут по одному, а «Светозарное вливание», два, так что отложите несколько, прежде чем тратить.\n\nМежду ними сидят пять рунных зачарований, по одному потребителю на каждый типовой дополнительный материал, так что ничто из того, что вы дробите, не становится тупиком: Runed Edge (оружие, Сила, расходует Resonant Steel), Runed Sigil (оружие, Интеллект, Resonant Timber), Runed Weave (нагрудник, Дух, Resonant Thread), Runed Hide (поножи, Ловкость, Resonant Hide) и Runed Links (шлем, Стойкость, Resonant Links). Каждое также берёт две эссенции перезвона; там, где у слота и характеристики есть и базовые, и высшие чары, рунный бонус ложится между ними, тогда как Runed Weave — самое сильное зачарование нагрудника на Дух вообще, а Runed Hide — единственное зачарование поножей на Ловкость. Точные бонусы все в таблице ниже.\n\nНад всеми ними стоит светозарный уровень, венец ремесла и единственные чары, которые вообще требуют навыка: Enchanting 100 для четырёх и 125 для «Светозарного вливания», как показано в столбце «Навык» ниже. Каждое берёт светозарный реагент и поднимает на одну ступень свой собственный слот: оружие (варианты мощи и силы заклинаний), нагрудник и сапоги. Последнее из них, «Светозарное вливание», ложится только на предмет, доведённый до совершенства, а такого предмета пока быть не может: оно написано наперёд, до той работы по доведению до совершенства, которой оно ждёт.",
         "enchantsNoteInfusionLive": "Чары делятся на четыре уровня. Базовый уровень работает на пыли перезвона (с небольшим добавлением эссенции на высоком конце) и покрывает слот оружия, вторую руку и каждый слот доспеха, с достаточным выбором по осям характеристик, чтобы каждая сборка нашла что-то для каждого слота: щиты и держимые заклинателем предметы во второй руке берут собственные чары на Стойкость, так что ни один надетый слот не остаётся без чар. Высший уровень стоит один осколок перезвона плюс эссенцию: более сильные бонусы для слотов с наибольшим влиянием. Кроме того, осколки кормят ещё три стока: два рецепта оберегов по пять штук за каждый, верхнюю ступень пополнения эффектов инструментов и светозарный уровень, где чары оружия и нагрудника берут по одному, а «Светозарное вливание», два, так что отложите несколько, прежде чем тратить.\n\nМежду ними сидят пять рунных зачарований, по одному потребителю на каждый типовой дополнительный материал, так что ничто из того, что вы дробите, не становится тупиком: Runed Edge (оружие, Сила, расходует Resonant Steel), Runed Sigil (оружие, Интеллект, Resonant Timber), Runed Weave (нагрудник, Дух, Resonant Thread), Runed Hide (поножи, Ловкость, Resonant Hide) и Runed Links (шлем, Стойкость, Resonant Links). Каждое также берёт две эссенции перезвона; там, где у слота и характеристики есть и базовые, и высшие чары, рунный бонус ложится между ними, тогда как Runed Weave, самое сильное зачарование нагрудника на Дух вообще, а Runed Hide, единственное зачарование поножей на Ловкость. Точные бонусы все в таблице ниже.\n\nНад всеми ними стоит светозарный уровень, венец ремесла и единственные чары, которые вообще требуют навыка: Enchanting 100 для четырёх и 125 для «Светозарного вливания», как показано в столбце «Навык» ниже. Каждое берёт светозарный реагент и поднимает на одну ступень свой собственный слот: оружие (варианты мощи и силы заклинаний), нагрудник и сапоги. Последнее из них, «Светозарное вливание», ложится только на предмет, доведённый до совершенства: доведение до совершенства, это работа самого владельца, а не зачарователя, и страница Ремесел рассказывает, как предмет его достигает.",
+        "enchantsNoteRaidFormula": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove the ordinary lower tiers sits the Lucent tier, the capstone ordinary work of the craft: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected: Perfecting is the wearer's own work, not the enchanter's, and the Professions page tells how a piece earns it.\n\nLast Flame's Zeal is a separate raid formula, not a free ordinary enchant. Learn its tradable formula at Enchanting 100 before applying it. Each application uses 3 Cores of the Last Flame and 2 Chime Shards; the formula can drop in the Crucible or be bought from its quartermaster for one core. Its melee proc and weapon-speed rules are shown in full below.",
         "charmsHeading": "Обереги для инструментов добытчика",
+        "formulaRequired": "Formula required",
         "charmsBody": "Обереги добытчика тоже родом из Enchanting. Tinker Gizzel учит обоим в мастерской Eastbrook, как только ваше Enchanting доходит до 25: «Сумке собирателя», что добавляет единицу к сбору, и «Глазу ремесленника», что поднимает уровень того, что выходит из земли. Каждый делается один раз, а потом ставится в кирку, топор или серп, где тратит заряд только на тех сборах, которые действительно улучшил.\n\nПополнение — вот где ремесло продолжает зарабатывать. Заряды восстанавливает тот, кто владеет инструментом, а не заезжий зачарователь, и пополнение стоит вдвое меньше материалов, когда этот владелец и есть зачарователь, подписавший оберег, и ещё меньше со специализацией в Enchanting. Поэтому оберег, проданный через прилавок, — это одна разовая продажа, а дешевле всего держать в ходу те обереги, что ездят на ваших собственных инструментах. Полная лестница зарядов и материалов есть на странице любой добывающей профессии, в разделе «Эффекты инструментов»."
       },
       "gatherIntro": {
@@ -6911,6 +6949,7 @@ export const ru_RU: EnTranslations = {
         "commissionsBody": "Добровольное изделие на заказ несет Узы мастера: вещь привязывается к тому, кто получит ее в обмене, и любой мастер у станка снимет привязку за ступенчатую плату.",
         "provenanceHeading": "Подписанные работы",
         "provenanceBody": "Изделия и находки редкого качества и выше несут подпись мастера, и одинаково подписанные вещи по-прежнему складываются в стопки.",
+        "provenanceBodyUndiscounted": "Some items carry a name. Hover one and the tooltip says Gathered by so-and-so on a raw material, or Crafted by so-and-so on a finished piece: the same mark, worded for how the item came to be. A signature is part of the item itself, travels with it through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fades.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. The one thing that can cost you a signature is a full bag: a signed unit needs room of its own, or a matching signed stack, to land in.\n\nA stack of items shares one identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. A signed log never joins a plain pile in either direction (merging would erase somebody's name), but identical payloads merge happily, so twenty ore signed by the same gatherer sit in one stack and a windfall does not shred your bags.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one), unless that reagent is marked undiscountable; raid cores always keep their full cost. Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
         "collectorsHeading": "Коллекционеры, трофеи и цена истории",
         "collectorsBody": "Торговцы слепы к происхождению: подписанная вещь продается NPC ровно по своей простой цене. Наценка за подпись существует только между игроками, что как раз и делает ее интересной: стопка руды-находки, подписанная знаменитым собирателем, Prime Cut с удачного сбора, шедевральный клинок с именем ремесленника, что с тех пор ушел на покой, все стоят столько, сколько говорит чья-то память.\n\nКнига деяний играет на том же инстинкте: Pristine Vein, Ancient Heartwood, Moonlit Bloom, A Perfect Specimen и Glimmer of Hope, это коллекционные отметки с нулевой Известностью, что существуют лишь ради доказательства, что миг случился с вами. Сохраните вещь, что заработала деяние, и вы держите расписку. Ничто из этого не сила; происхождение не покупает характеристик и не выигрывает боев, это бумажный след хороших дней игры.",
         "castPaceHeading": "Время применения и золотой сток",
@@ -6924,7 +6963,9 @@ export const ru_RU: EnTranslations = {
         "castPaceRecharge": "Перезарядка эффекта инструмента: применение {seconds} с",
         "castPaceBatch": "Партия: до {count} за один заказ, каждое изделие со своим применением",
         "doctrineHeading": "Игроки торгуют с игроками",
+        "introRaidCollections": "How coin moves through the trades: the exact fees and sinks, what actually sells, World Market rules, work orders, commissions, and the place of raid-funded collections alongside ordinary crafting.",
         "doctrineBody": "Сила созданных вещей всегда ниже рейдового порога, а перечисленные пошлины гонят товары в обмен между игроками, а не по кругу торговцев.",
+        "doctrineBodyRaidCollections": "The crafting economy is built on one idea: players supply players. Gatherers feed crafters, crafters feed questers and raiders, and breakers feed enchanters, with vendors and station masters standing at the edges to absorb junk and coin rather than to compete with you. If you want to make money from a profession, your customer is a person: learn what other players burn through, price against the World Market, and treat the NPC systems as a floor under your prices, not as the market itself.\n\nOrdinary crafted equipment supports the climb into endgame. The Crucible's raid-funded collections also offer an alternative to current raid drops: their materials come from raiding, while crafting turns those materials into a chosen armor and role profile. Their three slot choices and any-two bonus allow different combinations with raid gear. They still share the global two-piece Masterwrought cap, so crafting complements the rest of the raid kit without supplying an entire replacement set.",
         "orderBoardHeading": "Доска заказов",
         "orderBoardBody": "Искать мастера в чате не обязательно. Откройте своё окно ремесла: доска заказов в одном клике в его шапке. Заявку там может вывесить любой: назовите рецепт, который хотите получить, а затем либо оставьте заявку открытой для любого мастера, либо нацельте её на одного названного мастера, который тогда будет единственным, кто может её взять. Мастер, просматривающий доску, принимает заявку, и принятие его обязывает, так что над работой всегда трудится только один человек за раз.\n\nКогда вы вывешиваете заявку, не удерживается ничего: она не резервирует ни монет, ни материалов, так что цена и то, кто поставляет реагенты, остаются между вами двоими и оговариваются так же, как оговаривается любой заказ. Свою заявку можно отменить, пока она ещё открыта, а заявка, которую никто не принял, истекает сама через сутки. Как только мастер её принял, закрывает её доставка.\n\nДоставка идёт лицом к лицу. Мастер делает вещь как заказ, приходит к вам и передаёт её из рук в руки, так что держите свободную ячейку в сумке. То, что вы получите, подчиняется обычным правилам заказов ниже и привязывается к вам Узами мастера.",
         "commissionsBoardNote": "К заказу ведут два пути: заявка, которую вы вывешиваете на доске выше и которая приносит работу мастеру, и просто решение мастера сделать вещь для вас. Оба заканчиваются одними и теми же узами."
@@ -14728,6 +14769,141 @@ export const ru_RU: EnTranslations = {
       "deed_of_making": {
         "name": "Грамота созидания"
       },
+      "crucible_str_mail_chest": {
+        "name": "Кольчуга ударника Горнила"
+      },
+      "crucible_str_mail_waist": {
+        "name": "Кольчужный пояс ударника Горнила"
+      },
+      "crucible_str_mail_feet": {
+        "name": "Сабатоны ударника Горнила"
+      },
+      "crucible_tank_mail_chest": {
+        "name": "Кольчуга стража Горнила"
+      },
+      "crucible_tank_mail_waist": {
+        "name": "Кольчужный пояс стража Горнила"
+      },
+      "crucible_tank_mail_feet": {
+        "name": "Сабатоны стража Горнила"
+      },
+      "crucible_caster_mail_chest": {
+        "name": "Кольчуга заклинателя Горнила"
+      },
+      "crucible_caster_mail_waist": {
+        "name": "Кольчужный пояс заклинателя Горнила"
+      },
+      "crucible_caster_mail_feet": {
+        "name": "Сабатоны заклинателя Горнила"
+      },
+      "crucible_healer_mail_chest": {
+        "name": "Кольчуга целителя Горнила"
+      },
+      "crucible_healer_mail_waist": {
+        "name": "Кольчужный пояс целителя Горнила"
+      },
+      "crucible_healer_mail_feet": {
+        "name": "Сабатоны целителя Горнила"
+      },
+      "crucible_agi_leather_chest": {
+        "name": "Кожаная куртка застрельщика Горнила"
+      },
+      "crucible_agi_leather_waist": {
+        "name": "Кожаный пояс застрельщика Горнила"
+      },
+      "crucible_agi_leather_feet": {
+        "name": "Кожаные сапоги застрельщика Горнила"
+      },
+      "crucible_str_leather_chest": {
+        "name": "Кожаная куртка хищника Горнила"
+      },
+      "crucible_str_leather_waist": {
+        "name": "Кожаный пояс хищника Горнила"
+      },
+      "crucible_str_leather_feet": {
+        "name": "Кожаные сапоги хищника Горнила"
+      },
+      "crucible_tank_leather_chest": {
+        "name": "Кожаная куртка стража Горнила"
+      },
+      "crucible_tank_leather_waist": {
+        "name": "Кожаный пояс стража Горнила"
+      },
+      "crucible_tank_leather_feet": {
+        "name": "Кожаные сапоги стража Горнила"
+      },
+      "crucible_caster_leather_chest": {
+        "name": "Кожаная куртка заклинателя Горнила"
+      },
+      "crucible_caster_leather_waist": {
+        "name": "Кожаный пояс заклинателя Горнила"
+      },
+      "crucible_caster_leather_feet": {
+        "name": "Кожаные сапоги заклинателя Горнила"
+      },
+      "crucible_healer_leather_chest": {
+        "name": "Кожаная куртка целителя Горнила"
+      },
+      "crucible_healer_leather_waist": {
+        "name": "Кожаный пояс целителя Горнила"
+      },
+      "crucible_healer_leather_feet": {
+        "name": "Кожаные сапоги целителя Горнила"
+      },
+      "crucible_caster_cloth_chest": {
+        "name": "Мантия заклинателя Горнила"
+      },
+      "crucible_caster_cloth_waist": {
+        "name": "Кушак заклинателя Горнила"
+      },
+      "crucible_caster_cloth_feet": {
+        "name": "Туфли заклинателя Горнила"
+      },
+      "crucible_healer_cloth_chest": {
+        "name": "Мантия целителя Горнила"
+      },
+      "crucible_healer_cloth_waist": {
+        "name": "Кушак целителя Горнила"
+      },
+      "crucible_healer_cloth_feet": {
+        "name": "Туфли целителя Горнила"
+      },
+      "pattern_crucible_str_mail": {
+        "name": "Выкройка: Кольчужные доспехи ударника Горнила"
+      },
+      "pattern_crucible_tank_mail": {
+        "name": "Выкройка: Кольчужные доспехи стража Горнила"
+      },
+      "pattern_crucible_caster_mail": {
+        "name": "Выкройка: Кольчужные доспехи заклинателя Горнила"
+      },
+      "pattern_crucible_healer_mail": {
+        "name": "Выкройка: Кольчужные доспехи целителя Горнила"
+      },
+      "pattern_crucible_agi_leather": {
+        "name": "Выкройка: Кожаные доспехи застрельщика Горнила"
+      },
+      "pattern_crucible_str_leather": {
+        "name": "Выкройка: Кожаные доспехи хищника Горнила"
+      },
+      "pattern_crucible_tank_leather": {
+        "name": "Выкройка: Кожаные доспехи стража Горнила"
+      },
+      "pattern_crucible_caster_leather": {
+        "name": "Выкройка: Кожаные доспехи заклинателя Горнила"
+      },
+      "pattern_crucible_healer_leather": {
+        "name": "Выкройка: Кожаные доспехи целителя Горнила"
+      },
+      "pattern_crucible_caster_cloth": {
+        "name": "Выкройка: Тканевые доспехи заклинателя Горнила"
+      },
+      "pattern_crucible_healer_cloth": {
+        "name": "Выкройка: Тканевые доспехи целителя Горнила"
+      },
+      "formula_lastflame_zeal": {
+        "name": "Формула: Рвение Последнего Пламени"
+      },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"
       },
@@ -19821,6 +19997,50 @@ export const ru_RU: EnTranslations = {
         "bonus2": "Сила повышается на 10, выносливость повышается на 10.",
         "bonus4": "Сила атаки повышается на 25. Критические удары оружием с вероятностью 50% даруют «Могильную мощь», увеличивая силу атаки на 40 на 10 сек.",
         "bonus6": "Скорость атаки и чтения заклинаний повышается на 4%, меткость на 3%. Критические удары оружием оставляют в цели «Костяной осколок»: 5 ед. урона от кровотечения каждые 2 сек. в течение 12 сек. Суммируется до 3 раз."
+      },
+      "crucible_agi_leather": {
+        "name": "Кожаные доспехи застрельщика Горнила",
+        "bonus2": "Прямой физический урон, наносимый вами и вашими питомцами, дает заряд, но не чаще одного раза в секунду. При 6 зарядах весь урон, наносимый вами и вашими питомцами, повышается на 8% на 6 сек. Заряды исчезают после 8 сек. без подходящего попадания и не накапливаются во время усиления урона. Заряды и усиление исчезают при выходе из боя или если на вас остается меньше двух предметов этого комплекта."
+      },
+      "crucible_caster_cloth": {
+        "name": "Тканевые доспехи заклинателя Горнила",
+        "bonus2": "Магический урон, наносимый вами и вашими питомцами, включая периодический, дает заряд, но не чаще одного раза в секунду. При 6 зарядах весь урон, наносимый вами и вашими питомцами, повышается на 8% на 6 сек. Заряды исчезают после 8 сек. без подходящего попадания и не накапливаются во время усиления урона. Заряды и усиление исчезают при выходе из боя или если на вас остается меньше двух предметов этого комплекта."
+      },
+      "crucible_caster_leather": {
+        "name": "Кожаные доспехи заклинателя Горнила",
+        "bonus2": "Магический урон, наносимый вами и вашими питомцами, включая периодический, дает заряд, но не чаще одного раза в секунду. При 6 зарядах весь урон, наносимый вами и вашими питомцами, повышается на 8% на 6 сек. Заряды исчезают после 8 сек. без подходящего попадания и не накапливаются во время усиления урона. Заряды и усиление исчезают при выходе из боя или если на вас остается меньше двух предметов этого комплекта."
+      },
+      "crucible_caster_mail": {
+        "name": "Кольчужные доспехи заклинателя Горнила",
+        "bonus2": "Магический урон, наносимый вами и вашими питомцами, включая периодический, дает заряд, но не чаще одного раза в секунду. При 6 зарядах весь урон, наносимый вами и вашими питомцами, повышается на 8% на 6 сек. Заряды исчезают после 8 сек. без подходящего попадания и не накапливаются во время усиления урона. Заряды и усиление исчезают при выходе из боя или если на вас остается меньше двух предметов этого комплекта."
+      },
+      "crucible_healer_cloth": {
+        "name": "Тканевые доспехи целителя Горнила",
+        "bonus2": "Исцеление союзника, находящегося в бою, превращает 20% вашего избыточного исцеления в щит на нем на 6 сек. Учитываются периодическое исцеление и исцеление, полученное преобразованием урона. Действует и при исцелении себя в бою. Общая защита от всех владельцев комплекта ограничена 5% максимального здоровья получателя. Дополнительное избыточное исцеление пополняет щит, но не продлевает его. Эта защита не вызывает других эффектов исцеления. Ваши щиты исчезают, когда защищенный союзник выходит из боя, когда вы умираете или когда на вас остается меньше двух предметов этого комплекта."
+      },
+      "crucible_healer_leather": {
+        "name": "Кожаные доспехи целителя Горнила",
+        "bonus2": "Исцеление союзника, находящегося в бою, превращает 20% вашего избыточного исцеления в щит на нем на 6 сек. Учитываются периодическое исцеление и исцеление, полученное преобразованием урона. Действует и при исцелении себя в бою. Общая защита от всех владельцев комплекта ограничена 5% максимального здоровья получателя. Дополнительное избыточное исцеление пополняет щит, но не продлевает его. Эта защита не вызывает других эффектов исцеления. Ваши щиты исчезают, когда защищенный союзник выходит из боя, когда вы умираете или когда на вас остается меньше двух предметов этого комплекта."
+      },
+      "crucible_healer_mail": {
+        "name": "Кольчужные доспехи целителя Горнила",
+        "bonus2": "Исцеление союзника, находящегося в бою, превращает 20% вашего избыточного исцеления в щит на нем на 6 сек. Учитываются периодическое исцеление и исцеление, полученное преобразованием урона. Действует и при исцелении себя в бою. Общая защита от всех владельцев комплекта ограничена 5% максимального здоровья получателя. Дополнительное избыточное исцеление пополняет щит, но не продлевает его. Эта защита не вызывает других эффектов исцеления. Ваши щиты исчезают, когда защищенный союзник выходит из боя, когда вы умираете или когда на вас остается меньше двух предметов этого комплекта."
+      },
+      "crucible_str_leather": {
+        "name": "Кожаные доспехи хищника Горнила",
+        "bonus2": "Прямой физический урон, наносимый вами и вашими питомцами, дает заряд, но не чаще одного раза в секунду. При 6 зарядах весь урон, наносимый вами и вашими питомцами, повышается на 8% на 6 сек. Заряды исчезают после 8 сек. без подходящего попадания и не накапливаются во время усиления урона. Заряды и усиление исчезают при выходе из боя или если на вас остается меньше двух предметов этого комплекта."
+      },
+      "crucible_str_mail": {
+        "name": "Кольчужные доспехи ударника Горнила",
+        "bonus2": "Прямой физический урон, наносимый вами и вашими питомцами, дает заряд, но не чаще одного раза в секунду. При 6 зарядах весь урон, наносимый вами и вашими питомцами, повышается на 8% на 6 сек. Заряды исчезают после 8 сек. без подходящего попадания и не накапливаются во время усиления урона. Заряды и усиление исчезают при выходе из боя или если на вас остается меньше двух предметов этого комплекта."
+      },
+      "crucible_tank_leather": {
+        "name": "Кожаные доспехи стража Горнила",
+        "bonus2": "Урон от врага начинает 10-секундный период учета. Когда потеря здоровья за этот период достигает 40% от вашего максимального здоровья, вы получаете на 6 сек. щит, поглощающий урон в размере 8% от максимального здоровья. Срабатывает не чаще раза в 20 сек. Поглощенный урон и урон от самого себя не учитываются. Накопленный урон и щит исчезают при выходе из боя или если на вас остается меньше двух предметов этого комплекта. Перезарядка не сбрасывается."
+      },
+      "crucible_tank_mail": {
+        "name": "Кольчужные доспехи стража Горнила",
+        "bonus2": "Урон от врага начинает 10-секундный период учета. Когда потеря здоровья за этот период достигает 40% от вашего максимального здоровья, вы получаете на 6 сек. щит, поглощающий урон в размере 8% от максимального здоровья. Срабатывает не чаще раза в 20 сек. Поглощенный урон и урон от самого себя не учитываются. Накопленный урон и щит исчезают при выходе из боя или если на вас остается меньше двух предметов этого комплекта. Перезарядка не сбрасывается."
       },
       "dawnforged": {
         "name": "Облачение рассветной ковки",

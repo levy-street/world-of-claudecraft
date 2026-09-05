@@ -986,7 +986,8 @@ const MONOLITHS: MonolithRow[] = [
     // wc -l < src/sim/sim.ts after biome. Exact count.
     // Lowered 12028 -> 12006 in PR 3872 cleanup after removing the retired
     // tutorial action and its write-only account fact. Exact count, zero slack.
-    ceiling: 12006,
+    // Perfecting read/command adapters moved to professions/perfecting_world_view.ts.
+    ceiling: 12004,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1379,7 +1380,9 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered 10347 -> 10336 in PR 3872 cleanup after removing the unused
     // feast signer wire field plus the retired tutorial dispatch and account-fact
     // plumbing. Measured after formatting; exact count.
-    ceiling: 10336,
+    // Perfecting command parsing and naming dispatch now live in
+    // server/perfect_item_command.ts; rank exchange remains a thin adapter.
+    ceiling: 10330,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

@@ -11,6 +11,10 @@
 import type { ReliquaryLocaleTable } from '../reliquary_i18n';
 
 export const table: ReliquaryLocaleTable = {
+  professions_crucible: {
+    name: '熔爐匠藝',
+    desc: '十一套團隊副本製作套裝，每套均包含胸甲、腰帶和鞋靴。圖樣與配方屬於知識，不列為藏品。',
+  },
   // Dungeon, delve and world-boss pages: entities.* names verbatim.
   conquerors_hollow_crypt: {
     name: '空洞墓穴',

@@ -15,13 +15,15 @@ function groveheart() {
   sim.setPlayerLevel(20);
   expect(sim.setSpec('restoration')).toBe(true);
   const healer = sim.player;
-  const meta = sim.players.get(healer.id)!;
+  const meta = sim.players.get(healer.id);
+  if (!meta) throw new Error('Missing healer metadata');
   meta.equipment.chest = 'crucible_healer_leather_chest';
   meta.equipment.waist = 'crucible_healer_leather_waist';
   recalcPlayerStats(healer, 'druid', meta.equipment, meta.talentMods, meta.equipmentInstance);
   const allyId = sim.addPlayer('warrior', 'Tank');
   sim.setPlayerLevel(20, allyId);
-  const ally = sim.entities.get(allyId)!;
+  const ally = sim.entities.get(allyId);
+  if (!ally) throw new Error('Missing tank');
   ally.pos = { ...healer.pos };
   const enemy = createMob(9500, MOBS.training_dummy, 20, {
     ...healer.pos,
@@ -67,7 +69,7 @@ describe('Crucible healer participation through real combat healing', () => {
     expect(heal.overheal).toBeGreaterThan(0);
     expect(enemy.threat.get(healer.id)).toBeGreaterThan(0);
     expect(healer.inCombat).toBe(false);
-    const reserve = Math.min(Math.floor(heal.overheal! * 0.2), Math.floor(ally.maxHp * 0.05));
+    const reserve = Math.min(Math.floor((heal.overheal ?? 0) * 0.2), Math.floor(ally.maxHp * 0.05));
     expect(ward(ally)).toMatchObject({ value: reserve, remaining: 6 });
     updateAuras(ctx, ally);
     expect(ward(ally)).toMatchObject({ value: reserve, remaining: 5.95 });
@@ -103,7 +105,8 @@ describe('Crucible healer participation through real combat healing', () => {
     applyHeal(ctx, healer, ally, 100, 'Heal', 'regrowth', false, false);
     expect(ward(ally)?.value).toBe(20);
     tickAuras(ctx, ally, 20);
-    const remaining = ward(ally)!.remaining;
+    const remaining = ward(ally)?.remaining;
+    expect(remaining).toBeCloseTo(5);
     applyHeal(ctx, healer, ally, 1000, 'Heal', 'regrowth', false, false);
     expect(ward(ally)).toMatchObject({ value: Math.floor(ally.maxHp * 0.05), remaining });
     tickAuras(ctx, ally, 101);

@@ -60,6 +60,23 @@ export function resetCraftedCollectionState(entity: Entity, nextId: string | und
   );
 }
 
+// Healing an engaged ally is combat participation even when the healer has no
+// aggro target or recent damage and therefore has no personal combat flag.
+// Use this same admission for creation and recipient-side ward revalidation.
+function healerParticipant(ctx: SimContext, source: Entity, target: Entity): boolean {
+  return (
+    source.kind === 'player' &&
+    !source.dead &&
+    !target.dead &&
+    target.inCombat &&
+    ctx.entities.get(source.id) === source &&
+    ctx.entities.get(target.id) === target &&
+    ctx.isFriendlyTo(source, target) &&
+    !!source.craftedCollectionId &&
+    crucibleCollectionFamilyForSet(source.craftedCollectionId) === 'healer'
+  );
+}
+
 /** Recipient-side revalidation also runs before absorbs, so a gear change or
  * owner death cannot leave usable protection until the next recipient tick. */
 export function cleanupCraftedCollectionAuras(ctx: SimContext, entity: Entity): void {
@@ -68,16 +85,15 @@ export function cleanupCraftedCollectionAuras(ctx: SimContext, entity: Entity): 
     const aura = entity.auras[index];
     if (!isCraftedCollectionAura(aura.id) || aura.id === TANK_COOLDOWN_ID) continue;
     const source = ctx.entities.get(aura.sourceId);
+    const healingWard = aura.id.endsWith('_heal_ward');
     const valid =
-      !entity.dead &&
-      entity.inCombat &&
-      source &&
-      !source.dead &&
-      source.inCombat &&
-      source.craftedCollectionId &&
-      aura.id.startsWith(`${PREFIX}${source.craftedCollectionId}_`);
+      source?.craftedCollectionId &&
+      aura.id.startsWith(`${PREFIX}${source.craftedCollectionId}_`) &&
+      (healingWard
+        ? healerParticipant(ctx, source, entity)
+        : !entity.dead && entity.inCombat && !source.dead && source.inCombat);
     if (valid) {
-      if (!aura.id.endsWith('_heal_ward')) continue;
+      if (!healingWard) continue;
       aura.value = Math.min(aura.value, healingRoom);
       healingRoom -= aura.value;
       if (aura.value > 0) continue;
@@ -202,16 +218,7 @@ export function onCraftedCollectionHeal(
   target: Entity,
   overheal: number,
 ): void {
-  if (
-    overheal <= 0 ||
-    source.dead ||
-    target.dead ||
-    !source.inCombat ||
-    !target.inCombat ||
-    !source.craftedCollectionId ||
-    crucibleCollectionFamilyForSet(source.craftedCollectionId) !== 'healer'
-  )
-    return;
+  if (overheal <= 0 || !healerParticipant(ctx, source, target)) return;
   cleanupCraftedCollectionAuras(ctx, target);
   const wards = target.auras.filter(
     (aura) =>

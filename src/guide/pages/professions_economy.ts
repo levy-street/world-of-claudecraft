@@ -114,7 +114,7 @@ export function economyDetailHtml(): string {
     <article class="guide-article guide-prof-page">
       <p class="guide-section-more"><a href="${esc(hrefFor('professions'))}">${esc(t('guide.profPages.back'))}</a></p>
       <h1>${esc(t('guide.profPages.econ.title'))}</h1>
-      <p class="guide-lead">${esc(t('guide.profPages.econ.intro'))}</p>
+      <p class="guide-lead">${esc(t('guide.profPages.econ.introRaidCollections'))}</p>
       ${feesSection()}
       <section class="guide-block" id="prof-sells">
         <h2>${esc(t('guide.profPages.econ.sellsHeading'))}</h2>
@@ -136,7 +136,7 @@ export function economyDetailHtml(): string {
       </section>
       <section class="guide-block" id="prof-provenance">
         <h2>${esc(t('guide.profPages.econ.provenanceHeading'))}</h2>
-        ${paras('guide.profPages.econ.provenanceBody')}
+        ${paras('guide.profPages.econ.provenanceBodyUndiscounted')}
       </section>
       <section class="guide-block" id="prof-collectors">
         <h2>${esc(t('guide.profPages.econ.collectorsHeading'))}</h2>
@@ -149,7 +149,7 @@ export function economyDetailHtml(): string {
       </section>
       <section class="guide-block" id="prof-doctrine">
         <h2>${esc(t('guide.profPages.econ.doctrineHeading'))}</h2>
-        ${paras('guide.profPages.econ.doctrineBody')}
+        ${paras('guide.profPages.econ.doctrineBodyRaidCollections')}
       </section>
       ${related([
         { href: hrefFor('professions'), key: 'guide.nav.professions' },
