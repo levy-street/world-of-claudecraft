@@ -11906,7 +11906,7 @@ export const TARGETS = [
         }
         // The authored Watch Meadow spot (content/farshore.ts): the base branch
         // has no NPC to read it from, so the coordinates are restated here.
-        const at = forge ? { x: forge.pos.x, z: forge.pos.z } : { x: 377, z: 7 };
+        const at = forge ? { x: forge.pos.x, z: forge.pos.z } : { x: 366, z: 10 };
         p.pos = { x: at.x - 2.5, y: p.pos.y, z: at.z + 2.5 };
         p.prevPos = { ...p.pos };
         p.facing = Math.PI * 0.25;

@@ -1193,6 +1193,14 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'closes the market window when the player leaves the auctioneer',
   },
   {
+    call: 'this.riftForgeWindow.close',
+    band: 'slow',
+    gate: 'this.riftForgeWindow.isOpen && !riftForgeInReach(p, this.sim.entities.values(), NPC_WINDOW_CLOSE_RANGE)',
+    surface: 'window',
+    guard: { kind: 'callsite' },
+    why: "closes the forge window when the player walks out of the Riftwright's reach (the market rule; the sim place gate refuses the commands regardless)",
+  },
+  {
     call: 'this.marketWindow.refreshIfChanged',
     band: 'slow',
     gate: 'this.marketWindow.isOpen && !(!this.nearbyMarketNpc())',
@@ -1679,8 +1687,10 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // existing swingTimerBars.update row.
       // window 44 -> 46: the crucible vendor's out-of-range close (the third
       // #vendor-window tenant, on the heroic vendor's exact row shape).
+      // window 46 -> 47: the Rift Forge window's walk-away close (the market
+      // rule, added by the #3869 review's should-fix on the slow tick).
       // Both deltas apply on the merged tree.
-    ).toEqual({ window: 46, chrome: 84, none: 17 });
+    ).toEqual({ window: 47, chrome: 84, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1707,7 +1717,9 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       hud: 6,
       // Up to 12 with the crucible vendor's out-of-range close: the same
       // callsite-guarded shape as the copper and heroic vendor closes.
-      callsite: 12,
+      // callsite 12 -> 13: the Rift Forge window's walk-away close (the market
+      // rule; the call site itself is the gate, the same shape as marketWindow.close).
+      callsite: 13,
       none: 4,
     });
     // ...and the honest-exception list by NAME, because that is the one that should never

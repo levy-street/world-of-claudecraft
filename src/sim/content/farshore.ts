@@ -297,13 +297,19 @@ export const FARSHORE_NPCS: Record<string, NpcDef> = {
       'It opened right where the nets dry. Right there, where I stood every morning of my life. I do not go down to the shore anymore. I do not go much of anywhere anymore.',
   },
   // The Riftwright: the Rift Forge NPC (riftForge flag). Stands in the Watch
-  // Meadow beside Riftwatch Ollun, the one authored rift place in the world,
-  // so the ring a first clear mints is upgraded where the breaks are studied.
+  // Meadow a few yards south-west of Riftwatch Ollun, the one authored rift
+  // place in the world, so the ring a first clear mints is upgraded where the
+  // breaks are studied. The spot is deliberately off the meadow's road ends
+  // and clear of the Hilltop Spring's shore ring: every NPC gets a calm-anchor
+  // flatten pad (terrain_calm_anchors.ts), and at the original (377, 7) that
+  // pad deformed the spring's shoreline and two road edges by up to a yard
+  // (tests/terrain_height_parity.test.ts). Here it touches two open-meadow
+  // atlas points and nothing else.
   riftwright_maelis: {
     id: 'riftwright_maelis',
     name: 'Riftwright Maelis',
     title: 'Rift Forgemaster',
-    pos: { x: 377, z: 7 },
+    pos: { x: 366, z: 10 },
     facing: Math.PI,
     color: 0x7a3f8a,
     questIds: [],
