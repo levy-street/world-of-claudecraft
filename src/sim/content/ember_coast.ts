@@ -257,6 +257,17 @@ function stairRampStamps(spec: StairRampSpec): HeightStamp[] {
   return out;
 }
 
+/** The sea-pool ring's parapet height: the owner's five fortress_wall rows
+ *  at y -7.25, scale 12 (src/sim/forgefather_fortress.ts) top out here.
+ *  (Both consts must stay ABOVE FORGEFATHER_ISLE_TERRAIN_EDITS: its
+ *  initializer spreads northwestSlotStamps(), which reads them at module
+ *  load; below the table they would be a temporal-dead-zone error.)
+ *  tests/forgefather_fortress.test.ts pins it to the derived wall tops. */
+export const SEA_RING_PARAPET_Y = 3.91;
+/** The balcony shelf's level: a full yard under the parapet, so the wall
+ *  stands proud of the ground along its whole clear run. */
+export const NORTHWEST_SLOT_SHELF_Y = 2.9;
+
 /** The Forgefather's Isle fortress tiers: flat build plateaus with smooth
  *  approach ramps (the quay-pad idiom, stacked). Each tier's centre drifts
  *  north of the one below, so every tier keeps a broad south-facing
@@ -436,13 +447,47 @@ export const FORGEFATHER_ISLE_TERRAIN_EDITS: HeightStamp[] = [
   { x: 513, z: 2249.4, radius: 2.2, delta: -1.0, falloff: 'smooth', mode: 'level' },
   // ...and the northwest slot between the west ring wall and the flank
   // fills to a dead-end balcony shelf (a 12 yd deep two-cell slot has no
-  // walkable ladder; terrain is the answer): FLAT stamps hold the shelf
-  // sag-free between the walls, the smooth ladder grades its south
-  // approach down from the rim, and the only way out is the way in.
-  { x: 496, z: 2247, radius: 3, delta: 6.7, falloff: 'flat', mode: 'level' },
-  { x: 496, z: 2251.5, radius: 3, delta: 6.5, falloff: 'flat', mode: 'level' },
-  { x: 496, z: 2242.5, radius: 3, delta: 7.1, falloff: 'flat', mode: 'level' },
-  { x: 496, z: 2237, radius: 2.4, delta: 8.3, falloff: 'smooth', mode: 'level' },
-  { x: 496, z: 2238.5, radius: 2.4, delta: 7.9, falloff: 'smooth', mode: 'level' },
-  { x: 496, z: 2240, radius: 2.4, delta: 7.5, falloff: 'smooth', mode: 'level' },
+  // walkable ladder; terrain is the answer): the smooth ladder grades its
+  // south approach down from the rim, FLAT stamps hold the shelf sag-free
+  // between the walls, and the only way out is the way in. The whole
+  // shelf sits UNDER the ring wall's parapet (SEA_RING_PARAPET_Y, the
+  // owner's sea-level fortress_wall tops): the first bake held it at 6.5
+  // to 7.1, three yards over the wall top, so the ground plane cut clean
+  // through the west and northwest wall panels and the ring read as a
+  // bald rock hill from the strait (the Drakelands terrain-clipping
+  // report). Pinned by tests/forgefather_fortress.test.ts.
+  ...northwestSlotStamps(),
 ];
+
+/** The northwest wall-slot fill: a three-lane smooth ladder marching from
+ *  the flank rim (8.0, the raw rock at z 2236) down the slot to the shelf
+ *  level, then three flat discs holding the shelf itself. Three lanes across
+ *  the slot's width (the stair-bank idiom) keep the ladder level between
+ *  the west wall's inner face and the keep plinth instead of sagging into
+ *  a trough along the wall. Lane radii stop short of the wall's centre
+ *  line, so the drop outside the ladder hides inside the wall's own
+ *  thickness. */
+function northwestSlotStamps(): HeightStamp[] {
+  const out: HeightStamp[] = [];
+  const rimY = 8.0;
+  // Four 1.5 yd rows, z 2236 (the rim) to z 2240.5: the ladder is done
+  // descending BEFORE the west wall's clear run begins (raw ground drops
+  // under the parapet from z 2241 north), so no ladder row ever stands
+  // over the parapet at the wall's inner face. The grade is 1.1 per yard,
+  // inside the movement kernel's PLAYER_MAX_CLIMB_SLOPE of 1.5.
+  const rows = 3;
+  const footY = NORTHWEST_SLOT_SHELF_Y + 0.1;
+  for (let i = 0; i <= rows; i++) {
+    const z = 2236 + 1.5 * i;
+    const delta = Math.round((rimY + (footY - rimY) * (i / rows)) * 100) / 100;
+    for (const x of [494.9, 496, 497.1])
+      out.push({ x, z, radius: 2.2, delta, falloff: 'smooth', mode: 'level' });
+  }
+  for (const disc of [
+    { x: 496, z: 2244.5, radius: 2.6 },
+    { x: 496, z: 2248.8, radius: 2.6 },
+    { x: 496.3, z: 2251.4, radius: 2.4 },
+  ])
+    out.push({ ...disc, delta: NORTHWEST_SLOT_SHELF_Y, falloff: 'flat', mode: 'level' });
+  return out;
+}
