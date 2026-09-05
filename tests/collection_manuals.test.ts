@@ -37,7 +37,12 @@ afterAll(() => {
 });
 
 function setup(skill = 100) {
-  const sim = new Sim({ seed: 83, noPlayer: true, world: EMPTY_TEST_WORLD });
+  const sim = new Sim({
+    seed: 83,
+    playerClass: 'warrior',
+    noPlayer: true,
+    world: EMPTY_TEST_WORLD,
+  });
   const pid = sim.addPlayer('warrior', 'Manual Reader');
   const meta = sim.meta(pid)!;
   meta.autoEquip = false;
@@ -95,7 +100,7 @@ describe('collection manuals through item use', () => {
 
   it('does not teach from an invalid selected copy', () => {
     const { sim, pid, meta } = setup();
-    sim.useItem(ID, pid, { slotIndex: 999 });
+    sim.useItem(ID, pid, 999);
     expect(recipes.some((recipe) => meta.knownRecipes.has(recipe.id))).toBe(false);
     expect(sim.countItem(ID, pid)).toBe(1);
   });

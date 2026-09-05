@@ -1473,6 +1473,11 @@ export interface MountItemDef extends BaseItemDef {
 export interface RecipeItemDef extends BaseItemDef {
   kind: 'recipe';
   teachesRecipeId: string;
+  /** A collection manual teaches these recipes atomically. The first id also
+   *  occupies teachesRecipeId for legacy discovery and preview consumers. */
+  teachesRecipeIds?: readonly string[];
+  /** A formula uses the enchant catalog rather than the crafting catalog. */
+  teachesEnchantId?: string;
   armorType?: never;
   weapon?: never;
   use?: never;
@@ -1543,6 +1548,10 @@ export interface ItemInstancePayload {
    *  cloneItemInstancePayload's spread covers it; the load bound keeps only a
    *  legal in-range integer (item_instance_load.ts, drop-only). */
   perfecting?: number;
+  /** Permanent Perfecting binding, retained when a collection rank swap leaves rank zero. */
+  perfectingBound?: true;
+  /** This collection copy's immutable primary bonus, applied in rolled.stats only while Perfected. */
+  perfectingBonus?: Partial<CoreStats>;
   /** Marks a copy that has completed the Perfecting stage (Masterwrought R1).
    *  Minted by phase 12's rank walk (professions/perfecting.ts
    *  resolvePerfectingAttempt, when the track reaches PERFECTING_RANKS); the
@@ -1617,6 +1626,8 @@ export interface ItemInstancePayload {
 export function cloneItemInstancePayload(src: ItemInstancePayload): ItemInstancePayload {
   const instance: ItemInstancePayload = { ...src };
   if (src.charges) instance.charges = { ...src.charges };
+  if (src.perfectingBonus && typeof src.perfectingBonus === 'object' && !Array.isArray(src.perfectingBonus))
+    instance.perfectingBonus = { ...src.perfectingBonus };
   if (src.rolled)
     instance.rolled = {
       ...src.rolled,

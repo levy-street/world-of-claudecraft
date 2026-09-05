@@ -498,6 +498,7 @@ export function requiredReagentCountFor(
   professionId: string,
   isJackOfAllTrades = false,
 ): RequiredReagentResult {
+  if (reagent.noDiscount) return { count: reagent.count, selfSignedBonusApplied: false };
   const afterSelfSigned = hasSelfSigned ? Math.max(1, reagent.count - 1) : reagent.count;
   const multiplier = materialCostMultiplier(craftSkills, professionId);
   const jackMultiplier = isJackOfAllTrades ? 1 - JACK_MATERIAL_DISCOUNT_PCT : 1;

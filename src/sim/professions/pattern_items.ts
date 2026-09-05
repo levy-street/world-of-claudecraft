@@ -20,6 +20,7 @@ import { consumeSelectedInventorySlot, selectedInventorySlot } from '../item_cop
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { RecipeItemDef } from '../types';
+import { collectionManualRecipes } from './collection_manual';
 import { acquireRecipe, isRecipeKnown } from './crafting';
 import { teachTierMet } from './training';
 import type { ProfessionRecipeRecord } from './types';
@@ -103,8 +104,15 @@ export function useRecipePatternItem(
   ) {
     return;
   }
-  const recipe = recipeById(def.teachesRecipeId);
-  const verdict = resolvePatternLearn(recipe, meta);
+  const recipes = collectionManualRecipes(def, recipeById);
+  if (!recipes) return;
+  const missing = recipes.filter((recipe) => !isRecipeKnown(meta, recipe));
+  const verdict: PatternLearnResult =
+    missing.length === 0
+      ? { ok: false, reason: 'already_known' }
+      : (missing
+          .map((recipe) => resolvePatternLearn(recipe, meta))
+          .find((result) => !result.ok) ?? { ok: true });
   if (!verdict.ok) {
     // Three plain calls, each on ONE physical line: once biome wraps a call it
     // also adds a trailing comma, which the S3 drift-guard's closing-paren
@@ -129,14 +137,23 @@ export function useRecipePatternItem(
     // `if (!def) return;` arm. A refusal NEVER consumes the pattern.
     return;
   }
-  const learned = acquireRecipe(ctx, meta.entityId, def.teachesRecipeId, 'drop');
+  // The canonical mint still owns each grant. No await or inventory mutation
+  // occurs during this batch. Restore knowledge if a future mint adds a guard
+  // not represented by the pure preview, so even that denial stays atomic.
+  const previousKnowledge = new Set(meta.knownRecipes);
+  const learned = missing.every(
+    (recipe) => acquireRecipe(ctx, meta.entityId, recipe.id, 'drop').ok,
+  );
   // Defense in depth, the unlockMechChromaFromItem idiom: the resolver already
   // proved every condition this mint re-checks against the same recipe record
   // and the same live meta, so this arm is UNREACHABLE today and exists for
   // the day the mint grows a condition the resolver does not know. Return
   // without consuming rather than eating the copy for nothing; a lost pattern
   // is unrecoverable, a silent no-op is not.
-  if (!learned.ok) return;
+  if (!learned) {
+    meta.knownRecipes = previousKnowledge;
+    return;
+  }
   // Consume by the id the caller was asked to use, not def.id: useItem's own
   // ownership gate counted THAT id, so spending anything else could remove a
   // copy the player was never charged for. When the click named a slot (the
@@ -175,5 +192,7 @@ export function useRecipePatternItem(
   // record of knowing a recipe. And NO trainResult is emitted on a refusal:
   // the refusals above are ctx.error-only, because an ok:false event would
   // double-print through the hud's trainResult deny renderer.
-  ctx.emit({ type: 'trainResult', ok: true, recipeId: def.teachesRecipeId, pid: meta.entityId });
+  for (const recipe of missing) {
+    ctx.emit({ type: 'trainResult', ok: true, recipeId: recipe.id, pid: meta.entityId });
+  }
 }
