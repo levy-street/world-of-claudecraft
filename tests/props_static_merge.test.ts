@@ -103,7 +103,7 @@ describe('static prop merging', () => {
     expect(Array.from(sharedGeometry.getIndex()?.array ?? [])).toEqual(sourceIndex);
   });
 
-  it('keeps material and shadow buckets separate and ordered', () => {
+  it('keeps material buckets separate but merges casters with non-casters', () => {
     const group = new THREE.Group();
     const stone = new THREE.MeshStandardMaterial();
     const wood = new THREE.MeshStandardMaterial();
@@ -115,7 +115,7 @@ describe('static prop merging', () => {
 
     const merged = propStaticMergeInternalsForTest.mergeStaticMeshes(group, new Set());
 
-    expect(merged).toHaveLength(3);
+    expect(merged).toHaveLength(2);
     expect(
       merged.map((mesh) => ({
         material: mesh.material,
@@ -123,10 +123,80 @@ describe('static prop merging', () => {
         receiveShadow: mesh.receiveShadow,
       })),
     ).toEqual([
-      { material: stone, castShadow: false, receiveShadow: true },
-      { material: wood, castShadow: false, receiveShadow: true },
       { material: stone, castShadow: true, receiveShadow: true },
+      { material: wood, castShadow: false, receiveShadow: true },
     ]);
+  });
+
+  it('draws only the caster prefix in the shadow pass of a mixed bucket', () => {
+    const group = new THREE.Group();
+    const stone = new THREE.MeshStandardMaterial();
+    const unshadowed = new THREE.Mesh(indexedQuad(), stone);
+    unshadowed.position.x = 4;
+    const shadowed = new THREE.Mesh(indexedQuad(), stone);
+    shadowed.castShadow = true;
+    // Source order deliberately puts the non-caster first: the merge has to
+    // reorder, or the shadow prefix would clip the wrong half.
+    group.add(unshadowed, shadowed);
+
+    const merged = propStaticMergeInternalsForTest.mergeStaticMeshes(group, new Set());
+
+    expect(merged).toHaveLength(1);
+    const mesh = merged[0];
+    expect(mesh.castShadow).toBe(true);
+    expect((mesh as unknown as { shadowRangeIndexCount?: number }).shadowRangeIndexCount).toBe(6);
+    expect(mesh.geometry.getIndex()?.count).toBe(12);
+    // The caster's triangles come first, so its world position leads the
+    // merged position stream.
+    expect(Array.from(mesh.geometry.getAttribute('position').array).slice(0, 3)).toEqual([0, 0, 0]);
+
+    expect(mesh.geometry.drawRange).toEqual({ start: 0, count: Number.POSITIVE_INFINITY });
+    (mesh as unknown as { onBeforeShadow: () => void }).onBeforeShadow();
+    expect(mesh.geometry.drawRange).toEqual({ start: 0, count: 6 });
+    (mesh as unknown as { onAfterShadow: () => void }).onAfterShadow();
+    expect(mesh.geometry.drawRange).toEqual({ start: 0, count: Number.POSITIVE_INFINITY });
+  });
+
+  it('leaves a single-sided bucket ungated', () => {
+    const group = new THREE.Group();
+    const stone = new THREE.MeshStandardMaterial();
+    const a = new THREE.Mesh(indexedQuad(), stone);
+    a.castShadow = true;
+    const b = new THREE.Mesh(indexedQuad(), stone);
+    b.castShadow = true;
+    b.position.x = 4;
+    group.add(a, b);
+
+    const merged = propStaticMergeInternalsForTest.mergeStaticMeshes(group, new Set());
+
+    expect(merged).toHaveLength(1);
+    const mesh = merged[0];
+    expect(mesh.castShadow).toBe(true);
+    expect((mesh as unknown as { shadowRangeIndexCount?: number }).shadowRangeIndexCount).toBe(
+      undefined,
+    );
+    // three's own no-op hook survives on the prototype; the decisive check is
+    // that the shadow pass still draws the whole bucket.
+    (mesh as unknown as { onBeforeShadow: () => void }).onBeforeShadow();
+    expect(mesh.geometry.drawRange).toEqual({ start: 0, count: Number.POSITIVE_INFINITY });
+  });
+
+  it('never merges geometries whose attribute sets disagree', () => {
+    const group = new THREE.Group();
+    const stone = new THREE.MeshStandardMaterial();
+    const full = new THREE.Mesh(indexedQuad(), stone);
+    const sparse = indexedQuad();
+    sparse.deleteAttribute('color');
+    const partial = new THREE.Mesh(sparse, stone);
+    partial.position.x = 4;
+    group.add(full, partial);
+
+    const merged = propStaticMergeInternalsForTest.mergeStaticMeshes(group, new Set());
+
+    // Both survive: a single bucket would make three's mergeGeometries return
+    // null and drop the whole bucket out of the scene.
+    expect(merged).toHaveLength(2);
+    expect(merged.map((m) => m.geometry.getIndex()?.count)).toEqual([6, 6]);
   });
 
   it('de-interleaves indexed source attributes without mutating the shared geometry', () => {
