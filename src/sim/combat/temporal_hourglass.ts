@@ -2,6 +2,7 @@ import { zoneAt } from '../data';
 import type { GroundAoE } from '../entity_roster';
 import type { SimContext } from '../sim_context';
 import { type AbilityEffect, DT, type Entity, type Vec3 } from '../types';
+import { onCraftedCollectionHeal } from './crafted_collection_effects';
 import { consumeHealAbsorb, healingTakenMult } from './heal';
 
 export const TEMPORAL_HOURGLASS_ID = 'temporal_hourglass';
@@ -50,6 +51,8 @@ export function tickTemporalHourglassHealing(
   const landing = consumeHealAbsorb(ctx, target, intended);
   const absorbed = intended - landing;
   const healed = Math.min(landing, target.maxHp - target.hp);
+  const source = ctx.entities.get(aura.sourceId);
+  if (source) onCraftedCollectionHeal(ctx, source, target, landing - healed);
   if (healed <= 0 && absorbed <= 0) return;
 
   if (healed > 0) target.hp += healed;
@@ -64,7 +67,6 @@ export function tickTemporalHourglassHealing(
     ...(absorbed > 0 ? { absorbed } : {}),
     ...(overheal > 0 ? { overheal } : {}),
   });
-  const source = ctx.entities.get(aura.sourceId);
   if (source && healed > 0) ctx.healingThreat(source, target, healed);
 }
 

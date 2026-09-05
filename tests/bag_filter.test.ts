@@ -531,6 +531,8 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'deepfen_pearl',
     'duskweave_bag',
     'foragers_haversack',
+    // Formula scrolls follow the existing bag-side kind-'recipe' ruling.
+    'formula_lastflame_zeal',
     'frayed_prayer_beads',
     'gleamstag_charm',
     'gravewoven_bag',
@@ -560,6 +562,18 @@ describe('chip reachability census: the All-only set, pinned', () => {
     // Phase 11k retired the capstone feast's pattern with its recipe and added
     // three of its own, further down in sort order.
     'pattern_clockreel_fishing_rod',
+    // Each collection manual teaches three recipes but is still one scroll.
+    'pattern_crucible_agi_leather',
+    'pattern_crucible_caster_cloth',
+    'pattern_crucible_caster_leather',
+    'pattern_crucible_caster_mail',
+    'pattern_crucible_healer_cloth',
+    'pattern_crucible_healer_leather',
+    'pattern_crucible_healer_mail',
+    'pattern_crucible_str_leather',
+    'pattern_crucible_str_mail',
+    'pattern_crucible_tank_leather',
+    'pattern_crucible_tank_mail',
     'pattern_duskforged_bulwark',
     'pattern_duskforged_warblade',
     'pattern_evergarden_braised_greens',

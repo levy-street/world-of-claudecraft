@@ -3132,7 +3132,7 @@ async function startGame(
       // A ground aim armed before the drop is anchored to a stale world; the
       // rebuilt mirror may place the player elsewhere entirely.
       hud.cancelGroundAim();
-      hud.marketResyncAfterReconnect();
+      hud.resyncAfterReconnect();
       // A fresh join hands the server a brand-new PlayerMeta with stopAutoAttackOnTargetSwitch
       // undefined, so the stored preference needs a re-push, the same way it is
       // pushed once on world entry above. onReconnected fires before ClientWorld

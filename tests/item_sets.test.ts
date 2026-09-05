@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { CRUCIBLE_COLLECTIONS } from '../src/sim/content/crucible_collections';
 import { SET_ENGINE_BONUSES } from '../src/sim/content/ignivar_set_bonuses';
 import {
   aggregateSetBonuses,
@@ -179,8 +180,18 @@ describe('aggregateSetBonuses (the lineage ladder)', () => {
           ? '2,4,6'
           : SET_ENGINE_BONUSES[set.id] !== undefined
             ? '2,4'
-            : '3';
+            : CRUCIBLE_COLLECTIONS.some((collection) => collection.id === set.id)
+              ? '2'
+              : '3';
       expect([pieces.join(','), set.id]).toEqual([expected, set.id]);
+    }
+    // Three alternatives, any two activate the only bonus. The spare slot
+    // must not invent a third-piece reward or inherit a raid lineage.
+    expect(CRUCIBLE_COLLECTIONS).toHaveLength(11);
+    for (const collection of CRUCIBLE_COLLECTIONS) {
+      expect(collection.itemIds, collection.id).toHaveLength(3);
+      expect(ITEM_SETS[collection.id].lineage, collection.id).toBeUndefined();
+      expect(ITEM_SETS[collection.id].bonuses.map((bonus) => bonus.pieces)).toEqual([2]);
     }
   });
 

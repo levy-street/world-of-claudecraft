@@ -20,6 +20,7 @@
 // (qr-11G-ORDER): the crafting window and the wiki render a bill in authored
 // order, so an interleaving change is player-visible and nothing else sees it.
 import { describe, expect, it } from 'vitest';
+import { CRUCIBLE_COLLECTION_RECIPES } from '../src/sim/content/crucible_collections';
 import { FARM_CROPS, farmCropSkillThreshold } from '../src/sim/content/farm_crops';
 import { GATHERING_PROFESSIONS } from '../src/sim/content/professions';
 import {
@@ -1468,7 +1469,13 @@ describe('masterwrought Phase 11h: what it did NOT touch', () => {
     // Then 170 at the merge of release/v0.41.0 (tip e19d832b47): the
     // release's four Bank Storage BAG_RECIPES join ALL_RECIPES; this branch
     // minted nothing at the sync.
-    expect(ALL_RECIPES).toHaveLength(170);
+    // The Crucible integration adds eleven three-slot collections, not new
+    // provisioning rows. Preserve the old universe independently of the append.
+    expect(CRUCIBLE_COLLECTION_RECIPES).toHaveLength(33);
+    expect(
+      ALL_RECIPES.filter((recipe) => !CRUCIBLE_COLLECTION_RECIPES.includes(recipe)),
+    ).toHaveLength(170);
+    expect(ALL_RECIPES).toHaveLength(203);
     for (const row of APEX_ROWS) {
       expect(requireRecipe(row.id).skillReq, `${row.id} rung`).toBe(row.rung);
     }

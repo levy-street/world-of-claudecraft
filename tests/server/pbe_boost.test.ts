@@ -905,9 +905,9 @@ describe('boostAccountCharacters', () => {
 });
 
 describe('Masterwrought equip-cap awareness (phase 08)', () => {
-  // Current real role kits top out below the cap; the literal maximum keeps
-  // this sweep non-vacuous and records when live catalog ordering changes.
-  it('every current role kit carries at most one flagged piece', () => {
+  // The raid collections enter the role-weighted kits up to the existing cap.
+  // Keep the invariant separate from the reviewed live-catalog maximum.
+  it('every current role kit respects the cap, with collections reaching two', () => {
     let maxFlagged = 0;
     for (const cls of Object.keys(CLASS_ROLES) as PlayerClass[]) {
       for (const role of CLASS_ROLES[cls]) {
@@ -920,12 +920,12 @@ describe('Masterwrought equip-cap awareness (phase 08)', () => {
         maxFlagged = Math.max(maxFlagged, flagged.length);
       }
     }
-    expect(maxFlagged, 'current live-catalog maximum').toBe(1);
+    expect(maxFlagged, 'current live-catalog maximum').toBe(2);
   });
 
   it('synthetic ring, armor, and empty fallbacks enforce the cap deterministically', () => {
-    // The current live catalog never drives these demotion branches. Synthetic
-    // defs isolate them from whichever raid pieces win the role scorer.
+    // Synthetic defs isolate each demotion branch from whichever raid pieces
+    // currently win the role scorer.
     const isFlagged = (id: string) => id.startsWith('mw_');
     const scoreOf = (id: string) => ({ mw_chest: 30, mw_waist: 10, mw_ring: 5 })[id] ?? 0;
     // Ring refill: three flagged picks; the ring is the lowest-scored, so it

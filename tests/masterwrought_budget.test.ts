@@ -15,6 +15,10 @@
 // consumables carry no worn power, so they are pinned in their own tables and
 // the flag's ABSENCE is part of what each of those arms asserts.
 import { describe, expect, it } from 'vitest';
+import {
+  CRUCIBLE_COLLECTION_ITEMS,
+  CRUCIBLE_COLLECTION_RECIPES,
+} from '../src/sim/content/crucible_collections';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { ARMOR_RATING, FIVE_MAN_WEAPON_RATING } from '../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
@@ -789,7 +793,10 @@ describe('masterwrought apex budget sweep', () => {
     // No id may sit in two family tables (a duplicate would make the sorted
     // union equality below pass over a def the wrong family block never ran).
     expect(new Set(FLAGGED_TABLE_IDS).size).toBe(FLAGGED_TABLE_IDS.length);
-    expect(flagged).toEqual([...FLAGGED_TABLE_IDS].sort());
+    expect(Object.keys(CRUCIBLE_COLLECTION_ITEMS)).toHaveLength(33);
+    expect(flagged).toEqual(
+      [...FLAGGED_TABLE_IDS, ...Object.keys(CRUCIBLE_COLLECTION_ITEMS)].sort(),
+    );
   });
 
   it('every apex recipe output is in a table, plus the unflagged bag, tools, and consumables', () => {
@@ -1622,6 +1629,10 @@ describe('masterwrought apex budget sweep', () => {
       [string, ItemDef & Record<string, unknown>]
     >) {
       if (def.masterwrought !== true) continue;
+      // The new raid tier has its own item-level-35 budget and +3 Perfecting
+      // contract in crucible_collections/perfecting_swap. Keep R5's old-17
+      // literal ceilings unchanged rather than silently retuning them.
+      if (Object.hasOwn(CRUCIBLE_COLLECTION_ITEMS, id)) continue;
       const recipe = ALL_RECIPES.find((r) => r.resultItemId === id);
       expect(recipe, `${id} has an apex recipe`).toBeTruthy();
       const bonus = perfectedBonusStats(def, recipe!) as Record<string, number> | null;
@@ -1773,9 +1784,12 @@ describe('masterwrought apex budget sweep', () => {
     // any output that reaches the apex band must be flagged, which is what
     // puts it back inside the census.
     const apexOutputs = new Set(
-      [...APEX_ARMOR_RECIPES, ...APEX_GEAR_RECIPES, ...APEX_CONSUMABLE_RECIPES].map(
-        (r) => r.resultItemId,
-      ),
+      [
+        ...APEX_ARMOR_RECIPES,
+        ...APEX_GEAR_RECIPES,
+        ...APEX_CONSUMABLE_RECIPES,
+        ...CRUCIBLE_COLLECTION_RECIPES,
+      ].map((r) => r.resultItemId),
     );
     const carvedOut = new Set(CRUCIBLE_BAND_CARVE_OUT.map((entry) => entry.recipeId));
     let scanned = 0;
@@ -1797,10 +1811,11 @@ describe('masterwrought apex budget sweep', () => {
     const atBand = ALL_RECIPES.filter(
       (r) => !carvedOut.has(r.id) && (itemLevel(ITEMS[r.resultItemId]) ?? 0) >= 31,
     );
-    // The literal survives the carve-out by construction: an entry only ever
-    // removes a recipe the packet does not own, so 17 is still the packet's own
-    // at-band family. If this number moves, a masterwrought recipe moved.
-    expect(atBand.length, 'recipes really do reach the apex band').toBe(17);
+    // Preserve the original seventeen plus the independently pinned raid tier.
+    expect(
+      atBand.filter((r) => !Object.hasOwn(CRUCIBLE_COLLECTION_ITEMS, r.resultItemId)),
+    ).toHaveLength(17);
+    expect(atBand.length, 'recipes really do reach the apex band').toBe(50);
     for (const r of atBand) expect(apexOutputs.has(r.resultItemId), r.id).toBe(true);
     expect(offenders, 'an unflagged crafted output reached the apex item level').toEqual([]);
   });

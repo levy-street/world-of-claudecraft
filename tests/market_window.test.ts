@@ -753,10 +753,10 @@ describe('market_window: reconnect resync (#2416)', () => {
 
   it('wires the window through a hud.ts method, chained onto the ClientWorld reconnect hook in main.ts', () => {
     const method = hud.slice(
-      hud.indexOf('marketResyncAfterReconnect(): void {'),
-      hud.indexOf('marketResyncAfterReconnect(): void {') + 200,
+      hud.indexOf('resyncAfterReconnect(): void {'),
+      hud.indexOf('resyncAfterReconnect(): void {') + 200,
     );
-    expect(method, 'Hud.marketResyncAfterReconnect must exist').toContain(
+    expect(method, 'Hud.resyncAfterReconnect must exist').toContain(
       'this.marketWindow.onReconnected();',
     );
     // hud does not exist yet when enterWorld() first arms world.onReconnected (the
@@ -771,7 +771,7 @@ describe('market_window: reconnect resync (#2416)', () => {
       'priorOnReconnected?.();',
     );
     expect(chain, 'main.ts must call the hud resync hook on reconnect').toContain(
-      'hud.marketResyncAfterReconnect();',
+      'hud.resyncAfterReconnect();',
     );
   });
 });

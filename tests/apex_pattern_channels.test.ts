@@ -31,11 +31,17 @@
 // channel means adding a row a reader can see.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import {
+  CRUCIBLE_COLLECTION_RECIPES,
+  CRUCIBLE_COLLECTIONS,
+} from '../src/sim/content/crucible_collections';
 import { DELVE_SHOPS } from '../src/sim/content/delves';
 import { drownedLitanyChestItemsForTier } from '../src/sim/content/delves/drowned_litany_loot';
 import { delveChestItemsForTier } from '../src/sim/content/delves/lockpick_tiers';
+import { ENCHANTS } from '../src/sim/content/enchants';
 import { FARM_HEROIC_PATTERN_GROUP, HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_NPC_ID, HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
+import { CRUCIBLE_VENDOR_NPC_ID, CRUCIBLE_VENDOR_STOCK } from '../src/sim/content/ignivar_loot';
 import { FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
 import { authoredLettersById } from '../src/sim/content/letters';
 import { FURY_STOCK } from '../src/sim/content/pvp_honor';
@@ -82,6 +88,15 @@ import type { Entity, PlayerClass } from '../src/sim/types';
 
 const NYTHRAXIS_BOSS_ID = 'nythraxis_scourge_of_thornpeak';
 const RAID_GROUP = 'nythraxis_patterns';
+const CRUCIBLE_GROUP = 'crucible_profession_patterns';
+const CRUCIBLE_BOSS_IDS = [
+  'varkhul_forgefather_of_the_last_flame',
+  'ignivar_herald_of_the_last_flame',
+];
+const CRUCIBLE_SCROLL_IDS = [
+  ...CRUCIBLE_COLLECTIONS.map((collection) => `pattern_${collection.id}`),
+  'formula_lastflame_zeal',
+].sort();
 
 // THE SANCTIONED HOST REGISTRY. Every place in live content a pattern id is
 // allowed to appear, one row per recorded channel decision. The no-fourth-
@@ -112,7 +127,7 @@ const PATTERN_IDS = new Set(
     .map((def) => def.id),
 );
 const isPatternId = (id: string | undefined): boolean =>
-  !!id && (PATTERN_IDS.has(id) || id.startsWith('pattern_'));
+  !!id && (PATTERN_IDS.has(id) || id.startsWith('pattern_') || id.startsWith('formula_'));
 
 // The three channel surfaces, read live (never from the recipe tables, so this
 // file checks the recipe-to-channel direction independently).
@@ -123,6 +138,12 @@ const RAID_CHANNEL_IDS = new Set(
 );
 const RIFT_CHANNEL_IDS = new Set<string>(RIFT_PATTERN_ITEM_IDS);
 const VENDOR_CHANNEL_IDS = new Set(HEROIC_VENDOR_STOCK.map((offer) => offer.itemId));
+const CRUCIBLE_RAID_CHANNEL_IDS = new Set(
+  CRUCIBLE_BOSS_IDS.flatMap((bossId) => MOBS[bossId].loot)
+    .filter((entry) => entry.rollGroup === CRUCIBLE_GROUP)
+    .flatMap((entry) => (entry.itemId ? [entry.itemId] : [])),
+);
+const CRUCIBLE_VENDOR_CHANNEL_IDS = new Set(CRUCIBLE_VENDOR_STOCK.map((offer) => offer.itemId));
 
 // The farm set's three surfaces, read live the same way. Each is filtered to
 // PATTERN ids: the raid and rift channels carry seeds too, which are ordinary
@@ -147,12 +168,12 @@ describe('masterwrought R8 referential contract: every drop recipe reaches exact
   // counts are LITERAL floors (the recorded phase decisions), never re-derived.
   const apexDropRecipes = ALL_RECIPES.filter((recipe) => recipe.acquisition?.includes('drop'));
 
-  it('the drop-acquisition recipe set partitions 10 gear / 10 armor / 13 consumable / 6 farm / 1 rod', () => {
+  it('the drop-acquisition recipe set partitions the legacy families plus 33 Crucible recipes', () => {
     // 38 since masterwrought Phase 11i: three angler cooking rows plus the
     // apex rod's schematic, the first pattern teaching a row outside the
     // three APEX_* tables. 40 since masterwrought Phase 11k, which retired
     // 11i's capstone feast row and minted three apex role feasts in its place.
-    expect(apexDropRecipes).toHaveLength(40);
+    expect(apexDropRecipes).toHaveLength(73);
     const gear = apexDropRecipes.filter((r) => APEX_GEAR_RECIPES.includes(r));
     const armor = apexDropRecipes.filter((r) => APEX_ARMOR_RECIPES.includes(r));
     const consumable = apexDropRecipes.filter((r) => APEX_CONSUMABLE_RECIPES.includes(r));
@@ -164,6 +185,7 @@ describe('masterwrought R8 referential contract: every drop recipe reaches exact
     // four-term sum would have come up one short against the total no matter
     // how the consumable literal moved.
     const rod = apexDropRecipes.filter((r) => ROD_RECIPES.includes(r));
+    const crucible = apexDropRecipes.filter((r) => CRUCIBLE_COLLECTION_RECIPES.includes(r));
     expect(gear).toHaveLength(10);
     expect(armor).toHaveLength(10);
     // THIRTEEN: the eight phase-11 consumables, 11i's two surviving angler
@@ -171,15 +193,18 @@ describe('masterwrought R8 referential contract: every drop recipe reaches exact
     expect(consumable).toHaveLength(13);
     expect(farm).toHaveLength(6);
     expect(rod).toHaveLength(1);
+    expect(crucible).toHaveLength(33);
     // No drop recipe outside the five families: one with no assigned channel
     // would slip every family loop, so it fails here.
-    expect(gear.length + armor.length + consumable.length + farm.length + rod.length).toBe(
-      apexDropRecipes.length,
-    );
+    expect(
+      gear.length + armor.length + consumable.length + farm.length + rod.length + crucible.length,
+    ).toBe(apexDropRecipes.length);
     // And the families are DISJOINT, which a bare sum cannot show: a recipe
     // counted by two filters would balance the equality above while meaning
     // something quite different.
-    const familyIds = [...gear, ...armor, ...consumable, ...farm, ...rod].map((r) => r.id);
+    const familyIds = [...gear, ...armor, ...consumable, ...farm, ...rod, ...crucible].map(
+      (r) => r.id,
+    );
     expect(new Set(familyIds).size).toBe(familyIds.length);
   });
 
@@ -191,7 +216,8 @@ describe('masterwrought R8 referential contract: every drop recipe reaches exact
     // is therefore a SET per family rather than a single name, and the farm
     // rows are still pinned to exactly one DROP pillar apiece.
     for (const recipe of apexDropRecipes) {
-      const patternId = `pattern_${recipe.resultItemId}`;
+      const isCrucible = CRUCIBLE_COLLECTION_RECIPES.includes(recipe);
+      const patternId = `pattern_${isCrucible ? ITEMS[recipe.resultItemId].set : recipe.resultItemId}`;
       const isFarm = FARM_RECIPES.includes(recipe);
       const channels: string[] = [];
       if (RAID_CHANNEL_IDS.has(patternId)) channels.push('raid');
@@ -200,6 +226,15 @@ describe('masterwrought R8 referential contract: every drop recipe reaches exact
       if (RIFT_CHANNEL_IDS.has(patternId)) channels.push('rift');
       if (FARM_RIFT_CHANNEL_IDS.has(patternId)) channels.push('rift');
       if (VENDOR_CHANNEL_IDS.has(patternId)) channels.push('vendor');
+      if (CRUCIBLE_RAID_CHANNEL_IDS.has(patternId)) channels.push('crucible_raid');
+      if (CRUCIBLE_VENDOR_CHANNEL_IDS.has(patternId)) channels.push('crucible_vendor');
+      if (isCrucible) {
+        expect(channels, `${recipe.id} via ${patternId}`).toEqual([
+          'crucible_raid',
+          'crucible_vendor',
+        ]);
+        continue;
+      }
       if (!isFarm) {
         const assigned = APEX_GEAR_RECIPES.includes(recipe)
           ? 'raid'
@@ -222,6 +257,30 @@ describe('masterwrought R8 referential contract: every drop recipe reaches exact
 });
 
 describe('the hosting surfaces are live content', () => {
+  it('both Crucible bosses carry exactly the manuals and formula in either difficulty, with a core vendor fallback', () => {
+    expect(CRUCIBLE_SCROLL_IDS).toHaveLength(12);
+    for (const bossId of CRUCIBLE_BOSS_IDS) {
+      const entries = MOBS[bossId].loot.filter((entry) => entry.rollGroup === CRUCIBLE_GROUP);
+      expect(entries.map((entry) => entry.itemId).sort(), bossId).toEqual(CRUCIBLE_SCROLL_IDS);
+      expect(
+        Object.values(DUNGEONS).filter((dungeon) =>
+          dungeon.spawns.some((spawn) => spawn.mobId === bossId),
+        ),
+        bossId,
+      ).toHaveLength(1);
+      for (const entry of entries) {
+        expect(entry.chance, entry.itemId).toBe(0.025);
+        expect(entry.normalOnly ?? false, entry.itemId).toBe(false);
+        expect(entry.questId, entry.itemId).toBeUndefined();
+      }
+      expect(entries.reduce((sum, entry) => sum + entry.chance, 0)).toBeCloseTo(0.3, 10);
+    }
+    const stock = CRUCIBLE_VENDOR_STOCK.filter((offer) => isPatternId(offer.itemId));
+    expect(stock.map((offer) => offer.itemId).sort()).toEqual(CRUCIBLE_SCROLL_IDS);
+    for (const offer of stock) expect(offer.sigilId, offer.itemId).toBe('lastflame_core');
+    expect(NPCS[CRUCIBLE_VENDOR_NPC_ID].crucibleVendor).toBe(true);
+  });
+
   it('the raid group rides the boss template that exactly one registered dungeon spawns', () => {
     const entries = MOBS[NYTHRAXIS_BOSS_ID].loot.filter((entry) => entry.rollGroup === RAID_GROUP);
     expect(entries).toHaveLength(10);
@@ -301,10 +360,16 @@ describe('the no-fourth-channel sweep (masterwrought R8: three pillars, no fourt
     expect(mobIds.length).toBeGreaterThanOrEqual(230);
     let entriesWalked = 0;
     const sanctionedByGroup = new Map<string, number>();
+    const crucibleByBoss = new Map<string, number>();
     const leaks: string[] = [];
     for (const mobId of mobIds) {
       for (const entry of MOBS[mobId].loot ?? []) {
         entriesWalked++;
+        if (CRUCIBLE_BOSS_IDS.includes(mobId) && entry.rollGroup === CRUCIBLE_GROUP) {
+          expect(CRUCIBLE_SCROLL_IDS, `${mobId}: ${entry.itemId}`).toContain(entry.itemId);
+          crucibleByBoss.set(mobId, (crucibleByBoss.get(mobId) ?? 0) + 1);
+          continue;
+        }
         // The sanctioned hosts: the two appended pattern groups on the
         // nythraxis base table (registry above). Everything else on that
         // table, and every other mob, sweeps.
@@ -329,6 +394,7 @@ describe('the no-fourth-channel sweep (masterwrought R8: three pillars, no fourt
     // exists to catch.
     expect(sanctionedByGroup.get(RAID_GROUP), 'the apex gear group').toBe(10);
     expect(sanctionedByGroup.get(FARM_RAID_GROUP), 'the farming raid group').toBe(5);
+    for (const bossId of CRUCIBLE_BOSS_IDS) expect(crucibleByBoss.get(bossId), bossId).toBe(12);
   });
 
   it('no HEROIC_BOSS_LOOT table carries a pattern id outside the sanctioned farm group', () => {
@@ -587,7 +653,7 @@ describe('the no-fourth-channel sweep (masterwrought R8: three pillars, no fourt
 });
 
 describe('the phase 02 sweep floor', () => {
-  it('EXACTLY 40 shipped kind:recipe defs, each teaching a drop-acquirable recipe', () => {
+  it('every shipped pattern teaches drop-acquirable recipes, and only the Zeal formula teaches an enchant', () => {
     // recipe_pattern_items.test.ts sweeps every kind:'recipe' def for this
     // shape but is deliberately floorless (it predates shipped content); the
     // literal here is the floor, and the referential arms above make it
@@ -596,13 +662,28 @@ describe('the phase 02 sweep floor', () => {
     const recipeDefs = Object.values(ITEMS).filter((def) => def.kind === 'recipe');
     // 38 since masterwrought Phase 11i (the angler's endgame block), 40 since
     // Phase 11k (three apex feast recipes in, 11i's capstone feast out).
-    expect(recipeDefs).toHaveLength(40);
+    expect(recipeDefs).toHaveLength(52);
+    expect(recipeDefs.filter((def) => !CRUCIBLE_SCROLL_IDS.includes(def.id))).toHaveLength(40);
+    let recipesTaught = 0;
+    let enchantsTaught = 0;
     for (const def of recipeDefs) {
       if (def.kind !== 'recipe') continue; // narrow for teachesRecipeId
-      const recipe = recipeById(def.teachesRecipeId);
-      expect(recipe, `${def.id} teaches ${def.teachesRecipeId}`).toBeDefined();
-      expect(recipe?.acquisition, def.id).toContain('drop');
+      if (def.teachesEnchantId !== undefined) {
+        expect(def.id).toBe('formula_lastflame_zeal');
+        expect(def.teachesEnchantId).toBe('enchant_weapon_lastflame_zeal');
+        expect(ENCHANTS[def.teachesEnchantId]?.acquisition).toBe('drop');
+        enchantsTaught++;
+        continue;
+      }
+      for (const recipeId of def.teachesRecipeIds ?? [def.teachesRecipeId]) {
+        const recipe = recipeById(recipeId);
+        expect(recipe, `${def.id} teaches ${recipeId}`).toBeDefined();
+        expect(recipe?.acquisition, def.id).toContain('drop');
+        recipesTaught++;
+      }
     }
+    expect(recipesTaught).toBe(73);
+    expect(enchantsTaught).toBe(1);
   });
 });
 

@@ -3654,6 +3654,7 @@ export const hudChromeStrings = {
     healEcho: 'Falling below {threshold}% health restores {value} health',
     increase: {
       ap: 'Increases attack power by {value}',
+      str: 'Increases Strength by {value}',
       sp: 'Increases spell power by {value}',
       armor: 'Increases armor by {value}',
       int: 'Increases Intellect by {value}',
@@ -3664,6 +3665,7 @@ export const hudChromeStrings = {
     },
     reduce: {
       ap: 'Reduces attack power by {value}',
+      str: 'Reduces Strength by {value}',
       armor: 'Reduces armor by {value}',
       int: 'Reduces Intellect by {value}',
       agi: 'Reduces Agility by {value}',
@@ -5402,6 +5404,7 @@ export const hudChromeStrings = {
   // by enchant_apply_view.ts enchantNameKey in the Apply Enchant picker; never
   // the raw def name in the DOM.
   enchantName: {
+    enchant_weapon_lastflame_zeal: "Last Flame's Zeal",
     enchant_weapon_might: 'Weapon Etching: Might',
     enchant_weapon_intellect: 'Weapon Etching: Spellpower',
     enchant_offhand_stamina: 'Offhand Etching: Stamina',
@@ -5453,6 +5456,10 @@ export const hudChromeStrings = {
     enchant_chest_lucent_stamina: 'Chest Etching: Lucent Stamina',
     enchant_feet_lucent_agility: 'Boot Etching: Lucent Agility',
     enchant_lucent_infusion: 'Lucent Infusion',
+  },
+  enchantDescription: {
+    enchant_weapon_lastflame_zeal:
+      "Your landed melee attacks can grant 50 Strength for 15 sec and heal you for 200 health. Healing modifiers apply. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Each hand has its own buff; repeated triggers refresh that hand. Ranged attacks do not trigger this effect. Wolf Form uses its 1 sec base swing speed instead.",
   },
   // Professions window (Professions 2.0): the read-only craft-wheel
   // window. Craft and pair NAMES resolve through craftName / archetypePair
@@ -5931,6 +5938,7 @@ export const hudChromeStrings = {
   // Craft Cast System Phase 5: concurrent-cast denies use per-action busy keys
   // (cast duration paces; the shared "too quickly" quota is retired).
   enchanting: {
+    recipeNotLearned: 'Learn the formula before applying this enchant.',
     // The SOLE player-visible lines for these actions (#2430). The grant hub's
     // "You receive:" lines no longer print for a disenchant or a salvage yield
     // (the loot event's callerLogs flag), so the Yield variants below name the
@@ -6134,6 +6142,7 @@ export const hudChromeStrings = {
   // name of the item the taught recipe crafts (entity i18n, never a raw id).
   pattern: {
     teaches: 'Use: Teaches you how to craft {item}.',
+    teachesEnchant: 'Use: Teaches you how to apply {enchant}.',
   },
   // Maker's Bond unbind service window + result lines (Professions 2.0):
   // the station master's second gossip service beside training.
@@ -6187,12 +6196,40 @@ export const hudChromeStrings = {
   // recorded rank-0 shape; whether the sim should close that hole is a
   // maintainer read in the Phase 14 QA ledger).
   perfecting: {
+    swapTitle: 'Exchange Perfecting ranks',
+    swapIntro:
+      'Choose another owned piece from this collection. Exchange ranks at the matching crafting station, out of combat, with craft skill {skill}. No materials or failure roll.',
+    swapChoose: 'Choose a second piece to preview the exchange.',
+    swapRank: '{name}: rank {before} to {after}',
+    swapAction: 'Review rank exchange',
+    swapPending: 'Exchanging ranks',
+    swapConfirm: 'Both pieces become permanently bound to you. Exchange their Perfecting ranks?',
+    swapConfirmAccept: 'Bind and exchange ranks',
+    swapPreserve:
+      'Neither item is consumed. Names, cosmetic legendary promotion, and enchants stay on their original pieces. Equipment limits still apply.',
+    swapEnchantInactive:
+      'Its Perfected-only enchant becomes inactive until this piece is Perfected again.',
+    swapEnchantActive: 'Its Perfected-only enchant becomes active again.',
+    swapSuccess: 'Perfecting ranks exchanged. Both pieces are permanently bound.',
+    swapInterrupted:
+      "We could not confirm the exchange after reconnecting. Check both pieces' ranks before choosing another exchange.",
+    swapChanged: 'The selected pieces changed. Choose them again and review the new ranks.',
+    swapDead: 'You must be alive to exchange ranks.',
+    swapBusy: 'Leave combat and finish your current action before exchanging ranks.',
+    swapInvalid: 'These pieces have unsupported Perfecting progress and cannot exchange ranks.',
+    swapSameRank: 'These pieces already have the same Perfecting rank.',
+    swapSkill: "You need skill {skill} in this collection's craft.",
+    swapStation: 'Move to the matching crafting station to exchange ranks.',
+    swapLocked: 'Unlock both pieces before exchanging ranks.',
+    enchantInactive:
+      'Enchantment inactive: this piece must be Perfected. The enchantment is preserved.',
     title: 'Perfecting',
     close: 'Close the Perfecting window',
     openButton: 'Perfecting',
     openButtonAria: 'Open the Perfecting window',
     empty: 'You hold no Masterwrought piece. The apex recipes forge one.',
     wornChip: 'Worn',
+    bagCopy: 'Bag copy {index} of {count}',
     rowRank: 'Rank {rank} of {ranks}',
     rowPerfected: 'Perfected',
     // The status-region announcements (role=status beside the repaint shell):

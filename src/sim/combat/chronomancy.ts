@@ -24,6 +24,7 @@ import { ABILITIES } from '../data';
 import { recordCascadeConversion, recordCascadeDamage } from '../dev/cascade_playtest';
 import type { SimContext } from '../sim_context';
 import type { Aura, Entity } from '../types';
+import { onCraftedCollectionHeal } from './crafted_collection_effects';
 import { consumeHealAbsorb, healingTakenMult, healingThreat } from './heal';
 import { wearsSetBonus } from './set_bonus_wearer';
 
@@ -314,6 +315,7 @@ function applyEchoHeal(
   // DEV playtest tally (no-op without an active session): the applied heal plus the
   // portion lost to the missing-hp clamp (overheal). Never alters the healed value.
   recordCascadeConversion(source, healed, preClamp - healed);
+  onCraftedCollectionHeal(ctx, source, ally, preClamp - healed);
   if (healed <= 0) return;
   ally.hp += healed;
   const overheal = preClamp - healed;

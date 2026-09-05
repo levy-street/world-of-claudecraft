@@ -4,11 +4,22 @@ import type {
 } from '../sim/professions/commission_order';
 import type { MaterialRarity } from '../sim/professions/gathering';
 import type { PerfectItemRef, PerfectingInfoView } from '../sim/professions/perfecting';
+import type {
+  PerfectingSwapInfoView,
+  PerfectingSwapRequest,
+} from '../sim/professions/perfecting_swap';
 import type { PlayerProfessionSkill, ProfessionRecipeRecord } from '../sim/professions/types';
 import type { EquipSlot, StationDef } from '../sim/types';
 import type { WorldInteractionOutcome } from './interaction';
 
-export type { CommissionOrderScope, CommissionOrderStatus, PerfectItemRef, PerfectingInfoView };
+export type {
+  CommissionOrderScope,
+  CommissionOrderStatus,
+  PerfectItemRef,
+  PerfectingInfoView,
+  PerfectingSwapInfoView,
+  PerfectingSwapRequest,
+};
 
 // Render-safe projection of a player's professions standing. Stub as of
 // #1164, now real for the gathering professions (#1119): `skills` carries one
@@ -172,6 +183,7 @@ export interface ApplyEnchantResultView {
   reason?:
     | 'unknown_item'
     | 'unknown_enchant'
+    | 'recipe_not_learned'
     | 'wrong_slot'
     | 'not_held'
     | 'insufficient_materials'
@@ -509,4 +521,9 @@ export interface IWorldProfessions {
   // craftingIdentity mirrors, so the two cannot drift. A pure read: no wire
   // round trip, nothing predicted.
   perfectingInfo(ref: PerfectItemRef): PerfectingInfoView | null;
+
+  // Exchange progress only after explicit confirmation of both pinned copies.
+  // The authoritative result is personal; neither online method predicts state.
+  swapPerfectingRanks(request: PerfectingSwapRequest): void;
+  perfectingSwapInfo(request: PerfectingSwapRequest): PerfectingSwapInfoView | null;
 }

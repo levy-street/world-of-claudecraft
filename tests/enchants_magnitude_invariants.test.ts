@@ -14,6 +14,9 @@ import { xpForLevel } from '../src/sim/types';
 
 type Axis = 'str' | 'agi' | 'sta' | 'int' | 'spi' | 'armor';
 const AXES: readonly Axis[] = ['str', 'agi', 'sta', 'int', 'spi', 'armor'];
+const PROC_ENCHANT_ID = 'enchant_weapon_lastflame_zeal';
+// One explicitly approved proc, not a blanket exception for future proc rows.
+const isStaticEnchant = (enchant: EnchantDef) => enchant.id !== PROC_ENCHANT_ID;
 
 // Tier identity is derived from the reagent contract, exactly the doctrine the
 // table's section comments state: Lucent (the apex tier) consumes
@@ -30,10 +33,10 @@ const AXES: readonly Axis[] = ['str', 'agi', 'sta', 'int', 'spi', 'armor'];
 // them would leave this predicate silently matching nothing.
 const isApex = (e: EnchantDef) => e.reagents.some((r) => r.itemId === APEX_TIER_REAGENT);
 const isGreater = (e: EnchantDef) =>
-  !isApex(e) && e.reagents.some((r) => r.itemId === 'arcane_shard');
+  isStaticEnchant(e) && !isApex(e) && e.reagents.some((r) => r.itemId === 'arcane_shard');
 const isRuned = (e: EnchantDef) =>
-  !isApex(e) && e.reagents.some((r) => r.itemId.startsWith('resonant_'));
-const isBase = (e: EnchantDef) => !isApex(e) && !isGreater(e) && !isRuned(e);
+  isStaticEnchant(e) && !isApex(e) && e.reagents.some((r) => r.itemId.startsWith('resonant_'));
+const isBase = (e: EnchantDef) => isStaticEnchant(e) && !isApex(e) && !isGreater(e) && !isRuned(e);
 
 const axisOf = (e: EnchantDef): Axis => AXES.filter((a) => (e.statBonus[a] ?? 0) > 0)[0];
 
@@ -88,14 +91,35 @@ function bestValue(slot: string, axis: Axis, include: (e: EnchantDef) => boolean
 }
 
 describe('enchant table magnitude invariants', () => {
-  it('every enchant grants exactly one stat axis (the tier and stack sweeps below rely on it)', () => {
-    for (const e of Object.values(ENCHANTS)) {
+  it('every static enchant grants exactly one stat axis (the tier and stack sweeps below rely on it)', () => {
+    const statics = Object.values(ENCHANTS).filter(isStaticEnchant);
+    expect(statics).toHaveLength(47);
+    for (const e of statics) {
       // Nonzero, not positive: a negative side axis would slip past the
       // positive-only filters in axisOf and bestPerSlotTotal unseen.
       const axes = AXES.filter((a) => (e.statBonus[a] ?? 0) !== 0);
       expect(axes, e.id).toHaveLength(1);
       expect(e.statBonus[axes[0]] ?? 0, e.id).toBeGreaterThan(0);
     }
+  });
+
+  it('Zeal is the sole learned weapon proc and bakes no permanent stats into its copy', () => {
+    expect(
+      Object.values(ENCHANTS)
+        .filter((enchant) => enchant.weaponProc)
+        .map((enchant) => enchant.id),
+    ).toEqual([PROC_ENCHANT_ID]);
+    const zeal = ENCHANTS[PROC_ENCHANT_ID];
+    expect(zeal.statBonus).toEqual({});
+    expect(zeal.weaponProc).toEqual({ ppm: 1, strength: 50, duration: 15, heal: 200 });
+    expect(zeal.itemSlot).toBe('mainhand');
+    expect(zeal.acquisition).toBe('drop');
+    expect(zeal.skillReq).toBe(100);
+    expect(zeal.requiresPerfected).toBeUndefined();
+    expect(zeal.reagents).toEqual([
+      { itemId: 'lastflame_core', count: 3 },
+      { itemId: 'arcane_shard', count: 2 },
+    ]);
   });
 
   it('the best-per-slot stack per axis (rings twice) stays at the finishing-bonus totals', () => {
@@ -259,9 +283,9 @@ describe('enchant table magnitude invariants', () => {
         .filter((e) => e.requiresPerfected)
         .map((e) => e.id),
     ).toEqual(['enchant_lucent_infusion']);
-    // Every enchant OUTSIDE the apex tier keeps the historical free floor: an
-    // absent skillReq, not a zero one.
-    for (const e of Object.values(ENCHANTS).filter((x) => !isApex(x))) {
+    // Ordinary static enchants outside Lucent keep the historical free floor.
+    // Zeal's separate learned skill-100 contract is pinned above.
+    for (const e of Object.values(ENCHANTS).filter((x) => isStaticEnchant(x) && !isApex(x))) {
       expect(e.skillReq, `${e.id}: free floor`).toBeUndefined();
       expect(e.requiresPerfected, `${e.id}: any-copy`).toBeUndefined();
     }
@@ -342,6 +366,7 @@ describe('frozen enchant magnitudes (the #2415 replace-exactness premise)', () =
       Object.values(ENCHANTS).map((enchant) => [enchant.id, enchant.statBonus]),
     );
     expect(all).toEqual({
+      enchant_weapon_lastflame_zeal: {},
       enchant_weapon_might: { str: 2 },
       enchant_weapon_intellect: { int: 2 },
       enchant_offhand_stamina: { sta: 3 },
@@ -393,13 +418,10 @@ describe('frozen enchant magnitudes (the #2415 replace-exactness premise)', () =
   });
 });
 
-describe('the EnchantDef shape stays stat-only (R7)', () => {
-  // R7 locks the enchant table to STAT bonuses: no movement speed, no proc, no
-  // on-use, no cooldown knob. Every OTHER pin in this file reads statBonus, so
-  // all of them stay green over a def that grew a `moveSpeed` or `proc` field
-  // beside it. This is the one assertion that would notice, and it is a
-  // whole-def key sweep rather than a field check because the hazard is a knob
-  // nobody has thought of yet: an unknown key fails by DEFAULT.
+describe('ordinary EnchantDef rows stay stat-only, with one explicit Crucible proc exception', () => {
+  // R7 still owns ordinary stat tiers. The approved Zeal row alone can add
+  // its learned acquisition, weapon proc and mechanic description. Unknown
+  // knobs fail by default for BOTH shapes; no movement or on-use allowance.
   const ALLOWED_ENCHANT_KEYS = [
     'id',
     'name',
@@ -409,6 +431,7 @@ describe('the EnchantDef shape stays stat-only (R7)', () => {
     'skillReq',
     'requiresPerfected',
   ] as const;
+  const ZEAL_KEYS = [...ALLOWED_ENCHANT_KEYS, 'acquisition', 'weaponProc', 'description'];
 
   it('every row carries only allowlisted keys, and the required ones', () => {
     const rows = Object.values(ENCHANTS);
@@ -416,9 +439,9 @@ describe('the EnchantDef shape stays stat-only (R7)', () => {
     for (const enchant of rows) {
       for (const key of Object.keys(enchant)) {
         expect(
-          ALLOWED_ENCHANT_KEYS,
+          enchant.id === PROC_ENCHANT_ID ? ZEAL_KEYS : ALLOWED_ENCHANT_KEYS,
           `${enchant.id} carries "${key}": if this is a new authored field, decide against ` +
-            'R7 (stat-only) before allowlisting it here',
+            'the static/proc contract before allowlisting it here',
         ).toContain(key);
       }
       // The floor in the other direction, so the sweep cannot pass over a row

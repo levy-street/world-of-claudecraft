@@ -337,12 +337,12 @@ describe('craftIdsForMaterialItem', () => {
     }
   });
 
-  it('recipe-pending materials have no consumer yet and remain explicitly classified', () => {
-    expect(CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS.length).toBeGreaterThan(0);
-    for (const itemId of CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS) {
-      expect(MATERIAL_ITEM_IDS.has(itemId), itemId).toBe(true);
-      expect(craftIdsForMaterialItem(itemId), itemId).toEqual([]);
-    }
+  it('replaces the core staging exemption with actual armor profession consumers', () => {
+    expect(CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS).toEqual([]);
+    expect(MATERIAL_ITEM_IDS.has('lastflame_core')).toBe(true);
+    expect(craftIdsForMaterialItem('lastflame_core')).toEqual(
+      expect.arrayContaining(['armorcrafting', 'leatherworking', 'tailoring']),
+    );
   });
 
   it('every recipe professionId is a craft the affinity can name', () => {

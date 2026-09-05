@@ -112,6 +112,7 @@ import {
   aetherDartsChannelStart,
   aetherSurgeCastMult,
 } from './chronomancy';
+import { onCraftedCollectionHeal } from './crafted_collection_effects';
 import {
   consumeDesolationForCast,
   destructionCastTimeMult,
@@ -2323,6 +2324,7 @@ function applyChannelTick(
         if (!src.dead) {
           const intended = Math.round(dmg * eff.healFrac);
           const healed = Math.min(intended, src.maxHp - src.hp);
+          onCraftedCollectionHeal(ctx, src, src, intended - healed);
           if (healed > 0) {
             src.hp += healed;
             const overheal = intended - healed;

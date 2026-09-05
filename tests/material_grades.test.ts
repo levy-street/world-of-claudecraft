@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { CRUCIBLE_COLLECTION_RECIPES } from '../src/sim/content/crucible_collections';
 import { GATHER_NODE_TYPES, GATHER_NODES } from '../src/sim/content/gather_nodes';
 import { ALL_RECIPES, TOOL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS, QUESTS } from '../src/sim/data';
@@ -416,15 +417,29 @@ describe('the tool ladder the grades exist to build', () => {
     ]);
   });
 
-  it('a fine grade is only ever a tool-recipe reagent (nothing else was re-specced)', () => {
+  it('Fine grades stay confined to tool recipes and the approved Crucible mail collections', () => {
     const fineIds = new Set(Object.values(MATERIAL_GRADES).map((row) => row.fineItemId));
     const toolRecipeIds = new Set(TOOL_RECIPES.map((r) => r.id));
+    const collectionFineRecipes = CRUCIBLE_COLLECTION_RECIPES.filter(
+      (recipe) => recipe.professionId === 'armorcrafting',
+    );
+    expect(collectionFineRecipes).toHaveLength(12);
+    const collectionRecipeIds = new Set(collectionFineRecipes.map((recipe) => recipe.id));
+    for (const recipe of collectionFineRecipes) {
+      expect(
+        recipe.reagents.filter((reagent) => fineIds.has(reagent.itemId)),
+        recipe.id,
+      ).toEqual([
+        { itemId: 'fine_thorium_ore', count: 6 },
+        { itemId: 'fine_elderwood_log', count: 2 },
+      ]);
+    }
     for (const recipe of ALL_RECIPES) {
-      if (toolRecipeIds.has(recipe.id)) continue;
+      if (toolRecipeIds.has(recipe.id) || collectionRecipeIds.has(recipe.id)) continue;
       for (const reagent of recipe.reagents) {
         expect(
           fineIds.has(reagent.itemId),
-          `${recipe.id} consumes the fine grade ${reagent.itemId}; only TOOL_RECIPES should`,
+          `${recipe.id} consumes the fine grade ${reagent.itemId} outside the approved families`,
         ).toBe(false);
       }
     }

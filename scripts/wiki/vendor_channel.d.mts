@@ -20,11 +20,21 @@ export interface PatternVendorOffer {
 
 /** A recipe def as the wiki derivation reads it. */
 export interface PatternRecipeDef {
+  id?: string;
   resultItemId: string;
   acquisition?: readonly string[] | undefined;
 }
 
 export interface PatternChannelTables {
+  items?: Record<
+    string,
+    {
+      kind: string;
+      teachesRecipeId?: string;
+      teachesRecipeIds?: readonly string[];
+      teachesEnchantId?: string;
+    }
+  >;
   mobs: Record<string, PatternMobDef>;
   heroicBossLoot: Record<string, readonly PatternLootRow[]>;
   riftPatternItemIds: readonly string[];
@@ -33,6 +43,7 @@ export interface PatternChannelTables {
 }
 
 export interface PatternChannelSets {
+  patternsByRecipe?: Map<string, Set<string>>;
   dropped: Set<string>;
   vendor: Set<string>;
 }

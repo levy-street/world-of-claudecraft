@@ -14,6 +14,8 @@
 // tests/recipe_pattern_items.test.ts; this file pins the SHIPPED phase 11
 // content against the recorded contract.
 import { describe, expect, it } from 'vitest';
+import { CRUCIBLE_COLLECTIONS } from '../src/sim/content/crucible_collections';
+import { ENCHANTS } from '../src/sim/content/enchants';
 import { CRAFT_RING } from '../src/sim/content/professions';
 import {
   ALL_RECIPES,
@@ -69,6 +71,10 @@ const ROD_PATTERN_IDS = ROD_RECIPES.filter((r) => r.acquisition?.includes('drop'
   (r) => `pattern_${r.resultItemId}`,
 );
 const EVERY_PATTERN_ID = [...ALL_PATTERN_IDS, ...FARM_PATTERN_IDS, ...ROD_PATTERN_IDS];
+const CRUCIBLE_SCROLL_IDS = [
+  ...CRUCIBLE_COLLECTIONS.map((collection) => `pattern_${collection.id}`),
+  'formula_lastflame_zeal',
+];
 
 describe('apex pattern defs (the drop-taught pattern universe)', () => {
   it('covers every drop-taught apex recipe, one pattern_<output> def per recipe, and no strays', () => {
@@ -90,8 +96,9 @@ describe('apex pattern defs (the drop-taught pattern universe)', () => {
     // or losing the drop channel moves a literal rather than sliding through
     // both sides of the union below.
     expect(FARM_PATTERN_IDS).toHaveLength(6);
-    // Exactness both ways over the UNION: every shipped kind:'recipe' def is
-    // one of the 40, and every one of the 40 ships. The left side is read off
+    // Exactness both ways over the UNION: preserve every legacy single-recipe
+    // pattern, and add collection manuals plus the separate enchant formula.
+    // The left side is read off
     // the merged ITEMS table (populated by content/apex_patterns.ts and
     // content/farm_patterns.ts); the right side is computed from the RECIPE
     // tables, now across FOUR of them. Two independent derivations, which is
@@ -101,11 +108,47 @@ describe('apex pattern defs (the drop-taught pattern universe)', () => {
       .filter((def) => def.kind === 'recipe')
       .map((def) => def.id)
       .sort();
-    expect(shippedRecipeKind).toEqual([...EVERY_PATTERN_ID].sort());
+    expect(shippedRecipeKind).toEqual([...EVERY_PATTERN_ID, ...CRUCIBLE_SCROLL_IDS].sort());
     expect(EVERY_PATTERN_ID).toHaveLength(40);
+    expect(CRUCIBLE_SCROLL_IDS).toHaveLength(12);
+    expect(shippedRecipeKind).toHaveLength(52);
     // No id belongs to both halves: a collision would let the union stay the
     // right SIZE while one table quietly shadowed the other in mergeItems.
     expect(new Set(EVERY_PATTERN_ID).size).toBe(EVERY_PATTERN_ID.length);
+    expect(new Set([...EVERY_PATTERN_ID, ...CRUCIBLE_SCROLL_IDS]).size).toBe(52);
+  });
+
+  it('each Crucible manual teaches all three slot alternatives and the formula teaches only Zeal', () => {
+    expect(CRUCIBLE_COLLECTIONS).toHaveLength(11);
+    for (const collection of CRUCIBLE_COLLECTIONS) {
+      const manual = ITEMS[`pattern_${collection.id}`];
+      if (manual.kind !== 'recipe') throw new Error(`${manual.id} must be kind recipe`);
+      const expectedIds = collection.itemIds.map((itemId) => `recipe_${itemId}`);
+      expect(expectedIds, collection.id).toHaveLength(3);
+      expect(manual.teachesRecipeIds, collection.id).toEqual(expectedIds);
+      expect(manual.teachesRecipeId, collection.id).toBe(expectedIds[0]);
+      expect(manual.teachesEnchantId, collection.id).toBeUndefined();
+      for (const id of expectedIds) {
+        const recipe = recipeById(id);
+        expect(recipe?.professionId, id).toBe(collection.craftId);
+        expect(recipe?.skillReq, id).toBe(100);
+        expect(recipe?.acquisition, id).toEqual(['drop']);
+      }
+    }
+    const formula = ITEMS.formula_lastflame_zeal;
+    if (formula.kind !== 'recipe') throw new Error('Zeal formula must be kind recipe');
+    expect(formula.teachesEnchantId).toBe('enchant_weapon_lastflame_zeal');
+    expect(formula.teachesRecipeId).toBe(formula.teachesEnchantId);
+    expect(formula.teachesRecipeIds).toBeUndefined();
+    expect(recipeById(formula.teachesRecipeId)).toBeUndefined();
+    expect(ENCHANTS[formula.teachesEnchantId!].acquisition).toBe('drop');
+    for (const id of CRUCIBLE_SCROLL_IDS) {
+      expect(ITEMS[id].soulbound ?? false, id).toBe(false);
+      expect(ITEMS[id].noMarketList ?? false, id).toBe(false);
+      expect(ITEMS[id].noVendorSell, id).toBe(true);
+      expect(ITEMS[id].sellValue, id).toBe(0);
+      expect(ITEMS[id].quality, id).toBe('epic');
+    }
   });
 
   it('every pattern is a tradable, sellValue-100 recipe item whose rarity tracks its output', () => {

@@ -56,6 +56,21 @@ const SIGIL_GROUPS: Record<string, readonly string[]> = {
 };
 
 const IGNIVAR_BOSS_ID = 'ignivar_herald_of_the_last_flame';
+const PROFESSION_SCROLL_GROUP = 'crucible_profession_patterns';
+const PROFESSION_SCROLL_IDS = [
+  'pattern_crucible_str_mail',
+  'pattern_crucible_tank_mail',
+  'pattern_crucible_caster_mail',
+  'pattern_crucible_healer_mail',
+  'pattern_crucible_agi_leather',
+  'pattern_crucible_str_leather',
+  'pattern_crucible_tank_leather',
+  'pattern_crucible_caster_leather',
+  'pattern_crucible_healer_leather',
+  'pattern_crucible_caster_cloth',
+  'pattern_crucible_healer_cloth',
+  'formula_lastflame_zeal',
+];
 
 const gearItems = (): ItemDef[] =>
   Object.values(IGNIVAR_LOOT_ITEMS).filter((item) => item.kind !== 'tool');
@@ -243,9 +258,12 @@ describe('ignivar loot: sigils and redemption stock', () => {
   });
 
   it('the stock prices every set piece at one matching-slot sigil of its class group', () => {
-    expect(CRUCIBLE_VENDOR_STOCK.length).toBe(29 * 5);
+    expect(CRUCIBLE_VENDOR_STOCK.length).toBe(29 * 5 + 12);
+    expect(new Set(CRUCIBLE_VENDOR_STOCK.map((offer) => offer.itemId)).size).toBe(157);
+    const setOffers = CRUCIBLE_VENDOR_STOCK.filter((offer) => IGNIVAR_SET_ITEMS[offer.itemId]);
+    expect(setOffers).toHaveLength(29 * 5);
     const seen = new Set<string>();
-    for (const offer of CRUCIBLE_VENDOR_STOCK) {
+    for (const offer of setOffers) {
       expect(seen.has(offer.itemId), `${offer.itemId} listed once`).toBe(false);
       seen.add(offer.itemId);
       const piece = IGNIVAR_SET_ITEMS[offer.itemId];
@@ -261,6 +279,14 @@ describe('ignivar loot: sigils and redemption stock', () => {
     for (const id of Object.keys(IGNIVAR_SET_ITEMS)) {
       expect(seen.has(id), `${id} redeemable`).toBe(true);
     }
+  });
+
+  it('adds only twelve profession scrolls, each priced at one Last Flame Core', () => {
+    const scrolls = CRUCIBLE_VENDOR_STOCK.filter((offer) => !IGNIVAR_SET_ITEMS[offer.itemId]);
+    expect(scrolls).toEqual(
+      PROFESSION_SCROLL_IDS.map((itemId) => ({ itemId, sigilId: 'lastflame_core' })),
+    );
+    for (const offer of scrolls) expect(ITEMS[offer.itemId].kind).toBe('recipe');
   });
 });
 
@@ -379,7 +405,11 @@ describe('ignivar loot: the boss drop tables (one item per five raiders)', () =>
     expect(money).toMatchObject({ copper: 150000, chance: 1 });
     expect(money.heroicCopper).toBeGreaterThan(0);
     const groups = groupsOf(loot);
-    expect([...groups.keys()]).toEqual(['ignivar_sigils', 'ignivar_offset']);
+    expect([...groups.keys()]).toEqual([
+      'ignivar_sigils',
+      'ignivar_offset',
+      PROFESSION_SCROLL_GROUP,
+    ]);
     const sigils = [
       'sigil_anvil_shoulder',
       'sigil_ember_shoulder',
@@ -418,14 +448,20 @@ describe('ignivar loot: the boss drop tables (one item per five raiders)', () =>
     expect(
       shareOf(loot, offset?.ids.filter((id) => ITEMS[id].kind === 'weapon') ?? []),
     ).toBeCloseTo(0.1875, 6);
-    for (const [name, group] of groups) expect(group.sum, name).toBeCloseTo(1, 6);
+    for (const [name, group] of groups) {
+      expect(group.sum, name).toBeCloseTo(name === PROFESSION_SCROLL_GROUP ? 0.3 : 1, 6);
+    }
   });
 
   it('Varkhul pays one sigil slot plus one Normal-only feet/held/ring slot, and copper', () => {
     const loot = MOBS[VARKHUL_BOSS_ID].loot ?? [];
     expect(loot[0]).toMatchObject({ copper: 200000, chance: 1 });
     const groups = groupsOf(loot);
-    expect([...groups.keys()]).toEqual(['varkhul_sigils', 'varkhul_offset']);
+    expect([...groups.keys()]).toEqual([
+      'varkhul_sigils',
+      'varkhul_offset',
+      PROFESSION_SCROLL_GROUP,
+    ]);
     const sigils = [
       'sigil_anvil_legs',
       'sigil_ember_legs',
@@ -472,7 +508,9 @@ describe('ignivar loot: the boss drop tables (one item per five raiders)', () =>
     expect(
       shareOf(loot, offset?.ids.filter((id) => ITEMS[id].slot === 'offhand') ?? []),
     ).toBeCloseTo(0.1875, 6);
-    for (const [name, group] of groups) expect(group.sum, name).toBeCloseTo(1, 6);
+    for (const [name, group] of groups) {
+      expect(group.sum, name).toBeCloseTo(name === PROFESSION_SCROLL_GROUP ? 0.3 : 1, 6);
+    }
   });
 
   it('the Inner Crucible is a registered heroic room, so the Varkhul appends are LIVE', () => {
@@ -612,7 +650,18 @@ describe('ignivar loot: the boss drop tables (one item per five raiders)', () =>
       ['forgefire_spire', 0.12],
       ['staff_of_the_last_spring', 0.11],
     ]);
-    // The tables hold nothing else but the money row and the reagent rows.
+    // Profession knowledge is its own 30% roll on both difficulties. It never
+    // displaces either gear slot, changes an old weight, or joins the heroic pool.
+    for (const entries of [ignivar, varkhul]) {
+      expect(entries.filter((entry) => entry.rollGroup === PROFESSION_SCROLL_GROUP)).toEqual(
+        PROFESSION_SCROLL_IDS.map((itemId) => ({
+          itemId,
+          chance: 0.025,
+          rollGroup: PROFESSION_SCROLL_GROUP,
+        })),
+      );
+    }
+    // The ungrouped rows remain exactly the money row and the reagent rows.
     for (const [entries, groups] of [
       [ignivar, ['ignivar_sigils', 'ignivar_offset']],
       [varkhul, ['varkhul_sigils', 'varkhul_offset']],
@@ -626,7 +675,7 @@ describe('ignivar loot: the boss drop tables (one item per five raiders)', () =>
       expect(rest.slice(1).map((entry) => entry.chance)).toEqual([1, 0.5]);
       expect(
         new Set(entries.flatMap((entry) => (entry.rollGroup ? [entry.rollGroup] : []))),
-      ).toEqual(new Set(groups));
+      ).toEqual(new Set([...groups, PROFESSION_SCROLL_GROUP]));
     }
     for (const entry of [...ignivar, ...varkhul, ...ignivarHeroic, ...varkhulHeroic])
       expect(entry.chance, entry.itemId ?? 'copper').toBeGreaterThan(0);
@@ -648,7 +697,7 @@ describe('ignivar loot: the boss drop tables (one item per five raiders)', () =>
     // Rolls the real tables through rollLoot with and without a live heroic
     // claim (the same claim shape the roller reads in production), so the
     // cadence is pinned where it is paid, not just in the authored weights.
-    // The crafting reagent rides outside the cadence (a material, not gear).
+    // The crafting reagent and optional scroll ride outside the gear cadence.
     const perKill = DUNGEON_DEFS[IGNIVAR_RAID_ARENA_ID].suggestedPlayers / 5;
     expect(perKill).toBe(2);
     expect(DUNGEON_DEFS[IGNIVAR_SECOND_WING_ID].suggestedPlayers).toBe(
@@ -666,11 +715,14 @@ describe('ignivar loot: the boss drop tables (one item per five raiders)', () =>
       const template = MOBS[bossId];
       const base = template.loot ?? [];
       const sigilIds = new Set(
-        base.filter((e) => e.rollGroup && !e.normalOnly).map((e) => e.itemId),
+        base
+          .filter((e) => e.rollGroup === 'ignivar_sigils' || e.rollGroup === 'varkhul_sigils')
+          .map((e) => e.itemId),
       );
       const offsetIds = new Set(base.filter((e) => e.normalOnly).map((e) => e.itemId));
       const exclusiveIds = new Set((HEROIC_BOSS_LOOT[bossId] ?? []).map((e) => e.itemId));
       for (const heroic of [false, true]) {
+        let scrollKills = 0;
         for (let seed = 0; seed < 25; seed++) {
           sim.rng = new Rng(seed);
           const mob = createMob(-1, template, template.minLevel, { x: 0, y: 0, z: 0 });
@@ -685,15 +737,23 @@ describe('ignivar loot: the boss drop tables (one item per five raiders)', () =>
             } as unknown as (typeof sim.ctx.instances)[number]);
           }
           rollLoot(sim.ctx, mob, meta);
-          const gear = (mob.loot?.items ?? [])
-            .map((slot) => slot.itemId)
-            .filter((id) => id !== 'lastflame_core');
+          const items = (mob.loot?.items ?? []).map((slot) => slot.itemId);
+          const scrolls = items.filter((id) => PROFESSION_SCROLL_IDS.includes(id));
+          const gear = items.filter(
+            (id) => id !== 'lastflame_core' && !PROFESSION_SCROLL_IDS.includes(id),
+          );
           const label = `${bossId} ${heroic ? 'heroic' : 'normal'} seed ${seed}`;
+          expect(scrolls.length, label).toBeLessThanOrEqual(1);
+          scrollKills += scrolls.length;
           expect(gear.length, label).toBe(perKill);
           expect(gear.filter((id) => sigilIds.has(id)).length, label).toBe(1);
           expect(gear.filter((id) => offsetIds.has(id)).length, label).toBe(heroic ? 0 : 1);
           expect(gear.filter((id) => exclusiveIds.has(id)).length, label).toBe(heroic ? 1 : 0);
         }
+        // These seeded samples exercise both branches while the two original
+        // gear slots stay guaranteed on kills with and without a scroll.
+        expect(scrollKills).toBeGreaterThan(0);
+        expect(scrollKills).toBeLessThan(25);
       }
     }
   });

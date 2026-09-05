@@ -1,8 +1,11 @@
+import { resetCraftedCollectionState } from './combat/crafted_collection_effects';
 import { BATTLE_STANCE, buildStanceAura } from './combat/warrior_stances';
+import { crucibleCollectionFamilyForSet } from './content/crucible_collections';
 import type { TalentModifiers } from './content/talents';
 import { resolveActiveWeaponSkin } from './content/weapon_skin_rules';
 import { aggregateSetBonuses, CLASSES, ITEMS, MOBS, type NpcDef } from './data';
 import { canDualWield, isShieldItem } from './equipment_rules';
+import { activeItemInstanceStats } from './item_instance_stats';
 import { meetsLevelRequirement } from './item_level_req';
 import { pvpFractionsFromRatings } from './pvp';
 import type {
@@ -359,7 +362,7 @@ export function recalcPlayerStats(
     // rolled.stats as its authoritative aggregate). The equip path carries the
     // consumed inventory instance into equipmentInstance, so every source applies.
     // A plain piece has no entry here, so this is a no-op for the common case.
-    const rolled = equipmentInstance?.[slot]?.rolled?.stats;
+    const rolled = activeItemInstanceStats(equipmentInstance?.[slot]);
     if (rolled) {
       s.str += Number.isFinite(rolled.str) ? rolled.str : 0;
       s.agi += Number.isFinite(rolled.agi) ? rolled.agi : 0;
@@ -376,6 +379,10 @@ export function recalcPlayerStats(
   // totals so they feed every derivation below; AP/crit/pushback fold in at
   // their own steps (bonusAp, critChance, castPushbackReduction, knockbackResistance).
   const setEff = aggregateSetBonuses(setCounts);
+  resetCraftedCollectionState(
+    e,
+    [...setCounts].find(([id, count]) => count >= 2 && crucibleCollectionFamilyForSet(id))?.[0],
+  );
   s.str += setEff.str;
   s.agi += setEff.agi;
   s.sta += setEff.sta;
@@ -409,6 +416,7 @@ export function recalcPlayerStats(
     else if (a.kind === 'debuff_ap') bonusAp -= a.value;
     else if (a.kind === 'buff_armor') flatAuraArmor += a.value;
     else if (a.kind === 'buff_int') s.int += a.value;
+    else if (a.kind === 'buff_str') s.str += a.value;
     else if (a.kind === 'buff_agi') s.agi += a.value;
     else if (a.kind === 'buff_spi') s.spi += a.value;
     else if (a.kind === 'buff_sta') s.sta += a.value;

@@ -21,7 +21,8 @@ import {
   PRACTICE_ROW_X,
 } from '../src/sim/content/practice_dummies';
 import { BUILTIN_WORLD, MOBS, PROPS } from '../src/sim/data';
-import { createMob } from '../src/sim/entity';
+import { bestEpicGearFor } from '../src/sim/dev/bis_gear';
+import { characterDerivedStats, createMob } from '../src/sim/entity';
 import { mobTemplateForDungeonDifficulty } from '../src/sim/instances/difficulty';
 import {
   PLAYER_DUMMY_REST_HP_FRACTION,
@@ -204,6 +205,10 @@ describe('the Highwatch practice row', () => {
     const sim = makeWorld();
     const d = dummyOf(sim, FRIENDLY_PLAYER_DUMMY_ID);
     const vitals = playerDummyVitals();
+    const intendedKit = bestEpicGearFor('warrior', 'prot');
+    expect(intendedKit.chest).toBe('crucible_tank_mail_chest');
+    const intendedBody = characterDerivedStats('warrior', 20, intendedKit);
+    expect(vitals).toEqual({ maxHp: intendedBody.maxHp, armor: intendedBody.stats.armor });
 
     expect(d.level).toBe(20);
     expect(d.maxHp).toBe(vitals.maxHp);
@@ -217,13 +222,11 @@ describe('the Highwatch practice row', () => {
     // bestEpicGearFor, so any new epic entering a slot moves them. Pinned here
     // so the move reds with a named cause and a reviewer decides whether the
     // reference player body should have changed.
-    // Re-pinned at the eighth v0.41.0 sync (2026-08-30), the named cause the
-    // comment above demands: the release's Crucible raid catalog re-geared
-    // bestEpicGearFor (every slot's raw-stat winner is now a raid piece), so
-    // the SHIPPED friendly dummy's body moved with the live catalog. The
-    // maintainer's Phase 19 rows 12 and 13 (apex versus the Crucible tier)
-    // may re-gear it again; re-pin with that ruling's commit if so.
-    expect(vitals.maxHp, 'the derived reference-player pool').toBe(1232);
+    // The raid-collection integration replaces only the reference tank's chest
+    // with crucible_tank_mail_chest and uses the canonical warrior spec 'prot'.
+    // Reviewed result: 150 more HP, unchanged total armor. Other reference
+    // slots and the difficulty-floor calibration are not retuned here.
+    expect(vitals.maxHp, 'the derived reference-player pool').toBe(1382);
     expect(vitals.armor, 'and its armor').toBe(3265);
     // A player-sized pool, not the practice targets near-immortal one: heals
     // have to read as a real fraction of the bar.

@@ -140,8 +140,8 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // counts each move by one over the eighth composition; dispatch-only stays
 // 13. Set from a suite run on the merged tree, never by arithmetic in the
 // diff.
-const EXPECTED_SEND_COUNT = 213;
-const EXPECTED_DISPATCH_COUNT = 226;
+const EXPECTED_SEND_COUNT = 214;
+const EXPECTED_DISPATCH_COUNT = 227;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch

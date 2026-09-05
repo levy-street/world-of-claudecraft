@@ -34,6 +34,8 @@ export interface ProfessionNodeRecord {
 export interface ProfessionReagent {
   itemId: string;
   count: number;
+  /** Raid currency quantities are literal, exempt from all craft discounts. */
+  noDiscount?: true;
 }
 
 // A static recipe a crafting profession can learn: what it consumes, what it

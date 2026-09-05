@@ -144,11 +144,20 @@ describe('enchant_apply_view: effect facts on the pick row', () => {
     expect(fortitude?.effects[0].value).toBe(3);
   });
 
-  it('every listed enchant carries at least one effect, matching its statBonus', () => {
+  it('every listed enchant describes its flat stats or its proc without inventing flat stats', () => {
     for (const reagentId of ['arcane_dust', 'arcane_essence', 'arcane_shard', 'resonant_steel']) {
       for (const row of enchantsForReagent([], reagentId)) {
-        const bonus = ENCHANTS[row.enchantId].statBonus;
-        expect(row.effects.length, `${row.enchantId} effects`).toBeGreaterThan(0);
+        const enchant = ENCHANTS[row.enchantId];
+        const bonus = enchant.statBonus;
+        if (enchant.weaponProc) {
+          const descriptions = hudChromeStrings.enchantDescription as Record<string, string>;
+          expect(descriptions[row.enchantId], `${row.enchantId} proc description`).toBe(
+            enchant.description,
+          );
+          expect(descriptions[row.enchantId]).toContain(String(enchant.weaponProc.strength));
+          expect(descriptions[row.enchantId]).toContain(String(enchant.weaponProc.duration));
+          expect(descriptions[row.enchantId]).toContain(String(enchant.weaponProc.heal));
+        } else expect(row.effects.length, `${row.enchantId} effects`).toBeGreaterThan(0);
         expect(Object.fromEntries(row.effects.map((e) => [e.stat, e.value]))).toEqual(bonus);
       }
     }
@@ -220,6 +229,13 @@ describe('enchant_apply_view: tier classification', () => {
     const unclassifiable: string[] = [];
     for (const enchant of Object.values(ENCHANTS)) {
       for (const { itemId } of enchant.reagents) {
+        // This raid reagent accompanies a Greater-tier shard; it is not a
+        // new tier marker and must never quietly classify as a Base recipe.
+        if (itemId === 'lastflame_core') {
+          expect(enchantTier(enchant.id)).toBe('greater');
+          expect(enchant.weaponProc).toBeDefined();
+          continue;
+        }
         if (itemId === 'lucent_reagent') continue;
         if (itemId === 'arcane_shard') continue;
         if (itemId.startsWith('resonant_')) continue;
@@ -769,9 +785,9 @@ describe('enchant_apply_view: preservedReplaceTraits (#2421)', () => {
       rolled: { masterwork: true },
       boundTo: 9,
       bindOnTrade: true,
-      // Phase 14: the Perfecting family sits BELOW the trim gate with the
-      // bond, because the peer eqi projection carries neither field (the
-      // allowlist pin below), so a trimmed reader must stay silent about it.
+      // The old trimmed-reader flag conservatively hides the whole progress
+      // family. Public inspection now carries the final Perfected stamp, but
+      // still cannot disclose partial ranks or permanent binding.
       perfected: true as const,
     };
     expect(preservedReplaceTraits(victim, true)).toEqual(['signer', 'masterwork']);
@@ -802,15 +818,21 @@ describe('enchant_apply_view: preservedReplaceTraits (#2421)', () => {
     // not read as coverage either.
     const body = (block?.[0] ?? '').replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
     const projected = [...body.matchAll(/pub\.(\w+) = inst\.\w+/g)].map((m) => m[1]);
-    // Exactly the cosmetic inspect fields, and NOTHING that carries bind
-    // state. `name` (the player-chosen legendary name) joined at Masterwrought
-    // phase 13, the first cosmetic widening since the allowlist was written.
-    expect(projected.sort()).toEqual(['enchant', 'name', 'rolled', 'signer']);
+    // Cosmetic fields plus the Perfected stamp needed for active enchants and
+    // collection item levels. Nothing that carries bind state or partial ranks.
+    expect(projected.sort()).toEqual(['enchant', 'name', 'perfected', 'rolled', 'signer']);
     // Syntax-independent backstop: the extractor above only sees dot-notation
     // assignment, so a widening written as pub['boundTo'] = inst.boundTo or an
     // Object.assign spread would slip past it. Pin the FIELD NAMES out of the
     // loop body entirely, which no assignment shape can dodge.
-    for (const field of ['boundTo', 'bindOnTrade', 'charges', 'perfecting', 'perfected']) {
+    for (const field of [
+      'boundTo',
+      'bindOnTrade',
+      'charges',
+      'perfecting',
+      'perfectingBound',
+      'perfectingBonus',
+    ]) {
       expect(body, `${field} must not ride the public eqi wire`).not.toContain(field);
     }
   });
@@ -820,12 +842,9 @@ describe('enchant_apply_view: preservedReplaceTraits (#2421)', () => {
   // for the identical reason. Both are pinned in their own files, but nothing
   // linked them, so widening the wire would fail only the pin above and leave
   // the tooltip copy to be found later. Cross-pinned here instead: the two
-  // consumers of one policy must agree, mechanically. ONE recorded exception
-  // since 2026-08-27: the projection keeps `perfected`, a SELF-side fact the
-  // owner's own paperdoll needs for the promotion-scoped Unique-Equipped tag,
-  // while the wire pin above still refuses it on the peer eqi lane. So the
-  // projection is exactly wire-allowlist plus perfected, nothing else.
-  it('pins wornTooltipInstance to the wire allowlist plus the self-only perfected stamp', () => {
+  // consumers of one policy must agree, mechanically. The visible Perfected
+  // marker joins both projections to resolve dormant enchants after rank exchange.
+  it('pins wornTooltipInstance to the wire inspect allowlist', () => {
     const worn = wornTooltipInstance({
       signer: 'Tester',
       enchant: 'enchant_chest_stamina',
@@ -838,7 +857,7 @@ describe('enchant_apply_view: preservedReplaceTraits (#2421)', () => {
     });
     expect(
       Object.keys(worn ?? {}).sort(),
-      'wornTooltipInstance is the eqi allowlist plus perfected: widen both or neither',
+      'wornTooltipInstance is the eqi allowlist: widen both or neither',
     ).toEqual(['enchant', 'name', 'perfected', 'rolled', 'signer']);
   });
 
@@ -1243,9 +1262,7 @@ describe('enchant_apply_view: name discriminators (#2466)', () => {
 
   it('marks a heroic WORN row too, on the replace arm as well as the plain one', () => {
     const { base, heroic } = heroicPair('mainhand');
-    const [picked, worn] = Object.keys(ENCHANTS).filter(
-      (id) => ENCHANTS[id].itemSlot === 'mainhand',
-    );
+    const [picked, worn] = ['enchant_weapon_might', 'enchant_weapon_agility'];
     expect(worn, 'content carries two mainhand enchants').toBeDefined();
     expect(wornEnchantTargets({ mainhand: heroic }, {}, picked)).toEqual([
       { itemId: heroic, slot: 'mainhand', heroic: true },
@@ -1320,8 +1337,11 @@ describe('enchant_apply_view: name discriminators (#2466)', () => {
     // The selectivity half: a dual-wielded pair reads "Main Hand" / "Off Hand"
     // already, so numbering it would be noise. Both arms of the same list.
     const sword = itemForSlot('mainhand');
-    const enchantId = Object.keys(ENCHANTS).find((id) => ENCHANTS[id].itemSlot === 'mainhand');
-    const rows = wornEnchantTargets({ mainhand: sword, offhand: sword }, {}, enchantId as string);
+    const rows = wornEnchantTargets(
+      { mainhand: sword, offhand: sword },
+      {},
+      'enchant_weapon_might',
+    );
     expect(rows.map((row) => row.slot)).toEqual(['mainhand', 'offhand']);
     for (const row of rows) expect(Object.hasOwn(row, 'slotIndex')).toBe(false);
   });

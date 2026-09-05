@@ -1,0 +1,366 @@
+{
+  "styleContract": "woc-item-icon-v1",
+  "processing": "Separate generated originals normalized to512px sRGB; canonical assets:items converter128px WebP q82",
+  "items": [
+    {
+      "id": "crucible_str_mail_chest",
+      "width": 128,
+      "height": 128,
+      "bytes": 3912,
+      "sha256": "326efd4a463dbbc37057dae335f5bbe5913949bac31fc05c0580daccb055d0e8",
+      "opaque": true
+    },
+    {
+      "id": "crucible_str_mail_waist",
+      "width": 128,
+      "height": 128,
+      "bytes": 3038,
+      "sha256": "f960a3bb39ae56b45972307e1f9cdced56c1443c5b96fad4356fa567914f0ff3",
+      "opaque": true
+    },
+    {
+      "id": "crucible_str_mail_feet",
+      "width": 128,
+      "height": 128,
+      "bytes": 4214,
+      "sha256": "fe8c3b2a96d9bf04d39b26d4a70f918f58d92c9bb070e51220d7c7be4104773e",
+      "opaque": true
+    },
+    {
+      "id": "pattern_crucible_str_mail",
+      "width": 128,
+      "height": 128,
+      "bytes": 3630,
+      "sha256": "4f773e0fed4a58a7e1beb289930bb79de39d122f862e27eb51a9aab0ebdd3985",
+      "opaque": true
+    },
+    {
+      "id": "crucible_tank_mail_chest",
+      "width": 128,
+      "height": 128,
+      "bytes": 3972,
+      "sha256": "14a9c154dc15f03c073c68d443c0eb8635fd1c79296734ba849e56a7687faaa6",
+      "opaque": true
+    },
+    {
+      "id": "crucible_tank_mail_waist",
+      "width": 128,
+      "height": 128,
+      "bytes": 3242,
+      "sha256": "f291f25414761f11ed1726fb71d378a24185af2cb01f287e70b4071a03a96fd2",
+      "opaque": true
+    },
+    {
+      "id": "crucible_tank_mail_feet",
+      "width": 128,
+      "height": 128,
+      "bytes": 3706,
+      "sha256": "4a8be53d62aade99173075a26794d33a80cecc7f5427b3f38b8a2304a3455fd8",
+      "opaque": true
+    },
+    {
+      "id": "pattern_crucible_tank_mail",
+      "width": 128,
+      "height": 128,
+      "bytes": 3436,
+      "sha256": "7f2b7b7ca570cc10a02d085f2378164e408cc4c985e80329f4e67ee54d7e4856",
+      "opaque": true
+    },
+    {
+      "id": "crucible_caster_mail_chest",
+      "width": 128,
+      "height": 128,
+      "bytes": 4132,
+      "sha256": "f77994050a8a9df256848ed5d5458d77501339f25c2e2d6832ec9aa919fff24d",
+      "opaque": true
+    },
+    {
+      "id": "crucible_caster_mail_waist",
+      "width": 128,
+      "height": 128,
+      "bytes": 2996,
+      "sha256": "0066af69bcc2373527ad655655dec1e3264a66d2416ab053956627fa30c37701",
+      "opaque": true
+    },
+    {
+      "id": "crucible_caster_mail_feet",
+      "width": 128,
+      "height": 128,
+      "bytes": 4194,
+      "sha256": "6f2d13ef98764ff1508529232064290f0479c70d12a81d9b1f39d3162aae21cd",
+      "opaque": true
+    },
+    {
+      "id": "pattern_crucible_caster_mail",
+      "width": 128,
+      "height": 128,
+      "bytes": 3832,
+      "sha256": "525c64150b0c63c55a3a87cfdf3d14fc36423ab4b25c4042e3dc27a979b42364",
+      "opaque": true
+    },
+    {
+      "id": "crucible_healer_mail_chest",
+      "width": 128,
+      "height": 128,
+      "bytes": 3762,
+      "sha256": "1e46cd52a2a5cfdf17da26623c0c98cb66c6c938629cc6802046feb0095a03e4",
+      "opaque": true
+    },
+    {
+      "id": "crucible_healer_mail_waist",
+      "width": 128,
+      "height": 128,
+      "bytes": 3274,
+      "sha256": "436dcb17f5ed434dd9acb1d2440bed80de0a6d30d35116b9472bbbfbcc755385",
+      "opaque": true
+    },
+    {
+      "id": "crucible_healer_mail_feet",
+      "width": 128,
+      "height": 128,
+      "bytes": 3792,
+      "sha256": "c5ce279adfc9b06ebcfb6535516bde8e4cd393594c20c93599b16d2c44ac5a92",
+      "opaque": true
+    },
+    {
+      "id": "pattern_crucible_healer_mail",
+      "width": 128,
+      "height": 128,
+      "bytes": 4328,
+      "sha256": "adae0105396fd67edaff664028bd342ea5be5ae87a2fe16a25d301b2fc8899e4",
+      "opaque": true
+    },
+    {
+      "id": "crucible_agi_leather_chest",
+      "width": 128,
+      "height": 128,
+      "bytes": 2186,
+      "sha256": "bbc2d77e274a2c459f065187bf5fe828876a40dcd2b7db2ec261878c59865bc0",
+      "opaque": true
+    },
+    {
+      "id": "crucible_agi_leather_waist",
+      "width": 128,
+      "height": 128,
+      "bytes": 2934,
+      "sha256": "4cf63390b19b69f75624a92aa73a7348c0237fe7c21d01bd9c922918e4b6aa29",
+      "opaque": true
+    },
+    {
+      "id": "crucible_agi_leather_feet",
+      "width": 128,
+      "height": 128,
+      "bytes": 2900,
+      "sha256": "5277caa5eb89bbd382c4203ec326768df2aac93c33473408f225f2130ec443e6",
+      "opaque": true
+    },
+    {
+      "id": "pattern_crucible_agi_leather",
+      "width": 128,
+      "height": 128,
+      "bytes": 2524,
+      "sha256": "6fcc8bed0b447f8ed55f560ae5e8b1f7ec36187c2ed11b45262ccc0724afa78b",
+      "opaque": true
+    },
+    {
+      "id": "crucible_str_leather_chest",
+      "width": 128,
+      "height": 128,
+      "bytes": 3082,
+      "sha256": "1a52ef8add2568fa378f11c686657dfbfd40dbc9ccf33ea1498383542a78a9fa",
+      "opaque": true
+    },
+    {
+      "id": "crucible_str_leather_waist",
+      "width": 128,
+      "height": 128,
+      "bytes": 3204,
+      "sha256": "0f85fcc1aaf62602557f4655d1a97f8a4ad7d9cccc13336ccad423081e0d90a8",
+      "opaque": true
+    },
+    {
+      "id": "crucible_str_leather_feet",
+      "width": 128,
+      "height": 128,
+      "bytes": 4008,
+      "sha256": "31df211e5c5b21494283a755993b49c45bcdaf166197d85b94ddb96d95d2d3c0",
+      "opaque": true
+    },
+    {
+      "id": "pattern_crucible_str_leather",
+      "width": 128,
+      "height": 128,
+      "bytes": 3368,
+      "sha256": "ee578626eb2d06353a20d68539e3b209849341fdfaace7efaf61aa6e808efb89",
+      "opaque": true
+    },
+    {
+      "id": "crucible_tank_leather_chest",
+      "width": 128,
+      "height": 128,
+      "bytes": 3210,
+      "sha256": "3d58643089930bad952f20566d23aefb34a4c991d648d2de751cb831d0fa4300",
+      "opaque": true
+    },
+    {
+      "id": "crucible_tank_leather_waist",
+      "width": 128,
+      "height": 128,
+      "bytes": 3284,
+      "sha256": "6003196328408be466f90293e0391ac9e260ce4cea84d08a06902342e218141b",
+      "opaque": true
+    },
+    {
+      "id": "crucible_tank_leather_feet",
+      "width": 128,
+      "height": 128,
+      "bytes": 3572,
+      "sha256": "515c6ecf5cf33d2b205a98fbca3cc0420da7d374f39aced53558ded4dff0fe36",
+      "opaque": true
+    },
+    {
+      "id": "pattern_crucible_tank_leather",
+      "width": 128,
+      "height": 128,
+      "bytes": 3042,
+      "sha256": "b6fcd1a2c770273a688e06c809e8a2d9d0eea33beb3b004a8eb41ba972ad69a3",
+      "opaque": true
+    },
+    {
+      "id": "crucible_caster_leather_chest",
+      "width": 128,
+      "height": 128,
+      "bytes": 3164,
+      "sha256": "7f225cf9cb391f6b3339fe77097bdee09e9e5d11dfba8bd9287afd5e3ee1b388",
+      "opaque": true
+    },
+    {
+      "id": "crucible_caster_leather_waist",
+      "width": 128,
+      "height": 128,
+      "bytes": 2974,
+      "sha256": "048c9748330e6e63e5904e3acd7cb8d747159f822fd51279ee4dd9af1362550b",
+      "opaque": true
+    },
+    {
+      "id": "crucible_caster_leather_feet",
+      "width": 128,
+      "height": 128,
+      "bytes": 3410,
+      "sha256": "b5e38b2fb7c7d77336d95b2fc75eaae00819e3b0a5895178c1fa6e042f640e19",
+      "opaque": true
+    },
+    {
+      "id": "pattern_crucible_caster_leather",
+      "width": 128,
+      "height": 128,
+      "bytes": 3270,
+      "sha256": "75c329312e44542ad76a2f80aee7e4a24de079d85f0f172aa92fdf7478d89655",
+      "opaque": true
+    },
+    {
+      "id": "crucible_healer_leather_chest",
+      "width": 128,
+      "height": 128,
+      "bytes": 3090,
+      "sha256": "8bd24d6c361b42e84a9d955be553a5c5e3b1744ad4bb49c7cdbc0bba33b34fee",
+      "opaque": true
+    },
+    {
+      "id": "crucible_healer_leather_waist",
+      "width": 128,
+      "height": 128,
+      "bytes": 3518,
+      "sha256": "cc56d24051388158205037ad300905b388ae6744d40a5ad123b43be02eae582e",
+      "opaque": true
+    },
+    {
+      "id": "crucible_healer_leather_feet",
+      "width": 128,
+      "height": 128,
+      "bytes": 3742,
+      "sha256": "8d48361707b9557ebf2c0df7babcc6cead0e54b20744bad226d945f996499282",
+      "opaque": true
+    },
+    {
+      "id": "pattern_crucible_healer_leather",
+      "width": 128,
+      "height": 128,
+      "bytes": 2934,
+      "sha256": "526751d6ddfcc06f5d2b85f32f027c6840d6d7d9f226156f5eff221658d57f96",
+      "opaque": true
+    },
+    {
+      "id": "crucible_caster_cloth_chest",
+      "width": 128,
+      "height": 128,
+      "bytes": 2878,
+      "sha256": "f0a218a16aefa0c794e4b79e0acaa1d8596edcc1d4ad81c3f5f76603e08f10c8",
+      "opaque": true
+    },
+    {
+      "id": "crucible_caster_cloth_waist",
+      "width": 128,
+      "height": 128,
+      "bytes": 2730,
+      "sha256": "6736dd493f386cfcee460232e230717e59203f1c112fd48cafc98752f33c4eed",
+      "opaque": true
+    },
+    {
+      "id": "crucible_caster_cloth_feet",
+      "width": 128,
+      "height": 128,
+      "bytes": 2558,
+      "sha256": "6977fca774084a72a5a303f2dfbb32a8cf3d622596da6c0204ba0ba3c2f30493",
+      "opaque": true
+    },
+    {
+      "id": "pattern_crucible_caster_cloth",
+      "width": 128,
+      "height": 128,
+      "bytes": 2618,
+      "sha256": "3c8240b6f0d047cb86e9e838c8988a1cbc59fd88282d9baa6a1d7345e144682e",
+      "opaque": true
+    },
+    {
+      "id": "crucible_healer_cloth_chest",
+      "width": 128,
+      "height": 128,
+      "bytes": 3532,
+      "sha256": "9fb4ff91ed93cca8fe204f90f1df0886adeb6de0d4d61d59e5e8e828e49bfe03",
+      "opaque": true
+    },
+    {
+      "id": "crucible_healer_cloth_waist",
+      "width": 128,
+      "height": 128,
+      "bytes": 3176,
+      "sha256": "e231fc96a80cbd264ac6d57eaf71675325ae77bcc1a4e06a3151bc623a6b48b3",
+      "opaque": true
+    },
+    {
+      "id": "crucible_healer_cloth_feet",
+      "width": 128,
+      "height": 128,
+      "bytes": 3452,
+      "sha256": "702186f6d79a1388306d7c5344558cf9990a18affa77b37a899b7f79991901e2",
+      "opaque": true
+    },
+    {
+      "id": "pattern_crucible_healer_cloth",
+      "width": 128,
+      "height": 128,
+      "bytes": 3470,
+      "sha256": "c95c513872b4b39bb6767f4648c9d12b59012adfa8e85f4340041732b708be9b",
+      "opaque": true
+    },
+    {
+      "id": "formula_lastflame_zeal",
+      "width": 128,
+      "height": 128,
+      "bytes": 2556,
+      "sha256": "19b0197aed164ce23a73b36fdc160ee28d01a5a31644260af38cbae0ae380ca5",
+      "opaque": true
+    }
+  ]
+}

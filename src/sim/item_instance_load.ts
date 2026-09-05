@@ -37,6 +37,7 @@
 
 import { isLoadablePartyTradeMarker } from './loot/bop_trade_window';
 import { PERFECTING_RANKS } from './professions/perfecting';
+import { isValidPerfectingBonus } from './professions/perfecting_bonus';
 import { isLegalCrafterName } from './professions/tools';
 import { MAX_KNOWN_RECIPE_ID_LENGTH } from './professions/training';
 import type { ItemInstancePayload } from './types';
@@ -277,7 +278,14 @@ export function sanitizeItemInstancePayloadOnLoad(payload: unknown): SanitizedIt
       }
       continue;
     }
-    if (key === 'perfected') {
+    if (key === 'perfectingBonus') {
+      if (!isValidPerfectingBonus(value)) {
+        delete record[key];
+        dropped.push(key);
+      }
+      continue;
+    }
+    if (key === 'perfected' || key === 'perfectingBound') {
       // Kept only as the literal `true`, the one value any legal writer mints
       // (types.ts declares `perfected?: true`); anything else drops alone.
       if (value !== true) {

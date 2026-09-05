@@ -47,6 +47,10 @@ import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '..
 import { applyWellFedOnMealComplete } from '../wellfed';
 import { tickAfflictionAura, tickMaledictGaze } from './affliction';
 import { isStunned } from './cc';
+import {
+  cleanupCraftedCollectionAuras,
+  onCraftedCollectionHeal,
+} from './crafted_collection_effects';
 import { regenerateRuinOutOfCombat, tickPyreGuardian } from './destruction';
 import { druidEngineOnBleedTick } from './druid_engines';
 import { applyGreaterInvisibilityAftereffect } from './greater_invisibility';
@@ -268,6 +272,7 @@ export function cleanseFriendlyNpcAuras(ctx: SimContext, e: Entity): void {
 }
 
 export function updateAuras(ctx: SimContext, e: Entity): void {
+  cleanupCraftedCollectionAuras(ctx, e);
   if (e.dead) {
     e.stealthed = e.auras.some((a) => a.kind === 'stealth');
     return;
@@ -382,6 +387,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
               const landing = consumeHealAbsorb(ctx, src, intended);
               const absorbed = intended - landing;
               const healed = Math.min(landing, src.maxHp - src.hp);
+              onCraftedCollectionHeal(ctx, src, src, landing - healed);
               if (healed > 0 || absorbed > 0) {
                 if (healed > 0) src.hp += healed;
                 const overheal = landing - healed;
@@ -414,6 +420,8 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
           const landing = consumeHealAbsorb(ctx, e, intended);
           const absorbed = intended - landing;
           const healed = Math.min(landing, e.maxHp - e.hp);
+          const healer = ctx.entities.get(a.sourceId);
+          if (healer) onCraftedCollectionHeal(ctx, healer, e, landing - healed);
           if (healed > 0 || absorbed > 0) {
             if (healed > 0) e.hp += healed;
             const overheal = landing - healed;

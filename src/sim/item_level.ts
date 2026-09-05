@@ -11,7 +11,8 @@
 // tests import it directly.
 //
 // Two distinct outputs:
-//   - itemLevel(item): the tier number shown in the tooltip ("Item Level 10").
+//   - itemLevel(item): the definition's baseline tier. itemInstanceLevel adds
+//     an earned Perfected collection tier for the tooltip, never cosmetic rarity.
 //   - primaryStatBudget(...): the total primary-stat points an item of that tier
 //     SHOULD grant. normalizePrimaryStats() distributes that budget back across an
 //     item's existing stats so two drops from the same place carry the same total
@@ -19,6 +20,7 @@
 //     str/sta, a mage cloth piece stays int/spi). itemScore() is the realized
 //     power (stats + armor + weapon dps) for at-a-glance comparison.
 
+import { crucibleCollectionForItem } from './content/crucible_collections';
 import {
   HEROIC_BOSS_LOOT,
   HEROIC_LOOT_SOURCE_LEVEL,
@@ -54,7 +56,8 @@ import {
   TWOHAND_STAT_MULT,
   WORN_OFFHAND_STAT_MULT,
 } from './item_budget';
-import type { ItemDef } from './types';
+import { COLLECTION_PERFECTING_SOURCE_INCREASE } from './professions/perfecting_bonus';
+import type { ItemDef, ItemInstancePayload } from './types';
 
 export {
   HEROIC_VARIANT_SOURCE_LEVEL,
@@ -363,6 +366,19 @@ export function itemLevel(item: ItemDef): number | undefined {
   const bonus = QUALITY_ILVL_BONUS[item.quality ?? 'common'] ?? 0;
   const raid = src.raid ? RAID_ILVL_BONUS : 0;
   return Math.max(1, src.level + bonus + raid);
+}
+
+/** Display a copy's earned tier without repricing static budgets or cosmetic
+ *  promotion. Only the new collections earn three item levels when Perfected;
+ *  their partial ranks and the 17 legacy Masterwrought items keep the base tier. */
+export function itemInstanceLevel(
+  item: ItemDef,
+  instance?: ItemInstancePayload,
+): number | undefined {
+  const level = itemLevel(item);
+  return level !== undefined && instance?.perfected === true && crucibleCollectionForItem(item.id)
+    ? level + COLLECTION_PERFECTING_SOURCE_INCREASE
+    : level;
 }
 
 // The budget an item is expected to carry given its own source/quality/slot, or

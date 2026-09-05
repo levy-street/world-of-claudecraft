@@ -415,6 +415,12 @@ const ARMORCRAFTING_RECIPES = ALL_RECIPES.filter(
     !recipe.oncePerDay &&
     !recipe.reagents.some((reagent) => DAILY_GATED_OUTPUT_IDS.has(reagent.itemId)),
 );
+// The climb never assumes a drop manual is already owned. Its expectation
+// must use the same acquisition scope as deriveMastery, even when a raid
+// recipe has no daily-crafted intermediate and therefore stays in the pool.
+const LEARNABLE_ARMORCRAFTING_RECIPES = ARMORCRAFTING_RECIPES.filter(
+  (recipe) => isRecipeKnown(undefined, recipe) || recipe.acquisition?.includes('trainer'),
+);
 
 describe('the daily-gate exclusion actually excludes (filter liveness)', () => {
   it('the gated chain is derived non-empty and the forgefold row is out of the pool', () => {
@@ -496,7 +502,9 @@ describe('armorcrafting mastery derives from the live tables (R13)', () => {
     expect(ATTUNEMENT.pairedMajor).not.toBeNull();
     // Uncapped means the top recipe tier in the pool still teaches at the top
     // of the climb, which is what lets the walk reach the cap at all.
-    const topSkillReq = Math.max(...ARMORCRAFTING_RECIPES.map((recipe) => recipe.skillReq));
+    const topSkillReq = Math.max(
+      ...LEARNABLE_ARMORCRAFTING_RECIPES.map((recipe) => recipe.skillReq),
+    );
     expect(
       craftSkillGainMultiplier(
         { [CRAFT]: RUN.cap - 1 },
@@ -608,7 +616,23 @@ describe('armorcrafting mastery derives from the live tables (R13)', () => {
     expect(rungs.size).toBeGreaterThanOrEqual(3);
     // And the top rung is genuinely reached: the climb does not plateau on
     // mid-tier recipes and coast to the cap.
-    expect(Math.max(...rungs)).toBe(Math.max(...ARMORCRAFTING_RECIPES.map((r) => r.skillReq)));
+    expect(Math.max(...rungs)).toBe(
+      Math.max(...LEARNABLE_ARMORCRAFTING_RECIPES.map((r) => r.skillReq)),
+    );
+  });
+
+  it('does not price raid-only collections as a free shortcut through the trainer ladder', () => {
+    const raidRecipes = ARMORCRAFTING_RECIPES.filter((recipe) =>
+      recipe.acquisition?.includes('drop'),
+    );
+    expect(raidRecipes).toHaveLength(12);
+    for (const recipe of raidRecipes) {
+      expect(recipe.skillReq, recipe.id).toBe(100);
+      expect(LEARNABLE_ARMORCRAFTING_RECIPES, recipe.id).not.toContain(recipe);
+      expect(RUN.recipeUse.has(recipe.id), recipe.id).toBe(false);
+    }
+    expect(RUN.bill.has('lastflame_core')).toBe(false);
+    expect(Math.max(...LEARNABLE_ARMORCRAFTING_RECIPES.map((recipe) => recipe.skillReq))).toBe(75);
   });
 
   it('the bill draws on several distinct gathered materials and on non-gathered ones too', () => {

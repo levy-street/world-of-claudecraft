@@ -68,6 +68,7 @@ export interface ApplyEnchantResultEvent {
   reason?:
     | 'unknown_item'
     | 'unknown_enchant'
+    | 'recipe_not_learned'
     | 'wrong_slot'
     | 'not_held'
     | 'insufficient_materials'
@@ -171,6 +172,8 @@ export function applyEnchantResultToast(ev: ApplyEnchantResultEvent): Enchanting
       return { key: 'hudChrome.enchanting.enchantWrongSlot', sink: 'error' };
     case 'unknown_enchant':
       return { key: 'hudChrome.enchanting.enchantUnknown', sink: 'error' };
+    case 'recipe_not_learned':
+      return { key: 'hudChrome.enchanting.recipeNotLearned', sink: 'error' };
     case 'insufficient_materials':
       return { key: 'hudChrome.enchanting.enchantInsufficient', sink: 'error' };
     case 'no_bag_space':

@@ -122,8 +122,9 @@ const EXEMPT: ReadonlyArray<{ cmd: string; why: string }> = [
  * dispatch arm consumes (server/CLAUDE.md module-first), so the inline
  * Number.isInteger scan above cannot see them. An entry here is NOT an
  * exemption: the teeth move with the parse. The arm must CALL the named
- * parser, the parser module must carry the integer check on the named cell
- * field, and the parsed ref must reach the sim call in the same arm, so a
+ * dispatcher with its frame and authoritative host. That dispatcher must call
+ * the parser, whose module carries the integer check on the named cell field,
+ * and forward the parsed ref to the sim, so a
  * command in this family keeps the whole addressed contract. (perfect_item
  * was first classified EXEMPT with a prose pointer at its pins; the QA
  * test-decisiveness lane flagged that precedent as eroding the guard for
@@ -136,6 +137,7 @@ const PARSE_CORE_COMMANDS: ReadonlyArray<{
   cellField: string;
   senderFields: string[];
   senderHelper: { symbol: string; module: string };
+  dispatchHelper: { symbol: string; module: string };
 }> = [
   {
     cmd: 'perfect_item',
@@ -147,6 +149,10 @@ const PARSE_CORE_COMMANDS: ReadonlyArray<{
     // name drops the FIELD, never the frame).
     senderFields: ['slot', 'bag', 'item', 'copy', 'name'],
     senderHelper: { symbol: 'perfectingCommand', module: './perfecting_command' },
+    dispatchHelper: {
+      symbol: 'dispatchPerfectItemCommand',
+      module: '../server/perfect_item_command.ts',
+    },
   },
 ];
 
@@ -251,7 +257,7 @@ describe('every item command can name the copy it acts on', () => {
 
   it.each(PARSE_CORE_COMMANDS)(
     '$cmd names its copy through the $parser parse core, with teeth',
-    ({ cmd, parser, module, cellField, senderFields, senderHelper }) => {
+    ({ cmd, parser, module, cellField, senderFields, senderHelper, dispatchHelper }) => {
       // The sender now delegates its complementary worn/bagged shapes to a
       // pure helper. Follow the actual import, and require EVERY occurrence
       // to spread its whole result with the live reads, ref and name. The
@@ -277,13 +283,22 @@ describe('every item command can name the copy it acts on', () => {
       const rest = SERVER.slice(at + `case '${cmd}':`.length);
       const nextCase = rest.indexOf("case '");
       const arm = nextCase === -1 ? rest : rest.slice(0, nextCase);
-      expect(arm, `${cmd} must parse through ${parser} in its OWN arm`).toContain(`${parser}(`);
+      expect(arm, `${cmd} must delegate its OWN frame and authoritative host`).toMatch(
+        new RegExp(`${dispatchHelper.symbol}\\(msg,\\s*\\{\\s*sim,\\s*pid,`),
+      );
+      const dispatchImport = dispatchHelper.module.replace('../server/', './').replace(/\.ts$/, '');
+      expect(SERVER).toContain(`import { ${dispatchHelper.symbol} } from '${dispatchImport}';`);
+      const dispatchSource = readFileSync(new URL(dispatchHelper.module, import.meta.url), 'utf8');
+      expect(dispatchSource).toContain(`export function ${dispatchHelper.symbol}(`);
+      expect(dispatchSource).toContain(`const ref = ${parser}(msg);`);
+      expect(dispatchSource).toContain('if (!ref) return;');
       const parserSource = readFileSync(new URL(module, import.meta.url), 'utf8');
       expect(parserSource, `${parser} must carry the integer check on msg.${cellField}`).toContain(
         `Number.isInteger(msg.${cellField})`,
       );
-      const simCall = arm.slice(arm.indexOf('sim.'));
-      expect(simCall, `${cmd} must forward the parsed ref to the sim call`).toMatch(/\bref\b/);
+      expect(dispatchSource, `${cmd} must forward the parsed ref to the sim call`).toContain(
+        'host.sim.perfectItemAs(host.pid, ref, named.name);',
+      );
     },
   );
 

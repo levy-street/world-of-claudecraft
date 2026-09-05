@@ -50,7 +50,7 @@ import { isPrimaryOwnedPetEntity } from '../sim/pet/pet_selection';
 import { getArchetypeTitle, getHobbyCraft } from '../sim/professions/archetype';
 import type { RespecPaymentTier } from '../sim/professions/focus';
 import type { MaterialRarity } from '../sim/professions/gathering';
-import { perfectingInfoFrom } from '../sim/professions/perfecting';
+import type { PerfectingSwapRequest } from '../sim/professions/perfecting_swap';
 import { emptyCraftSkills } from '../sim/professions/wheel';
 import {
   catalogRankOwned,
@@ -227,6 +227,11 @@ import { applyReconSelfWire, ReconWireState } from './movement_reconciliation_wi
 import { createNativeAttestationProof } from './native_attestation';
 import { createNetPipelineStats, type NetPipelineStats } from './net_pipeline_stats';
 import { perfectingCommand } from './perfecting_command';
+import {
+  perfectingInfoForMirror,
+  perfectingSwapCommand,
+  perfectingSwapInfoForMirror,
+} from './perfecting_swap_command';
 import { optimisticQuestState } from './quest_state_optimistic';
 import { isTransientReconnectRejection, isTransientTimeoutRejection } from './reconnect_policy';
 import { isInputSendBackpressured } from './send_backpressure';
@@ -4314,19 +4319,14 @@ export class ClientWorld extends ReconWireState implements IWorld {
   perfectItem(ref: PerfectItemRef, name?: string): void {
     this.cmd({ cmd: 'perfect_item', ...perfectingCommand(this, ref, name) });
   }
-  // The one shared view builder the offline Sim also answers through
-  // (perfectingInfoFrom), fed the self mirrors: the whole `inv` array, the
-  // `equip`/`einst` worn set, and the cprof craft skills. A pure read over
-  // mirrored state, so under snapshot lag it can trail the server by a
-  // snapshot; the server still resolves every attempt authoritatively.
   perfectingInfo(ref: PerfectItemRef): PerfectingInfoView | null {
-    return perfectingInfoFrom({
-      ref,
-      inventory: this.inventory,
-      equipment: this.equipment,
-      equipmentInstances: this.equipmentInstances,
-      craftSkills: this.craftingIdentity.craftSkills,
-    });
+    return perfectingInfoForMirror(this, ref);
+  }
+  swapPerfectingRanks(request: PerfectingSwapRequest): void {
+    this.cmd({ cmd: 'swap_perfecting_ranks', ...perfectingSwapCommand(this, request) });
+  }
+  perfectingSwapInfo(request: PerfectingSwapRequest) {
+    return perfectingSwapInfoForMirror(this, request);
   }
   // Commission order board (Professions 2.0, issue #1298): command only,
   // never predicted. The server re-validates every field in
