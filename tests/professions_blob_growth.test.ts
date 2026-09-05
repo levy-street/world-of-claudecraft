@@ -30,7 +30,13 @@ import {
   BANK_STORAGE_KEY_MAX_LENGTH,
 } from '../src/sim/bank';
 import { CLASSES } from '../src/sim/content/classes';
+import {
+  CRUCIBLE_COLLECTION_ITEMS,
+  CRUCIBLE_COLLECTION_PATTERNS,
+  CRUCIBLE_COLLECTION_RECIPES,
+} from '../src/sim/content/crucible_collections';
 import { DEEDS } from '../src/sim/content/deeds';
+import { ENCHANTS } from '../src/sim/content/enchants';
 import { FARM_CROPS } from '../src/sim/content/farm_crops';
 import { FARM_BED_IDS } from '../src/sim/content/farm_patches';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
@@ -49,7 +55,11 @@ import {
 import { defaultBuild, MAX_LOADOUTS, SAVED_LOADOUT_BAR_SLOTS } from '../src/sim/content/talents';
 import { ALL_RECIPES, DELVES, DUNGEONS, ITEMS, QUESTS } from '../src/sim/data';
 import { VISITED_MARK_NAMESPACES } from '../src/sim/deeds';
-import { MASTERWROUGHT_LEGENDARY_CAP } from '../src/sim/equipment_rules';
+import {
+  canEquipItemInSlot,
+  MASTERWROUGHT_EQUIP_CAP,
+  MASTERWROUGHT_LEGENDARY_CAP,
+} from '../src/sim/equipment_rules';
 import {
   VAULT_UPGRADE_RUNGS,
   vaultCapacityPerMaterial,
@@ -60,10 +70,12 @@ import {
   craftsForPairTarget,
   hobbyCandidatesForPair,
 } from '../src/sim/professions/archetype';
+import { enchantedPayloadFor } from '../src/sim/professions/enchanting';
 import { FARM_MAX_GROW_MS } from '../src/sim/professions/farm_persist';
 import { NODE_HARVEST_TABLE } from '../src/sim/professions/gathering';
 import { MAX_LEGENDARY_NAME_LENGTH } from '../src/sim/professions/legendary_name';
 import { perfectedBonusStats } from '../src/sim/professions/perfecting';
+import { withPerfectingBonus } from '../src/sim/professions/perfecting_bonus';
 import { MAX_CRAFTED_BY_LENGTH, slotToolEffectRefused } from '../src/sim/professions/tools';
 import { MAX_KNOWN_RECIPE_ID_LENGTH, MAX_KNOWN_RECIPE_IDS } from '../src/sim/professions/training';
 import { type CharacterState, type PlayerMeta, Sim } from '../src/sim/sim';
@@ -72,6 +84,7 @@ import {
   DEED_STAT_KEYS,
   type EquipSlot,
   type InvSlot,
+  type ItemInstancePayload,
   MAX_LEVEL,
 } from '../src/sim/types';
 import { WORLD_BOSSES, worldBossLockoutId } from '../src/sim/world_boss';
@@ -395,25 +408,27 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
 //   76 bytes in-blob, which is also what the fixture measures. F6's standing
 //   instruction survives, but the quantity it tracks is the CONTENT set's byte
 //   cost, never the structural product the membership filter retired.
-const PROFESSIONS_BYTE_CEILING = 18432;
+// Crucible integration re-measure: 18,807 bytes. The prior 18 KiB structural
+// ceiling is crossed; 20 KiB is the next step with more than 1 KiB headroom.
+const PROFESSIONS_BYTE_CEILING = 20480;
 
 // The TWO Masterwrought cap slots (R6/R16: at most two apex pieces worn)
-// carry the Perfecting worst case on top (Masterwrought phase 12, the
-// bound-as-policy work): the Perfected stamp, the R2 bind (the wearer's
-// own entity id), and the R5 bonus record MERGED into the rolled stats the
-// way perfecting.ts merges it (additively, new keys appended). Derived from
-// the LIVE bake over the two shipped apex defs whose primary profiles add
-// the most keys to the fixture's {str, agi, sta} record (int and spi: the
-// grimoire's int/spi/sta, the vestments' int/spi), so every slot-keyed
-// payload here is one the professions-craft path can really produce. Both
-// ids are pinned: a re-profiled or retired apex def moves the fixture and
-// forces this ceiling re-read rather than silently narrowing it. Module
-// scope so the settle-content pin below derives its slots from the SAME
-// list the fixture stamps, instead of restating them.
+// carry real collection payloads, including immutable bonus provenance and
+// permanent binding. The warrior can wear these mail pieces: requiredClass
+// on armor is loot-targeting metadata, while admission checks armor weight.
+// The legacy vestment/grimoire fixture did not assign its item ids to the
+// equipped map. These ids and every ordinary slot now pass real slot admission.
 const PERFECTED_CAP_SLOTS: readonly (readonly [EquipSlot, string])[] = [
-  ['chest', 'sunspun_vestments'],
-  ['offhand', 'voidbound_grimoire'],
+  ['chest', 'crucible_healer_mail_chest'],
+  ['waist', 'crucible_healer_mail_waist'],
 ];
+const STORED_COLLECTION_ITEM_ID = 'crucible_healer_leather_chest';
+const RETAINABLE_KNOWN_IDS = new Set([
+  ...ALL_RECIPES.map((recipe) => recipe.id),
+  ...Object.values(ENCHANTS)
+    .filter((enchant) => enchant.acquisition === 'drop')
+    .map((enchant) => enchant.id),
+]);
 
 // Phase 13: EXACTLY ONE of the two Perfected cap slots also carries the
 // orange promotion, the LEGAL worst case (MASTERWROUGHT_LEGENDARY_CAP is 1,
@@ -432,15 +447,69 @@ const PROMOTED_CAP_NAME = 'A'.repeat(MAX_LEGENDARY_NAME_LENGTH);
 // own ids differ), so the ceiling stamps the widest legal wearer id.
 const PRODUCTION_WIDTH_BOUND_TO = 2_147_483_647;
 
+/** Choose the widest real, slot-compatible enchant payload, not a made-up roll. */
+function enchantCeiling(itemId: string, payload: ItemInstancePayload): ItemInstancePayload {
+  const def = ITEMS[itemId];
+  const candidates = Object.values(ENCHANTS)
+    .filter(
+      (enchant) =>
+        enchant.itemSlot === def.slot && (!enchant.requiresPerfected || payload.perfected),
+    )
+    .map((enchant) => enchantedPayloadFor(payload, enchant));
+  candidates.sort(
+    (a, b) =>
+      Buffer.byteLength(JSON.stringify(b), 'utf8') - Buffer.byteLength(JSON.stringify(a), 'utf8'),
+  );
+  if (!candidates[0]) throw new Error(`no legal enchant for ${itemId}`);
+  return candidates[0];
+}
+
+/** Real crafted collection shape: frozen profile, optional earned progress,
+ * and at most one cosmetic promotion per worn set (storage has no equip cap). */
+function collectionPayload(
+  itemId: string,
+  signer: string,
+  progressed: boolean,
+  promoted: boolean,
+): ItemInstancePayload {
+  const def = CRUCIBLE_COLLECTION_ITEMS[itemId];
+  const recipe = recipeById(`recipe_${itemId}`);
+  if (!def || !recipe) throw new Error(`missing collection fixture ${itemId}`);
+  let payload = withPerfectingBonus(def, recipe, { signer });
+  if (progressed) {
+    payload = {
+      ...payload,
+      perfected: true,
+      perfectingBound: true,
+      boundTo: PRODUCTION_WIDTH_BOUND_TO,
+      rolled: {
+        stats: Object.fromEntries(
+          Object.entries(payload.perfectingBonus ?? {}).filter(([, value]) => value > 0),
+        ),
+      },
+    };
+  }
+  if (promoted) {
+    if (!progressed) throw new Error('promotion requires earned Perfecting');
+    payload = {
+      ...payload,
+      rolled: { ...payload.rolled, quality: 'legendary' },
+      name: PROMOTED_CAP_NAME,
+    };
+  }
+  return enchantCeiling(itemId, payload);
+}
+
 function ceilingSim(nowMs?: number): Sim {
   const sim = makeSim(31, nowMs);
+  sim.setPlayerLevel(MAX_LEVEL);
   const meta = sim.players.get(sim.playerId) as PlayerMeta;
   // Every gathering skill at its own cap (fishing's is higher by design).
   meta.gatheringProficiency = Object.fromEntries(
     Object.values(GATHERING_PROFESSIONS).map((p) => [p.id, p.maxSkill]),
   ) as PlayerMeta['gatheringProficiency'];
   for (const craft of CRAFT_RING) meta.craftSkills[craft.id] = craft.maxSkill;
-  for (const recipe of ALL_RECIPES) meta.knownRecipes.add(recipe.id);
+  for (const id of RETAINABLE_KNOWN_IDS) meta.knownRecipes.add(id);
   for (const node of GATHER_NODES) {
     meta.nodeHarvestReadyAt[node.id] = sim.time + NODE_HARVEST_TABLE[node.type].respawnSeconds;
   }
@@ -490,63 +559,44 @@ function ceilingSim(nowMs?: number): Sim {
     date: '2026-01-01',
     crafted: new Set(ALL_RECIPES.filter((r) => r.oncePerDay).map((r) => r.id)),
   };
-  // EVERY equip slot carries a crafted, signed, enchanted, stat-rolled
-  // instance: the professions-endgame worst case the phase 16 review found
-  // missing from the first mint (one light slot understated the ceiling by
-  // over 2 KB). Slot-appropriateness is irrelevant to the serializer; the
-  // LOAD arm only requires the slot to be equipped for the instance to
-  // survive the settle. The id itself never enters the byte measurement
-  // (only slot-keyed payloads are measured), so the declaration-order pick
-  // is cosmetic; it exists to keep the equipment map non-empty.
-  const instanceItemId = Object.keys(ITEMS)[0];
+  // Every slot carries a real slot-compatible enchanted item. Crafted rows
+  // have legal full-width signatures; the ordinary dropped shield cannot.
+  // Two collection pieces replace ordinary gear, never enlarge the equip cap.
   // The fixture and the settle assertion both read ALL_EQUIP_SLOTS, so the
   // list length itself needs a literal pin: a slot silently dropped from the
   // live list would shrink the fixture and the measured ceiling in lockstep.
   if (ALL_EQUIP_SLOTS.length !== 12)
     throw new Error('live equip slot list changed; re-mint the ceiling');
   for (const slot of ALL_EQUIP_SLOTS) {
-    meta.equipment[slot] = instanceItemId;
-    meta.equipmentInstance[slot] = {
-      enchant: 'enchant_weapon_might',
-      rolled: { stats: { str: 2, agi: 2, sta: 2 } },
-      signer: longName,
-    };
+    const ordinary = ALL_RECIPES.map((recipe) => ITEMS[recipe.resultItemId]).find(
+      (def) =>
+        def &&
+        !def.masterwrought &&
+        !(def.kind === 'weapon' && def.hand === 'twohand') &&
+        canEquipItemInSlot('warrior', def, slot),
+    );
+    // There is no non-Masterwrought crafted shield. A real unsigned shield
+    // fills the offhand; inventing a signed crafting output would not be legal.
+    const selected =
+      ordinary ??
+      Object.values(ITEMS).find(
+        (def) => !def.masterwrought && canEquipItemInSlot('warrior', def, slot),
+      );
+    if (!selected) throw new Error(`no legal ordinary item for ${slot}`);
+    meta.equipment[slot] = selected.id;
+    meta.equipmentInstance[slot] = enchantCeiling(
+      selected.id,
+      ordinary ? { signer: longName } : {},
+    );
   }
   for (const [slot, apexId] of PERFECTED_CAP_SLOTS) {
-    const def = ITEMS[apexId];
-    const recipe = recipeById(`recipe_${apexId}`);
-    if (def?.masterwrought !== true || !recipe) {
-      throw new Error(`apex fixture id ${apexId} is no longer an apex recipe output; re-mint`);
-    }
-    const bonus = perfectedBonusStats(def, recipe);
-    // POSITIVE int/spi required, not mere key presence: the live stamp skips
-    // zero-valued shares, so a zero-bake would make this fixture write a
-    // payload the real path cannot produce (and red the settle-content pins
-    // with a misleading message) rather than failing here by name.
-    if (!bonus || (bonus.int ?? 0) < 1 || (bonus.spi ?? 0) < 1) {
-      throw new Error(
-        `apex fixture id ${apexId} no longer bakes a positive int/spi delta; re-mint`,
-      );
-    }
-    const stats: Record<string, number> = { str: 2, agi: 2, sta: 2 };
-    for (const [stat, value] of Object.entries(bonus)) {
-      // The live merge's own rule (perfecting.ts): zero shares are never
-      // written, so the fixture skips them identically.
-      if (value === undefined || value === 0) continue;
-      stats[stat] = (stats[stat] ?? 0) + value;
-    }
-    meta.equipmentInstance[slot] = {
-      enchant: 'enchant_weapon_might',
-      // The promoted slot carries the phase 13 stamp the live promotion
-      // writes: the quality override inside the SAME rolled record the R5
-      // stats live on, plus the full-width name (stats untouched, the
-      // promotion's own byte-identity rule).
-      rolled: slot === PROMOTED_CAP_SLOT ? { stats, quality: 'legendary' } : { stats },
-      signer: longName,
-      perfected: true,
-      boundTo: PRODUCTION_WIDTH_BOUND_TO,
-      ...(slot === PROMOTED_CAP_SLOT ? { name: PROMOTED_CAP_NAME } : {}),
-    };
+    meta.equipment[slot] = apexId;
+    meta.equipmentInstance[slot] = collectionPayload(
+      apexId,
+      longName,
+      true,
+      slot === PROMOTED_CAP_SLOT,
+    );
   }
   // Every repeatable cadence window live (the first mint never set the field,
   // and the `field in state` measurement filter silently forgave it).
@@ -638,7 +688,38 @@ function professionsBytes(state: CharacterState): number {
   const subset = Object.fromEntries(
     PROFESSIONS_BLOB_FIELDS.filter((field) => field in state).map((field) => [field, state[field]]),
   );
-  return JSON.stringify(subset).length;
+  return Buffer.byteLength(JSON.stringify(subset), 'utf8');
+}
+
+function fieldBytes(state: CharacterState, key: keyof CharacterState): number {
+  return Buffer.byteLength(JSON.stringify({ [key]: state[key] }), 'utf8') - 1;
+}
+
+/** Byte attribution only: remove this integration's new content ids without
+ * changing any payload. This is not an old-binary load compatibility test. */
+function withoutCrucibleContent(state: CharacterState): CharacterState {
+  const copy = JSON.parse(JSON.stringify(state)) as CharacterState;
+  const itemIds = new Set([
+    ...Object.keys(CRUCIBLE_COLLECTION_ITEMS),
+    ...Object.keys(CRUCIBLE_COLLECTION_PATTERNS),
+    'formula_lastflame_zeal',
+  ]);
+  const recipeIds = new Set([
+    ...CRUCIBLE_COLLECTION_RECIPES.map((recipe) => recipe.id),
+    'enchant_weapon_lastflame_zeal',
+  ]);
+  copy.knownRecipes = copy.knownRecipes?.filter((id) => !recipeIds.has(id));
+  if (copy.deedStats?.itemsDiscovered)
+    copy.deedStats.itemsDiscovered = copy.deedStats.itemsDiscovered.filter(
+      (id) => !itemIds.has(id),
+    );
+  if (copy.reliquary) {
+    for (const id of Object.keys(CRUCIBLE_COLLECTION_ITEMS)) delete copy.reliquary.firstFind?.[id];
+    copy.reliquary.illuminatedPages = copy.reliquary.illuminatedPages?.filter(
+      (id) => id !== 'professions_crucible',
+    );
+  }
+  return copy;
 }
 
 /**
@@ -770,7 +851,13 @@ describe('the professions blob growth bound (phase 16)', () => {
     // the per-player fields at their structural caps. These are what keep
     // the blob linear in CONTENT rather than unbounded per player.
     expect(Object.keys(s2.nodeHarvestCooldowns ?? {})).toHaveLength(GATHER_NODES.length);
-    expect(s2.knownRecipes ?? []).toHaveLength(new Set(ALL_RECIPES.map((r) => r.id)).size);
+    expect(s2.knownRecipes ?? []).toHaveLength(RETAINABLE_KNOWN_IDS.size);
+    expect(new Set(s2.knownRecipes)).toEqual(RETAINABLE_KNOWN_IDS);
+    expect(MAX_KNOWN_RECIPE_IDS).toBe(512);
+    expect(new Set(ALL_RECIPES.map((recipe) => recipe.id)).size).toBe(203);
+    expect(RETAINABLE_KNOWN_IDS.size).toBe(204);
+    expect(RETAINABLE_KNOWN_IDS.size).toBeLessThan(MAX_KNOWN_RECIPE_IDS);
+    expect(s2.knownRecipes).toContain('enchant_weapon_lastflame_zeal');
     // Derived from the refusal policy so a profession becoming slottable
     // moves this pin instead of freezing the understatement; the literal 4
     // is pinned beside it so the derivation cannot self-vacuate (11d F1).
@@ -817,16 +904,23 @@ describe('the professions blob growth bound (phase 16)', () => {
     // settle: the SHRINK side of the band (the floor sits 380 under the
     // measurement, so deleting the PERFECTED_CAP_SLOTS fixture loop would
     // still pass the band; the content pin here is what reds on that loss).
-    for (const [slot] of PERFECTED_CAP_SLOTS) {
+    expect(PERFECTED_CAP_SLOTS).toHaveLength(MASTERWROUGHT_EQUIP_CAP);
+    for (const [slot, itemId] of PERFECTED_CAP_SLOTS) {
       const inst = s2.equipmentInstance?.[slot];
       expect(inst?.perfected, `${slot} keeps the Perfected stamp`).toBe(true);
+      expect(inst?.perfectingBound, `${slot} keeps permanent binding`).toBe(true);
+      expect(inst?.perfectingBonus).toEqual(
+        perfectedBonusStats(ITEMS[itemId], recipeById(`recipe_${itemId}`)!),
+      );
+      expect(s2.equipment?.[slot]).toBe(itemId);
+      expect(canEquipItemInSlot('warrior', ITEMS[itemId], slot)).toBe(true);
       expect(typeof inst?.boundTo, `${slot} keeps the R2 bind`).toBe('number');
-      expect(inst?.rolled?.stats?.int, `${slot} keeps the merged int share`).toBeGreaterThanOrEqual(
-        1,
-      );
-      expect(inst?.rolled?.stats?.spi, `${slot} keeps the merged spi share`).toBeGreaterThanOrEqual(
-        1,
-      );
+      for (const [stat, value] of Object.entries(inst?.perfectingBonus ?? {})) {
+        if (value > 0)
+          expect(inst?.rolled?.stats?.[stat], `${slot} keeps ${stat}`).toBeGreaterThanOrEqual(
+            value,
+          );
+      }
     }
     // The phase 13 promotion worst case survives the settle too (the same
     // shrink-side reasoning: the floor sits 380 under the measurement, so
@@ -1037,8 +1131,11 @@ describe('the professions blob growth bound (phase 16)', () => {
     // and the floor measurement minus 380 (the 11m rule); the 18 KiB
     // structural ceiling holds with 836 bytes of headroom.
     const bytes = professionsBytes(s2);
-    expect(bytes).toBeGreaterThan(17216);
-    expect(bytes).toBeLessThan(17597);
+    // Crucible 2026-09-05: 18,807 = 17,596 + 1,189 (33 new recipe ids) + 32
+    // (Zeal) - 10 (legal equipment payloads, including new binding/provenance,
+    // replacing the invented three-stat rolls). Same narrow tracking band.
+    expect(bytes).toBeGreaterThan(18427);
+    expect(bytes).toBeLessThan(18808);
     // Strictly dominated by the band's upper edge while the band holds:
     // kept as documentation that the structural ceiling also bounds this
     // state, never the live guard.
@@ -1158,7 +1255,7 @@ describe('the professions blob growth bound (phase 16)', () => {
     const overSigner = 'S'.repeat(MAX_CRAFTED_BY_LENGTH + 1);
     const legalSigner = 'A'.repeat(MAX_CRAFTED_BY_LENGTH);
     const corruptSlot = ALL_EQUIP_SLOTS[0];
-    const keptSlot = ALL_EQUIP_SLOTS[1];
+    const keptSlot = ALL_EQUIP_SLOTS[3];
     const numericSlot = ALL_EQUIP_SLOTS[2];
     const corrupt = s1.equipmentInstance?.[corruptSlot];
     if (!corrupt) throw new Error('ceiling fixture lost its first equip instance');
@@ -1224,9 +1321,13 @@ describe('the professions blob growth bound (phase 16)', () => {
     // instance survives, and a legal maximum-length signer is untouched
     // wherever it sits.
     expect('signer' in (s2.equipmentInstance?.[corruptSlot] ?? {})).toBe(false);
-    expect(s2.equipmentInstance?.[corruptSlot]?.enchant).toBe('enchant_weapon_might');
+    expect(s2.equipmentInstance?.[corruptSlot]?.enchant).toBe(
+      s1.equipmentInstance?.[corruptSlot]?.enchant,
+    );
     expect('signer' in (s2.equipmentInstance?.[numericSlot] ?? {})).toBe(false);
-    expect(s2.equipmentInstance?.[numericSlot]?.enchant).toBe('enchant_weapon_might');
+    expect(s2.equipmentInstance?.[numericSlot]?.enchant).toBe(
+      s1.equipmentInstance?.[numericSlot]?.enchant,
+    );
     expect(s2.equipmentInstance?.[keptSlot]?.signer).toBe(legalSigner);
     expect('signer' in (s2.inventory?.[0]?.instance ?? {})).toBe(false);
     expect(s2.inventory?.[0]?.instance?.enchant).toBe('enchant_weapon_might');
@@ -1454,16 +1555,12 @@ function widestUnrestrictedBag(): { id: string; slots: number } {
   return best;
 }
 
-function instancedRow(itemId: string, signer: string): InvSlot {
+function instancedRow(itemId: string, signer: string, progressed = true): InvSlot {
   return {
     itemId,
     count: 1,
-    instance: {
-      enchant: 'enchant_weapon_might',
-      rolled: { stats: { str: 2, agi: 2, sta: 2 } },
-      signer,
-    },
-    craftedRecipeId: 'recipe_eastbrook_arming_sword',
+    instance: collectionPayload(itemId, signer, progressed, progressed),
+    craftedRecipeId: `recipe_${itemId}`,
   };
 }
 
@@ -1473,7 +1570,7 @@ function maximalCharacterSim(): Sim {
   const meta = sim.players.get(sim.playerId) as PlayerMeta;
   const e = sim.entities.get(sim.playerId)!;
   const longName = 'A'.repeat(MAX_CRAFTED_BY_LENGTH);
-  const instanceItemId = Object.keys(ITEMS)[0];
+  const instanceItemId = STORED_COLLECTION_ITEM_ID;
 
   // Progression at the cap, every counter wide.
   sim.setPlayerLevel(MAX_LEVEL);
@@ -1516,9 +1613,10 @@ function maximalCharacterSim(): Sim {
     });
   }
 
-  // Bags: the four sockets carry the widest unrestricted bag and every slot of
-  // the resulting capacity holds a crafted, signed, enchanted, stat-rolled copy
-  // with its recipe marker (the shape the mint sites really write into bags).
+  // Bags: every slot holds a signed, enchanted, Perfected and promoted
+  // collection copy. Storage is not subject to the worn promotion cap.
+  // Their id differs from both worn pieces, so promotion's unique-equip
+  // admission can produce them while the fixture's equipped pair is worn.
   // 16 slots is the unrestricted ceiling today (the 20- and 24-slot bags are
   // materials-only satchels feeding the narrower pool; an instanced row is the
   // wider per-slot payload, so the general bag is the byte-maximal choice).
@@ -1548,8 +1646,16 @@ function maximalCharacterSim(): Sim {
       `${i}`.padEnd(BANK_STORAGE_KEY_MAX_LENGTH, 'k'),
     ),
   };
-  // Buyback: the 12-row vendor ring, every row a signed instance.
-  meta.vendorBuyback = Array.from({ length: 12 }, () => instancedRow(instanceItemId, longName));
+  // Buyback: 12 signed, unbound collection copies with minted bonus provenance.
+  // A progressed/promoted copy is bound and cannot legally be sold here.
+  // Distinct legal signers prevent recordVendorBuyback merging them into one row.
+  meta.vendorBuyback = Array.from({ length: 12 }, (_, index) =>
+    instancedRow(
+      instanceItemId,
+      String.fromCharCode(65 + index).repeat(MAX_CRAFTED_BY_LENGTH),
+      false,
+    ),
+  );
   // Materials Vault: the top rung, every material at the per-material ceiling.
   meta.vault.upgrades = VAULT_UPGRADE_RUNGS;
   const perMaterial = vaultCapacityPerMaterial(meta.vault);
@@ -1648,8 +1754,8 @@ describe('the whole-character maximal blob (Phase 18 U-MEASURE)', () => {
     // professions arm pins, so the two measurements can never describe
     // different fixtures.
     const professions = professionsBytes(s2);
-    expect(professions).toBeGreaterThan(17216);
-    expect(professions).toBeLessThan(17597);
+    expect(professions).toBeGreaterThan(18427);
+    expect(professions).toBeLessThan(18808);
 
     // Every container really reached its ceiling through the load (the
     // `field in state` and non-empty pins above are the pattern): a load clamp
@@ -1681,6 +1787,26 @@ describe('the whole-character maximal blob (Phase 18 U-MEASURE)', () => {
     expect(s2.bank?.appliedStorageKeys).toHaveLength(12);
     expect(s2.bank?.appliedStorageKeys?.every((k) => k.length === 200)).toBe(true);
     expect(s2.vendorBuyback).toHaveLength(12);
+    expect(new Set(s2.vendorBuyback?.map((row) => row.instance?.signer)).size).toBe(12);
+    for (const row of [...(s2.inventory ?? []), ...(s2.bank?.inventory ?? [])]) {
+      expect(row.itemId).toBe(STORED_COLLECTION_ITEM_ID);
+      expect(row.instance?.perfectingBound).toBe(true);
+      expect(row.instance?.boundTo).toBe(PRODUCTION_WIDTH_BOUND_TO);
+      expect(row.instance?.perfected).toBe(true);
+      expect(row.instance?.perfectingBonus).toEqual(
+        perfectedBonusStats(ITEMS[row.itemId], recipeById(`recipe_${row.itemId}`)!),
+      );
+      expect(row.instance?.name).toBe(PROMOTED_CAP_NAME);
+      expect(row.instance?.rolled?.quality).toBe('legendary');
+    }
+    for (const row of s2.vendorBuyback ?? []) {
+      // Bound copies cannot be sold; the legal buyback maximum is unprogressed.
+      expect(row.instance?.perfectingBonus).toBeDefined();
+      expect(row.instance?.boundTo).toBeUndefined();
+      expect(row.instance?.perfectingBound).toBeUndefined();
+      expect(row.instance?.perfected).toBeUndefined();
+      expect(row.instance?.name).toBeUndefined();
+    }
     expect(Object.keys(s2.vault?.stock ?? {})).toHaveLength(vaultMaterialIds().size);
     expect(vaultMaterialIds().size).toBeGreaterThan(100);
     expect(s2.vault?.upgrades).toBe(VAULT_UPGRADE_RUNGS);
@@ -1820,21 +1946,66 @@ describe('the whole-character maximal blob (Phase 18 U-MEASURE)', () => {
     // or legal ceiling moved. Re-measured and re-based per the rule above,
     // never widened: the floor is measurement minus 380 and the edge is
     // measurement plus one, so the band remains exactly 381 bytes wide.
-    expect(bytes, reMint).toBeGreaterThan(151275);
-    expect(bytes, reMint).toBeLessThan(151657);
+    // Crucible integration 2026-09-05: 209,261 bytes. The current catalog with
+    // the OLD fixture measured 156,144; the six fixture-repair deltas below
+    // sum to 53,117 exactly. Most growth is previously omitted stored progress
+    // and promotion, not a per-swap ledger or solely the two new fields.
+    const fixtureBaseline = {
+      equipment: 273,
+      equipmentInstance: 1593,
+      inventory: 16254,
+      bank: 38365,
+      vendorBuyback: 2454,
+      knownRecipes: 5937,
+    } as const;
+    const fixtureDelta = Object.fromEntries(
+      Object.entries(fixtureBaseline).map(([key, value]) => [
+        key,
+        fieldBytes(s2, key as keyof typeof fixtureBaseline) - value,
+      ]),
+    );
+    expect(fixtureDelta).toEqual({
+      equipment: 115,
+      equipmentInstance: -10,
+      inventory: 16320,
+      bank: 35904,
+      vendorBuyback: 756,
+      knownRecipes: 32,
+    });
+    expect(bytes - 156144).toBe(Object.values(fixtureDelta).reduce((sum, value) => sum + value, 0));
+    const priorContent = withoutCrucibleContent(s2);
+    const contentDelta = Object.fromEntries(
+      (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
+        key,
+        fieldBytes(s2, key) - fieldBytes(priorContent, key),
+      ]),
+    );
+    expect(contentDelta).toEqual({ knownRecipes: 1221, deedStats: 1328, reliquary: 1971 });
+    expect(bytes - Buffer.byteLength(JSON.stringify(priorContent), 'utf8')).toBe(4520);
+    const metadataDelta = Object.fromEntries(
+      (['perfectingBonus', 'perfectingBound'] as const).map((field) => {
+        const stripped = JSON.parse(JSON.stringify(s2)) as CharacterState;
+        const instances = [
+          ...Object.values(stripped.equipmentInstance ?? {}),
+          ...(stripped.inventory ?? []).map((row) => row.instance),
+          ...(stripped.bank?.inventory ?? []).map((row) => row.instance),
+          ...(stripped.vendorBuyback ?? []).map((row) => row.instance),
+        ];
+        for (const instance of instances) if (instance) delete instance[field];
+        return [field, bytes - Buffer.byteLength(JSON.stringify(stripped), 'utf8')];
+      }),
+    );
+    expect(metadataDelta).toEqual({ perfectingBonus: 11880, perfectingBound: 5934 });
+    expect(bytes, reMint).toBeGreaterThan(208881);
+    expect(bytes, reMint).toBeLessThan(209262);
 
-    // WHAT THE MEASUREMENT SAYS ABOUT THE WARN THRESHOLD, now that D122 has
-    // ruled. The OLD 131,072 sat BELOW the measured legal worst case (about
-    // 0.87x), so a maxed character printed the oversized-save line on every
-    // autosave. qr-19-character-blob-warn-threshold (Phase 19) re-minted
-    // CHARACTER_BLOB_WARN_BYTES to 163,840 (160 KiB), the smallest 32-KiB step
-    // above the measured worst case, so the threshold now sits ABOVE it and a
-    // legal maximal character no longer trips it (measured worst case 151,656 <
-    // 163,840 warn). This arm pins that relation and reds BY DESIGN on any future
-    // re-mint that drops the threshold back under the worst case, which is the
-    // contract: the threshold and this measurement are re-read together
-    // (server/character_blob_size.ts). It also reds if content growth ever pushes
-    // the measured worst case above the warn, which is the fleet-creep signal.
+    // The Crucible database review approved 229,376 bytes (224 KiB), the first
+    // 32-KiB step above this corrected 209,261-byte storage-rich fixture. The
+    // previous 163,840-byte threshold warned on this legal modeled state.
+    // Pin the measured relation: a lower threshold or further content growth
+    // crossing it requires re-measuring and reviewing both sides together,
+    // never silently widening this test's narrow tracking band. This remains
+    // a warning only; the save-path tests prove oversized saves stay whole.
     expect(bytes).toBeLessThan(CHARACTER_BLOB_WARN_BYTES);
   });
 });
