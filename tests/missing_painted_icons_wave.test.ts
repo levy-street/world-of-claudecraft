@@ -664,7 +664,9 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // 298 at the release/v0.41.0 merge (2026-08-30): the release's five
     // Crucible raid deeds (276 to 281 on its own arm) join the same pending
     // side on the deed_cat_dungeon crest.
-    expect(DEED_ORDER).toHaveLength(298);
+    // The personal hammer quest uses the explicitly pending hidden-category crest.
+    expect(DEED_ORDER).toHaveLength(299);
+    expect(DEED_ART_PENDING.has('hid_forgebreaker')).toBe(true);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
     const provenance = readFileSync(
