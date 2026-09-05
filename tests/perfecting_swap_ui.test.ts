@@ -6,8 +6,8 @@ vi.mock('../src/game/audio', () => ({
   audio: { perfectingSuccess: vi.fn(), perfectingAttempt: vi.fn() },
 }));
 
-import { STATIONS } from '../src/sim/content/professions';
 import { audio } from '../src/game/audio';
+import { STATIONS } from '../src/sim/content/professions';
 import { type PerfectItemRef, perfectingInfoFrom } from '../src/sim/professions/perfecting';
 import { capturePerfectItemRef } from '../src/sim/professions/perfecting_copy';
 import { perfectingSwapInfoFrom } from '../src/sim/professions/perfecting_swap';
@@ -89,10 +89,54 @@ afterEach(() => {
 });
 
 describe('Perfecting rank exchange inside the existing window', () => {
+  it('distinguishes duplicate bagged and worn targets by rank and copy location through confirmation', () => {
+    world.equipment = { waist: WAIST };
+    world.equipmentInstances = { waist: { perfecting: 3 } };
+    world.inventory.push({ itemId: WAIST, count: 1, instance: { perfecting: 2, perfectingBound: true } });
+    win.open();
+    root().querySelectorAll<HTMLButtonElement>('[data-cand-i]')[1].click();
+    const labels = [...root().querySelectorAll<HTMLButtonElement>('[data-swap-target]')].map((row) => row.textContent);
+    expect(new Set(labels).size).toBe(labels.length);
+    expect(target(0).textContent).toContain('Worn (Waist)');
+    expect(target(0).textContent).toContain('Rank 3 of 4');
+    expect(target(1).textContent).toContain('Bag copy 1 of 2');
+    expect(target(1).textContent).toContain('Rank 1 of 4');
+    expect(target(3).textContent).toContain('Bag copy 2 of 2');
+    expect(target(3).textContent).toContain('Rank 2 of 4');
+    expect(root().querySelectorAll<HTMLButtonElement>('[data-cand-i]')[1].textContent).toContain('Bag copy 1 of 1');
+    target(3).click();
+    action().click();
+    const prompt = document.querySelector('.pf-swap-prompt')!;
+    expect(prompt.textContent).toContain('Bag copy 1 of 1');
+    expect(prompt.textContent).toContain('Bag copy 2 of 2');
+    // Confirmation keeps the captured copy labels even if a same-id sibling
+    // leaves before relocalization; the stale authorization must then refuse.
+    world.inventory.splice(1, 1);
+    win.relocalize();
+    expect(prompt.textContent).toContain('Bag copy 2 of 2');
+    document.querySelector<HTMLButtonElement>('[data-swap-confirm]')!.click();
+    expect(world.swapPerfectingRanks).not.toHaveBeenCalled();
+  });
+
+  it('names a worn target location alongside the bagged source in the preview and confirmation', () => {
+    world.equipment = { waist: WAIST };
+    world.equipmentInstances = { waist: { perfecting: 2 } };
+    win.open();
+    root().querySelectorAll<HTMLButtonElement>('[data-cand-i]')[1].click();
+    target().click();
+    const preview = root().querySelector('[data-swap-preview]')!;
+    expect(preview.textContent).toContain('Worn (Waist)');
+    expect(preview.textContent).toContain('Bag copy 1 of 1');
+    action().click();
+    expect(document.querySelector('.pf-swap-prompt')?.textContent).toContain('Worn (Waist)');
+    expect(document.querySelector('.pf-swap-prompt')?.textContent).toContain('Bag copy 1 of 1');
+  });
+
   it('recovers a lost success after reconnect without guessing the outcome or replaying the exchange', () => {
     world.inventory[0] = { itemId: CHEST, count: 1, instance: { perfecting: 1 } };
     world.inventory[1] = {
-      itemId: WAIST, count: 1,
+      itemId: WAIST,
+      count: 1,
       instance: { perfected: true, perfectingBonus: { str: 2 }, rolled: { stats: { str: 2 } } },
     };
     win.open();
@@ -108,7 +152,8 @@ describe('Perfecting rank exchange inside the existing window', () => {
     // A full post-reconnect snapshot arrives after hello. Its cprof identity is
     // a fresh object even when progression values did not change.
     world.inventory[0] = {
-      itemId: CHEST, count: 1,
+      itemId: CHEST,
+      count: 1,
       instance: { perfected: true, perfectingBonus: { str: 2 }, rolled: { stats: { str: 2 } } },
     };
     world.inventory[1] = { itemId: WAIST, count: 1, instance: { perfecting: 1 } };
@@ -168,10 +213,16 @@ describe('Perfecting rank exchange inside the existing window', () => {
   it('routes reconnect to Perfecting and preserves the existing market resync', () => {
     const hud = readFileSync('src/ui/hud.ts', 'utf8');
     const main = readFileSync('src/main.ts', 'utf8');
-    const method = hud.slice(hud.indexOf('resyncAfterReconnect(): void {'), hud.indexOf('resyncAfterReconnect(): void {') + 250);
+    const method = hud.slice(
+      hud.indexOf('resyncAfterReconnect(): void {'),
+      hud.indexOf('resyncAfterReconnect(): void {') + 250,
+    );
     expect(method).toContain('this.marketWindow.onReconnected();');
     expect(method).toContain('this.perfectingWindow?.onReconnected();');
-    const chain = main.slice(main.indexOf('const priorOnReconnected = online.onReconnected;'), main.indexOf('const priorOnReconnected = online.onReconnected;') + 650);
+    const chain = main.slice(
+      main.indexOf('const priorOnReconnected = online.onReconnected;'),
+      main.indexOf('const priorOnReconnected = online.onReconnected;') + 650,
+    );
     expect(chain).toContain('priorOnReconnected?.();');
     expect(chain).toContain('hud.resyncAfterReconnect();');
   });
