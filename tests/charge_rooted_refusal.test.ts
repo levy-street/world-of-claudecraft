@@ -53,7 +53,16 @@ function chargeSetup() {
 /** An ORDINARY root: breakable, and carrying no `unbreakableControl` flag. That
  *  is the case the effect-side guard misses, so it is the case worth pinning. */
 function rootPlayer(p: Entity): void {
-  p.auras.push({ kind: 'root', name: 'Entangling Roots', timeLeft: 8 } as never);
+  p.auras.push({
+    id: 'test_entangling_roots',
+    kind: 'root',
+    name: 'Entangling Roots',
+    remaining: 8,
+    duration: 8,
+    value: 0,
+    sourceId: p.id,
+    school: 'nature',
+  });
 }
 
 function runCharge(rooted: boolean) {
