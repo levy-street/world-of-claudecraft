@@ -256,7 +256,10 @@ server) verdict every inbound frame; `game.ts` is a thin consumer. The design re
   pinned by `ALL_DELTA_KEYS` + `TERSE_TO_IWORLD` in `tests/snapshots.test.ts` (W0a),
   which owns the list and guards the `selfWireJson` (encode) to `applySnapshot`
   (decode) round-trip. A new heavy self field lands in `selfWireJson` (here) and
-  `applySnapshot` (`online.ts`) in one commit, and is added to that registry. A value
+  `applySnapshot` (`online.ts`) in one commit, and is added to that registry. The
+  static combat-rating / progression scalar cohort and the in-combat bit `cbt` are
+  emitted by `server/self_scalar_wire.ts` (decoded by `src/net/combat_scalar_wire.ts`),
+  the emitter-module form a new self scalar follows. A value
   already serialized once realm-wide (the dungeon-finder board on `dfb`, built
   and stringified a single time per broadcast pass by the realm-readout memo) rides
   via `maybeRaw(...)` instead of `maybe(...)`, so the per-session diff reuses the one

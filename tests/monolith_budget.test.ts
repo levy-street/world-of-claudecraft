@@ -342,7 +342,12 @@ const MONOLITHS: MonolithRow[] = [
     // Explorer and Health Text wiring stay, and the queue-pop Discord DM row
     // shares the account-toggle seam. Measured on the merged tree.
     // Exact count, zero slack.
-    ceiling: 18933,
+    // Re-pinned while merging PR #3878 into the current candidate: the prior
+    // Loot Explorer, Health Text and account-toggle seam history stays, and the
+    // self in-combat flag wiring lands on the player frame while the zone-entry
+    // vista gate drops its recent-personal-event heuristic once p.inCombat is
+    // authoritative online. Measured on the merged tree. Exact count, zero slack.
+    ceiling: 18934,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -741,7 +746,14 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned on the merged PR #3873 candidate: both the release-side
     // server extractions and the queue-pop Discord DM hook survive. Measured
     // on the merged tree. Exact count, zero slack.
-    ceiling: 10575,
+    // Lowered 10641 -> 10625 by the self-scalar emitter extraction
+    // (server/self_scalar_wire.ts took the static combat-rating / progression
+    // maybe(...) cohort and is where the in-combat bit cbt landed).
+    // Re-pinned while merging PR #3878 into the current candidate: the prior
+    // release-side server extractions and queue-pop Discord DM hook stay, and
+    // the self-scalar emitter extraction lands with the in-combat bit. Measured
+    // on the merged tree. Exact count, zero slack.
+    ceiling: 10559,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

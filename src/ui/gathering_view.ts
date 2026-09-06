@@ -208,9 +208,9 @@ function gradeReadMetaFor(world: IWorld): GradeReadMeta {
  *  The deny mirror covers the sim arms the Entity mirror carries (dead,
  *  busy casting or consuming, action-locked shapeshift) plus the
  *  confirmed-grade capacity read through the sim's own countFit. Two
- *  honest limits (the fix-round review): the in-combat arm bites OFFLINE
- *  only (online mirrors never set p.inCombat, hud.ts's own note), so
- *  online it over-asks and the server's combat denial answers; and the
+ *  honest limits (the fix-round review): the in-combat arm trails the
+ *  server by one snapshot online (the self record's cbt bit), so in that
+ *  window it may over-ask and the server's combat denial answers; and the
  *  busy/consuming reads trail the server by one snapshot online, so in
  *  that window a just-freed player's ask is suppressed and the plain
  *  harvest silently skips the effect, a one-round-trip loss the charge

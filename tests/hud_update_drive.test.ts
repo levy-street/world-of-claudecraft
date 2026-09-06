@@ -840,7 +840,7 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
   {
     call: 'this.renderer.vistaPan',
     band: 'medium',
-    gate: "!inDungeon && currentZone.id !== this.lastZoneId && this.lastZoneId !== '' && !p.dead && !p.inCombat && !recentCombat",
+    gate: "!inDungeon && currentZone.id !== this.lastZoneId && this.lastZoneId !== '' && !p.dead && !p.inCombat",
     surface: 'none',
     why: 'the zone-entry camera sweep; a renderer call, not a HUD write',
   },
