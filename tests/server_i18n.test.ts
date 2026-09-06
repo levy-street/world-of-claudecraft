@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { GUILD_CREATION_FEE_COPPER } from '../src/sim/guild_bank';
-import { ensureLocaleLoaded, setLanguage, supportedLanguages } from '../src/ui/i18n';
-import { localizeServerText, tServer } from '../src/ui/server_i18n';
+import { ensureLocaleLoaded, formatMoney, setLanguage, supportedLanguages } from '../src/ui/i18n';
+import { localizeServerText, parseEnglishCompactMoney, tServer } from '../src/ui/server_i18n';
 
 // Messages the authoritative server emits as plain English; the client must
 // re-render them in the active locale (friends/guild/world/who/moderation).
@@ -48,6 +48,12 @@ describe('server-sent message localization', () => {
     // because both files are S3 blind spots and a drift between the emit
     // literal and these matchers ships English to every locale.
     'You need 1 gold to found a guild.',
+    // Guild bank gold movement notices (server/guild_bank_gold_notice.ts), an
+    // S3 blind spot like the two above; the money token covers every unit mix.
+    'Ada deposited 5g 20s 3c into the guild bank.',
+    'Ada deposited 5g 0s into the guild bank.',
+    'Bob withdrew 25s from the guild bank.',
+    'Bob withdrew 7c from the guild bank.',
     'The guild bank must be emptied before the guild can be disbanded.',
     // guildCreate's screened-name refusal (guild.nameNotAllowed): emitted from
     // server/social.ts, which the S3 guard does not scan, so the emit literal
@@ -132,6 +138,23 @@ describe('server-sent message localization', () => {
       expect(who).toContain('Carl');
       expect(who).toContain('12');
     }
+    setLanguage('en');
+  });
+
+  it('parses the guild bank notice money back to copper and re-renders it per locale', async () => {
+    expect(parseEnglishCompactMoney('5g 20s 3c')).toBe(52_003);
+    expect(parseEnglishCompactMoney('5g 0s')).toBe(50_000);
+    expect(parseEnglishCompactMoney('25s')).toBe(2_500);
+    expect(parseEnglishCompactMoney('7c')).toBe(7);
+    expect(parseEnglishCompactMoney('')).toBe(0);
+    await ensureLocaleLoaded('de_DE');
+    setLanguage('de_DE');
+    const out = localizeServerText('Ada deposited 5g 20s 3c into the guild bank.');
+    expect(out).toBe(
+      tServer('guild.bankGoldDeposited', { name: 'Ada', amount: formatMoney(52_003) }),
+    );
+    expect(out).toContain('Ada');
+    expect(out).toContain('Gildenbank');
     setLanguage('en');
   });
 

@@ -256,6 +256,10 @@ import { mergedPrsForLogin } from './github_contributors';
 import { githubForAccount } from './github_db';
 import { groundTelegraphWireJson, groundTelegraphWorld } from './ground_telegraph_wire';
 import { forEachGuarded, runGuarded } from './guarded_iter';
+import {
+  broadcastGuildBankGoldNotice,
+  type GuildBankGoldNoticePort,
+} from './guild_bank_gold_notice';
 import { createGuildBankLazyLoader, type GuildBankLazyLoader } from './guild_bank_lazy_loader';
 import { bustGuildBankLog, GUILD_BANK_LOG_VISIBLE_OPS } from './guild_bank_log';
 import { deliverGuildBankLog } from './guild_bank_log_delivery';
@@ -274,6 +278,7 @@ import {
   type GuildBankWriteResult,
   loadGuildBanksIntoSim,
 } from './guild_bank_state';
+import { dispatchGuildBankCommand } from './guild_bank_wire';
 import { createPaidGuildWithLeaderAtomic } from './guild_create_db';
 import { buyGuildRosterPageAtomic } from './guild_roster_page_db';
 import { guildRosterTransport } from './guild_roster_transport';
@@ -5254,6 +5259,15 @@ export class GameServer {
         markGuildBankDirty: (guildId) => this.markGuildBankDirty(session, guildId),
         recordGuildBankIncident: (kind) => gameMetricsCounters().guildBankIncident(kind),
         logError: (message) => console.error(message),
+        notifyGuildGoldMovement: (guildId, goldOp, copper) =>
+          void broadcastGuildBankGoldNotice(
+            this.guildBankGoldNoticePort,
+            guildId,
+            goldOp,
+            session.name,
+            copper,
+            (message, error) => console.error(message, error),
+          ),
       },
       session,
       target,
@@ -5261,6 +5275,18 @@ export class GameServer {
       run,
     );
   }
+
+  /** The transport the guild gold notice fans out over: the cached per-guild
+   *  roster read, live presence, and the events frame (the same three closures
+   *  SocialTransport hands the social service). */
+  private readonly guildBankGoldNoticePort: GuildBankGoldNoticePort = {
+    guildMembers: (guildId) => this.socialDb.guildMembers(guildId),
+    isOnline: (id) => this.sessionsByCharacterId.has(id),
+    deliver: (id, events) => {
+      const s = this.sessionsByCharacterId.get(id);
+      if (s) this.send(s, { t: 'events', list: [...events] });
+    },
+  };
 
   /** Answer one activity-log request, re-checking live authority after the
    *  cached database read before any entries cross the wire. */
@@ -8047,57 +8073,22 @@ export class GameServer {
           this.scheduleBankLedgerHighWaterSave(session);
         }
         break;
-      // Guild Bank: the officer-plus shared treasury + item store. Shape-only
-      // checks here (the bank_* idiom): the Sim owns every gameplay rule
-      // (banker proximity, officer-plus rank via the session membership stamp,
-      // quest-bind, treasury cap, table price, capacity). `slot` is a container
-      // index, `count` optional (omit = whole stack), `amount` copper. Every op
-      // runs through runGuildBankOp: the before/after guildBankInfoFor diff is
-      // the ONE success signal, pre-reserving the bank_ledger rows
-      // (container='guild') and marking the book dirty. The later fenced save
-      // commits those rows atomically with the character and book; a refusal
-      // diffs empty and stages neither row nor mark.
+      // Guild Bank: the five officer-plus book mutations, dispatched by
+      // server/guild_bank_wire.ts (shape checks) through runGuildBankOp
+      // (ledger evidence + the guild gold notice). The guard token is drawn
+      // here, once per frame, before the shape check.
       case 'guild_bank_deposit_gold':
-        if (!this.consumeGuildBankOp(session, receivedAtMs / 1000)) break;
-        if (typeof msg.amount === 'number') {
-          const amount = msg.amount;
-          this.runGuildBankOp(session, { pid }, 'deposit_gold', () =>
-            sim.guildBankDepositGoldFor(pid, amount),
-          );
-        }
-        break;
       case 'guild_bank_withdraw_gold':
-        if (!this.consumeGuildBankOp(session, receivedAtMs / 1000)) break;
-        if (typeof msg.amount === 'number') {
-          const amount = msg.amount;
-          this.runGuildBankOp(session, { pid }, 'withdraw_gold', () =>
-            sim.guildBankWithdrawGoldFor(pid, amount),
-          );
-        }
-        break;
       case 'guild_bank_deposit':
-        if (!this.consumeGuildBankOp(session, receivedAtMs / 1000)) break;
-        if (typeof msg.slot === 'number') {
-          const slot = msg.slot;
-          const count = typeof msg.count === 'number' ? msg.count : undefined;
-          this.runGuildBankOp(session, { pid }, 'deposit', () =>
-            sim.guildBankDepositFor(pid, slot, count),
-          );
-        }
-        break;
       case 'guild_bank_withdraw':
-        if (!this.consumeGuildBankOp(session, receivedAtMs / 1000)) break;
-        if (typeof msg.slot === 'number') {
-          const slot = msg.slot;
-          const count = typeof msg.count === 'number' ? msg.count : undefined;
-          this.runGuildBankOp(session, { pid }, 'withdraw', () =>
-            sim.guildBankWithdrawFor(pid, slot, count),
-          );
-        }
-        break;
       case 'guild_bank_buy_slots':
         if (!this.consumeGuildBankOp(session, receivedAtMs / 1000)) break;
-        this.runGuildBankOp(session, { pid }, 'buy_slots', () => sim.guildBankBuySlotsFor(pid));
+        dispatchGuildBankCommand(
+          { sim, run: (op, mutate) => this.runGuildBankOp(session, { pid }, op, mutate) },
+          command,
+          msg,
+          pid,
+        );
         break;
       // The activity log READ (no mutation, no sim call). It shares the guild
       // bank op guard rather than getting a second bucket: it is the same

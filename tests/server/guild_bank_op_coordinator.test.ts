@@ -50,6 +50,7 @@ function makeRig() {
   const markGuildBankDirty = vi.fn();
   const recordGuildBankIncident = vi.fn();
   const logError = vi.fn();
+  const notifyGuildGoldMovement = vi.fn();
   const host: GuildBankOpHostPort = {
     sim: { meta, guildBankInfoFor, guildBankInfoForGuild },
     guildBankDeleteInFlight,
@@ -59,6 +60,7 @@ function makeRig() {
     markGuildBankDirty,
     recordGuildBankIncident,
     logError,
+    notifyGuildGoldMovement,
   };
   const session: GuildBankOpSessionPort = {
     characterId: 7,
@@ -86,6 +88,7 @@ function makeRig() {
     markGuildBankDirty,
     recordGuildBankIncident,
     logError,
+    notifyGuildGoldMovement,
   };
 }
 
@@ -402,6 +405,64 @@ describe('guild-bank op coordinator', () => {
         purchasedSlotsAfter: 30,
       }),
     ]);
+  });
+
+  it('announces a committed player gold deposit to the guild with the moved magnitude', () => {
+    const rig = makeRig();
+    rig.state.playerBook = book({ treasury: 1_000 });
+    const liveActor = { copper: 60_000, inventory: [], guildMembership: { guildId: 23 } };
+    rig.state.meta = liveActor;
+    const run = () => {
+      rig.state.playerBook = book({ treasury: 53_003 });
+      liveActor.copper -= 52_003;
+    };
+
+    runGuildBankOp(rig.host, rig.session, { pid: 5 }, 'deposit_gold', run);
+
+    expect(rig.commit).toHaveBeenCalledTimes(1);
+    expect(rig.notifyGuildGoldMovement).toHaveBeenCalledTimes(1);
+    expect(rig.notifyGuildGoldMovement).toHaveBeenCalledWith(23, 'deposit_gold', 52_003);
+  });
+
+  it('announces a committed player gold withdrawal as a positive magnitude', () => {
+    const rig = makeRig();
+    rig.state.playerBook = book({ treasury: 53_003 });
+    const liveActor = { copper: 0, inventory: [], guildMembership: { guildId: 23 } };
+    rig.state.meta = liveActor;
+    const run = () => {
+      rig.state.playerBook = book({ treasury: 3 });
+      liveActor.copper += 53_000;
+    };
+
+    runGuildBankOp(rig.host, rig.session, { pid: 5 }, 'withdraw_gold', run);
+
+    expect(rig.notifyGuildGoldMovement).toHaveBeenCalledWith(23, 'withdraw_gold', 53_000);
+  });
+
+  it('stays silent for a refused gold op that diffs empty', () => {
+    const rig = makeRig();
+    rig.state.playerBook = book({ treasury: 1_000 });
+
+    runGuildBankOp(rig.host, rig.session, { pid: 5 }, 'withdraw_gold', vi.fn());
+
+    expect(rig.cancel).toHaveBeenCalledTimes(1);
+    expect(rig.notifyGuildGoldMovement).not.toHaveBeenCalled();
+  });
+
+  it('stays silent for an item move even though it commits', () => {
+    const rig = makeRig();
+    const carried: InvSlot = { itemId: 'copper_ore', count: 2 };
+    const liveInventory = [carried];
+    rig.state.meta = { copper: 500, inventory: liveInventory, guildMembership: { guildId: 23 } };
+    const run = () => {
+      rig.state.playerBook = book({ slots: [{ ...carried }] });
+      liveInventory.splice(0, liveInventory.length);
+    };
+
+    runGuildBankOp(rig.host, rig.session, { pid: 5 }, 'deposit', run);
+
+    expect(rig.commit).toHaveBeenCalledTimes(1);
+    expect(rig.notifyGuildGoldMovement).not.toHaveBeenCalled();
   });
 
   it('appends one successful player delta and stamps the acting bag movement', () => {

@@ -630,7 +630,10 @@ const MONOLITHS: MonolithRow[] = [
     // Down 10604 -> 10587 for the per-surface action-bar profiles: the
     // join read, the per-profile merge and the FIFO write moved to
     // server/hotbar_layout.ts (HotbarLayoutStore). Exact count.
-    ceiling: 10587,
+    // LOWERED 10587 -> 10578 by the guild bank gold notice: the five guild bank
+    // mutation cases moved to server/guild_bank_wire.ts (dispatchGuildBank-
+    // Command), which paid for the notice port wiring that stayed here.
+    ceiling: 10578,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

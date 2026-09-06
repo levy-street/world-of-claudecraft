@@ -11,7 +11,13 @@
 import { CLASSES, DUNGEONS, ZONES } from '../sim/data';
 import type { PlayerClass } from '../sim/types';
 import { tEntity } from './entity_i18n';
-import { getLanguage, type InterpolationValues, type SupportedLanguage, tPlural } from './i18n';
+import {
+  formatMoney,
+  getLanguage,
+  type InterpolationValues,
+  type SupportedLanguage,
+  tPlural,
+} from './i18n';
 import { SERVER_NEW } from './server_i18n.newlocales';
 import { IN_GAME_MODERATION_MESSAGES } from './server_i18n_moderation';
 
@@ -116,6 +122,8 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.disbanded': '<{name}> has been disbanded.',
     'guild.removedFrom': 'You have been removed from <{name}>.',
     'guild.joined': '{name} has joined the guild.',
+    'guild.bankGoldDeposited': '{name} deposited {amount} into the guild bank.',
+    'guild.bankGoldWithdrawn': '{name} withdrew {amount} from the guild bank.',
     'guild.memberLeft': '{name} has left the guild.',
     'guild.newMaster': '{name} is now the Guild Master of <{guild}>.',
     'guild.removedBy': '{name} has been removed from the guild by {actor}.',
@@ -268,6 +276,8 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.disbanded': '<{name}> has been disbanded.',
     'guild.removedFrom': 'You have been removed from <{name}>.',
     'guild.joined': '{name} has joined the guild.',
+    'guild.bankGoldDeposited': '{name} deposited {amount} into the guild bank.',
+    'guild.bankGoldWithdrawn': '{name} withdrew {amount} from the guild bank.',
     'guild.memberLeft': '{name} has left the guild.',
     'guild.newMaster': '{name} is now the Guild Master of <{guild}>.',
     'guild.removedBy': '{name} has been removed from the guild by {actor}.',
@@ -412,6 +422,8 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.disbanded': '<{name}> ha sido disuelta.',
     'guild.removedFrom': 'Has sido expulsado de <{name}>.',
     'guild.joined': '{name} se ha unido a la hermandad.',
+    'guild.bankGoldDeposited': '{name} depositó {amount} en el banco de la hermandad.',
+    'guild.bankGoldWithdrawn': '{name} retiró {amount} del banco de la hermandad.',
     'guild.memberLeft': '{name} ha abandonado la hermandad.',
     'guild.newMaster': '{name} ahora es el Maestro de hermandad de <{guild}>.',
     'guild.removedBy': '{name} ha sido expulsado de la hermandad por {actor}.',
@@ -558,6 +570,8 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.disbanded': '<{name}> se ha disuelto.',
     'guild.removedFrom': 'Has sido expulsado de <{name}>.',
     'guild.joined': '{name} se ha unido a la hermandad.',
+    'guild.bankGoldDeposited': '{name} depositó {amount} en el banco de la hermandad.',
+    'guild.bankGoldWithdrawn': '{name} retiró {amount} del banco de la hermandad.',
     'guild.memberLeft': '{name} ha abandonado la hermandad.',
     'guild.newMaster': '{name} es ahora el Maestro de hermandad de <{guild}>.',
     'guild.removedBy': '{name} ha sido expulsado de la hermandad por {actor}.',
@@ -704,6 +718,8 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.disbanded': '<{name}> a été dissoute.',
     'guild.removedFrom': 'Vous avez été renvoyé de <{name}>.',
     'guild.joined': '{name} a rejoint la guilde.',
+    'guild.bankGoldDeposited': '{name} a déposé {amount} dans la banque de guilde.',
+    'guild.bankGoldWithdrawn': '{name} a retiré {amount} de la banque de guilde.',
     'guild.memberLeft': '{name} a quitté la guilde.',
     'guild.newMaster': '{name} est désormais le maître de guilde de <{guild}>.',
     'guild.removedBy': '{name} a été renvoyé de la guilde par {actor}.',
@@ -850,6 +866,8 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.disbanded': '<{name}> a été dissoute.',
     'guild.removedFrom': 'Vous avez été retiré de <{name}>.',
     'guild.joined': '{name} a rejoint la guilde.',
+    'guild.bankGoldDeposited': '{name} a déposé {amount} dans la banque de guilde.',
+    'guild.bankGoldWithdrawn': '{name} a retiré {amount} de la banque de guilde.',
     'guild.memberLeft': '{name} a quitté la guilde.',
     'guild.newMaster': '{name} est maintenant le maître de guilde de <{guild}>.',
     'guild.removedBy': '{name} a été retiré de la guilde par {actor}.',
@@ -991,6 +1009,8 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.disbanded': '<{name}> è stata sciolta.',
     'guild.removedFrom': 'Sei stato rimosso da <{name}>.',
     'guild.joined': '{name} è entrato nella gilda.',
+    'guild.bankGoldDeposited': '{name} ha depositato {amount} nella banca della gilda.',
+    'guild.bankGoldWithdrawn': '{name} ha ritirato {amount} dalla banca della gilda.',
     'guild.memberLeft': '{name} ha abbandonato la gilda.',
     'guild.newMaster': '{name} ora è il Maestro di Gilda di <{guild}>.',
     'guild.removedBy': '{name} è stato rimosso dalla gilda da {actor}.',
@@ -1136,6 +1156,8 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.disbanded': '<{name}> wurde aufgelöst.',
     'guild.removedFrom': 'Ihr wurdet aus <{name}> entfernt.',
     'guild.joined': '{name} ist der Gilde beigetreten.',
+    'guild.bankGoldDeposited': '{name} hat {amount} in die Gildenbank eingezahlt.',
+    'guild.bankGoldWithdrawn': '{name} hat {amount} aus der Gildenbank abgehoben.',
     'guild.memberLeft': '{name} hat die Gilde verlassen.',
     'guild.newMaster': '{name} ist jetzt der Gildenmeister von <{guild}>.',
     'guild.removedBy': '{name} wurde von {actor} aus der Gilde entfernt.',
@@ -1272,6 +1294,8 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.disbanded': '<{name}>已被解散。',
     'guild.removedFrom': '你已被移出<{name}>。',
     'guild.joined': '{name}加入了公会。',
+    'guild.bankGoldDeposited': '{name}向公会银行存入了{amount}。',
+    'guild.bankGoldWithdrawn': '{name}从公会银行取出了{amount}。',
     'guild.memberLeft': '{name}离开了公会。',
     'guild.newMaster': '{name}现在是<{guild}>的会长。',
     'guild.removedBy': '{name}被{actor}移出了公会。',
@@ -1406,6 +1430,8 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.disbanded': '<{name}> 已被解散。',
     'guild.removedFrom': '你已被移出 <{name}>。',
     'guild.joined': '{name} 已加入公會。',
+    'guild.bankGoldDeposited': '{name} 已將 {amount} 存入公會銀行。',
+    'guild.bankGoldWithdrawn': '{name} 已從公會銀行提取 {amount}。',
     'guild.memberLeft': '{name} 已離開公會。',
     'guild.newMaster': '{name} 現在是 <{guild}> 的會長。',
     'guild.removedBy': '{name} 已被 {actor} 移出公會。',
@@ -1542,6 +1568,8 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.disbanded': '<{name}>이(가) 해체되었습니다.',
     'guild.removedFrom': '<{name}>에서 추방되었습니다.',
     'guild.joined': '{name}님이 길드에 가입했습니다.',
+    'guild.bankGoldDeposited': '{name}님이 길드 은행에 {amount}을(를) 입금했습니다.',
+    'guild.bankGoldWithdrawn': '{name}님이 길드 은행에서 {amount}을(를) 인출했습니다.',
     'guild.memberLeft': '{name}님이 길드를 떠났습니다.',
     'guild.newMaster': '{name}님이 이제 <{guild}>의 길드장입니다.',
     'guild.removedBy': '{name}님이 {actor}님에 의해 길드에서 추방되었습니다.',
@@ -1679,6 +1707,8 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.disbanded': '<{name}>は解散しました。',
     'guild.removedFrom': 'あなたは<{name}>から除名されました。',
     'guild.joined': '{name}がギルドに加入しました。',
+    'guild.bankGoldDeposited': '{name}がギルド銀行に{amount}を預けました。',
+    'guild.bankGoldWithdrawn': '{name}がギルド銀行から{amount}を引き出しました。',
     'guild.memberLeft': '{name}がギルドを脱退しました。',
     'guild.newMaster': '{name}が<{guild}>の新しいギルドマスターになりました。',
     'guild.removedBy': '{name}が{actor}によってギルドから除名されました。',
@@ -1822,6 +1852,8 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.disbanded': '<{name}> foi desfeita.',
     'guild.removedFrom': 'Você foi removido de <{name}>.',
     'guild.joined': '{name} entrou na guilda.',
+    'guild.bankGoldDeposited': '{name} depositou {amount} no banco da guilda.',
+    'guild.bankGoldWithdrawn': '{name} retirou {amount} do banco da guilda.',
     'guild.memberLeft': '{name} saiu da guilda.',
     'guild.newMaster': '{name} agora é o Mestre da Guilda de <{guild}>.',
     'guild.removedBy': '{name} foi removido da guilda por {actor}.',
@@ -1962,6 +1994,8 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.disbanded': 'Гильдия <{name}> распущена.',
     'guild.removedFrom': 'Вы были исключены из <{name}>.',
     'guild.joined': '{name} присоединяется к гильдии.',
+    'guild.bankGoldDeposited': '{name} внёс(ла) {amount} в банк гильдии.',
+    'guild.bankGoldWithdrawn': '{name} снял(а) {amount} из банка гильдии.',
     'guild.memberLeft': '{name} покидает гильдию.',
     'guild.newMaster': '{name} становится главой гильдии <{guild}>.',
     'guild.removedBy': '{name} исключен(а) из гильдии игроком {actor}.',
@@ -2015,6 +2049,17 @@ export function tServer(
   const table = DICT[lang] ?? DICT.en;
   const tmpl = table[key] ?? DICT.en[key] ?? key;
   return interpolate(tmpl, params);
+}
+
+/** Parse the server's English compact money ("5g 20s 3c", any subset of the
+ *  three units) back to copper so formatMoney can re-render it for the viewer's
+ *  locale. A unit that is absent counts as zero. */
+export function parseEnglishCompactMoney(text: string): number {
+  const unit = (suffix: string): number => {
+    const m = new RegExp(`(\\d+)${suffix}(?:\\b|$)`).exec(text);
+    return m ? Number(m[1]) : 0;
+  };
+  return unit('g') * 10000 + unit('s') * 100 + unit('c');
 }
 
 // English-content sub-values the server interpolates, mapped back to dictionary keys.
@@ -2351,6 +2396,25 @@ const RULES: Rule[] = [
     build: (m) => tServer('guild.invited', { name: m[1] }),
   },
   { re: /^(.+) has joined the guild\.$/, build: (m) => tServer('guild.joined', { name: m[1] }) },
+  {
+    // Guild bank gold movement notices (server/guild_bank_gold_notice.ts). The
+    // amount arrives as English compact money ("5g 20s 3c"); it is parsed back
+    // to copper and re-rendered by formatMoney for the viewer's locale.
+    re: /^(.+) deposited ((?:\d+g)?(?: ?\d+s)?(?: ?\d+c)?) into the guild bank\.$/,
+    build: (m) =>
+      tServer('guild.bankGoldDeposited', {
+        name: m[1],
+        amount: formatMoney(parseEnglishCompactMoney(m[2])),
+      }),
+  },
+  {
+    re: /^(.+) withdrew ((?:\d+g)?(?: ?\d+s)?(?: ?\d+c)?) from the guild bank\.$/,
+    build: (m) =>
+      tServer('guild.bankGoldWithdrawn', {
+        name: m[1],
+        amount: formatMoney(parseEnglishCompactMoney(m[2])),
+      }),
+  },
   { re: /^(.+) has left the guild\.$/, build: (m) => tServer('guild.memberLeft', { name: m[1] }) },
   {
     re: /^A guild named '(.+)' already exists\.$/,
