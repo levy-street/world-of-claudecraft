@@ -206,6 +206,9 @@ export const SPRINGMENDER_4PC_CHAIN_HARVEST_MULT = 1.5;
 export const CHRONOWEAVE_2PC_ECHO_CONVERT_SINGLE = 0.5;
 /** Chronoweave 4pc: seconds cut from Temporal Cascade's cooldown (base 17). */
 export const CHRONOWEAVE_4PC_CASCADE_COOLDOWN_CUT_SEC = 5;
+/** Chronoweave 4pc: offsets the extra casts unlocked by its cooldown cut.
+ *  170 * 0.7 = 119 mana every 12 sec, almost the base 170 every 17 sec. */
+export const CHRONOWEAVE_4PC_CASCADE_COST_PCT = -0.3;
 /** Pyroclast 2pc: the Scald guaranteed-crit execute threshold as a fraction
  *  of the target's max health (base SCORCH_EXECUTE_HP 0.3). Retuned 0.5 to
  *  0.35 (2026-08-30): at 0.5 the entire bottom half of a fight played at the
@@ -887,8 +890,9 @@ export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> =
   chronoweave: [
     {
       pieces: 2,
-      // Temporal Echo converts 50 percent of single-target Arcane damage
-      // instead of 40: bespoke bend at placeTemporalEcho, the ONE placement
+      // Temporal Echo converts 50 percent of other single-target Arcane damage;
+      // the Surge/Darts driver weight turns that coefficient into 200 percent
+      // instead of the baseline 160: bespoke bend at placeTemporalEcho, the ONE placement
       // write whose baked rate both combat (echoConvertRate) and the aura
       // tooltip (value) read back. Snapshot-at-placement: a mark placed
       // before a gear change keeps its placed rate until re-cast. The UI
@@ -903,16 +907,17 @@ export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> =
     },
     {
       pieces: 4,
-      // Temporal Cascade 17 -> 12 sec: a cooldownFlat row on the resolved
-      // entry, so the engine's cooldown set and the HUD's printed cooldown
-      // read the same number. Touches no rate constants, no classifier, no
-      // wire (the set doc's final-round sizing); no talent row targets
+      // Temporal Cascade 17 -> 12 sec and 170 -> 119 mana: one resolved
+      // ability row keeps the faster set cadence neutral in mana per second.
+      // The engine and HUD therefore read the same cooldown and cost. Touches
+      // no rate constants, classifier, or wire; no talent row targets
       // temporal_cascade, so there is no row overlap. Deterministic.
       effect: {
         ability: [
           {
             ability: 'temporal_cascade',
             cooldownFlat: -CHRONOWEAVE_4PC_CASCADE_COOLDOWN_CUT_SEC,
+            costPct: CHRONOWEAVE_4PC_CASCADE_COST_PCT,
           },
         ],
       },

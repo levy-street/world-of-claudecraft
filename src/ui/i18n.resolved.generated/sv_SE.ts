@@ -2744,7 +2744,7 @@ export const sv_SE: EnTranslations = {
       "suddenDeath": "Din nästa Tidig grav kostar inget raseri och ignorerar sitt hälsokrav",
       "aoeEcho": "{charges} ekon återstår: förmågor mot ett enda mål vållar {pct}% skada till upp till {targets} närliggande fiender",
       "sureCrit": "{charges} kastningar av skadeförmågor är garanterat kritiska träffar",
-      "temporalEcho": "Kastarens arkanskada läker dig för {singlePct}% av enmålsskada eller {areaPct}% av områdesskada",
+      "temporalEcho": "Kastarens arkanskada läker dig för {singlePct}% av enmålsskada eller {areaPct}% av områdesskada. Etervåg och Eterpilar får en x4-bonus på ett individuellt Tidsmässigt eko. Gruppekona skapar en lika stor läkningsreserv, fördelad efter saknad hälsa bland märkta allierade under 60% hälsa",
       "arcaneCharge": "{stacks} Arkanladdningar: Etersvall gör {damagePct}% mer skada, kastas {castPct}% snabbare och kostar {costMult}x mana",
       "physicalReduction": "Minskar mottagen fysisk skada med {pct}%",
       "temporalHourglass": "Immun och oförmögen att handla; återställer hälsa och accelererar nedkylningsåterhämtning. Högerklicka för att avbryta.",
@@ -11589,11 +11589,11 @@ export const sv_SE: EnTranslations = {
       },
       "temporal_echo": {
         "name": "Tidseko",
-        "description": "Märker en allierad med ett eko av ett friskare ögonblick och läker {damage} hälsa på en gång. Under {duration} sek dras en del av den Arkan skada du gör tillbaka genom ekoet för att läka dem."
+        "description": "Märker en allierad med ett eko av ett friskare ögonblick och läker {damage} hälsa på en gång. Under {duration} sek läker {echoSinglePct}% av din övriga Arkana enmålsskada och {echoAreaPct}% av din Arkana områdesskada dem. Etervåg och Eterpilar läker dem i stället för {echoDriverPct}% av skadan de gör."
       },
       "temporal_cascade": {
         "name": "Tidskaskad",
-        "description": "Skickar ett eko kaskaderande genom din grupp: målet och upp till fyra av deras närmaste allierade läks på en gång och märks var och en i {duration} sek, och drar en del av den Arkan skada du ger tillbaka genom deras ekon för att läka dem. (Kronomantik)"
+        "description": "Skickar ett eko kaskaderande genom din grupp: målet och upp till fyra av deras närmaste allierade läks på en gång och märks var och en i {duration} sek, och drar en del av den Arkana skada du gör tillbaka genom deras ekon för att läka dem. Etervåg och Eterpilar skapar en lika stor läkningsreserv från varje gruppseko, fördelad efter saknad hälsa bland märkta allierade under 60% hälsa. (Kronomantik)"
       },
       "temporal_reversal": {
         "name": "Tidsåtergång",
@@ -18985,8 +18985,8 @@ export const sv_SE: EnTranslations = {
       },
       "chronoweave": {
         "name": "Etervävda klädnader",
-        "bonus2": "Tidsmässigt eko omvandlar 50 procent av din mystiska skada mot ett mål till läkning. Skada du tar fördröjer inte längre dina besvärjelser.",
-        "bonus4": "Tidsmässig kaskads väntetid minskar med 5 sek."
+        "bonus2": "Tidsmässigt eko omvandlar 50% av din övriga Arkana skada mot ett mål till läkning. Etervåg och Eterpilar omvandlar i stället 200% av skadan de gör. Skada du tar fördröjer inte längre dina besvärjelser.",
+        "bonus4": "Tidsmässig kaskads väntetid minskar med 5 sek. och dess manakostnad minskar med 30%."
       },
       "cinderbark": {
         "name": "Askbarkens väktare",

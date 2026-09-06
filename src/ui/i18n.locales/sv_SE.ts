@@ -2642,10 +2642,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Förskjuter målet ett hjärtslag ur nuet; ett temporalt skal absorberar {damage} skada i 10 sek innan tidslinjen snäpper tillbaka.',
   'entities.abilities.temporal_barrier.name': 'Tidsbarriär',
   'entities.abilities.temporal_cascade.description':
-    'Skickar ett eko kaskaderande genom din grupp: målet och upp till fyra av deras närmaste allierade läks på en gång och märks var och en i {duration} sek, och drar en del av den Arkan skada du ger tillbaka genom deras ekon för att läka dem. (Kronomantik)',
+    'Skickar ett eko kaskaderande genom din grupp: målet och upp till fyra av deras närmaste allierade läks på en gång och märks var och en i {duration} sek, och drar en del av den Arkana skada du gör tillbaka genom deras ekon för att läka dem. Etervåg och Eterpilar skapar en lika stor läkningsreserv från varje gruppseko, fördelad efter saknad hälsa bland märkta allierade under 60% hälsa. (Kronomantik)',
   'entities.abilities.temporal_cascade.name': 'Tidskaskad',
   'entities.abilities.temporal_echo.description':
-    'Märker en allierad med ett eko av ett friskare ögonblick och läker {damage} hälsa på en gång. Under {duration} sek dras en del av den Arkan skada du gör tillbaka genom ekoet för att läka dem.',
+    'Märker en allierad med ett eko av ett friskare ögonblick och läker {damage} hälsa på en gång. Under {duration} sek läker {echoSinglePct}% av din övriga Arkana enmålsskada och {echoAreaPct}% av din Arkana områdesskada dem. Etervåg och Eterpilar läker dem i stället för {echoDriverPct}% av skadan de gör.',
   'entities.abilities.temporal_echo.name': 'Tidseko',
   'entities.abilities.temporal_hourglass.description':
     'Placerar ett temporalt timglas på vald plats. Under en fiende suspenderar det dem i {hostilePveDuration} sek i PvE eller {hostilePvpDuration} sek i PvP och hindrar alla handlingar; skada bryter effekten. Vid dina fötter eller under en gruppallierad ger det stasis i {duration} sek, förhindrar skada och handlingar, återställer {healing}% av maximala hälsan och låter nedkylningar återhämta sig {selfCooldownRecovery}% snabbare för dig eller {allyCooldownRecovery}% snabbare för en allierad. På tom mark väntar timglaset i {groundDuration} sek och påverkar den första giltiga enheten som kliver på det. Den gynnsamma auran kan avlägsnas manuellt.',
@@ -13425,7 +13425,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sweepingStrikes':
     'Enmålsslag träffar även {targets} närliggande fiende för {pct}% skada',
   'hudChrome.auraEffect.temporalEcho':
-    'Kastarens arkanskada läker dig för {singlePct}% av enmålsskada eller {areaPct}% av områdesskada',
+    'Kastarens arkanskada läker dig för {singlePct}% av enmålsskada eller {areaPct}% av områdesskada. Etervåg och Eterpilar får en x4-bonus på ett individuellt Tidsmässigt eko. Gruppekona skapar en lika stor läkningsreserv, fördelad efter saknad hälsa bland märkta allierade under 60% hälsa',
   'hudChrome.auraEffect.warlockAnchor':
     'Kasta igen inom {range} m för att återvända hit och förbruka ankaret',
   'hudChrome.auraEffect.wintersChill':
@@ -14181,8 +14181,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.benison_dawnweave.bonus2': 'Serafisk vaksamhets räddning helar 270 i stället för 180. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.benison_dawnweave.bonus4': 'När Serafisk vaksamhet utlöses helas dess allierade också med 15 procent av sin maximala hälsa under 10 sek.',
   'entities.itemSets.benison_dawnweave.name': 'Välsignelsens gryningsväv',
-  'entities.itemSets.chronoweave.bonus2': 'Tidsmässigt eko omvandlar 50 procent av din mystiska skada mot ett mål till läkning. Skada du tar fördröjer inte längre dina besvärjelser.',
-  'entities.itemSets.chronoweave.bonus4': 'Tidsmässig kaskads väntetid minskar med 5 sek.',
+  'entities.itemSets.chronoweave.bonus2': 'Tidsmässigt eko omvandlar 50% av din övriga Arkana skada mot ett mål till läkning. Etervåg och Eterpilar omvandlar i stället 200% av skadan de gör. Skada du tar fördröjer inte längre dina besvärjelser.',
+  'entities.itemSets.chronoweave.bonus4': 'Tidsmässig kaskads väntetid minskar med 5 sek. och dess manakostnad minskar med 30%.',
   'entities.itemSets.chronoweave.name': 'Etervävda klädnader',
   'entities.itemSets.cinderbark.bonus2': 'Svepande klor har 30 procents chans att lagra ytterligare gammalt blod.',
   'entities.itemSets.cinderbark.bonus4': 'Märgbräckan träffar 30 procent hårdare, och dess nödförsvar ersätter inte längre hugget.',

@@ -2744,7 +2744,7 @@ export const en: EnTranslations = {
       "suddenDeath": "Your next Execute costs no Rage and ignores its health requirement",
       "aoeEcho": "{charges} echoes remain: single-target abilities deal {pct}% damage to up to {targets} nearby enemies",
       "sureCrit": "{charges} damaging ability casts are guaranteed critical strikes",
-      "temporalEcho": "The caster's Arcane damage heals you for {singlePct}% of single-target or {areaPct}% of area damage",
+      "temporalEcho": "The caster's Arcane damage heals you for {singlePct}% of single-target or {areaPct}% of area damage. Aether Surge and Aether Darts use a 4x bonus on an individual Temporal Echo. Group Echoes create an equal healing reserve, shared among marked allies below 60% health according to missing health",
       "arcaneCharge": "{stacks} Arcane Charges: Aether Surge deals {damagePct}% more damage, casts {castPct}% faster, and costs {costMult}x mana",
       "physicalReduction": "Reduces Physical damage taken by {pct}%",
       "temporalHourglass": "Immune and unable to act; restores health and accelerates cooldown recovery. Right-click to cancel.",
@@ -11589,11 +11589,11 @@ export const en: EnTranslations = {
       },
       "temporal_echo": {
         "name": "Temporal Echo",
-        "description": "Marks an ally with an echo of a healthier moment, mending {damage} health at once. For {duration} sec, part of the Arcane damage you deal is drawn back through the echo to heal them."
+        "description": "Marks an ally with an echo of a healthier moment, mending {damage} health at once. For {duration} sec, {echoSinglePct}% of your other single-target Arcane damage and {echoAreaPct}% of your area Arcane damage heals them. Aether Surge and Aether Darts instead heal them for {echoDriverPct}% of the damage they deal."
       },
       "temporal_cascade": {
         "name": "Temporal Cascade",
-        "description": "Sends an echo cascading through your group: the target and up to four of their nearest allies are mended at once and each marked for {duration} sec, drawing part of the Arcane damage you deal back through their echoes to heal them. (Chronomancy)"
+        "description": "Sends an echo cascading through your group: the target and up to four of their nearest allies are mended at once, healing for more on those who have lost the most health, and each marked for {duration} sec, drawing part of the Arcane damage you deal back through their echoes to heal them. Aether Surge and Aether Darts create an equal healing reserve from every group Echo, shared among marked allies below 60% health according to missing health. (Chronomancy)"
       },
       "temporal_reversal": {
         "name": "Temporal Reversal",
@@ -18985,8 +18985,8 @@ export const en: EnTranslations = {
       },
       "chronoweave": {
         "name": "Aetherweave Vestments",
-        "bonus2": "Temporal Echo converts 50 percent of your single-target Arcane damage into healing. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Temporal Cascade's cooldown is reduced by 5 sec."
+        "bonus2": "Temporal Echo converts 50 percent of your other single-target Arcane damage into healing. Aether Surge and Aether Darts instead convert 200 percent of their damage. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Temporal Cascade's cooldown is reduced by 5 sec and its mana cost is reduced by 30 percent."
       },
       "cinderbark": {
         "name": "Cinderbark Ward",

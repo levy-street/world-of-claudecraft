@@ -2744,7 +2744,7 @@ export const id_ID: EnTranslations = {
       "suddenDeath": "Ajal Dini berikutnya tidak memakan Amarah dan mengabaikan syarat nyawanya",
       "aoeEcho": "{charges} gema tersisa: kemampuan bertarget tunggal memberikan {pct}% kerusakan kepada hingga {targets} musuh terdekat",
       "sureCrit": "{charges} rapalan kemampuan yang merusak dijamin menjadi pukulan kritis",
-      "temporalEcho": "Kerusakan Arkana dari perapal menyembuhkanmu sebesar {singlePct}% dari kerusakan bertarget tunggal atau {areaPct}% dari kerusakan area",
+      "temporalEcho": "Kerusakan Arkana dari perapal menyembuhkanmu sebesar {singlePct}% dari kerusakan bertarget tunggal atau {areaPct}% dari kerusakan area. Gelombang Aether dan Panah Aether mendapat bonus x4 pada Gema Temporal individual. Gema grup membuat cadangan penyembuhan yang sama, dibagikan menurut kesehatan yang hilang di antara sekutu bertanda dengan kesehatan di bawah 60%",
       "arcaneCharge": "{stacks} Muatan Arkana: Kekuatan Arkan memberikan {damagePct}% kerusakan lebih besar, dirapal {castPct}% lebih cepat, dan menghabiskan {costMult}x mana",
       "physicalReduction": "Mengurangi kerusakan Fisik yang diterima sebesar {pct}%",
       "temporalHourglass": "Kebal dan tidak dapat bertindak; memulihkan kesehatan dan mempercepat pemulihan jeda. Klik kanan untuk membatalkan.",
@@ -11589,11 +11589,11 @@ export const id_ID: EnTranslations = {
       },
       "temporal_echo": {
         "name": "Gema Waktu",
-        "description": "Menandai sekutu dengan gema dari momen yang lebih sehat, memulihkan {damage} kesehatan sekaligus. Selama {duration} dtk, sebagian kerusakan Arkan yang kamu berikan ditarik kembali melalui gema untuk menyembuhkan mereka."
+        "description": "Menandai sekutu dengan gema dari momen yang lebih sehat, memulihkan {damage} kesehatan sekaligus. Selama {duration} dtk, {echoSinglePct}% kerusakan Arkan satu target lainnya dan {echoAreaPct}% kerusakan Arkan areamu menyembuhkan mereka. Gelombang Aether dan Panah Aether sebagai gantinya menyembuhkan sebesar {echoDriverPct}% dari kerusakan yang dihasilkan."
       },
       "temporal_cascade": {
         "name": "Riam Waktu",
-        "description": "Mengirim gema berjenjang melalui grupmu: target dan hingga empat sekutu terdekatnya dipulihkan sekaligus dan masing-masing ditandai selama {duration} dtk, menarik sebagian kerusakan Arkan yang kamu berikan kembali melalui gema mereka untuk menyembuhkan mereka. (Kronomansi)"
+        "description": "Mengirim gema berjenjang melalui grupmu: target dan hingga empat sekutu terdekatnya dipulihkan sekaligus dan masing-masing ditandai selama {duration} dtk, menarik sebagian kerusakan Arkan yang kamu berikan kembali melalui gema mereka untuk menyembuhkan mereka. Gelombang Aether dan Panah Aether membuat cadangan penyembuhan yang sama dari setiap Gema grup, dibagikan menurut kesehatan yang hilang di antara sekutu bertanda dengan kesehatan di bawah 60%. (Kronomansi)"
       },
       "temporal_reversal": {
         "name": "Pembalikan Waktu",
@@ -18985,8 +18985,8 @@ export const id_ID: EnTranslations = {
       },
       "chronoweave": {
         "name": "Busana Tenunan Aether",
-        "bonus2": "Gema Temporal mengubah 50 persen kerusakan Arkana satu target Anda menjadi penyembuhan. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
-        "bonus4": "Waktu Pulih Lenyap Temporal berkurang 5 detik."
+        "bonus2": "Gema Temporal mengubah 50% kerusakan Arkana satu target lainnya menjadi penyembuhan. Gelombang Aether dan Panah Aether sebagai gantinya mengubah 200% dari kerusakan yang dihasilkan. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+        "bonus4": "Waktu pulih Lenyap Temporal berkurang 5 detik dan biaya mananya berkurang 30%."
       },
       "cinderbark": {
         "name": "Pelindung Kulit Bara",

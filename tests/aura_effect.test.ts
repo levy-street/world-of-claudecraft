@@ -572,6 +572,24 @@ describe('auraEffectDescriptor', () => {
     });
   });
 
+  it('discloses the Temporal Echo offensive-driver multiplier', () => {
+    expect(desc({ kind: 'temporal_echo', value: 0.4 })).toEqual({
+      key: 'hudChrome.auraEffect.temporalEcho',
+      nums: { singlePct: 40, areaPct: 15 },
+    });
+    expect(desc({ kind: 'temporal_echo', value: 0.13 })).toEqual({
+      key: 'hudChrome.auraEffect.temporalEcho',
+      nums: { singlePct: 13, areaPct: 6 },
+    });
+    expect(hudChromeStrings.auraEffect.temporalEcho).toContain('4x bonus on an individual');
+    expect(hudChromeStrings.auraEffect.temporalEcho).toContain(
+      'shared among marked allies below 60% health',
+    );
+    expect(hudChromeStrings.auraEffect.temporalEcho).toContain('Aether Surge and Aether Darts');
+    expect(hudChromeStrings.auraEffect.temporalEcho).not.toContain('2x bonus on a group Echo');
+    expect(hudChromeStrings.auraEffect.temporalEcho).not.toContain('7x');
+  });
+
   it('teaches the carried-flag buff its right-click-to-drop affordance', () => {
     // The one row that describes an ACTION rather than a stat: without it the
     // voluntary drop is undiscoverable, since nothing else on screen says it.

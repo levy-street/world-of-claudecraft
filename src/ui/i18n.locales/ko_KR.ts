@@ -8136,8 +8136,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '물결 치유가 네 번째 아군에게 닿고 치유의 흐름을 150%로 거두어들입니다.',
   'entities.itemSets.chronoweave.name': '에테르직조 예복',
   'entities.itemSets.chronoweave.bonus2':
-    '시간의 메아리가 단일 대상 비전 피해의 50%를 치유로 전환합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
-  'entities.itemSets.chronoweave.bonus4': '시간의 연쇄의 재사용 대기시간이 5초 감소합니다.',
+    '시간의 메아리가 다른 단일 대상 비전 피해의 50%를 치유로 전환합니다. 에테르 쇄도와 에테르 화살은 대신 자신이 입힌 피해의 200%를 치유로 전환합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+  'entities.itemSets.chronoweave.bonus4': '시간의 연쇄의 재사용 대기시간이 5초 감소하고 마나 소모량이 30% 감소합니다.',
   'entities.itemSets.pyroclast.name': '화쇄류 예장',
   'entities.itemSets.pyroclast.bonus2':
     '그을리기가 생명력이 35% 이하인 대상에게 항상 치명타로 적중합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
@@ -10704,7 +10704,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '대상을 현재에서 한 박자 벗어나게 합니다. 시간의 껍질이 10초 동안 피해를 {damage} 흡수한 뒤 시간선이 제자리로 돌아옵니다.',
   'entities.abilities.temporal_echo.name': '시간의 메아리',
   'entities.abilities.temporal_echo.description':
-    '더 건강했던 순간의 메아리로 아군에게 표식을 남겨 즉시 생명력을 {damage} 회복시킵니다. {duration}초 동안 당신이 입힌 비전 피해의 일부가 메아리를 통해 그 아군을 치유합니다.',
+    '더 건강했던 순간의 메아리로 아군에게 표식을 남겨 즉시 생명력을 {damage} 회복시킵니다. {duration}초 동안 다른 단일 대상 비전 피해의 {echoSinglePct}%와 광역 비전 피해의 {echoAreaPct}%가 그 아군을 치유합니다. 에테르 쇄도와 에테르 화살은 대신 자신이 입힌 피해의 {echoDriverPct}%만큼 그 아군을 치유합니다.',
   'entities.abilities.aspect_of_the_wild.description':
     '30미터 안의 아군에게 야생의 힘을 불어넣어 5분 동안 공격력을 45, 공격 속도를 5%만큼 증가시킵니다. (사냥꾼 특성)',
   'entities.abilities.avenging_wrath.description': '황금빛 신성한 힘으로 이루어진 실체 있는 날개를 펼쳐 헌신을 10 얻고, 15초 동안 당신의 기술이 만드는 헌신을 두 배로 만듭니다. 또한 당신이 입히는 피해와 치유량을 20% 높입니다. 여명약탈자: 분노의 망치를 어떤 대상에게든 쓸 수 있게 합니다.',
@@ -10824,7 +10824,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '얼어붙은 대상에 대한 주문의 치명타 확률이 50% 증가합니다. 서리의 손가락과 혹한의 추위도 대상을 얼어붙은 것으로 간주합니다. (냉기)',
   'entities.abilities.temporal_cascade.name': '시간의 연쇄',
   'entities.abilities.temporal_cascade.description':
-    '시간의 메아리를 파티에 연쇄시켜 대상과 가장 가까운 아군 최대 네 명을 즉시 치유하고 각각에게 {duration}초 동안 징표를 남깁니다. 자신이 입힌 비전 피해의 일부가 메아리를 타고 돌아와 징표가 있는 아군을 치유합니다. (시간술)',
+    '시간의 메아리를 파티에 연쇄시켜 대상과 가장 가까운 아군 최대 네 명을 즉시 치유하고 각각에게 {duration}초 동안 징표를 남깁니다. 자신이 입힌 비전 피해의 일부가 메아리를 타고 돌아와 징표가 있는 아군을 치유합니다. 에테르 쇄도와 에테르 화살은 각 그룹 메아리에서 같은 양의 치유 비축분을 생성하고, 생명력이 60% 미만인 징표 대상 아군에게 잃은 생명력에 따라 나누어 줍니다. (시간술)',
   'entities.abilities.temporal_reversal.name': '시간 역전',
   'entities.abilities.temporal_reversal.description':
     '쓰러진 아군의 시간선을 되돌려, 전투 중에도 시체가 있는 자리에서 생명력과 마나의 일부를 지닌 채 되살립니다. (시간술)',
@@ -13814,7 +13814,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sweepingStrikes':
     '단일 대상 공격이 주변 적 {targets}명에게도 {pct}% 피해를 줍니다',
   'hudChrome.auraEffect.temporalEcho':
-    '시전자의 비전 피해가 단일 대상 피해의 {singlePct}%, 광역 피해의 {areaPct}%만큼 당신을 치유합니다',
+    '시전자의 비전 피해가 단일 대상 피해의 {singlePct}%, 광역 피해의 {areaPct}%만큼 당신을 치유합니다. 에테르 쇄도와 에테르 화살은 개별 시간의 메아리에 4배 보너스를 적용합니다. 그룹 메아리는 같은 양의 치유 비축분을 생성하고, 생명력이 60% 미만인 징표 대상 아군에게 잃은 생명력에 따라 나누어 줍니다',
   'hudChrome.auraEffect.veiledEdge': '다음 잠복자의 일격이 두 배의 피해를 입힙니다',
   'hudChrome.auraEffect.veilstrikeWindow':
     '그림자에 휩싸임: 황혼장막 전용 선제 기술을 어느 각도에서든 사용할 수 있고, 주는 피해가 {pct}% 증가합니다',

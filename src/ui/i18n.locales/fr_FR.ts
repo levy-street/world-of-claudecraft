@@ -2693,10 +2693,10 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Décale la cible d'un battement de coeur hors du présent, une coquille temporelle absorbant {damage} points de dégâts pendant 10 s avant que la chronologie ne se rétablisse.",
   'entities.abilities.temporal_barrier.name': 'Barrière temporelle',
   'entities.abilities.temporal_cascade.description':
-    "Envoie un écho en cascade à travers votre groupe : la cible et jusqu'à quatre de ses alliés les plus proches sont soignés simultanément et chacun est marqué pendant {duration} s, canalisant une partie des dégâts d'Arcane que vous infligez de retour à travers leurs échos pour les soigner. (Chromancie)",
+    "Envoie un écho en cascade à travers votre groupe : la cible et jusqu'à quatre de ses alliés les plus proches sont soignés simultanément et chacun est marqué pendant {duration} s, canalisant une partie des dégâts d'Arcane que vous infligez de retour à travers leurs échos pour les soigner. Déferlante d'éther et Fléchettes d'éther créent une réserve de soins équivalente pour chaque Écho de groupe, répartie selon les points de vie manquants entre les alliés marqués à moins de 60% de leurs points de vie. (Chromancie)",
   'entities.abilities.temporal_cascade.name': 'Cascade temporelle',
   'entities.abilities.temporal_echo.description':
-    "Marque un allié de l'écho d'un moment plus sain, soignant immédiatement {damage} points de vie. Pendant {duration} s, une partie des dégâts d'Arcane que vous infligez est canalisée de retour à travers l'écho pour le soigner.",
+    "Marque un allié de l'écho d'un moment plus sain, soignant immédiatement {damage} points de vie. Pendant {duration} s, {echoSinglePct}% de vos autres dégâts d'Arcane à cible unique et {echoAreaPct}% de vos dégâts d'Arcane de zone le soignent. Déferlante d'éther et Fléchettes d'éther le soignent à la place à hauteur de {echoDriverPct}% des dégâts qu'elles infligent.",
   'entities.abilities.temporal_echo.name': 'Écho temporel',
   'entities.abilities.temporal_hourglass.description':
     "Placez un sablier temporel à l'emplacement sélectionné. Sous un ennemi, il le suspend pendant {hostilePveDuration} s en JcE ou {hostilePvpDuration} s en JcJ et empêche toutes ses actions ; les dégâts brisent l'effet. À vos pieds ou sous un allié de groupe, il accorde une stase pendant {duration} s, empêche les dégâts et les actions, restaure {healing} % de la vie maximale, et accélère la récupération des temps de recharge de {selfCooldownRecovery} % pour vous ou de {allyCooldownRecovery} % pour un allié. Sur un sol vide, le sablier attend {groundDuration} s et affecte la première unité valide qui le traverse. L'aura bénéfique peut être annulée manuellement.",
@@ -13677,7 +13677,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.suddenDeath': 'Votre prochaine Tombe précoce ne coûte aucune Rage et ignore sa condition de vie',
   'hudChrome.auraEffect.sureCrit': '{charges} incantations de capacités offensives sont des coups critiques garantis',
   'hudChrome.auraEffect.sweepingStrikes': 'Les frappes ciblées touchent aussi {targets} ennemi proche pour {pct}% de dégâts',
-  'hudChrome.auraEffect.temporalEcho': "Les dégâts d'Arcanes du lanceur vous soignent de {singlePct}% en cas de dégâts ciblés ou de {areaPct}% en cas de dégâts de zone",
+  'hudChrome.auraEffect.temporalEcho': "Les dégâts d'Arcanes du lanceur vous soignent de {singlePct}% en cas de dégâts ciblés ou de {areaPct}% en cas de dégâts de zone. Déferlante d'éther et Fléchettes d'éther bénéficient d'un bonus x4 avec un Écho temporel individuel. Les Échos de groupe créent une réserve de soins équivalente, répartie selon les points de vie manquants entre les alliés marqués à moins de 60% de leurs points de vie",
   'hudChrome.auraEffect.warlockAnchor': "Relancez à moins de {range} m pour revenir ici et consommer l'ancre",
   'hudChrome.auraEffect.wintersChill': '{charges} charges : les sorts compatibles traitent cette cible comme gelée',
   'hudChrome.auraEffect.makersBrand': "Pendant {duration} s, chaque cumul augmente les dégâts subis de la part de Varkhul de {pct}%. Cumul jusqu'à {max} fois. Les tanks doivent échanger à {swap} cumuls.",
@@ -14297,8 +14297,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.benison_dawnweave.bonus2': 'Le sauvetage de Vigilance séraphique rend 270 points de vie au lieu de 180. Les dégâts subis ne retardent plus vos incantations.',
   'entities.itemSets.benison_dawnweave.bonus4': 'Quand Vigilance séraphique se déclenche, son allié récupère aussi 15 % de ses points de vie maximum en 10 s.',
   'entities.itemSets.benison_dawnweave.name': 'Bénédiction tissée d’aurore',
-  'entities.itemSets.chronoweave.bonus2': 'Écho temporel convertit 50 % de vos dégâts des Arcanes à cible unique en soins. Les dégâts subis ne retardent plus vos incantations.',
-  'entities.itemSets.chronoweave.bonus4': 'Le temps de recharge de Cascade temporelle est réduit de 5 s.',
+  'entities.itemSets.chronoweave.bonus2': "Écho temporel convertit 50% de vos autres dégâts d'Arcane à cible unique en soins. Déferlante d'éther et Fléchettes d'éther convertissent à la place 200% des dégâts qu'elles infligent. Les dégâts subis ne retardent plus vos incantations.",
+  'entities.itemSets.chronoweave.bonus4': 'Le temps de recharge de Cascade temporelle est réduit de 5 s et son coût en mana de 30%.',
   'entities.itemSets.chronoweave.name': 'Vêtements tissés d’éther',
   'entities.itemSets.cinderbark.bonus2': 'Griffes balayantes a 30 % de chances d’emmagasiner un Sang ancien supplémentaire.',
   'entities.itemSets.cinderbark.bonus4': 'Brise-moelle inflige 30 % de dégâts supplémentaires, et la garde d’urgence ne remplace plus l’attaque.',

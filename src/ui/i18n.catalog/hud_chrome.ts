@@ -3594,7 +3594,7 @@ export const hudChromeStrings = {
       '{charges} echoes remain: single-target abilities deal {pct}% damage to up to {targets} nearby enemies',
     sureCrit: '{charges} damaging ability casts are guaranteed critical strikes',
     temporalEcho:
-      "The caster's Arcane damage heals you for {singlePct}% of single-target or {areaPct}% of area damage",
+      "The caster's Arcane damage heals you for {singlePct}% of single-target or {areaPct}% of area damage. Aether Surge and Aether Darts use a 4x bonus on an individual Temporal Echo. Group Echoes create an equal healing reserve, shared among marked allies below 60% health according to missing health",
     arcaneCharge:
       '{stacks} Arcane Charges: Aether Surge deals {damagePct}% more damage, casts {castPct}% faster, and costs {costMult}x mana',
     physicalReduction: 'Reduces Physical damage taken by {pct}%',

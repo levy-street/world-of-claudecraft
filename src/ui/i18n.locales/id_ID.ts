@@ -2649,10 +2649,10 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menggeser target sedetik keluar dari masa kini, cangkang temporal menyerap {damage} kerusakan selama 10 dtk sebelum garis waktu kembali.',
   'entities.abilities.temporal_barrier.name': 'Penghalang Waktu',
   'entities.abilities.temporal_cascade.description':
-    'Mengirim gema berjenjang melalui grupmu: target dan hingga empat sekutu terdekatnya dipulihkan sekaligus dan masing-masing ditandai selama {duration} dtk, menarik sebagian kerusakan Arkan yang kamu berikan kembali melalui gema mereka untuk menyembuhkan mereka. (Kronomansi)',
+    'Mengirim gema berjenjang melalui grupmu: target dan hingga empat sekutu terdekatnya dipulihkan sekaligus dan masing-masing ditandai selama {duration} dtk, menarik sebagian kerusakan Arkan yang kamu berikan kembali melalui gema mereka untuk menyembuhkan mereka. Gelombang Aether dan Panah Aether membuat cadangan penyembuhan yang sama dari setiap Gema grup, dibagikan menurut kesehatan yang hilang di antara sekutu bertanda dengan kesehatan di bawah 60%. (Kronomansi)',
   'entities.abilities.temporal_cascade.name': 'Riam Waktu',
   'entities.abilities.temporal_echo.description':
-    'Menandai sekutu dengan gema dari momen yang lebih sehat, memulihkan {damage} kesehatan sekaligus. Selama {duration} dtk, sebagian kerusakan Arkan yang kamu berikan ditarik kembali melalui gema untuk menyembuhkan mereka.',
+    'Menandai sekutu dengan gema dari momen yang lebih sehat, memulihkan {damage} kesehatan sekaligus. Selama {duration} dtk, {echoSinglePct}% kerusakan Arkan satu target lainnya dan {echoAreaPct}% kerusakan Arkan areamu menyembuhkan mereka. Gelombang Aether dan Panah Aether sebagai gantinya menyembuhkan sebesar {echoDriverPct}% dari kerusakan yang dihasilkan.',
   'entities.abilities.temporal_echo.name': 'Gema Waktu',
   'entities.abilities.temporal_hourglass.description':
     'Tempatkan jam pasir temporal di lokasi yang dipilih. Di bawah musuh, jam ini menangguhkan mereka selama {hostilePveDuration} dtk di PvE atau {hostilePvpDuration} dtk di PvP dan mencegah semua tindakan; kerusakan mematahkan efeknya. Di kakimu atau di bawah sekutu grup, jam ini memberikan stasis selama {duration} dtk, mencegah kerusakan dan tindakan, memulihkan {healing}% kesehatan maksimum, dan mempercepat pemulihan jeda sebesar {selfCooldownRecovery}% untukmu atau {allyCooldownRecovery}% untuk sekutu. Di tanah kosong, jam pasir menunggu selama {groundDuration} dtk dan mempengaruhi unit yang pertama kali menginjaknya. Aura menguntungkan dapat dihapus secara manual.',
@@ -13547,7 +13547,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sweepingStrikes':
     'Serangan bertarget tunggal juga menghantam {targets} musuh terdekat sebesar {pct}% kerusakan',
   'hudChrome.auraEffect.temporalEcho':
-    'Kerusakan Arkana dari perapal menyembuhkanmu sebesar {singlePct}% dari kerusakan bertarget tunggal atau {areaPct}% dari kerusakan area',
+    'Kerusakan Arkana dari perapal menyembuhkanmu sebesar {singlePct}% dari kerusakan bertarget tunggal atau {areaPct}% dari kerusakan area. Gelombang Aether dan Panah Aether mendapat bonus x4 pada Gema Temporal individual. Gema grup membuat cadangan penyembuhan yang sama, dibagikan menurut kesehatan yang hilang di antara sekutu bertanda dengan kesehatan di bawah 60%',
   'hudChrome.auraEffect.warlockAnchor':
     'Rapal ulang dalam radius {range} m untuk kembali ke sini dan mengonsumsi jangkar',
   'hudChrome.auraEffect.wintersChill':
@@ -14295,8 +14295,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.benison_dawnweave.bonus2': 'Penyelamatan Kewaspadaan Serafim menyembuhkan 270, naik dari 180. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.benison_dawnweave.bonus4': 'Saat Kewaspadaan Serafim terpicu, sekutunya juga dipulihkan sebesar 15 persen dari kesehatan maksimum mereka selama 10 detik.',
   'entities.itemSets.benison_dawnweave.name': 'Tenunan Fajar Berkah',
-  'entities.itemSets.chronoweave.bonus2': 'Gema Temporal mengubah 50 persen kerusakan Arkana satu target Anda menjadi penyembuhan. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
-  'entities.itemSets.chronoweave.bonus4': 'Waktu Pulih Lenyap Temporal berkurang 5 detik.',
+  'entities.itemSets.chronoweave.bonus2': 'Gema Temporal mengubah 50% kerusakan Arkana satu target lainnya menjadi penyembuhan. Gelombang Aether dan Panah Aether sebagai gantinya mengubah 200% dari kerusakan yang dihasilkan. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
+  'entities.itemSets.chronoweave.bonus4': 'Waktu pulih Lenyap Temporal berkurang 5 detik dan biaya mananya berkurang 30%.',
   'entities.itemSets.chronoweave.name': 'Busana Tenunan Aether',
   'entities.itemSets.cinderbark.bonus2': 'Cakar Sapu memiliki peluang 30 persen untuk menyimpan Darah Tua tambahan.',
   'entities.itemSets.cinderbark.bonus4': 'Patah Sumsum menghasilkan kerusakan 30 persen lebih besar, dan perlindungan daruratnya tidak lagi menggantikan serangan.',

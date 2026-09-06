@@ -2689,10 +2689,10 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Sposta il bersaglio di un istante fuori dal presente: un guscio temporale assorbe {damage} danni per 10 secondi prima che la linea del tempo scatti di ritorno.',
   'entities.abilities.temporal_barrier.name': 'Barriera Temporale',
   'entities.abilities.temporal_cascade.description':
-    "Invia un'eco in cascata attraverso il tuo gruppo: il bersaglio è fino a quattro alleati più vicini vengono curati contemporaneamente e ciascuno viene contrassegnato per {duration} secondi, convogliando parte dei danni Arcani che infliggi attraverso le loro echi per curarli. (Cronomanzia)",
+    "Invia un'eco in cascata attraverso il tuo gruppo: il bersaglio e fino a quattro alleati più vicini vengono curati contemporaneamente e ciascuno viene contrassegnato per {duration} secondi, convogliando parte dei danni Arcani che infliggi attraverso i loro echi per curarli. Impeto Etereo e Dardi Eterei creano una riserva di cure equivalente da ogni Eco di gruppo, distribuita in base alla salute mancante tra gli alleati marchiati con meno del 60% di salute. (Cronomanzia)",
   'entities.abilities.temporal_cascade.name': 'Cascata Temporale',
   'entities.abilities.temporal_echo.description':
-    "Contrassegna un alleato con l'eco di un momento più sano, curandolo di {damage} salute immediatamente. Per {duration} secondi, parte dei danni Arcani che infliggi viene convogliata attraverso l'eco per curarli.",
+    "Contrassegna un alleato con l'eco di un momento più sano, curandolo di {damage} salute immediatamente. Per {duration} secondi, il {echoSinglePct}% degli altri danni Arcani a bersaglio singolo e il {echoAreaPct}% dei danni Arcani ad area lo curano. Impeto Etereo e Dardi Eterei lo curano invece per il {echoDriverPct}% dei danni che infliggono.",
   'entities.abilities.temporal_echo.name': 'Eco Temporale',
   'entities.abilities.temporal_hourglass.description':
     "Posiziona una clessidra temporale nella posizione selezionata. Sotto un nemico, lo sospende per {hostilePveDuration} secondi in PvE o {hostilePvpDuration} secondi in PvP e impedisce qualsiasi azione; i danni interrompono l'effetto. Ai tuoi piedi o sotto un alleato del gruppo, concede la stasi per {duration} secondi, impedisce danni e azioni, ripristina il {healing}% della salute massima e fa recuperare i tempi di recupero del {selfCooldownRecovery}% più velocemente per te o del {allyCooldownRecovery}% più velocemente per un alleato. Sul terreno vuoto, la clessidra attende {groundDuration} secondi e colpisce la prima unità valida che vi sale sopra. L'aura benefica può essere rimossa manualmente.",
@@ -13626,7 +13626,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sweepingStrikes':
     'I colpi a bersaglio singolo colpiscono anche {targets} nemici vicini per il {pct}% dei danni',
   'hudChrome.auraEffect.temporalEcho':
-    'I danni Arcani del lanciatore ti curano per il {singlePct}% dei danni a bersaglio singolo o il {areaPct}% dei danni ad area',
+    'I danni Arcani del lanciatore ti curano per il {singlePct}% dei danni a bersaglio singolo o il {areaPct}% dei danni ad area. Impeto Etereo e Dardi Eterei ricevono un bonus x4 con un Eco Temporale individuale. Gli Echi di gruppo creano una riserva di cure equivalente, distribuita in base alla salute mancante tra gli alleati marchiati con meno del 60% di salute',
   'hudChrome.auraEffect.warlockAnchor':
     'Rilancia entro {range} metri per tornare qui e consumare l\'ancora',
   'hudChrome.auraEffect.wintersChill':
@@ -14343,8 +14343,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.benison_dawnweave.bonus2': 'La cura salvifica della Vigilanza Serafica sale a 270, da 180. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.benison_dawnweave.bonus4': 'Quando si attiva la Vigilanza Serafica, l’alleato viene curato anche del 15 percento della salute massima in 10 s.',
   'entities.itemSets.benison_dawnweave.name': 'Benedizione della Tessitura dell’Alba',
-  'entities.itemSets.chronoweave.bonus2': 'L’Eco Temporale converte il 50 percento dei danni arcani a bersaglio singolo in cure. I danni subiti non ritardano più il lancio degli incantesimi.',
-  'entities.itemSets.chronoweave.bonus4': 'Il tempo di recupero della Cascata Temporale è ridotto di 5 s.',
+  'entities.itemSets.chronoweave.bonus2': 'L’Eco Temporale converte il 50% degli altri danni Arcani a bersaglio singolo in cure. Impeto Etereo e Dardi Eterei convertono invece il 200% dei danni che infliggono. I danni subiti non ritardano più il lancio degli incantesimi.',
+  'entities.itemSets.chronoweave.bonus4': 'Il tempo di recupero della Cascata Temporale è ridotto di 5 s e il suo costo in mana del 30%.',
   'entities.itemSets.chronoweave.name': 'Vesti della Tessitura Eterea',
   'entities.itemSets.cinderbark.bonus2': 'Artigli Turbinanti hanno il 30 percento di probabilità di conservare un Sangue Antico aggiuntivo.',
   'entities.itemSets.cinderbark.bonus4': 'Frattura del Midollo infligge il 30 percento di danni in più e la sua guardia d’emergenza non sostituisce più il colpo.',

@@ -2744,7 +2744,7 @@ export const pt_BR: EnTranslations = {
       "suddenDeath": "Sua próxima Cova Prematura não custa Raiva e ignora seu requisito de vida",
       "aoeEcho": "Restam {charges} ecos: habilidades de alvo único causam {pct}% de dano a até {targets} inimigos próximos",
       "sureCrit": "{charges} lançamentos de habilidades que causam dano são acertos críticos garantidos",
-      "temporalEcho": "O dano Arcano do conjurador cura você em {singlePct}% do dano de alvo único ou {areaPct}% do dano em área",
+      "temporalEcho": "O dano Arcano do conjurador cura você em {singlePct}% do dano de alvo único ou {areaPct}% do dano em área. Surto de Éter e Dardos de Éter recebem um bônus de x4 com um Eco Temporal individual. Ecos de grupo criam uma reserva de cura equivalente, distribuída conforme a vida perdida entre aliados marcados com menos de 60% de vida",
       "arcaneCharge": "{stacks} Cargas Arcanas: Onda de Éter causa {damagePct}% mais dano, conjura {castPct}% mais rápido e custa {costMult}x de mana",
       "physicalReduction": "Reduz o dano Físico sofrido em {pct}%",
       "temporalHourglass": "Imune e incapaz de agir; restaura vida e acelera a recuperação de recarga. Clique com o botão direito para cancelar.",
@@ -11589,11 +11589,11 @@ export const pt_BR: EnTranslations = {
       },
       "temporal_echo": {
         "name": "Eco Temporal",
-        "description": "Marca um aliado com o eco de um momento mais saudável, restaurando {damage} de vida imediatamente. Por {duration} s, parte do dano Arcano que você causar é revertida pelo eco para curá-lo."
+        "description": "Marca um aliado com o eco de um momento mais saudável, restaurando {damage} de vida imediatamente. Por {duration} s, {echoSinglePct}% do seu outro dano Arcano de alvo único e {echoAreaPct}% do seu dano Arcano em área o curam. Surto de Éter e Dardos de Éter curam em vez disso {echoDriverPct}% do dano que causam."
       },
       "temporal_cascade": {
         "name": "Cascata Temporal",
-        "description": "Envia um eco em cascata pelo seu grupo: o alvo e até quatro dos aliados mais próximos são curados de uma vez, e cada um fica marcado por {duration} s, canalizando parte do dano Arcano que você causar de volta pelos seus ecos para curá-los. (Cronomancia)"
+        "description": "Envia um eco em cascata pelo seu grupo: o alvo e até quatro dos aliados mais próximos são curados de uma vez, e cada um fica marcado por {duration} s, canalizando parte do dano Arcano que você causar de volta pelos seus ecos para curá-los. Surto de Éter e Dardos de Éter criam uma reserva de cura equivalente para cada Eco de grupo, distribuída conforme a vida perdida entre aliados marcados com menos de 60% de vida. (Cronomancia)"
       },
       "temporal_reversal": {
         "name": "Reversão Temporal",
@@ -18985,8 +18985,8 @@ export const pt_BR: EnTranslations = {
       },
       "chronoweave": {
         "name": "Vestes da Trama Etérea",
-        "bonus2": "Eco Temporal converte 50% do seu dano Arcano de alvo único em cura. Dano sofrido não atrasa mais suas conjurações.",
-        "bonus4": "O tempo de recarga da Cascata Temporal é reduzido em 5 s."
+        "bonus2": "Eco Temporal converte 50% do seu outro dano Arcano de alvo único em cura. Surto de Éter e Dardos de Éter convertem em vez disso 200% do dano que causam. Dano sofrido não atrasa mais suas conjurações.",
+        "bonus4": "O tempo de recarga da Cascata Temporal é reduzido em 5 s e seu custo de mana em 30%."
       },
       "cinderbark": {
         "name": "Proteção de Casca de Brasa",
