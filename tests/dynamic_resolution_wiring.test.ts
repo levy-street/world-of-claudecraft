@@ -158,4 +158,35 @@ describe('dynamic resolution renderer wiring', () => {
     expect(renderer).toContain('(this.tmpV.x * 0.5 + 0.5) * this.viewport.width');
     expect(renderer).toContain('(-this.tmpV.y * 0.5 + 0.5) * this.viewport.height');
   });
+
+  it('reports the allocated drawing buffer, with the sub-rect flag and no layout read', () => {
+    // What perfStats says a session rasterizes: the canvas backing store beside
+    // the CSS viewport the renderer already caches. perfStats is read at boot,
+    // by the ~1 Hz metrics sampler and by the prewarm headroom poll, so a
+    // getBoundingClientRect here would be a layout read on a repeating path;
+    // the cached `this.viewport` is the sanctioned source.
+    //
+    // The flag is the load-bearing member. On this file's own subject, the
+    // dynamic path, `applyResolution` allocates at the manual ceiling and only
+    // `applyRenderRegion` moves the live extent, so the buffer alone reports a
+    // backed-off session at full size. Nothing downstream can recover the
+    // difference: supportsDynamicResolution comes from the post chain's pass
+    // list, not from the tier the report carries.
+    expect(renderer).toContain(
+      [
+        'drawingBuffer: {',
+        '  width: this.webgl.domElement.width,',
+        '  height: this.webgl.domElement.height,',
+        '  cssWidth: this.viewport.width,',
+        '  cssHeight: this.viewport.height,',
+        '  dynamicResolution: this.post?.supportsDynamicResolution === true,',
+        '},',
+      ].join('\n      '),
+    );
+    // The same predicate the allocation branches on, so the flag cannot drift
+    // from the path it describes.
+    expect(methodSource('private applyRenderRegion(): void')).toContain(
+      'post?.supportsDynamicResolution',
+    );
+  });
 });

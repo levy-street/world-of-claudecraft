@@ -625,6 +625,21 @@ function payloadFromSnapshot(
       rendererFoliage: renderer.foliage,
       rendererBudget: renderer.renderBudget,
       rendererQualityBuckets: renderer.qualityBuckets,
+      // The resolution the 3D scene is drawn at. The columns above cannot say
+      // it: `dpr` is the raw window.devicePixelRatio, never the renderer's
+      // capped ratio, and the viewport columns are window.innerWidth/Height,
+      // never the canvas rect. `dynamicResolution` rides along because a
+      // governor-backed-off session allocates at the manual ceiling and
+      // rasterizes a sub-rect, so without the flag it would read as full size
+      // (the reconstruction rule is on DrawingBufferStats). Five bounded
+      // scalars in rawSummary, the no-DDL home: no column, no metric.
+      rendererDrawingBuffer: {
+        width: renderer.drawingBuffer.width,
+        height: renderer.drawingBuffer.height,
+        cssWidth: renderer.drawingBuffer.cssWidth,
+        cssHeight: renderer.drawingBuffer.cssHeight,
+        dynamicResolution: renderer.drawingBuffer.dynamicResolution,
+      },
       rendererDiagnostics: renderer.renderDiagnostics,
       // The summary above is the whole prewarm payload. The live stats object
       // used to ride along beside it as `rendererPrewarm`, from before the
