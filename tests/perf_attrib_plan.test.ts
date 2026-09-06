@@ -26,6 +26,8 @@ const EXPECTED_LOW_OVERRIDES = {
   surfaceDetail: 'surfaceDetail:0',
   surfaceDetailTaps: 'surfaceDetailTaps:0',
   surfaceDetailClampK: 'surfaceDetailClampK:0',
+  anisotropy: 'anisotropy:1',
+  normalAnisotropy: 'normalAnisotropy:1',
   terrainRelief: 'terrainRelief:0',
   bladeCarpetRadius: 'bladeCarpetRadius:0',
   cliffScree: 'cliffScree:0',

@@ -500,6 +500,52 @@ describe('graphics tier resolution', () => {
     expect(constrainedInsane.shadowMap).toBe(2048);
   });
 
+  it('ladders texture anisotropy per tier, with normals at half the colour budget', () => {
+    const rungs = {
+      low: gfxInternalsForTest.settingsFor('low'),
+      medium: gfxInternalsForTest.settingsFor('medium'),
+      high: gfxInternalsForTest.settingsFor('high'),
+      ultra: gfxInternalsForTest.settingsFor('ultra'),
+      insane: gfxInternalsForTest.settingsFor('insane'),
+    };
+
+    expect(
+      Object.fromEntries(
+        Object.entries(rungs).map(([tier, s]) => [tier, [s.anisotropy, s.normalAnisotropy]]),
+      ),
+    ).toEqual({
+      low: [1, 1],
+      medium: [2, 1],
+      high: [4, 2],
+      ultra: [8, 4],
+      insane: [8, 4],
+    });
+
+    // The two memory profiles take the low budget whatever tier the player
+    // picked: a phone-class browser and every iOS WebKit host are the most
+    // bandwidth-bound devices in the fleet.
+    const phone = { maxTouchPoints: 5, coarsePointer: true, narrowViewport: true };
+    for (const tier of ['medium', 'high', 'ultra', 'insane'] as const) {
+      const constrained = gfxInternalsForTest.settingsFor(tier, phone);
+      const ios = gfxInternalsForTest.settingsFor(tier, { platform: 'ios' });
+      expect([constrained.anisotropy, constrained.normalAnisotropy], tier).toEqual([1, 1]);
+      expect([ios.anisotropy, ios.normalAnisotropy], tier).toEqual([1, 1]);
+    }
+
+    // Monotone with the tier ladder, and never below the 1 tap that means
+    // "isotropic": a future top tier keeps the ceiling rather than falling
+    // through to a lower rung.
+    const ladder = [rungs.low, rungs.medium, rungs.high, rungs.ultra, rungs.insane];
+    for (let i = 1; i < ladder.length; i++) {
+      expect(ladder[i].anisotropy).toBeGreaterThanOrEqual(ladder[i - 1].anisotropy);
+      expect(ladder[i].normalAnisotropy).toBeGreaterThanOrEqual(ladder[i - 1].normalAnisotropy);
+    }
+    for (const s of ladder) {
+      expect(s.normalAnisotropy).toBe(Math.max(1, s.anisotropy / 2));
+      expect(s.normalAnisotropy).toBeGreaterThanOrEqual(1);
+    }
+  });
+
   it('sheds the memory-spike knobs on constrained (phone-class) browsers, cosmetics only', () => {
     // A phone-class hint set (touch + coarse pointer): matches iOS WebKit, whose
     // per-process memory ceiling kills the WebContent process at world entry.

@@ -41,6 +41,7 @@
 // the line clean: the old clip ran per FACE on a mesh whose lower half is a
 // handful of big triangles, and no amount of subdivision fixed the sawtooth.
 import * as THREE from 'three';
+import { applyTextureAnisotropy } from '../texture_anisotropy';
 import {
   type BeardDecal,
   type Gender,
@@ -585,7 +586,7 @@ export function decalTextureFromData(
   // The projection oversamples the jaw badly (see the unwrap note), so one
   // screen pixel can span many texels one way and few the other. Without
   // anisotropy that reads as a blurred chin.
-  tex.anisotropy = 8;
+  applyTextureAnisotropy(tex, 'colour');
   tex.needsUpdate = true;
   textureCache.set(key, tex);
   return tex;

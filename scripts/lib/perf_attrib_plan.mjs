@@ -13,6 +13,8 @@ export const PERF_ATTRIB_KNOB_CASES = [
   { knob: 'surfaceDetail', gfxo: 'surfaceDetail:0' },
   { knob: 'surfaceDetailTaps', gfxo: 'surfaceDetailTaps:0' },
   { knob: 'surfaceDetailClampK', gfxo: 'surfaceDetailClampK:0' },
+  { knob: 'anisotropy', gfxo: 'anisotropy:1' },
+  { knob: 'normalAnisotropy', gfxo: 'normalAnisotropy:1' },
   { knob: 'terrainRelief', gfxo: 'terrainRelief:0' },
   { knob: 'bladeCarpetRadius', gfxo: 'bladeCarpetRadius:0' },
   { knob: 'cliffScree', gfxo: 'cliffScree:0' },

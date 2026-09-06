@@ -43,6 +43,7 @@ import {
 import { patchCanopyDetailShaderSource } from './foliage_shader_core';
 import { GFX, type GfxSettings } from './gfx';
 import { renderLayerDisabled } from './render_dev_flags';
+import { applyTextureAnisotropy } from './texture_anisotropy';
 
 const CANOPY_TEXTURE_DIR = '/textures/foliage/';
 const CANOPY_TEXTURE_PREFIX = 'Moss002';
@@ -149,7 +150,7 @@ export function prepareCanopyDetailProfileAssets(target: Readonly<GfxSettings>):
       repeat: true,
     }).then((tex) => {
       const t = tex.clone();
-      t.anisotropy = 4;
+      applyTextureAnisotropy(t, 'normal');
       t.needsUpdate = true;
       return t;
     });

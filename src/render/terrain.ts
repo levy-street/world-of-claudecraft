@@ -74,6 +74,7 @@ import {
   type WorldRect,
 } from './terrain_region_core';
 import { terrainSplatPresence, terrainSplatPresenceMask } from './terrain_splat_presence_core';
+import { applyTextureAnisotropy } from './texture_anisotropy';
 import { groundDetailTexture, groundSplatMaps, macroNoiseTexture } from './textures';
 import { disposeZoneBuildPool, zoneBuildPool } from './zone_build_pool';
 
@@ -112,8 +113,6 @@ const IDLE_BUILD_TIMEOUT_MS = 200;
 
 const TERRAIN_TEX: Record<string, THREE.Texture> = {};
 const terrainTexTasks = new Map<string, Promise<void>>();
-const ALBEDO_ANISOTROPY = 8;
-const NORMAL_ANISOTROPY = 4;
 
 function prepareTerrainTex(key: string, file: string, srgb: boolean): Promise<void> {
   if (TERRAIN_TEX[key]) return Promise.resolve();
@@ -140,7 +139,7 @@ function prepareTerrainTex(key: string, file: string, srgb: boolean): Promise<vo
       : loadTexture(url, { srgb, repeat: true })
   )
     .then((tex: THREE.Texture) => {
-      tex.anisotropy = srgb ? ALBEDO_ANISOTROPY : NORMAL_ANISOTROPY;
+      applyTextureAnisotropy(tex, srgb ? 'colour' : 'normal');
       TERRAIN_TEX[key] = tex;
     })
     .catch((err) => {
@@ -410,7 +409,7 @@ function terrainNormalTexture(): THREE.DataTexture {
   // rebakeNormalRegion re-upload regenerates it automatically.
   tex.minFilter = THREE.LinearMipmapLinearFilter;
   tex.generateMipmaps = true;
-  tex.anisotropy = NORMAL_ANISOTROPY;
+  applyTextureAnisotropy(tex, 'normal');
   tex.needsUpdate = true;
   return tex;
 }
@@ -807,7 +806,7 @@ function buildSplatAlbedoArray(t: Record<string, THREE.Texture>): SplatAlbedoArr
   texture.magFilter = THREE.LinearFilter;
   texture.minFilter = THREE.LinearMipmapLinearFilter;
   texture.generateMipmaps = true;
-  texture.anisotropy = ALBEDO_ANISOTROPY;
+  applyTextureAnisotropy(texture, 'colour');
   texture.needsUpdate = true;
   splatAlbedoCache?.texture.dispose();
   splatAlbedoCache = { texture, grassMean, complete };

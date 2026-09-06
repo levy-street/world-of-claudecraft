@@ -23,6 +23,8 @@ const settings = {
   surfaceDetail: true,
   surfaceDetailTaps: 4,
   surfaceDetailClampK: 1,
+  anisotropy: 8,
+  normalAnisotropy: 4,
   terrainRelief: 3,
   bladeCarpetRadius: 34,
   cliffScree: true,
@@ -58,6 +60,8 @@ describe('gfx override parsing', () => {
           'surfaceDetail:0',
           'surfaceDetailTaps:0',
           'surfaceDetailClampK:0.65',
+          'anisotropy:2',
+          'normalAnisotropy:1',
           'terrainRelief:2',
           'bladeCarpetRadius:24',
           'cliffScree:0',
@@ -89,6 +93,8 @@ describe('gfx override parsing', () => {
       surfaceDetail: false,
       surfaceDetailTaps: 0,
       surfaceDetailClampK: 0.65,
+      anisotropy: 2,
+      normalAnisotropy: 1,
       terrainRelief: 2,
       bladeCarpetRadius: 24,
       cliffScree: false,
@@ -193,13 +199,17 @@ describe('gfx override application', () => {
     // ultra, 3 on ultra and the Advanced default mix, 6 on insane. Named pins
     // for it live in tests/gfx.test.ts and
     // tests/canopy_detail_tier_core.test.ts.
+    // Regenerated across the board again for the anisotropy/normalAnisotropy
+    // ladder (texture_anisotropy.ts reads it; the per-tier values are pinned
+    // by tests/gfx.test.ts). Every profile moves by a VALUE here, since the
+    // ladder differs on every rung of the tier ladder.
     expect(hashes).toEqual({
-      low: '1b4559cd53dfa04a243eabb5bb01d2843cf7a0a9a2205e02110910e37cd6f42f',
-      medium: '3c859917380988dde4dc455aea2efb3391e987e952b64f039e973308ead2ad21',
-      high: '287d510dd2ec26b7ae8c8d7fa9f1642ae2cedef3ec86dcae897535952d501017',
-      ultra: 'b64b55668c28b2d0eaaa95580885b4276e99b2aa95f6777303922a6cf2116f22',
-      insane: '7ec7889501315477ef4f107088b0f618dd16d7c40e9ccb9712b27d5d8a3d93e3',
-      advanced: '7d357c28f5aa9b54c6190a1e12dd274c0a05c0b804ac349990a6a50f768f5da1',
+      low: '9204c503248f42e93a8a4c5fff97df43e32bc859a51d20480f0e9a96ffd91d70',
+      medium: '63cf76bd0e6fb1958e4cde6d8522944390b6931af13bd279a99ae7f5e4142ff4',
+      high: '487858152c65488c4a5a62963d0fc55c7d6d55083f2a5d523ec55121ed37ffa8',
+      ultra: '5614cf82beac1c13130b00c862c2bda2c375b3b696554d00f48a9dacb6278335',
+      insane: '16e8959af509aad0f37cdefd3cfd8bb6f362ef5cc4f283611d40addaaf64176a',
+      advanced: '372c473a449ab58d3eea024175e20274f829c942ed30a6339997426e5d40cf21',
     });
   });
 
