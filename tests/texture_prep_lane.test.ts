@@ -316,7 +316,9 @@ describe('the gates that run the lane (source pins)', () => {
     // Upload and touch ride the SAME priority the link did (imminent or not),
     // so an imminent key's tail cannot fall behind the lane its link overtook.
     const host = read('../src/render/reveal_compile_host.ts');
-    const gateAt = host.indexOf('const linked = deps.gate(');
+    // The gate call sits behind the warm-worker branch now (the pieces are
+    // warmed then gated, or gated directly); either arm is deps.gate.
+    const gateAt = host.indexOf('const linked = arms');
     const uploadAt = host.indexOf(
       '.then((gate) => deps.upload(target, priority).then(() => gate))',
     );

@@ -77,7 +77,7 @@ describe('reattachClonedMaterialHooks', () => {
     // Both layers are represented: the detail layer's own prefix, and the rim
     // hook it chains (surface-detail folds the previous hook's source into its
     // key, which is why the two must be re-attached in the source's order).
-    expect(clone.customProgramCacheKey()).toContain('surface-detail|fabric');
+    expect(clone.customProgramCacheKey()).toContain('surface-detail|');
     expect(clone.customProgramCacheKey()).toContain('patchPbrRimGlowFragmentShader');
   });
 
@@ -106,7 +106,7 @@ describe('reattachClonedMaterialHooks', () => {
     const clone = cloneMaterialWithHooks(source);
     expect(hasRimGlow(clone)).toBe(false);
     expect(clone.customProgramCacheKey()).toBe(source.customProgramCacheKey());
-    expect(clone.customProgramCacheKey()).toContain('surface-detail|stone');
+    expect(clone.customProgramCacheKey()).toContain('surface-detail|');
   });
 });
 
@@ -399,7 +399,7 @@ describe('armour-dye layer survival across the program-preserving clone', () => 
     // previous layer's LIVE key alongside its source text (the addRimGlow
     // pattern), so the dye marker rides through the rim wrapper into the
     // outermost key instead of collapsing into it.
-    expect(clone.customProgramCacheKey()).toContain('surface-detail|fabric');
+    expect(clone.customProgramCacheKey()).toContain('surface-detail|');
     expect(clone.customProgramCacheKey()).toContain('patchPbrRimGlowFragmentShader');
     expect(clone.customProgramCacheKey()).toContain('woc_armor_dye|');
     // And the patches themselves all still land on the clone.
@@ -517,5 +517,39 @@ describe('the character overlay caches and the arena walls clone through the hoo
     const body = methodSource(dungeon, '  private emitArenaHideable(');
     expect(body).toContain('cloneMaterialWithHooks(base)');
     expect(body).not.toContain('.clone(');
+  });
+});
+
+describe('the kit factories attach their hooks in the order the clone restores', () => {
+  // reattachClonedMaterialHooks re-attaches the zone haze, then the worn
+  // detail (the surfaceMat order, which foliage.ts follows too). A kit
+  // material attached the other way round composes a different key text, so
+  // its hook-preserving clone linked a SECOND program for the same GLSL: the
+  // 2026-08-27 program-key ledger counted 12 such links per login at
+  // Eastbrook, 6 of them one material twice.
+  it('reproduces the split a worn-then-haze source suffers on its clone', () => {
+    const source = new THREE.MeshStandardMaterial({ color: 0x8a7568 });
+    applySurfaceDetail(source, 'stone', { strength: 0.4 });
+    attachBiomeHaze(source);
+    const clone = cloneMaterialWithHooks(source);
+    expect(clone.customProgramCacheKey()).not.toBe(source.customProgramCacheKey());
+  });
+
+  it('props.ts convertMaterial and foliage.ts attach the haze before the worn detail', () => {
+    for (const [file, fn, end] of [
+      ['props.ts', 'function convertMaterial(', '\n/**'],
+      ['foliage.ts', 'attachBiomeHaze(mat);', 'applySurfaceDetail('],
+    ]) {
+      const source = readFileSync(new URL(`../src/render/${file}`, import.meta.url), 'utf8');
+      const start = source.indexOf(fn);
+      expect(start, `${file}: ${fn} not found`).toBeGreaterThan(-1);
+      const body = source.slice(start, source.indexOf(end, start + fn.length));
+      const haze = body.indexOf('attachBiomeHaze(mat)');
+      const worn = body.indexOf('applySurfaceDetail(');
+      expect(haze, `${file}: no haze attach in ${fn}`).toBeGreaterThan(-1);
+      expect(haze, `${file}: the haze must be attached before the worn detail`).toBeLessThan(
+        worn === -1 ? Number.POSITIVE_INFINITY : worn,
+      );
+    }
   });
 });

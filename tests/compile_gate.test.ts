@@ -345,6 +345,29 @@ describe('CompileGateQueue.runPieces', () => {
     ]);
   });
 
+  it('labels a gate submitted in several calls as one whole submission would have', async () => {
+    // The shader warm gate submits a root one piece at a time, as each piece's
+    // programs come back warm (shader_warm_gate.ts). Without the first index
+    // every one of those calls would label its unit `:0`, and the per-kind
+    // cost model would read one gate of many pieces as many gates of one.
+    const { units, sharedQueue } = recordingSharedQueue();
+    const queue = new CompileGateQueue(sharedQueue);
+    const options = { priority: 20, label: 'reveal-gate:Kit' };
+    const piece = () => Promise.resolve();
+
+    await queue.runPieces([piece], 1500, options, 2);
+    await queue.runPieces([piece], 1500, options, 0);
+    // A call of several pieces counts up from its own first index.
+    await queue.runPieces([piece, piece], 1500, options, 5);
+
+    expect(units.map((unit) => unit.label)).toEqual([
+      'reveal-gate:Kit:2',
+      'reveal-gate:Kit:0',
+      'reveal-gate:Kit:5',
+      'reveal-gate:Kit:6',
+    ]);
+  });
+
   it('fails the gate when any piece rejects or throws, still settling every other piece', async () => {
     const { sharedQueue } = recordingSharedQueue();
     const queue = new CompileGateQueue(sharedQueue);

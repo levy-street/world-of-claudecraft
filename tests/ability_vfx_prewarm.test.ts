@@ -154,24 +154,52 @@ describe('the renderer wires the units into the prewarm resume lane', () => {
   const entryStart = renderer.indexOf("id: 'vfx.ability-primitives'");
   const entry = renderer.slice(renderer.lastIndexOf('{', entryStart), entryStart + 2000);
 
-  it('retains texture and program units, never the visible spawn', () => {
+  it('retains texture units as cosmetic and program units as debt, never the visible spawn', () => {
     expect(entryStart).toBeGreaterThan(-1);
-    const unitsStart = entry.indexOf('resumeUnits: () => [');
+    const unitsStart = entry.indexOf('resumeUnits: () =>');
     expect(unitsStart).toBeGreaterThan(-1);
-    const units = entry.slice(unitsStart, entry.indexOf('\n        ],', unitsStart));
+    const programsStart = entry.indexOf('resumeProgramUnits: () =>', unitsStart);
+    expect(programsStart).toBeGreaterThan(unitsStart);
+    const units = entry.slice(unitsStart, programsStart);
     expect(units).toContain('abilityVfxTexturePrewarmSteps()');
     expect(units).toContain('this.prewarmTexture(texture)');
-    expect(units).toContain('collectAbilityVfxCompileTargets(this.scene)');
-    expect(units).toContain('this.compilePrewarmColorPrograms(target.object, false)');
+    // The program links are the debt arm (cast_vfx_prewarm.ts): the lazy
+    // stand-ins' stage + link, then one unit per pooled program.
+    expect(entry.slice(programsStart)).toContain(
+      'resumeProgramUnits: () => [...abilityMaterialSlot.resumeUnits(), ...castVfxUnits()],',
+    );
+    expect(renderer).toContain(
+      'castVfxProgramUnits(this.scene, abilityMaterialSlot.group, this.compileArms, this.webgl);',
+    );
+    // run() links the same set behind the curtain; the spawn binds textures only.
+    expect(entry).toContain('await Promise.all(castVfxUnits().map((unit) => unit.run()));');
     // Replaying prewarmSpawn live would pop a white primitive burst.
     expect(units).not.toContain('prewarmSpawn');
+    expect(entry.slice(programsStart, entry.indexOf('run: async'))).not.toContain('prewarmSpawn');
   });
 
   it('hands a policy-skipped entry its units instead of dropping them', () => {
-    expect(renderer).toContain('const skipUnits = prewarmEntryResumesAfterSkip(entry.id, policy)');
+    expect(renderer).toContain('const resumes = prewarmEntryResumesAfterSkip(entry.id, policy);');
+    expect(renderer).toContain('if (resumes) dropEntry(entry, skipUnits);');
+    // dropEntry keeps the entry's own units in its class and hands the
+    // program units over as `programs.<id>` debt (prewarm_policy.ts).
     expect(renderer).toContain(
-      'if (skipUnits.length > 0) droppedEntries.push({ id: entry.id, units: skipUnits });',
+      'if (units.length > 0) droppedEntries.push({ id: entry.id, units });',
     );
+    expect(renderer).toContain(
+      'droppedProgramEntries.push({ id: `programs.${entry.id}`, units: programs });',
+    );
+    // ... pushed between the compile remainder and the hidden catalogs.
+    const submitAt = renderer.indexOf(
+      "id: 'programs.compile-submit',\n        units: deferredSubmitUnits",
+    );
+    const programsAt = renderer.indexOf('droppedEntries.push(...droppedProgramEntries);');
+    const postPaintAt = renderer.indexOf(
+      "id: 'programs.compile-post-paint',\n        units: postPaintCompileUnits",
+    );
+    expect(submitAt).toBeGreaterThan(-1);
+    expect(programsAt).toBeGreaterThan(submitAt);
+    expect(postPaintAt).toBeGreaterThan(programsAt);
     // The summary stays honest about what a skip deferred rather than dropped.
     const detailAt = renderer.indexOf('constrained-minimal;resume=');
     expect(detailAt).toBeGreaterThan(-1);

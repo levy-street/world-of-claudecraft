@@ -97,6 +97,15 @@ export interface AbilityVfxDeps {
   // gesture below: without an authored clip, triggerAttack would fall back to
   // a weapon swing, which a blessing must never read as. Optional for tests.
   hasGestureClip?: (entityId: number, abilityId: string) => boolean;
+  // Whether a cast may draw at all: false while a program the pooled
+  // primitives or the lazy spell stand-ins need is still unlinked (the boot
+  // manifest missed them and the resume lane has not reached them yet), so a
+  // first cast never links a program cold on a live frame. The renderer's
+  // cast_vfx_readiness_core decides; optional for tests (always admitted).
+  castVfxAdmit?: () => boolean;
+  // The same answer for the per-frame syncEntity consult, uncounted (a
+  // refusal is a cast, not a frame). Defaults to castVfxAdmit.
+  castVfxReady?: () => boolean;
   // True when the ability resolves with no cast bar (no cast time, channel, or
   // empower hold). Only these get the synthetic pre-release windup phase: a
   // real cast already performed its ceremony through the live castingAbility
@@ -224,6 +233,11 @@ const CAST_FX = new Set([
 // spawnAoeRing radius in yards per spec ringScale unit (rg 2 = the classic
 // 8 yd warrior shout ring).
 const RING_RADIUS_PER_SCALE = 4;
+
+/** The tier a REFUSED cast plans at: the most degraded one, so resolving a
+ *  plan for the telegraphs the refusal still owes never charges the cast
+ *  budget. Neither the area ring nor a rig clip varies with it. */
+const REFUSED_CAST_TIER = 2;
 
 // Palette to school mapping for the pooled point-light flashes (the renderer's
 // pulseAt is school-colored).
@@ -499,10 +513,25 @@ export class AbilityVfx {
 
   // Returns true when this painter fully handled the event (the renderer skips
   // its generic school-colored arm), false to fall through unchanged.
+  private admitted(): boolean {
+    return this.deps.castVfxAdmit?.() ?? true;
+  }
+
+  private ready(): boolean {
+    return (this.deps.castVfxReady ?? this.deps.castVfxAdmit)?.() ?? true;
+  }
+
   handleSpellfx(ev: AbilityVfxSpellfxEvent): boolean {
     if (!ev.ability || !CAST_FX.has(ev.fx)) return false;
     const spec = abilityVfxSpecFor(ev.ability);
     if (!spec) return false;
+    // Claimed and drawn as nothing: the generic arm would link cold too. Two
+    // reads survive the refusal, for the same reason the point-anchored ring
+    // survives it in handleSpellfxAt below, and neither costs a cast program.
+    if (!this.admitted()) {
+      this.refusedTelegraphs(ev, spec);
+      return true;
+    }
     const full = abilityVfxFullSpecFor(ev.ability);
     // Beam-archetype channels (mind rays, drains) never fly a projectile:
     // every tick's cast-fx event feeds the channel tracker, which draws the
@@ -880,6 +909,18 @@ export class AbilityVfx {
     if (ev.fx !== 'nova' && ev.fx !== 'burst' && ev.fx !== 'tick') return false;
     const spec = abilityVfxSpecFor(ev.ability);
     if (!spec) return false;
+    if (!this.admitted()) {
+      // The terrain-draped area ring is an actionable telegraph (the blast
+      // AREA the player steps out of): its pool is linked at boot and never
+      // waits on the cast programs, so it draws even while the rest is held.
+      // With the plan's colour, or the same cast would read one colour on a
+      // held gate and another on an open one.
+      if (ev.radius) {
+        const held = planCast(spec, this.quality, REFUSED_CAST_TIER);
+        this.deps.spawnAoeRing(ev.x, ev.z, ev.radius, ev.school, held.color);
+      }
+      return true;
+    }
     const casterId = ev.sourceId ?? -1;
     const fx = this.deps.fx;
     const gy = fx.groundYAt(ev.x, ev.z);
@@ -1039,7 +1080,7 @@ export class AbilityVfx {
   // special whose ONLY event is its hit - that contact IS its cast, so it
   // charges the cast budget (deduped) and runs the full sequence.
   onDamage(ev: AbilityVfxDamageEvent): void {
-    if (ev.kind !== 'hit' || ev.amount <= 0) return;
+    if (ev.kind !== 'hit' || ev.amount <= 0 || !this.admitted()) return;
     const nowSec = this.now();
     const local = this.deps.localPlayerId?.() === ev.sourceId;
     if (!ev.ability) {
@@ -1151,6 +1192,8 @@ export class AbilityVfx {
   // anything not refreshed this frame, so there is no teardown bookkeeping.
   // Allocation-free per call.
   syncEntity(e: AbilityVfxEntityState, renderEffects = true): void {
+    // The held state below is kept either way; only the draws wait.
+    const gateHeld = renderEffects && !this.ready();
     const fx = this.deps.fx;
     let held = this.heldSemantic.get(e.id);
     if (!held) {
@@ -1165,8 +1208,15 @@ export class AbilityVfx {
     }
     const castingWasHeld = e.castingAbility !== null && held.castingAbility === e.castingAbility;
     const queuedWasHeld = e.queuedOnSwing != null && held.queuedOnSwing === e.queuedOnSwing;
-    if (!renderEffects) {
-      fx.sleepEntity(e.id);
+    if (gateHeld || !renderEffects) {
+      // A culled rig is off screen and drops everything with it (the
+      // pre-existing skip). A gate-held one is on screen and only its COSMETIC
+      // reads wait, so the sleep keeps its hard-CC band and the hold below
+      // refreshes it in place: a stun, fear or root is information the player
+      // acts on, and drawing it may link the overlay program cold once, which
+      // is the same trade the area ring already makes.
+      fx.sleepEntity(e.id, gateHeld);
+      if (gateHeld) this.holdWornCcBand(e, fx);
       this.latchHeldState(held, e);
       return;
     }
@@ -1367,25 +1417,7 @@ export class AbilityVfx {
       }
       bands++;
     }
-    // The hard-CC tell: a worn stun, fear, or root aura wears its band for the
-    // aura's whole life. Matched by what the SIM says the victim is suffering
-    // (aura kind, plus the sim's own fear rule for the fear family), never the
-    // spec table, so every source reads (mob stomps, ensnare affixes and traps
-    // included) and it works online for any victim in interest range, exactly
-    // like the bands above. Actionable information: it rides outside the cast
-    // budget, every quality tier keeps it, and the fx engine sweeps it the
-    // frame the aura fades. One band per victim, the most severe the victim
-    // wears, which is also what keeps a stunned target (always isRooted() in
-    // the sim) from wearing two. A dead body sheds it (an unbreakable stun can
-    // survive death by design, e.g. the Nythraxis transition ghosts; a corpse
-    // must not wear a frozen band). Deadness is the renderer's own
-    // isVisuallyDead rule, not a bare `dead` flag: a mob at 0 hp whose flag
-    // has not landed yet would otherwise keep the band for that window.
-    // CC_BAND_SPECS in the core owns each band's look and why.
-    if (!isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 })) {
-      const band = wornCcBand(e.auras);
-      if (band) fx.holdCcBand(e.id, band.type, band.remaining);
-    }
+    this.holdWornCcBand(e, fx);
     // On-next-swing queue (heroic-strike style): while the sim's queuedOnSwing
     // flag is armed, the queued ability's authored orbit rides the caster as
     // the empowerment tell - Reaver Strike's hot amber weaponGlow ember that
@@ -1441,6 +1473,28 @@ export class AbilityVfx {
         if (nowSec - ch.lastAt > ch.every * 1.9 + 0.25) this.beamChannels.delete(id);
       }
     }
+  }
+
+  // The hard-CC tell: a worn stun, fear, or root aura wears its band for the
+  // aura's whole life. Matched by what the SIM says the victim is suffering
+  // (aura kind, plus the sim's own fear rule for the fear family), never the
+  // spec table, so every source reads (mob stomps, ensnare affixes and traps
+  // included) and it works online for any victim in interest range, exactly
+  // like the orbit bands. Actionable information: it rides outside the cast
+  // budget, every quality tier keeps it, the closed cast gate keeps it too
+  // (only a culled rig drops it), and the fx engine sweeps it the frame the
+  // aura fades. One band per victim, the most severe the victim wears, which
+  // is also what keeps a stunned target (always isRooted() in the sim) from
+  // wearing two. A dead body sheds it (an unbreakable stun can survive death
+  // by design, e.g. the Nythraxis transition ghosts; a corpse must not wear a
+  // frozen band). Deadness is the renderer's own isVisuallyDead rule, not a
+  // bare `dead` flag: a mob at 0 hp whose flag has not landed yet would
+  // otherwise keep the band for that window. CC_BAND_SPECS in the core owns
+  // each band's look and why.
+  private holdWornCcBand(e: AbilityVfxEntityState, fx: AbilityVfxFx): void {
+    if (isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 })) return;
+    const band = wornCcBand(e.auras);
+    if (band) fx.holdCcBand(e.id, band.type, band.remaining);
   }
 
   private latchHeldState(held: AbilityVfxHeldSemanticState, e: AbilityVfxEntityState): void {
@@ -1512,6 +1566,28 @@ export class AbilityVfx {
     if (d.isMob?.(sourceId)) return;
     if (!d.hasGestureClip?.(sourceId, abilityId)) return;
     d.triggerAttack(sourceId, abilityId);
+  }
+
+  /** What a refused cast still owes the player. Two reads are telegraphs the
+   *  player ACTS on, so the gate must not hold them:
+   *
+   *  - The terrain-draped area ring, the blast area a player steps out of.
+   *    ability_vfx_core.ts states the rule this gate was breaking in its own
+   *    words: "NO tier drops the ring, the area telegraph". Its pool is linked
+   *    at boot and its scale and colour come off the spec, so drawing it costs
+   *    no cast program and no tier changes what it says.
+   *  - A mob's windup clip (and a spin spec's whirl), which is the authored
+   *    boss read the Cleave/Stun telegraph rides on. A rig animation is not a
+   *    program at all.
+   *
+   *  planCast at the most degraded tier because a refused cast must NOT charge
+   *  the cast budget (castTier records), and no tier moves either read.
+   */
+  private refusedTelegraphs(ev: AbilityVfxSpellfxEvent, spec: AbilityVfxSpec): void {
+    const plan = planCast(spec, this.quality, REFUSED_CAST_TIER);
+    if (plan.whirl || ev.fx === 'windup') this.deps.triggerAttack(ev.sourceId, ev.ability);
+    if (ev.fx === 'shout') this.spawnRing(ev.sourceId, plan, ev.school);
+    else if (ev.fx === 'nova') this.spawnRing(ev.targetId, plan, ev.school);
   }
 
   private spawnRing(entityId: number, plan: AbilityVfxPlan, school: string): void {

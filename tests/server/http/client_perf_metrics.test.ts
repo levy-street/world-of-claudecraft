@@ -31,6 +31,7 @@ import {
   CLIENT_PERF_OS_FAMILIES,
   CLIENT_PERF_RENDER_SCALE_BUCKETS,
   CLIENT_PERF_SCENE_CLASSES,
+  CLIENT_PERF_SHADER_WARM_REFUSALS,
   CLIENT_PERF_SUGGESTION_IDS,
   CLIENT_PERF_WORST10S_BUCKETS_SECONDS,
   type ClientPerfSample,
@@ -40,6 +41,8 @@ import {
   noopClientPerfMetricsSink,
   registerClientPerfMetrics,
   setClientPerfMetricsSink,
+  shaderWarmRefusalLabel,
+  WOC_CLIENT_SHADER_WARM_REPORTS_TOTAL,
 } from '../../../server/http/client_perf_metrics';
 import { handlePerfReport, perfReportInternalsForTest } from '../../../server/perf_report';
 
@@ -58,6 +61,8 @@ function sample(overrides: Partial<ClientPerfSample> = {}): ClientPerfSample {
     effectiveRenderScale: 0.85,
     contextLostCount: 0,
     suggestionIds: [],
+    shaderWarmWorkerActive: true,
+    shaderWarmRefusal: '',
     ...overrides,
   };
 }
@@ -152,7 +157,31 @@ describe('vocabulary pins', () => {
       'instance',
       'other',
     ]);
+    expect([...CLIENT_PERF_SHADER_WARM_REFUSALS]).toEqual([
+      'none',
+      'cannot-serve:hold-cap',
+      'context-lost',
+      'extension-drift',
+      'extension-mismatch',
+      'hold-timeouts:expired-share',
+      'hold-timeouts:wedged',
+      'ios-webkit',
+      'no-offscreen-canvas',
+      'no-webgl2',
+      'no-worker',
+      'pagehide',
+      'ready-timeout',
+      'worker-error',
+      'other',
+    ]);
     expect(CLIENT_PERF_JANK_THRESHOLD_MS).toBe(250);
+  });
+
+  it('pins the shader-warm series name as a literal', () => {
+    // It counts the SAME population as woc_client_reports_total, differing
+    // only by labels, so the name has to say which question it answers: a
+    // reader who saw `perf` there would take it for a different population.
+    expect(WOC_CLIENT_SHADER_WARM_REPORTS_TOTAL).toBe('woc_client_shader_warm_reports_total');
   });
 
   it('pins the histogram bucket edges as literals', () => {
@@ -440,5 +469,155 @@ describe('perf-report ingest emission', () => {
   it('holds the no-op sink by default so an unwired ingest never throws', () => {
     expect(clientPerfMetricsSink()).toBe(noopClientPerfMetricsSink);
     expect(() => clientPerfMetricsSink().perfReportStored(sample())).not.toThrow();
+  });
+});
+
+describe('shaderWarmRefusalLabel', () => {
+  it('maps the empty refusal to none and keeps the known causes whole', () => {
+    expect(shaderWarmRefusalLabel('')).toBe('none');
+    for (const cause of [
+      'hold-timeouts:expired-share',
+      'hold-timeouts:wedged',
+      'cannot-serve:hold-cap',
+      'ready-timeout',
+      'ios-webkit',
+      'pagehide',
+      'no-worker',
+      'worker-error',
+      'context-lost',
+      'no-offscreen-canvas',
+      'no-webgl2',
+      'extension-mismatch',
+    ]) {
+      expect(shaderWarmRefusalLabel(cause)).toBe(cause);
+    }
+  });
+
+  it('folds every extension-drift token onto one family and anything unlisted to other', () => {
+    expect(shaderWarmRefusalLabel('extension-drift:ext_color_buffer_float')).toBe(
+      'extension-drift',
+    );
+    expect(shaderWarmRefusalLabel('extension-drift:khr_parallel_shader_compile')).toBe(
+      'extension-drift',
+    );
+    for (const hostile of [
+      'extension-drift',
+      'a'.repeat(40),
+      'invented-cause',
+      'hold-timeouts',
+      'none',
+      'other',
+    ]) {
+      expect(CLIENT_PERF_SHADER_WARM_REFUSALS).toContain(shaderWarmRefusalLabel(hostile));
+    }
+    expect(shaderWarmRefusalLabel('invented-cause')).toBe('other');
+    expect(shaderWarmRefusalLabel('a'.repeat(40))).toBe('other');
+  });
+});
+
+describe('woc_client_shader_warm_reports_total', () => {
+  it('exposes the counter type line and the labelled sample for a refused worker', async () => {
+    const registry = new Registry();
+    const sink = registerClientPerfMetrics(registry);
+
+    sink.perfReportStored(
+      sample({ shaderWarmWorkerActive: false, shaderWarmRefusal: 'hold-timeouts:expired-share' }),
+    );
+
+    const text = await registry.metrics();
+    expect(text).toContain('# TYPE woc_client_shader_warm_reports_total counter');
+    expect(
+      value(
+        text,
+        /^woc_client_shader_warm_reports_total\{shader_warm_active="false",shader_warm_refusal="hold-timeouts:expired-share"\} (\d+)$/m,
+      ),
+    ).toBe(1);
+    // The live cohort is the other arm of the same question and stays at zero.
+    expect(
+      value(
+        text,
+        /^woc_client_shader_warm_reports_total\{shader_warm_active="true",shader_warm_refusal="none"\} (\d+)$/m,
+      ),
+    ).toBe(0);
+  });
+
+  it('counts a live worker under active=true with no refusal', async () => {
+    const registry = new Registry();
+    const sink = registerClientPerfMetrics(registry);
+
+    sink.perfReportStored(sample());
+
+    expect(
+      value(
+        await registry.metrics(),
+        /^woc_client_shader_warm_reports_total\{shader_warm_active="true",shader_warm_refusal="none"\} (\d+)$/m,
+      ),
+    ).toBe(1);
+  });
+
+  it('folds an unknown refusal to other and an extension drift to its family', async () => {
+    const registry = new Registry();
+    const sink = registerClientPerfMetrics(registry);
+
+    sink.perfReportStored(
+      sample({ shaderWarmWorkerActive: false, shaderWarmRefusal: 'invented-cause' }),
+    );
+    sink.perfReportStored(
+      sample({
+        shaderWarmWorkerActive: false,
+        shaderWarmRefusal: 'extension-drift:ext_color_buffer_float',
+      }),
+    );
+    sink.perfReportStored(
+      sample({
+        shaderWarmWorkerActive: false,
+        shaderWarmRefusal: 'extension-drift:khr_parallel_shader_compile',
+      }),
+    );
+
+    const text = await registry.metrics();
+    expect(
+      value(
+        text,
+        /^woc_client_shader_warm_reports_total\{shader_warm_active="false",shader_warm_refusal="other"\} (\d+)$/m,
+      ),
+    ).toBe(1);
+    // Both drifts share one series: the extension name never mints its own.
+    expect(
+      value(
+        text,
+        /^woc_client_shader_warm_reports_total\{shader_warm_active="false",shader_warm_refusal="extension-drift"\} (\d+)$/m,
+      ),
+    ).toBe(2);
+    const series = text.match(/^woc_client_shader_warm_reports_total\{[^}]*\}/gm) ?? [];
+    // Two active values times the fixed refusal vocabulary, whatever arrived.
+    expect(series.length).toBe(2 * CLIENT_PERF_SHADER_WARM_REFUSALS.length);
+    expect(text).not.toContain('ext_color_buffer_float');
+  });
+
+  it('zero-backfills the shader-warm cross product and skips benchmark reports', async () => {
+    const registry = new Registry();
+    const sink = registerClientPerfMetrics(registry);
+
+    sink.perfReportStored(
+      sample({ source: 'benchmark', shaderWarmWorkerActive: false, shaderWarmRefusal: 'pagehide' }),
+    );
+
+    const text = await registry.metrics();
+    // The harness is not a player: this counter stays 1:1 with the gameplay
+    // reports woc_client_reports_total counts, so a share of one over the
+    // other is a share over the same denominator.
+    expect(
+      value(
+        text,
+        /^woc_client_shader_warm_reports_total\{shader_warm_active="false",shader_warm_refusal="pagehide"\} (\d+)$/m,
+      ),
+    ).toBe(0);
+    expect(
+      value(
+        text,
+        /^woc_client_shader_warm_reports_total\{shader_warm_active="true",shader_warm_refusal="ios-webkit"\} (\d+)$/m,
+      ),
+    ).toBe(0);
   });
 });

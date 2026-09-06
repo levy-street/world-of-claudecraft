@@ -9,11 +9,43 @@ export interface AdaptiveLinkBudgetConfig {
   maxWindowLinks: number;
   initialLinkEstimate: number;
   increaseLinks: number;
-  fastSettlementMs: number;
-  slowSettlementMs: number;
+  /** The absolute bounds: a settle under `fastSettlementMs` grows the
+   *  window, one past `slowSettlementMs` halves it. Required without a
+   *  judge; a lane with `judgeSettlement` leaves them out. */
+  fastSettlementMs?: number;
+  slowSettlementMs?: number;
   noProgressMs: number;
   maxSleepMs: number;
+  /** How a settle is read. Absent, the two absolute bounds above decide. A
+   *  judge sees what the bounds cannot: the
+   *  unit's weight and how many units it shared the driver with, so it can
+   *  read a settle RELATIVE to what this driver costs alone rather than
+   *  against a millisecond figure measured on some other machine. */
+  judgeSettlement?: SettlementJudge;
 }
+
+/** One settled unit, as a judge sees it. */
+export interface SettlementSample {
+  settlementMs: number;
+  /** The unit's weight, whatever the caller prices in (the worker: thousands
+   *  of GLSL characters); 1 when the caller did not say. */
+  weight: number;
+  /** The most units in flight at any moment of this unit's life, itself
+   *  included: 1 is a unit the driver had to itself. */
+  concurrency: number;
+  /** The admission window when the unit settled. */
+  windowLinks: number;
+  /** The unit's synchronous prologue reported a program delta of zero: it
+   *  linked nothing, so its settle is the queue's time, not a link's. The
+   *  window credit is withheld by the lane whatever the judge says (the
+   *  cheap-unit discount); a judge that keeps state must not learn from it. */
+  cheap: boolean;
+}
+
+/** `fast` grows the window, `slow` halves it, `mid` leaves it. */
+export type SettlementVerdict = 'fast' | 'mid' | 'slow';
+
+export type SettlementJudge = (sample: SettlementSample) => SettlementVerdict;
 
 export type AdaptiveLinkBudgetState = 'ramp' | 'steady' | 'backoff' | 'stalled' | 'revealed';
 
@@ -56,7 +88,8 @@ export interface AdaptiveLinkBudgetSnapshot {
 export interface AdaptiveLinkBudget {
   canSubmit(): boolean;
   awaitSlot(shouldStop: () => boolean): Promise<boolean>;
-  markSubmitted(id: string): void;
+  /** `weight` is what the settlement judge prices the unit in; 1 when absent. */
+  markSubmitted(id: string, weight?: number): void;
   markSyncEnd(id: string, chargedLinks: number): void;
   markSettled(id: string): void;
   markFailed(id: string): void;
@@ -70,6 +103,9 @@ interface InFlightUnit {
   /** Its synchronous prologue reported a program delta of zero: the unit
    *  linked NOTHING, so how fast it settles says nothing about the driver. */
   cheap: boolean;
+  weight: number;
+  /** The most units in flight at once while this one was, itself included. */
+  peakConcurrency: number;
 }
 
 const defaultSleep = (ms: number): Promise<void> =>
@@ -84,6 +120,9 @@ const positiveInteger = (value: number, fallback: number): number =>
 
 const finiteDuration = (value: number, fallback: number): number =>
   Number.isFinite(value) && value >= 0 ? value : fallback;
+
+const positiveWeight = (value: number | undefined): number =>
+  value !== undefined && Number.isFinite(value) && value > 0 ? value : 1;
 
 function normalizedConfig(config: AdaptiveLinkBudgetConfig): AdaptiveLinkBudgetConfig {
   const minWindowLinks = positiveInteger(config.minWindowLinks, 1);
@@ -100,13 +139,27 @@ function normalizedConfig(config: AdaptiveLinkBudgetConfig): AdaptiveLinkBudgetC
     maxWindowLinks,
     initialLinkEstimate: positiveInteger(config.initialLinkEstimate, 1),
     increaseLinks: positiveInteger(config.increaseLinks, 1),
-    fastSettlementMs: finiteDuration(config.fastSettlementMs, 0),
+    fastSettlementMs: finiteDuration(config.fastSettlementMs ?? Number.NaN, 0),
     slowSettlementMs: Math.max(
-      finiteDuration(config.fastSettlementMs, 0),
-      finiteDuration(config.slowSettlementMs, 0),
+      finiteDuration(config.fastSettlementMs ?? Number.NaN, 0),
+      finiteDuration(config.slowSettlementMs ?? Number.NaN, 0),
     ),
     noProgressMs: positiveInteger(config.noProgressMs, 1),
     maxSleepMs: positiveInteger(config.maxSleepMs, 1),
+    judgeSettlement: config.judgeSettlement,
+  };
+}
+
+/** The absolute bounds, as a judge: what every lane without one gets. A
+ *  lane that gave neither bounds nor a judge reads every settle as `mid`. */
+function absoluteJudge(config: AdaptiveLinkBudgetConfig): SettlementJudge {
+  const fast = config.fastSettlementMs ?? 0;
+  const slow = config.slowSettlementMs ?? 0;
+  if (fast <= 0 && slow <= 0) return () => 'mid';
+  return ({ settlementMs }) => {
+    if (settlementMs <= fast) return 'fast';
+    if (settlementMs >= slow) return 'slow';
+    return 'mid';
   };
 }
 
@@ -122,6 +175,7 @@ export function createAdaptiveLinkBudget(
   clock: AdaptiveLinkBudgetClock,
 ): AdaptiveLinkBudget {
   const config = normalizedConfig(inputConfig);
+  const judge = config.judgeSettlement ?? absoluteJudge(config);
   const sleep = clock.sleep ?? defaultSleep;
   const inFlight = new Map<string, InFlightUnit>();
   let state: AdaptiveLinkBudgetState = 'ramp';
@@ -180,20 +234,40 @@ export function createAdaptiveLinkBudget(
   const finish = (id: string, failed: boolean): void => {
     const unit = inFlight.get(id);
     if (!unit) return;
-    const admissionClosed = state === 'stalled' || state === 'revealed';
+    const revealed = state === 'revealed';
+    const stalled = state === 'stalled';
     inFlight.delete(id);
     const now = clock.now();
     lastProgressAtMs = now;
     if (failed) {
       failedUnits++;
-      if (!admissionClosed) backoff('failed');
+      if (!revealed) backoff('failed');
       return;
     }
     settledUnits++;
     const settlementMs = Math.max(0, now - unit.submittedAtMs);
     lastSettlementMs = settlementMs;
-    if (admissionClosed) return;
-    if (settlementMs <= config.fastSettlementMs) {
+    if (revealed) return;
+    // A settle REFUTES the stall: the driver was slow, not wedged. The stall
+    // closed admission while nothing settled (a wedged link must not pile
+    // units behind it); with progress back, the lane reopens on the halved
+    // window, which is what a settlement past noProgressMs is anyway, and
+    // the next settles re-grow it. Terminal, the stall killed the whole
+    // compile lane after ONE unit on the Intel iGPU (a 16-root unit settles
+    // in more than 3 s there), on every login: 1 unit settled, 22 deferred
+    // to the live resume lane, in the 2026-08-26 arrival matrix.
+    if (stalled) {
+      backoff();
+      return;
+    }
+    const verdict = judge({
+      settlementMs,
+      weight: unit.weight,
+      concurrency: unit.peakConcurrency,
+      windowLinks,
+      cheap: unit.cheap,
+    });
+    if (verdict === 'fast') {
       // The cheap-unit discount. A unit that linked no program settles
       // instantly whatever the driver is doing, so its speed is not headroom:
       // growing the window on it is how a lane of already-linked units (the
@@ -204,7 +278,7 @@ export function createAdaptiveLinkBudget(
       windowLinks = Math.min(config.maxWindowLinks, windowLinks + config.increaseLinks);
       maxWindowObserved = Math.max(maxWindowObserved, windowLinks);
       transition(windowLinks >= config.maxWindowLinks ? 'steady' : 'ramp', 'fast-settlement');
-    } else if (settlementMs >= config.slowSettlementMs) {
+    } else if (verdict === 'slow') {
       backoff();
     } else {
       transition('steady', 'mid-settlement');
@@ -226,14 +300,20 @@ export function createAdaptiveLinkBudget(
         await sleep(Math.min(config.maxSleepMs, config.noProgressMs - noProgressForMs));
       }
     },
-    markSubmitted(id) {
+    markSubmitted(id, weight) {
       if (inFlight.has(id)) return;
       if (inFlight.size === 0) lastProgressAtMs = clock.now();
       inFlight.set(id, {
         submittedAtMs: clock.now(),
         links: estimatedLinksPerUnit,
         cheap: false,
+        weight: positiveWeight(weight),
+        peakConcurrency: 0,
       });
+      // Every unit in flight now shares the driver with this one.
+      for (const unit of inFlight.values()) {
+        unit.peakConcurrency = Math.max(unit.peakConcurrency, inFlight.size);
+      }
       submittedUnits++;
       notePeak();
     },

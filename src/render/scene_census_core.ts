@@ -26,6 +26,28 @@ export interface SceneCensusChild {
 }
 
 /**
+ * Adapt one top-level scene subtree to a bucket member: the renderer stamps
+ * `renderCategory` on the subtrees it owns, and anything without one shares
+ * the `unknown` bucket. Structural on purpose (no three import): the object
+ * is read live, so the census sees the visibility it toggles.
+ */
+export function sceneCensusChild(object: {
+  visible: boolean;
+  userData?: { renderCategory?: unknown };
+}): SceneCensusChild {
+  const category = object.userData?.renderCategory;
+  return {
+    category: typeof category === 'string' ? category : 'unknown',
+    get visible() {
+      return object.visible;
+    },
+    setVisible(visible: boolean) {
+      object.visible = visible;
+    },
+  };
+}
+
+/**
  * What the census needs from the live renderer. Counter contract: the host
  * puts the WebGL counters in manual-reset mode for the duration of the
  * capture (setCountersAutoReset), so `resetCounters` + `render` + `counters`
@@ -52,6 +74,11 @@ export interface SceneCensusHost {
   shadowsEnabled(): boolean;
   shadowAutoUpdate(): boolean;
   setShadowAutoUpdate(autoUpdate: boolean): void;
+  /** The burst is about to start, before its first render: the host's own
+   * out-of-band bookkeeping can close whatever the LIVE frames left it, so
+   * nothing that happened before the census is charged to it. Optional; a
+   * host that only discards draws needs no such boundary. */
+  beginOutOfBand?(): void;
   /** Drop the census renders from the live per-frame draw-stats delta. */
   discardOutOfBand(): void;
 }
@@ -135,6 +162,10 @@ export function captureSceneCensus(
     return host.counters();
   };
   try {
+    // Before the first render, so a host that classes programs by "unseen
+    // since the last boundary" does not charge the burst with what the live
+    // frames before it minted.
+    host.beginOutOfBand?.();
     host.setCountersAutoReset(false);
     const baseline = measure();
 

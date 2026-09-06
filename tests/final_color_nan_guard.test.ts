@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import type { GraphicsSettingsSnapshot } from '../src/game/graphics_rebuild_core';
 import { installFinalColorNanGuard } from '../src/render/final_color_nan_guard';
 import { activateGfxProfile, type GfxCapabilities, resolveGfxProfile } from '../src/render/gfx';
+import { stripComments } from './helpers/strip_comments';
 
 const originalOpaqueFragment = THREE.ShaderChunk.opaque_fragment;
 const originalFogFragment = THREE.ShaderChunk.fog_fragment;
@@ -111,13 +112,23 @@ describe('installFinalColorNanGuard call sites', () => {
   });
 
   it('the world renderer reaches gfx.ts (and so the guard) before it can compile or render', () => {
-    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
-    const rendererCreated = renderer.indexOf('this.webgl = new THREE.WebGLRenderer');
+    // Comments stripped, so a commented-out call cannot satisfy an anchor (and
+    // prose naming one cannot reorder them), as the sibling ordering pins do.
+    const renderer = stripComments(
+      readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8'),
+    );
+    // Anchored on the assignment, not on `new THREE.WebGLRenderer`: the
+    // construction itself lives in webgl_context_fallback.ts. Every offset is
+    // asserted found, so a later move reds this pin instead of comparing -1.
+    const rendererCreated = renderer.indexOf('this.webgl = created.webgl');
+    expect(rendererCreated).toBeGreaterThanOrEqual(0);
     const rendererInit = renderer.indexOf('initGfxTier(this.webgl)', rendererCreated);
     const firstCompile = renderer.indexOf('this.webgl.compile', rendererCreated);
     const firstRender = renderer.indexOf('this.webgl.render', rendererCreated);
+    expect(rendererInit).toBeGreaterThanOrEqual(0);
+    expect(firstCompile).toBeGreaterThanOrEqual(0);
+    expect(firstRender).toBeGreaterThanOrEqual(0);
 
-    expect(rendererCreated).toBeGreaterThanOrEqual(0);
     expect(rendererInit).toBeGreaterThan(rendererCreated);
     expect(firstCompile).toBeGreaterThan(rendererInit);
     expect(firstRender).toBeGreaterThan(rendererInit);

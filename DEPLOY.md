@@ -664,6 +664,17 @@ For off-box safety, sync the directory to S3 occasionally:
   rate limit, and per-session insert throttle bound the write rate), so
   corroborate a surprising shift against the client_perf_reports table before
   treating it as fleet truth.
+  `woc_client_shader_warm_reports_total` (same module, same stored gameplay reports) is
+  the shader warm-up cut of that population: `shader_warm_active` says whether
+  the warm-up worker was alive on the reporting client, and
+  `shader_warm_refusal` carries the cause when it was not (`none` when there is
+  none, one `extension-drift` series for the whole family, `other` for a cause
+  this server's vocabulary does not know). Its cardinality is the two active
+  values times that fixed vocabulary, pre-registered at zero like the rest of
+  the family. The SQL drill-down is the two client_perf_reports columns behind
+  it (`shader_warm_worker_active`, `shader_warm_refusal`, both bounded at
+  ingest), plus `raw_summary.shaderWarm` for the per-session detail (mode,
+  setting, backend, and the warmed / held counts).
 - **Multi-realm scraping**: one server process hosts exactly one realm, and no
   exported series carries a `realm` label (pinned by the exporter tests; the
   DB-backed business family filters on the realm in its queries instead). Give

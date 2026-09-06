@@ -1531,6 +1531,29 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.forceHighPerfGpu': '전용 게이밍 GPU 사용',
   'hudChrome.options.forceHighPerfGpuNote':
     '기본값 켜짐: 데스크톱 앱이 이 컴퓨터의 전용 게이밍 GPU를 요청합니다. 게임이 시작되지 않거나, 시작 후 검은 화면만 보이거나, 노트북 화면이 나오지 않으면 끄세요. 이 설정은 다음에 게임을 시작할 때 적용됩니다.',
+  'hudChrome.options.shaderWarm': '셰이더 사전 워밍업 워커',
+  'hudChrome.options.shaderWarmAuto': '자동',
+  'hudChrome.options.shaderWarmOff': '끄기',
+  'hudChrome.options.shaderWarmOn': '켜기',
+  'hudChrome.options.shaderWarmNote':
+    '게임 중 끊김을 막기 위해 백그라운드에서 셰이더 캐시를 미리 준비합니다. 자동: 그래픽 시스템이 지원하는 경우에만 켜집니다(권장). 켜기: 모든 환경에서 강제로 사용하며, 일부 환경에서는 성능이 나빠질 수 있습니다. 끄기: 사용하지 않습니다.',
+  'hudChrome.options.gpuBackend': '그래픽 백엔드',
+  'hudChrome.options.gpuBackendAuto': '자동',
+  'hudChrome.options.gpuBackendVulkan': 'Vulkan',
+  'hudChrome.options.gpuBackendOpenGL': 'OpenGL(느림)',
+  'hudChrome.options.gpuBackendActive': '현재 {backend}을(를) 사용 중입니다.',
+  'hudChrome.options.gpuBackendActiveUnavailable':
+    '현재 {backend}을(를) 사용 중입니다(Vulkan을 활성화할 수 없음).',
+  'hudChrome.options.gpuBackendNote':
+    '자동은 가장 알맞은 옵션을 대신 선택합니다. Vulkan이 더 빠르며 대부분의 플레이어에게 권장됩니다. OpenGL은 더 느리지만 Vulkan이 제대로 작동하지 않을 때 도움이 될 수 있습니다. 다음에 게임을 시작할 때 적용됩니다.',
+  'hudChrome.options.gpuBackendActiveAutoCapped':
+    '현재 {backend}을(를) 사용 중입니다. 이 그래픽 카드에서는 자동이 아직 Vulkan을 시도하지 않습니다. 시도하려면 Vulkan을 선택하세요.',
+  'hudChrome.options.gpuBackendSaveFailed':
+    '선택을 저장하지 못했습니다. 다음 실행에서도 {backend}을(를) 사용합니다.',
+  'hudChrome.options.restartPending': '일부 변경 사항은 재시작 후에 적용됩니다.',
+  'hudChrome.options.restartGame': '게임 재시작',
+  'hudChrome.options.restartInProgress': '게임을 재시작하는 중...',
+  'hudChrome.options.restartFailed': '게임을 자동으로 재시작할 수 없습니다. 종료한 뒤 다시 실행하세요.',
   'hudChrome.options.discordPresence': 'Discord 리치 프레즌스',
   'hudChrome.options.discordPresenceNote':
     '플레이하는 동안 현재 있는 지역과 이번 세션의 플레이 시간을 Discord 활동으로 표시하며, 당신의 Discord 프로필을 볼 수 있는 사람은 누구나 둘 다 볼 수 있습니다. 공유되는 것은 지역 이름, 이번 세션의 플레이 시간, 게임뿐이며, 캐릭터나 계정, 함께 플레이하는 사람은 절대 공유되지 않습니다. 이 컴퓨터에서 Discord 앱이 실행 중이어야 합니다.',
@@ -8503,6 +8526,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '이 세션은 통합(절전형) GPU에서 렌더링되고 있습니다. 이 컴퓨터에 별도의 게이밍 GPU도 있다면, 설정 > 시스템 > 디스플레이 > 그래픽에서 브라우저를 고성능으로 설정한 다음 다시 시작하세요. 데스크톱 앱은 자동으로 전용 GPU를 선택합니다.',
   'gpuNotice.hybridBodyLinux':
     '이 세션은 통합(절전형) GPU에서 렌더링되고 있습니다. 이 컴퓨터에 별도의 게이밍 GPU도 있다면, 브라우저나 그래픽 드라이버에 자체 GPU 선택 설정이 있거나 배포판에 GPU 전환 도구(PRIME 또는 optimus-manager 등)가 있을 수 있습니다. 데스크톱 앱은 자동으로 전용 GPU를 선택합니다.',
+  'gpuNotice.bodyRequestedBackend':
+    '선택한 그래픽 백엔드로 게임을 시작할 수 없어 OpenGL로 실행 중입니다. 정상적으로 작동하지만 로딩과 처음 몇 분 동안 더 끊길 수 있습니다. 옵션 > 그래픽 > 시스템에서 백엔드를 다시 선택할 수 있습니다.',
   'gpuNotice.hybridBodyOther':
     '이 세션은 통합(절전형) GPU에서 렌더링되고 있습니다. 이 컴퓨터에 별도의 게이밍 GPU도 있다면, 브라우저와 운영체제의 그래픽 설정을 확인하여 활성화하세요. 데스크톱 앱은 자동으로 전용 GPU를 선택합니다.',
   'gpuNotice.dismiss': '닫기',

@@ -1490,6 +1490,29 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.forceHighPerfGpu': '使用独立游戏显卡',
   'hudChrome.options.forceHighPerfGpuNote':
     '默认开启：桌面版会向本机申请使用独立游戏显卡。如果游戏无法启动、启动后黑屏，或笔记本屏幕没有画面，请关闭此选项。该设置将在下次启动游戏时生效。',
+  'hudChrome.options.shaderWarm': '着色器预热工作线程',
+  'hudChrome.options.shaderWarmAuto': '自动',
+  'hudChrome.options.shaderWarmOff': '关闭',
+  'hudChrome.options.shaderWarmOn': '开启',
+  'hudChrome.options.shaderWarmNote':
+    '在后台预热着色器缓存，以避免游戏中出现卡顿。自动：仅在你的图形系统支持时启用（推荐）。开启：在所有环境中强制启用，在部分配置上可能会让性能变差。关闭：不启用。',
+  'hudChrome.options.gpuBackend': '图形后端',
+  'hudChrome.options.gpuBackendAuto': '自动',
+  'hudChrome.options.gpuBackendVulkan': 'Vulkan',
+  'hudChrome.options.gpuBackendOpenGL': 'OpenGL（较慢）',
+  'hudChrome.options.gpuBackendActive': '当前使用 {backend}。',
+  'hudChrome.options.gpuBackendActiveUnavailable':
+    '当前使用 {backend}（无法启用 Vulkan）。',
+  'hudChrome.options.gpuBackendNote':
+    '自动会为你选择最合适的选项。Vulkan 更快，推荐大多数玩家使用。OpenGL 较慢，但在 Vulkan 无法正常工作时可能会有帮助。下次启动游戏时生效。',
+  'hudChrome.options.gpuBackendActiveAutoCapped':
+    '当前使用 {backend}。自动模式暂不会在此显卡上尝试 Vulkan；如需尝试，请选择 Vulkan。',
+  'hudChrome.options.gpuBackendSaveFailed':
+    '无法保存该选择。下次启动仍将使用 {backend}。',
+  'hudChrome.options.restartPending': '部分更改将在重启后生效。',
+  'hudChrome.options.restartGame': '重启游戏',
+  'hudChrome.options.restartInProgress': '正在重启游戏...',
+  'hudChrome.options.restartFailed': '游戏无法自行重启。请退出后重新启动。',
   'hudChrome.options.discordPresence': 'Discord 游戏状态',
   'hudChrome.options.discordPresenceNote':
     '游戏时将你当前所在的区域以及本次游戏时长显示为你的 Discord 活动状态，任何能看到你 Discord 个人资料的人都能看到这两项。只会分享区域名称、本次游戏时长和游戏名称，绝不会分享你的角色、账号或与你同行的人。需要本机正在运行 Discord 应用。',
@@ -8187,6 +8210,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '本次会话正在集成（节能）显卡上渲染。如果这台电脑还配有独立游戏显卡，请在 设置 > 系统 > 显示 > 显示卡 中将浏览器设为“高性能”，然后重启浏览器。桌面版会自动选择独立显卡。',
   'gpuNotice.hybridBodyLinux':
     '本次会话正在集成（节能）显卡上渲染。如果这台电脑还配有独立游戏显卡，您的浏览器或显卡驱动可能提供了自己的显卡选择设置，或者您的发行版可能提供了显卡切换工具（例如 PRIME 或 optimus-manager）。桌面版会自动选择独立显卡。',
+  'gpuNotice.bodyRequestedBackend':
+    '游戏无法在你选择的图形后端上启动，因此正在使用 OpenGL 运行。一切功能正常，但加载和最初几分钟可能更卡顿。你可以在「选项 > 图形 > 系统」中重新选择后端。',
   'gpuNotice.hybridBodyOther':
     '本次会话正在集成（节能）显卡上渲染。如果这台电脑还配有独立游戏显卡，请检查浏览器和操作系统的显卡设置以启用它。桌面版会自动选择独立显卡。',
   'gpuNotice.dismiss': '关闭',

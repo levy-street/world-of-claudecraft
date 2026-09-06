@@ -7,6 +7,7 @@
 import type { BiomeId } from '../sim/types';
 import type { BackgroundGpuQueueStats } from './background_gpu_queue';
 import type { BuildLedgerSnapshot } from './build_ledger_core';
+import type { CastVfxReadinessSnapshot } from './cast_vfx_readiness_core';
 import type { LookPiecesStats } from './characters/look_pieces';
 import type { EntryDetailHorizonSnapshot } from './entry_detail_horizon';
 import type { FoliagePerfStats } from './foliage';
@@ -101,6 +102,8 @@ export interface RendererPerfStats {
   foliage: FoliagePerfStats;
   glVendor: string;
   glRenderer: string;
+  /** The power preference the context was created with; null for a supplied context. */
+  glPowerPreference?: 'high-performance' | 'low-power' | 'default' | null;
   contextLost: number;
   contextRestored: number;
   /** 0 = full day, 1 = deep night; the night-visibility layers key off it. */
@@ -109,6 +112,7 @@ export interface RendererPerfStats {
   renderDiagnostics: RenderDiagnosticsSnapshot;
   lastFrame?: RendererFrameStats;
   prewarm: RendererPrewarmStats | null;
+  castVfx: CastVfxReadinessSnapshot;
   entryDetailHorizon: EntryDetailHorizonSnapshot;
   gpuQueue: BackgroundGpuQueueStats;
   gpuPrep: RendererGpuPrepStats;

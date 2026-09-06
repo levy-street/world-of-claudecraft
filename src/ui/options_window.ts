@@ -23,7 +23,19 @@ import { syncAppViewport } from '../game/app_viewport';
 import { audio } from '../game/audio';
 import { isCrossHotbarModifier } from '../game/cross_hotbar';
 import { desktopDisplayModeSupported } from '../game/desktop_display_mode_sync';
+import {
+  desktopGpuBackendActive,
+  desktopGpuBackendSupported,
+  desktopGpuBackendWriteFailed,
+  onDesktopGpuBackendActiveChange,
+  onDesktopGpuBackendWriteFailed,
+} from '../game/desktop_gpu_backend_sync';
 import { desktopGpuPrefSupported } from '../game/desktop_gpu_pref_sync';
+import {
+  desktopRestartSupported,
+  pendingRestartKeys,
+  requestDesktopRestart,
+} from '../game/desktop_next_launch_settings';
 import { desktopDiscordPresenceSupported } from '../game/discord_presence';
 import {
   GAMEPAD_CANCEL,
@@ -61,6 +73,7 @@ import {
   normalizeClickMoveButton,
   SETTING_RANGES,
 } from '../game/settings';
+import { shaderWarmChoiceAvailable } from '../render/shader_warm_client';
 import { desktopBridge } from '../runtime';
 import type { IWorld } from '../world_api';
 import { appVersionInfo } from './app_version';
@@ -68,7 +81,7 @@ import { type AuraOverlayHooks, AuraOverlaySettingsPanel } from './aura_overlay_
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
 import type { FocusTrapHandle } from './focus_manager';
-import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
+import { captureFocusKey, findFocusKey, restoreFirstEnabled } from './focus_restore';
 import type { BugReportHooks, GraphicsApplyOutcome, OptionsHooks } from './hud';
 import type { ChatClock } from './hud/chat/chat_timestamp';
 import {
@@ -112,6 +125,8 @@ import {
   withGraphicsDraft,
 } from './options_view';
 import { PerfOverlaySettingsPanel, type PerfSettingsHost } from './perf_overlay_settings';
+import { type RestartRequestPhase, restartStripState } from './restart_strip_core';
+import { buildRestartStrip, paintRestartStrip } from './restart_strip_painter';
 import { settingsCard, subhead } from './settings_controls';
 import { exportTransferCode, importTransferCode } from './settings_transfer';
 import type { TransferKind } from './settings_transfer_core';
@@ -424,10 +439,21 @@ export class OptionsWindow {
   private graphicsApplied: GraphicsSettingsSnapshot | null = null;
   private graphicsBusy = false;
   private graphicsOutcome: GraphicsApplyOutcome | null = null;
+  // Where the restart strip's own request stands (restart_strip_core.ts). The
+  // strip is composed at the foot of every panel that hosts a next-launch
+  // setting, so the phase lives on the window, not on a panel.
+  private restartPhase: RestartRequestPhase = 'idle';
   // Invalidates an async settlement after the window has closed and discarded
   // its draft. The coordinator still finishes safely; the closed painter simply
   // does not rebuild hidden DOM with stale local state.
   private graphicsApplyGeneration = 0;
+  // Live only while the Graphics panel is on screen: the shell judges the
+  // launch seconds after boot, so a panel opened before that verdict painted
+  // the backend row without its reading and never refreshed.
+  private gpuBackendWatch: (() => void) | null = null;
+  // Its twin for the other thing the backend row can say: the shell refused the
+  // write, which arrives one round trip after the click that caused it.
+  private gpuBackendWriteWatch: (() => void) | null = null;
 
   constructor(private readonly deps: OptionsWindowDeps) {}
 
@@ -471,6 +497,7 @@ export class OptionsWindow {
     this.graphicsBusy = false;
     this.graphicsOutcome = null;
     this.opened = false;
+    this.syncGpuBackendWatch();
     this.deps.root().removeAttribute('aria-busy');
     this.deps.root().style.display = 'none';
     this.capturingKey = null;
@@ -528,6 +555,7 @@ export class OptionsWindow {
     // The overlay is draggable only while the Performance sub-view is open.
     this.deps.options()?.perfOverlay.setPlacement(this.view === 'performance');
     this.deps.auraOverlays?.().setPlacement(this.view === 'auras');
+    this.syncGpuBackendWatch();
     switch (this.view) {
       case 'keybinds':
         this.renderKeybinds();
@@ -570,6 +598,28 @@ export class OptionsWindow {
     // (perf_overlay_settings.ts) rebuilds only its own subtree and never
     // touches this display value, which is already correct while that view stays open.
     if (this.opened) el.style.display = this.view === 'performance' ? 'flex' : 'block';
+  }
+
+  // The desktop shell's backend verdict lands on its own schedule, so the
+  // Graphics panel follows it while it is open, through the same rebuild a dial
+  // change uses. Held for exactly that view: nothing else paints the reading,
+  // and a subscription outliving the panel would rebuild hidden DOM.
+  private syncGpuBackendWatch(): void {
+    const wanted = this.opened && this.view === 'graphics';
+    if (wanted === (this.gpuBackendWatch !== null)) return;
+    if (!wanted) {
+      this.gpuBackendWatch?.();
+      this.gpuBackendWatch = null;
+      this.gpuBackendWriteWatch?.();
+      this.gpuBackendWriteWatch = null;
+      return;
+    }
+    this.gpuBackendWatch = onDesktopGpuBackendActiveChange(() => this.render());
+    // The refused write repaints the same panel: the buttons snap back to the
+    // value the shell actually holds, the row says so, and the restart strip
+    // (which reads that same local value) withdraws the offer it should never
+    // have made.
+    this.gpuBackendWriteWatch = onDesktopGpuBackendWriteFailed(() => this.render());
   }
 
   // Return to the Game Menu root without closing the window. The title-bar back
@@ -677,7 +727,7 @@ export class OptionsWindow {
           this.settingChoice(parent, c, hooks, c.rerender ? rerender : undefined, choiceBinding);
           break;
         case 'note':
-          this.noteRow(parent, c.textKey);
+          this.noteRow(parent, c.textKey, c.valueKeys);
           break;
         case 'musicToggle':
           this.musicToggle(parent, c.labelKey);
@@ -703,6 +753,11 @@ export class OptionsWindow {
     slider.step = String(c.step);
     slider.value = String(hooks.settings.get(key));
     slider.setAttribute('aria-label', label);
+    // Focus identity for rebuild-crossing restores (focus_restore.ts), the same
+    // one the choice buttons carry: the Graphics panel rebuilds on its own, on
+    // the shell's late backend verdict, and a dial that came back without its
+    // focus drops a keyboard player on <body>, outside the window's Tab trap.
+    slider.dataset.focusKey = key;
     const val = document.createElement('span');
     val.className = 'set-val';
     const fmt = this.sliderFormatter(c.fmt);
@@ -768,6 +823,8 @@ export class OptionsWindow {
     name.textContent = label;
     const toggle = document.createElement('button');
     toggle.className = 'btn set-toggle';
+    // Rebuild-crossing focus identity, as on the slider above.
+    toggle.dataset.focusKey = key;
     const sync = () => {
       const on = toggleIsOn(hooks.settings.get(key));
       toggle.textContent = on ? t('hud.options.on') : t('hud.options.off');
@@ -802,6 +859,11 @@ export class OptionsWindow {
     const toggle = document.createElement('button');
     toggle.className = 'btn set-toggle';
     toggle.dataset.settingKey = key;
+    // Rebuild-crossing focus identity, as on the slider above. Distinct from
+    // the settingKey beside it, which is how a rerendering toggle finds itself
+    // again after its OWN change; this one carries focus across a rebuild the
+    // player did not ask for.
+    toggle.dataset.focusKey = key;
     toggle.disabled = c.disabled ?? false;
     const sync = () => {
       const on = hooks.settings.get(key);
@@ -887,14 +949,38 @@ export class OptionsWindow {
       wrap.appendChild(btn);
     }
     row.append(name, wrap);
+    // The live reading, inside the row under its buttons. Not a sibling note:
+    // the wide graphics cards flow their children two-up, so a third child for
+    // one control would shift every row after it by a cell.
+    if (c.statusKey) {
+      const status = document.createElement('div');
+      status.className = 'set-note set-note-inline';
+      // A verdict that lands seconds after the panel was built, so it is a live
+      // region either way: assertive for the reading that says the choice did
+      // not take, polite for the one that just reports what is running.
+      status.setAttribute('role', c.statusAlert ? 'alert' : 'status');
+      if (!c.statusAlert) status.setAttribute('aria-live', 'polite');
+      const values: Record<string, string> = {};
+      for (const [name_, key_] of Object.entries(c.statusValueKeys ?? {})) values[name_] = t(key_);
+      status.textContent = c.statusValueKeys ? t(c.statusKey, values) : t(c.statusKey);
+      row.appendChild(status);
+    }
     parent.appendChild(row);
     sync();
   }
 
-  private noteRow(parent: HTMLElement, textKey: TranslationKey): void {
+  private noteRow(
+    parent: HTMLElement,
+    textKey: TranslationKey,
+    valueKeys?: Record<string, TranslationKey>,
+  ): void {
     const note = document.createElement('div');
     note.className = 'set-note';
-    note.textContent = t(textKey);
+    // The view names its placeholders as keys and this resolves them, so the
+    // whole sentence including the value stays one translatable string.
+    const values: Record<string, string> = {};
+    for (const [name, key] of Object.entries(valueKeys ?? {})) values[name] = t(key);
+    note.textContent = valueKeys ? t(textKey, values) : t(textKey);
     parent.appendChild(note);
   }
 
@@ -1090,6 +1176,70 @@ export class OptionsWindow {
     this.render();
   }
 
+  // The restart strip (restart_strip_painter.ts) for the panel being painted, or null
+  // when it has nothing to offer: no next-launch setting differs from what this
+  // launch runs on (whichever panel its row is on: the offer follows what is
+  // pending, so a player who toggled the GPU force under Interface and opened
+  // Graphics still sees the way to apply it), the shell cannot restart itself,
+  // or the host panel's own Apply comes first. The pending check reads the live
+  // settings against the shell's launch snapshot (desktop_next_launch_settings.ts),
+  // so a value put back to what is running withdraws the offer without any
+  // bookkeeping here. The click repaints the strip IN PLACE rather than through
+  // render(): a rebuild would replace the live region with its text and drop
+  // focus to the body (restart_strip_painter.ts).
+  private restartStrip(dirty: boolean, busy: boolean): HTMLElement | null {
+    const hooks = this.deps.options();
+    if (!hooks) return null;
+    const bridge = desktopBridge();
+    if (!desktopRestartSupported(bridge)) return null;
+    const pending = pendingRestartKeys(bridge, hooks.settings).length > 0;
+    const state = restartStripState({ pending, dirty, busy, phase: this.restartPhase });
+    if (state === 'hidden') {
+      // Nothing to offer means nothing to have failed: a stale failure would
+      // otherwise greet the next change.
+      if (!pending) this.restartPhase = 'idle';
+      return null;
+    }
+    let strip: HTMLElement | null = null;
+    strip = buildRestartStrip(state, {
+      onRestart: () => {
+        if (this.restartPhase === 'restarting' || !strip) return;
+        audio.click();
+        this.restartPhase = 'restarting';
+        paintRestartStrip(strip, 'restarting');
+        void requestDesktopRestart(bridge).then((started) => {
+          // On success the shell quits this process and nothing runs here; a
+          // false answer is the child that never started, and the offer stands.
+          if (started) return;
+          this.restartPhase = 'failed';
+          // The panel may have been rebuilt meanwhile (a setting changed while
+          // the request was out), leaving this strip detached: repaint it in
+          // place while it is still the live one, and rebuild the panel
+          // otherwise. Without the second arm the strip on screen keeps reading
+          // "Restarting" with its button disabled and the offer never returns.
+          if (strip?.isConnected) paintRestartStrip(strip, 'failed');
+          else this.showRestartFailure();
+        });
+      },
+    });
+    return strip;
+  }
+
+  // The failed answer landing after the strip that asked left the tree: only a
+  // panel that hosts a strip is rebuilt (another panel keeps the controls the
+  // player is on; its strip reads failed when it is next built), and the new
+  // node is then painted the way the in-place arm paints it, because a node
+  // built with its alert text already in place is not announced, and the
+  // failure hands focus back to the button that can retry.
+  private showRestartFailure(): void {
+    const hosted =
+      this.view === 'graphics' || (this.view === 'interface' && this.interfaceTab === 'general');
+    if (!this.opened || !hosted) return;
+    this.render();
+    const shown = this.deps.root().querySelector<HTMLElement>('[data-restart-strip]');
+    if (shown) paintRestartStrip(shown, 'failed');
+  }
+
   // The panel's ONE inline action row (playtest feedback): Back at the inline
   // start, the async status stretching between, then Reset to Defaults as a
   // quiet text button beside the primary Apply at the inline end. It replaces
@@ -1189,6 +1339,17 @@ export class OptionsWindow {
               // nativeShell: the mobile shells and pre-display-mode desktop
               // builds must keep the browser toggle they can actually serve.
               desktopDisplayMode: desktopDisplayModeSupported(desktopBridge()),
+              // The Linux graphics backend row in the System card: the bridge
+              // methods AND the shell's platform answer, folded into one flag.
+              desktopGpuBackend: desktopGpuBackendSupported(desktopBridge()),
+              desktopGpuBackendActive: desktopGpuBackendActive(),
+              // The shell refused the last write: the row says what the next
+              // start will really use, over the rung this one is on.
+              desktopGpuBackendWriteFailed: desktopGpuBackendWriteFailed(),
+              // The shader warm-up worker is forced off on iOS whatever the
+              // setting, so that host gets no row. The client's resolver owns
+              // that rule; asking it is what keeps the two from drifting.
+              shaderWarmChoice: shaderWarmChoiceAvailable(),
             },
           )
         : [];
@@ -1230,12 +1391,16 @@ export class OptionsWindow {
     note.className = 'set-note';
     note.textContent = t('hud.options.graphicsNote');
     el.appendChild(note);
+    // A next-launch change (the Linux backend row here, the GPU force under
+    // Interface) is applied by a restart, not by Apply: the strip offers it
+    // once the in-page draft is settled.
+    const restartStrip = this.restartStrip(this.graphicsDirty(), this.graphicsBusy);
+    if (restartStrip) el.appendChild(restartStrip);
     el.appendChild(this.graphicsFooter(controls, unavailable));
     // The generic settingsViewFooter is not used here (the inline action row
     // replaces it), so wire the title-bar close control directly.
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
-    if (focusKey !== null)
-      restoreFirstEnabled([el.querySelector<HTMLButtonElement>(`[data-focus-key="${focusKey}"]`)]);
+    if (focusKey !== null) restoreFirstEnabled([findFocusKey(el, focusKey)]);
   }
 
   // -------------------------------------------------------------------------
@@ -1563,6 +1728,12 @@ export class OptionsWindow {
       chat: [],
       combat: [],
     };
+    // The dedicated-GPU row lives on General: that tab hosts the strip (the
+    // others have no next-launch row to stand it beside).
+    if (tab === 'general') {
+      const restartStrip = this.restartStrip(false, false);
+      if (restartStrip) body.appendChild(restartStrip);
+    }
     this.settingsViewFooter(interfaceControlsForTab(controls, tab), (hooks, keys) => {
       const allKeys = [...keys, ...offMenuTabKeys[tab]];
       hooks.settings.reset(allKeys);

@@ -328,7 +328,11 @@ export function prewarmSubmitShouldStop(
  * They also carry compile/upload units, but a handful per family whose first
  * use is a specific event (a school's first impact, a skin's first draw),
  * not the ambient scene: they stay on the cosmetic BOOT_RESUME arm below
- * the preview lane, the pre-change behavior.
+ * the preview lane, the pre-change behavior. An entry's PROGRAMS are the
+ * exception: a dropped entry that declares resumeProgramUnits hands them over
+ * under `programs.<entry id>`, and every `programs.` id is debt (a cast VFX
+ * has no stand-in; the painter draws nothing until its programs are linked,
+ * so those links come right after the compile remainder).
  * `programs.compile-submit` here names the SYNTHETIC dropped entry the
  * deferred-submit hand-off pushes (the manifest entry of that id declares no
  * resumeUnits, so no other resume entry can carry it).
@@ -347,7 +351,7 @@ const PREWARM_DEBT_RESUME_IDS: ReadonlySet<string> = new Set([
 
 /** True when a dropped entry's resume units are hitch-causing debt. */
 export function prewarmResumeIsDebt(entryId: string): boolean {
-  return PREWARM_DEBT_RESUME_IDS.has(entryId);
+  return PREWARM_DEBT_RESUME_IDS.has(entryId) || entryId.startsWith('programs.');
 }
 
 /** Only roots in the settled, visible scene are presentation-critical before

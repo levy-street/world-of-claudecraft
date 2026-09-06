@@ -308,6 +308,12 @@ function buildLinuxPrimeEnv(existingEnv, fileExists = nodeExistsSync) {
 // check instead: every relaunch produces a child whose argv carries an explicit
 // --ozone-platform, and a marked process with one never relaunches.
 const PRIME_RELAUNCH_MARKER = 'WOC_PRIME_RELAUNCHED';
+// Beside the marker, WHAT the relaunch added, comma-separated: the env names buildLinuxPrimeEnv
+// planted (never one the player had already set) and LINUX_OZONE_X11_ARG when it was appended.
+// Accumulated across a relaunch chain rather than replaced at each hop (primeRelaunchRecord).
+// A player-requested restart (electron/launch_settings.cjs) strips exactly these and nothing of
+// the player's own, so a shell relaunch stays invisible to the environment it inherited.
+const PRIME_RELAUNCH_ADDED_ENV = 'WOC_PRIME_RELAUNCH_ADDED';
 
 /**
  * Whether this process should re-exec itself with the Linux PRIME env applied.
@@ -369,18 +375,94 @@ function isLinuxHybridGpu(readdir = nodeReaddirSync, readFile = nodeReadFileSync
 }
 
 /**
+ * The binary a self-relaunch must spawn. In an AppImage, execPath points inside the
+ * runtime's FUSE mount, which dies the moment this process exits; the outer AppImage file
+ * (env.APPIMAGE, the same source electron-updater restarts from) survives and brings up a
+ * fresh runtime + mount. A non-absolute APPIMAGE value is ignored: the variable is not
+ * ours to trust blindly, and a relative path would resolve against whatever cwd the
+ * launcher happened to have.
+ */
+function resolveSelfSpawnTarget(env, execPath) {
+  const appImage =
+    typeof env?.APPIMAGE === 'string' && nodePath.isAbsolute(env.APPIMAGE) ? env.APPIMAGE : null;
+  return appImage ?? execPath;
+}
+
+/**
+ * Spawn this program again with the given argv and environment: detached + unref'd so
+ * the parent can exit without waiting on the child, stdio inherited so the player's
+ * console output is uninterrupted. Shared by the two self-relaunch levers (the Linux
+ * PRIME re-exec below and the failed-Vulkan-trial relaunch in electron/gpu_backend.cjs),
+ * which is also why the process spawn stays in THIS file: the malware scan sanctions
+ * exactly one shipped shell module for process execution. Returns the spawn target for
+ * the caller's log line; throws when the spawn itself fails (the caller decides what a
+ * failed relaunch means).
+ */
+function spawnDetachedSelf({
+  env,
+  argv,
+  execPath = process.execPath,
+  spawn = nodeSpawn,
+  onSpawned,
+  onSpawnFailed,
+  onUnobservable,
+}) {
+  const spawnTarget = resolveSelfSpawnTarget(env, execPath);
+  const child = spawn(spawnTarget, argv, {
+    env,
+    stdio: 'inherit',
+    detached: true,
+  });
+  // spawn() returning is not a child: a target that cannot start (ENOENT on
+  // an AppImage swapped under a running session, EACCES) is reported LATER,
+  // as an 'error' event, which without a listener is an uncaught exception
+  // in this process. The 'spawn' event is the only proof the child exists.
+  if (typeof child.once === 'function') {
+    child.once('spawn', () => onSpawned?.(spawnTarget));
+    child.once('error', (err) => onSpawnFailed?.(err, spawnTarget));
+  } else {
+    // No event surface: neither callback can ever fire, so nothing about this child will
+    // ever be known. A caller that only logs claims nothing and passes nothing here; a
+    // caller waiting on an answer (the player-requested restart) is told there will not
+    // be one, rather than waiting for the life of the session.
+    onUnobservable?.(spawnTarget);
+  }
+  child.unref?.();
+  return spawnTarget;
+}
+
+/**
+ * The record this relaunch hands its child: what an earlier hop of the chain recorded
+ * planting, plus what THIS hop plants. Accumulated, never replaced, because a chain can
+ * plant its two halves at different hops: electron-updater's restart-to-update respawns
+ * with the current environment (marker and offload variables included) and EMPTY argv, so
+ * the hop that restores the ozone argument adds no variable at all, and a record replaced
+ * there would tell the player-requested restart (electron/launch_settings.cjs) that only
+ * the argument was the shell's, leaving a player who turned the discrete-GPU force off
+ * with a child still carrying the offload environment. Null when a marked parent left no
+ * record: the restart reads that as "everything the lever can plant", which is the answer
+ * it must keep rather than a partial list naming this hop alone.
+ */
+function primeRelaunchRecord(env, planted) {
+  const marked = env?.[PRIME_RELAUNCH_MARKER] === '1';
+  const inherited = env?.[PRIME_RELAUNCH_ADDED_ENV];
+  if (marked && typeof inherited !== 'string') return null;
+  const names = marked ? inherited.split(',').filter((name) => name !== '') : [];
+  return [...new Set([...names, ...planted])].join(',');
+}
+
+/**
  * Re-exec the current process (same argv, PRIME env baked into the child's environment from
  * birth). See lever 3 in the file header for why an in-process process.env mutation cannot
  * work here: only an environment present before Electron's own startup (before the zygote's
  * exec) ever reaches the GPU process. Hybrid-gated (lever 3 (a)); the spawn source is
  * env.APPIMAGE when set, because in an AppImage process.execPath dies with the parent's
- * FUSE mount (lever 3 (b)). Detached + unref'd so the parent can exit without waiting on
- * the child; stdio inherited so the player's console output is uninterrupted. Returns true
- * when a relaunch was spawned, in which case the CALLER must exit immediately via
- * process.exit(0), which stops the main script before any further statement runs (app.exit
- * also works but only after the app module is usable; process.exit needs nothing). Returns
- * false (nothing to do) on any other platform, on a non-hybrid machine, when this process
- * is already correctly configured, or if the spawn itself fails.
+ * FUSE mount (lever 3 (b), resolveSelfSpawnTarget). Returns true when a relaunch was
+ * spawned, in which case the CALLER must exit immediately via process.exit(0), which stops
+ * the main script before any further statement runs (app.exit also works but only after
+ * the app module is usable; process.exit needs nothing). Returns false (nothing to do) on
+ * any other platform, on a non-hybrid machine, when this process is already correctly
+ * configured, or if the spawn itself fails.
  */
 function relaunchForLinuxPrime(deps = {}) {
   const platform = deps.platform ?? process.platform;
@@ -394,14 +476,6 @@ function relaunchForLinuxPrime(deps = {}) {
   const baseArgv = deps.argv ?? process.argv.slice(1);
   if (!shouldRelaunchForLinuxPrime(env, baseArgv, fileExists)) return false;
 
-  const spawnFn = deps.spawn ?? nodeSpawn;
-  // In an AppImage, execPath points inside the runtime's FUSE mount, which dies the moment
-  // this process exits; the outer AppImage file (env.APPIMAGE, the same source
-  // electron-updater restarts from) survives and brings up a fresh runtime + mount.
-  const execPath = deps.execPath ?? process.execPath;
-  const appImage =
-    typeof env.APPIMAGE === 'string' && nodePath.isAbsolute(env.APPIMAGE) ? env.APPIMAGE : null;
-  const spawnTarget = appImage ?? execPath;
   // A Wayland session's GPU process crash-loops once PRIME offload is requested unless
   // Chromium is forced onto the X11 Ozone backend (see LINUX_OZONE_X11_ARG above); never
   // added when the player's own argv already makes an explicit --ozone-platform choice.
@@ -409,18 +483,26 @@ function relaunchForLinuxPrime(deps = {}) {
     ? baseArgv
     : [...baseArgv, LINUX_OZONE_X11_ARG];
   const additions = buildLinuxPrimeEnv(env, fileExists);
+  const planted = [...Object.keys(additions), ...(argv === baseArgv ? [] : [LINUX_OZONE_X11_ARG])];
   const childEnv = { ...env, ...additions, [PRIME_RELAUNCH_MARKER]: '1' };
+  const record = primeRelaunchRecord(env, planted);
+  if (record !== null) childEnv[PRIME_RELAUNCH_ADDED_ENV] = record;
 
   try {
-    const child = spawnFn(spawnTarget, argv, {
+    const spawnTarget = spawnDetachedSelf({
       env: childEnv,
-      stdio: 'inherit',
-      detached: true,
+      argv,
+      execPath: deps.execPath ?? process.execPath,
+      spawn: deps.spawn ?? nodeSpawn,
+      // The caller exits on the true return, before this can fire in practice
+      // (see the header: stopping the main script there is the point); heard
+      // rather than swallowed for the process that is still around to log it.
+      onSpawnFailed: (err, target) =>
+        log?.warn?.('[gpu] the Linux PRIME relaunch never started', { spawnTarget: target, err }),
     });
-    child.unref?.();
     log?.info?.('[gpu] relaunching for Linux PRIME render offload', {
       spawnTarget,
-      added: Object.keys(additions),
+      added: planted,
     });
     return true;
   } catch (err) {
@@ -544,10 +626,13 @@ module.exports = {
   LINUX_PRIME_ENV,
   LINUX_OZONE_X11_ARG,
   PRIME_RELAUNCH_MARKER,
+  PRIME_RELAUNCH_ADDED_ENV,
   buildLinuxPrimeEnv,
   hasExplicitOzonePlatformArg,
   isLinuxHybridGpu,
   shouldRelaunchForLinuxPrime,
+  resolveSelfSpawnTarget,
+  spawnDetachedSelf,
   relaunchForLinuxPrime,
   buildRegQueryArgs,
   buildRegWriteArgs,

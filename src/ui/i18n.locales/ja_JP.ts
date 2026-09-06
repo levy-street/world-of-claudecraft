@@ -1536,6 +1536,29 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.forceHighPerfGpu': '専用ゲーミングGPUを使用',
   'hudChrome.options.forceHighPerfGpuNote':
     '既定でオン：デスクトップ版はこのコンピューターの専用ゲーミングGPUを要求します。ゲームが起動しない、起動後に画面が真っ暗になる、またはノートパソコンの画面が映らない場合はオフにしてください。この設定は次回ゲームを起動したときに反映されます。',
+  'hudChrome.options.shaderWarm': 'シェーダー事前ウォームアップ ワーカー',
+  'hudChrome.options.shaderWarmAuto': '自動',
+  'hudChrome.options.shaderWarmOff': 'オフ',
+  'hudChrome.options.shaderWarmOn': 'オン',
+  'hudChrome.options.shaderWarmNote':
+    'ゲーム中のカクつきを防ぐため、バックグラウンドでシェーダーキャッシュを事前に温めます。自動：グラフィックス環境が対応している場合のみ有効になります（推奨）。オン：どの環境でも強制的に有効にします。環境によっては動作が重くなることがあります。オフ：無効にします。',
+  'hudChrome.options.gpuBackend': 'グラフィックスバックエンド',
+  'hudChrome.options.gpuBackendAuto': '自動',
+  'hudChrome.options.gpuBackendVulkan': 'Vulkan',
+  'hudChrome.options.gpuBackendOpenGL': 'OpenGL（低速）',
+  'hudChrome.options.gpuBackendActive': '現在は {backend} を使用しています。',
+  'hudChrome.options.gpuBackendActiveUnavailable':
+    '現在は {backend} を使用しています（Vulkan を有効にできませんでした）。',
+  'hudChrome.options.gpuBackendNote':
+    '自動はあなたに最適な選択肢を選びます。Vulkanのほうが高速で、ほとんどのプレイヤーにおすすめです。OpenGLは低速ですが、Vulkanが正しく動作しない場合に役立つことがあります。次回のゲーム起動時に反映されます。',
+  'hudChrome.options.gpuBackendActiveAutoCapped':
+    '現在 {backend} を使用中です。このグラフィックカードでは自動はまだVulkanを試しません。試すにはVulkanを選んでください。',
+  'hudChrome.options.gpuBackendSaveFailed':
+    'この選択を保存できませんでした。次回の起動でも {backend} が使用されます。',
+  'hudChrome.options.restartPending': '一部の変更は再起動後に反映されます。',
+  'hudChrome.options.restartGame': 'ゲームを再起動',
+  'hudChrome.options.restartInProgress': 'ゲームを再起動しています...',
+  'hudChrome.options.restartFailed': 'ゲームを自動で再起動できませんでした。終了してからもう一度起動してください。',
   'hudChrome.options.discordPresence': 'Discord リッチプレゼンス',
   'hudChrome.options.discordPresenceNote':
     'プレイ中、現在いるゾーンとこのセッションのプレイ時間をDiscordのアクティビティとして表示します。あなたのDiscordプロフィールを見られる人は誰でもその両方を見られます。共有されるのはゾーン名、このセッションのプレイ時間、ゲーム名だけで、キャラクターやアカウント、一緒に遊んでいる相手が共有されることはありません。このコンピューターでDiscordアプリが起動している必要があります。',
@@ -8510,6 +8533,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'このセッションは統合（省電力）GPUで描画しています。このパソコンにディスクリート（専用）ゲーミングGPUも搭載されている場合は、設定 > システム > ディスプレイ > グラフィックス でブラウザを「高パフォーマンス」に設定してから再起動してください。デスクトップアプリでは自動的にディスクリートGPUが選択されます。',
   'gpuNotice.hybridBodyLinux':
     'このセッションは統合（省電力）GPUで描画しています。このパソコンにディスクリート（専用）ゲーミングGPUも搭載されている場合は、ブラウザやグラフィックスドライバに独自のGPU選択設定があるか、お使いのディストリビューションにGPU切り替えツール（PRIMEやoptimus-managerなど）が用意されている場合があります。デスクトップアプリでは自動的にディスクリートGPUが選択されます。',
+  'gpuNotice.bodyRequestedBackend':
+    '選択したグラフィックスバックエンドでゲームを起動できなかったため、OpenGL で動作しています。動作に問題はありませんが、読み込みと最初の数分は引っかかりが増えることがあります。バックエンドはオプション > グラフィック > システムで選び直せます。',
   'gpuNotice.hybridBodyOther':
     'このセッションは統合（省電力）GPUで描画しています。このパソコンにディスクリート（専用）ゲーミングGPUも搭載されている場合は、ブラウザやオペレーティングシステムのグラフィックス設定を確認して有効にしてください。デスクトップアプリでは自動的にディスクリートGPUが選択されます。',
   'gpuNotice.dismiss': '閉じる',

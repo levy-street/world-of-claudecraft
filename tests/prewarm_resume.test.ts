@@ -539,6 +539,16 @@ describe('resumeDroppedPrewarmEntries', () => {
     expect(unitsSlice).toContain('compileShadow: (root) => this.compileShadowPrograms(root)');
     expect(compileUnitsSource).toContain('await options.compileColor(root)');
     expect(compileUnitsSource).toContain('await options.compileShadow(root)');
+    // ...and the lane ends where the live gates and the reveal host end: the
+    // piece settle over every program variant, then the per-program touch tail.
+    // Without it every boot-linked program paid the driver's uniform-table
+    // round trip at its FIRST LIVE DRAW (shader-program audit F15).
+    expect(unitsSlice).toContain(
+      'tail: entryCompileTail(this.webgl, this.prewarmDepthMaterials, this.backgroundGpuWork)',
+    );
+    expect(compileUnitsSource).toContain(
+      'if (options.tail) await runInitialSceneCompileTail(options.tail, root)',
+    );
     expect(compileEntry).not.toContain('compileAsync(this.scene');
     // The resume lane specifically must never race a scene-wide compileAsync
     // call away (the old bug this pin guards): resuming already-submitted
@@ -569,25 +579,42 @@ describe('resumeDroppedPrewarmEntries', () => {
     // PIECES one root per queue unit (PrewarmResumeUnit.pieces): the world is
     // live here, the together arm's second-arm continuations fired as one
     // 3 s task, and a batch-held unit starved the reveal gates behind it.
-    expect(source).toContain('const run = () => {');
-    expect(source).toContain(
-      'if (debt && unit.pieces) {\n                  return runPrewarmPiecesSerially(unit.pieces, (piece) =>\n                    this.backgroundGpuWork.run(piece.run, priority, piece.id, {\n                      releaseTail: true,\n                    }),\n                  );\n                }',
+    // The per-unit policy moved to src/render/prewarm_resume_runner.ts (the
+    // renderer keeps the binding); the same contract is pinned there, plus the
+    // warm ahead of each root's link (shader_warm_lane.ts).
+    const runner = readFileSync(
+      new URL('../src/render/prewarm_resume_runner.ts', import.meta.url),
+      'utf8',
+    );
+    expect(source).toContain('runResumeUnit(unit, entry, {');
+    expect(source).toContain('queue: this.backgroundGpuWork,');
+    expect(source).toContain('arms: this.compileArms,');
+    expect(runner).toContain('const pieces = debt ? unit.pieces : undefined;');
+    expect(runner).toContain('return runPrewarmPiecesSerially(pieces, (piece) =>');
+    expect(runner).toContain(
+      'deps.queue.run(piece.run, priority, piece.id, { releaseTail: true }),',
     );
     // A debt ROOT piece is one link: released under the tail cap, never a
     // held queue head (batch 18). The batch fallback and the cosmetic resume
     // keep the class-driven tail.
-    expect(source).toContain(
-      'return this.backgroundGpuWork.run(unit.run, priority, unit.id, {\n                  releaseTail: !debt,\n                });',
+    expect(runner).toContain(
+      'return deps.queue.run(unit.run, priority, unit.id, { releaseTail: !debt });',
     );
-    expect(source).toContain("return entry.id.startsWith('programs.compile')");
-    expect(source).toContain("'programs.compile-resume'");
+    expect(runner).toContain("if (entry.id.startsWith('programs.compile')) {");
+    expect(runner).toContain("'programs.compile-resume'");
+    // Every root asks the warm worker first, between units, never inside
+    // one, and before the compile lifecycle window opens.
+    expect(runner).toContain('await warmRootsBeforeLink(deps.arms, roots, {');
+    expect(runner.indexOf('await warmRootsBeforeLink(')).toBeLessThan(
+      runner.indexOf('await runPrewarmCompileResumeUnit('),
+    );
     // The old bare `releaseTail: true,` pin drifted: after the debt-class
     // split the only remaining literal `true` belongs to the preview lane,
     // an unrelated call site. The resume lane's contract is the class-driven
     // flag, and the kickoff must order debt ahead of the serial lane's
     // cosmetic entries (queue priority cannot reorder within the lane).
     expect(source).toContain('const resume = orderPrewarmResumeEntries(droppedEntries);');
-    expect(source).toContain('const units = entry.resumeUnits?.() ?? [];');
+    expect(source).toContain('dropEntry(entry, entry.resumeUnits?.() ?? []);');
     expect(source).toContain('droppedEntries.push({ id: entry.id, units })');
     expect(source).toContain("if (status === 'partial' || status === 'failed') {");
     expect(source).toContain('const partialUnits = entry.resumePartialUnits?.() ?? [];');

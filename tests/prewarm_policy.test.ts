@@ -341,6 +341,11 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     expect(prewarmResumeIsDebt('programs.compile')).toBe(true);
     expect(prewarmResumeIsDebt('programs.compile-submit')).toBe(true);
     expect(prewarmResumeIsDebt('programs.compile-post-paint')).toBe(true);
+    // A dropped entry's program links resume under `programs.<entry id>`: a
+    // cast VFX has no stand-in, so its links are debt while its textures keep
+    // the entry's cosmetic class.
+    expect(prewarmResumeIsDebt('programs.vfx.ability-primitives')).toBe(true);
+    expect(prewarmResumeIsDebt('vfx.ability-primitives')).toBe(false);
     expect(prewarmResumeIsDebt('textures.scene')).toBe(true);
     expect(prewarmResumeIsDebt('surface-detail.textures')).toBe(true);
     // The foliage species stream in with travel (ambient scene, not an
@@ -388,17 +393,25 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
       { id: 'props.ghost-fade-variants' },
       { id: 'textures.scene' },
       { id: 'vfx.weapon-skins' },
+      { id: 'vfx.ability-primitives' },
       { id: 'programs.compile' },
       { id: 'programs.compile-submit' },
+      { id: 'programs.vfx.ability-primitives' },
+      { id: 'programs.compile-post-paint' },
     ]);
     // Program links lead the debt class (a met unlinked program blocks the
     // frame; a texture upload is paced), then the upload debt, then cosmetic.
+    // The renderer pushes a dropped entry's program debt between the compile
+    // remainder and the hidden catalogs, and the order keeps it there.
     expect(ordered.map((entry) => entry.id)).toEqual([
       'programs.compile',
       'programs.compile-submit',
+      'programs.vfx.ability-primitives',
+      'programs.compile-post-paint',
       'textures.scene',
       'props.ghost-fade-variants',
       'vfx.weapon-skins',
+      'vfx.ability-primitives',
     ]);
     // All-cosmetic and all-debt lists come back untouched.
     expect(orderPrewarmResumeEntries([{ id: 'vfx.weapon-skins' }])).toEqual([
@@ -912,37 +925,47 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     // three 0.165 became a dead variant under 0.185 (its shadow pass draws the
     // default packing), and every character shadow program relinked cold at its
     // first draw (production: 1196 / 662 / 211 / 129 ms frames).
-    expect(renderer).toContain("import { prewarmDepthMaterial } from './prewarm_depth_material';");
+    // The shadow arm itself lives in src/render/compile_arms.ts (the renderer
+    // keeps a thin binding to it, so the dry compile of the shader warm audit
+    // rides the same state); the factory import moved with it.
+    const arms = codeWithoutLineComments(
+      readFileSync(new URL('../src/render/compile_arms.ts', import.meta.url), 'utf8').replace(
+        /\r\n/g,
+        '\n',
+      ),
+    );
+    expect(arms).toContain("import { prewarmDepthMaterial } from './prewarm_depth_material';");
+    expect(renderer).toContain('return linkShadowPrograms(this.compileArms, root);');
+    expect(renderer).not.toContain('prewarmDepthMaterial(');
     // The shadow arm covers EVERY mesh with a material, not just skinned rigs
     // (static and instanced casters' depth programs were 12 of the frame's 64
     // residual links) and not just the casters of the moment: castShadow is a
     // runtime distance toggle, so a rig gated beyond the shadow band must
     // still get its depth twin or it links cold at its first shadow draw.
     // Neither a `castShadow` branch nor a null-material swap belongs here.
-    const shadowStart = renderer.indexOf('private async compileShadowPrograms(');
-    // Comments are stripped above, so the slice ends on the next declaration.
-    const shadowEnd = renderer.indexOf('private prewarmRenderTarget', shadowStart);
+    const shadowStart = arms.indexOf('export function runShadowArm<T>(');
+    // Line comments are stripped above and the doc block of the next export
+    // carries none of the forbidden spellings, so the slice ends there.
+    const shadowEnd = arms.indexOf('export async function linkShadowPrograms(', shadowStart);
     expect(shadowStart).toBeGreaterThan(-1);
     expect(shadowEnd).toBeGreaterThan(shadowStart);
-    const shadowMethod = renderer.slice(shadowStart, shadowEnd);
+    const shadowMethod = arms.slice(shadowStart, shadowEnd);
     expect(shadowMethod).toContain('if (!mesh.isMesh || !mesh.material) return;');
     expect(shadowMethod).not.toContain('castShadow');
     expect(shadowMethod).not.toContain('isSkinnedMesh');
     expect(shadowMethod).not.toContain('mesh.material = null');
     expect(shadowMethod).toContain('for (const swap of swaps) swap.mesh.material = swap.material;');
-    // Scoped to the shadow arm: the renderer must not hand-build a depth
-    // material there (a `new THREE.MeshDepthMaterial(` or a `depthPacking` write
-    // in that block would be the override coming back by another door). The
-    // factory is fed the caster mesh too: one awaited depth material per
-    // (skinning x morph count x instancing) shape, not one shared instance whose
-    // single currentProgram slot leaves the sibling programs unpolled.
+    // Scoped to the shadow arm: it must not hand-build a depth material there
+    // (a `new THREE.MeshDepthMaterial(` or a `depthPacking` write in that block
+    // would be the override coming back by another door). The factory is fed
+    // the caster mesh too: one awaited depth material per (skinning x morph
+    // count x instancing) shape, not one shared instance whose single
+    // currentProgram slot leaves the sibling programs unpolled.
     // (tests/renderer_shadow_prewarm.test.ts proves the same behaviorally.)
     expect(shadowMethod).not.toContain('depthPacking');
     expect(shadowMethod).not.toContain('new THREE.MeshDepthMaterial(');
-    expect(shadowMethod).toContain('prewarmDepthMaterial(this.prewarmDepthMaterials, item, mesh)');
-    expect(shadowMethod).toContain(
-      'prewarmDepthMaterial(this.prewarmDepthMaterials, material, mesh)',
-    );
+    expect(shadowMethod).toContain('prewarmDepthMaterial(depthMaterials, item, mesh)');
+    expect(shadowMethod).toContain('prewarmDepthMaterial(depthMaterials, material, mesh)');
   });
 
   it('keeps the required desktop compiler behind the loading cover after a slow first frame', () => {
@@ -1579,7 +1602,7 @@ describe('mandatory interaction-landmark prewarm', () => {
 });
 
 describe('self-spirit prewarm queue wiring', () => {
-  it('preserves the idle delay and runs the compile through the shared GPU queue', () => {
+  it('preserves the idle delay and runs the warm and link units through the shared GPU queue', () => {
     const renderer = readFileSync(
       new URL('../src/render/renderer.ts', import.meta.url),
       'utf8',
@@ -1589,14 +1612,13 @@ describe('self-spirit prewarm queue wiring', () => {
     expect(start).toBeGreaterThan(-1);
     expect(end).toBeGreaterThan(start);
     const wiring = renderer.slice(start, end);
-    const idleAt = wiring.indexOf('idle: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS)');
-    const queueAt = wiring.indexOf('this.backgroundGpuWork.run(');
-    expect(idleAt).toBeGreaterThan(-1);
-    expect(queueAt).toBeGreaterThan(-1);
-    expect(wiring).toContain('() => this.warmSelfSpirit()');
-    expect(wiring).toContain('GPU_WORK_PRIORITY.VISIBLE_PREWARM');
-    expect(wiring).toContain("'self-spirit'");
-    expect(wiring).toContain('{ releaseTail: true }');
+    expect(wiring).toContain('idle: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS)');
+    // The units themselves (priority, labels, released tail, the hold
+    // between them) are pinned on the module, tests/self_spirit_warm.test.ts.
+    expect(wiring).toContain('warmSelfSpiritPrograms({');
+    expect(wiring).toContain('this.backgroundGpuWork.run(work, priority, label, options)');
+    expect(wiring).toContain('linkColorPrograms(this.compileArms, root, false)');
+    expect(wiring).toContain('!this.asyncCompileSupported || this.sim.player.ghost');
   });
 });
 

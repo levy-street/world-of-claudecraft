@@ -348,12 +348,25 @@ interface AttributionTargetFixture {
 // Re-minted for the Drakelands entrance merge into the raid branch (PRs 3689
 // plus 3734: both arms had re-minted, the merged renderer and evidence inputs
 // land together). No capture was retaken.
+// Re-minted for the 2026-08-31 v0.41.0 sync into the shader-warm branch: both
+// arms had re-minted, and the merged renderer, three patch, lockfile, and
+// re-stamped GLB inputs land together. No capture was retaken.
+// Re-minted for review round 3 of the shader-warm PR (the battleground ward
+// walk left renderer.ts for battleground_views.ts and the prebuild release
+// call replaced it). No capture was retaken.
+// Re-minted for the shader-warm PR's give-up rule and its review fixes
+// (renderer.ts: the census bracket and the cast units' compile-arm host).
+// No capture was retaken.
 // Re-minted at the release/v0.42.0 sync of PR #3439: renderer.ts moved for the
 // mount lifecycle seam (mount_lifecycle.ts) and the rickshaw hooks it absorbed.
 // Re-minted for the Cluckwork Mech Bird store mount (PR #3464) on top of the
 // v0.42.0 mount-lifecycle move: the renderer's stride accumulator moved to
 // src/render/stride_audio_core.ts and the mounted audio branch gained the
 // idle-hum poll. No capture was retaken.
+// Re-minted for the 2026-09-04 release/v0.42.0 sync into the shader-warm branch:
+// both arms had re-minted, and the merged renderer (the mount lifecycle and
+// stride audio moves beside this branch's changes) and evidence inputs land
+// together. No capture was retaken.
 // Re-minted for the Realm Builder monument (PR #3695) at its release/v0.42.0
 // base merge: the civic centrepiece changed asset, subject and shader cache
 // key on top of the mount-lifecycle and occluder-fade moves already sealed
@@ -362,8 +375,11 @@ interface AttributionTargetFixture {
 // Re-minted for the PR #3695 review fixes: the monument's impostor fragment
 // gained the fog, tonemapping and colourspace tail, moving
 // realm_builder_monument_fx.ts. No capture was retaken.
+// Re-minted for the 2026-09-05 release/v0.42.0 sync into the shader-warm branch:
+// the Realm Builder monument (PR #3695) and this branch's renderer changes
+// land together on the merged tree. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '85392484fb6509a37aa445bcc5bd5ebba58819939847318ccf288b048341b708';
+  '3a5b183e08a217c7421c7fecd4b61e43598b3a081fe8b07ba7fdabed559d0f7b';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

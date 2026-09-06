@@ -58,6 +58,7 @@ const {
   MAX_FORWARDED_ERRORS,
   MAX_MIRRORED_CONSOLE_LINES,
   clampText,
+  classifyRendererExit,
   escapeNotificationMarkup,
   normalizeConsoleMessage,
   rendererErrorLogEntry,
@@ -75,6 +76,24 @@ const {
   relaunchForLinuxPrime,
   summarizeGpuDevices,
 } = require('./gpu_preference.cjs');
+const {
+  GPU_BACKEND_SETTINGS,
+  activeGpuAdapterKey,
+  applyGpuBackendSwitches,
+  backendDidNotBind,
+  decideGpuBackendLaunch,
+  demoteAfterRepeatedCrashes,
+  gpuBackendMemoryAfterHealthySession,
+  launchCounterAfterAutoLaunch,
+  hasGetGpuInfoEvidence,
+  judgeGpuBackendLaunch,
+  relaunchOnLowerBackend,
+  requestedBackendUnavailable,
+  SESSION_HEALTHY_AFTER_MS,
+  shouldRescueMissingGpu,
+} = require('./gpu_backend.cjs');
+const { gpuBackendPolicy } = require('./gpu_backend_policy.cjs');
+const { launchSettingsSnapshot, restartApp } = require('./launch_settings.cjs');
 const { gpuStatusPayload } = require('./gpu_status_events.cjs');
 const { presentationStatePayload } = require('./presentation_events.cjs');
 const {
@@ -98,6 +117,12 @@ const {
 // close-time bounds save still to come).
 const desktopPrefsPath = path.join(app.getPath('userData'), DESKTOP_PREFS_FILENAME);
 const desktopPrefs = loadDesktopPrefs(desktopPrefsPath);
+// What THIS process started with, for the settings that only apply at the next launch
+// (electron/launch_settings.cjs). Taken here, before any lever reads the prefs and before
+// any setter can move them, and frozen: the getters below serve the STORED values, which
+// a setter moves live, so this snapshot is the only way the game can tell "changed,
+// restart to apply" from "already running".
+const launchSettings = launchSettingsSnapshot(desktopPrefs);
 
 // No-boot escape hatch (documented in docs/desktop-release.md): setting
 // WOC_DISABLE_GPU_FORCE=1 in the environment skips BOTH discrete-GPU levers
@@ -231,6 +256,63 @@ if (gpuForceDisabledByEnv) {
 } else {
   forceHighPerformanceGpu({ app, log });
 }
+
+/**
+ * Merge a partial into the live prefs and persist them. The GPU-backend memory is written
+ * from several places (the launch counter, a healthy session, a launch-time death), each
+ * of which owns only its own fields, so every one of them goes through here rather than
+ * spreading `{ ...desktopPrefs, ... }` and racing the others' fields. A null or empty
+ * partial is a no-op, which is how the pure helpers say "nothing changed".
+ */
+function mergeDesktopPrefs(partial) {
+  if (!partial || Object.keys(partial).length === 0) return false;
+  const next = { ...desktopPrefs, ...partial };
+  if (!saveDesktopPrefs(desktopPrefsPath, next)) {
+    log.warn('[gpu] could not persist the GPU backend memory');
+    return false;
+  }
+  Object.assign(desktopPrefs, partial);
+  return true;
+}
+
+// Linux only: Chromium's default WebGL backend there is ANGLE over OpenGL, where every
+// shader program link stalls the GPU process's presenting thread (100 to 320 ms hitches
+// per program the game cannot avoid); ANGLE's Vulkan backend links in about 10 ms. A
+// forced Vulkan backend has no OpenGL fallback of its own (a machine without a working
+// Vulkan driver lands on SwiftShader), so the shell runs a LADDER of rungs rather than one
+// backend: Auto starts on what this machine has proven it can run and climbs back on a
+// cadence, and a GPU-process death at launch rescues the session onto the rung below, in
+// every mode.
+//
+// Which rung THIS launch runs is decided here, before app 'ready' (the switches are read
+// there) and after the discrete-GPU force; the decision table (the rescue marker,
+// WOC_GPU_BACKEND, the no-lever rescue env, the setting, the Auto memory and its climb)
+// lives in electron/gpu_backend.cjs. logGpuStatus below judges what the GPU process
+// ACTUALLY bound and, once the session has proven healthy, writes the Auto memory.
+// The policy first (electron/gpu_backend_policy.cjs): what this machine's rendering GPU
+// needs on Vulkan (switches every Vulkan launch carries, whatever the mode) and whether
+// Auto is held at a rung there. Read from /sys/class/drm, so it is in hand before the
+// switches are appended.
+const gpuPolicy = gpuBackendPolicy({ platform: process.platform, env: process.env });
+const gpuBackendLaunch = decideGpuBackendLaunch({
+  platform: process.platform,
+  env: process.env,
+  prefs: desktopPrefs,
+  appVersion: app.getVersion(),
+  autoCeiling: gpuPolicy.autoCeiling,
+});
+applyGpuBackendSwitches(app, gpuBackendLaunch, gpuPolicy.vulkanSwitches);
+log.info(`[gpu] backend launch: ${gpuBackendLaunch.rung} (${gpuBackendLaunch.reason})`);
+if (gpuPolicy.why !== '') {
+  log.info(`[gpu] backend policy: ${gpuPolicy.why}`, {
+    vulkanSwitches: gpuPolicy.vulkanSwitches,
+    autoCeiling: gpuPolicy.autoCeiling?.rung ?? null,
+  });
+}
+// The climb counter moves on every Auto launch (never a rescued child, never an explicit
+// one), whether or not this launch climbed, so the cadence measures launches since the
+// last ATTEMPT rather than since anything at all.
+mergeDesktopPrefs(launchCounterAfterAutoLaunch({ prefs: desktopPrefs, launch: gpuBackendLaunch }));
 
 // Steam preloads its overlay into every native Linux game, and with that library mapped
 // Chromium's GPU process cannot start: the browser process gives up with a CHECK and the app
@@ -367,6 +449,29 @@ const MOVE_DISPLAY_DEBOUNCE_MS = 250;
 // electron/window_memory.cjs, which clamps every restored size to them.
 const DEFAULT_WINDOW_WIDTH = 1440;
 const DEFAULT_WINDOW_HEIGHT = 900;
+
+// Where a borderless preference is applied: at the reveal, or once the page has
+// loaded. Linux defers it, the other platforms do not.
+//
+// The window manager owns presentation state and can only honor a request for a
+// window it has already mapped. Asked for during the reveal on GNOME/X11, mutter
+// drops it, so the session runs in a plain window while isFullScreen() keeps
+// answering true. The bounds Chromium applies on the way in and the window
+// manager undoes on the way out then resize the compositor surface twice inside
+// one frame, which invalidates its Vulkan swapchain: vkAcquireNextImageKHR
+// returns VK_ERROR_OUT_OF_DATE_KHR, Chromium calls that unrecoverable and kills
+// the GPU process, and roughly half of those launches leave the page blocked
+// from WebGL for the rest of the session ("Web page caused context loss and was
+// blocked"), which is a game that never renders. Measured on the packaged build
+// (RTX 3090, GNOME/X11, ANGLE Vulkan): 15 of 15 reveal-time borderless launches
+// lost the GPU process and none of them presented full screen; 11 of 11 deferred
+// ones did neither.
+//
+// Linux only, deliberately: macOS and Windows honor the reveal-time apply today,
+// their compositors are not the one that drops it, and neither is measurable
+// from here. Widening this is a one-word change once someone can hold a
+// before/after on those platforms.
+const DEFER_DISPLAY_MODE_TO_LOAD = process.platform === 'linux';
 
 // How long a resize or a drag must settle before the window geometry is written
 // to disk. Both events fire continuously, and the file is rewritten whole, so
@@ -548,18 +653,19 @@ function createMainWindow() {
   // (documented BrowserWindow contract, verified against Electron 43), so a
   // constructor-time maximize would present an unpainted frame for the whole
   // load, defeating show:false. Placed before show() so the first visible
-  // frame is the already-maximized one.
+  // frame is the already-maximized one. Full screen is the opposite case on a
+  // deferring platform; see DEFER_DISPLAY_MODE_TO_LOAD.
   const win = mainWindow;
   const showMainWindow = () => {
     if (win.isDestroyed() || win.isVisible()) return false;
     // Borderless SUPERSEDES a maximized session: full screen already covers the
     // display, and doing both would leave the window remembering a maximized
-    // state it never presented. Applied here for the same reason as the
-    // maximize (and never as a `fullscreen` option on the constructor: an
-    // explicit fullscreen:false disables the macOS full-screen button, and
-    // constructor-time state would skip this reveal discipline entirely).
-    if (desktopPrefs.displayMode === 'borderless') win.setFullScreen(true);
-    else if (restore.maximized) win.maximize();
+    // state it never presented. On a deferring platform the full screen itself
+    // is not applied here (see DEFER_DISPLAY_MODE_TO_LOAD), but borderless still
+    // supersedes: a session that will go full screen must not maximize first.
+    if (desktopPrefs.displayMode === 'borderless') {
+      if (!DEFER_DISPLAY_MODE_TO_LOAD) win.setFullScreen(true);
+    } else if (restore.maximized) win.maximize();
     win.show();
     return true;
   };
@@ -584,6 +690,23 @@ function createMainWindow() {
     clearReadyToShowFallback();
     showMainWindow();
   });
+
+  // The deferred half of DEFER_DISPLAY_MODE_TO_LOAD, on did-finish-load: the
+  // signal the GPU readout and the presentation re-push already ride, and a
+  // real event rather than a delay, because a wall-clock constant tuned on one
+  // machine would not be a gate on any other. Bound with .once, so the mode is
+  // applied once per window creation exactly like the reveal it replaces, and a
+  // crash-recovery reload cannot snap back a window the player has fullscreened
+  // or restored by hand since. The stored mode is re-read at apply time, so a
+  // mode the player changed while the page was still loading (already applied
+  // live by desktop-set-display-mode) is left alone.
+  if (DEFER_DISPLAY_MODE_TO_LOAD) {
+    mainWindow.webContents.once('did-finish-load', () => {
+      if (win.isDestroyed()) return;
+      if (desktopPrefs.displayMode !== 'borderless') return;
+      win.setFullScreen(true);
+    });
+  }
 
   // Window hidden-ness, pushed from here because the page can never observe it.
   // Each event just re-derives (see sendPresentationState above), so none of
@@ -1031,7 +1154,121 @@ ipcMain.handle('desktop-get-gpu-force-opt-out', (event) => {
   return desktopPrefs.gpuForceOptOut === true;
 });
 
-// How the shell presents its window (Options > Interface). Unlike the GPU force this
+// The Linux GPU backend (Graphics > System). Stored, not applied live: the backend
+// switches land before Electron's own startup (see the gpuBackendLaunch block at the top
+// of this file), so a change takes effect at the NEXT launch. 'vulkan' and 'opengl' are
+// explicit: the memory is neither read nor written under them, though the RESCUE still
+// applies to every launch. Persisted first, committed in memory only on a successful
+// write, so the getter never reports a value the next launch will not read.
+ipcMain.handle('desktop-set-gpu-backend', (event, value) => {
+  if (!trustedSender(event)) return false;
+  if (!GPU_BACKEND_SETTINGS.includes(value)) return false;
+  // Idempotent on purpose, like the display-mode and Discord setters: the renderer
+  // re-pushes its stored setting at every boot, and answering that echo with a write
+  // would cost an fsynced prefs write per launch for a value that did not move.
+  if (value === desktopPrefs.gpuBackend) return true;
+  // Coming BACK to auto clears the GUESS and starts detection over: whatever this machine
+  // did under an explicit choice taught us nothing about what Auto should attempt, and a
+  // remembered rung from before the detour may describe a driver that has since changed.
+  // The PROOF survives: a session that once ran healthy here still ran healthy here, and
+  // it is what lets the climb aim straight instead of feeling its way up. A same-value
+  // push is already answered above; the comparison stays here so the reset can never ride
+  // an echo, which would start detection over at every launch.
+  const backToAuto = value === 'auto' && desktopPrefs.gpuBackend !== 'auto';
+  const next = { ...desktopPrefs, gpuBackend: value };
+  if (backToAuto) {
+    next.gpuBackendToAttempt = undefined;
+    next.consecutiveGpuLaunchCrashes = 0;
+    next.launchesSinceBackendReprobe = 0;
+  }
+  if (!saveDesktopPrefs(desktopPrefsPath, next)) {
+    log.warn('[gpu] could not persist the GPU backend preference');
+    return false;
+  }
+  desktopPrefs.gpuBackend = value;
+  if (backToAuto) {
+    desktopPrefs.gpuBackendToAttempt = undefined;
+    desktopPrefs.consecutiveGpuLaunchCrashes = 0;
+    desktopPrefs.launchesSinceBackendReprobe = 0;
+  }
+  return true;
+});
+
+// What the options row shows: the stored setting (what the NEXT launch will do), the rung
+// this launch is ACTUALLY running, whether that fell short of what was asked for, and
+// whether the lever exists on this platform at all so the row can hide itself off Linux.
+// The active rung is the point of the row: a player who picked Vulkan on a machine that
+// cannot run it would otherwise read "Vulkan" and be playing on OpenGL.
+function gpuBackendState() {
+  return {
+    setting: desktopPrefs.gpuBackend,
+    // Empty until the launch is judged: `boundRung` starts as the rung we ASKED
+    // for, and reporting that as the active one is exactly the lie the status
+    // line exists to stop (the page reads an empty rung as "nothing to say").
+    active: gpuBackendJudged ? boundRung : '',
+    // Read off the SETTING, not this launch's rung: a rescue chain ends on a
+    // process whose own launch succeeded, so comparing against the launch goes
+    // quiet on exactly the machine this message exists for.
+    requestedUnavailable: requestedBackendUnavailable({
+      setting: desktopPrefs.gpuBackend,
+      judged: gpuBackendJudged,
+      boundRung,
+    }),
+    // Auto asked for more and the policy held it at OpenGL (an excluded GPU): the row
+    // tells the player so, and that Vulkan is still theirs to pick.
+    autoCapped: gpuBackendLaunch.capped === true,
+    supported: process.platform === 'linux',
+  };
+}
+
+// The next-launch settings as THIS process read them (see launchSettings above): what
+// the options window compares the stored values against to offer a restart.
+ipcMain.handle('desktop-get-launch-settings', (event) => {
+  if (!trustedSender(event)) return null;
+  return launchSettings;
+});
+
+// Restart at the player's request (the options window's restart strip). Same handover as
+// the backend rescue: the single-instance lock is released and this process quits on the
+// child's 'spawn' event, never before (electron/launch_settings.cjs). app.quit, not
+// app.exit: the window is healthy, so its close-time bounds save and the will-quit
+// teardown get their normal turn. The answer is the child's fate: false when it never
+// started, with this process still running and holding its lock, so the strip can say so.
+let restartInFlight = null;
+ipcMain.handle('desktop-restart-app', (event) => {
+  if (!trustedSender(event)) return false;
+  // No chain cap here, unlike the backend rescue's: this restart is origin-gated
+  // (trustedSender) and single-flighted (below), and each child is a fresh
+  // process the player asked for, so there is no runaway chain to bound.
+  // One child at a time: a second ask while the first is still coming up joins its
+  // answer rather than spawning a second detached child beside it.
+  if (restartInFlight) return restartInFlight;
+  restartInFlight = restartApp({
+    log,
+    devServerUrl,
+    onSpawned: () => {
+      app.releaseSingleInstanceLock();
+      app.quit();
+    },
+  }).then((started) => {
+    if (!started) restartInFlight = null;
+    return started;
+  });
+  return restartInFlight;
+});
+
+ipcMain.handle('desktop-get-gpu-backend', (event) => {
+  if (!trustedSender(event)) return null;
+  return gpuBackendState();
+});
+
+/** Push the state the moment it is known, so a page open at the options row updates. */
+function sendGpuBackendState() {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  mainWindow.webContents.send('desktop-gpu-backend-state', gpuBackendState());
+}
+
+// How the shell presents its window (Graphics > Display). Unlike the GPU force this
 // applies LIVE as well as being stored: the player expects the mode to change under the
 // click, and the next launch reads the same stored value at the reveal. Persisted first,
 // so a mode that could not be written is not applied to a window the next launch would
@@ -1194,6 +1431,35 @@ ipcMain.handle('desktop-set-discord-presence-enabled', (event, enabled) => {
 // caps, but main re-validates and re-caps without trusting it
 // (electron/diagnostics.cjs); a malformed payload is dropped silently.
 let rendererErrorsLogged = 0;
+// The game's own WebGL renderer string (src/game/, sent once the game context exists).
+// Its one consumer is the backend judgement: getGPUInfo can leave glRenderer empty on
+// a healthy Linux Vulkan session, so this is the usual verdict source. Strings only, and
+// never an empty one (no evidence, same as an empty getGPUInfo reading); a SwiftShader
+// string still judges as OpenGL through judgeGpuBackendLaunch. Nothing is answered.
+// This makes a page-reported string a LAUNCH-CONTROL input: a reading below the rung
+// asked for re-execs the shell onto the rung below (rescueOntoLowerBackend, app.exit).
+// The parallelCompile flag beside it is the second input, and it writes too: reported
+// false on a launch already judged as vulkan-parallel-compile, it LOWERS the bound rung
+// to vulkan-plain (refineParallelCompile), which the options row then names and which a
+// launch the memory decided, once it proves healthy, then persists as the rung it
+// remembers (armHealthySessionTimer). It never rescues, so nothing re-execs on it.
+// The blast radius is bounded by construction: trusted senders only (the game page
+// this shell loaded, never a remote frame), judged once per process, one rescue per
+// process, and a chain capped by the rescue marker. Inside those bounds the worst a
+// page could do is not one-shot: refineParallelCompile(false) LOWERS the bound rung,
+// and the healthy-session timer then writes that lower rung to the memory, so every
+// LATER launch starts there until something raises it again. It is a persisted
+// downgrade to a slower backend, never an escape from the backend set, and it is why
+// the trusted-sender check is the load-bearing part of this handler.
+ipcMain.on('desktop-report-gpu-renderer', (event, renderer, parallelCompile) => {
+  if (!trustedSender(event)) return;
+  if (typeof renderer !== 'string' || renderer === '') return;
+  // The extension flag rides along as a strict boolean, or not at all (an
+  // older game build reports the string alone: unknown, never false).
+  const parallel = parallelCompile === true ? true : parallelCompile === false ? false : undefined;
+  judgeThisLaunch(renderer.slice(0, 256), false, parallel);
+});
+
 ipcMain.on('desktop-renderer-error', (event, payload) => {
   if (!trustedSender(event)) return;
   if (rendererErrorsLogged >= MAX_FORWARDED_ERRORS) return;
@@ -1266,6 +1532,218 @@ if (!singleInstance) {
 // dev-channel diagnostics; the whitelisted verdict pushed on 'desktop-gpu-status' is the one
 // user-facing product of this flow (the renderer localizes it, see src/game/).
 let lastGpuRendererLog = '';
+// Judged once per process; the rung that actually bound, and the active adapter this
+// machine reports (the proof records both: the adapter is what tells "this machine" from
+// another one, and it reads the same on every backend where the renderer string does
+// not). `sessionHealthy` latches the moment the session has run long enough for its rung
+// to count as proven.
+let gpuBackendJudged = false;
+let boundRung = gpuBackendLaunch.rung;
+let boundGpuAdapter = '';
+let sessionHealthy = false;
+let healthySessionTimer = null;
+// One rescue per process, whichever trigger reaches it first.
+let gpuRescueSpawned = false;
+// One counted death per process: the GPU process can report gone more than once inside
+// the launch window (a refused rescue keeps this process alive through Chromium's own
+// restarts), and the streak counts LAUNCHES, not events.
+let gpuLaunchDeathCounted = false;
+
+// What this launch actually bound, judged ONCE per process from the first piece of real
+// evidence (a crash-recovery reload must not re-judge: the adapter it lands on is the
+// post-crash fallback, not this launch's rung). Two sources feed it, both through this one
+// function so the handling has one shape: the getGPUInfo reading in logGpuStatus when it
+// carries evidence, and the renderer string the game reports over
+// desktop-report-gpu-renderer (on Linux getGPUInfo can leave glRenderer EMPTY on a healthy
+// Vulkan session, so the game's own WebGL renderer string is the usual source).
+//
+// Judging is NOT remembering. A launch that bound a lower rung than it asked for is
+// rescued right now, in every mode, because the player is on SwiftShader or worse as we
+// speak; the MEMORY only moves once the session has proven healthy (below), so an explicit
+// choice is rescued without ever being second-guessed on disk.
+function judgeThisLaunch(glRenderer, softwareRendering, parallelCompile) {
+  if (gpuBackendJudged) {
+    refineParallelCompile(parallelCompile);
+    return;
+  }
+  gpuBackendJudged = true;
+  boundRung = judgeGpuBackendLaunch({
+    glRenderer,
+    softwareRendering,
+    parallel: gpuBackendLaunch.parallel,
+    parallelCompile,
+  });
+  log.info(`[gpu] backend bound: ${boundRung} (asked for ${gpuBackendLaunch.rung})`, {
+    glRenderer,
+    softwareRendering,
+    parallelCompile,
+  });
+  sendGpuBackendState();
+  if (!backendDidNotBind(gpuBackendLaunch.rung, boundRung)) return;
+  // A Vulkan rung bound something that is not Vulkan: the switches did not take. Step
+  // down for real rather than sit on a software rasterizer for the session. Vulkan
+  // without the parallel-compile feature is NOT this case (backendDidNotBind): the
+  // window is healthy, and the memory remembers the rung that bound.
+  log.warn(`[gpu] ${gpuBackendLaunch.rung} did not bind; rescuing onto the rung below it`, {
+    bound: boundRung,
+  });
+  rescueOntoLowerBackend(`it bound ${boundRung} instead`);
+}
+
+/**
+ * The one reading the getGPUInfo arm cannot make: whether the page's context got the
+ * parallel-compile extension. When that arm judged first (it can win the race against
+ * the page's report), a top-rung launch was read as bound in full; the page's later
+ * report is the only evidence for the feature, so it may still lower the bound rung
+ * to plain Vulkan. A memory matter only (the healthy session then remembers the rung
+ * that really bound, and the options row says so); never a rescue, see
+ * backendDidNotBind.
+ */
+function refineParallelCompile(parallelCompile) {
+  if (parallelCompile !== false || boundRung !== 'vulkan-parallel-compile') return;
+  boundRung = 'vulkan-plain';
+  log.info('[gpu] backend bound refined: vulkan-plain (the page reports the extension absent)');
+  sendGpuBackendState();
+}
+
+/**
+ * The one way this process rescues itself onto a lower rung. Three triggers can reach it
+ * (the GPU process dying at launch, a judged lower binding, and a Vulkan rung that never
+ * got a GPU at all), and they can overlap: a pending getGPUInfo promise resolving after a
+ * death handler has already spawned would otherwise spawn a second child on the same rung.
+ * Latched, so the first one wins and the rest are no-ops. Off the ladder (not Linux)
+ * there is nothing to rescue onto, so nothing is logged as a rescue either.
+ *
+ * The single-instance lock is handed over, and this process exits, on the child's
+ * 'spawn' event (and only then): a child that requested its own lock while the parent
+ * still held it would see itself as a second instance and quit, and a parent that had
+ * exited on spawn() returning would leave nothing running when the child never starts
+ * (an async ENOENT). A refused or failed rescue keeps this process running, with its
+ * lock.
+ */
+function rescueOntoLowerBackend(why) {
+  if (!gpuBackendLaunch.ladder || gpuRescueSpawned || sessionHealthy) return;
+  gpuRescueSpawned = true;
+  log.warn(`[gpu] rescuing off ${gpuBackendLaunch.rung}: ${why}`);
+  relaunchOnLowerBackend(
+    {
+      log,
+      // On the child's 'spawn' event, never on spawn() returning: a child that
+      // never starts (an async ENOENT) leaves this process running, with its lock.
+      onSpawned: () => {
+        app.releaseSingleInstanceLock();
+        app.exit(0);
+      },
+    },
+    gpuBackendLaunch.rung,
+  );
+  // No lower rung, a spent chain or a child that never started: run on whatever we have
+  // rather than leave the player with nothing.
+}
+
+// A session is HEALTHY once it has survived SESSION_HEALTHY_AFTER_MS without a
+// GPU-process death. That is what separates "this rung runs here" from "this rung started
+// here", the distinction the previous verdict never made, and it is also what tells a LATE
+// crash apart from a launch failure.
+//
+// Armed from the launch itself, never from the judgement: a page that never reports its
+// renderer (WebGL creation failed outright is exactly that case) would otherwise leave the
+// session in "launch" state for its whole life, and a GPU-process death three hours in
+// would be counted as a launch failure, demote the memory, and re-exec a live session out
+// from under the player. Writing the MEMORY still requires a judged rung, because an
+// unjudged one is not evidence of anything. Off the ladder (not Linux) nothing is armed:
+// there is no memory to write and no launch failure to tell from a late crash.
+function armHealthySessionTimer() {
+  if (!gpuBackendLaunch.ladder || healthySessionTimer !== null || sessionHealthy) return;
+  healthySessionTimer = setTimeout(() => {
+    healthySessionTimer = null;
+    sessionHealthy = true;
+    if (!gpuBackendJudged) {
+      // Nothing reported its renderer, so there is no rung to record. The
+      // session still counts as healthy: a death from here is a late crash.
+      log.info('[gpu] session healthy, but the launch was never judged (memory untouched)');
+      return;
+    }
+    if (!gpuBackendLaunch.auto) {
+      // Only a launch the memory DECIDED writes it back. An explicit setting, an env
+      // override or the no-lever env are the player's (or the developer's) decision, not
+      // something learned about the machine: WOC_DISABLE_GPU_FORCE=1 must not demote the
+      // next ordinary launch. The launch's flag, never the setting alone: the setting
+      // says Auto under every override.
+      log.info(
+        `[gpu] session healthy on ${boundRung} (${gpuBackendLaunch.reason}, memory untouched)`,
+      );
+      return;
+    }
+    const next = gpuBackendMemoryAfterHealthySession({
+      prefs: desktopPrefs,
+      rung: boundRung,
+      appVersion: app.getVersion(),
+      gpuAdapter: boundGpuAdapter,
+      rescued: gpuBackendLaunch.rescued,
+    });
+    if (mergeDesktopPrefs(next)) {
+      log.info(`[gpu] session healthy on ${boundRung}; memory updated`, next);
+    } else {
+      log.info(`[gpu] session healthy on ${boundRung}; memory already says so`);
+    }
+  }, SESSION_HEALTHY_AFTER_MS);
+  healthySessionTimer.unref?.();
+}
+
+// The GPU process dying. Two very different events wear the same name:
+//
+// BEFORE the session is healthy, it is a launch failure: rescue it onto the rung below,
+// in EVERY mode, so the player gets a running game inside this launch instead of the
+// white screen Chromium leaves behind when it blocks a page from WebGL. Only then, and
+// only on Auto, does the crash streak move; three consecutive ones step the memory down.
+//
+// AFTER a healthy session it is the rare late crash: Chromium restarts the GPU process on
+// its own and this session keeps whatever it recovers on. Nothing is counted and nothing
+// is written, because the rung has already proven itself here.
+// The launch window opens now, not when something reports a renderer: see
+// armHealthySessionTimer. Deferred to whenReady only because Electron's timers are the
+// shell's own clock, and nothing before ready can die anyway.
+app.whenReady().then(armHealthySessionTimer);
+
+app.on('child-process-gone', (_event, details) => {
+  if (details?.type !== 'GPU') return;
+  const context = { reason: details?.reason, exitCode: details?.exitCode };
+  // Off the ladder the shell has no rung to step to and no memory to move: the crash
+  // guard's own listener already logs every child gone, so this one stays quiet.
+  if (!gpuBackendLaunch.ladder) return;
+  // A clean exit is the process lifecycle (our own quit inside the launch window):
+  // counting it would spawn a rescue child at quit and walk the memory down on a
+  // player who only looked and left. A kill came from outside the process (the OS OOM
+  // killer, the shell's own shutdown): no rung below answers it, and Chromium restarts
+  // the GPU process on its own; logged at warn so a shipped build shows it.
+  if (classifyRendererExit(details?.reason) === 'benign') {
+    const level = details?.reason === 'killed' ? 'warn' : 'info';
+    log[level](`[gpu] GPU process gone (not a crash) on ${boundRung}`, context);
+    return;
+  }
+  if (sessionHealthy) {
+    log.warn(`[gpu] GPU process gone after a healthy session on ${boundRung}`, context);
+    return;
+  }
+  log.error(`[gpu] GPU process gone at launch on ${gpuBackendLaunch.rung}`, context);
+  if (healthySessionTimer !== null) {
+    clearTimeout(healthySessionTimer);
+    healthySessionTimer = null;
+  }
+  // Only an Auto launch counts, and only a death ON the remembered rung moves the
+  // streak (demoteAfterRepeatedCrashes compares the rung with the attempt): a parent's
+  // death on the attempt counts, its rescued child runs a rung below and counts
+  // nothing more; a re-probe's death above the attempt counts nothing, and its
+  // rescued child, which lands ON the attempt, is then the one that counts.
+  if (gpuBackendLaunch.auto && !gpuLaunchDeathCounted) {
+    gpuLaunchDeathCounted = true;
+    const next = demoteAfterRepeatedCrashes({ prefs: desktopPrefs, rung: gpuBackendLaunch.rung });
+    if (mergeDesktopPrefs(next)) log.warn('[gpu] backend memory updated after the death', next);
+  }
+  rescueOntoLowerBackend('the GPU process died at launch');
+});
+
 function logGpuStatus() {
   let softwareVerdict = false;
   try {
@@ -1277,6 +1755,13 @@ function logGpuStatus() {
         webgl: status?.webgl,
         webgl2: status?.webgl2,
       });
+      // The rescue's third trigger. The other two need the GPU process to have LIVED, and
+      // a Vulkan rung on a machine with no usable driver never starts one: it cannot die,
+      // and with no GPU nothing can report a renderer. This reading is the only evidence
+      // there is, and the shell already had it in hand.
+      if (shouldRescueMissingGpu({ rung: gpuBackendLaunch.rung, hardwareWebgl: false })) {
+        rescueOntoLowerBackend('no hardware WebGL on a Vulkan rung');
+      }
     }
   } catch (err) {
     log.error('[gpu] could not read feature status', err);
@@ -1288,6 +1773,9 @@ function logGpuStatus() {
         log.warn('[gpu] GPU process reports softwareRendering: the game is on a CPU rasterizer');
       }
       const { devices, discreteInactive } = summarizeGpuDevices(info?.gpuDevice);
+      // The proof's machine key. Latched on the first reading that names an active
+      // adapter; a crash-recovery reload may report the same one again, or nothing.
+      if (boundGpuAdapter === '') boundGpuAdapter = activeGpuAdapterKey(devices);
       // Push the verdict BEFORE the log dedup below: the dedup exists only to keep the log
       // quiet, and after a crash-recovery reload the reading is usually identical, so a send
       // placed after it would never reach the freshly loaded page. This resolves async, so
@@ -1300,6 +1788,17 @@ function logGpuStatus() {
       });
       if (mainWindow && !mainWindow.isDestroyed()) {
         mainWindow.webContents.send('desktop-gpu-status', gpuStatus);
+      }
+      // Judge the Vulkan trial from this reading ONLY when it carries evidence (Chromium's
+      // softwareRendering flag, or a non-empty renderer string); an empty glRenderer with
+      // no software flag is the healthy-Vulkan-on-Linux reading, and the verdict then
+      // waits for the renderer string the game reports (judgeThisLaunch).
+      if (hasGetGpuInfoEvidence(aux)) {
+        judgeThisLaunch(aux.glRenderer, aux.softwareRendering);
+      } else if (!gpuBackendJudged) {
+        log.info(
+          "[gpu] backend: waiting for the renderer's report (no renderer string from getGPUInfo)",
+        );
       }
       const line = {
         glRenderer: aux.glRenderer,

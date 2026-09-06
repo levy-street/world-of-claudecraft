@@ -75,6 +75,25 @@ function programIdentity(material: THREE.Material): string {
  * the renderCategory tag the scene-census diagnostics also key off. Objects
  * without a material (a spirit holder group) carry no program of their own.
  */
+/** The distinct materials the compile targets carry, in the same walk: the
+ *  cast readiness gate asks whether each one's program is linked. */
+export function abilityVfxCompileMaterials(root: THREE.Object3D): THREE.Material[] {
+  const seen = new Set<string>();
+  const materials: THREE.Material[] = [];
+  root.traverse((child) => {
+    if (child.userData?.renderCategory !== 'vfx') return;
+    const material = (child as THREE.Mesh).material;
+    if (!material) return;
+    for (const mat of Array.isArray(material) ? material : [material]) {
+      const identity = programIdentity(mat);
+      if (seen.has(identity)) continue;
+      seen.add(identity);
+      materials.push(mat);
+    }
+  });
+  return materials;
+}
+
 export function collectAbilityVfxCompileTargets(root: THREE.Object3D): AbilityVfxCompileTarget[] {
   const seen = new Set<string>();
   const targets: AbilityVfxCompileTarget[] = [];

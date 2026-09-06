@@ -1,7 +1,9 @@
 import { graphicsPresetLabel } from '../render/gfx';
 import { isSoftwareRendererName } from '../render/software_renderer';
 import { crowdBucketLabel } from './crowd_bucket';
+import { collectLoadSpans } from './load_profiler';
 import { localDevPerfTraceEnabled, type PerfMonitor, type PerfSnapshot } from './perf';
+import { type BootPhaseDurations, bootPhaseDurations } from './perf_boot_phases_core';
 import { analyzePerfSuggestions } from './perf_doctor';
 import { entryRevealSummary } from './perf_entry_reveal_core';
 import {
@@ -11,6 +13,7 @@ import {
   sampleTransitions,
 } from './perf_prewarm_lists_core';
 import { jitteredPerfReportDelay } from './perf_report_schedule';
+import { shaderWarmBeaconSummary } from './perf_shader_warm_core';
 import type { Settings } from './settings';
 import type { WorldTelemetry } from './world_telemetry';
 
@@ -313,6 +316,19 @@ function rendererPrewarmPacingSummary(
 const prewarmHeavyListGate = createPrewarmHeavyListGate();
 
 /**
+ * The boot phases, read off the performance timeline ONCE: every measure they
+ * come from landed before the reporter starts (loadPhaseEnd('entry') precedes
+ * startPerfReporter in main.ts), so the first non-null read is final and the
+ * later beacons reuse it instead of re-walking the entry list each send.
+ */
+let bootPhasesMemo: BootPhaseDurations | null = null;
+
+function currentBootPhases(): BootPhaseDurations | null {
+  if (!bootPhasesMemo) bootPhasesMemo = bootPhaseDurations(collectLoadSpans());
+  return bootPhasesMemo;
+}
+
+/**
  * The fingerprint the payload built last is CARRYING, awaiting delivery, or
  * null when it carries no lists. Set once per build (payloadFromSnapshot calls
  * the summary exactly once) and committed by `send` only on a successful post.
@@ -526,6 +542,7 @@ function payloadFromSnapshot(
   characterId: number | null,
   worldTelemetry: WorldTelemetry | null = null,
   desktopShell = false,
+  bootPhases: BootPhaseDurations | null = null,
 ): Record<string, unknown> | null {
   const renderer = snapshot.renderer;
   if (!renderer) return null;
@@ -552,6 +569,11 @@ function payloadFromSnapshot(
   const suggestionIds = analyzePerfSuggestions(snapshot, location.search, { desktopShell }).map(
     (suggestion) => suggestion.id,
   );
+  // The shader warm worker, projected and bounded (perf_shader_warm_core.ts).
+  // The rest of that snapshot (the adapter, the per-gate counts, the audit
+  // beside it) stays local: this is the fleet's answer to "did the worker run
+  // on this backend, and what retired it when it did not".
+  const shaderWarm = shaderWarmBeaconSummary(snapshot.shaderWarm);
   return {
     schemaVersion: PERF_REPORT_SCHEMA_VERSION,
     releaseVersion: __APP_VERSION__,
@@ -562,6 +584,11 @@ function payloadFromSnapshot(
     graphicsConfigVersion: renderer.graphicsConfigVersion,
     gfxTier: renderer.tier,
     autoGovernor: renderer.autoGovernor,
+    // Two typed fields beside the block below, because the server stores them
+    // as columns a fleet query groups by; the empty string is "nothing
+    // refused it", which a NOT NULL column can hold and a null cannot.
+    shaderWarmWorkerActive: shaderWarm.active,
+    shaderWarmRefusal: shaderWarm.refusal ?? '',
     targetFps: renderer.budget.targetFps,
     renderScale: renderer.renderScale,
     effectiveRenderScale: renderer.effectiveRenderScale,
@@ -625,6 +652,14 @@ function payloadFromSnapshot(
       rendererPrewarmSummary: rendererPrewarmSummary(renderer.prewarm),
       rendererGpuQueue: rendererGpuQueueSummary(renderer.gpuQueue),
       entryReveal: entryRevealSummary(renderer.gpuPrep),
+      // The live-frame half of the prewarm's programsDelta: how much the
+      // program list grew in the 20 s after the curtain
+      // (src/render/post_reveal_links_core.ts).
+      postRevealLinks: snapshot.postRevealLinks,
+      // The boot phases behind the curtain, from the load profile that only
+      // window.__loadProfile and a console line carried until now.
+      bootPhases,
+      shaderWarm,
       assets: {
         preload: snapshot.assets.preload,
         byType: snapshot.assets.byType,
@@ -714,6 +749,7 @@ export function startPerfReporter(options: PerfReporterOptions): () => void {
       options.characterIdProvider(),
       options.worldTelemetryProvider?.() ?? null,
       options.desktopShell ?? false,
+      currentBootPhases(),
     );
     if (!body) {
       skip('no-renderer', sendOptions.final ? null : cadenceDelay(REPEAT_REPORT_MS));
@@ -826,4 +862,7 @@ export const perfReporterInternalsForTest = {
   PERF_REPORT_SCHEMA_VERSION,
   prewarmHeavyListGate,
   pendingPrewarmListFingerprint: () => pendingPrewarmListFingerprint,
+  resetBootPhasesForTest: () => {
+    bootPhasesMemo = null;
+  },
 };

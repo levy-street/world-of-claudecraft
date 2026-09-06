@@ -476,7 +476,10 @@ describe('three empty instanced draw skip patch', () => {
   it('records the hunk in the checked-in patch file', () => {
     // node_modules is reinstalled from patches/three@0.185.1.patch, so the
     // shipped artifact carries the hunk too, as an ADDED line rather than
-    // anywhere in its context.
+    // anywhere in its context. The GLSL assembly seam hunks below ride the
+    // same file, so the same check covers them: an installed-only edit that
+    // never reached the .patch would survive every source pin above until the
+    // next clean install silently dropped it.
     const patch = readFileSync(new URL('../patches/three@0.185.1.patch', import.meta.url), 'utf8');
     expect(
       patch.includes(
@@ -484,6 +487,265 @@ describe('three empty instanced draw skip patch', () => {
       ),
       'the empty-instanced skip is missing from patches/three@0.185.1.patch',
     ).toBe(true);
+    expect(
+      patch.includes('+function assembleProgramGlsl( parameters ) {'),
+      'the lifted GLSL assembly is missing from patches/three@0.185.1.patch',
+    ).toBe(true);
+    expect(
+      patch.includes('+\tconst { vertexGlsl, fragmentGlsl } = assembleProgramGlsl( parameters );'),
+      'the constructor call into the lifted assembly is missing from patches/three@0.185.1.patch',
+    ).toBe(true);
+    expect(
+      patch.includes('+\t\thasProgram: hasProgram,'),
+      'the WebGLPrograms hasProgram export is missing from patches/three@0.185.1.patch',
+    ).toBe(true);
+    expect(
+      patch.includes(
+        '+\t\tthis.collectProgramSources = function ( scene, camera, targetScene = null ) {',
+      ),
+      'collectProgramSources is missing from patches/three@0.185.1.patch',
+    ).toBe(true);
+  });
+});
+
+describe('three GLSL assembly seam patch', () => {
+  // The newest hunks of the same patch file. three assembles a program's final
+  // vertex and fragment sources inside the WebGLProgram constructor and links
+  // them in the same breath, and the browser keys its GPU program cache on
+  // those bytes; warming a program elsewhere (a worker GL context) therefore
+  // needs the sources BEFORE the link, and three ships no API for it. The lift
+  // is verbatim so the two paths cannot produce different bytes.
+  const source = readFileSync(
+    new URL('../node_modules/three/build/three.module.js', import.meta.url),
+    'utf8',
+  );
+  const unpatchedSibling = readFileSync(
+    new URL('../node_modules/three/build/three.cjs', import.meta.url),
+    'utf8',
+  );
+
+  it('lifts the constructor assembly into assembleProgramGlsl', () => {
+    expect(
+      source.includes('function assembleProgramGlsl( parameters ) {'),
+      'the GLSL assembly is not lifted out of the WebGLProgram constructor; re-run pnpm install',
+    ).toBe(true);
+    // The constructor must CONSUME the lifted assembly, in the same order as
+    // before: the program object is allocated first, the sources follow. A
+    // second inline copy of the assembly would be free to drift, and drifted
+    // bytes warm the cache under a key nothing ever asks for.
+    expect(
+      source.includes(
+        'const gl = renderer.getContext();\n\n\tconst program = gl.createProgram();\n\n\tconst { vertexGlsl, fragmentGlsl } = assembleProgramGlsl( parameters );',
+      ),
+      'the WebGLProgram constructor no longer reads the lifted assembly; re-run pnpm install',
+    ).toBe(true);
+    expect(
+      source.split('const fragmentGlsl = versionString + prefixFragment + fragmentShader;').length -
+        1,
+      'a second GLSL assembly site appeared; the lifted function no longer owns the only one',
+    ).toBe(1);
+    // Positive controls: the deliberately unpatched sibling bundle carries the
+    // assembly exactly once (so the count needle is matchable) and knows
+    // nothing of the lifted function, so the pins above prove the patch rather
+    // than three's own shape.
+    expect(
+      unpatchedSibling.split(
+        'const fragmentGlsl = versionString + prefixFragment + fragmentShader;',
+      ).length - 1,
+      'the unpatched three.cjs control no longer matches the assembly needle; the count pin may be vacuous',
+    ).toBe(1);
+    expect(
+      unpatchedSibling.includes('assembleProgramGlsl'),
+      'the unpatched three.cjs control already names assembleProgramGlsl; the pins above prove nothing',
+    ).toBe(false);
+  });
+
+  it('leaves the lifted assembly free of the GL context it was cut from', () => {
+    // The property that makes the lift usable: assembling touches no context,
+    // so it can run for a program nothing is about to link. gl.createProgram()
+    // in particular stays behind in the constructor, since it allocates the
+    // object the link consumes.
+    const start = source.indexOf('function assembleProgramGlsl( parameters ) {');
+    expect(start, 'assembleProgramGlsl is missing; re-run pnpm install').toBeGreaterThan(-1);
+    const end = source.indexOf(
+      'return { vertexGlsl: vertexGlsl, fragmentGlsl: fragmentGlsl };',
+      start,
+    );
+    expect(
+      end,
+      'assembleProgramGlsl does not return both sources; re-run pnpm install',
+    ).toBeGreaterThan(start);
+    const body = source.slice(start, end);
+    expect(
+      body.includes('gl.'),
+      'the lifted assembly touches the GL context, so it can no longer run off the render path',
+    ).toBe(false);
+    expect(
+      body.includes('renderer.'),
+      'the lifted assembly reaches back into the renderer, so it can no longer run off the render path',
+    ).toBe(false);
+    // Matchability control for the two negatives above: the constructor the
+    // assembly was cut FROM still carries both needles, so their absence in
+    // the lifted body is a property of the lift and not of the spelling.
+    const ctorStart = source.indexOf(
+      'function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {',
+    );
+    expect(
+      ctorStart,
+      'the WebGLProgram constructor is missing; re-run pnpm install',
+    ).toBeGreaterThan(-1);
+    const ctorHead = source.slice(ctorStart, source.indexOf("// log( '*VERTEX*'", ctorStart));
+    expect(
+      ctorHead.includes('const gl = renderer.getContext();'),
+      'the WebGLProgram constructor no longer opens on the GL context; the gl./renderer. negatives above may be vacuous',
+    ).toBe(true);
+    expect(
+      ctorHead.includes('gl.'),
+      'the "gl." needle no longer matches the constructor the assembly was cut from; the negative above is vacuous',
+    ).toBe(true);
+    expect(
+      ctorHead.includes('renderer.'),
+      'the "renderer." needle no longer matches the constructor the assembly was cut from; the negative above is vacuous',
+    ).toBe(true);
+    // Both sources must still be assembled inside it: a body that returns only
+    // one of them would pass every needle above and warm half a program.
+    expect(
+      body.includes('const vertexGlsl = versionString + prefixVertex + vertexShader;'),
+      'the lifted assembly no longer builds the vertex source; re-run pnpm install',
+    ).toBe(true);
+    expect(
+      body.includes('const fragmentGlsl = versionString + prefixFragment + fragmentShader;'),
+      'the lifted assembly no longer builds the fragment source; re-run pnpm install',
+    ).toBe(true);
+  });
+
+  it('exposes hasProgram so an already linked cache key can be skipped', () => {
+    expect(
+      source.includes(
+        'function hasProgram( cacheKey ) {\n\n\t\treturn programsMap.has( cacheKey );',
+      ),
+      'hasProgram no longer probes the program cache map; re-run pnpm install',
+    ).toBe(true);
+    // The probe is only reachable if WebGLPrograms actually returns it.
+    expect(
+      source.includes('hasProgram: hasProgram,'),
+      'WebGLPrograms no longer exposes hasProgram; re-run pnpm install',
+    ).toBe(true);
+    expect(
+      unpatchedSibling.includes('hasProgram'),
+      'the unpatched three.cjs control already names hasProgram; the pins above prove nothing',
+    ).toBe(false);
+  });
+
+  it('mirrors compile() into collectProgramSources without linking anything', () => {
+    const start = source.indexOf(
+      'this.collectProgramSources = function ( scene, camera, targetScene = null ) {',
+    );
+    expect(start, 'collectProgramSources is missing; re-run pnpm install').toBeGreaterThan(-1);
+    // The slice ends on the next member of the renderer rather than on a
+    // brace-and-indent shape: a reformatted or re-braced hunk would otherwise
+    // shrink the slice to nothing and turn every negative below green.
+    const bodyEnd = source.indexOf('this.compileAsync = function', start);
+    expect(
+      bodyEnd,
+      'compileAsync no longer follows collectProgramSources; the hunk slice has no end anchor',
+    ).toBeGreaterThan(start);
+    const body = source.slice(start, bodyEnd);
+    expect(
+      body.includes('assembleProgramGlsl( parameters )'),
+      'collectProgramSources no longer assembles the sources it exists to collect; re-run pnpm install',
+    ).toBe(true);
+    expect(
+      body.includes('programCache.hasProgram( cacheKey )'),
+      'collectProgramSources no longer skips an already linked cache key; re-run pnpm install',
+    ).toBe(true);
+    expect(
+      body.includes('return collected;'),
+      'collectProgramSources no longer returns what it collected; re-run pnpm install',
+    ).toBe(true);
+    // A material only ever seen by the dry pass still needs the dispose
+    // listener the real getProgram path registers, or its shader cache entry
+    // outlives it. It goes on BEFORE the uniforms are pulled, the same order
+    // getProgram uses.
+    const listener = body.indexOf("material.addEventListener( 'dispose', onMaterialDispose );");
+    const uniforms = body.indexOf('parameters.uniforms = programCache.getUniforms( material );');
+    expect(
+      listener,
+      'collectProgramSources no longer registers the material dispose listener; re-run pnpm install',
+    ).toBeGreaterThan(-1);
+    expect(
+      uniforms,
+      'collectProgramSources no longer pulls the material uniforms; re-run pnpm install',
+    ).toBeGreaterThan(-1);
+    expect(
+      uniforms,
+      'the dispose listener no longer precedes the uniform pull; re-run pnpm install',
+    ).toBeGreaterThan(listener);
+    // The one branch of getProgram the mirror deliberately does NOT carry, and
+    // the comment that says so: a node material assembled here would produce
+    // GLSL no link ever asks for.
+    expect(
+      body.includes(
+        '// getProgram builds node materials here first; this renderer has none, so\n\t\t\t\t// the mirror does not carry that branch (a node material would assemble wrong).',
+      ),
+      'the node-material scope note is gone from collectProgramSources; re-run pnpm install',
+    ).toBe(true);
+    // The render-state stack is pushed and popped around the whole traversal,
+    // through a try/finally: a throw mid-walk (a material getter, a hook) must
+    // not leave the renderer holding the collection's own render state.
+    expect(
+      body.includes('renderStateStack.push( currentRenderState );\n\n\t\t\ttry {'),
+      'the collection no longer opens a try after pushing the render state; re-run pnpm install',
+    ).toBe(true);
+    expect(
+      body.includes(
+        '} finally {\n\n\t\t\t\tcurrentRenderState = renderStateStack.pop();\n\n\t\t\t}\n\n\t\t\treturn collected;',
+      ),
+      'the render-state pop is no longer in a finally; a throw mid-collection leaks the render state',
+    ).toBe(true);
+    // The two ways this could silently become the thing it replaces: acquiring
+    // a program links it on the main thread, which is the cost the collection
+    // exists to move off; writing materialProperties would leave the real
+    // getProgram path reading state no link ever produced.
+    expect(
+      body.includes('acquireProgram'),
+      'collectProgramSources acquires a program, so it links on the main thread after all',
+    ).toBe(false);
+    expect(
+      body.includes('properties.get('),
+      'collectProgramSources writes renderer material properties, which only the real getProgram path owns',
+    ).toBe(false);
+    // Matchability control for those two negatives: compile()'s own path
+    // (prepareMaterial into getProgram) still spells both needles, so their
+    // absence from the mirror is the mirror's doing rather than a rename.
+    const prepareStart = source.indexOf('function prepareMaterial( material, scene, object ) {');
+    expect(prepareStart, 'prepareMaterial is missing; re-run pnpm install').toBeGreaterThan(-1);
+    const prepareBody = source.slice(
+      prepareStart,
+      source.indexOf('this.compile = function', prepareStart),
+    );
+    expect(
+      prepareBody.includes('getProgram( material, scene, object );'),
+      'prepareMaterial no longer routes into getProgram; the control below no longer covers compile()',
+    ).toBe(true);
+    const getProgramStart = source.indexOf('function getProgram( material, scene, object ) {');
+    expect(getProgramStart, 'getProgram is missing; re-run pnpm install').toBeGreaterThan(-1);
+    const getProgramBody = source.slice(
+      getProgramStart,
+      source.indexOf('function getUniformList( materialProperties ) {', getProgramStart),
+    );
+    expect(
+      getProgramBody.includes('programCache.acquireProgram('),
+      'the "acquireProgram" needle no longer matches compile()\'s own link path; the negative above is vacuous',
+    ).toBe(true);
+    expect(
+      getProgramBody.includes('properties.get('),
+      'the "properties.get(" needle no longer matches compile()\'s own link path; the negative above is vacuous',
+    ).toBe(true);
+    expect(
+      unpatchedSibling.includes('collectProgramSources'),
+      'the unpatched three.cjs control already names collectProgramSources; the pins above prove nothing',
+    ).toBe(false);
   });
 });
 
@@ -692,5 +954,57 @@ describe('the unpatched three bundles stay unconsumed', () => {
       expect(found.offenders.some((row) => row.includes('addons_clean.ts'))).toBe(false);
       expect(found.filesScanned).toBe(9);
     });
+  });
+});
+
+describe('three dry compile side branch', () => {
+  it('mirrors prepareMaterial: a transparent double-sided material collects its BackSide and FrontSide programs', () => {
+    const source = readFileSync(
+      new URL('../node_modules/three/build/three.module.js', import.meta.url),
+      'utf8',
+    );
+    const start = source.indexOf('this.collectProgramSources = function');
+    expect(start).toBeGreaterThan(-1);
+    const body = source.slice(start, source.indexOf('this.compileAsync = function', start));
+    expect(body.includes('function collectPreparedMaterial( material, scene, object )')).toBe(true);
+    expect(
+      body.includes(
+        'if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePass === false ) {',
+      ),
+    ).toBe(true);
+    // Both traversal call sites go through the side-aware wrapper, and the
+    // borrowed side never marks the material for an update (that is the real
+    // path's job).
+    expect(body.split('collectPreparedMaterial(').length - 1).toBe(3);
+    expect(body.includes('material.needsUpdate = true')).toBe(false);
+    // The side is BORROWED: the DoubleSide restore sits in a finally after
+    // both collects, so a throw inside either one (a material getter, an
+    // onBeforeCompile hook) cannot leave a live material stuck on BackSide.
+    const back = body.indexOf('material.side = BackSide;');
+    const front = body.indexOf('material.side = FrontSide;', back);
+    const sideFinally = body.indexOf('} finally {', front);
+    const restored = body.indexOf('material.side = DoubleSide;', sideFinally);
+    expect(back, 'the BackSide collect is gone; re-run pnpm install').toBeGreaterThan(-1);
+    expect(front, 'the FrontSide collect no longer follows the BackSide one').toBeGreaterThan(back);
+    expect(
+      sideFinally,
+      'the borrowed side is no longer restored from a finally; a throw mid-collect leaks it',
+    ).toBeGreaterThan(front);
+    expect(
+      restored,
+      'the DoubleSide restore is no longer inside that finally; re-run pnpm install',
+    ).toBeGreaterThan(sideFinally);
+    expect(
+      body.includes('} finally {\n\n\t\t\t\t\t\tmaterial.side = DoubleSide;\n\n\t\t\t\t\t}'),
+      'the side-restoring finally no longer holds the DoubleSide write alone; re-run pnpm install',
+    ).toBe(true);
+    const patch = readFileSync(new URL('../patches/three@0.185.1.patch', import.meta.url), 'utf8');
+    expect(
+      patch.includes('+\t\t\tfunction collectPreparedMaterial( material, scene, object ) {'),
+    ).toBe(true);
+    expect(
+      patch.includes('+\t\t\t\t\t\tmaterial.side = DoubleSide;'),
+      'the borrowed-side restore is missing from patches/three@0.185.1.patch',
+    ).toBe(true);
   });
 });

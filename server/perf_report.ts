@@ -8,6 +8,12 @@ import {
 import { clientPerfMetricsSink } from './http/client_perf_metrics';
 import type { RateLimitOutcome } from './http/types';
 import { json, readBody } from './http_util';
+import {
+  sanitizeBootPhases,
+  sanitizePostRevealLinks,
+  sanitizeShaderWarm,
+  shaderWarmToken,
+} from './perf_report_entry_blocks';
 import { rateLimitNow, requestIp, windowedRateLimitOutcome } from './ratelimit';
 import { REALM } from './realm';
 
@@ -709,6 +715,11 @@ function compactRawSummary(value: Record<string, unknown>): Record<string, unkno
     // A wedged GPU queue is exactly what a truncated report must still carry:
     // the block is small and bounded, and it is the whole signal.
     'rendererGpuQueue',
+    // The world-entry blocks: a handful of bounded fields each, and a slow
+    // entry is exactly the report most likely to overflow into this path.
+    'postRevealLinks',
+    'bootPhases',
+    'shaderWarm',
   ]) {
     if (value[key] !== undefined) out[key] = value[key];
   }
@@ -729,6 +740,15 @@ function rawSummary(value: unknown, devTraceAllowed = false): Record<string, unk
     const gpuQueue = sanitizeGpuQueueSummary(parsed.rendererGpuQueue);
     if (gpuQueue) parsed.rendererGpuQueue = gpuQueue;
     else delete parsed.rendererGpuQueue;
+    const postRevealLinks = sanitizePostRevealLinks(parsed.postRevealLinks);
+    if (postRevealLinks) parsed.postRevealLinks = postRevealLinks;
+    else delete parsed.postRevealLinks;
+    const bootPhases = sanitizeBootPhases(parsed.bootPhases);
+    if (bootPhases) parsed.bootPhases = bootPhases;
+    else delete parsed.bootPhases;
+    const shaderWarm = sanitizeShaderWarm(parsed.shaderWarm);
+    if (shaderWarm) parsed.shaderWarm = shaderWarm;
+    else delete parsed.shaderWarm;
     // The prewarm summary rides through verbatim on this path, bounded only by
     // the body cap, so its client-supplied LISTS are bounded here explicitly.
     // Without this the resume block's entries and failed-unit ids reach storage
@@ -819,6 +839,8 @@ export async function handlePerfReport(
     ),
     gfxTier: choiceIn(body.gfxTier, ['low', 'medium', 'high', 'ultra', 'insane'], 'low'),
     autoGovernor: Boolean(body.autoGovernor),
+    shaderWarmWorkerActive: Boolean(body.shaderWarmWorkerActive),
+    shaderWarmRefusal: shaderWarmToken(body.shaderWarmRefusal),
     targetFps: intIn(body.targetFps, 0, 240, 0),
     renderScale: numberIn(body.renderScale, 0.3, 1.5, 1),
     effectiveRenderScale: numberIn(body.effectiveRenderScale, 0.3, 1.5, 1),

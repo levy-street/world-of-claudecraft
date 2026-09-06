@@ -1,0 +1,221 @@
+// The desktop shell's graphics backend choice (Linux: a Vulkan trial), seen
+// from the renderer. The shell prefs store is the source of truth and applies
+// the choice at the NEXT launch; this module owns the renderer half: whether
+// the installed shell exposes the choice at all and on this platform, the
+// reflection of the STORED value into the local setting at boot, and the push
+// of a player's choice out. Same shape as desktop_gpu_pref_sync.ts; the two
+// gates are independent (an older shell has the GPU preference but not this).
+
+import type { DesktopBridge, DesktopGpuBackendSetting } from '../runtime';
+
+/** The stored values, in the order the options row lists them. */
+export const GPU_BACKEND_SETTING_VALUES = { auto: 0, vulkan: 1, opengl: 2 } as const;
+
+export interface DesktopGpuBackendSettings {
+  set(key: 'gpuBackend', value: number): number;
+}
+
+export function gpuBackendSettingFromValue(value: number): DesktopGpuBackendSetting {
+  const rounded = Math.round(value);
+  if (rounded === GPU_BACKEND_SETTING_VALUES.vulkan) return 'vulkan';
+  if (rounded === GPU_BACKEND_SETTING_VALUES.opengl) return 'opengl';
+  return 'auto';
+}
+
+export function gpuBackendValueFromSetting(setting: string): number {
+  if (setting === 'vulkan') return GPU_BACKEND_SETTING_VALUES.vulkan;
+  if (setting === 'opengl') return GPU_BACKEND_SETTING_VALUES.opengl;
+  return GPU_BACKEND_SETTING_VALUES.auto;
+}
+
+/** True when the installed shell exposes BOTH halves of the choice AND says
+ *  this platform has one (Linux only; a Windows or macOS shell exposes the
+ *  methods and answers false, so it shows no row). A bridge CAPABILITY plus
+ *  a synchronous platform value, never isNativeAppShell() (true in the
+ *  mobile shells too) and never an async answer the options window would
+ *  have to wait for. */
+export function desktopGpuBackendSupported(bridge: DesktopBridge | null | undefined): boolean {
+  return (
+    typeof bridge?.getGpuBackend === 'function' &&
+    typeof bridge?.setGpuBackend === 'function' &&
+    bridge?.hasGpuBackendChoice === true
+  );
+}
+
+/** Push a player's choice to the shell store and answer whether it stuck.
+ *  Never throws. Null when the shell has no setter (nothing to confirm, and
+ *  nothing to say about it); false on a rejected write, a dead channel, or the
+ *  shell answering false, which it does when its own prefs write failed, when
+ *  the sender is untrusted, or when the value is not one it knows. A write the
+ *  shell persisted clears the failure latch below (the apply arm latches the
+ *  refusal itself, see latchDesktopGpuBackendWriteFailed), so a retry that
+ *  works takes the sentence off the row. */
+export async function pushDesktopGpuBackend(
+  bridge: DesktopBridge | null | undefined,
+  value: number,
+): Promise<boolean | null> {
+  const write = bridge?.setGpuBackend;
+  if (typeof write !== 'function') return null;
+  let answer: unknown;
+  try {
+    answer = await write.call(bridge, gpuBackendSettingFromValue(value));
+  } catch {
+    // The shell's channel is gone, or it threw on the way in: the stored
+    // setting is whatever it was, which is exactly what the row must say.
+    return false;
+  }
+  if (answer === false) return false;
+  latchDesktopGpuBackendWriteFailed(false);
+  return true;
+}
+
+/** Reflect the shell's stored choice into the local setting at boot, writing
+ *  settings.set DIRECTLY (not through the options change path, which would
+ *  push the shell's own value straight back at it). Takes a settings FACTORY
+ *  for the same reason desktop_gpu_pref_sync.ts does. Order matters: this
+ *  runs at module scope in main.ts, before startGame's apply-all loop pushes
+ *  the local value back through the `gpuBackend` arm; inverted, the local
+ *  value would win over the shell's. */
+export async function syncDesktopGpuBackendSetting(
+  bridge: DesktopBridge | null | undefined,
+  createSettings: () => DesktopGpuBackendSettings,
+): Promise<void> {
+  const read = bridge?.getGpuBackend;
+  if (typeof read !== 'function') return;
+  let state: unknown;
+  try {
+    state = await read.call(bridge);
+  } catch {
+    return;
+  }
+  if (!state || typeof state !== 'object') return;
+  // The same answer carries the rung this launch is running: latch it here
+  // rather than asking the shell twice for one payload. The latch and the row's
+  // reader are at the foot of this module.
+  latchActive(state);
+  const { setting } = state as { setting?: unknown };
+  if (setting !== 'auto' && setting !== 'vulkan' && setting !== 'opengl') return;
+  createSettings().set('gpuBackend', gpuBackendValueFromSetting(setting));
+}
+
+/** What the options row shows about THIS launch, or null when the shell has not
+ *  judged it yet (and on every non-desktop caller). Only the two fields the row
+ *  reads: the row is about telling a player their choice did not take, not
+ *  about mirroring the shell's whole state. */
+export interface DesktopGpuBackendActive {
+  active: string;
+  requestedUnavailable: boolean;
+  /** Auto was held at OpenGL by the shell's GPU policy (an excluded card). */
+  autoCapped: boolean;
+}
+
+/** The latched reading, refreshed by the shell's push. Latched rather than
+ *  awaited per open, because the options row is built synchronously and a
+ *  promise would paint the row once without the line and never again. */
+let activeState: DesktopGpuBackendActive | null = null;
+
+const activeListeners = new Set<() => void>();
+
+/** Subscribe to a CHANGE of the latched reading. The shell judges the launch a
+ *  few seconds in, so a surface built before that verdict (the options graphics
+ *  panel) would otherwise paint without the reading and never learn it. No
+ *  payload: every reader goes through desktopGpuBackendActive() below, so there
+ *  is one answer, not two. Returns the unsubscribe. */
+export function onDesktopGpuBackendActiveChange(listener: () => void): () => void {
+  activeListeners.add(listener);
+  return () => activeListeners.delete(listener);
+}
+
+/** Latch a reading the shell just handed us and wake the subscribers, keeping
+ *  what we had when the payload says nothing. Silent on an identical re-push:
+ *  the shell resends the same state on its own schedule, and a rebuild there
+ *  would throw away the control a player is standing on. */
+function latchActive(state: unknown): void {
+  const next = readActive(state);
+  if (!next) return;
+  const previous = activeState;
+  activeState = next;
+  if (
+    previous &&
+    previous.active === next.active &&
+    previous.requestedUnavailable === next.requestedUnavailable &&
+    previous.autoCapped === next.autoCapped
+  )
+    return;
+  for (const listener of activeListeners) listener();
+}
+
+function readActive(state: unknown): DesktopGpuBackendActive | null {
+  if (!state || typeof state !== 'object') return null;
+  const { active, requestedUnavailable, autoCapped } = state as {
+    active?: unknown;
+    requestedUnavailable?: unknown;
+    autoCapped?: unknown;
+  };
+  // A rung the shell has not judged yet is absent, not a guess: showing the
+  // asked-for backend as the active one is exactly the lie the row exists to
+  // stop. Same for the flag, which is a strict boolean or nothing.
+  if (typeof active !== 'string' || active === '') return null;
+  if (typeof requestedUnavailable !== 'boolean') return null;
+  // The cap flag is newer than the verdict: an older shell omits it, which reads
+  // as "not capped" rather than as no verdict at all.
+  return { active, requestedUnavailable, autoCapped: autoCapped === true };
+}
+
+/** Subscribe to the shell's push. The FIRST reading comes from the boot sync
+ *  above, which already asks for the same payload; this is only how the row
+ *  learns the rung once the shell has judged the launch, which happens after
+ *  that read. Returns the unsubscribe. */
+export function initDesktopGpuBackendActive(bridge: DesktopBridge | null | undefined): () => void {
+  const subscribe = bridge?.onGpuBackendState;
+  if (typeof subscribe !== 'function') return () => {};
+  return subscribe.call(bridge, (state) => {
+    latchActive(state);
+  });
+}
+
+/** The reading the options row paints, or null while there is nothing to say. */
+export function desktopGpuBackendActive(): DesktopGpuBackendActive | null {
+  return activeState;
+}
+
+/** Whether the shell refused the last backend write it was given, which means
+ *  the STORED choice is still the old one and the next launch will use it. */
+let writeFailed = false;
+
+const writeFailedListeners = new Set<() => void>();
+
+/** Subscribe to a CHANGE of that signal, the same no-payload shape as
+ *  onDesktopGpuBackendActiveChange above: the answer comes back through
+ *  desktopGpuBackendWriteFailed(), so there is one reading, not two. Returns
+ *  the unsubscribe. */
+export function onDesktopGpuBackendWriteFailed(listener: () => void): () => void {
+  writeFailedListeners.add(listener);
+  return () => writeFailedListeners.delete(listener);
+}
+
+/** Latch the refusal and wake the subscribers on a transition (silent on a
+ *  repeat, like the reading above). The push above clears it itself, but the
+ *  apply arm latches a FAILURE, and only after it has put the local setting
+ *  back on the shell's stored value: the row's sentence names that stored
+ *  value, so waking before the revert would paint one pass naming the very
+ *  choice that did not take. */
+export function latchDesktopGpuBackendWriteFailed(failed: boolean): void {
+  if (writeFailed === failed) return;
+  writeFailed = failed;
+  for (const listener of writeFailedListeners) listener();
+}
+
+/** True while the shell's stored choice is NOT what the player last picked. */
+export function desktopGpuBackendWriteFailed(): boolean {
+  return writeFailed;
+}
+
+/** Tests only: forget the latched reading, the refusal, and their subscribers
+ *  between cases. */
+export function resetDesktopGpuBackendActiveForTest(): void {
+  activeState = null;
+  activeListeners.clear();
+  writeFailed = false;
+  writeFailedListeners.clear();
+}

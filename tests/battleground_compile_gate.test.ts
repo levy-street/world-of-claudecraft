@@ -286,18 +286,36 @@ describe('the battleground field stream gates every piece on the compile gate', 
     expect(field).not.toContain('group.add(terrain.group)');
     expect(field).not.toContain('group.add(placements.group)');
 
+    // The field construction left renderer.ts for src/render/battleground_views.ts
+    // (the shader-warm branch's extraction, which also prebuilds a hidden copy at
+    // the queue proposal). Same seam, one indirection further: the view module
+    // passes the renderer's host straight through as buildBattleground's options,
+    // so the gate reaches the stream exactly as it did inline.
+    const views = stripComments(
+      readFileSync(new URL('../src/render/battleground_views.ts', import.meta.url), 'utf8'),
+    );
+    expect(views, 'the construction must pass the host through as its options').toContain(
+      'buildBattleground(battlegroundOrigin(slot), host.seed, host)',
+    );
+    expect(views, 'the host must carry the gate into buildBattleground').toContain(
+      'compileGate?: (target: THREE.Object3D) => Promise<unknown>;',
+    );
+
     const renderer = stripComments(
       readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8'),
     );
-    const start = renderer.indexOf('buildBattleground(o, this.sim.cfg.seed, {');
+    const start = renderer.indexOf('private battlegroundViewHost(): BattlegroundViewHost {');
     expect(start).toBeGreaterThan(-1);
     // The end marker is asserted too: an unchecked -1 would silently widen
     // the slice to the file tail and let the pin pass from anywhere.
-    const end = renderer.indexOf('this.bgViews.set(i, view);', start);
+    const end = renderer.indexOf('\n  }', start);
     expect(end).toBeGreaterThan(-1);
-    const construction = renderer.slice(start, end);
-    expect(construction).toContain(
-      'compileGate: this.asyncCompileSupported ? (t) => this.compileGate(t) : undefined,',
+    expect(renderer.slice(start, end)).toContain('compileGate: this.worldCompileGate(),');
+    // The named helper carries the same substance the inline construction did:
+    // no gate at all on a context without KHR_parallel_shader_compile, so the
+    // pieces attach direct and link at their first draw.
+    expect(renderer, 'the gate must stay absent without parallel shader compile').toContain(
+      'return this.asyncCompileSupported ? (target) => this.compileGate(target) : undefined;',
     );
   });
 });

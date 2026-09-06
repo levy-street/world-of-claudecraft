@@ -345,7 +345,11 @@ describe('Renderer live shader compile rejection recovery', () => {
     expect(gateMethod).toContain('this.liveCompileGates.runPieces(');
     expect(gateMethod).toContain('compileMayStartBeforeInitialPaint(priority, requiredForEntry)');
     expect(gateMethod).toContain('this.initialGpuWorkStart');
-    expect(gateMethod).toContain('linkPieceWork(target, color, shadow, settle),');
+    // The piece cut, handed to the warm arm: the shader warm audit is told
+    // in that arm's assembly unit, so no announcement arm rides here.
+    expect(gateMethod).toContain('linkPieceWork(target, color, shadow, settle), {');
+    expect(gateMethod).toContain('runPiecesWarmed(this.compileArms, target,');
+    expect(gateMethod).toContain('firstIndex,');
     expect(gateMethod).not.toContain('this.liveCompileGates.run(');
     expect(gateMethod).toContain('this.uploadGateTexturesGated(target, priority)');
     // The tail carries the GATE's result: a timed-out or failed link proved

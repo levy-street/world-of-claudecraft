@@ -177,6 +177,12 @@ describe('options_window: WCAG 2.2 AA', () => {
     expect(componentsCss).toMatch(/\.gfx-footer \{[\s\S]*min-height: 40px;/);
     expect(componentsCss).toMatch(/\.graphics-apply-status \{[\s\S]*min-height: 1\.4em;/);
     expect(mobileCss).toMatch(/body\.mobile-touch \.graphics-apply-btn \{[\s\S]*min-height: 40px;/);
+    // The restart strip shares the row shape and the touch wrap: the status
+    // takes the whole line so the button keeps its floor beside it.
+    expect(mobileCss).toMatch(/body\.mobile-touch \.restart-strip \{[\s\S]*?flex-wrap: wrap;/);
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch \.restart-strip-status \{[\s\S]*?flex-basis: 100%;/,
+    );
     const rule = componentsCss.match(/\.gfx-footer \{([\s\S]*?)\n {2}\}/)?.[1] ?? '';
     expect(rule).not.toContain('transition');
     expect(rule).not.toContain('animation');

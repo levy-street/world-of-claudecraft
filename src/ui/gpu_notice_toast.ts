@@ -49,6 +49,7 @@ const NO_VERDICT: GpuNoticeVerdict = {
   softwareRendering: false,
   discreteInactive: false,
   hybridGpuLikely: false,
+  requestedBackendUnavailable: false,
 };
 
 function readDismissedSignature(): string {
@@ -129,11 +130,15 @@ export function gpuNoticeDisplayed(): GpuNoticeVerdict {
 export function updateGpuNoticeShellVerdict(verdict: {
   softwareRendering: boolean;
   discreteInactive: boolean;
+  /** The Linux shell rescued the launch off the backend the player picked.
+   *  Absent on every other push, which is why it defaults to false here. */
+  requestedBackendUnavailable?: boolean;
 }): void {
   shellVerdict = mergeGpuNoticeVerdicts(shellVerdict, {
     softwareRendering: verdict.softwareRendering,
     discreteInactive: verdict.discreteInactive,
     hybridGpuLikely: false,
+    requestedBackendUnavailable: verdict.requestedBackendUnavailable === true,
   });
   applyShellVerdict?.(shellVerdict);
 }
@@ -144,6 +149,8 @@ export function initGpuNotice(input: {
   softwareRendering: boolean;
   discreteInactive?: boolean;
   hybridGpuLikely?: boolean;
+  /** The Linux shell could not start on the backend the player picked. */
+  requestedBackendUnavailable?: boolean;
   desktopShell: boolean;
   desktopPlatform: DesktopPlatform;
 }): boolean {
@@ -161,6 +168,7 @@ export function initGpuNotice(input: {
     softwareRendering: input.softwareRendering,
     discreteInactive: input.discreteInactive === true,
     hybridGpuLikely: input.hybridGpuLikely === true,
+    requestedBackendUnavailable: input.requestedBackendUnavailable === true,
   };
   let verdict = mergeGpuNoticeVerdicts(localVerdict, shellVerdict);
   // Session fallback for the dismissal when storage writes are unavailable.

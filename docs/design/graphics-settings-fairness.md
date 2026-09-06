@@ -382,6 +382,11 @@ measured design decision. Tracked at levy-street/world-of-claudecraft#3525.
   that WON a slot, so a dropped one keeps reading through the burst. Pinned skips: a dead body,
   a frustum-culled non-actionable rig, and a cast-moment sequence for a band that is actually
   being drawn.
+- `tests/ability_vfx_cast_gate.test.ts`: the cast-readiness gate (the painter draws no cast
+  until every cast program is linked) never holds the hard-CC band, the area ring, or a windup
+  clip. The band is the one per-frame read that survives the closed gate: the gate sleeps the
+  entity to release its cosmetic pools, which deletes the band, so `holdWornCcBand` re-holds it
+  immediately after. Pinned skips stay a frustum-culled non-actionable rig and a dead body.
 - `tests/decoration_dims.test.ts`: `decorationHasCollider` classifies a rock at or above
   `ROCK_COLLIDER_MIN_SCALE` as solid, one below it as dressing, and every tree/tree2 as solid
   (colliders.ts gives every trunk a collider unconditionally).

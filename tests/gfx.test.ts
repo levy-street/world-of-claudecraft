@@ -6,6 +6,7 @@ import { DEVICE_MEMORY_GB_KEY, ENTRY_TIGHT_MODE_KEY } from '../src/device_memory
 import { NAMEPLATE_INTERVAL_LOW_SEC, nameplateIntervalSec } from '../src/game/ui_tier_knobs';
 import { FAR_ANIM_RANGE_SCALE_MAX } from '../src/render/crowd_lod';
 import {
+  activeGpuParallelCompile,
   classifyGpuRenderer,
   configureMaskedDoubleSidedVegetationMaterial,
   firstRunGraphicsPreset,
@@ -1240,6 +1241,34 @@ describe('graphics tier resolution', () => {
       expect(getContext).toHaveBeenCalledTimes(1);
       // The throwaway probe context is released instead of left to leak (PR901).
       expect(loseContext).toHaveBeenCalledTimes(1);
+    });
+
+    it('reads KHR_parallel_shader_compile off the same probe, unknown when the list is unavailable', () => {
+      const getParameter = vi.fn(() => 'ANGLE (NVIDIA, Vulkan 1.4.312 (NVIDIA GeForce RTX 3090))');
+      const getExtension = vi.fn((name: string) =>
+        name === 'WEBGL_lose_context'
+          ? { loseContext: vi.fn() }
+          : { UNMASKED_RENDERER_WEBGL: 0x9246 },
+      );
+      const probeWith = (getSupportedExtensions?: () => string[] | null) => {
+        gfxInternalsForTest.resetGpuRendererProbe();
+        const context = getSupportedExtensions
+          ? { getExtension, getParameter, getSupportedExtensions }
+          : { getExtension, getParameter };
+        vi.stubGlobal('document', {
+          createElement: vi.fn(() => ({ getContext: vi.fn(() => context) })),
+        });
+        return activeGpuParallelCompile();
+      };
+      expect(probeWith(() => ['OES_texture_float', 'KHR_parallel_shader_compile'])).toBe(true);
+      expect(probeWith(() => ['OES_texture_float'])).toBe(false);
+      expect(probeWith(() => null)).toBeUndefined();
+      // A context without the list method (a stub, an exotic host) leaves the
+      // answer unknown and, above all, still yields the renderer string.
+      expect(probeWith(undefined)).toBeUndefined();
+      expect(gfxInternalsForTest.probeGpuRenderer()).toBe(
+        'ANGLE (NVIDIA, Vulkan 1.4.312 (NVIDIA GeForce RTX 3090))',
+      );
     });
   });
 

@@ -105,7 +105,10 @@ export type PieceSettle = (node: THREE.Object3D, deadline: PieceDeadline) => Pro
  *  piece's compile prologue, as it saw the whole root's before. The settle
  *  gets the piece's own deadline, so its poll ends where the gate's timeout
  *  fires (the compiles themselves are never cut: a driver link is not
- *  cancellable), and a piece that settled proved every variant it carries. */
+ *  cancellable), and a piece that settled proved every variant it carries.
+ *  The shader warm audit is told about a piece where the piece's programs
+ *  are dry-assembled, in the warm gate's assembly unit (shader_warm_gate.ts),
+ *  never here: the state it reads there is the state the link runs in. */
 export function linkPieceWork(
   target: THREE.Object3D,
   compileColor: (node: THREE.Object3D) => Promise<unknown>,

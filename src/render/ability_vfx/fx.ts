@@ -1058,9 +1058,12 @@ export class AbilityVfxFx implements SequencerHost {
   // Presentation-culling transition for one entity. Semantic held state lives
   // in the painter, while scarce render pools are released immediately so an
   // offscreen actor consumes no overlay, shell, ground-aura, or glow work.
-  sleepEntity(entityId: number): void {
+  sleepEntity(entityId: number, keepCcBand = false): void {
     if (this.disposed) return;
-    this.ccBands.delete(entityId);
+    // The cast gate's hold keeps the band (actionable, refreshed in place by
+    // the hold that follows, so no entry is re-minted per frame); a culled
+    // rig drops it, and an unrefreshed one is swept at the next update.
+    if (!keepCcBand) this.ccBands.delete(entityId);
     this.windups.delete(entityId);
     const bands = this.orbits.get(entityId);
     if (bands) {

@@ -20,7 +20,9 @@ import {
   HITCH_GC_DROP_MIN_MB,
   type SceneCensusHost,
   type SceneCensusMeta,
+  sceneCensusChild,
 } from '../src/render/scene_census_core';
+import { stripComments } from './helpers/strip_comments';
 
 interface FakeChild {
   category: string;
@@ -538,6 +540,77 @@ describe('createHitchTracker', () => {
     tracker.frame({ ...base, frameMs: 10, heapMb: 200 });
     tracker.reset();
     expect(tracker.frame({ ...base, frameMs: 60, heapMb: 100 })?.cause).toBe('other');
+  });
+});
+
+describe('sceneCensusChild', () => {
+  it('buckets a subtree by its renderCategory stamp and reads visibility live', () => {
+    const object = { visible: true, userData: { renderCategory: 'foliage' } };
+    const child = sceneCensusChild(object);
+    expect(child.category).toBe('foliage');
+    // The census toggles through the adapter and diffs the counters after the
+    // render, so the read must follow the object rather than a snapshot.
+    child.setVisible(false);
+    expect(object.visible).toBe(false);
+    expect(child.visible).toBe(false);
+    object.visible = true;
+    expect(child.visible).toBe(true);
+  });
+
+  it('puts an unstamped or oddly stamped subtree in the unknown bucket', () => {
+    expect(sceneCensusChild({ visible: true, userData: {} }).category).toBe('unknown');
+    expect(sceneCensusChild({ visible: true }).category).toBe('unknown');
+    expect(sceneCensusChild({ visible: true, userData: { renderCategory: 7 } }).category).toBe(
+      'unknown',
+    );
+  });
+});
+
+describe('the census burst is excluded from BOTH per-frame readouts', () => {
+  it('discards its draws and charges its program links, at the host hooks', () => {
+    // The burst renders the scene with buckets hidden, so it links programs
+    // no live frame asks for (a hidden bucket takes its nested lights out of
+    // three's counted set, and every material drawn under the new lighting
+    // hash mints a variant). The draw-stats discard and the shader warm
+    // audit's out-of-band signal must therefore stay in the SAME hook: a
+    // capture taken under ?diagnostics otherwise blames the gates for the
+    // census's own links. The audit needs the burst BRACKETED, since it runs
+    // in its own task: without the begin, a gate's prologue that minted
+    // between the last present and the census is charged to the census.
+    // Comments stripped like the other source pins here: a prose mention of
+    // the hook must not satisfy a positive match, nor swell the count below.
+    const source = stripComments(
+      readFileSync(path.resolve(__dirname, '../src/render/renderer.ts'), 'utf8'),
+    );
+    const begin = /beginOutOfBand: \(\) => ([^\n]*),/.exec(source);
+    expect(begin?.[1]).toBe("liveProgramWatch.noteOutOfBandPrograms(this.webgl, 'begin')");
+    const hook = /discardOutOfBand: \(\) => \{([\s\S]*?)\},/.exec(source);
+    expect(hook).not.toBeNull();
+    expect(hook?.[1]).toContain("liveProgramWatch.noteOutOfBandPrograms(this.webgl, 'end')");
+    expect(hook?.[1]).toContain('this.discardOutOfBandDraws()');
+    // And nowhere else: the prewarm passes share the draw-stats seam, but
+    // their links are the announced ones the audit exists to match.
+    expect(source.split('noteOutOfBandPrograms').length - 1).toBe(2);
+  });
+
+  it('opens the bracket before the first census render', () => {
+    // The whole point of the begin: everything unseen at that instant was
+    // minted by the live frames, not by the burst.
+    const order: string[] = [];
+    const { host } = makeHost(worldChildren());
+    const bracketed: SceneCensusHost = {
+      ...host,
+      render: () => {
+        order.push('render');
+        host.render();
+      },
+      beginOutOfBand: () => order.push('begin'),
+      discardOutOfBand: () => order.push('end'),
+    };
+    captureSceneCensus(bracketed, META);
+    expect(order[0]).toBe('begin');
+    expect(order[1]).toBe('render');
+    expect(order[order.length - 1]).toBe('end');
   });
 });
 

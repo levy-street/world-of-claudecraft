@@ -10,8 +10,6 @@ import {
   ABILITIES,
   ARENA_SLOT_COUNT,
   arenaOrigin,
-  BG_SLOT_COUNT,
-  battlegroundOrigin,
   CLASSES,
   DELVE_MODULE_Z_START,
   DUNGEON_LIST,
@@ -49,13 +47,11 @@ import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import type { ChatBubbleStyle } from '../ui/chat_bubble_style';
 import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
-import { buildAbilityMaterialPrewarmGroup } from './ability_material_prewarm';
 import {
-  AbilityVfx,
-  AbilityVfxFx,
-  abilityVfxTexturePrewarmSteps,
-  collectAbilityVfxCompileTargets,
-} from './ability_vfx';
+  abilityMaterialPrewarmMaterials,
+  buildAbilityMaterialPrewarmGroup,
+} from './ability_material_prewarm';
+import { AbilityVfx, AbilityVfxFx, abilityVfxTexturePrewarmSteps } from './ability_vfx';
 import type { AbilityVfxTextures } from './ability_vfx/fx_textures';
 import { ABILITY_VFX_FULL_SPECS } from './ability_vfx_full_specs';
 import { shouldDrawLegacyCastSparkle, syncAbilityVfxCast } from './ability_vfx_registry';
@@ -71,10 +67,17 @@ import { formatResidencyBudget, residencyBudget } from './assets/residency_budge
 import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink';
 import { createBackgroundGpuQueue, GPU_WORK_PRIORITY } from './background_gpu_queue';
 import { attachBankerChestToNpcView } from './banker_chest';
-import { type BattlegroundView, buildBattleground } from './battleground';
+import type { BattlegroundView } from './battleground';
 import { BattlegroundFx } from './battleground_fx';
 import { updateBattlegroundOccluderFades } from './battleground_placements';
 import { buildBattlegroundObject } from './battleground_props';
+import {
+  type BattlegroundViewHost,
+  createBattlegroundViewState,
+  ensureBattlegroundViewNear,
+  prebuildBattlegroundView,
+  updateBattlegroundViews,
+} from './battleground_views';
 import { ensureBiomeHazeField, setBiomeHazeCamera, setBiomeHazeGrade } from './biome_haze_field';
 import { type BiomeHazePreset, hazeLightLevel } from './biome_haze_field_core';
 import { type BirdsView, buildBirds } from './birds';
@@ -110,6 +113,8 @@ import {
 import { buildCampBraziers, type CampBraziersView } from './camp_braziers';
 import { canopyDetailPrewarmTextures } from './canopy_detail';
 import { canvasDataUrlAsync } from './canvas_data_url';
+import { castVfxProgramUnits, createSceneCastVfxReadiness } from './cast_vfx_prewarm';
+import type { CastVfxReadiness } from './cast_vfx_readiness_core';
 import { buildCastleFeatures, type CastleFeaturesView } from './castle_features';
 import { buildCelestialSprites, type CelestialSprites } from './celestial_sprites';
 import { buildCharacterEffectPrewarmGroup } from './character_effect_prewarm';
@@ -191,6 +196,7 @@ import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack
 import { fogFarForBuiltGround, groundViewConeHalfAngle } from './chunk_residency_core';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { buildCliffScree, type CliffScreeView } from './cliff_scree';
+import { type CompileArmHost, linkColorPrograms, linkShadowPrograms } from './compile_arms';
 import type { CompileGateResult } from './compile_gate';
 import { CompileGateQueue, SerialGateLane, settlePendingSwap } from './compile_gate';
 import { linkPieceWork } from './compile_gate_pieces';
@@ -201,6 +207,7 @@ import {
 } from './compile_priority_core';
 import { preflightWebGL2ContextRecycle, type RecycledRendererContext } from './context_recycle';
 import { trackWebGLContext } from './context_release';
+import { type CorpseBeacon, createCorpseBeacon } from './corpse_beacon';
 import {
   animatesEveryFrame,
   animCadenceFrames,
@@ -279,6 +286,7 @@ import {
   ZONE_ENVIRONMENT_RESPONSE,
 } from './environment_transition_core';
 import { EvilEyeMarkers } from './evil_eye_markers';
+import { enableAndWatchRendererExtensions } from './extension_drift_sentinel';
 import { advanceSelfFacing, releaseSelfFacing, wrapAngle } from './facing_smooth';
 import {
   buildFarTerrain,
@@ -369,7 +377,7 @@ import { attachIgnivarModelVfx } from './ignivar_model_vfx';
 import { buildIgnivarRaidGate, ignivarRaidGatePlan } from './ignivar_raid_gate';
 import { buildImpactSite, buildImpactSitePrewarmGroup, type ImpactSiteView } from './impact_site';
 import { deferredPassArms, initialFrameDeferral, type LinkDebt } from './initial_frame_core';
-import { buildInitialSceneCompileUnits } from './initial_scene_compile_units';
+import { buildInitialSceneCompileUnits, entryCompileTail } from './initial_scene_compile_units';
 import {
   collectInitialPresentationTextures,
   InitialSceneTextureAdmission,
@@ -526,7 +534,6 @@ import {
   runPrewarmCompileSubmission,
   submitPrewarmCompileUnit,
 } from './prewarm_compile_submission_core';
-import { prewarmDepthMaterial } from './prewarm_depth_material';
 import {
   boundedPrewarmVisibility,
   runBackgroundPrewarm,
@@ -560,17 +567,15 @@ import {
   type PrewarmResumeEntry,
   type PrewarmResumeUnit,
   resumeDroppedPrewarmEntries,
-  runPrewarmCompileResumeUnit,
-  runPrewarmPiecesSerially,
   settlePrewarmBeforePublish,
   trackPrefetch,
   waitForPrefetch,
 } from './prewarm_resume';
 import { createPrewarmResumeLedger } from './prewarm_resume_ledger_core';
+import { runResumeUnit } from './prewarm_resume_runner';
 import { type PriestMarkersVisual, syncPriestMarkersVisual } from './priest_markers_visual';
 import { pieceProgramSettle } from './program_variant_settle';
 import { buildPropMaterialPrewarmGroup, buildProps, propResidencySources } from './props';
-
 import { makeQuestObjectGate, type QuestObjectGateOptions } from './quest_object_gate_core';
 import { buildGroundQuestObject } from './quest_objects';
 import { RaceLine } from './race_line';
@@ -634,6 +639,7 @@ import {
   type SceneCensusChild,
   type SceneCensusHost,
   type SceneCensusReport,
+  sceneCensusChild,
 } from './scene_census_core';
 import { type FlamePerceptualState, updateSceneryFlame } from './scenery_flame';
 import { downscaleDims } from './screenshot';
@@ -645,9 +651,12 @@ import {
   updateSelfRenderPosition,
 } from './self_render_position_core';
 import { SelfSpiritPrewarmer } from './self_spirit_prewarm';
+import { warmSelfSpiritPrograms } from './self_spirit_warm';
 import { SentenceVfx } from './sentence_vfx';
 import { sentenceImpactPlan } from './sentence_vfx_core';
 import { SET_PROC_FX_BY_NAME } from './set_proc_fx';
+import { runPiecesWarmed } from './shader_warm_gate';
+import { warmRootBeforeLink } from './shader_warm_lane';
 import {
   createShadowCadenceState,
   resetShadowCadence,
@@ -710,6 +719,7 @@ import { routeVarkhulForgeHammer } from './varkhul_forge_hammer';
 import { VarkhulForgestormVisuals } from './varkhul_forgestorm_visual';
 import { SCHOOL_COLORS, Vfx } from './vfx';
 import { createOffsetVfxAnchor, createVfxAnchor, type VfxAnchorPose } from './vfx_anchor';
+import { buildCastVfxBasicStandIns } from './vfx_basic_materials';
 import {
   finishViewCandidates,
   sampleCreatedViewType,
@@ -750,6 +760,7 @@ import { createWeaponVfxPrewarmSkinStage, weaponVfxPrewarmUnits } from './weapon
 import { weaponVfxShedScale } from './weapon_vfx_shed_core';
 import { Weather } from './weather';
 import { precipForBiome } from './weather_field_core';
+import { createRendererWebGL, type WebGLPowerPreference } from './webgl_context_fallback';
 import { buildWorldAmbientSources, footstepSurfaceAt } from './world_audio';
 import { surfaceDetailPrewarmTextures } from './worn_stone';
 import { buildYumiMaze, type YumiMazeView } from './yumi_maze';
@@ -1244,7 +1255,9 @@ export class Renderer {
   scene = new THREE.Scene();
   // A soft light pillar marking the local player's corpse during the ghost run.
   // Built lazily on first death, then just repositioned/toggled (no per-frame alloc).
-  private corpseBeacon: THREE.Mesh | null = null;
+  private corpseBeacon: CorpseBeacon | null = null;
+  private abilityMaterialStandIns: THREE.Material[] | null = null;
+  private castVfxReadiness: CastVfxReadiness;
   camera: THREE.PerspectiveCamera;
   webgl: THREE.WebGLRenderer;
   views = new Map<number, EntityView>();
@@ -1749,13 +1762,17 @@ export class Renderer {
   // each spends its own idle slot instead of stacking into one combat frame.
   private spiritBuildLane: Promise<unknown> = Promise.resolve();
   private selfSpirit = new SelfSpiritPrewarmer({
+    // Two queue units with the warm worker's hold between them
+    // (self_spirit_warm.ts); the player's state is re-read at every step.
     warm: () =>
-      this.backgroundGpuWork.run(
-        () => this.warmSelfSpirit(),
-        GPU_WORK_PRIORITY.VISIBLE_PREWARM,
-        'self-spirit',
-        { releaseTail: true },
-      ),
+      warmSelfSpiritPrograms({
+        blocked: () => !this.asyncCompileSupported || this.sim.player.ghost,
+        visual: () => this.views.get(this.sim.player.id)?.visual ?? null,
+        arms: this.compileArms,
+        run: (work, priority, label, options) =>
+          this.backgroundGpuWork.run(work, priority, label, options),
+        link: (root) => linkColorPrograms(this.compileArms, root, false),
+      }),
     idle: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS),
   });
   // Static terrain/water/features just beyond the current zone are built in a
@@ -1916,6 +1933,7 @@ export class Renderer {
   private nameplateTimer = 0;
   private glVendor = '';
   private glRenderer = '';
+  private contextPowerPreference: WebGLPowerPreference | null = null;
   private contextLostCount = 0;
   private contextRestoredCount = 0;
   private readonly onWebGLContextLost = (): void => {
@@ -2053,12 +2071,9 @@ export class Renderer {
     // composer's MSAA HalfFloat target, low is meant to run without AA, and
     // requesting it here would hit software GL (the autodetect can only run
     // after the context exists) with the most expensive setting there is.
-    this.webgl = new THREE.WebGLRenderer({
-      canvas,
-      context: options.context,
-      antialias: false,
-      powerPreference: 'high-performance',
-    });
+    const created = createRendererWebGL(canvas, options.context);
+    this.webgl = created.webgl;
+    this.contextPowerPreference = created.powerPreference;
     if (!this.webgl.capabilities.isWebGL2) {
       throw new Error('Renderer requires WebGL2');
     }
@@ -2121,13 +2136,12 @@ export class Renderer {
     this.webgl.shadowMap.type = THREE.PCFShadowMap;
     this.webgl.toneMapping = THREE.ACESFilmicToneMapping; // OutputPass reads this on the composer path
     this.webgl.toneMappingExposure = this.baseExposure;
-    // Only worth gating view draws on compileAsync when programs can link OFF the
-    // main thread; without the extension compileAsync compiles synchronously, so
-    // gating would just delay the same stall. Detected once here.
+    // The context's whole extension set, enabled before the first program links
+    // (renderer_extensions.ts); view draws gate on compileAsync only off-thread.
     try {
       this.asyncCompileSupported =
         typeof this.webgl.compileAsync === 'function' &&
-        this.webgl.getContext().getExtension('KHR_parallel_shader_compile') !== null;
+        enableAndWatchRendererExtensions(this.webgl).parallelCompile;
     } catch {
       this.asyncCompileSupported = false;
     }
@@ -2551,11 +2565,12 @@ export class Renderer {
     // only the hard watchdog ever reveals an unlinked root (reveal_gate.ts).
     if (this.asyncCompileSupported) {
       const revealHost = createRevealCompileHost({
-        gate: (pieces, options) =>
-          this.liveCompileGates.runPieces(pieces, VIEW_COMPILE_GATE_MAX_MS, options),
+        gate: (pieces, options, firstIndex) =>
+          this.liveCompileGates.runPieces(pieces, VIEW_COMPILE_GATE_MAX_MS, options, firstIndex),
         compileColor: (target) => this.compilePrewarmColorPrograms(target, false),
         compileShadow: (target) => this.compileShadowPrograms(target),
         settle: pieceProgramSettle(this.webgl.properties, this.prewarmDepthMaterials),
+        arms: this.compileArms,
         upload: (target, priority) => this.uploadGateTexturesGated(target, priority),
         touch: (target, priority, gate) => this.touchLinkedProgramsGated(target, priority, gate),
         predictRevealMs: () => this.gpuPrepBudget.predictMs(REVEAL_GATE_PREP_KIND),
@@ -2995,9 +3010,15 @@ export class Renderer {
     this.abilityVfxFx.setSpiritCompileGate(
       this.asyncCompileSupported ? (root: THREE.Object3D) => this.compileGate(root) : null,
     );
+    // The painter draws no cast until every cast program is linked (cast_vfx_prewarm.ts).
+    this.scene.add(buildCastVfxBasicStandIns());
+    const standIns = (): THREE.Material[] | null => this.abilityMaterialStandIns;
+    this.castVfxReadiness = createSceneCastVfxReadiness(this.scene, this.webgl, standIns);
     this.abilityVfx = new AbilityVfx({
       vfx: this.vfx,
       fx: this.abilityVfxFx,
+      castVfxAdmit: () => this.castVfxReadiness.admit(),
+      castVfxReady: () => this.castVfxReadiness.ready(),
       anchor: vfxAnchor,
       spawnAoeRing: (x, z, radius, school, colorHex) =>
         this.spawnAoeRing(x, z, radius, school, colorHex),
@@ -3694,6 +3715,12 @@ export class Renderer {
             if (this.asyncCompileSupported) {
               for (const obj of [...waterMeshes, ...featureGroups]) {
                 await idleSlot(IDLE_PREWARM_TIMEOUT_MS, { maxTimeoutDeferrals: 2 });
+                // The warm worker first (shader_warm_lane.ts), between units.
+                await warmRootBeforeLink(this.compileArms, obj, {
+                  priority: GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+                  label: `zone-prepare-warm:${obj.name || obj.type}`,
+                  run: (work, priority, label) => this.backgroundGpuWork.run(work, priority, label),
+                });
                 // Await the linker before revealing the object or advancing to
                 // another unit. Submit one object at a time so live work can
                 // jump queued visible-zone prewarm without overlapping it.
@@ -3787,6 +3814,12 @@ export class Renderer {
               }),
             compileChild: async (child) => {
               const childRoot = child as THREE.Object3D;
+              await warmRootBeforeLink(this.compileArms, childRoot, {
+                priority: GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+                label: `zone-prewarm-warm:${childRoot.name || childRoot.type}`,
+                run: (work, priority, label) => this.backgroundGpuWork.run(work, priority, label),
+                includeOffscreenVariant: true,
+              });
               await this.backgroundGpuWork.run(
                 () => this.compilePrewarmColorPrograms(childRoot, true),
                 GPU_WORK_PRIORITY.VISIBLE_PREWARM,
@@ -4028,9 +4061,7 @@ export class Renderer {
     // frame. Registration into the fog-cull sweep is deferred to the reveal,
     // because updateZoneFeatureVisibility writes .visible every frame and
     // would flip the hidden group back on mid-compile.
-    const gate = this.asyncCompileSupported
-      ? (target: THREE.Object3D) => this.compileGate(target)
-      : undefined;
+    const gate = this.worldCompileGate();
     const attached = attachSceneGroupGated(this.scene, view.group, gate);
     // Point lights ride the fireLights budget, NEVER the cull-toggled group
     // (fire_light_registry.ts carries the why).
@@ -4397,6 +4428,7 @@ export class Renderer {
       foliage: this.foliage.perfStats(),
       glVendor: this.glVendor,
       glRenderer: this.glRenderer,
+      glPowerPreference: this.contextPowerPreference,
       contextLost: this.contextLostCount,
       contextRestored: this.contextRestoredCount,
       nightAmount: Math.round(this.dnGlobalNight * 100) / 100,
@@ -4404,6 +4436,7 @@ export class Renderer {
       renderDiagnostics: this.lastFrameStats.renderDiagnostics,
       lastFrame: snapshotRendererFrameStats(this.lastFrameStats),
       prewarm: this.lastPrewarmStats,
+      castVfx: this.castVfxReadiness.snapshot(),
       entryDetailHorizon: this.entryDetailHorizon.snapshot(),
       gpuQueue: this.backgroundGpuWork.stats(),
       gpuPrep: { budget: this.gpuPrepBudget.snapshot(), events: gpuPrepEventsSnapshot() },
@@ -4455,8 +4488,8 @@ export class Renderer {
    * calls and triangles via bucket-visibility diffs through the real pipeline
    * (composer and shadow passes included), plus the shadow pass share via a
    * frozen-shadow render. On demand only (the ?perf overlay census button and
-   * the capture harness); the burst is excluded from the live draw-stats
-   * delta via discardOutOfBandDraws.
+   * the capture harness); the burst is bracketed out of the live draw-stats
+   * delta AND of the gates' shader warm audit, whose links it is charged for.
    */
   captureSceneCensus(): SceneCensusReport {
     const info = this.webgl.info;
@@ -4465,18 +4498,7 @@ export class Renderer {
       // Lights stay untouched: hiding one changes the lighting state hash and
       // recompiles programs mid-census, which would poison the diffs.
       if ((child as { isLight?: boolean }).isLight) continue;
-      children.push({
-        category:
-          typeof child.userData.renderCategory === 'string'
-            ? (child.userData.renderCategory as string)
-            : 'unknown',
-        get visible() {
-          return child.visible;
-        },
-        setVisible(visible: boolean) {
-          child.visible = visible;
-        },
-      });
+      children.push(sceneCensusChild(child));
     }
     const host: SceneCensusHost = {
       children: () => children,
@@ -4503,7 +4525,11 @@ export class Renderer {
       setShadowAutoUpdate: (autoUpdate: boolean) => {
         this.webgl.shadowMap.autoUpdate = autoUpdate;
       },
-      discardOutOfBand: () => this.discardOutOfBandDraws(),
+      beginOutOfBand: () => liveProgramWatch.noteOutOfBandPrograms(this.webgl, 'begin'),
+      discardOutOfBand: () => {
+        liveProgramWatch.noteOutOfBandPrograms(this.webgl, 'end');
+        this.discardOutOfBandDraws();
+      },
     };
     const p = this.sim.player;
     try {
@@ -5381,131 +5407,46 @@ export class Renderer {
     return sweepObjectTextures(this.textureSweepHost, obj);
   }
 
-  /**
-   * Link a root's exact live colour-program variant before a bounded upload.
-   * Three chooses output colour space from the current render target in
-   * compileAsync's synchronous prologue (authored on r165; the r185 prewarm
-   * re-audit kept this restore). Restore that global before awaiting
-   * the parallel linker so live frames never inherit the prewarm target.
-   */
-  private async compilePrewarmColorPrograms(
+  private compileArmHost: CompileArmHost | null = null;
+
+  /** The two compile arms, bound to this renderer (compile_arms.ts owns the
+   *  state each arm sets and the why). Read-through: the post pipeline, the
+   *  offscreen target and the depth cache all move during a session. Built
+   *  on first use, so a harness over the prototype gets one too. */
+  private get compileArms(): CompileArmHost {
+    if (this.compileArmHost) return this.compileArmHost;
+    const host: CompileArmHost = {
+      webgl: () => this.webgl,
+      context: () => this.webgl.getContext(),
+      camera: () => this.camera,
+      scene: () => this.scene,
+      shadowCamera: () => this.sun.shadow.camera,
+      offscreen: () => !!this.post,
+      offscreenTarget: () => {
+        this.prewarmRenderTarget ??= new THREE.WebGLRenderTarget(8, 8);
+        return this.prewarmRenderTarget;
+      },
+      depthMaterials: () => this.prewarmDepthMaterials,
+      shadowArm: () => GFX.dynamicShadows && this.asyncCompileSupported,
+    };
+    this.compileArmHost = host;
+    return host;
+  }
+
+  /** Link a root's exact live colour-program variant before a bounded upload. */
+  private compilePrewarmColorPrograms(
     root: THREE.Object3D,
     includeOffscreenVariant: boolean,
   ): Promise<void> {
-    const compileAtTarget = async (target: THREE.WebGLRenderTarget | null): Promise<void> => {
-      const previousTarget = this.webgl.getRenderTarget();
-      let compilePromise: Promise<THREE.Object3D>;
-      try {
-        this.webgl.setRenderTarget(target);
-        compilePromise = this.webgl.compileAsync(root, this.camera, this.scene);
-      } finally {
-        this.webgl.setRenderTarget(previousTarget);
-      }
-      await compilePromise;
-    };
-
-    // Direct tiers draw to the canvas in gameplay, so retain that variant.
-    if (!this.post) await compileAtTarget(null);
-
-    // Composer tiers draw the scene into a render target. Direct tiers also
-    // need this second variant before their bounded offscreen geometry upload,
-    // otherwise that upload itself can synchronously link a new program.
-    if (this.post || includeOffscreenVariant) {
-      this.prewarmRenderTarget ??= new THREE.WebGLRenderTarget(8, 8);
-      await compileAtTarget(this.prewarmRenderTarget);
-    }
+    return linkColorPrograms(this.compileArms, root, includeOffscreenVariant);
   }
 
-  /**
-   * compileAsync(scene, camera) does not enumerate Three's renderer-owned
-   * shadow materials. Temporarily put equivalent MeshDepthMaterials on EVERY
-   * mesh under the root, skinned or not, so KHR_parallel_shader_compile links
-   * those variants before the shadow pass asks getUniforms for them: static
-   * and instanced casters (12 of the initial frame's 64 residual synchronous
-   * links), and meshes NOT casting at gate time, because castShadow is toggled
-   * at runtime by distance (entity shadow band, zone shadow volume, gather
-   * nodes) frames after this arm ran, so a rig created beyond the band linked
-   * cold at its first shadow draw (eleven depth programs of 20 to 41 ms in
-   * 0.3 s on the 3090 ride, ten through Eastbrook in production). Depth twins
-   * are few, cached per (material inputs x mesh shape): a cache hit, no link.
-   */
-  private async compileShadowPrograms(root: THREE.Object3D): Promise<void> {
-    if (!GFX.dynamicShadows || !this.asyncCompileSupported) return;
-    const swaps: { mesh: THREE.Mesh; material: THREE.Material | THREE.Material[] }[] = [];
-    // Walked inside the try below so a throw mid-walk still restores every swap.
-    const swapMaterials = (): void => {
-      root.traverse((obj) => {
-        const mesh = obj as THREE.Mesh;
-        if (!mesh.isMesh || !mesh.material) return;
-        const material = mesh.material;
-        swaps.push({ mesh, material });
-        mesh.material = Array.isArray(material)
-          ? material.map((item) => prewarmDepthMaterial(this.prewarmDepthMaterials, item, mesh))
-          : prewarmDepthMaterial(this.prewarmDepthMaterials, material, mesh);
-      });
-    };
-    // Match the real shadow pass's program key exactly. A bare
-    // compileAsync(root, shadowCamera) uses the canvas output colour space
-    // and sees no scene lights, producing a skinned depth program that still
-    // misses both the render-target and shadow-map bits. Conversely, passing
-    // the world scene verbatim would add fog bits that WebGLShadowMap omits
-    // (its renderBufferDirect call uses a null scene). Keep the world only as
-    // the light source, briefly suppress its fog, and compile while any
-    // offscreen target is current so outputColorSpace is the linear working
-    // space. compileAsync runs its compile() prologue synchronously; restore
-    // the globals AND the swapped materials before awaiting the parallel
-    // linker: the boot-resume lane runs these units on VISIBLE post-reveal
-    // scene meshes, and a swap held across the awaited link (10 ms+ of real
-    // frames) would draw them as depth noise. The link tracks the depth
-    // material object, not the mesh, so restoring early is safe.
-    this.prewarmRenderTarget ??= new THREE.WebGLRenderTarget(8, 8);
-    const previousTarget = this.webgl.getRenderTarget();
-    const previousFog = this.scene.fog;
-    let compilePromise: Promise<THREE.Object3D> | null = null;
-    try {
-      swapMaterials();
-      if (swaps.length > 0) {
-        this.scene.fog = null;
-        this.webgl.setRenderTarget(this.prewarmRenderTarget);
-        compilePromise = this.webgl.compileAsync(root, this.sun.shadow.camera, this.scene);
-      }
-    } finally {
-      this.webgl.setRenderTarget(previousTarget);
-      this.scene.fog = previousFog;
-      for (const swap of swaps) swap.mesh.material = swap.material;
-    }
-    // Do not race a timer here. The underlying linker cannot be cancelled,
-    // so a timeout only lets it overlap the next child and gameplay.
-    if (compilePromise) await compilePromise;
+  /** Link the depth twins of every mesh under the root, under the shadow
+   *  pass's own state. */
+  private compileShadowPrograms(root: THREE.Object3D): Promise<void> {
+    return linkShadowPrograms(this.compileArms, root);
   }
 
-  // Link the local player's own body spirit (ghost) transparent variants
-  // off-thread so a later spirit release reuses cached programs instead of
-  // linking ~20 inline on the ungated self view (the ~2.2 s death stall).
-  // Applies the ghost materials to the REAL skinned meshes (so the variant
-  // matches the flip's skinning/morph), runs compileAsync's synchronous
-  // prologue, then restores the opaque originals BEFORE awaiting the linker
-  // (the compileShadowPrograms restore-early pattern): no frame draws the ghost,
-  // and the clones the flip reuses stay cached on the visual.
-  private async warmSelfSpirit(): Promise<boolean> {
-    if (!this.asyncCompileSupported || this.sim.player.ghost) return false;
-    const visual = this.views.get(this.sim.player.id)?.visual;
-    if (!visual) return false;
-    const previousTarget = this.webgl.getRenderTarget();
-    // Composer tiers link the ghost variant against their offscreen colour space.
-    if (this.post) this.prewarmRenderTarget ??= new THREE.WebGLRenderTarget(8, 8);
-    let compilePromise: Promise<THREE.Object3D>;
-    visual.setGhost(true);
-    try {
-      this.webgl.setRenderTarget(this.post ? this.prewarmRenderTarget : null);
-      compilePromise = this.webgl.compileAsync(visual.root, this.camera, this.scene);
-    } finally {
-      this.webgl.setRenderTarget(previousTarget);
-      visual.setGhost(false);
-    }
-    await compilePromise;
-    return true;
-  }
   // A tiny throwaway target for background child uploads, so a prewarm root
   // that is briefly visible during its bounded call is never presented on
   // the canvas. Lazily built once and kept: 8x8 RGBA plus depth is negligible.
@@ -5789,8 +5730,14 @@ export class Renderer {
     const abilityMaterialSlot = createVariantPrewarmSlot(
       variantSlotHost,
       'ability-materials',
-      buildAbilityMaterialPrewarmGroup,
+      () => {
+        const group = buildAbilityMaterialPrewarmGroup();
+        this.abilityMaterialStandIns = abilityMaterialPrewarmMaterials(group);
+        return group;
+      },
     );
+    const castVfxUnits = (): PrewarmResumeUnit[] =>
+      castVfxProgramUnits(this.scene, abilityMaterialSlot.group, this.compileArms, this.webgl);
     let mountPrewarmGroup: THREE.Group | null = null;
     const mountPrewarmPlannedKeys = mountPrewarmKeys(this.sim.ownedMounts());
     const mountPrewarmPendingKeys = new Set(mountPrewarmPlannedKeys);
@@ -5876,6 +5823,9 @@ export class Renderer {
       resumeUnits?: () => readonly PrewarmResumeUnit[];
       /** Optional remainder for a started entry that reports partial progress. */
       resumePartialUnits?: () => readonly PrewarmResumeUnit[];
+      /** The entry's program links, resumed as DEBT under `programs.<id>` when
+       * the entry never ran (a cast VFX has no stand-in). */
+      resumeProgramUnits?: () => readonly PrewarmResumeUnit[];
       run: () => void | Promise<void>;
       /** Read after run(): how much of the planned work actually happened. A
        * trimmed report downgrades the entry to 'partial' (prewarm_policy.ts),
@@ -5888,6 +5838,14 @@ export class Renderer {
     // Explicitly bounded units captured when their manifest entry misses the
     // loading deadline. Whole entry callbacks are never resumed live.
     const droppedEntries: PrewarmResumeEntry[] = [];
+    const droppedProgramEntries: PrewarmResumeEntry[] = [];
+    const dropEntry = (entry: PrewarmManifestEntry, units: readonly PrewarmResumeUnit[]): void => {
+      if (units.length > 0) droppedEntries.push({ id: entry.id, units });
+      const programs = entry.resumeProgramUnits?.() ?? [];
+      if (programs.length > 0) {
+        droppedProgramEntries.push({ id: `programs.${entry.id}`, units: programs });
+      }
+    };
     const resumeLedger = createPrewarmResumeLedger();
 
     // One shared dedupe store across EVERY compile collection in this entry
@@ -5937,23 +5895,23 @@ export class Renderer {
         compileColor: (root) => this.compilePrewarmColorPrograms(root, false),
         compileShadow: (root) => this.compileShadowPrograms(root),
         onCompiledRoot: () => compiledPrewarmRoots++,
+        tail: entryCompileTail(this.webgl, this.prewarmDepthMaterials, this.backgroundGpuWork),
       });
       for (const unit of units) compileLifecycle.recordFor(unit, lifecycleLane);
       return units;
     };
 
-    // Early compile submission: compileAsync links settle off-thread, so the
-    // sooner a unit is SUBMITTED the more of its link time overlaps the other
-    // manifest entries (surface-detail plus textures.scene alone are ~4.5 s of
-    // uploads on the reference desktop). 'programs.compile-submit' fires every
-    // visible-scene units right after they exist; hidden staged catalogs are
-    // classified as post-paint debt and retain their stand-ins. The final
-    // compile entry submits the visible remainder and then awaits it so
-    // all of their programs are READY before world.initial-frame renders; a
-    // program not ready by then links synchronously inside that frame, the
-    // measured first-draw stall class. Which groups each call collects is the
-    // pure planCompileSubmission (prewarm_policy.ts); the submit LOOP, its
-    // deadline rule and its never-drop contract are
+    // Early compile submission: compileAsync links settle off-thread, so the sooner
+    // a unit is SUBMITTED the more of its link time overlaps the other manifest
+    // entries (surface-detail plus textures.scene alone are ~4.5 s of uploads on the
+    // reference desktop). 'programs.compile-submit' fires every visible-scene unit
+    // right after it exists; hidden staged catalogs are classified as post-paint
+    // debt and retain their stand-ins. The final compile entry submits the visible
+    // remainder and then awaits it so all of their programs are READY before
+    // world.initial-frame renders; a program not ready by then links synchronously
+    // inside that frame, the measured first-draw stall class. Which groups each call
+    // collects is the pure planCompileSubmission (prewarm_policy.ts); the submit
+    // LOOP, its deadline rule and its never-drop contract are
     // runPrewarmCompileSubmission (prewarm_compile_submission_core.ts).
     const submittedCompileUnits: { id: string; done: Promise<void> }[] = [];
     const submittedCompileGroups = new Set<string>();
@@ -6078,8 +6036,7 @@ export class Renderer {
           textureDelta: 0,
           detail: entry.detail?.(),
         });
-        const units = entry.resumeUnits?.() ?? [];
-        if (units.length > 0) droppedEntries.push({ id: entry.id, units });
+        dropEntry(entry, entry.resumeUnits?.() ?? []);
         return;
       }
       let status: RendererPrewarmManifestEntryStats['status'] = 'completed';
@@ -6718,51 +6675,35 @@ export class Renderer {
         detail: () => `objects=${weaponVfxPrewarmGroup?.children.length ?? 0}`,
       },
       {
-        // Spawn one of every pooled ability-VFX primitive (rings, decals,
-        // pillar, shell, slash ribbon, overlay sprite). The pools build their
-        // meshes visible=false, so no render pass ever draws them: their
-        // textures and geometry stay un-uploaded, and the first spec'd cast in
-        // the open world used to pay for both synchronously. The spawns bind
-        // the per-style decal textures and the six impact sheets, so the
-        // texture re-walk below uploads the whole canvas set now.
-        // abilityVfxFx.clear() in the finally block hides everything again.
-        //
-        // resumeUnits deliberately does NOT replay the spawn: run live it
-        // would pop a white ring/decal/flipbook burst at the player's feet
-        // (the same reason vfx.atlas retains nothing). It carries the
-        // invisible half instead, one impact sheet per unit plus one program
-        // link per distinct pooled material. That is also the MINIMAL variant
-        // constrained devices get in place of this entry
-        // (CONSTRAINED_PREWARM_RESUME): there the whole entry is skipped, so
-        // each 512px sheet is otherwise drawn on the first impact of its
-        // school, i.e. mid-combat.
+        // The cast VFX (cast_vfx_prewarm.ts): stage the lazy stand-ins, link
+        // every cast program through the compile arms; the spawn only binds
+        // textures for the walk (no frame draws it, so it links nothing:
+        // measured 2026-08-28). Dropped by the 3 s budget on the OpenGL
+        // desktops: the programs resume as debt right after the compile
+        // remainder, the textures stay cosmetic, and the painter draws no
+        // cast until every program is linked. resumeUnits never replays the
+        // spawn: live, it would pop a white burst at the player's feet.
         id: 'vfx.ability-primitives',
         category: 'vfx',
         priority: 62,
         required: false,
-        resumeUnits: () => [
-          ...abilityVfxTexturePrewarmSteps().map((step) => ({
+        resumeUnits: () =>
+          abilityVfxTexturePrewarmSteps().map((step) => ({
             id: `texture:${step.id}`,
             run: () => {
               for (const texture of step.build()) this.prewarmTexture(texture);
             },
           })),
-          ...abilityMaterialSlot.resumeUnits(),
-          ...collectAbilityVfxCompileTargets(this.scene).map((target) => ({
-            id: `program:${target.id}`,
-            run: () => this.compilePrewarmColorPrograms(target.object, false),
-          })),
-        ],
-        run: () => {
+        resumeProgramUnits: () => [...abilityMaterialSlot.resumeUnits(), ...castVfxUnits()],
+        run: async () => {
           this.abilityVfxFx.prewarmSpawn(p.pos.x, p.pos.y, p.pos.z - 5, p.id);
-          // The lazily-minted spell materials (ability_material_prewarm.ts):
-          // staged hidden here, linked by the compile lane with the rest.
           abilityMaterialSlot.run();
           this.scene.traverse((child) => {
             const renderable = child as RenderableDiagnosticObject;
             if (renderable.userData.renderCategory !== 'vfx' || !renderable.material) return;
             this.prewarmMaterialTextures(renderable.material);
           });
+          await Promise.all(castVfxUnits().map((unit) => unit.run()));
         },
       },
       {
@@ -7144,10 +7085,9 @@ export class Renderer {
         // units, which run after entry instead of never.
         if (!prewarmEntryRuns(entry.id, policy)) {
           const counts = liveProgramWatch.programCounts(this.webgl);
-          const skipUnits = prewarmEntryResumesAfterSkip(entry.id, policy)
-            ? (entry.resumeUnits?.() ?? [])
-            : [];
-          if (skipUnits.length > 0) droppedEntries.push({ id: entry.id, units: skipUnits });
+          const resumes = prewarmEntryResumesAfterSkip(entry.id, policy);
+          const skipUnits = resumes ? (entry.resumeUnits?.() ?? []) : [];
+          if (resumes) dropEntry(entry, skipUnits);
           manifestEntries.push({
             id: entry.id,
             category: entry.category,
@@ -7201,6 +7141,7 @@ export class Renderer {
         units: deferredSubmitUnits.splice(0, deferredSubmitUnits.length),
       });
     }
+    droppedEntries.push(...droppedProgramEntries);
     if (postPaintCompileUnits.length > 0) {
       droppedEntries.push({
         id: 'programs.compile-post-paint',
@@ -7241,42 +7182,15 @@ export class Renderer {
           await Promise.allSettled(submittedCompileUnits.map((unit) => unit.done));
           return resumeDroppedPrewarmEntries(resume, {
             idleSlot: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS, { maxTimeoutDeferrals: 2 }),
-            runUnit: (unit, entry) => {
-              // Link/upload debt runs at BOOT_DEBT so the cosmetic BACKGROUND
-              // warmers (the preview lane) cannot starve it (hitch-hunt P1:
-              // minutes of unpaid link debt behind the previews). A debt
-              // BATCH (no pieces) keeps its tail HELD: released, its 16 to 32
-              // links piled into the driver at once (sub-1-fps for a minute
-              // with a dropped manifest). A debt ROOT piece releases its tail:
-              // ONE link under the released-tail cap, whereas a held root
-              // blocked the queue head for its whole link wait behind the
-              // driver's queue (batch 18: 4.0 s on the iGPU, reveals starved).
-              const debt = prewarmResumeIsDebt(entry.id);
-              resumeLedger.noteStart(entry.id);
-              const priority = debt ? GPU_WORK_PRIORITY.BOOT_DEBT : GPU_WORK_PRIORITY.BOOT_RESUME;
-              const run = () => {
-                if (debt && unit.pieces) {
-                  return runPrewarmPiecesSerially(unit.pieces, (piece) =>
-                    this.backgroundGpuWork.run(piece.run, priority, piece.id, {
-                      releaseTail: true,
-                    }),
-                  );
-                }
-                // Cosmetic resume keeps the released tail (held, a 16-root unit
-                // blocked live compile gates for seconds: travel hitches).
-                return this.backgroundGpuWork.run(unit.run, priority, unit.id, {
-                  releaseTail: !debt,
-                });
-              };
-              return entry.id.startsWith('programs.compile')
-                ? runPrewarmCompileResumeUnit(
-                    unit,
-                    compileLifecycle,
-                    'programs.compile-resume',
-                    run,
-                  )
-                : run();
-            },
+            // Priority, tail and the warm ahead of each root's link:
+            // prewarm_resume_runner.ts owns the policy and its why.
+            runUnit: (unit, entry) =>
+              runResumeUnit(unit, entry, {
+                queue: this.backgroundGpuWork,
+                ledger: resumeLedger,
+                lifecycle: compileLifecycle,
+                arms: this.compileArms,
+              }),
             afterEntry: hidePrewarmArtifacts,
             onUnitError: (entry, unit, error) => {
               resumeLedger.noteFailure(entry.id, unit.id);
@@ -7442,6 +7356,9 @@ export class Renderer {
         this.needleOfFateVfx.endCast(ev.entityId);
         break;
       }
+      case 'bgProposed':
+        prebuildBattlegroundView(this.bgViews, this.battlegroundViewHost());
+        break;
       case 'spellfx': {
         if (ev.fx === 'lichTransform') {
           if (!this.reducedMotion()) {
@@ -8626,24 +8543,24 @@ export class Renderer {
     const lookup = (id: number) => this.sim.entities.get(id);
     const isCasting = castingAtPlayerPredicate(lookup, this.sim.player.id);
     const priority = compilePriorityForTarget(target, this.sim.player.targetId, isCasting);
-    // Compile the variant pair the boot prewarm proved out, never a bare
-    // compileAsync at the ambient render target: three keys a program on the
-    // bound target's output colour space, so on composer tiers an unbound
-    // compile links the canvas srgb variant while the scene pass draws the
-    // linear one, and the first visible frame still linked the real program
-    // synchronously (the measured 300-500 ms border-crossing stall). The
-    // colour pass binds the tier-correct target; the skinned depth pass covers
-    // the renderer-owned shadow material the colour walk cannot enumerate; the
-    // touch tail warms the linked programs' uniform tables (no reveal query).
+    // The colour and shadow arms (compile_arms.ts owns why each binds what it
+    // binds); each piece asks the shader warm worker before it links, when
+    // the policy holds it (shader_warm_gate.ts), then rides this gate queue.
     const color = (node: THREE.Object3D) => this.compilePrewarmColorPrograms(node, false);
     const shadow = (node: THREE.Object3D) => this.compileShadowPrograms(node);
     const settle = pieceProgramSettle(this.webgl.properties, this.prewarmDepthMaterials);
     const submit = () =>
-      this.liveCompileGates.runPieces(
-        linkPieceWork(target, color, shadow, settle),
-        VIEW_COMPILE_GATE_MAX_MS,
-        { priority, label: `live-gate:${target.name || target.type}` },
-      );
+      runPiecesWarmed(this.compileArms, target, linkPieceWork(target, color, shadow, settle), {
+        priority,
+        imminent: false,
+        submit: (pieces, firstIndex) =>
+          this.liveCompileGates.runPieces(
+            pieces,
+            VIEW_COMPILE_GATE_MAX_MS,
+            { priority, label: `live-gate:${target.name || target.type}` },
+            firstIndex,
+          ),
+      });
     const startAfterInitialPaint = compileMayStartBeforeInitialPaint(priority, requiredForEntry)
       ? null
       : this.initialGpuWorkStart;
@@ -9038,9 +8955,9 @@ export class Renderer {
   // yumi maze copies; the geometry is static, and the only per-frame work is the
   // occluder fade the placements own (battleground_placements.ts).
   private bgViews = new Map<number, BattlegroundView>();
-  // Reused ward-state carrier: setWardState only READS these fields, so the
-  // per-frame push refills this object rather than minting a literal.
-  private bgWardState = { countdown: false, ghost: false, myTeam: null as number | null };
+  // The bookkeeping those copies need beside them (battleground_views.ts): the
+  // reused ward-state carrier, and whether the prebuild's offer was ever seen.
+  private bgViewState = createBattlegroundViewState();
   // Blue/red team arrows above every yumi fighter (yumi_team_markers.ts).
   private readonly yumiTeamMarkers = new YumiTeamMarkers();
   // Affliction's primary and Coven eyes remain actionable on every graphics tier.
@@ -9468,38 +9385,12 @@ export class Renderer {
             lowGfx: this.lowGfx,
           });
           setRenderCategory(view.group, 'dungeon');
-          this.scene.add(view.group);
+          void attachSceneGroupGated(this.scene, view.group, this.worldCompileGate());
           this.yumiMazeViews.set(i, view);
         }
       }
     } else if (inside && isBgPos(px)) {
-      // build the Thornhollow Fields copy the player was matched into (the yumi
-      // view-map pattern; the field is static, so no per-frame update hook)
-      for (let i = 0; i < BG_SLOT_COUNT; i++) {
-        if (this.bgViews.has(i)) continue;
-        const o = battlegroundOrigin(i);
-        if (Math.abs(px - o.x) < 220 && Math.abs(pz - o.z) < 200) {
-          // The field's authored point lights ride the shared fire-light budget
-          // (the yumi-maze hook shape above): the field streams in mid-session,
-          // and up to 14 lights appearing outside the rank would change the
-          // pinned visible point-light count and relink every lit material in
-          // view. The build is async, so the registration lands later; the
-          // callback marks the rank dirty whenever it does.
-          const view = buildBattleground(o, this.sim.cfg.seed, {
-            lowGfx: this.lowGfx,
-            // The raw registry on purpose: buildBgFieldLights (battleground.ts) hides
-            // each light and its release path splices, which an append-only sink cannot express.
-            fireLights: this.fireLights,
-            onFireLightsChanged: () => {
-              this.lightRankDirty = true;
-            },
-            // Gate each streamed field piece's shader links (the dungeon interiors' seam).
-            compileGate: this.asyncCompileSupported ? (t) => this.compileGate(t) : undefined,
-          });
-          this.scene.add(view.group);
-          this.bgViews.set(i, view);
-        }
-      }
+      ensureBattlegroundViewNear(this.bgViews, px, pz, this.battlegroundViewHost());
     } else if (inside && isArenaPos(px)) {
       void ensureDungeonAssets().catch(() => undefined);
       // build the Ashen Coliseum copy the player was matched into
@@ -9936,27 +9827,25 @@ export class Renderer {
   /** Drive the field wards off the live match view: the form-up gate while the
    *  countdown holds, and the grave ward while the player waits as a spirit.
    *  Only visibility flags, so this is cheap enough for the per-frame block. */
-  private updateBgWards(): void {
-    if (this.bgViews.size === 0) return;
-    const match = this.sim.bgInfo?.match ?? null;
-    // Scratch state, refilled in place: setWardState only reads the fields, so
-    // a fresh literal every frame would be pure garbage on the render path.
-    const state = this.bgWardState;
-    state.countdown = match?.state === 'countdown';
-    state.myTeam = match ? match.myTeam : null;
-    // The roster scan only matters while the match is live, so it is skipped as
-    // a whole outside that window rather than run and then discarded, and the
-    // plain loop over the at-most-ten rows allocates no per-frame closure.
-    state.ghost = false;
-    if (match?.state === 'active') {
-      const me = this.sim.playerId;
-      for (const row of match.players) {
-        if (row.pid !== me) continue;
-        state.ghost = row.dead;
-        break;
-      }
-    }
-    for (const view of this.bgViews.values()) view.setWardState(state);
+  /** The gate a streamed world group attaches through; none without parallel compile. */
+  private worldCompileGate(): ((target: THREE.Object3D) => Promise<unknown>) | undefined {
+    return this.asyncCompileSupported ? (target) => this.compileGate(target) : undefined;
+  }
+
+  /** What battleground_views.ts needs to build and attach a field copy. Its lights
+   *  ride the shared fire-light budget (the raw registry on purpose: buildBgFieldLights
+   *  hides each light and its release splices); the async build marks the rank dirty. */
+  private battlegroundViewHost(): BattlegroundViewHost {
+    return {
+      scene: this.scene,
+      seed: this.sim.cfg.seed,
+      lowGfx: this.lowGfx,
+      fireLights: this.fireLights,
+      onFireLightsChanged: () => {
+        this.lightRankDirty = true;
+      },
+      compileGate: this.worldCompileGate(),
+    };
   }
 
   private updateCelestialSprites(): void {
@@ -11887,32 +11776,14 @@ export class Renderer {
     }
     phaseStart = this.markRendererPhase(framePhaseMs, 'entities', phaseStart);
 
-    // Corpse beacon: a soft light pillar over the local player's body while their
-    // spirit runs back to it (the ghost run). Built once, then just repositioned.
+    // Corpse beacon (corpse_beacon.ts), built on the first ghost run.
     {
       const self = this.sim.player;
       const corpse = self?.dead && self.ghost ? self.corpsePos : null;
       if (corpse) {
-        if (!this.corpseBeacon) {
-          const geo = new THREE.CylinderGeometry(0.25, 0.25, 14, 8, 1, true);
-          const mat = new THREE.MeshBasicMaterial({
-            color: 0xbfe6ff,
-            transparent: true,
-            opacity: 0.3,
-            depthWrite: false,
-            side: THREE.DoubleSide,
-            blending: THREE.AdditiveBlending,
-          });
-          this.corpseBeacon = new THREE.Mesh(geo, mat);
-          this.corpseBeacon.renderOrder = 2;
-          setRenderCategory(this.corpseBeacon, 'ui3d');
-          this.scene.add(this.corpseBeacon);
-        }
-        this.corpseBeacon.visible = true;
-        this.corpseBeacon.position.set(corpse.x, corpse.y + 7, corpse.z);
-      } else if (this.corpseBeacon) {
-        this.corpseBeacon.visible = false;
-      }
+        this.corpseBeacon ??= createCorpseBeacon(this.scene);
+        this.corpseBeacon.sync(corpse);
+      } else this.corpseBeacon?.sync(null);
     }
 
     let worldStart = performance.now();
@@ -11982,7 +11853,7 @@ export class Renderer {
     );
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'water', worldStart);
     this.bgFx.update(this.time);
-    this.updateBgWards();
+    updateBattlegroundViews(this.bgViews, this.bgViewState, this.sim.bgInfo, this.sim.playerId);
     this.vfx.update(dt);
     // Racing line (cosmetic; reads the self race view only).
     this.raceLine.update(this.sim.mountRaceView(), this.time, dt);

@@ -492,8 +492,10 @@ describe('Thornhollow field lights ride the renderer point-light budget', () => 
     // registry, the build must not register after a teardown won the race, and
     // dispose must unregister BEFORE it disposes the lights.
     const renderer = readFileSync(`${ROOT}src/render/renderer.ts`, 'utf8');
-    const buildStart = renderer.indexOf('buildBattleground(o, this.sim.cfg.seed, {');
-    const buildEnd = renderer.indexOf('this.bgViews.set(i, view);', buildStart);
+    // The registry hand-off lives in the host the renderer gives
+    // battleground_views.ts, which builds the copies (the branch was extracted).
+    const buildStart = renderer.indexOf('private battlegroundViewHost(): BattlegroundViewHost {');
+    const buildEnd = renderer.indexOf('compileGate:', buildStart);
     expect(buildStart).toBeGreaterThan(-1);
     expect(buildEnd).toBeGreaterThan(buildStart);
     const construction = renderer.slice(buildStart, buildEnd);

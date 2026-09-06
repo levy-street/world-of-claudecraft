@@ -34,6 +34,11 @@ const {
   MIN_WINDOW_POSITION,
   MIN_WINDOW_WIDTH,
 } = require('./window_memory.cjs');
+const { GPU_BACKEND_RUNGS, GPU_BACKEND_SETTINGS } = require('./gpu_backend.cjs');
+
+/** How much of a proof's version and driver string is kept: enough to compare
+ *  two readings, far short of anything a prefs file should be storing. */
+const GPU_PROOF_FIELD_MAX = 256;
 
 // Bumped only when a field's MEANING changes. A file stamped with any other
 // version is discarded wholesale rather than field-matched: a future build may
@@ -60,11 +65,48 @@ const DISPLAY_MODES = ['borderless', 'windowed'];
 
 /**
  * The window presentation mode off disk. Exact-literal only: no case folding and
- * no aliases, because the value is fed straight to setFullScreen at the reveal,
- * and a near-miss ('Borderless', 'fullscreen') has to resolve to the default
+ * no aliases, because the value is fed straight to setFullScreen once the page
+ * has loaded, and a near-miss ('Borderless', 'fullscreen') has to resolve to the default
  * rather than to whichever branch a loose comparison happened to take.
  */
 const readDisplayMode = (value, fallback) => (DISPLAY_MODES.includes(value) ? value : fallback);
+
+/**
+ * The player's Linux GPU backend setting and the Auto memory off disk. Exact
+ * literals only, same reasoning as the display mode: both feed the launch
+ * decision in electron/gpu_backend.cjs before Electron starts, and a near-miss
+ * must land on the default rather than on whichever arm a loose comparison
+ * would pick.
+ */
+const readGpuBackend = (value, fallback) =>
+  GPU_BACKEND_SETTINGS.includes(value) ? value : fallback;
+/** A ladder rung, or undefined: absent means "Auto starts on the top rung". */
+const readGpuBackendRung = (value) => (GPU_BACKEND_RUNGS.includes(value) ? value : undefined);
+/** A counter off disk: a non-integer or a negative one reads as none. */
+const readCount = (value) => (isInteger(value) && value >= 0 ? value : 0);
+
+/**
+ * The proof that a session once ran healthy here, or null. A backend without the
+ * version it was proven under cannot be checked for staleness, and an unverifiable
+ * proof would aim the climb at a machine that no longer exists. The adapter key
+ * (`vendorId:deviceId` of the active GPU) may be EMPTY: getGPUInfo lists no active
+ * device on some machines, and the memory reads an unknown adapter as "the same
+ * machine", so an absent one is kept rather than costing the proof. Strings are
+ * capped because a prefs file is not a log.
+ */
+function readGpuBackendProof(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const backend = readGpuBackendRung(value.backend);
+  if (!backend) return null;
+  const { appVersion, gpuAdapter } = value;
+  if (typeof appVersion !== 'string' || appVersion === '') return null;
+  if (gpuAdapter !== undefined && typeof gpuAdapter !== 'string') return null;
+  return {
+    backend,
+    appVersion: appVersion.slice(0, GPU_PROOF_FIELD_MAX),
+    gpuAdapter: (gpuAdapter ?? '').slice(0, GPU_PROOF_FIELD_MAX),
+  };
+}
 
 /**
  * A window rect off disk, or null. Partial bounds are dropped whole: three of
@@ -91,6 +133,9 @@ function defaultDesktopPrefs() {
     gpuForceOptOut: false,
     displayMode: 'borderless',
     discordPresenceEnabled: true,
+    gpuBackend: 'auto',
+    consecutiveGpuLaunchCrashes: 0,
+    launchesSinceBackendReprobe: 0,
   };
 }
 
@@ -125,6 +170,21 @@ function sanitizeDesktopPrefs(input) {
   // one: it resolves to the default like any other unusable value, which is why
   // the schema version does not move for it.
   prefs.discordPresenceEnabled = readBoolean(input.discordPresenceEnabled, true);
+  // Additive as well (same absent-is-default reading, schema version unchanged):
+  // the Linux GPU backend setting and the Auto memory. Every unusable value
+  // resolves in the OPTIMISTIC direction, which is the safe one here: no
+  // remembered rung means Auto starts on the best backend, and the rescue is
+  // what covers a machine that cannot run it. `vulkanVerdict`, the verdict this
+  // memory replaces, is deliberately not read: a file written by a build that
+  // had it starts over with a clean memory rather than having a four-value
+  // verdict mapped onto a ladder it did not mean.
+  prefs.gpuBackend = readGpuBackend(input.gpuBackend, 'auto');
+  const toAttempt = readGpuBackendRung(input.gpuBackendToAttempt);
+  if (toAttempt) prefs.gpuBackendToAttempt = toAttempt;
+  const proof = readGpuBackendProof(input.gpuBackendProof);
+  if (proof) prefs.gpuBackendProof = proof;
+  prefs.consecutiveGpuLaunchCrashes = readCount(input.consecutiveGpuLaunchCrashes);
+  prefs.launchesSinceBackendReprobe = readCount(input.launchesSinceBackendReprobe);
   return prefs;
 }
 

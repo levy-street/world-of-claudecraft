@@ -752,12 +752,21 @@ function convertMaterial(
       emissiveIntensity: hollowEmissive ? 0.2 : (ov?.emissiveIntensity ?? 1) * 0.6,
     });
   }
+  // Distant-zone air (biome_haze_field.ts): every converted kit material
+  // hazes with the ground under it. Attached FIRST, before the worn detail,
+  // because that is the order surfaceMat, foliage.ts and
+  // reattachClonedMaterialHooks compose the two hooks: a kit material
+  // attached the other way round composed a different key text, so every
+  // hook-preserving clone of it linked a second program for the same GLSL
+  // (12 links per login at Eastbrook in the 2026-08-27 program-key ledger).
+  attachBiomeHaze(mat);
   // Triplanar surface-detail layer, applied before caching so every consumer
   // of the shared per-key material carries it (the helper self-gates to
   // standard materials, so the Lambert branch is a no-op). Routing matches on
   // the SOURCE material name (s.name), which keys the cache; the context
   // flags keep emissive/transparent surfaces clean and let Tripo props that
-  // ship their own PBR maps skip the bare-coverage fallback.
+  // ship their own PBR maps skip the bare-coverage fallback. Chains over the
+  // haze hook above.
   const worn =
     familyOverride !== undefined
       ? familyOverride
@@ -771,9 +780,6 @@ function convertMaterial(
       strength: worn.strength,
     });
   }
-  // Distant-zone air (biome_haze_field.ts): every converted kit material
-  // hazes with the ground under it, chained over the worn-detail hook.
-  attachBiomeHaze(mat);
   mat.name = `${kit}:${s.name}`;
   matConvCache.set(key, mat);
   return mat;

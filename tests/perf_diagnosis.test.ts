@@ -3,6 +3,8 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import type { PerfSnapshot } from '../src/game/perf';
 import { diagnosePerfSnapshot, formatPerfDiagnosisMarkdown } from '../src/game/perf_diagnosis_core';
+import { shaderWarmAuditSnapshot } from '../src/render/shader_warm_audit';
+import { shaderWarmSnapshot } from '../src/render/shader_warm_client';
 
 function digest(value = 0) {
   return { count: 600, avg: value, p95: value, max: value };
@@ -118,6 +120,7 @@ function baseSnapshot(): PerfSnapshot {
       renderDiagnostics: {} as never,
       nightAmount: 0,
       prewarm: null,
+      castVfx: { ready: true, refused: 0, pending: 0, forced: false },
       entryDetailHorizon: {
         active: false,
         cap: 700,
@@ -225,6 +228,9 @@ function baseSnapshot(): PerfSnapshot {
     netPipeline: null,
     heapSawtooth: null,
     hitchForensics: [],
+    postRevealLinks: null,
+    shaderWarmAudit: shaderWarmAuditSnapshot(),
+    shaderWarm: shaderWarmSnapshot(),
     input: {
       intents: 20,
       lastKind: 'move',

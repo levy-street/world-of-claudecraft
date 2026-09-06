@@ -1,3 +1,4 @@
+import { EventEmitter } from 'node:events';
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import {
@@ -557,6 +558,12 @@ describe('relaunchForLinuxPrime', () => {
         ...LINUX_PRIME_ENV,
         UNRELATED: 'x',
         WOC_PRIME_RELAUNCHED: '1',
+        // The record of what THIS relaunch planted (the player-requested restart in
+        // electron/launch_settings.cjs takes back exactly these): every offload
+        // variable, since the player had set none, and the ozone argument it appended.
+        WOC_PRIME_RELAUNCH_ADDED: [...Object.keys(LINUX_PRIME_ENV), '--ozone-platform=x11'].join(
+          ',',
+        ),
       },
       stdio: 'inherit',
       detached: true,
@@ -575,6 +582,28 @@ describe('relaunchForLinuxPrime', () => {
     expect(calls[0].args).toEqual(['--ozone-platform=x11']);
     const childEnv = calls[0].options.env as Record<string, string>;
     expect(childEnv.WOC_PRIME_RELAUNCHED).toBe('1');
+    // This hop plants no variable of its own, and a marked parent that left no record
+    // keeps the restart's "everything the lever can plant" reading: a record naming the
+    // argument alone would tell it the offload variables are the player's.
+    expect(childEnv).not.toHaveProperty('WOC_PRIME_RELAUNCH_ADDED');
+  });
+
+  it('accumulates the record across a hop that plants nothing new', () => {
+    // The same updater restart, from a child that DID leave a record. The hop adds only
+    // the argument, and the record it hands on still names every variable the chain
+    // planted, so the player-requested restart takes back the whole chain and not just
+    // the last hop of it.
+    const { spawn, calls } = fakeSpawn();
+    const env = {
+      ...LINUX_PRIME_ENV,
+      WOC_PRIME_RELAUNCHED: '1',
+      WOC_PRIME_RELAUNCH_ADDED: Object.keys(LINUX_PRIME_ENV).join(','),
+    };
+    relaunchForLinuxPrime(deps({ spawn, env, execPath: 'x', argv: [] }));
+    const childEnv = calls[0].options.env as Record<string, string>;
+    expect(childEnv.WOC_PRIME_RELAUNCH_ADDED.split(',').sort()).toEqual(
+      [...Object.keys(LINUX_PRIME_ENV), '--ozone-platform=x11'].sort(),
+    );
   });
 
   it('spawns the outer AppImage (env.APPIMAGE), never execPath, inside an AppImage', () => {
@@ -601,6 +630,11 @@ describe('relaunchForLinuxPrime', () => {
     const childEnv = calls[0].options.env as Record<string, string>;
     expect(childEnv.__GLX_VENDOR_LIBRARY_NAME).toBe('mesa');
     expect(childEnv.DRI_PRIME).toBe('1');
+    // The record is what the restart strips, so it must name only what the RELAUNCH
+    // planted: the player's own variable is not in it and survives the restart.
+    const record = childEnv.WOC_PRIME_RELAUNCH_ADDED.split(',');
+    expect(record).toContain('DRI_PRIME');
+    expect(record).not.toContain('__GLX_VENDOR_LIBRARY_NAME');
   });
 
   it('omits the EGL vendor replacement when the NVIDIA ICD json is absent on this machine', () => {
@@ -625,6 +659,10 @@ describe('relaunchForLinuxPrime', () => {
       deps({ spawn, env: {}, execPath: 'x', argv: ['--ozone-platform=wayland'] }),
     );
     expect(calls[0].args).toEqual(['--ozone-platform=wayland']);
+    // Not appended, so not recorded: the restart must not strip the player's own flag.
+    const childEnv = calls[0].options.env as Record<string, string>;
+    expect(childEnv.WOC_PRIME_RELAUNCH_ADDED.split(',')).not.toContain('--ozone-platform=x11');
+    expect(childEnv.WOC_PRIME_RELAUNCH_ADDED).toContain('DRI_PRIME');
   });
 
   it('still appends the explicit flag when argv only carries an ozone HINT', () => {
@@ -646,6 +684,21 @@ describe('relaunchForLinuxPrime', () => {
     const result = relaunchForLinuxPrime(deps({ spawn, env: {}, log: { warn } }));
     expect(result).toBe(false);
     expect(warn).toHaveBeenCalled();
+  });
+
+  it('hears a child that never started, as a warning rather than an uncaught error event', () => {
+    // The async failure (ENOENT on a swapped AppImage) arrives as an 'error'
+    // event; Node throws it as an uncaught exception when nothing listens.
+    const child = Object.assign(new EventEmitter(), { unref: vi.fn() });
+    const warn = vi.fn();
+    expect(relaunchForLinuxPrime(deps({ spawn: () => child, env: {}, log: { warn } }))).toBe(true);
+    expect(warn).not.toHaveBeenCalled();
+    const failure = new Error('spawn ENOENT');
+    expect(() => child.emit('error', failure)).not.toThrow();
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining('never started'),
+      expect.objectContaining({ err: failure }),
+    );
   });
 });
 

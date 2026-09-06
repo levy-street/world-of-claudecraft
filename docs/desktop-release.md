@@ -91,6 +91,264 @@ and runs in every CI test pass.
 Build each OS on its own runner (mac artifacts on macOS, Windows artifacts on Windows,
 Linux artifacts on Linux). Cross-building is not part of this runbook.
 
+## Running the desktop app locally
+
+`npm run electron:dev` (`scripts/electron-dev.mjs`) is the whole dev loop: it starts
+Vite with the desktop env baked in (`VITE_DESKTOP_APP`, the API origin, relative API
+paths), builds the gitignored `electron/vendor` bundles the main process requires, then
+launches Electron against the dev server. No `npm run build` is needed; the shell loads
+the live Vite page and reloads with it. Env vars that matter on that command line:
+
+- `VITE_DESKTOP_API_ORIGIN`: the API origin the shell talks to (default: production).
+  `VITE_DESKTOP_API_ORIGIN=http://localhost:8787 npm run electron:dev` runs against a
+  local `npm run server`.
+- `WOC_DISTRIBUTION=website|steam|epic`: try a channel unpacked (see above).
+- `WOC_DISABLE_GPU_FORCE=1`: skip every GPU lever for this launch (the discrete-GPU
+  force on all platforms, the Linux PRIME relaunch, and the Linux GPU backend switches).
+- `WOC_GPU_BACKEND=vulkan|opengl`: force the Linux GL backend for this launch, never
+  judged into the memory (see "GPU backend on Linux" below); `vulkan` is also how to try
+  Vulkan on a GPU the policy keeps Auto off (AMD, at the time of writing).
+
+Where the shell writes: `main.log` (the rotating shell log, `electron/logging.cjs`)
+and `desktop-prefs.json` (the shell's own prefs store, `electron/desktop_prefs.cjs`)
+both live under the per-user profile directory; the exact paths per OS are listed in
+"Error logging, crash dumps, privacy" below. An unpackaged dev run uses the same
+profile directory as an installed build of the same package name, so a memory or a
+preference recorded in dev is what the installed app reads next, and the other way
+round; delete `desktop-prefs.json` to start from defaults.
+
+## GPU backend on Linux
+
+On Linux, Chromium's default WebGL backend is ANGLE over OpenGL, where every shader
+program link resolves on the single GPU-process thread that presents frames: each link
+is a 100 to 320 ms hitch the game cannot schedule around. ANGLE's Vulkan backend links
+in about 10 ms and the hitches disappear (measured on an RTX 3090 and an Intel iGPU).
+Windows already runs D3D11 and macOS Metal, so only Linux needs the lever.
+
+The shell forces Vulkan with the Chromium switches (`VULKAN_BACKEND_SWITCHES` in
+`electron/gpu_backend.cjs`: `--use-gl=angle`, `--use-angle=vulkan`, and the
+`Vulkan,DefaultANGLEVulkan,VulkanFromANGLE` feature set) plus, on the top rung, the
+ANGLE feature switch `--enable-angle-features=enableParallelCompileAndLink`
+(`VULKAN_PARALLEL_COMPILE_SWITCH`), and nothing wider: no `--ignore-gpu-blocklist`, no
+`--disable-gpu-driver-bug-workarounds`, and never `--disable-vulkan-surface` (headless
+only). The ANGLE feature matters: ANGLE's Vulkan backend exposes
+`KHR_parallel_shader_compile` only when it is on (an opt-in feature since 2023, never
+defaulted), and without that extension the renderer runs its no-async-compile policy
+(every program links synchronously on the GPU-process thread, every compile gate is
+inert). `chrome://gpu` lists it under ANGLE Features as
+`enableParallelCompileAndLink: Enabled` when the switch took.
+
+### The ladder
+
+Three rungs, best first (`GPU_BACKEND_RUNGS`), named for what they are so a stored
+value reads without a decoder:
+
+| rung | what it runs |
+|---|---|
+| `vulkan-parallel-compile` | Vulkan with the ANGLE parallel-compile feature |
+| `vulkan-plain` | Vulkan without it (the feature is still opt-in upstream, and one rare late GPU-process crash was seen with it on Intel/Mesa) |
+| `opengl` | Chromium's default backend, no switches |
+
+### The policy: what a card needs from Vulkan, and whether Auto tries it
+
+Above the memory and the rescue below sits a third, simpler thing: the policy in
+`electron/gpu_backend_policy.cjs` (`GPU_BACKEND_POLICY`). The ladder's verdict only knows
+the failures it can observe (a GPU process that dies, a software rasterizer, a backend
+that did not bind); a driver that renders WRONG without dying is invisible to it, and a
+Steam Deck (AMD APU, Mesa RADV) reported exactly that: the game came up on Vulkan, was
+judged healthy, and every texture was noise. The cause, found on the Deck: ANGLE could
+not import Chromium's tiled AMD buffer through a DRM format modifier
+(`VK_ERROR_INVALID_DRM_FORMAT_MODIFIER_PLANE_LAYOUT_EXT`), so the compositor read the
+buffer with the wrong layout. With that ANGLE import path off
+(`--disable-angle-features=supportsImageDrmFormatModifier`) the picture is clean and the
+fast path stays: Vulkan measured ahead of OpenGL there (51.7 against 49.7 fps, a recent
+p95 of 22 against 33 ms, no frame over 50 ms against three).
+
+- An entry names a PCI vendor, optionally one device id (the most specific entry wins),
+  the switches every Vulkan launch on that card carries (`vulkanSwitches`), optionally
+  the rung Auto is held at (`autoCeiling`; absent means Auto climbs as anywhere else),
+  its reason and what would lift it. The switches follow the HARDWARE, never the mode: a
+  player who picks Vulkan on an AMD card, or forces it with `WOC_GPU_BACKEND=vulkan`, gets
+  the workaround too. AMD (`0x1002`) ships with the workaround and no ceiling.
+- The evidence is `/sys/class/drm` (`linuxGpuAdapters`), read at the top of `main.cjs`
+  before the switches are appended, the same source as the PRIME hybrid check. The
+  adapters judged are the ones that will render: under the PRIME offload the card that
+  does NOT drive the screen (what `DRI_PRIME=1` and the NVIDIA offload variables select,
+  whichever vendor it is), else the card that drives the screen (`boot_vga`), else all of
+  them (`renderingAdapters`); an unreadable `/sys` is no evidence and nothing applies.
+- A capped launch (`decideGpuBackendLaunch` with `autoCeiling`, `capAutoLaunch`) is NOT the
+  memory's: nothing is remembered and the counter does not move, so the policy leaves no
+  trace of its own and the day an entry is lifted Auto resumes from whatever it remembered
+  before (the top rung when nothing was). Auto is capped at the ceiling as well as above
+  it, so a machine whose memory already said OpenGL still reads as held by the policy in
+  the options row. The rescue still applies. `main.log` says
+  `[gpu] backend policy: 0x1002:0x163f: ...` with the switches and the ceiling, and a
+  capped launch reads `[gpu] backend launch: opengl (auto, capped at opengl: ...)`; the
+  options row then says "Auto does not try Vulkan on this graphics card yet; pick Vulkan
+  to try it" (`autoCapped` on `desktop-get-gpu-backend`). No entry carries a ceiling
+  today; the mechanism stays for the next unmeasured card.
+
+### Two mechanisms, kept apart
+
+The risk a forced Vulkan backend carries is that it has no OpenGL fallback of its own:
+a machine without a working Vulkan driver lands on SwiftShader, or its GPU process dies
+and Chromium then blocks the page from WebGL for the rest of the session, which is a
+game that never renders. Two separate answers, and keeping them separate is the point:
+
+**THE MEMORY** answers what Auto should attempt. It lives in `desktop-prefs.json`:
+
+- `gpuBackendToAttempt`: the rung Auto starts on. ABSENT means the top rung, not the
+  bottom one: a first launch is optimistic, and the rescue is what covers a machine
+  that cannot follow.
+- `gpuBackendProof`: the certainty beside the guess. `{ backend, appVersion, gpuAdapter }`,
+  the adapter being the active GPU's `vendorId:deviceId` from `app.getGPUInfo` (the same on
+  every backend, where the ANGLE renderer string names the backend and would read one card
+  on OpenGL as another machine; empty reads as unknown, the same machine),
+  written only by a HEALTHY session, absent meaning "no launch has ever succeeded here".
+- `consecutiveGpuLaunchCrashes`, `launchesSinceBackendReprobe`: the two counters below.
+
+**THE RESCUE** answers what to do when the GPU process dies at launch, and it runs in
+EVERY mode, explicit player choices included: relaunch one rung down at once
+(`relaunchOnLowerBackend`), so the player gets a running game inside the same launch
+instead of a dead screen they cannot click out of. The chain caps itself on the
+ladder's depth: a rescue may only target a rung BELOW the marker its process carries
+(`WOC_GPU_BACKEND_RESCUED_TO`, which names the rung in full), so at most two relaunches
+can ever spawn, with no counter to keep in step.
+
+### What a session does
+
+- The player's setting is `gpuBackend` (`auto` by default, or an explicit `vulkan` /
+  `opengl`), exposed to the game over the preload bridge (`getGpuBackend` /
+  `setGpuBackend`, channels `desktop-get-gpu-backend` / `desktop-set-gpu-backend`). It
+  is stored, not applied live: the switches land before Electron's own startup, so a
+  change takes effect at the next launch.
+- `decideGpuBackendLaunch` picks the rung, first match wins: the rescue marker, then
+  `WOC_GPU_BACKEND`, then `WOC_DISABLE_GPU_FORCE=1`, then an explicit setting, then the
+  Auto memory. The launch carries `auto` (this launch belongs to the memory: no env
+  override, no `WOC_DISABLE_GPU_FORCE=1`, no explicit setting), `rescued` (a rescue
+  spawned it; it inherits `auto` from its chain) and `ladder` (Linux). Every memory write
+  in `main.cjs` is gated on those flags, never on the setting alone: the setting reads
+  Auto under every override, so `WOC_DISABLE_GPU_FORCE=1` used to demote the next
+  ordinary launch.
+- `judgeGpuBackendLaunch` answers the rung this launch ACTUALLY bound, from the WebGL
+  renderer string the game reports over the preload bridge (`reportGpuRenderer`,
+  channel `desktop-report-gpu-renderer`). On Linux `app.getGPUInfo('complete')` can
+  leave `glRenderer` EMPTY on a perfectly healthy ANGLE Vulkan session (seen on
+  Electron 43 / Chrome 150 with an RTX 3090), so the getGPUInfo reading only judges
+  when it carries evidence of its own (`hasGetGpuInfoEvidence`: Chromium's
+  `softwareRendering` flag, or a non-empty renderer string); an empty reading logs
+  `[gpu] backend: waiting for the renderer's report` and leaves the launch unjudged.
+  Judging is NOT remembering: a Vulkan launch that bound something that is NOT Vulkan
+  (`backendDidNotBind`, by family) is rescued right now, whatever the mode, and only a
+  healthy session writes the memory. A parallel-compile launch whose page reports the
+  extension absent is healthy Vulkan: no rescue, the memory just remembers `vulkan-plain`.
+- A session is HEALTHY once it has survived `SESSION_HEALTHY_AFTER_MS` (60 s) without a
+  GPU-process death. The window is armed from the LAUNCH, not from the judgement, so a
+  page that never reports its renderer cannot leave the session in "launch" state for
+  its whole life and have a late crash treated as a launch failure. On an Auto launch, a
+  healthy session clears the crash streak, remembers its rung, and writes the proof when
+  it improves on the stored one or when the stored one describes another machine (a
+  different adapter or app version). A RESCUED child gets the proof arm only: its
+  parent's death already counted, and letting the child write the attempt demoted Auto on
+  the very first death (through the child instead of the counter) and cleared the streak
+  the parent had just started, so the threshold could never be reached.
+- A GPU-process death BEFORE that is a launch failure: on an Auto parent (never a rescued
+  child) the crash streak grows, and `MAX_CONSECUTIVE_GPU_LAUNCH_CRASHES` (3) consecutive
+  ones step the guess down, one count per process (the streak counts launches, not gone
+  events). A `clean-exit` (the shell's own quit inside the window) or a `killed` reason
+  (a kill from outside the process: the OS OOM killer, the shell's own shutdown) is not
+  a crash: nothing is counted and nothing is rescued, since no rung below answers either
+  and Chromium restarts the GPU process itself. A re-probe that dies above the remembered
+  rung counts nothing; its rescued child lands ON the remembered rung, and if that dies
+  too, that death counts (the rung compare in `demoteAfterRepeatedCrashes` is what tells
+  the two kinds of child apart).
+  Three, not one: a single death is what a transient compositor or driver hiccup
+  produces, and demoting on it walked healthy machines down to the slowest backend. The
+  PROOF is never touched by a crash. A death AFTER a healthy session is the rare late
+  crash: Chromium restarts the GPU process itself, and nothing is counted or written.
+- Auto climbs back on a cadence, and the proof is what sets it: with a valid proof
+  ABOVE the remembered rung, every `REPROBE_HIGHER_BACKEND_EVERY_LAUNCHES` (10) launches,
+  aiming STRAIGHT at the proven rung rather than one rung at a time; otherwise (no proof,
+  or one at or below the attempt, which is what a rescued child proving OpenGL leaves),
+  every `REPROBE_WITHOUT_PROOF_EVERY_LAUNCHES` (50), one rung at a time. A machine that
+  has never run the higher rung is not worth a rescue relaunch every ten launches for
+  life, and one that has is. Only Auto parents advance the counter (a rescue chain is one
+  launch to the player). An app version the proof does not know re-opens the ladder at
+  once.
+- Coming back to `auto` from an explicit setting clears the GUESS and the counters and
+  starts detection over; the PROOF survives, because a session that ran healthy here
+  still ran healthy here.
+- `WOC_GPU_BACKEND=vulkan|opengl` overrides the setting for that launch and is never
+  judged into the memory; `WOC_DISABLE_GPU_FORCE=1` disables the lever with the others,
+  and is never remembered either.
+- The rescue hands the single-instance lock over once the child is spawned
+  (`app.releaseSingleInstanceLock`, through `relaunchOnLowerBackend`'s `onSpawned`,
+  never on a refused or failed spawn): a child requesting its own lock while the parent
+  still held it would see itself as a second instance and quit.
+
+### What the player sees
+
+Graphics > System carries the backend picker on Linux desktop shells, and under its
+buttons a line naming the rung the session is ACTUALLY running, with
+`(unable to enable Vulkan)` appended when that fell short of the setting. A launch the
+rescue moved off the player's choice also raises the boot GPU notice
+(`src/ui/gpu_notice_toast.ts`, component `requested-backend`), so a player who never
+opens the options still learns their choice did not take. Both read the same shell
+answer: `active` and `requestedUnavailable` on `desktop-get-gpu-backend`, pushed again
+on `desktop-gpu-backend-state` when the launch is judged.
+
+### Settings that take effect at the next launch
+
+The backend setting and the discrete-GPU opt-out are read before Electron's own startup,
+so a setter persists them for the next launch and the running session keeps the old
+value. Two things make that usable (`electron/launch_settings.cjs`):
+
+- `desktop-get-launch-settings` answers what THIS process started with
+  (`launchSettingsSnapshot`, taken right after the prefs load and frozen). The getters
+  serve the STORED values, which a setter moves live, so the snapshot is the only way the
+  game can tell "changed, restart to apply" from "already running". The game's registry
+  of such settings is `NEXT_LAUNCH_SETTINGS` in `src/game/desktop_next_launch_settings.ts`;
+  a new next-launch setting is one entry there.
+- `desktop-restart-app` restarts the shell at the player's request (`restartApp`): the
+  options window's restart strip (`src/ui/restart_strip_painter.ts`, at the foot of the Graphics
+  panel and of Interface > General) offers "Restart Game" whenever a stored value has
+  moved off the snapshot, in place of an Apply that could not help. The child is spawned
+  through `spawnDetachedSelf` from an environment stripped of what the shell's own
+  relaunch levers planted (the rescue marker, and exactly the PRIME offload variables and
+  X11 ozone argument the PRIME relaunch recorded adding in `WOC_PRIME_RELAUNCH_ADDED`,
+  accumulated across every hop of a relaunch chain rather than replaced at each one; a
+  `DRI_PRIME` or `--ozone-platform` the player set themselves stays), the single-instance
+  lock is handed over on the child's `spawn` event, and this process quits through
+  `app.quit` so the close-time bounds save runs. One restart is in flight at a time; a
+  child that never starts answers false and the strip says so, this process keeps
+  running, with its lock. Under `npm run electron:dev` the restart is refused outright
+  (`VITE_DEV_SERVER_URL` is set): quitting there stops the orchestrator's Vite server with
+  this process, so the child would load a dead origin; the strip reports the failure, and
+  a dev run applies a next-launch setting by restarting `npm run electron:dev`. The snapshot is what the PREFS said at launch: under
+  `WOC_GPU_BACKEND` or `WOC_DISABLE_GPU_FORCE=1` the session runs the override, the
+  snapshot still names the stored value, and a restart offered against it re-launches
+  under the same override (those variables are the player's and are never stripped).
+
+### Reading the log, and rescuing a stuck machine
+
+`main.log` records `[gpu] backend launch: <rung> (<reason>)` at startup, then
+`[gpu] backend bound: <rung> (asked for <rung>)` once judged, then either
+`[gpu] session healthy on <rung>; memory updated` or, on a death,
+`[gpu] GPU process gone at launch on <rung>` followed by the relaunch line.
+
+A machine stuck on the wrong backend: start the game with `WOC_GPU_BACKEND=opengl` in the
+environment, or quit and delete `desktop-prefs.json` (the defaults are `auto` with no
+memory at all, which is one fresh optimistic launch that self-corrects). In the dev loop
+(`npm run electron:dev`) a rescued launch takes the loop down once: the orchestrator tears
+Vite down when its Electron child exits, and the relaunched process is left against a dead
+dev server and never judges; only the crash streak moved, so the next `npm run
+electron:dev` starts on the same rung until three such deaths in a row. On a desktop whose
+NVIDIA card drives the screen next to an integrated GPU left enabled, the Linux PRIME
+hybrid detection (`isLinuxHybridGpu`) reads `boot_vga` and skips the offload; should any
+GPU lever still misfire in the dev loop, run it with `WOC_DISABLE_GPU_FORCE=1` (it skips
+the PRIME config in `scripts/electron-dev.mjs` and every GPU lever in the shell) and pick
+the backend with `WOC_GPU_BACKEND=vulkan`, which wins over the rescue env.
+
 ## What the maintainer must provision (one-time)
 
 | Item | Used for | Where it goes |
@@ -641,7 +899,8 @@ product exist. Coding and merge stay dark-safe without those credentials.
   (`app.getPath('userData')`: macOS
   `~/Library/Application Support/world-of-claudecraft/`; Windows
   `%APPDATA%\world-of-claudecraft\`; Linux `~/.config/world-of-claudecraft/`),
-  holding window memory plus `gpuForceOptOut` (see `electron/desktop_prefs.cjs`).
+  holding window memory plus `gpuForceOptOut`, the Linux `gpuBackend` setting, and
+  its GPU backend memory (see `electron/desktop_prefs.cjs` and "GPU backend on Linux").
   The in-game toggle (Options, Interface, "Use the Dedicated Gaming GPU")
   writes it, but a machine the GPU force prevents from booting can never reach
   that toggle. The supported rescue for "the game will not start at all on a
@@ -651,9 +910,9 @@ product exist. Coding and merge stay dark-safe without those credentials.
   tolerates hand-edits, including a Windows editor's UTF-8 BOM; a corrupt or
   deleted file resolves to defaults, which is force ON. Faster one-launch
   variant needing no file edit: start the game with `WOC_DISABLE_GPU_FORCE=1`
-  in the environment (strict `1`), which skips both levers for that launch
-  without touching the stored preference; use it to boot far enough to flip
-  the in-game toggle off for good.
+  in the environment (strict `1`), which skips both levers (and the Linux GPU
+  backend switches) for that launch without touching the stored preference;
+  use it to boot far enough to flip the in-game toggle off for good.
 - V8 code cache: the app:// scheme registers `codeCache: true` (electron/main.cjs,
   pinned key by key in `tests/electron_scheme_privileges.test.ts`), so Chromium
   persists compiled bytecode for the bundled scripts under the per-user profile
@@ -746,6 +1005,17 @@ product exist. Coding and merge stay dark-safe without those credentials.
    name) showing the relaunched PID's parent already exited, and `[gpu] running as
    PRIME-relaunched child` in `main.log` (the child writes it; the parent exits
    before file logging exists).
+   Then the GL backend: `[gpu] backend launch: vulkan-parallel-compile (auto, best
+   rung)` on a first launch, `[gpu] backend bound: vulkan-parallel-compile (asked for
+   vulkan-parallel-compile)` once the page reports its renderer, and a minute later
+   `[gpu] session healthy on vulkan-parallel-compile; memory updated`, with the
+   active renderer line naming Vulkan and the real adapter (see "GPU backend on
+   Linux"). On a machine without a Vulkan driver, `[gpu] GPU process gone at launch
+   on vulkan-parallel-compile`, then `[gpu] rescuing off vulkan-parallel-compile: the
+   GPU process died at launch` and `[gpu] the GPU process died on
+   vulkan-parallel-compile; starting a relaunch on vulkan-plain`; the child's `main.log`
+   opens with `backend launch: vulkan-plain (rescued to vulkan-plain)`, a second
+   rescue lands on `opengl (rescued to opengl)`, and there is never a third.
    Known follow-ups, not yet addressed: the relaunch's interaction with the
    second-instance deep-link path (`worldofclaudecraft://` login handoff) has not
    been verified against a login link that arrives during the brief relaunch

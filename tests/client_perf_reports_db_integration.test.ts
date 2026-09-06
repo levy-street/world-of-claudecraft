@@ -1,6 +1,7 @@
 // Opt-in real-Postgres roundtrip for insertClientPerfReport and the phase 03
-// dimension columns plus the phase 05 suggestion_ids array. The insert's 44
-// positional parameters are the one place a renumbering slip lands values in
+// dimension columns, the phase 05 suggestion_ids array, and the shader warm-up
+// columns. The insert's positional parameter list is the one place a
+// renumbering slip lands values in
 // the wrong columns while every mocked-pool suite stays green, so this
 // roundtrip is the ONLY decisive guard: it writes a row of pairwise-distinct
 // values through the real statement, reads every column back by name, and
@@ -100,6 +101,8 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
       worst10sFrameP95Ms: 180.5,
       suggestionIds: ['hardware-acceleration', 'high-dpi'],
       rawSummary: { roundtrip: true, seconds: 77 },
+      shaderWarmWorkerActive: true,
+      shaderWarmRefusal: 'extension-drift:ext_roundtrip',
     });
 
     const res = await db.pool.query('SELECT * FROM client_perf_reports WHERE session_id = $1', [
@@ -151,6 +154,8 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
     // The pg driver maps a JS string array to TEXT[]; order must survive.
     expect(r.suggestion_ids).toEqual(['hardware-acceleration', 'high-dpi']);
     expect(r.raw_summary).toEqual({ roundtrip: true, seconds: 77 });
+    expect(r.shader_warm_worker_active).toBe(true);
+    expect(r.shader_warm_refusal).toBe('extension-drift:ext_roundtrip');
   });
 
   it('serves the row back through clientPerfRaw with the dimensions and suggestion ids mapped', async () => {
@@ -183,7 +188,9 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
       [`${MARKER}-legacy`, 'gameplay'],
     );
     const res = await db.pool.query(
-      'SELECT crowd_bucket, sim_entities, active_views, visible_views, worst_10s_frame_p95_ms, suggestion_ids FROM client_perf_reports WHERE session_id = $1',
+      `SELECT crowd_bucket, sim_entities, active_views, visible_views, worst_10s_frame_p95_ms,
+              suggestion_ids, shader_warm_worker_active, shader_warm_refusal
+         FROM client_perf_reports WHERE session_id = $1`,
       [`${MARKER}-legacy`],
     );
     expect(res.rows[0]).toEqual({
@@ -193,6 +200,8 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
       visible_views: 0,
       worst_10s_frame_p95_ms: 0,
       suggestion_ids: [],
+      shader_warm_worker_active: false,
+      shader_warm_refusal: '',
     });
   });
 

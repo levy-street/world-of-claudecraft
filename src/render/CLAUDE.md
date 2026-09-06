@@ -233,9 +233,12 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   the old ADMISSION only (every unit admitted at once, the ledger still
   learning); the reveal-gate policy has no legacy arm and keeps revealing
   piecewise under its soft deadline whatever that flag says. The touch tail runs as one budgeted queue
-  unit PER PROGRAM (`linked_program_touch_lane.ts`) on the live gates AND on the
-  reveal host, which previously ended at the shadow arm and left streamed decor
-  paying the uniform-table round trip on its reveal draw. Its readiness comes
+  unit PER PROGRAM (`linked_program_touch_lane.ts`) on the live gates, on the
+  reveal host, and on the world-entry compile lane. Each of those three once
+  ended at the shadow arm and left its programs paying the uniform-table round
+  trip on their first live draw; the boot lane opts in through the `tail` of
+  `initial_scene_compile_units.ts`, whose `entryCompileTail` binds the same
+  settle and touch arms the gates use. Its readiness comes
   from the SETTLE and never from a driver query: a settled gate records its
   target's current programs in `linked_program_readiness.ts` and the walk reads
   that record, because three latches `programReady` false after one missed poll,
@@ -553,7 +556,13 @@ GPU work signs. Each rule names its seam and its guard.
   `tests/ability_material_prewarm_sweep.test.ts`, the `buildInterior` gating pin in
   `tests/renderer_compile_gate.test.ts`, and the `live-program` events in
   `perfStats().gpuPrep`, whose count on an offline tour of the touched content is
-  the acceptance bar of a render PR.
+  the acceptance bar of a render PR. The fleet-side count of the same first seconds
+  is `post_reveal_links_core.ts`: `live_program_watch.ts` hosts one window per page,
+  armed at the first `markGpuHitchReveal` (the world entry; later arrivals only
+  count), sampled from the same present-host calls, closed 20 s later on the last
+  in-window count; `PerfMonitor` snapshots it as `postRevealLinks` and the beacon
+  ships it beside `entryReveal` (`tests/post_reveal_links_core.test.ts`, the host
+  block in `tests/live_program_watch.test.ts`).
 - **Every program-key change on a VISIBLE material rides a gated swap with a
   stand-in.** The key inputs: texture-slot presence, `transparent` / `blending` /
   `alphaToCoverage` / `alphaHash`, `defines`, `onBeforeCompile` /
@@ -623,6 +632,122 @@ GPU work signs. Each rule names its seam and its guard.
   `perfStats().lookPieces`) and `AssembleOptions.deferDecals`, guarded by
   `tests/look_pieces.test.ts`, `tests/deferred_face_decals.test.ts` and
   `tests/renderer_look_pieces_hold.test.ts`.
+- **No material buys a second scene pass: transmission is forbidden.** A material with
+  `transmission > 0` (a `MeshPhysicalMaterial`; GLTFLoader mints one for a glTF material
+  carrying `KHR_materials_transmission`) makes three draw the whole opaque scene a second
+  time per frame into a viewport-sized HalfFloat target with mipmaps
+  (`WebGLRenderer.renderTransmissionPass`), for as long as the object is on screen: a 4 s
+  first frame and a doubled draw cost on an integrated GPU, which no prewarm can remove
+  (measured 2026-08-28 on the water elemental's `living_water`). Translucency here is
+  alpha blending (`transparent`, `opacity`, `depthWrite: false`, the alphaMode BLEND
+  state). The loader neutralizes every transmissive material on a parsed GLB
+  (`assets/transmission_neutralize.ts`), and `tests/transmission_neutralize.test.ts` names
+  the shipped models that carry the extension so a new one is listed on purpose; a
+  procedural `new THREE.MeshPhysicalMaterial(` that sets `transmission`, `thickness` or
+  `attenuationColor` is a defect. Guard: `render-performance-reviewer` (its second-pass
+  check).
+- **The shader warm-up worker rides the gates, never beside them.** A Web Worker
+  owns a second WebGL2 context (`shader_warm_worker.ts`) that links the same GLSL the
+  game context is about to link, so the game's link is a driver program-cache hit
+  (the cache key is the translated source plus the context's enabled extension set,
+  which is why `renderer_extensions.ts` enables one pinned set on every context
+  before its first link). The client (`shader_warm_client.ts`, pure policy in
+  `shader_warm_client_core.ts`) resolves a MODE from the player's option and the
+  backend class (`gpu_backend_class_core.ts`, read off the renderer string): `auto`
+  is `all` where the compile runs off the presenting thread AND there is something to
+  warm AND that was measured (D3D11 only: `WORKER_WORTH_BACKENDS`; Metal reads like
+  Vulkan on its one datapoint and has no in-game measurement, so it stays out until the
+  explicit setting produces one), `off` on every OpenGL and GLES class,
+  where the worker only relocates the stall into the GPU process (measured 2026-08-28
+  on Linux NVIDIA, Linux Intel and Android Mali), and `off` on Vulkan, where a cold
+  link is already as cheap as a hit and the first draw is free while the worker's own
+  links cost three to six times more (measured 2026-08-30 on an RTX 3060, an RTX 3090
+  and an Intel iGPU); iOS is `off` whatever the setting (a second context is a
+  per-process ceiling risk there); `?shaderwarm=auto|off|reveal|all` overrides
+  (`0` and `1` are aliases of `off` and `all`, one grammar for both arms below), and
+  `?shaderwarmready=<ms>` lengthens the worker's ready deadline for a probe on a
+  backend whose GPU process is busy at boot (Windows OpenGL).
+  THE CHARACTER-SELECT CORPUS (`src/game/shader_cache_warmup.ts`, decisions in
+  `shader_warmup_core.ts`) is the other arm of the same cache, and the ONE producer
+  that is not a client of the scheduler, by construction rather than by exemption:
+  it replays the previous session's recorded program set on a hidden context while
+  the character-select screen is idle, before any `Renderer` (and so any
+  `background_gpu_queue`) exists, one program per animation frame, and every world
+  entry stops it as its first statement (`enterWorld` and `startOffline`, pinned by
+  the wiring block of `tests/shader_cache_warmup.test.ts`), so no live frame ever
+  shares the main thread with a submission; what the GPU process still resolves
+  after the click is the entry's own program set landing in the shared cache. It
+  reads the same stored option and the same pin as the worker (`readWarmupQuery`):
+  Off silences it, `auto` and On keep it (the backend rule is the worker's: a
+  second context linking DURING play; this arm was measured on the OpenGL desktops
+  where `auto` turns the worker off), iOS never mints its context, and a stored
+  record is bounded before, during and after inflation
+  (`SHADER_CORPUS_MAX_BYTES`, `SHADER_CORPUS_PROGRAM_LIMIT`).
+  The worker is a client of the EXISTING gates: `shader_warm_gate.ts` assembles a
+  root's program sources through the three patch's dry-compile hook
+  (`program_sources.ts`; the hook calls each live material's `onBeforeCompile`
+  once more against a throwaway shader object, so a hook must stay idempotent and
+  must never keep the shader object it was handed), posts them to the worker, and
+  holds the gate's link piece until the worker answers or `SHADER_WARM_LANE_HOLD_CAP_MS`
+  passes (`shader_warm_lane.ts`; a hold that expires abandons its request so the worker
+  drops what nobody else waits for; three breaker rules retire it for the session:
+  `SHADER_WARM_TIMEOUT_BREAKER` expiries in a row during which the worker settled NOTHING
+  (wedged), or `SHADER_WARM_EXPIRED_SHARE_BREAKER` of the last `SHADER_WARM_HOLD_WINDOW`
+  holds expired whatever it answered meanwhile (too slow for the demand); a slow worker
+  that keeps most holds served is kept). The third rule fires FIRST, on the worker's own
+  evidence and before any hold has paid: once it has settled `SHADER_WARM_EVIDENCE_LINKS`
+  links AND its first stats message has landed (the window is the divisor, and the
+  verdict is final), the queue ahead of the OLDEST outstanding hold, at the mean wall
+  this worker's links have actually cost, spread over the window that message reported,
+  is measured against what is left of the cap that hold's caller passed in
+  (`shaderWarmCannotServe`, refusal `cannot-serve:hold-cap`). Ahead is the worker's own
+  order, PRIORITY first and arrival only within one priority, so a live view held behind
+  a catalog's backlog is not charged for what the worker serves after it; the caller
+  also stamps when its cap clock started (`holdShaderPrograms`' `startedAtMs`), since a
+  lane asks inside a queue unit whose promise settles later. It is relative by
+  construction and carries no machine constant, the caller owning the cap and the worker
+  supplying the wall: on the laptop whose links cost about half a second it retires
+  seconds early with nothing expired, and where links are ten times shorter it never
+  fires at all. The worker paces its links with the AIMD budget
+  under a RELATIVE judge (`shader_warm_settle_judge_core.ts`): a settle is read against
+  what this driver costs for a link of COMPARABLE size it has to itself, per thousand
+  GLSL characters, never against a millisecond bound (the absolute 150/400 ms bounds
+  pinned a cold Windows D3D11 at one link for a whole session, on the one backend that
+  overlaps links, 2026-08-30); solo evidence opens the window to two and no further,
+  a cache hit teaches nothing, and a halving is followed by a cooldown. The boot lane
+  (`link_rate_budget.ts`) still runs the absolute bounds; the seam
+  (`AdaptiveLinkBudgetConfig.judgeSettlement`) is how it adopts the same rule later,
+  and a unit that linked nothing reaches the judge flagged `cheap` and teaches it
+  nothing (the boot sweep's already-linked views would otherwise set the etalon).
+  No new queue, no new lane: the hold is one more piece on
+  the caller's queue at the caller's priority, and the actionable floor and
+  imminent consults bypass it (`shaderWarmDecision`). The worker never draws, so it
+  is the one secondary context exempt from the `checkShaderErrors` rule, and it
+  goes with the renderer through `renderer_resource_lifecycle.ts` (`disposeShaderWarm`)
+  and on `pagehide`. The audit (`shader_warm_audit.ts`) names every program the game
+  context linked without a warm request (`unexpected`), so a new producer that
+  bypasses the gates shows up by key; `perfStats().shaderWarm` and
+  `perfStats().shaderWarmAudit` are the local readout, and of the worker's half only the
+  bounded projection `shaderWarmBeaconSummary` builds (`src/game/perf_shader_warm_core.ts`:
+  worker state, refusal, mode, setting, backend and three counts) rides the perf beacon,
+  as `rawSummary.shaderWarm` plus the typed `shaderWarmWorkerActive` and
+  `shaderWarmRefusal` fields; the audit and the adapter string ride none of it.
+  A capture taken under `?diagnostics` also runs the scene census, whose
+  bucket-visibility diffs link programs no live frame asks for: those are charged to
+  `outOfBand` at the same host hooks that discard the burst's draws
+  (`renderer.captureSceneCensus`, which BRACKETS the burst: the census runs in its own
+  task, so without a begin the prologue of a gate that minted between the last present
+  and the census is charged to it), so read `unexpected` as the gates' own escapes.
+  The cast-VFX gate (`cast_vfx_readiness_core.ts`,
+  `cast_vfx_prewarm.ts`) is the same idea one level up: the ability-VFX painter
+  draws no cast until every cast program is linked (linked means the settle
+  record of `linked_program_readiness.ts`, which each cast unit writes once its
+  compile settled; never the presence of `currentProgram`, assigned before the
+  link resolves, and never a driver query from a live frame), and the reads a
+  player ACTS on never wait behind it: the
+  terrain-draped area ring and a mob's windup clip on the cast path, and on the
+  per-frame path the hard-CC band (stun, fear, root), re-held right after the
+  sleep that releases the held entity's cosmetic pools (`tests/ability_vfx_cast_gate.test.ts`).
 - **Verify, do not assert.** `?perf`, then `__game.renderer.perfStats().gpuPrep`: the
   budget snapshot, the event ring (`live-program`, `gate-timeout`, `reveal-watchdog`,
   `reveal-soft-deadline`, `submit-stop`, `attach-watchdog`, `touch-unproven` (programs a

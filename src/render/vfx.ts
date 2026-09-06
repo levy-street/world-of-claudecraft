@@ -17,6 +17,7 @@ import {
 } from './ignivar_judgment_fire_core';
 import { PaladinSpellVfxController, type PaladinSpellVfxSprite } from './paladin_spell_vfx';
 import type { VfxAnchorResolver, VfxOffsetAnchorResolver } from './vfx_anchor';
+import { bubbleBeamMaterialOptions } from './vfx_basic_materials';
 import {
   insertActiveParticleSlot,
   pointSpriteBoundingRadius,
@@ -1026,23 +1027,11 @@ export class Vfx {
     const geometry = new THREE.CylinderGeometry(1, 1, 1, 10, 1, false);
     const water = new THREE.Mesh(
       geometry,
-      new THREE.MeshBasicMaterial({
-        color: 0x42bfe8,
-        transparent: true,
-        opacity: 0.48,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending,
-      }),
+      new THREE.MeshBasicMaterial(bubbleBeamMaterialOptions(0x42bfe8, 0.48)),
     );
     const core = new THREE.Mesh(
       geometry,
-      new THREE.MeshBasicMaterial({
-        color: 0xc5f7ff,
-        transparent: true,
-        opacity: 0.88,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending,
-      }),
+      new THREE.MeshBasicMaterial(bubbleBeamMaterialOptions(0xc5f7ff, 0.88)),
     );
     water.renderOrder = 5;
     core.renderOrder = 6;

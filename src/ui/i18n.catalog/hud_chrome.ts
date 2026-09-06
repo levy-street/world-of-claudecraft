@@ -1897,6 +1897,50 @@ export const hudChromeStrings = {
     forceHighPerfGpu: 'Use the Dedicated Gaming GPU',
     forceHighPerfGpuNote:
       'On by default: the desktop app asks this computer for its dedicated gaming GPU. Turn this off if the game will not start, opens to a black screen, or the laptop display goes blank. Takes effect the next time the game starts.',
+    // Graphics System card, two rows: the shader warm-up worker (auto follows
+    // the GPU backend) and, right under it, the Linux graphics backend row
+    // (desktop app, Linux only; the shell applies it at the next launch).
+    // Wordy values, M16: the five non-Latin fills land in this same change.
+    shaderWarm: 'Shader Warm-up Worker',
+    shaderWarmAuto: 'Auto',
+    shaderWarmOff: 'Off',
+    shaderWarmOn: 'On',
+    shaderWarmNote:
+      'Pre-warm shader cache in the background to prevent in-game stuttering. Auto: Enabled only when supported by your graphics system. (Recommended). On: Forced everywhere. May worsen performance on some setups. Off: Disabled.',
+    gpuBackend: 'Graphics Backend',
+    gpuBackendAuto: 'Auto',
+    gpuBackendVulkan: 'Vulkan',
+    gpuBackendOpenGL: 'OpenGL (slow)',
+    gpuBackendNote:
+      "Auto picks the best option for you. Vulkan is faster and recommended for most players. OpenGL is slower, but can help if Vulkan doesn't work properly. Takes effect the next time the game starts.",
+    // The status line under the buttons: what this launch is ACTUALLY running.
+    // Two whole sentences rather than one plus an appended parenthesis, so a
+    // translator can move the aside where their language wants it. The backend
+    // name is a placeholder, never concatenated.
+    gpuBackendActive: 'Currently using {backend}.',
+    gpuBackendActiveUnavailable: 'Currently using {backend} (unable to enable Vulkan).',
+    // Auto held at OpenGL by the shell's GPU policy (electron/gpu_backend_policy.cjs):
+    // the player is told why they are not on Vulkan, and that it is theirs to pick.
+    gpuBackendActiveAutoCapped:
+      'Currently using {backend}. Auto does not try Vulkan on this graphics card yet; pick Vulkan to try it.',
+    // The shell refused the write (its own prefs write failed, or it rejected
+    // the value): the stored choice never moved, so the sentence says what the
+    // NEXT start will use rather than what was just clicked. Wordy value, M16:
+    // the five non-Latin fills land in this same change.
+    gpuBackendSaveFailed: 'The choice could not be saved. The next start keeps {backend}.',
+    // What the player calls each backend in that line. Kept apart from the
+    // picker labels on purpose: the OpenGL button reads "OpenGL (slow)", and
+    // "Currently using OpenGL (slow) (unable to enable Vulkan)" would not do.
+    gpuBackendActiveNameVulkan: 'Vulkan',
+    gpuBackendActiveNameOpenGL: 'OpenGL',
+    // The restart strip (src/ui/restart_strip_painter.ts): a setting that only applies at
+    // the next launch of the desktop shell changed, so the panel offers the restart
+    // Apply cannot stand in for. Wordy values, M16: the five non-Latin fills land in
+    // this same change.
+    restartPending: 'Some changes take effect after a restart.',
+    restartGame: 'Restart Game',
+    restartInProgress: 'Restarting the game...',
+    restartFailed: 'The game could not restart itself. Quit and start it again.',
     // Interface panel toggle: publish the current zone to Discord as an
     // activity (desktop app only, on by default).
     discordPresence: 'Discord Rich Presence',

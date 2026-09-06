@@ -14096,6 +14096,35 @@
     min-width: 132px;
     margin: 0;
   }
+  /* The restart strip (restart_strip_painter.ts): a next-launch setting changed, so
+     the panel offers "Restart game" where Apply cannot help. Same row shape
+     as .gfx-footer, boxed so it reads as its own notice above the action row. */
+  .restart-strip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 40px;
+    margin-top: 8px;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.25);
+  }
+  .restart-strip .btn {
+    margin: 0;
+    min-width: 132px;
+  }
+  .restart-strip-status {
+    flex: 1 1 auto;
+    min-width: 0;
+    color: var(--color-text-muted);
+    font-size: 11.5px;
+    line-height: 1.4;
+  }
+  .restart-strip-status[role="alert"] {
+    color: var(--color-text-error);
+    font-weight: 700;
+  }
   .set-seg {
     display: flex;
     gap: 4px;
@@ -14155,6 +14184,14 @@
   }
   .gfx-card .set-row:has(.set-choice) > .set-choice {
     grid-column: auto;
+  }
+  /* A live reading inside a control row (the graphics backend's "currently
+     using X"), under its buttons rather than beside the row: the wide cards
+     below flow their children two-up, so a note of its own would shift every
+     row after it by a cell. Tighter above than a standalone note, which
+     separates two rows; this one belongs to the buttons over it. */
+  .set-note-inline {
+    margin: 2px 0 0;
   }
   /* Full-width cards (Display / System / Touch) span both columns below the
      dial cards; their single-height rows flow two-up so the closing band

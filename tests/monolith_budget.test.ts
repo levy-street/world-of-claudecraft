@@ -371,6 +371,25 @@ const MONOLITHS: MonolithRow[] = [
     // that arm's entry-horizon cull and this branch's ground-aim reticle
     // pass-through both land in the merged file. Measured on the merged tree,
     // never reconciled by arithmetic. Exact merged count, zero headroom.
+    // LOWERED at the 2026-08-29 v0.41.0 sync: this branch's extractions
+    // (compile_arms.ts, prewarm_resume_runner.ts, self_spirit_warm.ts,
+    // corpse_beacon.ts, battleground_views.ts) pay for the release arm's
+    // battleground compile-gate wiring and then some, and the field
+    // construction PR 3706 added inline left the file with the view module.
+    // Measured on the merged tree. Exact merged count, zero headroom.
+    // Lowered by the unused import the cast_vfx_prewarm.ts extraction left
+    // behind (its removal collapsed the import block). Exact count.
+    // Re-pinned at the 2026-08-31 v0.41.0 sync: the release arm's raid
+    // consolidation and set-proc extraction (set_proc_fx.ts) land alongside
+    // this branch's extractions; neither parent pin fits the combined file.
+    // Measured on the merged tree. Exact merged count, zero headroom.
+    // Lowered again after the battleground view drive (the per-frame ward-state
+    // push, and the release of a copy the session is done with) moved into
+    // src/render/battleground_views.ts beside the build it belongs to.
+    // Lowered again after the scene census's child adapter (the renderCategory
+    // read and the visibility accessors) moved to sceneCensusChild in
+    // src/render/scene_census_core.ts, which paid for the census burst's new
+    // shader-warm-audit hook. Exact count.
     // the raid consolidation paid its additions by moving the fog scene chain (fog_scene_state.ts), the spellfxAt dispatch arms, the boss facing lock, and the raid anchor/rig syncs out; exact count.
     // Lowered 13265 -> 13243: the set-proc swirl table and both resolution
     // walks moved to src/render/set_proc_fx.ts (the Crucible engine-proc arm
@@ -386,13 +405,21 @@ const MONOLITHS: MonolithRow[] = [
     // and the release arm's rickshaw hooks moved with it, so the merged file
     // lands below both prior pins. Measured on the merged tree. Exact merged
     // count, zero headroom.
+    // Re-pinned at the 2026-09-04 release/v0.42.0 sync into the shader-warm
+    // branch: the release arm's mount lifecycle and stride audio moves land
+    // beside this branch's extractions, so the merged file sits below both
+    // parent pins. Measured on the merged tree. Exact merged count, zero headroom.
     // The Realm Builder monument (PR #3695) adds 12 lines here: one import,
     // the one-line setRealmBuilderHonouree delegation, and the entity arm
     // that returns the monument's pick volume (matched on the template-id
     // literal like the noticeboard arm beside it; tests/realm_builder_monument
     // pins the literal to the constant). They land exactly on the pin above,
     // so the ceiling does not move but the slack is now zero.
-    ceiling: 13214,
+    // Re-pinned at the 2026-09-05 release/v0.42.0 sync into the shader-warm
+    // branch: the release arm's Realm Builder monument lines (PR #3695) land
+    // beside this branch's extractions, so the merged file sits below both
+    // parent pins. Measured on the merged tree. Exact merged count, zero headroom.
+    ceiling: 13085,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -539,12 +566,22 @@ const MONOLITHS: MonolithRow[] = [
     // extraction pays 2 more under the entry-fade row above. Measured on the
     // merged tree, never reconciled by arithmetic. Exact merged count, zero
     // headroom.
-    // Re-pinned after the /daynight dev-command extraction to
-    // src/game/daynight_dev_command.ts (net of the Ignivar placer dispatch).
-    // Re-pinned to the exact merged count of the v0.41.0 base sync into the
-    // raid branch: both arms extracted and added independently, so neither
-    // parent pin fits the combined file; the merged count is the honest bound.
-    ceiling: 11551,
+    // LOWERED at the 2026-08-29 v0.41.0 sync: this branch's
+    // desktop_shell_settings.ts extraction lands with the release arm's own
+    // rows. Measured on the merged tree. Exact merged count, zero headroom.
+    // Re-pinned at the 2026-08-31 v0.41.0 sync: the release arm's /daynight
+    // dev-command extraction and Discord login-choice rows land alongside this
+    // branch's extractions; the merged count is the honest bound. Measured on
+    // the merged tree. Exact merged count, zero headroom.
+    // Re-pinned 11501 -> 11503 at the 2026-09-05 release/v0.42.0 sync (PR #3695,
+    // the Realm Builder monument): release-side growth only; the branch's own
+    // helpers are unchanged and the merged file stays under the release's own
+    // 11551 row. Exact merged count, zero headroom.
+    // Re-pinned 11503 -> 11516 at the 2026-09-06 release/v0.42.0 sync: both arms
+    // added and extracted independently, so neither parent pin fits the combined
+    // file. Measured with wc -l on the merged tree, never reconciled by
+    // arithmetic. Exact merged count, zero headroom.
+    ceiling: 11516,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -758,13 +795,25 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
+    // Lowered 5145 -> 5095 when the two shader-warm perf-report columns needed
+    // room: rather than raise the ceiling for four unavoidable lines (an insert
+    // list, a row-type field), the whole client_perf_reports DDL moved to
+    // client_perf_reports_schema.ts, a dependency-free CLIENT_PERF_REPORTS_SCHEMA
+    // ensureSchema applies after SCHEMA (the admin_guilds_schema.ts shape, which
+    // is also what keeps a db.ts -> schema -> db.ts cycle impossible). Exact
+    // count, zero slack. The next candidate behind the same seam is the table's
+    // accessors (insert, prune, row type).
     // Up 5145 -> 5151 for the Realm Builder of the Month roll (PR #3695, at
     // its release/v0.42.0 base merge): the table and its SQL live in
     // server/realm_builder_db.ts; the residue here is the schema import and
     // the one ensureSchema() apply line with its ordering note, the same
     // shape every other domain *_SCHEMA takes. Exact merged count, zero
     // slack; maintainer-review item.
-    ceiling: 5151,
+    // Re-pinned at the 2026-09-05 release/v0.42.0 sync into the shader-warm
+    // branch: the release arm's realm_builder_db.ts schema residue (PR #3695)
+    // lands beside this branch's client_perf_reports_schema.ts extraction, so the
+    // merged file sits below both parent pins. Exact merged count, zero slack.
+    ceiling: 5101,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {

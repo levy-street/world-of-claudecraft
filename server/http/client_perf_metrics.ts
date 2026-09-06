@@ -19,11 +19,12 @@
 //   not a player) while still reaching storage for the admin reader.
 //
 // CARDINALITY IS BOUNDED BY DESIGN, same contract as game_metrics.ts: every
-// label value comes from one of the fixed vocabularies below. The two ingest
+// label value comes from one of the fixed vocabularies below. The ingest
 // fields that are NOT bounded upstream (zone_or_scenario is free text,
 // gl_renderer_bucket has an open-ended slug fallback for unrecognized
-// hardware) NEVER reach a label raw: classifyClientPerfScene and
-// classifyClientPerfGpuFamily collapse them into fixed classes with an
+// hardware, shader_warm_refusal is a bounded but open token) NEVER reach a
+// label raw: classifyClientPerfScene, classifyClientPerfGpuFamily and
+// shaderWarmRefusalLabel collapse them into fixed classes with an
 // explicit fallback, so a hand-rolled beacon cannot mint series. Nothing
 // per-player, per-session, or per-device (account id, character id, session
 // id, ip, exact renderer string) is ever a label.
@@ -125,6 +126,35 @@ export const CLIENT_PERF_SUGGESTION_IDS = [
 export type ClientPerfSuggestionId = (typeof CLIENT_PERF_SUGGESTION_IDS)[number];
 
 /**
+ * The shader warm-up refusal tokens worth telling apart as a LABEL: the causes
+ * the client mints today (src/render/shader_warm_client.ts retireForCause plus
+ * the worker's own ready refusals), each one a different operator action. The
+ * stored shader_warm_refusal column is a free-ish token, so it never reaches a
+ * label raw: shaderWarmRefusalLabel folds anything not listed here to 'other'
+ * and an empty refusal to 'none'. 'extension-drift' stands for the whole
+ * `extension-drift:<extension>` family (the extension name is unbounded, and
+ * the drill-down for WHICH extension is the stored column).
+ */
+export const CLIENT_PERF_SHADER_WARM_REFUSALS = [
+  'none',
+  'cannot-serve:hold-cap',
+  'context-lost',
+  'extension-drift',
+  'extension-mismatch',
+  'hold-timeouts:expired-share',
+  'hold-timeouts:wedged',
+  'ios-webkit',
+  'no-offscreen-canvas',
+  'no-webgl2',
+  'no-worker',
+  'pagehide',
+  'ready-timeout',
+  'worker-error',
+  'other',
+] as const;
+export type ClientPerfShaderWarmRefusal = (typeof CLIENT_PERF_SHADER_WARM_REFUSALS)[number];
+
+/**
  * A report whose worst 10s window p95 reached this many ms counts as janky.
  * This is the client reporter's own clamp value, so "reached" and "hit the
  * clamp" are the same test and the jank share is exactly the share of reports
@@ -142,6 +172,11 @@ export const WOC_CLIENT_LONG_TASK_P95_SECONDS = 'woc_client_long_task_p95_second
 export const WOC_CLIENT_EFFECTIVE_RENDER_SCALE = 'woc_client_effective_render_scale';
 export const WOC_CLIENT_CONTEXT_LOSSES_TOTAL = 'woc_client_context_losses_total';
 export const WOC_CLIENT_SUGGESTIONS_TOTAL = 'woc_client_suggestions_total';
+// The shader-warm cut of the SAME stored reports woc_client_reports_total
+// counts, under its own name because its labels are a different question
+// (is the warm-up worker alive on this client, and why not) rather than a
+// different population.
+export const WOC_CLIENT_SHADER_WARM_REPORTS_TOTAL = 'woc_client_shader_warm_reports_total';
 
 // Bucket edges are part of the exporter's public contract (a bucket edit
 // silently rewrites every dashboard quantile), so they are exported and pinned
@@ -186,6 +221,8 @@ export interface ClientPerfSample {
   effectiveRenderScale: number;
   contextLostCount: number;
   suggestionIds: string[];
+  shaderWarmWorkerActive: boolean;
+  shaderWarmRefusal: string;
 }
 
 /**
@@ -253,6 +290,21 @@ export function classifyClientPerfScene(zoneOrScenario: string): ClientPerfScene
     return 'other';
   }
   return 'overworld';
+}
+
+/**
+ * Collapse a stored shader_warm_refusal onto the bounded label vocabulary: the
+ * empty refusal is 'none', an `extension-drift:<extension>` token keeps only
+ * its family, and anything unlisted (an older or newer client's cause, a
+ * hand-rolled beacon's invention) folds to 'other'. The label set is therefore
+ * fixed at CLIENT_PERF_SHADER_WARM_REFUSALS whatever the wire carries.
+ */
+export function shaderWarmRefusalLabel(refusal: string): ClientPerfShaderWarmRefusal {
+  if (refusal === '') return 'none';
+  const family = refusal.startsWith('extension-drift:') ? 'extension-drift' : refusal;
+  return (CLIENT_PERF_SHADER_WARM_REFUSALS as readonly string[]).includes(family)
+    ? (family as ClientPerfShaderWarmRefusal)
+    : 'other';
 }
 
 function tierIn(value: string): ClientPerfGfxTier {
@@ -338,6 +390,12 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
     labelNames: ['os'] as const,
     registers: [registry],
   });
+  const shaderWarmReports = new Counter({
+    name: WOC_CLIENT_SHADER_WARM_REPORTS_TOTAL,
+    help: 'Stored gameplay perf reports by shader warm-up worker state: whether the worker was active on the reporting client, and the bounded refusal cause when it was not.',
+    labelNames: ['shader_warm_active', 'shader_warm_refusal'] as const,
+    registers: [registry],
+  });
   const suggestions = new Counter({
     name: WOC_CLIENT_SUGGESTIONS_TOTAL,
     help: 'Perf-doctor suggestion ids carried by stored gameplay perf reports.',
@@ -368,6 +426,11 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
   for (const scene of CLIENT_PERF_SCENE_CLASSES) {
     for (const device of CLIENT_PERF_DEVICE_CLASSES) worst10s.zero({ scene, device });
   }
+  for (const refusal of CLIENT_PERF_SHADER_WARM_REFUSALS) {
+    for (const active of ['true', 'false']) {
+      shaderWarmReports.inc({ shader_warm_active: active, shader_warm_refusal: refusal }, 0);
+    }
+  }
   for (const os of CLIENT_PERF_OS_FAMILIES) contextLosses.inc({ os }, 0);
   for (const suggestion of CLIENT_PERF_SUGGESTION_IDS) suggestions.inc({ suggestion }, 0);
 
@@ -386,6 +449,10 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
         reports.inc({
           ...tierDevice,
           gpu_family: classifyClientPerfGpuFamily(sample.glRendererBucket),
+        });
+        shaderWarmReports.inc({
+          shader_warm_active: sample.shaderWarmWorkerActive ? 'true' : 'false',
+          shader_warm_refusal: shaderWarmRefusalLabel(sample.shaderWarmRefusal),
         });
         frameP95.observe(tierDevice, observedOrZero(sample.frameP95Ms) / MS_PER_SECOND);
         fpsAvg.observe(tierDevice, observedOrZero(sample.fpsAvg));
