@@ -978,6 +978,7 @@ export const zh_CN: EnTranslations = {
       "mounts": "坐骑",
       "professions": "专业",
       "reliquary": "圣物库",
+      "lootExplorer": "战利品浏览器",
       "nameplates": "姓名板",
       "haptics": "震动反馈",
       "hapticsOff": "震动反馈：关",
@@ -4692,6 +4693,43 @@ export const zh_CN: EnTranslations = {
       "listingStatusCancelled": "已取消",
       "listingStatusSuspended": "已冻结",
       "listingStatusUnsold": "未售出"
+    },
+    "lootExplorer": {
+      "title": "战利品浏览器",
+      "close": "关闭战利品浏览器",
+      "searchPlaceholder": "搜索物品...",
+      "searchAria": "搜索物品",
+      "filterCategoryAria": "来源",
+      "filterClassAria": "职业",
+      "filterStatAria": "Stat",
+      "filterQualityAria": "品质",
+      "filterAll": "All",
+      "tabItems": "By Item",
+      "tabEncounters": "按来源",
+      "category": {
+        "raid": "Raid",
+        "dungeon": "地下城",
+        "delve": "探秘",
+        "open_world": "开放世界",
+        "rift": "Rift",
+        "vendor": "商人",
+        "quest_reward": "任务奖励",
+        "quest_objective": "任务目标",
+        "ground_object": "世界物品",
+        "starting_equipment": "初始装备"
+      },
+      "difficulty": {
+        "normal": "普通",
+        "heroic": "英雄"
+      },
+      "riftRankLabel": "Rift Rank {rank}",
+      "source": "{category}: {name}",
+      "sourceWithContext": "{category}: {name} ({context})",
+      "chance": "{pct}% 掉落几率",
+      "guaranteed": "必得",
+      "gatedByQuest": "任务进行中：{quest}",
+      "empty": "没有符合这些筛选条件的战利品。",
+      "resultCount": "{count} 个结果"
     }
   },
   "gatherEvent": {

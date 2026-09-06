@@ -324,7 +324,15 @@ const MONOLITHS: MonolithRow[] = [
     // src/ui/hud/action_bar/action_bar_bind_banner.ts; measured on the merged
     // candidate after the selected loot, combat, and Loping Stride integrations.
     // Exact count, zero slack.
-    ceiling: 18918,
+    // Raised 18905 -> 18926 (+21) for the Loot Explorer window: the field/ctor,
+    // the toggle method, the close-switch case, and the two minimap wiring
+    // lines are thin-consumer wiring to the fully extracted domain module
+    // (src/ui/hud/loot_explorer/); everything with substance (the index
+    // builder, filters, encounter grouping, the painter) lives there. Same
+    // shape as every prior window wiring (Reliquary, Deeds, Professions), and
+    // no clean branch-owned extraction exists for a brand-new window's own
+    // wiring. Maintainer decision, exact count: any further growth reds again.
+    ceiling: 18939,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
