@@ -28,10 +28,11 @@ describe('collection source derivation', () => {
     const facts = collectionItemFacts('whistle_proud_grunt');
     expect(facts?.obtainable).toBe(true);
     expect(facts?.drops).toEqual([]);
-    // Rare joined the global table at 0.05% (loot/global_drops.ts), so the
-    // vendor is the reliable route and the drop is the lucky one; both show.
-    expect(facts?.globalDrop?.quality).toBe('rare');
-    expect(facts?.globalDrop?.chance).toBe(0.0005);
+    // Vendor-only (loot/global_drops.ts WITHHELD_FROM_GLOBAL_POOL): the
+    // counter is the ONLY route, so no global-drop line may appear beside it.
+    // The window reads the roller's own pool for this, so a line here would
+    // mean a kill really could award it.
+    expect(facts?.globalDrop).toBeNull();
     expect(facts?.vendors).toHaveLength(1);
     const vendor = facts?.vendors[0];
     expect(vendor?.npcId).toBe('warmarshal_draven_kole');
@@ -60,6 +61,23 @@ describe('collection source derivation', () => {
     expect(vendor?.npcId).toBe('armorer_hode');
     expect(vendor?.price).toBe(ITEMS.whistle_penny_goldspark.buyValue);
     expect(facts?.tradeable).toBe(true);
+  });
+
+  it('gives all three vendor companions a counter and no drop at all', () => {
+    for (const itemId of [
+      'whistle_proud_grunt',
+      'whistle_loot_goblin',
+      'whistle_penny_goldspark',
+    ]) {
+      const facts = collectionItemFacts(itemId);
+      expect(facts?.vendors.length, itemId).toBe(1);
+      expect(facts?.drops, itemId).toEqual([]);
+      expect(facts?.globalDrop, itemId).toBeNull();
+      expect(facts?.fishingDrop, itemId).toBeNull();
+      // Still obtainable: the counter is a real source, and the window must
+      // not fall through to "no source in the game yet".
+      expect(facts?.obtainable, itemId).toBe(true);
+    }
   });
 
   it('reports the global whistle tier for a common buddy and nothing for a withheld tier', () => {

@@ -29,6 +29,36 @@ function rollMany(seed: number, n: number): { itemId: string; count: number }[][
 }
 
 describe('global buddy-whistle drop', () => {
+  it('carries no whistle that something else in the game owns outright', () => {
+    // The withheld set is content, not a switch: a companion something else
+    // owns outright (a currency counter, or the water) must not also fall off
+    // a mob, while the tier it came out of keeps paying everything else in it.
+    for (const itemId of [
+      'whistle_proud_grunt',
+      'whistle_loot_goblin',
+      'whistle_penny_goldspark',
+      'whistle_crystal_tide',
+    ]) {
+      for (const tier of GLOBAL_BUDDY_DROP_TIERS) {
+        expect(buddyWhistlesOfQuality(tier.quality), `${itemId} in ${tier.quality}`).not.toContain(
+          itemId,
+        );
+      }
+    }
+    // Withholding four rares did not switch the rarity off: the rares that
+    // nothing else claims are still in there, and still drop at 0.05%.
+    expect(buddyWhistlesOfQuality('rare')).toEqual([
+      'whistle_alon',
+      'whistle_cate_coin',
+      'whistle_kekius',
+      'whistle_solbot',
+      'whistle_trollface',
+    ]);
+    // The other live tier still has something to give, or the drop is dead.
+    expect(buddyWhistlesOfQuality('common').length).toBeGreaterThan(0);
+    expect(buddyWhistlesOfQuality('uncommon').length).toBeGreaterThan(0);
+  });
+
   it('declares exactly the four tiers at their owner-specified odds, in the fixed draw order', () => {
     expect(GLOBAL_BUDDY_DROP_TIERS.map((t) => [t.quality, t.chance])).toEqual([
       ['common', 0.015],

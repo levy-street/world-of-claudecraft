@@ -30,9 +30,15 @@ export interface GlobalBuddyDropTier {
 // reshape a golden. chance 0 can never win: Rng.chance is a strict `< p`.
 //
 // 2026-09-04: rare joins the table at 0.05%, a twentieth of the uncommon rate,
-// so a blue companion is a genuine long-odds find rather than vendor-only. The
-// three vendor rares (Proud Grunt, Loot Goblin, Penny Goldspark) keep their
-// currency counters as the reliable route; this is the lucky one.
+// so a blue companion is a genuine long-odds find rather than vendor-only.
+//
+// 2026-09-06: the rares that something else OWNS came back out of the pool.
+// Proud Grunt, Loot Goblin and Penny Goldspark are their vendors' alone (owner
+// request: the counters are the only way to them) and Crystal Tide is
+// fishing's alone. The tier keeps its rate and keeps the rares nothing else
+// claims -- Cate Coin, Alon, Trollface, Kekius and Solbot -- so a blue
+// companion is still a long-odds find off a kill. See
+// WITHHELD_FROM_GLOBAL_POOL.
 //
 // Epic stays withheld at chance 0: the one epic with a live source is the
 // Crystal Lich, and Nythraxis owns that chase (content/dungeons.ts).
@@ -60,18 +66,33 @@ export const GLOBAL_BUDDY_DROP_TIERS: readonly GlobalBuddyDropTier[] = [
 // tier's pool below and let any kill in the world hand it over, which is not
 // what it is: it is the angler's companion, and a companion earned at the
 // water should not also fall off a boar. WITHHELD_FROM_GLOBAL_POOL is what
-// enforces that, and this is the one entry on it.
+// enforces that.
 export const FISHING_BUDDY_DROP = {
   itemId: 'whistle_crystal_tide',
   chance: 0.005,
 } as const;
 
 /** Whistles the global tier pools never carry, because something else in the
- *  game owns their acquisition outright. Not the same as a withheld TIER (a
- *  tier at chance 0 withholds every whistle in it); this withholds one
- *  companion from a tier that is otherwise live, so the rare tier still hands
- *  out the three vendor rares at 0.05% while never handing out this one. */
-const WITHHELD_FROM_GLOBAL_POOL: ReadonlySet<string> = new Set([FISHING_BUDDY_DROP.itemId]);
+ *  game owns their acquisition outright: a named vendor, or the water. Not the
+ *  same as a withheld TIER (a tier at chance 0 withholds every whistle in it);
+ *  this withholds a NAMED companion from a tier that stays live for whatever
+ *  joins it later.
+ *
+ *  This is content, not a switch. The tier a withheld whistle came out of
+ *  stays live for everything else in it, and a new companion with no named
+ *  source starts dropping the day it is added. rollLoot also skips an empty
+ *  pool without changing its draw count, so even withholding a whole tier's
+ *  worth would leave the parity goldens alone. */
+const WITHHELD_FROM_GLOBAL_POOL: ReadonlySet<string> = new Set([
+  // Fishing's own, at 0.5% a catch (professions/fishing.ts).
+  FISHING_BUDDY_DROP.itemId,
+  // The three currency counters in Highwatch (content/zone3.ts): honor,
+  // Heroic Marks and gold. A companion you are meant to SAVE for should not
+  // also fall off a boar, which is the whole reason the counters exist.
+  'whistle_proud_grunt',
+  'whistle_loot_goblin',
+  'whistle_penny_goldspark',
+]);
 
 // Built once at module load from the merged ITEMS catalog (not just
 // content/items.ts) so a buddy whistle added anywhere else joins its tier's
