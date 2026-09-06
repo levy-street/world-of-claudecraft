@@ -369,6 +369,11 @@ export class RenderBudgetGovernor {
     resetTerrainDetailShed(this.detailShed);
     // The dev pin is the one write that ignores the ladder; both ladder arms
     // are gated on it, so asserting it here holds it for the session.
+    if (this.pinnedDetailLevel != null) {
+      this.detailShed.level = this.pinnedDetailLevel;
+      this.detailShed.target = this.pinnedDetailLevel;
+      this.levels.detail = this.pinnedDetailLevel;
+    }
     if (this.pinnedPostLevel != null) this.levels.post = this.pinnedPostLevel;
     this.frameMsEma = 16.7;
     this.submitMsEma = 0;
