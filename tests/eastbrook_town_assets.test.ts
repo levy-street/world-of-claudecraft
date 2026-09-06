@@ -21,7 +21,7 @@ const REPO_ROOT = path.join(__dirname, '..');
 const PROPS_ROOT = path.join(REPO_ROOT, 'public/models/props');
 const EVIDENCE_ROOT = path.join(REPO_ROOT, 'docs/screenshots/eastbrook-vale-rebuild/assets');
 const MATERIALS_ROOT = path.join(REPO_ROOT, 'docs/screenshots/eastbrook-vale-rebuild/materials');
-const SOURCE_FINGERPRINT = 'e5165462a28302356fe126d64eae130ce2b10ce9693fa326f35eed746dca3101';
+const SOURCE_FINGERPRINT = 'ab44e0dadc82e50d027a83924b0439152a3aa122ee49222274b5db69b05206ac';
 const SURFACE_ATLAS_SOURCE_SHA256 =
   'abec3036f8887e9c94972dab52aea664f18a74696db6b6d24cc48a4cfbe22b7d';
 const SURFACE_ATLAS_SHIPPING_SHA256 =
@@ -29,7 +29,7 @@ const SURFACE_ATLAS_SHIPPING_SHA256 =
 const SURFACE_ATLAS_PREVIEW_SHA256 =
   'ea6ba64e200f305f079cc858a4daf5d28dc8c240acd83895729237c521d26576';
 const SURFACE_ATLAS_FINGERPRINT =
-  'da04ddcd04d919673875c0a86e0f1eff809a218fd34d06e7f856f86fe148528e';
+  'd06cc23f7dbc8c7f805080fd25292737ef62537f11ee667db917f84f32ba7e28';
 const TURNAROUND_VIEWS = [
   'front',
   'right',
@@ -74,7 +74,7 @@ const ASSETS: readonly AssetContract[] = [
     rootName: 'EastbrookBank',
     dimensions: [7, 7.8, 5.5],
     bytes: 52_508,
-    sha256: '1b5d54e608c3014a51db188807f12c4220769a9f5fa81da08e9747b7b0486a08',
+    sha256: '0b00d8dc4f6349e123467b07482a3953c41302a112834d003e9978bef77fc815',
     triangles: 3104,
     primitiveTriangles: [2928, 176],
     triangleCeiling: 6000,
@@ -110,7 +110,7 @@ const ASSETS: readonly AssetContract[] = [
     rootName: 'EastbrookSmithy',
     dimensions: [7, 7.5, 5.5],
     bytes: 40_352,
-    sha256: 'd9b928ff0543f909816ab1ec11cc72b486807d114af263c8aee0a45e12d00a80',
+    sha256: '206becc53b2dfcd53653310c3f9e9844a4d3c9786289541e312018672d34aa7d',
     triangles: 2410,
     primitiveTriangles: [2282, 128],
     triangleCeiling: 6000,
@@ -138,7 +138,7 @@ const ASSETS: readonly AssetContract[] = [
     rootName: 'EastbrookInn',
     dimensions: [7.5, 8.5, 6],
     bytes: 67_768,
-    sha256: '5c99a325be8d4356093d4a5e47d950f986223476e248d2f2b400e49444ee626f',
+    sha256: '431118a00e43ebda58a9ad5adef8eb189077668c68dc9356315d7209f8d8a298',
     triangles: 4348,
     primitiveTriangles: [4004, 344],
     triangleCeiling: 6000,
@@ -166,7 +166,7 @@ const ASSETS: readonly AssetContract[] = [
     rootName: 'EastbrookChapel',
     dimensions: [5.5, 7, 6],
     bytes: 66_132,
-    sha256: '7d514373660b142f7061d1cd3a2396c39a9a98fd4c6019df4c790d6081728091',
+    sha256: '11f6f087e68cea65b049442f53b8050a37b48d6be8cdd8331ac77b4620215b12',
     triangles: 4120,
     primitiveTriangles: [3800, 320],
     triangleCeiling: 6000,
@@ -194,7 +194,7 @@ const ASSETS: readonly AssetContract[] = [
     rootName: 'EastbrookWeavingWorkshop',
     dimensions: [5.5, 5.8, 4.5],
     bytes: 40_392,
-    sha256: '60bcd59819a4d8c21f8b0d78cbb682590cc44d643f2bfe0214c945eb24a7ab31',
+    sha256: '4c07297573ca5c6d96eea43abc77c5f683849aad0d75b1384171b914dd390d1c',
     triangles: 2412,
     primitiveTriangles: [2272, 140],
     triangleCeiling: 6000,
@@ -222,7 +222,7 @@ const ASSETS: readonly AssetContract[] = [
     rootName: 'EastbrookToolworks',
     dimensions: [5.5, 5.8, 4.5],
     bytes: 39_920,
-    sha256: '2841b2ad1aa507b4078f9c2777ce21ca19d084b1cf2e1b48e69c023ab28372c2',
+    sha256: '56060967a2b36e5f11cf4a9b97f37ab9813967e0ffd06fe7dcd8c4daf71a7457',
     triangles: 2320,
     primitiveTriangles: [2180, 140],
     triangleCeiling: 6000,
@@ -250,7 +250,7 @@ const ASSETS: readonly AssetContract[] = [
     rootName: 'EastbrookCivicWellBeacon',
     dimensions: [3.2, 3.1, 3.2],
     bytes: 13_216,
-    sha256: 'c6f890e2f14466fd8ec1f80b66994a94a2df4324dbdb71215f26e30eb4bea97a',
+    sha256: '273f5bd5da52165ff5eb46bb121313a5f31de614a9e74f4ee355cb8ca9c3eee9',
     triangles: 464,
     primitiveTriangles: [456, 8],
     triangleCeiling: 3000,
@@ -278,7 +278,7 @@ const ASSETS: readonly AssetContract[] = [
     rootName: 'EastbrookMarketStall',
     dimensions: [2.8, 2.7, 2.2],
     bytes: 27_072,
-    sha256: '48749075dd4e66b830f5a5104a3b2da33a540600b88f93a96de70475c1d3cb1a',
+    sha256: 'a8156ee71e2b6bd2a0aded6a5a6026a7266fe15b45255e79af1198f0e513b5a0',
     triangles: 1314,
     primitiveTriangles: [1294, 20],
     triangleCeiling: 3000,
@@ -306,7 +306,7 @@ const ASSETS: readonly AssetContract[] = [
     rootName: 'EastbrookWallWing',
     dimensions: [6.5, 2.7, 0.65],
     bytes: 8352,
-    sha256: '561a2c43c8b54aaf494f5476f15e7b843133c712184742ca7b504ccf787e7250',
+    sha256: 'd585c968c202baf634a42ad64d65d5557b08eaa6d4456145004bbac9e1086c63',
     triangles: 206,
     primitiveTriangles: [196, 10],
     triangleCeiling: 206,
