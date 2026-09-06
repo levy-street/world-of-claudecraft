@@ -593,6 +593,15 @@ describe('routeEvents bot-detector observation and serialize-once shape', () => 
 // caller's mine.length > 0 guard keeps the integration path from reaching (an empty list,
 // a single fragment) and the length-alignment serializeEventFragments must hold.
 describe('event_frame pure assembly', () => {
+  it('prefilters the consumer-less portalToll the same way (the toll is a server booking)', () => {
+    const events: SimEvent[] = [
+      { type: 'portalToll', pid: 7, copper: 5_000 },
+      { type: 'log', text: 'x', pid: 7 } as SimEvent,
+    ];
+    const routable = filterRoutableEvents(events);
+    expect(routable.map((ev) => ev.type)).toEqual(['log']);
+  });
+
   it('filterRoutableEvents returns the SAME array when nothing matches (allocation-free common case)', () => {
     const events = [
       { type: 'chat', fromPid: 7, from: 'A', channel: 'general', text: 'hi' },

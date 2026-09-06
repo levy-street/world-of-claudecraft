@@ -15750,6 +15750,26 @@ export const nl_NL: EnTranslations = {
         "title": "Wachter van de Verre Duinen",
         "greeting": "Blijf laag. Geluid draagt vreemd over het glas, en de poort beneden heeft oren."
       },
+      "waystone_warden_ilse": {
+        "name": "Waystone Warden Ilse",
+        "title": "Keeper of the Wyrmgate",
+        "greeting": "Fifty silver and the Wyrmgate carries you to Highwatch. Cheaper than a drake, dearer than your own two legs."
+      },
+      "provisioner_dunmore": {
+        "name": "Provisioner Dunmore",
+        "title": "Sutler of the Last Keep",
+        "greeting": "Goat's roasted, water's cold, and the trolls have not burned the stores this week. Buy while that holds."
+      },
+      "sergeant_varga": {
+        "name": "Sergeant Varga",
+        "title": "Warden of the Bailey",
+        "greeting": "The garrison that held this keep never came home. We hold it for them now. Mind the breach in the east wall."
+      },
+      "chaplain_ondrey": {
+        "name": "Chaplain Ondrey",
+        "title": "Voice of the Quiet Halls",
+        "greeting": "The Last Spring still runs beside these walls, whatever the Forgefather stole from it. Sit a while. The halls are quiet, not empty."
+      },
       "reeve_ottoline": {
         "name": "Schout Ottoline",
         "title": "Schout van Lantaarnmeer",
@@ -18368,6 +18388,9 @@ export const nl_NL: EnTranslations = {
           },
           "9": {
             "label": "Grafwurm-Heiligdom"
+          },
+          "10": {
+            "label": "Wyrmgate Waystone"
           }
         }
       },

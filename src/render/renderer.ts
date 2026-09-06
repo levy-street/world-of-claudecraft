@@ -293,7 +293,6 @@ import {
   FOGLESS_DETAIL_FAR,
   horizonHazePlan,
 } from './far_terrain_core';
-import { buildFarshoreFeatures } from './farshore_features';
 import { buildFenFeatures, type FenFeaturesView } from './fen_features';
 import { buildFenbridgeTownView, type FenbridgeTownView } from './fenbridge_town';
 import {
@@ -679,6 +678,7 @@ import {
   lookAtFrozen,
   refreshFrozenWorldMatrix,
 } from './static_matrix';
+import { buildStaticWorldDressing } from './static_world_dressing';
 import { buildStationProps } from './stations';
 import { shouldRenderStealthGhost } from './stealth';
 import { createStepSmooth, type StepSmoothState, stepSmoothHeight } from './step_smooth_core';
@@ -734,7 +734,6 @@ import {
 } from './warrior_cast_fx_core';
 import { RecklessSkullPainter } from './warrior_cast_fx_painter';
 import { buildWater, setWaterDayNight, setWaterSunDirection, type WaterView } from './water';
-import { buildWaterFlora } from './water_flora';
 import {
   buildWeaponVfxPrewarmGroup,
   disposeWeaponEmissiveCache,
@@ -2480,19 +2479,12 @@ export class Renderer {
     // The light budget must exist BEFORE any attachZoneFeature call: a static
     // feature that ships glowLights pushes into it during the loop below.
     this.fireLights = props.fireLights;
-    // World-spanning modeled dressing, all static: the Duskfall cave mouths,
-    // lily-and-reed water flora on every temperate lake, and the Farshore's
-    // palm strand. Attached like the per-zone features so the distance cull
-    // applies: the gates and the palm strand have compact footprints of their
-    // own, and water flora registers one cull child per zone.
+    // World-spanning modeled dressing, all static (static_world_dressing.ts
+    // lists it). Attached like the per-zone features so the distance cull
+    // applies: compact footprints each, water flora one cull child per zone.
     this.hollowGates = buildHollowGates(this.sim.cfg.seed);
-    for (const staticFeature of [
-      this.hollowGates,
-      buildWaterFlora(this.sim.cfg.seed),
-      buildFarshoreFeatures(this.sim.cfg.seed),
-    ]) {
-      this.attachZoneFeature(staticFeature);
-    }
+    const dressing = buildStaticWorldDressing(this.hollowGates, this.sim.cfg.seed, this.lowGfx);
+    for (const staticFeature of dressing) this.attachZoneFeature(staticFeature);
     this.flames = props.flames;
     this.windmillFans = props.windmillFans;
     // Props are baked into world space at build and their update() only toggles

@@ -1132,6 +1132,11 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // sim_i18n EXACT map via log.veilEnter/log.veilLeave); scanning the module
     // keeps any FUTURE literal emit added here under the drift guard.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/portals.ts'), 'utf8'),
+    // The portal toll (the Wyrmgate Waystone's coin): its refusal is data-routed
+    // (PortalDef.tollText, matched via error.wyrmgateToll) with the shared
+    // 'Not enough money.' row as the text-less fallback; scanning keeps any
+    // future literal emit here under the guard.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/portal_toll.ts'), 'utf8'),
     // The tutorial greeting (spawn greeting event + the startTutorial ferry):
     // the ferry log line and the two gate denials are matched by the sim_i18n
     // EXACT map (log.provingFerry, error.tutorialFromHere,

@@ -15750,6 +15750,26 @@ export const zh_CN: EnTranslations = {
         "title": "远丘瞭望者",
         "greeting": "压低身子。声音在血玻璃上传得很怪，而下面那道门长着耳朵。"
       },
+      "waystone_warden_ilse": {
+        "name": "路碑守卫伊尔莎",
+        "title": "龙门守护者",
+        "greeting": "五十银币，龙门便送你去高望。比骑龙便宜，比你的双腿金贵。"
+      },
+      "provisioner_dunmore": {
+        "name": "军需官邓莫尔",
+        "title": "最后的堡垒随军商贩",
+        "greeting": "山羊烤好了，水是凉的，巨魔这周还没烧掉仓库。趁着还能买，赶紧买吧。"
+      },
+      "sergeant_varga": {
+        "name": "中士瓦尔加",
+        "title": "外院守卫",
+        "greeting": "守过这座堡垒的驻军再没回来。如今我们替他们守着。当心东墙的缺口。"
+      },
+      "chaplain_ondrey": {
+        "name": "牧师安德烈",
+        "title": "寂静厅堂之声",
+        "greeting": "最后之泉仍在这些墙边流淌，无论锻造之父从中偷走了什么。坐一会儿吧。厅堂寂静，却并不空荡。"
+      },
       "reeve_ottoline": {
         "name": "镇务官奥托琳",
         "title": "灯湖镇镇务官",
@@ -18368,6 +18388,9 @@ export const zh_CN: EnTranslations = {
           },
           "9": {
             "label": "墓龙圣所"
+          },
+          "10": {
+            "label": "龙门路碑"
           }
         }
       },

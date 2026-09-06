@@ -14,6 +14,7 @@ import type {
   ItemDef,
   MobTemplate,
   NpcDef,
+  PortalDef,
   QuestDef,
   ZoneDef,
   ZonePropsDef,
@@ -132,6 +133,44 @@ export const DRAKELANDS_ROADS: { x: number; z: number }[][] = [
     { x: 230, z: 1964 },
     { x: 186, z: 1892 },
   ], // the Cinder Dunes -> west to the Snowline crossing (fire meets ice)
+];
+
+// The Wyrmgate Waystone: a paired arch that carries a traveler between the
+// Highwatch green (Thornpeak Heights) and the Last Keep's bailey (just inside
+// its main gate, on the road axis) in one step, for a toll. The run up the Pale Causeway is a mounted rider's
+// minute and a walker's slog, so the toll is the classic trade: coin now, or
+// Riding (80 gold, mounts_training.ts) forever. Fifty silver a crossing sits
+// where a classic-era flight in a 16-20 band prices (tens of silver): felt on
+// every trip, so a regular commuter still wants the mount, never a purse
+// wipe for a misstep into the arch. src/sim/portals.ts runs the walk-in
+// trigger, portal_toll.ts settles the coin, and both sides stand in open
+// ground (`gate: 'waystone'`). The Highwatch side carries its own map mark,
+// placed at least 2 x POI_VISIT_RADIUS (deeds.ts) from the hub so it never
+// crowds Highwatch's in the wayfarer deed sweep; the keep side is found by
+// the Last Keep's own mark (castle_layout.ts owns the bailey plan, and the
+// arch pocket at (383, 2029) is the gatehouse road with 7.9 yd of clearance).
+export const WYRMGATE_WAYSTONE_TOLL_COPPER = 5_000; // 50 silver in copper
+
+export const DRAKELANDS_PORTALS: PortalDef[] = [
+  {
+    id: 'wyrmgate_waystone',
+    gate: 'waystone',
+    // Highwatch: the east green past the auction house, facing back west
+    // into town; the Last Keep: the gatehouse road inside the main gate,
+    // arrivals facing east up the bailey toward the well. Each landing sits
+    // 5 yd out of its own trigger (the Duskfall rule) so an arrival never
+    // bounces, and a walker entering the keep from the barbican meets the
+    // arch face-on.
+    a: { x: 52, z: 668, landing: { x: 47, z: 667, facing: Math.PI / 2 } },
+    b: { x: 383, z: 2029, landing: { x: 388, z: 2029, facing: -Math.PI / 2 } },
+    radius: 2.0,
+    tollCopper: WYRMGATE_WAYSTONE_TOLL_COPPER,
+    enterText:
+      'The waystone takes its silver and the Wyrmgate flares: hot ash wind, and the bailey of the Last Keep ahead.',
+    leaveText:
+      'The waystone takes its silver and the Wyrmgate flares: thin mountain air, and the walls of Highwatch ahead.',
+    tollText: 'The waystone stays dark. The Wyrmgate crossing costs 50 silver.',
+  },
 ];
 
 // The wastes' first inhabitants: the dragonkin brood nests across the
@@ -477,6 +516,14 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
 // Wyrmwatch, and a lone scout camps in the far dunes within sight of the
 // Orkadia wargate. The scout stands far from the hub on purpose: the war
 // chain sends players out to find her.
+//
+// The Last Keep garrison (the four `dynamic: true` records at the end): the
+// rebuilt castle's bailey had a well and two market stalls and nobody at
+// them. src/sim/last_keep_garrison.ts stands these four up on RESERVED
+// entity ids after the rng-driven roster (the FURY precedent), so adding a
+// keep NPC never shifts a camp mob's id and the parity goldens hold. Spots
+// come from the bailey clearance sweep (tests/last_keep_garrison.test.ts pins
+// them inside the curtain walls and 4 yd apart).
 export const DRAKELANDS_NPCS: Record<string, NpcDef> = {
   gatecaptain_brannoc: {
     id: 'gatecaptain_brannoc',
@@ -517,6 +564,65 @@ export const DRAKELANDS_NPCS: Record<string, NpcDef> = {
       'q_dk_matriarch_of_the_maw',
     ],
     greeting: 'Keep low. Sound carries strangely off the glass, and the gate below has ears.',
+  },
+  waystone_warden_ilse: {
+    id: 'waystone_warden_ilse',
+    name: 'Waystone Warden Ilse',
+    title: 'Keeper of the Wyrmgate',
+    pos: { x: 384, z: 2024 }, // beside the arch, off the road axis
+    facing: 0.2,
+    color: 0x9a6ad8,
+    questIds: [],
+    greeting:
+      'Fifty silver and the Wyrmgate carries you to Highwatch. Cheaper than a drake, dearer than your own two legs.',
+    dynamic: true,
+  },
+  provisioner_dunmore: {
+    id: 'provisioner_dunmore',
+    name: 'Provisioner Dunmore',
+    title: 'Sutler of the Last Keep',
+    pos: { x: 400, z: 2036 }, // the market row, between the two stalls
+    facing: -2.2,
+    color: 0xc09858,
+    questIds: [],
+    // Trail rations and the two potions every garrison sells; the Thornpeak
+    // quartermaster's own rows (content/zone3.ts), so a walker who crossed
+    // the waystone finds the same larder on both ends.
+    vendorItems: [
+      'trail_hardtack',
+      'meltwater_flask',
+      'roast_mountain_goat',
+      'glacier_melt',
+      'healing_potion',
+      'mana_potion',
+    ],
+    greeting:
+      "Goat's roasted, water's cold, and the trolls have not burned the stores this week. Buy while that holds.",
+    dynamic: true,
+  },
+  sergeant_varga: {
+    id: 'sergeant_varga',
+    name: 'Sergeant Varga',
+    title: 'Warden of the Bailey',
+    pos: { x: 411, z: 2027 }, // the court between the well and the ward stair
+    facing: 2.4,
+    color: 0xa84838,
+    questIds: [],
+    greeting:
+      'The garrison that held this keep never came home. We hold it for them now. Mind the breach in the east wall.',
+    dynamic: true,
+  },
+  chaplain_ondrey: {
+    id: 'chaplain_ondrey',
+    name: 'Chaplain Ondrey',
+    title: 'Voice of the Quiet Halls',
+    pos: { x: 428, z: 2054 }, // by the chapel, under the southeast watchtower
+    facing: -0.9,
+    color: 0xd8c890,
+    questIds: [],
+    greeting:
+      'The Last Spring still runs beside these walls, whatever the Forgefather stole from it. Sit a while. The halls are quiet, not empty.',
+    dynamic: true,
   },
 };
 

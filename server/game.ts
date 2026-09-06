@@ -383,6 +383,7 @@ import type { StorageAppliedEffect } from './storage_purchase_db';
 import { storageAppliedEffectsCommitted, storageRecovery } from './storage_purchases';
 import { StorageRecoverySessionSweep as RecoverySweep } from './storage_recovery_session_sweep';
 import { attachDetectorFlagHost } from './suspicion_flags';
+import { bookTickEvent } from './tick_event_bookings';
 import { createTickSaveObserver, TickProfiler, type TickProfilerSample } from './tick_profiler';
 import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
 import { maybeTrackDay7Retained, trackLevelMilestoneCapi } from './ua_capi';
@@ -9430,19 +9431,10 @@ export class GameServer {
     // inline.
     const deedUnlocks = new Map<ClientSession, string[]>();
     for (const ev of events) {
-      if (ev.type === 'unstuck' && ev.pid !== undefined) {
-        const session = this.clients.get(ev.pid);
-        if (session) {
-          recordUnstuckEvent(
-            {
-              realm: REALM,
-              accountId: session.accountId,
-              characterId: session.characterId,
-            },
-            ev,
-          );
-        }
-      }
+      // Unstuck records + tick-driven copper flows (tick_event_bookings.ts);
+      // the type gate keeps the session lookup off the common combat event.
+      if ((ev.type === 'unstuck' || ev.type === 'portalToll') && ev.pid !== undefined)
+        bookTickEvent(ev, this.clients.get(ev.pid));
       if (ev.type === 'deedUnlocked' && ev.pid !== undefined) {
         const s = this.clients.get(ev.pid);
         if (s) {

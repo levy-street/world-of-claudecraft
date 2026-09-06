@@ -363,7 +363,7 @@ interface AttributionTargetFixture {
 // gained the fog, tonemapping and colourspace tail, moving
 // realm_builder_monument_fx.ts. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '85392484fb6509a37aa445bcc5bd5ebba58819939847318ccf288b048341b708';
+  '830175aa8fc2e9f89de6c1c8d32d82dfc8a90e350c44ac71ece98a6b0ecf53cf';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

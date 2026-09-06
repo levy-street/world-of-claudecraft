@@ -1069,14 +1069,21 @@ describe('map_window_painter: painted stable marker sprites', () => {
       zonePaintOptions(zone),
     );
 
+    // Every shipped site of this kind in the zone paints (Thornpeak carries
+    // both the Duskfall cave mouth and the Wyrmgate Waystone arch).
+    const shipped = STABLE_MAP_NAVIGATION_LANDMARKS.filter(
+      (landmark) => landmark.kind === kind && landmark.zoneId === site.zoneId,
+    );
     const matching = result.navigation.filter((marker) => marker.kind === kind);
-    expect(matching).toHaveLength(1);
-    expect(markerArt.calls.filter((call) => call.id === id)).toEqual([
-      { id, size: 'mapNavigation' },
-    ]);
-    expect(trace.markerBlits.filter((blit) => blit.sprite.markerId === id)).toEqual([
-      expect.objectContaining({ sprite: { markerId: id, sizeId: 'mapNavigation' }, alpha: 1 }),
-    ]);
+    expect(matching).toHaveLength(shipped.length);
+    expect(markerArt.calls.filter((call) => call.id === id)).toEqual(
+      shipped.map(() => ({ id, size: 'mapNavigation' })),
+    );
+    expect(trace.markerBlits.filter((blit) => blit.sprite.markerId === id)).toEqual(
+      shipped.map(() =>
+        expect.objectContaining({ sprite: { markerId: id, sizeId: 'mapNavigation' }, alpha: 1 }),
+      ),
+    );
   });
 
   it.each([
@@ -1141,9 +1148,12 @@ describe('map_window_painter: painted stable marker sprites', () => {
 
       const marker = result.navigation.find((candidate) => candidate.kind === kind);
       if (!marker) throw new Error(`expected painted ${kind} marker`);
-      expect(markerArt.calls.filter((call) => call.id === id)).toEqual([
-        { id, size: 'mapNavigation' },
-      ]);
+      const shipped = STABLE_MAP_NAVIGATION_LANDMARKS.filter(
+        (landmark) => landmark.kind === kind && landmark.zoneId === site.zoneId,
+      );
+      expect(markerArt.calls.filter((call) => call.id === id)).toEqual(
+        shipped.map(() => ({ id, size: 'mapNavigation' })),
+      );
       expect(trace.markerBlits.filter((blit) => blit.sprite.markerId === id)).toEqual([]);
       const fill = trace.fills.find(
         (candidate) =>

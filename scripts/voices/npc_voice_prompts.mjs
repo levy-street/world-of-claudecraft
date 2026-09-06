@@ -1080,6 +1080,14 @@ export const VOICE_ALIAS = {
   brother_aldric_fen: 'brother_aldric',
   brother_aldric_highwatch: 'brother_aldric',
   brother_aldric_raid: 'brother_aldric',
+  // The Last Keep garrison (content/drakelands.ts) borrows the Wyrmwatch
+  // registers until each gets a designed voice: the warden speaks in Sela's
+  // quartermaster's calm, the sutler in Brannoc's ash-baked baritone, the
+  // sergeant in Yerrin's low scout's voice, the chaplain in Brother Aldric's.
+  waystone_warden_ilse: 'quartermaster_sela',
+  provisioner_dunmore: 'gatecaptain_brannoc',
+  sergeant_varga: 'scout_yerrin',
+  chaplain_ondrey: 'brother_aldric',
   scout_maren_highwatch: 'scout_maren',
   brother_halven_marsh: 'brother_halven',
   // Maelin is a development-only raid archivist and reuses the established

@@ -3748,6 +3748,18 @@ export interface PortalDef {
   radius: number;
   enterText: string; // flavor line for a -> b
   leaveText: string; // flavor line for b -> a
+  // A crossing toll in copper (src/sim/portal_toll.ts settles it): a traveler
+  // who cannot pay is refused ONCE per approach with `tollText` (the
+  // Entity.portalHoldId latch re-arms when they step out of the trigger) and
+  // never moved; one in combat is refused the same way, so a tolled arch in a
+  // town yard is never a fight exit. Absent or 0: a free passage, the Duskfall
+  // cave, which keeps its walk-in-anytime rule.
+  tollCopper?: number;
+  tollText?: string;
+  // 'waystone': a free-standing arch in open ground (render/waystone_portals.ts
+  // draws it; colliders.ts adds NO rock flanks). Absent: the modeled cave
+  // mouth (render/hollow_gates.ts, flanked by colliders.ts).
+  gate?: 'waystone';
 }
 
 export interface BuildingDef {
@@ -4372,6 +4384,10 @@ export interface Entity extends ClientMirroredEntityFields {
   // Lets a jump clear fences for the whole arc, independent of slope.
   jumping: boolean;
   fallStartY: number;
+  // The tolled portal (PortalDef.id) that last refused this player while they
+  // stood in its trigger: the refusal toast fires once per approach, not
+  // every tick. Cleared by src/sim/portals.ts once they leave the radius.
+  portalHoldId?: string;
   // Seconds of held underwater travel. Ramps the dive speed from its slow
   // opening pace to the cruise across one stroke (see player_motion.ts
   // swimSpeedMult); zero whenever the body is not submerged.
@@ -7050,6 +7066,11 @@ export type SimEvent = { pid?: number } & (
   // Personal and text-free: the client decides ONCE per device (localStorage)
   // to point out the town's twin bell, in case the ride was a misclick.
   | { type: 'ferryBellHome'; pid: number }
+  // A portal toll was paid (src/sim/portal_toll.ts): text-free, the flavor
+  // line rides the crossing's own log event. The server books it as a
+  // 'travel' copper flow (server/tick_event_bookings.ts), since a tick-driven
+  // spend has no command dispatch to be sampled against.
+  | { type: 'portalToll'; pid: number; copper: number }
   // Ferry island arrival (tutorial island): fired every time a ride sets a
   // player down at the Proving Shore arrival (the greeting ferry and the town
   // bell alike). Personal and text-free: the client renders Ferryman Odo's
@@ -7211,7 +7232,8 @@ export const EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS = 4 as const;
 // Static world services use their own namespace above the sequential allocator
 // and the reserved 1_000_000_000/1_000_000_001/1_000_000_002 singleton NPC ids
 // (the Vale Cup groundskeeper, FURY in Eastbrook, and Warmarshal Draven Kole in
-// Highwatch). A singleton NPC takes a reserved id AND `dynamic: true` so the
+// Highwatch; the Last Keep garrison takes 1_000_000_010 upward, see
+// src/sim/last_keep_garrison.ts). A singleton NPC takes a reserved id AND `dynamic: true` so the
 // generic world-init loop skips it: that loop allocates ids by iterating the
 // merged NPC table in insertion order, so a plain insertion would shift the id
 // of every NPC, camp mob and object created after it, which the parity goldens

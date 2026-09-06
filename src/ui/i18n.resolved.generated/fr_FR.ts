@@ -15750,6 +15750,26 @@ export const fr_FR: EnTranslations = {
         "title": "Guetteur des Dunes lointaines",
         "greeting": "Restez baissé. Le son porte étrangement sur le verre, et la porte en contrebas a des oreilles."
       },
+      "waystone_warden_ilse": {
+        "name": "Waystone Warden Ilse",
+        "title": "Keeper of the Wyrmgate",
+        "greeting": "Fifty silver and the Wyrmgate carries you to Highwatch. Cheaper than a drake, dearer than your own two legs."
+      },
+      "provisioner_dunmore": {
+        "name": "Provisioner Dunmore",
+        "title": "Sutler of the Last Keep",
+        "greeting": "Goat's roasted, water's cold, and the trolls have not burned the stores this week. Buy while that holds."
+      },
+      "sergeant_varga": {
+        "name": "Sergeant Varga",
+        "title": "Warden of the Bailey",
+        "greeting": "The garrison that held this keep never came home. We hold it for them now. Mind the breach in the east wall."
+      },
+      "chaplain_ondrey": {
+        "name": "Chaplain Ondrey",
+        "title": "Voice of the Quiet Halls",
+        "greeting": "The Last Spring still runs beside these walls, whatever the Forgefather stole from it. Sit a while. The halls are quiet, not empty."
+      },
       "reeve_ottoline": {
         "name": "Prévôte Ottoline",
         "title": "Prévôte de Lanternmere",
@@ -18368,6 +18388,9 @@ export const fr_FR: EnTranslations = {
           },
           "9": {
             "label": "Sanctuaire du Gravewyrm"
+          },
+          "10": {
+            "label": "Wyrmgate Waystone"
           }
         }
       },

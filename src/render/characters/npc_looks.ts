@@ -1656,6 +1656,78 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
     worn: kit('knight'),
     props: 'none',
   },
+  // The Last Keep garrison (content/drakelands.ts, spawned by
+  // sim/last_keep_garrison.ts). Warden Ilse: the waystone's keeper, violet
+  // trim, a staff to lean on between crossings.
+  waystone_warden_ilse: {
+    app: {
+      gender: 'female',
+      hair: 'braidcrown',
+      ...hair(38, 0.3, 0.25),
+      brows: 'arched',
+      eyeShape: 'sharp',
+      ...eyes(262, 0.45, 0.45),
+      ...skin(26, 0.45, 0.55),
+      mouth: 'neutral',
+      face: face({ jaw: 0.1, cheeks: 0.2 }),
+      body: body({ shoulders: 0.1 }),
+    },
+    worn: kit('mage'),
+    props: 'staff',
+  },
+  // Provisioner Dunmore: the sutler, broad and weathered, sleeves rolled.
+  provisioner_dunmore: {
+    app: {
+      gender: 'male',
+      hair: 'bald',
+      ...hair(24, 0.2, 0.3),
+      beard: 'full',
+      brows: 'bushy',
+      eyeShape: 'droopy',
+      ...eyes(30, 0.4, 0.3),
+      ...skin(22, 0.5, 0.4),
+      mouth: 'smile',
+      face: face({ jaw: 0.3, cheeks: 0.4 }),
+      body: body({ shoulders: 0.2, chest: 0.4 }),
+    },
+    worn: kit('rogue'),
+    props: 'none',
+  },
+  // Sergeant Varga: the bailey's warden, cropped hair, a shield she never sets down.
+  sergeant_varga: {
+    app: {
+      gender: 'female',
+      hair: 'crewcut',
+      ...hair(20, 0.15, 0.2),
+      brows: 'angled',
+      eyeShape: 'narrow',
+      ...eyes(40, 0.35, 0.3),
+      ...skin(24, 0.5, 0.45),
+      mouth: 'frown',
+      face: face({ jaw: 0.35, brow: 0.2 }),
+      body: body({ shoulders: 0.35, chest: 0.2 }),
+    },
+    worn: kit('knight'),
+    props: 'sword_shield',
+  },
+  // Chaplain Ondrey: the Quiet Halls' voice, grey and gentle, a tome under one arm.
+  chaplain_ondrey: {
+    app: {
+      gender: 'male',
+      hair: 'sweptback',
+      ...hair(40, 0.05, 0.7),
+      beard: 'goatee',
+      brows: 'soft',
+      eyeShape: 'round',
+      ...eyes(210, 0.3, 0.5),
+      ...skin(28, 0.4, 0.6),
+      mouth: 'lips',
+      face: face({ jaw: 0.05, chin: 0.2 }),
+      body: body({ shoulders: -0.1 }),
+    },
+    worn: kit('druid'),
+    props: 'tome',
+  },
   // Scout Yerrin, Far-Dune Watcher: keep low; glass carries sound.
   scout_yerrin: {
     app: {

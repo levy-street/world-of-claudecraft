@@ -15750,6 +15750,26 @@ export const pl_PL: EnTranslations = {
         "title": "Obserwator Dalekich Wydm",
         "greeting": "Trzymaj się nisko. Dźwięk niesie się dziwnie od szkła, a brama poniżej ma uszy."
       },
+      "waystone_warden_ilse": {
+        "name": "Waystone Warden Ilse",
+        "title": "Keeper of the Wyrmgate",
+        "greeting": "Fifty silver and the Wyrmgate carries you to Highwatch. Cheaper than a drake, dearer than your own two legs."
+      },
+      "provisioner_dunmore": {
+        "name": "Provisioner Dunmore",
+        "title": "Sutler of the Last Keep",
+        "greeting": "Goat's roasted, water's cold, and the trolls have not burned the stores this week. Buy while that holds."
+      },
+      "sergeant_varga": {
+        "name": "Sergeant Varga",
+        "title": "Warden of the Bailey",
+        "greeting": "The garrison that held this keep never came home. We hold it for them now. Mind the breach in the east wall."
+      },
+      "chaplain_ondrey": {
+        "name": "Chaplain Ondrey",
+        "title": "Voice of the Quiet Halls",
+        "greeting": "The Last Spring still runs beside these walls, whatever the Forgefather stole from it. Sit a while. The halls are quiet, not empty."
+      },
       "reeve_ottoline": {
         "name": "Zarządczyni Ottoline",
         "title": "Zarządczyni Lanternmere",
@@ -18368,6 +18388,9 @@ export const pl_PL: EnTranslations = {
           },
           "9": {
             "label": "Sanktuarium Grobowego Żmija"
+          },
+          "10": {
+            "label": "Wyrmgate Waystone"
           }
         }
       },

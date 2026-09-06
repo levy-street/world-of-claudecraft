@@ -40,6 +40,9 @@ export const COPPER_FLOW_SOURCES = [
   'delve',
   'craft',
   'trade',
+  // Tick-driven travel tolls (the Wyrmgate Waystone), booked from the sim's
+  // portalToll event by server/tick_event_bookings.ts, never by a command.
+  'travel',
   'wager',
   'dev',
   'other',

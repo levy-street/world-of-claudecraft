@@ -19,10 +19,15 @@ import type { SimEvent } from '../src/sim/types';
 // player-visible behavior, and this event is duplicate server-side evidence
 // of a craft the detector already observes through the craft command itself.
 // The some() guard keeps the common no-craft tick allocation-free.
+// portalToll (src/sim/portal_toll.ts) rides the same rule: the crossing's own
+// log line is what the traveler sees; the toll event exists for the server's
+// tick bookings (tick_event_bookings.ts), which run BEFORE this filter.
 export function filterRoutableEvents(events: readonly SimEvent[]): readonly SimEvent[] {
-  return events.some((ev) => ev.type === 'vaultCraftConsume')
-    ? events.filter((ev) => ev.type !== 'vaultCraftConsume')
-    : events;
+  return events.some(isServerOnlyEvent) ? events.filter((ev) => !isServerOnlyEvent(ev)) : events;
+}
+
+function isServerOnlyEvent(ev: SimEvent): boolean {
+  return ev.type === 'vaultCraftConsume' || ev.type === 'portalToll';
 }
 
 // JSON-stringify each event in a batch exactly once. The returned array is

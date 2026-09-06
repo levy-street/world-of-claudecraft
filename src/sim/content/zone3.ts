@@ -40,6 +40,9 @@ export const ZONE3_ZONE: ZoneDef = {
     { x: 55, z: 820, label: 'Wyrmcult Tents', id: 'wyrmcult_tents' },
     { x: -40, z: 830, label: 'Revenant Fields', id: 'revenant_fields' },
     { x: 0, z: 880, label: 'Gravewyrm Sanctum', id: 'gravewyrm_sanctum' },
+    // The Wyrmgate Waystone's Highwatch side (content/drakelands.ts
+    // DRAKELANDS_PORTALS owns the pair).
+    { x: 52, z: 668, label: 'Wyrmgate Waystone', id: 'wyrmgate_waystone' },
   ],
   welcome: 'Captain Thessaly holds the wall at Highwatch - barely.',
 };

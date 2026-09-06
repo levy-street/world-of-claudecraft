@@ -75,6 +75,7 @@ describe('copper flow source classification', () => {
       'other',
       'quest',
       'trade',
+      'travel',
       'vendor',
       'wager',
     ]);

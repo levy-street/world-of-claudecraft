@@ -1,8 +1,10 @@
 // Paired overworld portals: the seamless cave transitions between zone bands
-// that no road connects (the Veiled Hollow). A portal is pure data (PORTALS in
-// data.ts) checked per live player in the tick, right after dungeon door
-// triggers: no entities, no instance slots, and no rng draws, so it runs
-// byte-identically in the offline browser, the server, and the headless env.
+// that no road connects (the Veiled Hollow), and the tolled waystone arches
+// (the Wyrmgate Waystone, content/drakelands.ts). A portal is pure data
+// (PORTALS in data.ts) checked per live player in the tick, right after
+// dungeon door triggers: no entities, no instance slots, and no rng draws, so
+// it runs byte-identically in the offline browser, the server, and the
+// headless env. A toll is settled by portal_toll.ts before any move.
 //
 // The teleport recipe mirrors instances/dungeons.ts enterDungeon: reground,
 // kill the interpolation streak, rebucket, drop target and auto-attack, then
@@ -10,6 +12,7 @@
 
 import { DUNGEON_X_THRESHOLD, PORTALS } from './data';
 import { displacePlayer } from './displacement';
+import { settlePortalToll } from './portal_toll';
 import type { SimContext } from './sim_context';
 import type { Entity, PortalSide } from './types';
 
@@ -33,13 +36,20 @@ export function updatePortalTriggers(ctx: SimContext, p: Entity): void {
   if (p.pos.x > DUNGEON_X_THRESHOLD) return; // instances have their own exits
   for (const portal of PORTALS) {
     const radius = portal.radius > 0 ? portal.radius : PORTAL_TRIGGER_RADIUS;
-    if (dist2dTo(p, portal.a) < radius) {
-      teleport(ctx, p, portal.b, portal.enterText);
-      return;
+    const inA = dist2dTo(p, portal.a) < radius;
+    const inB = !inA && dist2dTo(p, portal.b) < radius;
+    if (!inA && !inB) {
+      // Out of this portal's trigger: a refused traveler's latch re-arms, so
+      // the next approach (with coin, or without) reads fresh.
+      if (p.portalHoldId === portal.id) p.portalHoldId = undefined;
+      continue;
     }
-    if (dist2dTo(p, portal.b) < radius) {
-      teleport(ctx, p, portal.a, portal.leaveText);
-      return;
-    }
+    // The toll (portal_toll.ts) is settled first: an unpaid crossing refuses
+    // once and moves nobody. `return`, not `continue`: the player is inside
+    // THIS portal's trigger, and no two portals overlap.
+    if (!settlePortalToll(ctx, p, portal)) return;
+    if (inA) teleport(ctx, p, portal.b, portal.enterText);
+    else teleport(ctx, p, portal.a, portal.leaveText);
+    return;
   }
 }

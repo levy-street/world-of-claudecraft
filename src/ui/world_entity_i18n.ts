@@ -305,6 +305,11 @@ const NPC_IDS = [
   'gatecaptain_brannoc',
   'quartermaster_sela',
   'scout_yerrin',
+  // The Last Keep garrison (spawned by src/sim/last_keep_garrison.ts)
+  'waystone_warden_ilse',
+  'provisioner_dunmore',
+  'sergeant_varga',
+  'chaplain_ondrey',
   // Lanternmere, the Amberfall
   'reeve_ottoline',
   'waywatcher_sorrel',

@@ -392,7 +392,11 @@ const MONOLITHS: MonolithRow[] = [
     // literal like the noticeboard arm beside it; tests/realm_builder_monument
     // pins the literal to the constant). They land exactly on the pin above,
     // so the ceiling does not move but the slack is now zero.
-    ceiling: 13214,
+    // Lowered 13214 -> 13206 after the world-spanning static dressing list
+    // (Duskfall gates, water flora, Farshore strand, waystone arches) moved
+    // to src/render/static_world_dressing.ts; the renderer keeps one build
+    // call and the attach loop.
+    ceiling: 13206,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -634,7 +638,9 @@ const MONOLITHS: MonolithRow[] = [
     // Down 10604 -> 10587 for the per-surface action-bar profiles: the
     // join read, the per-profile merge and the FIFO write moved to
     // server/hotbar_layout.ts (HotbarLayoutStore). Exact count.
-    ceiling: 10587,
+    // Lowered 10587 -> 10577 after the tick's per-event bookings (unstuck
+    // records, tick-driven copper flows) moved to server/tick_event_bookings.ts.
+    ceiling: 10577,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

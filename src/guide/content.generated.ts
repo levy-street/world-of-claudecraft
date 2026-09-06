@@ -2124,7 +2124,8 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "The Glimmermere",
       "Wyrmcult Tents",
       "Revenant Fields",
-      "Gravewyrm Sanctum"
+      "Gravewyrm Sanctum",
+      "Wyrmgate Waystone"
     ],
     "welcome": "Captain Thessaly holds the wall at Highwatch - barely.",
     "families": [

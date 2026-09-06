@@ -286,6 +286,7 @@ import { canStackInstancePayloads, isMergeableInstancePayload } from './item_ins
 import { meetsLevelRequirement } from './item_level_req';
 import { setItemLocked as setItemLockedCmd } from './item_lock';
 import * as items from './items';
+import { spawnLastKeepGarrison } from './last_keep_garrison';
 import {
   type DeedsLeaderboardPage,
   type DevLeaderboardPage,
@@ -2417,6 +2418,7 @@ export class Sim {
     }
 
     spawnRealmBuilderMonument(this.ctx, this.worldContent.props);
+    spawnLastKeepGarrison(this.ctx, this.worldContent.npcs);
     if (cfg.noPlayer && this.devCommands) this.spawnHealerPracticeDummy();
 
     if (!cfg.noPlayer) {

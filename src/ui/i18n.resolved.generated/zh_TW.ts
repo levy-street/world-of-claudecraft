@@ -15750,6 +15750,26 @@ export const zh_TW: EnTranslations = {
         "title": "遠沙丘守望者",
         "greeting": "壓低身子。聲音在血玻璃上傳得很怪，而下面那道門長著耳朵。"
       },
+      "waystone_warden_ilse": {
+        "name": "路碑守衛伊爾莎",
+        "title": "龍門守護者",
+        "greeting": "五十銀幣，龍門便送你去高望。比騎龍便宜，比你的雙腿金貴。"
+      },
+      "provisioner_dunmore": {
+        "name": "軍需官鄧莫爾",
+        "title": "最後的堡壘隨軍商販",
+        "greeting": "山羊烤好了，水是涼的，巨魔這週還沒燒掉倉庫。趁著還能買，趕緊買吧。"
+      },
+      "sergeant_varga": {
+        "name": "中士瓦爾加",
+        "title": "外院守衛",
+        "greeting": "守過這座堡壘的駐軍再沒回來。如今我們替他們守著。當心東牆的缺口。"
+      },
+      "chaplain_ondrey": {
+        "name": "牧師安德烈",
+        "title": "寂靜廳堂之聲",
+        "greeting": "最後之泉仍在這些牆邊流淌，無論鍛造之父從中偷走了什麼。坐一會兒吧。廳堂寂靜，卻並不空蕩。"
+      },
       "reeve_ottoline": {
         "name": "鎮長奧托琳",
         "title": "燈湖鎮鎮長",
@@ -18368,6 +18388,9 @@ export const zh_TW: EnTranslations = {
           },
           "9": {
             "label": "墓龍聖所"
+          },
+          "10": {
+            "label": "龍門路碑"
           }
         }
       },

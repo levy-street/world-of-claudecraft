@@ -463,6 +463,10 @@ function staticWorldColliders(seed: number): Collider[] {
   // cave (render/hollow_gates.ts); two flank circles and a back circle
   // shape the walk-in so the only way through the rock is the mouth itself.
   for (const portal of PORTALS) {
+    // A waystone arch stands in the open: the walk-in IS the open ground
+    // around it, so no rock flanks (render/waystone_portals.ts draws only
+    // the arch, and a body walks straight through it).
+    if (portal.gate === 'waystone') continue;
     for (const side of [portal.a, portal.b]) {
       const f = Math.atan2(side.landing.x - side.x, side.landing.z - side.z);
       const fx = Math.sin(f);
