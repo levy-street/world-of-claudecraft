@@ -6,8 +6,8 @@
 // game loop's queue-pop observer (server/discord_queue_pops.ts), which the
 // write busts so an opt-in mid-queue is honored on the next tick.
 
-import { getDiscordQueuePings, setDiscordQueuePings } from './discord_queue_pings_db';
 import { bustQueuePingCache } from './discord_queue_ping_cache';
+import { getDiscordQueuePings, setDiscordQueuePings } from './discord_queue_pings_db';
 import { ctxAccountId } from './http/context';
 import { withBody } from './http/middleware/body';
 import { requireAccount } from './http/middleware/require_account';

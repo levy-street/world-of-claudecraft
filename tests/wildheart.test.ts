@@ -58,6 +58,7 @@ const WILDHEART_TEST_WORLD: WorldContent = {
   npcs: {},
   groundObjects: [],
 };
+type DealDamage = Sim['dealDamage'];
 
 function makeSim(seed = 91): Sim {
   return new Sim({ seed, playerClass: 'warrior', noPlayer: true, world: WILDHEART_TEST_WORLD });
@@ -329,7 +330,7 @@ describe('Wildheart Basin dungeon content', () => {
     });
     const taken = (school: string): number => {
       p.hp = p.maxHp;
-      (sim as unknown as { dealDamage: Function }).dealDamage(
+      (sim as unknown as { dealDamage: DealDamage }).dealDamage(
         stalker,
         p,
         20,
@@ -466,7 +467,9 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
     ).toEqual(['wildheart_heroic2']);
     // The mounts must stay group-LESS: folding one into a gear group would make
     // it compete with (and at 0.1% effectively erase) a guaranteed epic.
-    expect(gear.every((e) => ITEMS[e.itemId!]?.kind !== 'mount')).toBe(true);
+    expect(gear.every((e) => e.itemId !== undefined && ITEMS[e.itemId]?.kind !== 'mount')).toBe(
+      true,
+    );
   });
 
   it('carries equal-rate secondary paths to both blue mounts, and to no other mount', () => {
@@ -481,7 +484,8 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
     // blue pays 0.1% wherever it drops, so the basin is never a cheaper route
     // to either mount than Ysolei or Korzul.
     for (const e of mounts) {
-      const quality = ITEMS[e.itemId!]?.quality;
+      if (!e.itemId) throw new Error('mount loot entry lost itemId');
+      const quality = ITEMS[e.itemId]?.quality;
       expect(quality, `${e.itemId} is a rare-tier mount`).toBe('rare');
       expect(e.chance, `${e.itemId} rate`).toBe(0.001);
     }
@@ -534,7 +538,7 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
     p.pos = { x: zulgar.pos.x + 1, y: zulgar.pos.y, z: zulgar.pos.z };
     p.prevPos = { ...p.pos };
     sim.rebucket(p);
-    (sim as unknown as { dealDamage: Function }).dealDamage(
+    (sim as unknown as { dealDamage: DealDamage }).dealDamage(
       p,
       zulgar,
       zulgar.hp + 100,
@@ -634,7 +638,7 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
       .find((e): e is Entity => e?.templateId === 'wildheart_stalker');
     if (!trash) throw new Error('no stalker spawned');
     const p = sim.entities.get(pid) as Entity;
-    (sim as unknown as { dealDamage: Function }).dealDamage(
+    (sim as unknown as { dealDamage: DealDamage }).dealDamage(
       p,
       trash,
       trash.hp + 100,

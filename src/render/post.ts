@@ -11,9 +11,9 @@ import { StaticOpaqueN8AOPass } from './post_n8ao';
 import { OutputGradePass } from './post_output_grade';
 import { resolveAoFullRes } from './post_pixel_budget_core';
 import { postPipelinePlan } from './post_plan_core';
-import { ByteTargetSMAAPass } from './post_smaa';
 import { PostShed } from './post_shed';
 import type { PostShedChain, PostShedRung } from './post_shed_core';
+import { ByteTargetSMAAPass } from './post_smaa';
 import { renderLayerDisabled } from './render_dev_flags';
 
 // Post chain: N8AO (high: half-res Low; ultra+insane: full-res Medium while the

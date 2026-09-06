@@ -1,5 +1,11 @@
 import { GFX_BUCKET_BANDS, type GfxBucketBands, type GfxRuntimeBudget, type GfxTier } from './gfx';
 import {
+  type PostShedChain,
+  postShedFloor,
+  postShedStepDown,
+  postShedStepUp,
+} from './post_shed_core';
+import {
   createTerrainDetailShedState,
   resetTerrainDetailShed,
   type TerrainDetailGfxRequest,
@@ -7,12 +13,6 @@ import {
   terrainDetailShedApplies,
   updateTerrainDetailShed,
 } from './terrain_detail_shed_core';
-import {
-  type PostShedChain,
-  postShedFloor,
-  postShedStepDown,
-  postShedStepUp,
-} from './post_shed_core';
 
 export type RenderBudgetMode = 'disabled' | 'stable' | 'degrading' | 'recovering';
 export type RenderBudgetReason =

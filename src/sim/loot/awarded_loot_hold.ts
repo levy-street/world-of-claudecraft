@@ -81,7 +81,11 @@ export function grantOrHoldAwardedLoot(
   const mob = ctx.entities.get(mobId);
   const meta = ctx.players.get(pid);
   const instance = awardInstanceFor(ctx, itemId, eligibility);
-  if (!mob?.dead || !meta || countFit(meta.inventory, bagPools(meta.bags), itemId, 1, instance) >= 1) {
+  if (
+    !mob?.dead ||
+    !meta ||
+    countFit(meta.inventory, bagPools(meta.bags), itemId, 1, instance) >= 1
+  ) {
     grantAwardedLootItem(ctx, itemId, pid, eligibility);
     return;
   }

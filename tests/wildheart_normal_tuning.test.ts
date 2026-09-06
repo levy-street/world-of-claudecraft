@@ -234,7 +234,9 @@ describe('normal Wildheart Basin ranged floors', () => {
     expect(enterDungeon(sim.ctx, BASIN, pid)).toBe(true);
     const instance = sim.instances.find((c) => c.dungeonId === BASIN && c.partyKey !== null);
     if (!instance) throw new Error('basin instance was not claimed');
-    const player = sim.entities.get(sim.players.get(pid)!.entityId);
+    const playerAccount = sim.players.get(pid);
+    if (!playerAccount) throw new Error('player account missing');
+    const player = sim.entities.get(playerAccount.entityId);
     const hexcaller = instance.mobIds
       .map((id) => sim.entities.get(id))
       .find((e) => e?.templateId === 'wildheart_hexcaller');
@@ -267,7 +269,9 @@ describe('normal Wildheart Basin ranged floors', () => {
     expect(hits.length, 'the caster never landed a hex').toBeGreaterThan(0);
     // Every landed hex clears the ranged floor, and the whole observed band sits
     // far above the unscaled 45-63 the same spell rolls at 1x.
-    const mult = basinTuning().rangedDamageMultiplierByMob!.wildheart_hexcaller;
+    const rangedMultipliers = basinTuning().rangedDamageMultiplierByMob;
+    if (!rangedMultipliers) throw new Error('basin ranged tuning missing');
+    const mult = rangedMultipliers.wildheart_hexcaller;
     expect(Math.min(...hits)).toBeGreaterThanOrEqual(RANGED_FLOOR);
     expect(Math.min(...hits)).toBeGreaterThan(spell.max + 20 * 1.1); // above the 1x CEILING
     expect(Math.max(...hits)).toBeLessThanOrEqual(
