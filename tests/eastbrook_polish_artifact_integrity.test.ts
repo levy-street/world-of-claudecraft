@@ -1063,10 +1063,13 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // renderer bytes and #3844's compositor surface/nameplate/spirit-grade bytes
 // combine in one tree, so the composite matches neither parent. No capture was
 // retaken.
+// Re-minted for the v0.42.0 release candidate renderer merge: the selected
+// renderer changes move the runtimeRender.renderer leaf and the metadata
+// authority follows the swept evidence bytes. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'f1b87993ab9fbae6b88750f8eebfca46dc27d61eadc70917486b1837c0568f95';
+  '7c3a347aa517e62d2c710f9db4ea64fcbf20954def037fa1065bf1e885a30806';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '4d8725cb089beecb52e7843bb4ba13bd3344609a2a4a0b002e610297f4530232';
+  '7f829e00768fb038a658e1862aa1c93f57b652910b2d500b222c1af56b73153d';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2226,6 +2229,8 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // retaken.
     // Re-minted for the v0.42.0 release batch renderer merge: same order, the
     // composite first, then this seal. No capture was retaken.
+    // Re-minted for the v0.42.0 release candidate renderer merge: same order,
+    // the composite first, then this seal. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
@@ -2240,7 +2245,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // capture was retaken.
       // Re-minted for the PR #3844 merge after PR #3841: same order, the
       // composite first, then this seal. No capture was retaken.
-    ).toBe('b1a3a3bc0a778c6ffc9e082a3da82285249cf433573e83ca1a2eaa66d819bf35');
+    ).toBe('6fb022b8669c607a8dbb41b88589ea4ba62fd5ab39fe5e02e7a39bfdd43bb694');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
