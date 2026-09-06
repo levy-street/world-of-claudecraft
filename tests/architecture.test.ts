@@ -757,6 +757,7 @@ const RENDER_PURE_CORES = [
   'src/render/warlock_meteor_fx_core.ts',
   'src/render/weapon_vfx_apply_queue_core.ts',
   'src/render/weapon_vfx_emissive_core.ts',
+  'src/render/zone_dressing_lod_core.ts',
   'src/render/zone_feature_visibility_core.ts',
   'src/render/zone_eviction_core.ts',
   'src/render/zone_prewarm_templates_core.ts',
