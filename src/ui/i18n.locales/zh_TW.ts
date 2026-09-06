@@ -734,7 +734,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.loot.chestTitle': '寶箱',
   'hudChrome.loot.takeLootButton': '拾取戰利品',
   'hudChrome.loot.takeLootTooltip': '收取金幣和掉落的物品。不會用掉採集機會。',
-  'hudChrome.loot.unifiedPressHint': '按一次互動鍵即可同時拾取戰利品並按城鎮專注進行採集。',
+  'hudChrome.loot.unifiedPressHint': '互動鍵只會拾取戰利品。要採集材料，請在此使用「採集」。',
   'hudChrome.loot.bindConfirmTitle': '拾取後綁定',
   'hudChrome.loot.bindConfirmBody':
     '這批戰利品中有一件物品在拾取後將與你綁定。綁定的物品只能在限定時間內交易給共同獲得該掉落的玩家。',
@@ -9416,7 +9416,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.witheredLine': '作物枯萎了。你清理了田畦：{name}。',
   'hudChrome.farming.witheredLineQty': '作物枯萎了。你清理了田畦：{name} x{qty}。',
   'hudChrome.farming.pressTarget.feastOverHarvest':
-    '盛宴和你的作物都在範圍內。互動會優先取用盛宴，而不是田畦；離開盛宴再去收穫。',
+    '盛宴和你的作物都在範圍內。互動會優先取用盛宴，而不是田畦；離開盛宴才能開啟你作物的田畦視窗。',
   'hudChrome.farming.pressTarget.feastOverPlant':
     '盛宴和空田畦都在範圍內。互動會優先取用盛宴，而不是田畦；離開盛宴再去播種。',
   'hudChrome.farming.seedBackLine': '你回收了種子：{name}。',
@@ -9432,7 +9432,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.plantSheet.plant': '種植',
   'hudChrome.farming.plantSheet.sowAria': '播種{name}',
   'hudChrome.farming.plantSheet.empty': '你沒有可以在這塊田裡播種的種子。',
-  'hudChrome.farming.plantSheet.close': '關閉種植面板',
+  'hudChrome.farming.plantSheet.close': '關閉田畦視窗',
   'hudChrome.farming.denied.bed_taken': '你已經在那裡種下了作物。',
   'hudChrome.farming.denied.skill': '你的耕作技能不足以種植該作物。',
   'hudChrome.farming.denied.no_seed': '你沒有該作物的種子。',
@@ -10692,6 +10692,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.stickyTarget': '點擊地面時保留目標',
   'hudChrome.unitFrame.targetOfTargetLabel': '目標的目標',
   'hudChrome.mobile.professions': '專業',
+  'hudChrome.professions.harvestBodyButton': '從屍體採集',
+  'hudChrome.professions.harvestBodyHint': '開啟附近可採集屍體的選項。只有確認選擇後才會採集。',
   'hudChrome.professions.title': '專業',
   'hudChrome.professions.close': '關閉專業',
   'hudChrome.professions.ringAria': '技藝之輪',
@@ -13587,7 +13589,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.professions.promotionBody':
     '最後一步是橙色晉升，而這正是造物契據的全部用途。帶上一件臻至完美的裝備和一份造物契據（銘文師的 125 技能文書），這份副本就會晉升為一件由你親自命名的傳說裝備。這裡沒有任何擲骰：晉升是確定性的，屬性完全不變，變的只是名字和顏色。契據本身可以交易，所以書寫者與佩戴者不必是同一個人；而家族上限多出的那一行依然生效：角色穿戴的兩件之中，傳說品質的大師鍛造裝備同時至多一件。',
   'guide.professions.harvestBodyFamilies':
-    '採集並不止於節點。許多被擊倒的野獸都可以各被採收一次，先到先得，取得獸皮、尖牙、利爪、獠牙、獸角、魚鰓、蛛絲、毒液、布料與獸肉，直接從屍體上與牠的普通戰利品一併取得；按下同一個鍵，兩者一同開啟。當一頭野獸身上帶有不只一種可用部件時，選擇便由你決定：把牠能給的一切盡數取走，或專注於較少的部件，換取你確實取得之物明顯更精細的品級。\n\n在會產出標本的野獸族類身上擲出精良或更高的採收品質，除了普通產出之外，還會額外給予一件署名的完美標本（完美的獸皮、完美的蜘蛛絲、完美的毒液腺、完美的爪或上等肉塊），並在你的功績之書中記下「完美標本」。任何角色都能採收，無需訓練，而你持有的任何採集工具都會計入最上等產出的判定，無論它屬於哪一門行業。',
+    '採集並不止於節點。許多被擊倒的野獸都可以各被採收一次，先到先得，取得獸皮、尖牙、利爪、獠牙、獸角、魚鰓、蛛絲、毒液、布料與獸肉，直接從屍體上與牠的普通戰利品一併取得。互動鍵只會拾取戰利品；採集是另一項選擇，需在戰利品視窗的「採集」一欄中進行。當一頭野獸身上帶有不只一種可用部件時，選擇便由你決定：把牠能給的一切盡數取走，或專注於較少的部件，換取你確實取得之物明顯更精細的品級。\n\n在會產出標本的野獸族類身上擲出精良或更高的採收品質，除了普通產出之外，還會額外給予一件署名的完美標本（完美的獸皮、完美的蜘蛛絲、完美的毒液腺、完美的爪或上等肉塊），並在你的功績之書中記下「完美標本」。任何角色都能採收，無需訓練，而你持有的任何採集工具都會計入最上等產出的判定，無論它屬於哪一門行業。',
   'guide.professions.toolEffectsBody':
     '採集工具上有一個插槽，而填進去的東西就是製作出來的符物。採集者儲囊會讓一次採收的產出多出一個單位；匠人之眼則會提升採上來之物的品級；匠人護符則以同樣的方式多出兩個單位。前兩者是附魔的活計：Eastbrook 工坊之主 Tinker Gizzel 會把它們教給附魔技能達到 25 的附魔師。匠人護符則是工程學的活計，圖樣由掉落取得，需 100 技能製作；三者都在他的工坊製作。\n\n剛插上的符物在普通品質的工具上帶有 20 次充能，工具每高一個稀有度階級就再多 10 次，所以同一枚符物插在史詩級的鎬上就從 50 次起跳。只有當符物確實改變了結果時才會消耗一次充能，對它沒能改善的採收絕不扣減；插槽也可以設定成每次使用前先問過你，讓符物等你說了「使用一次充能」再動。插上一枚新的符物，會以你當下攜帶的工具為準重鑄這個插槽，因此它會填到那把工具所能承載的量，而不是回到先前的某個高點；而一次完全不會造成任何改變的重插，會被擋下來，不會白白吃掉那枚符物。\n\n充能用盡並不會毀掉符物：由工具的持有者為插槽補充，每消耗一份秘法材料補 10 次充能，而它要求哪一種材料，取決於你身上攜帶的工具與這個插槽曾經被填充過的最好工具之間較好的那一個：普通或優秀工具用鈴音之塵，精良工具用鈴音精華，史詩工具用鈴音碎片。把好工具留在銀行裡並不會換來更便宜的補充，只會在同樣的價格下換來更少的次數；想誠實地降到便宜的階級，做法是帶著較差的工具插上一枚新的符物，如此便會就地重鑄插槽。如果插槽的上限高於你目前工具所能填滿的量，補充會停在那把工具的極限，並要你帶上更好的那一把。當你就是簽下這枚符物的製作者時，補充只需一半的材料；若你還專精該符物所屬的行業（採集者儲囊與匠人之眼屬附魔，匠人護符屬工程學），則更少；其他人一律付全額。補充是一次短暫的施法，和這個製作家族的其他動作一樣。',
   'guide.professions.toolEffectsHeading': '工具效果',
@@ -14603,7 +14605,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.q8':
     '離開城鎮還能製作嗎？',
   'guide.profPages.faq.a3':
-    '按一次鍵，兩者一同處理。屍體身上的一切，金幣與掉落物，加上任何可採收的部件，都在同一個視窗中開啟：戰利品照一般的拾取規則走，採收則是專業這一側，直接從屍身上剝下材料。\n\n採收先到先得，而且只有一次：每具屍體恰好只能被採收一次，由最先取得它的人採收，線上模式亦然。你的城鎮專注決定你拿到什麼：站在主據點城鎮裡，你可以把10點專注點數分配到你在意的部件類型上，每個受專注的部件都會擲出更好的品級（每5點提升一階，最多兩階），產量也更多（每1點10%）。未受專注的部件絕不會因此變差。',
+    '這是對同一具屍體的兩個獨立操作。屍體身上的一切，金幣與掉落物，加上任何可採收的部件，都在同一個視窗中開啟，但互動鍵與「拾取戰利品」只會取走普通戰利品，它照一般的拾取規則走。採收則是專業這一側，直接從屍身上剝下材料，只有當你在那個視窗中選擇「採集」時才會發生。\n\n採收先到先得，而且只有一次：每具屍體恰好只能被採收一次，由最先取得它的人採收，線上模式亦然。你的城鎮專注決定你拿到什麼：站在主據點城鎮裡，你可以把10點專注點數分配到你在意的部件類型上，每個受專注的部件都會擲出更好的品級（每5點提升一階，最多兩階），產量也更多（每1點10%）。未受專注的部件絕不會因此變差。',
   'guide.profPages.faq.a4':
     '你撞上了一次橫財。大約每90次採集會觸發一次稀有發現（樹上的遠古心材、礦上的純淨礦脈、草藥上的月光綻放）：它讓產量乘以五倍，為每一個單位署上你的名字，並向全區域播報這項發現。而在一次普通採集中擲出精良或更高的品質，同樣會為收穫署名。\n\n署名材料值得留著，或賣個好價錢：在工作檯上只要持有所需材料的任何一份署名副本，傑作機率就多2個百分點。只是別忘了，它們只能與署名完全相同的副本堆疊，因此會各自佔去一格背包欄位。',
   'guide.profPages.faq.a5':

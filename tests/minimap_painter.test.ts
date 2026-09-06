@@ -718,6 +718,50 @@ describe('minimap_painter: tiny procedural symbols carry identity without hue', 
     ]);
   });
 
+  it('draws a harvest-only corpse as an outlined pelt triangle, not the loot square', () => {
+    const harvest = drawSymbols([{ kind: 'mob-harvest', mx: 20, my: 30 }]);
+    const loot = drawSymbols([{ kind: 'mob-loot', mx: 20, my: 30 }]);
+
+    // Three stroked edges (the fake records the explicit ones; closePath supplies
+    // the last in the real canvas) in the corpse-loot paint, apex up.
+    expect(harvest.segments).toEqual([
+      { fromX: 20, fromY: 26.5, toX: 23.5, toY: 32.45, stroked: true },
+      { fromX: 23.5, fromY: 32.45, toX: 16.5, toY: 32.45, stroked: true },
+    ]);
+    expect(harvest.filledPaths).toEqual([
+      {
+        commands: ['moveTo', 'lineTo', 'lineTo', 'closePath'],
+        fillStyle: 'paint:mobLoot',
+        points: [
+          { x: 20, y: 26.5 },
+          { x: 23.5, y: 32.45 },
+          { x: 16.5, y: 32.45 },
+        ],
+      },
+    ]);
+    expect(harvest.strokedPaths).toEqual([
+      {
+        commands: ['moveTo', 'lineTo', 'lineTo', 'closePath'],
+        strokeStyle: 'paint:outline',
+        lineWidth: 1.25,
+      },
+    ]);
+    // No square at all: silhouette, not hue, is what tells the two apart.
+    expect(harvest.rects.filter((rect) => rect.op === 'stroke')).toEqual([]);
+    expect(loot.rects.filter((rect) => rect.op === 'stroke')).toHaveLength(1);
+    expect(loot.segments).toEqual([]);
+  });
+
+  it('scales the pelt triangle with the compact profile', () => {
+    const harvest = drawSymbols([{ kind: 'mob-harvest', mx: 20, my: 30 }], 'compact');
+    expect(harvest.filledPaths[0]?.points).toEqual([
+      { x: 20, y: 24.75 },
+      { x: 25.25, y: 33.675 },
+      { x: 14.75, y: 33.675 },
+    ]);
+    expect(harvest.strokedPaths[0]?.lineWidth).toBe(1.75);
+  });
+
   it('gives loose loot, calm mobs, aggro mobs, and lootable corpses four silhouettes', () => {
     const looseLoot = drawSymbols([{ kind: 'object-loot', mx: 20, my: 30 }]);
     const calmMob = drawSymbols([{ kind: 'mob', mx: 20, my: 30, aggro: false }]);

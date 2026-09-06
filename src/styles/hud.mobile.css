@@ -5181,6 +5181,12 @@
   body.mobile-touch .vendor-goods-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+  /* The corpse choice can open over the Professions sheet (z 95).
+     Keep it above that sheet even after the shared window manager writes its
+     desktop z band inline. Confirmation dialogs retain their higher layer. */
+  body.mobile-touch #loot-window {
+    z-index: 96 !important;
+  }
   body.mobile-touch .vendor-item,
   body.mobile-touch .bag-item,
   body.mobile-touch .mkt-tab,

@@ -3824,7 +3824,12 @@ export const hudChromeStrings = {
     takeLootButton: 'Take Loot',
     takeLootTooltip: 'Takes the coins and dropped items. Does not use up the harvest.',
     // Footer hint on the corpse loot window, the town-focus hint-line idiom.
-    unifiedPressHint: 'The interact key loots and harvests in one press, using your town focus.',
+    // Intentional gathering PR1: the interact key takes ordinary loot only and
+    // never harvests; components come from the explicit Harvest button. The key
+    // is remappable, so the copy names the action, never a key cap. Existing
+    // locale fills were refreshed in this change under the rewording rule.
+    unifiedPressHint:
+      'The interact key only takes the loot. To gather components, use Harvest here.',
     // The Take Loot confirm shown when the visible loot contains a soulbound
     // item (loot_window_controller.ts): taking it binds it, so the player
     // confirms once before the pickup, the classic bind-on-pickup warning.
@@ -5154,9 +5159,12 @@ export const hudChromeStrings = {
     // tryNearbyInteraction, so an absolute promise would be false whenever one
     // of those is also in reach. The second sentence is the way out, because a
     // notice that only describes a problem is not an affordance.
+    // Intentional gathering PR1: the bed press OPENS the bed window (harvest
+    // mode over my plot), it never harvests, so the way-out clause names the
+    // window. Existing locale fills were refreshed in this change.
     pressTarget: {
       feastOverHarvest:
-        'A feast and your crop are both in reach. Interact takes the feast before the bed; step away from the feast to harvest.',
+        "A feast and your crop are both in reach. Interact takes the feast before the bed; step away from the feast to open your crop's bed window.",
       feastOverPlant:
         'A feast and an empty bed are both in reach. Interact takes the feast before the bed; step away from the feast to plant.',
     },
@@ -5263,7 +5271,10 @@ export const hudChromeStrings = {
       plant: 'Plant',
       sowAria: 'Sow {name}',
       empty: 'You have no seed you can sow at this bed.',
-      close: 'Close the plant sheet',
+      // Intentional gathering PR1: the same window paints harvest mode for a
+      // bed holding my plot, so the close control names the bed window, not
+      // the plant sheet. Existing locale fills were refreshed in this change.
+      close: 'Close the bed window',
     },
     // The husk trade's one line (the knobs phase): names BOTH sides of the
     // trade, what left the bags and what arrived, because the compost grant's
@@ -5461,6 +5472,13 @@ export const hudChromeStrings = {
   professions: {
     title: 'Professions',
     close: 'Close professions',
+    // The corpse examine entry (intentional gathering PR1): the keyboard,
+    // pad and touch route to the corpse choice popup, since Tab targeting
+    // skips dead mobs. The button opens the CHOICE; the popup's own Harvest
+    // control is the only thing that gathers, and the hint says so.
+    harvestBodyButton: 'Harvest a body',
+    harvestBodyHint:
+      'Opens the choice for a body in reach that can still be harvested. Nothing is gathered until you choose.',
     ringAria: 'Craft wheel',
     skillsHeader: 'Craft skills',
     gatheringHeader: 'Gathering',

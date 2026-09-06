@@ -1,24 +1,30 @@
-// The plant sheet window painter (#plant-sheet-window): the window a press on
-// a free garden bed opens (Phase 9b, the bed verbs). The pure model lives in
-// farming_plant_sheet_view.ts; this module only paints it and sends the one
-// verb. Cold on purpose: paint on open, on a seed re-pick, and on a deny FOR
-// THIS BED; no clock, no signature memo, no layout read.
+// The bed window painter (#plant-sheet-window): the window a press on a garden
+// bed opens. Two modes, decided at a fresh open and FROZEN for it: a free bed
+// paints the seed-and-knobs PLANT sheet (Phase 9b); a bed holding my plot
+// paints HARVEST mode (intentional gathering PR1), frozen on that exact
+// planting (bed, crop, plantedAtMs). Pure models in farming_plant_sheet_view.ts;
+// this module paints them and sends the one verb per mode. Cold: paints on
+// open, on a seed re-pick, on a deny for this bed, on a farmReady while in
+// harvest mode, and from the Hud-polled refreshIfChanged when the harvest
+// plot's status moved (paintedStatus is that one memo); no clock, no layout
+// read, no driver of its own.
 //
-// THE SIM'S EVENTS ARE THE FEEDBACK (the husk-trade contract): the Plant
-// control sends IWorldFarming.plantCrop exactly once per activation and the
-// sheet STAYS OPEN. A farmPlanted for THIS bed closes it with the trap's own
-// focus restore (no successor window); a farmDenied FOR THIS BED leaves it
-// open, re-arms the control, and repaints affordability from the live bags
-// (a deny naming another bed, or naming none at all, is somebody else's
-// answer and is ignored: see notifyFarmEvent). The sim's
-// dead/busy gates answer through ctx.error rather than farmDenied (its
-// one-busy-sentence design), so the Hud also forwards every error toast via
-// notifyErrorToast, which re-arms without repainting: an answer arrived, the
-// in-flight belief is spent. Nothing here predicts an outcome.
+// THE SIM'S EVENTS ARE THE FEEDBACK: each control sends exactly once per
+// activation (pendingSend, mirrored onto aria-busy) and the sheet stays open.
+// The answer must name THIS bed AND fit THIS mode: farmPlanted for this bed
+// closes a plant sheet, farmHarvested / farmWithered for this bed close a
+// harvest sheet, farmDenied for this bed re-arms and repaints either. Anything
+// else is somebody else's answer, with one kept exception: a plant sheet's arm
+// also clears on ANY farmPlanted (a Phase 9b rule, pinned by tests). The sim's
+// dead/busy gates answer through ctx.error, so the Hud forwards every error
+// toast via notifyErrorToast, which re-arms without repainting. Nothing here
+// predicts an outcome; the sim revalidates everything.
 
 import { FARM_COMPOST_ITEM_ID, FARM_GROWTH_TONIC_ITEM_ID } from '../../../sim/content/farm_crops';
 import { ITEMS } from '../../../sim/data';
-import type { FarmPlantKnobs } from '../../../sim/professions/farm_projection';
+import type { FarmPlantKnobs, FarmPlotStatus } from '../../../sim/professions/farm_projection';
+import { distToBed } from '../../../sim/professions/farming';
+import { INTERACT_RANGE } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
 import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName } from '../../entity_i18n';
@@ -29,8 +35,13 @@ import { rovingTarget } from '../../roving_index';
 import { svgIcon } from '../../ui_icons';
 import type { FarmEvent } from './farm_event_feedback';
 import {
+  type BedSheetMode,
+  bedSheetMode,
+  buildHarvestSheetView,
   buildPlantSheetView,
-  canOpenPlantSheet,
+  type HarvestSheetView,
+  type HarvestSubject,
+  harvestSubjectOf,
   type PlantSheetKnob,
   type PlantSheetKnobId,
   type PlantSheetLockedRow,
@@ -74,6 +85,20 @@ export interface PlantSheetWindowDeps {
 export class PlantSheetWindow {
   private openerFocus: HTMLElement | null = null;
   private bedId: string | null = null;
+  /** Frozen at the fresh open: the verb never switches under the player. A
+   *  subject that stops fitting (my plot landed under a plant sheet; my plot
+   *  left, or was replaced, under a harvest sheet) closes on the next paint. */
+  private mode: BedSheetMode = 'plant';
+  /** Harvest mode's frozen planting; null in plant mode. */
+  private subject: HarvestSubject | null = null;
+  /** The status the harvest body was last painted with; the refreshIfChanged
+   *  poll compares the live plot against it. Cleared on close and fresh open,
+   *  re-latched by every harvest paint (relocalize included). */
+  private paintedStatus: FarmPlotStatus | null = null;
+  /** Bumped on every fresh open and close. Each painted send control captures
+   *  the value it was built under, so a detached control from an earlier open
+   *  (another bed, or the same bed re-opened on a new planting) sends nothing. */
+  private generation = 0;
   private selectedCropId: string | null = null;
   private choices: Record<PlantSheetKnobId, boolean> = {
     compost: false,
@@ -99,13 +124,15 @@ export class PlantSheetWindow {
     return this.deps.root().style.display === 'flex';
   }
 
+  /** Open the bed window for `bedId`: plant mode for a free bed, harvest mode
+   *  for a bed holding my plot. Opening never sends anything; the generic
+   *  interact press reaches this and no further. */
   open(bedId: string): void {
-    if (!canOpenPlantSheet(bedId, this.deps.world().myFarmPlots)) return;
     const root = this.deps.root();
     const wasOpen = this.isOpen;
     if (wasOpen && this.bedId === bedId) {
-      // A re-press at the SAME bed (key repeat, habit) keeps the player's
-      // picks and any in-flight send; it only refreshes the paint.
+      // A same-bed re-press keeps picks, mode, subject and any in-flight send;
+      // it only repaints (which closes if the subject no longer fits).
       this.paint();
       return;
     }
@@ -119,9 +146,15 @@ export class PlantSheetWindow {
       root.style.display = 'flex';
       this.deps.onVisibilityChange?.();
     }
-    // A fresh bed is a fresh decision: selection and knob picks reset, so a
-    // toggle paid for one bed never silently rides to another.
+    // A fresh bed is a fresh decision: mode, subject, generation, selection and
+    // knob picks reset, so nothing paid or armed for one open rides to another.
+    const plots = this.deps.world().myFarmPlots;
     this.bedId = bedId;
+    this.mode = bedSheetMode(bedId, plots);
+    const plot = plots.find((row) => row.bedId === bedId);
+    this.subject = this.mode === 'harvest' && plot ? harvestSubjectOf(plot) : null;
+    this.paintedStatus = null;
+    this.generation++;
     this.selectedCropId = null;
     this.choices = { compost: false, watch: false, tonic: false };
     this.setPendingSend(false);
@@ -133,6 +166,28 @@ export class PlantSheetWindow {
    *  labels follow the new locale (the cold-window relocalize contract). */
   relocalize(): void {
     if (this.isOpen) this.paint();
+  }
+
+  /** The cold poll for an OPEN HARVEST sheet (the Hud's slow band; plant mode
+   *  is untouched). Online, events and snapshots arrive in separate frames, so
+   *  a farmReady can repaint before the fplot delta that flips the plot and
+   *  leave the control stale; this catches the flip once the snapshot lands.
+   *  Compares the live plot against the last painted status: identical means
+   *  no DOM write; dead, out of reach, plot gone or replaced closes; a status
+   *  move on the same planting repaints once, keeping focus and the send arm. */
+  refreshIfChanged(): void {
+    if (!this.isOpen || this.mode !== 'harvest' || this.bedId === null || !this.subject) return;
+    const world = this.deps.world();
+    if (world.player.dead || !this.bedInReach(this.bedId)) {
+      this.close();
+      return;
+    }
+    const view = buildHarvestSheetView(this.bedId, world.myFarmPlots, this.subject);
+    if (view === null) {
+      this.close();
+      return;
+    }
+    if (view.status !== this.paintedStatus) this.paint();
   }
 
   /** The Hud's error-toast forward. The sim's dead and busy plantCrop gates
@@ -155,40 +210,51 @@ export class PlantSheetWindow {
     root.style.display = 'none';
     this.deps.onVisibilityChange?.();
     this.bedId = null;
+    this.subject = null;
+    this.paintedStatus = null;
+    this.generation++;
     this.setPendingSend(false);
     this.deps.restoreFocus(this.openerFocus);
     this.openerFocus = null;
   }
 
-  /** The Hud's farm-event forward. A farmPlanted for this bed is the success
-   *  answer: close with focus restore (no successor window). ANY farmPlanted
-   *  clears the send arm (the answer arrived; a matched close clears it
-   *  anyway, and an unmatched one must not leave the Plant control dead
-   *  forever). A deny for this bed re-arms the Plant control and repaints
-   *  affordability; every other event is not this window's business.
-   *
-   *  THE DENY MUST NAME THIS BED. Every plantCrop deny arm carries the bedId
-   *  the command named (pinned in tests/farm_deny_bed_correlation.test.ts), so
-   *  a bedId-free farmDenied is provably NOT the answer to this send: it is
-   *  the husk trade or a feast refusal, which have no bed to carry. Accepting
-   *  one used to clear the send arm early, letting a second click leave before
-   *  the real deny landed. The dead and busy gates are the only plant refusals
-   *  with no farmDenied at all, and notifyErrorToast above is their backstop. */
+  /** The Hud's farm-event forward, scoped by MODE and SUBJECT (header). Deny
+   *  correlation: every plantCrop and harvestCrop deny carries the bedId the
+   *  command named (tests/farm_deny_bed_correlation.test.ts), so a bedId-free
+   *  farmDenied (husk trade, feast) is provably not this send's answer and
+   *  never clears the arm. farmReady carries counts only, no bed, so a harvest
+   *  sheet answers it by re-reading its own plot: the same planting flipping
+   *  to ready enables the control in place, with no focus move. */
   notifyFarmEvent(ev: FarmEvent): void {
     if (!this.isOpen || this.bedId === null) return;
-    if (ev.type === 'farmPlanted') {
-      this.setPendingSend(false);
-      if (ev.bedId === this.bedId) this.close();
+    if (this.mode === 'plant') {
+      if (ev.type === 'farmPlanted') {
+        this.setPendingSend(false);
+        if (ev.bedId === this.bedId) this.close();
+      } else if (ev.type === 'farmDenied' && ev.bedId === this.bedId) {
+        this.setPendingSend(false);
+        this.paint();
+      }
       return;
     }
-    if (ev.type === 'farmDenied' && ev.bedId === this.bedId) {
+    if (ev.type === 'farmHarvested' || ev.type === 'farmWithered') {
+      if (ev.bedId !== this.bedId) return;
       this.setPendingSend(false);
+      this.close();
+    } else if (ev.type === 'farmDenied' && ev.bedId === this.bedId) {
+      this.setPendingSend(false);
+      this.paint();
+    } else if (ev.type === 'farmReady') {
       this.paint();
     }
   }
 
   private paint(): void {
     if (!this.isOpen || this.bedId === null) return;
+    if (this.mode === 'harvest') {
+      this.paintHarvest(this.bedId);
+      return;
+    }
     const world = this.deps.world();
     const view = buildPlantSheetView({
       bedId: this.bedId,
@@ -210,14 +276,36 @@ export class PlantSheetWindow {
     for (const knob of view.knobs) {
       if (!knob.affordable) this.choices[knob.id] = false;
     }
+    this.paintFrame(t('hudChrome.farming.plantSheet.title'), this.bodyHtml(view));
+  }
+
+  /** Harvest mode: the frozen planting's produce, its authoritative status, and
+   *  the explicit Harvest control (enabled only for ready or withered). The
+   *  planting leaving the snapshot, or a replacement planting in the bed,
+   *  closes the sheet rather than re-targeting it. */
+  private paintHarvest(bedId: string): void {
+    const view = this.subject
+      ? buildHarvestSheetView(bedId, this.deps.world().myFarmPlots, this.subject)
+      : null;
+    if (view === null) {
+      this.close();
+      return;
+    }
+    this.paintedStatus = view.status;
+    this.paintFrame(t('hudChrome.corpseHarvest.title'), this.harvestBodyHtml(view));
+  }
+
+  /** The window frame (title bar plus body), shared by both modes, with the
+   *  focus carry across the rebuild. */
+  private paintFrame(title: string, body: string): void {
     const root = this.deps.root();
     // A whole repaint destroys the subtree, so the focused control is carried
     // across the innerHTML write (the focus_restore contract).
     const focusKey = captureFocusKey(root);
     root.innerHTML =
-      `<div class="panel-title"><span id="plant-sheet-title">${esc(t('hudChrome.farming.plantSheet.title'))}</span>` +
-      `<button type="button" class="x-btn" data-close data-focus-key="plantSheetClose" aria-label="${esc(t('hudChrome.farming.plantSheet.close'))}" title="${esc(t('hudChrome.farming.plantSheet.close'))}">${svgIcon('close')}</button></div>` +
-      `<div class="ps-body">${this.bodyHtml(view)}</div>`;
+      `<div class="panel-title"><span id="plant-sheet-title">${esc(title)}</span>` +
+      `<button type="button" class="x-btn" data-close data-pad-initial-focus data-focus-key="plantSheetClose" aria-label="${esc(t('hudChrome.farming.plantSheet.close'))}" title="${esc(t('hudChrome.farming.plantSheet.close'))}">${svgIcon('close')}</button></div>` +
+      `<div class="ps-body">${body}</div>`;
     this.wire(root);
     if (focusKey !== null) {
       // findFocusKey, never a selector the key is spliced into. This sheet's
@@ -250,6 +338,9 @@ export class PlantSheetWindow {
   }
 
   private wire(root: HTMLElement): void {
+    // The open this paint belongs to. Each send control re-checks it at click
+    // time, so a detached control from an earlier open sends nothing.
+    const generation = this.generation;
     root.querySelector('[data-close]')?.addEventListener('click', () => this.close());
     const seeds = [...root.querySelectorAll<HTMLElement>('[data-seed-crop]')];
     seeds.forEach((btn, index) => {
@@ -276,7 +367,8 @@ export class PlantSheetWindow {
       });
     }
     root.querySelector('[data-plant]')?.addEventListener('click', () => {
-      if (this.pendingSend || this.bedId === null || this.selectedCropId === null) return;
+      if (generation !== this.generation || this.bedId === null) return;
+      if (this.pendingSend || this.selectedCropId === null) return;
       const knobs: FarmPlantKnobs = {};
       if (this.choices.compost) knobs.compost = true;
       if (this.choices.watch) knobs.watch = true;
@@ -287,6 +379,58 @@ export class PlantSheetWindow {
       // farmPlanted / farmDenied events are the feedback.
       this.deps.world().plantCrop(this.bedId, this.selectedCropId, knobs);
     });
+    root.querySelector('[data-harvest]')?.addEventListener('click', () => this.harvest(generation));
+  }
+
+  /** The ONE harvestCrop send in the client. Revalidates the LIVE world at
+   *  click time: this open is still current, the player is alive, the bed is
+   *  within the sim's own reach, and the bed still holds the FROZEN planting in
+   *  a harvestable status. A failed check sends nothing and repaints (closing
+   *  when the planting is gone or replaced, showing the disabled control when
+   *  it went back to growing). */
+  private harvest(generation: number): void {
+    if (generation !== this.generation || this.mode !== 'harvest' || this.pendingSend) return;
+    const bedId = this.bedId;
+    const subject = this.subject;
+    if (bedId === null || subject === null) return;
+    const world = this.deps.world();
+    if (world.player.dead || !this.bedInReach(bedId)) {
+      this.close();
+      return;
+    }
+    const view = buildHarvestSheetView(bedId, world.myFarmPlots, subject);
+    if (view === null || !view.canHarvest) {
+      this.paint();
+      return;
+    }
+    this.setPendingSend(true);
+    world.harvestCrop(bedId);
+  }
+
+  /** The sim's own reach rule (distToBed against INTERACT_RANGE, inclusive)
+   *  over the static bed geometry; an unknown bed id is out of reach. */
+  private bedInReach(bedId: string): boolean {
+    const world = this.deps.world();
+    for (const patch of world.farmPatches) {
+      for (const bed of patch.beds) {
+        if (bed.id === bedId) return distToBed(world.player.pos, bed) <= INTERACT_RANGE;
+      }
+    }
+    return false;
+  }
+
+  /** The harvest body: the produce name with the authority's status beside it
+   *  (the locked-row shape, so no new CSS), then the Harvest control, described
+   *  by the status so AT hears why a disabled control is disabled. */
+  private harvestBodyHtml(view: HarvestSheetView): string {
+    const statusId = 'plant-sheet-harvest-status';
+    return (
+      `<ul class="ps-list" role="list"><li class="ps-locked">` +
+      `<span class="ps-name">${esc(itemName(view.produceItemId))}</span>` +
+      `<span class="ps-reason" id="${statusId}">${esc(t(view.statusKey))}</span>` +
+      `</li></ul>` +
+      `<button type="button" class="ps-plant" data-harvest data-focus-key="plantSheetHarvest" aria-describedby="${statusId}"${view.canHarvest ? '' : ' disabled'}>${esc(t('hudChrome.corpseHarvest.harvestButton'))}</button>`
+    );
   }
 
   private bodyHtml(view: PlantSheetViewModel): string {

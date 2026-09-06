@@ -1049,11 +1049,21 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     band: 'medium',
     gate: '',
     surface: 'window',
+    // It stopped being close-only when the corpse popup gained a live refresh
+    // (intentional gathering PR1): the chest arm is still a range test that
+    // only closes, but the corpse arm re-reads availability every medium tick
+    // and REPAINTS the body when the advertised set moved, so it now polls
+    // behind a real latch and the row has to name it. The old sentence here
+    // read "no latch field: it is close-only", which stayed green because
+    // guardProblems skips `kind: 'none'` outright: a row can go quietly stale
+    // in exactly this direction, so the fix is a named module guard, never a
+    // reworded exception.
     guard: {
-      kind: 'none',
-      why: 'no latch field: it is close-only, gated on a non-null corpse/chest id plus a range test, and nulling the id disarms it',
+      kind: 'module',
+      module: 'hud/loot/loot_window_controller.ts',
+      proof: 'if (!force && sig === this.corpseSig) return availability;',
     },
-    why: 'closes the loot window when the player walks away from the corpse or chest',
+    why: 'closes the loot window when the player walks away, and repaints the open corpse body when its advertised loot/harvest set changes',
   },
   {
     call: 'this.closeVendor',
@@ -1314,6 +1324,18 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
         'const input = this.buildInput(); const sig = professionsRefreshSig(input); if (sig === this.lastSig) return;',
     },
     why: 'the professions window',
+  },
+  {
+    call: 'this.plantSheetWindow.refreshIfChanged',
+    band: 'slow',
+    gate: '',
+    surface: 'window',
+    guard: {
+      kind: 'module',
+      module: 'hud/professions/farming_plant_sheet_window.ts',
+      proof: 'if (view.status !== this.paintedStatus) this.paint();',
+    },
+    why: 'refreshes the open harvest choice after an event precedes its plot snapshot',
   },
   {
     call: 'this.questDialog.refreshIfChanged',
@@ -1696,7 +1718,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // and the farming affordance row are different calls), and the window
       // delta lands once, so the split below was counted from the merged table
       // rather than carried over from either side.
-    ).toEqual({ window: 46, chrome: 85, none: 17 });
+    ).toEqual({ window: 47, chrome: 85, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1715,7 +1737,11 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // Store ladder-signature row (phase 15) land beside the release's
       // woc_market_window and trade-window rows, less the Vale Cup window,
       // briefing and betting module guards the retirement takes with it.
-      module: 24,
+      // Plant-sheet harvest mode now polls its own status signature, and the
+      // loot window's corpse arm moved OUT of the `none` bucket below into
+      // this one: it gained a corpseSig latch when the popup started
+      // refreshing instead of only closing.
+      module: 26,
       // Phase 20's refreshCharSheetIfChanged and its siblings. Their latches are
       // HUD fields (lastCharSheetSig et al) because the cold char_window painter
       // holds no signature of its own to diff. The release's trade row left this
@@ -1724,7 +1750,8 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // Up to 12 with the crucible vendor's out-of-range close: the same
       // callsite-guarded shape as the copper and heroic vendor closes.
       callsite: 12,
-      none: 4,
+      // Down one: the loot window's proximity row now names a module guard.
+      none: 3,
     });
     // ...and the honest-exception list by NAME, because that is the one that should never
     // grow quietly: every entry is a window this repo knows has no invalidation guard.
@@ -1734,7 +1761,6 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         .sort(),
     ).toEqual([
       'this.lootRolls.update',
-      'this.lootWindow.updateProximity',
       'this.questDialog.updateProximity',
       'this.updateMapWindow',
     ]);
@@ -1773,6 +1799,11 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         'hud.ts: if (sig === this.lastTownFocusSig) return;',
         'hud/woc_trade/woc_trade_controller.ts: if (sig === this.lastTradeSig) return;',
         'hud/delve/lockpick_window.ts: if (lockpickRenderSig(view) !== this.lastSig) this.renderBoard();',
+        // The corpse popup's own latch. `force` is the relocalize arm, which
+        // rebuilds through the same guard past a signature a locale switch
+        // cannot move, so the flag is part of the line the pin looks for.
+        'hud/loot/loot_window_controller.ts: if (!force && sig === this.corpseSig) return availability;',
+        'hud/professions/farming_plant_sheet_window.ts: if (view.status !== this.paintedStatus) this.paint();',
         'hud/quest/quest_dialog_controller.ts: if (this.introHintVisibleFor(npc) !== this.lastIntroHintVisible || gossipRowSig(this.offerableRows(npc)) !== this.lastGossipRowSig) { this.refresh(); }',
         'mailbox_window.ts: if (sig === this.lastSig) return;',
         'market_window.ts: if (sig === this.lastSig) return;',

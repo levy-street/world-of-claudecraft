@@ -2917,7 +2917,7 @@ export const cs_CZ: EnTranslations = {
       "chestTitle": "Truhla",
       "takeLootButton": "Sebrat kořist",
       "takeLootTooltip": "Sebrat veškerou kořist",
-      "unifiedPressHint": "Stiskni pro sebrání",
+      "unifiedPressHint": "Tlačítko interakce sebere jen kořist. Pro sběr součástí použij zde Sklidit.",
       "bindConfirmTitle": "Váže se při sebrání",
       "bindConfirmBody": "Tato kořist obsahuje předmět, který se k tobě po sebrání naváže. Vázaný předmět lze směnit jen s hráči, kteří sdíleli jeho kořist, a to jen po omezenou dobu."
     },
@@ -3674,7 +3674,7 @@ export const cs_CZ: EnTranslations = {
       "witheredLine": "The crop withered. You clear the bed: {name}.",
       "witheredLineQty": "The crop withered. You clear the bed: {name} x{qty}.",
       "pressTarget": {
-        "feastOverHarvest": "A feast and your crop are both in reach. Interact takes the feast before the bed; step away from the feast to harvest.",
+        "feastOverHarvest": "A feast and your crop are both in reach. Interact takes the feast before the bed; step away from the feast to open your crop's bed window.",
         "feastOverPlant": "A feast and an empty bed are both in reach. Interact takes the feast before the bed; step away from the feast to plant."
       },
       "seedBackLine": "You recover seed: {name}.",
@@ -3714,7 +3714,7 @@ export const cs_CZ: EnTranslations = {
         "plant": "Plant",
         "sowAria": "Sow {name}",
         "empty": "You have no seed you can sow at this bed.",
-        "close": "Close the plant sheet"
+        "close": "Close the bed window"
       },
       "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
       "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}.",
@@ -3830,6 +3830,8 @@ export const cs_CZ: EnTranslations = {
     "professions": {
       "title": "Profese",
       "close": "Zavřít profese",
+      "harvestBodyButton": "Harvest a body",
+      "harvestBodyHint": "Opens the choice for a body in reach that can still be harvested. Nothing is gathered until you choose.",
       "ringAria": "Řemeslné kolo",
       "skillsHeader": "Řemeslné dovednosti",
       "gatheringHeader": "Sběr",
@@ -6600,7 +6602,7 @@ export const cs_CZ: EnTranslations = {
       "colHub": "Centrum",
       "colMaster": "Mistr",
       "masterCellFmt": "{name}, {title}",
-      "harvestBodyFamilies": "Sběr nekončí u nalezišť. Mnoho skolených tvorů lze jednou sklidit, kdo dřív přijde, ten dřív bere, na kůže, tesáky, drápy, kly, rohy, žábry, hedvábí, jed, látku a maso, přímo z těla vedle jeho běžné kořisti; jedno stisknutí otevře obojí. Když tvor nese víc než jednu zpracovatelnou složku, volba je na tobě: vezmi si všechno, co může dát, nebo se soustřeď na méně složek a získej měřitelně jemnější jakost toho, co si vezmeš.\n\nHod na vzácnou nebo lepší sklizeň u rodiny s dokonalým exemplářem ti navíc k běžnému výnosu udělí podepsaný dokonalý exemplář (Nepoškozenou kůži, Nedotčené hedvábí, Nedotčenou jedovou žlázu, Nedotčený dráp nebo Prvotřídní kus) a zapíše ti do Knihy skutků Dokonalý exemplář. Sklízet může kdokoli, žádný výcvik není potřeba, a do prémiového ramene se počítá jakýkoli sběračský nástroj, který vlastníš, ať patří k jakémukoli řemeslu.",
+      "harvestBodyFamilies": "Sběr nekončí u nalezišť. Mnoho skolených tvorů lze jednou sklidit, kdo dřív přijde, ten dřív bere, na kůže, tesáky, drápy, kly, rohy, žábry, hedvábí, jed, látku a maso, přímo z těla vedle jeho běžné kořisti. Tlačítko interakce sebere jen kořist; sklizení je vlastní volba, kterou provedeš v části Sklizeň v okně kořisti. Když tvor nese víc než jednu zpracovatelnou složku, volba je na tobě: vezmi si všechno, co může dát, nebo se soustřeď na méně složek a získej měřitelně jemnější jakost toho, co si vezmeš.\n\nHod na vzácnou nebo lepší sklizeň u rodiny s dokonalým exemplářem ti navíc k běžnému výnosu udělí podepsaný dokonalý exemplář (Nepoškozenou kůži, Nedotčené hedvábí, Nedotčenou jedovou žlázu, Nedotčený dráp nebo Prvotřídní kus) a zapíše ti do Knihy skutků Dokonalý exemplář. Sklízet může kdokoli, žádný výcvik není potřeba, a do prémiového ramene se počítá jakýkoli sběračský nástroj, který vlastníš, ať patří k jakémukoli řemeslu.",
       "focusBodyTiers": "Každé větší město drží panel Zaměření města pro přicházející sběrače: postav se ve městě, otevři ho vedle minimapy a rozděl rozpočet 10 bodů zaměření mezi typy složek, na kterých ti záleží. Každých 5 bodů na složce zvýší její úroveň sklizně o jeden stupeň (nejvýš o dva stupně) a každý bod přidá 10 procent k jejímu výnosu; nezaměřené složky nikdy nic nezhorší.\n\nTvé rozdělení sleduje postavu kamkoli jde a lze ho přesměrovat při každé další návštěvě města, tempem, které si zvolíš. Nespěchat je zdarma: přesměrování běží 1 minutu na každý přesunutý bod. Malá platba to zrychlí, 15 sekund na bod plus 5 měďáků a 1 Zvonivý prach na bod, a plná platba to udělá okamžité za 25 měďáků a 5 Zvonivého prachu na bod. Počítají se jen body, které skutečně přesuneš, takže posunout jediný bod je levné, a panel, který otevřeš a zavřeš beze změny, nestojí nic při žádné úrovni platby.",
       "toolEffectsHeading": "Efekty nástrojů",
       "toolEffectsBody": "A gathering tool has a slot in it, and a crafted charm is what goes in. A Gatherer's Cache adds a unit to what a harvest yields; an Artisan's Eye raises the grade of what it pulls up; a Maker's Charm adds two units the same way. The first two are enchanting work: Tinker Gizzel, Master of the Toolworks in Eastbrook, teaches them to enchanters who have reached 25 skill in the craft. The Maker's Charm is engineering work instead, a dropped pattern crafted at 100 skill; all three are made at his toolworks.\n\nA freshly slotted charm carries 20 charges on a common tool and 10 more for every rarity rung above common, so the same charm slotted on an epic pick starts at 50. A charge is spent only when the charm actually changed the outcome, never on a harvest it did not improve, and a slot can be set to ask each use, so the charm waits until you say Use a Charge. Slotting a fresh charm re-mints the slot around the tool you are carrying at that moment, so it fills to what that tool can hold rather than back to some earlier high mark, and a re-slot that would change nothing at all is turned away instead of eating the charm.\n\nRunning out of charges does not destroy the charm: the tool's owner refills the slot, 10 charges for each arcane material spent, and which material it asks for follows the better of the tool you are carrying and the best tool that slot has ever been filled by, Chime Dust for a common or uncommon tool, Chime Essence for a rare one, and a Chime Shard for an epic. Leaving the good tool in the bank does not buy a cheaper refill, only a smaller one at the same price; the honest way down to a cheaper rung is to slot a fresh charm while carrying the lesser tool, which re-mints the slot there. If the slot's ceiling sits above what your current tool can fill, the refill stops where that tool stops and tells you to carry the better one. The refill costs half the materials when you are the crafter who signed the charm, and less again if you are specialized in the charm's own craft, Enchanting for a Cache or an Eye, Engineering for a Maker's Charm; anyone else pays the full rate. A refill is a short cast, like the rest of the craft family."
@@ -6955,7 +6957,7 @@ export const cs_CZ: EnTranslations = {
         "q2": "Zvyšují běžné recepty moji dovednost donekonečna?",
         "a2": "No. Every recipe is scored by how far it sits below your current bracket in that craft, the classic orange, yellow, green, gray reading: full gain at or above your bracket, half one tier below, a quarter two tiers below, and nothing three or more below. Brackets are every 25 skill, so the free skill 0 recipes stop teaching you anything at 75 skill.\n\nThe caps are also lower than the classic 300 you might expect: each of the ten earnable crafts caps at 125, Mining, Logging, and Herbalism cap at 100, and Fishing runs long at 200. Climbing means moving up to recipes at your own bracket, not grinding the cheapest one.",
         "q3": "Jaký je rozdíl mezi sběrem kořisti a sklizením z těla?",
-        "a3": "Jedno stisknutí pokryje obojí. Vše, co tělo drží, mince a kořist plus jakékoli skliditelné součásti, se otevírá ve stejném okně: sběr kořisti se řídí normálními pravidly a sklizení je stranou profese, která strhuje materiály ze samotné mrtvoly.\n\nSklizení je první přijde první bere, pro jednoho hráče: každé tělo lze sklidit přesně jednou, tím, kdo si ho nárokuje jako první, online nevyjímaje. Tvoje Střediště zaměření určuje, co dostaneš: zatímco stojíš v uzlovém centru města, můžeš rozložit 10 bodů zaměření na typy složek, o které stojíš, a každá zaměřená složka hází za lepší stupeň (každých 5 bodů ji posune o krok výše, nejvýše o dva) a dává víc (10 procent za bod). Nezaměřené složky se nikdy nezhorší.",
+        "a3": "Jsou to dvě samostatné činnosti nad týmž tělem. Vše, co tělo drží, mince a kořist plus jakékoli skliditelné součásti, se otevírá ve stejném okně, ale tlačítko interakce a Sebrat kořist vezmou jen běžnou kořist, která se řídí normálními pravidly kořisti. Sklizení je stranou profese, která strhuje materiály ze samotné mrtvoly, a nastane teprve tehdy, když v tom okně zvolíš Sklidit.\n\nSklizení je první přijde první bere, pro jednoho hráče: každé tělo lze sklidit přesně jednou, tím, kdo si ho nárokuje jako první, online nevyjímaje. Tvoje Střediště zaměření určuje, co dostaneš: zatímco stojíš v uzlovém centru města, můžeš rozložit 10 bodů zaměření na typy složek, o které stojíš, a každá zaměřená složka hází za lepší stupeň (každých 5 bodů ji posune o krok výše, nejvýše o dva) a dává víc (10 procent za bod). Nezaměřené složky se nikdy nezhorší.",
         "q4": "Proč je moje Železná kůra podepsaná?",
         "a4": "Narazil jsi na nečekaný nález. Zhruba 1 sklizeň z 90 spustí vzácný sběratelský nález (prastaré jádrové dřevo na stromě, nedotčená žíla v rudě, měsíční květ mezi bylinami): pětinásobí výnos, podepíše každou jednotku tvým jménem a ohlásí nález celé zóně. Podpis přinese i vzácný nebo lepší hod na kvalitu při obyčejné sklizni.\n\nPodepsané materiály stojí za to si nechat nebo draze prodat: držení jakékoli podepsané kopie potřebné suroviny u pracovního stolu přidá 2 procentní body k šanci na mistrovské dílo. Jen pamatuj, že se skládají pouze se shodně podepsanými kopiemi, takže si drží vlastní místo v brašně.",
         "q5": "Jak zruším vazbu zakázkového kusu a co to stojí?",

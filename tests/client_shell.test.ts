@@ -2858,14 +2858,16 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain('stopAutorunForInteraction(\n      tryNearbyInteraction(');
     // Open-gate flip: the trailing (online === null) override is gone,
     // so the helpers default harvestStateReliable = true (trusting the hcb
-    // corpse-claim mirror online). The R40 confirm gate now trails the
-    // nothing-to-interact string, with harvestStateReliable still an
-    // explicit `undefined` (the default), never a live override.
-    // preferNpcId trails the confirm gate: the pad names the npc the player
-    // SELECTED, so a talk press cannot answer whoever happens to stand closer.
+    // corpse-claim mirror online); it stays an explicit `undefined` (the
+    // default), never a live override. Intentional gathering: the generic
+    // press takes no node list, tool gate, or R40 confirm gate any more (it
+    // never gathers; those stay on the explicit node/tool entry points).
+    // preferNpcId trails: the pad names the npc the player SELECTED, so a
+    // talk press cannot answer whoever happens to stand closer.
     expect(mainTs).toContain(
-      "t('errors.nothingInteract'),\n        undefined,\n        gatherEffectConfirm,\n        preferNpcId,\n      ),",
+      "t('errors.nothingInteract'),\n        undefined,\n        preferNpcId,\n      ),",
     );
+    expect(mainTs).not.toContain('GATHER_NODES,\n        (node) => gatherNodeToolGateFor');
     // The escort away line sits immediately before it (escort_interact.ts): an
     // escort run has no other client entry point, so an unwired argument here
     // would silently make those quests uncompletable again.

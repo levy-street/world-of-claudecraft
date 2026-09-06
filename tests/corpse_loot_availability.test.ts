@@ -35,6 +35,19 @@ describe('corpseLootAvailability', () => {
     expect(result.canOpen).toBe(false);
   });
 
+  it('does not advertise an exhausted personal slot as ordinary loot', () => {
+    const result = corpseLootAvailability(
+      corpse({
+        templateId: 'forest_wolf',
+        loot: { copper: 0, items: [{ itemId: 'wolf_fang', count: 0, personalFor: [1] }] },
+      }),
+      1,
+    );
+    expect(result.visibleItems).toEqual([]);
+    expect(result.hasLoot).toBe(false);
+    expect(result.harvestable).toBe(true);
+  });
+
   it('includes personal loot assigned to the local player', () => {
     const result = corpseLootAvailability(
       corpse({

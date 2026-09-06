@@ -25,6 +25,7 @@ import type { FarmEvent } from '../src/ui/hud/professions/farm_event_feedback';
 import { PlantSheetWindow } from '../src/ui/hud/professions/farming_plant_sheet_window';
 import { bindPointerBlur, POINTER_FOCUS_PARK_SELECTOR } from '../src/ui/pointer_blur';
 import type { IWorld } from '../src/world_api';
+import type { FarmPatchDef } from '../src/world_api/farming';
 import { stripComments } from './helpers/strip_comments';
 
 // happy-dom rewrites import.meta.url to an http scheme, so the repo root
@@ -46,6 +47,24 @@ class StubWorld {
   myFarmPlots: FarmPlotView[] = [];
   farmingSkill = TIER2_SKILL;
   plantCrop = vi.fn();
+  // The harvest-mode arm (intentional gathering PR1): the explicit Harvest
+  // control revalidates the player, the bed's reach and the live plot before
+  // it sends, so the stub carries a player and the static bed geometry.
+  harvestCrop = vi.fn();
+  player = { pos: { x: 2, y: 0, z: 0 }, dead: false };
+  farmPatches: FarmPatchDef[] = [
+    {
+      id: 'patch_test',
+      zoneId: 'eastbrook_vale',
+      tier: 1,
+      x: 2,
+      z: 0,
+      beds: [
+        { id: BED, x: 2, z: 0 },
+        { id: 'bed_eastbrook_2', x: 7, z: 0 },
+      ],
+    },
+  ];
   get professionsState() {
     return { skills: [{ professionId: 'farming', skill: this.farmingSkill, maxSkill: 100 }] };
   }
@@ -256,7 +275,7 @@ describe('plant sheet window: paint', () => {
     );
   });
 
-  it('refuses to open at a bed the caller already grows in (the canOpen guard)', () => {
+  it('opens in HARVEST mode at a bed the caller already grows in, never the seed list', () => {
     world.myFarmPlots = [
       {
         bedId: BED,
@@ -272,8 +291,444 @@ describe('plant sheet window: paint', () => {
     ];
     const win = makeWindow();
     win.open(BED);
+    expect(win.isOpen).toBe(true);
+    expect(root.querySelector('[data-plant]')).toBeNull();
+    expect(root.querySelector('[data-seed-crop]')).toBeNull();
+    expect(root.querySelector('[data-harvest]')).not.toBeNull();
+  });
+});
+
+// Intentional gathering PR1: the sheet is the bed window. A bed holding MY plot
+// opens in harvest mode, where the ONE explicit Harvest control is the only
+// thing that ever sends IWorldFarming.harvestCrop. The generic interact press
+// only OPENS this window; it never sends. Every send revalidates the live
+// world at click time (alive, in reach, the same bed still holds my plot, and
+// that plot is ready or withered) so a stale open can never harvest a bed or
+// a crop the player did not look at.
+describe('plant sheet window: harvest mode', () => {
+  const myPlot = (status: FarmPlotView['status'], bedId = BED): FarmPlotView => ({
+    bedId,
+    cropId: WHEAT.id,
+    plantedAtMs: 0,
+    readyAtMs: 1000,
+    compost: false,
+    watch: false,
+    tonic: false,
+    notified: false,
+    status,
+  });
+  const harvestBtn = (): HTMLButtonElement | null =>
+    root.querySelector<HTMLButtonElement>('[data-harvest]');
+  const harvested = (bedId: string): FarmEvent =>
+    ({
+      type: 'farmHarvested',
+      pid: 1,
+      bedId,
+      cropId: WHEAT.id,
+      itemId: WHEAT.produceItemId,
+      count: 2,
+    }) as FarmEvent;
+  const withered = (bedId: string): FarmEvent =>
+    ({ type: 'farmWithered', pid: 1, bedId, cropId: WHEAT.id, count: 1 }) as FarmEvent;
+
+  it('paints the crop name, the authoritative status, and an enabled Harvest for a ready plot', () => {
+    world.myFarmPlots = [myPlot('ready')];
+    makeWindow().open(BED);
+    expect(root.querySelector('#plant-sheet-title')?.textContent).toBe('Harvest');
+    expect(root.querySelector('.ps-name')?.textContent).toBe('Vale Wheat');
+    expect(root.querySelector('.ps-reason')?.textContent).toBe('Ready to harvest');
+    expect(harvestBtn()?.textContent).toBe('Harvest');
+    expect(harvestBtn()?.disabled).toBe(false);
+    // Fresh open lands focus on Close, never on the destructive control.
+    expect(document.activeElement).toBe(root.querySelector('[data-close]'));
+    expect(world.harvestCrop).not.toHaveBeenCalled();
+  });
+
+  it('a growing plot shows the still-growing line and a DISABLED Harvest that never sends', () => {
+    world.myFarmPlots = [myPlot('growing')];
+    makeWindow().open(BED);
+    expect(root.querySelector('.ps-reason')?.textContent).toBe('That crop is still growing.');
+    expect(harvestBtn()?.disabled).toBe(true);
+    harvestBtn()?.click();
+    expect(world.harvestCrop).not.toHaveBeenCalled();
+  });
+
+  it('a withered plot offers Harvest (clearing the bed) with the Withered line', () => {
+    world.myFarmPlots = [myPlot('withered')];
+    makeWindow().open(BED);
+    expect(root.querySelector('.ps-reason')?.textContent).toBe('Withered');
+    expect(harvestBtn()?.disabled).toBe(false);
+    harvestBtn()?.click();
+    expect(world.harvestCrop).toHaveBeenCalledWith(BED);
+  });
+
+  it('the explicit Harvest sends exactly once, arms aria-busy, and a same-bed farmHarvested closes', () => {
+    const opener = document.createElement('button');
+    document.body.appendChild(opener);
+    world.myFarmPlots = [myPlot('ready')];
+    const win = makeWindow(() => opener);
+    win.open(BED);
+    harvestBtn()?.click();
+    harvestBtn()?.click();
+    expect(world.harvestCrop).toHaveBeenCalledTimes(1);
+    expect(world.harvestCrop).toHaveBeenCalledWith(BED);
+    expect(root.getAttribute('aria-busy')).toBe('true');
+    expect(win.isOpen).toBe(true);
+    // Another bed's harvest is not this send's answer: it must not close.
+    win.notifyFarmEvent(harvested('bed_eastbrook_2'));
+    expect(win.isOpen).toBe(true);
+    win.notifyFarmEvent(harvested(BED));
     expect(win.isOpen).toBe(false);
+    expect(restoredTo).toBe(opener);
+    expect(root.getAttribute('aria-busy')).toBe('false');
+  });
+
+  it('a same-bed farmWithered is the other success answer and closes too', () => {
+    world.myFarmPlots = [myPlot('withered')];
+    const win = makeWindow();
+    win.open(BED);
+    harvestBtn()?.click();
+    win.notifyFarmEvent(withered(BED));
+    expect(win.isOpen).toBe(false);
+  });
+
+  it('a repeated interact press at the same bed repaints without sending and keeps the send arm', () => {
+    world.myFarmPlots = [myPlot('ready')];
+    const win = makeWindow();
+    win.open(BED);
+    harvestBtn()?.click();
+    expect(world.harvestCrop).toHaveBeenCalledTimes(1);
+    win.open(BED);
+    win.open(BED);
+    expect(world.harvestCrop).toHaveBeenCalledTimes(1);
+    expect(root.getAttribute('aria-busy')).toBe('true');
+    // Still armed: a click after the re-press does not double-send.
+    harvestBtn()?.click();
+    expect(world.harvestCrop).toHaveBeenCalledTimes(1);
+    expect(closeOthersSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('a deny naming this bed re-arms Harvest and repaints; a retry sends again', () => {
+    world.myFarmPlots = [myPlot('ready')];
+    const win = makeWindow();
+    win.open(BED);
+    harvestBtn()?.click();
+    // The sim refused (a full-bag family answer or any other reason naming
+    // this bed): the send is spent, the control comes back.
+    win.notifyFarmEvent({ type: 'farmDenied', pid: 1, reason: 'range', bedId: BED } as FarmEvent);
+    expect(root.getAttribute('aria-busy')).toBe('false');
+    harvestBtn()?.click();
+    expect(world.harvestCrop).toHaveBeenCalledTimes(2);
+  });
+
+  it('a deny naming ANOTHER bed, or none, leaves this send armed', () => {
+    world.myFarmPlots = [myPlot('ready')];
+    const win = makeWindow();
+    win.open(BED);
+    harvestBtn()?.click();
+    win.notifyFarmEvent(denied('bed_eastbrook_2'));
+    win.notifyFarmEvent({ type: 'farmDenied', pid: 1, reason: 'no_husks' } as FarmEvent);
+    harvestBtn()?.click();
+    expect(world.harvestCrop).toHaveBeenCalledTimes(1);
+  });
+
+  it('an error toast (the dead/busy gate) re-arms Harvest without repainting', () => {
+    world.myFarmPlots = [myPlot('ready')];
+    const win = makeWindow();
+    win.open(BED);
+    harvestBtn()?.click();
+    root.querySelector('#plant-sheet-title')?.setAttribute('data-qa-sentinel', '1');
+    win.notifyErrorToast();
+    expect(root.querySelector('#plant-sheet-title')?.getAttribute('data-qa-sentinel')).toBe('1');
+    harvestBtn()?.click();
+    expect(world.harvestCrop).toHaveBeenCalledTimes(2);
+  });
+
+  it('never sends for a dead player: the click revalidates and closes the sheet', () => {
+    world.myFarmPlots = [myPlot('ready')];
+    const win = makeWindow();
+    win.open(BED);
+    world.player.dead = true;
+    harvestBtn()?.click();
+    expect(world.harvestCrop).not.toHaveBeenCalled();
+    expect(win.isOpen).toBe(false);
+  });
+
+  it('never sends from out of reach: the click revalidates the bed distance and closes', () => {
+    world.myFarmPlots = [myPlot('ready')];
+    const win = makeWindow();
+    win.open(BED);
+    world.player.pos = { x: 40, y: 0, z: 0 };
+    harvestBtn()?.click();
+    expect(world.harvestCrop).not.toHaveBeenCalled();
+    expect(win.isOpen).toBe(false);
+  });
+
+  it('never sends once the plot left the snapshot (harvested elsewhere, or gone): closes instead', () => {
+    world.myFarmPlots = [myPlot('ready')];
+    const win = makeWindow();
+    win.open(BED);
+    world.myFarmPlots = [];
+    harvestBtn()?.click();
+    expect(world.harvestCrop).not.toHaveBeenCalled();
+    expect(win.isOpen).toBe(false);
+  });
+
+  it('never sends when the snapshot flipped the plot back to growing: repaints disabled', () => {
+    world.myFarmPlots = [myPlot('ready')];
+    const win = makeWindow();
+    win.open(BED);
+    world.myFarmPlots = [myPlot('growing')];
+    harvestBtn()?.click();
+    expect(world.harvestCrop).not.toHaveBeenCalled();
+    expect(win.isOpen).toBe(true);
+    expect(harvestBtn()?.disabled).toBe(true);
+  });
+
+  it('a stale Harvest never acts on a replacement crop or bed: the send names only the opened bed', () => {
+    world.myFarmPlots = [myPlot('ready')];
+    const win = makeWindow();
+    win.open(BED);
+    // The player moved on and opened another bed: the first bed's detached
+    // control must neither send for its bed nor for the new one.
+    const stale = harvestBtn();
+    world.myFarmPlots = [myPlot('ready'), myPlot('ready', 'bed_eastbrook_2')];
+    world.player.pos = { x: 7, y: 0, z: 0 };
+    win.open('bed_eastbrook_2');
+    stale?.click();
+    expect(world.harvestCrop).not.toHaveBeenCalled();
+    harvestBtn()?.click();
+    expect(world.harvestCrop).toHaveBeenCalledTimes(1);
+    expect(world.harvestCrop).toHaveBeenCalledWith('bed_eastbrook_2');
+  });
+
+  it('a REPLACEMENT plot in the same bed (same crop, new planting) closes on the re-press and is never harvested', () => {
+    world.myFarmPlots = [myPlot('ready')];
+    const win = makeWindow();
+    win.open(BED);
+    const stale = harvestBtn();
+    // The snapshot now shows a NEW planting of the same crop in the same bed
+    // (harvested and re-sown elsewhere): not the subject the player opened.
+    world.myFarmPlots = [{ ...myPlot('ready'), plantedAtMs: 9000 }];
+    stale?.click();
+    expect(world.harvestCrop).not.toHaveBeenCalled();
+    expect(win.isOpen).toBe(false);
+    // A same-bed re-press with the sheet still up would close the same way.
+    win.open(BED);
+    expect(win.isOpen).toBe(true);
+    world.myFarmPlots = [{ ...myPlot('ready'), plantedAtMs: 12000 }];
+    win.open(BED);
+    expect(win.isOpen).toBe(false);
+    expect(world.harvestCrop).not.toHaveBeenCalled();
+  });
+
+  it('a different crop planted in the same bed is refused the same way', () => {
+    world.myFarmPlots = [myPlot('ready')];
+    const win = makeWindow();
+    win.open(BED);
+    world.myFarmPlots = [{ ...myPlot('ready'), cropId: CARROT.id }];
+    harvestBtn()?.click();
+    expect(world.harvestCrop).not.toHaveBeenCalled();
+    expect(win.isOpen).toBe(false);
+  });
+
+  it('a detached Harvest from a CLOSED sheet never dispatches after a fresh same-bed open', () => {
+    // Close, then re-open the SAME bed on a new planting: the old control's
+    // open is over. Only the live control (this open's generation) may send.
+    world.myFarmPlots = [myPlot('ready')];
+    const win = makeWindow();
+    win.open(BED);
+    const stale = harvestBtn();
+    win.close();
+    world.myFarmPlots = [{ ...myPlot('ready'), plantedAtMs: 9000 }];
+    win.open(BED);
+    stale?.click();
+    expect(world.harvestCrop).not.toHaveBeenCalled();
+    expect(win.isOpen).toBe(true);
+    harvestBtn()?.click();
+    expect(world.harvestCrop).toHaveBeenCalledTimes(1);
+    expect(world.harvestCrop).toHaveBeenCalledWith(BED);
+  });
+
+  it('a live farmReady repaints an open harvest sheet: Harvest enables without a re-press or a focus move', () => {
+    world.myFarmPlots = [myPlot('growing')];
+    const win = makeWindow();
+    win.open(BED);
+    expect(harvestBtn()?.disabled).toBe(true);
+    expect(document.activeElement).toBe(root.querySelector('[data-close]'));
+    // The authority flipped the SAME planting to ready and said so.
+    world.myFarmPlots = [myPlot('ready')];
+    win.notifyFarmEvent({ type: 'farmReady', pid: 1, ready: 1 } as FarmEvent);
+    expect(harvestBtn()?.disabled).toBe(false);
+    expect(root.querySelector('.ps-reason')?.textContent).toBe('Ready to harvest');
+    // Focus stays where it was (Close); nothing lands on the destructive control.
+    expect(document.activeElement).toBe(root.querySelector('[data-close]'));
+    expect(world.harvestCrop).not.toHaveBeenCalled();
+  });
+
+  it('event-first: farmReady before its fplot delta leaves the control stale until refreshIfChanged sees the status move', () => {
+    // Online, events and snapshots arrive in separate frames: the farmReady is
+    // applied before the fplot delta that flips the plot. The event-driven
+    // repaint therefore still paints growing; the cold refresh the Hud polls
+    // picks the flip up once the snapshot lands, with no re-press.
+    world.myFarmPlots = [myPlot('growing')];
+    const win = makeWindow();
+    win.open(BED);
+    win.notifyFarmEvent({ type: 'farmReady', pid: 1, ready: 1 } as FarmEvent);
+    expect(harvestBtn()?.disabled).toBe(true);
+    // Snapshot unchanged: the refresh writes nothing (node identity holds).
+    const before = harvestBtn();
+    win.refreshIfChanged();
+    win.refreshIfChanged();
+    expect(harvestBtn()).toBe(before);
+    // The fplot delta lands, then the poll.
+    world.myFarmPlots = [myPlot('ready')];
+    win.refreshIfChanged();
+    expect(harvestBtn()?.disabled).toBe(false);
+    expect(root.querySelector('.ps-reason')?.textContent).toBe('Ready to harvest');
+    // Disabled-to-ready never moves focus onto the destructive control.
+    expect(document.activeElement).toBe(root.querySelector('[data-close]'));
+    expect(world.harvestCrop).not.toHaveBeenCalled();
+    // Latched: an unchanged repeat writes nothing again.
+    const after = harvestBtn();
+    win.refreshIfChanged();
+    expect(harvestBtn()).toBe(after);
+  });
+
+  it('refreshIfChanged closes on death, out of reach, a gone plot, or a replacement planting', () => {
+    const cases: Array<(w: StubWorld) => void> = [
+      (w) => {
+        w.player.dead = true;
+      },
+      (w) => {
+        w.player.pos = { x: 40, y: 0, z: 0 };
+      },
+      (w) => {
+        w.myFarmPlots = [];
+      },
+      (w) => {
+        w.myFarmPlots = [{ ...myPlot('ready'), plantedAtMs: 9000 }];
+      },
+    ];
+    for (const mutate of cases) {
+      world = new StubWorld();
+      world.myFarmPlots = [myPlot('ready')];
+      const win = makeWindow();
+      win.open(BED);
+      mutate(world);
+      win.refreshIfChanged();
+      expect(win.isOpen).toBe(false);
+    }
+    expect(world.harvestCrop).not.toHaveBeenCalled();
+  });
+
+  it('refreshIfChanged keeps a pending Harvest armed across a status repaint', () => {
+    world.myFarmPlots = [myPlot('ready')];
+    const win = makeWindow();
+    win.open(BED);
+    harvestBtn()?.click();
+    expect(root.getAttribute('aria-busy')).toBe('true');
+    // The authority reports the same planting withered (a status move, same
+    // subject): repaint once, arm still held, no second send.
+    world.myFarmPlots = [myPlot('withered')];
+    win.refreshIfChanged();
+    expect(root.querySelector('.ps-reason')?.textContent).toBe('Withered');
+    expect(root.getAttribute('aria-busy')).toBe('true');
+    harvestBtn()?.click();
+    expect(world.harvestCrop).toHaveBeenCalledTimes(1);
+  });
+
+  it('refreshIfChanged is a no-op for a closed sheet and for a PLANT sheet', () => {
+    const win = makeWindow();
+    win.refreshIfChanged();
     expect(root.innerHTML).toBe('');
+    win.open(BED);
+    root.querySelector('#plant-sheet-title')?.setAttribute('data-qa-sentinel', '1');
+    world.myFarmPlots = [myPlot('growing', 'bed_eastbrook_2')];
+    win.refreshIfChanged();
+    expect(root.querySelector('#plant-sheet-title')?.getAttribute('data-qa-sentinel')).toBe('1');
+    expect(win.isOpen).toBe(true);
+  });
+
+  it('relocalize re-latches the painted status so the next refresh writes nothing', () => {
+    world.myFarmPlots = [myPlot('ready')];
+    const win = makeWindow();
+    win.open(BED);
+    win.relocalize();
+    const node = harvestBtn();
+    win.refreshIfChanged();
+    expect(harvestBtn()).toBe(node);
+  });
+
+  it('a farmReady under a PLANT sheet does not repaint it', () => {
+    const win = makeWindow();
+    win.open(BED);
+    root.querySelector('#plant-sheet-title')?.setAttribute('data-qa-sentinel', '1');
+    win.notifyFarmEvent({ type: 'farmReady', pid: 1, ready: 1 } as FarmEvent);
+    expect(root.querySelector('#plant-sheet-title')?.getAttribute('data-qa-sentinel')).toBe('1');
+  });
+
+  it("another bed's harvest, or any planting answer, never clears a pending HARVEST send", () => {
+    // Scoped by subject AND mode: these are somebody else's answers. The
+    // harvest arm is cleared only by this bed's farmHarvested / farmWithered /
+    // farmDenied or the error-toast forward.
+    world.myFarmPlots = [myPlot('ready')];
+    const win = makeWindow();
+    win.open(BED);
+    harvestBtn()?.click();
+    win.notifyFarmEvent(harvested('bed_eastbrook_2'));
+    win.notifyFarmEvent(withered('bed_eastbrook_2'));
+    win.notifyFarmEvent(planted(BED));
+    win.notifyFarmEvent(planted('bed_eastbrook_2'));
+    expect(root.getAttribute('aria-busy')).toBe('true');
+    expect(win.isOpen).toBe(true);
+    harvestBtn()?.click();
+    expect(world.harvestCrop).toHaveBeenCalledTimes(1);
+  });
+
+  it('a harvest answer never clears a pending PLANT send (crossing regression)', () => {
+    const win = makeWindow();
+    win.open(BED);
+    root.querySelector<HTMLElement>('[data-plant]')?.click();
+    win.notifyFarmEvent(harvested('bed_eastbrook_2'));
+    win.notifyFarmEvent(withered(BED));
+    expect(root.getAttribute('aria-busy')).toBe('true');
+    root.querySelector<HTMLElement>('[data-plant]')?.click();
+    expect(world.plantCrop).toHaveBeenCalledTimes(1);
+  });
+
+  it('the mode is frozen at open: a same-bed re-press after the plot vanished closes rather than offering seeds', () => {
+    world.myFarmPlots = [myPlot('ready')];
+    const win = makeWindow();
+    win.open(BED);
+    world.myFarmPlots = [];
+    win.open(BED);
+    expect(win.isOpen).toBe(false);
+    // A FRESH open after that is a new decision and offers the seed list.
+    win.open(BED);
+    expect(win.isOpen).toBe(true);
+    expect(root.querySelector('[data-plant]')).not.toBeNull();
+    expect(root.querySelector('[data-harvest]')).toBeNull();
+  });
+
+  it('plant mode is frozen too: a same-bed re-press after my plot landed closes (no harvest offered)', () => {
+    const win = makeWindow();
+    win.open(BED);
+    expect(root.querySelector('[data-plant]')).not.toBeNull();
+    world.myFarmPlots = [myPlot('growing')];
+    win.open(BED);
+    expect(win.isOpen).toBe(false);
+  });
+
+  it('relocalize repaints an open harvest sheet in place', () => {
+    world.myFarmPlots = [myPlot('ready')];
+    const win = makeWindow();
+    win.open(BED);
+    harvestBtn()?.click();
+    win.relocalize();
+    expect(root.querySelector('[data-harvest]')).not.toBeNull();
+    expect(root.getAttribute('aria-busy')).toBe('true');
+    expect(world.harvestCrop).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -433,7 +888,9 @@ describe('plant sheet window: the Plant activation', () => {
     const win = makeWindow();
     win.open(BED);
     const close = root.querySelector<HTMLElement>('[data-close]');
-    expect(close?.getAttribute('aria-label')).toBe('Close the plant sheet');
+    // The window is the bed window now (plant OR harvest mode), so the close
+    // control cannot name the plant sheet.
+    expect(close?.getAttribute('aria-label')).toBe('Close the bed window');
     close?.click();
     expect(win.isOpen).toBe(false);
   });
@@ -457,6 +914,21 @@ describe('plant sheet window: re-open, event filters, and staleness (the review 
     // ...and so did the send arm: the re-press is not a re-send license.
     root.querySelector<HTMLElement>('[data-plant]')?.click();
     expect(world.plantCrop).toHaveBeenCalledTimes(1);
+  });
+
+  it('a detached Plant control from an earlier bed never plants into the bed opened since', () => {
+    // The identity twin of the harvest arm: the control captured its bed at
+    // paint time and re-checks it, so the stale node sends nothing and the
+    // live control still plants the bed that is actually up.
+    const win = makeWindow();
+    win.open(BED);
+    const stale = root.querySelector<HTMLElement>('[data-plant]');
+    win.open('bed_eastbrook_2');
+    stale?.click();
+    expect(world.plantCrop).not.toHaveBeenCalled();
+    root.querySelector<HTMLElement>('[data-plant]')?.click();
+    expect(world.plantCrop).toHaveBeenCalledTimes(1);
+    expect(world.plantCrop).toHaveBeenCalledWith('bed_eastbrook_2', WHEAT.id, {});
   });
 
   it('opening a DIFFERENT bed resets the picks, so a knob never rides between beds', () => {

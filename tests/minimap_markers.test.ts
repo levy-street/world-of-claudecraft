@@ -88,6 +88,10 @@ function makeWorld(shape: 'sim' | 'client'): IWorld {
     [10, ent({ id: 10, kind: 'object', lootable: true, pos: { x: 11, z: PZ } })],
     [11, ent({ id: 11, kind: 'mob', hostile: true, aggroTargetId: 1, pos: { x: 12, z: PZ } })],
     [12, ent({ id: 12, kind: 'mob', hostile: true, aggroTargetId: null, pos: { x: 13, z: PZ } })],
+    // A corpse holding ordinary loot for the viewer: untapped, so the shared
+    // pool is open to everyone (the mob-loot marker keys on WHAT THIS VIEWER
+    // MAY TAKE, never on the lootable flag alone, which a harvest-only body
+    // keeps true through its grace window).
     [
       13,
       ent({
@@ -96,6 +100,9 @@ function makeWorld(shape: 'sim' | 'client'): IWorld {
         hostile: true,
         dead: true,
         lootable: true,
+        loot: { copper: 4, items: [] },
+        tappedById: null,
+        harvestClaimedBy: null,
         pos: { x: 14, z: PZ },
       }),
     ],
@@ -472,6 +479,67 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
     const markers = buildMarkers(world as unknown as IWorld);
     expect(markers.filter((marker) => marker.kind === 'mob')).toHaveLength(2);
     expect(markers.filter((marker) => marker.kind === 'mob-loot')).toHaveLength(1);
+  });
+
+  describe('the corpse marker distinguishes ordinary loot from an open harvest', () => {
+    // forest_wolf carries mapped componentTags: harvestable while unclaimed.
+    // The seeded corpse (id 13) is re-shaped per case; every other seeded
+    // marker is unaffected, so the kinds list is filtered to the two corpse
+    // markers.
+    type CorpseShape = {
+      templateId: string;
+      loot: { copper: number; items: unknown[] } | null;
+      tappedById: number | null;
+      lootFfaTimer?: number;
+      harvestClaimedBy: number | null;
+      ownerId?: number | null;
+      corpseTimer?: number;
+    };
+    function corpseMarkers(shape: Partial<CorpseShape>, partyPids?: number[]) {
+      const world = makeWorld('sim') as unknown as {
+        entities: Map<number, Record<string, unknown>>;
+        partyInfo: { members: { pid: number }[] } | null;
+      };
+      const body = world.entities.get(13);
+      if (!body) throw new Error('expected the seeded corpse');
+      Object.assign(body, shape);
+      if (partyPids) world.partyInfo = { members: partyPids.map((pid) => ({ pid })) };
+      return buildMarkers(world as unknown as IWorld)
+        .map((m) => m.kind)
+        .filter((kind) => kind === 'mob-loot' || kind === 'mob-harvest');
+    }
+
+    it('keeps the loot square while ordinary loot remains, even with the harvest open', () => {
+      expect(corpseMarkers({ templateId: 'forest_wolf', loot: { copper: 4, items: [] } })).toEqual([
+        'mob-loot',
+      ]);
+    });
+
+    it('swaps to the harvest marker on a harvest-only body, and drops it once claimed', () => {
+      expect(corpseMarkers({ templateId: 'forest_wolf', loot: null })).toEqual(['mob-harvest']);
+      expect(corpseMarkers({ templateId: 'forest_wolf', loot: null, harvestClaimedBy: 9 })).toEqual(
+        [],
+      );
+    });
+
+    it("never advertises a stranger's owner-locked loot as mine", () => {
+      const locked = {
+        loot: { copper: 4, items: [] },
+        tappedById: 9,
+        lootFfaTimer: 60,
+        harvestClaimedBy: 9,
+      };
+      expect(corpseMarkers(locked)).toEqual([]);
+      // The lock lapses into FFA: the square returns.
+      expect(corpseMarkers({ ...locked, lootFfaTimer: 0 })).toEqual(['mob-loot']);
+      // A party mate's tap reads as mine through the viewer roster.
+      expect(corpseMarkers({ ...locked, tappedById: 5 }, [1, 5])).toEqual(['mob-loot']);
+    });
+
+    it('shows neither marker for an owned pet body or an expired body', () => {
+      expect(corpseMarkers({ ownerId: 1, loot: { copper: 4, items: [] } })).toEqual([]);
+      expect(corpseMarkers({ corpseTimer: 0, loot: { copper: 4, items: [] } })).toEqual([]);
+    });
   });
 
   it('preserves each gathering node type for the painter', () => {
@@ -1328,5 +1396,32 @@ describe('gather-node markers scale with the rim, not the node table (phase 16)'
 
   it('a viewer far from every node draws zero node markers regardless of the table size', () => {
     expect(nodeMarkersAt(99000, 99000)).toHaveLength(0);
+  });
+});
+
+describe('harvest marker full silhouette at the circular rim', () => {
+  it.each([
+    { profile: 'standard' as const, radius: 3.5, outline: 1.25 },
+    { profile: 'compact' as const, radius: 5.25, outline: 1.75 },
+  ])('contains the bottom miter corners in $profile mode', ({ profile, radius, outline }) => {
+    const world = makeWorld('client');
+    const corpse = world.entities.get(13)!;
+    corpse.templateId = 'forest_wolf';
+    corpse.loot = null;
+    // The painter's triangle has vertices (0,-r), (r,0.7r), (-r,0.7r).
+    // Its widest radial stroke point is a bottom miter, not the top apex.
+    const cornerX = radius + (outline / 2) * ((Math.hypot(1, 1.7) + 1) / 1.7);
+    const cornerY = radius * 0.7 + outline / 2;
+    const envelope = Math.hypot(cornerX, cornerY);
+    const safeCenter = S / 2 - MINIMAP_CLIP_INSET - envelope;
+    corpse.pos.x = world.player.pos.x - (safeCenter + 0.01);
+    corpse.pos.z = world.player.pos.z;
+    const harvest = () =>
+      createMinimapMarkers()
+        .build(world, S, 1, profile)
+        .markers.filter((marker) => marker.kind === 'mob-harvest');
+    expect(harvest()).toEqual([]);
+    corpse.pos.x = world.player.pos.x - (safeCenter - 0.01);
+    expect(harvest()).toHaveLength(1);
   });
 });

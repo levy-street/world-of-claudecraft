@@ -1,18 +1,24 @@
 import { describe, expect, it, vi } from 'vitest';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
+import { handleGatherNodeInteract } from '../src/game/gather_node_interact';
 import { tryNearbyInteraction } from '../src/game/nearby_interaction';
 import { LOOT_FFA_DELAY } from '../src/sim/loot/loot_ffa';
 import type { Entity } from '../src/sim/types';
 
-// A corpse you have no right to loot must not shadow the resource node under
-// it. The interact picker gives corpses absolute priority, and the old
-// availability predicate answered "does loot EXIST", not "may I take it", so a
-// stranger's unlooted kill sitting on a gather node captured every interact
-// press into a denied lootCorpse ("You don't have permission to loot that")
-// for the full LOOT_FFA_DELAY owner-lock. These suites pin the rights-aware
-// predicate: the press must fall through to the node while the owner-lock
-// holds, and the corpse must come back once the lock lapses (mirrored online
-// via the ffa wire key, tests/snapshots.test.ts).
+// A corpse you have no right to loot must not capture the interact press. The
+// old availability predicate answered "does loot EXIST", not "may I take it",
+// so a stranger's unlooted kill captured every interact press into a denied
+// lootCorpse ("You don't have permission to loot that") for the full
+// LOOT_FFA_DELAY owner-lock. These suites pin the rights-aware predicate: the
+// generic press sends NO loot command while the owner-lock holds, and the
+// corpse comes back once the lock lapses (mirrored online via the ffa wire
+// key, tests/snapshots.test.ts).
+//
+// Intentional gathering: the generic press is ordinary loot ONLY. It never
+// falls through to the node under the corpse and never sends the corpse
+// harvest half; the node is still gathered through its EXPLICIT entry point
+// (handleGatherNodeInteract, the node click), which these suites drive beside
+// the same body to prove the body never blocks it.
 
 const ME = 1;
 const STRANGER = 9;
@@ -60,7 +66,12 @@ function rig(e: Entity, partyInfo: { members: { pid: number }[] } | null = null)
     pickUpObject: () => false as const,
     nodeHarvestableByMe: () => true,
     harvestNode,
-  } as unknown as Parameters<typeof tryNearbyInteraction>[0];
+    // The press now falls through past the corpse to the bed arm, which
+    // reads these; inert here.
+    farmPatches: [],
+    myFarmPlots: [],
+  } as unknown as Parameters<typeof tryNearbyInteraction>[0] &
+    Parameters<typeof handleGatherNodeInteract>[0];
   const hud = {
     openMailbox: () => {},
     openQuestDialog: () => {},
@@ -69,9 +80,12 @@ function rig(e: Entity, partyInfo: { members: { pid: number }[] } | null = null)
   } as unknown as Parameters<typeof tryNearbyInteraction>[1] & {
     showError: ReturnType<typeof vi.fn>;
   };
-  const press = () =>
-    tryNearbyInteraction(world, hud, [NODE], null, 'far', 'notReady', 'escortAway', 'nothing');
-  return { world, hud, press, lootCorpse, harvestCorpse, harvestNode };
+  // The generic press (F / interact key).
+  const press = () => tryNearbyInteraction(world, hud, 'escortAway', 'nothing');
+  // The explicit node action (a click on the node beside the body).
+  const gatherNode = () =>
+    handleGatherNodeInteract(world, hud, world.player.pos, NODE.id, NODE.pos, 'far', 'notReady');
+  return { world, hud, press, gatherNode, lootCorpse, harvestCorpse, harvestNode };
 }
 
 // Loot only the STRANGER may take: tapped by them, owner-lock still counting.
@@ -80,9 +94,20 @@ const strangerLoot = () => ({
   items: [{ itemId: 'wolf_fang', count: 1 }],
 });
 
-describe('the reported bug: a rights-less corpse must not shadow the node', () => {
-  it('a fresh stranger-tapped corpse with plain loot yields the press to the node (no denied lootCorpse)', () => {
-    const { press, lootCorpse, harvestCorpse, harvestNode, hud } = rig(
+// The generic press beside a rights-less corpse: no loot, no harvest of any
+// kind, only the nothing line (never the loot denial toast).
+function expectPressSendsNothing(r: ReturnType<typeof rig>) {
+  expect(r.press()).toBe(false);
+  expect(r.lootCorpse).not.toHaveBeenCalled();
+  expect(r.harvestCorpse).not.toHaveBeenCalled();
+  expect(r.harvestNode).not.toHaveBeenCalled();
+  expect(r.hud.showError).toHaveBeenCalledTimes(1);
+  expect(r.hud.showError).toHaveBeenCalledWith('nothing');
+}
+
+describe('the reported bug: a rights-less corpse must not capture the press', () => {
+  it('a fresh stranger-tapped corpse with plain loot gets no denied lootCorpse, and the node still gathers explicitly', () => {
+    const r = rig(
       corpse({
         // harvestClaimedBy set: nothing harvestable either, a pure loot corpse.
         harvestClaimedBy: STRANGER,
@@ -92,15 +117,16 @@ describe('the reported bug: a rights-less corpse must not shadow the node', () =
       }),
     );
 
-    expect(press()).toBe(true);
-    expect(harvestNode).toHaveBeenCalledWith(NODE.id);
-    expect(lootCorpse).not.toHaveBeenCalled();
-    expect(harvestCorpse).not.toHaveBeenCalled();
-    expect(hud.showError).not.toHaveBeenCalled();
+    expectPressSendsNothing(r);
+
+    expect(r.gatherNode()).toBe(true);
+    expect(r.harvestNode).toHaveBeenCalledWith(NODE.id);
+    expect(r.lootCorpse).not.toHaveBeenCalled();
+    expect(r.harvestCorpse).not.toHaveBeenCalled();
   });
 
-  it('a copper-only stranger corpse also yields to the node', () => {
-    const { press, lootCorpse, harvestNode } = rig(
+  it('a copper-only stranger corpse also sends no loot on the press', () => {
+    const r = rig(
       corpse({
         harvestClaimedBy: STRANGER,
         tappedById: STRANGER,
@@ -109,15 +135,16 @@ describe('the reported bug: a rights-less corpse must not shadow the node', () =
       }),
     );
 
-    expect(press()).toBe(true);
-    expect(harvestNode).toHaveBeenCalledWith(NODE.id);
-    expect(lootCorpse).not.toHaveBeenCalled();
+    expectPressSendsNothing(r);
+
+    expect(r.gatherNode()).toBe(true);
+    expect(r.harvestNode).toHaveBeenCalledWith(NODE.id);
   });
 });
 
 describe('deliberately preserved corpse-priority arms', () => {
   it("the presser's own tap still loots first", () => {
-    const { press, lootCorpse, harvestNode } = rig(
+    const { press, lootCorpse, harvestCorpse, harvestNode } = rig(
       corpse({
         harvestClaimedBy: STRANGER,
         tappedById: ME,
@@ -128,11 +155,12 @@ describe('deliberately preserved corpse-priority arms', () => {
 
     expect(press()).toBe(true);
     expect(lootCorpse).toHaveBeenCalledWith(2);
+    expect(harvestCorpse).not.toHaveBeenCalled();
     expect(harvestNode).not.toHaveBeenCalled();
   });
 
   it("a party member's tap still loots first (my party stands in for the tapper's)", () => {
-    const { press, lootCorpse, harvestNode } = rig(
+    const { press, lootCorpse, harvestCorpse, harvestNode } = rig(
       corpse({
         harvestClaimedBy: STRANGER,
         tappedById: STRANGER,
@@ -144,11 +172,12 @@ describe('deliberately preserved corpse-priority arms', () => {
 
     expect(press()).toBe(true);
     expect(lootCorpse).toHaveBeenCalledWith(2);
+    expect(harvestCorpse).not.toHaveBeenCalled();
     expect(harvestNode).not.toHaveBeenCalled();
   });
 
   it('an FFA-lapsed stranger corpse is offered again (the documented deliberate-press take)', () => {
-    const { press, lootCorpse, harvestNode } = rig(
+    const { press, lootCorpse, harvestCorpse, harvestNode } = rig(
       corpse({
         harvestClaimedBy: STRANGER,
         tappedById: STRANGER,
@@ -159,11 +188,15 @@ describe('deliberately preserved corpse-priority arms', () => {
 
     expect(press()).toBe(true);
     expect(lootCorpse).toHaveBeenCalledWith(2);
+    expect(harvestCorpse).not.toHaveBeenCalled();
     expect(harvestNode).not.toHaveBeenCalled();
   });
 
-  it('a HARVESTABLE unclaimed stranger corpse still takes priority, harvest half only', () => {
-    const { press, lootCorpse, harvestCorpse, harvestNode, hud } = rig(
+  it('a HARVESTABLE unclaimed stranger corpse is no press target: its harvest half is never sent', () => {
+    // Before intentional gathering this corpse captured the press for its
+    // harvest half alone. Harvest is an explicit action now, so the press
+    // sends nothing at all, and the explicit node action beside it still works.
+    const r = rig(
       corpse({
         harvestClaimedBy: null,
         tappedById: STRANGER,
@@ -172,15 +205,15 @@ describe('deliberately preserved corpse-priority arms', () => {
       }),
     );
 
-    expect(press()).toBe(true);
-    expect(harvestCorpse).toHaveBeenCalledWith(2);
-    expect(lootCorpse).not.toHaveBeenCalled();
-    expect(harvestNode).not.toHaveBeenCalled();
-    expect(hud.showError).not.toHaveBeenCalled();
+    expectPressSendsNothing(r);
+
+    expect(r.gatherNode()).toBe(true);
+    expect(r.harvestNode).toHaveBeenCalledWith(NODE.id);
+    expect(r.harvestCorpse).not.toHaveBeenCalled();
   });
 
   it('a personal drop naming me keeps the corpse first even on a stranger tap', () => {
-    const { press, lootCorpse, harvestNode } = rig(
+    const { press, lootCorpse, harvestCorpse, harvestNode } = rig(
       corpse({
         harvestClaimedBy: STRANGER,
         tappedById: STRANGER,
@@ -191,11 +224,12 @@ describe('deliberately preserved corpse-priority arms', () => {
 
     expect(press()).toBe(true);
     expect(lootCorpse).toHaveBeenCalledWith(2);
+    expect(harvestCorpse).not.toHaveBeenCalled();
     expect(harvestNode).not.toHaveBeenCalled();
   });
 
   it('a party roster WITHOUT the tapper grants nothing (stranger party)', () => {
-    const { press, lootCorpse, harvestNode } = rig(
+    const r = rig(
       corpse({
         harvestClaimedBy: STRANGER,
         tappedById: STRANGER,
@@ -205,9 +239,7 @@ describe('deliberately preserved corpse-priority arms', () => {
       { members: [{ pid: ME }, { pid: 5 }] },
     );
 
-    expect(press()).toBe(true);
-    expect(harvestNode).toHaveBeenCalledWith(NODE.id);
-    expect(lootCorpse).not.toHaveBeenCalled();
+    expectPressSendsNothing(r);
   });
 });
 

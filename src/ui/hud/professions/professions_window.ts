@@ -35,6 +35,11 @@ import { gatheringProfessionNameKey } from './gathering_profession_name';
 import { archetypeImageUrl } from './profession_art';
 import type { EmpowermentCeiling, ProfessionRole } from './profession_identity_view';
 import {
+  harvestBodyEntryHtml,
+  harvestJournalEntryHtml,
+  wireHarvestEntries,
+} from './professions_harvest_entry_controller';
+import {
   buildProfessionsView,
   type CraftNextUnlock,
   type ProfessionsCraftRow,
@@ -99,6 +104,14 @@ export interface ProfessionsWindowDeps extends PainterHostPresentation {
    *  than a dead one. Not a command: the journal is a reader, so this window
    *  keeps its no-repaint-on-click contract. */
   openHarvestJournal?(): void;
+  /** Open the corpse choice popup for the targeted or nearest body whose
+   *  harvest is still open (intentional gathering PR1). The button is an
+   *  EXAMINE: the host names the body and opens the popup, and only the
+   *  popup's own Harvest control ever sends a harvest. Optional so a host
+   *  that has not wired the entry paints no dead button. Painted in BOTH
+   *  modes at any skill: Tab and pad targeting skip dead mobs, so this is
+   *  the keyboard, pad and touch route to a body. */
+  harvestBody?(): void;
 }
 
 export class ProfessionsWindow {
@@ -218,7 +231,7 @@ export class ProfessionsWindow {
     el.innerHTML =
       `<div class="panel-title"><span>${esc(t('hudChrome.professions.title'))}</span>` +
       `<button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.professions.close'))}">${svgIcon('close')}</button></div>` +
-      `<div class="prof-scroll">${body}</div>`;
+      `<div class="prof-scroll">${harvestBodyEntryHtml(this.deps.harvestBody !== undefined)}${body}</div>`;
 
     this.wire(el);
     const scroll = el.querySelector('.prof-scroll');
@@ -576,27 +589,13 @@ export class ProfessionsWindow {
           )}</span></div>` +
           `<div class="prof-bar-wrap"><span class="prof-bar"><span class="prof-bar-fill" style="width:${pct}%"></span></span></div>` +
           (opts.effects ? this.gatherEffectHtml(row) : '') +
-          this.harvestJournalHtml(row) +
+          harvestJournalEntryHtml(row.professionId, this.deps.openHarvestJournal !== undefined) +
           `</div></li>`
         );
       })
       .join('');
     if (rows === '') return '';
     return `<section class="prof-gathering"><h3 class="prof-section-header">${esc(t('hudChrome.professions.gatheringHeader'))}</h3><ul class="prof-list" role="list">${rows}</ul></section>`;
-  }
-
-  // Farming's one extra row control: the Harvest Journal entry point, under
-  // the Farming skill bar. It rides this window rather than a side-rail
-  // button because the journal is a farming readout and this is where a
-  // farmer already comes to read their skill. Unlike every other button in
-  // here it SPENDS NOTHING (it opens a reader), which is what earns it a
-  // focus key of its own: a rebuild under a focused row can park focus back
-  // on it without handing an Enter to an action the player never aimed at.
-  private harvestJournalHtml(row: ProfessionsGatheringRow): string {
-    if (row.professionId !== 'farming' || this.deps.openHarvestJournal === undefined) return '';
-    return `<div class="prof-effect-actions"><button type="button" class="btn prof-effect-btn" data-harvest-journal data-focus-key="harvestJournal">${esc(
-      t('hudChrome.harvestJournal.title'),
-    )}</button></div>`;
   }
 
   // The slotted tool effect, under its profession's skill bar, plus the
@@ -706,13 +705,7 @@ export class ProfessionsWindow {
       this.close();
       audio.click();
     });
-    // The journal opener: no command, no send guard, and no repaint of this
-    // window. It opens a reader over the caller's own plots, so a second
-    // click costs nothing and there is nothing for a peek-guard to protect.
-    el.querySelector('[data-harvest-journal]')?.addEventListener('click', () => {
-      audio.click();
-      this.deps.openHarvestJournal?.();
-    });
+    wireHarvestEntries(el, this.deps);
     // Slot/recharge senders: command only, never predicted, and NO repaint
     // here. The pid-scoped toolEffectResult event is the one repaint path
     // (Hud's arm re-renders an open professions window), which keeps this

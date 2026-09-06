@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { tryNearbyInteraction } from '../src/game/nearby_interaction';
 import { ITEMS } from '../src/sim/data';
-import type { Entity, GatherNodeDef, QuestProgress } from '../src/sim/types';
+import type { Entity, QuestProgress } from '../src/sim/types';
 import type { FarmPatchDef, FarmPlotStatus, FarmPlotView } from '../src/world_api/farming';
 
 function entity(overrides: Partial<Entity> & Pick<Entity, 'id' | 'kind'>): Entity {
@@ -18,7 +18,13 @@ function entity(overrides: Partial<Entity> & Pick<Entity, 'id' | 'kind'>): Entit
   } as Entity;
 }
 
-function rig(targets: Entity[] = [], nodes: GatherNodeDef[] = []) {
+// Every gathering command the generic press must never send (intentional
+// gathering: nodes, corpse components and crops are explicit actions only).
+const GATHERING_COMMANDS = /^(harvest|harvestCorpse|harvestCrop):/;
+const gatheringCalls = (calls: readonly string[]) =>
+  calls.filter((call) => GATHERING_COMMANDS.test(call));
+
+function rig(targets: Entity[] = []) {
   const player = entity({ id: 1, kind: 'player' });
   const calls: string[] = [];
   const world = {
@@ -39,6 +45,9 @@ function rig(targets: Entity[] = [], nodes: GatherNodeDef[] = []) {
       calls.push(`loot:${id}`);
       return true;
     },
+    // The gathering commands stay on the fixture (the live world carries
+    // them) so a regression that reaches for one is recorded as a call,
+    // never a TypeError that hides the intent.
     harvestCorpse: (id: number) => {
       calls.push(`harvestCorpse:${id}`);
     },
@@ -88,22 +97,11 @@ function rig(targets: Entity[] = [], nodes: GatherNodeDef[] = []) {
     // Phase 9b bed-arm seam member: inert here (lane A's arms exercise it).
     openPlantSheet: (bedId: string) => calls.push(`plantSheet:${bedId}`),
   };
-  return { world, hud, nodes, calls, player };
+  return { world, hud, calls, player };
 }
 
 function interact(r: ReturnType<typeof rig>) {
-  // null nodeToolGateFor: the tier-agnostic legacy shape (the gate arm has its
-  // own dedicated test below).
-  return tryNearbyInteraction(
-    r.world,
-    r.hud,
-    r.nodes,
-    null,
-    'too far',
-    'not ready',
-    'escort away',
-    'nothing',
-  );
+  return tryNearbyInteraction(r.world, r.hud, 'escort away', 'nothing');
 }
 
 describe('tryNearbyInteraction', () => {
@@ -239,26 +237,18 @@ describe('tryNearbyInteraction', () => {
     expect(r.calls).toEqual([expected]);
   });
 
-  it('harvests a ready node and preserves movement for a not-ready node', () => {
-    const node = {
-      id: 'ore_1',
-      zoneId: 'zone',
-      type: 'ore',
-      pos: { x: 1, z: 0 },
-      level: 1,
-      tier: 1,
-    } as const;
-    const ready = rig([], [node]);
-    expect(interact(ready)).toBe(true);
-    expect(ready.calls).toEqual(['harvest:ore_1']);
-
-    const coolingDown = rig([], [node]);
-    coolingDown.world.nodeHarvestableByMe.mockReturnValue(false);
-    expect(interact(coolingDown)).toBe(false);
-    expect(coolingDown.calls).toEqual(['error:not ready']);
+  it('never reads node readiness or sends harvestNode: the press knows no nodes', () => {
+    // The generic press takes no node list at all; a ready node underfoot is
+    // gathered only through the explicit node click. So nothing here can
+    // consult readiness, show the not-ready line, or send the harvest.
+    const r = rig();
+    expect(interact(r)).toBe(false);
+    expect(r.calls).toEqual(['error:nothing']);
+    expect(r.world.nodeHarvestableByMe).not.toHaveBeenCalled();
+    expect(gatheringCalls(r.calls)).toEqual([]);
   });
 
-  it('keeps corpse, delve, object, npc, node priority stable', () => {
+  it('keeps corpse, delve, object, npc priority stable and ends at the nothing line', () => {
     const npc = entity({ id: 2, kind: 'npc', templateId: 'elder_maren' });
     const object = entity({ id: 3, kind: 'object', lootable: true });
     const delve = entity({ id: 4, kind: 'object', templateId: 'delve_chest', lootable: true });
@@ -269,25 +259,17 @@ describe('tryNearbyInteraction', () => {
       lootable: true,
       loot: { copper: 1, items: [] },
     });
-    const node = {
-      id: 'ore_1',
-      zoneId: 'zone',
-      type: 'ore',
-      pos: { x: 1, z: 0 },
-      level: 1,
-      tier: 1,
-    } as const;
     const cases = [
-      { targets: [corpse, delve, object, npc], expected: 'loot:5' },
-      { targets: [delve, object, npc], expected: 'delve:4' },
-      { targets: [object, npc], expected: 'pickup:3' },
-      { targets: [npc], expected: 'quest:2' },
-      { targets: [], expected: 'harvest:ore_1' },
+      { targets: [corpse, delve, object, npc], expected: 'loot:5', outcome: true },
+      { targets: [delve, object, npc], expected: 'delve:4', outcome: true },
+      { targets: [object, npc], expected: 'pickup:3', outcome: true },
+      { targets: [npc], expected: 'quest:2', outcome: true },
+      { targets: [], expected: 'error:nothing', outcome: false },
     ];
 
-    for (const { targets, expected } of cases) {
-      const r = rig(targets, [node]);
-      expect(interact(r)).toBe(true);
+    for (const { targets, expected, outcome } of cases) {
+      const r = rig(targets);
+      expect(interact(r)).toBe(outcome);
       expect(r.calls).toEqual([expected]);
     }
   });
@@ -331,55 +313,6 @@ describe('tryNearbyInteraction', () => {
     expect(r.calls).toEqual(['error:nothing']);
   });
 
-  it('threads nodeToolGateFor to the picked node and surfaces the unmet line', () => {
-    const lockedNode = {
-      id: 'ore_t2',
-      zoneId: 'zone',
-      type: 'ore',
-      pos: { x: 1, z: 0 },
-      level: 10,
-      tier: 2,
-    } as const;
-    const r = rig([], [lockedNode]);
-    const seen: string[] = [];
-    const gateFor = (node: { id: string; tier: number }) => {
-      seen.push(node.id);
-      return { nodeTier: node.tier, viewerToolTier: 1, unmetText: 'needs tier 2' };
-    };
-    expect(
-      tryNearbyInteraction(
-        r.world,
-        r.hud,
-        r.nodes,
-        gateFor,
-        'too far',
-        'not ready',
-        'escort away',
-        'nothing',
-      ),
-    ).toBe(false);
-    // The resolver ran against the PICKED node, and the tool denial won over
-    // both harvest and not-ready (the node reads locked, not cooling).
-    expect(seen).toEqual(['ore_t2']);
-    expect(r.calls).toEqual(['error:needs tier 2']);
-
-    // The met arm: a sufficient viewer tier lets the harvest through untouched.
-    const met = rig([], [lockedNode]);
-    expect(
-      tryNearbyInteraction(
-        met.world,
-        met.hud,
-        met.nodes,
-        (node) => ({ nodeTier: node.tier, viewerToolTier: 2, unmetText: 'needs tier 2' }),
-        'too far',
-        'not ready',
-        'escort away',
-        'nothing',
-      ),
-    ).toBe(true);
-    expect(met.calls).toEqual(['harvest:ore_t2']);
-  });
-
   it('returns a rejected authoritative pickup result', async () => {
     const target = entity({ id: 2, kind: 'object', lootable: true });
     const r = rig([target]);
@@ -393,11 +326,11 @@ describe('tryNearbyInteraction', () => {
   });
 });
 
-// Unified corpse press: the interact key selects by canOpen (either
-// half remaining makes the corpse a target) and dispatches each half gated by
-// the availability predicate, harvest strictly before loot. The halves are
-// separate commands: a denied harvest never blocks the loot half.
-describe('tryNearbyInteraction unified corpse press', () => {
+// Intentional gathering: the generic press is ordinary loot ONLY. A corpse is
+// selected by hasLoot (what this viewer may actually take), never by its
+// harvest half, and the press sends lootCorpse alone. Corpse components are an
+// explicit action elsewhere.
+describe('tryNearbyInteraction corpse press is ordinary loot only', () => {
   function wolfCorpse(overrides: Partial<Entity> = {}): Entity {
     return entity({
       id: 2,
@@ -412,28 +345,141 @@ describe('tryNearbyInteraction unified corpse press', () => {
     });
   }
 
-  it('dispatches BOTH halves on a corpse with loot and an unclaimed harvest, harvest first', () => {
+  it('sends loot alone on a corpse with loot and an unclaimed harvest', () => {
     const r = rig([wolfCorpse()]);
     expect(interact(r)).toBe(true);
-    expect(r.calls).toEqual(['harvestCorpse:2', 'loot:2']);
+    expect(r.calls).toEqual(['loot:2']);
   });
 
-  it('dispatches loot only once the harvest claim is taken', () => {
+  it('sends loot once the harvest claim is taken', () => {
     const r = rig([wolfCorpse({ harvestClaimedBy: 9 })]);
     expect(interact(r)).toBe(true);
     expect(r.calls).toEqual(['loot:2']);
   });
 
-  it('dispatches harvest only on a loot-exhausted corpse inside the grace window', () => {
+  it('a harvest-only corpse is no target: no harvest, no loot, the nothing line', () => {
     const r = rig([wolfCorpse({ loot: null })]);
-    expect(interact(r)).toBe(true);
-    expect(r.calls).toEqual(['harvestCorpse:2']);
+    expect(interact(r)).toBe(false);
+    expect(r.calls).toEqual(['error:nothing']);
   });
 
-  it('dispatches neither on a claimed lootless corpse: it is no target at all', () => {
+  it('a harvest-only corpse never swallows an eligible ordinary interaction behind it', () => {
+    const npc = entity({
+      id: 3,
+      kind: 'npc',
+      templateId: 'elder_maren',
+      pos: { x: 3, y: 0, z: 0 },
+    });
+    const r = rig([wolfCorpse({ loot: null }), npc]);
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['quest:3']);
+  });
+
+  it('dispatches nothing on a claimed lootless corpse', () => {
     const r = rig([wolfCorpse({ loot: null, harvestClaimedBy: 9 })]);
     expect(interact(r)).toBe(false);
     expect(r.calls).toEqual(['error:nothing']);
+  });
+
+  it('normal material and quest loot on a corpse still opens', () => {
+    const r = rig([
+      wolfCorpse({
+        loot: {
+          copper: 0,
+          items: [
+            { itemId: 'wolf_fang', count: 1 },
+            { itemId: 'supply_crate', count: 1, personalFor: [1] },
+          ],
+        },
+      }),
+    ]);
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['loot:2']);
+  });
+
+  it('a stranger-tapped corpse under owner lock stays off limits', () => {
+    const r = rig([
+      wolfCorpse({
+        tappedById: 9,
+        lootFfaTimer: 60,
+        harvestClaimedBy: 9,
+        loot: { copper: 12, items: [{ itemId: 'wolf_fang', count: 1 }] },
+      }),
+    ]);
+    expect(interact(r)).toBe(false);
+    expect(r.calls).toEqual(['error:nothing']);
+  });
+
+  describe('repeated presses with a delayed snapshot send zero gathering commands', () => {
+    const readyBed: FarmPatchDef = {
+      id: 'patch_press',
+      zoneId: 'eastbrook_vale',
+      tier: 1,
+      x: 2,
+      z: 0,
+      beds: [{ id: 'bed_press_1', x: 2, z: 0 }],
+    };
+    const plot = (status: FarmPlotStatus): FarmPlotView => ({
+      bedId: 'bed_press_1',
+      cropId: 'vale_wheat',
+      plantedAtMs: 0,
+      readyAtMs: 1000,
+      compost: false,
+      watch: false,
+      tonic: false,
+      notified: false,
+      status,
+    });
+
+    it.each(['ready', 'growing'] as const)(
+      'a corpse emptied by the delayed snapshot, beside a %s crop',
+      (status) => {
+        const corpse = wolfCorpse();
+        const r = rig([corpse]);
+        r.world.farmPatches = [readyBed];
+        r.world.myFarmPlots = [plot(status)];
+
+        // Press 1: the snapshot has not caught up, the corpse still shows loot.
+        expect(interact(r)).toBe(true);
+        expect(interact(r)).toBe(true);
+        expect(r.calls).toEqual(['loot:2', 'loot:2']);
+
+        // The delayed snapshot lands: loot gone, harvest half still unclaimed.
+        // The press now falls to the bed arm, which OPENS the sheet for my plot
+        // (whatever its status) and sends no gathering command.
+        r.world.entities.set(corpse.id, { ...corpse, loot: null });
+        r.calls.length = 0;
+        expect(interact(r)).toBe(true);
+        expect(interact(r)).toBe(true);
+        expect(r.calls).toEqual(['plantSheet:bed_press_1', 'plantSheet:bed_press_1']);
+        expect(gatheringCalls(r.calls)).toEqual([]);
+      },
+    );
+
+    it.each(['ready', 'growing'] as const)(
+      'a corpse removed by the delayed snapshot, beside a %s crop',
+      (status) => {
+        const corpse = wolfCorpse();
+        const r = rig([corpse]);
+        r.world.farmPatches = [readyBed];
+        r.world.myFarmPlots = [plot(status)];
+
+        expect(interact(r)).toBe(true);
+        expect(r.calls).toEqual(['loot:2']);
+
+        r.world.entities.delete(corpse.id);
+        r.calls.length = 0;
+        expect(interact(r)).toBe(true);
+        expect(interact(r)).toBe(true);
+        expect(interact(r)).toBe(true);
+        expect(r.calls).toEqual([
+          'plantSheet:bed_press_1',
+          'plantSheet:bed_press_1',
+          'plantSheet:bed_press_1',
+        ]);
+        expect(gatheringCalls(r.calls)).toEqual([]);
+      },
+    );
   });
 });
 
@@ -500,19 +546,7 @@ describe('tryNearbyInteraction npc reach', () => {
     entity({ id, kind: 'npc', templateId: 'elder_maren', pos: { x, y: 0, z: 0 } });
 
   const interactPreferring = (r: ReturnType<typeof rig>, preferNpcId: number | null) =>
-    tryNearbyInteraction(
-      r.world,
-      r.hud,
-      r.nodes,
-      null,
-      'too far',
-      'not ready',
-      'escort away',
-      'nothing',
-      true,
-      undefined,
-      preferNpcId,
-    );
+    tryNearbyInteraction(r.world, r.hud, 'escort away', 'nothing', true, preferNpcId);
 
   it('talks to an npc standing just past the five yard interact range', () => {
     const r = rig([npcAt(2, 5.5)]);
@@ -598,25 +632,25 @@ describe('the garden-bed arm (Phase 9b)', () => {
     };
   }
 
-  function bedRig(
-    status: FarmPlotStatus | null,
-    targets: Entity[] = [],
-    nodes: GatherNodeDef[] = [],
-  ) {
-    const r = rig(targets, nodes);
+  function bedRig(status: FarmPlotStatus | null, targets: Entity[] = []) {
+    const r = rig(targets);
     r.world.farmPatches = [bedPatch];
     r.world.myFarmPlots = status === null ? [] : [myPlot(status)];
     return r;
   }
 
-  // Status never gates the client press: the sim's own farmDenied not_ready
-  // answers a growing plot, so all three statuses send the same harvest.
+  // Intentional gathering PR1: the generic press OPENS the bed sheet for an
+  // occupied bed too (the sheet paints harvest mode from the live plot), but it
+  // NEVER sends harvestCrop: the sheet's explicit Harvest control is the only
+  // send, whatever the plot's status and however often the key is pressed.
   it.each(['ready', 'withered', 'growing'] as const)(
-    'presses harvest exactly once beside my %s plot and never opens the sheet',
+    'opens the sheet beside my %s plot on every press and never sends harvest',
     (status) => {
       const r = bedRig(status);
       expect(interact(r)).toBe(true);
-      expect(r.calls).toEqual(['harvestCrop:bed_test_1']);
+      expect(interact(r)).toBe(true);
+      expect(r.calls).toEqual(['plantSheet:bed_test_1', 'plantSheet:bed_test_1']);
+      expect(gatheringCalls(r.calls)).toEqual([]);
     },
   );
 
@@ -640,20 +674,6 @@ describe('the garden-bed arm (Phase 9b)', () => {
     const r = bedRig(null);
     expect(interact(r)).toBe(true);
     expect(r.calls).toEqual(['plantSheet:bed_test_1']);
-  });
-
-  it('lets a gather node in range keep winning the press over a bed', () => {
-    const node = {
-      id: 'ore_1',
-      zoneId: 'zone',
-      type: 'ore',
-      pos: { x: 1, z: 0 },
-      level: 1,
-      tier: 1,
-    } as const;
-    const r = bedRig('ready', [], [node]);
-    expect(interact(r)).toBe(true);
-    expect(r.calls).toEqual(['harvest:ore_1']);
   });
 
   it('lets a corpse in range keep winning the press over a bed', () => {
@@ -735,20 +755,6 @@ describe('the feast arm (Phase 12)', () => {
     r.world.entities = new Map();
     expect(interact(r)).toBe(true);
     expect(r.calls).toEqual(['plantSheet:bed_test_1']);
-  });
-
-  it('a gather node in reach keeps winning the press over a feast', () => {
-    const node = {
-      id: 'ore_1',
-      zoneId: 'zone',
-      type: 'ore',
-      pos: { x: 1, z: 0 },
-      level: 1,
-      tier: 1,
-    } as const;
-    const r = rig([feast(12)], [node as unknown as GatherNodeDef]);
-    expect(interact(r)).toBe(true);
-    expect(r.calls).toEqual(['harvest:ore_1']);
   });
 
   it('falls through to the nothing-to-interact line when the feast is out of range', () => {

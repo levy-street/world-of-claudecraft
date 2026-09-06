@@ -7,7 +7,7 @@
 // THE CLAIM IS COMPARATIVE, AND DELIBERATELY SO. This module says the feast
 // takes the press BEFORE the bed. It does NOT say the press hits the feast,
 // because tryNearbyInteraction (nearby_interaction.ts) ranks corpses, delve
-// objects, lootable objects, npcs, escorts and gather nodes ABOVE both farming
+// objects, lootable objects, npcs and escorts ABOVE both farming
 // arms, so an absolute claim would be false whenever any of those is also in
 // reach. The comparative claim is true under ruling 11b-R3c-1 whatever else is
 // standing there, because that ruling orders exactly this pair. Do not
@@ -42,9 +42,11 @@ export interface FarmPressTargetWorld {
 }
 
 /** The ambiguity, named by what the bed press GIVES UP: a feast in reach beats
- *  a bed the caller has a plot in ('feast_over_harvest') or a free bed
- *  ('feast_over_plant'). One value per distinct sentence, so the consumer maps
- *  it straight to a key and diffs it as a repaint signature. */
+ *  a bed the caller has a plot in ('feast_over_harvest': the press would have
+ *  opened the bed window in harvest mode, never harvested by itself) or a free
+ *  bed ('feast_over_plant': the plant sheet). One value per distinct sentence,
+ *  so the consumer maps it straight to a key and diffs it as a repaint
+ *  signature. */
 export type FarmPressTarget = 'feast_over_harvest' | 'feast_over_plant';
 
 /** The resolved farming press ambiguity, or null when there is none: no bed in

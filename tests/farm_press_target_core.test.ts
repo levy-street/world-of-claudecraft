@@ -184,16 +184,7 @@ describe('the claim is the dispatcher own order, not a second copy of it', () =>
   }
 
   const press = (r: ReturnType<typeof dispatchRig>): InteractionOutcome =>
-    tryNearbyInteraction(
-      r.world,
-      r.hud,
-      [],
-      null,
-      'too far',
-      'not ready',
-      'escort away',
-      'nothing',
-    );
+    tryNearbyInteraction(r.world, r.hud, 'escort away', 'nothing');
 
   it('the press really does take the feast where the core says feast_over_harvest', () => {
     const w = world('sim', [feast(12)], patches(), myPlot());

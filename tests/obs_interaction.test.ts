@@ -127,6 +127,34 @@ describe('RL interactable observation parity', () => {
     expect(corpse.lootable).toBe(false);
   });
 
+  it('skips a harvest-only corpse and advertises the object the interact action uses', () => {
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior' });
+    const [corpse] = mobFixtures(sim, 'forest_wolf', 1);
+    makeLootableCorpse(sim, corpse, { x: 33, z: 0 });
+    corpse.loot = null;
+    corpse.harvestClaimedBy = null;
+    const object = createGroundObject(
+      sim.nextId++,
+      'wolf_fang',
+      'Fallback Wolf Fang',
+      sim.groundPos(34, 0),
+    );
+    sim.addEntity(object);
+    parkOtherInteractables(sim, corpse, object);
+    standAt(sim, { x: 32, z: 0 });
+    const draws = vi.fn();
+    sim.rng.setObserver(draws);
+
+    expectAdvertises(sim, object, 0.66);
+    applyAction(sim, ACTIONS.indexOf('interact'));
+
+    expect(object.lootable).toBe(false);
+    expect(sim.countItem('wolf_fang')).toBe(1);
+    expect(corpse.lootable).toBe(true);
+    expect(corpse.harvestClaimedBy).toBeNull();
+    expect(draws).not.toHaveBeenCalled();
+  });
+
   it('advertises and talks to a friendly quest mob through applyAction', () => {
     const sim = new Sim({ seed: SEED, playerClass: 'warrior' });
     const [questMob] = mobFixtures(sim, 'forest_wolf', 1);

@@ -1,5 +1,5 @@
 import { audio } from '../game/audio';
-import { corpseLootAvailability, localPartyMemberIds } from '../game/corpse_loot_availability';
+import { corpseLootAvailabilityInWorld } from '../game/corpse_loot_availability';
 import { CROSS_HOTBAR_ATTACK_ID } from '../game/cross_hotbar';
 import { syncDeathControllerHints } from '../game/death_controller_hint';
 import { farmPressTarget } from '../game/farm_press_target_core';
@@ -2374,14 +2374,9 @@ export class Hud {
       element: $('#loot-window'),
       document,
       world: () => this.sim,
-      corpseAvailability: (mob) =>
-        corpseLootAvailability(
-          mob,
-          this.sim.playerId,
-          true,
-          localPartyMemberIds(this.sim.partyInfo),
-        ),
+      corpseAvailability: (mob) => corpseLootAvailabilityInWorld(this.sim, mob),
       closeTransient: () => this.closeOtherWindows('#loot-window'),
+      showError: (text) => this.showError(text),
       hideTooltip: () => this.hideTooltip(),
       entityName: entityDisplayName,
       money: (copper) => this.moneyHtml(copper),
@@ -2394,6 +2389,8 @@ export class Hud {
       centerPopup: (element) => this.centerPopupInViewport(element),
       placePopup: (element, x, y, reserveRight, reserveBottom, minLeft, minTop) =>
         this.placePopupAt(element, x, y, reserveRight, reserveBottom, minLeft, minTop),
+      ...this.windowFocus('#loot-window'),
+      onVisibilityChange: () => this.syncAnyWindowOpenState(),
     });
     this.lootRolls = new LootRollController({
       document,
@@ -5303,6 +5300,7 @@ export class Hud {
     consumePeek: () => this.peekGuard.consume(),
     ...this.windowFocus('#professions-window'),
     openHarvestJournal: () => this.harvestJournalWindow.open(),
+    harvestBody: () => this.lootWindow.openHarvestBodyChoice(),
   });
   // The Harvest Journal painter (harvest_journal_view.ts core +
   // harvest_journal_window.ts painter): the read-only plot list over
@@ -7019,6 +7017,7 @@ export class Hud {
     if (this.deedsWindow.isOpen) this.deedsWindow.render();
     if (this.reliquaryWindow.isOpen) this.reliquaryWindow.render();
     if (this.professionsWindow.isOpen) this.professionsWindow.render();
+    this.lootWindow.relocalize();
     this.harvestJournalWindow.relocalize();
     this.plantSheetWindow.relocalize();
     // The Perfecting window's repaint signature is ids/ranks/counts, all
@@ -9818,6 +9817,7 @@ export class Hud {
     if (slowHud) this.refreshOpenProfessionSurfacesIfChanged();
     if (slowHud) this.refreshCharSheetIfChanged();
     if (slowHud && this.professionsWindow.isOpen) this.professionsWindow.refreshIfChanged();
+    if (slowHud) this.plantSheetWindow.refreshIfChanged();
     // The gossip dialog's intro hint row watches the same online cprof edge:
     // attunement retires it, and no quest event fires for that flip.
     if (slowHud) this.questDialog.refreshIfChanged();
@@ -16322,7 +16322,7 @@ export class Hud {
     this.harvestJournalWindow.toggle();
   }
 
-  // The bed arm's free-bed route (NearbyInteractionHud): opens the plant sheet.
+  // The bed choice route: planting and deliberate crop harvesting.
   openPlantSheet(bedId: string): void {
     this.plantSheetWindow.open(bedId);
   }

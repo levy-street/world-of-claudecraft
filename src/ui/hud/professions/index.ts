@@ -41,6 +41,7 @@ export * from './profession_image_ids';
 export * from './profession_log_tones';
 export * from './profession_tutorial_view';
 export * from './profession_tutorial_window';
+export * from './professions_harvest_entry_controller';
 export * from './professions_view';
 export * from './professions_window';
 export * from './recipe_pattern_tooltip_view';

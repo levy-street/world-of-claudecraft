@@ -9,11 +9,11 @@ import {
   nameplateHeraldryInto,
   nameplateHeraldryLift,
 } from './nameplate_heraldry_core';
-import { drawNameplateLootIcon } from './nameplate_loot_icon';
+import { drawNameplateCorpseIcon, type NameplateMarkerTone } from './nameplate_markers';
 import { NAMEPLATE_BASE_WIDTH, nameplateHealthBarWidth } from './nameplate_pick_core';
 
 export type NameplateFrame = '' | 'elite' | 'boss';
-export type NameplateMarkerTone = 'none' | 'quest' | 'active' | 'loot' | 'repeat' | 'cooldown';
+export type { NameplateMarkerTone } from './nameplate_markers';
 
 export interface NameplateBadge {
   url: string;
@@ -429,15 +429,8 @@ export class NameplateCanvasSurface {
     y -= rowHeight;
     y -= NAMEPLATE_MARKER_ROW_HEIGHT;
     if (state.marker) {
-      if (state.markerTone === 'loot') {
-        const forced = this.forcedColorsActive();
-        drawNameplateLootIcon(
-          ctx,
-          screenX,
-          y + 14,
-          forced ? 'CanvasText' : '#f2c84b',
-          forced ? 'Canvas' : '#1b1205',
-        );
+      if (state.markerTone === 'loot' || state.markerTone === 'harvest') {
+        drawNameplateCorpseIcon(ctx, screenX, y + 14, state.markerTone, this.forcedColorsActive());
       } else {
         const style = this.markerStyle;
         // The glyph channel's cross-surface color contract (pinned by

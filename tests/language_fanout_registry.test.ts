@@ -158,6 +158,7 @@ const FANOUT_ARMS: readonly string[] = [
   // The journal's relocalize gates itself (isOpen inside) and additionally
   // clears the standing ready announcement, whose text was minted in the OLD
   // locale and no flip would re-mint (Phase 14).
+  'this.lootWindow.relocalize|',
   'this.harvestJournalWindow.relocalize|',
   // The plant sheet's relocalize gates itself (paint only while open), so the
   // arm carries no guard of its own.
@@ -282,6 +283,12 @@ interface AnsweredSurface extends GatedModule {
 }
 
 const ANSWERED: readonly AnsweredSurface[] = [
+  {
+    file: 'hud/loot/loot_window_controller.ts',
+    memos: ['corpseSig'],
+    answer: 'this.lootWindow.relocalize',
+    why: 'the corpse signature holds action availability and loot quantities; locale changes rebuild once while preserving explicit choices and focus',
+  },
   {
     file: 'hud/battleground/battleground_scoreboard_painter.ts',
     memos: ['lastSig'],
@@ -418,6 +425,12 @@ const ANSWERED: readonly AnsweredSurface[] = [
     memos: ['lastSig', 'paintedWalletSig'],
     answer: 'this.wocMarketWindow.relocalize',
     why: "the Exchange listing rows, statuses and countdowns digest into lastSig; relocalize() self-gates on isOpen, rebuilds once, and render() re-latches the signature. paintedWalletSig is the Solana wallet card's locale-free connection and balance state that gates onWalletChanged(); the same render() repaints the card in the current language and re-latches the signature, so the one relocalize() arm answers both memos",
+  },
+  {
+    file: 'hud/professions/farming_plant_sheet_window.ts',
+    memos: ['paintedStatus'],
+    answer: 'this.plantSheetWindow.relocalize',
+    why: 'the crop status memo gates cold refresh; relocalize repaints and re-latches it',
   },
   {
     file: 'hud/professions/professions_window.ts',
