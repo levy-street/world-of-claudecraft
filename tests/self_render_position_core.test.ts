@@ -322,6 +322,27 @@ describe('updateSelfRenderPosition predictor path', () => {
     expect(state.predictor).toBeNull();
   });
 
+  it('drops a teleport-scale reconciled residual instead of gliding it', () => {
+    const state = createSelfRenderPositionState();
+    const player = playerAt({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 0 });
+    updateSelfRenderPosition(
+      state,
+      player,
+      SEED,
+      1,
+      FRAME_DT,
+      0,
+      {
+        kind: 'reconciled',
+        position: { x: 104200, y: 0, z: -1253 },
+        residual: { x: -104336, y: 0, z: 1365 },
+      },
+      false,
+    );
+    expect(state.offset).toEqual({ x: 0, y: 0, z: 0 });
+    expect(state.position).toEqual({ x: 104200, y: 0, z: -1253 });
+  });
+
   it('clears the handoff offset outright on an authoritative discontinuity', () => {
     const state = createSelfRenderPositionState();
     const player = playerAt({ x: 10, y: 0, z: 0 }, { x: 10, y: 0, z: 0 });
@@ -330,6 +351,68 @@ describe('updateSelfRenderPosition predictor path', () => {
     runPredicted(state, player, true);
     expect(state.offset).toEqual({ x: 0, y: 0, z: 0 });
     expect(state.position.x).toBe(9);
+  });
+
+  it('snaps to the authoritative pose when the gate closes across a teleport', () => {
+    // Delve entry: the predictor owned the pose at the board door, the server
+    // teleported the body to the instance band (~100k units east), and the
+    // delve gate closed the predictor on the same snapshot. The handoff gap is
+    // the whole door-to-instance distance; treated as a lead it would be
+    // rewound at MAX_SELF_REWIND_YD_PER_SEC for hours (the "sent flying across
+    // the map" report). Past the teleport threshold the gap snaps instead.
+    const state = createSelfRenderPositionState();
+    const door = playerAt({ x: 100, y: 0, z: 50 }, { x: 100, y: 0, z: 50 });
+    updateSelfRenderPosition(
+      state,
+      door,
+      SEED,
+      1,
+      FRAME_DT,
+      0.2,
+      { kind: 'reconciled', position: { x: 100.5, y: 0, z: 50 }, residual: null },
+      false,
+    );
+    expect(state.active).toBe(true);
+    const inside = playerAt({ x: 104200, y: 0, z: -1253 }, { x: 104200, y: 0, z: -1253 });
+    updateSelfRenderPosition(state, inside, SEED, 1, FRAME_DT, 0.2, null, false);
+    expect(state.active).toBe(false);
+    expect(state.offset).toEqual({ x: 0, y: 0, z: 0 });
+    expect(state.position).toEqual({ x: 104200, y: 0, z: -1253 });
+    // And it stays put: no residual rewind on the following frames.
+    updateSelfRenderPosition(state, inside, SEED, 1, FRAME_DT, 0.2, null, false);
+    expect(state.position).toEqual({ x: 104200, y: 0, z: -1253 });
+  });
+
+  it('keeps the bounded rewind for a handoff gap under the teleport threshold', () => {
+    const state = createSelfRenderPositionState();
+    const player = playerAt({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 0 });
+    const lead = Math.sqrt(SELF_MOTION_SNAP_DIST_SQ) - 0.5;
+    updateSelfRenderPosition(
+      state,
+      player,
+      SEED,
+      1,
+      FRAME_DT,
+      0.2,
+      { kind: 'reconciled', position: { x: lead, y: 0, z: 0 }, residual: null },
+      false,
+    );
+    updateSelfRenderPosition(state, player, SEED, 1, FRAME_DT, 0.2, null, false);
+    expect(state.position.x).toBeCloseTo(lead - MAX_SELF_REWIND_YD_PER_SEC * FRAME_DT, 10);
+  });
+
+  it('snaps when the predictor takes over across a teleport-scale gap', () => {
+    // Dungeon/arena entry keeps the predictor on: it suspends for the epoch
+    // frame (fallback owns the pose at the old spot) and resumes at the new
+    // authoritative pose next frame. That re-entry capture must not glide the
+    // camera across the map either.
+    const state = createSelfRenderPositionState();
+    const player = playerAt({ x: 10, y: 0, z: 0 }, { x: 10, y: 0, z: 0 });
+    updateSelfRenderPosition(state, player, SEED, 1, FRAME_DT, 0.2, null, false);
+    state.predictor = stubPredictor(() => ({ x: 104200, y: 0, z: -1253 }));
+    runPredicted(state, player);
+    expect(state.offset).toEqual({ x: 0, y: 0, z: 0 });
+    expect(state.position).toEqual({ x: 104200, y: 0, z: -1253 });
   });
 
   it('carries the offset on all three axes', () => {
