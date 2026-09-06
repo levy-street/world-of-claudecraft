@@ -20,6 +20,11 @@ export interface ParseCounters {
   observeMsMax: number;
   /** Set once when the budget breaker disables capture; requires a restart. */
   captureDisabled: number;
+  /** Gained aura events whose state snapshot hit the field cap and was cut
+   * short (aura_state.ts): completeness is the module's whole point, so a
+   * truncation must be visible rather than silent. Zero unless Aura grows
+   * past the cap. */
+  auraStateTruncated: number;
   censusRuns: number;
   censusRows: number;
   censusFailures: number;
@@ -42,6 +47,7 @@ export function createParseCounters(): ParseCounters {
     observeMsLast: 0,
     observeMsMax: 0,
     captureDisabled: 0,
+    auraStateTruncated: 0,
     censusRuns: 0,
     censusRows: 0,
     censusFailures: 0,
@@ -120,6 +126,11 @@ export function registerParseMetrics(registry: Registry, counters: ParseCounters
     'woc_parse_capture_disabled',
     'Budget breaker tripped (1 = capture off)',
     () => counters.captureDisabled,
+  );
+  gauge(
+    'woc_parse_aura_state_truncated_total',
+    'Gained aura events whose state snapshot hit the field cap',
+    () => counters.auraStateTruncated,
   );
   gauge('woc_parse_census_runs_total', 'Census exports since boot', () => counters.censusRuns);
   gauge(

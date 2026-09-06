@@ -10,9 +10,11 @@
 // rather than ever degrading the tick loop.
 import type { SimEvent } from '../../src/sim/types';
 import { ArenaSegmenter } from './arena';
+import { auraStateSnapshot } from './aura_state';
 import { BattlegroundSegmenter } from './battleground';
 import { BossCastSynthesizer } from './boss_casts';
 import type { EventEnrichment, FightParticipant, Surface } from './contract';
+import { EVENT_RECORD_POLICY, eventActorId } from './event_policy';
 import type { OpenFight, PendingClose } from './fights';
 import type { ParseFlags } from './flags';
 import { DungeonSegmenter } from './instances';
@@ -193,9 +195,23 @@ export class ParseRecorder {
           this.routeDeath(ev, tick);
           break;
         default:
+          // Everything else is classified in event_policy.ts (keyed by the full
+          // SimEvent union, so a new type cannot arrive here unclassified).
+          if (EVENT_RECORD_POLICY[ev.type] === 'record') this.routeRecorded(ev, tick);
           break;
       }
     }
+  }
+
+  /** Generic path for `record`-policy events: verbatim, to the actor's fight. */
+  private routeRecorded(ev: SimEvent, tick: number): void {
+    const actorId = eventActorId(ev);
+    if (actorId === null) return;
+    const match = this.fightFor(actorId);
+    if (match === null) return;
+    const enrichment: EventEnrichment | undefined =
+      match.ownerId !== null ? { ownerId: match.ownerId } : undefined;
+    match.fight.recordEvent(tick, ev as Record<string, unknown>, enrichment);
   }
 
   /** A pet's owner entity id, or the id itself for everything else. */
@@ -307,6 +323,36 @@ export class ParseRecorder {
     if (fight === undefined) return;
     let enrichment: EventEnrichment | undefined;
     if (ev.gained) {
+      // The live aura object: the event names it, the object holds its state.
+      // A fresh application or refresh always appends to the end (applyAura
+      // splices then pushes), so the backward scan finds the most recent
+      // match. The name always has to agree; when the event also carries
+      // source and ability id (fidelity round 1 emit sites) those must agree
+      // too, so a same-source decoy applied later cannot be mistaken for the
+      // named aura. The bare-name fallback (un-widened sites) is best-effort:
+      // with two same-named auras from different casters the older one is
+      // unreachable by name alone.
+      //
+      // Known miss, inherited from base: the Sunder/Expose stack-bump re-emit
+      // (effect_dispatch.ts) deliberately names the CURRENT caster while the
+      // live aura keeps the original one, so a bump from a second caster
+      // finds no live match and ships identity and stacks with no auraState.
+      const auras = this.opts.sim.entities.get(ev.targetId)?.auras;
+      let live: (typeof auras extends readonly (infer A)[] | undefined ? A : never) | undefined;
+      if (auras !== undefined) {
+        for (let i = auras.length - 1; i >= 0; i--) {
+          const aura = auras[i];
+          if (aura === undefined || aura.name !== ev.name) continue;
+          const matches =
+            ev.sourceId === undefined ||
+            (aura.sourceId === ev.sourceId &&
+              (ev.abilityId === undefined || aura.id === ev.abilityId));
+          if (matches) {
+            live = aura;
+            break;
+          }
+        }
+      }
       if (ev.sourceId !== undefined) {
         // Fidelity round 1 landed: the event itself carries attribution.
         enrichment = {
@@ -314,31 +360,26 @@ export class ParseRecorder {
           ...(ev.abilityId !== undefined ? { auraId: ev.abilityId } : {}),
           ...(ev.stacks !== undefined ? { auraStacks: ev.stacks } : {}),
         };
-      } else {
-        // Fallback state-join for un-widened emit sites: scan the live aura
-        // array backwards by name. A fresh application or refresh always
-        // appends to the end (applyAura splices then pushes), so the backward
-        // scan finds the most recent same-named aura. Best-effort only: with
-        // two same-named auras from different casters the older one is
-        // unreachable by name alone.
-        const auras = this.opts.sim.entities.get(ev.targetId)?.auras;
-        if (auras !== undefined) {
-          for (let i = auras.length - 1; i >= 0; i--) {
-            const aura = auras[i];
-            if (aura !== undefined && aura.name === ev.name) {
-              enrichment = {
-                auraSourceId: aura.sourceId,
-                auraId: aura.id,
-                ...(aura.stacks !== undefined ? { auraStacks: aura.stacks } : {}),
-              };
-              break;
-            }
-          }
-        }
+      } else if (live !== undefined) {
+        enrichment = {
+          auraSourceId: live.sourceId,
+          auraId: live.id,
+          ...(live.stacks !== undefined ? { auraStacks: live.stacks } : {}),
+        };
       }
+      // The aura's scalar state rides along automatically (aura_state.ts):
+      // whatever the sim keeps on the aura is what the parse gets.
+      const auraState =
+        live !== undefined ? auraStateSnapshot(live, this.noteAuraStateTruncated) : undefined;
+      if (auraState !== undefined) enrichment = { ...(enrichment ?? {}), auraState };
     }
     fight.recordEvent(tick, ev as Record<string, unknown>, enrichment);
   }
+
+  /** Bound once so the aura join passes a stable callback, no closure per event. */
+  private readonly noteAuraStateTruncated = (): void => {
+    this.opts.counters.auraStateTruncated++;
+  };
 
   private routeDeath(ev: SimEvent & { type: 'death' }, tick: number): void {
     const match = this.fightFor(ev.entityId) ?? this.fightFor(ev.killerId);

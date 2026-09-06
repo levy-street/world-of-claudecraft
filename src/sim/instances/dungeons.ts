@@ -540,7 +540,7 @@ export function enterDungeon(
       const player = ctx.entities.get(meta.entityId);
       if (player?.kind !== 'player') continue;
       for (const oldIgnivarId of oldIgnivarIds) {
-        clearIgnivarEncounterAuras(player, oldIgnivarId);
+        clearIgnivarEncounterAuras(ctx, player, oldIgnivarId);
       }
       for (const oldVarkhulId of oldVarkhulIds) {
         clearVarkhulEncounterAuras(player, oldVarkhulId);
@@ -846,7 +846,7 @@ export function leaveDungeon(ctx: SimContext, pid?: number): boolean {
       // The left room's teardown, exactly leaveDungeon's: departing scrubs the
       // leaver from its hate tables and sheds its encounter-owned auras.
       if (inst) scrubInstanceThreat(ctx, inst, p.id);
-      if (dungeon.id === IGNIVAR_RAID_ARENA_ID) clearIgnivarEncounterAuras(p);
+      if (dungeon.id === IGNIVAR_RAID_ARENA_ID) clearIgnivarEncounterAuras(ctx, p);
       if (dungeon.id === IGNIVAR_SECOND_WING_ID) clearVarkhulEncounterAuras(p);
       return true;
     }
@@ -890,7 +890,7 @@ export function detachFromDungeon(ctx: SimContext, p: Entity): { x: number; z: n
   if (!dungeon) return null;
   const inst = ctx.instances.find((i) => i.partyKey !== null && instanceClaimContains(i, p.pos));
   if (inst) scrubInstanceThreat(ctx, inst, p.id);
-  if (dungeon.id === IGNIVAR_RAID_ARENA_ID) clearIgnivarEncounterAuras(p);
+  if (dungeon.id === IGNIVAR_RAID_ARENA_ID) clearIgnivarEncounterAuras(ctx, p);
   if (dungeon.id === IGNIVAR_SECOND_WING_ID) clearVarkhulEncounterAuras(p);
   cancelProfessionSessionOnDisplacement(ctx, p);
   const drop = dungeon.leaveOffset ?? { x: 0, z: -DUNGEON_DOOR_RETURN_INSET };
