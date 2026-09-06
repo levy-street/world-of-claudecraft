@@ -575,6 +575,15 @@ export async function seedLowGraphicsPreset(page) {
   );
 }
 
+/** Persist the "Current / Max (Percent)" health text mode (4) for the player and
+ *  target frames before boot, on top of the lowest graphics preset. */
+async function seedHealthTextPercentMode(page) {
+  await seedLowGraphicsPreset(page);
+  await page.evaluateOnNewDocument(
+    `try { const s = JSON.parse(localStorage.getItem('woc_settings') ?? '{}') || {}; s.playerFrameHealthText = 4; s.targetFrameHealthText = 4; localStorage.setItem('woc_settings', JSON.stringify(s)); } catch {}`,
+  );
+}
+
 /** Deliberate HIGH comparison leg for identity-versus-bloom evidence. */
 async function seedHighGraphicsPreset(page) {
   await page.evaluateOnNewDocument(
@@ -7361,6 +7370,97 @@ export const TARGETS = [
       });
       const open = await pollForSize(page, '#options-menu .set-rows');
       return open ? { clip: '#options-menu' } : {};
+    },
+  },
+  {
+    // Interface > Frames: the Player / Target Health Text choice rows (and the
+    // fifth "Current / Max (Percent)" mode) the unit frames now share with the
+    // party frames.
+    key: 'interface-options-unit-frame-health-text',
+    label: 'Interface options panel: Player / Target Health Text rows',
+    when: ['ui/hud_frames'],
+    variants: [{ key: 'desktop' }],
+    async capture(page) {
+      await page.evaluate(() => {
+        const hud = window.__game?.hud;
+        if (!hud) return;
+        document.getElementById('tutorial-greeting')?.remove();
+        const win = document.querySelector('#options-menu');
+        if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
+        hud.toggleOptionsMenu();
+        // Interface is the fourth button on the main options menu (offline).
+        const buttons = Array.from(document.querySelectorAll('#options-menu .opt-btn'));
+        buttons[3]?.click();
+      });
+      let open = await pollForSize(page, '#options-menu .set-rows');
+      if (!open) return {};
+      // The Frames tab is the second tab of the Interface strip.
+      await page.evaluate(() => {
+        const tabs = Array.from(document.querySelectorAll('#options-menu .opt-tab'));
+        tabs[1]?.click();
+      });
+      open = await pollForSize(page, '[data-focus-key="playerFrameHealthText:0"]');
+      if (!open) return {};
+      await page.evaluate(() => {
+        document.getElementById('tutorial-greeting')?.remove();
+        document
+          .querySelector('[data-focus-key="playerFrameHealthText:0"]')
+          ?.closest('.set-row')
+          ?.scrollIntoView({ block: 'center' });
+      });
+      return { clip: '#options-menu' };
+    },
+  },
+  {
+    // The player and target frames printing the "Current / Max (Percent)" mode
+    // (seeded through the persisted settings), against a living mob.
+    key: 'unit-frame-health-text-percent',
+    label: 'Player and target frames: Current / Max (Percent) health text',
+    when: ['ui/hud_frames'],
+    variants: [
+      { key: 'player-frame', beforeLoad: seedHealthTextPercentMode, clip: '#player-frame' },
+      { key: 'target-frame', beforeLoad: seedHealthTextPercentMode, clip: '#target-frame' },
+    ],
+    async capture(page, variant) {
+      const staged = await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.getElementById('tutorial-greeting')?.remove();
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!game || !sim || !player) return { ok: false };
+        const win = document.querySelector('#options-menu');
+        if (win && getComputedStyle(win).display !== 'none') game.hud.toggleOptionsMenu();
+        // Nearest living mob, skipping the practice effigies (the sim refills them
+        // every tick, which would pin the percent at 100%).
+        let mob = null;
+        let best = Infinity;
+        for (const e of sim.entities.values()) {
+          if (e.kind !== 'mob' || e.hp <= 0 || e.id === player.id) continue;
+          if (/dummy|effigy/i.test(e.templateId ?? '')) continue;
+          const d = (e.pos.x - player.pos.x) ** 2 + (e.pos.z - player.pos.z) ** 2;
+          if (d < best) {
+            best = d;
+            mob = e;
+          }
+        }
+        if (!mob) return { ok: false };
+        player.targetId = mob.id;
+        window.__healthTextShotMob = mob;
+        return { ok: true };
+      });
+      if (!staged.ok) return {};
+      await wait(600);
+      // Off-full values so the percent is visibly not 100%, written right before
+      // the shutter (a training effigy refills itself between ticks).
+      await page.evaluate(() => {
+        const player = window.__game?.sim?.player;
+        const mob = window.__healthTextShotMob;
+        if (mob) mob.hp = Math.max(1, Math.round(mob.maxHp * 0.62));
+        if (player) player.hp = Math.max(1, Math.round(player.maxHp * 0.87));
+      });
+      await wait(120);
+      return { clip: variant.clip };
     },
   },
   {

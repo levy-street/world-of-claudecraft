@@ -2832,11 +2832,13 @@ async function startGame(
       case 'partyFrameColumns':
         document.documentElement.style.setProperty('--party-frame-columns', String(Math.round(v)));
         break;
+      case 'playerFrameHealthText':
+      case 'targetFrameHealthText':
       case 'partyFrameHealthText':
       case 'partyFrameSort':
       case 'partyFrameStyle':
-        // Read live by Hud.updatePartyFrames; persistence above is the only
-        // page-level work needed.
+        // Read live by Hud.updatePartyFrames / the unit-frame paints; persistence
+        // above is the only page-level work needed.
         break;
       case 'aurasOnPlayerFrame':
         hud.setAurasOnPlayerFrame(!!v);

@@ -801,6 +801,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.healthPercent': 'Проценты',
   'hudChrome.partyFrames.healthCurrent': 'Текущее',
   'hudChrome.partyFrames.healthCurrentMax': 'Текущее / Максимум',
+  'hudChrome.partyFrames.healthCurrentMaxPercent': 'Текущее / Максимум (проценты)',
   'hudChrome.partyFrames.sort': 'Сортировка игроков',
   'hudChrome.partyFrames.sortGroup': 'Группа',
   'hudChrome.partyFrames.showResource': 'Показывать ману, ярость и энергию',
@@ -875,6 +876,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.targetFrameScale': 'Размер рамки цели',
   'hudChrome.options.aurasOnPlayerFrame': 'Баффы у рамки игрока',
   'hudChrome.options.auraBarBelowFrame': 'Баффы под рамкой игрока',
+  'hudChrome.options.playerHealthText': 'Текст здоровья игрока',
+  'hudChrome.options.targetHealthText': 'Текст здоровья цели',
   'hudChrome.options.alwaysShowAllBuffs': 'Всегда показывать все баффы',
   'hud.core.mapCanvasLabel': 'Карта',
   'hud.core.mapSummary': 'Карта зоны {zone}.',
@@ -14449,13 +14452,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifMouseoverCast':
     'Позволяет лечению или дружественному заклинанию лечь на ту рамку группы, над которой висит курсор, не меняя вашу цель.',
   'guide.settingsPage.ifPartyHealthText':
-    'Что пишут полоски группы: ничего, проценты, текущее здоровье или текущее и максимальное.',
+    'Что пишут полоски группы: ничего, проценты, текущее здоровье, текущее и максимальное или оба значения с процентами рядом.',
   'guide.settingsPage.ifPartyShowAuras':
     'Показывать ли усиления и ослабления на рамках группы. Такие же переключатели отвечают за полоски ресурса, поглощение, питомцев и за то, показываетесь ли вы сами в своём списке группы.',
   'guide.settingsPage.ifPartySort':
     'Порядок, в котором перечислены участники группы: порядок в группе, роль или имя.',
   'guide.settingsPage.ifPartyStyle':
     'Раскладка группы: «Автоматически» подстраивается под размер вашей группы, «Классическая» — привычный столбец, а «Рейдовая» собирает всех в плотную сетку.',
+  'guide.settingsPage.ifPlayerHealthText': 'Что пишет ваша полоска здоровья: ничего, проценты, текущее здоровье, текущее и максимальное или оба значения с процентами рядом.',
+  'guide.settingsPage.ifTargetHealthText': 'Что пишут полоски здоровья цели и цели цели, с теми же вариантами, что и у вашей рамки.',
   'guide.settingsPage.ifPetFrame': 'Показывает рамку вашего питомца.',
   'guide.settingsPage.ifPlayerFrameScale': 'Размер вашей собственной рамки персонажа.',
   'guide.settingsPage.ifShowAttackButton':

@@ -775,6 +775,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.healthPercent': '百分比',
   'hudChrome.partyFrames.healthCurrent': '当前值',
   'hudChrome.partyFrames.healthCurrentMax': '当前 / 最大',
+  'hudChrome.partyFrames.healthCurrentMaxPercent': '当前 / 最大 (百分比)',
   'hudChrome.partyFrames.sort': '玩家排序',
   'hudChrome.partyFrames.sortGroup': '小队',
   'hudChrome.partyFrames.showResource': '显示法力、怒气和能量',
@@ -849,6 +850,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.targetFrameScale': '目标框缩放',
   'hudChrome.options.aurasOnPlayerFrame': '增益显示在玩家框',
   'hudChrome.options.auraBarBelowFrame': '增益显示在玩家框下方',
+  'hudChrome.options.playerHealthText': '玩家生命值文字',
+  'hudChrome.options.targetHealthText': '目标生命值文字',
   'hudChrome.options.alwaysShowAllBuffs': '始终显示所有增益',
   'hud.core.mapCanvasLabel': '地图',
   'hud.core.mapSummary': '{zone}的地图。',
@@ -13521,13 +13524,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifLockBars': '锁定你的技能栏，免得不小心把技能从格子里拖出来。',
   'guide.settingsPage.ifMouseoverCast':
     '让治疗或友方法术落在你鼠标悬停的那个队伍框体上，而不改变你当前的目标。',
-  'guide.settingsPage.ifPartyHealthText':
-    '队伍血条上写什么：不显示、百分比、当前生命，或当前与最大生命。',
+  'guide.settingsPage.ifPartyHealthText': '队伍血条上写什么：不显示、百分比、当前生命、当前与最大生命，或两者并附上百分比。',
   'guide.settingsPage.ifPartyShowAuras':
     '队伍框体上是否显示增益和减益。相应的开关还涵盖资源条、吸收盾、宠物，以及你自己是否出现在队伍列表里。',
   'guide.settingsPage.ifPartySort': '队伍成员的排列顺序：入队顺序、职责或名字。',
   'guide.settingsPage.ifPartyStyle':
     '队伍布局：“自动”跟随你的队伍规模，“经典”是传统的竖排，“团队”把所有人压进紧凑网格。',
+  'guide.settingsPage.ifPlayerHealthText': '自己的血条上写什么：不显示、百分比、当前生命、当前与最大生命，或两者并附上百分比。',
+  'guide.settingsPage.ifTargetHealthText': '目标和目标的目标血条上写什么，选项与自己的框体相同。',
   'guide.settingsPage.ifPetFrame': '为你的宠物显示一个框体。',
   'guide.settingsPage.ifPlayerFrameScale': '你自己单位框体的大小。',
   'guide.settingsPage.ifShowAttackButton': '在你的动作条上放一个明确的“攻击”按钮。',

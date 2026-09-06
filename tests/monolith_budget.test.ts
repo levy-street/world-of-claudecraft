@@ -332,7 +332,10 @@ const MONOLITHS: MonolithRow[] = [
     // shape as every prior window wiring (Reliquary, Deeds, Professions), and
     // no clean branch-owned extraction exists for a brand-new window's own
     // wiring. Maintainer decision, exact count: any further growth reds again.
-    ceiling: 18939,
+    // Merging PR #3870 after #3858 keeps the Loot Explorer window wiring above
+    // and lands the unit-frame Health Text wiring inside the current merged HUD
+    // shape. Re-measured on this merge result. Exact count, zero slack.
+    ceiling: 18936,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
