@@ -69,6 +69,8 @@ const CANCEL_VERTICAL_DISTANCE = 0.25;
 const BG_WALL_PRESS_PROBE_DISTANCE = 0.35;
 const BG_WALL_PRESS_MIN_PROGRESS = 0.05;
 const BG_WALL_PRESS_ESC_GRACE_SECONDS = 3;
+// Authored perimeter blockers sit on BG_HALF_* and extend this far outward.
+const BG_PERIMETER_WALL_HALF_DEPTH = 0.6;
 const battlegroundWallPressGrace = new WeakMap<SimContext, Map<number, number>>();
 
 export interface PendingUnstuck {
@@ -120,7 +122,7 @@ function battlegroundLocation(
   const origin = battlegroundOrigin(match.slot);
   const localX = pos.x - origin.x;
   const localZ = pos.z - origin.z;
-  const margin = PLAYER_BODY_RADIUS + POSITION_EPS;
+  const margin = PLAYER_BODY_RADIUS + BG_PERIMETER_WALL_HALF_DEPTH + POSITION_EPS;
   if (Math.abs(localX) > BG_HALF_X + margin || Math.abs(localZ) > BG_HALF_Z + margin) {
     return null;
   }

@@ -944,6 +944,48 @@ describe('unstuck area identity', () => {
     expect(Math.abs(player.pos.z - (origin.z + plot.z))).toBeLessThanOrEqual(plot.hd);
   });
 
+  it('accepts a battleground perimeter-wall trap beyond the playable footprint margin', () => {
+    const { sim, match, pid } = activeBattleground();
+    const player = required(sim.entities.get(pid), 'battleground player');
+    const origin = battlegroundOrigin(match.slot);
+    player.pos = sim.groundPos(origin.x + BG_HALF_X + PLAYER_BODY_RADIUS + 0.05, origin.z);
+    player.prevPos = { ...player.pos };
+    player.vx = 0;
+    player.vy = 0;
+    player.vz = 0;
+    player.onGround = true;
+    player.jumping = false;
+    player.inCombat = false;
+    player.combatTimer = 999;
+    sim.ctx.rebucket(player);
+
+    const resolved = resolvePosition(sim.cfg.seed, player.pos.x, player.pos.z, PLAYER_BODY_RADIUS);
+    expect(Math.hypot(resolved.x - player.pos.x, resolved.z - player.pos.z)).toBeGreaterThan(0.01);
+    expect(unstuckLocationAt(sim.ctx, pid, player.pos)?.area).toMatchObject({
+      kind: 'battleground',
+      id: 'thornhollow_fields',
+      instanceId: String(match.id),
+      slot: match.slot,
+    });
+
+    expect(sim.unstuck(pid)).toBe(true);
+    sim.drainEvents();
+    const events = tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20);
+    const completed = eventsOf(events).find((event) => event.phase === 'completed');
+
+    expect(completed?.area).toMatchObject({
+      kind: 'battleground',
+      id: 'thornhollow_fields',
+      instanceId: String(match.id),
+      slot: match.slot,
+    });
+    expect(sim.bgMatchFor(pid)).toBe(match);
+    expect(isBgPos(player.pos.x)).toBe(true);
+    const plot = BG_GRAVEYARDS[0];
+    expect(Math.abs(player.pos.x - (origin.x + plot.x))).toBeLessThanOrEqual(plot.hw);
+    expect(Math.abs(player.pos.z - (origin.z + plot.z))).toBeLessThanOrEqual(plot.hd);
+  });
+
   it('completes a battleground wall-press ESC attempt while movement input is still held', () => {
     const { sim, match, pid } = activeBattleground();
     const player = forceBattlegroundWallContact(sim, match, pid);
