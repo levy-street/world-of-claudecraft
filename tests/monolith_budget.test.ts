@@ -320,7 +320,11 @@ const MONOLITHS: MonolithRow[] = [
     // wiring) together with release's target dots, guild roster, Riftbound
     // tooltip and action-bar profile extractions. Measured on the merged tree.
     // Exact count, zero slack.
-    ceiling: 18915,
+    // Re-measured while merging PR #3856: the on-bar key-binding banner DOM
+    // stays extracted in src/ui/hud/action_bar/action_bar_bind_banner.ts, and
+    // the resolved Hud coordinator lands at this exact merged count.
+    // Exact count, zero slack.
+    ceiling: 18918,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
