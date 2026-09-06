@@ -26,7 +26,7 @@ export interface WalletReauthAccountShape {
   passwordSet: boolean;
 }
 
-export type WalletReauthMode = 'relink' | 'unlink';
+export type WalletReauthMode = 'relink' | 'unlink' | 'exchange_list';
 
 export type WalletReauthPlan =
   | { kind: 'password'; showTwoFactor: boolean }
@@ -109,11 +109,20 @@ export function promptWalletReauth(
 
     const title = document.createElement('h2');
     title.id = 'wallet-reauth-title';
-    title.textContent = mode === 'unlink' ? t('wallet.reauthUnlinkTitle') : t('wallet.reauthTitle');
+    title.textContent =
+      mode === 'unlink'
+        ? t('wallet.reauthUnlinkTitle')
+        : mode === 'exchange_list'
+          ? t('wallet.reauthListTitle')
+          : t('wallet.reauthTitle');
 
     const help = document.createElement('p');
     help.textContent =
-      plan.kind === 'no_password' ? t('wallet.reauthNoPassword') : t('wallet.reauthHelp');
+      plan.kind === 'no_password'
+        ? t('wallet.reauthNoPassword')
+        : mode === 'exchange_list'
+          ? t('wallet.reauthListHelp')
+          : t('wallet.reauthHelp');
 
     const actions = document.createElement('div');
     actions.className = 'confirm-actions';

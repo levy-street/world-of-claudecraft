@@ -45,6 +45,11 @@ import type {
   WocStrikeRow,
   WocStuckCustodyClasses,
 } from './woc_market';
+import {
+  postHeldEntryOnClient,
+  WOC_MARKET_HELD_SCHEMA,
+  type WocHeldPost,
+} from './woc_market_held_db';
 import type { WocOpsListingRow, WocOpsListingStatus, WocOpsP2pTradeRow } from './woc_market_ops';
 import type { WocBidStatus, WocSettlementState } from './woc_market_rules';
 import {
@@ -847,7 +852,19 @@ CREATE INDEX IF NOT EXISTS woc_market_stepup_challenges_realm_expiry
 -- woc_market_bids index their account FK for exactly this).
 CREATE INDEX IF NOT EXISTS woc_market_stepup_challenges_account
   ON woc_market_stepup_challenges (account_id);
-`;
+-- The Exchange Vault (woc_market_held_db.ts): a walletless seller lists with
+-- NO seller_wallet (their leg pays to the operator custody address and is
+-- booked to their Vault), so the column loses its NOT NULL. Additive and
+-- idempotent: DROP NOT NULL on an already-nullable column is a no-op, and
+-- every standing row keeps its wallet. The settlement keeps the quote's
+-- seller leg so the delivery finalize can credit the exact service figure.
+ALTER TABLE woc_market_listings ALTER COLUMN seller_wallet DROP NOT NULL;
+ALTER TABLE woc_market_settlements ADD COLUMN IF NOT EXISTS seller_leg_base TEXT;
+`.concat(
+  // The Vault ledger rides the same boot statement: it FKs accounts(id) and
+  // joins the settlements table above, so it must follow both.
+  WOC_MARKET_HELD_SCHEMA,
+);
 
 /** Lock-wait ceiling for the escrow transaction's accounts row. Short on
  *  purpose: a blocked escrow holds a pooled client, and the pool is shared
@@ -1012,8 +1029,8 @@ const BID_COLS =
 
 const SETTLEMENT_COLS =
   'id, listing_id, bid_id, attempt, buyer_account, buyer_character, buyer_name, buyer_wallet, ' +
-  'amount_cents, state, quote_reference, quote_expires, settled_amount_base, tx_signature, ' +
-  'fail_reason, deadline_at, created_at';
+  'amount_cents, state, quote_reference, quote_expires, settled_amount_base, seller_leg_base, ' +
+  'tx_signature, fail_reason, deadline_at, created_at';
 
 function ms(value: unknown): number {
   return value instanceof Date ? value.getTime() : new Date(String(value)).getTime();
@@ -1122,6 +1139,7 @@ function toSettlement(row: Row): WocSettlementRow {
     txSignature: row.tx_signature ?? null,
     failReason: row.fail_reason ?? null,
     settledAmountBase: row.settled_amount_base ?? null,
+    sellerLegBase: row.seller_leg_base ?? null,
     deadlineAtMs: ms(row.deadline_at),
     createdAtMs: ms(row.created_at),
   };
@@ -4138,13 +4156,14 @@ export class PgWocMarketDb implements WocMarketDb {
     reference: string,
     expiresAtMs: number,
     amountBase: string | null,
+    sellerLegBase: string | null,
   ): Promise<boolean> {
     const res = await this.boundedWrite(
       `UPDATE woc_market_settlements
           SET quote_reference = $2, quote_expires = to_timestamp($3 / 1000.0),
-              settled_amount_base = $4, updated_at = now()
+              settled_amount_base = $4, seller_leg_base = $5, updated_at = now()
         WHERE id = $1 AND state = 'offered'`,
-      [id, reference, expiresAtMs, amountBase],
+      [id, reference, expiresAtMs, amountBase, sellerLegBase],
     );
     return (res.rowCount ?? 0) > 0;
   }
@@ -4403,6 +4422,7 @@ export class PgWocMarketDb implements WocMarketDb {
     listingId: number;
     bidId: number | null;
     sale: Omit<WocSaleRow, 'id' | 'excluded' | 'atMs'>;
+    heldCredit?: WocHeldPost | null;
   }): Promise<'finalized' | 'already_final' | 'stale' | 'contended'> {
     try {
       return await this.withTx(async (client) => {
@@ -4498,6 +4518,10 @@ export class PgWocMarketDb implements WocMarketDb {
             WHERE id = $1 AND (status <> 'closed' OR item_disposed = false)`,
           [args.listingId, 'sold'],
         );
+        // The Vault seller's credit rides THIS transaction (idempotent on its
+        // ref, so the re-drive and a re-run post nothing new): the sale row
+        // and the seller's balance can never disagree across a crash.
+        if (args.heldCredit) await postHeldEntryOnClient(client, args.heldCredit);
         if (args.bidId !== null) {
           // The winner's held bond flows home after a completed settlement.
           await client.query(

@@ -93,6 +93,23 @@ export interface WocMarketEconomy {
     reference: string,
     signature: string,
   ): Promise<{ settled: boolean; pending: boolean; reason: string | null }>;
+  /** Settle a quote FROM the operator custody wallet (the Vault): the service
+   *  signs and broadcasts the quote it built for buyerWallet = the custody
+   *  address, the same payment/burn/treasury legs a wallet-signed settlement
+   *  carries. The game charged the buyer's Vault ledger BEFORE asking, and
+   *  reverses that charge on a refusal. Later confirm() polls for a held
+   *  settlement pass the 'held:<reference>' pseudo-signature. */
+  settleHeld(
+    reference: string,
+  ): Promise<{ settled: boolean; pending: boolean; reason: string | null }>;
+  /** Cash out: move `base` units from the custody wallet to the player's
+   *  verified wallet. memoRef is the ledger entry ref (idempotency key on
+   *  the service side too). */
+  heldWithdrawal(args: {
+    memoRef: string;
+    base: string;
+    wallet: string;
+  }): Promise<{ done: boolean; reason: string | null }>;
   refundBond(reference: string): Promise<{ done: boolean; reason: string | null }>;
   forfeitBond(reference: string): Promise<{ done: boolean; reason: string | null }>;
   /** Ops introspection for the price cache (proxy only; the dev economy has

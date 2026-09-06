@@ -1,6 +1,7 @@
 // FIRST import on purpose: loads .env before realm.ts (or any other module
 // with an import-time process.env read) evaluates. See server/env.ts.
 import './env';
+import { randomUUID } from 'node:crypto';
 import * as fs from 'node:fs';
 import * as http from 'node:http';
 import * as path from 'node:path';
@@ -438,6 +439,7 @@ import {
   handleWalletGet,
   handleWalletLink,
   handleWalletUnlink,
+  reauthorizeAccountProof,
 } from './wallet';
 import { allowedCorsOrigin, isWebClientRequest } from './web_login_guard';
 import {
@@ -464,6 +466,8 @@ import {
 } from './woc_market_db';
 import { wocStampHighWaterCount } from './woc_market_delivery';
 import { createWocEscrowGate } from './woc_market_escrow_gate';
+import { WocMarketHeldService, wocHeldWalletFromEnv } from './woc_market_held';
+import { PgWocMarketHeldDb } from './woc_market_held_db';
 import { wocParkRefusalCount } from './woc_market_local_ledgers';
 import { createWocMarketMonitor } from './woc_market_monitor';
 import { createDevWocMarketEconomy, createWocMarketEconomyProxy } from './woc_market_proxy';
@@ -2937,6 +2941,28 @@ const wocMarketDb = new PgWocMarketDb(pool);
 // The hot-read cache (H11): the service reads through it; the route layer's
 // mutation handlers bust it. ONE instance wired to both, or busts would miss.
 const wocMarketReadCache = new WocMarketReadCache();
+// The Exchange Vault (docs/prd/woc/marketplace.md, "Selling without a wallet:
+// the Vault"): on only when the operator names the custody address. The
+// market deps below get the service (listing intake, buy-now intake, the
+// settlement quote's seller address), the routes runtime gets it for the
+// Vault endpoints. The two settlement reads it needs come from the market
+// db, which is why it is constructed here rather than inside the service.
+const wocMarketHeldService = new WocMarketHeldService({
+  db: new PgWocMarketHeldDb(pool),
+  market: wocMarketDb,
+  economy: wocMarketEconomy,
+  verifiedWallet: async (account) => (await walletForAccount(account))?.pubkey ?? null,
+  accountProof: (account, proof) =>
+    reauthorizeAccountProof(account, (proof ?? {}) as Record<string, unknown>),
+  custodyWallet: wocHeldWalletFromEnv(),
+  now: () => Date.now(),
+  // Eager delivery after a settled Vault payment (the confirmSettlement
+  // precedent); a fresh local scope, the sweep stays the backstop.
+  deliverNow: async () => {
+    await wocMarketService.deliverConfirmedSettlements(Date.now(), { contended: false, parked: 0 });
+  },
+  nonce: () => randomUUID(),
+});
 // The wallet link/unlink writes in db.ts bust the activity readout through
 // the module-level registration (identity changes never wait out a TTL).
 registerWocMarketReadCacheForBusts(wocMarketReadCache);
@@ -2966,6 +2992,7 @@ const wocMarketService = new WocMarketService({
   db: wocMarketDb,
   economy: wocMarketEconomy,
   readCache: wocMarketReadCache,
+  held: wocMarketHeldService,
   // The step-up devsig arm rides the SAME double-gated switch as the dev
   // economy: impossible to reach in production, and one truth for "dev".
   stepUpDevSig: wocMarketDevService,
@@ -3062,6 +3089,7 @@ configureWocMarketRuntime({
   service: wocMarketService,
   readCache: wocMarketReadCache,
   authGuardDb: wocAuthGuardCache,
+  held: wocMarketHeldService,
 });
 // The dashboard's ops surface (the Exchange reads plus the parked-review
 // resolve arm). Injected here so internal.ts never imports the market route

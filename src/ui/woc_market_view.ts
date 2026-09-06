@@ -47,6 +47,8 @@ export interface WocMarketStatus {
   allowMounts: boolean;
   allowMechChromas: boolean;
   settlementWindowSeconds: number;
+  /** The Exchange Vault switch (absent on an older server: off). */
+  heldEnabled?: boolean;
   bond?: {
     rateBps: number;
     minCents: number;
@@ -157,6 +159,9 @@ export interface WocMarketViewInput {
   status: WocMarketStatus | null;
   statusFailed: boolean;
   walletLinked: boolean;
+  /** The Vault readout (GET /api/woc-market/held), or null while it loads
+   *  or when the realm has none. */
+  held: WocHeldInput | null;
   tab: WocMarketTab;
   nowMs: number;
   browse: {
@@ -256,6 +261,26 @@ export interface WocActivityModel {
   termsAccepted: boolean;
 }
 
+export interface WocHeldInput {
+  enabled: boolean;
+  base: string;
+  tokens: number;
+  canWithdraw: boolean;
+}
+
+/** The Vault as the painter sees it: what to offer, never how to compute a
+ *  figure (base and tokens arrive from the server side by side). */
+export interface WocVaultModel {
+  /** The realm books Vault balances (status.heldEnabled AND the readout agrees). */
+  enabled: boolean;
+  base: string;
+  tokens: number;
+  /** A linked wallet can receive a cash-out right now. */
+  canWithdraw: boolean;
+  /** The balance is spendable on a buy-now listing here. */
+  canPay: boolean;
+}
+
 export type WocMarketViewModel =
   | { kind: 'unavailable' } // platform-incapable build: the window never shows
   | { kind: 'loading' }
@@ -266,6 +291,9 @@ export type WocMarketViewModel =
       tab: WocMarketTab;
       paused: boolean;
       walletLinked: boolean;
+      /** Listing is possible: a linked wallet, or the Vault standing in for one. */
+      sellEnabled: boolean;
+      vault: WocVaultModel;
       tokensPerUsd: number | null;
       priceAsOfMs: number | null;
       settlementWindowSeconds: number;
@@ -470,6 +498,23 @@ function listingRow(
   };
 }
 
+/** The Vault switch is the SERVER's (status.heldEnabled); the readout only
+ *  carries figures. Off, or not yet read, means nothing is offered and the
+ *  balance still shows when one is booked (a realm that turned the Vault off
+ *  keeps every player's balance readable, frozen). */
+export function vaultModel(heldEnabled: boolean, held: WocHeldInput | null): WocVaultModel {
+  const base = held?.base ?? '0';
+  const positive = /^\d+$/.test(base) && base.replace(/^0+/, '') !== '';
+  const enabled = heldEnabled && held !== null && held.enabled;
+  return {
+    enabled,
+    base,
+    tokens: held?.tokens ?? 0,
+    canWithdraw: enabled && held.canWithdraw && positive,
+    canPay: enabled && positive,
+  };
+}
+
 export function buildWocMarketView(input: WocMarketViewInput): WocMarketViewModel {
   if (!input.capable) return { kind: 'unavailable' };
   if (input.statusFailed) return { kind: 'error' };
@@ -521,11 +566,15 @@ export function buildWocMarketView(input: WocMarketViewInput): WocMarketViewMode
       }
     : null;
 
+  const vault = vaultModel(status.heldEnabled === true, input.held);
+
   return {
     kind: 'ready',
     tab: input.tab,
     paused,
     walletLinked: input.walletLinked,
+    sellEnabled: input.walletLinked || vault.enabled,
+    vault,
     tokensPerUsd: status.price.tokensPerUsd,
     priceAsOfMs: status.price.asOfMs,
     settlementWindowSeconds: status.settlementWindowSeconds,
@@ -633,6 +682,9 @@ export function wocMarketViewSig(model: WocMarketViewModel): string {
     model.tab,
     model.paused ? 1 : 0,
     model.walletLinked ? 1 : 0,
+    // The Vault rides the digest by its exact base string: a credit or a
+    // charge must repaint the card and every button it enables.
+    `${model.vault.enabled ? 1 : 0}:${model.vault.base}:${model.vault.canWithdraw ? 1 : 0}`,
     model.tokensPerUsd ?? '',
     model.browse.page,
     model.browse.hasMore ? 1 : 0,

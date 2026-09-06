@@ -1495,6 +1495,38 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: 'wocMarketMutationRateLimited',
     requireOwnedExpected: REQUIRE_OWNED.bola404,
   },
+  // The Exchange Vault (server/woc_market_held_routes.ts): registry-only
+  // RouteDefs in the woc_market_routes.ts table, same terms as the family.
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
+    path: '/api/woc-market/held',
+    handler: 'server/woc_market_held_routes.ts readout (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.bearer,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/woc-market/held/withdraw',
+    handler: 'server/woc_market_held_routes.ts withdraw (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.full,
+    limiter: 'wocMarketMutationRateLimited',
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/woc-market/settlements/:id/confirm-held',
+    handler: 'server/woc_market_held_routes.ts confirmHeld (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.full,
+    limiter: 'wocMarketMutationRateLimited',
+    requireOwnedExpected: REQUIRE_OWNED.bola404,
+  },
   // Steam link family (server/steam/routes.ts): registry-only RouteDefs, same
   // new-route rule as the deeds pair. The whole trio is env-gated dark
   // (steam.disabled 503 until STEAM_ENABLED=1); the auth scopes below describe

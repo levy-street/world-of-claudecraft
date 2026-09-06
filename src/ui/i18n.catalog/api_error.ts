@@ -250,6 +250,17 @@ export const apiErrorStrings = {
     wallet_required: 'Link and verify a wallet before trading on the Exchange.',
     recipient_wallet_required:
       'That player must connect a wallet before they can accept $WOC payments.',
+    held_disabled: 'The Exchange Vault is not available on this realm.',
+    held_insufficient: 'Your Vault balance does not cover this purchase.',
+    held_empty: 'Your Vault is empty.',
+    held_withdraw_failed:
+      'The cash-out could not be completed. Your balance stays in your Vault; try again later.',
+    account_proof_required: 'Enter your account password to authorize this listing.',
+    account_proof_two_factor:
+      'Your account has two-factor enabled. Enter your code to authorize this listing.',
+    account_proof_no_password: 'This account has no password. Set one in account settings first.',
+    account_proof_invalid: 'The password or code was not accepted. Try again.',
+    account_proof_throttled: 'Too many failed attempts. Try again later.',
     self_offer: 'You cannot send a $WOC offer to yourself.',
     offer_expired: 'That $WOC offer expired. Ask for a new one.',
     terms_required: 'Accept the Marketplace terms to continue.',

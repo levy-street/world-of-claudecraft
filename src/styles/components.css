@@ -17132,6 +17132,44 @@
     width: 100%;
     white-space: nowrap;
   }
+  /* The Exchange Vault card: the wallet card's grid, so the two read as one
+     strip (title, sentence, balance, and the cash-out control on the edge). */
+  #woc-market-window .wm-banner-vault {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(160px, 220px);
+    grid-template-rows: auto auto;
+    gap: 4px var(--spacing-md);
+    align-items: start;
+    padding: var(--spacing-sm) 10px;
+    border-color: var(--gold);
+  }
+  #woc-market-window .wm-banner-vault > strong {
+    color: var(--gold);
+    font-family: var(--title-font);
+    font-size: 13px;
+    line-height: 17px;
+  }
+  #woc-market-window .wm-banner-vault p {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 12px;
+    line-height: 16px;
+  }
+  #woc-market-window .wm-banner-vault .wm-vault-balance {
+    grid-column: 1 / 3;
+    color: var(--gold);
+    font-weight: 600;
+  }
+  #woc-market-window .wm-banner-vault button {
+    grid-column: 3;
+    grid-row: 1 / 3;
+    align-self: center;
+    width: 100%;
+    white-space: nowrap;
+  }
+  #woc-market-window .wm-vault-sell-hint {
+    color: var(--gold);
+  }
   #woc-market-window .wm-wallet-balance {
     grid-column: 2;
     grid-row: 1 / 3;

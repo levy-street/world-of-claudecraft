@@ -136,7 +136,8 @@ describe('the refusal-to-wire mapping', () => {
     const rows = Object.entries(REFUSAL_ERRORS);
     // The EXACT count, not a floor. A floor of 35 let four union members vanish
     // silently; tsc catches a deleted Record key but not a shrunken union.
-    expect(rows).toHaveLength(58);
+    // 58 -> 67 with the Exchange Vault (four held_* arms, five account-proof arms).
+    expect(rows).toHaveLength(67);
     for (const [reason, mapped] of rows) {
       expect(mapped.code, reason).toMatch(/^woc_market\./);
       expect(mapped.status, reason).toBeGreaterThanOrEqual(400);
@@ -235,6 +236,17 @@ describe('the refusal-to-wire mapping', () => {
     ['recipient_wallet_required', 403, 'woc_market.recipient_wallet_required'],
     ['self_offer', 400, 'woc_market.self_offer'],
     ['offer_expired', 410, 'woc_market.offer_expired'],
+    // The Exchange Vault (woc_market_held.ts): the held_* arms, and the
+    // walletless listing's account-proof arms (one per re-auth outcome).
+    ['held_disabled', 403, 'woc_market.held_disabled'],
+    ['held_insufficient', 403, 'woc_market.held_insufficient'],
+    ['held_empty', 400, 'woc_market.held_empty'],
+    ['held_withdraw_failed', 503, 'woc_market.held_withdraw_failed'],
+    ['account_proof_required', 401, 'woc_market.account_proof_required'],
+    ['account_proof_two_factor', 401, 'woc_market.account_proof_two_factor'],
+    ['account_proof_no_password', 403, 'woc_market.account_proof_no_password'],
+    ['account_proof_invalid', 401, 'woc_market.account_proof_invalid'],
+    ['account_proof_throttled', 429, 'woc_market.account_proof_throttled'],
     // Wallet step-up on the custody movers (B6/R1): 403 auth-class, except
     // the lapsed challenge, a 410 like offer_expired (the fix is a fresh
     // challenge, not different credentials).
@@ -1058,7 +1070,8 @@ describe('the route table shape', () => {
   it('gates every route behind a guard, and every mutation behind a limiter too', () => {
     const api = routes.filter((r) => r.surface === 'api');
     // 22 -> 23 with the seller-history read (the Browse click-through).
-    expect(api).toHaveLength(23);
+    // 23 -> 26 with the Exchange Vault (readout, withdraw, confirm-held).
+    expect(api).toHaveLength(26);
     for (const route of api) {
       expect(route.middleware?.length ?? 0, `${route.method} ${route.path}`).toBeGreaterThan(0);
     }
@@ -1086,7 +1099,8 @@ describe('the route table shape', () => {
     // publicRead marker. Neither means the route is silently unguarded.
     const idRoutes = routes.filter((r) => r.surface === 'api' && r.path.includes('/:'));
     // 13 -> 14 with seller-history/:name (publicRead, the history precedent).
-    expect(idRoutes).toHaveLength(14);
+    // 14 -> 15 with settlements/:id/confirm-held (the Vault commit, owner-loaded).
+    expect(idRoutes).toHaveLength(15);
     for (const route of idRoutes) {
       const meta = route.meta as { requireOwned?: unknown; publicRead?: boolean } | undefined;
       expect(

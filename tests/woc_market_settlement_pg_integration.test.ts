@@ -337,7 +337,7 @@ describeDb('woc market settlement guards against real Postgres', () => {
       // The retry path's own compare-and-set arms find nothing to revive.
       expect(await marketDb.transitionSettlement(settlement.id, ['failed'], 'offered')).toBe(false);
       expect(
-        await marketDb.setSettlementQuote(settlement.id, 'ref-x', BASE_MS + MINUTE_MS, null),
+        await marketDb.setSettlementQuote(settlement.id, 'ref-x', BASE_MS + MINUTE_MS, null, null),
       ).toBe(false);
     });
 

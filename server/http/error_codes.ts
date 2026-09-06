@@ -272,6 +272,24 @@ export const ERROR_CODES = deepFreeze({
   // A directed p2p offer's named recipient has no verified wallet, so they
   // could not accept a $WOC payment (403).
   'woc_market.recipient_wallet_required': { params: [] },
+  // The Exchange Vault is off on this realm: no custody wallet is configured,
+  // so walletless listing, Vault payment, and cash-out all refuse (403).
+  'woc_market.held_disabled': { params: [] },
+  // The Vault balance does not cover the quoted amount (403).
+  'woc_market.held_insufficient': { params: [] },
+  // Nothing to cash out (400).
+  'woc_market.held_empty': { params: [] },
+  // The economy service refused or could not complete the cash-out; the
+  // balance was returned to the Vault (503).
+  'woc_market.held_withdraw_failed': { params: [] },
+  // The WALLETLESS listing step-up (the Vault): the account re-auth arms,
+  // one per wallet_reauth.ts outcome so the client can name the fix (401 /
+  // 403 / 429, mirroring the wallet.reauth_* family).
+  'woc_market.account_proof_required': { params: [] },
+  'woc_market.account_proof_two_factor': { params: [] },
+  'woc_market.account_proof_no_password': { params: [] },
+  'woc_market.account_proof_invalid': { params: [] },
+  'woc_market.account_proof_throttled': { params: [] },
   // A directed p2p offer addressed to the sender's own account (400).
   'woc_market.self_offer': { params: [] },
   // The directed p2p offer's acceptance window elapsed (410).

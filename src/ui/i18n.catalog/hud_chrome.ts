@@ -6698,5 +6698,24 @@ export const hudChromeStrings = {
     listingStatusCancelled: 'Cancelled',
     listingStatusSuspended: 'Suspended',
     listingStatusUnsold: 'Unsold',
+    // The Exchange Vault (docs/prd/woc/marketplace.md, "Selling without a
+    // wallet: the Vault"): the card, the walletless sell hint, the Vault
+    // payment arms, and the cash-out.
+    vaultTitle: 'Exchange Vault',
+    vaultBody:
+      'Sell without a linked wallet and your proceeds are held here as $WOC. Spend them on buy-now listings, or link a wallet and cash out whenever you like.',
+    vaultBalance: '{tokens} $WOC in your Vault',
+    vaultBalanceUsd:
+      'About {usd} at the current price. An estimate only: your Vault holds $WOC, and its dollar value moves with the market.',
+    vaultEmpty: 'Your Vault is empty.',
+    vaultWithdraw: 'Cash out to wallet',
+    vaultWithdrawAria: 'Cash out {tokens} $WOC to your linked wallet',
+    vaultNeedsWallet: 'Link a wallet to cash out your Vault balance.',
+    vaultWithdrawn: 'Cashed out {tokens} $WOC to your wallet.',
+    vaultSellHint:
+      'No wallet linked: the proceeds of this sale will be held in your Exchange Vault.',
+    vaultBuyWith: 'Buy with Vault balance',
+    vaultPaysNote: 'This purchase is paid from your Exchange Vault balance.',
+    quoteSignVault: 'Pay from Vault',
   },
 };

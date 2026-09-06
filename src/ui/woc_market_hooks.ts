@@ -1,3 +1,4 @@
+import type { WalletReauthProof } from '../net/online';
 import type { WocMarketClient } from '../net/woc_market_sdk';
 
 /** Online-only glue main.ts wires (the ClaudiumHooks pattern): the typed SDK,
@@ -25,4 +26,8 @@ export interface WocMarketHooks {
    *  deliberate: a challenge always carries its nonce, while a quote view's
    *  reference is nullable, so each parameter mirrors its source's truth. */
   signMessageBase58(message: string, stepUpNonce: string): Promise<string>;
+  /** The WALLETLESS listing step-up (the Exchange Vault): prompt for the
+   *  account password (plus second factor) and resolve the proof, or null on
+   *  cancel. Optional: a wiring without it cannot list without a wallet. */
+  accountProof?(): Promise<WalletReauthProof | null>;
 }

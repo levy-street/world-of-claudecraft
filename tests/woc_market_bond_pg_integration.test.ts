@@ -43,6 +43,13 @@ const HOUR_MS = 3_600_000;
 /** Controllable economy: confirm() serves the scripted verdict; quotes mint
  *  deterministic references. Only the members the bond paths reach are real. */
 class ScriptedEconomy implements WocMarketEconomy {
+  // The Vault arms are never exercised by the bond suite.
+  async settleHeld() {
+    return { settled: false, pending: false, reason: 'unscripted' };
+  }
+  async heldWithdrawal() {
+    return { done: false, reason: 'unscripted' };
+  }
   verdict: { settled: boolean; pending: boolean; reason: string | null } = {
     settled: false,
     pending: true,

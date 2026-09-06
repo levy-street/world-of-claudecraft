@@ -39,6 +39,7 @@ import type {
   WocSettlementRow,
 } from '../../server/woc_market';
 import { WocMarketService } from '../../server/woc_market';
+import { WocMarketHeldService } from '../../server/woc_market_held';
 import { createDevWocMarketEconomy } from '../../server/woc_market_proxy';
 import type { WocListingParams } from '../../server/woc_market_rules';
 import {
@@ -71,6 +72,7 @@ import { extractTradableCopy } from '../../src/sim/inventory_extract';
 import type { CharacterState } from '../../src/sim/sim';
 import type { InvSlot, ItemInstancePayload } from '../../src/sim/types';
 import { FakeWocMarketDb } from './helpers/fake_woc_market_db';
+import { FakeWocMarketHeldDb } from './helpers/fake_woc_market_held_db';
 
 // ---------------------------------------------------------------------------
 // Fixture: a real eligible item from the content tables
@@ -9238,5 +9240,285 @@ describe('desktop handoff registration', () => {
       ],
     ]);
     expect(buy.quote.reference).not.toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The Exchange Vault through the coordinator (woc_market_held.ts): the
+// walletless listing intake, the Vault buy-now intake, the settlement quote's
+// custody destination, and the delivery credit in the finalize tail.
+// ---------------------------------------------------------------------------
+
+const CUSTODY_WALLET = 'custody-wallet';
+
+function withVault(h: Harness, custodyWallet: string | null = CUSTODY_WALLET) {
+  const heldDb = new FakeWocMarketHeldDb(() => null, h.now);
+  let service: WocMarketService | null = null;
+  const held = new WocMarketHeldService({
+    db: heldDb,
+    market: h.db,
+    economy: h.economy,
+    verifiedWallet: h.deps.verifiedWallet,
+    // The account-proof verifier stand-in: any body that carries a password
+    // string counts as proven; the real core (wallet_reauth.ts) is proven in
+    // its own suite, this rig only routes the verdict.
+    accountProof: async (_account, proof) =>
+      typeof (proof as { password?: unknown } | null)?.password === 'string'
+        ? { ok: true }
+        : { ok: false, code: 'wallet.reauth_required' },
+    custodyWallet,
+    now: h.now,
+    deliverNow: async () => {
+      await service?.deliverConfirmedSettlements(h.now(), { contended: false, parked: 0 });
+    },
+    nonce: () => 'n1',
+  });
+  service = new WocMarketService({ ...h.deps, held });
+  return { service, held, heldDb };
+}
+
+describe('the Exchange Vault: selling without a wallet', () => {
+  it('still needs a wallet without a Vault, and a proof with one; a proven listing records no seller wallet', async () => {
+    const h = makeHarness();
+    h.wallets.delete(SELLER);
+    const bare = await h.service.createListing({
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      params: listingParams(),
+    });
+    expect(bare).toEqual({ ok: false, reason: 'wallet_required' });
+
+    const { service } = withVault(h);
+    const unproven = await service.createListing({
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      params: listingParams(),
+    });
+    expect(unproven).toEqual({ ok: false, reason: 'account_proof_required' });
+    // Nothing left the bags on the refusal.
+    expect(h.custody.bags.get(SELLER_CHAR)).toHaveLength(2);
+
+    const listed = unwrap(
+      await service.createListing({
+        account: SELLER,
+        characterId: SELLER_CHAR,
+        itemRef: { index: 0, itemId: EPIC_ITEM },
+        params: listingParams({ format: 'buy_now', startCents: 5000, buyNowCents: 5000 }),
+        accountProof: { password: 'pw' },
+      }),
+      'createListing',
+    );
+    expect(listed.listing.sellerWallet).toBeNull();
+    expect(listed.listing.sellerAccount).toBe(SELLER);
+  });
+
+  it('a wallet seller still takes the wallet step-up, never the account proof', async () => {
+    const h = makeHarness();
+    const { service } = withVault(h);
+    const res = await service.createListing({
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      params: listingParams(),
+      accountProof: { password: 'pw' },
+    });
+    expect(res).toEqual({ ok: false, reason: 'stepup_required' });
+  });
+});
+
+describe('the Exchange Vault: paying from it and being paid into it', () => {
+  async function walletlessBuyNowListing(h: Harness, service: WocMarketService) {
+    h.wallets.delete(SELLER);
+    return unwrap(
+      await service.createListing({
+        account: SELLER,
+        characterId: SELLER_CHAR,
+        itemRef: { index: 0, itemId: EPIC_ITEM },
+        params: listingParams({ format: 'buy_now', startCents: 5000, buyNowCents: 5000 }),
+        accountProof: { password: 'pw' },
+      }),
+      'createListing',
+    ).listing;
+  }
+
+  it("a walletless buyer pays from the Vault and the walletless seller is credited the quote's seller leg at delivery", async () => {
+    const h = makeHarness();
+    const { service, held, heldDb } = withVault(h);
+    const listing = await walletlessBuyNowListing(h, service);
+    h.wallets.delete(BUYER_A);
+    // No wallet, no Vault money: the intake refuses before any lock.
+    expect(
+      await service.buyNow({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        acceptTerms: true,
+      }),
+    ).toEqual({ ok: false, reason: 'wallet_required' });
+    expect(
+      await service.buyNow({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        acceptTerms: true,
+        payFrom: 'held',
+      }),
+    ).toEqual({ ok: false, reason: 'held_insufficient' });
+
+    // Seed a Vault balance (a prior sale) and buy from it.
+    await heldDb.post({
+      account: BUYER_A,
+      ref: 'seed',
+      kind: 'sale',
+      deltaBase: '100000000000000000',
+    });
+    const bought = unwrap(
+      await service.buyNow({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        acceptTerms: true,
+        payFrom: 'held',
+      }),
+      'buyNow',
+    );
+    expect(bought.settlement.buyerWallet).toBe(CUSTODY_WALLET);
+    expect(bought.quote.ok).toBe(true);
+    const amountBase = bought.quote.amount?.base ?? '';
+    const sellerLegBase = bought.quote.seller?.base ?? '';
+    expect(amountBase).not.toBe('');
+    expect(sellerLegBase).not.toBe('');
+    const stamped = await h.db.settlementById(bought.settlement.id);
+    expect(stamped?.sellerLegBase).toBe(sellerLegBase);
+
+    const paid = await held.confirmFromHeld(BUYER_A, bought.settlement.id);
+    expect(paid.ok).toBe(true);
+    expect(BigInt(await heldDb.balance(BUYER_A))).toBe(100000000000000000n - BigInt(amountBase));
+    const row = await h.db.settlementById(bought.settlement.id);
+    expect(row?.txSignature).toBe(`held:${bought.quote.reference}`);
+    // The eager delivery ran; the sweep converges whatever it parked.
+    await service.sweepPass();
+    expect((await h.db.settlementById(bought.settlement.id))?.state).toBe('delivered');
+    // The seller's credit rode the finalize tail: the exact service leg,
+    // idempotent on the settlement ref.
+    expect([...h.db.heldEntries.values()]).toEqual([
+      expect.objectContaining({
+        account: SELLER,
+        ref: `held:sale:${bought.settlement.id}`,
+        kind: 'sale',
+        deltaBase: sellerLegBase,
+        settlementId: bought.settlement.id,
+      }),
+    ]);
+  });
+
+  it('a wallet seller is paid on chain: no Vault credit at delivery', async () => {
+    const h = makeHarness();
+    const { service, held, heldDb } = withVault(h);
+    const listing = await listEpic(h, { format: 'buy_now', startCents: 5000, buyNowCents: 5000 });
+    h.wallets.delete(BUYER_A);
+    await heldDb.post({
+      account: BUYER_A,
+      ref: 'seed',
+      kind: 'sale',
+      deltaBase: '100000000000000000',
+    });
+    const bought = unwrap(
+      await service.buyNow({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        acceptTerms: true,
+        payFrom: 'held',
+      }),
+      'buyNow',
+    );
+    expect((await held.confirmFromHeld(BUYER_A, bought.settlement.id)).ok).toBe(true);
+    await service.sweepPass();
+    expect((await h.db.settlementById(bought.settlement.id))?.state).toBe('delivered');
+    expect(h.db.heldEntries.size).toBe(0);
+  });
+
+  it("a walletless seller's listing cannot be quoted once the Vault is off: honest quote_unavailable", async () => {
+    const h = makeHarness();
+    const { service } = withVault(h);
+    const listing = await walletlessBuyNowListing(h, service);
+    // The operator unset the custody wallet; a wallet buyer still tries.
+    const res = await h.service.buyNow({
+      account: BUYER_A,
+      characterId: CHAR_A,
+      listingId: listing.id,
+      acceptTerms: true,
+    });
+    expect(res).toEqual({ ok: false, reason: 'quote_unavailable' });
+    expect(
+      await service.buyNow({
+        account: BUYER_B,
+        characterId: CHAR_B,
+        listingId: listing.id,
+        acceptTerms: true,
+      }),
+    ).toMatchObject({ ok: true });
+  });
+
+  it('the sweep returns a Vault charge whose payment the poll later failed', async () => {
+    const h = makeHarness();
+    const pendingEconomy: WocMarketEconomy = {
+      ...h.economy,
+      settleHeld: async () => ({ settled: false, pending: true, reason: 'awaiting_finality' }),
+      confirm: async () => ({ settled: false, pending: false, reason: 'refused' }),
+    };
+    // The fake ledger's state oracle is synchronous; the test mirrors the row
+    // state into it after the poll decides.
+    const states = new Map<number, string>();
+    const heldDb = new FakeWocMarketHeldDb((id) => states.get(id) ?? null, h.now);
+    const held = new WocMarketHeldService({
+      db: heldDb,
+      market: h.db,
+      economy: pendingEconomy,
+      verifiedWallet: h.deps.verifiedWallet,
+      accountProof: async () => ({ ok: true }),
+      custodyWallet: CUSTODY_WALLET,
+      now: h.now,
+      deliverNow: async () => {},
+      nonce: () => 'n1',
+    });
+    const service = new WocMarketService({ ...h.deps, economy: pendingEconomy, held });
+    const listing = await listEpic(h, { format: 'buy_now', startCents: 5000, buyNowCents: 5000 });
+    h.wallets.delete(BUYER_A);
+    await heldDb.post({
+      account: BUYER_A,
+      ref: 'seed',
+      kind: 'sale',
+      deltaBase: '100000000000000000',
+    });
+    const bought = unwrap(
+      await service.buyNow({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        acceptTerms: true,
+        payFrom: 'held',
+      }),
+      'buyNow',
+    );
+    expect(await held.confirmFromHeld(BUYER_A, bought.settlement.id)).toEqual({
+      ok: true,
+      state: 'confirming',
+      reason: 'awaiting_finality',
+    });
+    expect(await heldDb.balance(BUYER_A)).not.toBe('100000000000000000');
+    // The chain poll refuses it: the row fails, the charge still stands.
+    const polled = await service.sweepPass();
+    expect(polled?.polled).toBeGreaterThanOrEqual(1);
+    expect((await h.db.settlementById(bought.settlement.id))?.state).toBe('failed');
+    expect(await heldDb.balance(BUYER_A)).not.toBe('100000000000000000');
+    // The next pass's reversal arm returns it, once.
+    states.set(bought.settlement.id, 'failed');
+    expect((await service.sweepPass())?.heldReversed).toBe(1);
+    expect(await heldDb.balance(BUYER_A)).toBe('100000000000000000');
+    expect((await service.sweepPass())?.heldReversed).toBe(0);
   });
 });

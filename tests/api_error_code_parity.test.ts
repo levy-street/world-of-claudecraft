@@ -180,6 +180,15 @@ const KNOWN_CODES = [
   'woc_market.stepup_wallet_mismatch',
   'woc_market.stepup_binding_mismatch',
   'woc_market.stepup_signature_invalid',
+  'woc_market.held_disabled',
+  'woc_market.held_insufficient',
+  'woc_market.held_empty',
+  'woc_market.held_withdraw_failed',
+  'woc_market.account_proof_required',
+  'woc_market.account_proof_two_factor',
+  'woc_market.account_proof_no_password',
+  'woc_market.account_proof_invalid',
+  'woc_market.account_proof_throttled',
 ];
 
 // The parametric contract pins: the matcher

@@ -22,6 +22,7 @@ const CORPUS = [
   'server/woc_market_proxy.ts',
   'server/woc_market_routes.ts',
   'server/main.ts',
+  'server/woc_market_held.ts',
   'server/http/config.ts',
   'server/http/middleware/require_internal_secret.ts',
   // The claudium proxy owns WOC_ECONOMY_SERVICE_URL; it is in scope because

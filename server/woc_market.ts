@@ -41,6 +41,8 @@ import type {
   WocPriceInfo,
   WocQuoteIntent,
 } from './woc_market_economy_types';
+import type { WocMarketHeldService } from './woc_market_held';
+import type { WocHeldPost } from './woc_market_held_db';
 import { pruneWocLocalLedgers, wocBackedOffIds, wocParkRow } from './woc_market_local_ledgers';
 import type { WocStuckCustodyClasses } from './woc_market_monitor_types';
 import type * as WocOps from './woc_market_ops';
@@ -59,7 +61,6 @@ import {
   listingEligibility,
   listingSoldNoticeCustodyRef,
   minNextBidCents,
-  settlementCustodyRef,
   strikeSuspensionMs,
   validListingParams,
   WOC_MARKET_ABANDON_EXEMPT_FAIL_REASONS,
@@ -83,6 +84,7 @@ import {
   type WocListingParams,
   type WocSettlementState,
 } from './woc_market_rules';
+import { stampSettlementQuote } from './woc_market_settlement_quote';
 import type {
   NewWocStepUpChallenge,
   WocStepUpBinding,
@@ -120,7 +122,8 @@ export interface WocListingRow {
   sellerAccount: number;
   sellerCharacter: number;
   sellerName: string;
-  sellerWallet: string;
+  /** Null for a Vault (walletless) seller: the seller leg pays to custody. */
+  sellerWallet: string | null;
   item: InvSlot;
   itemId: string;
   quality: string;
@@ -252,6 +255,9 @@ export interface WocSettlementRow {
   failReason: string | null;
   /** Base-unit token amount from the confirmed quote, for sale provenance. */
   settledAmountBase: string | null;
+  /** The quote's SELLER leg in base units (service-computed); what a Vault
+   *  seller is credited at delivery. Null before a quote lands. */
+  sellerLegBase: string | null;
   deadlineAtMs: number;
   createdAtMs: number;
 }
@@ -312,7 +318,8 @@ export interface NewWocListing {
   sellerAccount: number;
   sellerCharacter: number;
   sellerName: string;
-  sellerWallet: string;
+  /** Null for a Vault (walletless) seller: the seller leg pays to custody. */
+  sellerWallet: string | null;
   item: InvSlot;
   itemId: string;
   quality: string;
@@ -616,6 +623,9 @@ export interface WocMarketDb {
     listingId: number;
     bidId: number | null;
     sale: Omit<WocSaleRow, 'id' | 'excluded' | 'atMs'>;
+    /** A Vault seller's credit, posted INSIDE the close tail (idempotent on
+     *  its ref); null or absent for a wallet seller. */
+    heldCredit?: WocHeldPost | null;
   }): Promise<'finalized' | 'already_final' | 'stale' | 'contended'>;
   /** The stuck classes for the ops monitor (unbooked claims, stuck
    *  'delivering' settlements, closed-but-undisposed listings, 'review'
@@ -803,6 +813,7 @@ export interface WocMarketDb {
     reference: string,
     expiresAtMs: number,
     amountBase: string | null,
+    sellerLegBase: string | null,
   ): Promise<boolean>;
   /** offered -> confirming with the signature recorded (unique). */
   submitSettlementSignature(
@@ -1057,6 +1068,9 @@ export interface WocMarketDeps {
   db: WocMarketDb;
   economy: WocMarketEconomy;
   custody: WocMarketCustody;
+  /** The Exchange Vault (woc_market_held.ts). OPTIONAL: absent, every arm
+   *  behaves as before (a wallet is required to list and to buy). */
+  held?: WocMarketHeldService;
   verifiedWallet(account: number): Promise<string | null>;
   balanceTokens(pubkey: string): Promise<number | null>;
   /** True ONLY when the in-memory dev economy is live (the double-gated
@@ -1155,6 +1169,15 @@ export type WocMarketRefusal =
   | 'offer_pending' // one live directed deal per pair (the strike-farming bound)
   | 'item_mismatch' // the copy offered at acceptance is not the pinned agreed copy
   | 'offer_expired'
+  | 'held_disabled' // the Vault is off on this realm (no custody wallet configured)
+  | 'held_insufficient'
+  | 'held_empty'
+  | 'held_withdraw_failed'
+  | 'account_proof_required' // the walletless step-up: password (plus second factor)
+  | 'account_proof_two_factor'
+  | 'account_proof_no_password'
+  | 'account_proof_invalid'
+  | 'account_proof_throttled'
   | ExtractRefusal
   | WocEligibilityRefusal
   | ListingParamsRefusal
@@ -1571,6 +1594,9 @@ export class WocMarketService {
     /** The wallet step-up proof (B6/R1). Required on every PUBLIC listing;
      *  the directed consummation arm skips it because the SELLER's own
      *  acceptance already verified an offer-bound proof. */
+    /** The WALLETLESS step-up (the Vault): the account re-auth proof, taken
+     *  only when the seller has no linked wallet and the Vault is enabled. */
+    accountProof?: unknown;
     stepUp?: WocStepUpProof;
   }): Promise<{ ok: true; listing: WocListingRow } | Refused> {
     // The draining refusal (the escrow write-path rider), FIRST and IO-free:
@@ -1597,7 +1623,7 @@ export class WocMarketService {
     const gate = (await this.guardEnabledHealthy()) ?? (await this.guardSuspended(args.account));
     if (gate) return gate;
     const wallet = await this.deps.verifiedWallet(args.account);
-    if (!wallet) return refuse('wallet_required');
+    if (!wallet && !this.deps.held?.enabled()) return refuse('wallet_required');
     // Step-up BEFORE any business validation, deliberately: an unauthorized
     // bearer learns nothing about params or eligibility (no oracle). The one
     // accepted cost is that an honest seller who typo'd a price combination
@@ -1623,17 +1649,22 @@ export class WocMarketService {
         ...args,
         itemRef: { ...args.itemRef, expectInstance: args.itemRef.expectInstance ?? null },
       };
-      const gateUp = await this.guardStepUp(args.account, wallet, args.stepUp, {
-        operation: 'create_listing',
-        itemId: args.itemRef.itemId,
-        expectInstance: args.itemRef.expectInstance ?? null,
-        format: args.params.format,
-        startCents: args.params.startCents,
-        reserveCents: args.params.reserveCents,
-        buyNowCents: args.params.buyNowCents,
-        durationHours: args.params.durationHours,
-        offerNext: args.params.offerNext,
-      });
+      // A Vault seller has no wallet to sign with: the account itself proves
+      // the custody move (password plus second factor), the same threshold
+      // the wallet-unlink route holds. Nothing else in the arm changes.
+      const gateUp = !wallet
+        ? await this.deps.held?.guardAccountProof(args.account, args.accountProof)
+        : await this.guardStepUp(args.account, wallet, args.stepUp, {
+            operation: 'create_listing',
+            itemId: args.itemRef.itemId,
+            expectInstance: args.itemRef.expectInstance ?? null,
+            format: args.params.format,
+            startCents: args.params.startCents,
+            reserveCents: args.params.reserveCents,
+            buyNowCents: args.params.buyNowCents,
+            durationHours: args.params.durationHours,
+            offerNext: args.params.offerNext,
+          });
       if (gateUp) return gateUp;
     }
     const params = validListingParams(args.params);
@@ -2672,6 +2703,10 @@ export class WocMarketService {
     characterId: number;
     listingId: number;
     acceptTerms: boolean;
+    /** 'held': pay from the Vault (woc_market_held.ts); the settlement's
+     *  buyer wallet is then the custody address and confirmation goes
+     *  through confirmFromHeld, never a wallet signature. */
+    payFrom?: 'wallet' | 'held';
   }): Promise<{ ok: true; settlement: WocSettlementRow; quote: WocQuoteIntent } | Refused> {
     const nowMs = this.now();
     // The flag/health gate runs BEFORE any database read: with the feature off
@@ -2701,8 +2736,11 @@ export class WocMarketService {
       (await this.guardSuspended(args.account)) ??
       (await this.guardTerms(args.account, args.acceptTerms));
     if (gate) return gate;
-    const wallet = await this.deps.verifiedWallet(args.account);
-    if (!wallet) return refuse('wallet_required');
+    const fromHeld = args.payFrom === 'held';
+    const wallet = fromHeld
+      ? (this.deps.held?.custodyWallet() ?? null)
+      : await this.deps.verifiedWallet(args.account);
+    if (!wallet) return refuse(fromHeld ? 'held_disabled' : 'wallet_required');
     // Same WALLET is the same beneficial owner (H14): seller_account alone
     // missed the relink dance (list under wallet W, unlink, relink W on a
     // second account, buy the own listing into the public sales history).
@@ -2716,7 +2754,9 @@ export class WocMarketService {
       args.characterId,
     );
     if (!target || target.characterId !== args.characterId) return refuse('character_invalid');
-    const balanceGate = await this.guardBalance(wallet, listingPeek.buyNowCents);
+    const balanceGate = fromHeld
+      ? await this.deps.held?.guardCover(args.account, listingPeek.buyNowCents)
+      : await this.guardBalance(wallet, listingPeek.buyNowCents);
     if (balanceGate) return balanceGate;
 
     const lockExpiresAtMs = nowMs + WOC_MARKET_BUY_NOW_LOCK_SECONDS * 1000;
@@ -2788,70 +2828,22 @@ export class WocMarketService {
   // Settlement (winner or buy-now buyer)
   // -------------------------------------------------------------------------
 
-  private async quoteFor(
+  /** The quote stamp lives in woc_market_settlement_quote.ts; one call seam. */
+  private quoteFor(
     settlement: WocSettlementRow,
-    sellerWallet: string,
+    listingSellerWallet: string | null,
   ): Promise<WocQuoteIntent> {
-    const intent = await this.deps.economy.settlementQuote({
-      memoRef: settlementCustodyRef(settlement.id),
-      usdCents: settlement.amountCents,
-      buyerWallet: settlement.buyerWallet,
-      sellerWallet,
-    });
-    if (intent.ok && intent.reference !== null && intent.expiresAtMs !== null) {
-      let retiredPair: { reference: string; signature: string } | null = null;
-      if (
-        settlement.quoteReference !== null &&
-        settlement.quoteReference !== intent.reference &&
-        settlement.txSignature !== null
-      ) {
-        // A revival re-quote RETIRES a stored reference a payment may exist
-        // against: the row holds one scalar, and every later confirm asks
-        // about the fresh one only. The service side can legitimately end up
-        // with TWO settled quotes for this memoRef (its entry adoption
-        // re-settles a superseded quote a ledger-proven payment backs), and
-        // it keys everything on the reference, so this line is the game's
-        // only durable trace of the retired pair; an operator reconciling a
-        // later-adopted payment matches it against the service's admin quote
-        // rows (dev-channel, deliberately not player text). Scoped to rows
-        // with a RECORDED signature: an unsigned re-quote is routine (the
-        // quote-refresh path) and tracing it would emit a line per refresh.
-        // An UNSIGNED retired reference (paid on chain, never confirmed to
-        // the game) leaves no game-side line, deliberately: the service
-        // still holds that quote keyed by this settlement's memoRef
-        // (settlementCustodyRef of the id), which is what actually anchors
-        // reconciliation. Captured here, emitted only AFTER the CAS lands:
-        // the guarded write can lose (the row left 'offered' to a racing
-        // confirm), and a trace claiming a retirement that never happened
-        // would falsify the very trail it exists to keep.
-        retiredPair = {
-          reference: settlement.quoteReference,
-          signature: settlement.txSignature,
-        };
-      }
-      const stamped = await this.deps.db.setSettlementQuote(
-        settlement.id,
-        intent.reference,
-        intent.expiresAtMs,
-        intent.amount?.base ?? null,
-      );
-      if (!stamped) return { ...intent, ok: false, reason: 'settlement_not_open' };
-      // Every payable settlement quote (buy-now, winner, revival) registers
-      // for desktop signing, past the stamp only (no adopted row, no entry).
-      registerWocQuoteHandoff(
-        this.deps.desktopHandoff,
-        settlement.buyerAccount,
-        settlement.buyerWallet,
-        intent,
-        this.now(),
-      );
-      if (retiredPair !== null) {
-        console.warn(
-          `[woc_market] settlement ${settlement.id} retires quote reference ${logSafe(retiredPair.reference)} with recorded signature ${logSafe(retiredPair.signature)}`,
-        );
-      }
-    }
-    return intent;
+    return stampSettlementQuote(
+      {
+        db: this.deps.db,
+        economy: this.deps.economy,
+        desktopHandoff: this.deps.desktopHandoff,
+        custodyWallet: () => this.deps.held?.custodyWallet() ?? null,
+        now: () => this.now(),
+      },
+      settlement,
+      listingSellerWallet,
+    );
   }
 
   async settlementQuote(
@@ -3129,6 +3121,7 @@ export class WocMarketService {
       cancelClosed: 0,
       polled: 0,
       polledBonds: 0,
+      heldReversed: 0,
       delivered: 0,
       reconciled: 0,
       redriven: 0,
@@ -3202,6 +3195,12 @@ export class WocMarketService {
           // bond is excluded from lapsing by its signature, and this is what
           // resolves it.
           await runArm('polledBonds', () => this.pollConfirmingBonds());
+          // AFTER the poll: a held payment the poll just failed returns its
+          // Vault charge in the same pass (woc_market_held.ts).
+          await runArm(
+            'heldReversed',
+            () => this.deps.held?.reverseFailedPayments() ?? Promise.resolve(0),
+          );
         },
       },
       {
@@ -3877,7 +3876,7 @@ export class WocMarketService {
     return this.deliveryArmsMemo;
   }
 
-  private deliverConfirmedSettlements(nowMs: number, scope: WocDeliveryScope): Promise<number> {
+  deliverConfirmedSettlements(nowMs: number, scope: WocDeliveryScope): Promise<number> {
     return this.delivery().deliverConfirmedSettlements(nowMs, scope);
   }
 

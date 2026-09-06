@@ -9,6 +9,7 @@
 
 import { apiUrl } from '../client_origin';
 import type { InvSlot, ItemInstancePayload } from '../sim/types';
+import type { WalletReauthProof } from './online';
 
 export interface WocMarketClientConfig {
   token(): string | null;
@@ -45,6 +46,9 @@ export interface WocMarketStatus {
   /** The directed (p2p) payment hold in seconds: the buyer's commitment note
    *  names it. Absent from an older server (the note then names no figure). */
   directedHoldSeconds?: number;
+  /** The Exchange Vault switch: walletless selling and Vault payment are
+   *  offered only when true. Absent from an older server (read as off). */
+  heldEnabled?: boolean;
   /** The bid-bond schedule and bond payment window, so disclosure copy
    *  resolves live figures (the server's own mirror of the service rule; the
    *  service-computed figure still arrives on every quote). Absent from an
@@ -185,6 +189,8 @@ export interface WocSettlementView {
    *  nothing failed; absent from an older server. */
   failReason?: string | null;
   deadlineAtMs: number;
+  /** A Vault claim (pay through confirmHeld). Absent on an older server. */
+  heldPay?: boolean;
   createdAtMs: number;
 }
 
@@ -236,6 +242,10 @@ export interface CreateListingRequest {
   /** The wallet step-up proof (B6/R1): a fresh challenge signed by the linked
    *  wallet. Omitting it refuses woc_market.stepup_required server-side. */
   stepUp?: WocStepUpProof;
+  /** The WALLETLESS step-up (the Exchange Vault): the account re-auth proof
+   *  (password plus second factor), taken instead of stepUp when no wallet
+   *  is linked and the realm reports heldEnabled. */
+  accountProof?: WalletReauthProof;
 }
 
 export interface WocStepUpProof {
@@ -281,6 +291,27 @@ export interface BuyNowRequest {
   listingId: number;
   characterId: number;
   acceptTerms: boolean;
+  /** 'held' pays from the Exchange Vault (confirm through confirmHeld, no
+   *  wallet signature); anything else pays from the linked wallet. */
+  payFrom?: 'wallet' | 'held';
+}
+
+/** The Vault readout (GET /api/woc-market/held): base units are the exact
+ *  figure, tokens the display value; the client derives neither. */
+export interface WocHeldView {
+  enabled: boolean;
+  base: string;
+  tokens: number;
+  canWithdraw: boolean;
+  entries: WocHeldEntryView[];
+}
+
+export interface WocHeldEntryView {
+  id: number;
+  kind: 'sale' | 'pay' | 'pay_reverse' | 'withdraw' | 'withdraw_reverse';
+  deltaBase: string;
+  settlementId: number | null;
+  atMs: number;
 }
 
 export interface WocBrowseRequest {
@@ -599,7 +630,11 @@ export class WocMarketClient {
     const out = await this.request<{ settlement: WocSettlementView; quote: WocQuoteView }>(
       'POST',
       `/api/woc-market/listings/${req.listingId}/buy-now`,
-      { characterId: req.characterId, acceptTerms: req.acceptTerms },
+      {
+        characterId: req.characterId,
+        acceptTerms: req.acceptTerms,
+        ...(req.payFrom === 'held' ? { payFrom: 'held' } : {}),
+      },
     );
     return out.ok ? { ok: true, ...out.data } : out;
   }
@@ -608,6 +643,35 @@ export class WocMarketClient {
     const out = await this.request<{ quote: WocQuoteView }>(
       'POST',
       `/api/woc-market/settlements/${id}/quote`,
+    );
+    return out.ok ? { ok: true, ...out.data } : out;
+  }
+
+  async held(): Promise<{ ok: true; held: WocHeldView } | WocMarketFail> {
+    const out = await this.request<WocHeldView>('GET', '/api/woc-market/held');
+    return out.ok ? { ok: true, held: out.data } : out;
+  }
+
+  async withdrawHeld(): Promise<
+    { ok: true; base: string; tokens: number; wallet: string } | WocMarketFail
+  > {
+    const out = await this.request<{ base: string; tokens: number; wallet: string }>(
+      'POST',
+      '/api/woc-market/held/withdraw',
+      {},
+    );
+    return out.ok ? { ok: true, ...out.data } : out;
+  }
+
+  /** Pay an offered settlement from the Vault: no signature, the server
+   *  charges the ledger and settles from custody. */
+  async confirmHeld(
+    id: number,
+  ): Promise<{ ok: true; state: string; reason?: string | null } | WocMarketFail> {
+    const out = await this.request<{ state: string; reason?: string | null }>(
+      'POST',
+      `/api/woc-market/settlements/${id}/confirm-held`,
+      {},
     );
     return out.ok ? { ok: true, ...out.data } : out;
   }

@@ -25,6 +25,14 @@
 //                 suffixes every capture with the locale; run it AFTER a
 //                 STRESS=1 pass so the listings it browses already exist.
 //   SHOT_PREFIX=before  names the files before-* instead of after-*.
+//   VAULT=1       the Exchange Vault arm only (docs/prd/woc/marketplace.md,
+//                 "Selling without a wallet: the Vault"): a WALLETLESS buyer
+//                 with a seeded Vault balance (a direct ledger insert over
+//                 DATABASE_URL, dev-only; skipped where the table is absent,
+//                 which is what a base-branch BEFORE pass sees) browses a
+//                 buy-now listing, opens its Vault quote, and visits the Sell
+//                 tab; then the same on the mobile sheet. Needs the server
+//                 booted with WOC_MARKET_HELD_WALLET set.
 import { randomBytes } from 'node:crypto';
 import fs from 'node:fs';
 import { ed25519 } from '@noble/curves/ed25519';
@@ -70,6 +78,8 @@ const SHOT_PREFIX = process.env.SHOT_PREFIX ?? 'after';
 // seeded (a rerun, or the before-state pass over the same database), so an
 // iteration costs a browser flow rather than five minutes of paced seeding.
 const SEED = process.env.SEED !== '0';
+const VAULT = process.env.VAULT === '1';
+const VAULT_BASE = process.env.VAULT_BASE ?? '250000000000000';
 const REUSE_BUYER = process.env.BUYER ?? '';
 // The page URL: the locale rides the boot query (the client's own language
 // switch), so every capture of a locale pass reads in that locale.
@@ -329,6 +339,157 @@ async function seedListings({ prefix, charName, shapes, account = null }) {
 // The base pair: an AUCTION carries a reserve and no buy-now price, and a
 // BUY-NOW carries the price and no reserve: the rules refuse any other pairing,
 // so these are the only two shapes a new listing can take.
+/** Seed a Vault balance for a username straight into the ledger (a capture
+ *  rig's shortcut: the only real credit path is a delivered sale). Silent
+ *  where the table does not exist (a base-branch server). */
+async function seedVaultBalance(username, base) {
+  const url = process.env.DATABASE_URL;
+  if (!url) {
+    console.log('DATABASE_URL unset: no Vault balance seeded');
+    return;
+  }
+  const { default: pg } = await import('pg');
+  const client = new pg.Client(url);
+  await client.connect();
+  try {
+    const acct = await client.query('SELECT id FROM accounts WHERE username = $1', [username]);
+    const id = acct.rows[0]?.id;
+    if (!id) throw new Error(`no account ${username}`);
+    await client.query(
+      `INSERT INTO woc_market_held_entries (account_id, ref, kind, delta_base)
+       VALUES ($1, $2, 'sale', $3::numeric) ON CONFLICT (ref) DO NOTHING`,
+      [id, `held:sale:shot:${username}`, base],
+    );
+    await client.query(
+      `INSERT INTO woc_market_held_balances (account_id, base) VALUES ($1, $2::numeric)
+       ON CONFLICT (account_id) DO UPDATE SET base = EXCLUDED.base`,
+      [id, base],
+    );
+    console.log(`seeded a Vault balance of ${base} base units for ${username}`);
+  } catch (err) {
+    console.log(`Vault balance not seeded (${err.message}); the card will read empty or absent`);
+  } finally {
+    await client.end();
+  }
+}
+
+/** The Proving Shore's welcome modal (#tutorial-greeting) mounts a beat
+ *  after entry and sits across the window; close it through the HUD's own
+ *  path so its focus trap releases. */
+async function dismissGreeting(page) {
+  for (let i = 0; i < 6; i++) {
+    const closed = await page.evaluate(() => {
+      const hud = window.__game?.hud;
+      if (document.querySelector('#tutorial-greeting') === null) return false;
+      if (typeof hud?.closeTutorialGreeting === 'function') hud.closeTutorialGreeting();
+      else document.querySelector('#tutorial-greeting button')?.click();
+      return true;
+    });
+    if (closed) break;
+    await sleep(500);
+  }
+  await sleep(300);
+}
+
+async function vaultArm(browser) {
+  await seedSellerListing();
+  // A WALLETLESS buyer: no linkThrowawayWallet, which is the whole point.
+  const buyer = await registerAccount('wocvault');
+  await seedVaultBalance(buyer.username, VAULT_BASE);
+  const listingIds = await listingIdsByItem(buyer.token);
+  const page = await browser.newPage();
+  await page.setViewport({ width: 1600, height: 1000 });
+  await enterWorldInBrowser(page, {
+    username: buyer.username,
+    charName: `Vault${nameSuffix}`,
+    cls: 'rogue',
+  });
+  await dismissGreeting(page);
+  await openExchange(page);
+  await shoot(page, shotName('desktop-vault-browse'));
+  const buyNowId = listingIds.get(BUY_NOW_ITEM);
+  if (buyNowId) {
+    await clickListing(page, buyNowId);
+    await sleep(1200);
+    await shoot(page, shotName('desktop-vault-detail'));
+    // The Vault quote face: only the after-state can open it (the base
+    // build disables Buy now without a wallet), so a missing face is fine.
+    const opened = await page.evaluate(() => {
+      const terms = document.querySelector('#woc-market-window input[data-field="accept-terms"]');
+      if (terms instanceof HTMLInputElement && !terms.checked) terms.click();
+      const btn = document.querySelector('#woc-market-window button[data-action="buy-now"]');
+      if (btn instanceof HTMLButtonElement && !btn.disabled) {
+        btn.click();
+        return true;
+      }
+      return false;
+    });
+    if (opened) {
+      await page
+        .waitForSelector('#woc-market-window .wm-quote', { timeout: 15000 })
+        .catch(() => {});
+      await sleep(800);
+      await shoot(page, shotName('desktop-vault-quote'));
+      await page.evaluate(() => {
+        document.querySelector('#woc-market-window button[data-action="quote-cancel"]')?.click();
+      });
+      await sleep(800);
+    }
+  }
+  await clickTab(page, 'sell');
+  await page.evaluate((id) => window.__game.world.chat(`/dev give ${id}`), EPIC_ITEM);
+  await sleep(1500);
+  await page.evaluate(() => {
+    document.querySelector('#woc-market-window .wm-combo-input')?.focus();
+  });
+  await sleep(500);
+  await page.evaluate(() => {
+    document
+      .querySelector('#woc-market-window .wm-combo-item')
+      ?.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+  });
+  await sleep(1200);
+  await shoot(page, shotName('desktop-vault-sell'));
+  // The form's foot: the walletless hint and the Sell control (below the
+  // fold at 1000px), framed from the disclosures.
+  await shoot(
+    page,
+    shotName('desktop-vault-sell-submit'),
+    null,
+    '#woc-market-window .wm-disclosures',
+  );
+  await page.close();
+
+  // Mobile landscape, the same walletless story on the sheet.
+  const mob = await registerAccount('wocvaultm');
+  await seedVaultBalance(mob.username, VAULT_BASE);
+  const mobileContext = await browser.createBrowserContext();
+  const mobile = await mobileContext.newPage();
+  await mobile.setViewport({ width: 1280, height: 800 });
+  await enterWorldInBrowser(mobile, {
+    username: mob.username,
+    charName: `Vaultm${nameSuffix}`,
+    cls: 'mage',
+  });
+  await mobile.setViewport({ width: 915, height: 412, deviceScaleFactor: 2 });
+  const client = await mobile.createCDPSession();
+  await client.send('Emulation.setTouchEmulationEnabled', { enabled: true });
+  await mobile.evaluate(() => {
+    document.body.classList.add('mobile-touch');
+    window.dispatchEvent(new Event('resize'));
+  });
+  await sleep(1500);
+  await dismissGreeting(mobile);
+  await openExchange(mobile);
+  await shoot(mobile, shotName('mobile-vault-browse'), null);
+  if (buyNowId) {
+    await clickListing(mobile, buyNowId);
+    await sleep(1200);
+    await shoot(mobile, shotName('mobile-vault-detail'), null, '#woc-market-window .wm-detail');
+  }
+  await mobile.close();
+}
+
 async function seedSellerListing() {
   await seedListings({
     prefix: 'wocsell',
@@ -783,6 +944,20 @@ async function clickListing(page, listingId, { sortNewest = true } = {}) {
 }
 
 async function main() {
+  if (VAULT) {
+    const browser = await puppeteer.launch({
+      executablePath: BROWSER_PATH,
+      headless: 'new',
+      args: ['--window-size=1600,1000', '--use-angle=swiftshader'],
+    });
+    try {
+      await vaultArm(browser);
+    } finally {
+      await browser.close();
+    }
+    console.log('done: the Vault arm');
+    return;
+  }
   if (SEED) {
     await seedSellerListing();
     if (STRESS) await seedStressListings();

@@ -25,6 +25,8 @@ export interface WocSweepPassStats {
   polled: number;
   /** Bonds paid but not yet decided by the chain, re-checked this pass. */
   polledBonds: number;
+  /** Vault charges returned after a held payment failed or expired. */
+  heldReversed: number;
   delivered: number;
   reconciled: number;
   /** Delivered-but-unclosed settlements whose close tail was re-driven

@@ -12,9 +12,11 @@
 // focus_restore.ts; the language fan-out calls relocalize(), which re-renders
 // once and re-latches the signature.
 
+import type { WalletReauthProof } from '../net/online';
 import type {
   WocActivityView,
   WocEstimateView,
+  WocHeldView,
   WocListingView,
   WocMarketStatus,
   WocQuoteView,
@@ -67,12 +69,15 @@ import {
   wocWalletCardSig,
 } from './woc_market_chrome';
 import type { WocMarketHooks } from './woc_market_hooks';
+import { resolveWocNotice, type WocNotice } from './woc_market_notice';
+import { type WocPendingQuote, wocPendingQuoteHtml } from './woc_market_pending_quote';
 import { anyBondAwaitingChain, shouldPollWocMarket } from './woc_market_poll_core';
 import {
   wocBondPendingText,
   wocPaymentPendingText,
   wocSettlementFailText,
 } from './woc_market_reason_text';
+import { payPendingFromVault, type WocVaultHost, withdrawVault } from './woc_market_vault_arm';
 import {
   browseItemFilterIds,
   browseQualityOptions,
@@ -143,47 +148,9 @@ interface WocMarketScrollKeys {
  *  literals would let the two drift apart silently. */
 const SELL_LISTBOX_ID = 'wm-sell-listbox';
 
-// usdCents is NULLABLE on purpose: it is only a display label sourced from the
-// cached activity row, and a missing row must render no amount rather than a
-// fabricated $0.00 next to a real charge. The quote's token legs are the
-// authoritative figures either way.
-type PendingQuote =
-  | {
-      kind: 'bond';
-      bidId: number;
-      /** The listing's item when the painter knows it ('' otherwise): the
-       *  quote face names which auction the bond is for. Display only. */
-      itemId: string;
-      usdCents: number | null;
-      quote: WocQuoteView;
-    }
-  | {
-      kind: 'settlement';
-      settlementId: number;
-      itemId: string;
-      usdCents: number | null;
-      /** The claim's own payment deadline (the wire's deadlineAtMs), or null:
-       *  the quote face shows it beside the quote expiry. Display only. */
-      deadlineAtMs: number | null;
-      quote: WocQuoteView;
-    };
+type PendingQuote = WocPendingQuote;
 
 const PAGE_SIZE = 25;
-
-/** The toast strip's UNRESOLVED state: keys, codes, and screened reason
- *  words, resolved at render by resolveNotice() so a runtime language switch
- *  never leaves a stale-locale sentence on screen. */
-type WocNotice =
-  | { kind: 'key'; key: TranslationKey; error: boolean }
-  | { kind: 'api'; code: string; params?: Record<string, unknown>; error: boolean }
-  | { kind: 'pending'; reason: string | null; error: boolean }
-  | { kind: 'bondPending'; reason: string | null; error: boolean }
-  | {
-      kind: 'bridge';
-      reason: WalletBridgeReason;
-      flavor: 'sign' | 'payment';
-      error: boolean;
-    };
 
 export class WocMarketWindow {
   private built = false;
@@ -261,6 +228,9 @@ export class WocMarketWindow {
    *  held only in the DOM. Reset on close so every visit starts compact. */
   private bidTermsOpen = false;
   private pendingQuote: PendingQuote | null = null;
+  /** The Exchange Vault readout (GET /api/woc-market/held), refreshed with
+   *  every reload; null until read or on a realm without one. */
+  private held: WocHeldView | null = null;
   /** The bid preview's timer-free coalescing (see onBidPriceInput): the price
    *  still awaiting an estimate, and whether one is already out. */
   private bidEstimateWanted: number | null = null;
@@ -366,7 +336,12 @@ export class WocMarketWindow {
     if (seq !== this.renderSeq) return;
     this.status = status;
     this.statusFailed = !status.ok;
-    await Promise.all([this.loadBrowse(seq), this.loadActivity(seq)]);
+    // The Vault readout rides every reload; a failed read keeps the last one
+    // (a blip must not hide a balance the player just earned).
+    const held = hooks.client.held().then((out) => {
+      if (seq === this.renderSeq && out.ok) this.held = out.held;
+    });
+    await Promise.all([this.loadBrowse(seq), this.loadActivity(seq), held]);
     if (seq !== this.renderSeq) return;
     this.render();
   }
@@ -584,6 +559,7 @@ export class WocMarketWindow {
       status: this.status,
       statusFailed: this.statusFailed,
       walletLinked: this.deps.hooks()?.walletLinked() ?? false,
+      held: this.held,
       tab: this.tab,
       nowMs: Date.now(),
       browse: {
@@ -827,6 +803,17 @@ export class WocMarketWindow {
       paused: model.paused,
       wallet,
       tokensPerUsd: model.tokensPerUsd,
+      vault: model.vault.enabled
+        ? {
+            tokens: model.vault.tokens,
+            tokensText: this.tokens(model.vault.tokens),
+            positive: model.vault.canPay,
+            canWithdraw: model.vault.canWithdraw,
+            walletLinked: model.walletLinked,
+            busy: this.busy,
+            usd: (c) => this.usd(c),
+          }
+        : null,
     });
     const foot = wocMarketFootHtml({
       paused: model.paused,
@@ -834,14 +821,14 @@ export class WocMarketWindow {
       priceAsOfMs: model.priceAsOfMs,
       tokens: (value) => this.tokens(value),
       notice: this.notice
-        ? { text: this.resolveNotice(this.notice), error: this.notice.error }
+        ? { text: resolveWocNotice(this.notice), error: this.notice.error }
         : null,
       busyText: this.busy ? t(this.busyLabel ?? 'hudChrome.wocMarket.confirming') : null,
     });
 
     const body =
       this.pendingQuote !== null
-        ? this.quoteHtml(model)
+        ? this.quoteHtml()
         : model.tab === 'browse'
           ? this.browseHtml(model)
           : model.tab === 'sell'
@@ -1005,7 +992,11 @@ export class WocMarketWindow {
     const bidForm = this.bidFormHtml(model, d.row.id, name);
     // EXACT here, unlike the bid: buy-now carries no bond, so the server compares
     // this same price and nothing else.
-    const overBuyNow = overWalletBalance(this.buyNowTokens, this.walletTokens());
+    // A Vault payer's cover is the server's held_insufficient verdict, so the
+    // wallet-balance gate applies to a wallet payer only.
+    const overBuyNow =
+      model.walletLinked && overWalletBalance(this.buyNowTokens, this.walletTokens());
+    const noPayer = !model.walletLinked && !model.vault.canPay;
     const buyNow =
       d.row.buyNowCents !== null && !d.row.mine
         ? // The chrome builder: the walk-away-cost disclosure BEFORE the
@@ -1015,10 +1006,11 @@ export class WocMarketWindow {
             itemName: name,
             buyNowCents: d.row.buyNowCents,
             locked: d.row.buyNowLocked,
-            disabled: model.paused || !model.walletLinked || d.row.buyNowLocked || overBuyNow,
+            disabled: model.paused || noPayer || d.row.buyNowLocked || overBuyNow,
             tokensText: this.buyNowTokens === null ? null : this.tokens(this.buyNowTokens),
             overBalance: overBuyNow,
             usd: (c) => this.usd(c),
+            vaultPay: !model.vault.canPay ? 'none' : model.walletLinked ? 'extra' : 'held',
           })
         : '';
     // The shared cancel predicate (woc_market_view.ts canCancelListing): a
@@ -1330,7 +1322,10 @@ export class WocMarketWindow {
         `<p class="wm-note">${esc(t('hudChrome.wocMarket.sellFeeNote'))}</p>` +
         feeLines +
         `</div>` +
-        `<button type="button" class="wm-primary" data-action="sell-submit" ${model.paused || !model.walletLinked || this.busy ? 'disabled' : ''} ` +
+        (model.walletLinked
+          ? ''
+          : `<p class="wm-note wm-vault-sell-hint">${esc(t('hudChrome.wocMarket.vaultSellHint'))}</p>`) +
+        `<button type="button" class="wm-primary" data-action="sell-submit" ${model.paused || !model.sellEnabled || this.busy ? 'disabled' : ''} ` +
         `aria-label="${esc(t('hudChrome.wocMarket.sellSubmitAria', { item: this.itemName(selected.itemId) }))}" data-focus-key="wm-sell-submit">` +
         `${esc(t('hudChrome.wocMarket.sellSubmit'))}</button></div>`
       : '';
@@ -1354,44 +1349,36 @@ export class WocMarketWindow {
     });
   }
 
-  private quoteHtml(model: Extract<WocMarketViewModel, { kind: 'ready' }>): string {
+  private quoteHtml(): string {
     const pending = this.pendingQuote;
     if (!pending) return '';
-    void model;
-    const q = pending.quote;
-    const remainingMs = q.expiresAtMs === null ? 0 : Math.max(0, q.expiresAtMs - Date.now());
-    // With no cached USD label, the token legs below carry the amount rather
-    // than a fabricated $0.00. A bond names its listing's item when the
-    // painter knows it (a retry face after a declined wallet still says which
-    // auction it is for).
-    const title =
-      pending.usdCents === null
-        ? t('hudChrome.wocMarket.quoteTitle')
-        : pending.kind === 'bond'
-          ? pending.itemId === ''
-            ? t('hudChrome.wocMarket.quoteBondFor', { usd: this.usd(pending.usdCents) })
-            : t('hudChrome.wocMarket.quoteBondForItem', {
-                item: this.itemName(pending.itemId),
-                usd: this.usd(pending.usdCents),
-              })
-          : t('hudChrome.wocMarket.quoteSettlementFor', {
-              item: this.itemName(pending.itemId),
-              usd: this.usd(pending.usdCents),
-            });
-    // The face itself is the chrome builder's; this painter resolves the
-    // title, the token legs and the clock (chrome holds none of them).
-    return wocQuoteFaceHtml({
-      title,
-      amountTokens: q.amount ? this.tokens(q.amount.tokens) : null,
-      sellerTokens: q.seller ? this.tokens(q.seller.tokens) : null,
-      burnTokens: q.burn ? this.tokens(q.burn.tokens) : null,
-      treasuryTokens: q.treasury ? this.tokens(q.treasury.tokens) : null,
-      remainingMs,
-      // The claim's own payment deadline on a settlement quote (the trade
-      // arm's quote face shows its twin): 'Not now' keeps it running.
-      dueAtMs: pending.kind === 'settlement' ? pending.deadlineAtMs : null,
+    return wocPendingQuoteHtml(pending, {
+      usd: (c) => this.usd(c),
+      tokens: (v) => this.tokens(v),
+      itemName: (id) => this.itemName(id),
+      nowMs: Date.now(),
       busy: this.busy,
     });
+  }
+
+  /** The Vault arm's host slice (woc_market_vault_arm.ts): the window keeps
+   *  its busy guard, toast, and reload; the arm owns the two ladders. */
+  private vaultHost(): WocVaultHost {
+    return {
+      hooks: () => this.deps.hooks(),
+      withBusy: (label, run) => this.withBusy(label, run),
+      fail: (code, params) => this.fail(code, params),
+      ok: (key) => this.ok(key),
+      notice: (n) => {
+        this.notice = n;
+      },
+      clearPendingQuote: () => {
+        this.pendingQuote = null;
+      },
+      reload: () => this.reload(),
+      refreshWocBalance: (force) => this.deps.refreshWocBalance(force),
+      tokens: (value) => this.tokens(value),
+    };
   }
 
   /** Open the seller click-through pane and fetch their recent trades. The
@@ -1918,7 +1905,13 @@ export class WocMarketWindow {
         void this.placeBid(Number(target.getAttribute('data-listing')));
         break;
       case 'buy-now':
-        void this.buyNow(Number(target.getAttribute('data-listing')));
+        void this.buyNow(
+          Number(target.getAttribute('data-listing')),
+          target.getAttribute('data-pay') === 'held',
+        );
+        break;
+      case 'vault-withdraw':
+        void withdrawVault(this.vaultHost());
         break;
       case 'cancel-listing':
         void this.cancelListing(Number(target.getAttribute('data-listing')));
@@ -1970,24 +1963,6 @@ export class WocMarketWindow {
 
   private fail(code: string, params?: Record<string, unknown>): void {
     this.notice = { kind: 'api', code, params, error: true };
-  }
-
-  /** Resolve the stored notice to the CURRENT locale's text. Dispatch only:
-   *  every sentence comes from the pure mappers (api_error_i18n,
-   *  woc_market_reason_text, wallet_bridge_reason_text) or the catalog. */
-  private resolveNotice(n: WocNotice): string {
-    switch (n.kind) {
-      case 'key':
-        return t(n.key);
-      case 'api':
-        return userFacingApiError({ code: n.code, params: n.params });
-      case 'pending':
-        return wocPaymentPendingText(n.reason);
-      case 'bondPending':
-        return wocBondPendingText(n.reason);
-      case 'bridge':
-        return walletBridgeReasonText(n.reason, n.flavor);
-    }
   }
 
   private async withBusy(label: TranslationKey, run: () => Promise<void>): Promise<void> {
@@ -2069,7 +2044,7 @@ export class WocMarketWindow {
     if (quoted) await this.signPendingQuote();
   }
 
-  private async buyNow(listingId: number): Promise<void> {
+  private async buyNow(listingId: number, fromVault = false): Promise<void> {
     const hooks = this.deps.hooks();
     if (!hooks || !Number.isFinite(listingId)) return;
     const itemId = this.detail?.itemId ?? '';
@@ -2078,6 +2053,7 @@ export class WocMarketWindow {
         listingId,
         characterId: hooks.characterId(),
         acceptTerms: this.acceptTermsChecked(),
+        ...(fromVault ? { payFrom: 'held' as const } : {}),
       });
       if (!out.ok) {
         this.fail(out.code, out.params);
@@ -2088,6 +2064,7 @@ export class WocMarketWindow {
         kind: 'settlement',
         settlementId: out.settlement.id,
         itemId,
+        held: fromVault,
         usdCents: out.settlement.amountCents,
         deadlineAtMs:
           typeof out.settlement.deadlineAtMs === 'number' ? out.settlement.deadlineAtMs : null,
@@ -2188,54 +2165,66 @@ export class WocMarketWindow {
     // in the flow at all.
     await this.withBusy('hudChrome.wocMarket.confirming', async () => {
       const gen = this.busyGen;
-      // Step-up (B6/R1): a fresh server-built challenge, signed by the linked
-      // wallet, authorizes THIS listing. The wallet popup shows the message.
-      const issued = await hooks.client.stepUpChallenge({
-        operation: 'create_listing',
-        itemId: slot.itemId,
-        // The exact copy, so the signed message names which one leaves the
-        // bags and the server binds it (matches the createListing body below).
-        expectInstance: slot.instance ?? null,
-        format: submitFormat,
-        startCents,
-        reserveCents: listingReserve,
-        buyNowCents: listingBuyNow,
-        durationHours,
-        offerNext,
-      });
-      // Bail if the window was closed under the mint: a newer run now owns the
-      // state, and proceeding would fail or send a stale request.
-      if (!this.stillOwns(gen)) return;
-      if (!issued.ok) {
-        this.fail(issued.code, issued.params);
-        return;
+      // The WALLETLESS listing (the Exchange Vault): no wallet can sign a
+      // challenge, so the account itself authorizes the custody move
+      // (password plus second factor) and the proof rides the create body.
+      // The prompt is modal; a cancel lists nothing.
+      let accountProof: WalletReauthProof | null = null;
+      if (!hooks.walletLinked()) {
+        accountProof = hooks.accountProof ? await hooks.accountProof() : null;
+        if (accountProof === null || !this.stillOwns(gen)) return;
       }
-      let stepUpSignature: string;
-      if (issued.challenge.signatureRequired === false) {
-        // The dev economy's devsig arm, mirrored from the payment path:
-        // explicit permission only; an absent flag still goes to the wallet.
-        stepUpSignature = `devsig:${issued.challenge.nonce}`;
-      } else {
-        this.busyLabel = 'hudChrome.wocMarket.signing';
-        this.render();
-        try {
-          stepUpSignature = await hooks.signMessageBase58(
-            issued.challenge.message,
-            issued.challenge.nonce,
-          );
-        } catch (err) {
-          // Dev channel keeps the raw error; the player line is CLASSIFIED
-          // (decline, timeout, missing wallet), never err.message raw (the
-          // wallet-bridge i18n medium). A message signature moves no funds,
-          // so the generic arm stays the no-"payment" copy.
-          console.warn('[wallet bridge] step-up signature failed', err);
-          this.notice = {
-            kind: 'bridge',
-            reason: walletBridgeReason(err),
-            flavor: 'sign',
-            error: true,
-          };
+      let stepUpSignature = '';
+      let issued: Awaited<ReturnType<typeof hooks.client.stepUpChallenge>> | null = null;
+      if (accountProof === null) {
+        // Step-up (B6/R1): a fresh server-built challenge, signed by the linked
+        // wallet, authorizes THIS listing. The wallet popup shows the message.
+        issued = await hooks.client.stepUpChallenge({
+          operation: 'create_listing',
+          itemId: slot.itemId,
+          // The exact copy, so the signed message names which one leaves the
+          // bags and the server binds it (matches the createListing body below).
+          expectInstance: slot.instance ?? null,
+          format: submitFormat,
+          startCents,
+          reserveCents: listingReserve,
+          buyNowCents: listingBuyNow,
+          durationHours,
+          offerNext,
+        });
+        // Bail if the window was closed under the mint: a newer run now owns the
+        // state, and proceeding would fail or send a stale request.
+        if (!this.stillOwns(gen)) return;
+        if (!issued.ok) {
+          this.fail(issued.code, issued.params);
           return;
+        }
+        if (issued.challenge.signatureRequired === false) {
+          // The dev economy's devsig arm, mirrored from the payment path:
+          // explicit permission only; an absent flag still goes to the wallet.
+          stepUpSignature = `devsig:${issued.challenge.nonce}`;
+        } else {
+          this.busyLabel = 'hudChrome.wocMarket.signing';
+          this.render();
+          try {
+            stepUpSignature = await hooks.signMessageBase58(
+              issued.challenge.message,
+              issued.challenge.nonce,
+            );
+          } catch (err) {
+            // Dev channel keeps the raw error; the player line is CLASSIFIED
+            // (decline, timeout, missing wallet), never err.message raw (the
+            // wallet-bridge i18n medium). A message signature moves no funds,
+            // so the generic arm stays the no-"payment" copy.
+            console.warn('[wallet bridge] step-up signature failed', err);
+            this.notice = {
+              kind: 'bridge',
+              reason: walletBridgeReason(err),
+              flavor: 'sign',
+              error: true,
+            };
+            return;
+          }
         }
       }
       // The wallet handoff is the long pole a close can straddle: if it did,
@@ -2260,7 +2249,11 @@ export class WocMarketWindow {
         buyNowCents: listingBuyNow,
         durationHours,
         offerNext,
-        stepUp: { nonce: issued.challenge.nonce, signature: stepUpSignature },
+        ...(accountProof !== null
+          ? { accountProof }
+          : issued?.ok
+            ? { stepUp: { nonce: issued.challenge.nonce, signature: stepUpSignature } }
+            : {}),
       });
       if (!out.ok) {
         this.fail(out.code, out.params);
@@ -2317,6 +2310,8 @@ export class WocMarketWindow {
         kind: 'settlement',
         settlementId,
         itemId: listing?.itemId ?? '',
+        // A Vault claim resumes as a Vault payment (the wire marks it).
+        held: settlement?.heldPay === true,
         usdCents: settlement?.amountCents ?? null,
         deadlineAtMs: settlement?.deadlineAtMs ?? null,
         quote: out.quote,
@@ -2384,7 +2379,12 @@ export class WocMarketWindow {
   private async signPendingQuote(): Promise<void> {
     const hooks = this.deps.hooks();
     const pending = this.pendingQuote;
-    if (!hooks || !pending || pending.quote.transactionBase64 === null) return;
+    if (!hooks || !pending) return;
+    if (pending.kind === 'settlement' && pending.held) {
+      await payPendingFromVault(this.vaultHost(), pending.settlementId);
+      return;
+    }
+    if (pending.quote.transactionBase64 === null) return;
     // The dev arm signs nothing, so it never claims a wallet is waiting; the
     // real arm sets the wallet label right before the handoff (see the listing
     // submit above for the same sequencing).

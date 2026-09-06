@@ -664,6 +664,11 @@ export const en = {
     // removing a linked wallet asks for the account password first.
     reauthTitle: 'Confirm wallet change',
     reauthUnlinkTitle: 'Confirm wallet removal',
+    // The Exchange Vault's walletless listing: the account, not a wallet,
+    // authorizes the custody move.
+    reauthListTitle: 'Confirm your listing',
+    reauthListHelp:
+      'No wallet is linked, so your account password authorizes this listing instead of a wallet signature.',
     reauthHelp: 'For your security, enter your account password to authorize this change.',
     reauthNoPassword:
       'This account signs in without a password. Set a password in account settings first, then try again.',

@@ -3471,6 +3471,9 @@ async function startGame(
         load: loadWallet,
         desktopAuthorize: desktopWalletBrowserHandoffAvailable() ? wocDesktopAuthorize : null,
       },
+      // The walletless listing step-up (the Exchange Vault) rides the same
+      // account re-auth modal the wallet-change flows use.
+      accountProof: { readAccount: () => api.getAccount(), focusManager: walletFocusManager },
     }).catch((err) => console.warn('[woc] exchange attach failed', err));
     if (!NATIVE_APP) {
       hud.attachClaudium(claudiumHooks);

@@ -55,6 +55,8 @@ import type {
   WocSettlementRow,
   WocStrikeRow,
 } from './woc_market';
+import type { WocMarketHeldService } from './woc_market_held';
+import { createWocHeldHandlers } from './woc_market_held_routes';
 import type { WocMarketReadCache } from './woc_market_read_cache';
 import {
   bondCents,
@@ -153,6 +155,10 @@ export interface WocMarketRuntime {
    *  direct db reads. Absent in rigs: guards fall back to the direct reads,
    *  and the test override seam keeps absolute precedence over both. */
   authGuardDb?: BearerActiveGuardDb;
+  /** The Exchange Vault (woc_market_held.ts). Absent in rigs and on a realm
+   *  booted without WOC_MARKET_HELD_WALLET: the Vault routes answer
+   *  held_disabled and /status reports heldEnabled false. */
+  held?: WocMarketHeldService;
 }
 
 let runtime: WocMarketRuntime | null = null;
@@ -248,6 +254,18 @@ export const REFUSAL_ERRORS: Record<WocMarketRefusal, { status: number; code: Er
   // different things to the seller ("link YOUR wallet" versus "they must link
   // theirs"), and only the second is actionable by someone else.
   recipient_wallet_required: { status: 403, code: 'woc_market.recipient_wallet_required' },
+  // The Exchange Vault (woc_market_held.ts). The account-proof arms ride the
+  // wallet re-auth codes so the client's existing password and second-factor
+  // prompts serve the walletless listing unchanged.
+  held_disabled: { status: 403, code: 'woc_market.held_disabled' },
+  held_insufficient: { status: 403, code: 'woc_market.held_insufficient' },
+  held_empty: { status: 400, code: 'woc_market.held_empty' },
+  held_withdraw_failed: { status: 503, code: 'woc_market.held_withdraw_failed' },
+  account_proof_required: { status: 401, code: 'woc_market.account_proof_required' },
+  account_proof_two_factor: { status: 401, code: 'woc_market.account_proof_two_factor' },
+  account_proof_no_password: { status: 403, code: 'woc_market.account_proof_no_password' },
+  account_proof_invalid: { status: 401, code: 'woc_market.account_proof_invalid' },
+  account_proof_throttled: { status: 429, code: 'woc_market.account_proof_throttled' },
   self_offer: { status: 400, code: 'woc_market.self_offer' },
   offer_expired: { status: 410, code: 'woc_market.offer_expired' },
   // Wallet step-up on the custody movers (B6/R1). All 403 auth-class except
@@ -281,6 +299,15 @@ function throwRefusal(refusal: {
 const invalid = (): never => {
   throw new HttpError(400, 'woc_market.invalid_input');
 };
+
+// The Vault handlers (woc_market_held_routes.ts) over this module's private
+// runtime and cache seams; their RouteDef rows sit in the table below.
+const heldHandlers = createWocHeldHandlers({
+  held: () => runtime?.held ?? null,
+  throwRefusal,
+  bustMe: (account) => readCache()?.bustMe(account),
+  bustHistoryAll: () => readCache()?.bustHistoryAll(),
+});
 
 // ---------------------------------------------------------------------------
 // Decode helpers (strict, no coercion surprises)
@@ -480,6 +507,10 @@ function settlementView(row: WocSettlementRow & { itemId?: string }): Record<str
     failReason: screenWireFailReason(row.failReason),
     deadlineAtMs: row.deadlineAtMs,
     createdAtMs: row.createdAtMs,
+    // A Vault claim: the buyer wallet is the custody address, so the client
+    // resumes it through confirm-held rather than a wallet signature.
+    heldPay:
+      runtime?.held?.custodyWallet() !== null && row.buyerWallet === runtime?.held?.custodyWallet(),
   };
 }
 
@@ -568,6 +599,9 @@ async function statusHandler(ctx: Ctx): Promise<void> {
     // The directed (p2p) payment hold, so the trade arm's commitment note can
     // name the deadline whose lapse earns a strike instead of a guessed one.
     directedHoldSeconds: WOC_MARKET_DIRECTED_HOLD_SECONDS,
+    // The Vault switch: the client offers walletless selling and Vault
+    // payment only when the realm can actually book them.
+    heldEnabled: runtime?.held?.enabled() ?? false,
     // The bond schedule and the bond payment window, so the client's
     // disclosure copy resolves live figures instead of shipping figure-free
     // sentences (the copy-figures follow-up). These are this server's mirror
@@ -748,6 +782,11 @@ async function createListingHandler(ctx: Ctx): Promise<void> {
     // in-service consummation marker), so the service's directed skip is
     // unreachable from the public surface; the routes suite pins it.
     ...(stepUp === undefined ? {} : { stepUp }),
+    // The walletless step-up (the Vault): the account re-auth proof object,
+    // shape-checked by the re-auth core itself (a non-object is no proof).
+    ...(typeof body.accountProof === 'object' && body.accountProof !== null
+      ? { accountProof: body.accountProof }
+      : {}),
     account: ctxAccountId(ctx),
     characterId: intField(body.characterId, 1, Number.MAX_SAFE_INTEGER),
     itemRef: {
@@ -873,6 +912,9 @@ async function buyNowHandler(ctx: Ctx): Promise<void> {
     characterId: intField(body.characterId, 1, Number.MAX_SAFE_INTEGER),
     listingId: idParam(ctx),
     acceptTerms: body.acceptTerms === true,
+    // Anything but the literal 'held' pays from the wallet: an unknown value
+    // must never route money through the Vault by accident.
+    payFrom: body.payFrom === 'held' ? 'held' : 'wallet',
   });
   // Before the refusal throw: buyNow can insert a settlement and then
   // expire it on quote_unavailable, and can record first-time terms.
@@ -1426,6 +1468,30 @@ export const routes: RouteDef[] = [
     middleware: [activeAccount, rateLimit(WOC_MARKET_CONFIRM_POLICY), withBody(), ownedSettlement],
     meta: OWNED_ACCOUNT,
     handler: confirmSettlementHandler,
+  },
+  // The Exchange Vault (woc_market_held_routes.ts). The readout takes the
+  // FULL-scope guard like /me: it is the caller's own balance and ledger.
+  {
+    method: 'GET',
+    path: '/api/woc-market/held',
+    surface: 'api',
+    middleware: [activeAccount, rateLimit(WOC_MARKET_READ_POLICY)],
+    handler: heldHandlers.readout,
+  },
+  {
+    method: 'POST',
+    path: '/api/woc-market/held/withdraw',
+    surface: 'api',
+    middleware: [activeAccount, rateLimit(WOC_MARKET_CONFIRM_POLICY), withBody()],
+    handler: heldHandlers.withdraw,
+  },
+  {
+    method: 'POST',
+    path: '/api/woc-market/settlements/:id/confirm-held',
+    surface: 'api',
+    middleware: [activeAccount, rateLimit(WOC_MARKET_CONFIRM_POLICY), withBody(), ownedSettlement],
+    meta: OWNED_ACCOUNT,
+    handler: heldHandlers.confirmHeld,
   },
   // Operator arms: the central ADMIN_ROUTE_PERMISSIONS gate authorizes each
   // concrete path (moderation.read / moderation.act rows in admin_routes.ts).

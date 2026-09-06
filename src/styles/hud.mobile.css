@@ -4350,6 +4350,18 @@
     grid-row: auto;
     min-height: 44px;
   }
+  /* The Exchange Vault card stacks like the wallet card beside it. */
+  body.mobile-touch #woc-market-window .wm-banner-vault {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body.mobile-touch #woc-market-window .wm-banner-vault .wm-vault-balance {
+    grid-column: 1;
+  }
+  body.mobile-touch #woc-market-window .wm-banner-vault button {
+    grid-column: 1;
+    grid-row: auto;
+    min-height: 44px;
+  }
   body.mobile-touch #woc-market-window .wm-wallet-balance {
     grid-column: 1;
     grid-row: auto;

@@ -13,6 +13,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type {
   WocActivityView,
   WocEstimateView,
+  WocHeldView,
   WocListingView,
   WocMarketClient,
   WocMarketStatus,
@@ -148,6 +149,7 @@ interface FakeClient {
       { ok: true; sales: WocSaleView[]; seller: WocSellerView | null } | { ok: false; code: string }
     >;
     me: () => Promise<{ ok: true; activity: WocActivityView } | { ok: false; code: string }>;
+    held: () => Promise<{ ok: true; held: WocHeldView } | { ok: false; code: string }>;
     stepUpChallenge: () => Promise<
       { ok: true; challenge: WocStepUpChallenge } | { ok: false; code: string }
     >;
@@ -201,6 +203,10 @@ function fakeClient(rows: WocListingView[] = [listing(1)]): FakeClient {
       seller: { guildName: 'Monarchs' },
     }),
     me: async () => ({ ok: true, activity: EMPTY_ACTIVITY }),
+    held: async () => ({
+      ok: true,
+      held: { enabled: false, base: '0', tokens: 0, canWithdraw: false, entries: [] },
+    }),
     stepUpChallenge: async () => ({
       ok: true,
       challenge: { nonce: 'n1', message: 'sign me', expiresAtMs: NOW + 60_000 },
@@ -222,6 +228,7 @@ function fakeClient(rows: WocListingView[] = [listing(1)]): FakeClient {
     history: record('history'),
     sellerHistory: record('sellerHistory'),
     me: record('me'),
+    held: record('held'),
     stepUpChallenge: record('stepUpChallenge'),
     createListing: record('createListing'),
     cancelListing: record('cancelListing'),

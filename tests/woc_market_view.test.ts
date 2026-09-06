@@ -10,6 +10,7 @@ import {
   countdownSigBucket,
   lockedOutRows,
   sellableRows,
+  vaultModel,
   type WocActivityView,
   type WocBidView,
   type WocEstimateView,
@@ -184,6 +185,7 @@ const makeInput = (over: Partial<WocMarketViewInput> = {}): WocMarketViewInput =
   status: makeStatus(),
   statusFailed: false,
   walletLinked: true,
+  held: null,
   tab: 'browse',
   nowMs: NOW,
   browse: makeBrowse(),
@@ -877,5 +879,63 @@ describe('wocQuoteCountdownSig: the pending quote repaint key', () => {
     expect(wocQuoteCountdownSig(500, 1_000)).toBe('0');
     expect(wocQuoteCountdownSig(null, 1_000)).toBe('');
     expect(wocQuoteCountdownSig(undefined, 1_000)).toBe('');
+  });
+});
+
+describe('the Exchange Vault model', () => {
+  const held = { enabled: true, base: '2500000000', tokens: 2.5, canWithdraw: true };
+
+  it('is off until the SERVER says so, whatever the readout claims', () => {
+    expect(vaultModel(false, held)).toEqual({
+      enabled: false,
+      base: '2500000000',
+      tokens: 2.5,
+      canWithdraw: false,
+      canPay: false,
+    });
+    expect(vaultModel(true, null)).toMatchObject({ enabled: false, base: '0', canPay: false });
+    expect(vaultModel(true, { ...held, enabled: false })).toMatchObject({ enabled: false });
+  });
+
+  it('offers payment on a positive balance and a cash-out only with a wallet to receive it', () => {
+    expect(vaultModel(true, held)).toEqual({
+      enabled: true,
+      base: '2500000000',
+      tokens: 2.5,
+      canWithdraw: true,
+      canPay: true,
+    });
+    expect(vaultModel(true, { ...held, canWithdraw: false })).toMatchObject({
+      canWithdraw: false,
+      canPay: true,
+    });
+    // Zero in every spelling is not spendable.
+    expect(vaultModel(true, { ...held, base: '0', tokens: 0 })).toMatchObject({
+      canWithdraw: false,
+      canPay: false,
+    });
+    expect(vaultModel(true, { ...held, base: '000' })).toMatchObject({ canPay: false });
+  });
+
+  it('enables selling for a walletless player exactly when the Vault stands in', () => {
+    const on = makeStatus({ heldEnabled: true });
+    const off = ready(makeInput({ walletLinked: false, held }));
+    expect(off.sellEnabled).toBe(false);
+    expect(off.vault.enabled).toBe(false);
+    const withVault = ready(makeInput({ walletLinked: false, held, status: on }));
+    expect(withVault.sellEnabled).toBe(true);
+    expect(withVault.vault).toMatchObject({ enabled: true, canPay: true });
+    const linked = ready(makeInput({ walletLinked: true, held: null }));
+    expect(linked.sellEnabled).toBe(true);
+  });
+
+  it('moves the digest on a Vault credit or charge, by the exact base string', () => {
+    const on = makeStatus({ heldEnabled: true });
+    const before = wocMarketViewSig(ready(makeInput({ status: on, held })));
+    const after = wocMarketViewSig(
+      ready(makeInput({ status: on, held: { ...held, base: '2500000001' } })),
+    );
+    expect(after).not.toBe(before);
+    expect(wocMarketViewSig(ready(makeInput({ status: on, held })))).toBe(before);
   });
 });

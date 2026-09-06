@@ -28,6 +28,8 @@ import { nativeSolanaMobileBridge } from '../net/native_solana_mobile';
 import { resolveWalletCapability, type WalletCapabilityBridge } from '../net/wallet_capability';
 import { WocMarketClient } from '../net/woc_market_sdk';
 import { desktopBridge } from '../runtime';
+import type { FocusManager } from '../ui/focus_manager';
+import { acquireWalletReauth, type WalletReauthAccountShape } from '../ui/wallet_reauth_prompt';
 import type { WocMarketHooks } from '../ui/woc_market_window';
 
 /** The one desktop-bridge probe the gate reads (src/runtime.ts DesktopBridge). */
@@ -53,6 +55,13 @@ export interface WocMarketWiringDeps {
   /** The live REST session: `token` is read at request time, `base` once. */
   api: { readonly token: string | null; readonly base: string };
   online: { readonly characterId: number };
+  /** The walletless listing step-up (the Exchange Vault): the account
+   *  re-auth prompt's inputs. Optional: without it the Exchange cannot list
+   *  without a wallet (the server refuses account_proof_required). */
+  accountProof?: {
+    readAccount(): Promise<WalletReauthAccountShape>;
+    focusManager: FocusManager;
+  };
   wallet: {
     linkedPubkey(): string | null;
     /** The lazily loaded wallet bridge (src/net/wallet.ts), loaded on first sign. */
@@ -122,6 +131,16 @@ export async function attachWocMarketExchange(
     client: new WocMarketClient({ token: () => api.token, base: api.base }),
     characterId: () => online.characterId,
     walletLinked: () => wallet.linkedPubkey() !== null,
+    ...(deps.accountProof
+      ? {
+          accountProof: () =>
+            acquireWalletReauth(
+              deps.accountProof!.readAccount,
+              'exchange_list',
+              deps.accountProof!.focusManager,
+            ),
+        }
+      : {}),
     // Both signers: the desktop shell rides the external-browser handoff (the
     // server resolves the signable bytes from its own registered quote or
     // step-up challenge, never from these arguments); browser web keeps the

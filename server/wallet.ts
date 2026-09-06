@@ -50,7 +50,11 @@ import {
   walletLinkRateLimited,
 } from './ratelimit';
 import { buildLinkMessage, isSolanaAddress, verifySolanaSignature } from './wallet_link';
-import { authorizeWalletChange, type WalletReauthOutcome } from './wallet_reauth';
+import {
+  authorizeWalletChange,
+  type WalletReauthErrorCode,
+  type WalletReauthOutcome,
+} from './wallet_reauth';
 import { handleWocBalance, parseWocBalanceQuery } from './woc_balance';
 
 const CHALLENGE_TTL_MINUTES = 10;
@@ -779,3 +783,16 @@ export const routes: RouteDef[] = [
     handler: referralsHandler,
   },
 ];
+
+/** The Exchange Vault's walletless step-up (woc_market_held.ts): the SAME
+ *  account-proof arm the wallet-unlink route holds (password plus the second
+ *  factor when enrolled, behind the login failed-credential budget), with no
+ *  challenge message and no current wallet, so the signature arm can never
+ *  satisfy it. Returns the re-auth code on refusal; the market maps it. */
+export async function reauthorizeAccountProof(
+  accountId: number,
+  body: Record<string, unknown>,
+): Promise<{ ok: true } | { ok: false; code: WalletReauthErrorCode }> {
+  const out = await reauthorizeWalletChange(accountId, body, '', '');
+  return out.ok ? { ok: true } : { ok: false, code: out.code };
+}

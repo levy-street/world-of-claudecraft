@@ -398,3 +398,80 @@ describe('tradePartner(): a verdict only when the server ANSWERED', () => {
     await expect(client().tradePartner('Bree')).resolves.toEqual({ ok: false });
   });
 });
+
+describe('the Exchange Vault (held) calls', () => {
+  it('reads the Vault readout', async () => {
+    const held = {
+      enabled: true,
+      base: '1500000000',
+      tokens: 1.5,
+      canWithdraw: false,
+      entries: [],
+    };
+    stubFetch(() => ({ status: 200, body: held }));
+    const out = await client().held();
+    expect(calls[0]?.url.endsWith('/api/woc-market/held')).toBe(true);
+    expect(calls[0]?.init?.method).toBe('GET');
+    expect(out).toEqual({ ok: true, held });
+  });
+
+  it('cashes out with an empty body and returns the moved figure', async () => {
+    stubFetch(() => ({ status: 200, body: { base: '5', tokens: 0.000000005, wallet: 'w' } }));
+    const out = await client().withdrawHeld();
+    expect(calls[0]?.url.endsWith('/api/woc-market/held/withdraw')).toBe(true);
+    expect(calls[0]?.init?.method).toBe('POST');
+    expect(out).toEqual({ ok: true, base: '5', tokens: 0.000000005, wallet: 'w' });
+  });
+
+  it('confirms a Vault settlement with no signature', async () => {
+    stubFetch(() => ({ status: 200, body: { state: 'confirmed', reason: null } }));
+    const out = await client().confirmHeld(4);
+    expect(calls[0]?.url.endsWith('/api/woc-market/settlements/4/confirm-held')).toBe(true);
+    expect(JSON.parse(String(calls[0]?.init?.body))).toEqual({});
+    expect(out).toEqual({ ok: true, state: 'confirmed', reason: null });
+  });
+
+  it('sends payFrom only for a Vault purchase, never an unknown value', async () => {
+    stubFetch(() => ({ status: 200, body: { settlement: {}, quote: {} } }));
+    await client().buyNow({ listingId: 9, characterId: 21, acceptTerms: true, payFrom: 'held' });
+    expect(JSON.parse(String(calls[0]?.init?.body))).toEqual({
+      characterId: 21,
+      acceptTerms: true,
+      payFrom: 'held',
+    });
+    await client().buyNow({ listingId: 9, characterId: 21, acceptTerms: true });
+    expect(JSON.parse(String(calls[1]?.init?.body))).toEqual({
+      characterId: 21,
+      acceptTerms: true,
+    });
+  });
+
+  it('carries the account proof on a walletless listing body verbatim', async () => {
+    stubFetch(() => ({ status: 200, body: { listing: {} } }));
+    await client().createListing({
+      characterId: 21,
+      itemIndex: 0,
+      itemId: 'sunblade',
+      expectInstance: null,
+      format: 'buy_now',
+      startCents: 500,
+      reserveCents: null,
+      buyNowCents: 500,
+      durationHours: 12,
+      offerNext: false,
+      accountProof: { password: 'pw', totp: '123456' },
+    });
+    expect(JSON.parse(String(calls[0]?.init?.body))).toMatchObject({
+      accountProof: { password: 'pw', totp: '123456' },
+    });
+    expect(JSON.parse(String(calls[0]?.init?.body))).not.toHaveProperty('stepUp');
+  });
+
+  it('answers the Vault refusal codes as typed failures', async () => {
+    stubFetch(() => ({ status: 403, body: { code: 'woc_market.held_insufficient' } }));
+    await expect(client().confirmHeld(4)).resolves.toMatchObject({
+      ok: false,
+      code: 'woc_market.held_insufficient',
+    });
+  });
+});

@@ -148,6 +148,10 @@ const REGISTRY_ONLY_PATHS = new Set<string>([
   '/api/woc-market/listings/:id/buy-now',
   '/api/woc-market/settlements/:id/quote',
   '/api/woc-market/settlements/:id/confirm',
+  // The Exchange Vault (woc_market_held_routes.ts), same terms.
+  '/api/woc-market/held',
+  '/api/woc-market/held/withdraw',
+  '/api/woc-market/settlements/:id/confirm-held',
 ]);
 
 // Every legacy /api ladder row (dispatcher === main handleApi), minus the
@@ -416,6 +420,9 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'POST', path: '/api/woc-market/listings/:id/buy-now' },
     { method: 'POST', path: '/api/woc-market/settlements/:id/quote' },
     { method: 'POST', path: '/api/woc-market/settlements/:id/confirm' },
+    { method: 'GET', path: '/api/woc-market/held' },
+    { method: 'POST', path: '/api/woc-market/held/withdraw' },
+    { method: 'POST', path: '/api/woc-market/settlements/:id/confirm-held' },
     { method: 'POST', path: '/api/claudium/purchase' },
     { method: 'POST', path: '/api/claudium/native/quote' },
     { method: 'POST', path: '/api/claudium/native/confirm' },

@@ -144,6 +144,7 @@ function settlementRow(over: Partial<WocSettlementRow> = {}): WocSettlementRow {
     txSignature: null,
     failReason: null,
     settledAmountBase: null,
+    sellerLegBase: null,
     deadlineAtMs: FAR_FUTURE_MS,
     createdAtMs: 1_799_000_200_000,
     ...over,
@@ -393,6 +394,7 @@ describe('market wire views expose exactly their pinned key sets', () => {
         'attempt',
         'createdAtMs',
         'deadlineAtMs',
+        'heldPay',
         'failReason',
         'id',
         'itemId',
@@ -809,6 +811,7 @@ describe('response wrappers expose exactly their pinned key sets', () => {
         'settlementWindowSeconds',
         'directedHoldSeconds',
         'bond',
+        'heldEnabled',
       ].sort(),
     );
     // The bond schedule and payment window, exactly the rules constants: the

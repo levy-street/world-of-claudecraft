@@ -1677,7 +1677,13 @@ describe('woc_market_window: payment verdicts reach the player', () => {
     // And the RESOLVE side keeps the two mappers apart: the bond kind renders
     // through the bond voice, never the purchase-money copy (a swapped mapper
     // survived the store-side pin alone).
-    const resolve = code.slice(code.indexOf('private resolveNotice('));
+    // The resolver lives in src/ui/woc_market_notice.ts (the ratchet's
+    // sibling-module extraction); the window only dispatches to it.
+    const noticeCode = readFileSync(
+      new URL('../src/ui/woc_market_notice.ts', import.meta.url),
+      'utf8',
+    );
+    const resolve = noticeCode.slice(noticeCode.indexOf('export function resolveWocNotice('));
     const bondArm = resolve.slice(resolve.indexOf("case 'bondPending':"));
     expect(bondArm.slice(0, 120)).toContain('wocBondPendingText(n.reason)');
     const pendingArm = resolve.slice(resolve.indexOf("case 'pending':"));

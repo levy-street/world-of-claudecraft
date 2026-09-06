@@ -408,6 +408,32 @@ export function createWocMarketEconomyProxy(): WocMarketEconomy {
       });
       return { done: wire?.done === true, reason: wire?.reason ?? null };
     },
+
+    async settleHeld(reference) {
+      const wire = await callService<WireConfirm>({
+        method: 'POST',
+        path: 'held-settle',
+        body: { reference },
+        timeoutMs: CONFIRM_TIMEOUT_MS,
+      });
+      if (!wire)
+        return { settled: false, pending: true, reason: WOC_MARKET_CONFIRM_UNAVAILABLE_REASON };
+      return {
+        settled: wire.settled === true,
+        pending: wire.pending === true,
+        reason: wire.reason ?? null,
+      };
+    },
+
+    async heldWithdrawal(args) {
+      const wire = await callService<WireBondAction>({
+        method: 'POST',
+        path: 'held-withdrawal',
+        body: args,
+        timeoutMs: CONFIRM_TIMEOUT_MS,
+      });
+      return { done: wire?.done === true, reason: wire?.reason ?? null };
+    },
   };
 }
 
@@ -547,6 +573,22 @@ export function createDevWocMarketEconomy(now: () => number = Date.now): WocMark
       return { done: true, reason: null };
     },
     async forfeitBond() {
+      return { done: true, reason: null };
+    },
+    async settleHeld(reference) {
+      // Custody pays instantly on the dev chain: the same verdict a signed
+      // confirm gets, keyed on the same open-quote book.
+      const open = openQuotes.get(reference);
+      if (!open && !settledRefs.has(reference)) {
+        return { settled: false, pending: false, reason: 'unknown_reference' };
+      }
+      if (open && open.expiresAtMs <= now() && !settledRefs.has(reference)) {
+        return { settled: false, pending: false, reason: 'quote_expired' };
+      }
+      settledRefs.add(reference);
+      return { settled: true, pending: false, reason: null };
+    },
+    async heldWithdrawal() {
       return { done: true, reason: null };
     },
   };

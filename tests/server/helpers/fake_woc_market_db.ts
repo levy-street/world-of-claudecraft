@@ -38,6 +38,7 @@ import type {
   WocStuckCustodyClasses,
 } from '../../../server/woc_market';
 import { SETTLED_OFFER_GRACE_MS } from '../../../server/woc_market_db';
+import type { WocHeldPost } from '../../../server/woc_market_held_db';
 import type {
   WocOpsListingRow,
   WocOpsListingStatus,
@@ -135,6 +136,8 @@ export class FakeWocMarketDb implements WocMarketDb {
   private readonly bids = new Map<number, BidRec>();
   private readonly settlements = new Map<number, SettlementRec>();
   private readonly sales = new Map<number, WocSaleRow>();
+  /** Vault credits the finalize tail posted (ref-keyed, the ledger's dedupe). */
+  readonly heldEntries = new Map<string, WocHeldPost>();
   private readonly strikes = new Map<number, WocStrikeRow>();
   private readonly terms = new Map<number, number>();
 
@@ -1787,6 +1790,7 @@ export class FakeWocMarketDb implements WocMarketDb {
     listingId: number;
     bidId: number | null;
     sale: Omit<WocSaleRow, 'id' | 'excluded' | 'atMs'>;
+    heldCredit?: WocHeldPost | null;
   }): Promise<'finalized' | 'already_final' | 'stale' | 'contended'> {
     if (this.failNextFinalize) {
       const forced = this.failNextFinalize;
@@ -1815,6 +1819,11 @@ export class FakeWocMarketDb implements WocMarketDb {
         excluded: false,
         atMs: this.now(),
       });
+    }
+    // The Vault credit rides the close tail (mirrors postHeldEntryOnClient
+    // inside the Pg transaction): idempotent on the ref.
+    if (args.heldCredit && !this.heldEntries.has(args.heldCredit.ref)) {
+      this.heldEntries.set(args.heldCredit.ref, structuredClone(args.heldCredit));
     }
     // The close is a real compare-and-set (mirrors the Pg WHERE): a listing
     // already closed AND disposed downgrades the whole run to already_final.
@@ -1917,6 +1926,7 @@ export class FakeWocMarketDb implements WocMarketDb {
       txSignature: null,
       failReason: null,
       settledAmountBase: null,
+      sellerLegBase: null,
       deadlineAtMs: args.deadlineAtMs,
       createdAtMs: args.nowMs,
     };
@@ -1960,12 +1970,14 @@ export class FakeWocMarketDb implements WocMarketDb {
     reference: string,
     expiresAtMs: number,
     amountBase: string | null,
+    sellerLegBase: string | null = null,
   ): Promise<boolean> {
     const rec = this.settlements.get(id);
     if (!rec || rec.state !== 'offered') return false;
     rec.quoteReference = reference;
     rec.quoteExpiresAtMs = expiresAtMs;
     rec.settledAmountBase = amountBase;
+    rec.sellerLegBase = sellerLegBase;
     this.touchSettlement(id);
     return true;
   }

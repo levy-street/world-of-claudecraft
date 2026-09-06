@@ -262,12 +262,79 @@ export function wocMarketBannersHtml(args: {
   paused: boolean;
   wallet: WalletConnectionView | null;
   tokensPerUsd?: number | null;
+  /** The Exchange Vault card (null: the realm has no Vault, no card). */
+  vault?: WocVaultCardArgs | null;
 }): string {
   const banners =
     (args.paused
       ? `<div class="wm-banner wm-banner-paused">${esc(t('hudChrome.wocMarket.pausedBanner'))}</div>`
-      : '') + wocWalletCardHtml(args.wallet, args.tokensPerUsd ?? null);
+      : '') +
+    wocWalletCardHtml(args.wallet, args.tokensPerUsd ?? null) +
+    (args.vault
+      ? wocVaultCardHtml({ ...args.vault, tokensPerUsd: args.tokensPerUsd ?? null })
+      : '');
   return banners === '' ? '' : `<div class="wm-strip">${banners}</div>`;
+}
+
+export interface WocVaultCardArgs {
+  /** The balance in whole tokens (display value off the wire). */
+  tokens: number;
+  /** The balance as the window formats tokens ("1,234.5"). */
+  tokensText: string;
+  /** True when the balance is above zero. */
+  positive: boolean;
+  usd(cents: number): string;
+  /** A linked wallet can receive the cash-out right now. */
+  canWithdraw: boolean;
+  walletLinked: boolean;
+  busy: boolean;
+  /** The live display rate off /status (the banner passes its own). */
+  tokensPerUsd?: number | null;
+}
+
+/** The Vault's dollar line: a display ESTIMATE off the same live rate the
+ *  wallet card shows, never a stored figure (the Vault holds $WOC). Null with
+ *  pricing down or a non-positive rate. */
+export function wocVaultUsdText(
+  tokens: number,
+  tokensPerUsd: number | null,
+  usd: (cents: number) => string,
+): string | null {
+  if (tokensPerUsd === null || !(tokensPerUsd > 0) || !(tokens > 0)) return null;
+  return usd(Math.round((tokens / tokensPerUsd) * 100));
+}
+
+/**
+ * The Exchange Vault card: where a walletless seller's proceeds go, what the
+ * balance is worth right now (an ESTIMATE: the balance is $WOC and its dollar
+ * value moves with the market), and the cash-out control. Without a linked
+ * wallet the control gives way to the link hint, since the wallet card beside
+ * it already carries the Connect button.
+ */
+export function wocVaultCardHtml(args: WocVaultCardArgs): string {
+  const usdText = wocVaultUsdText(args.tokens, args.tokensPerUsd ?? null, args.usd);
+  const balance = args.positive
+    ? `<p class="wm-vault-balance">${esc(t('hudChrome.wocMarket.vaultBalance', { tokens: args.tokensText }))}</p>` +
+      (usdText === null
+        ? ''
+        : `<p class="wm-note">${esc(t('hudChrome.wocMarket.vaultBalanceUsd', { usd: usdText }))}</p>`)
+    : `<p class="wm-vault-balance">${esc(t('hudChrome.wocMarket.vaultEmpty'))}</p>`;
+  const action = args.canWithdraw
+    ? `<button type="button" data-action="vault-withdraw" ${args.busy ? 'disabled' : ''} ${FOCUS_KEY_ATTR}="wm-vault-withdraw" ` +
+      `aria-label="${esc(t('hudChrome.wocMarket.vaultWithdrawAria', { tokens: args.tokensText }))}">${esc(
+        t('hudChrome.wocMarket.vaultWithdraw'),
+      )}</button>`
+    : args.walletLinked || !args.positive
+      ? ''
+      : `<p class="wm-note">${esc(t('hudChrome.wocMarket.vaultNeedsWallet'))}</p>`;
+  return (
+    `<div class="wm-banner wm-banner-vault" data-vault-positive="${args.positive ? 1 : 0}">` +
+    `<strong>${esc(t('hudChrome.wocMarket.vaultTitle'))}</strong>` +
+    `<p>${esc(t('hudChrome.wocMarket.vaultBody'))}</p>` +
+    balance +
+    action +
+    `</div>`
+  );
 }
 
 export function wocWalletCardSig(wallet: WalletConnectionView): string {
@@ -438,13 +505,22 @@ export function wocBuyNowHtml(args: {
   tokensText: string | null;
   overBalance: boolean;
   usd(cents: number): string;
+  /** 'held': the primary button itself pays from the Vault (no wallet is
+   *  linked); 'extra': a linked wallet pays by default and a second button
+   *  offers the Vault; 'none': the Vault cannot pay for this listing. */
+  vaultPay?: 'held' | 'extra' | 'none';
 }): string {
+  const vaultPay = args.vaultPay ?? 'none';
   return (
     `<div class="wm-disclosures">` +
     `<p class="wm-note">${esc(t('hudChrome.wocMarket.buyNowNote'))}</p>` +
     (args.locked ? `<p class="wm-note">${esc(t('hudChrome.wocMarket.buyNowLockedTip'))}</p>` : '') +
+    (vaultPay === 'held'
+      ? `<p class="wm-note">${esc(t('hudChrome.wocMarket.vaultPaysNote'))}</p>`
+      : '') +
     `</div>` +
     `<button type="button" class="wm-primary" data-action="buy-now" data-listing="${args.listingId}" ` +
+    `${vaultPay === 'held' ? 'data-pay="held" ' : ''}` +
     `${args.disabled ? 'disabled' : ''} ` +
     `aria-label="${esc(
       t('hudChrome.wocMarket.buyNowAria', {
@@ -460,6 +536,13 @@ export function wocBuyNowHtml(args: {
         )}</p>`) +
     (args.overBalance
       ? `<p class="wm-over-balance">${esc(t('hudChrome.trade.woc.hintInsufficientBalance'))}</p>`
+      : '') +
+    // A linked wallet pays by default; the Vault is the second offer, after
+    // the primary control and its disclosures.
+    (vaultPay === 'extra'
+      ? `<button type="button" data-action="buy-now" data-listing="${args.listingId}" data-pay="held" ` +
+        `${args.locked ? 'disabled' : ''} ${FOCUS_KEY_ATTR}="wm-buy-now-vault">` +
+        `${esc(t('hudChrome.wocMarket.vaultBuyWith'))}</button>`
       : '')
   );
 }
@@ -531,6 +614,9 @@ export function wocQuoteFaceHtml(args: {
   remainingMs: number;
   dueAtMs: number | null;
   busy: boolean;
+  /** The settlement pays from the Vault: the commit button says so and no
+   *  wallet is involved. */
+  vaultPay?: boolean;
 }): string {
   const expired = args.remainingMs <= 0;
   const legs =
@@ -563,7 +649,7 @@ export function wocQuoteFaceHtml(args: {
     `<p class="wm-note">${esc(t('hudChrome.wocMarket.quoteFixedNote'))}</p>` +
     `<div class="wm-quote-actions">` +
     `<button type="button" class="wm-primary" data-action="quote-sign" ${expired || args.busy ? 'disabled' : ''} ${FOCUS_KEY_ATTR}="wm-quote-sign">${esc(
-      t('hudChrome.wocMarket.quoteSign'),
+      t(args.vaultPay ? 'hudChrome.wocMarket.quoteSignVault' : 'hudChrome.wocMarket.quoteSign'),
     )}</button>` +
     `<button type="button" data-action="quote-refresh" ${args.busy ? 'disabled' : ''} ${FOCUS_KEY_ATTR}="wm-quote-refresh">${esc(
       t('hudChrome.wocMarket.quoteRefresh'),

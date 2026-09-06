@@ -323,6 +323,74 @@ bank gate on.
   restricted eligibility policy; a future web3 server enables broader
   categories without rewriting settlement.
 
+### Selling without a wallet: the Vault
+
+Players may sell on the Exchange with NO linked wallet. Their proceeds are
+booked to an Exchange Vault, a per-account $WOC balance the game keeps on the
+player's behalf, spendable on buy-now listings here and cashed out to a wallet
+the player links later, whenever they like. This is the one place the game
+holds value for a player, and it is designed so the non-custodial constraints
+below still hold in the way that matters: the game never holds keys and never
+computes token math.
+
+- **The custody address.** The operator names one custody wallet
+  (`WOC_MARKET_HELD_WALLET`, unset by default: the Vault ships off). A
+  walletless seller's listing carries a null `seller_wallet`; the settlement
+  quote for such a listing names the custody address as the seller leg's
+  destination, so the ordinary on-chain settlement (buyer signs, 90/3/7
+  split) pays the seller's share INTO custody. The game never touches the
+  custody key: only the economy service moves custody funds.
+- **The ledger.** `server/woc_market_held_db.ts` keeps `woc_market_held_balances`
+  (base units, `NUMERIC(40,0)`, never negative) and the append-only
+  `woc_market_held_entries` (one unique ref per movement, so every post is
+  idempotent). The seller's credit is the quote's SERVICE-computed seller leg
+  (`seller_leg_base`, stamped on the settlement at quote time) and it posts
+  inside the delivery finalize transaction (`finalizeDeliveredSettlement`),
+  so the sale row and the seller's balance can never disagree across a crash.
+- **The walletless step-up.** A listing normally needs a wallet-signed step-up
+  challenge (B6/R1). With no wallet to sign, the account itself proves the
+  custody move: the account password plus the second factor when enrolled,
+  the same re-auth core and failed-credential budget the wallet-unlink route
+  holds (`server/wallet_reauth.ts`, exposed as `reauthorizeAccountProof`).
+  The proof rides the create body (`accountProof`) and is verified in the
+  service method, never in middleware. A wallet seller still takes the wallet
+  step-up; the account proof is never accepted in its place.
+- **Spending.** Buy-now may be paid from the Vault (`payFrom: 'held'`): the
+  settlement's buyer wallet is the custody address, the game charges the
+  quoted amount from the buyer's ledger FIRST (a short balance refuses
+  `held_insufficient` and writes nothing else), records the `held:<reference>`
+  pseudo-signature through the same offered to confirming transition a wallet
+  payment takes, then asks the service to settle that quote from custody
+  (`settleHeld`). A refusal reverses the charge in-request; a pending verdict
+  leaves the row confirming for the ordinary poll, and the sweep's
+  `heldReversed` arm returns the charge of any Vault payment the poll later
+  fails or the deadline expires. Bidding still needs a wallet: bonds are
+  wallet-signed transfers and stay so.
+- **Cash-out.** `POST /api/woc-market/held/withdraw` moves the WHOLE balance to
+  the player's verified wallet through the service's withdrawal rail
+  (`heldWithdrawal`): the charge lands first, a refused rail reverses it, and a
+  crash between the two leaves a visible unreversed withdraw entry as the
+  operator trace rather than a balance the player could spend twice.
+- **Denomination.** The Vault holds $WOC, never dollars. The client shows a
+  dollar figure only as an estimate off the same live rate the wallet card
+  uses, labelled as such: the value of a stored balance moves with the
+  market, and nothing here pegs it.
+- **Off switch.** With the custody wallet unset, walletless listing refuses
+  `wallet_required` as before, Vault payment and cash-out refuse
+  `held_disabled`, balances already booked stay readable but frozen, and a
+  walletless seller's existing listing answers `quote_unavailable` rather than
+  paying a seller leg to nobody.
+- **Wire.** `/status` carries `heldEnabled`; `GET /api/woc-market/held` is the
+  readout (base, display tokens, cash-out availability, recent entries);
+  `POST /api/woc-market/settlements/:id/confirm-held` is the Vault commit;
+  the settlement view carries `heldPay` so a Vault claim resumes as one.
+
+Economy-service surface this adds (a launch-gate item beside the existing
+quote/confirm/refund set): `held-settle` (settle a quote from custody; later
+`confirm` polls for it accept the `held:<reference>` pseudo-signature) and
+`held-withdrawal` (custody to a verified wallet, idempotent on the ledger ref).
+The dev economy implements both.
+
 ## Constraints (non-negotiable)
 
 - **Token firewall**: no wallet, token, or settlement code or imports anywhere
@@ -330,6 +398,12 @@ bank gate on.
   token scan in `tests/architecture.test.ts` enforces this structurally.
 - **Non-custodial**: the chain owns funds; the game server never holds keys and
   only ever verifies signatures and service confirmations.
+  The Exchange Vault (above) is the one recorded exception in SPIRIT, not in
+  mechanism: the game BOOKS a player's share of settled sales against an
+  operator custody wallet it never holds the key to, and every figure it
+  books is a service-issued leg. Enabling the Vault on a production realm is
+  a launch-gate item of its own: counsel review of the custodial position and
+  the Terms, and the service's `held-settle` / `held-withdrawal` rails.
 - **The game computes no token math**: prices, quotes, splits, and confirmation
   all come from the economy service; the game and client render what they are
   handed and refuse to synthesize fallbacks.
@@ -395,6 +469,12 @@ enabled on a production realm until they are reconciled:
 
 ## Implemented behavior (hook points)
 
+- The Exchange Vault: `server/woc_market_held.ts` (rules and the service),
+  `server/woc_market_held_db.ts` (`WOC_MARKET_HELD_SCHEMA`, the ledger SQL),
+  `server/woc_market_held_routes.ts` (the handlers; the RouteDef rows sit in
+  the market table), `server/woc_market_settlement_quote.ts` (the quote
+  stamp, custody destination included); client `src/ui/woc_market_vault_arm.ts`
+  over the window, the Vault card in `src/ui/woc_market_chrome.ts`.
 - Server domain: `server/woc_market_routes.ts` (RouteDef surface),
   `server/woc_market.ts` (lifecycle behind injected deps),
   `server/woc_market_rules.ts` (pure increments, anti-snipe, bond, eligibility,

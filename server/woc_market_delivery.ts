@@ -17,6 +17,7 @@ import type {
   WocSettlementRow,
   WocSweepErrorTag,
 } from './woc_market';
+import { heldSaleRef, isHeldBase } from './woc_market_held';
 import {
   WOC_LOCAL_STAMP_HIGH_WATER,
   wocBackedOffIds,
@@ -632,6 +633,18 @@ export function createWocMarketDeliveryArms(ctx: WocDeliveryCtx): WocMarketDeliv
       settlementId: settlement.id,
       listingId: listing.id,
       bidId: settlement.bidId,
+      // A Vault seller (no wallet on the listing) is credited the quote's
+      // seller leg in the same transaction; a wallet seller was paid on chain.
+      heldCredit:
+        listing.sellerWallet === null && isHeldBase(settlement.sellerLegBase)
+          ? {
+              account: listing.sellerAccount,
+              ref: heldSaleRef(settlement.id),
+              kind: 'sale',
+              deltaBase: settlement.sellerLegBase,
+              settlementId: settlement.id,
+            }
+          : null,
       sale: {
         realm: ctx.realm,
         listingId: listing.id,

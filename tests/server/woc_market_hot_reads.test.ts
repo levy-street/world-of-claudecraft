@@ -845,7 +845,9 @@ describe('route-layer busts (the full handler-to-surface table)', () => {
     // extra party busts, and confirmSettlement's eager-delivery history
     // drop. The TABLE above is the behavioral authority (it catches a
     // wrong-kind swap); this count only catches a call deleted wholesale.
-    expect(code.match(/readCache\(\)\?\.bust/g)).toHaveLength(25);
+    // 25 -> 27 with the Exchange Vault handlers' deps (woc_market_held_routes.ts
+    // busts the actor's readout and, on an eager delivery, the history map).
+    expect(code.match(/readCache\(\)\?\.bust/g)).toHaveLength(27);
   });
 
   it('handlers render cleanly over FROZEN cached values, twice in a row', async () => {
@@ -1164,7 +1166,7 @@ describe('production wiring (server/main.ts, source-pinned)', () => {
     expect(code.match(/new WocMarketReadCache\(\)/g)).toHaveLength(1);
     expect(code).toContain('readCache: wocMarketReadCache,');
     expect(code).toContain(
-      'configureWocMarketRuntime({\n  service: wocMarketService,\n  readCache: wocMarketReadCache,\n  authGuardDb: wocAuthGuardCache,\n})',
+      'configureWocMarketRuntime({\n  service: wocMarketService,\n  readCache: wocMarketReadCache,\n  authGuardDb: wocAuthGuardCache,\n  held: wocMarketHeldService,\n})',
     );
     expect(code).toContain('registerWocMarketReadCacheForBusts(wocMarketReadCache)');
     expect(code).toContain('readCaches: wocMarketReadCache.stats()');
