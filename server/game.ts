@@ -282,7 +282,7 @@ import { gameMetricsCounters, type WsDropCause } from './http/game_signals';
 import { bgWideInterestApplies, buildSharedInterestCandidates } from './interest_candidates';
 import { IpBlockList } from './ip_block';
 import { loadActiveBlockedIps } from './ip_block_db';
-import { keepaliveSweepDelayed } from './keepalive_sweep';
+import { keepaliveSweepDelayed, shouldReapSession } from './keepalive_sweep';
 import { LINKDEAD_GRACE_MS, planJoin } from './linkdead';
 import {
   consumeListReadToken,
@@ -464,7 +464,7 @@ const WHO_RESULT_LIMIT = 50;
 // character (self-trade by dual-boxing) is no longer needed. GMs are exempt.
 const MAX_ACTIVE_SESSIONS_PER_ACCOUNT = 1;
 // WS protocol-level ping cadence; see the keepalive interval in start().
-const WS_KEEPALIVE_PING_MS = 30_000;
+export const WS_KEEPALIVE_PING_MS = 30_000;
 const RESTART_COUNTDOWN_TOTAL_SECONDS = 600;
 const RESTART_COUNTDOWN_STEPS = [
   { atSeconds: 0, text: 'Server restart in 10 minutes.' },
@@ -2956,6 +2956,8 @@ export class GameServer {
   // gives up on the dead socket, which can take minutes; with it, the
   // client's reconnect backoff resumes within a ping interval or two (the
   // client tolerates that rejection mid-reconnect, src/net/reconnect_policy.ts).
+  // shouldReapSession also applies the hard ten-minute silence deadline that
+  // holds even when the stall guard below pauses the pong verdict.
   pingLiveSessions(): void {
     const now = Date.now();
     // A sweep that fired far later than its interval proves the process stalled, so
@@ -2965,13 +2967,11 @@ export class GameServer {
     const delayed = keepaliveSweepDelayed(now, this.lastKeepaliveSweepAt, WS_KEEPALIVE_PING_MS);
     for (const session of this.clients.values()) {
       if (session.linkdead || session.ws.readyState !== 1) continue;
-      if (session.awaitingPong && !delayed) {
+      if (shouldReapSession(session, delayed, this.lastKeepaliveSweepAt)) {
         const ws = session.ws;
         try {
           ws.terminate();
-        } catch {
-          /* socket already torn down */
-        }
+        } catch {} // socket already torn down
         this.socketClosed(session, ws);
         continue;
       }
