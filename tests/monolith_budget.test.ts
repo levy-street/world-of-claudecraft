@@ -332,7 +332,11 @@ const MONOLITHS: MonolithRow[] = [
     // shape as every prior window wiring (Reliquary, Deeds, Professions), and
     // no clean branch-owned extraction exists for a brand-new window's own
     // wiring. Maintainer decision, exact count: any further growth reds again.
-    ceiling: 18939,
+    // Re-pinned to the merged count after adding the player/target frame Health
+    // Text setting rows: the shared formatting/readout logic lives in
+    // hud_frames.ts and party_frames.ts, so Hud only carries the required
+    // settings/wiring. Exact count, zero slack.
+    ceiling: 18936,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -444,7 +448,11 @@ const MONOLITHS: MonolithRow[] = [
     // merging PR #3841 into the v0.42 candidate after PR #3839: the merged
     // renderer is the measured tree with Lambert terrain lighting preserved
     // under the standard-materials rig. Exact count, zero headroom.
-    ceiling: 13216,
+    // Re-pinned after the selected render governor merges added detail/post
+    // shed application and drawing-buffer telemetry while preserving their
+    // extracted policy cores. Measured on the merged tree. Exact count, zero
+    // headroom.
+    ceiling: 13235,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -617,7 +625,10 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at this conflicted PR #3835 merge after the candidate's
     // render/post integration grew main.ts independently of the foliage tier
     // ladder. Measured on the merged tree. Exact count, zero headroom.
-    ceiling: 11539,
+    // Re-pinned after the selected health-text and Discord queue integrations
+    // added their thin client/server hooks beside existing extracted modules.
+    // Measured on the merged tree. Exact count, zero headroom.
+    ceiling: 11548,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
