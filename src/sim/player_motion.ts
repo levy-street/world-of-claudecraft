@@ -730,7 +730,13 @@ function verticalPass(
       BODY_RADIUS,
       p.pos.y,
     );
-    if (glue > -Infinity && Math.abs(glue - p.pos.y) <= MAX_STEP_HEIGHT) {
+    // The terrain is always the floor. A glued top that has dipped BELOW the
+    // ground (a bridge deck or a rock whose far end the hillside buries)
+    // hands the body back to the support path, which maxes the terrain in:
+    // following it would seat the player under the ground, walled in by the
+    // terrain gate on every side (the "fell through the ground on a slope"
+    // trap only a teleport could escape).
+    if (glue >= ground && Math.abs(glue - p.pos.y) <= MAX_STEP_HEIGHT) {
       p.pos.y = glue;
       p.fallStartY = glue;
       return;
