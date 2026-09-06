@@ -14960,7 +14960,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.unlockItem': "Déverrouiller l'objet",
   'hudChrome.bags.capacityPoolsAria':
     'Emplacements de sac utilisés : {used} sur {total}. Objets généraux : {generalUsed} sur {generalTotal}. Matériaux : {materialsUsed} sur {materialsTotal}.',
-  'hudChrome.bags.capacityPools': 'Objets {generalUsed}/{generalTotal}, matériaux {materialsUsed}/{materialsTotal}',
+  'hudChrome.bags.capacityPools':
+    'Objets {generalUsed}/{generalTotal}, matériaux {materialsUsed}/{materialsTotal}',
   'hudChrome.bags.emptyMaterialsOnly': 'Matériaux uniquement',
   'hudChrome.bags.poolGeneral': 'Général : {used} sur {total}',
   'hudChrome.bags.poolMaterials': 'Matériaux : {used} sur {total}',

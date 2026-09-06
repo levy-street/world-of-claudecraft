@@ -6149,7 +6149,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.poolMaterials': '材料：{used}/{total}',
   'hudChrome.bags.capacityPoolsAria':
     '背包格已用：{used}/{total}。一般物品：{generalUsed}/{generalTotal}。材料：{materialsUsed}/{materialsTotal}。',
-  'hudChrome.bags.capacityPools': '物品 {generalUsed}/{generalTotal}，材料 {materialsUsed}/{materialsTotal}',
+  'hudChrome.bags.capacityPools':
+    '物品 {generalUsed}/{generalTotal}，材料 {materialsUsed}/{materialsTotal}',
   'hudChrome.bags.emptyMaterialsOnly': '僅限材料',
   'guide.brand': 'World of ClaudeCraft',
   'guide.brandShort': 'ClaudeCraft',

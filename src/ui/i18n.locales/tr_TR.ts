@@ -14642,7 +14642,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Her oyuncunun azami canının %{total} kadarını, çemberin içindeki oyuncular arasında bölerek verir ({players} oyuncuyla her birine %{perPlayer}). Eksik her oyuncu ayrıca, çemberin içindekiler dahil tüm akına azami canın %{missingPenalty} kadarı hasar verir.',
   'hudChrome.bags.capacityPoolsAria':
     'Kullanılan çanta yuvaları: {used} / {total}. Genel eşyalar: {generalUsed} / {generalTotal}. Malzemeler: {materialsUsed} / {materialsTotal}.',
-  'hudChrome.bags.capacityPools': 'Eşyalar {generalUsed}/{generalTotal}, malzemeler {materialsUsed}/{materialsTotal}',
+  'hudChrome.bags.capacityPools':
+    'Eşyalar {generalUsed}/{generalTotal}, malzemeler {materialsUsed}/{materialsTotal}',
   'hudChrome.bags.emptyMaterialsOnly': 'Yalnızca malzemeler',
   'hudChrome.bags.poolGeneral': 'Genel: {used} / {total}',
   'hudChrome.bags.poolMaterials': 'Malzemeler: {used} / {total}',

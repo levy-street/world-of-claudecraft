@@ -6360,7 +6360,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.poolMaterials': '재료: {total}칸 중 {used}칸',
   'hudChrome.bags.capacityPoolsAria':
     '사용 중인 가방 칸: {total}칸 중 {used}칸. 일반 아이템: {generalTotal}칸 중 {generalUsed}칸. 재료: {materialsTotal}칸 중 {materialsUsed}칸.',
-  'hudChrome.bags.capacityPools': '아이템 {generalUsed}/{generalTotal}, 재료 {materialsUsed}/{materialsTotal}',
+  'hudChrome.bags.capacityPools':
+    '아이템 {generalUsed}/{generalTotal}, 재료 {materialsUsed}/{materialsTotal}',
   'hudChrome.bags.emptyMaterialsOnly': '재료 전용',
   'guide.brand': 'World of ClaudeCraft',
   'guide.brandShort': 'ClaudeCraft',
@@ -10456,12 +10457,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemTooltip.riftSockets': '균열 보석 {used}/{total}',
   'hudChrome.riftForge.title': '균열의 화로',
   'hudChrome.riftForge.subtitle': '균열결속 반지',
-  'hudChrome.riftForge.empty': '가방에 균열결속 반지가 없습니다. 등급 균열의 첫 완파가 하나를 만들어 냅니다.',
+  'hudChrome.riftForge.empty':
+    '가방에 균열결속 반지가 없습니다. 등급 균열의 첫 완파가 하나를 만들어 냅니다.',
   'hudChrome.riftForge.wornHint': '착용 중입니다. 화로에 올리려면 벗으세요.',
   'hudChrome.riftForge.upgradeBtn': '아이템 레벨 {level}(으)로 강화 (정수 {cost})',
   'hudChrome.riftForge.upgradeMax': '강화 완료',
   'hudChrome.riftForge.gemPickAria': '박을 보석',
-  'hudChrome.riftForge.socketReplaceHint': '소켓이 가득 찼습니다. 다음 보석은 가장 오래된 {gem}을(를) 대체합니다.',
+  'hudChrome.riftForge.socketReplaceHint':
+    '소켓이 가득 찼습니다. 다음 보석은 가장 오래된 {gem}을(를) 대체합니다.',
   'hudChrome.riftForge.socketBtn': '박기',
   'hudChrome.riftForge.socketsNone': '보석 없음',
   'hudChrome.riftForge.noGems': '가방에 균열 보석이 없습니다',
@@ -10475,7 +10478,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.riftForge.reason.tooFar': '균열의 화로에서 너무 멀리 떨어져 있습니다.',
   'hudChrome.riftForge.done.upgrade': '{name}을(를) 강화했습니다.',
   'hudChrome.riftForge.done.socket': '{name}에 보석을 박았습니다.',
-  'hudChrome.riftForge.done.socketReplaced': '{name}에 보석을 박았습니다. {gem}은(는) 파괴되었습니다.',
+  'hudChrome.riftForge.done.socketReplaced':
+    '{name}에 보석을 박았습니다. {gem}은(는) 파괴되었습니다.',
   'hudChrome.itemTooltip.riftGemSocket': '균열결속 반지 소켓 보너스',
   'sim.rift.alreadyCleared': '이 균열은 이미 {names} 님이 정복했습니다.',
   'sim.rift.raceLost': '이 균열은 이미 {names} 님이 정복했습니다. 도전이 종료됩니다.',
@@ -12696,7 +12700,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.yieldLineRange': '{item} {min}~{max}개',
   'hudChrome.enchanting.alreadyEnchanted': '해당 아이템에는 이미 마법부여가 되어 있습니다.',
   'hudChrome.enchanting.sameEnchant': '해당 아이템에는 이미 같은 마법부여가 되어 있습니다.',
-  'hudChrome.enchanting.riftGear': '균열결속 반지는 균열 보석만 장착할 수 있으며 마법부여는 불가능합니다.',
+  'hudChrome.enchanting.riftGear':
+    '균열결속 반지는 균열 보석만 장착할 수 있으며 마법부여는 불가능합니다.',
   'hudChrome.enchanting.replaceTag': '{enchant} 대체',
   'hudChrome.enchanting.sameEnchantTag': '이미 적용됨',
   'hudChrome.enchanting.plainTag': '마법부여 없음',

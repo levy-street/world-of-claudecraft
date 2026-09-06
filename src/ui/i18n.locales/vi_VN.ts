@@ -14689,7 +14689,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Gây {total}% máu tối đa của mỗi người chơi, chia đều cho những người chơi đứng trong vòng tròn ({perPlayer}% mỗi người khi có {players} người). Mỗi người chơi còn thiếu cũng gây thêm {missingPenalty}% máu tối đa lên toàn bộ raid, kể cả những người đang đứng trong vòng tròn.',
   'hudChrome.bags.capacityPoolsAria':
     'Ô túi đã dùng: {used} trên {total}. Vật phẩm chung: {generalUsed} trên {generalTotal}. Nguyên liệu: {materialsUsed} trên {materialsTotal}.',
-  'hudChrome.bags.capacityPools': 'Vật phẩm {generalUsed}/{generalTotal}, nguyên liệu {materialsUsed}/{materialsTotal}',
+  'hudChrome.bags.capacityPools':
+    'Vật phẩm {generalUsed}/{generalTotal}, nguyên liệu {materialsUsed}/{materialsTotal}',
   'hudChrome.bags.emptyMaterialsOnly': 'Chỉ nguyên liệu',
   'hudChrome.bags.poolGeneral': 'Chung: {used} trên {total}',
   'hudChrome.bags.poolMaterials': 'Nguyên liệu: {used} trên {total}',

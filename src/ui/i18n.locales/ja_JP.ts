@@ -6385,7 +6385,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.poolMaterials': '素材: {total}個中{used}個',
   'hudChrome.bags.capacityPoolsAria':
     '使用中のバッグスロット: {total}個中{used}個。一般アイテム: {generalTotal}個中{generalUsed}個。素材: {materialsTotal}個中{materialsUsed}個。',
-  'hudChrome.bags.capacityPools': 'アイテム {generalUsed}/{generalTotal}、素材 {materialsUsed}/{materialsTotal}',
+  'hudChrome.bags.capacityPools':
+    'アイテム {generalUsed}/{generalTotal}、素材 {materialsUsed}/{materialsTotal}',
   'hudChrome.bags.emptyMaterialsOnly': '素材専用',
   'guide.brand': 'World of ClaudeCraft',
   'guide.brandShort': 'ClaudeCraft',
@@ -10491,12 +10492,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemTooltip.riftSockets': 'リフト宝石 {used}/{total}',
   'hudChrome.riftForge.title': 'リフトの炉',
   'hudChrome.riftForge.subtitle': 'リフトバウンドリング',
-  'hudChrome.riftForge.empty': 'カバンにリフトバウンドリングがありません。ランク付きリフトの初回踏破で1つ鋳造されます。',
+  'hudChrome.riftForge.empty':
+    'カバンにリフトバウンドリングがありません。ランク付きリフトの初回踏破で1つ鋳造されます。',
   'hudChrome.riftForge.wornHint': '装備中です。炉にかけるには外してください。',
   'hudChrome.riftForge.upgradeBtn': 'アイテムレベル{level}へ強化（エッセンス {cost}）',
   'hudChrome.riftForge.upgradeMax': '強化完了',
   'hudChrome.riftForge.gemPickAria': 'はめ込む宝石',
-  'hudChrome.riftForge.socketReplaceHint': 'ソケットは満杯です。次の宝石は最も古い{gem}と入れ替わります。',
+  'hudChrome.riftForge.socketReplaceHint':
+    'ソケットは満杯です。次の宝石は最も古い{gem}と入れ替わります。',
   'hudChrome.riftForge.socketBtn': 'はめ込む',
   'hudChrome.riftForge.socketsNone': '宝石なし',
   'hudChrome.riftForge.noGems': 'カバンにリフトの宝石がありません',
@@ -10510,7 +10513,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.riftForge.reason.tooFar': 'リフトの炉から離れすぎています。',
   'hudChrome.riftForge.done.upgrade': '{name}を強化しました。',
   'hudChrome.riftForge.done.socket': '{name}に宝石をはめ込みました。',
-  'hudChrome.riftForge.done.socketReplaced': '{name}に宝石をはめ込みました。{gem}は破壊されました。',
+  'hudChrome.riftForge.done.socketReplaced':
+    '{name}に宝石をはめ込みました。{gem}は破壊されました。',
   'hudChrome.itemTooltip.riftGemSocket': 'リフトバウンドリングのソケット効果',
   'sim.rift.alreadyCleared': 'このリフトはすでに {names} が攻略しました。',
   'sim.rift.raceLost': 'このリフトはすでに {names} が攻略しました。挑戦は終了します。',
@@ -12733,7 +12737,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.yieldLineRange': '{item} {min}から{max}個',
   'hudChrome.enchanting.alreadyEnchanted': 'そのアイテムにはすでにエンチャントが付与されています。',
   'hudChrome.enchanting.sameEnchant': 'そのアイテムにはすでに同じエンチャントが付与されています。',
-  'hudChrome.enchanting.riftGear': 'リフトバウンドリングはリフト宝石を嵌めるもので、エンチャントはできません。',
+  'hudChrome.enchanting.riftGear':
+    'リフトバウンドリングはリフト宝石を嵌めるもので、エンチャントはできません。',
   'hudChrome.enchanting.replaceTag': '{enchant}を置き換え',
   'hudChrome.enchanting.sameEnchantTag': '付与済み',
   'hudChrome.enchanting.plainTag': 'エンチャントなし',

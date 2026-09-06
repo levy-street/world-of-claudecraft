@@ -14801,7 +14801,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Causa {total}% da vida máxima de cada jogador, dividido entre os jogadores dentro do círculo ({perPlayer}% cada, com {players} jogadores). Cada jogador ausente também causa {missingPenalty}% de dano de vida máxima a toda a raide, incluindo os jogadores dentro do círculo.',
   'hudChrome.bags.capacityPoolsAria':
     'Espaços de bolsa usados: {used} de {total}. Itens gerais: {generalUsed} de {generalTotal}. Materiais: {materialsUsed} de {materialsTotal}.',
-  'hudChrome.bags.capacityPools': 'Itens {generalUsed}/{generalTotal}, materiais {materialsUsed}/{materialsTotal}',
+  'hudChrome.bags.capacityPools':
+    'Itens {generalUsed}/{generalTotal}, materiais {materialsUsed}/{materialsTotal}',
   'hudChrome.bags.emptyMaterialsOnly': 'Somente materiais',
   'hudChrome.bags.poolGeneral': 'Geral: {used} de {total}',
   'hudChrome.bags.poolMaterials': 'Materiais: {used} de {total}',

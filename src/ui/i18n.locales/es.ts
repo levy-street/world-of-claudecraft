@@ -14933,7 +14933,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'El Centinela de Ascuas te persigue. Mantenlo alejado de la banda hasta destruirlo.',
   'hudChrome.bags.capacityPoolsAria':
     'Espacios de bolsa usados: {used} de {total}. Objetos generales: {generalUsed} de {generalTotal}. Materiales: {materialsUsed} de {materialsTotal}.',
-  'hudChrome.bags.capacityPools': 'Objetos {generalUsed}/{generalTotal}, materiales {materialsUsed}/{materialsTotal}',
+  'hudChrome.bags.capacityPools':
+    'Objetos {generalUsed}/{generalTotal}, materiales {materialsUsed}/{materialsTotal}',
   'hudChrome.bags.emptyMaterialsOnly': 'Solo materiales',
   'hudChrome.bags.poolGeneral': 'General: {used} de {total}',
   'hudChrome.bags.poolMaterials': 'Materiales: {used} de {total}',

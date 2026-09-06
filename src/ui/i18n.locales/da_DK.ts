@@ -14610,7 +14610,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Giver {total}% af hver spillers maksimale helbred, delt mellem spillerne inde i cirklen ({perPlayer}% hver med {players} spillere). Hver manglende spiller giver desuden {missingPenalty}% af maksimalt helbred til hele raidet, inklusive spillerne inde i cirklen.',
   'hudChrome.bags.capacityPoolsAria':
     'Taskepladser brugt: {used} af {total}. Generelt: {generalUsed} af {generalTotal}. Materialer: {materialsUsed} af {materialsTotal}.',
-  'hudChrome.bags.capacityPools': 'Genstande {generalUsed}/{generalTotal}, materialer {materialsUsed}/{materialsTotal}',
+  'hudChrome.bags.capacityPools':
+    'Genstande {generalUsed}/{generalTotal}, materialer {materialsUsed}/{materialsTotal}',
   'hudChrome.bags.emptyMaterialsOnly': 'Kun materialer',
   'hudChrome.bags.poolGeneral': 'Generelt: {used} af {total}',
   'hudChrome.bags.poolMaterials': 'Materialer: {used} af {total}',

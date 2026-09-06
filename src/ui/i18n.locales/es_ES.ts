@@ -492,7 +492,8 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warlock.fateThreadsStatus': '{value} de {max} Hilos del destino.',
   'hudChrome.bags.itemAriaLocked': '{item}, cantidad {count}, artículo bloqueado',
   'hudChrome.bags.itemLockedLine': 'Artículo bloqueado',
-  'hudChrome.bags.capacityPools': 'Artículos {generalUsed}/{generalTotal}, materiales {materialsUsed}/{materialsTotal}',
+  'hudChrome.bags.capacityPools':
+    'Artículos {generalUsed}/{generalTotal}, materiales {materialsUsed}/{materialsTotal}',
   'hudChrome.bags.emptyMaterialsOnly': 'Solo para materiales',
   'hudChrome.bags.lockItem': 'Bloquear artículo',
   'hudChrome.bags.unlockItem': 'Desbloquear artículo',

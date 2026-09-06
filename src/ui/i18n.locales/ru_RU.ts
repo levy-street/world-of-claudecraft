@@ -6439,7 +6439,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.poolMaterials': 'Материалы: {used} из {total}',
   'hudChrome.bags.capacityPoolsAria':
     'Занято ячеек сумок: {used} из {total}. Общие предметы: {generalUsed} из {generalTotal}. Материалы: {materialsUsed} из {materialsTotal}.',
-  'hudChrome.bags.capacityPools': 'Предметы {generalUsed}/{generalTotal}, материалы {materialsUsed}/{materialsTotal}',
+  'hudChrome.bags.capacityPools':
+    'Предметы {generalUsed}/{generalTotal}, материалы {materialsUsed}/{materialsTotal}',
   'hudChrome.bags.emptyMaterialsOnly': 'Только материалы',
   'guide.brand': 'World of ClaudeCraft',
   'guide.brandShort': 'ClaudeCraft',
@@ -10640,16 +10641,19 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemTooltip.riftSockets': 'Самоцветы разлома {used}/{total}',
   'hudChrome.riftForge.title': 'Горн разлома',
   'hudChrome.riftForge.subtitle': 'Кольца разлома',
-  'hudChrome.riftForge.empty': 'В сумках нет кольца разлома. Первое прохождение рангового разлома выковывает одно.',
+  'hudChrome.riftForge.empty':
+    'В сумках нет кольца разлома. Первое прохождение рангового разлома выковывает одно.',
   'hudChrome.riftForge.wornHint': 'Надето. Снимите, чтобы ковать.',
   'hudChrome.riftForge.upgradeBtn': 'Улучшить до уровня предмета {level} ({cost} эссенции)',
   'hudChrome.riftForge.upgradeMax': 'Улучшено полностью',
   'hudChrome.riftForge.gemPickAria': 'Самоцвет для гнезда',
-  'hudChrome.riftForge.socketReplaceHint': 'Гнёзда заполнены: следующий самоцвет заменит самый старый, {gem}.',
+  'hudChrome.riftForge.socketReplaceHint':
+    'Гнёзда заполнены: следующий самоцвет заменит самый старый, {gem}.',
   'hudChrome.riftForge.socketBtn': 'Вставить',
   'hudChrome.riftForge.socketsNone': 'без самоцветов',
   'hudChrome.riftForge.noGems': 'В сумках нет самоцветов разлома',
-  'hudChrome.riftForge.refused': 'Горн отказал. Встаньте рядом с кузнецом разлома и попробуйте снова.',
+  'hudChrome.riftForge.refused':
+    'Горн отказал. Встаньте рядом с кузнецом разлома и попробуйте снова.',
   'hudChrome.riftForge.reason.notFound': 'Этого кольца нет в ваших сумках.',
   'hudChrome.riftForge.reason.notRiftGear': 'Ковать можно только кольцо разлома.',
   'hudChrome.riftForge.reason.maxUpgrade': 'Это кольцо улучшено полностью.',

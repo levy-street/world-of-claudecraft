@@ -14632,7 +14632,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Gör {total}% av varje spelares maximala hälsa, uppdelat mellan spelarna inuti cirkeln ({perPlayer}% var med {players} spelare). Varje spelare som saknas gör dessutom {missingPenalty}% av maximal hälsa i skada mot hela raiden, inklusive spelare inuti cirkeln.',
   'hudChrome.bags.capacityPoolsAria':
     'Använda väskplatser: {used} av {total}. Allmänna föremål: {generalUsed} av {generalTotal}. Material: {materialsUsed} av {materialsTotal}.',
-  'hudChrome.bags.capacityPools': 'Föremål {generalUsed}/{generalTotal}, material {materialsUsed}/{materialsTotal}',
+  'hudChrome.bags.capacityPools':
+    'Föremål {generalUsed}/{generalTotal}, material {materialsUsed}/{materialsTotal}',
   'hudChrome.bags.emptyMaterialsOnly': 'Endast material',
   'hudChrome.bags.poolGeneral': 'Allmänt: {used} av {total}',
   'hudChrome.bags.poolMaterials': 'Material: {used} av {total}',
