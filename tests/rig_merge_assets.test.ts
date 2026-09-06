@@ -259,13 +259,60 @@ describe('shipped character rigs satisfy the single-transform rebind law', () =>
     expect(distinctBindData).toBeGreaterThan(0);
   });
 
-  // rig_merge refuses to merge a part with morph targets (the rebake would drop
-  // them silently), so a rig that grows one quietly loses the saving. No shipped
-  // rig has any today: this is the canary that tells us the day one does.
+  // A morph-carrying part merges through the union plan, which places it by
+  // target NAME; a fixed rig with no targets takes the simpler path and needs
+  // no plan at all. This is the canary that tells us the day one grows some.
   it.each(RIGS)('%s: carries no morph targets, so nothing blocks the merge', (name) => {
     const glb = readGlb(`public/models/chars/${name}.glb`);
     const prims = (glb.json.meshes ?? []).flatMap((m: any) => m.primitives ?? []);
     expect(prims.length).toBeGreaterThan(0);
     expect(prims.filter((p: any) => p.targets?.length).length).toBe(0);
+  });
+
+  // The composed library is the rig that DOES carry targets, and the union
+  // merge can only place a target it can name: GLTFLoader builds a mesh's
+  // morphTargetDictionary from `extras.targetNames`, and without it every part
+  // gets a POSITIONAL dictionary that names nothing. mergeSkinnedParts refuses
+  // such a bucket rather than fold the wrong blendshapes together, so a
+  // re-export that drops the names is silent: the body just goes back to a draw
+  // per part.
+  it('the modular library names every morph target it ships', () => {
+    const glb = readGlb('public/models/chars/modular/warrior_modular.glb');
+    const meshes = (glb.json.meshes ?? []) as {
+      name: string;
+      extras?: { targetNames?: string[] };
+      primitives: { targets?: unknown[] }[];
+    }[];
+    const morphed = meshes.filter((mesh) => mesh.primitives.some((p) => p.targets?.length));
+    expect(morphed.length).toBeGreaterThan(100);
+    for (const mesh of morphed) {
+      const targets = mesh.primitives[0].targets ?? [];
+      expect(mesh.extras?.targetNames, `${mesh.name} target names`).toHaveLength(targets.length);
+    }
+  });
+
+  // The nine bare-body parts are the merge's biggest single win (nine skinned
+  // draws to one, in colour AND shadow), and it only happens while they agree
+  // on material and attribute set: the bucket key is (bones, material, world
+  // transform), and a part with an attribute the others lack is refused whole.
+  it('the composed bare body is one material and one attribute set', () => {
+    const glb = readGlb('public/models/chars/modular/warrior_modular.glb');
+    const meshes = (glb.json.meshes ?? []) as {
+      name: string;
+      primitives: { attributes: Record<string, number>; material: number }[];
+    }[];
+    const bodyParts = ['Torso', 'ArmL', 'ArmR', 'HandL', 'HandR', 'LegL', 'LegR', 'FootL', 'FootR'];
+    for (const gender of ['M', 'F']) {
+      const parts = bodyParts.map((part) => {
+        const mesh = meshes.find((m) => m.name === `${gender}_${part}`);
+        expect(mesh, `${gender}_${part}`).toBeDefined();
+        return mesh as (typeof meshes)[number];
+      });
+      expect(new Set(parts.map((m) => m.primitives.length))).toEqual(new Set([1]));
+      expect(new Set(parts.map((m) => m.primitives[0].material)).size).toBe(1);
+      expect(
+        new Set(parts.map((m) => Object.keys(m.primitives[0].attributes).sort().join(','))).size,
+      ).toBe(1);
+    }
   });
 });

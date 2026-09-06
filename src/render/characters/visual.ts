@@ -2044,7 +2044,7 @@ export class CharacterVisual {
       tintedFarMaterials(
         prep.def,
         this.entityColor,
-        farSourceMaterials(this.model, bake.isBody.length),
+        farSourceMaterials(this.model, bake.slots),
         bake.isBody,
         skinTexture(this.key, this.skinIndex),
         skinEmissiveTexture(this.key, this.skinIndex),
@@ -2482,7 +2482,7 @@ export class CharacterVisual {
       const mats = tintedFarMaterials(
         this.def,
         this.entityColor,
-        composed ? farSourceMaterials(this.model, composed.isBody.length) : prep.idleSrcMats,
+        composed ? farSourceMaterials(this.model, composed.slots) : prep.idleSrcMats,
         composed ? composed.isBody : prep.idleSrcIsBody,
         skinTexture(this.key, skinIndex),
         skinEmissiveTexture(this.key, skinIndex),
