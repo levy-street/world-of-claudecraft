@@ -12,6 +12,9 @@ import {
   lodDistsFor,
   treeDetailDistance,
 } from '../src/render/foliage_lod';
+import { WORLD_MIN_Z } from '../src/sim/data';
+import { generateDecorations } from '../src/sim/world';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
 // The adaptive budget's foliage lever spans [0, 1]; the distance scale and the
 // fog cull both derive from it, so tests must move them as the one dial they
@@ -356,6 +359,107 @@ describe('foliage LOD: the real-model and impostor windows cover the world', () 
   });
 });
 
+describe('foliage LOD: the lean rock/dressing caps measure from the near edge', () => {
+  // Issue #3525 and the "invisible rocks on Low at certain angles" report.
+  // Buckets are half the world wide, so a rock a stride from the player can
+  // sit in a bucket whose CENTER is past the lean rock cap; keyed on the
+  // camera-to-center distance the whole slab (that rock included) dropped
+  // out as the camera orbited, while its collider still blocked movement.
+  const cap = LOD_LOW.rockFar; // 190
+  const leanScale = foliageDistanceScale(1, true); // 1 at a rested budget
+  const radius = 290; // a shipped lean rock slab (see the world-data sweep below)
+  const leanRocks = (centerDist: number, over: Partial<BucketWindowInput> = {}) =>
+    windowFor({ centerDist, radius, maxDist: cap, distanceScale: leanScale, ...over });
+
+  it('regression: the center rule hid a slab whose near edge is under the player', () => {
+    // Center 200u off, near edge 90u INSIDE the cap (200 - 290 < 0: the
+    // player is standing in the slab). The old rule culls it outright.
+    expect(bucketVisible(leanRocks(200))).toBe(false);
+    expect(bucketVisible(leanRocks(200, { maxNearEdge: true }))).toBe(true);
+  });
+
+  it('a camera orbit no longer flips a slab the player stands in', () => {
+    // A third-person orbit moves the camera ~10u around the player. With the
+    // center 185u off that crossed the 190u cap on one side of the orbit.
+    for (const orbit of [-10, 0, 10]) {
+      expect(bucketVisible(leanRocks(185 + orbit, { maxNearEdge: true }))).toBe(true);
+    }
+    expect(bucketVisible(leanRocks(185 - 10))).toBe(true);
+    expect(bucketVisible(leanRocks(185 + 10))).toBe(false); // the old flicker
+  });
+
+  it('still culls the slab once its NEAREST instance is past the cap', () => {
+    expect(bucketVisible(leanRocks(cap + radius - 1, { maxNearEdge: true }))).toBe(true);
+    expect(bucketVisible(leanRocks(cap + radius, { maxNearEdge: true }))).toBe(false);
+  });
+
+  it('the budget still shrinks the near-edge cap', () => {
+    const starved = foliageDistanceScale(0, true); // 0.56: cap 106.4
+    const d = cap * starved + radius; // near edge on the starved cap
+    expect(bucketVisible(leanRocks(d + 1, { maxNearEdge: true, distanceScale: starved }))).toBe(
+      false,
+    );
+    expect(bucketVisible(leanRocks(d - 1, { maxNearEdge: true, distanceScale: starved }))).toBe(
+      true,
+    );
+  });
+
+  it('the min cap and the detail arms are untouched by maxNearEdge', () => {
+    // maxNearEdge only re-keys the numeric MAX probe.
+    const w = realTrees(400, { radius, detailFar: 300, maxNearEdge: true, minDist: 50 });
+    expect(bucketVisible(w)).toBe(true); // near edge 110 < detailFar
+    expect(bucketVisible({ ...w, centerDist: 40 })).toBe(false); // center under minDist
+    expect(bucketVisible({ ...w, centerDist: 300 + radius })).toBe(false); // whole slab past swap
+  });
+
+  it('the shipped world really has lean rock slabs wider than the rock cap', () => {
+    // Re-bucket the live decorations the way buildTrees() does (two columns
+    // split on x < 0, one band per BUCKET_DEPTH from WORLD_MIN_Z, radius from
+    // the bucket's bounds plus the canopy margin) and show the gap is real:
+    // a boulder on a slab's near edge can be under the player while the
+    // slab's center is past the cap. Parsed from the renderer so a re-bucketing
+    // that closes the gap by itself retires this pin honestly.
+    const foliageSrc = readFileSync(new URL('../src/render/foliage.ts', import.meta.url), 'utf8');
+    const depth = Number(/const BUCKET_DEPTH = (\d+)/.exec(foliageSrc)?.[1]);
+    const margin = Number(
+      /Math\.hypot\(maxX - minX, maxZ - minZ\) \/ 2 \+ (\d+); \/\/ canopy/.exec(foliageSrc)?.[1],
+    );
+    expect(depth).toBeGreaterThan(0);
+    expect(margin).toBeGreaterThan(0);
+    const bounds = new Map<
+      string,
+      { minX: number; maxX: number; minZ: number; maxZ: number; rocks: number }
+    >();
+    for (const d of generateDecorations(WORLD_SEED)) {
+      const key = `${Math.floor((d.z - WORLD_MIN_Z) / depth)}:${d.x < 0 ? 0 : 1}`;
+      let b = bounds.get(key);
+      if (!b) {
+        b = { minX: d.x, maxX: d.x, minZ: d.z, maxZ: d.z, rocks: 0 };
+        bounds.set(key, b);
+      }
+      b.minX = Math.min(b.minX, d.x);
+      b.maxX = Math.max(b.maxX, d.x);
+      b.minZ = Math.min(b.minZ, d.z);
+      b.maxZ = Math.max(b.maxZ, d.z);
+      if (d.kind === 'rock') b.rocks++;
+    }
+    const radii = [...bounds.values()]
+      .filter((b) => b.rocks > 0)
+      .map((b) => Math.hypot(b.maxX - b.minX, b.maxZ - b.minZ) / 2 + margin);
+    expect(radii.length).toBeGreaterThan(0);
+    const widest = Math.max(...radii);
+    // Most rock slabs out-radius the rested lean cap; the center rule
+    // therefore hides a near-edge boulder from a camera anywhere in the
+    // (cap, radius) annulus of slab-center distances.
+    const wider = radii.filter((r) => r > cap * leanScale).length;
+    expect(wider / radii.length).toBeGreaterThan(0.5);
+    expect(widest).toBeGreaterThan(cap * leanScale);
+    const camToCenter = cap * leanScale + 1;
+    expect(bucketVisible(leanRocks(camToCenter, { radius: widest }))).toBe(false);
+    expect(bucketVisible(leanRocks(camToCenter, { radius: widest, maxNearEdge: true }))).toBe(true);
+  });
+});
+
 describe('foliage LOD: the shadow clones no longer take this window', () => {
   // They key on the key light's own orthographic shadow volume instead
   // (src/render/foliage_shadow_core.ts, tests/foliage_shadow_core.test.ts).
@@ -364,9 +468,13 @@ describe('foliage LOD: the shadow clones no longer take this window', () => {
   // bounding radius, ~290u on the shipped ~500x240u slabs.
   const lodSrc = readFileSync(new URL('../src/render/foliage_lod.ts', import.meta.url), 'utf8');
 
-  it('keeps bucketVisible camera-keyed on the bucket centre for every row', () => {
+  it('keeps bucketVisible camera-keyed on the bucket centre by default', () => {
+    // The near-edge probe is an explicit per-row opt-in (maxNearEdge, for the
+    // rows whose vertex shader collapses instances past the same cap); no row
+    // gets it by default and no shadow-specific arm exists.
     expect(lodSrc).not.toContain('maxFromNearEdge');
-    expect(lodSrc).toContain('if (w.centerDist < minCap || w.centerDist >= maxCap) return false;');
+    expect(lodSrc).toContain('const maxProbe = w.maxNearEdge ? nearEdge : w.centerDist;');
+    expect(lodSrc).toContain('if (w.centerDist < minCap || maxProbe >= maxCap) return false;');
   });
 
   it('routes the shadow rows to the light-volume core', () => {

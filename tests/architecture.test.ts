@@ -743,6 +743,7 @@ const RENDER_PURE_CORES = [
   'src/render/far_surface_core.ts',
   'src/render/far_terrain_core.ts',
   'src/render/foliage_impostor_core.ts',
+  'src/render/foliage_frame_windows_core.ts',
   'src/render/lava_chain_core.ts',
   'src/render/foliage_lod.ts',
   'src/render/prewarm_pass.ts',

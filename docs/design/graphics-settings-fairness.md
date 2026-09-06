@@ -241,7 +241,8 @@ all), but a correct fix there would exempt effectively every tree from the trim,
 triangle-count and frame-time tradeoff on the weak/software GPUs this tier targets than the rock
 fix is, so it was tracked separately rather than folded in blind at
 levy-street/world-of-claudecraft#3415: see the entry below, where its decimation-trim half is
-fixed for real (a distinct, still-open bucket-culling half is also identified there). A second,
+fixed for real (the distinct bucket-culling half identified there is fixed in its own entry
+below). A second,
 unrelated invisible-collision gap was found in the same review, in the Evergarden's parterre
 beds and garden-biome pines (a zone-curation exclusion, unconditional on every preset, not this
 tier trim), tracked at levy-street/world-of-claudecraft#3417 and still open.
@@ -292,23 +293,49 @@ extreme survives the unluckiest possible hash draw, on both material tiers), and
 fix, so the only thing that changed is `survivesLeanDecimation` actually trusting it for every
 decoration kind rather than only rocks.
 
-**A second, distinct mechanism can still hide a collider-bearing rock or tree on this tier,
-independent of this fix, found during this entry's own review:** `bucketVisible()`
-(`src/render/foliage_lod.ts`) culls a whole scatter bucket by comparing camera distance to the
-bucket's CENTER against a numeric cap, not the bucket's near edge, and the shipped world's
+**A second, distinct mechanism used to hide a collider-bearing rock, and every bush, fern and
+mushroom around it, on this tier, found during this entry's own review and fixed in its own
+change:** `bucketVisible()` (`src/render/foliage_lod.ts`) culls a whole scatter bucket by
+comparing CAMERA distance to the bucket's CENTER against a numeric cap, and the shipped world's
 buckets run 273-307 yards in radius (two columns splitting the world in half, times depth
-bands), against an effective 106-245 yard lean-tier cap. A player standing right next to a
-decoration near a huge bucket's edge, whose content-weighted center is far away, can still have
-that decoration's entire InstancedMesh set invisible while the sim's collider (which knows
-nothing about camera position) keeps it solid, the same invisible-but-solid shape as the bug
-this entry fixes, through a real-time, camera-position-dependent path rather than a static
-build-time roll, which also better matches a report of a decoration flickering as the camera
-turns (this decimation-trim fix cannot produce that: its keep/drop decision is made once, at
-build time, and cannot change during a session). This affects rocks too, meaning the original
-rock fix above does not fully close the rock case either. Deliberately not folded into this fix
-for the same reason the tree case itself was originally deferred: it is a real, camera-distance
-performance tradeoff across ALL scenery sharing a bucket, cosmetic or not, and deserves its own
-measured design decision. Tracked at levy-street/world-of-claudecraft#3525.
+bands), against an effective 106-190 yard lean-tier rock cap. A player standing right next to a
+rock near a huge bucket's edge, whose content-weighted center is far away, had the rock's entire
+InstancedMesh set invisible while the sim's collider (which knows nothing about camera position)
+kept it solid: the same invisible-but-solid shape, through a real-time, camera-position-dependent
+path. Because the probe is the camera, not the player, a third-person orbit moved it by the
+camera's own offset, which is what a player saw as rocks and bushes popping in and out "at
+certain angles" on Low. Tracked at levy-street/world-of-claudecraft#3525; fixed as follows.
+
+The fix keeps the center rule for every row it was designed for (the near-fill density cull and
+the early bark cull, whose measured cost of a near-edge probe was ~4.6x the foliage triangles)
+and gives the lean rock and dressing rows an explicit opt-in, `maxNearEdge`: their slab survives
+until its NEAREST instance crosses the cap. On its own that would keep a half-slab of live
+boulders past the cap, so the same change binds those rows' vertex-shader collapse window
+(`foliage_collapse.ts`, roles `rock` and `dress`, which the lean arm previously left at `plain`
+and the fog wall) to the very same cap through one shared per-frame resolver,
+`src/render/foliage_frame_windows_core.ts`: every instance past the cap is a vertex-shader
+early-out, never a rasterized triangle. The accepted tradeoff is therefore one extra draw call
+per surviving slab plus the vertex-shader cost of its collapsed instances, on the lean tier only;
+the sprite arm already measured these rows radius-aware against their swap and is unchanged.
+Measured with `scripts/rock_bucket_cull_visibility_shot.mjs` (Low preset, offline world, the
+Willowfen pose in the fixing PR's before/after captures, foliage `perfStats()` at the
+capture frame): before, 24 submitted slabs (all tree rows: at that pose the center rule had
+culled EVERY rock and dressing slab, which is the bug); after, 47 slabs (24 tree, 8 rock, 15
+dressing), with submitted triangles rising from ~1.71M to ~2.21M, of which the rock and dressing
+share (~0.51M) is what the per-instance window collapses beyond the cap. Draw submission and
+vertex-shader work are the honest cost; fragment work past the cap is zero. If a Low-tier perf
+tour ever shows that vertex cost biting, the next lever is finer x-splitting of the rock and
+dressing slabs (shrinking their radius), not a return to the center rule.
+Near-fill trees keep the center rule: their cap carries a per-bucket reveal jitter the shared
+shader window cannot express, and every tree already stays visible to the runtime detail
+distance (issue #3526), which is the collider-visibility guarantee that matters for a trunk. Two
+deliberate edges: a sprite-arm build whose impostor bake failed keeps its rock and dressing rows
+drawing to the fog wall (they were registered expecting a sprite behind the swap, so the resolver
+keys the cap binding on the BUILT far-field policy, `impostorsActive`, not just the live sprite
+flag); and on the sprite arm ferns and mushrooms, which have no sprite side, still take the
+center-keyed dressing cap, so a fern under the player can still drop with the orbit on Medium and
+up. That residue is cosmetic only (no dressing kind carries a collider) and is left for a
+follow-up rather than paid for with live triangles here.
 
 ## Enforcing guards
 
@@ -388,6 +415,16 @@ measured design decision. Tracked at levy-street/world-of-claudecraft#3525.
 - `tests/foliage_decimation_core.test.ts`: `survivesLeanDecimation` never drops a solid rock or
   any tree/tree2 regardless of its hash draw, and still decimates sub-floor dressing rocks (the
   one decoration kind that can lack a collider) at the tuned keep rate.
+- `tests/foliage_lod.test.ts` ("the lean rock/dressing caps measure from the near edge"): the
+  center rule hid a slab whose near edge is under the player; a camera orbit no longer flips it;
+  the slab still culls once its nearest instance is past the cap; the budget still shrinks the
+  cap; and a sweep of the shipped world's real rock slabs proves most out-radius the lean cap.
+- `tests/foliage_frame_windows_core.test.ts`: the lean rock and dress shader collapse windows
+  EQUAL the bucket caps at every governor level (never the fog wall), the sprite arm is unchanged,
+  and a sprite-arm build whose bake failed keeps those rows to the fog wall.
+- `tests/foliage_lean_cull_wiring.test.ts`: source-scans `foliage.ts` to prove the lean rock and
+  dressing rows register with `nearEdge`, the rock material takes the `rock` window on both arms,
+  every lean dressing kind takes the `dress` window, and the windows resolve through the core.
 - `tests/foliage_decimation_wiring.test.ts`: source-scans `foliage.ts` to prove the leanFoliage
   decoration filter actually calls `survivesLeanDecimation` and that the old bare
   `hashAt(d.x, d.z, 83) < keep` shape has not been re-inlined.
