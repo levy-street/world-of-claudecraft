@@ -376,16 +376,23 @@ describe('owned class level 20 default action bars', () => {
     for (const { key, playerClass, spec, expected, known } of ownedSpecEntries()) {
       const source = new MemoryStorage();
       seedOwnedSpecBar(source, playerClass, spec, known);
-      const layout = captureActionBarLayout(source, playerClass, 'OwnedDefaultTester');
+      const layout = captureActionBarLayout(source, playerClass, 'OwnedDefaultTester', 'desktop');
 
       const destination = new MemoryStorage();
-      const restore = planActionBarRestore({ source: 'server', layout }, () => ({
-        v: 1,
-        forms: {},
-      }));
+      const restore = planActionBarRestore(
+        { source: 'server', profiles: { v: 2, profiles: { desktop: layout } } },
+        'desktop',
+        () => ({ v: 1, forms: {} }),
+      );
       expect(restore.action, key).toBe('apply-server');
       if (restore.action !== 'apply-server') throw new Error(`${key} did not restore from server`);
-      applyActionBarLayout(destination, playerClass, 'OwnedDefaultTester', restore.layout);
+      applyActionBarLayout(
+        destination,
+        playerClass,
+        'OwnedDefaultTester',
+        'desktop',
+        restore.layout,
+      );
 
       const imported = controllerFor(destination, playerClass, spec, known);
       imported.init();
@@ -393,8 +400,8 @@ describe('owned class level 20 default action bars', () => {
       const expectedBar = buildDefaultFormBar(expected, ACTION_BAR_ABILITY_SLOTS);
       expect(imported.actions, key).toEqual(expectedBar);
 
-      const reconnect = planActionBarRestore({ source: 'noop' }, () =>
-        captureActionBarLayout(destination, playerClass, 'OwnedDefaultTester'),
+      const reconnect = planActionBarRestore({ source: 'noop' }, 'desktop', (profile) =>
+        captureActionBarLayout(destination, playerClass, 'OwnedDefaultTester', profile),
       );
       expect(reconnect, key).toEqual({ action: 'none' });
       const reconnected = controllerFor(destination, playerClass, spec, known);

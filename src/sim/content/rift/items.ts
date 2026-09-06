@@ -9,6 +9,9 @@ export const RIFT_GEAR_ITEM_IDS = [
   'riftbound_band_of_insight',
   'riftbound_band_of_guile',
 ] as const;
+/** The same three ids as a set, for the by-id refusals (trade, enchanting,
+ *  the dev kit) that would otherwise each build their own. */
+export const RIFT_GEAR_ITEM_ID_SET: ReadonlySet<string> = new Set(RIFT_GEAR_ITEM_IDS);
 
 /** The clear-time gear ladder above the rares: epics that only a B+ final-boss
  * kill can shed (B already GUARANTEES one, so A does not raise the floor; S
@@ -66,8 +69,12 @@ const CASTER = ['mage', 'priest', 'warlock', 'druid'] as ItemDef['requiredClass'
 const RIFT_ARMOR_RATING = 40; // 40 rating = 4.0%, mirrors the heroic ilvl-31 armor floor
 const RIFT_JEWELRY_RATING = 25; // 25 rating, matches heroic quartermaster jewelry precedent
 
-/** Static shells. The non-fungible payload carries each drop's source, power,
- * upgrades, enchantment, sockets, gems, and rolled bonus stats. */
+/** Static shells. The three Riftbound bands below carry NO stats of their
+ * own: the non-fungible payload (ItemInstancePayload.rift) records the clear's
+ * rank, the essence upgrades, and the socketed gems, and rift/band_ladder.ts
+ * prices the whole ring from those (item level, primary stats, gem ratings)
+ * into the copy's rolled aggregate. A bare shell (a copy that somehow lost its
+ * payload) is therefore an empty ring, never a stat stick. */
 export const RIFT_ITEMS: Record<string, ItemDef> = {
   // Rogue dagger (Rift epic, B+ clear). A frost-bolt on-hit gives the fast
   // dagger a proc that actually helps a DPS rogue: an attack-speed chill would
@@ -121,6 +128,10 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     stackSize: 20,
     sellValue: 0,
   },
+  // Rift gems: one combat rating line each when socketed into a Riftbound
+  // band (rift/band_ladder.ts RIFT_GEM_RATING_STAT: crimson is crit, azure is
+  // haste, verdant is hit; RIFT_GEM_RATING per gem). The tooltip states the
+  // colour's rating (src/ui/rift_band_tooltip.ts) so the def needs no prose.
   rift_gem_crimson: {
     id: 'rift_gem_crimson',
     name: 'Crimson Rift Gem',
@@ -152,7 +163,6 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     slot: 'ring',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { str: 6, sta: 5 },
     sellValue: 5000,
     noMarketList: true,
   },
@@ -163,7 +173,6 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     slot: 'ring',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { int: 6, spi: 5 },
     sellValue: 5000,
     noMarketList: true,
   },
@@ -174,7 +183,6 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     slot: 'ring',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { agi: 6, sta: 5 },
     sellValue: 5000,
     noMarketList: true,
   },

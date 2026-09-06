@@ -212,8 +212,13 @@ export type {
   ActionBarFormLayout,
   ActionBarLayout,
   ActionBarLayoutForm,
+  ActionBarLayoutProfile,
+  ActionBarLayoutProfiles,
   ActionBarLayoutRestore,
+  ActionBarLayoutSave,
+  ActionBarLayoutWire,
   ActionBarSlotAction,
+  StoredActionBarLayout,
 } from './world_api/action_bar';
 export type { BankBonusSource, BankInfo, VaultInfo, VaultSpecialRef } from './world_api/bank';
 export type {
@@ -565,6 +570,8 @@ export const COMMAND_NAMES = [
   'df_apply_cancel',
   'df_app_respond',
   'rift_upgrade_item',
+  // Retired with the band item-level ladder (the forge enchant is gone); the
+  // token stays because this table is append-only, dispatched as a no-op.
   'rift_enchant_item',
   'rift_socket_gem',
   'deed_set_title',
@@ -609,6 +616,9 @@ export const COMMAND_NAMES = [
   // Guild billboard: set (or clear, with '') the officer-editable message
   // pinned atop the social window's Guild tab (SocialService.guildSetMotd).
   'guild_set_motd',
+  // Guild roster expansion: the Guild Master buys the next 20-seat page from
+  // their own purse (SocialService.guildBuyRosterPage); no client fields.
+  'guild_buy_roster_page',
   // Template-authored active on a controlled pet (Abyssal Chain, Felbolt)
   // plus its pet-bar autocast toggle.
   'pet_special',
@@ -738,6 +748,10 @@ export const DISPATCH_ONLY_COMMANDS = [
   'mount_train_answer',
   'mount_train_abort',
   'dev_profiler_invulnerable',
+  // The retired Riftbound forge enchant: no sender since the band item-level
+  // ladder replaced enchants with gem ratings; the server dispatches it as a
+  // no-op tombstone (server/game.ts).
+  'rift_enchant_item',
 ] as const satisfies readonly CommandName[];
 
 export type DispatchOnlyCommand = (typeof DISPATCH_ONLY_COMMANDS)[number];
@@ -748,7 +762,8 @@ export type DispatchOnlyCommand = (typeof DISPATCH_ONLY_COMMANDS)[number];
 export type ClientCommand = Exclude<CommandName, DispatchOnlyCommand>;
 
 // ---------------------------------------------------------------------------
-// Command facet tags (W6+). APPEND-ONLY metadata that names, for each wire
+// Command facet tags (W6+). APPEND-ONLY metadata (a retired token's row goes
+// with it, since the map is keyed by ClientCommand) that names, for each wire
 // command, the IWorld facet whose method sends it, so the command universe is
 // discoverable by domain. Like COMMAND_NAMES this is types-as-data, not
 // player-facing copy (no t(), no DOM); it never gates the wire (COMMAND_NAMES is
@@ -821,7 +836,6 @@ export const COMMAND_FACETS = {
   // professions surface and, like the other enchanting-family commands, has
   // no facet row here.)
   rift_upgrade_item: 'IWorldInventory',
-  rift_enchant_item: 'IWorldInventory',
   rift_socket_gem: 'IWorldInventory',
   // IWorldInventory: the one-shot bag clean-up; the sim re-derives the whole
   // arrangement, so there is no payload to validate.
@@ -937,6 +951,7 @@ export const COMMAND_FACETS = {
   guild_event_create: 'IWorldSocialGraph',
   guild_event_remove: 'IWorldSocialGraph',
   guild_set_motd: 'IWorldSocialGraph',
+  guild_buy_roster_page: 'IWorldSocialGraph',
   // IWorldMarket: World Market browse/list/buy/cancel/collect (snake_case wire
   // strings, by design). marketInfo is a snapshot read (no send, untagged).
   market_search: 'IWorldMarket',

@@ -42,7 +42,7 @@ describe('PgSocialDb pledge-consuming seat (addGuildMemberAtomic requirePledge)'
       .mockResolvedValueOnce({ rows: [], rowCount: 1 }) // pledge consume
       .mockResolvedValueOnce({ rows: [] }); // COMMIT
 
-    await expect(db.addGuildMemberAtomic(7, 44, 'member', 100, true)).resolves.toBe('ok');
+    await expect(db.addGuildMemberAtomic(7, 44, 'member', true)).resolves.toBe('ok');
 
     const verbs = client.query.mock.calls.map(([sql]) => String(sql).trim().split(/\s+/)[0]);
     expect(verbs).toEqual(['BEGIN', 'SELECT', 'SELECT', 'SELECT', 'INSERT', 'DELETE', 'COMMIT']);
@@ -66,7 +66,7 @@ describe('PgSocialDb pledge-consuming seat (addGuildMemberAtomic requirePledge)'
       .mockResolvedValueOnce({ rows: [], rowCount: 0 }) // pledge already gone
       .mockResolvedValueOnce({ rows: [] }); // ROLLBACK
 
-    await expect(db.addGuildMemberAtomic(7, 44, 'member', 100, true)).resolves.toBe('no_pledge');
+    await expect(db.addGuildMemberAtomic(7, 44, 'member', true)).resolves.toBe('no_pledge');
 
     const verbs = client.query.mock.calls.map(([sql]) => String(sql).trim().split(/\s+/)[0]);
     expect(verbs).toEqual(['BEGIN', 'SELECT', 'SELECT', 'SELECT', 'INSERT', 'DELETE', 'ROLLBACK']);
@@ -83,7 +83,7 @@ describe('PgSocialDb pledge-consuming seat (addGuildMemberAtomic requirePledge)'
       .mockResolvedValueOnce({ rows: [], rowCount: 1 })
       .mockResolvedValueOnce({ rows: [] }); // COMMIT
 
-    await expect(db.addGuildMemberAtomic(7, 44, 'member', 100)).resolves.toBe('ok');
+    await expect(db.addGuildMemberAtomic(7, 44, 'member')).resolves.toBe('ok');
 
     const verbs = client.query.mock.calls.map(([sql]) => String(sql).trim().split(/\s+/)[0]);
     expect(verbs).toEqual(['BEGIN', 'SELECT', 'SELECT', 'SELECT', 'INSERT', 'COMMIT']);

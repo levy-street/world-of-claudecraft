@@ -172,7 +172,7 @@ describe('ClientWorld native App-lifecycle reconnect (Capacitor appStateChange)'
       // The one thing the background branch actually does is flush a pending
       // action-bar layout save; queue one so the assertion below is decisive
       // rather than just "the socket was left alone".
-      world.saveActionBarLayout(STUB_LAYOUT);
+      world.saveActionBarLayout('desktop', STUB_LAYOUT);
       fireAppState(false);
       expect(StubWebSocket.instances.length).toBe(1);
       expect(harness.timers.length).toBe(0);

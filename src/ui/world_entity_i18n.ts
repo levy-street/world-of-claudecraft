@@ -347,6 +347,7 @@ const NPC_IDS = [
   'mender_saul',
   'bellkeeper_tam',
   'fisher_nell',
+  'riftwright_maelis', // the Rift Forge (Gullhaven, Farshore)
   'forgemistress_darva', // crafting-station master: forge (Eastbrook, zone 1)
   'cook_marlow', // crafting-station master: kitchens (Eastbrook, zone 1)
   'weaver_ottilie', // crafting-station master: loom (Eastbrook, zone 1)

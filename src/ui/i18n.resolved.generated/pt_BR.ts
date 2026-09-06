@@ -1307,6 +1307,11 @@ export const pt_BR: EnTranslations = {
       "separate": "Separar {meter}",
       "regroup": "Reagrupar {meter}"
     },
+    "targetDots": {
+      "title": "Target Dots",
+      "row": "{aura} on {target}",
+      "overflow": "{count} more not shown"
+    },
     "targetAuras": {
       "title": "Auras do alvo",
       "keybindLabel": "Benefícios e penalidades do alvo",
@@ -1618,6 +1623,9 @@ export const pt_BR: EnTranslations = {
       "showTargetOfTarget": "Mostrar Alvo do Alvo",
       "showTargetSwingTimer": "Mostrar temporizador de ataque do alvo",
       "showPetFrame": "Mostrar seu mascote",
+      "showNameplateDots": "Show My Dots on Nameplates",
+      "nameplateDotScale": "Nameplate Dot Size",
+      "showTargetDots": "Show Target Dots",
       "waterRipples": "Ondulações na água (esteiras)",
       "showAttackButton": "Exibir Botão de Ataque",
       "showDailyRewardsChest": "Mostrar Baú de Recompensas Diárias",
@@ -3005,7 +3013,8 @@ export const pt_BR: EnTranslations = {
         "playerFrame": "Jogador",
         "targetFrame": "Alvo",
         "partyFrames": "Grupo",
-        "swingBar": "Ataque Automático"
+        "swingBar": "Ataque Automático",
+        "targetDots": "Target Dots"
       },
       "framesMenu": "Configurações de Quadros",
       "framesMenuTitle": "Mostre ou oculte quadros individuais. Um quadro desmarcado permanece oculto até que você o marque novamente ou redefina para o padrão.",
@@ -3037,11 +3046,42 @@ export const pt_BR: EnTranslations = {
       "invalid": "Esse não é um código de exportação válido.",
       "wrongKind": "Esse código é de um tipo de exportação diferente."
     },
+    "riftForge": {
+      "title": "Rift Forge",
+      "subtitle": "Riftbound bands",
+      "currency": "{name}: {count}",
+      "empty": "No Riftbound band in your bags. A ranked Rift first clear mints one.",
+      "wornHint": "Worn. Unequip it to forge.",
+      "upgradeBtn": "Upgrade to item level {level} ({cost} essence)",
+      "upgradeMax": "Fully upgraded",
+      "gemPickAria": "Gem to socket",
+      "gemOption": "{name} ({bonus})",
+      "socketReplaceHint": "Sockets full: the next gem replaces the oldest, {gem}.",
+      "socketBtn": "Socket",
+      "socketsNone": "no gems",
+      "noGems": "No Rift gems in your bags",
+      "refused": "The forge refused. Stand at the Riftwright and try again.",
+      "reason": {
+        "notFound": "That band is not in your bags.",
+        "notRiftGear": "Only a Riftbound band can be forged.",
+        "maxUpgrade": "That band is fully upgraded.",
+        "insufficientEssence": "Not enough Rift Essence.",
+        "invalidGem": "You have no such Rift gem.",
+        "dead": "You can't do that while dead.",
+        "tooFar": "You are too far from the Rift Forge."
+      },
+      "done": {
+        "upgrade": "Upgraded {name}.",
+        "socket": "Socketed a gem into {name}.",
+        "socketReplaced": "Socketed a gem into {name}; {gem} was destroyed."
+      }
+    },
     "itemTooltip": {
       "requiresLevel": "Requer Nível {level}",
       "riftTier": "Item da Fenda de nível {tier}",
       "riftUpgrade": "Aprimoramento da fenda {level}/{max}",
       "riftSockets": "Gemas da fenda {used}/{total}",
+      "riftGemSocket": "Socket bonus for a Riftbound band",
       "statEnchanted": "+{value} {stat} (Encantado)",
       "enchantedFallback": "Encantado",
       "partyTradeWindow": "Você pode negociar este item com jogadores que compartilharam esse saque pelos próximos {time}. Equipá-lo encerra a janela de troca."
@@ -3558,6 +3598,20 @@ export const pt_BR: EnTranslations = {
           "set": "O mural da guilda foi atualizado.",
           "notOfficer": "Apenas oficiais e o Mestre da Guilda podem editar o mural."
         }
+      },
+      "roster": {
+        "seats": "{count} of {cap} seats",
+        "expand": "Expand roster (+{seats} seats for {price})",
+        "maxed": "The roster is at its largest size",
+        "confirm": "Expand the guild roster by {seats} seats for {price}? The gold comes from your own purse and is not refunded.",
+        "confirmAction": "Expand",
+        "expandedLine": "{name} has expanded the guild roster to {cap} members.",
+        "result": {
+          "notLeader": "Only the Guild Master may expand the guild roster.",
+          "maxed": "The guild roster cannot grow any larger.",
+          "cannotAfford": "You need {price} to expand the guild roster.",
+          "retry": "The guild roster changed while you were buying. Try again."
+        }
       }
     },
     "gathering": {
@@ -3975,6 +4029,7 @@ export const pt_BR: EnTranslations = {
       "yieldLineRange": "{min} a {max} {item}",
       "alreadyEnchanted": "Esse item já está encantado.",
       "sameEnchant": "Esse item já tem esse encantamento.",
+      "riftGear": "Riftbound bands take Rift gems, not enchants.",
       "replaceTag": "Substitui {enchant}",
       "sameEnchantTag": "Já aplicado",
       "plainTag": "Sem encantamento",
@@ -6069,6 +6124,8 @@ export const pt_BR: EnTranslations = {
       "raceBody": "Todos os grupos do reino podem atacar a mesma fenda ao mesmo tempo, cada um em sua própria cópia, e só o primeiro a derrubar a coisa lá no fundo a sela. Quando um grupo vence, o reino ouve o nome e o tempo deles, e o caminho de entrada se fecha atrás dele. Perder a corrida não encerra sua investida: sua cópia continua aberta, a coisa lá no fundo ainda cai para você, e você ainda sai andando por conta própria. O que isso custa é tudo o que concluí-la teria pago. O chefe não deixa nada para o grupo que chegou em segundo, então o que você leva para casa é só o que caiu dos mobs pelo caminho, nada mais. O Livro dos Feitos ainda conta sua conclusão, porque você realmente derrubou a coisa. É a única corrida do jogo que dá para perder sem nunca ver o rosto de quem te venceu.",
       "rewardsHeading": "O que você leva para casa",
       "rewardsBody": "Selar uma fenda, não apenas sobreviver a ela, é o que compensa. Derrube a fenda primeiro e ela paga como o conteúdo instanciado equivalente ao nível dela, então os níveis mais difíceis valem a corrida mais dura. Selar também coloca um Anel da Fenda nas mãos de todos que estavam presentes, talhado para a função da sua classe e pessoal para você, além de deixar Essência da Fenda em suas bolsas, com gemas da fenda por cima disso nos níveis mais difíceis. Além do caminho de volta para casa, a coisa lá no fundo deixa uma reserva selada que seu grupo pode arrombar para saques extras, usando o mesmo arrombamento de fechaduras do Caminho dos Pinos que você já conhece dos baús de incursão, então um trabalho limpo e paciente paga melhor que um apressado. Nada disso chega a um grupo que ficou em segundo lugar: uma corrida perdida deixa para você só o que caiu dos mobs pelo caminho. O Livro dos Feitos é a exceção, e ele conta sua conclusão de qualquer jeito, com um feito por selar sua primeira fenda e outro por derrubar uma de nível S.",
+      "forgeHeading": "The Rift Forge",
+      "forgeBody": "The band a ranked first clear mints is not finished when you receive it. Riftwright Maelis, who keeps a forge in the Watch Meadow on the Farshore, up the shore from Gullhaven beside the Breach Scholar, will raise its item level one step at a time and set the coloured gems the rifts drop into its sockets, each colour one combat rating. A full band takes a new gem in place of its oldest, so you can retune it later. All of that is paid in Rift Essence and Rift gems, the forge currency that falls from rift bosses and trades freely, so a friend can hand you the essence you are short. Take the band off before you bring it to her: she works on what is in your bags, and she does nothing at all unless you are standing at her forge.",
       "trackerHeading": "O rastreador na sua tela",
       "trackerBody": "Enquanto você está lá dentro, uma pequena faixa na tela mantém você orientado: em qual andar você está, de quantos no total, e uma contagem regressiva ao vivo. Leia essa contagem com atenção, porque ela não é sua corrida se esgotando. É a entrada de volta ao mundo se fechando. Uma vez que você atravessa, seu grupo joga a fenda no seu próprio ritmo, por quanto tempo for preciso, mas quando esse relógio chega a zero o caminho de entrada desaparece para todos, então pense duas vezes antes de sair perto do fim dele."
     },
@@ -7960,6 +8017,7 @@ export const pt_BR: EnTranslations = {
       "forgeUpgraded": "Aprimoramento da fenda concluído para {name}.",
       "forgeEnchanted": "Encantamento da fenda concluído para {name}.",
       "forgeSocketed": "Gema da fenda encaixada para {name}.",
+      "forgeGemReplaced": "Rift gem replaced for {name}: {gem} destroyed.",
       "detonateGlacialGrave": "Sepultura Glacial detona!",
       "detonateAbsoluteZero": "Zero Absoluto explode!",
       "detonateMagmaWell": "O Poço de Magma explode!",
@@ -15882,6 +15940,11 @@ export const pt_BR: EnTranslations = {
         "name": "Nell Assustada",
         "title": "Pescadora de Gullhaven",
         "greeting": "Abriu bem onde as redes secam. Bem ali, onde eu ficava toda manhã da minha vida. Não desço mais até a praia. Não vou a quase lugar nenhum mais."
+      },
+      "riftwright_maelis": {
+        "name": "Riftwright Maelis",
+        "title": "Rift Forgemaster",
+        "greeting": "A Riftbound band remembers the break that made it, {className}. Bring me the band, and the essence the breaks shed, and I will teach it to remember more."
       },
       "forgemistress_darva": {
         "name": "Forjadora Darva",

@@ -21,6 +21,7 @@
 // color literal here) and the two typeahead timings are named constants.
 
 import { CLASSES } from '../sim/data';
+import { GUILD_ROSTER_PAGE_SEATS } from '../sim/guild_roster';
 import type { PlayerClass } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { deedTitleText } from './deed_i18n';
@@ -29,7 +30,7 @@ import { classDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { captureFormDraft, restoreFormDraft } from './form_draft';
 import { loadGuildHideOffline, saveGuildHideOffline } from './guild_hide_offline';
-import { formatDateTime, formatNumber, t, tPlural } from './i18n';
+import { formatDateTime, formatMoney, formatNumber, t, tPlural } from './i18n';
 import { localizeZone } from './server_i18n';
 import {
   blockRows,
@@ -39,6 +40,7 @@ import {
   type GuildView,
   guildDisplayedRole,
   guildRosterItems,
+  guildRosterView,
   guildView,
   ignoreRows,
   myPledgeView,
@@ -267,7 +269,14 @@ export class SocialWindow {
     if (struct !== this.lastStruct) {
       this.lastStruct = struct;
       this.lastContent = this.contentSig();
+      // A structural change mid-session (a bought roster page re-pricing the
+      // footer button, a rank change) rebuilds the whole panel, which would
+      // otherwise wipe a half-typed invite or billboard draft: capture and
+      // restore them around the rebuild, the relocalize() recipe.
+      const el = this.deps.root();
+      const draft = captureFormDraft(el);
       this.render();
+      restoreFormDraft(el, draft);
     } else {
       const content = this.contentSig();
       if (content !== this.lastContent) {
@@ -668,7 +677,16 @@ export class SocialWindow {
     const guildCount = formatNumber(g.memberCount, { maximumFractionDigits: 0 });
     // The guild name carries its lifetime-XP colour tier (the nameplate ladder,
     // shared .guild-tier-N classes with the guild board).
-    const head = `<div class="soc-guild-head"><span class="guild-tier-${g.tier}">${esc(g.name)}</span> <span class="gm">${esc(tPlural('hudChrome.plurals.guildMembers', g.memberCount, { rank: rankLabel(g.rank), count: guildCount }))}</span></div>`;
+    // The seat readout beside the rank line: the roster's bought cap
+    // (memberCap) is what the count is measured against, so a guild that has
+    // outgrown its base roster can see the ceiling it is buying pages toward.
+    const seats = esc(
+      t('hudChrome.social.roster.seats', {
+        count: guildCount,
+        cap: formatNumber(g.memberCap, { maximumFractionDigits: 0 }),
+      }),
+    );
+    const head = `<div class="soc-guild-head"><span class="guild-tier-${g.tier}">${esc(g.name)}</span> <span class="gm">${esc(tPlural('hudChrome.plurals.guildMembers', g.memberCount, { rank: rankLabel(g.rank), count: guildCount }))}</span> <span class="gm" data-field="roster-seats">${seats}</span></div>`;
     // The persisted "hide offline" toggle: a pressed-state button (a single click event
     // through the delegated body handler, unlike a label+checkbox that double-fires).
     const toggle =
@@ -866,6 +884,18 @@ export class SocialWindow {
         16,
         true,
       );
+    // Roster expansion (the pure core decides who may buy and at what price;
+    // the server re-prices and refuses everyone but the Guild Master anyway):
+    // the leader sees the next page's price on the button, or a disabled
+    // button once the ladder is complete; other ranks see nothing here.
+    const roster = guildRosterView(this.deps.world().socialInfo);
+    if (roster && guild.rank === 'leader') {
+      const label =
+        roster.nextRosterPrice === null
+          ? `<button class="btn" data-act="guild-expand" disabled>${esc(t('hudChrome.social.roster.maxed'))}</button>`
+          : `<button class="btn" data-act="guild-expand">${esc(t('hudChrome.social.roster.expand', { seats: formatNumber(GUILD_ROSTER_PAGE_SEATS, { maximumFractionDigits: 0 }), price: formatMoney(roster.nextRosterPrice) }))}</button>`;
+      foot += `<div class="soc-add soc-leave">${label}</div>`;
+    }
     // classic MMOs: a Guild Master with other members can't just leave (they disband,
     // or hand over leadership via the crown action). Everyone else can leave.
     foot +=
@@ -933,6 +963,24 @@ export class SocialWindow {
         if (n) {
           w.guildCreate(n);
           this.clearInput('gname');
+        }
+      } else if (act === 'guild-expand') {
+        // Gold leaves the buyer's own purse and never comes back, so the page
+        // is bought through the shared confirm prompt like a disband. The
+        // prompt re-reads the price from the pure core at click time.
+        const roster = guildRosterView(w.socialInfo);
+        if (roster?.canExpandRoster && roster.nextRosterPrice !== null) {
+          this.deps.showPrompt(
+            esc(
+              t('hudChrome.social.roster.confirm', {
+                seats: formatNumber(GUILD_ROSTER_PAGE_SEATS, { maximumFractionDigits: 0 }),
+                price: formatMoney(roster.nextRosterPrice),
+              }),
+            ),
+            t('hudChrome.social.roster.confirmAction'),
+            () => w.guildBuyRosterPage(),
+            () => {},
+          );
         }
       } else if (act === 'guild-leave')
         this.deps.showPrompt(

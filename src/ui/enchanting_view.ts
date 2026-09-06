@@ -76,6 +76,7 @@ export interface ApplyEnchantResultEvent {
     // #2415: the honest already-enchanted deny (no confirm flag), and the
     // identical-enchant-id re-apply denied on every arm.
     | 'already_enchanted'
+    | 'rift_gear'
     | 'same_enchant'
     | 'busy';
 }
@@ -176,6 +177,8 @@ export function applyEnchantResultToast(ev: ApplyEnchantResultEvent): Enchanting
       return { key: 'hudChrome.enchanting.alreadyEnchanted', sink: 'error' };
     case 'same_enchant':
       return { key: 'hudChrome.enchanting.sameEnchant', sink: 'error' };
+    case 'rift_gear':
+      return { key: 'hudChrome.enchanting.riftGear', sink: 'error' };
     default:
       return { key: 'hudChrome.enchanting.notHeld', sink: 'error' };
   }

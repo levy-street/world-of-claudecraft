@@ -1927,6 +1927,7 @@
   /* lifetime-XP leaderboard panel (modeled on the quest-log window) */
   #leaderboard-window,
   #guild-board-window,
+  #rift-forge-window,
   #daily-rewards-window {
     width: 480px;
   }
@@ -1937,8 +1938,105 @@
      unconditional because the inline display:flex is; with the shell default (row)
      the header, tabs and board would lay out side by side. */
   #leaderboard-window,
-  #guild-board-window {
+  #guild-board-window,
+  #rift-forge-window {
     flex-direction: column;
+  }
+
+  /* ---------- rift forge ---------- */
+  /* The Riftwright's window (src/ui/hud/rift_forge/): a wallet strip, one
+     card per Riftbound band with its two forge lines, and a status line.
+     Rides the leaderboard family's column shell and lb-* empty state. */
+  #rift-forge-window .rf-greeting {
+    padding: 4px 2px 2px;
+    font-size: 12px;
+    font-style: italic;
+    color: var(--color-text-muted);
+  }
+  #rift-forge-window .rf-wallet {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    padding: 6px 2px;
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  #rift-forge-window .rf-currency {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  #rift-forge-window .rf-icon {
+    width: 18px;
+    height: 18px;
+    vertical-align: middle;
+  }
+  #rift-forge-window .rf-body {
+    overflow-y: auto;
+    max-height: 56vh;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  #rift-forge-window .rf-ring {
+    border: 1px solid var(--color-border-default);
+    border-radius: 4px;
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  #rift-forge-window .rf-ring-worn {
+    opacity: 0.75;
+  }
+  #rift-forge-window .rf-ring-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  #rift-forge-window .rf-ring-name {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--title-font);
+    font-size: 14px;
+  }
+  #rift-forge-window .rf-ring-tier {
+    margin-left: auto;
+    font-size: 11.5px;
+    color: var(--color-text-muted);
+  }
+  #rift-forge-window .rf-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+  }
+  #rift-forge-window .rf-line-label {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  #rift-forge-window .rf-gems {
+    display: inline-flex;
+    gap: 2px;
+    vertical-align: middle;
+  }
+  #rift-forge-window .rf-select {
+    max-width: 150px;
+  }
+  #rift-forge-window .rf-max,
+  #rift-forge-window .rf-hint {
+    font-size: 11.5px;
+    color: var(--color-text-muted);
+  }
+  #rift-forge-window .rf-status {
+    min-height: 18px;
+    padding: 6px 2px 0;
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  #rift-forge-window .rf-status-error {
+    color: var(--color-text-error);
   }
   /* The signpost guild board's own chrome: the roster drill-in's back/header
      row and the rank chips; everything else rides the lb-* family. */

@@ -98,6 +98,7 @@ import {
   type ActionBarWorldInput,
   createActionBarView,
 } from '../src/ui/hud/action_bar/action_bar_view';
+import { createTargetDotsView } from '../src/ui/hud/target_dots';
 import { makeWriterFacet, type PainterHostWriters } from '../src/ui/painter_host';
 import type { SwingTimerState } from '../src/ui/swing_timer';
 import { SwingTimerPainter } from '../src/ui/swing_timer_painter';
@@ -562,6 +563,16 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'hud/quest/quest_strip_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/cross_hotbar/cross_hotbar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/warlock/doom_meter_painter.ts', allow: {}, reflowAllow: {} },
+  // target_dots is the tracker-painter contract on the same budget as the deed
+  // and reliquary strips: ONE constructor innerHTML write for the whole row pool,
+  // the frame's role + aria-label set once in that same constructor, and every
+  // per-frame write (fill width, school attr, label, countdown, stacks, the
+  // on-target and expiring classes) facet-routed.
+  {
+    file: 'hud/target_dots/target_dots_painter.ts',
+    allow: { '.innerHTML': 1, '.setAttribute': 2 },
+    reflowAllow: {},
+  },
   { file: 'party_frames_painter.ts', allow: {}, reflowAllow: {} },
   // party_below_target measures the target frame, its #tf-debuffs strip, the
   // party container, and (on mobile) the rows wrapper + move zone (five rect
@@ -2883,6 +2894,43 @@ describe('hud_perf_budget ARM 2: per-frame allocation budget (Node, npm test)', 
       }).not.toThrow();
     });
   }
+
+  // target_dots_view sits in the same band as auras_view above and makes the
+  // same reuse claim, so it is held to the same probe rather than to a
+  // hand-rolled identity assertion in its own suite.
+  it('target_dots_view reuses its state container and row array every tick', () => {
+    const view = createTargetDotsView({
+      isOwn: () => true,
+      auraName: (a) => a.id,
+      targetName: (e) => e.name,
+      iconKey: (a) => a.id,
+    });
+    const entities = [
+      {
+        id: 1,
+        kind: 'mob',
+        name: 'Dummy',
+        dead: false,
+        auras: [
+          {
+            id: 'corruption',
+            name: 'Blackrot',
+            kind: 'dot' as const,
+            value: 6,
+            remaining: 12,
+            duration: 18,
+            sourceId: 4,
+            school: 'shadow',
+          },
+        ],
+      },
+    ];
+    const tick = () => view.tick({ entities, targetId: 1, enabled: true });
+    expect(() => {
+      assertAllocationStable(tick, 64, 'target_dots_view container');
+      assertAllocationStable(() => tick().rows, 64, 'target_dots_view rows');
+    }).not.toThrow();
+  });
 });
 
 // --------------------------------------------------------------------------

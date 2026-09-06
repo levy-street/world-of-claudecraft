@@ -481,6 +481,16 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
             // when this lease lands first, the migration sees it and refuses apply.
             // If the reload fails, release the lease before propagating/rejecting so
             // an unavailable row cannot strand the character until lease expiry.
+            //
+            // The previous session's last action-bar save may still be on its way
+            // to the row (HotbarLayoutStore holds it as pending until the write
+            // settles). Capture it BEFORE the reload below, so the join seeds from
+            // the newer of the two whichever side of that read the commit lands
+            // on: a document captured here is at least as new as any row this
+            // handshake can read, and once it settles the reload returns the same
+            // layout. Read after the reload it would race the settle and hand
+            // game.join the stale copy from the ownership read.
+            const queuedHotbarLayout = game.hotbarLayouts.pending(character.id);
             try {
               const refreshedCharacter = await getCharacter(accountId, character.id);
               if (!refreshedCharacter) {
@@ -518,6 +528,10 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
               admittedCharacter.is_gm,
               {
                 ...joinMeta,
+                // The fresh arm re-read the row after the lease: that copy, or
+                // the still-queued document captured before it, supersedes the
+                // ownership-read copy joinMeta carries (game.join re-validates).
+                hotbarLayout: queuedHotbarLayout ?? admittedCharacter.hotbar_layout ?? null,
                 leaseNonce,
                 bankBonus,
                 firstCharacter,

@@ -1,6 +1,7 @@
 import type { PoolClient } from 'pg';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { GUILD_BANK_PURGE_ACTION } from '../server/admin_db';
+import { GUILD_ROSTER_MAX_MEMBERS } from '../src/sim/guild_roster';
 
 const mocks = vi.hoisted(() => ({
   query: vi.fn(),
@@ -229,7 +230,7 @@ describe('admin guild database access', () => {
     expect(sql).toContain('g.id = $1 AND g.realm = $2');
     expect(sql).toContain('LIMIT $3');
     expect(sql).not.toContain('state');
-    expect(params).toEqual([4, 'test-realm', 100]);
+    expect(params).toEqual([4, 'test-realm', GUILD_ROSTER_MAX_MEMBERS]);
   });
 
   it('retains a bounded rename history without exposing deleted guilds', async () => {
@@ -303,7 +304,7 @@ describe('admin guild database access', () => {
     expect(client.query.mock.calls[2][1]).toEqual(['guild-name:test-realm:new name']);
     expect(client.query.mock.calls[3][0]).toContain('lower(name) = lower($2)');
     expect(client.query.mock.calls[3][1]).toEqual(['test-realm', 'New Name', 4]);
-    expect(client.query.mock.calls[5][1]).toEqual([4, 101]);
+    expect(client.query.mock.calls[5][1]).toEqual([4, GUILD_ROSTER_MAX_MEMBERS + 1]);
     expect(client.query.mock.calls[6][1]).toEqual([
       4,
       'test-realm',
@@ -334,7 +335,7 @@ describe('admin guild database access', () => {
     const maximums = transactionClient();
     const name = 'ABCDEFGHIJKLMNOPQRSTUVWX';
     const reason = 'x'.repeat(500);
-    const memberRows = Array.from({ length: 100 }, (_, index) => ({
+    const memberRows = Array.from({ length: GUILD_ROSTER_MAX_MEMBERS }, (_, index) => ({
       character_id: index + 1,
     }));
     maximums.query
@@ -424,10 +425,10 @@ describe('admin guild database access', () => {
     });
     // Self-exclusion is what makes this safe: the collision probe passes the guild id.
     expect(client.query.mock.calls[3][1]).toEqual(['test-realm', 'Historical Name', 4]);
-    // The rename fan-out list is read cap-bounded, not whole-roster: 100 members
+    // The rename fan-out list is read cap-bounded, not whole-roster: the roster ceiling
     // plus the single extra row that proves an overflow.
     expect(client.query.mock.calls[5][0]).toMatch(/FROM guild_members[\s\S]*LIMIT \$2/);
-    expect(client.query.mock.calls[5][1]).toEqual([4, 101]);
+    expect(client.query.mock.calls[5][1]).toEqual([4, GUILD_ROSTER_MAX_MEMBERS + 1]);
     expect(client.query).toHaveBeenLastCalledWith('COMMIT');
   });
 
@@ -460,7 +461,7 @@ describe('admin guild database access', () => {
       .mockResolvedValueOnce({ rows: [] })
       .mockResolvedValueOnce({ rows: [], rowCount: 1 })
       .mockResolvedValueOnce({
-        rows: Array.from({ length: 101 }, (_, characterId) => ({
+        rows: Array.from({ length: GUILD_ROSTER_MAX_MEMBERS + 1 }, (_, characterId) => ({
           character_id: characterId + 1,
         })),
       })

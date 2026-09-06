@@ -95,6 +95,9 @@ function setup() {
     beginChatModerationHydration: vi.fn((accountId: number) =>
       chatModerationLiveState.beginHydration(accountId),
     ),
+    // The fresh-join arm asks the action-bar store for a still-queued document
+    // before its post-lease reload; this file has nothing queued.
+    hotbarLayouts: { pending: () => null },
   };
   const deps: WsAuthDeps = {
     game: game as unknown as WsAuthDeps['game'],

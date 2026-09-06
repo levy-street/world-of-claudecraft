@@ -119,6 +119,23 @@ describe('bag_item_context_menu: special-copy classification', () => {
     expect(isSpecialCopy({ rolled: { stats: { str: 5 } } } as ItemInstancePayload)).toBe(true);
     // A legacy rolled.quality-only copy is NOT special (never signed/mw/enchanted).
     expect(isSpecialCopy({ rolled: { quality: 'rare' } } as ItemInstancePayload)).toBe(false);
+    // A Riftbound band: its rolled line is the ladder's, not an enchant
+    // (isEnchantedInstance is false for it), but the copy is a personal
+    // first-clear reward, so it stays special.
+    expect(
+      isSpecialCopy({
+        rolled: { quality: 'epic', stats: { str: 8, sta: 6 } },
+        rift: {
+          sourceEventId: 'e',
+          tier: 'S',
+          power: 4,
+          upgradeLevel: 0,
+          maxUpgradeLevel: 5,
+          gemSlots: 2,
+          gems: [],
+        },
+      } as ItemInstancePayload),
+    ).toBe(true);
   });
 });
 

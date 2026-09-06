@@ -370,6 +370,9 @@ export function recalcPlayerStats(
       bonusSp += Number.isFinite(rolled.spellPower) ? rolled.spellPower : 0;
       bonusCritRating += Number.isFinite(rolled.critRating) ? rolled.critRating : 0;
       bonusHasteRating += Number.isFinite(rolled.hasteRating) ? rolled.hasteRating : 0;
+      // A Riftbound band's verdant gem line (rift/band_ladder.ts); no other
+      // per-copy writer authors hit, so a plain copy stays a no-op here too.
+      bonusHitRating += Number.isFinite(rolled.hitRating) ? rolled.hitRating : 0;
     }
   }
   // Item-set bonuses from equipped pieces. Flat primary stats join the gear

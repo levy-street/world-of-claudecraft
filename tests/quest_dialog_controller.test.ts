@@ -296,6 +296,16 @@ describe('QuestDialogController', () => {
     expect(banker.interact).toHaveBeenCalledTimes(1);
     expect(banker.element.style.display).not.toBe('block');
 
+    // The Riftwright (riftForge flag) takes the same short-circuit: the sim's
+    // interact emits the window-opening event, identical on every host.
+    const forgeId = Object.values(NPCS).find((definition) => definition.riftForge)?.id;
+    if (!forgeId) throw new Error('rift forge fixture not found');
+    const forge = harness(npc(22, forgeId));
+    forge.controller.open(22);
+    expect(forge.targetEntity).toHaveBeenCalledWith(22);
+    expect(forge.interact).toHaveBeenCalledTimes(1);
+    expect(forge.element.style.display).not.toBe('block');
+
     const chronicler = harness(npc(21, CHRONICLER_TEMPLATE_IDS[0]));
     chronicler.controller.open(21);
 

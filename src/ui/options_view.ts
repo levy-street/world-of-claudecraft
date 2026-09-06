@@ -915,6 +915,15 @@ export function buildInterfaceControls(
       boolToggle(s, 'walkByAutoloot', 'hudChrome.options.walkByAutoloot'),
       boolToggle(s, 'groundReticle', 'hudChrome.options.groundReticle'),
       boolToggle(s, 'stickyTarget', 'hudChrome.options.stickyTarget'),
+      // The two dot-tracking surfaces, both showing only the LOCAL player's own
+      // debuffs: the icon row on an enemy's nameplate, and the standalone Target
+      // dots frame that tracks them across every enemy at once.
+      boolToggle(s, 'showNameplateDots', 'hudChrome.options.showNameplateDots'),
+      // Directly under its toggle, because it sizes exactly that row: 100% is
+      // the plate-native size and the slider only grows it, to 300%. Percent is
+      // the default slider format, so the readout says "150%".
+      slider(s, 'nameplateDotScale', 'hudChrome.options.nameplateDotScale'),
+      boolToggle(s, 'showTargetDots', 'hudChrome.options.showTargetDots'),
       slider(s, 'fctScale', 'hud.options.fctScale'),
       // The secondary/third bar toggles deliberately have NO menu rows: the
       // plus/minus buttons on the primary action bar are the one control for

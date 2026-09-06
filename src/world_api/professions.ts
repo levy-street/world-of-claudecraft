@@ -177,6 +177,8 @@ export interface ApplyEnchantResultView {
     // re-apply whose accept would be pure reagent loss.
     | 'already_enchanted'
     | 'same_enchant'
+    // A Riftbound band: forge-only, refused by id (professions/enchanting.ts).
+    | 'rift_gear'
     | 'busy';
 }
 

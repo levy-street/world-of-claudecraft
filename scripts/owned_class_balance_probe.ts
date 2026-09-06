@@ -1,8 +1,11 @@
 import { stoneboundThreatMultiplier } from '../src/sim/combat/shaman_warspirit';
+import { RIFT_GEAR_ITEM_ID_SET } from '../src/sim/content/rift/items';
 import type { TalentAllocation } from '../src/sim/content/talents';
 import { ITEMS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { updateMobTarget } from '../src/sim/mob/targeting';
+import { RIFT_BAND_GEM_SLOTS, RIFT_BAND_MAX_UPGRADE } from '../src/sim/rift/band_ladder';
+import { sanitizeRiftGearInstance } from '../src/sim/rift/progression';
 import { Sim } from '../src/sim/sim';
 import {
   dist2d,
@@ -479,7 +482,30 @@ function equipPbeLoadout(sim: Sim, spec: OwnedDpsSpec): void {
 function equipExactLoadout(sim: Sim, loadout: PbeLoadout): void {
   for (const [slot, itemId] of Object.entries(loadout) as [EquipSlot, string][]) {
     if (!ITEMS[itemId]) throw new Error(`missing PBE fixture item ${itemId}`);
-    sim.addItem(itemId, 1);
+    if (RIFT_GEAR_ITEM_ID_SET.has(itemId)) {
+      // A Riftbound band is priced by its copy (src/sim/rift/band_ladder.ts);
+      // the shell alone is an empty ring. The BiS fixture wears the maxed S
+      // band on the shell the loadout names, both sockets on the DPS ratings.
+      const maxed = sanitizeRiftGearInstance(
+        itemId,
+        {
+          rift: {
+            sourceEventId: 'probe-bis',
+            tier: 'S',
+            power: 4, // re-derived by the sanitizer from the tier
+            upgradeLevel: RIFT_BAND_MAX_UPGRADE,
+            maxUpgradeLevel: RIFT_BAND_MAX_UPGRADE,
+            gemSlots: RIFT_BAND_GEM_SLOTS.S,
+            gems: ['rift_gem_verdant', 'rift_gem_crimson'],
+          },
+        },
+        sim.playerId,
+      );
+      if (!maxed) throw new Error(`could not mint the PBE fixture band ${itemId}`);
+      sim.addItemInstance(itemId, maxed);
+    } else {
+      sim.addItem(itemId, 1);
+    }
     sim.equipItemToSlot(itemId, slot);
   }
   const equipment = sim.players.get(sim.playerId)?.equipment;

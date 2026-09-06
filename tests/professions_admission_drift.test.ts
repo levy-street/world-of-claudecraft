@@ -30,6 +30,7 @@ import {
   resolveDisenchant,
 } from '../src/sim/professions/enchanting';
 import { evaluateSalvageAdmission, resolveSalvage } from '../src/sim/professions/salvage';
+import { createRiftGearInstance } from '../src/sim/rift/progression';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import type { Entity, EquipSlot, InvSlot, SimEvent } from '../src/sim/types';
 import { completeRechargeCast } from './helpers/enchant_family_cast';
@@ -287,6 +288,19 @@ describe('apply-enchant admission matches its resolver (shared gates)', () => {
       enchantId: HELMET_ENCHANT,
       setup: (sim, _meta, pid) => {
         sim.addItem(SWORD, 1, pid);
+        sim.addItem(DUST, 5, pid);
+      },
+    },
+    {
+      // Riftbound bands are forge-only: refused by id on both halves so a
+      // doomed cast never starts (a ring enchant would otherwise admit it).
+      name: 'a Riftbound band (forge-only gear)',
+      expected: 'rift_gear',
+      itemId: 'riftbound_band_of_might',
+      enchantId: 'enchant_ring_spirit',
+      setup: (sim, _meta, pid) => {
+        const band = createRiftGearInstance('drift', 'S', 'warrior', pid);
+        sim.addItemInstance(band.itemId, band.instance, pid);
         sim.addItem(DUST, 5, pid);
       },
     },

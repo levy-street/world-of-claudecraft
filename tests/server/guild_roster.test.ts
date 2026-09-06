@@ -15,11 +15,13 @@ vi.mock('../../server/db', () => ({
 import { runWithStatementTimeout } from '../../server/db';
 import {
   guildRosterCached,
+  ROSTER_MEMBER_LIMIT,
   readGuildRoster,
   resetGuildRosterCacheForTests,
   routes,
 } from '../../server/guild_roster';
 import { resetPublicReadRateLimits } from '../../server/ratelimit';
+import { GUILD_ROSTER_MAX_MEMBERS } from '../../src/sim/guild_roster';
 import { type FakeRes, fakeCtx, makeReq } from './helpers';
 
 const runMock = vi.mocked(runWithStatementTimeout);
@@ -65,6 +67,15 @@ afterEach(() => {
   resetGuildRosterCacheForTests();
   resetPublicReadRateLimits();
   runMock.mockReset();
+});
+
+describe('guild roster row bound', () => {
+  it('derives the public read bound from the largest roster the ladder allows', () => {
+    // A guild that bought every page must not have its public roster silently
+    // truncated below what the admin detail shows.
+    expect(ROSTER_MEMBER_LIMIT).toBe(GUILD_ROSTER_MAX_MEMBERS);
+    expect(ROSTER_MEMBER_LIMIT).toBe(1000);
+  });
 });
 
 describe('guild roster route table', () => {

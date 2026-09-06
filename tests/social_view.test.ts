@@ -6,6 +6,7 @@ import {
   type GuildRosterItem,
   guildDisplayedRole,
   guildRosterItems,
+  guildRosterView,
   guildView,
   ignoreRows,
   myPledgeView,
@@ -116,6 +117,26 @@ describe('socialStructSig', () => {
       guild: { ...(SOCIAL.guild as GuildInfo), rank: 'member' },
     };
     expect(socialStructSig('friends', demoted, null)).not.toBe(base);
+  });
+
+  it('changes when the roster cap or the next page price changes (the footer button reads them)', () => {
+    const base = socialStructSig('guild', SOCIAL, null);
+    const guild = SOCIAL.guild as GuildInfo;
+    const bought: SocialInfo = {
+      ...SOCIAL,
+      guild: { ...guild, memberCap: (guild.memberCap ?? 100) + 20 },
+    };
+    expect(socialStructSig('guild', bought, null)).not.toBe(base);
+    const repriced: SocialInfo = {
+      ...SOCIAL,
+      guild: { ...guild, nextRosterPrice: (guild.nextRosterPrice ?? 0) + 1 },
+    };
+    expect(socialStructSig('guild', repriced, null)).not.toBe(base);
+    // The ladder's end (nothing left to buy) is its own structure too.
+    const maxed: SocialInfo = { ...SOCIAL, guild: { ...guild, nextRosterPrice: null } };
+    expect(socialStructSig('guild', maxed, null)).not.toBe(
+      socialStructSig('guild', repriced, null),
+    );
   });
 
   it('changes when the open-pledge count changes (the Pledges tab label carries it)', () => {
@@ -589,5 +610,66 @@ describe('ClientWorld-vs-Sim parity', () => {
     expect(friendRows(sim.social)).toEqual(friendRows(cli.social));
     expect(guildView(sim.social, 'Me')).toEqual(guildView(cli.social, 'Me'));
     expect(raidView(sim.party, 1)).toEqual(raidView(cli.party, 1));
+  });
+});
+
+describe('guild roster expansion (docs/prd/guild-roster-expansion.md)', () => {
+  const withRoster = (
+    rank: 'leader' | 'officer' | 'member',
+    roster: { memberCap?: number; nextRosterPrice?: number | null },
+  ): SocialInfo => ({
+    ...SOCIAL,
+    guild: { ...(SOCIAL.guild as GuildInfo), rank, ...roster },
+  });
+
+  it('passes the cap and the next price through, and only the leader may buy', () => {
+    const leader = guildView(
+      withRoster('leader', { memberCap: 120, nextRosterPrice: 1_200_000 }),
+      'Me',
+    ).guild!;
+    expect(leader.memberCap).toBe(120);
+    expect(leader.nextRosterPrice).toBe(1_200_000);
+    expect(leader.canExpandRoster).toBe(true);
+    for (const rank of ['officer', 'member'] as const) {
+      const view = guildView(withRoster(rank, { memberCap: 120, nextRosterPrice: 1_200_000 }), 'Me')
+        .guild!;
+      expect(view.memberCap, rank).toBe(120);
+      expect(view.canExpandRoster, rank).toBe(false);
+    }
+  });
+
+  it('a complete ladder (null price) leaves the leader nothing to buy', () => {
+    const view = guildView(withRoster('leader', { memberCap: 1000, nextRosterPrice: null }), 'Me')
+      .guild!;
+    expect(view.nextRosterPrice).toBeNull();
+    expect(view.canExpandRoster).toBe(false);
+  });
+
+  it('a frame from an older server (no roster fields) falls back to the base roster', () => {
+    // SOCIAL carries neither field: the pre-expansion mirror shape.
+    const view = guildView(SOCIAL, 'Me').guild!;
+    expect(view.memberCap).toBe(100);
+    expect(view.nextRosterPrice).toBeNull();
+    expect(view.canExpandRoster).toBe(false);
+  });
+});
+
+describe('guildRosterView (the footer read, no row mapping)', () => {
+  it('matches guildView for every rank and is null for a guildless viewer', () => {
+    for (const rank of ['leader', 'officer', 'member'] as const) {
+      const social: SocialInfo = {
+        ...SOCIAL,
+        guild: { ...(SOCIAL.guild as GuildInfo), rank, memberCap: 140, nextRosterPrice: 2_000_000 },
+      };
+      const full = guildView(social, 'Me').guild!;
+      expect(guildRosterView(social), rank).toEqual({
+        memberCap: full.memberCap,
+        nextRosterPrice: full.nextRosterPrice,
+        canExpandRoster: full.canExpandRoster,
+      });
+      expect(guildRosterView(social)?.canExpandRoster, rank).toBe(rank === 'leader');
+    }
+    expect(guildRosterView({ ...SOCIAL, guild: null })).toBeNull();
+    expect(guildRosterView(null)).toBeNull();
   });
 });

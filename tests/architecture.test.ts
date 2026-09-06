@@ -213,6 +213,7 @@ const UI_PURE_CORES = [
   'src/ui/map_semantic_accessibility_core.ts',
   'src/ui/paladin_devotion_view.ts',
   'src/ui/aura_icon_view.ts',
+  'src/ui/aura_strip_order_core.ts',
   'src/ui/aura_overlay_view.ts',
   'src/ui/banner_queue.ts',
   'src/ui/item_kind_label.ts',
@@ -457,6 +458,8 @@ const UI_PURE_CORES = [
   // The signpost guild board's roster drill-in core (the board itself reuses
   // guild_leaderboard_view above).
   'src/ui/hud/guild_board/guild_roster_view.ts',
+  // The Rift Forge window's row/affordance core (the Riftwright's service).
+  'src/ui/hud/rift_forge/rift_forge_view.ts',
   'src/ui/dev_leaderboard_view.ts',
   'src/ui/dev_command_view.ts',
   'src/ui/dev_item_picker_view.ts',
@@ -540,6 +543,7 @@ const UI_PURE_CORES = [
   'src/ui/trade_woc_view.ts',
   'src/ui/hud/rift/rift_floor_tracker_view.ts',
   'src/ui/hud/woc_trade/woc_trade_offer_view.ts',
+  'src/ui/hud/target_dots/target_dots_view.ts',
   'src/ui/safe_local_storage.ts',
 ].map((rel) => join(repoRoot, rel));
 
@@ -700,6 +704,7 @@ const RENDER_PURE_CORES = [
   'src/render/nameplate_view.ts',
   'src/render/nameplate_pick_core.ts',
   'src/render/nameplate_heraldry_core.ts',
+  'src/render/nameplate_dots_core.ts',
   'src/render/net_interp_core.ts',
   'src/render/paladin_ascension_core.ts',
   'src/render/paladin_sun_verdict_core.ts',

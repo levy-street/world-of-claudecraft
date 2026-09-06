@@ -9,10 +9,13 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random or
 // Date.now (enforced by tests/architecture.test.ts).
 
+import { RIFT_GEAR_ITEM_ID_SET } from '../content/rift/items';
 import { ITEMS } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { canEquipItemInSlot } from '../equipment_rules';
 import { refreshModsForEquipmentChange } from '../progression/talents';
+import { RIFT_BAND_MAX_UPGRADE } from '../rift/band_ladder';
+import { createRiftGearInstance } from '../rift/progression';
 import type { SimContext } from '../sim_context';
 import type { EquipSlot, ItemDef } from '../types';
 import { ALL_EQUIP_SLOTS } from '../types';
@@ -96,8 +99,21 @@ function applyDevGear(
   }
   let equipped = 0;
   for (const [slot, itemId] of Object.entries(picks) as [EquipSlot, string][]) {
-    meta.equipment[slot] = itemId;
-    if (meta.equipmentInstance) delete meta.equipmentInstance[slot];
+    delete meta.equipmentInstance[slot];
+    if (RIFT_GEAR_ITEM_ID_SET.has(itemId)) {
+      // A Riftbound band is priced by its copy (rift/band_ladder.ts): the
+      // shell alone is an empty ring, so the kit mints the maxed S band the
+      // parse loadout implies (every upgrade, both sockets filled with the
+      // two DPS ratings), on the class shell the wearer would have earned.
+      const band = createRiftGearInstance('dev-bis', 'S', meta.cls, pid, RIFT_BAND_MAX_UPGRADE, [
+        'rift_gem_verdant',
+        'rift_gem_crimson',
+      ]);
+      meta.equipment[slot] = band.itemId;
+      meta.equipmentInstance[slot] = band.instance;
+    } else {
+      meta.equipment[slot] = itemId;
+    }
     equipped++;
   }
   refreshModsForEquipmentChange(ctx, meta);

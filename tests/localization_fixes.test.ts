@@ -578,6 +578,12 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
     'Loadout "PvP" applied.',
     'Deleted build "PvP".',
     'You may choose a specialization at level 10.',
+    // The Rift forge log lines (src/sim/rift/progression.ts emitResult) reach
+    // ctx.emit through a variable, so the emit scanner below cannot see them;
+    // pinned here by sample instead, item names included.
+    'Rift upgrade completed for Riftbound Band of Might.',
+    'Rift gem socketed for Riftbound Band of Might.',
+    'Rift gem replaced for Riftbound Band of Might: Verdant Rift Gem destroyed.',
     'You can save at most 5 loadouts.',
     'You have prestiged! Prestige Rank 2.',
     'You dismiss Forest Wolf.',

@@ -12,7 +12,12 @@
 // gesture on the mobile layout and the stylesheet hides the chrome there, so an
 // unlocked interface on a phone is inert rather than half-working.
 
-import { framesToLock, type HudFrameSpec, type UnlockCandidate } from './interface_unlock_core';
+import {
+  framesToLock,
+  HUD_FRAME_SPECS,
+  type HudFrameSpec,
+  type UnlockCandidate,
+} from './interface_unlock_core';
 import type { MovableFrame } from './movable_frame';
 
 /** Where a re-homed frame came from, so locking can put it back exactly. */
@@ -450,6 +455,31 @@ export class InterfaceUnlock {
   }
 }
 
+/** The class a frame wears while a custom position applies (hud.css re-asserts
+ *  `position: absolute` on it, so a row lifted out of a flex column keeps its
+ *  saved left/top). */
+const HUD_FRAME_DETACHED_CLASS = 'hud-frame-detached';
+
+/**
+ * The slot a frame returns to when its custom position stops applying: the
+ * spec's declared stock home, resolved NOW against the live tree, else the
+ * slot captured at detach time. A declared home wins because a captured
+ * `nextSibling` can have left the parent since (the other aura row, detached
+ * too), and a parent captured while the frame sat somewhere transient is not
+ * a stock slot at all.
+ */
+function resolveStockHome(
+  doc: Document,
+  spec: HudFrameSpec,
+  captured: FrameHome | null,
+): FrameHome | null {
+  const stock = spec.stockHome;
+  if (!stock) return captured;
+  const parent = doc.getElementById(stock.parentId);
+  if (!parent) return null;
+  return { parent, next: stock.slot === 'first' ? parent.firstChild : null };
+}
+
 /**
  * Re-home a frame onto #ui while a custom position applies, and back to its
  * stock slot when it stops. A frame inside #bottom-bar (the action bars, the pet
@@ -458,24 +488,57 @@ export class InterfaceUnlock {
  * resolve in the wrong coordinates. This is the same move Hud already makes for
  * the player frame, generalized so every table row can share it: the element
  * refs the painters hold are live nodes, so they survive the reparent.
+ *
+ * The release half only puts back what the detacher took: a frame that is not
+ * on #ui at that moment belongs to another owner (the buff row docked on the
+ * player frame by the auras-on-frame option), who restores it on its own
+ * transition through restoreFrameHome below.
  */
 export function makeUiRootDetacher(
   doc: Document,
   spec: HudFrameSpec,
   frame: HTMLElement,
 ): (active: boolean) => void {
-  let home: FrameHome | null = null;
+  let captured: FrameHome | null = null;
   return (active: boolean) => {
-    frame.classList.toggle('hud-frame-detached', active);
+    frame.classList.toggle(HUD_FRAME_DETACHED_CLASS, active);
     if (!spec.detachToUiRoot) return;
+    const uiRoot = doc.getElementById('ui');
+    if (!uiRoot) return;
     if (active) {
-      const uiRoot = doc.getElementById('ui');
-      if (!uiRoot || frame.parentNode === uiRoot) return;
-      home ??= { parent: frame.parentNode as Node, next: frame.nextSibling };
+      if (frame.parentNode === uiRoot) return;
+      captured ??= { parent: frame.parentNode as Node, next: frame.nextSibling };
       uiRoot.appendChild(frame);
       return;
     }
+    if (frame.parentNode !== uiRoot) return;
+    const home = resolveStockHome(doc, spec, captured);
     if (!home || frame.parentNode === home.parent) return;
     home.parent.insertBefore(frame, home.next);
   };
+}
+
+/**
+ * Put a frame the HOST moved somewhere transient (the buff row on the player
+ * frame) back where the detacher would have it: on #ui while it still carries a
+ * custom position, else in its declared stock slot. The class is the truth here,
+ * not a remembered parent: a remembered parent is whatever the frame sat on when
+ * the host first looked, which was #ui whenever a saved position applied at boot.
+ * `frameId` names the HUD_FRAME_SPECS row, and the element comes from that row
+ * so the two cannot disagree. An unknown id, a row that declares no stock home,
+ * or an element missing from the document is a no-op: there is nothing to
+ * restore to (tests/interface_unlock_core.test.ts pins the ids hud.ts uses).
+ */
+export function restoreFrameHome(doc: Document, frameId: string): void {
+  const spec = HUD_FRAME_SPECS.find((s) => s.id === frameId);
+  const frame = spec && doc.getElementById(spec.elementId);
+  if (!spec || !frame) return;
+  if (frame.classList.contains(HUD_FRAME_DETACHED_CLASS)) {
+    const uiRoot = doc.getElementById('ui');
+    if (uiRoot && frame.parentNode !== uiRoot) uiRoot.appendChild(frame);
+    return;
+  }
+  const home = resolveStockHome(doc, spec, null);
+  if (!home || frame.parentNode === home.parent) return;
+  home.parent.insertBefore(frame, home.next);
 }

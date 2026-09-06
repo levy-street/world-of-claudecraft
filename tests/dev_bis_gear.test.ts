@@ -10,6 +10,7 @@ import {
 } from '../src/sim/dev/bis_gear';
 import { parseBisGearFor } from '../src/sim/dev/parse_bis_loadouts';
 import { canEquipItemInSlot } from '../src/sim/equipment_rules';
+import { RIFT_BAND_MAX_UPGRADE, RIFT_GEM_RATING } from '../src/sim/rift/band_ladder';
 import { Sim } from '../src/sim/sim';
 import type { EquipSlot } from '../src/sim/types';
 
@@ -45,6 +46,38 @@ describe('dev bis gear', () => {
     const thugMh = ITEMS[thuggery.mainhand ?? ''];
     expect(thugMh?.kind === 'weapon' && thugMh.hand !== 'twohand').toBe(true);
     expect(thuggery.offhand).toBeDefined();
+  });
+
+  it('mints a maxed S Riftbound band copy for every band the parse loadout names', () => {
+    // A band's ItemDef is a stat-free shell (rift/band_ladder.ts prices the
+    // copy), so equipping the loadout's id alone would put an empty ring on
+    // the finger. The kit mints the S+5 copy the top parse implies.
+    const sim = new Sim({ seed: 9, playerClass: 'warrior', autoEquip: true });
+    sim.setPlayerLevel(20);
+    expect(sim.setSpec('prot')).toBe(true);
+    const loadout = parseBisGearFor('warrior', 'prot');
+    expect(loadout?.ring1).toBe('riftbound_band_of_might');
+    equipBestInSlotForDev(
+      (sim as unknown as { ctx: Parameters<typeof equipBestInSlotForDev>[0] }).ctx,
+      sim.player.id,
+      'prot',
+    );
+    for (const slot of ['ring1', 'ring2'] as const) {
+      expect(sim.equipment[slot]).toBe('riftbound_band_of_might');
+      const copy = sim.equipmentInstances[slot];
+      expect(copy?.rift).toEqual(
+        expect.objectContaining({
+          tier: 'S',
+          upgradeLevel: RIFT_BAND_MAX_UPGRADE,
+          gems: ['rift_gem_verdant', 'rift_gem_crimson'],
+        }),
+      );
+      expect(copy?.rolled?.stats?.str ?? 0).toBeGreaterThan(0);
+      expect(copy?.rolled?.stats?.hitRating).toBe(RIFT_GEM_RATING);
+    }
+    // The bands' rolled line reaches the character sheet (two maxed S bands).
+    const bandStr = sim.equipmentInstances.ring1?.rolled?.stats?.str ?? 0;
+    expect(sim.player.stats.str).toBeGreaterThanOrEqual(2 * bandStr);
   });
 
   it('equips the caller and raises their attack power', () => {
