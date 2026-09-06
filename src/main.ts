@@ -289,6 +289,7 @@ import {
 } from './render/assets/graphics_profile';
 import {
   enableKtx2MipRelease,
+  type Ktx2RestoreTarget,
   ktx2MipsOnContextLost,
   ktx2MipsRestored,
 } from './render/assets/ktx2_mip_release';
@@ -1307,8 +1308,7 @@ async function startGame(
   // The world and socket stay live, but every client-frame owner pauses while
   // the renderer is recycled. The frame loop also clears its offline backlog.
   let graphicsRebuildPaused = false;
-  const ktx2RestoreUploadQueue =
-    createKtx2RestoreUploadQueueCoordinator<Renderer['backgroundGpuWork']>();
+  const ktx2RestoreUploadQueue = createKtx2RestoreUploadQueueCoordinator<Ktx2RestoreTarget>();
   let hud!: Hud;
   const baseEntryDiagnostics = (): EntryDiagnostics => {
     const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
@@ -1507,6 +1507,9 @@ async function startGame(
   const autoLoot = new AutoLoot();
   const perf = createPerfMonitor(null, DESKTOP_APP);
   canvas.addEventListener('webglcontextlost', () => {
+    // Start re-transcoding released KTX2 mips NOW (both in-place loss and the
+    // rebuild recycle fire here); the coordinator's getter, see
+    // ktx2_mip_release.ts header and ktx2_restore_upload_queue.ts.
     ktx2MipsOnContextLost(ktx2RestoreUploadQueue.current);
     entryDiagnostics.checkpoint('webgl-context-lost', {
       ...renderEntryDiagnostics(),
@@ -1552,7 +1555,7 @@ async function startGame(
     // character's choice onto every character on the machine.
     renderer = loadSpan('renderer-ctor', () => new Renderer(world, canvas, nameplates));
     rendererReady = true;
-    ktx2RestoreUploadQueue.publish(renderer.backgroundGpuWork);
+    ktx2RestoreUploadQueue.publish({ queue: renderer.backgroundGpuWork, host: renderer.webgl });
     publishGpuHitchRuntimeReceipt({ search: location.search, renderer: renderer.perfStats() });
     renderer.setAudioSink(sfx);
     renderer.showDevBadges = settings.get('showDevBadges');
@@ -2931,7 +2934,9 @@ async function startGame(
       graphicsRebuildPaused = paused;
       ktx2RestoreUploadQueue.setPaused(paused);
       if (paused) return;
-      ktx2RestoreUploadQueue.publish(rendererReady ? renderer.backgroundGpuWork : undefined);
+      ktx2RestoreUploadQueue.publish(
+        rendererReady ? { queue: renderer.backgroundGpuWork, host: renderer.webgl } : undefined,
+      );
       movementPrediction.resume();
       last = performance.now();
       acc = 0;
@@ -2996,7 +3001,7 @@ async function startGame(
         initializeGfx: false,
       });
       configureRebuiltRenderer(next);
-      ktx2RestoreUploadQueue.publish(next.backgroundGpuWork);
+      ktx2RestoreUploadQueue.publish({ queue: next.backgroundGpuWork, host: next.webgl });
       return next;
     },
     prepareCurrentZone: (next) =>
@@ -3027,7 +3032,7 @@ async function startGame(
       next.setAudioSink(sfx);
       renderer = next;
       rendererReady = true;
-      ktx2RestoreUploadQueue.publish(next.backgroundGpuWork);
+      ktx2RestoreUploadQueue.publish({ queue: next.backgroundGpuWork, host: next.webgl });
       publishGpuHitchRuntimeReceipt({ search: location.search, renderer: next.perfStats() });
       hud.replaceRenderer(next);
       perf.setRenderer(next);
