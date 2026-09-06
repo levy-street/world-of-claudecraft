@@ -59,6 +59,9 @@ const baseEnTable = {
   'error.bankCannotAfford': 'You cannot afford that bank expansion.',
   'error.bankMaxSlots': 'Your bank cannot be expanded further.',
   'error.bankTooFar': 'You are too far from the banker.',
+  // The Rift Forge place gate (src/sim/rift/forge_gate.ts): both forge
+  // operations refuse away from the Riftwright.
+  'error.riftForgeTooFar': 'You are too far from the Rift Forge.',
   // The purchase-mutex refusal ('Your bank has a purchase in progress.') is a
   // SERVER emit (server/bank_wire.ts) and lives in server_i18n.ts beside its
   // origin; the client's error chain runs that matcher first.
@@ -4579,6 +4582,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankCannotAfford': '你无力支付该银行扩展费用。',
     'error.bankMaxSlots': '你的银行无法再扩展了。',
     'error.bankTooFar': '你距离银行家太远。',
+    'error.riftForgeTooFar': '你离裂隙熔炉太远了。',
     'log.bankSlotsPurchased': '你购买了额外的银行栏位。',
     'error.bagSocketsFull': '你的所有背包栏位都已占用。',
     'error.bagSwapTooManyItems': '物品太多，无法换成那个背包。',
@@ -5044,6 +5048,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankCannotAfford': '你無力支付該銀行擴充費用。',
     'error.bankMaxSlots': '你的銀行無法再擴充了。',
     'error.bankTooFar': '你距離銀行家太遠。',
+    'error.riftForgeTooFar': '你離裂隙熔爐太遠了。',
     'log.bankSlotsPurchased': '你購買了額外的銀行欄位。',
     'error.bagSocketsFull': '你的所有背包欄位都已佔用。',
     'error.bagSwapTooManyItems': '物品太多，無法換成那個背包。',
@@ -5517,6 +5522,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankCannotAfford': '그 은행 확장을 구매할 돈이 부족합니다.',
     'error.bankMaxSlots': '은행을 더 이상 확장할 수 없습니다.',
     'error.bankTooFar': '은행원과 너무 멀리 떨어져 있습니다.',
+    'error.riftForgeTooFar': '균열의 화로에서 너무 멀리 떨어져 있습니다.',
     'log.bankSlotsPurchased': '추가 은행 칸을 구매했습니다.',
     'error.bagSocketsFull': '모든 가방 칸이 사용 중입니다.',
     'error.bagSwapTooManyItems': '소지품이 너무 많아 그 가방으로 교체할 수 없습니다.',
@@ -6004,6 +6010,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankCannotAfford': 'その銀行拡張を購入するにはお金が足りません。',
     'error.bankMaxSlots': '銀行をこれ以上拡張できません。',
     'error.bankTooFar': '銀行員から遠すぎます。',
+    'error.riftForgeTooFar': 'リフトの炉から離れすぎています。',
     'log.bankSlotsPurchased': '追加の銀行スロットを購入しました。',
     'error.bagSocketsFull': 'バッグスロットはすべて使用中です。',
     'error.bagSwapTooManyItems': 'アイテムが多すぎてそのバッグに交換できません。',
@@ -6974,6 +6981,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankCannotAfford': 'У вас недостаточно денег на это расширение банка.',
     'error.bankMaxSlots': 'Ваш банк больше нельзя расширить.',
     'error.bankTooFar': 'Вы слишком далеко от банкира.',
+    'error.riftForgeTooFar': 'Вы слишком далеко от горна разлома.',
     'log.bankSlotsPurchased': 'Вы покупаете дополнительные ячейки банка.',
     'error.bagSocketsFull': 'Все ячейки для сумок заняты.',
     'error.bagSwapTooManyItems': 'У вас слишком много предметов, чтобы сменить эту сумку.',
@@ -12662,15 +12670,20 @@ const RULES: Rule[] = [
   },
   {
     re: /^Rift upgrade completed for (.+)\.$/,
-    build: (m) => t('sim.rift.forgeUpgraded', { name: m[1] }),
+    build: (m) => t('sim.rift.forgeUpgraded', { name: locItem(m[1]) }),
   },
   {
     re: /^Rift enchant completed for (.+)\.$/,
-    build: (m) => t('sim.rift.forgeEnchanted', { name: m[1] }),
+    build: (m) => t('sim.rift.forgeEnchanted', { name: locItem(m[1]) }),
   },
   {
     re: /^Rift gem socketed for (.+)\.$/,
-    build: (m) => t('sim.rift.forgeSocketed', { name: m[1] }),
+    build: (m) => t('sim.rift.forgeSocketed', { name: locItem(m[1]) }),
+  },
+  {
+    // A socket on a full band destroys its oldest gem; the line names it.
+    re: /^Rift gem replaced for (.+): (.+) destroyed\.$/,
+    build: (m) => t('sim.rift.forgeGemReplaced', { name: locItem(m[1]), gem: locItem(m[2]) }),
   },
   // Boss lethal death-zone detonation lines (src/sim/mob/locomotion.ts). The sim
   // emits def.detonateText verbatim at zone expiry; match each exact string here and

@@ -28,6 +28,7 @@
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
 
 import { ENCHANTS } from '../sim/content/enchants';
+import { RIFT_GEAR_ITEM_ID_SET } from '../sim/content/rift/items';
 import { ITEMS } from '../sim/data';
 import { isEnchantedInstance, replaceVictimIndex } from '../sim/professions/enchanting';
 import {
@@ -449,6 +450,9 @@ export function enchantTargets(
   for (const slot of inventory) {
     const def = ITEMS[slot.itemId];
     if (!def || def.slot !== enchant.itemSlot) continue;
+    // Riftbound bands are forge-only (the sim refuses them by id with
+    // rift_gear); never offer a row the apply can only deny.
+    if (RIFT_GEAR_ITEM_ID_SET.has(slot.itemId)) continue;
     if (slot.instance && isEnchantedInstance(slot.instance)) {
       enchantedByItem.set(slot.itemId, (enchantedByItem.get(slot.itemId) ?? 0) + slot.count);
       continue;
@@ -541,6 +545,7 @@ export function wornEnchantTargets(
     if (!itemId) continue;
     const def = ITEMS[itemId];
     if (!def || def.slot !== enchant.itemSlot) continue;
+    if (RIFT_GEAR_ITEM_ID_SET.has(itemId)) continue; // forge-only, see enchantTargets
     const instance = equippedInstances[slot];
     if (instance && isEnchantedInstance(instance)) {
       // wireTrimmed: this arm reads the WORN mirror, whose online form is the

@@ -13,6 +13,7 @@
 import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { DUNGEON_LIST, QUESTS, ZONES } from '../src/sim/data';
+import { GUILD_ROSTER_MAX_MEMBERS } from '../src/sim/guild_roster';
 import { overworldDungeonPortals } from '../src/ui/map_dungeon_portals';
 import { TEXT_SPRITE_LIMIT, TextSpriteCache } from '../src/ui/text_sprite_cache';
 
@@ -571,7 +572,11 @@ describe('text_sprite_cache: the bound and its eviction', () => {
     // constant, so without this the budget could change with the suite green.
     // 384 -> 416: the tutorial-island + eastbrook quest tables carried the
     // derived worst case to 385 (the assertion below is what caught it).
-    expect(TEXT_SPRITE_LIMIT).toBe(416);
+    // 416 -> 800: the guild roster ladder (a guild could then seat 500) took the
+    // ally-name term from 150 to 550 and the derived worst case to 785.
+    // 800 -> 1300: the ladder's 1,000-seat hard cap took the ally-name term to
+    // 1050 and the derived worst case to 1285.
+    expect(TEXT_SPRITE_LIMIT).toBe(1300);
   });
 
   it('stays above the largest label set one redraw can ask for', () => {
@@ -590,7 +595,10 @@ describe('text_sprite_cache: the bound and its eviction', () => {
       if (!match) throw new Error(`server/social.ts no longer declares ${name}`);
       return Number(match[1]);
     };
-    const allyNames = cap('FRIEND_LIMIT') + cap('GUILD_MEMBER_LIMIT');
+    // The guild term is the LARGEST roster a guild can buy (the base seats plus
+    // every ladder page), not the base: a 1,000-seat guild entirely online is
+    // the set one redraw can ask for.
+    const allyNames = cap('FRIEND_LIMIT') + GUILD_ROSTER_MAX_MEMBERS;
     // The hard ceiling, deliberately: nothing caps the active quest log, so every
     // quest in the content tables can in principle carry a badge number at once.
     const badgeDigits = Object.keys(QUESTS).length;
@@ -608,7 +616,7 @@ describe('text_sprite_cache: the bound and its eviction', () => {
     // Each term on its own, so a single one degenerating to zero under a refactor
     // cannot hide behind another one's growth. Without these, the one-sided check
     // at the bottom passes just as happily on a worst case of 3.
-    expect(allyNames, 'ally names: the two server caps').toBe(150);
+    expect(allyNames, 'ally names: the friend cap plus the largest guild roster').toBe(1050);
     expect(badgeDigits, 'badge digits: one per quest').toBeGreaterThan(0);
     expect(poiLabels, 'POI labels: the widest zone').toBeGreaterThan(0);
     expect(portalNames, 'portal names: the zone with the most doors').toBeGreaterThan(0);
@@ -616,8 +624,8 @@ describe('text_sprite_cache: the bound and its eviction', () => {
     // quotes, which is the other direction the check below cannot see.
     expect(
       worstCase,
-      'the header quotes 371; a SMALLER total means a term broke',
-    ).toBeGreaterThanOrEqual(371);
+      'the header quotes 1285; a SMALLER total means a term broke',
+    ).toBeGreaterThanOrEqual(1285);
     expect(
       TEXT_SPRITE_LIMIT,
       `worst case grew to ${worstCase}: raise TEXT_SPRITE_LIMIT above it, or the map thrashes`,

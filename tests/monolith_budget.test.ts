@@ -290,37 +290,37 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
-    // Re-pinned at the release/v0.42.0 integration of the
-    // fix/actionbar-attack-slot-loadout-switch and fix/fullscreen-layout-reset
-    // arms. The release chain above lands at 18905; the candidate arm keeps
-    // the freed Attack-slot render fix (reopen of #3548, +40 over its own
-    // 19002 base): one import, a memoized freedAttackSlotAbility() per-slot
-    // cache, the tooltip's "Unavailable" fallback branch, the action-bar
-    // descriptor's slot-0 fallback, and a castSlot() refusal arm for a press on
-    // the now-visibly-assigned slot. PR #3759 keeps its real window re-anchor
-    // mechanism: window_reflow_core.ts remembers the requested spot across a
-    // fullscreen resize, folds release's windowMoved stamp into that path, and
-    // leaves window_position_core.ts fully superseded. Measured on the merged
-    // tree, never reconciled by arithmetic. Exact count, zero slack.
-    // Up 18905 -> 18911 for the Realm Builder monument's honour-roll card
-    // (PR #3695, re-measured at its release/v0.42.0 base merge). The card
-    // is its own module (src/ui/realm_builder_popup.ts); what is left here
-    // is the six lines that cannot live anywhere else: the import, the
-    // field, its relocalize() call, and the three-line event arm. Exact
+    // LOWERED for the Target dots frame: the tracker's own view + painter live
+    // in src/ui/hud/target_dots/, and describeAbilitySummary +
+    // abilityRequirementLines (pure i18n mappers with no Hud state) moved out to
+    // ability_tooltip_lines.ts, which more than paid for the wiring (18905 ->
+    // 18879 on its own tree).
+    // The Realm Builder monument's honour-roll card (PR #3695) adds six lines
+    // here that cannot live anywhere else: the import, the field, its
+    // relocalize() call, and the three-line event arm (the card itself is
+    // src/ui/realm_builder_popup.ts). Re-measured on the merged tree: 18879
+    // plus those six (18885). Exact merged count, zero slack; maintainer-review item.
+    // Lowered 18885 -> 18858 by the guild roster expansion (PR #3874), which
+    // extracted 27 lines from this file into the roster page modules. Exact
     // merged count, zero slack; maintainer-review item.
-    // Raised 18958 -> 18969 (+11) for the Soulwell aggro-pull fix: the deferred
-    // "Auto-Attack on Ability Use" pending state was armed optimistically at
-    // button-press time, before the sim confirmed the cast actually began, so a
-    // refused prior cast left it stuck armed and leaked an unwanted engage into
-    // the next unrelated successful cast (Soulwell, which never arms it itself).
-    // The actual decision (does a just-started cast still match the outstanding
-    // request) is a pure function in the existing sibling module
-    // attack_on_ability.ts, directly unit-tested there; what remains here is the
-    // stateful wiring the fix needs at all three sites that already touched this
-    // field (button press, castStart, castStop) and cannot be extracted further
-    // without duplicating Hud's own event-switch/settings-hook state. A
-    // maintainer decision, taken rather than paid for with someone else's code.
-    ceiling: 18969,
+    // Lowered 18858 -> 18851 by the Riftbound band item-level ladder: the
+    // rift tooltip lines moved into src/ui/rift_band_tooltip.ts (with the
+    // per-copy item-level readout), the compare block only threaded the
+    // hovered and worn instances through. Exact merged count, zero slack.
+    // Re-pinned to the exact merged count (the Rift Forge window wiring on top of the ladder: the repaint-family line and the walk-away close, over the base retune).
+    // Exact merged count, zero slack.
+    // Re-measured at the release/v0.42.0 sync that brought in the guild roster pages (PR #3874): the ladder's 18851 plus this branch's +15.
+    // Down 18866 -> 18857 for the per-surface action-bar profiles: the
+    // world-entry restore moved into ActionBarController.restoreLayout, so
+    // the HUD keeps one poll, one refresh call, and the two-line per-frame
+    // surface-flip follow beside the form sync. Exact merged count.
+    // Re-pinned at this release-line reconcile to keep the OSSBrain fixes that
+    // still live in Hud (freed Attack-slot rendering, fullscreen re-anchor,
+    // the Realm Builder event arm, and the Soulwell auto-attack pending-state
+    // wiring) together with release's target dots, guild roster, Riftbound
+    // tooltip and action-bar profile extractions. Measured on the merged tree.
+    // Exact count, zero slack.
+    ceiling: 18915,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -670,7 +670,27 @@ const MONOLITHS: MonolithRow[] = [
     // wire-encode line and the toggle_auto_face_lock dispatch case are
     // removed, so the prior +4 no longer applies. Re-measured on the
     // combined candidate. Exact count, zero slack.
-    ceiling: 10641,
+    // chatChannelHint and chatSenderFlair moved to their own server/ modules
+    // (the roster-expansion dispatch and transport spread landed in their
+    // place): the ratchet lowers with them.
+    // Lowered 10635 -> 10614 by the guild roster purchase rework: the
+    // post-COMMIT save acknowledgement moved to
+    // server/character_save_acknowledge.ts (shared by the market custody
+    // path and the roster coordinator), which more than paid for the
+    // coordinator's wiring and the quarantine hook's audit surface. Exact
+    // count, zero slack.
+    // Lowered 10614 -> 10613 by the Riftbound band item-level ladder (the retired forge enchant arm collapsing to a tombstone).
+    // Exact count, zero slack.
+    // Re-pinned to the exact merged count (the forge dispatch extraction plus the retired enchant tombstone arm).
+    // Exact merged count, zero slack.
+    // Re-measured at the release/v0.42.0 sync that brought in the guild roster pages (PR #3874): the ladder's 10613 plus this branch's -9.
+    // Down 10604 -> 10587 for the per-surface action-bar profiles: the
+    // join read, the per-profile merge and the FIFO write moved to
+    // server/hotbar_layout.ts (HotbarLayoutStore). Exact count.
+    // Re-pinned at this release-line reconcile: the OSSBrain auto-face-lock
+    // revert and release's server extractions both survive, and the merged
+    // file measures below either conflicted ceiling. Exact count, zero slack.
+    ceiling: 10585,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -757,7 +777,21 @@ const MONOLITHS: MonolithRow[] = [
     // this branch's entity_reanchor extraction, so the merged file lands
     // above either parent's own pin. Measured on the merged tree, never
     // reconciled by arithmetic. Exact count, zero slack.
-    ceiling: 5910,
+    // wrapAngle and copyPos moved to src/net/interp_math.ts: the ratchet
+    // lowers with them.
+    // Lowered 5896 -> 5892 by the Riftbound band item-level ladder (the retired forge enchant sender).
+    // Exact count, zero slack.
+    // Re-pinned to the exact merged count (the forge pair senders awaiting their ack, over the retired enchant sender).
+    // Exact merged count, zero slack.
+    // Re-measured at the release/v0.42.0 sync that brought in the guild roster pages (PR #3874): the ladder's 5892 plus this branch's +6.
+    // Down 5898 -> 5873 for the per-surface action-bar profiles: the
+    // debounced upload moved to src/net/action_bar_upload.ts
+    // (ActionBarLayoutUploader). Exact count.
+    // Re-pinned at this release-line reconcile: the gap-aware reanchor
+    // extraction, interp_math extraction, Rift Forge senders, guild roster
+    // sync and action-bar upload extraction all survive in the merged online
+    // mirror. Measured on the merged tree. Exact count, zero slack.
+    ceiling: 5875,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -899,7 +933,10 @@ const MONOLITHS: MonolithRow[] = [
     // (+70, one line under the old pin on its own tree) and this branch's
     // pledge nameplate line (+13) compound in the merged file. Exact count,
     // zero slack.
-    ceiling: 864,
+    // LOWERED for the nameplate dot row: the row's drawing moved to
+    // nameplate_dot_row.ts and the image cache to nameplate_image_cache.ts,
+    // which more than paid for the new draw step. Exact count, zero slack.
+    ceiling: 848,
     seam: 'the pure src/render/nameplate_heraldry_core.ts geometry module',
   },
   {

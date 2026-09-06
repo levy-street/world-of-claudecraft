@@ -56,9 +56,12 @@ const ADDRESSED_COMMANDS: ReadonlyArray<{
   // socket click always names the exact carried copy. Its parse arm lives in
   // the delegated dispatch module, not game.ts's label group.
   { cmd: 'bank_socket_bag', field: 'slot', dispatchIn: 'server/bank_wire.ts' },
-  { cmd: 'rift_upgrade_item', field: 'slot' },
-  { cmd: 'rift_enchant_item', field: 'slot' },
-  { cmd: 'rift_socket_gem', field: 'slot' },
+  // The forge pair: game.ts labels fall through to server/rift_forge_dispatch.ts,
+  // where each arm parses msg.slot. rift_enchant_item is absent on purpose:
+  // retired with the band item-level ladder, it has no ClientWorld sender (a
+  // dispatch-only tombstone arm).
+  { cmd: 'rift_upgrade_item', field: 'slot', dispatchIn: 'server/rift_forge_dispatch.ts' },
+  { cmd: 'rift_socket_gem', field: 'slot', dispatchIn: 'server/rift_forge_dispatch.ts' },
   { cmd: 'equip', field: 'bagSlot', why: 'slot is the equip slot on this token' },
 ];
 

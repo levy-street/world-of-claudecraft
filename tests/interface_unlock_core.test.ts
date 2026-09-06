@@ -33,6 +33,7 @@ describe('HUD_FRAME_SPECS', () => {
       'xpBar',
       'buffBar',
       'debuffBar',
+      'targetDots',
     ]);
     expect(HUD_FRAME_SPECS.map((s) => s.elementId)).toEqual([
       'actionbar',
@@ -49,6 +50,7 @@ describe('HUD_FRAME_SPECS', () => {
       'xpbar',
       'buff-bar',
       'debuff-bar',
+      'target-dots',
     ]);
     // A duplicated storage key would make two frames overwrite each other's
     // saved box, which is silent and only shows up after a reload.
@@ -72,6 +74,7 @@ describe('HUD_FRAME_SPECS', () => {
       'woc_hud_frame_xpbar',
       'woc_hud_frame_buffbar',
       'woc_hud_frame_debuffbar',
+      'woc_hud_frame_target_dots',
     ]);
   });
 
@@ -98,8 +101,11 @@ describe('HUD_FRAME_SPECS', () => {
   it('reserves box (layout) resize for the frames that genuinely reflow', () => {
     // Everything else is fixed content (46px slots, a minimap canvas, a
     // portrait), where stretching one axis only grew empty space.
+    // The Target dots tracker joins the two aura rows: a wider frame is a longer
+    // timer bar and more room for the label before it ellipses, which is a real
+    // reflow rather than empty space.
     const box = HUD_FRAME_SPECS.filter((s) => s.resizeMode === 'box').map((s) => s.id);
-    expect(box).toEqual(['buffBar', 'debuffBar']);
+    expect(box).toEqual(['buffBar', 'debuffBar', 'targetDots']);
   });
 
   it('names every frame with a label key so no placeholder is anonymous', () => {

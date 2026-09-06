@@ -77,6 +77,7 @@ export interface ApplyEnchantResultEvent {
     // confirmed identical-enchant-id re-apply is a normal replace, not a
     // deny (professions/enchanting.ts).
     | 'already_enchanted'
+    | 'rift_gear'
     | 'busy';
 }
 
@@ -174,6 +175,8 @@ export function applyEnchantResultToast(ev: ApplyEnchantResultEvent): Enchanting
     // instead of the old misleading "You do not have that item.".
     case 'already_enchanted':
       return { key: 'hudChrome.enchanting.alreadyEnchanted', sink: 'error' };
+    case 'rift_gear':
+      return { key: 'hudChrome.enchanting.riftGear', sink: 'error' };
     default:
       return { key: 'hudChrome.enchanting.notHeld', sink: 'error' };
   }

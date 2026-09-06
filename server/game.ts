@@ -111,7 +111,6 @@ import {
   STABLE_TIMER_WIRE_VERSION,
   type StableTimerWireVersion,
 } from '../src/world_api';
-import { type ActionBarLayout, sanitizeActionBarLayout } from '../src/world_api/action_bar';
 import { sameAppearance } from '../src/world_api/appearance';
 import { recordOnlineSample } from './admin_db';
 import { type AdminGuildBankView, adminGuildBankView } from './admin_guild_bank_view';
@@ -156,7 +155,9 @@ import {
   type DetectionCalibrationSnapshot,
 } from './calibration_snapshot';
 import { RESTORE_ITEM_MAX_COUNT } from './character_professions';
+import { acknowledgeSessionSaveEffects } from './character_save_acknowledge';
 import { applyCharacterSaveFixups } from './character_save_fixups';
+import { chatChannelHint } from './chat_channel_hint';
 import { ChatFilter } from './chat_filter';
 import {
   isChatFilterWrite,
@@ -171,6 +172,7 @@ import {
   pushMuteChange,
   pushStrikesChange,
 } from './chat_mod_live';
+import { chatSenderFlair } from './chat_sender_flair';
 import {
   applyCheaterMarkLive as applyCheaterMarkLiveRuntime,
   persistCheaterMark,
@@ -206,7 +208,6 @@ import {
   saveMarketState,
   saveRiftState,
   setAccountWeaponSkinLoadout,
-  setCharacterHotbarLayout,
   touchCharacterLogin,
   walletForAccount,
 } from './db';
@@ -274,6 +275,9 @@ import {
   loadGuildBanksIntoSim,
 } from './guild_bank_state';
 import { createPaidGuildWithLeaderAtomic } from './guild_create_db';
+import { buyGuildRosterPageAtomic } from './guild_roster_page_db';
+import { guildRosterTransport } from './guild_roster_transport';
+import { type HotbarLayoutState, HotbarLayoutStore, hotbarLayoutState } from './hotbar_layout';
 import { gameMetricsCounters, type WsDropCause } from './http/game_signals';
 import { bgWideInterestApplies, buildSharedInterestCandidates } from './interest_candidates';
 import { IpBlockList } from './ip_block';
@@ -351,6 +355,7 @@ import { eventLeadDayKey, resetDayKey } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
 import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './realm_readout_memo';
 import { RiftAssetCoordinator, riftAssetConfigFromEnv } from './rift_assets';
+import { dispatchRiftCommand } from './rift_forge_dispatch';
 import { refusedRiftForgeCommand } from './rift_forge_gate';
 import { RiftUpgradeCoordinator, riftUpgraderConfigFromEnv } from './rift_upgrader';
 import {
@@ -836,7 +841,6 @@ const HEAVY_SELF_CMDS = new Set<string>([
   // complete-time loot event is a HEAVY_SELF_EVENTS member, so listing it
   // here would buy a wasted heavy re-serialize per cast start.
   'rift_upgrade_item',
-  'rift_enchant_item',
   'rift_socket_gem',
   'equip_bag',
   'unequip_bag',
@@ -982,7 +986,7 @@ const DAILY_REWARD_ACTIVITY_MS = 60_000;
 const RELAY_COOLDOWN_MS = 8_000; // min gap between a player's "!" community posts
 const ADMIN_LOCATION_POI_RADIUS = 32;
 
-export interface ClientSession extends MovementInputSessionState {
+export interface ClientSession extends MovementInputSessionState, HotbarLayoutState {
   ws: WebSocket;
   accountId: number;
   accountCosmetics: AccountCosmetics;
@@ -1255,12 +1259,6 @@ export interface ClientSession extends MovementInputSessionState {
     priorGm: boolean;
     stowedPet: PetState | null;
   } | null;
-  // The character's stored action-bar layout as loaded at join (already
-  // bounds-validated), or null when the character has never saved one. Sent to
-  // the owning client exactly once via the `hbl` self field (self-scoped: never
-  // an entity/broadcast field), then frozen; subsequent client saves persist to
-  // the DB and never re-echo here. null wires as an explicit "seed from local".
-  initialHotbarLayout: ActionBarLayout | null;
 }
 
 interface SentEntityVersions {
@@ -1402,11 +1400,13 @@ function identityFields(e: Entity): Record<string, unknown> {
     // payload, riding the identity record (wireCacheFor diffs the identity
     // JSON, so an equip/unequip of an instanced piece re-emits automatically).
     // Data minimization: only the cosmetic inspect fields (signer, enchant,
-    // rolled) leave the server; boundTo, charges, and the bindOnTrade
-    // arm are gameplay state no inspecting client needs and never ride this key.
-    // The pub allowlist below (signer/enchant/rolled ONLY) is what enforces this,
-    // so a new non-cosmetic ItemInstancePayload field is excluded by construction;
-    // the owner still sees their own payload in full via the self `inv` mirror.
+    // rolled, and a Riftbound band's rift record: its rank, upgrades, and
+    // gems, which the band tooltip's item level and rank lines read) leave the
+    // server; boundTo, charges, and the bindOnTrade arm are gameplay state no
+    // inspecting client needs and never ride this key. The pub allowlist below
+    // (signer/enchant/rolled/rift ONLY) is what enforces this, so a new
+    // non-cosmetic ItemInstancePayload field is excluded by construction; the
+    // owner still sees their own payload in full via the self `inv` mirror.
     let eqi: Record<string, unknown> | undefined;
     for (const [slot, inst] of Object.entries(e.equippedInstances)) {
       if (!inst) continue;
@@ -1414,6 +1414,7 @@ function identityFields(e: Entity): Record<string, unknown> {
       if (inst.signer !== undefined) pub.signer = inst.signer;
       if (inst.enchant !== undefined) pub.enchant = inst.enchant;
       if (inst.rolled !== undefined) pub.rolled = inst.rolled;
+      if (inst.rift !== undefined) pub.rift = inst.rift;
       for (const _ in pub) {
         if (eqi === undefined) eqi = {};
         eqi[slot] = pub;
@@ -1470,21 +1471,6 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.objectItemId) out.obj = e.objectItemId;
   if (e.scale !== 1) out.sc = e.scale;
   if (e.color !== 0xffffff) out.c = e.color;
-  return out;
-}
-
-/**
- * The flair a chat line carries for its SENDER, or undefined when the account has
- * none, so an ordinary player's chat event is byte-unchanged on the wire. The links
- * run through the same wireStreamerLinks gate the entity encoding uses: an account
- * whose streamer flag is off ships no links here either, whatever is stored.
- */
-function chatSenderFlair(flair: AccountFlair): ChatSenderFlair | undefined {
-  const links = wireStreamerLinks(flair);
-  if (!flair.ai && !links) return undefined;
-  const out: ChatSenderFlair = {};
-  if (flair.ai) out.ai = true;
-  if (links) out.links = links;
   return out;
 }
 
@@ -1717,20 +1703,6 @@ function logSocialErr(err: unknown): void {
   console.error('social command failed:', err);
 }
 
-// Best-effort channel label for the violation log: the hard-word gate runs
-// before the message is routed, so infer the channel from its command prefix
-// (falling back to the player's last-used channel).
-function chatChannelHint(session: ClientSession, text: string): string {
-  if (/^\/(?:g|gu|guild)\s/i.test(text)) return 'guild';
-  if (/^\/(?:o|officer)\s/i.test(text)) return 'officer';
-  if (/^\/(?:w|whisper|t|tell|r|reply)\s/i.test(text)) return 'whisper';
-  if (/^\/(?:y|yell)\s/i.test(text)) return 'yell';
-  if (/^\/(?:p|party)\s/i.test(text)) return 'party';
-  if (/^\/(?:general|world)\s/i.test(text)) return 'general';
-  if (/^\/(?:s|say)\s/i.test(text)) return 'say';
-  return session.rememberedChat.channel;
-}
-
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -1827,7 +1799,7 @@ export class GameServer {
   // Action-bar layout is a whole-record replacement in its own character column.
   // One FIFO per character so a burst of debounced client saves cannot commit on
   // separate pool clients in reverse order and persist a stale layout.
-  private readonly hotbarLayoutSaveQueues = createKeyedSerialWriter<number>();
+  readonly hotbarLayouts = new HotbarLayoutStore();
   // Serializes every write of the single global Market blob (the 30s autosave
   // and the leave-path combined save). Both serialize the whole market; without
   // a queue their transactions could commit out of capture order and persist an
@@ -2491,6 +2463,18 @@ export class GameServer {
   private socialTransport(): SocialTransport {
     const actor = (s: ClientSession): SocialActor => ({ characterId: s.characterId, name: s.name });
     return {
+      // Roster expansion (server/guild_roster_transport.ts): the coordinator
+      // rides this server's public session, save-FIFO, and quarantine ports.
+      ...guildRosterTransport(this, (args) =>
+        buyGuildRosterPageAtomic(
+          {
+            pool,
+            cancelBackend: cancelDetachedBackend,
+            bustGuildRoster: (guildId) => this.socialDb.bustGuildRoster(guildId),
+          },
+          args,
+        ),
+      ),
       byCharacterId: (id) => {
         const s = this.sessionByCharacterId(id);
         return s ? actor(s) : null;
@@ -3622,14 +3606,6 @@ export class GameServer {
       });
   }
 
-  private enqueueHotbarLayoutSave(characterId: number, layout: ActionBarLayout): void {
-    void this.hotbarLayoutSaveQueues
-      .enqueue(characterId, () => setCharacterHotbarLayout(characterId, layout))
-      .catch((err) => {
-        console.error('failed to save hotbar layout:', err);
-      });
-  }
-
   join(
     ws: WebSocket,
     accountId: number,
@@ -3665,7 +3641,7 @@ export class GameServer {
         // The character's stored action-bar layout (characters.hotbar_layout),
         // passed through from the join handler's DB read. Untrusted at rest, so
         // it is re-validated here before it reaches the client.
-        hotbarLayout?: ActionBarLayout | null;
+        hotbarLayout?: unknown;
         // The character's authored modular look (characters.appearance),
         // normalized at write. Stamped onto the world entity so it rides the
         // identity wire (`app`) to every client in view.
@@ -3897,7 +3873,7 @@ export class GameServer {
       jailed: state?.jail ?? null,
       jailVisit: null,
       // Re-validate the stored layout (untrusted at rest) before it can wire out.
-      initialHotbarLayout: sanitizeActionBarLayout(meta.hotbarLayout),
+      ...hotbarLayoutState(meta.hotbarLayout, this.hotbarLayouts.pending(characterId)),
     };
     if (session.jailed) this.teleportJailedSession(session);
     this.ipSessionCounts.set(sessionIp, (this.ipSessionCounts.get(sessionIp) ?? 0) + 1);
@@ -4074,7 +4050,7 @@ export class GameServer {
     // rather than being reset to null, matching the sibling bankBonus
     // "absent means keep" pattern above.
     if (meta.hotbarLayout !== undefined) {
-      session.initialHotbarLayout = sanitizeActionBarLayout(meta.hotbarLayout);
+      Object.assign(session, hotbarLayoutState(meta.hotbarLayout, session.hotbarLayout));
     }
     // The freshly-read look, same "absent means keep" contract as the layout
     // above. ws_auth always supplies it on a real reconnect, so a redesign
@@ -4905,13 +4881,18 @@ export class GameServer {
    *  the live session unsaveable: a proven fence lost its lease, while an
    *  ambiguous result must let durable truth decide an unknown COMMIT. Pid is
    *  the extraction identity; books revert and the kick wires the takeover literal. */
-  escrowSessionLost(pid: number, characterId: number, kind: 'fenced' | 'ambiguous'): void {
+  escrowSessionLost(
+    pid: number,
+    characterId: number,
+    kind: 'fenced' | 'ambiguous',
+    surface = 'market escrow',
+  ): void {
     const session = this.sessionByCharacterId(characterId);
     if (!session || session.pid !== pid) return;
     session.escrowQuarantined = true;
     this.revertOwnGuildBookOps(session, [...session.dirtyGuildBanks.keys()]);
     if (!session.left) {
-      void this.kickSession(session, 'character taken over', `market escrow ${kind}`);
+      void this.kickSession(session, 'character taken over', `${surface} ${kind}`);
     }
   }
 
@@ -6061,35 +6042,10 @@ export class GameServer {
     return true;
   }
 
+  /** The post-COMMIT acknowledgement of a caller-owned save, one host
+   *  decision (server/character_save_acknowledge.ts owns the contract). */
   acknowledgeCharacterSaveEffects(save: CharacterSaveArgs): boolean {
-    const session = this.sessionByCharacterId(save.characterId);
-    const snapshot = save.bankLedgerSnapshot;
-    if (
-      !session ||
-      session.leaseNonce !== save.leaseNonce ||
-      !snapshot ||
-      snapshot.owner.realm !== REALM ||
-      snapshot.owner.characterId !== session.characterId ||
-      snapshot.owner.accountId !== session.accountId
-    ) {
-      return false;
-    }
-    const acknowledged = acknowledgeCommittedCharacterSaveEffects({
-      pendingStorageEffects: session.pendingStorageAppliedEffects,
-      storageSnapshot: save.storageEffects ?? [],
-      ledgerOutbox: session.bankLedgerJournal.outbox,
-      ledgerSnapshot: snapshot,
-      onStorageCommitted: storageAppliedEffectsCommitted,
-      onPostCommitFailure: (error) =>
-        console.error(
-          `storage recovery notification failed after WOC save for character ${session.characterId}:`,
-          error,
-        ),
-    });
-    if (acknowledged) {
-      visitGuildLedgerIdsForOps(snapshot.batches, GUILD_BANK_LOG_VISIBLE_OPS, bustGuildBankLog);
-    }
-    return acknowledged;
+    return acknowledgeSessionSaveEffects(this.sessionByCharacterId(save.characterId), save);
   }
 
   hasCharacterOnlySaveConflict(characterId: number): boolean {
@@ -6670,15 +6626,13 @@ export class GameServer {
       this.sendCommandOutcome(session, msg, false);
       return;
     }
-    // The Rift forge trio shipped sim+wire complete with no client UI, so the
-    // arms stay closed until the realm explicitly opts in (RIFT_FORGE_ENABLED=1;
-    // rationale in server/rift_forge_gate.ts): a crafted frame must not buy
-    // progression the stock client cannot reach. Refused ABOVE the heavy-self
-    // dirty flag below, so a blocked command cannot force a re-diff either.
+    // The Rift forge pair is open by default now that the forge window ships;
+    // RIFT_FORGE_ENABLED=0 is the ops kill switch (server/rift_forge_gate.ts).
+    // Refused ABOVE the heavy-self dirty flag below, so a closed command
+    // cannot force a re-diff either.
     if (refusedRiftForgeCommand(msg.cmd)) {
-      // Label-free by contract (game_signals.ts): the stock client never sends
-      // these, so the counter is the ops signal that a modified client probes
-      // the closed forge (and that a realm forgot the flag once the UI ships).
+      // Label-free by contract (game_signals.ts): the counter is the ops
+      // signal that forge attempts keep arriving at a realm that closed it.
       gameMetricsCounters().riftForgeRefused();
       this.sendCommandOutcome(session, msg, false);
       return;
@@ -7078,32 +7032,21 @@ export class GameServer {
       case 'deliver_commission_order':
         if (typeof msg.order === 'number') sim.deliverCommissionOrder(msg.order, pid);
         break;
-      case 'rift_upgrade_item':
-        if (typeof msg.item === 'string') {
-          const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
-          sim.upgradeRiftItem(msg.item, pid, slot);
-        }
-        break;
       case 'rift_enchant_item':
-        if (typeof msg.item === 'string' && typeof msg.stat === 'string') {
-          sim.enchantRiftItem(
-            msg.item,
-            msg.stat,
-            pid,
-            Number.isInteger(msg.slot) ? Number(msg.slot) : undefined,
-          );
-        }
+        // Retired tombstone: the forge enchant went away with the Riftbound
+        // band item-level ladder (rift/band_ladder.ts), but wire tokens are
+        // append-only (COMMAND_NAMES), so the arm stays and does nothing.
+        // Never routed to the forge dispatch: a crafted frame gets the same
+        // silence as any other no-op.
         break;
-      case 'rift_socket_gem':
-        if (typeof msg.item === 'string' && typeof msg.gem === 'string') {
-          sim.socketRiftGem(
-            msg.item,
-            msg.gem,
-            pid,
-            Number.isInteger(msg.slot) ? Number(msg.slot) : undefined,
-          );
-        }
+      case 'rift_upgrade_item':
+      case 'rift_socket_gem': {
+        // The forge pair answers the commandOutcome ack with the sim verdict
+        // (server/rift_forge_dispatch.ts): the forge window awaits it.
+        const forged = dispatchRiftCommand(sim, msg, pid);
+        if (forged) this.sendCommandOutcome(session, msg, forged.ok);
         break;
+      }
       case 'place_mobile_station':
         if (typeof msg.craft === 'string') sim.placeMobileStation(msg.craft, pid);
         break;
@@ -7234,15 +7177,13 @@ export class GameServer {
       case 'set_helm':
         sim.setHelmHidden(msg.hidden === true, pid);
         break;
-      // Per-character action-bar layout upload (untrusted client input). Validate
-      // + bound the payload; a malformed/oversized layout is dropped silently
-      // (never crashes the session). A clean layout is persisted to the
-      // character's own JSONB column via the per-character FIFO save queue.
-      case 'save_hotbar_layout': {
-        const layout = sanitizeActionBarLayout(msg.layout);
-        if (layout) this.enqueueHotbarLayoutSave(session.characterId, layout);
+      // Per-character action-bar layout upload (untrusted client input). The
+      // store validates + bounds the payload (a malformed one is dropped, never
+      // crashing the session), merges the named profile into the session's
+      // document, and persists it via the per-character FIFO save queue.
+      case 'save_hotbar_layout':
+        this.hotbarLayouts.save(session, msg);
         break;
-      }
       // Skin-select event lock-in. The Sim re-validates the skin against the
       // rank it rolled and consumes the event token; a forged claim no-ops.
       case 'claim_event_skin':
@@ -7694,6 +7635,11 @@ export class GameServer {
           if (this.enforceChatPolicy(session, msg.text)) break;
           void this.social.guildSetMotd(this.actorFor(session), msg.text).catch(logSocialErr);
         }
+        break;
+      case 'guild_buy_roster_page':
+        // Roster expansion: no client-supplied fields at all (the service
+        // prices the page from the guild row and charges the live purse).
+        void this.social.guildBuyRosterPage(this.actorFor(session)).catch(logSocialErr);
         break;
       // arena (Ashen Coliseum queue)
       case 'arena_queue': {
@@ -9348,10 +9294,10 @@ export class GameServer {
       });
       // IWorldActionBar login restore (self-scoped, never a broadcast/entity
       // field): the VIEWER's own stored layout, or an explicit null meaning "the
-      // server has no copy, seed from this device". Bound to the frozen join-time
-      // value, so lastSent-diffing sends it exactly once and a later client save
-      // never round-trips back to clobber an in-flight edit.
-      maybe('hbl', session.initialHotbarLayout);
+      // server has no copy, seed from this device". Serialized once at join and
+      // bound to that frozen text, so lastSent-diffing sends it exactly once and
+      // a later client save never round-trips back to clobber an in-flight edit.
+      maybeSerialized('hbl', session.initialHotbarLayoutJson);
     }
     selfLap?.('self.heavy');
     const assembled = extra === '' ? json : `${json.slice(0, -1)}${extra}}`;
@@ -10380,7 +10326,7 @@ export class GameServer {
     if (!hit) return false;
 
     const outcome = this.chatFilter.escalate(session.chatStrikes);
-    const channel = chatChannelHint(session, text);
+    const channel = chatChannelHint(session.rememberedChat.channel, text);
     // Optimistically advance the session so a rapid follow-up is already gated;
     // the DB write below returns the authoritative values and corrects any drift
     // (e.g. a second character on the same account raising strikes concurrently).

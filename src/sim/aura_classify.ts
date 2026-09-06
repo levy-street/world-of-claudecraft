@@ -52,6 +52,20 @@ export const DEBUFF_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   'cheater_mark',
 ]);
 
+/**
+ * Did `viewer` cast this aura? The ownership half of every "my auras" surface,
+ * beside the harm half it always runs with. Three surfaces had grown their own
+ * copy (the target strip, the target aura window, the nameplate dot row) and the
+ * newest had already dropped the zero guard.
+ *
+ * A missing or ZERO sourceId is never own: an older server's mirror omits the
+ * caster, and 0 is that absence rather than a player id, so an unattributed aura
+ * degrades to "someone else's" instead of being claimed by whoever is looking.
+ */
+export function isOwnAura(aura: { sourceId?: number }, viewerId: number): boolean {
+  return aura.sourceId !== undefined && aura.sourceId !== 0 && aura.sourceId === viewerId;
+}
+
 // A negative-value stat aura (e.g. a mob's Withering Wail sapping attack power, or
 // an Intellect-draining curse) is a debuff even though it reuses a buff_* kind.
 export function isDebuffAura(kind: AuraKind, value: number): boolean {

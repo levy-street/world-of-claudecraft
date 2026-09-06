@@ -136,12 +136,18 @@ export interface BagCopy {
 }
 
 /** Whether destroying this specific copy loses something irreplaceable: it was
- *  signed/crafted, is a masterwork proc, or is enchanted (isEnchantedInstance:
- *  the explicit marker or a legacy bare rolled.stats without masterwork). A
- *  plain fungible copy is never special. */
+ *  signed/crafted, is a masterwork proc, is enchanted (isEnchantedInstance:
+ *  the explicit marker or a legacy bare rolled.stats without masterwork), or
+ *  is a Riftbound band (a personal first-clear reward priced by its copy,
+ *  rift/band_ladder.ts). A plain fungible copy is never special. */
 export function isSpecialCopy(instance: ItemInstancePayload | undefined): boolean {
   if (!instance) return false;
-  return !!instance.signer || !!instance.rolled?.masterwork || isEnchantedInstance(instance);
+  return (
+    !!instance.signer ||
+    !!instance.rolled?.masterwork ||
+    !!instance.rift ||
+    isEnchantedInstance(instance)
+  );
 }
 
 /** Whether the copy the destructive action WOULD consume is special, so the

@@ -176,6 +176,8 @@ export interface ApplyEnchantResultView {
     // confirmReplace flag on the command. A confirmed identical-enchant-id
     // re-apply is a normal replace, not a deny.
     | 'already_enchanted'
+    // A Riftbound band: forge-only, refused by id (professions/enchanting.ts).
+    | 'rift_gear'
     | 'busy';
 }
 

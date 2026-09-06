@@ -181,6 +181,20 @@ export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
     detachToUiRoot: true,
     resizeMode: 'box',
   },
+  // The Target dots tracker. It genuinely REFLOWS (a wider frame is a longer
+  // timer bar and more room for the "<aura> on <target>" label before it
+  // ellipses), so its side edges resize the real box. Already a #ui child, so it
+  // does not detach. Hidden whenever the player has no dots out, which is why
+  // the unlock mode's placeholder chip matters here.
+  {
+    id: 'targetDots',
+    elementId: 'target-dots',
+    storageKey: 'woc_hud_frame_target_dots',
+    labelKey: 'hudChrome.interfaceUnlock.frameNames.targetDots',
+    fallbackSize: { w: 232, h: 150 },
+    detachToUiRoot: false,
+    resizeMode: 'box',
+  },
 ] as const;
 
 /** Every storage key the option owns, so a reset can clear the whole set. */

@@ -1287,18 +1287,27 @@ export interface ItemInstancePayload {
    *  ordinary soulbound copy. */
   partyTrade?: { untilMs: number; eligible: string[]; eligibleIds?: number[] };
   /** Long-term Rift gear progression. `rolled.stats` is the authoritative
-   * aggregate bonus consumed by recalcPlayerStats; this record explains how it
-   * was earned and lets forge operations rebuild it deterministically. */
+   * aggregate consumed by recalcPlayerStats (the band's whole stat line plus
+   * its gem ratings); this record is the bounded input it is rebuilt from
+   * (rift/progression.ts rebuildRolledStats, priced by rift/band_ladder.ts):
+   * the clear's rank sets the base item level, every essence upgrade raises it
+   * by one, and each socketed gem adds one rating line. `power` is the rank's
+   * essence weight (salvage yield and first-clear essence count). */
   rift?: {
     sourceEventId: string;
     tier: RiftTier;
     power: number;
     upgradeLevel: number;
     maxUpgradeLevel: number;
-    baseStats: Record<string, number>;
-    enchant?: { stat: string; value: number };
     gemSlots: number;
     gems: string[];
+    /** LEGACY (pre-ladder payloads only): the old additive base line. Never
+     *  read; the load rebuild drops it. Kept optional so a persisted copy
+     *  still types. */
+    baseStats?: Record<string, number>;
+    /** LEGACY (pre-ladder payloads only): the retired forge enchant. Never
+     *  read; the load rebuild drops it. */
+    enchant?: { stat: string; value: number };
   };
 }
 
@@ -1326,7 +1335,7 @@ export function cloneItemInstancePayload(src: ItemInstancePayload): ItemInstance
   if (src.rift) {
     instance.rift = {
       ...src.rift,
-      baseStats: { ...src.rift.baseStats },
+      ...(src.rift.baseStats && { baseStats: { ...src.rift.baseStats } }),
       ...(src.rift.enchant && { enchant: { ...src.rift.enchant } }),
       ...(Array.isArray(src.rift.gems) ? { gems: [...src.rift.gems] } : {}),
     };
@@ -3482,6 +3491,12 @@ export interface NpcDef {
   // A flag on the warfareVendor precedent so a second placement never widens a
   // hard-keyed constant.
   crucibleVendor?: boolean;
+  // The Riftwright: talking to this NPC opens the Rift Forge window (upgrade,
+  // socket on Riftbound rings, src/sim/rift/progression.ts), and the
+  // two forge commands gate on standing within reach of one of these (the
+  // banker precedent, src/sim/rift/forge_gate.ts). A flag rather than a
+  // hard-keyed id so a second forge placement never widens a constant.
+  riftForge?: boolean;
   // The Card Master: talking to this NPC joins/leaves the Card Duel minigame
   // queue (src/sim/social/card_duel.ts) instead of any vendor/bank flow.
   cardMaster?: boolean;
@@ -5444,6 +5459,12 @@ export type CalendarResultCode =
 // `set` is the success, the rest refusals).
 export type MotdResultCode = 'set' | 'notInGuild' | 'notOfficer';
 
+// Guild roster expansion refusals (mirrors server/social.ts
+// GuildRosterResultCode; every code is a refusal, the success is the
+// guild-wide guildRosterExpanded event). Redeclared here because src/sim
+// never imports server/; tests/social_system.test.ts pins the two in lockstep.
+export type GuildRosterResultCode = 'notInGuild' | 'notLeader' | 'maxed' | 'cannotAfford' | 'retry';
+
 // An in-flight party/raid ready check (social/ready_check.ts). Keyed on Sim by party
 // id. Each member is 'pending' until they answer; anyone still 'pending' when the
 // timeout fires is counted as "no response" (there is no separate afk state).
@@ -5832,6 +5853,9 @@ export type SimEvent = { pid?: number } & (
   // Structured data only (pid supplied by the union intersection); the client
   // builds every visible string, the mailbox precedent.
   | { type: 'bank' }
+  // Asks the client to open the Rift Forge window (the interact path at a
+  // riftForge NPC). Structured only, the bank precedent above.
+  | { type: 'riftForge' }
   // Interacting with a town noticeboard. Structured and personal: the client
   // owns localized feedback, and online routing sends it only to the reader.
   // 'listings' carries the board's posted notices verbatim (guild names and
@@ -5871,6 +5895,13 @@ export type SimEvent = { pid?: number } & (
   // sim never edits the billboard); declared here, like calendarResult, so the
   // one client event switch stays exhaustively typed.
   | { type: 'motdResult'; code: MotdResultCode }
+  // Guild roster expansion refusal (a code, never English; `price` in copper
+  // rides only the cannotAfford arm) and the guild-wide success line: the
+  // buyer's name and the new seat cap. Both emitted only by the server's
+  // SocialService (the sim never seats guild members); declared here, like
+  // calendarResult, so the one client event switch stays exhaustively typed.
+  | { type: 'guildRosterResult'; code: GuildRosterResultCode; price?: number }
+  | { type: 'guildRosterExpanded'; byName: string; cap: number }
   // A guildmate's or followed friend's marquee deed unlock. Emitted only by
   // the server's SocialService (the sim never sees other players' social
   // graphs); declared here, like calendarResult, so the one client event
@@ -6519,6 +6550,8 @@ export type SimEvent = { pid?: number } & (
         // confirmed identical-enchant-id re-apply is a normal replace, not a
         // deny (professions/enchanting.ts).
         | 'already_enchanted'
+        // A Riftbound band: forge-only gear (professions/enchanting.ts).
+        | 'rift_gear'
         | 'busy';
     }
   // Outcome of applying a loadout's saved gear set. TEXT-FREE on purpose: the sim
@@ -6794,23 +6827,26 @@ export type SimEvent = { pid?: number } & (
       type: 'riftForgeResult';
       pid: number;
       ok: boolean;
-      action: 'upgrade' | 'enchant' | 'socket';
+      action: 'upgrade' | 'socket';
       itemId: string;
       reason?:
         | 'not_found'
         | 'not_rift_gear'
         | 'max_upgrade'
         | 'insufficient_essence'
-        | 'invalid_stat'
         | 'invalid_gem'
-        | 'sockets_full'
         // Type-level only: the while-dead refusal is returned to callers but
-        // never emitted (the three dead-gate early returns in
+        // never emitted (the two dead-gate early returns in
         // rift/progression.ts sit ABOVE emitResult); its one player-facing
         // surface is the shared "You can't do that while dead." error line.
-        | 'dead';
+        | 'dead'
+        // Type-level only as well: the away-from-forge refusal (forge_gate.ts)
+        // returns above emitResult; its surface is the too-far error line.
+        | 'too_far';
       upgradeLevel?: number;
       essenceSpent?: number;
+      /** The gem a socket destroyed to make room (sockets are replaceable). */
+      replacedGem?: string;
     }
   // Gather-node harvest outcome (#1729): a successful resource harvest emits
   // this so the client can play a gathering audio cue for the acting player.

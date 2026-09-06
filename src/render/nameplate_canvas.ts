@@ -1,6 +1,16 @@
 import { borderAccent, borderMotifPrimitives } from '../ui/deed_border_view';
 import { TextSpriteCache, type TextSpriteStyle } from '../ui/text_sprite_cache';
 import {
+  drawNameplateDotRow,
+  NAMEPLATE_DOT_TIME_STYLE,
+  type NameplateDotRowHost,
+} from './nameplate_dot_row';
+import {
+  type NameplateDotsPlan,
+  nameplateDotRowHeight,
+  newNameplateDotsPlan,
+} from './nameplate_dots_core';
+import {
   createNameplateHeraldry,
   NAMEPLATE_HERALDRY_TITLE_STEP,
   NAMEPLATE_HERALDRY_WELL_ALPHA,
@@ -9,6 +19,16 @@ import {
   nameplateHeraldryInto,
   nameplateHeraldryLift,
 } from './nameplate_heraldry_core';
+import {
+  NAMEPLATE_IMAGE_CACHE_LIMIT,
+  NAMEPLATE_IMAGE_RETRY_BASE_FRAMES,
+  NameplateImageCache,
+} from './nameplate_image_cache';
+
+// Re-exported so the cache's budget stays part of THIS module's published
+// surface, where its callers and tests have always read it.
+export { NAMEPLATE_IMAGE_CACHE_LIMIT, NAMEPLATE_IMAGE_RETRY_BASE_FRAMES };
+
 import { drawNameplateLootIcon } from './nameplate_loot_icon';
 import { NAMEPLATE_BASE_WIDTH, nameplateHealthBarWidth } from './nameplate_pick_core';
 
@@ -59,6 +79,15 @@ export interface NameplateCanvasState {
   opacity: number;
   frame: NameplateFrame;
   comboPips: number;
+  /** The local player's OWN debuffs on this entity, filled by the painter through
+   *  nameplateDotsInto. Drawn as an icon row between the name row and the health
+   *  bar while the showNameplateDots setting is on. One plan PER PLATE (never a
+   *  shared scratch): the plan is also where a recycled slot's artwork is
+   *  invalidated, which only works when it belongs to one entity. Its slots keep
+   *  their high-water capacity, so a plate that loses a dot allocates nothing.
+   *  These are actionable timers, so no graphics tier ever sheds them (root
+   *  CLAUDE.md, gameplay-neutral graphics). */
+  dots: NameplateDotsPlan;
   aiLabel: string;
   /** The operator-applied Cheater tag, already localized AND already wrapped in
    *  its `< >` form by the painter's resolveContent (its only writer, the
@@ -103,6 +132,7 @@ export function createNameplateCanvasState(): NameplateCanvasState {
     opacity: 1,
     frame: '',
     comboPips: 0,
+    dots: newNameplateDotsPlan(),
     aiLabel: '',
     cheaterLabel: '',
     devOutline: null,
@@ -122,9 +152,6 @@ export const NAMEPLATE_MAX_PIXEL_RATIO = 2;
 // case from a 1536-entry count alone.
 export const NAMEPLATE_TEXT_SPRITE_LIMIT = 512;
 export const NAMEPLATE_TEXT_SPRITE_BUDGET_BYTES = 16 * 1024 * 1024;
-export const NAMEPLATE_IMAGE_CACHE_LIMIT = 160;
-export const NAMEPLATE_IMAGE_RETRY_BASE_FRAMES = 30;
-const NAMEPLATE_IMAGE_RETRY_MAX_FRAMES = 600;
 
 const TITLE_FONT = 'Cinzel, Georgia, serif';
 const NAME_STYLE: TextSpriteStyle = {
@@ -215,77 +242,6 @@ const HERALDRY_FRAME_WIDTH = 1;
 const HERALDRY_MOTIF_WIDTH = 1.25;
 const HERALDRY_RIVET_RADIUS = 1;
 
-interface CachedImage {
-  image: HTMLImageElement;
-  status: 'loading' | 'ready' | 'failed';
-  failures: number;
-  retryFrame: number;
-}
-
-class NameplateImageCache {
-  private readonly entries = new Map<string, CachedImage>();
-  private frame = 0;
-
-  beginFrame(): void {
-    this.frame++;
-  }
-
-  get(url: string): HTMLImageElement | null {
-    if (!url) return null;
-    let entry = this.entries.get(url);
-    if (!entry) {
-      entry = this.load(url, 0);
-      this.entries.set(url, entry);
-      this.trim();
-    } else if (entry.status === 'failed' && this.frame >= entry.retryFrame) {
-      entry = this.load(url, entry.failures);
-      this.entries.set(url, entry);
-    }
-    // Map insertion order is the LRU order. Every hit moves to the back, so a
-    // live working set above the cap evicts the least recently used URL even
-    // when every entry was touched in this frame.
-    this.entries.delete(url);
-    this.entries.set(url, entry);
-    return entry.status === 'ready' ? entry.image : null;
-  }
-
-  private load(url: string, failures: number): CachedImage {
-    const image = document.createElement('img');
-    const entry: CachedImage = {
-      image,
-      status: 'loading',
-      failures,
-      retryFrame: this.frame,
-    };
-    image.addEventListener('load', () => {
-      if (this.entries.get(url) !== entry) return;
-      entry.status = 'ready';
-      entry.failures = 0;
-    });
-    image.addEventListener('error', () => {
-      if (this.entries.get(url) !== entry) return;
-      entry.status = 'failed';
-      entry.failures++;
-      const delay = Math.min(
-        NAMEPLATE_IMAGE_RETRY_MAX_FRAMES,
-        NAMEPLATE_IMAGE_RETRY_BASE_FRAMES * 2 ** Math.min(5, entry.failures - 1),
-      );
-      entry.retryFrame = this.frame + delay;
-    });
-    image.referrerPolicy = 'no-referrer';
-    image.src = url;
-    if (image.complete && image.naturalWidth > 0) entry.status = 'ready';
-    return entry;
-  }
-
-  private trim(): void {
-    for (const key of this.entries.keys()) {
-      if (this.entries.size <= NAMEPLATE_IMAGE_CACHE_LIMIT) return;
-      this.entries.delete(key);
-    }
-  }
-}
-
 function roundedRect(
   ctx: CanvasRenderingContext2D,
   x: number,
@@ -329,6 +285,18 @@ export class NameplateCanvasSurface {
   private readonly targetGuildStyle: TextSpriteStyle = { ...TARGET_GUILD_STYLE };
   private readonly markerStyle: TextSpriteStyle = { ...MARKER_STYLE };
   private readonly castStyle: TextSpriteStyle = { ...CAST_STYLE };
+  private readonly dotTimeStyle: TextSpriteStyle = { ...NAMEPLATE_DOT_TIME_STYLE };
+  // The dot row borrows this surface's pen, caches and forced-colors state; it
+  // owns none of them. Built once so the per-frame draw allocates no bag.
+  private readonly dotRowHost: NameplateDotRowHost = {
+    forcedColors: () => this.forcedColorsActive(),
+    roundedRect,
+    drawImage: (url, x, y, size) => this.drawImage(url, x, y, size, false),
+    drawText: (ctx, text, x, y, font, fill) => {
+      this.dotTimeStyle.font = font;
+      this.text.draw(ctx, text, x, y, this.configureTextStyle(this.dotTimeStyle, fill));
+    },
+  };
   private readonly emoteStyle: TextSpriteStyle = { ...EMOTE_STYLE };
   private width = 0;
   private height = 0;
@@ -406,6 +374,14 @@ export class NameplateCanvasSurface {
     if (state.hpVisible) {
       y -= 7;
       this.drawHealth(state, screenX, y);
+    }
+    // Your own dots sit BETWEEN the health bar and the name row (the classic
+    // nameplate-tracker placement): the health bar stays the lowest thing the eye
+    // tracks and the cast bar keeps its anchor, while the plate grows upward.
+    // drawEmote below mirrors this exact step, or the emote bubble drifts.
+    if (state.dots.count > 0) {
+      y -= nameplateDotRowHeight(state.dots.count, state.dots.scale);
+      this.drawDots(state, screenX, y);
     }
     if (state.guild) {
       y -= state.currentTarget ? 14 : 12;
@@ -493,6 +469,8 @@ export class NameplateCanvasSurface {
     let y = screenY;
     if (state.castVisible) y -= 10;
     if (state.hpVisible) y -= 7;
+    // Mirrors drawBase's dot row exactly (same core, same count).
+    if (state.dots.count > 0) y -= nameplateDotRowHeight(state.dots.count, state.dots.scale);
     if (state.guild) y -= state.currentTarget ? 14 : 12;
     if (state.title) y -= NAMEPLATE_HERALDRY_TITLE_STEP;
     y -= this.heraldryLift(state);
@@ -789,6 +767,13 @@ export class NameplateCanvasSurface {
       y + 7,
       this.configureTextStyle(this.castStyle, CAST_STYLE.fill),
     );
+  }
+
+  /** The player's own dots, centred over the health bar. `topY` is the row's
+   *  top edge in plate units (drawBase already subtracted the row height); the
+   *  drawing itself lives in nameplate_dot_row.ts. */
+  private drawDots(state: NameplateCanvasState, centerX: number, topY: number): void {
+    drawNameplateDotRow(this.ctx, state.dots, centerX, topY, this.dotRowHost);
   }
 
   private drawCombo(count: number, centerX: number, y: number): void {

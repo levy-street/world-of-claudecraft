@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import type { CoreStats, ItemDef } from '../src/sim/types';
-import { itemStatDeltas } from '../src/ui/item_compare';
+import { itemStatDeltas, sameItemCopy, shouldCompareCopies } from '../src/ui/item_compare';
 
 function armor(
   id: string,
@@ -38,6 +38,38 @@ function weapon(id: string, min: number, max: number, speed: number): ItemDef {
   };
 }
 
+describe('sameItemCopy', () => {
+  it('matches a copy against its own projection and tells two bands apart', () => {
+    const rift = {
+      sourceEventId: 'e',
+      tier: 'S' as const,
+      power: 4,
+      upgradeLevel: 2,
+      maxUpgradeLevel: 5,
+      gemSlots: 2,
+      gems: ['rift_gem_verdant'],
+    };
+    const worn = { boundTo: 7, rolled: { stats: { str: 8, sta: 6, hitRating: 12 } }, rift };
+    // A structural clone, never a shared reference: both hosts hand the
+    // paperdoll and the compare block distinct objects for the same copy.
+    const projected = structuredClone({ rolled: worn.rolled, rift: worn.rift });
+    expect(projected.rift).not.toBe(worn.rift);
+    expect(sameItemCopy(projected, worn)).toBe(true);
+    expect(sameItemCopy(worn, { ...worn, rift: { ...rift, upgradeLevel: 3 } })).toBe(false);
+    expect(sameItemCopy(worn, { ...worn, rolled: { stats: { str: 9 } } })).toBe(false);
+    expect(sameItemCopy(undefined, undefined)).toBe(true);
+    expect(sameItemCopy(worn, undefined)).toBe(false);
+    // The compare decision: a different item always; the same id only for a
+    // per-copy piece that is not the worn copy itself.
+    expect(shouldCompareCopies('a', 'b')).toBe(true);
+    expect(shouldCompareCopies('a', 'a')).toBe(false);
+    expect(shouldCompareCopies('band', 'band', projected, worn)).toBe(false);
+    expect(
+      shouldCompareCopies('band', 'band', { ...worn, rift: { ...rift, upgradeLevel: 5 } }, worn),
+    ).toBe(true);
+  });
+});
+
 describe('itemStatDeltas', () => {
   it('reports positive deltas for an upgrade and negative for a downgrade', () => {
     const candidate = armor('better', { armor: 50, str: 5, sta: 3 });
@@ -54,6 +86,32 @@ describe('itemStatDeltas', () => {
     const same = armor('a', { armor: 40, str: 2 });
     const dup = armor('b', { armor: 40, str: 2 });
     expect(itemStatDeltas(same, dup)).toEqual([]);
+  });
+
+  it('reads each side through its copy: a stat-free shell compares by its rolled line', () => {
+    // A Riftbound band's ItemDef carries nothing; the copy carries the whole
+    // ring (primary stats plus gem ratings). Without the instances the band
+    // would read as an empty ring against whatever is worn.
+    const shell = armor('band', {});
+    const worn = armor('worn', { str: 5, sta: 4 }, { hitRating: 25 });
+    expect(itemStatDeltas(shell, worn).map((d) => d.stat)).toEqual(['str', 'sta', 'hitRating']);
+    const copy = { rolled: { stats: { str: 8, sta: 6, hitRating: 12 } } };
+    const byStat = Object.fromEntries(
+      itemStatDeltas(shell, worn, copy).map((d) => [d.stat, d.delta]),
+    );
+    expect(byStat).toEqual({ str: 3, sta: 2, hitRating: -13 });
+    // Both sides are per-copy: the same shell against a worn band of its own.
+    const wornCopy = { rolled: { stats: { str: 8, sta: 6, critRating: 12 } } };
+    const bothSides = Object.fromEntries(
+      itemStatDeltas(shell, shell, copy, wornCopy).map((d) => [d.stat, d.delta]),
+    );
+    expect(bothSides).toEqual({ hitRating: 12, critRating: -12 });
+    // An enchanted worn piece keeps its baked bonus in the comparison.
+    const plain = armor('plain', { sta: 10 });
+    const enchantedWorn = { rolled: { stats: { sta: 4 } } };
+    expect(itemStatDeltas(plain, armor('base', { sta: 10 }), undefined, enchantedWorn)).toEqual([
+      { stat: 'sta', delta: -4, decimals: 0 },
+    ]);
   });
 
   it('computes a fractional weapon DPS delta at one decimal of precision', () => {

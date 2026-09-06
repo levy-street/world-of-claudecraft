@@ -102,9 +102,12 @@ function asNumber(value: unknown): number {
   return typeof value === 'number' && Number.isFinite(value) ? value : 0;
 }
 
-/** Mirrors rebuildRolledStats in src/sim/rift/progression.ts at the reset
- *  state (level 0, no enchant, no gems): base stats only, with `sta`
- *  materialized the same way the live rebuild materializes it. */
+/** Mirrors the PRE-LADDER rebuildRolledStats (src/sim/rift/progression.ts as
+ *  it stood when this one-off migration ran) at the reset state: base stats
+ *  only, with `sta` materialized the way that rebuild materialized it. The
+ *  band item-level ladder has since replaced that model; the line written here
+ *  is provisional, because every load arm re-prices a band through
+ *  sanitizeRiftGearInstance from its rank, upgrades, and gems alone. */
 function resetRolledStats(instance: InstanceLike, rift: RiftPayloadLike): Record<string, unknown> {
   const base =
     rift.baseStats && typeof rift.baseStats === 'object'

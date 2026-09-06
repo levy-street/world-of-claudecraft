@@ -296,6 +296,21 @@ export const FARSHORE_NPCS: Record<string, NpcDef> = {
     greeting:
       'It opened right where the nets dry. Right there, where I stood every morning of my life. I do not go down to the shore anymore. I do not go much of anywhere anymore.',
   },
+  // The Riftwright: the Rift Forge NPC (riftForge flag). Stands in the Watch
+  // Meadow beside Riftwatch Ollun, the one authored rift place in the world,
+  // so the ring a first clear mints is upgraded where the breaks are studied.
+  riftwright_maelis: {
+    id: 'riftwright_maelis',
+    name: 'Riftwright Maelis',
+    title: 'Rift Forgemaster',
+    pos: { x: 377, z: 7 },
+    facing: Math.PI,
+    color: 0x7a3f8a,
+    questIds: [],
+    riftForge: true,
+    greeting:
+      'A Riftbound band remembers the break that made it, $C. Bring me the band, and the essence the breaks shed, and I will teach it to remember more.',
+  },
 };
 
 export const FARSHORE_QUESTS: Record<string, QuestDef> = {

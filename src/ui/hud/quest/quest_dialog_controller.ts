@@ -118,7 +118,9 @@ export class QuestDialogController {
     const world = this.deps.world();
     const npc = world.entities.get(npcId);
     if (npc?.kind !== 'npc') return;
-    if (NPCS[npc.templateId]?.banker) {
+    // The banker and the Riftwright both short-circuit the gossip menu: the
+    // sim's interact emits the window-opening event, identical on every host.
+    if (NPCS[npc.templateId]?.banker || NPCS[npc.templateId]?.riftForge) {
       world.targetEntity(npc.id);
       world.interact();
       return;

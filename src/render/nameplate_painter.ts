@@ -3,6 +3,7 @@
 // projection, decluttering, text/image caches, and the single canvas surface.
 
 import * as THREE from 'three';
+import { isOwnAura } from '../sim/aura_classify';
 import { ABILITIES, MOBS, QUESTS } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
 import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
@@ -13,6 +14,7 @@ import {
 } from '../sim/quests/quest_marker_kind';
 import { type Entity, GATHER_CAST_ID } from '../sim/types';
 import { abilityDisplayNameFromSource } from '../ui/ability_display_name';
+import { resolveHudAuraIconId } from '../ui/aura_icon_runtime';
 import { cheaterTagLabel } from '../ui/cheater_tag';
 import { deedBorderSlug } from '../ui/deed_border_view';
 import { deedTitleText } from '../ui/deed_i18n';
@@ -21,10 +23,14 @@ import { discordRoleTagLabel } from '../ui/discord_role_tag';
 import { tEntity } from '../ui/entity_i18n';
 import { holderTierBadgeDataUrl, holderTierByIndex } from '../ui/holder_tier';
 import { formatNumber, getI18nRevision, t } from '../ui/i18n';
-import { raidMarkerDataUrl } from '../ui/icons';
+import {
+  auraImageUrl,
+  cachedProceduralIconDataUrl,
+  proceduralIconDataUrl,
+  raidMarkerDataUrl,
+} from '../ui/icons';
 import { localizeSimAuraName } from '../ui/sim_i18n';
 import { type IWorld, OVERHEAD_EMOTES } from '../world_api';
-
 import { castBarState } from './cast_bar';
 import { anyCharacterRigDrawing, entityHasNoBody } from './entity_gate_stand_in_core';
 import { mobDisplayName, npcDisplayName, objectDisplayName } from './entity_labels';
@@ -36,6 +42,13 @@ import {
 } from './nameplate_canvas';
 import { COMBO_PIP_MAX } from './nameplate_combo';
 import { declutterNameplatesInPlace, type NameplateAnchor } from './nameplate_declutter';
+import { nameplateDotScale as nameplateDotScaleSetting } from './nameplate_dot_scale';
+import {
+  clampNameplateDotScale,
+  type NameplateDotAura,
+  nameplateDotRowHeight,
+  nameplateDotsInto,
+} from './nameplate_dots_core';
 import { nameplateHeraldryLift } from './nameplate_heraldry_core';
 import { type NameplatePickCandidate, pickNameplateHealthBarAt } from './nameplate_pick_core';
 import {
@@ -47,10 +60,37 @@ import { FRIENDLY, isFriendlyPet, mobNameColor } from './reaction';
 import type { EntityView } from './renderer';
 
 const NAMEPLATE_LEVEL_NUMBER_OPTIONS = { maximumFractionDigits: 0 } as const;
+// The dot countdown's two shapes, hoisted for the same reason the level options
+// above are: this runs per dot per plate per FRAME, and numberFormatFor keys its
+// cache on JSON.stringify(options), so a fresh literal here is an allocation
+// plus a stringify on the hot path. Indexed by the core's decimals field.
+const NAMEPLATE_DOT_NUMBER_OPTIONS = [
+  { minimumFractionDigits: 0, maximumFractionDigits: 0 },
+  { minimumFractionDigits: 1, maximumFractionDigits: 1 },
+] as const;
 const HOLDER_BADGE_URLS = new Map<number, string>();
 const DEV_BADGE_URLS = new Map<number, string>();
 
 const emoteIconUrl = (id: string): string => `/ui/emotes/emote-${id}.png`;
+
+// Nameplate dot artwork, keyed by the aura id. Static art wins; otherwise the
+// procedural icon, taken from the shared cache when it is already warm and minted
+// on demand (which warms it) when it is not. Resolved only when a slot's icon key
+// changes, so the per-frame path is a Map hit.
+const DOT_ICON_URLS = new Map<string, string>();
+const NAMEPLATE_DOT_ICON_PX = 32;
+
+function nameplateDotIconUrl(auraId: string, auraKind: string): string {
+  const cached = DOT_ICON_URLS.get(auraId);
+  if (cached !== undefined) return cached;
+  const iconId = resolveHudAuraIconId({ id: auraId, kind: auraKind });
+  const url =
+    auraImageUrl(iconId) ??
+    cachedProceduralIconDataUrl('aura', iconId, NAMEPLATE_DOT_ICON_PX) ??
+    proceduralIconDataUrl('aura', iconId, NAMEPLATE_DOT_ICON_PX);
+  DOT_ICON_URLS.set(auraId, url);
+  return url;
+}
 
 function holderBadgeUrl(index: number): string {
   const cached = HOLDER_BADGE_URLS.get(index);
@@ -102,6 +142,11 @@ export interface NameplatePainterDeps {
   showDevBadges: () => boolean;
   showOwnNameplate: () => boolean;
   showPlayerNameplates: () => boolean;
+  /** The nameplate dot row's SIZE, with 0 meaning off: the showNameplateDots
+   *  toggle and the nameplateDotScale slider fold into this one number at the
+   *  settings site. A player preference, never a graphics tier. Defaults to the
+   *  live setting (nameplate_dot_scale.ts); injectable so a test can drive it. */
+  nameplateDotScale?: () => number;
   isHostilePlayer: (e: Entity) => boolean;
 }
 
@@ -115,12 +160,16 @@ export class NameplatePainter {
   private readonly showDevBadges: () => boolean;
   private readonly showOwnNameplate: () => boolean;
   private readonly showPlayerNameplates: () => boolean;
+  private readonly nameplateDotScale: () => number;
   private readonly isHostilePlayer: (e: Entity) => boolean;
   private readonly surface: NameplateCanvasSurface;
   private readonly states = new Map<number, NameplateCanvasState>();
   private readonly tmpV = new THREE.Vector3();
   private readonly tmpV2 = new THREE.Vector3();
   private readonly plan: NameplatePlan = newNameplatePlan();
+  // The bound ownership predicate and the id it was bound for (see resolveDots).
+  private dotsOwnerId = -1;
+  private dotsIsOwn: (aura: NameplateDotAura) => boolean = () => false;
   private readonly anchorScratch: Array<NameplateAnchor & NameplatePickCandidate> = [];
   private anchorCount = 0;
   private i18nRevision = -1;
@@ -158,6 +207,7 @@ export class NameplatePainter {
     this.showDevBadges = deps.showDevBadges;
     this.showOwnNameplate = deps.showOwnNameplate;
     this.showPlayerNameplates = deps.showPlayerNameplates;
+    this.nameplateDotScale = deps.nameplateDotScale ?? nameplateDotScaleSetting;
     this.isHostilePlayer = deps.isHostilePlayer;
     this.surface = new NameplateCanvasSurface(deps.layer);
   }
@@ -235,7 +285,15 @@ export class NameplatePainter {
       }
 
       const anchor = this.anchorScratch[this.anchorCount];
-      const extraLift = nameplateHeraldryLift(state.border);
+      // Every pixel this plate paints ABOVE its name row, which is what decides
+      // the declutter envelope: the deed heraldry's seal and ribbon, plus the
+      // dot row, which sits under the name row and therefore pushes the name row
+      // and everything above it up by its own height. drawEmote already mirrors
+      // that step; without this the anchor did not, so two dotted plates in a
+      // crowd overlapped without being nudged apart.
+      const extraLift =
+        nameplateHeraldryLift(state.border) +
+        nameplateDotRowHeight(state.dots.count, state.dots.scale);
       if (anchor) {
         anchor.id = id;
         anchor.sx = screenX;
@@ -295,6 +353,51 @@ export class NameplatePainter {
     this.surface.dispose();
   }
 
+  /**
+   * The local player's own debuffs on this entity, refreshed EVERY frame: the
+   * countdown and the cooldown swipe are the whole point, so they cannot ride the
+   * throttled content pass. Only living mobs carry the row (a debuff on a player
+   * belongs to the unit frames, and a corpse's dots are already gone).
+   *
+   * Class-agnostic: nameplateDotsInto selects on ownership plus isDebuffAura, so a
+   * rogue's poisons and a druid's Lunar Tempest land here exactly like a warlock's
+   * Blackrot, with no ability or class list anywhere on the path.
+   */
+  private resolveDots(state: NameplateCanvasState, entity: Entity, player: Entity): void {
+    const scale = this.nameplateDotScale();
+    if (scale <= 0 || entity.kind !== 'mob' || entity.dead) {
+      state.dots.count = 0;
+      return;
+    }
+    state.dots.scale = clampNameplateDotScale(scale);
+    // The ownership predicate is bound ONCE per pass, not minted per plate: this
+    // runs for every plate on screen every frame. isOwnAura is the shared rule
+    // (src/sim/aura_classify.ts) the aura strips use, so the plate row cannot
+    // drift from them the way this call site had already drifted by dropping the
+    // zero guard.
+    if (this.dotsOwnerId !== player.id) {
+      this.dotsOwnerId = player.id;
+      this.dotsIsOwn = (aura: NameplateDotAura) => isOwnAura(aura, player.id);
+    }
+    const dots = nameplateDotsInto(state.dots, entity.auras, this.dotsIsOwn);
+    for (let i = 0; i < dots.count; i++) {
+      const slot = dots.slots[i];
+      if (!slot.iconUrl) {
+        const source = entity.auras.find((aura) => aura.id === slot.iconKey);
+        slot.iconUrl = nameplateDotIconUrl(slot.iconKey, source?.kind ?? '');
+      }
+      // Re-format only when the number actually moves at the drawn precision:
+      // above ten seconds that is once a second rather than once a frame, and
+      // the cached text is what the draw path reads either way.
+      const quantized =
+        slot.decimals === 1 ? Math.round(slot.remaining * 10) / 10 : Math.ceil(slot.remaining);
+      if (slot.timeText === '' || quantized !== slot.timeValue) {
+        slot.timeValue = quantized;
+        slot.timeText = formatNumber(quantized, NAMEPLATE_DOT_NUMBER_OPTIONS[slot.decimals]);
+      }
+    }
+  }
+
   private updateDynamicState(
     state: NameplateCanvasState,
     entity: Entity,
@@ -313,6 +416,7 @@ export class NameplatePainter {
     state.threat = plan.threat;
     state.comboPips = Math.max(0, Math.min(COMBO_PIP_MAX, plan.comboPips));
     state.hpFill = entity.hp / Math.max(1, entity.maxHp);
+    this.resolveDots(state, entity, player);
 
     const cast = castBarState(entity);
     state.castVisible = cast.visible;
