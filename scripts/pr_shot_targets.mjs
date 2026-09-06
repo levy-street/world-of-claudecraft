@@ -12116,6 +12116,70 @@ export const TARGETS = [
     },
   },
   {
+    key: 'dungeon-finder-catalogue',
+    label: 'Dungeon Finder window: Catalogue tab list and activity detail pane',
+    // FINDER_ACTIVITIES is hand-authored data-as-code (docs/prd/dungeon-finder.md); a new
+    // entry there is exactly the kind of change this target exists to catch, since it never
+    // touches a VISUAL_PREFIXES path on its own.
+    when: ['src/sim/content/dungeon_finder.ts'],
+    variants: [
+      { key: 'catalogue-desktop', charClass: 'warrior', charName: 'Thorgar' },
+      {
+        key: 'raid-detail-desktop',
+        charClass: 'warrior',
+        charName: 'Thorgar',
+        selectActivity: 'ignivar_raid_arena_normal',
+      },
+      {
+        key: 'wildheart-detail-desktop',
+        charClass: 'warrior',
+        charName: 'Thorgar',
+        selectActivity: 'wildheart_basin_heroic',
+      },
+      { key: 'catalogue-mobile', charClass: 'warrior', charName: 'Thorgar', mobile: true },
+    ],
+    async capture(page, variant) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+        // A fresh offline character can also fire the once-ever Proving Shore
+        // spawn greeting (tutorial_greeting_window.ts, #tutorial-greeting); its
+        // first button dismisses either the two-choice greeting or a one-button
+        // note variant.
+        document.getElementById('tutorial-greeting')?.querySelector('button')?.click();
+      });
+      await wait(300);
+      await page.evaluate(() => window.__game?.hud.toggleDungeonFinder());
+      const open = await pollForSize(page, '#dungeon-finder-window .df-row', 20, 300);
+      if (!open) throw new Error('dungeon finder catalogue rows did not render');
+      // The rail is a long scrollable list (docs/prd/dungeon-finder.md's hand-authored
+      // registry order): scroll the newest activities into view before shooting or
+      // selecting one, else they sit below the fold in every variant.
+      const focusRow = variant?.selectActivity ?? 'ignivar_raid_arena_normal';
+      await page.evaluate((id) => {
+        const rows = document.querySelectorAll('#dungeon-finder-window .df-row');
+        const row =
+          document.querySelector(`#dungeon-finder-window [data-row="${id}"]`) ??
+          rows[rows.length - 1];
+        row?.scrollIntoView({ block: 'center' });
+      }, focusRow);
+      if (variant?.selectActivity) {
+        const clicked = await page.evaluate((id) => {
+          const btn = document.querySelector(`#dungeon-finder-window [data-row="${id}"]`);
+          if (!(btn instanceof HTMLElement)) return false;
+          btn.click();
+          return true;
+        }, variant.selectActivity);
+        if (!clicked) throw new Error(`finder row ${variant.selectActivity} not found`);
+        const detail = await pollForSize(page, '#dungeon-finder-window .df-detail', 20, 300);
+        if (!detail) throw new Error('dungeon finder detail pane did not render');
+      }
+      await wait(400);
+      return { clip: '#dungeon-finder-window' };
+    },
+  },
+  {
     key: 'ground-aim-placement',
     when: [
       'action_bar/ground_aim',

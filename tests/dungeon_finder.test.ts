@@ -10,6 +10,7 @@ import {
   finderActivity,
 } from '../src/sim/content/dungeon_finder';
 import { FIRST_TALENT_LEVEL, type Role, TALENTS } from '../src/sim/content/talents';
+import { DUNGEONS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import {
   assignFinderRoles,
@@ -20,6 +21,7 @@ import {
   normalizeFinderSelection,
 } from '../src/sim/social/dungeon_finder';
 import type { PlayerClass, SimEvent } from '../src/sim/types';
+import { hudChromeStrings } from '../src/ui/i18n.catalog/hud_chrome';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 const FIVE = { tank: 1, healer: 1, dps: 3 };
@@ -96,7 +98,7 @@ function acceptAll(sim: Sim, pids: number[]): SimEvent[] {
 // ---------------------------------------------------------------------------
 
 describe('finder catalogue metadata', () => {
-  it('pins the 11 activity ids in catalogue order', () => {
+  it('pins the 15 activity ids in catalogue order', () => {
     expect(FINDER_ACTIVITIES.map((a) => a.id)).toEqual([
       'hollow_crypt_normal',
       'sunken_bastion_normal',
@@ -106,9 +108,13 @@ describe('finder catalogue metadata', () => {
       'sunken_bastion_heroic',
       'drowned_temple_heroic',
       'gravewyrm_sanctum_heroic',
+      'wildheart_basin_normal',
+      'wildheart_basin_heroic',
       'nythraxis_crypt_normal',
       'nythraxis_boss_arena_normal',
       'nythraxis_boss_arena_heroic',
+      'ignivar_raid_arena_normal',
+      'ignivar_raid_arena_heroic',
     ]);
   });
 
@@ -125,9 +131,13 @@ describe('finder catalogue metadata', () => {
       sunken_bastion_heroic: [20, 20],
       drowned_temple_heroic: [20, 20],
       gravewyrm_sanctum_heroic: [20, 20],
+      wildheart_basin_normal: [20, 20],
+      wildheart_basin_heroic: [20, 20],
       nythraxis_crypt_normal: [20, 20],
       nythraxis_boss_arena_normal: [20, 20],
       nythraxis_boss_arena_heroic: [20, 20],
+      ignivar_raid_arena_normal: [20, 20],
+      ignivar_raid_arena_heroic: [20, 20],
     });
   });
 
@@ -169,10 +179,13 @@ describe('finder catalogue metadata', () => {
     );
   });
 
-  it('heroics and the raid carry the daily lockout label; normals do not', () => {
+  it('heroics and the raids carry a lockout label; normals do not', () => {
     for (const a of FINDER_ACTIVITIES) {
-      const daily = a.difficulty === 'heroic' || a.kind === 'raid';
-      expect(a.lockout, a.id).toBe(daily ? 'daily' : 'none');
+      const locked = a.difficulty === 'heroic' || a.kind === 'raid';
+      // The Ignivar rooms are the weekly-reset raid (WEEKLY_LOCKOUT_RAID_ROOMS
+      // in src/sim/instances/dungeons.ts); everything else locks daily.
+      const expected = !locked ? 'none' : a.dungeonId === 'ignivar_raid_arena' ? 'weekly' : 'daily';
+      expect(a.lockout, a.id).toBe(expected);
     }
   });
 
@@ -190,6 +203,67 @@ describe('finder catalogue metadata', () => {
     const normalMechanics = normal?.encounters.flatMap((e) => e.mechanics) ?? [];
     const heroicMechanics = heroic?.encounters.flatMap((e) => e.mechanics) ?? [];
     for (const m of normalMechanics) expect(heroicMechanics).toContain(m);
+  });
+
+  it('catalogues the Ignivar raid family on the Crucible arena with the Forge-Lift as its door', () => {
+    for (const id of ['ignivar_raid_arena_normal', 'ignivar_raid_arena_heroic']) {
+      const a = finderActivity(id);
+      expect(a?.kind).toBe('raid');
+      expect(a?.dungeonId).toBe('ignivar_raid_arena');
+      // The family's ONE overworld entrance is the keep-tower forge-lift
+      // (IGNIVAR_KEEP_DOOR_POS in src/sim/content/dungeons.ts).
+      expect(a?.entranceDungeonId).toBe('ignivar_forge_lift');
+      expect(DUNGEONS[a?.entranceDungeonId ?? '']?.doorPos).toEqual(
+        DUNGEONS.ignivar_raid_arena.doorPos,
+      );
+      // Both boss rooms run on the weekly reset (WEEKLY_LOCKOUT_RAID_ROOMS),
+      // one lock per room, so the row reads the Inner Crucible's lock too.
+      expect(a?.lockout).toBe('weekly');
+      expect(a?.lockoutDungeonIds).toEqual(['ignivar_inner_crucible']);
+      expect(a?.attunementQuestId).toBeUndefined();
+      expect(a?.encounters.map((e) => e.mobId)).toEqual([
+        'ignivar_herald_of_the_last_flame',
+        'varkhul_forgefather_of_the_last_flame',
+      ]);
+      expect(a?.encounters.at(-1)?.final).toBe(true);
+    }
+    // Chains of the Forge is heroic-only (src/sim/ignivar_forge_chains.ts).
+    const normal = finderActivity('ignivar_raid_arena_normal');
+    const heroic = finderActivity('ignivar_raid_arena_heroic');
+    expect(normal?.encounters.flatMap((e) => e.mechanics)).not.toContain('chains_of_the_forge');
+    expect(heroic?.encounters[0].mechanics).toContain('chains_of_the_forge');
+    expect(heroic?.encounters[1]).toBe(normal?.encounters[1]);
+  });
+
+  it('catalogues The Wildheart Basin as a level-cap five-man on both difficulties', () => {
+    const normal = finderActivity('wildheart_basin_normal');
+    const heroic = finderActivity('wildheart_basin_heroic');
+    for (const a of [normal, heroic]) {
+      expect(a?.kind).toBe('dungeon');
+      expect(a?.dungeonId).toBe('wildheart_basin');
+      expect(a?.entranceDungeonId).toBe('wildheart_basin');
+      expect(a?.encounters.map((e) => e.mobId)).toEqual([
+        'wildheart_stalker',
+        'wildheart_ravager',
+        'wildheart_hexcaller',
+        'wildheart_beastmaster',
+        'wildheart_high_priest',
+      ]);
+      expect(a?.encounters.at(-1)?.final).toBe(true);
+    }
+    expect(normal?.lockout).toBe('none');
+    expect(heroic?.lockout).toBe('daily');
+  });
+
+  it('names every encounter mechanic key in the English finder catalogue', () => {
+    const keys = new Set(Object.keys(hudChromeStrings.finder.mech));
+    const missing: string[] = [];
+    for (const a of FINDER_ACTIVITIES) {
+      for (const e of a.encounters) {
+        for (const m of e.mechanics) if (!keys.has(m)) missing.push(`${a.id}/${e.mobId}: ${m}`);
+      }
+    }
+    expect(missing).toEqual([]);
   });
 });
 

@@ -209,6 +209,54 @@ describe('mob portrait source manifest', () => {
     ).toThrow(/missing changed row mob_001/);
   });
 
+  it('re-proves only the rows that moved when just the render bundle digest drifted', () => {
+    const trackedFiles = [
+      { path: 'scripts/render_finder_portraits.mjs', bytes: 10, sha256: 'render' },
+      { path: 'scripts/lib/mob_portrait_jobs.mjs', bytes: 11, sha256: 'jobs' },
+      { path: 'scripts/lib/mob_portrait_background.mjs', bytes: 12, sha256: 'background' },
+    ];
+    const rows = Array.from({ length: 4 }, (_, index) => ({
+      id: `mob_${index}`,
+      sourceFingerprint: `source-${index}`,
+      output: { bytes: 100 + index, sha256: `output-${index}` },
+    }));
+    const previous = {
+      schemaVersion: 2,
+      rendererFingerprint: 'renderer-a',
+      renderer: { trackedFiles: structuredClone(trackedFiles) },
+      portraits: structuredClone(rows),
+    };
+    // Bundle-only drift (the tracked renderer files are byte-identical): one
+    // re-rendered output is the only row that needs a receipt.
+    const bundleDrift = structuredClone(previous);
+    bundleDrift.rendererFingerprint = 'renderer-b';
+    bundleDrift.portraits[2].output = { bytes: 555, sha256: 'rerendered' };
+    expect(changedPortraitIds(previous, bundleDrift)).toEqual(['mob_2']);
+    const receipt = {
+      schemaVersion: 1,
+      generatedBy: 'scripts/render_finder_portraits.mjs',
+      rendererFingerprint: 'renderer-b',
+      portraits: [structuredClone(bundleDrift.portraits[2])],
+    };
+    expect(() =>
+      assertManifestWriteAuthorized({ previous, next: bundleDrift, receipt }),
+    ).not.toThrow();
+    expect(() =>
+      assertManifestWriteAuthorized({ previous, next: bundleDrift, receipt: null }),
+    ).toThrow(/without a renderer receipt: mob_2$/);
+    // A tracked renderer file moving with the same fingerprint drift is a
+    // renderer change: every row is back on the hook.
+    const rendererEdit = structuredClone(bundleDrift);
+    rendererEdit.renderer.trackedFiles[1].sha256 = 'jobs-edited';
+    expect(changedPortraitIds(previous, rendererEdit)).toHaveLength(4);
+    expect(() => assertManifestWriteAuthorized({ previous, next: rendererEdit, receipt })).toThrow(
+      /missing changed row mob_0/,
+    );
+    // A manifest with no tracked-file ledger cannot prove bundle-only drift.
+    const { renderer: _renderer, ...unledgered } = structuredClone(bundleDrift);
+    expect(changedPortraitIds(previous, unledgered)).toHaveLength(4);
+  });
+
   it('accepts a renderer receipt only when every changed source and output matches', () => {
     const previous = {
       schemaVersion: 2,

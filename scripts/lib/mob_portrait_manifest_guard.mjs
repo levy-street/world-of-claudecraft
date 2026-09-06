@@ -1,5 +1,30 @@
+// The renderer fingerprint folds two things together: the digests of the tracked renderer
+// source files and the digest of the browser render bundle. A tracked-file change is a
+// renderer CODE change and re-proves every row (any output could move). The bundle digest
+// alone moves on unrelated gameplay or content churn (its import graph reaches the world
+// and content modules; mob_portrait_manifest_diff.mjs explains why), the same drift
+// `--check` already tolerates as bookkeeping. A write under bundle-only drift therefore
+// re-proves exactly the rows whose source or output actually changed, so a contributor who
+// re-renders a handful of newly catalogued encounters is never asked to re-mint the
+// whole set on a machine that cannot reproduce the committed bytes.
+function trackedRendererFilesMatch(previous, next) {
+  const before = previous?.renderer?.trackedFiles;
+  const after = next?.renderer?.trackedFiles;
+  if (!Array.isArray(before) || !Array.isArray(after) || before.length !== after.length) {
+    return false;
+  }
+  return before.every((file, index) => {
+    const other = after[index];
+    return file.path === other?.path && file.bytes === other.bytes && file.sha256 === other.sha256;
+  });
+}
+
 export function changedPortraitIds(previous, next) {
-  if (!previous || previous.rendererFingerprint !== next.rendererFingerprint) {
+  if (!previous) return next.portraits.map((portrait) => portrait.id);
+  if (
+    previous.rendererFingerprint !== next.rendererFingerprint &&
+    !trackedRendererFilesMatch(previous, next)
+  ) {
     return next.portraits.map((portrait) => portrait.id);
   }
   const before = new Map(previous.portraits.map((portrait) => [portrait.id, portrait]));

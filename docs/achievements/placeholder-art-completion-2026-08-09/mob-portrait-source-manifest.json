@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "448a81d8c63a15b663c304ba52b285ed913382774a309dafb53c06b436f092ad",
+  "rendererFingerprint": "475ed2faf13d854a82e776e92d3b790c8834714c8d139a76a4d2b8660759eca7",
   "renderer": {
     "trackedFiles": [
       {
@@ -27,8 +27,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 4356414,
-      "sha256": "f443e52bdc3d91da3f8e1ce7ec06bcccae03c4efa350111e7e5b876aa4fc32ec",
+      "bytes": 4566857,
+      "sha256": "aa0bd961c89bce1755855892ad80dc3065f06698127af091747cddb4a3f0f36e",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -3301,7 +3301,7 @@
     {
       "id": "ignivar_herald_of_the_last_flame",
       "family": "elemental",
-      "finderEncounter": false,
+      "finderEncounter": true,
       "visualKey": "mob_ignivar",
       "renderSpec": {
         "model": {
@@ -3328,8 +3328,8 @@
       "sourceFingerprint": "c108d109f45326ad6a09a91f13991b30927d84a3273d5454e52118f9cad4f44f",
       "output": {
         "path": "public/ui/mobs/ignivar_herald_of_the_last_flame.webp",
-        "bytes": 2396,
-        "sha256": "80ee4a4a99665cc3086c6aa510e158015c1d664428273a2ed457f28f5d92b289"
+        "bytes": 2414,
+        "sha256": "1c0a946c66f821f1773d82920468b64d262eb3141aeb1960e30e3f849283e91e"
       }
     },
     {
@@ -7870,7 +7870,7 @@
     {
       "id": "varkhul_forgefather_of_the_last_flame",
       "family": "elemental",
-      "finderEncounter": false,
+      "finderEncounter": true,
       "visualKey": "mob_varkhul_forgefather",
       "renderSpec": {
         "model": {
@@ -7897,8 +7897,8 @@
       "sourceFingerprint": "a1b01f3bd947684ddc20c92d46e4c7c96b25b7422ec0690f4cccb5bdafd27d3e",
       "output": {
         "path": "public/ui/mobs/varkhul_forgefather_of_the_last_flame.webp",
-        "bytes": 3518,
-        "sha256": "dbb650626d73cd0baa886df465819b139a9e67940379ded07a700b77b79da0b0"
+        "bytes": 3506,
+        "sha256": "122c80fe8c0e4b9a57578302548370ed3c652ab29bbbc8251cd6caf31040f641"
       }
     },
     {
@@ -8523,7 +8523,7 @@
     {
       "id": "wildheart_beastmaster",
       "family": "troll",
-      "finderEncounter": false,
+      "finderEncounter": true,
       "visualKey": "mob_wildheart_beastmaster",
       "renderSpec": {
         "model": {
@@ -8550,14 +8550,14 @@
       "sourceFingerprint": "3c3b9c0c15aa5b1061dd6ebccde693527bd9c86c45be51cd26da658de0e0ff7e",
       "output": {
         "path": "public/ui/mobs/wildheart_beastmaster.webp",
-        "bytes": 3316,
-        "sha256": "15f49f4edd97ddde548ee5fe9533357b75546c154ba6f6c7c4f1fd1915b7e41a"
+        "bytes": 3264,
+        "sha256": "0f9437039e40650b5b17e36dc4938b4544363ec0bff78ef477317eabcafb93f3"
       }
     },
     {
       "id": "wildheart_hexcaller",
       "family": "troll",
-      "finderEncounter": false,
+      "finderEncounter": true,
       "visualKey": "mob_wildheart_hexcaller",
       "renderSpec": {
         "model": {
@@ -8584,14 +8584,14 @@
       "sourceFingerprint": "429116bbd70dc6c987264887d3677dd52cb3ed503d364ebc5da64e4b869e2360",
       "output": {
         "path": "public/ui/mobs/wildheart_hexcaller.webp",
-        "bytes": 3284,
-        "sha256": "a27aab09f2dc2048aee2c9dc294747c792c1b852e581adefb072acacd7d55e9d"
+        "bytes": 3276,
+        "sha256": "2c511ab73bfdcf3a5b80279da23168ac04fb9d035ae1cdaf690fac48ba72ab55"
       }
     },
     {
       "id": "wildheart_high_priest",
       "family": "troll",
-      "finderEncounter": false,
+      "finderEncounter": true,
       "visualKey": "mob_wildheart_high_priest",
       "renderSpec": {
         "model": {
@@ -8618,14 +8618,14 @@
       "sourceFingerprint": "119fe85f7e322bd33f8a8dfe2aa8447ca8ff6a9422ed7841d286bdda21cd85dd",
       "output": {
         "path": "public/ui/mobs/wildheart_high_priest.webp",
-        "bytes": 3542,
-        "sha256": "cb3553d0e55b2bc9371e3e815e01cd02c2484ef46ddbca0fb1bd7e26f932645c"
+        "bytes": 3516,
+        "sha256": "0a5a6a33e3682ab4a6b9630afdc5e5b858c7c1f1a64930bfdd2385dbb635e847"
       }
     },
     {
       "id": "wildheart_ravager",
       "family": "troll",
-      "finderEncounter": false,
+      "finderEncounter": true,
       "visualKey": "mob_wildheart_ravager",
       "renderSpec": {
         "model": {
@@ -8653,13 +8653,13 @@
       "output": {
         "path": "public/ui/mobs/wildheart_ravager.webp",
         "bytes": 3438,
-        "sha256": "9eb1589e570269d11d70689eed37070c16c675cd4e5d1a6e83f2d1ee97ee40ad"
+        "sha256": "920473c888f897077f5f910a482c2a58c866324c7ecb08c5b6d3e5079db82abd"
       }
     },
     {
       "id": "wildheart_stalker",
       "family": "troll",
-      "finderEncounter": false,
+      "finderEncounter": true,
       "visualKey": "mob_wildheart_stalker",
       "renderSpec": {
         "model": {
@@ -8686,8 +8686,8 @@
       "sourceFingerprint": "8566b5949a1b9a4f6cfe84d3f07a6d78a8bc35220e964b9080cbf5e797c1dbed",
       "output": {
         "path": "public/ui/mobs/wildheart_stalker.webp",
-        "bytes": 2162,
-        "sha256": "d10532b0172ae46b7a689cf3b986330e085f4cd5abfe5080a704076cabd403c0"
+        "bytes": 2180,
+        "sha256": "de84e863f85fba24ab4c863301b6e80014e7812403f20c7a74831dcf1b575317"
       }
     },
     {

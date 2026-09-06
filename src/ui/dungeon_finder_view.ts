@@ -89,8 +89,9 @@ export interface FinderEncounterViewModel {
   // partition one draw). Singles: independent authored chances.
   groups: FinderLootGroupView[];
   singles: FinderLootItemView[];
-  // Extra heroic-only groups appended on heroic difficulty (final boss only).
+  // Extra heroic-only rows appended on heroic difficulty.
   heroicGroups: FinderLootGroupView[];
+  heroicSingles: FinderLootItemView[];
 }
 
 export interface FinderActivityDetailView {
@@ -104,7 +105,7 @@ export interface FinderActivityDetailView {
   composition: { tank: number; healer: number; dps: number } | null;
   autoQueue: boolean;
   entrance: { x: number; z: number; zoneId: string };
-  lockout: 'none' | 'daily';
+  lockout: FinderActivity['lockout'];
   lockedMinutes: number;
   attunementQuestId: string | null;
   heroicMarks: number; // marks per participant on the heroic final boss (0 = none)
@@ -228,12 +229,19 @@ function blockReasonFor(
   return null;
 }
 
+// The longest remaining lock across the activity's rooms: a family that locks
+// per boss room (the Ignivar raid) reads every room it declares, so a player
+// locked to Varkhul alone still sees the lock on the one catalogue row.
 function lockoutMinutesFor(activity: FinderActivity, lockouts: RaidLockout[]): number {
-  const key =
-    activity.difficulty === 'heroic' ? `${activity.dungeonId}:heroic` : activity.dungeonId;
-  const hit = lockouts.find((l) => l.id === key);
-  if (!hit || activity.lockout !== 'daily') return 0;
-  return Math.max(1, Math.ceil(hit.msRemaining / 60000));
+  if (activity.lockout === 'none') return 0;
+  const ids = [activity.dungeonId, ...(activity.lockoutDungeonIds ?? [])];
+  let ms = 0;
+  for (const id of ids) {
+    const key = activity.difficulty === 'heroic' ? `${id}:heroic` : id;
+    const hit = lockouts.find((l) => l.id === key);
+    if (hit) ms = Math.max(ms, hit.msRemaining);
+  }
+  return ms > 0 ? Math.max(1, Math.ceil(ms / 60000)) : 0;
 }
 
 function lootItem(entry: { itemId?: string; chance: number }): FinderLootItemView | null {
@@ -292,8 +300,12 @@ function buildEncounters(activity: FinderActivity): FinderEncounterViewModel[] {
     // Mirror the roller's heroic-append gate exactly: a heroic claim rolls
     // HEROIC_BOSS_LOOT for ANY encounter that has a table, finale or not
     // (loot_roll.ts reads the table by mob id with no finale condition), so
-    // the preview must not hide a non-finale boss's heroic slot.
-    const heroicGroups = heroicClaim ? lootGroups(HEROIC_BOSS_LOOT[enc.mobId] ?? []).groups : [];
+    // the preview must not hide a non-finale boss's heroic slot, and it lists
+    // the table's group-less singles too (the Wildheart Beastmaster's
+    // heroic-only Duskwhisper is one).
+    const heroicLoot = heroicClaim
+      ? lootGroups(HEROIC_BOSS_LOOT[enc.mobId] ?? [])
+      : { groups: [], singles: [] };
     out.push({
       mobId: enc.mobId,
       final: enc.final === true,
@@ -303,7 +315,8 @@ function buildEncounters(activity: FinderActivity): FinderEncounterViewModel[] {
       copper,
       groups,
       singles,
-      heroicGroups,
+      heroicGroups: heroicLoot.groups,
+      heroicSingles: heroicLoot.singles,
     });
   }
   return out;
@@ -320,7 +333,7 @@ export function finderLootItemIds(): string[] {
       for (const group of [...encounter.groups, ...encounter.heroicGroups]) {
         for (const item of group.items) ids.add(item.itemId);
       }
-      for (const item of encounter.singles) ids.add(item.itemId);
+      for (const item of [...encounter.singles, ...encounter.heroicSingles]) ids.add(item.itemId);
     }
   }
   return [...ids];

@@ -95,9 +95,15 @@ export interface FinderActivity {
   // Display-only: the quest that gates physical entry, when one exists. The
   // finder never enforces attunement (door rules stay authoritative).
   attunementQuestId?: string;
-  // Display-only lockout summary: heroics and the raid lock daily on the
-  // final-boss kill; normal five-mans and the crypt have no lockout.
-  lockout: 'none' | 'daily';
+  // Display-only lockout summary: heroics and the Nythraxis arena lock daily
+  // on the final-boss kill; the Ignivar raid rooms lock on the WEEKLY reset
+  // boundary (WEEKLY_LOCKOUT_RAID_ROOMS in src/sim/instances/dungeons.ts);
+  // normal five-mans and the crypt have no lockout.
+  lockout: 'none' | 'daily' | 'weekly';
+  // Display-only: the extra dungeon ids whose lockouts this activity reads
+  // besides `dungeonId`, for a family that locks per boss room (the Ignivar
+  // raid's Inner Crucible). The heroic key derives per id the same way.
+  lockoutDungeonIds?: readonly string[];
 }
 
 const FIVE_MAN: FinderComposition = { tank: 1, healer: 1, dps: 3 };
@@ -170,6 +176,67 @@ const NYTHRAXIS_RAID_ENCOUNTERS_HEROIC: readonly FinderEncounter[] = [
       'dread_curse',
     ],
   },
+];
+
+const WILDHEART_BASIN_ENCOUNTERS: readonly FinderEncounter[] = [
+  { mobId: 'wildheart_stalker', mechanics: [] },
+  { mobId: 'wildheart_ravager', mechanics: ['bloodmane_rend', 'tusk_sweep'] },
+  { mobId: 'wildheart_hexcaller', mechanics: ['ancestral_sap'] },
+  {
+    mobId: 'wildheart_beastmaster',
+    mechanics: ['call_of_the_hunt', 'thickhide_ward', 'beast_pit_quake'],
+  },
+  {
+    mobId: 'wildheart_high_priest',
+    final: true,
+    mechanics: ['wildheart_pulse', 'jaguar_roar', 'enrage'],
+  },
+];
+
+// The Crucible of the Last Spring raid (docs/prd/ignivar-raid.md): two boss
+// rooms in one four-room instance family. Ignivar holds the Crucible arena,
+// Varkhul the Inner Crucible behind the Molten Assembly; the approach and
+// assembly trash rooms carry no finder encounter of their own.
+const IGNIVAR_RAID_ENCOUNTERS: readonly FinderEncounter[] = [
+  {
+    mobId: 'ignivar_herald_of_the_last_flame',
+    mechanics: [
+      'brand_of_the_pyre',
+      'forge_strike',
+      'rain_of_cinders',
+      'falling_cinders',
+      'revolving_inferno',
+      'forge_wave',
+      'apocalypse_add',
+      'judgment_of_the_forge',
+      'last_inferno',
+    ],
+  },
+  {
+    mobId: 'varkhul_forgefather_of_the_last_flame',
+    final: true,
+    mechanics: [
+      'makers_brand',
+      'forgefathers_sweep',
+      'tempering_ray',
+      'cinder_orbs',
+      'forgestorm',
+      'shared_pyre',
+      'anvils_decree',
+      'masters_assembly',
+    ],
+  },
+];
+
+// Heroic adds Chains of the Forge (src/sim/ignivar_forge_chains.ts) to
+// Ignivar; its own array, like the Nythraxis heroic list, so the normal-tier
+// preview never carries a heroic-only mechanic.
+const IGNIVAR_RAID_ENCOUNTERS_HEROIC: readonly FinderEncounter[] = [
+  {
+    mobId: 'ignivar_herald_of_the_last_flame',
+    mechanics: [...IGNIVAR_RAID_ENCOUNTERS[0].mechanics, 'chains_of_the_forge'],
+  },
+  IGNIVAR_RAID_ENCOUNTERS[1],
 ];
 
 export const FINDER_ACTIVITIES: readonly FinderActivity[] = [
@@ -286,6 +353,34 @@ export const FINDER_ACTIVITIES: readonly FinderActivity[] = [
     lockout: 'daily',
   },
   {
+    id: 'wildheart_basin_normal',
+    dungeonId: 'wildheart_basin',
+    difficulty: 'normal',
+    kind: 'dungeon',
+    minLevel: 20,
+    maxLevel: 20,
+    size: 5,
+    composition: FIVE_MAN,
+    autoQueue: true,
+    entranceDungeonId: 'wildheart_basin',
+    encounters: WILDHEART_BASIN_ENCOUNTERS,
+    lockout: 'none',
+  },
+  {
+    id: 'wildheart_basin_heroic',
+    dungeonId: 'wildheart_basin',
+    difficulty: 'heroic',
+    kind: 'dungeon',
+    minLevel: 20,
+    maxLevel: 20,
+    size: 5,
+    composition: FIVE_MAN,
+    autoQueue: true,
+    entranceDungeonId: 'wildheart_basin',
+    encounters: WILDHEART_BASIN_ENCOUNTERS,
+    lockout: 'daily',
+  },
+  {
     // The solo attunement instance: catalogued for discovery and social
     // listings (up to five may group for it), but never role-queued.
     id: 'nythraxis_crypt_normal',
@@ -330,6 +425,39 @@ export const FINDER_ACTIVITIES: readonly FinderActivity[] = [
     encounters: NYTHRAXIS_RAID_ENCOUNTERS_HEROIC,
     attunementQuestId: 'q_nythraxis_bound_guardian',
     lockout: 'daily',
+  },
+  {
+    // The Ignivar raid family is entered through the Forge-Lift (the keep
+    // tower door on Forgefather's Isle); the activity is keyed on the Crucible
+    // arena, whose lockout id is the family's first boss room.
+    id: 'ignivar_raid_arena_normal',
+    dungeonId: 'ignivar_raid_arena',
+    difficulty: 'normal',
+    kind: 'raid',
+    minLevel: 20,
+    maxLevel: 20,
+    size: 10,
+    composition: TEN_RAID,
+    autoQueue: true,
+    entranceDungeonId: 'ignivar_forge_lift',
+    encounters: IGNIVAR_RAID_ENCOUNTERS,
+    lockout: 'weekly',
+    lockoutDungeonIds: ['ignivar_inner_crucible'],
+  },
+  {
+    id: 'ignivar_raid_arena_heroic',
+    dungeonId: 'ignivar_raid_arena',
+    difficulty: 'heroic',
+    kind: 'raid',
+    minLevel: 20,
+    maxLevel: 20,
+    size: 10,
+    composition: TEN_RAID,
+    autoQueue: true,
+    entranceDungeonId: 'ignivar_forge_lift',
+    encounters: IGNIVAR_RAID_ENCOUNTERS_HEROIC,
+    lockout: 'weekly',
+    lockoutDungeonIds: ['ignivar_inner_crucible'],
   },
 ];
 
