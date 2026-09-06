@@ -1514,6 +1514,23 @@ describe('actionBarView: attack + item slots', () => {
     expect(ready.cdText).toBe('');
   });
 
+  it('paints no potion swipe on an elixir slot: elixirs have no shared cooldown', () => {
+    // src/sim/items.ts kind 'elixir' applies its aura with no potionCd write, so a
+    // placed elixir must stay usable while the potion timer runs.
+    const view = createActionBarView(
+      descriptor(slot(1, { item: item('elixir_of_the_bear', 'elixir') })),
+      fakeDeps(),
+    );
+    const s = view.tick(
+      world({ potionCdRemaining: 60, inventory: [{ itemId: 'elixir_of_the_bear', count: 1 }] }),
+    ).slots[0];
+    expect(s.kind).toBe('item');
+    expect(s.cooldownRemaining).toBe(0);
+    expect(s.cooldownPercent).toBe(0);
+    expect(s.cdText).toBe('');
+    expect(s.usable).toBe(true);
+  });
+
   it('does not paint a cooldown on a non-potion item even while the potion timer runs', () => {
     const view = createActionBarView(
       descriptor(slot(1, { item: item('iron_dagger', 'weapon') })),

@@ -498,7 +498,7 @@ export function bagTooltipHintKey(
   )
     return 'itemUi.tooltip.clickEquip';
   if (item.kind === 'food' || item.kind === 'drink') return 'itemUi.tooltip.clickConsume';
-  if (item.kind === 'potion') return 'itemUi.tooltip.clickUseInstant';
+  if (item.kind === 'potion' || item.kind === 'elixir') return 'itemUi.tooltip.clickUseInstant';
   // Charms (use.type 'toolEffect') slot from the Professions window, not from
   // a bag click. Mirror the sim refusal copy so the hover never promises a
   // use action the click cannot perform.

@@ -48,6 +48,7 @@ const NO_MODE: BagMode = {
 const ITEMS: Record<string, ItemDef> = {
   sword: { kind: 'weapon', name: 'Sword', quality: 'rare' } as ItemDef,
   potion: { kind: 'potion', name: 'Potion', quality: 'common' } as ItemDef,
+  elixir: { kind: 'elixir', name: 'Elixir', quality: 'uncommon' } as ItemDef,
   bread: { kind: 'food', name: 'Bread', quality: 'common' } as ItemDef,
   questItem: { kind: 'quest', name: 'Relic', quality: 'epic' } as ItemDef,
   bound: { kind: 'armor', name: 'Bound Plate', quality: 'uncommon', noMarketList: true } as ItemDef,
@@ -666,6 +667,7 @@ describe('bagTooltipHintKey', () => {
     expect(bagTooltipHintKey(ITEMS.sword, NO_MODE)).toBe('itemUi.tooltip.clickEquip');
     expect(bagTooltipHintKey(ITEMS.bread, NO_MODE)).toBe('itemUi.tooltip.clickConsume');
     expect(bagTooltipHintKey(ITEMS.potion, NO_MODE)).toBe('itemUi.tooltip.clickUseInstant');
+    expect(bagTooltipHintKey(ITEMS.elixir, NO_MODE)).toBe('itemUi.tooltip.clickUseInstant');
     expect(bagTooltipHintKey(ITEMS.rod, NO_MODE)).toBe('itemUi.tooltip.clickUse');
     // Charms refuse bag use (sim: "Open Professions to slot that."); the hint
     // must not advertise click-to-use for a click that only errors.
