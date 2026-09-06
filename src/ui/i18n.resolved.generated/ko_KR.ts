@@ -4472,7 +4472,7 @@ export const ko_KR: EnTranslations = {
       "summary": "세계 지도. 지역을 선택하면 해당 지도가 열립니다.",
       "toWorld": "세계 지도",
       "toZone": "지역 지도",
-      "toInstance": "Instance map",
+      "toInstance": "인스턴스 지도",
       "toggleAria": "세계 지도와 지역 지도 전환",
       "levels": "레벨 {min}부터 {max}까지"
     },
@@ -4507,7 +4507,7 @@ export const ko_KR: EnTranslations = {
       "walletLinkedConnected": "연결된 지갑 앱이 접속되어 $WOC로 결제할 준비가 되었습니다.",
       "walletUsdBalance": "{amount} USD",
       "walletUsdUnknown": "알 수 없음",
-      "walletCardDismiss": "Hide wallet card",
+      "walletCardDismiss": "지갑 카드 숨기기",
       "rateNote": "환율: {time} 기준 1 USD당 약 {tokens} $WOC.",
       "rateNotePaused": "마지막으로 확인된 환율: {time} 기준 1 USD당 약 {tokens} $WOC.",
       "estimateNote": "{usd}는 현재 환율로 약 {tokens} $WOC입니다.",
@@ -11672,7 +11672,7 @@ export const ko_KR: EnTranslations = {
       },
       "temporal_echo": {
         "name": "시간의 메아리",
-        "description": "더 건강했던 순간의 메아리로 아군에게 표식을 남겨 즉시 생명력을 {damage} 회복시킵니다. {duration}초 동안 당신이 입힌 비전 피해의 일부가 메아리를 통해 그 아군을 치유합니다."
+        "description": "더 건강했던 순간의 메아리로 아군에게 표식을 남겨 즉시 생명력을 {damage} 회복시킵니다. {duration}초 동안 당신의 다른 단일 대상 비전 피해의 {echoSinglePct}%와 범위 비전 피해의 {echoAreaPct}%가 그 아군을 치유합니다. 에테르 쇄도와 에테르 화살은 대신 자신이 입힌 피해의 {echoDriverPct}%만큼 그 아군을 치유합니다."
       },
       "temporal_cascade": {
         "name": "시간의 연쇄",

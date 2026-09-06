@@ -583,7 +583,7 @@ describe('map_window_painter: cadence + cached background preserved', () => {
     expect(markerInteraction).toContain('this.stations = EMPTY_MARKERS;');
     expect(markerInteraction).toContain('this.services = EMPTY_MARKERS;');
     expect(markerInteraction).toContain('this.navigation = EMPTY_MARKERS;');
-    expect(hud.match(/this\.clearMapHitState\(canvas\);/g)).toHaveLength(6);
+    expect(hud.match(/this\.clearMapHitState\(canvas\);/g)).toHaveLength(5);
     // The gather-tip resolve memo resets inside the shared clear and beside the
     // overworld store, bounding its staleness at the same
     // mediumHud repaint that refreshes the painted icon.

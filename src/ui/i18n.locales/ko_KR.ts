@@ -9661,6 +9661,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.walletLinkedConnected':
     '연결된 지갑 앱이 접속되어 $WOC로 결제할 준비가 되었습니다.',
   'hudChrome.wocMarket.walletUsdUnknown': '알 수 없음',
+  'hudChrome.wocMarket.walletCardDismiss': '지갑 카드 숨기기',
   'hudChrome.wocMarket.walletUsdBalance': '{amount} USD',
   'hudChrome.wocMarket.rateNote': '환율: {time} 기준 1 USD당 약 {tokens} $WOC.',
   'hudChrome.wocMarket.estimateNote': '{usd}는 현재 환율로 약 {tokens} $WOC입니다.',
@@ -11003,7 +11004,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '대상을 현재에서 한 박자 벗어나게 합니다. 시간의 껍질이 10초 동안 피해를 {damage} 흡수한 뒤 시간선이 제자리로 돌아옵니다.',
   'entities.abilities.temporal_echo.name': '시간의 메아리',
   'entities.abilities.temporal_echo.description':
-    '더 건강했던 순간의 메아리로 아군에게 표식을 남겨 즉시 생명력을 {damage} 회복시킵니다. {duration}초 동안 당신이 입힌 비전 피해의 일부가 메아리를 통해 그 아군을 치유합니다.',
+    '더 건강했던 순간의 메아리로 아군에게 표식을 남겨 즉시 생명력을 {damage} 회복시킵니다. {duration}초 동안 당신의 다른 단일 대상 비전 피해의 {echoSinglePct}%와 범위 비전 피해의 {echoAreaPct}%가 그 아군을 치유합니다. 에테르 쇄도와 에테르 화살은 대신 자신이 입힌 피해의 {echoDriverPct}%만큼 그 아군을 치유합니다.',
   'entities.abilities.aspect_of_the_wild.description':
     '30미터 안의 아군에게 야생의 힘을 불어넣어 5분 동안 공격력을 45, 공격 속도를 5%만큼 증가시킵니다. (사냥꾼 특성)',
   'entities.abilities.avenging_wrath.description':
@@ -12777,6 +12778,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.continentMap.toggleAria': '세계 지도와 지역 지도 전환',
   'hudChrome.continentMap.levels': '레벨 {min}부터 {max}까지',
   'hudChrome.continentMap.toZone': '지역 지도',
+  'hudChrome.continentMap.toInstance': '인스턴스 지도',
   'hudChrome.enchanting.wornTagIndexed': '착용 중 ({slot} {index})',
   'hudChrome.targetAuras.title': '대상 오라',
   'hudChrome.targetAuras.keybindLabel': '대상 강화 및 약화 효과',

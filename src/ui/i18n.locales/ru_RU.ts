@@ -9842,6 +9842,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.walletLinkedConnected':
     'Привязанное приложение-кошелёк подключено и готово к платежам в $WOC.',
   'hudChrome.wocMarket.walletUsdUnknown': 'Неизвестно',
+  'hudChrome.wocMarket.walletCardDismiss': 'Скрыть карточку кошелька',
   'hudChrome.wocMarket.walletUsdBalance': '{amount} USD',
   'hudChrome.wocMarket.rateNote': 'Курс: около {tokens} $WOC за доллар США по состоянию на {time}.',
   'hudChrome.wocMarket.estimateNote': '{usd} по текущему курсу составляет около {tokens} $WOC.',
@@ -11204,7 +11205,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Смещает цель на мгновение из настоящего: временная оболочка поглощает {damage} урона в течение 10 сек, после чего линия времени возвращается на место.',
   'entities.abilities.temporal_echo.name': 'Временное эхо',
   'entities.abilities.temporal_echo.description':
-    'Отмечает союзника эхом более здорового мгновения, мгновенно восполняя {damage} здоровья. В течение {duration} сек часть наносимого вами урона от тайной магии возвращается через эхо, исцеляя его.',
+    'Отмечает союзника эхом более здорового мгновения, мгновенно восполняя {damage} здоровья. В течение {duration} сек {echoSinglePct}% вашего прочего урона тайной магией по одной цели и {echoAreaPct}% урона тайной магией по области исцеляют этого союзника. Эфирный всплеск и Эфирные стрелы вместо этого исцеляют его на {echoDriverPct}% нанесённого ими урона.',
   'entities.abilities.aspect_of_the_wild.description':
     'Воодушевляет союзников в радиусе 30 м дикой силой, повышая их силу атаки на 45 и скорость атаки на 5% на 5 мин. (талант охотника)',
   'entities.abilities.avenging_wrath.description':
@@ -13023,6 +13024,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.continentMap.toggleAria': 'Переключение между картой мира и картой региона',
   'hudChrome.continentMap.levels': 'Уровни {min} до {max}',
   'hudChrome.continentMap.toZone': 'Карта региона',
+  'hudChrome.continentMap.toInstance': 'Карта подземелья',
   'hudChrome.enchanting.wornTagIndexed': 'Надето ({slot} {index})',
   'hudChrome.targetAuras.title': 'Ауры цели',
   'hudChrome.targetAuras.keybindLabel': 'Усиления и ослабления цели',

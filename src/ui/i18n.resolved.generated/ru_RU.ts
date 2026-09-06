@@ -4472,7 +4472,7 @@ export const ru_RU: EnTranslations = {
       "summary": "Карта мира. Выберите зону, чтобы открыть её карту.",
       "toWorld": "Карта мира",
       "toZone": "Карта региона",
-      "toInstance": "Instance map",
+      "toInstance": "Карта подземелья",
       "toggleAria": "Переключение между картой мира и картой региона",
       "levels": "Уровни {min} до {max}"
     },
@@ -4507,7 +4507,7 @@ export const ru_RU: EnTranslations = {
       "walletLinkedConnected": "Привязанное приложение-кошелёк подключено и готово к платежам в $WOC.",
       "walletUsdBalance": "{amount} USD",
       "walletUsdUnknown": "Неизвестно",
-      "walletCardDismiss": "Hide wallet card",
+      "walletCardDismiss": "Скрыть карточку кошелька",
       "rateNote": "Курс: около {tokens} $WOC за доллар США по состоянию на {time}.",
       "rateNotePaused": "Последний известный курс: около {tokens} $WOC за доллар США по состоянию на {time}.",
       "estimateNote": "{usd} по текущему курсу составляет около {tokens} $WOC.",
@@ -11672,7 +11672,7 @@ export const ru_RU: EnTranslations = {
       },
       "temporal_echo": {
         "name": "Временное эхо",
-        "description": "Отмечает союзника эхом более здорового мгновения, мгновенно восполняя {damage} здоровья. В течение {duration} сек часть наносимого вами урона от тайной магии возвращается через эхо, исцеляя его."
+        "description": "Отмечает союзника эхом более здорового мгновения, мгновенно восполняя {damage} здоровья. В течение {duration} сек {echoSinglePct}% вашего прочего урона тайной магией по одной цели и {echoAreaPct}% урона тайной магией по области исцеляют этого союзника. Эфирный всплеск и Эфирные стрелы вместо этого исцеляют его на {echoDriverPct}% нанесённого ими урона."
       },
       "temporal_cascade": {
         "name": "Временной каскад",

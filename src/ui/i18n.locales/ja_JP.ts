@@ -9700,6 +9700,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.walletLinkedConnected':
     'リンク済みのウォレットアプリに接続され、$WOC で支払う準備ができています。',
   'hudChrome.wocMarket.walletUsdUnknown': '不明',
+  'hudChrome.wocMarket.walletCardDismiss': 'ウォレットカードを隠す',
   'hudChrome.wocMarket.walletUsdBalance': '{amount} USD',
   'hudChrome.wocMarket.rateNote': 'レート: {time} 時点で 1 USD あたり約 {tokens} $WOC。',
   'hudChrome.wocMarket.estimateNote': '{usd} は現在のレートで約 {tokens} $WOC です。',
@@ -11039,7 +11040,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '対象を現在から一拍だけずらし、時の殻が10秒間、{damage}のダメージを吸収してから時間軸が元に戻る。',
   'entities.abilities.temporal_echo.name': '時の残響',
   'entities.abilities.temporal_echo.description':
-    'より健やかだった瞬間の残響で味方に刻印し、即座に{damage}の体力を回復する。{duration}秒間、与えた秘術ダメージの一部が残響を通じてその味方を癒やす。',
+    'より健やかだった瞬間の残響で味方に刻印し、即座に{damage}の体力を回復する。{duration}秒間、あなたの他の単体秘術ダメージの{echoSinglePct}%と範囲秘術ダメージの{echoAreaPct}%がその味方を癒やす。エーテルサージとエーテルダーツは代わりに、それらが与えたダメージの{echoDriverPct}%分その味方を癒やす。',
   'entities.abilities.aspect_of_the_wild.description':
     '30ヤード以内の味方を野生の力で鼓舞し、攻撃力を45、攻撃速度を5%上昇させる。効果時間5分。（ハンターのタレント）',
   'entities.abilities.avenging_wrath.description':
@@ -12814,6 +12815,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.continentMap.toggleAria': 'ワールドマップとゾーンマップを切り替える',
   'hudChrome.continentMap.levels': 'レベル {min} から {max}',
   'hudChrome.continentMap.toZone': 'ゾーンマップ',
+  'hudChrome.continentMap.toInstance': 'インスタンスマップ',
   'hudChrome.enchanting.wornTagIndexed': '装備中 ({slot}{index})',
   'hudChrome.targetAuras.title': 'ターゲットのオーラ',
   'hudChrome.targetAuras.keybindLabel': 'ターゲットのバフとデバフ',

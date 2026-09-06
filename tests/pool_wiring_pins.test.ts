@@ -194,6 +194,14 @@ const PINS: PoolWiringPin[] = [
   {
     path: 'src/sim/interaction.ts',
     sites: [
+      {
+        fn: 'lootCorpse',
+        what: 'the canGrantItemInstance gate on a personal signed corpse slot',
+      },
+      {
+        fn: 'lootCorpse',
+        what: 'the canGrantItemInstance gate on a shared signed corpse slot',
+      },
       { fn: 'harvestCorpse', what: 'the fitsAll pre-gate over the wanted component rows' },
       { fn: 'harvestCorpse', what: 'the canGrantItemInstance gate on a signed non-specimen grant' },
       { fn: 'harvestCorpse', what: 'the canGrantItemInstance gate on a specimen grant' },

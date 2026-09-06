@@ -14489,6 +14489,15 @@ export class Hud {
     this.log(zoneWelcome(zone.id), '#ffd100');
   }
 
+  private ensureChatFollow(): ChatScrollFollow {
+    if (this.chatFollow) return this.chatFollow;
+    const targets = [this.chatLogEl, this.combatLogEl].filter(
+      (el): el is HTMLElement => el !== undefined && el !== null,
+    );
+    this.chatFollow = new ChatScrollFollow(targets);
+    return this.chatFollow;
+  }
+
   private chatLogFrom(
     name: string,
     text: string,
@@ -14499,7 +14508,8 @@ export class Hud {
     fromTitle?: string,
     classId?: PlayerClass,
   ): void {
-    const wasNearBottom = this.chatFollow.shouldFollow(this.chatLogEl);
+    const chatFollow = this.ensureChatFollow();
+    const wasNearBottom = chatFollow.shouldFollow(this.chatLogEl);
     const div = document.createElement('div');
     // The line color is a pure function of its channel (the single source of truth
     // shared with the chat input tint), so it is derived here rather than passed in.
@@ -14580,7 +14590,7 @@ export class Hud {
       if (!first) break;
       this.chatLogEl.removeChild(first);
     }
-    if (wasNearBottom) this.chatLogEl.scrollTop = this.chatLogEl.scrollHeight;
+    if (wasNearBottom) chatFollow.scrollToBottom(this.chatLogEl);
   }
 
   // Append a chat message body, rendering [[q:id]] tokens as clickable quest links
@@ -14959,7 +14969,8 @@ export class Hud {
     // region when its durable channel line is filtered by another active tab.
     announceWhenFiltered = false,
   ): void {
-    const wasNearBottom = this.chatFollow.shouldFollow(el);
+    const chatFollow = this.ensureChatFollow();
+    const wasNearBottom = chatFollow.shouldFollow(el);
     const div = document.createElement('div');
     div.style.color = color;
     if (timestamp) this.prependTimestamp(div);
@@ -14998,7 +15009,7 @@ export class Hud {
       if (!first) break;
       el.removeChild(first);
     }
-    if (wasNearBottom) this.chatFollow.scrollToBottom(el);
+    if (wasNearBottom) chatFollow.scrollToBottom(el);
   }
 
   // A floating note over the local player (e.g. "Can't move!" when a movement command

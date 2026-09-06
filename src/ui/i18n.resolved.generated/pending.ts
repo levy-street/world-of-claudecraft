@@ -793,7 +793,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.targetDots.row"
   ],
   "ko_KR": [
-    "hudChrome.continentMap.toInstance",
     "hudChrome.lootExplorer.category.raid",
     "hudChrome.lootExplorer.category.rift",
     "hudChrome.lootExplorer.filterAll",
@@ -804,11 +803,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lootExplorer.tabItems",
     "hudChrome.riftForge.currency",
     "hudChrome.riftForge.gemOption",
-    "hudChrome.targetDots.row",
-    "hudChrome.wocMarket.walletCardDismiss"
+    "hudChrome.targetDots.row"
   ],
   "ja_JP": [
-    "hudChrome.continentMap.toInstance",
     "hudChrome.lootExplorer.category.raid",
     "hudChrome.lootExplorer.category.rift",
     "hudChrome.lootExplorer.filterAll",
@@ -819,8 +816,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lootExplorer.tabItems",
     "hudChrome.riftForge.currency",
     "hudChrome.riftForge.gemOption",
-    "hudChrome.targetDots.row",
-    "hudChrome.wocMarket.walletCardDismiss"
+    "hudChrome.targetDots.row"
   ],
   "pt_BR": [
     "apiError.discord.invalid_input",
@@ -949,7 +945,6 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.realmBuilderMonumentName"
   ],
   "ru_RU": [
-    "hudChrome.continentMap.toInstance",
     "hudChrome.lootExplorer.category.raid",
     "hudChrome.lootExplorer.category.rift",
     "hudChrome.lootExplorer.filterAll",
@@ -960,8 +955,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lootExplorer.tabItems",
     "hudChrome.riftForge.currency",
     "hudChrome.riftForge.gemOption",
-    "hudChrome.targetDots.row",
-    "hudChrome.wocMarket.walletCardDismiss"
+    "hudChrome.targetDots.row"
   ],
   "cs_CZ": [
     "apiError.discord.invalid_input",

@@ -4472,7 +4472,7 @@ export const ja_JP: EnTranslations = {
       "summary": "ワールドマップ。地域を選ぶとその地図が開きます。",
       "toWorld": "ワールドマップ",
       "toZone": "ゾーンマップ",
-      "toInstance": "Instance map",
+      "toInstance": "インスタンスマップ",
       "toggleAria": "ワールドマップとゾーンマップを切り替える",
       "levels": "レベル {min} から {max}"
     },
@@ -4507,7 +4507,7 @@ export const ja_JP: EnTranslations = {
       "walletLinkedConnected": "リンク済みのウォレットアプリに接続され、$WOC で支払う準備ができています。",
       "walletUsdBalance": "{amount} USD",
       "walletUsdUnknown": "不明",
-      "walletCardDismiss": "Hide wallet card",
+      "walletCardDismiss": "ウォレットカードを隠す",
       "rateNote": "レート: {time} 時点で 1 USD あたり約 {tokens} $WOC。",
       "rateNotePaused": "最後に確認したレート: {time} 時点で 1 USD あたり約 {tokens} $WOC。",
       "estimateNote": "{usd} は現在のレートで約 {tokens} $WOC です。",
@@ -11672,7 +11672,7 @@ export const ja_JP: EnTranslations = {
       },
       "temporal_echo": {
         "name": "時の残響",
-        "description": "より健やかだった瞬間の残響で味方に刻印し、即座に{damage}の体力を回復する。{duration}秒間、与えた秘術ダメージの一部が残響を通じてその味方を癒やす。"
+        "description": "より健やかだった瞬間の残響で味方に刻印し、即座に{damage}の体力を回復する。{duration}秒間、あなたの他の単体秘術ダメージの{echoSinglePct}%と範囲秘術ダメージの{echoAreaPct}%がその味方を癒やす。エーテルサージとエーテルダーツは代わりに、それらが与えたダメージの{echoDriverPct}%分その味方を癒やす。"
       },
       "temporal_cascade": {
         "name": "時の連鎖",
