@@ -311,6 +311,12 @@ export const HEROIC_MOB_TUNING: Record<string, HeroicMobTuning> = {
   },
 };
 
+// Heroic Varkhul, Master's Assembly (the 50% add intermission): the factor on
+// the three summoned add pools, on top of the per-role progression below.
+// 1 restores the 2026-08-24 tuning that no live raid has cleared; 0.7 is the
+// 2026-09 "very difficult, not impossible" line (rationale on the record).
+export const VARKHUL_HEROIC_ADD_HEALTH_RETUNE = 0.7;
+
 export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
   hollow_crypt: {
     id: 'hollow_crypt',
@@ -464,13 +470,29 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     difficulty: 'heroic',
     level: 22,
     healthMultiplier: 5 / 3,
-    // Boss: 120k -> 200k. Add overrides pin the requested per-role Heroic
-    // progression after the shared level transform: Sentinel +20%, Warden
-    // +25%, Artificer +30%.
+    // Boss: 120k -> 200k. Add overrides pin the per-role Heroic progression
+    // after the shared level transform (Sentinel +20%, Warden +25%, Artificer
+    // +30% over their level-22 pools), then apply the 2026-09 adds-phase retune.
+    // The 1200 / 1395 / 2170 figures are pre-elite: createMob multiplies every
+    // elite pool by 2.3, so the spawned Heroic adds were 3,312 / 4,011 / 6,488
+    // (88,500 HP across the 20 wave adds and 3 Artificers of the Master's
+    // Assembly, 1,264 raid DPS with zero downtime inside the 70 s cap).
+    // Live raids realize a median 696 DPS on those adds (best pull 865), and
+    // no Heroic Varkhul pull has finished the intermission; a Monte Carlo of
+    // the shipped encounter (tmp study, 2026-09-06) needed about 1,240 realized
+    // add DPS for a coin flip even with perfect beam soaks and interrupts.
+    // VARKHUL_HEROIC_ADD_HEALTH_RETUNE scales the three intermission adds to
+    // 0.7x (2,318 / 2,807 / 4,542, 61,950 HP, 885 zero-downtime DPS, still
+    // above Normal's 824 and still a hard check where Normal's meltdown is
+    // survivable). Measured with perfect execution: the raid wiping today
+    // clears about one pull in eight, a raid at its Heroic Ignivar output
+    // about four in five. Timers, wave count, heat and the meltdown are
+    // deliberately untouched: a longer cap alone spawns more Artificers and
+    // more heat, and did not help. Pinned by tests/ignivar_varkhul_health.test.ts.
     healthMultiplierByMob: {
-      ignivar_ember_sentinel: (1200 * 1.2) / 1300,
-      ignivar_crucible_warden: (1395 * 1.25) / 1505,
-      ignivar_cinder_artificer: (2170 * 1.3) / 2330,
+      ignivar_ember_sentinel: ((1200 * 1.2) / 1300) * VARKHUL_HEROIC_ADD_HEALTH_RETUNE,
+      ignivar_crucible_warden: ((1395 * 1.25) / 1505) * VARKHUL_HEROIC_ADD_HEALTH_RETUNE,
+      ignivar_cinder_artificer: ((2170 * 1.3) / 2330) * VARKHUL_HEROIC_ADD_HEALTH_RETUNE,
     },
     damageMultiplier: (251.5 * 1.35) / 272.5,
     addDamageMultiplier: 1,
