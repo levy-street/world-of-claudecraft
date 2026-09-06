@@ -153,6 +153,9 @@ const EXPECTED_CODES = [
   'cheater_mark.reason_required',
   'cheater_mark.invalid_duration',
   'cheater_mark.not_marked',
+  'kick.reason_required',
+  'kick.admin_target',
+  'kick.target_offline',
 ];
 
 describe('ERROR_CODES catalog', () => {

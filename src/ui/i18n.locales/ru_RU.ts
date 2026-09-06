@@ -2131,6 +2131,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Из вашей сети открыто слишком много подключений к этому миру. Пожалуйста, закройте лишние игровые окна или попробуйте снова через несколько минут.',
   'loading.messageRateExceeded':
     'Вы были отключены за слишком быструю отправку действий. Пожалуйста, подождите немного и войдите снова.',
+  'loading.kickedByModerator': 'Модератор отключил вас: {reason}',
   'errors.nothingInteract': 'Нет объекта для взаимодействия.',
   'errors.noEnemyNearby': 'Рядом нет врагов.',
   'errors.characterNameRequired': 'Введите имя персонажа.',
@@ -9515,6 +9516,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.cheater_mark.reason_required': 'Необходимо указать причину.',
   'apiError.cheater_mark.invalid_duration': 'Укажите длительность отметки не менее одной секунды.',
   'apiError.cheater_mark.not_marked': 'Эта учетная запись не отмечена.',
+  'apiError.kick.reason_required': 'Необходимо указать причину.',
+  'apiError.kick.admin_target': 'Учетные записи операторов нельзя отключить.',
+  'apiError.kick.target_offline': 'Этот игрок больше не в сети на этом мире.',
   'apiError.steam.invalid_ticket':
     'Steam не смог подтвердить этот запрос на привязку. Повторите попытку из настольного приложения.',
   'apiError.steam.banned': 'Этот аккаунт Steam нельзя привязать.',

@@ -1,11 +1,16 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import {
+  adminKickMessage,
+  ADMIN_KICK_MESSAGE_PREFIX as SERVER_ADMIN_KICK_MESSAGE_PREFIX,
+} from '../server/admin_kick_api';
 import { Api, ApiError } from '../src/net/online';
 import {
   isTransientReconnectRejection,
   isTransientTimeoutRejection,
 } from '../src/net/reconnect_policy';
 import {
+  ADMIN_KICK_MESSAGE_PREFIX,
   API_ERROR_KEYS,
   technicalErrorMessage,
   userFacingApiError,
@@ -241,6 +246,23 @@ describe('userFacingApiError prose fallback (un-migrated routes, until Phase 25)
     expect(userFacingApiError('A moderator requires one of your characters to be renamed.')).toBe(
       tServer('moderation.forceRename'),
     );
+  });
+
+  it('re-localizes the admin-panel kick line with the operator reason interpolated', () => {
+    // The prefix is a byte-exact wire contract with server/admin_kick_api.ts; the
+    // client restates it (it never imports server code), so pin the two equal.
+    expect(ADMIN_KICK_MESSAGE_PREFIX).toBe(SERVER_ADMIN_KICK_MESSAGE_PREFIX);
+    const reason = 'AFK in the Eastbrook square for two hours';
+    expect(userFacingApiError(adminKickMessage(reason))).toBe(
+      t('loading.kickedByModerator', { reason }),
+    );
+    // The reason rides verbatim, case included (matched on the original text, not
+    // the lower-cased prose), and never falls through to the generic rejection.
+    expect(userFacingApiError(adminKickMessage(reason))).toContain(reason);
+    expect(userFacingApiError(adminKickMessage(reason))).not.toBe(t('loading.connectionRejected'));
+    // Session-fatal like every other moderation kick: no transient arm may match.
+    expect(isTransientReconnectRejection(adminKickMessage(reason), 0)).toBe(false);
+    expect(isTransientTimeoutRejection(adminKickMessage(reason), 0)).toBe(false);
   });
 
   it('returns transport/protocol diagnostics verbatim in English', () => {

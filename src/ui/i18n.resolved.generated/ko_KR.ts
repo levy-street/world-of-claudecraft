@@ -4884,6 +4884,11 @@ export const ko_KR: EnTranslations = {
       "invalid_duration": "표식 기간은 최소 1초 이상이어야 합니다.",
       "not_marked": "해당 계정에는 표식이 없습니다."
     },
+    "kick": {
+      "reason_required": "사유를 입력해야 합니다.",
+      "admin_target": "운영자 계정은 추방할 수 없습니다.",
+      "target_offline": "해당 플레이어는 더 이상 이 서버에 접속해 있지 않습니다."
+    },
     "woc_market": {
       "invalid_input": "입력이 잘못되었습니다.",
       "disabled": "이 서버에서는 $WOC 거래소를 이용할 수 없습니다.",
@@ -8727,6 +8732,7 @@ export const ko_KR: EnTranslations = {
     "realmFull": "이 월드는 현재 포화 상태입니다. 몇 분 후에 다시 시도해 주세요.",
     "tooManyConnections": "사용 중인 네트워크에서 이 월드로 연결이 너무 많습니다. 추가 게임 창을 닫거나 몇 분 후에 다시 시도해 주세요.",
     "messageRateExceeded": "행동을 너무 빠르게 전송하여 연결이 끊어졌습니다. 잠시 기다렸다가 다시 로그인해 주세요.",
+    "kickedByModerator": "운영자가 연결을 끊었습니다: {reason}",
     "tips": {
       "classes": "팁: 9개 클래스는 저마다 플레이 방식이 다릅니다. 정하기 전에 몇 가지를 직접 해보세요.",
       "talents": "팁: 비전투 상태라면 언제든 특성을 초기화할 수 있어, 처음 선택도 절대 돌이킬 수 없는 것이 아닙니다.",
