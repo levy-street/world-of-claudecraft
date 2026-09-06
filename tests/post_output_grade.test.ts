@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
+import { FINITE_GUARD_GLSL } from '../src/render/post_finite_guard_glsl';
 import { OUTPUT_GRADE_FRAGMENT_SHADER, OutputGradePass } from '../src/render/post_output_grade';
 
 describe('fused output and grade shader', () => {
@@ -101,7 +102,12 @@ describe('fused output and grade shader', () => {
     // instead of just dropping the bloom contribution. Losing either scrub
     // brings the black back.
     const shader = OUTPUT_GRADE_FRAGMENT_SHADER;
-    expect(shader).toContain('(v.x < 0.0 || v.x >= 0.0) ? v.x : 0.0');
+    // Bit-exact, never a comparison: Mali evaluates NaN comparisons as finite
+    // (see post_finite_guard_glsl.ts), which is how the phone went black with
+    // the comparison form in place.
+    expect(shader).toContain(FINITE_GUARD_GLSL);
+    expect(shader).toContain('vec3 finite = wocSanitizeFinite(v);');
+    expect(shader).not.toContain('v.x < 0.0 || v.x >= 0.0');
     const helperAt = shader.indexOf('vec3 sanitizeFinite(vec3 v) {');
     const beautyScrubAt = shader.indexOf('outputColor.rgb = sanitizeFinite(outputColor.rgb);');
     const diffuseSampleAt = shader.indexOf('vec4 outputColor = texture(tDiffuse, inputUv);');
@@ -114,22 +120,17 @@ describe('fused output and grade shader', () => {
     expect(toneMapAt).toBeGreaterThan(bloomScrubAt);
   });
 
-  it('caps a stray +/-Infinity at the beauty target own half-float max before the SUM reaches quantizeHalf', () => {
-    // sanitizeFinite's NaN check alone deliberately lets Infinity and any
-    // runaway-but-finite value through; ACES (and every other selectable
-    // curve) internally divides two quantities that both diverge together on
-    // a uniformly-infinite input, the Infinity/Infinity indeterminate form,
-    // for v = +Inf AND v = -Inf alike, which is NaN again downstream of this
-    // sanitizer where nothing scrubs it a second time. clamp(...) on BOTH
-    // bounds closes that on both signs, while keeping the clamp floor well
-    // clear of the pre-existing legitimate negative-value passthrough (nothing
-    // real sits anywhere near -65504). The SUM of the beauty and bloom terms
-    // must be sanitized IN ADDITION TO the addend (see the NaN test above, a
-    // separate invariant): two terms independently capped at 65504 can still
-    // add to 131008, which packHalf2x16 cannot represent and rounds to
-    // +Infinity, reopening the exact hole this pin exists to keep shut. Never
-    // one scrub instead of the other.
+  it('caps finite overflow candidates before the SUM reaches quantizeHalf', () => {
+    // The shared guard owns literal NaN and Inf, and maps both to zero for the
+    // Android/Mali path. OutputGradePass still has to clamp finite runaway
+    // values on both signs, and it must sanitize the SUM of the beauty and
+    // bloom terms IN ADDITION TO the addend (see the NaN test above, a separate
+    // invariant): two large finite terms can still add past 65504, which
+    // packHalf2x16 cannot represent and rounds to +Infinity, reopening the
+    // exact hole this pin exists to keep shut. Never one scrub instead of the
+    // other.
     const shader = OUTPUT_GRADE_FRAGMENT_SHADER;
+    expect(shader).toContain('vec3 finite = wocSanitizeFinite(v);');
     expect(shader).toContain('return clamp(finite, vec3(-65504.0), vec3(65504.0));');
     expect(shader).not.toContain('clamp(finite, vec3(0.0), vec3(65504.0))');
     expect(shader).not.toContain('return min(finite, vec3(65504.0));');

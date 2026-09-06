@@ -17,6 +17,7 @@ import {
   type WebGLRenderTarget,
 } from 'three';
 import { FullScreenQuad, Pass } from 'three/examples/jsm/postprocessing/Pass.js';
+import { FINITE_GUARD_GLSL } from './post_finite_guard_glsl';
 
 interface TimeUniform {
   value: number;
@@ -53,34 +54,19 @@ export const OUTPUT_GRADE_FRAGMENT_SHADER = /* glsl */ `
   // the bloom high-pass reads the beauty and its Gaussian blur smears the NaN
   // across every mip, so OutputGradePass adds a frame-wide NaN and the tonemap
   // maps it to black. NaN survives only in the float composer targets (the
-  // direct-to-canvas UNSIGNED_BYTE tiers clamp it away), which is why low/medium
-  // are fine while the composer tiers go black. The IBL / PBR shader path emits
-  // those NaNs on some drivers (observed on ANGLE's OpenGL backend with NVIDIA on
-  // Linux). Every NaN comparison is false, so the (x < 0.0 || x >= 0.0) test
-  // keeps finite and infinite values and rewrites only NaN to zero. This must
-  // stay on the beauty AND the bloom read, since the blur already spread the NaN.
-  //
-  // A literal +/-Infinity is a SEPARATE hazard the check above deliberately
-  // lets through (Infinity >= 0.0 and -Infinity < 0.0 are both true): ACES and
-  // every other curve this pass can select compute their own internal ratio of
-  // two quantities that both diverge together on a uniformly-infinite input
-  // (v = +Inf AND v = -Inf drive the same Infinity/Infinity indeterminate form),
-  // which is NaN again, downstream of this sanitizer where nothing scrubs it a
-  // second time. Clamping BOTH bounds at the beauty target's own max finite
-  // magnitude (RGBA16F's ceiling, 65504) keeps every real HDR highlight this
-  // pipeline already renders untouched (none of them are within orders of
-  // magnitude of that ceiling, on either sign) and keeps every legitimate
-  // negative/near-zero value passing the check above exactly as before (nothing
-  // real sits anywhere near -65504), while turning a stray +/-Infinity into the
-  // same deterministic, clean saturation an ordinary very bright or very dark
-  // pixel gets, instead of the undefined per-driver outcome an internal NaN
-  // produces.
+  // are fine while the composer tiers go black. Sources seen so far: the IBL /
+  // PBR path on ANGLE's OpenGL backend (NVIDIA on Linux) and the N8AO
+  // compositer's depth-derived normal on Mali (Android Chrome). The scrub is the
+  // shared bit-exact guard (post_finite_guard_glsl.ts): the earlier comparison
+  // form let NaN through on Mali. It rewrites NaN and Inf to zero and must stay
+  // on the beauty AND the bloom read, since the blur already spread the NaN.
+  // The output-grade wrapper still clamps finite overflow candidates to the
+  // HalfFloat target's own max finite magnitude before quantizeHalf(), so a
+  // bright beauty + bloom sum cannot round back to Inf.
+  ${FINITE_GUARD_GLSL}
+
   vec3 sanitizeFinite(vec3 v) {
-    vec3 finite = vec3(
-      (v.x < 0.0 || v.x >= 0.0) ? v.x : 0.0,
-      (v.y < 0.0 || v.y >= 0.0) ? v.y : 0.0,
-      (v.z < 0.0 || v.z >= 0.0) ? v.z : 0.0
-    );
+    vec3 finite = wocSanitizeFinite(v);
     return clamp(finite, vec3(-65504.0), vec3(65504.0));
   }
 

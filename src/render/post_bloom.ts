@@ -1,7 +1,8 @@
 import { type Texture, Vector2, type WebGLRenderer, type WebGLRenderTarget } from 'three';
 import type { FullScreenQuad } from 'three/examples/jsm/postprocessing/Pass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
-import { restoreClassicBloomComposite } from './post_bloom_shader_core';
+import { guardBloomHighPassInput, restoreClassicBloomComposite } from './post_bloom_shader_core';
+import { FINITE_GUARD_GLSL } from './post_finite_guard_glsl';
 
 const BLUR_X = new Vector2(1, 0);
 const BLUR_Y = new Vector2(0, 1);
@@ -59,6 +60,13 @@ export class PreparedBloomPass extends UnrealBloomPass {
     }
     this.materialHighPassFilter.depthTest = false;
     this.materialHighPassFilter.depthWrite = false;
+    // One NaN beauty texel must not become a frame-wide NaN bloom: guard the
+    // high-pass read, the one place every mip below descends from.
+    this.materialHighPassFilter.fragmentShader = guardBloomHighPassInput(
+      this.materialHighPassFilter.fragmentShader,
+      FINITE_GUARD_GLSL,
+    );
+    this.materialHighPassFilter.needsUpdate = true;
     for (const material of this.separableBlurMaterials) {
       material.depthTest = false;
       material.depthWrite = false;
