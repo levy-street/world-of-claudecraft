@@ -74,6 +74,7 @@ import {
   rangedSwing as rangedSwingImpl,
   startAutoAttack as startAutoAttackImpl,
   stopAutoAttack as stopAutoAttackImpl,
+  tryPlayerSwing as tryPlayerSwingImpl,
   updatePlayerAutoAttack as updatePlayerAutoAttackImpl,
 } from './combat/auto_attack';
 import {
@@ -5456,6 +5457,7 @@ export class Sim {
       breakGhostWolf: sim.breakGhostWolf.bind(sim),
       forceDismount: sim.forceDismountPlayer.bind(sim),
       startAutoAttack: sim.startAutoAttack.bind(sim),
+      tryPlayerSwing: (p, meta) => tryPlayerSwingImpl(sim.ctx, p, meta),
       revivePet: sim.revivePet.bind(sim),
       completeFishing: (p, meta) => fishing.completeFishing(sim.ctx, p, meta),
       // Gather cast completion: module-bound with the live ctx,

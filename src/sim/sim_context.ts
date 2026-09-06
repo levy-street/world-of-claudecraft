@@ -901,6 +901,10 @@ export interface SimContextCallbacks {
   breakGhostWolf(e: Entity): void;
   forceDismount(e: Entity): void;
   startAutoAttack(pid?: number): void;
+  // One auto-attack swing attempt outside the per-tick driver (C5
+  // combat/auto_attack.tryPlayerSwing): the spell queue fires a ready wand
+  // bolt or melee swing between a completed cast and its queued follow-up.
+  tryPlayerSwing(p: Entity, meta: PlayerMeta): void;
   revivePet(pid?: number): void;
   completeFishing(p: Entity, meta: PlayerMeta): void;
   // Gather cast completion (Professions 2.0): updateCasting routes a
@@ -1636,6 +1640,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     breakGhostWolf: host.breakGhostWolf,
     forceDismount: host.forceDismount,
     startAutoAttack: host.startAutoAttack,
+    tryPlayerSwing: host.tryPlayerSwing,
     revivePet: host.revivePet,
     completeFishing: host.completeFishing,
     completeGatherCast: host.completeGatherCast,
