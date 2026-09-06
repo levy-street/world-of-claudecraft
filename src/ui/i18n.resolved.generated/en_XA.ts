@@ -2515,7 +2515,9 @@ export const en_XA: EnTranslations = {
       "unequipHint": "[Çļíçķ ţó ŕéɱóʋé ţĥíš ƀáĝ]",
       "poolGeneral": "[Ĝéñéŕáļ: {used} óƒ {total}]",
       "poolMaterials": "[Ɱáţéŕíáļš: {used} óƒ {total}]",
-      "capacityPoolsAria": "[Ɓáĝ šļóţš úšéð: {used} óƒ {total}. Ĝéñéŕáļ íţéɱš: {generalUsed} óƒ {generalTotal}. Ɱáţéŕíáļš: {materialsUsed} óƒ {materialsTotal}.]"
+      "capacityPoolsAria": "[Ɓáĝ šļóţš úšéð: {used} óƒ {total}. Ĝéñéŕáļ íţéɱš: {generalUsed} óƒ {generalTotal}. Ɱáţéŕíáļš: {materialsUsed} óƒ {materialsTotal}.]",
+      "capacityPools": "[Íţéɱš {generalUsed}/{generalTotal}, Ɱáţéŕíáļš {materialsUsed}/{materialsTotal}]",
+      "emptyMaterialsOnly": "[Ɱáţéŕíáļš óñļý]"
     },
     "raidConvert": {
       "toPartyDone": "[Ýóúŕ ŕáíð ĥáš çóñʋéŕţéð ƀáçķ ţó á þáŕţý.]",

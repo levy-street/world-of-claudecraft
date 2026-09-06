@@ -2515,7 +2515,9 @@ export const sv_SE: EnTranslations = {
       "unequipHint": "Klicka för att ta bort den här väskan",
       "poolGeneral": "Allmänt: {used} av {total}",
       "poolMaterials": "Material: {used} av {total}",
-      "capacityPoolsAria": "Använda väskplatser: {used} av {total}. Allmänna föremål: {generalUsed} av {generalTotal}. Material: {materialsUsed} av {materialsTotal}."
+      "capacityPoolsAria": "Använda väskplatser: {used} av {total}. Allmänna föremål: {generalUsed} av {generalTotal}. Material: {materialsUsed} av {materialsTotal}.",
+      "capacityPools": "Föremål {generalUsed}/{generalTotal}, material {materialsUsed}/{materialsTotal}",
+      "emptyMaterialsOnly": "Endast material"
     },
     "raidConvert": {
       "toPartyDone": "Din raid har omvandlats tillbaka till en grupp.",

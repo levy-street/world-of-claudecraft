@@ -2515,7 +2515,9 @@ export const it_IT: EnTranslations = {
       "unequipHint": "Clicca per rimuovere questa borsa",
       "poolGeneral": "Generale: {used} di {total}",
       "poolMaterials": "Materiali: {used} di {total}",
-      "capacityPoolsAria": "Spazi delle borse usati: {used} di {total}. Oggetti generali: {generalUsed} di {generalTotal}. Materiali: {materialsUsed} di {materialsTotal}."
+      "capacityPoolsAria": "Spazi delle borse usati: {used} di {total}. Oggetti generali: {generalUsed} di {generalTotal}. Materiali: {materialsUsed} di {materialsTotal}.",
+      "capacityPools": "Oggetti {generalUsed}/{generalTotal}, materiali {materialsUsed}/{materialsTotal}",
+      "emptyMaterialsOnly": "Solo materiali"
     },
     "raidConvert": {
       "toPartyDone": "La tua incursione è tornata a essere un gruppo.",

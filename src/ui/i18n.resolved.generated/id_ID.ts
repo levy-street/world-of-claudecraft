@@ -2515,7 +2515,9 @@ export const id_ID: EnTranslations = {
       "unequipHint": "Klik untuk melepas tas ini",
       "poolGeneral": "Umum: {used} dari {total}",
       "poolMaterials": "Material: {used} dari {total}",
-      "capacityPoolsAria": "Slot tas terpakai: {used} dari {total}. Barang umum: {generalUsed} dari {generalTotal}. Material: {materialsUsed} dari {materialsTotal}."
+      "capacityPoolsAria": "Slot tas terpakai: {used} dari {total}. Barang umum: {generalUsed} dari {generalTotal}. Material: {materialsUsed} dari {materialsTotal}.",
+      "capacityPools": "Barang {generalUsed}/{generalTotal}, material {materialsUsed}/{materialsTotal}",
+      "emptyMaterialsOnly": "Khusus material"
     },
     "raidConvert": {
       "toPartyDone": "Raid Anda telah diubah kembali menjadi rombongan.",

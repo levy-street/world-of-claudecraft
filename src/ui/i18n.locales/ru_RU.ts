@@ -6439,6 +6439,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.poolMaterials': 'Материалы: {used} из {total}',
   'hudChrome.bags.capacityPoolsAria':
     'Занято ячеек сумок: {used} из {total}. Общие предметы: {generalUsed} из {generalTotal}. Материалы: {materialsUsed} из {materialsTotal}.',
+  'hudChrome.bags.capacityPools': 'Предметы {generalUsed}/{generalTotal}, материалы {materialsUsed}/{materialsTotal}',
+  'hudChrome.bags.emptyMaterialsOnly': 'Только материалы',
   'guide.brand': 'World of ClaudeCraft',
   'guide.brandShort': 'ClaudeCraft',
   'guide.tagline': 'Классическая MMO, в которую можно играть бесплатно прямо в браузере.',

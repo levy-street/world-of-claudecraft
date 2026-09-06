@@ -2515,7 +2515,9 @@ export const es: EnTranslations = {
       "unequipHint": "Haz clic para quitar esta bolsa",
       "poolGeneral": "General: {used} de {total}",
       "poolMaterials": "Materiales: {used} de {total}",
-      "capacityPoolsAria": "Espacios de bolsa usados: {used} de {total}. Objetos generales: {generalUsed} de {generalTotal}. Materiales: {materialsUsed} de {materialsTotal}."
+      "capacityPoolsAria": "Espacios de bolsa usados: {used} de {total}. Objetos generales: {generalUsed} de {generalTotal}. Materiales: {materialsUsed} de {materialsTotal}.",
+      "capacityPools": "Objetos {generalUsed}/{generalTotal}, materiales {materialsUsed}/{materialsTotal}",
+      "emptyMaterialsOnly": "Solo materiales"
     },
     "raidConvert": {
       "toPartyDone": "Tu banda ha vuelto a convertirse en grupo.",

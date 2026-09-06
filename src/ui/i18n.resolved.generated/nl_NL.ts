@@ -2515,7 +2515,9 @@ export const nl_NL: EnTranslations = {
       "unequipHint": "Klik om deze tas af te doen",
       "poolGeneral": "Algemeen: {used} van {total}",
       "poolMaterials": "Materialen: {used} van {total}",
-      "capacityPoolsAria": "Tasvakken gebruikt: {used} van {total}. Algemene voorwerpen: {generalUsed} van {generalTotal}. Materialen: {materialsUsed} van {materialsTotal}."
+      "capacityPoolsAria": "Tasvakken gebruikt: {used} van {total}. Algemene voorwerpen: {generalUsed} van {generalTotal}. Materialen: {materialsUsed} van {materialsTotal}.",
+      "capacityPools": "Voorwerpen {generalUsed}/{generalTotal}, materialen {materialsUsed}/{materialsTotal}",
+      "emptyMaterialsOnly": "Alleen materialen"
     },
     "raidConvert": {
       "toPartyDone": "Je raid is terug omgezet naar een groep.",

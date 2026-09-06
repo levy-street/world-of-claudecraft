@@ -14803,6 +14803,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Doet {total}% van de maximale gezondheid van elke speler, verdeeld over de spelers in de cirkel ({perPlayer}% elk bij {players} spelers). Elke ontbrekende speler doet bovendien {missingPenalty}% van de maximale gezondheid aan de hele raid, inclusief spelers in de cirkel.',
   'hudChrome.bags.capacityPoolsAria':
     'Tasvakken gebruikt: {used} van {total}. Algemene voorwerpen: {generalUsed} van {generalTotal}. Materialen: {materialsUsed} van {materialsTotal}.',
+  'hudChrome.bags.capacityPools': 'Voorwerpen {generalUsed}/{generalTotal}, materialen {materialsUsed}/{materialsTotal}',
+  'hudChrome.bags.emptyMaterialsOnly': 'Alleen materialen',
   'hudChrome.bags.poolGeneral': 'Algemeen: {used} van {total}',
   'hudChrome.bags.poolMaterials': 'Materialen: {used} van {total}',
   'hudChrome.bank.buyConfirmClaudium': 'Kopen voor {cost} Claudium',

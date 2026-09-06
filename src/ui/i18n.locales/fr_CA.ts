@@ -309,6 +309,8 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'hud.prompts.guildRenamed': "Votre guilde a été renommée en {name} par l'équipe de modération.",
   'hudChrome.bags.itemAriaLocked': '{item}, quantité {count}, barré',
   'hudChrome.bags.itemLockedLine': 'Barré',
+  'hudChrome.bags.capacityPools': 'Articles {generalUsed}/{generalTotal}, matériaux {materialsUsed}/{materialsTotal}',
+  'hudChrome.bags.emptyMaterialsOnly': 'Matériaux seulement',
   'hudChrome.bags.lockItem': "Barrer l'objet",
   'hudChrome.bags.unlockItem': "Débarrer l'objet",
   'hudChrome.crafting.reagentLocked': 'Un composant pour cela est barré.',

@@ -3258,6 +3258,12 @@ export const hudChromeStrings = {
     poolMaterials: 'Materials: {used} of {total}',
     capacityPoolsAria:
       'Bag slots used: {used} of {total}. General items: {generalUsed} of {generalTotal}. Materials: {materialsUsed} of {materialsTotal}.',
+    // Issue #3795: with a satchel equipped the counter names both pools INLINE
+    // (an item pickup can be refused while the summed pair reads roomy), and
+    // the empty squares only a material may take say so on hover.
+    // (Wordy values, M16: the five non-Latin fills land in this same change.)
+    capacityPools: 'Items {generalUsed}/{generalTotal}, Materials {materialsUsed}/{materialsTotal}',
+    emptyMaterialsOnly: 'Materials only',
   },
   // Raid -> party demotion (Social panel raid tab). The sim emits these in English;
   // src/ui/sim_i18n.ts re-localizes them through these keys. Mirrors the existing

@@ -2515,7 +2515,9 @@ export const ko_KR: EnTranslations = {
       "unequipHint": "클릭하여 이 가방을 해제",
       "poolGeneral": "일반: {total}칸 중 {used}칸",
       "poolMaterials": "재료: {total}칸 중 {used}칸",
-      "capacityPoolsAria": "사용 중인 가방 칸: {total}칸 중 {used}칸. 일반 아이템: {generalTotal}칸 중 {generalUsed}칸. 재료: {materialsTotal}칸 중 {materialsUsed}칸."
+      "capacityPoolsAria": "사용 중인 가방 칸: {total}칸 중 {used}칸. 일반 아이템: {generalTotal}칸 중 {generalUsed}칸. 재료: {materialsTotal}칸 중 {materialsUsed}칸.",
+      "capacityPools": "아이템 {generalUsed}/{generalTotal}, 재료 {materialsUsed}/{materialsTotal}",
+      "emptyMaterialsOnly": "재료 전용"
     },
     "raidConvert": {
       "toPartyDone": "공격대가 파티로 다시 전환되었습니다.",

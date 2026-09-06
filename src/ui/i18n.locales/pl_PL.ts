@@ -14724,6 +14724,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Zadaje {total}% maksymalnego zdrowia każdego gracza, podzielone między graczy wewnątrz kręgu ({perPlayer}% każdy przy {players} graczach). Każdy brakujący gracz zadaje też {missingPenalty}% maksymalnego zdrowia całemu rajdowi, w tym graczom wewnątrz kręgu.',
   'hudChrome.bags.capacityPoolsAria':
     'Zajęte miejsca w torbie: {used} z {total}. Przedmioty ogólne: {generalUsed} z {generalTotal}. Materiały: {materialsUsed} z {materialsTotal}.',
+  'hudChrome.bags.capacityPools': 'Przedmioty {generalUsed}/{generalTotal}, materiały {materialsUsed}/{materialsTotal}',
+  'hudChrome.bags.emptyMaterialsOnly': 'Tylko materiały',
   'hudChrome.bags.poolGeneral': 'Ogólne: {used} z {total}',
   'hudChrome.bags.poolMaterials': 'Materiały: {used} z {total}',
   'hudChrome.bank.buyConfirmClaudium': 'Kup za {cost} Claudium',

@@ -48,6 +48,7 @@ const baseEnTable = {
   // non-material deposit refused while only materials-only satchel capacity
   // remains, so "full" would contradict the two-pool meter on screen.
   'error.bankOnlyMaterialsSpace': 'Only materials fit in the space left in your bank.',
+  'error.bagsOnlyMaterialsSpace': 'Only materials fit in the space left in your bags.',
   // The granularity no_fit refusal (src/sim/bank.ts, MoveResult.noFitCause
   // 'instanced_units'): free slots exist but the indivisible payload cannot
   // land whole, so both pool lines would lie.
@@ -1500,6 +1501,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankQuestItem': 'No puedes guardar objetos de misión en el banco.',
     'error.bankFull': 'Tu banco está lleno.',
     'error.bankOnlyMaterialsSpace': 'En el espacio que queda en tu banco solo caben materiales.',
+    'error.bagsOnlyMaterialsSpace': 'En el espacio que queda en tus bolsas solo caben materiales.',
     'error.bankStackIndivisible':
       'Ese montón no se puede dividir para caber en el espacio que queda en tu banco.',
     'error.bagsStackIndivisible':
@@ -1980,6 +1982,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankQuestItem': 'No puedes guardar objetos de misión en el banco.',
     'error.bankFull': 'Tu banco está lleno.',
     'error.bankOnlyMaterialsSpace': 'En el espacio que queda en tu banco solo caben materiales.',
+    'error.bagsOnlyMaterialsSpace': 'En el espacio que queda en tus bolsas solo caben materiales.',
     'error.bankStackIndivisible':
       'Ese montón no se puede dividir para caber en el espacio que queda en tu banco.',
     'error.bagsStackIndivisible':
@@ -2475,6 +2478,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankFull': 'Votre banque est pleine.',
     'error.bankOnlyMaterialsSpace':
       "Seuls des matériaux tiennent dans l'espace restant de votre banque.",
+    'error.bagsOnlyMaterialsSpace':
+      "Seuls des matériaux tiennent dans l'espace restant de vos sacs.",
     'error.bankStackIndivisible':
       "Cette pile ne peut pas être divisée pour tenir dans l'espace restant de votre banque.",
     'error.bagsStackIndivisible':
@@ -2971,6 +2976,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankFull': 'Votre banque est pleine.',
     'error.bankOnlyMaterialsSpace':
       "Seuls des matériaux tiennent dans l'espace restant de votre banque.",
+    'error.bagsOnlyMaterialsSpace':
+      "Seuls des matériaux tiennent dans l'espace restant de vos sacs.",
     'error.bankStackIndivisible':
       "Cette pile ne peut pas être divisée pour tenir dans l'espace restant de votre banque.",
     'error.bagsStackIndivisible':
@@ -3660,6 +3667,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankFull': 'La tua banca è piena.',
     'error.bankOnlyMaterialsSpace':
       "Nello spazio rimasto nella tua banca c'è posto solo per i materiali.",
+    'error.bagsOnlyMaterialsSpace':
+      "Nello spazio rimasto nelle tue borse c'è posto solo per i materiali.",
     'error.bankStackIndivisible':
       'Quella pila non può essere divisa per entrare nello spazio rimasto nella tua banca.',
     'error.bagsStackIndivisible':
@@ -4150,6 +4159,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankQuestItem': 'Ihr könnt keine Questgegenstände in der Bank lagern.',
     'error.bankFull': 'Eure Bank ist voll.',
     'error.bankOnlyMaterialsSpace': 'In Eurer Bank ist nur noch Platz für Materialien.',
+    'error.bagsOnlyMaterialsSpace': 'In Euren Taschen ist nur noch Platz für Materialien.',
     'error.bankStackIndivisible':
       'Dieser Stapel kann nicht geteilt werden, um in den restlichen Platz Eurer Bank zu passen.',
     'error.bagsStackIndivisible':
@@ -4577,6 +4587,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankWithdrawRefused': '该物品无法从公会银行取出。',
     'error.bankFull': '你的银行已满。',
     'error.bankOnlyMaterialsSpace': '你的银行剩余空间只能存放材料。',
+    'error.bagsOnlyMaterialsSpace': '你的背包剩余空间只能存放材料。',
     'error.bankStackIndivisible': '该物品堆无法拆分，放不进你银行的剩余空间。',
     'error.bagsStackIndivisible': '该物品堆无法拆分，放不进你背包的剩余空间。',
     'error.bankCannotAfford': '你无力支付该银行扩展费用。',
@@ -5043,6 +5054,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankWithdrawRefused': '該物品無法從公會銀行取出。',
     'error.bankFull': '你的銀行已滿。',
     'error.bankOnlyMaterialsSpace': '你的銀行剩餘空間只能存放材料。',
+    'error.bagsOnlyMaterialsSpace': '你的背包剩餘空間只能存放材料。',
     'error.bankStackIndivisible': '該物品堆無法拆分，放不進你銀行的剩餘空間。',
     'error.bagsStackIndivisible': '該物品堆無法拆分，放不進你背包的剩餘空間。',
     'error.bankCannotAfford': '你無力支付該銀行擴充費用。',
@@ -5517,6 +5529,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankWithdrawRefused': '해당 아이템은 길드 은행에서 꺼낼 수 없습니다.',
     'error.bankFull': '은행이 가득 찼습니다.',
     'error.bankOnlyMaterialsSpace': '은행에 남은 공간에는 재료만 보관할 수 있습니다.',
+    'error.bagsOnlyMaterialsSpace': '가방에 남은 공간에는 재료만 넣을 수 있습니다.',
     'error.bankStackIndivisible': '해당 묶음은 나눌 수 없어 은행에 남은 공간에 넣을 수 없습니다.',
     'error.bagsStackIndivisible': '해당 묶음은 나눌 수 없어 가방에 남은 공간에 넣을 수 없습니다.',
     'error.bankCannotAfford': '그 은행 확장을 구매할 돈이 부족합니다.',
@@ -6003,6 +6016,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankWithdrawRefused': 'そのアイテムはギルド銀行から引き出せません。',
     'error.bankFull': '銀行がいっぱいです。',
     'error.bankOnlyMaterialsSpace': '銀行の残りのスペースには素材しか入りません。',
+    'error.bagsOnlyMaterialsSpace': 'バッグの残りのスペースには素材しか入りません。',
     'error.bankStackIndivisible':
       'そのスタックは分割できないため、銀行の残りのスペースに収まりません。',
     'error.bagsStackIndivisible':
@@ -6531,6 +6545,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankQuestItem': 'Você não pode guardar itens de missão no banco.',
     'error.bankFull': 'Seu banco está cheio.',
     'error.bankOnlyMaterialsSpace': 'No espaço restante do seu banco só cabem materiais.',
+    'error.bagsOnlyMaterialsSpace': 'No espaço restante das suas bolsas só cabem materiais.',
     'error.bankStackIndivisible':
       'Essa pilha não pode ser dividida para caber no espaço restante do seu banco.',
     'error.bagsStackIndivisible':
@@ -6974,6 +6989,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankWithdrawRefused': 'Этот предмет нельзя забрать из банка гильдии.',
     'error.bankFull': 'Ваш банк полон.',
     'error.bankOnlyMaterialsSpace': 'В вашем банке осталось место только для материалов.',
+    'error.bagsOnlyMaterialsSpace': 'В ваших сумках осталось место только для материалов.',
     'error.bankStackIndivisible':
       'Эту стопку нельзя разделить, чтобы она поместилась в оставшееся место вашего банка.',
     'error.bagsStackIndivisible':

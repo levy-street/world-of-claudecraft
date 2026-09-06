@@ -14896,6 +14896,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Infligge il {total}% della salute massima di ogni giocatore, divisa tra i giocatori all'interno del cerchio ({perPlayer}% ciascuno con {players} giocatori). Ogni giocatore mancante infligge inoltre il {missingPenalty}% della salute massima all'intera incursione, compresi i giocatori all'interno del cerchio.",
   'hudChrome.bags.capacityPoolsAria':
     'Spazi delle borse usati: {used} di {total}. Oggetti generali: {generalUsed} di {generalTotal}. Materiali: {materialsUsed} di {materialsTotal}.',
+  'hudChrome.bags.capacityPools': 'Oggetti {generalUsed}/{generalTotal}, materiali {materialsUsed}/{materialsTotal}',
+  'hudChrome.bags.emptyMaterialsOnly': 'Solo materiali',
   'hudChrome.bags.poolGeneral': 'Generale: {used} di {total}',
   'hudChrome.bags.poolMaterials': 'Materiali: {used} di {total}',
   'hudChrome.bank.buyConfirmClaudium': 'Acquista per {cost} Claudium',

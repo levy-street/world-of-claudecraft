@@ -2515,7 +2515,9 @@ export const da_DK: EnTranslations = {
       "unequipHint": "Klik for at fjerne denne taske",
       "poolGeneral": "Generelt: {used} af {total}",
       "poolMaterials": "Materialer: {used} af {total}",
-      "capacityPoolsAria": "Taskepladser brugt: {used} af {total}. Generelt: {generalUsed} af {generalTotal}. Materialer: {materialsUsed} af {materialsTotal}."
+      "capacityPoolsAria": "Taskepladser brugt: {used} af {total}. Generelt: {generalUsed} af {generalTotal}. Materialer: {materialsUsed} af {materialsTotal}.",
+      "capacityPools": "Genstande {generalUsed}/{generalTotal}, materialer {materialsUsed}/{materialsTotal}",
+      "emptyMaterialsOnly": "Kun materialer"
     },
     "raidConvert": {
       "toPartyDone": "Dit raid er konverteret tilbage til en gruppe.",

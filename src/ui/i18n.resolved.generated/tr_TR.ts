@@ -2515,7 +2515,9 @@ export const tr_TR: EnTranslations = {
       "unequipHint": "Bu çantayı çıkarmak için tıkla",
       "poolGeneral": "Genel: {used} / {total}",
       "poolMaterials": "Malzemeler: {used} / {total}",
-      "capacityPoolsAria": "Kullanılan çanta yuvaları: {used} / {total}. Genel eşyalar: {generalUsed} / {generalTotal}. Malzemeler: {materialsUsed} / {materialsTotal}."
+      "capacityPoolsAria": "Kullanılan çanta yuvaları: {used} / {total}. Genel eşyalar: {generalUsed} / {generalTotal}. Malzemeler: {materialsUsed} / {materialsTotal}.",
+      "capacityPools": "Eşyalar {generalUsed}/{generalTotal}, malzemeler {materialsUsed}/{materialsTotal}",
+      "emptyMaterialsOnly": "Yalnızca malzemeler"
     },
     "raidConvert": {
       "toPartyDone": "Akının yeniden gruba dönüştü.",

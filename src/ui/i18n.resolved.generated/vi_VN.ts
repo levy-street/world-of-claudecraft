@@ -2515,7 +2515,9 @@ export const vi_VN: EnTranslations = {
       "unequipHint": "Nhấp để tháo chiếc túi này",
       "poolGeneral": "Chung: {used} trên {total}",
       "poolMaterials": "Nguyên liệu: {used} trên {total}",
-      "capacityPoolsAria": "Ô túi đã dùng: {used} trên {total}. Vật phẩm chung: {generalUsed} trên {generalTotal}. Nguyên liệu: {materialsUsed} trên {materialsTotal}."
+      "capacityPoolsAria": "Ô túi đã dùng: {used} trên {total}. Vật phẩm chung: {generalUsed} trên {generalTotal}. Nguyên liệu: {materialsUsed} trên {materialsTotal}.",
+      "capacityPools": "Vật phẩm {generalUsed}/{generalTotal}, nguyên liệu {materialsUsed}/{materialsTotal}",
+      "emptyMaterialsOnly": "Chỉ nguyên liệu"
     },
     "raidConvert": {
       "toPartyDone": "Raid của bạn đã chuyển trở lại thành tổ đội.",

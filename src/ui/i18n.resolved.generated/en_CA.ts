@@ -2515,7 +2515,9 @@ export const en_CA: EnTranslations = {
       "unequipHint": "Click to remove this bag",
       "poolGeneral": "General: {used} of {total}",
       "poolMaterials": "Materials: {used} of {total}",
-      "capacityPoolsAria": "Bag slots used: {used} of {total}. General items: {generalUsed} of {generalTotal}. Materials: {materialsUsed} of {materialsTotal}."
+      "capacityPoolsAria": "Bag slots used: {used} of {total}. General items: {generalUsed} of {generalTotal}. Materials: {materialsUsed} of {materialsTotal}.",
+      "capacityPools": "Items {generalUsed}/{generalTotal}, Materials {materialsUsed}/{materialsTotal}",
+      "emptyMaterialsOnly": "Materials only"
     },
     "raidConvert": {
       "toPartyDone": "Your raid has converted back to a party.",

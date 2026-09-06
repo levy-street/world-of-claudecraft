@@ -14545,6 +14545,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Způsobí {total} % maximálního zdraví každého hráče, rozděleno mezi hráče uvnitř kruhu ({perPlayer} % na hráče při {players} hráčích). Každý chybějící hráč navíc způsobí celému raidu {missingPenalty} % maximálního zdraví, včetně hráčů uvnitř kruhu.',
   'hudChrome.bags.capacityPoolsAria':
     'Použité sloty batohu: {used} z {total}. Obecné předměty: {generalUsed} z {generalTotal}. Materiály: {materialsUsed} z {materialsTotal}.',
+  'hudChrome.bags.capacityPools': 'Předměty {generalUsed}/{generalTotal}, materiály {materialsUsed}/{materialsTotal}',
+  'hudChrome.bags.emptyMaterialsOnly': 'Jen materiály',
   'hudChrome.bags.poolGeneral': 'Obecné: {used} z {total}',
   'hudChrome.bags.poolMaterials': 'Materiály: {used} z {total}',
   'hudChrome.bank.buyConfirmClaudium': 'Koupit za {cost} Claudium',

@@ -4836,6 +4836,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.capacityAria': 'Belegte Taschenplätze: {used} von {total}',
   'hudChrome.bags.capacityPoolsAria':
     'Belegte Taschenplätze: {used} von {total}. Allgemeine Gegenstände: {generalUsed} von {generalTotal}. Materialien: {materialsUsed} von {materialsTotal}.',
+  'hudChrome.bags.capacityPools': 'Gegenstände {generalUsed}/{generalTotal}, Materialien {materialsUsed}/{materialsTotal}',
+  'hudChrome.bags.emptyMaterialsOnly': 'Nur Materialien',
   'hudChrome.bags.socketEmpty': 'Leerer Taschenplatz',
   'hudChrome.bags.unequipHint': 'Klicke, um diese Tasche abzulegen',
   'hudChrome.calendar.addButton': 'Ereignis eintragen',

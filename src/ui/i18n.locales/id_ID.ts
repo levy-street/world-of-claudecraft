@@ -14789,6 +14789,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Memberikan {total}% dari kesehatan maksimum setiap pemain, dibagi di antara pemain di dalam lingkaran ({perPlayer}% masing-masing dengan {players} pemain). Setiap pemain yang hilang juga memberikan kerusakan {missingPenalty}% kesehatan maksimum ke seluruh raid, termasuk pemain di dalam lingkaran.',
   'hudChrome.bags.capacityPoolsAria':
     'Slot tas terpakai: {used} dari {total}. Barang umum: {generalUsed} dari {generalTotal}. Material: {materialsUsed} dari {materialsTotal}.',
+  'hudChrome.bags.capacityPools': 'Barang {generalUsed}/{generalTotal}, material {materialsUsed}/{materialsTotal}',
+  'hudChrome.bags.emptyMaterialsOnly': 'Khusus material',
   'hudChrome.bags.poolGeneral': 'Umum: {used} dari {total}',
   'hudChrome.bags.poolMaterials': 'Material: {used} dari {total}',
   'hudChrome.bank.buyConfirmClaudium': 'Beli seharga {cost} Claudium',

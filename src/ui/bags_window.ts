@@ -63,6 +63,7 @@ import {
   buildBagGrid,
   buildBagListRows,
   carriedPools,
+  materialsOnlyEmptyCells,
   resolveDepositSubmit,
   vendorSellIsInstant,
 } from './bags_view';
@@ -647,6 +648,14 @@ export class BagsWindow {
     }
     const counter = document.createElement('span');
     counter.className = `bag-capacity${model.used > model.capacity ? ' over' : ''}`;
+    const split = carriedPools(world.bags, world.inventory);
+    // The general pool is the one an ITEM pickup needs; when it is full the
+    // summed pair can still read roomy (issue #3795), so the counter wears a
+    // general-full mark the CSS warms, and the inline text names both pools.
+    if (split.showMaterials) counter.classList.add('pools');
+    if (split.showMaterials && split.general.used >= split.general.capacity) {
+      counter.classList.add('general-full');
+    }
     // Focusable: the per-pool split lives only in the tooltip, whose host
     // serves hover, long-press, AND focusin; a keyboard-only user needs the
     // tab stop to reach it (the bank meter's twin, QA 08). The focus key
@@ -655,17 +664,23 @@ export class BagsWindow {
     counter.tabIndex = 0;
     counter.dataset.focusKey = 'bag-capacity';
     const fmt = (n: number): string => formatNumber(n, { maximumFractionDigits: 0 });
-    counter.textContent = t('hudChrome.bags.capacity', {
-      used: fmt(model.used),
-      total: fmt(model.capacity),
-    });
+    counter.textContent = split.showMaterials
+      ? t('hudChrome.bags.capacityPools', {
+          generalUsed: fmt(split.general.used),
+          generalTotal: fmt(split.general.capacity),
+          materialsUsed: fmt(split.materials.used),
+          materialsTotal: fmt(split.materials.capacity),
+        })
+      : t('hudChrome.bags.capacity', {
+          used: fmt(model.used),
+          total: fmt(model.capacity),
+        });
     // The per-pool truth behind the summed counter (Bank Storage phase 08):
     // with a materials-only bag equipped the summed pair can look roomy while
     // one pool refuses pickups, so the aria splits when the materials pool has
     // anything to say and the tooltip always names the pools. The split comes
     // from the shared carriedPools core (the sim's own helpers), never a
     // painter re-derivation. Non-actionable span: no click, no peek guard.
-    const split = carriedPools(world.bags, world.inventory);
     counter.setAttribute(
       'aria-label',
       split.showMaterials
@@ -890,6 +905,22 @@ export class BagsWindow {
     // and a header node in the cell stream would shift bagIndex drop targets
     // (state.md locked decision 7). Rim/seal alone marks quest stacks in this view.
     if (model.cells.length > 0) {
+      // The trailing empties past the general pool's headroom are painted as
+      // materials-only squares (issue #3795): counted down from the END so
+      // exactly generalFree plain empties remain, wherever the holes sit.
+      let materialsOnly = materialsOnlyEmptyCells(
+        world.bags,
+        world.inventory,
+        model.cells.filter((c) => c === null).length,
+      );
+      const materialsOnlyFrom: number[] = [];
+      for (let cell = model.cells.length - 1; cell >= 0 && materialsOnly > 0; cell--) {
+        if (model.cells[cell] === null) {
+          materialsOnlyFrom.push(cell);
+          materialsOnly--;
+        }
+      }
+      const materialsOnlyCells = new Set(materialsOnlyFrom);
       for (let cell = 0; cell < model.cells.length; cell++) {
         const stack = model.cells[cell];
         const item = stack ? knownItemDef(ITEMS, stack.itemId) : undefined;
@@ -901,7 +932,7 @@ export class BagsWindow {
             ? this.buildStackCell(stack, item, cell)
             : stack
               ? this.buildUnknownStackCell(stack, cell)
-              : this.buildEmptyCell(cell),
+              : this.buildEmptyCell(cell, materialsOnlyCells.has(cell)),
         );
       }
       if (settle) this.applySortSettle(grid);
@@ -1261,10 +1292,19 @@ export class BagsWindow {
   // One empty square: free space in the bag. In the pristine view it is a real CELL a
   // stack can be parked in (a hole, deliberately), so it accepts a drop; in a derived
   // list view it is decorative padding. Never focusable either way.
-  private buildEmptyCell(cell: number | null): HTMLElement {
+  private buildEmptyCell(cell: number | null, materialsOnly = false): HTMLElement {
     const el = document.createElement('div');
-    el.className = 'bag-item empty';
+    el.className = `bag-item empty${materialsOnly ? ' materials-only' : ''}`;
     el.setAttribute('aria-hidden', 'true');
+    if (materialsOnly) {
+      // A square only a material may take (issue #3795): tinted by CSS and
+      // explained on hover. It stays aria-hidden like every empty square;
+      // the counter's split aria carries the pool truth for a reader.
+      this.deps.attachTooltip(
+        el,
+        () => `<div class="tt-sub">${esc(t('hudChrome.bags.emptyMaterialsOnly'))}</div>`,
+      );
+    }
     if (cell !== null) {
       el.dataset.bagIndex = String(cell);
       this.bindBagCellDrop(el, cell);

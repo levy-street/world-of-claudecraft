@@ -2515,7 +2515,9 @@ export const ja_JP: EnTranslations = {
       "unequipHint": "クリックしてこのバッグを外す",
       "poolGeneral": "一般: {total}個中{used}個",
       "poolMaterials": "素材: {total}個中{used}個",
-      "capacityPoolsAria": "使用中のバッグスロット: {total}個中{used}個。一般アイテム: {generalTotal}個中{generalUsed}個。素材: {materialsTotal}個中{materialsUsed}個。"
+      "capacityPoolsAria": "使用中のバッグスロット: {total}個中{used}個。一般アイテム: {generalTotal}個中{generalUsed}個。素材: {materialsTotal}個中{materialsUsed}個。",
+      "capacityPools": "アイテム {generalUsed}/{generalTotal}、素材 {materialsUsed}/{materialsTotal}",
+      "emptyMaterialsOnly": "素材専用"
     },
     "raidConvert": {
       "toPartyDone": "レイドがパーティに戻りました。",

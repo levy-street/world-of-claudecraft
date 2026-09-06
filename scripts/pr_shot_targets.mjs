@@ -2422,6 +2422,63 @@ export const TARGETS = [
     },
   },
   {
+    key: 'bags-materials-pool',
+    label:
+      'Bags with a materials-only satchel: the general pool full, the satchel room marked, and the pool-honest refusal',
+    when: ['sim/bags', 'sim/bag_pools', 'ui/bags_view', 'ui/bags_window'],
+    // Issue #3795: a materials satchel equipped, the general pool filled with
+    // gear and one material stack in the satchel. The counter names both pools
+    // inline, the free squares only a material may take are tinted, and an
+    // unequip that needs a general slot is refused with the pool-honest line
+    // (the base checkout shows the summed counter, plain squares, and "Your
+    // bags are full."). Full-viewport shot so the refusal toast is in frame.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        // The shore greeting (Ferryman Odo) docks over the bag grid: dismiss it
+        // the way a player would, so the squares under it stay in frame.
+        for (const b of document.querySelectorAll('button')) {
+          if (/understood/i.test(b.textContent ?? '')) b.click();
+        }
+        const sim = window.__game?.sim;
+        try {
+          sim?.addItem('burlap_reagent_pouch', 1);
+          sim?.equipBag?.('burlap_reagent_pouch');
+        } catch {}
+        const gear = [
+          'eastbrook_arming_sword',
+          'apprentice_staff',
+          'cryptbone_helm',
+          'worn_sword',
+          'baked_bread',
+          'minor_healing_potion',
+        ];
+        // Fill the GENERAL pool (16 backpack slots) with never-stacking gear
+        // and 1-per-slot consumables; the satchel's 8 squares stay free.
+        for (let i = 0; sim && sim.inventory.length < 16 && i < 64; i++) {
+          try {
+            sim.addItem(gear[i % gear.length], 1);
+          } catch {}
+        }
+        try {
+          sim?.addItem('copper_ore', 5);
+        } catch {}
+        const el = document.querySelector('#bags');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.toggleBags?.();
+      });
+      await wait(500);
+      // The refusal: a chest unequip needs a general-pool square, and none is free.
+      await page.evaluate(() => {
+        try {
+          window.__game?.sim?.unequipItem?.('chest');
+        } catch {}
+      });
+      await wait(400);
+      return { clip: null };
+    },
+  },
+  {
     key: 'inventory-sort',
     label: 'Bags after the one-shot Sort (stacks consolidated, ladder order)',
     when: ['sim/inventory_sort', 'ui/bags_window'],

@@ -2515,7 +2515,9 @@ export const fr_CA: EnTranslations = {
       "unequipHint": "Cliquez pour retirer ce sac",
       "poolGeneral": "Général : {used} sur {total}",
       "poolMaterials": "Matériaux : {used} sur {total}",
-      "capacityPoolsAria": "Emplacements de sac utilisés : {used} sur {total}. Objets généraux : {generalUsed} sur {generalTotal}. Matériaux : {materialsUsed} sur {materialsTotal}."
+      "capacityPoolsAria": "Emplacements de sac utilisés : {used} sur {total}. Objets généraux : {generalUsed} sur {generalTotal}. Matériaux : {materialsUsed} sur {materialsTotal}.",
+      "capacityPools": "Articles {generalUsed}/{generalTotal}, matériaux {materialsUsed}/{materialsTotal}",
+      "emptyMaterialsOnly": "Matériaux seulement"
     },
     "raidConvert": {
       "toPartyDone": "Votre raid a été reconverti en groupe.",

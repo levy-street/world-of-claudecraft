@@ -2515,7 +2515,9 @@ export const de_DE: EnTranslations = {
       "unequipHint": "Klicke, um diese Tasche abzulegen",
       "poolGeneral": "Allgemein: {used} von {total}",
       "poolMaterials": "Materialien: {used} von {total}",
-      "capacityPoolsAria": "Belegte Taschenplätze: {used} von {total}. Allgemeine Gegenstände: {generalUsed} von {generalTotal}. Materialien: {materialsUsed} von {materialsTotal}."
+      "capacityPoolsAria": "Belegte Taschenplätze: {used} von {total}. Allgemeine Gegenstände: {generalUsed} von {generalTotal}. Materialien: {materialsUsed} von {materialsTotal}.",
+      "capacityPools": "Gegenstände {generalUsed}/{generalTotal}, Materialien {materialsUsed}/{materialsTotal}",
+      "emptyMaterialsOnly": "Nur Materialien"
     },
     "raidConvert": {
       "toPartyDone": "Euer Schlachtzug wurde wieder in eine Gruppe umgewandelt.",
