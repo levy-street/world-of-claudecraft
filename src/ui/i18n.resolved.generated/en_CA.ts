@@ -4473,7 +4473,7 @@ export const en_CA: EnTranslations = {
       "toWorld": "World map",
       "toZone": "Zone map",
       "toInstance": "Instance map",
-      "toggleAria": "Switch between the world map and the zone map",
+      "toggleAria": "Switch between the world map, zone map, and instance map",
       "levels": "Levels {min} to {max}"
     },
     "arenaGate": {

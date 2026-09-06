@@ -4473,7 +4473,7 @@ export const en_XA: EnTranslations = {
       "toWorld": "[Ŵóŕļð ɱáþ]",
       "toZone": "[Žóñé ɱáþ]",
       "toInstance": "[Íñšţáñçé ɱáþ]",
-      "toggleAria": "[Šŵíţçĥ ƀéţŵééñ ţĥé ŵóŕļð ɱáþ áñð ţĥé žóñé ɱáþ]",
+      "toggleAria": "[Šŵíţçĥ ƀéţŵééñ ţĥé ŵóŕļð ɱáþ, žóñé ɱáþ, áñð íñšţáñçé ɱáþ]",
       "levels": "[Ļéʋéļš {min} ţó {max}]"
     },
     "arenaGate": {

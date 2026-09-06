@@ -6384,7 +6384,7 @@ export const hudChromeStrings = {
     // Third stop of the cycle inside an instance (and outside, when a party member
     // is in a dungeon whose floor plan can be drawn): the schematic instance map.
     toInstance: 'Instance map',
-    toggleAria: 'Switch between the world map and the zone map',
+    toggleAria: 'Switch between the world map, zone map, and instance map',
     // Hover tooltip over a zone region: its name plus the suggested level band.
     levels: 'Levels {min} to {max}',
   },

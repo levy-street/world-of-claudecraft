@@ -8,7 +8,7 @@
 // Host-agnostic (structural element interface) so a Vitest can pin it.
 
 export interface ScrollMetrics {
-  readonly scrollTop: number;
+  scrollTop: number;
   readonly scrollHeight: number;
   readonly clientHeight: number;
 }
@@ -26,15 +26,31 @@ export function isNearBottom(m: ScrollMetrics, threshold = NEAR_BOTTOM_PX): bool
 
 export class ChatScrollFollow {
   private readonly pinned = new WeakMap<ScrollFollowTarget, boolean>();
+  private readonly last = new WeakMap<ScrollFollowTarget, ScrollMetrics>();
 
   constructor(targets: readonly ScrollFollowTarget[] = []) {
     for (const el of targets) this.attach(el);
   }
 
-  /** Track one pane: every scroll (player or programmatic) re-evaluates the pin. */
+  /** Track one pane: every scroll re-evaluates the pin unless only layout changed. */
   attach(el: ScrollFollowTarget): void {
     this.pinned.set(el, true);
-    el.addEventListener('scroll', () => this.pinned.set(el, isNearBottom(el)));
+    this.rememberMetrics(el);
+    el.addEventListener('scroll', () => {
+      const previous = this.last.get(el);
+      const dimensionsChanged =
+        previous !== undefined &&
+        (previous.scrollHeight !== el.scrollHeight || previous.clientHeight !== el.clientHeight);
+      const layoutOnlyScroll = previous !== undefined && previous.scrollTop === el.scrollTop;
+      if ((this.pinned.get(el) ?? true) && dimensionsChanged && layoutOnlyScroll) {
+        this.scrollToBottom(el);
+        this.pinned.set(el, true);
+        this.rememberMetrics(el);
+        return;
+      }
+      this.pinned.set(el, isNearBottom(el));
+      this.rememberMetrics(el);
+    });
   }
 
   /**
@@ -44,5 +60,22 @@ export class ChatScrollFollow {
    */
   shouldFollow(el: ScrollFollowTarget): boolean {
     return this.pinned.get(el) ?? true;
+  }
+
+  scrollToBottom(el: ScrollFollowTarget): void {
+    el.scrollTop = Math.max(0, el.scrollHeight - el.clientHeight);
+    this.rememberMetrics(el);
+  }
+
+  scrollToBottomIfPinned(el: ScrollFollowTarget): void {
+    if (this.shouldFollow(el)) this.scrollToBottom(el);
+  }
+
+  private rememberMetrics(el: ScrollFollowTarget): void {
+    this.last.set(el, {
+      scrollTop: el.scrollTop,
+      scrollHeight: el.scrollHeight,
+      clientHeight: el.clientHeight,
+    });
   }
 }

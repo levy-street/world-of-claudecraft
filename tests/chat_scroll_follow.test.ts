@@ -62,6 +62,20 @@ describe('ChatScrollFollow', () => {
     expect(f.shouldFollow(pane)).toBe(true);
   });
 
+  it('keeps a pinned pane pinned through layout-driven scroll events', () => {
+    const pane = new FakePane();
+    pane.scrollHeight = 500;
+    pane.clientHeight = 200;
+    const f = new ChatScrollFollow([pane]);
+    pane.scrollTo(300);
+
+    pane.scrollHeight = 800;
+    pane.scrollTo(300);
+
+    expect(f.shouldFollow(pane)).toBe(true);
+    expect(pane.scrollTop).toBe(600);
+  });
+
   it('tracks each pane independently', () => {
     const chat = new FakePane();
     const combat = new FakePane();
