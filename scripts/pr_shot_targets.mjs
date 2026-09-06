@@ -2092,6 +2092,78 @@ export const TARGETS = [
     },
   },
   {
+    key: 'druid-strider-form',
+    label: 'Druid travel form: the Longstride body that replaced the chicken-cow',
+    // The form-visual registry and the body's own assets. classes.ts is left OUT
+    // on purpose: it changes for every content edit in the game and would fire
+    // this recipe on diffs that cannot move a single pixel of the body.
+    when: ['characters/manifest.ts', 'creatures/longstride', 'build_longstride_anims'],
+    variants: [
+      { key: 'desktop', charClass: 'druid', charName: 'Leafward', beforeLoad: lowGraphicsSeed },
+      {
+        key: 'mobile',
+        charClass: 'druid',
+        charName: 'Leafward',
+        mobile: true,
+        beforeLoad: lowGraphicsSeed,
+      },
+    ],
+    async capture(page) {
+      await page.keyboard.press('Escape');
+      await wait(400);
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+      });
+      await wait(300);
+      const leveled = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!game || !sim || !player) return false;
+        // Travel form is learned at 11; 20 clears it with room to spare.
+        sim.setPlayerLevel?.(20, player.id);
+        player.gm = true;
+        player.resource = player.maxResource;
+        return true;
+      });
+      if (!leveled) throw new Error('no offline game');
+      // Let the level-up deed banners clear the mid-screen before the shift.
+      await wait(5200);
+      await page.evaluate(() => {
+        const game = window.__game;
+        const player = game.sim.player;
+        game.sim.castAbility?.('travel_form', player.id);
+        // Swung around toward the front and a little above: the long bill and
+        // the leg length are the whole silhouette argument, and a dead-behind
+        // chase camera flattens both against the body.
+        game.input.camDist = 7;
+        game.input.camPitch = 0.36;
+        game.input.camYaw = player.facing - 2.2;
+      });
+      // The form rig is built lazily and held behind its compile gate, so the
+      // aura landing is NOT the same as the body being on screen. Wait for it.
+      let shown = false;
+      for (let poll = 0; poll < 40 && !shown; poll++) {
+        await wait(250);
+        shown = await page.evaluate(() => {
+          const game = window.__game;
+          const player = game?.sim?.player;
+          if (!player?.auras.some((aura) => aura.kind === 'form_travel')) return false;
+          return !!game?.renderer?.views?.get(player.id)?.travelVisual?.root.visible;
+        });
+      }
+      if (!shown) throw new Error('the travel form body never became visible');
+      // The shift's own burst sits right on top of the new body; what this
+      // target is evidence ABOUT is the body, so wait the burst out.
+      await wait(1800);
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      return { clip: '#ui' };
+    },
+  },
+  {
     key: 'tank-defensive-cds',
     // Widened past the tank when Dawnreaver grew a defensive of its own: the recipe
     // is the same (learn it, arm it, shoot the spellbook row plus the armed slot),

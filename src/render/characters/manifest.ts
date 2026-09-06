@@ -1003,15 +1003,22 @@ const RAPTOR: ClipMap = {
   death: 'Velociraptor_Death',
 };
 
-// Chicken-cow rig (chicken_cow.glb, procedurally authored — see
-// scripts/gen_chicken_cow.mjs). Node-transform animations, no hit-react.
-const CHICKEN_COW: ClipMap = {
-  idle: 'Idle',
-  walk: 'Walk',
-  run: 'Run',
-  attack: ['Attack'],
-  death: 'Death',
-  jump: 'Jump',
+// Druid Strider Form (the Longstride, longstride.glb). The same SHAPE of clip
+// map as the chicken-cow it replaces, because the form's slots have not
+// changed, but every clip is authored (scripts/build_longstride_anims.mjs)
+// rather than taken from the generated body's own retargets. The Tripo biped
+// presets that shipped with the rig are unusable on a bird: NeckTwist01 carries
+// the moa's whole neck and bill, so a preset that rotates it 77 degrees puts the
+// head behind the flank, and every one of the eight does. The authored clips
+// keep the preset LEGS (a moa's gait is genuinely bipedal) and re-author the
+// torso, neck and wings. No hit-react, as before.
+const LONGSTRIDE: ClipMap = {
+  idle: 'Strider_Idle',
+  walk: 'Strider_Walk',
+  run: 'Strider_Run',
+  attack: ['Strider_Peck'],
+  death: 'Strider_Topple',
+  jump: 'Strider_Jump',
 };
 
 // Raid 02 asset-pipeline rig (stone_cantor.glb): Mixamo-rigged, ships
@@ -1920,12 +1927,39 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 0xd08b45,
     tintStrength: 0.35,
   },
-  // Druid Travel Form: a daft chicken-cow hybrid (custom GLB). No tint: its
-  // authored cow-spots/comb/beak colours carry the look.
+  // Druid Strider Form: the Longstride, a moa built out of legs (asset pipeline
+  // body, authored clips). No tint: it ships its own rust hair-feather coat,
+  // bone bill and orange scaled feet, the same palette the other druid forms
+  // carry, so the family reads as one animal at three scales.
+  //
+  // 2.1 rather than the chicken-cow's 2.3. At 2.3 the travel form sat in the
+  // bear's mass class (2.35), which is a READ problem and not just a silly one:
+  // shifting to run should never make a druid a bigger target. 2.1 keeps it
+  // under the 2.6 caster and clear of the bear, with the mass moved into the
+  // legs so the silhouette is tall and narrow instead of broad.
   form_travel: {
-    url: `${CREATURES}/chicken_cow.glb`,
-    height: 2.3,
-    clips: CHICKEN_COW,
+    url: `${CREATURES}/longstride.glb`,
+    // Mesh-free clip donor, the way kiwi_form_anims.glb rides the kiwi body.
+    animUrls: [`${CREATURES}/longstride_anims.glb`],
+    height: 2.1,
+    // Tripo bipeds face +X; character visuals face +Z at world facing 0.
+    yaw: -Math.PI / 2,
+    clips: LONGSTRIDE,
+    // MEASURED off the authored clips at this height, the same way the bear's
+    // 1.6/5.4 were: a planted foot slides backwards relative to the hips at
+    // exactly body speed, so the stance-phase slide rate IS the speed the clip
+    // is authored for. Walk measures 3.08 yd/s and run 9.79, which are this
+    // form's actual speeds (the 2.2 walk and RUN_SPEED 7 references, both times
+    // the +40% the form grants). That puts normal travel at timeScale 1.0 and
+    // leaves the whole clamp band for snares and speed buffs. The entry carried
+    // NO refs before, which is why the chicken-cow skated.
+    walkRef: 3.1,
+    runRef: 9.8,
+    // Both authored clips run at real time: the peck is 0.95s and the topple
+    // 2s from upright to flat. Neither needs the speed-up the generic presets
+    // took to read at all (the slash ran 6.6s).
+    attackTimeScale: 1,
+    deathTimeScale: 1,
   },
 
   // -- rideable mounts (src/sim/content/mounts.ts catalog) -------------------

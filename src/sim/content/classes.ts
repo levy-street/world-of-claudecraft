@@ -6693,7 +6693,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   travel_form: {
     id: 'travel_form',
     tooltipOmitEffectLines: true,
-    name: 'Fleet Form',
+    name: 'Strider Form',
     class: 'druid',
     learnLevel: 11,
     cost: 30,

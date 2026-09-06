@@ -2830,7 +2830,7 @@ export const en_CA: EnTranslations = {
       "stealth": "Concealed; movement speed reduced by {pct}%",
       "formBear": "Bruin Form: increased health and armor",
       "formCat": "Wolf Form: melee damage and energy",
-      "formTravel": "Fleet Form: movement speed increased by {pct}%",
+      "formTravel": "Strider Form: movement speed increased by {pct}%",
       "formFireball": "Ember Form: movement speed increased by {pct}%; attacks and spells are disabled",
       "formMoonkin": "Moonwing Form: spell damage increased by {pct}% and armor increased by {armorPct}%",
       "formShadow": "Gloamveil Form: Shadow damage increased by {pct}%",
@@ -5684,7 +5684,7 @@ export const en_CA: EnTranslations = {
       "formName": {
         "form_bear": "Bruin Form",
         "form_cat": "Wolf Form",
-        "form_travel": "Fleet Form"
+        "form_travel": "Strider Form"
       }
     },
     "classHook": {
@@ -6325,7 +6325,7 @@ export const en_CA: EnTranslations = {
       "groupForms": "Druid Forms",
       "formBear": "Bruin Form",
       "formCat": "Wolf Form",
-      "formTravel": "Fleet Form",
+      "formTravel": "Strider Form",
       "groupCreatures": "Creatures",
       "groupPets": "Warlock Demons",
       "pickerLabel": "Choose a model to view",
@@ -11027,8 +11027,8 @@ export const en_CA: EnTranslations = {
         "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant strike for 80 to 100 Nature damage plus a 45 burn over 9 sec, restoring 35 mana and spending all 3."
       },
       "travel_form": {
-        "name": "Fleet Form",
-        "description": "Instantly shift into a swift fleet form, increasing movement speed by 40%. You cannot use other abilities while shifted, but can shift in or out of combat, ideal for escaping."
+        "name": "Strider Form",
+        "description": "Instantly shift into a swift travel form, increasing movement speed by 40%. You cannot use other abilities while shifted, but can shift in or out of combat, ideal for escaping."
       },
       "enrage": {
         "name": "Stoke",

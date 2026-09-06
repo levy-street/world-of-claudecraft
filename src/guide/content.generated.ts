@@ -1991,7 +1991,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "travel_form",
-        "name": "Fleet Form"
+        "name": "Strider Form"
       },
       {
         "id": "enrage",
@@ -12918,9 +12918,10 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "tintStrength": 0.35
   },
   "form_travel": {
-    "url": "models/creatures/chicken_cow.glb",
-    "idle": "Idle",
-    "height": 2.3
+    "url": "models/creatures/longstride.glb",
+    "idle": "Strider_Idle",
+    "height": 2.1,
+    "yaw": -1.5707963267948966
   },
   "mob_emberkin": {
     "url": "models/creatures/emberkin.glb",

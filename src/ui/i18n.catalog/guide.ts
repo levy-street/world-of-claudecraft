@@ -1270,7 +1270,7 @@ export const guideStrings = {
     formName: {
       form_bear: 'Bruin Form',
       form_cat: 'Wolf Form',
-      form_travel: 'Fleet Form',
+      form_travel: 'Strider Form',
     },
   },
   // Deprecated: short fantasy hooks. The class index and class page now use the canonical
@@ -2342,7 +2342,7 @@ export const guideStrings = {
     groupForms: 'Druid Forms',
     formBear: 'Bruin Form',
     formCat: 'Wolf Form',
-    formTravel: 'Fleet Form',
+    formTravel: 'Strider Form',
     groupCreatures: 'Creatures',
     groupPets: 'Warlock Demons',
     pickerLabel: 'Choose a model to view',
