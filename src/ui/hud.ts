@@ -103,6 +103,7 @@ import { TIER_SKILL_STEP, tierForSkill } from '../sim/professions/wheel';
 import { questObjectivesForMob } from '../sim/quest_targets';
 import type { ResolvedAbility } from '../sim/sim';
 import {
+  type AbilityDef,
   type AuraKind,
   CONSUME_DURATION,
   CRAFT_CAST_ID,
