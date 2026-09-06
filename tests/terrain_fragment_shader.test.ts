@@ -7,6 +7,7 @@
 // nothing at all. jsdom stays scoped to this file per tests/CLAUDE.md.
 import * as THREE from 'three';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import type { sharedUniforms } from '../src/render/gfx';
 
 interface FakeShader {
   uniforms: Record<string, THREE.IUniform>;
@@ -256,6 +257,74 @@ describe('insane terrain fragment shader', () => {
       );
     },
   );
+
+  describe('terrain-detail shed (governed uReliefSteps)', () => {
+    // compileTerrainShader calls vi.resetModules() and re-imports './gfx'
+    // fresh each time, so the module-scope sharedUniforms this file imported
+    // at the top is a stale instance by then: re-import it from the SAME
+    // fresh module graph terrain.ts just loaded.
+    async function liveSharedUniforms(): Promise<typeof sharedUniforms> {
+      const mod = await import('../src/render/gfx');
+      return mod.sharedUniforms;
+    }
+
+    it('an ultra material shares the live uReliefSteps uniform by reference', async () => {
+      const shader = await compileTerrainShader('ultra');
+      const live = await liveSharedUniforms();
+      expect(shader.uniforms.uReliefSteps).toBe(live.uReliefSteps);
+    });
+
+    it('a medium/high material never attaches the uniform: no relief 2+ code compiled at all', async () => {
+      for (const preset of ['medium', 'high']) {
+        const shader = await compileTerrainShader(preset);
+        expect(shader.uniforms.uReliefSteps).toBeUndefined();
+        expect(shader.fragmentShader).not.toContain('uniform float uReliefSteps;');
+      }
+    });
+
+    it('scales the EXISTING parallax and micro-shadow fades by the live level, inside the same gates', async () => {
+      const shader = await compileTerrainShader('ultra');
+      const frag = shader.fragmentShader;
+      expect(frag).toContain('uniform float uReliefSteps;');
+      // The parallax walk: its distance/incidence fade takes the relief weight
+      // (0 at the floor's relief 1, 1 from relief 2 up) and the existing
+      // pFade > 0.015 gate is what skips every tap below it.
+      const parallaxFade = frag.indexOf('* clamp(uReliefSteps - 1.0, 0.0, 1.0);');
+      expect(parallaxFade).toBeGreaterThan(-1);
+      expect(frag.indexOf('if (pFade > 0.015) {')).toBeGreaterThan(parallaxFade);
+      expect(frag.indexOf('wocGroundHeightSmooth(tuv, pAmp)')).toBeGreaterThan(parallaxFade);
+      // The micro sun-shadow: its distance fade takes the level-3 weight and
+      // the existing microFade > 0.0 gate skips its taps below relief 3.
+      const microFade = frag.indexOf('* clamp(uReliefSteps - 2.0, 0.0, 1.0);');
+      expect(microFade).toBeGreaterThan(-1);
+      expect(frag.indexOf('if (microFade > 0.0) {')).toBeGreaterThan(microFade);
+      expect(frag.indexOf('wocGroundHeight(tuv + sunStep')).toBeGreaterThan(microFade);
+      // No `>=` uniform compare anywhere: the shed is a weight on a fade, so
+      // a slewing level crossfades instead of switching a branch.
+      expect(frag).not.toMatch(/uReliefSteps\s*>=/);
+    });
+
+    it('the default program cache key (the hook source) is identical across shed levels', async () => {
+      await compileTerrainShader('ultra');
+      const { terrainInternalsForTest } = await import('../src/render/terrain');
+      const live = await liveSharedUniforms();
+      const mat = terrainInternalsForTest.createSplatMaterial();
+      const keyAtRequest = mat.customProgramCacheKey();
+      live.uReliefSteps.value = 1;
+      expect(mat.customProgramCacheKey()).toBe(keyAtRequest);
+      live.uReliefSteps.value = 2.32;
+      expect(mat.customProgramCacheKey()).toBe(keyAtRequest);
+    });
+
+    it('writing the shared uniform changes only the value the ALREADY-compiled ultra program reads, never its source', async () => {
+      const shader = await compileTerrainShader('ultra');
+      const live = await liveSharedUniforms();
+      const before = shader.fragmentShader;
+      live.uReliefSteps.value = 1;
+      expect(shader.fragmentShader).toBe(before);
+      expect(shader.uniforms.uReliefSteps.value).toBe(1);
+    });
+  });
 });
 
 // The Lambert terrain (Terrain Detail Low on the Advanced mix, or any tier

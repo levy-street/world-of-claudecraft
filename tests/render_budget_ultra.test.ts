@@ -37,8 +37,8 @@ describe('ultra render budget', () => {
     }).state();
 
     expect(renderBudgetShaderPrewarmLevels(state)).toEqual([
-      { grass: 0.86, foliage: 0.86, vfx: 0.92, lighting: 0.88, resolution: 1 },
-      { grass: 0.78, foliage: 0.78, vfx: 0.86, lighting: 0.78, resolution: 1 },
+      { grass: 0.86, foliage: 0.86, vfx: 0.92, lighting: 0.88, resolution: 1, detail: 1 },
+      { grass: 0.78, foliage: 0.78, vfx: 0.86, lighting: 0.78, resolution: 1, detail: 1 },
     ]);
   });
 });

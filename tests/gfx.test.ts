@@ -201,6 +201,7 @@ describe('graphics tier resolution', () => {
       expect(Object.keys(bands).sort()).toEqual(
         [
           'characters',
+          'detail',
           'foliage',
           'grass',
           'lighting',
@@ -226,6 +227,33 @@ describe('graphics tier resolution', () => {
     expect(GFX_BUCKET_BANDS.low.foliage.baseline).toBeGreaterThan(GFX_BUCKET_BANDS.low.foliage.min);
     expect(GFX_BUCKET_BANDS.low.characters.baseline).toBe(1);
     expect(GFX_BUCKET_BANDS.low.weapons.baseline).toBe(1);
+    // Terrain-detail shed (terrain_detail_shed_core.ts): the tier's own
+    // terrainRelief/surfaceDetailTaps/surfaceDetailClampK request is always
+    // the baseline (the static preset itself never changes). Only ultra and
+    // insane, whose own request sits ABOVE high's floor profile on every
+    // knob, are governable with real room to shed (min 0); every tier at or
+    // under high already ships the floor, so its band is pinned non-
+    // governable with no shed range at all, a high session provably
+    // untouched by the live level regardless of pressure.
+    for (const tier of ['low', 'medium', 'high'] as const) {
+      expect(GFX_BUCKET_BANDS[tier].detail).toEqual({
+        min: 1,
+        baseline: 1,
+        max: 1,
+        roi: 0,
+        cost: 'gpu',
+        governable: false,
+      });
+    }
+    for (const tier of ['ultra', 'insane'] as const) {
+      const band = GFX_BUCKET_BANDS[tier].detail;
+      expect(band.governable).toBe(true);
+      expect(band.min).toBe(0);
+      expect(band.baseline).toBe(1);
+      expect(band.max).toBe(1);
+      expect(band.cost).toBe('gpu');
+      expect(band.roi).toBe(0.92);
+    }
   });
 
   it('keeps medium as a middle tier while high and ultra retain the premium pipeline', () => {
