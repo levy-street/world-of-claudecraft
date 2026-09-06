@@ -210,6 +210,17 @@ export function resetSwingTimer(ctx: SimContext, p: Entity, meta: PlayerMeta): v
 export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   p.swingTimer = Math.max(0, p.swingTimer - DT);
   p.offhandSwingTimer = Math.max(0, p.offhandSwingTimer - DT);
+  tryPlayerSwing(ctx, p, meta);
+}
+
+// The swing attempt behind the per-tick driver, without the timer decay: every
+// gate (armed, not casting, target, timer, stun, facing, range, LoS) and the
+// swing itself. Reachable a second time in one tick from the spell queue
+// (casting_lifecycle.fireQueuedCast, via ctx.tryPlayerSwing): a cast that
+// completes with the next cast already queued never shows the driver a null
+// castingAbility, so the queue fires the ready swing itself before starting
+// the queued cast. Calling in here with the timer still running is a no-op.
+export function tryPlayerSwing(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   if (isValkyrsCallingAirborne(p)) return;
   if (p.auras.some((a) => isTravelFormAuraKind(a.kind))) {
     p.autoAttack = false;
