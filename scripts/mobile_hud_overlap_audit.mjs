@@ -341,31 +341,45 @@ async function forceTarget(page) {
   });
 }
 
-// Populate the buff bar best-effort: push a synthetic aura onto player.auras (the
+// How many synthetic buffs the sweep pushes. A single buff can never make the strip
+// WRAP, and an unwrapped strip is exactly the case that hid the buff/debuff overlap
+// this audit exists to catch: the mobile strips fit five icons per row, so one buff
+// left the second row (the one that used to land on the debuff row) untested on every
+// profile. Nine is comfortably past a wrap at every mobile width the sweep runs, and
+// a raid-buffed player carries more than that anyway.
+const AUDIT_BUFF_COUNT = 9;
+
+// Populate the buff bar best-effort: push synthetic auras onto player.auras (the
 // same array the buff-bar painter reads). Returns true if the bar has children.
 async function populateBuffBar(page) {
-  return page.evaluate(() => {
+  return page.evaluate((count) => {
     const sim = window.__game.sim;
     const p = sim.player;
     if (!Array.isArray(p.auras)) return false;
-    if (!p.auras.some((a) => a.id === 'audit-buff')) {
+    for (let i = 0; i < count; i++) {
+      const id = `audit-buff-${i}`;
       // Idempotent, matching the debuff helper: re-calling per profile must not
       // stack duplicate buff-bar entries (which would grow the bar's width).
+      if (p.auras.some((a) => a.id === id)) continue;
       p.auras.push({
-        id: 'audit-buff',
-        name: 'Audit Vigor',
+        id,
+        name: `Audit Vigor ${i + 1}`,
         kind: 'buff_ap',
-        remaining: 300,
-        duration: 300,
+        // Staggered well apart so the strip's urgency banding (aura_strip_order_core.ts)
+        // spreads them across bands rather than piling every marker into one, which
+        // keeps the sweep representative of a real strip's row shape.
+        remaining: 30 + i * 240,
+        duration: 30 + i * 240,
         value: 15,
         sourceId: sim.primaryId,
         school: 'physical',
       });
     }
-    // Honest result, mirroring the debuff helper: true only if the marker aura
-    // actually sits on the player (a skipped push must not read as populated).
-    return p.auras.some((a) => a.id === 'audit-buff');
-  });
+    // Honest result, mirroring the debuff helper: true only when EVERY marker aura
+    // actually sits on the player (a partial push must not read as populated, or the
+    // sweep would silently go back to measuring an unwrapped strip).
+    return p.auras.filter((a) => String(a.id).startsWith('audit-buff-')).length === count;
+  }, AUDIT_BUFF_COUNT);
 }
 
 // Accept a quest so #quest-tracker renders. sim.acceptQuest requires the player to

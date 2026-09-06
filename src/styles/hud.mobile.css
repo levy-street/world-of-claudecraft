@@ -3575,14 +3575,14 @@
   body.mobile-touch #raid-boss-guide-window .rbg-ability-detail p {
     font-size: 10px;
   }
-  body.mobile-touch #buff-bar {
+  /* One anchor for both strips: the column (hud.css #aura-stack) owns the
+     buff-to-debuff clearance, so the two `top` offsets that used to set it are
+     gone. The old pair put the debuff row 36px under the buff row while a buff
+     icon plus its duration label is 41px tall, so the rows overlapped as soon as
+     the buff strip wrapped. */
+  body.mobile-touch #aura-stack {
     right: max(10px, env(safe-area-inset-right));
     top: max(140px, env(safe-area-inset-top));
-    max-width: calc(180px * var(--mobile-chrome-scale, 1));
-  }
-  body.mobile-touch #debuff-bar {
-    right: max(20px, calc(env(safe-area-inset-right) + 10px));
-    top: calc(max(140px, env(safe-area-inset-top)) + 36px);
     max-width: calc(180px * var(--mobile-chrome-scale, 1));
   }
   /* Target dots on a landscape phone. The desktop seat (left: 18px; top: 34%)
@@ -7945,16 +7945,12 @@
     body.mobile-touch #party-frames .party-frame .bar {
       height: 4px;
     }
-    body.mobile-touch #buff-bar {
+    /* Same single-anchor move as the block above, and the scale now applies once
+       to the whole column instead of separately to two strips that then had to be
+       kept in step by hand. */
+    body.mobile-touch #aura-stack {
       right: calc(98px + env(safe-area-inset-right));
       top: max(8px, env(safe-area-inset-top));
-      max-width: 160px;
-      transform: scale(calc(0.85 * var(--mobile-chrome-scale, 1)));
-      transform-origin: right top;
-    }
-    body.mobile-touch #debuff-bar {
-      right: calc(98px + env(safe-area-inset-right));
-      top: calc(max(8px, env(safe-area-inset-top)) + 32px);
       max-width: 160px;
       transform: scale(calc(0.85 * var(--mobile-chrome-scale, 1)));
       transform-origin: right top;

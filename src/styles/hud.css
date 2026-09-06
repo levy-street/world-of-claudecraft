@@ -2965,10 +2965,33 @@
   }
 
   /* ---------- buff bar ---------- */
-  #buff-bar {
+  /* The two player aura strips share ONE column (classic layout: debuffs beneath
+     buffs). They used to be two independently absolute strips at fixed `top`
+     offsets, which cannot hold: each icon's duration label hangs 13px BELOW the
+     icon and out of flow, so a 28px icon really occupies 41px, and the buff strip
+     wraps to a second row as soon as the player carries more buffs than fit the
+     max-width. Any constant gap is then wrong at some buff count, and on the
+     mobile offsets it was wrong at the very first wrap: the second buff row landed
+     on top of the debuff row and hid its own duration labels behind the debuff
+     icons. Stacking them in a flex column makes the clearance a consequence of
+     flow rather than a number to maintain, at every wrap count and viewport. */
+  #aura-stack {
     position: absolute;
     right: 196px;
     top: 14px;
+    display: flex;
+    flex-direction: column;
+    /* Shrink-to-fit rows whose RIGHT edge pins to the stack's anchor, matching the
+       old `right`-anchored absolute strips. Wrapping still happens at max-width. */
+    align-items: flex-end;
+    /* Clears the last buff row's out-of-flow duration labels (13px) before the
+       debuff row starts, with a little breathing room on top. */
+    gap: 20px;
+    max-width: 320px;
+    /* The column's empty area must not eat clicks; the strips re-enable it. */
+    pointer-events: none;
+  }
+  #buff-bar {
     display: flex;
     /* Icon flow rides the buffsLeftToRight setting (Frames Settings menu):
        stock row-reverse grows right-to-left from the minimap-side anchor;
@@ -2976,23 +2999,21 @@
     flex-direction: var(--buff-bar-direction, row-reverse);
     flex-wrap: wrap;
     gap: 4px;
-    max-width: 320px;
+    /* Wrapped rows need the label band reserved too, or row 2 sits on row 1's
+       durations exactly the way the debuff strip used to. */
+    row-gap: 17px;
+    max-width: 100%;
     pointer-events: auto;
   }
-  /* Debuffs sit in their own row well beneath the buff row (classic layout),
-     level with the minimap's lower edge (the mail badge), so a wrapping wall of
-     raid buffs and their duration labels never crowds the debuff row. */
   #debuff-bar {
-    position: absolute;
-    right: 196px;
-    top: 172px;
     display: flex;
     /* The debuff row's twin of the #buff-bar direction var above
        (debuffsLeftToRight). */
     flex-direction: var(--debuff-bar-direction, row-reverse);
     flex-wrap: wrap;
     gap: 4px;
-    max-width: 320px;
+    row-gap: 17px;
+    max-width: 100%;
     pointer-events: auto;
   }
   /* Buffs on the Player Frame (aurasOnPlayerFrame): hud.ts reparents the BUFF
@@ -3005,6 +3026,8 @@
      dragged the frame somewhere. The row runs left-to-right from the frame's
      left edge. */
   #player-frame > #buff-bar {
+    /* Re-asserted: out of the stack the row is absolute against the frame again. */
+    position: absolute;
     right: auto;
     left: 0;
     top: auto;
@@ -3038,12 +3061,10 @@
   body.auras-on-frame.auras-below-frame #player-frame.pf-detached > #buff-bar {
     pointer-events: auto;
   }
-  /* With the buff row anchored to the frame, the player's own debuffs slide up
-     beside the minimap into the vacated top spot (classic WoW's debuff corner),
-     keeping the right-to-left stacking and wrapping downward from there. */
-  body.auras-on-frame #debuff-bar {
-    top: 14px;
-  }
+  /* With the buff row reparented onto the player frame, the debuff row is the only
+     child left in the stack, so it rises to the stack's top on its own (classic
+     WoW's debuff corner). That used to need a `body.auras-on-frame #debuff-bar`
+     top override; flow does it now, and the override is gone. */
   /* Party member mini aura strip: overlay the compact icons so gaining or losing
      an aura never changes frame height or shifts the surrounding raid grid. */
   .party-frame .pfm-auras {

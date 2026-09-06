@@ -218,6 +218,7 @@ const UI_PURE_CORES = [
   'src/ui/mouseover_cast_core.ts',
   'src/ui/paladin_devotion_view.ts',
   'src/ui/aura_icon_view.ts',
+  'src/ui/aura_strip_order_core.ts',
   'src/ui/aura_overlay_view.ts',
   'src/ui/banner_queue.ts',
   'src/ui/item_kind_label.ts',

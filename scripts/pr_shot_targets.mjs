@@ -2056,6 +2056,131 @@ export const TARGETS = [
     },
   },
   {
+    key: 'aura-strip',
+    label: 'Player buff and debuff strips under a full raid-buff load',
+    when: ['aura_strip_order', 'auras_view', 'auras_painter', 'aura_overflow'],
+    variants: [
+      { key: 'desktop', beforeLoad: lowGraphicsSeed },
+      { key: 'mobile', mobile: true, beforeLoad: lowGraphicsSeed },
+    ],
+    async capture(page, variant) {
+      await awaitWorldPainted(page);
+      // This recipe SEEDS player.auras rather than casting. That is deliberate and it
+      // is the opposite of what the sibling `target-auras` target does, so the reason
+      // matters: this target's claim is about STRIP LAYOUT (how many rows the buffs
+      // wrap to, and whether the debuff row clears their duration labels), never about
+      // how an aura came to exist. No reachable sequence of real casts puts a raid's
+      // worth of buffs plus four debuffs on one player inside a capture, and the empty
+      // strip a cast-only recipe could reach is exactly the state that hid the overlap
+      // bug. Same array and same move as scripts/mobile_hud_overlap_audit.mjs, which
+      // seeds for the same layout reason. `target-auras` casts for real because its
+      // claim IS that an ability applies an aura; that rule is scoped to that claim.
+      const seeded = await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const p = sim?.player;
+        if (!sim || !p || !Array.isArray(p.auras)) {
+          return { ok: false, reason: 'offline world is unavailable' };
+        }
+        p.auras.length = 0;
+        // A realistic raid-buffed spread: long upkeep applied FIRST (as a real pull
+        // does), the short cooldowns a player actually times applied last, so the shot
+        // shows what the ordering pass does rather than a pre-sorted list.
+        const buffs = [
+          ['bl_might', 'Blessing of Might', 'buff_ap', 1800, 25],
+          ['bl_kings', 'Blessing of Kings', 'buff_str', 1800, 10],
+          ['arcane_int', 'Arcane Intellect', 'buff_int', 1800, 20],
+          ['mark_wild', 'Mark of the Wild', 'buff_agi', 1800, 12],
+          ['power_word_fort', 'Power Word: Fortitude', 'buff_sta', 1800, 30],
+          ['divine_spirit', 'Divine Spirit', 'buff_spirit', 1800, 18],
+          ['battle_shout', 'Battle Shout', 'buff_ap', 120, 40],
+          ['horn_winter', 'Horn of Winter', 'buff_str', 120, 15],
+          ['well_fed', 'Well Fed', 'buff_sta', 900, 8],
+          ['flask_titans', 'Flask of Titans', 'buff_sta', 3600, 60],
+          ['sprint', 'Sprint', 'buff_speed', 9, 50],
+          ['heroism', 'Heroism', 'buff_haste', 34, 30],
+        ];
+        for (const [id, name, kind, remaining, value] of buffs) {
+          p.auras.push({
+            id,
+            name,
+            kind,
+            remaining,
+            duration: remaining,
+            value,
+            sourceId: sim.primaryId,
+            school: 'physical',
+          });
+        }
+        // One debuff per school border tint, so the shot also carries the school
+        // colouring the strip already ships.
+        const debuffs = [
+          ['rend', 'Rend', 'dot', 12, 20, 'physical'],
+          ['curse_weak', 'Curse of Weakness', 'debuff_ap', 110, 30, 'shadow'],
+          ['crippling_poison', 'Crippling Poison', 'slow', 8, 50, 'nature'],
+          ['frostbite', 'Frostbite', 'slow', 5, 60, 'frost'],
+        ];
+        for (const [id, name, kind, remaining, value, school] of debuffs) {
+          p.auras.push({
+            id,
+            name,
+            kind,
+            remaining,
+            duration: remaining,
+            value,
+            sourceId: 0,
+            school,
+          });
+        }
+        return { ok: true, count: p.auras.length };
+      });
+      if (!seeded.ok) throw new Error(seeded.reason);
+
+      // Wait for the painter to actually lay both strips out. Polling the DEBUFF row
+      // matters: it is the one that used to be drawn underneath the wrapped buff rows,
+      // so a shot taken before it has a box would hide the very thing being compared.
+      await page.waitForFunction(
+        () => {
+          const buffs = document.getElementById('buff-bar');
+          const debuffs = document.getElementById('debuff-bar');
+          if (!buffs || !debuffs) return false;
+          return buffs.getBoundingClientRect().height > 0 && debuffs.children.length > 0;
+        },
+        { timeout: 30000, polling: 200 },
+      );
+      await wait(600);
+
+      // A close-up over the UNION of the two strips, taken here rather than returned
+      // as a `clip` selector: `clip` resolves one element, and the whole point of the
+      // comparison is the space BETWEEN the two. A union rect also frames the same
+      // region on both sides of a before/after pair, where the after tree has a
+      // wrapper element the before tree does not. Same shape as the weapon-vfx-shed
+      // target's closeup; returning {} below still keeps the full-frame shot too.
+      const region = await page.evaluate(() => {
+        const b = document.getElementById('buff-bar').getBoundingClientRect();
+        const d = document.getElementById('debuff-bar').getBoundingClientRect();
+        const pad = 16;
+        const x = Math.max(0, Math.min(b.x, d.x) - pad);
+        const y = Math.max(0, Math.min(b.y, d.y) - pad);
+        // The duration labels hang out of flow BELOW the last row, so the bottom pad
+        // is deliberately deeper than the others or the shot crops the evidence off.
+        return {
+          x,
+          y,
+          width: Math.min(window.innerWidth - x, Math.max(b.right, d.right) - x + pad),
+          height: Math.min(window.innerHeight - y, Math.max(b.bottom, d.bottom) - y + pad + 14),
+        };
+      });
+      if (region.width > 0 && region.height > 0) {
+        await page.screenshot({
+          // biome-ignore lint/suspicious/noUndeclaredEnvVars: Screenshot-only CLI input is not a Turbo task dependency.
+          path: `${process.env.SHOTS_DIR ?? 'pr-shots'}/aura-strip-${variant.key}-closeup.png`,
+          clip: region,
+        });
+      }
+      return {};
+    },
+  },
+  {
     key: 'player-tooltip',
     label: 'Player hover tooltip',
     when: ['player_tooltip'],

@@ -342,7 +342,14 @@ const MONOLITHS: MonolithRow[] = [
     // settings/wiring. Re-pinned at this release reconcile after the map-level
     // extraction and chat follow repair landed on the combined candidate.
     // Exact count, zero slack.
-    ceiling: 18931,
+    // Lowered 18857 -> 18851 by the aura-strip column: the buff row's lazily
+    // captured home and the dead body class left applyAuraAnchor for
+    // restoreFrameHome (src/ui/interface_unlock.ts), and Reset Frame Positions
+    // re-applies the anchor in one line. Exact merged count.
+    // Re-pinned to the base-sync count after carrying this candidate's selected
+    // loot, combat, map, chat-follow, wallet, Temporal Echo, and render-gate
+    // wiring over that aura-strip extraction. Exact count, zero slack.
+    ceiling: 18925,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

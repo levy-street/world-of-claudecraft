@@ -557,7 +557,7 @@ import {
 } from './i18n';
 import { iconDataUrl, QUALITY_COLOR, raidMarkerDataUrl } from './icons';
 import { InspectWindow } from './inspect_window';
-import { InterfaceUnlock, makeUiRootDetacher } from './interface_unlock';
+import { InterfaceUnlock, makeUiRootDetacher, restoreFrameHome } from './interface_unlock';
 import { HUD_FRAME_SPECS } from './interface_unlock_core';
 import {
   buildFramesMenuSelects,
@@ -4072,9 +4072,10 @@ export class Hud {
     // this same feature, so it splits back apart too, routed through the
     // settings seam so the checkbox, persistence and body class stay in sync.
     // Settings that merely SHOW or HIDE content (the optional bars, the pet
-    // frame, buffs on the player frame) keep the player's choice: they have
-    // their own checkboxes and are not frame layout.
+    // frame, buffs on the player frame) keep the player's choice; the buff
+    // row's reset can seat it in the aura column, so its anchor re-applies.
     this.interfaceUnlock.resetAll();
+    this.applyAuraAnchor();
     this.doomMeter.resetPosition();
     this.chatGeometry.reset();
     this.meters.resetFrames();
@@ -4169,13 +4170,13 @@ export class Hud {
   // BUFF row into #player-frame, where CSS anchors it to the frame (above it
   // while docked over the action bars, below it once moved) and the frame's
   // children-zoom scale applies. The DEBUFF row never rides the frame: with the
-  // option on it slides up beside the minimap into the spot the buff row
-  // vacated (body.auras-on-frame, hud.css), classic WoW's debuff corner, so
-  // incoming debuffs stay in one glanceable place. Off (or the mobile layout,
-  // which owns its stock aura placement) restores the classic two-row corner;
-  // the aura painters' element refs are live nodes, so they survive the moves.
+  // option on it is the only child left in the #aura-stack column, so flow
+  // lifts it into the spot the buff row vacated, classic WoW's debuff corner.
+  // Off (or the mobile layout, which owns its stock aura placement) restores
+  // the two-row corner through restoreFrameHome, which puts the row on #ui
+  // while a saved position still applies and else back at the head of the
+  // column; the aura painters' element refs are live nodes, so they survive.
   private aurasOnPlayerFrame = false;
-  private buffBarHome: { parent: ParentNode; next: Node | null } | null = null;
 
   setAurasOnPlayerFrame(on: boolean): void {
     this.aurasOnPlayerFrame = on;
@@ -4192,18 +4193,11 @@ export class Hud {
 
   private applyAuraAnchor(): void {
     const on = this.aurasOnPlayerFrame && !this.isMobileLayout();
-    document.body.classList.toggle('auras-on-frame', on);
     const frame = this.playerFrameEl;
-    // The buff bar's stock home: right before its sibling debuff bar (which
-    // stays put in the DOM; only its CSS spot shifts with the body class).
-    this.buffBarHome ??= {
-      parent: this.buffBarEl.parentNode as ParentNode,
-      next: this.debuffBarEl,
-    };
     if (on) {
       if (this.buffBarEl.parentElement !== frame) frame.appendChild(this.buffBarEl);
     } else if (this.buffBarEl.parentElement === frame) {
-      this.buffBarHome.parent.insertBefore(this.buffBarEl, this.buffBarHome.next);
+      restoreFrameHome(document, 'buffBar');
     }
   }
 

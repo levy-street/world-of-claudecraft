@@ -8,10 +8,16 @@ const guideDesktopCss = desktopCss.slice(
   desktopCss.indexOf('.party-boss-guide-button'),
   desktopCss.indexOf('#party-frames.below-target'),
 );
-const guideMobileCss = mobileCss.slice(
-  mobileCss.indexOf('body.mobile-touch .party-boss-guide-button'),
-  mobileCss.indexOf('body.mobile-touch #buff-bar'),
-);
+// The mobile guide block ends where the aura column's anchor rule begins
+// (#aura-stack, which replaced the per-row #buff-bar / #debuff-bar seats).
+// Both anchors must resolve, or the slice silently runs to the end of the
+// file and the palette check below starts reading unrelated rules.
+const guideMobileStart = mobileCss.indexOf('body.mobile-touch .party-boss-guide-button');
+const guideMobileEnd = mobileCss.indexOf('body.mobile-touch #aura-stack');
+if (guideMobileStart < 0 || guideMobileEnd < guideMobileStart) {
+  throw new Error('raid guide mobile block anchors not found in hud.mobile.css');
+}
+const guideMobileCss = mobileCss.slice(guideMobileStart, guideMobileEnd);
 
 function rule(css: string, selector: string): string {
   const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');

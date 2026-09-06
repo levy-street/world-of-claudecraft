@@ -49,9 +49,11 @@ function isExempt(s: Pick<AuraSlotState, 'isDebuff' | 'alwaysRender' | 'key'>): 
  * shrinks a player's buff allotment. Among the ordinary buffs, short-duration
  * ones (`shortDuration`) fill the `cap` budget first; only once that is
  * exhausted do long-duration buffs start losing theirs. Within each bucket,
- * ties break by application order (index order), the same "first applied,
- * first rendered" rule the uncapped path already uses, so the selection
- * stays deterministic frame to frame.
+ * ties break by slot index, the order the strip renders in, so the selection
+ * stays deterministic frame to frame. On the shared 'all' strips that is sim
+ * application order; on the player's own two rows the view fills slots in
+ * urgency-band order (aura_strip_order_core.ts), so there the nearest-expiry
+ * buffs keep their budget first.
  */
 export function selectShedSlots(
   slots: readonly AuraSlotState[],

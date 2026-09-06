@@ -41,6 +41,17 @@ export interface HudFrameSpec {
    * as broken. See MovableFrameConfig.resizeMode.
    */
   resizeMode?: 'scale' | 'box';
+  /**
+   * The stock slot a detaching frame returns to, RESOLVED at release time rather
+   * than remembered from detach time. Only a frame whose stock parent holds
+   * another detaching frame needs it: a remembered `nextSibling` can itself have
+   * left the parent by the time the frame comes back (both aura rows detached,
+   * then reset in registration order), and a parent remembered while the frame
+   * was somewhere else entirely (the buff row on #ui when the auras-on-frame
+   * option captured it) is not a stock slot at all. 'first' inserts before the
+   * parent's current first child; 'last' appends.
+   */
+  stockHome?: { parentId: string; slot: 'first' | 'last' };
 }
 
 /**
@@ -161,8 +172,15 @@ export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
   // Both genuinely REFLOW (the icons re-wrap as the width changes), so their
   // side edges resize the real box rather than zooming, which keeps each
   // outline an honest picture of the area its auras will occupy. Both detach:
-  // the auras-on-frame option re-parents the buff row into the player frame at
-  // runtime, and the detacher is a no-op when a row already lives on #ui.
+  // their stock parent is the #aura-stack flex column (the clearance between the
+  // rows comes from flow, hud.css), so a saved position must lift a row onto #ui
+  // for its left/top to resolve against the viewport. Both declare their stock
+  // slot in the column (buff row first, debuff row last): the buff row's
+  // remembered sibling is the debuff row, which can be detached too, and the
+  // Buffs on the Player Frame option moves the buff row onto the player frame
+  // at runtime (hud.ts applyAuraAnchor), which restores it through
+  // restoreFrameHome; the debuff row declares its slot so the pair stays
+  // symmetric and neither depends on the other being home first.
   {
     id: 'buffBar',
     elementId: 'buff-bar',
@@ -171,6 +189,7 @@ export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
     fallbackSize: { w: 320, h: 32 },
     detachToUiRoot: true,
     resizeMode: 'box',
+    stockHome: { parentId: 'aura-stack', slot: 'first' },
   },
   {
     id: 'debuffBar',
@@ -180,6 +199,7 @@ export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
     fallbackSize: { w: 320, h: 32 },
     detachToUiRoot: true,
     resizeMode: 'box',
+    stockHome: { parentId: 'aura-stack', slot: 'last' },
   },
   // The Target dots tracker. It genuinely REFLOWS (a wider frame is a longer
   // timer bar and more room for the "<aura> on <target>" label before it
