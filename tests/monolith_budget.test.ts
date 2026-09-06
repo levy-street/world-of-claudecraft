@@ -956,7 +956,14 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED for the nameplate dot row: the row's drawing moved to
     // nameplate_dot_row.ts and the image cache to nameplate_image_cache.ts,
     // which more than paid for the new draw step. Exact count, zero slack.
-    ceiling: 848,
+    // Lowered 864 -> 842 after the badge/raid-marker/emote image cache moved to
+    // src/render/nameplate_image_cache.ts (the ratchet's own rule: an extraction
+    // lowers the ceiling), which paid for the layer hide/show and style-revision
+    // surface controls the repaint gate needs.
+    // Re-pinned to the exact PR #3844 merge output after the dot row, extracted
+    // image cache, and compositor repaint-skip surface controls composed in one
+    // file. Exact merged count, zero slack.
+    ceiling: 901,
     seam: 'the pure src/render/nameplate_heraldry_core.ts geometry module',
   },
   {

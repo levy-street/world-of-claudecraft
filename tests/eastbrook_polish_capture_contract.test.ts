@@ -377,8 +377,15 @@ interface AttributionTargetFixture {
 // Re-minted for the PR #3841 merge after PR #3839: the candidate's render-stack
 // renderer bytes and #3841's Lambert terrain fill write combine in one tree,
 // so the composite matches neither parent. No capture was retaken.
+// Re-minted for the compositor-surfaces batch (renderer.ts only: the opaque
+// world context, the nameplate surface-ratio and cadence wiring, the spirit
+// grade hookup and the build-diag extraction). No capture was retaken.
+// Re-minted for the PR #3844 merge after PR #3841: the candidate's render-stack
+// renderer bytes and #3844's compositor surface/nameplate/spirit-grade bytes
+// combine in one tree, so the composite matches neither parent. No capture was
+// retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '6b9faccab4159dce23af5bab71c9cfb323b05ebe46841a037621f85968d477ef';
+  '4d8725cb089beecb52e7843bb4ba13bd3344609a2a4a0b002e610297f4530232';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

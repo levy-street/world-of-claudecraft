@@ -115,6 +115,11 @@ export interface RendererPerfStats {
   /** 0 = full day, 1 = deep night; the night-visibility layers key off it. */
   nightAmount: number;
   phaseMs: RendererPhaseStats;
+  /** Nameplate SURFACE accounting beside the `nameplates` phase timing above:
+   *  how many passes actually cleared and repainted the full-viewport plate
+   *  canvas, and how many were skipped because the frame would have produced
+   *  the same pixels (nameplate_paint_gate_core.ts). */
+  nameplates: { paints: number; paintsSkipped: number };
   renderDiagnostics: RenderDiagnosticsSnapshot;
   lastFrame?: RendererFrameStats;
   prewarm: RendererPrewarmStats | null;

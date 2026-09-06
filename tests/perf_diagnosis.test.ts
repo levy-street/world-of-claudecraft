@@ -118,6 +118,7 @@ function baseSnapshot(): PerfSnapshot {
         submit: digest(4),
         total: digest(9),
       },
+      nameplates: { paints: 0, paintsSkipped: 0 },
       renderDiagnostics: {} as never,
       nightAmount: 0,
       prewarm: null,

@@ -4,8 +4,6 @@ import { existsSync, readFileSync } from 'node:fs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   createNameplateCanvasState,
-  NAMEPLATE_IMAGE_CACHE_LIMIT,
-  NAMEPLATE_IMAGE_RETRY_BASE_FRAMES,
   NAMEPLATE_MARKER_ROW_HEIGHT,
   NAMEPLATE_TEXT_SPRITE_BUDGET_BYTES,
   NAMEPLATE_TEXT_SPRITE_LIMIT,
@@ -22,6 +20,10 @@ import {
   NAMEPLATE_HERALDRY_WELL_ALPHA,
   NAMEPLATE_HERALDRY_WELL_FILL,
 } from '../src/render/nameplate_heraldry_core';
+import {
+  NAMEPLATE_IMAGE_CACHE_LIMIT,
+  NAMEPLATE_IMAGE_RETRY_BASE_FRAMES,
+} from '../src/render/nameplate_image_cache';
 import {
   BORDER_ACCENT_SLUGS,
   type BorderMotifKind,

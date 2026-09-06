@@ -31,7 +31,7 @@
 //                 is the A/B that says whether a suspect distant surface is
 //                 this layer or the real splat terrain underneath it
 
-// Beside the ?<name>=off layer switches, two knobs with their own accessors:
+// Beside the ?<name>=off layer switches, knobs with their own accessors:
 //   ?bladesectors=<n> - how many ways each blade-grass pool's slot grid is split
 //                  per axis, so three can frustum-cull the sectors behind the
 //                  camera (blade_grass_sector_pool.ts). 1 collapses each pool
@@ -47,6 +47,10 @@
 //                  kill switch for pacing: if the budget regresses on a machine,
 //                  ?prep=legacy is the A/B that says so without a rebuild, and
 //                  the same flag is what a rollback ships as the default.
+//   ?canvasalpha=on - restore three's own world-context attributes (alpha: true,
+//                     the translucent surface every build before this shipped).
+//                     The world canvas is opaque by default now; this is the A/B
+//                     arm for measuring the compositor difference on one build.
 
 /**
  * Sectors per axis each blade-grass pool splits its slot grid into. Four is
@@ -96,4 +100,14 @@ const gpuPrep = ((): GpuPrepMode => {
 /** The session's GPU-preparation mode: 'legacy' only under `?prep=legacy`. */
 export function gpuPrepMode(): GpuPrepMode {
   return gpuPrep;
+}
+
+const canvasAlpha = ((): boolean => {
+  if (typeof location === 'undefined') return false;
+  return new URLSearchParams(location.search).get('canvasalpha') === 'on';
+})();
+
+/** True under `?canvasalpha=on`: keep the legacy TRANSLUCENT world context. */
+export function worldCanvasAlphaRequested(): boolean {
+  return canvasAlpha;
 }

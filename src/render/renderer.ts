@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { NumberSampleRing } from '../game/sample_ring';
-import { coerceFxTier, nameplateIntervalSec } from '../game/ui_tier_knobs';
+import { coerceFxTier, nameplateIntervalSec, nameplatePixelRatio } from '../game/ui_tier_knobs';
 import { supportHeightAt } from '../sim/colliders';
 import {
   emptyPriestMarkerState,
@@ -406,7 +406,6 @@ import {
 } from './link_rate_budget';
 import { runWorldGateTouchLane } from './linked_program_touch_lane';
 import * as liveProgramWatch from './live_program_watch';
-import { renderLoadMeasure } from './load_marks';
 import {
   type LocoState,
   type LocoTrack,
@@ -443,6 +442,7 @@ import {
 } from './mount_prewarm';
 import { releaseMountFx } from './mount_visual_lifecycle';
 import { mountVisualSpec } from './mount_visuals';
+import { createNameplateCadenceState, nameplateFullPassDue } from './nameplate_cadence_core';
 import { NameplatePainter } from './nameplate_painter';
 import {
   isProjectedNameplateAnchorVisible,
@@ -588,7 +588,6 @@ import { createPrewarmResumeLedger } from './prewarm_resume_ledger_core';
 import { type PriestMarkersVisual, syncPriestMarkersVisual } from './priest_markers_visual';
 import { pieceProgramSettle } from './program_variant_settle';
 import { buildPropMaterialPrewarmGroup, buildProps, propResidencySources } from './props';
-
 import { makeQuestObjectGate, type QuestObjectGateOptions } from './quest_object_gate_core';
 import { buildGroundQuestObject } from './quest_objects';
 import { RaceLine } from './race_line';
@@ -614,6 +613,7 @@ import {
   type RenderableDiagnosticObject,
   RenderDiagnostics,
 } from './render_diagnostics';
+import { createRendererBuildDiag } from './renderer_build_diag';
 import { measureFeatureFootprint, setRenderCategory } from './renderer_diagnostics';
 import { snapshotRendererFrameStats } from './renderer_frame_stats_snapshot';
 import {
@@ -624,6 +624,7 @@ import {
   type RendererFramePhaseMs,
   type RendererWorldPhaseMs,
 } from './renderer_frame_telemetry_core';
+import { createRendererGlContext } from './renderer_gl_context';
 import type {
   RendererFrameStats,
   RendererPerfStats,
@@ -696,6 +697,7 @@ import { zoneArrivalReady } from './sky_residency_core';
 import { SkyResidencyDriver } from './sky_residency_driver';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
 import { buildSoulwell, disposeSoulwellVisual, syncSoulwellVisual } from './soulwell';
+import { SpiritGrade } from './spirit_grade';
 import {
   freezeStaticMatrices,
   freezeStaticSubtreeMatrices,
@@ -1934,7 +1936,8 @@ export class Renderer {
   private godRayZoneScale = 1;
   private viewport = { width: 1, height: 1 };
   private viewportPollTimer = 0;
-  private nameplateTimer = 0;
+  private readonly nameplateCadence = createNameplateCadenceState();
+  private spiritGrade: SpiritGrade;
   private glVendor = '';
   private glRenderer = '';
   private contextLostCount = 0;
@@ -2040,27 +2043,8 @@ export class Renderer {
     setBuildSpanSink(this.buildLedger.record); // view-part:* spans: 'part' lane, out of the frame spend
     // biome-ignore format: Keep the established constructor body stable inside the failure guard.
     try {
-    // Dev-channel build-phase telemetry (English, console.info, Release-silent):
-    // the iPhone 17 Pro WebContent kill lands INSIDE this constructor, after
-    // every preload completes, so localizing which build phase tips the memory
-    // ceiling requires a marker between phases. Wall-clock only, no allocation.
-    // Every segment also stamps a 'woc:load:renderer-ctor/<phase>' measure for
-    // the boot profiler (window.__loadProfile), unconditionally: marks are
-    // cheap and the profiler needs them on production-class devices too.
-    const bdStart = performance.now();
-    let bdLast = bdStart;
-    const bd = (phase: string): void => {
-      const now = performance.now();
-      renderLoadMeasure(`renderer-ctor/${phase}`, bdLast, now);
-      // Gated like [load-diag] and the residency table: dev browsers plus the
-      // iOS WebKit profile under diagnosis, never the production web console.
-      if (import.meta.env.DEV || GFX.iosMemoryProfile) {
-        console.info(
-          `[build-diag] ${phase} +${(now - bdLast).toFixed(0)}ms (total ${(now - bdStart).toFixed(0)}ms)`,
-        );
-      }
-      bdLast = now;
-    };
+    // Dev-channel build-phase telemetry; see renderer_build_diag.ts.
+    const bd = createRendererBuildDiag();
     // The scene root sits at identity forever; with matrixAutoUpdate on it
     // recomposes each frame and three's updateMatrixWorld force-cascades the
     // multiply through every auto-update descendant (r185 still bypasses the
@@ -2075,7 +2059,8 @@ export class Renderer {
     // after the context exists) with the most expensive setting there is.
     this.webgl = new THREE.WebGLRenderer({
       canvas,
-      context: options.context,
+      // Opaque world surface; see renderer_gl_context.ts (?canvasalpha=on A/B).
+      context: options.context ?? createRendererGlContext(canvas) ?? undefined,
       antialias: false,
       powerPreference: 'high-performance',
     });
@@ -2197,6 +2182,13 @@ export class Renderer {
       world: this.sim,
       layer: this.nameplateLayer,
       getViewport: () => this.viewport,
+      // The plate surface follows the world's own effective ratio, never the
+      // raw device one (ui_tier_knobs.nameplatePixelRatio).
+      getSurfacePixelRatio: () =>
+        nameplatePixelRatio(
+          window.devicePixelRatio,
+          Math.min(window.devicePixelRatio, GFX.pixelRatioCap) * this.effectiveRenderScale,
+        ),
       showNameplates: () => this.showNameplates,
       showDevBadges: () => this.showDevBadges,
       showOwnNameplate: () => this.showOwnNameplate,
@@ -3153,6 +3145,9 @@ export class Renderer {
         { gradeOnly: !GFX.composer },
       );
 
+    // Ghost tint: the grade pass on composer/grade tiers, the base.css filter on
+    // low. See spirit_grade.ts.
+    this.spiritGrade = new SpiritGrade(canvas, this.post, () => this.reducedMotion());
     bd('weather-post');
     window.addEventListener('resize', this.onViewportResize);
     window.addEventListener('orientationchange', this.onOrientationChange);
@@ -4410,6 +4405,7 @@ export class Renderer {
       contextRestored: this.contextRestoredCount,
       nightAmount: Math.round(this.dnGlobalNight * 100) / 100,
       phaseMs: this.rendererPhaseStats(),
+      nameplates: this.nameplatePainter.paintStats(),
       renderDiagnostics: this.lastFrameStats.renderDiagnostics,
       lastFrame: snapshotRendererFrameStats(this.lastFrameStats),
       prewarm: this.lastPrewarmStats,
@@ -12282,21 +12278,14 @@ export class Renderer {
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'godRays', worldStart);
     phaseStart = this.markRendererPhase(framePhaseMs, 'world', phaseStart);
 
-    this.nameplateTimer += dt;
-    // Static-preset tiered cadence: the nameplate refresh interval follows
-    // the player's chosen graphics tier (the data-fx-level the preset applier
-    // stamps), NEVER the FPS governor (the two-controller rule). The
-    // LOW tier runs 1/15s, richer tiers 1/24s. The axis is the PRESET, not the device:
-    // the weak-GPU cost ceiling (the PR901 lesson) is restored through the device-aware
-    // first-run default (resolveDefaultGraphicsPreset in gfx.ts), which lands a
-    // recognized-weak or software GPU on the LOW preset (its 1/15s ceiling) while a
-    // mid/unknown device defaults to medium (1/24s). An explicit player preset wins.
-    const nameplateInterval = nameplateIntervalSec(
-      coerceFxTier(document.documentElement.dataset.fxLevel),
+    // The tier cadence rule and its rationale live in nameplate_cadence_core.ts.
+    const fullNameplatePass = nameplateFullPassDue(
+      this.nameplateCadence,
+      dt,
+      nameplateIntervalSec(coerceFxTier(document.documentElement.dataset.fxLevel)),
     );
-    const fullNameplatePass = this.nameplateTimer >= nameplateInterval;
-    if (fullNameplatePass) this.nameplateTimer = 0;
     this.nameplatePainter.update(fullNameplatePass);
+    this.spiritGrade.update(dt, p.dead && p.ghost);
     this.updateChatBubbles();
     phaseStart = this.markRendererPhase(framePhaseMs, 'nameplates', phaseStart);
     this.updateTravelSpeedFx(p, selfPos, dt);

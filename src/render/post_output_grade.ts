@@ -31,12 +31,23 @@ export const OUTPUT_GRADE_FRAGMENT_SHADER = /* glsl */ `
   uniform float uTime;
   uniform vec4 uInputUvRect;
   uniform vec2 uInputTexelSize;
+  // Spirit (ghost) mode, 0 alive to 1 fully drained. Eased on the CPU by
+  // spirit_grade_core.ts, the same 0.6s CSS ease the base.css filter it
+  // replaces used to run.
+  uniform float uSpirit;
 
   #include <tonemapping_pars_fragment>
   #include <colorspace_pars_fragment>
 
   in vec2 vUv;
   out vec4 pc_fragColor;
+
+  // The classic death drain: CSS grayscale(1) brightness(0.88). The CSS
+  // filter list interpolates BOTH functions, so a half-faded ghost is a half
+  // desaturation times a half-applied brightness, not a lerp toward the final
+  // colour. Applied on display-referred sRGB values, which is where the CSS
+  // filter shorthand operates too, so the look is unchanged.
+  const float SPIRIT_BRIGHTNESS = 0.88;
 
   const vec3 LIFT = vec3(0.010, 0.008, 0.010);
   const vec3 GAIN = vec3(1.10, 1.035, 0.90);
@@ -274,6 +285,10 @@ export const OUTPUT_GRADE_FRAGMENT_SHADER = /* glsl */ `
     vec2 d = vUv - 0.5;
     c *= 1.0 - 0.20 * smoothstep(0.60, 0.95, dot(d, d) * 2.2);
     c += (fract(sin(dot(vUv * 731.7 + uTime, vec2(12.9898, 78.233))) * 43758.5) - 0.5) * 0.012;
+    if (uSpirit > 0.0) {
+      float grey = dot(c, vec3(0.2126, 0.7152, 0.0722));
+      c = mix(c, vec3(grey), uSpirit) * (1.0 - (1.0 - SPIRIT_BRIGHTNESS) * uSpirit);
+    }
     pc_fragColor = vec4(c, 1.0);
   }
 `;
@@ -312,6 +327,7 @@ export class OutputGradePass extends Pass {
     uTime: TimeUniform;
     uInputUvRect: { value: Vector4 };
     uInputTexelSize: { value: Vector2 };
+    uSpirit: { value: number };
   };
   readonly material: RawShaderMaterial;
   readonly fsQuad: FullScreenQuad;
@@ -335,6 +351,7 @@ export class OutputGradePass extends Pass {
       uTime: timeUniform,
       uInputUvRect: { value: new Vector4(1, 1, 1, 1) },
       uInputTexelSize: { value: new Vector2(0, 0) },
+      uSpirit: { value: 0 },
     };
     this.material = new RawShaderMaterial({
       name: 'OutputGradeShader',
