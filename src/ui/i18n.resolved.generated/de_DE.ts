@@ -3100,6 +3100,7 @@ export const de_DE: EnTranslations = {
       "close": "Schließen",
       "keybind": "Discord-Panel",
       "disabled": "Die Discord-Integration ist momentan nicht verfügbar.",
+      "queuePingsLabel": "Send me a Discord direct message when my battleground or arena queue pops (needs a linked Discord account)",
       "tiers": {
         "none": "Ohne Rang",
         "initiate": "Eingeweihter",
@@ -4831,7 +4832,8 @@ export const de_DE: EnTranslations = {
       "link_required": "Verknüpfe zuerst dein Discord-Konto.",
       "swag_claimed": "Du hast diese Belohnung bereits beansprucht.",
       "swag_tier": "Erreiche einen höheren Rang, um dies zu beanspruchen.",
-      "swag_points": "Nicht genügend Punkte."
+      "swag_points": "Nicht genügend Punkte.",
+      "invalid_input": "Invalid input."
     },
     "deeds": {
       "invalid_input": "Ungültige Eingabe."

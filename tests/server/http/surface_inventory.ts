@@ -1210,6 +1210,28 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: null,
     requireOwnedExpected: null,
   },
+  // The queue-pop Discord DM opt-in toggle (server/discord_queue_pings.ts):
+  // the deeds broadcasts pair's shape exactly (read-tier GET, full-scope POST).
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
+    path: '/api/discord/queue-pings',
+    handler: 'server/discord_queue_pings.ts queuePingsReadHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.bearer,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/discord/queue-pings',
+    handler: 'server/discord_queue_pings.ts queuePingsHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.full,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
   // Reliquary (server/reliquary.ts): the population-rarity aggregate, a
   // registry-only RouteDef born after the migration like the deeds family, and
   // the deeds-rarity row shape exactly (anonymous public JSON read, budgeted

@@ -3100,6 +3100,7 @@ export const ko_KR: EnTranslations = {
       "close": "닫기",
       "keybind": "Discord 패널",
       "disabled": "현재 Discord 연동을 사용할 수 없습니다.",
+      "queuePingsLabel": "전장 또는 투기장 대기열이 잡히면 Discord 다이렉트 메시지로 알려주기 (연결된 Discord 계정 필요)",
       "tiers": {
         "none": "등급 없음",
         "initiate": "입문자",
@@ -4831,7 +4832,8 @@ export const ko_KR: EnTranslations = {
       "link_required": "먼저 Discord 계정을 연결하세요.",
       "swag_claimed": "이미 이 보상을 받았습니다.",
       "swag_tier": "이 보상을 받으려면 더 높은 등급에 도달하세요.",
-      "swag_points": "포인트가 부족합니다."
+      "swag_points": "포인트가 부족합니다.",
+      "invalid_input": "입력이 올바르지 않습니다."
     },
     "deeds": {
       "invalid_input": "입력이 올바르지 않습니다."

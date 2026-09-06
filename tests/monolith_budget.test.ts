@@ -335,7 +335,14 @@ const MONOLITHS: MonolithRow[] = [
     // Merging PR #3870 after #3858 keeps the Loot Explorer window wiring above
     // and lands the unit-frame Health Text wiring inside the current merged HUD
     // shape. Re-measured on this merge result. Exact count, zero slack.
-    ceiling: 18936,
+    // Lowered by 3 with the account-toggle seam: the OptionsHooks deed-broadcast
+    // shape and its queue-pop DM sibling both read the shared AccountToggleSeam
+    // type from options_window.ts instead of an inline object type each.
+    // Re-pinned while merging PR #3873 into the current candidate: the Loot
+    // Explorer and Health Text wiring stay, and the queue-pop Discord DM row
+    // shares the account-toggle seam. Measured on the merged tree.
+    // Exact count, zero slack.
+    ceiling: 18933,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -447,7 +454,10 @@ const MONOLITHS: MonolithRow[] = [
     // merging PR #3841 into the v0.42 candidate after PR #3839: the merged
     // renderer is the measured tree with Lambert terrain lighting preserved
     // under the standard-materials rig. Exact count, zero headroom.
-    ceiling: 13216,
+    // Re-pinned while resolving the PR #3873 integration candidate: the current
+    // renderer carries the prior candidate's render/post integration. Measured
+    // on the merged tree. Exact count, zero headroom.
+    ceiling: 13235,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -624,7 +634,10 @@ const MONOLITHS: MonolithRow[] = [
     // dispatch wiring: two keybind/controller switch arms plus the mobile
     // controls hook, all thin calls into Hud's extracted window seam. Exact
     // merged count, zero headroom.
-    ceiling: 11546,
+    // Re-pinned while merging PR #3873 into the current candidate: main keeps
+    // the Loot Explorer dispatch wiring and the queue-pop Discord DM account
+    // toggle hook. Measured on the merged tree. Exact count, zero headroom.
+    ceiling: 11553,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -721,7 +734,14 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at this release-line reconcile: the OSSBrain auto-face-lock
     // revert and release's server extractions both survive, and the merged
     // file measures below either conflicted ceiling. Exact count, zero slack.
-    ceiling: 10585,
+    // Lowered by 10 with the queue-pop Discord DM hook: the duelEnd activity
+    // card moved to discord_activity_pvp.ts (the arm keeps the two session
+    // lookups and the enqueue), which paid for the one observer call, its
+    // deps field and the two imports (discord_queue_pops.ts). Exact count.
+    // Re-pinned on the merged PR #3873 candidate: both the release-side
+    // server extractions and the queue-pop Discord DM hook survive. Measured
+    // on the merged tree. Exact count, zero slack.
+    ceiling: 10575,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

@@ -9489,6 +9489,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.json.malformed': 'Не удалось прочитать запрос. Повторите попытку.',
   'apiError.body.too_large': 'Запрос слишком большой. Повторите попытку с меньшим объёмом данных.',
   'apiError.body.unsupported_media_type': 'Неподдерживаемый формат запроса.',
+  'apiError.discord.invalid_input': 'Недопустимые данные.',
   'apiError.deeds.invalid_input': 'Недопустимые данные.',
   'apiError.guilds.invalid_roster_name': 'Недопустимое название гильдии.',
   'apiError.guilds.unknown': 'Гильдии с таким названием нет.',
@@ -10935,6 +10936,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Ваша учётная запись: место {rank}, лучшие {percent} процентов, Известность {renown}',
   'hudChrome.deeds.lbSelfRank': 'Ваша учётная запись: место {rank}, лучшие {percent} процентов',
   'hudChrome.deeds.lbEmpty': 'В рейтинге пока нет летописцев.',
+  'hudChrome.discord.queuePingsLabel':
+    'Присылать мне личное сообщение в Discord, когда очередь на поле боя или арену сработает (нужен привязанный аккаунт Discord)',
   'hudChrome.deeds.broadcastsLabel':
     'Делиться деяниями с согильдейцами и подписчиками, а карточками деяний и шедевров с лентой Discord',
   'guide.deedsPage.catHeading': '{label} ({count})',

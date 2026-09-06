@@ -714,18 +714,18 @@ export class Api {
     await this.post('/api/account/deactivate', { username, password });
   }
 
-  // The account's deed-broadcast setting (accounts.deed_broadcasts): whether a
-  // marquee unlock fans out to guildmates and followers, and whether the
-  // Discord activity feed posts the account's deed and masterwork cards (R58).
-  // Read/write pair for the options toggle; both need the signed-in bearer. A
-  // malformed read body conservatively reads as enabled (the column default).
-  async deedBroadcasts(): Promise<boolean> {
-    const data = await this.get('/api/deeds/broadcasts');
-    return data.enabled !== false;
+  // An account boolean setting behind a `{ enabled }` read/write route pair:
+  // the deed-broadcast opt-out (/api/deeds/broadcasts, accounts.deed_broadcasts,
+  // R58) and the queue-pop Discord DM opt-in (/api/discord/queue-pings). Both
+  // need the signed-in bearer; main.ts binds the path per options row. A
+  // malformed read body conservatively reads as the route's column default.
+  async accountToggle(path: string, fallback: boolean): Promise<boolean> {
+    const data = await this.get(path);
+    return typeof data.enabled === 'boolean' ? data.enabled : fallback;
   }
 
-  async setDeedBroadcasts(enabled: boolean): Promise<boolean> {
-    const data = await this.post('/api/deeds/broadcasts', { enabled });
+  async setAccountToggle(path: string, enabled: boolean): Promise<boolean> {
+    const data = await this.post(path, { enabled });
     return data.enabled === true;
   }
 

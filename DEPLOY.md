@@ -1082,7 +1082,9 @@ Discord server and the game: status-tier roles plus a level-on-name nickname syn
 from in-game data, presence (the online count and the featured voice room) pushed
 into the HUD widget, in-game "!" community posts relayed as embeds, a
 significant-activity feed (max level, rare drops, duels, arena), daily-rewards
-winner posts, and the consumer for the game's Discord outbox. It is a pure consumer
+winner posts, opt-in queue-pop direct messages (a player's battleground offer or
+arena seat, DMed to their linked account; no channel id to configure), and the
+consumer for the game's Discord outbox. It is a pure consumer
 of the game server: it reads and writes through the secret-gated
 `/internal/discord/*` API and holds nothing durable of its own, so stopping it never
 affects the realm.

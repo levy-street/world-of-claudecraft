@@ -3100,6 +3100,7 @@ export const pl_PL: EnTranslations = {
       "close": "Zamknij",
       "keybind": "Panel Discorda",
       "disabled": "Integracja z Discord jest obecnie niedostępna.",
+      "queuePingsLabel": "Send me a Discord direct message when my battleground or arena queue pops (needs a linked Discord account)",
       "tiers": {
         "none": "Bez rangi",
         "initiate": "Adept",
@@ -4831,7 +4832,8 @@ export const pl_PL: EnTranslations = {
       "link_required": "Najpierw połącz swoje konto Discord.",
       "swag_claimed": "Już odebrałeś tę nagrodę.",
       "swag_tier": "Osiągnij wyższą rangę, aby to odebrać.",
-      "swag_points": "Za mało punktów."
+      "swag_points": "Za mało punktów.",
+      "invalid_input": "Invalid input."
     },
     "deeds": {
       "invalid_input": "Nieprawidłowe dane."

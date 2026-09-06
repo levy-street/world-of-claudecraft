@@ -3100,6 +3100,7 @@ export const zh_CN: EnTranslations = {
       "close": "关闭",
       "keybind": "Discord 面板",
       "disabled": "Discord 集成当前不可用。",
+      "queuePingsLabel": "当我的战场或竞技场排队匹配成功时，通过 Discord 私信通知我（需要已关联的 Discord 账号）",
       "tiers": {
         "none": "未入级",
         "initiate": "见习者",
@@ -4831,7 +4832,8 @@ export const zh_CN: EnTranslations = {
       "link_required": "请先关联你的 Discord 账号。",
       "swag_claimed": "你已经领取过此奖励。",
       "swag_tier": "达到更高段位即可领取。",
-      "swag_points": "积分不足。"
+      "swag_points": "积分不足。",
+      "invalid_input": "输入无效。"
     },
     "deeds": {
       "invalid_input": "输入无效。"

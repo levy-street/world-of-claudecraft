@@ -8940,6 +8940,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'apiError.json.malformed': '無法讀取該請求。請再試一次。',
   'apiError.body.too_large': '該請求過大。請減少資料後再試一次。',
   'apiError.body.unsupported_media_type': '不支援的請求格式。',
+  'apiError.discord.invalid_input': '輸入無效。',
   'apiError.deeds.invalid_input': '輸入無效。',
   'apiError.guilds.invalid_roster_name': '公會名稱無效。',
   'apiError.guilds.unknown': '沒有這個名字的公會。',
@@ -10242,6 +10243,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.lbSelfAccount': '你的帳號：第 {rank} 名，位居前 {percent}%，名望 {renown}',
   'hudChrome.deeds.lbSelfRank': '你的帳號：第 {rank} 名，位居前 {percent}%',
   'hudChrome.deeds.lbEmpty': '尚無上榜的編年史家。',
+  'hudChrome.discord.queuePingsLabel':
+    '當我的戰場或競技場排隊配對成功時，透過 Discord 私訊通知我（需要已連結的 Discord 帳號）',
   'hudChrome.deeds.broadcastsLabel':
     '與公會成員和關注者分享功績達成，並向 Discord 動態分享功績與傑作卡片',
   'guide.deedsPage.catHeading': '{label}（{count}）',
