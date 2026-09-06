@@ -689,6 +689,7 @@ const RENDER_PURE_CORES = [
   'src/render/ground_tilt_core.ts',
   'src/render/grass_build_slicer_core.ts',
   'src/render/grass_cap_collapse_core.ts',
+  'src/render/grass_tuft_cards_core.ts',
   'src/render/step_smooth_core.ts',
   'src/render/eastbrook_town_visibility_core.ts',
   'src/render/fenbridge_town_visibility_core.ts',
@@ -719,6 +720,7 @@ const RENDER_PURE_CORES = [
   // Same reason, one seam over: the per-interior encounter prewarm's decision
   // layer (which interior warms what, the kill switch, the live-queue verdict).
   'src/render/interior_encounter_prewarm.ts',
+  'src/render/canopy_detail_tier_core.ts',
   'src/render/camp_brazier_placement_core.ts',
   'src/render/night_accents_core.ts',
   'src/render/night_light_field_core.ts',

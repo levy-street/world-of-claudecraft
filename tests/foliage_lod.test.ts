@@ -10,11 +10,18 @@ import {
   LOD_HIGH,
   LOD_LOW,
   lodDistsFor,
+  TREE_DETAIL_FAR_BY_TIER,
   treeDetailDistance,
 } from '../src/render/foliage_lod';
+import type { GfxTier } from '../src/render/gfx';
 import { WORLD_MIN_Z } from '../src/sim/data';
 import { generateDecorations } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
+
+const TIERS: readonly GfxTier[] = ['low', 'medium', 'high', 'ultra', 'insane'];
+// The tiers that actually reach LOD_BY_TIER: `low` is always leanFoliage, so it
+// keeps LOD_LOW whole and none of the shared-row claims below apply to it.
+const NON_LEAN_TIERS: readonly GfxTier[] = ['medium', 'high', 'ultra', 'insane'];
 
 // The adaptive budget's foliage lever spans [0, 1]; the distance scale and the
 // fog cull both derive from it, so tests must move them as the one dial they
@@ -28,9 +35,10 @@ function detailAt(
   fog: { near: number; far: number },
   modelQuality: number,
   leanFoliage = false,
+  tier: GfxTier = 'ultra',
 ): { detailFar: number; fogLimit: number } {
   const fogLimit = foliageFogLimit(fog.far, modelQuality);
-  const base = lodDistsFor(leanFoliage).treeDetailFar;
+  const base = lodDistsFor(leanFoliage, tier).treeDetailFar;
   const scale = foliageDistanceScale(modelQuality, leanFoliage);
   return { detailFar: treeDetailDistance(base, fog.near, fog.far, scale, fogLimit), fogLimit };
 }
@@ -141,6 +149,32 @@ describe('foliage LOD: the lean-arm treeline never ends in clear air', () => {
       }
     },
   );
+
+  it('holds for every per-tier base, since a session with no sprites still takes one', () => {
+    // The sprite verdict is standardMaterials && !leanFoliage &&
+    // !constrainedMemory (far_terrain_core.ts farFieldPolicy), so an ordinary
+    // constrained-memory phone or tablet resolving to medium or high is NOT
+    // leanFoliage and still has no impostors: it takes a row of
+    // TREE_DETAIL_FAR_BY_TIER and then runs THIS law. The per-tier table is
+    // safe there only because the safety lives in the law: whatever base it
+    // is handed, the blend floor still owns the boundary.
+    for (const tier of NON_LEAN_TIERS) {
+      for (const { biome, near, far } of FOG_ROWS) {
+        for (const q of QUALITY_LEVELS) {
+          const { detailFar, fogLimit } = detailAt({ near, far }, q, false, tier);
+          const label = `${tier} ${biome} q${q}`;
+          expect(detailFar, label).toBeLessThanOrEqual(fogLimit);
+          const fogFloor = near + IMPOSTOR_MIN_FOG_BLEND * (far - near);
+          expect(detailFar, label).toBeGreaterThanOrEqual(Math.min(fogFloor, fogLimit));
+          if (detailFar < fogLimit) {
+            expect(fogBlendAt(detailFar, near, far), label).toBeGreaterThanOrEqual(
+              IMPOSTOR_MIN_FOG_BLEND - 1e-9,
+            );
+          }
+        }
+      }
+    }
+  });
 
   it('regression: a build-time 300u boundary ended the treeline half-clear in long-fog zones', () => {
     // This is the reported bug, not the fix's own arithmetic. The open-sky Vale
@@ -542,14 +576,49 @@ describe('foliage LOD: sprite rows (the merged per-bucket impostor meshes)', () 
 });
 
 describe('foliage LOD: tiers and purity', () => {
-  it('hands the low tier its own, tighter table', () => {
-    expect(lodDistsFor(true)).toBe(LOD_LOW);
-    expect(lodDistsFor(false)).toBe(LOD_HIGH);
+  it('hands every lean session its own, tighter table whatever the tier says', () => {
+    for (const tier of TIERS) expect(lodDistsFor(true, tier)).toBe(LOD_LOW);
+    expect(lodDistsFor(false, 'ultra')).toBe(LOD_HIGH);
+    expect(lodDistsFor(false, 'insane')).toBe(LOD_HIGH);
     expect(LOD_LOW.treeDetailFar).toBeLessThan(LOD_HIGH.treeDetailFar);
   });
 
-  it('stays a pure decision module: no Three, no sim', () => {
+  it('spreads the authored real-model radius across the non-lean tiers', () => {
+    expect(TIERS.map((tier) => lodDistsFor(false, tier).treeDetailFar)).toEqual([
+      LOD_LOW.treeDetailFar,
+      190,
+      230,
+      300,
+      300,
+    ]);
+    // Only the handoff radius moves: every other row of the table is shared,
+    // so nothing about bark, dressing, rocks or the near-fill cap re-tiers.
+    for (const tier of NON_LEAN_TIERS) {
+      const { barkFar, dressFar, rockFar, treeFillFar } = lodDistsFor(false, tier);
+      expect({ barkFar, dressFar, rockFar, treeFillFar }, tier).toEqual({
+        barkFar: LOD_HIGH.barkFar,
+        dressFar: LOD_HIGH.dressFar,
+        rockFar: LOD_HIGH.rockFar,
+        treeFillFar: LOD_HIGH.treeFillFar,
+      });
+    }
+    // Monotone: a tier never draws real geometry further than the one above it.
+    const bases = NON_LEAN_TIERS.map((tier) => TREE_DETAIL_FAR_BY_TIER[tier]);
+    for (let i = 1; i < bases.length; i++) expect(bases[i]).toBeGreaterThanOrEqual(bases[i - 1]);
+    // The near-fill cap must still sit above the handoff on every tier, or a
+    // near-fill tree would die at its bucket cap before its sprite took over
+    // (the invariant spriteSwapDistance's closing note depends on).
+    for (const tier of NON_LEAN_TIERS) {
+      const d = lodDistsFor(false, tier);
+      expect(d.treeDetailFar, tier).toBeLessThan(d.treeFillFar);
+    }
+  });
+
+  it('stays a pure decision module: no Three, no sim, no runtime import at all', () => {
     const src = readFileSync(new URL('../src/render/foliage_lod.ts', import.meta.url), 'utf8');
-    expect(src).not.toMatch(/^import/m);
+    // The GfxTier import is `import type`, erased at build, so this module
+    // still pulls nothing in at runtime. Any VALUE import would.
+    const imports = [...src.matchAll(/^import\b[^\n]*/gm)].map((m) => m[0]);
+    expect(imports).toEqual(["import type { GfxTier } from './gfx';"]);
   });
 });

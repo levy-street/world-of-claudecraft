@@ -27,9 +27,11 @@ const settings = {
   bladeCarpetRadius: 34,
   cliffScree: true,
   canopyDetail: true,
+  canopyDetailTaps: 6,
   pixelRatioCap: 2.5,
   grassRadius: 82,
   grassStep: 1.8,
+  grassCardsPerTuft: 4,
   leanFoliage: false,
   standardMaterials: true,
   terrainSplat: true,
@@ -60,9 +62,11 @@ describe('gfx override parsing', () => {
           'bladeCarpetRadius:24',
           'cliffScree:0',
           'canopyDetail:0',
+          'canopyDetailTaps:3',
           'pixelRatioCap:1.48',
           'grassRadius:80',
           'grassStep:2.05',
+          'grassCardsPerTuft:3',
           'leanFoliage:1',
           'standardMaterials:0',
           'terrainSplat:0',
@@ -89,9 +93,11 @@ describe('gfx override parsing', () => {
       bladeCarpetRadius: 24,
       cliffScree: false,
       canopyDetail: false,
+      canopyDetailTaps: 3,
       pixelRatioCap: 1.48,
       grassRadius: 80,
       grassStep: 2.05,
+      grassCardsPerTuft: 3,
       leanFoliage: true,
       standardMaterials: false,
       terrainSplat: false,
@@ -176,13 +182,24 @@ describe('gfx override application', () => {
     // tests/gfx.test.ts). advanced did NOT move, which is the check that the
     // dial's top rung still writes 4096 explicitly instead of inheriting the
     // new high base.
+    // Regenerated across the board for `grassCardsPerTuft`, the grass tuft's
+    // card count (grass_tuft_cards_core.ts). This one moves a VALUE on every
+    // row: 2 on low, 3 on medium and high, 4 on ultra, insane and the
+    // Advanced default mix. The ladder itself is pinned by name in
+    // tests/gfx.test.ts and tests/grass_tuft_cards_core.test.ts; this row is
+    // the byte guard that says nothing ELSE moved with it.
+    // Regenerated across the board again for `canopyDetailTaps`, the canopy
+    // clump layer's per-tier tap count (canopy_detail_tier_core.ts): 0 below
+    // ultra, 3 on ultra and the Advanced default mix, 6 on insane. Named pins
+    // for it live in tests/gfx.test.ts and
+    // tests/canopy_detail_tier_core.test.ts.
     expect(hashes).toEqual({
-      low: '49e537a97a367badeb8f9cbeb408bbb0832e886e164349eb682a0b3a128f2dcb',
-      medium: '7f724620474ca3dc4f4ffc18653a5b07ed02de35984fb65375bbd38b7d79644e',
-      high: 'abeba01300c7e11c55187c521feb09719d4dee1a83e3d2b6baca20865e2461cd',
-      ultra: '08c271575220f6f332b4730a04a9e77be13ee1b9624eda37056f8d2660ea6c0f',
-      insane: 'f3399ea1e9439ea52e873be3decb7dc8ccbb77f04dcb28db2da2359c885d5ca0',
-      advanced: '5674b855481ede62fb55fbe0f8074d991227487bc152f6f0e8676ff94b0947e6',
+      low: '1b4559cd53dfa04a243eabb5bb01d2843cf7a0a9a2205e02110910e37cd6f42f',
+      medium: '3c859917380988dde4dc455aea2efb3391e987e952b64f039e973308ead2ad21',
+      high: '287d510dd2ec26b7ae8c8d7fa9f1642ae2cedef3ec86dcae897535952d501017',
+      ultra: 'b64b55668c28b2d0eaaa95580885b4276e99b2aa95f6777303922a6cf2116f22',
+      insane: '7ec7889501315477ef4f107088b0f618dd16d7c40e9ccb9712b27d5d8a3d93e3',
+      advanced: '7d357c28f5aa9b54c6190a1e12dd274c0a05c0b804ac349990a6a50f768f5da1',
     });
   });
 

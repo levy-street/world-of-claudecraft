@@ -354,6 +354,32 @@ center-keyed dressing cap, so a fern under the player can still drop with the or
 up. That residue is cosmetic only (no dressing kind carries a collider) and is left for a
 follow-up rather than paid for with live triangles here.
 
+### The foliage tier ladder gained three knobs (2026-09-02)
+
+Three foliage costs used to be flat across the whole tier ladder above lean, and all three are
+now derived per tier. Each is cosmetic richness and none of them hides or delays anything a
+player acts on, but the tree one deserves its reasoning written down rather than assumed.
+
+- **`GFX.grassCardsPerTuft`** (`src/render/grass_tuft_cards_core.ts`): alpha-tested quads per
+  grass tuft. Lean 2, medium and high 3, ultra and insane 4; the shed card is the near-horizontal
+  sky-facing one. Grass is the one scatter layer the constrained profile is already allowed to
+  thin, precisely because it is NON-OCCLUDING: it carries no collider, hides nothing a player
+  reacts to, and `gfx.ts` deliberately keeps every tier on the full tree and rock placement set
+  for exactly that contrast. Dropping a card can only reveal slightly more ground, never less.
+- **`TREE_DETAIL_FAR_BY_TIER`** (`src/render/foliage_lod.ts`): how far real tree geometry reaches
+  before the baked sprite impostor takes over. This one moves a REPRESENTATION per tier, so it is
+  the one that needs an argument. The impostor is a picture of the same tree at the same base,
+  height, tint and sway, so a tree past the handoff is neither missing nor see-through and the
+  invisible-but-solid shape above cannot arise. The load-bearing fact, though, is arithmetic: the
+  nearest handoff ANY tier can take in clear air is `SPRITE_SWAP_MIN` (150 yd), undercut by at
+  most `IMPOSTOR_SWAP_FADE` (24 yd), and 126 yd is outside `PLAYER_INTEREST_DROP_RADIUS` (100 yd),
+  the radius at which the server will even tell a client another player exists. So no tier can
+  differ in how a player standing behind a tree reads, because on every tier that tree is still
+  real geometry wherever a player can be.
+- **`GFX.canopyDetailTaps`** (`src/render/canopy_detail_tier_core.ts`): triplanar taps per
+  surviving leaf fragment, 0 below ultra, 3 on ultra (the AO half), 6 on insane. Fragment shading
+  only, no displacement and no silhouette change, so it cannot move what a canopy occludes.
+
 ## Enforcing guards
 
 - `tests/auras_painter.test.ts`: a debuff past the buff cap still renders; an all-debuff bar
@@ -454,6 +480,16 @@ follow-up rather than paid for with live triangles here.
 - `tests/foliage_decimation_wiring.test.ts`: source-scans `foliage.ts` to prove the leanFoliage
   decoration filter actually calls `survivesLeanDecimation` and that the old bare
   `hashAt(d.x, d.z, 83) < keep` shape has not been re-inlined.
+- `tests/foliage_impostor_core.test.ts`: the per-tier real-model radius, and the fairness floor
+  itself, that `SPRITE_SWAP_MIN - IMPOSTOR_SWAP_FADE` stays outside
+  `PLAYER_INTEREST_DROP_RADIUS` on every shipped tier, so no tier's billboard band can reach a
+  distance at which another player exists to be occluded differently.
+- `tests/grass_tuft_cards_core.test.ts`: the per-tier card and triangle ladder, tier
+  monotonicity, that the Advanced Foliage Density dial can never hand a lean session extra
+  cards, and that the knob and the geometry the build actually merges agree.
+- `tests/canopy_detail_tier_core.test.ts`: the per-tier tap ladder and its monotonicity, that
+  the taps knob and the `canopyDetail` flag can never disagree, and that the two arms key
+  distinct programs.
   The band's TYPE is itself actionable, not decoration, which is why the cast-moment stand-down
   answers on any band type rather than stun alone: the `cc` archetype flashes the same yellow
   stars for every control ability, so a rooted victim would otherwise read as stunned for the

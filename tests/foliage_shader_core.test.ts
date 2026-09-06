@@ -62,6 +62,7 @@ describe('foliage shader core', () => {
       fadeEnd: 55,
       creviceDownStart: 0.15,
       creviceDownFull: 0.7,
+      normalDetail: true,
     });
     const alphaTest = patched.fragmentShader.indexOf('#include <alphatest_fragment>');
     const canopyFade = patched.fragmentShader.indexOf('float canopyDetK =');
@@ -88,6 +89,45 @@ describe('foliage shader core', () => {
     const shadeAt = patched.fragmentShader.indexOf('diffuseColor.rgb *= canopyShade;');
     const desaturateAt = patched.fragmentShader.indexOf('diffuseColor.rgb = mix(');
     expect(shadeAt).toBeLessThan(desaturateAt);
+  });
+
+  it('compiles the AO half alone when the tier drops the normal taps', () => {
+    const aoOnly = patchCanopyDetailShaderSource(BASE_VERTEX, BASE_FRAGMENT, {
+      fadeStart: 34,
+      fadeEnd: 44,
+      creviceDownStart: 0.15,
+      creviceDownFull: 0.7,
+      normalDetail: false,
+    });
+    // 3 taps, not 6, and the normal sampler is not even declared: this is a
+    // genuinely smaller fragment shader, never the full one with dead code.
+    expect(aoOnly.fragmentShader.match(/texture2D\( uCanopyAoTex/g)).toHaveLength(3);
+    expect(aoOnly.fragmentShader).not.toContain('uCanopyNormalTex');
+    expect(aoOnly.fragmentShader).not.toContain('uCanopyStrength');
+    expect(aoOnly.fragmentShader).not.toContain('canopyViewN');
+    // The stock chunk it used to wrap is left exactly as it found it.
+    expect(aoOnly.fragmentShader).toContain('#include <normal_fragment_maps>');
+    expect(aoOnly.fragmentShader.match(/#include <normal_fragment_maps>/g)).toHaveLength(1);
+    // Everything the AO half needs still runs, including the triplanar weights
+    // it shares with the dropped half and the geometric crevice term.
+    expect(aoOnly.fragmentShader).toContain('canopyW = pow( abs( canopyGN ), vec3( 4.0 ) );');
+    expect(aoOnly.fragmentShader).toContain(
+      'canopyAoTerm = mix( 1.0, uCanopyAoLo + canopyAo * uCanopyAoSpan, canopyDetK );',
+    );
+    expect(aoOnly.fragmentShader).toContain('diffuseColor.rgb *= canopyShade;');
+    expect(aoOnly.fragmentShader).toContain('totalEmissiveRadiance *= canopyShade * canopyShade;');
+    // The tightened band is compiled in as the literal it was handed.
+    expect(aoOnly.fragmentShader).toContain('smoothstep( 34.0, 44.0,');
+    // The vertex stage is shared byte for byte: only the fragment half splits.
+    const full = patchCanopyDetailShaderSource(BASE_VERTEX, BASE_FRAGMENT, {
+      fadeStart: 34,
+      fadeEnd: 44,
+      creviceDownStart: 0.15,
+      creviceDownFull: 0.7,
+      normalDetail: true,
+    });
+    expect(aoOnly.vertexShader).toBe(full.vertexShader);
+    expect(aoOnly.fragmentShader.length).toBeLessThan(full.fragmentShader.length);
   });
 
   it('reuses the exact diffuse-map sample and preserves later canopy emissive shading', () => {
@@ -119,6 +159,7 @@ describe('foliage shader core', () => {
         fadeEnd: 55,
         creviceDownStart: 0.15,
         creviceDownFull: 0.7,
+        normalDetail: true,
       },
     );
     const sharedMap = reuseDiffuseMapSampleForEmissive(canopy.fragmentShader);

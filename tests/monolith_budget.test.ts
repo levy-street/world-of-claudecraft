@@ -593,7 +593,10 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at the v0.42 candidate integration after the raid reset and
     // generated guide hooks landed on top of that reconcile. Exact merged
     // count, zero headroom.
-    ceiling: 11526,
+    // Re-pinned at this conflicted PR #3835 merge after the candidate's
+    // render/post integration grew main.ts independently of the foliage tier
+    // ladder. Measured on the merged tree. Exact count, zero headroom.
+    ceiling: 11539,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -924,7 +927,15 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered again after extracting the per-frame distance-window resolver
     // (detail swap, rock/dress swaps, collapse uniforms) into
     // src/render/foliage_frame_windows_core.ts.
-    ceiling: 3983,
+    // Lowered again after the grass tuft's card ladder (which quads a tuft
+    // carries, and where each one sits) moved to the pure
+    // src/render/grass_tuft_cards_core.ts, and once more when the cap-collapse
+    // band's two-input decision followed it into
+    // grass_cap_collapse_core.ts. Exact count, zero slack.
+    // Re-pinned to the exact conflicted merge output after the candidate's
+    // foliage_frame_windows_core extraction and PR #3835's foliage tier
+    // ladder extractions composed. Exact count, zero slack.
+    ceiling: 3969,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {

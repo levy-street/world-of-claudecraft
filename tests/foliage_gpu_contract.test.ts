@@ -33,9 +33,7 @@ describe('foliage GPU optimization production wiring', () => {
       'utf8',
     );
     expect(core).toContain('return `grass-card|cap:${grassCardCapKey(band)}|${baseProgramKey}`;');
-    expect(foliage).toContain(
-      'const capCollapseBand = grassCapCollapseBand(GFX.bladeCarpetRadius);',
-    );
+    expect(foliage).toContain('const capCollapseBand = grassCollapseBandFor(');
     expect(foliage).toContain('const capCollapse = grassCapCollapseShaderPatch(capBand);');
     expect(foliage).toContain('applyGrassShader(mat, uniforms, capCollapseBand);');
     expect(foliage).toContain('applyGrassShader(fmMat, uniforms, null);');
