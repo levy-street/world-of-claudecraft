@@ -99,6 +99,7 @@ import { gatherToolProfessionFor, nearestGatherNodeForProfession } from './game/
 import { publishGpuHitchRuntimeReceipt } from './game/gpu_hitch_receipt';
 import { GraphicsRebuildCoordinator } from './game/graphics_rebuild_coordinator';
 import {
+  captureGraphicsSettingsSnapshot,
   type GraphicsSettingsSnapshot,
   graphicsApplyMode,
   graphicsSettingsSnapshotsEqual,
@@ -2888,16 +2889,9 @@ async function startGame(
   // apply persisted settings to the freshly-built subsystems
   const saved = settings.all();
   for (const k of Object.keys(saved) as (keyof GameSettings)[]) applySetting(k, saved[k]);
-  const captureGraphicsSettings = (): GraphicsSettingsSnapshot =>
-    normalizeGraphicsSettingsSnapshot({
-      graphicsPreset: settings.get('graphicsPreset'),
-      terrainDetail: settings.get('terrainDetail'),
-      foliageDensity: settings.get('foliageDensity'),
-      surfaceDetail: settings.get('surfaceDetail'),
-      effectsQuality: settings.get('effectsQuality'),
-      shadowQuality: settings.get('shadowQuality'),
-    });
-  let appliedGraphicsSettings = captureGraphicsSettings();
+  let appliedGraphicsSettings: GraphicsSettingsSnapshot = captureGraphicsSettingsSnapshot((key) =>
+    settings.get(key),
+  );
   const graphicsCapabilities = captureGfxCapabilities(renderer.webgl);
   const configureRebuiltRenderer = (next: Renderer): void => {
     next.showNameplates = renderer.showNameplates;
