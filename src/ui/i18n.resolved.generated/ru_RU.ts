@@ -3836,6 +3836,18 @@ export const ru_RU: EnTranslations = {
       "pairsHeld": "Открыто пар: {count}",
       "returnsLabel": "Возвращений: {count}"
     },
+    "recipeTracker": {
+      "trackerLabel": "Рецепты",
+      "collapseHint": "Свернуть трекер рецептов",
+      "expandHint": "Развернуть трекер рецептов",
+      "pin": "Закрепить",
+      "unpin": "Открепить",
+      "pinFull": "Трекер рецептов заполнен (не более {cap} рецептов)",
+      "pinAria": "Закрепить {name} в трекере HUD",
+      "unpinAria": "Открепить {name} из трекера HUD",
+      "haveNeed": "{have}/{need}",
+      "resultCount": "{name} x{count}"
+    },
     "crafting": {
       "title": "Крафт",
       "close": "Закрыть крафт",

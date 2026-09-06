@@ -5327,6 +5327,95 @@
     }
   }
 
+  /* ---------- pinned-recipe tracker ---------- */
+  /* The recipes the player pinned from the crafting window, each over its
+     reagent have/need lines. Header chrome is the shared dt-* tracker
+     vocabulary (fit-content width, the #reliquary-tracker rail rationale);
+     the rt-* rows are this strip's own shape. */
+  #recipe-tracker {
+    width: 100%;
+    font-size: 12px;
+    color: var(--color-text-overlay);
+    text-shadow: 1px 1px 2px #000;
+    pointer-events: none;
+  }
+  #recipe-tracker .dt-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: fit-content;
+    max-width: 100%;
+    font-family: var(--title-font);
+    font-size: 14px;
+    color: var(--color-text-overlay);
+    text-align: left;
+    background: none;
+    border: 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--gold) 27%, transparent);
+    margin: 0 0 4px;
+    padding: 0 0 2px;
+    cursor: pointer;
+    pointer-events: auto;
+    text-shadow: 1px 1px 2px #000;
+  }
+  #recipe-tracker .dt-header:hover {
+    color: #fff;
+  }
+  #recipe-tracker .dt-header:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+  #recipe-tracker .dt-chevron {
+    font-size: 10px;
+    line-height: 1;
+  }
+  #recipe-tracker .dt-tally {
+    color: var(--color-text-overlay);
+    font-weight: 400;
+    opacity: 0.85;
+  }
+  @media (pointer: coarse) {
+    #recipe-tracker .dt-header {
+      min-height: 40px;
+    }
+  }
+  #recipe-tracker .rt-recipe {
+    margin-top: 4px;
+  }
+  #recipe-tracker .rt-name {
+    font-weight: bold;
+    font-family: var(--title-font);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  #recipe-tracker .rt-ready .rt-name {
+    color: var(--color-quest);
+  }
+  #recipe-tracker .rt-mat {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    padding-left: 10px;
+    font-size: 11px;
+    opacity: 0.9;
+  }
+  #recipe-tracker .rt-mat-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+  #recipe-tracker .rt-mat-count {
+    flex: none;
+    font-variant-numeric: tabular-nums;
+  }
+  #recipe-tracker .rt-mat.done {
+    color: var(--color-quest);
+    opacity: 0.75;
+  }
+
   /* ---------- delve tracker ---------- */
   #delve-tracker {
     width: 100%;

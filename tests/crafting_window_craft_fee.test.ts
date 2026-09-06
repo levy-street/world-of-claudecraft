@@ -54,6 +54,12 @@ function craftingDeps(qty = 1): CraftingWindowDeps {
     commissionChecked: () => false,
     onToggleCommission: () => {},
     selectedCraft: () => null,
+    recipePinned: () => false,
+    onToggleRecipePin: (recipeId: string) => ({
+      pinned: new Set([recipeId]),
+      full: false,
+      changed: true,
+    }),
     onSelectCraft: () => {},
   };
 }

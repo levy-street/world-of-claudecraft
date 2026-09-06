@@ -113,6 +113,7 @@ describe('the wired roots (the surfaces the fix covers)', () => {
       ['#quest-tracker', '.qt-header, .qt-title'],
       ['#deed-tracker', '.dt-header'],
       ['#reliquary-tracker', '.dt-header'],
+      ['#recipe-tracker', '.dt-header'],
       ['#minimap-disc', 'button'],
     ]);
   });

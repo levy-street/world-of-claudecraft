@@ -3836,6 +3836,18 @@ export const ja_JP: EnTranslations = {
       "pairsHeld": "保持している組み合わせ：{count}",
       "returnsLabel": "復帰：{count}"
     },
+    "recipeTracker": {
+      "trackerLabel": "レシピ",
+      "collapseHint": "レシピトラッカーを折りたたむ",
+      "expandHint": "レシピトラッカーを展開",
+      "pin": "ピン留め",
+      "unpin": "ピン解除",
+      "pinFull": "レシピトラッカーが満杯です（最大 {cap} レシピ）",
+      "pinAria": "{name}をHUDトラッカーにピン留め",
+      "unpinAria": "{name}のピン留めをHUDトラッカーから解除",
+      "haveNeed": "{have}/{need}",
+      "resultCount": "{name} x{count}"
+    },
     "crafting": {
       "title": "製作",
       "close": "製作を閉じる",

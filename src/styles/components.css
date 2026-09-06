@@ -6835,6 +6835,30 @@
     border-color: var(--gold-dim);
     background: var(--gold);
   }
+  /* The HUD-tracker pin chip in the batch row: the commission chip's pill
+     language, pressed = pinned. */
+  .crafting-pin-chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 26px;
+    padding: 4px 12px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.3);
+    color: var(--color-text-muted);
+    font-family: var(--title-font);
+    font-size: 11px;
+    cursor: var(--cursor-point);
+  }
+  .crafting-pin-chip:hover {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+  }
+  .crafting-pin-chip[aria-pressed="true"] {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+    background: rgb(200 163 74 / 12%);
+  }
   .train-row.train-known {
     cursor: default;
   }

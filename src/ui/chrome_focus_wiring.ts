@@ -47,6 +47,7 @@ export const CHROME_TRACKER_BLURS: readonly (readonly [root: string, selector: s
   ['#quest-tracker', '.qt-header, .qt-title'],
   ['#deed-tracker', '.dt-header'],
   ['#reliquary-tracker', '.dt-header'],
+  ['#recipe-tracker', '.dt-header'],
   ['#minimap-disc', 'button'],
 ];
 

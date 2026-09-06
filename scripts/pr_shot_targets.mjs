@@ -605,6 +605,65 @@ async function clearPinsOnLowPreset(page) {
   await seedLowGraphicsPreset(page);
 }
 
+/** The recipe-tracker twin: wipe the per-character recipe pin store (the pin
+ *  chip is a TOGGLE, so a prior variant's pins would flip off) and seed the
+ *  low preset before the document loads. */
+async function clearRecipePinsOnLowPreset(page) {
+  await page.evaluateOnNewDocument(
+    `try { for (const k of Object.keys(localStorage)) { if (k.indexOf('woc_recipe_pins') === 0) localStorage.removeItem(k); } } catch {}`,
+  );
+  await seedLowGraphicsPreset(page);
+}
+
+/** Recipes the capture pins, under RECIPE_TRACK_CAP so the shot shows a
+ *  tracked set rather than the cap refusal. */
+const RECIPE_TRACKER_PINS = 3;
+
+/** Open the crafting window with a PARTIAL reagent grant (so every tracked
+ *  line shows a mix of farmed and missing materials), then pin the first few
+ *  recipes through the window's own pin chips: the real path, storage and
+ *  tracker repaint included, never the view core. Leaves the window open. */
+async function pinRecipeTrackerRecipes(page) {
+  await page.evaluate(() => {
+    document.querySelector('#gpu-notice')?.remove();
+    // The island's greeting note would sit over both the window and the
+    // strip; dismiss it through its own control.
+    document
+      .getElementById('tutorial-greeting')
+      ?.querySelector('[data-close], [data-skip]')
+      ?.click();
+    const sim = window.__game?.sim;
+    for (const [id, n] of [
+      ['linen_scrap', 3],
+      ['silverleaf_herb', 1],
+      ['bone_fragments', 1],
+    ]) {
+      try {
+        sim?.addItem(id, n);
+      } catch {}
+    }
+    const el = document.querySelector('#crafting-window');
+    if (el) el.style.display = 'none';
+    window.__game?.hud?.toggleCrafting?.();
+  });
+  const open = await pollForSize(page, '#crafting-window');
+  if (!open) throw new Error('crafting window did not open');
+  const pinned = await page.evaluate((limit) => {
+    const chips = Array.from(
+      document.querySelectorAll('#crafting-window .crafting-pin-chip'),
+    ).filter((c) => c.getAttribute('aria-pressed') !== 'true');
+    let n = 0;
+    for (const chip of chips) {
+      if (n >= limit) break;
+      chip.click();
+      n++;
+    }
+    return n;
+  }, RECIPE_TRACKER_PINS);
+  if (pinned === 0) throw new Error('no crafting pin chip to click');
+  await wait(400);
+}
+
 /** Open The Reliquary on the Conquerors shelf and return its page ids in shelf
  *  order. That shelf is item-only, which is what makes the partial fill below
  *  predictable (marks, mounts, titles and skins live in other stores). */
@@ -6338,6 +6397,33 @@ export const TARGETS = [
         return {};
       }
       return variant?.key === 'desktop' ? { clip: '#reliquary-tracker' } : {};
+    },
+  },
+  {
+    key: 'recipe-tracker',
+    label:
+      'The pinned-recipe HUD tracker: reagent have/need per pinned recipe, and the crafting window pin chip',
+    // Scoped to the tracker's own modules; the crafting target already covers
+    // the window, so a wider when list would double every crafting capture.
+    when: ['ui/recipe_tracker_view', 'ui/recipe_tracker_painter', 'ui/recipe_pins_store'],
+    variants: [
+      // The strip itself, expanded, a block per pinned recipe.
+      { key: 'desktop', beforeLoad: clearRecipePinsOnLowPreset },
+      // The same frame uncropped: where the strip sits in #right-tracker-stack.
+      { key: 'hud-desktop', beforeLoad: clearRecipePinsOnLowPreset },
+      // The pin chips that feed it, on the crafting window's recipe rows.
+      { key: 'pin-desktop', beforeLoad: clearRecipePinsOnLowPreset },
+    ],
+    async capture(page, variant) {
+      await pinRecipeTrackerRecipes(page);
+      if (variant?.key === 'pin-desktop') return { clip: '#crafting-window' };
+      // Close the window: the tracker is the always-on surface, and the open
+      // window covers it.
+      await page.evaluate(() => window.__game?.hud?.toggleCrafting?.());
+      await wait(700);
+      const shown = await pollForSize(page, '#recipe-tracker');
+      if (!shown) throw new Error('recipe tracker painted no lines');
+      return variant?.key === 'desktop' ? { clip: '#recipe-tracker' } : {};
     },
   },
   {

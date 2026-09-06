@@ -64,6 +64,12 @@ function craftingDeps(): CraftingWindowDeps {
     commissionChecked: () => false,
     onToggleCommission: () => {},
     selectedCraft: () => null,
+    recipePinned: () => false,
+    onToggleRecipePin: (recipeId: string) => ({
+      pinned: new Set([recipeId]),
+      full: false,
+      changed: true,
+    }),
     onSelectCraft: () => {},
   };
 }
@@ -163,6 +169,10 @@ describe('crafting window: Tab focus trap and restore-on-close', () => {
     expect(document.activeElement).toBe(craftBtn);
     expect(pressTab()).toBe(true);
     expect(document.activeElement).toBe(createAllBtn);
+    // The HUD-tracker pin chip sits last in the batch row (an enabled tab
+    // stop, so the cycle reaches it before wrapping).
+    expect(pressTab()).toBe(true);
+    expect(document.activeElement).toBe(el.querySelector('.crafting-pin-chip'));
     expect(pressTab()).toBe(true);
     expect(document.activeElement).toBe(ordersBtn); // wraps
     expect(pressTab()).toBe(true);

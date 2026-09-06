@@ -642,6 +642,14 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: { '.innerHTML': 1, '.setAttribute': 3, '.removeAttribute': 3 },
     reflowAllow: {},
   },
+  // recipe_tracker is the same painter contract: ONE constructor innerHTML
+  // write for the whole skeleton (block pool times reagent pool), every refresh
+  // write facet-routed. No chip mode (hidden on touch), so no ARIA swap pairs.
+  {
+    file: 'recipe_tracker_painter.ts',
+    allow: { '.innerHTML': 1 },
+    reflowAllow: {},
+  },
   // The Thornhollow Fields scoreboard rebuilds its skeleton in ONE innerHTML write
   // only when the STRUCTURAL sig changes (new match / roster change). Every
   // per-frame write is facet-routed.

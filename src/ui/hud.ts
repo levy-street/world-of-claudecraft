@@ -713,6 +713,13 @@ import { RaidBossGuideWindow, raidBossGuideContextFallback } from './raid_boss_g
 import { lockoutParts, lockoutShape } from './raid_lockout';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
 import { presentRealmBuilder, RealmBuilderPopup } from './realm_builder_popup';
+import { RecipePinStore } from './recipe_pins_store';
+import { RecipeTrackerPainter } from './recipe_tracker_painter';
+import {
+  makeRecipeTrackerInput,
+  type RecipeTrackerInput,
+  recipeTrackerView,
+} from './recipe_tracker_view';
 import {
   reliquaryIlluminationBroadcastLine,
   reliquaryIlluminationBroadcastRendered,
@@ -799,6 +806,7 @@ import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap, CLICK_SUPPRESS_MS, TAP_SLOP_PX } from './touch_tap';
 import { buildTownFocusView, stepTownFocus, townFocusRenderSig } from './town_focus_view';
 import { renderTownFocusWindow } from './town_focus_window';
+import { wireTrackerHeader } from './tracker_header_wiring';
 import { installTrackerStackAnchor } from './tracker_stack_anchor';
 import { tradeOfferCeiling } from './trade_view';
 import { TutorialOverlay } from './tutorial';
@@ -2756,93 +2764,41 @@ export class Hud {
     $('#mm-deeds').addEventListener('click', () => this.toggleDeeds());
     $('#mm-reliquary')?.addEventListener('click', () => this.toggleReliquary());
     $('#mm-professions').addEventListener('click', () => this.toggleProfessions());
-    // Collapse/expand the on-screen quest tracker by clicking its header. The
-    // overlay is click-through (pointer-events:none) except the header button, so
-    // delegate on the stable container (the header is rebuilt on each render).
-    $('#quest-tracker').addEventListener('click', (e) => {
-      if ((e.target as HTMLElement).closest('.qt-header')) this.toggleQuestTrackerCollapsed();
-      // A quest row jumps to that quest's detail in the quest log window.
-      const row = (e.target as HTMLElement).closest<HTMLElement>('.qt-title');
-      if (row?.dataset.quest) this.questlogWindow.openWithQuest(row.dataset.quest);
+    // The always-on tracker headers share one delegation contract
+    // (tracker_header_wiring.ts): a click or Enter/Space on the header flips
+    // the persisted collapse, stopped before the game binds hijack the focused
+    // button; a quest row jumps to that quest in the log. On the compact touch
+    // tier the deed and Reliquary rows are folded away (hud.mobile.css) and the
+    // header is a count chip, so activation opens the owning window instead of
+    // toggling a collapse the player cannot see; the recipe tracker is hidden
+    // on touch.
+    wireTrackerHeader($('#quest-tracker'), {
+      header: '.qt-header',
+      toggle: () => this.toggleQuestTrackerCollapsed(),
+      rows: {
+        selector: '.qt-title',
+        activate: (row) => {
+          if (!row.dataset.quest) return false;
+          this.questlogWindow.openWithQuest(row.dataset.quest);
+          return true;
+        },
+      },
     });
-    // Keyboard activation: handle Enter/Space here and stop the event before it
-    // bubbles to the window-level game keybinds (Enter is bound to Open Chat,
-    // Space is preventDefault'd for jump), which would otherwise hijack the
-    // focused header button's native activation. The tracker is a non-modal
-    // overlay, so canUseGameKeys() stays true and those binds fire while it has
-    // focus; stopping propagation here keeps the toggle reachable by keyboard.
-    $('#quest-tracker').addEventListener('keydown', (e) => {
-      const target = e.target as HTMLElement;
-      if (e.key !== 'Enter' && e.key !== ' ' && e.code !== 'Space') return;
-      if (target.closest('.qt-header')) {
-        e.preventDefault();
-        e.stopPropagation();
-        this.toggleQuestTrackerCollapsed();
-        return;
-      }
-      // Keyboard activation for the quest rows (role=button), stopped before
-      // the window-level game keybinds hijack Enter/Space (same as the header).
-      const row = target.closest<HTMLElement>('.qt-title');
-      if (row?.dataset.quest) {
-        e.preventDefault();
-        e.stopPropagation();
-        this.questlogWindow.openWithQuest(row.dataset.quest);
-      }
+    const compactTouch = (): boolean =>
+      document.body.classList.contains('mobile-touch') &&
+      document.body.classList.contains('hud-mobile-compact');
+    wireTrackerHeader($('#deed-tracker'), {
+      toggle: () => this.toggleDeedTrackerCollapsed(),
+      isCompact: compactTouch,
+      openCompact: () => this.openDeeds(),
     });
-    // Collapse/expand the deed tracker from its header (the quest tracker
-    // delegation pattern: click plus the Enter/Space keydown arm below,
-    // stopped before the window-level chat-open/jump binds hijack the
-    // focused header button; see the quest-tracker guard above). On the
-    // compact touch tier the rows are folded away (hud.mobile.css) and the
-    // header is a count chip: activation opens the Book of Deeds instead of
-    // toggling a collapse the player cannot see.
-    $('#deed-tracker').addEventListener('click', (e) => {
-      if (!(e.target as HTMLElement).closest('.dt-header')) return;
-      const body = document.body.classList;
-      if (body.contains('mobile-touch') && body.contains('hud-mobile-compact')) {
-        this.openDeeds();
-        return;
-      }
-      this.toggleDeedTrackerCollapsed();
+    wireTrackerHeader($('#reliquary-tracker'), {
+      toggle: () => this.toggleReliquaryTrackerCollapsed(),
+      isCompact: compactTouch,
+      openCompact: () => this.openReliquary(),
     });
-    $('#deed-tracker').addEventListener('keydown', (e) => {
-      if (e.key !== 'Enter' && e.key !== ' ' && e.code !== 'Space') return;
-      if (!(e.target as HTMLElement).closest('.dt-header')) return;
-      e.preventDefault();
-      e.stopPropagation();
-      const body = document.body.classList;
-      if (body.contains('mobile-touch') && body.contains('hud-mobile-compact')) {
-        this.openDeeds();
-        return;
-      }
-      this.toggleDeedTrackerCollapsed();
-    });
-    // The Reliquary tracker header, the same delegation contract as the deed
-    // tracker above: click plus the Enter/Space keydown arm, stopped before the
-    // window-level chat-open/jump binds hijack the focused header button. On the
-    // compact touch tier the rows are folded away (hud.mobile.css) and the
-    // header is a count chip: activation opens The Reliquary instead of toggling
-    // a collapse the player cannot see.
-    $('#reliquary-tracker').addEventListener('click', (e) => {
-      if (!(e.target as HTMLElement).closest('.dt-header')) return;
-      const body = document.body.classList;
-      if (body.contains('mobile-touch') && body.contains('hud-mobile-compact')) {
-        this.openReliquary();
-        return;
-      }
-      this.toggleReliquaryTrackerCollapsed();
-    });
-    $('#reliquary-tracker').addEventListener('keydown', (e) => {
-      if (e.key !== 'Enter' && e.key !== ' ' && e.code !== 'Space') return;
-      if (!(e.target as HTMLElement).closest('.dt-header')) return;
-      e.preventDefault();
-      e.stopPropagation();
-      const body = document.body.classList;
-      if (body.contains('mobile-touch') && body.contains('hud-mobile-compact')) {
-        this.openReliquary();
-        return;
-      }
-      this.toggleReliquaryTrackerCollapsed();
+    wireTrackerHeader($('#recipe-tracker'), {
+      toggle: () => this.toggleRecipeTrackerCollapsed(),
     });
     // Chrome focus hygiene (the shared Enter/Space key guard + pointer-only focus
     // drop) over the trackers, the non-modal overlay panels, and the micromenu rail:
@@ -5343,6 +5299,19 @@ export class Hud {
     root: () => $('#reliquary-tracker'),
     writers: this.writerFacet,
   });
+  // Pinned-recipe HUD tracker (#recipe-tracker): the crafting window's pin
+  // chips write the per-character store, the slow-band painter reads it and
+  // folds each reagent's carried count against the craft's charge.
+  private readonly recipePins = new RecipePinStore({
+    world: () => this.sim,
+    storage: () => localStorage,
+    known: (recipeId) => this.sim.recipeList.some((recipe) => recipe.id === recipeId),
+  });
+  private recipeTrackerInput: RecipeTrackerInput | null = null;
+  private readonly recipeTrackerPainter = new RecipeTrackerPainter({
+    root: () => $('#recipe-tracker'),
+    writers: this.writerFacet,
+  });
   // Seats #right-tracker-stack below the minimap column's REAL rendered bottom
   // (a wrapping zone label, the mobile chrome scale, and the compact transform
   // all move it past any stylesheet constant); slow band plus coalesced resize,
@@ -6957,6 +6926,7 @@ export class Hud {
     // now so the strip never shows a stale language for up to a slow tick.
     this.updateDeedTracker();
     this.updateReliquaryTracker();
+    this.updateRecipeTracker();
     this.charWindow.renderIfOpen();
     // The arena window's render-skip signature is text-independent (offline sentinel or a
     // JSON of ids/numbers), so a language switch alone never moves it; relocalize() forces
@@ -9754,6 +9724,9 @@ export class Hud {
     // The Reliquary tracker is always-on chrome for the same reason: pinned
     // pages fill from normal play, and an illuminated page drops off.
     if (slowHud) this.updateReliquaryTracker();
+    // The pinned-recipe tracker is always-on chrome too: reagents arrive from
+    // gathering and loot with no craft event to repaint on.
+    if (slowHud) this.updateRecipeTracker();
     // Re-seat the tracker stack under the minimap column (bounded layout read).
     if (slowHud) this.trackerStackAnchor.apply();
     if (slowHud && this.calendarWindow.isOpen) this.calendarWindow.refreshIfChanged();
@@ -16061,6 +16034,12 @@ export class Hud {
           if (on) this.craftCommissionOptIn.add(recipeId);
           else this.craftCommissionOptIn.delete(recipeId);
         },
+        recipePinned: (recipeId) => this.recipePins.has(recipeId),
+        onToggleRecipePin: (recipeId) => {
+          const result = this.recipePins.toggle(recipeId);
+          if (result.changed) this.updateRecipeTracker();
+          return result;
+        },
         craftQty: (recipeId) => this.craftQtyByRecipe.get(recipeId) ?? 1,
         onCraftQty: (recipeId, qty) => {
           this.craftQtyByRecipe.set(recipeId, Math.max(1, Math.floor(qty)));
@@ -16408,6 +16387,26 @@ export class Hud {
     settings.set('reliquaryTrackerCollapsed', !settings.get('reliquaryTrackerCollapsed'));
     audio.click();
     this.updateReliquaryTracker();
+  }
+
+  // Repaint the pinned-recipe tracker from the live world: the slow band, a
+  // pin toggle, the collapse toggle, and language switches all funnel here;
+  // the elided writers make an unchanged repaint free.
+  private updateRecipeTracker(): void {
+    this.recipeTrackerInput ??= makeRecipeTrackerInput(() => this.sim);
+    const input = this.recipeTrackerInput;
+    input.pinned = this.recipePins.pinned;
+    input.collapsed = (this.optionsHooks?.settings.get('recipeTrackerCollapsed') ?? false) === true;
+    this.recipeTrackerPainter.update(recipeTrackerView(input));
+  }
+
+  /** Flip the persisted recipe-tracker collapse (header click/keyboard delegation). */
+  private toggleRecipeTrackerCollapsed(): void {
+    const settings = this.optionsHooks?.settings;
+    if (!settings) return;
+    settings.set('recipeTrackerCollapsed', !settings.get('recipeTrackerCollapsed'));
+    audio.click();
+    this.updateRecipeTracker();
   }
 
   toggleCalendar(): void {

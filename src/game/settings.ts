@@ -451,6 +451,10 @@ export const BOOL_SETTINGS = {
   // collapsed to just its header. Toggled by clicking the tracker header (the
   // quest-tracker convention); kept here so the choice persists.
   reliquaryTrackerCollapsed: { def: false },
+  // off by default (expanded): when on, the on-screen pinned-recipe tracker is
+  // collapsed to just its header. Toggled by clicking the tracker header (the
+  // quest-tracker convention); kept here so the choice persists.
+  recipeTrackerCollapsed: { def: false },
   // on by default: the on-screen Reliquary tracker (pinned pages, or the
   // nearly-complete default before any pin) is shown at all. The master
   // switch above the collapse: off removes the strip entirely. Flipped from

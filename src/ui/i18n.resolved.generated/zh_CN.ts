@@ -3836,6 +3836,18 @@ export const zh_CN: EnTranslations = {
       "pairsHeld": "已持有组合：{count}",
       "returnsLabel": "回归：{count}"
     },
+    "recipeTracker": {
+      "trackerLabel": "配方",
+      "collapseHint": "收起配方追踪器",
+      "expandHint": "展开配方追踪器",
+      "pin": "固定",
+      "unpin": "取消固定",
+      "pinFull": "配方追踪器已满（最多 {cap} 个配方）",
+      "pinAria": "将{name}固定到HUD追踪器",
+      "unpinAria": "从HUD追踪器取消固定{name}",
+      "haveNeed": "{have}/{need}",
+      "resultCount": "{name} x{count}"
+    },
     "crafting": {
       "title": "制作",
       "close": "关闭制作",

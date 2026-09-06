@@ -67,6 +67,12 @@ function deps(qty = 1) {
       qtyMap.set(recipeId, n);
     }),
     selectedCraft: () => null as string | null,
+    recipePinned: () => false,
+    onToggleRecipePin: (recipeId: string) => ({
+      pinned: new Set([recipeId]),
+      full: false,
+      changed: true,
+    }),
     onSelectCraft: vi.fn(),
   };
 }

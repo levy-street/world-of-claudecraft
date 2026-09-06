@@ -3836,6 +3836,18 @@ export const da_DK: EnTranslations = {
       "pairsHeld": "Afholdte par: {count}",
       "returnsLabel": "Returnerer: {count}"
     },
+    "recipeTracker": {
+      "trackerLabel": "Recipes",
+      "collapseHint": "Collapse recipe tracker",
+      "expandHint": "Expand recipe tracker",
+      "pin": "Pin",
+      "unpin": "Unpin",
+      "pinFull": "The recipe tracker is full (up to {cap} recipes)",
+      "pinAria": "Pin {name} to the HUD tracker",
+      "unpinAria": "Unpin {name} from the HUD tracker",
+      "haveNeed": "{have}/{need}",
+      "resultCount": "{name} x{count}"
+    },
     "crafting": {
       "title": "Håndværk",
       "close": "Tæt håndværk",

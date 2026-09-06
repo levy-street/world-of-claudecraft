@@ -5293,6 +5293,20 @@ export const hudChromeStrings = {
   },
   // Crafting window (#1127): the minimal common-tier crafting action, one row
   // per known recipe, a Craft button enabled only when every reagent is held.
+  // The pinned-recipe HUD tracker (#recipe-tracker) and the crafting window's
+  // pin chip that fills it. The collapsed tally reuses hudChrome.questTracker.count.
+  recipeTracker: {
+    trackerLabel: 'Recipes',
+    collapseHint: 'Collapse recipe tracker',
+    expandHint: 'Expand recipe tracker',
+    pin: 'Pin',
+    unpin: 'Unpin',
+    pinFull: 'The recipe tracker is full (up to {cap} recipes)',
+    pinAria: 'Pin {name} to the HUD tracker',
+    unpinAria: 'Unpin {name} from the HUD tracker',
+    haveNeed: '{have}/{need}',
+    resultCount: '{name} x{count}',
+  },
   crafting: {
     title: 'Crafting',
     close: 'Close crafting',

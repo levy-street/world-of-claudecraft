@@ -54,6 +54,7 @@ import { professionImageUrl } from './profession_art';
 import { renderProfessionIdentityCard } from './profession_identity_card';
 import type { ProfessionIdentityModel } from './profession_identity_view';
 import { qualityGlowShadow } from './quality_glow';
+import { RECIPE_TRACK_CAP, type RecipePinToggleResult } from './recipe_tracker_view';
 import { svgIcon } from './ui_icons';
 
 // Duration chip and aria: up to two decimals when non-integer (1.75s),
@@ -106,6 +107,12 @@ export interface CraftingWindowDeps extends PainterHostPresentation {
    *  The painter renders the control only on commissionEligible rows. */
   commissionChecked(recipeId: string): boolean;
   onToggleCommission(recipeId: string, on: boolean): void;
+  /** Pinned-recipe tracker (#recipe-tracker): whether `recipeId` is on the
+   *  player's per-character pin list, and the toggle the per-row chip fires.
+   *  The HUD owns the store; the result's `full` flag is a refused add at the
+   *  cap, which the chip announces instead of silently doing nothing. */
+  recipePinned(recipeId: string): boolean;
+  onToggleRecipePin(recipeId: string): RecipePinToggleResult;
   /** Per-recipe qty stepper value (HUD-held so repaints keep the pick). */
   craftQty(recipeId: string): number;
   onCraftQty(recipeId: string, qty: number): void;
@@ -576,6 +583,41 @@ export function renderCraftingWindow(
         deps.onCraft(row.recipeId, all);
       });
       batchRow.appendChild(createAllBtn);
+      // Pin to the HUD tracker: an aria-pressed toggle chip (the commission
+      // chip's language) whose label AND state follow the pin. The click
+      // mirrors the flip locally instead of repainting the window; a refused
+      // add at the cap rides the polite live region so it is never a silent
+      // no-op.
+      const pinBtn = document.createElement('button');
+      pinBtn.type = 'button';
+      pinBtn.className = 'crafting-pin-chip';
+      pinBtn.dataset.focusKey = `pin:${row.recipeId}`;
+      const paintPin = (pinned: boolean): void => {
+        pinBtn.setAttribute('aria-pressed', pinned ? 'true' : 'false');
+        pinBtn.textContent = t(
+          pinned ? 'hudChrome.recipeTracker.unpin' : 'hudChrome.recipeTracker.pin',
+        );
+        pinBtn.setAttribute(
+          'aria-label',
+          t(pinned ? 'hudChrome.recipeTracker.unpinAria' : 'hudChrome.recipeTracker.pinAria', {
+            name: resultName,
+          }),
+        );
+      };
+      paintPin(deps.recipePinned(row.recipeId));
+      pinBtn.addEventListener('click', () => {
+        const result = deps.onToggleRecipePin(row.recipeId);
+        if (result.full) {
+          deps.announce(
+            t('hudChrome.recipeTracker.pinFull', {
+              cap: formatNumber(RECIPE_TRACK_CAP, { maximumFractionDigits: 0 }),
+            }),
+          );
+          return;
+        }
+        paintPin(result.pinned.has(row.recipeId));
+      });
+      batchRow.appendChild(pinBtn);
       item.appendChild(batchRow);
       // Commission opt-in (the Maker's Bond): a per-recipe pill toggle-chip
       // in the card's chip language, right-aligned in the card footer so it

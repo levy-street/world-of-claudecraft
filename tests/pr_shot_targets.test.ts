@@ -657,6 +657,42 @@ describe('classifyDiff', () => {
   });
 });
 
+describe('recipe-tracker target', () => {
+  it('holds the recipe-tracker capture to the window and store contracts it borrows', () => {
+    const stripSource = (src: string): string =>
+      src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+    const script = stripSource(
+      readFileSync(join(__dirname, '../scripts/pr_shot_targets.mjs'), 'utf8'),
+    );
+    const storeSrc = stripSource(
+      readFileSync(join(__dirname, '../src/ui/recipe_pins_store.ts'), 'utf8'),
+    );
+    const windowSrc = stripSource(
+      readFileSync(join(__dirname, '../src/ui/crafting_window.ts'), 'utf8'),
+    );
+    // The between-variant cleanup sweeps the store's own prefix (the chip is
+    // a TOGGLE, so a stale pin would be flipped off and the capture corrupt).
+    expect(storeSrc).toContain("RECIPE_PIN_KEY_PREFIX = 'woc_recipe_pins'");
+    expect(script).toContain("indexOf('woc_recipe_pins')");
+    // The staging clicks the window's own chip, skipping already-pressed ones.
+    expect(windowSrc).toContain("pinBtn.className = 'crafting-pin-chip';");
+    expect(script).toContain('.crafting-pin-chip');
+    expect(script).toContain("getAttribute('aria-pressed') !== 'true'");
+    for (const path of [
+      'src/ui/recipe_tracker_painter.ts',
+      'src/ui/recipe_tracker_view.ts',
+      'src/ui/recipe_pins_store.ts',
+    ]) {
+      const plan = classifyDiff([path]);
+      expect(plan.isVisual, path).toBe(true);
+      expect(
+        plan.specific.map((t: { key: string }) => t.key),
+        path,
+      ).toContain('recipe-tracker');
+    }
+  });
+});
+
 describe('diffChangedPaths', () => {
   function section(header: string, minus: string, plus: string) {
     return `diff --git ${header}\n--- ${minus}\n+++ ${plus}\n@@ -1 +1 @@\n-x\n+y\n`;

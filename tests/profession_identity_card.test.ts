@@ -294,6 +294,12 @@ describe('profession identity card painter contract', () => {
         onCraftQty: vi.fn(),
         announce: vi.fn(),
         selectedCraft: () => null as string | null,
+        recipePinned: () => false,
+        onToggleRecipePin: (recipeId: string) => ({
+          pinned: new Set([recipeId]),
+          full: false,
+          changed: true,
+        }),
         onSelectCraft: vi.fn(),
       },
     );
@@ -374,6 +380,12 @@ describe('profession identity card painter contract', () => {
         onCraftQty: vi.fn(),
         announce: vi.fn(),
         selectedCraft: () => null as string | null,
+        recipePinned: () => false,
+        onToggleRecipePin: (recipeId: string) => ({
+          pinned: new Set([recipeId]),
+          full: false,
+          changed: true,
+        }),
         onSelectCraft: vi.fn(),
       },
     );
@@ -447,6 +459,12 @@ describe('profession identity card painter contract', () => {
         onCraftQty: vi.fn(),
         announce: vi.fn(),
         selectedCraft: () => null as string | null,
+        recipePinned: () => false,
+        onToggleRecipePin: (recipeId: string) => ({
+          pinned: new Set([recipeId]),
+          full: false,
+          changed: true,
+        }),
         onSelectCraft: vi.fn(),
       },
       undefined,
@@ -693,6 +711,12 @@ describe('crafting window pins', () => {
     onCraftQty: vi.fn(),
     announce: vi.fn(),
     selectedCraft: () => null as string | null,
+    recipePinned: () => false,
+    onToggleRecipePin: (recipeId: string) => ({
+      pinned: new Set([recipeId]),
+      full: false,
+      changed: true,
+    }),
     onSelectCraft: vi.fn(),
   });
   const comboRow = (unmetCrafts: string[]) => ({

@@ -6237,6 +6237,17 @@
   body.mobile-touch #reliquary-tracker {
     display: none;
   }
+  /* The pinned-recipe tracker follows the Reliquary tracker off the touch HUD
+     for the same crowding reason; the crafting window's pin chips still work
+     and the list is waiting on desktop. */
+  body.mobile-touch #recipe-tracker {
+    display: none;
+  }
+  /* And its feeder: a pin chip on the touch crafting window would promise a
+     surface this tier never shows. */
+  body.mobile-touch .crafting-pin-chip {
+    display: none;
+  }
   /* ---------- mobile tracker chips (compact) ---------- */
   /* Compact count chips, both trackers at once: with the rows folded away the
      header is the whole surface, and the desktop treatment (14px title font on

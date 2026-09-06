@@ -1349,6 +1349,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the always-on Reliquary tracker (not gated on a window): pinned pages fill from normal play and an illuminated page drops off',
   },
   {
+    call: 'this.updateRecipeTracker',
+    band: 'slow',
+    gate: '',
+    surface: 'chrome',
+    why: 'the always-on pinned-recipe tracker (not gated on a window): reagents arrive from gathering and loot with no craft event to repaint on',
+  },
+  {
     call: 'this.trackerStackAnchor.apply',
     band: 'slow',
     gate: '',
@@ -1695,7 +1702,10 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // window 44 -> 46: the crucible vendor's out-of-range close (the third
       // #vendor-window tenant, on the heroic vendor's exact row shape).
       // Both deltas apply on the merged tree.
-    ).toEqual({ window: 47, chrome: 85, none: 17 });
+      // chrome 85 -> 86: the always-on pinned-recipe tracker
+      // (recipe_tracker_view.ts + recipe_tracker_painter.ts), the Reliquary
+      // tracker's exact slow-band row shape.
+    ).toEqual({ window: 47, chrome: 86, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

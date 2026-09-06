@@ -663,18 +663,21 @@ describe('tracker accessibility (quest-tracker contract)', () => {
     expect(tracker).toMatch(/dt-bar" aria-hidden="true"/);
   });
 
-  it('arms Enter/Space on #deed-tracker, stopped before the game binds hijack them', () => {
+  it('arms Enter/Space on #deed-tracker through the shared tracker-header wiring', () => {
+    // The click plus Enter/Space arms live in src/ui/tracker_header_wiring.ts
+    // (pinned behaviorally in tests/tracker_header_wiring.test.ts); hud.ts
+    // hands it the two actions: the count chip opens the Book on the compact
+    // touch tier, the desktop header toggles the collapse.
     const arm = hud.match(
-      /\$\('#deed-tracker'\)\.addEventListener\('keydown',[\s\S]*?\n {4}\}\);/,
+      /wireTrackerHeader\(\$\('#deed-tracker'\), \{[\s\S]*?\n {4}\}\);/,
     )?.[0] as string;
     expect(arm).toBeTruthy();
-    expect(arm).toContain("if (e.key !== 'Enter' && e.key !== ' ' && e.code !== 'Space') return;");
-    expect(arm).toContain('e.preventDefault();');
-    expect(arm).toContain('e.stopPropagation();');
-    // The same compact-touch branch as the click delegation: the count chip
-    // opens the Book, the desktop header toggles the collapse.
-    expect(arm).toContain('this.openDeeds();');
-    expect(arm).toContain('this.toggleDeedTrackerCollapsed();');
+    expect(arm).toContain('toggle: () => this.toggleDeedTrackerCollapsed(),');
+    expect(arm).toContain('isCompact: compactTouch,');
+    expect(arm).toContain('openCompact: () => this.openDeeds(),');
+    expect(hud).toMatch(
+      /const compactTouch = \(\): boolean =>\s*document\.body\.classList\.contains\('mobile-touch'\) &&\s*document\.body\.classList\.contains\('hud-mobile-compact'\);/,
+    );
   });
 
   it('paints the gold focus ring on the focused header', () => {
@@ -787,9 +790,9 @@ describe('mobile layout (hud.mobile.css)', () => {
       /body\.mobile-touch #deed-tracker \.dt-list \{\s*max-height: 88px;\s*overflow: hidden;/,
     );
     // The hud delegation: compact touch tap opens the window, desktop keeps
-    // the collapse toggle.
+    // the collapse toggle (the shared wiring's openCompact/toggle pair).
     expect(hud).toMatch(
-      /body\.contains\('mobile-touch'\) && body\.contains\('hud-mobile-compact'\)[\s\S]{0,80}?this\.openDeeds\(\);/,
+      /toggle: \(\) => this\.toggleDeedTrackerCollapsed\(\),\s*isCompact: compactTouch,\s*openCompact: \(\) => this\.openDeeds\(\),/,
     );
   });
 });

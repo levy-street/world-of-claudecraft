@@ -3836,6 +3836,18 @@ export const ko_KR: EnTranslations = {
       "pairsHeld": "보유한 조합: {count}",
       "returnsLabel": "복귀: {count}"
     },
+    "recipeTracker": {
+      "trackerLabel": "제작법",
+      "collapseHint": "제작법 추적기 접기",
+      "expandHint": "제작법 추적기 펼치기",
+      "pin": "고정",
+      "unpin": "고정 해제",
+      "pinFull": "제작법 추적기가 가득 찼습니다 (최대 {cap}개)",
+      "pinAria": "{name} HUD 추적기에 고정",
+      "unpinAria": "{name} HUD 추적기에서 고정 해제",
+      "haveNeed": "{have}/{need}",
+      "resultCount": "{name} x{count}"
+    },
     "crafting": {
       "title": "제작",
       "close": "제작 닫기",

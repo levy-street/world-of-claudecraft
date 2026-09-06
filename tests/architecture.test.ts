@@ -471,6 +471,7 @@ const UI_PURE_CORES = [
   'src/ui/reliquary_sheet_view.ts',
   'src/ui/character_progression_view.ts',
   'src/ui/reliquary_tracker_view.ts',
+  'src/ui/recipe_tracker_view.ts',
   'src/ui/tracker_stack_anchor_core.ts',
   'src/ui/spellbook_view.ts',
   'src/ui/hud/quest/questlog_view.ts',

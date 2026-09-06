@@ -297,7 +297,11 @@ const MONOLITHS: MonolithRow[] = [
     // world-entry restore moved into ActionBarController.restoreLayout, so
     // the HUD keeps one poll, one refresh call, and the two-line per-frame
     // surface-flip follow beside the form sync. Exact merged count.
-    ceiling: 18857,
+    // Lowered 18857 -> 18856 by the pinned-recipe tracker change: the four
+    // tracker-header click/keydown delegations moved into
+    // src/ui/tracker_header_wiring.ts, which paid for the recipe tracker's
+    // own thin wiring (the ratchet follows the extraction down).
+    ceiling: 18856,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
