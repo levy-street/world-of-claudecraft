@@ -473,7 +473,7 @@ import {
   buildBgTimeWarningView,
 } from './hud/battleground';
 import { BgProposalPopup } from './hud/battleground/battleground_proposal_popup';
-import { ChatAnnouncer } from './hud/chat/chat_announcer';
+import { ChatAnnouncer, ChatScrollFollow } from './hud/chat';
 import { chatChannelColor } from './hud/chat/chat_channels';
 import { ChatGeometryController } from './hud/chat/chat_geometry_controller';
 import {
@@ -1390,6 +1390,7 @@ export class Hud {
   private chatTimestamps = localStorage.getItem('chatTimestamps') === '1';
   private chatClock: ChatClock = clampChatClock(localStorage.getItem('chatClock'));
   private combatLogEl = $('#combatlog');
+  private chatFollow = new ChatScrollFollow([this.chatLogEl, this.combatLogEl]);
   // Off-screen polite live region for the throttled combat summary. The 3D
   // world / game canvas is OUT of accessibility scope (not screen-readable), so this
   // announces only the combat-log text, never the game world.
@@ -14493,8 +14494,7 @@ export class Hud {
     fromTitle?: string,
     classId?: PlayerClass,
   ): void {
-    const wasNearBottom =
-      this.chatLogEl.scrollHeight - this.chatLogEl.scrollTop - this.chatLogEl.clientHeight < 24;
+    const wasNearBottom = this.chatFollow.shouldFollow(this.chatLogEl);
     const div = document.createElement('div');
     // The line color is a pure function of its channel (the single source of truth
     // shared with the chat input tint), so it is derived here rather than passed in.
@@ -14954,7 +14954,7 @@ export class Hud {
     // region when its durable channel line is filtered by another active tab.
     announceWhenFiltered = false,
   ): void {
-    const wasNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 24;
+    const wasNearBottom = this.chatFollow.shouldFollow(el);
     const div = document.createElement('div');
     div.style.color = color;
     if (timestamp) this.prependTimestamp(div);

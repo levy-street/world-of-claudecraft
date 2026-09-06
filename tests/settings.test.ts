@@ -529,6 +529,7 @@ describe('Interface & Comfort settings pack', () => {
     expect(s.set('tooltipScale', 9)).toBe(SETTING_RANGES.tooltipScale.max);
     expect(s.set('fctScale', 0)).toBe(SETTING_RANGES.fctScale.min);
     expect(s.set('chatFontScale', 1.2)).toBe(1.2);
+    expect(s.set('chatFontScale', 9)).toBe(SETTING_RANGES.chatFontScale.max);
     expect(s.set('chatOpacity', 0)).toBe(SETTING_RANGES.chatOpacity.min);
   });
 
@@ -579,5 +580,26 @@ describe('click-to-move mouse button setting', () => {
     expect(normalizeClickMoveButton(2)).toBe(2);
     expect(clickMoveButtonLabel(0)).toBe('Left Click');
     expect(clickMoveButtonLabel(2)).toBe('Right Click');
+  });
+});
+
+// Chat text is 11px at stock, so the old 1.4 ceiling left it unreadable on a 4K
+// display at 100% OS scaling (players dropped to 1080p just to read chat). The
+// slider must reach at least 2x (1080p-equivalent size on 4K) and accept it
+// unclamped; the ceiling itself sits above that for TV / low-vision headroom.
+describe('chat text size reaches 4K-readable sizes', () => {
+  it('lets the slider double the stock chat text', () => {
+    const s = new Settings();
+    expect(SETTING_RANGES.chatFontScale.max).toBeGreaterThanOrEqual(2);
+    expect(s.set('chatFontScale', 2)).toBe(2);
+    const reloaded = new Settings();
+    expect(reloaded.get('chatFontScale')).toBe(2);
+  });
+
+  it('pins the ceiling at 2.5 and clamps above it', () => {
+    const s = new Settings();
+    expect(SETTING_RANGES.chatFontScale.max).toBe(2.5);
+    expect(s.set('chatFontScale', 2.5)).toBe(2.5);
+    expect(s.set('chatFontScale', 3)).toBe(2.5);
   });
 });
