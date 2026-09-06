@@ -55,7 +55,7 @@ import type {
   MasterLootThreshold,
 } from '../types';
 import { dist2d, PARTY_XP_RANGE } from '../types';
-import { bopPartyTradeInstance } from './bop_trade_window';
+import { grantAwardedLootItem, grantOrHoldAwardedLoot } from './awarded_loot_hold';
 import { lootEntryRollsOnClaim } from './loot_difficulty_gate';
 import { isTapGroupMember, LOOT_FFA_DELAY } from './loot_ffa';
 
@@ -522,32 +522,6 @@ export function killSnapshotEligibility(
   };
 }
 
-// The one grant every award arm routes through (including the corpse-return
-// openToAll pickup in interaction.ts). A SOULBOUND drop with anyone else in
-// the drop-moment snapshot is granted as an instanced copy carrying the
-// bind-on-pickup party trade window (bop_trade_window.ts): tradeable only
-// with the players who were loot-eligible at the exact kill moment, until
-// the window expires or the copy is equipped. Everything else stays the
-// plain force-add grant these sites always used.
-//
-// A windowed grant deliberately does NOT auto-equip: addItemInstance has no
-// auto-equip arm, and that is load-bearing here, because equipping strips
-// the window (items.ts equipmentPayloadFor), so an auto-equip on the win
-// would silently destroy the tradability the window exists to grant. The
-// player equips by hand, accepting the bind.
-export function grantAwardedLootItem(
-  ctx: SimContext,
-  itemId: string,
-  pid: number,
-  eligibility: { names: readonly string[]; characterIds: readonly number[] },
-): void {
-  const instance = ITEMS[itemId]?.soulbound
-    ? bopPartyTradeInstance(ctx.lockoutNowMs(), eligibility.names, eligibility.characterIds)
-    : undefined;
-  if (instance) ctx.addItemInstance(itemId, instance, pid, 1);
-  else ctx.addItem(itemId, 1, pid);
-}
-
 // Rotates a common/junk drop over the kill-time eligible party members
 // (`partyLootCandidatesForMob`, backed by `mob.lootRecipientIds`), never the
 // loot-time in-range set: that is the fairness point. Mirrors
@@ -561,16 +535,17 @@ function tryAwardItemByRoundRobin(ctx: SimContext, itemId: string, mob: Entity):
   if (!party) return false;
   const winner = candidates[party.lootTurn % candidates.length];
   party.lootTurn++;
-  grantAwardedLootItem(ctx, itemId, winner.entityId, killSnapshotEligibility(ctx, mob));
+  grantOrHoldAwardedLoot(ctx, mob.id, itemId, winner.entityId, killSnapshotEligibility(ctx, mob));
   return true;
 }
 
 // Returns true when the item was consumed off the corpse (a roll started, a
 // round-robin winner took it, or it landed in the looter's bags); false when
 // the looter-takes-all direct grant found the looter's bags full, so the
-// caller leaves it on the corpse. The roll and round-robin paths are not
-// capacity-gated: those grants force-add (items are never destroyed, and the
-// looter cannot free space on the winner's behalf).
+// caller leaves it on the corpse. The roll and round-robin paths resolve
+// later for a winner who is not the looter, so the looter cannot free space
+// on their behalf: a full-bags winner's award is HELD on the corpse for them
+// instead (loot/awarded_loot_hold.ts), never force-added past capacity.
 export function awardSharedLootItem(
   ctx: SimContext,
   itemId: string,
@@ -829,7 +804,7 @@ export function assignMasterLoot(
         text: `${r.meta.name} assigned [[i:${roll.itemId}]] to ${targetName}.`,
         pid,
       });
-    grantAwardedLootItem(ctx, roll.itemId, targets[0], roll.windowEligible);
+    grantOrHoldAwardedLoot(ctx, roll.mobId, roll.itemId, targets[0], roll.windowEligible);
     return;
   }
   convertMasterRollToNeedGreed(ctx, roll, targets);
@@ -975,7 +950,7 @@ export function resolveLootRoll(ctx: SimContext, roll: PendingLootRoll): void {
       });
     return;
   }
-  grantAwardedLootItem(ctx, roll.itemId, winner.pid, roll.windowEligible);
+  grantOrHoldAwardedLoot(ctx, roll.mobId, roll.itemId, winner.pid, roll.windowEligible);
 }
 
 // Whether `pid` is a currently-connected player the loot hub's addItem/resolve
@@ -1046,3 +1021,7 @@ export function pruneCorpseLoot(ctx: SimContext, mob: Entity): void {
     mob.corpseTimer = Math.min(mob.corpseTimer, 4);
   }
 }
+
+// The shared award grant moved to awarded_loot_hold.ts beside the hold that
+// gates it; re-exported so interaction.ts and the tests resolve unchanged.
+export { grantAwardedLootItem };

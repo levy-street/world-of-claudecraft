@@ -1176,6 +1176,9 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // L1: the loot-distribution layer's player-facing loot emits ("You loot ...",
     // "Everyone passed on ...", "<name> wins ...").
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/loot/loot_roll.ts'), 'utf8'),
+    // L2: the awarded-loot hold (a full-bags winner's "waiting on the corpse"
+    // and "mailed to you" loot lines).
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/loot/awarded_loot_hold.ts'), 'utf8'),
     // T1: player target selectors + raid-marker store (the setMarker error literal,
     // byte-identical after the move so its matcher is unchanged).
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/targeting.ts'), 'utf8'),
