@@ -1580,7 +1580,11 @@ export class BagsWindow {
         this.deps.showError(t('hudChrome.mailbox.cannotMail'));
         return;
       case 'mailAttachBlockedBound':
-        this.deps.showError(t('hudChrome.mailbox.cannotMail'));
+        // The specific "bound" reason (mirrors the sim's own noMailBound send-time
+        // refusal), not the generic cannotMail line: this copy is bind-on-trade
+        // or already stamped boundTo, so telling the player it is bound until
+        // traded in person is accurate where "cannot be mailed" reads as final.
+        this.deps.showError(t('hudChrome.mailbox.result.noMailBound'));
         return;
       case 'mailAttach':
         this.deps.stageMailParcel(s.itemId, s.instance);
