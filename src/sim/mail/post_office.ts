@@ -37,6 +37,10 @@ import {
   sanitizeEscrowSlot,
 } from '../item_instance_transfer';
 import { removeVendorSellUnits } from '../items';
+import { isMaterialItemId } from '../material_ids';
+import { rekeyMaterialSignature } from '../material_signatures';
+import { validateMaterialSlotSourcesOnLoad } from '../material_slot_load';
+
 import { WYRMFALL_CORE_ITEM_ID } from '../professions/masterwrought_materials';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -49,6 +53,7 @@ import {
   type MailResultCode,
 } from '../types';
 import { MailIndex } from './mail_index';
+import { planMaterialMailAttachments } from './material_attachment_plan';
 
 const MAIL_RANGE = INTERACT_RANGE + 2; // you must stand at a raven pillar to tend your post
 export const MAIL_POSTAGE = 30; // copper per letter
@@ -489,8 +494,10 @@ export class PostOffice {
           this.result(meta.entityId, 'noMailBound');
           return;
         }
-        instancedWanted.push({ itemId: s.itemId, instance: s.instance });
-      } else {
+        if (!isMaterialItemId(s.itemId)) {
+          instancedWanted.push({ itemId: s.itemId, instance: s.instance });
+        }
+      } else if (!isMaterialItemId(s.itemId)) {
         wanted.set(s.itemId, (wanted.get(s.itemId) ?? 0) + count);
       }
     }
@@ -517,6 +524,23 @@ export class PostOffice {
         return;
       }
     }
+    // Materials plan as one batch on an independent inventory before copper or
+    // goods move. Source signatures are provenance rather than payload
+    // identity, so a plain material request may include premium units that the
+    // legacy signer-needle route already allowed. Sequential scratch planning
+    // also closes the overlap between such a plain request and a legacy signer
+    // needle: a later shortfall refuses the whole letter instead of booking a
+    // partial parcel after the first request consumed its unit.
+    const materialPlan = planMaterialMailAttachments(meta.inventory, items);
+    if (!materialPlan.ok) {
+      if (materialPlan.error === 'invalid-material-state') {
+        throw new Error('invalid material source state in mail attachment planning');
+      }
+      if (materialPlan.error === 'insufficient') {
+        this.result(meta.entityId, 'notEnoughItems');
+      }
+      return;
+    }
     if (meta.copper < coin + MAIL_POSTAGE) {
       this.result(meta.entityId, 'cantAffordPostage');
       return;
@@ -525,32 +549,39 @@ export class PostOffice {
       this.result(meta.entityId, 'recipientBoxFull');
       return;
     }
-    // Escrow: coin and goods leave the sender now, ride with the raven. An
-    // instanced entry escrows the ACTUAL matching copy, whose payload
-    // (removeMatchingInstance's contract, never the wire needle) is what the
-    // letter carries. A plain entry escrows via removeVendorSellUnits (the
-    // trade/market walk) with a `skip` that spares every instanced copy
-    // (matching the countFungibleItem check above, so an instanced copy is
-    // never consumed as a plain stack member), so the escrow reports each
-    // removed unit's plain-stack craftedRecipeId marker (bags.ts
-    // InvSlot.craftedRecipeId): otherwise a mailed crafted item lands at the
-    // recipient with no marker, laundering the disenchant-gate provenance the
-    // same way the trade/market fix closed. A single plain entry can legitimately
-    // span two provenance buckets (the market's boundstone_helm case), so it
-    // splits into one parcel per bucket rather than merging them.
+    // Escrow: coin and goods leave the sender now, ride with the raven.
+    // Materials apply the already-validated batch answer below, so the rows
+    // entering the letter are exactly the source/payload/recipe composition the
+    // preview selected. Non-materials keep the existing equality-needle and
+    // fungible removal paths, including their craftedRecipeId bucket split.
     meta.copper -= coin + MAIL_POSTAGE;
     const parcels: InvSlot[] = [];
-    for (const s of items) {
+    if (materialPlan.value.rowsByAttachment.some((rows) => rows !== null)) {
+      meta.inventory.length = materialPlan.value.inventory.length;
+      for (let i = 0; i < materialPlan.value.inventory.length; i++) {
+        meta.inventory[i] = materialPlan.value.inventory[i];
+      }
+      this.ctx.onInventoryChangedForQuests?.(meta);
+    }
+    for (const [attachmentIndex, s] of items.entries()) {
+      const materialRows = materialPlan.value.rowsByAttachment[attachmentIndex];
+      if (materialRows !== null) {
+        parcels.push(...materialRows);
+        continue;
+      }
       if (s.instance && typeof s.instance === 'object') {
         const escrowed = removeMatchingInstance(this.ctx, s.itemId, s.instance, meta.entityId);
         // The craft marker rides alongside the payload: an instanced parcel can
         // be crafted too (a masterwork proc, an enchanted crafted piece), so it
         // is carried rather than assumed absent on this arm.
-        if (escrowed?.instance)
+        if (escrowed)
           parcels.push({
             itemId: s.itemId,
             count: 1,
-            instance: escrowed.instance,
+            ...(escrowed.instance === undefined ? {} : { instance: escrowed.instance }),
+            ...(escrowed.materialSources === undefined
+              ? {}
+              : { materialSources: escrowed.materialSources }),
             ...(escrowed.craftedRecipeId === undefined
               ? {}
               : { craftedRecipeId: escrowed.craftedRecipeId }),
@@ -649,9 +680,18 @@ export class PostOffice {
           s.count,
           s.instance,
           s.craftedRecipeId,
+          s.materialSources,
         )
       ) {
-        grantCopies(this.ctx, meta.entityId, s.itemId, s.count, s.instance, s.craftedRecipeId);
+        grantCopies(
+          this.ctx,
+          meta.entityId,
+          s.itemId,
+          s.count,
+          s.instance,
+          s.craftedRecipeId,
+          s.materialSources,
+        );
       } else {
         kept.push(s);
       }
@@ -997,6 +1037,7 @@ export class PostOffice {
       // foreign-held, the accepted craftedBy limitation.
       if (m.recipientKey === key) {
         for (const slot of m.items) {
+          if (rekeyMaterialSignature(slot, oldName, newName)) changed = true;
           if (rekeySigner(slot.instance, oldName, newName)) changed = true;
         }
       }
@@ -1165,6 +1206,9 @@ export class PostOffice {
 
   loadMail(save: MailSave | null | undefined): void {
     if (!save) return;
+    for (const letter of save.mail ?? []) {
+      for (const slot of letter?.items ?? []) validateMaterialSlotSourcesOnLoad(slot);
+    }
     const returnedParcels: {
       recipientKey: string;
       recipientName: string;

@@ -5,8 +5,12 @@
 //
 // The claim under test, over any generated sequence of vault ops:
 //
-//   1. CONSERVATION. For every material id, carried(bags) + vault stock +
-//      consumed-by-craft is constant across the run. The consumed term is
+//   1. CONSERVATION. For every material id, carried(bags) + vault holdings +
+//      consumed-by-craft is constant across the run. The vault term spans BOTH
+//      of its stores (the pooled count map and the attribution-bearing rows a
+//      deposit folds pooled units into), through the shared vaultStoredCount:
+//      a pooled-only read would watch a fold move units one field sideways and
+//      report them destroyed. The consumed term is
 //      CLOSED FORM (the recipe's own reagent counts times the number of crafts
 //      that completed), never a tally of what the harness watched leave: the
 //      addPurgeBurn doctrine from the guild file, for the same reason (a tally
@@ -118,6 +122,7 @@ import {
   VAULT_UPGRADE_PRICES,
   VAULT_UPGRADE_STEP,
   vaultMaterialIds,
+  vaultStoredCount,
 } from '../src/sim/materials_vault';
 import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
@@ -514,10 +519,13 @@ function vaultFingerprint(w: World): string {
   const stock = Object.keys(vault.stock)
     .map((key) => `${key}=${String(vault.stock[key])}`)
     .join(',');
+  // The per-unit SOURCE composition is part of the byte-identical probe: a
+  // refusal that left the counts alone but re-attributed a bucket would
+  // otherwise read as "nothing moved".
   const special = vault.special
     .map(
       (slot) =>
-        `${slot.itemId}:${slot.count}:${JSON.stringify(slot.instance ?? null)}:${slot.craftedRecipeId ?? ''}:${slot.slot ?? ''}`,
+        `${slot.itemId}:${slot.count}:${JSON.stringify(slot.instance ?? null)}:${slot.craftedRecipeId ?? ''}:${slot.slot ?? ''}:${JSON.stringify(slot.materialSources ?? null)}`,
     )
     .join('|');
   return `stock{${stock}};special[${special}]`;
@@ -527,9 +535,16 @@ function countCarried(w: World, itemId: string): number {
   return w.sim.countItem(itemId, w.pid);
 }
 
+/** Everything the vault holds under one id, across BOTH of its stores.
+ *
+ *  Not the `stock` map alone. The vault keeps attribution-bearing material in
+ *  `special`, and a deposit that opens or joins such a block FOLDS the compact
+ *  units into it, so a pooled-only read would watch units leave `stock` and
+ *  report them DESTROYED while they sat one field away. The shared
+ *  `vaultStoredCount` is the same sum the deposit gate itself measures headroom
+ *  against, so the oracle and the rule cannot drift. */
 function vaultStock(w: World, itemId: string): number {
-  const stock = metaOf(w.sim, w.pid).vault.stock;
-  return Object.hasOwn(stock, itemId) ? stock[itemId] : 0;
+  return vaultStoredCount(metaOf(w.sim, w.pid).vault, itemId);
 }
 
 function upgradesOf(w: World): number {

@@ -9,7 +9,7 @@ import { join } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import * as bagsMod from '../src/sim/bags';
 import { ITEMS } from '../src/sim/data';
-import { canStackInstancePayloads } from '../src/sim/item_instance_merge';
+import type { MaterialComposition } from '../src/sim/material_sources';
 import * as questCredit from '../src/sim/quests/quest_credit';
 import type { SimContext } from '../src/sim/sim_context';
 import * as tradeMod from '../src/sim/social/trade';
@@ -260,50 +260,44 @@ describe('trade module (direct, no Sim)', () => {
           if (inv[i].itemId === itemId && !inv[i].instance && inv[i].count <= 0) inv.splice(i, 1);
         }
       },
+      // BOTH grant arms delegate to the REAL shared packer (bags.ts addStacked),
+      // which is what the capacity model (fitsAfterSwap) already calls. A fake
+      // that pushed a fresh slot instead was the source of every "expected 16,
+      // got 17" here: production correctly answered "this fits by merging into a
+      // compatible stack" and the fake then refused to merge, so the artifact
+      // was the mock, not the model. Delegating also carries `materialSources`,
+      // which the push-only stub dropped on the floor, silently laundering the
+      // provenance the swap exists to move.
       addItem: (
         itemId: string,
         count: number,
         pid?: number,
-        opts?: { craftedRecipeId?: string },
+        opts?: { craftedRecipeId?: string; materialSources?: MaterialComposition },
       ) => {
-        const inv = players.get(pid!).inventory;
-        const slot: any = { itemId, count };
-        if (opts?.craftedRecipeId !== undefined) slot.craftedRecipeId = opts.craftedRecipeId;
-        inv.push(slot);
+        bagsMod.addStacked(
+          players.get(pid!).inventory,
+          itemId,
+          count,
+          undefined,
+          opts?.craftedRecipeId,
+          opts?.materialSources,
+        );
       },
-      // Merge-aware like the real Sim.addItemInstance (identical-payload
-      // stacking): byte-equal mergeable payloads share a stack up to the
-      // item's REAL cap (stackSizeOf: tools and charms cap at 1, so a charm
-      // copy always takes its own slot); everything else takes a fresh slot.
-      // The crafted marker keys the merge AND lands on the granted slot, the
-      // same two rules the real hub applies, so an instanced copy's crafting
-      // provenance is observable on arrival instead of being washed off by
-      // the fake.
       addItemInstance: (
         itemId: string,
         inst: any,
         pid?: number,
-        _count?: number,
-        opts?: { craftedRecipeId?: string },
+        count?: number,
+        opts?: { craftedRecipeId?: string; materialSources?: MaterialComposition },
       ) => {
-        const inv = players.get(pid!).inventory;
-        const target = inv.find(
-          (s: any) =>
-            s.itemId === itemId &&
-            s.count < bagsMod.stackSizeOf(ITEMS[s.itemId]) &&
-            s.craftedRecipeId === opts?.craftedRecipeId &&
-            canStackInstancePayloads(s.instance, inst),
+        bagsMod.addStacked(
+          players.get(pid!).inventory,
+          itemId,
+          count ?? 1,
+          inst,
+          opts?.craftedRecipeId,
+          opts?.materialSources,
         );
-        if (target) target.count += 1;
-        else
-          inv.push({
-            itemId,
-            count: 1,
-            instance: inst,
-            ...(opts?.craftedRecipeId === undefined
-              ? {}
-              : { craftedRecipeId: opts.craftedRecipeId }),
-          });
       },
       // Per-unit payload returns like the real Sim.removeItem:
       // one entry per unit consumed, cloned while the slot survives.
@@ -331,15 +325,16 @@ describe('trade module (direct, no Sim)', () => {
 
   it('preserves an instanced item payload (enchant/signature/rolled quality) across a swap', () => {
     const instance = { signer: 'Ayla', rolled: { quality: 'epic' } };
-    // pid 1 holds exactly one instanced copy of 'wolf_fang' (no plain copies).
+    // Keep this payload test on a non-material item. Material signers are
+    // canonicalized into materialSources, which is covered by trade_material_sources.test.ts.
     const { ctx, players } = makeInstancedTradeCtx(
-      [{ itemId: 'wolf_fang', count: 1, instance }],
+      [{ itemId: 'baked_bread', count: 1, instance }],
       [],
     );
 
     tradeMod.tradeRequest(ctx, 2, 1);
     tradeMod.tradeAccept(ctx, 2);
-    tradeMod.tradeSetOffer(ctx, [{ itemId: 'wolf_fang', count: 1 }], 0, 1);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'baked_bread', count: 1 }], 0, 1);
     tradeMod.tradeConfirm(ctx, 1);
     tradeMod.tradeConfirm(ctx, 2);
 
@@ -437,15 +432,15 @@ describe('trade module (direct, no Sim)', () => {
     const foreign = { signer: 'Cedric' };
     const { ctx, players } = makeInstancedTradeCtx(
       [
-        { itemId: 'wolf_fang', count: 1, instance: foreign },
-        { itemId: 'wolf_fang', count: 1, instance: selfSigned },
+        { itemId: 'baked_bread', count: 1, instance: foreign },
+        { itemId: 'baked_bread', count: 1, instance: selfSigned },
       ],
       [],
     );
 
     tradeMod.tradeRequest(ctx, 2, 1);
     tradeMod.tradeAccept(ctx, 2);
-    tradeMod.tradeSetOffer(ctx, [{ itemId: 'wolf_fang', count: 1 }], 0, 1);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'baked_bread', count: 1 }], 0, 1);
     tradeMod.tradeConfirm(ctx, 1);
     tradeMod.tradeConfirm(ctx, 2);
 
@@ -559,7 +554,13 @@ describe('trade module (direct, no Sim)', () => {
     expect(body).not.toMatch(/for \(let i = [^;]*inventory\.length - 1/);
     // The arrival is landed unit by unit with the boundTo stamp arm, keyed on
     // payload AND marker (the merge key addStacked really uses).
-    expect(body).toContain('addStacked(scratchOwn, g.itemId, 1, arrival, u.craftedRecipeId)');
+    // The source argument is part of the pin, not incidental: the model must
+    // pack the arriving unit with the SAME composition the grant will, or a
+    // material that fits only by merging into a compatible stack is modelled
+    // as needing a fresh slot (or the reverse), which is the #2139 class.
+    expect(body).toContain(
+      'addStacked(scratchOwn, g.itemId, 1, arrival, u.craftedRecipeId, u.materialSources)',
+    );
     expect(body).toContain('boundTo: meta.entityId');
     // And the LIVE removal consumes the same walk, so the pin above cannot be
     // satisfied by a fork: removeOffer must delegate to shippedOfferUnits.
@@ -585,24 +586,24 @@ describe('trade module (direct, no Sim)', () => {
   it('rejects a trade that would push the receiver over bag capacity via an instanced grant', () => {
     // Reproduces the capacity-gate hole the fitsAfterSwap fix closes: the
     // receiver is already at full (16-slot) capacity, one of those slots is a
-    // partial plain wolf_fang stack. addStacked/countFit would let a receive
+    // partial plain baked_bread stack. addStacked/countFit would let a receive
     // "stack" onto that partial slot, but the real transfer grants an
     // instanced copy via addItemInstance, which never merges and always takes
     // a fresh slot, so the receiver would end up over capacity.
     const instance = { signer: 'Borin' };
     const receiverInv = [
-      { itemId: 'wolf_fang', count: 1 }, // partial plain stack (room to stack, but not a free slot)
+      { itemId: 'baked_bread', count: 1 }, // partial plain stack (room to stack, but not a free slot)
       ...Array.from({ length: 15 }, (_, i) => ({ itemId: `filler_${i}`, count: 1 })),
     ];
     const { ctx, players, events } = makeInstancedTradeCtx(
-      [{ itemId: 'wolf_fang', count: 1, instance }],
+      [{ itemId: 'baked_bread', count: 1, instance }],
       receiverInv,
     );
     expect(players.get(2).inventory).toHaveLength(16);
 
     tradeMod.tradeRequest(ctx, 2, 1);
     tradeMod.tradeAccept(ctx, 2);
-    tradeMod.tradeSetOffer(ctx, [{ itemId: 'wolf_fang', count: 1 }], 0, 1);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'baked_bread', count: 1 }], 0, 1);
     tradeMod.tradeConfirm(ctx, 1);
     tradeMod.tradeConfirm(ctx, 2);
 
@@ -652,15 +653,15 @@ describe('trade module (direct, no Sim)', () => {
     const instance = { signer: 'Ayla' };
     const { ctx, players } = makeInstancedTradeCtx(
       [
-        { itemId: 'wolf_fang', count: 1 },
-        { itemId: 'wolf_fang', count: 1, instance },
+        { itemId: 'baked_bread', count: 1 },
+        { itemId: 'baked_bread', count: 1, instance },
       ],
       [],
     );
 
     tradeMod.tradeRequest(ctx, 2, 1);
     tradeMod.tradeAccept(ctx, 2);
-    tradeMod.tradeSetOffer(ctx, [{ itemId: 'wolf_fang', count: 2 }], 0, 1);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'baked_bread', count: 2 }], 0, 1);
     tradeMod.tradeConfirm(ctx, 1);
     tradeMod.tradeConfirm(ctx, 2);
 
@@ -669,6 +670,7 @@ describe('trade module (direct, no Sim)', () => {
     const plain = players.get(2).inventory.find((s: any) => !s.instance);
     const instanced = players.get(2).inventory.find((s: any) => s.instance);
     expect(plain?.count).toBe(1);
+    expect(instanced?.count).toBe(1);
     expect(instanced?.instance).toEqual(instance);
   });
 
@@ -721,7 +723,12 @@ describe('trade module (direct, no Sim)', () => {
     expect(plain?.itemId).toBe('wolf_fang');
     expect(plain?.count).toBe(1);
     expect(instanced?.itemId).toBe('wolf_fang');
-    expect(instanced?.instance).toEqual(instA);
+    expect(instanced?.instance).toEqual({
+      charges: { lifesteal: 2 },
+      rolled: { stats: { atk: 3 }, masterwork: true },
+      enchant: 'flame_weapon',
+    });
+    expect(instanced?.materialSources).toEqual([{ count: 1, source: { signer: 'Ayla' } }]);
   });
 
   it('swaps same-itemId instances across the trade, not back to their owners', () => {
@@ -746,9 +753,15 @@ describe('trade module (direct, no Sim)', () => {
     tradeMod.tradeConfirm(ctx, 2);
 
     expect(players.get(1).inventory).toHaveLength(1);
-    expect(players.get(1).inventory[0].instance).toEqual(instB);
+    expect(players.get(1).inventory[0].instance).toEqual({ rolled: { masterwork: true } });
+    expect(players.get(1).inventory[0].materialSources).toEqual([
+      { count: 1, source: { signer: 'Borin' } },
+    ]);
     expect(players.get(2).inventory).toHaveLength(1);
-    expect(players.get(2).inventory[0].instance).toEqual(instA);
+    expect(players.get(2).inventory[0].instance).toEqual({ rolled: { masterwork: true } });
+    expect(players.get(2).inventory[0].materialSources).toEqual([
+      { count: 1, source: { signer: 'Ayla' } },
+    ]);
   });
 
   it('routes the instanced copy across when plain copies of the same item flow the other way', () => {
@@ -770,7 +783,10 @@ describe('trade module (direct, no Sim)', () => {
     tradeMod.tradeConfirm(ctx, 2);
 
     expect(players.get(1).inventory).toHaveLength(1);
-    expect(players.get(1).inventory[0].instance).toEqual(instB);
+    expect(players.get(1).inventory[0].instance).toEqual({ enchant: 'flame_weapon' });
+    expect(players.get(1).inventory[0].materialSources).toEqual([
+      { count: 1, source: { signer: 'Borin' } },
+    ]);
     const bPlain = players.get(2).inventory.filter((s: any) => !s.instance);
     expect(bPlain.reduce((n: number, s: any) => n + s.count, 0)).toBe(2);
     expect(players.get(2).inventory.some((s: any) => s.instance)).toBe(false);
@@ -854,23 +870,27 @@ describe('trade module (direct, no Sim)', () => {
     expect(invA.find((s: any) => s.itemId === 'wolf_fang')).toEqual({
       itemId: 'wolf_fang',
       count: 1,
-      instance: { signer: 'Ayla' },
+      materialSources: [{ count: 1, source: { signer: 'Ayla' } }],
     });
     const breadA = invA.filter((s: any) => s.itemId === 'baked_bread');
     expect(breadA).toHaveLength(1);
     expect(breadA[0].count).toBe(2);
     expect(breadA[0].instance).toEqual({ signer: 'Borin' });
 
-    // B receives 2 plain fangs plus 2 signed units merged into their own
-    // byte-equal signed stack (1 + 2 = 3); the bread left entirely.
+    // B receives the exact five-unit composition: two unrecorded units and
+    // three units signed by Ana. Source-aware packing keeps them in one row.
     const invB = players.get(2).inventory;
     expect(invB.some((s: any) => s.itemId === 'baked_bread')).toBe(false);
-    const plainB = invB.find((s: any) => s.itemId === 'wolf_fang' && !s.instance);
-    const signedB = invB.filter((s: any) => s.itemId === 'wolf_fang' && s.instance);
-    expect(plainB?.count).toBe(2);
-    expect(signedB).toHaveLength(1);
-    expect(signedB[0].count).toBe(3);
-    expect(signedB[0].instance).toEqual({ signer: 'Ayla' });
+    expect(invB).toEqual([
+      {
+        itemId: 'wolf_fang',
+        count: 5,
+        materialSources: [
+          { count: 2, source: {} },
+          { count: 3, source: { signer: 'Ayla' } },
+        ],
+      },
+    ]);
 
     // Unit conservation across both sides: 6 fangs and 2 breads, before and after.
     const units = (itemId: string) =>
@@ -900,13 +920,20 @@ describe('trade module (direct, no Sim)', () => {
     const session = tradeMod.tradeFor(ctx, 1);
     const staged = (session!.a === 1 ? session!.offerA : session!.offerB).items;
     expect(staged).toEqual([
-      { itemId: 'wolf_fang', count: 1 },
-      { itemId: 'wolf_fang', count: 1, instance: { signer: 'Ayla' } },
+      {
+        itemId: 'wolf_fang',
+        count: 2,
+        materialSources: [
+          { count: 1, source: {} },
+          { count: 1, source: { signer: 'Ayla' } },
+        ],
+      },
     ]);
     // The staged payload is the preview's own clone, never an alias of the
     // live bag copy: mutating it must not reach the bags.
-    (staged[1].instance as { signer: string }).signer = 'Tampered';
-    expect(players.get(1).inventory[1].instance.signer).toBe('Ayla');
+    const stagedSource = staged[0].materialSources![1] as { source: { signer?: string } };
+    stagedSource.source.signer = 'Tampered';
+    expect(players.get(1).inventory[1].instance?.signer).toBe('Ayla');
   });
 
   it('groups staged units by copy identity, in the selection order', () => {
@@ -925,17 +952,20 @@ describe('trade module (direct, no Sim)', () => {
     // Highest index first: the Borin copy sits above the Ayla stack, and the
     // two identical Ayla units group back into one slot.
     expect(staged).toEqual([
-      { itemId: 'wolf_fang', count: 1, instance: { signer: 'Borin' } },
-      { itemId: 'wolf_fang', count: 2, instance: { signer: 'Ayla' } },
+      {
+        itemId: 'wolf_fang',
+        count: 3,
+        materialSources: [
+          { count: 2, source: { signer: 'Ayla' } },
+          { count: 1, source: { signer: 'Borin' } },
+        ],
+      },
     ]);
   });
 
-  it('falls back to the generic walk when a staged copy left the bags before confirm', () => {
-    // Bags can change between staging and confirm; offerCovered re-validates
-    // the per-id totals, and a missing pinned copy must not fail the trade
-    // (the pre-preview behavior: SOME eligible copy moves). The staged
-    // display was stale for exactly the window the player changed their own
-    // bags, which is the honesty level the gold trade always had.
+  it('refuses a staged material composition that left the bags before confirm', () => {
+    // A source-aware pin cannot fall back to another source bucket: doing so
+    // would launder the provenance the counterparty accepted.
     const { ctx, players, events } = makeInstancedTradeCtx(
       [
         { itemId: 'wolf_fang', count: 1 },
@@ -955,12 +985,16 @@ describe('trade module (direct, no Sim)', () => {
     );
     tradeMod.tradeConfirm(ctx, 1);
     tradeMod.tradeConfirm(ctx, 2);
-    expect(events.some((e: any) => e.type === 'error')).toBe(false);
-    // The signed copy crossed instead of the vanished plain one.
-    expect(players.get(2).inventory).toEqual([
+    expect(events.filter((e: any) => e.type === 'error')).toHaveLength(2);
+    expect(
+      events
+        .filter((e: any) => e.type === 'error')
+        .every((e: any) => e.text === 'Trade failed: items or money no longer available.'),
+    ).toBe(true);
+    expect(players.get(2).inventory).toEqual([]);
+    expect(players.get(1).inventory).toEqual([
       { itemId: 'wolf_fang', count: 1, instance: { signer: 'Ayla' } },
     ]);
-    expect(players.get(1).inventory.filter((s: any) => s.itemId === 'wolf_fang')).toHaveLength(0);
   });
 
   it('ships the PINNED signed copy when a plain twin lands in the bags before confirm', () => {
@@ -982,7 +1016,14 @@ describe('trade module (direct, no Sim)', () => {
     expect(
       (session!.a === 1 ? session!.offerA : session!.offerB).items,
       'the preview pinned the signed copy',
-    ).toEqual([{ itemId: 'wolf_fang', count: 1, instance: signed }]);
+    ).toEqual([
+      {
+        itemId: 'wolf_fang',
+        count: 1,
+        instance: { rolled: { quality: 'epic' } },
+        materialSources: [{ count: 1, source: { signer: 'Ayla' } }],
+      },
+    ]);
     // A loot drop lands a plain copy of the same id above it, in the window
     // between staging and confirm.
     players.get(1).inventory.push({ itemId: 'wolf_fang', count: 1 });
@@ -991,7 +1032,14 @@ describe('trade module (direct, no Sim)', () => {
     tradeMod.tradeConfirm(ctx, 2);
 
     expect(events.some((e) => e.type === 'error')).toBe(false);
-    expect(players.get(2).inventory).toEqual([{ itemId: 'wolf_fang', count: 1, instance: signed }]);
+    expect(players.get(2).inventory).toEqual([
+      {
+        itemId: 'wolf_fang',
+        count: 1,
+        instance: { rolled: { quality: 'epic' } },
+        materialSources: [{ count: 1, source: { signer: 'Ayla' } }],
+      },
+    ]);
     expect(players.get(1).inventory, 'the newcomer stayed home').toEqual([
       { itemId: 'wolf_fang', count: 1 },
     ]);
@@ -1024,7 +1072,12 @@ describe('trade module (direct, no Sim)', () => {
     tradeMod.tradeSetOffer(ctx, [{ itemId: 'wolf_fang', count: 1 }], 0, 1);
     const session = tradeMod.tradeFor(ctx, 1);
     expect((session!.a === 1 ? session!.offerA : session!.offerB).items).toEqual([
-      { itemId: 'wolf_fang', count: 1, instance: staged },
+      {
+        itemId: 'wolf_fang',
+        count: 1,
+        instance: { rolled: { quality: 'epic' } },
+        materialSources: [{ count: 1, source: { signer: 'Ayla' } }],
+      },
     ]);
     // Borin confirms what he saw; Ayla's copy is then Perfected under the
     // open window (the live payload object is what a sim-side stamp mutates).
@@ -1080,7 +1133,8 @@ describe('trade module (direct, no Sim)', () => {
       {
         itemId: 'wolf_fang',
         count: 1,
-        instance: { signer: 'Ayla', rolled: { quality: 'epic' }, perfected: true },
+        instance: { rolled: { quality: 'epic' }, perfected: true },
+        materialSources: [{ count: 1, source: { signer: 'Ayla' } }],
       },
     ]);
     expect(players.get(1).inventory).toEqual([]);
@@ -1150,7 +1204,11 @@ describe('trade module (direct, no Sim)', () => {
       'the bread arrived in the slot the give freed',
     ).toBe(true);
     expect(players.get(2).inventory, 'the pinned signed copy crossed, not a plain unit').toEqual([
-      { itemId: 'wolf_fang', count: 1, instance: signedA },
+      {
+        itemId: 'wolf_fang',
+        count: 1,
+        materialSources: [{ count: 1, source: { signer: 'Ayla' } }],
+      },
     ]);
     expect(
       players
@@ -1185,7 +1243,12 @@ describe('trade module (direct, no Sim)', () => {
     tradeMod.tradeSetOffer(ctx, [{ itemId: 'wolf_fang', count: 1 }], 0, 1);
     const session = tradeMod.tradeFor(ctx, 1);
     expect((session!.a === 1 ? session!.offerA : session!.offerB).items).toEqual([
-      { itemId: 'wolf_fang', count: 1, instance: payload, craftedRecipeId: 'recipe_fang' },
+      {
+        itemId: 'wolf_fang',
+        count: 1,
+        materialSources: [{ count: 1, source: { signer: 'Ayla' } }],
+        craftedRecipeId: 'recipe_fang',
+      },
     ]);
     // The twin arrives at the HIGHER index, which is exactly where a
     // marker-blind walk looks first.
@@ -1196,7 +1259,12 @@ describe('trade module (direct, no Sim)', () => {
 
     expect(events.some((e) => e.type === 'error')).toBe(false);
     expect(players.get(2).inventory).toEqual([
-      { itemId: 'wolf_fang', count: 1, instance: payload, craftedRecipeId: 'recipe_fang' },
+      {
+        itemId: 'wolf_fang',
+        count: 1,
+        materialSources: [{ count: 1, source: { signer: 'Ayla' } }],
+        craftedRecipeId: 'recipe_fang',
+      },
     ]);
     expect(players.get(1).inventory).toEqual([
       { itemId: 'wolf_fang', count: 1, instance: payload },
@@ -1219,7 +1287,13 @@ describe('trade module (direct, no Sim)', () => {
     tradeMod.tradeSetOffer(ctx, [{ itemId: 'wolf_fang', count: 1 }], 0, 1);
     const session = tradeMod.tradeFor(ctx, 1);
     const staged = (session!.a === 1 ? session!.offerA : session!.offerB).items;
-    expect(staged).toEqual([{ itemId: 'wolf_fang', count: 1, instance: payload }]);
+    expect(staged).toEqual([
+      {
+        itemId: 'wolf_fang',
+        count: 1,
+        materialSources: [{ count: 1, source: { signer: 'Ayla' } }],
+      },
+    ]);
     expect(staged[0].craftedRecipeId).toBeUndefined();
     players.get(1).inventory.push({
       itemId: 'wolf_fang',
@@ -1233,7 +1307,11 @@ describe('trade module (direct, no Sim)', () => {
 
     expect(events.some((e) => e.type === 'error')).toBe(false);
     expect(players.get(2).inventory).toEqual([
-      { itemId: 'wolf_fang', count: 1, instance: payload },
+      {
+        itemId: 'wolf_fang',
+        count: 1,
+        materialSources: [{ count: 1, source: { signer: 'Ayla' } }],
+      },
     ]);
     expect(players.get(2).inventory[0].craftedRecipeId, 'no provenance was forged').toBeUndefined();
     expect(players.get(1).inventory).toEqual([
@@ -1265,7 +1343,8 @@ describe('trade module (direct, no Sim)', () => {
     expect(players.get(2).inventory).toHaveLength(16);
     const merged = players.get(2).inventory.find((s: any) => s.itemId === 'wolf_fang');
     expect(merged.count).toBe(2);
-    expect(merged.instance).toEqual({ signer: 'Ayla' });
+    expect(merged.instance).toBeUndefined();
+    expect(merged.materialSources).toEqual([{ count: 2, source: { signer: 'Ayla' } }]);
   });
 
   it('still refuses at full capacity when the byte-equal twin bears charges (never merged)', () => {
@@ -1296,11 +1375,11 @@ describe('trade module (direct, no Sim)', () => {
     // slots, and a per-slot capacity pass re-counted the same giver stock
     // (two slots of one id each claimed the single plain unit, the model
     // predicted one arrival slot where the grant needs two, and the receiver
-    // overflowed past the gate). One plain plus one signed fang need TWO
+    // overflowed past the gate). One plain plus one instanced bread need TWO
     // receiver slots; with one free slot the trade must refuse.
     const giver = [
-      { itemId: 'wolf_fang', count: 1 },
-      { itemId: 'wolf_fang', count: 1, instance: { signer: 'Ayla' } },
+      { itemId: 'baked_bread', count: 1 },
+      { itemId: 'baked_bread', count: 1, instance: { signer: 'Ayla' } },
     ];
     const receiverFull = Array.from({ length: 15 }, (_, i) => ({
       itemId: `filler_${i}`,
@@ -1312,7 +1391,7 @@ describe('trade module (direct, no Sim)', () => {
       ]);
       tradeMod.tradeRequest(ctx, 2, 1);
       tradeMod.tradeAccept(ctx, 2);
-      tradeMod.tradeSetOffer(ctx, [{ itemId: 'wolf_fang', count: 2 }], 0, 1);
+      tradeMod.tradeSetOffer(ctx, [{ itemId: 'baked_bread', count: 2 }], 0, 1);
       tradeMod.tradeConfirm(ctx, 1);
       tradeMod.tradeConfirm(ctx, 2);
       expect(events.some((e) => e.type === 'error' && /not enough bag space/.test(e.text))).toBe(
@@ -1329,7 +1408,7 @@ describe('trade module (direct, no Sim)', () => {
       );
       tradeMod.tradeRequest(ctx, 2, 1);
       tradeMod.tradeAccept(ctx, 2);
-      tradeMod.tradeSetOffer(ctx, [{ itemId: 'wolf_fang', count: 2 }], 0, 1);
+      tradeMod.tradeSetOffer(ctx, [{ itemId: 'baked_bread', count: 2 }], 0, 1);
       tradeMod.tradeConfirm(ctx, 1);
       tradeMod.tradeConfirm(ctx, 2);
       expect(events.some((e) => e.type === 'error')).toBe(false);
@@ -1369,7 +1448,9 @@ describe('trade module (direct, no Sim)', () => {
     expect(fired, 'staging is a preview, not an inventory change').toBe(0);
     tradeMod.tradeConfirm(ctx, 1);
     tradeMod.tradeConfirm(ctx, 2);
-    expect(players.get(2).inventory).toHaveLength(3);
+    // The two material fangs coalesce into one source-aware block alongside
+    // the bread, while the transfer still fires the quest hook once.
+    expect(players.get(2).inventory).toHaveLength(2);
     expect(fired, 'one batch fire for two ids across three staged slots').toBe(1);
   });
 

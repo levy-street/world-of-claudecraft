@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { HEAVY_SELF_CMDS } from '../server/heavy_self';
+import { dispatchInventoryGroupingCommand } from '../server/material_stack_wire';
 import { stackSizeOf } from '../src/sim/bags';
 // Aliased: this file declares a small synthetic table for the ladder arms; the
 // real merged catalog drives the whole-catalog and grade-family arms.
@@ -247,7 +248,10 @@ describe('consolidateBagStacks', () => {
   it('tops up the earliest partial stack and splices emptied donors', () => {
     const inv = [slot('copper_ore', 15), slot('blade'), slot('copper_ore', 5)];
     consolidateBagStacks(inv, lookup, cap);
-    expect(inv).toEqual([slot('copper_ore', 20), slot('blade')]);
+    expect(inv).toEqual([
+      slot('copper_ore', 20, { materialSources: [{ source: {}, count: 20 }] }),
+      slot('blade'),
+    ]);
   });
 
   it('leaves a remainder stack when the total exceeds one cap', () => {
@@ -256,7 +260,7 @@ describe('consolidateBagStacks', () => {
     expect(inv.map((s) => s.count)).toEqual([20, 5]);
   });
 
-  it('never merges a plain stack with an instanced copy, in either direction', () => {
+  it('merges plain and legacy signed material while preserving the exact quantities', () => {
     const inv = [
       slot('copper_ore', 5),
       slot('copper_ore', 5, { instance: { signer: 'Aldric' } }),
@@ -264,12 +268,16 @@ describe('consolidateBagStacks', () => {
     ];
     consolidateBagStacks(inv, lookup, cap);
     expect(inv).toEqual([
-      slot('copper_ore', 10),
-      slot('copper_ore', 5, { instance: { signer: 'Aldric' } }),
+      slot('copper_ore', 15, {
+        materialSources: [
+          { source: {}, count: 10 },
+          { source: { signer: 'Aldric' }, count: 5 },
+        ],
+      }),
     ]);
   });
 
-  it('merges byte-equal instanced payloads and keeps distinct payloads apart', () => {
+  it('combines different legacy signatures with exact surviving bucket counts', () => {
     const inv = [
       slot('copper_ore', 5, { instance: { signer: 'Aldric' } }),
       slot('copper_ore', 5, { instance: { signer: 'Brenna' } }),
@@ -277,8 +285,12 @@ describe('consolidateBagStacks', () => {
     ];
     consolidateBagStacks(inv, lookup, cap);
     expect(inv).toEqual([
-      slot('copper_ore', 10, { instance: { signer: 'Aldric' } }),
-      slot('copper_ore', 5, { instance: { signer: 'Brenna' } }),
+      slot('copper_ore', 15, {
+        materialSources: [
+          { source: { signer: 'Aldric' }, count: 10 },
+          { source: { signer: 'Brenna' }, count: 5 },
+        ],
+      }),
     ]);
   });
 
@@ -296,7 +308,13 @@ describe('consolidateBagStacks', () => {
       slot('copper_ore', 5, { craftedRecipeId: 'r1' }),
     ];
     consolidateBagStacks(inv, lookup, cap);
-    expect(inv).toEqual([slot('copper_ore', 10, { craftedRecipeId: 'r1' }), slot('copper_ore', 5)]);
+    expect(inv).toEqual([
+      slot('copper_ore', 10, {
+        craftedRecipeId: 'r1',
+        materialSources: [{ source: {}, count: 10 }],
+      }),
+      slot('copper_ore', 5, { materialSources: [{ source: {}, count: 5 }] }),
+    ]);
   });
 
   it('lets a legacy overstacked entry donate without ever being split', () => {
@@ -309,7 +327,10 @@ describe('consolidateBagStacks', () => {
     const inv = [slot('copper_ore', 10), slot('copper_ore', -3), slot('copper_ore', 4)];
     consolidateBagStacks(inv, lookup, cap);
     // The corrupt entry neither donates nor vanishes; the honest stacks merge.
-    expect(inv).toEqual([slot('copper_ore', 14), slot('copper_ore', -3)]);
+    expect(inv).toEqual([
+      slot('copper_ore', 14, { materialSources: [{ source: {}, count: 14 }] }),
+      slot('copper_ore', -3),
+    ]);
   });
 
   it('never lets a corrupt non-positive count ABSORB honest units either', () => {
@@ -317,7 +338,10 @@ describe('consolidateBagStacks', () => {
     // deficit leaves 7 and silently destroys three real items.
     const inv = [slot('copper_ore', -3), slot('copper_ore', 10)];
     consolidateBagStacks(inv, lookup, cap);
-    expect(inv).toEqual([slot('copper_ore', -3), slot('copper_ore', 10)]);
+    expect(inv).toEqual([
+      slot('copper_ore', -3),
+      slot('copper_ore', 10, { materialSources: [{ source: {}, count: 10 }] }),
+    ]);
   });
 
   it('treats a non-integer count as corrupt on both sides (never donates, never absorbs)', () => {
@@ -326,15 +350,22 @@ describe('consolidateBagStacks', () => {
     // the honest stacks around it still merge.
     const inv = [slot('copper_ore', 2.5), slot('copper_ore', 10), slot('copper_ore', 4)];
     consolidateBagStacks(inv, lookup, cap);
-    expect(inv).toEqual([slot('copper_ore', 2.5), slot('copper_ore', 14)]);
+    expect(inv).toEqual([
+      slot('copper_ore', 2.5),
+      slot('copper_ore', 14, { materialSources: [{ source: {}, count: 14 }] }),
+    ]);
   });
 
-  it('never merges an instanced target into a later plain donor (the other direction)', () => {
+  it('merges a legacy signed target with a later plain donor', () => {
     const inv = [slot('copper_ore', 5, { instance: { signer: 'Aldric' } }), slot('copper_ore', 5)];
     consolidateBagStacks(inv, lookup, cap);
     expect(inv).toEqual([
-      slot('copper_ore', 5, { instance: { signer: 'Aldric' } }),
-      slot('copper_ore', 5),
+      slot('copper_ore', 10, {
+        materialSources: [
+          { source: {}, count: 5 },
+          { source: { signer: 'Aldric' }, count: 5 },
+        ],
+      }),
     ]);
   });
 
@@ -775,6 +806,20 @@ describe('server wiring for inv_sort (source pins)', () => {
     const start = gameSource.indexOf("case 'inv_sort':");
     expect(start).toBeGreaterThanOrEqual(0);
     const body = gameSource.slice(start, gameSource.indexOf('break;', start));
-    expect(body).toContain('sim.sortInventory(pid)');
+    expect(body).toContain('dispatchInventoryGroupingCommand(sim, pid, msg)');
+    const calls: (number | undefined)[] = [];
+    dispatchInventoryGroupingCommand(
+      {
+        sortInventory: (pid) => {
+          calls.push(pid);
+        },
+        moveInventoryItem: () => {},
+        separateMaterialStack: () => {},
+        combineMaterialStacks: () => {},
+      },
+      7,
+      { cmd: 'inv_sort' },
+    );
+    expect(calls).toEqual([7]);
   });
 });

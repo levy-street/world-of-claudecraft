@@ -16,6 +16,7 @@
 // src/sim-pure: no DOM/Three/render-ui-game-net imports, no rng, no clock
 // (enforced by tests/architecture.test.ts). Pure bookkeeping, zero draws.
 
+import { rekeyMaterialSignature } from './material_signatures';
 import type { CharacterState } from './sim';
 import type { ItemInstancePayload } from './types';
 
@@ -60,9 +61,16 @@ export function rekeyInstanceSigner(
 ): boolean {
   let changed = false;
   for (const slot of state.inventory ?? []) {
+    if (rekeyMaterialSignature(slot, oldName, newName)) changed = true;
     if (rekeySigner(slot.instance, oldName, newName)) changed = true;
   }
   for (const slot of state.bank?.inventory ?? []) {
+    if (rekeyMaterialSignature(slot, oldName, newName)) changed = true;
+    if (rekeySigner(slot.instance, oldName, newName)) changed = true;
+  }
+  // Vault-held signatures belong to the same owner; attribution snapshots stay historical.
+  for (const slot of state.vault?.special ?? []) {
+    if (rekeyMaterialSignature(slot, oldName, newName)) changed = true;
     if (rekeySigner(slot.instance, oldName, newName)) changed = true;
   }
   // The buyback ring is the fifth signer-bearing blob region (the
@@ -72,6 +80,7 @@ export function rekeyInstanceSigner(
   // longer answers to its owner (and after a reclaim, one naming a
   // stranger).
   for (const slot of state.vendorBuyback ?? []) {
+    if (rekeyMaterialSignature(slot, oldName, newName)) changed = true;
     if (rekeySigner(slot.instance, oldName, newName)) changed = true;
   }
   // BOTH equipment-map spellings: the loader still reads the legacy plural

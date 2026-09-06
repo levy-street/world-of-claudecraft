@@ -8,6 +8,7 @@ import type {
   MarketSubtypeFilter,
 } from '../sim/market_query';
 import type { MarketSaleRecord } from '../sim/market_sale_log';
+import type { MaterialComposition } from '../sim/material_sources';
 import type { InvSlot, ItemInstancePayload } from '../sim/types';
 
 // ---------------------------------------------------------------------------
@@ -28,6 +29,7 @@ export interface MarketListingView {
    *  allowlist (signer/enchant/rolled; never boundTo/bindOnTrade/charges): the
    *  tooltip's enchant line and maker's mark. Absent on plain listings. */
   instance?: ItemInstancePayload;
+  materialSources?: MaterialComposition;
 }
 
 export interface MarketInfo {

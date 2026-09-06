@@ -164,6 +164,8 @@ export const IWORLD_MEMBERS = [
   { name: 'equipItemToSlot', kind: 'method' },
   { name: 'moveInventoryItem', kind: 'method' },
   { name: 'sortInventory', kind: 'method' },
+  { name: 'separateMaterialStack', kind: 'method' },
+  { name: 'combineMaterialStacks', kind: 'method' },
   { name: 'unequipItem', kind: 'method' },
   { name: 'useItem', kind: 'method' },
   { name: 'discardItem', kind: 'method' },
@@ -778,10 +780,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // (six data, two method; no overlap, no kind flips): 354 members, 97
     // data, 257 method. Set from a suite run on the merged tree, never by
     // arithmetic in the diff. This cleanup removes that retired ferry method:
-    // 353 members, 97 data, 256 methods.
-    expect(IWORLD_MEMBERS.length).toBe(353);
+    // Material grouping adds two inventory methods: 355 members, 97 data, 258 methods.
+    expect(IWORLD_MEMBERS.length).toBe(355);
     expect(DATA_MEMBERS.length).toBe(97);
-    expect(METHOD_MEMBERS.length).toBe(256);
+    expect(METHOD_MEMBERS.length).toBe(258);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -861,6 +863,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'claimEventSkin',
       'clearMarker',
       'collectDelveChestLoot',
+      'combineMaterialStacks',
       'commissionOrders',
       'companionState',
       'companionUpgrade',
@@ -1082,6 +1085,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'selectTalentRow',
       'sellAllJunk',
       'sellItem',
+      'separateMaterialStack',
       'setActiveBorder',
       'setActiveTitle',
       'setDungeonDifficulty',
@@ -1296,6 +1300,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'claimEventSkin',
       'clearMarker',
       'collectDelveChestLoot',
+      'combineMaterialStacks',
       'companionUpgrade',
       'consumeFeast',
       'convertHusks',
@@ -1458,6 +1463,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'selectTalentRow',
       'sellAllJunk',
       'sellItem',
+      'separateMaterialStack',
       'setActiveBorder',
       'setActiveTitle',
       'setDungeonDifficulty',
@@ -1678,6 +1684,8 @@ const FACET_INVENTORY = [
   'equipItemToSlot',
   'moveInventoryItem',
   'sortInventory',
+  'separateMaterialStack',
+  'combineMaterialStacks',
   'unequipItem',
   'useItem',
   'discardItem',
@@ -2228,8 +2236,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(353);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(353);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(355);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(355);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

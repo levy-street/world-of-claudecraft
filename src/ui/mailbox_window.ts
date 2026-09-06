@@ -15,6 +15,7 @@ import { audio } from '../game/audio';
 import { ITEMS } from '../sim/data';
 import { itemInstancePayloadsEqual } from '../sim/item_instance_merge';
 import { isTransferLockedInstance } from '../sim/item_instance_transfer';
+import type { MaterialComposition } from '../sim/material_sources';
 import type { InvSlot, ItemInstancePayload } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { markDialogRoot } from './dialog_root';
@@ -23,6 +24,11 @@ import { esc } from './esc';
 import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
 import { captureFormDraft, restoreFormDraft } from './form_draft';
 import { formatMoney, formatNumber, t } from './i18n';
+import {
+  appendableMailParcelCount,
+  mailParcelCountCeiling,
+  plannedMailParcelSources,
+} from './mail_parcel_sources_view';
 import {
   buildMailboxView,
   canStageInstancedCopy,
@@ -36,6 +42,13 @@ import {
   recipientSuggestions,
   wrappedSuggestionIndex,
 } from './mailbox_view';
+import {
+  appendMaterialSourcesActionAfter,
+  attachMaterialSourcesContextMenu,
+  closeMaterialSourcesDialogForOwner,
+  type MaterialSourcesDialogOpener,
+} from './material_sources_dialog';
+import { materialSourcesForDisplay } from './material_sources_view';
 import type { PainterHostPresentation } from './painter_host';
 import { svgIcon } from './ui_icons';
 import { wornItemCellParts } from './worn_item_cell_view';
@@ -110,12 +123,14 @@ export class MailboxWindow {
 
   close(): void {
     if (!this.opened) return;
+    const root = this.deps.root();
+    closeMaterialSourcesDialogForOwner(root);
     window.clearTimeout(this.recipientSuggestTimer);
     this.recipientSuggest = { items: [], index: -1 };
     this.opened = false;
     this.openedId = null;
     this.attachments = [];
-    this.deps.root().style.display = 'none';
+    root.style.display = 'none';
     this.deps.hideTooltip();
     this.deps.syncBags(false);
     this.deps.restoreFocus(this.openerFocus);
@@ -138,21 +153,26 @@ export class MailboxWindow {
       );
       return;
     }
+    const materialCount = appendableMailParcelCount(
+      this.deps.world().inventory,
+      this.attachments,
+      itemId,
+      instance,
+    );
     if (instance) {
-      // One chip per COPY, not per distinct payload: byte-equal copies are
-      // interchangeable and the sim escrows each named entry separately, so a
-      // player holding several identical signed copies can send several in one
-      // letter (bounded by what they hold unlocked and by the parcel limit
-      // above). Differently-instanced copies of one item id each get their own
-      // chip as before.
+      // Material payloads can be reconstructed from source descriptors, so the
+      // shared planner decides how many matching units remain after earlier
+      // chips. Other items retain the established byte-equal copy rule.
       if (
-        !canStageInstancedCopy(
-          this.attachments,
-          itemId,
-          instance,
-          this.ownedInstancedCountFor(itemId, instance),
-          max,
-        )
+        materialCount !== null
+          ? materialCount < 1
+          : !canStageInstancedCopy(
+              this.attachments,
+              itemId,
+              instance,
+              this.ownedInstancedCountFor(itemId, instance),
+              max,
+            )
       )
         return;
       this.attachments.push({ itemId, count: 1, instance });
@@ -161,7 +181,7 @@ export class MailboxWindow {
       return;
     }
     if (this.attachments.some((s) => s.itemId === itemId && !s.instance)) return;
-    const count = this.ownedCountFor(itemId);
+    const count = materialCount ?? this.ownedCountFor(itemId);
     if (count < 1) return;
     this.attachments.push({ itemId, count });
     audio.click();
@@ -206,11 +226,20 @@ export class MailboxWindow {
       .reduce((n, s) => n + s.count, 0);
   }
 
+  private parcelCountCeiling(index: number): number {
+    const slot = this.attachments[index];
+    if (slot === undefined) return 0;
+    return (
+      mailParcelCountCeiling(this.deps.world().inventory, this.attachments, index) ??
+      this.ownedCountFor(slot.itemId)
+    );
+  }
+
   /** Nudge a staged parcel's quantity from the +/- stepper (#1444). */
-  private adjustParcelQty(itemId: string, delta: number): void {
-    const slot = this.attachments.find((s) => s.itemId === itemId && !s.instance);
-    if (!slot) return;
-    const next = clampParcelQty(slot.count, delta, this.ownedCountFor(itemId));
+  private adjustParcelQty(index: number, delta: number): void {
+    const slot = this.attachments[index];
+    if (!slot || slot.instance) return;
+    const next = clampParcelQty(slot.count, delta, this.parcelCountCeiling(index));
     if (next === slot.count) return;
     slot.count = next;
     audio.click();
@@ -220,10 +249,10 @@ export class MailboxWindow {
   /** Commit a TYPED parcel quantity (the chip input's change event). Always
    *  repaints, even when the count is unchanged, so a normalized-away entry
    *  ("007", "", "999" over stock) snaps the field back to the real value. */
-  private setParcelQty(itemId: string, raw: string): void {
-    const slot = this.attachments.find((s) => s.itemId === itemId && !s.instance);
-    if (!slot) return;
-    const next = parseParcelQty(raw, this.ownedCountFor(itemId), slot.count);
+  private setParcelQty(index: number, raw: string): void {
+    const slot = this.attachments[index];
+    if (!slot || slot.instance) return;
+    const next = parseParcelQty(raw, this.parcelCountCeiling(index), slot.count);
     if (next !== slot.count) {
       slot.count = next;
       audio.click();
@@ -473,6 +502,8 @@ export class MailboxWindow {
         const item = ITEMS[slot.itemId];
         const chip = document.createElement('span');
         chip.className = 'mail-attachment-item';
+        let displayedName = slot.itemId;
+        let displayedSources: MaterialComposition | undefined;
         if (item) {
           // The chip describes the attached COPY (the all-surfaces item-cell
           // rule, worn_item_cell_view.ts): a legacy legendary-rolled copy is
@@ -481,11 +512,29 @@ export class MailboxWindow {
           const stack =
             slot.count > 1 ? ` x${formatNumber(slot.count, { maximumFractionDigits: 0 })}` : '';
           chip.innerHTML = `${this.deps.itemIcon(item, cell.quality)}<span style="color:${cell.color}">${esc(cell.name)}${esc(stack)}</span>`;
-          this.deps.attachTooltip(chip, () => this.deps.itemTooltip(item, slot.instance));
+          // An attached material stack keeps its contributors on the way
+          // through the post: the letter's slot IS the stack.
+          displayedName = cell.name;
+          displayedSources = materialSourcesForDisplay(slot);
+          this.deps.attachTooltip(chip, () =>
+            this.deps.itemTooltip(item, slot.instance, displayedSources),
+          );
+          attachMaterialSourcesContextMenu(
+            chip,
+            cell.name,
+            displayedSources,
+            this.deps.openMaterialSources,
+          );
         } else {
           chip.textContent = slot.itemId;
         }
         attachmentsRow.appendChild(chip);
+        appendMaterialSourcesActionAfter(
+          chip,
+          displayedName,
+          displayedSources,
+          this.deps.openMaterialSources,
+        );
       }
     }
     const actions = body.querySelector<HTMLElement>('#mail-actions');
@@ -730,6 +779,28 @@ export class MailboxWindow {
     }
   }
 
+  private currentParcelSources(index: number): MaterialComposition | undefined {
+    return plannedMailParcelSources(this.deps.world().inventory, this.attachments)?.[index];
+  }
+
+  private attachParcelSourceDetails(
+    element: HTMLElement,
+    itemName: string,
+    index: number,
+    displayedSources: MaterialComposition | undefined,
+  ): void {
+    const open = this.deps.openMaterialSources;
+    if (displayedSources === undefined || displayedSources.length === 0 || open === undefined)
+      return;
+    const openCurrent: MaterialSourcesDialogOpener = (options) => {
+      const sources = this.currentParcelSources(index);
+      if (sources === undefined || sources.length === 0) return;
+      open({ ...options, sources });
+    };
+    attachMaterialSourcesContextMenu(element, itemName, displayedSources, openCurrent);
+    appendMaterialSourcesActionAfter(element, itemName, displayedSources, openCurrent);
+  }
+
   private renderParcels(): void {
     const parcels = this.deps.root().querySelector<HTMLElement>('#mail-parcels');
     if (!parcels) return;
@@ -740,6 +811,10 @@ export class MailboxWindow {
     // container passed is the PARCEL LIST, not the window root, so focus
     // sitting anywhere else in the mailbox is correctly left alone.
     const focusKey = captureFocusKey(parcels);
+    const displayedSourcePlan = plannedMailParcelSources(
+      this.deps.world().inventory,
+      this.attachments,
+    );
     parcels.innerHTML = '';
     if (this.attachments.length === 0) {
       const hint = document.createElement('span');
@@ -777,9 +852,13 @@ export class MailboxWindow {
       // is a focusin listener on this exact element.
       name.tabIndex = 0;
       name.innerHTML = `${this.deps.itemIcon(item, cell.quality)}<span style="color:${cell.color}">${esc(cell.name)}</span>`;
-      this.deps.attachTooltip(name, () => this.deps.itemTooltip(item, slot.instance));
+      const displayedSources = displayedSourcePlan?.[chipIdx];
+      this.deps.attachTooltip(name, () =>
+        this.deps.itemTooltip(item, slot.instance, this.currentParcelSources(chipIdx)),
+      );
       chip.appendChild(name);
-      const owned = this.ownedCountFor(slot.itemId);
+      this.attachParcelSourceDetails(name, cell.name, chipIdx, displayedSources);
+      const owned = this.parcelCountCeiling(chipIdx);
       const controls: {
         minus?: HTMLButtonElement;
         plus?: HTMLButtonElement;
@@ -801,7 +880,7 @@ export class MailboxWindow {
             item: cell.name,
           }),
         );
-        minus.addEventListener('click', () => this.adjustParcelQty(slot.itemId, -1));
+        minus.addEventListener('click', () => this.adjustParcelQty(chipIdx, -1));
         // Typeable quantity (was a read-only span): validated on change/blur,
         // never per keystroke, so typing is not interrupted by the repaint.
         // Purely client UX: the sim's post office re-validates every send
@@ -831,7 +910,7 @@ export class MailboxWindow {
           qty.select();
           qty.addEventListener('mouseup', (e) => e.preventDefault(), { once: true });
         });
-        qty.addEventListener('change', () => this.setParcelQty(slot.itemId, qty.value));
+        qty.addEventListener('change', () => this.setParcelQty(chipIdx, qty.value));
         qty.addEventListener('keydown', (ke) => {
           if (ke.key === 'Enter') {
             ke.preventDefault();
@@ -850,7 +929,7 @@ export class MailboxWindow {
             item: cell.name,
           }),
         );
-        plus.addEventListener('click', () => this.adjustParcelQty(slot.itemId, 1));
+        plus.addEventListener('click', () => this.adjustParcelQty(chipIdx, 1));
         step.append(minus, qty, plus);
         chip.appendChild(step);
         controls.minus = minus;

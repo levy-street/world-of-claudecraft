@@ -81,10 +81,19 @@ export function grantTradableCopyImpl(
       slot.count,
       slot.instance,
       slot.craftedRecipeId,
+      slot.materialSources,
     )
   ) {
     return false;
   }
-  grantCopies(ctx, meta.entityId, slot.itemId, slot.count, slot.instance, slot.craftedRecipeId);
+  grantCopies(
+    ctx,
+    meta.entityId,
+    slot.itemId,
+    slot.count,
+    slot.instance,
+    slot.craftedRecipeId,
+    slot.materialSources,
+  );
   return true;
 }

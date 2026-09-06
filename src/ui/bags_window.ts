@@ -24,6 +24,7 @@ import { FIREBOTTLE_COOLDOWN_SECS, FIREBOTTLE_ITEM_ID } from '../sim/interaction
 import { baggedCopyAnchor } from '../sim/item_copy_anchor';
 import { itemCopyPin, type NamedSlotTarget } from '../sim/item_copy_ref';
 import { isItemLocked } from '../sim/item_lock';
+import type { MaterialComposition } from '../sim/material_sources';
 import { vaultMaterialIds } from '../sim/materials_vault';
 import type { EquipSlot, InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import type { IWorld } from '../world_api';
@@ -95,6 +96,16 @@ import {
   UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS,
 } from './item_instance_glyph_mark';
 import { knownItemDef } from './known_item';
+import {
+  bagMaterialDepositSelection,
+  type MaterialStorageDestination,
+} from './material_source_storage_actions';
+import {
+  appendMaterialSourcesActionAfter,
+  closeMaterialSourcesDialogForOwner,
+  type MaterialSourcesSelectionFactory,
+} from './material_sources_dialog';
+import { materialSourcesForDisplay } from './material_sources_view';
 import type { PainterHostPresentation } from './painter_host';
 import { BAG_ITEM_ROW_ATTR } from './panel_key_guard';
 import {
@@ -127,7 +138,10 @@ const BAG_PROMPT_SELECTOR =
 // Exported for the HUD's mobile cluster-close paths (closeVendor / onBankClosed),
 // which hide #bags without running close(): they must not strand a still-visible
 // prompt in #prompt-stack (promptModalOpen() would keep gating game keys on it).
-export function dismissBagPrompts(): void {
+export function dismissBagPrompts(
+  owner: HTMLElement | null = document.getElementById('bags'),
+): void {
+  if (owner) closeMaterialSourcesDialogForOwner(owner);
   for (const p of document.querySelectorAll(BAG_PROMPT_SELECTOR)) p.remove();
 }
 
@@ -313,6 +327,7 @@ export interface BagsWindowDeps extends PainterHostPresentation {
     instance?: ItemInstancePayload,
     vendorSellCount?: number,
     runSellAll?: () => void,
+    materialSources?: MaterialComposition,
   ): void;
 }
 
@@ -456,7 +471,7 @@ export class BagsWindow {
     // never runs the prompt's dismiss(). Tear any open prompt down here so it is not left
     // an orphaned aria-modal dialog floating over the closed window, then clear the inert
     // it set: a hidden window must never stay inert or the next open shows a dead grid.
-    dismissBagPrompts();
+    dismissBagPrompts(el);
     el.style.display = 'none';
     el.inert = false;
     this.clearTrackerHighlight();
@@ -1114,7 +1129,7 @@ export class BagsWindow {
         // instead: touch has no shift-click either, so this is its only way
         // to reach Sell all.
         if (this.deps.isTouchHud()) {
-          if (this.itemMenuAvailable(item, s.itemId, s.instance)) {
+          if (this.itemMenuAvailable(item, s.itemId, s.instance, materialSourcesForDisplay(s))) {
             this.openItemMenuFor(item, s, ev);
             return;
           }
@@ -1185,7 +1200,7 @@ export class BagsWindow {
         // destroying is the drag-out-to-world gesture). Every item now offers
         // at least Lock/Unlock (issue 3042), so this always opens the menu;
         // left-click is unchanged (still runs the classic action instantly).
-        if (this.itemMenuAvailable(item, s.itemId, s.instance)) {
+        if (this.itemMenuAvailable(item, s.itemId, s.instance, materialSourcesForDisplay(s))) {
           this.openItemMenuFor(item, s, ev);
           return;
         }
@@ -1287,6 +1302,21 @@ export class BagsWindow {
         },
       });
       this.attachRowTooltip(row, item, s);
+      const displayedSources = materialSourcesForDisplay(s);
+      const sourceSelection = this.storageSourceSelection(s);
+      if (displayedSources && sourceSelection && this.deps.openMaterialSources) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'material-source-item material-source-item-cell';
+        wrapper.appendChild(row);
+        appendMaterialSourcesActionAfter(
+          row,
+          itemName,
+          displayedSources,
+          this.deps.openMaterialSources,
+          sourceSelection,
+        );
+        return wrapper;
+      }
       return row;
     }
   }
@@ -1857,7 +1887,18 @@ export class BagsWindow {
       const link = bagShiftLinks(mode)
         ? `<div class="tt-sub">${esc(t('hudChrome.itemShare.linkHint'))}</div>`
         : '';
-      return this.deps.itemTooltip(item, s.instance) + extra + partial + equipDrag + destroy + link;
+      // The stack's own per-unit provenance travels with it: the card lists
+      // each contributor and how many of their units are in THIS stack. Through
+      // the shared projection, so a LEGACY signed material stack reads as
+      // unrecorded units carrying the signature rather than claiming a gatherer.
+      return (
+        this.deps.itemTooltip(item, s.instance, materialSourcesForDisplay(s)) +
+        extra +
+        partial +
+        equipDrag +
+        destroy +
+        link
+      );
     });
   }
 
@@ -1972,6 +2013,7 @@ export class BagsWindow {
     item: ItemDef,
     itemId: string,
     instance?: ItemInstancePayload,
+    materialSources?: MaterialComposition,
   ): boolean {
     const mode = this.bagMode();
     const inDefaultMode =
@@ -1984,7 +2026,7 @@ export class BagsWindow {
       !mode.guildBankDeposit &&
       !mode.vaultDeposit &&
       !mode.petFeed;
-    return inDefaultMode && bagItemHasContextActions(item, itemId, instance);
+    return inDefaultMode && bagItemHasContextActions(item, itemId, instance, materialSources, true);
   }
 
   // Open the action menu at the event's viewport point (falling back to the row
@@ -2007,7 +2049,12 @@ export class BagsWindow {
       // The slot REFERENCE rides along so an action can re-resolve the clicked
       // copy when it runs, rather than trusting an index captured at open; the
       // menu owns no error surface, so the refusal toast is supplied from here.
-      { index, slot: s, refuseNotHeld: () => this.deps.showError(tSim('error.noItem')) },
+      {
+        index,
+        slot: s,
+        opener: ev.currentTarget as HTMLElement,
+        refuseNotHeld: () => this.deps.showError(tSim('error.noItem')),
+      },
       x,
       y,
       () => this.runBagAction(item, s, ev),
@@ -2016,7 +2063,41 @@ export class BagsWindow {
       vendorSellCount === undefined
         ? undefined
         : () => this.sellAllBagItem(item, s, vendorSellCount),
+      materialSourcesForDisplay(s),
     );
+  }
+
+  /** Build the explicit-source deposit callback at the moment its visible
+   * action opens. The destination and bag pin are then fixed until Confirm;
+   * neither is recaptured from a later render. */
+  private storageSourceSelection(s: InvSlot): MaterialSourcesSelectionFactory {
+    if (
+      !this.deps.isPersonalBankTab() &&
+      !this.deps.isGuildBankTab() &&
+      !this.deps.isVaultBankTab()
+    ) {
+      return undefined;
+    }
+    return () => {
+      const world = this.deps.world();
+      const slotIndex = bagStackIndex(world.inventory, s);
+      if (slotIndex < 0) return null;
+      const destination: MaterialStorageDestination | null = this.deps.isPersonalBankTab()
+        ? 'bank'
+        : this.deps.isGuildBankTab()
+          ? 'guild'
+          : this.deps.isVaultBankTab()
+            ? 'vault'
+            : null;
+      if (!destination) return null;
+      const session = bagMaterialDepositSelection(world, s, destination, () => {
+        this.deps.hideTooltip();
+        this.render();
+      })?.();
+      const bankRoot = document.getElementById('bank-window');
+      if (!session || !bankRoot) return null;
+      return { ...session, associatedOwners: [bankRoot] };
+    };
   }
 
   /** N for the vendor right-click/tap menu's Sell all (N) row: every copy of

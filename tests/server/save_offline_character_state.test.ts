@@ -35,9 +35,16 @@ function realCharacterState(): CharacterState {
   return state;
 }
 
+// The one answer stands in for every statement, so it carries the material
+// source PRE-IMAGE columns this writer's own FOR UPDATE lock reads: a character
+// holding neither container. A row that answered NOTHING is refused by the
+// journal rather than read as an empty bank.
 function transactionClient(rowCount: number) {
   const client = { query: vi.fn(), release: vi.fn() };
-  client.query.mockResolvedValue({ rows: [], rowCount } as never);
+  client.query.mockResolvedValue({
+    rows: [{ before_bank: null, before_vault: null }],
+    rowCount,
+  } as never);
   return client;
 }
 
@@ -105,8 +112,13 @@ describe('saveOfflineCharacterState: fenced on the absence of a live lease', () 
     expect(statements[2]).toBe('SET LOCAL lock_timeout = 2000');
     expect(statements[3]).toBe('SET LOCAL idle_in_transaction_session_timeout = 10000');
     // The row lock comes BEFORE the fenced write, and in the stronger mode
-    // (the Phase 18 QA fix round; see below).
-    expect(statements[4]).toBe('SELECT 1 FROM characters WHERE id = $1 AND realm = $2 FOR UPDATE');
+    // (the Phase 18 QA fix round; see below). Its projection is the material
+    // source pre-image: this writer REPLACES the blob, so the state it
+    // overwrites is the before-state its journal replays from, read under the
+    // lock it already takes rather than as a second statement.
+    expect(statements[4]).toBe(
+      "SELECT state->'bank' AS before_bank, state->'vault' AS before_vault FROM characters WHERE id = $1 AND realm = $2 FOR UPDATE",
+    );
     // Every bound is set BEFORE the write it bounds.
     const update = statements.findIndex((text) => text.includes('UPDATE characters'));
     expect(update).toBe(5);
@@ -152,7 +164,7 @@ describe('saveOfflineCharacterState: fenced on the absence of a live lease', () 
     expect(statements[lock]).not.toContain('FOR NO KEY UPDATE');
     // Realm-pinned like the write it precedes, so a cross-realm id locks nothing.
     expect(statements[lock]).toBe(
-      'SELECT 1 FROM characters WHERE id = $1 AND realm = $2 FOR UPDATE',
+      "SELECT state->'bank' AS before_bank, state->'vault' AS before_vault FROM characters WHERE id = $1 AND realm = $2 FOR UPDATE",
     );
     const lockValues = client.query.mock.calls[lock][1] as unknown[];
     expect(lockValues[0]).toBe(41);

@@ -75,6 +75,7 @@ import { CRAFT_BATCH_MAX, CRAFT_GOLD_SINK_COPPER_PER_BUDGET } from '../content/p
 import { recipeById } from '../content/recipes';
 import { ITEMS } from '../data';
 import { countUnlockedInSlots, removeUnlockedFromSlots } from '../item_lock';
+import { holdsMaterialSignature } from '../material_signatures';
 import {
   consumePlayerVaultStock,
   consumeVaultStock,
@@ -397,7 +398,7 @@ export function holdsSelfSignedInstance(
   playerName: string,
   itemId: string,
 ): boolean {
-  return inventory.some((s) => s.itemId === itemId && s.instance?.signer === playerName);
+  return holdsMaterialSignature(inventory, itemId, playerName);
 }
 
 /** Whether `meta` holds an inventory slot for `itemId` carrying a signed
@@ -439,7 +440,7 @@ function hasSelfSignedInstance(meta: PlayerMeta, itemId: string): boolean {
  *  same inversion the sibling exists to prevent. */
 function hasSignedInstance(meta: PlayerMeta, itemId: string): boolean {
   const gradeIds = materialGradeIds(itemId);
-  return meta.inventory.some((s) => gradeIds.includes(s.itemId) && !!s.instance?.signer);
+  return gradeIds.some((gradeId) => holdsMaterialSignature(meta.inventory, gradeId));
 }
 
 /** The result of resolving one reagent's required quantity: the final count

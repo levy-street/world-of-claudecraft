@@ -108,6 +108,29 @@ describe('itemInstancePayloadsEqual', () => {
     ).toBe(true);
   });
 
+  it('a JSON-parsed own __proto__ key is an ordinary identity term, in both directions', () => {
+    // JSON.parse mints '__proto__' as an OWN key; reading it off the other side
+    // without an ownership check lands on Object.prototype, which has no own
+    // enumerable keys and so matched any empty object.
+    const tainted = JSON.parse('{"__proto__":{}}') as ItemInstancePayload;
+    const ordinary = JSON.parse('{"unrelated":{}}') as ItemInstancePayload;
+    expect(itemInstancePayloadsEqual(tainted, ordinary)).toBe(false);
+    expect(itemInstancePayloadsEqual(ordinary, tainted)).toBe(false);
+    // Still equal to its own shape, and still value-sensitive.
+    expect(itemInstancePayloadsEqual(tainted, JSON.parse('{"__proto__":{}}'))).toBe(true);
+    expect(
+      itemInstancePayloadsEqual(
+        JSON.parse('{"__proto__":{"a":1}}'),
+        JSON.parse('{"__proto__":{"a":2}}'),
+      ),
+    ).toBe(false);
+    // Nested, where the same read happens one level down.
+    const nested = JSON.parse('{"rolled":{"__proto__":{}}}') as ItemInstancePayload;
+    const nestedPlain = JSON.parse('{"rolled":{"unrelated":{}}}') as ItemInstancePayload;
+    expect(itemInstancePayloadsEqual(nested, nestedPlain)).toBe(false);
+    expect(itemInstancePayloadsEqual(nestedPlain, nested)).toBe(false);
+  });
+
   it('charge maps compare per-key (equal maps equal, differing maps refuse)', () => {
     expect(
       itemInstancePayloadsEqual({ charges: { fireball: 3 } }, { charges: { fireball: 3 } }),

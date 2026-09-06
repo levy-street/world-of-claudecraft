@@ -326,6 +326,7 @@ export const id_ID: EnTranslations = {
     }
   },
   "hudChrome": {
+    "materialStackSelectionUnavailable": "That material selection is no longer available.",
     "warlock": {
       "doomLabel": "Kecaman",
       "fateThreadsLabel": "Benang Takdir",
@@ -3047,7 +3048,33 @@ export const id_ID: EnTranslations = {
       "enchantedFallback": "Dimantrai",
       "partyTradeWindow": "Kamu dapat memperdagangkan barang ini kepada pemain yang berbagi jarahannya selama {time} berikutnya. Memakainya mengakhiri jendela perdagangan.",
       "perfectedBadge": "Perfected",
-      "perfectingRank": "Perfecting: rank {rank} of {ranks}"
+      "perfectingRank": "Perfecting: rank {rank} of {ranks}",
+      "materialSourceGatherer": "{count} × Collected by {name}",
+      "materialSourceGathererSigned": "{count} × Collected by {name}, signed by {signer}",
+      "materialSourceUnrecorded": "{count} × No gatherer recorded",
+      "materialSourceUnrecordedSigned": "{count} × No gatherer recorded, signed by {name}",
+      "materialSourceMore": "+{sources} more sources, {units} units"
+    },
+    "materialSources": {
+      "detailsTitle": "Sources for {item}",
+      "pickerTitle": "Choose sources from {item}",
+      "close": "Close material sources",
+      "view": "Sources",
+      "choose": "Sources",
+      "viewAria": "View all material sources for {item}",
+      "chooseAria": "Choose material sources to move for {item}",
+      "cancel": "Cancel",
+      "confirm": "Move selected units",
+      "listAria": "Material source list",
+      "total": "{units} units in this stack",
+      "row": "{count} units: {source}",
+      "gatherer": "Collected by {name}",
+      "gathererSigned": "Collected by {name}, signed by {signer}",
+      "unrecorded": "No gatherer recorded",
+      "unrecordedSigned": "No gatherer recorded, signed by {name}",
+      "quantityAria": "Units from {source}, up to {count}",
+      "decreaseAria": "Decrease units from {source}",
+      "increaseAria": "Increase units from {source}"
     },
     "materialHint": {
       "fineGrade": "Mutu halus. Dikumpulkan dari urat tingkat penuh dengan alat berperingkat di atas materialnya, dan dihitung sebagai versi biasa di mana pun versi biasa dibutuhkan.",
@@ -4058,7 +4085,11 @@ export const id_ID: EnTranslations = {
       "applyEnchant": "Terapkan Mantrai",
       "sunder": "Sunder",
       "sell": "Jual",
-      "sellAll": "Jual semua ({count})"
+      "sellAll": "Jual semua ({count})",
+      "viewSources": "View sources",
+      "separateByGatherer": "Separate by gatherer",
+      "takeChosenQuantity": "Take out chosen quantity",
+      "combine": "Combine material stacks"
     },
     "enchanting": {
       "disenchantedLine": "Kamu menghancurkan pemantraan {item}.",
@@ -6912,7 +6943,7 @@ export const id_ID: EnTranslations = {
         "commissionsHeading": "Karya pesanan dan Ikatan Pembuat",
         "commissionsBody": "Karya pesanan adalah pembuatan yang dilakukan untuk seseorang. Saat membuat senjata, potongan zirah, atau off-hand yang dipegang (ramuan tidak bisa membawa ikatan), pembuat bisa menandai pembuatan itu sebagai karya pesanan: item yang selesai berperilaku normal di tangan pembuatnya sendiri, tetapi begitu berpindah tangan dalam perdagangan, ia terikat pada orang yang menerimanya. Itulah Ikatan Pembuat: pembeli mendapat itemnya, dan item itu tidak bisa diteruskan atau dijual kembali.\n\nIkatan bukan untuk selamanya, hanya mahal. Setiap master stasiun bisa melepas ikatan karya pesanan sementara kamu berdiri di stasiunnya (stasiun bergerak tidak pernah menawarkan layanan ini), dengan biaya yang ditetapkan berdasarkan kualitas item: 25 perak untuk tidak umum, 1 emas untuk langka, 4 emas untuk epik, dengan item legendaris membayar tarif epik dan karya pesanan biasa membayar tarif tidak umum.\n\nBiaya tersebut membeli lembar bersih, bukan penyembuhan: item masih merupakan karya pesanan, sehingga ia terikat kembali pada siapa pun yang menerimanya dalam perdagangan berikutnya, dan semua hal lain tentangnya, tanda tangan, karya besar, dan mantra, tetap tidak berubah.",
         "provenanceHeading": "Karya bertanda tangan",
-        "provenanceBody": "Some items carry a name. Hover one and the tooltip says Gathered by so-and-so on a raw material, or Crafted by so-and-so on a finished piece: the same mark, worded for how the item came to be. A signature is part of the item itself, travels with it through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fades.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. The one thing that can cost you a signature is a full bag: a signed unit needs room of its own, or a matching signed stack, to land in.\n\nA stack of items shares one identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. A signed log never joins a plain pile in either direction (merging would erase somebody's name), but identical payloads merge happily, so twenty ore signed by the same gatherer sit in one stack and a windfall does not shred your bags.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
+        "provenanceBody": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; open Sources for the full list. Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
         "collectorsHeading": "Kolektor, piala, dan harga sebuah cerita",
         "collectorsBody": "Pedagang NPC buta terhadap asal-usul: item bertanda tangan dijual ke NPC dengan harga biasanya. Premium pada tanda tangan hanya ada di antara pemain, dan itulah yang membuatnya menarik: setumpuk bijih rejeki yang ditandatangani oleh pengumpul terkenal, Potongan Utama dari panen yang beruntung, sebuah bilah karya besar yang mencantumkan nama pembuat yang sudah pensiun, semuanya berharga sebanyak yang dikatakan ingatan seseorang.\n\nKitab Jasa bersandar pada naluri yang sama: Urat Murni, Kayu Hati Kuno, Mekar Bulan Purnama, Spesimen Sempurna, dan Kilau Harapan adalah tanda kolektor tanpa Kemasyhuran yang ada semata-mata untuk membuktikan bahwa sebuah momen pernah terjadi padamu. Simpan item yang mendapat jasa tersebut dan kamu memegang kuitansinya. Tidak ada daya di sini; asal-usul tidak membeli stat dan tidak memenangkan pertarungan, itu adalah jejak kertas permainan tentang hari-hari yang baik.",
         "castPaceHeading": "Waktu rapal dan saluran pembuangan koin",
@@ -6953,7 +6984,7 @@ export const id_ID: EnTranslations = {
         "title": "FAQ Profesi",
         "intro": "Jawaban cepat untuk pertanyaan yang paling sering ditanyakan para pembuat.",
         "q1": "Why do my signed items not stack?",
-        "a1": "A signed item is an instanced item: it carries its own little record (the signer, any rolled quality, masterwork stats, an enchant, a bond) instead of being an anonymous copy. Two copies merge into one stack only when those records match exactly.\n\nIn practice: rare ore you gathered yourself stacks with more rare ore you gathered yourself, because both say Gathered by you and nothing else differs. The same material signed by a friend sits in its own slot, and a plain unsigned copy never merges into a signed stack. Bags, bank, trade, mail, and the World Market all follow this one rule.",
+        "a1": "Finished items still follow the strict instance rule: two copies merge only when their signer, rolled properties, masterwork stats, enchant, bond, and other identity all match exactly. A signed blade therefore stays apart from a plain one.\n\nMaterials are the exception. Compatible stacks of the same material can merge even when their collectors or signers differ, because the stack keeps a count for each source. The hover tooltip summarizes the sources; open Sources for the full list. Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.",
         "q2": "Apakah resep biasa menaikkan keahlian saya selamanya?",
         "a2": "No. Every recipe is scored by how far it sits below your current bracket in that craft, the classic orange, yellow, green, gray reading: full gain at or above your bracket, half one tier below, a quarter two tiers below, and nothing three or more below. Brackets are every 25 skill, so the free skill 0 recipes stop teaching you anything at 75 skill.\n\nThe caps are also lower than the classic 300 you might expect: each of the ten earnable crafts caps at 125, Mining, Logging, and Herbalism cap at 100, and Fishing runs long at 200. Climbing means moving up to recipes at your own bracket, not grinding the cheapest one.",
         "q3": "Apa perbedaan antara menjarah dan memanen bangkai?",

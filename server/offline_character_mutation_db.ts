@@ -3,6 +3,10 @@
 // Async work such as moderation audit and market/mail writes belongs outside.
 import { sanitizeRemovedZone1Content } from '../src/sim/removed_zone1_content';
 import type { CharacterState } from '../src/sim/sim';
+import {
+  captureCharacterPreimage,
+  journalCharacterSaveSources,
+} from './character_material_sources_db';
 import { CHARACTER_SAVE_LEASED_LINE, characterUpdateStatement } from './character_save_statement';
 import { runWithStatementTimeout } from './db';
 import {
@@ -32,6 +36,9 @@ export async function mutateOfflineCharacterState(
     );
     const row = loaded.rows[0] as { level: number; state: CharacterState | null } | undefined;
     if (!row?.state) return { ok: false, error: 'character not found' };
+    // The before-state for the source journal, DETACHED before the callback runs:
+    // `mutate` rewrites this blob in place, so a later read would be the after.
+    const preimage = captureCharacterPreimage(row.state);
     const changed = mutate(row.state);
     if (!Number.isSafeInteger(changed) || changed < 0) {
       throw new Error('offline character mutation must return a non-negative safe integer');
@@ -53,6 +60,10 @@ export async function mutateOfflineCharacterState(
       realm: REALM,
     });
     const saved = await query(statement.text, statement.values);
+    // Same transaction, after the write: a lease-refused write (0 rows) journals
+    // nothing, and a refused journal aborts the mutation with it. A sanctioned
+    // signer rewrite is exactly the exact-decrement/exact-increment pair here.
+    await journalCharacterSaveSources({ query }, characterId, preimage, saved, cleanState);
     return (saved.rowCount ?? 0) > 0
       ? { ok: true, changed }
       : { ok: false, error: CHARACTER_SAVE_LEASED_LINE };

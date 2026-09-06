@@ -89,8 +89,8 @@ import {
 import { specialRoleColor } from '../sim/discord_roles';
 import { canEquipItem, isUniqueEquipped, weaponHand } from '../sim/equipment_rules';
 import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
-import { requiredLevelFor } from '../sim/item_level_req';
 import type { Ante, PickAction } from '../sim/lockpick';
+import type { MaterialComposition } from '../sim/material_sources';
 import { petCanForceTaunt } from '../sim/pet/pet_taunt_gate';
 import {
   computeRespecCost,
@@ -629,12 +629,14 @@ import {
   instanceBindingLines,
   instanceBonusStatLines,
   instanceLockLine,
-  instanceMakersMarkLine,
   instancePartyTradeLine,
   instanceTitleHtml,
   itemNumber,
+  itemRequiredLevelLine,
   itemStatName,
+  materialMakersMarkLines,
   tooltipEffectiveQuality,
+  vendorSellTooltipLine,
 } from './item_instance_tooltip';
 import { itemKindLabel, itemQualityLabel } from './item_kind_label';
 import { itemNameColor } from './item_name_color';
@@ -675,6 +677,7 @@ import { MAP_OPEN_ZOOM, type MapWindowMode, mapWindowMode } from './map_window_v
 import { marketCollectIndicatorView } from './market_view';
 import { MarketWindow } from './market_window';
 import { masterwroughtTooltipLines } from './masterwrought_cap_view';
+import { closeMaterialSourcesDialog, openMaterialSourcesDialog } from './material_sources_dialog';
 import { Meters } from './meters';
 import { minimapMode } from './minimap_markers';
 import { MINIMAP_SIZE, MinimapPainter } from './minimap_painter';
@@ -5035,9 +5038,11 @@ export class Hud {
     this.mapMarkerProfile,
   );
   private readonly presentationBag: PainterHostPresentation = {
+    openMaterialSources: openMaterialSourcesDialog,
     itemIcon: (item, quality) => this.itemIcon(item, quality),
     moneyHtml: (copper) => this.moneyHtml(copper),
-    itemTooltip: (item, instance?: ItemInstancePayload) => this.itemTooltip(item, true, instance),
+    itemTooltip: (item, instance, materialSources) =>
+      this.itemTooltip(item, true, instance, materialSources),
     attachTooltip: (el, html) => this.attachTooltip(el, html),
   };
   // The interactive talents window. All allocation reads and mutations cross the
@@ -5170,6 +5175,7 @@ export class Hud {
   // bindContextMenuActions) and the one confirm-dialog family; the bags window
   // opens it via the openItemActionMenu dep above.
   private readonly bagItemActionMenu = new BagItemActionMenu({
+    openMaterialSources: openMaterialSourcesDialog,
     world: () => this.sim,
     ctxMenu: {
       element: () => $('#ctx-menu'),
@@ -5679,7 +5685,9 @@ export class Hud {
     log: (text, color) => this.log(text, color),
     itemIcon: (item, quality) => this.itemIcon(item, quality),
     attachTooltip: (el, html) => this.attachTooltip(el, html),
-    itemTooltip: (item, compare, instance) => this.itemTooltip(item, compare, instance),
+    itemTooltip: (item, compare, instance, materialSources) =>
+      this.itemTooltip(item, compare, instance, materialSources),
+    openMaterialSources: openMaterialSourcesDialog,
     renderBags: () => this.renderBags(),
   });
   private readonly wocMarketWindow = new WocMarketWindow({
@@ -6391,7 +6399,12 @@ export class Hud {
   // maker's mark, or baked bonus stats specific to THIS copy. Absent for
   // fungible stacks and def-only surfaces (the crafting window's result rows),
   // so those render exactly as before.
-  private itemTooltip(item: ItemDef, compare = true, instance?: ItemInstancePayload): string {
+  private itemTooltip(
+    item: ItemDef,
+    compare = true,
+    instance?: ItemInstancePayload,
+    materialSources?: MaterialComposition,
+  ): string {
     // Quest items are a purpose class, not a quality tier: title and kind use
     // quest gold, and the kind line is "Quest Item" alone (never "Common Quest
     // Item"). Story lines (related quest, progress, rules, orphaned) come from
@@ -6678,29 +6691,15 @@ export class Hud {
     if (requiredClasses) {
       html += `<div class="tt-sub">${esc(t('itemUi.tooltip.classes', { classes: requiredClasses.map(classDisplayName).join(', ') }))}</div>`;
     }
-    // Classic "Requires Level N" line for equippable gear gated above level 1.
-    // Red when the viewer is below the requirement (cannot equip yet), otherwise
-    // a normal sub line. Level math/data lives in the pure sim leaf.
-    const req = requiredLevelFor(item);
-    if ((item.kind === 'weapon' || item.kind === 'armor') && req > 1) {
-      const meets = this.sim.player.level >= req;
-      html += `<div class="${meets ? 'tt-sub' : 'tt-red'}">${esc(t('hudChrome.itemTooltip.requiresLevel', { level: itemNumber(req) }))}</div>`;
-    }
+    html += itemRequiredLevelLine(item, this.sim.player.level);
     html += this.itemProcBlock(item);
     html += this.itemSetBlock(item);
-    html += instanceMakersMarkLine(instance, item);
+    html += materialMakersMarkLines(item, instance, materialSources);
     // Stackables state their per-slot cap (sim/bags.ts stackSizeOf), so a
     // player holding a single potion learns more copies will share the slot;
     // 1-per-slot kinds, mounts, and charge-bearing payloads render nothing.
     html += stackSizeTooltipLine(item, instance);
-    // Gated on the SAME pair the vendor path refuses on (src/sim/items.ts
-    // sellItem), never on sellValue alone: a def can carry a sellValue it will
-    // never be paid, and advertising a price the server is about to deny is a
-    // lie the player only discovers from an error toast. The tier-1 gathering
-    // tools are the case that made this matter, being common staples a new
-    // player actively tries to sell back.
-    if (item.sellValue > 0 && !item.noVendorSell && !item.soulbound)
-      html += `<div class="tt-sub">${esc(t('itemUi.tooltip.sellPrice', { money: formatLocalizedMoney(item.sellValue) }))}</div>`;
+    html += vendorSellTooltipLine(item);
     if (compare) html += this.itemCompareBlock(item, instance);
     return html;
   }
@@ -18669,6 +18668,7 @@ export class Hud {
   // Closes the topmost UI. Returns true if something was closed.
   closeAll(): boolean {
     if (clearOpenStoreResult()) return true;
+    if (closeMaterialSourcesDialog()) return true;
     if (closeOpenTouchMenu()) return true;
     if (this.lootWindow.hasOpenChest) {
       this.closeLoot();

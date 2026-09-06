@@ -639,27 +639,45 @@ achievable input, specialized plus self-signed, enforced in
 `tests/recipe_economy.test.ts`.
 
 ### Provenance and instance stacking
-Two slots merge only when itemId matches AND the instance payload is
-byte-equal (`canStackInstancePayloads`,
-`src/sim/item_instance_merge.ts`); a charges-bearing payload never merges;
-any NEW payload field automatically prevents cross-field merges. Provenance
-copy resolves by item KIND: gathered signers read "Gathered by {name}",
-crafted read "Crafted by {name}". Instanced slots carry a bag-grid marker.
-A signed grant needs same-signer stack room OR a genuinely free slot (the
-merge-aware `canGrantItemInstance` gate; a signed instance merges only into
-a byte-equal same-signer stack, never a plain one); with neither, the grant
-falls back to the unsigned fungible top-up (the signature truncates, the
-yield does not; pinned in `tests/gather_node_harvest.test.ts` and the corpse
-suites). That room is measured against the WHOLE grant rather than one copy,
-because a corpse signed component carries its rolled quantity: room for one
-unit of three refuses outright instead of spilling the remainder past
-capacity. A gathering node differs on purpose and lands a partial fit, since
-it has no reserved plain fallback to catch the rest. Mail attachments expire after
-`MAIL_ATTACHMENT_EXPIRY_SECONDS` with exactly one return-to-sender cycle
-(system and work-order mail exempt). A character rename re-keys market and
-mail but sweeps only the renamed character's own blob for instance signers
-(`rekeyInstanceSigner`); foreign-held signed copies keep the stale name (a
-flagged maintainer surface).
+Ordinary instance stacking remains strict: two slots merge only when `itemId`
+matches and the instance payload is byte-equal
+(`canStackInstancePayloads`, `src/sim/item_instance_merge.ts`). A
+charges-bearing payload never merges, and any new payload field automatically
+prevents a cross-field merge. `craftedRecipeId` must also match. Instanced
+slots carry a bag-grid marker.
+
+Materials add canonical per-unit composition without making that composition
+part of the remaining payload identity. `normalizeMaterialStack` projects a
+legacy payload signer into a source descriptor and removes it from the payload;
+it never invents a gatherer for stock that did not record one. New material
+units carry descriptors whose gatherer and premium signer are independent:
+the gatherer includes its stable namespace/id and historic display-name
+snapshot, while the optional signer alone grants the legacy signature benefits.
+Two material stacks are compatible when `itemId`, `craftedRecipeId`, and
+the remaining instance payload match and neither is manually separated.
+Their gatherers, signers, source counts, total counts, and bag cells do not
+block a merge. `mergeMaterialCompositions` preserves and coalesces only exact
+whole descriptors, so no collector or signer is erased.
+
+The hover tooltip shows at most five descriptor rows, followed by exact hidden
+source and unit totals. The Sources dialog shows the full uncapped composition.
+Manual separation is an owner's container grouping preference rather than item
+identity: it survives save/load and inventory sorting, and explicit Combine
+clears it. A transfer strips it from the departing units so the destination can
+pack them normally.
+
+An ordinary material signature rides the units' source descriptor. It never
+truncates separately because a compatible stack contains another gatherer or
+signer: whenever the material units land, the signature lands with them.
+Capacity still limits which units can land. A corpse family's distinct pristine
+specimen remains a different item and still needs its own compatible room; if
+it cannot fit, the ordinary component survives and the specimen is lost.
+
+Mail attachments expire after `MAIL_ATTACHMENT_EXPIRY_SECONDS` with exactly
+one return-to-sender cycle (system and work-order mail exempt). A character
+rename re-keys market and mail but sweeps only the renamed character's own blob
+for legacy instance signers (`rekeyInstanceSigner`). Foreign-held signed
+copies and material gatherer snapshots retain the historic name.
 
 ### Enchanting, disenchant, salvage
 Enchanting is ungated by design (the no-admission-gate ruling is LOCKED:
@@ -1248,8 +1266,8 @@ must be re-derived if either number is ever tuned on its own.
 - Two-procs-one-drain masterwork toast coalescing (celebration plan-contract
   change; banner and sound coalescing are by design).
 - Windfall per-instance loot-line burst batching polish.
-- Zone-1 signed starter instances design confirm (the identical-payload
-  stacking premise changed: same-signer copies now merge).
+- Zone-1 signed starter material design confirm (sources now merge across
+  gatherers and signers while preserving every exact descriptor).
 - The bareClient fixture unification chore (#2088) and the shared
   deep-water predicate extraction (SWIM_DEPTH copies).
 - Delete the dead non-en positional entity arrays in

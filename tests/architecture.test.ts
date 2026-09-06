@@ -311,6 +311,11 @@ const UI_PURE_CORES = [
   'src/ui/quest_item_tooltip_view.ts',
   'src/ui/item_name_color.ts',
   'src/ui/item_compare_view.ts',
+  // The per-unit material provenance model behind the item tooltip's source
+  // rows: descriptor identity, surviving counts, and the premium marker, with
+  // no DOM and no name lookup of any kind.
+  'src/ui/material_sources_view.ts',
+  'src/ui/material_source_transfer_view.ts',
   'src/ui/item_slot_labels.ts',
   'src/ui/bank_view.ts',
   // The bank's bonus-slot breakdown footer: the KNOWN account-source table and the
@@ -452,6 +457,7 @@ const UI_PURE_CORES = [
   'src/ui/woc_market_reason_text.ts',
   'src/ui/woc_market_view.ts',
   'src/ui/mailbox_view.ts',
+  'src/ui/mail_parcel_sources_view.ts',
   'src/ui/calendar_view.ts',
   'src/ui/char_view.ts',
   'src/ui/masterwrought_cap_view.ts',
@@ -2396,6 +2402,8 @@ const UI_DOM_MODULES = [
   'src/ui/map_marker_palette_lifecycle.ts',
   'src/ui/market_window.ts',
   'src/ui/woc_market_window.ts',
+  'src/ui/material_sources_dialog.ts',
+  'src/ui/personal_bank_item_cell.ts',
   'src/ui/meters.ts',
   'src/ui/meters_frame.ts',
   'src/ui/minimap_gilded_ornament.ts',

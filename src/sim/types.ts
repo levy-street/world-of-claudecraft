@@ -1,3 +1,6 @@
+import type { LocalGathererIdentity } from './material_gatherer';
+import { cloneMaterialData, cloneMaterialPayload } from './material_payload_identity';
+import type { MaterialComposition } from './material_sources';
 // Core shared types for the simulation. The sim layer has zero DOM/rendering deps.
 
 import type { ChatSenderFlair, StreamerLinks } from './account_flair';
@@ -1651,6 +1654,10 @@ export function cloneItemInstancePayload(src: ItemInstancePayload): ItemInstance
 export interface InvSlot {
   itemId: string;
   count: number;
+  /** Exact surviving material sources. Absent on legacy homogeneous saves. */
+  materialSources?: MaterialComposition;
+  /** Owner grouping choice, retained by sorting/saving and stripped on transfer. */
+  materialSeparated?: true;
   /** Additive, optional per-instance payload (#1165). Absent for ordinary fungible stacks. */
   instance?: ItemInstancePayload;
   /** Recipe id that minted this stack when crafting provenance matters but the
@@ -1670,8 +1677,19 @@ export interface InvSlot {
 // equipped-instance map, src/sim/professions/enchanting.ts) for why that is
 // unsafe and what this clones instead.
 export function cloneInvSlot<T extends InvSlot>(slot: T): T {
-  if (!slot.instance) return { ...slot };
-  return { ...slot, instance: cloneItemInstancePayload(slot.instance) };
+  const copied = { ...slot };
+  if (slot.instance) {
+    copied.instance =
+      slot.materialSources === undefined
+        ? cloneItemInstancePayload(slot.instance)
+        : cloneMaterialPayload(slot.instance);
+  }
+  // Copy before load validation without interpreting malformed source data.
+  // A rejected descriptor must never be silently replaced with unknown stock.
+  if (slot.materialSources !== undefined) {
+    copied.materialSources = cloneMaterialData(slot.materialSources);
+  }
+  return copied;
 }
 
 /** ONE unit lifted out of an inventory slot, carrying BOTH provenance channels
@@ -1690,6 +1708,8 @@ export function cloneInvSlot<T extends InvSlot>(slot: T): T {
 export interface InventoryUnit {
   instance: ItemInstancePayload | undefined;
   craftedRecipeId: string | undefined;
+  /** Exact material source for this one unit; payload stays canonical. */
+  materialSources?: MaterialComposition;
 }
 
 export interface LootSlot extends InvSlot {
@@ -7966,6 +7986,21 @@ export interface SimConfig {
   // before a craft or enchant consumes from the Materials Vault. Offline and
   // headless hosts omit it and receive an inert successful reservation.
   vaultConsumptionAdmission?: VaultConsumptionAdmission;
+  // The material-gatherer identity for the player this constructor MINTS (the
+  // primary offline/headless character), allocated by the HOST outside the sim
+  // and passed in whole (src/sim/material_gatherer.ts). A VALUE, never a
+  // factory: the sim reads it once at construction and never derives one, so
+  // the same explicit inputs always give the same attribution and no clock,
+  // randomness or crypto is reachable from here.
+  //
+  // A production browser or headless host ALWAYS supplies it for a real player.
+  // Omitting it (a unit test, a probe rig, the editor viewport) is the supported
+  // UNKNOWN case: that player gathers unrecorded stock exactly as before this
+  // feature, and nothing is invented from the seed, the entity id or the name.
+  //
+  // Secondary players a host adds later carry their OWN id through
+  // addPlayer({ localGathererIdentity }); this field never covers them.
+  gathererIdentity?: LocalGathererIdentity;
 }
 
 export function emptyMoveInput(): MoveInput {

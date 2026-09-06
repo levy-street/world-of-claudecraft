@@ -9,6 +9,7 @@ import type { SavedCooldowns } from './cooldown_persist';
 import type { SavedDeedStats } from './deeds';
 import type { PlayerEquipment } from './entity';
 import type { JailState } from './jail';
+import type { LocalGathererIdentity } from './material_gatherer';
 import type { SavedMaterialsVaultState } from './materials_vault';
 import type { ArchetypeState } from './professions/archetype';
 import type { PersistedFarmPlot } from './professions/farm_persist';
@@ -296,6 +297,17 @@ export interface CharacterState {
   // The Reliquary (JSONB; optional, written only when non-empty so pre-system
   // saves load cleanly and stay byte-equal until the system engages).
   reliquary?: SavedReliquaryState;
+  // The durable OFFLINE/HEADLESS material-gatherer identity (src/sim/material_gatherer.ts).
+  // Optional and written ONLY by a host that has one, so an online character's
+  // blob and every pre-feature save stay byte-equal: the server re-supplies an
+  // online identity from the character row at every join, and a save can never
+  // carry an identity claim back in.
+  //
+  // On load it SUPERSEDES the fresh host default, which is what makes a reloaded
+  // local character keep the identity its already-gathered stock is attributed
+  // to. A present-but-malformed value refuses the load rather than regenerating
+  // a different id (readPersistedLocalIdentity).
+  materialGathererIdentity?: LocalGathererIdentity;
 }
 
 export interface PetState {

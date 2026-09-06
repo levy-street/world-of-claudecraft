@@ -305,6 +305,8 @@ import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips'
 import { mergeCustodyParcelOverlay } from './mail_custody_overlay';
 import { rearmMailPartitionsOnFailure, writeDirtyMailPartitions } from './mail_partition_rearm';
 import { buyWithSoldVolume } from './market_sold_volume';
+import { readMaterialSourceTransferWire } from './material_source_transfer_wire';
+import { dispatchInventoryGroupingCommand } from './material_stack_wire';
 import { EMPTY_ACCOUNT_COSMETICS, reconcileWornMechChromaForJoin } from './mech_chroma_reconcile';
 import {
   applyMobScanTick,
@@ -6685,16 +6687,10 @@ export class GameServer {
         }
         break;
       case 'inv_move':
-        // Manual bag order (a drag between bag cells). Both indices are re-validated
-        // inside the sim against the live bag, so a bogus pair is simply refused.
-        if (typeof msg.from === 'number' && typeof msg.to === 'number') {
-          sim.moveInventoryItem(msg.from, msg.to, pid);
-        }
-        break;
       case 'inv_sort':
-        // The one-shot bag clean-up. No payload: the sim re-derives the whole
-        // arrangement from the live inventory, so there is nothing to trust.
-        sim.sortInventory(pid);
+      case 'material_separate':
+      case 'material_combine':
+        dispatchInventoryGroupingCommand(sim, pid, msg);
         break;
       case 'unequip_item':
         if (typeof msg.slot === 'string' && isEquipSlot(msg.slot)) {
@@ -8003,9 +7999,11 @@ export class GameServer {
         if (!this.consumeGuildBankOp(session, receivedAtMs / 1000)) break;
         if (typeof msg.slot === 'number') {
           const slot = msg.slot;
-          const count = typeof msg.count === 'number' ? msg.count : undefined;
+          const transfer = readMaterialSourceTransferWire(msg, slot);
+          if (transfer === null) break;
+          const { count, selection } = transfer;
           this.runGuildBankOp(session, { pid }, 'deposit', () =>
-            sim.guildBankDepositFor(pid, slot, count),
+            sim.guildBankDepositFor(pid, slot, count, selection),
           );
         }
         break;
@@ -8013,9 +8011,11 @@ export class GameServer {
         if (!this.consumeGuildBankOp(session, receivedAtMs / 1000)) break;
         if (typeof msg.slot === 'number') {
           const slot = msg.slot;
-          const count = typeof msg.count === 'number' ? msg.count : undefined;
+          const transfer = readMaterialSourceTransferWire(msg, slot);
+          if (transfer === null) break;
+          const { count, selection } = transfer;
           this.runGuildBankOp(session, { pid }, 'withdraw', () =>
-            sim.guildBankWithdrawFor(pid, slot, count),
+            sim.guildBankWithdrawFor(pid, slot, count, selection),
           );
         }
         break;

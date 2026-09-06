@@ -20,6 +20,7 @@ import {
   predictVaultDepositAll,
   vaultDepositAllSummaryKey,
   vaultRowAction,
+  vaultSpecialContentKey,
   vaultWithdrawFit,
   vaultWithdrawNotice,
 } from '../src/ui/vault_view';
@@ -157,6 +158,22 @@ describe('buildVaultView', () => {
     expect(signedRow?.kind === 'special' ? signedRow.specialRef.instance?.signer : null).toBe(
       'Ada',
     );
+  });
+
+  it('forwards a deep-cloned material composition and fingerprints composition changes', () => {
+    const sources = [
+      { source: { gatherer: { kind: 'character' as const, id: 4, name: 'Ada' } }, count: 2 },
+    ];
+    const special = slot('copper_ore', 2, { materialSources: sources });
+    const model = buildVaultView(vinfo({}, 1, 40, 50000, [special]), lookup);
+    if (model.kind !== 'vault') throw new Error('expected vault');
+    const row = model.rows.find((entry) => entry.kind === 'special');
+    expect(row?.kind === 'special' ? row.materialSources : undefined).toEqual(sources);
+    expect(row?.kind === 'special' ? row.materialSources : undefined).not.toBe(sources);
+    const changed = slot('copper_ore', 2, {
+      materialSources: [{ source: sources[0].source, count: 1 }],
+    });
+    expect(vaultSpecialContentKey([special])).not.toEqual(vaultSpecialContentKey([changed]));
   });
 
   it('keeps duplicate special rows separately addressable by their snapshot indices', () => {

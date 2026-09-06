@@ -1,5 +1,7 @@
 import type { PlayerEquipmentInstances } from '../sim/entity';
 import type { NamedSlotTarget } from '../sim/item_copy_ref';
+import type { MaterialComposition } from '../sim/material_sources';
+import type { MaterialStackSelection } from '../sim/material_stack_selection';
 import type { EquipSlot, InvSlot, ItemInstancePayload } from '../sim/types';
 import type { VendorBuyOptions } from '../sim/vendor_buy_stack';
 
@@ -29,6 +31,14 @@ export interface IWorldInventory {
    *  command; deterministic, so both hosts land the identical grid
    *  (src/sim/inventory_sort.ts). */
   sortInventory(): void;
+  /** Owner grouping only. The captured target and any exact source quantities
+   * are revalidated against the authoritative inventory before changing it. */
+  separateMaterialStack(
+    itemId: string,
+    target: MaterialStackSelection,
+    selectedSources?: MaterialComposition,
+  ): void;
+  combineMaterialStacks(itemId: string, target: MaterialStackSelection): void;
   /** Equip into the exact slot the player aimed at (a paperdoll drop target),
    *  instead of letting the sim's resolver pick (a ring dropped on the second
    *  finger lands there even while the first is free). The sim re-validates the

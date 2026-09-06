@@ -41,12 +41,68 @@ beforeEach(() => {
   openMarketWriteGate();
   openMailPartitionWriteGate();
   batchSeq = 0;
+  journalRevisions.clear();
 });
+
+// The material-source pre-image columns the character save's locking read (or,
+// on the single-statement path, its own RETURNING) answers with. This fixture's
+// character holds neither container, which is a REAL pre-image; a row answering
+// NOTHING is refused by the save rather than read as an empty bank.
+const PREIMAGE_ROW = { before_bank: null, before_vault: null };
+
+// Per-container revision counters, so a repeated save of one container answers
+// 2 after 1 the way the anchor upsert's increment does. Reset per test.
+const journalRevisions = new Map<string, number>();
+
+/**
+ * The source-journal write, answered the way the real statement answers: ONE
+ * row per record it was handed, echoing that record's own identity and the
+ * revision its anchor upsert allocated.
+ *
+ * DERIVED from the parameter rather than a fixed row list, deliberately. The
+ * writer refuses a short answer ("wrote 1 of 2 container revisions"), so a
+ * fixed list would turn a save that journals a second container into a thrown
+ * fixture artifact instead of a tested behavior, and a list long enough for two
+ * would answer a one-container save with a row it never asked for.
+ */
+function journalRowsFor(values: unknown[] | undefined) {
+  const records = JSON.parse(String((values ?? [])[0])) as {
+    ord: number;
+    realm: string;
+    container: string;
+    owner_id: number;
+  }[];
+  return records.map((record) => {
+    const key = `${record.realm}/${record.container}/${record.owner_id}`;
+    const revision = (journalRevisions.get(key) ?? 0) + 1;
+    journalRevisions.set(key, revision);
+    return {
+      ord: record.ord,
+      realm: record.realm,
+      container: record.container,
+      // bigint columns come back as exact TEXT, never as JS numbers.
+      owner_id: String(record.owner_id),
+      revision: String(revision),
+    };
+  });
+}
+
+/** The one statement the source journal issues, anchored so it can never be
+ *  confused with the receipt claim's own `WITH receipt_input AS` CTE. */
+const JOURNAL_SQL = /^WITH input AS/;
 
 function clientStub(rowCounts?: (sql: string) => number) {
   const query = vi.fn().mockImplementation((sql: string, values?: unknown[]) => {
     if (/SELECT id FROM accounts/i.test(sql)) {
       return Promise.resolve({ rows: [{ id: Number(values?.[0]) }], rowCount: 1 });
+    }
+    if (/FOR NO KEY UPDATE/i.test(sql) || /UPDATE characters/i.test(sql)) {
+      const rowCount = rowCounts ? rowCounts(String(sql)) : 0;
+      return Promise.resolve({ rows: rowCount > 0 ? [PREIMAGE_ROW] : [], rowCount });
+    }
+    if (JOURNAL_SQL.test(sql)) {
+      const rows = journalRowsFor(values);
+      return Promise.resolve({ rows, rowCount: rows.length });
     }
     if (/WITH receipt_input AS/i.test(sql)) {
       const params = values as unknown[];
@@ -207,7 +263,13 @@ const STORAGE_EFFECT: StorageAppliedEffect = {
 function storageEffectClient() {
   const query = vi.fn(async (sql: string, values?: unknown[]) => {
     if (/SELECT id FROM accounts/i.test(sql)) return { rows: [{ id: 7 }], rowCount: 1 };
-    if (/UPDATE characters/i.test(sql)) return { rows: [], rowCount: 1 };
+    if (/FOR NO KEY UPDATE/i.test(sql) || /UPDATE characters/i.test(sql)) {
+      return { rows: [PREIMAGE_ROW], rowCount: 1 };
+    }
+    if (JOURNAL_SQL.test(sql)) {
+      const rows = journalRowsFor(values);
+      return { rows, rowCount: rows.length };
+    }
     if (/WITH receipt_input AS/i.test(sql)) {
       const params = values as unknown[];
       const rowCounts = params[5] as number[];
@@ -342,7 +404,7 @@ describe('saveCharacterAndGuildBankState (the game-loop escrow save)', () => {
       REALM,
       JSON.stringify({
         treasury: 1_500,
-        inventory: [{ itemId: 'wolf_fang', count: 2 }],
+        inventory: [{ itemId: 'wolf_fang', count: 2, materialSources: [{ source: {}, count: 2 }] }],
         purchasedSlots: 0,
       }),
     ]);
@@ -354,6 +416,57 @@ describe('saveCharacterAndGuildBankState (the game-loop escrow save)', () => {
     // never persist independently (they commit or vanish together).
     expect(dbMock.query).not.toHaveBeenCalled();
     expect(client.release).toHaveBeenCalled();
+  });
+
+  it('journals the book move once, after the book write, from the LOCKED before-state', async () => {
+    // The source audit rides this same transaction. What is decisive is not
+    // that a statement appears but WHICH state it read: the journal replays
+    // from the persisted before-state the merge locked, so a first-ever write
+    // opens EMPTY and the deposit is the move. Reading the merged after-state
+    // instead would open at two fangs and journal nothing at all.
+    const client = clientStub(() => 1);
+    dbMock.connect.mockResolvedValueOnce(client as never);
+
+    await saveCharacterAndGuildBankState(42, 5, STATE, [SAVE_9, SAVE_7], 'nonce-1');
+
+    const sqls = client.query.mock.calls.map((c) => String(c[0]));
+    const journals = sqls.filter((sql) => JOURNAL_SQL.test(sql));
+    // ONE statement for the whole save, never one per guild (and never one per
+    // gatherer). The character half of this fixture holds no bank or vault, so
+    // the only container that moved is the book.
+    expect(journals).toHaveLength(1);
+    const journalIndex = sqls.findIndex((sql) => JOURNAL_SQL.test(sql));
+    const lastBook = sqls.reduce(
+      (last, sql, index) => (/INSERT INTO guild_banks[\s\S]*DO UPDATE/i.test(sql) ? index : last),
+      -1,
+    );
+    expect(lastBook).toBeGreaterThan(0);
+    // After the write it audits, and before COMMIT: a refused book must take
+    // the transaction down before its audit is ever sent.
+    expect(journalIndex).toBeGreaterThan(lastBook);
+    expect(journalIndex).toBeLessThan(sqls.findIndex((sql) => /^COMMIT/.test(sql)));
+
+    const records = JSON.parse(
+      String((client.query.mock.calls[journalIndex][1] as unknown[])[0]),
+    ) as {
+      realm: string;
+      container: string;
+      owner_id: number;
+      opening: unknown;
+      movements: unknown[];
+    }[];
+    // Guild 9's deltas are GOLD only, so its book moved no material: an
+    // unchanged container costs no record, no anchor and no revision.
+    expect(records).toHaveLength(1);
+    expect(records[0].realm).toBe(REALM);
+    expect(records[0].container).toBe('guild');
+    expect(records[0].owner_id).toBe(7);
+    // The deposit exactly: two fangs of legacy unrecorded stock, never a
+    // rewritten whole-stack figure.
+    expect(records[0].movements).toEqual([
+      { itemId: 'wolf_fang', count: 2, sourceDeltas: [{ source: {}, count: 2 }] },
+    ]);
+    expect(records[0].opening).toEqual({ entries: [] });
   });
 
   it('a fence miss rolls back everything and returns false (no book write at all)', async () => {

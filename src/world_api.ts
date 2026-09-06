@@ -187,7 +187,9 @@ export type {
 // orange piece's chosen name) and the self wire carries the `fplot` farm-plot
 // delta. An epoch-25 client can neither render Perfected copies nor a farm,
 // and an epoch-25 server omits both, stranding Perfecting progress and plots.
-export const ONLINE_WORLD_LAYOUT_VERSION = 26 as const;
+// 27 = Material stacks carry exact per-source counts. Older clients cannot
+// describe a selected source or preserve its identity through item commands.
+export const ONLINE_WORLD_LAYOUT_VERSION = 27 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI
@@ -749,6 +751,8 @@ export const COMMAND_NAMES = [
   // validates the ref shape and the sim resolves every gate and the one roll.
   // Appended because wire tokens are never reordered.
   'perfect_item',
+  'material_separate',
+  'material_combine',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -871,6 +875,8 @@ export const COMMAND_FACETS = {
   // IWorldInventory: the one-shot bag clean-up; the sim re-derives the whole
   // arrangement, so there is no payload to validate.
   inv_sort: 'IWorldInventory',
+  material_separate: 'IWorldInventory',
+  material_combine: 'IWorldInventory',
   // IWorldTelemetry: fire-and-forget metrics sink.
   telemetry: 'IWorldTelemetry',
   // IWorldProgressionXp: opt-in cosmetic prestige (leaderboard is a REST GET, no

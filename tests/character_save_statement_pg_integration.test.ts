@@ -22,6 +22,7 @@ import type { Pool as PgPool } from 'pg';
 import { Pool } from 'pg';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { CHARACTER_SAVE_LEASED_LINE } from '../server/character_save_statement';
+import { materialSourceConnection } from '../server/material_source_connection';
 import {
   applyOfflineCharacterSaveBounds,
   type BoundedTransactionRunner,
@@ -78,6 +79,7 @@ describeDb('lease-fenced character saves (REAL Postgres)', () => {
   // unfenced-offline-writers item) and the refusal arm's existence probe
   // (clear-item-name-select1), imported the same deferred way.
   let characters: typeof import('../server/characters');
+  let characterSignerDb: typeof import('../server/character_signer_db');
   let pbe: typeof import('../server/pbe_boost');
   let clearItemNameDb: typeof import('../server/clear_item_name_db');
   let logger: typeof import('../server/http/logger').logger;
@@ -155,13 +157,21 @@ describeDb('lease-fenced character saves (REAL Postgres)', () => {
 
     db = await import('../server/db');
     characters = await import('../server/characters');
+    characterSignerDb = await import('../server/character_signer_db');
     pbe = await import('../server/pbe_boost');
     clearItemNameDb = await import('../server/clear_item_name_db');
     logger = (await import('../server/http/logger')).logger;
     realm = (await import('../server/realm')).REALM;
     await db.ensureSchema();
 
-    pool = new Pool({ connectionString: verifyUrl(ADMIN_URL as string), max: 8 });
+    // The fixture pool ANNOUNCES the code-owned writer capability, through the
+    // same composer production uses. ensureSchema installs the writer guard
+    // unconditionally, so a fixture that writes `characters` or
+    // `character_leases` from an un-announcing connection is refused exactly
+    // like the un-migrated binary it looks like. Composing it here rather than
+    // hand-writing the option keeps the fixture on the one definition; a suite
+    // that means to prove the guard REFUSES omits this deliberately.
+    pool = new Pool({ ...materialSourceConnection(verifyUrl(ADMIN_URL as string)), max: 8 });
   }, 120_000);
 
   afterAll(async () => {
@@ -1009,5 +1019,438 @@ describeDb('lease-fenced character saves (REAL Postgres)', () => {
       expect(await db.saveCharacterState(id, 7, STATE('unfenced'))).toBe(true);
       expect(await markerOf(id)).toBe('unfenced');
     });
+  });
+
+  // The material source journal's live half. The DB-free suites prove what the
+  // adapter computes; only a real database can answer the question this feature
+  // was designed around: WHICH before-state a save's pre-image is when another
+  // transaction held the row, and whether the audit really commits and rolls
+  // back with the state it audits.
+  describe('the material source pre-image (the intentional gathering journal)', () => {
+    const ORE = 'copper_ore';
+
+    /** A character state holding exactly `count` banked ore, unrecorded stock. */
+    const BANKED = (count: number, marker: string) =>
+      ({
+        level: 5,
+        marker,
+        questLog: [],
+        questsDone: [],
+        inventory: [],
+        bank: { inventory: [{ itemId: ORE, count }], purchasedSlots: 0, bonusSlots: 0 },
+      }) as unknown as CharacterState;
+
+    async function seedBanked(count: number): Promise<number> {
+      const id = await makeCharacter();
+      await pool.query(`UPDATE characters SET state = $2::jsonb WHERE id = $1`, [
+        id,
+        JSON.stringify(BANKED(count, 'seed')),
+      ]);
+      return id;
+    }
+
+    async function anchorOf(characterId: number) {
+      const res = await pool.query(
+        `SELECT current_revision::text AS revision, opening
+           FROM material_source_containers
+          WHERE realm = $1 AND container = 'personal' AND owner_id = $2`,
+        [realm, characterId],
+      );
+      return res.rows[0];
+    }
+
+    async function movementsOf(characterId: number) {
+      const res = await pool.query(
+        `SELECT revision::text AS revision, movements
+           FROM material_source_journal
+          WHERE realm = $1 AND container = 'personal' AND owner_id = $2
+          ORDER BY revision`,
+        [realm, characterId],
+      );
+      return res.rows;
+    }
+
+    it('takes the COMMITTED PREDECESSOR as its pre-image after a real lock wait', async () => {
+      // The caller-owned path's whole claim, at application level. A competing
+      // transaction commits 4 -> 5 ore WHILE this save is parked on the row
+      // lock; the save then writes 7. If the pre-image were the snapshot the
+      // save started from, the journal would read +3. The committed predecessor
+      // is 5, so the honest answer is +2, and that number is the proof.
+      const id = await seedBanked(4);
+      const holder = await pool.connect();
+      const client = await db.pool.connect();
+      try {
+        await holder.query('BEGIN');
+        await holder.query(`UPDATE characters SET state = $2::jsonb WHERE id = $1`, [
+          id,
+          JSON.stringify(BANKED(5, 'holder')),
+        ]);
+
+        await client.query('BEGIN');
+        const saved = db.saveCharacterStateOnClient(client, id, 7, BANKED(7, 'saved'));
+        await waitForRowLockWaiter();
+        await holder.query('COMMIT');
+        expect(await saved).toBe(true);
+        await client.query('COMMIT');
+      } finally {
+        await holder.query('ROLLBACK').catch(() => {});
+        holder.release();
+        client.release();
+      }
+
+      expect(await markerOf(id)).toBe('saved');
+      const rows = await movementsOf(id);
+      expect(rows).toHaveLength(1);
+      expect(rows[0].revision).toBe('1');
+      expect(rows[0].movements).toEqual([
+        { itemId: ORE, count: 2, sourceDeltas: [{ source: {}, count: 2 }] },
+      ]);
+      // The opening is that same committed predecessor, so a replay from it
+      // reconciles against the stock actually stored.
+      const anchor = await anchorOf(id);
+      expect(anchor.revision).toBe('1');
+      expect(anchor.opening).toEqual({
+        entries: [{ itemId: ORE, count: 5, sources: [{ source: {}, count: 5 }] }],
+      });
+    }, 30_000);
+
+    it('the TWO-STATEMENT nonce path also reads the committed predecessor after a wait', async () => {
+      // The caller-owned path proves the single-statement form; this is the
+      // other shape, and it is a different mechanism: the pre-image comes from
+      // the SEPARATE locking SELECT, so what is under test is that a locking
+      // read re-projects the updated tuple after waiting out a competing write
+      // rather than answering from its original snapshot. Same evidence shape:
+      // a competitor commits 4 -> 5 mid-wait, this save writes 7, and only a
+      // +2 movement can be right.
+      const id = await seedBanked(4);
+      await grantLease(id, 'session-a', 3600);
+      const holder = await pool.connect();
+      try {
+        await holder.query('BEGIN');
+        await holder.query(`UPDATE characters SET state = $2::jsonb WHERE id = $1`, [
+          id,
+          JSON.stringify(BANKED(5, 'holder')),
+        ]);
+        const write = db.saveCharacterState(id, 7, BANKED(7, 'saved'), 'session-a');
+        await waitForRowLockWaiter();
+        await holder.query('COMMIT');
+        expect(await write).toBe(true);
+      } finally {
+        await holder.query('ROLLBACK').catch(() => {});
+        holder.release();
+      }
+
+      expect(await markerOf(id)).toBe('saved');
+      const rows = await movementsOf(id);
+      expect(rows).toHaveLength(1);
+      expect(rows[0].movements).toEqual([
+        { itemId: ORE, count: 2, sourceDeltas: [{ source: {}, count: 2 }] },
+      ]);
+      expect((await anchorOf(id)).opening).toEqual({
+        entries: [{ itemId: ORE, count: 5, sources: [{ source: {}, count: 5 }] }],
+      });
+    }, 30_000);
+
+    it('keeps the opening IMMUTABLE and only increments the revision on the next move', async () => {
+      const id = await seedBanked(2);
+      expect(await db.saveCharacterState(id, 7, BANKED(3, 'first'))).toBe(true);
+      expect(await db.saveCharacterState(id, 7, BANKED(9, 'second'))).toBe(true);
+
+      const anchor = await anchorOf(id);
+      expect(anchor.revision).toBe('2');
+      // Still the FIRST move's before-state, never rewritten by the second.
+      expect(anchor.opening).toEqual({
+        entries: [{ itemId: ORE, count: 2, sources: [{ source: {}, count: 2 }] }],
+      });
+      const rows = await movementsOf(id);
+      expect(rows.map((row) => row.revision)).toEqual(['1', '2']);
+      expect(rows[1].movements).toEqual([
+        { itemId: ORE, count: 6, sourceDeltas: [{ source: {}, count: 6 }] },
+      ]);
+    }, 30_000);
+
+    it('writes NOTHING when the save moves no material (an equal-state re-save)', async () => {
+      const id = await seedBanked(3);
+      expect(await db.saveCharacterState(id, 7, BANKED(3, 'unchanged'))).toBe(true);
+      expect(await markerOf(id)).toBe('unchanged');
+      // No anchor at all: absent means UNAUDITED storage, which is exactly what
+      // an untouched container is, and never a passing reconciliation.
+      expect(await anchorOf(id)).toBeUndefined();
+      expect(await movementsOf(id)).toHaveLength(0);
+    }, 30_000);
+
+    it('rolls the audit back with the state when the caller aborts', async () => {
+      const id = await seedBanked(1);
+      const client = await db.pool.connect();
+      try {
+        await client.query('BEGIN');
+        expect(await db.saveCharacterStateOnClient(client, id, 7, BANKED(4, 'aborted'))).toBe(true);
+        // The audit is visible INSIDE the transaction that wrote it...
+        const inside = await client.query(
+          `SELECT count(*)::int AS n FROM material_source_journal WHERE owner_id = $1`,
+          [id],
+        );
+        expect(inside.rows[0].n).toBe(1);
+        await client.query('ROLLBACK');
+      } finally {
+        client.release();
+      }
+      // ...and gone with the state it audited once the caller aborts.
+      expect(await markerOf(id)).toBe('seed');
+      expect(await anchorOf(id)).toBeUndefined();
+      expect(await movementsOf(id)).toHaveLength(0);
+    }, 30_000);
+
+    it('journals nothing when the nonce fence refuses the write', async () => {
+      const id = await seedBanked(2);
+      await grantLease(id, 'session-a', 3600);
+      // A displaced session: its nonce no longer matches, so the write touches
+      // nothing and must not leave an audit claiming it did.
+      expect(await db.saveCharacterState(id, 7, BANKED(50, 'displaced'), 'session-stale')).toBe(
+        false,
+      );
+      expect(await markerOf(id)).toBe('seed');
+      expect(await anchorOf(id)).toBeUndefined();
+      expect(await movementsOf(id)).toHaveLength(0);
+    }, 30_000);
+
+    it('journals the offline writer under its own lock (the PBE roster shape)', async () => {
+      const id = await seedBanked(6);
+      expect(await db.saveOfflineCharacterState(id, 7, BANKED(1, 'offline'))).toBe(true);
+      expect(await markerOf(id)).toBe('offline');
+      const rows = await movementsOf(id);
+      expect(rows).toHaveLength(1);
+      expect(rows[0].movements).toEqual([
+        { itemId: ORE, count: -5, sourceDeltas: [{ source: {}, count: -5 }] },
+      ]);
+    }, 30_000);
+
+    describe('offline signer rekeys carry exact material source journals', () => {
+      const mixedState = (marker: string, signer: string): CharacterState =>
+        ({
+          level: 5,
+          marker,
+          questLog: [],
+          questsDone: [],
+          inventory: [],
+          bank: {
+            inventory: [
+              {
+                itemId: 'copper_ore',
+                count: 5,
+                materialSources: [
+                  { source: { signer }, count: 2 },
+                  {
+                    source: {
+                      gatherer: { kind: 'character', id: 77, name: 'GatheredBefore' },
+                    },
+                    count: 3,
+                  },
+                ],
+                instance: { rolled: { quality: 'rare', stats: { power: 7 } } },
+                craftedRecipeId: 'recipe:bank-ore',
+              },
+            ],
+            purchasedSlots: 0,
+            bonusSlots: 0,
+          },
+          vault: {
+            stock: {},
+            special: [
+              {
+                itemId: 'copper_ore',
+                count: 4,
+                materialSources: [
+                  { source: { signer }, count: 1 },
+                  {
+                    source: {
+                      gatherer: { kind: 'character', id: 77, name: 'GatheredBefore' },
+                    },
+                    count: 3,
+                  },
+                ],
+                instance: { rolled: { quality: 'masterwork', stats: { power: 11 } } },
+                craftedRecipeId: 'recipe:vault-ore',
+              },
+            ],
+            upgrades: 0,
+          },
+        }) as unknown as CharacterState;
+
+      async function stateOf(characterId: number): Promise<CharacterState> {
+        return (await pool.query(`SELECT state FROM characters WHERE id = $1`, [characterId]))
+          .rows[0].state as CharacterState;
+      }
+
+      async function sourceMovementsOf(characterId: number, container: 'personal' | 'vault') {
+        const res = await pool.query(
+          `SELECT revision::text AS revision, movements
+             FROM material_source_journal
+            WHERE realm = $1 AND container = $2 AND owner_id = $3
+            ORDER BY revision`,
+          [realm, container, characterId],
+        );
+        return res.rows;
+      }
+
+      const invokeSweep = (
+        kind: 'rename' | 'reclaim',
+        characterId: number,
+        state: CharacterState,
+        oldName: string,
+        newName: string,
+      ) =>
+        kind === 'rename'
+          ? characters.rekeyRenamedCharacterOwnSigner(characterId, 5, state, oldName, newName)
+          : characters.rekeyReclaimedCharacterWorldState(
+              {
+                rekeyMarketSeller: () => false,
+                saveMarket: async () => {},
+                rekeyMailOwner: () => false,
+                saveMail: async () => {},
+              },
+              {
+                id: characterId,
+                archivedName: newName,
+                freedName: oldName,
+                level: 5,
+                state,
+              },
+            );
+
+      it.each([
+        ['rename', 'Oldname', 'Zedname'],
+        ['reclaim', 'Freed', 'Freeda'],
+      ] as const)(
+        '%s rewrites bank and vault signatures with count-zero old/new legs',
+        async (kind, oldName, newName) => {
+          const id = await makeCharacter();
+          const initial = mixedState(`${kind}-before`, oldName);
+          await pool.query(`UPDATE characters SET state = $2::jsonb WHERE id = $1`, [
+            id,
+            JSON.stringify(initial),
+          ]);
+
+          await invokeSweep(kind, id, initial, oldName, newName);
+
+          const saved = await stateOf(id);
+          const bankSlot = saved.bank!.inventory[0]!;
+          const vaultSlot = saved.vault!.special![0]!;
+          expect(bankSlot.instance).toEqual({
+            rolled: { quality: 'rare', stats: { power: 7 } },
+          });
+          expect(bankSlot.craftedRecipeId).toBe('recipe:bank-ore');
+          expect(bankSlot.materialSources).toContainEqual({
+            source: { signer: newName },
+            count: 2,
+          });
+          expect(bankSlot.materialSources).toContainEqual({
+            source: {
+              gatherer: { kind: 'character', id: 77, name: 'GatheredBefore' },
+            },
+            count: 3,
+          });
+          expect(vaultSlot.instance).toEqual({
+            rolled: { quality: 'masterwork', stats: { power: 11 } },
+          });
+          expect(vaultSlot.craftedRecipeId).toBe('recipe:vault-ore');
+          expect(vaultSlot.materialSources).toContainEqual({
+            source: { signer: newName },
+            count: 1,
+          });
+          expect(vaultSlot.materialSources).toContainEqual({
+            source: {
+              gatherer: { kind: 'character', id: 77, name: 'GatheredBefore' },
+            },
+            count: 3,
+          });
+
+          expect(await sourceMovementsOf(id, 'personal')).toEqual([
+            {
+              revision: '1',
+              movements: [
+                {
+                  itemId: 'copper_ore',
+                  count: 0,
+                  instance: { rolled: { quality: 'rare', stats: { power: 7 } } },
+                  craftedRecipeId: 'recipe:bank-ore',
+                  sourceDeltas: [
+                    { source: { signer: oldName }, count: -2 },
+                    { source: { signer: newName }, count: 2 },
+                  ],
+                },
+              ],
+            },
+          ]);
+          expect(await sourceMovementsOf(id, 'vault')).toEqual([
+            {
+              revision: '1',
+              movements: [
+                {
+                  itemId: 'copper_ore',
+                  count: 0,
+                  instance: { rolled: { quality: 'masterwork', stats: { power: 11 } } },
+                  craftedRecipeId: 'recipe:vault-ore',
+                  sourceDeltas: [
+                    { source: { signer: oldName }, count: -1 },
+                    { source: { signer: newName }, count: 1 },
+                  ],
+                },
+              ],
+            },
+          ]);
+
+          // A retried sweep sees no old signer, performs no second character
+          // write, and allocates no duplicate journal revision.
+          await invokeSweep(kind, id, saved, oldName, newName);
+          expect((await sourceMovementsOf(id, 'personal')).map((row) => row.revision)).toEqual([
+            '1',
+          ]);
+          expect((await sourceMovementsOf(id, 'vault')).map((row) => row.revision)).toEqual(['1']);
+        },
+      );
+
+      it('rolls back the mixed bank and vault rewrite when the journal statement fails', async () => {
+        const id = await makeCharacter();
+        const initial = mixedState('rollback-before', 'Oldname');
+        await pool.query(`UPDATE characters SET state = $2::jsonb WHERE id = $1`, [
+          id,
+          JSON.stringify(initial),
+        ]);
+        const failing: BoundedTransactionRunner = (timeoutMs, fn) =>
+          db.runWithStatementTimeout(timeoutMs, (query) =>
+            fn(async (text, values) => {
+              if (text.includes('INSERT INTO material_source_journal')) {
+                throw new Error('forced material journal failure');
+              }
+              return query(text, values);
+            }),
+          );
+
+        await expect(
+          characterSignerDb.rekeyOfflineCharacterSigner(id, 'Oldname', 'Zedname', failing),
+        ).rejects.toThrow('forced material journal failure');
+        expect(await stateOf(id)).toEqual(initial);
+        expect(await sourceMovementsOf(id, 'personal')).toEqual([]);
+        expect(await sourceMovementsOf(id, 'vault')).toEqual([]);
+
+        // The failed transaction left no revision behind, so a retry starts at
+        // revision 1 and lands both container records atomically.
+        expect(await characterSignerDb.rekeyOfflineCharacterSigner(id, 'Oldname', 'Zedname')).toBe(
+          true,
+        );
+        expect((await sourceMovementsOf(id, 'personal')).map((row) => row.revision)).toEqual(['1']);
+        expect((await sourceMovementsOf(id, 'vault')).map((row) => row.revision)).toEqual(['1']);
+      });
+    });
+
+    it('reaps the anchor and its journal with the character row (the ownership cascade)', async () => {
+      const id = await seedBanked(1);
+      expect(await db.saveCharacterState(id, 7, BANKED(2, 'doomed'))).toBe(true);
+      expect(await anchorOf(id)).toBeDefined();
+      await pool.query(`DELETE FROM characters WHERE id = $1`, [id]);
+      expect(await anchorOf(id)).toBeUndefined();
+      expect(await movementsOf(id)).toHaveLength(0);
+    }, 30_000);
   });
 });

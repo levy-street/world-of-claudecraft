@@ -88,7 +88,7 @@ export interface WocCustodyGameHost {
  *  ceiling (pool checkout + BEGIN and the installing SET LOCAL under the
  *  15s session default + the twelve-statement ledger-plus-storage maximum +
  *  its twelve inter-statement idle windows under the 10s save bound + the
- *  lock wait + COMMIT under the 65s driver backstop: 255s worst case, derived and
+ *  lock wait + COMMIT under the 65s driver backstop: 262.5s worst case, derived and
  *  pinned in the tunables ladder, under the HTTP layer's 300s), so client
  *  fetch timeouts must be sized off THAT, not off this deadline. The FIFO
  *  occupancy story is wider still: the pre-job guild flush rides the 60s

@@ -479,19 +479,31 @@ describe('every professions grant site is accounted for (#2430)', () => {
     // defensive retired-crop fallback), the knobs phase's compost grant in
     // convertHusks, the crop-ladder phase's tier 3/4 seed-back grant (ONE
     // call site above the survived/withered branch, deliberately shared by
-    // both outcomes, so it counts once), and the celebrations phase's two
-    // golden-harvest sites in harvestCrop's grantGolden closure (the signed
-    // addItemInstance for what fits, the plain addItem overflow remainder;
-    // one closure serves both grades, so the pair counts once), and
-    // masterwrought Phase 11f's golden BONUS grant (one extra item on a golden
-    // win: a next-tier seed or a farming pattern). All nine carry both flags,
-    // because farmHarvested / farmWithered / farmHusksConverted own the whole
-    // player feedback; the bonus is named on farmHarvested as
+    // both outcomes, so it counts once), the celebrations phase's golden
+    // BONUS grant (one extra item on a golden win: a next-tier seed or a
+    // farming pattern), and harvestCrop's grantGolden closure, which used to
+    // be TWO call sites per grade (a signed addItemInstance mint for what
+    // fit, plus a plain addItem overflow remainder for what did not) and is
+    // now ONE: the signature no longer lives on the granted payload, it rides
+    // the granted units' own SOURCE bucket (material_gatherer.ts's
+    // gatheredMaterialSources), so a full bag can no longer separate the
+    // units from their mark and the truncating overflow arm it existed for is
+    // gone (farming.ts's own banner on grantGolden). 9 -> 8 on that
+    // consolidation alone; nothing left the sweep uncovered. All eight carry
+    // both flags, because farmHarvested / farmWithered / farmHusksConverted
+    // own the whole player feedback; the bonus is named on farmHarvested as
     // goldenBonusItemId, the seedBackCount idiom, so it has a line of its own
     // in the client without a second hub grant line.
-    'farming.ts': 9,
+    'farming.ts': 8,
     'fishing.ts': 2,
-    'gathering.ts': 2,
+    // gathering.ts's harvest grant was the same shape as farming's golden
+    // closure: a signed addItemInstance arm for what fit, plus a plain addItem
+    // fungible top-up for what did not. `resolveHarvest`'s `grantFungibleFit`
+    // now grants once, signed or not, via the same source-bucket provenance
+    // (gatheredMaterialSources with an optional signer); the truncating
+    // second arm is gone with it. 2 -> 1 on that consolidation; no addItem
+    // call left this file, so nothing is missing from the sweep.
+    'gathering.ts': 1,
     // Masterwrought phase 04: the two core delivery arms (heroic/raid kill
     // and rift first clear) and the two ember accrual arms, all documented
     // NO_RESULT_EVENT_GRANTS; plus the sundering essence grant, whose sunder
@@ -499,7 +511,19 @@ describe('every professions grant site is accounted for (#2430)', () => {
     'masterwrought_materials.ts': 4,
     'sundering.ts': 1,
     'salvage.ts': 2,
-    'interaction.ts:harvestCorpse': 6,
+    // interaction.ts's harvestCorpse dropped one grant, 6 -> 5, on the exact
+    // same consolidation as farming/gathering above: the signed-component
+    // grant used to be a separate `{ signer }` addItemInstance mint (with a
+    // plain-fallback top-up for what a full bag refused), and now rides the
+    // plain grant's own source-bucket provenance (material_gatherer.ts's
+    // gatheredMaterialSources) in one call, per the "SIGNED-COMPONENT loop"
+    // comment on that arm; zero addItemInstance calls remain in the function.
+    // The consolidation is the only change: harvestCorpse is still an inline
+    // command body in interaction.ts (this drop predates the Intentional
+    // Gathering timed-cast extraction), so the hand-spliced boundary slice
+    // below still joins it into the sweep. Every remaining call still carries
+    // silent + callerLogs, pinned below.
+    'interaction.ts:harvestCorpse': 5,
   };
 
   // Sites that deliberately carry NEITHER flag, keyed by a stable substring of
@@ -598,7 +622,9 @@ describe('every professions grant site is accounted for (#2430)', () => {
   // directory walk above could never see it, and its six grants sat unflagged
   // through the whole of #2430. Only harvestCorpse's own body joins the sweep:
   // the other grants in that file (lootCorpse's distribution, pickUpObject)
-  // are ordinary loot and must keep printing the hub line.
+  // are ordinary loot and must keep printing the hub line. The grant count
+  // inside it has since dropped to five (see EXPECTED_GRANT_SITES above); the
+  // slice and the join stay the same shape.
   const harvestBody = functionBody(
     codeOnly(readFileSync(path.resolve(process.cwd(), 'src/sim/interaction.ts'), 'utf8')),
     'export function harvestCorpse(',
@@ -666,21 +692,24 @@ describe('every professions grant site is accounted for (#2430)', () => {
 
   it('the harvestCorpse slice is the whole function and nothing but the function', () => {
     // Two ways the slice could go wrong and leave the sweep green while
-    // checking the wrong thing: stopping early (the six grants shrink to
+    // checking the wrong thing: stopping early (the five grants shrink to
     // fewer, so a real unflagged one hides outside the window) or running past
     // the function's closing brace into the ordinary loot grants below, which
     // legitimately carry neither flag and would turn the sweep permanently
     // red. Bind both ends.
     const harvestSites = sites.filter((s) => s.file === 'interaction.ts:harvestCorpse');
-    expect(harvestSites).toHaveLength(6);
+    expect(harvestSites).toHaveLength(5);
     // BOTH flags. The shared cue sweep below now asks for `silent` everywhere
     // too (#2458 retired the one site that owned the line without the cue), and
-    // EXPECTED_GRANT_SITES now carries the count of six as well, so neither is
-    // this pin's alone any more. It stays because the count belongs HERE, next
-    // to the boundary checks it interprets: six is what says the slice found
-    // the whole function. One harvest command grants several DISTINCT items, so
-    // a site that kept `callerLogs` but lost `silent` would give one harvest
-    // several cues rather than one stray ding (#2457 acceptance criterion 3).
+    // EXPECTED_GRANT_SITES now carries the count of five as well (the
+    // signed-component grant's own addItemInstance mint consolidated into the
+    // plain grant's source-bucket provenance, same as farming/gathering), so
+    // neither is this pin's alone any more. It stays because the count belongs
+    // HERE, next to the boundary checks it interprets: five is what says the
+    // slice found the whole function. One harvest command grants several
+    // DISTINCT items, so a site that kept `callerLogs` but lost `silent` would
+    // give one harvest several cues rather than one stray ding (#2457
+    // acceptance criterion 3).
     for (const site of harvestSites) {
       expect(site.call, site.call).toContain('silent: true');
       expect(site.call, site.call).toContain('callerLogs: true');

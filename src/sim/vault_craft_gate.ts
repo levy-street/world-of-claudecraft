@@ -57,9 +57,11 @@ import {
   instanceInfoAt,
   WIDE_CLAIM_DUNGEON_ID,
 } from './instances/dungeons';
+import { materialItemIds } from './material_ids';
 import { riftInstanceAtPos } from './rift/runs';
 import type { SimContext } from './sim_context';
 import { NYTHRAXIS_ROOM_RADIUS } from './types';
+import { drawableVaultProjection } from './vault_material_sources';
 
 /** How far WEST of its band origin a dungeon def's claim footprint can reach.
  *  Built from the SAME exported symbols instances/dungeons.ts builds its two
@@ -237,35 +239,48 @@ export function vaultDrawBlocked(ctx: SimContext, pid: number): boolean {
 }
 
 /**
- * The LIVE vault stock a reagent draw may spend for `pid` here, or null when
- * this player draws from their bags alone (unresolvable, or
- * `vaultDrawBlocked`). Null is the "behaves exactly like before the two-pool
- * mechanic" answer that every caller branches on. In practice null means
- * BLOCKED OR UNRESOLVABLE and nothing else: `PlayerMeta.vault` is
- * non-optional and every player is constructed with `{ stock: {}, upgrades:
- * 0 }`, so a resolvable open-world player always gets a record (an empty one
- * plans no takes, which is the same byte-identical outcome). The `?? null`
- * arm below is defensive against a meta-less pid only. Consumers must never
- * read null as "has no vault".
+ * The vault stock a reagent draw may spend for `pid` here, or null when this
+ * player draws from their bags alone (unresolvable, or `vaultDrawBlocked`).
+ * Null is the "behaves exactly like before the two-pool mechanic" answer that
+ * every caller branches on. In practice null means BLOCKED OR UNRESOLVABLE and
+ * nothing else: `PlayerMeta.vault` is non-optional and every player is
+ * constructed with an empty one, so a resolvable open-world player always gets
+ * a record (an empty one plans no takes, which is the same byte-identical
+ * outcome). The `?? null` arm below is defensive against a meta-less pid only.
+ * Consumers must never read null as "has no vault".
  *
- * THE RETURNED RECORD IS THE LIVE `PlayerMeta.vault.stock` REFERENCE, not a
- * clone, and that carries obligations:
+ * THE RETURNED RECORD IS A FRESH PER-CALL PROJECTION, not the live
+ * `PlayerMeta.vault.stock` reference it used to be, and the change is
+ * load-bearing rather than cosmetic. The vault now keeps drawable material in
+ * TWO representations: the compact count map, and the identity collection,
+ * where a stack carrying per-unit provenance has to live because a count map
+ * has nowhere to put a gatherer. Handing back only the compact half would hide
+ * plainly gathered material from every craft that could always spend it before
+ * its representation moved. So this folds both halves into one per-id answer
+ * (vault_material_sources.ts `drawableVaultProjection`), filtered to the
+ * drawable and ELIGIBLE units and to nothing else: premium buckets and rows
+ * that keep per-copy identity stay invisible here exactly as they always were.
  *
- * - SIM-INTERNAL ONLY. It must never be handed across the IWorld seam, put on
- *   a snapshot, or returned from a world-api member. `materials_vault.ts`
- *   `craftVaultStockFor` is the ONLY boundary shape; every consumer outside
- *   the sim takes that clone.
- * - READ-ONLY to its consumers. Nothing may write to it directly. The one
- *   sanctioned mutation is `consumeVaultStock`, which owns the drawable rule
- *   and the delete-at-zero write shape.
+ * Cloning is safe for the consume path because that path PLANS THE WHOLE DRAW
+ * BEFORE APPLYING ANY OF IT and tallies both pools while planning
+ * (professions/reagent_sources.ts `countMinusPlanned`, applied at every craft
+ * and enchant site), so two reagents naming one material are never promised the
+ * same units. The old liveness argument, that a second reagent must observe the
+ * first one's spend, described a plan-as-you-spend loop that no caller has: it
+ * would also have been wrong the moment a draw could come out of the identity
+ * collection, which no record reference can express.
  *
- * It is live rather than cloned because the consume path plans nothing it does
- * not immediately spend: a second reagent naming the same material must see
- * the first one's spend, and a snapshot would let both claim the same units.
+ * WRITE NOTHING TO IT. The one sanctioned mutation of vault stock remains
+ * `consumeVaultStock`, which re-plans against the LIVE stores and owns the
+ * delete-at-zero write shape; a caller that decremented this projection would
+ * be editing a copy while believing it spent something.
  *
  * Ungated the same way `consumeVaultStock` is (no rung, no nearBanker, no dead
  * check), for the same reasons: this is the read half of that primitive, and
- * `vaultDrawBlocked` above is the gate that actually applies here.
+ * `vaultDrawBlocked` above is the gate that actually applies here. That gate is
+ * UNCHANGED by any of this, and it is what the server probes every snapshot
+ * (`craftVaultDrawBlockedFor`); this projection is built only on the craft and
+ * enchant paths and on a changed cvault signature, never per snapshot.
  *
  * DO NOT short-circuit a locked or empty vault to null ahead of the gate: the
  * null-vs-empty-record distinction is load-bearing on the client. hud.ts
@@ -277,5 +292,7 @@ export function vaultDrawBlocked(ctx: SimContext, pid: number): boolean {
  */
 export function vaultDrawStock(ctx: SimContext, pid: number): Record<string, number> | null {
   if (vaultDrawBlocked(ctx, pid)) return null;
-  return ctx.players.get(pid)?.vault?.stock ?? null;
+  const held = ctx.players.get(pid)?.vault;
+  if (!held) return null;
+  return drawableVaultProjection(held.stock, held.special, materialItemIds());
 }

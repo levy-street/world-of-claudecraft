@@ -168,19 +168,23 @@ describe('removeMatchingInstance', () => {
 });
 
 describe('canGrantCopies / grantCopies: the shared exchange-pipe pair', () => {
-  it('capacity: plain-stack room is not instanced room, and the reverse', () => {
+  it('capacity: plain-stack room excludes enchanted payloads in either direction', () => {
     const inventory: InvSlot[] = [{ itemId: 'pristine_hide', count: 1 }];
     // One free slot short: the plain stack tops up, the instanced copy needs
     // its own slot.
     expect(canGrantCopies(inventory, { general: 1, materials: 0 }, 'pristine_hide', 1)).toBe(true);
     expect(
-      canGrantCopies(inventory, { general: 1, materials: 0 }, 'pristine_hide', 1, SIGNED),
+      canGrantCopies(inventory, { general: 1, materials: 0 }, 'pristine_hide', 1, {
+        enchant: 'ench_stat_str',
+      }),
     ).toBe(false);
     const signedStack: InvSlot[] = [
-      { itemId: 'pristine_hide', count: 1, instance: { signer: 'Ayla' } },
+      { itemId: 'pristine_hide', count: 1, instance: { enchant: 'ench_stat_str' } },
     ];
     expect(
-      canGrantCopies(signedStack, { general: 1, materials: 0 }, 'pristine_hide', 1, SIGNED),
+      canGrantCopies(signedStack, { general: 1, materials: 0 }, 'pristine_hide', 1, {
+        enchant: 'ench_stat_str',
+      }),
     ).toBe(true);
     expect(canGrantCopies(signedStack, { general: 1, materials: 0 }, 'pristine_hide', 1)).toBe(
       false,

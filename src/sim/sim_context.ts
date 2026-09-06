@@ -18,6 +18,7 @@ import type { TalentModifiers } from './content/talents';
 import type { DeedRuntime } from './deeds';
 import type { DelayedEvent, GroundAoE } from './entity_roster';
 import type { GuildBankState } from './guild_bank';
+import type { InventoryGrantOptions } from './inventory_grant';
 import type { PendingLootRoll } from './loot/loot_roll';
 import type { MarketListing } from './market';
 import type { MobScanCounters } from './mob/scan_counters';
@@ -98,6 +99,7 @@ export type RuntimeSimConfig = Required<
     | 'respawnSeconds'
     | 'storagePrices'
     | 'vaultConsumptionAdmission'
+    | 'gathererIdentity'
   >
 > &
   Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds'>;
@@ -846,17 +848,7 @@ export interface SimContextCallbacks {
   // opts.movement: also Sim.addItem's, same contract (this grant relocates or
   // re-mints copies somebody already held, so it never bumps a Reliquary
   // obtain count; discovery still fires).
-  addItem(
-    itemId: string,
-    count: number,
-    pid?: number,
-    opts?: Readonly<{
-      silent?: boolean;
-      callerLogs?: boolean;
-      craftedRecipeId?: string;
-      movement?: boolean;
-    }>,
-  ): void;
+  addItem(itemId: string, count: number, pid?: number, opts?: InventoryGrantOptions): void;
   // Equip passthroughs for the /dev kit presets (src/sim/dev_kit.ts), which equip
   // bags before gear so pooled bag capacity exists before the pieces land. Plain
   // delegations to the Sim inventory hub; every validation (class, level, slot,
@@ -864,21 +856,13 @@ export interface SimContextCallbacks {
   equipBag(itemId: string, socket?: number, pid?: number): void;
   equipItem(itemId: string, pid?: number): void;
   unequipItem(slot: EquipSlot, pid?: number): boolean;
-  // #1145 signed materials: grants a single non-fungible item copy carrying an
-  // instance payload (signer/charges/rolled/boundTo, #1165), never merged into a
-  // plain fungible stack. Used by corpse harvest to stamp a rare+ monster
-  // material with the harvester's name.
+  // Payload grants preserve material source buckets and gear instance identity.
   addItemInstance(
     itemId: string,
     instance: ItemInstancePayload,
     pid?: number,
     count?: number,
-    opts?: Readonly<{
-      silent?: boolean;
-      callerLogs?: boolean;
-      craftedRecipeId?: string;
-      movement?: boolean;
-    }>,
+    opts?: InventoryGrantOptions,
   ): void;
   // L2 World Market escrow (marketList) also consumes removeItem; it is declared once
   // above (P1b inventory-hub helper, points-at Sim) - deduped, not re-added here.

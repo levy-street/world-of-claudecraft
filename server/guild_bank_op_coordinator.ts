@@ -188,6 +188,11 @@ export function runGuildBankOp(
       copperDelta: delta.copperDelta,
       purchasedSlotsBefore: delta.purchasedSlotsBefore ?? 0,
       purchasedSlotsAfter: delta.purchasedSlotsAfter,
+      // The exact per-source legs the differ read off the book. Threaded, not
+      // recomputed: the sidecar's whole point is that the replay moves the units
+      // this command really moved, and dropping the field here would silently
+      // demote every material move back to a legacy whole-stack projection.
+      materialSources: delta.materialSources ?? null,
     }));
 
     host.markGuildBankDirty(guildId);

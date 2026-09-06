@@ -71,6 +71,17 @@ function fillBags(sim: Sim): void {
 }
 
 describe('stack sizes and stacking math', () => {
+  it('every fixture id in this block is a NON-material, so it exercises the legacy arm', () => {
+    // An honest material takes the packing-core arm instead (bags.ts "The
+    // material arm"; its contracts are tests/material_bags.test.ts). Without
+    // this pin a taxonomy change could silently reroute the whole block and
+    // quietly redefine what its identical-payload assertions below mean.
+    // Exactly the ids this block puts through countFit/addStacked/fitsAll.
+    for (const id of ['baked_bread', 'worn_sword', 'rusty_dagger', 'training_mace']) {
+      expect(materialItemIds().has(id), id).toBe(false);
+    }
+  });
+
   it('gear, bags, and tools never stack; consumables stack to 20', () => {
     expect(stackSizeOf(ITEMS.worn_sword)).toBe(1);
     expect(stackSizeOf(ITEMS.linen_pouch)).toBe(1);

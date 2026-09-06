@@ -30,7 +30,6 @@ import {
   canAddItem,
   instancedCountCap,
   migrationBagsFor,
-  stackSizeOf,
 } from './bags';
 import * as bankMod from './bank';
 import {
@@ -278,14 +277,16 @@ import type { GuildBankState, GuildMembership } from './guild_bank';
 import * as guildBankMod from './guild_bank';
 import * as raidReadouts from './ignivar_raid_readouts';
 import * as interaction from './interaction';
+import * as inventoryConsumption from './inventory_consumption';
 import type { ExtractOutcome, ExtractRef } from './inventory_extract';
+import { grantInventoryInstances, type InventoryGrantOptions } from './inventory_grant';
 import { foldNamedSlotTarget, type NamedSlotTarget } from './item_copy_ref';
 import {
   boundCraftedRecipeIdOnLoad,
   sanitizeItemInstancePayloadOnLoad,
   warnDroppedInstanceKeys,
 } from './item_instance_load';
-import { canStackInstancePayloads, isMergeableInstancePayload } from './item_instance_merge';
+import { isMergeableInstancePayload } from './item_instance_merge';
 import { meetsLevelRequirement } from './item_level_req';
 import { countRawInSlots, setItemLocked as setItemLockedCmd } from './item_lock';
 import * as items from './items';
@@ -323,6 +324,23 @@ import {
 import { type MailSave, PostOffice } from './mail/post_office';
 import { Market, type MarketListing, type MarketSave } from './market';
 import { defaultMarketQuery, type MarketQuery } from './market_query';
+import {
+  type GathererIdentity,
+  type LocalGathererIdentity,
+  persistedLocalIdentity,
+  readLocalGathererIdentity,
+  readPersistedLocalIdentity,
+  resolveGathererIdentity,
+} from './material_gatherer';
+import {
+  normalizeLoadedMaterialSlot,
+  preservesMaterialCountOnLoad,
+  validateCharacterMaterialSourcesOnLoad,
+} from './material_slot_load';
+import type { MaterialSourceTransferSelection } from './material_source_transfer_selection';
+import type { MaterialComposition } from './material_sources';
+import { changeMaterialStackGrouping } from './material_stack_commands';
+import type { MaterialStackSelection } from './material_stack_selection';
 import type { MaterialsVaultState } from './materials_vault';
 import * as vaultMod from './materials_vault';
 import {
@@ -456,7 +474,6 @@ import {
   completeDisenchantCast as completeDisenchantCastImpl,
   type DisenchantResult,
   disenchantItem as disenchantItemImpl,
-  isEnchantedInstance,
 } from './professions/enchanting';
 import { warnDroppedFarmPlotRows } from './professions/farm_load_report';
 import { normalizeFarmPlots, serializeFarmPlots } from './professions/farm_persist';
@@ -1291,6 +1308,14 @@ export interface PlayerMeta {
   // Stable database character id when running on the server. Offline/sim-only
   // callers fall back to entityId for systems that need a rename-proof owner key.
   characterId?: number;
+  // The DURABLE half of this player's material-gatherer descriptor
+  // (src/sim/material_gatherer.ts): the authoritative character id online, the
+  // host-allocated opaque id offline/headless, or ABSENT when no host supplied
+  // one, in which case every gather this session records nothing. Resolved ONCE
+  // at addPlayer from explicit inputs and never derived from the seed, the
+  // entity id or the name. The display NAME is deliberately not stored here: a
+  // mint snapshots `name` live, so a rename applies to future gathers only.
+  gathererIdentity?: GathererIdentity;
   cls: PlayerClass;
   name: string;
   // Dev-only test dummy spawned via "/dev bot <name>" (social/chat.ts, gated by
@@ -2490,6 +2515,9 @@ export class Sim {
     if (!cfg.noPlayer) {
       this.ownPlayerPid = this.addPlayer(this.cfg.playerClass, this.cfg.playerName, {
         autoEquip: this.cfg.autoEquip,
+        // Carried through, never derived: the host allocated this id outside the
+        // sim. Absent for a bare test/probe Sim, which then gathers unrecorded.
+        localGathererIdentity: cfg.gathererIdentity ?? null,
       });
       // The compulsory tutorial starts ASHORE, not one greeting sweep later.
       // An offline session is always a fresh character, so landing at the
@@ -2645,6 +2673,16 @@ export class Sim {
       autoEquip?: boolean;
       state?: CharacterState;
       characterId?: number;
+      // The FRESH host-allocated material-gatherer identity for an
+      // offline/headless character that has none persisted yet
+      // (src/sim/material_gatherer.ts). Allocated by the host OUTSIDE the sim
+      // (a crypto UUID, or a host namespace plus a monotonic counter) and passed
+      // in whole; a persisted identity on `state` supersedes it. Ignored
+      // entirely when `characterId` is present: an online character is
+      // attributed from the authoritative row, never from a local id. A host
+      // adding a SECOND local player must allocate that player its own id here
+      // rather than reusing the primary's.
+      localGathererIdentity?: LocalGathererIdentity | null;
       // Pre-latch the compulsory-tutorial one-shot (sim/tutorial/greeting.ts):
       // the server passes true for a BARE join (null character state), which
       // is the test-harness shape, so a fixture character is never ferried
@@ -2670,6 +2708,14 @@ export class Sim {
       bot?: boolean;
     },
   ): number {
+    validateCharacterMaterialSourcesOnLoad(opts?.state);
+    // Read BEFORE any entity or meta exists: a malformed stored gatherer
+    // identity refuses the whole join rather than being silently replaced by
+    // the fresh host default, which would split one player's provenance across
+    // two durable ids with nothing left to detect it.
+    const persistedGathererIdentity = readPersistedLocalIdentity(
+      opts?.state?.materialGathererIdentity,
+    );
     const savedState = opts?.state
       ? sanitizeRemovedZone1Content(migrateCharacterTalentsV2(cls, opts.state)).state
       : undefined;
@@ -2738,6 +2784,18 @@ export class Sim {
     const meta: PlayerMeta = {
       entityId: player.id,
       characterId: opts?.characterId,
+      // Resolved from EXPLICIT inputs only, in the module's fixed precedence
+      // (authoritative characterId, then the persisted local identity, then the
+      // fresh host default). A malformed persisted value throws out of the read
+      // above, before this player is registered, rather than being regenerated
+      // into a different identity than its own gathered stock names.
+      gathererIdentity: resolveGathererIdentity({
+        ...(opts?.characterId === undefined ? {} : { characterId: opts.characterId }),
+        ...(persistedGathererIdentity === undefined
+          ? {}
+          : { persisted: persistedGathererIdentity }),
+        hostDefault: readLocalGathererIdentity(opts?.localGathererIdentity),
+      }),
       cls,
       name,
       skin: savedState?.skin ?? 0,
@@ -3012,7 +3070,8 @@ export class Sim {
       // never launder into independent copies via a later deposit or trade.
       meta.inventory = s.inventory.map((raw) => {
         const slot = cloneInvSlot(raw);
-        slot.count = Math.min(slot.count, instancedCountCap(ITEMS[slot.itemId], slot.instance));
+        if (!preservesMaterialCountOnLoad(slot))
+          slot.count = Math.min(slot.count, instancedCountCap(ITEMS[slot.itemId], slot.instance));
         return slot;
       });
       for (const slot of meta.inventory) {
@@ -3049,6 +3108,7 @@ export class Sim {
           else delete slot.instance;
         }
       }
+      meta.inventory = meta.inventory.map(normalizeLoadedMaterialSlot);
       if (s.bags === undefined) {
         // PRE-BAG save: the character earned this space under the infinite
         // inventory, so grant + equip bags that cover it (lowest quality tier
@@ -3104,8 +3164,13 @@ export class Sim {
           if (payload) slot.instance = payload;
           else delete slot.instance;
         }
-        if (slot.instance && !isMergeableInstancePayload(slot.instance)) slot.count = 1;
-        return slot;
+        if (
+          !preservesMaterialCountOnLoad(slot) &&
+          slot.instance &&
+          !isMergeableInstancePayload(slot.instance)
+        )
+          slot.count = 1;
+        return normalizeLoadedMaterialSlot(slot);
       });
       // Bank sanitizes on load (never destroys items; a pre-bank save sanitizes to
       // an empty bank; see bank.ts sanitizeBankState). Deliberately NO wire-rev bump
@@ -4180,6 +4245,15 @@ export class Sim {
       ...(() => {
         const reliquary = serializeReliquaryState(meta.reliquary);
         return reliquary ? { reliquary } : {};
+      })(),
+      // The LOCAL gatherer identity only, so it survives save/reload and
+      // supersedes the next session's fresh host default. An online character
+      // writes nothing here (its id comes from the row at every join, and a save
+      // must never carry an identity claim back in), so its blob and every
+      // pre-feature save stay byte-equal.
+      ...(() => {
+        const materialGathererIdentity = persistedLocalIdentity(meta.gathererIdentity);
+        return materialGathererIdentity ? { materialGathererIdentity } : {};
       })(),
     };
     return sanitizeRemovedZone1Content(state).state;
@@ -8215,11 +8289,7 @@ export class Sim {
   // World Market lists/escrows against this, never the instanced count, so an
   // instanced copy is never sold as if it were a plain stack member.
   countFungibleItem(itemId: string, pid?: number): number {
-    const r = this.resolve(pid);
-    if (!r) return 0;
-    let n = 0;
-    for (const s of r.meta.inventory) if (s.itemId === itemId && !s.instance) n += s.count;
-    return n;
+    return inventoryConsumption.countFungibleItem(this.ctx, itemId, pid);
   }
 
   // Grants are stack-aware (bags.ts addStacked, which never merges into an
@@ -8269,22 +8339,19 @@ export class Sim {
   // buyback loop it is not free, because the materials are consumed. A
   // CURRENCY vendor counts too (delve Marks are earned in the world). What
   // does NOT count is a copy changing hands or being re-minted from itself.
-  addItem(
-    itemId: string,
-    count: number,
-    pid?: number,
-    opts?: Readonly<{
-      silent?: boolean;
-      callerLogs?: boolean;
-      craftedRecipeId?: string;
-      movement?: boolean;
-    }>,
-  ): void {
+  addItem(itemId: string, count: number, pid?: number, opts?: InventoryGrantOptions): void {
     const r = this.resolve(pid);
     if (!r) return;
     const { meta } = r;
     const def = ITEMS[itemId];
-    addStacked(meta.inventory, itemId, count, undefined, opts?.craftedRecipeId);
+    addStacked(
+      meta.inventory,
+      itemId,
+      count,
+      undefined,
+      opts?.craftedRecipeId,
+      opts?.materialSources,
+    );
     // Every grant that reaches the hub is an acquisition for the Book of
     // Deeds discovery ledger (loot, craft, quest reward, vendor, mail, trade).
     // `movement` rides along but never gates discovery: it only tells the
@@ -8324,57 +8391,29 @@ export class Sim {
     }
   }
 
-  // Grant `count` non-fungible copies of `itemId` carrying an instance payload
-  // (#1165: signer/charges/rolled/boundTo). Identical-payload stacking: each
-  // copy merges into an existing slot whose payload is byte-equal
-  // under canStackInstancePayloads (so a charge-bearing payload stays
-  // one-per-slot) with stack room; otherwise it takes its own slot entry. It
-  // never merges with a plain or differently-instanced stack. A multi-unit
-  // grant (a rare-event windfall) emits ONE loot line with the xN suffix
-  // instead of one line and cue per unit; discovery and quest hooks fire once
-  // per grant, matching addItem's per-call semantics.
-  // opts.silent / opts.callerLogs: see addItem's matching params above, same
-  // contract.
-  // opts.movement: see addItem's matching param above, same contract.
+  // Grant payload-bearing copies. Materials coalesce exact source buckets;
+  // other items retain identical-payload stacking and one-per-slot charges.
+  // Loot events, discovery and movement accounting match addItem.
   addItemInstance(
     itemId: string,
     instance: ItemInstancePayload,
     pid?: number,
     count = 1,
-    opts?: Readonly<{
-      silent?: boolean;
-      callerLogs?: boolean;
-      craftedRecipeId?: string;
-      movement?: boolean;
-    }>,
+    opts?: InventoryGrantOptions,
   ): void {
     const r = this.resolve(pid);
     if (!r) return;
     if (count < 1) return;
     const { meta } = r;
     const def = ITEMS[itemId];
-    const stack = stackSizeOf(def);
-    for (let i = 0; i < count; i++) {
-      const mergeTarget = meta.inventory.find(
-        (s) =>
-          s.itemId === itemId &&
-          s.count < stack &&
-          s.craftedRecipeId === opts?.craftedRecipeId &&
-          canStackInstancePayloads(s.instance, instance),
-      );
-      if (mergeTarget) mergeTarget.count += 1;
-      // The first pushed slot holds the caller's payload object (the shipped
-      // single-unit contract); any further slot a stack-cap crossing forces
-      // gets its own clone, so two slots never share one mutable payload
-      // (charges mutate in place, unbind clears boundTo on one slot).
-      else
-        meta.inventory.push({
-          itemId,
-          count: 1,
-          instance: i === 0 ? instance : cloneItemInstancePayload(instance),
-          ...(opts?.craftedRecipeId === undefined ? {} : { craftedRecipeId: opts.craftedRecipeId }),
-        });
-    }
+    grantInventoryInstances(
+      meta.inventory,
+      itemId,
+      count,
+      instance,
+      opts?.craftedRecipeId,
+      opts?.materialSources,
+    );
     // Discovery ledger: the instance's rolled quality (gathered rares) beats
     // the static def quality for the quality-first marks. `movement` rides
     // along exactly as in addItem above (provenance only, never membership).
@@ -8412,46 +8451,14 @@ export class Sim {
   // case) must never alias the surviving stack's shared payload. The final
   // unit of a fully-consumed slot returns the original object.
   removeItem(itemId: string, count: number, pid?: number): ItemInstancePayload[] {
-    const consumedInstances: ItemInstancePayload[] = [];
-    const r = this.resolve(pid);
-    if (!r) return consumedInstances;
-    const { meta } = r;
-    for (let i = meta.inventory.length - 1; i >= 0 && count > 0; i--) {
-      const s = meta.inventory[i];
-      if (s.itemId !== itemId) continue;
-      const take = Math.min(s.count, count);
-      if (s.instance) {
-        for (let unit = 0; unit < take; unit++) {
-          const finalUnitOfSlot = take >= s.count && unit === take - 1;
-          consumedInstances.push(
-            finalUnitOfSlot ? s.instance : cloneItemInstancePayload(s.instance),
-          );
-        }
-      }
-      s.count -= take;
-      count -= take;
-      if (s.count <= 0) meta.inventory.splice(i, 1);
-    }
-    this.ctx.onInventoryChangedForQuests(meta);
-    return consumedInstances;
+    return inventoryConsumption.removeItem(this.ctx, itemId, count, pid);
   }
 
   // Fungible-only removal (#1165): skips instanced slots entirely, so a market
   // listing/escrow can never consume a signed/rolled/bound copy even when the
   // caller only checked countFungibleItem beforehand.
   removeFungibleItem(itemId: string, count: number, pid?: number): void {
-    const r = this.resolve(pid);
-    if (!r) return;
-    const { meta } = r;
-    for (let i = meta.inventory.length - 1; i >= 0 && count > 0; i--) {
-      const s = meta.inventory[i];
-      if (s.itemId !== itemId || s.instance) continue;
-      const take = Math.min(s.count, count);
-      s.count -= take;
-      count -= take;
-      if (s.count <= 0) meta.inventory.splice(i, 1);
-    }
-    this.ctx.onInventoryChangedForQuests(meta);
+    inventoryConsumption.removeFungibleItem(this.ctx, itemId, count, pid);
   }
 
   // The broker custody pair (extraction into escrow, grant back) lives in
@@ -8478,15 +8485,7 @@ export class Sim {
   // PREFERENCE tier: it gates on countItem and falls back to removeItem when
   // every held copy is enchanted (issue #2340; see resolveDisenchant).
   countEnchantableItem(itemId: string, pid?: number): number {
-    const r = this.resolve(pid);
-    if (!r) return 0;
-    let n = 0;
-    for (const s of r.meta.inventory) {
-      if (s.itemId !== itemId) continue;
-      if (s.instance && isEnchantedInstance(s.instance)) continue;
-      n += s.count;
-    }
-    return n;
+    return inventoryConsumption.countEnchantableItem(this.ctx, itemId, pid);
   }
 
   // Removal counterpart to countEnchantableItem above: prefers plain fungible
@@ -8503,43 +8502,7 @@ export class Sim {
   // its marker on the SLOT, not in an `instance`, so a payload-only return had
   // nowhere to put it.
   removeEnchantableItem(itemId: string, count: number, pid?: number): InventoryUnit[] {
-    const consumed: InventoryUnit[] = [];
-    const r = this.resolve(pid);
-    if (!r) return consumed;
-    const { meta } = r;
-    // Pass 1: plain fungible stacks only, same order removeFungibleItem uses.
-    for (let i = meta.inventory.length - 1; i >= 0 && count > 0; i--) {
-      const s = meta.inventory[i];
-      if (s.itemId !== itemId || s.instance) continue;
-      const take = Math.min(s.count, count);
-      for (let unit = 0; unit < take; unit++) {
-        consumed.push({ instance: undefined, craftedRecipeId: s.craftedRecipeId });
-      }
-      s.count -= take;
-      count -= take;
-      if (s.count <= 0) meta.inventory.splice(i, 1);
-    }
-    // Pass 2: instanced copies that are not already enchanted. Per-unit
-    // returns with the same clone-on-survival rule removeItem follows: the
-    // enchant path mutates the payload it gets back, so a surviving stack's
-    // shared payload must never be aliased out.
-    for (let i = meta.inventory.length - 1; i >= 0 && count > 0; i--) {
-      const s = meta.inventory[i];
-      if (s.itemId !== itemId || !s.instance || isEnchantedInstance(s.instance)) continue;
-      const take = Math.min(s.count, count);
-      for (let unit = 0; unit < take; unit++) {
-        const finalUnitOfSlot = take >= s.count && unit === take - 1;
-        consumed.push({
-          instance: finalUnitOfSlot ? s.instance : cloneItemInstancePayload(s.instance),
-          craftedRecipeId: s.craftedRecipeId,
-        });
-      }
-      s.count -= take;
-      count -= take;
-      if (s.count <= 0) meta.inventory.splice(i, 1);
-    }
-    this.ctx.onInventoryChangedForQuests(meta);
-    return consumed;
+    return inventoryConsumption.removeEnchantableItem(this.ctx, itemId, count, pid);
   }
 
   // True when `count` copies of the item fit the player's pooled bag budget
@@ -8607,6 +8570,17 @@ export class Sim {
 
   sortInventory(pid?: number): void {
     items.sortInventory(this.ctx, pid);
+  }
+  separateMaterialStack(
+    itemId: string,
+    target: MaterialStackSelection,
+    selectedSources?: MaterialComposition,
+    pid?: number,
+  ): void {
+    changeMaterialStackGrouping(this.ctx, itemId, target, 'separate', selectedSources, pid);
+  }
+  combineMaterialStacks(itemId: string, target: MaterialStackSelection, pid?: number): void {
+    changeMaterialStackGrouping(this.ctx, itemId, target, 'combine', undefined, pid);
   }
 
   // Equip into the exact slot the player aimed at (the paperdoll drop target),
@@ -10518,12 +10492,22 @@ export class Sim {
   // the IWorld surface call these unchanged, reaching the inventory hub through
   // the SimContext. Each op has one entry point, gated on banker proximity (nearBanker).
 
-  bankDeposit(slotIndex: number, count?: number, pid?: number): void {
-    bankMod.bankDeposit(this.ctx, slotIndex, count, pid);
+  bankDeposit(
+    slotIndex: number,
+    count?: number,
+    pidOrSelection?: number | MaterialSourceTransferSelection,
+    pid?: number,
+  ): void {
+    bankMod.bankDeposit(this.ctx, slotIndex, count, pidOrSelection, pid);
   }
 
-  bankWithdraw(slotIndex: number, count?: number, pid?: number): void {
-    bankMod.bankWithdraw(this.ctx, slotIndex, count, pid);
+  bankWithdraw(
+    slotIndex: number,
+    count?: number,
+    pidOrSelection?: number | MaterialSourceTransferSelection,
+    pid?: number,
+  ): void {
+    bankMod.bankWithdraw(this.ctx, slotIndex, count, pidOrSelection, pid);
   }
 
   bankBuySlots(pid?: number): void {
@@ -10564,8 +10548,13 @@ export class Sim {
   // The Materials Vault: the per-character material stockpile
   // -------------------------------------------------------------------------
   // Thin delegates; materials_vault.ts owns state, persistence, gates, and revisions.
-  vaultDeposit(slotIndex: number, count?: number, pid?: number): void {
-    vaultMod.vaultDeposit(this.ctx, slotIndex, count, pid);
+  vaultDeposit(
+    slotIndex: number,
+    count?: number,
+    pidOrSelection?: number | MaterialSourceTransferSelection,
+    pid?: number,
+  ): void {
+    vaultMod.vaultDeposit(this.ctx, slotIndex, count, pidOrSelection, pid);
   }
   vaultDepositAll(pid?: number): void {
     vaultMod.vaultDepositAll(this.ctx, pid);
@@ -10658,12 +10647,22 @@ export class Sim {
     guildBankMod.guildBankWithdrawGold(this.ctx, amount, pid);
   }
 
-  guildBankDepositFor(pid: number, slotIndex: number, count?: number): void {
-    guildBankMod.guildBankDeposit(this.ctx, slotIndex, count, pid);
+  guildBankDepositFor(
+    pid: number,
+    slotIndex: number,
+    count?: number,
+    selection?: MaterialSourceTransferSelection,
+  ): void {
+    guildBankMod.guildBankDeposit(this.ctx, slotIndex, count, pid, selection);
   }
 
-  guildBankWithdrawFor(pid: number, slotIndex: number, count?: number): void {
-    guildBankMod.guildBankWithdraw(this.ctx, slotIndex, count, pid);
+  guildBankWithdrawFor(
+    pid: number,
+    slotIndex: number,
+    count?: number,
+    selection?: MaterialSourceTransferSelection,
+  ): void {
+    guildBankMod.guildBankWithdraw(this.ctx, slotIndex, count, pid, selection);
   }
 
   guildBankBuySlotsFor(pid: number): void {

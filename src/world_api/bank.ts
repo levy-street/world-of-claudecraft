@@ -1,3 +1,4 @@
+import type { MaterialSourceTransferSelection } from '../sim/material_source_transfer_selection';
 import type { InvSlot } from '../sim/types';
 
 // ---------------------------------------------------------------------------
@@ -97,6 +98,7 @@ export interface VaultSpecialRef {
   index: number;
   instance?: InvSlot['instance'];
   craftedRecipeId?: string;
+  selection?: import('../sim/material_source_transfer_selection').MaterialSourceTransferSelection;
 }
 
 export interface IWorldBank {
@@ -130,8 +132,12 @@ export interface IWorldBank {
   // unknown, never coerce it to 0 (that would advertise the whole ladder as
   // free room).
   bankPurchasedSlots: number | null;
-  bankDeposit(slotIndex: number, count?: number): void;
-  bankWithdraw(slotIndex: number, count?: number): void;
+  bankDeposit(slotIndex: number, count?: number, selection?: MaterialSourceTransferSelection): void;
+  bankWithdraw(
+    slotIndex: number,
+    count?: number,
+    selection?: MaterialSourceTransferSelection,
+  ): void;
   bankBuySlots(): void;
   // --- Bank bag sockets (Bank Storage phases 06 and 07). All banker-gated
   // like the three commands above; the sim owns every rule (unlock order,
@@ -151,7 +157,11 @@ export interface IWorldBank {
   bankUnsocketBag(socket: number): void;
   // Non-null only while standing at a banker NPC, like bankInfo.
   vaultInfo: VaultInfo | null;
-  vaultDeposit(slotIndex: number, count?: number): void;
+  vaultDeposit(
+    slotIndex: number,
+    count?: number,
+    selection?: import('../sim/material_source_transfer_selection').MaterialSourceTransferSelection,
+  ): void;
   vaultWithdraw(itemId: string, count?: number, special?: VaultSpecialRef): void;
   // Deposit every depositable carried material in ONE batched server-side
   // command (never a client-side loop of vaultDeposit sends: the command lane

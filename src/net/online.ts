@@ -1,3 +1,7 @@
+import type { MaterialComposition } from '../sim/material_sources';
+import type { MaterialStackSelection } from '../sim/material_stack_selection';
+import { materialStorageTransferPayload } from './material_storage_command';
+
 // Online play: REST auth client + WebSocket world mirror.
 
 import { App } from '@capacitor/app';
@@ -212,6 +216,7 @@ import { decodeGuildBankLogFrame, GUILD_BANK_LOG_TTL_MS } from './guild_bank_log
 import { foldInputAck } from './input_ack';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
 import { inputSignature } from './input_signature';
+import { applyMaterialInventoryWire } from './material_inventory_wire';
 import {
   applyMountRaceEventToMirror,
   decodeMountRaceView,
@@ -3520,18 +3525,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       const copper = s.copper ?? this.copper;
       if (copper !== this.copper) this.invChanged = true;
       this.copper = copper;
-      if (s.inv !== undefined) {
-        this.inventory = s.inv;
-        this.invChanged = true;
-      }
-      if (s.buyback !== undefined) {
-        this.vendorBuyback = s.buyback;
-        this.invChanged = true;
-      }
-      if (s.bags !== undefined) {
-        this.bags = s.bags;
-        this.invChanged = true;
-      }
+      if (applyMaterialInventoryWire(this, s)) this.invChanged = true;
       if (s.equip !== undefined) this.equipment = s.equip;
       if (s.einst !== undefined) this.equipmentInstances = s.einst ?? {};
       // IWorldCosmetics facet (W7) self-decode: cosmetics is delta-guarded (a
@@ -4088,6 +4082,16 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
   sortInventory(): void {
     this.cmd({ cmd: 'inv_sort' });
+  }
+  separateMaterialStack(
+    itemId: string,
+    target: MaterialStackSelection,
+    selectedSources?: MaterialComposition,
+  ): void {
+    this.cmd({ cmd: 'material_separate', item: itemId, target, sources: selectedSources });
+  }
+  combineMaterialStacks(itemId: string, target: MaterialStackSelection): void {
+    this.cmd({ cmd: 'material_combine', item: itemId, target });
   }
   // Same 'equip' wire token with the aimed slot attached: an older server that
   // ignores the field simply resolves the slot itself, so the field is additive.
@@ -5089,11 +5093,11 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // re-validates banker proximity, capacity, and quest-item rules on every send. The
   // slotIndex rides as `slot` and the optional partial count as `count`, matching the
   // castAbilityBySlot/discard wire idiom. ---
-  bankDeposit(slotIndex: number, count?: number): void {
-    this.cmd({ cmd: 'bank_deposit', slot: slotIndex, ...(count !== undefined ? { count } : {}) });
+  bankDeposit(...args: Parameters<typeof materialStorageTransferPayload>): void {
+    this.cmd({ cmd: 'bank_deposit', ...materialStorageTransferPayload(...args) });
   }
-  bankWithdraw(slotIndex: number, count?: number): void {
-    this.cmd({ cmd: 'bank_withdraw', slot: slotIndex, ...(count !== undefined ? { count } : {}) });
+  bankWithdraw(...args: Parameters<typeof materialStorageTransferPayload>): void {
+    this.cmd({ cmd: 'bank_withdraw', ...materialStorageTransferPayload(...args) });
   }
   bankBuySlots(): void {
     this.cmd({ cmd: 'bank_buy_slots' });
@@ -5122,8 +5126,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // re-validates banker proximity, material scope, cap, and price. Deposit uses
   // carried-inventory index, optional partial `count`); pooled withdrawals use
   // `itemId`, while special rows add their snapshot index plus fingerprint. ---
-  vaultDeposit(slotIndex: number, count?: number): void {
-    this.cmd({ cmd: 'vault_deposit', slot: slotIndex, ...(count !== undefined ? { count } : {}) });
+  vaultDeposit(...args: Parameters<typeof materialStorageTransferPayload>): void {
+    this.cmd({ cmd: 'vault_deposit', ...materialStorageTransferPayload(...args) });
   }
   vaultWithdraw(...args: Parameters<typeof vaultWithdrawPayload>): void {
     this.cmd({ cmd: 'vault_withdraw', ...vaultWithdrawPayload(...args) });
@@ -5146,19 +5150,11 @@ export class ClientWorld extends ReconWireState implements IWorld {
   guildBankWithdrawGold(amount: number): void {
     this.cmd({ cmd: 'guild_bank_withdraw_gold', amount });
   }
-  guildBankDeposit(slotIndex: number, count?: number): void {
-    this.cmd({
-      cmd: 'guild_bank_deposit',
-      slot: slotIndex,
-      ...(count !== undefined ? { count } : {}),
-    });
+  guildBankDeposit(...args: Parameters<typeof materialStorageTransferPayload>): void {
+    this.cmd({ cmd: 'guild_bank_deposit', ...materialStorageTransferPayload(...args) });
   }
-  guildBankWithdraw(slotIndex: number, count?: number): void {
-    this.cmd({
-      cmd: 'guild_bank_withdraw',
-      slot: slotIndex,
-      ...(count !== undefined ? { count } : {}),
-    });
+  guildBankWithdraw(...args: Parameters<typeof materialStorageTransferPayload>): void {
+    this.cmd({ cmd: 'guild_bank_withdraw', ...materialStorageTransferPayload(...args) });
   }
   guildBankBuySlots(): void {
     this.cmd({ cmd: 'guild_bank_buy_slots' });

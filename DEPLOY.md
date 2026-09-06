@@ -376,7 +376,9 @@ For off-box safety, sync the directory to S3 occasionally:
   `storage_purchase_guard_character_delete` and
   `storage_purchase_guard_account_delete` (on characters/accounts),
   `storage_purchase_guard_consumed_key`, `storage_purchase_archive_applied`,
-  `bank_ledger_growth_budget_insert` (on bank_ledger), and
+  `bank_ledger_growth_budget_insert` and `bank_ledger_growth_budget_delete` (on
+  bank_ledger), `material_source_journal_growth_budget_insert` and
+  `material_source_journal_growth_budget_delete` (on material_source_journal), and
   `bank_ledger_growth_budget_commit` (the DEFERRABLE constraint trigger on
   bank_ledger_growth_pending). On a rolled-back binary a
   character holding a pending storage purchase becomes UNDELETABLE: the 55006
@@ -846,19 +848,19 @@ For off-box safety, sync the directory to S3 occasionally:
   realms is
   `sum(sum by (recipe) (woc_rod_fee_payments_total) * max by (recipe) (woc_rod_fee_copper))`.
   `woc_bank_ledger_growth_budget` is another database-wide gauge exported by
-  every realm. Never sum its row count or capacity: use one target, or `max`
-  without the target `realm` label for `lifetime_inserted_rows` and
+  every realm. Never sum its row count, byte size or capacity: use one target, or `max`
+  without the target `realm` label for `accounted_rows`, `total_bytes` and
   `hard_limit_rows`. Use `max` for `observation_age_seconds` so the stalest realm
   is visible, `max` for `limit_warning` so one realm that has observed the warn
-  crossing raises it, and `min` for `initialized` so one realm that has never
-  observed the singleton cannot hide behind healthy peers.
-  `lifetime_inserted_rows` is a lifetime INSERT counter, not a live row count:
-  it is never credited back when ledger rows disappear through the
-  characters/accounts `ON DELETE CASCADE`, so after deletion churn it reads
-  higher than a live `count(*)` of `bank_ledger`. The measure label was RENAMED
-  this release: any dashboard or alert keying `observed_committed_rows` must
-  move to `lifetime_inserted_rows` with this deploy (the old series stops
-  being exported). The per-process bank-ledger FIFO drop total moved the same
+  crossing raises it, and `min` for `initialized` (and `bytes_known`) so one realm that
+  has never observed the singleton cannot hide behind healthy peers.
+  `accounted_rows` is the aggregate audit rows the budget currently accounts for
+  across `bank_ledger` and `material_source_journal`: it rises on inserts and FALLS when
+  an owner cascade reaps audit rows, so it tracks live storage rather than history ever
+  written. `lifetime_inserted_rows` carries the same value as a deprecated alias for
+  dashboards that predate the aggregate budget; its NAME is now wrong and it is removed
+  once those panels move to `accounted_rows`. (The earlier rename of
+  `observed_committed_rows` to `lifetime_inserted_rows` still applies to anything older.) The per-process bank-ledger FIFO drop total moved the same
   way: `woc_bank_ledger_tail{measure="dropped_rows"}` is no longer exported,
   so an existing any-increase alert on that arm goes silently to no-data;
   point it at the `woc_bank_ledger_tail_dropped_rows_total` counter and alert
@@ -1085,12 +1087,34 @@ For off-box safety, sync the directory to S3 occasionally:
   (shared + quota + listener + deadline-cancel), the same arithmetic as above) breaks
   the stock budget; the boot clients and rolling-restart overlap still ride on top of
   what it counts.
-- **`BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS`: database-wide lifetime ceiling.** The
-  default is 10,000,000 rows for the keep-forever anti-dupe ledger. First deployment
-  seeds an exact `COUNT(*)` while inserts are locked; PostgreSQL then accounts every
-  writer, including old binaries and raw SQL, in the inserting transaction and refuses
-  the COMMIT that would cross the ceiling. `bank_ledger` PREDATES this release (it has
-  been accumulating since 2026-07-06), so the first install of this release seeds over
+- **`BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS`: database-wide AGGREGATE audit ceiling.** The
+  default is 10,000,000 rows, and it now covers `bank_ledger` PLUS
+  `material_source_journal` against ONE singleton, one env value and one ceiling (there
+  is no per-table budget and no second knob). `material_source_containers` is not
+  counted: an anchor is created with its first journal row and reaped with its last, so
+  its cardinality is already bounded by counted rows. First deployment
+  seeds an exact `COUNT(*)` of each counted table while writers are locked; PostgreSQL
+  then accounts every writer, including old binaries and raw SQL, in the writing
+  transaction and refuses the COMMIT that would cross the ceiling.
+  **The counter is now NET, not a lifetime tally.** Statement triggers count INSERTs and
+  DELETEs on both tables, so a character or account deletion that cascades audit rows
+  away gives that capacity back. Two consequences for operators: a transaction that only
+  REMOVES audit rows is admitted even while the budget sits over the ceiling (that is
+  the way back from an over-cap seed, with no counter surgery), and a removal larger
+  than the whole accounted figure is refused as SQLSTATE 55000 `audit growth budget
+  underflow` rather than clamped to zero, because it means the accumulator itself is
+  wrong. Reaching the limit is still not permission to prune the audit trail.
+  **The one-time aggregate migration.** An install seeded by an earlier release carries
+  `budget_revision = 1` (a bank_ledger-only lifetime insert count). The first boot of
+  this release converges it ONCE, inside the boot transaction that already holds the
+  canonical schema advisory lock: it adds the additive `budget_revision` and
+  `deleted_rows` columns, publishes the three new triggers, locks both counted tables in
+  SHARE ROW EXCLUSIVE and REPLACES `committed_rows` with an exact recount of both. That
+  boot costs one count pass per counted table (the journal is empty at cutover). Every
+  later boot reads the revision marker and does nothing: no ALTER, no COUNT, no
+  source-table lock. Concurrent realms park at the advisory acquire holding nothing.
+  Deploy it with every realm stopped, like any seeding boot. `bank_ledger` PREDATES this
+  budget (it has been accumulating since 2026-07-06), so the first install seeds over
   the real production history, never an empty table. Know the real blocked window:
   EVERY boot transaction (steady-state included) holds ACCESS EXCLUSIVE on
   `bank_ledger` from its first schema fragment to COMMIT (the idempotent ADD COLUMN
@@ -1113,8 +1137,7 @@ For off-box safety, sync the directory to S3 occasionally:
   telemetry-only: `woc_bank_vault_realm_row_breaches_total` (sum across realms, alert on
   rate) counts admissions the old refusing guard would have dropped; sustained growth there
   means organic bank/vault traffic is outrunning the old per-process budget, not abuse (the
-  per-account bucket still refuses abuse). Reaching the limit is not permission to
-  prune the audit trail. The ceiling transitively bounds `bank_ledger_batch_receipts`
+  per-account bucket still refuses abuse). The ceiling transitively bounds `bank_ledger_batch_receipts`
   (also keep-forever; at least one ledger row per receipt batch, so it can never
   outgrow the ledger ceiling). The receipt fingerprint gained the
   operator-attribution field in this same release, and the receipts table ships
@@ -1129,11 +1152,27 @@ For off-box safety, sync the directory to S3 occasionally:
   drains active monitor SQL before closing the pool; `pool.end()` then remains the
   final bounded teardown for any new socket connection attempt already inside
   node-postgres.
+  That minute read also carries the AGGREGATE stored-byte figure
+  (`measure="total_bytes"`, with `measure="bytes_known"` saying whether a reading has
+  landed), summed over `bank_ledger`, `material_source_containers` and
+  `material_source_journal` in the SAME statement: rows bound the ceiling, bytes are what
+  you size disk against. It is not lock-free. `pg_total_relation_size` opens each
+  relation with AccessShareLock, so during a boot transaction (which holds ACCESS
+  EXCLUSIVE on `bank_ledger`) that minute read waits and then fails at its 1s statement
+  timeout. Expect one failed telemetry beat and one log line per boot; it self-heals on
+  the next minute.
   Alert if `measure="observation_age_seconds"` exceeds 180 (the refresh path is stale),
-  and page before `lifetime_inserted_rows / hard_limit_rows` reaches 0.8 so capacity
+  and page before `accounted_rows / hard_limit_rows` reaches 0.8 so capacity
   work happens before save refusals quarantine sessions; `measure="limit_warning"`
   flips to 1 at exactly that 0.8 crossing (and the crossing realm logs one
-  console.warn per process), so an alert rule can key on it directly. Raising the
+  console.warn per process), so an alert rule can key on it directly.
+  `accounted_rows` is the measure to use: it is the aggregate audit rows currently
+  accounted for. `lifetime_inserted_rows` is retained as a DEPRECATED alias carrying the
+  identical value so existing dashboards and alerts keep working across this deploy;
+  it stopped being a lifetime count when the budget became aggregate and net, and it is
+  removed once those panels move. Note that BOTH can now fall, so an alert written to
+  assume a monotonic counter (a `increase()`/`resets()` rule) must be re-expressed
+  against the gauge value. Raising the
   ceiling requires a maintenance window, and the order matters: STOP every realm
   process (a quiesced-but-running realm still holds the old compiled value and
   refuses its first write after the update as `BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS`

@@ -3,8 +3,9 @@
 // payload survives send, flight, claim, the return-to-sender flight, the
 // soulbound-return sweep, and the JSONB save round trip byte-equal. Armed
 // (bindOnTrade) and bound (boundTo) copies are refused with the noMailBound
-// code; the plain fungible path stays byte-identical. Probes the REAL Sim
-// delegates plus the mocked-db GameServer wire.
+// code. Non-material fungible mail stays byte-identical; material pools retain
+// their exact source composition. Probes the REAL Sim delegates plus the
+// mocked-db GameServer wire.
 
 import { describe, expect, it, vi } from 'vitest';
 import type WebSocket from 'ws';
@@ -41,7 +42,7 @@ import {
   MAIL_POSTAGE,
 } from '../src/sim/mail/post_office';
 import { Sim } from '../src/sim/sim';
-import type { Entity, ItemInstancePayload, SimEvent } from '../src/sim/types';
+import type { Entity, InvSlot, ItemInstancePayload, SimEvent } from '../src/sim/types';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 const BOOTS = 'oiled_boots';
@@ -87,8 +88,41 @@ function tickFor(sim: Sim, seconds: number): void {
 }
 
 const bookOf = (sim: Sim) =>
-  (sim.postOffice as unknown as { mail: { expiresAt: number; items: { instance?: unknown }[] }[] })
-    .mail;
+  (sim.postOffice as unknown as { mail: { expiresAt: number; items: InvSlot[] }[] }).mail;
+
+// A legacy `signer` is no longer a payload field on a MATERIAL: it projects
+// into the stack's source buckets, and the payload keeps only what is not
+// provenance. These two read the buckets, so the assertions below still pin the
+// exact ownership they always did, by unit count, at its new home.
+type SourceCarrier = {
+  materialSources?: readonly { source: { signer?: string }; count: number }[];
+};
+
+/** signer -> unit count over a row's buckets; unrecorded units key as `-`. */
+function signerCounts(row: SourceCarrier | undefined): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const bucket of row?.materialSources ?? []) {
+    const key = bucket.source.signer ?? '-';
+    out[key] = (out[key] ?? 0) + bucket.count;
+  }
+  return out;
+}
+
+/** Signer counts summed over several rows (a claim that may now share a stack). */
+function signerCountsAcross(rows: readonly SourceCarrier[]): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const row of rows) {
+    for (const [signer, count] of Object.entries(signerCounts(row))) {
+      out[signer] = (out[signer] ?? 0) + count;
+    }
+  }
+  return out;
+}
+
+// A non-material stackable and a non-material unstackable, for the controls
+// that must prove the material arm changed nothing outside its own taxonomy.
+const BREAD = 'baked_bread';
+const SWORD = 'worn_sword';
 
 const ENCHANTED: ItemInstancePayload = {
   enchant: 'ench_stat_str',
@@ -117,6 +151,79 @@ function firstPlayerLetterId(sim: Sim, pid: number): number {
 }
 
 describe('mailSend: instanced attachments', () => {
+  it('mails a canonical mixed-source material pool in bulk, including premium units', () => {
+    const { sim, sender } = mailSetup();
+    sim.addItem(HIDE, 3, sender, {
+      materialSources: [
+        { source: {}, count: 1 },
+        {
+          source: { gatherer: { kind: 'character', id: sender, name: 'Sender' } },
+          count: 1,
+        },
+        { source: { signer: 'Sender' }, count: 1 },
+      ],
+    });
+
+    sim.mailSend('Rex', 'all', 'mixed sources', 0, [{ itemId: HIDE, count: 3 }], sender);
+
+    expect(mailCodes(sim.drainEvents())).toContain('sent');
+    expect(slotsOf(sim, sender, HIDE)).toHaveLength(0);
+    const letter = bookOf(sim).find((m) => m.items.length > 0);
+    expect(letter?.items).toHaveLength(1);
+    expect(letter?.items[0].count).toBe(3);
+    expect(signerCounts(letter?.items[0])).toEqual({ '-': 2, Sender: 1 });
+  });
+
+  it('matches canonical material payload independently from its source signer', () => {
+    const { sim, sender } = mailSetup();
+    sim.addItemInstance(HIDE, { enchant: 'ench_stat_str' }, sender, 2, {
+      materialSources: [
+        { source: { signer: 'Ana' }, count: 1 },
+        { source: { signer: 'Bru' }, count: 1 },
+      ],
+    });
+
+    sim.mailSend(
+      'Rex',
+      'one',
+      'same enchant',
+      0,
+      [{ itemId: HIDE, count: 1, instance: { enchant: 'ench_stat_str' } }],
+      sender,
+    );
+
+    expect(mailCodes(sim.drainEvents())).toContain('sent');
+    const letter = bookOf(sim).find((m) => m.items.length > 0);
+    expect(letter?.items[0].instance).toEqual({ enchant: 'ench_stat_str' });
+    expect(letter?.items[0].materialSources).toHaveLength(1);
+    expect(slotsOf(sim, sender, HIDE).reduce((n, slot) => n + slot.count, 0)).toBe(1);
+  });
+
+  it('refuses overlapping plain and legacy-signer requests before charging or escrowing', () => {
+    const { sim, sender } = mailSetup();
+    sim.addItemInstance(HIDE, { ...SIGNED }, sender);
+    const before = structuredClone(slotsOf(sim, sender, HIDE));
+
+    sim.mailSend(
+      'Rex',
+      'twice',
+      'one unit',
+      0,
+      [
+        { itemId: HIDE, count: 1 },
+        { itemId: HIDE, count: 1, instance: SIGNED },
+      ],
+      sender,
+    );
+
+    const codes = mailCodes(sim.drainEvents());
+    expect(codes).toContain('notEnoughItems');
+    expect(codes).not.toContain('sent');
+    expect(slotsOf(sim, sender, HIDE)).toEqual(before);
+    expect(sim.players.get(sender)!.copper).toBe(10000);
+    expect(bookOf(sim).some((letter) => letter.items.length > 0)).toBe(false);
+  });
+
   it('an enchanted piece rides the raven and claims byte-equal', () => {
     const { sim, sender, recipient } = mailSetup();
     sim.addItemInstance(BOOTS, { ...ENCHANTED, rolled: { stats: { str: 2 } } }, sender);
@@ -163,7 +270,12 @@ describe('mailSend: instanced attachments', () => {
     sim.mailTake(firstPlayerLetterId(sim, recipient), recipient);
     const got = slotsOf(sim, recipient, HIDE);
     expect(got.reduce((n, s) => n + s.count, 0)).toBe(2);
-    for (const s of got) expect(s.instance).toEqual(SIGNED);
+    // Two parcels, two units, both still Sender's. The signature now lives in
+    // the source buckets, and byte-equal material may share ONE stack on the
+    // way in, so the ownership claim is counted across the slots rather than
+    // asserted per slot.
+    expect(signerCountsAcross(got)).toEqual({ Sender: 2 });
+    for (const s of got) expect(s.instance?.signer).toBeUndefined();
   });
 
   it('holding one copy but attaching it twice is refused (notEnoughItems)', () => {
@@ -238,14 +350,19 @@ describe('mailSend: instanced attachments', () => {
     // whole claim: same item, same sender, same mailbox, one flag apart.
     const kept = slotsOf(sim, sender, HIDE);
     expect(kept).toHaveLength(1);
-    expect(kept[0].instance).toEqual({ ...ARMED, ...disarmed });
+    // The ARMING flag is payload state and stays on the payload; only the
+    // signature moved into the bucket. That split is the point of the case:
+    // the flag the refusal keyed on is exactly where it was.
+    expect(kept[0].instance).toEqual({ ...ARMED });
+    expect(signerCounts(kept[0])).toEqual({ Sender: 1 });
 
     tickFor(sim, MAIL_DELIVERY_SECONDS + 1);
     moveToMailbox(sim, recipient);
     sim.mailTake(firstPlayerLetterId(sim, recipient), recipient);
     const got = slotsOf(sim, recipient, HIDE);
     expect(got).toHaveLength(1);
-    expect(got[0].instance).toEqual(disarmed);
+    expect(got[0].instance?.bindOnTrade).toBeUndefined();
+    expect(signerCounts(got[0])).toEqual({ Sender: 1 });
   });
 
   it('a forged needle naming a payload the sender does not hold escrows nothing', () => {
@@ -253,8 +370,17 @@ describe('mailSend: instanced attachments', () => {
     sim.addItemInstance(HIDE, { signer: 'SomeoneElse' }, sender);
     sim.mailSend('Rex', 'forge', 'fake', 0, [{ itemId: HIDE, count: 1, instance: SIGNED }], sender);
     const codes = mailCodes(sim.drainEvents());
+    // The REFUSAL is the claim and is unchanged: a needle naming a signature
+    // the sender does not hold matches nothing and escrows nothing.
     expect(codes).toContain('notEnoughItems');
-    expect(slotsOf(sim, sender, HIDE)[0].instance).toEqual({ signer: 'SomeoneElse' });
+    expect(codes).not.toContain('sent');
+    const held = slotsOf(sim, sender, HIDE);
+    expect(held).toHaveLength(1);
+    expect(held[0].count).toBe(1);
+    // The held copy is untouched, and it is still SomeoneElse's unit: the
+    // forged needle neither consumed it nor relabelled its ownership.
+    expect(signerCounts(held[0])).toEqual({ SomeoneElse: 1 });
+    expect(held[0].instance?.signer).toBeUndefined();
   });
 
   it('a stripped-lock forgery cannot free a bound copy: equality fails, nothing escrows', () => {
@@ -298,12 +424,44 @@ describe('mailSend: instanced attachments', () => {
     sim.mailSend('Rex', 'junk', 'scales', 0, [{ itemId: SCALE, count: 3 }], sender);
     expect(mailCodes(sim.drainEvents())).toContain('sent');
     const letter = bookOf(sim).find((m) => m.items.length > 0);
-    expect(letter?.items).toEqual([{ itemId: SCALE, count: 3 }]);
+    const row = letter?.items[0] as (SourceCarrier & { itemId: string; count: number }) | undefined;
+    // The CLAIM is unchanged: no instance key on a plain parcel row. A material
+    // additionally carries the exact provenance of the units escrowed, which is
+    // three unrecorded units here and nothing invented.
+    expect(row?.itemId).toBe(SCALE);
+    expect(row?.count).toBe(3);
+    expect('instance' in (row ?? {})).toBe(false);
+    expect(signerCounts(row)).toEqual({ '-': 3 });
+    expect(row?.materialSources).toEqual([{ source: {}, count: 3 }]);
+  });
+
+  it('a NON-material plain parcel row still carries neither key', () => {
+    // The control for the row above: outside the material taxonomy the escrow
+    // row is byte-identical to what it always was, with no source list at all.
+    const { sim, sender } = mailSetup();
+    sim.addItem(BREAD, 5, sender);
+    sim.mailSend('Rex', 'lunch', 'bread', 0, [{ itemId: BREAD, count: 3 }], sender);
+    expect(mailCodes(sim.drainEvents())).toContain('sent');
+    const letter = bookOf(sim).find((m) => m.items.length > 0);
+    expect(letter?.items).toEqual([{ itemId: BREAD, count: 3 }]);
   });
 });
 
 describe('mailTake: instanced capacity modeling', () => {
-  it('an instanced parcel needs instanced room; it stays attached until space frees', () => {
+  /** Fill every remaining backpack slot with copies that genuinely occupy one
+   *  slot each. Deliberately a NON-material unstackable: filling with signed
+   *  material would now merge into a single stack and never reach the cap. */
+  function fillBackpack(sim: Sim, pid: number): void {
+    const meta = metaOf(sim, pid);
+    while (meta.inventory.length < 16) sim.addItem(SWORD, 1, pid);
+  }
+
+  it('a signed MATERIAL parcel lands in a compatible stack a full bag still has', () => {
+    // This case used to prove "instanced room is not plain room". For a
+    // material that distinction is exactly what the shared-stack rule removes:
+    // a Sender-signed unit and an unrecorded unit are compatible, so the plain
+    // hide stack really does have room and the take really can deliver. The
+    // enchanted control below keeps the original claim where it still holds.
     const { sim, sender, recipient } = mailSetup();
     sim.addItemInstance(HIDE, { ...SIGNED }, sender);
     sim.mailSend('Rex', 'gift', 'hide', 0, [{ itemId: HIDE, count: 1, instance: SIGNED }], sender);
@@ -311,21 +469,86 @@ describe('mailTake: instanced capacity modeling', () => {
     moveToMailbox(sim, recipient);
     const recipientMeta = metaOf(sim, recipient);
     recipientMeta.inventory.length = 0;
-    // A plain hide stack with room would satisfy a PLAIN capacity check; the
-    // signed parcel needs its own slot, so the take must keep it attached.
     sim.addItem(HIDE, 1, recipient);
-    while (recipientMeta.inventory.length < 16) {
-      sim.addItemInstance(SCALE, { signer: `F${recipientMeta.inventory.length}` }, recipient);
-    }
+    fillBackpack(sim, recipient);
+    expect(recipientMeta.inventory).toHaveLength(16);
+
+    const letterId = firstPlayerLetterId(sim, recipient);
+    sim.drainEvents();
+    sim.mailTake(letterId, recipient);
+
+    // No refusal, no new slot, and the unit kept its owner.
+    expect(errorTexts(sim.drainEvents())).not.toContain('Your bags are full.');
+    expect(recipientMeta.inventory).toHaveLength(16);
+    const hide = slotsOf(sim, recipient, HIDE);
+    expect(hide).toHaveLength(1);
+    expect(hide[0].count).toBe(2);
+    expect(signerCounts(hide[0])).toEqual({ '-': 1, Sender: 1 });
+  });
+
+  it('an ENCHANTED parcel still needs its own slot and stays attached until one frees', () => {
+    // The control that keeps the original capacity claim: an enchanted payload
+    // is NOT compatible with a plain stack (the merge rule is unchanged there),
+    // so the parcel still needs a free slot whatever its source says.
+    const { sim, sender, recipient } = mailSetup();
+    sim.addItemInstance(HIDE, { ...ENCHANTED }, sender);
+    sim.mailSend(
+      'Rex',
+      'gift',
+      'hide',
+      0,
+      [{ itemId: HIDE, count: 1, instance: ENCHANTED }],
+      sender,
+    );
+    tickFor(sim, MAIL_DELIVERY_SECONDS + 1);
+    moveToMailbox(sim, recipient);
+    const recipientMeta = metaOf(sim, recipient);
+    recipientMeta.inventory.length = 0;
+    sim.addItem(HIDE, 1, recipient);
+    fillBackpack(sim, recipient);
+
     const letterId = firstPlayerLetterId(sim, recipient);
     sim.drainEvents();
     sim.mailTake(letterId, recipient);
     expect(errorTexts(sim.drainEvents())).toContain('Your bags are full.');
-    expect(slotsOf(sim, recipient, HIDE).some((s) => s.instance)).toBe(false);
+    expect(slotsOf(sim, recipient, HIDE).some((s) => s.instance?.enchant)).toBe(false);
+
     // Free a slot: the retry delivers the payload intact.
     recipientMeta.inventory.pop();
     sim.mailTake(letterId, recipient);
-    const got = slotsOf(sim, recipient, HIDE).filter((s) => s.instance);
+    const got = slotsOf(sim, recipient, HIDE).filter((s) => s.instance?.enchant);
+    expect(got).toHaveLength(1);
+    expect(got[0].instance).toEqual(ENCHANTED);
+  });
+
+  it('a NON-material instanced parcel needs instanced room, exactly as before', () => {
+    // The taxonomy control: outside materials the capacity model is untouched,
+    // signature and all.
+    const { sim, sender, recipient } = mailSetup();
+    sim.addItemInstance(BREAD, { ...SIGNED }, sender);
+    sim.mailSend(
+      'Rex',
+      'gift',
+      'bread',
+      0,
+      [{ itemId: BREAD, count: 1, instance: SIGNED }],
+      sender,
+    );
+    tickFor(sim, MAIL_DELIVERY_SECONDS + 1);
+    moveToMailbox(sim, recipient);
+    const recipientMeta = metaOf(sim, recipient);
+    recipientMeta.inventory.length = 0;
+    sim.addItem(BREAD, 1, recipient);
+    fillBackpack(sim, recipient);
+
+    const letterId = firstPlayerLetterId(sim, recipient);
+    sim.drainEvents();
+    sim.mailTake(letterId, recipient);
+    expect(errorTexts(sim.drainEvents())).toContain('Your bags are full.');
+
+    recipientMeta.inventory.pop();
+    sim.mailTake(letterId, recipient);
+    const got = slotsOf(sim, recipient, BREAD).filter((s) => s.instance);
     expect(got).toHaveLength(1);
     expect(got[0].instance).toEqual(SIGNED);
   });
@@ -405,8 +628,15 @@ describe('return flight and persistence', () => {
     });
     const letter = bookOf(sim).find((m) => m.items.length > 0);
     // The oversized signer dropped and the emptied payload dropped whole; the
-    // attachment itself survives as plain recoverable data.
-    expect(letter?.items[0]).toEqual({ itemId: 'wolf_fang', count: 1 });
+    // attachment itself survives as plain recoverable data. The bound is what
+    // is on trial, so the signer must be gone from BOTH homes: not on the
+    // payload, and not laundered into a source bucket either.
+    expect(letter?.items[0]).toEqual({
+      itemId: 'wolf_fang',
+      count: 1,
+      materialSources: [{ source: {}, count: 1 }],
+    });
+    expect(signerCounts(letter?.items[0] as SourceCarrier)).toEqual({ '-': 1 });
   });
 
   it('rekeyMailOwner follows the escrowed payload signers on the recipient arm only', () => {
@@ -453,10 +683,14 @@ describe('return flight and persistence', () => {
     const own = letters.find((m) => m.subject === 'own');
     const foreign = letters.find((m) => m.subject === 'foreign');
     expect(own?.recipientKey).toBe('9');
-    expect(own?.items[0]?.instance).toEqual({ signer: 'Newname' });
-    expect(foreign?.items[0]?.instance, 'stranger parcel untouched').toEqual({
-      signer: 'Oldname',
+    // The rename follows the signature into its new home: the owner's escrowed
+    // unit re-keys in the SOURCE bucket, one unit, and the stranger's parcel is
+    // untouched. Renaming the owned scope only is the whole claim.
+    expect(signerCounts(own?.items[0] as SourceCarrier)).toEqual({ Newname: 1 });
+    expect(signerCounts(foreign?.items[0] as SourceCarrier), 'stranger parcel untouched').toEqual({
+      Oldname: 1,
     });
+    expect((own?.items[0] as { instance?: ItemInstancePayload })?.instance?.signer).toBeUndefined();
   });
 
   it('the soulbound-return sweep keeps the returned parcel payload', () => {
@@ -517,6 +751,46 @@ describe('persistence: pre-payload saves', () => {
     const sim = makeWorld();
     sim.loadMail(JSON.parse(JSON.stringify(oldSave)));
     const reserialized = JSON.parse(JSON.stringify(sim.serializeMail()));
+    // Every field of a pre-payload row survives untouched. A MATERIAL row now
+    // also states the provenance those units always had and nobody recorded:
+    // two unrecorded units, exactly the count the row holds. That projection is
+    // additive and lossless, so the row is asserted whole rather than loosened.
+    expect(reserialized.mail).toEqual([
+      {
+        ...oldSave.mail[0],
+        items: [{ itemId: HIDE, count: 2, materialSources: [{ source: {}, count: 2 }] }],
+      },
+    ]);
+    // Nothing was invented: no gatherer, no signature, on a save that had none.
+    expect(signerCounts(reserialized.mail[0].items[0])).toEqual({ '-': 2 });
+  });
+
+  it('a NON-material v0.31 row round-trips byte-identically, source list and all', () => {
+    // The control for the projection above: outside the material taxonomy a
+    // pre-payload row is still byte-for-byte what it was, with no new key.
+    const oldSave = {
+      mail: [
+        {
+          id: 4,
+          recipientKey: '9',
+          recipientName: 'Rex',
+          senderName: 'Old Sender',
+          kind: 'player' as const,
+          subject: 'old',
+          body: 'plain parcel',
+          copper: 5,
+          items: [{ itemId: BREAD, count: 2 }],
+          deliverIn: 0,
+          secondsLeft: 1000,
+          read: false,
+          returned: false,
+        },
+      ],
+      nextMailId: 5,
+    };
+    const sim = makeWorld();
+    sim.loadMail(JSON.parse(JSON.stringify(oldSave)));
+    const reserialized = JSON.parse(JSON.stringify(sim.serializeMail()));
     expect(reserialized.mail).toEqual(oldSave.mail);
   });
 });
@@ -537,9 +811,21 @@ describe('mailInfoFor: display payloads are trimmed', () => {
     moveToMailbox(sim, recipient);
     const info = sim.mailInfoFor(recipient);
     const letter = info?.messages.find((m) => m.items.length > 0);
-    expect(letter?.items[0].instance).toEqual({ signer: 'Sender' });
+    const row = letter?.items[0];
+    // The two halves of this case are unchanged in substance. The DISPLAY still
+    // shows who signed it and still never wires charges; the signature simply
+    // reaches the client in the source bucket now that the payload does not
+    // carry it. `charges` staying off the wire is the security half.
+    expect(signerCounts(row as SourceCarrier)).toEqual({ Sender: 1 });
+    expect(row?.instance?.charges).toBeUndefined();
+    expect(row?.instance?.signer).toBeUndefined();
+
     sim.mailTake(letter!.id, recipient);
-    expect(slotsOf(sim, recipient, HIDE)[0].instance).toEqual(CHARGED);
+    // The BOOK kept the full payload for the take: charges survive intact, and
+    // the signature is still Sender's, counted in the bucket.
+    const claimed = slotsOf(sim, recipient, HIDE)[0];
+    expect(claimed.instance).toEqual({ charges: { zap: 2 } });
+    expect(signerCounts(claimed)).toEqual({ Sender: 1 });
   });
 });
 

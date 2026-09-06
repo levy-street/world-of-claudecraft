@@ -6,6 +6,7 @@
 import { performance } from 'node:perf_hooks';
 import { Pool } from 'pg';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import { auditGrowthBytesSql } from '../../server/audit_growth_sources';
 import {
   BankLedgerGrowthMonitorPoolBusy,
   createBankLedgerGrowthMonitor,
@@ -162,6 +163,79 @@ describeDb('bank-ledger growth monitor against real PostgreSQL', () => {
     } finally {
       if (!heldReleased) held.release();
     }
+  });
+
+  it('sums the whole audit surface in one lock-free expression, tolerating tables that do not exist', async () => {
+    // The byte measure rides the minute point read, so it has to answer
+    // against a partially migrated database rather than failing the refresh.
+    // Here only two of the three audit tables exist.
+    const pool = trackedPool('growth-monitor-audit-bytes');
+    const bytesSql = `SELECT ${auditGrowthBytesSql()} AS total_bytes`;
+    // No audit table at all: an honest null, not an error.
+    expect((await pool.query(bytesSql)).rows).toEqual([{ total_bytes: null }]);
+
+    await pool.query('CREATE TABLE public.bank_ledger (id BIGSERIAL PRIMARY KEY, payload TEXT)');
+    await pool.query(
+      `INSERT INTO public.bank_ledger (payload)
+       SELECT repeat('x', 200) FROM pg_catalog.generate_series(1, 500)`,
+    );
+    const ledgerOnly = Number((await pool.query(bytesSql)).rows[0].total_bytes);
+    expect(ledgerOnly).toBeGreaterThan(0);
+
+    await pool.query(
+      'CREATE TABLE public.material_source_journal (id BIGSERIAL PRIMARY KEY, payload TEXT)',
+    );
+    await pool.query(
+      `INSERT INTO public.material_source_journal (payload)
+       SELECT repeat('y', 200) FROM pg_catalog.generate_series(1, 500)`,
+    );
+    // Aggregate, not per table: the source journal's storage joins the same
+    // figure the ledger's does.
+    const aggregate = Number((await pool.query(bytesSql)).rows[0].total_bytes);
+    expect(aggregate).toBeGreaterThan(ledgerOnly);
+    expect(aggregate).toBe(
+      Number(
+        (
+          await pool.query(
+            `SELECT pg_catalog.pg_total_relation_size('public.bank_ledger'::pg_catalog.regclass)
+                  + pg_catalog.pg_total_relation_size('public.material_source_journal'::pg_catalog.regclass)
+               AS expected`,
+          )
+        ).rows[0].expected,
+      ),
+    );
+
+    // It is NOT lock-free. pg_total_relation_size opens each relation with
+    // AccessShareLock, so it waits behind an ACCESS EXCLUSIVE holder (a boot
+    // transaction is the real one). Prove the conflict, and prove the caller's
+    // statement timeout is what bounds it: the cost of a boot is one failed
+    // telemetry beat, not a stuck client.
+    const blocker = trackedPool('growth-monitor-audit-bytes-blocker');
+    const held = await blocker.connect();
+    try {
+      await held.query('BEGIN');
+      await held.query('LOCK TABLE public.bank_ledger IN ACCESS EXCLUSIVE MODE');
+      const waiter = await pool.connect();
+      try {
+        await waiter.query('SET statement_timeout = 250');
+        const startedAt = performance.now();
+        await expect(waiter.query(bytesSql)).rejects.toMatchObject({ code: '57014' });
+        expect(performance.now() - startedAt).toBeLessThan(2_000);
+        await waiter.query('RESET statement_timeout');
+      } finally {
+        waiter.release();
+      }
+      await held.query('ROLLBACK');
+    } finally {
+      held.release();
+    }
+    // Released with the blocking transaction: the very next read answers.
+    await expect(pool.query(bytesSql)).resolves.toMatchObject({ rowCount: 1 });
+
+    await pool.query('DROP TABLE public.bank_ledger');
+    await pool.query('DROP TABLE public.material_source_journal');
+    await closePool(blocker);
+    await closePool(pool);
   });
 
   it('monitor.stop aborts and drains the real query before pool.end', async () => {

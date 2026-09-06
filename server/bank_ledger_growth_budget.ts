@@ -1,20 +1,64 @@
-// Cross-process hard ceiling for the keep-forever bank_ledger table.
+// Cross-process hard ceiling for the keep-forever AUDIT tables: bank_ledger
+// plus the material source journal, accounted TOGETHER against one durable
+// singleton, one env knob and one ceiling.
 //
-// A statement-level database trigger counts the rows PostgreSQL actually
-// inserts into one transaction-local accumulator. A deferred constraint
-// trigger applies that accumulator to the shared ceiling during COMMIT, after
-// application queries have finished, so the singleton row never stays locked
-// across a save transaction's storage or guild tail. This covers current
-// writers, mixed-release processes, and raw SQL; rollback restores both the
-// ledger and accumulator, while an idempotent receipt retry that inserts no
-// ledger rows consumes nothing. The first migration locks ledger inserts while
-// it seeds an exact COUNT(*), then publishes both triggers and the counter
-// together when ensureSchema commits.
+// Statement-level database triggers count the rows PostgreSQL actually inserts
+// into, and deletes from, each audited table, into one transaction-local
+// accumulator. A deferred constraint trigger applies that accumulator's NET
+// delta to the shared ceiling during COMMIT, after application queries have
+// finished, so the singleton row never stays locked across a save
+// transaction's storage, guild or source-journal tail. This covers current
+// writers, mixed-release processes, and raw SQL; rollback restores the audit
+// rows and the accumulator together, while an idempotent receipt retry that
+// writes no audit rows consumes nothing.
+//
+// WHAT THE COUNTER MEANS (aggregate, and net): committed_rows is the number of
+// audit rows the budget currently accounts for across ALL counted tables, not a
+// per-table figure and not a lifetime insert tally. A cascading owner delete
+// that removes audit rows gives that capacity back, which is what makes the
+// ceiling a bound on stored audit rows rather than on history ever written.
+// material_source_containers is not counted: an anchor is minted with its first
+// journal row and reaped with its last, so its cardinality is already bounded
+// by the journal rows that are counted (server/audit_growth_sources.ts).
+//
+// The durable objects keep their historical bank_ledger_growth_* names because
+// renaming live tables, functions and triggers is a migration with no payoff.
+//
+// MIGRATION: an install that predates the aggregate budget carries
+// budget_revision 1 (a bank_ledger-only lifetime insert count). It converges
+// ONCE, inside the boot transaction's canonical schema advisory lock: both
+// source tables are locked, the missing triggers are published, and
+// committed_rows is replaced by an EXACT recount across both tables. Later
+// boots read the revision marker, scan nothing and take no source-table lock.
+
+import {
+  AUDIT_GROWTH_BUDGET_TABLE,
+  AUDIT_GROWTH_PENDING_DELTA_CONSTRAINT,
+  AUDIT_GROWTH_PENDING_TABLE,
+  AUDIT_GROWTH_SOURCES,
+  auditGrowthAccumulatorSql,
+  auditGrowthTriggerCreateSql,
+  auditGrowthTriggerProbeSql,
+  auditGrowthTriggerRefusalSql,
+  auditGrowthTriggers,
+} from './audit_growth_sources';
 
 export const BANK_LEDGER_GROWTH_DEFAULT_HARD_LIMIT_ROWS = 10_000_000;
 export const BANK_LEDGER_GROWTH_LIMIT_ENV = 'BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS';
 export const BANK_LEDGER_GROWTH_LIMIT_SQLSTATE = 'P0001';
 export const BANK_LEDGER_GROWTH_LIMIT_CONSTRAINT = 'bank_ledger_growth_hard_limit';
+
+/**
+ * The durable shape marker on the singleton. 1 is the original bank_ledger-only
+ * lifetime insert count; 2 is the aggregate net row count over every table in
+ * AUDIT_GROWTH_SOURCES. It is the ONE thing a later boot reads to decide that
+ * it owes no migration, so it is bumped only by a change that needs a recount.
+ */
+export const BANK_LEDGER_GROWTH_BUDGET_REVISION = 2;
+
+/** object_not_in_prerequisite_state: an accounting invariant, never capacity. */
+export const BANK_LEDGER_GROWTH_UNDERFLOW_SQLSTATE = '55000';
+export const BANK_LEDGER_GROWTH_UNDERFLOW_MESSAGE = 'audit growth budget underflow';
 
 export function bankLedgerGrowthHardLimitFromEnv(
   env: Readonly<Record<string, string | undefined>> = process.env,
@@ -34,54 +78,110 @@ export function bankLedgerGrowthHardLimitFromEnv(
 export const BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS = bankLedgerGrowthHardLimitFromEnv();
 
 /**
- * Applied once per boot under the schema advisory lock. The bootstrap lock is
- * taken only before the durable singleton is initialized, and excludes inserts
- * while COUNT(*) establishes the exact starting point. Later boots do not scan
- * or lock bank_ledger; a missing trigger or split hard-limit config fails boot.
- * An existing ledger already above the first configured ceiling is seeded at
- * its exact count and serves with all later ledger inserts refused, preserving
- * non-ledger access while operators raise or reconcile the limit.
+ * Applied once per boot under the schema advisory lock. Source-table locks are
+ * taken only on the two boots that owe work (the first install, and the ONE
+ * aggregate migration of an existing install), and they exclude writers while
+ * an exact COUNT establishes the starting point. Every later boot probes
+ * catalogs only: no COUNT, no ALTER, no source-table lock. A missing or
+ * tampered trigger, a split hard-limit config, or a singleton left at another
+ * revision fails boot.
+ *
+ * An audit surface already above the configured ceiling is seeded or recounted
+ * at its exact size and serves with all later net-growth transactions refused,
+ * preserving non-ledger access while operators raise or reconcile the limit.
+ * Transactions that only REMOVE audit rows keep working there, so the state is
+ * recoverable rather than wedged.
  */
 export function bankLedgerGrowthBudgetSchema(schemaName = 'public'): string {
   if (!/^[a-z_][a-z0-9_]*$/.test(schemaName)) {
     throw new Error('bank ledger growth budget schema must be a simple lowercase identifier');
   }
   const schema = `"${schemaName}"`;
-  const ledgerRegclass = `${schema}.bank_ledger`;
-  const pendingRegclass = `${schema}.bank_ledger_growth_pending`;
-  const budgetRegclass = `${schema}.bank_ledger_growth_budget`;
-  const accumulatorRegprocedure = `${schema}.accumulate_bank_ledger_growth_budget()`;
-  const enforcerRegprocedure = `${schema}.enforce_bank_ledger_growth_budget()`;
+  const pendingRegclass = `${schema}.${AUDIT_GROWTH_PENDING_TABLE}`;
+  const budgetRegclass = `${schema}.${AUDIT_GROWTH_BUDGET_TABLE}`;
+  const triggers = auditGrowthTriggers();
+
+  const triggerDeclarations = triggers
+    .map(
+      (trigger) =>
+        `  named_${trigger.variable}_trigger BOOLEAN;\n  valid_${trigger.variable}_trigger BOOLEAN;`,
+    )
+    .join('\n');
+  const triggerProbes = triggers
+    .map((trigger) => auditGrowthTriggerProbeSql(schema, trigger))
+    .join('\n');
+  const triggerRefusals = triggers.map(auditGrowthTriggerRefusalSql).join('\n');
+  const triggerCreates = triggers
+    .map((trigger) => auditGrowthTriggerCreateSql(schema, trigger))
+    .join('\n');
+  const allTriggersValid = triggers
+    .map((trigger) => `valid_${trigger.variable}_trigger`)
+    .join(' AND ');
+  const legacyTriggersValid = triggers
+    .filter((trigger) => trigger.requiredBeforeAggregate)
+    .map((trigger) => `valid_${trigger.variable}_trigger`)
+    .join(' AND ');
+
+  const sourceExistenceGuards = AUDIT_GROWTH_SOURCES.map(
+    (source) => `  IF pg_catalog.to_regclass('${schema}.${source.table}') IS NULL THEN
+    RAISE EXCEPTION USING
+      ERRCODE = '55000',
+      MESSAGE = 'audit growth budget requires ${source.table} to exist first';
+  END IF;`,
+  ).join('\n');
+  const sourceLocks = AUDIT_GROWTH_SOURCES.map(
+    (source) => `    LOCK TABLE ${schema}.${source.table} IN SHARE ROW EXCLUSIVE MODE;`,
+  ).join('\n');
+  const exactAggregateCount = AUDIT_GROWTH_SOURCES.map(
+    (source) => `(SELECT count(*)::bigint FROM ${schema}.${source.table})`,
+  ).join('\n         + ');
+  const accumulatorFunctions = AUDIT_GROWTH_SOURCES.map((source) =>
+    auditGrowthAccumulatorSql(schema, source),
+  ).join('\n\n');
+
   return `
--- The singleton takes one guarded UPDATE per ledger-writing transaction,
+-- The singleton takes one guarded UPDATE per audit-writing transaction,
 -- forever, against one live row: dead singleton versions accumulate at the
--- ledger write rate while the default scale-factor trigger, computed against
+-- audit write rate while the default scale-factor trigger, computed against
 -- one live row, would wait on the fixed 50-tuple floor plus nothing. HOT
 -- pruning inside the nearly-empty page absorbs most of that churn (fillfactor
 -- is a no-op for a one-row table), so the fixed threshold below is the
 -- backstop that keeps the page and the visibility map clean without vacuuming
 -- every few seconds.
-CREATE TABLE IF NOT EXISTS "__woc_bank_ledger_growth_schema__".bank_ledger_growth_budget (
+--
+-- budget_revision defaults to 1, the pre-aggregate shape, so an ADD COLUMN
+-- against a legacy install marks it as owing the migration. A FRESH install
+-- never takes that path: its seeding INSERT writes the current revision
+-- explicitly, having counted every source table.
+CREATE TABLE IF NOT EXISTS ${budgetRegclass} (
   singleton BOOLEAN PRIMARY KEY DEFAULT TRUE CHECK (singleton),
   committed_rows BIGINT NOT NULL CHECK (committed_rows >= 0),
   hard_limit_rows BIGINT NOT NULL CHECK (hard_limit_rows > 0),
+  budget_revision INT NOT NULL DEFAULT 1 CHECK (budget_revision > 0),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 ) WITH (autovacuum_vacuum_scale_factor = 0, autovacuum_vacuum_threshold = 1000);
 
 -- This table has no committed rows in healthy operation. Its one row per
--- ledger-writing transaction exists only until the deferred trigger consumes
--- it during COMMIT; rollback removes it together with the ledger insert.
+-- audit-writing transaction exists only until the deferred trigger consumes
+-- it during COMMIT; rollback removes it together with the audit rows.
 -- That one-INSERT-one-DELETE-per-transaction churn against zero committed rows
 -- is the textbook queue-table autovacuum shape: dead tuples accumulate at the
--- ledger write rate while a scale-factor trigger, computed against a table of
+-- audit write rate while a scale-factor trigger, computed against a table of
 -- zero live rows, would barely ever fire. Vacuum on a small fixed dead-tuple
 -- threshold instead. No fillfactor: every row here dies inside its own
 -- transaction, so update headroom buys nothing (an install converged by an
 -- earlier build may still carry fillfactor=70; harmless, and the probe below
 -- deliberately ignores it).
-CREATE TABLE IF NOT EXISTS "__woc_bank_ledger_growth_schema__".bank_ledger_growth_pending (
+--
+-- The two counters are kept apart rather than folded into one signed column:
+-- each accumulator adds to its own direction, the enforcer nets them once, and
+-- the column names stay true for an operator reading a live pending row.
+CREATE TABLE IF NOT EXISTS ${pendingRegclass} (
   transaction_id xid8 PRIMARY KEY,
-  inserted_rows BIGINT NOT NULL CHECK (inserted_rows > 0)
+  inserted_rows BIGINT NOT NULL DEFAULT 0,
+  deleted_rows BIGINT NOT NULL DEFAULT 0,
+  CONSTRAINT ${AUDIT_GROWTH_PENDING_DELTA_CONSTRAINT}
+    CHECK (inserted_rows >= 0 AND deleted_rows >= 0 AND inserted_rows + deleted_rows > 0)
 ) WITH (autovacuum_vacuum_scale_factor = 0, autovacuum_vacuum_threshold = 100);
 
 -- Converge tables created before the storage parameters existed, but only
@@ -114,7 +214,7 @@ BEGIN
                      ELSE FALSE
                    END) = 2
   ) THEN
-    ALTER TABLE "__woc_bank_ledger_growth_schema__".bank_ledger_growth_pending
+    ALTER TABLE ${pendingRegclass}
       SET (autovacuum_vacuum_scale_factor = 0, autovacuum_vacuum_threshold = 100);
   END IF;
   IF NOT EXISTS (
@@ -131,60 +231,110 @@ BEGIN
                      ELSE FALSE
                    END) = 2
   ) THEN
-    ALTER TABLE "__woc_bank_ledger_growth_schema__".bank_ledger_growth_budget
+    ALTER TABLE ${budgetRegclass}
       SET (autovacuum_vacuum_scale_factor = 0, autovacuum_vacuum_threshold = 1000);
   END IF;
 END
 $bank_ledger_growth_reloptions_converge$;
 
-CREATE OR REPLACE FUNCTION "__woc_bank_ledger_growth_schema__".accumulate_bank_ledger_growth_budget()
-RETURNS TRIGGER
-LANGUAGE plpgsql
-SET search_path = pg_catalog, "__woc_bank_ledger_growth_schema__", pg_temp
-AS $$
+-- Shape converge for an install that predates the aggregate budget, gated on
+-- catalog probes so a steady-state boot issues no ALTER at all. All three are
+-- additive and cheap: ADD COLUMN with a constant default is a metadata-only
+-- write since PostgreSQL 11, and the pending table holds no committed rows to
+-- scan for the replacement CHECK. The legacy inserted_rows > 0 CHECK is looked
+-- up by DEFINITION, never by its system-generated name, and only ever on the
+-- budget's own accumulator table.
+DO $bank_ledger_growth_shape_converge$
 DECLARE
-  inserted_rows BIGINT;
+  legacy_check RECORD;
 BEGIN
-  SELECT count(*)::bigint INTO inserted_rows FROM inserted_bank_ledger_rows;
-  IF inserted_rows = 0 THEN
-    RETURN NULL;
+  IF NOT EXISTS (
+    SELECT 1
+      FROM pg_catalog.pg_attribute
+     WHERE attrelid = '${budgetRegclass}'::pg_catalog.regclass
+       AND attname = 'budget_revision'
+       AND NOT attisdropped
+  ) THEN
+    ALTER TABLE ${budgetRegclass}
+      ADD COLUMN budget_revision INT NOT NULL DEFAULT 1 CHECK (budget_revision > 0);
   END IF;
 
-  INSERT INTO "__woc_bank_ledger_growth_schema__".bank_ledger_growth_pending (transaction_id, inserted_rows)
-  VALUES (pg_catalog.pg_current_xact_id(), inserted_rows)
-  ON CONFLICT (transaction_id) DO UPDATE
-    SET inserted_rows = "__woc_bank_ledger_growth_schema__".bank_ledger_growth_pending.inserted_rows
-                      + EXCLUDED.inserted_rows;
-  RETURN NULL;
-END
-$$;
+  IF NOT EXISTS (
+    SELECT 1
+      FROM pg_catalog.pg_attribute
+     WHERE attrelid = '${pendingRegclass}'::pg_catalog.regclass
+       AND attname = 'deleted_rows'
+       AND NOT attisdropped
+  ) THEN
+    ALTER TABLE ${pendingRegclass}
+      ADD COLUMN deleted_rows BIGINT NOT NULL DEFAULT 0;
+  END IF;
 
-CREATE OR REPLACE FUNCTION "__woc_bank_ledger_growth_schema__".enforce_bank_ledger_growth_budget()
+  FOR legacy_check IN
+    SELECT c.conname
+      FROM pg_catalog.pg_constraint c
+     WHERE c.conrelid = '${pendingRegclass}'::pg_catalog.regclass
+       AND c.contype = 'c'
+       AND c.conname <> '${AUDIT_GROWTH_PENDING_DELTA_CONSTRAINT}'
+       AND pg_catalog.pg_get_constraintdef(c.oid) LIKE '%inserted_rows > 0%'
+  LOOP
+    EXECUTE 'ALTER TABLE ${pendingRegclass} DROP CONSTRAINT '
+      || pg_catalog.quote_ident(legacy_check.conname);
+  END LOOP;
+
+  IF NOT EXISTS (
+    SELECT 1
+      FROM pg_catalog.pg_constraint
+     WHERE conrelid = '${pendingRegclass}'::pg_catalog.regclass
+       AND conname = '${AUDIT_GROWTH_PENDING_DELTA_CONSTRAINT}'
+  ) THEN
+    ALTER TABLE ${pendingRegclass}
+      ADD CONSTRAINT ${AUDIT_GROWTH_PENDING_DELTA_CONSTRAINT}
+      CHECK (inserted_rows >= 0 AND deleted_rows >= 0 AND inserted_rows + deleted_rows > 0);
+  END IF;
+END
+$bank_ledger_growth_shape_converge$;
+
+${accumulatorFunctions}
+
+CREATE OR REPLACE FUNCTION ${schema}.enforce_bank_ledger_growth_budget()
 RETURNS TRIGGER
 LANGUAGE plpgsql
-SET search_path = pg_catalog, "__woc_bank_ledger_growth_schema__", pg_temp
-AS $$
+SET search_path = pg_catalog, ${schema}, pg_temp
+AS $enforce_audit_growth_budget$
 DECLARE
+  attempted_inserted_rows BIGINT;
+  attempted_deleted_rows BIGINT;
   attempted_rows BIGINT;
   before_rows BIGINT;
   stored_limit BIGINT;
 BEGIN
-  -- Several ledger statements queue several deferred trigger events for the
+  -- Several audit statements queue several deferred trigger events for the
   -- same transaction. Exactly one event wins this DELETE and applies the
-  -- final accumulated count; every later event observes no row and is inert.
-  DELETE FROM "__woc_bank_ledger_growth_schema__".bank_ledger_growth_pending
+  -- final accumulated counters; every later event observes no row and is inert.
+  DELETE FROM ${pendingRegclass}
    WHERE transaction_id = NEW.transaction_id
-  RETURNING inserted_rows INTO attempted_rows;
+  RETURNING inserted_rows, deleted_rows
+       INTO attempted_inserted_rows, attempted_deleted_rows;
   IF NOT FOUND THEN
     RETURN NULL;
   END IF;
+  attempted_rows := attempted_inserted_rows - attempted_deleted_rows;
 
-  UPDATE "__woc_bank_ledger_growth_schema__".bank_ledger_growth_budget
+  -- One guarded UPDATE decides everything: the capacity arm applies only to a
+  -- transaction that GROWS the audit surface, so a transaction that removes
+  -- rows keeps working against an already-over-limit budget and gives its
+  -- capacity back. The non-negative arm refuses to underflow rather than
+  -- clamping a miscount silently to zero. A net-zero transaction still takes
+  -- the update, deliberately: that is how every audit-writing transaction
+  -- keeps re-proving this process agrees with the durable limit.
+  UPDATE ${budgetRegclass}
      SET committed_rows = committed_rows + attempted_rows,
          updated_at = now()
    WHERE singleton = TRUE
      AND hard_limit_rows = ${BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS}
-     AND committed_rows + attempted_rows <= hard_limit_rows
+     AND committed_rows + attempted_rows >= 0
+     AND (attempted_rows <= 0 OR committed_rows + attempted_rows <= hard_limit_rows)
   RETURNING hard_limit_rows INTO stored_limit;
   IF FOUND THEN
     RETURN NULL;
@@ -192,7 +342,7 @@ BEGIN
 
   SELECT committed_rows, hard_limit_rows
     INTO before_rows, stored_limit
-    FROM "__woc_bank_ledger_growth_schema__".bank_ledger_growth_budget
+    FROM ${budgetRegclass}
    WHERE singleton = TRUE;
   IF NOT FOUND THEN
     RAISE EXCEPTION USING
@@ -216,6 +366,21 @@ BEGIN
       )::text;
   END IF;
 
+  -- More audit rows removed than the budget ever accounted for. That is a
+  -- broken accumulator, not a full disk: refuse loudly with both directions of
+  -- the attempt rather than let the counter wrap into the CHECK or quietly
+  -- floor at zero and lose the discrepancy.
+  IF before_rows + attempted_rows < 0 THEN
+    RAISE EXCEPTION USING
+      ERRCODE = '${BANK_LEDGER_GROWTH_UNDERFLOW_SQLSTATE}',
+      MESSAGE = '${BANK_LEDGER_GROWTH_UNDERFLOW_MESSAGE}',
+      DETAIL = pg_catalog.json_build_object(
+        'committed_rows', before_rows,
+        'attempted_inserted_rows', attempted_inserted_rows,
+        'attempted_deleted_rows', attempted_deleted_rows
+      )::text;
+  END IF;
+
   RAISE EXCEPTION USING
     ERRCODE = '${BANK_LEDGER_GROWTH_LIMIT_SQLSTATE}',
     MESSAGE = 'bank ledger growth limit exceeded',
@@ -226,91 +391,52 @@ BEGIN
       'hard_limit_rows', stored_limit
     )::text;
 END
-$$;
+$enforce_audit_growth_budget$;
 
-DO $$
+DO $bank_ledger_growth_bootstrap$
 DECLARE
-  named_insert_trigger BOOLEAN;
-  valid_insert_trigger BOOLEAN;
-  named_commit_trigger BOOLEAN;
-  valid_commit_trigger BOOLEAN;
+${triggerDeclarations}
   budget_initialized BOOLEAN;
+  stored_revision INT;
 BEGIN
+  -- The counted tables must already exist: this fragment is the LAST boot
+  -- fragment precisely so every audited table is in place before it runs.
+  -- Naming the missing one beats a bare regclass cast failure.
+${sourceExistenceGuards}
+
   SELECT EXISTS (
-    SELECT 1 FROM "__woc_bank_ledger_growth_schema__".bank_ledger_growth_budget WHERE singleton = TRUE
+    SELECT 1 FROM ${budgetRegclass} WHERE singleton = TRUE
   ) INTO budget_initialized;
-  SELECT EXISTS (
-    SELECT 1
-      FROM pg_catalog.pg_trigger
-     WHERE tgrelid = '${ledgerRegclass}'::pg_catalog.regclass
-       AND tgname = 'bank_ledger_growth_budget_insert'
-       AND NOT tgisinternal
-  ) INTO named_insert_trigger;
-  SELECT EXISTS (
-    SELECT 1
-      FROM pg_catalog.pg_trigger
-     WHERE tgrelid = '${ledgerRegclass}'::pg_catalog.regclass
-       AND tgname = 'bank_ledger_growth_budget_insert'
-       AND NOT tgisinternal
-       AND tgenabled = 'O'
-       AND tgtype = 4
-       AND tgfoid = '${accumulatorRegprocedure}'::pg_catalog.regprocedure
-       AND tgnargs = 0
-       AND pg_catalog.octet_length(tgargs) = 0
-       AND tgattr::text = ''
-       AND tgqual IS NULL
-       AND tgnewtable = 'inserted_bank_ledger_rows'
-       AND tgoldtable IS NULL
-  ) INTO valid_insert_trigger;
+  SELECT budget_revision INTO stored_revision
+    FROM ${budgetRegclass}
+   WHERE singleton = TRUE;
 
-  SELECT EXISTS (
-    SELECT 1
-      FROM pg_catalog.pg_trigger
-     WHERE tgrelid = '${pendingRegclass}'::pg_catalog.regclass
-       AND tgname = 'bank_ledger_growth_budget_commit'
-       AND NOT tgisinternal
-  ) INTO named_commit_trigger;
-  SELECT EXISTS (
-    SELECT 1
-      FROM pg_catalog.pg_trigger
-     WHERE tgrelid = '${pendingRegclass}'::pg_catalog.regclass
-       AND tgname = 'bank_ledger_growth_budget_commit'
-       AND NOT tgisinternal
-       AND tgenabled = 'O'
-       AND tgtype = 21
-       AND tgfoid = '${enforcerRegprocedure}'::pg_catalog.regprocedure
-       AND tgnargs = 0
-       AND pg_catalog.octet_length(tgargs) = 0
-       AND tgattr::text = ''
-       AND tgqual IS NULL
-       AND tgconstraint <> 0
-       AND tgdeferrable
-       AND tginitdeferred
-       AND tgnewtable IS NULL
-       AND tgoldtable IS NULL
-  ) INTO valid_commit_trigger;
+${triggerProbes}
 
-  IF named_insert_trigger AND NOT valid_insert_trigger THEN
-    RAISE EXCEPTION USING
-      ERRCODE = '55000',
-      MESSAGE = 'bank_ledger_growth_budget_insert has an unsafe definition';
-  END IF;
-  IF named_commit_trigger AND NOT valid_commit_trigger THEN
-    RAISE EXCEPTION USING
-      ERRCODE = '55000',
-      MESSAGE = 'bank_ledger_growth_budget_commit has an unsafe definition';
-  END IF;
+${triggerRefusals}
 
   -- After initialization, an absent trigger is evidence of an unaudited write
-  -- window. Recreating it without an exact reconciliation would permanently
-  -- undercount rows inserted during that gap, so fail boot for an operator.
-  IF budget_initialized AND (NOT valid_insert_trigger OR NOT valid_commit_trigger) THEN
+  -- window. Recreating it without an exact reconciliation would leave the
+  -- counter wrong for rows written during that gap, so fail boot for an
+  -- operator. A budget still at the legacy revision is judged against the
+  -- legacy trigger set only: the aggregate triggers are legitimately absent
+  -- there until the migration below publishes them.
+  IF budget_initialized
+     AND stored_revision >= ${BANK_LEDGER_GROWTH_BUDGET_REVISION}
+     AND NOT (${allTriggersValid}) THEN
+    RAISE EXCEPTION USING
+      ERRCODE = '55000',
+      MESSAGE = 'initialized bank ledger growth budget is missing an enforcement trigger';
+  END IF;
+  IF budget_initialized
+     AND stored_revision < ${BANK_LEDGER_GROWTH_BUDGET_REVISION}
+     AND NOT (${legacyTriggersValid}) THEN
     RAISE EXCEPTION USING
       ERRCODE = '55000',
       MESSAGE = 'initialized bank ledger growth budget is missing an enforcement trigger';
   END IF;
   IF budget_initialized AND EXISTS (
-    SELECT 1 FROM "__woc_bank_ledger_growth_schema__".bank_ledger_growth_pending
+    SELECT 1 FROM ${pendingRegclass}
   ) THEN
     RAISE EXCEPTION USING
       ERRCODE = '55000',
@@ -326,58 +452,59 @@ BEGIN
     -- COLUMN IF NOT EXISTS converges take it even as no-ops and hold it to
     -- COMMIT), so ledger reads AND writes from every other process stall
     -- for the WHOLE boot transaction on every boot, and this seed extends
-    -- that one boot by exactly one count pass. The count is a parallel
-    -- index-only scan over the PK (measured: ~43 MB of index per 2M rows,
-    -- tens of milliseconds warm, low seconds cold at the 10M ceiling on
-    -- modest hardware; DEPLOY.md, the growth-limit section, carries the
-    -- numbers). A warm-up pre-count was tried and REVERTED: inside this
+    -- that one boot by exactly one count pass per counted table. The ledger
+    -- count is a parallel index-only scan over the PK (measured: ~43 MB of
+    -- index per 2M rows, tens of milliseconds warm, low seconds cold at the
+    -- 10M ceiling on modest hardware; DEPLOY.md, the growth-limit section,
+    -- carries the numbers); the source journal is empty at its own first
+    -- boot. A warm-up pre-count was tried and REVERTED: inside this
     -- transaction there is no unlocked place to put it, so it only doubled
     -- the pass (review round three, measured 1.85x). The seeding deploy
     -- still requires every realm stopped, the standard stop-then-cutover.
-    -- CREATE TRIGGER holds this lock too, but spelling it before COUNT makes
-    -- the mixed-release bootstrap boundary explicit and independent of DDL
-    -- lock implementation details (inside THIS transaction it is a formality
-    -- over the stronger lock already held). A RE-seed (the singleton deleted
-    -- over a grown ledger) pays the same shape and stays a
-    -- maintenance-window operation.
-    LOCK TABLE "__woc_bank_ledger_growth_schema__".bank_ledger IN SHARE ROW EXCLUSIVE MODE;
-    DELETE FROM "__woc_bank_ledger_growth_schema__".bank_ledger_growth_pending;
+    -- CREATE TRIGGER holds these locks too, but spelling them before COUNT
+    -- makes the mixed-release bootstrap boundary explicit and independent of
+    -- DDL lock implementation details (inside THIS transaction the ledger
+    -- lock is a formality over the stronger lock already held). A RE-seed
+    -- (the singleton deleted over a grown audit surface) pays the same shape
+    -- and stays a maintenance-window operation.
+${sourceLocks}
+    DELETE FROM ${pendingRegclass};
 
-    IF NOT valid_commit_trigger THEN
-      EXECUTE 'CREATE CONSTRAINT TRIGGER bank_ledger_growth_budget_commit
-        AFTER INSERT OR UPDATE ON "__woc_bank_ledger_growth_schema__".bank_ledger_growth_pending
-        DEFERRABLE INITIALLY DEFERRED
-        FOR EACH ROW
-        EXECUTE FUNCTION "__woc_bank_ledger_growth_schema__".enforce_bank_ledger_growth_budget()';
-    END IF;
+${triggerCreates}
 
-    IF NOT valid_insert_trigger THEN
-      -- REFERENCING NEW TABLE + count(*) is the only correct row-count source
-      -- for a statement-level trigger. The proposed alternative, GET
-      -- DIAGNOSTICS ROW_COUNT inside the trigger function, was evaluated and
-      -- rejected: ROW_COUNT there reflects the function's OWN last statement,
-      -- never the statement that fired the trigger, and a statement-level
-      -- trigger has no other affected-row count. The transition tuplestore's
-      -- cost is bounded by the 2,048-row outbox prefix cap on ledger batches.
-      EXECUTE 'CREATE TRIGGER bank_ledger_growth_budget_insert
-        AFTER INSERT ON "__woc_bank_ledger_growth_schema__".bank_ledger
-        REFERENCING NEW TABLE AS inserted_bank_ledger_rows
-        FOR EACH STATEMENT
-        EXECUTE FUNCTION "__woc_bank_ledger_growth_schema__".accumulate_bank_ledger_growth_budget()';
-    END IF;
-
-    INSERT INTO "__woc_bank_ledger_growth_schema__".bank_ledger_growth_budget
-      (singleton, committed_rows, hard_limit_rows)
+    INSERT INTO ${budgetRegclass}
+      (singleton, committed_rows, hard_limit_rows, budget_revision)
     -- Deliberately allow committed_rows to start above the ceiling. The
-    -- enforcement predicate then refuses every future insert without making
-    -- unrelated gameplay unavailable during an emergency cap rollout.
-    SELECT TRUE, COUNT(*)::bigint, ${BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS}
-      FROM "__woc_bank_ledger_growth_schema__".bank_ledger;
+    -- enforcement predicate then refuses every future net-growth transaction
+    -- without making unrelated gameplay unavailable, and deletions still
+    -- reduce it, during an emergency cap rollout.
+    SELECT TRUE,
+           ${exactAggregateCount},
+           ${BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS},
+           ${BANK_LEDGER_GROWTH_BUDGET_REVISION};
+  ELSIF stored_revision < ${BANK_LEDGER_GROWTH_BUDGET_REVISION} THEN
+    -- The ONE aggregate migration, inside the boot transaction that already
+    -- holds the canonical schema advisory lock, so concurrent realms are
+    -- parked at the advisory acquire holding nothing. Lock every counted
+    -- table BEFORE publishing the new triggers and counting, so no writer can
+    -- slip a row between the snapshot this count reads and the moment its own
+    -- statement starts being accumulated. The pre-aggregate counter was a
+    -- lifetime insert tally that cascaded deletes never credited back, so it
+    -- is REPLACED by the exact live count rather than adjusted.
+${sourceLocks}
+
+${triggerCreates}
+
+    UPDATE ${budgetRegclass}
+       SET committed_rows = ${exactAggregateCount},
+           budget_revision = ${BANK_LEDGER_GROWTH_BUDGET_REVISION},
+           updated_at = now()
+     WHERE singleton = TRUE;
   END IF;
 
   IF EXISTS (
     SELECT 1
-      FROM "__woc_bank_ledger_growth_schema__".bank_ledger_growth_budget
+      FROM ${budgetRegclass}
      WHERE singleton = TRUE
        AND hard_limit_rows <> ${BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS}
   ) THEN
@@ -385,17 +512,32 @@ BEGIN
       ERRCODE = '22023',
       MESSAGE = '${BANK_LEDGER_GROWTH_LIMIT_ENV} disagrees with the durable bank-ledger limit';
   END IF;
+
+  -- Post-condition, and the downgrade fence: after this fragment the singleton
+  -- is at exactly this build's revision. A HIGHER revision means an older
+  -- binary is booting against a database a newer one already migrated, whose
+  -- counter it would maintain under the wrong rules.
+  IF EXISTS (
+    SELECT 1
+      FROM ${budgetRegclass}
+     WHERE singleton = TRUE
+       AND budget_revision <> ${BANK_LEDGER_GROWTH_BUDGET_REVISION}
+  ) THEN
+    RAISE EXCEPTION USING
+      ERRCODE = '55000',
+      MESSAGE = 'bank ledger growth budget revision disagrees with this process';
+  END IF;
 END
-$$;
+$bank_ledger_growth_bootstrap$;
 
 -- Readback for hand-applied installs. The BOOT readback is issued separately
 -- by db.ts as its own single-statement SELECT: sending this whole schema as
 -- one multi-statement query makes node-postgres return an ARRAY of results,
 -- so a .rows[0] read of the combined result would never see this statement.
 SELECT committed_rows, hard_limit_rows
-  FROM "__woc_bank_ledger_growth_schema__".bank_ledger_growth_budget
+  FROM ${budgetRegclass}
  WHERE singleton = TRUE;
-`.replaceAll('"__woc_bank_ledger_growth_schema__"', schema);
+`;
 }
 
 export const BANK_LEDGER_GROWTH_BUDGET_SCHEMA = bankLedgerGrowthBudgetSchema();
@@ -410,7 +552,7 @@ export function bankLedgerGrowthBudgetReadbackSql(schemaName = 'public'): string
   if (!/^[a-z_][a-z0-9_]*$/.test(schemaName)) {
     throw new Error('bank ledger growth budget schema must be a simple lowercase identifier');
   }
-  return `SELECT committed_rows, hard_limit_rows FROM "${schemaName}".bank_ledger_growth_budget WHERE singleton = TRUE`;
+  return `SELECT committed_rows, hard_limit_rows FROM "${schemaName}".${AUDIT_GROWTH_BUDGET_TABLE} WHERE singleton = TRUE`;
 }
 
 export class BankLedgerGrowthLimitExceeded extends Error {
@@ -429,13 +571,32 @@ export class BankLedgerGrowthLimitExceeded extends Error {
 }
 
 export interface BankLedgerGrowthBudgetReadout {
+  /** Audit rows the durable budget accounts for, aggregated over every counted
+   *  table and net of removals. Null until the first accepted observation. */
   readonly committedRows: number | null;
   readonly hardLimitRows: number;
+  /** Total stored bytes across the audit surface (counted tables plus the
+   *  source anchor table), or null when no byte observation has landed. */
+  readonly observedBytes: number | null;
   readonly observedAtMs: number | null;
 }
 
 let observedCommittedRows: number | null = null;
+let observedTotalBytes: number | null = null;
 let observedAtMs: number | null = null;
+let issuedGeneration = 0;
+let acceptedGeneration = 0;
+
+/**
+ * Claim an ordering ticket BEFORE reading the database. The counter now falls
+ * as well as rises, so observations cannot be ordered by value; they are
+ * ordered by when their read STARTED. A refusal observes the database while a
+ * slow poll is still in flight, claims a higher ticket, and wins.
+ */
+export function beginBankLedgerGrowthObservation(): number {
+  issuedGeneration += 1;
+  return issuedGeneration;
+}
 
 function safeDbInteger(value: unknown): number | null {
   if (typeof value !== 'number' && typeof value !== 'string') return null;
@@ -444,11 +605,18 @@ function safeDbInteger(value: unknown): number | null {
   return Number.isSafeInteger(parsed) && parsed >= 0 ? parsed : null;
 }
 
-/** Record a database-returned counter value for the scrape-time gauge. */
+/**
+ * Record a database-returned counter value for the scrape-time gauge. Callers
+ * that read the database asynchronously pass the ticket they claimed BEFORE the
+ * read; an omitted ticket is claimed here, which is right for a caller (a
+ * refusal, the boot readback) whose value was observed at call time. A stale
+ * ticket is dropped, not failed: the read itself was healthy.
+ */
 export function observeBankLedgerGrowthBudget(
   committedRows: unknown,
   hardLimitRows: unknown = BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS,
   nowMs: number = Date.now(),
+  generation: number = beginBankLedgerGrowthObservation(),
 ): boolean {
   const committed = safeDbInteger(committedRows);
   const limit = safeDbInteger(hardLimitRows);
@@ -460,12 +628,26 @@ export function observeBankLedgerGrowthBudget(
   ) {
     return false;
   }
-  // The durable counter is monotonic. A refusal can report a newer value while
-  // a periodic SELECT that took its snapshot just before that COMMIT is still
-  // in flight; never let the late response move the exported gauge backward.
-  if (observedCommittedRows !== null && committed < observedCommittedRows) return true;
+  if (generation < acceptedGeneration) return true;
+  acceptedGeneration = generation;
   observedCommittedRows = committed;
   observedAtMs = nowMs;
+  return true;
+}
+
+/**
+ * The aggregate stored-byte reading that rides the same minute refresh, ordered
+ * by the same ticket. Bytes legitimately fall (a vacuum, a cascade); a
+ * malformed or stale reading leaves the last one in place.
+ */
+export function observeBankLedgerGrowthBytes(
+  totalBytes: unknown,
+  generation: number = beginBankLedgerGrowthObservation(),
+): boolean {
+  const bytes = safeDbInteger(totalBytes);
+  if (bytes === null) return false;
+  if (generation < acceptedGeneration) return true;
+  observedTotalBytes = bytes;
   return true;
 }
 
@@ -473,6 +655,7 @@ export function bankLedgerGrowthBudgetReadout(): BankLedgerGrowthBudgetReadout {
   return Object.freeze({
     committedRows: observedCommittedRows,
     hardLimitRows: BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS,
+    observedBytes: observedTotalBytes,
     observedAtMs,
   });
 }

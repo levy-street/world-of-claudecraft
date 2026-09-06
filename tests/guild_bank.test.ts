@@ -42,6 +42,10 @@ import {
   revertGuildBankDeltasTo,
   sanitizeGuildBankState,
 } from '../src/sim/guild_bank';
+import { isMaterialItemId, materialItemIds } from '../src/sim/material_ids';
+import { materialPayloadKey } from '../src/sim/material_payload_identity';
+import { materialSourceKey } from '../src/sim/material_sources';
+import { normalizeMaterialStack } from '../src/sim/material_stack';
 import { Sim } from '../src/sim/sim';
 import type { Entity, InvSlot, WorldContent } from '../src/sim/types';
 import { META_EXCLUDE, samplePlayerMeta } from './parity/trace';
@@ -55,6 +59,12 @@ const POSITIONS = [0, 24, 30, 36, 42, 48, 54, 60]; // every valid purchasedSlots
 const EXPANSION_TOTAL = 1925000; // 192g50s across the six treasury expansions (rungs 1..6)
 
 const EMPTY: GuildBankState = { treasury: 0, inventory: [], purchasedSlots: 0 };
+
+// The one NON-material fixture id this suite uses, the same one the personal
+// bank's twin arms use (tests/bank.test.ts): kind 'food', so the junk-kind
+// material set excludes it. It is what keeps the indivisibility and flooring
+// controls on an item whose units really are inseparable from their payload.
+const NON_MATERIAL_SIM = 'roasted_boar';
 
 function freshSim(): Sim {
   return new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true });
@@ -200,9 +210,16 @@ describe('sanitizeGuildBankState (the ONE load path)', () => {
       ],
     }).inventory;
     expect(out).toEqual([
-      { itemId: 'wolf_fang', count: 3 },
+      // A MATERIAL row is normalized on load: its units project into ONE
+      // unrecorded bucket (the empty descriptor). Nobody recorded a gatherer
+      // for legacy stock, so none is invented.
+      { itemId: 'wolf_fang', count: 3, materialSources: [{ source: {}, count: 3 }] },
+      // A removed-content id is NOT a material and is never given a
+      // composition: it stays dormant recoverable data, byte for byte.
       { itemId: 'unknown_id_xyz', count: 3 },
     ]);
+    expect(isMaterialItemId('wolf_fang')).toBe(true);
+    expect(isMaterialItemId('unknown_id_xyz')).toBe(false);
   });
 
   it('clamps counts like the personal bank: floor, min 1, instanced stack caps', () => {
@@ -212,9 +229,14 @@ describe('sanitizeGuildBankState (the ONE load path)', () => {
         { itemId: 'wolf_fang', count: 2.9 },
         // Unstacked weapon (stackSize 1) with an instance payload caps at 1.
         { itemId: 'worn_sword', count: 5, instance: { signer: 'Ana' } },
-        // Mergeable payload caps at the stack size (wolf_fang: 20).
+        // A MATERIAL keeps its stored count: a signer is provenance, not
+        // per-copy identity, so the tamper ceiling does not apply and a LEGAL
+        // legacy over-cap holding survives instead of losing the 21st unit its
+        // buckets still account for (preservesMaterialCountOnLoad).
         { itemId: 'wolf_fang', count: 21, instance: { signer: 'Ana' } },
-        // Charge-bearing payloads stay one-per-slot (the shared-payload dupe guard).
+        // Charge-bearing payloads stay one-per-slot (the shared-payload dupe
+        // guard): charges ARE per-copy identity, so the exemption does not
+        // reach them and this still clamps to 1.
         { itemId: 'wolf_fang', count: 4, instance: { signer: 'Ana', charges: { zap: 2 } } },
         // Unknown def: the merge-legal ceiling does not apply.
         { itemId: 'unknown_id_xyz', count: 30, instance: { signer: 'Ana' } },
@@ -222,9 +244,31 @@ describe('sanitizeGuildBankState (the ONE load path)', () => {
         { itemId: 'wolf_fang', count: 2, instance: 'not-an-object' },
       ],
     }).inventory;
-    expect(out.map((s) => s.count)).toEqual([1, 2, 1, 20, 1, 30, 2]);
+    expect(out.map((s) => s.count)).toEqual([1, 2, 1, 21, 1, 30, 2]);
+    // The NON-material control is untouched by the material model: its payload
+    // stays on the slot and its count still clamps.
     expect(out[2]).toEqual({ itemId: 'worn_sword', count: 1, instance: { signer: 'Ana' } });
-    expect(out[6]).toEqual({ itemId: 'wolf_fang', count: 2 });
+    // The legacy signer MOVES into the descriptor; nothing is invented and
+    // nothing is dropped, so the payload empties away with it.
+    expect(out[3]).toEqual({
+      itemId: 'wolf_fang',
+      count: 21,
+      materialSources: [{ source: { signer: 'Ana' }, count: 21 }],
+    });
+    expect('instance' in out[3]).toBe(false);
+    // The charge-bearing row keeps its charges (per-copy identity) while its
+    // signer relocates: one row, both channels, neither invented.
+    expect(out[4]).toEqual({
+      itemId: 'wolf_fang',
+      count: 1,
+      instance: { charges: { zap: 2 } },
+      materialSources: [{ source: { signer: 'Ana' }, count: 1 }],
+    });
+    expect(out[6]).toEqual({
+      itemId: 'wolf_fang',
+      count: 2,
+      materialSources: [{ source: {}, count: 2 }],
+    });
     expect('instance' in out[6]).toBe(false);
   });
 
@@ -238,10 +282,17 @@ describe('sanitizeGuildBankState (the ONE load path)', () => {
         { itemId: 'wolf_fang', count: 2, craftedRecipeId: 7 },
       ],
     }).inventory;
+    // The marker rides beside the composition: both provenance channels survive
+    // the same load, and neither overwrites the other.
     expect(out).toEqual([
-      { itemId: 'wolf_fang', count: 2, craftedRecipeId: 'recipe_a' },
-      { itemId: 'wolf_fang', count: 2 },
-      { itemId: 'wolf_fang', count: 2 },
+      {
+        itemId: 'wolf_fang',
+        count: 2,
+        craftedRecipeId: 'recipe_a',
+        materialSources: [{ source: {}, count: 2 }],
+      },
+      { itemId: 'wolf_fang', count: 2, materialSources: [{ source: {}, count: 2 }] },
+      { itemId: 'wolf_fang', count: 2, materialSources: [{ source: {}, count: 2 }] },
     ]);
     // toEqual treats an undefined-valued key as absent, so pin absence directly.
     expect('craftedRecipeId' in out[1]).toBe(false);
@@ -273,12 +324,24 @@ describe('sanitizeGuildBankState (the ONE load path)', () => {
     expect('craftedRecipeId' in out[0]).toBe(false);
     expect(JSON.stringify(out)).not.toContain('xxxxx');
     expect(JSON.stringify(out)).not.toContain('rrrrr');
+    // The oversized signer is dropped by the SHARED payload bound BEFORE the
+    // material normalize runs, so the surviving unit is honestly UNRECORDED.
+    // A descriptor is never fabricated out of a signer the bound refused.
+    expect(out[0]).toEqual({
+      itemId: 'wolf_fang',
+      count: 1,
+      instance: { junkKey: 'nope' },
+      materialSources: [{ source: {}, count: 1 }],
+    });
+    // The legal signer beside it becomes its own exact bucket instead, with the
+    // crafted marker untouched.
     expect(out[1]).toEqual({
       itemId: 'wolf_fang',
       count: 1,
-      instance: { signer: 'Ana' },
       craftedRecipeId: 'jerky',
+      materialSources: [{ source: { signer: 'Ana' }, count: 1 }],
     });
+    expect('instance' in out[1]).toBe(false);
   });
 
   it('tolerates an overstacked PLAIN slot uncapped (the bank.ts pre-bag idiom, pinned)', () => {
@@ -289,7 +352,11 @@ describe('sanitizeGuildBankState (the ONE load path)', () => {
     const out = sanitizeGuildBankState({
       inventory: [{ itemId: 'wolf_fang', count: 999 }],
     }).inventory;
-    expect(out).toEqual([{ itemId: 'wolf_fang', count: 999 }]);
+    // Uncapped, and every one of the 999 units is accounted for in ONE
+    // unrecorded bucket: the projection is lossless, never a clip.
+    expect(out).toEqual([
+      { itemId: 'wolf_fang', count: 999, materialSources: [{ source: {}, count: 999 }] },
+    ]);
   });
 
   it('stays in lockstep with sanitizeBankState on the shared inventory arm', () => {
@@ -372,7 +439,7 @@ describe('the per-guild book map (Sim.guildBanks + load/serialize seam)', () => 
     expect(sim.guildBanks.get(3)).toEqual({
       treasury: 500,
       purchasedSlots: 24,
-      inventory: [{ itemId: 'wolf_fang', count: 3 }],
+      inventory: [{ itemId: 'wolf_fang', count: 3, materialSources: [{ source: {}, count: 3 }] }],
     });
     // Evict-then-load is the sanctioned reload path (Phase 3 disband/maintenance).
     sim.guildBanks.delete(3);
@@ -398,7 +465,14 @@ describe('the per-guild book map (Sim.guildBanks + load/serialize seam)', () => 
     sim.loadGuildBank(5, {
       treasury: 777,
       purchasedSlots: 24,
-      inventory: [{ itemId: 'wolf_fang', count: 3, instance: { signer: 'Ana' } }],
+      // A MATERIAL row (whose signer normalizes into a composition) and a
+      // NON-material instanced row, so both mutable per-slot objects are
+      // covered: the composition is where a material's provenance now lives,
+      // and an aliased one would let a save mutate the live book's buckets.
+      inventory: [
+        { itemId: 'wolf_fang', count: 3, instance: { signer: 'Ana' } },
+        { itemId: 'worn_sword', count: 1, instance: { signer: 'Ana' } },
+      ],
     });
     const book = sim.guildBanks.get(5);
     expect(book).toBeDefined();
@@ -407,7 +481,13 @@ describe('the per-guild book map (Sim.guildBanks + load/serialize seam)', () => 
     expect(save).not.toBe(book);
     expect(save?.inventory).not.toBe(book?.inventory);
     expect(save?.inventory[0]).not.toBe(book?.inventory[0]);
-    expect(save?.inventory[0].instance).not.toBe(book?.inventory[0].instance);
+    expect(save?.inventory[0].materialSources).toBeDefined();
+    expect(save?.inventory[0].materialSources).not.toBe(book?.inventory[0].materialSources);
+    expect(save?.inventory[0].materialSources?.[0]).not.toBe(
+      book?.inventory[0].materialSources?.[0],
+    );
+    expect(save?.inventory[1].instance).toBeDefined();
+    expect(save?.inventory[1].instance).not.toBe(book?.inventory[1].instance);
     // Mutating the snapshot never touches the live book.
     if (save) {
       save.treasury = 0;
@@ -781,9 +861,14 @@ describe('guild bank ops: the shared refusal dimensions (every op, one axis at a
       sim.playerId,
       meta(sim).inventory.findIndex((s) => s.itemId === 'wolf_fang'),
     );
-    expect(book(sim).inventory).toEqual([{ itemId: 'wolf_fang', count: 3 }]);
+    expect(book(sim).inventory).toEqual([
+      { itemId: 'wolf_fang', count: 3, materialSources: [{ source: {}, count: 3 }] },
+    ]);
     sim.guildBankWithdrawFor(sim.playerId, 0, 1);
-    expect(book(sim).inventory).toEqual([{ itemId: 'wolf_fang', count: 2 }]);
+    // Conservation is exact on a partial withdraw: the bucket follows the units.
+    expect(book(sim).inventory).toEqual([
+      { itemId: 'wolf_fang', count: 2, materialSources: [{ source: {}, count: 2 }] },
+    ]);
     sim.guildBankBuySlotsFor(sim.playerId);
     expect(book(sim).purchasedSlots).toBe(30); // opened base 24 + one 6-slot expansion
     expect(book(sim).treasury).toBe(76_500); // 101500 - 25000 (rung-1 price literal)
@@ -1076,13 +1161,42 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
       expect(fingerprint(sim), String(badCount)).toBe(before);
       expect(sim.drainEvents(), String(badCount)).toEqual([]);
     }
-    // A fractional count FLOORS rather than refusing: the shared
-    // moveBetweenContainers contract the personal bank already rides, pinned
-    // here so the guild bank cannot drift from it silently.
+    // A fractional count on a MATERIAL is REFUSED, inert, not floored: the
+    // shared take validates the requested quantity as a positive safe integer
+    // before it will split provenance, and a request the model cannot honour
+    // exactly moves nothing rather than silently moving a different amount.
+    // Still the shared moveBetweenContainers contract the personal bank rides,
+    // so the two containers cannot drift; what changed is the contract, for
+    // both, on materials only.
+    const beforeFraction = fingerprint(sim);
     sim.drainEvents();
     sim.guildBankDepositFor(sim.playerId, depositIndex, 1.5);
-    expect(book(sim).inventory.find((s) => s.itemId === 'wolf_fang')?.count).toBe(4);
-    expect(meta(sim).inventory.find((s) => s.itemId === 'wolf_fang')?.count).toBe(2);
+    expect(fingerprint(sim)).toBe(beforeFraction);
+    expect(sim.drainEvents()).toEqual([]);
+    expect(book(sim).inventory.find((s) => s.itemId === 'wolf_fang')?.count).toBe(3);
+    expect(meta(sim).inventory.find((s) => s.itemId === 'wolf_fang')?.count).toBe(3);
+  });
+
+  it('a fractional count still FLOORS on the legacy (non-material) arm', () => {
+    // The other half of the contract above, kept live so the two arms cannot
+    // silently converge: a non-material fungible has no per-unit provenance to
+    // split, so it keeps the pre-material flooring moveBetweenContainers has
+    // always applied.
+    const sim = makeOfficerSim();
+    expect(isMaterialItemId(NON_MATERIAL_SIM)).toBe(false);
+    // Premise: the anonymous-pipe policy passes it, so the capacity/count arm
+    // is what answers rather than a refusal upstream of it.
+    expect(guildBankPipeRefusal({ itemId: NON_MATERIAL_SIM, count: 1 })).toBeNull();
+    sim.addItem(NON_MATERIAL_SIM, 3);
+    sim.drainEvents();
+    const idx = meta(sim).inventory.findIndex((s) => s.itemId === NON_MATERIAL_SIM);
+    // Read the carried count rather than assuming it: the starting kit is not
+    // this test's fixture, and the claim is the DELTA, not the total.
+    const carried = meta(sim).inventory[idx]?.count ?? 0;
+    expect(carried).toBeGreaterThan(1);
+    sim.guildBankDepositFor(sim.playerId, idx, 1.5);
+    expect(book(sim).inventory.find((s) => s.itemId === NON_MATERIAL_SIM)?.count).toBe(1);
+    expect(meta(sim).inventory.find((s) => s.itemId === NON_MATERIAL_SIM)?.count).toBe(carried - 1);
   });
 
   it('un-credits a collect objective on deposit and re-credits it on withdraw', () => {
@@ -1204,11 +1318,23 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
     // and "full" would lie about the free slot on screen. Charges are not a
     // per-copy transfer lock, so the pipe policy passes and the capacity gate
     // is the arm that answers.
+    //
+    // The stack is a NON-material, matching the personal bank's twin arm
+    // (tests/bank.test.ts) and for its reason: a charges payload is genuinely
+    // indivisible there, which is what makes "cannot be split" the honest line.
+    // A MATERIAL's units really are divisible, so this state answers as pool
+    // exhaustion on that arm and running this one on a material would assert
+    // the wrong contract.
     const sim = makeOfficerSim();
+    expect(isMaterialItemId(NON_MATERIAL_SIM)).toBe(false);
     for (let i = 0; i < GUILD_BANK_RUNG_SLOTS[0] - 1; i++) {
       book(sim).inventory.push({ itemId: 'wolf_fang', count: 1, instance: { signer: `S${i}` } });
     }
-    meta(sim).inventory.push({ itemId: 'wolf_fang', count: 3, instance: { charges: { heal: 2 } } });
+    meta(sim).inventory.push({
+      itemId: NON_MATERIAL_SIM,
+      count: 3,
+      instance: { charges: { heal: 2 } },
+    });
     const before = fingerprint(sim);
     sim.drainEvents();
     sim.guildBankDepositFor(sim.playerId, meta(sim).inventory.length - 1);
@@ -1229,9 +1355,14 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
     // deposit names the full book and must NOT claim the stack cannot be
     // split: a later re-widening of the granularity cause cannot silently
     // restore the wrong literal here.
+    // The filler is a DIFFERENT material id, deliberately. Differently signed
+    // units of the SAME material now share a stack (a signer is provenance, not
+    // identity), so 22 signed wolf_fang slots would absorb this stack instead of
+    // refusing it and the arm would test nothing. A distinct material id cannot
+    // merge with it, so the shortfall is still real slots.
     const sim = makeOfficerSim();
     for (let i = 0; i < GUILD_BANK_RUNG_SLOTS[0] - 2; i++) {
-      book(sim).inventory.push({ itemId: 'wolf_fang', count: 1, instance: { signer: `S${i}` } });
+      book(sim).inventory.push({ itemId: 'copper_ore', count: 1, instance: { signer: `S${i}` } });
     }
     meta(sim).inventory.push({ itemId: 'wolf_fang', count: 45, instance: { signer: 'Ana' } });
     const before = fingerprint(sim);
@@ -1248,9 +1379,15 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
   it('a granularity withdraw refusal gets the bags-direction line, never "bags are full"', () => {
     // The mirror into the officer's bags: the hand-shaped charges stack sits
     // in the book, the bags keep ONE free slot, and the refusal names the
-    // stack's indivisibility rather than claiming the bags are full.
+    // stack's indivisibility rather than claiming the bags are full. A
+    // NON-material for the same reason the deposit twin above uses one: only
+    // there is "cannot be split" the honest line.
     const sim = makeOfficerSim();
-    book(sim).inventory.push({ itemId: 'wolf_fang', count: 3, instance: { charges: { heal: 2 } } });
+    book(sim).inventory.push({
+      itemId: NON_MATERIAL_SIM,
+      count: 3,
+      instance: { charges: { heal: 2 } },
+    });
     const m = meta(sim);
     const cap = bagCapacity(m.bags);
     while (m.inventory.length < cap - 1) {
@@ -1286,9 +1423,14 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
     book(sim).inventory.push({ itemId: 'wolf_fang', count: 45, instance: { signer: 'Ana' } });
     const m = meta(sim);
     const cap = bagCapacity(m.bags);
+    // A DIFFERENT material id fills the bags (the deposit twin's reasoning):
+    // differently signed units of the same material merge now, so wolf_fang
+    // fillers would top up and the withdrawal would land. Each push adds one
+    // slot unconditionally, so the loop still terminates; growing the bags with
+    // a merging add would not.
     while (m.inventory.length < cap - 2) {
       m.inventory.push({
-        itemId: 'wolf_fang',
+        itemId: 'copper_ore',
         count: 1,
         instance: { signer: `B${m.inventory.length}` },
       });
@@ -1311,7 +1453,14 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
     const idx = meta(sim).inventory.findIndex((s) => s.itemId === 'wolf_fang');
     sim.guildBankDepositFor(sim.playerId, idx, 4);
     expect(meta(sim).inventory.find((s) => s.itemId === 'wolf_fang')?.count).toBe(6);
-    expect(book(sim).inventory).toEqual([{ itemId: 'wolf_fang', count: 4 }]);
+    // 4 of the 10 units move, and their bucket moves with them: 4 here, 6 left
+    // behind, no unit and no descriptor invented or lost.
+    expect(book(sim).inventory).toEqual([
+      { itemId: 'wolf_fang', count: 4, materialSources: [{ source: {}, count: 4 }] },
+    ]);
+    expect(meta(sim).inventory.find((s) => s.itemId === 'wolf_fang')?.materialSources).toEqual([
+      { source: {}, count: 6 },
+    ]);
     expect(
       hasLog(sim.drainEvents(), `You deposit ${ITEMS.wolf_fang.name} into the guild bank.`),
     ).toBe(true);
@@ -1322,28 +1471,66 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
     book(sim).inventory.push({ itemId: 'wolf_fang', count: 5 });
     sim.drainEvents();
     sim.guildBankWithdrawFor(sim.playerId, 0, 2);
-    expect(book(sim).inventory).toEqual([{ itemId: 'wolf_fang', count: 3 }]);
+    expect(book(sim).inventory).toEqual([
+      { itemId: 'wolf_fang', count: 3, materialSources: [{ source: {}, count: 3 }] },
+    ]);
     expect(meta(sim).inventory.find((s) => s.itemId === 'wolf_fang')?.count).toBe(2);
     expect(
       hasLog(sim.drainEvents(), `You withdraw ${ITEMS.wolf_fang.name} from the guild bank.`),
     ).toBe(true);
   });
 
-  it('an instanced stack moves WHOLE regardless of the requested count (indivisible)', () => {
+  it('a NON-material instanced stack moves WHOLE regardless of the requested count', () => {
+    // The indivisibility control, kept on an item the material model does not
+    // own: a per-copy payload cannot be split from its units, so a partial
+    // request still moves the whole slot.
     const sim = makeOfficerSim();
     const payload = { signer: 'Ana' };
-    meta(sim).inventory.push({ itemId: 'wolf_fang', count: 3, instance: { ...payload } });
+    expect(isMaterialItemId(NON_MATERIAL_SIM)).toBe(false);
+    meta(sim).inventory.push({ itemId: NON_MATERIAL_SIM, count: 3, instance: { ...payload } });
     const idx = meta(sim).inventory.findIndex((s) => s.instance?.signer === 'Ana');
     sim.guildBankDepositFor(sim.playerId, idx, 1); // partial request: still all 3
     expect(meta(sim).inventory.some((s) => s.instance?.signer === 'Ana')).toBe(false);
-    expect(book(sim).inventory).toEqual([{ itemId: 'wolf_fang', count: 3, instance: payload }]);
+    expect(book(sim).inventory).toEqual([
+      { itemId: NON_MATERIAL_SIM, count: 3, instance: payload },
+    ]);
     sim.guildBankWithdrawFor(sim.playerId, 0, 1); // and back, whole again
     expect(book(sim).inventory).toEqual([]);
     expect(meta(sim).inventory.find((s) => s.instance?.signer === 'Ana')).toEqual({
-      itemId: 'wolf_fang',
+      itemId: NON_MATERIAL_SIM,
       count: 3,
       instance: payload,
     });
+  });
+
+  it('a SIGNED material stack splits per unit, carrying its exact bucket both ways', () => {
+    // The other side of the same rule, and why the control above had to move: a
+    // signer on a MATERIAL is provenance, not per-copy identity, so the stack IS
+    // divisible and each half keeps the exact units it owns. Conservation is
+    // exact across the split (1 + 2 = 3) and no gatherer is invented for it.
+    const sim = makeOfficerSim();
+    meta(sim).inventory.push({ itemId: 'wolf_fang', count: 3, instance: { signer: 'Ana' } });
+    const idx = meta(sim).inventory.findIndex((s) => s.instance?.signer === 'Ana');
+    sim.guildBankDepositFor(sim.playerId, idx, 1);
+    expect(book(sim).inventory).toEqual([
+      { itemId: 'wolf_fang', count: 1, materialSources: [{ source: { signer: 'Ana' }, count: 1 }] },
+    ]);
+    const kept = meta(sim).inventory.find(
+      (s) => s.itemId === 'wolf_fang' && s.materialSources !== undefined,
+    );
+    expect(kept).toEqual({
+      itemId: 'wolf_fang',
+      count: 2,
+      materialSources: [{ source: { signer: 'Ana' }, count: 2 }],
+    });
+    // The signer left the payload for the descriptor, in both halves.
+    expect(meta(sim).inventory.some((s) => s.instance?.signer === 'Ana')).toBe(false);
+    // Withdrawing the unit back restores the whole holding as ONE bucket.
+    sim.guildBankWithdrawFor(sim.playerId, 0, 1);
+    expect(book(sim).inventory).toEqual([]);
+    expect(meta(sim).inventory.find((s) => s.itemId === 'wolf_fang')?.materialSources).toEqual([
+      { source: { signer: 'Ana' }, count: 3 },
+    ]);
   });
 
   it('a plain crafted stack keeps its craftedRecipeId marker across the round trip', () => {
@@ -1351,8 +1538,15 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
     meta(sim).inventory.push({ itemId: 'wolf_fang', count: 2, craftedRecipeId: 'r_test' });
     const idx = meta(sim).inventory.findIndex((s) => s.craftedRecipeId === 'r_test');
     sim.guildBankDepositFor(sim.playerId, idx);
+    // The crafted marker is identity (it keeps this stack apart from an
+    // unmarked one) and rides beside the composition, never instead of it.
     expect(book(sim).inventory).toEqual([
-      { itemId: 'wolf_fang', count: 2, craftedRecipeId: 'r_test' },
+      {
+        itemId: 'wolf_fang',
+        count: 2,
+        craftedRecipeId: 'r_test',
+        materialSources: [{ source: {}, count: 2 }],
+      },
     ]);
     sim.guildBankWithdrawFor(sim.playerId, 0);
     expect(book(sim).inventory).toEqual([]);
@@ -1874,7 +2068,11 @@ describe('revertGuildBankDeltas (the unflushable-session surgical undo)', () => 
         purchasedSlotsAfter: 0,
       },
     ]);
-    expect(book(sim).inventory).toEqual([{ itemId: 'wolf_fang', count: 2 }]);
+    // The undo removes 3 of the 5 units and the remainder keeps the exact
+    // bucket for what is left: an inverse is a removal, never a rewrite.
+    expect(book(sim).inventory).toEqual([
+      { itemId: 'wolf_fang', count: 2, materialSources: [{ source: {}, count: 2 }] },
+    ]);
     // Reverting a withdraw restores the copy WITH its craft provenance.
     sim.revertGuildBankDeltas(GUILD_ID, [
       {
@@ -2204,17 +2402,49 @@ describe('applyGuildBankDeltasTo / revertGuildBankDeltasTo (the forward + invers
     payload && 'charges' in (payload as Record<string, unknown>) ? 1 : want;
 
   /** A book's CONSERVED content: treasury, ladder position, and the item
-   *  multiset summed per (itemId, canonical payload, craft provenance). Slot
-   *  LAYOUT is deliberately excluded: addStacked appends, so a remove-then-
-   *  restore cycle legitimately reorders slots and splits a charge-bearing
-   *  grant one copy per slot. Conservation is what the pair owes. */
+   *  multiset. Slot LAYOUT is deliberately excluded: addStacked appends, so a
+   *  remove-then-restore cycle legitimately reorders slots and splits a
+   *  charge-bearing grant one copy per slot. Conservation is what the pair owes.
+   *
+   *  A MATERIAL is summed per NORMALIZED payload identity and per DESCRIPTOR,
+   *  with the exact per-source counts, for two reasons this corpus would
+   *  otherwise miss entirely. The raw `JSON.stringify(instance)` key stopped
+   *  being the book's identity once a legacy `signer` moved out of the payload
+   *  and into its own bucket: a legitimate merge would then read as two
+   *  different keys and the property would fail for the wrong reason. And a
+   *  count-only value cannot see the regression that actually matters now, a
+   *  pair that conserves the NUMBER of units while moving WHOSE units they are,
+   *  which is exactly what a source-blind replay does.
+   *
+   *  A non-material keeps the original raw key and its unit total. */
   const fingerprint = (b: GuildBankState): string => {
-    const m = new Map<string, number>();
+    const held = new Map<string, Map<string, number>>();
+    const add = (key: string, bucket: string, count: number) => {
+      const buckets = held.get(key) ?? new Map<string, number>();
+      buckets.set(bucket, (buckets.get(bucket) ?? 0) + count);
+      held.set(key, buckets);
+    };
     for (const s of b.inventory) {
-      const key = `${s.itemId}|${JSON.stringify(s.instance ?? null)}|${s.craftedRecipeId ?? ''}`;
-      m.set(key, (m.get(key) ?? 0) + s.count);
+      if (!isMaterialItemId(s.itemId)) {
+        add(
+          `${s.itemId}|${JSON.stringify(s.instance ?? null)}|${s.craftedRecipeId ?? ''}`,
+          '',
+          s.count,
+        );
+        continue;
+      }
+      const normalized = normalizeMaterialStack(s, materialItemIds());
+      // A book this corpus cannot read is a defect in the corpus or the replay,
+      // never something to fingerprint around.
+      if (!normalized.ok) throw new Error(`unreadable material stack: ${normalized.error}`);
+      for (const entry of normalized.value.materialSources ?? []) {
+        add(materialPayloadKey(normalized.value), materialSourceKey(entry.source), entry.count);
+      }
     }
-    return JSON.stringify([b.treasury, b.purchasedSlots, [...m.entries()].sort()]);
+    const rows = [...held.entries()]
+      .map(([key, buckets]) => [key, [...buckets.entries()].sort()] as const)
+      .sort((x, y) => (x[0] < y[0] ? -1 : x[0] > y[0] ? 1 : 0));
+    return JSON.stringify([b.treasury, b.purchasedSlots, rows]);
   };
 
   function genBook(rnd: () => number): GuildBankState {
@@ -2333,6 +2563,91 @@ describe('applyGuildBankDeltasTo / revertGuildBankDeltasTo (the forward + invers
     }
     // The property is only worth what it covered.
     expect(checked).toBeGreaterThan(200);
+  });
+
+  it('the fingerprint instrument is SENSITIVE to attribution, not just to unit totals', () => {
+    // Without this the property above could silently degrade to a count-only
+    // comparison and stay green while a replay moved the wrong officer's units.
+    const ana = { gatherer: { kind: 'character' as const, id: 11, name: 'Ana' } };
+    const bru = { gatherer: { kind: 'character' as const, id: 22, name: 'Bru' } };
+    const book = (a: number, b: number): GuildBankState => ({
+      treasury: 0,
+      purchasedSlots: 24,
+      inventory: [
+        {
+          itemId: 'copper_ore',
+          count: a + b,
+          materialSources: [
+            { source: ana, count: a },
+            { source: bru, count: b },
+          ],
+        },
+      ],
+    });
+
+    // Six units either way: only WHOSE they are differs.
+    expect(fingerprint(book(4, 2))).not.toBe(fingerprint(book(2, 4)));
+    // And the literal attribution really is in the string, per descriptor.
+    expect(fingerprint(book(4, 2))).toContain('4');
+    expect(fingerprint(book(4, 2))).toContain('2');
+    // Layout-independent, exactly like the totals arm: the same units split
+    // across two stacks fingerprint identically to one merged stack.
+    const split: GuildBankState = {
+      treasury: 0,
+      purchasedSlots: 24,
+      inventory: [
+        { itemId: 'copper_ore', count: 4, materialSources: [{ source: ana, count: 4 }] },
+        { itemId: 'copper_ore', count: 2, materialSources: [{ source: bru, count: 2 }] },
+      ],
+    };
+    expect(fingerprint(split)).toBe(fingerprint(book(4, 2)));
+  });
+
+  it('a source-blind replay of a mixed stack is CAUGHT, with the exact surviving counts named', () => {
+    const ana = { gatherer: { kind: 'character' as const, id: 11, name: 'Ana' } };
+    const bru = { gatherer: { kind: 'character' as const, id: 22, name: 'Bru' } };
+    const book: GuildBankState = {
+      treasury: 0,
+      purchasedSlots: 24,
+      inventory: [
+        {
+          itemId: 'copper_ore',
+          count: 6,
+          materialSources: [
+            { source: ana, count: 4 },
+            { source: bru, count: 2 },
+          ],
+        },
+      ],
+    };
+    const withdrawBru: GuildBankOpDelta = {
+      op: 'withdraw',
+      itemId: 'copper_ore',
+      count: 2,
+      instance: null,
+      craftedRecipeId: null,
+      materialSources: [{ source: bru, count: -2 }],
+      copperDelta: 0,
+      purchasedSlotsBefore: 0,
+      purchasedSlotsAfter: 0,
+    };
+
+    expect(applyGuildBankDeltasTo(book, [withdrawBru])).toBeNull();
+    // LITERAL attribution, not a total: four of Ana's and none of Bru's. A
+    // source-blind `slot.count -= 2` would leave the same six-minus-two total
+    // while spending whichever units came last.
+    const survivors = book.inventory[0].materialSources ?? [];
+    expect(survivors).toHaveLength(1);
+    expect(survivors[0].count).toBe(4);
+    expect(survivors[0].source.gatherer?.name).toBe('Ana');
+    expect(book.inventory[0].count).toBe(4);
+
+    revertGuildBankDeltasTo(book, [withdrawBru]);
+    const restored = book.inventory[0].materialSources ?? [];
+    expect(restored.map((entry) => [entry.source.gatherer?.name, entry.count]).sort()).toEqual([
+      ['Ana', 4],
+      ['Bru', 2],
+    ]);
   });
 
   it('a ladder step replays ONLY onto the base its witness names, in both directions', () => {
@@ -2517,7 +2832,17 @@ describe('applyGuildBankDeltasTo / revertGuildBankDeltasTo (the forward + invers
         })(),
       ),
     );
-    expect(netted.inventory).toEqual([{ itemId: 'wolf_fang', count: 1, instance: { boundTo: 7 } }]);
+    // The removal takes 2 of the 3 units and leaves the exact bucket for the
+    // survivor. The non-signer payload (`boundTo`) is per-copy identity and
+    // stays on the slot: only a legacy signer relocates into a descriptor.
+    expect(netted.inventory).toEqual([
+      {
+        itemId: 'wolf_fang',
+        count: 1,
+        instance: { boundTo: 7 },
+        materialSources: [{ source: {}, count: 1 }],
+      },
+    ]);
     // And it nets AGAINST a deposit of the same identity, the same way a
     // withdraw would: deposit 2 then purge 2 is a no-op on the book.
     expect(netGuildBankOpLogForReplay([deposit(2), purge(2)])).toEqual([]);

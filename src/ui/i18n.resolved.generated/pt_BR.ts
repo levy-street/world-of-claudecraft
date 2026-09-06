@@ -326,6 +326,7 @@ export const pt_BR: EnTranslations = {
     }
   },
   "hudChrome": {
+    "materialStackSelectionUnavailable": "That material selection is no longer available.",
     "warlock": {
       "doomLabel": "Condenação",
       "fateThreadsLabel": "Fios do Destino",
@@ -3047,7 +3048,33 @@ export const pt_BR: EnTranslations = {
       "enchantedFallback": "Encantado",
       "partyTradeWindow": "Você pode negociar este item com jogadores que compartilharam esse saque pelos próximos {time}. Equipá-lo encerra a janela de troca.",
       "perfectedBadge": "Perfected",
-      "perfectingRank": "Perfecting: rank {rank} of {ranks}"
+      "perfectingRank": "Perfecting: rank {rank} of {ranks}",
+      "materialSourceGatherer": "{count} × Collected by {name}",
+      "materialSourceGathererSigned": "{count} × Collected by {name}, signed by {signer}",
+      "materialSourceUnrecorded": "{count} × No gatherer recorded",
+      "materialSourceUnrecordedSigned": "{count} × No gatherer recorded, signed by {name}",
+      "materialSourceMore": "+{sources} more sources, {units} units"
+    },
+    "materialSources": {
+      "detailsTitle": "Sources for {item}",
+      "pickerTitle": "Choose sources from {item}",
+      "close": "Close material sources",
+      "view": "Sources",
+      "choose": "Sources",
+      "viewAria": "View all material sources for {item}",
+      "chooseAria": "Choose material sources to move for {item}",
+      "cancel": "Cancel",
+      "confirm": "Move selected units",
+      "listAria": "Material source list",
+      "total": "{units} units in this stack",
+      "row": "{count} units: {source}",
+      "gatherer": "Collected by {name}",
+      "gathererSigned": "Collected by {name}, signed by {signer}",
+      "unrecorded": "No gatherer recorded",
+      "unrecordedSigned": "No gatherer recorded, signed by {name}",
+      "quantityAria": "Units from {source}, up to {count}",
+      "decreaseAria": "Decrease units from {source}",
+      "increaseAria": "Increase units from {source}"
     },
     "materialHint": {
       "fineGrade": "Grau fino. Coletado de um veio de nível pleno com uma ferramenta de nível acima do material, e conta como a versão comum sempre que uma for exigida.",
@@ -4058,7 +4085,11 @@ export const pt_BR: EnTranslations = {
       "applyEnchant": "Aplicar Encantamento",
       "sunder": "Sunder",
       "sell": "Vender",
-      "sellAll": "Vender tudo ({count})"
+      "sellAll": "Vender tudo ({count})",
+      "viewSources": "View sources",
+      "separateByGatherer": "Separate by gatherer",
+      "takeChosenQuantity": "Take out chosen quantity",
+      "combine": "Combine material stacks"
     },
     "enchanting": {
       "disenchantedLine": "Você desencanta {item}.",
@@ -6912,7 +6943,7 @@ export const pt_BR: EnTranslations = {
         "commissionsHeading": "Encomendas e o Vínculo do Artesão",
         "commissionsBody": "Uma encomenda é uma criação feita para alguém. Ao criar uma arma, uma peça de armadura ou um item secundário sustentado (uma poção não pode carregar um vínculo), o artesão pode marcar a criação como encomenda: a peça acabada se comporta normalmente nas mãos de quem a fez, mas no momento em que troca de mãos em uma negociação ela se vincula à pessoa que a recebeu. É o Vínculo do Artesão: o comprador recebe sua peça, e a peça não pode ser repassada nem revendida.\n\nOs vínculos não são eternos, apenas caros. Qualquer mestre de posto desvincular uma peça vinculada enquanto você estiver na estação (uma estação móvel nunca oferece o serviço), por uma taxa definida pela qualidade do item: 25 pratas para incomum, 1 ouro para raro, 4 ouros para épico, com um lendário pagando a taxa épica e uma peça comum encomendada a taxa de incomum.\n\nA taxa compra uma lousa limpa, não uma cura: a peça ainda é uma encomenda, então ela se vincula novamente a quem a receber na próxima negociação, e todo o resto, assinatura, obra-prima e encantamentos, permanece intacto.",
         "provenanceHeading": "Trabalho assinado",
-        "provenanceBody": "Some items carry a name. Hover one and the tooltip says Gathered by so-and-so on a raw material, or Crafted by so-and-so on a finished piece: the same mark, worded for how the item came to be. A signature is part of the item itself, travels with it through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fades.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. The one thing that can cost you a signature is a full bag: a signed unit needs room of its own, or a matching signed stack, to land in.\n\nA stack of items shares one identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. A signed log never joins a plain pile in either direction (merging would erase somebody's name), but identical payloads merge happily, so twenty ore signed by the same gatherer sit in one stack and a windfall does not shred your bags.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
+        "provenanceBody": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; open Sources for the full list. Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
         "collectorsHeading": "Colecionadores, troféus e o preço de uma história",
         "collectorsBody": "Os vendedores são cegos à proveniência: um item assinado é vendido a um PNJ exatamente pelo seu preço comum. O prêmio de uma assinatura existe apenas entre jogadores, o que é precisamente o que o torna interessante: uma pilha de minério inesperado assinada por um coletor famoso, um Corte Principal de uma colheita sortuda, uma lâmina obra-prima com o nome de um artesão aposentado, todos custam o que a memória de alguém diz que valem.\n\nO Livro dos Feitos apoia o mesmo instinto: Veia Imaculada, Cerne Ancião, Flor ao Luar, Um Espécime Perfeito e Lampejo de Esperança são marcas de colecionador com zero de Renome que existem apenas para provar que um momento aconteceu com você. Guarde o item que conquistou o feito e você tem o recibo. Nada disso é poder; a proveniência não compra atributos nem vence batalhas, é o rastro de papel do jogo para dias felizes.",
         "castPaceHeading": "Tempo de conjuração e o dreno de ouro",
@@ -6953,7 +6984,7 @@ export const pt_BR: EnTranslations = {
         "title": "Perguntas Frequentes sobre Profissões",
         "intro": "Respostas rápidas para as perguntas que os artesãos fazem com mais frequência.",
         "q1": "Why do my signed items not stack?",
-        "a1": "A signed item is an instanced item: it carries its own little record (the signer, any rolled quality, masterwork stats, an enchant, a bond) instead of being an anonymous copy. Two copies merge into one stack only when those records match exactly.\n\nIn practice: rare ore you gathered yourself stacks with more rare ore you gathered yourself, because both say Gathered by you and nothing else differs. The same material signed by a friend sits in its own slot, and a plain unsigned copy never merges into a signed stack. Bags, bank, trade, mail, and the World Market all follow this one rule.",
+        "a1": "Finished items still follow the strict instance rule: two copies merge only when their signer, rolled properties, masterwork stats, enchant, bond, and other identity all match exactly. A signed blade therefore stays apart from a plain one.\n\nMaterials are the exception. Compatible stacks of the same material can merge even when their collectors or signers differ, because the stack keeps a count for each source. The hover tooltip summarizes the sources; open Sources for the full list. Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.",
         "q2": "As receitas comuns aumentam minha perícia para sempre?",
         "a2": "No. Every recipe is scored by how far it sits below your current bracket in that craft, the classic orange, yellow, green, gray reading: full gain at or above your bracket, half one tier below, a quarter two tiers below, and nothing three or more below. Brackets are every 25 skill, so the free skill 0 recipes stop teaching you anything at 75 skill.\n\nThe caps are also lower than the classic 300 you might expect: each of the ten earnable crafts caps at 125, Mining, Logging, and Herbalism cap at 100, and Fishing runs long at 200. Climbing means moving up to recipes at your own bracket, not grinding the cheapest one.",
         "q3": "Qual é a diferença entre saquear e colher um cadáver?",

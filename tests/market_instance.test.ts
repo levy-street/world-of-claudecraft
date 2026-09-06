@@ -42,7 +42,9 @@ import { groundHeight } from '../src/sim/world';
 
 const BOOTS = 'oiled_boots'; // armor, stack 1
 const HIDE = 'pristine_hide'; // junk rare material, stack 20
-const SCALE = 'mudfin_scale'; // filler
+// The signed-material filler this file used to pack bags with is gone: signed
+// material now shares one stack, so it could never reach the slot cap. The
+// non-material SWORD below is the replacement.
 
 const makeWorld = () => new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
 
@@ -79,6 +81,28 @@ function errorTexts(events: SimEvent[]): string[] {
 function playerListings(sim: Sim) {
   return sim.marketListings.filter((l) => !l.house);
 }
+
+// A legacy `signer` is no longer a payload field on a MATERIAL: it projects
+// into the row's source buckets. This reads them, so the ownership assertions
+// below still pin the exact units they always did, at their new home.
+type SourceCarrier = {
+  materialSources?: readonly { source: { signer?: string }; count: number }[];
+};
+
+/** signer -> unit count over a row's buckets; unrecorded units key as `-`. */
+function signerCounts(row: SourceCarrier | undefined): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const bucket of row?.materialSources ?? []) {
+    const key = bucket.source.signer ?? '-';
+    out[key] = (out[key] ?? 0) + bucket.count;
+  }
+  return out;
+}
+
+// Non-material controls: a stackable food and an unstackable weapon, so the
+// cases that must prove nothing changed outside the material taxonomy can.
+const BREAD = 'baked_bread';
+const SWORD = 'worn_sword';
 
 const ENCHANTED: ItemInstancePayload = {
   enchant: 'ench_stat_str',
@@ -164,7 +188,20 @@ describe('marketBuy / marketCancel: the payload crosses intact', () => {
     expect(sim.players.get(pid)!.copper).toBe(100000 + 950);
   });
 
-  it('buy capacity-models the payload: plain-stack room is not instanced room', () => {
+  /** Fill every remaining backpack slot with copies that really occupy one slot
+   *  each. Deliberately a NON-material unstackable: filling with signed
+   *  material would now share one stack and never reach the cap. */
+  function fillBackpack(sim: Sim, pid: number): void {
+    const meta = metaOf(sim, pid);
+    while (meta.inventory.length < 16) sim.addItem(SWORD, 1, pid);
+  }
+
+  it('buy capacity-models a MATERIAL through the shared stack: a compatible stack IS room', () => {
+    // This case used to prove "plain-stack room is not instanced room". For a
+    // material that is exactly the distinction the shared-stack rule removes: a
+    // Lister-signed unit and an unrecorded unit are compatible, so the plain
+    // hide stack really does have room and the buy really does land. The two
+    // controls below keep the original claim where it still holds.
     const { sim, pid } = marketSetup();
     const buyer = sim.addPlayer('mage', 'Buyer');
     standAtMerchant(sim, buyer);
@@ -172,25 +209,81 @@ describe('marketBuy / marketCancel: the payload crosses intact', () => {
     sim.addItemInstance(HIDE, { ...SIGNED }, pid);
     sim.marketListInstance(HIDE, 100, SIGNED, pid);
     const id = playerListings(sim)[0].id;
-    // Fill the buyer's 16 slots; one is a PLAIN hide stack with room. A plain
-    // grant would top it up, but the signed copy needs its own slot: refuse.
     const buyerMeta = metaOf(sim, buyer);
     buyerMeta.inventory.length = 0;
     sim.addItem(HIDE, 1, buyer);
-    while (buyerMeta.inventory.length < 16) {
-      sim.addItemInstance(SCALE, { signer: `F${buyerMeta.inventory.length}` }, buyer);
-    }
+    fillBackpack(sim, buyer);
+    expect(buyerMeta.inventory).toHaveLength(16);
+
+    sim.drainEvents();
+    sim.marketBuy(id, buyer);
+
+    expect(errorTexts(sim.drainEvents())).toHaveLength(0);
+    expect(playerListings(sim)).toHaveLength(0);
+    // No new slot, and the unit arrived with its owner intact.
+    expect(buyerMeta.inventory).toHaveLength(16);
+    const hide = slotsOf(sim, buyer, HIDE);
+    expect(hide).toHaveLength(1);
+    expect(hide[0].count).toBe(2);
+    expect(signerCounts(hide[0])).toEqual({ '-': 1, Lister: 1 });
+  });
+
+  it('buy still refuses an ENCHANTED copy with no slot for it', () => {
+    // The control that keeps the original capacity claim: an enchanted payload
+    // is not compatible with a plain stack, so it needs a free slot whatever
+    // its source says, and the buyer is not charged when it cannot land.
+    const { sim, pid } = marketSetup();
+    const buyer = sim.addPlayer('mage', 'Buyer');
+    standAtMerchant(sim, buyer);
+    sim.players.get(buyer)!.copper = 100000;
+    sim.addItemInstance(HIDE, { ...ENCHANTED }, pid);
+    sim.marketListInstance(HIDE, 100, ENCHANTED, pid);
+    const id = playerListings(sim)[0].id;
+    const buyerMeta = metaOf(sim, buyer);
+    buyerMeta.inventory.length = 0;
+    sim.addItem(HIDE, 1, buyer);
+    fillBackpack(sim, buyer);
+
     sim.drainEvents();
     sim.marketBuy(id, buyer);
     expect(errorTexts(sim.drainEvents())).toContain('Your bags are full.');
     expect(playerListings(sim)).toHaveLength(1);
     expect(sim.players.get(buyer)!.copper).toBe(100000);
-    // A byte-equal signed stack with room IS instanced room: the buy lands.
-    const plainIdx = buyerMeta.inventory.findIndex((s) => s.itemId === HIDE && !s.instance);
-    buyerMeta.inventory[plainIdx] = { itemId: HIDE, count: 1, instance: { ...SIGNED } };
+
+    // Free a slot and the same buy lands with its payload intact.
+    buyerMeta.inventory.pop();
     sim.marketBuy(id, buyer);
     expect(errorTexts(sim.drainEvents())).toHaveLength(0);
-    const merged = slotsOf(sim, buyer, HIDE).filter((s) => s.instance);
+    const got = slotsOf(sim, buyer, HIDE).filter((s) => s.instance?.enchant);
+    expect(got).toHaveLength(1);
+    expect(got[0].instance).toEqual(ENCHANTED);
+  });
+
+  it('buy capacity for a NON-material is unchanged: plain room is not instanced room', () => {
+    // The taxonomy control: outside materials the old model holds exactly.
+    const { sim, pid } = marketSetup();
+    const buyer = sim.addPlayer('mage', 'Buyer');
+    standAtMerchant(sim, buyer);
+    sim.players.get(buyer)!.copper = 100000;
+    sim.addItemInstance(BREAD, { ...SIGNED }, pid);
+    sim.marketListInstance(BREAD, 100, SIGNED, pid);
+    const id = playerListings(sim)[0].id;
+    const buyerMeta = metaOf(sim, buyer);
+    buyerMeta.inventory.length = 0;
+    sim.addItem(BREAD, 1, buyer);
+    fillBackpack(sim, buyer);
+
+    sim.drainEvents();
+    sim.marketBuy(id, buyer);
+    expect(errorTexts(sim.drainEvents())).toContain('Your bags are full.');
+    expect(sim.players.get(buyer)!.copper).toBe(100000);
+
+    // A byte-equal signed stack with room IS instanced room, as it always was.
+    const plainIdx = buyerMeta.inventory.findIndex((s) => s.itemId === BREAD && !s.instance);
+    buyerMeta.inventory[plainIdx] = { itemId: BREAD, count: 1, instance: { ...SIGNED } };
+    sim.marketBuy(id, buyer);
+    expect(errorTexts(sim.drainEvents())).toHaveLength(0);
+    const merged = slotsOf(sim, buyer, BREAD).filter((s) => s.instance);
     expect(merged).toHaveLength(1);
     expect(merged[0].count).toBe(2);
     expect(merged[0].instance).toEqual(SIGNED);
@@ -242,15 +335,25 @@ describe('browse rows: the display payload is trimmed to the public allowlist', 
     const info = sim.marketInfoFor(pid);
     const rows = info!.listings.filter((l) => l.mine);
     expect(rows).toHaveLength(2);
-    const instanced = rows.find((l) => l.instance);
-    const plain = rows.find((l) => !l.instance);
-    // Trimmed: the signature survives for the maker's mark, charges never wire.
-    expect(instanced?.instance).toEqual({ signer: 'Lister' });
-    expect(instanced?.count).toBe(1);
-    // The plain row must not even carry the key (wire byte-identity).
+    // Keyed on the listed COUNT, not on payload presence: a material's payload
+    // may now be emptied by the signature moving into its bucket, so `instance`
+    // no longer separates the two rows.
+    const instanced = rows.find((l) => l.count === 1);
+    const plain = rows.find((l) => l.count === 3);
+    // Trimmed, same two claims: the signature still reaches the client for the
+    // maker's mark (in the source bucket now), and charges STILL never wire.
+    expect(signerCounts(instanced as SourceCarrier)).toEqual({ Lister: 1 });
+    expect(instanced?.instance?.charges).toBeUndefined();
+    expect(instanced?.instance?.signer).toBeUndefined();
+    // The plain row carries no instance key (wire byte-identity) and states the
+    // provenance of the three units it really holds.
     expect(plain !== undefined && 'instance' in plain).toBe(false);
-    // The book itself keeps the FULL payload for delivery.
-    expect(playerListings(sim).find((l) => l.instance)?.instance).toEqual(CHARGED);
+    expect(signerCounts(plain as SourceCarrier)).toEqual({ '-': 3 });
+    // The book itself keeps the FULL payload for delivery: charges intact, and
+    // the signature still Lister's.
+    const booked = playerListings(sim).find((l) => l.count === 1);
+    expect(booked?.instance).toEqual({ charges: { zap: 2 } });
+    expect(signerCounts(booked as SourceCarrier)).toEqual({ Lister: 1 });
   });
 
   it('trims boundTo/bindOnTrade from a payload that was bound AFTER listing-time checks', () => {
@@ -282,16 +385,21 @@ describe('persistence: instanced listings and collections round-trip the JSONB s
     sim.addItem(HIDE, 3, pid);
     sim.marketList(HIDE, 3, 100, pid);
     const save = JSON.parse(JSON.stringify(sim.serializeMarket()));
-    const plainRow = save.listings.find((l: { instance?: unknown }) => !l.instance);
+    const plainRow = save.listings.find((l: { itemId: string }) => l.itemId === HIDE);
+    // The persisted shape gains exactly ONE key on a material row, and it is
+    // the provenance of the units listed. No payload key appears, which is the
+    // claim: a plain listing is still plain.
     expect(Object.keys(plainRow).sort()).toEqual([
       'count',
       'id',
       'itemId',
+      'materialSources',
       'price',
       'secondsLeft',
       'sellerKey',
       'sellerName',
     ]);
+    expect(plainRow.materialSources).toEqual([{ source: {}, count: 3 }]);
     const sim2 = makeWorld();
     sim2.loadMarket(save);
     const loaded = sim2.marketListings.filter((l) => !l.house);
@@ -308,6 +416,65 @@ describe('persistence: instanced listings and collections round-trip the JSONB s
     const sim2 = makeWorld();
     sim2.loadMarket(save);
     expect(sim2.marketListings.filter((l) => !l.house)[0].count).toBe(1);
+  });
+
+  it('clamps a legacy signed material listing before it can mint copies on reclaim', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Lister');
+    standAtMerchant(sim, pid);
+    sim.loadMarket({
+      listings: [
+        {
+          id: 900,
+          sellerKey: String(pid),
+          sellerName: 'Lister',
+          itemId: HIDE,
+          count: 500,
+          price: 100,
+          secondsLeft: 1000,
+          instance: { signer: 'Ana' },
+        },
+      ],
+      collections: [],
+      nextListingId: 901,
+    });
+
+    const listing = playerListings(sim)[0];
+    expect(listing.count).toBe(1);
+    expect(listing.instance).toBeUndefined();
+    expect(signerCounts(listing)).toEqual({ Ana: 1 });
+
+    sim.marketCancel(listing.id, pid);
+    const reclaimed = slotsOf(sim, pid, HIDE);
+    expect(reclaimed).toHaveLength(1);
+    expect(reclaimed[0].count).toBe(1);
+    expect(signerCounts(reclaimed[0])).toEqual({ Ana: 1 });
+  });
+
+  it('preserves a validated explicit material composition above one copy on load', () => {
+    const sim = makeWorld();
+    sim.loadMarket({
+      listings: [
+        {
+          id: 901,
+          sellerKey: '7',
+          sellerName: 'Lister',
+          itemId: HIDE,
+          count: 5,
+          price: 100,
+          secondsLeft: 1000,
+          instance: { enchant: 'ench_stat_str' },
+          materialSources: [{ source: { signer: 'Ana' }, count: 5 }],
+        },
+      ],
+      collections: [],
+      nextListingId: 902,
+    });
+
+    const listing = playerListings(sim)[0];
+    expect(listing.count).toBe(5);
+    expect(listing.instance).toEqual({ enchant: 'ench_stat_str' });
+    expect(signerCounts(listing)).toEqual({ Ana: 5 });
   });
 
   it('an instanced collection return survives the save round trip', () => {
@@ -343,6 +510,44 @@ describe('persistence: pre-payload saves and size bounds', () => {
       ],
       collections: [{ key: '7', copper: 120, items: [{ itemId: HIDE, count: 2 }] }],
       nextListingId: 1001,
+    };
+    const sim = makeWorld();
+    sim.loadMarket(JSON.parse(JSON.stringify(oldSave)));
+    const reserialized = JSON.parse(JSON.stringify(sim.serializeMarket()));
+    // Every field of a pre-payload row survives untouched. A MATERIAL row also
+    // states the provenance those units always had and nobody recorded: three
+    // unrecorded units listed, two in the collection, exactly the counts held.
+    // The projection is additive and lossless, so the rows are asserted whole.
+    expect(reserialized.listings).toEqual([
+      { ...oldSave.listings[0], materialSources: [{ source: {}, count: 3 }] },
+    ]);
+    expect(reserialized.collections).toEqual([
+      {
+        ...oldSave.collections[0],
+        items: [{ itemId: HIDE, count: 2, materialSources: [{ source: {}, count: 2 }] }],
+      },
+    ]);
+    // Nothing invented: no gatherer and no signature on a save that had none.
+    expect(signerCounts(reserialized.listings[0])).toEqual({ '-': 3 });
+  });
+
+  it('a NON-material v0.31 save round-trips byte-identically, source list and all', () => {
+    // The control for the projection above: outside the material taxonomy a
+    // pre-payload save is still byte-for-byte what it was, with no new key.
+    const oldSave = {
+      listings: [
+        {
+          id: 1002,
+          sellerKey: '7',
+          sellerName: 'Old Seller',
+          itemId: BREAD,
+          count: 3,
+          price: 250,
+          secondsLeft: 1000,
+        },
+      ],
+      collections: [{ key: '7', copper: 120, items: [{ itemId: BREAD, count: 2 }] }],
+      nextListingId: 1003,
     };
     const sim = makeWorld();
     sim.loadMarket(JSON.parse(JSON.stringify(oldSave)));
@@ -387,9 +592,14 @@ describe('persistence: pre-payload saves and size bounds', () => {
     // round 5 finder caught the clamp reading the bound's output).
     expect(listing.count).toBe(1);
     // The clone-mangled array instance dropped whole; the collection item
-    // survives plain with its count.
+    // survives plain with its count, and a material states that count's
+    // provenance as the unrecorded units it always was.
     const coll = out.collections.find((c: { key: string }) => c.key === '7');
-    expect(coll.items[0]).toEqual({ itemId: HIDE, count: 2 });
+    expect(coll.items[0]).toEqual({
+      itemId: HIDE,
+      count: 2,
+      materialSources: [{ source: {}, count: 2 }],
+    });
   });
 
   it('rekeyMarketSeller follows the escrowed payload signers too (the fix-round completion)', () => {
@@ -439,20 +649,32 @@ describe('persistence: pre-payload saves and size bounds', () => {
     const own = out.listings.find((l: { id: number }) => l.id === 901);
     const foreign = out.listings.find((l: { id: number }) => l.id === 902);
     expect(own.sellerKey).toBe('77');
-    expect(own.instance).toEqual({ signer: 'Newname' });
-    expect(foreign.instance, 'a stranger listing is foreign-held').toEqual({ signer: 'Oldname' });
+    // The rename follows the signature into its new home: the owner's escrowed
+    // unit re-keys in the SOURCE bucket, one unit each, and the stranger's
+    // listing is untouched. Renaming the OWNED scope only is the whole claim,
+    // and no gatherer snapshot is rewritten by it.
+    expect(signerCounts(own)).toEqual({ Newname: 1 });
+    expect(signerCounts(foreign), 'a stranger listing is foreign-held').toEqual({ Oldname: 1 });
+    expect(own.instance?.signer).toBeUndefined();
     const coll = out.collections.find((c: { key: string }) => c.key === '77');
-    expect(coll.items[0].instance).toEqual({ signer: 'Newname' });
+    expect(signerCounts(coll.items[0])).toEqual({ Newname: 1 });
   });
 
   it('a maximally instanced seller book serializes inside a stated byte budget', () => {
     // 12 fully-instanced listings (the per-seller cap) with worst-case-ish
     // payloads must stay small: a future ItemInstancePayload field that
     // inflates every persisted row should fail here, not a production autosave.
+    //
+    // The signer is the LONGEST LEGAL one (MAX_CRAFTED_BY_LENGTH, which is the
+    // 16-character ceiling server/auth.ts enforces on a real character name),
+    // not an arbitrarily long string. A 24-character signer is data no account
+    // can produce, the shared source model refuses it outright, and measuring a
+    // shape that cannot exist told us nothing about a real autosave.
+    const MAX_LEGAL_SIGNER = 'A'.repeat(16);
     const { sim, pid } = marketSetup();
     for (let i = 0; i < 12; i++) {
       const payload: ItemInstancePayload = {
-        signer: 'A'.repeat(24),
+        signer: MAX_LEGAL_SIGNER,
         enchant: 'enchant_feet_agility',
         rolled: { quality: 'epic', stats: { str: 9, agi: 9, sta: 9, int: 9, spi: 9 } },
       };
@@ -460,6 +682,11 @@ describe('persistence: pre-payload saves and size bounds', () => {
       sim.marketListInstance(HIDE, 100, payload, pid);
     }
     expect(playerListings(sim)).toHaveLength(12);
+    // The persisted row now also carries the unit's exact source, so the shape
+    // being measured is payload PLUS composition. The budget below is the
+    // pre-source number and is deliberately NOT raised here: if it fails, the
+    // maintainer re-measures the real worst case and states the new number with
+    // its decomposition, rather than a worker widening it to whatever passed.
     const bytes = JSON.stringify(sim.serializeMarket()).length;
     expect(bytes).toBeLessThan(8192);
   });
