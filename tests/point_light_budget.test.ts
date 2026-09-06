@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   createFireLightAdopter,
   pruneFireLights,
@@ -217,6 +217,33 @@ describe('applyPointLightBudget', () => {
       expect(mid.light.visible).toBe(true);
       expect(far.light.visible).toBe(true);
       expect(near.light.visible).toBe(false);
+    });
+
+    it('an ineligible dynamic light skips the world-matrix walk entirely', () => {
+      // getWorldPosition walks and recomputes the whole ancestor matrix chain.
+      // A light nothing can draw (the far-LOD swap hid the rig carrying it, a
+      // streamed group is off) can never hold a counted slot, so paying that
+      // walk for it is pure waste, and a crowd of weapon-skin lights is exactly
+      // where it adds up. Eligibility is decided first and gates the read.
+      const scene = new THREE.Scene();
+      const hiddenGroup = new THREE.Group();
+      hiddenGroup.visible = false;
+      scene.add(hiddenGroup);
+      const hidden = inScene(scene, rankedLight(1, 0), hiddenGroup);
+      hidden.dynamic = true;
+      const shown = inScene(scene, rankedLight(5, 0));
+      shown.dynamic = true;
+      const hiddenRead = vi.spyOn(hidden.light, 'getWorldPosition');
+      const shownRead = vi.spyOn(shown.light, 'getWorldPosition');
+
+      applyPointLightBudget([hidden, shown], 0, 0, 2, 2, RANGE_SQ, scene);
+
+      expect(hiddenRead).not.toHaveBeenCalled();
+      // The eligible one still refreshes: a moving VFX light must not rank on
+      // a stale position.
+      expect(shownRead).toHaveBeenCalledTimes(1);
+      expect(hidden.light.visible).toBe(false);
+      expect(shown.light.visible).toBe(true);
     });
 
     it('a light not attached under the scene root is not drawn-eligible', () => {

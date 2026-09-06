@@ -241,8 +241,8 @@ describe('the shed applied to a live rig', () => {
       expect(nodes.every((n) => n.visible)).toBe(true);
       // the light dims WITHOUT losing its visible flag: three counts visible
       // point lights into every lit material's program cache key
-      expect(handle.light.intensity).toBeGreaterThan(0);
-      expect(handle.light.visible).toBe(true);
+      expect(handle.light?.intensity).toBeGreaterThan(0);
+      expect(handle.light?.visible).toBe(true);
     }
     handle.dispose();
   });
@@ -252,11 +252,11 @@ describe('the shed applied to a live rig', () => {
     const scaled = { ...DEFAULT_TUNING };
     handle.setTuning(scaleWeaponVfxTuning({}, 1, scaled));
     handle.update(1 / 60);
-    const bright = handle.light.intensity;
+    const bright = handle.light?.intensity ?? 0;
     handle.setTuning(scaleWeaponVfxTuning({}, 0.4, scaled));
     handle.update(1 / 60);
-    expect(handle.light.intensity).toBeGreaterThan(0);
-    expect(handle.light.intensity).toBeLessThan(bright);
+    expect(handle.light?.intensity).toBeGreaterThan(0);
+    expect(handle.light?.intensity).toBeLessThan(bright);
     let visible = 0;
     handle.group.traverse((o) => {
       if ((o as THREE.Mesh).isMesh || (o as THREE.Points).isPoints) visible += o.visible ? 1 : 0;
