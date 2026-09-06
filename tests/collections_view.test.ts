@@ -133,6 +133,10 @@ describe('collections view model', () => {
     expect(buddyKindOf('solbot')).toBe('humanoid');
     expect(buddyKindOf('frostfire')).toBe('elemental');
     expect(buddyKindOf('forgemaw')).toBe('elemental');
+    expect(buddyKindOf('phantom')).toBe('elemental');
+    // The fishing catch takes no override: it is a beast by its own family,
+    // which is the default path this list exists to keep honest.
+    expect(buddyKindOf('crystal_tide')).toBe('beast');
     // And nothing else drifted into them: every other companion still groups
     // by its family, so a new buddy lands in a creature group by default.
     const authored = BUDDY_KEYS.filter((key) => BUDDIES[key].kind !== undefined);
@@ -141,6 +145,7 @@ describe('collections view model', () => {
         'alon',
         'ansem',
         'forgemaw',
+        'phantom',
         'frostfire',
         'kekius',
         'rocky',

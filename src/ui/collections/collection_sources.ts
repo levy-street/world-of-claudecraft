@@ -19,7 +19,11 @@
 import { HEROIC_BOSS_LOOT } from '../../sim/content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from '../../sim/content/heroic_vendor';
 import { DUNGEONS, ITEMS, MOBS, NPCS, zoneAt } from '../../sim/data';
-import { GLOBAL_BUDDY_DROP_TIERS } from '../../sim/loot/global_drops';
+import {
+  buddyWhistlesOfQuality,
+  FISHING_BUDDY_DROP,
+  GLOBAL_BUDDY_DROP_TIERS,
+} from '../../sim/loot/global_drops';
 import type { ItemDef } from '../../sim/types';
 
 /** What a vendor charges. Gold is copper; honor and marks are their own
@@ -77,6 +81,12 @@ export interface CollectionItemFacts {
    *  while the tier is held at chance 0, which is how a withheld tier reads as
    *  "no source" rather than as a 0% drop the player could chase forever. */
   globalDrop: CollectionGlobalDropSource | null;
+  /** The share of every landed catch that lands this whistle instead of a
+   *  fish, for the one companion the water gives up (loot/global_drops.ts
+   *  FISHING_BUDDY_DROP). Null for everything else, which is everything else.
+   *  A number rather than a source record: fishing has no mob and no vendor to
+   *  name, and "anywhere" is the whole of its location. */
+  fishingDrop: number | null;
   /** False when nothing in the game grants this item today. */
   obtainable: boolean;
 }
@@ -165,16 +175,24 @@ function dropsFor(itemId: string): CollectionDropSource[] {
 }
 
 /** Buddy whistles only: the tier this quality rides, when it can actually
- *  drop. A tier held at chance 0 (rare and epic today) reports null. */
+ *  drop. A tier held at chance 0 (epic today) reports null, and so does a
+ *  whistle the tier's pool withholds -- the Crystal Tide, which fishing owns
+ *  outright. Both the membership test and the count come from the roller's
+ *  own pool rather than a second sweep over ITEMS, so the line can never claim
+ *  a source the loot table would not actually pay. */
 function globalDropFor(def: ItemDef): CollectionGlobalDropSource | null {
   if (def.kind !== 'buddy') return null;
   const quality = def.quality ?? 'common';
   const tier = GLOBAL_BUDDY_DROP_TIERS.find((t) => t.quality === quality);
   if (!tier || tier.chance <= 0) return null;
-  const poolSize = Object.values(ITEMS).filter(
-    (item) => item.kind === 'buddy' && (item.quality ?? 'common') === quality,
-  ).length;
-  return { quality, chance: tier.chance, poolSize };
+  const pool = buddyWhistlesOfQuality(quality);
+  if (!pool.includes(def.id)) return null;
+  return { quality, chance: tier.chance, poolSize: pool.length };
+}
+
+/** The catch share, for the one whistle fishing hands out. */
+function fishingDropFor(itemId: string): number | null {
+  return itemId === FISHING_BUDDY_DROP.itemId ? FISHING_BUDDY_DROP.chance : null;
 }
 
 /** Everything the Collections window needs about one collectible's item. */
@@ -186,6 +204,7 @@ export function collectionItemFacts(itemId: string): CollectionItemFacts | null 
   const vendors = vendorsFor(itemId, def);
   const drops = dropsFor(itemId);
   const globalDrop = globalDropFor(def);
+  const fishingDrop = fishingDropFor(itemId);
   const facts: CollectionItemFacts = {
     itemId,
     name: def.name,
@@ -197,7 +216,9 @@ export function collectionItemFacts(itemId: string): CollectionItemFacts | null 
     vendors,
     drops,
     globalDrop,
-    obtainable: vendors.length > 0 || drops.length > 0 || globalDrop !== null,
+    fishingDrop,
+    obtainable:
+      vendors.length > 0 || drops.length > 0 || globalDrop !== null || fishingDrop !== null,
   };
   cache.set(itemId, facts);
   return facts;

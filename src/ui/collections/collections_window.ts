@@ -127,6 +127,8 @@ const BUDDY_LORE: Readonly<Record<string, TranslationKey>> = {
   skeleton: 'hudChrome.collections.buddyLore.skeleton',
   crystal_lich: 'hudChrome.collections.buddyLore.crystal_lich',
   forgemaw: 'hudChrome.collections.buddyLore.forgemaw',
+  crystal_tide: 'hudChrome.collections.buddyLore.crystal_tide',
+  phantom: 'hudChrome.collections.buddyLore.phantom',
 };
 
 const PET_KIND_LABEL: Record<CollectionPetKind, TranslationKey> = {
@@ -416,6 +418,14 @@ export class CollectionsWindow {
             chance: pct(facts.globalDrop.chance),
             count: num(facts.globalDrop.poolSize),
           }),
+        ),
+      );
+    }
+    if (facts.fishingDrop !== null) {
+      lines.push(
+        this.line(
+          'hudChrome.collections.detail.dropLabel',
+          t('hudChrome.collections.detail.fishingDrop', { chance: pct(facts.fishingDrop) }),
         ),
       );
     }

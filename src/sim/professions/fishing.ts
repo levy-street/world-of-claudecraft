@@ -25,6 +25,7 @@ import { FISHING_RARE_ID, FISHING_TABLES_BY_BAND, isRawCookingCatch } from '../c
 import { DEEPFEN_SHALLOWS_LAKE } from '../content/zone2';
 import { ITEMS, zoneAt } from '../data';
 import { onFishCaughtForDeeds } from '../deeds';
+import { FISHING_BUDDY_DROP } from '../loot/global_drops';
 import { forceDismount } from '../mounts';
 import { PLAYER_SWIM_DEPTH } from '../pathfind';
 import type { PlayerMeta } from '../sim';
@@ -581,13 +582,29 @@ export function completeFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): v
   const zoneId = p.fishCastZoneId || zoneAt(p.pos.x, p.pos.z).id;
   const table = bandTables[zoneId] ?? bandTables.eastbrook_vale;
   const total = table.reduce((sum, e) => sum + e.weight, 0);
-  let roll = ctx.rng.next() * total;
+  // ONE draw, two questions. The bottom FISHING_BUDDY_DROP.chance of the
+  // uniform lands the Crystal Tide whistle (loot/global_drops.ts) and the rest
+  // of it rides the catch table exactly as it always has: `u * total` is the
+  // same mapping the table has always been read with, so every catch above the
+  // slice resolves to the fish it resolved to before this existed. That is why
+  // the companion is a SHARE of the catch and not a bonus beside it -- a
+  // second chance() draw would land the whistle without displacing a fish, but
+  // it would also shift the whole stream and re-mint every pinned catch
+  // sequence and every fishing parity golden. The cost of the cheap version is
+  // that the slice comes out of the table's FIRST row, which is a real 0.5%
+  // shave on that row and is accepted knowingly.
+  const u = ctx.rng.next();
+  let roll = u * total;
   let caught: string | null = null;
-  for (const entry of table) {
-    roll -= entry.weight;
-    if (roll < 0) {
-      caught = entry.itemId;
-      break;
+  if (u < FISHING_BUDDY_DROP.chance) {
+    caught = FISHING_BUDDY_DROP.itemId;
+  } else {
+    for (const entry of table) {
+      roll -= entry.weight;
+      if (roll < 0) {
+        caught = entry.itemId;
+        break;
+      }
     }
   }
   if (caught === null) {

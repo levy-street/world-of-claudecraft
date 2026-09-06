@@ -6379,7 +6379,9 @@
         "whistle_raptor",
         "whistle_skeleton",
         "whistle_crystal_lich",
-        "whistle_forgemaw"
+        "whistle_forgemaw",
+        "whistle_crystal_tide",
+        "whistle_phantom"
       ],
       "commonPrompt": "Not a text-to-image prompt: deterministic in-engine still of the committed GLB model (hero three-quarter turntable view, auto-framed to the model's bounding sphere) resized to 128px; ember_fox/moss_hare apply a post-render tint recoloring the shared fox rig."
     }

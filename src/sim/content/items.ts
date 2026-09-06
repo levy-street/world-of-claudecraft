@@ -687,6 +687,25 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     sellValue: 50_000, // 5g, the flat vendor price every whistle takes
   },
+  // The angler's companion: fished up anywhere at 0.5% a catch
+  // (professions/fishing.ts). Rare, so it also rides the global rare tier's
+  // 0.05% off a kill like the three vendor rares do.
+  whistle_crystal_tide: {
+    id: 'whistle_crystal_tide',
+    name: 'Crystal Tide Whistle',
+    kind: 'buddy',
+    buddy: 'crystal_tide',
+    quality: 'rare',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
+  whistle_phantom: {
+    id: 'whistle_phantom',
+    name: 'Phantom Whistle',
+    kind: 'buddy',
+    buddy: 'phantom',
+    quality: 'uncommon',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
   // Developer-only, same treatment as the tank above: no acquisition path, so
   // it stays soulbound rather than tradable. Use /dev give reins_rickshaw_mount
   // while the feature remains under development.

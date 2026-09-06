@@ -3481,7 +3481,9 @@ export const da_DK: EnTranslations = {
         "raptor": "Drakelands hatchling stock, sold on before it learns how fast it can run. Every new owner is told to keep it fed, and none of them need telling twice.",
         "skeleton": "It came up out of the Wraithwood barrows, dusted itself off, and has followed people about ever since. Nobody has established whose bones these were.",
         "crystal_lich": "A splinter of Nythraxis itself, still humming with the cold that shaped it. It answers to whoever pulled it from the wreck of the raid, and it has not forgiven them for it.",
-        "forgemaw": "Forged in the Crucible of the Last Spring and never quite finished, it walked out of Ignivar's foundry while the hammers were still falling. Only the heroic descent finds it: the molten thing keeps returning to the forge that made it, and follows home whoever survives the fire twice."
+        "forgemaw": "Forged in the Crucible of the Last Spring and never quite finished, it walked out of Ignivar's foundry while the hammers were still falling. Only the heroic descent finds it: the molten thing keeps returning to the forge that made it, and follows home whoever survives the fire twice.",
+        "crystal_tide": "A tide sprite that rides its own drop of sea-glass, hooked out of still water by anglers from the Vale to Farshore who were fishing for supper. It keeps the water it came up in, and it will not be talked into going back.",
+        "phantom": "A palm-sized haunt out of the Wraithwood barrows, all sheet and no bones, which turns up in a pack that was closed and stays for the company. Nobody has worked out what it wants, and it has never once tried to frighten anyone."
       },
       "petKind": {
         "beast": "Beasts",
@@ -3518,6 +3520,7 @@ export const da_DK: EnTranslations = {
         "heroicDrop": "{mob} ({location}), Heroic only, {chance}% per kill",
         "dropWithHeroic": "{mob} ({location}), {chance}% per kill, {heroicChance}% on Heroic",
         "globalDrop": "Any enemy, {chance}% per kill, one of {count} at this rarity",
+        "fishingDrop": "Fishing anywhere, {chance}% per catch",
         "vendor": "{npc} ({location}) for {price}",
         "honorPrice": "{amount} Honor",
         "marksPrice": "{amount} Heroic Marks",
@@ -13485,6 +13488,12 @@ export const da_DK: EnTranslations = {
       "whistle_forgemaw": {
         "name": "Forgemaw The Molten Whistle"
       },
+      "whistle_crystal_tide": {
+        "name": "Crystal Tide Whistle"
+      },
+      "whistle_phantom": {
+        "name": "Phantom Whistle"
+      },
       "lastflame_core": {
         "name": "Den sidste flammes kerne"
       },
@@ -15577,6 +15586,12 @@ export const da_DK: EnTranslations = {
       },
       "buddy_forgemaw": {
         "name": "Forgemaw The Molten"
+      },
+      "buddy_crystal_tide": {
+        "name": "Crystal Tide"
+      },
+      "buddy_phantom": {
+        "name": "Phantom"
       },
       "ironvein_foreman": {
         "name": "Jernåre-Formand"

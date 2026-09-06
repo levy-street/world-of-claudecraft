@@ -4731,6 +4731,10 @@ export const hudChromeStrings = {
         'A splinter of Nythraxis itself, still humming with the cold that shaped it. It answers to whoever pulled it from the wreck of the raid, and it has not forgiven them for it.',
       forgemaw:
         "Forged in the Crucible of the Last Spring and never quite finished, it walked out of Ignivar's foundry while the hammers were still falling. Only the heroic descent finds it: the molten thing keeps returning to the forge that made it, and follows home whoever survives the fire twice.",
+      crystal_tide:
+        'A tide sprite that rides its own drop of sea-glass, hooked out of still water by anglers from the Vale to Farshore who were fishing for supper. It keeps the water it came up in, and it will not be talked into going back.',
+      phantom:
+        'A palm-sized haunt out of the Wraithwood barrows, all sheet and no bones, which turns up in a pack that was closed and stays for the company. Nobody has worked out what it wants, and it has never once tried to frighten anyone.',
     },
     // The buddy tab groups by what a companion IS before it sorts by rarity.
     petKind: {
@@ -4780,6 +4784,9 @@ export const hudChromeStrings = {
       // The buddy whistles ride one shared per-kill roll for their whole rarity
       // tier, so the odds belong to the tier and the winner is drawn from it.
       globalDrop: 'Any enemy, {chance}% per kill, one of {count} at this rarity',
+      // Fishing: no mob to name and no place to name either, since any water
+      // in the world pays the same share of a landed catch.
+      fishingDrop: 'Fishing anywhere, {chance}% per catch',
       vendor: '{npc} ({location}) for {price}',
       honorPrice: '{amount} Honor',
       marksPrice: '{amount} Heroic Marks',

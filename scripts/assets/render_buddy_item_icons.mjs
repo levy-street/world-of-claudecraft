@@ -62,6 +62,9 @@ export const BUDDY_ICON_BATCH = [
   { itemId: 'whistle_crystal_lich', glb: 'public/models/buddies/crystal_lich.glb' },
   // The epic heroic-Crucible drop, from its own GLB.
   { itemId: 'whistle_forgemaw', glb: 'public/models/buddies/forgemaw.glb' },
+  // The fishing catch and the green elemental, both from their own GLBs.
+  { itemId: 'whistle_crystal_tide', glb: 'public/models/buddies/crystal_tide.glb' },
+  { itemId: 'whistle_phantom', glb: 'public/models/buddies/phantom.glb' },
 ];
 
 /** True when a GLB declares the KTX2 texture extension, which the preview

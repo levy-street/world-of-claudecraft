@@ -148,6 +148,15 @@ export const BUDDY_MOBS: Record<string, MobTemplate> = {
     'elemental',
     0xffffff,
   ),
+  // The fishing catch and the green elemental. Both ship their own GLB with
+  // baked textures and no tint, so the color is inert here as usual.
+  [buddyTemplateId('crystal_tide')]: buddyTemplate(
+    'crystal_tide',
+    'Crystal Tide',
+    'beast',
+    0xffffff,
+  ),
+  [buddyTemplateId('phantom')]: buddyTemplate('phantom', 'Phantom', 'elemental', 0xffffff),
 };
 
 /** Every valid buddy templateId, for the cheap `isBuddyMob` membership check

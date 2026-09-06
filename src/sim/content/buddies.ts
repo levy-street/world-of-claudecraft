@@ -50,7 +50,9 @@ export type BuddyKey =
   | 'raptor'
   | 'skeleton'
   | 'crystal_lich'
-  | 'forgemaw';
+  | 'forgemaw'
+  | 'crystal_tide'
+  | 'phantom';
 
 /** How the Hunting window groups a companion. Mostly the follower's own mob
  *  family says it (a wolf is a beast), but two groups are editorial and no
@@ -219,6 +221,20 @@ export const BUDDIES: Record<BuddyKey, BuddyDef> = {
   forgemaw: {
     key: 'forgemaw',
     name: 'Forgemaw The Molten',
+    kind: 'elemental',
+  },
+  // rare, and the only companion that comes out of the water: a 0.5% share of
+  // every landed catch, in any zone (src/sim/professions/fishing.ts, riding
+  // the same single draw the catch table rides).
+  crystal_tide: {
+    key: 'crystal_tide',
+    name: 'Crystal Tide',
+  },
+  // uncommon, on the ordinary green drop: nothing names it, so it rides the
+  // global whistle table like every other uncommon (loot/global_drops.ts).
+  phantom: {
+    key: 'phantom',
+    name: 'Phantom',
     kind: 'elemental',
   },
 };

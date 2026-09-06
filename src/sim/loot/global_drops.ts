@@ -43,6 +43,36 @@ export const GLOBAL_BUDDY_DROP_TIERS: readonly GlobalBuddyDropTier[] = [
   { quality: 'epic', chance: 0 },
 ];
 
+// The angler's companion (2026-09-06 owner request): Crystal Tide is fished
+// up anywhere, at 0.5% of every landed catch. It lives here rather than in
+// professions/fishing.ts because this module is where a buddy's sources that
+// are NOT a mob's own loot table are declared, and because the whistle it
+// names has to stay one edit away from the tier list above: the companion is
+// rare, so it ALSO rides the 0.05% rare tier off a kill, and a reader tuning
+// one rate should see the other.
+//
+// Being a share of the catch rather than a bonus beside it is deliberate: a
+// cast is one rng draw by contract (professions/fishing.ts), and this rides
+// the bottom slice of that same draw. See the draw site for why that keeps
+// every pinned catch sequence and every fishing parity golden intact.
+//
+// FISHING IS ITS ONLY SOURCE. Being a rare would otherwise put it in the rare
+// tier's pool below and let any kill in the world hand it over, which is not
+// what it is: it is the angler's companion, and a companion earned at the
+// water should not also fall off a boar. WITHHELD_FROM_GLOBAL_POOL is what
+// enforces that, and this is the one entry on it.
+export const FISHING_BUDDY_DROP = {
+  itemId: 'whistle_crystal_tide',
+  chance: 0.005,
+} as const;
+
+/** Whistles the global tier pools never carry, because something else in the
+ *  game owns their acquisition outright. Not the same as a withheld TIER (a
+ *  tier at chance 0 withholds every whistle in it); this withholds one
+ *  companion from a tier that is otherwise live, so the rare tier still hands
+ *  out the three vendor rares at 0.05% while never handing out this one. */
+const WITHHELD_FROM_GLOBAL_POOL: ReadonlySet<string> = new Set([FISHING_BUDDY_DROP.itemId]);
+
 // Built once at module load from the merged ITEMS catalog (not just
 // content/items.ts) so a buddy whistle added anywhere else joins its tier's
 // pool automatically. Sorted for a stable, reviewable id order that never
@@ -50,14 +80,17 @@ export const GLOBAL_BUDDY_DROP_TIERS: readonly GlobalBuddyDropTier[] = [
 const BUDDY_WHISTLES_BY_QUALITY: Record<string, string[]> = {};
 for (const item of Object.values(ITEMS)) {
   if (item.kind !== 'buddy') continue;
+  if (WITHHELD_FROM_GLOBAL_POOL.has(item.id)) continue;
   const quality = item.quality ?? 'common';
   if (!BUDDY_WHISTLES_BY_QUALITY[quality]) BUDDY_WHISTLES_BY_QUALITY[quality] = [];
   BUDDY_WHISTLES_BY_QUALITY[quality].push(item.id);
 }
 for (const pool of Object.values(BUDDY_WHISTLES_BY_QUALITY)) pool.sort();
 
-/** Every buddy-whistle item id of `quality`, in a fixed sorted order (empty
- *  when the catalog has none at that quality yet). */
+/** Every buddy-whistle item id of `quality` the global table can actually
+ *  hand out, in a fixed sorted order (empty when the catalog has none at that
+ *  quality yet). A withheld companion is absent, so this is also the honest
+ *  answer to "one of how many" for the UI. */
 export function buddyWhistlesOfQuality(quality: string): readonly string[] {
   return BUDDY_WHISTLES_BY_QUALITY[quality] ?? [];
 }

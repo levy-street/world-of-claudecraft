@@ -2297,6 +2297,16 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: BUDDY_CLIPS,
   },
   // epic, the heroic Crucible drop. Baked molten texture, so no tint.
+  buddy_crystal_tide: {
+    url: `${BUDDIES_DIR}/crystal_tide.glb`,
+    height: 0.8,
+    clips: BUDDY_CLIPS,
+  },
+  buddy_phantom: {
+    url: `${BUDDIES_DIR}/phantom.glb`,
+    height: 0.8,
+    clips: BUDDY_CLIPS,
+  },
   buddy_forgemaw: {
     url: `${BUDDIES_DIR}/forgemaw.glb`,
     height: 0.85,
@@ -3709,6 +3719,8 @@ const MOB_KEYS: Record<string, string> = {
   buddy_skeleton: 'buddy_skeleton',
   buddy_crystal_lich: 'buddy_crystal_lich',
   buddy_forgemaw: 'buddy_forgemaw',
+  buddy_crystal_tide: 'buddy_crystal_tide',
+  buddy_phantom: 'buddy_phantom',
   // Packlord Stampede guardians are transient local templates, not MOBS rows.
   // Give the three summoned beasts distinct existing bodies instead of the
   // generic humanoid bandit fallback.
